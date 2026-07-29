@@ -112,11 +112,11 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
       queuedOnSwing: opts.queuedOnSwing ?? null,
       pos: opts.playerPos ?? { x: 0, y: 0, z: 0 },
       abilityCharges: opts.abilityCharges,
-      stealthed: opts.stealthed ?? false,
       auras: opts.auras ?? [],
     },
     target: targetPos === null ? null : { dead: opts.targetDead ?? false, pos: targetPos },
     inventory: opts.inventory ?? [],
+    stealthed: opts.stealthed ?? false,
   };
 }
 

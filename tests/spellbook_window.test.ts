@@ -69,7 +69,10 @@ describe('spellbook_window: the pinned Attack row', () => {
     expect(code.indexOf('this.appendAttackRow(list')).toBeLessThan(
       code.indexOf('for (const row of view.rows) this.appendRow(list, row)'),
     );
-    expect(code).toContain('attackOnBar: this.deps.attackOnBar()');
+    // The Attack state reaches the view through the latch takeControlChange() fills at
+    // the top of render(), not a second deps.attackOnBar() read (#2519).
+    expect(code).toContain('attackOnBar: this.lastAttackOnBar');
+    expect(code).toContain('const attackOnBar = this.deps.attackOnBar()');
   });
 
   it('reuses the existing Attack name/tooltip keys (no new player strings)', () => {
@@ -84,7 +87,18 @@ describe('spellbook_window: the pinned Attack row', () => {
   });
 
   it('keeps the per-frame refresh syncing the Attack toggle (options can flip it)', () => {
-    expect(code).toContain("querySelector<HTMLButtonElement>('[data-attack-toggle]')");
+    // The ref is COLLECTED as appendAttackRow builds the button, not re-found by its
+    // marker on every frame (#2519). The behavior is driven in
+    // tests/spellbook_tick_repaint.test.ts.
+    //
+    // The `data-attack-toggle` marker stays, and its remaining readers are worth naming
+    // because none of them is in src/: the styling keys off the `.spell-hotbar-toggle`
+    // CLASS, and the drag path carries HOTBAR_ATTACK_MIME on the row, so after this
+    // change the marker is read only by scripts/spellbook_attack_shot.mjs (the Attack-row
+    // screenshot probe) and by the tests/spellbook_tick_repaint.test.ts harness. Both
+    // break silently if the dataset write is removed as dead.
+    expect(code).toContain('this.attackToggle = toggle');
+    expect(code).toContain('const attackBtn = this.attackToggle');
     expect(code).toContain("attackBtn.setAttribute('aria-pressed'");
   });
 });
@@ -109,8 +123,31 @@ describe('spellbook_window: the Attack row is draggable onto the action bar', ()
 });
 
 describe('spellbook_window: mobile action-ring page label (Phase 4, touch-only)', () => {
-  it('feeds abilityIdByBarSlot through to the pure view core', () => {
-    expect(code).toContain('abilityIdByBarSlot: this.deps.abilityIdByBarSlot()');
+  it('feeds the per-slot ability ids through to the pure view core', () => {
+    // Derived from the bar's live slot array at render time rather than taken as its own
+    // allocating dep, since the per-frame change check walks the same array (#2519).
+    expect(code).toContain('abilityIdByBarSlot: this.lastSlotIds');
+    expect(code).toContain('this.lastSlotIds.push(slotAbilityId(action))');
+    expect(code).toMatch(/slotAbilityId\(action: HotbarAction\): string \| null/);
+  });
+
+  it('takes the bar as Hud LIVE slot array, with no copy in between', () => {
+    // The per-frame change check walks whatever this dep returns, so a defensive copy on
+    // the Hud side would put a fresh 33-element array back on every frame the window is
+    // open, which is the allocation #2519 removed. Nothing behavioral can see that (a copy
+    // compares equal), so the wiring is pinned here.
+    //
+    // Scoped to the spellbook's own deps bag rather than the whole of hud.ts: the negative
+    // half would otherwise fire on any UNRELATED window that happens to take a dep by one
+    // of these names.
+    const bagStart = hud.indexOf('new SpellbookWindow({');
+    expect(bagStart, 'the spellbook deps bag moved or was renamed').toBeGreaterThan(-1);
+    const bag = hud.slice(bagStart, hud.indexOf('  });', bagStart));
+    expect(bag).toContain('barActions: () => this.hotbarActions');
+    expect(bag, 'the two allocating derived bar deps should be gone').not.toContain(
+      'barAbilityIds',
+    );
+    expect(bag).not.toContain('abilityIdByBarSlot');
   });
 
   it('gates the page label on both a non-null mobilePage AND touch mode', () => {
@@ -144,44 +181,73 @@ describe('spellbook_window: hud.update() refresh call site', () => {
   it('drives the open spellbook from hud.update() through tickOpen while displayed', () => {
     // Pin the hud.ts call site so a refactor cannot silently stop the open
     // spellbook from tracking action-bar AND talent changes. tickOpen re-renders
-    // on a resolved-numbers change, else falls back to the cheap toggle refresh.
+    // on a resolved-numbers change, else falls back to the gated toggle refresh.
     expect(hud).toContain('if (this.spellbookWindow.isOpen) this.spellbookWindow.tickOpen();');
+  });
+
+  it('gates the per-frame fall-through behind its own change check (#2519)', () => {
+    // The fall-through used to repaint unconditionally. Both entry points survive and
+    // are different contracts: tickOpen takes the gated one, and Hud keeps the forced
+    // one for the bar changes it makes itself (the login layout restore, reset-form-bar).
+    // What either one DOES is driven in tests/spellbook_tick_repaint.test.ts; these two
+    // pins only keep the per-frame call site pointed at the gated variant.
+    expect(code).toContain('this.refreshHotbarControlsIfChanged()');
+    expect(code).toContain('if (!this.takeControlChange()) return');
+    expect(hud).toContain('this.spellbookWindow.refreshHotbarControls();');
+    // The change check walks the slot array IN PLACE. A derived list here would allocate on
+    // every frame the window is open, and no behavioral test can see it (the derived list
+    // compares the same), so the shape is pinned: an index loop over `actions`, no map /
+    // filter / spread.
+    expect(code).toContain('for (let i = 0; i < actions.length; i++)');
+    const movedStart = code.indexOf('private controlsMoved(');
+    const movedBody = code.slice(
+      movedStart,
+      code.indexOf('private paintHotbarControls(', movedStart),
+    );
+    expect(movedStart, 'controlsMoved went missing').toBeGreaterThan(-1);
+    for (const alloc of ['.map(', '.filter(', '.flatMap(', '.concat(', 'new Set(', '...']) {
+      expect(movedBody, `controlsMoved allocates via ${alloc}`).not.toContain(alloc);
+    }
   });
 
   it('keeps the in-place refresh updating the aria-pressed + disabled state per toggle', () => {
     // The call-site guard above proves the refresh fires; this pins what it WRITES.
-    // refreshHotbarControls keys off `btn` (vs appendRow's `toggle`), so the row
+    // paintHotbarControls keys off `btn` (vs appendRow's `toggle`), so the row
     // guard does not cover this path: without these, the open spellbook's toggles
     // would stop tracking the bar (the whole reason this path is not-cold).
     expect(code).toContain("btn.setAttribute('aria-pressed'");
-    expect(code).toContain('btn.disabled = !onBar && !hasFree');
+    expect(code).toContain('const disabled = !onBar && !hasFree');
+    expect(code).toContain('if (btn.disabled !== disabled) btn.disabled = disabled');
   });
 
-  it('elides the per-frame toggle writes to on-bar flips only (this runs every frame)', () => {
-    // refreshHotbarControls fires on EVERY animation frame while the window is open, so
-    // the +/- text, the remove class, the aria-pressed, and the i18n-backed aria-label
-    // are gated on an actual on-bar membership flip (read from aria-pressed, which
-    // appendRow seeds), not rewritten unconditionally. Only `disabled` stays per-frame
-    // (it depends on hasFree). A revert to unconditional writes drops this guard.
+  it('elides the toggle writes to on-bar flips only, per row', () => {
+    // A repaint fires when any of the three bar inputs moves, so the +/- text, the
+    // remove class, the aria-pressed, and the i18n-backed aria-label are gated on an
+    // actual on-bar membership flip (read from aria-pressed, which appendRow seeds),
+    // not rewritten for every row. A revert to unconditional writes drops this guard.
     expect(code).toContain("(btn.getAttribute('aria-pressed') === 'true') !== onBar");
   });
 });
 
 describe('spellbook_window: tooltip/summary reflect talent changes (tooltip parity)', () => {
   it('re-renders the open window only when a resolved ability number changed', () => {
-    // tickOpen compares a content signature (id/rank/cost/cast/cooldown) of
-    // world.known, not its array identity: the online mirror rebuilds that array
-    // every snapshot, so reference equality would rebuild the DOM every frame. A
-    // real change (e.g. a talent dropping Wicked Slash cost 45 -> 40) rebuilds the
-    // row summaries; an unchanged frame falls back to the cheap toggle refresh.
+    // tickOpen compares the CONTENT of world.known (id/rank/cost/cast/cooldown), not
+    // its array identity: the online mirror rebuilds that array every snapshot, so
+    // reference equality would rebuild the DOM every frame. A real change (e.g. a
+    // talent dropping Wicked Slash cost 45 -> 40) rebuilds the row summaries; an
+    // unchanged frame falls through to the gated toggle refresh.
     expect(code).toContain('tickOpen()');
-    expect(code).toContain(
-      'SpellbookWindow.knownSig(this.deps.world().known) !== this.lastKnownSig',
-    );
-    expect(code).toContain('this.lastKnownSig = SpellbookWindow.knownSig(world.known)');
-    // the signature carries the numbers a row summary paints, so a cost/cooldown
-    // change flips it (a bare id:rank would miss a same-rank talent cost cut).
-    expect(code).toMatch(/knownSig[\s\S]*k\.def\.id.*k\.rank.*k\.cost.*k\.castTime.*k\.cooldown/);
+    expect(code).toContain('if (this.knownChanged(this.deps.world().known)) {');
+    expect(code).toContain('this.captureKnown(world.known)');
+    // The comparison carries every number a row summary paints, so a cost/cooldown
+    // change flips it (a bare id/rank check would miss a same-rank talent cost cut).
+    // Field-by-field on purpose (#2519): the joined signature string this replaced
+    // was rebuilt on every frame the window was open.
+    for (const field of ['k.rank', 'k.cost', 'k.castTime', 'k.cooldown']) {
+      expect(code, `knownChanged stopped comparing ${field}`).toContain(`${field} !== this.known`);
+    }
+    expect(code).toContain('k.def.id !== this.knownIds[i]');
+    expect(code).toContain('this.knownNums.push(k.rank, k.cost, k.castTime, k.cooldown)');
   });
 
   it('preserves scroll position and keyboard focus across the talent-driven rebuild', () => {

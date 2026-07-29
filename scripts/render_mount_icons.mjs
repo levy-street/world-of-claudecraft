@@ -1,5 +1,5 @@
-// Render 3D face/front icons for the six rideable mounts, for use as the 2D bag/tooltip
-// icons on their reins items. Mirrors the headless-Chrome +
+// Render 3D face/front icons for the rideable mounts, for use as the 2D bag/tooltip
+// icons on their reins items (and the mount-picker cards). Mirrors the headless-Chrome +
 // swiftshader harness of scripts/render_weapon_icons.mjs and the transparent-WebP + blank
 // alpha check of scripts/wiki/render_model_stills.mjs, but frames a front three-quarter
 // close-up of each mount's head from its own bounding box (see scripts/mount_icon_entry.js
@@ -16,6 +16,7 @@ import * as esbuild from 'esbuild';
 import puppeteer from 'puppeteer-core';
 import sharp from 'sharp';
 import { BROWSER_PATH } from './browser_path.mjs';
+import { ktx2TranscoderScriptTag } from './lib/ktx2_assets.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mountsDir = path.join(root, 'public/models/mounts');
@@ -69,6 +70,21 @@ const JOBS = [
     id: 'reins_thunderstrut_gobbler',
     cfg: { headFwd: 0.7, headUp: 0.7, fill: 0.62, yaw: 0.45, pitch: 0.12 },
   },
+  {
+    // Show the cannon, prow, and near track together so the silhouette reads
+    // as a vehicle even at bag-icon size.
+    file: 'terrorspark_groundshaker.glb',
+    id: 'reins_terrorspark_groundshaker',
+    cfg: { headFwd: 0.1, headUp: 0, fill: 1.18, yaw: 0.68, pitch: 0.24 },
+  },
+  {
+    // The raptor carries its head high and well forward on a long neck, above a
+    // saddle set back over the hips: anchor forward and high, and look slightly
+    // down so the snout reads rather than the saddle behind it.
+    file: 'drakemaw_raptor.glb',
+    id: 'reins_drakemaw_raptor',
+    cfg: { headFwd: 0.95, headUp: 0.82, fill: 0.55, yaw: 0.52, pitch: 0.14 },
+  },
 ];
 
 const only = process.env.ONLY ? new Set(process.env.ONLY.split(',')) : null;
@@ -83,7 +99,10 @@ const built = await esbuild.build({
   logLevel: 'silent',
 });
 const bundleJs = built.outputFiles[0].text;
-const html = `<!doctype html><html><head><meta charset="utf8"><style>html,body{margin:0;background:transparent}</style></head><body><script>${bundleJs}</script></body></html>`;
+const ktx2Tag = ktx2TranscoderScriptTag(
+  path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'),
+);
+const html = `<!doctype html><html><head><meta charset="utf8"><style>html,body{margin:0;background:transparent}</style></head><body>${ktx2Tag}<script>${bundleJs}</script></body></html>`;
 
 // 2) Drive headless Chrome over software WebGL.
 const browser = await puppeteer.launch({

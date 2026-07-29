@@ -8,6 +8,7 @@
   import Panel from '../components/Panel.svelte';
   import Pager from '../components/Pager.svelte';
   import CharactersTable from '../components/CharactersTable.svelte';
+  import CharacterProfessionsModal from '../components/CharacterProfessionsModal.svelte';
 
   let characters = $state<Paginated<CharacterRow> | null>(null);
   let failed = $state(false);
@@ -16,6 +17,8 @@
   let dir = $state<'asc' | 'desc'>('desc');
   let page = $state(1);
   let searchTimer: ReturnType<typeof setTimeout> | null = null;
+  // R35 professions inspector: the character whose modal is open.
+  let inspected = $state<CharacterRow | null>(null);
 
   async function refresh(): Promise<void> {
     try {
@@ -75,6 +78,20 @@
   {#if failed}
     <div class="empty">{t('characters.loadFailed')}</div>
   {:else if characters}
-    <CharactersTable rows={characters.rows} {sort} {dir} {onSort} />
+    <CharactersTable
+      rows={characters.rows}
+      {sort}
+      {dir}
+      {onSort}
+      onInspectProfessions={(row) => (inspected = row)}
+    />
   {/if}
 </Panel>
+
+{#if inspected}
+  <CharacterProfessionsModal
+    characterId={inspected.id}
+    characterName={inspected.name}
+    onClose={() => (inspected = null)}
+  />
+{/if}

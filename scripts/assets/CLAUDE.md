@@ -28,6 +28,23 @@ For reference-image reconstruction and procedural GLB authoring, read the living
 - **`build_foliage.mjs`** is a superset for `foliage.json`: adds `weld + simplify`
   (target `ratio`), strips constant-white `COLOR_0`, and hue-rotates leaf textures
   via `recolor` rules. Use this only for foliage.
+- **`build_battleground_map.mjs`** (+ `battleground/`, own CLAUDE.md) builds the Thornhollow Fields
+  field's map document from the combat plan plus the Thornhollow art kit, and
+  `compile_thornhollow.mjs` compiles that document into `src/sim/thornhollow_field.generated.ts`.
+  Both are deterministic and both committed artifacts are freshness-gated by
+  `tests/battleground_band.test.ts`: re-run BOTH after any edit under `battleground/`.
+- **`compress_glb_textures.mjs` is the mandatory FINAL step after ANY exporter run.**
+  Every embedded texture in a shipped GLB is KTX2/Basis (`KHR_texture_basisu`) so it
+  stays GPU-compressed in memory instead of decoding to a full RGBA bitmap (the decode
+  amplification of the old webp embeds is what got the native iOS client jetsam-killed
+  at world entry). The exporters above still emit webp; re-running one and committing
+  its raw output silently reverts that asset, and `tests/glb_texture_compression.test.ts`
+  turns the drift red. Recover with
+  `node scripts/assets/compress_glb_textures.mjs && node scripts/build_media_manifest.mjs generate`.
+  It needs the `ktx` tool from KhronosGroup/KTX-Software 4.3+ on PATH (no sudo: expand
+  the release pkg with `pkgutil --expand-full`, add its `bin/` to PATH). The one
+  sanctioned exception, WEAPON_VFX skin models, is excluded automatically (their
+  emissive derivation must drawImage the baseColor; see the test header).
 - **Per-asset procedural exporters** (`banker_chest/`, `eastbrook_town/`,
   `eastbrook_grand_armoury/`, `eastbrook_mailbox/`, `eastbrook_noticeboard/`) author GLBs
   from reference images: deterministic `model.js` factory, browser `export_entry.js`,
@@ -37,11 +54,14 @@ For reference-image reconstruction and procedural GLB authoring, read the living
   never a bespoke pipeline.
 - **Source fingerprints are load-bearing.** Eastbrook-era exporters stamp a sha256 over a
   pinned input list (factory/entry/exporter/spec, `build_assets.mjs`, reference
-  turnarounds, the shared atlas, and `package-lock.json`) into the GLB extras, and tests
+  turnarounds, the shared atlas, and `pnpm-lock.yaml`) into the GLB extras, and tests
   recompute it live. Any change to a fingerprinted input, including a lockfile-only bump,
   means re-exporting the affected families (`--no-preview`), regenerating the media
   manifest, and re-pinning the sha256/fingerprint literals in tests, docs, and capture
-  evidence JSONs in the same change.
+  evidence JSONs in the same change. For a lockfile-only leaf rename/swap that must keep
+  shipping GLB sizes, prefer the size-preserving in-place remint
+  (`scripts/assets/remint_lockfile_fingerprints.mjs`) over a full geometry rebuild, then
+  re-pin seals and run `remint_polish_provenance.mjs` as needed.
 
 ## Relationship to the rest
 - **Output to `public/`** (the GLB/texture/HDRI tree the game loads at runtime).

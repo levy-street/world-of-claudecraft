@@ -1,18 +1,17 @@
-// Server-authoritative Unstuck countdown and graveyard release.
+// Server-authoritative Unstuck countdown and graveyard teleport.
 //
 // Unstuck is intentionally not a short-range teleport. An eligible player may
 // start it from any valid world position. If they remain idle and undisturbed
-// for the countdown, the outcome depends on whether they were alive when they
-// asked:
-//  - alive: they die and rise as a ghost at the nearest graveyard. Their corpse
-//    is abandoned, so the only way back is the Pale Keeper and The Keeper's Toll.
-//  - dead or a ghost: the death loop has nothing left to take, so they are pulled
-//    to the nearest graveyard and raised there on exactly the Pale Keeper's terms
-//    (a fifth of their pools plus The Keeper's Toll). This is the escape hatch for
-//    a spirit that cannot reach its corpse or an angel; it saves the walk, not the
-//    toll, so it is never the cheap way out of a death.
-// Either way the price is paid, and neither outcome can be reached by an attempt
-// that started on the other side of the life/death line (see cancelReason).
+// for the countdown they are moved to the nearest graveyard, which is the one
+// point in every zone guaranteed to be reachable open ground. Unstuck never
+// kills and never leaves a corpse:
+//  - alive: they are simply moved there, still alive, with their pools intact.
+//  - dead or a ghost: they are moved there and raised on the Pale Keeper's hp
+//    terms (a fifth of their pools). This is the escape hatch for a spirit that
+//    cannot reach its corpse or an angel.
+// Either way the price is Unstuck Sickness (all attributes -75%, level-scaled up
+// to 5 minutes), and neither outcome can be reached by an attempt that started on
+// the other side of the life/death line (see cancelReason).
 
 import { isRooted, isStunned } from './combat/cc';
 import {
@@ -27,7 +26,7 @@ import { delveModuleZOffset } from './delves/runs';
 import { riftInstanceAtPos } from './rift/runs';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import { releasePlayerSpiritForUnstuck, reviveAtGraveyardForUnstuck } from './spirit';
+import { moveToGraveyardForUnstuck, reviveAtGraveyardForUnstuck } from './spirit';
 import {
   DT,
   type Entity,
@@ -58,10 +57,11 @@ export interface PendingUnstuck {
   damageTaken: number;
   lastAnnouncedSecond: number;
   /**
-   * Whether the invoker was dead or a ghost when the countdown began. It decides
-   * the outcome (release vs revive) and makes a crossing of the life/death line
-   * IN EITHER DIRECTION a cancel, so an attempt can never resolve as the outcome
-   * the player did not ask for.
+   * Whether the invoker was dead or a ghost when the countdown began. A crossing of the
+   * life/death line IN EITHER DIRECTION is a cancel, so an attempt can never resolve as
+   * the outcome the player did not ask for. That matters most in the living-to-dead
+   * direction: without it, dying mid-countdown would be answered by a graveyard revive,
+   * which would make a pre-started /unstuck a cheaper alternative to the death loop.
    */
   startedDead: boolean;
 }
@@ -280,9 +280,9 @@ function cancelReason(
     Math.abs(p.pos.y - pending.origin.y) > CANCEL_VERTICAL_DISTANCE
   )
     return 'moved';
-  // Crossing the life/death line either way invalidates the attempt: a living
-  // player who died must not silently get the revive, and a player who was raised
-  // mid-countdown no longer needs one.
+  // Crossing the life/death line either way invalidates the attempt: a living player who
+  // died must take the ordinary death loop rather than a discounted graveyard revive, and a
+  // player who was raised mid-countdown no longer needs one.
   if ((p.dead || p.ghost) !== pending.startedDead) return 'state_changed';
   if (
     p.jailed ||
@@ -337,16 +337,11 @@ function completeUnstuck(
   pending: PendingUnstuck,
 ): void {
   meta.pendingUnstuck = null;
-  // A living player pays the ordinary price: they die here and rise as a ghost,
-  // corpse abandoned. Someone who was ALREADY dead has nothing left to lose that
-  // way, so they are pulled to the graveyard and raised on the Pale Keeper's terms.
+  // Both outcomes land on the same graveyard and charge the same Unstuck Sickness; they
+  // differ only in whether a revive is needed on arrival. A living player is never killed.
   const wasDead = p.dead || p.ghost;
-  if (wasDead) {
-    reviveAtGraveyardForUnstuck(ctx, p.id);
-  } else {
-    ctx.handleDeath(p, null);
-    releasePlayerSpiritForUnstuck(ctx, p.id);
-  }
+  if (wasDead) reviveAtGraveyardForUnstuck(ctx, p.id);
+  else moveToGraveyardForUnstuck(ctx, p.id);
   p.cooldowns.set(UNSTUCK_COOLDOWN_ID, UNSTUCK_SUCCESS_COOLDOWN_SECONDS);
 
   const destination = unstuckLocationAt(ctx, p.id, p.pos)?.point ?? {
@@ -357,7 +352,7 @@ function completeUnstuck(
   ctx.emit({
     type: 'unstuck',
     phase: 'completed',
-    reason: wasDead ? 'revived_at_graveyard' : 'nearest_graveyard',
+    reason: wasDead ? 'revived_at_graveyard' : 'moved_to_graveyard',
     area: pending.area,
     origin: pending.origin,
     destination,

@@ -16,9 +16,9 @@ branch).
 | 6 | Server broadcast residuals (dirty epochs, invalidation matrix, catch-up policy, load soak) | not authored | PENDING |
 
 Branch state: packets 0 and 3 are COMBINED on feature/input-cadence (worktree
-/Users/fernando/Documents/wocc-input-cadence) for one PR off release/v0.30.0, at the
+worktree wocc-input-cadence) for one PR off release/v0.30.0, at the
 maintainer's request; feature/perf-instruments (worktree
-/Users/fernando/Documents/wocc-player-perf) retains packet 0's standalone history and
+worktree wocc-player-perf) retains packet 0's standalone history and
 is superseded by the combined branch. The R1 add/add union for these docs was applied
 at the combine merge.
 

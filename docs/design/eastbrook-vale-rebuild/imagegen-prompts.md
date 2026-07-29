@@ -6,23 +6,29 @@ prompt record cited by [imagegen-provenance.md](imagegen-provenance.md).
 
 ## Record authority
 
-The ten fenced JavaScript blocks below are copied byte-for-byte from
-`response_item.payload.input` records in this local Codex session:
+The ten fenced JavaScript blocks below preserve the image-generation tool inputs
+from a Codex session (transcript path redacted). Session timestamps are UTC.
+Generation occurred on 2026-07-23 local time.
 
-`/Users/fernando/.codex/sessions/2026/07/23/rollout-2026-07-23T21-29-11-019f91f4-8f50-7963-9204-7c8f970e5dc6.jsonl`
+Each block keeps the shared reference-path array, common prompt literal, per-asset
+prompt suffix literals, and the interpolation expression passed to imagegen.
+**Machine-local absolute paths were rewritten to repo-relative or redacted forms**
+(for example `docs/screenshots/...` and `codex-generated-images/<id>.png`) so this
+repo does not store personal filesystem locations. Prompt prose and structure are
+otherwise unchanged.
 
-Session timestamps are UTC. Generation occurred on 2026-07-23 local time. For a batched call, the
-verbatim block records the exact shared reference-path array, common prompt literal, per-asset
-prompt suffix literals, and the interpolation expression passed to imagegen. Nothing in the
-blocks has been normalized, paraphrased, or reconstructed. Each block's SHA-256 is over the exact
-`payload.input` UTF-8 bytes, excluding the surrounding Markdown fence.
+Each listed payload SHA-256 is the original session hash over the unredacted
+`payload.input` UTF-8 bytes at generation time. After path redaction the fenced
+blocks are no longer byte-identical to that payload; do not recompute the listed
+hashes against the redacted text.
 
-Some verbatim payloads contain Unicode punctuation. A changed-file copy scanner must treat these
-fenced archival blocks as hash-locked source evidence; replacing that punctuation would corrupt
-the exact prompt record.
+Some payloads contain Unicode punctuation. A changed-file copy scanner must still
+treat the prompt prose as archival; do not "normalize" punctuation in the fenced
+blocks.
 
-Generated filenames are the immutable imagegen-store originals. Accepted destination paths are
-relative to `docs/screenshots/eastbrook-vale-rebuild/`. Rejected bytes remain outside Git.
+Generated filenames are the immutable imagegen-store originals. Accepted
+destination paths are relative to `docs/screenshots/eastbrook-vale-rebuild/`.
+Rejected bytes remain outside Git.
 
 ## Output map
 
@@ -54,12 +60,12 @@ Exact payload SHA-256: `0330d6876b8c516cbb77f186e55890605ae85c482f559b544d683281
 // @exec: {"yield_time_ms": 120000, "max_output_tokens": 2000}
 const result = await tools.image_gen__imagegen({
   referenced_image_paths: [
-    "/Users/fernando/Documents/wocc-banker-chest-glb/tmp/eastbrook_rebuild/baseline/town-planning/current-elevated-overview-desktop-ultra.png",
-    "/Users/fernando/Documents/wocc-banker-chest-glb/tmp/eastbrook_rebuild/baseline/town-planning/current-planning-top-down-desktop-ultra.png",
-    "/Users/fernando/Documents/wocc-banker-chest-glb/tmp/eastbrook_rebuild/baseline/town-planning/current-gate-approach-desktop-ultra.png",
-    "/Users/fernando/Documents/wocc-banker-chest-glb/tmp/eastbrook_rebuild/baseline/town-planning/current-armoury-facade-desktop-ultra.png",
-    "/Users/fernando/Documents/wocc-banker-chest-glb/tmp/eastbrook_rebuild/baseline/town-planning/current-player-scale-desktop-ultra.png",
-    "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/banker-chest/after-desktop-ultra.png"
+    "tmp/eastbrook_rebuild/baseline/town-planning/current-elevated-overview-desktop-ultra.png",
+    "tmp/eastbrook_rebuild/baseline/town-planning/current-planning-top-down-desktop-ultra.png",
+    "tmp/eastbrook_rebuild/baseline/town-planning/current-gate-approach-desktop-ultra.png",
+    "tmp/eastbrook_rebuild/baseline/town-planning/current-armoury-facade-desktop-ultra.png",
+    "tmp/eastbrook_rebuild/baseline/town-planning/current-player-scale-desktop-ultra.png",
+    "docs/screenshots/banker-chest/after-desktop-ultra.png"
   ],
   prompt: `Create one original World of ClaudeCraft master-concept image for rebuilding Eastbrook Vale, using ONLY the attached original in-game captures as visual style, scale, terrain, player-rig, banker-chest, and Grand Armoury references. This is a reconstruction-ready, stylized Three.js game-environment concept, not photorealistic fantasy art and not an imitation of any existing commercial game.
 
@@ -124,11 +130,11 @@ Exact payload SHA-256: `d210cbb834c010ed1272bd87f31b08e7ac4e1c96e337329a4ac970d5
 // @exec: {"yield_time_ms": 120000, "max_output_tokens": 2000}
 const result = await tools.image_gen__imagegen({
   referenced_image_paths: [
-    "/Users/fernando/Documents/wocc-banker-chest-glb/tmp/eastbrook_rebuild/baseline/town-planning/current-elevated-overview-desktop-ultra.png",
-    "/Users/fernando/Documents/wocc-banker-chest-glb/tmp/eastbrook_rebuild/baseline/town-planning/current-planning-top-down-desktop-ultra.png",
-    "/Users/fernando/Documents/wocc-banker-chest-glb/tmp/eastbrook_rebuild/baseline/town-planning/current-gate-approach-desktop-ultra.png",
-    "/Users/fernando/Documents/wocc-banker-chest-glb/tmp/eastbrook_rebuild/baseline/town-planning/current-armoury-facade-desktop-ultra.png",
-    "/Users/fernando/Documents/wocc-banker-chest-glb/tmp/eastbrook_rebuild/baseline/town-planning/current-player-scale-desktop-ultra.png"
+    "tmp/eastbrook_rebuild/baseline/town-planning/current-elevated-overview-desktop-ultra.png",
+    "tmp/eastbrook_rebuild/baseline/town-planning/current-planning-top-down-desktop-ultra.png",
+    "tmp/eastbrook_rebuild/baseline/town-planning/current-gate-approach-desktop-ultra.png",
+    "tmp/eastbrook_rebuild/baseline/town-planning/current-armoury-facade-desktop-ultra.png",
+    "tmp/eastbrook_rebuild/baseline/town-planning/current-player-scale-desktop-ultra.png"
   ],
   prompt: `Create one original World of ClaudeCraft master-concept image for rebuilding Eastbrook Vale, using ONLY the attached original in-game captures as visual style, scale, terrain, player-rig, banker-chest, and Grand Armoury references. This is a reconstruction-ready, stylized Three.js game-environment concept, not photorealistic fantasy art and not an imitation of any existing commercial game.
 
@@ -188,11 +194,11 @@ Exact payload SHA-256: `7473e65b5c5d560d5537162c5523d87b82a95c6f88a090d04fc9b6d4
 // @exec: {"yield_time_ms": 120000, "max_output_tokens": 2000}
 const result = await tools.image_gen__imagegen({
   referenced_image_paths: [
-    "/Users/fernando/.codex/generated_images/019f91f4-8f50-7963-9204-7c8f970e5dc6/exec-af7a282a-9957-4b91-90d0-6459b8ec3b48.png",
-    "/Users/fernando/Documents/wocc-banker-chest-glb/tmp/eastbrook_rebuild/baseline/town-planning/current-planning-top-down-desktop-ultra.png",
-    "/Users/fernando/Documents/wocc-banker-chest-glb/tmp/eastbrook_rebuild/baseline/town-planning/current-armoury-facade-desktop-ultra.png",
-    "/Users/fernando/Documents/wocc-banker-chest-glb/tmp/eastbrook_rebuild/baseline/town-planning/current-player-scale-desktop-ultra.png",
-    "/Users/fernando/Documents/wocc-banker-chest-glb/tmp/eastbrook_rebuild/baseline/town-planning/current-elevated-overview-desktop-ultra.png"
+    "codex-generated-images/exec-af7a282a-9957-4b91-90d0-6459b8ec3b48.png",
+    "tmp/eastbrook_rebuild/baseline/town-planning/current-planning-top-down-desktop-ultra.png",
+    "tmp/eastbrook_rebuild/baseline/town-planning/current-armoury-facade-desktop-ultra.png",
+    "tmp/eastbrook_rebuild/baseline/town-planning/current-player-scale-desktop-ultra.png",
+    "tmp/eastbrook_rebuild/baseline/town-planning/current-elevated-overview-desktop-ultra.png"
   ],
   prompt: `Revise the first attached generated Eastbrook Vale concept into the accepted reconstruction master while preserving its strongest qualities: the wide elevated three-quarter view, circular six-gate wall, open civic green, simple radial paths, three-stall market, deep-blue/stone/timber palette, and abundant negative space.
 
@@ -233,9 +239,9 @@ Exact payload SHA-256: `743cb1c5cc9704a19f8b1e17768a3a23e7bb3cdf8c1e24e4fb427fee
 // @exec: {"yield_time_ms": 120000, "max_output_tokens": 2000}
 const result = await tools.image_gen__imagegen({
   referenced_image_paths: [
-    "/Users/fernando/.codex/generated_images/019f91f4-8f50-7963-9204-7c8f970e5dc6/exec-2bd52573-c9c1-4788-920d-d7a9d494c97b.png",
-    "/Users/fernando/Documents/wocc-banker-chest-glb/tmp/eastbrook_rebuild/baseline/town-planning/current-armoury-facade-desktop-ultra.png",
-    "/Users/fernando/Documents/wocc-banker-chest-glb/tmp/eastbrook_rebuild/baseline/town-planning/current-planning-top-down-desktop-ultra.png"
+    "codex-generated-images/exec-2bd52573-c9c1-4788-920d-d7a9d494c97b.png",
+    "tmp/eastbrook_rebuild/baseline/town-planning/current-armoury-facade-desktop-ultra.png",
+    "tmp/eastbrook_rebuild/baseline/town-planning/current-planning-top-down-desktop-ultra.png"
   ],
   prompt: `Edit the first attached corrected Eastbrook Vale master concept. Preserve the complete image composition, all six gates, central green and well, Grand Armoury, bank with chest, smithy with forge/chimney, west chapel, southwest weaving workshop, south toolworks, three market stalls, paths, scale, palette, and rendering style.
 
@@ -271,9 +277,9 @@ Exact payload SHA-256: `2effa6823e240e788e754d172b708ad8e9cdfc3959dc3c5c9e407e99
 ```javascript
 // @exec: {"yield_time_ms": 120000, "max_output_tokens": 3000}
 const refs = [
-  "/Users/fernando/.codex/generated_images/019f91f4-8f50-7963-9204-7c8f970e5dc6/exec-cfc6ded3-5058-4d72-9a51-edb7f4c1c851.png",
-  "/Users/fernando/Documents/wocc-banker-chest-glb/tmp/eastbrook_rebuild/baseline/town-planning/current-armoury-facade-desktop-ultra.png",
-  "/Users/fernando/Documents/wocc-banker-chest-glb/tmp/eastbrook_rebuild/baseline/town-planning/current-player-scale-desktop-ultra.png"
+  "codex-generated-images/exec-cfc6ded3-5058-4d72-9a51-edb7f4c1c851.png",
+  "tmp/eastbrook_rebuild/baseline/town-planning/current-armoury-facade-desktop-ultra.png",
+  "tmp/eastbrook_rebuild/baseline/town-planning/current-player-scale-desktop-ultra.png"
 ];
 const common = `Use only the attached original World of ClaudeCraft captures and accepted Eastbrook master concept for style and scale. Create an isolated reconstruction turnaround sheet on a plain light neutral-gray studio background. Show exactly seven consistent views of the SAME complete building with identical proportions and details: orthographic front, right, rear, left, front three-quarter, rear three-quarter, and one low grazing player-eye three-quarter view with a single plain 2.6-yard World of ClaudeCraft humanoid scale mannequin. Arrange the seven views as a clean contact sheet without labels. The building floor is seated at Y=0; show roof overhangs, foundation, recessed doors/windows, thresholds, all sides and rear, and no cutaway. Stylized low-poly deterministic Three.js feasibility, strong large color/value groups, zero-texture vertex-color look. No scenery, terrain, other buildings, decorative frame, readable text, pseudo-text, logos, symbols from other games, watermarks, extra characters, photorealism, or cast-shadow background clutter. Deep Eastbrook-blue pitched roof, gray stone lower floor/foundation, warm dark timber framing, restrained cobalt-and-gold accents, warm amber windows.`;
 const specs = [
@@ -313,9 +319,9 @@ Exact payload SHA-256: `07e688b1be7f5e82f8d2d0834c9d556f19ecb22c48b3c1638089b83f
 ```javascript
 // @exec: {"yield_time_ms": 120000, "max_output_tokens": 3000}
 const refs = [
-  "/Users/fernando/.codex/generated_images/019f91f4-8f50-7963-9204-7c8f970e5dc6/exec-cfc6ded3-5058-4d72-9a51-edb7f4c1c851.png",
-  "/Users/fernando/Documents/wocc-banker-chest-glb/tmp/eastbrook_rebuild/baseline/town-planning/current-armoury-facade-desktop-ultra.png",
-  "/Users/fernando/Documents/wocc-banker-chest-glb/tmp/eastbrook_rebuild/baseline/town-planning/current-player-scale-desktop-ultra.png"
+  "codex-generated-images/exec-cfc6ded3-5058-4d72-9a51-edb7f4c1c851.png",
+  "tmp/eastbrook_rebuild/baseline/town-planning/current-armoury-facade-desktop-ultra.png",
+  "tmp/eastbrook_rebuild/baseline/town-planning/current-player-scale-desktop-ultra.png"
 ];
 const common = `Use only the attached original World of ClaudeCraft captures and accepted Eastbrook master concept for style and scale. Create an isolated reconstruction turnaround sheet on a plain light neutral-gray studio background. Show exactly seven consistent views of the SAME complete building with identical proportions and details: orthographic front, right, rear, left, front three-quarter, rear three-quarter, and one low grazing player-eye three-quarter view with a single plain 2.6-yard World of ClaudeCraft humanoid scale mannequin. Arrange the seven views as a clean contact sheet without labels. The building floor is seated at Y=0; show roof overhangs, foundation, recessed doors/windows, thresholds, all sides and rear, and no cutaway. Stylized low-poly deterministic Three.js feasibility, large color/value groups, zero-texture vertex-color look, appropriate for about 2,000-3,500 triangles. No scenery, terrain, other buildings, decorative frame, readable text, pseudo-text, logos, symbols from other games, watermarks, extra characters, photorealism, or cast-shadow background clutter. Deep Eastbrook-blue roof, gray stone foundation/lower walls, warm dark timber framing, restrained cobalt-and-gold accents, warm amber windows.`;
 const specs = [
@@ -353,9 +359,9 @@ Exact payload SHA-256: `1a54c7080346579aee4e5ffe0ab40b22d9fc33d514c3f1937282dfad
 ```javascript
 // @exec: {"yield_time_ms": 120000, "max_output_tokens": 3000}
 const refs = [
-  "/Users/fernando/.codex/generated_images/019f91f4-8f50-7963-9204-7c8f970e5dc6/exec-cfc6ded3-5058-4d72-9a51-edb7f4c1c851.png",
-  "/Users/fernando/Documents/wocc-banker-chest-glb/tmp/eastbrook_rebuild/baseline/town-planning/current-planning-top-down-desktop-ultra.png",
-  "/Users/fernando/Documents/wocc-banker-chest-glb/tmp/eastbrook_rebuild/baseline/town-planning/current-player-scale-desktop-ultra.png"
+  "codex-generated-images/exec-cfc6ded3-5058-4d72-9a51-edb7f4c1c851.png",
+  "tmp/eastbrook_rebuild/baseline/town-planning/current-planning-top-down-desktop-ultra.png",
+  "tmp/eastbrook_rebuild/baseline/town-planning/current-player-scale-desktop-ultra.png"
 ];
 const common = `Use only the attached original World of ClaudeCraft captures and accepted Eastbrook master concept for style and scale. Create a clean isolated reconstruction reference on a plain light neutral-gray studio background, stylized low-poly deterministic Three.js geometry with large vertex-color groups and zero textures. No terrain, unrelated scenery, readable text, pseudo-text, logos, proprietary symbols, watermarks, photorealism, or tiny ornament. Deep Eastbrook blue, gray stone, warm dark timber, restrained worn gold, warm amber and cyan-blue emissive accents.`;
 const specs = [
@@ -392,9 +398,9 @@ Exact payload SHA-256: `5943b8faa358b302f7b5b0660ebe02147e8aa3b8cb81b1f4628f90d6
 // @exec: {"yield_time_ms": 120000, "max_output_tokens": 2000}
 const result = await tools.image_gen__imagegen({
   referenced_image_paths: [
-    "/Users/fernando/.codex/generated_images/019f91f4-8f50-7963-9204-7c8f970e5dc6/exec-15f97054-6544-40a4-9e89-d83a5b250848.png",
-    "/Users/fernando/.codex/generated_images/019f91f4-8f50-7963-9204-7c8f970e5dc6/exec-cfc6ded3-5058-4d72-9a51-edb7f4c1c851.png",
-    "/Users/fernando/Documents/wocc-banker-chest-glb/tmp/eastbrook_rebuild/baseline/town-planning/current-player-scale-desktop-ultra.png"
+    "codex-generated-images/exec-15f97054-6544-40a4-9e89-d83a5b250848.png",
+    "codex-generated-images/exec-cfc6ded3-5058-4d72-9a51-edb7f4c1c851.png",
+    "tmp/eastbrook_rebuild/baseline/town-planning/current-player-scale-desktop-ultra.png"
   ],
   prompt: `Regenerate the Eastbrook wall/gate reconstruction sheet. The first attached sheet is REJECTED because it shows only a single half-wing and hides the required central passage. Preserve its low gray-stone, dark-timber, cobalt-cap, warm-window, cyan-wayfinding visual language, but correct the object.
 
@@ -431,9 +437,9 @@ Exact payload SHA-256: `e8bdc34a12749d1bf5ad112aa97ddcc18b7f6dcf62d12c521457c31b
 // @exec: {"yield_time_ms": 120000, "max_output_tokens": 2000}
 const result=await tools.image_gen__imagegen({
   referenced_image_paths:[
-    "/Users/fernando/.codex/generated_images/019f91f4-8f50-7963-9204-7c8f970e5dc6/exec-15f97054-6544-40a4-9e89-d83a5b250848.png",
-    "/Users/fernando/.codex/generated_images/019f91f4-8f50-7963-9204-7c8f970e5dc6/exec-cfc6ded3-5058-4d72-9a51-edb7f4c1c851.png",
-    "/Users/fernando/Documents/wocc-banker-chest-glb/tmp/eastbrook_rebuild/baseline/town-planning/current-player-scale-desktop-ultra.png"
+    "codex-generated-images/exec-15f97054-6544-40a4-9e89-d83a5b250848.png",
+    "codex-generated-images/exec-cfc6ded3-5058-4d72-9a51-edb7f4c1c851.png",
+    "tmp/eastbrook_rebuild/baseline/town-planning/current-player-scale-desktop-ultra.png"
   ],
   prompt:`Create an isolated reconstruction turnaround sheet for ONE reusable Eastbrook CURVED WALL WING MODULE. This is intentionally only one half of a gate assembly; runtime mirrors it to form a symmetrical five-yard opening. Do not try to show the second half or a whole town.
 
@@ -477,9 +483,9 @@ Exact payload SHA-256: `a83d9d63f4be41be42269313642cc2ed72705010dd8edf7875143cf2
 // @exec: {"yield_time_ms": 120000, "max_output_tokens": 1200}
 const result = await tools.image_gen__imagegen({
   referenced_image_paths: [
-    "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-vale-rebuild/concepts/master-concept.png",
-    "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/eastbrook-grand-armoury/after-close-desktop-ultra.png",
-    "/Users/fernando/Documents/wocc-banker-chest-glb/docs/screenshots/banker-chest/after-desktop-ultra.png"
+    "docs/screenshots/eastbrook-vale-rebuild/concepts/master-concept.png",
+    "docs/screenshots/eastbrook-grand-armoury/after-close-desktop-ultra.png",
+    "docs/screenshots/banker-chest/after-desktop-ultra.png"
   ],
   prompt: `Create an ORIGINAL World of ClaudeCraft production material-atlas reference for a high-performance stylized MMORPG town. Use the first image as the desired material richness and palette; use the second and third only to understand the currently flat Grand Armoury and banker chest surfaces that need richer material breakup.
 

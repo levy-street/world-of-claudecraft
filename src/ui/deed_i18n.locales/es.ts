@@ -7,6 +7,102 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: 'Bandera en Mano',
+    desc: 'Captura una bandera en Campos Espinosos.',
+  },
+  pvp_bg_first_win: {
+    name: 'La Hondonada Resiste',
+    desc: 'Gana una batalla en Campos Espinosos.',
+  },
+  pvp_bg_wins_25: {
+    name: 'Guardián de la Hondonada',
+    desc: 'Gana 25 batallas en Campos Espinosos.',
+    title: 'Abanderado',
+  },
+  pvp_bg_captures_100: {
+    name: 'Cien Banderas',
+    desc: 'Captura 100 banderas en Campos Espinosos a lo largo de tu carrera.',
+  },
+  dgn_rift: {
+    name: 'Caminante de la Brecha',
+    desc: 'Supera una Brecha derrotando a su jefe de piso.',
+  },
+  dgn_rift_s_rank: {
+    name: 'Soberano de la Brecha',
+    desc: 'Supera una Brecha de rango S, el nivel más difícil que puede abrir un portal de Brecha.',
+  },
+  pvp_honor_sergeant: {
+    name: 'Sargento',
+    desc: 'Gana 10.000 de honor a lo largo de tu vida. Gastarlo nunca te cuesta el rango.',
+    title: 'Sargento',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: 'Caballero Teniente',
+    desc: 'Gana 40.000 de honor a lo largo de tu vida, toda una temporada de guerra real a tus espaldas.',
+    title: 'Caballero Teniente',
+  },
+  pvp_honor_field_marshal: {
+    name: 'Mariscal de Campo',
+    desc: 'Gana 150.000 de honor a lo largo de tu vida. Poco común en cualquier reino, y así debe ser.',
+    title: 'Mariscal de Campo',
+  },
+  chr_drakemaw_broodlord: {
+    name: 'Rompenidos',
+    desc: 'Abate a un Señor de la Nidada de Drakemaw entre sus huevos, sorteando el grito, el tajo y el fuego.',
+  },
+  chr_maw_matriarch: {
+    name: 'El Cielo Enmudece',
+    desc: 'Abate a Cindraleth, la Matriarca de las Fauces, en su nido de cráter sobre el Drakemaw.',
+  },
+  chr_frostveil_gatherer: {
+    name: 'Cosecha en terrazas',
+    desc: 'Recolecta una veta de mineral, un rodal de madera y un bancal de hierbas en Frostveil.',
+  },
+  chr_frostveil_first_cast: {
+    name: 'Primer hielo en el tarn',
+    desc: 'Pesca un pez en las aguas de Frostveil.',
+  },
+  chr_amberfall_gatherer: {
+    name: 'La cosecha de Amberfall',
+    desc: 'Recolecta una veta de mineral, un rodal de madera y un bancal de hierbas en Amberfall.',
+  },
+  chr_amberfall_first_cast: {
+    name: 'Una captura del gran cenagal',
+    desc: 'Pesca un pez en las aguas de Amberfall.',
+  },
+  chr_nightbloom_gatherer: {
+    name: 'La cosecha sonadora',
+    desc: 'Recolecta una veta de mineral, un rodal de madera y un bancal de hierbas en Nightbloom.',
+  },
+  chr_nightbloom_first_cast: {
+    name: 'Una onda en el pozo lunar',
+    desc: 'Pesca un pez en las aguas de Nightbloom.',
+  },
+  chr_wraithwood_gatherer: {
+    name: 'Cosecha bajo el dosel',
+    desc: 'Recolecta una veta de mineral, un rodal de madera y un bancal de hierbas en Wraithwood.',
+  },
+  chr_wraithwood_first_cast: {
+    name: 'Un lance en la bahia del espejo',
+    desc: 'Pesca un pez en las aguas de Wraithwood.',
+  },
+  chr_palmreach_gatherer: {
+    name: 'Cosecha en la playa de palmas',
+    desc: 'Recolecta una veta de mineral, un rodal de madera y un bancal de hierbas en Palmreach.',
+  },
+  chr_palmreach_first_cast: {
+    name: 'Lance en la laguna zafiro',
+    desc: 'Pesca un pez en las aguas de Palmreach.',
+  },
+  chr_evergarden_gatherer: {
+    name: 'La abundancia del parterre',
+    desc: 'Recolecta una veta de mineral, un rodal de madera y un bancal de hierbas en Evergarden.',
+  },
+  chr_evergarden_first_cast: {
+    name: 'Un lance en el estanque de petalos',
+    desc: 'Pesca un pez en las aguas de Evergarden.',
+  },
   pvp_card_duel_first_win: {
     name: 'La baza es mía',
     desc: 'Gana un Duelo de Cartas en el Maestro de Cartas.',
@@ -816,6 +912,86 @@ export const table: DeedLocaleTable = {
   soc_salvage_50: {
     name: 'El taller del desmontador',
     desc: 'Desguaza 50 piezas de equipo para recuperar sus materiales en bruto.',
+  },
+  dgn_wildheart_basin: {
+    name: 'La cuenca contraataca',
+    desc: 'Derrota a Zulgar, Voz de la Cuenca, en la Cuenca del Corazón Salvaje.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Heroico: La Cuenca del Corazón Salvaje',
+    desc: 'Derrota a Zulgar, Voz de la Cuenca, en la Cuenca del Corazón Salvaje en dificultad heroica.',
+  },
+  chr_peaks_gatherer: {
+    name: 'Cosecha de las Alturas',
+    desc: 'Recolecta una veta de mineral, un árbol talable y un macizo de hierbas en las Alturas de Thornpeak.',
+  },
+  chr_marsh_rares_ii: {
+    name: 'El Glotón, Contado',
+    desc: 'Mata a Grubjaw el Glotón, un cuarto terror con nombre de la Ciénaga de Mirefen que quedó fuera del primer recuento.',
+  },
+  chr_peaks_rares_ii: {
+    name: 'Más nombres tallados en el risco',
+    desc: 'Mata al Viejo Cragmaw y al Señor de Esquirlas Kazzix, dos terrores con nombre más de las Alturas de Thornpeak que quedaron fuera del primer recuento.',
+  },
+  chr_gleamstag: {
+    name: 'La leyenda que no atacaba primero',
+    desc: 'Mata al Ciervo Fulgurante, un élite raro y esquivo que no ataca a menos que lo acorralen.',
+  },
+  chr_hollow_rares: {
+    name: 'La manada recuerda',
+    desc: 'Mata al Viejo Marrowshell y a Aurelhorn, Primero de la Manada, los dos jefes raros errantes de la Hondonada.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'La abundancia del pantano',
+    desc: 'Recolecta una veta de mineral, un árbol talable y un macizo de hierbas en el Pantano de los Sauces.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Ondas en los Páramos de Lirios',
+    desc: 'Pesca un pez en las aguas del Pantano de los Sauces.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Cosecha en el promontorio',
+    desc: 'Recolecta una veta de mineral, un árbol talable y un macizo de hierbas en la Cresta del Vendaval.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'Un sedal en el Lago Espejo',
+    desc: 'Pesca un pez en las aguas de la Cresta del Vendaval.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Provisiones isleñas',
+    desc: 'Recolecta una veta de mineral, un árbol talable y un macizo de hierbas en la Costa Lejana.',
+  },
+  chr_farshore_first_cast: {
+    name: 'Lo que saben las gaviotas',
+    desc: 'Pesca un pez en las aguas de la Costa Lejana.',
+  },
+  prog_engineering_rare: {
+    name: 'Ingeniería de precisión',
+    desc: 'Fabrica tu primer objeto de calidad rara en Ingeniería.',
+  },
+  prog_alchemy_rare: {
+    name: 'Una cosecha excepcional',
+    desc: 'Fabrica tu primer objeto de calidad rara en Alquimia.',
+  },
+  prog_cooking_rare: {
+    name: 'Un plato para el recuerdo',
+    desc: 'Fabrica tu primer objeto de calidad rara en Cocina.',
+  },
+  prog_leatherworking_rare: {
+    name: 'Curtido fino',
+    desc: 'Fabrica tu primer objeto de calidad rara en Peletería.',
+  },
+  prog_tailoring_rare: {
+    name: 'Una puntada magistral',
+    desc: 'Fabrica tu primer objeto de calidad rara en Sastrería.',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Templado hasta brillar',
+    desc: 'Fabrica tu primer objeto de calidad rara en Fabricación de armas.',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Blindado a la perfección',
+    desc: 'Fabrica tu primer objeto de calidad rara en Fabricación de armaduras.',
   },
 };
 

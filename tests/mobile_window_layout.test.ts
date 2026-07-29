@@ -104,19 +104,43 @@ describe('mobile window layout CSS', () => {
     }`);
   });
 
-  it('neutralizes the market controls flex-basis so column stacking never grows their height', () => {
-    // components.css gives .mkt-search/.mkt-filters/.mkt-filter a desktop flex-basis
-    // (200px/auto/140px) meant as a row WIDTH; once .mkt-controls/.mkt-filters flip to
-    // flex-direction: column that basis becomes a HEIGHT instead, ballooning the search
-    // box and clipping the filters and listing body out of the window (#2107 review).
+  it('reduces the shared market control grid to one column on mobile touch', () => {
+    // Search and filters share the desktop grid, so mobile changes the column definition
+    // directly. No nested flex basis may return and turn a control width into its height.
     expect(mobileCss).toMatch(
-      /body\.mobile-touch \.mkt-search \{[^}]*flex: 0 0 auto;[^}]*max-width: none;[^}]*min-height: 40px;/,
+      /body\.mobile-touch \.mkt-controls \{[^}]*grid-template-columns: 1fr;[^}]*align-items: stretch;/,
     );
     expect(mobileCss).toMatch(
-      /body\.mobile-touch \.mkt-filters \{[^}]*flex: 0 0 auto;[^}]*flex-direction: column;/,
+      /body\.mobile-touch \.mkt-search \{[^}]*max-width: none;[^}]*min-height: 40px;/,
     );
-    expect(mobileCss).toMatch(
-      /body\.mobile-touch \.mkt-filter \{[^}]*flex: 0 0 auto;[^}]*max-width: none;/,
+    expect(mobileCss).toMatch(/body\.mobile-touch \.mkt-filter \{[^}]*max-width: none;/);
+    expect(mobileCss).not.toMatch(/body\.mobile-touch \.mkt-(?:search|filter) \{[^}]*\bflex:/);
+    expect(mobileCss).not.toContain('body.mobile-touch .mkt-filters {');
+  });
+
+  it('floors the vendor purchase-quantity controls at 40px under a coarse pointer (phase 21)', () => {
+    // The control row lives in components.css beside the rest of the vendor
+    // family; the coarse-pointer floor is the mobile tap-target contract the
+    // desktop chip size must never squeeze away.
+    const components = readFileSync(
+      new URL('../src/styles/components.css', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    expect(components).toMatch(
+      /@media \(pointer: coarse\) \{\s*\.vendor-qty-btn \{[^}]*min-width: 40px;[^}]*min-height: 40px;/,
+    );
+  });
+
+  it('floors the shared prompt-family action buttons at 40px under a coarse pointer (phase 21 QA)', () => {
+    // The bags/bank/vendor quantity prompts share one recipe; the vendor
+    // custom-amount prompt made those buttons a mobile purchase surface, so
+    // the tap floor lives on the shared .prompt .btn rule in hud.css.
+    const hudCss = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8').replace(
+      /\r\n/g,
+      '\n',
+    );
+    expect(hudCss).toMatch(
+      /@media \(pointer: coarse\) \{\s*\.prompt \.btn \{[^}]*min-width: 40px;[^}]*min-height: 40px;/,
     );
   });
 });

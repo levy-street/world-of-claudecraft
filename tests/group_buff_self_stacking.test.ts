@@ -72,6 +72,89 @@ describe('Emboldening Roar never stacks its crit buff with itself', () => {
   });
 });
 
+describe('Mass Barrier never stacks its shield with itself', () => {
+  it('two mages casting on an overlapping group leave exactly one absorb copy per target', () => {
+    const sim = new Sim({ seed: 2026, playerClass: 'mage', noPlayer: true }) as AnySim;
+    const a = sim.addPlayer('mage', 'MageA');
+    const b = sim.addPlayer('mage', 'MageB');
+    for (const pid of [a, b]) {
+      sim.setPlayerLevel(20, pid);
+      expect(sim.applyTalents({ spec: 'frost', rows: { 17: 'mag_r17_mass_barrier' } }, pid)).toBe(
+        true,
+      );
+      const p = sim.entities.get(pid) as Entity;
+      p.resource = p.maxResource;
+    }
+    const entA = sim.entities.get(a) as Entity;
+    const entB = sim.entities.get(b) as Entity;
+    entB.pos = { ...entA.pos };
+    entB.prevPos = { ...entA.pos };
+    sim.partyInvite(b, a);
+    sim.partyAccept(b);
+
+    sim.castAbility('mass_barrier', a);
+    entB.gcdRemaining = 0;
+    sim.castAbility('mass_barrier', b);
+
+    for (const ent of [entA, entB]) {
+      const shield = ent.auras.filter((x) => x.id === 'mass_barrier');
+      expect(shield, 'one Mass Barrier copy').toHaveLength(1);
+      // The later cast owns the surviving copy.
+      expect(shield[0].sourceId).toBe(b);
+    }
+  });
+});
+
+describe("Nature's Fury never stacks its spell-crit pulse with itself", () => {
+  it('two druids in the same party pulsing on a shared ally leave exactly one copy', () => {
+    const sim = new Sim({ seed: 2026, playerClass: 'druid', noPlayer: true }) as AnySim;
+    const a = sim.addPlayer('druid', 'DruidA');
+    const b = sim.addPlayer('druid', 'DruidB');
+    for (const pid of [a, b]) {
+      sim.setPlayerLevel(20, pid);
+      expect(
+        sim.applyTalents({ spec: null, rows: { 20: 'dru_r20_improved_hurricane' } }, pid),
+      ).toBe(true);
+    }
+    const entA = sim.entities.get(a) as Entity;
+    const entB = sim.entities.get(b) as Entity;
+    entB.pos = { ...entA.pos };
+    entB.prevPos = { ...entA.pos };
+    sim.partyInvite(b, a);
+    sim.partyAccept(b);
+
+    // Moonwing Form is the Balance signature (gated behind the balance spec);
+    // the talent under test only needs the form AURA, so apply it directly
+    // like tests/natures_fury.test.ts does, without spending a spec pick.
+    const applyAura = sim as unknown as { applyAura(t: Entity, a: Record<string, unknown>): void };
+    for (const [ent, sourceId] of [
+      [entA, a],
+      [entB, b],
+    ] as const) {
+      applyAura.applyAura(ent, {
+        id: 'moonkin_form',
+        name: 'Moonwing Form',
+        kind: 'form_moonkin',
+        remaining: 3600,
+        duration: 3600,
+        value: 0,
+        sourceId,
+        school: 'arcane',
+      });
+    }
+
+    // Nature's Fury pulses once a second, staggered by pid: run past a full
+    // cycle so both druids have pulsed onto each other at least once.
+    for (let i = 0; i < 40; i++) sim.tick();
+
+    for (const ent of [entA, entB]) {
+      const fury = ent.auras.filter((x) => x.id === 'natures_fury');
+      expect(fury, "one Nature's Fury copy").toHaveLength(1);
+      expect(fury[0].kind).toBe('buff_spellcrit');
+    }
+  });
+});
+
 describe('every group buff is exhaustion-gated or source-independent', () => {
   it('no aoeAlly buff can silently self-stack across casters', () => {
     const offenders: string[] = [];
@@ -95,6 +178,11 @@ describe('every group buff is exhaustion-gated or source-independent', () => {
           // The dispatch stamps this as `${abilityId}_hp` (Rallying Cry).
           if (!SOURCE_INDEPENDENT_GROUP_BUFF_AURA_IDS.has(`${ability.id}_hp`)) {
             offenders.push(`${ability.id} (aoeAllyMaxHp)`);
+          }
+        } else if (eff.type === 'aoeAllyAbsorb') {
+          // The dispatch applies this straight under the ability id (Mass Barrier).
+          if (!SOURCE_INDEPENDENT_GROUP_BUFF_AURA_IDS.has(ability.id)) {
+            offenders.push(`${ability.id} (aoeAllyAbsorb)`);
           }
         }
       }

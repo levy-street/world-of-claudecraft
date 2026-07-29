@@ -4,6 +4,9 @@
 // (live 5s overview+online, activity 60s) with per-component, auto-torn-down timers.
 export const LIVE_REFRESH_MS = 5_000;
 export const ACTIVITY_REFRESH_MS = 60_000;
+// The online-players page polls a full roster rebuild, so it runs a minute apart
+// from the 5s dashboard tick, and the operator can switch it off entirely.
+export const ONLINE_REFRESH_MS = 60_000;
 export const SEARCH_DEBOUNCE_MS = 300;
 
 export function poll(fn: () => void, ms: number): () => void {

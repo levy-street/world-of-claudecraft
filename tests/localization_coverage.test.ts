@@ -157,7 +157,6 @@ describe('i18n Localization Key Coverage', () => {
     'hud.core.mobileMore',
     'hud.core.mobileMoreAria',
     'hud.core.mobileSocial',
-    'hud.core.mobileArena',
     'hud.core.mobileMenu',
     'hud.core.mobileUse',
     'hud.core.mobileMeters',
@@ -359,6 +358,8 @@ describe('i18n Localization Key Coverage', () => {
     action: 'Open Chat',
     amount: 42,
     answered: 6,
+    // The elixir use line's granted-buff name (itemUi.tooltip.useElixirAura).
+    aura: 'Might of the Boar',
     base: 14,
     rested: 18,
     buyer: 'Mira',
@@ -374,15 +375,23 @@ describe('i18n Localization Key Coverage', () => {
     delta: '+13',
     dps: '7.4',
     duration: '15s',
+    // The per-unit ask beside a stack's total (itemUi.market.buyConfirmBodyStack);
+    // a money string like `money` above, not a bare number.
+    each: '4 silver',
     form: 'Bear',
     fps: 60,
     guild: 'Night Watch',
     index: 2,
+    id: 'fine_example_ore',
     interactKey: 'F',
     moveKeys: 'W/A/S/D',
     questKey: 'L',
     item: 'Rough Bracers',
     key: 'K',
+    // The death recap's slayer (hud.system.deathRecapKiller[Ability]): a mob
+    // or player display name spliced verbatim. One sample only, the base and
+    // this branch each added the same key independently.
+    killer: 'Mira',
     kind: 'Weapon',
     slots: 14,
     label: 'Wolf',
@@ -393,6 +402,8 @@ describe('i18n Localization Key Coverage', () => {
     max: 25,
     message: 'Meet at the inn',
     min: 16,
+    // The elixir use line's buff duration in whole minutes (itemUi.tooltip.useElixir*).
+    minutes: 10,
     money: '12 copper',
     name: 'Aki',
     needed: 400,
@@ -407,6 +418,7 @@ describe('i18n Localization Key Coverage', () => {
     range: 30,
     rank: 2,
     realm: 'Eastbrook',
+    requirement: 'Requires Mining 40',
     resource: 'Mana',
     seconds: 7,
     shown: 120,
@@ -965,7 +977,9 @@ describe('i18n Localization Key Coverage', () => {
     // 7 raid/dungeon families with name+bonus2+bonus3+bonus4 (every epic family
     // carries a 4-piece proc tier), plus 3 leveling haste kits carrying a
     // single 3-piece tier (name+bonus3 only).
-    expect(itemSetEntries).toHaveLength(7 * 4 + 3 * 2);
+    // 7 epic families x (name + bonus2/3/4), 3 haste kits x (name + bonus3), and the
+    // 5 WARFARE families x (name + bonus2/4/7).
+    expect(itemSetEntries).toHaveLength(7 * 4 + 3 * 2 + 5 * 4);
     expect(missingEntityTranslationsForGroups(['itemSet'])).toHaveLength(0);
 
     for (const lang of ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const) {
@@ -1262,7 +1276,9 @@ describe('i18n Localization Key Coverage', () => {
   // Deed names and reward titles that legitimately equal English in a locale,
   // recorded as deliberate cross-language cognates (Veteran, Champion, Paragon,
   // and Gladiator are those languages' own words; Marginalia is Latin; nl keeps
-  // the poker term Full House). This list IS the recording mechanism: a deed
+  // the poker term Full House; Sergeant is the real de/nl/sv rank word, spelled
+  // identically, and the rest of that honor ladder IS translated). This list IS
+  // the recording mechanism: a deed
   // name or title that matches English WITHOUT a row here is an accidental
   // leak at the release gate. Dialect locales list their rendered result
   // (es_ES and fr_CA resolve through their base tables plus overrides).
@@ -1273,6 +1289,8 @@ describe('i18n Localization Key Coverage', () => {
     fr_CA: ['prog_champion.name', 'prog_champion.title', 'dlv_lore_journal.name'],
     it_IT: ['soc_market_magnate.title'],
     de_DE: [
+      'pvp_honor_sergeant.name',
+      'pvp_honor_sergeant.title',
       'prog_veteran.name',
       'prog_veteran.title',
       'prog_champion.name',
@@ -1284,6 +1302,8 @@ describe('i18n Localization Key Coverage', () => {
     ],
     pt_BR: ['prog_paragon.name', 'prog_paragon.title'],
     nl_NL: [
+      'pvp_honor_sergeant.name',
+      'pvp_honor_sergeant.title',
       'dlv_lore_journal.name',
       'pvp_arena_1v1_1900.name',
       'pvp_arena_1v1_1900.title',
@@ -1297,6 +1317,8 @@ describe('i18n Localization Key Coverage', () => {
       'pvp_arena_1v1_1900.title',
     ],
     sv_SE: [
+      'pvp_honor_sergeant.name',
+      'pvp_honor_sergeant.title',
       'prog_veteran.name',
       'prog_veteran.title',
       'pvp_arena_1v1_1900.name',
@@ -1312,9 +1334,9 @@ describe('i18n Localization Key Coverage', () => {
 
   it('should provide deed content translations for every supported locale', () => {
     const deedEntries = deedTranslationManifest();
-    // name + desc per deed, plus one title entry per title deed (30 as of
-    // Professions 2.0; tests/deeds_content.test.ts pins the count).
-    expect(deedEntries.length).toBe(Object.keys(DEEDS).length * 2 + 30);
+    // name + desc per deed, plus one title entry per title deed (34 as of the
+    // WARFARE lifetime-honor ranks; tests/deeds_content.test.ts pins the count).
+    expect(deedEntries.length).toBe(Object.keys(DEEDS).length * 2 + 34);
 
     for (const lang of supportedLanguages) {
       setLanguage(lang);
@@ -1570,13 +1592,6 @@ describe('i18n Localization Key Coverage', () => {
     expect(hudSource).toContain('dungeonDisplayNameFromSource');
     expect(hudSource).not.toContain('zoneWelcomeText(');
 
-    const rendererSource = fs.readFileSync(
-      path.resolve(process.cwd(), 'src/render/renderer.ts'),
-      'utf8',
-    );
-    // objectDisplayName still localizes the build-time object nameplate write in the
-    // renderer; the helper itself moved into entity_labels.ts.
-    expect(rendererSource).toContain('objectDisplayName');
     // The per-entity nameplate content (corpse/mob names) moved into the
     // NameplatePainter; localization is preserved, just relocated (mirrors the
     // minimap_painter zone-label move above).
@@ -1818,7 +1833,11 @@ describe('i18n Localization Key Coverage', () => {
     expect(html).toContain('data-i18n="hud.core.mobileChat"');
     expect(html).toContain('data-i18n="hud.core.mobileMore"');
     expect(html).toContain('data-i18n="hud.core.mobileSocial"');
-    expect(html).toContain('data-i18n="hud.core.mobileArena"');
+    // The merged PvP window's launcher label (Thornhollow Fields + arenas on one
+    // button); the old mobileArena key stays in the catalog like mobileTarget
+    // but no longer appears in the markup.
+    expect(html).toContain('data-i18n="hudChrome.pvp.mobileLabel"');
+    expect(html).not.toContain('data-i18n="hud.core.mobileArena"');
     // The Settings button (promoted to the bar between Social and More) uses
     // mobileSettings ("Settings"); the old mobileMenu ("Menu") key stays in the
     // catalog but, like mobileTarget, no longer appears in the markup.

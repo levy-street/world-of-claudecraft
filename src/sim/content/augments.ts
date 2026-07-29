@@ -205,7 +205,10 @@ export const AUGMENTS: AugmentDef[] = [
     tier: 'prismatic',
     classes: PHYSICAL,
     description: '+25% all damage, +25% maximum health, +300 armor. Walk it down.',
-    effect: { global: { meleeDmgPct: 0.25 }, stats: { maxHpPct: 0.25, armor: 300 } },
+    effect: {
+      global: { meleeDmgPct: 0.25, spellDmgPct: 0.25 },
+      stats: { maxHpPct: 0.25, armor: 300 },
+    },
   },
   {
     id: 'aug_ascendant',

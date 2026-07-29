@@ -1,11 +1,15 @@
 import { describe, expect, it } from 'vitest';
+import { RAW_COOKING_CATCH_IDS } from '../src/sim/content/items';
+import { ITEMS as CATALOG_ITEMS } from '../src/sim/data';
 import type { InvSlot, ItemDef } from '../src/sim/types';
 import { DEFAULT_BAG_FILTER, type ItemLookup } from '../src/ui/bag_filter';
 import {
   type BagMode,
   bagDestroyAction,
   bagItemAction,
+  bagNoMatchKind,
   bagQualityKey,
+  bagQuestSectionHeadersAllowed,
   bagShiftLinks,
   bagStackIndex,
   bagsMoneyRowStale,
@@ -13,6 +17,7 @@ import {
   bagTooltipHintKey,
   bankDepositOpensPrompt,
   buildBagGrid,
+  buildBagListRows,
   resolveDepositSubmit,
 } from '../src/ui/bags_view';
 
@@ -27,7 +32,9 @@ const NO_MODE: BagMode = {
   mailAttach: false,
   marketSell: false,
   vendorOpen: false,
+  bankOpen: false,
   bankDeposit: false,
+  guildBankDeposit: false,
   petFeed: false,
 };
 
@@ -38,14 +45,22 @@ const ITEMS: Record<string, ItemDef> = {
   questItem: { kind: 'quest', name: 'Relic', quality: 'epic' } as ItemDef,
   bound: { kind: 'armor', name: 'Bound Plate', quality: 'uncommon', noMarketList: true } as ItemDef,
   rod: { kind: 'tool', name: 'Fishing Rod', use: { type: 'fishing' } } as ItemDef,
-  reins: {
-    id: 'reins_grag_bear',
-    kind: 'mount',
-    mount: 'grag_bear',
-    name: 'Reins of the Goliath Grag-Bear',
+  // Tool-effect charm: use.type 'toolEffect' is not bag-usable; the hover must
+  // point at the Professions window rather than advertising "Click to use".
+  charm: {
+    kind: 'tool',
+    name: "Gatherer's Cache",
     quality: 'rare',
+    use: { type: 'toolEffect', effectId: 'gatherers_cache' },
   } as ItemDef,
   soulbound: { kind: 'quest', name: 'Soulbound Key', quality: 'epic', noDiscard: true } as ItemDef,
+  starterTool: {
+    kind: 'tool',
+    name: 'Gathering Sickle',
+    quality: 'common',
+    noVendorSell: true,
+    noMarketList: true,
+  } as ItemDef,
   mark: {
     kind: 'tool',
     name: 'Heroic Mark',
@@ -64,6 +79,13 @@ describe('bagShiftLinks', () => {
     expect(bagShiftLinks({ ...NO_MODE, petFeed: true })).toBe(true);
     expect(bagShiftLinks({ ...NO_MODE, vendorOpen: true })).toBe(false);
     expect(bagShiftLinks({ ...NO_MODE, bankDeposit: true })).toBe(false);
+    expect(bagShiftLinks({ ...NO_MODE, guildBankDeposit: true })).toBe(false);
+    // bankOpen is the ONE consumer that deliberately does not read the superset:
+    // the gate here is "does something else already own shift-click", and a bank
+    // view with no deposit target has no split prompt to collide with. Pinned so
+    // the exception is a tested decision, not an omission (every other consumer
+    // of bankOpen goes inert; this one stays live).
+    expect(bagShiftLinks({ ...NO_MODE, bankOpen: true })).toBe(true);
   });
 });
 
@@ -113,7 +135,9 @@ describe('bagDestroyAction', () => {
       'marketSell',
       'vendorOpen',
       'petFeed',
+      'bankOpen',
       'bankDeposit',
+      'guildBankDeposit',
     ] as const) {
       expect(bagDestroyAction(ITEMS.sword, { ...NO_MODE, [mode]: true })).toBe('none');
       // even a normally-blocked item is 'none' (not 'discardBlocked') in these modes.
@@ -141,6 +165,69 @@ describe('bagItemAction priority order', () => {
     expect(bagItemAction(ITEMS.sword, { ...NO_MODE, petFeed: true })).toBe('petFeedBlocked');
     expect(bagItemAction(ITEMS.questItem, NO_MODE)).toBe('discardQuest');
     expect(bagItemAction(ITEMS.potion, NO_MODE)).toBe('use');
+  });
+});
+
+describe('transfer-locked instanced copies (issue 1165)', () => {
+  const ARMED = { bindOnTrade: true };
+  const STAMPED = { bindOnTrade: true, boundTo: 7 };
+  const SIGNED = { signer: 'Ayla' };
+
+  it('blocks a locked copy in market-sell mode, in place, for armed AND stamped', () => {
+    expect(bagItemAction(ITEMS.sword, { ...NO_MODE, marketSell: true }, ARMED)).toBe(
+      'marketSellBlockedBound',
+    );
+    expect(bagItemAction(ITEMS.sword, { ...NO_MODE, marketSell: true }, STAMPED)).toBe(
+      'marketSellBlockedBound',
+    );
+  });
+
+  it('blocks a locked copy in mail-attach mode, in place, for armed AND stamped', () => {
+    expect(bagItemAction(ITEMS.sword, { ...NO_MODE, mailAttach: true }, ARMED)).toBe(
+      'mailAttachBlockedBound',
+    );
+    expect(bagItemAction(ITEMS.sword, { ...NO_MODE, mailAttach: true }, STAMPED)).toBe(
+      'mailAttachBlockedBound',
+    );
+  });
+
+  it('an UNLOCKED instanced copy stages normally: signed goods list and mail', () => {
+    expect(bagItemAction(ITEMS.sword, { ...NO_MODE, marketSell: true }, SIGNED)).toBe('marketSell');
+    expect(bagItemAction(ITEMS.sword, { ...NO_MODE, mailAttach: true }, SIGNED)).toBe('mailAttach');
+  });
+
+  it('the def-level gates still outrank the lock: quest/noMarketList block first', () => {
+    expect(bagItemAction(ITEMS.questItem, { ...NO_MODE, marketSell: true }, STAMPED)).toBe(
+      'marketSellBlockedQuest',
+    );
+    expect(bagItemAction(ITEMS.bound, { ...NO_MODE, mailAttach: true }, STAMPED)).toBe(
+      'mailAttachBlocked',
+    );
+  });
+
+  it('a lock never blocks outside the two pipe modes: vendor/bank/trade are unchanged', () => {
+    expect(bagItemAction(ITEMS.sword, { ...NO_MODE, tradeOpen: true }, STAMPED)).toBe('trade');
+    expect(bagItemAction(ITEMS.sword, { ...NO_MODE, vendorOpen: true }, STAMPED)).toBe(
+      'vendorSell',
+    );
+    expect(bagItemAction(ITEMS.sword, { ...NO_MODE, bankDeposit: true }, STAMPED)).toBe(
+      'bankDeposit',
+    );
+  });
+
+  it('the tooltip hint mirrors the block: cannot-market / cannot-mail for locked copies', () => {
+    expect(bagTooltipHintKey(ITEMS.sword, { ...NO_MODE, marketSell: true }, STAMPED)).toBe(
+      'itemUi.tooltip.cannotMarket',
+    );
+    expect(bagTooltipHintKey(ITEMS.sword, { ...NO_MODE, mailAttach: true }, ARMED)).toBe(
+      'hudChrome.mailbox.cannotMail',
+    );
+    expect(bagTooltipHintKey(ITEMS.sword, { ...NO_MODE, marketSell: true }, SIGNED)).toBe(
+      'itemUi.tooltip.clickMarketList',
+    );
+    expect(bagTooltipHintKey(ITEMS.sword, { ...NO_MODE, mailAttach: true }, SIGNED)).toBe(
+      'hudChrome.mailbox.clickAttach',
+    );
   });
 });
 
@@ -186,11 +273,13 @@ describe('bag mode chain order pin (insertion guard)', () => {
     mailAttach: true,
     marketSell: true,
     vendorOpen: true,
+    bankOpen: true,
     bankDeposit: true,
+    guildBankDeposit: true,
     petFeed: true,
   };
 
-  it('peels the action ladder one rung at a time: trade > mail-attach > market-sell > vendor > bank-deposit > pet-feed > kind fallbacks', () => {
+  it('peels the action ladder one rung at a time: trade > mail-attach > market-sell > vendor > guild-bank-deposit > bank-deposit > bank-open-no-target > pet-feed > kind fallbacks', () => {
     let mode = { ...ALL_MODES };
     expect(bagItemAction(ITEMS.sword, mode)).toBe('trade');
     mode = { ...mode, tradeOpen: false };
@@ -200,15 +289,95 @@ describe('bag mode chain order pin (insertion guard)', () => {
     mode = { ...mode, marketSell: false };
     expect(bagItemAction(ITEMS.sword, mode)).toBe('vendorSell');
     mode = { ...mode, vendorOpen: false };
+    expect(bagItemAction(ITEMS.sword, mode)).toBe('guildBankDeposit');
+    expect(bagItemAction(ITEMS.questItem, mode)).toBe('guildBankDepositBlockedQuest');
+    mode = { ...mode, guildBankDeposit: false };
     expect(bagItemAction(ITEMS.sword, mode)).toBe('bankDeposit');
     expect(bagItemAction(ITEMS.questItem, mode)).toBe('bankDepositBlockedQuest');
     mode = { ...mode, bankDeposit: false };
+    // The no-target rung: the bank is still OPEN, so the click stops here for
+    // every item kind rather than dropping to the rungs that act on the item.
+    expect(bagItemAction(ITEMS.sword, mode)).toBe('bankDepositBlockedNoTarget');
+    expect(bagItemAction(ITEMS.potion, mode)).toBe('bankDepositBlockedNoTarget');
+    expect(bagItemAction(ITEMS.bread, mode)).toBe('bankDepositBlockedNoTarget');
+    expect(bagItemAction(ITEMS.questItem, mode)).toBe('bankDepositBlockedNoTarget');
+    mode = { ...mode, bankOpen: false };
     expect(bagItemAction(ITEMS.bread, mode)).toBe('petFeed');
     expect(bagItemAction(ITEMS.sword, mode)).toBe('petFeedBlocked');
     mode = { ...mode, petFeed: false };
     expect(mode).toEqual(NO_MODE);
     expect(bagItemAction(ITEMS.questItem, mode)).toBe('discardQuest');
     expect(bagItemAction(ITEMS.sword, mode)).toBe('use');
+  });
+
+  it('a bank open with NEITHER deposit armed never falls through to the use ladder', () => {
+    // The regression this rung exists for (PR #2812 review): disarming both
+    // deposit modes for the guild pane's Log view left the ladder falling out
+    // the bottom, so an officer reading the activity log who clicked a bag item
+    // DRANK / EQUIPPED / SUMMONED it. Every kind that has a default action below
+    // the bank rungs is pinned here, and the mount/bag/quest kinds are named
+    // explicitly because each reaches a DIFFERENT sink (useItem, equipBag, the
+    // destroy prompt).
+    const logView: BagMode = { ...NO_MODE, bankOpen: true };
+    for (const key of ['sword', 'potion', 'bread', 'rod', 'questItem', 'bound', 'mark'] as const) {
+      expect(bagItemAction(ITEMS[key], logView), key).toBe('bankDepositBlockedNoTarget');
+    }
+    expect(bagItemAction({ kind: 'bag' }, logView)).toBe('bankDepositBlockedNoTarget');
+    expect(bagItemAction({ kind: 'mount' }, logView)).toBe('bankDepositBlockedNoTarget');
+    // Control: the SAME items with the bank closed keep their default actions,
+    // so the rung is proven to be the bank's doing and not a blanket refusal.
+    expect(bagItemAction(ITEMS.sword, NO_MODE)).toBe('use');
+    expect(bagItemAction({ kind: 'bag' }, NO_MODE)).toBe('equipBag');
+    expect(bagItemAction(ITEMS.questItem, NO_MODE)).toBe('discardQuest');
+    // And an ARMED deposit still outranks the no-target rung in both panes.
+    expect(bagItemAction(ITEMS.sword, { ...logView, bankDeposit: true })).toBe('bankDeposit');
+    expect(bagItemAction(ITEMS.sword, { ...logView, guildBankDeposit: true })).toBe(
+      'guildBankDeposit',
+    );
+  });
+
+  it('the open bank with no deposit target keeps destroy and the tooltip honest', () => {
+    // The same disarm re-armed two OTHER affordances that the open bank owns:
+    // shift+right-click destroy went live over a reading surface, and the
+    // tooltip advertised "Click to equip" for a click that is now refused.
+    const logView: BagMode = { ...NO_MODE, bankOpen: true };
+    expect(bagDestroyAction(ITEMS.sword, logView)).toBe('none');
+    expect(bagDestroyAction(ITEMS.soulbound, logView)).toBe('none');
+    // Control: with the bank fully closed the destroy affordance is live again.
+    expect(bagDestroyAction(ITEMS.sword, NO_MODE)).toBe('discard');
+    expect(bagTooltipHintKey(ITEMS.sword, logView)).toBe('hudChrome.bank.cannotDepositNow');
+    expect(bagTooltipHintKey(ITEMS.questItem, logView)).toBe('hudChrome.bank.cannotDepositNow');
+    expect(bagTooltipHintKey(ITEMS.potion, logView)).toBe('hudChrome.bank.cannotDepositNow');
+    // Control: closed bank, and each armed pane, keep their own hints.
+    expect(bagTooltipHintKey(ITEMS.sword, NO_MODE)).toBe('itemUi.tooltip.clickEquip');
+    expect(bagTooltipHintKey(ITEMS.sword, { ...logView, bankDeposit: true })).toBe(
+      'hudChrome.bank.depositHint',
+    );
+    expect(bagTooltipHintKey(ITEMS.sword, { ...logView, guildBankDeposit: true })).toBe(
+      'hudChrome.bank.guildDepositHint',
+    );
+  });
+
+  it('guild-bank-deposit pre-empts every pipe dimension in place (never falling to a lower rung)', () => {
+    const mode = { ...NO_MODE, guildBankDeposit: true };
+    // Allowed: an ordinary item, and an unlocked instanced copy.
+    expect(bagItemAction(ITEMS.sword, mode)).toBe('guildBankDeposit');
+    expect(bagItemAction(ITEMS.sword, mode, { signer: 'Ada' })).toBe('guildBankDeposit');
+    // Quest / soulbound / noMarketList / per-copy transfer lock each deny with
+    // their own arm (voicing the exact sim line at the consumer).
+    expect(bagItemAction(ITEMS.questItem, mode)).toBe('guildBankDepositBlockedQuest');
+    expect(bagItemAction(ITEMS.mark, mode)).toBe('guildBankDepositBlockedSoulbound');
+    expect(bagItemAction(ITEMS.bound, mode)).toBe('guildBankDepositBlockedNoTransfer');
+    expect(bagItemAction(ITEMS.sword, mode, { bindOnTrade: true })).toBe(
+      'guildBankDepositBlockedNoTransfer',
+    );
+    expect(bagItemAction(ITEMS.sword, mode, { boundTo: 7 })).toBe(
+      'guildBankDepositBlockedNoTransfer',
+    );
+    // Even with the pet-feed rung armed below, a deny blocks in place.
+    expect(bagItemAction(ITEMS.questItem, { ...mode, petFeed: true })).toBe(
+      'guildBankDepositBlockedQuest',
+    );
   });
 
   it('blocked variants block in place, they never fall through to a lower rung', () => {
@@ -226,6 +395,17 @@ describe('bag mode chain order pin (insertion guard)', () => {
     expect(bagItemAction(ITEMS.bound, { ...ALL_MODES, tradeOpen: false, mailAttach: false })).toBe(
       'marketSellBlockedNoMarket',
     );
+    // A quest item blocks in place at the GUILD bank rung; it must NOT fall
+    // through to the personal bank rung or pet-feed.
+    expect(
+      bagItemAction(ITEMS.questItem, {
+        ...ALL_MODES,
+        tradeOpen: false,
+        mailAttach: false,
+        marketSell: false,
+        vendorOpen: false,
+      }),
+    ).toBe('guildBankDepositBlockedQuest');
     // A quest item blocks in place at the bank; it must NOT fall through to pet-feed.
     expect(
       bagItemAction(ITEMS.questItem, {
@@ -234,6 +414,7 @@ describe('bag mode chain order pin (insertion guard)', () => {
         mailAttach: false,
         marketSell: false,
         vendorOpen: false,
+        guildBankDeposit: false,
       }),
     ).toBe('bankDepositBlockedQuest');
   });
@@ -249,9 +430,24 @@ describe('bag mode chain order pin (insertion guard)', () => {
     mode = { ...mode, marketSell: false };
     expect(bagTooltipHintKey(ITEMS.sword, mode)).toBe('itemUi.tooltip.clickSell');
     mode = { ...mode, vendorOpen: false };
+    // The guild tab carries its OWN hint keys (the consequences differ from
+    // the personal pane), and its cannot arm covers every pipe dimension,
+    // not only quest.
+    expect(bagTooltipHintKey(ITEMS.sword, mode)).toBe('hudChrome.bank.guildDepositHint');
+    expect(bagTooltipHintKey(ITEMS.questItem, mode)).toBe('hudChrome.bank.guildCannotDeposit');
+    expect(bagTooltipHintKey(ITEMS.mark, mode)).toBe('hudChrome.bank.guildCannotDeposit');
+    expect(bagTooltipHintKey(ITEMS.bound, mode)).toBe('hudChrome.bank.guildCannotDeposit');
+    expect(bagTooltipHintKey(ITEMS.sword, mode, { boundTo: 7 })).toBe(
+      'hudChrome.bank.guildCannotDeposit',
+    );
+    mode = { ...mode, guildBankDeposit: false };
     expect(bagTooltipHintKey(ITEMS.sword, mode)).toBe('hudChrome.bank.depositHint');
     expect(bagTooltipHintKey(ITEMS.questItem, mode)).toBe('hudChrome.bank.cannotDeposit');
     mode = { ...mode, bankDeposit: false };
+    // The no-target rung: still an OPEN bank, so the hint says so instead of
+    // advertising an equip the click will refuse.
+    expect(bagTooltipHintKey(ITEMS.sword, mode)).toBe('hudChrome.bank.cannotDepositNow');
+    mode = { ...mode, bankOpen: false };
     // Pet-feed has no tooltip hint: a weapon falls through to the kind branch.
     expect(bagTooltipHintKey(ITEMS.sword, mode)).toBe('itemUi.tooltip.clickEquip');
     mode = { ...mode, petFeed: false };
@@ -260,10 +456,18 @@ describe('bag mode chain order pin (insertion guard)', () => {
 
   it('shift-to-chat-link stays vendor- and bank-owned even with every mode on', () => {
     expect(bagShiftLinks(ALL_MODES)).toBe(false);
-    // Vendor AND bank each own shift; turning off only one keeps it owned.
+    // Vendor AND both bank modes each own shift; turning off only some keeps it owned.
     expect(bagShiftLinks({ ...ALL_MODES, vendorOpen: false })).toBe(false);
     expect(bagShiftLinks({ ...ALL_MODES, bankDeposit: false })).toBe(false);
-    expect(bagShiftLinks({ ...ALL_MODES, vendorOpen: false, bankDeposit: false })).toBe(true);
+    expect(bagShiftLinks({ ...ALL_MODES, vendorOpen: false, bankDeposit: false })).toBe(false);
+    expect(
+      bagShiftLinks({
+        ...ALL_MODES,
+        vendorOpen: false,
+        bankDeposit: false,
+        guildBankDeposit: false,
+      }),
+    ).toBe(true);
   });
 });
 
@@ -295,10 +499,26 @@ describe('bagTooltipHintKey', () => {
     expect(bagTooltipHintKey(ITEMS.bread, NO_MODE)).toBe('itemUi.tooltip.clickConsume');
     expect(bagTooltipHintKey(ITEMS.potion, NO_MODE)).toBe('itemUi.tooltip.clickUseInstant');
     expect(bagTooltipHintKey(ITEMS.rod, NO_MODE)).toBe('itemUi.tooltip.clickUse');
-    // The base reins tooltip already carries the use-to-summon line; bags must
-    // not append a duplicate action hint.
-    expect(bagTooltipHintKey(ITEMS.reins, NO_MODE)).toBe('');
+    // Charms refuse bag use (sim: "Open Professions to slot that."); the hint
+    // must not advertise click-to-use for a click that only errors.
+    expect(bagTooltipHintKey(ITEMS.charm, NO_MODE)).toBe(
+      'hudChrome.professions.toolEffectTooltip.openProfessions',
+    );
     expect(bagTooltipHintKey({ kind: 'junk' }, NO_MODE)).toBe('');
+  });
+
+  it('raw cooking catches are not clickConsume (junk reagents, no food kind)', () => {
+    // Phase 2: live catalog catches are kind junk with no use; bag affordance
+    // must not advertise consume. Right-click still hits useItem and shows the
+    // refuse toast via the Phase 1 error pipeline.
+    for (const id of RAW_COOKING_CATCH_IDS) {
+      const rawCatch = CATALOG_ITEMS[id];
+      expect(rawCatch, id).toBeTruthy();
+      expect(rawCatch.kind, id).toBe('junk');
+      expect(bagTooltipHintKey(rawCatch, NO_MODE), id).toBe('');
+      expect(bagItemAction(rawCatch, NO_MODE), id).toBe('use');
+      expect(bagItemAction(rawCatch, { ...NO_MODE, petFeed: true }), id).toBe('petFeedBlocked');
+    }
   });
 });
 
@@ -407,6 +627,107 @@ describe('buildBagGrid', () => {
   });
 });
 
+describe('bagNoMatchKind (empty filter copy)', () => {
+  it('selects the warm quest empty copy only for the quest category', () => {
+    expect(bagNoMatchKind({ category: 'quest', sort: 'recent', search: '' })).toBe('quest');
+    expect(bagNoMatchKind({ category: 'quest', sort: 'quality', search: 'x' })).toBe('quest');
+  });
+
+  it('keeps the generic no-match line for every other filter', () => {
+    expect(bagNoMatchKind(DEFAULT_BAG_FILTER)).toBe('generic');
+    expect(bagNoMatchKind({ category: 'weapon', sort: 'recent', search: '' })).toBe('generic');
+    expect(bagNoMatchKind({ category: 'all', sort: 'recent', search: 'zzzz' })).toBe('generic');
+  });
+});
+
+describe('bagQuestSectionHeadersAllowed + buildBagListRows (soft Quest section)', () => {
+  // Locked decision 7: soft Quest section headers must not break bag cell drop
+  // indices. In All + recent (bagOrderIsManual true) the painter uses model.cells
+  // and never inserts section nodes; pure helpers must also refuse headers there
+  // so a future list-path call cannot reintroduce the bug.
+  const mixed: InvSlot[] = [
+    { itemId: 'sword', count: 1 },
+    { itemId: 'questItem', count: 2 },
+    { itemId: 'potion', count: 3 },
+    { itemId: 'questItem', count: 1 },
+  ];
+
+  it('forbids section headers in All + recent (manual drop-target cell stream)', () => {
+    expect(bagQuestSectionHeadersAllowed(DEFAULT_BAG_FILTER)).toBe(false);
+    const rows = buildBagListRows(mixed, lookup, DEFAULT_BAG_FILTER);
+    expect(rows.every((r) => r.kind === 'stack')).toBe(true);
+    expect(rows.map((r) => (r.kind === 'stack' ? r.slot.itemId : r.section))).toEqual([
+      'sword',
+      'questItem',
+      'potion',
+      'questItem',
+    ]);
+  });
+
+  it('allows headers in derived lists (quality/name sort, category, search)', () => {
+    expect(bagQuestSectionHeadersAllowed({ ...DEFAULT_BAG_FILTER, sort: 'quality' })).toBe(true);
+    expect(bagQuestSectionHeadersAllowed({ ...DEFAULT_BAG_FILTER, sort: 'name' })).toBe(true);
+    expect(bagQuestSectionHeadersAllowed({ category: 'quest', sort: 'recent', search: '' })).toBe(
+      true,
+    );
+    expect(bagQuestSectionHeadersAllowed({ category: 'all', sort: 'recent', search: 'x' })).toBe(
+      true,
+    );
+  });
+
+  it('emits a Quest section then quest stacks then rest when the list is mixed', () => {
+    const filter = { ...DEFAULT_BAG_FILTER, sort: 'quality' as const };
+    const rows = buildBagListRows(mixed, lookup, filter);
+    expect(rows[0]).toEqual({ kind: 'section', section: 'quest' });
+    // Quest stacks keep relative order; rest keep relative order after them.
+    expect(rows.slice(1).map((r) => (r.kind === 'stack' ? r.slot.itemId : r.section))).toEqual([
+      'questItem',
+      'questItem',
+      'sword',
+      'potion',
+    ]);
+    // Exactly one section header (never nested or duplicated).
+    expect(rows.filter((r) => r.kind === 'section')).toHaveLength(1);
+  });
+
+  it('omits the header when every visible stack is quest (category quest)', () => {
+    const onlyQuest: InvSlot[] = [
+      { itemId: 'questItem', count: 1 },
+      { itemId: 'questItem', count: 2 },
+    ];
+    const filter = { category: 'quest' as const, sort: 'recent' as const, search: '' };
+    const rows = buildBagListRows(onlyQuest, lookup, filter);
+    expect(rows.every((r) => r.kind === 'stack')).toBe(true);
+    expect(rows.map((r) => (r.kind === 'stack' ? r.slot.itemId : ''))).toEqual([
+      'questItem',
+      'questItem',
+    ]);
+  });
+
+  it('omits the header when no quest stacks are visible', () => {
+    const noQuest: InvSlot[] = [
+      { itemId: 'sword', count: 1 },
+      { itemId: 'potion', count: 1 },
+    ];
+    const filter = { ...DEFAULT_BAG_FILTER, sort: 'name' as const };
+    const rows = buildBagListRows(noQuest, lookup, filter);
+    expect(rows.every((r) => r.kind === 'stack')).toBe(true);
+  });
+
+  it('manual All+recent buildBagGrid keeps real cells with no section stream', () => {
+    // Drop-index integrity: the pristine view paints model.cells by index.
+    // Section headers are list-only; cells path never consults buildBagListRows.
+    // Pin that the manual grid still exposes one entry per capacity square.
+    const model = buildBagGrid(mixed, lookup, DEFAULT_BAG_FILTER, 8);
+    expect(model.state).toBe('items');
+    expect(model.cells.length).toBe(8);
+    // Occupied cell indices match layout order; no header can shift bagIndex.
+    const occupied = model.cells.map((s, i) => (s ? i : -1)).filter((i) => i >= 0);
+    expect(occupied).toEqual([0, 1, 2, 3]);
+    expect(bagQuestSectionHeadersAllowed(DEFAULT_BAG_FILTER)).toBe(false);
+  });
+});
+
 describe('ClientWorld-vs-Sim parity', () => {
   // The Sim exposes its inventory array directly; a ClientWorld mirrors it from a
   // server snapshot (a JSON round-trip). Drive the grid model from both and assert
@@ -463,5 +784,38 @@ describe('bagsMoneyRowStale', () => {
   it('is not pinned to the current shown value', () => {
     // Mirrors bagsWindowShown's own contract: guard the hidden values, not 'flex'.
     expect(bagsMoneyRowStale('block', 5000, 1000)).toBe(true);
+  });
+});
+
+describe('noVendorSell affordances (the quest-granted starter tools)', () => {
+  it('denies the vendor click in place instead of dispatching a sale the sim refuses', () => {
+    // The sim refuses on noVendorSell (src/sim/items.ts sellItem). Before this
+    // mirror existed the click dispatched anyway and the player's only feedback
+    // was an error toast. A quality-'common' tool with a real sellValue is the
+    // case that made it visible: the tier-1 gathering tools are the first items
+    // to carry noVendorSell AND a nonzero sell price.
+    expect(bagItemAction(ITEMS.starterTool, { ...NO_MODE, vendorOpen: true })).toBe(
+      'vendorSellBlocked',
+    );
+    // Discriminating control: an ordinary sellable item still sells.
+    expect(bagItemAction(ITEMS.sword, { ...NO_MODE, vendorOpen: true })).toBe('vendorSell');
+  });
+
+  it('labels the tooltip cannot-vendor rather than advertising a click to sell', () => {
+    expect(bagTooltipHintKey(ITEMS.starterTool, { ...NO_MODE, vendorOpen: true })).toBe(
+      'itemUi.tooltip.cannotVendor',
+    );
+    expect(bagTooltipHintKey(ITEMS.sword, { ...NO_MODE, vendorOpen: true })).toBe(
+      'itemUi.tooltip.clickSell',
+    );
+  });
+
+  it('leaves every other mode alone: the flag gates the vendor arm only', () => {
+    // noVendorSell must not leak into trade, bank, or use. The tool is also
+    // noMarketList, so the market and mail arms block on THAT flag, which is a
+    // separate rule with its own pins above.
+    expect(bagItemAction(ITEMS.starterTool, { ...NO_MODE, tradeOpen: true })).toBe('trade');
+    expect(bagItemAction(ITEMS.starterTool, { ...NO_MODE, bankDeposit: true })).toBe('bankDeposit');
+    expect(bagItemAction(ITEMS.starterTool, NO_MODE)).toBe('use');
   });
 });

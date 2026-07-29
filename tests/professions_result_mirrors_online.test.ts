@@ -11,8 +11,8 @@
 //      the no-clear guarantee (a snapshot without the key preserves the mirror).
 //   D. Reconnect-style full snapshot (fresh session.lastSent) re-ships all three
 //      keys, including explicit nulls.
-//   E. Throttled apply_enchant attribution (the shipped coverage suite probes
-//      disenchant and salvage attribution, never enchant).
+//   E. Busy apply_enchant attribution while another cast is live (the shipped
+//      coverage suite probes disenchant and salvage attribution, never enchant).
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('../server/db', () => ({
@@ -36,13 +36,14 @@ vi.mock('../server/db', () => ({
 }));
 
 import { type ClientSession, GameServer } from '../server/game';
-import { ClientWorld } from '../src/net/online';
+import type { ClientWorld } from '../src/net/online';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
-import { CRAFT_THROTTLE_MAX_PER_WINDOW } from '../src/sim/professions/action_throttle';
-import type { Entity, PlayerClass, SimEvent } from '../src/sim/types';
+import type { Entity, SimEvent } from '../src/sim/types';
 import { grantItemToken, grantQtyText, harvestLineKey } from '../src/ui/grant_line_view';
 import { t } from '../src/ui/i18n';
+import { bareClient } from './helpers/bare_client';
+import { completeEnchantFamilyCast } from './helpers/enchant_family_cast';
 
 const COMMON_WEAPON = 'eastbrook_arming_sword';
 const DUST = 'arcane_dust';
@@ -57,7 +58,6 @@ type WireMsg = {
 };
 
 type SnapWireMsg = WireMsg & { self: Record<string, unknown> };
-type BareClientHarness = ClientWorld & Record<string, unknown>;
 type PositionedEntity = Entity & { prevPos?: Entity['pos'] };
 
 function fakeWs(): { sent: WireMsg[]; ws: unknown } {
@@ -89,6 +89,12 @@ function routeTick(server: GameServer): void {
   (server as unknown as { routeEvents(e: SimEvent[]): void }).routeEvents(server.sim.tick());
 }
 
+/** Complete a running profession cast on the server sim and route its events. */
+function flushProfessionCast(server: GameServer, pid: number): void {
+  completeEnchantFamilyCast(server.sim as never, pid);
+  routeTick(server);
+}
+
 function broadcast(server: GameServer): void {
   (server as unknown as { broadcastSnapshots(): void }).broadcastSnapshots();
 }
@@ -115,64 +121,6 @@ function eventsFor(sent: WireMsg[], type: SimEvent['type'], fromIdx = 0): SimEve
 
 function eventFrames(sent: WireMsg[], fromIdx = 0): WireMsg[] {
   return sent.slice(fromIdx).filter((m) => m.t === 'events');
-}
-
-// The tests/snapshots.test.ts bareClient shape (identical to the shipped
-// suites): a ClientWorld without WebSocket plumbing.
-function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWorld {
-  const c = Object.create(ClientWorld.prototype) as BareClientHarness;
-  Object.assign(c, {
-    cfg: { seed: 20061, playerClass },
-    entities: new Map(),
-    playerId: pid,
-    ownPlayerId: pid,
-    ownPlayerClass: playerClass,
-    spectating: null,
-    cupInfo: null,
-    lastVcupRemainder: null,
-    lastVcupShared: null,
-    sportRole: null,
-    moveInput: {},
-    inventory: [],
-    vendorBuyback: [],
-    equipment: {},
-    accountCosmetics: {
-      completedQuestIds: [],
-      mechChromaIds: [],
-      weaponSkinIds: [],
-      weaponSkinLoadout: {},
-    },
-    copper: 0,
-    honor: 0,
-    lifetimeHonor: 0,
-    xp: 0,
-    known: [],
-    questLog: new Map(),
-    questsDone: new Set(),
-    pendingQuestCommands: new Map(),
-    partyInfo: null,
-    selectedDungeonDifficulty: 'normal',
-    tradeInfo: null,
-    duelInfo: null,
-    lastSnapAt: 0,
-    snapInterval: 50,
-    serverTickHz: null,
-    missingSince: new Map(),
-    pendingFacingDelta: 0,
-    connected: true,
-    eventQueue: [],
-    mouselookFacing: null,
-    lastInputSentAt: 0,
-    lastInputSig: '',
-    inputSeq: 0,
-    pendingInputSeqSentAt: new Map(),
-    ackedInputSeq: 0,
-    inputEchoSamples: [],
-    spectateFacingPending: false,
-    pendingSpectateFacing: null,
-    nodeCooldowns: new Map(),
-  });
-  return c;
 }
 
 // eventQueue is private on ClientWorld; the probe reads it through one cast
@@ -203,12 +151,12 @@ describe('result mirror: event arm alone through the real onMessage path', () =>
     server.sim.addItem(COMMON_WEAPON, 3, st.pid);
     server.sim.addItem(DUST, 5, st.pid);
     const client = bareClient(st.pid);
-    expect(client.lastSalvageResult).toBeUndefined(); // bareClient skips field init
+    expect(client.lastSalvageResult).toBeNull(); // bareClient's declaration default
 
     // Salvage.
     let mark = fc.sent.length;
     cmd(server, st, { cmd: 'salvage_item', item: COMMON_WEAPON });
-    routeTick(server);
+    flushProfessionCast(server, st.pid);
     for (const f of eventFrames(fc.sent, mark)) feed(client, f);
     const salvStash = server.sim.lastSalvageResultFor(st.pid);
     expect(salvStash?.ok).toBe(true);
@@ -218,7 +166,7 @@ describe('result mirror: event arm alone through the real onMessage path', () =>
     // Disenchant.
     mark = fc.sent.length;
     cmd(server, st, { cmd: 'disenchant_item', item: COMMON_WEAPON });
-    routeTick(server);
+    flushProfessionCast(server, st.pid);
     for (const f of eventFrames(fc.sent, mark)) feed(client, f);
     const dencStash = server.sim.lastDisenchantResultFor(st.pid);
     expect(dencStash?.ok).toBe(true);
@@ -228,7 +176,7 @@ describe('result mirror: event arm alone through the real onMessage path', () =>
     // Apply enchant (the third weapon copy is still held; dust covers reagents).
     mark = fc.sent.length;
     cmd(server, st, { cmd: 'apply_enchant', item: COMMON_WEAPON, enchant: WEAPON_ENCHANT });
-    routeTick(server);
+    flushProfessionCast(server, st.pid);
     for (const f of eventFrames(fc.sent, mark)) feed(client, f);
     const enchStash = server.sim.lastEnchantResultFor(st.pid);
     expect(enchStash?.ok).toBe(true);
@@ -263,7 +211,7 @@ describe('the loot stand-down flags survive the server to client wire', () => {
     // and the flagged grant of the material it salvaged into.
     const mark = fc.sent.length;
     cmd(server, st, { cmd: 'salvage_item', item: COMMON_WEAPON });
-    routeTick(server);
+    flushProfessionCast(server, st.pid);
     for (const f of eventFrames(fc.sent, mark)) feed(client, f);
 
     const loot = queueOf(client).filter((e: SimEvent) => e.type === 'loot') as Array<{
@@ -482,7 +430,7 @@ describe('result mirror: event/snapshot ordering never regresses the mirror', ()
     server.sim.addItem(COMMON_WEAPON, 1, st.pid);
 
     cmd(server, st, { cmd: 'salvage_item', item: COMMON_WEAPON });
-    routeTick(server);
+    flushProfessionCast(server, st.pid);
     broadcast(server);
     const frames = eventFrames(fc.sent);
     const snap = snapAfter(fc.sent);
@@ -532,7 +480,7 @@ describe('result mirror: reconnect full snapshot converges the mirror', () => {
     server.sim.addItem(COMMON_WEAPON, 1, st.pid);
 
     cmd(server, st, { cmd: 'salvage_item', item: COMMON_WEAPON });
-    routeTick(server);
+    flushProfessionCast(server, st.pid);
     broadcast(server); // normal session state: salv delta consumed here
     const stash = server.sim.lastSalvageResultFor(st.pid);
     expect(stash?.ok).toBe(true);
@@ -557,62 +505,52 @@ describe('result mirror: reconnect full snapshot converges the mirror', () => {
 });
 
 // ---------------------------------------------------------------------------
-// E. Throttled apply_enchant attribution (the missing third direction).
+// E. Busy apply_enchant attribution while another cast is live.
 // ---------------------------------------------------------------------------
-describe('result mirror: throttled apply_enchant surfaces via enchantResult/ench only', () => {
-  it('a valid enchant attempt on a spent window denies with enchantResult throttled, sibling surfaces untouched', () => {
+describe('result mirror: busy apply_enchant surfaces via enchantResult/ench only', () => {
+  it('a valid enchant attempt while salvage is casting denies with enchantResult busy, siblings untouched', () => {
     const server = new GameServer();
     const fc = fakeWs();
     const st = joinServer(server, fc, 705, 'WireE');
     placeAt(server, st.pid, FIELD_POS);
-    // 11 weapons: 10 burn the shared window (5 salvage + 5 disenchant), 1 stays
-    // held as the enchant target. 5 dust covers the enchant reagents, so every
-    // pre-throttle check passes and the deny is genuinely the throttle.
-    server.sim.addItem(COMMON_WEAPON, CRAFT_THROTTLE_MAX_PER_WINDOW + 1, st.pid);
+    // One weapon to salvage (holds the cast), one weapon + dust for the enchant
+    // that must deny as busy without consuming.
+    server.sim.addItem(COMMON_WEAPON, 2, st.pid);
     server.sim.addItem(DUST, 5, st.pid);
 
-    const half = CRAFT_THROTTLE_MAX_PER_WINDOW / 2;
-    for (let i = 0; i < half; i++) cmd(server, st, { cmd: 'salvage_item', item: COMMON_WEAPON });
-    for (let i = 0; i < CRAFT_THROTTLE_MAX_PER_WINDOW - half; i++)
-      cmd(server, st, { cmd: 'disenchant_item', item: COMMON_WEAPON });
-    routeTick(server); // drain the burn's events
+    cmd(server, st, { cmd: 'salvage_item', item: COMMON_WEAPON });
+    routeTick(server);
     const preSalv = server.sim.lastSalvageResultFor(st.pid);
     const preDenc = server.sim.lastDisenchantResultFor(st.pid);
-    expect(preSalv?.ok).toBe(true);
-    expect(preDenc?.ok).toBe(true);
     const dustBefore = server.sim.countItem(DUST, st.pid);
-    expect(server.sim.countItem(COMMON_WEAPON, st.pid)).toBe(1);
+    expect(server.sim.countItem(COMMON_WEAPON, st.pid)).toBe(2);
     const mark = fc.sent.length;
 
     cmd(server, st, { cmd: 'apply_enchant', item: COMMON_WEAPON, enchant: WEAPON_ENCHANT });
     routeTick(server);
 
-    // Exactly one enchantResult, reason throttled; ZERO sibling events.
     const ench = eventsFor(fc.sent, 'enchantResult', mark);
     expect(ench).toHaveLength(1);
     if (ench[0].type !== 'enchantResult') throw new Error('expected enchantResult');
     expect(ench[0].ok).toBe(false);
-    expect(ench[0].reason).toBe('throttled');
+    expect(ench[0].reason).toBe('busy');
     expect(ench[0].enchantId).toBe(WEAPON_ENCHANT);
     expect(eventsFor(fc.sent, 'disenchantResult', mark)).toEqual([]);
     expect(eventsFor(fc.sent, 'salvageResult', mark)).toEqual([]);
 
-    // Sibling stashes untouched; nothing consumed by the throttled attempt.
-    expect(server.sim.lastEnchantResultFor(st.pid)?.reason).toBe('throttled');
+    expect(server.sim.lastEnchantResultFor(st.pid)?.reason).toBe('busy');
     expect(server.sim.lastSalvageResultFor(st.pid)).toEqual(preSalv);
     expect(server.sim.lastDisenchantResultFor(st.pid)).toEqual(preDenc);
     expect(server.sim.countItem(DUST, st.pid)).toBe(dustBefore);
-    expect(server.sim.countItem(COMMON_WEAPON, st.pid)).toBe(1);
+    expect(server.sim.countItem(COMMON_WEAPON, st.pid)).toBe(2);
 
-    // Convergence arm: the ench delta decodes onto the right mirror and the
-    // sibling mirrors receive their own (pre-mark) values, not the deny.
     broadcast(server);
     const snap = snapAfter(fc.sent, mark);
     if (!snap) throw new Error('no snapshot');
     const client = bareClient(st.pid);
     applySnap(client, snap);
     expect(client.lastEnchantResult?.ok).toBe(false);
-    expect(client.lastEnchantResult?.reason).toBe('throttled');
+    expect(client.lastEnchantResult?.reason).toBe('busy');
     expect(client.lastSalvageResult).toEqual(preSalv);
     expect(client.lastDisenchantResult).toEqual(preDenc);
   });

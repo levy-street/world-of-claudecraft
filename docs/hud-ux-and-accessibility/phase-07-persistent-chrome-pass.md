@@ -33,7 +33,7 @@ STEP 0 - PRE-FLIGHT (do this before anything else; STOP on any failure)
    helper and --quality-* tokens. If ANY of these is missing, STOP and surface
    exactly which checkpoint is unmet; do not start Phase 7 on an unmet checkpoint.
 3. Memory scan. Read the user memory index and the relevant notes:
-   /Users/fernando/.claude/projects/-Users-fernando-Documents-world-of-claudecraft/memory/MEMORY.md
+   project MEMORY.md (path redacted)
    and the notes for: hud, i18n, shared-worktree, never-push-to-fork,
    no-em-dashes-or-emojis, live-site-and-test-creds. Honor all of them this phase.
 4. Branch. Create and switch to the phase branch:

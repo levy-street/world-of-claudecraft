@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
-[![Version](https://img.shields.io/badge/version-0.31.0-blue)](../../package.json)
+[![Version](https://img.shields.io/badge/version-0.35.1-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.zh_TW.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -92,7 +92,7 @@ npm install
 npm run dev        # then open http://localhost:5173 and choose Play Offline
 ```
 
-為你的角色命名，從九個職業中任選一個，你就會從 **Eastbrook Vale**（1 到 7 級）出發，這是一座被眾多樞紐環繞的集市城鎮：北邊是狼群出沒處，東邊是野豬草甸，西邊是 the Sableweb 森林，西北是 Mirror Lake，西南是一處滿是穴居生物的銅礦坑，東北是一座住著不安亡者的荒廢禮拜堂，東南則有 Gorrak 的盜匪營地。北方道路爬上一處山口，通往 **Mirefen Marsh**（6 到 13 級，樞紐 Fenbridge），再往上到 **Thornpeak Heights**（13 到 20 級，樞紐 Highwatch）。世界種子固定寫在 `src/main.ts` 裡，所以每次造訪都是同一個地方。
+為你的角色命名，從九個職業中任選一個，你就會從 **Eastbrook Vale**（1 到 7 級）出發，這是一座被眾多樞紐環繞的集市城鎮：北邊是狼群出沒處，東邊是野豬草甸，西邊是 the Sableweb 森林，西北是 Mirror Lake，西南是一處滿是穴居生物的銅礦坑，東北是一座住著不安亡者的荒廢禮拜堂，東南則有 Gorrak 的盜匪營地。北方道路爬上一處山口，通往 **Mirefen Marsh**（6 到 13 級，樞紐 Fenbridge），再往上到 **Thornpeak Heights**（13 到 20 級，樞紐 Highwatch）。世界種子固定寫在 `src/sim/world_seed.ts` 裡，所以每次造訪都是同一個地方。
 
 ### Windows、Linux 與 macOS 的桌面應用程式
 

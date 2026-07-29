@@ -44,6 +44,14 @@ const itemStringsEn = {
       armor: 'Armor',
       quest: 'Quest Item',
       junk: 'Junk',
+      // The fine-grade presentation split (the UX pass): a fine material's
+      // KIND stays 'junk' internally (substitution and sell rules key off
+      // it) but its tooltip line reads this instead.
+      fineMaterial: 'Fine Material',
+      // Honest materials (ores, reagents, raw cooking catches, ...): kind
+      // stays junk for Sell Junk / taxonomy, but the tooltip line reads
+      // Material so they do not look like grey trash.
+      material: 'Material',
       food: 'Food',
       drink: 'Drink',
     },
@@ -71,8 +79,23 @@ const itemStringsEn = {
       useFood: 'Use: Restores {amount} health over {seconds} sec. Must remain seated while eating.',
       useDrink:
         'Use: Restores {amount} mana over {seconds} sec. Must remain seated while drinking.',
+      // Battle elixirs (elixir_tooltip_view.ts): the stat line for a mapped
+      // buff kind, and the aura-name fallback so an unmapped kind still says
+      // what quaffing grants instead of saying nothing.
+      useElixir: 'Use: Increases your {stat} by {value} for {minutes} min. Usable in combat.',
+      useElixirAura: 'Use: Grants {aura} for {minutes} min. Usable in combat.',
       questItem: 'Quest Item',
+      // Story tooltip lines (quest_item_tooltip_view.ts): related quest title,
+      // keep-rules footer, and orphaned copy when the item is no longer needed
+      // for an active quest. Progress reuses questUi.detail.objectiveProgress
+      // via the host so tracker and item tooltips share one number format.
+      questRelated: 'Quest: {quest}',
+      questRules: 'Cannot be sold, banked, or traded.',
+      questOrphaned: 'Not needed for any active quest.',
       classes: 'Classes: {classes}',
+      // Stackable per-slot cap (stack_size_tooltip_view.ts); unstackable
+      // kinds render no line at all rather than "Max stack: 1".
+      maxStack: 'Max stack: {count}',
       sellPrice: 'Sell price: {money}',
       clickBuy: 'Click to buy',
       clickSell: 'Click to sell',
@@ -93,6 +116,21 @@ const itemStringsEn = {
       destroyTitle: 'Destroy {item}',
       destroyConfirm: 'Destroy',
       destroyCancel: 'Cancel',
+      // Tooltip sub-line for a stack whose item id this bundle cannot resolve
+      // (a client one deploy behind the server, R34); the title is the raw id.
+      unknownItem: 'Unknown item',
+      // The same stack's accessible name: the aria channel must carry the
+      // UNKNOWN signal too, since the tooltip sub-line is hover-only.
+      unknownItemAria: 'Unknown item {id}, quantity {count}',
+      // The per-copy flags for an unknown stack (stale-client guard): both
+      // aria facts must survive together, the UNKNOWN signal (the tooltip is
+      // mouse-only) and the instance flag the sighted glyph shows. Kind map
+      // mirrors hudChrome.bags.itemAria*: signed and generic share the
+      // maker-marked wording.
+      unknownItemAriaMasterwork: 'Unknown item {id}, quantity {count}, masterwork',
+      unknownItemAriaEnchanted: 'Unknown item {id}, quantity {count}, enchanted copy',
+      unknownItemAriaBound: 'Unknown item {id}, quantity {count}, bound copy',
+      unknownItemAriaInstanced: 'Unknown item {id}, quantity {count}, maker-marked copy',
     },
     equipment: {
       empty: 'Empty',
@@ -103,6 +141,38 @@ const itemStringsEn = {
       close: 'Close vendor',
       hint: 'Click an item in your bags to sell it while this window is open.',
       buyAria: 'Buy {item} for {price}',
+      // The requirement-carrying sibling (R22): an aria-label REPLACES the
+      // button's content as its accessible name, so a row whose tool carries
+      // an unmet wield requirement must fold that advisory into the name
+      // itself or screen-reader users never hear it. One key, never two
+      // concatenated t() results; {requirement} receives the already
+      // localized "Requires {craft} {skill}" line.
+      buyAriaWithRequirement: 'Buy {item} for {price}. {requirement}',
+      // Bulk purchase (#2374): a ctrl/cmd-click on the row or this always-visible
+      // control buys the largest affordable stack in one purchase.
+      buyStack: 'Buy {count}',
+      buyStackAria: 'Buy {count} {item} for {price}',
+      // The 1x/5x/10x/custom purchase control row (phase 21). qtyMultiple is
+      // the visible label on both the control chips AND the per-row count
+      // chip beside a multiplied total (one grammar for both surfaces); the
+      // arias name the action for screen readers.
+      qtyRowAria: 'Purchase quantity',
+      qtyMultiple: '{count}x',
+      qtyMultipleAria: 'Buy {count} at a time',
+      qtyCustom: 'Custom',
+      qtyCustomAria: 'Choose a custom amount to buy',
+      // The count-aware row labels (acceptance: aria names qty and total
+      // price). The requirement sibling folds the R22 advisory into the name
+      // exactly like buyAriaWithRequirement: one combined key, never two
+      // concatenated t() results.
+      buyCountAria: 'Buy {count} of {item} for {price}',
+      buyCountAriaWithRequirement: 'Buy {count} of {item} for {price}. {requirement}',
+      // The custom-amount prompt (the sell-split prompt family): the title
+      // shows the countFit-derived maximum so the cap is never a surprise;
+      // the cancel label reuses sellQuantityCancel like the deposit prompt.
+      buyQuantityTitle: 'Buy how many {item}? Up to {max}.',
+      buyQuantityInput: 'Quantity to buy',
+      buyQuantityConfirm: 'Buy',
     },
     market: {
       title: 'The World Market',
@@ -172,6 +242,17 @@ const itemStringsEn = {
       reclaim: 'Reclaim',
       buyAria: 'Buy {item} for {price}',
       reclaimAria: 'Reclaim {item}',
+      // Confirm prompt gating a buyout (Reclaim stays one click: it returns your own
+      // goods and costs nothing). The stack body quotes the total ask and the
+      // per-unit ask the browse row showed; buyChanged is the confirm-time refusal
+      // when the listing was replaced or re-priced while the prompt was up (a listing
+      // that left entirely reuses itemUi.errors.listingUnavailable).
+      buyConfirmTitle: 'Confirm Purchase',
+      buyConfirmBody: 'Buy {item} for {price}?',
+      buyConfirmBodyStack: 'Buy {item} x{count} for {price} ({each} each)?',
+      buyConfirmAccept: 'Buy',
+      buyConfirmCancel: 'Cancel',
+      buyChanged: 'That listing changed before you confirmed. Check the price and try again.',
       sellNote:
         'List goods from your bags. The Merchant takes a {cut}% cut when an item sells. You are using {used}/{max} listing slots.',
       sellPickEmpty: 'Click an item in your bags to choose what to sell.',
@@ -183,6 +264,10 @@ const itemStringsEn = {
       collectEmpty: 'Nothing waiting. Sale proceeds and expired listings collect here.',
       collectNote: 'Earnings and returned goods the Merchant is holding for you.',
       saleProceeds: 'Sale proceeds',
+      // The itemized ledger under the proceeds line. saleOlder covers the rows the
+      // ledger cap dropped, whose gold IS still in the total above.
+      saleBuyer: 'Sold to {buyer}',
+      saleOlder: 'Plus {count} earlier sales, included in the total.',
       collectAll: 'Collect All',
     },
     logs: {
@@ -293,6 +378,7 @@ export const itemStrings = {
         clickDestroy: 'Haz clic para destruir',
       },
       bags: {
+        ...itemStringsEn.itemUi.bags,
         title: 'Bolsas',
         close: 'Cerrar bolsas',
         empty: 'Tus bolsas están vacías.',
@@ -308,6 +394,11 @@ export const itemStrings = {
         close: 'Cerrar vendedor',
         hint: 'Haz clic en un objeto de tus bolsas para venderlo mientras esta ventana esté abierta.',
         buyAria: 'Comprar {item} por {price}',
+        // English text carried through: never translated because the pending resolved
+        // table drives the UI regardless (itemStrings.es is not consumed at runtime,
+        // see i18n.catalog/index.ts), so a real translation here would be inert.
+        buyStack: itemStringsEn.itemUi.vendor.buyStack,
+        buyStackAria: itemStringsEn.itemUi.vendor.buyStackAria,
       },
       market: {
         ...itemStringsEn.itemUi.market,
@@ -455,6 +546,7 @@ export const itemStrings = {
         clickDestroy: 'Cliquer pour détruire',
       },
       bags: {
+        ...itemStringsEn.itemUi.bags,
         title: 'Sacs',
         close: 'Fermer les sacs',
         empty: 'Vos sacs sont vides.',
@@ -470,6 +562,11 @@ export const itemStrings = {
         close: 'Fermer le vendeur',
         hint: 'Cliquez sur un objet dans vos sacs pour le vendre tant que cette fenêtre est ouverte.',
         buyAria: 'Acheter {item} pour {price}',
+        // English text carried through: never translated because the pending resolved
+        // table drives the UI regardless (itemStrings.fr is not consumed at runtime,
+        // see i18n.catalog/index.ts), so a real translation here would be inert.
+        buyStack: itemStringsEn.itemUi.vendor.buyStack,
+        buyStackAria: itemStringsEn.itemUi.vendor.buyStackAria,
       },
       market: {
         ...itemStringsEn.itemUi.market,
@@ -617,6 +714,7 @@ export const itemStrings = {
         clickDestroy: 'Clicca per distruggere',
       },
       bags: {
+        ...itemStringsEn.itemUi.bags,
         title: 'Borse',
         close: 'Chiudi borse',
         empty: 'Le tue borse sono vuote.',
@@ -777,6 +875,7 @@ export const itemStrings = {
         clickDestroy: 'Zum Zerstören klicken',
       },
       bags: {
+        ...itemStringsEn.itemUi.bags,
         title: 'Taschen',
         close: 'Taschen schließen',
         empty: 'Eure Taschen sind leer.',
@@ -936,6 +1035,7 @@ export const itemStrings = {
         clickDestroy: '点击摧毁',
       },
       bags: {
+        ...itemStringsEn.itemUi.bags,
         title: '背包',
         close: '关闭背包',
         empty: '你的背包是空的。',
@@ -1090,6 +1190,7 @@ export const itemStrings = {
         clickDestroy: '點擊摧毀',
       },
       bags: {
+        ...itemStringsEn.itemUi.bags,
         title: '背包',
         close: '關閉背包',
         empty: '你的背包是空的。',
@@ -1246,6 +1347,7 @@ export const itemStrings = {
         clickDestroy: '클릭하여 파괴',
       },
       bags: {
+        ...itemStringsEn.itemUi.bags,
         title: '가방',
         close: '가방 닫기',
         empty: '가방이 비어 있습니다.',
@@ -1404,6 +1506,7 @@ export const itemStrings = {
         clickDestroy: 'クリックして破棄',
       },
       bags: {
+        ...itemStringsEn.itemUi.bags,
         title: 'バッグ',
         close: 'バッグを閉じる',
         empty: 'バッグは空です。',
@@ -1562,6 +1665,7 @@ export const itemStrings = {
         clickDestroy: 'Clique para destruir',
       },
       bags: {
+        ...itemStringsEn.itemUi.bags,
         title: 'Bolsas',
         close: 'Fechar bolsas',
         empty: 'Suas bolsas estão vazias.',
@@ -1720,6 +1824,7 @@ export const itemStrings = {
         clickDestroy: 'Нажмите, чтобы уничтожить',
       },
       bags: {
+        ...itemStringsEn.itemUi.bags,
         title: 'Сумки',
         close: 'Закрыть сумки',
         empty: 'Ваши сумки пусты.',
@@ -1802,8 +1907,13 @@ export const itemStrings = {
   },
 };
 
-itemStrings.es_ES = itemStrings.es;
-itemStrings.fr_CA = itemStrings.fr_FR;
+// The casts keep these dialect aliases from forcing new keys into the inline
+// locale blocks above: those blocks are INERT legacy data (the resolver reads
+// only itemStrings.en; translations live in src/ui/i18n.locales/<lang>.ts),
+// and the uncast assignment is exactly what once pushed real fills into this
+// file where no locale ever served them.
+itemStrings.es_ES = itemStrings.es as typeof itemStringsEn;
+itemStrings.fr_CA = itemStrings.fr_FR as typeof itemStringsEn;
 
 const ITEM_ENTITY_IDS = [
   'worn_sword',
@@ -1872,6 +1982,11 @@ const ITEM_ENTITY_IDS = [
   'arcane_essence',
   'arcane_shard',
   'fen_muster_order',
+  // Quest-dedupe pass (zones 1 to 3): the firebottle quest tools and collects.
+  'firebottle',
+  'murloc_hut',
+  'restless_skull',
+  'vanguard_bone',
   'mire_prowler_pelt',
   'lost_caravan_goods',
   'waterlogged_idol',
@@ -2047,6 +2162,13 @@ const ITEM_ENTITY_IDS = [
   'cinderweave_legwraps',
   'cinderweave_handwraps',
   'cinderweave_slippers',
+  'thornhide_headdress',
+  'thornhide_mantle',
+  'thornhide_vestment',
+  'thornhide_cinch',
+  'thornhide_leggings',
+  'thornhide_gloves',
+  'thornhide_boots',
   'final_oath_medallion',
   'razorwind_torque',
   'cinder_sigil_pendant',
@@ -2177,6 +2299,17 @@ const ITEM_ENTITY_IDS = [
   'resonant_links',
   'resonant_steel',
   'resonant_timber',
+  'fine_copper_ore',
+  'fine_iron_ore',
+  'fine_thorium_ore',
+  'fine_ironbark_log',
+  'fine_ashwood_log',
+  'fine_elderwood_log',
+  'fine_silverleaf_herb',
+  'fine_goldleaf_herb',
+  'fine_sunpetal_herb',
+  'stormreel_fishing_rod',
+  'tidewrought_fishing_rod',
   'duskwisp_essence',
   'spore_heart',
   'gleaming_antler',
@@ -2223,6 +2356,10 @@ const ITEM_ENTITY_IDS = [
   'wildheart_tuskblade',
   'wildheart_hexwood_staff',
   'wildheart_fangknife',
+  'fanglords_beastspear',
+  'bloodmane_warleggings',
+  'vineclaw_stalking_breeches',
+  'sunbone_ritual_sarong',
   'thick_winter_pelt',
   'aurora_mote',
   'hearth_ember_cache',
@@ -2279,6 +2416,17 @@ const ITEM_ENTITY_IDS = [
   'saltforged_grips',
   'mantle_of_the_unbroken_shore',
   'last_keep_signet',
+  'gatherers_cache',
+  'artisans_eye',
+  'reins_terrorspark_groundshaker',
+  'reins_drakemaw_raptor',
+  'moggers_hide_quiver',
+  'cragmaw_huntquiver',
+  'gravewyrm_bone_quiver',
+  'direfang_quiver',
+  'sharp_claw',
+  'curved_tusk',
+  'pristine_claw',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2314,6 +2462,10 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   wildheart_tuskblade: 'Wildheart Tuskblade',
   wildheart_hexwood_staff: 'Hexwood Staff of the Basin',
   wildheart_fangknife: 'Fangknife of Zulgar',
+  fanglords_beastspear: "Fanglord's Beastspear",
+  bloodmane_warleggings: 'Bloodmane Warleggings',
+  vineclaw_stalking_breeches: 'Vineclaw Stalking Breeches',
+  sunbone_ritual_sarong: 'Sunbone Ritual Sarong',
   thick_winter_pelt: 'Thick Winter Pelt',
   aurora_mote: 'Aurora Mote',
   hearth_ember_cache: 'Ember Cache',
@@ -2370,6 +2522,35 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   saltforged_grips: 'Saltforged Grips',
   mantle_of_the_unbroken_shore: 'Mantle of the Unbroken Shore',
   last_keep_signet: 'Signet of the Last Keep',
+  gatherers_cache: "Gatherer's Cache",
+  artisans_eye: "Artisan's Eye",
+  reins_terrorspark_groundshaker: 'Ignition Key: Terrorspark Groundshaker',
+  // Quest-dedupe pass (zones 1 to 3): English-appended until the release fill
+  // folds them into the per-locale arrays.
+  firebottle: 'Firebottle',
+  murloc_hut: 'Mudfin Hut',
+  // Dragonkin brood rebuild (PR #2811), same English-appended treatment.
+  reins_drakemaw_raptor: 'Reins of the Drakemaw Raptor',
+  restless_skull: 'Restless Skull',
+  vanguard_bone: 'Vanguard Bone',
+  // Hunter quivers, the class's first held-offhand ladder; same English-appended
+  // treatment until the release fill folds them into the per-locale arrays.
+  moggers_hide_quiver: "Mogger's Hide Quiver",
+  cragmaw_huntquiver: 'Cragmaw Huntquiver',
+  gravewyrm_bone_quiver: 'Gravewyrm Bone Quiver',
+  direfang_quiver: 'Direfang Quiver',
+  sharp_claw: 'Sharp Claw',
+  curved_tusk: 'Curved Tusk',
+  pristine_claw: 'Pristine Claw',
+  // Thornhide Garb, the leather caster WARFARE family. English-appended like the
+  // quivers above until the release fill folds them into the per-locale arrays.
+  thornhide_headdress: 'Thornhide Headdress',
+  thornhide_mantle: 'Thornhide Mantle',
+  thornhide_vestment: 'Thornhide Vestment',
+  thornhide_cinch: 'Thornhide Cinch',
+  thornhide_leggings: 'Thornhide Leggings',
+  thornhide_gloves: 'Thornhide Gloves',
+  thornhide_boots: 'Thornhide Boots',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {
@@ -2790,6 +2971,17 @@ const itemNamesEn = {
       'Resonant Links',
       'Resonant Steel',
       'Resonant Timber',
+      'Fine Copper Ore',
+      'Fine Iron Ore',
+      'Fine Osmium Ore',
+      'Fine Ironbark Log',
+      'Fine Ashwood Log',
+      'Fine Highpine Log',
+      'Fine Sheenleaf Herb',
+      'Fine Goldleaf Herb',
+      'Fine Sunpetal Herb',
+      'Stormreel Fishing Rod',
+      'Tidewrought Fishing Rod',
       'Duskwisp Essence',
       'Spore Heart',
       'Gleaming Antler',
@@ -3206,6 +3398,17 @@ export const itemNames = {
         'Resonant Links',
         'Resonant Steel',
         'Resonant Timber',
+        'Fine Copper Ore',
+        'Fine Iron Ore',
+        'Fine Osmium Ore',
+        'Fine Ironbark Log',
+        'Fine Ashwood Log',
+        'Fine Highpine Log',
+        'Fine Sheenleaf Herb',
+        'Fine Goldleaf Herb',
+        'Fine Sunpetal Herb',
+        'Stormreel Fishing Rod',
+        'Tidewrought Fishing Rod',
         'Esencia de fuego crepuscular',
         'Corazón de espora',
         'Asta reluciente',
@@ -3620,6 +3823,17 @@ export const itemNames = {
         'Resonant Links',
         'Resonant Steel',
         'Resonant Timber',
+        'Fine Copper Ore',
+        'Fine Iron Ore',
+        'Fine Osmium Ore',
+        'Fine Ironbark Log',
+        'Fine Ashwood Log',
+        'Fine Highpine Log',
+        'Fine Sheenleaf Herb',
+        'Fine Goldleaf Herb',
+        'Fine Sunpetal Herb',
+        'Stormreel Fishing Rod',
+        'Tidewrought Fishing Rod',
         'Essence de feu follet du crépuscule',
         'Coeur de spore',
         'Bois de cerf luisant',
@@ -4035,6 +4249,17 @@ export const itemNames = {
         'Resonant Links',
         'Resonant Steel',
         'Resonant Timber',
+        'Fine Copper Ore',
+        'Fine Iron Ore',
+        'Fine Osmium Ore',
+        'Fine Ironbark Log',
+        'Fine Ashwood Log',
+        'Fine Highpine Log',
+        'Fine Sheenleaf Herb',
+        'Fine Goldleaf Herb',
+        'Fine Sunpetal Herb',
+        'Stormreel Fishing Rod',
+        'Tidewrought Fishing Rod',
         'Essenza di fuoco fatuo del crepuscolo',
         'Cuore di spora',
         'Palco luccicante',
@@ -4448,6 +4673,17 @@ export const itemNames = {
         'Resonant Links',
         'Resonant Steel',
         'Resonant Timber',
+        'Fine Copper Ore',
+        'Fine Iron Ore',
+        'Fine Osmium Ore',
+        'Fine Ironbark Log',
+        'Fine Ashwood Log',
+        'Fine Highpine Log',
+        'Fine Sheenleaf Herb',
+        'Fine Goldleaf Herb',
+        'Fine Sunpetal Herb',
+        'Stormreel Fishing Rod',
+        'Tidewrought Fishing Rod',
         'Dämmerirrlicht-Essenz',
         'Sporenherz',
         'Schimmerndes Geweih',
@@ -4861,6 +5097,17 @@ export const itemNames = {
         'Resonant Links',
         'Resonant Steel',
         'Resonant Timber',
+        '优质铜矿石',
+        '优质铁矿石',
+        '优质锇矿石',
+        '优质铁皮木原木',
+        '优质灰木原木',
+        '优质高松原木',
+        '优质润光叶草',
+        '优质金叶草',
+        '优质阳瓣草',
+        '风暴轮钓竿',
+        '潮铸钓竿',
         '暮光灵精华',
         '孢子之心',
         '辉光鹿角',
@@ -5274,6 +5521,17 @@ export const itemNames = {
         'Resonant Links',
         'Resonant Steel',
         'Resonant Timber',
+        '優質銅礦石',
+        '優質鐵礦石',
+        '優質鋨礦石',
+        '優質鐵皮木原木',
+        '優質灰木原木',
+        '優質高松原木',
+        '優質潤光葉草',
+        '優質金葉草',
+        '優質陽瓣草',
+        '風暴輪釣竿',
+        '潮鑄釣竿',
         '暮光靈精華',
         '孢子之心',
         '輝光鹿角',
@@ -5687,6 +5945,17 @@ export const itemNames = {
         'Resonant Links',
         'Resonant Steel',
         'Resonant Timber',
+        '상급 구리 광석',
+        '상급 철 광석',
+        '상급 오스뮴 광석',
+        '상급 무쇠껍질나무 통나무',
+        '상급 잿빛나무 통나무',
+        '상급 고산솔 통나무',
+        '상급 윤광잎 약초',
+        '상급 금빛잎 약초',
+        '상급 태양꽃잎 약초',
+        '폭풍릴 낚싯대',
+        '조수벼림 낚싯대',
         '황혼 위습의 정수',
         '포자 심장',
         '빛나는 가지뿔',
@@ -6100,6 +6369,17 @@ export const itemNames = {
         'Resonant Links',
         'Resonant Steel',
         'Resonant Timber',
+        '上質な銅鉱石',
+        '上質な鉄鉱石',
+        '上質なオスミウム鉱石',
+        '上質なアイアンバークの丸太',
+        '上質なアッシュウッドの丸太',
+        '上質な高嶺松の丸太',
+        '上質な艶葉草',
+        '上質なゴールドリーフ草',
+        '上質なサンペタル草',
+        '嵐リールの釣り竿',
+        '潮鍛えの釣り竿',
         'ダスクウィスプの精髄',
         '胞子の心臓',
         '輝く鹿角',
@@ -6513,6 +6793,17 @@ export const itemNames = {
         'Resonant Links',
         'Resonant Steel',
         'Resonant Timber',
+        'Fine Copper Ore',
+        'Fine Iron Ore',
+        'Fine Osmium Ore',
+        'Fine Ironbark Log',
+        'Fine Ashwood Log',
+        'Fine Highpine Log',
+        'Fine Sheenleaf Herb',
+        'Fine Goldleaf Herb',
+        'Fine Sunpetal Herb',
+        'Stormreel Fishing Rod',
+        'Tidewrought Fishing Rod',
         'Essência de fogo-fátuo do crepúsculo',
         'Coração de esporo',
         'Galhada reluzente',
@@ -6926,6 +7217,17 @@ export const itemNames = {
         'Resonant Links',
         'Resonant Steel',
         'Resonant Timber',
+        'Отборная медная руда',
+        'Отборная железная руда',
+        'Отборная осмиевая руда',
+        'Отборное бревно железнокорого дерева',
+        'Отборное бревно пепельного дерева',
+        'Отборное бревно горной сосны',
+        'Отборная трава глянцелист',
+        'Отборная трава золотолист',
+        'Отборная трава солнцелепест',
+        'Удочка со штормовой катушкой',
+        'Удочка приливной ковки',
         'Сущность сумеречного огонька',
         'Споровое сердце',
         'Сияющий рог',

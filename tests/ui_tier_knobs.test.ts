@@ -172,11 +172,12 @@ describe('ui_tier_knobs - nameplate refresh cadence (static-preset tiered, secon
 });
 
 describe('ui_tier_knobs - nonSelfRepaintDue (a target SWAP bypasses the tier throttle)', () => {
-  // The load-bearing fairness rule for the target frame + target debuff strip: a target
-  // SWAP must repaint immediately so a throttled low player never sees the PREVIOUS
-  // target's HP / debuffs; otherwise the tier cadence governs. Lifted out of hud.update()
-  // so the swap-bypass is unit-testable (a `||`->`&&` typo here would strand a stale
-  // target on low).
+  // The load-bearing fairness rule for the target frame (and the target-of-target frame,
+  // which shares the same throttle): a target SWAP must repaint immediately so a throttled
+  // low player never sees the PREVIOUS target's HP; otherwise the tier cadence governs.
+  // Lifted out of hud.update() so the swap-bypass is unit-testable (a `||`->`&&` typo here
+  // would strand a stale target on low). The target debuffs strip is never tier-gated at
+  // all (see src/ui/hud.ts), so it does not go through this gate.
   it('repaints immediately on a subject change even when the cadence is NOT due', () => {
     // intervalMs 100, only 10ms elapsed -> cadence not due, but the subject changed.
     expect(nonSelfRepaintDue(true, 1000, 1010, 100)).toBe(true);

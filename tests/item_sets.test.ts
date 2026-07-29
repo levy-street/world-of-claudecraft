@@ -59,6 +59,9 @@ describe('aggregateSetBonuses (pure resolver)', () => {
       hitRating: 0,
       castPushbackReduction: 0,
       knockbackResistance: 0,
+      pvpOffenseRating: 0,
+      pvpDefenseRating: 0,
+      ccDurationReduction: 0,
       procs: [],
     });
   });
@@ -139,8 +142,16 @@ describe('aggregateSetBonuses (pure resolver)', () => {
       const pieces = set.bonuses.map((b) => b.pieces);
       // every epic (raid/dungeon) family carries 2-, 3-, and 4-piece tiers (the
       // 4-piece is a proc); the leveling haste kits deliberately carry the
-      // single 3-piece tier.
-      const expected = pieces.length === 1 ? '3' : '2,3,4';
+      // single 3-piece tier. The four WARFARE families are 2/4/7: seven because
+      // at six the seventh armor slot had one right answer (abandon the chest,
+      // the priciest piece with the best PvE replacement) and measured strictly
+      // better than the intended build (4,200 honor and 0.89x against the full
+      // kit's 5,400 and 1.03x). tests/warfare_balance_harness.test.ts guards it.
+      const expected = set.id.startsWith('warfare_')
+        ? '2,4,7'
+        : pieces.length === 1
+          ? '3'
+          : '2,3,4';
       expect([pieces.join(','), set.id]).toEqual([expected, set.id]);
     }
   });

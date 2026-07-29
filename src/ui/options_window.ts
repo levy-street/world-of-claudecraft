@@ -21,7 +21,20 @@
 
 import { syncAppViewport } from '../game/app_viewport';
 import { audio } from '../game/audio';
-import { GAMEPAD_NONE, gamepadButtonLabel } from '../game/gamepad_map';
+import {
+  GAMEPAD_NONE,
+  GAMEPAD_ZOOM_IN,
+  GAMEPAD_ZOOM_OUT,
+  gamepadButtonLabel,
+} from '../game/gamepad_map';
+import {
+  GRAPHICS_REBUILD_KEYS,
+  type GraphicsSettingsKey,
+  type GraphicsSettingsSnapshot,
+  graphicsDisplaySnapshot,
+  normalizeGraphicsSettingsSnapshot,
+  stageGraphicsDraftChange,
+} from '../game/graphics_rebuild_core';
 import {
   BIND_ACTIONS,
   BIND_CATEGORIES,
@@ -40,9 +53,12 @@ import {
 } from '../game/settings';
 import type { IWorld } from '../world_api';
 import { appVersionInfo } from './app_version';
+import { type AuraOverlayHooks, AuraOverlaySettingsPanel } from './aura_overlay_settings';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
-import type { BugReportHooks, OptionsHooks } from './hud';
+import type { FocusTrapHandle } from './focus_manager';
+import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
+import type { BugReportHooks, GraphicsApplyOutcome, OptionsHooks } from './hud';
 import type { ChatClock } from './hud/chat/chat_timestamp';
 import {
   formatNumber,
@@ -59,10 +75,13 @@ import {
   buildAudioControls,
   buildBugReportInfo,
   buildControllerControls,
-  buildGraphicsControls,
+  buildGraphicsSections,
   buildInterfaceControls,
   buildOptionsMenu,
   type ChoiceControl,
+  copyGraphicsDraft,
+  flattenGraphicsSections,
+  graphicsDraftDirty,
   INTERFACE_TAB_LABEL_KEY,
   INTERFACE_TAB_ORDER,
   type InterfaceTab,
@@ -77,8 +96,10 @@ import {
   type ToggleControl,
   toggleIsOn,
   toggleNextValue,
+  withGraphicsDraft,
 } from './options_view';
 import { PerfOverlaySettingsPanel, type PerfSettingsHost } from './perf_overlay_settings';
+import { settingsCard } from './settings_controls';
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
 import { tabStripHtml, tabStripModel } from './tab_strip_view';
 import {
@@ -99,6 +120,28 @@ const BUG_DESC_MAX_LEN = 2000;
 // Full-scale percent for the slider gold-fill gradient (the --range-fill custom
 // property is 0%..100%). Named so the fill math carries no bare literal.
 const RANGE_FILL_FULL_PCT = 100;
+const GRAPHICS_REBUILD_KEY_SET: ReadonlySet<string> = new Set(GRAPHICS_REBUILD_KEYS);
+
+interface NumericChoiceBinding {
+  get(key: NumericSettingKey): number;
+  set(key: NumericSettingKey, value: number): void;
+}
+
+// The seven GameSettings the Key Bindings panel renders alongside the
+// rebindable keys (the settingToggleKeybind + clickMoveMouseButtonRow calls in
+// renderKeybinds below). Its Reset to Defaults must restore these too, not just
+// the key-code map: without this list, a player's custom mouse-camera,
+// click-to-move (and its mouse button), attack-move, left-handed-touch, or
+// profanity-filter choice silently survived a "reset everything" click.
+const KEYBIND_PANEL_SETTING_KEYS: (keyof GameSettings)[] = [
+  'mouseCamera',
+  'lockCursorOnRotate',
+  'clickToMove',
+  'clickToMoveButton',
+  'attackMove',
+  'leftHandedTouch',
+  'filterProfanity',
+];
 
 // Endonyms for the in-game language picker; never localized (they render
 // identically in every locale, matching the homepage footer picker), keyed by
@@ -144,6 +187,9 @@ const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   strafeLeft: 'hud.keybinds.actions.strafeLeft',
   strafeRight: 'hud.keybinds.actions.strafeRight',
   jump: 'hud.keybinds.actions.jump',
+  // English-only chrome key, like every keybind row added since the `hud`
+  // domain was tsc-locked to inline per-locale blocks.
+  dive: 'hudChrome.keybinds.dive',
   autorun: 'hud.keybinds.actions.autorun',
   target: 'hud.keybinds.actions.target',
   attackMove: 'hud.keybinds.actions.attackMove',
@@ -155,6 +201,7 @@ const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   bags: 'hud.keybinds.actions.bags',
   nameplates: 'hud.keybinds.actions.nameplates',
   meters: 'hud.keybinds.actions.meters',
+  targetAuras: 'hudChrome.targetAuras.keybindLabel',
   social: 'hud.keybinds.actions.social',
   arena: 'hud.keybinds.actions.arena',
   dungeonFinder: 'hudChrome.finder.title',
@@ -166,12 +213,15 @@ const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   targetFriendlyNext: 'hudChrome.keybinds.targetFriendlyNext',
   discord: 'hudChrome.keybinds.discord',
   valecup: 'hudChrome.keybinds.valecup',
+  bgFlag: 'hudChrome.keybinds.bgFlag',
   sheathe: 'hudChrome.keybinds.sheathe',
   petAttack: 'hudChrome.keybinds.petAttack',
   petStop: 'hudChrome.keybinds.petStop',
   petTaunt: 'hudChrome.keybinds.petTaunt',
   petDefensive: 'hudChrome.keybinds.petDefensive',
   petAggressive: 'hudChrome.keybinds.petAggressive',
+  targetPet: 'hudChrome.keybinds.targetPet',
+
   // Reuse the existing window/feature names so these labels localize everywhere
   // without duplicating strings (these two ids were previously absent from the
   // map and fell back to the raw English BIND_ACTIONS labels).
@@ -198,6 +248,8 @@ export interface OptionsWindowDeps {
   world(): IWorld;
   /** The options seam main.ts wires after Input exists (null until attached). */
   options(): OptionsHooks | null;
+  /** Player-specific proc overlay editor, owned by Hud (null until wired). */
+  auraOverlays?: () => AuraOverlayHooks;
   /** The bug-report seam (online only; its presence gates the Report a Bug row). */
   bugReport(): BugReportHooks | null;
   /** The keybind store (read labels, rebind, reset). */
@@ -206,6 +258,9 @@ export interface OptionsWindowDeps {
   slotActionName(slot: number): string | null;
   /** Re-sync the action-bar keycaps after a rebind/reset. */
   refreshKeybindLabels(): void;
+  /** Close this window and enter the on-bar key-binding mode (issue 1238): the
+   *  single "Edit action bar keys" entry that replaces the per-slot rebind rows. */
+  beginActionBarKeybindMode(): void;
   /** The shared gold-themed dropdown (carries the listbox ARIA + keyboard nav). */
   buildDropdown(
     options: { value: string; label: string }[],
@@ -218,6 +273,8 @@ export interface OptionsWindowDeps {
   setDropdownValue(root: HTMLElement, value: string): void;
   /** Focus the first interactive element (or a preferred selector) inside a root. */
   focusFirstInteractive(root: HTMLElement, preferredSelector?: string): void;
+  /** Open a nested dialog on the shared HUD focus-manager stack. */
+  openFocusTrap(root: () => HTMLElement, returnFocusTo: HTMLElement): FocusTrapHandle;
   /** Clear transient overlays when the menu opens (closeOtherWindows). */
   closeOthers(): void;
   hideTooltip(): void;
@@ -319,13 +376,30 @@ export class OptionsWindow {
   // The Options > Performance panel, lazily built and reused (it caches the live
   // position-slider handles so a drag-to-move can update them in place).
   private perfSettings: PerfOverlaySettingsPanel | null = null;
+  private auraSettings: AuraOverlaySettingsPanel | null = null;
   // The element to refocus when the window closes (WCAG 2.2 AA focus return).
   private returnFocus: HTMLElement | null = null;
+  // Tracked separately from the root's inline `display` (rather than reading
+  // it back, the char-window precedent): the Performance sub-view needs
+  // `display: flex` (its scroll wrapper needs a flex column, issue 2569)
+  // while every other sub-view stays `block`, so no single string value means
+  // "open" any more (the deeds/bank-window precedent for the same reason).
+  private opened = false;
+  // Renderer-bound graphics values are edited locally. Closing the Options
+  // window discards these fields without touching Settings or the live renderer.
+  private graphicsDraft: GraphicsSettingsSnapshot | null = null;
+  private graphicsApplied: GraphicsSettingsSnapshot | null = null;
+  private graphicsBusy = false;
+  private graphicsOutcome: GraphicsApplyOutcome | null = null;
+  // Invalidates an async settlement after the window has closed and discarded
+  // its draft. The coordinator still finishes safely; the closed painter simply
+  // does not rebuild hidden DOM with stale local state.
+  private graphicsApplyGeneration = 0;
 
   constructor(private readonly deps: OptionsWindowDeps) {}
 
   get isOpen(): boolean {
-    return this.deps.root().style.display === 'block';
+    return this.opened;
   }
 
   toggle(): void {
@@ -344,8 +418,8 @@ export class OptionsWindow {
     this.view = 'main';
     this.capturingKey = null;
     this.keybindNote = '';
+    this.opened = true;
     this.render();
-    this.deps.root().style.display = 'block';
     music.pauseForMenu();
     audio.click();
   }
@@ -354,9 +428,22 @@ export class OptionsWindow {
   // the panel, drop the key-capture + tooltip + perf overlay placement, resume
   // music, and return focus to the opener (WCAG 2.2 AA).
   close(): void {
+    // Keep the submitted draft attached to its single-flight transaction. If
+    // the window closed and reopened mid-swap, a second draft could otherwise
+    // settle against the first transaction's result.
+    if (this.graphicsBusy) return;
+    this.graphicsApplyGeneration += 1;
+    this.graphicsDraft = null;
+    this.graphicsApplied = null;
+    this.graphicsBusy = false;
+    this.graphicsOutcome = null;
+    this.opened = false;
+    this.deps.root().removeAttribute('aria-busy');
     this.deps.root().style.display = 'none';
     this.capturingKey = null;
     this.deps.options()?.perfOverlay.setPlacement(false);
+    this.auraSettings?.closePlacement();
+    this.deps.auraOverlays?.().setPlacement(false);
     this.deps.hideTooltip();
     music.resumeFromMenu();
     const target = this.returnFocus;
@@ -383,6 +470,7 @@ export class OptionsWindow {
 
   private render(): void {
     const el = this.deps.root();
+    if (this.view !== 'graphics') el.removeAttribute('aria-busy');
     // WCAG 2.2 AA: the Esc/options menu is a focus-trapped window, so name the
     // root and give it a dialog role.
     // Name the dialog per sub-view. Every sub-view paints a <span id="options-title">
@@ -401,9 +489,12 @@ export class OptionsWindow {
     // The wide multi-column layouts belong to their own sub-views; clear each when
     // leaving it so the other sub-views (and the main menu) keep their default width.
     if (this.view !== 'keybinds') el.classList.remove('kb-wide');
+    if (this.view !== 'graphics') el.classList.remove('gfx-wide');
     if (this.view !== 'performance') el.classList.remove('perf-wide');
+    if (this.view !== 'auras') el.classList.remove('aura-wide');
     // The overlay is draggable only while the Performance sub-view is open.
     this.deps.options()?.perfOverlay.setPlacement(this.view === 'performance');
+    this.deps.auraOverlays?.().setPlacement(this.view === 'auras');
     switch (this.view) {
       case 'keybinds':
         this.renderKeybinds();
@@ -416,6 +507,9 @@ export class OptionsWindow {
         break;
       case 'interface':
         this.renderInterface();
+        break;
+      case 'auras':
+        this.renderAuras();
         break;
       case 'controller':
         this.renderController();
@@ -435,6 +529,14 @@ export class OptionsWindow {
     // buildTitle (it rerender()s internally, which would drop a listener added
     // here).
     el.querySelector('[data-back]')?.addEventListener('click', () => this.goBack());
+    // Performance is the one sub-view whose scroll wrapper needs a flex column
+    // (`.perf-scroll`, components.css, issue 2569); every other sub-view stays
+    // the plain block card. render() re-runs on every navigation (goBack, a
+    // menu entry), so this always reflects the CURRENT view, not just the one
+    // active when the window first opened. A perf control's own self-rerender
+    // (perf_overlay_settings.ts) rebuilds only its own subtree and never
+    // touches this display value, which is already correct while that view stays open.
+    if (this.opened) el.style.display = this.view === 'performance' ? 'flex' : 'block';
   }
 
   // Return to the Game Menu root without closing the window. The title-bar back
@@ -523,6 +625,7 @@ export class OptionsWindow {
     controls: OptionsControl[],
     hooks: OptionsHooks,
     rerender: (focusKey?: BoolSettingKey) => void,
+    choiceBinding?: NumericChoiceBinding,
   ): void {
     for (const c of controls) {
       switch (c.control) {
@@ -536,7 +639,7 @@ export class OptionsWindow {
           this.settingBoolToggle(parent, c, hooks, c.rerender ? (key) => rerender(key) : undefined);
           break;
         case 'choice':
-          this.settingChoice(parent, c, hooks, c.rerender ? rerender : undefined);
+          this.settingChoice(parent, c, hooks, c.rerender ? rerender : undefined, choiceBinding);
           break;
         case 'note':
           this.noteRow(parent, c.textKey);
@@ -693,6 +796,7 @@ export class OptionsWindow {
     c: ChoiceControl,
     hooks: OptionsHooks,
     onChange?: () => void,
+    binding?: NumericChoiceBinding,
   ): void {
     const key = c.key as NumericSettingKey;
     const label = t(c.labelKey);
@@ -704,8 +808,23 @@ export class OptionsWindow {
     const wrap = document.createElement('div');
     wrap.className = 'set-choice';
     const sync = () => {
-      const current = Math.round(hooks.settings.get(key));
-      for (const btn of [...wrap.querySelectorAll<HTMLButtonElement>('button[data-value]')]) {
+      // Nearest-option select (not Math.round): the round-10 level ladders
+      // persist half-step values (0.5 = Medium), which rounding would
+      // mis-highlight as the next button up. Exact stored values (every
+      // historical row) behave exactly as before.
+      const raw = binding?.get(key) ?? hooks.settings.get(key);
+      const buttons = [...wrap.querySelectorAll<HTMLButtonElement>('button[data-value]')];
+      let current = Number.NaN;
+      let bestDistance = Number.POSITIVE_INFINITY;
+      for (const btn of buttons) {
+        const value = Number(btn.dataset.value);
+        const distance = Math.abs(value - raw);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          current = value;
+        }
+      }
+      for (const btn of buttons) {
         const selected = Number(btn.dataset.value) === current;
         btn.classList.toggle('sel', selected);
         btn.setAttribute('aria-pressed', String(selected));
@@ -717,11 +836,16 @@ export class OptionsWindow {
       btn.type = 'button';
       btn.className = 'btn set-choice-btn';
       btn.dataset.value = String(option.value);
+      // Focus identity for rebuild-crossing restores (focus_restore.ts): a
+      // rerendering choice wipes the panel, and this key is how the rebuilt
+      // equivalent of the clicked button is found again.
+      btn.dataset.focusKey = `${key}:${option.value}`;
       btn.textContent = optionLabel;
       btn.setAttribute('aria-label', optionLabel);
       btn.addEventListener('click', () => {
         audio.click();
-        hooks.onSettingChange(key, option.value);
+        if (binding) binding.set(key, option.value);
+        else hooks.onSettingChange(key, option.value);
         sync();
         onChange?.();
       });
@@ -779,18 +903,28 @@ export class OptionsWindow {
   // that view renders (issue 2341), rather than wiping the whole GameSettings
   // object. NoteControl/MusicToggleControl carry no key and are filtered out
   // by optionsControlKeys.
-  private settingsViewFooter(controls: OptionsControl[]): void {
+  private settingsViewFooter(
+    controls: OptionsControl[],
+    resetAction?: (hooks: OptionsHooks, keys: readonly (keyof GameSettings)[]) => void,
+    resetDisabled = false,
+  ): void {
     const el = this.deps.root();
     const keys = optionsControlKeys(controls) as (keyof GameSettings)[];
     const reset = document.createElement('button');
     reset.className = 'btn';
     reset.textContent = t('hud.options.resetToDefaults');
+    reset.disabled = resetDisabled;
     reset.addEventListener('click', () => {
       audio.click();
       const hooks = this.deps.options();
-      hooks?.settings.reset(keys);
+      if (!hooks) return;
+      if (resetAction) {
+        resetAction(hooks, keys);
+        return;
+      }
+      hooks.settings.reset(keys);
       // re-apply only this view's settings to their subsystem, then redraw
-      for (const k of keys) hooks?.onSettingChange(k, hooks.settings.get(k));
+      for (const k of keys) hooks.onSettingChange(k, hooks.settings.get(k));
       this.render();
     });
     const back = document.createElement('button');
@@ -802,38 +936,260 @@ export class OptionsWindow {
   }
 
   // -------------------------------------------------------------------------
-  // Graphics (cluster 3): static WebGL preset as a plain setting value; no
-  // governor read, no effects-quality cutoff.
+  // Graphics (cluster 3): the six renderer-bound choices are a disposable local
+  // draft. Every other row in this panel continues to write live.
   // -------------------------------------------------------------------------
+
+  private ensureGraphicsDraft(hooks: OptionsHooks): GraphicsSettingsSnapshot {
+    if (!this.graphicsDraft || !this.graphicsApplied) {
+      const applied = copyGraphicsDraft(hooks.graphicsApplied());
+      this.graphicsApplied = applied;
+      this.graphicsDraft = copyGraphicsDraft(applied);
+    }
+    return this.graphicsDraft;
+  }
+
+  private graphicsChoiceBinding(hooks: OptionsHooks): NumericChoiceBinding {
+    return {
+      get: (key) => {
+        if (!GRAPHICS_REBUILD_KEY_SET.has(key)) return hooks.settings.get(key);
+        // Dials DISPLAY the staged mix under Advanced and the active preset's
+        // seeded levels otherwise (graphics_rebuild_core).
+        return graphicsDisplaySnapshot(this.ensureGraphicsDraft(hooks))[
+          key as keyof GraphicsSettingsSnapshot
+        ];
+      },
+      set: (key, value) => {
+        if (!GRAPHICS_REBUILD_KEY_SET.has(key)) {
+          hooks.onSettingChange(key, value);
+          return;
+        }
+        // Editing a per-system dial under a fixed preset switches the draft to
+        // the Advanced custom mix seeded from that preset (pure staging rule);
+        // the applied snapshot lets a return to Advanced restore an applied
+        // mix instead of re-seeding over it. A same-value tap is a no-op.
+        const draft = this.ensureGraphicsDraft(hooks);
+        const staged = stageGraphicsDraftChange(
+          draft,
+          key as GraphicsSettingsKey,
+          value,
+          this.graphicsApplied,
+        );
+        if (staged === draft) return;
+        this.graphicsDraft = copyGraphicsDraft(staged);
+        this.graphicsOutcome = null;
+      },
+    };
+  }
+
+  // Dirty over the DISPLAY projections, not the stored drafts: under a fixed
+  // preset the stored dial values are invisible dead data (a leftover from an
+  // abandoned Advanced detour must not arm Apply when the panel is pixel-
+  // identical to the applied state).
+  private graphicsDirty(): boolean {
+    return !!(
+      this.graphicsDraft &&
+      this.graphicsApplied &&
+      graphicsDraftDirty(
+        GRAPHICS_REBUILD_KEYS,
+        graphicsDisplaySnapshot(this.graphicsDraft),
+        graphicsDisplaySnapshot(this.graphicsApplied),
+      )
+    );
+  }
+
+  private settleGraphicsApply(
+    generation: number,
+    submitted: GraphicsSettingsSnapshot,
+    outcome: GraphicsApplyOutcome,
+  ): void {
+    if (generation !== this.graphicsApplyGeneration) return;
+    this.graphicsBusy = false;
+    this.graphicsOutcome = outcome;
+    if (outcome === 'applied' || outcome === 'saved') {
+      this.graphicsApplied = copyGraphicsDraft(submitted);
+      this.graphicsDraft = copyGraphicsDraft(submitted);
+    }
+    if (this.opened && this.view === 'graphics') {
+      this.render();
+      this.deps.focusFirstInteractive(
+        this.deps.root(),
+        outcome === 'failed' || outcome === 'fatal' ? '[data-graphics-apply]' : undefined,
+      );
+    }
+  }
+
+  private applyGraphicsDraft(): void {
+    const hooks = this.deps.options();
+    if (!hooks || !this.graphicsDraft || this.graphicsBusy || !this.graphicsDirty()) return;
+    const submitted = copyGraphicsDraft(this.graphicsDraft);
+    const generation = ++this.graphicsApplyGeneration;
+    this.graphicsBusy = true;
+    this.graphicsOutcome = null;
+    this.render();
+    // The clicked Apply button is replaced by the busy render and becomes
+    // disabled. Move focus to the first remaining control rather than letting it
+    // fall to <body>; settlement returns it to Retry/Reload when actionable.
+    this.deps.focusFirstInteractive(this.deps.root());
+    void Promise.resolve()
+      .then(() => hooks.applyGraphics(submitted))
+      .then((outcome) => this.settleGraphicsApply(generation, submitted, outcome))
+      .catch(() => this.settleGraphicsApply(generation, submitted, 'failed'));
+  }
+
+  private resetGraphicsDraft(
+    hooks: OptionsHooks,
+    renderedKeys: readonly (keyof GameSettings)[],
+  ): void {
+    const liveKeys = renderedKeys.filter((key) => !GRAPHICS_REBUILD_KEY_SET.has(key));
+    hooks.settings.reset(liveKeys);
+    for (const key of liveKeys) hooks.onSettingChange(key, hooks.settings.get(key));
+    this.graphicsDraft = normalizeGraphicsSettingsSnapshot({});
+    this.graphicsOutcome = null;
+    this.render();
+  }
+
+  // The panel's ONE inline action row (playtest feedback): Back at the inline
+  // start, the async status stretching between, then Reset to Defaults as a
+  // quiet text button beside the primary Apply at the inline end. It replaces
+  // the generic settingsViewFooter AND the old boxed apply region for this
+  // view, keeping their behaviors: the status live region, the busy/fatal
+  // gating, the fatal Reload arm, and the reset scoped to this view's keys.
+  private graphicsFooter(controls: OptionsControl[], unavailable: boolean): HTMLElement {
+    const footer = document.createElement('div');
+    footer.className = 'gfx-footer';
+    footer.setAttribute('aria-busy', String(this.graphicsBusy));
+
+    const back = document.createElement('button');
+    back.className = 'btn';
+    back.textContent = t('hud.options.back');
+    back.addEventListener('click', () => this.goBack());
+
+    const status = document.createElement('div');
+    status.className = 'graphics-apply-status';
+    const outcome = this.graphicsOutcome;
+    const alert = outcome === 'failed' || outcome === 'fatal';
+    status.setAttribute('role', alert ? 'alert' : 'status');
+    if (this.graphicsBusy) status.textContent = t('hudChrome.options.graphicsApplying');
+    else if (outcome === 'applied') status.textContent = t('hudChrome.options.graphicsApplied');
+    else if (outcome === 'saved') status.textContent = t('hudChrome.options.graphicsSaved');
+    else if (outcome === 'failed') status.textContent = t('hudChrome.options.graphicsFailed');
+    else if (outcome === 'fatal') status.textContent = t('hudChrome.options.graphicsFatal');
+    else if (this.graphicsDirty()) status.textContent = t('hudChrome.options.graphicsDraftChanged');
+
+    const reset = document.createElement('button');
+    reset.type = 'button';
+    reset.className = 'btn gfx-btn-text';
+    reset.textContent = t('hud.options.resetToDefaults');
+    reset.disabled = unavailable;
+    reset.addEventListener('click', () => {
+      audio.click();
+      const hooks = this.deps.options();
+      if (!hooks) return;
+      this.resetGraphicsDraft(hooks, optionsControlKeys(controls) as (keyof GameSettings)[]);
+    });
+
+    const action = document.createElement('button');
+    action.type = 'button';
+    action.className = 'btn graphics-apply-btn';
+    action.dataset.graphicsApply = '';
+    if (outcome === 'fatal') {
+      action.textContent = t('hudChrome.options.graphicsReload');
+      action.addEventListener('click', () => {
+        audio.click();
+        location.reload();
+      });
+    } else {
+      action.textContent = t(
+        outcome === 'failed'
+          ? 'hudChrome.options.graphicsRetry'
+          : 'hudChrome.options.graphicsApply',
+      );
+      action.disabled = this.graphicsBusy || !this.graphicsDirty();
+      action.addEventListener('click', () => {
+        audio.click();
+        this.applyGraphicsDraft();
+      });
+    }
+    footer.append(back, status, reset, action);
+    return footer;
+  }
 
   private renderGraphics(): void {
     const hooks = this.deps.options();
-    const body = this.settingsViewShell(t('hud.options.graphics'));
-    const controls = hooks
-      ? buildGraphicsControls(this.settingsSource(hooks), {
-          touch: useTouchInterface(),
-          nativeShell: isNativeAppShell(),
-        })
-      : [];
-    if (hooks) this.applyControls(body, controls, hooks, () => this.renderGraphics());
     const el = this.deps.root();
+    // The rebuild below destroys the control the player is standing on (every
+    // dial re-renders the panel); carry the focused control's identity across
+    // via the shared focus_restore seam and refocus its rebuilt equivalent.
+    const focusKey = captureFocusKey(el);
+    // The wide two-column card layout (the kb-wide/perf-wide widening family);
+    // the render() dispatcher clears the class when the view changes.
+    el.classList.add('gfx-wide');
+    el.innerHTML = this.panelTitle(t('hud.options.graphics'));
+    const body = document.createElement('div');
+    body.className = 'gfx-cols';
+    el.appendChild(body);
+    const draft = hooks ? this.ensureGraphicsDraft(hooks) : null;
+    // The dial rows read DISPLAY values: the staged draft under Advanced, the
+    // active preset's seeded levels otherwise (graphicsDisplaySnapshot).
+    const sections =
+      hooks && draft
+        ? buildGraphicsSections(
+            withGraphicsDraft(
+              this.settingsSource(hooks),
+              GRAPHICS_REBUILD_KEYS,
+              graphicsDisplaySnapshot(draft),
+            ),
+            {
+              touch: useTouchInterface(),
+              nativeShell: isNativeAppShell(),
+            },
+          )
+        : [];
+    const controls = flattenGraphicsSections(sections);
+    const columns = [document.createElement('div'), document.createElement('div')];
+    for (const col of columns) {
+      col.className = 'gfx-col';
+      body.appendChild(col);
+    }
+    for (const section of sections) {
+      // The shared card family (settings_controls.ts): perf-card chrome +
+      // role="group" naming, with the gfx modifier for this panel's spacing.
+      // A 'full' section spans both columns below them (grid auto-placement:
+      // the wide cards are appended after the two column boxes).
+      const host = section.column === 'full' ? body : columns[section.column - 1];
+      const card = settingsCard(host, t(section.titleKey), {
+        className: section.column === 'full' ? 'gfx-card gfx-card-wide' : 'gfx-card',
+      });
+      const rows = document.createElement('div');
+      rows.className = 'set-rows';
+      card.appendChild(rows);
+      if (hooks)
+        this.applyControls(
+          rows,
+          section.controls,
+          hooks,
+          // Through render(), not renderGraphics(): the dispatcher re-wires
+          // the title-bar [data-back] control the rebuild just destroyed.
+          () => this.render(),
+          this.graphicsChoiceBinding(hooks),
+        );
+    }
+    const unavailable = this.graphicsBusy || this.graphicsOutcome === 'fatal';
+    body.inert = unavailable;
+    body.classList.toggle('graphics-controls-disabled', unavailable);
+    if (this.graphicsBusy) el.setAttribute('aria-busy', 'true');
+    else el.removeAttribute('aria-busy');
     const note = document.createElement('div');
     note.className = 'set-note';
     note.textContent = t('hud.options.graphicsNote');
     el.appendChild(note);
-    const reloadNote = document.createElement('div');
-    reloadNote.className = 'set-note';
-    reloadNote.textContent = t('hud.options.graphicsReloadNote');
-    const reload = document.createElement('button');
-    reload.type = 'button';
-    reload.className = 'btn';
-    reload.textContent = t('hud.options.reloadNow');
-    reload.addEventListener('click', () => {
-      audio.click();
-      location.reload();
-    });
-    el.append(reloadNote, reload);
-    this.settingsViewFooter(controls);
+    el.appendChild(this.graphicsFooter(controls, unavailable));
+    // The generic settingsViewFooter is not used here (the inline action row
+    // replaces it), so wire the title-bar close control directly.
+    el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
+    if (focusKey !== null)
+      restoreFirstEnabled([el.querySelector<HTMLButtonElement>(`[data-focus-key="${focusKey}"]`)]);
   }
 
   // -------------------------------------------------------------------------
@@ -1013,6 +1369,11 @@ export class OptionsWindow {
     const el = this.deps.root();
     const hooks = this.deps.options();
     const tab = this.interfaceTab;
+    // The full, untagged control list across all four tabs (~40 settings): the
+    // footer's Reset to Defaults must restore every Interface setting the panel
+    // governs, not just whichever tab happens to be open when the player clicks
+    // it, so switching tabs never changes what the shared button resets.
+    const controls = hooks ? buildInterfaceControls(this.settingsSource(hooks)) : [];
 
     const stripHost = document.createElement('div');
     stripHost.innerHTML = tabStripHtml(
@@ -1043,19 +1404,11 @@ export class OptionsWindow {
     }
 
     if (hooks)
-      this.applyControls(
-        body,
-        interfaceControlsForTab(buildInterfaceControls(this.settingsSource(hooks)), tab),
-        hooks,
-        (focusKey) => {
-          this.renderInterface();
-          if (focusKey)
-            this.deps
-              .root()
-              .querySelector<HTMLElement>(`[data-setting-key="${focusKey}"]`)
-              ?.focus();
-        },
-      );
+      this.applyControls(body, interfaceControlsForTab(controls, tab), hooks, (focusKey) => {
+        this.renderInterface();
+        if (focusKey)
+          this.deps.root().querySelector<HTMLElement>(`[data-setting-key="${focusKey}"]`)?.focus();
+      });
 
     // Frames closes with the unit-frames reset row.
     if (tab === 'frames') this.unitFramesResetRow(body);
@@ -1065,7 +1418,8 @@ export class OptionsWindow {
     if (tab === 'chat') {
       this.chatTimestampRows(body);
       this.chatWindowResetRow(body);
-      // Deed broadcasts (share deed unlocks with guild and friends): an ASYNC
+      // Deed broadcasts (share deed unlocks with guildmates and followers, and
+      // deed and masterwork cards with the Discord feed, R58): an ASYNC
       // account setting (accounts.deed_broadcasts), not a settings.ts key, so it
       // is a bespoke row; the seam is the final truth (main.ts wires it only when
       // an authenticated account exists, so an offline character never sees it).
@@ -1081,12 +1435,7 @@ export class OptionsWindow {
       }
     }
 
-    const back = document.createElement('button');
-    back.className = 'btn';
-    back.textContent = t('hud.options.back');
-    back.addEventListener('click', () => this.goBack());
-    el.appendChild(back);
-    el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
+    this.settingsViewFooter(controls);
   }
 
   // The chat-timestamp on/off toggle plus the 12/24-hour clock-format pair (the
@@ -1193,6 +1542,23 @@ export class OptionsWindow {
     if (!hooks) return;
     this.perfSettings ??= new PerfOverlaySettingsPanel(this.perfSettingsHost(hooks));
     this.perfSettings.render(this.deps.root());
+  }
+
+  private renderAuras(): void {
+    const hooks = this.deps.auraOverlays?.();
+    if (!hooks) return;
+    this.deps.root().classList.add('aura-wide');
+    const body = this.settingsViewShell(t('hudChrome.auraOverlay.title'));
+    this.auraSettings ??= new AuraOverlaySettingsPanel({
+      auras: hooks,
+      click: () => audio.click(),
+      openFocusTrap: this.deps.openFocusTrap,
+    });
+    this.auraSettings.render(body);
+    this.deps
+      .root()
+      .querySelector('[data-close]')
+      ?.addEventListener('click', () => this.close());
   }
 
   private perfSettingsHost(hooks: OptionsHooks): PerfSettingsHost {
@@ -1395,12 +1761,16 @@ export class OptionsWindow {
   }
 
   // Action ids a gamepad button may be bound to: explicit unbind, the game menu,
-  // plus every one-shot (edge) keybind action and Jump. Movement-axis actions
-  // (forward/strafe/turn) are excluded, they live on the analog stick.
+  // the two pad-only camera zoom steps, plus every one-shot (edge) keybind action
+  // and Jump. Movement-axis actions (forward/strafe/turn) are excluded, they live
+  // on the analog stick. Zoom ships unbound by default (no free default slot
+  // remains among the 13 bindable buttons), so it is opt-in only from here.
   private gamepadActionOptions(): { value: string; label: string }[] {
     const opts: { value: string; label: string }[] = [
       { value: GAMEPAD_NONE, label: t('hud.options.unbound') },
       { value: 'escape', label: t('hudChrome.controller.menuAction') },
+      { value: GAMEPAD_ZOOM_IN, label: t('hudChrome.controller.zoomIn') },
+      { value: GAMEPAD_ZOOM_OUT, label: t('hudChrome.controller.zoomOut') },
     ];
     for (const a of BIND_ACTIONS) {
       if (a.id === 'attackMove') continue; // mode-gated; not a useful pad default
@@ -1575,12 +1945,59 @@ export class OptionsWindow {
     note.className = 'kb-note';
     note.textContent = this.keybindNote || t('hud.options.keybindHelpMouseCamera');
     el.appendChild(note);
+    // Mouse buttons bind like keys (src/game/mouse_binds.ts); say so once here
+    // rather than rewording every capture prompt. Pointless on touch, which has
+    // no mouse, so it follows the same useTouchInterface() gate the rest of the
+    // desktop-only rows use.
+    if (!useTouchInterface()) {
+      const mouseNote = document.createElement('div');
+      mouseNote.className = 'kb-note';
+      mouseNote.textContent = t('hudChrome.keybinds.mouseHint');
+      el.appendChild(mouseNote);
+    }
     const cols = document.createElement('div');
     cols.className = 'kb-cols';
     // The Attack Move key is only meaningful (and only rebindable) while its mode
     // is on; otherwise hide its row so it can't shadow Turn Left's A in the list.
     const attackMoveOn = !!hooks?.settings.get('attackMove');
     for (const category of BIND_CATEGORIES) {
+      if (category === 'Action Bar') {
+        // The wall of per-slot rebind rows (one per action-bar slot, 34 on this
+        // branch) dominated the panel; a single entry opens the on-bar
+        // click-a-slot-then-press-a-key mode instead (issue 1238). Desktop
+        // only: the mode needs a physical keyboard, so hide it on touch, like
+        // the mode entry it replaces on the primary Key Bindings surface.
+        if (useTouchInterface()) continue;
+        const col = document.createElement('div');
+        col.className = 'kb-col';
+        const header = document.createElement('div');
+        header.className = 'kb-cat';
+        header.textContent = BIND_CATEGORY_LABEL_KEYS[category]
+          ? t(BIND_CATEGORY_LABEL_KEYS[category])
+          : category;
+        col.appendChild(header);
+        // Not a .kb-row: that grid is shaped for a name plus two key buttons,
+        // which this single-button entry does not have. .kb-rows is already a
+        // column flexbox, so the button just becomes its one, full-width child.
+        const rows = document.createElement('div');
+        rows.className = 'kb-rows';
+        const editBtn = document.createElement('button');
+        editBtn.type = 'button';
+        editBtn.className = 'btn kb-actionbar-edit';
+        editBtn.textContent = t('hudChrome.actionBar.editKeys');
+        editBtn.addEventListener('click', () => {
+          audio.click();
+          this.deps.beginActionBarKeybindMode();
+        });
+        rows.appendChild(editBtn);
+        col.appendChild(rows);
+        const hint = document.createElement('div');
+        hint.className = 'kb-note';
+        hint.textContent = t('hudChrome.actionBar.editKeysHint');
+        col.appendChild(hint);
+        cols.appendChild(col);
+        continue;
+      }
       const visible = BIND_ACTIONS.filter(
         (a) => a.category === category && (a.id !== 'attackMove' || attackMoveOn),
       );
@@ -1639,6 +2056,13 @@ export class OptionsWindow {
     reset.addEventListener('click', () => {
       audio.click();
       this.deps.keybinds().reset();
+      // The panel also renders seven GameSettings toggles alongside the
+      // rebindable keys (mouse camera, click-to-move and its mouse button,
+      // attack move, left-handed touch, profanity filter); Reset to Defaults
+      // must restore those too, not just the key-code map.
+      const hooks = this.deps.options();
+      hooks?.settings.reset(KEYBIND_PANEL_SETTING_KEYS);
+      for (const k of KEYBIND_PANEL_SETTING_KEYS) hooks?.onSettingChange(k, hooks.settings.get(k));
       this.capturingKey = null;
       this.keybindNote = t('hud.options.keybindReset');
       this.deps.refreshKeybindLabels();

@@ -7,6 +7,102 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: 'Bandeira em Mãos',
+    desc: 'Capture uma bandeira em Campos de Thornhollow.',
+  },
+  pvp_bg_first_win: {
+    name: 'O Vale Resiste',
+    desc: 'Vença uma partida em Campos de Thornhollow.',
+  },
+  pvp_bg_wins_25: {
+    name: 'Guardião do Vale',
+    desc: 'Vença 25 partidas em Campos de Thornhollow.',
+    title: 'Portador da Bandeira',
+  },
+  pvp_bg_captures_100: {
+    name: 'Cem Bandeiras',
+    desc: 'Capture 100 bandeiras em Campos de Thornhollow ao longo da sua carreira.',
+  },
+  dgn_rift: {
+    name: 'Andarilho da Fenda',
+    desc: 'Limpe uma Fenda derrotando o chefe do andar.',
+  },
+  dgn_rift_s_rank: {
+    name: 'Soberano da Fenda',
+    desc: 'Limpe uma Fenda de nível S, o grau mais difícil que um portal de Fenda pode gerar.',
+  },
+  pvp_honor_sergeant: {
+    name: 'Sargento',
+    desc: 'Ganhe 10.000 de Honra ao longo da vida. Gastá-la nunca custa o posto.',
+    title: 'Sargento',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: 'Cavaleiro-Tenente',
+    desc: 'Ganhe 40.000 de Honra ao longo da vida, uma temporada de guerra de verdade nas costas.',
+    title: 'Cavaleiro-Tenente',
+  },
+  pvp_honor_field_marshal: {
+    name: 'Marechal de Campo',
+    desc: 'Ganhe 150.000 de Honra ao longo da vida. Raro em qualquer reino, e deveria ser.',
+    title: 'Marechal de Campo',
+  },
+  chr_drakemaw_broodlord: {
+    name: 'Quebra-Ninhada',
+    desc: 'Derrote um Senhor da Ninhada de Drakemaw em meio aos seus ovos, enfrentando o brado, o golpe em arco e o fogo.',
+  },
+  chr_maw_matriarch: {
+    name: 'O Céu Se Cala',
+    desc: 'Derrote Cindraleth, a Matriarca das Fauces, em seu poleiro na cratera acima do Drakemaw.',
+  },
+  chr_frostveil_gatherer: {
+    name: 'Colheita nos terracos',
+    desc: 'Colha um veio de minerio, um bosque de madeira e um canteiro de ervas em Frostveil.',
+  },
+  chr_frostveil_first_cast: {
+    name: 'Primeiro gelo no lago',
+    desc: 'Pesque um peixe nas aguas de Frostveil.',
+  },
+  chr_amberfall_gatherer: {
+    name: 'A colheita de Amberfall',
+    desc: 'Colha um veio de minerio, um bosque de madeira e um canteiro de ervas em Amberfall.',
+  },
+  chr_amberfall_first_cast: {
+    name: 'Uma pesca do grande charco',
+    desc: 'Pesque um peixe nas aguas de Amberfall.',
+  },
+  chr_nightbloom_gatherer: {
+    name: 'A colheita sonhadora',
+    desc: 'Colha um veio de minerio, um bosque de madeira e um canteiro de ervas em Nightbloom.',
+  },
+  chr_nightbloom_first_cast: {
+    name: 'Uma ondulacao no poco lunar',
+    desc: 'Pesque um peixe nas aguas de Nightbloom.',
+  },
+  chr_wraithwood_gatherer: {
+    name: 'Colheita sob a copa',
+    desc: 'Colha um veio de minerio, um bosque de madeira e um canteiro de ervas em Wraithwood.',
+  },
+  chr_wraithwood_first_cast: {
+    name: 'Um arremesso na baia espelhada',
+    desc: 'Pesque um peixe nas aguas de Wraithwood.',
+  },
+  chr_palmreach_gatherer: {
+    name: 'Colheita na praia das palmeiras',
+    desc: 'Colha um veio de minerio, um bosque de madeira e um canteiro de ervas em Palmreach.',
+  },
+  chr_palmreach_first_cast: {
+    name: 'Arremesso na lagoa safira',
+    desc: 'Pesque um peixe nas aguas de Palmreach.',
+  },
+  chr_evergarden_gatherer: {
+    name: 'A fartura do parterre',
+    desc: 'Colha um veio de minerio, um bosque de madeira e um canteiro de ervas em Evergarden.',
+  },
+  chr_evergarden_first_cast: {
+    name: 'Um arremesso no lago de petalas',
+    desc: 'Pesque um peixe nas aguas de Evergarden.',
+  },
   pvp_card_duel_first_win: {
     name: 'Regras da Casa',
     desc: 'Vença um Duelo de Cartas no Mestre das Cartas.',
@@ -813,5 +909,85 @@ export const table: DeedLocaleTable = {
   soc_salvage_50: {
     name: 'O Ferro-Velho',
     desc: 'Recupere 50 pecas de equipamento transformando-as em materiais brutos.',
+  },
+  dgn_wildheart_basin: {
+    name: 'A Bacia Revida',
+    desc: 'Derrote Zulgar, Voz da Bacia, na Bacia de Wildheart.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Heroico: A Bacia de Wildheart',
+    desc: 'Derrote Zulgar, Voz da Bacia, na Bacia de Wildheart na dificuldade Heroica.',
+  },
+  chr_peaks_gatherer: {
+    name: 'Colheita das Alturas',
+    desc: 'Colha um veio de minério, um bosque de madeira e um canteiro de ervas nas Alturas de Thornpeak.',
+  },
+  chr_marsh_rares_ii: {
+    name: 'O Glutão, Ajustado nas Contas',
+    desc: 'Mate Grubjaw, o Glutão, um quarto terror nomeado do Pântano de Mirefen que ficou fora da primeira contagem.',
+  },
+  chr_peaks_rares_ii: {
+    name: 'Mais Nomes Talhados na Rocha',
+    desc: 'Mate o Velho Cragmaw e o Senhor dos Estilhaços Kazzix, mais dois terrores nomeados das Alturas de Thornpeak que ficaram fora da primeira contagem.',
+  },
+  chr_gleamstag: {
+    name: 'A Lenda Que Não Atacava Primeiro',
+    desc: 'Mate o Cervo Reluzente, um elite raro e arisco que só ataca quando encurralado.',
+  },
+  chr_hollow_rares: {
+    name: 'A Manada Lembra',
+    desc: 'Mate o Velho Marrowshell e Aurelhorn, Primeiro da Manada, os dois chefes raros errantes do Vale.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Fartura do Brejo',
+    desc: 'Colha um veio de minério, um bosque de madeira e um canteiro de ervas em Willowfen.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Marolas nas Lilymoors',
+    desc: 'Pesque um peixe nas águas de Willowfen.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Colheita no Promontório',
+    desc: 'Colha um veio de minério, um bosque de madeira e um canteiro de ervas em Galecrest.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'Uma Linha no Lago Espelho',
+    desc: 'Pesque um peixe nas águas de Galecrest.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Provisões da Ilha',
+    desc: 'Colha um veio de minério, um bosque de madeira e um canteiro de ervas na Farshore.',
+  },
+  chr_farshore_first_cast: {
+    name: 'O Que as Gaivotas Sabem',
+    desc: 'Pesque um peixe nas águas da Farshore.',
+  },
+  prog_engineering_rare: {
+    name: 'Engenharia de Precisão',
+    desc: 'Crie seu primeiro item de qualidade rara em Engenharia.',
+  },
+  prog_alchemy_rare: {
+    name: 'Uma Safra Rara',
+    desc: 'Crie seu primeiro item de qualidade rara em Alquimia.',
+  },
+  prog_cooking_rare: {
+    name: 'Um Prato Memorável',
+    desc: 'Crie seu primeiro item de qualidade rara em Culinária.',
+  },
+  prog_leatherworking_rare: {
+    name: 'Curtimento Fino',
+    desc: 'Crie seu primeiro item de qualidade rara em Couraria.',
+  },
+  prog_tailoring_rare: {
+    name: 'Um Ponto de Mestre',
+    desc: 'Crie seu primeiro item de qualidade rara em Alfaiataria.',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Temperado até Brilhar',
+    desc: 'Crie seu primeiro item de qualidade rara em Fabricação de Armas.',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Blindado à Perfeição',
+    desc: 'Crie seu primeiro item de qualidade rara em Fabricação de Armaduras.',
   },
 };

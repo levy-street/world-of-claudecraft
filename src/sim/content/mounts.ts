@@ -17,7 +17,9 @@ export type MountKey =
   | 'aether_hover_cycle'
   | 'shadowjump_toad'
   | 'stormfeather_griffin'
-  | 'thunderstrut_gobbler';
+  | 'thunderstrut_gobbler'
+  | 'drakemaw_raptor'
+  | 'terrorspark_groundshaker';
 
 export type MountRarity = 'common' | 'uncommon' | 'rare' | 'epic';
 
@@ -30,8 +32,9 @@ export interface MountDef {
   moveSpeedPct: number;
 }
 
-// Speed tiers: the purchasable horse is the 60% base, and the loot-only specials
-// tier above it at 70 / 75 / 80% by rarity. Speed is the only stat a mount grants.
+// Speed tiers: the purchasable horse is the 60% base, and the collectible or
+// developer-only specials tier above it at 70 / 75 / 80% by rarity. Speed is
+// the only stat a mount grants.
 //
 // There is NO per-mount level gate. It used to exist and never once fired: the
 // reins items carry no requiredLevel, the vendor path has its own hardcoded
@@ -74,8 +77,10 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     rarity: 'rare',
     moveSpeedPct: 0.75,
   },
-  // Epic tier (80%): the hover-cycle and the gobbler. Rift S clears are their
-  // only source; nothing static drops them.
+  // Epic tier (80%): the hover-cycle and the gobbler come from Rift S clears.
+  // The Terrorspark Groundshaker is developer-only for now and has no
+  // player-facing acquisition, and stays LAST in the catalog (the tests pin the
+  // developer mount as the tail, so a new player-facing mount lands above it).
   aether_hover_cycle: {
     key: 'aether_hover_cycle',
     name: 'Aether-Jouster Hover-Cycle',
@@ -85,6 +90,21 @@ export const MOUNTS: Record<MountKey, MountDef> = {
   thunderstrut_gobbler: {
     key: 'thunderstrut_gobbler',
     name: 'Thunderstrut the Grand Gobbler',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
+  // The Drakemaw legendary: a saddle-broken brood raptor. Its reins
+  // (content/drakelands.ts) currently have NO acquisition path; the broodlord
+  // drop was pulled and a dedicated world boss carries it in a follow-up.
+  drakemaw_raptor: {
+    key: 'drakemaw_raptor',
+    name: 'Drakemaw Raptor',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
+  terrorspark_groundshaker: {
+    key: 'terrorspark_groundshaker',
+    name: 'Terrorspark Groundshaker',
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },

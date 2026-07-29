@@ -169,12 +169,6 @@ export interface ActionBarPlayerInput {
   abilityCharges?: {
     [id: string]: { charges: number; recharge?: number; rechargeLength?: number } | undefined;
   };
-  /** Whether the player currently carries a `kind:'stealth'` aura (Stealth or
-   *  Vanish). Gates a `requiresStealth` ability's usable state (issue #1890):
-   *  without this the bar never dimmed Cheap Shot/Ambush/Garrote out of
-   *  stealth, so they looked equally "ready" whether or not the cast would
-   *  actually succeed. */
-  stealthed: boolean;
   /** The player's worn auras: the free-cost proc read (Battle Trance /
    *  next_cast_free) that drives the slot glow and usable state, the
    *  kill-window gate, and the next-cast empowerment read. Both worlds expose
@@ -194,6 +188,8 @@ export interface ActionBarWorldInput {
   player: ActionBarPlayerInput;
   target: ActionBarTargetInput | null;
   inventory: readonly { itemId: string; count: number }[];
+  /** Aura-derived because the online player entity's local cache is not wired. */
+  stealthed: boolean;
 }
 
 /** One slot's derived state. All fields are mutated IN PLACE each tick; the object
@@ -504,7 +500,7 @@ export function createActionBarView(
           (!(player.resource < ability.cost) || freeByProc) &&
           windowOpen &&
           !(maxCharges > 1 && chargesLeft <= 0) &&
-          (!def.requiresStealth || player.stealthed);
+          (!def.requiresStealth || world.stealthed);
         slot.outOfRange =
           def.requiresTarget &&
           tgtDist !== null &&

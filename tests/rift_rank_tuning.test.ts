@@ -6,6 +6,8 @@ import {
 } from '../src/sim/content/rift/items';
 import { RIFT_BOSS_IDS, RIFT_TRASH_IDS } from '../src/sim/content/rift/mobs';
 import { BUILTIN_WORLD, ITEMS, MOBS, riftInstanceOrigin } from '../src/sim/data';
+import { RIFT_MECHANIC_SPACING_SEC } from '../src/sim/mob/mechanic_spacing';
+import { RIFT_MECHANIC_WINDUP_SEC } from '../src/sim/mob/rift_escape_window';
 import { riftHeroicClearPool, riftNormalClearPool } from '../src/sim/rift/loot_pools';
 import { RIFT_TIER_INFO } from '../src/sim/rift/portals';
 import {
@@ -389,6 +391,11 @@ describe('rift ranks: lethal boss death zone (deathZoneCast / deathZoneStrike)',
       sim.player.prevPos = { ...sim.player.pos };
       sim.player.hp = sim.player.maxHp;
       boss.deathZoneCastTimer = 0.01;
+      // The warm-up ticks fired other kit mechanics (aoePulse lands on the
+      // first engaged tick) which armed the shared spacing lock; the zone
+      // under test must fire from a clear lock, as it would in a real fight
+      // once the spacing window has passed.
+      boss.mechanicLockTimer = 0;
       inst.bossDeathZones = [];
       sim.tick();
       return { sim, inst, boss };
@@ -490,6 +497,9 @@ describe('rift ranks: lethal boss death zone (deathZoneCast / deathZoneStrike)',
     sim.player.hp = sim.player.maxHp;
     p2.hp = p2.maxHp;
     boss.deathZoneStrikeTimer = 0.01;
+    // Clear the shared spacing lock the warm-up mechanics armed, so the
+    // barrage under test fires on the very next tick.
+    boss.mechanicLockTimer = 0;
     inst.bossDeathZones = [];
     sim.tick();
     expect(inst.bossDeathZones, 'one zone per living member at S').toHaveLength(2);
@@ -586,10 +596,19 @@ describe('rift ranks: non-lethal mechanic damage cap (heroic_s safety rule)', ()
     sim.player.hp = sim.player.maxHp;
     boss.mechanicDamageMult = 10_000_000; // force the raw roll far beyond max HP
     boss.pulseTimer = 0.01;
-    const events = sim.tick();
-    const hit = events.find(
-      (ev) => ev.type === 'damage' && ev.ability === pulse.name && ev.targetId === sim.player.id,
-    ) as { amount: number } | undefined;
+    // The stamped pulse now telegraphs before detonating (rift_escape_window.ts):
+    // drive through the windup until the blast lands, topping hp and holding
+    // position each tick so the only damage on the landing tick is the pulse.
+    let hit: { amount: number } | undefined;
+    for (let i = 0; i < Math.ceil((RIFT_MECHANIC_WINDUP_SEC + 1) * 20) && !hit; i++) {
+      sim.player.pos = { ...boss.pos, z: boss.pos.z - Math.min(6, pulse.radius - 1) };
+      sim.player.prevPos = { ...sim.player.pos };
+      sim.player.hp = sim.player.maxHp;
+      const events = sim.tick();
+      hit = events.find(
+        (ev) => ev.type === 'damage' && ev.ability === pulse.name && ev.targetId === sim.player.id,
+      ) as { amount: number } | undefined;
+    }
     expect(hit, 'the pulse landed').toBeTruthy();
     const cap = Math.floor(sim.player.maxHp * RIFT_NONLETHAL_MECHANIC_CAP_PCT);
     expect(hit!.amount, 'the cap engaged exactly').toBe(cap);
@@ -1304,15 +1323,84 @@ describe('rift ranks: budget escape and citadel exemption', () => {
     sim.enterRift(seed, 20, sim.player.id);
     const inst = active(sim);
     // The citadel fields a miniboss (ritualist) and a boss (pitlord).
-    // Neither should carry riftMechanicLimit since citadel is exempt.
+    // Neither should carry riftMechanicLimit since citadel is exempt, but BOTH
+    // still carry the shared mechanic spacing (the budget exemption is about
+    // kit size, not about letting mechanics stack).
     if (inst.minibossId !== null) {
       const mini = sim.entities.get(inst.minibossId!)!;
       expect(mini.riftMechanicLimit, 'citadel miniboss is exempt from rank budget').toBeUndefined();
+      expect(mini.riftMechanicSpacing, 'citadel miniboss still spaced').toBe(
+        RIFT_MECHANIC_SPACING_SEC,
+      );
     }
     if (inst.bossId !== null) {
       const boss = sim.entities.get(inst.bossId!)!;
       expect(boss.riftMechanicLimit, 'citadel boss is exempt from rank budget').toBeUndefined();
+      expect(boss.riftMechanicSpacing, 'citadel boss still spaced').toBe(RIFT_MECHANIC_SPACING_SEC);
     }
+  });
+
+  it('every rift-spawned boss is stamped with the shared mechanic spacing; trash is not', () => {
+    const seed = seedWithFinalBoss('rift_boss_frost');
+    const sim = enterAtBossFloor(seed, 28); // S rank
+    const inst = active(sim);
+    const boss = sim.entities.get(inst.bossId!)!;
+    expect(boss.riftMechanicSpacing, 'ranked boss stamped').toBe(RIFT_MECHANIC_SPACING_SEC);
+    expect(boss.riftMechanicLimit, 'ranked boss still budget-capped').toBe(
+      RIFT_RANK_MECHANIC_BUDGET.S,
+    );
+    const trash = inst.mobIds
+      .map((id) => sim.entities.get(id))
+      .filter((m): m is Entity => !!m && m.id !== inst.bossId && m.id !== inst.minibossId);
+    for (const m of trash) {
+      expect(m.riftMechanicSpacing, `${m.templateId} trash unstamped`).toBeUndefined();
+    }
+  });
+
+  it('a live spacing lock holds a due death zone; the cast starts once the lock clears', () => {
+    const seed = seedWithFinalBoss('rift_boss_frost');
+    const sim = enterAtBossFloor(seed, 28); // S rank: deathZoneCast live
+    const inst = active(sim);
+    const boss = sim.entities.get(inst.bossId!)!;
+    const def = MOBS.rift_boss_frost.deathZoneCast!;
+    killTrash(sim);
+    sim.player.auras.push({
+      id: 'test_absorb',
+      name: 'Test Absorb',
+      kind: 'absorb',
+      remaining: 999,
+      duration: 999,
+      value: 100_000_000,
+      sourceId: sim.player.id,
+      school: 'physical',
+    } as Entity['auras'][number]);
+    boss.deathZoneCastTimer = 999;
+    boss.deathZoneStrikeTimer = 999;
+    sim.player.pos = { ...boss.pos, z: boss.pos.z - 3 };
+    sim.player.prevPos = { ...sim.player.pos };
+    tickAlive(sim, 5); // warm-up: aoePulse fires on first contact and arms the lock
+    expect(boss.mechanicLockTimer, 'warm-up armed the shared lock').toBeGreaterThan(0);
+    boss.deathZoneCastTimer = 0.01; // due now, but the lock is live
+    inst.bossDeathZones = [];
+    let heldTicks = 0;
+    while (boss.castingAbility !== def.castId && heldTicks < 20 * 8) {
+      // While the lock runs the due zone must hold: no cast, no zone placed.
+      if ((boss.mechanicLockTimer ?? 0) > 0) {
+        expect(boss.castingAbility, 'no cast while the lock runs').toBeNull();
+        expect(inst.bossDeathZones, 'no zone while the lock runs').toHaveLength(0);
+      }
+      sim.player.hp = sim.player.maxHp;
+      sim.tick();
+      heldTicks++;
+    }
+    expect(boss.castingAbility, 'the held zone cast once the lock cleared').toBe(def.castId);
+    expect(inst.bossDeathZones.length, 'the zone was placed at cast start').toBeGreaterThan(0);
+    // It held for roughly the lock remainder, not a full fresh cycle. The
+    // warm-up pulse is a stamped WINDUP fire (rift_escape_window.ts), so the
+    // lock it armed spans the telegraph plus one spacing window.
+    expect(heldTicks * (1 / 20)).toBeLessThanOrEqual(
+      RIFT_MECHANIC_SPACING_SEC + RIFT_MECHANIC_WINDUP_SEC + 0.5,
+    );
   });
 
   it('dodgeability: deathZone castTime satisfies slowedSpeed * castTime >= radius * 1.2 for each boss with in-kit CC', () => {

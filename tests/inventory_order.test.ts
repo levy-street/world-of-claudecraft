@@ -157,6 +157,9 @@ describe('Sim.moveInventoryItem', () => {
   });
 });
 
+// Kept bespoke on purpose (issue #2088): a dynamic import plus a hand-picked
+// field subset (`cmd` only). tests/helpers/bare_client.ts bareClient() is the
+// default for a new suite that just needs a bare ClientWorld.
 describe('ClientWorld.moveInventoryItem (wire)', () => {
   it('sends the from/to pair on the inv_move command', async () => {
     const { ClientWorld } = await import('../src/net/online');

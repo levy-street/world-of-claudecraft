@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../src/render/characters/assets', () => ({
@@ -89,33 +89,35 @@ describe('char_skin_window: paintCharSkinPicker (extracted from hud.ts)', () => 
     expect(() => paintCharSkinPicker(makeHost())).not.toThrow();
   });
 
-  it('renders one swatch per class skin and marks the current one selected', () => {
+  // The numbered class chromas are retired: the appearance customizer composes
+  // the body, so the row is empty for a player who owns no mech chroma.
+  it('renders no swatch at all for the retired class chromas', () => {
     const host = makeHost({ skin: 1 });
     paintCharSkinPicker(host);
     const row = document.getElementById('char-skin-row') as HTMLElement;
-    const swatches = row.querySelectorAll<HTMLButtonElement>('.skin-swatch');
-    expect(swatches).toHaveLength(SKIN_COUNTS.mage);
-    expect(swatches[1].classList.contains('sel')).toBe(true);
-    expect(swatches[0].classList.contains('sel')).toBe(false);
+    expect(row.querySelectorAll('.skin-swatch')).toHaveLength(0);
+    expect(row.querySelector('.skin-unequip-btn')).toBeNull();
   });
 
-  it('clicking a class swatch commits the skin and re-mounts the preview', () => {
-    const host = makeHost({ skin: 0 });
-    paintCharSkinPicker(host);
-    const row = document.getElementById('char-skin-row') as HTMLElement;
-    const swatches = row.querySelectorAll<HTMLButtonElement>('.skin-swatch');
-    swatches[2].click();
-    expect(host.changeSkinCalls).toEqual([[2, 'class']]);
-    expect(swatches[2].classList.contains('sel')).toBe(true);
-    expect(host.mountCharPreview).toHaveBeenCalled();
-  });
-
-  it('adds the mech catalog and an unequip control once a chroma is unlocked', () => {
+  it('shows ONLY the mech catalog, never a class swatch, once a chroma is unlocked', () => {
     const chromaId = MECH_CHROMAS[0].id;
     const host = makeHost({ skinCatalog: 'mech', skin: 0, mechChromaIds: [chromaId] });
     paintCharSkinPicker(host);
     const row = document.getElementById('char-skin-row') as HTMLElement;
-    expect(row.querySelectorAll('.skin-swatch').length).toBeGreaterThan(SKIN_COUNTS.mage);
+    // One swatch per OWNED chroma, and not one of the class skins with them
+    // (the old row opened with SKIN_COUNTS.mage of those before the mech set).
+    const swatches = row.querySelectorAll('.skin-swatch');
+    expect(swatches).toHaveLength(1);
+    expect(swatches.length).toBeLessThan(SKIN_COUNTS.mage);
+  });
+
+  // A mech wearer must keep a way back to their own character: the row is the
+  // only host for that control, so it survives the class-chroma retirement.
+  it('keeps the unequip control so a mech wearer is never stranded', () => {
+    const chromaId = MECH_CHROMAS[0].id;
+    const host = makeHost({ skinCatalog: 'mech', skin: 0, mechChromaIds: [chromaId] });
+    paintCharSkinPicker(host);
+    const row = document.getElementById('char-skin-row') as HTMLElement;
     const unequip = row.querySelector<HTMLButtonElement>('.skin-unequip-btn');
     expect(unequip).not.toBeNull();
     unequip?.click();
@@ -136,7 +138,9 @@ describe('char_skin_window: paintCharSkinPicker (extracted from hud.ts)', () => 
     const host = makeHost({ skinCatalog: 'class', skin: 0, mechChromaIds: [chromaId] });
     paintCharSkinPicker(host);
     const row = document.getElementById('char-skin-row') as HTMLElement;
-    const mechSwatch = row.querySelectorAll<HTMLButtonElement>('.skin-swatch')[SKIN_COUNTS.mage];
+    // First swatch in the row is now the first MECH chroma: the class skins
+    // that used to occupy those slots are gone.
+    const mechSwatch = row.querySelectorAll<HTMLButtonElement>('.skin-swatch')[0];
     mechSwatch.click();
     expect(host.changeSkinCalls).toEqual([[0, 'mech']]);
     expect(mechSwatch.classList.contains('sel')).toBe(true);

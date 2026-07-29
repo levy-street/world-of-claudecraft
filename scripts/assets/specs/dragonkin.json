@@ -1,0 +1,48 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/Dragonkin_Mobs/built/dragonkin_elite.glb",
+      "out": "models/creatures/dragonkin_elite.glb",
+      "type": "character",
+      "maxTex": 512,
+      "keepClips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Attack",
+        "Cleave",
+        "FireBreath",
+        "Shout",
+        "Stun",
+        "Death"
+      ]
+    },
+    {
+      "src": "tmp/asset_src/Dragonkin_Mobs/built/dragonkin_mob.glb",
+      "out": "models/creatures/dragonkin_mob.glb",
+      "type": "character",
+      "maxTex": 512,
+      "keepClips": ["Idle", "Walk", "Run", "Attack", "Shout", "Death"]
+    },
+    {
+      "src": "tmp/asset_src/Dragonkin_Mobs/built/dragonkin_baby.glb",
+      "out": "models/creatures/dragonkin_baby.glb",
+      "type": "character",
+      "maxTex": 512,
+      "keepClips": ["Idle", "Walk", "Run", "JumpAttack", "Death"]
+    },
+    {
+      "src": "tmp/asset_src/Dragonkin_Mobs/built/dragon_egg.glb",
+      "out": "models/creatures/dragon_egg.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/Dragonkin_Mobs/built/drakemaw_raptor.glb",
+      "out": "models/mounts/drakemaw_raptor.glb",
+      "type": "character",
+      "keepClips": ["Idle", "Walk", "Run", "Death"],
+      "keepExtras": true
+    }
+  ]
+}

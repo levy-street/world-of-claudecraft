@@ -17,16 +17,29 @@
 
 import type { BiomeId } from '../sim/types';
 
-/** Full day-to-night-to-day period. Twelve real hours, so the world runs two
- *  cycles per real day, deliberately decoupled from any player's local clock. */
-export const DAY_NIGHT_CYCLE_MS = 12 * 60 * 60 * 1000;
+/** Full day-to-night-to-day period. Twenty real minutes, so every play session
+ *  sees the whole cycle several times over; epoch-anchored below, so the phase
+ *  is identical for every player on Earth at the same instant, decoupled from
+ *  local clocks. */
+export const DAY_NIGHT_CYCLE_MS = 20 * 60 * 1000;
 
 /** The grade a frame reads: intensity scale for the lights + IBL, per-channel
  *  color multipliers for the sky dome and fog, a fog-distance pull-in, and the
  *  raw night amount (0 = full day, 1 = deepest night) for hue-cool blends. */
 export interface DayNightGrade {
-  /** multiplies sun + hemisphere + environment intensity (1 = authored day). */
+  /** multiplies the sun key light's intensity (1 = authored day). */
   lightScale: number;
+  /**
+   * multiplies the AMBIENT half of the rig (hemisphere light + image-based
+   * lighting) instead of `lightScale`. It sits on a higher night floor, because
+   * the two halves answer different questions after dark: the key light is the
+   * moon, which genuinely is that dim, while the ambient term is the sky bounce
+   * that keeps terrain shape and silhouettes readable. Dropping both to the same
+   * floor is what makes a night scene read as a black cutout rather than as
+   * night, and lifting the key light instead would just flatten the moonlight
+   * into a second sun. Always >= lightScale, always <= 1.
+   */
+  ambientScale: number;
   /** multiplies the sky dome color (1,1,1 = day; dark blue at night). */
   sky: [number, number, number];
   /** multiplies the biome fog color (kept lighter than the sky for readability). */
@@ -37,71 +50,351 @@ export interface DayNightGrade {
   nightAmt: number;
 }
 
-/** SHIP DAY ONLY for now. The day/night cycle arrived with the grid-world merge and
- *  is not the look we release on yet, so every consumer pins itself to full day:
- *  the clock reports noon and the renderer applies NEUTRAL_DAY_GRADE instead of the
- *  cycle's grade. Nothing about the cycle math is removed, so flipping this to false
- *  restores it in one line, and `/daynight <phase>` still overrides it for testing. */
-export const DAY_ONLY = true;
+/** The cycle is LIVE: the moving sun and moon are the world's light sources and
+ *  the clock reports the real epoch-anchored phase. Setting this back to true
+ *  re-pins every consumer to full day (the clock reports noon and the renderer
+ *  applies NEUTRAL_DAY_GRADE), the one-line kill switch the cycle shipped
+ *  behind; `/daynight <phase>` overrides the live clock either way. */
+export const DAY_ONLY = false;
+
+/** Open-air ambience states whose fog, key light, hemisphere light, and IBL
+ * must advance with the same live grade as the sky dome. Authored interiors
+ * keep their own fixed lighting rigs even when they happen to show a sky. */
+export function usesLiveDayNightLighting(fogState: string): boolean {
+  return fogState === 'outdoor' || fogState === 'battleground';
+}
 
 /** The identity grade: the world exactly as its authored daylight rig paints it.
- *  Note this is NOT `dayNightGrade(1)`, whose "day" is deliberately dimmed and
- *  cooled (lightScale 0.65, cool sky/fog) to leave headroom for night. */
+ *  `dayNightGrade(1)` lands on these same values by construction (the day
+ *  targets below are neutral), so the cycle's noon IS the authored day look. */
 export const NEUTRAL_DAY_GRADE: DayNightGrade = {
   lightScale: 1,
+  ambientScale: 1,
   sky: [1, 1, 1],
   fog: [1, 1, 1],
   farScale: 1,
   nightAmt: 0,
 };
 
-// Night targets. The floor stays moonlit, not black, so a neutral realm at
-// deepest night still reads and stays playable, but the sky itself goes a deep
-// dark blue so the moon and stars stand out against it; the fog is a touch
-// lighter than the sky for readability. Tuned darker than the first pass
-// (floor 0.26, sky 0.07/0.09/0.21) so night actually feels like night.
-const NIGHT_LIGHT_FLOOR = 0.18;
+/**
+ * THE BASE LIGHT: how much of full daylight the world keeps at midnight.
+ *
+ * This is the single number that decides how dark night is anywhere. Everything
+ * else in this file (the amplitude band, the realm palettes, the IBL
+ * normalization) only governs how realms differ from EACH OTHER; they all sit on
+ * top of this floor, so no amount of per-realm correction can make night darker
+ * than the base light allows. When night reads bright everywhere at once, this
+ * is the knob, and it is the only one.
+ *
+ * History, because it is a reversal worth knowing. This was walked UP across
+ * three passes (0.50, 0.62, 0.78) against playtest feedback that night was too
+ * dark to move around in, measured by mean frame luminance over a screenshot
+ * tour. That work was correct for the world it was tuned in: a world with no
+ * real lamps, where the only thing holding a forest interior together after dark
+ * WAS the ambient floor.
+ *
+ * That premise is gone. Every road in the world now carries authored streetlamps
+ * feeding the night light field with true distance and normal falloff
+ * (streetlamps.ts, night_light_field.ts), so local readability comes from actual
+ * light sources instead of from a global lift. Holding 0.78 meant night was 78
+ * percent of noon and no realm could read as night however its palette was
+ * graded. Coming back down is what lets the lamps matter.
+ */
+export const NIGHT_BASE_LIGHT = 0.3;
+
+/**
+ * The ambient (hemisphere + IBL) floor. The sky bounce is what holds terrain
+ * shape and body silhouettes together, so it IS the base light.
+ */
+const NIGHT_AMBIENT_FLOOR = NIGHT_BASE_LIGHT;
+
+/**
+ * The key light (sun handing over to moon) floor, deliberately well under the
+ * ambient one.
+ *
+ * The CONTRAST between the two halves is the night cue, not the absolute level:
+ * only the key light casts the long moon shadows that sell it, and a key as
+ * strong as the ambient flattens night into a dim day. The ratio is preserved
+ * from the tuning that established it, so lowering the base light darkens the
+ * night without changing what makes it read as night.
+ */
+const NIGHT_KEY_TO_AMBIENT = 0.46;
+const NIGHT_LIGHT_FLOOR = NIGHT_BASE_LIGHT * NIGHT_KEY_TO_AMBIENT;
+/**
+ * Measured ambient energy of each realm's own sky HDRI: the solid-angle-weighted
+ * mean radiance over the sphere with sky.ts's gain and clamp applied, so it is
+ * what the renderer actually integrates rather than what the file contains.
+ * Regenerate with `node scripts/hdri_irradiance.mjs`.
+ *
+ * These are DATA, not tuning. The four paint-only biomes alias a shipped
+ * neighbour's HDRI (sky.ts BIOME_HDRI_2K) and carry that sky's number.
+ */
+export const REALM_SKY_IRRADIANCE: Record<BiomeId, number> = {
+  amber: 0.5449, // amber_sunset
+  beach: 0.5348, // aliases vale_day
+  cave: 0.6473, // aliases marsh_overcast
+  desert: 0.4163, // aliases peaks_dawn
+  dusk: 0.2498, // hollow_dusk
+  ember: 0.0432, // ember_storm
+  fen: 0.9541, // fen_day
+  frost: 0.3977, // frost_twilight
+  gale: 0.6586, // galecrest_day
+  garden: 0.8111, // evergarden_day
+  haunt: 0.3413, // wraithwood_gloom
+  jungle: 0.8125, // palmreach_day
+  marsh: 0.6473, // marsh_overcast
+  night: 0.048, // nightbloom_dream
+  peaks: 0.4163, // peaks_dawn
+  vale: 0.5348, // vale_day
+  volcano: 0.6473, // aliases marsh_overcast
+};
+
+/**
+ * The night the whole world is normalized to: the Vale's, because Eastbrook's
+ * night reads correctly and it sits exactly on the split. Every realm measured
+ * at or below it (Thornpeak 0.42, the Nightbloom 0.05) also reads correctly;
+ * every realm above it (Willowfen 0.95, Palmreach and Evergarden 0.81, Farshore
+ * 0.77, Galecrest 0.66, Mirefen 0.65) reads as an overcast afternoon instead.
+ *
+ * Lower this to darken the whole world's night; it is the one global knob.
+ */
+export const NIGHT_IBL_REFERENCE = 0.5348;
+
+/**
+ * The correction is two-sided and UNCAPPED: a realm whose sky pours in too much
+ * light is pulled down, one that pours in too little is pulled up, and both land
+ * exactly on the reference. Night is the same brightness in every realm.
+ *
+ * The Drakelands' storm sky (0.043) and the Nightbloom's dream sky (0.048) take
+ * a twelvefold lift, which is the point rather than a problem: their HDRIs keep
+ * their colour, so those realms still read as ember and violet, they simply stop
+ * being the only two realms where night is also darker. A dark sky is a TINT
+ * here, not a light level.
+ */
+
+/**
+ * How much of a realm's IBL survives at FULL night, 1 for any realm already at
+ * or under the reference.
+ *
+ * This is a LEVEL correction and nothing else. The HDRI keeps its own colour, so
+ * the Amberreach's night is still golden and the Drakelands' still ember: only
+ * the amount of light it pours in is equalized. A realm darker than the datum is
+ * never lifted, because a dark sky IS that realm's identity.
+ */
+export function realmNightIblScale(biome: BiomeId): number {
+  const energy = REALM_SKY_IRRADIANCE[biome];
+  if (!(energy > 0)) return 1;
+  return NIGHT_IBL_REFERENCE / energy;
+}
+
+/**
+ * IBL multiplier for a realm at a given night amount: exactly 1 by day, easing
+ * to `realmNightIblScale` at full night. Day is untouched on purpose, because
+ * the lighting rig and the per-biome HDRI gains were tuned against it.
+ */
+export function nightIblScale(biome: BiomeId, nightAmt: number): number {
+  return 1 - (1 - realmNightIblScale(biome)) * clamp01(nightAmt);
+}
+
+/**
+ * How far a realm's own night colour tints its MOONLIGHT, 0 to 1.
+ *
+ * The key light and sky bounce cool toward a single fixed moon hue after dark
+ * (NIGHT_SUN_COOL / NIGHT_HEMI_COOL in renderer.ts). On its own that converges
+ * every realm on the same blue midnight and throws away the thing that makes a
+ * realm's lighting legible: the Drakelands' grass is GREEN, and it reads red by
+ * day only because the ember key light tints it. Losing that after dark loses
+ * the realm, not merely its sky.
+ *
+ * So the moonlight is carried toward the realm's own night hue. A neutral realm
+ * is unaffected, and every realm keeps tinting what it lights all night long.
+ */
+export const REALM_MOON_TINT = 0.7;
+
+/**
+ * Per-channel multiplier that carries a realm's night hue at UNCHANGED
+ * luminance, so it re-colours a light without brightening it.
+ *
+ * `realmFog` is the frame's `dnGrade.fog`, which already encodes how far into
+ * night the realm is and in what colour. Luminance-neutral by construction,
+ * which is what keeps this a tint rather than a second exposure knob: applied
+ * to any light, the result has the same luma it started with.
+ */
+export function realmLightTint(
+  realmFog: readonly [number, number, number],
+  amount: number,
+): [number, number, number] {
+  const level = luma(realmFog as [number, number, number]);
+  if (!(level > 0)) return [1, 1, 1];
+  const a = clamp01(amount);
+  return [
+    1 + (realmFog[0] / level - 1) * a,
+    1 + (realmFog[1] / level - 1) * a,
+    1 + (realmFog[2] / level - 1) * a,
+  ];
+}
+
 const NIGHT_SKY: [number, number, number] = [0.045, 0.06, 0.15];
 const NIGHT_FOG: [number, number, number] = [0.14, 0.18, 0.31];
 const NIGHT_FAR_SCALE = 0.82;
-// Day targets. Deliberately held well under white: the shipped HDRIs are bright
-// day skies that bloom out to a jarring white at full strength, so the peak of
-// the cycle is dimmed to a calm, soft daylight. Dusk (the midpoint of the lerp)
-// then lands between night and this calmer day, which is the whole point.
-const DAY_LIGHT_CAP = 0.65;
-const DAY_SKY: [number, number, number] = [0.58, 0.62, 0.7];
-const DAY_FOG: [number, number, number] = [0.64, 0.68, 0.76];
 
-// Per-realm swing. 1 = the realm takes the full day-to-night grade; a smaller
-// value compresses the swing toward the realm's authored look, so realms whose
-// fixed time of day is their identity keep it. The authored look is treated as
-// the DAY peak, so the amplitude only governs how far the night dip pulls it
-// down (a realm never brightens past what it ships with). Amplitude doubles as a
-// readability floor for already-dark realms (haunt, night) so they never crush
-// to unplayable black at world-midnight. A Record over BiomeId, so tsc fails the
-// build if a new biome is added without a considered amplitude here.
-export const REALM_DAYNIGHT_AMPLITUDE: Record<BiomeId, number> = {
-  // neutral daylight realms: the full day-to-night swing
-  vale: 1,
-  marsh: 1,
-  peaks: 1,
-  fen: 1,
-  garden: 1,
-  gale: 1,
-  jungle: 0.95,
-  // signature times of day: compressed swings that keep each realm itself
-  frost: 0.7, // pale-blue day eases to a deep frozen-blue night
-  amber: 0.55, // endless golden hour settles toward a golden evening
-  ember: 0.5, // the volcanic sky dims but its lava glow (separate lights) stays
-  night: 0.4, // the dream-night realm only breathes; never full daylight, never black
-  haunt: 0.4, // already a dead-grey gloom; a gentle swing that stays readable
-  dusk: 0.35, // the Veiled Hollow's permanent dusk drifts between early and late dusk
-  // paint-only biomes (map editor): never a realm band, so neutral full swing
-  beach: 1,
-  desert: 1,
-  volcano: 1,
-  cave: 1,
+/** A signature realm's own night: per-channel sky/fog endpoints replacing the
+ *  global deep-blue night, plus an optional scale on the moonlit light floor.
+ *  This is how a realm keeps its identity after dark: the Nightbloom's night is
+ *  purple and a shade darker, the Drakelands' stays warm with its lava glow. */
+export interface RealmNightPalette {
+  sky: [number, number, number];
+  fog: [number, number, number];
+  /** multiplies NIGHT_LIGHT_FLOOR (1 = the global moonlit floor). */
+  floorScale?: number;
+}
+
+/** Night palettes for the realms whose mood IS a color. Realms without an entry
+ *  take the global deep-blue night. Partial on purpose: a new biome without an
+ *  entry gets a sane default instead of a build error (the amplitude table is
+ *  the exhaustive one). */
+const RELATIVE_LUMA: [number, number, number] = [0.2126, 0.7152, 0.0722];
+
+function luma(c: readonly [number, number, number]): number {
+  return RELATIVE_LUMA[0] * c[0] + RELATIVE_LUMA[1] * c[1] + RELATIVE_LUMA[2] * c[2];
+}
+
+/** Rescale a colour to a reference's luminance, keeping its hue exactly. */
+function atNightLevel(
+  colour: [number, number, number],
+  reference: [number, number, number],
+): [number, number, number] {
+  const l = luma(colour);
+  if (!(l > 0)) return [...colour];
+  const k = luma(reference) / l;
+  return [colour[0] * k, colour[1] * k, colour[2] * k];
+}
+
+/**
+ * A realm's night endpoints, authored as a HUE and normalized to the global
+ * night's LEVEL.
+ *
+ * The separation matters and was the bug. These entries are hand-picked colours
+ * and their luminances had drifted apart: the Amberreach's night sky was 1.60x
+ * the neutral night and its fog 1.38x, the Drakelands' 1.44x and 1.20x, while
+ * the Nightbloom's sat at 1.00x. That tracked the reports exactly, because a
+ * "night colour" authored bright IS a bright night no matter what the grade
+ * does. Normalizing the luminance keeps every authored hue (the Amberreach's
+ * night is still golden, the Drakelands' still ember, the Frostveil's still
+ * frozen cyan) while making them all the same DEPTH of night.
+ *
+ * So: sky and fog carry the realm's colour, `floorScale` carries any deliberate
+ * difference in level. One knob each, and neither can silently do the other's
+ * job.
+ */
+function realmNight(
+  sky: [number, number, number],
+  fog: [number, number, number],
+  floorScale?: number,
+): RealmNightPalette {
+  const palette: RealmNightPalette = {
+    sky: atNightLevel(sky, NIGHT_SKY),
+    fog: atNightLevel(fog, NIGHT_FOG),
+  };
+  if (floorScale !== undefined) palette.floorScale = floorScale;
+  return palette;
+}
+
+export const REALM_NIGHT_PALETTE: Partial<Record<BiomeId, RealmNightPalette>> = {
+  // the Nightbloom's dream-night deepens to violet, darker than a neutral night
+  night: realmNight([0.09, 0.045, 0.17], [0.24, 0.14, 0.36]),
+  // the Drakelands' volcanic night glows warm: embers, not moonlight
+  ember: realmNight([0.16, 0.075, 0.045], [0.34, 0.19, 0.12]),
+  // the Amberreach's golden hour settles into a deep amber evening
+  amber: realmNight([0.14, 0.095, 0.05], [0.32, 0.24, 0.15]),
+  // the Veiled Hollow's dusk goes rose-violet after dark
+  dusk: realmNight([0.13, 0.06, 0.13], [0.28, 0.16, 0.28]),
+  // the Frostveil's night is a frozen cyan-blue, colder than the neutral night
+  frost: realmNight([0.035, 0.07, 0.16], [0.12, 0.2, 0.32]),
+  // the Wraithwood's gloom drains to a dead grey-green
+  haunt: realmNight([0.075, 0.09, 0.085], [0.19, 0.22, 0.2]),
 };
+// Day targets. Neutral on purpose: the golden-hour lighting rig and the
+// per-biome HDRI gains (sky.ts HDRI_TUNE) were tuned against the identity
+// grade, so the cycle's noon must reproduce that approved look exactly, and
+// the cycle only ever dips DOWN toward night from it. (The old sub-white caps
+// here predated those gains; they re-dimmed an already-graded day.)
+const DAY_LIGHT_CAP = 1;
+const DAY_SKY: [number, number, number] = [1, 1, 1];
+const DAY_FOG: [number, number, number] = [1, 1, 1];
+
+// How much a realm RESISTS the night: 0 takes the full neutral swing, 1 is the
+// most signature realm in the world. This is a STYLE weight and an ordering, not
+// a brightness: the band below decides how much night any of it can actually
+// buy, so a realm can lean on its identity but can never opt out of night.
+//
+// A Record over BiomeId, so tsc fails the build if a new biome arrives without a
+// considered weight here.
+const REALM_NIGHT_RESISTANCE: Record<BiomeId, number> = {
+  // neutral daylight realms: the full day-to-night swing
+  vale: 0,
+  marsh: 0,
+  peaks: 0,
+  fen: 0,
+  garden: 0,
+  gale: 0,
+  jungle: 0.08,
+  // signature times of day, in increasing order of how fixed that time is
+  frost: 0.46, // pale-blue day eases to a deep frozen-blue night
+  amber: 0.69, // endless golden hour settles toward a golden evening
+  ember: 0.77, // the volcanic sky dims but its lava glow (separate lights) stays
+  night: 0.77, // the dream-night realm never sees full daylight
+  haunt: 0.92, // already a dead-grey gloom; a gentle swing that stays readable
+  dusk: 1, // the Veiled Hollow's permanent dusk drifts between early and late dusk
+  // paint-only biomes (map editor): never a realm band, so neutral full swing
+  beach: 0,
+  desert: 0,
+  volcano: 0,
+  cave: 0,
+};
+
+/**
+ * The tightest a realm's day/night swing may ever be compressed.
+ *
+ * This is the load-bearing number for "night looks like night everywhere". The
+ * weights above used to BE the amplitudes, spanning 0.35 to 1, which meant that
+ * at world-midnight the Veiled Hollow still sat at 65 percent daylight, the
+ * Drakelands and Nightbloom at 50, and the Amberreach at 45, while a neutral
+ * realm one border away went fully dark. Walking between them was not a change
+ * of mood, it was one realm being at night and its neighbour being at noon; a
+ * night screenshot in the Amberreach was simply a daylight screenshot with a
+ * warm grade over it.
+ *
+ * Holding every realm inside [MIN, 1] keeps midnight within a narrow band for
+ * the whole world (a signature realm lands a little above the neutral floor,
+ * never half-lit), and identity is carried where it belongs: by
+ * REALM_NIGHT_PALETTE, which still paints the Drakelands' night in embers and
+ * the Nightbloom's in violet.
+ *
+ * Now 1: the band is deliberately collapsed to a point, so EVERY realm takes the
+ * full swing and midnight is the same depth of night the world over. Whatever
+ * daylight a realm kept was mixed toward WHITE, which did not merely lighten it,
+ * it desaturated the very night colour that realm exists for. Holding some back
+ * was always working against the identity it was meant to protect.
+ *
+ * Identity now rides entirely on HUE: REALM_NIGHT_PALETTE's colours (levelled to
+ * one luminance, hue untouched) and REALM_MOON_TINT. Same brightness everywhere,
+ * different colour everywhere. Lower this if per-realm swing is ever wanted
+ * back; REALM_NIGHT_RESISTANCE still records the intended ordering.
+ */
+export const MIN_DAYNIGHT_AMPLITUDE = 1;
+
+/** Per-realm swing. 1 = the full day-to-night grade; smaller compresses the
+ *  swing toward the realm's authored look. The authored look is the DAY peak,
+ *  so amplitude only governs how far the night dip pulls down (a realm never
+ *  brightens past what it ships with). Derived, never hand-set, so no realm can
+ *  drift back out of the band. */
+export const REALM_DAYNIGHT_AMPLITUDE: Record<BiomeId, number> = Object.fromEntries(
+  Object.entries(REALM_NIGHT_RESISTANCE).map(([biome, resistance]) => [
+    biome,
+    1 - resistance * (1 - MIN_DAYNIGHT_AMPLITUDE),
+  ]),
+) as Record<BiomeId, number>;
 
 function clamp01(v: number): number {
   return v < 0 ? 0 : v > 1 ? 1 : v;
@@ -151,13 +444,28 @@ export function effectiveDayness(global: number, biome: BiomeId): number {
   return clamp01(1 - (1 - clamp01(global)) * amp);
 }
 
-/** Map an effective daylight amount to the render grade a frame applies. */
-export function dayNightGrade(e: number): DayNightGrade {
+/** Map an effective daylight amount to the render grade a frame applies. With a
+ *  biome, the night end of the lerp comes from that realm's own palette (the
+ *  Nightbloom's violet, the Drakelands' ember-warm) so a signature realm stays
+ *  itself after dark; without one (or without an entry) it is the global
+ *  deep-blue night. Day is always the identity, so the biome only shapes the
+ *  dip, never the authored daylight. */
+export function dayNightGrade(e: number, biome?: BiomeId): DayNightGrade {
   const c = clamp01(e);
+  const palette = biome === undefined ? undefined : REALM_NIGHT_PALETTE[biome];
+  const nightSky = palette?.sky ?? NIGHT_SKY;
+  const nightFog = palette?.fog ?? NIGHT_FOG;
+  const floorScale = palette?.floorScale ?? 1;
+  const nightFloor = NIGHT_LIGHT_FLOOR * floorScale;
+  // A realm's floorScale shapes its ambient the same way it shapes its key
+  // light, but the ambient floor is capped at the authored day so a realm that
+  // scales UP (the Drakelands' ember glow) can never brighten past noon.
+  const nightAmbientFloor = Math.min(DAY_LIGHT_CAP, NIGHT_AMBIENT_FLOOR * floorScale);
   return {
-    lightScale: lerp(NIGHT_LIGHT_FLOOR, DAY_LIGHT_CAP, c),
-    sky: lerp3(NIGHT_SKY, DAY_SKY, c),
-    fog: lerp3(NIGHT_FOG, DAY_FOG, c),
+    lightScale: lerp(nightFloor, DAY_LIGHT_CAP, c),
+    ambientScale: lerp(nightAmbientFloor, DAY_LIGHT_CAP, c),
+    sky: lerp3(nightSky, DAY_SKY, c),
+    fog: lerp3(nightFog, DAY_FOG, c),
     farScale: lerp(NIGHT_FAR_SCALE, 1, c),
     nightAmt: 1 - c,
   };
@@ -168,7 +476,7 @@ export function fullDayGrade(): DayNightGrade {
   return dayNightGrade(1);
 }
 
-// The minimap day/night dial paints the 12h cycle as a ring of sky colors and
+// The minimap day/night dial paints the world cycle as a ring of sky colors and
 // a "now" marker; SKY_DIAL_* are the stops it lerps between.
 const SKY_DIAL_NIGHT: [number, number, number] = [0.11, 0.13, 0.26]; // deep navy
 const SKY_DIAL_GLOW: [number, number, number] = [0.86, 0.52, 0.3]; // dawn/dusk warm
@@ -224,4 +532,115 @@ export function aboveHorizon(dirY: number): number {
  *  the dark of night. */
 export function nightStarAmount(dayness: number): number {
   return smoothstep((0.35 - clamp01(dayness)) / 0.3); // dayness >= 0.35 -> 0, <= 0.05 -> 1
+}
+
+// Dawn/dusk grade warmth: the sky/fog multipliers pull toward these as the sun
+// crosses the horizon, so the whole frame (sky dome, scene fog, water) takes
+// the sunrise and sunset orange rather than just the key light.
+//
+// The drama here is SATURATION, never added light, and that distinction is
+// load-bearing: distant sprite impostors and the sun-path water glints already
+// sit near the top of the range at dusk, so a tint that lifts red is what turns
+// them into detail-less white peach. So red stays at (sky) or under (fog) the
+// pre-overhaul gain and the depth comes from pulling green and blue down, which
+// is also the physically right direction: at the horizon the sun is dimmer AND
+// redder, not brighter. Net effect against the values these replace: red 0 to
+// -2 percent, Rec.709 luminance 13 to 15 percent LOWER, red-to-blue ratio up
+// from about 1.8 to about 2.8. Pinned in tests/day_night.test.ts.
+const DUSK_SKY_TINT: [number, number, number] = [1.14, 0.72, 0.4];
+const DUSK_FOG_TINT: [number, number, number] = [1.18, 0.74, 0.42];
+
+/** Warm a grade toward the dawn/dusk orange by duskAmt (duskWarmAmount). Hue
+ *  only: lightScale and farScale stay the cycle's own curve. Returns a new
+ *  grade, never mutates the input; a zero duskAmt returns it untouched. */
+export function warmDuskGrade(g: DayNightGrade, duskAmt: number): DayNightGrade {
+  const d = clamp01(duskAmt);
+  if (d <= 0) return g;
+  const tintSky = lerp3([1, 1, 1], DUSK_SKY_TINT, d);
+  const tintFog = lerp3([1, 1, 1], DUSK_FOG_TINT, d);
+  return {
+    ...g,
+    sky: [g.sky[0] * tintSky[0], g.sky[1] * tintSky[1], g.sky[2] * tintSky[2]],
+    fog: [g.fog[0] * tintFog[0], g.fog[1] * tintFog[1], g.fog[2] * tintFog[2]],
+  };
+}
+
+/** How strongly the dawn/dusk sky glow shows, 0..1, from the sun's elevation
+ *  (its unit-direction y). Peaks while the sun crosses the horizon: fades in
+ *  as it drops below ~26 degrees of arc (y 0.44), is full through the crossing,
+ *  and is gone once the sun sinks well under (deep night has no sunset). The
+ *  sky dome pours its warm horizon lobe in scaled by this.
+ *
+ *  The window is deliberately WIDE. The first cut only opened at y 0.3 and shut
+ *  at y -0.24, which gave a golden band about a sixth of the cycle: over
+ *  before a player crossing a zone noticed it. Starting the ramp higher and
+ *  letting the afterglow linger a little deeper stretches that past a fifth of
+ *  the cycle (about four and a half of the twenty minutes), a real golden hour,
+ *  without leaking into deep night: the peak sun elevation is ~0.66, so noon
+ *  still lands exactly on zero. */
+export function duskWarmAmount(sunElev: number): number {
+  const above = smoothstep((0.44 - sunElev) / 0.4); // fades in as the sun lowers
+  const below = smoothstep((sunElev + 0.3) / 0.26); // fades out as it sinks under
+  return above * below;
+}
+
+/** How much of the key light's golden-hour warmth survives at a sun elevation,
+ *  0 (none) to 1 (all of it). This is the sunset's own horizon gate, and it is
+ *  deliberately NOT aboveHorizon: that curve is already down to 0.35 by the
+ *  time the sun sits ON the horizon, which washed the key light to a pale pink
+ *  (rgb 234,199,189) at exactly the moment the sky was most orange, and was the
+ *  single biggest reason sunset read flat. This holds full warmth through the
+ *  crossing and instead reaches zero at y -0.14, still comfortably before
+ *  updateKeyLight has finished handing the key over to the moon (y -0.15), so
+ *  moonlight never picks up a sunset tint. */
+export function sunsetWarmGate(sunElev: number): number {
+  return smoothstep((sunElev + 0.14) / 0.16); // y <= -0.14 -> 0, y >= 0.02 -> 1
+}
+
+/** How far the sky dome desaturates toward night, 0 (day, untouched) to a
+ *  capped maximum at deepest night: the day HDRI's blues and cloud color grey
+ *  out BEFORE the dark night multiply, so the night sky reads as moonlit grey
+ *  going on dark, not as a dimmed daytime photograph. Capped under 1 so a
+ *  trace of the realm's own sky color survives. */
+export function nightSkyDesat(nightAmt: number): number {
+  return 0.75 * smoothstep(clamp01(nightAmt));
+}
+
+/** The synodic month: eight world days per lunar cycle, epoch-anchored like
+ *  the day itself, so the moon's shape drifts night to night the way the real
+ *  moon's does and every player sees the identical phase. Defined in world
+ *  days on purpose, so it scales with the day period automatically. */
+export const LUNAR_CYCLE_MS = 8 * DAY_NIGHT_CYCLE_MS;
+
+/** Lunar phase in [0, 1): 0 = new moon, 0.25 = first quarter, 0.5 = full,
+ *  0.75 = last quarter. Same defensive double-modulo as cyclePhase. */
+export function lunarPhase(nowMs: number): number {
+  return (((nowMs % LUNAR_CYCLE_MS) + LUNAR_CYCLE_MS) % LUNAR_CYCLE_MS) / LUNAR_CYCLE_MS;
+}
+
+/** How the moon face's phase shadow is traced for a lunar phase: which side
+ *  of the disc the shadow hugs (the moon waxes lit-from-the-right), the
+ *  terminator ellipse's half-width (0 = the straight quarter-moon line,
+ *  1 = a full-disc curve), and which side that ellipse bulges toward. Pure,
+ *  so the canvas painter stays a dumb tracer and this geometry is testable.
+ *  Sides are -1 (left) or 1 (right) in screen space. */
+export interface MoonTerminator {
+  /** fraction of the face lit: 0 = new, 0.5 = a quarter, 1 = full */
+  litFrac: number;
+  shadowSide: -1 | 1;
+  /** terminator ellipse half-width as a fraction of the disc radius */
+  rx: number;
+  bulgeSide: -1 | 1;
+}
+
+export function moonTerminator(p: number): MoonTerminator {
+  const c = ((p % 1) + 1) % 1;
+  const a = Math.cos(2 * Math.PI * c); // +1 new, 0 at the quarters, -1 full
+  const waxing = c < 0.5;
+  const shadowSide: -1 | 1 = waxing ? -1 : 1;
+  // crescents (a > 0): the shadow spills past centre, bulging toward the lit
+  // side; gibbous (a < 0): the lit face spills over, terminator bulging back
+  // into the shadow side.
+  const bulgeSide: -1 | 1 = a > 0 ? (-shadowSide as -1 | 1) : shadowSide;
+  return { litFrac: (1 - a) / 2, shadowSide, rx: Math.abs(a), bulgeSide };
 }

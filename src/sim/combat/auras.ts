@@ -42,6 +42,7 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
 import { isStunned } from './cc';
+import { applyGreaterInvisibilityAftereffect } from './greater_invisibility';
 import { onHotExpired, tickProcState } from './talent_procs';
 import { temporalHourglassCooldownDelta, tickTemporalHourglassHealing } from './temporal_hourglass';
 import { tickThornsCooldown } from './thorns_charge';
@@ -104,7 +105,14 @@ export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void 
   } else if (p.resourceType === 'rage' && !p.inCombat) {
     p.resource = Math.max(0, p.resource - 2);
   }
-  if (!p.inCombat && p.hp < p.maxHp && !p.eating) {
+  // Eating STACKS with natural regen (issue #1608), matching how drinking
+  // already stacks with mana regen below: a food tick heals on TOP of this,
+  // not instead of it, so sitting to eat is never worse than standing idle.
+  // The one exception is a zero-hpPer2s "eating" session (p.eating?.hpPer2s
+  // === 0): that shape heals nothing itself and is the sim's documented dev
+  // freeze idiom (see startCascadePlaytest/startDevSandbox in sim.ts), which
+  // still needs natural regen suppressed to hold a scripted hp bar in place.
+  if (!p.inCombat && p.hp < p.maxHp && p.eating?.hpPer2s !== 0) {
     const regen = p.stats.sta * 0.3 + 2;
     p.hp = Math.min(p.maxHp, p.hp + Math.round(regen));
   }
@@ -151,6 +159,7 @@ export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void 
 export function updateTimers(p: Entity): void {
   p.gcdRemaining = Math.max(0, p.gcdRemaining - DT);
   p.potionCdRemaining = Math.max(0, p.potionCdRemaining - DT);
+  p.firebottleCdRemaining = Math.max(0, p.firebottleCdRemaining - DT);
   p.fiveSecondRule += DT;
   p.combatTimer += DT;
   for (const [k, v] of p.cooldowns) {
@@ -271,7 +280,13 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             true,
             undefined,
             // Periodic (DoT) ticks are not a direct attack: they must not walk a
-            // mob's leash anchor, so a DoT-kited mob still leashes home.
+            // mob's leash anchor, so a DoT-kited mob still leashes home. Ticks
+            // also deliberately carry NO abilityId (the label above is FCT and
+            // combat-log only): a hybrid ability's dot shares its ability id
+            // (Throat Wire's bleed is aura id 'garrote'), so a tick that carried
+            // the id would replay the ability's dedicated impact recording
+            // (IMPACT_ABILITY_CUES) every interval, the exact per-tick spam the
+            // one-shot dotApply moment exists to avoid.
             false,
             false,
             // Banks copied from resolved damage (Ignite) skip the source-output
@@ -281,9 +296,11 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           if (a.leechPct !== undefined) {
             const src = ctx.entities.get(a.sourceId);
             if (src && !src.dead) {
-              const healed = Math.min(Math.round(tickDamage * a.leechPct), src.maxHp - src.hp);
+              const intended = Math.round(tickDamage * a.leechPct);
+              const healed = Math.min(intended, src.maxHp - src.hp);
               if (healed > 0) {
                 src.hp += healed;
+                const overheal = intended - healed;
                 ctx.emit({
                   type: 'heal2',
                   sourceId: src.id,
@@ -291,6 +308,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
                   amount: healed,
                   crit: false,
                   ability: a.name,
+                  ...(overheal > 0 ? { overheal } : {}),
                 });
                 ctx.healingThreat(src, src, healed);
               }
@@ -298,9 +316,11 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           }
           if (e.dead) return;
         } else if (a.kind === 'hot') {
-          const healed = Math.min(Math.round(a.value * ctx.healingTakenMult(e)), e.maxHp - e.hp);
+          const intended = Math.round(a.value * ctx.healingTakenMult(e));
+          const healed = Math.min(intended, e.maxHp - e.hp);
           if (healed > 0) {
             e.hp += healed;
+            const overheal = intended - healed;
             ctx.emit({
               type: 'heal2',
               sourceId: a.sourceId,
@@ -310,6 +330,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
               ability: a.name,
               hot: true,
               abilityId: a.id,
+              ...(overheal > 0 ? { overheal } : {}),
             });
             const src = ctx.entities.get(a.sourceId);
             if (src) ctx.healingThreat(src, e, healed);
@@ -334,6 +355,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
       e.auras.splice(liveIndex, 1);
       ctx.applyNonPlayerStatAura(e, a, -1);
       ctx.emit({ type: 'aura', targetId: e.id, name: a.name, gained: false });
+      applyGreaterInvisibilityAftereffect(ctx, e, a);
       // A HoT that ran its FULL duration (this natural-expiry path, never a
       // dispel/overwrite) reports to the caster's talent procs. No rng.
       if (a.kind === 'hot') {

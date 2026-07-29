@@ -30,8 +30,8 @@ import { HARVEST_COMPONENT_ITEMS, NODE_MATERIAL_TABLE } from '../src/sim/profess
 import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES, MAX_LEVEL, XP_TABLE, type ZoneDef } from '../src/sim/types';
 import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
-const WORLD_SEED = 20061; // production seed (main.ts / server/game.ts)
 const SCRIPTED_COLLECT_ITEMS = new Set(['the_codfather']);
 
 // The complete set of ways a collect-objective item can legitimately enter a
@@ -143,6 +143,43 @@ describe('content referential integrity', () => {
     expect(QUEST_ORDER.at(-1)).toBe('q_lb_q0_ashore');
   });
 
+  it('every camp-spawned mob has an unconditional loot entry (copper at minimum)', () => {
+    // The v0.32.0 realms shipped 34 camp-spawned mobs with empty loot arrays
+    // and another 20 whose only entries were quest-gated: rollLoot
+    // (src/sim/loot/loot_roll.ts) drives entirely off template.loot, so both
+    // shapes drop nothing outside their quest, not even copper. Require at
+    // least one entry with no questId gate. The sanctioned lootless camp
+    // spawns are the practice target and the ambient stable horse (both
+    // non-combat fixtures by design), plus the Gilded Stag: the farm-yield
+    // economy model (tests/economy_yield.test.ts) uses it as the quest-only,
+    // zero-coin exemplar on purpose. The quest-dedupe content pass added the
+    // Broodmother egg clutch (spider_egg): a destructible quest object, not a
+    // combatant (dmgBase 0, moveSpeed 0, aggroRadius 0, xpMult 0, damageable
+    // only on q_broodmother via requiresQuestId), so it is lootless by design
+    // like the other fixtures, not a v0.32.0-style empty-loot regression.
+    const LOOTLESS_FIXTURES = new Set([
+      'training_dummy',
+      'stable_horse',
+      'gilded_stag',
+      'spider_egg',
+    ]);
+    const problems: string[] = [];
+    const seen = new Set<string>();
+    for (const c of CAMPS) {
+      if (seen.has(c.mobId) || LOOTLESS_FIXTURES.has(c.mobId)) continue;
+      seen.add(c.mobId);
+      const t = MOBS[c.mobId];
+      // Puzzle-object mobs (xpMult 0: the 1 HP dragonkin egg, the spider
+      // egg-sac pattern) pay no XP and carry no loot BY DESIGN: the hatched
+      // fight is the reward, and a lootable shell would sparkle every corpse
+      // in a clutch. The xpMult-0 marker is the principled gate.
+      if (t?.xpMult === 0) continue;
+      if (t && !t.loot.some((l) => !l.questId))
+        problems.push(`${c.mobId} spawns from a camp with no unconditional loot`);
+    }
+    expect(problems).toEqual([]);
+  });
+
   it('all loot tables, vendor stock, camps and dungeon spawns resolve', () => {
     const problems: string[] = [];
     for (const m of Object.values(MOBS)) {
@@ -172,6 +209,36 @@ describe('content referential integrity', () => {
     for (const d of DUNGEON_LIST) {
       for (const s of d.spawns) {
         if (!MOBS[s.mobId]) problems.push(`${d.id}: spawn ${s.mobId} missing`);
+      }
+    }
+    expect(problems).toEqual([]);
+  });
+
+  it('every kill-quest target mob actually spawns somewhere', () => {
+    // v0.34.0 shipped q_gc_scuttlers_in_the_pots (shoal_scuttler) and
+    // q_gc_wind_against_the_wick (gale_wisp) with kill targets that resolved
+    // fine in MOBS but had zero camp or dungeon spawn entry: unfinishable,
+    // and blocking the downstream Galecrest chain via requiresQuest. The
+    // "every quest reference resolves" test above only checks the mob id
+    // exists, never that anything spawns it, so this closes that gap.
+    // bound_guardian is a Nythraxis raid-encounter add spawned by the
+    // encounter script itself (src/sim/encounters/nythraxis.ts), not a
+    // world camp or a dungeon spawn list, so it is a documented exception.
+    const RAID_ENCOUNTER_SPAWNED = new Set(['bound_guardian']);
+    const spawning = new Set<string>();
+    for (const c of CAMPS) spawning.add(c.mobId);
+    for (const d of DUNGEON_LIST) for (const s of d.spawns) spawning.add(s.mobId);
+    const problems: string[] = [];
+    for (const q of Object.values(QUESTS)) {
+      for (const obj of q.objectives) {
+        if (
+          obj.type === 'kill' &&
+          obj.targetMobId &&
+          !spawning.has(obj.targetMobId) &&
+          !RAID_ENCOUNTER_SPAWNED.has(obj.targetMobId)
+        ) {
+          problems.push(`${q.id}: kill target ${obj.targetMobId} has no camp/dungeon spawn source`);
+        }
       }
     }
     expect(problems).toEqual([]);

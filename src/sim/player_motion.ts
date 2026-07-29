@@ -82,12 +82,118 @@ export const COYOTE_TIME = 0.15;
 export const FALL_SAFE_DISTANCE = 12; // yards of free fall before damage
 export const STEEP_SLIDE_SPEED = RUN_SPEED; // yd/s a player skids downhill off unwalkable ground
 export const SWIM_SPEED_MULT = 0.65;
-// Body bobs just below the water line at this location (terrain/feature-aware:
-// -Infinity outside a declared lake, so this is never called off a waterline
-// that doesn't exist there).
-export function swimSurfaceY(x: number, z: number): number {
-  return waterLevelAt(x, z) - 0.75;
+// Buoyancy: a submerged body rises toward the swim surface at this rate
+// (yd/s) instead of teleporting there. Walking past the swim-depth line used
+// to snap y from the lake bed straight to the surface in one tick; a fixed
+// deterministic rise keeps the same end state and reads as floating up.
+export const SWIM_BUOYANCY_RISE = 5;
+// Deepest a falling body plunges below the swim surface before buoyancy takes
+// over (a dive reads as a dive, not as landing on glass), always kept clear
+// of the bed itself.
+export const SWIM_MAX_PLUNGE = 1.2;
+// Underwater travel. A dive opens slow and deliberate and settles into a cruise
+// once the first full stroke is behind you — the ramp is exactly one stroke of
+// the authored breaststroke (Swim_Breaststroke, 1.7s), so the speed-up lands on
+// the beat the animation finishes its first pull. The cruise still sits UNDER
+// the surface pace: swimming underwater is never the fast way to travel.
+export const SWIM_DIVE_SPEED_MULT = 0.32;
+export const SWIM_DIVE_CRUISE_MULT = 0.58;
+export const SWIM_STROKE_PERIOD = 1.7;
+/** Descend / ascend rate while swimming (yd/s), at full steer. */
+export const SWIM_DIVE_RATE = 3.2;
+export const SWIM_ASCEND_RATE = 4.2;
+/** Yards of plunge per yd/s of water-entry speed BEYOND a flat hop's landing
+ *  speed, capped: a cliff dive drives the body under before it floats back. */
+export const SWIM_PLUNGE_PER_SPEED = 0.12;
+export const SWIM_PLUNGE_MAX = 2.5;
+/** Rate floor for the gentlest steer, as a fraction of the rates above. Easing
+ *  the camera just past the threshold has to MOVE you — a band that starts at
+ *  zero reads as a dead control — but it must not lurch either, so the shallow
+ *  end is a drift and the steep end is the full plunge. */
+export const SWIM_STEER_MIN_RATE = 0.3;
+/** Feet clearance kept above the lake bed, so a diver never sinks into terrain. */
+export const SWIM_FLOOR_CLEARANCE = 0.35;
+/** Below the waterline by this much = underwater (not just bobbing on a swell). */
+export const SWIM_SUBMERGE_EPS = 0.12;
+
+// Wading: water over the feet but ground still under them. The swim latch takes
+// over once the bed drops PLAYER_SWIM_DEPTH under the line, so this band tops
+// out below the waist by construction — which is exactly the range where a body
+// should be shoving water aside rather than striding through it.
+/** Ankle deep. Below this it is a puddle and costs nothing. */
+export const WADE_MIN_DEPTH = 0.22;
+/** ...and the depth by which the drag is at full strength. */
+export const WADE_FULL_DEPTH = 0.75;
+/** Speed multiplier at WADE_FULL_DEPTH. Slower, not crippling: crossing a ford
+ *  should read as effort, and a shoreline should never feel like a snare. */
+export const WADE_SPEED_MULT = 0.72;
+
+/**
+ * Horizontal drag from standing in water, 0.72..1 by depth.
+ *
+ * Ramped rather than stepped so a shoreline has no speed cliff in it: walking
+ * down a beach slows continuously as the water climbs the legs. Off (1) on dry
+ * ground, and while SWIMMING — there the stroke multiplier owns the speed.
+ */
+export function wadeSpeedMult(feetDepth: number): number {
+  if (!Number.isFinite(feetDepth) || feetDepth <= WADE_MIN_DEPTH) return 1;
+  const t = Math.min(1, (feetDepth - WADE_MIN_DEPTH) / (WADE_FULL_DEPTH - WADE_MIN_DEPTH));
+  return 1 + (WADE_SPEED_MULT - 1) * t;
 }
+
+/**
+ * The vertical rate multiplier a MoveInput asks for, 0.3..1.
+ *
+ * `swimSteer` is how far the camera is pitched into the dive (or the climb).
+ * It is OPTIONAL on the wire: the dive KEY, a bot, an old client and every test
+ * that builds a MoveInput by hand all omit it and get 1 — the original,
+ * ungraded behaviour — so nothing has to know about it to keep working.
+ */
+export function swimSteerRate(steer: number | undefined): number {
+  if (typeof steer !== 'number' || !Number.isFinite(steer)) return 1;
+  const t = Math.min(1, Math.max(0, steer));
+  return SWIM_STEER_MIN_RATE + (1 - SWIM_STEER_MIN_RATE) * t;
+}
+
+/** True when the body is swimming with its feet BELOW the surface line. */
+export function isSubmerged(e: Entity, seed: number): boolean {
+  const ground = groundHeight(e.pos.x, e.pos.z, seed);
+  const level = waterLevelAt(e.pos.x, e.pos.z, seed);
+  return swimsAt(e.pos.y, ground, level) && e.pos.y < level - 0.75 - SWIM_SUBMERGE_EPS;
+}
+
+/** The swim test itself, over an ALREADY-sampled ground height and water level.
+ *  Everything that asks "am I swimming" routes through here so the expensive
+ *  terrain sample is taken exactly once per caller — paying for it twice per
+ *  gate per tick is enough to add minutes to a long simulation. */
+function swimsAt(y: number, ground: number, level: number): boolean {
+  return ground < level - SWIM_DEPTH && y <= level - 0.75 + 0.15;
+}
+
+/**
+ * Horizontal swim multiplier. Surface swimming is unchanged; underwater starts
+ * at the dive pace and eases to the cruise across one stroke of held travel.
+ */
+export function swimSpeedMult(strokeT: number, submerged: boolean): number {
+  if (!submerged) return SWIM_SPEED_MULT;
+  const t = Math.min(1, Math.max(0, strokeT / SWIM_STROKE_PERIOD));
+  const eased = t * t * (3 - 2 * t);
+  return SWIM_DIVE_SPEED_MULT + (SWIM_DIVE_CRUISE_MULT - SWIM_DIVE_SPEED_MULT) * eased;
+}
+// Body bobs just below the water line at this location (terrain/feature-aware:
+// -Infinity outside every declared lake and the open sea, so this is never
+// called off a waterline that doesn't exist there).
+export function swimSurfaceY(x: number, z: number, seed: number): number {
+  return waterLevelAt(x, z, seed) - 0.75;
+}
+
+/** Swimmable depth at a point, sampling the terrain ONCE (the mount water-walls
+ *  ask about a destination they have no height for yet). */
+function isDeepFor(x: number, z: number, seed: number): boolean {
+  const ground = groundHeight(x, z, seed);
+  return ground < waterLevelAt(x, z, seed) - SWIM_DEPTH;
+}
+
 const SWIM_DEPTH = PLAYER_SWIM_DEPTH; // ground this far under the water line = deep water
 const MAX_CLIMB_SLOPE = PLAYER_MAX_CLIMB_SLOPE;
 const BODY_RADIUS = PLAYER_BODY_RADIUS;
@@ -131,10 +237,8 @@ export function jumpMult(e: Entity): number {
 }
 
 export function isSwimming(e: Entity, seed: number): boolean {
-  return (
-    groundHeight(e.pos.x, e.pos.z, seed) < waterLevelAt(e.pos.x, e.pos.z) - SWIM_DEPTH &&
-    e.pos.y <= swimSurfaceY(e.pos.x, e.pos.z) + 0.15
-  );
+  const ground = groundHeight(e.pos.x, e.pos.z, seed);
+  return swimsAt(e.pos.y, ground, waterLevelAt(e.pos.x, e.pos.z, seed));
 }
 
 export interface PlayerMotionDeps {
@@ -205,14 +309,40 @@ export function stepPlayerMotion(
   if (wantsMove && p.sitting) deps.standUp(p);
 
   const hasMoveInput = mx !== 0 || mz !== 0;
-  const swimming = isSwimming(p, deps.seed);
+  // One terrain sample serves both latches for the whole tick.
+  const swimGround = groundHeight(p.pos.x, p.pos.z, deps.seed);
+  const swimLevel = waterLevelAt(p.pos.x, p.pos.z, deps.seed);
+  const swimming = swimsAt(p.pos.y, swimGround, swimLevel);
+  const submerged = swimming && p.pos.y < swimLevel - 0.75 - SWIM_SUBMERGE_EPS;
+  // Stroke lead-in for the underwater ramp. It banks while submerged (a pause to
+  // look around does not cost you the cruise you earned) and only resets when
+  // the body surfaces or leaves the water entirely.
+  if (submerged) {
+    p.swimStroke = Math.min(SWIM_STROKE_PERIOD, p.swimStroke + (hasMoveInput ? DT : 0));
+  } else {
+    p.swimStroke = 0;
+  }
+  if (!swimming) p.swimDiving = false;
   // Standing on unwalkably steep ground: no control, no jump, slide downhill.
   // Steepness is of the RIDDEN surface (submerged ground clamps to the
   // waterline), so an uneven lake bed never strips control from a wader and
   // slides it back into deep water.
-  const steepGround =
+  //
+  // The steepness gate reads a 1-yard-CELL memo (rideSteepnessAt rounds to the
+  // cell): a level point one step from a sheer riser inherits the cell's slope
+  // and reads steep though the ground under the feet is flat. Stripping control
+  // off that alone froze the body against the riser base, input disabled and no
+  // downhill to slide off (players stuck all along the Last Keep's west terrace
+  // edge). So the control strip also requires an ACTUAL downhill, sampled at the
+  // EXACT position (terrainDownhill): genuinely steep ground still strips
+  // control and slides, but a flat shoulder the cell memo over-reads keeps
+  // control, and the wall/contour gate below still refuses the climb.
+  const steepFlagged =
     p.onGround && !swimming && rideSteepnessAt(p.pos.x, p.pos.z, deps.seed) > MAX_CLIMB_SLOPE;
-  // Move-to-cancel: any movement input during a keyed summon cancels the cast.
+  const steepSlide = steepFlagged ? terrainDownhill(p.pos.x, p.pos.z, deps.seed) : null;
+  const steepGround = steepSlide !== null;
+  // Move-to-cancel: any movement input during a summon channel cancels the cast.
+  // Dismount channels (mountCastKey === '') remain fully rooted (handled by mountLocked below).
   if (p.mountCastRemaining > 0 && p.mountCastKey !== '' && hasMoveInput) {
     p.mountCastRemaining = 0;
     p.mountCastKey = '';
@@ -248,7 +378,11 @@ export function stepPlayerMotion(
       speed = Math.min(speed, options.maxDistance / DT);
     }
     if (mz < 0) speed *= BACKPEDAL_MULT;
-    if (swimming) speed *= SWIM_SPEED_MULT;
+    if (swimming) speed *= swimSpeedMult(p.swimStroke, submerged);
+    // Shallow water pushes back. Reuses the waterline this tick already
+    // sampled, and is inert both on dry ground (no water level there) and while
+    // swimming (the stroke multiplier above owns that speed).
+    else if (p.onGround) speed *= wadeSpeedMult(swimLevel - p.pos.y);
     // world = forward * mz + right * mx, with right = (-cos f, sin f)
     const sin = Math.sin(p.facing),
       cos = Math.cos(p.facing);
@@ -264,7 +398,7 @@ export function stepPlayerMotion(
   // Also what lets a jump STARTED in place drift forward, and a fall off a
   // ledge stay steerable, instead of the old frozen-at-takeoff trajectory.
   const airSteering = moving && !p.onGround && !swimming;
-  const slide = steepGround ? terrainDownhill(p.pos.x, p.pos.z, deps.seed) : null;
+  const slide = steepSlide;
   if (slide || movingOnGround || airSteering || (!p.onGround && (p.vx !== 0 || p.vz !== 0))) {
     if (slide && p.castingAbility) deps.cancelCast(p);
     if (airSteering) {
@@ -327,10 +461,7 @@ export function stepPlayerMotion(
       // into the water; horizontal velocity dies with it while airborne,
       // matching the steep-wall airborne gate.
       const mountBlockedByWater =
-        !!p.mountKey &&
-        !swimming &&
-        groundHeight(moveOut.x, moveOut.z, deps.seed) <
-          waterLevelAt(moveOut.x, moveOut.z) - SWIM_DEPTH;
+        !!p.mountKey && !swimming && isDeepFor(moveOut.x, moveOut.z, deps.seed);
       if (mountBlockedByWater) {
         if (!p.onGround) {
           p.vx = 0;
@@ -391,7 +522,7 @@ function stepInstancedRegion(
       // so stepping back into a water body from the submerged bed just outside
       // its footprint is never a wall (real water can continue past a
       // footprint edge into the open sea)
-      const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz);
+      const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz, deps.seed);
       const g1 = groundHeight(nx, nz, deps.seed);
       const r0 = Math.max(groundHeight(p.pos.x, p.pos.z, deps.seed), wls);
       const r1 = Math.max(g1, wls);
@@ -418,7 +549,7 @@ function stepInstancedRegion(
       // dais rim), not a face to bounce off.
       const h1 = groundHeight(nx, nz, deps.seed);
       if (h1 > p.pos.y + MANTLE_REACH) {
-        const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz);
+        const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz, deps.seed);
         const r0 = Math.max(groundHeight(p.pos.x, p.pos.z, deps.seed), wls);
         const r1 = Math.max(h1, wls);
         const run = Math.hypot(nx - p.pos.x, nz - p.pos.z);
@@ -443,11 +574,7 @@ function stepInstancedRegion(
     // from land. Reset the candidate to the current pose (and kill horizontal
     // velocity when airborne, matching the steep-wall airborne gate) so the body
     // stops at the shore instead of clipping into the water.
-    if (
-      p.mountKey &&
-      !swimming &&
-      groundHeight(nx, nz, deps.seed) < waterLevelAt(nx, nz) - SWIM_DEPTH
-    ) {
+    if (p.mountKey && !swimming && isDeepFor(nx, nz, deps.seed)) {
       nx = p.pos.x;
       nz = p.pos.z;
       if (!p.onGround) {
@@ -495,24 +622,12 @@ function verticalPass(
     BODY_RADIUS,
     p.pos.y + (p.onGround ? 0 : MANTLE_REACH),
   );
-  const deepWater = ground < waterLevelAt(p.pos.x, p.pos.z) - SWIM_DEPTH;
-  if (deepWater && p.pos.y <= swimSurfaceY(p.pos.x, p.pos.z) + 0.05) {
-    // treading water at the surface
-    p.pos.y = swimSurfaceY(p.pos.x, p.pos.z);
-    p.vy = 0;
-    p.vx = 0;
-    p.vz = 0;
-    p.onGround = true;
-    p.jumping = false;
-    p.fallStartY = p.pos.y;
-    if (inp.jump && !isRooted(p) && !mountLocked) {
-      // small hop to climb onto shores and docks
-      p.vy = JUMP_VELOCITY * 0.7 * jumpMult(p);
-      p.vx = wishX * wishSpeed;
-      p.vz = wishZ * wishSpeed;
-      p.onGround = false;
-      p.jumping = true;
-    }
+  // `ground` is already sampled above: reuse it rather than paying for the
+  // terrain again on every vertical step.
+  const waterHere = waterLevelAt(p.pos.x, p.pos.z, deps.seed);
+  const deepWater = ground < waterHere - SWIM_DEPTH;
+  if (deepWater && p.pos.y <= waterHere - 0.75 + 0.05) {
+    swimVerticalPass(p, inp, wishX, wishZ, wishSpeed, mountLocked, ground, waterHere);
     return;
   }
   // Coyote window: within COYOTE_TIME of WALKING off a ledge (vy starts at 0
@@ -540,9 +655,21 @@ function verticalPass(
     p.vy -= GRAVITY * DT;
     p.pos.y += p.vy * DT;
     p.fallStartY = Math.max(p.fallStartY, p.pos.y);
-    if (deepWater && p.pos.y <= swimSurfaceY(p.pos.x, p.pos.z)) {
-      // splashing into deep water breaks the fall
-      p.pos.y = swimSurfaceY(p.pos.x, p.pos.z);
+    if (deepWater && p.pos.y <= waterHere - 0.75) {
+      // Splashing into deep water breaks the fall — and the harder the hit,
+      // the deeper the body drives under before buoyancy lifts it back
+      // (swimVerticalPass floats a non-diving body at SWIM_ASCEND_RATE).
+      // A hop's landing speed (JUMP_VELOCITY) plunges nothing, so stepping
+      // off a bank into a lake still just settles at the seat; a flail-height
+      // fall drives a couple of yards under. The floor clamp keeps a plunge
+      // in a barely-deep-enough pool off the bed.
+      const impact = -p.vy;
+      const plunge = Math.min(
+        SWIM_PLUNGE_MAX,
+        Math.max(0, (impact - JUMP_VELOCITY) * SWIM_PLUNGE_PER_SPEED),
+      );
+      const plungeFloor = Math.min(waterHere - 0.75, ground + SWIM_FLOOR_CLEARANCE);
+      p.pos.y = Math.max(plungeFloor, waterHere - 0.75 - plunge);
       p.vy = 0;
       p.vx = 0;
       p.vz = 0;
@@ -621,6 +748,89 @@ function verticalPass(
       p.fallStartY = support;
     }
   }
+}
+
+// The vertical half of swimming: hold depth, dive, ascend, or hop out onto a
+// bank. The water carries the body, so this branch owns Y outright — no gravity,
+// no fall damage, and `onGround` stays true (the body is supported, just not by
+// terrain), which is what keeps the jump pose and landing thud off a swimmer.
+//
+// Buoyancy keys off INTENT, not depth. A body that chose to be down here (the
+// dive input has been held since it entered the water — `swimDiving`) is
+// neutrally buoyant, so exploring a lake bed is not a key you have to keep
+// held. A body that did NOT choose it — teleported in, knocked in, spawned in —
+// rides straight back up to the line, which is the rule the rest of the game
+// leans on: nothing ever ends up parked on a lake bed. Surfacing is always one
+// held jump away either way, and the descent is floored a fixed clearance above
+// the bed so a diver never sinks into terrain.
+function swimVerticalPass(
+  p: Entity,
+  inp: MoveInput,
+  wishX: number,
+  wishZ: number,
+  wishSpeed: number,
+  mountLocked: boolean,
+  ground: number,
+  waterHere: number,
+): void {
+  const surface = waterHere - 0.75;
+  // Never let the clamp push the body UP into the surface in water too shallow
+  // to dive in: there, the floor and the ceiling are the same line.
+  const floor = Math.min(surface, ground + SWIM_FLOOR_CLEARANCE);
+  const controllable = !isRooted(p) && !mountLocked;
+  p.vx = 0;
+  p.vz = 0;
+  p.vy = 0;
+  p.onGround = true;
+  p.jumping = false;
+
+  // How hard the camera is aimed into it. The keys and every hand-built
+  // MoveInput read as full rate, so only a graded camera steer is ever slower.
+  const steer = swimSteerRate(inp.swimSteer);
+
+  if (inp.jump && controllable && p.pos.y >= surface - 1e-3) {
+    // At the line already: the small hop that climbs onto shores and docks.
+    p.vy = JUMP_VELOCITY * 0.7 * jumpMult(p);
+    p.vx = wishX * wishSpeed;
+    p.vz = wishZ * wishSpeed;
+    p.onGround = false;
+    p.jumping = true;
+  } else if (inp.jump && controllable) {
+    // JUMP outranks dive. `dive` is a latched camera BAND as well as a key,
+    // and a swimmer naturally looks down at where they are going — with dive
+    // ranked first, the space bar silently did nothing whenever the camera
+    // was pitched past the dive line, which read as "the controls stopped
+    // working". An explicit jump press is always deliberate: it climbs at the
+    // full rate, whatever the camera or a simultaneously-held Ctrl says, and
+    // it also ends the dive so the body keeps floating on release.
+    p.swimDiving = false;
+    p.pos.y = Math.min(surface, p.pos.y + SWIM_ASCEND_RATE * DT);
+  } else if (inp.dive && controllable) {
+    // ...but dive still wins over `surface` (the look-up camera): the key is
+    // explicit, the camera band is passive.
+    p.swimDiving = true;
+    p.pos.y = Math.max(floor, p.pos.y - SWIM_DIVE_RATE * steer * DT);
+  } else if (inp.surface && controllable) {
+    // Rise on the look-up camera. Deliberately NOT the hop branch above:
+    // holding the view up while already floating must leave you floating,
+    // not fling you out of the water once a second. Camera input is steered.
+    p.pos.y = Math.min(surface, p.pos.y + SWIM_ASCEND_RATE * steer * DT);
+  } else if (p.swimDiving) {
+    // Neutral buoyancy, but only for a body that DOVE here: hold this depth so
+    // exploring a lake bed is not a key you have to keep held. The floor clamp
+    // also lifts a swimmer who drifted over rising ground.
+    p.pos.y = Math.min(surface, Math.max(floor, p.pos.y));
+  } else {
+    // Never dove (teleported in, knocked in, plunged in from a fall): the
+    // water carries the body up to the line — at the real ascend rate rather
+    // than a snap, so a plunge entry visibly bobs back to the surface. The
+    // long-standing rule still holds: nothing ever ends up parked on a lake
+    // bed, it just takes the float a beat to get there.
+    p.pos.y = Math.min(surface, p.pos.y + SWIM_ASCEND_RATE * DT);
+  }
+  // Reaching the line ends the dive: the next release of the controls floats.
+  if (p.pos.y >= surface - 1e-6) p.swimDiving = false;
+  p.fallStartY = p.pos.y;
 }
 
 // Ease the body off any terrain wall it now overlaps. The slope gates above

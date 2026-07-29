@@ -77,8 +77,9 @@ async function broadcastsReadHandler(ctx: Ctx): Promise<void> {
 
 /**
  * POST /api/deeds/broadcasts { enabled: boolean }: set the account's
- * marquee-unlock broadcast opt-out (accounts.deed_broadcasts). The flag only
- * gates the guild/friend fan-out; unlocks themselves are never affected.
+ * marquee-unlock broadcast opt-out (accounts.deed_broadcasts). The flag gates
+ * the guild/follower fan-out AND the Discord activity feed's deed and
+ * masterwork cards (R58); unlocks themselves are never affected.
  * Requires a mutation-scope bearer; the strict boolean check answers the
  * domain's stable invalid-input code.
  */

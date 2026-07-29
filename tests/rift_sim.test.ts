@@ -429,5 +429,94 @@ describe('rift sim: client-sync event', () => {
     expect(evt?.baseLevel).toBe(18);
     expect(evt?.floorIndex).toBe(0);
     expect(evt?.floorCount).toBeGreaterThanOrEqual(3);
+    // A /dev portal has no backing RiftEvent (race.ts: dev portals are
+    // "deliberately outside the global race"), so it carries no closing timer;
+    // the HUD must degrade to floor-progress-only rather than show a bogus timer.
+    expect(evt?.expiresAtMs).toBeNull();
+    expect(sim.riftEventMsRemaining()).toBeNull();
+  });
+
+  it('carries a live expiresAtMs deadline for a real portal, ticking down but re-emitted unchanged on descent', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(20);
+    // A /dev portal has no riftEventId by default (see the previous case); give
+    // this one a real backing RiftEvent so enterRift takes the ranked-event
+    // path (eventId = portal.riftEventId), exactly like a natural world portal.
+    sim.chat('/dev portal 91 18', sim.player.id);
+    const portal = [...sim.entities.values()].find((e) => e.templateId === 'rift_portal')!;
+    const eventId = 'test-rift-event';
+    const lifetimeSecs = 3600; // RIFT_PORTAL_LIFETIME
+    portal.riftEventId = eventId;
+    sim.riftEvents.push({
+      eventId,
+      ordinal: 1,
+      portalId: portal.id,
+      status: 'open',
+      tier: 'C',
+      zoneId: 'test_zone',
+      zoneName: 'Test Zone',
+      riftName: 'Test Rift',
+      seed: 91,
+      baseLevel: 18,
+      openedAt: sim.time,
+      expiresAt: sim.time + lifetimeSecs,
+      position: { x: portal.pos.x, z: portal.pos.z },
+      contentId: 'test',
+      contentHash: 'test',
+      contentLocked: false,
+      upgradeStatus: 'heuristic',
+      upgrade: null,
+      assetPipeline: { status: 'none', jobId: null, requestIds: [] },
+      firstClear: null,
+    });
+
+    sim.player.pos = { ...portal.pos };
+    const entryEvents = sim.tick();
+    const entryEvt = entryEvents.find((e) => e.type === 'riftState') as
+      | Extract<SimEvent, { type: 'riftState' }>
+      | undefined;
+    expect(entryEvt).toBeTruthy();
+    expect(entryEvt?.eventId).toBe(eventId);
+    expect(entryEvt?.expiresAtMs).not.toBeNull();
+    // Right at entry, the deadline should sit close to the full lifetime out
+    // from the moment the event opened (a couple ticks of DT=1/20s tolerance).
+    expect(Math.abs((entryEvt?.expiresAtMs as number) - lifetimeSecs * 1000)).toBeLessThan(500);
+
+    const inst = sim.riftInstances.find((i) => i.partyKey !== null)!;
+    expect(inst.eventId).toBe(eventId);
+
+    const firstMs = sim.riftEventMsRemaining();
+    expect(firstMs).not.toBeNull();
+    expect(Math.abs((firstMs as number) - lifetimeSecs * 1000)).toBeLessThan(500);
+
+    // Advance real sim-clock time: the locally-derived remaining value ticks
+    // down (the whole point of the fix: no snapshot round trip needed for this).
+    tickAlive(sim, 20 * 30); // 30 sim-seconds
+    const laterMs = sim.riftEventMsRemaining();
+    expect(laterMs).not.toBeNull();
+    expect(laterMs as number).toBeLessThan(firstMs as number);
+    expect(Math.abs((firstMs as number) - (laterMs as number) - 30_000)).toBeLessThan(200);
+
+    // Descend a floor: emitRiftState fires again (runs.ts descend call site).
+    // Same backing event, same clock conversion: the wire deadline comes back
+    // unchanged (an event's expiresAt does not move just because a party
+    // descends), not decremented by the elapsed time like a countdown would be.
+    killTrash(sim);
+    inst.litPylons = new Set(inst.pylonIds);
+    inst.puzzleSolved = true;
+    tickAlive(sim, 21);
+    expect(inst.descentId).not.toBeNull();
+    const desc = sim.entities.get(inst.descentId!)!;
+    sim.player.pos = { ...desc.pos };
+    sim.player.hp = sim.player.maxHp;
+    const descendEvents = sim.tick();
+    const descendEvt = descendEvents.find((e) => e.type === 'riftState') as
+      | Extract<SimEvent, { type: 'riftState' }>
+      | undefined;
+    expect(descendEvt).toBeTruthy();
+    expect(descendEvt?.expiresAtMs).not.toBeNull();
+    expect(
+      Math.abs((descendEvt?.expiresAtMs as number) - (entryEvt?.expiresAtMs as number)),
+    ).toBeLessThan(500);
   });
 });

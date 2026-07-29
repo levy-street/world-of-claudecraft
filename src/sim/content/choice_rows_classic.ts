@@ -127,6 +127,11 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
             ability: [
               { ability: 'ice_barrier', addEffects: [{ type: 'breakRoots' }] },
               { ability: 'blazing_barrier', addEffects: [{ type: 'breakRoots' }] },
+              // Chronomancy's shield fills the same personal-barrier slot (see
+              // PERSONAL_BARRIER_IDS) and can also be cast on an ally: the
+              // breakRoots dispatch case gates on a self-cast so a ward laid
+              // on an ally never cleanses the caster's own root.
+              { ability: 'temporal_barrier', addEffects: [{ type: 'breakRoots' }] },
             ],
           },
         },
@@ -134,7 +139,7 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
           id: 'mag_r8_greater_invis',
           name: 'Greater Invisibility',
           description:
-            'Grants Greater Invisibility: vanish for 20 sec, removing 2 damage-over-time effects and taking 90% less damage while invisible and shortly after.',
+            'Grants Greater Invisibility: vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec.',
           icon: 'greater_invisibility',
           effect: { grant: { ability: 'greater_invisibility' } },
         },
@@ -1903,7 +1908,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Hellglass Ward',
           description:
             'Every 3rd damaging Fire or Shadow spell raises a demonic ward absorbing 90 damage for 10 sec.',
-          icon: 'summon_felhound',
+          icon: 'summon_felhunter',
           effect: {
             proc: {
               id: 'wlk_grimoire_of_carnage',

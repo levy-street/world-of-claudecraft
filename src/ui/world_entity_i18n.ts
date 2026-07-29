@@ -101,6 +101,12 @@ const MOB_IDS = [
   'deepfen_spearjaw',
   'mirefen_widowling',
   'spider_egg_sac',
+  // Quest-dedupe pass (zones 1 to 3): the Broodmother clutch and the new elites.
+  'spider_egg',
+  'widow_hatchling',
+  'drowned_warlord',
+  'brakka_wallbreaker',
+  'threnos_first_voice',
   'grave_silt_bulwark',
   'sump_troll_devourer',
   'choir_thrall',
@@ -166,6 +172,10 @@ const MOB_IDS = [
   'ashbone_warcaller',
   'dune_troll',
   'cindraleth_maw_matriarch',
+  'dragonkin_egg',
+  'dragonkin_whelp',
+  'dragonkin_broodguard',
+  'drakemaw_broodlord',
   'gilded_stag',
   'gloam_fox',
   'orchard_treant',
@@ -250,6 +260,7 @@ const NPC_IDS = [
   'armorer_hode',
   'heroic_quartermaster', // Heroic Marks vendor (Highwatch, zone 3)
   'fury', // Honor Quartermaster and WARFARE vendor (Eastbrook, zone 1)
+  'warmarshal_draven_kole', // Master of the Warfare Stores, the WARFARE vendor (Highwatch, zone 3)
   'loremaster_caddis',
   'auctioneer_voss', // second World Market auctioneer (Highwatch, zone 3)
   'bursar_fernando', // Gilded Strongbox banker (Eastbrook, zone 1)

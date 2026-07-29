@@ -196,6 +196,8 @@ describe('druid spell pack — casting applies effects', () => {
         strafeLeft: false,
         strafeRight: false,
         jump: false,
+        dive: false,
+        surface: false,
       };
       const start = { x: e.pos.x, z: e.pos.z };
       for (let i = 0; i < 60; i++) sim.tick();
@@ -235,6 +237,8 @@ describe('druid spell pack — casting applies effects', () => {
         strafeLeft: false,
         strafeRight: false,
         jump: false,
+        dive: false,
+        surface: false,
       };
       const start = { x: e.pos.x, z: e.pos.z };
       for (let i = 0; i < 60; i++) sim.tick();

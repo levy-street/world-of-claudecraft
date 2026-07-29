@@ -113,6 +113,7 @@ function makeFakeSprite(trace: Trace): FakeSprite {
     miterLimit: DEFAULT_MITER_LIMIT,
     textAlign: 'start',
     textBaseline: 'alphabetic',
+    setTransform(): void {},
     measureText(text: string): Partial<TextMetrics> {
       sprite.measured.push(`${ctx.font}|${ctx.textAlign}|${ctx.textBaseline}|${text}`);
       return trace.metrics(text, ctx.font, ctx.textAlign);
@@ -467,7 +468,9 @@ describe('text_sprite_cache: the bound and its eviction', () => {
       ...ZONES.map((zone) => overworldDungeonPortals(DUNGEON_LIST, zone.zMin, zone.zMax).length),
     );
     const zoneTitle = 1;
-    const questGiverGlyphs = 2;
+    // Gold '?', gold '!', and the phase 23 repeat-blue '!' (the cooldown
+    // variant dims the blue raster at blit time, minting no fourth sprite).
+    const questGiverGlyphs = 3;
 
     const worstCase =
       allyNames + badgeDigits + poiLabels + portalNames + zoneTitle + questGiverGlyphs;
@@ -482,8 +485,8 @@ describe('text_sprite_cache: the bound and its eviction', () => {
     // quotes, which is the other direction the check below cannot see.
     expect(
       worstCase,
-      'the header quotes 370; a SMALLER total means a term broke',
-    ).toBeGreaterThanOrEqual(370);
+      'the header quotes 371; a SMALLER total means a term broke',
+    ).toBeGreaterThanOrEqual(371);
     expect(
       TEXT_SPRITE_LIMIT,
       `worst case grew to ${worstCase}: raise TEXT_SPRITE_LIMIT above it, or the map thrashes`,
@@ -600,6 +603,31 @@ describe('text_sprite_cache: the bound and its eviction', () => {
     // The overshoot is reclaimed at the next boundary.
     cache.beginRedraw();
     expect(cache.size).toBe(TEXT_SPRITE_LIMIT);
+  });
+
+  it('hard-bounds a high-DPR cache by bytes and evicts least recently used first', () => {
+    const trace = newTrace();
+    installDocument(trace);
+    const byteBudget = 52_000;
+    const cache = new TextSpriteCache(10, byteBudget);
+    const ctx = targetContext(trace);
+    cache.setPixelRatio(2);
+
+    cache.draw(ctx, 'A', 0, 0, OUTLINED);
+    cache.draw(ctx, 'B', 0, 0, OUTLINED);
+    cache.draw(ctx, 'A', 0, 0, OUTLINED);
+    cache.draw(ctx, 'C', 0, 0, OUTLINED);
+
+    expect(cache.bytes).toBeLessThanOrEqual(byteBudget);
+    expect(cache.size).toBe(2);
+    expect(trace.sprites).toHaveLength(3);
+
+    cache.draw(ctx, 'A', 0, 0, OUTLINED);
+    cache.draw(ctx, 'C', 0, 0, OUTLINED);
+    expect(trace.sprites).toHaveLength(3);
+    cache.draw(ctx, 'B', 0, 0, OUTLINED);
+    expect(trace.sprites).toHaveLength(4);
+    expect(cache.bytes).toBeLessThanOrEqual(byteBudget);
   });
 });
 

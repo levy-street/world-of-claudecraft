@@ -2,49 +2,49 @@
   "comment": "The Galecrest's outskirt raider encampments from KayKit Medieval Hexagon Pack (CC0): red-banded hide tents and watchtower (red colorway), the spiked palisade wall (neutral), and camp dressing. Same source collection as gale_harbor.json.",
   "items": [
     {
-      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/red/building_tent_red.gltf",
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/red/building_tent_red.gltf",
       "out": "models/biome/hexr_tent.glb",
       "type": "static",
       "maxTex": 512
     },
     {
-      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/red/building_watchtower_red.gltf",
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/red/building_watchtower_red.gltf",
       "out": "models/biome/hexr_watchtower.glb",
       "type": "static",
       "maxTex": 512
     },
     {
-      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/neutral/wall_straight.gltf",
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/neutral/wall_straight.gltf",
       "out": "models/biome/hexn_palisade.glb",
       "type": "static",
       "maxTex": 512
     },
     {
-      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/decoration/props/barrel.gltf",
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/decoration/props/barrel.gltf",
       "out": "models/biome/hex_barrel.glb",
       "type": "static",
       "maxTex": 512
     },
     {
-      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/decoration/props/target.gltf",
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/decoration/props/target.gltf",
       "out": "models/biome/hex_target.glb",
       "type": "static",
       "maxTex": 512
     },
     {
-      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/decoration/props/flag_red.gltf",
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/decoration/props/flag_red.gltf",
       "out": "models/biome/hex_flag_red.glb",
       "type": "static",
       "maxTex": 512
     },
     {
-      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/units/neutral/cannon.gltf",
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/units/neutral/cannon.gltf",
       "out": "models/biome/hex_cannon.glb",
       "type": "static",
       "maxTex": 512
     },
     {
-      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/blue/building_windmill_blue.gltf",
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/blue/building_windmill_blue.gltf",
       "out": "models/biome/hexb_windmill.glb",
       "type": "static",
       "maxTex": 512

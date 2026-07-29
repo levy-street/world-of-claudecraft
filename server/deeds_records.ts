@@ -20,15 +20,20 @@
 // longer carrying those ids, there is nothing left to replay from.
 
 import { DEEDS } from '../src/sim/content/deeds';
+import { FISHING_RARE_ID } from '../src/sim/content/items';
+import { ITEMS } from '../src/sim/data';
 import type { DeedDef } from '../src/sim/types';
 import type { DeedsRarity } from '../src/world_api';
 import { insertCharacterDeed, insertCharacterDeeds } from './deeds_db';
+// Imported from the mirror modules DIRECTLY (not the ./steam or ./epic
+// barrels): this module rides in game.ts's graph, and the barrels would drag
+// routes.ts (and its load-time requireAccount over the db module) into every
+// test that partial-mocks the db, the known overlay-mock breakage class.
+// Steam and Epic observers are independent (D21): either may be dark; one
+// outage must not block the other.
+import { onDeedRecorded as onEpicDeedRecorded } from './epic/mirror';
 import { REALM } from './realm';
-// Imported from the mirror module DIRECTLY (not the ./steam barrel): this
-// module rides in game.ts's graph, and the barrel would drag routes.ts (and
-// its load-time requireAccount over the db module) into every test that
-// partial-mocks the db, the known overlay-mock breakage class.
-import { onDeedRecorded } from './steam/mirror';
+import { onDeedRecorded as onSteamDeedRecorded } from './steam/mirror';
 
 // Per-process FIFO tail. A character lives on one realm process, so chaining
 // preserves that character's unlock order; a rejection is caught (logged) and
@@ -66,6 +71,31 @@ export function isPubliclyListableDeedId(id: string): boolean {
   return def !== undefined && def.hidden !== true;
 }
 
+/** The first-koi deed (col_glimmerfin, "Glimmer of Hope", desc "Catch a
+ *  Sunglint Koi"; the NAME is what ships as the card's deedName): the one
+ *  feed-worthy deed with no title reward; its Discord card reads as a catch. */
+export const FIRST_KOI_DEED_ID = 'col_glimmerfin';
+
+/** The Discord activity-feed payload for one deed unlock, or null when the
+ *  unlock is not feed-worthy. Feed-worthy is exactly a title-rewarding deed or
+ *  the first-koi deed: the professions moments the rareloot detector cannot see
+ *  (no loot roll fires for a catch, a craft, or a deed; the first masterwork
+ *  rides prog_masterwright's title). A Discord channel is precisely the
+ *  third-party public surface the hidden-deed contract covers, so this routes
+ *  through isPubliclyListableDeedId and fails CLOSED on hidden or unknown ids.
+ *  Pure so the gate is unit-testable. */
+export function discordFeedDeed(
+  deedId: string,
+): { deedName: string; deedTitle?: string; itemName?: string } | null {
+  const def = DEEDS[deedId];
+  if (!def || !isPubliclyListableDeedId(deedId)) return null;
+  if (deedId === FIRST_KOI_DEED_ID) {
+    return { deedName: def.name, itemName: ITEMS[FISHING_RARE_ID]?.name ?? FISHING_RARE_ID };
+  }
+  if (def.reward?.kind === 'title') return { deedName: def.name, deedTitle: def.reward.text };
+  return null;
+}
+
 /** The public form of the rarity aggregate: keep only publicly listable deeds
  *  so an anonymous caller can neither enumerate a hidden deed's id the moment
  *  one player earns it nor learn a newer/rolled-back id. Pure; the main.ts
@@ -96,11 +126,13 @@ export function recordDeedUnlock(
         }),
       )
       .then(() => {
-        // The Steam mirror observes THIS observer: it hooks in only after the
-        // character_deeds upsert resolves, is synchronous + swallow-all
-        // (server/steam/mirror.ts), and stays a per-process no-op unless
-        // STEAM_ENABLED=1, the deed is mapped, and the account is linked.
-        onDeedRecorded(who.accountId, deedId);
+        // Storefront mirrors observe THIS observer: each hooks in only after
+        // the character_deeds upsert resolves, is synchronous + swallow-all,
+        // and stays a per-process no-op unless its flag is on, the deed is
+        // mapped, and the account is linked. Direct dual fan-out (D21), not a
+        // shared mega-bus: Steam and Epic are independent.
+        onSteamDeedRecorded(who.accountId, deedId);
+        onEpicDeedRecorded(who.accountId, deedId);
       })
       .catch((err) => {
         console.error('character_deeds write failed:', err);
@@ -121,9 +153,10 @@ export function recordDeedUnlock(
  *  A single-id slice delegates to recordDeedUnlock, keeping the common
  *  live-unlock case on its exact single-row insert; an empty slice never
  *  touches the tail. Unlike the login reconcile (a DB write only), the drain
- *  owns the Steam at-least-once push, so onDeedRecorded fires once per id AFTER
- *  the batch resolves. A rejected batch logs and never breaks the tail;
- *  at-least-once heals via the join reconcile, which replays the same ids. */
+ *  owns the storefront at-least-once pushes, so each onDeedRecorded fires once
+ *  per id AFTER the batch resolves. A rejected batch logs and never breaks the
+ *  tail; at-least-once heals via the join reconcile, which replays the same
+ *  ids. */
 export function recordDeedUnlocks(
   who: { characterId: number; accountId: number },
   deedIds: readonly string[],
@@ -145,13 +178,16 @@ export function recordDeedUnlocks(
         ),
       )
       .then(() => {
-        // The drain, unlike the login reconcile, owns the Steam at-least-once
-        // push: notify the mirror once per id, in unlock order, only after the
-        // batch upsert resolves. onDeedRecorded is synchronous + swallow-all and
-        // a per-process no-op unless STEAM_ENABLED, the deed is mapped, and the
-        // account is linked (server/steam/mirror.ts), exactly like the
-        // single-unlock path.
-        for (const id of ids) onDeedRecorded(who.accountId, id);
+        // The drain, unlike the login reconcile, owns the storefront
+        // at-least-once pushes: notify each mirror once per id, in unlock
+        // order, only after the batch upsert resolves. Each onDeedRecorded is
+        // synchronous + swallow-all and a per-process no-op unless its flag
+        // is on, the deed is mapped, and the account is linked (Steam and
+        // Epic independently; D21).
+        for (const id of ids) {
+          onSteamDeedRecorded(who.accountId, id);
+          onEpicDeedRecorded(who.accountId, id);
+        }
       })
       .catch((err) => {
         console.error('character_deeds batch write failed:', err);
@@ -171,12 +207,13 @@ export function recordDeedUnlocks(
  *  into the join path, and a rejected batch logs and continues the chain. An
  *  empty set is a no-op that never touches the tail.
  *
- *  Deliberately does NOT call the Steam onDeedRecorded hook per row: the
- *  character_deeds write is the whole job here. Steam's own login catch-up is
- *  owned by mirror.reconcileOnLogin, called separately from the join path
- *  (server/game.ts) beside this reconcile. It replays the earned-and-mapped
- *  subset to Steam throttled per account, so a dropped achievement push heals
- *  without churning the push queue with an account's whole history every join. */
+ *  Deliberately does NOT call the storefront onDeedRecorded hooks per row: the
+ *  character_deeds write is the whole job here. Each storefront's own login
+ *  catch-up is owned by its mirror.reconcileOnLogin, called separately from
+ *  the join path (server/game.ts) beside this reconcile. They replay the
+ *  earned-and-mapped subset throttled per account, so a dropped achievement
+ *  push heals without churning the push queue with an account's whole history
+ *  every join. */
 export function reconcileCharacterDeeds(
   who: { characterId: number; accountId: number },
   deedIds: readonly string[],

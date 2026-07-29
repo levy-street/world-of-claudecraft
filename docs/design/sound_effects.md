@@ -85,6 +85,12 @@ not change the exit code), so the shipped world clips, which predate the mono
 policy, do not break the gate before the one-time re-process. Pass
 `npm run sfx:check -- --strict` to promote them to failures, and
 `npm run sfx:conform` (`--fix`) to conform loudness and downmix in a single pass.
+The 8 `player_hurt_female_1..5` / `player_death_female_1..3` clips under
+`public/audio/sfx/` are an intentional, temporary exception to the naming rule:
+they are staged ahead of the player-gender model swap (no `PlayerMeta` gender
+field exists yet to key playback on), so `--strict` currently flags all 8 as
+"not a catalog key, numbered variant, or mob subfamily file". That is expected
+noise, not a regression, until the swap lands and wires them under a real key.
 
 A third advisory category flags a `custom: true` key whose measured LUFS lands
 suspiciously close to the generated-content target (`TARGET_LUFS`, -14): the
@@ -197,6 +203,7 @@ until that loop stops.
 | `mount_run_shadowjump_toad` | 0.52 | slime spring and damp footfall |
 | `mount_run_stormfeather_griffin` | 0.51 | large wing rush and hard talon contact |
 | `mount_run_thunderstrut_gobbler` | 0.40 | higher feather rush and quick claw contact |
+| `mount_run_terrorspark_groundshaker` | 0.55 | compact tread clatter with a low mechanical drive pulse |
 | `move_jump` | 0.5 | quick light gear/leather exertion and fabric rustle, a person leaping up |
 | `move_land` | 0.6 | a person landing from a jump, boots thud with armor and gear settle |
 | `move_splash` | 0.8 | a body plunging into water, big splash |
@@ -325,6 +332,16 @@ as footstep variant choice, not gameplay-affecting).
 | `amb_dungeon` | ✓ | global | a dark stone dungeon interior, dripping water echoes and a low ominous drone |
 | `amb_rain` | ✓ | global | steady rainfall pattering with occasional distant thunder |
 | `amb_snow` | ✓ | global | a soft muffled snowy wind, quiet and cold |
+
+Point ambience (`amb_campfire`/`amb_forge`) shares the same falloff every
+other positional sound uses by default, but `amb_forge` gets its own,
+narrower audible-distance override (`FORGE_MAX_DISTANCE`, `src/game/sfx.ts`;
+`makePanner`/`loop`/`tooFar` all take an optional refDistance/maxDistance
+override, defaulting to the shared constants so nothing else's range shifts).
+This sets the stage for future station ambiences (Professions 2.0's other
+station types: kitchens, apothecary, tannery, loom, toolworks, see issue
+#2208) to get their own audible radius the same way: a new `AmbientPointSource`
+`kind` plus a named constant, no changes to the override mechanism itself.
 
 ### Interface and personal event cues
 

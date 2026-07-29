@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -238,6 +238,7 @@ describe('active-world noticeboard service', () => {
         playerId: number;
         craftingIdentity: { synced: boolean };
         craftSkills: Record<string, number>;
+        gatheringProficiency: Record<string, number>;
       };
       renderer: { handleEvent: ReturnType<typeof vi.fn> };
       playEventSfx: ReturnType<typeof vi.fn>;
@@ -255,6 +256,7 @@ describe('active-world noticeboard service', () => {
       playerId: 17,
       craftingIdentity: { synced: false },
       craftSkills: {},
+      gatheringProficiency: {},
     };
     hud.renderer = { handleEvent: vi.fn() };
     hud.playEventSfx = vi.fn();
@@ -341,7 +343,6 @@ describe('active-world noticeboard service', () => {
       hd: 0.3,
       rot: 0.25,
       cameraTopY: present.groundPos(118, -76).y + 2.6,
-      camGhost: true,
     });
   });
 

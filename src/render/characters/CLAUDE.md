@@ -43,6 +43,9 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
 - `rig_merge.ts`: merges a KayKit rig's quantized body-part SkinnedMeshes into
   one draw per material (`assets.ts` `assembleModel` calls it). Read its
   header bind-pose proof before touching bone inverses.
+- `skin_gpu_layout.ts`: compacts merged palettes to every matrix the shader
+  fetches, narrows exact joint indices, and crops unused RGBA32F bone-texture
+  rows without changing skin weights, matrix values, draws, or shader math.
 - `visual.ts`: `CharacterVisual`, the mixer + `BaseState` machine, LOD/shadow/ghost
   plumbing, one-shot triggers, death/revive edge logic.
 - `preview.ts`: `CharacterPreview`, the character-creation turntable (own scene/
@@ -67,7 +70,10 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
 - `portrait_framing.ts`: pure camera-framing math per `PortraitFraming`
   (headshot chip vs 3/4 body, e.g. the Inspect window) for `portrait.ts`
   (`tests/portrait_framing.test.ts`).
-- `index.ts`: public exports + `createCharacterVisual(e, formKey?)` factory.
+- `modular.ts`: pure part-selection + colour math for COMPOSED bodies (the
+  warrior test bed). See "Modular bodies" below.
+- `index.ts`: public exports + `createCharacterVisual(e, formKey?)` factory, plus
+  `setModularLookProvider` (the entity-to-composed-look seam).
 
 ## Keys & dispatch
 Every drawable is a `VisualDef` in `VISUALS` (player classes, creature families,
@@ -124,6 +130,153 @@ live in `manifest.ts`), falling back to `mob_bandit`; NPCs to `NPC_KEYS`. Forms
   mixer weights across death, respawn and repeated swings. Fix bugs test-first:
   reproduce there (or in `tests/rig_merge.test.ts` for merge math), then the
   smallest change that turns it green.
+
+## Modular bodies (`player_warrior_modular`)
+A `VisualDef` with `modular: true` points at a PART LIBRARY, not a finished
+character: `models/chars/modular/warrior_modular.glb` carries both base bodies,
+their underclothing, every hair/brow, and ALL SEVEN class kits cut into equip
+slots, all on the one shared `Rig_Medium`, which is why no cross-file skeleton
+matching is ever needed.
+`assembleModel` routes those defs to `assembleModular`, which prunes the parsed
+scene to the picked node names (`modularPartNames`), runs the SAME
+`mergeSkinnedParts` pass, and caches the result per part set, so a kitted body
+is ~1 draw per material (skin/hair/eye/cloth + one atlas per set worn), not one
+per part.
+- Slots may be MIXED across sets, and a set does not have to fill every slot: the
+  helmless sets leave `head` empty so the character's own hair shows, and the
+  mage has no `hands` piece because KayKit models its hands as bare flesh.
+  `helmed` therefore tests for an actual head PIECE, not for the slot being set.
+- The underclothing (`M_Loin`, `F_Loin`, `F_Top`) is body geometry but is
+  REPLACED, not layered: each piece draws only while its slot is bare (loincloth
+  answers to `legs`, chest wrap to `chest`), because worn under a set of tassets
+  it just pokes through them. It carries `mod_cloth` so the skin-tone wheel does
+  not repaint it. `slotCovered()` is the test, and a set that has no piece for
+  the slot does not count as covering it.
+- The FACE is morph targets, not geometry variants: eight paired sliders
+  (`nose_up`/`nose_dn` ...) resolved by `morphInfluences()` and applied per
+  instance in `applyMorphs`. Geometry stays shared, so the face must never enter
+  `modularGeometryKey`, only the signature. `mergeSkinnedParts` leaves
+  morph-carrying parts unmerged by design, which is what makes this work at all.
+- The MOUTH is a part (`M_Mouth_<style>` / `F_Mouth_<style>`), not a morph. It
+  used to be a crease in the head driven by exclusive presets, and measured,
+  neither head had a mouth worth the name: a 15mm dent on the male that faded to
+  nothing by x=0.06, and none at all on the female, what she was showing was
+  the shading of her triangulation, which is why hers looked the cleaner of the
+  two. A 13-vertex band cannot hold a mouth, so it became a projected part like
+  the eyes. That buys lips that stand PROUD of the skin (a dent only goes
+  inward), symmetry by construction (every sample is taken at |x| and
+  reflected), and open styles that are a different MESH, aperture, dark cavity
+  and their own teeth, rather than a deformation of a closed one. Unlike the
+  ears it survives a helm, for the reason the eyes do: every helm is open at the
+  face. The head keeps its `mouth_*` targets even though nothing drives them,
+  `stubble.ts` reads them to locate the lips.
+- A part with more than one MATERIAL (only the mouth: lips, mouth line, teeth)
+  exports as a multi-primitive glTF mesh, and GLTFLoader expands that into a
+  GROUP named after the node whose children are named after the mesh DATABLOCK.
+  `modularVariant`'s prune therefore matches a mesh's own name OR its parent's.
+- `buzz` / `crew` (hair) and `stubble` / `scruff` (beard) are NOT volumes and no
+  longer parts at all: they are a TEXTURE DECAL built at compose time from the
+  head's own surface (`stubble.ts`, material `mod_stubble`, alpha-blended,
+  recoloured with the HAIR colour). See the section below. The GLB's old
+  `M_Fuzz_buzz` / `M_Stub_stubble` layers are dead and nothing picks them.
+- Eyes, ears, lashes and teeth are their own parts, not islands inside the head
+ that is what lets eyes and ears be swapped and scaled at all. They are body
+  parts no armour slot hides. Brows/eyes/lashes/stubble are PROJECTED onto the
+  head surface at authoring time (`tmp/modular/features.py`), so they cannot
+  float off it.
+- Every projected face part is per-gender (`M_Eye_almond`, `F_Brow_soft`, …) for
+  the same reason the fuzz caps are: the two heads are separate sculpts, not one
+  scaled copy, and a patch built against the male head lands INSIDE the female
+  one. Shipping a single set left every female character with no eyes at all.
+- ...and every one of them carries the HEAD's own shape-key names (`cheeks_up`,
+  `jaw_dn`, …) alongside its own. Projection glues a part to the face at BUILD
+  time only; the cheeks slider then moves the head surface by up to 27mm at the
+  outer corner of the eye. `applyMorphs` drives targets by name, so a part that
+  ships `cheeks_up` follows the head for free. No-op keys are dropped at
+  authoring time, so what a part carries says which sliders actually reach it.
+- The eyelash is the flick KayKit models into the rogue head, rebuilt per eye
+  shape so it always leaves the corner that eye actually has. It rides
+  `mod_hair` and so has no colour of its own, a lash is hair. `lashes` is a
+  plain on/off in the appearance, defaulting ON so a look saved before it
+  existed does not read as "shaved".
+- The eye material is recoloured per character like skin and hair; teeth
+  (`mod_tooth`) and the mouth interior (`mod_mouth`) never are. The mouth line
+  is near-black and so is the eye, but it must NOT share `mod_eye`: that goes
+  through the player's eye wheel, so blue eyes gave you a blue mouth. Its colour
+  also has to differ from `mod_eye`'s, because the glTF exporter merges
+  materials whose settings are identical and the bug would come back silently.
+- The class sets' OWN bare-skin faces are deleted at authoring time (UV swatch
+  cell (0,3)) so the player's body and skin tone show through a barbarian's
+  chest or a druid's midriff instead of flesh painted from the class atlas.
+- Colours are material-level: `mod_skin`/`mod_hair` are swapped for a recoloured
+  clone BEFORE `applyMaterials` snapshots the source, so the tint survives the
+  low-graphics Lambert path. Only PLATE gets `userData.bodyMesh`, keeping the
+  per-class skin-atlas swap (`SKINS`) off the colour-picked body, `bodyMesh` is
+  keyed off `isArmorMaterial`, so a new set MUST be added to `ARMOR_MATERIALS`
+  or its plate silently stops responding to skins.
+- A look change is a GEOMETRY change: callers rebuild the visual (as
+  `CharacterPreview.setVisualKey` does) rather than mutating one in place.
+- **Only the local player composes.** The appearance is presentation state with
+  no wire format, so `setModularLookProvider` claims that one entity and every
+  other warrior keeps the fixed `player_warrior` rig. The far-LOD bake in
+  `prepareVisual` likewise measures `DEFAULT_LOOK`, not the entity's.
+- Part names are the contract; `tests/modular_character.test.ts` gates the tables
+  against the shipped GLB, because a renamed node fails SILENTLY (the body just
+  loses a limb). Authoring scripts live in `tmp/modular/`; the body's radius
+  tables are SOLVED against the armour there (`solve_body.py` + `expose.py`),
+  not hand-tuned, and each set is fitted to the frozen body by `classfit.py`.
+
+## Stubble as a decal (`stubble.ts`)
+Growth too short to have a silhouette is skin you can see THROUGH hair, so it is
+a mask, not a mesh. Modelled as a shell it reads as a helmet; modelled as a
+flat-alpha copy of the head's faces (what shipped before) it reads as a smudge
+with an outline that lands wherever the head's coarse triangles fall. The decal
+is the head's own surface, trimmed, subdivided, lifted 0.4% of head height, and
+painted with a generated RGBA map.
+- Nothing is added to the GLB and nothing is authored: the frame, the unwrap,
+  the mask and the stipple are all derived from the head geometry at runtime and
+  cached per (head, styles). Switching the styles off adds NO object at all, so
+  a bare face is exactly the head.
+- The head frame is the head's own BOUNDING BOX mapped to the unit sphere. Every
+  primitive in the GLB is meshopt-quantized into its own integer range (see
+  `rig_merge.ts`), so the two heads do not even share a coordinate system,
+  normalizing by the box makes one set of angles describe both.
+- The unwrap is AZIMUTHAL EQUIDISTANT about the head centre, which is continuous
+  and injective everywhere but one direction (straight down, which `TRIM_THETA`
+  removes). The obvious lat-long unwrap has a seam down the back of the head and
+  a degenerate crown, and BOTH are inside a buzz cut's footprint.
+- The footprints were measured off the layers that shipped before, and the
+  landmarks they respect were measured off the head's own morph targets:
+  `mouth_*` moves exactly the lip ring, `nose_up` exactly the nose. The tests
+  assert against those targets rather than against the constants.
+- The NOSE OVERHANGS the philtrum, so a directional unwrap sends the nostril
+  underside and the skin below it to the same texel. The overhang is removed
+  from the decal surface (`isNoseUnderside`, applied after subdividing so its
+  edge is fine), that is what lets the beard line be the measured one and still
+  keep the nose clean. The general form of that test ("is anything closer to the
+  head centre along this ray") is WRONG: it carved a rectangle out of the skin
+  under the lower lip, off the mouth crease's inner wall at 0.58 of the chin's
+  radius. (`mouth_seat` has since smoothed that crease away, the mouth is its
+  own part, but the general test is still the wrong shape of test.)
+- The stipple is a jittered lattice over the SPHERE OF DIRECTIONS, with a whole
+  number of columns per ring so it closes on itself (no grain seam at the nape).
+  Dots must be a texel or two across, at 1024 texels over 360 degrees a
+  "realistic" 0.2-degree dot is sub-texel and reads as noise, and the ring
+  above and below has to be tested too, or every dot sits near its ring centre
+  and the field reads as horizontal rows.
+- RGB is written in EVERY texel, alpha only where there is growth: three
+  multiplies the whole texel into the fragment, so a transparent texel left at
+  black bleeds through bilinear filtering and rings every dot with a dark halo.
+- Subdivision is what makes the line clean, and its effect is invisible unless
+  you subtract the lift first: measured against the lifted vertex, going from 2
+  levels to 3 looks like it buys 0.07 degrees; measured against the skin under
+  it, it buys 1.10 -> 0.30. Two levels (~10k triangles, ~50ms, ~1.1MB of morph
+  data) is the shipped trade.
+- A plain `map` and not a shader ON PURPOSE: `tintedMaterial` rebuilds every
+  character material as Lambert on the low graphics tier, so an injected shader
+  (the `addRimGlow` hook) silently vanishes there. That path now also carries
+  `depthWrite` / `polygonOffset` across, which it did not before, they are
+  blend state, not shading.
 
 ## Gotchas / never
 - KayKit GLBs ship **every** accessory visible: `VisualDef.show` is an allowlist

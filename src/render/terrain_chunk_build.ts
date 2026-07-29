@@ -2,7 +2,7 @@
 // the row-wise fills that write plain typed arrays.
 //
 // Split out of terrain.ts because none of it touches WebGL. It writes
-// Float32Array / Uint32Array and nothing else, so it can run off the main
+// Float32Array / Uint16Array and nothing else, so it can run off the main
 // thread; terrain.ts keeps finishChunkGeometry, which is the only part that
 // needs Three's BufferGeometry, and every other WebGL-side concern.
 //
@@ -34,174 +34,18 @@ import {
   ZONES,
 } from '../sim/data';
 import { fbm2 } from '../sim/rng';
-import type { BiomeId } from '../sim/types';
 import { roadDistance, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import { impactCraterTerrainBlend } from './impact_terrain';
 import { meshTerrainHeight } from './terrain_mesh_height';
+import { BIOME_PALETTE, ROCK_SLOPE_START, TERRAIN_TONES } from './terrain_palette';
 
 const SKIRT_DROP = 0.3;
-const SLOPE_EPS = 1.5; // matches the legacy color pass so tints don't shift
-const BIOME_PALETTE: Record<
-  BiomeId,
-  { grass: number; grassDark: number; grassYellow: number; dirt: number; sand: number }
-> = {
-  vale: {
-    grass: 0x548545,
-    grassDark: 0x3e6635,
-    grassYellow: 0x768c44,
-    dirt: 0x8a6f47,
-    sand: 0xc2b283,
-  },
-  marsh: {
-    grass: 0x596d36,
-    grassDark: 0x41522b,
-    grassYellow: 0x71764a,
-    dirt: 0x6e5a3e,
-    sand: 0x8f7f5c,
-  },
-  peaks: {
-    grass: 0x687a55,
-    grassDark: 0x4d5c45,
-    grassYellow: 0x8d9168,
-    dirt: 0x7d6a50,
-    sand: 0xb0a486,
-  },
-  // Paint-only biomes (editor brush): flat palettes, no zone-band blend.
-  // Coastal green-blue, brighter sand than the desert's.
-  beach: {
-    grass: 0x9ab86a,
-    grassDark: 0x7d9a5a,
-    grassYellow: 0xb8c278,
-    dirt: 0xc2a575,
-    sand: 0xf0e4bc,
-  },
-  // Warmer and browner than the beach, less green. Pushed further orange
-  // than a first pass to separate it clearly from the beach at a glance.
-  desert: {
-    grass: 0xcbaa5e,
-    grassDark: 0xa88d48,
-    grassYellow: 0xe0c070,
-    dirt: 0xc08f4a,
-    sand: 0xecc890,
-  },
-  // Dark, red-tinted ash rather than the cave's neutral grey. Pushed darker
-  // still so it reads as scorched ground, not just "dirty".
-  volcano: {
-    grass: 0x3c2c28,
-    grassDark: 0x281c18,
-    grassYellow: 0x503830,
-    dirt: 0x2c2018,
-    sand: 0x4c342c,
-  },
-  // Neutral blue-grey stone, distinct from volcano's warm ash. Pushed cooler
-  // and darker so it reads as underground rock, not daylight dirt.
-  cave: {
-    grass: 0x585e66,
-    grassDark: 0x3e444c,
-    grassYellow: 0x6a7078,
-    dirt: 0x484e56,
-    sand: 0x767c86,
-  },
-  // dusk: violet-cast glade greens with dusty rose soil
-  dusk: {
-    grass: 0x6d7566,
-    grassDark: 0x4c4e58,
-    grassYellow: 0x8c8078,
-    dirt: 0x6e5a68,
-    sand: 0xa593a2,
-  },
-  ember: {
-    grass: 0xc9a86a,
-    grassDark: 0xa8854f,
-    grassYellow: 0xd8bc80,
-    dirt: 0x9a6a44,
-    sand: 0xe0c088,
-  },
-  frost: {
-    grass: 0xeef4fa,
-    grassDark: 0xd8e4f0,
-    grassYellow: 0xcfdce8,
-    dirt: 0x9fb0c0,
-    sand: 0xdfe8f2,
-  },
-  amber: {
-    grass: 0xc9a44e,
-    grassDark: 0xa88438,
-    grassYellow: 0xe0c060,
-    dirt: 0x8a6a42,
-    sand: 0xd8bc84,
-  },
-  fen: {
-    grass: 0x7cab68,
-    grassDark: 0x5c8a52,
-    grassYellow: 0xa2c47a,
-    dirt: 0x6e6448,
-    sand: 0xb8bc8e,
-  },
-  // night: the Nightbloom dreams in violet. The splat textures are
-  // green-authored, so these run hot and saturated or the meadow reads
-  // green anyway (the amber realm's fire-orange needed the same push)
-  night: {
-    grass: 0xc06cf2,
-    grassDark: 0x8f4ecc,
-    grassYellow: 0xe08cf8,
-    dirt: 0x8a5cb8,
-    sand: 0xd8a8f0,
-  },
-  // haunt: dead mossy floor, cold wet earth, everything a shade too dark
-  haunt: {
-    grass: 0x46543e,
-    grassDark: 0x2e382c,
-    grassYellow: 0x5a6644,
-    dirt: 0x453c34,
-    sand: 0x6b6754,
-  },
-  // jungle: saturated tropical green over bright coral sand
-  jungle: {
-    grass: 0x3f9448,
-    grassDark: 0x2c7038,
-    grassYellow: 0x74b04e,
-    dirt: 0x8a6e4a,
-    sand: 0xf2e2b4,
-  },
-  // garden: mown lawn over warm gravel, tidy even where it has run wild
-  garden: {
-    grass: 0x58a04e,
-    grassDark: 0x3f7e3c,
-    grassYellow: 0x86b85c,
-    dirt: 0x8a7a5a,
-    sand: 0xd8cca8,
-  },
-  // gale: wind-dried sage downs over grey shingle
-  gale: {
-    grass: 0x6a9a62,
-    grassDark: 0x4c7a4e,
-    grassYellow: 0x9ab070,
-    dirt: 0x7a6e58,
-    sand: 0xd8d0b8,
-  },
-};
-
-// rock starts creeping in at lower slopes in the peaks, later in the marsh
-const ROCK_SLOPE_START: Record<BiomeId, number> = {
-  vale: 0.55,
-  marsh: 0.62,
-  peaks: 0.45,
-  beach: 0.7,
-  desert: 0.55,
-  volcano: 0.35,
-  cave: 0.4,
-  dusk: 0.52,
-  ember: 0.5,
-  frost: 0.5,
-  amber: 0.52,
-  fen: 0.6,
-  night: 0.55,
-  haunt: 0.58,
-  jungle: 0.6,
-  garden: 0.6,
-  gale: 0.5, // the cliffs crag early
-};
+// Three-quad tiles keep a compact working set across both diagonal choices.
+// The old full-row walk evicted one grid row before the next quad could reuse
+// it on the 25-52-quad chunk widths.
+const INDEX_TILE_QUADS = 3;
+// Ground palette + rock slope thresholds live in terrain_palette.ts (plain
+// data, no Three) so the far-vista mesh colors from the same source.
 
 const clamp01 = (v: number): number => Math.max(0, Math.min(1, v));
 
@@ -221,20 +65,20 @@ const grassC = new THREE.Color(),
   grassYellowC = new THREE.Color();
 const dirtC = new THREE.Color(),
   sandC = new THREE.Color();
-const dirtDarkC = new THREE.Color(0x73592f);
-const rockC = new THREE.Color(0x7a7a72);
-const wetRockC = new THREE.Color(0x3f4442); // dark wet-rock shoreline (peaks/volcano/cave)
+const dirtDarkC = new THREE.Color(TERRAIN_TONES.dirtDark);
+const rockC = new THREE.Color(TERRAIN_TONES.rock);
+const wetRockC = new THREE.Color(TERRAIN_TONES.wetRock); // dark wet-rock shoreline (peaks/volcano/cave)
 const impactAshC = new THREE.Color(0x18110d);
 const impactScorchC = new THREE.Color(0x2a160c);
-const hazyPeakC = new THREE.Color(0xa8bdd4); // world-rim mountains, atmospheric
-const emberForestC = new THREE.Color(0x729a4e); // the Drakelands' green gatewood
-const emberScorchC = new THREE.Color(0x6a4a40); // volcanic ground near the Drakemaw
-const emberBasaltC = new THREE.Color(0x4e3c34); // the cones' dark volcanic rock
-const cobbleC = new THREE.Color(0x8f8c86); // the Amberfall's laid stone
+const hazyPeakC = new THREE.Color(TERRAIN_TONES.hazyPeak); // world-rim mountains, atmospheric
+const emberForestC = new THREE.Color(TERRAIN_TONES.emberForest); // the Drakelands' green gatewood
+const emberScorchC = new THREE.Color(TERRAIN_TONES.emberScorch); // volcanic ground near the Drakemaw
+const emberBasaltC = new THREE.Color(TERRAIN_TONES.emberBasalt); // the cones' dark volcanic rock
+const cobbleC = new THREE.Color(TERRAIN_TONES.cobble); // the Amberfall's laid stone
 const cobbleDarkC = new THREE.Color(0x6e6b66); // ...its mortar-shadow cells
 const duskCliffC = new THREE.Color(0x544d58); // dark weathered sea-cliff stone
 const duskStrataC = new THREE.Color(0x8d7d76); // pale strata bands in the face
-const snowCapC = new THREE.Color(0xedf3fa);
+const snowCapC = new THREE.Color(TERRAIN_TONES.snowCap);
 const lowSunC = new THREE.Color(0xe7d9a5);
 const lowShadeC = new THREE.Color(0x60745b);
 const zonePalettes = ZONES.map((zn) => {
@@ -310,16 +154,80 @@ function lerpSplat(w: [number, number, number, number], layer: 0 | 1 | 2 | 3, t:
 
 // One terrain sample: height, analytic normal, legacy tint color and splat
 // weights. Both tiers use the color; only the splat tier consumes weights.
-function sampleVertex(x: number, z: number, seed: number, lowShade: boolean): VertexSample {
-  const h = meshTerrainHeight(x, z, seed);
-  const hx = meshTerrainHeight(x + SLOPE_EPS, z, seed) - meshTerrainHeight(x - SLOPE_EPS, z, seed);
-  const hz = meshTerrainHeight(x, z + SLOPE_EPS, seed) - meshTerrainHeight(x, z - SLOPE_EPS, seed);
-  const slope = Math.sqrt(hx * hx + hz * hz) / (2 * SLOPE_EPS);
-  const invLen = 1 / Math.hypot(hx / (2 * SLOPE_EPS), 1, hz / (2 * SLOPE_EPS));
+// The grass colour the terrain itself would paint at (x, z): the zone-blended
+// palette plus the same two fbm patch-noise layers the vertex tint uses.
+// Foliage keys tuft and dressing tints off this so ground cover reads as
+// growing out of the meadow instead of sitting on top of it (a flat biome
+// constant left grass arithmetically decoupled from the ground under it).
+export function groundGrassColorAt(
+  x: number,
+  z: number,
+  seed: number,
+  out: THREE.Color,
+): THREE.Color {
+  paletteAt(x, z);
+  const v = groundLushnessAt(x, z, seed);
+  out.copy(grassC).lerp(grassDarkC, v);
+  const v2 = fbm2(x * 0.16, z * 0.16, seed + 59, 2);
+  out.lerp(grassYellowC, v2 * 0.35);
+  return out;
+}
+
+// The dark-patch weight of the grass palette (0 = yellowed open ground,
+// 1 = deep lush green), exposed so grass PLACEMENT can follow the same
+// noise the ground colour does: dense tall stands on the lush patches,
+// thinning to bare ground between them.
+export function groundLushnessAt(x: number, z: number, seed: number): number {
+  return fbm2(x * 0.045, z * 0.045, seed + 53, 3);
+}
+
+// The height lattice a chunk's vertex samples share. The old sampler paid
+// FIVE meshTerrainHeight taps per vertex (the vertex plus a four-tap
+// central-difference stencil at a fixed 1.5yd epsilon); adjacent vertices
+// never shared their stencil taps, so a chunk resampled the heightfield
+// almost fivefold. The lattice computes each height ONCE on the vertex grid
+// plus a one-cell margin ring, and normals difference the neighboring
+// lattice heights instead (epsilon = the chunk's own vertex spacing): about
+// 4.6x fewer heightfield evaluations per chunk, which is what pays for the
+// natural-relief field being richer per sample.
+function ensureHeightRow(state: ChunkGeometryBuildState, hcj: number): void {
+  if (state.heightRowDone[hcj]) return;
+  state.heightRowDone[hcj] = 1;
+  const { nx, x0, z0, stepX, stepZ, seed } = state;
+  const hw = nx + 3;
+  const z = z0 + (hcj - 1) * stepZ;
+  const rowStart = hcj * hw;
+  for (let hci = 0; hci < hw; hci++) {
+    state.heights[rowStart + hci] = meshTerrainHeight(x0 + (hci - 1) * stepX, z, seed);
+  }
+}
+
+function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): VertexSample {
+  const { nx, x0, z0, stepX, stepZ, seed, lowShade } = state;
+  const x = x0 + ci * stepX;
+  const z = z0 + cj * stepZ;
+  const hw = nx + 3;
+  ensureHeightRow(state, cj);
+  ensureHeightRow(state, cj + 1);
+  ensureHeightRow(state, cj + 2);
+  const hAt = (i: number, j: number): number => state.heights[(j + 1) * hw + (i + 1)];
+  const h = hAt(ci, cj);
+  const hx = hAt(ci + 1, cj) - hAt(ci - 1, cj);
+  const hz = hAt(ci, cj + 1) - hAt(ci, cj - 1);
+  const slope = Math.hypot(hx / (2 * stepX), hz / (2 * stepZ));
+  // Surface curvature from the shared lattice (the discrete Laplacian,
+  // 1/yd): negative on convex breaks (ridge crests, cliff shoulders),
+  // positive in concave folds (gullies, foot-slopes). Drives the
+  // material-accumulation tinting below: exposed stone on convexity, pooled
+  // soil in concavity, the standard curvature-texturing rule.
+  const curv =
+    (hAt(ci + 1, cj) + hAt(ci - 1, cj) + hAt(ci, cj + 1) + hAt(ci, cj - 1) - 4 * h) /
+    (stepX * stepX);
+  const invLen = 1 / Math.hypot(hx / (2 * stepX), 1, hz / (2 * stepZ));
   const normal: [number, number, number] = [
-    -(hx / (2 * SLOPE_EPS)) * invLen,
+    -(hx / (2 * stepX)) * invLen,
     invLen,
-    -(hz / (2 * SLOPE_EPS)) * invLen,
+    -(hz / (2 * stepZ)) * invLen,
   ];
 
   paletteAt(x, z);
@@ -335,6 +243,23 @@ function sampleVertex(x: number, z: number, seed: number, lowShade: boolean): Ve
   cTmp.copy(grassC).lerp(grassDarkC, v);
   const v2 = fbm2(x * 0.16, z * 0.16, seed + 59, 2);
   cTmp.lerp(grassYellowC, v2 * 0.35);
+  // Dry bare patches: mid-frequency margins where the turf thins to earth,
+  // so open country reads as worn, patchy ground instead of one unbroken
+  // green sheet (noise-modulated splat rule; the groomed garden and the
+  // snowbound frost keep their even cover).
+  if (biome !== 'garden' && biome !== 'frost') {
+    // two uncorrelated scales: broad worn regions (~80yd) carrying smaller
+    // bare patches (~38yd), so the wear reads fractal instead of one dot size
+    const dry =
+      fbm2(x * 0.026, z * 0.026, seed + 83, 2) * 0.62 +
+      fbm2(x * 0.012, z * 0.012, seed + 89, 2) * 0.38;
+    const dryW = clamp01((dry - 0.58) * 3.2);
+    if (dryW > 0) {
+      cTmp.lerp(dirtC, dryW * 0.5);
+      cTmp.lerp(grassYellowC, dryW * 0.35);
+      lerpSplat(w, 1, dryW * 0.45);
+    }
+  }
   if (biome === 'ember') {
     // the gatewood is green in the south near Wyrmwatch and dries into sand
     // northward; the volcanic belt then darkens toward scorched basalt
@@ -418,10 +343,31 @@ function sampleVertex(x: number, z: number, seed: number, lowShade: boolean): Ve
   const rockStreak = fbm2(x * 0.09, z * 0.09, seed + 41, 3);
   const snowPatch = fbm2(x * 0.06, z * 0.06, seed + 47, 3);
   const rockStart = ROCK_SLOPE_START[biome];
-  if (slope > rockStart) {
-    const t = Math.min(1, (slope - rockStart) * 2);
+  // Curvature accents (see curv above): a convex break sheds its cover to
+  // exposed stone even before the slope threshold, and a concave fold pools
+  // darker soil. Both are gated by real gradient so flat ground never
+  // mottles, and both come BEFORE the slope-rock arm so a true cliff still
+  // ends at full rock.
+  const exposeW = clamp01(-curv * 0.85 - 0.1) * clamp01((slope - 0.3) * 2.2);
+  if (exposeW > 0) {
+    cTmp.lerp(rockC, Math.min(1, exposeW) * 0.55);
+    lerpSplat(w, 2, Math.min(1, exposeW) * 0.5);
+  }
+  const poolW = clamp01(curv * 0.8 - 0.1) * clamp01((0.95 - slope) * 2) * (1 - shore);
+  if (poolW > 0) {
+    cTmp.lerp(dirtDarkC, Math.min(1, poolW) * 0.3);
+    lerpSplat(w, 1, Math.min(1, poolW) * 0.3);
+  }
+  // Noise-dithered rock margin: the grass-to-stone boundary wanders with the
+  // streak field instead of tracing one smooth slope contour, and the blend
+  // is a touch sharper so the margin reads as a ragged edge, not a fade.
+  const rockEdge = rockStart + (rockStreak - 0.5) * 0.5;
+  let rockTintW = 0;
+  if (slope > rockEdge) {
+    const t = Math.min(1, (slope - rockEdge) * 2.6);
+    rockTintW = t;
     cTmp.lerp(rockC, t);
-    cTmp.lerp(dirtDarkC, t * (rockStreak - 0.5) * 0.35);
+    cTmp.lerp(dirtDarkC, t * (rockStreak - 0.5) * 0.5);
     lerpSplat(w, 2, t);
     // (the Great Maze's hedge walls are modeled props over flat lawn now:
     // no steep terrain faces remain inside the maze to restyle)
@@ -432,6 +378,13 @@ function sampleVertex(x: number, z: number, seed: number, lowShade: boolean): Ve
       const band = (Math.sin(h * 1.7 + x * 0.06 + z * 0.045) + 1) / 2;
       cTmp.lerp(duskCliffC, t * nearSea * (0.45 + band * 0.35));
       cTmp.lerp(duskStrataC, t * nearSea * (1 - band) * 0.3);
+    } else {
+      // every other realm's stone carries warm strata: height-keyed bands
+      // wobbled by the streak noise, so cliff faces and crags read as
+      // layered geology instead of one smooth pour
+      const band = (Math.sin(h * 0.52 + (rockStreak - 0.5) * 5.2) + 1) * 0.5;
+      cTmp.lerp(dirtDarkC, t * band * 0.3);
+      cTmp.lerp(duskStrataC, t * (1 - band) * 0.18);
     }
   }
   // high ground (ridges, peaks) goes rocky then snowy (the Drakelands' high
@@ -463,12 +416,30 @@ function sampleVertex(x: number, z: number, seed: number, lowShade: boolean): Ve
     cTmp.lerp(snowCapC, 0.8 * blanket);
     snow = Math.max(snow, 0.85 * blanket);
   }
-  if (h > 22) {
-    const rockT = clamp01((h - 22) / 10) * (0.6 + rockStreak * 0.25);
+  // The high-rock altitude band's onset wanders with the streak noise (a
+  // dithered elevation band, not a striped cutoff), and the stone above it
+  // takes the same warm strata as the slope rock so summits read layered.
+  const highH = 22 + (rockStreak - 0.5) * 7;
+  if (h > highH) {
+    const rockT = clamp01((h - highH) / 10) * (0.6 + rockStreak * 0.25);
+    rockTintW = Math.max(rockTintW, rockT);
     cTmp.lerp(biome === 'ember' ? emberBasaltC : rockC, rockT);
     snow = biome === 'ember' ? 0 : clamp01((h - 34 + (snowPatch - 0.5) * 14) / 26) * 0.85;
+    if (biome !== 'ember') {
+      const band = (Math.sin(h * 0.52 + (rockStreak - 0.5) * 5.2) + 1) * 0.5;
+      cTmp.lerp(dirtDarkC, rockT * (1 - snow) * band * 0.26);
+      cTmp.lerp(duskStrataC, rockT * (1 - snow) * (1 - band) * 0.14);
+    }
     cTmp.lerp(snowCapC, snow);
-    lerpSplat(w, 2, clamp01((h - 22) / 10) * 0.8);
+    lerpSplat(w, 2, clamp01((h - highH) / 10) * 0.8);
+  }
+  // A 30yd stone-tone field over every rock-tinted vertex: whole faces
+  // shift a shade lighter or darker at a scale that survives any view
+  // distance, so distant mountainsides read as varied stone masses instead
+  // of one flat pour (fine texture mips away; this scale does not).
+  if (rockTintW > 0.05) {
+    const rockTone = fbm2(x * 0.033, z * 0.033, seed + 87, 2);
+    cTmp.multiplyScalar(1 + (rockTone - 0.5) * 0.3 * Math.min(1, rockTintW) * (1 - snow));
   }
   if (impact.scorch > 0) {
     cTmp.lerp(impactScorchC, 0.88 * impact.scorch);
@@ -497,6 +468,13 @@ function sampleVertex(x: number, z: number, seed: number, lowShade: boolean): Ve
     snow = Math.max(snow, rimSnow);
     lerpSplat(w, 2, rim * 0.85);
   }
+  // Hill-scale tone drift: a very-low-frequency value swing so one region's
+  // fields and faces sit a few percent lighter or darker than the next.
+  // Applied over everything (grass, rock, snow alike) because real ground
+  // varies at this scale regardless of material; the swing is small enough
+  // to never read as a patch, only as regions that feel different.
+  const toneDrift = fbm2(x * 0.008, z * 0.008, seed + 97, 2);
+  cTmp.multiplyScalar(0.95 + toneDrift * 0.1);
   // mud rides the dirt layer wherever the marsh palette is active
   const mud = marshWeightAt(x, z);
   if (lowShade) {
@@ -534,7 +512,7 @@ export interface ChunkGeometryArrays {
   uvs: Float32Array;
   splats: Float32Array | null;
   extras: Float32Array | null;
-  indices: Uint32Array;
+  indices: Uint16Array;
 }
 
 export interface ChunkGeometryBuildState extends ChunkGeometryArrays {
@@ -553,6 +531,11 @@ export interface ChunkGeometryBuildState extends ChunkGeometryArrays {
    *  document/navigator, so a worker would resolve a different tier. */
   lowShade: boolean;
   sampleCache: Map<number, VertexSample>;
+  /** The shared height lattice: (nx+3) x (nz+3) heights covering the vertex
+   *  grid plus a one-cell margin ring for the normal stencil, each height
+   *  computed once (see ensureHeightRow). */
+  heights: Float32Array;
+  heightRowDone: Uint8Array;
 }
 
 export function beginChunkGeometry(
@@ -581,7 +564,13 @@ export function beginChunkGeometry(
   const extras = withSplat ? new Float32Array(count * 4) : null;
   const quadsX = gw - 1,
     quadsZ = gh - 1;
-  const indices = new Uint32Array(quadsX * quadsZ * 6);
+  // WebGL2 reserves 65535 as the fixed primitive-restart index. The largest
+  // current chunk has 2,809 vertices, but keep the exact safety condition
+  // beside the narrowing in case the chunk ladder changes later.
+  if (count > 0xffff) {
+    throw new Error(`Terrain chunk has ${count} vertices; Uint16 indices require at most 65535`);
+  }
+  const indices = new Uint16Array(quadsX * quadsZ * 6);
   return {
     nx,
     nz,
@@ -603,11 +592,13 @@ export function beginChunkGeometry(
     extras,
     indices,
     sampleCache: new Map<number, VertexSample>(),
+    heights: new Float32Array((nx + 3) * (nz + 3)),
+    heightRowDone: new Uint8Array(nz + 3),
   };
 }
 
 export function fillChunkVertexRow(state: ChunkGeometryBuildState, gj: number): void {
-  const { nx, nz, gw, x0, z0, stepX, stepZ, seed, skirtSpan, worldDepth, lowShade } = state;
+  const { nx, nz, gw, x0, z0, stepX, stepZ, skirtSpan, worldDepth } = state;
   for (let gi = 0; gi < gw; gi++) {
     const i = gi - 1,
       j = gj - 1; // interior indices; -1 / n+1 are skirt
@@ -620,7 +611,7 @@ export function fillChunkVertexRow(state: ChunkGeometryBuildState, gj: number): 
     const cacheKey = cj * gw + ci;
     let s = state.sampleCache.get(cacheKey);
     if (!s) {
-      s = sampleVertex(x, z, seed, lowShade);
+      s = sampleVertex(state, ci, cj);
       state.sampleCache.set(cacheKey, s);
     }
     const vi = gj * gw + gi;
@@ -654,8 +645,18 @@ export function fillChunkVertexRow(state: ChunkGeometryBuildState, gj: number): 
 
 export function fillChunkIndexRow(state: ChunkGeometryBuildState, gj: number): void {
   const quadsX = state.gw - 1;
-  let k = gj * quadsX * 6;
+  const quadsZ = state.gh - 1;
+  const tileRowStart = Math.floor(gj / INDEX_TILE_QUADS) * INDEX_TILE_QUADS;
+  const tileHeight = Math.min(INDEX_TILE_QUADS, quadsZ - tileRowStart);
   for (let gi = 0; gi < quadsX; gi++) {
+    const tileColumnStart = Math.floor(gi / INDEX_TILE_QUADS) * INDEX_TILE_QUADS;
+    const tileWidth = Math.min(INDEX_TILE_QUADS, quadsX - tileColumnStart);
+    const cellOffset =
+      tileRowStart * quadsX +
+      tileColumnStart * tileHeight +
+      (gj - tileRowStart) * tileWidth +
+      (gi - tileColumnStart);
+    let k = cellOffset * 6;
     const a = gj * state.gw + gi;
     const b = a + 1;
     const c = a + state.gw;

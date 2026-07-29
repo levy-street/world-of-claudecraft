@@ -15,6 +15,10 @@ vi.mock('../server/db', () => ({
   accountAndScopeForToken: vi.fn(),
   isAdminAccount: vi.fn(),
   accountMailTarget: vi.fn(async () => null),
+  moderationStatusForAccount: vi.fn(async () => ({ locked: false, message: '' })),
+  createCompanionToken: vi.fn(),
+  listCompanionTokens: vi.fn(async () => []),
+  revokeCompanionToken: vi.fn(),
 }));
 vi.mock('../server/antibot_config_db', () => ({
   loadAntibotConfig: vi.fn(async () => ({ data: {}, updatedAt: null })),

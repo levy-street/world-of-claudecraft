@@ -33,7 +33,9 @@ export const WARLOCK_PET_MOBS: Record<string, MobTemplate> = {
     minLevel: 1,
     maxLevel: 60,
     family: 'demon',
-    // tank: deep health pool and heavy armor, modest melee damage, taunts
+    // tank: deep health pool and heavy armor, modest melee damage, taunts.
+    // petRole marks it as the roster's threat-holder: createDemonPet reads this
+    // to default auto-taunt on so it holds aggro without a manual toggle.
     hpBase: 70,
     hpPerLevel: 28,
     dmgBase: 4,
@@ -45,6 +47,7 @@ export const WARLOCK_PET_MOBS: Record<string, MobTemplate> = {
     loot: [],
     scale: 1.15,
     color: 0x3a3a6e,
+    petRole: 'melee_tank',
   },
   // Glass-cannon melee striker: hits hard and fast on a light frame, but
   // folds quickly under retaliation — the warlock's leveling DPS demon.

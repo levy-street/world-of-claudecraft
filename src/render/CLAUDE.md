@@ -20,12 +20,32 @@ Everything else is a sibling module in one of these families:
   `dungeon.ts` (instanced/merged GLBs), `water.ts` (terrain-aware water bodies;
   shore-depth and tier core in `water_core.ts`, sleeping GPU height field and
   facing-aligned character volume wakes in `water_simulation.ts`), `sky.ts`. Event/minigame scenes follow
+  the same pattern: `jail_scene.ts`, `vale_cup_*.ts`, `yumi_*.ts`, `battleground*.ts`
+  (Thornhollow Fields: kit-module field from the pure `battleground_core.ts` manifest,
+  entity props in `battleground_props.ts`).
   the same pattern: `jail_scene.ts`, `vale_cup_*.ts`, `yumi_*.ts`. Rift
   portals: `door_portal.ts` also builds the bespoke world-rift gate GLB with
   its rank-tinted energy membrane (`buildRiftGateBody`), and `rift_rank.ts` is
   the floating C/B/A/S rank badge above a world rift portal.
 - **Per-frame overlay/FX modules** ticked from `sync()`: `vfx.ts` (pooled
-  particles), `weather.ts`, `character_effects.ts`.
+  particles), `weather.ts` (any weathered biome inside the camera box drives
+  precipitation and masked spawns keep it over that zone's own cells, so a
+  neighbouring realm's snow is visible from outside; decisions in
+  `weather_field_core.ts`), `character_effects.ts`.
+- **Cross-surface shader services** own a shared uniform block plus a GLSL
+  snippet that SEVERAL materials splice, never a copy per material.
+  `biome_haze_field.ts` (+ its `_core`) is the reference: one small world-space
+  DataTexture of per-zone haze colour and strength (colour carries the zone's
+  light level and its baked weather veil, so a twilight realm reads dim and a
+  snowing one white from outside), which `terrain.ts`, the far vista tiles and
+  `water.ts` all splice at the same anchor (immediately before
+  `<fog_fragment>`) on the same uniform objects, so distant land carries its
+  own realm's atmosphere and the detail-horizon handoff cannot draw a ring.
+  The sky dome (`sky.ts`) is a fourth consumer on the same uniforms: a
+  directional horizon-band tint sampled along the view ray, applied before
+  the dome's own fog band so the camera zone's fog still owns the true rim.
+  The renderer builds the field once from its outdoor fog presets and pushes
+  the camera + `dnGrade.fog` per frame; `?zonehaze=off` is the A/B switch.
 - **The nameplate suite** (below) owns all overhead text and badges.
 - **Pure logic cores** (below) hold Node-tested per-frame decisions.
 - **Perf governors:** `render_budget.ts` (adaptive frame budget, see
@@ -114,9 +134,22 @@ significant-contributor name glow lives there too. Narrow helpers:
 rules, all CI-enforced:
 - **Cache results are IMMUTABLE: clone before mutating.** `releaseGltf(url)` drops
   the cache entry after geometry is extracted.
-- **`preload.ts` is the boot gate.** Subsystems call `registerPreload(promise)` at
-  import time and `startGame` awaits `assetsReady()`, so `build*()` can read resolved
-  assets synchronously. A new module-load fetch MUST `registerPreload`.
+- **`preload.ts` is the boot gate, and it has TWO lanes.** `startGame` awaits
+  `assetsReady()` either way, so `build*()` still reads resolved assets
+  synchronously; the lanes differ only in WHEN the fetch starts. A new module-load
+  fetch MUST register in one of them, and for world content that is the deferred one:
+  - `registerDeferredPreload(() => load...())` for world content. Nothing runs until
+    `startGame` calls `beginDeferredPreloads()`. The thunk must CREATE the promise
+    when invoked, never close over one already in flight.
+  - `registerPreload(promise)` stays eager, for the few assets the LAUNCHER itself
+    draws. Today that is `characters/assets.ts` (the character-creation preview) and
+    `placed_assets.ts` (which runs during world build, not at import).
+  Fetching world content at import meant merely reaching the home screen decoded the
+  whole set, and the spike crossed WKWebView's per-process ceiling: a 12 GB iPhone 17
+  Pro was killed 1.6s in and reloaded forever, unseen by the entry crash guard (it
+  only arms inside `startGame`). Guarded by `tests/defer_launcher_preloads.test.ts`,
+  which also pins that the lane opens BEFORE the `assetsReady()` that gates the
+  Renderer, and fails on any new eager registrant outside the two allowed files.
 - **Preload sets are tier-INDEPENDENT.** They freeze at the import-time tier
   guess but placement runs against the LIVE tier, so a preload set must be a
   superset of EVERY tier's placement set or world entry crashes with "asset not
@@ -129,6 +162,9 @@ rules, all CI-enforced:
   so it covers your module.
 
 ## i18n: overhead labels are the only string surface here
+One deliberate exception: `scene_census_core.ts`'s table/format helpers feed the
+`?perf` overlay, a dev diagnostic that stays English by the `src/game/CLAUDE.md`
+perf-overlay carve-out; never reuse them in player-facing chrome.
 The renderer is geometry/shaders; the overhead-text surface is
 `nameplate_painter.ts` (owns `t`/`tEntity`/`formatNumber`) plus
 `entity_labels.ts` (localized display-name helpers, lifted out of `renderer.ts`
@@ -163,11 +199,47 @@ collision/movement.
   `package.json` is n8ao's peer dependency, not imported directly, so don't
   remove it as "unused." Don't bump Three or swap the chain casually: shaders
   here patch the pinned release's shader chunks via `onBeforeCompile`, so any
-  bump means re-verifying every patched chunk.
+  bump means re-verifying every patched chunk. A bump also touches KTX2:
+  `assets/ktx2_support.ts` hand-builds a `workerConfig` on its no-context
+  fallback arm (a shape KTX2Loader owns and can change between releases), and
+  the shipped `public/basis/` transcoder must be regenerated from the new three
+  via `node scripts/patch_basis_transcoder.mjs` (never a raw copy: the shipped
+  JS carries an eval-free embind patch so the KTX2 blob worker survives the
+  Electron shell CSP, which has no 'unsafe-eval'). `tests/glb_texture_compression.test.ts`
+  pins shipped === patch(vendored) and `tests/basis_transcoder_csp.test.ts` pins
+  the no-dynamic-code invariant; both go red on a raw re-copy.
 - Reuse, don't allocate: instancing for repeats, merge one-offs per
   (material, z-band), share materials via `surfaceMat`, distance-cull/LOD in
   `sync` (see the `*_RANGE_SQ` constants). No per-frame `new THREE.*` in hot paths;
   reuse the `tmpV` scratch vectors / scratch arrays already in `renderer.ts`.
+  The VFX world-anchor seam follows the same rule with an explicit contract:
+  `vfx_anchor.ts` `createVfxAnchor` takes an optional caller-owned destination,
+  so a per-frame path passes its own scratch (the reading is valid only until
+  that scratch is reused) and a one-shot spawn path omits it and gets a fresh
+  retainable vector.
+- **A cosmetic subsystem answers to a lever, and the lever says which job it is
+  doing.** `weapon_vfx_shed_core.ts` is the shape to copy: it FADES (both arms
+  floored above the multiplier at which a part stops drawing) and leaves REMOVAL
+  to the character LOD swap, which already owns it on inputs the whole render
+  path shares. Read its header before adding a shed of your own, including why
+  the distance arm is anchored to the fixed `CHARACTER_LOD_RANGE_SQ` and not to
+  the live crowd-adaptive band edge, and
+  `docs/design/graphics-settings-fairness.md` for why that choice is what keeps
+  a fade fairness-safe.
+- **Work that a hidden subtree cannot show is work not to do.** The far-LOD swap
+  hides `modelWrap`, so anything parented into the rig (a held weapon and its
+  VFX) stops being drawn without any of its own flags changing; a per-frame
+  driver over such a subtree should skip. Check the swap ACTUALLY happened
+  (`CharacterVisual.setFar` keeps the rig visible when no baked mesh exists,
+  while `isFar` reads true either way), never just the intent flag.
+- **Cloning a material? Use `material_clone_hooks.ts`.** `Material.clone()` copies
+  userData but silently DROPS `onBeforeCompile`, and three keys its program cache
+  on `customProgramCacheKey()`, whose default return value IS
+  `onBeforeCompile.toString()`. So a bare clone of a patched material (rim glow,
+  the worn surface-detail layer) both renders un-patched AND links a whole new
+  program on its first draw, wherever that draw lands. `cloneMaterialWithHooks`
+  re-attaches exactly the layers the source carried, in the source's order, so
+  the composed key comes out identical and the clone reuses the linked program.
 - **`render_budget.ts` is the renderer's adaptive-budget core** (tier-driven frame
   budget + telemetry, keyed off `gfx.ts` quality bands). `renderer.ts` owns it,
   degrades against it, and pushes the resulting grass/foliage/vfx quality levels into

@@ -32,26 +32,57 @@ const OUT_PX = Number(process.env.STILL_PX || 320); // shipped size; entry super
 mkdirSync(outDir, { recursive: true });
 
 // 1) Bundle the browser entry. loadGltf -> assetUrl reads import.meta.env.DEV (DEV gates the
-//    root-relative /<logical> paths our static server maps into public/), which esbuild leaves
-//    intact for a classic IIFE <script src> and would be a SyntaxError. esbuild matches each
+//    root-relative /<logical> paths our static server maps into public/). esbuild matches each
 //    FULL member path exactly (a bare `import.meta.env` define does NOT fold `.DEV`), so define
-//    both Vite flags media.ts / i18n.ts read; the assert below fails loudly if a transitive
-//    module ever reads another import.meta field this define misses.
+//    every Vite flag a transitive module reads (`grep -rho 'import\.meta\.env\.[A-Za-z_]*' src/`):
+//    media.ts / i18n.ts read DEV/PROD, and render/gfx.ts pulls in client_origin.ts and
+//    (transitively) runtime.ts for native/desktop-app origin detection, none of which apply to
+//    this static headless render. Keep the list exhaustive and at web-browser defaults.
+//
+//    A missed define no longer surfaces as a raw `import.meta` SyntaxError: current esbuild
+//    rewrites `import.meta` to an EMPTY OBJECT in an IIFE (with a warning), so `({}).env.X`
+//    TypeErrors at page boot and the harness hangs at the __ready wait instead (surfacing only
+//    as a PAGEERR and a 20s wait-for timeout). client_origin.ts reading VITE_NATIVE_APP hit
+//    exactly that. The guard below therefore checks BOTH shapes: a literal `import.meta` and
+//    the rewritten empty-object env reads.
 const bundled = await esbuild.build({
   entryPoints: [path.join(root, 'scripts', 'wiki', 'stills_render_entry.js')],
   bundle: true,
   format: 'iife',
   platform: 'browser',
-  define: { 'import.meta.env.DEV': 'true', 'import.meta.env.PROD': 'false' },
+  define: {
+    'import.meta.env.DEV': 'true',
+    'import.meta.env.PROD': 'false',
+    // src/client_origin.ts and src/runtime.ts (pulled in transitively via the guide
+    // viewer's asset chain) also read import.meta.env at module scope; esbuild replaces
+    // the whole import.meta object with {} for a non-ESM output format, so an undefined
+    // field access here throws in the browser page rather than failing this build step
+    // (the assert below only catches a literal `import.meta` surviving the bundle, not
+    // an unmatched member access on the now-empty stand-in object). esbuild matches the
+    // FULL member path, so every VITE_* member those modules read needs its own entry.
+    'import.meta.env.BASE_URL': '"/"',
+    'import.meta.env.VITE_API_ORIGIN': '""',
+    'import.meta.env.VITE_DESKTOP_API_ORIGIN': '""',
+    'import.meta.env.VITE_DESKTOP_APP': '""',
+    'import.meta.env.VITE_DESKTOP_RELATIVE_API': '""',
+    'import.meta.env.VITE_DISCORD_DISABLED': '""',
+    'import.meta.env.VITE_NATIVE_APP': '""',
+    'import.meta.env.VITE_REOWN_PROJECT_ID': '""',
+    'import.meta.env.VITE_TURNSTILE_SITEKEY': '""',
+    'import.meta.env.VITE_WALLET_DISABLED': '""',
+  },
   write: false,
   logLevel: 'silent',
 });
 const bundleJs = bundled.outputFiles[0].text;
-if (bundleJs.includes('import.meta')) {
+// Both failure shapes of a missed define: a raw `import.meta` (older esbuild kept it: a
+// SyntaxError in a classic script) and the current empty-object rewrite (import_meta = {} /
+// import_meta.env.X: a boot-time TypeError the __ready wait can only report as a timeout).
+if (bundleJs.includes('import.meta') || /\bimport_meta\b/.test(bundleJs)) {
   throw new Error(
-    'stills bundle still contains a raw `import.meta`: a transitive module reads an ' +
-      'import.meta.env field with no define. Add an `import.meta.env.<field>` define above ' +
-      '(esbuild matches the full member path) before it SyntaxErrors in the IIFE.',
+    'stills bundle still reads an import.meta.env field with no define (esbuild rewrites ' +
+      'import.meta to an empty object in an IIFE, so the page TypeErrors at boot). Add an ' +
+      "'import.meta.env.<field>' define above; esbuild matches the full member path.",
   );
 }
 
@@ -75,17 +106,21 @@ const dataUrl = `data:text/javascript;base64,${Buffer.from(dataBuilt.outputFiles
 const { GUIDE_CLASSES, GUIDE_DRUID_FORMS, GUIDE_WARLOCK_PETS, GUIDE_FAMILIES, GUIDE_MODELS } =
   await import(dataUrl);
 
-// Flatten every figure to a distinct (model, tint) render job, deduped by still key.
+// Flatten every figure to a distinct (model, tint, tintStrength) render job, deduped by
+// still key. tintStrength comes straight off the figure record (build_content.mjs bakes it
+// alongside tint/still), the same value model.ts reads off GUIDE_MODELS[model] to paint the
+// render, so a strength-only manifest change mints a new key here too.
 const jobs = new Map();
-const addFigure = (model, tint) => {
+const addFigure = (model, tint, tintStrength) => {
   if (!model || !GUIDE_MODELS[model]) return;
-  const key = stillKey(model, tint);
-  if (!jobs.has(key)) jobs.set(key, { key, model, tint: tint ?? null });
+  const key = stillKey(model, tint, tintStrength);
+  if (!jobs.has(key)) jobs.set(key, { key, model, tint: tint ?? null, tintStrength });
 };
-for (const c of GUIDE_CLASSES) addFigure(c.model, c.tint);
-for (const d of GUIDE_DRUID_FORMS) addFigure(d.model, d.tint);
-for (const p of GUIDE_WARLOCK_PETS) addFigure(p.model, p.tint);
-for (const f of GUIDE_FAMILIES) for (const c of f.creatures) addFigure(c.model, c.tint);
+for (const c of GUIDE_CLASSES) addFigure(c.model, c.tint, c.tintStrength);
+for (const d of GUIDE_DRUID_FORMS) addFigure(d.model, d.tint, d.tintStrength);
+for (const p of GUIDE_WARLOCK_PETS) addFigure(p.model, p.tint, p.tintStrength);
+for (const f of GUIDE_FAMILIES)
+  for (const c of f.creatures) addFigure(c.model, c.tint, c.tintStrength);
 
 // 3) Serve public/ (for the GLBs) plus the render harness and bundle, all same-origin so
 //    the page's `/models/...` fetches resolve to the committed assets.

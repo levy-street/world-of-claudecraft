@@ -43,10 +43,22 @@ dependency set. The one sanctioned exception is the standalone admin dashboard
 Most directories above have their own `CLAUDE.md` with local conventions; read it when you work there.
 
 ## Commands
+Install once per clone/worktree with **pnpm** (pinned via `packageManager` in
+`package.json`, currently `pnpm@10.34.5`; shared content-addressable store makes
+multi-worktree installs cheap). **Corepack is not required.** Same on macOS,
+Linux, and Windows: `npm install -g pnpm@10.34.5` (match the pin), then
+`pnpm install --frozen-lockfile`. Never commit `package-lock.json`. Full policy:
+CONTRIBUTING.md. After install, `pnpm run <script>` and `npm run <script>` both work;
+the nested `npm run` forms below are the package.json script names.
+
 - `npm run dev`: Vite client on :5173 (proxies `/api`, `/admin/api`, `/ws` to :8787).
 - `npm run server`: esbuild-bundle + run the authoritative server on :8787.
 - `npm test`: Vitest. **Prefer a single file while iterating:** `npx vitest run tests/sim.test.ts`.
-- `npm run gate`: the full CI-equivalent pre-merge gate (i18n gen + freshness, malware scan,
+- `node scripts/gate_select.mjs`: **the pre-merge gate.** Same step list as `npm run gate`
+  (nothing dropped) with one substitution: the full vitest run becomes an always-run set
+  plus `vitest related`. Roughly 3x faster; falls back to the full suite for any change it
+  cannot reason about. See `docs/qa-gate.md`.
+- `npm run gate`: the full CI-equivalent gate, still the deeper check (i18n gen + freshness, malware scan,
   changed-files biome, SFX conformance, full tests with bounded workers, `tsc`, all builds;
   release-tier automatically on a `release/**` branch; FFmpeg/ffprobe come from the bundled
   ffmpeg-static/ffprobe-static packages, PATH is the fallback). Exit-code-safe;
@@ -86,7 +98,8 @@ Implementation requirements:
 
 Deliverable: a PR based off the latest release branch, following
 `.github/PULL_REQUEST_TEMPLATE.md`, that is **fully mergeable and passes CI**. Gate it locally
-with `npm run gate` (above) before calling it done.
+with `node scripts/gate_select.mjs` (above) before calling it done; `npm run gate` remains
+the deeper check when you want the whole suite locally.
 
 ## Architecture (the load-bearing ideas)
 - **One sim, three hosts.** The exact same `src/sim/` code runs the offline
@@ -156,9 +169,14 @@ with `npm run gate` (above) before calling it done.
   liberally as a check while working. `require('typescript')` deliberately resolves a
   TypeScript 6 JS API wrapper because svelte-check needs that API; never collapse the dual
   alias yourself (the collapse triggers live in CONTRIBUTING.md, "TypeScript toolchain", and
-  `tests/server/new_endpoint.test.ts` pins both arms). Regenerate `package-lock.json` ONLY
-  with `npx npm@10 install --package-lock-only`; plain `npm ci` is safe on any npm major
-  (rationale in CONTRIBUTING.md).
+  `tests/server/new_endpoint.test.ts` pins both arms). **Package manager is pnpm**
+  (`packageManager: pnpm@10.34.5`, single lockfile `pnpm-lock.yaml`, `.npmrc`
+  `node-linker=hoisted` for npm-compatible layout + shared store). Install pnpm
+  with `npm install -g pnpm@10.34.5` (Corepack not required; same on macOS/Linux/
+  Windows), then `pnpm install --frozen-lockfile`. Regenerate the lockfile only via
+  `pnpm install` / `pnpm add` / `pnpm update` (never hand-edit; never reintroduce
+  `package-lock.json`). CI is `pnpm/action-setup` + frozen install. Full policy:
+  CONTRIBUTING.md.
 - **Keep the dependency set tiny.** Don't add packages without a clear need. (Svelte
   and `@sveltejs/vite-plugin-svelte` are the one sanctioned exception, scoped to the
   `src/admin/` dashboard bundle; the game/guide/play entries stay framework-free.)
@@ -314,4 +332,5 @@ correct.
 `README.md` (host/develop/play + fidelity checklist) · `DESIGN.md` (the adopted interface
 design-language standard; interface changes land through its rollout phases) ·
 `DEPLOY.md` (production) · `CREDITS.md` (asset licenses) · `docs/design/` (design docs) ·
-`docs/prd/` (feature specs) · `docs/qa-gate.md` (the layered QA gate).
+`docs/prd/` (feature specs) · `docs/qa-gate.md` (the layered QA gate) ·
+`docs/merge-queue.md` (the merge queue + required-check contract on protected branches).

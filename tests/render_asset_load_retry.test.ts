@@ -33,6 +33,7 @@ describe('loadGltf retries a transient failure before rejecting', () => {
     vi.doMock('three/addons/loaders/GLTFLoader.js', () => ({
       GLTFLoader: class {
         setMeshoptDecoder(): void {}
+        setKTX2Loader(): void {}
         load(
           _url: string,
           onLoad: (g: unknown) => void,
@@ -58,6 +59,7 @@ describe('loadGltf retries a transient failure before rejecting', () => {
     vi.doMock('three/addons/loaders/GLTFLoader.js', () => ({
       GLTFLoader: class {
         setMeshoptDecoder(): void {}
+        setKTX2Loader(): void {}
         load(_url: string, _onLoad: unknown, _onProgress: unknown, onError: () => void): void {
           calls++;
           onError();

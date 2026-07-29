@@ -449,12 +449,16 @@ describe('quest npc roles', () => {
     const events = sim.tick();
 
     expect(redbrook.auras.some((a) => a.kind === 'polymorph')).toBe(false);
-    expect(events).toContainEqual({
-      type: 'aura',
-      targetId: redbrook.id,
-      name: 'Polymorph',
-      gained: false,
-    });
+    // objectContaining: fade sites may gain attribution fields over time and
+    // this assertion cares only about the fade itself.
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: 'aura',
+        targetId: redbrook.id,
+        name: 'Polymorph',
+        gained: false,
+      }),
+    );
   });
 });
 

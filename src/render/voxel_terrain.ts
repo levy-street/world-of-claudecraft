@@ -5,7 +5,7 @@ import { voxelDensity } from '../sim/voxel';
 import { meshVoxelChunk } from '../sim/voxel_mesh';
 import { roadDistance, terrainHeight, waterLevelAt } from '../sim/world';
 import { loadTexture } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 
 // Real PBR albedo (ambientCG 1K, shipped under public/textures/terrain, this
 // repo's existing asset set: no new files). Unconditional load (not gated on
@@ -15,7 +15,7 @@ import { registerPreload } from './assets/preload';
 // which comfortably has far more than the handful of texture units this uses.
 const VOXEL_TEX: Record<string, THREE.Texture> = {};
 function kickVoxelTex(key: string, file: string): void {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadTexture(`/textures/terrain/${file}`, { srgb: true, repeat: true }).then((tex) => {
       VOXEL_TEX[key] = tex;
       return tex;
@@ -26,7 +26,7 @@ kickVoxelTex('grassC', 'Grass001_Color.jpg');
 kickVoxelTex('rockC', 'Rock051_Color.jpg');
 kickVoxelTex('rockStreakC', 'Rock029_Color.jpg');
 kickVoxelTex('roadC', 'PavingStones046_Color.jpg'); // packed walkway/road stone
-kickVoxelTex('dirtC', 'Ground048_Color.jpg');
+kickVoxelTex('dirtC', 'Ground023_Color.jpg');
 kickVoxelTex('mudC', 'Ground071_Color.jpg');
 kickVoxelTex('sandC', 'Ground080_Color.jpg');
 kickVoxelTex('snowC', 'Snow010A_Color.jpg');
@@ -298,7 +298,7 @@ export function buildVoxelTerrain(seed: number): VoxelTerrainView {
           }
           mud[vi] = marshWeightAt(vz);
           snow[vi] = Math.max(0, Math.min(1, (vy - SNOW_HEIGHT) / SNOW_FEATHER));
-          const wl = waterLevelAt(vx, vz);
+          const wl = waterLevelAt(vx, vz, seed);
           sand[vi] = wl === -Infinity ? 0 : Math.max(0, Math.min(1, 1 - (vy - wl) / 2));
         }
         geo.setAttribute('aRoad', new THREE.BufferAttribute(road, 1));

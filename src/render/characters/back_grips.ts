@@ -81,7 +81,14 @@ const BACK_GRIPS: Record<string, BackGripSpec> = {
   VAR_WAND: { position: [0.5, -0.38, -0.08], euler: [0.05, 0.15, Math.PI * 0.72] },
   VAR_BOOK: { position: [0.5, -0.38, -0.08], euler: [0.05, 0.15, Math.PI * 0.72] },
   VAR_CROSSBOW: { position: [0.0, 0.1, -0.3], euler: [0, Math.PI / 2, Math.PI] },
-  VAR_BOW: { position: [0.0, 0.1, -0.32], euler: [0, Math.PI / 2, Math.PI] },
+  // A BOW is not a crossbow. The crossbow carry above lays a wide, T-shaped
+  // body flat across the shoulders, and its Math.PI / 2 yaw is what makes that
+  // read; applied to a tall bow arc the same yaw leaves the limbs pointing
+  // straight up and down, so a sheathed bow stood vertically up the spine
+  // instead of lying strapped across the back (reported from live play).
+  // A bow is long and thin like a greatsword, so it takes the greatsword's
+  // diagonal: 45 degrees across the back, face flat to the spine.
+  VAR_BOW: { position: [0.14, 0.1, -0.3], euler: [0.1, 0, Math.PI * 0.75] },
   // Off-hand gear from the two-slot loadout (release/v0.24.0-ptr): a left-hand
   // prop of any family above mirrors automatically via backGripFor's side
   // argument.
@@ -103,11 +110,29 @@ const BACK_GRIPS: Record<string, BackGripSpec> = {
  *  fails when a new family lands without a carry. */
 export const BACK_GRIP_FAMILIES: ReadonlySet<string> = new Set(Object.keys(BACK_GRIPS));
 
+/** Families whose on-back carry is NOT handed. The crossbow carry lies flat and
+ *  SYMMETRIC across the shoulders, so mirroring it only flips the weapon
+ *  end-for-end for no visual gain. The mirror exists so dual-wielded BLADES
+ *  cross, which needs a carry that leans to one side in the first place.
+ *
+ *  This matters for ranged specifically because bows and crossbows ARE
+ *  left-hand props: weaponSkinAttachBone moves a drawn bow to handslot.l so it
+ *  sits in the draw animation's front arm, and handSide() then reports 'l' here
+ *  when the weapon is sheathed. VAR_BOW is deliberately NOT in this set: its
+ *  carry is a diagonal, so it should lean like any other diagonal. */
+const SIDE_AGNOSTIC_BACK_GRIPS: ReadonlySet<string> = new Set([
+  '1H_Crossbow',
+  '2H_Crossbow',
+  'VAR_CROSSBOW',
+]);
+
 /** The on-back transform for a sheathed prop: family-specific, mirrored across X
- *  (position and lean) for a left-hand prop, defaulting for unknown families. */
+ *  (position and lean) for a left-hand prop, defaulting for unknown families.
+ *  The ranged families opt out of the mirror (see above). */
 export function backGripFor(accessory: string | null, side: 'r' | 'l'): BackGripTransform {
   const spec = (accessory && BACK_GRIPS[accessory]) || DEFAULT_BACK;
-  const mirror = side === 'l' ? -1 : 1;
+  const handed = !(accessory && SIDE_AGNOSTIC_BACK_GRIPS.has(accessory));
+  const mirror = side === 'l' && handed ? -1 : 1;
   return {
     position: [spec.position[0] * mirror, spec.position[1], spec.position[2]],
     quaternion: quatFromEulerXYZ(spec.euler[0], spec.euler[1] * mirror, spec.euler[2] * mirror),

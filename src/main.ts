@@ -2,8 +2,12 @@
 // index.html and play.html both bootstrap through this module, so this one import
 // styles both game entries; admin/guide use their own entries and inline CSS.
 import './styles/index.css';
+import { markEntryTightMode } from './device_memory_hint';
 import { startDiscordLogin } from './discord_login_start';
-import { syncAppViewport as syncAppViewportShared } from './game/app_viewport';
+import {
+  syncAppViewport as syncAppViewportShared,
+  syncSettledAppViewport,
+} from './game/app_viewport';
 import { audio } from './game/audio';
 import { AutoLoot } from './game/autoloot';
 import {
@@ -12,8 +16,14 @@ import {
   cssEffectsTier,
   readBrowserEnv,
 } from './game/browser_env';
+import { hideBrowserSupportNotice, initBrowserSupportNotice } from './game/browser_support_notice';
 import { isCameraDrivenFacingActive } from './game/camera_driven_facing';
-import { cameraFollowShouldSettle, updateFollowCameraYaw, wrapAngle } from './game/camera_follow';
+import {
+  cameraFollowShouldSettle,
+  isRespawnFacingResyncEdge,
+  updateFollowCameraYaw,
+  wrapAngle,
+} from './game/camera_follow';
 import { shouldRecoverOnComposerBlur } from './game/chat_keyboard_dismiss';
 import {
   clickMoveBrokenByTeleport,
@@ -43,13 +53,29 @@ import {
 import {
   checkpointActiveEntryDiagnostics,
   createEntryDiagnosticsController,
+  resumeActiveEntryDiagnostics,
   stopActiveEntryDiagnostics,
+  suspendActiveEntryDiagnostics,
 } from './game/entry_diagnostics';
 import { GamepadManager } from './game/gamepad';
 import { GamepadBindings } from './game/gamepad_bindings';
 import { shouldUseGamepadPointerMode } from './game/gamepad_pointer_mode';
+import { isGameplayInputBlocked } from './game/gameplay_input_gate';
 import { handleGatherNodeInteract } from './game/gather_node_interact';
 import { gatherToolProfessionFor, nearestGatherNodeForProfession } from './game/gather_tool_use';
+import { GraphicsRebuildCoordinator } from './game/graphics_rebuild_coordinator';
+import {
+  type GraphicsSettingsSnapshot,
+  graphicsApplyMode,
+  graphicsSettingsSnapshotsEqual,
+  normalizeGraphicsSettingsSnapshot,
+} from './game/graphics_rebuild_core';
+import {
+  clearGraphicsRebuildProbe,
+  consumeGraphicsRebuildCrashProbe,
+  stampGraphicsRebuildProbe,
+  updateGraphicsRebuildProbePhase,
+} from './game/graphics_rebuild_crash_guard';
 import { Input } from './game/input';
 import { InputActivityMeter, installInputActivityTracking } from './game/input_activity';
 import { stopAutorunForInteraction } from './game/interaction_autorun';
@@ -64,7 +90,11 @@ import {
 } from './game/interactions';
 import { createIntroLogoOverlay } from './game/intro_logo_overlay';
 import { Keybinds } from './game/keybinds';
-import { newKeyboardTurnState, stepKeyboardTurnFacing } from './game/keyboard_turn_facing';
+import {
+  type KeyboardTurnArgs,
+  newKeyboardTurnState,
+  stepKeyboardTurnFacing,
+} from './game/keyboard_turn_facing';
 import { applyMobileKeyboardViewport } from './game/keyboard_viewport_applier';
 import { shouldUseStaticBackdrop } from './game/landing_backdrop';
 import { createLandingThemeAudio } from './game/landing_theme';
@@ -83,12 +113,14 @@ import { diagonalMovementVisualFacing } from './game/movement_visual';
 import { music } from './game/music';
 import { tryNearbyInteraction } from './game/nearby_interaction';
 import { isOfflineModeAvailable } from './game/offline_mode_gate';
+import { padReelItemId } from './game/pad_reel';
 import { createPerfMonitor } from './game/perf';
 import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
 import { SceneDirector } from './game/scene_director';
 import { playSceneDirectiveSfx } from './game/scene_sfx';
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
+import { SelfMotionFrameBuffer } from './game/self_motion_frame_buffer';
 import {
   type GameSettings,
   normalizeClickMoveButton,
@@ -106,7 +138,7 @@ import {
 } from './game/spawn_cinematic';
 import { safeStartupGraphicsPreset } from './game/startup_graphics_safety';
 import { shouldClearTargetOnGroundClick } from './game/target_click';
-import { resolveUiEffectsProfile } from './game/ui_effects_profile';
+import { loadingCurtainFadeMs, resolveUiEffectsProfile } from './game/ui_effects_profile';
 import { currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
 import { telemetryZoneId } from './game/world_telemetry';
@@ -135,6 +167,7 @@ import {
   signInWithNativeApple,
 } from './net/native_apple_auth';
 import { createNativeAttestationProof } from './net/native_attestation';
+import { primeNativeDeviceMemoryHint } from './net/native_device_info';
 import {
   createNativeDiscordProof,
   installNativeDiscordUrlHandler,
@@ -142,6 +175,11 @@ import {
   openNativeDiscordOAuth,
   takeNativeDiscordVerifier,
 } from './net/native_discord';
+import { notifyOtaAppReady } from './net/native_ota';
+import {
+  createNativeSolanaWalletClient,
+  nativeSolanaMobileBridge,
+} from './net/native_solana_mobile';
 import {
   Api,
   ApiError,
@@ -162,19 +200,56 @@ import {
   resumeRoute,
   savePlayMarker,
 } from './net/resume_play';
+import { createSeekerEntitlementSync } from './net/seeker_entitlement_sync';
 import { openStripeCheckout } from './net/stripe_checkout';
 import type { WalletOption, WalletPickerMode, WalletPickerResult } from './net/wallet';
 import { resolveWalletCapability } from './net/wallet_capability';
 import { installWalletResumeHandlers } from './net/wallet_resume';
-import { assetsReady } from './render/assets/preload';
-import { CharacterPreview, type PreviewAppearance } from './render/characters';
-import { charactersReady, preloadMechAssets } from './render/characters/assets';
-import { skinCount } from './render/characters/manifest';
-import { onPortraitsReady, playerPortraitDataUrl } from './render/characters/portrait';
+import {
+  prepareGraphicsProfileAssets,
+  resetGraphicsProfileDerivedCaches,
+} from './render/assets/graphics_profile';
+import { assetsReady, beginDeferredPreloads } from './render/assets/preload';
+import {
+  CharacterPreview,
+  type PreviewAppearance,
+  setModularLookProvider,
+} from './render/characters';
+import {
+  charactersReady,
+  ensureCharacterUrl,
+  preloadMechAssets,
+  startStreamedCharacterPreloads,
+} from './render/characters/assets';
+import { skinCount, weaponSkinModelUrl } from './render/characters/manifest';
+import {
+  ARMOR_SETS,
+  type ArmorLoadout,
+  type ArmorSetId,
+  classArmorSet,
+  fullSet,
+  type ModularAppearance,
+  type ModularLook,
+  normalizeAppearance,
+} from './render/characters/modular';
+import {
+  onPortraitsReady,
+  onPortraitUpdate,
+  playerPortraitDataUrl,
+  resetPortraitRendererForGraphicsRebuild,
+} from './render/characters/portrait';
+import { type RecycledRendererContext, recycleWebGL2Context } from './render/context_recycle';
 import { installWebGLContextRelease } from './render/context_release';
-import { setDayNightPhaseOverride } from './render/day_night_clock';
-import { firstRunGraphicsPreset, GFX, graphicsPresetLabel } from './render/gfx';
-import { cueHarborShip, harborShipAttachFrame, resetHarborShipCues } from './render/harbor';
+import { setDayNightPhaseOverride, setLunarPhaseOverride } from './render/day_night_clock';
+import {
+  activateGfxProfile,
+  captureGfxCapabilities,
+  firstRunGraphicsPreset,
+  GFX,
+  getActiveGfxProfile,
+  graphicsPresetLabel,
+  resolveGfxProfile,
+} from './render/gfx';
 import { Renderer } from './render/renderer';
 import {
   hasAuthoritativeSelfPositionDiscontinuity,
@@ -183,16 +258,19 @@ import {
 import { ensureSkyAssetsAt, navigatorSaveData } from './render/sky';
 import { ARRIVAL_NEIGHBOR_STREAM_RADIUS } from './render/zone_streaming';
 import { desktopBridge } from './runtime';
+import { breathFraction, stepBreathUsedSeconds } from './sim/breath';
 import { pathCrossesFence } from './sim/colliders';
 import { isStunned } from './sim/combat/cc';
 import { ABILITIES, CLASSES } from './sim/content/classes';
 import { HEROIC_VENDOR_STOCK } from './sim/content/heroic_vendor';
+import { MECH_CHROMAS } from './sim/content/skins';
 import { rowTreeFor } from './sim/content/talents';
 import {
   GATHER_NODES,
   ITEMS,
   isDelvePos,
   isRiftPos,
+  MOBS,
   QUESTS,
   questRewardItem,
   setActiveWorldContent,
@@ -200,8 +278,9 @@ import {
 } from './sim/data';
 import { canEquipItem } from './sim/equipment_rules';
 import { MARKET_HOUSE_STOCK } from './sim/market';
+import { bagOwnedMounts } from './sim/mounts';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
-import { playSceneForPlayer, registeredSceneIds, sceneById } from './sim/scenes/scenes';
+import { isSubmerged } from './sim/player_motion';
 import { Sim } from './sim/sim';
 import { TAB_NEAR_RADIUS, TAB_QUERY_RADIUS, tabConeHalfAt } from './sim/tab_target';
 import {
@@ -214,6 +293,7 @@ import {
   type WorldContent,
 } from './sim/types';
 import { zoneBiomeAt } from './sim/world';
+import { WORLD_SEED } from './sim/world_seed';
 import { startSitePresence } from './site_presence';
 import {
   accountPortalModel,
@@ -223,6 +303,7 @@ import {
 } from './ui/account_portal';
 import { technicalErrorMessage, userFacingApiError } from './ui/api_error_i18n';
 import { formatFooterVersion } from './ui/app_version';
+import { type AppearanceCustomizer, mountAppearanceCustomizer } from './ui/appearance_customizer';
 import {
   handleKeyboardActivation,
   syncInputAriaState,
@@ -230,6 +311,7 @@ import {
   validateCharacterName,
   validateForm,
 } from './ui/auth_utils';
+import { BreathBar } from './ui/breath_bar';
 import { assembleBugReportMeta } from './ui/bug_report';
 import {
   cameraPromptOpen,
@@ -240,6 +322,7 @@ import { deleteCharButtonHtml } from './ui/char_delete_button';
 import { loadCharselectNews } from './ui/charselect_news';
 import { ChatCommandMenu } from './ui/chat_command_menu';
 import { CLASS_DETAILS, SIGNATURE_ABILITIES } from './ui/class_details_data';
+import { classIconUrl } from './ui/class_icon_art';
 import { claudiumBalanceAddress, currentWocDiscountBps } from './ui/claudium_view';
 import { ensureDeedLocalesLoaded } from './ui/deed_i18n';
 import { isDevGuiCommand } from './ui/dev_command_view';
@@ -262,9 +345,14 @@ import { renderDiscordWidget } from './ui/discord_widget';
 import { finderLootItemIds } from './ui/dungeon_finder_view';
 import { classDisplayName, tEntity } from './ui/entity_i18n';
 import { showEntryGuardBanner } from './ui/entry_guard_banner';
+import { refreshEpicLinkStatus, wireEpicLink } from './ui/epic_link';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
-import { attachGatherNodeHoverTooltip, gatherNodeToolGateFor } from './ui/gather_node_tooltip';
-import { gatherToolNoNodeKey } from './ui/gathering_view';
+import {
+  attachGatherNodeHoverTooltip,
+  gatherNodeToolGateFor,
+} from './ui/gather_node_tooltip_controller';
+import { gatherEffectPrompt, gatherToolNoNodeKey } from './ui/gathering_view';
+import { loadHighscoresInto } from './ui/highscore_board';
 import { type ClaudiumHooks, Hud } from './ui/hud';
 import { resolveActionBarVisibility } from './ui/hud/action_bar/action_bar_visibility_core';
 import { autosizeChatInput } from './ui/hud/chat/chat_input_autosize';
@@ -299,6 +387,7 @@ import {
 import { createLoadingTipRotation, type LoadingTipRotation } from './ui/loading_tips';
 import { applyMinimapOrnamentVars } from './ui/minimap_gilded_ornament';
 import { showMobileWalletLauncher } from './ui/mobile_wallet_launcher';
+import { mobileMountAction } from './ui/mount_quick_summon';
 import { applyNativeDeviceLanguage } from './ui/native_language';
 import { scheduleNativeUpdateCheck } from './ui/native_update_prompt';
 import { loadNewsInto } from './ui/news_feed';
@@ -310,6 +399,7 @@ import { buildPerfOverlayView, FrameMeter } from './ui/perf_overlay_model';
 import { hydratePortraits, portraitChipHtml } from './ui/portrait_chip';
 import { hideReconnectOverlay, showReconnectOverlay } from './ui/reconnect_overlay';
 import { createSpectateBadge } from './ui/spectate_badge';
+import { refreshStartSkinPickerPortraits } from './ui/start_skin_picker_portraits';
 import { refreshSteamLinkStatus, wireSteamLink } from './ui/steam_link';
 import { shouldShowStorePromo } from './ui/store_promo_card';
 import { talentRowOptionIconRef } from './ui/talent_icons';
@@ -331,10 +421,8 @@ import {
   shouldDisconnectUnverifiedWallet,
 } from './ui/wallet_balance';
 import { buildWalletConnectionView } from './ui/wallet_connection_view';
-import { formatXp } from './ui/xp_bar';
-import type { IWorld, LeaderboardEntry } from './world_api';
+import type { IWorld } from './world_api';
 
-const WORLD_SEED = 20061; // fixed: World of ClaudeCraft is a persistent place
 const CLICK_MOVE_TURN_RATE = 4.2; // rad/sec; responsive turning while the camera stays decoupled from click spam
 const CLICK_MOVE_WAYPOINT_STOP = 0.8; // yards; intermediate A* corners should roll through, not stutter-stop
 const CLICK_MOVE_REROUTE_DISTANCE = 4; // yards; live entity targets can move this far before we recompute the path
@@ -408,6 +496,12 @@ applyNativeDeviceLanguage({
   languages: navigator.languages,
   language: navigator.language,
 });
+
+// Cache the native shell's physical-memory measurement for the NEXT boot's
+// synchronous graphics-profile resolution (4 GB-class devices get the tight
+// residency profile; see src/device_memory_hint.ts). Fire-and-forget: this
+// boot's profile is already resolved, and a missing bridge no-ops.
+void primeNativeDeviceMemoryHint();
 
 const SITE_URL = 'https://worldofclaudecraft.com/';
 
@@ -623,6 +717,7 @@ setInterfaceMode(interfaceModeFromSetting(new Settings().get('interfaceMode')));
 syncAppViewport();
 syncBuildInfo();
 scheduleNativeUpdateCheck(__APP_VERSION__);
+void notifyOtaAppReady();
 preventMobileZoom();
 syncPhoneTouchClass();
 window.matchMedia(PHONE_TOUCH_QUERY).addEventListener?.('change', syncPhoneTouchClass);
@@ -801,6 +896,11 @@ function requestBrowserFullscreen(): void {
   const root = document.documentElement as FullscreenElement;
   const request = root.requestFullscreen?.bind(root) ?? root.webkitRequestFullscreen?.bind(root);
   if (!request) return;
+  // Fullscreen needs transient activation. Chrome logs a console error for every
+  // call made without it, whether or not the rejection is caught, so skip the
+  // call we already know will be refused. Browsers without userActivation still
+  // attempt it, which is the previous behavior.
+  if (navigator.userActivation && !navigator.userActivation.isActive) return;
   try {
     const result = request();
     if (result instanceof Promise) void result.catch(() => {});
@@ -833,12 +933,18 @@ function requestPreferredFullscreen(): void {
 // Loading screen (shown from "enter world" until the first frame renders)
 // ---------------------------------------------------------------------------
 
-const LOADING_FADE_MS = 350; // keep in sync with the #loading-screen CSS transition
 const LOADING_TIP_ROTATE_MS = 5000;
 
 let loadingHideTimer: number | null = null;
 let loadingTipRotation: LoadingTipRotation | null = null;
 let loadingTipTimer: number | null = null;
+
+function loadingCurtainFadeDelayMs(): number {
+  const osReducedMotion =
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  return loadingCurtainFadeMs(new Settings().get('reduceMotion') || osReducedMotion);
+}
 
 function showLoadingScreen(statusText: string): void {
   const el = $('#loading-screen');
@@ -909,7 +1015,7 @@ function hideLoadingScreen(): void {
   loadingHideTimer = window.setTimeout(() => {
     el.classList.remove('visible', 'fade');
     loadingHideTimer = null;
-  }, LOADING_FADE_MS);
+  }, loadingCurtainFadeDelayMs());
 }
 
 // Resolve only after the browser has actually painted. The scene build
@@ -940,6 +1046,9 @@ function enterLoadingState(statusText: string): void {
   showLoadingScreen(statusText);
   $('#start-screen').style.display = 'none';
   releaseStartScreenPreview();
+  // Landing-only advisory: never let it survive into the world on top of
+  // in-world HUD chrome (it shares the chat frame's bottom-left corner).
+  hideBrowserSupportNotice();
 }
 
 async function prepareWorldEntry(): Promise<boolean> {
@@ -1001,40 +1110,20 @@ async function startGame(
   // Paint the loading screen before anything can block, assetsReady may resolve
   // immediately when assets are already cached, and the scene build is synchronous.
   await nextPaint();
-  // Lazy locale flip: fetch the active locale's chunk (plus the deed locale chunk the HUD's
-  // deed surfaces read) and make both resident before the HUD renders (mountGameUi ->
-  // translatePage fans out hundreds of t() calls). It sits behind the loading screen (already
-  // painted above), so a stored non-en visitor never sees an English flash. This is now a
-  // REAL per-locale network request, so guard it: startGame is void-invoked (see the call
-  // sites) with no .catch, and English is always resident, so a failed fetch must fall back
-  // to English and keep booting rather than reject unhandled.
-  try {
-    await Promise.all([ensureLocaleLoaded(getLanguage()), ensureDeedLocalesLoaded(getLanguage())]);
-  } catch {
-    // Soft fallback: English is statically resident; boot in English (the picker can retry).
-  }
-  try {
-    await assetsReady((done, total) => setLoadingProgressRange(done, total, 0, 35));
-  } catch (err) {
-    fatalOverlay(t('loading.assetsFailed', { error: technicalErrorMessage(err) }));
-    return;
-  }
-  // Assets are the only network-bound phase the slow-connection hint can
-  // speak to; everything after this is synchronous CPU-bound scene build, so
-  // stop watching here rather than leaving it armed through hideLoadingScreen.
-  stopSlowConnectionWatch();
-  const spectateBadge = createSpectateBadge();
-  setLoadingStatus(t('loading.enteringWorld'));
-  // Let the final status + full progress bar paint before the synchronous
-  // Renderer/Hud build freezes the main thread for a beat.
-  await nextPaint();
-  mountGameUi();
-
-  const canvas = $('#game-canvas') as unknown as HTMLCanvasElement;
-  const nameplates = $('#nameplates') as HTMLDivElement;
-
-  const keybinds = new Keybinds(keybindScope);
+  // Graphics preset resolution + the entry crash probe run BEFORE the locale and
+  // asset awaits below. Those awaits are where the WebContent process actually
+  // holds its peak footprint on phone-class WebKit (the import-time preloads all
+  // resolve inside assetsReady), and a probe armed only after them missed every
+  // kill in that window: the next boot found no evidence, stepped nothing down,
+  // and the player re-crashed identically (the iPhone 13 entry-crash report).
+  // Settings and both preset writers are pure localStorage/navigator reads, so
+  // hoisting them ahead of mountGameUi is safe; everything DOM-bound (canvas
+  // lookups, the context-lost listeners) stays below, after the template mounts.
   const settings = new Settings();
+  // "Stop Auto-Attack on Target Switch" (issue #1358) is authoritative on the
+  // sim, so a stored player preference must be re-pushed on every world entry
+  // (offline sim or online server), not just when the Options toggle changes.
+  world.setStopAutoAttackOnTargetSwitch(settings.get('stopAutoAttackOnTargetSwitch'));
   // First-run graphics default: until a device default has been applied (the dedicated
   // graphicsDefaultApplied marker, NOT the graphicsPreset key, which save() def-fills the moment
   // any unrelated setting is stored), probe the device (GPU name, memory, cores, touch) and
@@ -1067,38 +1156,12 @@ async function startGame(
   if (safePreset !== settings.get('graphicsPreset')) {
     settings.set('graphicsPreset', safePreset);
   }
-  // UI theming: apply the persisted theme's CSS variables to :root, then keep a
-  // hook so the Options panel can switch preset / override colours live.
-  const themeStore = new ThemeStore();
-  function applyTheme(): void {
-    const vars = themeStore.cssVars();
-    for (const name of Object.keys(vars))
-      document.documentElement.style.setProperty(name, vars[name]);
-  }
-  applyTheme();
-  // Graphics-tier HUD effects: publish the resolved effect profile (data-fx-level +
-  // the --fx-* tokens) on settings / OS reduced-motion changes only, never per
-  // frame. Driven by the STATIC graphics preset (the gfx.ts `ui` band stays
-  // governable:false): the FPS governor cannot measure compositor blur cost (the
-  // two-controller hazard). The pure resolver decides; this applier is the thin DOM
-  // consumer, mirroring applyTheme above. Motion has a single source of truth: the
-  // OS prefers-reduced-motion channel (owned by the applier) OR the in-game
-  // reduceMotion setting, both feeding the resolver's reduceMotion input; the
-  // body.reduce-motion class below stays only as the CSS hook it already is.
-  const uiEffectsApplier = new UiEffectsApplier({
-    resolve: (osReducedMotion) =>
-      resolveUiEffectsProfile({
-        presetLabel: graphicsPresetLabel(settings.get('graphicsPreset')),
-        effectsQuality: settings.get('effectsQuality'),
-        reduceMotion: osReducedMotion || settings.get('reduceMotion'),
-      }),
-  });
-  uiEffectsApplier.applyNow();
   let renderer!: Renderer;
   let rendererReady = false;
+  // The world and socket stay live, but every client-frame owner pauses while
+  // the renderer is recycled. The frame loop also clears its offline backlog.
+  let graphicsRebuildPaused = false;
   let hud!: Hud;
-  const autoLoot = new AutoLoot();
-  const perf = createPerfMonitor(null);
   const baseEntryDiagnostics = (): EntryDiagnostics => {
     const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
     return {
@@ -1133,6 +1196,7 @@ async function startGame(
       tier: stats.tier,
       constrainedMemory: GFX.constrainedMemory,
       nativeIosMemoryProfile: GFX.nativeIosMemoryProfile,
+      tightMemory: GFX.tightMemory,
       dynamicShadows: GFX.dynamicShadows,
       shadowMap: GFX.shadowMap,
       msaaSamples: GFX.msaaSamples,
@@ -1178,6 +1242,97 @@ async function startGame(
     baseSnapshot: baseEntryDiagnostics,
     renderSnapshot: renderEntryDiagnostics,
   });
+  // World-entry crash guard: persist a probe BEFORE the locale/asset awaits AND the
+  // synchronous scene build. If phone WebKit kills the WebContent process anywhere in
+  // that window (no event, no error, just a reload), the next boot finds the probe
+  // still armed and steps the graphics preset down one tier (see the recovery block
+  // in wireStartScreens). Cleared once the entry demonstrably survives, on the
+  // handled failure paths below, and whenever the page is hidden (a backgrounded
+  // eviction is NOT an entry crash).
+  entryDiagnostics.start(settings.get('graphicsPreset'));
+  // Dev-channel diagnostic (English on purpose): grep "[entry-guard]" in the WebView
+  // inspector / device console to isolate crash-at-entry causes on real hardware.
+  console.info(
+    `[entry-guard] world entry: preset=${settings.get('graphicsPreset')} ` +
+      `(${graphicsPresetLabel(settings.get('graphicsPreset'))}) native=${isNativeRuntime()}`,
+  );
+  // Name the await window in the probe: a kill during the locale/asset resolution
+  // now reads as checkpoint=assets-await instead of masquerading as a scene-build
+  // death (start() stamps scene-build-start; the real one is re-stamped below).
+  entryDiagnostics.checkpoint('assets-await', baseEntryDiagnostics());
+  // Lazy locale flip: fetch the active locale's chunk (plus the deed locale chunk the HUD's
+  // deed surfaces read) and make both resident before the HUD renders (mountGameUi ->
+  // translatePage fans out hundreds of t() calls). It sits behind the loading screen (already
+  // painted above), so a stored non-en visitor never sees an English flash. This is now a
+  // REAL per-locale network request, so guard it: startGame is void-invoked (see the call
+  // sites) with no .catch, and English is always resident, so a failed fetch must fall back
+  // to English and keep booting rather than reject unhandled.
+  try {
+    await Promise.all([ensureLocaleLoaded(getLanguage()), ensureDeedLocalesLoaded(getLanguage())]);
+  } catch {
+    // Soft fallback: English is statically resident; boot in English (the picker can retry).
+  }
+  // Open the deferred preload lane: the world's assets do not fetch at module
+  // import any more, because decoding them merely to show the LAUNCHER crossed
+  // WKWebView's per-process ceiling (a 12 GB iPhone 17 Pro was killed 1.6 s in and
+  // reloaded forever). This must run BEFORE the await below, which snapshots the
+  // task list, so the Renderer still cannot outrun a load.
+  const deferredStarted = beginDeferredPreloads();
+  console.info(`[entry-guard] world assets: started ${deferredStarted} deferred preloads`);
+  try {
+    await assetsReady((done, total) => setLoadingProgressRange(done, total, 0, 35));
+  } catch (err) {
+    // A HANDLED failure is not a process kill, so the crash probe must not
+    // survive to cost the player a graphics tier next boot (same rule as the
+    // scene-build catch below).
+    entryDiagnostics.stop();
+    fatalOverlay(t('loading.assetsFailed', { error: technicalErrorMessage(err) }));
+    return;
+  }
+  // Assets are the only network-bound phase the slow-connection hint can
+  // speak to; everything after this is synchronous CPU-bound scene build, so
+  // stop watching here rather than leaving it armed through hideLoadingScreen.
+  stopSlowConnectionWatch();
+  const spectateBadge = createSpectateBadge();
+  setLoadingStatus(t('loading.enteringWorld'));
+  // Let the final status + full progress bar paint before the synchronous
+  // Renderer/Hud build freezes the main thread for a beat.
+  await nextPaint();
+  mountGameUi();
+
+  const canvas = $('#game-canvas') as unknown as HTMLCanvasElement;
+  const nameplates = $('#nameplates') as HTMLDivElement;
+
+  const keybinds = new Keybinds(keybindScope);
+  // UI theming: apply the persisted theme's CSS variables to :root, then keep a
+  // hook so the Options panel can switch preset / override colours live.
+  const themeStore = new ThemeStore();
+  function applyTheme(): void {
+    const vars = themeStore.cssVars();
+    for (const name of Object.keys(vars))
+      document.documentElement.style.setProperty(name, vars[name]);
+  }
+  applyTheme();
+  // Graphics-tier HUD effects: publish the resolved effect profile (data-fx-level +
+  // the --fx-* tokens) on settings / OS reduced-motion changes only, never per
+  // frame. Driven by the STATIC graphics preset (the gfx.ts `ui` band stays
+  // governable:false): the FPS governor cannot measure compositor blur cost (the
+  // two-controller hazard). The pure resolver decides; this applier is the thin DOM
+  // consumer, mirroring applyTheme above. Motion has a single source of truth: the
+  // OS prefers-reduced-motion channel (owned by the applier) OR the in-game
+  // reduceMotion setting, both feeding the resolver's reduceMotion input; the
+  // body.reduce-motion class below stays only as the CSS hook it already is.
+  const uiEffectsApplier = new UiEffectsApplier({
+    resolve: (osReducedMotion) =>
+      resolveUiEffectsProfile({
+        presetLabel: graphicsPresetLabel(settings.get('graphicsPreset')),
+        effectsQuality: settings.get('effectsQuality'),
+        reduceMotion: osReducedMotion || settings.get('reduceMotion'),
+      }),
+  });
+  uiEffectsApplier.applyNow();
+  const autoLoot = new AutoLoot();
+  const perf = createPerfMonitor(null);
   canvas.addEventListener('webglcontextlost', () => {
     entryDiagnostics.checkpoint('webgl-context-lost', {
       ...renderEntryDiagnostics(),
@@ -1189,29 +1344,33 @@ async function startGame(
     entryDiagnostics.checkpoint('webgl-context-restored');
     console.info('[entry-diag] WebGL context restored during or after world entry');
   });
-  // World-entry crash guard: persist a probe RIGHT BEFORE the synchronous scene build.
-  // If phone WebKit kills the WebContent process during the build (no event, no error,
-  // just a reload), the next boot finds the probe still armed and steps the graphics
-  // preset down one tier (see the recovery block in wireStartScreens). Cleared once the
-  // entry demonstrably survives, on the handled failure path below, and whenever the
-  // page is hidden (a backgrounded eviction is NOT an entry crash).
-  entryDiagnostics.start(settings.get('graphicsPreset'));
-  // Dev-channel diagnostic (English on purpose): grep "[entry-guard]" in the WebView
-  // inspector / device console to isolate crash-at-entry causes on real hardware.
-  console.info(
-    `[entry-guard] world entry: preset=${settings.get('graphicsPreset')} ` +
-      `(${graphicsPresetLabel(settings.get('graphicsPreset'))}) native=${isNativeRuntime()}`,
-  );
+  // The probe was armed before the locale/asset awaits above; mark that the await
+  // window ended and the synchronous scene build is what runs next.
+  entryDiagnostics.checkpoint('scene-build-start', baseEntryDiagnostics());
   try {
     setLoadingPercent(37, t('loading.enteringWorld'));
     await ensureSkyAssetsAt(world.player.pos.x, world.player.pos.z);
     setLoadingPercent(40, t('loading.enteringWorld'));
+    // Compose the LOCAL player's body from their authored appearance: every
+    // class routes through the modular part library, each via its own
+    // `player_<class>_modular` def. Every other entity keeps its fixed class
+    // rig: the look is presentation state and is not on the wire, so remote
+    // players cannot be composed yet. In-world the kit's helm follows the
+    // entity's OWN `helmHidden` wire bit (the paperdoll eye toggle) rather
+    // than the creation turntable's preview state, so peers compose with the
+    // owner's choice the day looks ride the wire.
+    setModularLookProvider((e) =>
+      e.kind === 'player' && e.id === world.playerId
+        ? inWorldLookFor(e.templateId as PlayerClass, e.helmHidden)
+        : null,
+    );
     renderer = new Renderer(world, canvas, nameplates);
     rendererReady = true;
     renderer.setAudioSink(sfx);
     renderer.showDevBadges = settings.get('showDevBadges');
     renderer.showOwnNameplate = settings.get('showOwnNameplate');
     renderer.showPlayerNameplates = settings.get('showPlayerNameplates');
+    renderer.setWaterRipples(settings.get('waterRipples'));
     // Dev-only: ?targetcone=1 draws the Tab-target front cone on the ground in
     // front of the player, for tuning the targeting angle/radius (tab_target.ts).
     if (import.meta.env.DEV && new URLSearchParams(location.search).get('targetcone') === '1') {
@@ -1232,7 +1391,7 @@ async function startGame(
     // constructor ran initGfxTier, so the adapter verdict is resolved by now.
     initSoftwareRenderNotice(DESKTOP_APP);
     hud = new Hud(world, renderer, keybinds, {
-      dailyRewardsEnabled: !NATIVE_APP,
+      dailyRewardsEnabled: NATIVE_APP ? await walletCapabilityReady : true,
       devCommandsEnabled: import.meta.env.DEV,
       constrainedMemory: GFX.constrainedMemory,
     });
@@ -1311,8 +1470,6 @@ async function startGame(
     entryDiagnostics.markStable('[entry-guard] world entry stable; runtime probe armed');
   }, ENTRY_PROBE_STABLE_MS);
 
-  // Offline only: expose the dev "2v2 Fiesta vs Bots" practice toggle to the HUD.
-  if (offlineSim) hud.setFiestaPracticeHook(() => offlineSim.startFiestaPractice());
   // The Vale Cup practice-vs-bots button (the window calls world.vcupPracticeStart
   // through IWorld). Private instanced practice works online AND offline, so the
   // button is always available.
@@ -1435,9 +1592,18 @@ async function startGame(
   });
   // Dev-only chat command to scrub the world day/night cycle for testing:
   //   /daynight night|dawn|day|dusk|<0..1>|auto   (also /dev daynight, /dev time)
+  //   /daynight moon new|crescent|half|full|<0..1>|auto   (the lunar phase)
   // Render-only: it just overrides the shared clock phase (day_night_clock), so
   // the sky lighting and the minimap dial both jump to the chosen time of day.
   // Returns true when it handled the input (so it is not also sent to chat).
+  const MOON_PRESETS: Record<string, number> = {
+    new: 0,
+    crescent: 0.125,
+    half: 0.25,
+    quarter: 0.25,
+    gibbous: 0.375,
+    full: 0.5,
+  };
   const DAY_NIGHT_PRESETS: Record<string, number> = {
     midnight: 0,
     night: 0,
@@ -1462,6 +1628,31 @@ async function startGame(
     const arg = m[1].trim().toLowerCase();
     if (!arg) {
       hud.log('[dev] usage: /daynight night|dawn|day|dusk|<0..1>|auto', '#ffcf6a');
+      hud.log('[dev]        /daynight moon new|crescent|half|full|<0..1>|auto', '#ffcf6a');
+      return true;
+    }
+    const moonArg = arg.match(/^moon\s*(.*)$/);
+    if (moonArg) {
+      const moonWord = moonArg[1].trim();
+      if (!moonWord || ['auto', 'off', 'real', 'resume', 'clear'].includes(moonWord)) {
+        setLunarPhaseOverride(null);
+        hud.log('[dev] moon resumed (real lunar clock)', '#8fd0ff');
+        return true;
+      }
+      let moonPhase: number | null = moonWord in MOON_PRESETS ? MOON_PRESETS[moonWord] : null;
+      if (moonPhase === null) {
+        const n = Number.parseFloat(moonWord);
+        if (Number.isFinite(n)) moonPhase = ((n % 1) + 1) % 1;
+      }
+      if (moonPhase === null) {
+        hud.log(
+          `[dev] unknown moon "${moonWord}" - try new|crescent|half|full|<0..1>|auto`,
+          '#ffcf6a',
+        );
+        return true;
+      }
+      setLunarPhaseOverride(moonPhase);
+      hud.log(`[dev] moon set to ${moonWord} (lunar phase ${moonPhase.toFixed(2)})`, '#8fd0ff');
       return true;
     }
     if (['auto', 'off', 'real', 'resume', 'clear'].includes(arg)) {
@@ -1540,15 +1731,18 @@ async function startGame(
   chatDismiss?.addEventListener('click', () => chatInput.blur());
 
   // One keyboard/gamepad action gate for every blocking client surface. The
-  // camera prompt lives outside Hud, so it reports its open state explicitly.
-  // The Last Bell scene input lock joins here so ability/UI keys are
-  // suppressed the same way the other blocking surfaces suppress them.
+  // camera prompt lives outside Hud, so it reports its open state explicitly, and
+  // chat reports both its presence and its focus (only the latter blocks; see
+  // gameplay_input_gate.ts).
   const gameplayInputBlocked = () =>
-    hud.isModalOpen() ||
-    hud.promptModalOpen() ||
-    cameraPromptOpen() ||
-    sceneDirector.inputLocked() ||
-    chatInput.style.display === 'block';
+    isGameplayInputBlocked({
+      graphicsRebuildPaused,
+      modalOpen: hud.isModalOpen(),
+      promptModalOpen: hud.promptModalOpen(),
+      cameraPromptOpen: cameraPromptOpen(),
+      chatComposerVisible: chatInput.style.display === 'block',
+      chatComposerFocused: document.activeElement === chatInput,
+    });
 
   const input = new Input(
     canvas,
@@ -1563,6 +1757,10 @@ async function startGame(
         else if (action === 'stop') world.setPetMode('passive');
         else world.setPetMode(action); // 'defensive' | 'aggressive'
       },
+      // Ctrl+6 by default: select your own pet, the keyboard route to what clicking
+      // the pet frame does (one implementation, on the Hud, which owns the roster
+      // scan that resolves the pet).
+      onTargetPet: () => hud.targetOwnPet(),
       // slot 0 (key 1) is Attack for every class, auto-attack without needing
       // right-click; keys and clicks share the Hud's remappable slot layout
       onAbility: (slot) => hud.castSlot(slot),
@@ -1602,6 +1800,9 @@ async function startGame(
           case 'meters':
             hud.toggleMeters();
             break;
+          case 'targetAuras':
+            hud.toggleTargetAuras();
+            break;
           case 'social':
             hud.toggleSocial();
             break;
@@ -1613,6 +1814,9 @@ async function startGame(
             break;
           case 'valecup':
             hud.toggleValeCup();
+            break;
+          case 'bgFlag':
+            bgFlagKey();
             break;
           case 'mount':
             // Ride the pick immediately (every player always has one; the
@@ -1708,20 +1912,30 @@ async function startGame(
     if (characterOpen === lastCharacterOpen) return;
     lastCharacterOpen = characterOpen;
     entryDiagnostics.checkpoint(characterOpen ? 'character-open' : 'character-closed');
-    console.info(`[entry-diag] character ${characterOpen ? 'opened' : 'closed'}`);
   };
   const syncQuestDialogOpenDiagnostics = (): void => {
     const questDialogOpen = hud.questDialogOpen;
     if (questDialogOpen === lastQuestDialogOpen) return;
     lastQuestDialogOpen = questDialogOpen;
     entryDiagnostics.checkpoint(questDialogOpen ? 'quest-dialog-open' : 'quest-dialog-closed');
-    console.info(`[entry-diag] quest dialog ${questDialogOpen ? 'opened' : 'closed'}`);
   };
 
   const mobileControls = new MobileControls(input, {
     onCycleTarget: () => world.tabTarget(),
     onJump: () => input.triggerTouchJump(),
-    onInteract: () => interactKey(),
+    onInteract: () => {
+      // The touch twin of the pad reel arm (pad_reel.ts, the dispatch's
+      // 'interact' case below): mid fishing cast the Use press answers the
+      // bite with the carried implement instead of running the nearby scan
+      // over a live bobber (the phase 14 QA found the touch path still had
+      // the exact failure the pad arm closed).
+      const reelRod = padReelItemId(world.player.castingAbility, world.inventory);
+      if (reelRod !== null) {
+        world.useItem(reelRod);
+        return;
+      }
+      interactKey();
+    },
     onChat: () => openChat(),
     onChatOpen: () => openChatRead(),
     onChatClose: () => closeChat(),
@@ -1746,7 +1960,17 @@ async function startGame(
     onLeaderboard: () => hud.toggleLeaderboard(),
     onDailyRewards: () => hud.toggleDailyRewards(),
     onDeeds: () => hud.toggleDeeds(),
-    onMountToggle: () => world.toggleMounted(),
+    onMountToggle: () => {
+      // Dismount is the shared toggleMounted() path (unchanged); summoning an
+      // owned mount from a single tap goes through its reins item directly,
+      // since toggleMounted() itself never summons (src/ui/mount_quick_summon.ts).
+      // bagOwnedMounts (bags only, never bank) matches what useItem can
+      // actually summon: world.ownedMounts() includes bank-only reins that
+      // useItem would refuse (#2739 followup).
+      const action = mobileMountAction(world.player.mountKey, bagOwnedMounts(world.inventory));
+      if (action.kind === 'summon') world.useItem(action.itemId);
+      else world.toggleMounted();
+    },
     onProfessions: () => hud.toggleProfessions(),
     onNameplates: () => (renderer.showNameplates = !renderer.showNameplates),
     onMusic: () => {
@@ -1774,13 +1998,11 @@ async function startGame(
     if (optionsOpen !== lastOptionsOpen) {
       lastOptionsOpen = optionsOpen;
       entryDiagnostics.checkpoint(optionsOpen ? 'settings-open' : 'settings-closed');
-      console.info(`[entry-diag] settings ${optionsOpen ? 'opened' : 'closed'}`);
     }
   };
   hud.onQuestDialogStateChange = (open) => {
     lastQuestDialogOpen = open;
     entryDiagnostics.checkpoint(open ? 'quest-dialog-open' : 'quest-dialog-closed');
-    console.info(`[entry-diag] quest dialog ${open ? 'opened' : 'closed'}`);
     syncOverlayDiagnostics();
   };
   stopMobileMoreDiagnostics?.();
@@ -1797,7 +2019,6 @@ async function startGame(
       mobileControls.syncAutorun(false);
     }
     entryDiagnostics.checkpoint(open ? 'mobile-more-open' : 'mobile-more-closed');
-    console.info(`[entry-diag] mobile More ${open ? 'opened' : 'closed'}`);
   });
   hud.onResurrectAtSpiritHealer = () => {
     void stopAutorunForInteraction(world.resurrectAtSpiritHealer(), input, mobileControls);
@@ -1851,9 +2072,21 @@ async function startGame(
       case 'targetFriendlyNext':
         world.friendlyTabTarget();
         break;
-      case 'interact':
+      case 'interact': {
+        // The pad reel (the UX pass): mid fishing cast, the interact press
+        // answers the bite by re-using the rod (the sim's armed-window arm),
+        // instead of running a nearby scan over a live bobber and forcing
+        // the angler into cursor-mode bag clicks. Resolves the B-button
+        // interact conflict for pad anglers; keyboard anglers keep their
+        // hotbar/bags press unchanged.
+        const reelRod = padReelItemId(world.player.castingAbility, world.inventory);
+        if (reelRod !== null) {
+          world.useItem(reelRod);
+          break;
+        }
         interactKey();
         break;
+      }
       case 'bags':
         hud.toggleBags();
         break;
@@ -1878,6 +2111,9 @@ async function startGame(
       case 'meters':
         hud.toggleMeters();
         break;
+      case 'targetAuras':
+        hud.toggleTargetAuras();
+        break;
       case 'social':
         hud.toggleSocial();
         break;
@@ -1886,6 +2122,9 @@ async function startGame(
         break;
       case 'valecup':
         hud.toggleValeCup();
+        break;
+      case 'bgFlag':
+        bgFlagKey();
         break;
       case 'mount':
         world.toggleMounted();
@@ -1905,6 +2144,47 @@ async function startGame(
       case 'professions':
         hud.toggleProfessions();
         break;
+      case 'crafting':
+        // The controller panel has always OFFERED this bind (it lists every
+        // edge keybind action); the dispatch dropped it silently.
+        hud.toggleCrafting();
+        break;
+      case 'petStop':
+        // The pet edges, the dungeon finder, and the sheathe toggle: the
+        // same offered-but-dropped sweep that found Crafting (the controller
+        // panel lists every edge keybind action), each wired to its exact
+        // keyboard handler.
+        world.setPetMode('passive');
+        break;
+      case 'petTaunt':
+        world.petTaunt();
+        break;
+      case 'petAttack':
+        world.petAttack();
+        break;
+      case 'petDefensive':
+        world.setPetMode('defensive');
+        break;
+      case 'petAggressive':
+        world.setPetMode('aggressive');
+        break;
+      case 'targetPet':
+        hud.targetOwnPet();
+        break;
+      case 'dungeonFinder':
+        hud.toggleDungeonFinder();
+        break;
+      case 'sheathe': {
+        // The keyboard arm's exact rule: the world owns the gate, the cue
+        // plays only when the state moved.
+        const wasStowed = world.player.weaponStowed;
+        world.toggleWeaponStow();
+        if (world.player.weaponStowed !== wasStowed) {
+          if (world.player.weaponStowed) audio.weaponSheathe();
+          else audio.weaponUnsheathe();
+        }
+        break;
+      }
       case 'chat':
         openChat();
         break;
@@ -2046,6 +2326,13 @@ async function startGame(
       settings.set('startAttackOnAbilityUse', !!value);
       return;
     }
+    if (key === 'stopAutoAttackOnTargetSwitch') {
+      // Authoritative on the sim (issue #1358): persist locally AND mirror the
+      // live value onto the player, so the very next target switch honors it.
+      const v = settings.set('stopAutoAttackOnTargetSwitch', !!value);
+      world.setStopAutoAttackOnTargetSwitch(v);
+      return;
+    }
     if (key === 'showAttackButton') {
       // Slot-0 mode switch, read LIVE by the HUD (attackSlotIsAttack): ON keeps the
       // classic Attack toggle; OFF turns the first slot into a normal assignable one
@@ -2058,10 +2345,17 @@ async function startGame(
       if (!v) hud.cancelGroundAim();
       return;
     }
+    if (key === 'waterRipples') {
+      // The wake height field lives renderer-side (render modules never read
+      // the settings store), so the flip is pushed rather than read live.
+      renderer.setWaterRipples(settings.set('waterRipples', !!value));
+      return;
+    }
     if (
       key === 'partyFrameShowResource' ||
       key === 'partyFrameShowAbsorbs' ||
       key === 'partyFrameShowAuras' ||
+      key === 'partyFrameShowPets' ||
       key === 'partyFrameShowSelf'
     ) {
       // Read live by Hud.updatePartyFrames (its config is rebuilt from settings each
@@ -2103,6 +2397,15 @@ async function startGame(
       document.body.classList.toggle('compact-chat', settings.set('compactChat', !!value));
       return;
     }
+    if (key === 'hideUnusedActionSlots') {
+      // Purely presentational (issue 2429): a body class the action-bar CSS reads
+      // to strip the empty-slot chrome. No live subsystem to update.
+      document.body.classList.toggle(
+        'hide-unused-action-slots',
+        settings.set('hideUnusedActionSlots', !!value),
+      );
+      return;
+    }
     if (key === 'showSecondaryActionBar' || key === 'showThirdActionBar') {
       const visibility = resolveActionBarVisibility(
         {
@@ -2120,6 +2423,10 @@ async function startGame(
     }
     if (key === 'showTargetOfTarget') {
       hud.setShowTargetOfTarget(settings.set('showTargetOfTarget', !!value));
+      return;
+    }
+    if (key === 'showPetFrame') {
+      hud.setShowPetFrame(settings.set('showPetFrame', !!value));
       return;
     }
     if (key === 'showDailyRewardsChest') {
@@ -2247,12 +2554,14 @@ async function startGame(
         break;
       case 'interfaceMode':
         // Desktop/touch override: update the resolver, then re-apply the layout
-        // (body class, stable viewport) and the on-screen controls live so the
-        // switch takes effect without a reload.
+        // (body class, stable viewport) and the on-screen controls live. Refresh
+        // controls before measuring, then repeat the measurement while the browser
+        // settles its visual viewport so the canvas/camera cannot retain the old
+        // desktop width until a page reload.
         setInterfaceMode(interfaceModeFromSetting(v));
         syncPhoneTouchClass();
-        syncAppViewport();
         mobileControls.refreshInterfaceMode();
+        syncSettledAppViewport(syncAppViewport);
         break;
       case 'gamepadStickDeadzone':
         gamepad.setDeadzone(v);
@@ -2331,6 +2640,198 @@ async function startGame(
   const saved = settings.all();
   for (const k of Object.keys(saved) as (keyof GameSettings)[]) applySetting(k, saved[k]);
 
+  const captureGraphicsSettings = (): GraphicsSettingsSnapshot =>
+    normalizeGraphicsSettingsSnapshot({
+      graphicsPreset: settings.get('graphicsPreset'),
+      terrainDetail: settings.get('terrainDetail'),
+      foliageDensity: settings.get('foliageDensity'),
+      surfaceDetail: settings.get('surfaceDetail'),
+      effectsQuality: settings.get('effectsQuality'),
+      shadowQuality: settings.get('shadowQuality'),
+    });
+  let appliedGraphicsSettings = captureGraphicsSettings();
+  const graphicsCapabilities = captureGfxCapabilities(renderer.webgl);
+
+  const configureRebuiltRenderer = (next: Renderer): void => {
+    next.showNameplates = renderer.showNameplates;
+    next.showDevBadges = settings.get('showDevBadges');
+    next.showOwnNameplate = settings.get('showOwnNameplate');
+    next.showPlayerNameplates = settings.get('showPlayerNameplates');
+    next.reduceMotionSetting = settings.get('reduceMotion');
+    next.setBrightness(settings.get('brightness'));
+    next.setCameraFov(settings.get('cameraFov'));
+    next.setRenderScale(settings.get('renderScale'));
+    next.setWeatherEnabled(settings.get('weather') >= 0.5);
+    next.camYaw = input.camYaw;
+    next.camPitch = input.camPitch;
+    next.camDist = input.camDist;
+    next.onZonePrepared = (zoneId) => hud.queueMapBgPrewarm(zoneId);
+    if (import.meta.env.DEV && new URLSearchParams(location.search).get('targetcone') === '1') {
+      next.enableTargetConeDebug(tabConeHalfAt, TAB_NEAR_RADIUS, TAB_QUERY_RADIUS);
+    }
+  };
+
+  const graphicsRebuild = new GraphicsRebuildCoordinator<
+    GraphicsSettingsSnapshot,
+    Renderer,
+    RecycledRendererContext
+  >({
+    currentRenderer: () => renderer,
+    captureSettings: () => appliedGraphicsSettings,
+    settingsEqual: graphicsSettingsSnapshotsEqual,
+    preflightContext: (current) => current.preflightContextRecycle(),
+    setClientPaused: (paused) => {
+      graphicsRebuildPaused = paused;
+      if (!paused) {
+        last = performance.now();
+        acc = 0;
+      }
+    },
+    resetInput: () => {
+      input.resetForClientTransition();
+      pendingReleaseFacing = null;
+      prevCameraDrivenFacing = false;
+      Object.assign(kbTurn, newKeyboardTurnState());
+      hud.cancelGroundAim();
+      mobileControls.syncAutorun(false);
+    },
+    neutralizeOnlineInput: () => {
+      online?.neutralizeInputForClientPause();
+    },
+    showOpaqueCurtain: () => showLoadingScreen(t('hudChrome.options.graphicsApplying')),
+    awaitCurtainPaint: nextPaint,
+    hideOpaqueCurtain: hideLoadingScreen,
+    prepareTargetAssets: async (target, onProgress) => {
+      const profile = resolveGfxProfile(graphicsCapabilities, target, location.search);
+      await prepareGraphicsProfileAssets(profile.settings, world.player.pos, onProgress);
+    },
+    resetAuxiliaryRenderers: () => {
+      const resetErrors: unknown[] = [];
+      try {
+        hud.resetGraphicsPreviewContexts();
+      } catch (error) {
+        resetErrors.push(error);
+      }
+      try {
+        resetPortraitRendererForGraphicsRebuild();
+      } catch (error) {
+        resetErrors.push(error);
+      }
+      if (resetErrors.length > 0) {
+        throw new AggregateError(resetErrors, 'Graphics preview teardown failed');
+      }
+    },
+    captureRendererContext: (current) => ({
+      canvas: current.webgl.domElement,
+      context: current.webgl.getContext() as WebGL2RenderingContext,
+    }),
+    shutdownRenderer: async (current) => {
+      perf.setRenderer(null);
+      current.onZonePrepared = null;
+      current.setAudioSink(null);
+      rendererReady = false;
+      const recycled = await current.shutdown();
+      return recycled;
+    },
+    recycleContext: recycleWebGL2Context,
+    activateProfile: (target) =>
+      activateGfxProfile(resolveGfxProfile(graphicsCapabilities, target, location.search)).epoch,
+    resetProfileResources: () => resetGraphicsProfileDerivedCaches(),
+    buildRenderer: (target, recycled) => {
+      const next = new Renderer(world, recycled.canvas, nameplates, {
+        context: recycled.context,
+        initializeGfx: false,
+      });
+      configureRebuiltRenderer(next);
+      return next;
+    },
+    prepareCurrentZone: (next) =>
+      next.prepareZoneAt(world.player.pos.x, world.player.pos.z, (done, total) =>
+        setLoadingProgressRange(done, total, 35, 65),
+      ),
+    prepareNeighborZones: (next) =>
+      next.prepareZonesAround(
+        world.player.pos.x,
+        world.player.pos.z,
+        ARRIVAL_NEIGHBOR_STREAM_RADIUS,
+        (done, total) => setLoadingProgressRange(done, total, 65, 88),
+      ),
+    prewarmRenderer: async (next) => {
+      await next.prewarmInitialScene();
+      // Same law as the boot gate: the rebuilt renderer's far grid built
+      // eagerly behind this opaque curtain; hold (bounded) so the commit
+      // reveals a finished horizon instead of easing the fog out on screen.
+      await next.farVistaReady();
+    },
+    validateRenderer: (next) => {
+      next.sync(1, 0, null, 0, null);
+      if (next.webgl.getContext().isContextLost()) {
+        throw new Error('WebGL2 context was lost while validating the rebuilt renderer');
+      }
+    },
+    commit: (next, target) => {
+      settings.patch(target);
+      configureRebuiltRenderer(next);
+      next.setAudioSink(sfx);
+      renderer = next;
+      rendererReady = true;
+      hud.replaceRenderer(next);
+      perf.setRenderer(next);
+      perf.reset();
+      appliedGraphicsSettings = normalizeGraphicsSettingsSnapshot(target);
+      uiEffectsApplier.applyNow();
+      applyBrowserEffects(settings.get('browserEffects'));
+      const devGame = (window as unknown as { __game?: { renderer?: Renderer } }).__game;
+      if (devGame) devGame.renderer = next;
+      try {
+        hud.restoreGraphicsPreviewContexts();
+      } catch (error) {
+        console.warn('Graphics preview restoration failed after renderer rebuild', error);
+      }
+    },
+    onProgress: ({ stage, done, total }) => {
+      if (stage === 'assets' && done !== undefined && total !== undefined) {
+        setLoadingProgressRange(done, total, 0, 35);
+      } else if (stage === 'current-zone') {
+        setLoadingPercent(35, t('hudChrome.options.graphicsApplying'));
+      } else if (stage === 'neighbor-zones') {
+        setLoadingPercent(65, t('hudChrome.options.graphicsApplying'));
+      } else if (stage === 'prewarm') {
+        setLoadingPercent(90, t('hudChrome.options.graphicsApplying'));
+      } else if (stage === 'validation') {
+        setLoadingPercent(98, t('hudChrome.options.graphicsApplying'));
+      }
+    },
+    suspendEntryDiagnostics: () => entryDiagnostics.suspend(),
+    resumeEntryDiagnostics: (target) => entryDiagnostics.resume(target.graphicsPreset),
+    markCrashPhase: (phase, from, target, generation) => {
+      if (phase === 'starting') {
+        stampGraphicsRebuildProbe({
+          generation,
+          at: Date.now(),
+          phase,
+          from: { ...from },
+          target: { ...target },
+        });
+      } else {
+        updateGraphicsRebuildProbePhase(phase);
+      }
+    },
+    clearCrashMarker: clearGraphicsRebuildProbe,
+    isContextFailure: (error) => {
+      const message = error instanceof Error ? error.message : String(error);
+      return /WebGL(?:2)? context|WEBGL_lose_context|context (?:lost|recycle|restored|replaced)/i.test(
+        message,
+      );
+    },
+    showFatalReload: (error) => {
+      console.error('Live graphics renderer rebuild failed fatally', error);
+      fatalOverlay(t('hudChrome.options.graphicsFatal'), {
+        buttonLabel: t('hudChrome.options.graphicsReload'),
+      });
+    },
+  });
+
   // the options menu drives logout + key-capture + settings, all of which need
   // refs that only exist now (input/renderer) or are page-level (reload)
   hud.attachOptions({
@@ -2345,6 +2846,27 @@ async function startGame(
     captureKey: (cb) => input.captureNextKey(cb),
     settings,
     onSettingChange: (key, value) => applySetting(key, value),
+    graphicsApplied: () => appliedGraphicsSettings,
+    applyGraphics: async (draft) => {
+      const target = normalizeGraphicsSettingsSnapshot(draft);
+      const targetProfile = resolveGfxProfile(graphicsCapabilities, target, location.search);
+      const mode = graphicsApplyMode(
+        appliedGraphicsSettings,
+        target,
+        getActiveGfxProfile().fingerprint,
+        targetProfile.fingerprint,
+      );
+      if (mode === 'unchanged') return 'applied';
+      if (mode === 'saved') {
+        settings.patch(target);
+        appliedGraphicsSettings = target;
+        uiEffectsApplier.applyNow();
+        return 'saved';
+      }
+      const outcome = await graphicsRebuild.rebuild(target);
+      if (outcome.status === 'applied' || outcome.status === 'unchanged') return 'applied';
+      return outcome.status === 'fatal' ? 'fatal' : 'failed';
+    },
     theme: {
       get: () => themeStore.get(),
       setPreset: (id: PresetId) => {
@@ -2407,6 +2929,24 @@ async function startGame(
   // otherwise, so it is a live affordance offline too (not gated on `online`).
   hud.attachDiscordHook(() => openDiscordEntry());
   if (online) {
+    // Issue #2416: chain onto whatever onReconnected enterWorld already armed
+    // (the reconnect overlay teardown), rather than replacing it: hud does not
+    // exist yet when enterWorld sets that handler, so the market resync has to
+    // be wired here instead, once hud is actually available.
+    const priorOnReconnected = online.onReconnected;
+    online.onReconnected = () => {
+      priorOnReconnected?.();
+      hud.marketResyncAfterReconnect();
+      // A fresh join (as opposed to a resume within the linkdead grace window)
+      // hands the server a brand-new PlayerMeta with stopAutoAttackOnTargetSwitch
+      // undefined, so the stored preference needs a re-push, the same way it is
+      // pushed once on world entry above. onReconnected fires before ClientWorld
+      // marks itself connected again, so any send from here would be silently
+      // dropped; ClientWorld owns the re-push itself (it remembers the last
+      // value passed to setStopAutoAttackOnTargetSwitch and replays it right
+      // after connected flips true, and again after spectate ends), so nothing
+      // needs to happen on this side.
+    };
     // A hosted dev/PBE realm booted with ALLOW_DEV_COMMANDS=1 lights the /dev GUI
     // even in a production client build, where import.meta.env.DEV is false. That
     // build flag alone used to gate it, which is why a tester on a dev realm could
@@ -2678,7 +3218,28 @@ async function startGame(
       }
     }
   }
+  // The deliberate Thornhollow Fields flag press. Inside a live match the bare interact
+  // key also routes here (the field has no other interactables), which gives
+  // the mobile interact button flag parity for free; the world owns every rule
+  // (radius, team, the return-beats-press race), so a stray press is a no-op.
+  function bgFlagKey(): void {
+    if (world.bgInfo?.match) world.bgFlagAction();
+  }
+
+  // The R40 per-use effect confirm gate, shared by every gather entry point
+  // (world click, interact key, gathering-tool use): the pure question from
+  // the view core, the ask through the HUD's confirm-dialog family. The
+  // harvest proceeds on either answer; only the charge follows it.
+  const gatherEffectConfirm = {
+    needed: (nodeId: string) => gatherEffectPrompt(world, nodeId),
+    ask: (prompt: { effectId: string; charges: number }, proceed: (confirmed: boolean) => void) =>
+      hud.confirmToolEffectUse(prompt, proceed),
+  };
   function interactKey(): void {
+    if (world.bgInfo?.match?.state === 'active') {
+      world.bgFlagAction();
+      return;
+    }
     stopAutorunForInteraction(
       tryNearbyInteraction(
         world,
@@ -2687,7 +3248,10 @@ async function startGame(
         (node) => gatherNodeToolGateFor(world, node),
         t('questUi.errors.tooFar'),
         t('hudChrome.gathering.notReady'),
+        t('questUi.errors.escortAway'),
         t('errors.nothingInteract'),
+        undefined,
+        gatherEffectConfirm,
       ),
       input,
       mobileControls,
@@ -2719,7 +3283,15 @@ async function startGame(
     // ignoreFences: the player can hop fences, so route straight over them
     // instead of around, resolveMove fires the jump as we reach the rail.
     // swim: the player can swim, so let the route cross/enter water.
-    return findPlayerPath(world.cfg.seed, world.player.pos, target, undefined, true, true);
+    return findPlayerPath(
+      world.cfg.seed,
+      world.player.pos,
+      target,
+      undefined,
+      true,
+      true,
+      world.riftCollisionToken,
+    );
   }
 
   function resolvedClickMoveTarget(target: { x: number; z: number }): {
@@ -2727,7 +3299,7 @@ async function startGame(
     z: number;
   } {
     // swim: keep a clicked water destination instead of snapping it to shore.
-    return resolvePlayerDestination(world.cfg.seed, target, true);
+    return resolvePlayerDestination(world.cfg.seed, target, true, world.riftCollisionToken);
   }
 
   function syncGroundAimReticle(): void {
@@ -2798,6 +3370,7 @@ async function startGame(
             t('questUi.errors.tooFar'),
             t('hudChrome.gathering.notReady'),
             gatherNodeToolGateFor(world, node),
+            gatherEffectConfirm,
           ),
           input,
           mobileControls,
@@ -2918,7 +3491,8 @@ async function startGame(
         }
       }
       if (best !== null) {
-        const e = world.entities.get(best)!;
+        const e = world.entities.get(best);
+        if (!e) return;
         world.targetEntity(best);
         const target = resolvedClickMoveTarget({ x: e.pos.x, z: e.pos.z });
         input.setClickMoveTarget(
@@ -3157,6 +3731,11 @@ async function startGame(
   // eases back to zero so the camera settles in behind the character.
   let lastInterpFacing: number | null = null;
   let wasClickMoving = false;
+  // Tracks the player's dead/ghost state across frames so a respawn/release-spirit
+  // edge (see isRespawnFacingResyncEdge) can resync lastInterpFacing below, the same
+  // way the click-to-move release edge does just underneath it.
+  let prevPlayerDead = world.player.dead;
+  let prevPlayerGhost = world.player.ghost;
   // Tracks camera-driven facing (classic right-mouse mouselook, or Mouse Camera
   // mode while a movement key is held) across frames so its falling edge can
   // commit the final camera yaw to the player facing (see mouselook_release.ts
@@ -3173,6 +3752,15 @@ async function startGame(
   // channel, passed through on the one engage-edge frame so the server still
   // sees a manual turn (breaks /follow, marks anti-AFK activity).
   const kbTurn = newKeyboardTurnState();
+  const kbTurnArgs: KeyboardTurnArgs = {
+    turnLeft: false,
+    turnRight: false,
+    turnAllowed: false,
+    sentFacing: null,
+    serverFacing: 0,
+    echoMs: 0,
+    frameDt: 0,
+  };
   function updateCamera(frameDt: number, interpFacing: number): void {
     const mi = input.readMoveInput();
     const clickMoving = !!input.clickMoveTarget && !input.suspendMovement && !movementFrozen();
@@ -3183,6 +3771,17 @@ async function startGame(
     // handoff stays smooth even in pure-follow (non-camera-driven) mode.
     if (wasClickMoving && !clickMoving) lastInterpFacing = interpFacing;
     wasClickMoving = clickMoving;
+    // A respawn/release-spirit forces the player's facing to 0 (see spirit.ts and
+    // entity_roster.ts); resync here too, or the rigid follow term below reads the
+    // gap against the stale pre-death lastInterpFacing as a turn and sticks the
+    // camera off-yaw (see isRespawnFacingResyncEdge for why).
+    const playerDead = world.player.dead;
+    const playerGhost = world.player.ghost;
+    if (isRespawnFacingResyncEdge(prevPlayerDead, prevPlayerGhost, playerDead, playerGhost)) {
+      lastInterpFacing = interpFacing;
+    }
+    prevPlayerDead = playerDead;
+    prevPlayerGhost = playerGhost;
     const next = updateFollowCameraYaw({
       camYaw: input.camYaw,
       interpFacing,
@@ -3311,7 +3910,15 @@ async function startGame(
               clickMoveStuckSince = now;
               input.rerouteClickMoveTarget(
                 goal,
-                findPlayerPath(world.cfg.seed, world.player.pos, goal, undefined, false, true),
+                findPlayerPath(
+                  world.cfg.seed,
+                  world.player.pos,
+                  goal,
+                  undefined,
+                  false,
+                  true,
+                  world.riftCollisionToken,
+                ),
               );
             } else {
               input.clearClickMove();
@@ -3323,8 +3930,8 @@ async function startGame(
     return { mi, facing };
   }
 
-  function partyMemberIds(): Set<number> {
-    const ids = new Set<number>();
+  function partyMemberIds(ids: Set<number>): Set<number> {
+    ids.clear();
     for (const m of world.partyInfo?.members ?? []) {
       if (m.pid !== world.playerId) ids.add(m.pid);
     }
@@ -3337,6 +3944,8 @@ async function startGame(
   // hovered mob dying or turning hostile updates without waiting for a re-pick.
   const hoverPickGate = new HoverPickGate();
   let hoverPickedId: number | null = null;
+  const hoverPartyMemberIds = new Set<number>();
+  const hoverPvpOpponentIds = new Set<number>();
 
   function updateHoverCursor(): void {
     if (!input.hoverActive || input.isDragging() || hud.isModalOpen()) {
@@ -3348,8 +3957,10 @@ async function startGame(
       hoverPickedId = renderer.pick(input.hoverX, input.hoverY);
     }
     const entity = hoverPickedId !== null ? world.entities.get(hoverPickedId) : undefined;
-    const pvpOpponents = activePvpOpponentIds(world);
-    input.setHoverCursor(hoverCursorKind(entity, world.playerId, partyMemberIds(), pvpOpponents));
+    const pvpOpponents = activePvpOpponentIds(world, hoverPvpOpponentIds);
+    input.setHoverCursor(
+      hoverCursorKind(entity, world.playerId, partyMemberIds(hoverPartyMemberIds), pvpOpponents),
+    );
     // WoW-style mouseover tooltip (name / level / creature type) for a mob under
     // the cursor, reusing the same (gated) pick this function already does for
     // the hover-cursor kind above; the tooltip content still re-resolves every
@@ -3361,6 +3972,24 @@ async function startGame(
     } else {
       hud.clearHoverTooltip();
     }
+  }
+
+  // WoW-style breath mirror bar. Display-only: the HUD steps its own copy of
+  // the sim's breath clock (sim/breath.ts constants) from the DISPLAYED self
+  // state, so it works identically offline and online with no wire traffic;
+  // the sim deals the authoritative drowning damage on its own copy.
+  const breathBar = new BreathBar(document.getElementById('ui') ?? document.body);
+  let breathUsedSeconds = 0;
+  function updateBreathBar(dt: number): void {
+    const self = world.entities.get(world.playerId);
+    if (!self || self.dead) {
+      breathUsedSeconds = 0;
+      breathBar.update(1, false, dt);
+      return;
+    }
+    const submerged = isSubmerged(self, world.cfg.seed);
+    breathUsedSeconds = stepBreathUsedSeconds(breathUsedSeconds, submerged, dt);
+    breathBar.update(breathFraction(breathUsedSeconds), submerged, dt);
   }
 
   // Desktop-only gather-node hover tooltip (Professions 2.0): the
@@ -3398,6 +4027,7 @@ async function startGame(
         t('questUi.errors.tooFar'),
         t('hudChrome.gathering.notReady'),
         gatherNodeToolGateFor(world, node),
+        gatherEffectConfirm,
       ),
       input,
       mobileControls,
@@ -3440,6 +4070,7 @@ async function startGame(
   // perf_metrics_sampler.ts; here we inject the live sources.
   const sampleMetrics = createMetricsSampler({
     renderer,
+    getRenderer: () => renderer,
     meter: perfMeter,
     getOnline: () => online,
     getEntityCount: () => world.entities.size,
@@ -3449,8 +4080,28 @@ async function startGame(
     getApm: () => inputMeter.apm(performance.now()),
   });
 
+  function visualFacingFor(
+    mi: ReturnType<typeof input.readMoveInput>,
+    baseFacing: number,
+  ): number | null {
+    return !movementFrozen() ? diagonalMovementVisualFacing(mi, baseFacing) : null;
+  }
+
+  const perfNetworkStats = {
+    connected: false,
+    snapInterval: 0,
+    lastSnapAge: -1,
+    alpha: 0,
+  };
+  const selfMotionFrameBuffer = new SelfMotionFrameBuffer();
+
   function frame(now: number): void {
     requestAnimationFrame(frame);
+    if (graphicsRebuildPaused) {
+      last = now;
+      acc = 0;
+      return;
+    }
     maybeWarmCurrentZone();
     let frameDt = (now - last) / 1000;
     last = now;
@@ -3487,15 +4138,27 @@ async function startGame(
       mobileControls.syncAutorun(false);
     }
     playerWasDead = playerDead;
-    perf.trace('input.updateTouchLook', () => input.updateTouchLook(frameDt), {
-      frameDtMs: frameDt * 1000,
-    });
-    perf.trace('input.gamepad', () => gamepad.poll(frameDt), {
-      frameDtMs: frameDt * 1000,
-    });
-    perf.trace('input.hoverCursor', () => updateHoverCursor(), {
-      active: input.hoverActive,
-    });
+    const frameDtMs = frameDt * 1000;
+    let traceStart = perf.startTrace();
+    try {
+      input.updateTouchLook(frameDt);
+    } finally {
+      perf.finishTrace('input.updateTouchLook', traceStart, 'frameDtMs', frameDtMs);
+    }
+    traceStart = perf.startTrace();
+    try {
+      gamepad.poll(frameDt);
+    } finally {
+      perf.finishTrace('input.gamepad', traceStart, 'frameDtMs', frameDtMs);
+    }
+    const hoverActive = input.hoverActive;
+    traceStart = perf.startTrace();
+    try {
+      updateHoverCursor();
+    } finally {
+      perf.finishTrace('input.hoverCursor', traceStart, 'active', hoverActive);
+    }
+    updateBreathBar(frameDt);
     perf.markInputFrame(performance.now());
 
     const mouselook = intro === null && input.isMouselookActive() && !movementFrozen();
@@ -3529,10 +4192,6 @@ async function startGame(
       ? (renderFacing ?? controllerFacing ?? pendingReleaseFacing)
       : null;
 
-    const visualFacingFor = (
-      mi: ReturnType<typeof input.readMoveInput>,
-      baseFacing: number,
-    ): number | null => (!movementFrozen() ? diagonalMovementVisualFacing(mi, baseFacing) : null);
     if (offlineSim) {
       acc += frameDt;
       // Supply the UTC day for the delve daily reset (the sim never reads the wall
@@ -3546,34 +4205,65 @@ async function startGame(
         );
         Object.assign(offlineSim.moveInput, mi);
         const stepFacing = movementFacing ?? facing;
-        if (stepFacing !== null) offlineSim.player.facing = stepFacing;
+        // A stun locks facing (issue #2426): stepPlayerMotion already blocks
+        // turnLeft/turnRight while stunned, but mouselook/controller facing is
+        // applied out of band, here, before tick(), and must honor the same gate
+        // or a stunned player can still turn to face away from a positional attack.
+        if (stepFacing !== null && !isStunned(offlineSim.player)) {
+          offlineSim.player.facing = stepFacing;
+        }
         offlineSim.updateFiestaBots(); // dev: steer Fiesta practice bots (no-op unless active)
         perf.markInputSent(performance.now());
-        const events = perf.time('sim', () =>
-          perf.trace('sim.tick', () => offlineSim.tick(), { mode: 'offline' }),
-        );
-        sceneDirector.handleEvents(events);
-        perf.time('events', () =>
-          perf.trace('hud.handleEvents', () => hud.handleEvents(events), {
-            mode: 'offline',
-            events: events.length,
-          }),
-        );
+        const simStart = perf.startTime();
+        let events: ReturnType<typeof offlineSim.tick>;
+        traceStart = perf.startTrace();
+        try {
+          events = offlineSim.tick();
+        } finally {
+          perf.finishTrace('sim.tick', traceStart, 'mode', 'offline');
+          perf.finishTime('sim', simStart);
+        }
+        const eventsLength = events.length;
+        const eventsStart = perf.startTime();
+        traceStart = perf.startTrace();
+        try {
+          hud.handleEvents(events);
+        } finally {
+          perf.finishTrace(
+            'hud.handleEvents',
+            traceStart,
+            'mode',
+            'offline',
+            'events',
+            eventsLength,
+          );
+          perf.finishTime('events', eventsStart);
+        }
         // A tick consumed the latched release facing (movementFacing fed
         // stepFacing above); drop it so it is not re-applied next frame.
         pendingReleaseFacing = null;
         acc -= DT;
       }
+      // Re-check immediately after the tick loop, before renderer.sync() below reads
+      // offlineSim.player.pos for this frame. The call at the top of frame() only sees
+      // the position as of the START of the frame; a tick above can itself teleport the
+      // player (release-spirit/resurrect landing in a different zone, a dungeon door or
+      // portal trigger reached mid-tick), which the top-of-frame call has no way to see.
+      // Left unchecked, this frame would still render the just-teleported position with
+      // no loading curtain and an unprepared destination zone (a one-frame flash of an
+      // empty/black view). maybeWarmCurrentZone() is idempotent per call (it early-returns
+      // once a warmup is already in flight or the zone is ready), so calling it twice in
+      // one frame is safe; it does not remove the top-of-frame call, which still owns the
+      // input-suspend handling and catches a teleport triggered from outside the tick
+      // (e.g. a UI action) before this frame's tick even runs.
+      maybeWarmCurrentZone();
       const pp = offlineSim.player;
-      perf.trace(
-        'camera.follow',
-        () =>
-          updateCamera(frameDt, pp.prevFacing + wrapAngle(pp.facing - pp.prevFacing) * (acc / DT)),
-        {
-          mode: 'offline',
-          frameDtMs: frameDt * 1000,
-        },
-      );
+      traceStart = perf.startTrace();
+      try {
+        updateCamera(frameDt, pp.prevFacing + wrapAngle(pp.facing - pp.prevFacing) * (acc / DT));
+      } finally {
+        perf.finishTrace('camera.follow', traceStart, 'mode', 'offline', 'frameDtMs', frameDtMs);
+      }
       introCameraTick(now);
       sceneCameraTick();
       renderer.camYaw = input.camYaw;
@@ -3584,28 +4274,49 @@ async function startGame(
       const offlineRenderFacing =
         visualFacingFor(input.readMoveInput(), movementFacing ?? offlineSim.player.facing) ??
         movementFacing;
-      perf.time('renderer', () =>
-        perf.trace(
+      const offlineAlpha = acc / DT;
+      const offlineViews = renderer.views.size;
+      const rendererStart = perf.startTime();
+      traceStart = perf.startTrace();
+      try {
+        renderer.sync(acc / DT, frameDt, offlineRenderFacing, 0, null);
+      } finally {
+        perf.finishTrace(
           'renderer.sync',
-          () => renderer.sync(acc / DT, frameDt, offlineRenderFacing, 0, null),
-          {
-            mode: 'offline',
-            views: renderer.views.size,
-            alpha: acc / DT,
-          },
-        ),
-      );
-      perf.trace('ui.clickMoveMarker', () => updateClickMoveMarker());
+          traceStart,
+          'mode',
+          'offline',
+          'views',
+          offlineViews,
+          'alpha',
+          offlineAlpha,
+        );
+        perf.finishTime('renderer', rendererStart);
+      }
+      traceStart = perf.startTrace();
+      try {
+        updateClickMoveMarker();
+      } finally {
+        perf.finishTrace('ui.clickMoveMarker', traceStart);
+      }
       perf.markInputVisible(performance.now());
       if (settings.get('walkByAutoloot')) autoLoot.run(world, now);
-      perf.time('hud', () => perf.trace('hud.update', () => hud.update(), { mode: 'offline' }));
+      const hudStart = perf.startTime();
+      traceStart = perf.startTrace();
+      try {
+        hud.update();
+      } finally {
+        perf.finishTrace('hud.update', traceStart, 'mode', 'offline');
+        perf.finishTime('hud', hudStart);
+      }
       perf.tick(now);
       entryDiagnostics.renderedFrame(now);
       return;
     }
 
     // online: inputs stream on a timer inside ClientWorld; here we mirror state
-    const net = online!;
+    const net = online;
+    if (!net) return;
     spectateBadge.update(net.spectating);
     const spectateFacing = net.consumeSpectateFacing();
     if (spectateFacing !== null) input.camYaw = spectateFacing;
@@ -3632,15 +4343,14 @@ async function startGame(
     // stutter this feature has chased). The turn flags are zeroed on the wire
     // while the local heading owns the channel, or the server would integrate
     // the turn a second time on top of the streamed facing.
-    const kbFacing = stepKeyboardTurnFacing(kbTurn, {
-      turnLeft: resolved.mi.turnLeft,
-      turnRight: resolved.mi.turnRight,
-      turnAllowed: net.spectating === null && !movementFrozen() && !isStunned(pe),
-      sentFacing: foreignFacing,
-      serverFacing: interpServerFacing,
-      echoMs: onlineInputEchoMs,
-      frameDt,
-    });
+    kbTurnArgs.turnLeft = resolved.mi.turnLeft;
+    kbTurnArgs.turnRight = resolved.mi.turnRight;
+    kbTurnArgs.turnAllowed = net.spectating === null && !movementFrozen() && !isStunned(pe);
+    kbTurnArgs.sentFacing = foreignFacing;
+    kbTurnArgs.serverFacing = interpServerFacing;
+    kbTurnArgs.echoMs = onlineInputEchoMs;
+    kbTurnArgs.frameDt = frameDt;
+    const kbFacing = stepKeyboardTurnFacing(kbTurn, kbTurnArgs);
     // wireFacing, not kbFacing: only input-derived headings go on the wire.
     // Streaming the seam/glide corrections (which chase the mirror) would
     // close a feedback loop through the server that at high RTT never
@@ -3677,29 +4387,53 @@ async function startGame(
       drainedEvents,
       net.playerId,
     );
-    perf.time('events', () =>
-      perf.trace('hud.handleEvents', () => hud.handleEvents(drainedEvents), {
-        mode: 'online',
-        events: drainedEvents.length,
-      }),
-    );
+    const drainedEventsLength = drainedEvents.length;
+    const eventsStart = perf.startTime();
+    traceStart = perf.startTrace();
+    try {
+      hud.handleEvents(drainedEvents);
+    } finally {
+      perf.finishTrace(
+        'hud.handleEvents',
+        traceStart,
+        'mode',
+        'online',
+        'events',
+        drainedEventsLength,
+      );
+      perf.finishTime('events', eventsStart);
+    }
     if (net.consumeProfanityChanged()) {
-      perf.trace('hud.setProfanityWords', () => hud.setProfanityWords(net.profanityWords), {
-        words: net.profanityWords.length,
-      });
+      const profanityWordsLength = net.profanityWords.length;
+      traceStart = perf.startTrace();
+      try {
+        hud.setProfanityWords(net.profanityWords);
+      } finally {
+        perf.finishTrace('hud.setProfanityWords', traceStart, 'words', profanityWordsLength);
+      }
     }
     if (net.consumeInventoryChanged()) {
-      perf.trace('hud.onInventoryChanged', () => hud.onInventoryChanged());
+      traceStart = perf.startTrace();
+      try {
+        hud.onInventoryChanged();
+      } finally {
+        perf.finishTrace('hud.onInventoryChanged', traceStart);
+      }
     }
     if (net.consumeCosmeticsChanged()) {
-      perf.trace('hud.onCosmeticsChanged', () => hud.onCosmeticsChanged());
+      traceStart = perf.startTrace();
+      try {
+        hud.onCosmeticsChanged();
+      } finally {
+        perf.finishTrace('hud.onCosmeticsChanged', traceStart);
+      }
     }
-    perf.setNetwork({
-      connected: net.connected,
-      snapInterval: Math.round(net.snapInterval),
-      lastSnapAge: net.lastSnapAt > 0 ? Math.round(performance.now() - net.lastSnapAt) : -1,
-      alpha: Math.round(alpha * 100) / 100,
-    });
+    perfNetworkStats.connected = net.connected;
+    perfNetworkStats.snapInterval = Math.round(net.snapInterval);
+    perfNetworkStats.lastSnapAge =
+      net.lastSnapAt > 0 ? Math.round(performance.now() - net.lastSnapAt) : -1;
+    perfNetworkStats.alpha = Math.round(alpha * 100) / 100;
+    perf.setNetwork(perfNetworkStats);
     // Always-on net-pipeline counters (net_pipeline_stats.ts): fold the
     // snapshots-applied-since-last-frame count, then publish the stats source
     // UNGATED (ruling R9), unlike the overlay-gated setNetwork above; the
@@ -3715,9 +4449,8 @@ async function startGame(
     // a delve (the portcullis door clamps are not mirrored client-side).
     const selfMotion: SelfMotionFrame | null = SELF_MOTION_DISABLED
       ? null
-      : {
-          enabled:
-            net.spectating === null &&
+      : selfMotionFrameBuffer.write(
+          net.spectating === null &&
             !movementFrozen() &&
             !playerImmobilized() &&
             !isDelvePos(pe.pos.x) &&
@@ -3730,54 +4463,85 @@ async function startGame(
             // not re-simulate: predicting a fall through it would fight the
             // authoritative pull-up and show the correction as a stutter.
             pe.climbing !== true,
-          moveInput: resolved.mi,
-          displayFacing: netFacing ?? interpServerFacing,
-          echoMs: onlineInputEchoMs,
-          jitterMs: onlineJitterMs,
+          resolved.mi,
+          netFacing ?? interpServerFacing,
+          onlineInputEchoMs,
+          onlineJitterMs,
           alpha,
           frameDt,
-        };
-    perf.trace('camera.follow', () => updateCamera(frameDt, kbFacing ?? interpServerFacing), {
-      mode: 'online',
-      alpha,
-      frameDtMs: frameDt * 1000,
-      lastSnapAge: net.lastSnapAt > 0 ? performance.now() - net.lastSnapAt : -1,
-    });
+        );
+    const cameraLastSnapAge = net.lastSnapAt > 0 ? performance.now() - net.lastSnapAt : -1;
+    traceStart = perf.startTrace();
+    try {
+      updateCamera(frameDt, kbFacing ?? interpServerFacing);
+    } finally {
+      perf.finishTrace(
+        'camera.follow',
+        traceStart,
+        'mode',
+        'online',
+        'alpha',
+        alpha,
+        'frameDtMs',
+        frameDtMs,
+        'lastSnapAge',
+        cameraLastSnapAge,
+      );
+    }
     introCameraTick(now);
     sceneCameraTick();
     renderer.camYaw = input.camYaw;
     renderer.camPitch = input.camPitch;
     renderer.camDist = input.camDist;
     syncGroundAimReticle();
-    perf.time('renderer', () =>
-      perf.trace(
+    const onlineViews = renderer.views.size;
+    const rendererStart = perf.startTime();
+    traceStart = perf.startTrace();
+    try {
+      renderer.sync(
+        alpha,
+        frameDt,
+        // netFacing (mouselook, keyboard turn, click-move, release latch)
+        // is applied server-side the moment it arrives, so the model may
+        // show it immediately; without it the click-move yaw would lag
+        // the predicted position by a round trip and corners would slide.
+        net.spectating === null ? onlineRenderFacing : null,
+        adaptiveSelfAlphaLead(onlineInputEchoMs, onlineJitterMs, net.snapInterval),
+        selfMotion,
+        selfAuthoritativeDiscontinuity,
+      );
+    } finally {
+      perf.finishTrace(
         'renderer.sync',
-        () =>
-          renderer.sync(
-            alpha,
-            frameDt,
-            // netFacing (mouselook, keyboard turn, click-move, release latch)
-            // is applied server-side the moment it arrives, so the model may
-            // show it immediately; without it the click-move yaw would lag
-            // the predicted position by a round trip and corners would slide.
-            net.spectating === null ? onlineRenderFacing : null,
-            adaptiveSelfAlphaLead(onlineInputEchoMs, onlineJitterMs, net.snapInterval),
-            selfMotion,
-            selfAuthoritativeDiscontinuity,
-          ),
-        {
-          mode: 'online',
-          views: renderer.views.size,
-          alpha,
-          frameDtMs: frameDt * 1000,
-        },
-      ),
-    );
-    perf.trace('ui.clickMoveMarker', () => updateClickMoveMarker());
+        traceStart,
+        'mode',
+        'online',
+        'views',
+        onlineViews,
+        'alpha',
+        alpha,
+        'frameDtMs',
+        frameDtMs,
+      );
+      perf.finishTime('renderer', rendererStart);
+    }
+    traceStart = perf.startTrace();
+    try {
+      updateClickMoveMarker();
+    } finally {
+      perf.finishTrace('ui.clickMoveMarker', traceStart);
+    }
     maybeShowImmobileNote(now);
     perf.markInputVisible(performance.now());
     if (settings.get('walkByAutoloot')) autoLoot.run(world, now);
-    perf.time('hud', () => perf.trace('hud.update', () => hud.update(), { mode: 'online' }));
+    const hudStart = perf.startTime();
+    traceStart = perf.startTrace();
+    try {
+      hud.update();
+    } finally {
+      perf.finishTrace('hud.update', traceStart, 'mode', 'online');
+      perf.finishTime('hud', hudStart);
+    }
     perf.tick(now);
     entryDiagnostics.renderedFrame(now);
   }
@@ -3997,20 +4761,47 @@ async function startGame(
     // has been materialized successfully.
     console.warn('Renderer prewarm failed', err);
   }
-  try {
-    await hud.prewarmCharacterPreview();
-  } catch (err) {
-    // The paperdoll preview is optional UI. If its secondary WebGL context
-    // cannot prewarm, opening the window can still take the normal lazy path.
-    console.warn('Character preview prewarm failed', err);
+  // The entry allocation spike is over: start streaming the mob bodies the
+  // packaged iOS boot gate deliberately excluded (empty everywhere else). A mob
+  // whose GLB is still arriving renders a beat late through the fail-soft
+  // view-create path, instead of its decode competing with the scene build for
+  // the WebContent memory ceiling.
+  const streamedCount = startStreamedCharacterPreloads();
+  if (streamedCount > 0) {
+    console.info(`[entry-guard] streaming ${streamedCount} deferred character assets`);
   }
-  try {
-    await hud.prewarmArmoryPreview();
-  } catch (err) {
-    // The store is optional and online-only. A secondary-context failure must
-    // never prevent entering the world; opening it can retain the lazy path.
-    console.warn('Armory preview prewarm failed', err);
+  // Each preview prewarm mints a SECONDARY WebGL context beside the world
+  // renderer: real WebKit GPU-process residency held for a window the player
+  // may never open. The 4 GB-class tight profile skips both and keeps their
+  // documented lazy first-open path instead (the catch arms below already
+  // promise exactly that fallback).
+  if (!GFX.tightMemory) {
+    try {
+      await hud.prewarmCharacterPreview();
+    } catch (err) {
+      // The paperdoll preview is optional UI. If its secondary WebGL context
+      // cannot prewarm, opening the window can still take the normal lazy path.
+      console.warn('Character preview prewarm failed', err);
+    }
+    try {
+      await hud.prewarmArmoryPreview();
+    } catch (err) {
+      // The store is optional and online-only. A secondary-context failure must
+      // never prevent entering the world; opening it can retain the lazy path.
+      console.warn('Armory preview prewarm failed', err);
+    }
   }
+  // The far vista has been building eagerly since the renderer was
+  // constructed, overlapping every asset wait above. Hold the curtain
+  // (bounded) until the grid can stand in for the fog, so the first visible
+  // frame carries the finished horizon; without this gate a loaded
+  // production boot starves the build and the fog lifts tens of seconds
+  // into play. On timeout the classic eased flip covers it, as before.
+  const farVistaReady = await renderer.farVistaReady();
+  entryDiagnostics.checkpoint('far-vista-ready', {
+    ...renderEntryDiagnostics(),
+    farVistaReady,
+  });
   setLoadingPercent(100, t('loading.enteringWorld'));
   await nextPaint();
   last = performance.now();
@@ -4051,7 +4842,12 @@ async function startGame(
           applyMouseCamera: (enabled) => applySetting('mouseCamera', enabled),
           isBlocked: () => intro !== null,
         });
-        (window as any).__game = {
+        (
+          window as Window &
+            typeof globalThis & {
+              __game?: Record<string, unknown>;
+            }
+        ).__game = {
           sim: world,
           world,
           renderer,
@@ -4063,6 +4859,11 @@ async function startGame(
           gamepad,
           scenes: { registeredSceneIds, sceneById, playSceneForPlayer },
           music,
+          // The live content table, for E2E rigs that stage a template state
+          // shipped content cannot reach (scripts/shot_2513_unmapped_corpse.mjs
+          // retags a template all-unmapped, the tests' withUnmappedTemplate
+          // idiom). Debug surface only; never written by game code.
+          MOBS,
           /** Opens the board and drains queued sim events. Do not call sim.lockpickEngage directly offline. */
           lockpickEngage: (objectId: number, ante: number) =>
             hud.submitLockpickEngage(objectId, ante as 1 | 2 | 3),
@@ -4086,7 +4887,7 @@ async function startGame(
             },
           );
         }
-      }, LOADING_FADE_MS);
+      }, loadingCurtainFadeDelayMs());
     }),
   );
   // Now in-game: fade the home-page theme out (it kept playing through loading).
@@ -4137,6 +4938,17 @@ async function startOffline(
   // weapon model on the mech (swap them in the bag to see each one). DEV builds
   // only (mirrors devCommands gating); inert in production.
   if (import.meta.env.DEV && new URLSearchParams(location.search).has('mech')) {
+    // Own every chroma before wearing one. Without this the Character window's
+    // skin row filters to the OWNED chromas, finds none and collapses to
+    // nothing: the session spawns inside the mech with no way to switch chroma
+    // or get back out of it. Unlocking the set makes the real in-game path
+    // exercisable -- click a swatch to change chroma, Unequip to return to your
+    // own body, then right-click the returned armor plate in the bag to put it
+    // back on.
+    sim.accountCosmetics = {
+      ...sim.accountCosmetics,
+      mechChromaIds: MECH_CHROMAS.map((c) => c.id),
+    };
     sim.setPlayerSkin(sim.playerId, 0, 'mech');
     // One weapon per held-model family (sword / axe / mace / dagger / staff / wand
     // / polearm); only the ones this class can wield are granted, so every bag
@@ -4179,6 +4991,15 @@ async function startOffline(
 // ---------------------------------------------------------------------------
 
 const api = new Api();
+const seekerEntitlementSync = createSeekerEntitlementSync({
+  entitlement: async () => (await api.seekerEntitlement()).entitled,
+  createClaimProof: () => createNativeAttestationProof(api.base, 'seeker-claim'),
+  claim: async (proof) => (await api.claimSeekerEntitlement(proof)).entitled,
+  onPermanentFailure: (error) => {
+    console.error('[wallet] Seeker entitlement sync was rejected', error);
+    flashWalletError(userFacingApiError(error));
+  },
+});
 
 // Referral capture: a visitor who arrives from a shared player card link
 // (?ref=<slug>) carries the referrer's slug into registration. Read it once at
@@ -4263,10 +5084,13 @@ function renderSkinPicker(
   });
 }
 
-/** Give each class button a small portrait preview of that class. Wired to
- *  {@link onPortraitsReady} so it runs once portrait.ts's own asset barrier
- *  resolves (portraits render synchronously from then on); one-shot per chip
- *  via the .mini-class-portrait guard below, so it is safe to call again. */
+/** Give each class button its painted class emblem (class_icon_art.ts), so the
+ *  rail reads as "pick a class" rather than "pick a face" - the 3D headshot this
+ *  once showed was the same subject as the turntable directly above it. Falls
+ *  back to the procedural crest for an id with no art, which for the static
+ *  markup in both entry documents means never. A plain <img src> needs no asset
+ *  barrier; one-shot per chip via the .mini-class-portrait guard below, so it is
+ *  safe to call again. */
 function decorateClassChips(): void {
   document
     .querySelectorAll<HTMLElement>('#charcreate-panel .mini-class, #offline-select .mini-class')
@@ -4278,13 +5102,13 @@ function decorateClassChips(): void {
       label.className = 'mini-class-label';
       if (key) label.dataset.i18n = key;
       label.textContent = (li.textContent ?? '').trim();
-      li.removeAttribute('data-i18n'); // moved onto the label so i18n won't wipe the portrait
+      li.removeAttribute('data-i18n'); // moved onto the label so i18n won't wipe the emblem
       li.textContent = '';
       const img = document.createElement('img');
       img.className = 'mini-class-portrait';
       img.alt = '';
-      const url = playerPortraitDataUrl(cls, 0);
-      if (url) img.src = url;
+      img.decoding = 'async';
+      img.src = classIconUrl(cls) ?? iconDataUrl('crest', `class_${cls}`, 96);
       li.appendChild(img);
       li.appendChild(label);
       li.classList.add('has-portrait');
@@ -4298,10 +5122,217 @@ function selectedSkin(rowId: string, fallback: number): number {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+// ---------------------------------------------------------------------------
+// Modular character appearance
+//
+// Every class's body is COMPOSED from parts (see render/characters/modular.ts)
+// rather than cloned from a finished class rig, so the creation preview is
+// driven by a stored appearance instead of setClass(). Each class renders
+// through its own `player_<class>_modular` def (its clips and hand layout) and
+// wears its class kit by default.
+// ---------------------------------------------------------------------------
+const MODULAR_APPEARANCE_KEY = 'woc.modularAppearance';
+const MODULAR_ARMOR_KEY = 'woc.modularArmorSet';
+/** Host element per class-details panel that the customizer mounts into. */
+const APPEARANCE_HOSTS: Record<string, string> = {
+  'charcreate-class-details': '#charcreate-appearance',
+  'offline-class-details': '#offline-appearance',
+};
+
+let modularAppearance: ModularAppearance = readStoredAppearance();
+const appearanceUis = new Map<string, AppearanceCustomizer>();
+
+function readStoredAppearance(): ModularAppearance {
+  try {
+    const raw = localStorage.getItem(MODULAR_APPEARANCE_KEY);
+    return normalizeAppearance(raw ? (JSON.parse(raw) as Partial<ModularAppearance>) : null);
+  } catch {
+    // private mode / corrupt value: a default body is always better than none
+    return normalizeAppearance(null);
+  }
+}
+
+// The creator emits on every `input` and every `pointermove` (the colour
+// wheels), and localStorage.setItem is synchronous: a wheel drag would pay a
+// stringify plus a store write per pointer sample. Coalesce to one trailing
+// write, flushed on pagehide so a refresh mid-drag still keeps the look.
+const APPEARANCE_STORE_DEBOUNCE_MS = 200;
+let appearancePendingStore: ModularAppearance | null = null;
+let appearanceStoreTimer: number | null = null;
+
+function flushAppearanceStore(): void {
+  if (appearanceStoreTimer !== null) {
+    window.clearTimeout(appearanceStoreTimer);
+    appearanceStoreTimer = null;
+  }
+  const pending = appearancePendingStore;
+  appearancePendingStore = null;
+  if (!pending) return;
+  try {
+    localStorage.setItem(MODULAR_APPEARANCE_KEY, JSON.stringify(pending));
+  } catch {
+    /* storage unavailable: the look still applies for this session */
+  }
+}
+
+function storeAppearance(a: ModularAppearance): void {
+  appearancePendingStore = a;
+  if (appearanceStoreTimer !== null) return;
+  appearanceStoreTimer = window.setTimeout(flushAppearanceStore, APPEARANCE_STORE_DEBOUNCE_MS);
+}
+
+/** Which kit a class's composed body wears: its own class kit by default
+ *  (classArmorSet), overridable per class from storage.
+ *
+ *  There is no picker for the override yet - reading it from storage keeps
+ *  every set reachable (and the fit verifiable) without new strings, and is
+ *  exactly the value a picker would write when one is added. The legacy
+ *  un-scoped key (`woc.modularArmorSet`, the warrior-test-bed knob) still
+ *  applies to the warrior only, so a set left there cannot dress all nine
+ *  classes as knights. */
+function readStoredArmorSet(cls: PlayerClass): ArmorSetId {
+  try {
+    const raw =
+      localStorage.getItem(`${MODULAR_ARMOR_KEY}.${cls}`) ??
+      (cls === 'warrior' ? localStorage.getItem(MODULAR_ARMOR_KEY) : null);
+    return (ARMOR_SETS as readonly string[]).includes(raw ?? '')
+      ? (raw as ArmorSetId)
+      : classArmorSet(cls);
+  } catch {
+    return classArmorSet(cls);
+  }
+}
+
+/** The composed appearance a class renders with. Reads `modularAppearance`
+ *  live, so editing the look in creation is reflected the next time a visual
+ *  is built. */
+function modularLookForClass(cls: PlayerClass): ModularLook | null {
+  return { app: modularAppearance, worn: creationLoadout(cls) };
+}
+
+/** The IN-WORLD look: the class's full kit, with the head piece left off when
+ *  the wearer's `helmHidden` wire bit says so (the paperdoll eye toggle).
+ *  Distinct from creationLoadout on purpose: the creation turntable's
+ *  helm preview is a view for picking a face, not a wardrobe choice. */
+function inWorldLookFor(cls: PlayerClass, helmHidden: boolean): ModularLook | null {
+  const full = fullSet(readStoredArmorSet(cls));
+  return { app: modularAppearance, worn: helmHidden ? { ...full, head: null } : full };
+}
+
+/** Whether the creation turntable shows the set's helm. A view of the
+ *  character, not a property of them, so it lives here and not in the stored
+ *  appearance - a saved look must not carry "was previewing the helmet". */
+let creationHelm = false;
+
+/** The creation loadout for a class's set: everything it has, MINUS the helm
+ *  unless it has been switched back on, so the player can see the face, hair
+ *  and skin tone they are picking. */
+function creationLoadout(cls: PlayerClass): ArmorLoadout {
+  const set = readStoredArmorSet(cls);
+  const full = fullSet(set);
+  return creationHelm ? full : { ...full, head: null };
+}
+
+/** Drive the creation/offline turntable for a class chip: every class composes
+ *  from the stored appearance, wearing its class kit, through its own modular
+ *  def (class clips + starter weapons). */
+function previewClassBody(cls: PlayerClass): void {
+  if (!characterPreview) return;
+  const look = modularLookForClass(cls);
+  if (look) characterPreview.setModular(look.app, look.worn, cls);
+  else characterPreview.setClass(cls);
+}
+
+/** The class each panel's customizer is currently editing. The customizer
+ *  mounts ONCE per panel and survives class switches (its rows are class-
+ *  agnostic), so its closures must read the panel's live class from here
+ *  rather than capture the class they mounted under; a captured one would
+ *  keep previewing the first class's kit and weapons after a switch. */
+const appearancePanelClass = new Map<string, PlayerClass>();
+
+/** Mount (or tear down) the appearance customizer under a class-details panel. */
+function syncAppearanceUi(panelId: string, cls: PlayerClass): void {
+  const hostSel = APPEARANCE_HOSTS[panelId];
+  if (!hostSel) return;
+  const host = document.querySelector(hostSel) as HTMLElement | null;
+  if (!host) return;
+  appearancePanelClass.set(panelId, cls);
+  const existing = appearanceUis.get(panelId);
+  if (!modularLookForClass(cls)) {
+    existing?.destroy();
+    appearanceUis.delete(panelId);
+    host.hidden = true;
+    return;
+  }
+  host.hidden = false;
+  if (existing) {
+    // The panel survives class switches; poke it so live-coloured chips (the
+    // outfit swatches read the class kit) repaint for the new class.
+    existing.set({});
+    return;
+  }
+  const panelClass = () => appearancePanelClass.get(panelId) ?? cls;
+  appearanceUis.set(
+    panelId,
+    mountAppearanceCustomizer(host, {
+      value: modularAppearance,
+      onChange: (next) => {
+        modularAppearance = next;
+        storeAppearance(next);
+        const c = panelClass();
+        characterPreview?.setModular(next, creationLoadout(c), c);
+      },
+      helm: creationHelm,
+      onHelm: (on) => {
+        creationHelm = on;
+        const c = panelClass();
+        characterPreview?.setModular(modularAppearance, creationLoadout(c), c);
+      },
+      // The chips must preview against the set the composed body actually
+      // wears: the stored override when one exists, not the class default.
+      armorSet: () => readStoredArmorSet(panelClass()),
+    }),
+  );
+}
+
+/**
+ * Whether creation offers the class's ready-made looks.
+ *
+ * OFF for now (Troy, 2026-08-03). The row predates the appearance customizer
+ * and offers a different answer to the same question (it picks a whole
+ * finished character, while the customizer builds one), so with both on screen
+ * the creator asks you to choose your look twice. Presets come back once the
+ * hair set is finished, and will then be whole authored appearances rather than
+ * per-class chromas.
+ *
+ * Only the two CREATION rows are gated. The in-game character window has its
+ * own picker (`#char-skin-row`, char_skin_window.ts) and is untouched: a skin
+ * already owned must stay reachable. Nothing else changes: the pickers still
+ * exist, still render, and the skin the player enters with is simply the
+ * default (0), which is what `selectedSkin` falls back to with no row mounted.
+ */
+const CREATION_SKIN_PRESETS = false;
+
+/** Hide a creation skin row, leaving the machinery in place. Only the row: the
+ *  online row shares its .skin-picker wrapper with the appearance customizer's
+ *  host, and an inline display:none on the wrapper also overrides the cs-wow
+ *  layout's display:contents, which is how the create panel lost its
+ *  customizer entirely when this hid the whole picker. */
+function hideSkinPicker(rowId: string): void {
+  const row = $(rowId) as HTMLElement | null;
+  if (!row) return;
+  row.innerHTML = '';
+  row.style.display = 'none';
+}
+
 /** Reset to the default skin and (re)render the offline picker for a class. */
 function refreshOfflineSkins(cls: PlayerClass): void {
   offlineSkin = 0;
   characterPreview?.setSkin(0);
+  if (!CREATION_SKIN_PRESETS) {
+    hideSkinPicker('#offline-skin-row');
+    return;
+  }
   renderSkinPicker('#offline-skin-row', cls, 0, (i) => {
     offlineSkin = i;
     characterPreview?.setSkin(i);
@@ -4312,11 +5343,19 @@ function refreshOfflineSkins(cls: PlayerClass): void {
 function refreshOnlineSkins(cls: PlayerClass): void {
   onlineSkin = 0;
   characterPreview?.setSkin(0);
+  if (!CREATION_SKIN_PRESETS) {
+    hideSkinPicker('#online-skin-row');
+    return;
+  }
   renderSkinPicker('#online-skin-row', cls, 0, (i) => {
     onlineSkin = i;
     characterPreview?.setSkin(i);
   });
 }
+
+onPortraitUpdate((visualKey, skin) => {
+  refreshStartSkinPickerPortraits(document, visualKey, skin, playerPortraitDataUrl);
+});
 
 function updatePreviewContainer(panelId: string): void {
   if (!characterPreview) return;
@@ -4338,7 +5377,7 @@ function updatePreviewContainer(panelId: string): void {
     } else {
       const row = document.querySelector('#char-list .char-row.sel') as HTMLElement | null;
       const cls = (row?.dataset.class as PlayerClass) ?? 'warrior';
-      characterPreview.setClass(cls);
+      previewClassBody(cls);
       characterPreview.setSkin(Number(row?.dataset.skin ?? 0) || 0);
     }
     syncPreviewAfterPanelLayout();
@@ -4352,7 +5391,7 @@ function updatePreviewContainer(panelId: string): void {
   const selEl = document.querySelector(selSelector) as HTMLElement | null;
   if (selEl) {
     const cls = selEl.dataset.class as PlayerClass;
-    characterPreview.setClass(cls);
+    previewClassBody(cls);
     if (panelId === '#charcreate-panel') refreshOnlineSkins(cls);
     else refreshOfflineSkins(cls);
   }
@@ -4498,12 +5537,14 @@ function show(el: string): void {
   // Reset currently rendered classes to force re-render/animation when opening a panel
   for (const key of ['offline-class-details', 'charcreate-class-details']) {
     currentlyRenderedClass[key] = null;
-    if (revertTimeouts[key] !== null && revertTimeouts[key] !== undefined) {
-      window.clearTimeout(revertTimeouts[key]!);
+    const revertTimeout = revertTimeouts[key];
+    if (revertTimeout !== null && revertTimeout !== undefined) {
+      window.clearTimeout(revertTimeout);
       revertTimeouts[key] = null;
     }
-    if (hoverTimeouts[key] !== null && hoverTimeouts[key] !== undefined) {
-      window.clearTimeout(hoverTimeouts[key]!);
+    const hoverTimeout = hoverTimeouts[key];
+    if (hoverTimeout !== null && hoverTimeout !== undefined) {
+      window.clearTimeout(hoverTimeout);
       hoverTimeouts[key] = null;
     }
   }
@@ -5505,7 +6546,7 @@ async function refreshCharacters(): Promise<void> {
     if (firstRow) {
       firstRow.click();
     } else {
-      characterPreview?.setClass('warrior');
+      previewClassBody('warrior');
     }
   } catch (err) {
     // A failed roster load must also drop any boot resume intent: leaving it
@@ -5516,7 +6557,10 @@ async function refreshCharacters(): Promise<void> {
   }
 }
 
-function fatalOverlay(message: string, opts?: { keepResumeMarker?: boolean }): void {
+function fatalOverlay(
+  message: string,
+  opts?: { keepResumeMarker?: boolean; buttonLabel?: string },
+): void {
   // A fatal overlay is a terminal client state whose only exit is a reload, so
   // clearing the resume marker HERE covers every present and future caller: the
   // reload lands on the normal boot path instead of auto-resuming into the same
@@ -5534,7 +6578,7 @@ function fatalOverlay(message: string, opts?: { keepResumeMarker?: boolean }): v
   el.appendChild(messageEl);
   const btn = document.createElement('button');
   btn.className = 'btn';
-  btn.textContent = t('errors.returnToLogin');
+  btn.textContent = opts?.buttonLabel ?? t('errors.returnToLogin');
   btn.addEventListener('click', () => location.reload());
   el.appendChild(btn);
   document.body.appendChild(el);
@@ -5612,7 +6656,8 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
       button.textContent = t('auth.enterWorld');
     }
   }
-  const world = new ClientWorld(api.token!, c.id, c.class, api.base, getClientSeed());
+  if (!api.token) throw new Error('online world entry requires an auth token');
+  const world = new ClientWorld(api.token, c.id, c.class, api.base, getClientSeed());
   // Wire shareable player cards for this online session: publishing uploads the
   // composited PNG to this realm and returns an absolute public page URL, and
   // the referral provider feeds the card footer. Both are cleared on disconnect.
@@ -5706,6 +6751,13 @@ const activeClassDetailsTimeouts: Record<string, number | null> = {};
 
 // The char-select roster row's real, in-world appearance for the 3D preview.
 function charselectAppearance(c: CharacterSummary): PreviewAppearance {
+  // The packaged iOS shell streams the Armory weapon-skin GLBs after world
+  // entry instead of holding all of them at the launcher, so the preview of a
+  // character wearing one needs ITS skin fetched on demand (the mech lazy-load
+  // pattern). Memoized and a no-op when resident or on eager platforms; a
+  // preview built in the race window shows the base weapon and picks the skin
+  // up on the next selection change.
+  ensureCharacterUrl(weaponSkinModelUrl(c.weaponSkinId ?? null));
   return {
     cls: c.class,
     skin: c.skin ?? 0,
@@ -5731,8 +6783,13 @@ function renderClassDetails(
   // offline pickers pass none and rebuild the class body only when the class changes.
   if (characterPreview) {
     if (preview) characterPreview.setAppearance(preview);
-    else if (currentlyRenderedClass[panelId] !== className) characterPreview.setClass(className);
+    else if (currentlyRenderedClass[panelId] !== className) previewClassBody(className);
   }
+
+  // Show the part/colour pickers for a composed body, hide them for a fixed
+  // class rig. Runs BEFORE the redundancy return so the first render of a
+  // panel mounts them (the class has not "changed" at that point).
+  if (!preview) syncAppearanceUi(panelId, className);
 
   // Redundant render check (class details panel content only)
   if (currentlyRenderedClass[panelId] === className) return;
@@ -5870,7 +6927,16 @@ function renderClassDetails(
             eff.type === 'imbue',
         );
         if (secondaryEffect) {
-          if (secondaryEffect.type === 'dot' || secondaryEffect.type === 'hot') {
+          if (secondaryEffect.type === 'dot' && secondaryEffect.perCombo !== undefined) {
+            // A combo-point bleed finisher (rupture, rip): `total` alone is the
+            // damage at zero combo points, a state the caster can never reach.
+            // Render base plus per-combo-point, the same composition the
+            // finisherDamage arm above and abilityEffectText in the HUD use.
+            dmgText = t('abilityUi.tooltip.finisherDamage', {
+              base: formatClassDetailNumber(secondaryEffect.total),
+              perCombo: formatClassDetailNumber(secondaryEffect.perCombo),
+            });
+          } else if (secondaryEffect.type === 'dot' || secondaryEffect.type === 'hot') {
             dmgText = formatClassDetailNumber(secondaryEffect.total);
           } else if (secondaryEffect.type === 'absorb') {
             dmgText = formatClassDetailNumber(secondaryEffect.amount);
@@ -6242,8 +7308,10 @@ async function loadProjectStats(): Promise<void> {
         }),
       );
     }
-  } catch (err) {
-    console.error('Failed to fetch project stats:', err);
+  } catch {
+    // A marketing counter is not worth an error entry: the API being down or
+    // absent (offline play, a dev client with no server) is an ordinary state
+    // and the cache fallback below already handles it.
     // If API fails, fall back to cached data (even if expired)
     if (cached) {
       setAll(characterEls, String(cached.characters_created ?? '-'));
@@ -6254,62 +7322,11 @@ async function loadProjectStats(): Promise<void> {
 }
 
 // Home-page global (cross-realm) lifetime-XP leaderboard. Server computes the
-// virtual level + ranking; this only renders. Re-fetched each time the High
-// Scores view is opened (the server caches, so this is cheap).
-let highscoresLoading = false;
+// virtual level + ranking; the board markup (including the `<Guild>` tag beside
+// each name) lives in ./ui/highscore_board, extracted out of this firewall file
+// the way the news feed was; this call site only supplies the host + fetcher.
 async function loadHighscores(): Promise<void> {
-  const host = $('#hs-leaderboard');
-  if (!host || highscoresLoading) return;
-  highscoresLoading = true;
-  host.innerHTML = `<div class="hs-loading">${t('game.leaderboard.loading')}</div>`;
-  let rows: LeaderboardEntry[] = [];
-  try {
-    rows = await api.leaderboard('global', 100);
-  } catch {
-    host.innerHTML = `<div class="hs-error">${t('game.leaderboard.retry')}</div>`;
-    highscoresLoading = false;
-    return;
-  }
-  highscoresLoading = false;
-  if (rows.length === 0) {
-    host.innerHTML = `<div class="hs-empty">${t('game.leaderboard.empty')}</div>`;
-    return;
-  }
-  const esc = (s: string): string =>
-    s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
-  const rankLabel = t('game.leaderboard.rank');
-  const nameLabel = t('game.leaderboard.name');
-  const realmLabel = t('game.leaderboard.realmCol');
-  const levelLabel = t('game.leaderboard.level');
-  const virtualLevelLabel = t('game.leaderboard.vlevel');
-  const lifetimeXpLabel = t('game.leaderboard.lifetimeXp');
-  const head =
-    `<div class="hs-row hs-head">` +
-    `<span class="hs-rank">${rankLabel}</span>` +
-    `<span class="hs-name">${nameLabel}</span>` +
-    `<span class="hs-realm">${realmLabel}</span>` +
-    `<span class="hs-lvl">${levelLabel}</span>` +
-    `<span class="hs-vlvl">${virtualLevelLabel}</span>` +
-    `<span class="hs-xp">${lifetimeXpLabel}</span></div>`;
-  const body = rows
-    .map((r) => {
-      const cls = CLASSES[r.cls];
-      const star =
-        r.prestigeRank > 0
-          ? `<span class="hs-prestige" title="${t('game.prestige.rank')} ${r.prestigeRank}">★${r.prestigeRank}</span>`
-          : '';
-      return (
-        `<div class="hs-row${r.rank <= 3 ? ' hs-top' : ''}">` +
-        `<span class="hs-rank">${r.rank}</span>` +
-        `<span class="hs-name"${cls ? ` title="${esc(classDisplayName(r.cls))}"` : ''}>${star}${esc(r.name)}</span>` +
-        `<span class="hs-realm" data-label="${esc(realmLabel)}">${esc(r.realm ?? '')}</span>` +
-        `<span class="hs-lvl" data-label="${esc(levelLabel)}">${r.level}</span>` +
-        `<span class="hs-vlvl" data-label="${esc(virtualLevelLabel)}">${r.virtualLevel}</span>` +
-        `<span class="hs-xp" data-label="${esc(lifetimeXpLabel)}">${formatXp(r.lifetimeXp)}</span></div>`
-      );
-    })
-    .join('');
-  host.innerHTML = head + body;
+  await loadHighscoresInto($('#hs-leaderboard'), () => api.leaderboard('global', 100));
 }
 
 // News & Updates: published GitHub releases, proxied + cached by the server.
@@ -6476,7 +7493,7 @@ const walletCapabilityReady = resolveWalletCapability({
   disabled: String(import.meta.env.VITE_WALLET_DISABLED ?? '').trim() === '1',
   nativeApp: NATIVE_APP,
   desktopApp: DESKTOP_APP,
-  bridge: DESKTOP_APP ? desktopBridge() : null,
+  bridge: NATIVE_APP ? nativeSolanaMobileBridge : DESKTOP_APP ? desktopBridge() : null,
 }).then((enabled) => {
   WALLET_ENABLED = enabled;
   return enabled;
@@ -6525,6 +7542,9 @@ function loadWallet(): Promise<typeof import('./net/wallet')> {
     ? Promise.resolve(walletMod)
     : import('./net/wallet').then((m) => {
         walletMod = m;
+        if (NATIVE_APP) {
+          walletMod.configureNativeSolanaWallet(createNativeSolanaWalletClient());
+        }
         walletMod.configureWalletConnect(
           String(import.meta.env.VITE_REOWN_PROJECT_ID ?? '').trim() || null,
         );
@@ -6640,8 +7660,9 @@ function showWalletPicker(
     const extensionHelp = document.createElement('p');
     extensionHelp.className = 'wallet-picker-help wallet-picker-extension-help';
     extensionHelp.id = 'wallet-picker-extension-help';
-    extensionHelp.textContent =
-      mode === 'standalone'
+    extensionHelp.textContent = NATIVE_APP
+      ? t('wallet.seekerAppHelp')
+      : mode === 'standalone'
         ? t('wallet.standaloneAppHelp')
         : mode === 'mobile'
           ? t('wallet.mobileAppHelp')
@@ -7289,7 +8310,7 @@ async function refreshGithubLinkStatus(): Promise<void> {
   } catch (err) {
     console.error('[github] could not load status', err);
   }
-  if (!status || status.enabled !== true) {
+  if (status?.enabled !== true) {
     group.hidden = true;
     return;
   }
@@ -7755,6 +8776,7 @@ function clearDiscordChoice(): void {
 
 async function refreshWalletLinkStatus(): Promise<void> {
   if (!(await walletCapabilityReady)) {
+    seekerEntitlementSync.reset();
     linkedWalletPubkey = null;
     linkedWocBalance = null;
     connectedWocBalance = null;
@@ -7764,6 +8786,7 @@ async function refreshWalletLinkStatus(): Promise<void> {
     return;
   }
   if (!api.token) {
+    seekerEntitlementSync.reset();
     linkedWalletPubkey = null;
     linkedWocBalance = null;
     desktopWalletBrowserSessionActive = false;
@@ -7790,6 +8813,13 @@ async function refreshWalletLinkStatus(): Promise<void> {
   }
   updateWalletButton();
   const pubkey = linkedWalletPubkey;
+  if (statusKnown) {
+    await seekerEntitlementSync.sync({
+      accountKey: api.username ?? '',
+      walletPubkey: pubkey,
+      eligible: NATIVE_APP && WALLET_ENABLED,
+    });
+  }
   if (pubkey && WALLET_ENABLED) {
     try {
       const wallet = await loadWallet();
@@ -7822,6 +8852,12 @@ async function completeWalletVerifyFlow(address: string): Promise<void> {
     setWalletFlowStatus('verify');
     const result = await api.linkWallet(address, signature, nonce);
     linkedWalletPubkey = result.pubkey;
+    if (NATIVE_APP) {
+      const attestation = await createNativeAttestationProof(api.base, 'seeker-claim');
+      if (!attestation || !(await api.claimSeekerEntitlement(attestation)).entitled) {
+        throw new Error('Seeker entitlement verification failed');
+      }
+    }
     linkedWocBalance = connectedWocBalance;
     if (linkedWocBalance === null) linkedWocBalance = await wallet.fetchWocBalance(address);
     updateWalletButton();
@@ -7996,6 +9032,13 @@ async function switchWallet(): Promise<void> {
 async function wireWallet(): Promise<void> {
   setWalletUiEnabled(false);
   await walletCapabilityReady;
+  document.body.classList.toggle('seeker-wallet-enabled', NATIVE_APP && WALLET_ENABLED);
+  if (NATIVE_APP && WALLET_ENABLED) {
+    const dailyRewardsButton = document.getElementById('mobile-daily-rewards');
+    if (dailyRewardsButton) {
+      document.getElementById('mobile-combat-controls')?.appendChild(dailyRewardsButton);
+    }
+  }
   setWalletUiEnabled(WALLET_ENABLED);
   // Feature-gate: when explicitly disabled, remove the wallet row entirely and
   // never download the wallet chunk.
@@ -8168,6 +9211,7 @@ function wireStartScreens(): void {
   void wireWallet();
   wireGithubLink();
   wireSteamLink(api);
+  wireEpicLink(api);
 
   // mode select
   const onlineBtn = $('#btn-online');
@@ -8214,6 +9258,7 @@ function wireStartScreens(): void {
     void refreshWalletLinkStatus();
     void refreshGithubLinkStatus();
     void refreshSteamLinkStatus(api);
+    void refreshEpicLinkStatus(api);
     // Mandatory recovery-email capture: block realm entry until a pre-email account
     // sets one (a fresh signup already has it, so this is a no-op there).
     await maybePromptRecoveryEmail();
@@ -9201,6 +10246,7 @@ function wireStartScreens(): void {
   });
   setupNavBtn(navBtnDownload, '#download-view');
   initDesktopDownload();
+  initBrowserSupportNotice();
   setupNavBtn(navBtnLogin, '#hero-view', () => {
     show('#login-panel');
   });
@@ -9298,6 +10344,7 @@ function wireStartScreens(): void {
     void refreshWalletLinkStatus();
     void refreshGithubLinkStatus();
     void refreshSteamLinkStatus(api);
+    void refreshEpicLinkStatus(api);
     // A Discord login usually captured the email already, but confirm and prompt
     // if it did not (e.g. the address was missing on the Discord account).
     void maybePromptRecoveryEmail().then(() => goToLoggedInPlay());
@@ -9484,7 +10531,21 @@ function wireStartScreens(): void {
   // runtimes, the environments where the OS reload makes the crash otherwise invisible;
   // elsewhere the probe is only logged (and cleared: it is a one-shot signal).
   const entryRecoveryAt = Date.now();
-  const entryRecovery = planEntryCrashRecovery(readEntryProbeRaw(), entryRecoveryAt);
+  const interruptedGraphicsRebuild = consumeGraphicsRebuildCrashProbe(entryRecoveryAt);
+  if (interruptedGraphicsRebuild) {
+    // Settings are committed only after a candidate validates, so the persisted
+    // old profile is already the safe boot choice. Clear the generic probe too:
+    // this was a named live rebuild, not a failed initial world entry, and must
+    // never cost the player an unrelated automatic downgrade.
+    clearEntryProbe();
+    console.warn(
+      `[graphics-rebuild] previous live rebuild ended at phase=${interruptedGraphicsRebuild.phase} ` +
+        `generation=${interruptedGraphicsRebuild.generation}; retained saved graphics settings`,
+    );
+  }
+  const entryRecovery = interruptedGraphicsRebuild
+    ? null
+    : planEntryCrashRecovery(readEntryProbeRaw(), entryRecoveryAt);
   if (entryRecovery) persistEntryRecoveryLog(entryRecovery, entryRecoveryAt);
   clearEntryProbe();
   if (entryRecovery) {
@@ -9494,6 +10555,13 @@ function wireStartScreens(): void {
         recoverySettings.set('graphicsPreset', entryRecovery.to);
       }
       recoverySettings.set('graphicsDefaultApplied', true);
+      // A confirmed WebContent kill during entry is direct evidence this device
+      // runs at its memory ceiling, and the preset ladder has no rung below Low.
+      // Stamp the tight-memory marker: from the NEXT module load the gfx profile
+      // and the render preload sweeps shed residency (DPR, pooled rigs, deferred
+      // cosmetic atlases/prewarms) independently of the preset. Time-limited in
+      // device_memory_hint.ts so a one-off kill cannot degrade a device forever.
+      markEntryTightMode(entryRecoveryAt);
       clearPlayMarker();
       console.warn(
         `[entry-guard] previous world entry crashed ${Math.round(entryRecovery.ageMs / 1000)}s ` +
@@ -9576,6 +10644,7 @@ function wireStartScreens(): void {
     void refreshWalletLinkStatus();
     void refreshGithubLinkStatus();
     void refreshSteamLinkStatus(api);
+    void refreshEpicLinkStatus(api);
     // (Discord status is refreshed by enterLoggedInChrome above.)
     // A just-completed Discord login lands straight in play; capture a recovery
     // email first if the Discord grant did not provide one. The desktop-login
@@ -9596,24 +10665,24 @@ function wireStartScreens(): void {
   // no-op when no session is in play, so it is safe to register unconditionally.
   const restampResumeMarker = () => {
     if (document.visibilityState === 'hidden') {
-      console.info('[entry-diag] page hidden; entry probe cleared as a lifecycle transition');
       refreshPlayMarker(Date.now());
       // A page that leaves the foreground mid-entry was not killed by a foreground
       // memory spike: a later eviction while backgrounded (or a deliberate reload,
       // which also fires pagehide) must not read as an entry crash next boot.
-      stopActiveEntryDiagnostics();
-      clearEntryProbe();
+      suspendActiveEntryDiagnostics();
+    } else {
+      // A hidden page can resume the same entry attempt. Re-arm the probe with
+      // its last durable checkpoint before the awaits or scene build continue,
+      // so a later foreground WebContent kill still advances the recovery ladder.
+      resumeActiveEntryDiagnostics();
     }
   };
   document.addEventListener('visibilitychange', restampResumeMarker);
-  window.addEventListener('pageshow', (event) => {
-    console.info(`[entry-diag] pageshow persisted=${event.persisted}`);
-  });
-  window.addEventListener('pagehide', (event) => {
-    console.info(`[entry-diag] pagehide persisted=${event.persisted}; entry probe cleared`);
+  window.addEventListener('pagehide', () => {
     refreshPlayMarker(Date.now());
     stopActiveEntryDiagnostics();
     clearEntryProbe();
+    flushAppearanceStore();
   });
   window.addEventListener('error', (event) => {
     const errorType = event.error instanceof Error ? event.error.name : 'unknown';
@@ -9813,15 +10882,11 @@ function wireStartScreens(): void {
     syncLandingGraphicsSelect();
   });
 
-  // Give each class chip its portrait as soon as portrait.ts's own (separate,
-  // wider) character-asset barrier resolves, independent of the 3D preview
-  // below. portraitsReady() latches once and decorateClassChips() is one-shot
-  // per chip, so gating this off charactersReady()'s narrower, retried set
-  // (as the 3D preview below does) left it permanently false whenever a
-  // transient failure landed in the wider set portrait.ts actually waits on:
-  // the preview would recover (that is charactersReady()'s job) but every
-  // class chip stayed a plain label for the rest of the page's life.
-  onPortraitsReady(decorateClassChips);
+  // Give each class chip its crest immediately: crests are drawn procedurally
+  // on a canvas, so unlike the 3D headshots this once waited on they need no
+  // character-asset barrier at all - and no asset failure can leave a chip a
+  // plain label for the rest of the page's life.
+  decorateClassChips();
 
   // Initialize 3D character preview once its assets are ready. Gated on the
   // narrower charactersReady() (with its own retries), not the site-wide
@@ -9862,7 +10927,7 @@ function wireStartScreens(): void {
               : '#charcreate-panel .mini-class.sel';
           const selEl = document.querySelector(selSelector) as HTMLElement | null;
           const cls = selEl ? (selEl.dataset.class as PlayerClass) : 'warrior';
-          characterPreview.setClass(cls);
+          previewClassBody(cls);
         }
       }
     })

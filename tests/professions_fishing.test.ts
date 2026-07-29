@@ -30,30 +30,33 @@ vi.mock('../server/db', () => ({
 }));
 
 import { type ClientSession, GameServer } from '../server/game';
-import { ClientWorld } from '../src/net/online';
 import { bagCapacity } from '../src/sim/bags';
 import { updateCasting } from '../src/sim/combat/casting_lifecycle';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
-import { FISHING_TABLES, FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
-import { DEEPFEN_SHALLOWS_LAKE, LAKE } from '../src/sim/data';
+import {
+  FISHING_TABLES,
+  FISHING_TABLES_BY_BAND,
+  isRawCookingCatch,
+} from '../src/sim/content/items';
+import { GATHERING_PROFESSIONS } from '../src/sim/content/professions';
+import { DEEPFEN_SHALLOWS_LAKE, ITEMS, LAKE } from '../src/sim/data';
 import {
   completeFishing,
+  FISH_BITE_DELAY_MIN_SEC,
+  FISH_EARLY_REEL_GRACE_SEC,
   FISHING_BAND_THRESHOLDS,
   FISHING_GAIN_SCHEDULE,
   FISHING_JUNK_GAIN_CUTOFF_PROFICIENCY,
   fishingBandFor,
   fishingCatchGain,
+  fishingCatchGainAt,
+  fishingTeachingCeilingFor,
   startFishing,
 } from '../src/sim/professions/fishing';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
-import {
-  type Entity,
-  FISHING_CAST_ID,
-  GATHER_CAST_ID,
-  type PlayerClass,
-  type SimEvent,
-} from '../src/sim/types';
+import { DT, type Entity, FISHING_CAST_ID, GATHER_CAST_ID, type SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
+import { bareClient } from './helpers/bare_client';
 
 function makeSim(seed = 467): Sim {
   return new Sim({ seed, playerClass: 'warrior', autoEquip: true });
@@ -80,6 +83,9 @@ interface FishingResultEvent {
   pid: number;
   itemId: string;
   quality: string;
+  /** The water the cast resolved against, which the tier-2 R19 drive below
+   *  reads to prove it fished Mirefen rather than the Vale fallback. */
+  zoneId: string;
 }
 
 function fishingResultsIn(events: readonly SimEvent[]): FishingResultEvent[] {
@@ -149,124 +155,136 @@ function catchSequenceLive(sim: Sim, meta: PlayerMeta, n: number): (string | nul
   return out;
 }
 
-// The literal band-0 catch sequence at seed 467 under the shipped LIVE
-// loop, re-recorded after the Eastbrook camp respacing thinned the zone-1 camp
-// counts (the world-gen camp loop draws 5 rng values per mob at Sim
-// construction, so fewer mobs shorten that construction-time sequence and fork
-// every later shared-stream draw): each session consumes TWO draws, draw 2i
-// the hidden bite delay and draw 2i+1 the table walk against the SHIPPED
-// Vale rows (trout 45 / perch 30 / weed 12 / koi 3 / null 10). Any
-// accidental extra draw, band-boundary change, or band-0 table drift breaks
-// this pin.
-const B0_SEQ_467: (string | null)[] = [
-  TROUT,
-  TROUT,
-  TROUT,
-  TROUT,
-  null,
-  KOI,
-  TROUT,
+// The literal band-0 catch sequence at seed 36 under the LIVE loop: each
+// session consumes TWO draws, draw 2i the hidden bite delay and draw 2i+1 the
+// table walk against the band-0 Vale rows (trout 46 / perch 31 / weed 12 /
+// koi 1 / null 10). Any accidental extra draw, band-boundary change, or
+// band-0 table drift breaks this pin.
+//
+// The seed moved 467 to 36 with the Galecrest quest-camp content pass
+// (062f6180ef): its four new camps draw at world gen, and under the shifted
+// stream seed 467's band-0 and band-1 walks landed IDENTICAL, which would
+// have left the band pins below green on equal arrays and proved nothing.
+// Seed 36 was hunted for the property 467 lost: all three band walks differ,
+// and they differ inside the first twelve sessions.
+const B0_SEQ_36: (string | null)[] = [
+  PERCH,
   TROUT,
   null,
+  TROUT,
+  WEED,
+  null,
+  PERCH,
+  TROUT,
   PERCH,
   WEED,
   TROUT,
+  null,
+  null,
   TROUT,
+  TROUT,
+  PERCH,
+  WEED,
+  PERCH,
+  TROUT,
+  TROUT,
+  TROUT,
+  TROUT,
+  TROUT,
+  TROUT,
+  PERCH,
+  TROUT,
+  PERCH,
   null,
   PERCH,
-  PERCH,
-  PERCH,
-  TROUT,
-  KOI,
-  PERCH,
-  PERCH,
-  TROUT,
-  TROUT,
-  TROUT,
-  TROUT,
-  TROUT,
-  PERCH,
-  TROUT,
-  PERCH,
-  TROUT,
+  null,
 ];
 
 // The literal band-1 live-loop sequence for the SAME seed with fishing
-// proficiency 150 (band-1 Vale weights trout 48 / perch 33 / weed 8 / koi 3 /
-// null 8). It first diverges from B0_SEQ_467 at index 5, and again at 8, 10
-// (perch, not band 0's tangled weed: the band-1 junk de-weighting), and 13, so
+// proficiency 150 (band-1 Vale weights trout 49 / perch 32 / weed 8 / koi 3 /
+// null 8). It first diverges from B0_SEQ_36 at index 6 (the perch where band 0
+// draws tangled weed: the junk row falls 12 to 8, so the perch span's ceiling
+// climbs 77 to 81 and swallows that draw), again at 9 by the same step, and at
+// 14 (trout where band 0 draws a perch: the trout row rises 46 to 49), so
 // matching the full 30-cast walk proves the live path actually switched
-// tables; index 4 is the hunted band DISCRIMINATOR against band 2 (the empty
-// hook here, the koi there). Re-recorded after the Eastbrook camp respacing
-// thinned the zone-1 camp counts.
-const B1_SEQ_467: (string | null)[] = [
-  TROUT,
-  TROUT,
-  TROUT,
+// tables; index 7 is the hunted band DISCRIMINATOR against band 2 (the tangled
+// weed here, the rare koi there). The divergence is asserted rather than
+// described: see the discriminator pin below, which fails if the walks ever
+// collapse onto each other.
+const B1_SEQ_36: (string | null)[] = [
+  PERCH,
   TROUT,
   null,
+  TROUT,
   WEED,
-  TROUT,
-  TROUT,
-  KOI,
-  PERCH,
+  null,
   PERCH,
   TROUT,
-  TROUT,
-  KOI,
-  PERCH,
   PERCH,
   PERCH,
   TROUT,
   KOI,
-  PERCH,
-  PERCH,
-  TROUT,
-  TROUT,
-  TROUT,
+  null,
   TROUT,
   TROUT,
   PERCH,
+  WEED,
+  PERCH,
+  TROUT,
+  TROUT,
+  TROUT,
+  TROUT,
+  TROUT,
   TROUT,
   PERCH,
   TROUT,
+  PERCH,
+  null,
+  PERCH,
+  null,
 ];
 
 // The literal band-2 live-loop sequence for the SAME seed with fishing
-// proficiency 200 (band-2 Vale weights trout 51 / perch 36 / weed 4 / koi 3 /
+// proficiency 200 (band-2 Vale weights trout 50 / perch 34 / weed 4 / koi 6 /
 // null 6) against the same interleaved stream. It diverges, decisively, from
-// BOTH the band-0 and band-1 walks at index 4: that table draw lands where
-// bands 0 and 1 yield the empty hook but band 2 yields the koi (the hunted
-// divergence index under the two-draw stream), so matching this sequence
-// proves the live path resolved FISHING_TABLES_BY_BAND[2], not a band-1
-// collapse (the top-band wiring was previously unpinned on the live path).
-// Re-recorded after the Eastbrook camp respacing thinned the zone-1 camp
-// counts.
-const B2_SEQ_467: (string | null)[] = [
+// BOTH the band-0 and band-1 walks at index 7: that table draw lands where
+// the lower bands yield tangled weed but band 2 yields the rare koi (the junk
+// row falls 8 to 4 while the koi row rises 3 to 6, so the koi span's floor
+// drops 89 to 88 and takes that draw, the hunted divergence cell under the
+// two-draw stream), so matching this sequence proves the live path resolved
+// FISHING_TABLES_BY_BAND[2], not a band-1 collapse (the top-band wiring was
+// previously unpinned on the live path).
+const B2_SEQ_36: (string | null)[] = [
+  PERCH,
   TROUT,
+  null,
   TROUT,
+  PERCH,
+  null,
+  PERCH,
   TROUT,
+  PERCH,
+  PERCH,
   TROUT,
   KOI,
-  WEED,
+  null,
   TROUT,
   TROUT,
-  WEED,
-  PERCH,
-  PERCH,
-  TROUT,
-  TROUT,
-  WEED,
   PERCH,
   PERCH,
   PERCH,
   TROUT,
-  WEED,
+  TROUT,
+  TROUT,
+  TROUT,
+  TROUT,
+  TROUT,
   PERCH,
+  TROUT,
   PERCH,
-  TROUT,
-  TROUT,
-  TROUT,
+  null,
+  PERCH,
+  null,
 ];
 
 // Probe candidate shore spots around the Deepfen Shallows lake with the REAL
@@ -303,9 +321,11 @@ function codfatherSim(): { sim: Sim; meta: PlayerMeta } {
   const sim = makeSim();
   const meta = sim.meta(sim.playerId)!;
   // The shore probe drives the REAL startFishing, whose implement gate
-  // (#2343) needs tackle in bags. The pole is not a gatherTool (tier still
-  // floors to 1), so it changes no draw and no deadline.
-  sim.addItem('simple_fishing_pole', 1);
+  // (#2343) needs tackle in bags AND whose zone gate needs a rod the water
+  // takes. The Deepfen Shallows sit in Mirefen, which asks for tier 2, so the
+  // simple pole alone can no longer reach this quest's water: the Ironreel is
+  // the tackle the Codfather now costs. Pinned on its own below.
+  sim.addItem('ironreel_fishing_rod', 1);
   meta.questLog.set('q_the_codfather', {
     questId: 'q_the_codfather',
     counts: [0],
@@ -334,13 +354,13 @@ describe('fishing determinism (pin 1)', () => {
     expect(seqA.some((c) => c !== null)).toBe(true);
   });
 
-  it('band 0 reproduces the shipped Vale table: literal live-loop sequence at seed 467', () => {
-    const sim = makeSim(467);
+  it('band 0 reproduces the shipped Vale table: literal live-loop sequence at seed 36', () => {
+    const sim = makeSim(36);
     // The pole satisfies the implement gate (#2343) and is mechanically
     // identical to bare hands, so the recorded literals hold byte-identical.
     sim.addItem('simple_fishing_pole', 1);
     teleportToValeShore(sim);
-    expect(catchSequenceLive(sim, sim.meta(sim.playerId)!, 30)).toEqual(B0_SEQ_467);
+    expect(catchSequenceLive(sim, sim.meta(sim.playerId)!, 30)).toEqual(B0_SEQ_36);
   });
 });
 
@@ -384,6 +404,38 @@ describe('fishing draw contract (pin 2, the bite-and-reel shape)', () => {
     expect(outcomes.some((c) => c !== null)).toBe(true);
   });
 
+  it('no skilling while dead: a dead player cannot start a fishing session (R31)', () => {
+    // Already enforced (the dead gate at the top of startFishing); pinned
+    // beside the harvest twin (tests/gather_node_harvest.test.ts) so the pair
+    // cannot rot apart: R31 leans on death actually stopping the skilling.
+    const sim = makeSim(4242);
+    const meta = sim.meta(sim.playerId)!;
+    teleportToValeShore(sim);
+    sim.addItem('simple_fishing_pole', 1);
+    const p = sim.player;
+    p.dead = true;
+    p.hp = 0;
+    sim.events = [];
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+    try {
+      startFishing(sim.ctx, p, meta);
+      expect(p.castingAbility).toBeNull();
+      expect(draws).toBe(0);
+      expect(sim.events).toContainEqual(
+        expect.objectContaining({ type: 'error', text: "You can't do that while dead." }),
+      );
+      // The positive control: the same fixture alive really can cast, so the
+      // refusal above is the dead gate and not a broken shore or missing pole.
+      p.dead = false;
+      p.hp = 1;
+      startFishing(sim.ctx, p, meta);
+      expect(p.castingAbility).toBe(FISHING_CAST_ID);
+    } finally {
+      sim.rng.setObserver(null);
+    }
+  });
+
   it('a missed reel window draws nothing more: one draw total, and only the cast is lost', () => {
     const sim = makeSim(467);
     const meta = sim.meta(sim.playerId)!;
@@ -402,7 +454,12 @@ describe('fishing draw contract (pin 2, the bite-and-reel shape)', () => {
       updateCasting(sim.ctx, p, meta); // the miss fires at deadline + 1
       expect(draws).toBe(1); // no table roll ever happened
       expect(p.castingAbility).toBe(null);
-      expect(sim.events).toContainEqual({ type: 'fishingGotAway', pid: sim.playerId });
+      expect(sim.events).toContainEqual({
+        type: 'fishingGotAway',
+        pid: sim.playerId,
+        zoneId: 'eastbrook_vale',
+        band: 0,
+      });
       expect(sim.events).toContainEqual(
         expect.objectContaining({ type: 'castStop', success: false }),
       );
@@ -440,7 +497,9 @@ describe('fishing draw contract (pin 2, the bite-and-reel shape)', () => {
     }
     // The capacity gate sits AFTER the table roll, so the session still spent
     // both draws (bite delay plus table); at seed 467 the first table draw
-    // resolves a perch (B0_SEQ_467[0]) that simply gets away.
+    // resolves a river perch that simply gets away. Pinned to the row that
+    // actually rolls, so the count below stays a real gate rather than a
+    // vacuous zero for a row the walk never reaches.
     expect(draws).toBe(2);
     expect(sim.events).toContainEqual(
       expect.objectContaining({ type: 'error', text: 'Your bags are full.' }),
@@ -535,6 +594,52 @@ describe('fishing proficiency accrual (pin 3)', () => {
   });
 });
 
+describe('fishing character XP: the deliberate zero', () => {
+  it('grants no character XP on any branch, through both the direct and live cast paths', () => {
+    // Fishing is the only UNCAPPED gathering faucet (no node, no per-player
+    // respawn), so it pays zero character XP by design: at a world-node
+    // harvest's per-action XP it would be worth several times the XP per hour
+    // of every other gathering profession. completeFishing carries that as a
+    // comment; this is the pin, so a later change touching fishing cannot
+    // quietly turn the prose false.
+    const sim = makeSim(4242);
+    const meta = sim.meta(sim.playerId)!;
+    const before = meta.counters.xpGained;
+
+    // The direct path: enough casts to cover landed fish, landed junk, and
+    // the no-bite branch at this seed.
+    let landed = 0;
+    let empty = 0;
+    for (let i = 0; i < 30; i++) {
+      if (castOnce(sim, meta).caught === null) empty++;
+      else landed++;
+    }
+    expect(landed).toBeGreaterThan(0);
+    expect(empty).toBeGreaterThan(0);
+    expect(meta.counters.xpGained).toBe(before);
+
+    // The live cast lifecycle (bite, armed reel window, landed catch) too, so
+    // the zero is not an artifact of calling completeFishing directly. The
+    // implement gate (#2343) needs tackle in bags; the simple pole is
+    // mechanically identical to bare hands, so it perturbs no draw.
+    sim.addItem('simple_fishing_pole', 1);
+    teleportToValeShore(sim);
+    for (let i = 0; i < 5; i++) castOnceLive(sim, meta);
+    expect(meta.counters.xpGained).toBe(before);
+
+    // The proficiency faucet DID run: this is a real zero on a live path, not
+    // a run where nothing happened.
+    sim.tick();
+    expect(meta.gatheringProficiency.fishing).toBeGreaterThan(0);
+
+    // Non-vacuity: the same counter is live and does move when something
+    // actually grants character XP, so the assertions above are a genuine
+    // zero rather than a probe that can never increment.
+    sim.ctx.grantXp(10, meta);
+    expect(meta.counters.xpGained).toBeGreaterThan(before);
+  });
+});
+
 describe('fishing catch gain schedule (Professions 2.0)', () => {
   it('fishingCatchGain walks the fractional schedule AT the half-band boundaries', () => {
     expect(fishingCatchGain(0, false)).toBe(1);
@@ -579,10 +684,15 @@ describe('fishing catch gain schedule (Professions 2.0)', () => {
     expect(meta.pendingGatherGrants).toEqual([{ professionId: 'fishing', amount: 0.5 }]);
   });
 
-  it('live junk cutoff: at proficiency 150 a weed queues nothing while a fish queues 0.02', () => {
-    // No rod, so the band-1 proficiency silently caps to the band-0 table,
-    // which still carries the weed row: junk-ness comes from the caught
-    // item's def kind (ItemDef kind 'junk'), never from the band.
+  it('live R19 ceiling: at proficiency 150 tier-1 water teaches NOTHING, fish and weed alike', () => {
+    // Before R19 this drive pinned the junk cutoff (the fish queued 0.02
+    // while the weed queued nothing). Tier-1 water now grays entirely at 100,
+    // which SWALLOWS the junk cutoff here: both kinds queue nothing, and the
+    // junk-versus-fish discrimination above the ceiling only exists in
+    // higher-tier water, where the pure arms below pin it (a live tier-2
+    // drive would need a rod and a junk row in that band's table, which the
+    // shipped tables do not guarantee). The drive still lands both kinds so
+    // the zero is proven for each, not vacuously.
     const sim = makeSim(467);
     const meta = sim.meta(sim.playerId)!;
     teleportToValeShore(sim);
@@ -592,24 +702,111 @@ describe('fishing catch gain schedule (Professions 2.0)', () => {
     for (let i = 0; i < 60 && !(sawJunk && sawFish); i++) {
       const before = meta.pendingGatherGrants.length;
       const { caught } = castOnce(sim, meta);
-      if (caught === null) {
-        expect(meta.pendingGatherGrants).toHaveLength(before);
-      } else if (caught === WEED) {
-        sawJunk = true;
-        expect(meta.pendingGatherGrants).toHaveLength(before); // cut off past band 0
-      } else {
-        sawFish = true;
-        expect(meta.pendingGatherGrants).toHaveLength(before + 1);
-        expect(meta.pendingGatherGrants[meta.pendingGatherGrants.length - 1]).toEqual({
-          professionId: 'fishing',
-          amount: 0.02,
-        });
-      }
+      if (caught === WEED) sawJunk = true;
+      else if (caught !== null) sawFish = true;
+      expect(meta.pendingGatherGrants).toHaveLength(before);
     }
-    // Decisive only if the drive really saw both kinds (seed 467's band-0
-    // walk lands both well inside 60 casts).
     expect(sawJunk).toBe(true);
     expect(sawFish).toBe(true);
+  });
+
+  it('live R19 in TIER-2 water: Mirefen still teaches 0.1 at proficiency 120', () => {
+    // The live evidence every drive above is blind to: they all fish tier-1
+    // Vale water, so replacing the rodTierRequiredForZone(zoneId) read at
+    // completeFishing's gain call with the literal 1 kept the whole suite
+    // green. 120 is past tier-1's ceiling of 100 and inside tier-2's 150, so
+    // that mutation zeroes the grant this arm requires. Driven in the Deepfen
+    // Shallows (Mirefen), through the shore probe that runs the REAL
+    // startFishing, so the zone rod gate is satisfied for real by the Ironreel
+    // the water demands.
+    const sim = makeSim(467);
+    const meta = sim.meta(sim.playerId)!;
+    sim.addItem('ironreel_fishing_rod', 1);
+    teleportToDeepfenShore(sim, meta);
+    meta.gatheringProficiency.fishing = 120;
+    // The Mirefen-EXCLUSIVE band-1 rows, off the live table: a silent fallback
+    // to the Vale rows (the zone key the table pick falls back to) must not be
+    // mistakable for a Mirefen catch, and the koi sits in both tables.
+    const bandRows = FISHING_TABLES_BY_BAND[1];
+    const valeIds = new Set(bandRows.eastbrook_vale.map((e) => e.itemId));
+    const mirefenOnly = bandRows.mirefen_marsh
+      .map((e) => e.itemId)
+      .filter((id): id is string => id !== null && !valeIds.has(id));
+    expect(mirefenOnly.length).toBeGreaterThan(0); // non-vacuity of the filter
+    let landedFish = 0;
+    for (let i = 0; i < 60 && landedFish === 0; i++) {
+      const before = meta.pendingGatherGrants.length;
+      const [result] = fishingResultsIn(castOnce(sim, meta).events);
+      if (!result) continue; // an empty hook queues nothing on any tier
+      // Grey fishing junk only (weed/boot by literal id). Raw cooking catches
+      // are also kind junk but still teach; do not recompute production's
+      // isGreyFishingJunk formula here or a co-edit can keep both green.
+      if (result.itemId === WEED || result.itemId === 'soggy_boot') {
+        // The junk cutoff composing with the ceiling INSIDE teaching water,
+        // which no live drive covered before: past 100 a boot teaches nothing
+        // even where the water itself still teaches.
+        expect(meta.pendingGatherGrants).toHaveLength(before);
+        expect(isRawCookingCatch(result.itemId)).toBe(false);
+      } else if (mirefenOnly.includes(result.itemId)) {
+        expect(isRawCookingCatch(result.itemId)).toBe(true);
+        landedFish++;
+        // The water the GAIN itself resolved against, straight off the event:
+        // the catch table, the deed credit, the telemetry and the gain all read
+        // one zoneId local, so pinning it here rules out a silent fallback to
+        // the Vale rows being mistaken for tier-2 teaching.
+        expect(result.zoneId).toBe('mirefen_marsh');
+        expect(meta.pendingGatherGrants.slice(before)).toEqual([
+          { professionId: 'fishing', amount: 0.1 },
+        ]);
+      }
+    }
+    expect(landedFish, 'the drive must land a Mirefen fish').toBe(1);
+  });
+
+  it('the R19 teaching ceilings derive from the schedule rows: 100, 150, then the cap', () => {
+    // Walked off the composed gain, not restated: the first proficiency at
+    // which a legal-band fish teaches nothing in each water tier.
+    const grayPoint = (zoneTier: number): number => {
+      for (let p = 0; p <= 200; p++) {
+        if (fishingCatchGainAt(p, false, zoneTier) === 0) return p;
+      }
+      return Number.POSITIVE_INFINITY;
+    };
+    expect(grayPoint(1)).toBe(100);
+    expect(grayPoint(2)).toBe(150);
+    expect(grayPoint(3)).toBe(200);
+    // Each is a true boundary and equals its schedule row's edge, the
+    // derivation the ceiling is defined by.
+    for (const tier of [1, 2, 3]) {
+      expect(fishingCatchGainAt(grayPoint(tier) - 1, false, tier)).toBeGreaterThan(0);
+      expect(fishingTeachingCeilingFor(tier)).toBe(FISHING_GAIN_SCHEDULE[tier].belowProficiency);
+    }
+    // Tier-3 water teaches to the cap: the ceiling IS the cap, so only the
+    // maxSkill clamp stops the climb there.
+    expect(fishingTeachingCeilingFor(3)).toBe(GATHERING_PROFESSIONS.fishing.maxSkill);
+    // Out-of-ladder tiers clamp instead of throwing: below 1 reads tier 1,
+    // above 3 reads tier 3 (a future tier-4 zone teaches to the cap until
+    // the schedule itself grows a row).
+    expect(fishingTeachingCeilingFor(0)).toBe(100);
+    expect(fishingTeachingCeilingFor(4)).toBe(200);
+  });
+
+  it('below its water ceiling the composed gain IS the schedule amount (the D12 arm)', () => {
+    // R19 composes with the untouched schedule: no value changes, teaching
+    // just stops at the water's edge. Junk composition included: the cutoff
+    // still bites above 100 wherever the water itself still teaches.
+    expect(fishingCatchGainAt(0, false, 1)).toBe(1);
+    expect(fishingCatchGainAt(49, false, 1)).toBe(1);
+    expect(fishingCatchGainAt(50, false, 1)).toBe(0.5);
+    expect(fishingCatchGainAt(99, false, 1)).toBe(0.5);
+    expect(fishingCatchGainAt(100, false, 2)).toBe(0.1);
+    expect(fishingCatchGainAt(149, false, 2)).toBe(0.1);
+    expect(fishingCatchGainAt(150, false, 3)).toBe(0.02);
+    expect(fishingCatchGainAt(199, false, 3)).toBe(0.02);
+    // The junk cutoff survives inside higher water's teaching range.
+    expect(fishingCatchGainAt(120, true, 2)).toBe(0);
+    expect(fishingCatchGainAt(120, false, 2)).toBe(0.1);
+    expect(fishingCatchGainAt(99, true, 1)).toBe(0.5);
   });
 });
 
@@ -631,30 +828,33 @@ describe('fishing band function (pin 4)', () => {
   });
 });
 
-// Literal shipped band-0 rows (order included). NEVER derive these from the
-// content table: the whole point is to red-flag drift in the source.
-const SHIPPED_B0_ROWS: Record<string, { itemId: string | null; weight: number }[]> = {
+// Literal band-0 rows (order included). NEVER derive these from the content
+// table: the whole point is to red-flag drift in the source. Eastbrook asks
+// for band 0, so its row is the starter table it has always been apart from
+// the koi, which moved onto the skill scale; Mirefen and Thornpeak are what a
+// band-0 angler gets for fishing one and two bands over their head.
+const B0_ROWS: Record<string, { itemId: string | null; weight: number }[]> = {
   eastbrook_vale: [
-    { itemId: TROUT, weight: 45 },
-    { itemId: PERCH, weight: 30 },
+    { itemId: TROUT, weight: 46 },
+    { itemId: PERCH, weight: 31 },
     { itemId: WEED, weight: 12 },
-    { itemId: KOI, weight: 3 },
+    { itemId: KOI, weight: 1 },
     { itemId: null, weight: 10 },
   ],
   mirefen_marsh: [
-    { itemId: 'raw_marsh_pike', weight: 40 },
-    { itemId: 'raw_bog_eel', weight: 30 },
-    { itemId: 'soggy_boot', weight: 8 },
-    { itemId: WEED, weight: 9 },
-    { itemId: KOI, weight: 3 },
-    { itemId: null, weight: 10 },
+    { itemId: 'raw_marsh_pike', weight: 22 },
+    { itemId: 'raw_bog_eel', weight: 17 },
+    { itemId: 'soggy_boot', weight: 12 },
+    { itemId: WEED, weight: 13 },
+    { itemId: KOI, weight: 1 },
+    { itemId: null, weight: 35 },
   ],
   thornpeak_heights: [
-    { itemId: 'raw_frostgill_trout', weight: 40 },
-    { itemId: 'raw_stonescale_carp', weight: 30 },
-    { itemId: WEED, weight: 14 },
-    { itemId: KOI, weight: 4 },
-    { itemId: null, weight: 12 },
+    { itemId: 'raw_frostgill_trout', weight: 9 },
+    { itemId: 'raw_stonescale_carp', weight: 7 },
+    { itemId: WEED, weight: 28 },
+    { itemId: KOI, weight: 1 },
+    { itemId: null, weight: 55 },
   ],
 };
 
@@ -669,11 +869,10 @@ const JUNK_ROWS: Record<string, string[]> = {
   mirefen_marsh: ['soggy_boot', WEED],
   thornpeak_heights: [WEED],
 };
-const KOI_WEIGHT: Record<string, number> = {
-  eastbrook_vale: 3,
-  mirefen_marsh: 3,
-  thornpeak_heights: 4,
-};
+// The rare catch is the one row that reads SKILL alone: identical in every
+// zone, rising with the band, because it is the rod ladder's reagent and the
+// angler who earned the band should be the one who farms it.
+const KOI_WEIGHT_BY_BAND = [1, 3, 6];
 
 function weightOf(band: number, zoneId: string, itemId: string | null): number {
   const row = FISHING_TABLES_BY_BAND[band][zoneId].find((r) => r.itemId === itemId);
@@ -682,10 +881,10 @@ function weightOf(band: number, zoneId: string, itemId: string | null): number {
 }
 
 describe('fishing table structure (pin 5)', () => {
-  it('band 0 rows for all three zones literally equal the shipped rows, in order', () => {
+  it('band 0 rows for all three zones literally equal the authored rows, in order', () => {
     expect(FISHING_TABLES_BY_BAND).toHaveLength(3);
     for (const zoneId of ZONE_IDS) {
-      expect(FISHING_TABLES_BY_BAND[0][zoneId]).toEqual(SHIPPED_B0_ROWS[zoneId]);
+      expect(FISHING_TABLES_BY_BAND[0][zoneId]).toEqual(B0_ROWS[zoneId]);
     }
   });
 
@@ -701,12 +900,17 @@ describe('fishing table structure (pin 5)', () => {
     }
   });
 
-  it('glimmerfin_koi weight never scales with skill: literally 3/3/4 per zone in every band', () => {
+  it('glimmerfin_koi weight scales with SKILL and nothing else: literally 1/3/6 in every zone', () => {
     for (let band = 0; band < 3; band++) {
       for (const zoneId of ZONE_IDS) {
-        expect(weightOf(band, zoneId, KOI), `${zoneId} band ${band} koi`).toBe(KOI_WEIGHT[zoneId]);
+        expect(weightOf(band, zoneId, KOI), `${zoneId} band ${band} koi`).toBe(
+          KOI_WEIGHT_BY_BAND[band],
+        );
       }
     }
+    // The row really moves, so the loop above is not three copies of one
+    // number, and it moves UP: this is the only row a shortfall never touches.
+    expect(KOI_WEIGHT_BY_BAND[0]).toBeLessThan(KOI_WEIGHT_BY_BAND[2]);
   });
 
   it('band steps are monotonic: food fish never lose weight, junk and empty hooks never gain', () => {
@@ -732,13 +936,40 @@ describe('fishing table structure (pin 5)', () => {
     }
   });
 
+  it('the three literal walks really do diverge, at the indices their comments name', () => {
+    // The band pins below are only decisive because these sequences differ.
+    // Asserting WHERE they differ turns that from a comment into a test: a
+    // reweight that collapsed band 1 onto band 2 would leave every toEqual
+    // above green on identical arrays and prove nothing about band selection.
+    expect(B0_SEQ_36).not.toEqual(B1_SEQ_36);
+    expect(B1_SEQ_36).not.toEqual(B2_SEQ_36);
+    expect(B0_SEQ_36[9]).not.toBe(B1_SEQ_36[9]);
+    expect(B1_SEQ_36[4]).not.toBe(B2_SEQ_36[4]);
+    // The EXACT divergence sets, so every comment naming an index is held to
+    // the recording rather than trusted: bands 0 and 1 part at 9 and 11
+    // only; the two upper bands part at 4 and 16. Both sets sit inside the first
+    // twelve sessions, which is what makes the 12-session slice below decisive.
+    const differing01 = B0_SEQ_36.map((v, i) => (v === B1_SEQ_36[i] ? -1 : i)).filter(
+      (i) => i >= 0,
+    );
+    expect(differing01).toEqual([9, 11]);
+    const differing = B1_SEQ_36.map((v, i) => (v === B2_SEQ_36[i] ? -1 : i)).filter((i) => i >= 0);
+    expect(differing).toEqual([4, 16]);
+    // The 12-session slice pins band 0 against band 2 directly, so record where
+    // THAT pair parts too under the same stream.
+    const differing02 = B0_SEQ_36.map((v, i) => (v === B2_SEQ_36[i] ? -1 : i)).filter(
+      (i) => i >= 0,
+    );
+    expect(differing02).toEqual([4, 9, 11, 16]);
+  });
+
   it('FISHING_TABLES is the identical band-0 object (alias identity, not a copy)', () => {
     expect(FISHING_TABLES).toBe(FISHING_TABLES_BY_BAND[0]);
   });
 
-  it('no band introduces an item id outside the shipped band-0 set (zero new items)', () => {
+  it('no band introduces an item id outside the band-0 set (zero new items)', () => {
     for (const zoneId of ZONE_IDS) {
-      const shipped = new Set(SHIPPED_B0_ROWS[zoneId].map((r) => r.itemId));
+      const shipped = new Set(B0_ROWS[zoneId].map((r) => r.itemId));
       for (let band = 0; band < 3; band++) {
         for (const row of FISHING_TABLES_BY_BAND[band][zoneId]) {
           expect(shipped.has(row.itemId), `${zoneId} band ${band} id ${row.itemId}`).toBe(true);
@@ -749,8 +980,8 @@ describe('fishing table structure (pin 5)', () => {
 });
 
 describe('fishing band selection liveness (pin 6)', () => {
-  it('proficiency 150 resolves the band-1 Vale table: literal live-loop sequence at seed 467', () => {
-    const sim = makeSim(467);
+  it('proficiency 150 resolves the band-1 Vale table: literal live-loop sequence at seed 36', () => {
+    const sim = makeSim(36);
     const meta = sim.meta(sim.playerId)!;
     meta.gatheringProficiency.fishing = 150;
     // Band 1 also needs the tier-2 rod in bags (the silent tool
@@ -759,24 +990,24 @@ describe('fishing band selection liveness (pin 6)', () => {
     // rod-independent given the band.
     sim.addItem('ironreel_fishing_rod', 1);
     teleportToValeShore(sim);
-    // B1_SEQ_467 first diverges from B0_SEQ_467 at index 5 for the same rng
+    // B1_SEQ_36 first diverges from B0_SEQ_36 at index 6 for the same rng
     // stream, so this full-walk match proves the live path actually switched
     // tables.
-    expect(catchSequenceLive(sim, meta, 30)).toEqual(B1_SEQ_467);
+    expect(catchSequenceLive(sim, meta, 30)).toEqual(B1_SEQ_36);
   });
 
-  it('proficiency 200 resolves the band-2 Vale table: literal live-loop sequence at seed 467', () => {
-    const sim = makeSim(467);
+  it('proficiency 200 resolves the band-2 Vale table: literal live-loop sequence at seed 36', () => {
+    const sim = makeSim(36);
     const meta = sim.meta(sim.playerId)!;
     meta.gatheringProficiency.fishing = 200;
     // Band 2 needs the tier-3 rod (band b requires tool tier b + 1).
     sim.addItem('silverstream_fishing_rod', 1);
     teleportToValeShore(sim);
-    // Index 4 sits in the hunted band-discriminating window (the koi here
-    // where the band-0 and band-1 tables yield the empty hook; see the
-    // B2_SEQ_467 derivation comment), so this match proves the live path
-    // resolved the TOP band, not a band-1 collapse.
-    expect(catchSequenceLive(sim, meta, 24)).toEqual(B2_SEQ_467);
+    // Index 7 is the hunted band-discriminating cell (the rare koi here, where
+    // both lower tables yield tangled weed; see the B2_SEQ_36 derivation
+    // comment), so this match proves the live path resolved the TOP band, not
+    // a band-1 collapse.
+    expect(catchSequenceLive(sim, meta, 30)).toEqual(B2_SEQ_36);
   });
 });
 
@@ -789,7 +1020,7 @@ describe('fishing band selection liveness (pin 6)', () => {
 // the denial pin below).
 describe('fishing band tool cap (Professions 2.0)', () => {
   it('proficiency 150 with only the pole (no rod) silently caps to the band-0 table (literal sequence)', () => {
-    const sim = makeSim(467);
+    const sim = makeSim(36);
     const meta = sim.meta(sim.playerId)!;
     meta.gatheringProficiency.fishing = 150;
     // The pole satisfies the implement gate (#2343) but is NOT a gatherTool,
@@ -797,61 +1028,63 @@ describe('fishing band tool cap (Professions 2.0)', () => {
     // arm's intent, unchanged.
     sim.addItem('simple_fishing_pole', 1);
     teleportToValeShore(sim);
-    // B0 and B1 diverge at indices 5, 8, 10, and 13 on this stream, so the
+    // B0 and B1 diverge at indices 6, 9, and 14 on this stream, so the
     // full 30-session walk is decisive: band-1 proficiency without a rod
     // still walks the SHIPPED band-0 table, and nothing else changes (no
     // error, no event).
-    expect(catchSequenceLive(sim, meta, 30)).toEqual(B0_SEQ_467);
+    expect(catchSequenceLive(sim, meta, 30)).toEqual(B0_SEQ_36);
   });
 
-  it('proficiency 250 with the tier-2 rod stays band 1: the discriminator window yields the koi', () => {
-    const sim = makeSim(467);
+  it('proficiency 250 with the tier-2 rod stays band 1: the discriminator cell yields weed', () => {
+    const sim = makeSim(36);
     const meta = sim.meta(sim.playerId)!;
     meta.gatheringProficiency.fishing = 250;
     sim.addItem('ironreel_fishing_rod', 1);
     teleportToValeShore(sim);
-    // Index 10 (perch, not band 0's tangled weed) proves the walk left band
-    // 0; index 4 is the hunted band DISCRIMINATOR: that table draw lands
-    // where band 2 yields the koi but band 1 yields the empty hook (the
-    // B2_SEQ_467 derivation comment), so the empty hook there proves the
-    // tier-2 rod held the walk at band 1 despite band-2 proficiency.
-    expect(catchSequenceLive(sim, meta, 30)).toEqual(B1_SEQ_467);
+    // Indices 6, 9, and 14 (perch and trout, not band 0's weed and perch)
+    // prove the walk left band 0; index 7 is the hunted band DISCRIMINATOR:
+    // that table draw lands where band 2 yields the rare koi but band 1 still
+    // yields tangled weed (the B2_SEQ_36 derivation comment), so that cell
+    // proves the tier-2 rod held the walk at band 1 despite band-2
+    // proficiency.
+    expect(catchSequenceLive(sim, meta, 30)).toEqual(B1_SEQ_36);
   });
 
   it('proficiency 250 with the tier-3 rod reaches band 2 (the full B2 literal)', () => {
-    const sim = makeSim(467);
+    const sim = makeSim(36);
     const meta = sim.meta(sim.playerId)!;
     meta.gatheringProficiency.fishing = 250;
     sim.addItem('silverstream_fishing_rod', 1);
     teleportToValeShore(sim);
-    expect(catchSequenceLive(sim, meta, 24)).toEqual(B2_SEQ_467);
+    expect(catchSequenceLive(sim, meta, 30)).toEqual(B2_SEQ_36);
   });
 
   it('a high rod never buys bands: proficiency band 0 with the tier-3 rod stays band 0', () => {
-    const sim = makeSim(467);
+    const sim = makeSim(36);
     const meta = sim.meta(sim.playerId)!;
     // Proficiency 0 resolves band 0 while the silverstream rod allows band 2,
     // so the effective band must take the PROFICIENCY arm of min(profBand,
     // allowedBand): a fresh buyer of the 150c rod cannot fish the band-2
     // table. Every other cap test binds the rod arm or the equal case, so
     // this is the only guard against the min() collapsing to allowedBand
-    // alone. B0 diverges from B2 at index 4 (the empty hook vs the koi), so
-    // 12 sessions are decisive.
+    // alone. B0 diverges from B2 at index 6 (tangled weed against the perch)
+    // and again at 7 (tangled weed against the rare koi), so 12 sessions are
+    // decisive.
     sim.addItem('silverstream_fishing_rod', 1);
     teleportToValeShore(sim);
-    expect(catchSequenceLive(sim, meta, 12)).toEqual(B0_SEQ_467.slice(0, 12));
+    expect(catchSequenceLive(sim, meta, 12)).toEqual(B0_SEQ_36.slice(0, 12));
   });
 
   it('a pole-only proficiency-0 angler still reproduces the B0 literal walk exactly', () => {
-    const sim = makeSim(467);
+    const sim = makeSim(36);
     const meta = sim.meta(sim.playerId)!;
     // The pole keeps use: { type: 'fishing' }: it satisfies the implement
     // gate (#2343) but is not a gatherTool, so the bag scan floors to tier 1:
     // band 0 AND the tier-1 bite-delay range, so both draws of every session
-    // match the B0 recording (made bare-handed, pre-gate) byte for byte.
+    // match the B0 recording byte for byte.
     sim.addItem('simple_fishing_pole', 1);
     teleportToValeShore(sim);
-    expect(catchSequenceLive(sim, meta, 30)).toEqual(B0_SEQ_467);
+    expect(catchSequenceLive(sim, meta, 30)).toEqual(B0_SEQ_36);
   });
 
   it('bare hands are denied at the cast: exactly one gatherDenied, zero draws, no session (#2343)', () => {
@@ -884,9 +1117,20 @@ describe('fishing band tool cap (Professions 2.0)', () => {
     expect(sim.player.castingAbility).toBe(null);
   });
 
-  it('useItem on each new rod starts the standard fishing cast', () => {
-    for (const rodId of ['ironreel_fishing_rod', 'silverstream_fishing_rod']) {
-      const sim = makeSim(467);
+  it('useItem on every tiered rod starts the standard fishing cast', () => {
+    // Derived over the live item table rather than a hand list, so a rod
+    // added later cannot skip this by not being written down here.
+    const rodIds = Object.values(ITEMS)
+      .filter((def) => def.use?.type === 'gatherTool' && def.use.professionId === 'fishing')
+      .map((def) => def.id);
+    expect(rodIds.sort()).toEqual([
+      'ironreel_fishing_rod',
+      'silverstream_fishing_rod',
+      'stormreel_fishing_rod',
+      'tidewrought_fishing_rod',
+    ]);
+    for (const rodId of rodIds) {
+      const sim = makeSim(4242);
       // South shore of the vale lake, facing the center (the pin-10 idiom).
       const pz = LAKE.z - LAKE.radius - 2;
       teleportTo(sim, LAKE.x, pz);
@@ -953,11 +1197,15 @@ describe('fishing band tool cap (Professions 2.0)', () => {
 
 describe('fishingResult event (pin 7)', () => {
   it('a landed catch emits the text-free fishingResult alongside the item grant', () => {
-    const sim = makeSim(467);
+    const sim = makeSim(8);
     const meta = sim.meta(sim.playerId)!;
     sim.events = [];
     const { caught, events } = castOnce(sim, meta);
-    expect(caught).toBe(PERCH); // the first shared-stream table draw at seed 467
+    // The first shared-stream table draw at seed 8, re-hunted after the
+    // release-content sync: the tangled weed, which is still a landed catch.
+    // The junk row is the deliberate choice here, since it proves junk emits
+    // the event too, at its own def quality (poor), and not just food fish.
+    expect(caught).toBe(WEED);
     const results = fishingResultsIn(events);
     expect(results).toHaveLength(1);
     // Exact shape: ids plus values only (the gatherResult precedent), so a
@@ -965,20 +1213,27 @@ describe('fishingResult event (pin 7)', () => {
     expect(results[0]).toEqual({
       type: 'fishingResult',
       pid: sim.playerId,
-      itemId: PERCH,
-      quality: 'common',
+      itemId: WEED,
+      quality: 'poor',
+      zoneId: 'eastbrook_vale',
+      band: 0,
     });
     // The loot grant still happens alongside the event.
-    expect(sim.countItem(PERCH)).toBe(1);
+    expect(sim.countItem(WEED)).toBe(1);
   });
 
   it('quality mirrors the caught ItemDef (poor for weed, uncommon for koi); silent on no-bite', () => {
-    const sim = makeSim(467);
+    const sim = makeSim(1);
     const meta = sim.meta(sim.playerId)!;
+    // Band 2, because the koi is a skill-scaled row now: at band 0 it is one
+    // weight in a hundred and a short walk would not reach one. The event
+    // shape under test is band-agnostic; only how long you wait is not.
+    meta.gatheringProficiency.fishing = 200;
+    sim.addItem('silverstream_fishing_rod', 1);
     let weedEvent: FishingResultEvent | undefined;
     let koiEvent: FishingResultEvent | undefined;
     let sawNoBite = false;
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 32; i++) {
       const { caught, events } = castOnce(sim, meta);
       const results = fishingResultsIn(events);
       if (caught === null) {
@@ -994,7 +1249,9 @@ describe('fishingResult event (pin 7)', () => {
         if (caught === KOI) koiEvent = results[0];
       }
     }
-    // The seed 467 run covers all three arms (see B0_SEQ_467).
+    // The seed 4242 band-2 run covers all three arms (re-recorded after the
+    // Galecrest quest-camp content pass): the weed at 11, the empty hook at
+    // 13, the koi at 14 and again at 16.
     expect(sawNoBite).toBe(true);
     expect(weedEvent?.quality).toBe('poor');
     expect(koiEvent?.quality).toBe('uncommon');
@@ -1016,14 +1273,15 @@ describe('landed-catch grant flags (pin 11)', () => {
     }>;
 
   it('a landed catch grants silent and caller-logged, so the reel line is the only line', () => {
-    const sim = makeSim(4242);
+    const sim = makeSim(1);
     const meta = sim.meta(sim.playerId)!;
     sim.events = [];
     const { caught, events } = castOnce(sim, meta);
-    // Seed 4242's first band-0 cast, re-recorded at the origin/main base merge
-    // (the merged content moves the shared rng before the cast). Pinned to the
-    // fish rather than "not null" so the case still proves a real catch landed,
-    // which is what makes the grant flags below meaningful.
+    // Seed 1's first band-0 cast, re-recorded after the release-content sync.
+    // quest-camp content pass (any content add moves the shared rng before
+    // the cast). Pinned to the fish rather than "not null" so the case still
+    // proves a real catch landed, which is what makes the grant flags below
+    // meaningful.
     expect(caught).toBe(TROUT);
     const loot = lootIn(events);
     expect(loot).toHaveLength(1);
@@ -1073,7 +1331,9 @@ describe('landed-catch grant flags (pin 11)', () => {
 
 describe('fishing deeds through the extracted module path (pin 9)', () => {
   it('a landed real fish via completeFishing still marks fish:<zone>', () => {
-    const sim = makeSim(467);
+    // Seed 4, re-hunted after the release-content sync: the first cast lands
+    // the perch.
+    const sim = makeSim(4);
     const meta = sim.meta(sim.playerId)!;
     expect(meta.deedStats.visited.has('fish:eastbrook_vale')).toBe(false);
     const { caught } = castOnce(sim, meta);
@@ -1122,16 +1382,19 @@ describe('fishing deeds through the extracted module path (pin 9)', () => {
     // Acceptance criterion 3: the rare catch and its deed complete unchanged
     // through the extracted module path. col_glimmerfin is a collectItems
     // trigger riding the addItem collection path, so a real completeFishing
-    // koi (index 11 of the seed-467 castOnce walk, re-recorded after the
-    // Eastbrook camp respacing thinned the zone-1 camp counts and shifted the
-    // shared stream) must credit it end to end.
-    const sim = makeSim(467);
+    // koi must credit it end to end. Driven at band 2, the band the koi row is
+    // now weighted for; the deed itself has no band condition.
+    const sim = makeSim(4);
     const meta = sim.meta(sim.playerId)!;
+    meta.gatheringProficiency.fishing = 200;
+    sim.addItem('silverstream_fishing_rod', 1);
     let koiAt = -1;
-    for (let i = 0; i < 15; i++) {
+    // Seed 4, re-hunted after the release-content sync: the band-2 walk still
+    // lands a single koi inside the same six casts.
+    for (let i = 0; i < 6; i++) {
       if (castOnce(sim, meta).caught === KOI) koiAt = i;
     }
-    expect(koiAt).toBe(11);
+    expect(koiAt).toBe(5);
     expect(sim.events).toContainEqual(
       expect.objectContaining({
         type: 'log',
@@ -1287,55 +1550,6 @@ function lastSnap(sent: any[]): any {
   return null;
 }
 
-// A ClientWorld without the WebSocket plumbing, to drive applySnapshot
-// directly (the bareClient idiom from tests/snapshots.test.ts).
-function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWorld {
-  const c: any = Object.create(ClientWorld.prototype);
-  c.cfg = { seed: 20061, playerClass };
-  c.entities = new Map();
-  c.playerId = pid;
-  c.ownPlayerId = pid;
-  c.ownPlayerClass = playerClass;
-  c.spectating = null;
-  c.cupInfo = null;
-  c.sportRole = null;
-  c.moveInput = {};
-  c.inventory = [];
-  c.vendorBuyback = [];
-  c.equipment = {};
-  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
-  c.copper = 0;
-  c.honor = 0;
-  c.lifetimeHonor = 0;
-  c.xp = 0;
-  c.known = [];
-  c.questLog = new Map();
-  c.questsDone = new Set();
-  c.pendingQuestCommands = new Map();
-  c.partyInfo = null;
-  c.selectedDungeonDifficulty = 'normal';
-  c.tradeInfo = null;
-  c.duelInfo = null;
-  c.lastSnapAt = 0;
-  c.snapInterval = 50;
-  c.serverTickHz = null;
-  c.missingSince = new Map();
-  c.pendingFacingDelta = 0;
-  c.connected = true;
-  c.eventQueue = [];
-  c.mouselookFacing = null;
-  c.lastInputSentAt = 0;
-  c.lastInputSig = '';
-  c.inputSeq = 0;
-  c.pendingInputSeqSentAt = new Map();
-  c.ackedInputSeq = 0;
-  c.inputEchoSamples = [];
-  c.spectateFacingPending = false;
-  c.pendingSpectateFacing = null;
-  c.nodeCooldowns = new Map();
-  return c;
-}
-
 describe('fishing over the live server (pin 8)', () => {
   // Joins two sessions, silences every mob (mob damage cancels a fishing
   // session mid-drive), hands the angler the pole, and probes shore spots
@@ -1446,6 +1660,55 @@ describe('fishing over the live server (pin 8)', () => {
     expect(client.gatheringProficiency.fishing).toBe(1);
   });
 
+  it('an empty-hook reel routes the personal fishingEmptyHook to the angler only', () => {
+    // The telemetry-only sibling of the routed trio above: no client handler
+    // exists by design (the player-visible half is the "No fish are biting."
+    // log line), but the event still rides the same personal routing, and
+    // this is the one arm of the four that had no online pin.
+    const { server, fcA, fcB, sa, angler } = setupAngler();
+    let empty = false;
+    for (let session = 0; session < 100 && !empty; session++) {
+      if (angler.castingAbility !== FISHING_CAST_ID) {
+        server.sim.useItem('simple_fishing_pole', sa.pid);
+        expect(angler.castingAbility).toBe(FISHING_CAST_ID);
+      }
+      fcA.sent.length = 0;
+      fcB.sent.length = 0;
+      let bit = false;
+      for (let i = 0; i < 200 && !bit; i++) {
+        (server as any).routeEvents(server.sim.tick());
+        bit = deliveredEvents(fcA).some((ev) => ev.type === 'fishingBite');
+      }
+      expect(bit).toBe(true);
+      server.sim.useItem('simple_fishing_pole', sa.pid); // the reel
+      (server as any).routeEvents(server.sim.drainEvents());
+      empty = deliveredEvents(fcA).some((ev) => ev.type === 'fishingEmptyHook');
+      expect(deliveredEvents(fcB).some((ev) => ev.type === 'fishingEmptyHook')).toBe(false);
+      server.sim.tick();
+    }
+    expect(empty).toBe(true);
+  });
+
+  it('a pre-bite re-press over the live server reels in early: personal fishingEarlyReel, no busy error, recast allowed', () => {
+    const { server, fcA, fcB, sa, angler } = setupAngler();
+    // The probe cast is live and pre-bite straight out of setup. Ride the
+    // real loop past the grace but under the 3 s bite floor.
+    expect(angler.castingAbility).toBe(FISHING_CAST_ID);
+    expect(angler.fishBiteAtTick).toBeGreaterThan(0);
+    for (let i = 0; i < 25; i++) server.sim.tick();
+    expect(angler.fishBiteAtTick).toBeGreaterThan(server.sim.tickCount);
+    server.sim.useItem('simple_fishing_pole', sa.pid); // the spam press
+    (server as any).routeEvents(server.sim.drainEvents());
+    expect(angler.castingAbility).toBe(null);
+    // The personal event reached the angler only, and no busy error did.
+    expect(deliveredEvents(fcA).some((ev) => ev.type === 'fishingEarlyReel')).toBe(true);
+    expect(deliveredEvents(fcB).some((ev) => ev.type === 'fishingEarlyReel')).toBe(false);
+    expect(deliveredEvents(fcA).some((ev) => ev.type === 'error')).toBe(false);
+    // The early reel costs only the cast: the recast starts immediately.
+    server.sim.useItem('simple_fishing_pole', sa.pid);
+    expect(angler.castingAbility).toBe(FISHING_CAST_ID);
+  });
+
   it('a missed reel window gets away server-side: personal fishingGotAway, no catch, no grant', () => {
     const { server, fcA, fcB, sa, angler, meta } = setupAngler();
     let missed = false;
@@ -1464,5 +1727,465 @@ describe('fishing over the live server (pin 8)', () => {
     // Recast immediately: the miss costs nothing but the session itself.
     server.sim.useItem('simple_fishing_pole', sa.pid);
     expect(angler.castingAbility).toBe(FISHING_CAST_ID);
+  });
+});
+
+describe('the reel is exempt from the in-combat gate', () => {
+  it('aggro during the bite wait no longer eats a valid reel', () => {
+    const sim = makeSim(4242);
+    const meta = sim.meta(sim.playerId)!;
+    teleportToValeShore(sim);
+    sim.addItem('simple_fishing_pole', 1);
+    const p = sim.player;
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+    try {
+      startFishing(sim.ctx, p, meta); // the bite-delay draw
+      expect(p.castingAbility).toBe(FISHING_CAST_ID);
+      sim.tickCount = p.fishBiteAtTick;
+      updateCasting(sim.ctx, p, meta); // fires the bite, arms the reel window
+      expect(p.fishReelDeadlineTick).toBeGreaterThan(0);
+      // Something aggroes during the wait: proximity aggro sets inCombat
+      // with no landed hit, so the armed reel is still valid.
+      p.inCombat = true;
+      sim.events = [];
+      startFishing(sim.ctx, p, meta); // the reel: the table draw
+    } finally {
+      sim.rng.setObserver(null);
+    }
+    // The catch LANDS: session ended cleanly, the table draw was spent, and
+    // no combat denial fired.
+    expect(p.castingAbility).toBeNull();
+    expect(draws).toBe(2);
+    expect(
+      sim.events.some(
+        (e) =>
+          (e as { type: string; success?: boolean }).type === 'castStop' &&
+          (e as { success?: boolean }).success === true,
+      ),
+    ).toBe(true);
+    expect(
+      sim.events.some(
+        (e) =>
+          (e as { type: string; text?: string }).type === 'error' &&
+          (e as { text?: string }).text === "You can't do that while in combat.",
+      ),
+    ).toBe(false);
+    p.inCombat = false;
+  });
+
+  it('in combat with NO armed reel, a re-press reels in early instead of a free denial (order pin)', () => {
+    // Pre-bite: the session runs but the deadline is unarmed. The early-reel
+    // arm sits ABOVE the combat denial for the same reason the reel arm does:
+    // were the denial to win, an in-combat spammer would get free no-op
+    // presses until the bite armed the window and the hoisted reel arm landed
+    // the catch anyway (the spam-click exploit, combat variant).
+    const sim = makeSim(4242);
+    const meta = sim.meta(sim.playerId)!;
+    teleportToValeShore(sim);
+    sim.addItem('simple_fishing_pole', 1);
+    const p = sim.player;
+    startFishing(sim.ctx, p, meta);
+    expect(p.castingAbility).toBe(FISHING_CAST_ID);
+    expect(p.fishReelDeadlineTick).toBe(0);
+    // Past the grace (aggro can arrive any time during the 3 to 8 s wait).
+    for (let t = 0; t < Math.round(FISH_EARLY_REEL_GRACE_SEC / DT); t++) {
+      sim.tickCount += 1;
+      updateCasting(sim.ctx, p, meta);
+    }
+    p.inCombat = true;
+    sim.events = [];
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+    try {
+      startFishing(sim.ctx, p, meta);
+    } finally {
+      sim.rng.setObserver(null);
+    }
+    // The session ended as an early reel: no combat denial, no draw spent.
+    expect(sim.events.some((e) => (e as { type: string }).type === 'error')).toBe(false);
+    expect(sim.events).toContainEqual(expect.objectContaining({ type: 'fishingEarlyReel' }));
+    expect(p.castingAbility).toBeNull();
+    expect(draws).toBe(0);
+    p.inCombat = false;
+  });
+
+  it('a reel past the deadline still gets the busy error, in combat or not (the miss arm owns that tick)', () => {
+    const sim = makeSim(4242);
+    const meta = sim.meta(sim.playerId)!;
+    teleportToValeShore(sim);
+    sim.addItem('simple_fishing_pole', 1);
+    const p = sim.player;
+    startFishing(sim.ctx, p, meta);
+    sim.tickCount = p.fishBiteAtTick;
+    updateCasting(sim.ctx, p, meta);
+    // One past the deadline: the miss arm owns this tick, not the reel.
+    sim.tickCount = p.fishReelDeadlineTick + 1;
+    sim.events = [];
+    startFishing(sim.ctx, p, meta);
+    expect(
+      sim.events.some(
+        (e) =>
+          (e as { type: string; text?: string }).type === 'error' &&
+          (e as { text?: string }).text === 'You are busy.',
+      ),
+    ).toBe(true);
+  });
+});
+
+describe('a pre-bite re-press reels in early: the spam-click exploit stays closed', () => {
+  // THE EXPLOIT THIS PINS SHUT: a re-press before the bite used to fall
+  // through to the free "You are busy." no-op, so holding the pole button on
+  // a spam cadence was a guaranteed catch: one of the presses always fell
+  // inside the armed reel window, and the reaction minigame (attention over
+  // reflexes, docs/design/professions.md) never happened. Now every pre-bite
+  // press reels the line in empty and ends the session, so spam casts and
+  // cancels forever and only a press that answers the BITE can land a fish.
+  it('spam-pressing the pole never lands a reel', () => {
+    const sim = makeSim(467);
+    const meta = sim.meta(sim.playerId)!;
+    teleportToValeShore(sim);
+    sim.addItem('simple_fishing_pole', 1);
+    const p = sim.player;
+    const before = new Map(VALE_CATCH_IDS.map((id) => [id, sim.countItem(id)]));
+    // 100 press cycles at 4 ticks (0.2 s) apart: pre-fix the first session's
+    // bite (3 to 8 s in) always armed the window under a live session and the
+    // next spam press landed the reel. Post-fix a session survives only the
+    // grace (1 s): presses inside it are busy no-ops, the first press past
+    // it reels in early, and no session ever reaches the 3 s bite floor.
+    for (let i = 0; i < 100; i++) {
+      if (p.castingAbility !== FISHING_CAST_ID) startFishing(sim.ctx, p, meta);
+      for (let t = 0; t < 4; t++) {
+        sim.tickCount += 1;
+        updateCasting(sim.ctx, p, meta);
+      }
+      startFishing(sim.ctx, p, meta); // the spam press
+    }
+    const earlyReels = sim.events.filter(
+      (e) => (e as { type: string }).type === 'fishingEarlyReel',
+    ).length;
+    // No reel ever resolved: no landed catch, no empty hook, no successful
+    // castStop, no item, no proficiency grant. Sessions die on the first
+    // press past the grace: 5 cycles each (ages 4/8/12/16 busy, 20 reels
+    // early), so 100 cycles is exactly 20 early reels.
+    expect(fishingResultsIn(sim.events)).toHaveLength(0);
+    expect(sim.events.some((e) => (e as { type: string }).type === 'fishingEmptyHook')).toBe(false);
+    expect(sim.events.some((e) => (e as { type: string }).type === 'fishingBite')).toBe(false);
+    expect(
+      sim.events.some(
+        (e) =>
+          (e as { type: string; success?: boolean }).type === 'castStop' &&
+          (e as { success?: boolean }).success === true,
+      ),
+    ).toBe(false);
+    for (const id of VALE_CATCH_IDS) expect(sim.countItem(id)).toBe(before.get(id));
+    expect(meta.pendingGatherGrants).toHaveLength(0);
+    expect(earlyReels).toBe(20);
+  });
+
+  it('the grace stays strictly under the bite floor, or spam would be free again (derivation pin)', () => {
+    // Were FISH_EARLY_REEL_GRACE_SEC ever tuned to reach
+    // FISH_BITE_DELAY_MIN_SEC, presses inside the grace would be free no-ops
+    // all the way to an armed reel window and the spam-click exploit would
+    // reopen. The margin is two full seconds today.
+    expect(FISH_EARLY_REEL_GRACE_SEC).toBeLessThan(FISH_BITE_DELAY_MIN_SEC);
+  });
+
+  it('inside the grace a re-press is the busy no-op and the session survives (double-press guard)', () => {
+    const sim = makeSim(467);
+    const meta = sim.meta(sim.playerId)!;
+    teleportToValeShore(sim);
+    sim.addItem('simple_fishing_pole', 1);
+    const p = sim.player;
+    startFishing(sim.ctx, p, meta);
+    // One tick in (a bag double-click, key auto-repeat): still the busy
+    // denial, session untouched, no draw.
+    sim.tickCount += 1;
+    updateCasting(sim.ctx, p, meta);
+    sim.events = [];
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+    try {
+      startFishing(sim.ctx, p, meta);
+    } finally {
+      sim.rng.setObserver(null);
+    }
+    expect(sim.events).toContainEqual(
+      expect.objectContaining({ type: 'error', text: 'You are busy.' }),
+    );
+    expect(sim.events.some((e) => (e as { type: string }).type === 'fishingEarlyReel')).toBe(false);
+    expect(p.castingAbility).toBe(FISHING_CAST_ID);
+    expect(draws).toBe(0);
+  });
+
+  it('the grace boundary is exact: the last in-grace tick denies, the first past it reels early', () => {
+    const graceTicks = Math.round(FISH_EARLY_REEL_GRACE_SEC / DT);
+    // One tick short of the grace: still the busy denial.
+    {
+      const sim = makeSim(467);
+      const meta = sim.meta(sim.playerId)!;
+      teleportToValeShore(sim);
+      sim.addItem('simple_fishing_pole', 1);
+      const p = sim.player;
+      startFishing(sim.ctx, p, meta);
+      for (let t = 0; t < graceTicks - 1; t++) {
+        sim.tickCount += 1;
+        updateCasting(sim.ctx, p, meta);
+      }
+      sim.events = [];
+      startFishing(sim.ctx, p, meta);
+      expect(sim.events).toContainEqual(
+        expect.objectContaining({ type: 'error', text: 'You are busy.' }),
+      );
+      expect(p.castingAbility).toBe(FISHING_CAST_ID);
+    }
+    // Exactly the grace: the early reel ends the session.
+    {
+      const sim = makeSim(467);
+      const meta = sim.meta(sim.playerId)!;
+      teleportToValeShore(sim);
+      sim.addItem('simple_fishing_pole', 1);
+      const p = sim.player;
+      startFishing(sim.ctx, p, meta);
+      for (let t = 0; t < graceTicks; t++) {
+        sim.tickCount += 1;
+        updateCasting(sim.ctx, p, meta);
+      }
+      sim.events = [];
+      startFishing(sim.ctx, p, meta);
+      expect(sim.events).toContainEqual(expect.objectContaining({ type: 'fishingEarlyReel' }));
+      expect(p.castingAbility).toBeNull();
+    }
+  });
+
+  it('the early reel ends the session draw-free with the pinned zone and no busy error', () => {
+    const sim = makeSim(467);
+    const meta = sim.meta(sim.playerId)!;
+    teleportToValeShore(sim);
+    sim.addItem('simple_fishing_pole', 1);
+    const p = sim.player;
+    startFishing(sim.ctx, p, meta);
+    expect(p.castingAbility).toBe(FISHING_CAST_ID);
+    const pinnedZone = p.fishCastZoneId;
+    expect(pinnedZone).not.toBe('');
+    // Ride past the double-press grace (1 s), still well before the 3 s
+    // bite floor.
+    for (let t = 0; t < Math.round(FISH_EARLY_REEL_GRACE_SEC / DT); t++) {
+      sim.tickCount += 1;
+      updateCasting(sim.ctx, p, meta);
+    }
+    expect(p.fishBiteAtTick).toBeGreaterThan(sim.tickCount); // still pre-bite
+    sim.events = [];
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+    try {
+      startFishing(sim.ctx, p, meta); // the early re-press
+    } finally {
+      sim.rng.setObserver(null);
+    }
+    // Session over, hidden state cleared, zero draws (the one-draw-per-cast
+    // contract: a session that ends early spent only its bite-delay draw).
+    expect(draws).toBe(0);
+    expect(p.castingAbility).toBeNull();
+    expect(p.fishBiteAtTick).toBe(0);
+    expect(p.fishReelDeadlineTick).toBe(0);
+    expect(p.fishCastZoneId).toBe('');
+    // The event carries the rod-gate-validated cast zone and the effective
+    // band, exactly like the miss family it sits beside.
+    expect(sim.events).toContainEqual(
+      expect.objectContaining({
+        type: 'fishingEarlyReel',
+        pid: sim.playerId,
+        zoneId: pinnedZone,
+        band: 0,
+      }),
+    );
+    expect(sim.events).toContainEqual(
+      expect.objectContaining({ type: 'castStop', entityId: sim.playerId, success: false }),
+    );
+    // The old free no-op is gone, and the miss family is untouched: an early
+    // reel is not a got-away (the telemetry counts them apart).
+    expect(sim.events.some((e) => (e as { type: string }).type === 'error')).toBe(false);
+    expect(sim.events.some((e) => (e as { type: string }).type === 'fishingGotAway')).toBe(false);
+    // Recasting is immediate: the early reel costs only the cast itself.
+    startFishing(sim.ctx, p, meta);
+    expect(p.castingAbility).toBe(FISHING_CAST_ID);
+  });
+
+  it('a direct-assigned session with inert hidden state still gets the busy error', () => {
+    // The parity/cancel drives assign castingAbility directly and never arm
+    // fishBiteAtTick; the early-reel arm keys on a LIVE pre-bite session
+    // (fishBiteAtTick > 0), so those drives keep the plain busy denial.
+    const sim = makeSim(467);
+    const meta = sim.meta(sim.playerId)!;
+    teleportToValeShore(sim);
+    sim.addItem('simple_fishing_pole', 1);
+    const p = sim.player;
+    p.castingAbility = FISHING_CAST_ID;
+    expect(p.fishBiteAtTick).toBe(0);
+    sim.events = [];
+    startFishing(sim.ctx, p, meta);
+    expect(sim.events).toContainEqual(
+      expect.objectContaining({ type: 'error', text: 'You are busy.' }),
+    );
+    expect(p.castingAbility).toBe(FISHING_CAST_ID);
+    p.castingAbility = null;
+  });
+});
+
+describe('fishing breaks stealth and action-locked forms refuse it', () => {
+  it('an action-locked form refuses with the shapeshifted literal and zero draws', () => {
+    const sim = makeSim(4242);
+    const meta = sim.meta(sim.playerId)!;
+    teleportToValeShore(sim);
+    sim.addItem('simple_fishing_pole', 1);
+    const p = sim.player;
+    p.auras.push({
+      id: 'fireball_form',
+      name: 'Ember Form',
+      kind: 'form_fireball',
+      value: 0,
+      remaining: 600,
+      duration: 600,
+      sourceId: p.id,
+      school: 'physical',
+    } as Entity['auras'][number]);
+    sim.events = [];
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+    try {
+      startFishing(sim.ctx, sim.player, meta);
+    } finally {
+      sim.rng.setObserver(null);
+    }
+    expect(
+      sim.events.some(
+        (e) =>
+          (e as { type: string; text?: string }).type === 'error' &&
+          (e as { text?: string }).text === "You can't do that while shapeshifted.",
+      ),
+    ).toBe(true);
+    expect(sim.events.some((e) => (e as { type: string }).type === 'castStart')).toBe(false);
+    expect(draws).toBe(0);
+    // Shift out in the SAME fixture: the form was the operative cause.
+    p.auras.splice(0, p.auras.length);
+    startFishing(sim.ctx, sim.player, meta);
+    expect(p.castingAbility).toBe(FISHING_CAST_ID);
+  });
+
+  it('casting a line breaks stealth; a denied cast does not', () => {
+    const sim = makeSim(4242);
+    const meta = sim.meta(sim.playerId)!;
+    const p = sim.player;
+    const stealthAura = () =>
+      ({
+        id: 'stealth',
+        name: 'Stealth',
+        kind: 'stealth',
+        value: 0,
+        remaining: 600,
+        duration: 600,
+        sourceId: p.id,
+        school: 'physical',
+      }) as Entity['auras'][number];
+    // Denied first (toolless: the implement gate refuses): stealth survives.
+    teleportToValeShore(sim);
+    p.auras.push(stealthAura());
+    p.stealthed = true;
+    startFishing(sim.ctx, p, meta);
+    expect(p.castingAbility).toBeNull();
+    expect(p.auras.some((a) => a.kind === 'stealth')).toBe(true);
+    // Granted next: the cast start breaks it, still exactly one draw.
+    sim.addItem('simple_fishing_pole', 1);
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+    try {
+      startFishing(sim.ctx, p, meta);
+    } finally {
+      sim.rng.setObserver(null);
+    }
+    expect(p.castingAbility).toBe(FISHING_CAST_ID);
+    expect(p.auras.some((a) => a.kind === 'stealth')).toBe(false);
+    expect(p.stealthed).toBe(false);
+    expect(draws).toBe(1);
+  });
+});
+
+describe('fishing telemetry events (empty hook and the bags-full got-away)', () => {
+  it('an empty hook emits the structured fishingEmptyHook beside the log line', () => {
+    const sim = makeSim(4242);
+    const meta = sim.meta(sim.playerId)!;
+    // Walk the deterministic band-0 table until the null row resolves.
+    let sawEmpty = false;
+    for (let i = 0; i < 60 && !sawEmpty; i++) {
+      const { caught, events } = castOnce(sim, meta);
+      const empties = events.filter((e) => (e as { type: string }).type === 'fishingEmptyHook');
+      if (caught === null && events.some((e) => (e as { type: string }).type === 'log')) {
+        sawEmpty = true;
+        expect(empties).toEqual([
+          { type: 'fishingEmptyHook', pid: sim.playerId, zoneId: 'eastbrook_vale', band: 0 },
+        ]);
+      } else {
+        // Non-empty outcomes never emit it.
+        expect(empties).toHaveLength(0);
+      }
+    }
+    expect(sawEmpty, 'the band-0 walk never resolved an empty hook').toBe(true);
+  });
+
+  it('a bags-full catch emits fishingGotAway (the draw was spent, the catch was lost)', () => {
+    const sim = makeSim(4242);
+    const meta = sim.meta(sim.playerId)!;
+    const capacity = bagCapacity(
+      (sim as unknown as { players: Map<number, { bags: unknown[] }> }).players.get(sim.playerId)!
+        .bags as never,
+    );
+    const m = sim.meta(sim.playerId)! as unknown as { inventory: unknown[] };
+    while (m.inventory.length < capacity) sim.addItem('bone_fragments', 20);
+    // Deterministic: walk until a non-null row resolves against full bags.
+    let sawGotAway = false;
+    for (let i = 0; i < 60 && !sawGotAway; i++) {
+      const { caught, events } = castOnce(sim, meta);
+      expect(caught).toBeNull(); // nothing can land in full bags
+      const aways = events.filter((e) => (e as { type: string }).type === 'fishingGotAway');
+      if (aways.length > 0) {
+        sawGotAway = true;
+        expect(aways).toEqual([
+          { type: 'fishingGotAway', pid: sim.playerId, zoneId: 'eastbrook_vale', band: 0 },
+        ]);
+        expect(
+          events.some(
+            (e) =>
+              (e as { type: string; text?: string }).type === 'error' &&
+              (e as { text?: string }).text === 'Your bags are full.',
+          ),
+        ).toBe(true);
+      }
+    }
+    expect(sawGotAway, 'no non-null row resolved against full bags').toBe(true);
+  });
+});
+
+describe('the swim deny holds for the whole session (the jump-cast bypass, round 7)', () => {
+  it('a live cast cancels the tick the caster ends up swimming', () => {
+    // A cast pressed mid-leap over deep water passes the press-time deny
+    // (the airborne y-term sits above the surface) and used to splash into
+    // a live session: the vertical splash is not the move input the
+    // ordinary cancel watches. The session upkeep now enforces the same
+    // deny across the session's lifetime.
+    const sim = makeSim(4242);
+    teleportToValeShore(sim);
+    sim.addItem('simple_fishing_pole', 1);
+    sim.useItem('simple_fishing_pole');
+    expect(sim.player.castingAbility, 'the cast started legally on land').toBe('fishing');
+    // The splash: the player ends up in the lake's deep water mid-session.
+    teleportTo(sim, LAKE.x, LAKE.z);
+    sim.tick();
+    expect(sim.player.castingAbility, 'the session cancelled on swim entry').toBeNull();
+    // And a fresh legal cast still works afterward (cancel left no residue).
+    const dry = teleportToValeShore(sim);
+    void dry;
+    sim.useItem('simple_fishing_pole');
+    expect(sim.player.castingAbility).toBe('fishing');
   });
 });

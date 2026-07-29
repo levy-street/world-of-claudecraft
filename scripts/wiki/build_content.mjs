@@ -27,13 +27,17 @@ const entrySource = `
   export { ZONES, DUNGEONS, MOBS, CAMPS, DELVE_LIST, NPCS, ITEMS, QUESTS, zoneAt } from './src/sim/data.ts';
   export { WARLOCK_PET_MOBS } from './src/sim/content/warlock_pets.ts';
   export { DELVE_COMPANIONS, DELVE_AFFIXES } from './src/sim/content/delves/index.ts';
+  export { DELVE_SHOPS } from './src/sim/content/delves/shop.ts';
   export { DEEDS, DEED_ORDER } from './src/sim/content/deeds.ts';
   export { DEED_IMAGE_IDS } from './src/ui/deed_image_ids.ts';
   export { VISUALS, visualKeyFor } from './src/render/characters/manifest.ts';
   export {
     CRAFT_RING, STATIONS, STATION_TYPE_BY_CRAFT, STATION_RADIUS, PERK_THRESHOLDS,
-    CRAFT_GOLD_SINK_COPPER_PER_BUDGET, CRAFT_THROTTLE_WINDOW_SECONDS,
-    CRAFT_THROTTLE_MAX_PER_WINDOW, GATHERING_PROFESSIONS, GATHERING_PROFESSION_IDS,
+    CRAFT_GOLD_SINK_COPPER_PER_BUDGET, CRAFT_CAST_DURATION_FIELD_SEC,
+    CRAFT_CAST_DURATION_SKILL_25_SEC, CRAFT_CAST_DURATION_SKILL_50_SEC,
+    CRAFT_CAST_DURATION_SKILL_75_SEC, CRAFT_CAST_DURATION_SKILL_100_OR_COMBO_SEC,
+    ENCHANT_FAMILY_CAST_DURATION_SEC, TOOL_RECHARGE_CAST_DURATION_SEC,
+    CRAFT_BATCH_MAX, GATHERING_PROFESSIONS, GATHERING_PROFESSION_IDS,
   } from './src/sim/content/professions.ts';
   export { ALL_RECIPES } from './src/sim/content/recipes.ts';
   export { ENCHANTS } from './src/sim/content/enchants.ts';
@@ -42,6 +46,7 @@ const entrySource = `
   export {
     TIER_SKILL_STEP, tierForSkill, REDUCED_TIER_MULTIPLIER, MINIMAL_TIER_MULTIPLIER,
   } from './src/sim/professions/wheel.ts';
+  export { WIELD_REQUIREMENT_BY_TIER } from './src/sim/professions/wield_gate.ts';
   export { TRAINING_FEE_BY_TIER, trainingFeeFor } from './src/sim/professions/training.ts';
   export {
     NODE_HARVEST_TABLE, NODE_MATERIAL_TABLE, GATHER_CAST_BASE_SEC, GATHER_CAST_FLOOR_SEC,
@@ -102,6 +107,7 @@ const {
   NPCS,
   DELVE_COMPANIONS,
   DELVE_AFFIXES,
+  DELVE_SHOPS,
   DEEDS,
   DEED_ORDER,
   DEED_IMAGE_IDS,
@@ -116,8 +122,14 @@ const {
   STATION_RADIUS,
   PERK_THRESHOLDS,
   CRAFT_GOLD_SINK_COPPER_PER_BUDGET,
-  CRAFT_THROTTLE_WINDOW_SECONDS,
-  CRAFT_THROTTLE_MAX_PER_WINDOW,
+  CRAFT_CAST_DURATION_FIELD_SEC,
+  CRAFT_CAST_DURATION_SKILL_25_SEC,
+  CRAFT_CAST_DURATION_SKILL_50_SEC,
+  CRAFT_CAST_DURATION_SKILL_75_SEC,
+  CRAFT_CAST_DURATION_SKILL_100_OR_COMBO_SEC,
+  ENCHANT_FAMILY_CAST_DURATION_SEC,
+  TOOL_RECHARGE_CAST_DURATION_SEC,
+  CRAFT_BATCH_MAX,
   GATHERING_PROFESSIONS,
   GATHERING_PROFESSION_IDS,
   ALL_RECIPES,
@@ -126,6 +138,7 @@ const {
   FISHING_TABLES_BY_BAND,
   FISHING_RARE_ID,
   TIER_SKILL_STEP,
+  WIELD_REQUIREMENT_BY_TIER,
   tierForSkill,
   REDUCED_TIER_MULTIPLIER,
   MINIMAL_TIER_MULTIPLIER,
@@ -212,6 +225,17 @@ function tintFor(visualKey, entityColor) {
   if (!def || def.tint === undefined) return null;
   return def.tint === 'entity' ? entityColor : def.tint;
 }
+// The manifest's tint strength for a tinted model, resolved with the same fallback
+// modelKeyFor bakes onto MODELS[visualKey], so a figure's own record and its model spec
+// never disagree. Baked onto the figure alongside tint/still and threaded into
+// stillUrl/stillKey so a tintStrength-only manifest edit (no tint color change) mints a
+// new still key: the old committed WebP orphans and the new one is missing until someone
+// regenerates, which is the self-detection this module exists for (see still_key.mjs).
+function tintStrengthFor(visualKey) {
+  const def = VISUALS[visualKey];
+  if (!def || def.tint === undefined) return undefined;
+  return def.tintStrength ?? 0.4;
+}
 const playerVisualKey = (id) => visualKeyFor({ kind: 'player', templateId: id });
 const mobVisualKey = (id) => visualKeyFor({ kind: 'mob', templateId: id });
 
@@ -236,6 +260,7 @@ const classes = ALL_CLASSES.map((id) => {
   const vk = playerVisualKey(id);
   const tint = tintFor(vk, 0xffffff);
   const tintHex = tint != null ? hex(tint) : null;
+  const tintStrength = tintStrengthFor(vk);
   const model = modelKeyFor(vk);
   return {
     id,
@@ -247,7 +272,10 @@ const classes = ALL_CLASSES.map((id) => {
     abilities: kit.map(abilityRef),
     model,
     ...(tintHex != null ? { tint: tintHex } : {}),
-    ...(stillUrl(model, tintHex) ? { still: stillUrl(model, tintHex) } : {}),
+    ...(tintStrength !== undefined ? { tintStrength } : {}),
+    ...(stillUrl(model, tintHex, tintStrength)
+      ? { still: stillUrl(model, tintHex, tintStrength) }
+      : {}),
   };
 });
 
@@ -307,11 +335,15 @@ const druidForms = DRUID_FORM_KEYS.map((vk) => {
   if (!model) throw new Error(`druid form visual missing from the manifest: ${vk}`);
   const tint = tintFor(vk, 0xffffff);
   const tintHex = tint != null ? hex(tint) : null;
+  const tintStrength = tintStrengthFor(vk);
   return {
     id: vk,
     model,
     ...(tintHex != null ? { tint: tintHex } : {}),
-    ...(stillUrl(model, tintHex) ? { still: stillUrl(model, tintHex) } : {}),
+    ...(tintStrength !== undefined ? { tintStrength } : {}),
+    ...(stillUrl(model, tintHex, tintStrength)
+      ? { still: stillUrl(model, tintHex, tintStrength) }
+      : {}),
   };
 });
 
@@ -320,13 +352,17 @@ const warlockPets = Object.values(WARLOCK_PET_MOBS).map((p) => {
   const vk = mobVisualKey(p.id);
   const tint = tintFor(vk, p.color ?? 0xffffff);
   const tintHex = tint != null ? hex(tint) : null;
+  const tintStrength = tintStrengthFor(vk);
   const model = modelKeyFor(vk);
   return {
     id: p.id,
     name: p.name,
     model,
     ...(tintHex != null ? { tint: tintHex } : {}),
-    ...(stillUrl(model, tintHex) ? { still: stillUrl(model, tintHex) } : {}),
+    ...(tintStrength !== undefined ? { tintStrength } : {}),
+    ...(stillUrl(model, tintHex, tintStrength)
+      ? { still: stillUrl(model, tintHex, tintStrength) }
+      : {}),
   };
 });
 
@@ -336,9 +372,7 @@ const FAMILY_ORDER = [
   'beast',
   'spider',
   'mudfin',
-  'murloc',
   'burrower',
-  'kobold',
   'humanoid',
   'troll',
   'ogre',
@@ -369,6 +403,7 @@ for (const [id, m] of Object.entries(MOBS)) {
   const vk = mobVisualKey(id);
   const tint = tintFor(vk, m.color ?? 0xffffff);
   const tintHex = tint != null ? hex(tint) : null;
+  const tintStrength = tintStrengthFor(vk);
   const model = modelKeyFor(vk);
   famMap[m.family] ??= new Map();
   famMap[m.family].set(m.name, {
@@ -379,7 +414,10 @@ for (const [id, m] of Object.entries(MOBS)) {
     templateId: id,
     model,
     ...(tintHex != null ? { tint: tintHex } : {}),
-    ...(stillUrl(model, tintHex) ? { still: stillUrl(model, tintHex) } : {}),
+    ...(tintStrength !== undefined ? { tintStrength } : {}),
+    ...(stillUrl(model, tintHex, tintStrength)
+      ? { still: stillUrl(model, tintHex, tintStrength) }
+      : {}),
   });
   publishedMobIds.add(id);
 }
@@ -612,10 +650,34 @@ const craftedByCraft = (itemId) => {
   const recipe = ALL_RECIPES.find((r) => r.resultItemId === itemId);
   return recipe ? recipe.professionId : null;
 };
-const toolRow = (itemId, tier) => {
+// The Delve Marks price, for a tool a delve counter stocks. Without this the
+// Source column reads "Crafted (Engineering)" for the eight top tools while the
+// prose directly above the table promises a Marks route, which is the table
+// contradicting its own page.
+const marksRowFor = (itemId) => {
+  for (const entries of Object.values(DELVE_SHOPS)) {
+    const row = entries.find((e) => e.itemId === itemId);
+    if (row) return row;
+  }
+  return null;
+};
+const marksPriceFor = (itemId) => marksRowFor(itemId)?.marks ?? null;
+// The delve counter's unlock gate for a Marks-priced tool row, flattened for
+// the table cell: how many total clears, or a Heroic clear (shop.ts
+// DelveShopGate). An 'available' row emits neither.
+const marksGateFor = (itemId) => {
+  const gate = marksRowFor(itemId)?.gate;
+  if (gate === 'heroicClear') return { marksHeroicClear: true };
+  const clears = typeof gate === 'string' ? /^clears:(\d+)$/.exec(gate) : null;
+  return clears ? { marksClears: Number(clears[1]) } : {};
+};
+const toolRow = (itemId, tier, professionId) => {
   const def = ITEMS[itemId];
   const vendors = toolVendors(itemId);
   const craftedBy = craftedByCraft(itemId);
+  // R22: land tools above tier 1 carry a wield requirement; rods are the
+  // structural exemption and every rod row omits the field.
+  const wieldReq = professionId === 'fishing' ? 0 : (WIELD_REQUIREMENT_BY_TIER[tier] ?? 0);
   return {
     name: def.name,
     tier,
@@ -623,6 +685,9 @@ const toolRow = (itemId, tier) => {
     priceCopper: def.buyValue ?? null,
     vendors,
     ...(craftedBy ? { craftedBy } : {}),
+    ...(marksPriceFor(itemId) !== null ? { priceMarks: marksPriceFor(itemId) } : {}),
+    ...marksGateFor(itemId),
+    ...(wieldReq > 0 ? { wieldProficiency: wieldReq } : {}),
   };
 };
 const toolLadderFor = (professionId) => {
@@ -630,10 +695,10 @@ const toolLadderFor = (professionId) => {
   // The simple pole is the fishing ladder's tier-1 rung (use type 'fishing'
   // resolves to effective tier 1 and satisfies the #2343 implement gate,
   // professions/tools.ts).
-  if (professionId === 'fishing') rows.push(toolRow('simple_fishing_pole', 1));
+  if (professionId === 'fishing') rows.push(toolRow('simple_fishing_pole', 1, professionId));
   for (const [id, def] of Object.entries(ITEMS)) {
     if (def.use?.type === 'gatherTool' && def.use.professionId === professionId) {
-      rows.push(toolRow(id, def.use.tier));
+      rows.push(toolRow(id, def.use.tier, professionId));
     }
   }
   return rows.sort((a, b) => a.tier - b.tier);
@@ -827,9 +892,17 @@ const workOrders = Object.values(QUESTS)
   });
 const profEconomy = {
   craftFeeCopperPerBudgetPoint: CRAFT_GOLD_SINK_COPPER_PER_BUDGET,
-  actionThrottle: {
-    windowSeconds: CRAFT_THROTTLE_WINDOW_SECONDS,
-    maxActions: CRAFT_THROTTLE_MAX_PER_WINDOW,
+  // Craft Cast System: the exact cast-pace numbers the transparency policy
+  // publishes (the retired actionThrottle block's successor).
+  castPace: {
+    fieldSec: CRAFT_CAST_DURATION_FIELD_SEC,
+    skill25Sec: CRAFT_CAST_DURATION_SKILL_25_SEC,
+    skill50Sec: CRAFT_CAST_DURATION_SKILL_50_SEC,
+    skill75Sec: CRAFT_CAST_DURATION_SKILL_75_SEC,
+    comboSec: CRAFT_CAST_DURATION_SKILL_100_OR_COMBO_SEC,
+    enchantFamilySec: ENCHANT_FAMILY_CAST_DURATION_SEC,
+    rechargeSec: TOOL_RECHARGE_CAST_DURATION_SEC,
+    batchMax: CRAFT_BATCH_MAX,
   },
   marketCutPct: pct(MARKET_CUT),
   listingDepositCopper: MARKET_LISTING_DEPOSIT_COPPER,
@@ -897,6 +970,10 @@ export interface GuideClassInfo {
   abilities: GuideAbilityRef[];
   model: string;
   tint?: string;
+  /** Manifest tint strength (0..1) for this figure's model, when tinted. Feeds the still's
+   *  filename identity (still_key.mjs) alongside model/tint; the live viewer reads its own
+   *  copy off GuideModelSpec.tintStrength, so this is not consumed for rendering. */
+  tintStrength?: number;
   /** Pre-rendered transparent still (public/guide-stills/), the default poster. */
   still?: string;
 }
@@ -923,13 +1000,13 @@ export interface GuideDungeon {
   name?: string;
 }
 
-export interface GuideWarlockPet { id: string; name: string; model: string; tint?: string; still?: string; }
+export interface GuideWarlockPet { id: string; name: string; model: string; tint?: string; tintStrength?: number; still?: string; }
 
 // Druid shapeshift forms. Unnamed on purpose: the gallery labels them with guide.models.form*
 // keys so the names localize like the rest of the picker chrome.
-export interface GuideDruidForm { id: string; model: string; tint?: string; still?: string; }
+export interface GuideDruidForm { id: string; model: string; tint?: string; tintStrength?: number; still?: string; }
 
-export interface GuideCreature { name: string; min: number; max: number; rare: boolean; templateId: string; model: string; tint?: string; still?: string; }
+export interface GuideCreature { name: string; min: number; max: number; rare: boolean; templateId: string; model: string; tint?: string; tintStrength?: number; still?: string; }
 export interface GuideFamily { family: string; creatures: GuideCreature[]; }
 
 export interface GuideDelveKeeper { name: string; title: string; }
@@ -1021,6 +1098,18 @@ export interface GuideProfTool {
   priceCopper: number | null;
   vendors: { name: string; hub: string }[];
   craftedBy?: string;
+  /** Delve Marks price, for a tool a delve counter stocks. Absent otherwise. */
+  priceMarks?: number;
+  /** Total delve clears the Marks row unlocks after (shop.ts 'clears:N').
+   *  Consumed today by the tests/guide.test.ts gate pin only: the source
+   *  cell keeps the count as an English literal until the deferred locale
+   *  re-fill adds a {clears} token (R64, the packet review doc). */
+  marksClears?: number;
+  /** True when the Marks row unlocks after a Heroic clear. */
+  marksHeroicClear?: boolean;
+  /** R22 wield requirement (proficiency in the tool's own trade) for land
+   *  tools above tier 1. Absent for tier 1 and for every fishing rod. */
+  wieldProficiency?: number;
 }
 
 export interface GuideProfNodeRow {
@@ -1111,7 +1200,16 @@ export interface GuideProfWorkOrder {
 
 export interface GuideProfEconomy {
   craftFeeCopperPerBudgetPoint: number;
-  actionThrottle: { windowSeconds: number; maxActions: number };
+  castPace: {
+    fieldSec: number;
+    skill25Sec: number;
+    skill50Sec: number;
+    skill75Sec: number;
+    comboSec: number;
+    enchantFamilySec: number;
+    rechargeSec: number;
+    batchMax: number;
+  };
   marketCutPct: number;
   listingDepositCopper: number;
   trainingFeeCopperByTier: number[];

@@ -1,29 +1,29 @@
 'use strict';
 
 // Pure, Node-testable resolution of the desktop shell's runtime configuration:
-// which distribution channel this build is (website download vs Steam depot),
-// whether the in-app auto-updater may run, and where crash minidumps may be
-// submitted. Lives beside shell_guards.cjs for the same reason: electron/main.cjs
-// runs outside tsc and vitest, so every decision worth pinning is made here where
-// tests/electron_desktop_config.test.ts can exercise it directly. No electron
-// imports; callers pass everything in.
+// which distribution channel this build is (website download, Steam depot, or
+// Epic Games Store), whether the in-app auto-updater may run, and where crash
+// minidumps may be submitted. Lives beside shell_guards.cjs for the same reason:
+// electron/main.cjs runs outside tsc and vitest, so every decision worth pinning
+// is made here where tests/electron_desktop_config.test.ts can exercise it
+// directly. No electron imports; callers pass everything in.
 //
 // The channel is stamped into the PACKAGED package.json by scripts/electron-build.mjs
 // (electron-builder extraMetadata writes a `wocDesktop` object), because a shipped
-// app has no build-time env: the Steam depot and the website installer are the same
-// code and differ only by this stamp. WOC_DISTRIBUTION overrides it for local
-// testing of either path in `electron .` / electron:dev.
+// app has no build-time env: the Steam depot, Epic store build, and website
+// installer are the same code and differ only by this stamp. WOC_DISTRIBUTION
+// overrides it for local testing of any path in `electron .` / electron:dev.
 
 const { PRODUCTION_API_ORIGIN, updateChannelForOrigin } = require('./update_guard.cjs');
 
-const DISTRIBUTIONS = new Set(['website', 'steam']);
+const DISTRIBUTIONS = new Set(['website', 'steam', 'epic']);
 
 // Resolve the distribution channel. The WOC_DISTRIBUTION env override applies
 // ONLY to unpackaged checkouts (`electron .` / electron:dev): a PACKAGED
 // build's channel is its stamp, period. Honoring env on a packaged build
 // would be exactly the escape hatch updaterAllowed promises not to have
-// (WOC_DISTRIBUTION=website on a Steam install would flip the updater back
-// on). Unknown values collapse to the default rather than throwing: a
+// (WOC_DISTRIBUTION=website on a Steam or Epic install would flip the updater
+// back on). Unknown values collapse to the default rather than throwing: a
 // half-stamped build must still launch, and 'website' is the safe channel
 // (its only extra behavior, the updater, is additionally gated on isPackaged).
 function resolveDistribution({ packagedMetadata, env, isPackaged } = {}) {
@@ -83,18 +83,18 @@ function resolveDesktopOrigins({ packagedMetadata, env, isPackaged } = {}) {
   return { apiOrigin, loginOrigin };
 }
 
-// The one gate the auto-updater honors. Steam builds MUST NOT self-update
-// (SteamPipe owns updates; Valve's guidance is explicit), and an unpackaged
-// checkout has nothing to update, so the updater runs only for a packaged
-// website build. There is deliberately no env escape hatch to force it ON in
-// a Steam build; WOC_DISTRIBUTION=website on a dev checkout still stays off
-// via isPackaged.
+// The one gate the auto-updater honors. Steam and Epic builds MUST NOT
+// self-update (SteamPipe / Epic BPT own patches; store guidance is explicit),
+// and an unpackaged checkout has nothing to update, so the updater runs only
+// for a packaged website build. There is deliberately no env escape hatch to
+// force it ON in a Steam or Epic build; WOC_DISTRIBUTION=website on a dev
+// checkout still stays off via isPackaged.
 function updaterAllowed({ distribution, isPackaged }) {
   return isPackaged === true && distribution === 'website';
 }
 
 // Wallet handoff is intentionally limited to the website-distributed shell.
-// Keep this decision pure and tested so the Steam IPC cannot drift open.
+// Keep this decision pure and tested so Steam and Epic IPC cannot drift open.
 function walletConnectionSupported({ distribution }) {
   return distribution === 'website';
 }

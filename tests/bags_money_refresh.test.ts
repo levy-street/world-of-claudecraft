@@ -54,9 +54,11 @@ vi.mock('../server/db', () => ({
 }));
 
 import { type ClientSession, GameServer } from '../server/game';
-import { ClientWorld } from '../src/net/online';
-import type { Entity, PlayerClass } from '../src/sim/types';
+import { emptySaleLog } from '../src/sim/market_sale_log';
+import type { Entity } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import { bareClient } from './helpers/bare_client';
+import { methodBody } from './helpers/method_body';
 
 const PROCEEDS = 54321;
 
@@ -87,57 +89,6 @@ function joinServer(
   if ('error' in session) throw new Error(session.error);
   session.blockListLoaded = true;
   return session;
-}
-
-// A ClientWorld without the WebSocket plumbing, to drive applySnapshot directly
-// (the tests/snapshots.test.ts idiom, copied per the repo's house pattern).
-function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWorld {
-  const c: any = Object.create(ClientWorld.prototype);
-  c.cfg = { seed: 20061, playerClass };
-  c.entities = new Map();
-  c.playerId = pid;
-  c.ownPlayerId = pid;
-  c.ownPlayerClass = playerClass;
-  c.spectating = null;
-  c.cupInfo = null;
-  c.lastVcupRemainder = null;
-  c.lastVcupShared = null;
-  c.sportRole = null;
-  c.moveInput = {};
-  c.inventory = [];
-  c.vendorBuyback = [];
-  c.equipment = {};
-  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
-  c.copper = 0;
-  c.honor = 0;
-  c.lifetimeHonor = 0;
-  c.xp = 0;
-  c.known = [];
-  c.questLog = new Map();
-  c.questsDone = new Set();
-  c.pendingQuestCommands = new Map();
-  c.partyInfo = null;
-  c.selectedDungeonDifficulty = 'normal';
-  c.tradeInfo = null;
-  c.duelInfo = null;
-  c.lastSnapAt = 0;
-  c.snapInterval = 50;
-  c.serverTickHz = null;
-  c.missingSince = new Map();
-  c.pendingFacingDelta = 0;
-  c.connected = true;
-  c.eventQueue = [];
-  c.mouselookFacing = null;
-  c.lastInputSentAt = 0;
-  c.lastInputSig = '';
-  c.inputSeq = 0;
-  c.pendingInputSeqSentAt = new Map();
-  c.ackedInputSeq = 0;
-  c.inputEchoSamples = [];
-  c.spectateFacingPending = false;
-  c.pendingSpectateFacing = null;
-  c.nodeCooldowns = new Map();
-  return c;
 }
 
 function merchant(sim: any): Entity {
@@ -175,6 +126,7 @@ function setup() {
   sim.market.marketCollections.set(String(meta.characterId ?? meta.entityId), {
     copper: PROCEEDS,
     items: [],
+    sales: emptySaleLog(),
   });
 
   const client = bareClient(session.pid);
@@ -250,6 +202,7 @@ describe('bag money-row freshness on a money-only delta (#2373)', () => {
     sim.market.marketCollections.set(String(meta.characterId ?? meta.entityId), {
       copper: 0,
       items: [{ itemId: 'worn_sword', count: 1 }],
+      sales: emptySaleLog(),
     });
 
     const snap = collect(server, fc, session);
@@ -345,8 +298,11 @@ describe('bag purse-freshness wiring (source pins)', () => {
     // the cold-load-safe form too (issue #1538): every money-only credit now routes
     // through here, so the raw `!== 'none'` compare would rebuild a window the
     // player has never opened on each one.
-    expect(hud).toMatch(
-      /onInventoryChanged\(\): void \{[^}]*if \(bagsWindowShown\(\$\('#bags'\)\.style\.display\)\) this\.renderBags\(\);/,
+    // Sliced to the method body (the shared two-space-close bound) rather
+    // than a flat [^}]* reach from the opener: brace-bearing sibling arms
+    // inside onInventoryChanged broke that shape once (#2931).
+    expect(methodBody(hud, 'onInventoryChanged(): void {')).toContain(
+      "if (bagsWindowShown($('#bags').style.display)) this.renderBags();",
     );
   });
 

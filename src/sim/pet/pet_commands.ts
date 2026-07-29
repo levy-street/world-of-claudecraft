@@ -50,7 +50,9 @@ import {
   PET_GROWL_INTERVAL,
   type PetMode,
 } from '../types';
-import { startWaterJet } from './pet_ai';
+import { applyPetOwnerScaling, startWaterJet } from './pet_ai';
+import { isTameableFamily } from './pet_scaling';
+import { petCanForceTaunt } from './pet_taunt_gate';
 
 // Slice-only tuning consts, moved verbatim from sim.ts with the slice.
 const PET_TAUNT_RANGE = 5;
@@ -208,6 +210,10 @@ export function restorePet(ctx: SimContext, owner: Entity, state: PetState): voi
   pet.lootable = false;
   pet.wanderTarget = null;
   clearThreat(pet);
+  // Grow the pool by the owner's share BEFORE restoring the saved health, so a
+  // pet saved at full comes back at the full inherited pool rather than at the
+  // template pool with the share bolted on afterwards.
+  applyPetOwnerScaling(ctx, pet);
   if (state.dead) {
     pet.dead = true;
     pet.hp = 0;
@@ -234,6 +240,10 @@ export function syncPetLevel(ctx: SimContext, owner: Entity): void {
   pet.scale = scaled.scale;
   pet.color = scaled.color;
   pet.hp = pet.dead ? 0 : Math.max(1, Math.min(pet.maxHp, Math.round(pet.maxHp * hpFrac)));
+  // maxHp/armor were just rebuilt from the template alone, so the owner's share is
+  // gone with them: drop the tracked delta before re-deriving it at the new level.
+  pet.petOwnerHpBonus = 0;
+  applyPetOwnerScaling(ctx, pet);
 }
 
 function cleanPetName(raw: string): string | null {
@@ -244,8 +254,7 @@ function cleanPetName(raw: string): string | null {
 export function tameError(ctx: SimContext, p: Entity, target: Entity): string | null {
   if (target.kind !== 'mob' || !target.hostile) return 'You cannot tame that.';
   const template = MOBS[target.templateId];
-  if (!template || (template.family !== 'beast' && template.family !== 'spider'))
-    return 'Only beasts can be tamed.';
+  if (!template || !isTameableFamily(template.family)) return 'Only beasts can be tamed.';
   if (template.elite || template.boss || template.rare) return 'That beast is too strong to tame.';
   if (target.level > p.level) return 'That beast is too high level for you to tame.';
   if (target.spawnPos.x > DUNGEON_X_THRESHOLD) return 'You cannot tame dungeon creatures.';
@@ -279,6 +288,9 @@ export function completeTame(ctx: SimContext, p: Entity, target: Entity): void {
   pet.inCombat = false;
   pet.tappedById = null;
   pet.auras = [];
+  // Apply the owner's share before the full-health fill so a freshly tamed beast
+  // starts at its inherited pool, not the bare template pool.
+  applyPetOwnerScaling(ctx, pet);
   pet.hp = pet.maxHp;
   pet.loot = null;
   pet.lootable = false;
@@ -358,7 +370,15 @@ export function createDemonPet(
   pet.ownerId = owner.id;
   pet.petMode = 'defensive';
   pet.petTauntTimer = 0;
-  pet.petAutoTaunt = false;
+  // A melee_tank demon (Gloomshade) is built to hold threat, so it comes up with
+  // auto-taunt already on for a solo owner; every other demon keeps the old opt-in
+  // default. petCanForceTaunt is the shared taunt-eligibility gate (pet_taunt_gate.ts)
+  // so a future tank demon that can't taunt doesn't default on. In a party/raid,
+  // default off: an unattended 10s Growl cycle would rip non-boss adds off the real
+  // tank (classic keeps autocast Torment off by default for the same reason), so
+  // grouped owners keep the manual /pettaunt opt-in instead.
+  pet.petAutoTaunt =
+    template.petRole === 'melee_tank' && petCanForceTaunt(mobId) && !ctx.partyOf(owner.id);
   pet.petAutoWaterJet = false;
   pet.petManualTauntPending = false;
   pet.hostile = false;
@@ -423,6 +443,7 @@ export function applyDemonHealTick(ctx: SimContext, owner: Entity): void {
   const healed = Math.min(amount, pet.maxHp - pet.hp);
   if (healed <= 0) return;
   pet.hp += healed;
+  const overheal = amount - healed;
   ctx.emit({
     type: 'heal2',
     sourceId: owner.id,
@@ -430,6 +451,7 @@ export function applyDemonHealTick(ctx: SimContext, owner: Entity): void {
     amount: healed,
     crit: false,
     ability: 'Demon Heal',
+    ...(overheal > 0 ? { overheal } : {}),
   });
   ctx.healingThreat(owner, pet, healed);
 }
@@ -575,7 +597,7 @@ export function petTaunt(ctx: SimContext, pid?: number): void {
     ctx.error(r.e.id, noPetError(r.e, 'You have no living pet.'));
     return;
   }
-  if (MOBS[pet.templateId]?.petCanTaunt === false) return;
+  if (!petCanForceTaunt(pet.templateId)) return;
   if (pet.petTauntTimer > 0) {
     ctx.error(r.e.id, 'Pet taunt is not ready.');
     return;
@@ -755,7 +777,7 @@ export function setPetAutoTaunt(ctx: SimContext, enabled: boolean, pid?: number)
     ctx.error(r.e.id, noPetError(r.e));
     return;
   }
-  if (MOBS[pet.templateId]?.petCanTaunt === false) {
+  if (!petCanForceTaunt(pet.templateId)) {
     pet.petAutoTaunt = false;
     return;
   }
@@ -797,7 +819,7 @@ export function setPetAutoWaterJet(ctx: SimContext, enabled: boolean, pid?: numb
 export function petTauntReadout(ctx: SimContext, owner: Entity): string {
   const pet = petOf(ctx, owner.id);
   if (!pet) return 'You do not have a pet.';
-  if (MOBS[pet.templateId]?.petCanTaunt === false) return 'This pet cannot taunt.';
+  if (!petCanForceTaunt(pet.templateId)) return 'This pet cannot taunt.';
   if (pet.petTauntTimer <= 0) {
     return pet.petAutoTaunt
       ? `Your pet's Growl is ready. Auto-taunt is on.`

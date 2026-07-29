@@ -21,6 +21,7 @@
 
 import { corpseInteractionAvailability } from './corpse_interaction';
 import { deadTargetSelectable } from './dead_target';
+import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { isVcupCrossTeam } from './social/vale_cup';
 import { orderTabTargets, TAB_QUERY_RADIUS } from './tab_target';
@@ -38,6 +39,24 @@ export class Targeting {
   // Target selection (tab / nearest / friendly cycle)
   // ---------------------------------------------------------------------------
 
+  // Optional QoL preference (issue #1358): mirrors the client's
+  // `stopAutoAttackOnTargetSwitch` setting onto the authoritative PlayerMeta so
+  // every selector below (targetEntity, tabTarget, targetNearestEnemy,
+  // targetNearestFriendly, friendlyTabTarget) can gate on it consistently.
+  setStopAutoAttackOnTargetSwitch(enabled: boolean, pid?: number): void {
+    const r = this.ctx.resolve(pid);
+    if (!r) return;
+    r.meta.stopAutoAttackOnTargetSwitch = enabled;
+  }
+
+  // Whether a switch to `nextTargetId` should disengage auto-attack under the
+  // player's `stopAutoAttackOnTargetSwitch` preference: only when the setting is
+  // on, auto-attack is currently running, and the switch is actually a CHANGE
+  // (re-selecting the same target is a no-op, not a switch).
+  private stopsAutoAttackOnSwitch(meta: PlayerMeta, p: Entity, nextTargetId: number): boolean {
+    return !!meta.stopAutoAttackOnTargetSwitch && p.autoAttack && p.targetId !== nextTargetId;
+  }
+
   targetEntity(id: number | null, pid?: number): void {
     const r = this.ctx.resolve(pid);
     if (!r) return;
@@ -52,6 +71,7 @@ export class Targeting {
     }
     const e = this.ctx.entities.get(id);
     if (!e || (e.dead && !this.deadEntitySelectableFor(e, p.id))) return;
+    if (this.stopsAutoAttackOnSwitch(r.meta, p, id)) p.autoAttack = false;
     p.targetId = id;
     if (!this.ctx.isHostileTo(p, e) || e.dead) p.autoAttack = false;
   }
@@ -83,19 +103,22 @@ export class Targeting {
       p.facing,
     );
     const curIdx = ids.indexOf(p.targetId ?? -1);
+    let nextId: number;
     if (curIdx === -1) {
       // No (or no longer valid) target: grab the priority enemy, cluster first.
-      p.targetId = ids[0];
+      nextId = ids[0];
     } else if (curIdx < primaryCount) {
       // Cycling the near fight cluster: wrap back to its first (priority) mob
       // instead of stepping out to a distant idle enemy still in range.
-      p.targetId = ids[(curIdx + 1) % primaryCount];
+      nextId = ids[(curIdx + 1) % primaryCount];
     } else {
       // Sitting on a distant fallback target: walk the rest of the fallback,
       // then wrap back into the near cluster.
       const next = curIdx + 1;
-      p.targetId = next < ids.length ? ids[next] : ids[0];
+      nextId = next < ids.length ? ids[next] : ids[0];
     }
+    if (this.stopsAutoAttackOnSwitch(r.meta, p, nextId)) p.autoAttack = false;
+    p.targetId = nextId;
   }
 
   targetNearestEnemy(pid?: number): void {
@@ -117,7 +140,10 @@ export class Targeting {
         best = e;
       }
     });
-    if (best) p.targetId = (best as Entity).id;
+    if (best) {
+      if (this.stopsAutoAttackOnSwitch(r.meta, p, (best as Entity).id)) p.autoAttack = false;
+      p.targetId = (best as Entity).id;
+    }
   }
 
   private enemyCandidates(p: Entity): { e: Entity; d: number }[] {
@@ -190,7 +216,10 @@ export class Targeting {
         best = c.e;
       }
     }
-    if (best) p.targetId = best.id;
+    if (best) {
+      if (this.stopsAutoAttackOnSwitch(r.meta, p, best.id)) p.autoAttack = false;
+      p.targetId = best.id;
+    }
   }
 
   friendlyTabTarget(pid?: number): void {
@@ -202,6 +231,7 @@ export class Targeting {
     candidates.sort((a, b) => a.d - b.d);
     const curIdx = candidates.findIndex((c) => c.e.id === p.targetId);
     const next = candidates[(curIdx + 1) % candidates.length];
+    if (this.stopsAutoAttackOnSwitch(r.meta, p, next.e.id)) p.autoAttack = false;
     p.targetId = next.e.id;
   }
 

@@ -1,14 +1,26 @@
 import { describe, expect, it } from 'vitest';
 import {
   ARENA_DAILY_TAPER_START,
+  awardBattlegroundAssistHonor,
+  awardBattlegroundHonor,
+  awardBattlegroundKillHonor,
   awardFiestaCompletionHonor,
   awardFiestaKillHonor,
   awardRankedArenaWinHonor,
+  BATTLEGROUND_ASSIST_HONOR,
+  BATTLEGROUND_FIRST_WIN_BONUS_HONOR,
+  BATTLEGROUND_KILL_HONOR,
+  BATTLEGROUND_LOSS_HONOR,
+  BATTLEGROUND_RESULT_DR,
+  BATTLEGROUND_WIN_HONOR,
+  battlegroundResultMultiplier,
   FIESTA_COMPLETION_HONOR,
   FIESTA_KILL_HONOR,
   FIESTA_WIN_BONUS_HONOR,
   grantHonor,
+  HONOR_REPEAT_DR,
   RANKED_ARENA_WIN_HONOR,
+  repeatHonorMultiplier,
 } from '../src/sim/pvp';
 import type { ArenaMatch } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
@@ -269,6 +281,122 @@ describe('Fiesta honor', () => {
   });
 });
 
+describe('Thornhollow Fields honor income', () => {
+  function bgPlayer(): { sim: Sim; meta: NonNullable<ReturnType<Sim['meta']>> } {
+    const sim = world();
+    sim.utcDay = '2026-08-06';
+    const pid = sim.addPlayer('warrior', 'Fielder', { characterId: 700 });
+    return { sim, meta: sim.meta(pid)! };
+  }
+
+  it("pays 80 for the day's first win and 60 for the next", () => {
+    const { sim, meta } = bgPlayer();
+    const first = awardBattlegroundHonor(sim.ctx, meta, '["character:1"]', 'win');
+    expect(first.firstWinBonus).toBe(BATTLEGROUND_FIRST_WIN_BONUS_HONOR);
+    expect(first.total).toBe(80);
+    // A fresh opposing identity, so the repeat curve is not what is measured:
+    // only the bonus should be missing the second time.
+    const second = awardBattlegroundHonor(sim.ctx, meta, '["character:2"]', 'win');
+    expect(second.firstWinBonus).toBe(0);
+    expect(second.total).toBe(BATTLEGROUND_WIN_HONOR);
+    expect(second.total).toBe(60);
+  });
+
+  it('neither arms nor claims the daily bonus on a loss or a draw', () => {
+    const { sim, meta } = bgPlayer();
+    for (const outcome of ['loss', 'draw'] as const) {
+      const paid = awardBattlegroundHonor(sim.ctx, meta, `["character:${outcome}"]`, outcome);
+      expect(paid.firstWinBonus).toBe(0);
+      expect(paid.total).toBe(BATTLEGROUND_LOSS_HONOR);
+      expect(meta.honorArenaDaily!.bgFirstWinClaimed).toBeUndefined();
+    }
+    // The bonus survived both, and the day's first WIN still collects it.
+    const win = awardBattlegroundHonor(sim.ctx, meta, '["character:win"]', 'win');
+    expect(win.firstWinBonus).toBe(BATTLEGROUND_FIRST_WIN_BONUS_HONOR);
+    expect(meta.honorArenaDaily!.bgFirstWinClaimed).toBe(true);
+  });
+
+  it('pays the daily bonus undecayed on top of a decayed base award', () => {
+    const { sim, meta } = bgPlayer();
+    const key = '["character:premade"]';
+    // Three results against the same roster first, so the fourth sits on the
+    // curve's floor. Losses, so none of them claims the bonus.
+    for (let i = 0; i < 3; i++) awardBattlegroundHonor(sim.ctx, meta, key, 'loss');
+    const win = awardBattlegroundHonor(sim.ctx, meta, key, 'win');
+    // Base is floored at 0.25 (60 -> 15); the bonus is NOT decayed with it.
+    expect(win.total - win.firstWinBonus).toBe(15);
+    expect(win.firstWinBonus).toBe(BATTLEGROUND_FIRST_WIN_BONUS_HONOR);
+    expect(win.total).toBe(35);
+  });
+
+  it('floors the result curve at a quarter and never reaches zero', () => {
+    const { sim, meta } = bgPlayer();
+    const key = '["character:stable-premade"]';
+    // Many more results than the curve is long: the tail is the whole point.
+    const paid = Array.from(
+      { length: 10 },
+      () => awardBattlegroundHonor(sim.ctx, meta, key, 'loss').total,
+    );
+    expect(paid).toEqual([20, 10, 5, 5, 5, 5, 5, 5, 5, 5]);
+    expect(paid.every((amount) => amount > 0)).toBe(true);
+
+    const wins = bgPlayer();
+    const winPaid = Array.from(
+      { length: 6 },
+      () => awardBattlegroundHonor(wins.sim.ctx, wins.meta, key, 'win').total,
+    );
+    // The first carries the +20 daily bonus; the rest are the floored base.
+    expect(winPaid).toEqual([80, 30, 15, 15, 15, 15]);
+  });
+
+  it('keeps the battleground result curve separate from the shared Fiesta one', () => {
+    // The regression the separate-curve decision exists to prevent: editing
+    // HONOR_REPEAT_DR in place to floor the battleground would retune Fiesta,
+    // battleground kills, and battleground assists along with it.
+    expect(HONOR_REPEAT_DR).toEqual([1, 0.5, 0.25, 0]);
+    expect(BATTLEGROUND_RESULT_DR).toEqual([1, 0.5, 0.25, 0.25]);
+    expect(repeatHonorMultiplier(3)).toBe(0);
+    expect(battlegroundResultMultiplier(3)).toBe(0.25);
+    // Past the end of each array the last entry holds.
+    expect(repeatHonorMultiplier(99)).toBe(0);
+    expect(battlegroundResultMultiplier(99)).toBe(0.25);
+  });
+
+  it('leaves Fiesta awards on the shared zero-floor curve', () => {
+    const sim = world();
+    sim.utcDay = '2026-08-06';
+    const pid = sim.addPlayer('rogue', 'Partygoer', { characterId: 701 });
+    const meta = sim.meta(pid)!;
+    const pairs = new Map<string, number>();
+    expect(Array.from({ length: 5 }, () => awardFiestaKillHonor(sim.ctx, meta, 99, pairs))).toEqual(
+      [20, 10, 5, 0, 0],
+    );
+    const completions = Array.from({ length: 5 }, () =>
+      awardFiestaCompletionHonor(sim.ctx, meta, '["character:enemy"]', false),
+    );
+    expect(completions).toEqual([20, 10, 5, 0, 0]);
+  });
+
+  it('leaves battleground kill and assist honor on the shared curve, per match', () => {
+    const { sim, meta } = bgPlayer();
+    const kills = new Map<string, number>();
+    expect(
+      Array.from({ length: 5 }, () => awardBattlegroundKillHonor(sim.ctx, meta, 99, kills)),
+    ).toEqual([5, 2, 1, 0, 0]);
+    expect(BATTLEGROUND_KILL_HONOR).toBe(5);
+
+    const assists = new Map<string, number>();
+    expect(
+      Array.from({ length: 5 }, () => awardBattlegroundAssistHonor(sim.ctx, meta, 99, assists)),
+    ).toEqual([2, 1, 0, 0, 0]);
+    expect(BATTLEGROUND_ASSIST_HONOR).toBe(2);
+
+    // The counters live on the MATCH, so a new match starts the curve over.
+    const nextMatch = new Map<string, number>();
+    expect(awardBattlegroundKillHonor(sim.ctx, meta, 99, nextMatch)).toBe(5);
+  });
+});
+
 describe('WARFARE damage', () => {
   it('scales hostile player damage and leaves friendly and PvE paths unchanged', () => {
     const sim = world();
@@ -314,6 +442,7 @@ describe('WARFARE damage', () => {
     sim.duels.set(targetPid, sim.duels.get(sourcePid)!);
 
     (sim as any).dealDamage(source, target, 100, false, 'arcane', null, 'hit');
-    expect(target.hp).toBe(904);
+    // 100 x (1 + 0.30) x (1 - 0.30) = 91 at the raised WARFARE caps.
+    expect(target.hp).toBe(909);
   });
 });

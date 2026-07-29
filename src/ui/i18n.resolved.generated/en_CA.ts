@@ -340,11 +340,14 @@ export const en_CA: EnTranslations = {
       "menuButton": "Unstuck",
       "help": "Recovery: /unstuck starts a stationary countdown to move you to a nearby reachable safe spot.",
       "helpAtGraveyard": "Recovery: /unstuck starts a stationary countdown, then sends your spirit to the nearest graveyard. Returning through the Pale Keeper requires The Keeper's Toll.",
+      "helpUnstuckSickness": "Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. It leaves you with Unstuck Sickness for up to 5 minutes.",
       "started": "Unstuck in {seconds} seconds. Moving, fighting, taking damage, or starting another action cancels it.",
       "countdown": "Unstuck: {seconds}",
       "completed": "Moved to the nearest reachable safe spot.",
       "completedAtGraveyard": "Your spirit has returned to the nearest graveyard. Speak to the Pale Keeper to accept The Keeper's Toll.",
       "revivedAtGraveyard": "You have been returned to the nearest graveyard and revived. The Keeper's Toll weighs on you.",
+      "movedToGraveyard": "You have been moved to the nearest graveyard. Unstuck Sickness weighs on you.",
+      "revivedAtGraveyardUnstuck": "You have been moved to the nearest graveyard and revived. Unstuck Sickness weighs on you.",
       "cancelledMoved": "Unstuck cancelled because you moved.",
       "cancelledDamaged": "Unstuck cancelled because you took damage.",
       "cancelledCombat": "Unstuck cancelled because you entered combat.",
@@ -393,7 +396,8 @@ export const en_CA: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emotes",
-      "done": "Done"
+      "done": "Done",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Daily Rewards",
@@ -776,6 +780,10 @@ export const en_CA: EnTranslations = {
       "ready": "Swing",
       "seconds": "{seconds}s"
     },
+    "breath": {
+      "label": "Breath",
+      "drowning": "Drowning!"
+    },
     "rest": {
       "resting": "Resting"
     },
@@ -788,6 +796,7 @@ export const en_CA: EnTranslations = {
       "targetAnnounce": "Mark {name}",
       "targetOfTargetLabel": "Mark's Mark",
       "partyLabel": "Your Band",
+      "petLabel": "Your Pet",
       "partyChip": "Party",
       "partyGroup": "Group {n}",
       "durationUnitSeconds": "s",
@@ -821,7 +830,7 @@ export const en_CA: EnTranslations = {
       "targetCycleShort": "Target",
       "spellbookPageLabel": "Page {page}",
       "hideKeyboard": "Hide keyboard",
-      "chatPlaceholder": "Say something..."
+      "chatPlaceholder": "Say something... (! for community commands)"
     },
     "tutorial": {
       "moveBodyTouch": "Use the movement stick to move and drag the screen to look around. Take a few steps to begin.",
@@ -889,6 +898,13 @@ export const en_CA: EnTranslations = {
       "heroicName": "Heroic {name}",
       "heroicLocked": "You are locked to Heroic {name}."
     },
+    "riftTracker": {
+      "title": "Rift",
+      "floor": "Floor {current} of {total}",
+      "closesIn": "Closes in {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "N",
       "NE": "NE",
@@ -904,7 +920,36 @@ export const en_CA: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m}m {s}s",
       "seconds": "{s}s",
-      "autoShowHint": "Rows appear automatically once your party deals damage or healing, and this segment closes a few seconds after combat ends."
+      "autoShowHint": "Rows appear automatically once your party deals damage or healing, and this segment closes a few seconds after combat ends.",
+      "threatFallback": "No live threat: showing damage to {name}",
+      "breakdownSummary": "{tab}: {value}",
+      "breakdownRow": "{value} ({percent})",
+      "breakdownOther": "Other ({count})",
+      "percent": "{value}%",
+      "petAbility": "{pet}: {ability}",
+      "melee": "Melee",
+      "move": "Drag to move this meter",
+      "resize": "Drag to resize this meter",
+      "dock": "Dock this meter back into the meters window",
+      "separate": "Separate {meter}",
+      "regroup": "Regroup {meter}"
+    },
+    "targetAuras": {
+      "title": "Target Auras",
+      "keybindLabel": "Target Buffs and Debuffs",
+      "all": "All",
+      "debuffs": "Debuffs",
+      "buffs": "Buffs",
+      "unlock": "Move target aura window",
+      "lock": "Lock target aura window",
+      "configureRows": "Configure target auras",
+      "fewerRows": "Prefer fewer aura rows",
+      "moreRows": "Prefer more aura rows",
+      "visibleRows": "Preferred aura rows: {count}",
+      "showSources": "Show aura sources",
+      "hideSources": "Hide aura sources",
+      "ownAura": "Your aura",
+      "opacity": "Aura opacity: {percent}"
     },
     "petFeed": {
       "disabledFullHp": "Pet is at full health",
@@ -916,14 +961,30 @@ export const en_CA: EnTranslations = {
       "targetFriendlyNext": "Cycle Friendly Target",
       "discord": "Discord",
       "valecup": "Vale Cup",
+      "bgFlag": "Battleground Flag Action",
       "sheathe": "Sheathe/Unsheathe Weapon",
+      "dive": "Swim Down",
       "categoryPet": "Pet",
       "petAttack": "Pet: Attack",
       "petStop": "Pet: Stop",
       "petTaunt": "Pet: Taunt",
       "petDefensive": "Pet: Defensive",
       "petAggressive": "Pet: Aggressive",
-      "mount": "Mount / Dismount"
+      "targetPet": "Pet: Mark",
+      "mount": "Mount / Dismount",
+      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world."
+    },
+    "actionBar": {
+      "editKeys": "Edit action bar keys",
+      "editKeysHint": "Click a slot on the action bar, then press a key to bind it.",
+      "bannerHint": "Click a slot, then press a key to bind it. Click Done when finished.",
+      "bannerCapturing": "Press a key to bind this slot...",
+      "boundToKey": "Bound to {key}.",
+      "reset": "Reset",
+      "done": "Done",
+      "cancel": "Cancel",
+      "resetConfirmTitle": "Reset action bar keys?",
+      "resetConfirmBody": "The first bar returns to its default keys. The second and third bars become unbound. This cannot be undone."
     },
     "mounts": {
       "mount": "Mount",
@@ -936,13 +997,17 @@ export const en_CA: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage the Shadow-Jump Toad",
       "name_stormfeather_griffin": "Sky-Reach Stormfeather",
       "name_thunderstrut_gobbler": "Thunderstrut the Grand Gobbler",
+      "name_terrorspark_groundshaker": "Terrorspark Groundshaker",
+      "name_drakemaw_raptor": "Drakemaw Raptor",
       "desc_valorsteed": "A hardy, sure-footed steed that provides enhanced travel speed.",
       "desc_grag_bear": "A hardy, sure-footed bear that provides enhanced travel speed.",
       "desc_stalkglider_snail": "A hearty, slow-burning snail that provides enhanced travel speed.",
       "desc_aether_hover_cycle": "A powerful magitech bike designed for swift, low-hovering combat traversal.",
       "desc_shadowjump_toad": "A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.",
       "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled.",
-      "desc_thunderstrut_gobbler": "A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead."
+      "desc_thunderstrut_gobbler": "A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead.",
+      "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.",
+      "desc_drakemaw_raptor": "A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash."
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
@@ -962,6 +1027,93 @@ export const en_CA: EnTranslations = {
       "timeout": "Race Failed",
       "progress": "Gates {n} of {total}",
       "timeLeft": "{seconds}s"
+    },
+    "pvp": {
+      "launcherTitle": "PvP",
+      "mobileLabel": "PvP",
+      "bracket1v1": "1v1",
+      "bracket2v2": "2v2"
+    },
+    "bg": {
+      "title": "Thornhollow Fields",
+      "blurb": "Two ruined keeps face each other across a walled hollow in the shadow of Thornpeak: Crimson to the south, Azure to the north, and the older Ruin Courtyard between them that neither has ever held. Five a side, one banner each, and the first to carry three of theirs home takes the field.",
+      "modeTag": "5v5 Capture the Flag",
+      "offlineNote": "Thornhollow Fields is syncing. The queue opens once the realm answers.",
+      "ratingSummary": "Rating. {wins} wins / {losses} losses",
+      "careerCaptures": "Career captures: {count}",
+      "enterQueue": "Enter the Queue",
+      "enterQueueParty": "Enter the Queue (party of {count})",
+      "leaveQueue": "Leave Queue",
+      "searching": "Searching. {count}/{size} in queue.",
+      "queuedParty": "Party of {count}.",
+      "queueNote": "Two teams of five. Steal the enemy banner and run it to your keep. First to 3 captures wins. Group up to 5 and queue together; grab Sprint Runes and weave the cover to lose your pursuers.",
+      "matchInProgress": "Battle in progress. {crimson}:{azure}.",
+      "ladderAllTime": "Ladder. All-Time",
+      "noRanked": "No champions ranked yet. Be the first.",
+      "ladderOnline": "Ladder. Online Now",
+      "noChallengers": "No champions online right now. Be the first.",
+      "playerLevelClassTitle": "{name}. Level {level} {className}",
+      "playerClassTitle": "{name}. {className}",
+      "crimson": "Crimson",
+      "azure": "Azure",
+      "yourTeamTitle": "Your team",
+      "clock": "{minutes}:{seconds}",
+      "formUp": "Form up: {seconds}",
+      "firstTo": "First to {caps} captures",
+      "flagState": {
+        "home": "Flag at the keep",
+        "carried": "Flag stolen!",
+        "dropped": "Flag on the ground"
+      },
+      "respawnIn": "Next wave: respawning in {seconds}",
+      "resultVictory": "Victory!",
+      "resultDefeat": "Defeat",
+      "resultDraw": "Draw",
+      "leavingIn": "Leaving the battleground in {seconds}",
+      "killFeed": "{killer} felled {victim}",
+      "killFeedFallen": "{victim} has fallen",
+      "foundBanner": "Battle found. You fight for the {team}!",
+      "countdownBanner": "Thornhollow Fields begins in {seconds}",
+      "startBanner": "Capture the flag!",
+      "flagTakenLog": "{name} has taken the {team} flag!",
+      "flagDroppedLog": "The {team} flag was dropped.",
+      "flagReturnedLog": "The {team} flag was returned.",
+      "dropFlagConfirmTitle": "Drop the flag?",
+      "dropFlagConfirmBody": "You are carrying the enemy flag. Dropping it leaves it on the ground, where either team can reach it.",
+      "dropFlagConfirmAccept": "Drop the flag",
+      "boardToggleLabel": "Match scoreboard. Press Enter to pin the full board open.",
+      "levelRequirement": "You must reach level {level} to unlock queueing for this battleground.",
+      "board": {
+        "kills": "Kills",
+        "assists": "Assists",
+        "deaths": "Deaths",
+        "captures": "Captures"
+      },
+      "flagTakenBanner": "The {takers} have taken the {team} flag!",
+      "flagReturnedBanner": "The {team} flag was returned!",
+      "capturedTeamBanner": "The {takers} have captured the {team} flag! {crimson}:{azure}",
+      "capturedLog": "{name} captured the {team} flag. Score {crimson}:{azure}.",
+      "victoryBanner": "Victory! Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "defeatBanner": "Defeat. Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "drawBanner": "Thornhollow Fields draw {crimson}:{azure}. Rating {rating} ({delta})",
+      "endBannerDetail": "Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "endLog": "Thornhollow Fields ended {crimson}:{azure}. Rating {rating} ({delta}).",
+      "endedTimer": "Time expired",
+      "endedForfeit": "The match was forfeited",
+      "endedTimerLog": "The match clock ran out; the higher score took the field.",
+      "endedForfeitLog": "The match was forfeited.",
+      "firstWinBonusLine": "First win of the day: +{honor} Honor",
+      "firstWinBonusLog": "First win of the day: you gain {honor} bonus Honor.",
+      "timeWarningMinutes": "{minutes} minutes remain",
+      "timeWarningOneMinute": "One minute remains",
+      "timeWarningMinutesLog": "{minutes} minutes remain in the battle.",
+      "timeWarningOneMinuteLog": "One minute remains in the battle.",
+      "map": {
+        "crimsonKeep": "Crimson Keep",
+        "azureKeep": "Azure Keep",
+        "ruinCourtyard": "The Ruin Courtyard",
+        "graveyard": "Graveyard"
+      }
     },
     "vcup": {
       "title": "The Vale Cup",
@@ -985,6 +1137,7 @@ export const en_CA: EnTranslations = {
       },
       "awayNote": "If both sides fly the same banner, the away side plays the inverted palette.",
       "rolesHeading": "Sport role",
+      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Deeds that call for the 3v3 bracket or larger cannot be earned here.",
       "role": {
         "allrounder": {
           "name": "All-Rounder",
@@ -1026,6 +1179,7 @@ export const en_CA: EnTranslations = {
       "guildBoardWl": "{wins} W, {losses} L",
       "practice": "Practice vs. Bots",
       "practiceNote": "Starts a private bot match on your own practice pitch right away.",
+      "practiceUnratedNote": "Practice bouts are unrated: standings and Book of Deeds progress do not count.",
       "practicingNow": "Practicing now ({count}):",
       "clock": "{minutes}:{seconds}",
       "indicatorQueued": "Vale Cup queue: {bracket}, position {position} of {count}",
@@ -1068,6 +1222,8 @@ export const en_CA: EnTranslations = {
         "rule5": "Anyone can walk up and cheer you on from the stands.",
         "kitHeading": "Your kit",
         "kitNote": "These moves replace your class abilities for the match.",
+        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings do not move, and deeds for goals, saves, and clean sheets do not count.",
+        "practiceUnratedNote": "This is a practice bout, so it is unrated: standings do not move, and Book of Deeds progress does not count.",
         "rosterHeading": "The team sheet",
         "you": "You",
         "bot": "Bot",
@@ -1109,6 +1265,33 @@ export const en_CA: EnTranslations = {
       "browserEffectsReduced": "Reduced",
       "browserEffectsMinimal": "Minimal",
       "browserEffectsNote": "Auto tones down heavy CSS effects (blur, glow, background motion) based on your browser and device. Lower it manually if the interface feels sluggish.",
+      "graphicsApply": "Apply Graphics",
+      "graphicsApplying": "Applying graphics settings...",
+      "graphicsApplied": "Graphics settings applied.",
+      "graphicsSaved": "Graphics settings saved. The active renderer already matches them.",
+      "graphicsFailed": "Graphics could not be applied. Your previous settings are still active.",
+      "graphicsRetry": "Retry Graphics",
+      "graphicsFatal": "Graphics recovery failed. Reload the game to continue.",
+      "graphicsReload": "Reload Game",
+      "graphicsDraftChanged": "Graphics changes are ready to apply.",
+      "gfxSectionQuality": "Quality",
+      "gfxSectionWorld": "World Detail",
+      "gfxSectionLighting": "Lighting & Effects",
+      "gfxSectionCamera": "Camera",
+      "gfxSectionDisplay": "Display",
+      "gfxSectionSystem": "System",
+      "gfxSectionTouch": "Touch Controls",
+      "gfxViewDistance": "View Distance",
+      "gfxWaterQuality": "Water Quality",
+      "gfxCharacterDetail": "Character Detail",
+      "gfxAmbientOcclusion": "Ambient Occlusion",
+      "gfxBloom": "Bloom",
+      "gfxAntiAliasing": "Anti-Aliasing",
+      "gfxDynamicLights": "Dynamic Lights",
+      "gfxParticleEffects": "Particle Effects",
+      "gfxHalf": "Half",
+      "gfxCustomNote": "Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.",
+      "gfxEffectsNote": "Ambient Occlusion, Bloom and Anti-Aliasing ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect.",
       "interfaceMode": "Interface Mode",
       "interfaceModeAuto": "Auto",
       "interfaceModeDesktop": "Desktop",
@@ -1130,6 +1313,7 @@ export const en_CA: EnTranslations = {
       "aurasOnPlayerFrame": "Buffs on the Player Frame",
       "highContrastBackground": "High-Contrast Background",
       "startAttackOnAbility": "Auto-Attack on Ability Use",
+      "stopAutoAttackOnTargetSwitch": "Stop Auto-Attack on Target Switch",
       "walkByAutoloot": "Walk-by Autoloot",
       "groundReticle": "Ground-Targeting Reticle",
       "mouseoverCast": "Mouseover Cast on Party Frames",
@@ -1139,7 +1323,11 @@ export const en_CA: EnTranslations = {
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Show Secondary Action Bar",
       "showThirdActionBar": "Show Third Action Bar",
+      "hideUnusedActionSlots": "Hide Unused Action Slots",
+      "lockActionBars": "Lock Action Bars",
       "showTargetOfTarget": "Show Target of Target",
+      "showPetFrame": "Show Your Pet",
+      "waterRipples": "Water Ripples (Wakes)",
       "showAttackButton": "Show Attack Button",
       "showDailyRewardsChest": "Show Daily Rewards Chest",
       "mobileCameraJoystick": "Camera joystick",
@@ -1176,6 +1364,8 @@ export const en_CA: EnTranslations = {
       "buttons": "Button Layout",
       "resetButtons": "Reset Button Layout",
       "menuAction": "Game Menu",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Left stick moves, right stick looks. Open a window to use the on-screen pointer."
     },
     "perf": {
@@ -1250,26 +1440,99 @@ export const en_CA: EnTranslations = {
         "offline": "Offline"
       }
     },
+    "auraOverlay": {
+      "title": "Auras",
+      "currentClass": "Current class: {class}",
+      "previewHint": "Use Setup Positions to move an aura without covering the menu.",
+      "noProcs": "No supported proc is available for this character.",
+      "enabled": "Show Aura",
+      "icon": "Spell Icon",
+      "arcs": "Side Crescents",
+      "groundRing": "Ground Ring",
+      "groundRingSpellOrder": "Ground Ring: Spell Order",
+      "crescentsSpellOrder": "Side Crescents: Spell Order",
+      "size": "Size",
+      "iconSize": "Icon Size",
+      "crescentBlockSize": "Crescent Block Size",
+      "groundRingBlockSize": "Ground Ring Block Size",
+      "opacity": "Opacity",
+      "color": "Color",
+      "allOn": "All On",
+      "allOff": "All Off",
+      "reposition": "Setup Positions",
+      "positioning": "Positioning: {aura}",
+      "selectAura": "Aura",
+      "done": "Done",
+      "moveLeft": "Move Left",
+      "moveUp": "Move Up",
+      "moveDown": "Move Down",
+      "moveRight": "Move Right",
+      "moveEarlier": "Move spell inward",
+      "moveLater": "Move spell outward",
+      "screenPosition": "Screen Position",
+      "spellOrder": "Spell Order",
+      "reset": "Reset Position",
+      "spellPosition": "Spell order {position} / {count}",
+      "procs": {
+        "revenge": "Revenge!",
+        "battleTrance": "Battle Trance",
+        "overpowerCharge": "Redhand Empowerment",
+        "suddenDeath": "Sudden Death",
+        "victoryRush": "Victory Rush",
+        "enrage": "Mayhem: Enraged",
+        "heatingUp": "Heating Up",
+        "arcaneCharge": "Arcane Charges",
+        "aetherRush": "Aether Rush"
+      }
+    },
     "playerCard": {
       "showWalletBadge": "Show wallet badge"
     },
     "landing": {
       "highContrast": "High Contrast",
-      "highContrastAria": "Toggle high-contrast background: disables the moving trailer so start-screen text stays legible"
+      "highContrastAria": "Toggle high-contrast background: disables the moving trailer so start-screen text stays legible",
+      "browserSupport": {
+        "title": "Heads up: unsupported browser",
+        "body": "You may see reduced performance in this browser. For the best experience, get the desktop app for Windows, macOS, or Linux. Prefer playing in a browser? Chrome performs best, and Firefox and Safari are also supported.",
+        "getDesktopApp": "Get the desktop app",
+        "continueInBrowser": "Continue in browser",
+        "dismissAria": "Dismiss the unsupported browser notice"
+      }
     },
     "warfare": {
       "honorAmount": "{amount} Honor",
       "dualPrice": "{money} + {honor}",
       "balance": "Honor: {amount}",
       "honorFloat": "+{amount} Honor",
+      "honorFloatReason": "+{amount} Honor ({reason})",
       "honorGain": "You gain {amount} Honor ({reason}).",
       "notEnoughHonor": "Not enough Honor.",
       "reasons": {
         "arenaWin": "Arena victory",
         "fiestaKill": "Fiesta takedown",
         "fiestaComplete": "Fiesta completed",
-        "fiestaWin": "Fiesta victory"
+        "fiestaWin": "Fiesta victory",
+        "battlegroundWin": "Thornhollow Fields victory",
+        "battlegroundFirstWin": "first Thornhollow Fields win today",
+        "battlegroundComplete": "Thornhollow Fields battle fought",
+        "battlegroundKill": "honorable kill",
+        "battlegroundAssist": "killing blow assisted"
+      },
+      "floatReasons": {
+        "kill": "Kill",
+        "assist": "Assist",
+        "firstWin": "First Win"
       }
+    },
+    "warfareShop": {
+      "gossipOption": "Browse Warfare Sets",
+      "gossipOptionAria": "Browse the Warfare set shop offered by {name}",
+      "jewelry": "Jewelry",
+      "weapons": "Weapons",
+      "owned": "Owned",
+      "buyAria": "Buy {item} for {honor}",
+      "buyOwnedAria": "Buy {item} for {honor}, already owned",
+      "buyConfirmBody": "Buy {item} for {honor}? Honor purchases cannot be refunded."
     },
     "charSheet": {
       "offense": "Offense",
@@ -1341,6 +1604,7 @@ export const en_CA: EnTranslations = {
     },
     "itemHeroicTag": "[HEROIC]",
     "itemSoulbound": "Soulbound",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1427,7 +1691,9 @@ export const en_CA: EnTranslations = {
     },
     "paperdoll": {
       "unequipAria": "Unequip {item}",
-      "unequipHint": "Click ×, right-click, or drag to bags to unequip"
+      "unequipHint": "Click ×, right-click, or drag to bags to unequip",
+      "hideHelmAria": "Hide helmet",
+      "showHelmAria": "Show helmet"
     },
     "account": {
       "title": "Account",
@@ -1493,6 +1759,10 @@ export const en_CA: EnTranslations = {
       "twoFactorRecoveryTitle": "Save your recovery codes",
       "twoFactorRecoveryHint": "Each code works once. Store them somewhere safe: they are the only way back in if you lose your authenticator app.",
       "twoFactorDownloadCodes": "Download Codes",
+      "recoveryCodesFileHeader": "{brand} recovery codes",
+      "recoveryCodesFileAccount": "Account: {username}",
+      "recoveryCodesFileHint": "Each code can be used once if you lose access to your authenticator app.",
+      "recoveryCodesFileWarn": "Keep this file somewhere safe and private.",
       "twoFactorDone": "Done",
       "twoFactorDisableHint": "Enter your password to turn two-factor off. Your recovery codes will be discarded.",
       "twoFactorDisableBtn": "Turn Off Two-Factor",
@@ -1534,10 +1804,12 @@ export const en_CA: EnTranslations = {
       "title": "Harvest",
       "harvestButton": "Harvest",
       "harvestTooltip": "Gathers the checked components. Each corpse can be harvested once, first come. Does not take the loot.",
-      "concentrateHint": "Fewer chosen components yield a higher tier each.",
+      "yieldTierHint": "The fewer components a harvest takes, the higher the tier of each.",
       "nothingSelectedYields": "Nothing you selected can be harvested from this corpse.",
       "alreadyHarvested": "This corpse has already been harvested.",
       "componentAria": "Harvest {component}",
+      "componentNoYield": "nothing yet",
+      "componentAriaNoYield": "Harvest {component}: {note}",
       "components": {
         "hide": "Hide",
         "fang": "Fang",
@@ -1560,7 +1832,13 @@ export const en_CA: EnTranslations = {
       "saveButton": "Save Focus",
       "notInTownHint": "You must be in town to set your focus.",
       "increaseAria": "Increase focus on {component}",
-      "decreaseAria": "Decrease focus on {component}"
+      "decreaseAria": "Decrease focus on {component}",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "Promote to Leader",
@@ -1618,13 +1896,16 @@ export const en_CA: EnTranslations = {
       "itemAriaEnchanted": "{item}, quantity {count}, enchanted copy",
       "itemAriaBound": "{item}, quantity {count}, bound copy",
       "itemAriaMasterwork": "{item}, quantity {count}, masterwork",
+      "itemAriaQuest": "{item}, quantity {count}, quest item",
       "filterGroupAria": "Filter bags by category",
       "filterAll": "All",
       "filterWeapon": "Weapons",
       "filterArmor": "Armor",
       "filterConsumable": "Consumables",
       "filterMaterial": "Materials",
+      "filterTool": "Tools",
       "filterQuest": "Quest",
+      "filterQuestCountAria": "Quest, {count} items",
       "filterMount": "Mounts",
       "sortAria": "Sort bag items",
       "sortRecent": "Recent",
@@ -1633,6 +1914,7 @@ export const en_CA: EnTranslations = {
       "searchPlaceholder": "Search items",
       "searchAria": "Search bag items by name",
       "noMatch": "No items match your filters.",
+      "noQuestItems": "No quest items in your bags.",
       "capacity": "{used}/{total}",
       "capacityAria": "Bag slots used: {used} of {total}",
       "backpack": "Backpack",
@@ -1666,6 +1948,7 @@ export const en_CA: EnTranslations = {
       "dmgDoneReduce": "Reduces damage dealt by {pct}%",
       "heatingUp": "Your next consecutive Fire builder critical strike grants Hot Streak; a non-critical builder removes Heating Up",
       "elementalConvergencePrimed": "Your next spell from the other elemental school grants Elemental Convergence",
+      "carriedFlag": "You are carrying the enemy flag. Cancel this buff to drop it.",
       "battleStance": "Battle Stance: 10% more rage generation",
       "berserkerStance": "Berserker Stance: crits 3% more often and hit 3% harder",
       "crit": "Increases critical strike chance by {pct}%",
@@ -1801,7 +2084,9 @@ export const en_CA: EnTranslations = {
       "levelFamily": "Level {level} {family}",
       "familyDemon": "Demon",
       "hostile": "Hostile",
-      "friendly": "Friendly"
+      "friendly": "Friendly",
+      "elite": "Elite",
+      "boss": "Boss"
     },
     "targetFrame": {
       "unlock": "Move target frame",
@@ -1836,6 +2121,8 @@ export const en_CA: EnTranslations = {
       "showResource": "Show Mana, Rage, and Energy",
       "showAbsorbs": "Show Absorb Shields",
       "showAuras": "Show Buffs and Debuffs",
+      "showPets": "Show Pets",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Show Your Frame"
     },
     "frameReset": {
@@ -1850,6 +2137,9 @@ export const en_CA: EnTranslations = {
       "enchantedFallback": "Enchanted"
     },
     "materialHint": {
+      "fineGrade": "Fine grade. Gathered from a full-tier vein with a tool ranked above the material, and counts as the ordinary version wherever one is required.",
+      "cookingCatch": "Cooking ingredient. Must be cooked before eating.",
+      "usedBy": "Used by {crafts}.",
       "arcaneDust": "Enchanting reagent. Disenchanted from common and uncommon gear.",
       "arcaneEssence": "Enchanting reagent. Disenchanted from rare gear.",
       "arcaneShard": "Enchanting reagent. Disenchanted from epic and legendary gear.",
@@ -2047,6 +2337,14 @@ export const en_CA: EnTranslations = {
       "benefits": "Link your Steam account from the desktop app to mirror the deeds you earn into Steam achievements.",
       "noTicket": "Steam did not provide a link ticket. Start Steam, then try again."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Link Epic",
+      "unlink": "Unlink Epic",
+      "linked": "Linked to Epic account {id}",
+      "benefits": "Link your Epic account from the Epic desktop app to mirror the deeds you earn into Epic achievements.",
+      "noProof": "Epic did not provide a link proof. Launch from the Epic Games Store, then try again."
+    },
     "mailbox": {
       "title": "Mailbox",
       "subtitle": "The Ravenpost",
@@ -2091,6 +2389,7 @@ export const en_CA: EnTranslations = {
         "noRecipient": "No one by that name holds a mailbox here.",
         "tooManyParcels": "A letter carries at most {count} parcels.",
         "noMailQuestItems": "You cannot mail quest items.",
+        "noMailBound": "That item is bound and cannot be mailed.",
         "notEnoughItems": "You do not have that many to send.",
         "cantAffordPostage": "You cannot afford the postage.",
         "recipientBoxFull": "Their mailbox is full.",
@@ -2122,6 +2421,7 @@ export const en_CA: EnTranslations = {
       "depositHint": "Click to deposit",
       "depositPartialHint": "Shift-click to deposit a partial amount",
       "cannotDeposit": "Cannot be banked",
+      "cannotDepositNow": "Cannot be deposited right now",
       "depositQuantityTitle": "Deposit {item}",
       "depositQuantityInput": "Quantity to deposit",
       "depositQuantityConfirm": "Deposit",
@@ -2132,6 +2432,7 @@ export const en_CA: EnTranslations = {
       "sortAria": "Sort bank items",
       "searchAria": "Search bank items by name",
       "depositAll": "Deposit all materials",
+      "depositAllTooltip": "Sends every crafting reagent and junk item from your bags to the bank in one trip. Gathering tools, equipped gear, quest items, and consumables are never touched.",
       "depositAllDone": "Materials deposited: {count}.",
       "depositAllFull": "Materials deposited: {count}. Bank now full.",
       "depositAllNone": "Bank full: nothing deposited.",
@@ -2147,7 +2448,52 @@ export const en_CA: EnTranslations = {
       "bonusAdvertWallet": "Link a wallet to earn 2 slots.",
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "Invite a friend: when they reach level 10 you each earn 2 slots, up to 5 friends.",
-      "bonusSectionAria": "Bonus bank slots and how to earn more"
+      "bonusSectionAria": "Bonus bank slots and how to earn more",
+      "tabsAria": "Bank tabs",
+      "personalTab": "Personal",
+      "guildTab": "Guild",
+      "guildCapacityAria": "Guild bank slots used: {used} of {total}",
+      "guildEmpty": "The guild bank is empty.",
+      "guildTreasury": "Guild treasury",
+      "guildDepositGold": "Deposit money",
+      "guildWithdrawGold": "Withdraw money",
+      "guildDepositGoldTitle": "Deposit money into the guild treasury",
+      "guildWithdrawGoldTitle": "Withdraw money from the guild treasury",
+      "guildGoldAvailable": "Available: {amount}",
+      "guildBuyConfirm": "Purchase {count} additional guild bank slots for {price} from the guild treasury?",
+      "guildBuyNote": "Paid from the guild treasury",
+      "guildTreasuryShort": "Treasury short",
+      "guildOpenBank": "Open the guild bank",
+      "guildOpenConfirm": "Open the guild bank for {price}? This is paid from your own money.",
+      "guildOpenAccept": "Open",
+      "guildOpenNote": "Paid from your own money, not the guild treasury",
+      "guildPurseShort": "Not enough money",
+      "guildReadOnlyNote": "Only guild officers can make changes to the guild bank.",
+      "guildUnopenedNote": "The guild bank has not been opened yet.",
+      "guildDormantNote": "Locked items cannot be withdrawn and prevent disbanding the guild.",
+      "guildDormantHint": "This item is locked in the guild bank and cannot be withdrawn.",
+      "guildDormantAria": "{item}, quantity {count}, cannot be withdrawn",
+      "guildUnknownItem": "Unknown item",
+      "guildDepositHint": "Click to deposit into the guild bank",
+      "guildCannotDeposit": "Cannot go in the guild bank",
+      "guildGoldCannotMove": "That amount cannot be moved right now.",
+      "guildViewsAria": "Guild bank views",
+      "guildContentsTab": "Contents",
+      "guildLogTab": "Log",
+      "logAria": "Guild bank activity log",
+      "logNote": "The {count} most recent guild bank actions.",
+      "logLoading": "Loading the guild bank log...",
+      "logEmpty": "Nothing has been moved in or out of the guild bank yet.",
+      "logUnavailable": "The guild bank log cannot be read right now.",
+      "logFormerMember": "A former guild member",
+      "logDepositItem": "{actor} deposited {count} {item}",
+      "logWithdrawItem": "{actor} withdrew {count} {item}",
+      "logDepositMoney": "{actor} deposited {amount}",
+      "logWithdrawMoney": "{actor} withdrew {amount}",
+      "logBuySlots": "{actor} bought a bank expansion for {amount}",
+      "logOpenBank": "{actor} opened the guild bank for {amount}",
+      "logCharterFee": "{actor} paid the guild charter fee of {amount}",
+      "logAdminPurge": "An administrator removed {count} {item}"
     },
     "calendar": {
       "title": "Event Calendar",
@@ -2185,10 +2531,6 @@ export const en_CA: EnTranslations = {
           "title": "Market Day",
           "note": "The Merchant expects fresh stock. A fine day to browse the World Market."
         },
-        "fiestaNight": {
-          "title": "Fiesta Night",
-          "note": "The 2v2 Fiesta ring draws its loudest crowds tonight."
-        },
         "arenaClash": {
           "title": "Arena Clash",
           "note": "Duelists flock to the Ashen Coliseum. Queue up and climb the ladder."
@@ -2225,6 +2567,7 @@ export const en_CA: EnTranslations = {
       "billboard": {
         "label": "Guild Billboard",
         "empty": "Nothing on the billboard yet.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Set by {name}",
         "save": "Save",
         "placeholder": "Write a message for the guild",
@@ -2250,6 +2593,7 @@ export const en_CA: EnTranslations = {
       "catchLine": "You reel in: {name}",
       "biteLine": "Something takes the bait!",
       "gotAwayLine": "It got away.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "Ore Vein",
         "wood": "Timber Stand",
@@ -2268,7 +2612,8 @@ export const en_CA: EnTranslations = {
       "toolTierUnmet": {
         "mining": "You need a tier {tier} mining pick to harvest this vein.",
         "logging": "You need a tier {tier} logging axe to fell this stand.",
-        "herbalism": "You need a tier {tier} herbalism sickle to gather this patch."
+        "herbalism": "You need a tier {tier} herbalism sickle to gather this patch.",
+        "fishing": "You need a tier {tier} fishing rod to fish these waters."
       },
       "toolRequired": {
         "mining": "You need a mining pick to harvest this vein.",
@@ -2281,6 +2626,12 @@ export const en_CA: EnTranslations = {
         "logging": "There is no timber stand within reach.",
         "herbalism": "There is no herb patch within reach."
       },
+      "wieldUnmet": {
+        "mining": "You need Mining {skill} to swing the pick already in your bags.",
+        "logging": "You need Logging {skill} to swing the axe already in your bags.",
+        "herbalism": "You need Herbalism {skill} to work the sickle already in your bags."
+      },
+      "wieldUnmetCorpse": "You need gathering skill {skill} to put your finest tool to work.",
       "toolTierUnmetCorpse": "You need a tier {tier} gathering tool to recover the finest materials.",
       "toolTooltip": {
         "kind": {
@@ -2292,7 +2643,8 @@ export const en_CA: EnTranslations = {
         "unlocks": {
           "mining": "Required to mine ore veins up to tier {tier}.",
           "logging": "Required to fell timber stands up to tier {tier}.",
-          "herbalism": "Required to gather herb patches up to tier {tier}."
+          "herbalism": "Required to gather herb patches up to tier {tier}.",
+          "fishing": "Required to fish waters up to tier {tier}."
         },
         "use": {
           "mining": "Use: Mine a nearby ore vein.",
@@ -2307,8 +2659,12 @@ export const en_CA: EnTranslations = {
       },
       "downgradeMark": "Bags full: the find was stored without its gatherer's mark.",
       "downgradeFind": "Bags full: a pristine find slipped away.",
+      "emptyHookNote": "Nothing on the hook",
       "stateReady": "Ready",
-      "stateCooldown": "Respawning"
+      "stateCooldown": "Respawning",
+      "stateCooldownTimed": "Respawns in {time}",
+      "respawnClock": "{minutes}:{seconds}",
+      "fineGradePreview": "Your tool refines this yield to fine grade."
     },
     "archetypeTitle": {
       "label": "Title",
@@ -2342,6 +2698,7 @@ export const en_CA: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Enchant Weapon - Might",
       "enchant_weapon_intellect": "Enchant Weapon - Spellpower",
+      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
       "enchant_helmet_fortitude": "Enchant Helmet - Fortitude",
       "enchant_neck_spirit": "Enchant Necklace - Spirit",
       "enchant_shoulder_agility": "Enchant Shoulders - Agility",
@@ -2398,6 +2755,45 @@ export const en_CA: EnTranslations = {
       "ceilingRare": "Rare cap",
       "ceilingCommon": "Common cap",
       "skillValue": "{skill} / {max}",
+      "toolEffectCharges": "{charges} of {max} charges",
+      "toolEffectSpent": "Spent, needs recharging",
+      "toolEffectDepleted": "Tool effect spent",
+      "toolEffectRechargePrice": "Recharge: {count} x {material}",
+      "toolEffectModeAsk": "Ask each use",
+      "toolEffectModePrompt": "Asks each use",
+      "toolEffectConfirmTitle": "Use {effect}?",
+      "toolEffectConfirmBody": "Spend a charge on this harvest? Declining still gathers, without the bonus. Charges left: {charges}.",
+      "toolEffectConfirmAccept": "Use a Charge",
+      "toolEffectConfirmDecline": "Gather Without",
+      "toolEffectName": {
+        "gatherersCache": "Gatherer's Cache",
+        "artisansEye": "Artisan's Eye",
+        "quickeningCharm": "Springback Charm"
+      },
+      "toolEffectTooltip": {
+        "kind": "Tool charm",
+        "bonus": {
+          "gatherersCache": "+1 yield per harvest while charged.",
+          "artisansEye": "Raises the harvest grade by 1 tool tier while charged.",
+          "quickeningCharm": "Shortens the node respawn timer it triggers."
+        },
+        "howToSlot": "Slot onto a mining, logging, or herbalism tool from the Professions window. Consumed when slotted.",
+        "charges": "Starts with {base} charges on a common tool (+{bonus} per rarity rung).",
+        "landOnly": "Does not slot on fishing rods.",
+        "openProfessions": "Open Professions to slot this onto a gathering tool."
+      },
+      "toolEffectSlotButton": "Slot {effect}",
+      "toolEffectRechargeButton": "Recharge",
+      "toolEffectSlotted": "{effect} slotted on {profession}.",
+      "toolEffectSlotInvalid": "{effect} cannot be slotted there.",
+      "toolEffectNoTool": "You need a real {profession} tool first.",
+      "toolEffectNoCharm": "You need a crafted {effect} charm in your bags.",
+      "toolEffectNoGain": "{effect} is already slotted and fully charged.",
+      "toolEffectRecharged": "{effect} recharged: {material} x{count} consumed.",
+      "toolEffectRechargeNoSlot": "No effect is slotted on {profession}.",
+      "toolEffectRechargeFull": "{effect} is already fully charged.",
+      "toolEffectRechargeToolCapped": "Carry a better {profession} tool to charge {effect} further.",
+      "toolEffectRechargeMaterials": "Recharging {effect} needs {material} x{count}.",
       "tierPipAria": "Tier {tier}",
       "nextUnlockTier": "{points} points to the next tier: masterwork odds improve",
       "nextUnlockSpecialized": "{points} points to Specialized: material costs drop",
@@ -2422,9 +2818,27 @@ export const en_CA: EnTranslations = {
     "crafting": {
       "title": "Crafting",
       "close": "Close crafting",
-      "craft": "Craft",
+      "dialogOption": "Crafting",
+      "dialogOptionAria": "Open the crafting window for {craft}",
+      "crafting": "Crafting",
+      "create": "Create",
+      "createAll": "Create All",
+      "createAllAria": "Create the maximum number of this recipe from materials held",
+      "qtyRowAria": "Craft quantity",
+      "qtyDecreaseAria": "Decrease craft quantity, currently {count}",
+      "qtyIncreaseAria": "Increase craft quantity, currently {count}",
+      "qtyValueAria": "Craft quantity, {count}",
+      "batchRemaining": "{remaining} of {total} remaining",
+      "batchRemainingAria": "{remaining} of {total} crafts remaining",
+      "durationChip": "{seconds}s",
+      "durationAria": "Cast time: {seconds} seconds",
+      "progressAria": "Craft progress",
+      "announceStart": "Crafting {name}",
+      "announceComplete": "Finished crafting {name}",
+      "announceCancel": "Crafting cancelled",
       "reagentsNeeded": "Requires:",
       "reagentLine": "{name} x{have}/{required}",
+      "reagentFineSub": "(spends {count} fine-grade)",
       "empty": "No recipes known yet.",
       "resultAria": "Craft {name}",
       "craftedToast": "Crafted: {name}",
@@ -2466,6 +2880,8 @@ export const en_CA: EnTranslations = {
         "colSkill": "Skill",
         "colRole": "Role",
         "colCap": "Cap",
+        "allCrafts": "All crafts",
+        "skillListAria": "Craft skills",
         "tutorial": "First tier: reach skill {skill} in a craft. Successful recipes raise that craft without erasing knowledge elsewhere.",
         "nearTier": "{craft} is {points} skill from its next tier.",
         "dormantKnowledge": "{craft} knowledge is retained but dormant until its pair or hobby is active."
@@ -2479,7 +2895,7 @@ export const en_CA: EnTranslations = {
         "loom": "Loom",
         "toolworks": "Toolworks"
       },
-      "throttled": "You are crafting too quickly. Wait a moment and try again.",
+      "busy": "You are busy.",
       "recipeNotLearned": "You have not learned that recipe yet.",
       "noBagSpace": "You do not have room for the crafted item.",
       "skillReqLine": "Requires {craft} {skill}",
@@ -2493,6 +2909,8 @@ export const en_CA: EnTranslations = {
       "masterworkToast": "Masterwork! {name}",
       "masterworkZoneLine": "{crafter} crafted a masterwork {name}!",
       "tierUpToast": "{craft} advanced to tier {tier}!",
+      "skillUpToast": "{skill} skill increased to {level}!",
+      "skillUpSubtext": "Skill increased to {level}!",
       "trendNudge": "Your hands are leaning toward the {archetype}. Its attunement waits with {master}.",
       "trendNudgeNoMaster": "Your hands are leaning toward the {archetype}. Seek a craft master to take it up.",
       "attunedZoneLine": "{name} has attuned as {archetype}!",
@@ -2532,9 +2950,9 @@ export const en_CA: EnTranslations = {
       "notHeld": "You do not have that item.",
       "notDisenchantable": "You cannot disenchant that.",
       "notSalvageable": "You cannot salvage that.",
-      "disenchantThrottled": "You are disenchanting too quickly. Wait a moment and try again.",
-      "salvageThrottled": "You are salvaging too quickly. Wait a moment and try again.",
-      "enchantThrottled": "You are enchanting too quickly. Wait a moment and try again.",
+      "disenchantBusy": "You are busy.",
+      "salvageBusy": "You are busy.",
+      "enchantBusy": "You are busy.",
       "enchantWrongSlot": "That enchant cannot be applied to that item.",
       "enchantUnknown": "That enchant does not exist.",
       "enchantInsufficient": "You do not have the materials for that enchant.",
@@ -2552,6 +2970,7 @@ export const en_CA: EnTranslations = {
       "noEnchants": "No enchant uses this reagent.",
       "noTargets": "No eligible item to enchant.",
       "wornTag": "Worn ({slot})",
+      "wornTagIndexed": "Worn ({slot} {index})",
       "tier": {
         "base": "Base Enchants",
         "runed": "Runed Enchants",
@@ -2616,6 +3035,59 @@ export const en_CA: EnTranslations = {
       "cannotAfford": "You cannot afford the unbinding fee.",
       "outOfRange": "You must be at a crafting station to unbind.",
       "noSpace": "You do not have room for the unbound copy."
+    },
+    "commissionBoard": {
+      "title": "Commission Orders",
+      "close": "Close commission orders",
+      "openButton": "Orders",
+      "openButtonAria": "Open the commission order board",
+      "intro": "Commission a crafter to make you a piece, or take on someone else's order.",
+      "formTitle": "Open a Commission",
+      "recipeLabel": "Item",
+      "recipeEmpty": "You know no craftable equipment recipes yet.",
+      "scopeLabel": "Who can accept",
+      "scopeOpen": "Anyone (open board)",
+      "scopeCrafter": "A specific crafter",
+      "crafterNameLabel": "Crafter name",
+      "crafterNamePlaceholder": "Character name",
+      "openSubmit": "Post Order",
+      "sectionMine": "My Requests",
+      "sectionToCraft": "My Commissions",
+      "sectionBoard": "Open Board",
+      "boardEmpty": "No open orders right now.",
+      "mineEmpty": "You have not opened any commissions.",
+      "toCraftEmpty": "You are not crafting anyone's order right now.",
+      "rowFor": "{item} for {requester}",
+      "rowTargeted": "{item} for {requester} (for {crafter})",
+      "acceptedBy": "Accepted by {name}",
+      "statusOpen": "Open",
+      "statusAccepted": "Accepted",
+      "statusDelivered": "Delivered",
+      "statusCancelled": "Cancelled",
+      "statusExpired": "Expired",
+      "cancelButton": "Cancel",
+      "acceptButton": "Accept",
+      "deliverButton": "Deliver",
+      "deliverHint": "Craft the commissioned piece (with the commission toggle on), then come back here to deliver it.",
+      "opened": "You post a commission order for {item}.",
+      "cancelled": "You cancel the commission order for {item}.",
+      "accepted": "You accept the commission order for {item}.",
+      "delivered": "You deliver {item} to {name}.",
+      "denyUnknownRecipe": "That recipe does not exist.",
+      "denyNotCommissionEligible": "That recipe cannot be commissioned.",
+      "denyUnknownCrafter": "No character by that name is known.",
+      "denySelfCrafter": "You cannot commission yourself.",
+      "denyTooManyOpen": "You already have too many open commission orders.",
+      "denyUnknownOrder": "That commission order no longer exists.",
+      "denyOrderNotOpen": "That commission order is no longer open.",
+      "denySelfOrder": "You cannot accept your own commission order.",
+      "denyNotEligibleCrafter": "That commission order was posted for someone else.",
+      "denyNotYourOrder": "That is not your commission order.",
+      "denyOrderNotAccepted": "That commission order has not been accepted yet.",
+      "denyNotYourAcceptance": "You did not accept that commission order.",
+      "denyNotCrafted": "Craft the commissioned piece first (with the commission toggle on).",
+      "denyOutOfRange": "You must be near the requester to deliver a commission.",
+      "denyNoSpace": "The requester has no room in their bags."
     },
     "finder": {
       "title": "Dungeon Finder",
@@ -2715,7 +3187,8 @@ export const en_CA: EnTranslations = {
         "raise_fallen": "Raise Fallen (periodic waves of adds)",
         "soul_rend": "Soul Rend (marked players must spread and be healed)",
         "deathless_rage": "Deathless Rage (interrupted at the wardstones)",
-        "wardstones": "Wardstone channels (phase transition)"
+        "wardstones": "Wardstone channels (phase transition)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -2727,6 +3200,7 @@ export const en_CA: EnTranslations = {
       "countLabel": "{earned}/{total} deeds",
       "completionAria": "Deeds earned: {earned} of {total}",
       "recentLabel": "Recent:",
+      "recentJumpAria": "Jump to {name}",
       "nearestLabel": "Nearly there:",
       "filterGroupAria": "Filter deeds",
       "filterAll": "All",
@@ -2780,7 +3254,7 @@ export const en_CA: EnTranslations = {
       "lbSelfAccount": "Your account: rank {rank}, top {percent} percent, {renown} Renown",
       "lbSelfRank": "Your account: rank {rank}, top {percent} percent",
       "lbEmpty": "No ranked chroniclers yet.",
-      "broadcastsLabel": "Share deed unlocks with guild and friends",
+      "broadcastsLabel": "Share deed unlocks with guildmates and followers, and deed and masterwork cards with the Discord feed",
       "titledName": "{name} [{title}]"
     },
     "continentMap": {
@@ -2929,8 +3403,29 @@ export const en_CA: EnTranslations = {
       "account_taken": "That Steam account is already linked to another account.",
       "upstream": "Steam did not respond. Try again in a moment."
     },
+    "epic": {
+      "disabled": "Epic linking is not available right now.",
+      "invalid_token": "Epic could not verify this link request. Try again from the desktop app.",
+      "banned": "That Epic account cannot be linked.",
+      "already_linked": "Your account already has a linked Epic account.",
+      "account_taken": "That Epic account is already linked to another account.",
+      "upstream": "Epic did not respond. Try again in a moment."
+    },
     "wallet": {
       "handoff_invalid": "That wallet authorization expired or could not be verified. Try again."
+    },
+    "ota_updates": {
+      "invalid_input": "Invalid input."
+    },
+    "seeker": {
+      "native_only": "Seeker entitlement is available only in the native app.",
+      "attestation_failed": "Device verification failed. Please try again.",
+      "solana_artifact_required": "Use the Solana Store app to continue.",
+      "wallet_required": "Link and verify a wallet first.",
+      "genesis_token_required": "A verified Seeker Genesis Token is required.",
+      "genesis_token_claimed": "That Seeker Genesis Token has already been claimed.",
+      "entitlement_required": "Verified Seeker entitlement is required.",
+      "current_ownership_required": "Current Seeker Genesis Token ownership is required."
     }
   },
   "guide": {
@@ -2964,6 +3459,7 @@ export const en_CA: EnTranslations = {
       "talents": "Talents",
       "arena": "Arena & PvP",
       "valeCup": "Vale Cup",
+      "thornhollow": "Thornhollow Fields",
       "deeds": "Book of Deeds",
       "glossary": "Glossary",
       "wishIKnew": "Things I Wish I Knew",
@@ -3133,16 +3629,21 @@ export const en_CA: EnTranslations = {
       "groupInterface": "Interface",
       "groupCamera": "Camera",
       "talents": "Talents",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Leaderboard",
       "deeds": "Book of Deeds",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Crafting",
       "valeCup": "Vale Cup",
+      "mount": "Mount / Dismount",
       "calendar": "Event Calendar",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Use action bar abilities (the number row; a second bar sits on the numpad)",
       "targetFriendly": "Target nearest friendly",
       "cycleFriendly": "Cycle friendly target",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Open game menu and options",
       "bothMouse": "Both Mouse Buttons",
       "runForward": "Run forward",
@@ -3153,7 +3654,7 @@ export const en_CA: EnTranslations = {
       "mobileHeading": "On mobile",
       "mobileBody": "Touch controls appear automatically on phones and tablets: a movement stick on the left, drag anywhere else to look, pinch with two fingers to zoom the camera, and on-screen buttons for your abilities and menus. A small arrow in the top left corner shows or hides the menu buttons, and the More button there holds the rest of your windows.",
       "controllerHeading": "On a controller",
-      "controllerBody": "Gamepads work too, and controller support is on by default. The left stick moves, the right stick aims the camera, and the face and shoulder buttons cover your abilities, jumping, and interacting. Open a window like your bags to bring up an on-screen pointer, and the game menu navigates directly with the D-pad and face buttons. You can remap the buttons and adjust stick deadzone, camera speed, vibration, and inverted look from the controller settings in the options."
+      "controllerBody": "Gamepads work too, and controller support is on by default. The left stick moves, the right stick aims the camera, and the face and shoulder buttons cover your abilities, jumping, and interacting. Open a window like your bags to bring up an on-screen pointer, and the game menu navigates directly with the D-pad and face buttons. You can remap the buttons and adjust stick deadzone, camera speed, vibration, and inverted look from the controller settings in the options, where a button can also be bound to zoom the camera in or out (unbound by default)."
     },
     "settingsPage": {
       "heading": "Settings & Performance",
@@ -3531,14 +4032,6 @@ export const en_CA: EnTranslations = {
         "name": "Reptiles",
         "desc": "Cold-blooded hunters with a hiss and a snap all their own, distinct from the warm-blooded beasts."
       },
-      "murloc": {
-        "name": "Croakfins",
-        "desc": "Croaking fish-folk of lake shore and tide pool, quick to swarm anything that wades too close."
-      },
-      "kobold": {
-        "name": "Scamps",
-        "desc": "Skittering scavengers and sprites of glade and hedgerow, more nuisance than menace until they gather in numbers."
-      },
       "demon": {
         "name": "Demons",
         "desc": "Invaders from beyond the rifts, all fire and spite. Where one stands, a breach is never far."
@@ -3677,7 +4170,7 @@ export const en_CA: EnTranslations = {
       "bastionBody": "A flooded fortress lost to the marsh, held by drowned defenders and the rising tide itself.",
       "templeBody": "A moonlit shrine sunk beneath a glowing tarn high in the peaks, reached through a gate of cold light. A drowned cult still sings down there in its rotted vestments, and the warnings carved on the shore say something below only sleeps. A self-contained mystery, set apart from the main story, for the curious and the well-prepared.",
       "sanctumBody": "The dark heart of Thornpeak, where the cult's long work reaches its terrible peak.",
-      "wildheartBody": "A rain-soaked jungle caldera where two raised hunting trails circle a jade cenote. Cross beast dens and ancestor ruins, then climb the ritual pyramid to face Zulgar.",
+      "wildheartBody": "A rain-soaked jungle caldera where two raised hunting trails circle a jade cenote. Cross beast dens and ancestor ruins, then climb the ritual pyramid to see who waits at the top.",
       "raidName": "The endgame raid",
       "raidBody": "Beyond a sealed royal door waits a ten-player trial: a multi-stage fight and a deathless power the whole raid must shut down together. Earn your way in, then bring nine friends.",
       "heroicTitle": "Heroic mode",
@@ -3742,23 +4235,25 @@ export const en_CA: EnTranslations = {
       "duelsBody": "Challenge any player you meet to a friendly duel. Nothing is on the line but pride, so it is the easiest way to learn a matchup or settle a friendly argument.",
       "coliseumHeading": "The Ashen Coliseum",
       "coliseumBody": "The Coliseum is the realm's arena, where you face other players in ranked matches, one on one or two on two. Each bracket keeps its own standing, so a win lifts you up that ladder for the whole realm to see. Open the Arena window to sign up for a bracket, alone or with your partner.",
-      "fiestaHeading": "Two versus two Fiesta",
-      "fiestaBody": "Fiesta is a fast, two-on-two brawl fought as one continuous bout, with every fighter brought to an even footing. As the fight runs you draft augments, quick boosts that reshape your kit on the fly, so no two matches play quite the same.",
-      "augmentsNote": "Augments and power-ups last only for the match. They are about playful, on-the-spot builds, not lasting power, so nobody buys their way to a win.",
-      "wavesTitle": "Augments arrive in waves",
-      "wavesBody": "A Fiesta bout hands you fresh picks as it goes, and the picks grow bolder the longer the fight runs. You build from one wave to the next, choosing one of a few options each time and keeping it for the rest of the bout.",
-      "waveSilverTitle": "Silver",
-      "waveSilverBody": "The opening wave: clean, single-stat boosts that sharpen the basics of your class.",
-      "waveGoldTitle": "Gold",
-      "waveGoldBody": "The middle wave: two-edged combos where your build starts to take shape and sing.",
-      "wavePrismaticTitle": "Prismatic",
-      "wavePrismaticBody": "The final wave: build-defining, screen-melting spikes meant to feel ridiculous in the best way.",
-      "yumiHeading": "Protect Yumi",
-      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
-      "powerupsTitle": "Power-ups in the ring",
-      "powerupsBody": "Glowing orbs also drop into the arena mid-fight, free for whoever reaches them first. They are deliberately over the top and last only a short while: Speed Demon for a blink of blinding pace, Colossus to swell up into a lumbering giant, Moon Boots for a bouncing, low-gravity leap, and Berserker for a sudden surge of fury.",
       "ladderHeading": "Climbing the ladder",
       "ladderBody": "Ranked play tracks your standing over time. Check the leaderboard to see where you sit and who holds the top of the realm."
+    },
+    "thornhollowPage": {
+      "heading": "Thornhollow Fields",
+      "intro": "A ranked 5v5 capture-the-flag battleground fought in a walled hollow in the old growth below Thornpeak, where two ruined keeps face each other down the length of a ravine and an older courtyard sits between them that neither has ever held. Two teams of five, two keeps, one goal: steal the enemy banner and run it home before they run yours.",
+      "queueHeading": "Queueing up",
+      "queueBody": "Open the Thornhollow Fields panel and enter the queue solo, or bring a party of up to five and queue together: parties are always kept on one team, and the remaining seats fill with solo champions. When ten stand ready, the match seats both teams at their keeps for a short form-up before the flags go live.",
+      "fieldHeading": "The field",
+      "fieldBody": "A walled, open-air field carved into three chambers: each team has its own field before its keep, and the walled Ruin Courtyard sits between them. Two curtain walls span the full width, and every move between chambers passes a contested crossing: the wide main gate, or the gatehouse, a small room straddling the wall whose offset doors force a jog past an ambush corner. Each keep is sealed except its mouth, so every flag run starts and ends through the same opening, and a low barricade breaks the straight charge into it. The courtyard holds the hollow heart ruin and the two flank Sprint Runes; the other two wait on the flag approaches. A Battle or Ward Rune (more damage dealt, or less damage taken, for a few seconds) waits at each main gate's courtyard mouth: both pads open the match on the same face and flip with every claim.",
+      "flagsHeading": "Flags",
+      "flagsBody": "Each keep holds its team flag. Take the enemy flag and carry it to your own stand to score; the first team to three captures wins, and a timed-out battle resolves on score. A slain carrier drops the flag where they fell: an enemy can take it up again, while its own team returns it home instantly just by reaching it. The flag also refuses to hide: picking it up breaks stealth, and a carrier who turns invisible by any means drops it on the spot.",
+      "pickupNote": "Picking a flag up is always a deliberate press of the battleground action key: nobody ever becomes the carrier by strafing through the wrong spot.",
+      "respawnHeading": "Falling in battle",
+      "respawnBody": "Death keeps the classic rite: your corpse lies where it fell until YOU release, and the spirit rises in the fenced graveyard beside your keep, warded there until your team's next respawn wave. The wave raises every waiting spirit together, and the two team waves are deliberately staggered, so the fight never fully resets at once. There is no corpse run and no Spirit Healer bargain: release, wait out the wave, fight.",
+      "carrierHeading": "Carrying the flag",
+      "carrierBody": "A carrier who holds the enemy flag too long grows more and more vulnerable, taking ever-increasing damage until the flag is captured, dropped, or returned. Hiding with the flag is a losing plan; running it home is the winning one.",
+      "ladderHeading": "The ladder",
+      "ladderBody": "Every match moves a persistent per-character battleground rating, win or lose, and the all-time board ranks the realm champions. Wins and hard-fought losses also pay Honor through the Warfare system."
     },
     "valeCupPage": {
       "heading": "The Vale Cup",
@@ -3900,6 +4395,8 @@ export const en_CA: EnTranslations = {
       "sourcesBody": "Most of your early upgrades are quest rewards, so it pays to finish quests rather than grind. Enemies drop gear when you defeat them, vendors in town sell solid basics, crafters turn gathered materials into wearable pieces, and the player market lets you buy from other adventurers. At the top of the hill, two mark currencies buy gear found nowhere else: Delve Marks at the delve keeper, and Heroic Marks at the heroic quartermaster.",
       "soulboundTitle": "Soulbound: yours and yours alone",
       "soulboundBody": "A few special rewards are soulbound, bound to your character from the moment you earn them. A soulbound item cannot be traded, mailed, sold to a vendor, or listed on the market; it is yours and yours alone. Today that protection guards prize tokens such as Heroic Marks, while the gear you win is yours to trade, sell, or share freely.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Sets and set bonuses",
       "setsBody": "Some armor comes in matched families, several pieces cut to look and fight as one. Wear enough of a family at once and the set wakes up, granting bonuses on top of each piece's own stats, and the more pieces you wear the stronger it gets. A few such families turn up as prized drops while you level; the greatest of them come from the toughest group content near the level cap, so chasing a full set is a classic endgame goal.",
       "consumablesTitle": "Consumables",
@@ -3908,8 +4405,8 @@ export const en_CA: EnTranslations = {
       "consumablesFood": "Food and drink restore you while you sit and rest between fights. Eating recovers health, drinking recovers mana, and resting this way is free. Sit down for a few seconds after a tough fight instead of running into the next one half-healed.",
       "consumablesElixirs": "Elixirs grant a temporary buff while you adventure, a small edge that helps when you want to push a little further.",
       "fishingTitle": "Fishing",
-      "fishingBody": "Fishing is a calm change of pace. Carry a fishing pole, use it beside open water, and reel in what bites. You mostly catch fish that are food you can eat, the odd bit of junk to sell for a few coins, and now and then a prized rare catch. What you find depends on the water you fish in.",
-      "fishingFood": "The fish you reel in are food: eat one while you sit to rest and it restores health, with the heartier fish coming from the colder, deeper waters in the north. A line in the lake is a quiet way to keep your pack stocked between fights.",
+      "fishingBody": "Fishing is a calm change of pace. Carry a fishing pole, use it beside open water, and reel in what bites. You mostly catch raw fish for the cooking pot, the odd bit of junk to sell for a few coins, and now and then a prized rare catch. What you find depends on the water you fish in.",
+      "fishingFood": "The fish you reel in are cooking ingredients, not trail snacks: cook them at a kitchen (or a specialized field kitchen) into sit-down meals that restore health over rest. Deeper zones stock higher-tier catches for better dishes, so a line in the lake is a quiet way to keep the cook and the party fed between fights.",
       "fishingRare": "Now and then your line catches something far better than supper: a shimmering prized fish that any angler might luck into in any water. Hook one and your log lights up with the catch. It is the kind of lucky pull that makes an idle afternoon at the lake worth telling people about.",
       "cosmeticsTitle": "Looks and cosmetics",
       "cosmeticsBody": "Some rewards change only how your character looks, never how strong you are. These cosmetic skins let you stand out without affecting the game, so wear whichever you like.",
@@ -3921,7 +4418,7 @@ export const en_CA: EnTranslations = {
     "professions": {
       "intro": "Beyond combat and quests, the world rewards you for working the land and the forge: gathering raw materials, turning them into gear and goods across ten crafting trades, and settling into an identity as one of the ten archetypes those trades represent.",
       "harvestTitle": "Harvesting the hunt itself",
-      "harvestBody": "Gathering does not stop at nodes. Many slain beasts can be harvested once each, first come first served, for hides, fangs, silk, and meat, straight from the corpse alongside its ordinary loot; one press opens both. The choice is yours each time, too: strip everything the corpse offers, or concentrate on fewer components and take a measurably finer grade of what you do take.\n\nA rare or better harvest roll on a specimen-bearing family also grants a signed perfect specimen (a Pristine Hide, Pristine Silk, Pristine Venom Gland, or Prime Cut) on top of the ordinary yield, and records A Perfect Specimen in your Book of Deeds. Any character can harvest, no training required, and any gathering tool you own counts toward the premium arm, whichever trade it belongs to.",
+      "harvestBodyChoice": "Gathering does not stop at nodes. Many slain beasts can be harvested once each, first come first served, for hides, fangs, silk, and meat, straight from the corpse alongside its ordinary loot; one press opens both. Where a beast carries more than one workable component, the choice is yours: take everything it can give, or concentrate on fewer components and take a measurably finer grade of what you do take.\n\nA rare or better harvest roll on a specimen-bearing family also grants a signed perfect specimen (a Pristine Hide, Pristine Silk, Pristine Venom Gland, or Prime Cut) on top of the ordinary yield, and records A Perfect Specimen in your Book of Deeds. Any character can harvest, no training required, and any gathering tool you own counts toward the premium arm, whichever trade it belongs to.",
       "focusTitle": "Town Focus",
       "focusBody": "Every hub town keeps a Town Focus panel for visiting harvesters: stand in town, open it from beside the minimap, and spread a budget of 10 focus points across the component types you care about. Every 5 points on a component raises its harvest grade one step (two steps at most), and each point adds 10 percent to its yield; unfocused components are never made worse. Your allocation follows your character everywhere and can be reworked, free, on any later visit to town.",
       "craftHowTitle": "The crafting window",
@@ -3929,9 +4426,9 @@ export const en_CA: EnTranslations = {
       "craftMasteryBody": "Honest expectations: the climb to a craft's 125 cap is at least 125 successful crafts, since each full-gain craft moves you exactly one point, and in practice somewhat more as recipes fade between trainer rungs. The crafting itself is quick; feeding it is the real journey, so budget a few dedicated evenings of gathering and crafting per trade.\n\nThe gathering trades reach their 100 cap over a normal leveling journey if you harvest as you travel, though the last stretch wants the high-tier nodes of the far north. Fishing is the long road by design: by its own gain schedule, 200 proficiency is more than three thousand catches. Master Angler is a title earned over a season of quiet evenings, not a weekend.",
       "archetypeChooseTitle": "The Guild letter, and changing your mind",
       "archetypeChooseBody": "You do not need to seek any of this out. Work your trades, and once your craft skills first show a clear leaning toward one pair, the Crafting Guild notices and sends a Ravenpost letter naming the master to see and the quest to take. It arrives once per character, and only if you have not already sworn to a pair.",
-      "archetypeSwitchBody": "A declaration is not a life sentence, either. A pair you have never held is simply a fresh attunement quest, while returning to a pair you walked away from asks you to make amends first: five tasks the first time, and three more added for every switch you have already made. The choice stays meaningful without ever locking a door for good.",
+      "archetypeSwitchBody": "A declaration is not a life sentence, either. A pair you have never held is simply a fresh attunement quest, while returning to a pair you walked away from asks you to make amends first: five tasks the first time, and three more added for every return you have already made (taking up a brand-new pair never raises the count). The choice stays meaningful without ever locking a door for good.",
       "whatHeading": "A trade beside the sword",
-      "whatBody": "Professions are the working life of the world: four gathering trades that pull raw material straight out of the land, and a ring of ten crafts that turn it into gear, meals, potions, and tools. Everything feeds something else here. The ore you mine becomes a blade, the blade takes an enchant, and the enchant needs dust broken out of old gear, so a gatherer, a crafter, and a tinkerer are all links in one chain.\n\nThere is no profession limit to agonize over. Every character can raise all eight crafts that have content today and all four gathering professions side by side; the only exclusive choice is your archetype, the identity you eventually swear to, though once you attune the crafts that fall dormant behind it stop climbing. Skill never goes down, and nothing you learn is ever taken away.",
+      "whatBody": "Professions are the working life of the world: four gathering trades that pull raw material straight out of the land, and a ring of ten crafts that turn it into gear, meals, potions, and tools. Everything feeds something else here. The ore you mine becomes a blade, the blade takes an enchant, and the enchant needs dust broken out of old gear, so a gatherer, a crafter, and a tinkerer are all links in one chain.\n\nThere is no profession limit to agonize over. Every character can raise seven of the eight crafts that have content today and all four gathering professions side by side (Engineering is the one holdout: its recipes all start above the free ceiling, so its ladder waits for the Bombardier's oath); the only exclusive choice is your archetype, the identity you eventually swear to, though once you attune the crafts that fall dormant behind it climb only on their common recipes, and past skill 75 not at all. Skill never goes down, and nothing you learn is ever taken away.",
       "ringHeading": "The craft ring",
       "ringBody": "Every craft with content today caps at 125 skill: Weaponcrafting, Armorcrafting, Tailoring, Leatherworking, Cooking, Alchemy, Engineering, and Enchanting. At a cap the trade keeps working, harvests still yield, crafts still resolve, and masterworks can still happen; only the number stops climbing. Pick a card below for a craft's full recipe tables and numbers.",
       "ringWaveNote": "Two crafts on the wheel, Jewelcrafting and Inscription, hold their seats but ship no recipes yet. That is deliberate rather than an oversight: their content arrives with future zones, and the caps above rise the same way, so a capped craft today is a head start on that expansion, not a finish line.",
@@ -3940,7 +4437,7 @@ export const en_CA: EnTranslations = {
       "gatherHubHeading": "Gathering",
       "gatherHubBody": "Four gathering trades feed the ring from the field: Mining, Logging, and Herbalism pull ore, timber, and herbs out of the land and cap at 100 proficiency, while Fishing runs on its own bite-and-reel rhythm all the way to 200. Each page below carries the exact node maps, tool ladders, and odds.",
       "archetypesHeading": "The wheel and its archetypes",
-      "archetypesBody": "The ten crafts sit on a fixed wheel, and geography on that wheel matters. Every two neighbors form a named pair: Smith for Weaponcrafting and Armorcrafting, Outfitter for Leatherworking and Tailoring, Apothecary for Alchemy and Cooking, Bombardier for Engineering and Alchemy, and six more around the ring.\n\nAttuning to a pair is a quest, not a menu click. Four pairs can be joined today (Smith, Outfitter, Apothecary, and Bombardier), each anchored by a resident master in Eastbrook whose acceptance quest states the whole bargain up front before you take it. Until you declare, every craft advances freely on recipes up through the rare tier, so you can try everything before you choose.\n\nOnce you attune, your two pair crafts become your majors, with no ceiling short of the cap. The rest of the wheel does not go dark: one craft opposite your majors stays on as a hobby that keeps climbing through the rare tier (a repeatable quest at Smith Haldren's forge lets you swap which one), and every other craft goes dormant. A dormant craft keeps its skill and its common recipes; it simply stops climbing and never turns out a masterwork while it rests.",
+      "archetypesBody": "The ten crafts sit on a fixed wheel, and geography on that wheel matters. Every two neighbors form a named pair: Smith for Weaponcrafting and Armorcrafting, Outfitter for Leatherworking and Tailoring, Apothecary for Alchemy and Cooking, Bombardier for Engineering and Alchemy, and six more around the ring.\n\nAttuning to a pair is a quest, not a menu click. Four pairs can be joined today (Smith, Outfitter, Apothecary, and Bombardier), each anchored by a resident master in Eastbrook whose acceptance quest states the whole bargain up front before you take it. Until you declare, every craft advances freely on recipes up through the rare tier (any recipe asking skill 74 or less), so you can try nearly everything before you choose (Engineering alone has no recipe that low, so its number waits).\n\nOnce you attune, your two pair crafts become your majors, with no ceiling short of the cap. The rest of the wheel does not go dark: one craft opposite your majors stays on as a hobby that keeps climbing through the rare tier (a repeatable quest at Smith Haldren's forge lets you swap which one), and every other craft goes dormant. A dormant craft keeps its skill and its common recipes, which keep teaching it on the normal curve until they gray at 75; everything above common stops paying at once, and a dormant craft never turns out a masterwork while it rests.",
       "pairFmt": "{a} and {b}",
       "curveHeading": "The Mastery Curve",
       "curveBody": "Skill gain follows one rule everywhere, the four-state Mastery Curve. Every {step} points of skill is a tier, and each recipe is scored by where it sits against yours: at or above your tier it grants full gain, one tier below grants half, two below a quarter, and three or more below nothing at all.\n\nThe crafting window paints this straight onto the recipe list in the classic colors: orange for full gain, yellow for reduced, green for a trickle, gray for none. Gains are deterministic, never a skill-up roll, so the same craft at the same tier always moves your skill by exactly the same amount, and a recipe turning yellow is your cue to train the next rung.\n\nGathering runs on the same curve with the same tier step, scored against the node instead of a recipe: easy nodes gray out as you pass them, and the richer nodes of the later zones are what finish a climb. Fishing keeps its own schedule: a full point per catch below 50 proficiency, half to 100, a tenth to 150, and a slow tail all the way to 200, with junk catches teaching nothing from 100 on.",
@@ -3951,7 +4448,7 @@ export const en_CA: EnTranslations = {
       "deedsHeading": "Deeds that remember the journey",
       "deedsBody": "The Book of Deeds walks beside every step of this. Your first attunement earns Craftsworn and your first masterwork earns Masterwright, both wearable as titles. Each of the eight earnable crafts marks a milestone deed at 50 skill and crowns its cap with a Grandmaster title, while Fishing gets Old Salt at 100 proficiency and the Master Angler title at 200.\n\nThere are quieter pages too: deeds for your first harvest and first craft, for the rare finds luck turns up in the field, and for taking up salvage. All of it is cosmetic, titles and Renown only. A deed never grants power; it only proves you were there.",
       "startHeading": "Where to start",
-      "startBody": "Fresh off the road in Eastbrook? Find Foreman Odell and take A Trade for Every Hand: he will point you at the ore veins around the Copper Dig southwest of town and hand you your first calluses. From then on, harvest every vein, timber stand, and herb patch you pass while questing; proficiency comes naturally to travelers.\n\nBack in town, press T to open the crafting window and work the common recipes every character knows from the start. Visit the masters at the forge, kitchens, loom, and toolworks to see what they teach, and take their work orders for steady coin. By the time the Guild's letter finds you, you will already know which pair feels like home.",
+      "startBody": "Fresh off the road in Eastbrook? Find Foreman Odell and take A Trade for Every Hand: he will point you at the ore veins around the Copper Dig southeast of town and hand you your first calluses. Mind the dig itself: the Deeprock Diggers camped on it stand a few levels above a fresh arrival, so work the outlying veins first and save the camp's heart for when you have leveled a little. From then on, harvest every vein, timber stand, and herb patch you pass while questing; proficiency comes naturally to travelers.\n\nBack in town, press T to open the crafting window and work the common recipes every character knows from the start. Visit the masters at the forge, kitchens, loom, and toolworks to see what they teach, and take their work orders for steady coin. By the time the Guild's letter finds you, you will already know which pair feels like home.",
       "colStation": "Station",
       "colHub": "Hub",
       "colMaster": "Master",
@@ -3996,27 +4493,27 @@ export const en_CA: EnTranslations = {
         "leatherworking": "Leatherworking tans Agility and Stamina gear for the classes that dodge instead of block, from Fenbridge hide basics to the rare mirewarden set, and it is the one deep craft trained out in the marsh.",
         "cooking": "Cooking turns the day's catch into sit-down meals that heal over 18 seconds of rest, the cheapest healing in the game, from Salted Jerky all the way to Marlow's Grand Roast. Everyone eats, so no craft is more universally welcome in a group.",
         "alchemy": "Alchemy turns herbs, glands, and glass into bottles that win fights: healing and mana draughts for the moment things go wrong, and stamina elixirs that sit on your buff bar through a whole dungeon.",
-        "engineering": "Engineering builds the tools every serious gatherer ends up wanting: the tier 4 and tier 5 picks, axes, and sickles no vendor will ever stock, each one consuming the tool below it.",
-        "enchanting": "Enchanting takes gear apart and puts the power back in: break unwanted pieces into arcane materials, then spend them on a permanent stat bonus for a piece you mean to keep. No station, no trainer, and anyone can start on day one."
+        "engineering": "Engineering builds the tools every serious gatherer ends up wanting: the tier 4 and tier 5 picks, axes, sickles, and fishing rods that no counter will ever sell for coin, each one consuming the tool below it.",
+        "enchanting": "Enchanting takes gear apart and puts the power back in: break unwanted pieces into arcane materials, then spend them on a permanent stat bonus for a piece you mean to keep. Breaking and enchanting need no station and no trainer, and anyone can start on day one; only the two charm recipes ask more, taught at the toolworks."
       },
       "craftProse": {
         "weaponcrafting": {
           "identityHeading": "The edge every fighter shops for",
           "identityBody": "Someone in every group wants this craft's work, because the rare rung alone covers all three appetites: the Osmium Warblade for Strength melee, the Glyphsteel War Axe for Agility fighters, and the Highpine Battle Staff, an Intellect and Spirit stave for the robe crowd.\n\nOn the craft ring it stands between Armorcrafting and Jewelcrafting. Its living identity is the Smith, the Weaponcrafting and Armorcrafting pair, sworn before Forgemistress Darva at the forge by working three ore veins with your own hands; the Bladewright pair with Jewelcrafting is named on the ring too, but it cannot be sworn yet, since Jewelcrafting ships no recipes until a later zone expansion.",
           "materialsHeading": "What the forge drinks",
-          "materialsBody": "Mining is the backbone. Copper ore comes off the tier 1 veins of Eastbrook Vale, iron ore from Mirefen Marsh, and osmium ore from Thornpeak Heights, and each rung of the ladder steps up the same way. Logging matters more than you might expect: ironbark hafts the boar spear, ashwood shoulders the maul, and a single highpine log forms the battle staff.\n\nThe rest comes from the hunt and the counter. Rough hide for grips is harvested straight off wolf and boar corpses, bone fragments drop from everyday kills, and the forge ladder burns Smithing Flux, 20 copper a jar from Darva herself. If your own mining lags behind, Darva sells osmium ore at the forge and Tinker Gizzel stocks glyphsteel bars at the toolworks, at a premium that makes gathering friends look cheap.",
+          "materialsBody": "Mining is the backbone. Copper ore comes off the tier 1 veins of Eastbrook Vale, iron ore from Mirefen Marsh, and osmium ore from Thornpeak Heights, and each rung of the ladder steps up the same way. Logging matters more than you might expect: ironbark hafts the boar spear, ashwood shoulders the maul, and a single highpine log forms the battle staff.\n\nThe rest comes from the hunt and the counter. Rough hide for grips is harvested straight off wolf and boar corpses, bone fragments come off the restless dead or out of salvaged common gear, and the forge ladder burns Smithing Flux, 20 copper a jar from Darva herself. If your own mining lags behind, no counter will save you on the ore itself: osmium comes off the Thornpeak veins, off the starter veins of every younger zone but the Farshore (whose veins dig iron), or out of another player's stack, by trade or the World Market. Only the Glyphsteel Bar is bought for coin, from Tinker Gizzel at the toolworks or Quartermaster Bree in Highwatch.",
           "ladderHeading": "The ladder, rung by rung",
           "ladderBody": "One field recipe, the Eastbrook Arming Sword, is known to everyone from the start and crafts anywhere from hunt drops (a couple of wolf fangs and bone fragments) plus six Smithing Flux off the forge counter. The real ladder is nine trainer recipes in three rungs, all forge-bound: the copper rung (bearded axe, flanged mace, boar spear) is free to learn at skill 0, the iron rung (longsword, maul, dirk) opens at skill 25 for 25 silver a recipe, and the osmium rung (warblade, war axe, battle staff) opens at skill 50 for 1 gold each. Darva teaches a recipe the moment your tier in the craft reaches its own, so each rung unlocks exactly when its skill band begins.\n\nOne more recipe rides the pair: the Gravewyrm Gauntlets, a trainer-taught combination piece that only an attuned Smith with both Weaponcrafting and Armorcrafting at skill 25 can work, and it needs no station at all.",
           "routeHeading": "Masterworks, and a working route to 125",
-          "routeBody": "Any piece with a real stat line, which on this ladder means the iron rung and up, can come off the anvil as a masterwork; the statless copper commons never proc, because there is nothing in them to improve. Iron counts as a tier 1 material for the masterwork bonus, highpine and glyphsteel as tier 2, so the top rung procs a little more often.\n\nRide the copper rung to 25, train the iron rung the day it opens and ride it to 50, then the osmium rung to 75. Past 75 nothing higher ships yet, so the osmium recipes fade to half and then quarter gain: budget roughly 150 more crafts to reach the 125 cap, and remember the shared throttle of ten craft actions per minute when you sit down to batch.\n\nFund the climb as you go: Darva's forge work order takes eight copper ore off your hands every 30 minutes for a little coin and XP, and the iron and osmium rungs sell honestly to leveling melee. The Book of Deeds marks Edge and Temper at skill 50 and crowns Grandmaster Weaponcrafting at 125."
+          "routeBody": "Any piece with a real stat line, which on this ladder means the iron rung and up, can come off the anvil as a masterwork so long as the finer quality fits inside your tier ceiling; the statless copper commons never proc, because there is nothing in them to improve. Iron and osmium count as tier 1 materials for the masterwork bonus, highpine and glyphsteel as tier 2, and skill sitting above a recipe's own tier adds its own point per tier, so among the osmium three it is the war axe and the battle staff that carry the material edge, and a rung keeps proccing better after you have outgrown it.\n\nRide the copper rung to 25, train the iron rung the day it opens and ride it to 50, then the osmium rung to 75. Past 75 nothing higher ships yet, so the osmium recipes fade to half and then quarter gain: budget roughly 150 more crafts to reach the 125 cap, and each craft takes real cast time, so a long batch is paced by duration rather than a quota.\n\nFund the climb as you go: Darva's forge work order takes eight copper ore off your hands every 30 minutes for a little coin and XP, and the iron and osmium rungs sell honestly to leveling melee. The Book of Deeds marks Edge and Temper at skill 50 and crowns Grandmaster Weaponcrafting at 125."
         },
         "armorcrafting": {
           "identityHeading": "Mail for the front line",
-          "identityBody": "Armorcrafting's ladder reads like a soldier's career: the plain riveted copper girdle, sabatons, and gauntlets to start, the ironlink hauberk, legguards, and spaulders with their first real stat lines, and the rare osmiumscale greathelm, cuirass, and leggings, Strength and Stamina pieces with the biggest armor numbers a crafter can make.\n\nIt has a quieter side too: the Eastbrook Warded Leggings, a caster-statted field common, and the Kilnscale Mantle, a rare Intellect and Spirit mail shoulder at skill 75, keep the spell-minded mail wearers on the customer list. On the ring it sits between Weaponcrafting and Engineering; the Smith pair with Weaponcrafting is sworn before Forgemistress Darva, while the Gearwright pair with Engineering is named but has no oath quest yet.",
+          "identityBody": "Armorcrafting's ladder reads like a soldier's career: the plain riveted copper girdle, sabatons, and gauntlets to start, the ironlink hauberk, legguards, and spaulders with their first real stat lines, and the rare osmiumscale greathelm, cuirass, and leggings, Strength and Stamina pieces with armor numbers at the very top of a crafter's art.\n\nIt has a quieter side too: the Eastbrook Warded Leggings, a caster-statted field common, and the Kilnscale Mantle, a rare Intellect and Spirit mail shoulder at skill 75, keep the spell-minded mail wearers on the customer list. On the ring it sits between Weaponcrafting and Engineering; the Smith pair with Weaponcrafting is sworn before Forgemistress Darva, while the Gearwright pair with Engineering is named but has no oath quest yet.",
           "materialsHeading": "Ore by the sackful",
-          "materialsBody": "No craft eats ore faster. The ironlink hauberk alone takes five iron ore, and every osmiumscale piece wants three or four osmium plus an glyphsteel bar, so a serious armorcrafter mines Mirefen Marsh and Thornpeak Heights or pays someone who does. Copper feeds the first rung, straight from the veins by the Copper Dig.\n\nAround the metal go the soft parts: rough hide harvested off wolf and boar corpses, bone fragments and linen scraps from ordinary hunting, and a jar of Smithing Flux (20 copper at the forge) in nearly every recipe. Darva sells osmium ore over the counter for the impatient.",
+          "materialsBody": "No craft eats ore faster. The ironlink hauberk alone takes five iron ore, and every osmiumscale piece wants three or four osmium plus a glyphsteel bar, so a serious armorcrafter mines Mirefen Marsh and Thornpeak Heights or pays someone who does. Copper feeds the first rung, straight from the veins by the Copper Dig.\n\nAround the metal go the soft parts: rough hide harvested off wolf and boar corpses, bone fragments off the restless dead (or salvaged out of common gear), and Smithing Flux jars (20 copper each at the forge) in nearly every recipe. No counter sells osmium: the impatient buy it off other players or mine it themselves, on Thornpeak or the starter veins of ten of the eleven younger zones (the Farshore alone digs iron).",
           "ladderHeading": "Learning at Darva's forge",
-          "ladderBody": "Two field commons, the Eastbrook Chainmail Vest and the Warded Leggings, are known from the start and craft anywhere. The trainer ladder is nine recipes in three rungs at the Eastbrook forge: the copper rung is free at skill 0, the ironlink rung costs 25 silver a recipe at skill 25, and the osmiumscale rung costs 1 gold each at skill 50, with each rung teachable the moment your tier reaches it.\n\nBeyond the ladder sit two specials. The Boundstone Helm is the Smith combination recipe, trainer-taught, station-free, and workable only by an attuned Smith with both crafts at skill 25. The Kilnscale Mantle needs no teacher at all: everyone knows it, but at skill 75 and forge-bound, it is the craft's tier 3 capstone.",
+          "ladderBody": "Two field commons, the Eastbrook Chainmail Vest and the Warded Leggings, are known from the start and craft anywhere. The trainer ladder is nine recipes in three rungs at the Eastbrook forge: the copper rung is free at skill 0, the ironlink rung costs 25 silver a recipe at skill 25, and the osmiumscale rung costs 1 gold each at skill 50, with each rung teachable the moment your tier reaches it.\n\nBeyond the ladder sit two specials. The Boundstone Helm is one of the two Smith combination recipes (the Gravewyrm Gauntlets are its sibling on the weaponcrafting side), trainer-taught, station-free, and workable only by an attuned Smith with both crafts at skill 25. The Kilnscale Mantle needs no teacher at all: everyone knows it from the start, and nothing but the forge and the materials gates working it. Its listed skill of 75 is about gain, not permission: with Armorcrafting as a major it pays full skill gain from the very first hammer stroke to 99, so a Smith with osmium to spare can lean on it early. Below a major's ceiling the tier 3 recipe teaches nothing, so an undeclared or hobby armorcrafter works it for the piece, not the points.",
           "routeHeading": "Masterworks, and a working route to 125",
           "routeBody": "From the ironlink rung up, every craft rolls the masterwork chance; the armor-only copper commons cannot proc, since a masterwork improves stats and they carry none. Iron counts as a tier 1 material for the proc and glyphsteel as tier 2.\n\nThe climb is the standard three-rung ride: copper to 25, ironlink to 50, osmiumscale to 75, training each rung the day it opens. Where Armorcrafting gets lucky is the stretch after 75: the Kilnscale Mantle is a tier 3 recipe, so it pays full gain to 99 and half after, which means the last fifty points take about 75 crafts instead of the 150 a craft without a capstone needs. Each mantle costs seven osmium ore and five Smithing Flux, so stock up in Thornpeak and at the forge counter before you start the run.\n\nDarva's work order buys eight copper ore every 30 minutes for coin and XP, a nice sink for the low-tier ore you outgrow. The Book of Deeds marks Hammer and Plate at skill 50, and Grandmaster Armorcrafting waits at the 125 cap."
         },
@@ -4034,61 +4531,61 @@ export const en_CA: EnTranslations = {
           "identityHeading": "Leather for the swift",
           "identityBody": "The ladder climbs from the plain Fenbridge hide leggings, boots, and belt through the uncommon marshstalker jerkin, hood, and spaulders to the rare mirewarden set, the best leather a crafter can cut. Two caster pieces round it out: the Eastbrook Druid's Hide field common and the Duskhide Wraps at skill 75.\n\nOn the ring it sits between Cooking and Tailoring. Its living pair is the Outfitter, Leatherworking and Tailoring, sworn before Weaver Ottilie in Eastbrook; the Trapper pair with Cooking is named on the ring but has no oath quest yet.",
           "materialsHeading": "The hunt is the harvest",
-          "materialsBody": "Leatherworking is the craft where your leveling route and your supply line are the same thing: rough hide is harvested straight off hide-bearing corpses, wolves and boars above all, and each corpse serves one harvester only, first come first served. A rare or better harvest roll also grants a Pristine Hide, a signed specimen the Mirewarden Jerkin calls for, so bank every one you find.\n\nThe supporting cast is small: spider legs and silk, homespun cloth off humanoids, a single osmium ore in each mirewarden rare piece (six in the Duskhide Wraps capstone), and a Tanning Agent at 16 copper from the tannery counter. Tanner Hesk sells osmium ore too, if you would rather not mine.",
+          "materialsBody": "Leatherworking is the craft where your leveling route and your supply line are the same thing: rough hide is harvested straight off hide-bearing corpses, wolves and boars above all, and each corpse serves one harvester only, first come first served. A rare or better harvest roll also grants a Pristine Hide, a signed specimen the Mirewarden Jerkin calls for, so bank every one you find.\n\nThe supporting cast is small: spider legs and silk, homespun cloth off humanoids, a single osmium ore in each mirewarden rare piece (six in the Duskhide Wraps capstone), and a Tanning Agent at 16 copper from the tannery counter. Osmium itself is never counter-bought: mine it yourself, on Thornpeak or nearly any younger zone's starter veins (the Farshore alone digs iron), or buy it off another player.",
           "ladderHeading": "Trained in Fenbridge",
-          "ladderBody": "Here is the wrinkle: the tannery stands in Fenbridge, on the Mirefen Marsh road, making Leatherworking the one deep craft trained outside Eastbrook. Tanner Hesk teaches the ladder at his vats: the Fenbridge hide rung free at skill 0, the marshstalker rung at 25 silver a recipe from skill 25, and the mirewarden rung at 1 gold each from skill 50, each rung opening as your tier reaches it.\n\nTwo recipes skip the trainer: the field commons (the Tanned Leather Jerkin and Druid's Hide) craft anywhere from the start, and the Duskhide Wraps are known to everyone but sit at skill 75, tannery-bound. Note that the Outfitter oath itself is sworn back in Eastbrook with Ottilie; only the teaching happens in the marsh.",
+          "ladderBody": "Here is the wrinkle: the tannery stands in Fenbridge, on the Mirefen Marsh road, making Leatherworking the one deep craft trained out in the marsh. Tanner Hesk teaches the ladder at his vats: the Fenbridge hide rung free at skill 0, the marshstalker rung at 25 silver a recipe from skill 25, and the mirewarden rung at 1 gold each from skill 50, each rung opening as your tier reaches it.\n\nThree recipes skip the trainer: the field commons (the Tanned Leather Jerkin and Eastbrook Druid's Hide) craft anywhere from the start, and the Duskhide Wraps are known to everyone but sit at skill 75, tannery-bound. Note that the Outfitter oath itself is sworn back in Eastbrook with Ottilie; only the teaching happens in the marsh.",
           "routeHeading": "Masterworks, and a working route to 125",
-          "routeBody": "From the marshstalker rung up, every craft rolls the masterwork chance, and the Pristine Hide in a Mirewarden Jerkin provides the signed-reagent bonus automatically; osmium counts as a tier 1 material for the proc. The statless hide commons cannot proc.\n\nLevel it the natural way: harvest every wolf and boar you kill from level one, craft the hide rung to 25 wherever you stand, then train in Fenbridge as the quests pull you into the marsh anyway. Marshstalker carries you to 50 and mirewarden to 75; past that the Duskhide Wraps, a tier 3 recipe at six osmium ore, three Pristine Hide, two rough hide, and a Tanning Agent, pays full gain to 99 and half after, about 75 crafts for the final fifty points to the 125 cap.\n\nThe mobile tannery matters more for this craft than any other: specialize at 75 and a saddlebag of hides becomes finished gear at the campfire instead of a walk back to Fenbridge. Hesk's tannery work order buys eight rough hides every 30 minutes, a tidy return on skins you were collecting regardless, and the Book of Deeds marks Tanner's Trade at skill 50 with Grandmaster Leatherworking at the cap."
+          "routeBody": "Any piece with real stats rolls the masterwork chance so long as the finer quality fits inside your tier ceiling, the statted Eastbrook Druid's Hide included, and a signed Pristine Hide in a Mirewarden Jerkin provides the signed-reagent bonus automatically; osmium counts as a tier 1 material for the proc. The statless hide commons cannot proc.\n\nLevel it the natural way: harvest every wolf and boar you kill from level one, let the two field commons carry you to 25 wherever you stand, then train the hide rung at the vats when the quests pull you into the marsh anyway. Marshstalker carries you to 50 and mirewarden to 75; past that the Duskhide Wraps, a tier 3 recipe at six osmium ore, three Pristine Hide, two rough hide, and a Tanning Agent, pays an attuned Outfitter full gain to 99 and half after, about 75 crafts for the final fifty points to the 125 cap; below a major's ceiling the tier 3 recipe teaches nothing.\n\nThe mobile tannery matters more for this craft than any other: specialize at 75 and a saddlebag of hides becomes finished gear at the campfire instead of a walk back to Fenbridge. Hesk's tannery work order buys eight rough hides every 30 minutes, a tidy return on skins you were collecting regardless, and the Book of Deeds marks Tanner's Trade at skill 50 with Grandmaster Leatherworking at the cap."
         },
         "cooking": {
           "identityHeading": "The pot that feeds the party",
-          "identityBody": "Eat a cooked meal and it heals you over 18 seconds of rest, which between pulls is the cheapest healing in the game. The ladder runs from a 90-health Pan-Seared River Perch all the way to Marlow's Grand Roast at 980, the largest sit-heal that exists.\n\nOn the ring Cooking sits between Alchemy and Leatherworking. Its living pair is the Apothecary, Alchemy and Cooking, sworn before Cook Marlow at the Eastbrook kitchens after hunting four wild boars for the pot; the Trapper pair with Leatherworking is named on the ring but has no oath quest yet.",
+          "identityBody": "Eat a cooked meal and it heals you over 18 seconds of rest, which between pulls is the cheapest healing in the game. The ladder runs from a 90-health Pan-Seared River Perch all the way to Marlow's Grand Roast at 980, a sit-heal nothing in the game beats.\n\nOn the ring Cooking sits between Alchemy and Leatherworking. Its living pair is the Apothecary, Alchemy and Cooking, sworn before Cook Marlow at the Eastbrook kitchens after hunting four wild boars for the pot; the Trapper pair with Leatherworking is named on the ring but has no oath quest yet.",
           "materialsHeading": "A pantry fed by rod and knife",
-          "materialsBody": "Fishing stocks the signature ingredients, zone by zone: mirror trout and river perch from the waters of Eastbrook Vale, marsh pike and bog eel from Mirefen Marsh, frostgill trout and slatefin carp from Thornpeak Heights. Every rung of the ladder cooks the fish of its tier, so a cook who fishes never runs dry.\n\nThe butcher's side comes off harvested corpses: game meat from boars and their kin, and, on a rare or better harvest roll, a signed Prime Cut, the centerpiece of the grand roast. Herbs season the better dishes, one ashwood log smokes the eel, and Cooking Salt runs 8 copper a pouch from Marlow's own stall.",
+          "materialsBody": "Fishing stocks the signature ingredients, zone by zone: raw mirror trout and river perch from the waters of Eastbrook Vale, marsh pike and bog eel from Mirefen Marsh, frostgill trout and slatefin carp from Thornpeak Heights. Raw catches never restore health on their own: they are kitchen reagents, and the cooked meals are what you eat. The rungs mix the zones freely (the free rung already wants marsh pike, the mid rung Thornpeak's frostgill, and the rare supper folds the Vale's mirror trout back in), so a cook who fishes wherever the road goes never runs dry.\n\nThe butcher's side comes off harvested corpses: game meat from boars and their kin, and, on a rare or better harvest roll, a signed Prime Cut, the centerpiece of the grand roast. Herbs season the better dishes, one ashwood log smokes the eel, and Cooking Salt runs 8 copper a pouch from Marlow's own stall.",
           "ladderHeading": "From jerky to the grand roast",
-          "ladderBody": "Salted Jerky is the field recipe: known from the start, one spider leg, craftable anywhere, the trail food of every fresh adventurer. The trainer ladder cooks at the Eastbrook kitchens on the west side of the square: the free rung at skill 0 (the perch, Hunter's Game Skewer, Herbed Marsh Pike), the mid rung at skill 25 for 25 silver a recipe (Ashwood Smoked Eel, Goldleaf Game Stew, Frostgill Chowder), and the rare rung at skill 50 for 1 gold each (Silvered Carp Supper, Angler's Feast Platter, Marlow's Grand Roast).\n\nBatch dishes stretch your ingredients: the smoked eel and the game stew serve two per craft, and the feast platter serves three. Marlow teaches each rung the moment your tier in Cooking reaches it.",
+          "ladderBody": "Salted Jerky is the field recipe: known from the start, one spider leg, craftable anywhere, the trail food of every fresh adventurer. The trainer ladder cooks at the Eastbrook kitchens on the east side of the square: the free rung at skill 0 (the perch, Hunter's Game Skewer, Herbed Marsh Pike), the mid rung at skill 25 for 25 silver a recipe (Ashwood Smoked Eel, Goldleaf Game Stew, Frostgill Chowder), and the rare rung at skill 50 for 1 gold each (Silvered Carp Supper, Angler's Feast Platter, Marlow's Grand Roast).\n\nBatch dishes stretch your ingredients: the smoked eel and the game stew serve two per craft, and the feast platter serves three. Marlow teaches each rung the moment your tier in Cooking reaches it.",
           "routeHeading": "Specialization, not masterworks, and the route to 125",
           "routeBody": "Cooking is the honest exception to the masterwork story: a meal has no stat line to improve, so dishes never proc one, and no cook should chase it. The craft's mastery is specialization at 75: a fifth less of every ingredient, which compounds fast on batch dishes, and a mobile field kitchen so the feast gets cooked at the dungeon door.\n\nCook what you catch: pair the climb with a fishing session and the two skills feed each other all the way up. Jerky and the free rung carry you to 25 at a point per craft, the mid rung to 50, and the rare rung to 75; past 75 no higher dish ships yet, so the rare dishes fade to half and then quarter gain, roughly 150 more crafts to the cap. Treat it as stocking, not grinding: a guild eats every serving.\n\nMarlow's kitchens work order buys eight game meat every 30 minutes for coin and XP, and the Book of Deeds marks Seasoned Chef at skill 50 on the way to the Grandmaster Cooking title at 125."
         },
         "alchemy": {
           "identityHeading": "Bottles that win fights",
-          "identityBody": "The craft is worked at the apothecary in Highwatch, home of Alchemist Verane, Master of the Apothecary, who teaches the recipe ladder, sells Glass Vials at 12 copper, and pays coin for herbs through her work order.\n\nOn the craft ring, Alchemy sits with the trial-and-error trades, next to Engineering on one side and Cooking on the other. That gives it two pair identities: the Bombardier (Engineering and Alchemy, taken up before Tinker Gizzel in Eastbrook) and the Apothecary (Alchemy and Cooking, sworn before Cook Marlow). Attune to either pair to make Alchemy a major and open the skill all the way to its cap; until then it works to the rare tier like any undeclared craft.",
+          "identityBody": "The craft is worked at the apothecary in Highwatch, home of Alchemist Verane, Master of the Apothecary, who teaches the recipe ladder, sells Glass Vials at 12 copper, and pays coin for herbs through her work order.\n\nOn the craft ring, Alchemy sits with the trial-and-error trades, next to Engineering on one side and Cooking on the other. That gives it two pair identities: the Bombardier (Engineering and Alchemy, taken up before Tinker Gizzel in Eastbrook) and the Apothecary (Alchemy and Cooking, sworn before Cook Marlow). Attune to either pair to make Alchemy a major and let your own signed work teach you back; the Bombardier pair also opens its combination brew, the Elixir of the Bear, while the Apothecary pair ships no combination recipe yet. The ladder itself never waits, though, because every Alchemy recipe sits inside the rare tier that undeclared crafts work under, so the whole climb to the cap is open before any oath.",
           "materialsHeading": "Herbs, glands, and glass",
           "materialsBody": "Every draught wants a Glass Vial plus herbs matched to its rung: sheenleaf grows in Eastbrook Vale, goldleaf in Mirefen Marsh, and sunpetal in Thornpeak Heights, one herb per zone, so your bottles climb the world alongside you. Herbalism is the natural partner skill, though buying from gatherers or the market works just as well; deeper zones hold higher-tier patches that ask for a better sickle, so keep your tool current if you pick your own.\n\nThe elixir line adds a hunter's ingredient: Venom Glands harvested from venomous corpses, and the top elixir asks for a Pristine Venom Gland, the signed rare specimen a lucky corpse harvest turns up. If you do not harvest yourself, those are exactly the goods worth asking a hunter friend to bring back.",
           "ladderHeading": "The recipe ladder",
-          "ladderBody": "Everyone knows the Minor Healing Potion from the start and can mix it anywhere, no station needed. The real ladder is nine recipes taught by Verane at the apothecary, three at each rung: the skill 0 recipes are free, the skill 25 rung costs 25 silver per recipe, and the skill 50 rung costs 1 gold per recipe. Each rung is a healing draught, a mana draught, and a stamina elixir, stepping from common sheenleaf bottles (120 health, 160 mana) through uncommon goldleaf (200 health, 260 mana) to rare sunpetal (280 health, 360 mana).\n\nThe elixirs climb the same way: the Elixir of the Boar grants 6 Stamina for 10 minutes, the Vipersear Elixir 9 for 15 minutes, and the Elixir of the Serpent 12 for 15 minutes, brewing two bottles per craft. One more recipe sits off to the side: the Elixir of the Bear, a combination brew Verane teaches for 25 silver once your Alchemy reaches 25, mixable anywhere, but only by an attuned Bombardier with both Alchemy and Engineering at 25.",
+          "ladderBody": "Everyone knows the Minor Healing Potion from the start and can mix it anywhere, no station needed. The real ladder is nine recipes taught by Verane at the apothecary, three at each rung: the skill 0 recipes are free, the skill 25 rung costs 25 silver per recipe, and the skill 50 rung costs 1 gold per recipe. Each rung is a healing draught, a mana draught, and a stamina elixir, stepping from common sheenleaf bottles (120 health, 160 mana) through uncommon goldleaf (200 health, 260 mana) to rare sunpetal (280 health, 360 mana).\n\nThe elixirs climb the same way: the Elixir of the Boar grants 6 Stamina for 10 minutes, the Vipersear Elixir 9 for 15 minutes, and the Elixir of the Serpent 12 for 15 minutes, the Serpent alone brewing two bottles per craft. One more recipe sits off to the side: the Elixir of the Bear, a combination brew Verane teaches for 25 silver once your Alchemy reaches 25, mixable anywhere, but only by an attuned Bombardier with both Alchemy and Engineering at 25.",
           "routeHeading": "A brewer's route to 125",
-          "routeBody": "Draughts and elixirs never roll masterworks; that proc belongs to stat-bearing gear. Your name still travels, though: the rare sunpetal draughts are brewed one bottle at a time and arrive signed with a maker's mark, while the double-batch Elixir of the Serpent stays plain. At skill 75 you specialize, and every Alchemy recipe costs 20 percent fewer materials from then on.\n\nTake Herbalism early and pick as you level: sheenleaf is everywhere in the Vale, and once you reach Verane's bench the free rung will carry you cleanly to skill 25 on herbs you would have picked anyway. Learn the 25 rung the moment it turns on, move your picking to the marsh for goldleaf, and let Verane's work order (six Goldleaf Herbs for 45 copper, repeatable every 30 minutes) hand a little coin back as you go.\n\nFrom 50 on, brew sunpetal draughts and Serpent batches out of Thornpeak herbs. The last stretch from 100 to 125 is a deliberate trickle, so brew what actually sells rather than burning herbs for the number, and remember that consumables are the one crafted good everyone re-buys forever. The Book of Deeds marks Strange Brews at skill 50 and Grandmaster Alchemy at the cap."
+          "routeBody": "Draughts and elixirs never roll masterworks; that proc belongs to stat-bearing gear. Your name still travels, though: the rare sunpetal draughts arrive signed with a maker's mark, and so does every bottle of the double-batch Elixir of the Serpent, so nothing rare in this craft leaves the bench unsigned. At skill 75 you specialize, and every Alchemy recipe costs 20 percent fewer materials from then on.\n\nTake Herbalism early and pick as you level: sheenleaf is everywhere in the Vale, and once you reach Verane's bench the free rung will carry you cleanly to skill 25 on herbs you would have picked anyway. Learn the 25 rung the moment it turns on, move your picking to the marsh for goldleaf, and let Verane's work order (six Goldleaf Herbs for 45 copper, repeatable every 30 minutes) hand a little coin back as you go.\n\nFrom 50 on, brew sunpetal draughts and Serpent batches out of Thornpeak sunpetal, with a little Vale and marsh greenery still in the mix. The last stretch from 100 to 125 is a deliberate trickle, so brew what actually sells rather than burning herbs for the number, and remember that consumables are the one crafted good everyone re-buys forever. The Book of Deeds marks Strange Brews at skill 50 and Grandmaster Alchemy at the cap."
         },
         "engineering": {
           "identityHeading": "The toolmaker's monopoly",
-          "identityBody": "The craft is worked at the toolworks in the southeast corner of Eastbrook Square, home of Tinker Gizzel, Master of the Toolworks. Tiers 1 through 3 of every tool line are ordinary vendor stock; tiers 4 and 5 exist only through an engineer.\n\nOn the ring it sits with the trial-and-error trades, next to Alchemy and Armorcrafting, giving it two pair identities: the Bombardier (Engineering and Alchemy, taken up before Gizzel himself) and the Gearwright (Armorcrafting and Engineering, named but not yet swearable). One warning matters more here than anywhere else: both of Engineering's recipe rungs sit above the rare-tier ceiling that hobbies and undeclared crafters work under, so the skill number only moves for a crafter whose majors include Engineering, which today means the Bombardier. Anyone can still build the tools; an unattuned crafter just learns nothing from doing it.",
+          "identityBody": "The craft is worked at the toolworks in the southwest corner of Eastbrook Square, home of Tinker Gizzel, Master of the Toolworks. Tiers 1 through 3 of every tool line are ordinary vendor stock; tiers 4 and 5 come off an engineer's bench, or out of the Drowned Litany's delve counter for Delve Marks behind its clears gates, and never out of any till for coin.\n\nOn the ring it sits with the trial-and-error trades, next to Alchemy and Armorcrafting, giving it two pair identities: the Bombardier (Engineering and Alchemy, taken up before Gizzel himself) and the Gearwright (Armorcrafting and Engineering, named but not yet swearable). One warning matters more here than anywhere else: every one of Engineering's recipe rungs sits above the rare-tier ceiling that hobbies and undeclared crafters work under, so the skill number only moves for a crafter whose majors include Engineering, which today means the Bombardier. Anyone can still build the land tools; an unattuned crafter just learns nothing from doing it, and the two rod recipes ask for Gizzel's teaching besides.",
           "materialsHeading": "Reagents and prior tools",
-          "materialsBody": "Every tool recipe consumes the tool one tier below it plus a premium material: four Osmium Ore and a Skysilver Mining Pick become the Osmium Mining Pick, then two Glyphsteel Bars and that osmium pick become the Glyphsteel Mining Pick, and the axe and sickle lines mirror the same shape with Ashwood and Highpine Logs, Goldleaf and Sunpetal Herbs.\n\nGizzel stocks all six premium reagents at the toolworks if you want speed over margin, but the ore, logs, and herbs are all gatherable in Mirefen Marsh and Thornpeak Heights, and gathered stock is where the profit lives. The one exception is the Glyphsteel Bar, which is vendor-only, so every glyphsteel-tier tool carries a fixed coin floor built into its cost.",
+          "materialsBody": "Every land tool recipe consumes the tool one tier below it plus a FINE material, and that pairing is the whole land ladder: four Fine Iron Ore and a Skysilver Mining Pick become the Osmium Mining Pick, then two Glyphsteel Bars, two Fine Osmium Ore and that osmium pick become the Glyphsteel Mining Pick. The axe and sickle lines mirror the fine-plus-prior-tool shape with Fine Ashwood and Fine Highpine Logs, Fine Goldleaf and Fine Sunpetal Herbs, though their tier 5 rungs ask no Glyphsteel Bars: the pick is the one line that gets dearer at the top. The two rod recipes break the pattern on purpose: the Stormreel takes four Sunglint Koi and a Silverstream rod, the Tidewrought two Koi, eight Raw Slatefin Carp and that Stormreel, so the top of the angler's ladder is paid for on the water rather than at a vein.\n\nA fine material is not sold anywhere and does not drop from an ordinary harvest: you get it by working one of a zone's full-grade veins with a tool ranked above the material itself, which in practice means the tool one rung below the one you are trying to build (the easier veins a zone keeps for travellers yield the plain material whatever you swing). That is deliberate. On the craft route, a tier 5 tool comes from actually swinging the tier 4 one, not from a shopping trip; the Delve Marks counter is the one way around it. The single exception is the Glyphsteel Bar, refined and vendor-only, 1 silver 60 copper a bar from Quartermaster Bree in Highwatch or from Gizzel's own counter, so the Glyphsteel Mining Pick alone carries a fixed coin floor built into its cost.",
           "ladderHeading": "The tool ladder",
-          "ladderBody": "The whole ladder is six recipes, all bound to the toolworks station and all known automatically, no trainer fee ever: the tier 4 pick, axe, and sickle at skill 75, and the tier 5 versions at skill 150. That second number is not a typo, and it sits above the current 125 cap on purpose: skill requirements never gate a craft here, they only shape skill gain, so you can build a tier 5 tool the day you hold its reagents and its tier 4 predecessor.\n\nEvery finished tool is rare or epic quality and comes out signed, so your name rides the zones on other players' toolbelts. Engineering also holds up half of one combination recipe: the Elixir of the Bear, brewed by an attuned Bombardier with both Engineering and Alchemy at 25.",
+          "ladderBody": "The ladder is eight recipes, all bound to the toolworks station. The six land-tool recipes are known automatically, no trainer fee ever: the tier 4 pick, axe, and sickle at skill 75, and the tier 5 versions at skill 150. That second number is not a typo, and it sits above the current 125 cap on purpose: skill requirements never gate a craft here, they only shape skill gain, so you can build a tier 5 tool the day you hold its reagents and its tier 4 predecessor. The two crafted rods are the taught exception: Gizzel teaches the Stormreel at skill 75 for 4 gold and the Tidewrought at skill 125 for 16 gold, each the moment your tier in the craft reaches its own.\n\nEvery finished tool is rare or epic quality and comes out signed, so your name rides the zones on other players' toolbelts. Engineering also holds up half of one combination recipe: the Elixir of the Bear, brewed by an attuned Bombardier with both Engineering and Alchemy at 25.",
           "routeHeading": "An engineer's route to 125",
           "routeBody": "Tools carry no combat stats, so they never roll masterworks; that proc belongs to stat-bearing gear. Specialization still lands at skill 75: 20 percent fewer materials per craft, and a temporary field toolworks that turns any gathering trip into a workshop. The gain math barely fades here: the skill 75 recipes pay full gain until 100 and half after, and the skill 150 recipes pay full gain all the way to the 125 cap, so the real constraint is reagents and coin, never gray recipes.\n\nPick your pair first, because nothing moves without it: take the Bombardier attunement from Tinker Gizzel. Then feed the ladder: level Mining, Logging, or Herbalism yourself or befriend gatherers, buy the tier 3 tools from vendors, and treat Gizzel's work order (eight Ironbark Logs for 16 copper, repeatable every 30 minutes) as walking-around money.\n\nEngineering is a low-volume prestige trade, roughly one skill point per finished tool, so treat every craft as stock for sale. The pitch to your customers writes itself: each tool tier above a node's own trims 0.4 seconds off the 2.5 second harvest cast (down to a 1.5 second floor), so a tier 5 tool is a speed upgrade on every node in the world, and only you can make one. The Book of Deeds marks Cogs and Sprockets at skill 50 and Grandmaster Engineering at 125."
         },
         "enchanting": {
           "identityHeading": "Gear apart, power back in",
-          "identityBody": "There is no station, no trainer, and no recipe list to buy: every enchant is known from the start, anyone can disenchant from day one, and the skill caps at 125 like every craft.\n\nOn the ring it sits between Inscription and Jewelcrafting, so its two pair identities are the Arcanist (Inscription and Enchanting) and the Gembinder (Enchanting and Jewelcrafting). Neither can be sworn yet, since both neighbors await their first recipes, so today Enchanting climbs as everyone's craft: free to the rare tier before any oath, and a natural hobby pick for a Bombardier or an Apothecary. Enchanters also keep the gathering world running: the three slottable tool effects are Enchanter work, and an original crafter recharges their own effects at a discount, deeper still once specialized.",
+          "identityBody": "Every enchant is known from the start, anyone can disenchant from day one, and neither ever needs a station; the skill caps at 125 like every craft. The one taught corner of the trade is its pair of charm recipes: Tinker Gizzel teaches the Gatherer's Cache and the Artisan's Eye at the toolworks in the southwest corner of Eastbrook Square, for the ordinary tier fee once your Enchanting reaches 25, and the charms themselves are worked at his station.\n\nOn the ring it sits between Inscription and Jewelcrafting, so its two pair identities are the Arcanist (Inscription and Enchanting) and the Gembinder (Enchanting and Jewelcrafting). Neither can be sworn yet, since both neighbors await their first recipes, so today Enchanting climbs as everyone's craft: free to the rare tier before any oath, and a natural hobby pick for a Bombardier or an Apothecary. Enchanters also keep the gathering world running: the two slottable tool effects are Enchanter work, and an original crafter recharges their own effects at a discount, deeper still once specialized.",
           "levelingHeading": "How enchanting levels",
-          "levelingBody": "Two actions move the skill: disenchanting a piece, and applying an enchant. Each success is worth up to one point, scaled by how serious the work is: the rarity of the piece you break, or the reagent tier of the enchant you apply. Common disenchants and dust-only enchants score as common work; uncommon disenchants and essence enchants as uncommon; rare disenchants and every Runed or Greater enchant as rare; epic and legendary disenchants higher still.\n\nThe familiar mastery fade applies on 25-point tiers, so common-grade work goes gray at skill 75, uncommon work at 100, and rare-tier work exactly at the 125 cap. Enchanting also has one kindness of its own: input above your archetype ceiling is rounded down to that ceiling instead of zeroed, so before you attune, an epic disenchant simply scores as rare rather than teaching nothing. If Enchanting ends up dormant behind another identity, everything scores as common work and the climb stalls at 75; keep it as your hobby and rare-tier work still pays, just slower past 75.",
+          "levelingBody": "Three actions move the skill: disenchanting a piece, applying an enchant, and crafting the two charms, which climb the ordinary crafting curve. Each success is worth up to one point, scaled by how serious the work is: the rarity of the piece you break, or the reagent tier of the enchant you apply. Common disenchants and dust-only enchants score as common work; uncommon disenchants and essence enchants as uncommon; rare disenchants and every Runed or Greater enchant as rare; epic and legendary disenchants rank higher still on the table, though no enchanting identity today reaches past the rare rung, so they pay the same as rare work in practice. One honesty rules the breaking bench: a piece that came off a player bench (crafted, signed, or masterworked) still mills into materials but teaches nothing, so a craft-and-break loop levels no one, and the lessons are in world-found gear.\n\nThe familiar mastery fade applies on 25-point tiers, so common-grade work goes gray at skill 75, uncommon work at 100, and rare-tier work exactly at the 125 cap. Enchanting also has one kindness of its own: input above your archetype ceiling is rounded down to that ceiling instead of zeroed, so before you attune, an epic disenchant simply scores as rare rather than teaching nothing. If Enchanting ends up dormant behind another identity, breaking and applying score as common work and the climb stalls at 75, while the two charms, riding the crafting curve above the common ceiling, teach a dormant enchanter nothing at all; keep it as your hobby and rare-tier work still pays, just slower past 75.",
           "marketHeading": "Enchanted copies, provenance, and the market",
-          "marketBody": "Applying an enchant spends the reagents and marks one specific copy of the item. Point it at a bagged copy and you get back a distinct enchanted copy; point it at a piece you are already wearing and it is enchanted in place, right where it sits, with no unequip and re-equip dance. Either way the bonus follows that piece forever, through unequips, bank trips, and trades. One enchant per piece: applying a different enchant to an enchanted copy asks for confirmation, then replaces the old enchant outright, destroying it with no refund of its materials. Selling, discarding, and disenchanting all prefer plain copies first, so your finished piece does not get eaten by accident. Identically enchanted copies even stack together in your bags.\n\nMasterwork gear and enchanting are friends: a masterwork piece stays fully enchantable, and the enchant adds on top of the masterwork bonus without disturbing it or the maker's signature. Stacking every source, a signed masterwork carrying a Greater enchant is the best a crafted piece gets, and it still sits below raid loot by design.\n\nOn the market, the World Market brokers only plain, unmodified stock, so enchanted and signed pieces change hands face to face through the trade window instead. The materials are the marketable half of the craft: Dust, Essence, and Shards list freely, listing costs nothing, and the Merchant takes 5 percent of a completed sale only. That makes the two classic enchanter incomes selling materials on the market, and taking a customer's piece in trade, enchanting it, and handing it back."
+          "marketBody": "Applying an enchant spends the reagents and marks one specific copy of the item. Point it at a bagged copy and you get back a distinct enchanted copy; point it at a piece you are already wearing and it is enchanted in place, right where it sits, with no unequip and re-equip dance. Either way the bonus follows that piece forever, through unequips, bank trips, and trades. One enchant per piece: applying a different enchant to an enchanted copy asks for confirmation, then replaces the old enchant outright, destroying it with no refund of its materials. Selling, discarding, and disenchanting all prefer plain copies first, so your finished piece does not get eaten by accident.\n\nMasterwork gear and enchanting are friends: a masterwork piece stays fully enchantable, and the enchant adds on top of the masterwork bonus without disturbing it or the maker's signature. Stacking every source, a signed masterwork carrying a Greater enchant is the best a crafted piece gets, and it still sits below raid loot by design.\n\nOn the market, an enchanted or signed piece lists like anything else: it goes up as its own single-copy listing, the tooltip shows the enchant and the maker's mark, and the Ravenpost carries it just as faithfully. The materials remain the steady half of the craft: Dust, Essence, and Shards list freely, listing costs nothing, and the Merchant takes 5 percent of a completed sale only. That makes the two classic enchanter incomes selling materials, and selling finished work: over the market, by raven, or face to face in a trade window."
         }
       },
       "howHeading": "How crafting works",
-      "howBody": "Open the crafting window (default key T) and every recipe you know is listed with what it needs and what you have on hand. Station-bound recipes ask you to stand within 20 yards of the right station in town, field recipes craft anywhere, and Enchanting never needs a station at all. There is no failure roll: a craft with the materials in hand always succeeds.\n\nTwo small frictions keep the economy honest. Every successful craft pays a fee of 2 copper per point of the item's stat budget, and craft-type actions share one pace: at most 10 crafts, disenchants, enchants, or salvages in any 60 seconds. Neither will trouble a normal session; both stop a maxed specialist from flooding the market.",
+      "howBody": "Open the crafting window (default key T) and every recipe you know is listed with what it needs and what you have on hand. Station-bound recipes ask you to stand within 20 yards of the right station in town, field recipes craft anywhere, and Enchanting's breaking and enchanting need no station at all (only its two charm recipes are station work, at the toolworks). There is no failure roll: a craft with the materials in hand always succeeds.\n\nTwo small frictions keep the economy honest. Every successful craft pays a fee of 2 copper per point of the item's stat budget, and every craft-family action takes real cast time (field crafts near two seconds, harder ladder crafts longer, and disenchant, enchant, salvage, and tool recharge each about a second and a half). Materials, the gold fee, stations, and skill ceilings do the rest; nothing scolds you for working too quickly.",
       "recipesHeading": "Recipes",
       "recipesNote": "Every recipe of the craft: its exact skill requirement and materials, where it is learned and for what fee, and the three skill values where its gain fades to half, a quarter, and nothing.",
       "masteryHeading": "Skill gain",
       "masteryBody": "Every recipe in the window wears its gain state in the classic colors: orange means full gain, yellow half, green a quarter, gray nothing. The boundaries are exact, every {step} skill is a tier, and a recipe fades one color for each tier it falls below yours.\n\nBecause gains are deterministic (a full-gain craft always moves you exactly one point), you can plan a whole climb from the list: work a rung while it is orange, train the next rung as it turns yellow, and never spend materials on a gray craft expecting progress. At the cap of {cap} the number stops, but the recipes, the masterwork chance, and the profits keep working.",
       "masterworkHeading": "Masterworks",
-      "masterworkBody": "Every successful craft is exactly what the recipe promises, and sometimes a little more: a masterwork finishes the same piece one quality tier finer, with the bonus stats baked in at craft time. It is add-only, never a downgrade, and it stays below the raid floor, so crafted gear can be excellent without replacing a raid drop.\n\nThe chance is published, not mystical: {base}% base, plus {perTier}% per tier your skill sits above the recipe, plus {signed}% when any signed reagent goes in, plus {spec}% once you are specialized, with higher-tier materials adding 1 to 2% more, all capped at {cap}%. Only a piece with real stats can improve, so statless commons, tools, and consumables never proc; a dormant craft never produces one, and a hobby craft cannot masterwork past its rare ceiling.\n\nFine work carries its maker. Rare and better single-copy outputs are signed (Crafted by; gathered materials carry Gathered by), a masterwork is always signed whatever its quality, and identically signed pieces still stack. A signature is provenance, not a lock: signed goods trade freely.",
+      "masterworkBody": "Every successful craft is exactly what the recipe promises, and sometimes a little more: a masterwork finishes the same piece one quality tier finer, with the bonus stats baked in at craft time. It is add-only, never a downgrade, and it stays below the raid floor, so crafted gear can be excellent without replacing a raid drop.\n\nThe chance is published, not mystical: {base}% base, plus {perTier}% per tier your skill sits above the recipe, plus {signed}% when any signed reagent goes in, plus {spec}% once you are specialized, with higher-tier materials adding 1 to 2% more, all capped at {cap}%. Only a piece with real stats can improve, so statless commons, tools, and consumables never proc; a dormant craft never produces one, and a hobby craft cannot masterwork past its rare ceiling.\n\nFine work carries its maker. Rare and better outputs are signed, every copy (Crafted by; gathered materials carry Gathered by), a masterwork is always signed whatever its quality. A signature is provenance, not a lock: signed goods trade, mail, and list on the World Market freely.",
       "trainingHeading": "Training",
-      "trainingBody": "Trainer recipes come from the resident masters, taught at their stations. The rule is one line: a master teaches a recipe once your tier in the craft has reached the recipe's own tier, and nothing else gates it, not your level, not your archetype. The trainer ladder rungs sit at skill 0, 25, and 50 today, so a fresh rung opens with every tier you climb.\n\nFees are one-time and flat by rung: the starting rung is free, the skill 25 rung costs {tier1} a recipe, and the skill 50 rung costs {tier2}. You must stand at the master's actual station to train, and a mobile station never counts. The common field recipes and the tool recipes need no training at all; every character knows them from the start.",
+      "trainingBody": "Trainer recipes come from the resident masters, taught at their stations. The rule is one line: a master teaches a recipe once your tier in the craft has reached the recipe's own tier, and nothing else gates it, not your level, not your archetype. The gear and consumable ladders run their rungs at skill 0, 25, and 50; Engineering's two rod lessons continue the ladder at 75 and 125, and Enchanting's two charm recipes sit on the 25 rung, so a fresh rung opens as your tiers climb.\n\nFees are one-time and flat by rung: the starting rung is free, the skill 25 rung costs {tier1} a recipe, the skill 50 rung {tier2}, and the rod lessons above them carry their own fees, listed beside each recipe in the table. You must stand at the master's actual station to train, and a mobile station never counts. The common field recipes and the six crafted land-tool recipes need no training at all; every character knows them from the start.",
       "specializationHeading": "Specialization",
       "specializationBody": "At skill {at} this craft specializes you, no quest needed: recipes cost {pct}% fewer materials from then on, and specialization adds its own bump to the masterwork chance.\n\nSpecialists also learn to take the workshop with them: a specialized crafter can set up a mobile station in the field for ten minutes at a time, so station-bound recipes can be worked at the mine mouth instead of back in town. Its limits are deliberate: it never counts for training with a master or for unbinding a commissioned piece, and it expires on its timer whether or not you used it.",
       "ench": {
@@ -4100,7 +4597,7 @@ export const en_CA: EnTranslations = {
         "meleeWeapons": "Melee weapons",
         "timberWeapons": "Staves, wands, bows, and crossbows",
         "enchantsHeading": "Enchants",
-        "enchantsNote": "Enchants come in three tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot plus every armor slot except the off hand, with enough stat-axis options that every build finds something for each slot. The Greater tier costs one Chime Shard plus Essence and is the only thing Shards are for: stronger bonuses on the highest-impact slots.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.",
+        "enchantsNote": "Enchants come in three tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot plus every armor slot except the off hand, with enough stat-axis options that every build finds something for each slot. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed two more sinks besides, the two charm recipes at five apiece and the top rung of tool-effect recharges, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.",
         "colEnchant": "Enchant",
         "colSlot": "Slot",
         "colTier": "Tier",
@@ -4115,57 +4612,62 @@ export const en_CA: EnTranslations = {
         "bonusFmt": "+{value} {stat}"
       },
       "gatherIntro": {
-        "mining": "Mining pulls ore straight out of the world's rock: copper in Eastbrook Vale, iron in Mirefen Marsh, and osmium up in Thornpeak Heights, feeding the forge crafts. Open to everyone from level 1: all it takes is a mining pick in your bags, 20 copper at any zone hub. Tracked on its own counter to a cap of 100.",
-        "logging": "Logging fells timber from stands of trees in all three zones: ironbark in Eastbrook Vale, ashwood in Mirefen Marsh, and highpine in Thornpeak Heights, the raw stock for hafts, staves, and the engineer's bench. Open to everyone from level 1 with a logging axe in your bags (20 copper at any zone hub), tracked on its own counter to a cap of 100.",
-        "herbalism": "Herbalism gathers what grows wild: sheenleaf in Eastbrook Vale, goldleaf in Mirefen Marsh, and sunpetal in Thornpeak Heights, the leaf and stem that keep the apothecary trades brewing. Open to everyone from level 1 with a herbalism sickle in your bags (20 copper at any zone hub), tracked on its own counter to a cap of 100.",
-        "fishing": "Fishing is the odd one out among the gathering trades, and the deepest: a real bite-and-reel minigame, its own catch tables in every zone, and a proficiency cap of 200, twice the others. Buy a pole, face open water, and cast."
+        "mining": "Mining pulls ore straight out of the world's rock: copper in Eastbrook Vale, iron in Mirefen Marsh, and osmium up in Thornpeak Heights, with starter veins scattered through every younger zone beyond them, feeding the forge crafts. Open to everyone from level 1: a 20 copper mining pick from an Eastbrook, Fenbridge, or Highwatch counter opens every starter vein, and the higher rungs of the pick ladder wake as your own counter earns them. Tracked on its own counter to a cap of 100.",
+        "logging": "Logging fells timber from stands of trees across the whole world: ironbark in Eastbrook Vale, ashwood in Mirefen Marsh, highpine in Thornpeak Heights, and starter stands in every younger zone, the raw stock for hafts, staves, and the engineer's bench. Open to everyone from level 1 with a logging axe in your bags (20 copper at the Eastbrook, Fenbridge, and Highwatch counters), tracked on its own counter to a cap of 100.",
+        "herbalism": "Herbalism gathers what grows wild: sheenleaf in Eastbrook Vale, goldleaf in Mirefen Marsh, sunpetal in Thornpeak Heights, and starter patches in every younger zone, the leaf and stem that keep the apothecary trades brewing. Open to everyone from level 1 with a herbalism sickle in your bags (20 copper at the Eastbrook, Fenbridge, and Highwatch counters), tracked on its own counter to a cap of 100.",
+        "fishing": "Fishing is the odd one out among the gathering trades, and the deepest: a real bite-and-reel minigame, its own catch tables in each of the three heartland zones (the young waters beyond them all serve the Vale's table for now), and a proficiency cap of 200, twice the others. Buy a pole, face open water, and cast."
       },
       "rhythmHeading": "The gathering rhythm",
-      "rhythmBody": "A harvest is a short visible cast, not an instant grab: {base} seconds base, never below a {floor} second floor. Owning a tool above the node's tier speeds you up by {tool} seconds per tier above it, and each proficiency band you cross trims another {band} seconds; merely matching the node's tier gets you in the door, it is the tiers above it that make you fast.\n\nA full bag politely refuses the cast before it starts, so nothing is wasted mid-swing, and every harvest pays a small slice of character XP, scaled by the node's level against your own the way kill XP scales: a trivial gray node teaches a capped character nothing.",
-      "gainBody": "Gain is deterministic, never a skill-up roll: a node at or above your gain tier teaches a full point per harvest, and every {step} proficiency is one tier scored against the node. Tier 1 nodes pay in full below 25, half to 49, a quarter to 74, and nothing from 75 on; tier 2 nodes pay in full to 49; the one tier 3 node pays in full to 74 and half right up to the cap of {cap}.\n\nThe intended route is plain: learn on the starter nodes of the Vale, move to the marsh, and finish the climb on the high ground of Thornpeak Heights. At the cap the learning stops but the yields do not: a capped gatherer keeps pulling max-quality material forever.",
+      "rhythmBody": "A harvest is a short visible cast, not an instant grab: {base} seconds base, never below a {floor} second floor. Carrying a tool above the node's tier, one your proficiency lets you wield, speeds you up by {tool} seconds per tier above it, and each proficiency band you cross trims another {band} seconds; merely matching the node's tier gets you in the door, it is the tiers above it that make you fast.\n\nA full bag politely refuses the cast before it starts, so nothing is wasted mid-swing, and every harvest pays a small slice of character XP, scaled by the node's level against your own the way kill XP scales: a trivial gray node teaches a capped character nothing.",
+      "gainBody": "Gain is deterministic, never a skill-up roll: a node at or above your gain tier teaches a full point per harvest, and every {step} proficiency is one tier scored against the node. Tier 1 nodes pay in full below 25, half to 49, a quarter to 74, and nothing from 75 on; tier 2 nodes pay in full to 49; the two tier 3 nodes of each trade pay in full to 74 and half right up to the cap of {cap}.\n\nThe intended route is plain: learn on the starter nodes of the Vale, move to the marsh, and finish the climb on the high ground of Thornpeak Heights. At the cap the learning stops but the yields do not: a capped gatherer keeps rolling the best odds the trade offers forever.",
       "nodesHeading": "Nodes by zone",
       "nodesNote": "Where the nodes are, their tier, the tool they need, and what they yield. Every node respawns for you {respawn} seconds after your own harvest, and that timer is yours alone: another gatherer working the same node never delays yours, so there is no node racing and no camping. Each zone up the ladder brings a better material out of tougher ground.",
       "toolsHeading": "Tools",
-      "toolsNote": "Every node needs its trade's tool in your bags, tier 1 included: no pick, no ore, and no pole, no fish. The vendor ladder covers tiers 1 to 3, stocked at every zone hub; a tool just has to be in your bags, there is no equip slot and no durability, so each is a one-time purchase. Only the tier matters to the gate: a tool's rarity color is cosmetic.\n\nAbove the vendor ladder sit two crafted tools, tier 4 and tier 5, made at the toolworks by engineers and never sold by any NPC. No node today needs more than tier 3, so their value right now is speed: a top tool pins the cast at its floor on lower nodes, and it will be the entry ticket when higher-tier ground arrives.",
+      "toolsNote": "Every node needs its trade's tool in your bags, tier 1 included: no pick, no ore, and no pole, no fish. The vendor ladder covers tiers 1 to 3 across the three heartland hubs: the tier-1 tool is sold at all three, the rungs above it where the ground that uses them begins (Fenbridge adds tier 2, Highwatch tier 3), and the younger settlements beyond them stock no tools at all, so kit up before you travel. Every counter sells every rung it stocks freely, and any tool passes by direct trade; every rung also lists on the Market and travels by mail except the three 20-copper land starters: those are bought at a counter or passed hand to hand, and never sold back, mailed, or listed. What is gated is the wielding. A land tool above tier 1 works only once your proficiency in its own trade has earned it, {tier2Prof} for tier 2, {tier3Prof} for tier 3, and 85 and 100 for the two crafted rungs, and the vendor row, the tooltip, and the table below all name the requirement up front. Until then a tool bought ahead simply waits in your bags, opening no ground, buying no speed, and minting no fine grades, then wields the moment your counter touches its number. Fishing rods are the one exception: no rod carries a wield requirement, and Trader Wilkes in Eastbrook deliberately stocks the tier 2 and tier 3 rods for anglers buying ahead. A tool never occupies an equip slot and never wears out, so each is a one-time purchase, and only the tier matters to the gate: a rarer tool of the same tier opens nothing extra. Rarity is not only colour, though. It makes a slotted tool effect last longer, and on a rod it widens the reel window.\n\nA better tool buys three things, not two. It opens higher-tier ground, it shortens the cast, and it improves what comes out: work a vein with a tool ranked ABOVE the zone's own material and the harvest yields the fine grade of it instead of the plain one. The vein has to be one of the zone's full-grade ones, so the easier veins a zone keeps for travellers still yield the ordinary material. Fine materials are what the crafted tool recipes consume, and a fine grade counts as its ordinary version anywhere a recipe or a work order asks for one, so upgrading never strands you: it just means your copper ore arrives as Fine Copper Ore.\n\nAbove the vendor ladder each trade has two crafted tools, tier 4 and tier 5, made at the toolworks (every character knows the land recipes; the skill that climbs for the work is Engineering's), or bought with Delve Marks at the Drowned Litany counter once its clears gates are met: the table below carries the Marks price and the clears each rung asks. No merchant ever sells them for coin. Fishing has its own pair, and they are learned from the toolmaker rather than known from the start. No node and no water today needs more than tier 3, so the top two rungs buy speed, grade and a kinder reel window rather than access, and they will be the entry ticket when higher-tier ground arrives.",
       "toolCrafted": "Crafted ({craft})",
+      "toolCraftedOrMarks": "Crafted ({craft}) or {marks} Delve Marks after three Drowned Litany clears",
+      "toolCraftedOrMarksHeroic": "Crafted ({craft}) or {marks} Delve Marks after a Heroic Drowned Litany clear",
       "toolVendor": "{name} ({hub})",
       "toolUnavailable": "Not sold",
-      "priceNone": "Not sold",
+      "priceNone": "Not sold for coin",
       "toolTierReq": "Tier {tier} tool",
+      "colWield": "Use at",
+      "wieldNone": "Any",
       "yieldsHeading": "What a harvest yields",
       "yieldsBody": "Every harvest rolls a quality for what it grants, and your proficiency is the whole story of that roll. A brand new gatherer always pulls common material; every point of skill moves weight steadily out of common into the higher grades and never backward, until at the 100 cap the common grade disappears entirely: 60 percent uncommon, 30 percent rare, 8 percent epic, and 2 percent legendary, every time.\n\nQuality also means quantity: a common roll yields 1 unit, uncommon and rare yield 2, epic 3, and legendary 4. Any rare, epic, or legendary pull arrives as a signed instance stamped Gathered by you: at cap that is four harvests in ten carrying your name, and the provenance rules on the Crafting Economy page explain why crafters pay extra for exactly those stacks.",
       "bandsHeading": "Proficiency bands",
-      "bandsBody": "Proficiency bands are the shared 0/100/200 ladder over a trade's counter: each band you cross shaves the gather cast, and for fishing the bands also select the catch tables (with a rod to match). The land trades cap at 100, so band 1 is their ceiling; only fishing reaches band 2.",
+      "bandsBody": "Proficiency bands are the shared 0/100/200 ladder over a trade's counter. For the land trades the band crossed at 100 shaves the gather cast, and their cap makes band 1 the ceiling. Fishing's bands shave nothing: they select the catch tables (with a rod to match), only fishing reaches band 2, and the climb itself is what pulls an angler to deeper water, where the better tables and the further lessons both live.",
       "bandFmt": "Band {band}: from {at} proficiency",
       "rareHeading": "Rare finds",
       "rareBody": "Every harvest, whatever your skill, carries a 1 in {oneIn} chance of a rare find: a pristine vein in ore, ancient heartwood in timber, a moonlit bloom among the herbs. The find multiplies that harvest's yield {mult} times over, every unit arrives signed with your name regardless of the quality rolled, and the whole zone hears about it by name. Each flavor also inscribes its own zero-Renown deed in your Book of Deeds, a collector's mark that exists purely to prove it happened to you.",
-      "specimenBody": "Keep a little bag room spare when you farm: a windfall needs open slots to land signed, and if nothing fits the yield still arrives but the signature is lost. Corpse harvesting has its own jackpot arm too: about {pct}% of corpse harvests roll rare or better, signing the yield and, on specimen families, granting a signed perfect specimen.",
+      "specimenBody": "Keep a little bag room spare when you farm: a signed windfall needs room of its own or a matching signed stack to land in, and if nothing fits the yield still arrives but the signature is lost. Corpse harvesting has its own jackpot arm too: about {pct}% of each harvested component comes up rare or better. A family with a perfect specimen to give (hide, silk, venom, meat) keeps its ordinary yield plain and mints the signed specimen beside it; every other family signs the yield itself.",
       "gatherDeedsHeading": "Deeds along the way",
       "gatherDeeds": {
-        "mining": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Mining inscribes Ore in the Blood. Reaching 100 in any three of Mining, Logging, Herbalism, and Fishing adds Master Gatherer at 25 Renown, and cracking a pristine vein records its own collector's mark. None of these grant power: deeds are titles and Renown, a record of the roads you have walked.",
-        "logging": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Logging inscribes Heartwood Hewer. Reaching 100 in any three of Mining, Logging, Herbalism, and Fishing adds Master Gatherer at 25 Renown, and a strike of ancient heartwood records its own collector's mark. Deeds are titles and Renown only, never power.",
-        "herbalism": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Herbalism inscribes Master of the Meadow. Reaching 100 in any three of Mining, Logging, Herbalism, and Fishing adds Master Gatherer at 25 Renown, and a moonlit bloom records its own collector's mark. Deeds are titles and Renown only, never power.",
-        "fishing": "The 100 milestone inscribes Old Salt and 200 inscribes Master Angler with its title, the very top of the angler's art; Fishing also counts toward Master Gatherer, earned at 100 in any three gathering trades. A first fish from each zone's waters fills its own page, and the Sunglint Koi records Glimmer of Hope, so travelers with a pole in their pack fill their book faster than they expect."
+        "mining": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Mining inscribes Ore in the Blood. Reaching 100 in any three of Mining, Logging, Herbalism, and Fishing adds Master Gatherer at 25 Renown, and cracking a pristine vein records its own collector's mark. Twelve zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. None of these grant power: deeds are titles and Renown, a record of the roads you have walked.",
+        "logging": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Logging inscribes Heartwood Hewer. Reaching 100 in any three of Mining, Logging, Herbalism, and Fishing adds Master Gatherer at 25 Renown, and a strike of ancient heartwood records its own collector's mark. Twelve zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
+        "herbalism": "Your first node of any trade earns Fruits of the Field, and the 100 cap in Herbalism inscribes Master of the Meadow. Reaching 100 in any three of Mining, Logging, Herbalism, and Fishing adds Master Gatherer at 25 Renown, and a moonlit bloom records its own collector's mark. Twelve zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
+        "fishing": "The 100 milestone inscribes Old Salt and 200 inscribes Master Angler with its title, the very top of the angler's art; Fishing also counts toward Master Gatherer, earned at 100 in any three gathering trades. A first fish from each of twelve zones' waters fills its own page, the three heartland zones and the Willowfen, the Galecrest, the Farshore, the Frostveil, the Amberfall, the Nightbloom, the Wraithwood, the Palmreach, and the Evergarden beyond them, and the Sunglint Koi records Glimmer of Hope, so travelers with a pole in their pack fill their book faster than they expect."
       },
       "fish": {
         "startHeading": "Getting started",
-        "startBody": "A Simple Fishing Pole costs 20 copper from Fisherman Brandt in Eastbrook (look for the Old Salt glaring at Mirror Lake from the town's east edge); Tinker Gizzel, Provisioner Hale in Fenbridge, and Quartermaster Bree in Highwatch stock poles too. Use the pole while facing water deep enough to hold fish, up to about 24 yards ahead of you, and your bobber sails out.\n\nYou cannot cast while in combat, while swimming, or while dead: casting from shore is the intended posture, and any fishable water works, in every zone.",
+        "startBody": "A Simple Fishing Pole costs 20 copper from Fisherman Brandt in Eastbrook (look for the Old Salt at the town's east edge, by the road to Mirror Lake); Tinker Gizzel, Provisioner Hale in Fenbridge, and Quartermaster Bree in Highwatch stock poles too. Use the pole while facing water deep enough to hold fish, up to about 24 yards ahead of you, and your bobber sails out.\n\nYou cannot cast while in combat, while swimming, or while dead: casting from shore is the intended posture. Water gets harder as the land does, though: the marsh wants at least the tier 2 Ironreel and the peaks the tier 3 Silverstream, and a line cast without the rod that water takes never leaves your hand. Two rods sit above those, the Stormreel and the Tidewrought: engineers craft them at the toolworks out of what a line pulls up, and the Drowned Litany's delve counter sells them for Delve Marks behind its clears gates, though never for coin. No water asks for them, so they buy a shorter wait and a wider reel window instead of access, which at the top rung means a bite in a flat three seconds.",
         "biteHeading": "Bite and reel",
-        "biteBody": "After the cast, a bite comes at a hidden moment between {min} and {max} seconds; the delay is decided when the line lands, so no two casts feel quite alike. When the bobber bites you have a {reel} second window to press the pole again and reel in: reel inside it and the catch lands, hesitate past it and the fish gets away with nothing to show. A whole session caps at {cap} seconds, so even a quiet cast resolves quickly.\n\nBetter rods sharpen both ends of the minigame: each rod tier above the first trims {rod} seconds off the longest possible wait and adds {reelRod} seconds to the reel window, so the Ironreel pulls the worst wait down to 6.5 seconds with a 3.75 second window, and the Silverstream to 5 and 4.5. The quickest bites never change whatever you hold, and a rod only needs to be in your bags to count.",
+        "biteBody": "After the cast, a bite comes at a hidden moment between {min} and {max} seconds; the delay is decided when the line lands, so no two casts feel quite alike. When the bobber bites you have a {reel} second window to press the pole again and reel in: reel inside it and the catch lands, hesitate past it and the fish gets away with nothing to show. A whole session caps at {cap} seconds, so even a quiet cast resolves quickly.\n\nBetter rods sharpen both ends of the minigame: each rod tier above the first trims {rod} seconds off the longest possible wait, never below the three-second floor the top rod already grazes, and adds {reelRod} seconds to the reel window, so the Ironreel pulls the worst wait down to 6.5 seconds with a 3.25 second window, and the Silverstream to 5 with a window past 4, its rarity widening the reel a little beyond what the tier alone pays. The quickest bites never change whatever you hold, and a rod only needs to be in your bags to count.",
+        "earlyReelNote": "One caution for eager thumbs: press the pole again before anything bites and you reel in an empty line, ending the cast (a moment of grace right after casting forgives an accidental double-press). Patience is the whole game: wait for the bite, then strike.",
         "scheduleHeading": "Proficiency gain",
-        "scheduleNote": "Fishing gain follows a fixed schedule with no dice: a full point per catch below 50 proficiency, half a point below 100, a tenth below 150, and a slow 0.02 trickle from 150 to 200. That last stretch is a thousands-of-catches journey on purpose: 200 is a statement, not a stop on the way to something else.\n\nJunk stops teaching entirely at {cutoff}: from there on, weeds and boots are just weeds and boots. Every landed catch otherwise gains at the scheduled rate, so fish where you would anyway and let the counter climb.",
+        "scheduleNote": "Fishing gain follows a fixed schedule with no dice: a full point per catch below 50 proficiency, half a point below 100, a tenth below 150, and a slow 0.02 trickle from 150 to 200. That last stretch is a thousands-of-catches journey on purpose: 200 is a statement, not a stop on the way to something else.\n\nJunk stops teaching entirely at {cutoff}: from there on, weeds and boots are just weeds and boots. The water itself caps the lesson too: the Vale's tier 1 waters (and every young shore beyond the heartland) teach nothing past 100, the marsh's stop at 150, and only Thornpeak's school an angler the whole way to 200. Every landed catch otherwise gains at the scheduled rate, so when the counter stalls, the schedule is telling you to seek deeper water.",
         "colProficiency": "Proficiency",
         "colGain": "Gain per catch",
         "belowFmt": "Below {below}",
         "tablesHeading": "Catch tables",
-        "tablesNote": "Your proficiency selects one of three catch bands: band 0 from the start, band 1 at 100, band 2 at 200, each shifting weight out of junk and empty hooks into real fish, zone by zone. Each band above the first also demands a rod: band 1 wants the tier 2 Ironreel, band 2 the tier 3 Silverstream. Your effective band is the lower of what your skill has earned and what your rod supports, and the cap is silent: with a lesser rod you still catch, just off the lower band's table, so if your catches feel stuck while your skill climbs, check your rod first.\n\nEach zone's waters hold their own pair of food fish, healing more the deeper the zone, all of them cooking inputs and perfectly good sit-and-eat food raw off the line. The rest of the table is the angler's tax: weed, the occasional boot, and the empty hook, which never fully disappears. The {rare} is the same long-shot on every line, at flat odds that never change with skill, so the newest angler on the dock has the same shot as a Master Angler.",
+        "tablesNote": "Your proficiency selects one of three catch bands: band 0 from the start, band 1 at 100, band 2 at 200, each shifting weight out of junk and empty hooks into real fish, zone by zone. Each band above the first also demands a rod: band 1 wants the tier 2 Ironreel, band 2 the tier 3 Silverstream. Your effective band is the lower of what your skill has earned and what your rod supports, and the cap is silent: with a lesser rod you still catch, just off the lower band's table, so if your catches feel stuck while your skill climbs, check your rod first.\n\nEach zone's waters hold their own pair of cooking catches, higher-tier fish the deeper the zone, all of them kitchen reagents that must be cooked before they restore anything. The rest of the table is the angler's tax: weed, the occasional boot, and the empty hook, which never fully disappears. How much you pay depends on the water your bobber lands in, not where you stand: a cast reaches up to 24 yards, and the rod the water demands, the table it draws from, the deed it credits, and how far it teaches all answer to the zone that water belongs to, decided the moment the line lands. Each zone's water is written for a band of its own, the Vale for band 0, the marsh for band 1, the peaks for band 2, and fishing one band under that turns roughly a third of your casts into empty hooks, two bands under it more than half. The rod gets you to the water; the skill is what makes it pay, and the climb is what pulls an angler deeper, because better bands are not just better pay: past the Vale they are the only waters that keep teaching. The {rare} is the one row that answers to your catch band and nothing else: the same odds in every zone, and six times likelier at band 2 than at band 0, so the rarest thing on the dock is the one a Master Angler really is better at.",
         "bandHeading": "Band {band}: proficiency {at} and up, rod tier {rod}",
         "colCatch": "Catch",
         "colOdds": "Odds",
         "pctFmt": "{pct}%",
         "emptyHook": "Nothing biting",
         "koiHeading": "The Sunglint Koi",
-        "koiBody": "Every body of water in the game hides the same prize: the Sunglint Koi, an uncommon gleam on the line worth 75 copper to a vendor and rather more to your pride. Its odds are a flat 3 percent per landed catch (4 percent in Thornpeak's cold water) at every band, and landing one records Glimmer of Hope in your Book of Deeds, a zero-Renown collector's mark. When it happens, the log makes sure you know."
+        "koiBody": "Every body of water in the game hides the same prize: the Sunglint Koi, an uncommon gleam on the line worth 75 copper to a vendor and rather more to your pride. Its odds answer to your catch band and to nothing else, the same in every zone: a 1 percent row of the catch table at band 0, 3 at band 1, and 6 at band 2, drawn on every reeled-in cast, so the koi comes to the angler who earned the deep tables. Landing one records Glimmer of Hope in your Book of Deeds, a zero-Renown collector's mark. When it happens, the log makes sure you know."
       },
       "econ": {
         "title": "Crafting Economy",
@@ -4181,15 +4683,15 @@ export const en_CA: EnTranslations = {
         "feeUnbind": "Unbind fee",
         "feeUnbindValue": "{uncommon} uncommon, {rare} rare, {epic} epic",
         "trainingHeading": "Training fees",
-        "trainingNote": "One flat fee per recipe rung, charged once when a master teaches it; the higher tiers of the table wait for future content.",
+        "trainingNote": "One flat fee per recipe rung, charged once when a master teaches it; every rung of the table below is in live use today, from the free starter recipes to the toolmaker's rod lessons at the top.",
         "trainingTierFmt": "Tier {tier}: {fee}",
         "free": "Free",
         "sellsHeading": "What sells, and why",
         "sellsBody": "The steadiest business is consumables, because they are used up and bought again. Potions, cooked food, and enchants all vanish with use: a fighter who buys a sword once will buy healing potions forever, and every fresh piece of gear is a fresh chance to sell an enchant.\n\nMasterwork pieces are the premium end. They cannot be made to order, so one of a wanted piece commands a real markup, and your signature on it is walking advertising. Reagents are the third pillar: arcane materials from disenchanting, typed Resonant secondaries flowing straight from breaker to enchanter, and signed gathered materials, which crafters chasing masterwork procs pay over the odds for.",
         "marketHeading": "The World Market and its cut",
-        "marketBody": "The World Market is the realm-wide exchange, kept by the Merchant in Eastbrook and Auctioneer Voss in Highwatch. Listing is free: there is no deposit, and an unsold listing simply comes back to you. The house takes its cut only when something actually sells: 5 percent of the sale price, and the rest waits for you to collect.\n\nOne important limit: the Market brokers plain goods only. A signed, masterwork, enchanted, or bound copy is never swept into a listing, so the special pieces change hands face to face in a trade window, which carries an item's full identity, signature and all. Price those yourself; the Market only tells you what the plain version fetches.",
+        "marketBody": "The World Market is the realm-wide exchange, kept by the Merchant in Eastbrook and Auctioneer Voss in Highwatch. Listing is free: there is no deposit, and an unsold listing simply comes back to you. The house takes its cut only when something actually sells: 5 percent of the sale price, and the rest waits for you to collect.\n\nSpecial pieces are welcome too: a signed, masterwork, or enchanted copy goes up as its own single-copy listing that carries its identity onto the tooltip, signature and all, and it never mixes with a plain stack. The one refusal is a bound copy: a piece locked by the Maker's Bond, or still armed to bind, stays out of the Market and the mail alike, so a bond can never be laundered away. Price special work yourself; the plain listings only tell you what the plain version fetches.",
         "workOrdersHeading": "Work orders",
-        "workOrdersNote": "Each station master posts a standing work order: bring a stack of their craft's staple material and get paid on the spot, plus a little quest experience. The pay is deliberately {pct}% of what a vendor would give you for the same stack, rounded down, so a work order is never the profitable way to sell materials, just a reason to swing by the station.\n\nEvery order runs on its own {minutes} minute clock per character: turn one in and that master has nothing more for you until the timer laps. Treat them as a small bonus on materials you were gathering anyway, not a business.",
+        "workOrdersNote": "Each station master posts a standing work order: bring a stack of their craft's staple material and get paid on the spot, plus a little quest experience. The pay is deliberately {pct}% of what a vendor would give you for the same stack, rounded down, so a work order is never the profitable way to sell materials, just a reason to swing by the station.\n\nEvery order runs on its own {minutes} minute clock per character: turn one in and that master has nothing more for you until the timer laps. The marks over a master's head and on your maps keep the score for you: a bright blue ! is repeatable work you have handled before, and the same mark dimmed is repeatable work still inside its clock, offered again once the window laps. Treat them as a small bonus on materials you were gathering anyway, not a business.",
         "colOrder": "Work order",
         "colMaster": "Master",
         "colAsks": "Asks for",
@@ -4197,11 +4699,19 @@ export const en_CA: EnTranslations = {
         "commissionsHeading": "Commissions and the Maker's Bond",
         "commissionsBody": "A commission is a craft made for someone. When crafting a weapon, armor piece, or held off-hand (a potion cannot carry a bond), the crafter can flag the craft as a commission: the finished piece behaves normally in the maker's own hands, but the moment it changes hands in a trade it binds to the person who received it. That is the Maker's Bond: the buyer gets their piece, and the piece cannot be passed on or resold.\n\nBonds are not forever, just expensive. Any station master will unbind a bound piece while you stand at their station (a mobile station never offers the service), for a fee set by the item's quality: 25 silver uncommon, 1 gold rare, 4 gold epic, with a legendary paying the epic rate and a commissioned common piece the uncommon one.\n\nThe fee buys a clean slate, not a cure: the piece is still a commission, so it binds again to whoever receives it in the next trade, and everything else about it, signature, masterwork, and enchants, survives untouched.",
         "provenanceHeading": "Signed work",
-        "provenanceBody": "Some items carry a name. Hover one and the tooltip says Gathered by so-and-so on a raw material, or Crafted by so-and-so on a finished piece: the same mark, worded for how the item came to be. A signature is part of the item itself, travels with it through trades and the bank, and never fades.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, rare finds sign their entire five-fold windfall, and a corpse harvest's lucky roll signs its yield, pristine specimens included. Crafting signs along the same line: a single-copy output of rare or better quality mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. The one thing that can cost you a signature is a full bag: a signed unit needs room of its own, or a matching signed stack, to land in.\n\nA stack of items shares one identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. A signed log never joins a plain pile in either direction (merging would erase somebody's name), but identical payloads merge happily, so twenty ore signed by the same gatherer sit in one stack and a windfall does not shred your bags.\n\nSignatures pay crafters back: consuming any signed reagent, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you: when a piece you signed performs in your own hands, a potion drunk at the right moment, a killing blow landed, armor worn at a kill, a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors.",
+        "provenanceBody": "Some items carry a name. Hover one and the tooltip says Gathered by so-and-so on a raw material, or Crafted by so-and-so on a finished piece: the same mark, worded for how the item came to be. A signature is part of the item itself, travels with it through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fades.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. The one thing that can cost you a signature is a full bag: a signed unit needs room of its own, or a matching signed stack, to land in.\n\nA stack of items shares one identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. A signed log never joins a plain pile in either direction (merging would erase somebody's name), but identical payloads merge happily, so twenty ore signed by the same gatherer sit in one stack and a windfall does not shred your bags.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through the flask alone: drink a potion you signed and a small trickle of skill flows back to the craft that brewed it, as long as that craft is one of your active majors.",
         "collectorsHeading": "Collectors, trophies, and the price of a story",
         "collectorsBody": "Vendors are blind to provenance: a signed item sells to an NPC for exactly its plain price. The premium on a signature exists only between players, which is precisely what makes it interesting: a stack of windfall ore signed by a famous gatherer, a Prime Cut from a lucky harvest, a masterwork blade naming a crafter who has since retired, all cost whatever someone's memory says they are worth.\n\nThe Book of Deeds leans into the same instinct: Pristine Vein, Ancient Heartwood, Moonlit Bloom, A Perfect Specimen, and Glimmer of Hope are zero-Renown collector's marks that exist purely to prove a moment happened to you. Keep the item that earned the deed and you hold the receipt. None of this is power; provenance buys no stats and wins no fights, it is the game's paper trail of good days.",
-        "throttleHeading": "The action throttle",
-        "throttleBody": "Output has a ceiling: crafting, disenchanting, enchanting, and salvaging share one budget of {actions} successful actions per rolling {seconds} seconds. A denied attempt costs nothing and spends no budget. You will never feel it in normal play; it exists so a maxed specialist with a full bank cannot flood the Market, whatever their skill or stockpile.",
+        "castPaceHeading": "Cast time and the gold sink",
+        "castPaceBody": "Profession actions take real cast time: recipes scale from just under two seconds for simple field work up to a few seconds at the top of the ladder, and disenchant, enchant, salvage, and tool-effect recharge each take a fixed short cast. Cancel mid-cast and you lose nothing. Every successful craft also pays a copper fee proportional to the item budget. Together with materials, stations, and skill ceilings, that pace keeps the Market honest without a separate action quota. The exact durations by skill band are listed below.",
+        "castPaceField": "Field recipes (no skill requirement): {seconds}s cast",
+        "castPaceSkill25": "Recipes up to skill 25: {seconds}s cast",
+        "castPaceSkill50": "Recipes up to skill 50: {seconds}s cast",
+        "castPaceSkill75": "Recipes up to skill 75: {seconds}s cast",
+        "castPaceCombo": "Top-of-ladder and combo recipes: {seconds}s cast",
+        "castPaceEnchantFamily": "Disenchant, enchant, and salvage: {seconds}s cast",
+        "castPaceRecharge": "Tool-effect recharge: {seconds}s cast",
+        "castPaceBatch": "Batch crafting: up to {count} in one order, one cast each",
         "doctrineHeading": "Players trade with players",
         "doctrineBody": "The crafting economy is built on one idea: players supply players. Gatherers feed crafters, crafters feed questers and raiders, and breakers feed enchanters, with vendors and station masters standing at the edges to absorb junk and coin rather than to compete with you. If you want to make money from a profession, your customer is a person: learn what other players burn through, price against the World Market, and treat the NPC systems as a floor under your prices, not as the market itself.\n\nCrafted gear is tuned to sit below the raid floor: even a masterwork is only ever one quality tier above its recipe, never past legendary, and its stat budget stays under the raid loot band. The forge gets you ready for the hardest content; it does not replace it. That keeps crafters, raiders, and the market in a stable triangle: raid drops stay aspirational, and crafted pieces stay the best gear money can actually buy."
       },
@@ -4209,21 +4719,21 @@ export const en_CA: EnTranslations = {
         "title": "Professions FAQ",
         "intro": "Quick answers to the questions crafters ask most.",
         "q1": "Why do my signed items not stack?",
-        "a1": "A signed item is an instanced item: it carries its own little record (the signer, any rolled quality, masterwork stats, an enchant, a bond) instead of being an anonymous copy. Two copies merge into one stack only when those records match exactly.\n\nIn practice: rare ore you gathered yourself stacks with more rare ore you gathered yourself, because both say Gathered by you and nothing else differs. The same material signed by a friend sits in its own slot, and a plain unsigned copy never merges into a signed stack. Bags, bank, and trade all follow this one rule.",
+        "a1": "A signed item is an instanced item: it carries its own little record (the signer, any rolled quality, masterwork stats, an enchant, a bond) instead of being an anonymous copy. Two copies merge into one stack only when those records match exactly.\n\nIn practice: rare ore you gathered yourself stacks with more rare ore you gathered yourself, because both say Gathered by you and nothing else differs. The same material signed by a friend sits in its own slot, and a plain unsigned copy never merges into a signed stack. Bags, bank, trade, mail, and the World Market all follow this one rule.",
         "q2": "Do common recipes raise my skill forever?",
         "a2": "No. Every recipe is scored by how far it sits below your current bracket in that craft, the classic orange, yellow, green, gray reading: full gain at or above your bracket, half one tier below, a quarter two tiers below, and nothing three or more below. Brackets are every 25 skill, so the free skill 0 recipes stop teaching you anything at 75 skill.\n\nThe caps are also lower than the classic 300 you might expect: each of the eight earnable crafts caps at 125, Mining, Logging, and Herbalism cap at 100, and Fishing runs long at 200. Climbing means moving up to recipes at your own bracket, not grinding the cheapest one.",
         "q3": "What is the difference between looting and harvesting a corpse?",
         "a3": "One press covers both. Everything a corpse holds, coin and drops plus any harvestable components, opens in the same window: loot follows the normal loot rules, and harvesting is the professions side, stripping materials off the carcass itself.\n\nHarvesting is first come, single use: each corpse can be harvested exactly once, by whoever claims it first, online included. Your Town Focus shapes what you get: while standing in a town hub you can spread 10 focus points across the component types you care about, and each focused component rolls a better tier (every 5 points bumps it a step, at most two steps) and yields more (10 percent per point). Unfocused components are never made worse.",
         "q4": "Why is my Ironbark Log signed?",
-        "a4": "You hit a windfall. Roughly 1 harvest in 90 triggers a rare gather event (ancient heartwood on a tree, a pristine vein on ore, a moonlit bloom on herbs): it multiplies the yield five times, signs every unit with your name, and announces the find to the whole zone. A rare or better rarity roll on an ordinary harvest signs the yield too.\n\nSigned materials are worth keeping or selling dear: consuming any signed reagent in a craft adds 2 percent to the masterwork chance. Just remember they only stack with identically signed copies, so they keep their own bag slot.",
+        "a4": "You hit a windfall. Roughly 1 harvest in 90 triggers a rare gather event (ancient heartwood on a tree, a pristine vein on ore, a moonlit bloom on herbs): it multiplies the yield five times, signs every unit with your name, and announces the find to the whole zone. A rare or better rarity roll on an ordinary harvest signs the yield too.\n\nSigned materials are worth keeping or selling dear: holding any signed copy of a needed reagent at the bench adds 2 percentage points to the masterwork chance. Just remember they only stack with identically signed copies, so they keep their own bag slot.",
         "q5": "How do I unbind a commissioned piece, and what does it cost?",
         "a5": "Walk to any crafting station with the piece in your bags and pay the master. The fee follows the item's quality: 25 silver for an uncommon piece, 1 gold for a rare, 4 gold for an epic; a legendary pays the epic rate, and a commissioned common piece pays the uncommon rate. It must be a real station: a mobile station never offers the service.\n\nThe fee buys a clean slate, not a cure: the piece remains a commission, so it binds again to whoever receives it in the next trade. If several bound copies share a stack, one copy is peeled off and unbound per payment.",
         "q6": "Where do I learn recipes, and what do they cost?",
-        "a6": "The nine common field recipes and the tool recipes are known to everyone from the start, and so are three station-bound capstones (the Kilnscale Mantle, the Wardweave Cowl, and the Duskhide Wraps), which need no trainer, only their station. Everything else is taught by the resident masters at their stations across the three hub towns: most stand in Eastbrook, the tanner keeps the tannery in Fenbridge, and the alchemist keeps the apothecary in Highwatch.\n\nTrainer recipes come in rungs at skill 0, 25, and 50, priced free, 25 silver, and 1 gold as a one-time fee. A master teaches a recipe once your bracket in that craft has reached the recipe's own bracket, and you must be standing at their station to learn: a mobile station does not count.",
+        "a6": "The nine common field recipes and the six crafted land-tool recipes are known to everyone from the start, and so are three station-bound capstones (the Kilnscale Mantle, the Wardweave Cowl, and the Duskhide Wraps), which need no trainer, only their station. Everything else is taught by the resident masters at their stations across the three hub towns: most stand in Eastbrook, the tanner keeps the tannery in Fenbridge, and the alchemist keeps the apothecary in Highwatch.\n\nTrainer recipes run in rungs: skill 0, 25, and 50 for the gear and consumable crafts, priced free, 25 silver, and 1 gold as one-time fees; Enchanting's two charm recipes sit on the 25 rung, and the toolmaker teaches the two crafted fishing rods at 75 and 125 for 4 and 16 gold. A master teaches a recipe once your bracket in that craft has reached the recipe's own bracket, and you must be standing at their station to learn: a mobile station does not count.",
         "q7": "Why did my gathering suddenly slow down?",
-        "a7": "The gather cast starts at 2.5 seconds and is shaved down two ways: 0.4 seconds for every tool tier you own above the node's own tier, and 0.15 seconds for each proficiency band you have crossed (at 100 and 200), with a floor of 1.5 seconds. Move from tier 1 nodes up to tier 3 nodes and your surplus vanishes, so the same pick swings slower again. Owning exactly the required tier buys no speed; it only opens the node.\n\nSkill gain fades the same way crafting does: a node grays out as your proficiency climbs past its tier (tier 1 nodes teach nothing from proficiency 75 on), so the answer to slow gains is higher tier nodes, which need a tool of at least their tier (bare hands count as tier 1). Fishing follows its own taper: full gain below 50 proficiency, half below 100, a trickle of 0.1 below 150 and 0.02 below 200, and junk catches teach nothing at all from 100 on.",
+        "a7": "The gather cast starts at 2.5 seconds and is shaved down two ways: 0.4 seconds for every tool tier you carry and can wield above the node's own tier, and 0.15 seconds once your trade's counter crosses its 100 band, with a floor of 1.5 seconds. Move from tier 1 nodes up to tier 3 nodes and your surplus vanishes, so the same pick swings slower again. Holding exactly the required tier buys no speed; it only opens the node.\n\nSkill gain fades the same way crafting does: a node grays out as your proficiency climbs past its tier (tier 1 nodes teach nothing from proficiency 75 on), so the answer to slow gains is higher tier nodes. Those need a tool of at least their tier in your bags (no node is ever worked bare-handed, tier 1 included), and a land tool above tier 1 also wants its wield mark first, 40/70/85/100 in its own trade for tiers 2 through 5. Fishing follows its own taper: full gain below 50 proficiency, half below 100, a trickle of 0.1 below 150 and 0.02 below 200, junk catches teach nothing at all from 100 on, and the water itself caps the lesson (tier 1 waters stop teaching at 100, the marsh at 150), so a stalled counter can also mean you have outgrown the water.",
         "q8": "Can I craft away from town?",
-        "a8": "Partly. The nine common field recipes (the starter weapon, armor, food, and potion staples) craft anywhere, any time. Everything above them is bound to a station type: forge, kitchens, apothecary, tannery, loom, or toolworks, and you must be within 20 yards of the station for the craft to go through.\n\nAt 75 skill in a craft you specialize, and along with a 20 percent material discount you gain a mobile station: place it in the field and it stands for 10 minutes, serving that craft's recipes as if you were at the real thing. The mobile station is for crafting only: learning recipes and unbinding commissions always require the true station in town."
+        "a8": "Partly. The nine common field recipes (the starter weapon, armor, food, and potion staples) craft anywhere, any time, and so do the three combination recipes of the sworn pairs. Everything else above them is bound to a station type: forge, kitchens, apothecary, tannery, loom, or toolworks, and you must be within 20 yards of the station for the craft to go through.\n\nAt 75 skill in a craft you specialize, and along with a 20 percent material discount you gain a mobile station: place it in the field and it stands for 10 minutes, serving that craft's recipes as if you were at the real thing. The mobile station is for crafting only: learning recipes and unbinding commissions always require the true station in town."
       }
     },
     "economy": {
@@ -4239,14 +4749,14 @@ export const en_CA: EnTranslations = {
       "bankHow": "With the vault open, click an item in your bags to deposit it and click it in the vault to take it back. The vault holds goods only, never coin, and quest items stay with you. When your bags fill up mid-journey, one button sweeps all your crafting materials in at once.",
       "bankSlots": "A fresh vault starts small and grows with you. The bursar sells further slots for coin at ever-steeper prices, and playing online earns bonus room on top, for things like a verified email, linked accounts, and friends you bring into the game.",
       "buyingTitle": "Buying and selling",
-      "buyingBody": "Speak to a merchant and choose to browse their goods, and their shop opens with three tabs: Browse, Sell, and Buyback. Browse holds everything they stock, yours if you can afford it. Sell lists what in your bags they will pay for, and selling a piece that carries its own rolled quality asks you to confirm first, so a prized copy never slips away by mistake. If you part with something you regret, the Buyback tab holds your recent sales so you can buy them back for the coin you were paid.",
+      "buyingBody": "Speak to a merchant and choose to browse their goods, and their shop opens as a single panel: everything they stock in one list, yours with a click if you can afford it. A quantity strip above the goods sets how many each click buys, one, five, or ten at a time, or a custom count, though a few special wares, mounts among them, only ever sell one at a time. Stackable coin-priced wares also carry a second offer beside the row that takes as many as your coin covers, up to a full stack, in one purchase. Selling is just as direct: while the shop is open, click an item in your bags to sell it on the spot, and what a merchant will not take, quest goods and soulbound pieces among them, simply stays put. If you part with something you regret, the shop keeps a Buyback list of your recent sales so you can buy them back for the coin you were paid.",
       "junkTitle": "Clearing out junk",
-      "junkBody": "Drops you have no use for still sell to any vendor, so empty your bags whenever you pass through town rather than letting them fill up. The vendor Sell tab even keeps a one-click button that sells every Poor-quality oddment at once. Truly worthless odds and ends can also be discarded outright to make room.",
+      "junkBody": "Drops you have no use for still sell to any merchant with a shop of their own, so empty your bags whenever you pass through town rather than letting them fill up. The merchant's window even keeps a one-click Sell Junk button that sells every Poor-quality oddment at once. Truly worthless odds and ends can also be discarded outright to make room.",
       "tradeTitle": "Trading with other players",
       "tradeBody": "You can trade face to face with anyone standing near you. Both of you put items and coin into a shared window and the swap only happens once you both confirm it, so neither side can be caught out. It is the simple way to hand a friend a drop or settle a deal.",
       "mailTitle": "The Ravenpost",
       "mailBody": "Every hub town keeps a carved raven pillar: a mailbox of the Ravenpost, the letter service of the realm. Stand at one to write to any character by name, a friend online or long offline, and attach coin or goods to the letter for a small postage. The raven takes a short while to fly; when it lands, an envelope indicator tells the recipient something is waiting.",
-      "mailHow": "Collecting works the same in reverse: stand at any pillar to read your letters and take what they carry into your purse and bags. A plain letter fades away after a while, but one still carrying coin or goods waits for you, however long you take. Some things the post refuses outright: soulbound items, quest goods, and one-of-a-kind cosmetic tokens travel with you or not at all. And keep an eye on the pillar after a good turn-in; some questgivers write.",
+      "mailHow": "Collecting works the same in reverse: stand at any pillar to read your letters and take what they carry into your purse and bags. A plain letter fades away after a while, but one still carrying coin or goods waits for you, however long you take. Some things the post refuses outright: soulbound items, quest goods, bound or bind-on-trade pieces, and one-of-a-kind cosmetic tokens travel with you or not at all. And keep an eye on the pillar after a good turn-in; some questgivers write.",
       "dailyTitle": "Daily rewards",
       "dailyBody": "A treasure chest button on your screen opens the daily rewards window. Each day sets out a handful of tasks, complete quests, fight in the Ashen Coliseum, win a Vale Cup match, and offers a free spin of the prize wheel, all worth points toward that day's standings, and the day's top earners share a prize pool for holders of the optional community token. None of it grants power in the game. The window itself spells out the day's rules and who is eligible, shows the leaderboard, and keeps your history.",
       "marketTitle": "The World Market",
@@ -4659,6 +5169,7 @@ export const en_CA: EnTranslations = {
       "terrainCapReached": "Terrain edit limit reached ({max}). Extra sculpt stamps were not added.",
       "placementCapReached": "Placement limit reached ({max}). Extra assets were not added.",
       "blockerCapReached": "Blocker wall limit reached ({max}). The new wall was not added.",
+      "campCapReached": "Camp limit reached ({max}). The new camp was not added.",
       "autosaveOff": "Autosave turned off: {reason} Save manually, then turn it back on."
     },
     "confirm": {
@@ -4933,6 +5444,199 @@ export const en_CA: EnTranslations = {
     "realm": "World",
     "newCharacter": "New Character",
     "appearance": "Appearance",
+    "customize": "Customize",
+    "body": "Body",
+    "genderMale": "Male",
+    "genderFemale": "Female",
+    "hair": "Hair",
+    "brows": "Eyebrows",
+    "skinTone": "Skin Tone",
+    "hairColor": "Hair Color",
+    "lightness": "Light / Dark",
+    "colorWheelAria": "{label} color wheel: drag to pick hue and saturation",
+    "lightnessAria": "{label} lightness",
+    "customColor": "Custom",
+    "colorPresetAria": "{label} preset {n}",
+    "beard": "Beard",
+    "face": "Face",
+    "faceNose": "Nose",
+    "faceEyes": "Eye Size",
+    "faceJaw": "Jaw",
+    "faceBrow": "Brow",
+    "faceCheeks": "Cheeks",
+    "faceChin": "Chin",
+    "bodyShoulders": "Shoulders",
+    "bodyChest": "Chest",
+    "bodyHips": "Hips",
+    "bodyHands": "Hand Size",
+    "bodyElbows": "Elbows",
+    "bodyKnees": "Knees",
+    "bodyFeet": "Feet",
+    "mouth": "Mouth",
+    "mouthNeutral": "Neutral",
+    "mouthLips": "Full lips",
+    "mouthSmile": "Smile",
+    "mouthFrown": "Frown",
+    "mouthWide": "Wide",
+    "mouthPout": "Pout",
+    "mouthGrin": "Grin",
+    "mouthOpen": "Open",
+    "mouthAwe": "Awe",
+    "faceEars": "Ears",
+    "faceSmirk": "Smirk",
+    "eyeShape": "Eye Shape",
+    "eyeColor": "Eye Color",
+    "earShape": "Ear Shape",
+    "lashes": "Eyelashes",
+    "lashesOn": "On",
+    "lashesOff": "Off",
+    "lashColor": "Eyelash Color",
+    "outfit": "Outfit Color",
+    "outfitClassic": "Classic",
+    "outfitCrimson": "Crimson",
+    "outfitEmber": "Ember",
+    "outfitGold": "Gold",
+    "outfitForest": "Forest",
+    "outfitEmerald": "Emerald",
+    "outfitTeal": "Teal",
+    "outfitAzure": "Azure",
+    "outfitRoyal": "Royal Blue",
+    "outfitViolet": "Violet",
+    "outfitMagenta": "Magenta",
+    "outfitRose": "Rose",
+    "outfitOnyx": "Onyx",
+    "outfitIvory": "Ivory",
+    "outfitGilded": "Gilded",
+    "outfitBonewrought": "Bonewrought",
+    "outfitObsidian": "Obsidian",
+    "outfitVerdigris": "Verdigris",
+    "outfitBloodforged": "Bloodforged",
+    "lipstick": "Lipstick",
+    "blush": "Blush",
+    "eyeshadow": "Eyeshadow",
+    "makeupNone": "None",
+    "shadeRose": "Rose",
+    "shadeCoral": "Coral",
+    "shadeRuby": "Ruby",
+    "shadeBerry": "Berry",
+    "shadePlum": "Plum",
+    "shadeNude": "Nude",
+    "shadePeach": "Peach",
+    "shadeWarm": "Warm",
+    "shadeMauve": "Mauve",
+    "shadeSmoke": "Smoke",
+    "shadeBronze": "Bronze",
+    "shadeTeal": "Teal",
+    "randomize": "Randomize Look",
+    "randomizeShort": "Random",
+    "helmPreview": "Show Helmet",
+    "style": "Style",
+    "resetLook": "Reset Look",
+    "resetShort": "Reset",
+    "browFlat": "Flat",
+    "browArched": "Arched",
+    "browThin": "Thin",
+    "browBushy": "Bushy",
+    "browWorried": "Worried",
+    "browSharp": "Sharp",
+    "browRound": "Round",
+    "eyeRound": "Round",
+    "eyeAlmond": "Almond",
+    "eyeNarrow": "Narrow",
+    "eyeWide": "Wide",
+    "eyeSharp": "Sharp",
+    "eyeDroopy": "Droopy",
+    "eyeSleepy": "Sleepy",
+    "eyeWideset": "Wide-set",
+    "eyeCat": "Cat",
+    "eyeDoe": "Doe",
+    "earRound": "Round",
+    "earPointed": "Pointed",
+    "earSmall": "Small",
+    "earWide": "Wide",
+    "hairBald": "Bald",
+    "hairBuzz": "Buzz Cut",
+    "hairCrew": "Clipper Cut",
+    "hairCrewcut": "Textured Crew Cut",
+    "hairPixie": "Pixie Cut",
+    "hairSweptpixie": "Swept Pixie",
+    "hairQuiff": "Brushed-Up Quiff",
+    "hairSidepart": "Classic Side Part",
+    "hairMessy": "Messy Short Spikes",
+    "hairCurlycap": "Short Curly Cap",
+    "hairPompadour": "Short Pompadour",
+    "hairSweptback": "Medium Swept-Back",
+    "hairFauxhawk": "Faux Hawk",
+    "hairMohawk": "Full Mohawk",
+    "hairTopknot": "Top Knot",
+    "hairWarriorbraid": "Warrior Braid",
+    "hairHighbun": "High Bun",
+    "hairLowbun": "Low Bun",
+    "hairBraidcrown": "Braided Crown",
+    "hairAfro": "Rounded Afro",
+    "hairCurlyafro": "Curly Afro",
+    "hairChinbob": "Chin-Length Bob",
+    "hairBluntbangs": "Blunt Bangs Bob",
+    "hairWavybob": "Wavy Bob",
+    "hairAsymbob": "Asymmetric Bob",
+    "hairCurtains": "Curtain Middle Part",
+    "hairHighpony": "High Ponytail",
+    "hairSidepony": "Side Ponytail",
+    "hairHalfbun": "Half-Up Bun",
+    "hairLayered": "Shoulder-Length Layered",
+    "hairCurls": "Loose Curls",
+    "hairLongwavy": "Long Wavy",
+    "hairLongcenterpart": "Long Center Part",
+    "hairLongpart": "Long Straight Centre Part",
+    "hairMullet": "Chunky Mullet",
+    "hairTwinbraids": "Twin Braids",
+    "hairLowpony": "Low Ponytail",
+    "hairFantasybraid": "Fantasy Braid",
+    "beardNone": "None",
+    "beardStubble": "Stubble",
+    "beardScruff": "Scruff",
+    "beardMutton": "Mutton Chops",
+    "beardGoatee": "Goatee",
+    "beardChinpuff": "Chin Puff",
+    "beardStache": "Moustache",
+    "beardHorseshoe": "Horseshoe",
+    "beardShortbox": "Boxed",
+    "beardFull": "Full",
+    "beardVikingb": "Braided",
+    "beardWizard": "Wizard",
+    "beardStubbleBeard": "Heavy Stubble",
+    "browNone": "None",
+    "browSoft": "Soft",
+    "browThick": "Thick",
+    "browAngled": "Angled",
+    "earrings": "Earrings",
+    "jewelMaterial": "Jewellery Material",
+    "jewelDefault": "As Forged",
+    "jewelGold": "Gold",
+    "jewelSilver": "Silver",
+    "jewelBone": "Bone",
+    "jewelIron": "Iron",
+    "jewelCopper": "Copper",
+    "jewelBronze": "Bronze",
+    "jewelObsidian": "Obsidian",
+    "jewelJade": "Jade",
+    "jewelAmethyst": "Amethyst",
+    "jewelRuby": "Ruby",
+    "jewelPearl": "Pearl",
+    "jewelTurquoise": "Turquoise",
+    "earNone": "None",
+    "earStud": "Stud",
+    "earHoop": "Hoop",
+    "earBone": "Bone Charm",
+    "earBonehoop": "Bone Ring",
+    "earMoon": "Moon Crescent",
+    "earMoonstar": "Moonlit Star",
+    "earRunic": "Rune Stone",
+    "earChain": "Beaded Drop",
+    "earSeptum": "Nose Ring",
+    "earWarden": "Warden's Iron",
+    "earCuff": "Cuff",
+    "earFeather": "Feather",
     "class": "Class",
     "name": "Name",
     "chromaOption": "Chroma {n}",
@@ -5014,6 +5718,7 @@ export const en_CA: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "Holder perks are active. Connect the app when you need to sign or spend.",
     "extensionHelp": "Choose an installed browser wallet, or open Reown AppKit for Phantom, Solflare, Backpack, and more.",
     "mobileAppHelp": "Choose Phantom or Solflare. Your wallet app will ask for approval. Keep this game open and return to it when finished.",
+    "seekerAppHelp": "Continue with Seed Vault Wallet. Review the connection and verification requests in Seed Vault, then return to the game.",
     "standaloneAppHelp": "Wallet connections are not available in the Home Screen app yet. Open World of ClaudeCraft in Safari or Chrome to use Phantom or Solflare.",
     "openAppTitle": "Continue in {wallet}",
     "openAppHelp": "Open {wallet} to review this request. Keep this game tab open while the wallet app is active.",
@@ -5641,7 +6346,6 @@ export const en_CA: EnTranslations = {
   "yumi": {
     "bracket3": "Yumi 3v3",
     "bracket5": "Yumi 5v5",
-    "enterQueue": "Join Protect Yumi!",
     "queue": {
       "join": "You join the Protect Yumi queue. Guard your familiar…",
       "leave": "You leave the Protect Yumi queue.",
@@ -5679,9 +6383,6 @@ export const en_CA: EnTranslations = {
   },
   "fiesta": {
     "bracket": "Fiesta",
-    "enterQueue": "Join the Fiesta!",
-    "practice": "🎉 Practice vs Bots",
-    "practiceNote": "Offline practice: spawns 3 AI bots and queues you for a 2v2 Fiesta. Click again to stop.",
     "banner": {
       "wave": "WAVE {wave}/{total} — CHOOSE AN AUGMENT!",
       "augmentGained": "Augment gained: {name}!",
@@ -5746,6 +6447,7 @@ export const en_CA: EnTranslations = {
     },
     "augment": {
       "choose": "Choose an Augment",
+      "cardAria": "{name} ({category}) - {description}",
       "aug_brutality": {
         "name": "Brutality",
         "desc": "Your physical strikes hit 15% harder."
@@ -5937,10 +6639,16 @@ export const en_CA: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "Downloading update {version}...",
-      "ready": "Update {version} is ready. It installs when you quit, or restart now.",
+      "checkingTitle": "Checking for updates...",
+      "checkingBody": "New versions download while you play.",
+      "uptodateTitle": "You're up to date",
+      "downloadingTitle": "Downloading update {version}...",
+      "downloadingBody": "You can keep playing. It installs when you quit.",
+      "readyTitle": "Update {version} is ready",
+      "readyBody": "Restart to install now, or keep playing and it installs when you quit.",
       "restart": "Restart now",
-      "later": "Later"
+      "later": "Later",
+      "dismiss": "Dismiss"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -6128,11 +6836,12 @@ export const en_CA: EnTranslations = {
       "releaseSpirit": "Release Spirit",
       "chatTab": "Chat",
       "combatLogTab": "Combat Log",
-      "chatPlaceholder": "Say something... (/s say, /w name whisper, /r reply, /p party, /gu guild, /o officer, /general general, /help)",
+      "chatPlaceholder": "Say something... (/s say, /w name whisper, /r reply, /p party, /gu guild, /o officer, /general general, /help, ! for community commands)",
       "chatChannels": {
         "add": "Add chat channel",
         "addTitle": "Add channel",
         "close": "Close {channel} tab",
+        "moveHint": "Reorder {channel} tab: drag it, or use Alt+Left and Alt+Right",
         "sendingTo": "Message {channel}",
         "names": {
           "say": "Say",
@@ -6155,7 +6864,6 @@ export const en_CA: EnTranslations = {
       "mobileMore": "More",
       "mobileMoreAria": "Show more menus",
       "mobileSocial": "Social",
-      "mobileArena": "Arena",
       "mobileMenu": "Menu",
       "mobileSettings": "Settings",
       "mobileUse": "Interact",
@@ -6189,11 +6897,15 @@ export const en_CA: EnTranslations = {
       "graphicsPresetMedium": "Medium",
       "graphicsPresetHigh": "High",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Insane",
       "graphicsPresetAdvanced": "Advanced",
       "terrainDetail": "Terrain Detail",
       "foliageDensity": "Foliage Density",
       "effectsQuality": "Effects & Lighting",
       "shadowQuality": "Shadow Quality",
+      "surfaceDetail": "Surface Detail",
+      "surfaceDetailBasic": "Basic",
+      "surfaceDetailFull": "Full",
       "terrainLow": "Low",
       "terrainHigh": "High",
       "touchOpacity": "Touch Controls Opacity",
@@ -6268,7 +6980,7 @@ export const en_CA: EnTranslations = {
         "nameplates": "Toggle Nameplates",
         "meters": "Damage Meters",
         "social": "Friends & Guild",
-        "arena": "Arena (Ashen Coliseum)",
+        "arena": "PvP (Thornhollow Fields and Arenas)",
         "chat": "Open Chat",
         "attack": "Attack",
         "actionBarSlot": "Action Bar {slot}"
@@ -6357,6 +7069,8 @@ export const en_CA: EnTranslations = {
       "joinParty": "Join Party",
       "guildInvite": "{name} invites you to join {guild}.",
       "joinGuild": "Join Guild",
+      "guildInviteCancelled": "A pending guild invitation was cancelled because the guild was renamed.",
+      "guildRenamed": "Your guild has been renamed to {name} by the moderation team.",
       "tradeRequest": "{name} wants to trade with you.",
       "openTrade": "Open Trade",
       "duelRequest": "{name} has challenged you to a duel!",
@@ -6370,6 +7084,10 @@ export const en_CA: EnTranslations = {
       "floatingDodge": "Dodge",
       "floatingParry": "Parry",
       "floatingResist": "Resist",
+      "floatingEvade": "Evade",
+      "floatingBlock": "{amount} Block",
+      "floatingHealFull": "Full",
+      "floatingHealAbsorbed": "Absorbed",
       "cannotMove": "Can't move!",
       "attack": "attack",
       "damageDone": "Your {ability} hits {target} for {amount}.",
@@ -6380,10 +7098,17 @@ export const en_CA: EnTranslations = {
       "dodged": "Your {ability} is dodged by {target}.",
       "parried": "Your {ability} is parried by {target}.",
       "resisted": "Your {ability} is resisted by {target}.",
+      "evaded": "Your {ability} is evaded by {target}.",
+      "blockedDone": "Your {ability} is blocked by {target}, dealing {amount}.",
+      "blockedTaken": "You block {source}'s attack, taking {amount}.",
       "healSelf": "Your {ability} heals you for {amount}.",
       "healSelfCrit": "Your {ability} critically heals you for {amount}.",
       "healOther": "Your {ability} heals {target} for {amount}.",
       "healOtherCrit": "Your {ability} critically heals {target} for {amount}.",
+      "healSelfFull": "Your {ability} lands, but you are already at full health.",
+      "healOtherFull": "Your {ability} lands on {target}, but they are already at full health.",
+      "healSelfAbsorbed": "Your {ability} is devoured by the blight on you.",
+      "healOtherAbsorbed": "Your {ability} is devoured by the blight on {target}.",
       "death": "{name} dies.",
       "auraGain": "You gain {name}.",
       "auraFade": "{name} fades from you.",
@@ -6392,6 +7117,11 @@ export const en_CA: EnTranslations = {
     },
     "system": {
       "playerDeath": "You have died.",
+      "deathRecapKillerAbility": "You have died. Slain by {killer}'s {ability}.",
+      "deathRecapKiller": "You have died. Slain by {killer}.",
+      "deathRecapAbility": "You have died. Slain by {ability}.",
+      "deathRecapFalling": "You have died. You fell to your death.",
+      "deathRecapDrowned": "You have died. You drowned.",
       "respawn": "You feel rested and whole again.",
       "ignoringChat": "Ignoring chat from {name}.",
       "noLongerIgnoring": "No longer ignoring {name}.",
@@ -6472,10 +7202,12 @@ export const en_CA: EnTranslations = {
       "arenaQueueTrading": "Finish your trade before queueing.",
       "arenaQueueInstance": "You cannot queue from inside an instance.",
       "tradeInProgress": "A trade is already in progress.",
+      "tradeAlreadyTrading": "That player is already trading.",
       "tradeTooFar": "Target is too far away to trade.",
       "tradeExpired": "The trade request has expired.",
       "tradeFailed": "Trade failed: items or money no longer available.",
-      "tradeBound": "That item is bound and cannot be traded."
+      "tradeBound": "That item is bound and cannot be traded.",
+      "marketListBound": "That item is bound and cannot be listed."
     },
     "logs": {
       "standUp": "You stand up.",
@@ -6635,6 +7367,10 @@ export const en_CA: EnTranslations = {
         "officer": "Officer",
         "member": "Member"
       },
+      "tenure": {
+        "recruit": "Recruit",
+        "veteran": "Veteran"
+      },
       "guildHeadOne": "you are {rank}, {count} member",
       "guildHeadMany": "you are {rank}, {count} members"
     },
@@ -6741,6 +7477,11 @@ export const en_CA: EnTranslations = {
     "cast": {
       "fishing": "Fishing",
       "gathering": "Gathering",
+      "crafting": "Crafting",
+      "disenchanting": "Disenchanting",
+      "enchanting_apply": "Enchanting",
+      "salvaging": "Salvaging",
+      "tool_recharge": "Recharging",
       "demonHeal": "Demon Heal",
       "thunzharrStormcall": "Stormcall",
       "rift_frost_execution": "Glacial Grave",
@@ -6766,7 +7507,8 @@ export const en_CA: EnTranslations = {
       "title": "Quests",
       "complete": "Complete",
       "showOnMap": "Show {name} on the map",
-      "hideFromMap": "Hide {name} from the map"
+      "hideFromMap": "Hide {name} from the map",
+      "unknownQuest": "Unknown quest ({id})"
     },
     "log": {
       "title": "Quest Log",
@@ -6778,6 +7520,8 @@ export const en_CA: EnTranslations = {
       "activeStatus": "Active",
       "readyStatus": "Complete",
       "completedStatus": "Completed",
+      "repeatableStatus": "Repeatable",
+      "cooldownStatus": "Available again soon",
       "returnTo": "Return to {name}",
       "abandon": "Abandon Quest",
       "abandonConfirmTitle": "Abandon Quest",
@@ -6791,6 +7535,7 @@ export const en_CA: EnTranslations = {
       "greetingFallback": "Greetings.",
       "availableQuestAria": "Available quest: {name}",
       "readyQuestAria": "Quest ready to turn in: {name}",
+      "repeatableQuestAria": "Repeatable quest: {name}",
       "discussQuest": "Discuss {name}.",
       "discussQuestAria": "Discuss quest: {name}",
       "profIntroHint": "See {name} for \"{quest}\".",
@@ -6831,7 +7576,8 @@ export const en_CA: EnTranslations = {
       "incomplete": "That quest is not complete.",
       "giverMissing": "That quest giver is not nearby.",
       "turnInMissing": "That quest turn-in is not nearby.",
-      "tooFar": "Too far away."
+      "tooFar": "Too far away.",
+      "escortAway": "Your escort is not at their post right now. They will return there shortly."
     }
   },
   "itemUi": {
@@ -6870,6 +7616,8 @@ export const en_CA: EnTranslations = {
       "armor": "Armour",
       "quest": "Quest Item",
       "junk": "Junk",
+      "fineMaterial": "Fine Material",
+      "material": "Material",
       "food": "Food",
       "drink": "Drink",
       "tool": "Tool",
@@ -6901,8 +7649,14 @@ export const en_CA: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Use: Restores {amount} health over {seconds} sec. Must remain seated while eating.",
       "useDrink": "Use: Restores {amount} mana over {seconds} sec. Must remain seated while drinking.",
+      "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Usable in combat.",
+      "useElixirAura": "Use: Grants {aura} for {minutes} min. Usable in combat.",
       "questItem": "Quest Item",
+      "questRelated": "Quest: {quest}",
+      "questRules": "Cannot be sold, banked, or traded.",
+      "questOrphaned": "Not needed for any active quest.",
       "classes": "Classes: {classes}",
+      "maxStack": "Max stack: {count}",
       "sellPrice": "Sell price: {money}",
       "clickBuy": "Click to buy",
       "clickSell": "Click to sell",
@@ -6929,7 +7683,13 @@ export const en_CA: EnTranslations = {
       "stackCount": "x{count}",
       "destroyTitle": "Destroy {item}",
       "destroyConfirm": "Destroy",
-      "destroyCancel": "Cancel"
+      "destroyCancel": "Cancel",
+      "unknownItem": "Unknown item",
+      "unknownItemAria": "Unknown item {id}, quantity {count}",
+      "unknownItemAriaMasterwork": "Unknown item {id}, quantity {count}, masterwork",
+      "unknownItemAriaEnchanted": "Unknown item {id}, quantity {count}, enchanted copy",
+      "unknownItemAriaBound": "Unknown item {id}, quantity {count}, bound copy",
+      "unknownItemAriaInstanced": "Unknown item {id}, quantity {count}, maker-marked copy"
     },
     "equipment": {
       "empty": "Empty",
@@ -6940,6 +7700,19 @@ export const en_CA: EnTranslations = {
       "close": "Close vendor",
       "hint": "Click an item in your bags to sell it while this window is open.",
       "buyAria": "Buy {item} for {price}",
+      "buyAriaWithRequirement": "Buy {item} for {price}. {requirement}",
+      "buyStack": "Buy {count}",
+      "buyStackAria": "Buy {count} {item} for {price}",
+      "qtyRowAria": "Purchase quantity",
+      "qtyMultiple": "{count}x",
+      "qtyMultipleAria": "Buy {count} at a time",
+      "qtyCustom": "Custom",
+      "qtyCustomAria": "Choose a custom amount to buy",
+      "buyCountAria": "Buy {count} of {item} for {price}",
+      "buyCountAriaWithRequirement": "Buy {count} of {item} for {price}. {requirement}",
+      "buyQuantityTitle": "Buy how many {item}? Up to {max}.",
+      "buyQuantityInput": "Quantity to buy",
+      "buyQuantityConfirm": "Buy",
       "buybackTitle": "Buyback",
       "buybackEmpty": "No items",
       "buybackAria": "Buy back {item} for {price}",
@@ -7018,6 +7791,12 @@ export const en_CA: EnTranslations = {
       "reclaim": "Reclaim",
       "buyAria": "Buy {item} for {price}",
       "reclaimAria": "Reclaim {item}",
+      "buyConfirmTitle": "Confirm Purchase",
+      "buyConfirmBody": "Buy {item} for {price}?",
+      "buyConfirmBodyStack": "Buy {item} x{count} for {price} ({each} each)?",
+      "buyConfirmAccept": "Buy",
+      "buyConfirmCancel": "Cancel",
+      "buyChanged": "That listing changed before you confirmed. Check the price and try again.",
       "sellNote": "List goods from your bags. The Merchant takes a {cut}% cut when an item sells. You are using {used}/{max} listing slots.",
       "sellPickEmpty": "Click an item in your bags to choose what to sell.",
       "quantity": "Quantity",
@@ -7028,6 +7807,8 @@ export const en_CA: EnTranslations = {
       "collectEmpty": "Nothing waiting. Sale proceeds and expired listings collect here.",
       "collectNote": "Earnings and returned goods the Merchant is holding for you.",
       "saleProceeds": "Sale proceeds",
+      "saleBuyer": "Sold to {buyer}",
+      "saleOlder": "Plus {count} earlier sales, included in the total.",
       "collectAll": "Collect All"
     },
     "logs": {
@@ -7219,7 +8000,7 @@ export const en_CA: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Greater Invisibility",
-        "description": "Vanish for 20 sec: removes 2 damage-over-time effects and you take 90% less damage while invisible and shortly after. (Mage talent)"
+        "description": "Vanish for 20 sec and remove 2 damage-over-time effects. When the invisibility ends, take 90% less damage for 2 sec. (Mage talent)"
       },
       "hot_streak": {
         "name": "Hot Streak",
@@ -8505,6 +9286,18 @@ export const en_CA: EnTranslations = {
       "fen_muster_order": {
         "name": "Fenbridge Muster Order"
       },
+      "firebottle": {
+        "name": "Firebottle"
+      },
+      "murloc_hut": {
+        "name": "Mudfin Hut"
+      },
+      "restless_skull": {
+        "name": "Restless Skull"
+      },
+      "vanguard_bone": {
+        "name": "Vanguard Bone"
+      },
       "mire_prowler_pelt": {
         "name": "Mire Prowler Pelt"
       },
@@ -9030,6 +9823,27 @@ export const en_CA: EnTranslations = {
       "cinderweave_slippers": {
         "name": "Cinderweave Slippers"
       },
+      "thornhide_headdress": {
+        "name": "Thornhide Headdress"
+      },
+      "thornhide_mantle": {
+        "name": "Thornhide Mantle"
+      },
+      "thornhide_vestment": {
+        "name": "Thornhide Vestment"
+      },
+      "thornhide_cinch": {
+        "name": "Thornhide Cinch"
+      },
+      "thornhide_leggings": {
+        "name": "Thornhide Leggings"
+      },
+      "thornhide_gloves": {
+        "name": "Thornhide Gloves"
+      },
+      "thornhide_boots": {
+        "name": "Thornhide Boots"
+      },
       "final_oath_medallion": {
         "name": "Medallion of the Final Oath"
       },
@@ -9420,6 +10234,39 @@ export const en_CA: EnTranslations = {
       "resonant_timber": {
         "name": "Resonant Timber"
       },
+      "fine_copper_ore": {
+        "name": "Fine Copper Ore"
+      },
+      "fine_iron_ore": {
+        "name": "Fine Iron Ore"
+      },
+      "fine_thorium_ore": {
+        "name": "Fine Osmium Ore"
+      },
+      "fine_ironbark_log": {
+        "name": "Fine Ironbark Log"
+      },
+      "fine_ashwood_log": {
+        "name": "Fine Ashwood Log"
+      },
+      "fine_elderwood_log": {
+        "name": "Fine Highpine Log"
+      },
+      "fine_silverleaf_herb": {
+        "name": "Fine Sheenleaf Herb"
+      },
+      "fine_goldleaf_herb": {
+        "name": "Fine Goldleaf Herb"
+      },
+      "fine_sunpetal_herb": {
+        "name": "Fine Sunpetal Herb"
+      },
+      "stormreel_fishing_rod": {
+        "name": "Stormreel Fishing Rod"
+      },
+      "tidewrought_fishing_rod": {
+        "name": "Tidewrought Fishing Rod"
+      },
       "duskwisp_essence": {
         "name": "Duskwisp Essence"
       },
@@ -9557,6 +10404,18 @@ export const en_CA: EnTranslations = {
       },
       "wildheart_fangknife": {
         "name": "Fangknife of Zulgar"
+      },
+      "fanglords_beastspear": {
+        "name": "Fanglord's Beastspear"
+      },
+      "bloodmane_warleggings": {
+        "name": "Bloodmane Warleggings"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Vineclaw Stalking Breeches"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Sunbone Ritual Sarong"
       },
       "thick_winter_pelt": {
         "name": "Thick Winter Pelt"
@@ -9725,6 +10584,39 @@ export const en_CA: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Signet of the Last Keep"
+      },
+      "gatherers_cache": {
+        "name": "Gatherer's Cache"
+      },
+      "artisans_eye": {
+        "name": "Artisan's Eye"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "Ignition Key: Terrorspark Groundshaker"
+      },
+      "reins_drakemaw_raptor": {
+        "name": "Reins of the Drakemaw Raptor"
+      },
+      "moggers_hide_quiver": {
+        "name": "Mogger's Hide Quiver"
+      },
+      "cragmaw_huntquiver": {
+        "name": "Cragmaw Huntquiver"
+      },
+      "gravewyrm_bone_quiver": {
+        "name": "Gravewyrm Bone Quiver"
+      },
+      "direfang_quiver": {
+        "name": "Direfang Quiver"
+      },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Conjured Springwater"
@@ -10302,6 +11194,24 @@ export const en_CA: EnTranslations = {
       "wyrmchoir_handwraps": {
         "name": "Wyrmchoir Handwraps"
       },
+      "basin_stalkers_tunic": {
+        "name": "Basin Stalker's Tunic"
+      },
+      "verdant_heart_vestment": {
+        "name": "Verdant-Heart Vestment"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Sunbone Ritual Hauberk"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Greatfang of the Basin"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Sunbone Oracle's Crown"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Bloodmane War-Legguards"
+      },
       "deathless_greatblade": {
         "name": "Deathless Greatblade"
       },
@@ -10703,6 +11613,21 @@ export const en_CA: EnTranslations = {
       "spider_egg_sac": {
         "name": "Spider Egg-Sac"
       },
+      "spider_egg": {
+        "name": "Broodmother Egg"
+      },
+      "widow_hatchling": {
+        "name": "Widow Hatchling"
+      },
+      "drowned_warlord": {
+        "name": "The Drowned Warlord"
+      },
+      "brakka_wallbreaker": {
+        "name": "Brakka the Wallbreaker"
+      },
+      "threnos_first_voice": {
+        "name": "Threnos the First Voice"
+      },
       "grave_silt_bulwark": {
         "name": "Grave-Silt Bulwark"
       },
@@ -10882,6 +11807,18 @@ export const en_CA: EnTranslations = {
       },
       "cindraleth_maw_matriarch": {
         "name": "Cindraleth the Maw Matriarch"
+      },
+      "dragonkin_egg": {
+        "name": "Dragonkin Egg"
+      },
+      "dragonkin_whelp": {
+        "name": "Dragonkin Whelp"
+      },
+      "dragonkin_broodguard": {
+        "name": "Dragonkin Broodguard"
+      },
+      "drakemaw_broodlord": {
+        "name": "Drakemaw Broodlord"
       },
       "gilded_stag": {
         "name": "Gilded Stag"
@@ -11272,6 +12209,11 @@ export const en_CA: EnTranslations = {
         "title": "Honor Quartermaster",
         "greeting": "The sands remember every victory. Spend your honor well."
       },
+      "warmarshal_draven_kole": {
+        "name": "Warmarshal Draven Kole",
+        "title": "Master of the Warfare Stores",
+        "greeting": "Honor is the only coin I take, and the Warfare stores are mine to guard. Earn your rank on the field and I will armor you for the next one."
+      },
       "loremaster_caddis": {
         "name": "Loremaster Caddis",
         "title": "Loremaster",
@@ -11636,7 +12578,7 @@ export const en_CA: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "A Trade for Every Hand",
-        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There are ore veins in the rocks around the Copper Dig, southwest of town. Go swing a pick and work 5 of them yourself, mind; I'll know the difference.",
+        "text": "Every soul in Eastbrook works a trade besides the sword, {playerName}. There are ore veins in the rocks around the Copper Dig, southeast of town. Go swing a pick and work 5 of them yourself, mind; I'll know the difference.",
         "completion": "See? Ore gathered and callus on your hands. Keep at the mining, logging, and herb-picking as you travel the roads, and when you're back in town, mind the Town Focus board by the market and the crafting bench nearby. There's a fair trade waiting in all of it, if you want it.",
         "objectives": {
           "0": {
@@ -11709,17 +12651,17 @@ export const en_CA: EnTranslations = {
       },
       "q_bones": {
         "title": "The Restless Dead",
-        "text": "The old ruin on the northwest hill was a chapel once, and its yard a resting place. Something has stirred the dead from their sleep. Grant them peace, {playerName} - return 8 Restless Bones to the earth.",
+        "text": "The old ruin on the northwest hill was a chapel once, and its yard a resting place. Something has stirred the dead from their sleep. Put them down and bring me a skull from each you lay to rest, {playerName}, eight in all, so I may speak the rites over them and grant the peace they were denied.",
         "completion": "May they rest now, and may the Light forgive whatever woke them.",
         "objectives": {
           "0": {
-            "label": "Restless Bones laid to rest"
+            "label": "Restless Skulls recovered"
           }
         }
       },
       "q_supplies": {
         "title": "Stolen Supplies",
-        "text": "Those bandits hit my last wagon and made off with four crates of goods - tools, salt, good Eastbrook linen. The crates are stacked around their camp in the southeast hills. Steal them back for me, would you?",
+        "text": "Those bandits hit my last wagon and made off with four crates of goods: tools, salt, good Eastbrook linen. The crates are stacked around their camp in the southwest hills. Steal them back for me, would you?",
         "completion": "My crates! Barely a scratch on them. You are a wonder.",
         "objectives": {
           "0": {
@@ -11892,11 +12834,11 @@ export const en_CA: EnTranslations = {
       },
       "q_deepfen_purge": {
         "title": "Back to the Shallows",
-        "text": "Aldric says those idols are cult-make - which means the mudfins are hauling the marsh's old evil up one armful at a time. I will not have it washing onto my causeway. Go back to the shallows and break the dredging for good: 14 more snappers.",
+        "text": "Aldric says those idols are cult-make, which means the mudfins are hauling the marsh's old evil up one armful at a time, and it all funnels through their reed-huts on the shallows. I will not have it washing onto my causeway. Take this firebottle, get right up against each hut, and burn the lot. Five should break their dredging for good.",
         "completion": "Ruthless and thorough. If this marsh ever dries out, there's warden's work waiting for you.",
         "objectives": {
           "0": {
-            "label": "Deepfen Snapper slain"
+            "label": "Mudfin huts burned"
           }
         }
       },
@@ -11915,11 +12857,11 @@ export const en_CA: EnTranslations = {
       },
       "q_broodmother": {
         "title": "The Broodmother",
-        "text": "You have seen the webs - now ask yourself what spins cables thick as a man's wrist. The wardens call her the Broodmother, and her clutch hangs over Widow Thicket like a second canopy. Burn through 8 more widows and put the old mother down before that clutch opens.",
+        "text": "You have seen the webs, now ask yourself what spins cables thick as a man's wrist. The wardens call her the Broodmother, and her clutch hangs over Widow Thicket like a second canopy. Smash 8 of her eggs and put the old mother down before the rest can hatch. Mind the clutch, some eggs will not go quietly.",
         "completion": "Dead? Truly dead? Then the thicket is just trees again. The Light bless your blade, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Mirefen Widow slain"
+            "label": "Broodmother eggs destroyed"
           },
           "1": {
             "label": "The Broodmother slain"
@@ -11948,11 +12890,11 @@ export const en_CA: EnTranslations = {
       },
       "q_no_rest": {
         "title": "No Rest in the Reeds",
-        "text": "The rite on those censers binds the drowned to rise wherever the marsh touches them - and the marsh touches everything. There will be no rest in these reeds until the dead outnumber the living. We cannot unmake the rite yet, but we can empty it of soldiers. Lay 14 more of the Drowned Dead to rest.",
-        "completion": "You give the dead more mercy than their masters ever did. Take this - you have more than earned it.",
+        "text": "The rite on those censers binds the drowned to rise, and now it has raised one strong enough to lead them. The wardens call him the Drowned Warlord, and while he holds the Drowned Chapel the dead keep their ranks. Break him, {playerName}, and the rest will scatter back into the mire.",
+        "completion": "You give the dead more mercy than their masters ever did. Take this, you have more than earned it.",
         "objectives": {
           "0": {
-            "label": "Drowned Dead laid to rest"
+            "label": "The Drowned Warlord slain"
           }
         }
       },
@@ -12101,7 +13043,7 @@ export const en_CA: EnTranslations = {
       },
       "q_old_cragmaw": {
         "title": "Old Cragmaw",
-        "text": "The mountain folk put a name to the prints my scout found: Old Cragmaw, a scar-pelted tyrant of a cat that has outlived three generations of its own pack. It is the reason the stalkers flood my road, {playerName}. Its den sits on the western ridge above the road south. Bring a friend, and put the old devil down.",
+        "text": "The mountain folk put a name to the prints my scout found: Old Cragmaw, a scar-pelted tyrant of a cat that has outlived three generations of its own pack. It is the reason the stalkers flood my road, {playerName}. Its den sits on the eastern ridge above the road south. Bring a friend, and put the old devil down.",
         "completion": "Down at last. The mountain folk swore that cat would outlive the wall itself. The stalkers will keep to their high snows now, {playerName}, and my patrols will walk the road without bleeding for it. The whole ridge is quieter for your work.",
         "objectives": {
           "0": {
@@ -12151,11 +13093,11 @@ export const en_CA: EnTranslations = {
       },
       "q_ogre_bounty": {
         "title": "The Captain's Bounty",
-        "text": "Maren's totems tell me all I need to know: the clans are bought, and my wall is their first errand. I will not wait for them to muster. Fourteen more Thornpeak Ogres, {playerName} - and I will pay bounty on every one.",
+        "text": "Maren's totems name the hand that bought the clans: an ogre they call Brakka the Wallbreaker, and he is mustering the rest against my gate. Cut off the head and the clans scatter. Bring me Brakka, {playerName}, and Highwatch will pay a captain's bounty.",
         "completion": "Bounty paid in full. The foothills are quieter - now we deal with the ones doing the buying.",
         "objectives": {
           "0": {
-            "label": "Thornpeak Ogre slain"
+            "label": "Brakka the Wallbreaker slain"
           }
         }
       },
@@ -12221,26 +13163,20 @@ export const en_CA: EnTranslations = {
       },
       "q_cult_orders": {
         "title": "Orders from Below",
-        "text": "The zealots move with purpose now - watches set, supplies counted, like soldiers before a siege. Cultists who organize are cultists taking orders, {playerName}. Kill eight more and bring me four sets of their written orders. I would know the hand that commands them.",
+        "text": "The zealots move with purpose now, watches set and supplies counted, like soldiers before a siege. Cultists who organize are cultists taking orders, {playerName}. One of them is carrying written orders from below. Find the zealot who has them and bring the orders to me: I would know the hand that commands them.",
         "completion": "This script... I last saw its like in Morthen's grimoire, in Eastbrook. The same hand has guided every grave we have fought over, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Wyrmcult Zealot slain"
-          },
-          "1": {
-            "label": "Wyrmcult Orders"
+            "label": "Orders from Below"
           }
         }
       },
       "q_necromancers": {
         "title": "The Phylactery Ring",
-        "text": "The orders speak of a \"ring of phylacteries\" - soul-vessels, {playerName}, set about the Sanctum to feed it. The cult's necromancers carry them like holy relics. Kill eight necromancers and bring me three phylacteries unbroken. I must know what souls they hold.",
+        "text": "The orders speak of a \"ring of phylacteries\", soul-vessels, {playerName}, set about the Sanctum to feed it. The cult's necromancers carry them like holy relics. Take five phylacteries from them, unbroken, and bring them to me. I must know what souls they hold.",
         "completion": "Light forgive us. These hold the dead of the Vale and the fen - every corpse the Gravecallers ever raised, harvested. They were never building an army, {playerName}. They were gathering a tithe.",
         "objectives": {
           "0": {
-            "label": "Wyrmcult Necromancer slain"
-          },
-          "1": {
             "label": "Ritual Phylactery"
           }
         }
@@ -12257,11 +13193,11 @@ export const en_CA: EnTranslations = {
       },
       "q_revenant_vanguard": {
         "title": "Bones of the Vanguard",
-        "text": "The revenants are forming ranks, {playerName} - true ranks, shield-lines and columns, drilling with no drummer. They are being mustered for the Sanctum gate. Break fourteen more before that march begins, and Highwatch will owe you its best steel.",
+        "text": "The revenants are forming ranks, {playerName}, true ranks, shield-lines and columns, drilling with no drummer. Break their vanguard and bring me ten of their bones, so the smiths can read how they were bound. Do it before the march begins, and Highwatch will owe you its best steel.",
         "completion": "The fields lie still again. Take this - it was made for the defenders of the wall, and no one has earned it more.",
         "objectives": {
           "0": {
-            "label": "Boneclad Revenant slain"
+            "label": "Vanguard Bone recovered"
           }
         }
       },
@@ -12287,11 +13223,11 @@ export const en_CA: EnTranslations = {
       },
       "q_voice_below": {
         "title": "The Voice Below",
-        "text": "Last night the whole cult camp knelt at once, {playerName} - every zealot, every necromancer, all facing the Sanctum. Korzul speaks to them in their sleep now; Vael heard the same voice in the fen, and Morthen before him. Cut the congregation down - ten zealots, six necromancers - before that voice has hands enough to pull the gate open itself.",
-        "completion": "The kneeling has stopped. We have not silenced the voice, {playerName} - only thinned its choir. It must be enough.",
+        "text": "Last night the whole cult camp knelt at once, {playerName}, every zealot and necromancer facing the Sanctum, and one throat led the chant. They call him Threnos, the First Voice, and Korzul speaks through his mouth. Vael heard the same voice in the fen, and Morthen before him. Silence Threnos and cut down the six necromancers who keep his choir, before that voice has hands enough to pull the gate open itself.",
+        "completion": "Threnos is silent, and the kneeling has stopped, {playerName}. We have not ended the voice below, only taken from it the mouth that carried it. It must be enough.",
         "objectives": {
           "0": {
-            "label": "Wyrmcult Zealot slain"
+            "label": "Threnos the First Voice silenced"
           },
           "1": {
             "label": "Wyrmcult Necromancer slain"
@@ -12340,7 +13276,7 @@ export const en_CA: EnTranslations = {
       },
       "q_the_codfather": {
         "title": "The Codfather",
-        "text": "The Codfather isn't just a fish, {playerName}, he's a cold-blooded killer. Old-timers swear he eats Mire Prowlers for breakfast, and even the Mirefen Widows won't spin their webs near the Deepfen Shallows out of sheer terror. He rules those waters. Grab a fishing pole, drag that old devil out of his waters, and I will admit you have joined the family.",
+        "text": "The Codfather isn't just a fish, {playerName}, he's a cold-blooded killer. Old-timers swear he eats Mire Prowlers for breakfast, and even the Mirefen Widows won't spin their webs near the Deepfen Shallows out of sheer terror. He rules those waters, and marsh water takes an Ironreel Fishing Rod, no less; my counter sells them. Get one in hand, drag that old devil out of his waters, and I will admit you have joined the family.",
         "completion": "By the damp saints... The Codfather himself. Look at those whiskers. Fenbridge will eat stories off this catch for a year, {playerName}.",
         "objectives": {
           "0": {
@@ -12360,7 +13296,7 @@ export const en_CA: EnTranslations = {
       },
       "q_nythraxis_graves": {
         "title": "Graves of the Forgotten",
-        "text": "I have seen these marks before, on three old graves around the northern battlefield. Captain Aldren lies on the eastern rise, High Priest Malric near the central broken road, and Royal Assassin Voss by the western cliff. Touch each grave and listen, {playerName}. The dead may remember what the living forgot.",
+        "text": "I have seen these marks before, on three old graves around the northern battlefield. Captain Aldren lies on the western rise, High Priest Malric further south along the western edge, and Royal Assassin Voss by the eastern cliff. Touch each grave and listen, {playerName}. The dead may remember what the living forgot.",
         "completion": "Aldren remained loyal, Malric refused to accept death, and Voss saw the danger before anyone else. All three served the same forgotten king.",
         "objectives": {
           "0": {
@@ -12376,7 +13312,7 @@ export const en_CA: EnTranslations = {
       },
       "q_nythraxis_sealed_crypt": {
         "title": "The Abandoned Crypt",
-        "text": "The visions point to the abandoned crypt in the western cliff. There is an old legend that the crypt housed a king. Perhaps Thornpeak sealed him below after Malric's ritual twisted him into something deathless. Enter the crypt and see what remains inside.",
+        "text": "The visions point to the abandoned crypt in the eastern cliff. There is an old legend that the crypt housed a king. Perhaps Thornpeak sealed him below after Malric's ritual twisted him into something deathless. Enter the crypt and see what remains inside.",
         "completion": "The keystone halves fit together, and Voss's diary names what they sealed: the signet of King Nythraxis. If the diary is true, that signet is the key to his tomb.",
         "objectives": {
           "0": {
@@ -12418,7 +13354,7 @@ export const en_CA: EnTranslations = {
       },
       "q_mogger": {
         "title": "Mogger Must Fall",
-        "text": "Mogger has split carts, flattened fences, and killed enough livestock to empty half the Vale. Do not face him alone. Take two strong companions into the eastern meadow and put the brute down for good.",
+        "text": "Mogger has split carts, flattened fences, and killed enough livestock to empty half the Vale. Do not face him alone. Take two strong companions into the western meadow and put the brute down for good.",
         "completion": "Mogger is dead at last. Eastbrook's fields are safer, and you leave the Vale with one more tale worth retelling.",
         "objectives": {
           "0": {
@@ -12438,11 +13374,11 @@ export const en_CA: EnTranslations = {
       },
       "q_prof_attune_outfitter": {
         "title": "The Outfitter's Measure",
-        "text": "Measure the cost before you cut, that is the first rule at my loom. Choose me and Leatherworking and Tailoring become your two majors, the pair you may carry beyond rare work; the craft opposite them settles in as your hobby, taken to rare and left there. The trades you set aside are not unravelled, {playerName}, only folded away, dormant until you take them up again. Be certain, though: should you leave this pair and later want it back, the way home is paid in labor that lengthens each time, five culled at first, then eight, then eleven, always a little more. If your mind is made, cull four webwood spiders and bring their silk to the loom, for good thread starts every good garment.",
+        "text": "Measure the cost before you cut, that is the first rule at my loom. Choose me and Leatherworking and Tailoring become your two majors, the pair you may carry beyond rare work; the craft opposite them settles in as your hobby, taken to rare and left there. The trades you set aside are not unravelled, {playerName}, only folded away, dormant until you take them up again. Be certain, though: should you leave this pair and later want it back, the way home is paid in labor that lengthens each time, five culled at first, then eight, then eleven, always a little more. If your mind is made, cull four Sableweb Lurkers and bring their silk to the loom, for good thread starts every good garment.",
         "completion": "Even thread, even hand. Leatherworking and Tailoring are yours to carry as far as your skill will reach. Measure twice, and they will not fail you.",
         "objectives": {
           "0": {
-            "label": "Webwood Spider culled"
+            "label": "Sableweb Lurker culled"
           }
         }
       },
@@ -12478,17 +13414,17 @@ export const en_CA: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "Threads Rejoined",
-        "text": "Back at my loom after all. I hold no grudge, {playerName}, but the thread remembers a hand that let it go, and the cost of taking it up again is measured out longer each time. Cull the webwood spiders crowding the western woods, and the labor will settle your hands before they touch good silk again.",
+        "text": "Back at my loom after all. I hold no grudge, {playerName}, but the thread remembers a hand that let it go, and the cost of taking it up again is measured out longer each time. Cull the Sableweb Lurkers crowding the eastern woods, and the labor will settle your hands before they touch good silk again.",
         "completion": "Steady again. Leatherworking and Tailoring return to your hands as majors. Measure twice this time before you wander.",
         "objectives": {
           "0": {
-            "label": "Webwood Spider culled"
+            "label": "Sableweb Lurker culled"
           }
         }
       },
       "q_prof_amends_apothecary": {
         "title": "Back on the Stove",
-        "text": "Well, look who is back at my pot. No hard feelings, {playerName}, a kitchen always has room, but you know the tab runs longer every time you walk out on it. Go thin the wild boars in the east meadow, because honest sweat is the first ingredient, and it will remind your hands of the work.",
+        "text": "Well, look who is back at my pot. No hard feelings, {playerName}, a kitchen always has room, but you know the tab runs longer every time you walk out on it. Go thin the wild boars in the west meadow, because honest sweat is the first ingredient, and it will remind your hands of the work.",
         "completion": "There is the old flavor. Alchemy and Cooking are back on your stove as majors. Stay a while this time.",
         "objectives": {
           "0": {
@@ -12498,11 +13434,11 @@ export const en_CA: EnTranslations = {
       },
       "q_prof_amends_bombardier": {
         "title": "The Ledger Grows",
-        "text": "You came BACK, ha, they always come back, the loud stuff has a pull, yes? No sulking from me, {playerName}, but the ledger, oh the ledger, it grows every time you skip out, more each return, that is only fair. Go clear the tunnel rats out of the dig for me, sweat first, sparks later, that is the rule I just made up.",
+        "text": "You came BACK, ha, they always come back, the loud stuff has a pull, yes? No sulking from me, {playerName}, but the ledger, oh the ledger, it grows every time you skip out, more each return, that is only fair. Go clear the Deeprock Diggers out of the dig for me, sweat first, sparks later, that is the rule I just made up.",
         "completion": "THERE it is, the itch is back in your hands. Engineering and Alchemy, majors again, go on, go make a bang. Try to stay put this time, eh?",
         "objectives": {
           "0": {
-            "label": "Tunnel Rat exterminated"
+            "label": "Deeprock Digger exterminated"
           }
         }
       },
@@ -12867,7 +13803,7 @@ export const en_CA: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Seeing Wren Home",
-        "text": "My apprentice Wren went out to walk the Goldmelt line two days ago and never came back. I found her tracks, she is holed up under the road markers southwest of the Aurora Steps, too scared of the wolves to move. I cannot leave the fen, {playerName}. Walk her to Veyla's camp on the Steps. She will be safe under the lights.",
+        "text": "My apprentice Wren went out to walk the Goldmelt line two days ago and never came back. I found her tracks, she is holed up under the road markers northeast of the Aurora Steps, too scared of the wolves to move. I cannot leave the fen, {playerName}. Walk her to Veyla's camp on the Steps. She will be safe under the lights.",
         "completion": "The girl is inside, wrapped in half my blankets and talking the stars out of the sky. You did a kind thing today, {playerName}. The Reach doesn't see many of those.",
         "objectives": {
           "0": {
@@ -13551,7 +14487,7 @@ export const en_CA: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Bram Come Home",
-        "text": "My Bram took the boat out the morning the nets-break opened, and the sea threw him back somewhere past the Landing point. I heard him three nights ago, {playerName}, calling over the water, and I was too afraid to go. I am still too afraid. Please. His boat lies wrecked on the north shore. Walk him home to me.",
+        "text": "My Bram took the boat out the morning the nets-break opened, and the sea threw him back somewhere past the Landing point. I heard him three nights ago, {playerName}, calling over the water, and I was too afraid to go. I am still too afraid. Please. His boat lies wrecked on the south shore. Walk him home to me.",
         "completion": "Bram! You brought him back to me whole, {playerName}. We both wept and neither of us is ashamed. Whatever the breaks take from this island next, they do not get my family. Not anymore.",
         "objectives": {
           "0": {
@@ -14491,6 +15427,36 @@ export const en_CA: EnTranslations = {
       "vale_arcanist": {
         "name": "Vale Arcanist's Regalia",
         "bonus3": "Increases attack and casting speed by 7.5%."
+      },
+      "warfare_ashstalker": {
+        "name": "Ashstalker Kit",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Killing a hostile player grants Ashen Step, increasing movement speed by 40% for 6 sec."
+      },
+      "warfare_cinderweave": {
+        "name": "Cinderweave Regalia",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec."
+      },
+      "warfare_furyforged": {
+        "name": "Furyforged Battlegear",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Killing a hostile player grants Unbroken Oath, absorbing 200 damage for 10 sec."
+      },
+      "warfare_stormbound": {
+        "name": "Stormbound Vestments",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec."
+      },
+      "warfare_thornhide": {
+        "name": "Thornhide Garb",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Thornguard, increasing dodge by 15% for 6 sec."
       },
       "wyrmshadow": {
         "name": "Nightfang Vestments",

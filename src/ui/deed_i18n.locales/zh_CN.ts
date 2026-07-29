@@ -7,6 +7,102 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: '旗帜在手',
+    desc: '在荆谷原野夺取一面旗帜。',
+  },
+  pvp_bg_first_win: {
+    name: '荆谷首胜',
+    desc: '赢得一场荆谷原野战场。',
+  },
+  pvp_bg_wins_25: {
+    name: '荆谷守护者',
+    desc: '赢得25场荆谷原野战场。',
+    title: '旗手',
+  },
+  pvp_bg_captures_100: {
+    name: '百面战旗',
+    desc: '生涯累计在荆谷原野夺取100面旗帜。',
+  },
+  dgn_rift: {
+    name: '裂隙行者',
+    desc: '击败裂隙的楼层首领，清除该裂隙。',
+  },
+  dgn_rift_s_rank: {
+    name: '裂隙君主',
+    desc: '清除一个S级裂隙，这是裂隙传送门能够生成的最高难度等级。',
+  },
+  pvp_honor_sergeant: {
+    name: '中士',
+    desc: '生涯累计获得10,000点荣誉。花费荣誉不会剥夺你的军阶。',
+    title: '中士',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: '骑士中尉',
+    desc: '生涯累计获得40,000点荣誉，那是一整个赛季真枪实弹的战争。',
+    title: '骑士中尉',
+  },
+  pvp_honor_field_marshal: {
+    name: '陆军元帅',
+    desc: '生涯累计获得150,000点荣誉。在任何王国都十分罕见，理应如此。',
+    title: '陆军元帅',
+  },
+  chr_drakemaw_broodlord: {
+    name: '碎卵者',
+    desc: '在满是龙卵的巢穴中击杀一头龙喉巢主，挺过它的怒吼、顺劈与烈焰。',
+  },
+  chr_maw_matriarch: {
+    name: '长空归寂',
+    desc: '在龙喉上空的火山口栖地中，击杀辛德拉蕾丝，龙喉之母。',
+  },
+  chr_frostveil_gatherer: {
+    name: '梯田收获',
+    desc: '在Frostveil采集一处矿脉、一片木料和一块草药地。',
+  },
+  chr_frostveil_first_cast: {
+    name: '山湖初冰',
+    desc: '在Frostveil水域钓上一条鱼。',
+  },
+  chr_amberfall_gatherer: {
+    name: 'Amberfall的收获',
+    desc: '在Amberfall采集一处矿脉、一片木料和一块草药地。',
+  },
+  chr_amberfall_first_cast: {
+    name: '大沼泽之获',
+    desc: '在Amberfall水域钓上一条鱼。',
+  },
+  chr_nightbloom_gatherer: {
+    name: '梦中收获',
+    desc: '在Nightbloom采集一处矿脉、一片木料和一块草药地。',
+  },
+  chr_nightbloom_first_cast: {
+    name: '月井涟漪',
+    desc: '在Nightbloom水域钓上一条鱼。',
+  },
+  chr_wraithwood_gatherer: {
+    name: '树冠下的收获',
+    desc: '在Wraithwood采集一处矿脉、一片木料和一块草药地。',
+  },
+  chr_wraithwood_first_cast: {
+    name: '镜湾一投',
+    desc: '在Wraithwood水域钓上一条鱼。',
+  },
+  chr_palmreach_gatherer: {
+    name: '棕榈滩收获',
+    desc: '在Palmreach采集一处矿脉、一片木料和一块草药地。',
+  },
+  chr_palmreach_first_cast: {
+    name: '蓝宝石潟湖垂钓',
+    desc: '在Palmreach水域钓上一条鱼。',
+  },
+  chr_evergarden_gatherer: {
+    name: '花坛馈赠',
+    desc: '在Evergarden采集一处矿脉、一片木料和一块草药地。',
+  },
+  chr_evergarden_first_cast: {
+    name: '花瓣池一投',
+    desc: '在Evergarden水域钓上一条鱼。',
+  },
   pvp_card_duel_first_win: {
     name: '以牌为规',
     desc: '在牌局大师处赢得一场纸牌对决。',
@@ -487,5 +583,82 @@ export const table: DeedLocaleTable = {
   soc_salvage_50: {
     name: '拆解行家',
     desc: '将50件装备拆解还原为原始材料。',
+  },
+  dgn_wildheart_basin: { name: '盆地反击', desc: '在荒野之心盆地中击败盆地之声祖尔加。' },
+  dgn_wildheart_basin_heroic: {
+    name: '英雄：荒野之心盆地',
+    desc: '在英雄难度的荒野之心盆地中击败盆地之声祖尔加。',
+  },
+  chr_peaks_gatherer: {
+    name: '高地馈赠',
+    desc: '在荆峰高地采集一处矿脉、一片林木与一丛草药。',
+  },
+  chr_marsh_rares_ii: {
+    name: '暴食者，终得清算',
+    desc: '斩杀暴食者蛆颚，泥沼湿地第四位恶名之敌，首次清算时被漏记在册。',
+  },
+  chr_peaks_rares_ii: {
+    name: '峭壁上新刻的名字',
+    desc: '斩杀老岩颚与碎片领主卡兹克斯，荆峰高地又两位恶名之敌，首次清算时被漏记在册。',
+  },
+  chr_gleamstag: {
+    name: '从不先出手的传说',
+    desc: '斩杀微光雄鹿，一头稀有而避世的精英，只有被逼入绝境才会出手。',
+  },
+  chr_hollow_rares: {
+    name: '鹿群不忘',
+    desc: '斩杀老髓壳与鹿群之首金辉角，帷幕幽谷的两位游荡稀有首领。',
+  },
+  chr_willowfen_gatherer: {
+    name: '柳泽丰饶',
+    desc: '在柳泽沼地采集一处矿脉、一片林木与一丛草药。',
+  },
+  chr_willowfen_first_cast: {
+    name: '睡莲泽的涟漪',
+    desc: '在柳泽沼地的水域钓起一条鱼。',
+  },
+  chr_galecrest_gatherer: {
+    name: '海岬收成',
+    desc: '在疾风崖采集一处矿脉、一片林木与一丛草药。',
+  },
+  chr_galecrest_first_cast: {
+    name: '镜湖垂纶',
+    desc: '在疾风崖的水域钓起一条鱼。',
+  },
+  chr_farshore_gatherer: {
+    name: '岛上补给',
+    desc: '在远岸采集一处矿脉、一片林木与一丛草药。',
+  },
+  chr_farshore_first_cast: {
+    name: '海鸥知晓',
+    desc: '在远岸的水域钓起一条鱼。',
+  },
+  prog_engineering_rare: {
+    name: '精密工程',
+    desc: '在工程学中制作你的第一件稀有品质物品。',
+  },
+  prog_alchemy_rare: {
+    name: '稀世佳酿',
+    desc: '在炼金术中制作你的第一件稀有品质物品。',
+  },
+  prog_cooking_rare: {
+    name: '令人难忘的佳肴',
+    desc: '在烹饪中制作你的第一件稀有品质物品。',
+  },
+  prog_leatherworking_rare: {
+    name: '精细鞣制',
+    desc: '在制皮中制作你的第一件稀有品质物品。',
+  },
+  prog_tailoring_rare: {
+    name: '大师的针脚',
+    desc: '在裁缝中制作你的第一件稀有品质物品。',
+  },
+  prog_weaponcrafting_rare: {
+    name: '淬炼至光亮',
+    desc: '在武器锻造中制作你的第一件稀有品质物品。',
+  },
+  prog_armorcrafting_rare: {
+    name: '锻造至完美',
+    desc: '在护甲锻造中制作你的第一件稀有品质物品。',
   },
 };

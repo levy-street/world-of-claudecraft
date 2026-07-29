@@ -7,12 +7,17 @@
 // material's baseColor map to the supplied chroma PNG and re-renders a
 // 3/4 hero pose. Runs offline under headless swiftshader.
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { attachKtx2 } from './lib/ktx2_entry.js';
 
 const SIZE = 1920; // supersample; the driver downscales
 
-const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true, alpha: false });
+const renderer = new THREE.WebGLRenderer({
+  antialias: true,
+  preserveDrawingBuffer: true,
+  alpha: false,
+});
 renderer.setSize(SIZE, SIZE);
 renderer.setPixelRatio(1);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -22,9 +27,15 @@ document.body.appendChild(renderer.domElement);
 
 function makeLights() {
   const g = new THREE.Group();
-  const key = new THREE.DirectionalLight(0xfff0dc, 2.6); key.position.set(2.5, 4, 3); g.add(key);
-  const fill = new THREE.DirectionalLight(0x9fb6e0, 1.2); fill.position.set(-3, 1.5, 1.5); g.add(fill);
-  const rim = new THREE.DirectionalLight(0xffffff, 1.6); rim.position.set(-1, 2, -4); g.add(rim);
+  const key = new THREE.DirectionalLight(0xfff0dc, 2.6);
+  key.position.set(2.5, 4, 3);
+  g.add(key);
+  const fill = new THREE.DirectionalLight(0x9fb6e0, 1.2);
+  fill.position.set(-3, 1.5, 1.5);
+  g.add(fill);
+  const rim = new THREE.DirectionalLight(0xffffff, 1.6);
+  rim.position.set(-1, 2, -4);
+  g.add(rim);
   g.add(new THREE.AmbientLight(0xffffff, 0.6));
   return g;
 }
@@ -45,20 +56,26 @@ function loadImage(dataUrl) {
   });
 }
 
-let gltfScene = null;     // parsed once
-let material = null;      // the single shared combatMech material
+let gltfScene = null; // parsed once
+let material = null; // the single shared combatMech material
 
 function parseOnce(glbB64) {
   if (gltfScene) return Promise.resolve();
   return new Promise((resolve, reject) => {
-    new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).parse(
-      b64ToArrayBuffer(glbB64), '', (gltf) => {
+    attachKtx2(new GLTFLoader().setMeshoptDecoder(MeshoptDecoder), renderer).parse(
+      b64ToArrayBuffer(glbB64),
+      '',
+      (gltf) => {
         gltfScene = gltf.scene;
         gltfScene.traverse((o) => {
-          if (o.isMesh && o.material) { material = o.material; }
+          if (o.isMesh && o.material) {
+            material = o.material;
+          }
         });
         resolve();
-      }, reject);
+      },
+      reject,
+    );
   });
 }
 
@@ -66,7 +83,7 @@ window.renderMech = async (glbB64, texB64) => {
   await parseOnce(glbB64);
 
   // build chroma texture (glTF baseColor conventions: sRGB, flipY=false)
-  const img = await loadImage('data:image/png;base64,' + texB64);
+  const img = await loadImage(`data:image/png;base64,${texB64}`);
   const tex = new THREE.Texture(img);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.flipY = false;
@@ -101,7 +118,7 @@ window.renderMech = async (glbB64, texB64) => {
   const fov = 30;
   const cam = new THREE.PerspectiveCamera(fov, 1, 0.01, 100);
   const dist = (r / Math.sin((fov * Math.PI) / 360)) * 1.02;
-  cam.position.set(dist * 0.26, dist * 0.10, dist);
+  cam.position.set(dist * 0.26, dist * 0.1, dist);
   cam.lookAt(0, r * 0.06, 0);
 
   renderer.setClearColor(0x14171d, 1);

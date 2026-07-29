@@ -31,8 +31,8 @@ Key data points (measured or replicated during this investigation):
   the frame is main-thread CPU-bound on that machine (a browser CPU/allocation/GPU trace in
   Packet 0 confirms it formally; LOW parity alone is strong evidence, not proof).
 - Fleet reports: some players report MEDIUM outperforming LOW. Verified real; see 4.5.
-- 91-player Ultra capture (docs/screenshots/rig-merge-crowd-after.jpg, produced by
-  scripts/crowd_fps_bench.mjs with vsync disabled): frame p95 32 ms vs renderer p95 16.8 ms,
+- 91-player Ultra capture (produced by scripts/crowd_fps_bench.mjs with vsync disabled;
+  numbers below are from that capture, image not retained in-tree): frame p95 32 ms vs renderer p95 16.8 ms,
   entities 2.9 ms, nameplates 1.0 ms. Roughly 15 ms per frame of non-renderer main-thread
   work (HUD, snapshot apply, GC, style/layout); order-of-magnitude, since percentiles do not
   subtract. Note the same capture's "1 draw / 1 triangle" row is the draw-stats bug (4.6).
@@ -761,7 +761,7 @@ current 60 s unlink window.
 - Fairness rules: docs/design/graphics-settings-fairness.md; UI contracts: src/ui/CLAUDE.md;
   render contracts: src/render/CLAUDE.md; server hot paths: server/CLAUDE.md.
 - Bot detection private repo (contract for the Packet 6 anti-bot decision):
-  /Users/fernando/Documents/wocc-bot-protection (overlay at private/bot_detector/).
+  worktree wocc-bot-protection (overlay at private/bot_detector/).
 - External reports cross-examined 2026-07 (codex v1 July 8 profile, codex v2 v0.30 review,
   codex v3 design review of revision 1 of this document): scorecards folded into sections
   5 and 6; adopted-and-verified v3 corrections: crowd-multiplicative server scaling, net

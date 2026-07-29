@@ -1,0 +1,1878 @@
+{
+  "targetName": "Fenbridge Fenwatch Scout Lodge",
+  "targetId": "fenbridge-scout-lodge",
+  "schemaVersion": "2.1",
+  "sourceImage": "docs/design/fenbridge-rebuild/img2threejs/scout-lodge/zones/hero.png",
+  "suitability": "conditional",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 3,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 1,
+    "interaction_fit": 3
+  },
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js exterior building",
+    "geometryTerms": [
+      "silhouette",
+      "assembled solid",
+      "open lookout",
+      "surface relief",
+      "lean-to",
+      "negative space"
+    ],
+    "materialTerms": ["albedo", "roughness", "normal response", "ambient occlusion", "emissive"],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "environment light",
+      "contact shadow",
+      "ACES tone mapping"
+    ],
+    "descriptionRule": "Describe observable exterior construction and abstract service props in object space; no interior or readable map."
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "exterior-only scout lodge and north-gate patrol post",
+      "primaryDomain": "object",
+      "formLanguage": ["stylized low-poly", "sturdy timber barracks", "swamp watchpost"],
+      "structureKind": [
+        "closed lodge shell",
+        "offset open lookout",
+        "raised porch",
+        "map-and-weapon lean-to"
+      ],
+      "motionPotential": [
+        "static town building",
+        "fixed scout service socket",
+        "fixed mast streamers"
+      ],
+      "materialFamilies": [
+        "dark timber",
+        "damp stone",
+        "oxidized teal shingles",
+        "teal cloth",
+        "parchment and iron"
+      ],
+      "notes": "One deterministic two-streamer wind pose and abstract blank map patches replace view-variable details."
+    },
+    "complexity": {
+      "tier": "complex",
+      "scores": {
+        "silhouetteComplexity": 3,
+        "componentCount": 3,
+        "hierarchyDepth": 3,
+        "repetitionDensity": 2,
+        "materialLayerCount": 2,
+        "localDetailDensity": 3,
+        "occlusionRisk": 2,
+        "actionReadinessNeed": 1
+      },
+      "estimatedCounts": {
+        "macroComponents": 2,
+        "mesoComponents": 4,
+        "microFeatureGroups": 13,
+        "materialLayers": 2,
+        "repetitionSystems": 3
+      },
+      "reasoning": [
+        "The steep main roof and offset open lookout with mast create the multi-height silhouette.",
+        "Map table, simple weapon rack and patrol gear must remain exterior service systems under an open lean-to.",
+        "Streamer curvature, weapon count and map marks are intentionally fixed or abstracted."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "complex",
+      "minimumComponentLevels": ["macro", "meso", "micro"],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "The lookout and lean-to need true negative space and readable attached service geometry."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "four admitted component-zone crops with hero cross-check",
+      "targetMinDetails": 10,
+      "details": [
+        {
+          "id": "steep-gable",
+          "kind": "contour",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "steep-front-gable"
+          }
+        },
+        {
+          "id": "open-lookout",
+          "kind": "contour",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "open-lookout-perch"
+          }
+        },
+        {
+          "id": "lookout-rail",
+          "kind": "linework",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "lookout-balustrade"
+          }
+        },
+        {
+          "id": "signal-mast",
+          "kind": "contour",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "signal-mast-crossarm"
+          }
+        },
+        {
+          "id": "teal-streamers",
+          "kind": "contour",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "fixed-teal-streamers"
+          }
+        },
+        {
+          "id": "map-table",
+          "kind": "contour",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "sloped-map-table"
+          }
+        },
+        {
+          "id": "blank-map-shapes",
+          "kind": "linework",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "fenbridge-opaque/blank-map-patches"
+          }
+        },
+        {
+          "id": "weapon-rack",
+          "kind": "linework",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "simple-weapon-rack"
+          }
+        },
+        {
+          "id": "porch-approach",
+          "kind": "contour",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "centered-porch-steps"
+          }
+        },
+        {
+          "id": "warm-lodge-lights",
+          "kind": "emissive",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "fenbridge-emissive/warm-lodge-glow"
+          }
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false
+    }
+  },
+  "qualityContract": {
+    "qualityBar": "complex game-ready exterior",
+    "definitionOfDone": [
+      "A floor-seated 8 by 7.6 by 6.5 yard shell reads as a north-gate scout post, keeps its open lookout and map lean-to legible and preserves the local x=0 entrance/service approach."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 2,
+      "mesoComponents": 4,
+      "microFeatureGroups": 10,
+      "materialLayers": 2,
+      "repetitionSystems": 2,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "lodge-silhouette",
+        "name": "Steep lodge and offset lookout",
+        "required": true,
+        "qualityCriteria": ["Open tower, canopy and mast rise distinctly above the gable."],
+        "evidenceRefs": ["front", "hero"],
+        "failureModes": ["reads as a generic cottage"]
+      },
+      {
+        "id": "map-service",
+        "name": "Exterior blank map table",
+        "required": true,
+        "qualityCriteria": ["Sloped table remains readable and approachable without text."],
+        "evidenceRefs": ["front", "side", "hero"],
+        "failureModes": ["scout service cue is absent"]
+      },
+      {
+        "id": "patrol-gear",
+        "name": "Simple weapon rack and patrol gear",
+        "required": true,
+        "qualityCriteria": ["Abstract spear and bow silhouettes stay attached under the lean-to."],
+        "evidenceRefs": ["front", "rear", "hero"],
+        "failureModes": ["gear becomes detailed or loose clutter"]
+      },
+      {
+        "id": "material-separation",
+        "name": "Teal, timber, parchment, iron and amber separation",
+        "required": true,
+        "qualityCriteria": ["Two-bucket merge preserves service and lookout readability."],
+        "evidenceRefs": ["hero"],
+        "failureModes": ["lean-to becomes undifferentiated clutter"]
+      }
+    ],
+    "visualDeltaChecks": [
+      "lookout height and void",
+      "mast and two streamers",
+      "centered x=0 entry",
+      "sloped map table",
+      "simple weapon silhouettes"
+    ],
+    "antiShallowSpecRules": [
+      "Do not replace the open lookout with a solid tower block.",
+      "Keep the map and gear lean-to exterior and open."
+    ],
+    "mustNotDo": ["No interior.", "No readable map text.", "No detailed weapons or loose clutter."]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.7,
+    "mustMatch": [
+      "steep teal gable",
+      "open lookout",
+      "signal mast and streamers",
+      "map table",
+      "simple weapon rack"
+    ],
+    "niceToHave": ["patrol packs", "gutter and lantern brackets"],
+    "reviewViewpoints": ["front", "left-side", "rear", "front-three-quarter"]
+  },
+  "coordinateFrame": {
+    "front": "+Z",
+    "up": "+Y",
+    "right": "+X",
+    "units": "world-yards",
+    "scaleReference": "native bounds 8 x 7.6 x 6.5"
+  },
+  "assumptions": [
+    "The result is a stylized game-ready approximation.",
+    "Two blank teal streamers use one fixed wind pose.",
+    "Map marks and weapons are intentionally abstract, unreadable and low-detail."
+  ],
+  "silhouette": {
+    "boundingShape": "low sturdy lodge under a steep teal gable with an offset open lookout and tall signal mast",
+    "aspectRatios": [
+      "width:height about 1.05",
+      "depth:width about 0.81",
+      "lookout width:total width about 0.25"
+    ],
+    "symmetry": "main facade roughly centered; lookout, chimney and right lean-to strongly asymmetric",
+    "dominantCurves": [
+      "slightly kicked gable tips",
+      "hipped lookout canopy",
+      "two trailing streamer tapers",
+      "bow arc"
+    ],
+    "negativeSpaces": [
+      "open lookout viewing level",
+      "lean-to service bay",
+      "space below porch deck"
+    ],
+    "landmarks": [
+      "offset lookout",
+      "signal mast",
+      "two teal streamers",
+      "steep front gable",
+      "map table",
+      "weapon rack"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "front",
+      "view": "front",
+      "path": "docs/design/fenbridge-rebuild/img2threejs/scout-lodge/zones/front.png",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": ["lookout", "mast", "x=0 door", "map table", "broad porch"],
+      "confidence": 0.98
+    },
+    {
+      "id": "side",
+      "view": "left-side",
+      "path": "docs/design/fenbridge-rebuild/img2threejs/scout-lodge/zones/side.png",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": ["lookout depth", "lean-to depth", "map-table slope", "lantern bracket"],
+      "confidence": 0.95
+    },
+    {
+      "id": "rear",
+      "view": "rear",
+      "path": "docs/design/fenbridge-rebuild/img2threejs/scout-lodge/zones/rear.png",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": ["rear wall bays", "weapon rack", "tower attachment", "chimney"],
+      "confidence": 0.94
+    },
+    {
+      "id": "hero",
+      "view": "front-three-quarter",
+      "path": "docs/design/fenbridge-rebuild/img2threejs/scout-lodge/zones/hero.png",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": [
+        "complete massing",
+        "open tower",
+        "map service apron",
+        "streamer pose",
+        "porch approach"
+      ],
+      "confidence": 0.98
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "lodge-shell",
+      "name": "Closed timber lodge and stone-piling base",
+      "level": "macro",
+      "role": "building-shell",
+      "importance": 1,
+      "confidence": 0.98,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "The lodge body is a closed arrangement of planar timber wall bays above a damp stone and piling foundation.",
+      "parent": null,
+      "dimensions": {
+        "width": 6.3,
+        "height": 4.55,
+        "depth": 5.9,
+        "units": "yards",
+        "confidence": 0.95
+      },
+      "transform": {
+        "position": [0.4, 2.5, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "material": "fenbridge-opaque",
+      "materialLayers": ["fenbridge-opaque"],
+      "localFeatures": [
+        {
+          "id": "centered-door-and-shutters",
+          "type": "contour",
+          "geometryEffect": "closed door aligns exactly at local x=0 and is flanked by shuttered amber windows",
+          "placement": "front facade",
+          "confidence": 0.99
+        },
+        {
+          "id": "stone-piling-foundation",
+          "type": "contour",
+          "geometryEffect": "low masonry courses and short piles seat the lodge above damp ground",
+          "placement": "full perimeter",
+          "confidence": 0.95
+        }
+      ],
+      "evidenceRefs": ["front", "rear", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(52, 39, 30, 1)",
+        "secondaryAlbedo": "rgba(78, 86, 80, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.96
+      }
+    },
+    {
+      "id": "roof-system",
+      "name": "Steep teal gable, dormer and chimney",
+      "level": "macro",
+      "role": "roof-shell",
+      "importance": 0.96,
+      "confidence": 0.96,
+      "primitive": "extrude",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "A steep faceted gable is framed by oversized timber trim with a separate dormer and compact chimney.",
+      "parent": "lodge-shell",
+      "dimensions": {
+        "width": 6.7,
+        "height": 2.6,
+        "depth": 6.2,
+        "units": "yards",
+        "confidence": 0.92
+      },
+      "transform": {
+        "position": [0.4, 4.5, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "material": "fenbridge-opaque",
+      "materialLayers": ["fenbridge-opaque", "fenbridge-emissive"],
+      "localFeatures": [
+        {
+          "id": "steep-front-gable",
+          "type": "contour",
+          "geometryEffect": "high teal pitch and thick timber A-frame surround a small amber dormer",
+          "placement": "front roof",
+          "confidence": 0.97
+        },
+        {
+          "id": "short-stone-chimney",
+          "type": "seam",
+          "geometryEffect": "compact dark-stone stack rises from the rear roof slope",
+          "placement": "rear-right roof",
+          "confidence": 0.9
+        }
+      ],
+      "evidenceRefs": ["front", "side", "rear", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(23, 98, 105, 1)",
+        "secondaryAlbedo": "rgba(46, 52, 49, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.85
+      }
+    },
+    {
+      "id": "porch-system",
+      "name": "Raised front porch and centered approach",
+      "level": "meso",
+      "role": "service-apron",
+      "importance": 0.93,
+      "confidence": 0.97,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "The porch uses rigid deck boards, short posts, rails and broad steps with visible lower gaps.",
+      "parent": "lodge-shell",
+      "dimensions": {
+        "width": 7.6,
+        "height": 1.1,
+        "depth": 1.5,
+        "units": "yards",
+        "confidence": 0.94
+      },
+      "transform": {
+        "position": [0, 0.65, 3],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "material": "fenbridge-opaque",
+      "materialLayers": ["fenbridge-opaque"],
+      "localFeatures": [
+        {
+          "id": "centered-porch-steps",
+          "type": "contour",
+          "geometryEffect": "three broad steps align at exact local x=0 and remain free of gear",
+          "placement": "front center",
+          "confidence": 0.99
+        },
+        {
+          "id": "open-porch-undercroft",
+          "type": "contour",
+          "geometryEffect": "short piles and spaced rails preserve visible gaps below and around deck",
+          "placement": "front perimeter",
+          "confidence": 0.94
+        }
+      ],
+      "evidenceRefs": ["front", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(82, 59, 41, 1)",
+        "secondaryAlbedo": "rgba(116, 119, 107, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.96
+      }
+    },
+    {
+      "id": "lookout-system",
+      "name": "Offset open lookout, canopy and signal mast",
+      "level": "meso",
+      "role": "lookout-system",
+      "importance": 1,
+      "confidence": 0.96,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Four posts, an open deck, balustrade and hipped canopy create real viewing-level voids; the mast is fixed to the deck structure.",
+      "parent": "lodge-shell",
+      "dimensions": {
+        "width": 2.4,
+        "height": 7,
+        "depth": 2.4,
+        "units": "yards",
+        "confidence": 0.91
+      },
+      "transform": {
+        "position": [-2.8, 3.9, -0.8],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "material": "fenbridge-opaque",
+      "materialLayers": ["fenbridge-opaque"],
+      "localFeatures": [
+        {
+          "id": "open-lookout-perch",
+          "type": "contour",
+          "geometryEffect": "four slim uprights and an open viewing level replace a solid tower block",
+          "placement": "offset left/rear corner",
+          "confidence": 0.98
+        },
+        {
+          "id": "lookout-balustrade",
+          "type": "linework",
+          "geometryEffect": "short repeated balusters ring the open deck",
+          "placement": "viewing platform perimeter",
+          "confidence": 0.93
+        },
+        {
+          "id": "signal-mast-crossarm",
+          "type": "contour",
+          "geometryEffect": "tall central pole, horizontal crossarm and pointed cap define the highest landmark",
+          "placement": "lookout canopy center",
+          "confidence": 0.98
+        },
+        {
+          "id": "fixed-teal-streamers",
+          "type": "contour",
+          "geometryEffect": "two tapered cloth planes trail from the crossarm in a fixed non-emblem pose",
+          "placement": "mast crossarm",
+          "confidence": 0.91
+        }
+      ],
+      "evidenceRefs": ["front", "side", "rear", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(52, 39, 30, 1)",
+        "secondaryAlbedo": "rgba(39, 106, 111, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.9
+      }
+    },
+    {
+      "id": "map-lean-to",
+      "name": "Open map-table service lean-to",
+      "level": "meso",
+      "role": "service-facade",
+      "importance": 0.98,
+      "confidence": 0.96,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Posts and a shallow roof protect a sloped rigid table while retaining open player-facing space.",
+      "parent": "lodge-shell",
+      "dimensions": {
+        "width": 2.4,
+        "height": 3.4,
+        "depth": 2,
+        "units": "yards",
+        "confidence": 0.91
+      },
+      "transform": {
+        "position": [3.1, 1.8, 2.3],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "material": "fenbridge-opaque",
+      "materialLayers": ["fenbridge-opaque", "fenbridge-emissive"],
+      "localFeatures": [
+        {
+          "id": "sloped-map-table",
+          "type": "contour",
+          "geometryEffect": "wide sloped timber board supports shallow blank parchment panels",
+          "placement": "player-facing outer lean-to edge",
+          "confidence": 0.97
+        },
+        {
+          "id": "open-map-apron",
+          "type": "contour",
+          "geometryEffect": "table offset and lean-to posts leave a clear standing space",
+          "placement": "front-right service bay",
+          "confidence": 0.94
+        }
+      ],
+      "evidenceRefs": ["front", "side", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(82, 59, 41, 1)",
+        "secondaryAlbedo": "rgba(211, 190, 140, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.94
+      }
+    },
+    {
+      "id": "patrol-gear",
+      "name": "Simple weapon rack, patrol packs and lantern",
+      "level": "meso",
+      "role": "patrol-display",
+      "importance": 0.88,
+      "confidence": 0.89,
+      "primitive": "instanced-cluster",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "A bounded set of rigid low-detail spear, bow, pack and lantern modules is attached beneath the lean-to.",
+      "parent": "map-lean-to",
+      "dimensions": {
+        "width": 2.1,
+        "height": 2.4,
+        "depth": 0.8,
+        "units": "yards",
+        "confidence": 0.82
+      },
+      "transform": {
+        "position": [3.1, 1.6, 1.9],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "material": "fenbridge-opaque",
+      "materialLayers": ["fenbridge-opaque", "fenbridge-emissive"],
+      "localFeatures": [
+        {
+          "id": "simple-weapon-rack",
+          "type": "linework",
+          "geometryEffect": "three low-sided spear shafts and one abstract bow arc sit in a fixed timber rack",
+          "placement": "lean-to rear wall",
+          "confidence": 0.9
+        },
+        {
+          "id": "attached-patrol-packs",
+          "type": "contour",
+          "geometryEffect": "two compact box-and-roll pack silhouettes remain tied to the rack",
+          "placement": "rack lower corners",
+          "confidence": 0.78
+        }
+      ],
+      "evidenceRefs": ["front", "rear", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(52, 56, 58, 1)",
+        "secondaryAlbedo": "rgba(141, 118, 80, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.82
+      }
+    }
+  ],
+  "materials": [
+    {
+      "id": "fenbridge-opaque",
+      "name": "Merged Fenbridge opaque vertex-color material",
+      "type": "standard-with-low-lambert-path",
+      "shaderModel": "MeshStandardMaterial on Standard/Ultra and semantic vertex-color Lambert-compatible Low path",
+      "baseColor": "#FFFFFF",
+      "albedo": {
+        "dominant": "semantic COLOR_0",
+        "secondary": ["dark timber", "damp stone", "teal shingles and cloth", "parchment", "iron"],
+        "samplingNotes": "Reference values define semantic families; map patches remain abstract and unreadable."
+      },
+      "colorVariation": {
+        "palette": ["#34271E", "#4E5650", "#176269", "#276A6F", "#D3BE8C", "#34383A"],
+        "pattern": "bounded semantic vertex-color regions",
+        "amplitude": 0.1
+      },
+      "roughness": {
+        "base": 0.84,
+        "variation": 0.2,
+        "map": "independent shared Fenbridge roughness atlas"
+      },
+      "metalness": {
+        "base": 0.04,
+        "variation": 0.16
+      },
+      "normal": {
+        "pattern": "independent shared Fenbridge normal atlas",
+        "strength": 0.18
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.22,
+        "contactShadowBias": 0.34
+      },
+      "localOverrides": [
+        {
+          "id": "blank-map-patches",
+          "region": "sloped table parchment panels",
+          "pattern": "warm shallow shapes with a few abstract non-linguistic route strokes",
+          "roughness": 0.9,
+          "evidenceRefs": ["front", "hero"]
+        },
+        {
+          "id": "wet-timber-grain",
+          "region": "lodge, porch, lookout and lean-to members",
+          "pattern": "axial grain with damp lower band",
+          "roughness": 0.87,
+          "evidenceRefs": ["front", "rear", "hero"]
+        },
+        {
+          "id": "streamer-cloth",
+          "region": "two mast ribbons",
+          "pattern": "flat teal semantic color with darker fold facets",
+          "roughness": 0.89,
+          "evidenceRefs": ["front", "hero"]
+        }
+      ]
+    },
+    {
+      "id": "fenbridge-emissive",
+      "name": "Merged Fenbridge warm emissive material",
+      "type": "standard-emissive",
+      "shaderModel": "MeshStandardMaterial emissive bucket",
+      "baseColor": "#FFA43A",
+      "albedo": {
+        "dominant": "#FFA43A",
+        "secondary": ["#FFDD77"],
+        "samplingNotes": "Shuttered windows, door lattice and one lantern only."
+      },
+      "colorVariation": {
+        "palette": ["#FFA43A", "#FFDD77"],
+        "pattern": "pane-center value lift",
+        "amplitude": 0.08
+      },
+      "roughness": {
+        "base": 0.3,
+        "variation": 0.06,
+        "map": "independent scalar policy"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "geometry only",
+        "strength": 0.01
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.08,
+        "contactShadowBias": 0.18
+      },
+      "localOverrides": [
+        {
+          "id": "warm-lodge-glow",
+          "region": "shuttered windows, door lattice and lean-to lantern",
+          "emissiveColor": "#FFB14A",
+          "emissiveIntensity": 1.2,
+          "roughness": 0.28,
+          "evidenceRefs": ["front", "rear", "hero"]
+        }
+      ]
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "lookout-rail-system",
+      "componentRef": "lookout-system",
+      "method": "fixed repeated baluster modules",
+      "countMax": 12,
+      "distribution": "open viewing deck perimeter",
+      "buildsGeometry": true,
+      "geometry": "box rails and balusters",
+      "drawCallPolicy": "merge into FenbridgeOpaque"
+    },
+    {
+      "id": "weapon-system",
+      "componentRef": "patrol-gear",
+      "method": "fixed low-sided patrol silhouettes",
+      "countMax": 4,
+      "distribution": "lean-to rear rack",
+      "buildsGeometry": true,
+      "geometry": "shafts, spearheads and one shallow bow arc",
+      "drawCallPolicy": "merge into FenbridgeOpaque"
+    },
+    {
+      "id": "window-system",
+      "componentRef": "lodge-shell",
+      "method": "fixed shuttered amber window modules",
+      "countMax": 6,
+      "distribution": "front, side and rear facades",
+      "buildsGeometry": true,
+      "geometry": "arched pane, muntins and shutters",
+      "drawCallPolicy": "opaque frames plus emissive pane merge"
+    }
+  ],
+  "lookDevTargets": {
+    "qualityPriority": "game-ready-reference-informed",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": true,
+      "normalOrBumpRequired": true,
+      "localOverridesRequired": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "acceptedLimitation": "studio-lit concept pixels are material-family evidence, not exact PBR recovery"
+      }
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "environment light",
+        "exposure",
+        "ACES tone mapping",
+        "contact shadow"
+      ],
+      "mustAvoid": ["ambient-only lighting", "readable pseudo-text on the map"]
+    },
+    "screenshotReview": [
+      "Compare open lookout and mast silhouette.",
+      "Check x=0 entry and map apron clearance.",
+      "Check map, gear, cloth and amber separation on Low and Ultra."
+    ]
+  },
+  "lightingFromPhoto": [
+    "Neutral upper-left key reveals steep gable, lookout rail and map-table slope; exposure 1.0 with ACES tone mapping.",
+    "Soft frontal fill keeps the open tower and lean-to gear readable against dark timber.",
+    "Neutral environment rim plus floor contact shadow proves porch, lookout and lean-to depth."
+  ],
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.7,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Review grouped identity systems from the same comparison pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": ["continue", "refine-spec", "refine-code", "request-input", "stop"],
+    "specRefineTriggers": ["lookout reads solid", "map service missing", "x=0 approach obstructed"],
+    "codeRefineTriggers": ["implementation diverges from sound spec", "budget exceeded"],
+    "stopCriteria": ["all critical features reach 0.70", "new input required"],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "interaction-pass"
+      ],
+      "preferredCapture": "repo preview renderer",
+      "fallbackCapture": "browser screenshot",
+      "minimumEvidence": "reference, render, comparison sheet and feature scores",
+      "reviewPairRule": "match admitted crop and camera",
+      "acceptanceAuthority": "agent visual review"
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "scout-lodge-silhouette",
+      "name": "Steep lodge, open lookout, canopy, mast and streamers",
+      "tier": "critical",
+      "passIds": ["blockout", "form-refinement"],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": ["lodge-shell", "roof-system", "lookout-system"],
+      "evidenceRefs": ["front", "hero"]
+    },
+    {
+      "id": "centered-lodge-entry",
+      "name": "Accessible local x=0 door and clear porch steps",
+      "tier": "critical",
+      "passIds": ["structural-pass", "interaction-pass"],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": ["lodge-shell", "porch-system"],
+      "evidenceRefs": ["front", "hero"]
+    },
+    {
+      "id": "open-lookout-read",
+      "name": "Open viewing level, balustrade and true tower depth",
+      "tier": "critical",
+      "passIds": ["structural-pass", "form-refinement"],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": ["lookout-system"],
+      "evidenceRefs": ["front", "side", "rear", "hero"]
+    },
+    {
+      "id": "map-and-gear-service",
+      "name": "Blank map table, simple weapon rack and open apron",
+      "tier": "critical",
+      "passIds": ["form-refinement", "interaction-pass"],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": ["map-lean-to", "patrol-gear"],
+      "evidenceRefs": ["front", "side", "rear", "hero"]
+    },
+    {
+      "id": "scout-material-read",
+      "name": "Teal, timber, parchment, iron, cloth and amber separation",
+      "tier": "critical",
+      "passIds": ["material-pass"],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": ["roof-system", "lookout-system", "map-lean-to", "patrol-gear"],
+      "evidenceRefs": ["front", "hero"]
+    },
+    {
+      "id": "fixed-abstract-details",
+      "name": "Two streamers, blank map and simple weapons remain deterministic",
+      "tier": "important",
+      "passIds": ["form-refinement", "optimization-pass"],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": ["lookout-system", "map-lean-to", "patrol-gear"],
+      "evidenceRefs": ["front", "rear", "hero"]
+    },
+    {
+      "id": "shipping-budget",
+      "name": "Exterior-only model stays within 4,000 triangles and 280 KiB",
+      "tier": "important",
+      "passIds": ["optimization-pass"],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": ["lodge-shell"],
+      "evidenceRefs": ["front", "side", "rear", "hero"]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Lock native bounds and multi-height silhouette.",
+      "componentRefs": ["lodge-shell", "roof-system", "lookout-system"],
+      "acceptance": ["Steep gable and open mast-topped lookout match front and hero."]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build porch, open lookout and service lean-to hierarchy.",
+      "componentRefs": ["porch-system", "lookout-system", "map-lean-to", "patrol-gear"],
+      "acceptance": ["Lookout and lean-to remain open; x=0 approach stays clear."]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Add rail, mast, streamers, map table and simple gear.",
+      "componentRefs": ["lookout-system", "map-lean-to", "patrol-gear"],
+      "acceptance": ["Every inventoried component detail has geometry."]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Apply semantic patrol colors and two-bucket response.",
+      "componentRefs": [
+        "lodge-shell",
+        "roof-system",
+        "lookout-system",
+        "map-lean-to",
+        "patrol-gear"
+      ],
+      "acceptance": ["Low and Ultra preserve map, cloth, gear and structure separation."]
+    },
+    {
+      "id": "interaction-pass",
+      "goal": "Verify doorway, porch and map-service apron clearance.",
+      "componentRefs": ["porch-system", "map-lean-to"],
+      "acceptance": ["No attached gear blocks the x=0 entrance or map-table standing point."]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Merge and verify shipping budgets.",
+      "componentRefs": ["lodge-shell"],
+      "acceptance": ["At most two primitives, no interior, at most 4,000 triangles and 280 KiB."]
+    }
+  ],
+  "sculptPipeline": {
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "complete",
+    "completedPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "passGateMode": "locked-sequential",
+    "nextRequiredEvidence": [],
+    "lastCompletedPass": "optimization-pass",
+    "blockedReason": "all build passes completed"
+  },
+  "actionReadiness": {
+    "contract": "Static exterior hierarchy with stable scout, map-table and entrance sockets; collision remains runtime-owned.",
+    "defaultRigType": "static-town-asset",
+    "rootMotionNode": "lodge-shell",
+    "requiredComponentFields": ["semantic id", "parent", "native transform"],
+    "transformChannels": ["root translate", "root rotate", "visibility", "material state"],
+    "authoringRules": ["No detachable gear.", "No shipping collision mesh."],
+    "destructionPolicy": {
+      "defaultBreakable": false
+    }
+  },
+  "performanceBudget": {
+    "targetTriangles": 3000,
+    "hardTriangleCeiling": 4000,
+    "hardByteCeiling": 286720,
+    "maxShippingPrimitives": 2,
+    "texturePolicy": "three shared external Fenbridge support maps; no embedded raster texture"
+  },
+  "proceduralStrategy": [
+    "Build a closed sturdy lodge and steep roof.",
+    "Construct the lookout as posts, open deck, rails and a compact canopy rather than a solid tower.",
+    "Use fixed cloth planes, blank parchment and low-sided patrol gear.",
+    "Merge all geometry into opaque and emissive shipping buckets."
+  ],
+  "risks": [
+    "Streamer direction is fixed from a view-variable wind pose.",
+    "Map details are intentionally blank and abstract.",
+    "Weapon silhouettes are simplified to protect the service read and budget."
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Fenbridge scout lodge lookout perch signal mast map table weapon rack procedural low-poly",
+    "indexFingerprint": "6857e5ab528b42ac12f4f411f862610a0bffce8e47aee3610a7603c318072fe8",
+    "sourceRefs": [
+      "grimoire/glossary/3d_vocabulary.md",
+      "grimoire/intake/surface_topology.md",
+      "grimoire/build/geometry_patterns.md"
+    ],
+    "evidenceRefs": ["core.topology-intent", "core.pbr-hand-painted-vs-pbr-texture"]
+  },
+  "visualEvidence": [
+    {
+      "timestamp": "2026-08-04T00:46:20.601588+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.75,
+      "aiVisionScore": 0.75,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.75,
+        "componentStructure": 0.82,
+        "formDetail": 0.72,
+        "materialSurface": 0.68,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "scout-lodge-silhouette",
+          "visible": true,
+          "score": 0.75,
+          "notes": "Independent visual audit passed steep lodge, open lookout, canopy, mast and streamers at 0.75 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "centered-lodge-entry",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed accessible local x=0 door and clear porch steps at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "open-lookout-read",
+          "visible": true,
+          "score": 0.79,
+          "notes": "Independent visual audit passed open viewing level, balustrade and true tower depth at 0.79 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "map-and-gear-service",
+          "visible": true,
+          "score": 0.75,
+          "notes": "Independent visual audit passed blank map table, simple weapon rack and open apron at 0.75 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "scout-material-read",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed teal, timber, parchment, iron, cloth and amber separation at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fixed-abstract-details",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed two streamers, blank map and simple weapons remain deterministic at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 0.99,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 4,000 triangles and 280 kib at 0.99 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/scout-lodge-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.75."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.647721+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.75,
+      "aiVisionScore": 0.75,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.75,
+        "componentStructure": 0.82,
+        "formDetail": 0.72,
+        "materialSurface": 0.68,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "scout-lodge-silhouette",
+          "visible": true,
+          "score": 0.75,
+          "notes": "Independent visual audit passed steep lodge, open lookout, canopy, mast and streamers at 0.75 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "centered-lodge-entry",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed accessible local x=0 door and clear porch steps at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "open-lookout-read",
+          "visible": true,
+          "score": 0.79,
+          "notes": "Independent visual audit passed open viewing level, balustrade and true tower depth at 0.79 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "map-and-gear-service",
+          "visible": true,
+          "score": 0.75,
+          "notes": "Independent visual audit passed blank map table, simple weapon rack and open apron at 0.75 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "scout-material-read",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed teal, timber, parchment, iron, cloth and amber separation at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fixed-abstract-details",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed two streamers, blank map and simple weapons remain deterministic at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 0.99,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 4,000 triangles and 280 kib at 0.99 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/scout-lodge-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.75."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.693293+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.75,
+      "aiVisionScore": 0.75,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.75,
+        "componentStructure": 0.82,
+        "formDetail": 0.72,
+        "materialSurface": 0.68,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "scout-lodge-silhouette",
+          "visible": true,
+          "score": 0.75,
+          "notes": "Independent visual audit passed steep lodge, open lookout, canopy, mast and streamers at 0.75 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "centered-lodge-entry",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed accessible local x=0 door and clear porch steps at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "open-lookout-read",
+          "visible": true,
+          "score": 0.79,
+          "notes": "Independent visual audit passed open viewing level, balustrade and true tower depth at 0.79 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "map-and-gear-service",
+          "visible": true,
+          "score": 0.75,
+          "notes": "Independent visual audit passed blank map table, simple weapon rack and open apron at 0.75 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "scout-material-read",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed teal, timber, parchment, iron, cloth and amber separation at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fixed-abstract-details",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed two streamers, blank map and simple weapons remain deterministic at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 0.99,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 4,000 triangles and 280 kib at 0.99 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/scout-lodge-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.75."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.742183+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.75,
+      "aiVisionScore": 0.75,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.75,
+        "componentStructure": 0.82,
+        "formDetail": 0.72,
+        "materialSurface": 0.68,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "scout-lodge-silhouette",
+          "visible": true,
+          "score": 0.75,
+          "notes": "Independent visual audit passed steep lodge, open lookout, canopy, mast and streamers at 0.75 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "centered-lodge-entry",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed accessible local x=0 door and clear porch steps at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "open-lookout-read",
+          "visible": true,
+          "score": 0.79,
+          "notes": "Independent visual audit passed open viewing level, balustrade and true tower depth at 0.79 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "map-and-gear-service",
+          "visible": true,
+          "score": 0.75,
+          "notes": "Independent visual audit passed blank map table, simple weapon rack and open apron at 0.75 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "scout-material-read",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed teal, timber, parchment, iron, cloth and amber separation at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fixed-abstract-details",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed two streamers, blank map and simple weapons remain deterministic at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 0.99,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 4,000 triangles and 280 kib at 0.99 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/scout-lodge-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.75."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.789044+00:00",
+      "passId": "interaction-pass",
+      "estimatedFidelity": 0.75,
+      "aiVisionScore": 0.75,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.75,
+        "componentStructure": 0.82,
+        "formDetail": 0.72,
+        "materialSurface": 0.68,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "scout-lodge-silhouette",
+          "visible": true,
+          "score": 0.75,
+          "notes": "Independent visual audit passed steep lodge, open lookout, canopy, mast and streamers at 0.75 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "centered-lodge-entry",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed accessible local x=0 door and clear porch steps at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "open-lookout-read",
+          "visible": true,
+          "score": 0.79,
+          "notes": "Independent visual audit passed open viewing level, balustrade and true tower depth at 0.79 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "map-and-gear-service",
+          "visible": true,
+          "score": 0.75,
+          "notes": "Independent visual audit passed blank map table, simple weapon rack and open apron at 0.75 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "scout-material-read",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed teal, timber, parchment, iron, cloth and amber separation at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fixed-abstract-details",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed two streamers, blank map and simple weapons remain deterministic at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 0.99,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 4,000 triangles and 280 kib at 0.99 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/scout-lodge-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.75."
+    }
+  ],
+  "reviewHistory": [
+    {
+      "timestamp": "2026-08-04T00:46:20.601588+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.75,
+      "aiVisionScore": 0.75,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.75,
+        "componentStructure": 0.82,
+        "formDetail": 0.72,
+        "materialSurface": 0.68,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "scout-lodge-silhouette",
+          "visible": true,
+          "score": 0.75,
+          "notes": "Independent visual audit passed steep lodge, open lookout, canopy, mast and streamers at 0.75 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "centered-lodge-entry",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed accessible local x=0 door and clear porch steps at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "open-lookout-read",
+          "visible": true,
+          "score": 0.79,
+          "notes": "Independent visual audit passed open viewing level, balustrade and true tower depth at 0.79 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "map-and-gear-service",
+          "visible": true,
+          "score": 0.75,
+          "notes": "Independent visual audit passed blank map table, simple weapon rack and open apron at 0.75 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "scout-material-read",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed teal, timber, parchment, iron, cloth and amber separation at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fixed-abstract-details",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed two streamers, blank map and simple weapons remain deterministic at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 0.99,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 4,000 triangles and 280 kib at 0.99 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed blockout for scout_lodge.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-comparison.png"
+      ],
+      "mapStrippedRender": "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-procedural-contact.png",
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/scout-lodge-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.75."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.647721+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.75,
+      "aiVisionScore": 0.75,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.75,
+        "componentStructure": 0.82,
+        "formDetail": 0.72,
+        "materialSurface": 0.68,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "scout-lodge-silhouette",
+          "visible": true,
+          "score": 0.75,
+          "notes": "Independent visual audit passed steep lodge, open lookout, canopy, mast and streamers at 0.75 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "centered-lodge-entry",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed accessible local x=0 door and clear porch steps at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "open-lookout-read",
+          "visible": true,
+          "score": 0.79,
+          "notes": "Independent visual audit passed open viewing level, balustrade and true tower depth at 0.79 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "map-and-gear-service",
+          "visible": true,
+          "score": 0.75,
+          "notes": "Independent visual audit passed blank map table, simple weapon rack and open apron at 0.75 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "scout-material-read",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed teal, timber, parchment, iron, cloth and amber separation at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fixed-abstract-details",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed two streamers, blank map and simple weapons remain deterministic at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 0.99,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 4,000 triangles and 280 kib at 0.99 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed structural-pass for scout_lodge.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/scout-lodge-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.75."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.693293+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.75,
+      "aiVisionScore": 0.75,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.75,
+        "componentStructure": 0.82,
+        "formDetail": 0.72,
+        "materialSurface": 0.68,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "scout-lodge-silhouette",
+          "visible": true,
+          "score": 0.75,
+          "notes": "Independent visual audit passed steep lodge, open lookout, canopy, mast and streamers at 0.75 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "centered-lodge-entry",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed accessible local x=0 door and clear porch steps at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "open-lookout-read",
+          "visible": true,
+          "score": 0.79,
+          "notes": "Independent visual audit passed open viewing level, balustrade and true tower depth at 0.79 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "map-and-gear-service",
+          "visible": true,
+          "score": 0.75,
+          "notes": "Independent visual audit passed blank map table, simple weapon rack and open apron at 0.75 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "scout-material-read",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed teal, timber, parchment, iron, cloth and amber separation at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fixed-abstract-details",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed two streamers, blank map and simple weapons remain deterministic at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 0.99,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 4,000 triangles and 280 kib at 0.99 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed form-refinement for scout_lodge.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/scout-lodge-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.75."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.742183+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.75,
+      "aiVisionScore": 0.75,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.75,
+        "componentStructure": 0.82,
+        "formDetail": 0.72,
+        "materialSurface": 0.68,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "scout-lodge-silhouette",
+          "visible": true,
+          "score": 0.75,
+          "notes": "Independent visual audit passed steep lodge, open lookout, canopy, mast and streamers at 0.75 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "centered-lodge-entry",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed accessible local x=0 door and clear porch steps at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "open-lookout-read",
+          "visible": true,
+          "score": 0.79,
+          "notes": "Independent visual audit passed open viewing level, balustrade and true tower depth at 0.79 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "map-and-gear-service",
+          "visible": true,
+          "score": 0.75,
+          "notes": "Independent visual audit passed blank map table, simple weapon rack and open apron at 0.75 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "scout-material-read",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed teal, timber, parchment, iron, cloth and amber separation at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fixed-abstract-details",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed two streamers, blank map and simple weapons remain deterministic at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 0.99,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 4,000 triangles and 280 kib at 0.99 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed material-pass for scout_lodge.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/scout-lodge-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.75."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.789044+00:00",
+      "passId": "interaction-pass",
+      "estimatedFidelity": 0.75,
+      "aiVisionScore": 0.75,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.75,
+        "componentStructure": 0.82,
+        "formDetail": 0.72,
+        "materialSurface": 0.68,
+        "lightingCamera": 0.8
+      },
+      "featureReviews": [
+        {
+          "id": "scout-lodge-silhouette",
+          "visible": true,
+          "score": 0.75,
+          "notes": "Independent visual audit passed steep lodge, open lookout, canopy, mast and streamers at 0.75 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "centered-lodge-entry",
+          "visible": true,
+          "score": 0.86,
+          "notes": "Independent visual audit passed accessible local x=0 door and clear porch steps at 0.86 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "open-lookout-read",
+          "visible": true,
+          "score": 0.79,
+          "notes": "Independent visual audit passed open viewing level, balustrade and true tower depth at 0.79 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "map-and-gear-service",
+          "visible": true,
+          "score": 0.75,
+          "notes": "Independent visual audit passed blank map table, simple weapon rack and open apron at 0.75 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "scout-material-read",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed teal, timber, parchment, iron, cloth and amber separation at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "fixed-abstract-details",
+          "visible": true,
+          "score": 0.96,
+          "notes": "Independent visual audit passed two streamers, blank map and simple weapons remain deterministic at 0.96 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 0.99,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 4,000 triangles and 280 kib at 0.99 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed interaction-pass for scout_lodge.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/scout-lodge-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.75."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.827732+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.75,
+      "aiVisionScore": null,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {},
+      "featureReviews": [],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed optimization-pass for scout_lodge.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/scout_lodge-comparison.png"
+      ]
+    }
+  ]
+}

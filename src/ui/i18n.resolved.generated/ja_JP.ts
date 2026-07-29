@@ -340,11 +340,14 @@ export const ja_JP: EnTranslations = {
       "menuButton": "スタック解除",
       "help": "復帰：/unstuck はその場でカウントダウンを開始し、近くの到達可能な安全地点へ移動します。",
       "helpAtGraveyard": "復帰：/unstuck はその場でカウントダウンを開始し、完了すると魂を最寄りの墓地へ送ります。生き返るには霊魂の癒し手から番人の代償を受ける必要があります。",
+      "helpUnstuckSickness": "復帰：/unstuck はその場でカウントダウンを開始し、完了すると最寄りの墓地へ移動します。倒れていた場合は蘇生します。スタック解除の後遺症が最大5分間残ります。",
       "started": "{seconds}秒後にスタックを解除します。移動、戦闘、被ダメージ、別の行動を始めるとキャンセルされます。",
       "countdown": "スタック解除：{seconds}",
       "completed": "到達可能な最寄りの安全な場所へ移動しました。",
       "completedAtGraveyard": "魂は最寄りの墓地へ戻りました。霊魂の癒し手に話しかけ、番人の代償を受けてください。",
       "revivedAtGraveyard": "最寄りの墓地へ戻され、蘇生しました。番人の代償があなたにのしかかっています。",
+      "movedToGraveyard": "最寄りの墓地へ移動しました。スタック解除の後遺症があなたにのしかかっています。",
+      "revivedAtGraveyardUnstuck": "最寄りの墓地へ移動し、蘇生しました。スタック解除の後遺症があなたにのしかかっています。",
       "cancelledMoved": "移動したため、スタック解除をキャンセルしました。",
       "cancelledDamaged": "ダメージを受けたため、スタック解除をキャンセルしました。",
       "cancelledCombat": "戦闘に入ったため、スタック解除をキャンセルしました。",
@@ -393,7 +396,8 @@ export const ja_JP: EnTranslations = {
     },
     "emoteEditor": {
       "title": "エモート",
-      "done": "完了"
+      "done": "完了",
+      "close": "エモートを閉じる"
     },
     "dailyRewards": {
       "title": "デイリー報酬",
@@ -776,6 +780,10 @@ export const ja_JP: EnTranslations = {
       "ready": "攻撃",
       "seconds": "{seconds}秒"
     },
+    "breath": {
+      "label": "息",
+      "drowning": "溺れています！"
+    },
     "rest": {
       "resting": "休息中"
     },
@@ -788,6 +796,7 @@ export const ja_JP: EnTranslations = {
       "targetAnnounce": "ターゲット：{name}",
       "targetOfTargetLabel": "ターゲットのターゲット",
       "partyLabel": "あなたのパーティ",
+      "petLabel": "あなたのペット",
       "partyChip": "パーティ",
       "partyGroup": "グループ {n}",
       "durationUnitSeconds": "秒",
@@ -821,7 +830,7 @@ export const ja_JP: EnTranslations = {
       "targetCycleShort": "標的",
       "spellbookPageLabel": "ページ{page}",
       "hideKeyboard": "キーボードを隠す",
-      "chatPlaceholder": "発言する..."
+      "chatPlaceholder": "発言する... (! でコミュニティコマンド)"
     },
     "tutorial": {
       "moveBodyTouch": "移動スティックで移動し、画面をドラッグして周囲を見回します。数歩進んで始めましょう。",
@@ -889,6 +898,13 @@ export const ja_JP: EnTranslations = {
       "heroicName": "ヒロイック:{name}",
       "heroicLocked": "ヒロイックの{name}にロックされています。"
     },
+    "riftTracker": {
+      "title": "リフト",
+      "floor": "フロア {current}/{total}",
+      "closesIn": "リフトは{time}後に閉じます",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "北",
       "NE": "北東",
@@ -904,7 +920,36 @@ export const ja_JP: EnTranslations = {
       "perSecondRow": "{total}（{rate}）",
       "minutesSeconds": "{m}分{s}秒",
       "seconds": "{s}秒",
-      "autoShowHint": "パーティがダメージまたは回復を与えると行が自動的に表示され、戦闘終了の数秒後にこのセグメントは閉じます。"
+      "autoShowHint": "パーティがダメージまたは回復を与えると行が自動的に表示され、戦闘終了の数秒後にこのセグメントは閉じます。",
+      "threatFallback": "リアルタイムのヘイトなし：{name}へのダメージを表示",
+      "breakdownSummary": "{tab}：{value}",
+      "breakdownRow": "{value}（{percent}）",
+      "breakdownOther": "その他（{count}）",
+      "percent": "{value}%",
+      "petAbility": "{pet}：{ability}",
+      "melee": "近接攻撃",
+      "move": "ドラッグしてこのメーターを移動",
+      "resize": "ドラッグしてこのメーターの大きさを変更",
+      "dock": "このメーターをメーターウィンドウに戻す",
+      "separate": "{meter}を分離",
+      "regroup": "{meter}を統合"
+    },
+    "targetAuras": {
+      "title": "ターゲットのオーラ",
+      "keybindLabel": "ターゲットのバフとデバフ",
+      "all": "すべて",
+      "debuffs": "デバフ",
+      "buffs": "バフ",
+      "unlock": "ターゲットオーラウィンドウを移動",
+      "lock": "ターゲットオーラウィンドウをロック",
+      "configureRows": "ターゲットオーラを設定",
+      "fewerRows": "オーラ行数を少なくする",
+      "moreRows": "オーラ行数を多くする",
+      "visibleRows": "優先するオーラ行数: {count}",
+      "showSources": "オーラの使用者名を表示",
+      "hideSources": "オーラの使用者名を非表示",
+      "ownAura": "自分のオーラ",
+      "opacity": "オーラの不透明度: {percent}"
     },
     "petFeed": {
       "disabledFullHp": "ペットは満タンの体力です",
@@ -916,14 +961,30 @@ export const ja_JP: EnTranslations = {
       "targetFriendlyNext": "味方ターゲットを順に切り替え",
       "discord": "Discord",
       "valecup": "ヴェイルカップ",
+      "bgFlag": "戦場フラッグアクション",
       "sheathe": "武器を納刀/抜刀",
+      "dive": "潜水",
       "categoryPet": "ペット",
       "petAttack": "ペット：攻撃",
       "petStop": "ペット：停止",
       "petTaunt": "ペット：挑発",
       "petDefensive": "ペット：防御",
       "petAggressive": "ペット：攻撃的",
-      "mount": "騎乗 / 降車"
+      "targetPet": "ペット：ターゲット",
+      "mount": "騎乗 / 降車",
+      "mouseHint": "マウスボタンも使えます。割り当て中に中ボタン (M3) やサイドボタン (M4、M5) を押してください。左右のボタンはカメラ操作、クリック移動、ワールド内のクリックに予約されています。"
+    },
+    "actionBar": {
+      "editKeys": "アクションバーのキーを編集",
+      "editKeysHint": "アクションバーのスロットをクリックし、キーを押して割り当てます。",
+      "bannerHint": "スロットをクリックし、キーを押して割り当てます。終わったら「完了」をクリックしてください。",
+      "bannerCapturing": "キーを押してこのスロットに割り当てます…",
+      "boundToKey": "{key} に割り当てました。",
+      "reset": "リセット",
+      "done": "完了",
+      "cancel": "キャンセル",
+      "resetConfirmTitle": "アクションバーのキーをリセットしますか？",
+      "resetConfirmBody": "1本目のバーはデフォルトのキーに戻り、2本目と3本目のバーは未設定になります。この操作は取り消せません。"
     },
     "mounts": {
       "mount": "騎乗",
@@ -936,13 +997,17 @@ export const ja_JP: EnTranslations = {
       "name_shadowjump_toad": "影跳びのカマカゲ",
       "name_stormfeather_griffin": "スカイリーチ・ストームフェザー",
       "name_thunderstrut_gobbler": "大七面鳥サンダーストラット",
+      "name_terrorspark_groundshaker": "地揺らしのテラースパーク",
+      "name_drakemaw_raptor": "火口のラプトル",
       "desc_valorsteed": "頑健で足取り確かな駿馬。移動速度を高める。",
       "desc_grag_bear": "頑健で足取り確かな熊。移動速度を高める。",
       "desc_stalkglider_snail": "粘り強くゆっくり燃えるカタツムリ。移動速度を高める。",
       "desc_aether_hover_cycle": "低空ホバーで戦場を駆け抜けるために設計された強力な魔導バイク。",
       "desc_shadowjump_toad": "どんな地形も影の跳躍で瞬時に越える、巨大で足取り確かなガマ。",
       "desc_stormfeather_griffin": "ルーンの爪で地を闊歩する気高き嵐のグリフォン。翼はたたまれている。",
-      "desc_thunderstrut_gobbler": "嵐より生まれた巨大な七面鳥。目覚めし峰から尾羽を雷雲のごとく広げ、闊歩して降りてくる。"
+      "desc_thunderstrut_gobbler": "嵐より生まれた巨大な七面鳥。目覚めし峰から尾羽を雷雲のごとく広げ、闊歩して降りてくる。",
+      "desc_terrorspark_groundshaker": "重厚な履帯と大口径砲、恐れ知らずの操縦士向けの鞍を備えた小型装甲車両。",
+      "desc_drakemaw_raptor": "火口のカルデラで鞍慣らしされた巣育ちのラプトル。筋肉と疾走のかたまりで、いまなお灰の匂いをかすかに漂わせている。"
     },
     "mountTraining": {
       "mountPrompt": "{key} キーを押して訓練用ヴァロースティードに騎乗する。",
@@ -955,13 +1020,100 @@ export const ja_JP: EnTranslations = {
     "mountRace": {
       "startButton": "レース開始",
       "cancelButton": "レースをキャンセル",
-      "go": "GO!",
+      "go": "スタート！",
       "start": "スタート！すべての障害を跳び越え、アーチへ戻って駆け抜けろ。",
       "toFinish": "アーチへ戻って駆け抜けろ！",
       "finished": "{seconds}秒でゴール！",
       "timeout": "レース失敗",
       "progress": "障害 {n} / {total}",
-      "timeLeft": "{seconds}s"
+      "timeLeft": "{seconds}秒"
+    },
+    "pvp": {
+      "launcherTitle": "PvP",
+      "mobileLabel": "PvP",
+      "bracket1v1": "1対1",
+      "bracket2v2": "2対2"
+    },
+    "bg": {
+      "title": "ソーンホロウ平原",
+      "blurb": "ソーンピークの影が落ちる、壁に囲まれた窪地を挟んで二つの廃城が向かい合う。南に真紅、北に蒼藍、その間には未だどちらの手にも落ちていない古い廃墟の中庭が横たわる。五対五、旗は各一本。相手の旗を三度持ち帰った側が戦場を制する。",
+      "modeTag": "5v5キャプチャー・ザ・フラッグ",
+      "offlineNote": "ソーンホロウ平原は同期中です。レルムの応答後にキューが開きます。",
+      "ratingSummary": "レーティング。{wins}勝 / {losses}敗",
+      "careerCaptures": "通算キャプチャー:{count}",
+      "enterQueue": "キューに参加",
+      "enterQueueParty": "キューに参加({count}人パーティ)",
+      "leaveQueue": "キューを離脱",
+      "searching": "検索中。キュー {count}/{size}。",
+      "queuedParty": "{count}人パーティ。",
+      "queueNote": "5人ずつの2チーム。敵の軍旗を奪い、自軍の砦へ持ち帰れ。先に3回キャプチャーしたチームの勝利。最大5人のパーティで一緒に参加可能。スプリントルーンを拾い、遮蔽物を縫って追手を振り切ろう。",
+      "matchInProgress": "戦闘中。{crimson}:{azure}。",
+      "ladderAllTime": "ラダー。歴代ランキング",
+      "noRanked": "まだ誰もランクインしていません。一番乗りを目指せ。",
+      "ladderOnline": "ラダー。オンライン中",
+      "noChallengers": "今オンラインの勇者はいません。一番乗りを目指せ。",
+      "playerLevelClassTitle": "{name}。レベル{level} {className}",
+      "playerClassTitle": "{name}。{className}",
+      "crimson": "クリムゾン",
+      "azure": "アズール",
+      "yourTeamTitle": "あなたのチーム",
+      "clock": "{minutes}:{seconds}",
+      "formUp": "整列:{seconds}",
+      "firstTo": "先取{caps}キャプチャー",
+      "flagState": {
+        "home": "旗は砦にある",
+        "carried": "旗が奪われた!",
+        "dropped": "旗は地面にある"
+      },
+      "respawnIn": "次のウェーブ:{seconds}秒後に復活",
+      "resultVictory": "勝利!",
+      "resultDefeat": "敗北",
+      "resultDraw": "引き分け",
+      "leavingIn": "{seconds}秒後に戦場を離れます",
+      "killFeed": "{killer}が{victim}を倒した",
+      "killFeedFallen": "{victim}が倒れた",
+      "foundBanner": "マッチ成立。あなたは{team}として戦います!",
+      "countdownBanner": "ソーンホロウ平原開始まで{seconds}",
+      "startBanner": "旗を奪え!",
+      "flagTakenLog": "{name}が{team}の旗を奪った!",
+      "flagDroppedLog": "{team}の旗が落とされた。",
+      "flagReturnedLog": "{team}の旗が戻された。",
+      "dropFlagConfirmTitle": "旗を落としますか？",
+      "dropFlagConfirmBody": "敵の旗を運搬中です。落とすと旗は地面に残り、どちらの陣営も拾えます。",
+      "dropFlagConfirmAccept": "旗を落とす",
+      "boardToggleLabel": "試合スコアボード。Enterで全体ボードを固定表示します。",
+      "levelRequirement": "この戦場のキュー参加はレベル{level}で解放されます。",
+      "board": {
+        "kills": "キル",
+        "assists": "アシスト",
+        "deaths": "デス",
+        "captures": "奪取"
+      },
+      "flagTakenBanner": "{takers}が{team}の旗を奪った!",
+      "flagReturnedBanner": "{team}の旗が戻された!",
+      "capturedTeamBanner": "{takers}が{team}の旗をキャプチャー!{crimson}:{azure}",
+      "capturedLog": "{name}が{team}の旗をキャプチャー。スコア{crimson}:{azure}。",
+      "victoryBanner": "勝利!ソーンホロウ平原{crimson}:{azure}。レーティング{rating}({delta})",
+      "defeatBanner": "敗北。ソーンホロウ平原{crimson}:{azure}。レーティング{rating}({delta})",
+      "drawBanner": "ソーンホロウ平原引き分け{crimson}:{azure}。レーティング{rating}({delta})",
+      "endBannerDetail": "ソーンホロウ平原{crimson}:{azure}。レーティング{rating}({delta})",
+      "endLog": "ソーンホロウ平原終了、{crimson}:{azure}。レーティング{rating}({delta})。",
+      "endedTimer": "時間切れ",
+      "endedForfeit": "この試合は棄権で終了しました",
+      "endedTimerLog": "試合時間が尽き、得点の高い側が戦場を制しました。",
+      "endedForfeitLog": "この試合は棄権で終了しました。",
+      "firstWinBonusLine": "本日の初勝利:名誉+{honor}",
+      "firstWinBonusLog": "本日の初勝利:追加で名誉を{honor}獲得しました。",
+      "timeWarningMinutes": "残り{minutes}分",
+      "timeWarningOneMinute": "残り1分",
+      "timeWarningMinutesLog": "戦闘は残り{minutes}分です。",
+      "timeWarningOneMinuteLog": "戦闘は残り1分です。",
+      "map": {
+        "crimsonKeep": "真紅の城塞",
+        "azureKeep": "蒼藍の城塞",
+        "ruinCourtyard": "廃墟の中庭",
+        "graveyard": "墓地"
+      }
     },
     "vcup": {
       "title": "ヴェイルカップ",
@@ -985,6 +1137,7 @@ export const ja_JP: EnTranslations = {
       },
       "awayNote": "両チームが同じ旗を選んだ場合、アウェー側は反転配色でプレイする。",
       "rolesHeading": "ポジション",
+      "rolesSmallBracketNote": "1対1と2対2の階級では全員がオールラウンダーとして出場する。3対3以上の階級を求める功績はここでは達成できない。",
       "role": {
         "allrounder": {
           "name": "オールラウンダー",
@@ -1026,6 +1179,7 @@ export const ja_JP: EnTranslations = {
       "guildBoardWl": "{wins} 勝 {losses} 敗",
       "practice": "ボット練習試合",
       "practiceNote": "ソウフィールドでボットとのフル試合をすぐに始める。",
+      "practiceUnratedNote": "練習試合はレート対象外。戦績も功績の書の進行も数えられない。",
       "practicingNow": "練習中（{count}）：",
       "clock": "{minutes}:{seconds}",
       "indicatorQueued": "ヴェイルカップ待機中:{bracket}、{count} 人中 {position} 番目",
@@ -1068,6 +1222,8 @@ export const ja_JP: EnTranslations = {
         "rule5": "誰でも近づいて、スタンドから声援を送れる。",
         "kitHeading": "あなたの技",
         "kitNote": "試合中はこれらの技がクラスのアビリティと入れ替わる。",
+        "unratedNote": "ボットがピッチにいるため、この試合はレート対象外。戦績は動かず、ゴール・セーブ・クリーンシートの功績も数えられない。",
+        "practiceUnratedNote": "これは練習試合のためレート対象外。戦績は動かず、功績の書の進行も数えられない。",
         "rosterHeading": "メンバー表",
         "you": "あなた",
         "bot": "ボット",
@@ -1109,6 +1265,33 @@ export const ja_JP: EnTranslations = {
       "browserEffectsReduced": "軽減",
       "browserEffectsMinimal": "最小",
       "browserEffectsNote": "自動はブラウザとデバイスに応じて、負荷の高い CSS エフェクト（ぼかし・グロー・背景アニメーション）を抑えます。動作が重い場合は手動で下げてください。",
+      "graphicsApply": "グラフィックを適用",
+      "graphicsApplying": "グラフィック設定を適用中...",
+      "graphicsApplied": "グラフィック設定を適用しました。",
+      "graphicsSaved": "グラフィック設定を保存しました。現在のレンダラーはすでに同じ設定です。",
+      "graphicsFailed": "グラフィック設定を適用できませんでした。以前の設定は引き続き有効です。",
+      "graphicsRetry": "グラフィックを再試行",
+      "graphicsFatal": "グラフィックの復旧に失敗しました。続行するにはゲームを再読み込みしてください。",
+      "graphicsReload": "ゲームを再読み込み",
+      "graphicsDraftChanged": "グラフィックの変更を適用できます。",
+      "gfxSectionQuality": "画質",
+      "gfxSectionWorld": "ワールド詳細",
+      "gfxSectionLighting": "ライティングとエフェクト",
+      "gfxSectionCamera": "カメラ",
+      "gfxSectionDisplay": "表示",
+      "gfxSectionSystem": "システム",
+      "gfxSectionTouch": "タッチ操作",
+      "gfxViewDistance": "描画距離",
+      "gfxWaterQuality": "水面品質",
+      "gfxCharacterDetail": "キャラクター詳細",
+      "gfxAmbientOcclusion": "アンビエントオクルージョン",
+      "gfxBloom": "ブルーム",
+      "gfxAntiAliasing": "アンチエイリアス",
+      "gfxDynamicLights": "動的ライト",
+      "gfxParticleEffects": "パーティクル効果",
+      "gfxHalf": "半分",
+      "gfxCustomNote": "ダイヤルを変更すると画質プリセットが「詳細」に切り替わります。「高」品質ベースの上に、現在のプリセットに表示されているレベルを起点として組み立てるカスタム設定です。",
+      "gfxEffectsNote": "アンビエントオクルージョン、ブルーム、アンチエイリアスはポストプロセスチェーンに依存します。「エフェクトとライティング」が低の場合、チェーンが無効になりこれらの設定は効果がありません。",
       "interfaceMode": "操作モード",
       "interfaceModeAuto": "自動",
       "interfaceModeDesktop": "デスクトップ",
@@ -1130,6 +1313,7 @@ export const ja_JP: EnTranslations = {
       "aurasOnPlayerFrame": "バフをプレイヤーフレームに表示",
       "highContrastBackground": "高コントラスト背景",
       "startAttackOnAbility": "アビリティ使用時に自動攻撃",
+      "stopAutoAttackOnTargetSwitch": "ターゲット切り替え時に自動攻撃を停止",
       "walkByAutoloot": "通りがかり自動ルート",
       "groundReticle": "地面ターゲットのレティクル",
       "mouseoverCast": "パーティフレームでマウスオーバーキャスト",
@@ -1139,7 +1323,11 @@ export const ja_JP: EnTranslations = {
       "itemScoreLine": "スコア {score}",
       "showSecondaryActionBar": "セカンダリアクションバーを表示",
       "showThirdActionBar": "3本目のアクションバーを表示",
+      "hideUnusedActionSlots": "未使用のアクションスロットを非表示",
+      "lockActionBars": "アクションバーをロック",
       "showTargetOfTarget": "ターゲットのターゲットを表示",
+      "showPetFrame": "自分のペットを表示",
+      "waterRipples": "水面の波紋（航跡）",
       "showAttackButton": "攻撃ボタンを表示",
       "showDailyRewardsChest": "デイリー報酬の宝箱を表示",
       "mobileCameraJoystick": "カメラスティック",
@@ -1176,6 +1364,8 @@ export const ja_JP: EnTranslations = {
       "buttons": "ボタン配置",
       "resetButtons": "ボタン配置をリセット",
       "menuAction": "ゲームメニュー",
+      "zoomIn": "ズームイン",
+      "zoomOut": "ズームアウト",
       "help": "左スティックで移動、右スティックで視点。ウィンドウを開くと画面ポインターが使えます。"
     },
     "perf": {
@@ -1250,26 +1440,99 @@ export const ja_JP: EnTranslations = {
         "offline": "オフライン"
       }
     },
+    "auraOverlay": {
+      "title": "オーラ",
+      "currentClass": "現在のクラス: {class}",
+      "previewHint": "「位置を設定」でオーラを動かし、メニューを隠さないようにします。",
+      "noProcs": "このキャラクターに対応する発動効果がありません。",
+      "enabled": "オーラを表示",
+      "icon": "スペルアイコン",
+      "arcs": "サイドクレセント",
+      "groundRing": "グラウンドリング",
+      "groundRingSpellOrder": "グラウンドリング: スペル順",
+      "crescentsSpellOrder": "サイドクレセント: スペル順",
+      "size": "サイズ",
+      "iconSize": "アイコンサイズ",
+      "crescentBlockSize": "クレセントブロックサイズ",
+      "groundRingBlockSize": "グラウンドリングブロックサイズ",
+      "opacity": "不透明度",
+      "color": "色",
+      "allOn": "すべてオン",
+      "allOff": "すべてオフ",
+      "reposition": "位置を設定",
+      "positioning": "配置: {aura}",
+      "selectAura": "オーラ",
+      "done": "完了",
+      "moveLeft": "左へ移動",
+      "moveUp": "上へ移動",
+      "moveDown": "下へ移動",
+      "moveRight": "右へ移動",
+      "moveEarlier": "スペルを内側へ",
+      "moveLater": "スペルを外側へ",
+      "screenPosition": "画面位置",
+      "spellOrder": "スペル順",
+      "reset": "位置をリセット",
+      "spellPosition": "スペル順 {position} / {count}",
+      "procs": {
+        "revenge": "リベンジ！",
+        "battleTrance": "バトルトランス",
+        "overpowerCharge": "レッドハンドエンパワー",
+        "suddenDeath": "サドンデス",
+        "victoryRush": "ビクトリーラッシュ",
+        "enrage": "メイヘム: エンレイジ",
+        "heatingUp": "ヒーティングアップ",
+        "arcaneCharge": "アーケインチャージ",
+        "aetherRush": "エーテルラッシュ"
+      }
+    },
     "playerCard": {
       "showWalletBadge": "ウォレットバッジを表示"
     },
     "landing": {
       "highContrast": "高コントラスト",
-      "highContrastAria": "高コントラスト背景を切り替えます。動画トレーラーを無効にして、スタート画面のテキストを読みやすくします"
+      "highContrastAria": "高コントラスト背景を切り替えます。動画トレーラーを無効にして、スタート画面のテキストを読みやすくします",
+      "browserSupport": {
+        "title": "ご注意：サポート対象外のブラウザです",
+        "body": "このブラウザではパフォーマンスが低下する場合があります。最高の体験のために、Windows、macOS、Linux 向けデスクトップアプリの入手をお勧めします。ブラウザでのプレイをご希望ですか？Chrome が最もパフォーマンスに優れ、Firefox と Safari もサポートされています。",
+        "getDesktopApp": "デスクトップアプリを入手",
+        "continueInBrowser": "ブラウザで続ける",
+        "dismissAria": "サポート対象外ブラウザの通知を閉じる"
+      }
     },
     "warfare": {
       "honorAmount": "名誉 {amount}",
       "dualPrice": "{money} + {honor}",
       "balance": "名誉: {amount}",
       "honorFloat": "名誉 +{amount}",
+      "honorFloatReason": "名誉 +{amount}（{reason}）",
       "honorGain": "名誉を {amount} 獲得しました（{reason}）。",
       "notEnoughHonor": "名誉が足りません。",
       "reasons": {
         "arenaWin": "アリーナ勝利",
         "fiestaKill": "フィエスタ撃破",
         "fiestaComplete": "フィエスタ完遂",
-        "fiestaWin": "フィエスタ勝利"
+        "fiestaWin": "フィエスタ勝利",
+        "battlegroundWin": "ソーンホロウ平原勝利",
+        "battlegroundFirstWin": "本日のソーンホロウ平原初勝利",
+        "battlegroundComplete": "ソーンホロウ平原参戦",
+        "battlegroundKill": "名誉ある撃破",
+        "battlegroundAssist": "撃破アシスト"
+      },
+      "floatReasons": {
+        "kill": "撃破",
+        "assist": "アシスト",
+        "firstWin": "初勝利"
       }
+    },
+    "warfareShop": {
+      "gossipOption": "ウォーフェアセットを見る",
+      "gossipOptionAria": "{name}のウォーフェアセット商店を見る",
+      "jewelry": "アクセサリー",
+      "weapons": "武器",
+      "owned": "所有済み",
+      "buyAria": "{item}を{honor}で購入",
+      "buyOwnedAria": "{item}を{honor}で購入、所有済み",
+      "buyConfirmBody": "{item}を{honor}で購入しますか？名誉での購入は返金できません。"
     },
     "charSheet": {
       "offense": "攻撃",
@@ -1341,6 +1604,7 @@ export const ja_JP: EnTranslations = {
     },
     "itemHeroicTag": "[ヒロイック]",
     "itemSoulbound": "魂縛",
+    "itemUniqueEquipped": "装備ユニーク",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1427,7 +1691,9 @@ export const ja_JP: EnTranslations = {
     },
     "paperdoll": {
       "unequipAria": "{item}を外す",
-      "unequipHint": "× をクリック、右クリック、またはバッグへドラッグで外す"
+      "unequipHint": "× をクリック、右クリック、またはバッグへドラッグで外す",
+      "hideHelmAria": "兜を隠す",
+      "showHelmAria": "兜を表示"
     },
     "account": {
       "title": "アカウント",
@@ -1493,6 +1759,10 @@ export const ja_JP: EnTranslations = {
       "twoFactorRecoveryTitle": "リカバリーコードを保存してください",
       "twoFactorRecoveryHint": "各コードは一度だけ使用できます。安全な場所に保管してください。認証アプリを紛失した場合、これらが唯一の復旧手段です。",
       "twoFactorDownloadCodes": "コードをダウンロード",
+      "recoveryCodesFileHeader": "{brand} リカバリーコード",
+      "recoveryCodesFileAccount": "アカウント：{username}",
+      "recoveryCodesFileHint": "認証アプリにアクセスできなくなった場合、各コードは一度だけ使用できます。",
+      "recoveryCodesFileWarn": "このファイルは安全でプライベートな場所に保管してください。",
       "twoFactorDone": "完了",
       "twoFactorDisableHint": "二段階認証を無効にするにはパスワードを入力してください。リカバリーコードは破棄されます。",
       "twoFactorDisableBtn": "二段階認証を無効にする",
@@ -1534,10 +1804,12 @@ export const ja_JP: EnTranslations = {
       "title": "採取",
       "harvestButton": "採取",
       "harvestTooltip": "チェックした部位を採取します。各死体は早い者勝ちで一度だけ採取できます。戦利品は取りません。",
-      "concentrateHint": "選ぶ部位が少ないほど、各部位の品質が高くなります。",
+      "yieldTierHint": "一度の採取で実際に取れる部位が少ないほど、各部位の採取ティアが高くなります。",
       "nothingSelectedYields": "選んだ部位はどれも、この死体から採取できません。",
       "alreadyHarvested": "この死体はすでに採取されています。",
       "componentAria": "{component}を採取",
+      "componentNoYield": "まだ産出なし",
+      "componentAriaNoYield": "{component}を採取：{note}",
       "components": {
         "hide": "毛皮",
         "fang": "牙",
@@ -1560,7 +1832,13 @@ export const ja_JP: EnTranslations = {
       "saveButton": "フォーカスを保存",
       "notInTownHint": "フォーカスを設定するには町にいる必要があります。",
       "increaseAria": "{component}へのフォーカスを増やす",
-      "decreaseAria": "{component}へのフォーカスを減らす"
+      "decreaseAria": "{component}へのフォーカスを減らす",
+      "respecTierLabel": "再割り振りの速さ",
+      "respecTierTimeOption": "無料（時間をかける）",
+      "respecTierPartialOption": "速い（少額の費用）",
+      "respecTierInstantOption": "即時（全額費用）",
+      "respecCostFree": "無料",
+      "respecCostLine": "{coin}と{materials}がかかります"
     },
     "party": {
       "promoteLeader": "パーティリーダーに指定",
@@ -1618,13 +1896,16 @@ export const ja_JP: EnTranslations = {
       "itemAriaEnchanted": "{item}、数量 {count}、エンチャント済みの品",
       "itemAriaBound": "{item}、数量 {count}、バインド済みの品",
       "itemAriaMasterwork": "{item}、数量 {count}、傑作",
+      "itemAriaQuest": "{item}、数量 {count}、クエストアイテム",
       "filterGroupAria": "バッグをカテゴリーで絞り込む",
       "filterAll": "すべて",
       "filterWeapon": "武器",
       "filterArmor": "防具",
       "filterConsumable": "消耗品",
       "filterMaterial": "素材",
+      "filterTool": "道具",
       "filterQuest": "クエスト",
+      "filterQuestCountAria": "クエスト、{count} 個のアイテム",
       "filterMount": "マウント",
       "sortAria": "バッグのアイテムを並べ替える",
       "sortRecent": "最近",
@@ -1633,6 +1914,7 @@ export const ja_JP: EnTranslations = {
       "searchPlaceholder": "アイテムを検索",
       "searchAria": "名前でバッグのアイテムを検索",
       "noMatch": "条件に一致するアイテムはありません。",
+      "noQuestItems": "バッグにクエストアイテムはありません。",
       "capacity": "{used}/{total}",
       "capacityAria": "使用中のバッグスロット: {total}個中{used}個",
       "backpack": "バックパック",
@@ -1666,6 +1948,7 @@ export const ja_JP: EnTranslations = {
       "dmgDoneReduce": "与えるダメージを{pct}%低下させる",
       "heatingUp": "次の炎系ビルダーが連続でクリティカルになるとホットストリークを獲得し、クリティカルでなければヒーティングアップが解除されます",
       "elementalConvergencePrimed": "次に異なる属性の呪文を唱えると、エレメンタル・コンバージェンスが発動します",
+      "carriedFlag": "敵の旗を運搬中です。このバフを解除すると旗を落とします。",
       "battleStance": "バトルスタンス: 怒りの生成量が10%増加",
       "berserkerStance": "バーサーカースタンス: クリティカル率が3%上昇し、与えるダメージが3%増加",
       "crit": "クリティカル率を{pct}%上昇させる",
@@ -1801,7 +2084,9 @@ export const ja_JP: EnTranslations = {
       "levelFamily": "レベル{level} {family}",
       "familyDemon": "デーモン",
       "hostile": "敵対",
-      "friendly": "味方"
+      "friendly": "味方",
+      "elite": "エリート",
+      "boss": "ボス"
     },
     "targetFrame": {
       "unlock": "ターゲットフレームを移動",
@@ -1836,6 +2121,8 @@ export const ja_JP: EnTranslations = {
       "showResource": "マナ・怒り・エネルギーを表示",
       "showAbsorbs": "吸収シールドを表示",
       "showAuras": "バフとデバフを表示",
+      "showPets": "ペットを表示",
+      "petHealth": "ペット{name}、体力{pct}",
       "showSelf": "自分のフレームを表示"
     },
     "frameReset": {
@@ -1850,6 +2137,9 @@ export const ja_JP: EnTranslations = {
       "enchantedFallback": "エンチャント済み"
     },
     "materialHint": {
+      "fineGrade": "上質な等級。素材より上位の道具で満位の採取地から採ったもので、通常版が求められる場所ではそのまま代用できます。",
+      "cookingCatch": "料理材料。食べる前に調理が必要です。",
+      "usedBy": "{crafts}で使用されます。",
       "arcaneDust": "エンチャントの材料。一般と良質の装備を魔力分解して得られる。",
       "arcaneEssence": "エンチャントの材料。レアの装備を魔力分解して得られる。",
       "arcaneShard": "エンチャントの材料。エピックと伝説の装備を魔力分解して得られる。",
@@ -2047,6 +2337,14 @@ export const ja_JP: EnTranslations = {
       "benefits": "デスクトップアプリからSteamアカウントを連携すると、獲得した功績がSteam実績に反映されます。",
       "noTicket": "Steamから連携チケットを取得できませんでした。Steamを起動してからもう一度お試しください。"
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Epicと連携",
+      "unlink": "Epic連携を解除",
+      "linked": "Epicアカウント {id} と連携済み",
+      "benefits": "EpicデスクトップアプリからEpicアカウントを連携すると、獲得した功績がEpic実績に反映されます。",
+      "noProof": "Epicから連携証明を取得できませんでした。Epic Games Storeから起動してからもう一度お試しください。"
+    },
     "mailbox": {
       "title": "メールボックス",
       "subtitle": "レイヴンポスト",
@@ -2091,6 +2389,7 @@ export const ja_JP: EnTranslations = {
         "noRecipient": "その名前のメールボックスの持ち主はいません。",
         "tooManyParcels": "1通の手紙に添付できる小包は最大{count}個です。",
         "noMailQuestItems": "クエストアイテムは郵送できません。",
+        "noMailBound": "そのアイテムはバインドされているため郵送できません。",
         "notEnoughItems": "送るのに十分な数を持っていません。",
         "cantAffordPostage": "郵送料を支払えません。",
         "recipientBoxFull": "相手のメールボックスは満杯です。",
@@ -2122,6 +2421,7 @@ export const ja_JP: EnTranslations = {
       "depositHint": "クリックで預ける",
       "depositPartialHint": "Shift+クリックで一部だけ預ける",
       "cannotDeposit": "銀行に預けられません",
+      "cannotDepositNow": "今は預けられません",
       "depositQuantityTitle": "{item}を預ける",
       "depositQuantityInput": "預ける数量",
       "depositQuantityConfirm": "預ける",
@@ -2132,6 +2432,7 @@ export const ja_JP: EnTranslations = {
       "sortAria": "銀行のアイテムを並べ替える",
       "searchAria": "名前で銀行のアイテムを検索",
       "depositAll": "すべての素材を預ける",
+      "depositAllTooltip": "カバン内の製作素材とがらくたをまとめて銀行に預けます。採集用道具、装備中の防具、クエストアイテム、消耗品は対象外です。",
       "depositAllDone": "素材を預けました：{count}。",
       "depositAllFull": "素材を預けました：{count}。銀行がいっぱいになりました。",
       "depositAllNone": "銀行がいっぱいです：何も預けられませんでした。",
@@ -2147,7 +2448,52 @@ export const ja_JP: EnTranslations = {
       "bonusAdvertWallet": "ウォレットを連携すると2スロット獲得できます。",
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "友達を招待しましょう：友達がレベル10に達すると、お互いに2スロット獲得できます。友達は最大5人までです。",
-      "bonusSectionAria": "ボーナス銀行スロットと獲得方法"
+      "bonusSectionAria": "ボーナス銀行スロットと獲得方法",
+      "tabsAria": "銀行タブ",
+      "personalTab": "個人",
+      "guildTab": "ギルド",
+      "guildCapacityAria": "使用中のギルド銀行スロット: {total}個中{used}個",
+      "guildEmpty": "ギルド銀行は空です。",
+      "guildTreasury": "ギルド金庫",
+      "guildDepositGold": "お金を預ける",
+      "guildWithdrawGold": "お金を引き出す",
+      "guildDepositGoldTitle": "ギルド金庫にお金を預ける",
+      "guildWithdrawGoldTitle": "ギルド金庫からお金を引き出す",
+      "guildGoldAvailable": "利用可能: {amount}",
+      "guildBuyConfirm": "ギルド金庫から {price} でギルド銀行スロットを{count}個追加購入しますか？",
+      "guildBuyNote": "ギルド金庫から支払われます",
+      "guildTreasuryShort": "金庫の資金不足",
+      "guildOpenBank": "ギルド銀行を開設する",
+      "guildOpenConfirm": "{price} でギルド銀行を開設しますか？この費用はあなた自身の所持金から支払われます。",
+      "guildOpenAccept": "開設",
+      "guildOpenNote": "ギルド金庫ではなく、あなた自身の所持金から支払われます",
+      "guildPurseShort": "所持金不足",
+      "guildReadOnlyNote": "ギルド銀行を変更できるのはギルド役員のみです。",
+      "guildUnopenedNote": "ギルド銀行はまだ開設されていません。",
+      "guildDormantNote": "ロックされたアイテムは引き出せず、ギルドの解散もできなくなります。",
+      "guildDormantHint": "このアイテムはギルド銀行にロックされており、引き出せません。",
+      "guildDormantAria": "{item}、数量 {count}、引き出し不可",
+      "guildUnknownItem": "不明なアイテム",
+      "guildDepositHint": "クリックでギルド銀行に預ける",
+      "guildCannotDeposit": "ギルド銀行には入れられません",
+      "guildGoldCannotMove": "現在その金額は移動できません。",
+      "guildViewsAria": "ギルド銀行の表示",
+      "guildContentsTab": "内容",
+      "guildLogTab": "ログ",
+      "logAria": "ギルド銀行の活動ログ",
+      "logNote": "直近{count}件のギルド銀行の操作です。",
+      "logLoading": "ギルド銀行のログを読み込んでいます...",
+      "logEmpty": "ギルド銀行にはまだ何も出し入れされていません。",
+      "logUnavailable": "現在、ギルド銀行のログを閲覧できません。",
+      "logFormerMember": "元ギルドメンバー",
+      "logDepositItem": "{actor} が {item} を {count} 個預けました",
+      "logWithdrawItem": "{actor} が {item} を {count} 個引き出しました",
+      "logDepositMoney": "{actor} が {amount} を預けました",
+      "logWithdrawMoney": "{actor} が {amount} を引き出しました",
+      "logBuySlots": "{actor} が {amount} で銀行の拡張を購入しました",
+      "logOpenBank": "{actor} が {amount} でギルド銀行を開設しました",
+      "logCharterFee": "{actor} がギルド設立費用 {amount} を支払いました",
+      "logAdminPurge": "管理者が {item} を {count} 個削除しました"
     },
     "calendar": {
       "title": "イベントカレンダー",
@@ -2185,10 +2531,6 @@ export const ja_JP: EnTranslations = {
           "title": "市の日",
           "note": "商人が新しい品を待っている。ワールドマーケットを見て回るのに良い日。"
         },
-        "fiestaNight": {
-          "title": "フィエスタナイト",
-          "note": "今夜の2v2フィエスタのリングは大賑わい。"
-        },
         "arenaClash": {
           "title": "アリーナ激突",
           "note": "決闘者たちが灰燼の闘技場へ。キューに並んでラダーを駆け上がろう。"
@@ -2225,6 +2567,7 @@ export const ja_JP: EnTranslations = {
       "billboard": {
         "label": "ギルド掲示板",
         "empty": "掲示板にはまだ何もありません。",
+        "loginLine": "ギルド掲示板：{text}",
         "setBy": "{name}が設定",
         "save": "保存",
         "placeholder": "ギルドへのメッセージを書く",
@@ -2250,6 +2593,7 @@ export const ja_JP: EnTranslations = {
       "catchLine": "{name}を釣り上げた",
       "biteLine": "何かが食いついた！",
       "gotAwayLine": "逃げられてしまった。",
+      "earlyReelLine": "巻き上げるのが早すぎた。まだ何も食いついていなかった。",
       "nodeName": {
         "ore": "鉱脈",
         "wood": "立木",
@@ -2268,7 +2612,8 @@ export const ja_JP: EnTranslations = {
       "toolTierUnmet": {
         "mining": "この鉱脈を採掘するにはティア{tier}の採掘ピッケルが必要です。",
         "logging": "この立木を伐り倒すにはティア{tier}の伐採斧が必要です。",
-        "herbalism": "この群生地を採取するにはティア{tier}の薬草鎌が必要です。"
+        "herbalism": "この群生地を採取するにはティア{tier}の薬草鎌が必要です。",
+        "fishing": "この水域で釣るにはティア{tier}の釣り竿が必要です。"
       },
       "toolRequired": {
         "mining": "この鉱脈を採掘するには採掘ピッケルが必要です。",
@@ -2281,6 +2626,12 @@ export const ja_JP: EnTranslations = {
         "logging": "手の届く範囲に立木がありません。",
         "herbalism": "手の届く範囲に薬草の群生地がありません。"
       },
+      "wieldUnmet": {
+        "mining": "バッグにある採掘ピッケルを振るうには採掘{skill}が必要です。",
+        "logging": "バッグにある伐採斧を振るうには伐採{skill}が必要です。",
+        "herbalism": "バッグにある薬草鎌を扱うには薬草学{skill}が必要です。"
+      },
+      "wieldUnmetCorpse": "最高の道具を使いこなすには採集スキル{skill}が必要です。",
       "toolTierUnmetCorpse": "最高の素材を回収するにはティア{tier}の採集道具が必要です。",
       "toolTooltip": {
         "kind": {
@@ -2292,7 +2643,8 @@ export const ja_JP: EnTranslations = {
         "unlocks": {
           "mining": "ティア{tier}までの鉱脈の採掘に必要です。",
           "logging": "ティア{tier}までの立木の伐採に必要です。",
-          "herbalism": "ティア{tier}までの薬草の群生地の採取に必要です。"
+          "herbalism": "ティア{tier}までの薬草の群生地の採取に必要です。",
+          "fishing": "ティア{tier}までの水域での釣りに必要です。"
         },
         "use": {
           "mining": "使用：近くの鉱脈を採掘する。",
@@ -2307,8 +2659,12 @@ export const ja_JP: EnTranslations = {
       },
       "downgradeMark": "バッグが満杯です：収穫は採集者の印なしで収納されました。",
       "downgradeFind": "バッグが満杯です：極上の獲物を逃してしまいました。",
+      "emptyHookNote": "針には何もなし",
       "stateReady": "採集可能",
-      "stateCooldown": "再生中"
+      "stateCooldown": "再生中",
+      "stateCooldownTimed": "{time}後に再生",
+      "respawnClock": "{minutes}:{seconds}",
+      "fineGradePreview": "あなたの道具なら、ここの採取物は上質な等級になります。"
     },
     "archetypeTitle": {
       "label": "称号",
@@ -2342,6 +2698,7 @@ export const ja_JP: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "武器エンチャント - 剛力",
       "enchant_weapon_intellect": "武器エンチャント - 呪文威力",
+      "enchant_offhand_stamina": "オフハンドエンチャント - スタミナ",
       "enchant_helmet_fortitude": "頭エンチャント - 堅牢",
       "enchant_neck_spirit": "首エンチャント - 精神力",
       "enchant_shoulder_agility": "肩エンチャント - 敏捷性",
@@ -2398,6 +2755,45 @@ export const ja_JP: EnTranslations = {
       "ceilingRare": "レア上限",
       "ceilingCommon": "コモン上限",
       "skillValue": "{skill} / {max}",
+      "toolEffectCharges": "残り {charges} / {max} 回",
+      "toolEffectSpent": "使い切りました。再充填が必要です",
+      "toolEffectDepleted": "道具の効果を使い切りました",
+      "toolEffectRechargePrice": "再充填: {material} x{count}",
+      "toolEffectModeAsk": "毎回確認する",
+      "toolEffectModePrompt": "毎回確認します",
+      "toolEffectConfirmTitle": "{effect}を使いますか？",
+      "toolEffectConfirmBody": "この採集で1回分を消費しますか？断っても採集は行われますが、ボーナスは付きません。残り：{charges}回",
+      "toolEffectConfirmAccept": "1回分を使う",
+      "toolEffectConfirmDecline": "そのまま採集",
+      "toolEffectName": {
+        "gatherersCache": "採集者の貯蔵袋",
+        "artisansEye": "職人の眼",
+        "quickeningCharm": "早戻りの護符"
+      },
+      "toolEffectTooltip": {
+        "kind": "道具用の護符",
+        "bonus": {
+          "gatherersCache": "充填中は採集ごとに産出+1。",
+          "artisansEye": "充填中は収穫の品質がツール1段階ぶん上がる。",
+          "quickeningCharm": "発動した資源ノードの再生タイマーを短縮する。"
+        },
+        "howToSlot": "専門技能ウィンドウから採掘・伐採・薬草学のツールに装着する。装着すると消費される。",
+        "charges": "コモン品質のツールでは{base}回の充填から始まる（レア度が1段階上がるごとに+{bonus}回）。",
+        "landOnly": "釣り竿には装着できない。",
+        "openProfessions": "専門技能ウィンドウを開き、採集ツールに装着しよう。"
+      },
+      "toolEffectSlotButton": "{effect}を装着",
+      "toolEffectRechargeButton": "再充填",
+      "toolEffectSlotted": "{effect}を{profession}に装着した。",
+      "toolEffectSlotInvalid": "{effect}はそこには装着できない。",
+      "toolEffectNoTool": "まず本物の{profession}用ツールが必要だ。",
+      "toolEffectNoCharm": "バッグに製作した{effect}が必要だ。",
+      "toolEffectNoGain": "{effect}はすでに装着され、充填も満タンだ。",
+      "toolEffectRecharged": "{effect}を再充填した：{material}x{count}を消費。",
+      "toolEffectRechargeNoSlot": "{profession}には効果が装着されていない。",
+      "toolEffectRechargeFull": "{effect}はすでに完全に充填されている。",
+      "toolEffectRechargeToolCapped": "{effect}をさらに充填するには、より上質な{profession}用ツールが必要だ。",
+      "toolEffectRechargeMaterials": "{effect}の再充填には{material}x{count}が必要だ。",
       "tierPipAria": "ティア {tier}",
       "nextUnlockTier": "次のティアまであと {points}：傑作の成功率が上がります",
       "nextUnlockSpecialized": "専門化まであと {points}：素材コストが下がります",
@@ -2422,9 +2818,27 @@ export const ja_JP: EnTranslations = {
     "crafting": {
       "title": "製作",
       "close": "製作を閉じる",
-      "craft": "製作",
+      "dialogOption": "製作",
+      "dialogOptionAria": "{craft}の製作ウィンドウを開く",
+      "crafting": "製作中",
+      "create": "作成",
+      "createAll": "すべて作成",
+      "createAllAria": "所持材料で作れる最大数までこのレシピを作成する",
+      "qtyRowAria": "作成数",
+      "qtyDecreaseAria": "作成数を減らす（現在 {count}）",
+      "qtyIncreaseAria": "作成数を増やす（現在 {count}）",
+      "qtyValueAria": "作成数、{count}",
+      "batchRemaining": "残り {remaining}/{total}",
+      "batchRemainingAria": "残り {remaining} 個、合計 {total} 個",
+      "durationChip": "{seconds}秒",
+      "durationAria": "詠唱時間: {seconds} 秒",
+      "progressAria": "製作の進行",
+      "announceStart": "{name} を製作中",
+      "announceComplete": "{name} の製作が完了",
+      "announceCancel": "製作をキャンセルした",
       "reagentsNeeded": "必要素材:",
       "reagentLine": "{name}: {have}/{required}",
+      "reagentFineSub": "（上質な等級を{count}個消費）",
       "empty": "既知のレシピはありません。",
       "resultAria": "{name}を製作",
       "craftedToast": "製作しました:{name}",
@@ -2466,6 +2880,8 @@ export const ja_JP: EnTranslations = {
         "colSkill": "技能",
         "colRole": "役割",
         "colCap": "上限",
+        "allCrafts": "すべての職種",
+        "skillListAria": "職種の技能",
         "tutorial": "最初のティア：いずれかの技を技能 {skill} まで上げます。レシピの成功は他の知識を消さず、その技を成長させます。",
         "nearTier": "{craft}は次のティアまであと技能 {points} です。",
         "dormantKnowledge": "{craft}の知識は保持されていますが、その組み合わせか趣味が有効になるまで休眠します。"
@@ -2479,7 +2895,7 @@ export const ja_JP: EnTranslations = {
         "loom": "織機",
         "toolworks": "工作場"
       },
-      "throttled": "製作が速すぎます。少し待ってからもう一度お試しください。",
+      "busy": "手が離せません。",
       "recipeNotLearned": "そのレシピはまだ習得していません。",
       "noBagSpace": "バッグに製作したアイテムを入れる空きがありません。",
       "skillReqLine": "{craft} {skill} が必要",
@@ -2493,6 +2909,8 @@ export const ja_JP: EnTranslations = {
       "masterworkToast": "傑作！{name}",
       "masterworkZoneLine": "{crafter}が傑作{name}を作り上げました！",
       "tierUpToast": "{craft}がティア {tier} に到達しました！",
+      "skillUpToast": "{skill}の技能が {level} に上がりました！",
+      "skillUpSubtext": "技能が {level} に上がりました！",
       "trendNudge": "あなたの腕は{archetype}へと傾いています。その調律の依頼は{master}のもとで待っています。",
       "trendNudgeNoMaster": "あなたの腕は{archetype}へと傾いています。その道に進むには工芸の師匠を探しましょう。",
       "attunedZoneLine": "{name}が{archetype}として調律しました！",
@@ -2532,9 +2950,9 @@ export const ja_JP: EnTranslations = {
       "notHeld": "そのアイテムを所持していません。",
       "notDisenchantable": "それは魔力分解できません。",
       "notSalvageable": "それは解体できません。",
-      "disenchantThrottled": "魔力分解が速すぎます。少し待ってからもう一度お試しください。",
-      "salvageThrottled": "解体が速すぎます。少し待ってからもう一度お試しください。",
-      "enchantThrottled": "エンチャントが速すぎます。少し待ってからもう一度お試しください。",
+      "disenchantBusy": "手が離せません。",
+      "salvageBusy": "手が離せません。",
+      "enchantBusy": "手が離せません。",
       "enchantWrongSlot": "そのエンチャントはそのアイテムには付与できません。",
       "enchantUnknown": "そのエンチャントは存在しません。",
       "enchantInsufficient": "そのエンチャントに必要な素材がありません。",
@@ -2552,6 +2970,7 @@ export const ja_JP: EnTranslations = {
       "noEnchants": "この素材を使うエンチャントはありません。",
       "noTargets": "エンチャントできるアイテムがありません。",
       "wornTag": "装備中 ({slot})",
+      "wornTagIndexed": "装備中 ({slot}{index})",
       "tier": {
         "base": "基本エンチャント",
         "runed": "ルーンエンチャント",
@@ -2616,6 +3035,59 @@ export const ja_JP: EnTranslations = {
       "cannotAfford": "バインド解除の手数料を支払えません。",
       "outOfRange": "バインド解除するには作業台のそばにいる必要があります。",
       "noSpace": "バッグにバインド解除したアイテムを入れる空きがありません。"
+    },
+    "commissionBoard": {
+      "title": "依頼ボード",
+      "close": "依頼ボードを閉じる",
+      "openButton": "依頼",
+      "openButtonAria": "依頼ボードを開く",
+      "intro": "職人に一品の製作を依頼するか、他の人の依頼を引き受けましょう。",
+      "formTitle": "依頼を出す",
+      "recipeLabel": "アイテム",
+      "recipeEmpty": "まだ依頼できる装備のレシピを習得していません。",
+      "scopeLabel": "誰が引き受けられるか",
+      "scopeOpen": "誰でも（公開依頼）",
+      "scopeCrafter": "特定の職人",
+      "crafterNameLabel": "職人の名前",
+      "crafterNamePlaceholder": "キャラクター名",
+      "openSubmit": "依頼を出す",
+      "sectionMine": "自分の依頼",
+      "sectionToCraft": "引き受けた依頼",
+      "sectionBoard": "公開依頼",
+      "boardEmpty": "現在、公開されている依頼はありません。",
+      "mineEmpty": "まだ依頼を出していません。",
+      "toCraftEmpty": "現在、誰の依頼も引き受けていません。",
+      "rowFor": "{item}（依頼者：{requester}）",
+      "rowTargeted": "{item}（依頼者：{requester} / 指名：{crafter}）",
+      "acceptedBy": "{name}が引き受け済み",
+      "statusOpen": "募集中",
+      "statusAccepted": "引き受け済み",
+      "statusDelivered": "納品済み",
+      "statusCancelled": "キャンセル済み",
+      "statusExpired": "期限切れ",
+      "cancelButton": "キャンセル",
+      "acceptButton": "引き受ける",
+      "deliverButton": "納品",
+      "deliverHint": "受注品として（受注トグルをオンにして）製作してから、ここに戻って納品してください。",
+      "opened": "{item}の依頼を出しました。",
+      "cancelled": "{item}の依頼をキャンセルしました。",
+      "accepted": "{item}の依頼を引き受けました。",
+      "delivered": "{item}を{name}に納品しました。",
+      "denyUnknownRecipe": "そのレシピは存在しません。",
+      "denyNotCommissionEligible": "そのレシピは依頼できません。",
+      "denyUnknownCrafter": "その名前のキャラクターは見つかりません。",
+      "denySelfCrafter": "自分自身に依頼することはできません。",
+      "denyTooManyOpen": "募集中の依頼が上限に達しています。",
+      "denyUnknownOrder": "その依頼はもう存在しません。",
+      "denyOrderNotOpen": "その依頼はもう募集していません。",
+      "denySelfOrder": "自分が出した依頼は引き受けられません。",
+      "denyNotEligibleCrafter": "その依頼は別の職人に指名されています。",
+      "denyNotYourOrder": "それはあなたの依頼ではありません。",
+      "denyOrderNotAccepted": "その依頼はまだ引き受けられていません。",
+      "denyNotYourAcceptance": "あなたはその依頼を引き受けていません。",
+      "denyNotCrafted": "先に受注品を製作してください（受注トグルをオンに）。",
+      "denyOutOfRange": "納品するには依頼者の近くにいる必要があります。",
+      "denyNoSpace": "依頼者のバッグに空きがありません。"
     },
     "finder": {
       "title": "ダンジョンファインダー",
@@ -2715,7 +3187,8 @@ export const ja_JP: EnTranslations = {
         "raise_fallen": "死者蘇生（周期的な増援ウェーブ）",
         "soul_rend": "ソウルレンド（対象は散開して回復を受ける）",
         "deathless_rage": "不死の憤怒（ウォードストーンで妨害）",
-        "wardstones": "ウォードストーンの詠唱（フェーズ移行）"
+        "wardstones": "ウォードストーンの詠唱（フェーズ移行）",
+        "dread_curse": "ドレッドカース（ヒロイック限定、タンク交代用の累積デバフ）"
       }
     },
     "deeds": {
@@ -2727,6 +3200,7 @@ export const ja_JP: EnTranslations = {
       "countLabel": "功績 {earned}/{total}",
       "completionAria": "獲得済みの功績: {earned}/{total}",
       "recentLabel": "最近:",
+      "recentJumpAria": "{name}へ移動",
       "nearestLabel": "あと少し:",
       "filterGroupAria": "功績を絞り込む",
       "filterAll": "すべて",
@@ -2780,14 +3254,14 @@ export const ja_JP: EnTranslations = {
       "lbSelfAccount": "あなたのアカウント：{rank} 位（上位 {percent}%）、名声 {renown}",
       "lbSelfRank": "あなたのアカウント：{rank} 位（上位 {percent}%）",
       "lbEmpty": "ランク入りした年代記作家はまだいません。",
-      "broadcastsLabel": "功績の達成をギルドとフレンドに共有する",
+      "broadcastsLabel": "功績の達成をギルドメンバーとフォロワーに、功績と傑作のカードをDiscordフィードに共有する",
       "titledName": "{name}【{title}】"
     },
     "continentMap": {
       "title": "ワールドマップ",
       "summary": "ワールドマップ。地域を選ぶとその地図が開きます。",
       "toWorld": "ワールドマップ",
-      "toZone": "Zone map",
+      "toZone": "ゾーンマップ",
       "toggleAria": "ワールドマップとゾーンマップを切り替える",
       "levels": "レベル {min} から {max}"
     }
@@ -2929,8 +3403,29 @@ export const ja_JP: EnTranslations = {
       "account_taken": "そのSteamアカウントは既に別のアカウントに連携されています。",
       "upstream": "Steamから応答がありません。しばらくしてからもう一度お試しください。"
     },
+    "epic": {
+      "disabled": "Epic連携は現在利用できません。",
+      "invalid_token": "Epicがこの連携リクエストを確認できませんでした。デスクトップアプリからもう一度お試しください。",
+      "banned": "そのEpicアカウントは連携できません。",
+      "already_linked": "このアカウントには既にEpicアカウントが連携されています。",
+      "account_taken": "そのEpicアカウントは既に別のアカウントに連携されています。",
+      "upstream": "Epicから応答がありません。しばらくしてからもう一度お試しください。"
+    },
     "wallet": {
       "handoff_invalid": "ウォレット認証の有効期限が切れたか、確認できませんでした。もう一度お試しください。"
+    },
+    "ota_updates": {
+      "invalid_input": "入力が無効です。"
+    },
+    "seeker": {
+      "native_only": "Seeker資格はネイティブアプリでのみ利用できます。",
+      "attestation_failed": "端末の検証に失敗しました。もう一度お試しください。",
+      "solana_artifact_required": "Solana Store版アプリを使用して続行してください。",
+      "wallet_required": "先にウォレットを連携して検証してください。",
+      "genesis_token_required": "検証済みのSeeker Genesis Tokenが必要です。",
+      "genesis_token_claimed": "そのSeeker Genesis Tokenはすでに取得されています。",
+      "entitlement_required": "検証済みのSeeker資格が必要です。",
+      "current_ownership_required": "現在Seeker Genesis Tokenを所有している必要があります。"
     }
   },
   "guide": {
@@ -2964,6 +3459,7 @@ export const ja_JP: EnTranslations = {
       "talents": "タレント",
       "arena": "アリーナとPvP",
       "valeCup": "ヴェイルカップ",
+      "thornhollow": "ソーンホロウ平原",
       "deeds": "功績の書",
       "glossary": "用語集",
       "wishIKnew": "知っておきたかったこと",
@@ -3133,16 +3629,21 @@ export const ja_JP: EnTranslations = {
       "groupInterface": "インターフェース",
       "groupCamera": "カメラ",
       "talents": "タレント",
+      "professions": "生産職",
       "arena": "アリーナ",
       "leaderboard": "リーダーボード",
       "deeds": "功績の書",
+      "sheathe": "武器を納刀/抜刀",
       "crafting": "製作",
       "valeCup": "ヴェイルカップ",
+      "mount": "騎乗 / 降車",
       "calendar": "イベントカレンダー",
+      "dungeonFinder": "ダンジョンファインダー",
       "discord": "Discord",
       "abilities": "アクションバーのアビリティを使用（数字キーの列。二つ目のバーはテンキーにあります）",
       "targetFriendly": "最も近い友好的な対象をターゲット",
       "cycleFriendly": "友好的なターゲットを順に切り替え",
+      "targetAuras": "ターゲットのバフとデバフ",
       "gameMenu": "ゲームメニューとオプションを開く",
       "bothMouse": "マウスの左右ボタン同時押し",
       "runForward": "前進",
@@ -3153,7 +3654,7 @@ export const ja_JP: EnTranslations = {
       "mobileHeading": "モバイルでは",
       "mobileBody": "スマートフォンやタブレットでは、タッチ操作が自動で表示されます。左側に移動用スティック、それ以外の場所はどこでもドラッグして視点操作、二本指でつまむとカメラをズームでき、そしてアビリティやメニュー用の画面上ボタンが現れます。左上隅の小さな矢印でメニューボタンの表示と非表示を切り替えられ、そこにある「その他」ボタンに残りのウィンドウがまとめられています。",
       "controllerHeading": "コントローラーでは",
-      "controllerBody": "ゲームパッドにも対応しており、コントローラーのサポートは初期設定で有効になっています。左スティックで移動し、右スティックでカメラを操作し、フェイスボタンとショルダーボタンでアビリティ、ジャンプ、対話を行います。バッグのようなウィンドウを開くと画面上のポインターが表示され、ゲームメニューは十字キーとフェイスボタンで直接操作できます。ボタンの割り当て変更や、スティックのデッドゾーン、カメラ速度、振動、視点反転の調整は、オプションのコントローラー設定から行えます。"
+      "controllerBody": "ゲームパッドにも対応しており、コントローラーのサポートは初期設定で有効になっています。左スティックで移動し、右スティックでカメラを操作し、フェイスボタンとショルダーボタンでアビリティ、ジャンプ、対話を行います。バッグのようなウィンドウを開くと画面上のポインターが表示され、ゲームメニューは十字キーとフェイスボタンで直接操作できます。ボタンの割り当て変更や、スティックのデッドゾーン、カメラ速度、振動、視点反転の調整は、オプションのコントローラー設定から行えます。ボタンをカメラのズームイン・ズームアウトに割り当てることもできます（初期状態では未割り当て）。"
     },
     "settingsPage": {
       "heading": "設定とパフォーマンス",
@@ -3531,14 +4032,6 @@ export const ja_JP: EnTranslations = {
         "name": "爬虫類",
         "desc": "独特の威嚇音と鋭い一撃を持つ、冷血のハンターたち。温血の獣たちとは一線を画します。"
       },
-      "murloc": {
-        "name": "クロークフィン",
-        "desc": "湖岸や潮だまりに棲む、しわがれ声の魚人たち。近づきすぎた者には、すぐさま群れをなして襲いかかります。"
-      },
-      "kobold": {
-        "name": "いたずら小妖",
-        "desc": "林間や生け垣をちょろちょろと駆け回る、漁り屋の小妖たち。数が揃うまでは、脅威というより厄介者です。"
-      },
       "demon": {
         "name": "デーモン",
         "desc": "裂け目の彼方から来た侵略者たち。その身は炎と悪意のかたまりです。一体がいるところ、次元の裂け目は決して遠くありません。"
@@ -3677,7 +4170,7 @@ export const ja_JP: EnTranslations = {
       "bastionBody": "沼地に呑まれて失われた水没の要塞。溺れた守備兵と、満ちゆく潮そのものに守られています。",
       "templeBody": "沼地の道から外れた場所に沈む祠。好奇心旺盛で、しっかり備えた者のための寄り道です。",
       "sanctumBody": "ソーンピークの暗き中心。カルトの長きにわたる企てが、おぞましい頂点に達する場所です。",
-      "wildheartBody": "温かな雨に濡れた密林のカルデラ。翡翠色の泉を囲む二本の高い狩猟路を進み、獣の巣と祖霊の遺跡を越えて、儀式のピラミッドでズルガーに挑め。",
+      "wildheartBody": "温かな雨に濡れた密林のカルデラ。翡翠色の泉を囲む二本の高い狩猟路を進み、獣の巣と祖霊の遺跡を越えて、儀式のピラミッドの頂で誰が待っているか確かめよ。",
       "raidName": "エンドコンテンツのレイド",
       "raidBody": "封じられた王家の扉の奥で、10人用の試練が待ち受けます。複数段階の戦いと、レイド全員で力を合わせて封じねばならない不死の力です。挑む資格を勝ち取り、9人の仲間を連れて挑みましょう。",
       "heroicTitle": "ヒロイックモード",
@@ -3742,23 +4235,25 @@ export const ja_JP: EnTranslations = {
       "duelsBody": "出会った相手なら誰でも友好的な決闘に挑めます。賭けるのはプライドだけなので、相性を学んだり仲間内の言い争いに決着をつけたりするのに一番手軽な方法です。",
       "coliseumHeading": "灰のコロシアム",
       "coliseumBody": "灰の闘技場はレルムのアリーナで、ランクマッチで他のプレイヤーと対戦します。一対一、あるいは二対二です。各ブラケットはそれぞれ独自の順位を保つので、勝てばそのラダーを駆け上がり、レルム全体に見てもらえます。アリーナのウィンドウを開き、一人で、あるいはパートナーとブラケットに登録しましょう。",
-      "fiestaHeading": "2対2のフィエスタ",
-      "fiestaBody": "フィエスタは、一つの途切れない試合として行うテンポの速い2対2の乱戦で、すべての戦士が対等な条件で戦います。試合が進むにつれてオーグメント、つまりその場で構成を組み替える手早い強化をドラフトするので、同じマッチは二つとありません。",
-      "augmentsNote": "オーグメントやパワーアップはそのマッチの間だけ続きます。持続的な強さではなく、その場で組む遊び心のあるビルドが目的なので、課金で勝ちを買えるわけではありません。",
-      "wavesTitle": "オーグメントはウェーブで訪れる",
-      "wavesBody": "フィエスタの試合では、進行に応じて新たな一手が手に入り、試合が長引くほどその一手は大胆になっていきます。一つのウェーブから次へとビルドを築き上げ、毎回いくつかの候補から一つを選び、残りの試合の間はそれを持ち続けます。",
-      "waveSilverTitle": "シルバー",
-      "waveSilverBody": "最初のウェーブ。単一ステータスを伸ばすシンプルな強化で、クラスの基本を研ぎ澄まします。",
-      "waveGoldTitle": "ゴールド",
-      "waveGoldBody": "中盤のウェーブ。両刃の組み合わせが並び、あなたのビルドが形を成して輝き始めます。",
-      "wavePrismaticTitle": "プリズマティック",
-      "wavePrismaticBody": "最後のウェーブ。ビルドを決定づける、画面を溶かすほどのスパイク。最高の意味でばかげていると感じられるよう作られています。",
-      "yumiHeading": "Yumiを守れ",
-      "yumiBody": "Protect Yumiは迷路で行うチーム目標モード。各チームは自分の猫の使い魔を守りながら、敵の使い魔を狙います。二匹の猫は時折迷路の別の場所へ転移するため、防衛、追撃、捜索の間で戦況が揺れ動きます。3対3か5対5でキューに参加でき、倒れても少しの間ベンチに下がるだけです。",
-      "powerupsTitle": "リングのパワーアップ",
-      "powerupsBody": "戦いの最中、光り輝くオーブがアリーナに落ちてきます。先に取った者の自由になり、しかも狙い通りに度を越していて、効果はほんの一瞬だけ。スピードデーモンは目もくらむ速さへ、コロッサスはのっそりと歩く巨人へ、ムーンブーツは低重力で跳ね回るジャンプへ、バーサーカーは突如あふれる怒りへとあなたを変えます。",
       "ladderHeading": "ラダーを駆け上がる",
       "ladderBody": "ランクプレイでは時間をかけて順位を記録します。リーダーボードを確認すれば、自分の位置やレルムの頂点に立つのが誰かが分かります。"
+    },
+    "thornhollowPage": {
+      "heading": "ソーンホロウ平原",
+      "intro": "ソーンピークの下、古い森に抱かれた壁に囲まれた窪地で戦うランク制5対5の旗奪取戦場。峡谷の両端で二つの廃城が向かい合い、その間にはどちらの手にも落ちたことのない、より古い中庭が横たわる。五人ずつ、城は二つ、目的は一つ。相手の旗を奪い、こちらの旗を奪われる前に持ち帰れ。",
+      "queueHeading": "キューへの参加",
+      "queueBody": "ソーンホロウ平原パネルを開けばソロで参加できるほか、最大5人のパーティで一緒に並べます。パーティは必ず同じチームに配置され、残りの席はソロの勇者で埋まります。10人が揃うと両チームが砦に配置され、短い整列ののち旗が有効になります。",
+      "fieldHeading": "戦場",
+      "fieldBody": "壁に囲まれた野外の戦場は、3つの区画に分かれています。両チームそれぞれの前庭と、その間に挟まれた「廃墟の中庭」です。全幅を貫く2枚の隔壁が境界となり、区画間の移動は必ず争奪点を通ります。広い正門と、隔壁をまたぐ門楼です。門楼の2つの扉は互い違いに開いており、伏撃の角を回り込む必要があります。各砦は正面口以外が完全に封じられているため、旗をめぐる出入りは必ず同じ開口部を通ります。その正面口には低いバリケードが立ち、まっすぐな突撃を阻みます。中庭には空洞の中心遺跡と側翼の2つのスプリントルーンがあり、残る2つは旗への進路に待っています。さらに各正門の中庭側入口にはバトルルーンまたはウォードルーン(短時間、与ダメージ増加か被ダメージ軽減)が待機:両方の台は同じ面で試合を開始し、取得のたびに面が切り替わります。",
+      "flagsHeading": "旗",
+      "flagsBody": "各砦は自軍の旗を守っています。敵の旗を奪って自軍の旗座まで運べば得点。先に3回キャプチャーしたチームの勝利で、時間切れの戦いはスコアで決着します。倒された運び手はその場に旗を落とします。敵は拾い直せますが、旗の持ち主チームは近づくだけで即座に旗を戻せます。また、旗は決して隠れません。旗を拾うとステルスは解除され、運び手がどんな手段であれ姿を消せば、旗はその場に落ちます。",
+      "pickupNote": "旗を拾うのは常に戦場アクションキーの意図的な押下です。誤って旗の上を走り抜けて運び手になることはありません。",
+      "respawnHeading": "戦場での死",
+      "respawnBody": "死は古典の儀式のまま:遺体はあなた自身が解放するまでその場に残り、魂は自陣キープの傍らの柵に囲まれた墓地に現れ、次のチーム復活ウェーブまでそこに縛られます。ウェーブは待機中の霊体を全員同時に蘇らせます。両チームのウェーブは意図的にずらされており、戦いが同時に完全リセットされることはありません。遺体走りも、スピリットヒーラーとの取引もありません:解放し、ウェーブを待ち、戦うのみ。",
+      "carrierHeading": "旗の運搬",
+      "carrierBody": "敵の旗を長く持ちすぎた運び手はどんどん脆くなり、旗がキャプチャー、ドロップ、返還されるまで被ダメージが増え続けます。旗を抱えて隠れるのは負け筋。持ち帰るのが勝ち筋です。",
+      "ladderHeading": "ラダー",
+      "ladderBody": "勝っても負けても、毎試合キャラクターごとの戦場レーティングが動き、歴代ランキングがレルムの王者を記録します。勝利と最後まで戦い抜いた敗北にはウォーフェアシステムを通じて名誉も支払われます。"
     },
     "valeCupPage": {
       "heading": "ヴェイルカップ",
@@ -3900,6 +4395,8 @@ export const ja_JP: EnTranslations = {
       "sourcesBody": "序盤のアップグレードのほとんどはクエスト報酬なので、稼ぎ作業よりクエストを終わらせるほうが得です。敵は倒されると装備を落とし、町の商人は手堅い基本装備を売り、職人は採集した素材を身につけられる品へと変え、プレイヤーマーケットでは他の冒険者から買えます。そして頂の上では、二つの刻印通貨が、ほかでは見つからない装備を買わせてくれます。デルヴの番人のもとではデルヴの刻印、英雄補給係のもとでは英雄の証です。",
       "soulboundTitle": "魂縛：あなただけのもの",
       "soulboundBody": "価値ある品の多くは魂縛、つまり入手した瞬間からあなたのキャラクターに縛られています。魂縛のアイテムは取引にも郵送にも出せず、商人に売ることも、マーケットに出品することもできません。それはもうあなたの物語の一部であり、ほかの誰かが代わりに持ち運ぶことはできないのです。",
+      "uniqueTitle": "装備ユニーク：同じレジェンダリーは1つだけ",
+      "uniqueBody": "レジェンダリーアイテムは装備ユニークです。キャラクターは同じレジェンダリーを同時に1つしか装備できず、そのヒロイック版も同じアイテムとして扱われます。2つ目はバッグや銀行、マーケットに置けますが、両方を同時に装備しようとすると拒否されます。ツールチップには金色の「装備ユニーク」タグが表示されるので、2つ持ちのビルドを計画する前にこのルールを確認できます。",
       "setsTitle": "セットとセットボーナス",
       "setsBody": "一部の防具は、見た目も戦いぶりもひと揃いになるよう仕立てられた、おそろいのシリーズで手に入ります。同じシリーズを一定数まとめて装備するとセットが目を覚まし、各部位そのもののステータスに加えてボーナスを与え、装備する部位が多いほど効果は強まります。そうしたシリーズのいくつかは、レベリング中の貴重なドロップとしても現れます。最も偉大なものはレベル上限近くの最も手強いグループコンテンツから手に入るので、フルセットを追い求めることは古典的なエンドゲームの目標になっています。",
       "consumablesTitle": "消耗品",
@@ -3921,7 +4418,7 @@ export const ja_JP: EnTranslations = {
     "professions": {
       "intro": "戦闘やクエストだけでなく、この世界は大地を耕し鍛冶場に立つあなたにも報いてくれます。原材料を採集し、十の製作職を通じてそれを装備や品物へと変え、それらの職が体現する十のアーキタイプのひとつとして自らのアイデンティティを築いていきます。",
       "harvestTitle": "狩りそのものを採取する",
-      "harvestBody": "採集はノードで終わらない。倒した獣の中には、通常の戦利品と並んで、死体から直接素材を採取できるものがいる：毛皮、牙、絹糸、さらに奇妙なものまで。一体の獲物につき採り手は一人：最初に採取した者がすべてを手にする。そして選択は毎回あなたのものだ：死体が差し出すすべてを剥ぎ取るか、ひとつの素材に集中してより上のグレードを受け取るか。採取はどのキャラクターにもでき、職も訓練も要らない。とりわけ見事な素材には、採取した者の名まで刻まれる。",
+      "harvestBodyChoice": "採集はノードで終わらない。倒した獣の多くは、通常の戦利品と並んで、死体から直接素材を採取できる：毛皮、牙、絹糸、そして肉。各死体は早い者勝ちで一度だけ採取でき、ひと押しで戦利品と採取の両方が開く。加工できる素材をふたつ以上持つ獣なら、選択はあなたのものだ：その獣が差し出せるすべてを取るか、より少ない素材に集中して、実際に取る分だけはっきりと上のグレードで受け取るか。\n\n標本を宿す系統の獣でレア以上の採取を引き当てると、通常の産出に加えて署名入りの完璧な標本（極上の獣皮、極上の蜘蛛の糸、極上の毒腺、極上の肉のいずれか）も手に入り、功績の書に「申し分なき標本」が刻まれる。採取はどのキャラクターにもでき、訓練も要らない。手持ちの採集道具はどの職のものであれ、このレア以上の判定を後押しする。",
       "focusTitle": "町のフォーカス",
       "focusBody": "どの拠点の町にも、訪れる採り手のための「町のフォーカス」パネルがある。町の中に立ってミニマップの脇から開き、わずかなフォーカスポイントの持ち分を、気にかける素材の種類へ振り分けよう。フォーカスした素材は、以後どの死体からもワングレード上質に、そして少し多めに採れる。割り振りはどこを歩いてもキャラクターに付いてまわり、後で町を訪れれば、無料で何度でも組み直せる。",
       "craftHowTitle": "製作ウィンドウ",
@@ -3951,7 +4448,7 @@ export const ja_JP: EnTranslations = {
       "deedsHeading": "旅路を刻む功績",
       "deedsBody": "功績の書が歩みに寄り添います。初めての調律で技巧に誓いし者、初めての傑作でMasterwrightを獲得し、どちらも称号として身につけられます。八つの製作職はそれぞれスキル50で節目の功績、上限125でGrandmaster称号を戴き、釣りは熟練100でOld Salt、200でMaster Angler称号を得ます。初めての採集や製作、野外の幸運な発見、サルベージにも静かなページがあります。すべて装飾のみ。称号と名声だけで、功績が力を与えることはありません。",
       "startHeading": "どこから始めるか",
-      "startBody": "Eastbrookに着いたばかりなら、Foreman Odellを訪ねてA Trade for Every Handを受けましょう。町の南西Copper Digの鉱脈を教えてくれます。以後は旅の途中で見かける鉱脈や木立、薬草をすべて採ること。町ではTキーで製作ウィンドウを開き、誰もが知る初期レシピを作り、鍛冶場、厨房、織機、工作場の師匠たちを訪ね、作業依頼で堅実に稼ぎましょう。ギルドの手紙が届く頃には、どの対が我が家か分かっているはずです。",
+      "startBody": "Eastbrookに着いたばかりなら、Foreman Odellを訪ねてA Trade for Every Handを受けましょう。町の南東Copper Digの鉱脈を教えてくれます。以後は旅の途中で見かける鉱脈や木立、薬草をすべて採ること。町ではTキーで製作ウィンドウを開き、誰もが知る初期レシピを作り、鍛冶場、厨房、織機、工作場の師匠たちを訪ね、作業依頼で堅実に稼ぎましょう。ギルドの手紙が届く頃には、どの対が我が家か分かっているはずです。",
       "colStation": "作業場",
       "colHub": "拠点",
       "colMaster": "師匠",
@@ -4046,7 +4543,7 @@ export const ja_JP: EnTranslations = {
           "materialsHeading": "竿と包丁が満たす食料庫",
           "materialsBody": "看板食材は釣りが地方ごとに供給します。Eastbrook Valeの鏡鱒と川鱸、Mirefen Marshの沼カワカマスと泥鰻、Thornpeak Heightsの霜鰓鱒と板鰭鯉。梯子の各段はその段の魚を調理するので、釣る料理人は品切れ知らずです。肉屋の側は亡骸採集から。猪などの獣肉、そしてレア以上の採集判定で署名入りのPrime Cut、大ローストの主役が出ます。薬草が上位の皿に香りを添え、ashwoodの丸太一本が鰻を燻し、Cooking SaltはMarlowの店で一袋8銅です。",
           "ladderHeading": "干し肉から大ローストへ",
-          "ladderBody": "Salted Jerkyが野外レシピです。最初から誰でも、蜘蛛の脚1本で、どこでも作れる駆け出しの携行食。訓練の梯子は広場西側のEastbrook厨房で、無料段はスキル0（川鱸、Hunter's Game Skewer、Herbed Marsh Pike）、中段はスキル25で各25銀（Ashwood Smoked Eel、Goldleaf Game Stew、Frostgill Chowder）、レア段はスキル50で各1金（Silvered Carp Supper、Angler's Feast Platter、Marlow's Grand Roast）。まとめ料理は食材を伸ばします。燻製鰻と煮込みは1回で2皿、宴会盛りは3皿です。",
+          "ladderBody": "Salted Jerkyが野外レシピです。最初から誰でも、蜘蛛の脚1本で、どこでも作れる駆け出しの携行食。訓練の梯子は広場東側のEastbrook厨房で、無料段はスキル0（川鱸、Hunter's Game Skewer、Herbed Marsh Pike）、中段はスキル25で各25銀（Ashwood Smoked Eel、Goldleaf Game Stew、Frostgill Chowder）、レア段はスキル50で各1金（Silvered Carp Supper、Angler's Feast Platter、Marlow's Grand Roast）。まとめ料理は食材を伸ばします。燻製鰻と煮込みは1回で2皿、宴会盛りは3皿です。",
           "routeHeading": "傑作ではなく特化、そして125への道",
           "routeBody": "料理は傑作物語の正直な例外です。皿に伸ばす能力値がないので傑作は決して発動せず、追う必要もありません。この職の極みは75の特化です。全食材が2割引きになり（まとめ料理では加速度的に効きます）、移動式の野外厨房でダンジョンの扉の前で宴が炊けます。釣った物を料理し、二つの技能を互いに養いましょう。干し肉と無料段で25、中段で50、レア段で75。以降は上位の皿が未実装のため半減から四分の一へ薄れ、上限まではおよそ150回。作り置きと考えれば無駄がなく、ギルドは全皿を平らげます。Marlowの依頼は30分ごとに獣肉8個。スキル50でSeasoned Chef、125でGrandmaster Cooking称号です。"
         },
@@ -4076,7 +4573,7 @@ export const ja_JP: EnTranslations = {
           "levelingHeading": "エンチャントの上げ方",
           "levelingBody": "スキルを動かす行動は二つ、分解とエンチャント付与です。成功ごとに最大1ポイント、仕事の重さで換算されます。コモンの分解と粉だけのエンチャントはコモンの仕事、良質の分解とエッセンスのエンチャントは良質、レアの分解とRunedやGreaterのエンチャントはレア、エピックと伝説の分解はさらに上です。お馴染みの熟達の薄れが25ポイント刻みで効き、コモンの仕事はスキル75で、良質は100で、レアの仕事はちょうど上限の125で灰色になります。エンチャントだけの情けもひとつ。天井を超える入力はゼロではなく天井へ丸められるため、誓う前でもエピックの分解はレアとして数えられ、無駄になりません。エンチャントが休眠に落ちればすべてコモン扱いで登りは75で止まり、趣味に据えればレアの仕事はまだ実り、75以降が遅くなるだけです。",
           "marketHeading": "付与済みの品と来歴と市場",
-          "marketBody": "付与は素材を消費し、特定の一品に印を付けます。鞄の中の品に使えば別個の付与済みの品が返り、装備中の品に使えばその場で付与され、外して着け直す必要はありません。どちらでも効果は永遠にその品に付き従います。一品にひとつ。付与済みの品に別の付与を使うと確認のうえ古い付与をそのまま置き換え、古い付与は素材の返却なしに破棄されます。売却、破棄、分解はどれも無印の品を先に選ぶので、完成品がうっかり食われることはありません。同一の付与品同士は重ねられます。傑作とエンチャントは友人です。傑作は問題なく付与でき、効果は傑作ボーナスにも署名にも触れず上乗せされます。全部を積んだ署名入り傑作のGreater付与が工芸品の頂点で、それでも設計上レイド戦利品の下に座ります。世界市場は無印の品しか扱わないため、付与済みや署名入りは取引ウィンドウで直接手渡し。市場に出せる半分は素材の方です。粉、エッセンス、シャードは自由に出品でき、出品無料、手数料は成立時の5%だけです。"
+          "marketBody": "付与は素材を消費し、特定の一品に印を付けます。鞄の中の品に使えば別個の付与済みの品が返り、装備中の品に使えばその場で付与され、外して着け直す必要はありません。どちらでも効果は永遠にその品に付き従います。一品にひとつ。付与済みの品に別の付与を使うと確認のうえ古い付与をそのまま置き換え、古い付与は素材の返却なしに破棄されます。売却、破棄、分解はどれも無印の品を先に選ぶので、完成品がうっかり食われることはありません。同一の付与品同士は重ねられます。傑作とエンチャントは友人です。傑作は問題なく付与でき、効果は傑作ボーナスにも署名にも触れず上乗せされます。全部を積んだ署名入り傑作のGreater付与が工芸品の頂点で、それでも設計上レイド戦利品の下に座ります。付与済みや署名入りの品も世界市場に出せます。一品ずつの単品出品となり、ツールチップには付与と作り手の銘が表示され、ワタリガラス便でも同じように送れます。素材は今も商いの堅実な半分です。粉、エッセンス、シャードは自由に出品でき、出品無料、手数料は成立時の5%だけです。"
         }
       },
       "howHeading": "製作の流れ",
@@ -4126,12 +4623,16 @@ export const ja_JP: EnTranslations = {
       "nodesHeading": "ゾーン別ノード",
       "nodesNote": "ノードの場所・ティア・必要な道具・産出の一覧です。各ノードはあなたの採集から{respawn}秒後に、あなた専用に再出現します。",
       "toolsHeading": "道具",
-      "toolsNote": "どのノードにも、その職の道具をバッグに入れておくことが必要です。ティア1も例外ではありません。ピッケルがなければ鉱石は掘れず、竿がなければ魚も釣れません。商人が扱うのはティア1から3までで、どのゾーンの拠点にも並んでいます。道具はバッグにあればよく、装備枠も耐久度もないため、購入は一度きりです。採集の可否を決めるのはティアだけで、道具のレアリティの色は見た目だけのものです。\n\n商人の品揃えの上には、製作でしか手に入らない道具がティア4と5の二つあります。工作場で工作の職人が作るもので、NPCは決して売りません。今のところティア3を超える道具を求めるノードはないため、その価値は速さにあります。最上位の道具は低いティアのノードでの採集詠唱を最短の秒数に固定し、より高いティアの土地が現れたときには入場券にもなります。",
+      "toolsNote": "どの採集ポイントにも、その専門の道具をバッグに入れておく必要があります。ティア1も例外ではありません。つるはしがなければ鉱石は採れず、釣り竿がなければ魚も釣れません。商人のはしごはティア1から3までを扱い、各拠点は自分の土地で使うティアだけを置いています。そのためティア1の道具はどの地域拠点でも売られていますが、その上の段は、それを必要とする鉱脈のある場所で売られます。その段を買うには、商人はその専門の熟練度も求めます。ティア2には {tier2Prof}、ティア3には {tier3Prof} が必要で、商品欄にその条件が示されます。道具はバッグに入っていればよく、装備枠も耐久度もありません。ですから購入は一度きりで、すでに持っている道具はそのまま使えます。条件に関わるのはティアだけです。同じティアでレアリティが高い道具でも、開けるものが増えるわけではありません。ただしレアリティは色だけのものではありません。差し込んだ道具効果の持ちが長くなり、釣り竿ならリールの猶予も広がります。\n\n良い道具が買うものは二つではなく三つです。より高いティアの土地を開き、採集時間を縮め、採れるものを良くします。その地域の素材より上のティアの道具で鉱脈を掘ると、通常の素材ではなく上質級が手に入ります。対象はその地域の完全品級の鉱脈に限られるため、旅人向けに残された易しい鉱脈からは通常の素材が出ます。上質素材は道具のレシピが消費するものであり、レシピや依頼が通常版を求めるところではどこでも上質級がその代わりになります。ですから強化して行き詰まることはありません。銅鉱石が上質な銅鉱石として手に入るようになるだけです。\n\n商人のはしごの上には、各専門にティア4とティア5の製作道具が二つあります。技師が道具工房で作るか、溺れた連祷のカウンターで探索の印を使って購入します。硬貨でこれらを売る商人はいません。釣りには専用の一対があり、最初から知っているのではなく道具職人から習います。今のところティア3を超えて必要とする採集ポイントも水域もないため、最上位の二段が買うのは入場条件ではなく、速さと品級と優しいリールの猶予です。より高いティアの土地が現れたとき、それらが入場券になります。",
       "toolCrafted": "製作品（{craft}）",
+      "toolCraftedOrMarks": "{craft}で製作、または探索の印 {marks} で購入",
+      "toolCraftedOrMarksHeroic": "{craft}で製作、または溺れし連祷のヒロイック攻略後に探索の印 {marks} で購入",
       "toolVendor": "{name}（{hub}）",
       "toolUnavailable": "非売品",
       "priceNone": "非売品",
       "toolTierReq": "ティア{tier}の道具",
+      "colWield": "使用熟練度",
+      "wieldNone": "制限なし",
       "yieldsHeading": "採集の実り",
       "yieldsBody": "採集のたびに品質が抽選され、その確率は熟練度がすべてです。始めたばかりの採集者は常にコモン品ですが、熟練が上がるほど高い等級へ重みが移り、決して後退しません。上限100ではコモンが完全に消え、60%が良質、30%がレア、8%がエピック、2%が伝説になります。品質は量でもあります。コモンは1個、良質とレアは2個、エピックは3個、伝説は4個。レア以上の収穫はあなたの署名入り（Gathered by）で届き、上限では十回に四回、名前が刻まれます。",
       "bandsHeading": "熟練度バンド",
@@ -4152,6 +4653,7 @@ export const ja_JP: EnTranslations = {
         "startBody": "Simple Fishing PoleはEastbrookのFisherman Brandtが20銅で売っています（町の東端でMirror Lakeを睨む老練の釣り師です）。Tinker Gizzel、FenbridgeのProvisioner Hale、HighwatchのQuartermaster Breeにも在庫があります。前方約24ヤード以内の十分に深い水面に向かって竿を使えば、浮きが飛んでいきます。戦闘中、泳いでいる間、死亡中は投げられません。岸から釣るのが本来の姿で、どの地方の釣れる水域でも構いません。",
         "biteHeading": "アタリとリール",
         "biteBody": "キャストから{min}から{max}秒でアタリが来ます（良い竿は待ちを最大{rod}秒縮めます）。リールの猶予は{reel}秒に竿がティア1つ上がるごとに{reelRod}秒加わり、1回のセッションは最長{cap}秒です。",
+        "earlyReelNote": "せっかちな指への注意：アタリが来る前にもう一度竿を使うと空の糸を巻き上げ、そのキャストは終わります（キャスト直後のわずかな猶予がうっかりの二度押しを許してくれます）。釣りは我慢がすべて。アタリを待って、それから合わせましょう。",
         "scheduleHeading": "熟練度成長",
         "scheduleNote": "釣りの成長は熟練度ごとの固定スケジュールに従い、{cutoff}からはガラクタを釣っても何も学べません。",
         "colProficiency": "熟練度",
@@ -4187,7 +4689,7 @@ export const ja_JP: EnTranslations = {
         "sellsHeading": "何が売れるか、なぜか",
         "sellsBody": "最も堅実な商売は消耗品です。使えばなくなり、また買われるからです。薬、料理、エンチャントはすべて消えもの。剣を一度買った戦士も回復薬は永遠に買い続けます。傑作は高級品市場です。注文生産はできないため、望まれた一品には本物の上乗せがつき、刻まれた署名は歩く看板になります。素材が第三の柱です。分解で得る秘術素材、砕き手からエンチャンターへ直接流れるResonant副産物、そして傑作を狙う職人が割高でも買う署名入り採集素材です。",
         "marketHeading": "世界市場と手数料",
-        "marketBody": "世界市場はレルム全体の取引所で、EastbrookのMerchantとHighwatchのAuctioneer Vossが取り仕切ります。出品は無料。保証金はなく、売れ残りはそのまま戻ります。手数料は成立時のみ、売値の5%です。重要な制限として、市場が扱うのは無印の品だけです。署名入り、傑作、エンチャント済み、バインド済みの品は出品されないため、特別な品は取引ウィンドウで直接手渡しされます。値付けは自分で。市場が教えてくれるのは無印の相場だけです。",
+        "marketBody": "世界市場はレルム全体の取引所で、EastbrookのMerchantとHighwatchのAuctioneer Vossが取り仕切ります。出品は無料。保証金はなく、売れ残りはそのまま戻ります。手数料は成立時のみ、売値の5%です。特別な品も歓迎です。署名入り、傑作、エンチャント済みの品は一品ずつの単品出品となり、ツールチップに署名まで含めた素性がそのまま表示され、無印の山と混ざることはありません。唯一の拒否はバインドされた品です。作り手の絆で縛られた、またはこれから縛られる品は市場にも郵便にも出せず、絆を洗い流すことはできません。特別な品の値付けは自分で。無印の出品が教えてくれるのは無印の相場だけです。",
         "workOrdersHeading": "作業依頼",
         "workOrdersNote": "各師匠は自分の定番素材の束を店売り価格の{pct}%で買い取り、{minutes}分ごとに繰り返せます。",
         "colOrder": "作業依頼",
@@ -4200,8 +4702,16 @@ export const ja_JP: EnTranslations = {
         "provenanceBody": "レア以上の製作品と発見には作り手の署名が入り、署名が完全に一致する品は今でもスタックできます。",
         "collectorsHeading": "収集家と戦利品、物語の値段",
         "collectorsBody": "商人は来歴を見ません。署名入りでもNPCへの売値は無印と同額です。署名の上乗せはプレイヤーの間にだけ存在し、だからこそ面白いのです。名の知れた採集者が署名した幸運の鉱石、Prime Cutの一切れ、引退した職人の名を刻む傑作の剣。値段は誰かの記憶が決めます。功績の書も同じ心を汲みます。Pristine Vein、Ancient Heartwood、Moonlit Bloom、A Perfect Specimen、Glimmer of Hopeはいずれも名声ゼロの収集印で、その瞬間があなたに起きた証のためだけにあります。これらは力ではありません。来歴は能力値を買わず、戦いにも勝ちません。良き日々の控えです。",
-        "throttleHeading": "行動の制限",
-        "throttleBody": "製作・分解・エンチャント・サルベージはひとつの制限を共有します。{seconds}秒あたり最大{actions}回です。",
+        "castPaceHeading": "詠唱時間とゴールドの消費",
+        "castPaceBody": "専門職の行動には実際の詠唱時間がかかります。簡単な野外レシピは2秒弱、梯子の上位レシピは数秒、分解・付魔・解体・道具効果の充填はそれぞれ固定の短い詠唱です。詠唱中にキャンセルしても損失はありません。成功した製作にはアイテム予算に応じた銅貨の手数料もかかります。材料・作業台・技能上限と合わせて、別枠の行動上限がなくても市場を健全に保てます。スキル帯ごとの正確な詠唱時間は下記のとおりです。",
+        "castPaceField": "フィールドレシピ（スキル要件なし）: 詠唱 {seconds} 秒",
+        "castPaceSkill25": "スキル25までのレシピ: 詠唱 {seconds} 秒",
+        "castPaceSkill50": "スキル50までのレシピ: 詠唱 {seconds} 秒",
+        "castPaceSkill75": "スキル75までのレシピ: 詠唱 {seconds} 秒",
+        "castPaceCombo": "最上位およびコンボレシピ: 詠唱 {seconds} 秒",
+        "castPaceEnchantFamily": "分解・付魔・解体: 詠唱 {seconds} 秒",
+        "castPaceRecharge": "道具効果の充填: 詠唱 {seconds} 秒",
+        "castPaceBatch": "まとめて作成: 一度の注文で最大 {count} 個、1個ずつ詠唱",
         "doctrineHeading": "プレイヤー同士の取引",
         "doctrineBody": "製作装備の強さは常にレイドの下限を下回り、上記の費用は品物を商店の循環ではなくプレイヤー間の取引へと押し出します。"
       },
@@ -4246,7 +4756,7 @@ export const ja_JP: EnTranslations = {
       "tradeBody": "近くに立っている相手とは、対面で直接取引できます。互いが共有の窓にアイテムとコインを入れ、双方が確認して初めて交換が成立するので、どちらも損をする心配はありません。友達にドロップ品を手渡したり、約束を取り決めたりする手軽な方法です。",
       "mailTitle": "レイヴンポスト",
       "mailBody": "どの拠点の町にも、ワタリガラスを彫った柱が立っています。レルムの手紙配達、レイヴンポストのメールボックスです。その前に立てば、オンラインの友人にも長くオフラインの相手にも、名前を指定してどのキャラクターへも手紙を書け、わずかな郵送料でコインや品物を手紙に添えられます。ワタリガラスが飛ぶには少し時間がかかります。届くと、封筒の印が受取人に何かが待っていると知らせてくれます。",
-      "mailHow": "受け取りも同じで、向きが逆になるだけです。どの柱の前でも手紙を読み、添えられたものを財布とバッグに納められます。手紙は永遠には待ってくれないので、ワタリガラスに見放される前に受け取りましょう。ポストがきっぱり断るものが二つあります。魂縛のアイテムとクエスト品は、あなた自身が運ぶか、まったく運ばれないかのどちらかです。そして、良い報告を終えたあとは柱に目を配りましょう。手紙をよこす発注者もいるのです。",
+      "mailHow": "受け取りも同じで、向きが逆になるだけです。どの柱の前でも手紙を読み、添えられたものを財布とバッグに納められます。手紙は永遠には待ってくれないので、ワタリガラスに見放される前に受け取りましょう。ポストがきっぱり断るものがいくつかあります。魂縛のアイテム、クエスト品、そしてバインド済みの品や取引で縛られる品は、あなた自身が運ぶか、まったく運ばれないかのどちらかです。そして、良い報告を終えたあとは柱に目を配りましょう。手紙をよこす発注者もいるのです。",
       "dailyTitle": "デイリー報酬",
       "dailyBody": "画面上の宝箱ボタンを押すと、デイリー報酬のウィンドウが開きます。毎日いくつかの課題が用意され、クエストを達成したり、灰の闘技場で戦ったり、ヴェイルカップの試合に勝ったりでき、さらに賞品ホイールを一日一回無料で回せます。これらはすべてその日の順位に向けたポイントになり、上位の獲得者たちは、任意のコミュニティトークンの保有者向けの賞金プールを分け合います。いずれもゲーム内で力を授けることはありません。ウィンドウにはその日のルールと参加資格が示され、リーダーボードが表示され、あなたの履歴も残されます。",
       "marketTitle": "ワールドマーケット",
@@ -4659,6 +5169,7 @@ export const ja_JP: EnTranslations = {
       "terrainCapReached": "地形編集の上限に達しました（{max}）。超過分のスカルプトは追加されませんでした。",
       "placementCapReached": "配置数の上限に達しました（{max}）。超過分のアセットは追加されませんでした。",
       "blockerCapReached": "ブロッカー壁の上限（{max}）に達しました。新しい壁は追加されませんでした。",
+      "campCapReached": "キャンプの上限（{max}）に達しました。新しいキャンプは追加されませんでした。",
       "autosaveOff": "自動保存をオフにしました：{reason} 手動で保存してから、再度オンにしてください。"
     },
     "confirm": {
@@ -4933,6 +5444,199 @@ export const ja_JP: EnTranslations = {
     "realm": "ワールド",
     "newCharacter": "新規キャラクター",
     "appearance": "外見",
+    "customize": "カスタマイズ",
+    "body": "体型",
+    "genderMale": "男性",
+    "genderFemale": "女性",
+    "hair": "髪型",
+    "brows": "眉",
+    "skinTone": "肌の色",
+    "hairColor": "髪の色",
+    "lightness": "明るさ",
+    "colorWheelAria": "{label}のカラーホイール：ドラッグして色相と彩度を選択",
+    "lightnessAria": "{label}の明るさ",
+    "customColor": "カスタム",
+    "colorPresetAria": "{label}のプリセット {n}",
+    "beard": "ひげ",
+    "face": "顔",
+    "faceNose": "鼻",
+    "faceEyes": "目の大きさ",
+    "faceJaw": "あご",
+    "faceBrow": "まゆ",
+    "faceCheeks": "ほお",
+    "faceChin": "あご先",
+    "bodyShoulders": "肩",
+    "bodyChest": "胸",
+    "bodyHips": "腰まわり",
+    "bodyHands": "手の大きさ",
+    "bodyElbows": "ひじ",
+    "bodyKnees": "ひざ",
+    "bodyFeet": "足",
+    "mouth": "口",
+    "mouthNeutral": "ふつう",
+    "mouthLips": "厚い唇",
+    "mouthSmile": "笑顔",
+    "mouthFrown": "しかめ面",
+    "mouthWide": "大きめ",
+    "mouthPout": "とがり口",
+    "mouthGrin": "歯見せ笑い",
+    "mouthOpen": "開き",
+    "mouthAwe": "驚き",
+    "faceEars": "耳",
+    "faceSmirk": "にやり",
+    "eyeShape": "目の形",
+    "eyeColor": "目の色",
+    "earShape": "耳の形",
+    "lashes": "まつげ",
+    "lashesOn": "あり",
+    "lashesOff": "なし",
+    "lashColor": "まつげの色",
+    "outfit": "衣装カラー",
+    "outfitClassic": "クラシック",
+    "outfitCrimson": "クリムゾン",
+    "outfitEmber": "エンバー",
+    "outfitGold": "ゴールド",
+    "outfitForest": "フォレスト",
+    "outfitEmerald": "エメラルド",
+    "outfitTeal": "ティール",
+    "outfitAzure": "アジュール",
+    "outfitRoyal": "ロイヤルブルー",
+    "outfitViolet": "バイオレット",
+    "outfitMagenta": "マゼンタ",
+    "outfitRose": "ローズ",
+    "outfitOnyx": "オニキス",
+    "outfitIvory": "アイボリー",
+    "outfitGilded": "黄金装飾",
+    "outfitBonewrought": "骨細工",
+    "outfitObsidian": "黒曜石",
+    "outfitVerdigris": "緑青",
+    "outfitBloodforged": "血鍛造",
+    "lipstick": "口紅",
+    "blush": "チーク",
+    "eyeshadow": "アイシャドウ",
+    "makeupNone": "なし",
+    "shadeRose": "ローズ",
+    "shadeCoral": "コーラル",
+    "shadeRuby": "ルビー",
+    "shadeBerry": "ベリー",
+    "shadePlum": "プラム",
+    "shadeNude": "ヌード",
+    "shadePeach": "ピーチ",
+    "shadeWarm": "ウォーム",
+    "shadeMauve": "モーヴ",
+    "shadeSmoke": "スモーク",
+    "shadeBronze": "ブロンズ",
+    "shadeTeal": "ティール",
+    "randomize": "ランダムな外見",
+    "randomizeShort": "ランダム",
+    "helmPreview": "ヘルムを表示",
+    "style": "スタイル",
+    "resetLook": "外見をリセット",
+    "resetShort": "リセット",
+    "browFlat": "平ら",
+    "browArched": "アーチ",
+    "browThin": "細め",
+    "browBushy": "太め",
+    "browWorried": "困り眉",
+    "browSharp": "鋭角",
+    "browRound": "丸み",
+    "eyeRound": "丸目",
+    "eyeAlmond": "アーモンド",
+    "eyeNarrow": "切れ長",
+    "eyeWide": "ぱっちり",
+    "eyeSharp": "鋭角",
+    "eyeDroopy": "たれ目",
+    "eyeSleepy": "ねむ目",
+    "eyeWideset": "離れ目",
+    "eyeCat": "ネコ目",
+    "eyeDoe": "タレ目がち",
+    "earRound": "丸耳",
+    "earPointed": "とがり耳",
+    "earSmall": "小さめ",
+    "earWide": "大きめ",
+    "hairBald": "坊主",
+    "hairBuzz": "丸刈り",
+    "hairCrew": "ショート",
+    "hairCrewcut": "クルーカット",
+    "hairPixie": "ピクシーカット",
+    "hairSweptpixie": "流しピクシー",
+    "hairQuiff": "クイッフ",
+    "hairSidepart": "サイドパート",
+    "hairMessy": "無造作ツンツン",
+    "hairCurlycap": "ショートカール",
+    "hairPompadour": "リーゼント",
+    "hairSweptback": "ミディアム流し",
+    "hairFauxhawk": "ソフトモヒカン",
+    "hairMohawk": "モヒカン",
+    "hairTopknot": "お団子",
+    "hairWarriorbraid": "戦士の編み込み",
+    "hairHighbun": "高めのお団子",
+    "hairLowbun": "低めのお団子",
+    "hairBraidcrown": "編み込みクラウン",
+    "hairAfro": "アフロ",
+    "hairCurlyafro": "カーリーアフロ",
+    "hairChinbob": "あご丈ボブ",
+    "hairBluntbangs": "ぱっつん前髪ボブ",
+    "hairWavybob": "ウェーブボブ",
+    "hairAsymbob": "アシンメトリーボブ",
+    "hairCurtains": "カーテンヘア",
+    "hairHighpony": "ハイポニーテール",
+    "hairSidepony": "サイドポニーテール",
+    "hairHalfbun": "ハーフお団子",
+    "hairLayered": "肩までのレイヤー",
+    "hairCurls": "ゆるふわカール",
+    "hairLongwavy": "ロングウェーブ",
+    "hairLongcenterpart": "ロングセンターパート",
+    "hairLongpart": "ロングセンターパート",
+    "hairMullet": "ウルフカット",
+    "hairTwinbraids": "ツイン三つ編み",
+    "hairLowpony": "ローポニーテール",
+    "hairFantasybraid": "ファンタジー三つ編み",
+    "beardNone": "なし",
+    "beardStubble": "無精ひげ",
+    "beardScruff": "薄ひげ",
+    "beardMutton": "ほおひげ",
+    "beardGoatee": "ヤギひげ",
+    "beardChinpuff": "あご下ひげ",
+    "beardStache": "口ひげ",
+    "beardHorseshoe": "馬蹄ひげ",
+    "beardShortbox": "ボックス",
+    "beardFull": "フルビアード",
+    "beardVikingb": "編みひげ",
+    "beardWizard": "魔道士髭",
+    "beardStubbleBeard": "濃い無精髭",
+    "browNone": "なし",
+    "browSoft": "やわらかめ",
+    "browThick": "太め",
+    "browAngled": "つり眉",
+    "earrings": "ピアス",
+    "jewelMaterial": "装飾品の素材",
+    "jewelDefault": "そのまま",
+    "jewelGold": "ゴールド",
+    "jewelSilver": "シルバー",
+    "jewelBone": "ボーン",
+    "jewelIron": "アイアン",
+    "jewelCopper": "カッパー",
+    "jewelBronze": "ブロンズ",
+    "jewelObsidian": "オブシディアン",
+    "jewelJade": "ヒスイ",
+    "jewelAmethyst": "アメジスト",
+    "jewelRuby": "ルビー",
+    "jewelPearl": "パール",
+    "jewelTurquoise": "ターコイズ",
+    "earNone": "なし",
+    "earStud": "スタッド",
+    "earHoop": "フープ",
+    "earBone": "骨の護符",
+    "earBonehoop": "骨のリング",
+    "earMoon": "三日月",
+    "earMoonstar": "月光の星",
+    "earRunic": "ルーンストーン",
+    "earChain": "ビーズドロップ",
+    "earSeptum": "鼻リング",
+    "earWarden": "守人の鉄",
+    "earCuff": "イヤーカフ",
+    "earFeather": "フェザー",
     "class": "クラス",
     "name": "名前",
     "chromaOption": "カラー {n}",
@@ -5014,6 +5718,7 @@ export const ja_JP: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "ホルダー特典が有効です。署名や支払いが必要なときはアプリを接続してください。",
     "extensionHelp": "ここにウォレットを表示するには、Solflare Wallet などのブラウザ用ウォレット拡張機能を有効にしておいてください。",
     "mobileAppHelp": "Phantom または Solflare を選択してください。ウォレットアプリで承認を求められます。ゲームを開いたままにし、完了後に戻ってください。",
+    "seekerAppHelp": "Seed Vault Walletで続行します。Seed Vaultで接続と認証のリクエストを確認し、完了したらゲームに戻ってください。",
     "standaloneAppHelp": "ホーム画面アプリでは、まだウォレットに接続できません。Phantom または Solflare を使用するには、Safari か Chrome で World of ClaudeCraft を開いてください。",
     "openAppTitle": "{wallet} で続行",
     "openAppHelp": "{wallet} を開いてこのリクエストを確認してください。ウォレットアプリの使用中も、このゲームタブを開いたままにしてください。",
@@ -5641,7 +6346,6 @@ export const ja_JP: EnTranslations = {
   "yumi": {
     "bracket3": "Yumi 3v3",
     "bracket5": "Yumi 5v5",
-    "enterQueue": "Protect Yumiに参加！",
     "queue": {
       "join": "Protect Yumiのキューに参加しました。使い魔を守りましょう…",
       "leave": "Protect Yumiのキューを離れました。",
@@ -5679,9 +6383,6 @@ export const ja_JP: EnTranslations = {
   },
   "fiesta": {
     "bracket": "Fiesta",
-    "enterQueue": "Fiestaに参加！",
-    "practice": "🎉 ボットとの練習",
-    "practiceNote": "オフライン練習：AIボットを3体出現させ、2v2 Fiestaのキューに登録します。もう一度クリックで停止。",
     "banner": {
       "wave": "ウェーブ {wave}/{total} — オーグメントを選べ！",
       "augmentGained": "オーグメント獲得：{name}！",
@@ -5746,6 +6447,7 @@ export const ja_JP: EnTranslations = {
     },
     "augment": {
       "choose": "オーグメントを選択",
+      "cardAria": "{name}（{category}）：{description}",
       "aug_brutality": {
         "name": "蛮勇",
         "desc": "物理攻撃の威力が15%上昇する。"
@@ -5937,10 +6639,16 @@ export const ja_JP: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "アップデート {version} をダウンロード中...",
-      "ready": "アップデート {version} の準備ができました。ゲーム終了時に自動でインストールされます。今すぐ再起動もできます。",
+      "checkingTitle": "アップデートを確認中...",
+      "checkingBody": "ゲームは自動的に最新の状態に保たれます。",
+      "uptodateTitle": "お使いのバージョンは最新です。",
+      "downloadingTitle": "アップデート {version} をダウンロード中...",
+      "downloadingBody": "プレイは続けられます。アップデートはゲーム終了時にインストールされます。",
+      "readyTitle": "アップデート {version} の準備ができました",
+      "readyBody": "ゲーム終了時に自動でインストールされます。今すぐ再起動もできます。",
       "restart": "今すぐ再起動",
-      "later": "後で"
+      "later": "後で",
+      "dismiss": "閉じる"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -6128,11 +6836,12 @@ export const ja_JP: EnTranslations = {
       "releaseSpirit": "霊魂を解放",
       "chatTab": "チャット",
       "combatLogTab": "戦闘ログ",
-      "chatPlaceholder": "発言する... (/s 発言、/w 名前 ささやき、/r 返信、/p パーティ、/gu ギルド、/o オフィサー、/general 一般、/help)",
+      "chatPlaceholder": "発言する... (/s 発言、/w 名前 ささやき、/r 返信、/p パーティ、/gu ギルド、/o オフィサー、/general 一般、/help、! でコミュニティコマンド)",
       "chatChannels": {
         "add": "チャットチャンネルを追加",
         "addTitle": "チャンネルを追加",
         "close": "{channel}タブを閉じる",
+        "moveHint": "{channel}タブを並べ替え: ドラッグするか、Alt+左または Alt+右を使用",
         "sendingTo": "{channel}に送信",
         "names": {
           "say": "発言",
@@ -6155,7 +6864,6 @@ export const ja_JP: EnTranslations = {
       "mobileMore": "その他",
       "mobileMoreAria": "その他のメニューを表示",
       "mobileSocial": "ソーシャル",
-      "mobileArena": "アリーナ",
       "mobileMenu": "メニュー",
       "mobileSettings": "設定",
       "mobileUse": "使用",
@@ -6189,11 +6897,15 @@ export const ja_JP: EnTranslations = {
       "graphicsPresetMedium": "中",
       "graphicsPresetHigh": "高",
       "graphicsPresetUltra": "ウルトラ",
+      "graphicsPresetInsane": "極限",
       "graphicsPresetAdvanced": "詳細",
       "terrainDetail": "地形の詳細",
       "foliageDensity": "草木の密度",
       "effectsQuality": "エフェクトと照明",
       "shadowQuality": "影の品質",
+      "surfaceDetail": "表面ディテール",
+      "surfaceDetailBasic": "基本",
+      "surfaceDetailFull": "フル",
       "terrainLow": "低",
       "terrainHigh": "高",
       "touchOpacity": "タッチ操作の不透明度",
@@ -6268,7 +6980,7 @@ export const ja_JP: EnTranslations = {
         "nameplates": "ネームプレート切り替え",
         "meters": "ダメージメーター",
         "social": "フレンド & ギルド",
-        "arena": "アリーナ（灰の闘技場）",
+        "arena": "PvP(ソーンホロウ平原とアリーナ)",
         "chat": "チャットを開く",
         "attack": "攻撃",
         "actionBarSlot": "アクションバー {slot}"
@@ -6357,6 +7069,8 @@ export const ja_JP: EnTranslations = {
       "joinParty": "パーティに参加",
       "guildInvite": "{name}があなたを{guild}に招待しています。",
       "joinGuild": "ギルドに参加",
+      "guildInviteCancelled": "ギルド名が変更されたため、保留中のギルド招待は取り消されました。",
+      "guildRenamed": "あなたのギルドは運営チームによって{name}に改名されました。",
       "tradeRequest": "{name}が取引を希望しています。",
       "openTrade": "取引を開く",
       "duelRequest": "{name}があなたに決闘を申し込みました！",
@@ -6370,6 +7084,10 @@ export const ja_JP: EnTranslations = {
       "floatingDodge": "回避",
       "floatingParry": "受け流し",
       "floatingResist": "抵抗",
+      "floatingEvade": "完全回避",
+      "floatingBlock": "{amount} ブロック",
+      "floatingHealFull": "満タン",
+      "floatingHealAbsorbed": "吸収",
       "cannotMove": "動けない！",
       "attack": "攻撃",
       "damageDone": "{ability}が{target}に命中し、{amount}のダメージ。",
@@ -6380,10 +7098,17 @@ export const ja_JP: EnTranslations = {
       "dodged": "{target}は{ability}を回避しました。",
       "parried": "{target}は{ability}を受け流しました。",
       "resisted": "{target}は{ability}に抵抗しました。",
+      "evaded": "{target}は{ability}を完全回避しました。",
+      "blockedDone": "{target}は{ability}をブロックし、{amount}のダメージ。",
+      "blockedTaken": "{source}の攻撃をブロックし、{amount}のダメージを受けました。",
       "healSelf": "{ability}が自分を{amount}回復しました。",
       "healSelfCrit": "{ability}が自分をクリティカルで{amount}回復しました。",
       "healOther": "{ability}が{target}を{amount}回復しました。",
       "healOtherCrit": "{ability}が{target}をクリティカルで{amount}回復しました。",
+      "healSelfFull": "{ability}は命中しましたが、すでに体力は満タンです。",
+      "healOtherFull": "{ability}は{target}に命中しましたが、対象はすでに体力満タンです。",
+      "healSelfAbsorbed": "{ability}は自分に付いた腐敗に飲み込まれた。",
+      "healOtherAbsorbed": "{ability}は{target}に付いた腐敗に飲み込まれた。",
       "death": "{name}は死亡しました。",
       "auraGain": "{name}を得ました。",
       "auraFade": "{name}が自分から消えました。",
@@ -6392,6 +7117,11 @@ export const ja_JP: EnTranslations = {
     },
     "system": {
       "playerDeath": "死亡しました。",
+      "deathRecapKillerAbility": "死亡しました。{killer}の{ability}に倒されました。",
+      "deathRecapKiller": "死亡しました。{killer}に倒されました。",
+      "deathRecapAbility": "死亡しました。{ability}によって死亡しました。",
+      "deathRecapFalling": "死亡しました。転落死しました。",
+      "deathRecapDrowned": "死亡しました。溺死しました。",
       "respawn": "再び休まり、完全な状態になりました。",
       "ignoringChat": "{name}のチャットを無視します。",
       "noLongerIgnoring": "{name}の無視を解除しました。",
@@ -6472,10 +7202,12 @@ export const ja_JP: EnTranslations = {
       "arenaQueueTrading": "取引を終えてからキューに入ってください。",
       "arenaQueueInstance": "インスタンス内からキューには入れません。",
       "tradeInProgress": "すでに取引が進行中です。",
+      "tradeAlreadyTrading": "そのプレイヤーはすでに取引中です。",
       "tradeTooFar": "対象が遠すぎて取引できません。",
       "tradeExpired": "取引リクエストは期限切れです。",
       "tradeFailed": "取引失敗: アイテムまたは所持金が利用できません。",
-      "tradeBound": "そのアイテムはバインドされているため取引できません。"
+      "tradeBound": "そのアイテムはバインドされているため取引できません。",
+      "marketListBound": "そのアイテムはバインドされているため出品できません。"
     },
     "logs": {
       "standUp": "立ち上がりました。",
@@ -6635,6 +7367,10 @@ export const ja_JP: EnTranslations = {
         "officer": "士官",
         "member": "メンバー"
       },
+      "tenure": {
+        "recruit": "新兵",
+        "veteran": "古参"
+      },
       "guildHeadOne": "あなたは{rank}、{count}人のメンバー",
       "guildHeadMany": "あなたは{rank}、{count}人のメンバー"
     },
@@ -6741,24 +7477,29 @@ export const ja_JP: EnTranslations = {
     "cast": {
       "fishing": "釣り",
       "gathering": "採集",
+      "crafting": "製作",
+      "disenchanting": "分解",
+      "enchanting_apply": "付魔",
+      "salvaging": "解体",
+      "tool_recharge": "充填",
       "demonHeal": "悪魔の治癒",
       "thunzharrStormcall": "嵐の呼び声",
-      "rift_frost_execution": "Glacial Grave",
-      "rift_frost_strike": "Absolute Zero",
-      "rift_ember_execution": "Magma Well",
-      "rift_ember_strike": "Core Meltdown",
-      "rift_venom_execution": "Venom Pool",
-      "rift_venom_strike": "Broodmother's Mark",
-      "rift_necro_execution": "Soul Grave",
-      "rift_necro_strike": "Death Sentence",
-      "rift_brute_execution": "Earthshatter",
-      "rift_brute_strike": "Final Judgment",
-      "rift_arcane_execution": "Void Rift",
-      "rift_arcane_strike": "Arcane Annihilation",
-      "rift_storm_execution": "Lightning Rod",
-      "rift_storm_strike": "Stormcaller's Wrath",
-      "rift_tide_execution": "Abyssal Maw",
-      "rift_tide_strike": "Crushing Depth"
+      "rift_frost_execution": "氷河の墓",
+      "rift_frost_strike": "絶対零度",
+      "rift_ember_execution": "マグマの泉",
+      "rift_ember_strike": "コアメルトダウン",
+      "rift_venom_execution": "毒の沼",
+      "rift_venom_strike": "蜘蛛母の刻印",
+      "rift_necro_execution": "魂の墓",
+      "rift_necro_strike": "死の宣告",
+      "rift_brute_execution": "大地砕き",
+      "rift_brute_strike": "最後の審判",
+      "rift_arcane_execution": "虚空の裂け目",
+      "rift_arcane_strike": "秘術の殲滅",
+      "rift_storm_execution": "避雷針",
+      "rift_storm_strike": "嵐の使者の怒り",
+      "rift_tide_execution": "深淵の顎",
+      "rift_tide_strike": "粉砕の深淵"
     }
   },
   "questUi": {
@@ -6766,7 +7507,8 @@ export const ja_JP: EnTranslations = {
       "title": "クエスト",
       "complete": "完了",
       "showOnMap": "{name}をマップに表示",
-      "hideFromMap": "{name}をマップから隠す"
+      "hideFromMap": "{name}をマップから隠す",
+      "unknownQuest": "不明なクエスト（{id}）"
     },
     "log": {
       "title": "クエストログ",
@@ -6778,6 +7520,8 @@ export const ja_JP: EnTranslations = {
       "activeStatus": "進行中",
       "readyStatus": "完了",
       "completedStatus": "完了済み",
+      "repeatableStatus": "繰り返し可能",
+      "cooldownStatus": "まもなく再受注可能",
       "returnTo": "{name}に戻る",
       "abandon": "クエストを破棄",
       "abandonConfirmTitle": "クエストを破棄",
@@ -6791,6 +7535,7 @@ export const ja_JP: EnTranslations = {
       "greetingFallback": "こんにちは。",
       "availableQuestAria": "受諾可能なクエスト: {name}",
       "readyQuestAria": "報告可能なクエスト: {name}",
+      "repeatableQuestAria": "繰り返し可能なクエスト: {name}",
       "discussQuest": "{name}について話す。",
       "discussQuestAria": "クエストについて話す: {name}",
       "profIntroHint": "{name}から「{quest}」を受けましょう。",
@@ -6831,7 +7576,8 @@ export const ja_JP: EnTranslations = {
       "incomplete": "そのクエストは完了していません。",
       "giverMissing": "そのクエストの依頼主が近くにいません。",
       "turnInMissing": "そのクエストの報告先が近くにいません。",
-      "tooFar": "遠すぎます。"
+      "tooFar": "遠すぎます。",
+      "escortAway": "護衛する相手は今その場所にいません。しばらくすれば戻ってきます。"
     }
   },
   "itemUi": {
@@ -6870,6 +7616,8 @@ export const ja_JP: EnTranslations = {
       "armor": "防具",
       "quest": "クエストアイテム",
       "junk": "雑貨",
+      "fineMaterial": "上質な素材",
+      "material": "素材",
       "food": "食べ物",
       "drink": "飲み物",
       "tool": "道具",
@@ -6901,8 +7649,14 @@ export const ja_JP: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "使用: {seconds}秒かけて体力を{amount}回復します。食事中は座ったままでいる必要があります。",
       "useDrink": "使用: {seconds}秒かけてマナを{amount}回復します。飲んでいる間は座ったままでいる必要があります。",
+      "useElixir": "使用: {stat}が{value}上昇し、{minutes}分間持続します。戦闘中に使用可能。",
+      "useElixirAura": "使用: {aura}の効果を得て、{minutes}分間持続します。戦闘中に使用可能。",
       "questItem": "クエストアイテム",
+      "questRelated": "クエスト：{quest}",
+      "questRules": "売却、銀行預け入れ、取引はできません。",
+      "questOrphaned": "進行中のクエストでは必要ありません。",
       "classes": "クラス: {classes}",
+      "maxStack": "スタック上限: {count}",
       "sellPrice": "売却価格: {money}",
       "clickBuy": "クリックして購入",
       "clickSell": "クリックして売却",
@@ -6929,7 +7683,13 @@ export const ja_JP: EnTranslations = {
       "stackCount": "x{count}",
       "destroyTitle": "{item}を破棄",
       "destroyConfirm": "破棄",
-      "destroyCancel": "キャンセル"
+      "destroyCancel": "キャンセル",
+      "unknownItem": "不明なアイテム",
+      "unknownItemAria": "不明なアイテム {id}、数量 {count}",
+      "unknownItemAriaMasterwork": "不明なアイテム {id}、数量 {count}、傑作",
+      "unknownItemAriaEnchanted": "不明なアイテム {id}、数量 {count}、エンチャント済みの品",
+      "unknownItemAriaBound": "不明なアイテム {id}、数量 {count}、バインド済みの品",
+      "unknownItemAriaInstanced": "不明なアイテム {id}、数量 {count}、銘入りの品"
     },
     "equipment": {
       "empty": "空",
@@ -6940,6 +7700,19 @@ export const ja_JP: EnTranslations = {
       "close": "商人を閉じる",
       "hint": "このウィンドウが開いている間、バッグ内のアイテムをクリックすると売却できます。",
       "buyAria": "{item}を{price}で購入",
+      "buyAriaWithRequirement": "{item}を{price}で購入。{requirement}",
+      "buyStack": "{count}個購入",
+      "buyStackAria": "{item}を{count}個、{price}で購入",
+      "qtyRowAria": "購入数量",
+      "qtyMultiple": "{count}個",
+      "qtyMultipleAria": "一度に{count}個ずつ購入",
+      "qtyCustom": "カスタム",
+      "qtyCustomAria": "購入数を自分で指定",
+      "buyCountAria": "{item}を{count}個、{price}で購入",
+      "buyCountAriaWithRequirement": "{item}を{count}個、{price}で購入。{requirement}",
+      "buyQuantityTitle": "{item}をいくつ購入しますか？最大{max}。",
+      "buyQuantityInput": "購入する数量",
+      "buyQuantityConfirm": "購入",
       "buybackTitle": "買い戻し",
       "buybackEmpty": "アイテムなし",
       "buybackAria": "{item}を{price}で買い戻す",
@@ -7018,6 +7791,12 @@ export const ja_JP: EnTranslations = {
       "reclaim": "回収",
       "buyAria": "{item}を{price}で購入",
       "reclaimAria": "{item}を回収",
+      "buyConfirmTitle": "購入の確認",
+      "buyConfirmBody": "{item}を{price}で購入しますか？",
+      "buyConfirmBodyStack": "{item} x{count}を{price}（各 {each}）で購入しますか？",
+      "buyConfirmAccept": "購入",
+      "buyConfirmCancel": "キャンセル",
+      "buyChanged": "その出品は確認する前に変更されました。価格を確認してからもう一度お試しください。",
       "sellNote": "バッグから品物を出品します。売れると商人が{cut}%を受け取ります。出品枠 {used}/{max} を使用中です。",
       "sellPickEmpty": "売るものを選ぶにはバッグ内のアイテムをクリックしてください。",
       "quantity": "数量",
@@ -7028,6 +7807,8 @@ export const ja_JP: EnTranslations = {
       "collectEmpty": "待機中のものはありません。売上と期限切れの出品はここで受け取ります。",
       "collectNote": "商人が預かっている売上と返却品です。",
       "saleProceeds": "売上",
+      "saleBuyer": "{buyer}に売却",
+      "saleOlder": "ほかに {count} 件の以前の売却があり、合計に含まれています。",
       "collectAll": "すべて受け取る"
     },
     "logs": {
@@ -7219,7 +8000,7 @@ export const ja_JP: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "グレーターインビジビリティ",
-        "description": "20秒間姿を消します。継続ダメージ効果を2個解除し、透明状態の間と解除直後は受けるダメージが90%減少します。（メイジタレント）"
+        "description": "20 秒間姿を消し、継続ダメージ効果を 2 つ取り除く。透明化が終了すると、2 秒間、受けるダメージが 90% 減少する。（メイジのタレント）"
       },
       "hot_streak": {
         "name": "ホットストリーク",
@@ -8505,6 +9286,18 @@ export const ja_JP: EnTranslations = {
       "fen_muster_order": {
         "name": "フェンブリッジ召集令"
       },
+      "firebottle": {
+        "name": "火炎瓶"
+      },
+      "murloc_hut": {
+        "name": "泥ひれの小屋"
+      },
+      "restless_skull": {
+        "name": "安らがぬ頭蓋骨"
+      },
+      "vanguard_bone": {
+        "name": "先兵の骨"
+      },
       "mire_prowler_pelt": {
         "name": "沼の徘徊者の毛皮"
       },
@@ -9030,6 +9823,27 @@ export const ja_JP: EnTranslations = {
       "cinderweave_slippers": {
         "name": "熾火織りの上履き"
       },
+      "thornhide_headdress": {
+        "name": "ソーンハイドの頭巾"
+      },
+      "thornhide_mantle": {
+        "name": "ソーンハイドの肩衣"
+      },
+      "thornhide_vestment": {
+        "name": "ソーンハイドの法衣"
+      },
+      "thornhide_cinch": {
+        "name": "ソーンハイドの腰帯"
+      },
+      "thornhide_leggings": {
+        "name": "ソーンハイドの脚当て"
+      },
+      "thornhide_gloves": {
+        "name": "ソーンハイドの手甲"
+      },
+      "thornhide_boots": {
+        "name": "ソーンハイドの足袋"
+      },
       "final_oath_medallion": {
         "name": "最後の誓いのメダリオン"
       },
@@ -9420,6 +10234,39 @@ export const ja_JP: EnTranslations = {
       "resonant_timber": {
         "name": "共鳴の木材"
       },
+      "fine_copper_ore": {
+        "name": "上質な銅鉱石"
+      },
+      "fine_iron_ore": {
+        "name": "上質な鉄鉱石"
+      },
+      "fine_thorium_ore": {
+        "name": "上質なオスミウム鉱石"
+      },
+      "fine_ironbark_log": {
+        "name": "上質なアイアンバークの丸太"
+      },
+      "fine_ashwood_log": {
+        "name": "上質なアッシュウッドの丸太"
+      },
+      "fine_elderwood_log": {
+        "name": "上質な高嶺松の丸太"
+      },
+      "fine_silverleaf_herb": {
+        "name": "上質な艶葉草"
+      },
+      "fine_goldleaf_herb": {
+        "name": "上質なゴールドリーフ草"
+      },
+      "fine_sunpetal_herb": {
+        "name": "上質なサンペタル草"
+      },
+      "stormreel_fishing_rod": {
+        "name": "嵐リールの釣り竿"
+      },
+      "tidewrought_fishing_rod": {
+        "name": "潮鍛えの釣り竿"
+      },
       "duskwisp_essence": {
         "name": "ダスクウィスプの精髄"
       },
@@ -9557,6 +10404,18 @@ export const ja_JP: EnTranslations = {
       },
       "wildheart_fangknife": {
         "name": "ズルガーの牙小刀"
+      },
+      "fanglords_beastspear": {
+        "name": "牙王の獣槍"
+      },
+      "bloodmane_warleggings": {
+        "name": "血鬣の戦脚甲"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "蔦爪の潜行ズボン"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "陽骨の儀式腰布"
       },
       "thick_winter_pelt": {
         "name": "厚い冬毛皮"
@@ -9725,6 +10584,39 @@ export const ja_JP: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "最後の砦の印章"
+      },
+      "gatherers_cache": {
+        "name": "採集者の貯蔵袋"
+      },
+      "artisans_eye": {
+        "name": "職人の眼"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "テラースパークの始動キー"
+      },
+      "reins_drakemaw_raptor": {
+        "name": "火口のラプトルの手綱"
+      },
+      "moggers_hide_quiver": {
+        "name": "モガーの革の矢筒"
+      },
+      "cragmaw_huntquiver": {
+        "name": "クラッグモウの狩猟矢筒"
+      },
+      "gravewyrm_bone_quiver": {
+        "name": "墓ワームの骨の矢筒"
+      },
+      "direfang_quiver": {
+        "name": "ダイアファングの矢筒"
+      },
+      "sharp_claw": {
+        "name": "鋭い鉤爪"
+      },
+      "curved_tusk": {
+        "name": "曲がった牙"
+      },
+      "pristine_claw": {
+        "name": "無傷の鉤爪"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"
@@ -10302,6 +11194,24 @@ export const ja_JP: EnTranslations = {
       "wyrmchoir_handwraps": {
         "name": "ワームクワイアの手巻き"
       },
+      "basin_stalkers_tunic": {
+        "name": "盆地追跡者のチュニック"
+      },
+      "verdant_heart_vestment": {
+        "name": "翠心の祭服"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "陽骨の儀式ホーバーク"
+      },
+      "greatfang_of_the_basin": {
+        "name": "盆地の大牙"
+      },
+      "sunbone_oracles_crown": {
+        "name": "陽骨の託宣者の冠"
+      },
+      "bloodmane_war_legguards": {
+        "name": "血鬣の戦レッグガード"
+      },
       "deathless_greatblade": {
         "name": "不死の大剣"
       },
@@ -10703,6 +11613,21 @@ export const ja_JP: EnTranslations = {
       "spider_egg_sac": {
         "name": "蜘蛛の卵嚢"
       },
+      "spider_egg": {
+        "name": "群れの母の卵"
+      },
+      "widow_hatchling": {
+        "name": "ウィドウの幼体"
+      },
+      "drowned_warlord": {
+        "name": "溺れの武将"
+      },
+      "brakka_wallbreaker": {
+        "name": "壁砕きのブラッカ"
+      },
+      "threnos_first_voice": {
+        "name": "第一の声スレノス"
+      },
       "grave_silt_bulwark": {
         "name": "墓泥の防壁"
       },
@@ -10882,6 +11807,18 @@ export const ja_JP: EnTranslations = {
       },
       "cindraleth_maw_matriarch": {
         "name": "シンドラレス、火口の母竜"
+      },
+      "dragonkin_egg": {
+        "name": "ドラゴンキンの卵"
+      },
+      "dragonkin_whelp": {
+        "name": "ドラゴンキンの仔"
+      },
+      "dragonkin_broodguard": {
+        "name": "ドラゴンキンの巣守り"
+      },
+      "drakemaw_broodlord": {
+        "name": "火口の巣主"
       },
       "gilded_stag": {
         "name": "黄金の牡鹿"
@@ -11272,6 +12209,11 @@ export const ja_JP: EnTranslations = {
         "title": "名誉補給官",
         "greeting": "戦場の砂は、すべての勝利を記憶している。名誉は賢く使うことだ。"
       },
+      "warmarshal_draven_kole": {
+        "name": "戦元帥ドレイヴン・コール",
+        "title": "ウォーフェア軍需庫の管理者",
+        "greeting": "私が受け取る通貨は名誉だけだ。ウォーフェア軍需庫は私が守っている。戦場で階級を勝ち取れ。次の戦いに備えて武具を整えてやろう。"
+      },
       "loremaster_caddis": {
         "name": "博識者キャディス",
         "title": "博識者",
@@ -11636,7 +12578,7 @@ export const ja_JP: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "剣以外にも稼ぎはある",
-        "text": "イーストブルックでは誰もが剣のほかに生業を持つ、{playerName}。町の南西、カッパー・ディグ周辺の岩場には鉱脈がある。つるはしを振るい、自分の手で5か所採掘してこい。ごまかしても分かるぞ。",
+        "text": "イーストブルックでは誰もが剣のほかに生業を持つ、{playerName}。町の南東、カッパー・ディグ周辺の岩場には鉱脈がある。つるはしを振るい、自分の手で5か所採掘してこい。ごまかしても分かるぞ。",
         "completion": "どうだ？ 鉱石を採り、手にはまめができた。旅の途中でも採掘、伐採、薬草採集を続けるんだ。町へ戻ったら、市場そばのタウンフォーカス掲示板と近くの製作台も忘れるな。望むなら、どの仕事にもまっとうな稼ぎが待っている。",
         "objectives": {
           "0": {
@@ -11719,7 +12661,7 @@ export const ja_JP: EnTranslations = {
       },
       "q_supplies": {
         "title": "盗まれた物資",
-        "text": "盗賊が最後の荷車を奪いました。道具、塩、上等なイーストブルックの麻です。南東の野営地から箱を4つ取り戻してください。",
+        "text": "盗賊が最後の荷車を奪いました。道具、塩、上等なイーストブルックの麻です。南西の野営地から箱を4つ取り戻してください。",
         "completion": "私の箱です！傷もほとんどありません。あなたは大した人です。",
         "objectives": {
           "0": {
@@ -11948,7 +12890,7 @@ export const ja_JP: EnTranslations = {
       },
       "q_no_rest": {
         "title": "葦の中に安息なし",
-        "text": "その儀式は湿地が触れる場所で溺死者を起こします。まだ壊せませんが、兵を14体減らせます。",
+        "text": "その香炉の儀式は溺れ死者を起こします。そして今、彼らを率いるほど強い者まで蘇らせました。番人たちは彼を「溺れの武将」と呼びます。彼が沈んだ礼拝堂を占める限り、死者は隊列を崩しません。{playerName}、彼を打ち倒してください。残りは泥沼へ散り散りに戻るはずです。",
         "completion": "あなたは死者に、主たちより多くの慈悲を与えました。受け取ってください。",
         "objectives": {
           "0": {
@@ -12101,7 +13043,7 @@ export const ja_JP: EnTranslations = {
       },
       "q_old_cragmaw": {
         "title": "老いたるクラッグモウ",
-        "text": "山の民は、斥候が見つけた足跡の主を知っていました。老いたるクラッグモウ。傷だらけの毛皮をまとい、群れの三世代を生き延びた暴君の大猫です。追跡者が街道に溢れるのはこいつのせいです、{playerName}。ねぐらは南街道を見下ろす西の尾根。仲間を連れて、あの老いた悪魔を仕留めてください。",
+        "text": "山の民は、斥候が見つけた足跡の主を知っていました。老いたるクラッグモウ。傷だらけの毛皮をまとい、群れの三世代を生き延びた暴君の大猫です。追跡者が街道に溢れるのはこいつのせいです、{playerName}。ねぐらは南街道を見下ろす東の尾根。仲間を連れて、あの老いた悪魔を仕留めてください。",
         "completion": "ついに倒れましたか。山の民は、あの猫は壁より長生きすると誓っていたものです。これで追跡者は高い雪に留まるでしょう、{playerName}。巡察も血を流さずに街道を歩けます。あなたの働きで、尾根全体が静かになりました。",
         "objectives": {
           "0": {
@@ -12226,9 +13168,6 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "ワーム教団の狂信者を討伐"
-          },
-          "1": {
-            "label": "ワーム教団の命令書"
           }
         }
       },
@@ -12239,9 +13178,6 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "ワーム教団の死霊術師を討伐"
-          },
-          "1": {
-            "label": "儀式の経箱"
           }
         }
       },
@@ -12340,7 +13276,7 @@ export const ja_JP: EnTranslations = {
       },
       "q_the_codfather": {
         "title": "タラのゴッドファーザー",
-        "text": "タラのゴッドファーザーはただの魚ではない、{playerName}。冷血の殺し屋だ。古老たちは、奴がミレの徘徊者を朝飯に食うと誓っているし、ミレフェンのウィドウでさえ恐怖のあまりディープフェン浅瀬の近くには巣を張らぬ。あの水域は奴のものだ。釣り竿を手に取り、その老いた悪魔を奴の水域から引きずり出せ。そうすれば、お前もファミリーの一員と認めよう。",
+        "text": "タラのゴッドファーザーはただの魚ではない、{playerName}。冷血の殺し屋だ。古老たちは、奴がミレの徘徊者を朝飯に食うと誓っているし、ミレフェンのウィドウでさえ恐怖のあまりディープフェン浅瀬の近くには巣を張らぬ。あの水域は奴のものだ。それに湿地の水で釣るなら、他でもない鉄リールの釣り竿が要る。うちのカウンターで売っているぞ。一本手にして、その老いた悪魔を奴の水域から引きずり出せ。そうすれば、お前もファミリーの一員と認めよう。",
         "completion": "湿った聖人たちよ……タラのゴッドファーザーそのものだ。あのヒゲを見ろ。フェンブリッジはこの一匹の話で一年は食っていけるぞ、{playerName}。",
         "objectives": {
           "0": {
@@ -12360,7 +13296,7 @@ export const ja_JP: EnTranslations = {
       },
       "q_nythraxis_graves": {
         "title": "忘れられし者の墓",
-        "text": "この印を以前にも見ました。北の戦場を囲む三つの古い墓です。アルドレン隊長は東の高台に、大神官マルリックは中央の壊れた道の近くに、王家の暗殺者ヴォスは西の崖のそばに眠っています。それぞれの墓に触れて耳を澄ませてください、{playerName}。死者は生者が忘れたことを覚えているかもしれません。",
+        "text": "この印を以前にも見ました。北の戦場を囲む三つの古い墓です。アルドレン隊長は西の高台に、大神官マルリックはそこから西の縁に沿ってさらに南に、王家の暗殺者ヴォスは東の崖のそばに眠っています。それぞれの墓に触れて耳を澄ませてください、{playerName}。死者は生者が忘れたことを覚えているかもしれません。",
         "completion": "オルドレンは忠義を守り、マルリックは死を受け入れず、ヴォスは誰よりも早く危険を見抜きました。三人は同じ忘れられた王に仕えていました。",
         "objectives": {
           "0": {
@@ -12376,7 +13312,7 @@ export const ja_JP: EnTranslations = {
       },
       "q_nythraxis_sealed_crypt": {
         "title": "放棄された地下墓所",
-        "text": "幻視は、西の崖にある廃棄された墓所を示しています。その墓所には王がいたという古い伝説があります。マルリックの儀式が王を死なぬものへ歪めた後、ソーンピークが彼を地下に封じたのかもしれません。墓所へ入り、中に何が残っているか確かめてください。",
+        "text": "幻視は、東の崖にある廃棄された墓所を示しています。その墓所には王がいたという古い伝説があります。マルリックの儀式が王を死なぬものへ歪めた後、ソーンピークが彼を地下に封じたのかもしれません。墓所へ入り、中に何が残っているか確かめてください。",
         "completion": "要石の二つの半分が合わさり、ヴォスの日誌はそれらが封じたものの名を示しています。ニスラクシス王の印章指輪です。日誌が真実なら、その指輪こそ彼の墓への鍵です。",
         "objectives": {
           "0": {
@@ -12418,7 +13354,7 @@ export const ja_JP: EnTranslations = {
       },
       "q_mogger": {
         "title": "モガーを倒せ",
-        "text": "モガーは荷車を裂き、柵を潰し、谷の半分を空にするほど家畜を殺しました。ひとりで挑んではいけません。強い仲間を二人連れ、東の草地であの巨獣を完全に倒してください。",
+        "text": "モガーは荷車を裂き、柵を潰し、谷の半分を空にするほど家畜を殺しました。ひとりで挑んではいけません。強い仲間を二人連れ、西の草地であの巨獣を完全に倒してください。",
         "completion": "モガーはついに死にました。イーストブルックの畑は安全になり、あなたは語る価値のある物語をもう一つ抱えて谷を去ります。",
         "objectives": {
           "0": {
@@ -12478,7 +13414,7 @@ export const ja_JP: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "再びつなぐ糸",
-        "text": "結局、私の織機に戻ってきましたね。恨みはありません、{playerName}。けれど糸は、手放した手を覚えているものです。そして取り直す代償は、毎回長く測り出されます。西の森にひしめくセイブルウェブの潜伏者を間引きなさい。その労苦が、よい絹に再び触れる前に、あなたの手を落ち着かせてくれるでしょう。",
+        "text": "結局、私の織機に戻ってきましたね。恨みはありません、{playerName}。けれど糸は、手放した手を覚えているものです。そして取り直す代償は、毎回長く測り出されます。東の森にひしめくセイブルウェブの潜伏者を間引きなさい。その労苦が、よい絹に再び触れる前に、あなたの手を落ち着かせてくれるでしょう。",
         "completion": "また落ち着きましたね。皮革加工と裁縫は、主専攻としてあなたの手に戻ります。今度こそ、さまよう前に二度測りなさい。",
         "objectives": {
           "0": {
@@ -12488,7 +13424,7 @@ export const ja_JP: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "また竈の前へ",
-        "text": "おや、誰かと思えば俺の鍋の前に戻ってきたな。悪く思っちゃいないさ、{playerName}、台所にはいつだって席がある。だが出ていくたびに勘定が長くなるのは知ってるだろ。東の野原の野生の猪を間引いてこい。まっとうな汗こそ最初の材料だ、それがお前の手に仕事を思い出させてくれる。",
+        "text": "おや、誰かと思えば俺の鍋の前に戻ってきたな。悪く思っちゃいないさ、{playerName}、台所にはいつだって席がある。だが出ていくたびに勘定が長くなるのは知ってるだろ。西の野原の野生の猪を間引いてこい。まっとうな汗こそ最初の材料だ、それがお前の手に仕事を思い出させてくれる。",
         "completion": "ほら、昔なじみの味だ。錬金術と料理は、主専攻としてお前の竈に戻ってきた。今度はしばらくいてくれよ。",
         "objectives": {
           "0": {
@@ -12867,7 +13803,7 @@ export const ja_JP: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "レンを送り届けて",
-        "text": "弟子のレンが二日前にゴールドメルトの罠のラインを見回りに出て、戻ってこない。足跡は見つけた。オーロラの階段の南西の道標の下に隠れて、狼が怖くて動けずにいるんだ。わたしは沼を離れられない、{playerName}。あの子を階段のヴェイラの野営まで歩かせてやってくれ。光の下なら安全だ。",
+        "text": "弟子のレンが二日前にゴールドメルトの罠のラインを見回りに出て、戻ってこない。足跡は見つけた。オーロラの階段の北東の道標の下に隠れて、狼が怖くて動けずにいるんだ。わたしは沼を離れられない、{playerName}。あの子を階段のヴェイラの野営まで歩かせてやってくれ。光の下なら安全だ。",
         "completion": "あの子は中にいるよ。わたしの毛布を半分体に巻きつけて、空から星を語り落とす勢いでしゃべっている。今日、お前は優しいことをしたね、{playerName}。この果ての地では、めったに見られないものだよ。",
         "objectives": {
           "0": {
@@ -13551,7 +14487,7 @@ export const ja_JP: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "ブラムを家へ",
-        "text": "うちのブラムは、網場の裂け目が開いたあの朝に船を出して、海は船着き場の岬の先のどこかに彼を打ち返した。三晩前に聞いたんだ、{playerName}、水の向こうから呼ぶ声を。なのに怖くて行けなかった。今でも怖い。お願いだ。彼の船は北の岸で難破している。彼を家まで連れて帰っておくれ。",
+        "text": "うちのブラムは、網場の裂け目が開いたあの朝に船を出して、海は船着き場の岬の先のどこかに彼を打ち返した。三晩前に聞いたんだ、{playerName}、水の向こうから呼ぶ声を。なのに怖くて行けなかった。今でも怖い。お願いだ。彼の船は南の岸で難破している。彼を家まで連れて帰っておくれ。",
         "completion": "ブラム！五体満足で連れ帰ってくれたんだね、{playerName}。ふたりして泣いたけど、どちらも恥じてなんかいないよ。裂け目どもが次にこの島から何を奪おうと、うちの家族だけは渡さない。もう二度と。",
         "objectives": {
           "0": {
@@ -14491,6 +15427,36 @@ export const ja_JP: EnTranslations = {
       "vale_arcanist": {
         "name": "谷の秘術師の装束",
         "bonus3": "攻撃速度と詠唱速度が15%上昇します。"
+      },
+      "warfare_ashstalker": {
+        "name": "アッシュストーカーの装備",
+        "bonus2": "ウォーフェア防御レーティングが40上昇します。",
+        "bonus4": "ウォーフェア攻撃レーティングが40上昇し、敵対プレイヤーから受けるクラウドコントロールの持続時間が15%短縮されます。",
+        "bonus7": "ウォーフェアの攻撃および防御レーティングが80上昇します。敵対プレイヤーを撃破すると「アッシェンステップ」が発動し、6秒間、移動速度が40%上昇します。"
+      },
+      "warfare_cinderweave": {
+        "name": "シンダーウィーヴの法衣",
+        "bonus2": "ウォーフェア防御レーティングが40上昇します。",
+        "bonus4": "ウォーフェア攻撃レーティングが40上昇し、敵対プレイヤーから受けるクラウドコントロールの持続時間が15%短縮されます。",
+        "bonus7": "ウォーフェアの攻撃および防御レーティングが80上昇します。呪文に15%の確率で「エンバーワード」が発動し、8秒間120ダメージを吸収します。"
+      },
+      "warfare_furyforged": {
+        "name": "フューリーフォージの戦装束",
+        "bonus2": "ウォーフェア防御レーティングが40上昇します。",
+        "bonus4": "ウォーフェア攻撃レーティングが40上昇し、敵対プレイヤーから受けるクラウドコントロールの持続時間が15%短縮されます。",
+        "bonus7": "ウォーフェアの攻撃および防御レーティングが80上昇します。敵対プレイヤーを撃破すると「アンブロークンオース」が発動し、10秒間200ダメージを吸収します。"
+      },
+      "warfare_stormbound": {
+        "name": "ストームバウンドの法衣",
+        "bonus2": "ウォーフェア防御レーティングが40上昇します。",
+        "bonus4": "ウォーフェア攻撃レーティングが40上昇し、敵対プレイヤーから受けるクラウドコントロールの持続時間が15%短縮されます。",
+        "bonus7": "ウォーフェアの攻撃および防御レーティングが80上昇します。呪文に15%の確率で「エンバーワード」が発動し、8秒間120ダメージを吸収します。"
+      },
+      "warfare_thornhide": {
+        "name": "ソーンハイドの装束",
+        "bonus2": "ウォーフェア防御レーティングが40上昇します。",
+        "bonus4": "ウォーフェア攻撃レーティングが40上昇し、敵対プレイヤーから受けるクラウドコントロールの持続時間が15%短縮されます。",
+        "bonus7": "ウォーフェアの攻撃および防御レーティングが80上昇します。呪文に15%の確率で「ソーンガード」が発動し、6秒間、回避率が15%上昇します。"
       },
       "wyrmshadow": {
         "name": "ナイトファングの装束",

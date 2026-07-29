@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 
 // Mock the db layer so importing server/game (for wireEntity) needs no Postgres,
@@ -16,12 +18,26 @@ vi.mock('../server/db', () => ({
 
 import { meleeSwing, updatePlayerAutoAttack } from '../src/sim/combat/auto_attack';
 import { castAbility } from '../src/sim/combat/casting_lifecycle';
+import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
-import { MOUNT_KEYS, MOUNTS, mountDef, normalizeMountKey } from '../src/sim/content/mounts';
-import { ITEMS, MOBS, QUESTS } from '../src/sim/data';
-import { createMob } from '../src/sim/entity';
-import { useItem } from '../src/sim/items';
+import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import {
+  DEFAULT_MOUNT,
+  MOUNT_KEYS,
+  MOUNTS,
+  mountDef,
+  normalizeMountKey,
+  normalizeSelectedMount,
+  TRAINING_MOUNT_KEY,
+} from '../src/sim/content/mounts';
+import { ITEMS, MOBS, NPCS, QUESTS } from '../src/sim/data';
+import { createMob } from '../src/sim/entity';
+import { guildBankPipeRefusal } from '../src/sim/guild_bank';
+import { sellItem, useItem } from '../src/sim/items';
+import { MARKET_HOUSE_STOCK } from '../src/sim/market';
+import {
+  bagOwnedMounts,
+  MOUNT_OWNERSHIP_REVALIDATE_TICKS,
   MOUNT_SUMMON_SECONDS,
   mountItemId,
   mountOwned,
@@ -40,7 +56,10 @@ import {
   RIFT_GREEN_MOUNT_REINS,
 } from '../src/sim/rift/progression';
 import { Sim } from '../src/sim/sim';
+import type { SimContext } from '../src/sim/sim_context';
+import { tradeSetOffer } from '../src/sim/social/trade';
 import { DT, FORM_AURA_KINDS, type MountItemDef, type SimEvent } from '../src/sim/types';
+import { groundHeight } from '../src/sim/world';
 
 function makeWorld() {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
@@ -81,10 +100,12 @@ function ride(sim: Sim, pid: number, key: string): void {
   finishTransition(sim, pid);
 }
 
-describe('mount catalog (the seven ground mounts from the cards)', () => {
-  it('has exactly the seven mounts with the horse first (the base mount)', () => {
-    expect(MOUNT_KEYS).toHaveLength(7);
+describe('mount catalog', () => {
+  it('has exactly nine mounts with the horse first and the developer tank last', () => {
+    expect(MOUNT_KEYS).toHaveLength(9);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
+    expect(MOUNT_KEYS.at(-1)).toBe('terrorspark_groundshaker');
+    expect(DEFAULT_MOUNT).toBe('valorsteed');
   });
 
   it('pins each card: rarity and speed, with NO per-mount level gate', () => {
@@ -99,6 +120,7 @@ describe('mount catalog (the seven ground mounts from the cards)', () => {
     expect(spec('stalkglider_snail')).toEqual(['rare', 0.75]);
     expect(spec('aether_hover_cycle')).toEqual(['epic', 0.8]);
     expect(spec('thunderstrut_gobbler')).toEqual(['epic', 0.8]);
+    expect(spec('terrorspark_groundshaker')).toEqual(['epic', 0.8]);
     // The level field is GONE, not merely unused: it never fired (reins carry no
     // requiredLevel and every source is level-20 content) and leaving it would
     // invite a second gate to grow back beside ridingTrained.
@@ -138,13 +160,24 @@ describe('mount reins items (the collection: owning the item is owning the mount
   const reinsFor = (key: string) =>
     Object.values(ITEMS).filter((d) => d.kind === 'mount' && d.mount === key) as MountItemDef[];
 
-  it('every mount has exactly one soulbound reins item (the horse now included)', () => {
+  it('every mount has exactly one reins item; player reins are unbound, the dev tank stays bound', () => {
     for (const key of MOUNT_KEYS) {
       const items = reinsFor(key);
       expect(items).toHaveLength(1);
       const item = items[0];
       expect(mountItemId(key)).toBe(item.id);
-      expect(item.soulbound).toBe(true); // never traded, mailed, listed, or destroyed
+      if (key === 'terrorspark_groundshaker') {
+        // The developer-only tank stays soulbound: it has no player acquisition
+        // path, and tradability would turn a dev grant into a leak vector.
+        expect(item.soulbound).toBe(true);
+      } else {
+        // Player reins are NOT soulbound: they trade, mail, list, and store in
+        // the guild bank like any other item (the transfer describe below).
+        expect(item.soulbound).toBeFalsy();
+        // sellValue is 0, so the vendor path stays closed instead of paying
+        // nothing for an accidental sale that buyback rotation could eat.
+        expect(item.noVendorSell).toBe(true);
+      }
       expect(item.noDiscard).toBe(true);
       expect(item.sellValue).toBe(0);
       // The item's name color matches the card's rarity tier.
@@ -152,7 +185,19 @@ describe('mount reins items (the collection: owning the item is owning the mount
     }
   });
 
-  it('only the horse reins is purchasable, for 10 gold; the rest are loot-only', () => {
+  // scripts/mounts_shot.mjs grants the reins by a hardcoded list, and a mount
+  // added to the catalog without a matching row leaves the capture tool showing
+  // a stale collection while every gate stays green. Pin the list against the
+  // catalog so the desync is a red test instead of a silently short screenshot.
+  it('the mounts capture script grants exactly the catalog reins', () => {
+    const source = readFileSync(path.join(__dirname, '..', 'scripts/mounts_shot.mjs'), 'utf8');
+    const block = source.match(/for \(const id of \[([^\]]*)\]\)/);
+    expect(block, 'the reins grant loop moved or changed shape').not.toBeNull();
+    const granted = [...(block as RegExpMatchArray)[1].matchAll(/'([^']+)'/g)].map((m) => m[1]);
+    expect(granted.sort()).toEqual(MOUNT_KEYS.map((key) => mountItemId(key)).sort());
+  });
+
+  it('only the horse reins is purchasable, for 10 gold', () => {
     const horse = reinsFor('valorsteed')[0];
     expect(horse.id).toBe('reins_valorsteed');
     expect(horse.buyValue).toBe(100_000); // 10 gold in copper (ridingTrained gated)
@@ -171,9 +216,34 @@ describe('mount reins items (the collection: owning the item is owning the mount
     // mount's rarity without moving its drop and this reds immediately.
     const nyth = HEROIC_BOSS_LOOT['nythraxis_scourge_of_thornpeak'] ?? [];
     const CHANCE_FOR_RARITY: Record<string, number> = { uncommon: 0.005, rare: 0.001 };
+    // The FIVE-MAN bosses carrying each drop-tier mount, pinned explicitly (the
+    // heroic raid carries all four on top of these). Listed rather than counted
+    // so a stray new path fails here instead of silently widening a mount's
+    // supply. The two blues each carry a SECOND five-man path: the Wildheart
+    // Basin is the fifth heroic five-man against a four-mount catalog, so it
+    // takes equal-rate secondary paths to both rather than a fifth signature
+    // mount (owner call, 2026-08-01). Rate parity below is what keeps that
+    // honest: every path still pays the one rarity rate.
+    // NO SOURCE YET (owner call, 2026-08-04): the Drakemaw Raptor briefly took an
+    // open-world-rare path, dropping off the four Drakemaw Broodlords. That is
+    // reverted: the broodlord is the 90% source of the quest chain's own
+    // emberwing_scale, so hanging the only farmable epic mount on it camped the
+    // Drakemaw belt and tap-blocked every leveler questing through. The reins move
+    // to a dedicated world boss in a follow-up; until then the def ships with no
+    // acquisition path at all. Listed EXPLICITLY so a sourceless mount is a
+    // decision and never an accident: when the world boss lands, delete the entry
+    // and the rarity-derived rule below takes back over.
+    const NO_SOURCE_YET: readonly string[] = ['reins_drakemaw_raptor'];
+    const FIVE_MAN_SOURCES: Record<string, readonly string[]> = {
+      reins_stormfeather_griffin: ['morthen'],
+      reins_shadowjump_toad: ['vael_the_mistcaller'],
+      reins_grag_bear: ['wildheart_high_priest', 'ysolei'],
+      reins_stalkglider_snail: ['korzul_the_gravewyrm', 'wildheart_high_priest'],
+    };
 
     for (const key of MOUNT_KEYS) {
       if (key === 'valorsteed') continue; // the purchase, not a drop
+      if (key === 'terrorspark_groundshaker') continue; // developer-only, pinned separately below
       const itemId = mountItemId(key)!;
       const rarity = MOUNTS[key].rarity;
       // No mount is ever on a NORMAL mob table, at any rarity.
@@ -189,18 +259,38 @@ describe('mount reins items (the collection: owning the item is owning the mount
       );
 
       if (rarity === 'epic') {
-        // Rift S clears are the sole source. Nothing heroic, nothing static.
+        // Rift S clears are the sole source, EXCEPT a mount held sourceless on
+        // purpose. Either way it stays out of every heroic table, so the heroic
+        // tier's mount supply is unchanged.
         expect(heroicEntries, `${itemId} (epic) must not be heroic-reachable`).toEqual([]);
+        if (NO_SOURCE_YET.includes(itemId)) {
+          // The mob-table sweep above already proved it drops off nothing. Pin
+          // the remaining three pools too, so "no path" means no path: the day
+          // its world boss lands, it gets ONE source, not a quiet second one.
+          for (const [pool, name] of [
+            [RIFT_EPIC_MOUNT_REINS, 'rift S'],
+            [RIFT_BLUE_MOUNT_REINS, 'rift blue'],
+            [RIFT_GREEN_MOUNT_REINS, 'rift green'],
+          ] as const) {
+            expect(
+              pool as readonly string[],
+              `${itemId} has no source yet: not in ${name}`,
+            ).not.toContain(itemId);
+          }
+          continue;
+        }
         expect(RIFT_EPIC_MOUNT_REINS as readonly string[]).toContain(itemId);
         continue;
       }
 
       const chance = CHANCE_FOR_RARITY[rarity];
       expect(chance, `${rarity} is a known drop tier`).toBeDefined();
-      // Exactly two heroic paths: one five-man boss, plus the heroic raid.
-      expect(heroicEntries.length, `${itemId} heroic paths`).toBe(2);
+      // Its five-man sources are exactly the pinned set, plus the heroic raid.
       const fiveMan = heroicEntries.filter((e) => e.bossId !== 'nythraxis_scourge_of_thornpeak');
-      expect(fiveMan.length, `${itemId} has one five-man path`).toBe(1);
+      expect(fiveMan.map((e) => e.bossId).sort(), `${itemId} five-man paths`).toEqual(
+        FIVE_MAN_SOURCES[itemId],
+      );
+      expect(heroicEntries.length, `${itemId} heroic paths`).toBe(fiveMan.length + 1);
       expect(
         nyth.some((l) => l.itemId === itemId),
         `${itemId} on the heroic raid`,
@@ -214,6 +304,67 @@ describe('mount reins items (the collection: owning the item is owning the mount
       expect(riftPool as readonly string[], `${itemId} in the matching rift tier`).toContain(
         itemId,
       );
+    }
+  });
+
+  it('keeps the tank developer-only and absent from every normal acquisition table', () => {
+    const itemId = 'reins_terrorspark_groundshaker';
+    const item = ITEMS[itemId] as MountItemDef;
+    expect(item).toMatchObject({
+      kind: 'mount',
+      mount: 'terrorspark_groundshaker',
+      quality: 'epic',
+      soulbound: true,
+      noDiscard: true,
+      sellValue: 0,
+    });
+    expect(item.buyValue).toBeUndefined();
+
+    for (const mob of Object.values(MOBS)) {
+      expect(
+        mob.loot.some((entry) => entry.itemId === itemId),
+        `${itemId} must not be on ${mob.id}`,
+      ).toBe(false);
+    }
+    for (const [bossId, loot] of Object.entries(HEROIC_BOSS_LOOT)) {
+      expect(
+        loot.some((entry) => entry.itemId === itemId),
+        `${itemId} must not be on heroic boss ${bossId}`,
+      ).toBe(false);
+    }
+    expect([
+      ...RIFT_GREEN_MOUNT_REINS,
+      ...RIFT_BLUE_MOUNT_REINS,
+      ...RIFT_EPIC_MOUNT_REINS,
+    ]).not.toContain(itemId);
+    for (const npc of Object.values(NPCS)) {
+      expect(npc.vendorItems ?? [], `${itemId} must not be sold by ${npc.id}`).not.toContain(
+        itemId,
+      );
+    }
+    expect(
+      HEROIC_VENDOR_STOCK.map((offer) => offer.itemId),
+      `${itemId} must not be sold by the Heroic Quartermaster`,
+    ).not.toContain(itemId);
+    for (const [delveId, offers] of Object.entries(DELVE_SHOPS)) {
+      expect(
+        offers.map((offer) => offer.itemId),
+        `${itemId} must not be sold by delve shop ${delveId}`,
+      ).not.toContain(itemId);
+    }
+    expect(
+      MARKET_HOUSE_STOCK.map((offer) => offer.itemId),
+      `${itemId} must not be seeded by the World Market`,
+    ).not.toContain(itemId);
+    for (const quest of Object.values(QUESTS)) {
+      expect(
+        Object.values(quest.itemRewards),
+        `${itemId} must not be rewarded by ${quest.id}`,
+      ).not.toContain(itemId);
+      expect(
+        quest.requiredItems ?? [],
+        `${itemId} must not be required by ${quest.id}`,
+      ).not.toContain(itemId);
     }
   });
 
@@ -258,10 +409,25 @@ describe('mount reins items (the collection: owning the item is owning the mount
     expect(ownedMounts(meta)).toContain('stormfeather_griffin');
   });
 
-  it('reports no free mount for a headless world or an unknown player id', () => {
+  it('bagOwnedMounts is bags-only: a bank-only reins does not count (#2739 followup)', () => {
+    // The mobile quick-summon button (src/ui/mount_quick_summon.ts) picks from
+    // this list, not the wider ownedMounts(), because it hands the result
+    // straight to useItem, which gates on countItem (bags only). A bank-only
+    // reins must therefore be invisible here even though ownedMounts() (bags +
+    // bank) reports it, or the button would offer a summon useItem refuses.
     const sim = makeWorld();
-    expect(sim.ownedMounts()).toEqual([]);
-    expect(sim.ownedMountsFor(999_999)).toEqual([]);
+    const pid = join(sim, 20);
+    const meta = sim.players.get(pid)!;
+    expect(bagOwnedMounts(meta.inventory)).toEqual([]);
+
+    meta.bank.inventory.push({ itemId: 'reins_grag_bear', count: 1 });
+    expect(ownedMounts(meta)).toContain('grag_bear'); // wider list sees the bank
+    expect(bagOwnedMounts(meta.inventory)).toEqual([]); // bags-only list does not
+
+    sim.addItem('reins_valorsteed', 1, pid);
+    // Catalog order: valorsteed (bags) is visible; grag_bear (bank-only) is not,
+    // even though grag_bear would otherwise sort first by not being present at all.
+    expect(bagOwnedMounts(meta.inventory)).toEqual(['valorsteed']);
   });
 
   it('exposes the collection on the IWorld facade (ownedMounts), empty for a fresh player', () => {
@@ -286,6 +452,287 @@ describe('mount reins items (the collection: owning the item is owning the mount
     expect(sim.countItem('reins_stormfeather_griffin', pid)).toBe(1);
     expect(mountOwned(sim.players.get(pid)!, 'stormfeather_griffin')).toBe(true);
     expect(e.mountKey).toBe('stormfeather_griffin');
+  });
+});
+
+// Reins are ordinary transferable items now (not soulbound): every anonymous or
+// direct exchange pipe accepts them, while noDiscard and noVendorSell keep the
+// two accidental-loss paths closed. One decisive test per pipe, through the
+// real gate each pipe applies.
+describe('mount reins transfer (not soulbound: the collection trades hands)', () => {
+  it('a reins item is accepted into a trade offer, not filtered as soulbound', () => {
+    // Mirrors the heroic_mark filter test (tests/heroic_soulbound.test.ts),
+    // inverted: the reins must SURVIVE the offer filter.
+    const bags = new Map<number, Map<string, number>>([[1, new Map([['reins_grag_bear', 1]])]]);
+    const session: any = {
+      a: 1,
+      b: 2,
+      offerA: null,
+      offerB: null,
+      acceptedA: true,
+      acceptedB: true,
+    };
+    const ctx = {
+      resolve: (pid?: number) => (pid === 1 ? { meta: { entityId: 1, copper: 0 }, e: {} } : null),
+      trades: new Map<number, any>([[1, session]]),
+      countItem: (itemId: string, pid?: number) => bags.get(pid ?? 1)?.get(itemId) ?? 0,
+    } as unknown as SimContext;
+
+    tradeSetOffer(ctx, [{ itemId: 'reins_grag_bear', count: 1 }], 0, 1);
+
+    expect(session.offerA.items.map((s: any) => s.itemId)).toContain('reins_grag_bear');
+  });
+
+  it('a reins item can be mailed to another character', () => {
+    const sim = makeWorld();
+    const sender = sim.addPlayer('warrior', 'Alice');
+    const recipient = sim.addPlayer('mage', 'Bob');
+    const senderMeta = sim.players.get(sender)!;
+    const recipientMeta = sim.players.get(recipient)!;
+    const box = sim.entities.get(sim.postOffice.mailboxIds[0])!;
+    const senderEntity = sim.entities.get(sender)!;
+    senderMeta.copper = 1_000;
+    sim.addItem('reins_grag_bear', 1, sender);
+    senderEntity.pos = { ...box.pos };
+    senderEntity.prevPos = { ...box.pos };
+    sim.rebucket(senderEntity);
+    sim.drainEvents();
+
+    sim.mailSendResolved(
+      { key: String(recipientMeta.characterId ?? recipient), name: recipientMeta.name },
+      'One careful owner',
+      '',
+      0,
+      [{ itemId: 'reins_grag_bear', count: 1 }],
+      sender,
+    );
+
+    const events = sim.drainEvents();
+    expect(
+      events.some((e) => e.type === 'mailResult' && (e as any).code === 'noMailSoulbound'),
+    ).toBe(false);
+    // Escrowed out of the sender's bags: the parcel really carries the mount.
+    expect(sim.countItem('reins_grag_bear', sender)).toBe(0);
+  });
+
+  it('a reins item can be listed on the World Market', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const merchant = [...sim.entities.values()].find((e) => e.templateId === 'the_merchant')!;
+    const e = sim.entities.get(seller)!;
+    e.pos.x = merchant.pos.x;
+    e.pos.z = merchant.pos.z;
+    e.prevPos = { ...e.pos };
+    sim.addItem('reins_grag_bear', 1, seller);
+    sim.drainEvents();
+
+    sim.marketList('reins_grag_bear', 1, 100, seller);
+
+    expect(errorTexts(sim.drainEvents())).toEqual([]);
+    expect(sim.marketListings.some((l) => l.itemId === 'reins_grag_bear' && !l.house)).toBe(true);
+    // Escrowed out of the bags: the listing really carries the mount.
+    expect(sim.countItem('reins_grag_bear', seller)).toBe(0);
+  });
+
+  // Drive the ownership re-validation through its id-staggered cadence: call
+  // the transition for up to one full window, advancing the tick counter so
+  // the stagger is guaranteed to land exactly once.
+  function revalidateWindow(sim: Sim, pid: number, windows = 1): void {
+    const e = sim.entities.get(pid)!;
+    for (let i = 0; i < windows * MOUNT_OWNERSHIP_REVALIDATE_TICKS; i++) {
+      updateMountTransition(sim.ctx, e, false);
+      sim.tickCount++;
+    }
+  }
+
+  it('listing the ridden reins away dismounts within the re-validation window', () => {
+    // The ride follows the item: once the reins leave the player's possession
+    // (here the market escrow, but any pipe), the mounted state must not
+    // outlive ownership, or one reins could keep a chain of players mounted.
+    const sim = makeWorld();
+    const pid = join(sim);
+    sim.addItem('reins_grag_bear', 1, pid);
+    const merchant = [...sim.entities.values()].find((e) => e.templateId === 'the_merchant')!;
+    const e = sim.entities.get(pid)!;
+    e.pos.x = merchant.pos.x;
+    e.pos.z = merchant.pos.z;
+    e.prevPos = { ...e.pos };
+    ride(sim, pid, 'grag_bear');
+    expect(e.mountKey).toBe('grag_bear');
+
+    sim.marketList('reins_grag_bear', 1, 100, pid);
+    expect(sim.countItem('reins_grag_bear', pid)).toBe(0);
+
+    revalidateWindow(sim, pid);
+    expect(e.mountKey).toBe('');
+  });
+
+  it('mailing the ridden reins away dismounts within the re-validation window', () => {
+    // Same rule through the mail escrow: the parcel carries the mount away at
+    // send time, so the rider must come down.
+    const sim = makeWorld();
+    const pid = join(sim);
+    const other = sim.addPlayer('mage', 'Bob');
+    const meta = sim.players.get(pid)!;
+    const otherMeta = sim.players.get(other)!;
+    meta.copper = 1_000;
+    sim.addItem('reins_grag_bear', 1, pid);
+    const box = sim.entities.get(sim.postOffice.mailboxIds[0])!;
+    const e = sim.entities.get(pid)!;
+    e.pos = { ...box.pos };
+    e.prevPos = { ...box.pos };
+    sim.rebucket(e);
+    ride(sim, pid, 'grag_bear');
+    expect(e.mountKey).toBe('grag_bear');
+
+    sim.mailSendResolved(
+      { key: String(otherMeta.characterId ?? other), name: otherMeta.name },
+      'One careful owner',
+      '',
+      0,
+      [{ itemId: 'reins_grag_bear', count: 1 }],
+      pid,
+    );
+    expect(sim.countItem('reins_grag_bear', pid)).toBe(0);
+
+    revalidateWindow(sim, pid);
+    expect(e.mountKey).toBe('');
+  });
+
+  it('trading the ridden reins away dismounts once the trade completes', () => {
+    // The full trade pipe through the real tick loop: items move only at
+    // completion, so the rider stays up until then and comes down within one
+    // re-validation window after.
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('mage', 'Bet');
+    const eA = sim.entities.get(a)!;
+    const eB = sim.entities.get(b)!;
+    eA.pos.x = 0;
+    eA.pos.z = -40;
+    eA.pos.y = groundHeight(eA.pos.x, eA.pos.z, sim.cfg.seed);
+    eA.prevPos = { ...eA.pos };
+    eB.pos.x = 3;
+    eB.pos.z = -40;
+    eB.pos.y = groundHeight(eB.pos.x, eB.pos.z, sim.cfg.seed);
+    eB.prevPos = { ...eB.pos };
+    sim.players.get(a)!.ridingTrained = true;
+    sim.addItem('reins_grag_bear', 1, a);
+    sim.tick();
+    ride(sim, a, 'grag_bear');
+    expect(eA.mountKey).toBe('grag_bear');
+
+    sim.tradeRequest(b, a);
+    sim.tradeAccept(b);
+    sim.tradeSetOffer([{ itemId: 'reins_grag_bear', count: 1 }], 0, a);
+    sim.tradeConfirm(a);
+    sim.tradeConfirm(b);
+    for (let i = 0; i <= MOUNT_OWNERSHIP_REVALIDATE_TICKS + 1 && eA.mountKey; i++) sim.tick();
+
+    expect(sim.countItem('reins_grag_bear', b)).toBe(1);
+    expect(mountOwned(sim.players.get(b)!, 'grag_bear')).toBe(true);
+    expect(eA.mountKey).toBe('');
+  });
+
+  it('a banked reins keeps the ride: ownership spans bags plus bank', () => {
+    // Non-vacuity control for the dismounts above: losing the item dismounts,
+    // merely re-homing it to the bank does not, even across two full windows.
+    const sim = makeWorld();
+    const pid = join(sim);
+    sim.addItem('reins_grag_bear', 1, pid);
+    const e = sim.entities.get(pid)!;
+    ride(sim, pid, 'grag_bear');
+    const meta = sim.players.get(pid)!;
+    const slotIndex = meta.inventory.findIndex((s) => s.itemId === 'reins_grag_bear');
+    meta.bank.inventory.push(meta.inventory.splice(slotIndex, 1)[0]);
+
+    revalidateWindow(sim, pid, 2);
+    expect(e.mountKey).toBe('grag_bear');
+  });
+
+  it('never steals the lent training steed: the one sanctioned unowned ride', () => {
+    // The exemption dimension: a lesson rider owns no reins at all, and the
+    // re-validation must leave the lent steed alone or the level-20 tutorial
+    // breaks on its first window.
+    const sim = makeWorld();
+    const pid = join(sim, 20);
+    const meta = sim.players.get(pid)!;
+    meta.ridingTrained = false;
+    meta.mountTraining = {
+      sessionId: 'test_session',
+      ownerId: pid,
+      anchor: { x: 0, z: 0 },
+      state: 'IN_PROGRESS',
+      phase: 'mount',
+    };
+    const e = sim.entities.get(pid)!;
+    expect(toggleMount(sim.ctx, pid)).toBe(true);
+    finishTransition(sim, pid);
+    expect(e.mountKey).toBe(TRAINING_MOUNT_KEY);
+    expect(mountOwned(meta, TRAINING_MOUNT_KEY)).toBe(false); // truly unowned
+
+    revalidateWindow(sim, pid, 2);
+    expect(e.mountKey).toBe(TRAINING_MOUNT_KEY);
+  });
+
+  it('the re-validation draws no rng, on both the pass and the dismount arm', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    sim.addItem('reins_grag_bear', 1, pid);
+    const e = sim.entities.get(pid)!;
+    ride(sim, pid, 'grag_bear');
+    const meta = sim.players.get(pid)!;
+    sim.tickCount = e.id; // align the stagger so the scan runs on this call
+    let draws = 0;
+    sim.rng.setObserver(() => {
+      draws++;
+    });
+    sim.rng.next();
+    expect(draws).toBe(1); // positive control
+    draws = 0;
+    updateMountTransition(sim.ctx, e, false); // owner: the pass arm
+    expect(e.mountKey).toBe('grag_bear');
+    meta.inventory.splice(
+      meta.inventory.findIndex((s) => s.itemId === 'reins_grag_bear'),
+      1,
+    );
+    updateMountTransition(sim.ctx, e, false); // the dismount arm
+    expect(e.mountKey).toBe('');
+    expect(draws).toBe(0);
+    sim.rng.setObserver(null);
+  });
+
+  it('the guild bank pipe accepts reins in both directions', () => {
+    for (const direction of [undefined, 'withdraw'] as const) {
+      expect(
+        guildBankPipeRefusal({ itemId: 'reins_grag_bear', count: 1 }, direction),
+        String(direction),
+      ).toBeNull();
+    }
+  });
+
+  it('the developer tank stays refused by the exchange pipes (still soulbound)', () => {
+    expect(guildBankPipeRefusal({ itemId: 'reins_terrorspark_groundshaker', count: 1 })).not.toBe(
+      null,
+    );
+  });
+
+  it('vendor sell still refuses reins (noVendorSell: sellValue 0 protects the collection)', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Seller');
+    const marla = [...sim.entities.values()].find(
+      (e) => e.kind === 'npc' && e.templateId === 'stablemaster_marla',
+    )!;
+    const player = sim.entities.get(pid)!;
+    player.pos.x = marla.pos.x;
+    player.pos.z = marla.pos.z;
+    sim.addItem('reins_valorsteed', 1, pid);
+    sim.drainEvents();
+
+    sellItem(sim.ctx, 'reins_valorsteed', 1, pid);
+
+    expect(sim.countItem('reins_valorsteed', pid)).toBe(1);
+    expect(errorTexts(sim.drainEvents())).toContain('That item is not for sale.');
   });
 });
 
@@ -324,7 +771,7 @@ describe('mount purchase (Marla sells reins for 10g after ridingTrained)', () =>
     meta.copper = 2_000_000;
     meta.ridingTrained = false; // explicitly not trained
     const npcId = standAtStable(sim, pid);
-    sim.buyItem(npcId, 'reins_valorsteed', pid);
+    sim.buyItem(npcId, 'reins_valorsteed', undefined, pid);
     expect(errorTexts(sim.tick())).toContain(
       'You must learn to ride first. Find a riding trainer.',
     );

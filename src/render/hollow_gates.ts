@@ -11,7 +11,7 @@ import { REALM_PORTALS } from '../sim/content/realm';
 import { hash2 } from '../sim/rng';
 import { terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { flowerTuftTexture } from './textures';
 
 export interface HollowGatesView {
@@ -26,7 +26,7 @@ const GATE_URLS = {
 type GateKey = keyof typeof GATE_URLS;
 const gateScenes: Partial<Record<GateKey, THREE.Group>> = {};
 for (const key of Object.keys(GATE_URLS) as GateKey[]) {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(GATE_URLS[key]).then((gltf) => {
       gateScenes[key] = gltf.scene;
     }),
@@ -65,7 +65,17 @@ export function buildHollowGates(seed: number): HollowGatesView {
     outer.add(inner);
     inner.position.set(-cx * s, -box.min.y * s, -cz * s);
     inner.scale.setScalar(s);
-    outer.position.set(x, terrainHeight(x, z, seed) - 0.25, z);
+    // Seat at the footprint MINIMUM (center + a ring under the mound's
+    // base), not the center sample: the calm pad levels the bench, but the
+    // classic ground still undulates ~half a yard, and a base edge hovering
+    // over a dip reads as floating on a prop this wide.
+    let seatY = terrainHeight(x, z, seed);
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2;
+      const h = terrainHeight(x + Math.cos(a) * 4.5, z + Math.sin(a) * 4.5, seed);
+      if (h < seatY) seatY = h;
+    }
+    outer.position.set(x, seatY - 0.35, z);
     outer.rotation.y = facing;
     outer.traverse((o) => {
       const mesh = o as THREE.Mesh;

@@ -1419,6 +1419,13 @@
   .hs-vlvl {
     color: var(--color-text-muted, #b9ac82);
   }
+  /* The `<Guild>` tag beside a ranked player's name. It rides inside .hs-name
+     rather than as its own grid column, so both the desktop grid and the mobile
+     stacked areas below keep their existing column/area sets. */
+  .hs-guild {
+    color: var(--color-text-muted, #b9ac82);
+    font-size: 11px;
+  }
   .hs-lvl,
   .hs-vlvl {
     text-align: center;
@@ -1985,7 +1992,7 @@
     justify-content: space-between;
     padding: 6vh 0 7vh;
     opacity: 1;
-    transition: opacity 0.35s ease;
+    transition: opacity calc(0.35s * var(--motion-scale)) ease;
   }
   #loading-screen.visible {
     display: flex;
@@ -2020,7 +2027,13 @@
     height: 100%;
     width: 0%;
     background: linear-gradient(180deg, var(--color-primary), var(--color-primary-dim));
-    transition: width 0.2s ease;
+    transition: width calc(0.2s * var(--motion-scale)) ease;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #loading-screen,
+    #ls-fill {
+      transition: none;
+    }
   }
   #ls-status {
     color: var(--color-text-light);
@@ -2931,7 +2944,10 @@
     body:not(.mobile-touch) #charcreate-panel.cs-wow .mini-class .mini-class-portrait {
       width: 62px;
       height: 62px;
-      border-radius: 50%;
+      /* The crest art is a rounded square with its own frame, so a round
+         medallion would slice its corners off; a percentage radius keeps the
+         same silhouette at the 48px size the narrow layout drops to. */
+      border-radius: 18%;
       border: 3px solid #2c2c3a;
       outline: 1px solid #000;
       background: radial-gradient(circle at 35% 30%, #23233a, #0d0d16);
@@ -3116,15 +3132,16 @@
       justify-content: flex-end;
       margin: 0;
     }
-    /* $WOC Wallet and Developer become two matching stacked cards on the
+    /* Wallet, Developer, Steam, and Epic become matching stacked cards on the
        account bar: the service name reads as the card's own header, the
        action row sits under it, and the helper caption anchors the foot,
        instead of a label floating beside a button row with its caption
        dangling underneath. Overrides the base .cs-wallet row layout (label
        beside actions, separator border-top), which the card/mobile layouts
-       keep. */
+       keep. Each card still starts hidden until its own advert / link state
+       lights it. */
     body:not(.mobile-touch) #charselect-panel.cs-wow
-      :is(.cs-wallet-group, .cs-github-group, .cs-steam-group) {
+      :is(.cs-wallet-group, .cs-github-group, .cs-steam-group, .cs-epic-group) {
       flex-direction: column;
       align-items: stretch;
       justify-content: flex-start;
@@ -3150,13 +3167,27 @@
       max-width: 300px;
       font-size: 10px;
     }
-    /* Below 1800px the two cards (verified wallet + linked developer) plus
-       the realm/sort controls no longer fit the account bar on one line
-       with their helper captions, so the bar wraps tall and eats stage
-       height: drop the captions (every action keeps its title/aria text)
-       so the wrapped cards stay short. */
+    /* Below 1800px the stacked account cards plus the realm/sort controls
+       no longer fit the account bar on one line with their helper captions,
+       so the bar wraps tall and eats stage height: drop the captions (every
+       action keeps its title/aria text) so the wrapped cards stay short. */
     @media (max-width: 1799px) {
       body:not(.mobile-touch) #charselect-panel.cs-wow .cs-wallet-help {
+        display: none;
+      }
+    }
+    /* The 1800px threshold above was tuned for the two-to-three-card bar.
+       With BOTH storefront cards lit (Steam and Epic advertised together,
+       the four-card worst case beside wallet + developer) the captioned
+       cards alone run past 1300px, so a 1920px bar wraps tall again: in
+       that state the captions drop up to a wider threshold. Caption text is
+       helper copy only; every action keeps its title/aria text, so nothing
+       actionable is hidden. */
+    @media (max-width: 2199px) {
+      body:not(.mobile-touch)
+        #charselect-panel.cs-wow
+        .cs-head-row:has(.cs-steam-group:not([hidden])):has(.cs-epic-group:not([hidden]))
+        .cs-wallet-help {
         display: none;
       }
     }
@@ -5612,7 +5643,7 @@
     border-radius: 3px;
   }
 
-  /* Class buttons with a portrait preview of that class */
+  /* Class buttons with that class's crest alongside the name */
   .mini-class.has-portrait {
     display: flex;
     align-items: center;
@@ -5626,7 +5657,6 @@
     height: 36px;
     border-radius: 7px;
     object-fit: cover;
-    object-position: 50% 15%;
     flex: 0 0 auto;
     background: radial-gradient(circle at 50% 34%, #232234, #0c0c14);
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -5667,6 +5697,101 @@
   #charcreate-panel .cs-form-actions {
     margin-top: auto;
     padding-top: 16px;
+  }
+
+  /* ---------- Offline creator on phones ----------
+     Below the 861px cs-wow takeover the creator is this stacked card, which
+     still assumed ~400px of width: the class grid's intrinsic min-content
+     inflated the panel past a 375px viewport (#hero-view is a grid item with
+     min-width:auto, so it grew instead of shrinking), clipping the right chip
+     column and the title. Phones get a panel that genuinely fits, chips that
+     shrink and ellipsize, and the 3D preview lifted ABOVE the appearance dock
+     and actions, so the character being built is on screen while editing it
+     instead of below Enter World. */
+  @media (max-width: 540px) {
+    #hero-view {
+      min-width: 0;
+    }
+    #offline-select {
+      min-width: 0;
+      max-width: 100%;
+      padding: 18px 14px;
+    }
+    #offline-select .auth-title {
+      font-size: clamp(22px, 6.5vw, 32px);
+    }
+    #offline-select .mini-class-row {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    /* Medallion chips (the desktop takeover's silhouette at card scale):
+       crest above a small full label, instead of the row layout whose labels
+       ellipsized to three letters at this width. */
+    #offline-select .mini-class {
+      min-width: 0;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 5px;
+      padding: 8px 2px 6px;
+      text-align: center;
+    }
+    #offline-select .mini-class .mini-class-portrait {
+      width: 42px;
+      height: 42px;
+    }
+    #offline-select .mini-class .mini-class-label {
+      flex: 0 0 auto;
+      max-width: 100%;
+      font-size: 10px;
+      letter-spacing: 0.4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* Unwrap both columns and the create form (the desktop takeover already
+       proves each tolerates display:contents) so the layout's flex column can
+       interleave the two halves; `order` then slots the model preview right
+       under the class chips. */
+    #offline-select .charselect-col-left,
+    #offline-select .charselect-col-right,
+    #offline-select .char-create {
+      display: contents;
+    }
+    #offline-select .auth-label {
+      order: 1;
+    }
+    #offline-select .char-input-group {
+      order: 2;
+    }
+    #offline-select .mini-class-row {
+      order: 3;
+      margin-bottom: 0;
+    }
+    /* The preview rides along: pinned under the 58px sticky site header while
+       the appearance rows scroll, so every change lands on a character you can
+       still see. Height gives shorter phones their options back; the solid
+       backdrop stops the rows reading through it while stuck; z-index sits
+       above the dock (auto) and below the site header (20). */
+    #offline-select .char-preview-container {
+      order: 4;
+      position: sticky;
+      top: 62px;
+      z-index: 10;
+      height: clamp(180px, 38vh, 300px);
+      background: linear-gradient(180deg, rgba(13, 13, 20, 0.97) 0%, rgba(8, 8, 13, 0.99) 100%);
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.55);
+    }
+    #offline-select #offline-skin-row {
+      order: 5;
+    }
+    #offline-select #offline-appearance {
+      order: 6;
+    }
+    #offline-select .auth-actions {
+      order: 7;
+    }
+    #offline-select #offline-class-details {
+      order: 8;
+    }
   }
   #btn-charcreate-back,
   #btn-charselect-back {
@@ -6282,9 +6407,67 @@
       align-items: center;
       gap: 8px;
     }
-    body.mobile-touch #charselect-panel .cs-wallet,
-    body.mobile-touch #charselect-panel .cs-wallet-hidden-note {
+    body.mobile-touch:not(.seeker-wallet-enabled) #charselect-panel .cs-wallet,
+    body.mobile-touch:not(.seeker-wallet-enabled) #charselect-panel .cs-wallet-hidden-note {
       display: none;
+    }
+    /* Seeker wallet strip: pair the service name and verified helper as one
+       header row, then keep every connection action on the row below. */
+    body.mobile-touch.seeker-wallet-enabled #charselect-panel .cs-wallet-group {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-rows: auto auto;
+      column-gap: 12px;
+      row-gap: 7px;
+      align-items: center;
+    }
+    body.mobile-touch.seeker-wallet-enabled #charselect-panel .cs-wallet-main {
+      display: contents;
+    }
+    body.mobile-touch.seeker-wallet-enabled #charselect-panel .cs-wallet-group > .cs-wallet-label {
+      grid-column: 1;
+      grid-row: 1;
+      align-self: center;
+      width: auto;
+      margin: 0;
+      padding: 0;
+      font-size: 12px;
+      line-height: 1.35;
+      white-space: nowrap;
+    }
+    body.mobile-touch.seeker-wallet-enabled #charselect-panel .cs-wallet-help {
+      grid-column: 2;
+      grid-row: 1;
+      align-self: center;
+      justify-self: start;
+      width: auto;
+      max-width: none;
+      margin: 0;
+      padding: 0;
+      text-align: left;
+      line-height: 1.35;
+    }
+    body.mobile-touch.seeker-wallet-enabled #charselect-panel .cs-wallet-actions {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      width: 100%;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    body.mobile-touch.seeker-wallet-enabled #charselect-panel :is(.wallet-cta, .wallet-mini) {
+      min-width: 40px;
+      min-height: 40px;
+      padding: 5px 8px;
+      font-size: 11px;
+    }
+    body.mobile-touch.seeker-wallet-enabled #charselect-panel .wallet-status {
+      min-height: 36px;
+      max-width: 290px;
+      padding: 5px 8px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     body.mobile-touch #charselect-panel .cs-controls {
       gap: 6px;
@@ -7540,33 +7723,153 @@
   }
 
   /* ---------- desktop update toast (Electron shell) ---------- */
-  /* Owned by src/ui/desktop_update_toast.ts: a fixed, non-blocking notice for
+  /* Owned by src/ui/desktop_update_toast.ts: a fixed, non-blocking card for
      the auto-updater (website desktop builds only). Lives at shell level so it
-     renders on both the pre-game shell and in-world. */
+     renders on both the pre-game shell and in-world. One FIXED width (not a
+     max-width over a single flex row): the old layout let the buttons squeeze
+     the message column until it clipped; the card now stacks title, body,
+     progress, and actions so every localized string gets the full width. */
   #desktop-update-toast {
     position: fixed;
-    top: var(--spacing-md);
-    right: var(--spacing-md);
+    /* Same safe-area handling as the sibling toasts below: inert on the
+       desktop shell today, correct if the card ever meets a notch. */
+    top: calc(var(--spacing-md) + env(safe-area-inset-top, 0px));
+    right: calc(var(--spacing-md) + env(safe-area-inset-right, 0px));
     z-index: 260;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: var(--spacing-sm);
-    max-width: min(440px, calc(100vw - 2 * var(--spacing-md)));
-    padding: var(--spacing-sm) var(--spacing-md);
-    background: linear-gradient(180deg, rgba(21, 21, 31, 0.96) 0%, rgba(11, 11, 18, 0.98) 100%);
+    width: min(400px, calc(100vw - 2 * var(--spacing-md)));
+    padding: var(--spacing-md);
+    background: linear-gradient(180deg, rgba(21, 21, 31, 0.97) 0%, rgba(11, 11, 18, 0.98) 100%);
+    /* Even 1px border on all sides (same language as #gpu-notice / #perf-nudge).
+       No accent left stripe: that read as generic toast chrome. */
     border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     color: var(--color-text-light);
     font-family: var(--font-sans);
     font-size: 13px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    line-height: 1.45;
+    box-shadow:
+      0 12px 32px rgba(0, 0, 0, 0.65),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    animation: desktop-update-in 240ms ease-out;
   }
   #desktop-update-toast[hidden] {
     display: none;
   }
-  #desktop-update-toast button {
+  @keyframes desktop-update-in {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .desktop-update-icon {
     flex-shrink: 0;
-    padding: 4px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    /* Token-only halo: the accent presets recompute --color-primary-glow, so
+       a literal outer stop would stay gold while the inner stop follows the
+       accent; fading to transparent keeps it one hue under every preset. */
+    background: radial-gradient(circle at 35% 30%, var(--color-primary-glow), transparent 75%);
+    border: 1px solid var(--color-border-default);
+    color: var(--color-primary);
+  }
+  .desktop-update-icon .ui-icon {
+    width: 15px;
+    height: 15px;
+  }
+  .desktop-update-spinner {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid var(--color-primary-glow);
+    border-top-color: var(--color-primary);
+    animation: desktop-update-spin 900ms linear infinite;
+  }
+  @keyframes desktop-update-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  .desktop-update-content {
+    flex: 1;
+    min-width: 0;
+    /* One title line plus one body line (the checking card's height), so the
+       title-only up-to-date card resolves in place instead of shrinking. */
+    min-height: 42px;
+  }
+  .desktop-update-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-primary);
+    /* Room for the corner dismiss control, so a long localized title can
+       never run underneath it. */
+    padding-right: var(--spacing-lg);
+    overflow-wrap: break-word;
+  }
+  #desktop-update-toast[data-mode="ready"] .desktop-update-title {
+    padding-right: 0;
+  }
+  .desktop-update-body {
+    margin-top: 2px;
+    color: var(--color-text-muted);
+    overflow-wrap: break-word;
+  }
+  .desktop-update-body[hidden] {
+    display: none;
+  }
+  .desktop-update-progress {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+  }
+  .desktop-update-progress[hidden] {
+    display: none;
+  }
+  .desktop-update-progress-track {
+    flex: 1;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+  }
+  .desktop-update-progress-fill {
+    height: 100%;
+    width: 0;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--color-primary-dim), var(--color-primary));
+    transition: width 300ms ease;
+  }
+  .desktop-update-progress-pct {
+    flex-shrink: 0;
+    min-width: 34px;
+    text-align: right;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .desktop-update-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+  }
+  .desktop-update-actions[hidden] {
+    display: none;
+  }
+  .desktop-update-actions button {
+    min-height: 28px;
+    padding: 4px 14px;
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-sm);
@@ -7574,11 +7877,93 @@
     font: inherit;
     cursor: var(--cursor-point);
   }
-  #desktop-update-toast button:hover {
+  .desktop-update-actions .desktop-update-restart {
+    background: var(--color-primary-glow);
+    border-color: var(--color-primary-dim);
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+  .desktop-update-actions .desktop-update-restart:hover {
+    background: var(--color-primary-glow-heavy);
     border-color: var(--color-primary);
   }
-  #desktop-update-toast .desktop-update-restart {
+  .desktop-update-actions .desktop-update-later:hover {
     border-color: var(--color-primary);
+  }
+  .desktop-update-close {
+    position: absolute;
+    top: var(--spacing-xs);
+    right: var(--spacing-xs);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    cursor: var(--cursor-point);
+  }
+  .desktop-update-close:hover {
+    color: var(--color-text-light);
+  }
+  .desktop-update-close[hidden] {
+    display: none;
+  }
+  .desktop-update-close .ui-icon {
+    width: 12px;
+    height: 12px;
+  }
+  #desktop-update-toast button:focus-visible {
+    outline: 3px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #desktop-update-toast {
+      animation: none;
+    }
+    .desktop-update-spinner {
+      /* A frozen partial ring reads as a stuck control; solid-color the ring
+         so it stays a state glyph when the rotation is dropped. */
+      animation: none;
+      border-color: var(--color-primary);
+    }
+    .desktop-update-progress-fill {
+      transition: none;
+    }
+  }
+  /* The card is desktop-Electron-only, but Electron ships on touchscreen
+     laptops: give its controls the coarse-pointer touch floor the sibling
+     toasts carry, and keep the title clear of the enlarged corner dismiss. */
+  @media (pointer: coarse) {
+    .desktop-update-actions button,
+    .desktop-update-close {
+      min-height: 40px;
+      min-width: 40px;
+    }
+    .desktop-update-title {
+      padding-right: 44px;
+    }
+    #desktop-update-toast[data-mode="ready"] .desktop-update-title {
+      padding-right: 0;
+    }
+  }
+  /* Download progress is conveyed by the .fill gradient, which forced-colors
+     strips (same failure class the cast bars pin in base.css): pin the fill
+     to Highlight so the filled width survives. Same layer and later in the
+     sheet than the base fill rule, so no !important is needed here. The
+     forced palette also flattens the spinner's four border colors into one,
+     which turns the rotation into invisible motion: stop it and let the
+     solid ring read as the state glyph, like the reduced-motion arm above. */
+  @media (forced-colors: active) {
+    .desktop-update-progress-fill {
+      background: Highlight;
+    }
+    .desktop-update-spinner {
+      animation: none;
+    }
   }
 
   /* ---------- software rendering notice ---------- */
@@ -7606,6 +7991,15 @@
     font-family: var(--font-sans);
     font-size: 13px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  }
+  /* Only a shell that actually mints the update card (the class is stamped by
+     initDesktopUpdateToast once its bridge capability check passes) reserves
+     the taller first slot; every other session keeps the original 56px slot.
+     216px covers the tallest localized ready card under pointer:coarse
+     (32px padding + 2px borders + two 20.3px title lines + three 18.85px
+     body lines + 8px margin + 40px actions is about 201px). */
+  body.desktop-update-card #gpu-notice {
+    top: calc(var(--spacing-md) + 216px + env(safe-area-inset-top, 0px));
   }
   #gpu-notice[hidden] {
     display: none;
@@ -7648,10 +8042,10 @@
   #perf-nudge {
     position: fixed;
     /* Same safe-area handling as #gpu-notice: clear of a notch on mobile
-       shells, zero everywhere else; 112px clears both toast slots above.
-       Unlike the pre-game portrait sibling, this toast surfaces IN-GAME,
-       where web mobile is landscape-only, so the right edge also clears a
-       rotated notch / rounded corner. */
+       shells, zero everywhere else; 112px clears the update-toast slot (56px)
+       plus the gpu-notice slot. Unlike the pre-game portrait sibling, this
+       toast surfaces IN-GAME, where web mobile is landscape-only, so the
+       right edge also clears a rotated notch / rounded corner. */
     top: calc(var(--spacing-md) + 112px + env(safe-area-inset-top, 0px));
     right: calc(var(--spacing-md) + env(safe-area-inset-right, 0px));
     z-index: 260;
@@ -7667,6 +8061,11 @@
     font-family: var(--font-sans);
     font-size: 13px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  }
+  /* The update card's taller slot (216px, see #gpu-notice) pushes this third
+     slot down with it; sessions without the card keep the 112px stack. */
+  body.desktop-update-card #perf-nudge {
+    top: calc(var(--spacing-md) + 272px + env(safe-area-inset-top, 0px));
   }
   #perf-nudge[hidden] {
     display: none;
@@ -7698,4 +8097,801 @@
       min-width: 40px;
     }
   }
+
+  /* ---------- unsupported browser notice ---------- */
+  /* Owned by src/game/browser_support_notice.ts: a one-time, dismissible
+     advisory shown at boot to a player on a browser outside the officially
+     supported set (Chrome, Firefox, Safari), never in the desktop app or a
+     native mobile shell (issue #2266). Bottom-left so it never collides with
+     the top-right toast stack (#gpu-notice / #perf-nudge / update toast). */
+  #browser-support-notice {
+    position: fixed;
+    left: calc(var(--spacing-md) + env(safe-area-inset-left, 0px));
+    bottom: calc(var(--spacing-md) + env(safe-area-inset-bottom, 0px));
+    z-index: 260;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    max-width: min(420px, calc(100vw - 2 * var(--spacing-md)));
+    padding: var(--spacing-md);
+    background: linear-gradient(180deg, rgba(21, 21, 31, 0.96) 0%, rgba(11, 11, 18, 0.98) 100%);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-light);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  }
+  .browser-support-notice-title {
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .browser-support-notice-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+  }
+  .browser-support-notice-actions button {
+    padding: 6px 12px;
+    min-height: 24px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    color: inherit;
+    font: inherit;
+    cursor: var(--cursor-point);
+  }
+  .browser-support-notice-desktop {
+    border-color: var(--color-primary);
+  }
+  .browser-support-notice-actions button:hover {
+    border-color: var(--color-primary);
+  }
+  .browser-support-notice-actions button:focus-visible {
+    outline: 3px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  @media (pointer: coarse) {
+    .browser-support-notice-actions button {
+      min-height: 40px;
+      min-width: 40px;
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Modular-character appearance customizer (character creation).
+   Mounted into #charcreate-appearance / #offline-appearance by main.ts; every
+   class routes through the modular body, so this is THE creation appearance UI.
+
+   A compact tabbed panel in the register of a AAA creator: panel chrome
+   (title + whole-look tools), a Body/Face/Hair/Style tab rail, and one
+   scrolling page of rows per tab, stepper capsules for the long style lists,
+   centre-notched sliders for the morph pairs, switches for booleans, swatch
+   strips for makeup, HSL wheels for colours. These rules live OUTSIDE
+   @layer shell on purpose (like the dock rules they replace): the docks must
+   outrank the layered panel layouts at any specificity.
+   --------------------------------------------------------------------------- */
+.appearance-customizer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+  /* stacked/narrow layouts: a readable column, not full-bleed */
+  max-width: 348px;
+  padding: 10px 10px 8px;
+  font-family: var(--font-sans);
+  background: linear-gradient(172deg, rgba(17, 17, 26, 0.92) 0%, rgba(9, 9, 14, 0.94) 100%);
+  border: 1px solid var(--color-border-showcase);
+  outline: 1px solid rgba(0, 0, 0, 0.55);
+  border-radius: 10px;
+  box-shadow:
+    0 12px 34px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.045);
+}
+
+/* ------------------------------------------------------------ panel chrome */
+.appearance-customizer .ac-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 2px;
+}
+
+.appearance-customizer .ac-title {
+  font-family: var(--title-font);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.appearance-customizer .ac-tools {
+  display: flex;
+  gap: 5px;
+}
+
+.appearance-customizer .ac-tool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  /* labelled pills, not bare icons: the die and the circular arrow did not
+     say what they do on their own. Width is content-driven now; the height
+     stays on the old 26px grid so the header line is unchanged. */
+  height: 26px;
+  padding: 0 8px 0 6px;
+  color: #cbbd97;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--color-border-showcase);
+  border-radius: 6px;
+  cursor: var(--cursor-point);
+  transition:
+    color 120ms ease,
+    background 120ms ease,
+    border-color 120ms ease;
+}
+
+.appearance-customizer .ac-tool:hover {
+  color: #ffe9a8;
+  background: rgba(200, 168, 56, 0.14);
+  border-color: rgba(200, 168, 56, 0.55);
+}
+
+.appearance-customizer .ac-tool:active {
+  transform: translateY(0.5px);
+}
+
+.appearance-customizer .ac-tool-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------- tab rail */
+.appearance-customizer .ac-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  padding: 2px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--color-border-showcase);
+  border-radius: 8px;
+}
+
+.appearance-customizer .ac-tab {
+  height: 26px;
+  padding: 0 2px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: var(--cursor-point);
+  /* the four labels are translated: never let a longer locale wrap the rail */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition:
+    color 120ms ease,
+    background 120ms ease,
+    border-color 120ms ease;
+}
+
+.appearance-customizer .ac-tab:hover {
+  color: var(--color-text-light);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.appearance-customizer .ac-tab.sel {
+  color: #ffe9a8;
+  background: linear-gradient(180deg, rgba(200, 168, 56, 0.24), rgba(200, 168, 56, 0.1));
+  border-color: rgba(200, 168, 56, 0.55);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+/* ------------------------------------------------------------------ pages */
+.appearance-customizer .ac-pages {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(200, 168, 56, 0.35) transparent;
+  /* keep row content clear of the scrollbar gutter */
+  padding-right: 4px;
+  margin-right: -4px;
+}
+
+.appearance-customizer .ac-pages::-webkit-scrollbar {
+  width: 8px;
+}
+
+.appearance-customizer .ac-pages::-webkit-scrollbar-thumb {
+  background: rgba(200, 168, 56, 0.28);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.appearance-customizer .ac-page {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.appearance-customizer .ac-page[hidden] {
+  display: none;
+}
+
+.appearance-customizer .ac-div {
+  height: 1px;
+  margin: 4px 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-border-showcase) 18%,
+    var(--color-border-showcase) 82%,
+    transparent
+  );
+}
+
+/* ------------------------------------------------------------------- rows */
+.appearance-customizer .ac-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+}
+
+.appearance-customizer .ac-label {
+  flex: 0 0 86px;
+  font-size: 10.5px;
+  line-height: 1.25;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-dim, #b9a883);
+}
+
+.appearance-customizer .ac-sub {
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-dim, #b9a883);
+  opacity: 0.8;
+}
+
+/* ------------------------------------------------- segmented pair (body) */
+.appearance-customizer .ac-seg {
+  display: grid;
+  flex: 1 1 auto;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.appearance-customizer .ac-seg-btn {
+  height: 30px;
+  font: inherit;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  background: rgba(0, 0, 0, 0.32);
+  border: 1px solid var(--color-border-showcase);
+  border-radius: 6px;
+  cursor: var(--cursor-point);
+  transition:
+    color 120ms ease,
+    background 120ms ease,
+    border-color 120ms ease;
+}
+
+.appearance-customizer .ac-seg-btn:hover {
+  color: var(--color-text-light);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.appearance-customizer .ac-seg-btn.sel {
+  color: #ffe9a8;
+  background: linear-gradient(180deg, rgba(200, 168, 56, 0.26), rgba(120, 92, 34, 0.22));
+  border-color: rgba(226, 190, 108, 0.75);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+/* -------------------------------------------------------- stepper capsule */
+.appearance-customizer .ac-step {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: stretch;
+  height: 28px;
+  min-width: 0;
+  background: rgba(0, 0, 0, 0.32);
+  border: 1px solid var(--color-border-showcase);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.appearance-customizer .ac-step-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 24px;
+  padding: 0;
+  color: #cbbd97;
+  background: transparent;
+  border: 0;
+  cursor: var(--cursor-point);
+  transition:
+    color 120ms ease,
+    background 120ms ease;
+}
+
+.appearance-customizer .ac-step-btn:hover {
+  color: #ffe9a8;
+  background: rgba(200, 168, 56, 0.16);
+}
+
+.appearance-customizer .ac-step-btn:active {
+  background: rgba(200, 168, 56, 0.26);
+}
+
+/* The value IS a <select>, so browsing the whole list is one click and the
+   row stays a single 28px capsule whatever the list length. Chrome-less and
+   centred so it reads as the stepper's value, not a form control. */
+.appearance-customizer .ac-step-value {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0 4px;
+  font: inherit;
+  font-size: 12px;
+  text-align: center;
+  text-align-last: center;
+  color: var(--color-text-light);
+  background: transparent;
+  border: 0;
+  border-inline: 1px solid var(--color-border-showcase);
+  border-radius: 0;
+  appearance: none;
+  cursor: var(--cursor-point);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background 120ms ease;
+}
+
+.appearance-customizer .ac-step-value:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* The popup list is drawn by the platform, which does NOT inherit the panel's
+   colours, without this the options come out as dark text on a dark menu on
+   some platforms and are unreadable. */
+.appearance-customizer .ac-step-value option {
+  color: #e8dcc0;
+  background: #1a1712;
+}
+
+/* ---------------------------------------------------------------- sliders */
+.appearance-customizer .ac-slide {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  height: 24px;
+  min-width: 0;
+}
+
+.appearance-customizer .ac-slider {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: var(--cursor-point);
+}
+
+/* --ac-track is written per element by the lightness slider (a dark → light
+   ramp of its own hue, so the direction of travel is visible rather than
+   captioned). The morph sliders never set it and keep the neutral rail. */
+.appearance-customizer .ac-slider::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--ac-track, rgba(255, 255, 255, 0.1));
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.appearance-customizer .ac-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 13px;
+  height: 13px;
+  margin-top: -4.5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffe9a8, #c8a838 70%, #8a713a);
+  border: 1px solid #6f5a2a;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+.appearance-customizer .ac-slider::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--ac-track, rgba(255, 255, 255, 0.1));
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.appearance-customizer .ac-slider::-moz-range-thumb {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffe9a8, #c8a838 70%, #8a713a);
+  border: 1px solid #6f5a2a;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+/* The sculpted default sits mid-track; the notch makes the detent visible so
+   "unchanged" reads at a glance across a column of sliders. */
+.appearance-customizer .ac-notch {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 2px;
+  height: 10px;
+  transform: translate(-50%, -50%);
+  background: rgba(240, 235, 216, 0.22);
+  border-radius: 1px;
+  pointer-events: none;
+}
+
+/* ----------------------------------------------------------------- switch */
+.appearance-customizer .ac-switch {
+  position: relative;
+  flex: 0 0 auto;
+  width: 38px;
+  height: 20px;
+  margin-left: auto;
+  padding: 0;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--color-border-showcase);
+  border-radius: 10px;
+  cursor: var(--cursor-point);
+  transition:
+    background 140ms ease,
+    border-color 140ms ease;
+}
+
+.appearance-customizer .ac-switch::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #8b8069;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+  transition:
+    left 140ms ease,
+    background 140ms ease;
+}
+
+.appearance-customizer .ac-switch[aria-checked="true"] {
+  background: rgba(200, 168, 56, 0.32);
+  border-color: rgba(226, 190, 108, 0.75);
+}
+
+.appearance-customizer .ac-switch[aria-checked="true"]::after {
+  left: 20px;
+  background: radial-gradient(circle at 35% 30%, #ffe9a8, #c8a838 75%);
+}
+
+/* --------------------------------------------------------- makeup swatches */
+.appearance-customizer .ac-swatches {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 5px;
+}
+
+.appearance-customizer .ac-mk-swatch {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid rgba(180, 150, 90, 0.45);
+  border-radius: 50%;
+  background: transparent;
+  cursor: var(--cursor-point);
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease,
+    border-color 120ms ease;
+}
+
+.appearance-customizer .ac-mk-swatch:hover {
+  transform: scale(1.12);
+}
+
+.appearance-customizer .ac-mk-swatch.sel {
+  border-color: #fff6dd;
+  box-shadow:
+    0 0 0 2px rgba(226, 190, 108, 0.9),
+    0 0 6px rgba(226, 190, 108, 0.5);
+}
+
+/* OFF is a swatch too, drawn as an empty chip struck through, so the row does
+   not need a separate on/off control next to it. */
+.appearance-customizer .ac-mk-none {
+  background:
+    linear-gradient(
+      to bottom right,
+      transparent calc(50% - 1px),
+      rgba(226, 190, 108, 0.75) calc(50% - 1px),
+      rgba(226, 190, 108, 0.75) calc(50% + 1px),
+      transparent calc(50% + 1px)
+    ),
+    rgba(0, 0, 0, 0.32);
+}
+
+/* ------------------------------------------------------------ colour rows */
+.appearance-customizer .ac-color {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  padding: 6px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(70, 58, 28, 0.55);
+  border-radius: 8px;
+}
+
+.appearance-customizer .ac-color-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.appearance-customizer .ac-color-head .ac-label {
+  flex: 1 1 auto;
+}
+
+/* Live readback of the picked colour, up in the row header where it reads as
+   the row's value. */
+.appearance-customizer .ac-chipdot {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid rgba(240, 235, 216, 0.3);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+/* The preset strip: the row's primary control. Left-aligned under the header
+   and allowed to wrap, so a fourteen-shade hair palette is two tidy lines
+   rather than a scroller. */
+.appearance-customizer .ac-sw-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.appearance-customizer .ac-sw {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid rgba(180, 150, 90, 0.45);
+  border-radius: 50%;
+  background: transparent;
+  cursor: var(--cursor-point);
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease,
+    border-color 120ms ease;
+}
+
+.appearance-customizer .ac-sw:hover {
+  transform: scale(1.12);
+}
+
+.appearance-customizer .ac-sw.sel {
+  border-color: #fff6dd;
+  box-shadow:
+    0 0 0 2px rgba(226, 190, 108, 0.9),
+    0 0 6px rgba(226, 190, 108, 0.5);
+}
+
+/* Custom reads as "every other colour": the full hue circle in the chip, so it
+   is obviously not one more shade in the strip. */
+.appearance-customizer .ac-sw-custom {
+  background: conic-gradient(
+    from 90deg,
+    #ff4d4d,
+    #ffd24d,
+    #4dff77,
+    #4dd2ff,
+    #7a4dff,
+    #ff4dd2,
+    #ff4d4d
+  );
+  position: relative;
+}
+
+.appearance-customizer .ac-sw-custom::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: rgba(10, 10, 16, 0.82);
+  transition: inset 120ms ease;
+}
+
+/* Open: the hole closes up, so the chip reads as "this menu is showing". */
+.appearance-customizer .ac-color.open .ac-sw-custom::after {
+  inset: 8px;
+}
+
+/* The picker drawer. Bordered and inset so it reads as a menu that opened off
+   the chip rather than more of the row. */
+.appearance-customizer .ac-custom[hidden] {
+  display: none;
+}
+
+.appearance-customizer .ac-custom {
+  margin-top: 2px;
+  padding: 7px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(200, 168, 56, 0.3);
+  border-radius: 7px;
+}
+
+.appearance-customizer .ac-color-body {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.appearance-customizer .ac-wheel-holder {
+  position: relative;
+  flex: 0 0 auto;
+  line-height: 0;
+}
+
+.appearance-customizer .ac-wheel {
+  display: block;
+  border-radius: 50%;
+  cursor: crosshair;
+  touch-action: none;
+  box-shadow:
+    0 0 0 1px rgba(180, 150, 90, 0.45),
+    0 2px 6px rgba(0, 0, 0, 0.55);
+}
+
+/* Selection puck: centred on its coordinate, so it must not eat the pointer. */
+.appearance-customizer .ac-wheel-dot {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  margin: -6px 0 0 -6px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+}
+
+.appearance-customizer .ac-color-right {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+/* ------------------------------------------------------------------ focus */
+.appearance-customizer
+:is(
+  .ac-tab,
+  .ac-tool,
+  .ac-seg-btn,
+  .ac-step-value,
+  .ac-switch,
+  .ac-mk-swatch,
+  .ac-sw,
+  .ac-slider,
+  .ac-wheel
+):focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 1px;
+}
+
+/* ------------------------------------------------------------ touch floor */
+@media (pointer: coarse) {
+  .appearance-customizer .ac-row {
+    min-height: 40px;
+  }
+  .appearance-customizer .ac-tab,
+  .appearance-customizer .ac-seg-btn,
+  .appearance-customizer .ac-step,
+  .appearance-customizer .ac-tool {
+    height: 40px;
+  }
+  .appearance-customizer .ac-tool {
+    /* height only: a labelled pill must stay content-width, and the old
+       40px square would clip the word */
+    padding: 0 10px 0 8px;
+  }
+  .appearance-customizer .ac-step-btn {
+    flex-basis: 36px;
+  }
+  .appearance-customizer .ac-switch {
+    width: 46px;
+    height: 24px;
+  }
+  .appearance-customizer .ac-switch::after {
+    width: 18px;
+    height: 18px;
+  }
+  .appearance-customizer .ac-switch[aria-checked="true"]::after {
+    left: 24px;
+  }
+  .appearance-customizer .ac-mk-swatch,
+  .appearance-customizer .ac-sw {
+    width: 28px;
+    height: 28px;
+  }
+  .appearance-customizer .ac-sw-custom::after {
+    inset: 7px;
+  }
+  .appearance-customizer .ac-color.open .ac-sw-custom::after {
+    inset: 11px;
+  }
+  .appearance-customizer .ac-slide {
+    height: 34px;
+  }
+}
+
+/* ------------------------------------------------------------------ docks */
+/* Both creator panels are full-viewport "WoW takeover" stages at >=861px (the
+   create panel only without body.mobile-touch): the turntable is a full-bleed
+   absolute layer at z-index 1, and the customizer docks over its left edge as
+   a fixed column, clear of the centred name entry above and the class rail
+   below. z-index 3 is what the panels' other docks use to sit above the
+   canvas, without it the canvas swallows every click. The panel is a fixed
+   dock and the page area inside it scrolls, so the column never collides with
+   the rail whatever a tab holds. */
+@media (min-width: 861px) {
+  #offline-select .appearance-customizer,
+  body:not(.mobile-touch) #charcreate-panel.cs-wow .appearance-customizer {
+    position: absolute;
+    left: 22px;
+    top: 126px;
+    /* max-height, not bottom: the panel hugs whatever the open tab holds (Body
+       is two rows, Face is a dozen) instead of always drawing a full-height
+       frame with dead space under a short tab. The cap keeps it clear of the
+       class rail, whose medallions + labels reach about 182px up from the
+       panel edge (measured, both creators), plus breathing room. */
+    max-height: calc(100% - 322px);
+    width: 318px;
+    max-width: none;
+    margin-top: 0;
+    z-index: 3;
+  }
+}
+
+/* Narrow / stacked layouts flow the panel in the form column instead. The
+   create form's section captions double the panel's own title there, and the
+   preset strip they captioned is gone (CREATION_SKIN_PRESETS), so the caption
+   is dropped rather than the panel renamed. */
+#charcreate-panel .skin-picker-header {
+  display: none;
 }

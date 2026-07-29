@@ -31,6 +31,7 @@ export interface SkinEventControllerDeps {
   closeTop(): boolean;
   hideTooltip(): void;
   onPortraitsReady(callback: () => void): void;
+  onPortraitUpdate(callback: (visualKey: string, skin: number) => void): void;
   preloadMechAssets(): Promise<void>;
   preview: SkinEventPreviewPort;
   openFocusTrap(root: () => HTMLElement | null): FocusTrapHandle;
@@ -58,7 +59,9 @@ export class SkinEventController {
   private mode: SkinEventMode = 'class';
   private mechAssets: Promise<void> | null = null;
 
-  constructor(private readonly deps: SkinEventControllerDeps) {}
+  constructor(private readonly deps: SkinEventControllerDeps) {
+    this.deps.onPortraitUpdate((visualKey, skin) => this.refreshChoiceThumb(visualKey, skin));
+  }
 
   open(rank: SkinRank, options?: { mech?: boolean }): void {
     for (let index = 0; index < 20 && this.deps.closeTop(); index++) {
@@ -141,6 +144,21 @@ export class SkinEventController {
     return this.mode === 'mech'
       ? visualPortraitDataUrl('player_mech', index)
       : playerPortraitDataUrl(this.deps.world().cfg.playerClass, index);
+  }
+
+  private refreshChoiceThumb(visualKey: string, skin: number): void {
+    if (!this.element?.classList.contains('open') || this.revealTimer !== null) return;
+    const expectedKey =
+      this.mode === 'mech' ? 'player_mech' : `player_${this.deps.world().cfg.playerClass}`;
+    if (visualKey !== expectedKey) return;
+    const button = this.element.querySelector<HTMLButtonElement>(`.se-swatch[data-skin="${skin}"]`);
+    const url = button ? this.choiceThumb(skin) : null;
+    if (!button || !url || button.querySelector('img')) return;
+    const img = this.deps.document.createElement('img');
+    img.src = url;
+    img.alt = '';
+    button.textContent = '';
+    button.appendChild(img);
   }
 
   private choiceName(choice: Pick<SkinEventChoice, 'rank' | 'id'>): string {

@@ -445,6 +445,34 @@ describe('Battlefield Experience wired into potion-drunk (#1149)', () => {
   });
 });
 
+// Regression: recipeForResultItem (content/recipes.ts) previously searched
+// COMMON_RECIPES only, even though it is documented as a reverse lookup over
+// every recipe and ALL_RECIPES (aggregating COMMON_RECIPES, TOOL_RECIPES,
+// CASTER_HUB_RECIPES, COMBO_RECIPES, and LADDER_RECIPES) already existed in
+// the same file. That silently broke Battlefield Experience for every
+// ladder/tool/combo/caster-hub recipe, including both shipped alchemy rare
+// potions. This exercises the REAL shipped recipe_sunpetal_healing_draught
+// output (LADDER_RECIPES, genuinely quality 'rare' per profession_items.ts,
+// no quality mutation needed, unlike the def-quality fallback cases above)
+// drunk end to end through the real potion-drunk tracked event (items.ts
+// useItem), proving the lookup covers a genuine LADDER_RECIPES item.
+describe('Battlefield Experience credits a real LADDER_RECIPES output (regression)', () => {
+  it('a self-signed sunpetal healing draught (recipe_sunpetal_healing_draught, LADDER_RECIPES) drunk by its signer trickles alchemy skill', () => {
+    expect(ITEMS.sunpetal_healing_draught.quality).toBe('rare');
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = (sim as any).players.get(pid);
+    meta.archetype.activeArchetype = 'alchemy';
+    sim.addItemInstance('sunpetal_healing_draught', { signer: meta.name }, pid);
+    const entity = (sim as any).entities.get(pid);
+    entity.hp = 1;
+
+    sim.useItem('sunpetal_healing_draught', pid);
+
+    expect(meta.craftSkills.alchemy).toBe(BATTLEFIELD_XP_TRICKLE);
+  });
+});
+
 // #1149's re-craft/re-sign requirement: "the original crafter benefits most
 // on later improving that same item" falls out for free from signer-based
 // attribution, since a re-craft simply re-signs the instance with the new

@@ -260,12 +260,21 @@ export function deedTitleText(id: string): string {
   return maybePseudo(localeEntry(id)?.title ?? def.reward.text);
 }
 
+/** The guild-chat news template for another player's marquee unlock with the
+ *  deed slot filled by a caller-owned string: the HUD passes its splice
+ *  sentinel (DEED_NAME_TOKEN) so the deed name lands as a clickable jump
+ *  node; deedBroadcastLine below passes the resolved name for a plain-text
+ *  line. One template render, so the two forms cannot drift. */
+export function deedBroadcastRendered(characterName: string, deedSlot: string): string {
+  return t('hudChrome.deeds.broadcastLine', { name: characterName, deed: deedSlot });
+}
+
 /** The guild-chat news line for another player's marquee unlock, composed
  *  client-side from the id-based wire event (the server never sends deed
  *  English). Pure and Node-testable so the one HUD switch arm stays a thin
  *  log call. */
 export function deedBroadcastLine(characterName: string, deedId: string): string {
-  return t('hudChrome.deeds.broadcastLine', { name: characterName, deed: deedName(deedId) });
+  return deedBroadcastRendered(characterName, deedName(deedId));
 }
 
 /** A player name decorated with their selected title through the

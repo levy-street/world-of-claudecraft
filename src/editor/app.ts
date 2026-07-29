@@ -15,6 +15,7 @@ import { BUILTIN_WORLD, MOBS, PLAYER_START, setActiveWorldContent } from '../sim
 import {
   clampBlockerSegment,
   MAX_BLOCKERS,
+  MAX_CAMPS,
   MAX_COLLIDE_RADIUS,
   MAX_PLACEMENTS,
   MAX_TERRAIN_EDITS,
@@ -28,6 +29,7 @@ import { Editor3DViewport } from './3d/viewport';
 import { AssetBrowser } from './asset_browser';
 import { ASSET_CATALOG, assetById } from './asset_catalog.generated';
 import { nearestBlockerIndex } from './blocker_core';
+import { resolveCampClick } from './camp_core';
 import { draw } from './canvas';
 import {
   type AssetPlacement,
@@ -71,6 +73,7 @@ import {
   erasePlacementIndex,
   eraseStampIndex,
   flattenStamp,
+  pickPlacementIndex,
   smoothStamp,
   stampRegion,
   unionRegion,
@@ -1319,33 +1322,25 @@ export class EditorApp {
 
   private campClick(w: Vec2): void {
     const camps = this.camps();
-    // Click inside an existing camp's radius selects it (nearest wins).
-    let best = -1;
-    let bestD = Number.POSITIVE_INFINITY;
-    for (let i = 0; i < camps.length; i++) {
-      const c = camps[i];
-      const dx = w.x - c.center.x;
-      const dz = w.z - c.center.z;
-      const d = Math.sqrt(dx * dx + dz * dz);
-      if (d <= Math.max(4, c.radius) && d < bestD) {
-        best = i;
-        bestD = d;
-      }
-    }
-    if (best >= 0) {
-      this.selectedCamp = best;
-      this.campMobId = camps[best].mobId;
+    // Click inside an existing camp's radius selects it (nearest wins); on
+    // empty ground, resolveCampClick also refuses a new camp once the
+    // document is already at MAX_CAMPS, mirroring terrainEdits/placements/
+    // blockers so an author never silently loses camps past the shared
+    // sanitizer's truncation point on the next save/load.
+    const result = resolveCampClick(camps, w.x, w.z, this.campMobId, MAX_CAMPS);
+    if (result.kind === 'select') {
+      this.selectedCamp = result.index;
+      this.campMobId = camps[result.index].mobId;
       this.inspector.refresh();
       this.canvasDirty = true;
       return;
     }
+    if (result.kind === 'capped') {
+      this.toasts.error(t('editor.status.campCapReached', { max: MAX_CAMPS }));
+      return;
+    }
     // New camps APPEND to content.camps (never reorder); spawns appear in playtest.
-    const camp: CampDef = {
-      mobId: this.campMobId,
-      center: { x: w.x, z: w.z },
-      radius: 10,
-      count: 3,
-    };
+    const camp: CampDef = result.camp;
     camps.push(camp);
     this.selectedCamp = camps.length - 1;
     this.afterCampsChanged();
@@ -2433,7 +2428,7 @@ export class EditorApp {
         this.grab = { x: w.x - hit.point.x, z: w.z - hit.point.z };
         this.inspector.refresh();
       } else {
-        const pi = erasePlacementIndex(this.map.placements, w.x, w.z, 2);
+        const pi = pickPlacementIndex(this.map.placements, w.x, w.z, this.cam.pxPerYard);
         if (pi >= 0) {
           this.selectedKey = null;
           this.setSelectedPlacement(pi);

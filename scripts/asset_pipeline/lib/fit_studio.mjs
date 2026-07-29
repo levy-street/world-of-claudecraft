@@ -1,0 +1,543 @@
+// Fit Studio server (`pipeline.mjs fit`): the designer places each modular
+// hair sculpt, jewellery set and hair band on the character with a
+// move/rotate/scale gizmo in the browser, and Save writes the placement to
+// tmp/modular/anchors.json, the file hairimp.py / jewel.py / bands.py read on
+// the next rebuild, so a saved anchor IS the seat (the solver only runs for
+// styles without one).
+//
+// Deliberately its own small server rather than a mode of the library viewer:
+// it needs none of the inventory/thumbnail machinery, and it must serve the
+// modular AUTHORING artifacts (tmp/modular/*.glb, the raw pre-KTX export and
+// the hair sculpts), which the library's /repo guard rightly refuses.
+//
+// The page itself lives in scripts/asset_pipeline/fit_studio/ as plain ES
+// modules (no build step), read per request so edits show on a reload. Only
+// this server file is cached at start, restart after editing it.
+
+import { spawn } from 'node:child_process';
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  renameSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
+import { join } from 'node:path';
+import { REPO_ROOT } from './env.mjs';
+
+const MODULAR_DIR = join(REPO_ROOT, 'tmp/modular');
+const ANCHORS_PATH = join(MODULAR_DIR, 'anchors.json');
+const SCULPT_PATH = join(MODULAR_DIR, 'body_sculpt.json');
+const HAIR_SCULPT_PATH = join(MODULAR_DIR, 'hair_sculpt.json');
+const HAIR_SRC_DIR = join(MODULAR_DIR, 'hair_src');
+const BANDS_SPEC_PATH = join(MODULAR_DIR, 'bands_spec.json');
+const PAGE_DIR = join(REPO_ROOT, 'scripts/asset_pipeline/fit_studio');
+
+const MIME = {
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.json': 'application/json',
+  '.glb': 'model/gltf-binary',
+  '.png': 'image/png',
+  '.svg': 'image/svg+xml',
+  '.wasm': 'application/wasm',
+};
+
+export function loadAnchors() {
+  try {
+    return JSON.parse(readFileSync(ANCHORS_PATH, 'utf8'));
+  } catch {
+    return { version: 1, hair: {}, jewel: {}, band: {} };
+  }
+}
+
+/** The hair-band rings as authored (tmp/modular/bands_spec.json), the SCULPT
+ *  half of a band, in the raw export's glTF axes. The studio builds its
+ *  preview ring straight from this and gizmos a delta on top, so what the
+ *  designer drags is exactly what bands.py will produce. */
+export function loadBandSpec() {
+  try {
+    return JSON.parse(readFileSync(BANDS_SPEC_PATH, 'utf8')).bands ?? {};
+  } catch {
+    return {};
+  }
+}
+
+// One-deep safety net: the first write of each server run snapshots the
+// anchors as they were BEFORE this editing session, so a bad afternoon is
+// always one `cp anchors.json.bak anchors.json` away from undone.
+let backedUpThisRun = false;
+function writeAnchors(data) {
+  mkdirSync(MODULAR_DIR, { recursive: true });
+  if (!backedUpThisRun && existsSync(ANCHORS_PATH)) {
+    copyFileSync(ANCHORS_PATH, `${ANCHORS_PATH}.bak`);
+    backedUpThisRun = true;
+  }
+  // Atomic: the Blender rebuild may read this file at any moment.
+  const tmp = `${ANCHORS_PATH}.tmp`;
+  writeFileSync(tmp, `${JSON.stringify(data, null, 2)}\n`);
+  renameSync(tmp, ANCHORS_PATH);
+}
+
+const KEY_RE = /^[a-z0-9_]+$/;
+// 'band' is the hair-band cuff (tmp/modular/bands.py). Unlike the other two
+// its matrix is a DELTA on the authored ring rather than an absolute seat,
+// the ring is generated, so it has no origin of its own to be absolute
+// against, but it is stored, validated and reset exactly like them.
+const ANCHOR_KINDS = new Set(['hair', 'jewel', 'band']);
+// Twinned with JEWEL_MATERIALS in tmp/modular/jewel.py and the preset table
+// in fit_studio/anchors.js, keep all three in sync.
+const JEWEL_MATERIAL_NAMES = new Set([
+  'gold',
+  'silver',
+  'bone',
+  'iron',
+  'copper',
+  'bronze',
+  'obsidian',
+  'jade',
+  'amethyst',
+  'ruby',
+  'pearl',
+  'turquoise',
+]);
+// Twinned with UNDERHAIR_STYLES in src/render/characters/modular.ts and the
+// picker in fit_studio/anchors.js. 'none' switches the under-layer off.
+const UNDERHAIR_NAMES = new Set([
+  'none',
+  'buzz',
+  'crew',
+  'solid',
+  'solid_high',
+  'widow',
+  'receded',
+  'low_fade',
+  'high_fade',
+  'sparse',
+  'horseshoe',
+]);
+const UNDERHAIR_GENERATED = join(REPO_ROOT, 'src/render/characters/underhair.generated.ts');
+
+/** Regenerate the table the GAME reads at runtime, so a designer's per-style
+ *  underhair choice ships without a rebuild. Only non-default choices are
+ *  written; a missing style falls back to buzz in baseScalpDecal. */
+function writeUnderhairGenerated() {
+  const anchors = loadAnchors();
+  const picks = Object.entries(anchors.hair ?? {})
+    .filter(([, e]) => e.underhair && e.underhair !== 'buzz')
+    .map(([style, e]) => `  ${JSON.stringify(style)}: ${JSON.stringify(e.underhair)},`)
+    .sort();
+  const body = picks.length ? `{\n${picks.join('\n')}\n}` : '{}';
+  const src =
+    '// AUTO-GENERATED by the Fit Studio server (scripts/asset_pipeline/lib/\n' +
+    '// fit_studio.mjs) from tmp/modular/anchors.json, do not hand-edit. Each hair\n' +
+    "// style's under-hair scalp pattern, authored with its anchor; missing = the\n" +
+    "// classic buzz growth, 'none' = no under-layer for that style.\n" +
+    `export const UNDERHAIR: Partial<Record<string, string>> = ${body};\n`;
+  const tmp = `${UNDERHAIR_GENERATED}.tmp`;
+  writeFileSync(tmp, src);
+  renameSync(tmp, UNDERHAIR_GENERATED);
+}
+
+/** Upsert one placement. Free text never reaches the file: kind and key are
+ *  allowlist-shaped, the matrix must be 16 finite numbers, sway one of three
+ *  known strings, the jewel material a preset name plus two bounded tint
+ *  numbers. */
+export function saveAnchor({ kind, key, matrix, sway, material, tint, underhair }) {
+  if (!ANCHOR_KINDS.has(kind)) throw new Error(`bad kind: ${kind}`);
+  if (typeof key !== 'string' || !KEY_RE.test(key)) throw new Error(`bad key: ${key}`);
+  if (!Array.isArray(matrix) || matrix.length !== 16 || !matrix.every((n) => Number.isFinite(n))) {
+    throw new Error('matrix must be 16 finite numbers');
+  }
+  const data = loadAnchors();
+  data[kind] ??= {};
+  const entry = { matrix: matrix.map((n) => Number(n)), savedAt: new Date().toISOString() };
+  if (kind === 'hair' && (sway === 'on' || sway === 'off')) entry.sway = sway;
+  if (kind === 'hair' && underhair !== undefined && underhair !== '' && underhair !== 'buzz') {
+    if (!UNDERHAIR_NAMES.has(underhair)) throw new Error(`bad underhair: ${underhair}`);
+    entry.underhair = underhair;
+  }
+  if (kind === 'jewel' && material !== undefined && material !== '') {
+    if (!JEWEL_MATERIAL_NAMES.has(material)) throw new Error(`bad material: ${material}`);
+    entry.material = material;
+    const h = Number(tint?.h ?? 0);
+    const l = Number(tint?.l ?? 0);
+    if (!Number.isFinite(h) || !Number.isFinite(l) || Math.abs(h) > 180 || Math.abs(l) > 1) {
+      throw new Error('tint out of range');
+    }
+    if (h !== 0 || l !== 0) entry.tint = { h, l };
+  }
+  data[kind][key] = entry;
+  writeAnchors(data);
+  if (kind === 'hair') writeUnderhairGenerated();
+  return {
+    saved: `${kind}/${key}`,
+    sway: entry.sway ?? 'auto',
+    material: entry.material ?? 'atlas',
+  };
+}
+
+/** Remove one placement (back to the solver / built position). */
+export function resetAnchor({ kind, key }) {
+  if (!ANCHOR_KINDS.has(kind)) throw new Error(`bad kind: ${kind}`);
+  if (typeof key !== 'string' || !KEY_RE.test(key)) throw new Error(`bad key: ${key}`);
+  const data = loadAnchors();
+  if (data[kind]?.[key]) {
+    delete data[kind][key];
+    writeAnchors(data);
+    if (kind === 'hair') writeUnderhairGenerated();
+    return { reset: `${kind}/${key}` };
+  }
+  return { reset: null };
+}
+
+export function loadSculpt() {
+  try {
+    return JSON.parse(readFileSync(SCULPT_PATH, 'utf8'));
+  } catch {
+    return { version: 1, parts: {} };
+  }
+}
+
+const PART_RE = /^[MF]_[A-Za-z]+$/;
+
+/** Upsert one body part's grab-brush deltas: rows of
+ *  [restX, restY, restZ, dX, dY, dZ] in glTF axes, keyed by rest POSITION so
+ *  the Blender rebuild can match them onto its own vertex order. */
+export function saveSculpt({ part, entries }) {
+  if (typeof part !== 'string' || !PART_RE.test(part)) throw new Error(`bad part: ${part}`);
+  if (
+    !Array.isArray(entries) ||
+    entries.length > 20000 ||
+    !entries.every((r) => Array.isArray(r) && r.length === 6 && r.every((n) => Number.isFinite(n)))
+  ) {
+    throw new Error('entries must be rows of 6 finite numbers');
+  }
+  const data = loadSculpt();
+  data.parts ??= {};
+  if (entries.length === 0) delete data.parts[part];
+  else data.parts[part] = entries.map((r) => r.map((n) => Number(n.toFixed(5))));
+  data.savedAt = new Date().toISOString();
+  mkdirSync(MODULAR_DIR, { recursive: true });
+  const tmp = `${SCULPT_PATH}.tmp`;
+  writeFileSync(tmp, `${JSON.stringify(data)}\n`);
+  renameSync(tmp, SCULPT_PATH);
+  return { saved: part, rows: entries.length };
+}
+
+export function resetSculpt() {
+  mkdirSync(MODULAR_DIR, { recursive: true });
+  const tmp = `${SCULPT_PATH}.tmp`;
+  writeFileSync(tmp, `${JSON.stringify({ version: 1, parts: {} })}\n`);
+  renameSync(tmp, SCULPT_PATH);
+  return { reset: true };
+}
+
+export function loadHairSculpt() {
+  try {
+    return JSON.parse(readFileSync(HAIR_SCULPT_PATH, 'utf8'));
+  } catch {
+    return { version: 1, styles: {} };
+  }
+}
+
+/** Upsert one hair style's shape deltas: rows of
+ *  [restX, restY, restZ, dX, dY, dZ] in the RAW sculpt's own local glTF axes,
+ *  keyed by rest position, hairimp.py applies them to the imported sculpt
+ *  before the seat/cut chain, so a tweak reshapes what everything downstream
+ *  sees. Empty entries delete the style's tweak. */
+export function saveHairSculpt({ style, entries }) {
+  if (typeof style !== 'string' || !KEY_RE.test(style)) throw new Error(`bad style: ${style}`);
+  if (
+    !Array.isArray(entries) ||
+    entries.length > 80000 ||
+    !entries.every((r) => Array.isArray(r) && r.length === 6 && r.every((n) => Number.isFinite(n)))
+  ) {
+    throw new Error('entries must be rows of 6 finite numbers');
+  }
+  const data = loadHairSculpt();
+  data.styles ??= {};
+  if (entries.length === 0) delete data.styles[style];
+  else data.styles[style] = entries.map((r) => r.map((n) => Number(n.toFixed(5))));
+  data.savedAt = new Date().toISOString();
+  mkdirSync(MODULAR_DIR, { recursive: true });
+  const tmp = `${HAIR_SCULPT_PATH}.tmp`;
+  writeFileSync(tmp, `${JSON.stringify(data)}\n`);
+  renameSync(tmp, HAIR_SCULPT_PATH);
+  return { saved: style, rows: entries.length };
+}
+
+// ---------------------------------------------------------------------------
+// Hand-painted under-hair masks
+// ---------------------------------------------------------------------------
+/** Everything the page needs to boot: the hair slugs on disk, which character
+ *  GLB to load (raw authoring export preferred, plain floats, 1 skin), and
+ *  the saved anchors. Jewellery styles are discovered client-side from the
+ *  E2_ nodes of the character GLB itself, so a renamed set can never go
+ *  stale here. */
+export function fitState() {
+  const hair = existsSync(HAIR_SRC_DIR)
+    ? readdirSync(HAIR_SRC_DIR)
+        .filter((f) => f.endsWith('.glb'))
+        .map((f) => f.replace(/\.glb$/, ''))
+        .sort()
+    : [];
+  const rawGlb = 'tmp/modular/warrior_modular.glb';
+  const shippedGlb = 'public/models/chars/modular/warrior_modular.glb';
+  const characterGlb = existsSync(join(REPO_ROOT, rawGlb))
+    ? rawGlb
+    : existsSync(join(REPO_ROOT, shippedGlb))
+      ? shippedGlb
+      : null;
+  return {
+    hair,
+    characterGlb,
+    anchors: loadAnchors(),
+    sculpt: loadSculpt().parts ?? {},
+    hairSculpt: loadHairSculpt().styles ?? {},
+    bands: loadBandSpec(),
+  };
+}
+
+// --- publish-to-game --------------------------------------------------------
+//
+// One click in the studio runs the hair-only rebuild chain and ships the
+// result into THIS build's public/, the same three steps done by hand until
+// now (Troy, 2026-08-07: "a button that will import the updated hair styles
+// to my woc build"):
+//   1. headless Blender over tmp/modular/hair_checkpoint.blend +
+//      hairfit_run.py, rebuilds every hair/beard sculpt and every hair band
+//      from the saved anchors and re-applies the armour fixups (fitfix), ~90s;
+//   2. tmp/_ktx_swap_multi.mjs, swap embedded PNGs for the KTX2 atlases;
+//   3. copy into public/models/chars/modular/warrior_modular.glb.
+// The job is async (POST starts it, GET polls) because step 1 is ~90s and
+// the page should not hold a request open that long.
+const BLENDER_BIN = '/Applications/Blender.app/Contents/MacOS/Blender';
+const publishJob = { running: false, ok: null, log: [], startedAt: 0, finishedAt: 0 };
+
+function pubLog(line) {
+  publishJob.log.push(line);
+  if (publishJob.log.length > 200) publishJob.log.shift();
+}
+
+function runStep(cmd, args, label) {
+  return new Promise((resolve, reject) => {
+    pubLog(`> ${label}`);
+    const child = spawn(cmd, args, { cwd: REPO_ROOT });
+    let tail = '';
+    const eat = (buf) => {
+      tail = (tail + buf.toString()).slice(-4000);
+    };
+    child.stdout.on('data', eat);
+    child.stderr.on('data', eat);
+    child.on('error', (err) => reject(new Error(`${label}: ${err.message}`)));
+    child.on('close', (code) => {
+      for (const l of tail.split('\n').slice(-12)) if (l.trim()) pubLog(`  ${l.trim()}`);
+      if (code === 0) resolve();
+      else reject(new Error(`${label} exited ${code}`));
+    });
+  });
+}
+
+export function startPublish() {
+  if (publishJob.running) throw new Error('a publish is already running');
+  const checkpoint = join(MODULAR_DIR, 'hair_checkpoint.blend');
+  if (!existsSync(BLENDER_BIN)) throw new Error('Blender not found at ' + BLENDER_BIN);
+  if (!existsSync(checkpoint))
+    throw new Error(
+      'missing tmp/modular/hair_checkpoint.blend (run a full rebuild with WOC_HAIR_CHECKPOINT set)',
+    );
+  publishJob.running = true;
+  publishJob.ok = null;
+  publishJob.log = [];
+  publishJob.startedAt = Date.now();
+  void (async () => {
+    try {
+      await runStep(
+        BLENDER_BIN,
+        ['--background', checkpoint, '--python', join(MODULAR_DIR, 'hairfit_run.py')],
+        'rebuild hair from anchors (headless Blender)',
+      );
+      await runStep(
+        process.execPath,
+        [
+          'tmp/_ktx_swap_multi.mjs',
+          'tmp/modular/warrior_modular.glb',
+          'tmp/modular/warrior_modular_ktx.glb',
+        ],
+        'swap atlases to KTX2',
+      );
+      const dst = join(REPO_ROOT, 'public/models/chars/modular/warrior_modular.glb');
+      copyFileSync(join(MODULAR_DIR, 'warrior_modular_ktx.glb'), dst);
+      pubLog(`> shipped ${dst}`);
+      publishJob.ok = true;
+    } catch (err) {
+      pubLog(`ERROR: ${err.message}`);
+      publishJob.ok = false;
+    } finally {
+      publishJob.running = false;
+      publishJob.finishedAt = Date.now();
+    }
+  })();
+  return { started: true };
+}
+
+export function publishStatus() {
+  return {
+    running: publishJob.running,
+    ok: publishJob.ok,
+    log: publishJob.log.slice(-30),
+    startedAt: publishJob.startedAt,
+    finishedAt: publishJob.finishedAt,
+  };
+}
+
+/** Start the Fit Studio http server. Returns { server, url }. */
+export async function serveFitStudio({ port = 5184 } = {}) {
+  const http = await import('node:http');
+  const { normalize, extname } = await import('node:path');
+  const { buildThreeBundle } = await import('./library.mjs');
+  const threeBundle = await buildThreeBundle();
+  // Page modules are read per request so edits show on a plain reload.
+  const pageFile = (name) => readFileSync(join(PAGE_DIR, name), 'utf8');
+
+  // /repo/* guard: the viewer's allowlist plus the modular authoring GLBs.
+  // tmp/modular is gated to .glb so the .blend scenes and python never serve.
+  const ALLOWED = ['public/', 'tmp/asset_pipeline/', 'tmp/modular/'];
+  const send = (res, code, type, body) => {
+    res.writeHead(code, { 'Content-Type': type, 'Cache-Control': 'no-store' });
+    res.end(body);
+  };
+  const sendJson = (res, code, obj) => send(res, code, MIME['.json'], JSON.stringify(obj));
+  const readBody = (req) =>
+    new Promise((resolve) => {
+      let data = '';
+      req.on('data', (c) => {
+        data += c;
+        // sculpt saves carry thousands of vertex rows; anchors are tiny
+        if (data.length > 8e6) req.destroy();
+      });
+      req.on('end', () => {
+        try {
+          resolve(data ? JSON.parse(data) : {});
+        } catch {
+          resolve({});
+        }
+      });
+      req.on('error', () => resolve({}));
+    });
+
+  const server = http.createServer(async (req, res) => {
+    try {
+      const url = decodeURIComponent((req.url || '/').split('?')[0]);
+      if (url === '/' || url === '/index.html') {
+        return send(res, 200, MIME['.html'], pageFile('index.html'));
+      }
+      // The page's own modules: flat files in fit_studio/, extension-gated.
+      if (url.startsWith('/fit_studio/')) {
+        const name = normalize(url.slice('/fit_studio/'.length));
+        const ext = extname(name);
+        if (
+          name.includes('/') ||
+          name.includes('..') ||
+          !['.js', '.css', '.svg', '.png'].includes(ext)
+        ) {
+          return send(res, 403, 'text/plain', 'forbidden');
+        }
+        const p = join(PAGE_DIR, name);
+        if (!existsSync(p)) return send(res, 404, 'text/plain', 'not found');
+        return send(res, 200, MIME[ext], readFileSync(p));
+      }
+      if (url === '/three.bundle.js') return send(res, 200, MIME['.js'], threeBundle);
+      if (url === '/basis/basis_transcoder.js' || url === '/basis/basis_transcoder.wasm') {
+        const p = join(REPO_ROOT, 'public', url.slice(1));
+        return send(res, 200, MIME[extname(p)] ?? 'application/octet-stream', readFileSync(p));
+      }
+      if (url === '/api/fit/state' && req.method === 'GET') {
+        return sendJson(res, 200, fitState());
+      }
+      if (url === '/api/fit/save' && req.method === 'POST') {
+        try {
+          return sendJson(res, 200, saveAnchor(await readBody(req)));
+        } catch (err) {
+          return sendJson(res, 400, { error: String(err.message ?? err) });
+        }
+      }
+      if (url === '/api/fit/reset' && req.method === 'POST') {
+        try {
+          return sendJson(res, 200, resetAnchor(await readBody(req)));
+        } catch (err) {
+          return sendJson(res, 400, { error: String(err.message ?? err) });
+        }
+      }
+      if (url === '/api/fit/sculpt' && req.method === 'POST') {
+        try {
+          return sendJson(res, 200, saveSculpt(await readBody(req)));
+        } catch (err) {
+          return sendJson(res, 400, { error: String(err.message ?? err) });
+        }
+      }
+      if (url === '/api/fit/sculpt-reset' && req.method === 'POST') {
+        return sendJson(res, 200, resetSculpt());
+      }
+      if (url === '/api/fit/hair-sculpt' && req.method === 'POST') {
+        try {
+          return sendJson(res, 200, saveHairSculpt(await readBody(req)));
+        } catch (err) {
+          return sendJson(res, 400, { error: String(err.message ?? err) });
+        }
+      }
+      if (url === '/api/fit/publish-game' && req.method === 'POST') {
+        try {
+          return sendJson(res, 200, startPublish());
+        } catch (err) {
+          return sendJson(res, 400, { error: String(err.message ?? err) });
+        }
+      }
+      if (url === '/api/fit/publish-status' && req.method === 'GET') {
+        return sendJson(res, 200, publishStatus());
+      }
+      if (url.startsWith('/repo/')) {
+        const rel = normalize(url.slice('/repo/'.length)).replace(/^(\.\.[/\\])+/, '');
+        if (!ALLOWED.some((a) => rel.startsWith(a)))
+          return send(res, 403, 'text/plain', 'forbidden');
+        if (rel.startsWith('tmp/modular/') && !rel.endsWith('.glb')) {
+          return send(res, 403, 'text/plain', 'forbidden');
+        }
+        const p = join(REPO_ROOT, rel);
+        if (!p.startsWith(REPO_ROOT)) return send(res, 403, 'text/plain', 'forbidden');
+        if (existsSync(p)) {
+          return send(res, 200, MIME[extname(p)] ?? 'application/octet-stream', readFileSync(p));
+        }
+        return send(res, 404, 'text/plain', 'not found');
+      }
+      return send(res, 404, 'text/plain', 'not found');
+    } catch (err) {
+      return send(res, 500, 'text/plain', String(err.message ?? err));
+    }
+  });
+
+  // Another session (or an abandoned run) may hold the port, walk forward a
+  // few rather than dying, and report the port actually bound.
+  let bound = port;
+  for (let i = 0; i < 6; i++) {
+    try {
+      await new Promise((resolve, reject) => {
+        server.once('error', reject);
+        server.listen(bound, () => {
+          server.removeAllListeners('error');
+          resolve();
+        });
+      });
+      break;
+    } catch (err) {
+      if (err?.code !== 'EADDRINUSE' || i === 5) throw err;
+      bound += 1;
+    }
+  }
+  return { server, url: `http://localhost:${bound}/` };
+}

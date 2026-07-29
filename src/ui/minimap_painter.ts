@@ -24,9 +24,19 @@
 // radii, rect size, outline width, the NPC glyph font + offsets, the arrow geometry) is a
 // named constant.
 
-import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_X, yumiMazeOriginAt } from '../sim/data';
+import { BG_HALF_X, BG_HALF_Z, bgFieldPlanWalls } from '../sim/battleground_layout';
+import {
+  bgOriginAt,
+  isBgPos,
+  WORLD_MAX_X,
+  WORLD_MAX_Z,
+  WORLD_MIN_X,
+  yumiMazeOriginAt,
+} from '../sim/data';
 import { yumiMazeLayout } from '../sim/yumi_maze_layout';
 import type { IWorld } from '../world_api';
+import { paintBgFieldAtlas } from './bg_field_relief_core';
+import { drawBgAtlasMarks } from './hud/battleground';
 import { createMinimapMarkers, type MinimapMarker, type NpcGlyph } from './minimap_markers';
 import type { PainterHostWriters } from './painter_host';
 
@@ -57,6 +67,10 @@ const PLAYER_ARROW_OUTLINE_WIDTH = 1;
 // "actionable" against the dimmer, outline-less cooldown dot.
 const GATHER_NODE_READY_RADIUS = 3;
 const GATHER_NODE_COOLDOWN_RADIUS = 2;
+// How far the lock strike's diagonal overshoots the node disc on each side,
+// so the line reads as a strike THROUGH the dot rather than a chord inside
+// it, at both disc radii.
+const LOCK_STRIKE_OVERREACH = 1.5;
 // Crafting station: an outlined diamond (rotated-square silhouette) so it reads
 // apart from the round gather dots and the axis-aligned loot/mob squares at
 // minimap scale. Half-diagonal in px.
@@ -108,6 +122,12 @@ const NPC_GLYPH_OFFSET_Y = 3;
 const NPC_GLYPH_SPRITE_SIZE = 16;
 const NPC_GLYPH_SPRITE_ORIGIN_X = 2;
 const NPC_GLYPH_SPRITE_BASELINE_Y = 12;
+// The cooldown variant's dim: the repeat-blue '!' blitted at this globalAlpha
+// (a work order inside its cadence window, marked where the NPC previously
+// showed nothing). Applied at drawImage time so the sprite cache stays at one
+// raster per (glyph, color); matches .np-marker.cooldown's opacity so the
+// nameplate and minimap dim identically.
+const NPC_GLYPH_COOLDOWN_ALPHA = 0.55;
 
 // Corpse marker (ghost run): a compact procedural skull, drawn from canvas
 // primitives (cranium + jaw in the corpse color, eye sockets and a nasal notch
@@ -127,6 +147,45 @@ const FULL_CIRCLE = Math.PI * 2;
 const MAZE_BG_PX_PER_YARD = 3;
 const MAZE_BG_MARGIN_YD = 24;
 const MAZE_BG_WALL_ALPHA = 0.75;
+
+// Thornhollow Fields battleground background: the same cached-raster technique over
+// bgFieldPlanWalls() (every REAL box collider of the authored Thornhollow
+// field, so the minimap shows exactly what blocks movement) laid over the
+// field's ATLAS GROUND. The ground is what makes the raster carry information
+// away from the keeps: Thornhollow's walls are concentrated in the two
+// fortresses, so a walls-only sheet leaves the whole flag run, the flank ridges
+// and the Fightpit blank.
+//
+// It is the SAME atlas plate the M-key map draws (see
+// hud/battleground/battleground_map_painter.ts), built from the same two shared
+// modules so the two surfaces can never describe two different fields:
+// bg_field_relief_core.paintBgFieldAtlas writes the ground (the authored paint
+// as base color with the two graveyard plots as their own surface family,
+// hypsometric tinting, fbm mottle, contour banding, inked surface edges,
+// northwest hillshade), then battleground_atlas_marks_painter bakes the crowns,
+// the boulder and rubble stipples and the graveyard headstones over it.
+// Deliberately NOT baked: the plate's LANDMARK LABELS. At this scale a name is
+// a few pixels tall, and the raster is blitted as a player-centered sub-rect, so
+// baked text would smear across the window instead of sitting on its landmark.
+// The M-map is where the field is read by name.
+//
+// The field is 240x452yd, so this raster does NOT reuse the maze's constants:
+// one square pad off the long half-extent at 3px/yd would be 1500x1500 (2.25M
+// px, over twice the old field's 984x984 sheet). A PER-AXIS pad at 2.5px/yd is
+// 720x1250 (900k px), under the old sheet, and 1:1 or finer at the two lower
+// zoom presets (1.7 and 2.55px/yd); the two closest presets magnify it, which
+// is the trade taken for a sheet that stays under the old one on a field three
+// times the size.
+const BG_FIELD_PX_PER_YARD = 2.5;
+const BG_FIELD_PAD_X_YD = BG_HALF_X + MAZE_BG_MARGIN_YD;
+const BG_FIELD_PAD_Z_YD = BG_HALF_Z + MAZE_BG_MARGIN_YD;
+// Walls sit on painted ground rather than on bare canvas, so they carry a touch
+// more weight than the maze's stubs do. Raised from 0.85 with the atlas ground:
+// the old hypsometric wash was a pale sand (luma about 180) and the atlas paints
+// the same lanes as turf and worn dirt (luma about 130), so an unchanged alpha
+// would have handed the one ACTIONABLE layer on this raster less separation than
+// it had before. Walls are cover; the ground under them is decoration.
+const BG_FIELD_WALL_ALPHA = 0.95;
 
 // Draw the corpse skull centered at (x, y): `fill` paints the bone, `socket` the
 // dark eye/nose hollows so the shape reads even over light terrain.
@@ -153,11 +212,15 @@ function drawCorpseSkull(
 
 // The `--color-minimap-*` design tokens the painter resolves once and caches (they are
 // static; see resolveColors). These mirror the colors the inline overworld minimap used
-// verbatim.
-const MINIMAP_COLOR_TOKENS = {
+// verbatim. Exported so the suite pins EVERY entry against tokens.css: a token missing
+// there freezes as '' for the whole session once resolveColors caches (the glyph then
+// draws default black on every redraw), and a hand-copied test list cannot see a new
+// entry it was never told about.
+export const MINIMAP_COLOR_TOKENS = {
   allyFriend: '--color-minimap-ally-friend',
   allyGuild: '--color-minimap-ally-guild',
   npcQuest: '--color-minimap-npc-quest',
+  npcQuestRepeat: '--color-minimap-npc-quest-repeat',
   portal: '--color-minimap-portal',
   objectLoot: '--color-minimap-object-loot',
   mobAggro: '--color-minimap-mob-aggro',
@@ -206,11 +269,15 @@ export class MinimapPainter {
   // The Protect Yumi maze wall cache (built on first in-maze redraw; the fixed
   // competitive layout never changes, so one raster serves the session).
   private mazeBg: HTMLCanvasElement | null = null;
+  // The Thornhollow Fields cache, relief plus wall plan (same lifecycle as mazeBg:
+  // the authored field never changes, so one raster serves the session).
+  private battlegroundBg: HTMLCanvasElement | null = null;
   // NPC glyph sprites (see the NPC_GLYPH_* header), keyed color -> glyph. Nested rather
   // than one map on a `${glyph}|${color}` composite so the per-marker lookup in the draw
   // loop allocates NO key string. Bounded without eviction by construction: NpcGlyph is a
-  // closed three-member union and resolveColors freezes one color set for the session, so
-  // the live map holds at most three sprites of 16x16 each.
+  // closed three-member union and resolveColors freezes TWO glyph colors for the session
+  // (the gold npcQuest and the repeat blue), so the live map holds at most six sprites of
+  // 16x16 each (the cooldown variant dims the repeat sprite at blit time, no extra raster).
   private readonly glyphSprites = new Map<string, Map<NpcGlyph, HTMLCanvasElement>>();
 
   constructor(
@@ -218,6 +285,10 @@ export class MinimapPainter {
     private readonly classColor: (cls: string) => string,
     private readonly localizeZone: (zoneId: string) => string,
     private readonly localizeRift: (name: string, rank: string | null) => string,
+    /** The battleground's own name. The band sits far off the overworld plane,
+     *  so localizeZone would resolve it to whatever zone its coordinates happen
+     *  to land nearest, which reads as the last town the player stood in. */
+    private readonly battlegroundName: () => string,
   ) {}
 
   /** Resolve the minimap color tokens in one getComputedStyle pass (a 2D
@@ -251,6 +322,16 @@ export class MinimapPainter {
     zoom: number,
     zoneBg: MinimapZoneBg | null = null,
   ): void {
+    // One token resolve serves both branches below (cached; static tokens).
+    const colors = this.resolveColors();
+    // Thornhollow Fields battleground band: Hud routes the 'battleground' minimap mode
+    // through this overworld entry (the mode falls through its delve/yumi
+    // branches), so branch to the field raster here instead of blitting the
+    // far-off overworld terrain cache the band sits outside of.
+    if (isBgPos(world.player.pos.x)) {
+      this.paintBattleground(ctx, world, zoneLabelEl, zoom, colors);
+      return;
+    }
     const S = MINIMAP_SIZE;
     const pxPerYard = MINIMAP_BASE_SCALE * zoom;
     const model = this.markers.build(world, S, pxPerYard);
@@ -261,7 +342,6 @@ export class MinimapPainter {
     } else {
       this.writers.setText(zoneLabelEl, this.localizeZone(model.zoneId));
     }
-    const colors = this.resolveColors();
     const p = world.player;
 
     ctx.clearRect(0, 0, S, S);
@@ -283,7 +363,8 @@ export class MinimapPainter {
     ctx.drawImage(bg, sx, sy, sw, sw, 0, 0, S, S);
 
     // Sharp overlay: the current zone's own high-res background, placed by its
-    // world rect so the player sits at centre. +X is map-left, +Z is map-down.
+    // world rect so the player sits at centre. +X is map-left, +Z is map-up
+    // (R61: maxZ lands at the bitmap top).
     if (zoneBg) {
       const r = zoneBg.region;
       const half = S / 2;
@@ -365,6 +446,116 @@ export class MinimapPainter {
     return canvas;
   }
 
+  /**
+   * Thornhollow Fields battleground render: the ordinary overworld marker set (party
+   * discs, players, mob dots) over a cached raster of the Thornhollow field's
+   * relief and wall plan (the paintYumiMaze technique). The '#zone-label' keeps
+   * the localized committed zone (the arena-band precedent; the band has no
+   * dedicated zone entry).
+   */
+  paintBattleground(
+    ctx: CanvasRenderingContext2D,
+    world: IWorld,
+    zoneLabelEl: HTMLElement,
+    zoom: number,
+    colors: MinimapColors,
+  ): void {
+    const S = MINIMAP_SIZE;
+    const pxPerYard = MINIMAP_BASE_SCALE * zoom;
+    const model = this.markers.build(world, S, pxPerYard);
+    this.writers.setText(zoneLabelEl, this.battlegroundName());
+    const p = world.player;
+    const o = bgOriginAt(p.pos.z);
+    const bg = this.ensureBattlegroundBg(colors);
+
+    ctx.clearRect(0, 0, S, S);
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(S / 2, S / 2, S / 2 - CLIP_INSET, 0, FULL_CIRCLE);
+    ctx.clip();
+    ctx.imageSmoothingEnabled = false;
+    // Sub-rect blit centered on the player's field-local position. BOTH axes
+    // follow the marker projection (+X map-left, +Z map-UP), which is also what
+    // the overworld terrain blit above does: the raster is built with the same
+    // two negations, so a wall north of you draws above you.
+    const s = BG_FIELD_PX_PER_YARD;
+    const sw = S / (pxPerYard / s);
+    const sx = (BG_FIELD_PAD_X_YD - (p.pos.x - o.x)) * s - sw / 2;
+    const sy = (BG_FIELD_PAD_Z_YD - (p.pos.z - o.z)) * s - sw / 2;
+    ctx.drawImage(bg, sx, sy, sw, sw, 0, 0, S, S);
+    this.drawMarkers(ctx, model.markers, colors);
+    ctx.restore();
+  }
+
+  // Rasterize the fixed Thornhollow field ONCE and hold it for the session, in
+  // three layers, each drawn in the live projection's axes (+X map-left,
+  // +Z map-up) so the sub-rect blit in paintBattleground stays a plain blit:
+  //   1. the atlas ground, written straight into an ImageData by the shared pure
+  //      core (authored ground paint, the two graveyard plots as their own
+  //      surface family, hypsometric tint, mottle, contours, inked surface
+  //      edges, northwest hillshade). It is sampled terrain, not chrome, which
+  //      is why it is the one thing here that is not a token,
+  //   2. the atlas marks (tree crowns, boulder and rubble stipples, graveyard
+  //      headstones) through the shared mark painter the M-map plate uses,
+  //   3. the field's real wall plan over both, in the outline token.
+  // No landmark labels (see the header): illegible at 2.5px/yd and smeared by
+  // the player-centered blit.
+  //
+  // The ground and the marks cost a one-time build of tens of ms on the first
+  // battleground paint, an order of magnitude more than the flat wash they
+  // replaced. That is paid ONCE per session for a raster the redraw only blits,
+  // so it buys no per-frame cost at all; paintBattleground is still blit plus
+  // markers.
+  //
+  // Tier-identical: walls are actionable cover, so no preset or governor gates
+  // any of this (the graphics-settings fairness invariant). The ground and the
+  // marks are cosmetic and are drawn for everyone for the same reason: a knob
+  // that shed them would still have to leave the walls exactly as they are.
+  private ensureBattlegroundBg(colors: MinimapColors): HTMLCanvasElement {
+    if (this.battlegroundBg) return this.battlegroundBg;
+    const s = BG_FIELD_PX_PER_YARD;
+    const w = Math.ceil(BG_FIELD_PAD_X_YD * 2 * s);
+    const h = Math.ceil(BG_FIELD_PAD_Z_YD * 2 * s);
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const bctx = canvas.getContext('2d');
+    if (!bctx) return canvas;
+    const ground = bctx.createImageData(w, h);
+    // axis +1: the minimap is drawn in WORLD orientation and never turned for a
+    // team, so both teams are handed the identical raster, lit from the
+    // screen's northwest (the M-map is the surface that owns the turned view).
+    paintBgFieldAtlas(ground.data, w, h, s, BG_FIELD_PAD_X_YD, BG_FIELD_PAD_Z_YD, 1);
+    bctx.putImageData(ground, 0, 0);
+    drawBgAtlasMarks(bctx, {
+      fx: (x: number) => (BG_FIELD_PAD_X_YD - x) * s,
+      fy: (z: number) => (BG_FIELD_PAD_Z_YD - z) * s,
+      s,
+    });
+    // Walls last, so cover always reads over the ground and the marks. They keep
+    // the resolved outline token rather than the M-map's slate fill plus cast
+    // shadow and ink: that treatment is drawn at several times this scale, where
+    // a 1.6px cast and a 0.7px ink line are a fraction of a wall, while here a
+    // curtain is about 2px of raster and the cast alone would be most of it. The
+    // token also tracks the HUD's own contrast (theme, forced-colors), which a
+    // fixed slate literal cannot.
+    bctx.globalAlpha = BG_FIELD_WALL_ALPHA;
+    bctx.fillStyle = colors.outline;
+    // Thornhollow's walls are placed structures, not axis-aligned segments, so
+    // each box is stroked under its own yaw. Canvas y grows downward while the
+    // raster negates both field axes, which is a 180 degree rotation: it
+    // preserves the rectangle but reverses the sense of the angle, hence -rot.
+    for (const wall of bgFieldPlanWalls()) {
+      bctx.save();
+      bctx.translate((BG_FIELD_PAD_X_YD - wall.x) * s, (BG_FIELD_PAD_Z_YD - wall.z) * s);
+      bctx.rotate(-wall.rot);
+      bctx.fillRect(-wall.hw * s, -wall.hd * s, wall.hw * 2 * s, wall.hd * 2 * s);
+      bctx.restore();
+    }
+    this.battlegroundBg = canvas;
+    return canvas;
+  }
+
   // Rasterize (once) and return the sprite for an NPC quest glyph in `color`; the
   // per-redraw draw is then a plain drawImage. Keyed on the resolved color as well as the
   // glyph so a future theme/contrast cache bust naturally re-rasterizes.
@@ -413,7 +604,7 @@ export class MinimapPainter {
           ctx.fill();
           ctx.stroke();
           break;
-        case 'npc':
+        case 'npc': {
           // Blit the cached glyph sprite so its internal fillText origin lands on the
           // inline site's (mx - 2, my + 3) anchor.
           //
@@ -433,12 +624,23 @@ export class MinimapPainter {
           // The tradeoff, deliberately taken: the glyph now snaps to whole pixels where
           // fillText advanced it in quarter-pixel steps. At the minimap's 1.7 px/yard base
           // scale that is a sub-pixel marker shift on a surface that redraws at 10Hz.
+          //
+          // Color by the folded marker state: gold for ready/available and the
+          // neutral dot, the repeat token for a completed repeatable, and the
+          // repeat token dimmed for a work order inside its cadence window.
+          const repeatColored = m.marker === 'repeat' || m.marker === 'cooldown';
+          // Restore the PRIOR alpha, not a literal 1: nothing else dims this
+          // context today, but a literal would hardcode that caller state.
+          const priorAlpha = ctx.globalAlpha;
+          if (m.marker === 'cooldown') ctx.globalAlpha = NPC_GLYPH_COOLDOWN_ALPHA;
           ctx.drawImage(
-            this.npcGlyphSprite(m.glyph, colors.npcQuest),
+            this.npcGlyphSprite(m.glyph, repeatColored ? colors.npcQuestRepeat : colors.npcQuest),
             Math.round(m.mx - NPC_GLYPH_OFFSET_X - NPC_GLYPH_SPRITE_ORIGIN_X),
             Math.round(m.my + NPC_GLYPH_OFFSET_Y - NPC_GLYPH_SPRITE_BASELINE_Y),
           );
+          if (m.marker === 'cooldown') ctx.globalAlpha = priorAlpha;
           break;
+        }
         case 'portal':
           ctx.fillStyle = colors.portal;
           ctx.beginPath();
@@ -545,27 +747,43 @@ export class MinimapPainter {
           ctx.fill();
           ctx.stroke();
           break;
-        case 'gather-node':
+        case 'gather-node': {
           // Tool-tier lock (Professions 2.0) composes with the
           // respawn state: a locked node keeps the ready/cooldown silhouette
           // (radius + outline) but the locked tint replaces the state color,
           // so both dimensions stay readable at once. Actionable info on
           // every graphics tier (fairness invariant: never preset-gated).
+          const radius = m.ready ? GATHER_NODE_READY_RADIUS : GATHER_NODE_COOLDOWN_RADIUS;
           if (m.ready) {
             ctx.fillStyle = m.locked ? colors.gatherLocked : colors.gatherReady;
             ctx.strokeStyle = colors.outline;
             ctx.lineWidth = MARKER_OUTLINE_WIDTH;
             ctx.beginPath();
-            ctx.arc(m.mx, m.my, GATHER_NODE_READY_RADIUS, 0, FULL_CIRCLE);
+            ctx.arc(m.mx, m.my, radius, 0, FULL_CIRCLE);
             ctx.fill();
             ctx.stroke();
           } else {
             ctx.fillStyle = m.locked ? colors.gatherLocked : colors.gatherCooldown;
             ctx.beginPath();
-            ctx.arc(m.mx, m.my, GATHER_NODE_COOLDOWN_RADIUS, 0, FULL_CIRCLE);
+            ctx.arc(m.mx, m.my, radius, 0, FULL_CIRCLE);
             ctx.fill();
           }
+          // The non-hue lock cue (the UX pass, DESIGN.md color independence:
+          // every state pairs color with a second signal): a locked node
+          // carries a diagonal strike through its disc on BOTH respawn
+          // silhouettes, so the lock never rides tint alone. Outline-colored,
+          // so it reads on either fill at every marker size.
+          if (m.locked) {
+            const reach = radius + LOCK_STRIKE_OVERREACH;
+            ctx.strokeStyle = colors.outline;
+            ctx.lineWidth = MARKER_OUTLINE_WIDTH;
+            ctx.beginPath();
+            ctx.moveTo(m.mx - reach, m.my + reach);
+            ctx.lineTo(m.mx + reach, m.my - reach);
+            ctx.stroke();
+          }
           break;
+        }
       }
     }
   }

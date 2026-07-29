@@ -162,7 +162,9 @@ export class PlacedAssetsView {
         this.refreshSelection();
       }
     });
-    // Boot-time builds gate the loading screen; live editor adds do not.
+    // Boot-time builds gate the loading screen; live editor adds do not. Eager by
+    // nature: this runs while the world is being built, not at module import, so
+    // `task` is already in flight and there is nothing for the deferred lane to hold.
     if (preload) registerPreload(task);
   }
 

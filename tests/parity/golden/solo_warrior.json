@@ -10,14 +10,14 @@
     "base mobSwing (mob swings the player)",
     "rollLoot via mob death (L1, ~5876/6036)"
   ],
-  "draws": 302,
-  "drawDigest": "f2f40719",
+  "draws": 309,
+  "drawDigest": "f78161ea",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 844,
-      "state": "50c75041",
+      "nextId": 964,
+      "state": "e836976c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -38,11 +38,11 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -55,7 +55,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 835,
+          "entityId": 959,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -91,7 +91,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 835
+              "sourceId": 959
             }
           ],
           "blockChance": 0.05,
@@ -104,7 +104,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 835,
+          "id": 959,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -148,45 +148,45 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 845,
-      "state": "ac614b57",
-      "events": "44990ab2",
+      "nextId": 965,
+      "state": "c395d0b1",
+      "events": "911add89",
       "rng": {
         "draws": 7,
-        "digest": "d9dea8ae"
+        "digest": "4f9a2cfb"
       }
     },
     {
       "tick": 40,
       "time": 2,
-      "nextId": 845,
-      "state": "1cf7c6b7",
+      "nextId": 965,
+      "state": "eea107ad",
       "events": "741638a5",
       "rng": {
         "draws": 7,
-        "digest": "d9dea8ae"
+        "digest": "4f9a2cfb"
       }
     },
     {
       "tick": 60,
       "time": 3,
-      "nextId": 845,
-      "state": "3be40bb5",
-      "events": "7a87be3c",
+      "nextId": 965,
+      "state": "9364cbc3",
+      "events": "30c22ce9",
       "rng": {
-        "draws": 166,
-        "digest": "0a7c62b3"
+        "draws": 174,
+        "digest": "847684f0"
       }
     },
     {
       "tick": 72,
       "time": 3.6,
-      "nextId": 845,
-      "state": "73671e15",
-      "events": "ebcbae74",
+      "nextId": 965,
+      "state": "438c9d2f",
+      "events": "14b3b208",
       "rng": {
-        "draws": 255,
-        "digest": "ca1f00b6"
+        "draws": 263,
+        "digest": "d3f0124f"
       },
       "label": "kill",
       "players": [
@@ -203,18 +203,18 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 7072,
-            "damageTaken": 4,
+            "damageDealt": 7073,
+            "damageTaken": 5,
             "kills": 1
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 7072,
+              "damageDealt": 7073,
               "kills": 1
             },
             "dungeonClears": {},
@@ -244,7 +244,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 835,
+          "entityId": 959,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -282,7 +282,7 @@
               "name": "Battle Stance",
               "remaining": 3596.4,
               "school": "physical",
-              "sourceId": 835
+              "sourceId": 959
             }
           ],
           "blockChance": 0.05,
@@ -294,13 +294,13 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 102.6,
-          "hp": 438,
-          "id": 835,
+          "hp": 49995,
+          "id": 959,
           "inCombat": true,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
-          "maxHp": 442,
+          "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -330,7 +330,7 @@
             "str": 41
           },
           "swingTimer": 0.45,
-          "targetId": 844,
+          "targetId": 964,
           "templateId": "warrior",
           "weapon": {
             "max": 5,
@@ -350,7 +350,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 844,
+          "id": 964,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -360,11 +360,17 @@
           },
           "level": 2,
           "loot": {
-            "copper": 10
+            "copper": 11,
+            "items": [
+              {
+                "count": 1,
+                "itemId": "wolf_fang"
+              }
+            ]
           },
           "lootFfaTimer": 60,
           "lootRecipientIds": [
-            835
+            959
           ],
           "lootable": true,
           "maxHp": 6000,
@@ -378,7 +384,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "respawnTimer": 25,
+          "respawnTimer": 60,
           "spawnPos": {
             "x": 4,
             "y": 1.5,
@@ -388,8 +394,8 @@
             "armor": 10
           },
           "swingTimer": 0.45,
-          "tappedById": 835,
-          "targetId": 835,
+          "tappedById": 959,
+          "targetId": 959,
           "templateId": "forest_wolf",
           "weapon": {
             "max": 6,
@@ -402,12 +408,12 @@
     {
       "tick": 76,
       "time": 3.8,
-      "nextId": 845,
-      "state": "278f1e2c",
-      "events": "1ca37634",
+      "nextId": 965,
+      "state": "98199d99",
+      "events": "7d77b079",
       "rng": {
-        "draws": 302,
-        "digest": "f2f40719"
+        "draws": 309,
+        "digest": "f78161ea"
       },
       "label": "final",
       "players": [
@@ -424,18 +430,18 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 7072,
-            "damageTaken": 4,
+            "damageDealt": 7073,
+            "damageTaken": 5,
             "kills": 1
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 7072,
+              "damageDealt": 7073,
               "kills": 1
             },
             "dungeonClears": {},
@@ -469,7 +475,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 835,
+          "entityId": 959,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -507,7 +513,7 @@
               "name": "Battle Stance",
               "remaining": 3596.2,
               "school": "physical",
-              "sourceId": 835
+              "sourceId": 959
             }
           ],
           "blockChance": 0.05,
@@ -520,13 +526,13 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 102.8,
-          "hp": 438,
-          "id": 835,
+          "hp": 49995,
+          "id": 959,
           "inCombat": true,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
-          "maxHp": 442,
+          "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -556,7 +562,7 @@
             "str": 41
           },
           "swingTimer": 0.25,
-          "targetId": 844,
+          "targetId": 964,
           "templateId": "warrior",
           "weapon": {
             "max": 5,
@@ -576,7 +582,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 844,
+          "id": 964,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -586,11 +592,17 @@
           },
           "level": 2,
           "loot": {
-            "copper": 10
+            "copper": 11,
+            "items": [
+              {
+                "count": 1,
+                "itemId": "wolf_fang"
+              }
+            ]
           },
           "lootFfaTimer": 59.8,
           "lootRecipientIds": [
-            835
+            959
           ],
           "lootable": true,
           "maxHp": 6000,
@@ -604,7 +616,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "respawnTimer": 24.8,
+          "respawnTimer": 59.8,
           "spawnPos": {
             "x": 4,
             "y": 1.5,
@@ -614,8 +626,8 @@
             "armor": 10
           },
           "swingTimer": 0.45,
-          "tappedById": 835,
-          "targetId": 835,
+          "tappedById": 959,
+          "targetId": 959,
           "templateId": "forest_wolf",
           "weapon": {
             "max": 6,

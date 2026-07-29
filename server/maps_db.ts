@@ -5,6 +5,7 @@
 
 import type { Pool } from 'pg';
 import type { MapDoc } from '../src/sim/map_doc';
+import { recordContentModerationAction } from './content_moderation_db';
 import type { MapRecord, MapStatus, MapSummary, MapsDb } from './maps';
 
 export const MAPS_SCHEMA = `
@@ -241,6 +242,43 @@ export class PgMapsDb implements MapsDb {
       [id, status, accountId],
     );
     return (res.rowCount ?? 0) > 0;
+  }
+
+  // Moderation write: the status UPDATE and the content_moderation_actions
+  // audit row land in the SAME transaction (mirrors addBlockedIp in
+  // ip_block_db.ts), so the log can never drift from the row it describes.
+  async adminUnpublish(
+    id: number,
+    audit: { adminAccountId: number; reason: string },
+  ): Promise<boolean> {
+    const client = await this.pool.connect();
+    try {
+      await client.query('BEGIN');
+      const res = await client.query(
+        `UPDATE maps SET status = 'private', updated_at = now()
+          WHERE id = $1
+          RETURNING account_id`,
+        [id],
+      );
+      const done = (res.rowCount ?? 0) > 0;
+      if (done) {
+        await recordContentModerationAction(client, {
+          resourceKind: 'map',
+          resourceId: id,
+          ownerAccountId: res.rows[0]?.account_id ?? null,
+          adminAccountId: audit.adminAccountId,
+          action: 'unpublish',
+          reason: audit.reason,
+        });
+      }
+      await client.query('COMMIT');
+      return done;
+    } catch (err) {
+      await client.query('ROLLBACK').catch(() => {});
+      throw err;
+    } finally {
+      client.release();
+    }
   }
 
   async deleteMap(id: number, accountId: number): Promise<boolean> {

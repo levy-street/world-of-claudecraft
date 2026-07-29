@@ -12,22 +12,26 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import type { InvSlot } from '../src/sim/types';
+import type { InvSlot, QuestProgress } from '../src/sim/types';
 import { bagInstanceGlyphKind } from '../src/ui/bag_instance_glyph_view';
 import { BagsWindow, type BagsWindowDeps } from '../src/ui/bags_window';
 import { ItemDragState } from '../src/ui/item_drag_state';
 import type { IWorld } from '../src/world_api';
 
-function fakeWorld(inventory: InvSlot[]): IWorld {
+function fakeWorld(inventory: InvSlot[], questLog: Map<string, QuestProgress> = new Map()): IWorld {
   return {
     inventory,
     bags: [null, null, null, null],
     bagCapacity: 16,
     copper: 0,
+    questLog,
   } as unknown as IWorld;
 }
 
-function windowFor(inventory: InvSlot[]): HTMLElement {
+function windowFor(
+  inventory: InvSlot[],
+  questLog: Map<string, QuestProgress> = new Map(),
+): HTMLElement {
   const root = document.createElement('div');
   document.body.appendChild(root);
   const noop = (): void => {};
@@ -37,7 +41,7 @@ function windowFor(inventory: InvSlot[]): HTMLElement {
     itemTooltip: () => '',
     attachTooltip: noop,
     root: () => root,
-    world: () => fakeWorld(inventory),
+    world: () => fakeWorld(inventory, questLog),
     wocBalanceHtml: () => '',
     claudiumLauncherHtml: () => '',
     openClaudium: noop,
@@ -53,6 +57,8 @@ function windowFor(inventory: InvSlot[]): HTMLElement {
     isMarketSell: () => false,
     isMailAttach: () => false,
     isBankOpen: () => false,
+    isPersonalBankTab: () => false,
+    isGuildBankTab: () => false,
     pendingPetFeed: () => false,
     closeVendor: noop,
     closeBank: noop,
@@ -73,6 +79,8 @@ function windowFor(inventory: InvSlot[]): HTMLElement {
     isTouchHud: () => false,
     markEquipDropTargets: noop,
     dropOnEquipSlot: noop,
+    dropOnActionSlot: noop,
+    dropOnActionRingSlot: noop,
     openItemActionMenu: noop,
   };
   new BagsWindow(deps).render();
@@ -189,7 +197,9 @@ describe('bags grid instanced-slot marker', () => {
     expect(cells[3].querySelector('.bi-glyph')).toBeNull();
     expect(cells[3].querySelector('.bi-instance')).not.toBeNull();
     for (const cell of cells) {
-      const markers = cell.querySelectorAll('.bi-glyph, .bi-instance, .bi-masterwork-seal');
+      const markers = cell.querySelectorAll(
+        '.bi-glyph, .bi-instance, .bi-masterwork-seal, .bi-quest-seal, .bi-fine-seal',
+      );
       expect(markers.length).toBe(1);
     }
     // The three glyphs are genuinely different art, not one shape recolored.
@@ -250,6 +260,211 @@ describe('bags grid instanced-slot marker', () => {
   });
 });
 
+describe('bags grid quest-purpose mark', () => {
+  it('a quest stack gets bag-quest, the seal, and quest aria; junk does not', () => {
+    const root = windowFor([
+      { itemId: 'boar_hide', count: 1 },
+      { itemId: 'copper_ore', count: 1 },
+    ]);
+    const cells = root.querySelectorAll('button.bag-item');
+    expect(cells.length).toBe(2);
+    expect(cells[0].classList.contains('bag-quest')).toBe(true);
+    expect(cells[1].classList.contains('bag-quest')).toBe(false);
+    const seal = cells[0].querySelector('.bi-quest-seal');
+    expect(seal).not.toBeNull();
+    expect(seal?.getAttribute('aria-hidden')).toBe('true');
+    expect(cells[1].querySelector('.bi-quest-seal')).toBeNull();
+    expect(cells[0].getAttribute('aria-label')).toBe('Bristly Boar Hide, quantity 1, quest item');
+    expect(cells[1].getAttribute('aria-label')).toBe('Copper Ore, quantity 1');
+  });
+
+  it('quest seal outranks instance glyphs; masterwork seal outranks quest seal', () => {
+    // Priority pin: masterwork > quest > enchanted. Quest items rarely carry
+    // instance payloads, but the composition must still pick exactly one corner
+    // mark so two treatments never stack. Purpose-class aria always says quest
+    // item even when masterwork wins the corner (policy: purpose outranks copy).
+    const root = windowFor([
+      {
+        itemId: 'boar_hide',
+        count: 1,
+        instance: { enchant: 'enchant_chest_stamina' },
+      },
+      {
+        itemId: 'boar_hide',
+        count: 1,
+        instance: { signer: 'Anna', rolled: { masterwork: true, stats: { sta: 1 } } },
+      },
+    ]);
+    const cells = root.querySelectorAll('button.bag-item');
+    expect(cells.length).toBe(2);
+    // Quest + enchanted: quest seal wins; no bi-glyph-enchanted.
+    expect(cells[0].classList.contains('bag-quest')).toBe(true);
+    expect(cells[0].querySelector('.bi-quest-seal')).not.toBeNull();
+    expect(cells[0].querySelector('.bi-glyph')).toBeNull();
+    expect(cells[0].querySelector('.bi-masterwork-seal')).toBeNull();
+    expect(cells[0].getAttribute('aria-label')).toBe('Bristly Boar Hide, quantity 1, quest item');
+    // Quest + masterwork: masterwork seal wins; rim still marks quest.
+    expect(cells[1].classList.contains('bag-quest')).toBe(true);
+    expect(cells[1].querySelector('.bi-masterwork-seal')).not.toBeNull();
+    expect(cells[1].querySelector('.bi-quest-seal')).toBeNull();
+    expect(cells[1].querySelector('.bi-glyph')).toBeNull();
+    expect(cells[1].getAttribute('aria-label')).toBe('Bristly Boar Hide, quantity 1, quest item');
+    expect(cells[1].getAttribute('aria-label')).not.toContain('masterwork');
+  });
+
+  it('a counted quest stack keeps its count badge beside the seal', () => {
+    const root = windowFor([{ itemId: 'boar_hide', count: 5 }]);
+    const cell = root.querySelector('button.bag-item');
+    expect(cell?.querySelector('.bi-quest-seal')).not.toBeNull();
+    expect(cell?.querySelector('.bi-count')?.textContent).toContain('5');
+    expect(cell?.getAttribute('aria-label')).toBe('Bristly Boar Hide, quantity 5, quest item');
+  });
+
+  // Ready seal must be DOM-painted from a real questLog, not only source-pinned
+  // as class strings in bags_window. boar_hide -> q_boars (collect x5).
+  it('paints bag-quest-ready and bi-quest-seal-ready when the related quest is ready', () => {
+    const questLog = new Map<string, QuestProgress>([
+      ['q_boars', { questId: 'q_boars', counts: [5], state: 'ready' }],
+    ]);
+    const root = windowFor([{ itemId: 'boar_hide', count: 5 }], questLog);
+    const cell = root.querySelector('button.bag-item');
+    expect(cell?.classList.contains('bag-quest')).toBe(true);
+    expect(cell?.classList.contains('bag-quest-ready')).toBe(true);
+    const seal = cell?.querySelector('.bi-quest-seal');
+    expect(seal).not.toBeNull();
+    expect(seal?.classList.contains('bi-quest-seal-ready')).toBe(true);
+    // Purpose aria stays "quest item"; ready is a visual brighten only.
+    expect(cell?.getAttribute('aria-label')).toBe('Bristly Boar Hide, quantity 5, quest item');
+  });
+
+  it('does not paint ready classes when the related quest is still active and incomplete', () => {
+    const questLog = new Map<string, QuestProgress>([
+      ['q_boars', { questId: 'q_boars', counts: [2], state: 'active' }],
+    ]);
+    const root = windowFor([{ itemId: 'boar_hide', count: 2 }], questLog);
+    const cell = root.querySelector('button.bag-item');
+    expect(cell?.classList.contains('bag-quest')).toBe(true);
+    expect(cell?.classList.contains('bag-quest-ready')).toBe(false);
+    const seal = cell?.querySelector('.bi-quest-seal');
+    expect(seal).not.toBeNull();
+    expect(seal?.classList.contains('bi-quest-seal-ready')).toBe(false);
+  });
+
+  it('does not paint ready when active log has matching collect complete', () => {
+    // q_boars objective count is 5; full collect while still active is not
+    // turn-in ready (other objectives may remain). Seal stays default quest.
+    const questLog = new Map<string, QuestProgress>([
+      ['q_boars', { questId: 'q_boars', counts: [5], state: 'active' }],
+    ]);
+    const root = windowFor([{ itemId: 'boar_hide', count: 5 }], questLog);
+    const cell = root.querySelector('button.bag-item');
+    expect(cell?.classList.contains('bag-quest')).toBe(true);
+    expect(cell?.classList.contains('bag-quest-ready')).toBe(false);
+    expect(cell?.querySelector('.bi-quest-seal-ready')).toBeNull();
+  });
+});
+
+describe('bags grid fine-grade mark', () => {
+  it('a fine stack gets bag-fine and the seal, keeps its quality class; base and junk do not', () => {
+    const root = windowFor([
+      { itemId: 'fine_copper_ore', count: 1 },
+      { itemId: 'copper_ore', count: 1 },
+      { itemId: 'mudfin_scale', count: 1 },
+    ]);
+    const cells = root.querySelectorAll('button.bag-item');
+    expect(cells.length).toBe(3);
+    expect(cells[0].classList.contains('bag-fine')).toBe(true);
+    // The grade mark ADDS to the quality treatment, never replaces it: the
+    // cell keeps its q-common class (the premise of the CSS ordering pin
+    // below) and its quality color var.
+    expect(cells[0].classList.contains('q-common')).toBe(true);
+    expect((cells[0] as HTMLElement).style.getPropertyValue('--bag-slot-quality')).not.toBe('');
+    expect(cells[1].classList.contains('bag-fine')).toBe(false);
+    expect(cells[2].classList.contains('bag-fine')).toBe(false);
+    const seal = cells[0].querySelector('.bi-fine-seal');
+    expect(seal).not.toBeNull();
+    expect(seal?.getAttribute('aria-hidden')).toBe('true');
+    expect(cells[1].querySelector('.bi-fine-seal')).toBeNull();
+    expect(cells[2].querySelector('.bi-fine-seal')).toBeNull();
+    // Deliberately NO dedicated grade aria: the item NAME already carries the
+    // grade word in every locale, so the cell keeps the plain accessible name
+    // (and an instanced fine copy keeps its per-copy flag, pinned below).
+    expect(cells[0].getAttribute('aria-label')).toBe('Fine Copper Ore, quantity 1');
+    expect(cells[1].getAttribute('aria-label')).toBe('Copper Ore, quantity 1');
+  });
+
+  it('the fine seal is its own art, not the quest seal recolored', () => {
+    // Both seals are 12px top-left chrome SVGs; if they ever collapsed onto
+    // the same icon, fine stacks would read as quest stacks, the exact
+    // confusion the mark exists to remove.
+    const root = windowFor([
+      { itemId: 'fine_copper_ore', count: 1 },
+      { itemId: 'boar_hide', count: 1 },
+    ]);
+    const cells = root.querySelectorAll('button.bag-item');
+    expect(cells.length).toBe(2);
+    const fineSvg = cells[0].querySelector('.bi-fine-seal svg')?.innerHTML ?? '';
+    const questSvg = cells[1].querySelector('.bi-quest-seal svg')?.innerHTML ?? '';
+    expect(fineSvg).not.toBe('');
+    expect(questSvg).not.toBe('');
+    expect(fineSvg).not.toBe(questSvg);
+  });
+
+  it('fine seal outranks every instance glyph; masterwork seal outranks fine seal', () => {
+    // Corner priority: masterwork > fine > signed/generic (the full table is
+    // unit-tested in bag_corner_mark_view.test.ts). Rim still marks fine when
+    // masterwork wins the corner; the aria keeps the per-copy flag because
+    // the grade is already in the name.
+    const root = windowFor([
+      { itemId: 'fine_copper_ore', count: 1, instance: { signer: 'Anna' } },
+      { itemId: 'fine_copper_ore', count: 1, instance: { bindOnTrade: false } },
+      {
+        itemId: 'fine_copper_ore',
+        count: 1,
+        instance: { signer: 'Anna', rolled: { masterwork: true, stats: { sta: 1 } } },
+      },
+    ]);
+    const cells = root.querySelectorAll('button.bag-item');
+    expect(cells.length).toBe(3);
+    // Fine + signed: fine seal wins the corner; no bi-glyph-signed.
+    expect(cells[0].classList.contains('bag-fine')).toBe(true);
+    expect(cells[0].querySelector('.bi-fine-seal')).not.toBeNull();
+    expect(cells[0].querySelector('.bi-glyph')).toBeNull();
+    expect(cells[0].querySelector('.bi-masterwork-seal')).toBeNull();
+    expect(cells[0].getAttribute('aria-label')).toBe(
+      'Fine Copper Ore, quantity 1, maker-marked copy',
+    );
+    // Fine + generic instanced payload: fine seal wins; no generic wedge.
+    expect(cells[1].classList.contains('bag-fine')).toBe(true);
+    expect(cells[1].querySelector('.bi-fine-seal')).not.toBeNull();
+    expect(cells[1].querySelector('.bi-instance')).toBeNull();
+    // Fine + masterwork: masterwork seal wins the corner; rim still marks
+    // fine; the aria announces the masterwork copy flag.
+    expect(cells[2].classList.contains('bag-fine')).toBe(true);
+    expect(cells[2].querySelector('.bi-masterwork-seal')).not.toBeNull();
+    expect(cells[2].querySelector('.bi-fine-seal')).toBeNull();
+    expect(cells[2].querySelector('.bi-glyph')).toBeNull();
+    expect(cells[2].getAttribute('aria-label')).toBe('Fine Copper Ore, quantity 1, masterwork');
+    // Exactly one corner treatment per cell across the whole marker family.
+    for (const cell of cells) {
+      expect(
+        cell.querySelectorAll(
+          '.bi-glyph, .bi-instance, .bi-masterwork-seal, .bi-quest-seal, .bi-fine-seal',
+        ).length,
+      ).toBe(1);
+    }
+  });
+
+  it('a counted fine stack keeps its count badge beside the seal', () => {
+    const root = windowFor([{ itemId: 'fine_iron_ore', count: 7 }]);
+    const cell = root.querySelector('button.bag-item');
+    expect(cell?.classList.contains('bag-fine')).toBe(true);
+    expect(cell?.querySelector('.bi-fine-seal')).not.toBeNull();
+    expect(cell?.querySelector('.bi-count')?.textContent).toContain('7');
+    expect(cell?.getAttribute('aria-label')).toBe('Fine Iron Ore, quantity 7');
+  });
+});
+
 describe('marker stylesheet contract (source pins)', () => {
   // jsdom gives import.meta.url an http URL, which readFileSync(new URL(...))
   // rejects (the vendor_window_painter precedent): resolve from __dirname.
@@ -279,12 +494,23 @@ describe('marker stylesheet contract (source pins)', () => {
   });
 
   it('the per-kind glyphs share the same always-on, preset-independent contract', () => {
-    const glyphStart = components.indexOf('.bag-item .bi-glyph {');
-    expect(glyphStart).toBeGreaterThan(-1);
-    const glyphBlock = components.slice(glyphStart, components.indexOf('}', glyphStart));
+    // One shared corner-mark BOX carries the geometry for the per-copy glyphs
+    // and the quest / fine seals (rule of three); each kind's own rule holds
+    // only its color. The grouped selector is the pin that every member is in
+    // the family, the bank glyph twin included (a banked masterwork keeps the
+    // same seal art; tests/bank_window_instance_marker.test.ts pins the bank
+    // half from its side, keep the pair in sync).
+    const boxStart = components.search(
+      /\.bag-item \.bi-glyph,\s*\.bank-item \.bi-glyph,\s*\.bag-item \.bi-quest-seal,\s*\.bag-item \.bi-fine-seal \{/,
+    );
+    expect(boxStart).toBeGreaterThan(-1);
+    const glyphBlock = components.slice(boxStart, components.indexOf('}', boxStart));
     expect(glyphBlock).toContain('position: absolute');
     expect(glyphBlock).toContain('top: 1px');
     expect(glyphBlock).toContain('left: 1px');
+    expect(glyphBlock).toContain('width: 12px');
+    expect(glyphBlock).toContain('height: 12px');
+    expect(glyphBlock).toContain('pointer-events: none');
     // No graphics-tier gate and no hover reveal: the glyph is information-add
     // and must render identically on every preset (fairness).
     expect(glyphBlock).not.toContain('--fx-');
@@ -303,5 +529,109 @@ describe('marker stylesheet contract (source pins)', () => {
     // The painter carries no inline color for the glyphs.
     const painter = readFileSync(join(__dirname, '../src/ui/bags_window.ts'), 'utf8');
     expect(painter).not.toContain('bi-glyph" style=');
+  });
+
+  it('quest bag treatment is always-on, tokenized, and never an --fx gate', () => {
+    const tokens = readFileSync(join(__dirname, '../src/styles/tokens.css'), 'utf8');
+    expect(tokens).toContain('--color-quest:');
+    expect(tokens).toContain('#ffd12d');
+    // Bag tokens must alias the DESIGN.md --color-quest lineage, not invent a second yellow.
+    expect(tokens).toMatch(/--color-bag-quest-rim:\s*var\(--color-quest\)/);
+    expect(tokens).toMatch(/--color-bag-quest-seal:\s*var\(--color-quest\)/);
+    expect(tokens).toContain('--color-bag-quest-wash:');
+    // Bounded to the declaration ([^;]*): an unbounded gap would skate past a
+    // raw-hex wash to the next var(--color-quest) line and pin nothing.
+    expect(tokens).toMatch(/--color-bag-quest-wash:[^;]*var\(--color-quest\)/);
+    const commonStart = components.indexOf('.bag-item.q-common');
+    const questCellStart = components.indexOf('.bag-item.bag-quest {');
+    expect(questCellStart).toBeGreaterThan(-1);
+    // Quest rim must follow the common/poor neutral reset so equal-specificity
+    // !important border-color wins for purpose gold.
+    expect(commonStart).toBeGreaterThan(-1);
+    expect(questCellStart).toBeGreaterThan(commonStart);
+    const questCellBlock = components.slice(
+      questCellStart,
+      components.indexOf('}', questCellStart),
+    );
+    expect(questCellBlock).toContain('border-color:');
+    expect(questCellBlock).toContain('!important');
+    expect(questCellBlock).toContain('box-shadow:');
+    expect(questCellBlock).toContain('var(--color-bag-quest-rim)');
+    expect(questCellBlock).toContain('var(--color-bag-quest-wash)');
+    expect(questCellBlock).not.toContain('--fx-');
+    expect(components).not.toContain('.bag-item:hover .bi-quest-seal');
+    // The quest seal shares the corner-mark box (geometry pinned in the
+    // per-kind glyph test above, whose grouped selector includes this seal);
+    // its own rule is color-only, pinned as an exact single-declaration shape
+    // (an indexOf slice could land on the grouped box rule instead).
+    expect(components).toMatch(
+      /\.bag-item \.bi-quest-seal \{\s*color: var\(--color-bag-quest-seal\);\s*\}/,
+    );
+    // Ready seal brightens via the same quest lineage; pulse is optional only.
+    expect(tokens).toMatch(/--color-bag-quest-seal-ready:[^;]*var\(--color-quest\)/);
+    expect(components).toContain('bi-quest-seal-ready');
+    expect(components).toContain('bag-quest-ready');
+    expect(components).toContain('bag-quest-ready-pulse');
+    // prefers-reduced-motion drops the pulse only, never the seal or rim.
+    expect(components).toMatch(
+      /prefers-reduced-motion:\s*reduce[\s\S]*?\.bi-quest-seal-ready[\s\S]*?animation:\s*none/,
+    );
+    // Painter paints classes only; no raw quest hex in bags_window.
+    const painter = readFileSync(join(__dirname, '../src/ui/bags_window.ts'), 'utf8');
+    expect(painter).not.toContain('#ffd12d');
+    expect(painter).not.toContain('#ffd100');
+    expect(painter).toContain('bag-quest');
+    expect(painter).toContain('bi-quest-seal');
+    expect(painter).toContain('bagQuestMarkKind');
+    expect(painter).toContain('bag-quest-ready');
+    expect(painter).toContain('bi-quest-seal-ready');
+  });
+
+  it('fine bag treatment is always-on, tokenized, and never an --fx gate', () => {
+    const tokens = readFileSync(join(__dirname, '../src/styles/tokens.css'), 'utf8');
+    expect(tokens).toContain('--color-bag-fine:');
+    expect(tokens).toMatch(/--color-bag-fine-rim:\s*var\(--color-bag-fine\)/);
+    expect(tokens).toMatch(/--color-bag-fine-seal:\s*var\(--color-bag-fine\)/);
+    expect(tokens).toContain('--color-bag-fine-wash:');
+    // Bounded to the declaration ([^;]*): an unbounded gap would skate past a
+    // raw-hex wash to the -seal line below it and pin nothing.
+    expect(tokens).toMatch(/--color-bag-fine-wash:[^;]*var\(--color-bag-fine\)/);
+    const commonStart = components.indexOf('.bag-item.q-common');
+    const fineCellStart = components.indexOf('.bag-item.bag-fine {');
+    expect(fineCellStart).toBeGreaterThan(-1);
+    // Fine rim must follow the common/poor neutral reset so equal-specificity
+    // !important border-color wins for the refined grade color. (Order against
+    // .bag-quest is not load-bearing: bagRimClasses never emits both, pinned
+    // in bag_corner_mark_view.test.ts.)
+    expect(commonStart).toBeGreaterThan(-1);
+    expect(fineCellStart).toBeGreaterThan(commonStart);
+    const fineCellBlock = components.slice(fineCellStart, components.indexOf('}', fineCellStart));
+    expect(fineCellBlock).toContain('border-color:');
+    expect(fineCellBlock).toContain('!important');
+    expect(fineCellBlock).toContain('box-shadow:');
+    expect(fineCellBlock).toContain('var(--color-bag-fine-rim)');
+    expect(fineCellBlock).toContain('var(--color-bag-fine-wash)');
+    expect(fineCellBlock).not.toContain('--fx-');
+    // The fine seal shares the corner-mark box (geometry pinned in the
+    // per-kind glyph test above, whose grouped selector includes this seal);
+    // its own rule is color-only, pinned as an exact single-declaration shape
+    // (an indexOf slice lands on the grouped box rule, where fine is the last
+    // selector in the list).
+    expect(components).toMatch(
+      /\.bag-item \.bi-fine-seal \{\s*color: var\(--color-bag-fine-seal\);\s*\}/,
+    );
+    expect(components).not.toContain('.bag-item:hover .bi-fine-seal');
+    // The painter paints classes only: no inline style and no raw fine teal
+    // (the token literal must live in tokens.css alone).
+    const painter = readFileSync(join(__dirname, '../src/ui/bags_window.ts'), 'utf8');
+    expect(painter).toContain('bagFineMark');
+    expect(painter).toContain('bi-fine-seal');
+    expect(painter).not.toContain('bi-fine-seal" style=');
+    expect(painter).not.toContain('#6ec8d4');
+    // Rim exclusivity is consumed from the pure core, not re-derived inline:
+    // the className template defers to bagRimClasses (code literal, so a
+    // comment mentioning the name cannot satisfy this pin).
+    expect(painter).toContain('${bagRimClasses(questMark, fineMark)}');
+    expect(painter).toContain('bagCornerMark(glyphKind, questMark, fineMark)');
   });
 });

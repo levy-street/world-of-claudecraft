@@ -87,7 +87,6 @@ export const EASTBROOK_TOWN_REBUILD_PLACEMENT_INVENTORY = Object.freeze({
     'eastbrook_fence_smithy_west',
     'eastbrook_fence_smithy_outer',
     'eastbrook_fence_smithy_east',
-    'eastbrook_fence_market_outer',
   ]),
   artisanRow: Object.freeze([]),
   benches: Object.freeze([
@@ -116,8 +115,8 @@ export const EASTBROOK_TOWN_POLISH_V2_PLACEMENT_INVENTORY = Object.freeze({
   ]),
 });
 
-const EASTBROOK_TOWN_HISTORICAL_TRIANGLES = 29_644;
-const EASTBROOK_TOWN_POLISH_V2_TRIANGLES = 28_330;
+const EASTBROOK_TOWN_HISTORICAL_TRIANGLES = 29_436;
+const EASTBROOK_TOWN_POLISH_V2_TRIANGLES = 28_902;
 
 const EMPTY_TOWN_PLACEMENT_INVENTORY = Object.freeze(
   Object.fromEntries(
@@ -125,13 +124,22 @@ const EMPTY_TOWN_PLACEMENT_INVENTORY = Object.freeze(
   ),
 );
 
-export function expectedTownPlacementInventory(expectedTown, contractId = null) {
+export function expectedTownPlacementInventory(
+  expectedTown,
+  contractId = null,
+  captureContractSnapshot = null,
+) {
   if (typeof expectedTown !== 'boolean') {
     throw new Error('expectedTown must be a boolean');
   }
-  const rebuildInventory = contractId
-    ? townCaptureContract(contractId).placementInventory
-    : EASTBROOK_TOWN_REBUILD_PLACEMENT_INVENTORY;
+  if (captureContractSnapshot !== null && captureContractSnapshot.id !== contractId) {
+    throw new Error('town placement contract snapshot id does not match the requested contract');
+  }
+  const rebuildInventory =
+    captureContractSnapshot?.placementInventory ??
+    (contractId
+      ? townCaptureContract(contractId).placementInventory
+      : EASTBROOK_TOWN_REBUILD_PLACEMENT_INVENTORY);
   return expectedTown
     ? Object.freeze({
         legacy: EMPTY_TOWN_PLACEMENT_INVENTORY,
@@ -655,8 +663,16 @@ function finiteVector2(value) {
   return Number.isFinite(value?.x) && Number.isFinite(value?.z);
 }
 
-export function assertTownAttributionTargetState({ targets, contractId, requestedVisible }) {
-  const contract = townCaptureContract(contractId);
+export function assertTownAttributionTargetState({
+  targets,
+  contractId,
+  requestedVisible,
+  captureContractSnapshot = null,
+}) {
+  if (captureContractSnapshot !== null && captureContractSnapshot.id !== contractId) {
+    throw new Error('town attribution contract snapshot id does not match the requested contract');
+  }
+  const contract = captureContractSnapshot ?? townCaptureContract(contractId);
   if (!Array.isArray(targets) || targets.length !== contract.attributionTargets.length) {
     throw new Error(`${contractId}: attribution target inventory is incomplete`);
   }
@@ -755,8 +771,11 @@ export function assertTownNpcFacingOverlay({ overlay, contractId }) {
   }
 }
 
-export function assertTownMotionEvidence({ evidence, contractId }) {
-  const contract = townCaptureContract(contractId);
+export function assertTownMotionEvidence({ evidence, contractId, captureContractSnapshot = null }) {
+  if (captureContractSnapshot !== null && captureContractSnapshot.id !== contractId) {
+    throw new Error('town motion contract snapshot id does not match the requested contract');
+  }
+  const contract = captureContractSnapshot ?? townCaptureContract(contractId);
   const expected = contract.motionCapture;
   if (!expected) {
     if (evidence !== null) throw new Error(`${contractId}: motion evidence must be absent`);
@@ -1184,6 +1203,7 @@ function assertExactJson(actual, expected, label) {
 export function assertTownCaptureMetadata({
   metadata,
   contractId = null,
+  captureContractSnapshot = null,
   expectedTown,
   expectedArmoury,
   profile,
@@ -1201,7 +1221,12 @@ export function assertTownCaptureMetadata({
     throw new Error('town capture contract id does not match the requested contract');
   }
   const resolvedContractId = contractId ?? metadataContractId;
-  const captureContract = resolvedContractId ? townCaptureContract(resolvedContractId) : null;
+  if (captureContractSnapshot !== null && captureContractSnapshot.id !== resolvedContractId) {
+    throw new Error('town capture contract snapshot id does not match the requested contract');
+  }
+  const captureContract =
+    captureContractSnapshot ??
+    (resolvedContractId ? townCaptureContract(resolvedContractId) : null);
   const expectedComparison = expectedTown
     ? (captureContract?.sourceComparison ?? 'feature-worktree')
     : 'pr-2356-head';
@@ -1257,6 +1282,7 @@ export function assertTownCaptureMetadata({
       targets: metadata.observed?.contractTargets,
       contractId: captureContract.id,
       requestedVisible: true,
+      captureContractSnapshot,
     });
     const contractAssetStates = metadata.observed?.contractAssetStates;
     if (
@@ -1276,12 +1302,17 @@ export function assertTownCaptureMetadata({
       assertTownMotionEvidence({
         evidence: metadata.motionEvidence,
         contractId: captureContract.id,
+        captureContractSnapshot,
       });
     } else if (metadata.motionEvidence !== null) {
       throw new Error('motion evidence was attached to a non-motion capture view');
     }
   }
-  const expectedInventory = expectedTownPlacementInventory(expectedTown, resolvedContractId);
+  const expectedInventory = expectedTownPlacementInventory(
+    expectedTown,
+    resolvedContractId,
+    captureContractSnapshot,
+  );
   assertExactJson(
     metadata.expected,
     {
@@ -1665,10 +1696,16 @@ export function assertTownPerformanceBlockState({
   rootVisible,
   shadowEnabled,
   contractId = null,
+  captureContractSnapshot = null,
 }) {
-  const expectedTriangles = contractId
-    ? townCaptureContract(contractId).townTriangles
-    : EASTBROOK_TOWN_HISTORICAL_TRIANGLES;
+  if (captureContractSnapshot !== null && captureContractSnapshot.id !== contractId) {
+    throw new Error('town performance contract snapshot id does not match the requested contract');
+  }
+  const expectedTriangles =
+    captureContractSnapshot?.townTriangles ??
+    (contractId
+      ? townCaptureContract(contractId).townTriangles
+      : EASTBROOK_TOWN_HISTORICAL_TRIANGLES);
   if (raw.targetName !== EASTBROOK_TOWN_ROOT_NAME) {
     throw new Error(
       `${label}: performance target must be ${EASTBROOK_TOWN_ROOT_NAME}, got ${raw.targetName}`,

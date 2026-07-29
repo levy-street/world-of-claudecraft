@@ -18,7 +18,29 @@ import {
 import { WEAPON_SKIN_LIST } from '../src/sim/content/weapon_skins';
 import { ITEMS } from '../src/sim/data';
 import { weaponHand } from '../src/sim/equipment_rules';
+import { iconDataUrl, weaponIconUrl } from '../src/ui/icons';
 import { ITEM_WEAPON_VARIANTS } from '../src/ui/weapon_variants';
+
+function withTemporaryOwnProperty(
+  target: object,
+  key: PropertyKey,
+  value: unknown,
+  run: () => void,
+): void {
+  const original = Object.getOwnPropertyDescriptor(target, key);
+  Object.defineProperty(target, key, {
+    configurable: true,
+    enumerable: true,
+    value,
+    writable: true,
+  });
+  try {
+    run();
+  } finally {
+    if (original) Object.defineProperty(target, key, original);
+    else Reflect.deleteProperty(target, key);
+  }
+}
 
 // The per-item held weapon models: each weapon item maps (via the shared
 // ITEM_WEAPON_VARIANTS table) to a variant key that must have BOTH a 3D model GLB
@@ -32,6 +54,106 @@ describe('held weapon models', () => {
       expect(existsSync(`public/models/weapons/${key}.glb`), `${key}.glb missing`).toBe(true);
       expect(existsSync(`public/ui/weapons/${key}.jpg`), `${key}.jpg missing`).toBe(true);
     }
+  });
+
+  it('every live heroic weapon inherits one base variant across bag and held art', () => {
+    const heroicWeapons = Object.values(ITEMS)
+      .filter((item) => item.kind === 'weapon' && item.heroicOf !== undefined)
+      .sort((a, b) => a.id.localeCompare(b.id));
+
+    expect(heroicWeapons.map((item) => item.id)).toEqual([
+      'heroic_bonewrought_greatsword',
+      'heroic_deathless_heartwood',
+      'heroic_direfang_greatblade',
+      'heroic_fang_of_korzul',
+      'heroic_fanglords_beastspear',
+      'heroic_gravewyrm_thornmaul',
+      'heroic_kingsbane_last_oath',
+      'heroic_maul_of_the_scourged_wilds',
+      'heroic_nightfangs_greatstaff',
+      'heroic_staff_of_the_gravewyrm',
+      'heroic_staff_of_velkhar',
+      'heroic_wildheart_fangknife',
+      'heroic_wildheart_hexwood_staff',
+      'heroic_wildheart_tuskblade',
+      'heroic_wyrmfang_greatblade',
+    ]);
+
+    for (const heroic of heroicWeapons) {
+      const baseId = heroic.heroicOf;
+      expect(baseId, `${heroic.id} must name a base item`).toBeDefined();
+      if (!baseId) continue;
+
+      const base = ITEMS[baseId];
+      expect(base?.kind, `${heroic.id} base ${baseId} must be a weapon`).toBe('weapon');
+      expect(Object.hasOwn(ITEM_WEAPON_VARIANTS, heroic.id), heroic.id).toBe(false);
+      expect(Object.hasOwn(ITEM_WEAPON_VARIANTS, baseId), baseId).toBe(true);
+
+      const variant = ITEM_WEAPON_VARIANTS[baseId];
+      expect(variant, `${baseId} must have a real variant`).toBeTruthy();
+      if (!variant) continue;
+
+      expect(existsSync(`public/models/weapons/${variant}.glb`), `${variant}.glb missing`).toBe(
+        true,
+      );
+      expect(existsSync(`public/ui/weapons/${variant}.jpg`), `${variant}.jpg missing`).toBe(true);
+      expect(iconDataUrl('item', heroic.id), `${heroic.id} bag icon`).toBe(
+        `/ui/weapons/${variant}.jpg`,
+      );
+      expect(itemWeaponModelUrl(heroic.id), `${heroic.id} held model`).toBe(
+        `models/weapons/${variant}.glb`,
+      );
+      expect(iconDataUrl('item', heroic.id), `${heroic.id} inventory portrait`).toBe(
+        iconDataUrl('item', baseId),
+      );
+    }
+
+    expect(weaponIconUrl('worn_sword')).toBe('/ui/weapons/sword_a.jpg');
+    for (const hostile of ['__proto__', 'constructor', 'toString', 'hasOwnProperty']) {
+      expect(weaponIconUrl(hostile), hostile).toBeNull();
+      expect(itemWeaponModelUrl(hostile), `${hostile} mainhand`).toBeNull();
+      expect(itemOffhandModelUrl(hostile), `${hostile} offhand`).toBeNull();
+    }
+    expect(weaponIconUrl('stale_server_weapon_id')).toBeNull();
+    expect(itemWeaponModelUrl('stale_server_weapon_id')).toBeNull();
+    expect(itemOffhandModelUrl('stale_server_weapon_id')).toBeNull();
+  });
+
+  it('prefers a direct weapon variant over heroic inheritance for bag and held art', () => {
+    const heroicId = 'heroic_wyrmfang_greatblade';
+    const heroic = ITEMS[heroicId];
+    const originalBaseId = heroic.heroicOf;
+    expect(originalBaseId).toBe('wyrmfang_greatblade');
+    expect(Object.hasOwn(ITEM_WEAPON_VARIANTS, heroicId)).toBe(false);
+
+    withTemporaryOwnProperty(heroic, 'heroicOf', 'worn_sword', () => {
+      withTemporaryOwnProperty(ITEM_WEAPON_VARIANTS, heroicId, 'dagger_a', () => {
+        expect(weaponIconUrl(heroicId)).toBe('/ui/weapons/dagger_a.jpg');
+        expect(iconDataUrl('item', heroicId)).toBe('/ui/weapons/dagger_a.jpg');
+        expect(itemWeaponModelUrl(heroicId)).toBe('models/weapons/dagger_a.glb');
+        expect(itemOffhandModelUrl(heroicId)).toBe('models/weapons/dagger_a.glb');
+      });
+    });
+
+    expect(heroic.heroicOf).toBe(originalBaseId);
+    expect(Object.hasOwn(ITEM_WEAPON_VARIANTS, heroicId)).toBe(false);
+  });
+
+  it('rejects prototype keys inherited through heroicOf for bag and held art', () => {
+    const heroicId = 'heroic_wyrmfang_greatblade';
+    const heroic = ITEMS[heroicId];
+    const originalBaseId = heroic.heroicOf;
+    expect(Object.hasOwn(ITEM_WEAPON_VARIANTS, heroicId)).toBe(false);
+
+    for (const hostileBaseId of ['__proto__', 'constructor', 'toString', 'hasOwnProperty']) {
+      withTemporaryOwnProperty(heroic, 'heroicOf', hostileBaseId, () => {
+        expect(weaponIconUrl(heroicId), `${hostileBaseId} bag`).toBeNull();
+        expect(itemWeaponModelUrl(heroicId), `${hostileBaseId} mainhand`).toBeNull();
+        expect(itemOffhandModelUrl(heroicId), `${hostileBaseId} offhand`).toBeNull();
+      });
+    }
+
+    expect(heroic.heroicOf).toBe(originalBaseId);
   });
 
   it('itemWeaponModelUrl resolves mapped items and ignores everything else', () => {
@@ -76,18 +198,31 @@ describe('held weapon models', () => {
     expect(unmapped.map((item) => item.id)).toEqual([]);
   });
 
-  // The wraithfire_orb (and its generated heroic clone) plus the valefire_lantern
-  // are the known held model gaps: the shared art set has no orb or lantern model
-  // to map them to, so they need new art, not a table row. Pinning the exact set
-  // makes the exception conscious: a future held_offhand item must either map to
-  // a model or extend this pin.
-  it('pins the held_offhand items without a model (orb and lantern)', () => {
+  // The orbs, the lantern and the quivers (each with its generated heroic clone
+  // where the source is heroic-eligible) are the known held model gaps: the
+  // shared art set has no orb, lantern or quiver model to map them to, so they
+  // need new art, not a table row. The quivers are a softer gap than the orbs:
+  // the hunter's ranger.glb already carries a built-in quiver mesh, so an
+  // unmapped quiver reads correctly on the body instead of showing nothing.
+  // Pinning the exact set makes the exception conscious: a future held_offhand
+  // item must either map to a model or extend this pin.
+  it('pins the held_offhand items without a model (orbs, lantern and quivers)', () => {
     const heldOffhands = Object.values(ITEMS).filter((item) => item.kind === 'held_offhand');
     const unmapped = heldOffhands
       .filter((item) => itemOffhandModelUrl(item.id) === null)
       .map((item) => item.id)
       .sort();
-    expect(unmapped).toEqual(['heroic_wraithfire_orb', 'valefire_lantern', 'wraithfire_orb']);
+    expect(unmapped).toEqual([
+      'cragmaw_huntquiver',
+      'direfang_quiver',
+      'gravewyrm_bone_quiver',
+      'heroic_direfang_quiver',
+      'heroic_gravewyrm_bone_quiver',
+      'heroic_wraithfire_orb',
+      'moggers_hide_quiver',
+      'valefire_lantern',
+      'wraithfire_orb',
+    ]);
   });
 
   it('resolves actual offhands independently from the mainhand model', () => {
@@ -189,7 +324,9 @@ describe('held weapon models', () => {
     expect(players).toContain('player_mech');
     for (const key of players) {
       const def = VISUALS[key];
-      if (key === 'player_hunter') {
+      // both hunter bodies: the fixed rig and its composed (modular) variant
+      // share the class hand layout, so both keep the crossbow
+      if (key === 'player_hunter' || key === 'player_hunter_modular') {
         expect(def.weaponSlots, 'hunter must keep its crossbow').toBeUndefined();
       } else {
         expect(def.weaponSlots?.includes(0), `${key} should swap its mainhand`).toBe(true);

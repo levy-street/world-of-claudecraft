@@ -23,7 +23,8 @@ const OUTPUT =
 // = the app's own default (ultra). Maps the preset label to the woc_settings numeric value
 // (src/render/gfx.ts PRESET_LOW..PRESET_ULTRA).
 const PERF_PRESET = process.env.PERF_PRESET ?? null;
-const PRESET_VALUES = { low: 1, medium: 2, high: 3, ultra: 4 };
+// 5 is the Advanced custom profile (never a bench target); 6 is Insane.
+const PRESET_VALUES = { low: 1, medium: 2, high: 3, ultra: 4, insane: 6 };
 
 const THRESHOLDS = {
   maxFrameP95: numberEnv('PERF_MAX_FRAME_P95'),
@@ -479,7 +480,9 @@ async function runViewport(browser, viewport) {
   if (PERF_PRESET) {
     const presetValue = PRESET_VALUES[PERF_PRESET];
     if (!presetValue) {
-      throw new Error(`Unknown PERF_PRESET=${PERF_PRESET}; use low, medium, high, or ultra.`);
+      throw new Error(
+        `Unknown PERF_PRESET=${PERF_PRESET}; use low, medium, high, ultra, or insane.`,
+      );
     }
     // Seed the STATIC graphics preset into woc_settings before any app script runs, so the
     // applier resolves it on boot and the HUD tier knobs read the right data-fx-level.

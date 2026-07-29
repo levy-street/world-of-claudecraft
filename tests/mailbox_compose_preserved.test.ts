@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 // Staging a parcel must not clear the compose form. The bug: stageParcel (the
 // bags-window click that attaches an item) ran the FULL window render, and
 // renderSend rebuilds the whole form via innerHTML with empty inputs, so the

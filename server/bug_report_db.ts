@@ -15,6 +15,9 @@ export const BUG_REPORT_RATE_LIMIT = 5;
 // src/ui/bug_report.ts). The server re-clamps because a direct API caller never
 // runs the client assembly.
 const META_STR_MAX = 512;
+// Mirrors moderation_db.ts's ACTION_REASON_MAX: an admin's optional resolve/dismiss
+// note is short-form context, not a report body.
+const REVIEW_NOTE_MAX = 500;
 
 // The real client only ever produces a downscaled JPEG data URL. Allow the common
 // raster image data-URL types and nothing else, so a hand-crafted payload (e.g.
@@ -25,9 +28,11 @@ const SCREENSHOT_DATA_URL = /^data:image\/(?:jpeg|png|webp);base64,/;
 // Server-side screenshot gate: a base64 raster image data URL within the size cap.
 // Enforced here (not just at the route) so every insert path is protected.
 export function isStorableScreenshot(value: unknown): value is string {
-  return typeof value === 'string'
-    && value.length <= BUG_SCREENSHOT_MAX
-    && SCREENSHOT_DATA_URL.test(value);
+  return (
+    typeof value === 'string' &&
+    value.length <= BUG_SCREENSHOT_MAX &&
+    SCREENSHOT_DATA_URL.test(value)
+  );
 }
 
 // Bounded, fixed-shape view of the client metadata. Mirrors BugReportMeta in
@@ -52,9 +57,14 @@ function metaNum(value: unknown): number {
   return typeof value === 'number' && Number.isFinite(value) ? value : 0;
 }
 
+function cleanReviewNote(value: unknown): string {
+  return typeof value === 'string' ? value.trim().slice(0, REVIEW_NOTE_MAX) : '';
+}
+
 export function clampBugReportMeta(value: unknown): BugReportMeta {
   const m = value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
-  const vp = m.viewport && typeof m.viewport === 'object' ? (m.viewport as Record<string, unknown>) : {};
+  const vp =
+    m.viewport && typeof m.viewport === 'object' ? (m.viewport as Record<string, unknown>) : {};
   return {
     build: metaStr(m.build),
     userAgent: metaStr(m.userAgent),
@@ -147,7 +157,10 @@ export async function createBugReport(
   return { id: Number(res.rows[0].id), screenshotStored: screenshot !== null };
 }
 
-export async function listBugReports(limit = 100, offset = 0): Promise<{ rows: BugReportRow[]; total: number }> {
+export async function listBugReports(
+  limit = 100,
+  offset = 0,
+): Promise<{ rows: BugReportRow[]; total: number }> {
   const capped = Math.max(1, Math.min(200, Math.floor(limit)));
   const off = Math.max(0, Math.floor(offset));
   const res = await pool.query(
@@ -170,6 +183,30 @@ export async function listBugReports(limit = 100, offset = 0): Promise<{ rows: B
 // null when the report has none or does not exist.
 export async function getBugReportScreenshot(id: number): Promise<string | null> {
   if (!Number.isFinite(id)) return null;
-  const res = await pool.query(`SELECT screenshot FROM bug_reports WHERE id = $1`, [Math.floor(id)]);
+  const res = await pool.query(`SELECT screenshot FROM bug_reports WHERE id = $1`, [
+    Math.floor(id),
+  ]);
   return res.rows[0]?.screenshot ?? null;
+}
+
+export type BugReportResolution = 'resolved' | 'dismissed';
+
+// Close one OPEN bug report, mirroring moderation_db.ts's ignoreReport UPDATE shape
+// (status flip + reviewed_at/reviewed_by_account_id/review_note stamp, gated on the
+// row still being 'open' so a double-submit or a race against another admin is a
+// no-op rather than clobbering an earlier resolution). Returns false when the id
+// does not exist or was already resolved/dismissed.
+export async function resolveBugReport(
+  id: number,
+  adminAccountId: number,
+  status: BugReportResolution,
+  note: unknown,
+): Promise<boolean> {
+  const res = await pool.query(
+    `UPDATE bug_reports
+     SET status = $2, reviewed_at = now(), reviewed_by_account_id = $3, review_note = $4
+     WHERE id = $1 AND status = 'open'`,
+    [id, status, adminAccountId, cleanReviewNote(note)],
+  );
+  return (res.rowCount ?? 0) > 0;
 }

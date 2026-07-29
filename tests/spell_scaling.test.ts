@@ -90,6 +90,14 @@ describe('directHitBonus', () => {
     const d = def({ school: 'physical', scalesWith: 'ranged' });
     expect(directHitBonus(rap, d, 3.0)).toBe(Math.round(rap * (3.0 / 3.5) * RANGED_SPELL_AP_SCALE));
   });
+
+  it('mult (the resolved talent/mastery multiplier) wraps the whole rider (#1803)', () => {
+    const sp = 400;
+    const d = def({});
+    expect(directHitBonus(sp, d, 3.0, false, 1.25)).toBe(Math.round(sp * (3.0 / 3.5) * 1.25));
+    // Default mult stays 1: existing callers are unaffected.
+    expect(directHitBonus(sp, d, 3.0)).toBe(Math.round(sp * (3.0 / 3.5)));
+  });
 });
 
 describe('channelTickBonus', () => {
@@ -101,6 +109,12 @@ describe('channelTickBonus', () => {
 
   it('returns 0 for a non-channeled ability', () => {
     expect(channelTickBonus(500, def({}))).toBe(0);
+  });
+
+  it('mult wraps the tick rider (#1803)', () => {
+    const sp = 210;
+    const d = def({ castTime: 0, channel: { duration: 3, ticks: 3 } });
+    expect(channelTickBonus(sp, d, 1.5)).toBe(Math.round(sp * (3 / 3.5 / 3) * 1.5));
   });
 });
 
@@ -119,6 +133,12 @@ describe('dotTickBonus', () => {
     expect(dotTickBonus(rap, d, 15, 3)).toBe(
       Math.round((rap * (15 / 15) * RANGED_SPELL_AP_SCALE) / 5),
     );
+  });
+
+  it('mult wraps the tick rider (#1803)', () => {
+    const sp = 150;
+    const d = def({});
+    expect(dotTickBonus(sp, d, 18, 3, 1.2)).toBe(Math.round((sp * (18 / 15) * 1.2) / 6));
   });
 });
 
@@ -141,12 +161,23 @@ describe('directHealBonus', () => {
       HEALING_SP_SCALE * directHitBonus(sp, def({ school: 'holy' }), 3.5),
     );
   });
+
+  it('mult wraps the whole rider (#1803)', () => {
+    const sp = 300;
+    expect(directHealBonus(sp, 3.5, false, 1.15)).toBe(
+      Math.round(sp * HEALING_SP_SCALE * 1.0 * 1.15),
+    );
+  });
 });
 
 describe('absorbBonus', () => {
   it('adds the authored fraction of Spell Power to a shield (mage barriers: no heal scale)', () => {
     expect(absorbBonus(123, 0.5)).toBe(62);
     expect(absorbBonus(80, 0)).toBe(0);
+  });
+
+  it('mult wraps the rider (#1803)', () => {
+    expect(absorbBonus(123, 0.5, 1.3)).toBe(Math.round(123 * 0.5 * 1.3));
   });
 });
 
@@ -161,6 +192,13 @@ describe('hotTickBonus', () => {
     const sp = 210;
     expect(hotTickBonus(sp, 15, 3)).toBe(
       HEALING_SP_SCALE * dotTickBonus(sp, def({ school: 'nature' }), 15, 3),
+    );
+  });
+
+  it('mult wraps the tick rider (#1803)', () => {
+    const sp = 150;
+    expect(hotTickBonus(sp, 12, 3, 1.25)).toBe(
+      Math.round((sp * HEALING_SP_SCALE * (12 / 15) * 1.25) / 4),
     );
   });
 });

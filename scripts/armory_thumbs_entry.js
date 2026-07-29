@@ -15,6 +15,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { createWeaponVfx, TIERS, WEAPON_VFX } from '../src/render/weapon_vfx.ts';
 import { WEAPON_SKINS } from '../src/sim/content/weapon_skins.ts';
+import { attachKtx2 } from './lib/ktx2_entry.js';
 
 const SIZE = 640; // supersampled; the driver downscales to the shipped 512
 const SETTLE_FRAMES = 96; // ~1.6s so motes/aurora/drift populate their loops
@@ -30,7 +31,7 @@ renderer.setSize(SIZE, SIZE, false);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-const loader = new GLTFLoader();
+const loader = attachKtx2(new GLTFLoader(), renderer);
 loader.setMeshoptDecoder(MeshoptDecoder);
 
 function loadGlb(url) {

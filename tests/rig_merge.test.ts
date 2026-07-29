@@ -4,6 +4,7 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import {
+  animatedNodeNames,
   BIND_EPS,
   mergeSkinnedParts,
   REBIND_EPS,
@@ -228,6 +229,14 @@ describe('mergeSkinnedParts', () => {
     return n;
   };
 
+  it('extracts animated scene-node names from Three animation tracks', () => {
+    const clip = new THREE.AnimationClip('wrapper motion', 1, [
+      new THREE.VectorKeyframeTrack('wrapper.position', [0, 1], [0, 0, 0, 1, 0, 0]),
+    ]);
+
+    expect(animatedNodeNames([clip])).toEqual(new Set(['wrapper']));
+  });
+
   it('collapses per-primitive bind data into one mesh, one skeleton', () => {
     const { root } = rig((canon, i) => {
       const t = new THREE.Matrix4().makeScale(0.4 + i * 0.1, 0.4 + i * 0.1, 0.4 + i * 0.1);
@@ -273,6 +282,113 @@ describe('mergeSkinnedParts', () => {
       expect(after.y).toBeCloseTo(before[i].y, 4);
       expect(after.z).toBeCloseTo(before[i].z, 4);
     }
+  });
+
+  it('merges static sibling wrappers with the same world transform', () => {
+    const { root, bones, parts } = rig((canon, i) => {
+      const t = new THREE.Matrix4().makeScale(0.4 + i * 0.1, 0.5, 0.6).setPosition(i * 0.1, 0, 0);
+      return canon.map((m) => new THREE.Matrix4().copy(m).multiply(t));
+    });
+    for (const part of parts) {
+      const wrapper = new THREE.Group();
+      root.add(wrapper);
+      wrapper.add(part);
+    }
+    root.updateMatrixWorld(true);
+    const before = parts.flatMap((part) =>
+      [0, 1, 2].map((index) => skinVertex(part, index, bones).applyMatrix4(part.matrixWorld)),
+    );
+
+    mergeSkinnedParts(root, new Set());
+
+    expect(countSkinned(root)).toBe(1);
+    const mergedMeshes: THREE.SkinnedMesh[] = [];
+    root.traverse((object) => {
+      if ((object as THREE.SkinnedMesh).isSkinnedMesh) {
+        mergedMeshes.push(object as THREE.SkinnedMesh);
+      }
+    });
+    const merged = mergedMeshes[0];
+    if (!merged) throw new Error('sibling-wrapper merge produced no mesh');
+    merged.updateMatrixWorld(true);
+    for (let i = 0; i < before.length; i++) {
+      const after = skinVertex(merged, i, bones).applyMatrix4(merged.matrixWorld);
+      expect(after.x).toBeCloseTo(before[i].x, 4);
+      expect(after.y).toBeCloseTo(before[i].y, 4);
+      expect(after.z).toBeCloseTo(before[i].z, 4);
+    }
+  });
+
+  it('keeps sibling wrappers separate when an animation targets either chain', () => {
+    const { root, parts } = rig((canon) => canon.map((matrix) => matrix.clone()));
+    for (let i = 0; i < parts.length; i++) {
+      const wrapper = new THREE.Group();
+      wrapper.name = `wrapper_${i}`;
+      root.add(wrapper);
+      wrapper.add(parts[i]);
+    }
+
+    mergeSkinnedParts(root, new Set(['wrapper_1']));
+
+    expect(countSkinned(root)).toBe(2);
+  });
+
+  it('keeps a directly animated mesh out of a sibling-wrapper merge', () => {
+    const { root, parts } = rig((canon) => canon.map((matrix) => matrix.clone()));
+    for (let i = 0; i < parts.length; i++) {
+      const wrapper = new THREE.Group();
+      parts[i].name = `mesh_${i}`;
+      root.add(wrapper);
+      wrapper.add(parts[i]);
+    }
+
+    mergeSkinnedParts(root, new Set(['mesh_1']));
+
+    expect(countSkinned(root)).toBe(2);
+  });
+
+  it('does not merge wrappers under different grandparents', () => {
+    const { root, parts } = rig((canon) => canon.map((matrix) => matrix.clone()));
+    const left = new THREE.Group();
+    const right = new THREE.Group();
+    root.add(left, right);
+    for (let i = 0; i < parts.length; i++) {
+      const wrapper = new THREE.Group();
+      (i < 2 ? left : right).add(wrapper);
+      wrapper.add(parts[i]);
+    }
+
+    mergeSkinnedParts(root, new Set());
+
+    expect(countSkinned(root)).toBe(2);
+  });
+
+  it('does not merge meshes whose wrapper visibility differs', () => {
+    const { root, parts } = rig((canon) => canon.map((matrix) => matrix.clone()));
+    for (let i = 0; i < parts.length; i++) {
+      const wrapper = new THREE.Group();
+      wrapper.visible = i !== 1;
+      root.add(wrapper);
+      wrapper.add(parts[i]);
+    }
+
+    mergeSkinnedParts(root, new Set());
+
+    expect(countSkinned(root)).toBe(2);
+  });
+
+  it('does not merge sibling wrappers with different world transforms', () => {
+    const { root, parts } = rig((canon) => canon.map((matrix) => matrix.clone()));
+    for (let i = 0; i < parts.length; i++) {
+      const wrapper = new THREE.Group();
+      wrapper.position.x = i;
+      root.add(wrapper);
+      wrapper.add(parts[i]);
+    }
+
+    mergeSkinnedParts(root, new Set());
+
+    expect(countSkinned(root)).toBe(3);
   });
 
   it('leaves parts whose bind data no single transform explains unmerged', () => {

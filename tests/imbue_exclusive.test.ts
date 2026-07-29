@@ -54,20 +54,26 @@ describe('weapon imbues are a mutually-exclusive single slot (H2-1)', () => {
     const { sim, p } = makePlayer('shaman', 16);
     cast(sim, p, 'rockbiter_weapon');
     const events = cast(sim, p, 'flametongue_weapon');
-    // the replaced imbue is announced lost (this is what clears its client buff icon)
-    expect(events).toContainEqual({
-      type: 'aura',
-      targetId: p.id,
-      name: 'Stonebound Weapon',
-      gained: false,
-    });
+    // the replaced imbue is announced lost (this is what clears its client buff
+    // icon); the fade also carries its attribution since the parse fidelity
+    // widening, so match on the load-bearing fields rather than deep equality
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: 'aura',
+        targetId: p.id,
+        name: 'Stonebound Weapon',
+        gained: false,
+      }),
+    );
     // and the new imbue is announced gained
-    expect(events).toContainEqual({
-      type: 'aura',
-      targetId: p.id,
-      name: 'Pyrebrand Weapon',
-      gained: true,
-    });
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: 'aura',
+        targetId: p.id,
+        name: 'Pyrebrand Weapon',
+        gained: true,
+      }),
+    );
   });
 
   it('re-casting the same imbue refreshes in place (still one aura)', () => {

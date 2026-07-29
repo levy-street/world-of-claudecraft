@@ -9,7 +9,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { runEffects } from '../src/sim/combat/effect_dispatch';
-import { MOBS } from '../src/sim/data';
+import { ABILITIES, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import type { PlayerMeta, ResolvedAbility } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
@@ -86,6 +86,200 @@ describe('effect_dispatch: a single cast fans into every listed effect', () => {
 
     expect(mob.hp).toBeLessThan(hp0); // finisherDamage (spentCombo > 0) dealt damage
     expect(p.comboPoints).toBe(0); // spendsCombo reset, AFTER the effect loop
+  });
+
+  it('rogue rupture: dot damage scales with combo points spent (bleed finisher, not flat)', () => {
+    const dotValueAt = (combo: number): number => {
+      const { sim, p, meta } = makeSim('rogue', 20);
+      const mob = spawnTarget(sim, p);
+      p.comboPoints = combo;
+      const res = resolve(sim, 'rupture', p.id);
+      runEffects(sim.ctx, p, meta, mob, res);
+      const dot = mob.auras.find((a: Aura) => a.kind === 'dot' && a.sourceId === p.id);
+      if (!dot) throw new Error('rupture dot did not land');
+      return dot.value;
+    };
+
+    const at1 = dotValueAt(1);
+    const at5 = dotValueAt(5);
+
+    // Rupture is a combo-point finisher (spendsCombo: true); banking to 5 combo
+    // points must deal more per-tick damage than spending it at 1, mirroring the
+    // repo's other finishers (eviscerate/ferocious_bite finisherDamage,
+    // slice_and_dice finisherHaste, kidney_shot finisherStun) that all scale with
+    // spentCombo. Before the fix, the 'dot' effect had no perCombo term, so this
+    // was flat regardless of combo points banked.
+    //
+    // Pin the exact tick-value delta rather than a loose greater-than: Rupture's
+    // content record is { total: 16, perCombo: 16, duration: 16, interval: 2 },
+    // so the DoT coefficient is total + perCombo*spentCombo, spread across
+    // duration/interval = 8 ticks. Attack-power scaling (dotSp) is identical at
+    // both combo counts (same character, same gear), so it cancels out of the
+    // delta: dotBase(1) = round((16+16*1)/8) = 4, dotBase(5) = round((16+16*5)/8)
+    // = 12, an exact +8 delta this pin locks in.
+    expect(at5 - at1).toBe(8);
+  });
+
+  it('garrote: the direct hit carries abilityId, the bleed ticks never do (no per-tick cue replay)', () => {
+    const { sim, p, meta } = makeSim('rogue', 20);
+    const mob = spawnTarget(sim, p);
+    sim.events.length = 0;
+    runEffects(sim.ctx, p, meta, mob, resolve(sim, 'garrote', p.id));
+
+    // The direct hit is the one damage event allowed to carry the stable id.
+    const direct = sim.events.filter((ev) => ev.type === 'damage' && ev.amount > 0);
+    expect(direct).toHaveLength(1);
+    expect(direct[0]).toMatchObject({ abilityId: 'garrote' });
+
+    // The bleed shares the ability id as its aura id, so an id-carrying tick
+    // would replay the garrote recording every 3s for 18s
+    // (IMPACT_ABILITY_CUES); combat/auras.ts must emit ticks without it.
+    sim.events.length = 0;
+    const ticks: { abilityId?: string | null }[] = [];
+    for (let i = 0; i < 20 * 7; i++) {
+      for (const ev of sim.tick()) {
+        if (ev.type === 'damage' && ev.ability === 'Throat Wire' && ev.amount > 0) ticks.push(ev);
+      }
+    }
+    expect(ticks.length).toBeGreaterThan(0);
+    for (const tick of ticks) expect(tick.abilityId ?? null).toBeNull();
+  });
+
+  it('fearImpact is gated to Harrow: Morrowlash shares fearDr but emits none', () => {
+    // Harrow (ability id 'fear'): the landed fear sounds once at the target.
+    const harrow = makeSim('warlock', 20);
+    const harrowTarget = spawnTarget(harrow.sim, harrow.p);
+    harrow.sim.events.length = 0;
+    runEffects(
+      harrow.sim.ctx,
+      harrow.p,
+      harrow.meta,
+      harrowTarget,
+      resolve(harrow.sim, 'fear', harrow.p.id),
+    );
+    const fearImpacts = harrow.sim.events.filter(
+      (ev) => ev.type === 'spellfx' && ev.fx === 'fearImpact',
+    );
+    expect(fearImpacts).toHaveLength(1);
+    expect(fearImpacts[0]).toMatchObject({ targetId: harrowTarget.id, ability: 'fear' });
+
+    // Morrowlash (death_coil) also carries fearDr (the graded fear break), but
+    // it has no fear recording and its own directDamage impact already sounds
+    // the hit, so the fearImpact emit must stay gated to Harrow's id.
+    // death_coil is a row-17 choice-row grant, so select it first.
+    const coil = makeSim('warlock', 20);
+    expect(coil.sim.applyTalents({ spec: null, rows: { 17: 'wlk_r17_death_coil' } })).toBe(true);
+    const coilTarget = spawnTarget(coil.sim, coil.p);
+    coil.sim.events.length = 0;
+    runEffects(
+      coil.sim.ctx,
+      coil.p,
+      coil.meta,
+      coilTarget,
+      resolve(coil.sim, 'death_coil', coil.p.id),
+    );
+    expect(coilTarget.auras.some((a: Aura) => a.kind === 'incapacitate')).toBe(true);
+    expect(coil.sim.events.some((ev) => ev.type === 'spellfx' && ev.fx === 'fearImpact')).toBe(
+      false,
+    );
+
+    // The AoE fear shouts emit fearImpact from the separate aoeFear case
+    // (once per creature actually feared), which the Harrow id gate above
+    // must not touch. psychic_scream is a row-8 choice-row grant.
+    const shout = makeSim('priest', 20);
+    expect(shout.sim.applyTalents({ spec: null, rows: { 8: 'pri_r8_psychic_scream' } })).toBe(true);
+    const shoutTarget = spawnTarget(shout.sim, shout.p);
+    shout.sim.events.length = 0;
+    runEffects(
+      shout.sim.ctx,
+      shout.p,
+      shout.meta,
+      shoutTarget,
+      resolve(shout.sim, 'psychic_scream', shout.p.id),
+    );
+    const shoutImpacts = shout.sim.events.filter(
+      (ev) => ev.type === 'spellfx' && ev.fx === 'fearImpact',
+    );
+    expect(shoutImpacts).toHaveLength(1);
+    expect(shoutImpacts[0]).toMatchObject({ targetId: shoutTarget.id, ability: 'psychic_scream' });
+  });
+
+  it('druid rip: dot damage scales with combo points spent (bleed finisher, not flat)', () => {
+    const dotValueAt = (combo: number): number => {
+      const { sim, p, meta } = makeSim('druid', 20);
+      const mob = spawnTarget(sim, p);
+      p.comboPoints = combo;
+      const res = resolve(sim, 'rip', p.id);
+      runEffects(sim.ctx, p, meta, mob, res);
+      const dot = mob.auras.find((a: Aura) => a.kind === 'dot' && a.sourceId === p.id);
+      if (!dot) throw new Error('rip dot did not land');
+      return dot.value;
+    };
+
+    const at1 = dotValueAt(1);
+    const at5 = dotValueAt(5);
+
+    // Rip's content record is { total: 10, perCombo: 10, duration: 12, interval: 2 },
+    // 6 ticks. dotBase(1) = round((10+10*1)/6) = 3, dotBase(5) = round((10+10*5)/6)
+    // = 10, an exact +7 delta (attack-power scaling cancels out of the delta the
+    // same way it does for Rupture above).
+    expect(at5 - at1).toBe(7);
+  });
+
+  it('rupture and rip: the 5-combo-point payload is UNCHANGED from the old flat totals', () => {
+    // The delta pins above lock the SHAPE of the combo scaling but not its
+    // absolute magnitude: a retune of total/perCombo that keeps the same 1-to-5
+    // delta would slip past them. This is the PR's actual behavioral promise
+    // (adding scaling must not change the ability's power at max combo points),
+    // so pin the unmodified content coefficients at 5 combo points to literals.
+    const dotAt5 = (id: 'rupture' | 'rip') => {
+      const eff = ABILITIES[id].effects.find((e) => e.type === 'dot');
+      if (!eff || eff.type !== 'dot') throw new Error(`${id} has no dot effect`);
+      if (eff.perCombo === undefined) throw new Error(`${id} lost its perCombo term`);
+      const total = eff.total + eff.perCombo * 5;
+      return { total, perTick: Math.round(total / (eff.duration / eff.interval)) };
+    };
+
+    // Rupture was a flat 96 over 16 sec at a 2 sec interval (8 ticks) before the
+    // combo term existed; Rip was a flat 60 over 12 sec (6 ticks).
+    expect(dotAt5('rupture')).toEqual({ total: 96, perTick: 12 });
+    expect(dotAt5('rip')).toEqual({ total: 60, perTick: 10 });
+  });
+
+  it('rogue rupture: a melee damage-percent modifier scales BOTH the base total and the perCombo term of the dot', () => {
+    // Regression test for the scaleEffect gap the reviewer found on PR #2447: the
+    // 'dot' case in scaleEffect (src/sim/content/classes.ts) only scaled `total`,
+    // leaving `perCombo` (which carries most of Rupture's damage at high combo
+    // points) almost inert against damage modifiers. Assassination's spec
+    // baseline (src/sim/content/spec_baselines.ts) grants global.meleeDmgPct:
+    // 0.08, a physical-school modifier that must now multiply BOTH total and
+    // perCombo through applyTalentMods -> scaleEffect.
+    const dotValueAt = (combo: number, spec: string | null): number => {
+      const { sim, p, meta } = makeSim('rogue', 20);
+      if (spec) sim.setSpec(spec, p.id);
+      const mob = spawnTarget(sim, p);
+      p.comboPoints = combo;
+      const res = resolve(sim, 'rupture', p.id);
+      runEffects(sim.ctx, p, meta, mob, res);
+      const dot = mob.auras.find((a: Aura) => a.kind === 'dot' && a.sourceId === p.id);
+      if (!dot) throw new Error('rupture dot did not land');
+      return dot.value;
+    };
+
+    const baseAt1 = dotValueAt(1, null);
+    const baseAt5 = dotValueAt(5, null);
+    const modAt1 = dotValueAt(1, 'assassination');
+    const modAt5 = dotValueAt(5, 'assassination');
+
+    // The 5-combo-point payload (where perCombo dominates the total) must be
+    // strictly higher under the +8% melee damage modifier.
+    expect(modAt5).toBeGreaterThan(baseAt5);
+    // The whole payload scales: the delta attributable to perCombo (4 combo
+    // points' worth) must ALSO grow under the modifier, not stay flat. Before
+    // the fix, scaleEffect's 'dot' case scaled only `total`, so this delta
+    // (driven entirely by perCombo) was IDENTICAL with or without meleeDmgPct;
+    // this assertion is the direct regression check for that gap.
+    expect(modAt5 - modAt1).toBeGreaterThan(baseAt5 - baseAt1);
   });
 
   it('paladin consecration: the groundAoE case pushes a ground effect and fires the on-cast pulse', () => {

@@ -27,20 +27,24 @@ import { deedTitleText } from './deed_i18n';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName } from './entity_i18n';
 import { esc } from './esc';
+import { captureFormDraft, restoreFormDraft } from './form_draft';
 import { loadGuildHideOffline, saveGuildHideOffline } from './guild_hide_offline';
 import { formatDateTime, formatNumber, t, tPlural } from './i18n';
 import { localizeZone } from './server_i18n';
 import {
   blockRows,
   friendRows,
+  type GuildDisplayedRole,
   type GuildRow,
   type GuildView,
+  guildDisplayedRole,
   guildRosterItems,
   guildView,
   ignoreRows,
   raidView,
   type SocialTab,
   socialStructSig,
+  tenureTier,
 } from './social_view';
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
 import { tabStripHtml, tabStripModel } from './tab_strip_view';
@@ -120,6 +124,72 @@ function rankLabel(rank: string): string {
       : t('hud.social.ranks.member');
 }
 
+// Displayed-role chip text for a keyed role from the pure core
+// (guildDisplayedRole): the two tenure tiers get their tier labels, every
+// rank role maps through rankLabel, so the core stays i18n-free.
+function roleLabel(role: GuildDisplayedRole): string {
+  if (role === 'recruit') return t('hud.social.tenure.recruit');
+  if (role === 'veteran') return t('hud.social.tenure.veteran');
+  return rankLabel(role);
+}
+
+/** One guild-roster row. A stateless string builder (module-level, exported so
+ *  the render arm is behavior-testable in Node): the caller reads the clock
+ *  once per rebuild and threads it through, so every row in the same rebuild
+ *  resolves its tenure tier against the same instant. */
+export function guildMemberRowHtml(m: GuildRow, now: number): string {
+  // Offline rows carry a "last seen" line: a locale-formatted date/time,
+  // or the localized "never" when no login has been recorded.
+  const lastSeenWhen = m.lastLogin
+    ? formatDateTime(new Date(m.lastLogin), { dateStyle: 'medium', timeStyle: 'short' })
+    : t('hudChrome.social.lastSeenNever');
+  const meta = m.online
+    ? `<span class="zone">${esc(m.zone ? localizeZone(m.zone) : '')}</span><br>${esc(statusLabel(m.status))}`
+    : `${esc(t('hud.social.status.offline'))}<br>${esc(t('hudChrome.social.lastSeen', { when: lastSeenWhen }))}`;
+  // The title sits AFTER the rank chip so the chip stays glued to the
+  // name; the ellipsized .soc-name cell trims the title tail first.
+  const memberTitle = m.activeTitle ? deedTitleText(m.activeTitle) : '';
+  const memberTitleSpan = memberTitle ? `<span class="soc-title">${esc(memberTitle)}</span>` : '';
+  // The ONE role chip per row: officers and the leader show their rank label
+  // (never a tenure label); a regular member shows the tenure tier AS the
+  // role (Recruit under 7 days, Veteran at 30+, Member in between or with an
+  // unknown joinedAt). Always-visible chip text (never hover-only), before
+  // the deed title; display-only (rank, permissions, and sort untouched).
+  // The client clock is fine here (ui code, not sim). Known cosmetic quirk,
+  // by design: the repaint gate keys on socialInfo content, not the clock,
+  // so a member crossing a threshold while the panel sits open keeps the old
+  // label until the next social frame or reopen (a wall-clock driver would
+  // break the cold-window "no repeating driver" contract).
+  // All five role labels share the one .rank chip treatment (user call: the
+  // label alone distinguishes the tiers; no per-tier tint).
+  const role = guildDisplayedRole(m.rank, tenureTier(m.joinedAt, now));
+  const nameInner = `${esc(m.name)}<span class="rank">${esc(roleLabel(role))}</span>${memberTitleSpan}`;
+  const name =
+    m.online && !m.self
+      ? `<button type="button" class="soc-name soc-link" data-whisper="${esc(m.name)}" title="${esc(t('hud.social.whisperTitle', { name: m.name }))}">${nameInner}</button>`
+      : `<span class="soc-name">${nameInner}</span>`;
+  let actions = m.canWhisper
+    ? `<button type="button" class="soc-x" data-whisper="${esc(m.name)}" title="${esc(t('hud.social.whisperTitle', { name: m.name }))}">${svgIcon('whisper')}</button>`
+    : '';
+  if (m.canTransfer)
+    actions += `<button type="button" class="soc-x" data-act="gtransfer" data-name="${esc(m.name)}" title="${esc(t('hud.social.makeGuildMasterTitle', { name: m.name }))}">${svgIcon('crown')}</button>`;
+  if (m.canPromote)
+    actions += `<button type="button" class="soc-x" data-act="promote" data-name="${esc(m.name)}" title="${esc(t('hud.social.promoteTitle', { name: m.name }))}">▲</button>`;
+  if (m.canDemote)
+    actions += `<button type="button" class="soc-x" data-act="demote" data-name="${esc(m.name)}" title="${esc(t('hud.social.demoteTitle', { name: m.name }))}">▼</button>`;
+  if (m.canKick)
+    actions += `<button type="button" class="soc-x" data-act="gkick" data-name="${esc(m.name)}" title="${esc(t('hud.social.removeGuildTitle', { name: m.name }))}">${svgIcon('close')}</button>`;
+  const tip = esc(dotTitle(m.online, m.status, m.zone));
+  return (
+    `<div class="soc-row">` +
+    `<span class="soc-dot ${m.dot === 'off' ? '' : m.dot}" title="${tip}"></span>` +
+    `<span class="soc-id">${name}<span class="soc-sub">${esc(t('hud.social.levelClass', { level: formatNumber(m.level, { maximumFractionDigits: 0 }), className: playerClassDisplayName(m.cls) }))}</span></span>` +
+    `<span class="soc-meta" title="${tip}">${meta}</span>` +
+    (actions ? `<span class="soc-actions">${actions}</span>` : '') +
+    `</div>`
+  );
+}
+
 export class SocialWindow {
   private tab: SocialTab = 'friends';
   // split signatures: structural changes (tab, guild membership, raid roster)
@@ -196,6 +266,39 @@ export class SocialWindow {
         this.refreshList();
       }
     }
+  }
+
+  /**
+   * Re-localize after an in-game language switch (the Hud's woc:languagechange
+   * fan-out). Self-gated on isOpen so the fan-out can call it unconditionally.
+   *
+   * A full render() is what this needs and refreshList() is not a substitute:
+   * the panel title, the five tab labels and the footer's placeholders and
+   * button labels are all emitted by render(), which refreshList never reaches
+   * (it swaps `.soc-body` only). Three things have to survive that rebuild:
+   *   - the half-typed name in the tab's typeahead, emitted with no value;
+   *   - the guild billboard draft. refreshList protects it by reading the live
+   *     input, but render() destroys `.soc-body` BEFORE calling refreshList, so
+   *     by then there is nothing left to read. Capture happens first here.
+   *   - `this.suggest`, which render() strands: it destroys the `.soc-suggest`
+   *     listbox and leaves the field populated, so ArrowDown/Enter would act on
+   *     items no longer on screen. The pending search is dropped with the DOM
+   *     that showed it.
+   *
+   * Both signatures are RE-LATCHED rather than cleared: render() does not touch
+   * them, and clearing would buy a second full rebuild on the next slow tick
+   * that would wipe the draft this just restored.
+   */
+  relocalize(): void {
+    if (!this.isOpen) return;
+    const el = this.deps.root();
+    const draft = captureFormDraft(el);
+    window.clearTimeout(this.suggestTimer);
+    this.suggest = { field: '', items: [], index: -1 };
+    this.render();
+    restoreFormDraft(el, draft);
+    this.lastStruct = this.structSig();
+    this.lastContent = this.contentSig();
   }
 
   private structSig(): string {
@@ -478,11 +581,14 @@ export class SocialWindow {
       `<span class="soc-hide-box" aria-hidden="true"></span>${esc(t('hudChrome.social.hideOffline'))}</button>`;
     // Online-first grouping with per-group count headers; the offline group (header +
     // rows) is suppressed when the toggle is on. Empty groups emit no header.
+    // One clock read per rebuild (loop-invariant), so every row in the same
+    // rebuild resolves its tenure tier against the same instant.
+    const now = Date.now();
     const body = guildRosterItems(g.rows, this.hideOffline)
       .map((item) =>
         item.kind === 'header'
           ? `<div class="soc-group-head">${esc(t(item.group === 'online' ? 'hudChrome.social.onlineHeader' : 'hudChrome.social.offlineHeader', { n: formatNumber(item.count, { maximumFractionDigits: 0 }) }))}</div>`
-          : this.guildMemberRowHtml(item.row),
+          : guildMemberRowHtml(item.row, now),
       )
       .join('');
     return head + this.billboardHtml(g) + toggle + body;
@@ -519,46 +625,6 @@ export class SocialWindow {
       message +
       setBy +
       edit +
-      `</div>`
-    );
-  }
-
-  private guildMemberRowHtml(m: GuildRow): string {
-    // Offline rows carry a "last seen" line: a locale-formatted date/time,
-    // or the localized "never" when no login has been recorded.
-    const lastSeenWhen = m.lastLogin
-      ? formatDateTime(new Date(m.lastLogin), { dateStyle: 'medium', timeStyle: 'short' })
-      : t('hudChrome.social.lastSeenNever');
-    const meta = m.online
-      ? `<span class="zone">${esc(m.zone ? localizeZone(m.zone) : '')}</span><br>${esc(statusLabel(m.status))}`
-      : `${esc(t('hud.social.status.offline'))}<br>${esc(t('hudChrome.social.lastSeen', { when: lastSeenWhen }))}`;
-    // The title sits AFTER the rank chip so the chip stays glued to the
-    // name; the ellipsized .soc-name cell trims the title tail first.
-    const memberTitle = m.activeTitle ? deedTitleText(m.activeTitle) : '';
-    const memberTitleSpan = memberTitle ? `<span class="soc-title">${esc(memberTitle)}</span>` : '';
-    const nameInner = `${esc(m.name)}<span class="rank">${esc(rankLabel(m.rank))}</span>${memberTitleSpan}`;
-    const name =
-      m.online && !m.self
-        ? `<button type="button" class="soc-name soc-link" data-whisper="${esc(m.name)}" title="${esc(t('hud.social.whisperTitle', { name: m.name }))}">${nameInner}</button>`
-        : `<span class="soc-name">${nameInner}</span>`;
-    let actions = m.canWhisper
-      ? `<button type="button" class="soc-x" data-whisper="${esc(m.name)}" title="${esc(t('hud.social.whisperTitle', { name: m.name }))}">${svgIcon('whisper')}</button>`
-      : '';
-    if (m.canTransfer)
-      actions += `<button type="button" class="soc-x" data-act="gtransfer" data-name="${esc(m.name)}" title="${esc(t('hud.social.makeGuildMasterTitle', { name: m.name }))}">${svgIcon('crown')}</button>`;
-    if (m.canPromote)
-      actions += `<button type="button" class="soc-x" data-act="promote" data-name="${esc(m.name)}" title="${esc(t('hud.social.promoteTitle', { name: m.name }))}">▲</button>`;
-    if (m.canDemote)
-      actions += `<button type="button" class="soc-x" data-act="demote" data-name="${esc(m.name)}" title="${esc(t('hud.social.demoteTitle', { name: m.name }))}">▼</button>`;
-    if (m.canKick)
-      actions += `<button type="button" class="soc-x" data-act="gkick" data-name="${esc(m.name)}" title="${esc(t('hud.social.removeGuildTitle', { name: m.name }))}">${svgIcon('close')}</button>`;
-    const tip = esc(dotTitle(m.online, m.status, m.zone));
-    return (
-      `<div class="soc-row">` +
-      `<span class="soc-dot ${m.dot === 'off' ? '' : m.dot}" title="${tip}"></span>` +
-      `<span class="soc-id">${name}<span class="soc-sub">${esc(t('hud.social.levelClass', { level: formatNumber(m.level, { maximumFractionDigits: 0 }), className: playerClassDisplayName(m.cls) }))}</span></span>` +
-      `<span class="soc-meta" title="${tip}">${meta}</span>` +
-      (actions ? `<span class="soc-actions">${actions}</span>` : '') +
       `</div>`
     );
   }

@@ -255,7 +255,11 @@ export class FiestaController {
         `<span class="fa-cat cat-${category}">${esc(t(`fiesta.category.${category}` as TranslationKey))}</span>`;
       card.setAttribute(
         'aria-label',
-        `${this.augmentName(id)} (${t(`fiesta.category.${category}` as TranslationKey)}) - ${this.augmentDescription(id)}`,
+        t('fiesta.augment.cardAria', {
+          name: this.augmentName(id),
+          category: t(`fiesta.category.${category}` as TranslationKey),
+          description: this.augmentDescription(id),
+        }),
       );
       card.addEventListener('click', () => {
         this.deps.audio.click();

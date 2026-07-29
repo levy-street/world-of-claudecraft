@@ -22,6 +22,7 @@ import { queueGatheringGrant } from '../src/sim/professions/gathering';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import { FISHING_CAST_ID, type SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
+import { runCraft } from './helpers/enchant_family_cast';
 
 const PLAYTHROUGH_SEED = 4242;
 const PAIR = 'weaponcrafting+armorcrafting';
@@ -32,7 +33,12 @@ const KOI = 'glimmerfin_koi';
 const sim = new Sim({ seed: PLAYTHROUGH_SEED, playerClass: 'warrior', autoEquip: true });
 const pid = sim.playerId;
 const meta = sim.players.get(pid) as PlayerMeta;
-const player = sim.entities.get(pid)!;
+function requirePlayer() {
+  const entity = sim.entities.get(pid);
+  if (!entity) throw new Error('playthrough player entity missing');
+  return entity;
+}
+const player = requirePlayer();
 
 function deedEvents(evs: SimEvent[]): Extract<SimEvent, { type: 'deedUnlocked' }>[] {
   return evs.filter((ev): ev is Extract<SimEvent, { type: 'deedUnlocked' }> => {
@@ -66,7 +72,7 @@ function purgeItem(itemId: string): void {
 // The marquee bar, mirrored from server/deeds_records.ts isMarqueeDeed (kept
 // inline so this suite stays sim-pure: importing the server module drags the
 // db pool into the graph; the REAL predicate agreeing with these inputs is
-// pinned in tests/deed_records.test.ts, profession exemplar included).
+// pinned in tests/deed_records_table.test.ts, profession exemplar included).
 function marqueeBar(deedId: string): boolean {
   const def = DEEDS[deedId];
   return def.renown >= 25 || def.reward !== undefined;
@@ -81,7 +87,7 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // The vestments recipe gained cloth and thread volume.
     sim.addItem('homespun_cloth', 3, pid);
     sim.addItem('spool_of_thread', 5, pid);
-    sim.craftItem(VESTMENTS_RECIPE, false, pid);
+    runCraft(sim, VESTMENTS_RECIPE, false, pid);
     expect(sim.lastCraftResult?.ok).toBe(true);
     // Hunted precondition of the whole run: seed 4242's FIRST craft does not
     // masterwork-proc (base 3 percent), so the Masterwright beat below stays
@@ -150,26 +156,21 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     sim.gainCraftSkill(pid, 'tailoring', 125 - meta.craftSkills.tailoring);
     let procAt = -1;
     for (let i = 0; i < 120 && procAt < 0; i++) {
-      // Session-only pacing state, reset per attempt so the hunt spends rng
-      // draws only through the ONE proc roll per successful craft (the shared
-      // action throttle would otherwise deny, which draws nothing and would
-      // stall the hunt).
-      meta.craftThrottle.count = 0;
       sim.addItemInstance('linen_scrap', { signer: meta.name }, pid);
       sim.addItem('linen_scrap', 1, pid);
       sim.addItem('spider_leg', 1, pid);
       sim.addItem('homespun_cloth', 3, pid);
       sim.addItem('spool_of_thread', 5, pid);
-      sim.craftItem(VESTMENTS_RECIPE, false, pid);
+      runCraft(sim, VESTMENTS_RECIPE, false, pid);
       if (!sim.lastCraftResult?.ok)
         throw new Error(`craft ${i} denied: ${sim.lastCraftResult?.reason}`);
       if (sim.lastCraftResult.masterwork === true) procAt = i;
       else purgeItem('eastbrook_ritual_vestments'); // keep the bags clear between attempts
     }
     // Hunted literal (seed 4242, this exact beat order, re-recorded after the
-    // Eastbrook camp respacing thinned the zone-1 camp counts, which shifts every
-    // world-gen draw downstream): the proc lands on attempt index 3.
-    expect(procAt).toBe(3);
+    // craft-cast system landed: craft start/complete split shifts shared-stream
+    // draws vs the instant-craft era): the proc lands on attempt index 7.
+    expect(procAt).toBe(7);
     expect(meta.deedStats.counters.masterworksCrafted).toBe(1);
     const evs = sim.tick();
     const ev = deedEvents(evs).find((e) => e.deedId === 'prog_masterwright');
@@ -259,15 +260,22 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false);
   });
 
-  // 90s budget: the re-hunted koi session sits at index 26 in the shared
+  // 90s budget: the re-hunted koi session sits at index 16 in the shared
   // stream, and every session ticks the REAL world to its bite.
   // Raised timeout (the climb_slope idiom): this beat drives thousands of
-  // REAL world ticks (27 bite-and-reel sessions plus bounded combat waits),
+  // REAL world ticks (17 bite-and-reel sessions plus bounded combat waits),
   // which overruns the 5s default under CI/core contention; every loop is
   // guard-bounded, so a genuine hang still terminates into a failed pin.
   it('beat 11: the koi lands through the REAL bite-and-reel loop and the deed fires on the catch', {
     timeout: 90_000,
   }, () => {
+    // The rare catch is a skill-scaled row now (content/items.ts): its weight
+    // is 1 in a hundred at band 0 and 6 at band 2. This angler is already at
+    // fishing's cap (beat 9) but has been fishing on the starter pole, which
+    // holds the effective band at 0 through the silent rod cap. The top rod is
+    // what lets the band they earned actually pay, which is the whole point of
+    // the row, so the hunt runs with it in the bags.
+    sim.addItem('silverstream_fishing_rod', 1, pid);
     let koiSession = -1;
     let sawBiteOnKoiSession = false;
     for (let s = 0; s < 120 && koiSession < 0; s++) {
@@ -295,12 +303,10 @@ describe('scripted playthrough (one sim, live sites only)', () => {
         sawBiteOnKoiSession = bit;
       }
     }
-    // Hunted literal (seed 4242, after every beat above, re-recorded after the
-    // Eastbrook camp respacing merged into this branch, which thins the zone-1
-    // camp counts and shifts every world-gen draw downstream, so neither
-    // parent's recording holds): the expanded campaign world's live tick
-    // stream lands the koi on session index 69.
-    expect(koiSession).toBe(69);
+    // Hunted literal (seed 4242, after every beat above), re-recorded with the
+    // craft-cast system: shared-stream draws shift vs the instant-craft era.
+    // The merged world lands the koi on session index 20.
+    expect(koiSession).toBe(20);
     expect(sawBiteOnKoiSession).toBe(true); // the celebration follows the bite moment
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false); // grant sweeps at the tick tail
     const evs = sim.tick();
@@ -313,10 +319,11 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // Bank the run's loot: the hunts need free bags for the x5 windfalls, and
     // no later beat reads the inventory. Pure state cleanup, zero draws.
     meta.inventory.length = 0;
-    // Hunted literals (seed 4242, after every beat above, re-recorded after the
-    // Eastbrook camp respacing merged into this branch, which shifts every
-    // world-gen draw downstream): the harvest index where each flavor's 1-in-90
-    // event fires under the shared stream.
+    // Hunted literals (seed 4242, after every beat above, re-recorded after
+    // the zones 1-3 quest-dedupe content pass: its added camps, mobs, and
+    // items move every shared-stream draw downstream, the same cause as that
+    // pass's parity scenario re-hunt): the harvest index where each flavor's
+    // 1-in-90 event fires under the shared stream.
     // #2343: each hunt's harvest needs its profession's tool in bags. The
     // tier-1 tools ride the whole beat (purgeItem never touches them) and
     // addItem draws no rng, so the hunted hitAt literals hold.
@@ -326,18 +333,18 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // Hunted literals (seed 4242, after every beat above): the harvest index
     // where each flavor's 1-in-90 event fires under the shared stream.
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
-      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 87 },
+      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 128 },
       {
         nodeId: 'wood_eastbrook_1',
         deedId: 'col_ancient_heartwood',
         itemId: 'ironbark_log',
-        hitAt: 175,
+        hitAt: 116,
       },
       {
         nodeId: 'herb_eastbrook_1',
         deedId: 'col_moonlit_bloom',
         itemId: 'silverleaf_herb',
-        hitAt: 177,
+        hitAt: 4,
       },
     ];
     const hitIndices: number[] = [];
@@ -353,7 +360,8 @@ describe('scripted playthrough (one sim, live sites only)', () => {
         // (the gather_rare_events.test.ts hunt idiom).
         purgeItem(hunt.itemId);
         delete meta.nodeHarvestReadyAt[hunt.nodeId];
-        if (!sim.harvestNode(hunt.nodeId, pid)) throw new Error(`${hunt.nodeId} cast denied`);
+        if (!sim.harvestNode(hunt.nodeId, undefined, pid))
+          throw new Error(`${hunt.nodeId} cast denied`);
         player.castingAbility = null;
         player.castRemaining = 0;
         sim.ctx.completeGatherCast(player, meta);
@@ -396,17 +404,127 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       sim.harvestCorpse(mob.id, ['hide'], pid);
       if (sim.countItem('pristine_hide', pid) > 0) hitAt = i;
     }
-    // Hunted literal (seed 4242, after every beat above, re-recorded after the
-    // Eastbrook camp respacing and expanded campaign world merged into this
-    // branch): the rare-or-better rarity roll that mints the signed specimen
-    // lands on attempt index 5 after the three live rare-node hunts above.
-    expect(hitAt).toBe(5);
+    // Hunted literal (seed 4242, after every beat above), re-recorded with the
+    // craft-cast system: the rare-or-better rarity roll that mints the signed
+    // specimen lands on attempt index 8.
+    expect(hitAt).toBe(8);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     expect(specimen?.instance?.signer).toBe(meta.name);
     expect(meta.deedStats.visited.has('gather_event:perfect_specimen')).toBe(true);
     sim.tick();
     expect(meta.deedsEarned.has('col_perfect_specimen')).toBe(true);
     sim.entities.delete(mob.id);
+  });
+
+  // Basic universal profession deeds (issue #2055): one rare-or-better craft
+  // per craft on the ring lands that craft's milestone. Output quality is a
+  // static fact of the recipe's result def (the Professions 2.0 output roll
+  // is retired), so every craft below succeeds on the first attempt: no
+  // hunt needed, unlike the masterwork proc beat. Four recipes are
+  // grandfathered (TOOL_RECIPES/CASTER_HUB_RECIPES, no acquisition list):
+  // materials and station presence alone unlock them. The other three ship
+  // only trainer-taught rare recipes, so this beat trains each for real
+  // through sim.trainRecipe before crafting it; the copper grant and the
+  // direct craft-skill bumps are preconditions only (exactly the beats-3-to-5
+  // idiom above), never the deed's own trigger.
+  it('beat 16: every craft with a rare-tier recipe lands its per-craft rare-tier milestone', () => {
+    const rareDeedIds = [
+      'prog_engineering_rare',
+      'prog_alchemy_rare',
+      'prog_cooking_rare',
+      'prog_leatherworking_rare',
+      'prog_tailoring_rare',
+      'prog_weaponcrafting_rare',
+      'prog_armorcrafting_rare',
+    ];
+    for (const id of rareDeedIds) expect(meta.deedsEarned.has(id), id).toBe(false);
+    // Free the bags: the earlier gather/fishing/harvest beats leave a full
+    // hold, and this beat needs room for seven crafted outputs plus reagents.
+    meta.inventory.length = 0;
+
+    moveToNpc('tinker_gizzel'); // engineering: station_eastbrook_toolworks
+    sim.addItem('fine_iron_ore', 4, pid);
+    sim.addItem('mithril_mining_pick', 1, pid);
+    runCraft(sim, 'recipe_thorium_mining_pick', false, pid);
+    expect(sim.lastCraftResult?.ok, 'engineering craft').toBe(true);
+    expect(sim.lastCraftResult?.quality, 'engineering craft').toBe('rare');
+
+    moveToNpc('weaver_ottilie'); // tailoring: station_eastbrook_loom
+    sim.addItem('sunpetal_herb', 2, pid);
+    sim.addItem('goldleaf_herb', 2, pid);
+    sim.addItem('pristine_silk', 2, pid);
+    sim.addItem('spider_silk', 4, pid);
+    sim.addItem('spool_of_thread', 2, pid);
+    runCraft(sim, 'recipe_wardweave_cowl', false, pid);
+    expect(sim.lastCraftResult?.ok, 'tailoring craft').toBe(true);
+    expect(sim.lastCraftResult?.quality, 'tailoring craft').toBe('rare');
+
+    moveToNpc('tanner_hesk'); // leatherworking: station_fenbridge_tannery
+    sim.addItem('thorium_ore', 6, pid);
+    sim.addItem('pristine_hide', 3, pid);
+    sim.addItem('rough_hide', 2, pid);
+    sim.addItem('tanning_agent', 1, pid);
+    runCraft(sim, 'recipe_duskhide_wraps', false, pid);
+    expect(sim.lastCraftResult?.ok, 'leatherworking craft').toBe(true);
+    expect(sim.lastCraftResult?.quality, 'leatherworking craft').toBe('rare');
+
+    moveToNpc(SMITH_MASTER); // armorcrafting: station_eastbrook_forge
+    sim.addItem('thorium_ore', 7, pid);
+    sim.addItem('smithing_flux', 5, pid);
+    runCraft(sim, 'recipe_sootscale_mantle', false, pid);
+    expect(sim.lastCraftResult?.ok, 'armorcrafting craft').toBe(true);
+    expect(sim.lastCraftResult?.quality, 'armorcrafting craft').toBe('rare');
+
+    // The remaining three crafts ship only trainer-taught rare recipes
+    // (skillReq 50, so teachTierMet needs tier 2). A flat copper grant funds
+    // every training fee (a pure gold-sink precondition; trainRecipe itself
+    // still charges it for real).
+    meta.copper += 100000;
+
+    sim.gainCraftSkill(pid, 'weaponcrafting', 50);
+    moveToNpc(SMITH_MASTER); // weaponcrafting is also taught at the forge
+    sim.trainRecipe('recipe_thorium_warblade', pid);
+    expect(meta.lastTrainResult?.ok, 'weaponcrafting train').toBe(true);
+    sim.addItem('thorium_ore', 4, pid);
+    sim.addItem('iron_ore', 2, pid);
+    sim.addItem('smithing_flux', 2, pid);
+    runCraft(sim, 'recipe_thorium_warblade', false, pid);
+    expect(sim.lastCraftResult?.ok, 'weaponcrafting craft').toBe(true);
+    expect(sim.lastCraftResult?.quality, 'weaponcrafting craft').toBe('rare');
+
+    sim.gainCraftSkill(pid, 'cooking', 50);
+    moveToNpc('cook_marlow'); // cooking: station_eastbrook_kitchens
+    sim.trainRecipe('recipe_silvered_carp_supper', pid);
+    expect(meta.lastTrainResult?.ok, 'cooking train').toBe(true);
+    sim.addItem('raw_stonescale_carp', 3, pid);
+    sim.addItem('raw_mirror_trout', 1, pid);
+    sim.addItem('goldleaf_herb', 1, pid);
+    sim.addItem('cooking_salt', 1, pid);
+    runCraft(sim, 'recipe_silvered_carp_supper', false, pid);
+    expect(sim.lastCraftResult?.ok, 'cooking craft').toBe(true);
+    expect(sim.lastCraftResult?.quality, 'cooking craft').toBe('rare');
+
+    sim.gainCraftSkill(pid, 'alchemy', 50);
+    moveToNpc('alchemist_verane'); // alchemy: station_highwatch_apothecary
+    sim.trainRecipe('recipe_sunpetal_mana_draught', pid);
+    expect(meta.lastTrainResult?.ok, 'alchemy train').toBe(true);
+    sim.addItem('sunpetal_herb', 2, pid);
+    sim.addItem('goldleaf_herb', 1, pid);
+    sim.addItem('glass_vial', 1, pid);
+    runCraft(sim, 'recipe_sunpetal_mana_draught', false, pid);
+    expect(sim.lastCraftResult?.ok, 'alchemy craft').toBe(true);
+    expect(sim.lastCraftResult?.quality, 'alchemy craft').toBe('rare');
+
+    // Every mark sweeps at the tick tail, all seven in one grant pass.
+    for (const id of rareDeedIds) expect(meta.deedsEarned.has(id), id).toBe(false);
+    const evs = sim.tick();
+    const firedIds = deedEvents(evs).map((ev) => ev.deedId);
+    for (const id of rareDeedIds) {
+      expect(firedIds, id).toContain(id);
+      expect(meta.deedsEarned.has(id), id).toBe(true);
+      expect(DEEDS[id].renown, id).toBe(10);
+      expect(DEEDS[id].reward, id).toBeUndefined();
+    }
   });
 
   it('epilogue: the whole playthrough earned every beat deed exactly once', () => {
@@ -425,6 +543,13 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       'col_ancient_heartwood',
       'col_moonlit_bloom',
       'col_perfect_specimen',
+      'prog_engineering_rare',
+      'prog_alchemy_rare',
+      'prog_cooking_rare',
+      'prog_leatherworking_rare',
+      'prog_tailoring_rare',
+      'prog_weaponcrafting_rare',
+      'prog_armorcrafting_rare',
     ];
     for (const id of earned) expect(meta.deedsEarned.has(id), id).toBe(true);
     // deedsEarned is a Map, so "exactly once" is structural; the renown total

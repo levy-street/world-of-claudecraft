@@ -4,83 +4,83 @@
 
 export const BAKED_MAP_BG = {
   seed: 20061,
-  plateWidth: 480,
+  pxPerYd: 1.3333333333333333,
   hashRows: 16,
   zones: {
   "eastbrook_vale": {
     "w": 480,
     "h": 480,
-    "rowHash": "c682c90f"
+    "rowHash": "5348677c"
   },
   "mirefen_marsh": {
     "w": 480,
     "h": 480,
-    "rowHash": "01b48fa8"
+    "rowHash": "0576b60c"
   },
   "thornpeak_heights": {
     "w": 480,
     "h": 480,
-    "rowHash": "4b6ba10a"
+    "rowHash": "64f3ed37"
   },
   "veiled_hollow": {
-    "w": 480,
+    "w": 720,
     "h": 720,
-    "rowHash": "5b1dad40"
+    "rowHash": "5f01ee31"
   },
   "drakelands": {
-    "w": 480,
+    "w": 640,
     "h": 800,
-    "rowHash": "d7912be5"
+    "rowHash": "0296af91"
   },
   "frostveil": {
-    "w": 480,
+    "w": 693,
     "h": 693,
-    "rowHash": "435eb65f"
+    "rowHash": "b7e55216"
   },
   "amberfall": {
-    "w": 480,
-    "h": 747,
-    "rowHash": "f54a6cc1"
+    "w": 613,
+    "h": 746,
+    "rowHash": "4c562364"
   },
   "willowfen": {
-    "w": 480,
-    "h": 693,
-    "rowHash": "4dcd71c9"
+    "w": 587,
+    "h": 694,
+    "rowHash": "b497d16e"
   },
   "nightbloom": {
-    "w": 480,
-    "h": 747,
-    "rowHash": "b328f747"
+    "w": 613,
+    "h": 746,
+    "rowHash": "624a4c22"
   },
   "wraithwood": {
-    "w": 480,
-    "h": 747,
-    "rowHash": "b9f90873"
+    "w": 613,
+    "h": 746,
+    "rowHash": "fe751ecf"
   },
   "palmreach": {
-    "w": 480,
-    "h": 747,
-    "rowHash": "1a091822"
+    "w": 613,
+    "h": 746,
+    "rowHash": "227a8eb0"
   },
   "evergarden": {
-    "w": 480,
-    "h": 747,
-    "rowHash": "17a11c04"
+    "w": 613,
+    "h": 746,
+    "rowHash": "dd3f0bb5"
   },
   "galecrest": {
-    "w": 480,
-    "h": 693,
-    "rowHash": "e619e8e5"
+    "w": 587,
+    "h": 694,
+    "rowHash": "9e0f3e3c"
   },
   "farshore_isle": {
     "w": 480,
-    "h": 432,
-    "rowHash": "27bae3a0"
+    "h": 480,
+    "rowHash": "f593fe3c"
   },
   "world_strip": {
     "w": 140,
-    "h": 203,
-    "rowHash": "e9566f6a"
+    "h": 337,
+    "rowHash": "5444352a"
   }
 },
 } as const;

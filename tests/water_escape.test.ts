@@ -73,6 +73,8 @@ const mi = (over: Partial<MoveInput> = {}): MoveInput => ({
   strafeLeft: false,
   strafeRight: false,
   jump: false,
+  dive: false,
+  surface: false,
   ...over,
 });
 

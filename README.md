@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.31.0-blue)](package.json)
+[![Version](https://img.shields.io/badge/version-0.35.1-blue)](package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -60,14 +60,13 @@ Same seed, same world, everywhere. Much of what you see is still drawn from code
 
 ## Screenshots
 
-![The Eastbrook town square, campfire and questgivers](docs/screenshots/party-questing.jpg)
+![A mounted guild muster on the road to the Riftfields](docs/screenshots/guild-muster-mounted.jpg)
 
 | | |
 |:---:|:---:|
-| ![Dusk at the Eastbrook campfire](docs/screenshots/eastbrook-dusk.jpg)<br>*Dusk at the Eastbrook campfire* | ![Elite pulls in the Hollow Crypt](docs/screenshots/hollow-crypt.jpg)<br>*Torch-lit elite pulls in the Hollow Crypt* |
-| ![The restless dead at the ruined chapel](docs/screenshots/restless-dead.jpg)<br>*The restless dead at the ruined chapel* | ![A brawl with Vale Bandits](docs/screenshots/vale-bandits.jpg)<br>*Outnumbered at the bandit camp* |
-| ![Old Greyjaw hunted down on the north road](docs/screenshots/old-greyjaw.jpg)<br>*Old Greyjaw, the rare spawn, run down on the north road* | ![Vendor and bags UI](docs/screenshots/vendor-and-bags.jpg)<br>*Gearing up at Trader Wilkes's, with the vendor and bags open* |
-| ![The moongate on the Glimmermere shore](docs/screenshots/glimmermere-moongate.jpg)<br>*The drowned climb out at the Glimmermere moongate* | ![Ysolei on the altar of the Drowned Temple](docs/screenshots/drowned-temple-altar.jpg)<br>*Lunar Tempest and the altar of the Drowned Temple* |
+| ![Night over a lantern-lit village in Mirefen Marsh](docs/screenshots/mirefen-marsh-night.jpg)<br>*Lantern-light in Mirefen Marsh at night* | ![Spellfire erupts in a torch-lit dungeon hall](docs/screenshots/dungeon-spellfire.jpg)<br>*A dungeon pull goes loud under the green torches* |
+| ![Players crowd together in the snowfall on the live world](docs/screenshots/live-world-crowd.jpg)<br>*A crowded hour on the live world* | ![Riding the Amberfall road under golden trees](docs/screenshots/amberfall-road.jpg)<br>*Every leaf burns gold on the Amberfall road* |
+| ![Rift warnings fill the chat on the night road through the Palmreach](docs/screenshots/palmreach-rift-warnings.jpg)<br>*Rift warnings roll in on the Palmreach road* | ![Rolling into a snowed-in village in the Frostveil Reach](docs/screenshots/frostveil-reach-village.jpg)<br>*Snowbound lamplight in the Frostveil Reach* |
 
 Weather is biome-driven and render-only, so it never touches the deterministic sim:
 
@@ -88,11 +87,13 @@ Create an account, create a character, and enter the live world. To run that sam
 Offline mode is a local single-player world with no account and no server authority, so it ships in development builds only. Run the dev server and it appears in the mode picker:
 
 ```bash
-npm install
-npm run dev        # then open http://localhost:5173 and choose Play Offline
+# once per machine (match package.json packageManager; Corepack not required)
+npm install -g pnpm@10.34.5
+pnpm install --frozen-lockfile
+pnpm run dev       # then open http://localhost:5173 and choose Play Offline
 ```
 
-Name your character, pick any of the nine classes, and you start in **Eastbrook Vale** (levels 1-7), a market town ringed by hubs: wolf runs to the north, boar meadows east, the Sableweb woods west, Mirror Lake northwest, a burrower-ridden copper dig southwest, and a ruined chapel of restless dead northeast, with Gorrak's bandit camp to the southeast. The north road climbs a mountain pass into **Mirefen Marsh** (6-13, hub Fenbridge) and on up to **Thornpeak Heights** (13-20, hub Highwatch). The world seed is fixed in `src/main.ts`, so it is the same place every visit.
+Name your character, pick any of the nine classes, and you start in **Eastbrook Vale** (levels 1-7), a market town ringed by hubs: wolf runs to the north, boar meadows east, the Sableweb woods west, Mirror Lake northwest, a burrower-ridden copper dig southwest, and a ruined chapel of restless dead northeast, with Gorrak's bandit camp to the southeast. The north road climbs a mountain pass into **Mirefen Marsh** (6-13, hub Fenbridge) and on up to **Thornpeak Heights** (13-20, hub Highwatch). The world seed is fixed in `src/sim/world_seed.ts`, so it is the same place every visit.
 
 ### Desktop apps for Windows, Linux, and macOS
 
@@ -129,12 +130,13 @@ For **remote hosting**, put the compose stack on any VPS, set a real `POSTGRES_P
 ### Develop online with hot reload
 
 ```bash
-npm install
+npm install -g pnpm@10.34.5   # once per machine; match package.json packageManager
+pnpm install --frozen-lockfile
 cp .env.example .env
 # set POSTGRES_PASSWORD and point DATABASE_URL at the same password
-npm run db:up        # postgres 16 in docker (port 5433, volume-persisted)
-npm run server       # authoritative game server on :8787 (REST + WebSocket)
-npm run dev          # client dev server on :5173 (proxies /api, /admin/api, and /ws)
+pnpm run db:up       # postgres 16 in docker (port 5433, volume-persisted)
+pnpm run server      # authoritative game server on :8787 (REST + WebSocket)
+pnpm run dev         # client dev server on :5173 (proxies /api, /admin/api, and /ws)
 ```
 
 Open http://localhost:5173, choose **Play Online**, create an account, create a character, and Enter World. The character-select screen shows the latest release news in its News & Updates panel, with NEW badges for anything you have not seen. Open a second tab and log in again to see each other in town. `Enter` opens chat. The player wiki is the in-repo Guide, served at http://localhost:5173/wiki and at `/wiki` in production; its content is generated from current game data by `npm run wiki:content`.
@@ -238,6 +240,15 @@ Press `G` or the arena button to queue. Matchmaking teleports fighters into a pr
 
 Ranked wins and Fiesta takedowns pay **Honor**, which the quartermaster in town trades for a set of Warfare gear. Warfare is a PvP-only stat, so the set wins duels without ever out-gearing same-tier dungeon loot in PvE.
 
+### Thornhollow Fields (5v5 capture the flag)
+
+Press `G` to open the PvP window (Thornhollow Fields is its primary tab, beside the 1v1 and 2v2 arena brackets) and Enter the Queue, solo or with a party of up to five (parties stay together; solos fill the rest). Two teams of five fight over a walled, open-air field with a keep at each end: steal the enemy banner with a deliberate press of the battleground action key and run it to your own stand. First to 3 captures wins inside a 12-minute cap.
+
+- **Team wave respawns** (no graveyard run): each team's fallen rise together on a staggered wave clock at their keep, briefly spawn-protected until they act.
+- **Anti-turtle carrier fatigue**: hold the enemy flag too long and you take ever-increasing damage until it is captured, dropped, or returned. The flag also refuses to hide: grabbing it breaks stealth, and a carrier who turns invisible drops it on the spot.
+- **Three chambers, contested crossings**: two full-width curtain walls carve the field into each team's own field chamber and the walled Ruin Courtyard between them; every move between chambers passes the wide main gate or the gatehouse room with its offset doors. Each keep is sealed except its mouth, a low barricade breaks the straight charge into it, and **Sprint Runes** wait at the flag approaches and flanks. The whole map is point-symmetric, so neither team is favored.
+- A persistent per-character **battleground rating** (Elo over team averages, base 1500) with an all-time leaderboard (`GET /api/battleground/leaderboard`), and Honor for played-out wins and losses.
+
 ### Playing together
 
 - **Dungeon Finder**: open it with `Shift+I` to browse dungeons and raids, inspect bosses and loot, join an automatic tank/healer/DPS role queue, or create a premade listing. Finder-made groups still travel to the entrance together.
@@ -280,7 +291,7 @@ Ranked wins and Fiesta takedowns pay **Honor**, which the quartermaster in town 
 | `Z` / `X` | sheath or draw your weapons, emote wheel |
 | `V` / `R` / `Esc` | nameplates, autorun, close the top window (or open the game menu) |
 
-Every binding is remappable in the keybinds panel. Touch controls (a movement stick, camera drag, and on-screen action buttons) come up automatically on mobile.
+Every binding is remappable in the keybinds panel, and mouse buttons bind like keys: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world. Touch controls (a movement stick, camera drag, and on-screen action buttons) come up automatically on mobile.
 
 ## Architecture (one sim, three hosts)
 
@@ -344,7 +355,7 @@ Every FFmpeg path the gate and the audio tests exercise resolves the bundled
 `ffmpeg-static`/`ffprobe-static` npm packages, so a normal contribution needs no system
 FFmpeg install. The conformance-measuring paths (`npm run sfx:check`, the audio tests, the
 Studio's export validation) bind to the static binaries directly, with no `PATH` fallback:
-rerun `npm ci` if a scripts-skipped install left them missing. The Studio's playback and
+rerun `pnpm install --frozen-lockfile` if a scripts-skipped install left them missing. The Studio's playback and
 encode spawns and the `npm run gate` preflight resolve via `scripts/sfx/ffmpeg_paths.mjs`,
 which does fall back to `PATH`. Some standalone audio generator scripts (for example
 `scripts/gen_ui_sfx.mjs`) still default to `PATH` `ffmpeg`.
@@ -361,6 +372,7 @@ node scripts/tour_temple.mjs    # screenshot tour of the Glimmermere and Drowned
 node scripts/mp_integration.mjs # API, WS, and persistence checks (server running)
 node scripts/social_e2e.mjs     # trade and duel over the wire (ALLOW_DEV_COMMANDS=1)
 node scripts/arena_visual.mjs   # two clients queue and fight a ranked 1v1
+node scripts/squad_visual.mjs   # several clients queue and play Thornhollow Fields 5v5 CTF (ALLOW_DEV_COMMANDS=1)
 node scripts/crypt_raid.mjs     # five bots clear the Hollow Crypt (ALLOW_DEV_COMMANDS=1)
 ```
 

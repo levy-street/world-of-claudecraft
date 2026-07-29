@@ -6,7 +6,7 @@ import {
   resolvePosition,
 } from '../src/sim/colliders';
 import { PROPS } from '../src/sim/data';
-import { EASTBROOK_BUILDINGS_BY_ID, EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
+import { EASTBROOK_BUILDINGS_BY_ID } from '../src/sim/eastbrook_layout';
 import {
   findPath,
   findPlayerPath,
@@ -16,15 +16,19 @@ import {
 import { Sim } from '../src/sim/sim';
 import { groundHeight, WATER_LEVEL } from '../src/sim/world';
 
-const TEST_FENCE_PLACEMENT = EASTBROOK_LAYOUT.fences.find(
-  (fence) => fence.id === 'eastbrook_fence_market_outer',
+// Highwatch paddock west run: an isolated, open-field fence with room to detour
+// on both sides, used to exercise generic fence-blocking / fence-jump pathfinding
+// (not Eastbrook or Fenbridge-specific). The old (-18,313) pin was a removed
+// Fenbridge legacy fence that no longer ships.
+const TEST_FENCE_PLACEMENT = PROPS.fences.find(
+  (fence) => fence.x1 === -14 && fence.z1 === 649 && fence.x2 === -4 && fence.z2 === 647,
 );
-if (!TEST_FENCE_PLACEMENT) throw new Error('missing Eastbrook market-edge fence');
+if (!TEST_FENCE_PLACEMENT) throw new Error('missing Highwatch paddock west fence');
 const TEST_FENCE = {
-  x1: TEST_FENCE_PLACEMENT.start.x,
-  z1: TEST_FENCE_PLACEMENT.start.z,
-  x2: TEST_FENCE_PLACEMENT.end.x,
-  z2: TEST_FENCE_PLACEMENT.end.z,
+  x1: TEST_FENCE_PLACEMENT.x1,
+  z1: TEST_FENCE_PLACEMENT.z1,
+  x2: TEST_FENCE_PLACEMENT.x2,
+  z2: TEST_FENCE_PLACEMENT.z2,
 } as const;
 
 function acrossFence(distance: number): {

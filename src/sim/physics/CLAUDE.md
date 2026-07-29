@@ -54,6 +54,16 @@ general 3D solver and exact rather than approximate for this content.
   `MANTLE_REACH` lift only when airborne over a standable top, mirroring
   `colliders.ts` `passesOver`, so a jump that falls just short of a rim still
   carries over. Grounded climbing goes through `steppableAt` alone.
+- **One allowance, read by both halves of the tick.** `MANTLE_REACH`
+  (`colliders.ts`) is the SINGLE number the horizontal gates (`blocksAt` here,
+  `passesOver` there) and the vertical support query (`floorHeightAt`'s `maxY`
+  in `player_motion.ts`) both read, and it is pinned equal to
+  `MAX_STEP_HEIGHT`. Never raise one arm alone: a top the horizontal pass
+  admits but the landing snap will not seat is a top the body tunnels into,
+  landing on the terrain INSIDE the prop and getting ejected sideways by
+  depenetration on the next grounded tick. The equality with `MAX_STEP_HEIGHT`
+  (and so with `LEDGE_GRAB_MIN`) is what keeps the ladder in `ledge.ts`
+  gapless, and is pinned by `tests/physics_character.test.ts`.
 - **Every step-up is headroom-gated** (`isClear`): climbing must never push a
   body into a wall.
 - **The solver runs the open world; interiors share its traversal queries.**

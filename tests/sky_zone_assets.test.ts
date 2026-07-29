@@ -42,4 +42,20 @@ describe('zone-scoped sky assets', () => {
     expect(loadHdr).toHaveBeenCalledTimes(2);
     expect(loadTexture).not.toHaveBeenCalled();
   });
+
+  it('renders the shipping HDRI dome after opaques at far depth', async () => {
+    const { buildSky, ensureSkyBiomeAssets, skyBiomesAt, SKY_BACKGROUND_RENDER_ORDER } =
+      await import('../src/render/sky');
+    await ensureSkyBiomeAssets(skyBiomesAt(0, 0));
+
+    const sky = buildSky(false, new THREE.Vector3(90, 140, 50));
+    const material = sky.dome.material as THREE.ShaderMaterial;
+    expect(SKY_BACKGROUND_RENDER_ORDER).toBe(1000);
+    expect(sky.dome.renderOrder).toBe(1000);
+    expect(material.depthWrite).toBe(false);
+    expect(material.vertexShader).toContain(
+      'gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);',
+    );
+    expect(material.vertexShader).toContain('gl_Position.z = gl_Position.w;');
+  });
 });

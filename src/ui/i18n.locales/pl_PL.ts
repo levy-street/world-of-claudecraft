@@ -2,24 +2,944 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const pl_PL: Partial<Record<TranslationKey, string>> = {
+  'abilityUi.cast.crafting': 'Wytwarzanie',
+  'abilityUi.cast.disenchanting': 'Rozbrajanie',
+  'abilityUi.cast.enchanting_apply': 'Zaklinanie',
+  'abilityUi.cast.salvaging': 'Odzyskiwanie',
+  'abilityUi.cast.tool_recharge': 'Ładowanie',
+  'auth.beard': 'Broda',
+  'auth.beardChinpuff': 'Bródka',
+  'auth.beardFull': 'Pełna',
+  'auth.beardGoatee': 'Kozia bródka',
+  'auth.beardHorseshoe': 'Podkowa',
+  'auth.beardMutton': 'Bokobrody',
+  'auth.beardNone': 'Brak',
+  'auth.beardScruff': 'Zarost',
+  'auth.beardShortbox': 'Kwadratowa',
+  'auth.beardStache': 'Wąsy',
+  'auth.beardStubble': 'Szczecina',
+  'auth.beardStubbleBeard': 'Gęsta szczecina',
+  'auth.beardVikingb': 'Pleciona',
+  'auth.beardWizard': 'Czarodziejska',
+  'auth.blush': 'Róż',
+  'auth.bodyChest': 'Klatka piersiowa',
+  'auth.bodyElbows': 'Łokcie',
+  'auth.bodyFeet': 'Stopy',
+  'auth.bodyHands': 'Wielkość dłoni',
+  'auth.bodyHips': 'Biodra',
+  'auth.bodyKnees': 'Kolana',
+  'auth.bodyShoulders': 'Ramiona',
+  'auth.colorPresetAria': 'Zestaw {label} {n}',
+  'auth.customColor': 'Własny',
+  'auth.earBone': 'Kościany amulet',
+  'auth.earBonehoop': 'Kościany kolczyk',
+  'auth.earChain': 'Koralikowy wisiorek',
+  'auth.earCuff': 'Klips',
+  'auth.earFeather': 'Pióro',
+  'auth.earHoop': 'Kółko',
+  'auth.earMoon': 'Półksiężyc',
+  'auth.earMoonstar': 'Księżycowa gwiazda',
+  'auth.earNone': 'Brak',
+  'auth.earRunic': 'Kamień run',
+  'auth.earSeptum': 'Kolczyk w nosie',
+  'auth.earStud': 'Sztyft',
+  'auth.earWarden': 'Żelazo Strażnika',
+  'auth.earrings': 'Kolczyki',
+  'auth.eyeshadow': 'Cień do powiek',
+  'auth.hairAfro': 'Okrągłe afro',
+  'auth.hairAsymbob': 'Asymetryczny bob',
+  'auth.hairBluntbangs': 'Bob z prostą grzywką',
+  'auth.hairBraidcrown': 'Pleciona korona',
+  'auth.hairBuzz': 'Krótko ścięte',
+  'auth.hairChinbob': 'Bob do podbródka',
+  'auth.hairCrew': 'Cięcie maszynką',
+  'auth.hairCrewcut': 'Teksturowany jeżyk',
+  'auth.hairCurls': 'Luźne loki',
+  'auth.hairCurlyafro': 'Kręcone afro',
+  'auth.hairCurlycap': 'Krótkie kręcone',
+  'auth.hairCurtains': 'Przedziałek na środku',
+  'auth.hairFantasybraid': 'Fantazyjny warkocz',
+  'auth.hairFauxhawk': 'Pseudoirokez',
+  'auth.hairHalfbun': 'Pół-kok',
+  'auth.hairHighbun': 'Wysoki kok',
+  'auth.hairHighpony': 'Wysoki kucyk',
+  'auth.hairLayered': 'Warstwowe do ramion',
+  'auth.hairLongcenterpart': 'Długie z przedziałkiem',
+  'auth.hairLongpart': 'Długie proste z przedziałkiem',
+  'auth.hairLongwavy': 'Długie falowane',
+  'auth.hairLowbun': 'Niski kok',
+  'auth.hairLowpony': 'Niski kucyk',
+  'auth.hairMessy': 'Rozczochrane kolce',
+  'auth.hairMohawk': 'Pełny irokez',
+  'auth.hairMullet': 'Gruby czeski',
+  'auth.hairPixie': 'Pixie',
+  'auth.hairPompadour': 'Krótki pompadour',
+  'auth.hairQuiff': 'Uczesana grzywka',
+  'auth.hairSidepart': 'Klasyczny przedziałek boczny',
+  'auth.hairSidepony': 'Boczny kucyk',
+  'auth.hairSweptback': 'Średnie zaczesane do tyłu',
+  'auth.hairSweptpixie': 'Zaczesane pixie',
+  'auth.hairTopknot': 'Kok na czubku',
+  'auth.hairTwinbraids': 'Dwa warkocze',
+  'auth.hairWarriorbraid': 'Wojowniczy warkocz',
+  'auth.hairWavybob': 'Falowany bob',
+  'auth.helmPreview': 'Pokaż hełm',
+  'auth.jewelAmethyst': 'Ametyst',
+  'auth.jewelBone': 'Kość',
+  'auth.jewelBronze': 'Brąz',
+  'auth.jewelCopper': 'Miedź',
+  'auth.jewelDefault': 'Jak wykute',
+  'auth.jewelGold': 'Złoto',
+  'auth.jewelIron': 'Żelazo',
+  'auth.jewelJade': 'Jadeit',
+  'auth.jewelMaterial': 'Materiał biżuterii',
+  'auth.jewelObsidian': 'Obsydian',
+  'auth.jewelPearl': 'Perła',
+  'auth.jewelRuby': 'Rubin',
+  'auth.jewelSilver': 'Srebro',
+  'auth.jewelTurquoise': 'Turkus',
+  'auth.lashColor': 'Kolor rzęs',
+  'auth.lashes': 'Rzęsy',
+  'auth.lashesOff': 'Wyłączone',
+  'auth.lashesOn': 'Włączone',
+  'auth.lipstick': 'Szminka',
+  'auth.makeupNone': 'Brak',
+  'auth.outfit': 'Kolor stroju',
+  'auth.outfitAzure': 'Lazurowy',
+  'auth.outfitBloodforged': 'Krwiokuty',
+  'auth.outfitBonewrought': 'Kościokuty',
+  'auth.outfitClassic': 'Klasyczny',
+  'auth.outfitCrimson': 'Karmazynowy',
+  'auth.outfitEmber': 'Żarowy',
+  'auth.outfitEmerald': 'Szmaragdowy',
+  'auth.outfitForest': 'Leśny',
+  'auth.outfitGilded': 'Złocony',
+  'auth.outfitGold': 'Złoty',
+  'auth.outfitIvory': 'Kość słoniowa',
+  'auth.outfitMagenta': 'Magenta',
+  'auth.outfitObsidian': 'Obsydianowy',
+  'auth.outfitOnyx': 'Onyksowy',
+  'auth.outfitRose': 'Różany',
+  'auth.outfitRoyal': 'Błękit królewski',
+  'auth.outfitTeal': 'Morski',
+  'auth.outfitVerdigris': 'Patynowy',
+  'auth.outfitViolet': 'Fioletowy',
+  'auth.randomize': 'Losowy wygląd',
+  'auth.randomizeShort': 'Losowo',
+  'auth.resetLook': 'Resetuj wygląd',
+  'auth.resetShort': 'Resetuj',
+  'auth.shadeBerry': 'Jagodowy',
+  'auth.shadeBronze': 'Brązowy',
+  'auth.shadeCoral': 'Koralowy',
+  'auth.shadeMauve': 'Malwowy',
+  'auth.shadeNude': 'Cielisty',
+  'auth.shadePeach': 'Brzoskwiniowy',
+  'auth.shadePlum': 'Śliwkowy',
+  'auth.shadeRose': 'Różany',
+  'auth.shadeRuby': 'Rubinowy',
+  'auth.shadeSmoke': 'Dymny',
+  'auth.shadeTeal': 'Morski',
+  'auth.shadeWarm': 'Ciepły',
+  'auth.style': 'Styl',
+  'editor.status.campCapReached': 'Osiągnięto limit obozów ({max}). Nowy obóz nie został dodany.',
+  'entities.itemSets.warfare_ashstalker.bonus2': 'Zwiększa Ocenę Obrony DZIAŁAŃ WOJENNYCH o 40.',
+  'entities.itemSets.warfare_ashstalker.bonus4':
+    'Zwiększa Ocenę Ataku DZIAŁAŃ WOJENNYCH o 40, a kontrola tłumu nakładana na ciebie przez wrogich graczy trwa o 15% krócej.',
+  'entities.itemSets.warfare_ashstalker.bonus7':
+    'Zwiększa Ocenę Ataku i Obrony DZIAŁAŃ WOJENNYCH o 80. Zabicie wrogiego gracza nadaje Popielny Krok, zwiększający prędkość ruchu o 40% na 6 sek.',
+  'entities.itemSets.warfare_ashstalker.name': 'Zestaw Ashstalker',
+  'entities.itemSets.warfare_cinderweave.bonus2': 'Zwiększa Ocenę Obrony DZIAŁAŃ WOJENNYCH o 40.',
+  'entities.itemSets.warfare_cinderweave.bonus4':
+    'Zwiększa Ocenę Ataku DZIAŁAŃ WOJENNYCH o 40, a kontrola tłumu nakładana na ciebie przez wrogich graczy trwa o 15% krócej.',
+  'entities.itemSets.warfare_cinderweave.bonus7':
+    'Zwiększa Ocenę Ataku i Obrony DZIAŁAŃ WOJENNYCH o 80. Twoje zaklęcia mają 15% szansy na nadanie Żarowej Osłony, pochłaniającej 120 obrażeń przez 8 sek.',
+  'entities.itemSets.warfare_cinderweave.name': 'Regalia Cinderweave',
+  'entities.itemSets.warfare_furyforged.bonus2': 'Zwiększa Ocenę Obrony DZIAŁAŃ WOJENNYCH o 40.',
+  'entities.itemSets.warfare_furyforged.bonus4':
+    'Zwiększa Ocenę Ataku DZIAŁAŃ WOJENNYCH o 40, a kontrola tłumu nakładana na ciebie przez wrogich graczy trwa o 15% krócej.',
+  'entities.itemSets.warfare_furyforged.bonus7':
+    'Zwiększa Ocenę Ataku i Obrony DZIAŁAŃ WOJENNYCH o 80. Zabicie wrogiego gracza nadaje Niezłomną Przysięgę, pochłaniającą 200 obrażeń przez 10 sek.',
+  'entities.itemSets.warfare_furyforged.name': 'Rynsztunek bojowy Furyforged',
+  'entities.itemSets.warfare_stormbound.bonus2': 'Zwiększa Ocenę Obrony DZIAŁAŃ WOJENNYCH o 40.',
+  'entities.itemSets.warfare_stormbound.bonus4':
+    'Zwiększa Ocenę Ataku DZIAŁAŃ WOJENNYCH o 40, a kontrola tłumu nakładana na ciebie przez wrogich graczy trwa o 15% krócej.',
+  'entities.itemSets.warfare_stormbound.bonus7':
+    'Zwiększa Ocenę Ataku i Obrony DZIAŁAŃ WOJENNYCH o 80. Twoje zaklęcia mają 15% szansy na nadanie Żarowej Osłony, pochłaniającej 120 obrażeń przez 8 sek.',
+  'entities.itemSets.warfare_stormbound.name': 'Szaty Stormbound',
+  'entities.itemSets.warfare_thornhide.bonus2': 'Zwiększa Ocenę Obrony DZIAŁAŃ WOJENNYCH o 40.',
+  'entities.itemSets.warfare_thornhide.bonus4':
+    'Zwiększa Ocenę Ataku DZIAŁAŃ WOJENNYCH o 40, a kontrola tłumu nakładana na ciebie przez wrogich graczy trwa o 15% krócej.',
+  'entities.itemSets.warfare_thornhide.bonus7':
+    'Zwiększa Ocenę Ataku i Obrony DZIAŁAŃ WOJENNYCH o 80. Twoje zaklęcia mają 15% szansy na nadanie Cierniowej Straży, zwiększającej unik o 15% na 6 sek.',
+  'entities.itemSets.warfare_thornhide.name': 'Strój Thornhide',
+  'entities.items.curved_tusk.name': 'Zakrzywiony Kieł',
+  'entities.items.pristine_claw.name': 'Nieskazitelny Pazur',
+  'entities.items.sharp_claw.name': 'Ostry Pazur',
+  'entities.items.thornhide_boots.name': 'Buty Thornhide',
+  'entities.items.thornhide_cinch.name': 'Pas Thornhide',
+  'entities.items.thornhide_gloves.name': 'Rękawice Thornhide',
+  'entities.items.thornhide_headdress.name': 'Nakrycie głowy Thornhide',
+  'entities.items.thornhide_leggings.name': 'Nogawice Thornhide',
+  'entities.items.thornhide_mantle.name': 'Płaszcz Thornhide',
+  'entities.items.thornhide_vestment.name': 'Szata Thornhide',
+  'entities.npcs.warmarshal_draven_kole.greeting':
+    'Honor to jedyna moneta, jaką przyjmuję, a zaopatrzenie Działań Wojennych jest moje do strzeżenia. Zdobądź swoją rangę na polu bitwy, a uzbroję cię na następną.',
+  'entities.npcs.warmarshal_draven_kole.name': 'Marszałek Wojenny Draven Kole',
+  'entities.npcs.warmarshal_draven_kole.title': 'Mistrz Zaopatrzenia Działań Wojennych',
+  'guide.controls.dungeonFinder': 'Wyszukiwarka lochów',
+  'guide.controls.mount': 'Dosiądź / zsiądź z wierzchowca',
+  'guide.controls.professions': 'Profesje',
+  'guide.controls.sheathe': 'Chowaj / dobywaj broń',
+  'guide.controls.targetAuras': 'Wzmocnienia i osłabienia celu',
+  'guide.gear.uniqueBody':
+    'Legendarne przedmioty są unikatowo zakładane: twoja postać może nosić naraz tylko jedną kopię danej legendy, a jej heroiczna wersja liczy się jako ten sam przedmiot. Druga kopia może leżeć w twoich torbach, w banku lub na rynku, ale próba założenia obu naraz zostaje odrzucona, a etykieta niesie złoty znacznik Unikatowo zakładany, byś widział tę zasadę, zanim zaplanujesz build wokół dwóch takich przedmiotów.',
+  'guide.gear.uniqueTitle': 'Unikatowo zakładany: jedna legenda danego rodzaju',
+  'guide.nav.thornhollow': 'Pola Ciernistej Kotliny',
+  'guide.profPages.econ.castPaceBatch':
+    'Wytwarzanie seryjne: do {count} w jednym zamówieniu, jedno rzucenie na sztukę',
+  'guide.profPages.econ.castPaceBody':
+    'Działania profesji wymagają realnego czasu rzucania: przepisy skalują się od niespełna dwóch sekund dla prostej pracy polowej do kilku sekund na szczycie drabinki, a rozbrajanie, zaklinanie, odzyskiwanie i ładowanie efektu narzędzia zajmują każde stały, krótki czas rzucenia. Anuluj w trakcie rzucania, a nic nie tracisz. Każde udane wytworzenie płaci też miedzianą opłatę proporcjonalną do budżetu przedmiotu. Razem z materiałami, stacjami i pułapami umiejętności to tempo utrzymuje uczciwość Rynku bez osobnego limitu działań. Dokładne czasy trwania według pasma umiejętności są wypisane poniżej.',
+  'guide.profPages.econ.castPaceCombo':
+    'Przepisy szczytu drabinki i kombinowane: {seconds} s rzucania',
+  'guide.profPages.econ.castPaceEnchantFamily':
+    'Rozbrajanie, zaklinanie i odzyskiwanie: {seconds} s rzucania',
+  'guide.profPages.econ.castPaceField':
+    'Przepisy polowe (bez wymogu umiejętności): {seconds} s rzucania',
+  'guide.profPages.econ.castPaceHeading': 'Czas rzucania i pochłaniacz złota',
+  'guide.profPages.econ.castPaceRecharge': 'Ładowanie efektu narzędzia: {seconds} s rzucania',
+  'guide.profPages.econ.castPaceSkill25': 'Przepisy do umiejętności 25: {seconds} s rzucania',
+  'guide.profPages.econ.castPaceSkill50': 'Przepisy do umiejętności 50: {seconds} s rzucania',
+  'guide.profPages.econ.castPaceSkill75': 'Przepisy do umiejętności 75: {seconds} s rzucania',
+  'guide.profPages.fish.earlyReelNote':
+    'Jedna przestroga dla niecierpliwych kciuków: naciśnij wędkę ponownie, zanim cokolwiek weźmie przynętę, a wyciągniesz pustą żyłkę, kończąc zarzut (chwila łaski zaraz po zarzuceniu wybacza przypadkowe podwójne naciśnięcie). Cierpliwość to cała gra: czekaj na branie, potem zacinaj.',
+  'guide.thornhollowPage.carrierBody':
+    'Niosący, który zbyt długo trzyma wrogą flagę, staje się coraz bardziej podatny, otrzymując narastające obrażenia, aż flaga zostanie przechwycona, upuszczona lub zwrócona. Ukrywanie się z flagą to plan skazany na porażkę; zaniesienie jej do domu to ten zwycięski.',
+  'guide.thornhollowPage.carrierHeading': 'Niesienie flagi',
+  'guide.thornhollowPage.fieldBody':
+    'Otoczone murem, otwarte pole podzielone na trzy komory: każda drużyna ma własne pole przed swoją twierdzą, a między nimi leży otoczony murem Zrujnowany Dziedziniec. Dwa mury kurtynowe rozciągają się na całą szerokość, a każde przejście między komorami mija sporne przejście: szeroką główną bramę albo przedbramie, małe pomieszczenie okraczające mur, którego przesunięte względem siebie drzwi wymuszają zbaczanie obok zakątka na zasadzkę. Każda twierdza jest zamknięta poza swoim wejściem, więc każdy bieg z flagą zaczyna się i kończy przez to samo przejście, a niska barykada rozbija prostą szarżę na nie. Dziedziniec mieści ruinę w sercu kotliny i dwie flankujące Runy Pędu; pozostałe dwie czekają na podejściach do flag. Runa Bitwy lub Runa Osłony (więcej zadawanych obrażeń albo mniej otrzymywanych przez kilka sekund) czeka przy wejściu na dziedziniec od strony każdej głównej bramy: obie płyty otwierają mecz po tej samej stronie i zmieniają się przy każdym przejęciu.',
+  'guide.thornhollowPage.fieldHeading': 'Pole bitwy',
+  'guide.thornhollowPage.flagsBody':
+    'Każda twierdza trzyma flagę swojej drużyny. Zabierz wrogą flagę i zanieś ją do własnego stojaka, by zdobyć punkt; pierwsza drużyna z trzema przechwyceniami wygrywa, a bitwa zakończona czasem rozstrzyga się według wyniku. Powalony niosący upuszcza flagę tam, gdzie padł: wróg może ją podnieść ponownie, podczas gdy jego własna drużyna zwraca ją do domu natychmiast, po prostu do niej docierając. Flaga też nie da się ukryć: podniesienie jej przerywa skrytość, a niosący, który stanie się niewidzialny w dowolny sposób, upuszcza ją natychmiast.',
+  'guide.thornhollowPage.flagsHeading': 'Flagi',
+  'guide.thornhollowPage.heading': 'Pola Ciernistej Kotliny',
+  'guide.thornhollowPage.intro':
+    'Rankingowa bitwa 5 na 5 o przechwycenie flagi, stoczona w otoczonej murem kotlinie w starodrzewiu poniżej Ciernistego Szczytu, gdzie dwie zrujnowane twierdze stają naprzeciw siebie na długości wąwozu, a między nimi leży starszy dziedziniec, którego żadna z nich nigdy nie zdobyła. Dwie drużyny po pięciu, dwie twierdze, jeden cel: ukraść wrogi sztandar i zanieść go do domu, zanim oni zaniosą wasz.',
+  'guide.thornhollowPage.ladderBody':
+    'Każdy mecz porusza trwały ranking pola bitwy przypisany do postaci, bez względu na wygraną czy przegraną, a tabela wszech czasów wskazuje mistrzów królestwa. Zwycięstwa i zacięte porażki płacą też Honor przez system Działań Wojennych.',
+  'guide.thornhollowPage.ladderHeading': 'Drabinka rankingowa',
+  'guide.thornhollowPage.pickupNote':
+    'Podniesienie flagi to zawsze celowe naciśnięcie klawisza akcji pola bitwy: nikt nigdy nie staje się niosącym, po prostu przemykając przez niewłaściwe miejsce.',
+  'guide.thornhollowPage.queueBody':
+    'Otwórz panel Pól Ciernistej Kotliny i dołącz do kolejki solo, albo przyprowadź grupę liczącą do pięciu osób i wejdźcie razem: grupy zawsze trafiają do jednej drużyny, a pozostałe miejsca zapełniają samotni mistrzowie. Gdy dziesięcioro graczy jest gotowych, mecz sadza obie drużyny przy ich twierdzach na krótkie przygotowanie, zanim flagi ożyją.',
+  'guide.thornhollowPage.queueHeading': 'Dołączanie do kolejki',
+  'guide.thornhollowPage.respawnBody':
+    'Śmierć zachowuje klasyczny rytuał: twoje zwłoki leżą tam, gdzie padły, dopóki TY się nie uwolnisz, a duch powstaje na ogrodzonym cmentarzu obok twojej twierdzy, chroniony tam do następnej fali odrodzenia twojej drużyny. Fala wskrzesza razem każdego czekającego ducha, a obie fale drużyn są celowo przesunięte w czasie, więc walka nigdy nie resetuje się w całości naraz. Nie ma biegu do zwłok ani targu z Uzdrowicielem Duchów: uwolnij się, przeczekaj falę, walcz.',
+  'guide.thornhollowPage.respawnHeading': 'Upadek w bitwie',
+  'hud.combat.blockedDone': 'Twój {ability} zostaje zablokowany przez {target}, zadając {amount}.',
+  'hud.combat.blockedTaken': 'Blokujesz atak od {source}, otrzymując {amount}.',
+  'hud.combat.floatingBlock': 'Zablokowano {amount}',
+  'hud.keybinds.actions.arena': 'PvP (Pola Ciernistej Kotliny i areny)',
+  'hudChrome.auraEffect.carriedFlag':
+    'Niesiesz wrogą flagę. Anuluj to wzmocnienie, aby ją upuścić.',
+  'hudChrome.bank.guildReadOnlyNote':
+    'Tylko oficerowie gildii mogą wprowadzać zmiany w banku gildii.',
+  'hudChrome.bank.guildUnopenedNote': 'Bank gildii nie został jeszcze otwarty.',
+  'hudChrome.bank.logUnavailable': 'Nie można teraz odczytać dziennika banku gildii.',
+  'hudChrome.bg.azure': 'Lazur',
+  'hudChrome.bg.blurb':
+    'Dwie zrujnowane twierdze stają naprzeciw siebie za otoczoną murem kotliną w cieniu Ciernistego Szczytu: Karmazyn na południu, Lazur na północy, a między nimi starszy Zrujnowany Dziedziniec, którego żadna z nich nigdy nie zdobyła. Po pięciu graczy z każdej strony, po jednym sztandarze, a pierwsza drużyna, która zaniesie do domu trzy z nich, zdobywa pole.',
+  'hudChrome.bg.board.assists': 'Asysty',
+  'hudChrome.bg.board.captures': 'Przechwycenia',
+  'hudChrome.bg.board.deaths': 'Zgony',
+  'hudChrome.bg.board.kills': 'Zabójstwa',
+  'hudChrome.bg.boardToggleLabel':
+    'Tablica wyników meczu. Naciśnij Enter, aby przypiąć pełną tablicę na stałe.',
+  'hudChrome.bg.capturedLog': '{name} przechwycił flagę drużyny {team}. Wynik {crimson}:{azure}.',
+  'hudChrome.bg.capturedTeamBanner':
+    'Drużyna {takers} przechwyciła flagę drużyny {team}! {crimson}:{azure}',
+  'hudChrome.bg.careerCaptures': 'Przechwycenia w karierze: {count}',
+  'hudChrome.bg.clock': '{minutes}:{seconds}',
+  'hudChrome.bg.countdownBanner': 'Pola Ciernistej Kotliny zaczynają się za {seconds}',
+  'hudChrome.bg.crimson': 'Karmazyn',
+  'hudChrome.bg.defeatBanner':
+    'Porażka. Pola Ciernistej Kotliny {crimson}:{azure}. Ranking {rating} ({delta})',
+  'hudChrome.bg.drawBanner':
+    'Remis na Polach Ciernistej Kotliny {crimson}:{azure}. Ranking {rating} ({delta})',
+  'hudChrome.bg.dropFlagConfirmAccept': 'Upuść flagę',
+  'hudChrome.bg.dropFlagConfirmBody':
+    'Niesiesz wrogą flagę. Upuszczenie jej zostawia ją na ziemi, gdzie może po nią sięgnąć każda z drużyn.',
+  'hudChrome.bg.dropFlagConfirmTitle': 'Upuścić flagę?',
+  'hudChrome.bg.endBannerDetail':
+    'Pola Ciernistej Kotliny {crimson}:{azure}. Ranking {rating} ({delta})',
+  'hudChrome.bg.endLog':
+    'Pola Ciernistej Kotliny zakończyły się {crimson}:{azure}. Ranking {rating} ({delta}).',
+  'hudChrome.bg.endedForfeit': 'Mecz zakończył się walkowerem',
+  'hudChrome.bg.endedForfeitLog': 'Mecz zakończył się walkowerem.',
+  'hudChrome.bg.endedTimer': 'Czas upłynął',
+  'hudChrome.bg.endedTimerLog': 'Czas meczu upłynął; pole zdobyła drużyna z wyższym wynikiem.',
+  'hudChrome.bg.enterQueue': 'Dołącz do kolejki',
+  'hudChrome.bg.enterQueueParty': 'Dołącz do kolejki (grupa {count} os.)',
+  'hudChrome.bg.firstTo': 'Pierwsza drużyna do {caps} przechwyceń',
+  'hudChrome.bg.firstWinBonusLine': 'Pierwsze zwycięstwo dnia: +{honor} Honor',
+  'hudChrome.bg.firstWinBonusLog':
+    'Pierwsze zwycięstwo dnia: otrzymujesz {honor} dodatkowego Honoru.',
+  'hudChrome.bg.flagDroppedLog': 'Flaga drużyny {team} została upuszczona.',
+  'hudChrome.bg.flagReturnedBanner': 'Flaga drużyny {team} została zwrócona!',
+  'hudChrome.bg.flagReturnedLog': 'Flaga drużyny {team} została zwrócona.',
+  'hudChrome.bg.flagState.carried': 'Flaga skradziona!',
+  'hudChrome.bg.flagState.dropped': 'Flaga na ziemi',
+  'hudChrome.bg.flagState.home': 'Flaga w twierdzy',
+  'hudChrome.bg.flagTakenBanner': 'Drużyna {takers} zabrała flagę drużyny {team}!',
+  'hudChrome.bg.flagTakenLog': '{name} zabrał flagę drużyny {team}!',
+  'hudChrome.bg.formUp': 'Formowanie szyku: {seconds}',
+  'hudChrome.bg.foundBanner': 'Znaleziono bitwę. Walczysz za drużynę {team}!',
+  'hudChrome.bg.killFeed': '{killer} powalił {victim}',
+  'hudChrome.bg.killFeedFallen': '{victim} poległ',
+  'hudChrome.bg.ladderAllTime': 'Drabinka. Wszech czasów',
+  'hudChrome.bg.ladderOnline': 'Drabinka. Teraz online',
+  'hudChrome.bg.leaveQueue': 'Opuść kolejkę',
+  'hudChrome.bg.leavingIn': 'Opuszczenie pola bitwy za {seconds}',
+  'hudChrome.bg.levelRequirement':
+    'Musisz osiągnąć poziom {level}, aby odblokować kolejkę do tego pola bitwy.',
+  'hudChrome.bg.map.azureKeep': 'Twierdza Lazur',
+  'hudChrome.bg.map.crimsonKeep': 'Twierdza Karmazyn',
+  'hudChrome.bg.map.graveyard': 'Cmentarz',
+  'hudChrome.bg.map.ruinCourtyard': 'Zrujnowany Dziedziniec',
+  'hudChrome.bg.matchInProgress': 'Bitwa w toku. {crimson}:{azure}.',
+  'hudChrome.bg.modeTag': 'Przechwycenie flagi 5v5',
+  'hudChrome.bg.noChallengers': 'Nikt z mistrzów nie jest teraz online. Bądź pierwszy.',
+  'hudChrome.bg.noRanked': 'Żaden mistrz nie ma jeszcze rankingu. Bądź pierwszy.',
+  'hudChrome.bg.offlineNote':
+    'Pola Ciernistej Kotliny synchronizują się. Kolejka otworzy się, gdy odpowie królestwo.',
+  'hudChrome.bg.playerClassTitle': '{name}. {className}',
+  'hudChrome.bg.playerLevelClassTitle': '{name}. Poziom {level} {className}',
+  'hudChrome.bg.queueNote':
+    'Dwie drużyny po pięciu. Ukradnij wrogi sztandar i zanieś go do swojej twierdzy. Pierwsza drużyna z 3 przechwyceniami wygrywa. Zbierz się w grupę do 5 osób i dołączcie do kolejki razem; łap Runy Pędu i lawiruj wśród osłon, by zgubić pościg.',
+  'hudChrome.bg.queuedParty': 'Grupa {count} os.',
+  'hudChrome.bg.ratingSummary': 'Ranking. {wins} zwycięstw / {losses} porażek',
+  'hudChrome.bg.respawnIn': 'Następna fala: odrodzenie za {seconds}',
+  'hudChrome.bg.resultDefeat': 'Porażka',
+  'hudChrome.bg.resultDraw': 'Remis',
+  'hudChrome.bg.resultVictory': 'Zwycięstwo!',
+  'hudChrome.bg.searching': 'Szukanie. {count}/{size} w kolejce.',
+  'hudChrome.bg.startBanner': 'Przechwyć flagę!',
+  'hudChrome.bg.timeWarningMinutes': 'Pozostało {minutes} min',
+  'hudChrome.bg.timeWarningMinutesLog': 'W bitwie pozostało {minutes} min.',
+  'hudChrome.bg.timeWarningOneMinute': 'Pozostała jedna minuta',
+  'hudChrome.bg.timeWarningOneMinuteLog': 'W bitwie pozostała jedna minuta.',
+  'hudChrome.bg.title': 'Pola Ciernistej Kotliny',
+  'hudChrome.bg.victoryBanner':
+    'Zwycięstwo! Pola Ciernistej Kotliny {crimson}:{azure}. Ranking {rating} ({delta})',
+  'hudChrome.bg.yourTeamTitle': 'Twoja drużyna',
+  'hudChrome.commissionBoard.acceptButton': 'Przyjmij',
+  'hudChrome.commissionBoard.accepted': 'Przyjmujesz zamówienie na {item}.',
+  'hudChrome.commissionBoard.acceptedBy': 'Przyjęte przez {name}',
+  'hudChrome.commissionBoard.boardEmpty': 'Obecnie brak otwartych zamówień.',
+  'hudChrome.commissionBoard.cancelButton': 'Anuluj',
+  'hudChrome.commissionBoard.cancelled': 'Anulujesz zamówienie na {item}.',
+  'hudChrome.commissionBoard.close': 'Zamknij zamówienia',
+  'hudChrome.commissionBoard.crafterNameLabel': 'Imię rzemieślnika',
+  'hudChrome.commissionBoard.crafterNamePlaceholder': 'Imię postaci',
+  'hudChrome.commissionBoard.deliverButton': 'Dostarcz',
+  'hudChrome.commissionBoard.deliverHint':
+    'Wytwórz zamówiony przedmiot (z włączonym przełącznikiem zamówienia), a potem wróć tutaj, aby go dostarczyć.',
+  'hudChrome.commissionBoard.delivered': 'Dostarczasz {item} dla {name}.',
+  'hudChrome.commissionBoard.denyNoSpace': 'Zleceniodawca nie ma miejsca w torbach.',
+  'hudChrome.commissionBoard.denyNotCommissionEligible': 'Tego przepisu nie można zamówić.',
+  'hudChrome.commissionBoard.denyNotCrafted':
+    'Najpierw wytwórz zamówiony przedmiot (z włączonym przełącznikiem zamówienia).',
+  'hudChrome.commissionBoard.denyNotEligibleCrafter':
+    'To zamówienie zostało wystawione dla kogoś innego.',
+  'hudChrome.commissionBoard.denyNotYourAcceptance': 'Nie przyjąłeś tego zamówienia.',
+  'hudChrome.commissionBoard.denyNotYourOrder': 'To nie jest twoje zamówienie.',
+  'hudChrome.commissionBoard.denyOrderNotAccepted': 'To zamówienie nie zostało jeszcze przyjęte.',
+  'hudChrome.commissionBoard.denyOrderNotOpen': 'To zamówienie nie jest już otwarte.',
+  'hudChrome.commissionBoard.denyOutOfRange':
+    'Musisz być blisko zleceniodawcy, aby dostarczyć zamówienie.',
+  'hudChrome.commissionBoard.denySelfCrafter': 'Nie możesz zamówić przedmiotu u samego siebie.',
+  'hudChrome.commissionBoard.denySelfOrder': 'Nie możesz przyjąć własnego zamówienia.',
+  'hudChrome.commissionBoard.denyTooManyOpen': 'Masz już zbyt wiele otwartych zamówień.',
+  'hudChrome.commissionBoard.denyUnknownCrafter': 'Nie znaleziono postaci o tym imieniu.',
+  'hudChrome.commissionBoard.denyUnknownOrder': 'To zamówienie już nie istnieje.',
+  'hudChrome.commissionBoard.denyUnknownRecipe': 'Ten przepis nie istnieje.',
+  'hudChrome.commissionBoard.formTitle': 'Złóż zamówienie',
+  'hudChrome.commissionBoard.intro':
+    'Zleć rzemieślnikowi wykonanie przedmiotu albo podejmij się cudzego zamówienia.',
+  'hudChrome.commissionBoard.mineEmpty': 'Nie złożyłeś żadnych zamówień.',
+  'hudChrome.commissionBoard.openButton': 'Zamówienia',
+  'hudChrome.commissionBoard.openButtonAria': 'Otwórz tablicę zamówień',
+  'hudChrome.commissionBoard.openSubmit': 'Wystaw zamówienie',
+  'hudChrome.commissionBoard.opened': 'Wystawiasz zamówienie na {item}.',
+  'hudChrome.commissionBoard.recipeEmpty': 'Nie znasz jeszcze żadnych przepisów na ekwipunek.',
+  'hudChrome.commissionBoard.recipeLabel': 'Przedmiot',
+  'hudChrome.commissionBoard.rowFor': '{item} dla {requester}',
+  'hudChrome.commissionBoard.rowTargeted': '{item} dla {requester} (dla {crafter})',
+  'hudChrome.commissionBoard.scopeCrafter': 'Konkretny rzemieślnik',
+  'hudChrome.commissionBoard.scopeLabel': 'Kto może przyjąć',
+  'hudChrome.commissionBoard.scopeOpen': 'Każdy (otwarta tablica)',
+  'hudChrome.commissionBoard.sectionBoard': 'Otwarta tablica',
+  'hudChrome.commissionBoard.sectionMine': 'Moje zlecenia',
+  'hudChrome.commissionBoard.sectionToCraft': 'Moje zamówienia do wykonania',
+  'hudChrome.commissionBoard.statusAccepted': 'Przyjęte',
+  'hudChrome.commissionBoard.statusCancelled': 'Anulowane',
+  'hudChrome.commissionBoard.statusDelivered': 'Dostarczone',
+  'hudChrome.commissionBoard.statusExpired': 'Wygasłe',
+  'hudChrome.commissionBoard.statusOpen': 'Otwarte',
+  'hudChrome.commissionBoard.title': 'Zamówienia',
+  'hudChrome.commissionBoard.toCraftEmpty': 'Obecnie nie realizujesz niczyjego zamówienia.',
+  'hudChrome.controller.zoomIn': 'Przybliż',
+  'hudChrome.controller.zoomOut': 'Oddal',
+  'hudChrome.crafting.announceCancel': 'Wytwarzanie anulowane',
+  'hudChrome.crafting.announceComplete': 'Ukończono wytwarzanie: {name}',
+  'hudChrome.crafting.announceStart': 'Wytwarzanie: {name}',
+  'hudChrome.crafting.batchRemaining': 'Pozostało {remaining} z {total}',
+  'hudChrome.crafting.batchRemainingAria': 'Pozostało {remaining} z {total} wytworzeń',
+  'hudChrome.crafting.busy': 'Jesteś zajęty.',
+  'hudChrome.crafting.crafting': 'Wytwarzanie',
+  'hudChrome.crafting.create': 'Wytwórz',
+  'hudChrome.crafting.createAll': 'Wytwórz wszystko',
+  'hudChrome.crafting.createAllAria':
+    'Wytwórz maksymalną liczbę tego przepisu z posiadanych materiałów',
+  'hudChrome.crafting.durationAria': 'Czas rzucania: {seconds} sek.',
+  'hudChrome.crafting.durationChip': '{seconds} s',
+  'hudChrome.crafting.progressAria': 'Postęp wytwarzania',
+  'hudChrome.crafting.qtyDecreaseAria': 'Zmniejsz liczbę do wytworzenia, obecnie {count}',
+  'hudChrome.crafting.qtyIncreaseAria': 'Zwiększ liczbę do wytworzenia, obecnie {count}',
+  'hudChrome.crafting.qtyRowAria': 'Liczba do wytworzenia',
+  'hudChrome.crafting.qtyValueAria': 'Liczba do wytworzenia, {count}',
+  'hudChrome.crafting.skillUpSubtext': 'Umiejętność wzrosła do {level}!',
+  'hudChrome.crafting.skillUpToast': 'Umiejętność {skill} wzrosła do {level}!',
+  'hudChrome.enchanting.disenchantBusy': 'Jesteś zajęty.',
+  'hudChrome.enchanting.enchantBusy': 'Jesteś zajęty.',
+  'hudChrome.enchanting.salvageBusy': 'Jesteś zajęty.',
+  'hudChrome.gathering.earlyReelLine': 'Zacinasz zbyt wcześnie. Nic nie wzięło przynęty.',
+  'hudChrome.itemUniqueEquipped': 'Unikatowo zakładany',
+  'hudChrome.keybinds.bgFlag': 'Akcja flagi pola bitwy',
+  'hudChrome.keybinds.dive': 'Nurkowanie w dół',
+  'hudChrome.materialHint.usedBy': 'Używane w: {crafts}.',
+  'hudChrome.meters.threatFallback': 'Brak zagrożenia na żywo: pokazywanie obrażeń wobec {name}',
+  'hudChrome.options.gfxAmbientOcclusion': 'Okluzja otoczenia',
+  'hudChrome.options.gfxAntiAliasing': 'Wygładzanie krawędzi',
+  'hudChrome.options.gfxBloom': 'Bloom',
+  'hudChrome.options.gfxCharacterDetail': 'Szczegóły postaci',
+  'hudChrome.options.gfxCustomNote':
+    'Zmiana suwaka przełącza zestaw jakości na Zaawansowany: własną mieszankę zbudowaną na bazie jakości High, zaczynając od poziomów pokazanych dla twojego obecnego zestawu.',
+  'hudChrome.options.gfxDynamicLights': 'Światła dynamiczne',
+  'hudChrome.options.gfxEffectsNote':
+    'Okluzja otoczenia, Bloom i wygładzanie krawędzi działają w łańcuchu postprodukcji: gdy Efekty i oświetlenie są ustawione na Low, łańcuch jest wyłączony i nie mają one żadnego efektu.',
+  'hudChrome.options.gfxHalf': 'Połowa',
+  'hudChrome.options.gfxParticleEffects': 'Efekty cząsteczek',
+  'hudChrome.options.gfxSectionCamera': 'Kamera',
+  'hudChrome.options.gfxSectionDisplay': 'Wyświetlacz',
+  'hudChrome.options.gfxSectionLighting': 'Efekty i oświetlenie',
+  'hudChrome.options.gfxSectionQuality': 'Jakość',
+  'hudChrome.options.gfxSectionSystem': 'System',
+  'hudChrome.options.gfxSectionTouch': 'Sterowanie dotykowe',
+  'hudChrome.options.gfxSectionWorld': 'Szczegóły świata',
+  'hudChrome.options.gfxViewDistance': 'Zasięg widoczności',
+  'hudChrome.options.gfxWaterQuality': 'Jakość wody',
+  'hudChrome.options.stopAutoAttackOnTargetSwitch': 'Zatrzymaj automatyczny atak przy zmianie celu',
+  'hudChrome.partyFrames.petHealth': 'Zwierzę {name}, zdrowie {pct}',
+  'hudChrome.partyFrames.showPets': 'Pokaż zwierzęta',
+  'hudChrome.professions.toolEffectTooltip.bonus.artisansEye':
+    'Podnosi gatunek zbioru o 1 poziom narzędzia, gdy naładowane.',
+  'hudChrome.professions.toolEffectTooltip.bonus.gatherersCache':
+    '+1 do uzysku za zbiór, gdy naładowane.',
+  'hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm':
+    'Skraca czas odnowienia węzła, który uruchamia.',
+  'hudChrome.professions.toolEffectTooltip.charges':
+    'Zaczyna z {base} ładunkami na pospolitym narzędziu (+{bonus} za każdy stopień rzadkości).',
+  'hudChrome.professions.toolEffectTooltip.howToSlot':
+    'Osadź na narzędziu górniczym, drwalskim lub zielarskim w oknie Profesji. Zużywa się przy osadzeniu.',
+  'hudChrome.professions.toolEffectTooltip.kind': 'Talizman narzędzia',
+  'hudChrome.professions.toolEffectTooltip.landOnly': 'Nie osadza się na wędkach.',
+  'hudChrome.professions.toolEffectTooltip.openProfessions':
+    'Otwórz Profesje, aby osadzić to na narzędziu zbierackim.',
+  'hudChrome.pvp.bracket1v1': '1v1',
+  'hudChrome.pvp.bracket2v2': '2v2',
+  'hudChrome.pvp.launcherTitle': 'PvP',
+  'hudChrome.pvp.mobileLabel': 'PvP',
+  'hudChrome.townFocus.respecCostFree': 'Za darmo',
+  'hudChrome.townFocus.respecCostLine': 'Kosztuje {coin} i {materials}',
+  'hudChrome.townFocus.respecTierInstantOption': 'Natychmiastowy (pełny koszt)',
+  'hudChrome.townFocus.respecTierLabel': 'Szybkość resetu talentów',
+  'hudChrome.townFocus.respecTierPartialOption': 'Szybszy (niski koszt)',
+  'hudChrome.townFocus.respecTierTimeOption': 'Darmowy (nie spiesz się)',
+  'hudChrome.warfare.floatReasons.assist': 'Asysta',
+  'hudChrome.warfare.floatReasons.firstWin': 'Pierwsze zwycięstwo',
+  'hudChrome.warfare.floatReasons.kill': 'Zabójstwo',
+  'hudChrome.warfare.honorFloatReason': '+{amount} Honor ({reason})',
+  'hudChrome.warfare.reasons.battlegroundAssist': 'Asysta przy ciosie kończącym',
+  'hudChrome.warfare.reasons.battlegroundComplete': 'Stoczono bitwę na Polach Ciernistej Kotliny',
+  'hudChrome.warfare.reasons.battlegroundFirstWin':
+    'Pierwsze dzisiejsze zwycięstwo na Polach Ciernistej Kotliny',
+  'hudChrome.warfare.reasons.battlegroundKill': 'Honorowe zabójstwo',
+  'hudChrome.warfare.reasons.battlegroundWin': 'Zwycięstwo na Polach Ciernistej Kotliny',
+  'hudChrome.warfareShop.buyAria': 'Kup {item} za {honor}',
+  'hudChrome.warfareShop.buyConfirmBody':
+    'Kupić {item} za {honor}? Zakupów za Honor nie można zwrócić.',
+  'hudChrome.warfareShop.buyOwnedAria': 'Kup {item} za {honor}, już posiadane',
+  'hudChrome.warfareShop.gossipOption': 'Przeglądaj Zestawy Działań Wojennych',
+  'hudChrome.warfareShop.gossipOptionAria':
+    'Przeglądaj sklep zestawów Działań Wojennych oferowany przez {name}',
+  'hudChrome.warfareShop.jewelry': 'Biżuteria',
+  'hudChrome.warfareShop.owned': 'Posiadane',
+  'hudChrome.warfareShop.weapons': 'Broń',
+  'itemUi.market.saleBuyer': 'Kupujący: {buyer}',
+  'itemUi.market.saleOlder': 'Plus {count} wcześniejszych sprzedaży, wliczonych w sumę.',
+  'itemUi.tooltip.maxStack': 'Maks. stos: {count}',
+  'itemUi.tooltip.useElixir':
+    'Użycie: zwiększa twoje {stat} o {value} na {minutes} min. Można użyć w walce.',
+  'itemUi.tooltip.useElixirAura': 'Użycie: nadaje {aura} na {minutes} min. Można użyć w walce.',
+  'hud.system.deathRecapAbility': 'Zginąłeś. Zabity przez {ability}.',
+  'hud.system.deathRecapDrowned': 'Zginąłeś. Utonąłeś.',
+  'hud.system.deathRecapFalling': 'Zginąłeś. Spadłeś na śmierć.',
+  'hud.system.deathRecapKiller': 'Zginąłeś. Zabity przez {killer}.',
+  'hud.system.deathRecapKillerAbility': 'Zginąłeś. Zabity przez {killer} za pomocą {ability}.',
+  'hudChrome.bags.filterQuestCountAria': 'Zadania, {count} przedmiotów',
+  'hudChrome.bags.itemAriaQuest': '{item}, ilość {count}, przedmiot zadania',
+  'hudChrome.bags.noQuestItems': 'Brak przedmiotów zadań w twoich torbach.',
+  'hudChrome.bank.cannotDepositNow': 'Nie można teraz zdeponować',
+  'hudChrome.bank.depositAllTooltip':
+    'Wysyła każdy reagent rzemieślniczy i przedmiot tandetny z twoich toreb do banku za jednym razem. Narzędzia do zbieractwa, założony ekwipunek, przedmioty zadań i przedmioty konsumpcyjne nigdy nie są ruszane.',
+  'hudChrome.bank.guildBuyConfirm':
+    'Kupić {count} dodatkowych miejsc w banku gildii za {price} ze skarbca gildii?',
+  'hudChrome.bank.guildBuyNote': 'Opłacone ze skarbca gildii',
+  'hudChrome.bank.guildCannotDeposit': 'Nie można umieścić w banku gildii',
+  'hudChrome.bank.guildCapacityAria': 'Wykorzystane miejsca w banku gildii: {used} z {total}',
+  'hudChrome.bank.guildContentsTab': 'Zawartość',
+  'hudChrome.bank.guildDepositGold': 'Wpłać pieniądze',
+  'hudChrome.bank.guildDepositGoldTitle': 'Wpłać pieniądze do skarbca gildii',
+  'hudChrome.bank.guildDepositHint': 'Kliknij, aby zdeponować w banku gildii',
+  'hudChrome.bank.guildDormantAria': '{item}, ilość {count}, nie można wyjąć',
+  'hudChrome.bank.guildDormantHint':
+    'Ten przedmiot jest zablokowany w banku gildii i nie można go wyjąć.',
+  'hudChrome.bank.guildDormantNote':
+    'Zablokowanych przedmiotów nie można wyjąć, a ich obecność uniemożliwia rozwiązanie gildii.',
+  'hudChrome.bank.guildEmpty': 'Bank gildii jest pusty.',
+  'hudChrome.bank.guildGoldAvailable': 'Dostępne: {amount}',
+  'hudChrome.bank.guildGoldCannotMove': 'Tej kwoty nie można teraz przenieść.',
+  'hudChrome.bank.guildLogTab': 'Dziennik',
+  'hudChrome.bank.guildOpenAccept': 'Otwórz',
+  'hudChrome.bank.guildOpenBank': 'Otwórz bank gildii',
+  'hudChrome.bank.guildOpenConfirm':
+    'Otworzyć bank gildii za {price}? Zostanie to opłacone z twoich własnych pieniędzy.',
+  'hudChrome.bank.guildOpenNote': 'Opłacone z twoich własnych pieniędzy, nie ze skarbca gildii',
+  'hudChrome.bank.guildPurseShort': 'Za mało pieniędzy',
+  'hudChrome.bank.guildTab': 'Gildia',
+  'hudChrome.bank.guildTreasury': 'Skarbiec gildii',
+  'hudChrome.bank.guildTreasuryShort': 'Za mało w skarbcu',
+  'hudChrome.bank.guildUnknownItem': 'Nieznany przedmiot',
+  'hudChrome.bank.guildViewsAria': 'Widoki banku gildii',
+  'hudChrome.bank.guildWithdrawGold': 'Wypłać pieniądze',
+  'hudChrome.bank.guildWithdrawGoldTitle': 'Wypłać pieniądze ze skarbca gildii',
+  'hudChrome.bank.logAdminPurge': 'Administrator usunął {count} {item}',
+  'hudChrome.bank.logAria': 'Dziennik aktywności banku gildii',
+  'hudChrome.bank.logBuySlots': '{actor} kupił rozszerzenie banku za {amount}',
+  'hudChrome.bank.logCharterFee':
+    '{actor} zapłacił opłatę za założenie gildii w wysokości {amount}',
+  'hudChrome.bank.logDepositItem': '{actor} zdeponował {count} {item}',
+  'hudChrome.bank.logDepositMoney': '{actor} zdeponował {amount}',
+  'hudChrome.bank.logEmpty': 'Nic jeszcze nie zostało przeniesione do ani z banku gildii.',
+  'hudChrome.bank.logFormerMember': 'Były członek gildii',
+  'hudChrome.bank.logLoading': 'Wczytywanie dziennika banku gildii...',
+  'hudChrome.bank.logNote': '{count} najnowszych działań w banku gildii.',
+  'hudChrome.bank.logOpenBank': '{actor} otworzył bank gildii za {amount}',
+  'hudChrome.bank.logWithdrawItem': '{actor} wyjął {count} {item}',
+  'hudChrome.bank.logWithdrawMoney': '{actor} wypłacił {amount}',
+  'hudChrome.bank.personalTab': 'Osobiste',
+  'hudChrome.bank.tabsAria': 'Zakładki banku',
+  'hudChrome.crafting.dialogOption': 'Rzemiosło',
+  'hudChrome.crafting.dialogOptionAria': 'Otwórz okno rzemiosła dla {craft}',
+  'hudChrome.deeds.recentJumpAria': 'Przejdź do {name}',
+  'hudChrome.landing.browserSupport.body':
+    'W tej przeglądarce możesz zauważyć obniżoną wydajność. Aby zapewnić sobie najlepsze wrażenia, pobierz aplikację na komputer dla systemu Windows, macOS lub Linux. Wolisz grać w przeglądarce? Chrome działa najlepiej, a Firefox i Safari również są obsługiwane.',
+  'hudChrome.landing.browserSupport.continueInBrowser': 'Kontynuuj w przeglądarce',
+  'hudChrome.landing.browserSupport.dismissAria':
+    'Zamknij powiadomienie o nieobsługiwanej przeglądarce',
+  'hudChrome.landing.browserSupport.getDesktopApp': 'Pobierz aplikację na komputer',
+  'hudChrome.landing.browserSupport.title': 'Uwaga: nieobsługiwana przeglądarka',
+  'hudChrome.materialHint.cookingCatch': 'Składnik kuchenny. Wymaga ugotowania przed zjedzeniem.',
+  'hudChrome.mounts.desc_drakemaw_raptor':
+    'Ujeżdżony wylęgowy raptor z Kaldery Smoczej Paszczy: same ścięgna i pęd, wciąż pachnący z lekka popiołem.',
+  'hudChrome.mounts.name_drakemaw_raptor': 'Raptor Smoczej Paszczy',
+  'hudChrome.options.graphicsApplied': 'Zastosowano ustawienia grafiki.',
+  'hudChrome.options.graphicsApply': 'Zastosuj grafikę',
+  'hudChrome.options.graphicsApplying': 'Stosowanie ustawień grafiki...',
+  'hudChrome.options.graphicsDraftChanged': 'Zmiany grafiki są gotowe do zastosowania.',
+  'hudChrome.options.graphicsFailed':
+    'Nie udało się zastosować grafiki. Twoje poprzednie ustawienia są nadal aktywne.',
+  'hudChrome.options.graphicsFatal':
+    'Przywracanie grafiki nie powiodło się. Wczytaj grę ponownie, aby kontynuować.',
+  'hudChrome.options.graphicsReload': 'Wczytaj grę ponownie',
+  'hudChrome.options.graphicsRetry': 'Ponów próbę grafiki',
+  'hudChrome.options.graphicsSaved':
+    'Zapisano ustawienia grafiki. Aktywny renderer już im odpowiada.',
+  'hudChrome.options.lockActionBars': 'Zablokuj paski akcji',
+  'itemUi.kind.material': 'Materiał',
+  'itemUi.market.buyChanged':
+    'Ta oferta zmieniła się, zanim zdążyłeś potwierdzić. Sprawdź cenę i spróbuj ponownie.',
+  'itemUi.market.buyConfirmAccept': 'Kup',
+  'itemUi.market.buyConfirmBody': 'Kupić {item} za {price}?',
+  'itemUi.market.buyConfirmBodyStack': 'Kupić {item} x{count} za {price} ({each} za sztukę)?',
+  'itemUi.market.buyConfirmCancel': 'Anuluj',
+  'itemUi.market.buyConfirmTitle': 'Potwierdź zakup',
+  'itemUi.tooltip.questOrphaned': 'Niepotrzebny w żadnym aktywnym zadaniu.',
+  'itemUi.tooltip.questRelated': 'Zadanie: {quest}',
+  'itemUi.tooltip.questRules': 'Nie można go sprzedać, zdeponować w banku ani wymienić.',
+  'desktop.update.checkingBody': 'Nowe wersje pobierają się, gdy grasz.',
+  'desktop.update.checkingTitle': 'Sprawdzanie aktualizacji...',
+  'desktop.update.dismiss': 'Zamknij',
+  'desktop.update.downloadingBody': 'Możesz grać dalej. Instalacja nastąpi, gdy wyjdziesz z gry.',
+  'desktop.update.uptodateTitle': 'Masz najnowszą wersję',
+  'entities.items.firebottle.name': 'Ognista Butelka',
+  'entities.items.murloc_hut.name': 'Chata Mudfinów',
+  'entities.items.reins_drakemaw_raptor.name': 'Wodze Raptora Smoczej Paszczy',
+  'entities.items.restless_skull.name': 'Niespokojna Czaszka',
+  'entities.items.vanguard_bone.name': 'Kość Awangardy',
+  'entities.mobs.brakka_wallbreaker.name': 'Brakka Murołamca',
+  'entities.mobs.dragonkin_broodguard.name': 'Smoczy Strażnik Wylęgu',
+  'entities.mobs.dragonkin_egg.name': 'Smocze Jajo',
+  'entities.mobs.dragonkin_whelp.name': 'Smoczątko',
+  'entities.mobs.drakemaw_broodlord.name': 'Władca Wylęgu Smoczej Paszczy',
+  'entities.mobs.drowned_warlord.name': 'Utopiony Wódz Wojenny',
+  'entities.mobs.spider_egg.name': 'Jajo Matki Pomiotu',
+  'entities.mobs.threnos_first_voice.name': 'Threnos, Pierwszy Głos',
+  'entities.mobs.widow_hatchling.name': 'Wylęg Wdowy',
+  'entities.quests.q_no_rest.text':
+    'Obrzęd rzucony na te kadzielnice zmusza utopionych do powstania z martwych, a teraz wskrzesił jednego na tyle potężnego, by nimi dowodzić. Strażnicy zwą go Utopionym Wodzem Wojennym, a póki włada Zatopioną Kaplicą, zmarli trzymają szyki. Złam go, {playerName}, a reszta rozproszy się z powrotem w trzęsawisko.',
+  'hud.social.tenure.recruit': 'Rekrut',
+  'hud.social.tenure.veteran': 'Weteran',
+  'hudChrome.keybinds.mouseHint':
+    'Przyciski myszy też działają: podczas przypisywania naciśnij środkowy przycisk (M3) lub boczny przycisk (M4, M5). Lewy i prawy przycisk pozostają zarezerwowane dla kamery, ruchu kliknięciem i klikania obiektów w świecie.',
+  'hudChrome.social.billboard.loginLine': 'Tablica ogłoszeń gildii: {text}',
+  'hudChrome.actionBar.editKeys': 'Edytuj klawisze paska akcji',
+  'hudChrome.actionBar.editKeysHint':
+    'Kliknij slot na pasku akcji, a następnie naciśnij klawisz, aby go przypisać.',
+  'hudChrome.actionBar.bannerHint':
+    'Kliknij slot, a następnie naciśnij klawisz, aby go przypisać. Po zakończeniu kliknij Gotowe.',
+  'hudChrome.actionBar.bannerCapturing': 'Naciśnij klawisz, aby przypisać ten slot...',
+  'hudChrome.actionBar.boundToKey': 'Przypisano do {key}.',
+  'hudChrome.actionBar.reset': 'Resetuj',
+  'hudChrome.actionBar.done': 'Gotowe',
+  'hudChrome.actionBar.cancel': 'Anuluj',
+  'hudChrome.actionBar.resetConfirmTitle': 'Zresetować klawisze paska akcji?',
+  'hudChrome.actionBar.resetConfirmBody':
+    'Pierwszy pasek wraca do domyślnych klawiszy. Drugi i trzeci tracą przypisania. Tego nie można cofnąć.',
+  'hudChrome.vcup.rolesSmallBracketNote':
+    'W formatach 1 na 1 i 2 na 2 każdy zawodnik gra zestawem Wszechstronnego. Czynów wymagających formatu 3 na 3 lub większego nie da się tu zdobyć.',
+  'hudChrome.vcup.practiceUnratedNote':
+    'Mecze treningowe są nierankingowe: ranking ani postęp w Księdze Czynów się nie liczą.',
+  'hudChrome.vcup.briefing.unratedNote':
+    'Na boisku są boty, więc ten mecz jest nierankingowy: ranking się nie zmienia, a czyny za gole, obrony i czyste konta się nie liczą.',
+  'hudChrome.vcup.briefing.practiceUnratedNote':
+    'To mecz treningowy, więc jest nierankingowy: ranking się nie zmienia, a postęp w Księdze Czynów się nie liczy.',
+  'hudChrome.bags.filterTool': 'Narzędzia',
+  'hudChrome.materialHint.fineGrade':
+    'Gatunek wyborny. Zebrany z żyły o pełnym poziomie narzędziem wyższej rangi niż sam materiał; liczy się jako zwykła wersja wszędzie tam, gdzie jest ona wymagana.',
+  'hudChrome.gathering.toolTierUnmet.fishing':
+    'Potrzebujesz wędki {tier} poziomu, by łowić w tych wodach.',
+  'hudChrome.gathering.wieldUnmet.mining':
+    'Potrzebujesz Górnictwa {skill}, by machnąć kilofem, który masz już w torbach.',
+  'hudChrome.gathering.wieldUnmet.logging':
+    'Potrzebujesz Wyrębu {skill}, by machnąć siekierą, którą masz już w torbach.',
+  'hudChrome.gathering.wieldUnmet.herbalism':
+    'Potrzebujesz Zielarstwa {skill}, by pracować sierpem, który masz już w torbach.',
+  'hudChrome.gathering.wieldUnmetCorpse':
+    'Potrzebujesz umiejętności zbieractwa {skill}, by wykorzystać swoje najlepsze narzędzie.',
+  'hudChrome.gathering.toolTooltip.unlocks.fishing':
+    'Wymagana do łowienia w wodach do poziomu {tier}.',
+  'hudChrome.gathering.emptyHookNote': 'Nic na haczyku',
+  'hudChrome.gathering.stateCooldownTimed': 'Odnawia się za {time}',
+  'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',
+  'hudChrome.gathering.fineGradePreview':
+    'Twoje narzędzie podnosi ten urobek do gatunku wybornego.',
+  'hudChrome.professions.toolEffectCharges': '{charges} z {max} ładunków',
+  'hudChrome.professions.toolEffectSpent': 'Zużyty, wymaga naładowania',
+  'hudChrome.professions.toolEffectDepleted': 'Efekt narzędzia zużyty',
+  'hudChrome.professions.toolEffectRechargePrice': 'Ładowanie: {count} x {material}',
+  'hudChrome.professions.toolEffectModeAsk': 'Pytaj przy każdym użyciu',
+  'hudChrome.professions.toolEffectModePrompt': 'Pyta przy każdym użyciu',
+  'hudChrome.professions.toolEffectConfirmTitle': 'Użyć: {effect}?',
+  'hudChrome.professions.toolEffectConfirmBody':
+    'Zużyć ładunek na ten zbiór? Odmowa i tak pozwala zbierać, tylko bez premii. Pozostałe ładunki: {charges}.',
+  'hudChrome.professions.toolEffectConfirmAccept': 'Zużyj ładunek',
+  'hudChrome.professions.toolEffectConfirmDecline': 'Zbieraj bez niego',
+  'hudChrome.professions.toolEffectName.gatherersCache': 'Skrytka Zbieracza',
+  'hudChrome.professions.toolEffectName.artisansEye': 'Oko Rzemieślnika',
+  'hudChrome.professions.toolEffectName.quickeningCharm': 'Talizman Sprężystości',
+  'hudChrome.professions.toolEffectSlotButton': 'Osadź {effect}',
+  'hudChrome.professions.toolEffectRechargeButton': 'Naładuj',
+  'hudChrome.professions.toolEffectSlotted': 'Osadzono {effect} w profesji: {profession}.',
+  'hudChrome.professions.toolEffectSlotInvalid': 'Nie można tam osadzić: {effect}.',
+  'hudChrome.professions.toolEffectNoTool':
+    'Najpierw potrzebujesz prawdziwego narzędzia: {profession}.',
+  'hudChrome.professions.toolEffectNoCharm':
+    'Potrzebujesz w torbach wytworzonego talizmanu: {effect}.',
+  'hudChrome.professions.toolEffectNoGain': 'Już osadzone i w pełni naładowane: {effect}.',
+  'hudChrome.professions.toolEffectRecharged': 'Naładowano {effect}: zużyto {material} x{count}.',
+  'hudChrome.professions.toolEffectRechargeNoSlot':
+    'Nie osadzono żadnego efektu w profesji: {profession}.',
+  'hudChrome.professions.toolEffectRechargeFull': 'Już w pełni naładowane: {effect}.',
+  'hudChrome.professions.toolEffectRechargeToolCapped':
+    'Weź lepsze narzędzie ({profession}), aby naładować {effect} wyżej.',
+  'hudChrome.professions.toolEffectRechargeMaterials':
+    'Ładowanie ({effect}) wymaga: {material} x{count}.',
+  'hudChrome.crafting.reagentFineSub': '(zużywa {count} gatunku wybornego)',
+  'hudChrome.crafting.identity.allCrafts': 'Wszystkie rzemiosła',
+  'hudChrome.crafting.identity.skillListAria': 'Umiejętności rzemieślnicze',
+  'hudChrome.deeds.broadcastsLabel':
+    'Udostępniaj zdobyte czyny członkom gildii i obserwującym, a karty czynów i arcydzieł kanałowi Discorda',
+  'apiError.epic.account_taken': 'To konto Epic jest już powiązane z innym kontem.',
+  'apiError.epic.already_linked': 'Twoje konto ma już powiązane konto Epic.',
+  'apiError.epic.banned': 'Tego konta Epic nie można powiązać.',
+  'apiError.epic.disabled': 'Powiązanie z Epic jest obecnie niedostępne.',
+  'apiError.epic.invalid_token':
+    'Epic nie mógł zweryfikować tej prośby o powiązanie. Spróbuj ponownie z aplikacji na komputer.',
+  'apiError.epic.upstream': 'Epic nie odpowiedział. Spróbuj ponownie za chwilę.',
+  'apiError.seeker.native_only': 'Uprawnienie Seeker jest dostępne tylko w aplikacji natywnej.',
+  'apiError.seeker.attestation_failed':
+    'Weryfikacja urządzenia nie powiodła się. Spróbuj ponownie.',
+  'apiError.seeker.solana_artifact_required': 'Aby kontynuować, użyj aplikacji Solana Store.',
+  'apiError.seeker.wallet_required': 'Najpierw powiąż i zweryfikuj portfel.',
+  'apiError.seeker.genesis_token_required': 'Wymagany jest zweryfikowany Seeker Genesis Token.',
+  'apiError.seeker.genesis_token_claimed': 'Ten Seeker Genesis Token został już odebrany.',
+  'apiError.seeker.entitlement_required': 'Wymagane jest zweryfikowane uprawnienie Seeker.',
+  'apiError.seeker.current_ownership_required': 'Musisz obecnie posiadać Seeker Genesis Token.',
+  'guide.professions.archetypeSwitchBody':
+    'Deklaracja to też nie wyrok dożywocia. Para, której nigdy nie miałeś, to po prostu świeże zadanie dostrojenia, natomiast powrót do pary, którą porzuciłeś, wymaga od ciebie najpierw zadośćuczynienia: pięć zadań pojednania za pierwszym razem i trzy kolejne doliczane za każdy powrót, którego już dokonałeś (podjęcie zupełnie nowej pary nigdy nie podnosi tej liczby). Wybór pozostaje znaczący, nie zamykając na zawsze żadnych drzwi.',
+  'guide.professions.whatBody':
+    'Profesje to robocze życie świata: cztery fachy zbierackie, które wyciągają surowiec prosto z ziemi, i pierścień dziesięciu rzemiosł, które zamieniają go w ekwipunek, posiłki, mikstury i narzędzia. Tutaj wszystko karmi coś innego. Ruda, którą wydobywasz, staje się ostrzem, ostrze przyjmuje zaklęcie, a zaklęcie potrzebuje pyłu wyłuskanego ze starego ekwipunku, więc zbieracz, rzemieślnik i majsterkowicz to ogniwa jednego łańcucha.\n\nNie ma limitu profesji, nad którym trzeba by się zamartwiać. Każda postać może rozwijać siedem z ośmiu rzemiosł mających dziś zawartość oraz wszystkie cztery profesje zbierackie równolegle (Inżynieria jest jedynym wyjątkiem: wszystkie jej przepisy zaczynają się powyżej darmowego sufitu, więc jej drabinka czeka na przysięgę Bombardiera); jedynym wyborem na wyłączność jest twój archetyp, tożsamość, której ostatecznie przysięgasz, choć po dostrojeniu rzemiosła, które zapadają za nim w uśpienie, wspinają się już tylko na swoich pospolitych przepisach, a powyżej umiejętności 75 wcale. Umiejętność nigdy nie spada, a nic, czego się nauczysz, nie zostaje ci nigdy odebrane.',
+  'guide.professions.archetypesBody':
+    'Dziesięć rzemiosł siedzi na stałym kole, a geografia tego koła ma znaczenie. Każda dwójka sąsiadów tworzy nazwaną parę: Kowal dla Wytwarzania Broni i Wytwarzania Pancerzy, Krawiec-Wytwórca dla Garbarstwa i Krawiectwa, Aptekarz dla Alchemii i Gotowania, Bombardier dla Inżynierii i Alchemii, oraz sześć kolejnych dookoła pierścienia.\n\nDostrojenie do pary to zadanie, a nie kliknięcie w menu. Dziś można przystąpić do czterech par (Kowal, Krawiec-Wytwórca, Aptekarz i Bombardier), a każdą kotwiczy rezydujący mistrz w Eastbrook, którego zadanie przyjęcia przedstawia całą umowę wprost, zanim ją podejmiesz. Dopóki się nie zadeklarujesz, każde rzemiosło rozwija się swobodnie na przepisach aż po rzadki poziom (dowolny przepis wymagający umiejętności 74 lub mniej), więc możesz spróbować niemal wszystkiego, zanim wybierzesz (jedynie Inżynieria nie ma przepisu tak nisko, więc jej liczba czeka).\n\nGdy już się dostroisz, dwa rzemiosła twojej pary stają się twoimi kierunkami głównymi, bez żadnego sufitu poza pułapem. Reszta koła nie gaśnie: jedno rzemiosło naprzeciw twoich kierunków głównych zostaje jako zajęcie dodatkowe, które wspina się dalej przez rzadki poziom (powtarzalne zadanie przy kuźni Kowala Haldrena pozwala zmienić, które to), a każde inne rzemiosło zapada w uśpienie. Uśpione rzemiosło zachowuje swoją umiejętność i swoje pospolite przepisy, które uczą go dalej na normalnej krzywej, dopóki nie zszarzeją przy 75; wszystko powyżej pospolitego przestaje płacić od razu, a uśpione rzemiosło, dopóki odpoczywa, nigdy nie wydaje arcydzieła.',
+  'guide.professions.startBody':
+    'Prosto z drogi do Eastbrook? Znajdź Sztygara Odella i weź zadanie Fach dla każdej dłoni: wskaże ci żyły rudy wokół Miedzianego Wykopaliska na południowy wschód od miasta i wręczy ci twoje pierwsze odciski. Uważaj na sam wykop: obozujący na nim kopacze z Deeprock stoją kilka poziomów wyżej niż świeży przybysz, więc obrób najpierw żyły na obrzeżach, a serce obozu zostaw na czas, gdy trochę podniesiesz poziom. Od tej pory zbieraj z każdej żyły, każdego drzewostanu i każdego łanu ziół, które mijasz w trakcie zadań; biegłość przychodzi podróżnikom sama.\n\nPo powrocie do miasta wciśnij T, by otworzyć okno wytwarzania, i pracuj na pospolitych przepisach, które każda postać zna od początku. Odwiedź mistrzów przy kuźni, kuchniach, warsztacie tkackim i narzędziowni, by zobaczyć, czego uczą, i bierz ich zlecenia robocze dla stałego dopływu monet. Zanim znajdzie cię list Gildii, będziesz już wiedzieć, która para wydaje ci się domem.',
+  'guide.profPages.craftIntro.engineering':
+    'Inżynieria buduje narzędzia, których prędzej czy później zapragnie każdy poważny zbieracz: kilofy, siekiery, sierpy i wędki poziomu 4 i poziomu 5, których żadna lada nigdy nie sprzeda za monetę, a każde z nich pochłania narzędzie o poziom niższe.',
+  'guide.profPages.craftIntro.enchanting':
+    'Zaklinanie rozbiera ekwipunek i wkłada moc z powrotem: rozłóż niechciane elementy na materiały arkaniczne, a potem wydaj je na stałą premię do statystyk elementu, który zamierzasz zatrzymać. Rozkładanie i zaklinanie nie wymagają ani stacji, ani trenera, i każdy może zacząć pierwszego dnia; więcej wymagają tylko dwa przepisy na talizmany, nauczane w narzędziowni.',
+  'guide.profPages.craftProse.weaponcrafting.materialsBody':
+    'Górnictwo to kręgosłup. Ruda Miedzi schodzi z żył poziomu 1 w Dolinie Wschodniego Strumienia, Ruda żelaza z Trzęsawiska Mokrzawia, a Ruda Thorium z Wyżyn Ciernistego Szczytu, i każdy szczebel drabinki wspina się tak samo. Wyrąb liczy się bardziej, niż mógłbyś przypuszczać: żelazna kora osadza włócznię na dzika, jesion popiołowy dźwiga maczugę, a jedna Kłoda Starodrzewu tworzy kostur bojowy.\n\nReszta pochodzi z łowów i z lady. Szorstką skórę na rękojeści zbiera się prosto ze zwłok wilków i dzików, Odłamki kości schodzą z niespokojnych umarłych albo z odzyskiwania pospolitego ekwipunku, a drabinka kuźni pali Topnik kowalski, po 20 miedzianych za słój od samej Darvy. Jeśli twoje własne górnictwo zostaje w tyle, żadna lada nie uratuje cię przy samej rudzie: thorium schodzi z żył Ciernistego Szczytu, z początkowych żył każdej młodszej strefy poza Dalekim Wybrzeżem (którego żyły kopią żelazo) albo ze stosu innego gracza, przez wymianę lub Rynek Świata. Tylko Sztabkę Arkanitu kupuje się za monetę, u Majsterkowicza Gizzela w narzędziowni albo u Kwatermistrzyni Bree w Highwatch.',
+  'guide.profPages.craftProse.weaponcrafting.routeBody':
+    'Każdy element z prawdziwą linią statystyk, co na tej drabince oznacza szczebel żelazny i wyżej, może zejść z kowadła jako arcydzieło, o ile lepsza jakość mieści się w pułapie twojego poziomu; pospolite miedziane elementy bez statystyk nigdy nie procują, bo nie ma w nich czego poprawiać. Żelazo i thorium liczą się dla premii arcydzieła jako materiały pierwszego poziomu, starodrzew i arkanit jako drugiego, a umiejętność stojąca powyżej własnego poziomu przepisu dokłada własny punkt za każdy poziom, więc wśród trójki z thorium to topór wojenny i kostur bojowy niosą przewagę materiałową, a szczebel procuje coraz lepiej także wtedy, gdy już z niego wyrosłeś.\n\nJedź szczeblem miedzianym do 25, naucz się szczebla żelaznego w dniu, gdy się otwiera, i jedź nim do 50, a potem szczeblem z thorium do 75. Powyżej 75 nic wyższego jeszcze nie wyszło, więc przepisy z thorium zanikają do połowy, a potem do ćwierci przyrostu: zaplanuj mniej więcej 150 dodatkowych wytworzeń, by dobić do pułapu 125, i pamiętaj o wspólnym ograniczniku dziesięciu akcji rzemieślniczych na minutę, gdy siadasz do partii.\n\nFinansuj wspinaczkę na bieżąco: zlecenie robocze kuźni Darvy zdejmuje ci z rąk osiem Rud Miedzi co 30 minut za trochę monety i PD, a szczeble żelazny i z thorium sprzedają się uczciwie awansującym wojownikom walki wręcz. Księga Czynów zaznacza Ostrze i Hartowanie przy umiejętności 50 i wieńczy Arcymistrzostwo Wytwarzania Broni przy 125.',
+  'guide.profPages.craftProse.armorcrafting.identityBody':
+    'Drabinka Wytwarzania Pancerzy czyta się jak kariera żołnierza: na początek prosty nitowany miedziany pas, sabatony i rękawice, potem kolczuga z żelaznych ogniw, nagolenniki i naramienniki z pierwszymi prawdziwymi liniami statystyk, a na końcu rzadki wielki hełm, kirys i nogawice z łuski thorium, elementy na Siłę i Wytrzymałość, z wartościami pancerza na samym szczycie rzemieślniczej sztuki.\n\nMa też cichszą stronę: Chronione Nogawice ze Wschodniego Strumienia, polowy pospolity element pod statystyki zaklinaczy, oraz Peleryna Poczernionej Łuski, rzadki kolczy naramiennik na Intelekt i Ducha przy umiejętności 75, trzymają na liście klientów tych noszących kolczugę, którzy myślą zaklęciami. Na pierścieniu stoi między Wytwarzaniem Broni a Inżynierią; para Kowala z Wytwarzaniem Broni jest przysięgana przed Mistrzynią Kuźni Darvą, natomiast para Zębatkowca z Inżynierią jest nazwana, ale nie ma jeszcze zadania przysięgi.',
+  'guide.profPages.craftProse.armorcrafting.materialsBody':
+    'Żadne rzemiosło nie pożera rudy szybciej. Sama kolczuga z żelaznych ogniw bierze pięć rud żelaza, a każdy element z łuski thorium chce trzech albo czterech rud thorium plus Sztabkę Arkanitu, więc poważny płatnerz kopie w Trzęsawisku Mokrzawia i Wyżynach Ciernistego Szczytu albo płaci komuś, kto to robi. Miedź zasila pierwszy szczebel, prosto z żył przy Miedzianym Wykopalisku.\n\nWokół metalu idą części miękkie: Szorstka skóra zbierana ze zwłok wilków i dzików, Odłamki kości z niespokojnych umarłych (albo odzyskane ze zwykłego ekwipunku) oraz słoje Topnika kowalskiego (po 20 miedzianych przy kuźni) w niemal każdym przepisie. Żadna lada nie sprzedaje thorium: niecierpliwi kupują je od innych graczy albo wydobywają sami, na Ciernistym Szczycie lub w początkowych żyłach dziesięciu z jedenastu młodszych stref (samo Dalekie Wybrzeże kopie żelazo).',
+  'guide.profPages.craftProse.armorcrafting.ladderBody':
+    'Dwa polowe pospolite elementy, Kolczy kaftan ze Wschodniego Strumienia i Chronione Nogawice, są znane od początku i wytwarzają się wszędzie. Drabinka mistrza to dziewięć przepisów w trzech szczeblach przy kuźni w Eastbrook: szczebel miedziany jest darmowy przy umiejętności 0, szczebel z żelaznych ogniw kosztuje 25 srebrnych za przepis przy umiejętności 25, a szczebel z łuski thorium 1 złoty za sztukę przy umiejętności 50, przy czym każdego szczebla można się nauczyć w chwili, gdy sięgnie go twój poziom.\n\nPoza drabinką stoją dwa wyjątki. Hełm spętanego kamienia to jeden z dwóch kombinowanych przepisów Kowala (Rękawice Grobowego Żmija są jego rodzeństwem po stronie Wytwarzania Broni), nauczany przez mistrza, niewymagający stacji i możliwy do wykonania tylko przez dostrojonego Kowala z oboma rzemiosłami na umiejętności 25. Peleryna Poczernionej Łuski nie potrzebuje żadnego nauczyciela: wszyscy znają ją od początku, a pracę nad nią bramkują wyłącznie kuźnia i materiały. Podana przy niej umiejętność 75 dotyczy przyrostu, nie pozwolenia: z Wytwarzaniem Pancerzy jako główną specjalizacją płaci pełny przyrost umiejętności od pierwszego uderzenia młota aż do 99, więc Kowal z zapasem thorium może się na niej oprzeć wcześnie. Poniżej pułapu głównej specjalizacji przepis trzeciego poziomu nie uczy niczego, więc niezadeklarowany albo hobbystyczny płatnerz pracuje nad nią dla samego elementu, nie dla punktów.',
+  'guide.profPages.craftProse.leatherworking.materialsBody':
+    'Garbarstwo to rzemiosło, w którym twoja trasa awansowania i twoja linia zaopatrzenia są tym samym: Szorstką skórę zbiera się prosto ze zwłok noszących skórę, przede wszystkim wilków i dzików, a każde zwłoki obsługują tylko jednego zbieracza, kto pierwszy, ten lepszy. Rzadki lub lepszy rzut zbioru daje w dodatku Nieskazitelną skórę, podpisany okaz, o który prosi Kaftan strażnika bagien, więc odkładaj do banku każdą, jaką znajdziesz.\n\nObsada drugoplanowa jest mała: nogi pająków i pajęczy jedwab, Samodziałowa tkanina z humanoidów, po jednej rudzie thorium w każdym rzadkim elemencie strażnika bagien (sześć w zwieńczeniu, Owijkach ze Zmierzchowej Skóry) i Środek garbujący po 16 miedzianych przy ladzie garbarni. Samego thorium nigdy nie kupuje się przy ladzie: wydobądź je sam, na Ciernistym Szczycie albo w początkowych żyłach niemal każdej młodszej strefy (samo Dalekie Wybrzeże kopie żelazo), albo odkup od innego gracza.',
+  'guide.profPages.craftProse.leatherworking.ladderBody':
+    'Oto haczyk: garbarnia stoi w Fenbridge, przy drodze przez Trzęsawisko Mokrzawia, co czyni Garbarstwo jedynym głębokim rzemiosłem szkolonym w terenie, na mokradłach. Garbarz Hesk uczy drabinki przy swoich kadziach: szczebel skór z Fenbridge darmowo przy umiejętności 0, szczebel tropiciela mokradeł po 25 srebrnych za przepis od umiejętności 25, a szczebel strażnika bagien po 1 złotym za sztukę od umiejętności 50, przy czym każdy szczebel otwiera się, gdy sięgnie go twój poziom.\n\nTrzy przepisy omijają trenera: polowe pospolite elementy (Kaftan z garbowanej skóry i Skóra Druida ze Wschodniego Strumienia) wytwarzają się wszędzie od początku, a Owijki ze Zmierzchowej Skóry zna każdy, ale siedzą przy umiejętności 75 i są związane z garbarnią. Zwróć uwagę, że sama przysięga Zaopatrzeniowca składana jest z powrotem w Eastbrook u Ottilie; na mokradłach odbywa się wyłącznie nauka.',
+  'guide.profPages.craftProse.leatherworking.routeBody':
+    'Każdy element z prawdziwymi statystykami losuje szansę na arcydzieło, o ile lepsza jakość mieści się w pułapie twojego poziomu, wliczając w to Skórę Druida ze Wschodniego Strumienia ze statystykami, a podpisana Nieskazitelna skóra w Kaftanie strażnika bagien daje premię za podpisany reagent automatycznie; thorium liczy się dla proca jako materiał pierwszego poziomu. Pospolite skórzane elementy bez statystyk procować nie mogą.\n\nAwansuj je naturalnie: zbieraj z każdego wilka i dzika, którego zabijesz, od pierwszego poziomu, pozwól dwóm polowym pospolitym elementom donieść cię do 25, gdziekolwiek stoisz, a potem naucz się szczebla skór przy kadziach, gdy zadania i tak wciągną cię na mokradła. Szczebel tropiciela mokradeł niesie cię do 50, a strażnika bagien do 75; dalej Owijki ze Zmierzchowej Skóry, przepis trzeciego poziomu za sześć rud thorium, trzy Nieskazitelne skóry, dwie Szorstkie skóry i Środek garbujący, płacą dostrojonemu Zaopatrzeniowcowi pełny przyrost do 99 i połowę potem, około 75 wytworzeń na ostatnie pięćdziesiąt punktów do pułapu 125; poniżej pułapu głównej specjalizacji przepis trzeciego poziomu nie uczy niczego.\n\nRuchoma garbarnia liczy się dla tego rzemiosła bardziej niż dla jakiegokolwiek innego: wyspecjalizuj się przy 75, a juki pełne skór stają się gotowym ekwipunkiem przy ognisku zamiast spaceru z powrotem do Fenbridge. Zlecenie robocze garbarni Heska kupuje osiem Szorstkich skór co 30 minut, ładny zwrot ze skór, które i tak zbierałeś, a Księga Czynów zaznacza Rzemiosło Garbarza przy umiejętności 50, z Arcymistrzostwem Garbarstwa przy pułapie.',
+  'guide.profPages.craftProse.cooking.identityBody':
+    'Zjedz ugotowany posiłek, a leczy cię przez 18 sekund odpoczynku, co między kolejnymi pociągnięciami jest najtańszym leczeniem w grze. Drabinka biegnie od Okonia rzecznego smażonego na patelni za 90 zdrowia aż po Wielką pieczeń Marlowa za 980, leczenie na siedząco, którego nic w grze nie przebija.\n\nNa pierścieniu Gotowanie stoi między Alchemią a Garbarstwem. Jego żywą parą jest Aptekarz, Alchemia i Gotowanie, przysięgany przed Kucharzem Marlowem w kuchniach Eastbrook po upolowaniu czterech dzikich dzików do garnka; para Trapera z Garbarstwem jest nazwana na pierścieniu, ale nie ma jeszcze zadania przysięgi.',
+  'guide.profPages.craftProse.cooking.materialsBody':
+    'Wędkarstwo zaopatruje w charakterystyczne składniki, strefa po strefie: pstrąg lustrzany i okoń rzeczny z wód Doliny Wschodniego Strumienia, szczupak moczarowy i węgorz bagienny z Trzęsawiska Mokrzawia, pstrąg mroźnoskrzelny i karp Slatefin z Wyżyn Ciernistego Szczytu. Szczeble mieszają strefy swobodnie (darmowy szczebel już chce szczupaka moczarowego, środkowy mroźnoskrzelnego z Ciernistego Szczytu, a rzadka kolacja wplata z powrotem pstrąga lustrzanego z Doliny), więc kucharz, który łowi wszędzie tam, dokąd prowadzi droga, nigdy nie zostaje na sucho.\n\nStrona rzeźnicza schodzi ze zbieranych zwłok: Mięso z dziczyzny z dzików i ich krewnych, a przy rzadkim lub lepszym rzucie zbioru podpisane Pierwsze cięcie, centralny element wielkiej pieczeni. Zioła doprawiają lepsze dania, jedna Kłoda Jesionu Popiołowego wędzi węgorza, a Sól kuchenna kosztuje 8 miedzianych za woreczek na własnym straganie Marlowa.',
+  'guide.profPages.craftProse.alchemy.identityBody':
+    'Rzemiosło uprawia się przy stanowisku Aptekarza w Highwatch, siedzibie Alchemik Verane, Mistrzyni Aptekarstwa, która uczy drabinki przepisów, sprzedaje Szklane fiolki po 12 miedzianych i płaci monetą za zioła przez swoje zlecenie robocze.\n\nNa pierścieniu rzemiosł Alchemia stoi wśród fachów prób i błędów, z Inżynierią po jednej stronie i Gotowaniem po drugiej. Daje jej to dwie tożsamości par: Bombardiera (Inżynieria i Alchemia, podejmowanego przed Majsterkowiczem Gizzelem w Eastbrook) oraz Aptekarza (Alchemia i Gotowanie, przysięganego przed Kucharzem Marlowem). Dostrój się do dowolnej z tych par, by uczynić Alchemię główną specjalizacją i pozwolić własnej podpisanej pracy uczyć cię z powrotem; para Bombardiera otwiera też swój kombinowany wywar, Eliksir niedźwiedzia, podczas gdy para Aptekarza nie wydaje jeszcze żadnego przepisu kombinowanego. Sama drabinka nigdy jednak nie każe czekać, bo każdy przepis Alchemii mieści się w rzadkim poziomie, na którym pracują niezadeklarowane rzemiosła, więc cała wspinaczka do pułapu stoi otworem jeszcze przed jakąkolwiek przysięgą.',
+  'guide.profPages.craftProse.alchemy.ladderBody':
+    'Drobną miksturę leczniczą zna każdy od początku i może ją mieszać wszędzie, bez żadnej stacji. Prawdziwa drabinka to dziewięć przepisów nauczanych przez Verane przy stanowisku Aptekarza, po trzy na każdym szczeblu: przepisy umiejętności 0 są darmowe, szczebel umiejętności 25 kosztuje 25 srebrnych za przepis, a szczebel umiejętności 50 kosztuje 1 złoty za przepis. Każdy szczebel to wywar leczniczy, wywar many i eliksir wytrzymałości, wspinający się od pospolitych butelek na srebrnoliście (120 zdrowia, 160 many) przez niepospolity złotolist (200 zdrowia, 260 many) po rzadki słonecznopłatek (280 zdrowia, 360 many).\n\nEliksiry wspinają się tak samo: Eliksir Dzika daje 6 Wytrzymałości na 10 minut, Eliksir Jadoognisty 9 na 15 minut, a Eliksir Węża 12 na 15 minut, przy czym sam Eliksir Węża warzy dwie butelki na jedno wytworzenie. Z boku stoi jeszcze jeden przepis: Eliksir niedźwiedzia, kombinowany wywar, którego Verane uczy za 25 srebrnych, gdy twoja Alchemia osiągnie 25, mieszalny wszędzie, ale tylko przez dostrojonego Bombardiera z Alchemią i Inżynierią na poziomie 25.',
+  'guide.profPages.craftProse.alchemy.routeBody':
+    'Wywary i eliksiry nigdy nie losują arcydzieł; ten proc należy do ekwipunku ze statystykami. Twoje imię i tak jednak podróżuje: rzadkie wywary na słonecznopłatku przychodzą podpisane znakiem wytwórcy, tak samo jak każda butelka podwójnej partii Eliksiru Węża, więc nic rzadkiego w tym rzemiośle nie opuszcza stołu bez podpisu. Przy umiejętności 75 następuje specjalizacja i od tej chwili każdy przepis Alchemii kosztuje 20 procent mniej materiałów.\n\nWeź Zielarstwo wcześnie i zbieraj w trakcie awansowania: srebrnolist jest w Dolinie wszędzie, a gdy dotrzesz do stołu Verane, darmowy szczebel doniesie cię czysto do umiejętności 25 na ziołach, które i tak byś zerwał. Naucz się szczebla 25 w chwili, gdy się włączy, przenieś zbieranie na mokradła po złotolist i pozwól, by zlecenie robocze Verane (sześć Ziół Złotolistnych za 45 miedzianych, powtarzalne co 30 minut) oddawało ci po drodze trochę monety.\n\nOd 50 warz wywary na słonecznopłatku i partie Eliksiru Węża ze słonecznopłatka z Ciernistego Szczytu, wciąż domieszkując trochę zieleni z Doliny i z mokradeł. Ostatni odcinek od 100 do 125 to celowy strumyczek, więc warz to, co naprawdę się sprzedaje, zamiast palić zioła dla samej liczby, i pamiętaj, że materiały jednorazowe to jedyny wyrób rzemieślniczy, który wszyscy kupują ponownie w nieskończoność. Księga Czynów zaznacza Dziwne Wywary przy umiejętności 50, a Arcymistrzostwo Alchemii przy pułapie.',
+  'guide.profPages.craftProse.engineering.identityBody':
+    'Rzemiosło uprawia się w narzędziowni w południowo-zachodnim rogu placu Eastbrook, siedzibie Majsterkowicza Gizzela, Mistrza narzędziowni. Poziomy od 1 do 3 każdej linii narzędzi to zwykły towar sprzedawców; poziomy 4 i 5 schodzą ze stołu inżyniera albo z lady wypraw Utopionej Litanii za Znaki Wypraw, zza bramek jej ukończeń, i nigdy z żadnej kasy za monetę.\n\nNa pierścieniu stoi wśród fachów prób i błędów, obok Alchemii i Wytwarzania Pancerzy, co daje mu dwie tożsamości par: Bombardiera (Inżynieria i Alchemia, podejmowanego przed samym Gizzelem) oraz Zębatkowca (Wytwarzanie Pancerzy i Inżynieria, nazwanego, ale jeszcze nie do przysięgnięcia). Jedno ostrzeżenie liczy się tu bardziej niż gdziekolwiek indziej: każdy ze szczebli przepisów Inżynierii stoi powyżej pułapu rzadkiego poziomu, na którym pracują hobbyści i niezadeklarowani rzemieślnicy, więc liczba umiejętności rusza się tylko u rzemieślnika, którego główne specjalizacje obejmują Inżynierię, co dziś oznacza Bombardiera. Narzędzia lądowe może zbudować każdy; niedostrojony rzemieślnik po prostu niczego się przy tym nie uczy, a dwa przepisy na wędki wymagają w dodatku nauki u Gizzela.',
+  'guide.profPages.craftProse.engineering.materialsBody':
+    'Każdy przepis na narzędzie lądowe pochłania narzędzie o poziom niższe plus materiał WYBORNY, i ta para to cała drabinka lądowa: cztery Wyborne Rudy Żelaza i Mithrilowy Kilof Górniczy stają się Kilofem Górniczym z Thorium, a potem dwie Sztabki Arkanitu, dwie Wyborne Rudy Thorium i ten kilof z thorium stają się Kilofem Górniczym z Arkanitu. Linie siekier i sierpów powtarzają kształt wyborny-plus-poprzednie-narzędzie z Wybornymi Kłodami Jesionu Popiołowego i Starodrzewu oraz Wybornymi Zielami Złotolistnymi i Słonecznego Płatka, choć ich szczeble poziomu 5 nie proszą o żadne Sztabki Arkanitu: kilof to jedyna linia, która drożeje na szczycie. Dwa przepisy na wędki celowo łamią schemat: Wędka z burzowym kołowrotkiem bierze cztery Karpiki Słonecznoblask i wędkę srebrnego strumienia, a Wędka kuta przypływem dwa Karpiki, osiem Surowych karpi Slatefin i tamtą Wędkę z burzowym kołowrotkiem, więc szczyt drabinki wędkarza opłaca się na wodzie, a nie przy żyle.\n\nMateriał wyborny nie jest nigdzie sprzedawany i nie wypada ze zwykłego zbioru: dostajesz go, pracując przy jednej z pełnowartościowych żył strefy narzędziem o randze wyższej niż sam materiał, co w praktyce oznacza narzędzie o szczebel niższe od tego, które próbujesz zbudować (łatwiejsze żyły, które strefa trzyma dla podróżnych, dają zwykły materiał, czymkolwiek machniesz). To jest celowe. Na trasie rzemieślniczej narzędzie poziomu 5 bierze się z faktycznego machania tym poziomu 4, a nie z wyprawy na zakupy; lada za Znaki Wypraw to jedyna droga naokoło. Jedynym wyjątkiem jest Sztabka Arkanitu, rafinowana i dostępna wyłącznie u sprzedawcy, po 1 srebrnym 60 miedzianych za sztabkę u Kwatermistrzyni Bree w Highwatch albo przy własnej ladzie Gizzela, więc sam Kilof Górniczy z Arkanitu niesie wbudowaną w swój koszt stałą podłogę monetową.',
+  'guide.profPages.craftProse.engineering.ladderBody':
+    'Drabinka to osiem przepisów, wszystkie związane ze stanowiskiem narzędziowni. Sześć przepisów na narzędzia lądowe jest znanych automatycznie, nigdy bez żadnej opłaty dla trenera: kilof, siekiera i sierp poziomu 4 przy umiejętności 75 oraz wersje poziomu 5 przy umiejętności 150. Ta druga liczba nie jest literówką i celowo stoi powyżej obecnego pułapu 125: wymagania umiejętności nigdy nie bramkują tu rzemiosła, kształtują wyłącznie przyrost umiejętności, więc narzędzie poziomu 5 możesz zbudować tego dnia, w którym trzymasz jego reagenty i jego poprzednika poziomu 4. Dwie wytwarzane wędki to nauczany wyjątek: Gizzel uczy Wędki z burzowym kołowrotkiem przy umiejętności 75 za 4 złote, a Wędki kutej przypływem przy umiejętności 125 za 16 złotych, każdej w chwili, gdy twój poziom w rzemiośle osiągnie jej własny.\n\nKażde gotowe narzędzie ma jakość rzadką lub epicką i wychodzi podpisane, więc twoje imię jeździ po strefach na pasach z narzędziami innych graczy. Inżynieria dźwiga też połowę jednego przepisu kombinowanego: Eliksiru niedźwiedzia, warzonego przez dostrojonego Bombardiera z Inżynierią i Alchemią na poziomie 25.',
+  'guide.profPages.craftProse.enchanting.identityBody':
+    'Każde zaklęcie jest znane od początku, każdy może rozkładać zaklęcia od pierwszego dnia i żadne z tych dwóch nigdy nie wymaga stacji; umiejętność ma pułap 125 jak każde rzemiosło. Jedynym nauczanym zakątkiem tego fachu jest jego para przepisów na talizmany: Majsterkowicz Gizzel uczy Skrytki Zbieracza i Oka Rzemieślnika w narzędziowni w południowo-zachodnim rogu placu Eastbrook, za zwykłą opłatę zależną od poziomu, gdy twoje Zaklinanie osiągnie 25, a same talizmany wykonuje się przy jego stanowisku.\n\nNa pierścieniu stoi między Kaligrafią a Jubilerstwem, więc jego dwie tożsamości par to Arkanista (Kaligrafia i Zaklinanie) oraz Jubiler (Zaklinanie i Jubilerstwo). Żadnej nie da się jeszcze przysiąc, bo obaj sąsiedzi czekają na swoje pierwsze przepisy, więc dziś Zaklinanie wspina się jako rzemiosło każdego: darmowe aż do rzadkiego poziomu jeszcze przed jakąkolwiek przysięgą i naturalny wybór na hobby dla Bombardiera albo Aptekarza. Zaklinacze utrzymują też przy życiu świat zbieractwa: oba osadzane efekty narzędzi to robota Zaklinacza, a pierwotny wytwórca ładuje własne efekty ze zniżką, tym głębszą po specjalizacji.',
+  'guide.profPages.craftProse.enchanting.levelingBody':
+    'Umiejętność poruszają trzy czynności: rozłożenie elementu, nałożenie zaklęcia i wytworzenie dwóch talizmanów, które wspinają się po zwykłej krzywej wytwarzania. Każdy sukces wart jest najwyżej jeden punkt, skalowany tym, jak poważna jest praca: rzadkością rozbijanego elementu albo poziomem reagentu nakładanego zaklęcia. Pospolite rozkłady i zaklęcia na samym pyle liczą się jako praca pospolita; niepospolite rozkłady i zaklęcia na esencji jako niepospolita; rzadkie rozkłady oraz każde zaklęcie Runiczne lub Wyższe jako rzadka; epickie i legendarne rozkłady stoją w tabeli jeszcze wyżej, choć żadna dzisiejsza tożsamość zaklinacza nie sięga ponad rzadki szczebel, więc w praktyce płacą tyle samo co praca rzadka. Przy stole rozbijania obowiązuje jedna uczciwość: element, który zszedł ze stołu gracza (wytworzony, podpisany lub mistrzowski), wciąż mieli się na materiały, ale niczego nie uczy, więc pętla wytwórz-i-rozbij nikogo nie awansuje, a lekcje kryją się w ekwipunku znalezionym w świecie.\n\nZnane zanikanie mistrzostwa działa na poziomach co 25 punktów, więc praca gatunku pospolitego szarzeje przy umiejętności 75, niepospolita przy 100, a praca rzadkiego poziomu dokładnie przy pułapie 125. Zaklinanie ma też jedną własną uprzejmość: wkład powyżej pułapu twojego archetypu jest zaokrąglany w dół do tego pułapu, zamiast zerowany, więc zanim się dostroisz, epicki rozkład liczy się po prostu jako rzadki, a nie uczy niczego. Jeśli Zaklinanie skończy uśpione za inną tożsamością, rozbijanie i nakładanie liczą się jako praca pospolita, a wspinaczka staje przy 75, natomiast dwa talizmany, jadące po krzywej wytwarzania powyżej pułapu pospolitego, nie uczą uśpionego zaklinacza zupełnie niczego; trzymaj je jako hobby, a praca rzadkiego poziomu wciąż płaci, tyle że wolniej po 75.',
+  'guide.profPages.craftProse.enchanting.marketBody':
+    'Nałożenie zaklęcia zużywa reagenty i znaczy jedną konkretną kopię przedmiotu. Wskaż kopię z torby, a dostaniesz z powrotem osobną zaklętą kopię; wskaż element, który już nosisz, a zostanie zaklęty na miejscu, dokładnie tam, gdzie siedzi, bez tańca ze zdejmowaniem i zakładaniem z powrotem. Tak czy inaczej premia idzie za tym elementem na zawsze, przez zdejmowanie, wizyty w banku i wymiany. Jedno zaklęcie na element: nałożenie innego zaklęcia na zaklętą kopię prosi o potwierdzenie, a potem zastępuje stare zaklęcie bez reszty, niszcząc je bez zwrotu jego materiałów. Sprzedaż, wyrzucanie i rozkładanie zawsze sięgają najpierw po zwykłe kopie, więc twój gotowy element nie zostanie zjedzony przez przypadek.\n\nMistrzowski ekwipunek i zaklinanie się przyjaźnią: element będący arcydziełem pozostaje w pełni zaklinalny, a zaklęcie dokłada się na wierzch premii arcydzieła, nie naruszając ani jej, ani podpisu wytwórcy. Po zsumowaniu wszystkich źródeł podpisane arcydzieło niosące Wyższe zaklęcie to najlepsze, co może osiągnąć wyrób rzemieślniczy, i z założenia wciąż stoi poniżej łupów rajdowych.\n\nNa rynku zaklęty lub podpisany element wystawia się jak wszystko inne: idzie w górę jako własne wystawienie na jedną kopię, dymek pokazuje zaklęcie i znak wytwórcy, a Krucza Poczta niesie go równie wiernie. Materiały pozostają stabilną połową rzemiosła: Pył, Esencja i Odłamki wystawiają się swobodnie, wystawienie nic nie kosztuje, a Kupiec bierze 5 procent wyłącznie od zakończonej sprzedaży. To sprawia, że dwa klasyczne dochody zaklinacza to sprzedaż materiałów i sprzedaż gotowej pracy: przez rynek, przez kruka albo twarzą w twarz w oknie wymiany.',
+  'guide.profPages.howBody':
+    'Otwórz okno wytwarzania (domyślnie klawisz T), a zobaczysz listę wszystkich znanych ci przepisów wraz z tym, czego wymagają i co masz pod ręką. Przepisy związane ze stacją każą ci stanąć w promieniu 20 jardów od właściwej stacji w mieście, przepisy polowe wytwarza się wszędzie, a rozkładanie i zaklinanie w Zaklinaniu nie wymagają żadnej stacji (tylko jego dwa przepisy na talizmany to praca przy stacji, w narzędziowni). Nie ma rzutu na niepowodzenie: wyrób z materiałami pod ręką zawsze się udaje.\n\nDwa drobne tarcia utrzymują gospodarkę w ryzach. Każdy udany wyrób płaci opłatę 2 miedziaków za punkt budżetu statystyk przedmiotu, a akcje typu rzemieślniczego dzielą jedno tempo: najwyżej 10 wyrobów, rozłożeń, zaklęć, odzysków lub ładowań narzędzi w każdym 60-sekundowym oknie. Żadne z nich nie przeszkodzi w normalnej sesji; oba powstrzymują wyspecjalizowanego rzemieślnika przed zalaniem rynku.',
+  'guide.profPages.masterworkBody':
+    'Każdy udany wyrób jest dokładnie tym, co obiecuje przepis, a czasem czymś nieco więcej: arcydzieło kończy ten sam przedmiot o jeden poziom jakości lepiej, z premiowymi statystykami wtopionymi w chwili wytworzenia. Działa tylko na plus, nigdy nie obniża, i pozostaje poniżej progu rajdowego, więc wytwarzany ekwipunek może być znakomity, nie zastępując łupu rajdowego.\n\nSzansa jest jawna, nie mistyczna: {base}% podstawy, plus {perTier}% za każdy poziom, o który twoja umiejętność przewyższa przepis, plus {signed}%, gdy w skład wchodzi jakikolwiek podpisany reagent, plus {spec}%, gdy już się wyspecjalizujesz, przy czym materiały wyższego poziomu dodają jeszcze 1 do 2%, a wszystko ograniczone do {cap}%. Poprawić można wyłącznie przedmiot z prawdziwymi statystykami, więc pospolite rzeczy bez statystyk, narzędzia i przedmioty zużywalne nigdy nie procują; uśpione rzemiosło nigdy arcydzieła nie wyda, a rzemiosło dodatkowe nie może stworzyć arcydzieła ponad swój rzadki pułap.\n\nDobra robota niesie ze sobą swojego twórcę. Wyroby rzadkie i lepsze są podpisane, każda kopia (Stworzone przez; zebrane materiały noszą Zebrane przez), a arcydzieło jest podpisane zawsze, niezależnie od jakości. Podpis to proweniencja, nie kłódka: podpisane towary swobodnie przechodzą przez wymianę, pocztę i wystawienia na Rynku Świata.',
+  'guide.profPages.trainingBody':
+    'Przepisy od trenerów pochodzą od rezydujących mistrzów i są nauczane przy ich stacjach. Zasada mieści się w jednym zdaniu: mistrz uczy przepisu, gdy twój poziom w rzemiośle osiągnie własny poziom przepisu, i nic więcej tego nie ogranicza, ani twój poziom postaci, ani twój archetyp. Drabinki ekwipunkowe i konsumpcyjne mają szczeble przy umiejętności 0, 25 i 50; dwie lekcje wędek z Inżynierii przedłużają drabinkę przy 75 i 125, a dwa przepisy na talizmany z Zaklinania siedzą na szczeblu 25, więc świeży szczebel otwiera się w miarę, jak rosną twoje poziomy.\n\nOpłaty są jednorazowe i stałe dla szczebla: szczebel startowy jest darmowy, szczebel umiejętności 25 kosztuje {tier1} za przepis, szczebel umiejętności 50 {tier2}, a lekcje wędek powyżej nich mają własne opłaty, wypisane obok każdego przepisu w tabeli. Żeby się szkolić, musisz stać przy prawdziwej stacji mistrza, a ruchoma stacja nigdy się nie liczy. Pospolite przepisy polowe i sześć przepisów na wytwarzane narzędzia lądowe nie wymagają żadnego szkolenia; każda postać zna je od początku.',
+  'guide.profPages.ench.enchantsNote':
+    'Zaklęcia dzielą się na trzy poziomy. Poziom podstawowy działa na Pyle Kuranta (z odrobiną Esencji na górnym końcu) i obejmuje slot broni oraz każdy slot pancerza poza dłonią pomocniczą, z taką liczbą osi statystyk, że każdy build znajdzie coś na każdy slot. Poziom Wyższy kosztuje jeden Odłamek Kuranta plus Esencję: mocniejsze premie na slotach o największym znaczeniu. Odłamki zasilają poza tym dwa dalsze odpływy, dwa przepisy na talizmany po pięć sztuk każdy oraz najwyższy szczebel ładowania efektów narzędzi, więc odłóż kilka do banku, zanim zaczniesz wydawać.\n\nPomiędzy nimi siedzi pięć zaklęć Runicznych, po jednym odbiorcy na każdy typowany surowiec drugorzędny, więc nic, co zmielisz, nie jest nigdy ślepą uliczką: Runiczne Ostrze (broń, Siła, zużywa Rezonującą stal), Runiczny Sygil (broń, Intelekt, Rezonujące drewno), Runiczny Splot (tors, Duch, Rezonująca nić), Runiczna Skóra (nogi, Zręczność, Rezonująca skóra) oraz Runiczne Ogniwa (hełm, Wytrzymałość, Rezonujące ogniwa). Każde bierze też dwie Esencje Kuranta; tam, gdzie slot i statystyka mają zarówno zaklęcie podstawowe, jak i Wyższe, premia Runiczna ląduje między nimi, a Runiczny Splot jest wprost najsilniejszym zaklęciem na Ducha na tors, zaś Runiczna Skóra to jedyne zaklęcie na Zręczność na nogi w ogóle. Dokładne premie znajdziesz w tabeli poniżej.',
+  'guide.profPages.gatherIntro.mining':
+    'Górnictwo wyciąga rudę prosto ze skał świata: miedź w Dolinie Wschodniego Strumienia, żelazo na Trzęsawisku Mokrzawia i osmium wysoko na Wyżynach Ciernistego Szczytu, ze startowymi żyłami rozsianymi po każdej młodszej strefie poza nimi, karmiąc rzemiosła kuźni. Otwarte dla każdego od 1 poziomu: kilof górniczy za 20 miedziaków z lady w Eastbrook, Fenbridge lub Highwatch otwiera każdą startową żyłę, a wyższe szczeble drabinki kilofów budzą się w miarę, jak zapracuje na nie twój własny licznik. Liczone na własnym liczniku do pułapu 100.',
+  'guide.profPages.gatherIntro.logging':
+    'Drwalstwo ścina drewno z drzewostanów w całym świecie: żelazną korę w Dolinie Wschodniego Strumienia, jesion popiołowy na Trzęsawisku Mokrzawia, wysoką sosnę na Wyżynach Ciernistego Szczytu i startowe drzewostany w każdej młodszej strefie, surowiec na trzonki, kostury i warsztat inżyniera. Otwarte dla każdego od 1 poziomu, o ile masz w torbach siekierę drwala (20 miedziaków przy ladach w Eastbrook, Fenbridge i Highwatch), liczone na własnym liczniku do pułapu 100.',
+  'guide.profPages.gatherIntro.herbalism':
+    'Zielarstwo zbiera to, co rośnie dziko: lśnolist w Dolinie Wschodniego Strumienia, złotolist na Trzęsawisku Mokrzawia, słonecznopłatek na Wyżynach Ciernistego Szczytu i startowe łany w każdej młodszej strefie, liść i łodygę, dzięki którym fachy aptekarskie wciąż warzą. Otwarte dla każdego od 1 poziomu, o ile masz w torbach sierp zielarski (20 miedziaków przy ladach w Eastbrook, Fenbridge i Highwatch), liczone na własnym liczniku do pułapu 100.',
+  'guide.profPages.gatherIntro.fishing':
+    'Wędkarstwo to wyjątek wśród fachów zbierackich i zarazem najgłębszy z nich: prawdziwa minigra brania i wyciągania, własne tabele połowów w każdej z trzech stref serca królestwa (młode wody poza nimi na razie korzystają z tabeli Doliny) i pułap biegłości 200, dwa razy wyższy niż u pozostałych. Kup wędkę, stań twarzą do otwartej wody i zarzuć.',
+  'guide.profPages.rhythmBody':
+    'Zbiór to krótkie, widoczne rzucanie, a nie natychmiastowe chwycenie: {base} sekund podstawy, nigdy poniżej podłogi {floor} sekund. Noszenie narzędzia powyżej poziomu węzła, takiego, które twoja biegłość pozwala ci dzierżyć, przyspiesza cię o {tool} sekund za każdy poziom ponad nim, a każde przekroczone pasmo biegłości ścina kolejne {band} sekund; samo dorównanie poziomowi węzła wpuszcza cię przez drzwi, to poziomy powyżej niego czynią cię szybkim.\n\nPełna torba grzecznie odmawia rzucania, zanim się ono zacznie, więc nic nie marnuje się w połowie zamachu, a każdy zbiór płaci małą porcję PD postaci, skalowaną poziomem węzła względem twojego tak samo, jak skaluje się PD za zabójstwa: banalny szary węzeł nie uczy postaci na pułapie niczego.',
+  'guide.profPages.gainBody':
+    'Przyrost jest deterministyczny, nigdy nie jest rzutem na podniesienie umiejętności: węzeł na poziomie twojego przyrostu lub wyżej uczy pełnego punktu za zbiór, a każde {step} biegłości to jeden poziom liczony względem węzła. Węzły poziomu 1 płacą w pełni poniżej 25, połowę do 49, ćwierć do 74 i nic od 75 wzwyż; węzły poziomu 2 płacą w pełni do 49; dwa węzły poziomu 3 każdego fachu płacą w pełni do 74 i połowę aż do pułapu {cap}.\n\nZamierzona trasa jest prosta: ucz się na startowych węzłach Doliny, przenieś się na trzęsawisko i dokończ wspinaczkę na wysoczyznach Wyżyn Ciernistego Szczytu. Przy pułapie nauka się kończy, ale plony nie: zbieracz na pułapie na zawsze losuje najlepsze szanse, jakie oferuje jego fach.',
+  'guide.profPages.toolsNote':
+    'Każdy węzeł wymaga narzędzia swojego fachu w twoich torbach, z poziomem 1 włącznie: nie ma kilofa, nie ma rudy; nie ma wędki, nie ma ryby. Drabinka sprzedawców obejmuje poziomy od 1 do 3 w trzech centrach serca królestwa: narzędzie poziomu 1 sprzedaje się we wszystkich trzech, a szczeble powyżej niego tam, gdzie zaczyna się teren, który ich wymaga (Fenbridge dokłada poziom 2, Highwatch poziom 3), natomiast młodsze osady poza nimi nie trzymają narzędzi wcale, więc zaopatrz się przed podróżą. Każda lada sprzedaje swobodnie każdy szczebel, który ma w zapasie, a dowolne narzędzie przechodzi przez bezpośrednią wymianę; każdy szczebel można też wystawić na Rynku i wysłać pocztą, z wyjątkiem trzech lądowych narzędzi startowych za 20 miedziaków: te kupuje się przy ladzie albo przekazuje z rąk do rąk i nigdy nie odsprzedaje, nie wysyła pocztą ani nie wystawia. Ograniczone jest dzierżenie. Narzędzie lądowe powyżej poziomu 1 działa dopiero wtedy, gdy zapracuje na nie twoja biegłość we własnym fachu, {tier2Prof} dla poziomu 2, {tier3Prof} dla poziomu 3 oraz 85 i 100 dla dwóch szczebli wytwarzanych, a wiersz sprzedawcy, podpowiedź i poniższa tabela od razu podają ten wymóg. Do tego czasu narzędzie kupione z wyprzedzeniem po prostu czeka w torbach, nie otwierając terenu, nie kupując szybkości i nie wybijając wybornych gatunków, po czym daje się dzierżyć w chwili, gdy twój licznik dotknie jego liczby. Wędki są jedynym wyjątkiem: żadna wędka nie ma wymogu dzierżenia, a Handlarz Wilkes w Eastbrook celowo trzyma na stanie wędki poziomu 2 i 3 dla wędkarzy kupujących z wyprzedzeniem. Narzędzie nigdy nie zajmuje slotu wyposażenia i nigdy się nie zużywa, więc każde to zakup jednorazowy, a dla progu liczy się wyłącznie poziom: rzadsze narzędzie tego samego poziomu nie otwiera nic dodatkowego. Rzadkość to jednak nie tylko kolor. Sprawia, że osadzony efekt narzędzia trwa dłużej, a na wędce poszerza okno wyciągania.\n\nLepsze narzędzie kupuje trzy rzeczy, nie dwie. Otwiera teren wyższego poziomu, skraca rzucanie i poprawia to, co z niego wychodzi: obrób żyłę narzędziem o randze POWYŻEJ własnego materiału strefy, a zbiór wyda jego wyborny gatunek zamiast zwykłego. Żyła musi być jedną z pełnogatunkowych żył strefy, więc łatwiejsze żyły, które strefa zachowuje dla podróżnych, nadal dają zwykły materiał. To materiały wyborne zużywają przepisy na wytwarzane narzędzia, a wyborny gatunek liczy się jako jego zwykła wersja wszędzie tam, gdzie przepis lub zlecenie robocze o nią prosi, więc ulepszanie nigdy nie zostawia cię na lodzie: oznacza tylko, że twoja ruda miedzi przychodzi jako Wyborna Ruda Miedzi.\n\nPonad drabinką sprzedawców każdy fach ma dwa narzędzia wytwarzane, poziomu 4 i 5, robione w narzędziowni (przepisy lądowe zna każda postać; umiejętnością, która rośnie przy tej pracy, jest Inżynieria), albo kupowane za Znaki Wypraw przy ladzie Utopionej Litanii po spełnieniu jej progów oczyszczeń: poniższa tabela podaje cenę w Znakach i liczbę oczyszczeń, o którą prosi każdy szczebel. Żaden kupiec nigdy nie sprzeda ich za monetę. Wędkarstwo ma własną parę, a tych uczy się u wytwórcy narzędzi, zamiast znać je od początku. Żaden węzeł ani żadna woda nie wymaga dziś więcej niż poziomu 3, więc dwa najwyższe szczeble kupują szybkość, gatunek i łaskawsze okno wyciągania zamiast dostępu, a staną się biletem wstępu, gdy pojawi się teren wyższego poziomu.',
+  'guide.profPages.toolCraftedOrMarks':
+    'Wytworzony ({craft}) lub {marks} Znaków Wypraw po trzech oczyszczeniach Utopionej Litanii',
+  'guide.profPages.toolCraftedOrMarksHeroic':
+    'Wytworzony ({craft}) lub {marks} Znaków Wypraw po heroicznym oczyszczeniu Utopionej Litanii',
+  'guide.profPages.priceNone': 'Niesprzedawane za monety',
+  'guide.profPages.colWield': 'Użycie od',
+  'guide.profPages.wieldNone': 'Dowolna',
+  'guide.profPages.bandsBody':
+    'Pasma biegłości to wspólna drabina 0/100/200 rozpięta nad licznikiem każdego zawodu. W zawodach lądowych pasmo przekroczone przy 100 skraca czas rzucania zbioru, a ich pułap sprawia, że pasmo 1 jest sufitem. Pasma wędkarstwa nie skracają niczego: wybierają tabele połowów (przy dopasowanej wędce), tylko wędkarstwo sięga pasma 2, a sama wspinaczka jest tym, co ciągnie wędkarza na głębsze wody, gdzie mieszkają zarówno lepsze tabele, jak i dalsze lekcje.',
+  'guide.profPages.specimenBody':
+    'Zostawiaj trochę wolnego miejsca w torbach, gdy farmisz: podpisana gratka potrzebuje własnego miejsca albo pasującego podpisanego stosu, w który wpadnie, a jeśli nic nie pasuje, plon i tak przychodzi, lecz podpis przepada. Zbieranie z tusz ma też własne ramię jackpota: około {pct}% każdego pozyskanego składnika wychodzi rzadkie lub lepsze. Rodzina, która ma do dania doskonały okaz (skóra, jedwab, jad, mięso), zostawia swój zwykły plon zwykłym i wybija podpisany okaz obok niego; każda inna rodzina podpisuje sam plon.',
+  'guide.profPages.gatherDeeds.fishing':
+    'Kamień milowy 100 wpisuje Starego Solonego, a 200 wpisuje Mistrza Wędkarstwa wraz z jego tytułem, absolutny szczyt sztuki wędkarskiej; Wędkarstwo liczy się też do Mistrza Zbieracza, zdobywanego przy 100 w dowolnych trzech fachach zbierackich. Pierwsza ryba z wód każdej z sześciu stref wypełnia własną stronę, trzy strefy serca królestwa oraz Wierzbowe Mokradła, Wichrowy Grzbiet i Dalekie Wybrzeże poza nimi, a Karpik Słonecznoblask zapisuje Przebłysk Nadziei, więc podróżnicy z wędką w plecaku zapełniają swoją księgę szybciej, niż się spodziewają.',
+  'guide.profPages.fish.startBody':
+    'Prosta wędka kosztuje 20 miedziaków u Rybaka Brandta w Eastbrook (szukaj Starego Wilka Morskiego na wschodnim skraju miasta, przy drodze do Jeziora Lustrzanego); wędki mają na stanie także Majsterkowicz Gizzel, Zaopatrzeniowiec Hale w Fenbridge i Kwatermistrzyni Bree w Highwatch. Użyj wędki zwrócony ku wodzie na tyle głębokiej, by mieściła ryby, w odległości do jakichś 24 jardów przed sobą, a twój spławik poszybuje w jej stronę.\n\nNie zarzucisz w walce, wpław ani po śmierci: zamierzoną postawą jest łowienie z brzegu. Woda twardnieje jednak razem z lądem: trzęsawisko wymaga co najmniej Żelaznego Kołowrotka poziomu 2, a szczyty Srebrnego Strumienia poziomu 3, i żyłka zarzucona bez wędki, której dana woda wymaga, nigdy nie opuszcza twojej ręki. Ponad nimi stoją dwie wędki, Burzowy Kołowrotek i Kuta Przypływem: inżynierowie wytwarzają je w narzędziowni z tego, co wyciągnie żyłka, a lada wypraw przy Utopionej Litanii sprzedaje je za Znaki Wypraw po spełnieniu progów oczyszczeń, choć nigdy za monetę. Żadna woda ich nie wymaga, więc kupują krótsze oczekiwanie i szersze okno wyciągania zamiast dostępu, co na najwyższym szczeblu oznacza branie w równe trzy sekundy.',
+  'guide.profPages.fish.biteBody':
+    'Po zarzuceniu branie przychodzi w ukrytej chwili między {min} a {max} sekundą; opóźnienie rozstrzyga się w momencie, gdy żyłka ląduje w wodzie, więc żadne dwa zarzucenia nie są całkiem takie same. Gdy spławik zanurkuje, masz okno {reel} sekund, by znów wcisnąć wędkę i wyciągnąć: wyciągnij w tym czasie, a połów ląduje w torbie, zawahaj się dłużej, a ryba ucieka i nic po niej nie zostaje. Cała sesja ma pułap {cap} sekund, więc nawet spokojne zarzucenie rozstrzyga się szybko.\n\nLepsze wędki wyostrzają oba końce minigry: każdy poziom wędki powyżej pierwszego ścina {rod} sekund z najdłuższego możliwego oczekiwania, nigdy poniżej trzysekundowej podłogi, której najlepsza wędka już dotyka, i dodaje {reelRod} sekund do okna wyciągania, więc Żelazny Kołowrotek sprowadza najgorsze oczekiwanie do 6,5 sekundy przy oknie 3,25 sekundy, a Srebrny Strumień do 5 przy oknie ponad 4, bo jego rzadkość poszerza wyciąganie nieco ponad to, co płaci sam poziom. Najszybsze brania nie zmieniają się niezależnie od tego, co trzymasz, a wędka musi jedynie leżeć w twoich torbach, by się liczyła.',
+  'guide.profPages.fish.scheduleNote':
+    'Przyrost wędkarski podąża za stałym harmonogramem bez żadnych kostek: pełny punkt za połów poniżej 50 biegłości, pół punktu poniżej 100, dziesiąta część poniżej 150 i powolna strużka 0,02 od 150 do 200. Ten ostatni odcinek to celowo podróż na tysiące połowów: 200 to deklaracja, a nie przystanek w drodze do czegoś innego.\n\nŚmieci przestają uczyć całkowicie przy {cutoff}: od tego miejsca wodorosty i buty to tylko wodorosty i buty. Sama woda też nakłada pułap na naukę: wody poziomu 1 w Dolinie (i każdy młody brzeg poza sercem królestwa) nie uczą niczego powyżej 100, wody trzęsawiska zatrzymują się na 150, i tylko wody Ciernistego Szczytu szkolą wędkarza całą drogę do 200. Każdy wyciągnięty połów daje poza tym przyrost według harmonogramu, więc gdy licznik staje, harmonogram mówi ci, byś poszukał głębszej wody.',
+  'guide.profPages.fish.tablesNote':
+    'Twoja biegłość wybiera jedno z trzech pasm połowów: pasmo 0 od początku, pasmo 1 przy 100, pasmo 2 przy 200, a każde przesuwa wagę ze śmieci i pustych haczyków na prawdziwe ryby, strefa po strefie. Każde pasmo powyżej pierwszego wymaga też wędki: pasmo 1 chce Żelaznego Kołowrotka poziomu 2, pasmo 2 Srebrnego Strumienia poziomu 3. Twoje efektywne pasmo to niższa z dwóch wartości: tego, na co zapracowała twoja umiejętność, i tego, co udźwignie twoja wędka, a ograniczenie jest ciche: gorszą wędką wciąż łowisz, tylko z tabeli niższego pasma, więc jeśli twoje połowy stoją w miejscu, choć umiejętność rośnie, sprawdź najpierw wędkę.\n\nWody każdej strefy kryją własną parę ryb jadalnych, leczących tym mocniej, im głębsza strefa, a wszystkie są składnikami kuchennymi i całkiem dobrym jedzeniem na postój prosto z żyłki. Reszta tabeli to podatek wędkarza: wodorosty, od czasu do czasu but i pusty haczyk, który nigdy nie znika do końca. Ile płacisz, zależy od wody, w której ląduje twój spławik, a nie od tego, gdzie stoisz: zarzucenie sięga do 24 jardów, a wędka, której woda wymaga, tabela, z której losuje, czyn, który zalicza, i to, jak daleko uczy, wszystko odpowiada strefie, do której ta woda należy, rozstrzygnięte w chwili, gdy żyłka ląduje. Woda każdej strefy jest napisana pod własne pasmo, Dolina pod pasmo 0, trzęsawisko pod pasmo 1, szczyty pod pasmo 2, a łowienie o jedno pasmo niżej zamienia mniej więcej jedną trzecią twoich zarzuceń w puste haczyki, dwa pasma niżej ponad połowę. Wędka doprowadza cię do wody; to umiejętność sprawia, że woda płaci, a wspinaczka jest tym, co ciągnie wędkarza głębiej, bo lepsze pasma to nie tylko lepsza zapłata: poza Doliną tylko one wciąż uczą. {rare} to jedyny wiersz, który odpowiada twojemu pasmu połowów i niczemu więcej: te same szanse w każdej strefie i sześć razy większe na paśmie 2 niż na paśmie 0, więc najrzadsza rzecz przy pomoście to ta, w której Mistrz Wędkarstwa naprawdę jest lepszy.',
+  'guide.profPages.fish.koiBody':
+    'Każdy zbiornik wodny w grze kryje tę samą nagrodę: Karpika Słonecznoblask, niepospolity błysk na żyłce wart 75 miedziaków u sprzedawcy i znacznie więcej dla twojej dumy. Jego szanse odpowiadają wyłącznie twojemu pasmu połowów i niczemu więcej, tak samo w każdej strefie: 1 procent wiersza tabeli połowów na paśmie 0, 3 na paśmie 1 i 6 na paśmie 2, losowane przy każdym wyciągniętym zarzuceniu, więc karpik przychodzi do wędkarza, który zapracował na głębokie tabele. Wyciągnięcie go zapisuje Przebłysk Nadziei w twojej Księdze Czynów, znak kolekcjonerski bez Renomy. Gdy się to zdarzy, dziennik zadba o to, byś o tym wiedział.',
+  'guide.profPages.econ.trainingNote':
+    'Jedna stała opłata za szczebel przepisów, pobierana raz, gdy mistrz go naucza; każdy szczebel z poniższej tabeli jest dziś w żywym użyciu, od darmowych przepisów startowych po lekcje wędek u wytwórcy narzędzi na samej górze.',
+  'guide.profPages.econ.provenanceBody':
+    'Niektóre przedmioty noszą imię. Najedź na taki, a dymek powie Zebrane przez kogoś tam na surowym materiale albo Stworzone przez kogoś tam na gotowym wyrobie: ten sam znak, ubrany w słowa zależnie od tego, jak przedmiot powstał. Podpis jest częścią samego przedmiotu, jedzie z nim przez wymiany, bank, pocztę, Rynek Świata, a nawet odkup u sprzedawcy, i nigdy nie blednie.\n\nZbieractwo podpisuje swoją najlepszą pracę automatycznie: każdy zbiór, który wylosuje rzadki lub lepszy, przychodzi podpisany, a rzadkie znaleziska podpisują cały swój pięciokrotny urobek. Szczęśliwy rzut przy zbiorze ze zwłok podpisuje plon tam, gdzie dana rodzina nie ma okazu do oddania, a tam, gdzie ma, zostawia plon zwykły i wybija obok niego podpisany nieskazitelny okaz. Wytwarzanie podpisuje wedle tej samej linii: każda kopia wyniku rzadkiego lub lepszego wybija się podpisana, a arcydzieło podpisuje się zawsze, niezależnie od swojej jakości, więc najlepsza wersja każdego elementu zawsze wymienia swojego twórcę. Jedyne, co może kosztować cię podpis, to pełna torba: podpisana sztuka potrzebuje własnego miejsca albo pasującego podpisanego stosu, w którym może wylądować.\n\nStos przedmiotów dzieli jedną tożsamość, więc dwie kopie łączą się tylko wtedy, gdy każdy znak zgadza się dokładnie: ten sam przedmiot, ten sam podpisujący, te same statystyki arcydzieła, to samo zaklęcie, ta sama więź. Podpisana kłoda nigdy nie dołącza do zwykłej sterty w żadną stronę (łączenie wymazałoby czyjeś imię), ale identyczne ładunki łączą się chętnie, więc dwadzieścia rud podpisanych przez tego samego zbieracza siedzi w jednym stosie, a urobek nie szatkuje ci toreb.\n\nPodpisy oddają rzemieślnikom z nawiązką: trzymanie przy stole dowolnej podpisanej kopii potrzebnego reagentu, obojętne kto ją podpisał, dodaje 2 punkty procentowe szansy na arcydzieło, a trzymanie reagentu podpisanego twoją własną ręką obniża wymaganą ilość tego reagentu o jeden (nigdy poniżej jednego). Twoja własna podpisana praca rzadka lub lepsza nawet dalej cię uczy, dziś wyłącznie przez butelkę: wypij miksturę, którą podpisałeś, a mały strumyczek umiejętności popłynie z powrotem do rzemiosła, które ją uwarzyło, o ile to rzemiosło jest jedną z twoich aktywnych głównych specjalizacji.',
+  'guide.profPages.faq.a4':
+    'Trafiła ci się gratka. Mniej więcej 1 zbiór na 90 wyzwala rzadkie zdarzenie zbierackie (starożytne twarde drewno na drzewie, pierwotna żyła w rudzie, rozkwitły w blasku księżyca kwiat wśród ziół): mnoży plon pięć razy, podpisuje każdą jednostkę twoim imieniem i ogłasza znalezisko całej strefie. Rzut na rzadką lub lepszą jakość przy zwykłym zbiorze również podpisuje plon.\n\nPodpisane materiały warto zachować albo sprzedać drogo: trzymanie przy warsztacie dowolnej podpisanej kopii potrzebnego reagentu dodaje 2 punkty procentowe do szansy na arcydzieło. Pamiętaj tylko, że łączą się w stos wyłącznie z identycznie podpisanymi kopiami, więc zajmują własny slot w torbie.',
+  'guide.profPages.faq.a6':
+    'Dziewięć pospolitych przepisów polowych i sześć przepisów na wytwarzane narzędzia lądowe zna każdy od początku, podobnie jak trzy zwieńczenia związane ze stacją (Naramiennik Piecołuski, Kaptur z Ochronnej Tkaniny i Owijki ze Zmierzchowej Skóry), które nie wymagają trenera, a jedynie swojej stacji. Wszystkiego innego uczą rezydujący mistrzowie przy swoich stacjach w trzech miastach centralnych: większość stoi w Eastbrook, garbarz prowadzi garbarnię w Fenbridge, a alchemik aptekę w Highwatch.\n\nPrzepisy od trenerów biegną szczeblami: umiejętność 0, 25 i 50 dla rzemiosł ekwipunkowych i konsumpcyjnych, w cenach: za darmo, 25 srebrnych i 1 złoty jako opłaty jednorazowe; dwa przepisy na talizmany z Zaklinania siedzą na szczeblu 25, a wytwórca narzędzi uczy dwóch wytwarzanych wędek przy 75 i 125 za 4 i 16 złotych. Mistrz uczy przepisu, gdy twoje pasmo w danym rzemiośle osiągnie pasmo samego przepisu, a żeby się uczyć, musisz stać przy jego stacji: ruchoma stacja się nie liczy.',
+  'guide.profPages.faq.a7':
+    'Czas zbierania startuje z 2,5 sekundy i skraca się na dwa sposoby: o 0,4 sekundy za każdy poziom narzędzia, które nosisz i potrafisz dzierżyć ponad własny poziom węzła, oraz o 0,15 sekundy, gdy licznik twojego fachu przekroczy pasmo 100, z podłogą na 1,5 sekundy. Przejdź z węzłów poziomu 1 na węzły poziomu 3, a twoja nadwyżka znika, więc ten sam kilof macha znowu wolniej. Trzymanie dokładnie wymaganego poziomu nie kupuje szybkości; otwiera tylko węzeł.\n\nPrzyrost umiejętności zanika tak samo jak przy wytwarzaniu: węzeł szarzeje, gdy twoja biegłość wspina się ponad jego poziom (węzły poziomu 1 niczego nie uczą od biegłości 75 wzwyż), więc odpowiedzią na powolne przyrosty są węzły wyższego poziomu. Te wymagają narzędzia co najmniej ich poziomu w torbach (żadnego węzła nie obrabia się gołymi rękami, z poziomem 1 włącznie), a narzędzie lądowe powyżej poziomu 1 chce najpierw swojego progu dzierżenia: 40/70/85/100 we własnym fachu dla poziomów od 2 do 5. Wędkarstwo ma własne zwężenie: pełny przyrost poniżej 50 biegłości, połowa poniżej 100, strużka 0,1 poniżej 150 i 0,02 poniżej 200, śmieciowe połowy nie uczą już niczego od 100 wzwyż, a sama woda nakłada pułap na naukę (wody poziomu 1 przestają uczyć przy 100, trzęsawisko przy 150), więc zatrzymany licznik może też oznaczać, że wyrosłeś z tej wody.',
+  'guide.profPages.faq.a8':
+    'Częściowo. Dziewięć pospolitych przepisów polowych (startowa broń, pancerz, jedzenie i mikstury) wytwarza się wszędzie i o każdej porze, podobnie jak trzy przepisy kombinowane przysięgniętych par. Wszystko powyżej nich jest związane z typem stacji: kuźnia, kuchnie, apteka, garbarnia, warsztat tkacki lub narzędziownia, a żeby wyrób doszedł do skutku, musisz być w promieniu 20 jardów od stacji.\n\nPrzy 75 umiejętności w rzemiośle specjalizujesz się, a wraz z 20-procentową zniżką na materiały zyskujesz ruchomą stację: rozstaw ją w terenie, a stoi przez 10 minut, obsługując przepisy tego rzemiosła tak, jakbyś stał przy prawdziwej. Ruchoma stacja służy wyłącznie do wytwarzania: nauka przepisów i odwiązywanie zamówień zawsze wymagają prawdziwej stacji w mieście.',
+  'wallet.seekerAppHelp':
+    'Kontynuuj z Seed Vault Wallet. Przejrzyj żądania połączenia i weryfikacji w Seed Vault, a następnie wróć do gry.',
+  'questUi.tracker.unknownQuest': 'Nieznane zadanie ({id})',
+  'questUi.log.repeatableStatus': 'Powtarzalne',
+  'questUi.log.cooldownStatus': 'Wkrótce znów dostępne',
+  'questUi.dialog.repeatableQuestAria': 'Zadanie powtarzalne: {name}',
+  'itemUi.kind.fineMaterial': 'Wyborny materiał',
+  'itemUi.bags.unknownItem': 'Nieznany przedmiot',
+  'itemUi.bags.unknownItemAria': 'Nieznany przedmiot {id}, ilość {count}',
+  'itemUi.bags.unknownItemAriaMasterwork': 'Nieznany przedmiot {id}, ilość {count}, arcydzieło',
+  'itemUi.bags.unknownItemAriaEnchanted': 'Nieznany przedmiot {id}, ilość {count}, zaklęta kopia',
+  'itemUi.bags.unknownItemAriaBound': 'Nieznany przedmiot {id}, ilość {count}, związana kopia',
+  'itemUi.bags.unknownItemAriaInstanced': 'Nieznany przedmiot {id}, ilość {count}, oznaczona kopia',
+  'itemUi.vendor.buyAriaWithRequirement': 'Kup {item} za {price}. {requirement}',
+  'itemUi.vendor.qtyRowAria': 'Liczba kupowanych sztuk',
+  'itemUi.vendor.qtyMultiple': '{count}x',
+  'itemUi.vendor.qtyMultipleAria': 'Kupuj po {count} sztuk naraz',
+  'itemUi.vendor.qtyCustom': 'Własna',
+  'itemUi.vendor.qtyCustomAria': 'Wybierz własną liczbę sztuk do kupienia',
+  'itemUi.vendor.buyCountAria': 'Kup {count} {item} za {price}',
+  'itemUi.vendor.buyCountAriaWithRequirement': 'Kup {count} {item} za {price}. {requirement}',
+  'itemUi.vendor.buyQuantityTitle': 'Ile sztuk {item}? Maksymalnie {max}.',
+  'itemUi.vendor.buyQuantityInput': 'Ilość do kupienia',
+  'itemUi.vendor.buyQuantityConfirm': 'Kup',
+  'entities.abilities.greater_invisibility.description':
+    'Znikasz na 20 s i usuwasz 2 efekty obrażeń w czasie. Gdy niewidzialność się kończy, przez 2 s otrzymujesz o 90% mniej obrażeń. (talent maga)',
+  'entities.items.fine_copper_ore.name': 'Wyborna Ruda Miedzi',
+  'entities.items.fine_iron_ore.name': 'Wyborna Ruda Żelaza',
+  'entities.items.fine_thorium_ore.name': 'Wyborna Ruda Thorium',
+  'entities.items.fine_ironbark_log.name': 'Wyborna Kłoda Żelaznej Kory',
+  'entities.items.fine_ashwood_log.name': 'Wyborna Kłoda Jesionu Popiołowego',
+  'entities.items.fine_elderwood_log.name': 'Wyborna Kłoda Starodrzewu',
+  'entities.items.fine_silverleaf_herb.name': 'Wyborne Ziele Srebrnolistne',
+  'entities.items.fine_goldleaf_herb.name': 'Wyborne Ziele Złotolistne',
+  'entities.items.fine_sunpetal_herb.name': 'Wyborne Ziele Słonecznego Płatka',
+  'entities.items.stormreel_fishing_rod.name': 'Wędka z burzowym kołowrotkiem',
+  'entities.items.tidewrought_fishing_rod.name': 'Wędka kuta przypływem',
+  'entities.items.gatherers_cache.name': 'Skrytka Zbieracza',
+  'entities.items.artisans_eye.name': 'Oko Rzemieślnika',
+  'entities.items.reins_terrorspark_groundshaker.name':
+    'Kluczyk zapłonu: Groziskra, Wstrząsacz Ziemi',
+  'hud.options.graphicsPresetInsane': 'Ekstremalne',
+  'hud.options.surfaceDetail': 'Szczegóły powierzchni',
+  'hud.options.surfaceDetailBasic': 'Podstawowe',
+  'hud.options.surfaceDetailFull': 'Pełne',
+  'hudChrome.auraOverlay.allOff': 'Wyłącz wszystko',
+  'hudChrome.auraOverlay.allOn': 'Włącz wszystko',
+  'hudChrome.auraOverlay.arcs': 'Boczne półksiężyce',
+  'hudChrome.auraOverlay.color': 'Kolor',
+  'hudChrome.auraOverlay.crescentBlockSize': 'Rozmiar bloku półksiężyca',
+  'hudChrome.auraOverlay.crescentsSpellOrder': 'Boczne półksiężyce: kolejność zaklęć',
+  'hudChrome.auraOverlay.currentClass': 'Obecna klasa: {class}',
+  'hudChrome.auraOverlay.done': 'Gotowe',
+  'hudChrome.auraOverlay.enabled': 'Pokaż aurę',
+  'hudChrome.auraOverlay.groundRing': 'Pierścień na ziemi',
+  'hudChrome.auraOverlay.groundRingBlockSize': 'Rozmiar bloku pierścienia na ziemi',
+  'hudChrome.auraOverlay.groundRingSpellOrder': 'Pierścień na ziemi: kolejność zaklęć',
+  'hudChrome.auraOverlay.icon': 'Ikona zaklęcia',
+  'hudChrome.auraOverlay.iconSize': 'Rozmiar ikony',
+  'hudChrome.auraOverlay.moveDown': 'Przesuń w dół',
+  'hudChrome.auraOverlay.moveEarlier': 'Przesuń zaklęcie do środka',
+  'hudChrome.auraOverlay.moveLater': 'Przesuń zaklęcie na zewnątrz',
+  'hudChrome.auraOverlay.moveLeft': 'Przesuń w lewo',
+  'hudChrome.auraOverlay.moveRight': 'Przesuń w prawo',
+  'hudChrome.auraOverlay.moveUp': 'Przesuń w górę',
+  'hudChrome.auraOverlay.noProcs': 'Dla tej postaci nie jest dostępny żaden obsługiwany proc.',
+  'hudChrome.auraOverlay.opacity': 'Krycie',
+  'hudChrome.auraOverlay.positioning': 'Pozycjonowanie: {aura}',
+  'hudChrome.auraOverlay.previewHint':
+    'Użyj Ustaw pozycje, aby przesunąć aurę bez zasłaniania menu.',
+  'hudChrome.auraOverlay.procs.aetherRush': 'Napływ eteru',
+  'hudChrome.auraOverlay.procs.arcaneCharge': 'Ładunki Arkanów',
+  'hudChrome.auraOverlay.procs.battleTrance': 'Trans bojowy',
+  'hudChrome.auraOverlay.procs.enrage': 'Rzeź: rozwścieczony',
+  'hudChrome.auraOverlay.procs.heatingUp': 'Rozgrzewanie',
+  'hudChrome.auraOverlay.procs.overpowerCharge': 'Wzmocnienie Krwawej ręki',
+  'hudChrome.auraOverlay.procs.revenge': 'Odwet!',
+  'hudChrome.auraOverlay.procs.suddenDeath': 'Nagła śmierć',
+  'hudChrome.auraOverlay.procs.victoryRush': 'Zryw zwycięstwa',
+  'hudChrome.auraOverlay.reposition': 'Ustaw pozycje',
+  'hudChrome.auraOverlay.reset': 'Resetuj pozycję',
+  'hudChrome.auraOverlay.screenPosition': 'Pozycja na ekranie',
+  'hudChrome.auraOverlay.selectAura': 'Aura',
+  'hudChrome.auraOverlay.size': 'Rozmiar',
+  'hudChrome.auraOverlay.spellOrder': 'Kolejność zaklęć',
+  'hudChrome.auraOverlay.spellPosition': 'Kolejność zaklęć {position} / {count}',
+  'hudChrome.auraOverlay.title': 'Aury',
+  'hudChrome.epic.benefits':
+    'Powiąż swoje konto Epic z poziomu aplikacji Epic na komputer, aby zdobyte czyny odzwierciedlały się w osiągnięciach Epic.',
+  'hudChrome.epic.link': 'Powiąż Epic',
+  'hudChrome.epic.linked': 'Powiązane z kontem Epic {id}',
+  'hudChrome.epic.noProof':
+    'Epic nie dostarczył potwierdzenia powiązania. Uruchom grę z Epic Games Store i spróbuj ponownie.',
+  'hudChrome.epic.title': 'Epic',
+  'hudChrome.epic.unlink': 'Usuń powiązanie z Epic',
+  'hudChrome.mounts.desc_terrorspark_groundshaker':
+    'Zwarta opancerzona maszyna z ciężkimi gąsienicami, wielkokalibrowym działem i siodłem stworzonym dla nieustraszonych pilotów.',
+  'hudChrome.mounts.name_terrorspark_groundshaker': 'Groziskra, Wstrząsacz Ziemi',
+  'hudChrome.targetAuras.all': 'Wszystko',
+  'hudChrome.targetAuras.buffs': 'Wzmocnienia',
+  'hudChrome.targetAuras.configureRows': 'Skonfiguruj aury celu',
+  'hudChrome.targetAuras.debuffs': 'Osłabienia',
+  'hudChrome.targetAuras.fewerRows': 'Preferuj mniej rzędów aur',
+  'hudChrome.targetAuras.hideSources': 'Ukryj źródła aur',
+  'hudChrome.targetAuras.keybindLabel': 'Wzmocnienia i osłabienia celu',
+  'hudChrome.targetAuras.lock': 'Zablokuj okno aur celu',
+  'hudChrome.targetAuras.moreRows': 'Preferuj więcej rzędów aur',
+  'hudChrome.targetAuras.opacity': 'Krycie aur: {percent}',
+  'hudChrome.targetAuras.ownAura': 'Twoja aura',
+  'hudChrome.targetAuras.showSources': 'Pokaż źródła aur',
+  'hudChrome.targetAuras.title': 'Aury celu',
+  'hudChrome.targetAuras.unlock': 'Przesuń okno aur celu',
+  'hudChrome.targetAuras.visibleRows': 'Preferowane rzędy aur: {count}',
   'hudChrome.bags.itemAriaMasterwork': '{item}, ilość {count}, arcydzieło',
   'hudChrome.archetypePair.tailoring+inscription': 'Magotkacz',
   'hudChrome.enchantName.enchant_weapon_runed_focus': 'Zaklinanie broni - Runowe Ognisko',
   'hudChrome.professions.ctaRaiseSpecialized':
     'Podnoś dalej {craft}: {points} więcej punktów do Specjalistycznego, a koszty materiałów spadną.',
-  'guide.professions.harvestBody':
-    'Zbieranie nie kończy się na węzłach. Wiele pokonanych bestii można zebrać po jednej z każdej tuszy, kto pierwszy ten lepszy, pozyskując skóry, kły, jedwab i mięso prosto ze zwłok razem ze zwykłym łupem; jedno wciśnięcie otwiera oboje. Wybór należy do ciebie za każdym razem: obierz wszystko, co oferują zwłoki, albo skup się na mniejszej liczbie składników i odbierz wyraźniejszy gatunek tego, co bierzesz.\n\nRzadki lub lepszy rzut zbierania ze zwłok rasy z osobnikami daje też podpisany doskonały okaz (Nieskazitelna Skóra, Nieskazitelny Jedwab, Nieskazitelny Gruczoł Jadowy lub Polędwiczek) ponad zwykłym plonem i zapisuje Doskonały Osobnik w twojej Księdze Czynów. Każda postać może zbierać bez żadnego szkolenia, a każde narzędzie zbierackie, które posiadasz, wlicza się do premii za jakość, niezależnie od fachu, do którego należy.',
+  'guide.professions.harvestBodyChoice':
+    'Zbieranie nie kończy się na węzłach. Wiele pokonanych bestii można zebrać po jednej z każdej tuszy, kto pierwszy ten lepszy, pozyskując skóry, kły, jedwab i mięso prosto ze zwłok razem ze zwykłym łupem; jedno wciśnięcie otwiera oboje. Gdy bestia niesie więcej niż jeden użyteczny składnik, wybór należy do ciebie: weź wszystko, co może dać, albo skup się na mniejszej liczbie składników i odbierz wyraźniejszy gatunek tego, co bierzesz.\n\nRzadki lub lepszy rzut zbierania ze zwłok rasy z osobnikami daje też podpisany doskonały okaz (Nieskazitelna Skóra, Nieskazitelny Jedwab, Nieskazitelny Gruczoł Jadowy lub Polędwiczek) ponad zwykłym plonem i zapisuje Doskonały Osobnik w twojej Księdze Czynów. Każda postać może zbierać bez żadnego szkolenia, a każde narzędzie zbierackie, które posiadasz, wlicza się do premii za jakość, niezależnie od fachu, do którego należy.',
   'guide.professions.craftMasteryTitle': 'Jak długo trwa zdobycie mistrzostwa',
   'guide.professions.craftMasteryBody':
     'Uczciwe oczekiwania: wspinaczka do pułapu 125 w rzemiośle to co najmniej 125 udanych wytworzeń, gdyż każde wytworzenie za pełny przyrost przesuwa wynik dokładnie o jeden punkt, a w praktyce nieco więcej, gdy przepisy słabną między szczeblami mistrza. Samo wytwarzanie jest szybkie; zasilanie go to prawdziwa podróż, więc zaplanuj kilka dedykowanych wieczorów zbierania i wytwarzania na fach.\n\nFachy zbierackie docierają do pułapu 100 podczas normalnego poziomowania, jeśli zbierasz podczas podróży, choć ostatni odcinek wymaga węzłów wysokiego poziomu dalekiej północy. Wędkarstwo to z założenia długa droga: według własnego harmonogramu przyrostu, 200 biegłości to ponad trzy tysiące połowów. Mistrz Wędkarz to tytuł zdobywany przez cały sezon spokojnych wieczorów, nie przez jeden weekend.',
   'guide.professions.archetypeChooseTitle': 'List Gildii i zmiana zdania',
   'guide.professions.archetypeChooseBody':
     'Nie musisz tego szukać samodzielnie. Wykonuj swoje rzemiosła, a gdy twoje umiejętności po raz pierwszy wyraźnie skłaniają się ku jednej parze, Gildia Rzemieślnicza to zauważa i wysyła list Kruczą Pocztą, podając imię mistrza do odwiedzenia i zadanie do podjęcia. Przybywa raz na postać i tylko wtedy, gdy nie złożyłeś jeszcze przysięgi parze.',
-  'guide.professions.archetypeSwitchBody':
-    'Deklaracja nie jest też wyrokiem dożywotnim. Para, której nigdy nie miałeś, to po prostu świeże zadanie dostrojenia, natomiast powrót do pary, od której odszedłeś, wymaga najpierw naprawienia szkód: pięciu zadań za pierwszym razem, z trzema kolejnymi za każde następne przekształcenie. Wybór pozostaje znaczący, nie zamykając na dobre żadnych drzwi.',
   'guide.professions.whatHeading': 'Fach obok miecza',
-  'guide.professions.whatBody':
-    'Profesje to życie zawodowe świata: cztery zawody zbierackie wyciągające surowce wprost z ziemi i pierścień dziesięciu rzemiosł przekuwających je w ekwipunek, posiłki, mikstury i narzędzia. Wszystko tu coś zasila. Ruda, którą wydobywasz, staje się ostrzem, ostrze przyjmuje zaklinanie, a zaklinanie potrzebuje pyłu wybitego ze starego ekwipunku, więc zbieracz, rzemieślnik i majster to ogniwa jednego łańcucha.\n\nNie ma tu limitu profesji, nad którym trzeba by się głowić. Każda postać może rozwijać wszystkie osiem rzemiosł z dzisiejszą zawartością i wszystkie cztery zawody zbierackie równolegle; jedynym wyłącznym wyborem jest twój archetyp - tożsamość, do której w końcu przysięgasz - choć gdy się dostroisz, rzemiosła, które za nim uśpią, przestają się wspinać. Umiejętność nigdy nie spada i niczego, czego się nauczyłeś, nie odbiera ci się nigdy.',
   'guide.professions.ringHeading': 'Pierścień rzemiosł',
   'guide.professions.ringBody':
     'Każde rzemiosło z zawartością dziś ma limit 125 umiejętności: Płatnerstwo, Zbrojmistrzostwo, Krawiectwo, Kuśnierstwo, Gotowanie, Alchemia, Inżynieria i Zaklinanie. Po osiągnięciu limitu zawód nadal działa, zbiory nadal przynoszą plony, wytwarzanie nadal rozstrzyga, a arcydzieła nadal mogą się zdarzać; tylko liczba przestaje rosnąć. Wybierz poniżej kartę rzemiosła, by zobaczyć pełne tabele przepisów i liczby.',
@@ -31,8 +951,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.professions.gatherHubBody':
     'Cztery zawody zbierackie zasilają pierścień z terenu: górnictwo, drwalstwo i zielarstwo wyciągają rudę, drewno i zioła z ziemi i mają limit 100 biegłości, podczas gdy wędkarstwo biegnie własnym rytmem brania i holowania aż do 200. Każda poniższa strona niesie dokładne mapy węzłów, drabiny narzędzi i szanse.',
   'guide.professions.archetypesHeading': 'Koło i jego archetypy',
-  'guide.professions.archetypesBody':
-    'Dziesięć rzemiosł siedzi na stałym kole, a geografia na tym kole ma znaczenie. Każde dwie sąsiednie profesje tworzą nazwaną parę: Kowal dla Płatnerstwa i Zbrojmistrzostwa, Krawiec dla Kuśnierstwa i Krawiectwa, Aptekarz dla Alchemii i Gotowania, Bombardier dla Inżynierii i Alchemii, i sześć więcej wokół pierścienia.\n\nDostrojenie do pary to zadanie, nie kliknięcie w menu. Dziś można dołączyć do czterech par (Kowal, Krawiec, Aptekarz i Bombardier), każda zakotwiczona u rezydującego mistrza we Wschodnim Potoku, którego zadanie akceptacyjne przedstawia cały układ z góry, zanim go przyjmiesz. Do czasu deklaracji każde rzemiosło swobodnie się wspina na przepisach aż przez poziom rzadki, więc możesz wszystkiego spróbować przed wyborem.\n\nGdy się dostroisz, twoje dwa rzemiosła parowe stają się twoimi głównymi, bez żadnego pułapu poniżej limitu. Reszta koła nie gaśnie: jedno rzemiosło naprzeciwko twoich głównych pozostaje jako hobby, wdrapując się przez poziom rzadki (powtarzalne zadanie przy kuźni Kowala Haldrena pozwala wymieniać które), a wszystkie pozostałe rzemiosła przechodzą w uśpienie. Uśpione rzemiosło zachowuje swoją umiejętność i pospolite przepisy; po prostu przestaje się wspinać i nie tworzy arcydzieł, dopóki śpi.',
   'guide.professions.pairFmt': '{a} i {b}',
   'guide.professions.curveHeading': 'Krzywa Mistrzostwa',
   'guide.professions.curveBody':
@@ -47,8 +965,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.professions.deedsBody':
     'Księga Czynów kroczy obok każdego kroku tej drogi. Pierwsze dostrojenie przynosi czyn Zaprzysiężony Rzemiosłu, a pierwsze arcydzieło - Mistrz Wyrobu, oba do noszenia jako tytuły. Każde z ośmiu rzemiosł możliwych do zdobycia zaznacza kamień milowy przy 50 umiejętności i uwieńcza swój limit tytułem Arcymistrza, podczas gdy wędkarstwo dostaje Starego Solonego przy 100 biegłości i tytuł Mistrza Wędkarstwa przy 200.\n\nSą też spokojniejsze strony: czyny za pierwsze zebranie i pierwsze wytworzenie, za rzadkie znaleziska, które los przynosi w terenie, i za wzięcie się za salvage. Wszystko jest kosmetyczne: tytuły i Renoma wyłącznie. Czyn nie daje mocy; tylko udowadnia, że tam byłeś.',
   'guide.professions.startHeading': 'Od czego zacząć',
-  'guide.professions.startBody':
-    'Świeżo przybyły do Wschodniego Potoku? Znajdź Brygadzistę Odella i przyjmij zadanie Fach dla Każdej Ręki: wskaże ci żyły rudy wokół Miedzianego Wykopu na południowym zachodzie od miasta i da ci pierwsze odciski. Od tej chwili zbieraj każdą żyłę, drzewostan i łan ziół, które mijasz przy zadaniach; biegłość przychodzi naturalnie do podróżników.\n\nZ powrotem w mieście naciśnij T, by otworzyć okno wytwarzania, i pracuj na pospolitych przepisach znanych każdej postaci od początku. Odwiedź mistrzów przy kuźni, kuchni, krosnach i warsztacie, by zobaczyć, czego uczą, i przyjmij ich zlecenia na stały dochód. Zanim list Gildii cię odnajdzie, już będziesz wiedział, która para czuje się jak dom.',
   'guide.professions.colStation': 'Stacja',
   'guide.professions.colHub': 'Centrum',
   'guide.professions.colMaster': 'Mistrz',
@@ -96,33 +1012,19 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Gotowanie zamienia dzienny połów w posiłki, które leczą przez 18 sekund odpoczynku: najtańsze leczenie w grze, od Solonej Soloniny aż po Wielki Pieczeń Marlowa. Wszyscy jedzą, więc żaden fach nie jest bardziej powszechnie mile widziany w grupie.',
   'guide.profPages.craftIntro.alchemy':
     'Alchemia zamienia zioła, gruczoły i szkło w butelki, które wygrywają walki: leczące i manowe wywary na chwilę, gdy wszystko idzie nie tak, oraz eliksiry wytrzymałości, które siedzą na pasku wzmocnień przez cały loch.',
-  'guide.profPages.craftIntro.engineering':
-    'Inżynieria buduje narzędzia, których każdy poważny zbieracz w końcu potrzebuje: kilofy, siekiery i sierpy poziomu 4 i 5, których żaden sprzedawca nigdy nie będzie miał na stanie, przy czym każde z nich zużywa narzędzie niższe o jeden poziom.',
-  'guide.profPages.craftIntro.enchanting':
-    'Zaklinanie rozbiera ekwipunek i wkłada moc z powrotem: rozbij niechciane elementy na tajemne materiały, a potem wydaj je na trwały premię do statystyk kawałka, który chcesz zachować. Bez stacji, bez mistrza, i każdy może zacząć od pierwszego dnia.',
   'guide.profPages.craftProse.weaponcrafting.identityHeading':
     'Ostrze, którego szuka każdy wojownik',
   'guide.profPages.craftProse.weaponcrafting.identityBody':
     'Ktoś w każdej grupie chce roboty tego fachu, bo sam rzadki szczebel pokrywa wszystkie trzy apetyty: Osmiumowa Klinga Wojenna dla walczących na Siłę, Glifostalowy Topór Wojenny dla myśliwych na Zręczność, oraz Wysokososnowy Kostur Bojowy, laska na Intelekt i Ducha dla tłumu w szatach.\n\nNa pierścieniu rzemiosł stoi między Wytwarzaniem Pancerzy a Jubilerstwem. Jego żywą tożsamością jest Kowal, para Wytwarzania Broni i Wytwarzania Pancerzy, przysięgnięta przed Mistrzynią Kuźni Darvą przy kuźni przez wydobycie trzech żył rudy własnymi rękami; para Mistrzów Ostrzy z Jubilerstwem jest też nazwana na pierścieniu, ale nie można jej jeszcze przysięgnąć, bo Jubilerstwo nie wydaje przepisów aż do późniejszej ekspansji stref.',
   'guide.profPages.craftProse.weaponcrafting.materialsHeading': 'Czym żywi się kuźnia',
-  'guide.profPages.craftProse.weaponcrafting.materialsBody':
-    'Górnictwo to fundament. Miedź pochodzi z żył pierwszego poziomu w Dolinie Eastbrook, ruda żelaza z Mirefen, a ruda osmium ze Thornpeak, i każdy szczebel drabiny wspina się dokładnie tak samo. Drwalstwo ma większe znaczenie, niż mogłoby się wydawać: żelaznokora służy jako trzon włóczni na dzika, jesionowe drewno dźwiga buzdygan, a z jednej kłody Wysokiej Sosny powstaje laska bojowa.\n\nReszta pochodzi z łowów i lady. Szorstka skóra na uchwyty jest zbierana prosto z tusz wilków i dzików, fragmenty kości wypadają przy zwykłych zabójstwach, a drabina kuźni spala Topnik Kowalski, po 20 miedzi za słoik od samej Darvy. Jeśli twoje wydobycie własne pozostaje w tyle, Darva sprzedaje rudę osmium przy kuźni, a Majsterkowicz Gizzel zaopatruje sztabki glifostalu w warsztatach, za dopłatą, która sprawia, że znajomi zbieracze wyglądają tanio.',
   'guide.profPages.craftProse.weaponcrafting.ladderHeading': 'Drabinka szczebel po szczeblu',
   'guide.profPages.craftProse.weaponcrafting.ladderBody':
     'Jeden przepis polowy, Miecz Uzbrojenia z Eastbrook, jest znany wszystkim od początku i wytwarza się wszędzie ze spadów z łowów (para wilczych kłów i odłamki kości) plus sześć Topników Kowalskich z lady kuźni. Prawdziwa drabinka to dziewięć przepisów od mistrza w trzech szczeblach, wszystkie ograniczone do kuźni: miedziany szczebel (topór brodaty, buława żebrowana, włócznia na dzika) jest darmowy do nauki przy umiejętności 0, żelazny szczebel (długi miecz, maczuga, sztylet) otwiera się przy umiejętności 25 za 25 srebrnych za przepis, a osmiumowy szczebel (klinga wojenna, topór wojenny, kostur bojowy) otwiera się przy umiejętności 50 za 1 złoty za przepis. Darva uczy przepisu w chwili, gdy twój poziom w fachu osiągnie jego własny, więc każdy szczebel odblokowuje się dokładnie wtedy, gdy zaczyna się jego pasmo umiejętności.\n\nJeden dodatkowy przepis jedzie z parą: Rękawice Grobosmoka, kombinowany element nauczany przez mistrza, możliwy do wykonania tylko przez dostrojonego Kowala z Wytwarzaniem Broni i Wytwarzaniem Pancerzy na poziomie 25, i nie wymaga żadnej stacji.',
   'guide.profPages.craftProse.weaponcrafting.routeHeading':
     'Arcydzieła i robocza trasa do poziomu 125',
-  'guide.profPages.craftProse.weaponcrafting.routeBody':
-    'Każdy przedmiot z prawdziwą linią statystyk, co na tej drabinie oznacza poziom żelaza i wyżej, może wyjść z kowadła jako arcydzieło; pospolite wyroby miedziane bez statystyk nigdy nie wyzwalają efektu, bo nie ma w nich nic do ulepszenia. Żelazo liczy się jako materiał pierwszego poziomu dla premii arcydzieła, Wysoka Sosna i glifstal jako drugiego, więc najwyższy szczebel wyzwala efekt nieco częściej.\n\nPrzejedź poziom miedzi do 25, naucz się poziomu żelaza w dniu, gdy się odblokuje, i przejedź go do 50, następnie poziom osmium do 75. Po 75 nic wyższego nie jest jeszcze dostępne, więc przepisy osmiumowe słabną do połowy, a potem ćwierci zysku: zaplanuj mniej więcej 150 dodatkowych wyrobów, by dotrzeć do pułapu 125, i pamiętaj o współdzielonym ograniczniku dziesięciu akcji wytwarzania na minutę, gdy siadasz do hurtowej produkcji.\n\nFinansuj wspinaczkę na bieżąco: zlecenie robocze z kuźni Darvy bierze osiem rud miedzi z ręki co 30 minut w zamian za trochę monet i PD, a poziomy żelaza i osmium sprzedają się uczciwie rozwijającym się wojownikom wręcz. Księga Czynów oznacza Ostrze i Zahartowanie przy umiejętności 50 i uwieńcza tytułem Wielki Mistrz Wytwarzania Broni przy 125.',
   'guide.profPages.craftProse.armorcrafting.identityHeading': 'Kolczuga na pierwszą linię',
-  'guide.profPages.craftProse.armorcrafting.identityBody':
-    'Drabinka Wytwarzania Pancerzy czyta się jak kariera żołnierza: zwykły nitowany miedziany pas, sabatonki i rękawice na start, kolczugowy napierśnik, nagolenniki i naramienniki ze swoimi pierwszymi prawdziwymi liniami statystyk, oraz rzadki wielki hełm, napierśnik i nagolenniki osmiumowej łuski, elementy Siły i Wytrzymałości z największymi liczbami pancerza, jakie rzemieślnik może zrobić.\n\nMa też cichszą stronę: Ochraniacze Nóg ze Wschodniej Twierdzy Eastbrook, element polowy pod statystyki magów, oraz Naramiennik Piecołuski, rzadki naramiennik kolczugi na Intelekt i Ducha przy umiejętności 75, trzymają magicznie nastawionych nosicieli kolczugi na liście klientów. Na pierścieniu stoi między Wytwarzaniem Broni a Inżynierią; para Kowala z Wytwarzaniem Broni jest przysięgana przed Mistrzynią Kuźni Darvą, a para Zębatkowca z Inżynierią jest nazwana, ale nie ma jeszcze zadania przysięgi.',
   'guide.profPages.craftProse.armorcrafting.materialsHeading': 'Ruda na worki',
-  'guide.profPages.craftProse.armorcrafting.materialsBody':
-    'Żaden fach nie pochłania rudy szybciej. Sam kolczugowy napierśnik bierze pięć rud żelaza, a każdy element osmiumowej łuski potrzebuje trzech lub czterech sztuk osmium plus sztabkę glifostalu, więc poważny wytwórca pancerzy wydobywa w Bagnach Mirefen i Wyżynach Thornpeak lub płaci komuś, kto to robi. Miedź zasila pierwszy szczebel, prosto z żył przy Miedzianym Kopalniku.\n\nWokół metalu idą miękkie elementy: surowa skóra zbierana ze zwłok wilków i dzików, odłamki kości i lniane skrawki ze zwykłego łowiectwa, oraz słoik Topnika Kowalskiego (20 miedzianych przy kuźni) w niemal każdym przepisie. Darva sprzedaje rudę osmium przez ladę dla niecierpliwych.',
   'guide.profPages.craftProse.armorcrafting.ladderHeading': 'Nauka przy kuźni Darvy',
-  'guide.profPages.craftProse.armorcrafting.ladderBody':
-    'Dwa polowe pospolite elementy, Kolczugi Wschodni Kaftan i Ochraniacze Nóg, są znane od samego początku i wytwarzane wszędzie. Drabinka mistrza to dziewięć przepisów w trzech szczeblach w kuźni Eastbrook: miedziany szczebel jest darmowy przy umiejętności 0, szczebel kolczugowy kosztuje 25 srebrnych za przepis od umiejętności 25, a szczebel osmiumowej łuski kosztuje 1 złoty za przepis od umiejętności 50, przy czym każdy szczebel można kupić w chwili, gdy twój poziom go osiągnie.\n\nPoza drabinką leżą dwie specjalne rzeczy. Hełm Kamienia Granicznego to kombinowany przepis Kowala, nauczany przez mistrza, bez stacji, możliwy do wykonania tylko przez dostrojonego Kowala z obydwoma fachami na umiejętności 25. Naramiennik Piecołuski nie wymaga żadnego mistrza: wszyscy go znają, ale przy umiejętności 75 i ograniczony do kuźni, to zwieńczenie trzeciego poziomu fachu.',
   'guide.profPages.craftProse.armorcrafting.routeHeading': 'Arcydzieła i działająca droga do 125',
   'guide.profPages.craftProse.armorcrafting.routeBody':
     'Od szczebla kolczugowego wzwyż każde wytworzenie rzuca szansę na arcydzieło; pospolite miedzianie bez pancerza nie mogą jej procować, bo arcydzieło poprawia statystyki, a te ich nie mają. Żelazo liczy się jako materiał pierwszego poziomu dla procentu, a glifstal jako drugiego.\n\nWspinaczka to standardowa trzyszczeblowa przejażdżka: miedź do 25, kolczuga do 50, osmiumowa łuska do 75, ucząc każdego szczebla w dniu, gdy się otwiera. Wytwarzanie Pancerzy ma szczęście w odcinku po 75: Naramiennik Piecołuski to przepis trzeciego poziomu, więc płaci pełny przyrost do 99 i połowę potem, co oznacza, że ostatnie pięćdziesiąt punktów zajmuje około 75 wytworzeń zamiast 150, których potrzebuje fach bez zwieńczenia. Każdy naramiennik kosztuje siedem rud osmium i pięć Topników Kowalskich, więc zaopatrz się w Thornpeak i przy ladzie kuźni przed rozpoczęciem biegu.\n\nZamówienie robocze Darvy kupuje osiem rud miedzianych co 30 minut za monetę i PD, niezły odpływ dla rudy niskiego poziomu, z której wyrastasz. Księga Czynów zaznacza Młot i Płytę przy umiejętności 50, a Arcymistrzostwo Wytwarzania Pancerzy czeka przy pułapie 125.',
@@ -143,63 +1045,33 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.leatherworking.identityBody':
     'Drabinka wspina się od zwykłych fenbryjskich skórzanych nogawic, butów i pasa przez niespopolite kaftany, kaptura i naramienniki strażnika bagien po rzadki zestaw strażnika bajor, najlepszą skórę, jaką rzemieślnik może wyciąć. Dwa elementy pod magów go uzupełniają: polowy Kaftan Druida ze Wschodniego Eastbrook i Owijacze Mrocznej Skóry przy umiejętności 75.\n\nNa pierścieniu siedzi między Gotowaniem a Krawiectwem. Jego żywą parą jest Zaopatrzeniowiec, Garbarstwo i Krawiectwo, przysięgnięte przed Tkaczką Ottilie w Eastbrook; para Łapacza z Gotowaniem jest nazwana na pierścieniu, ale nie ma jeszcze zadania przysięgi.',
   'guide.profPages.craftProse.leatherworking.materialsHeading': 'Łów to żniwo',
-  'guide.profPages.craftProse.leatherworking.materialsBody':
-    'Garbarstwo to fach, gdzie twoja trasa poziomowania i linia dostaw to to samo: surowa skóra jest zbierana prosto ze skóronośnych zwłok, wilków i dzików przede wszystkim, a każde zwłoki służy tylko jednemu zbieraczowi, kto pierwszy ten lepszy. Rzadkie lub lepsze żniwo ze zwłok daje też Nieskazitelną Skórę, sygnowany okaz, którego Kaftan Strażnika Bajor wymaga, więc bankuj każdą, jaką znajdziesz.\n\nObsada wspierająca jest mała: nogi pająka i jedwab, grube płótno z humanoidów, jedna ruda osmium w każdym rzadkim elemencie strażnika bajor (sześć w zwieńczeniu Owijaczów Mrocznej Skóry) i Środek Garbujący za 16 miedzianych z lady garbarni. Garbarz Hesk też sprzedaje rudę osmium, jeśli wolisz nie wydobywać.',
   'guide.profPages.craftProse.leatherworking.ladderHeading': 'Szkolenie w Fenbridge',
-  'guide.profPages.craftProse.leatherworking.ladderBody':
-    'Oto szkopuł: garbarnia stoi w Fenbridge, na drodze do Bagien Mirefen, co sprawia, że Garbarstwo to jedyny głęboki fach szkolony poza Eastbrook. Garbarz Hesk uczy drabinki przy swoich kadziach: fenbryjski szczebel skóry za darmo przy umiejętności 0, szczebel strażnika bagien za 25 srebrnych za przepis od umiejętności 25, oraz szczebel strażnika bajor za 1 złoty za przepis od umiejętności 50, przy czym każdy szczebel otwiera się, gdy twój poziom go osiągnie.\n\nDwa przepisy omijają mistrza: polowe pospolite elementy (Wyprawiony Skórzany Kaftan i Kaftan Druida) wytwarzają się wszędzie od początku, a Owijacze Mrocznej Skóry są znane wszystkim, ale siedzą przy umiejętności 75, ograniczone do garbarni. Zauważ, że sam akt przysięgi Zaopatrzeniowca jest składany z powrotem w Eastbrook z Ottilie; tylko nauczanie odbywa się w bagnach.',
   'guide.profPages.craftProse.leatherworking.routeHeading': 'Arcydzieła i działająca droga do 125',
-  'guide.profPages.craftProse.leatherworking.routeBody':
-    'Od szczebla strażnika bagien wzwyż każde wytworzenie rzuca szansę na arcydzieło, a Nieskazitelna Skóra w Kaftanie Strażnika Bajor zapewnia automatycznie premię za sygnowany reagent; osmium liczy się jako materiał pierwszego poziomu dla procentu. Statystycznie puste pospolite skórzane elementy nie mogą procować.\n\nPoziomuj to w naturalny sposób: zbieraj każdego wilka i dzika, którego zabijesz od pierwszego poziomu, wytwarzaj szczebel skóry do 25 gdziekolwiek stoisz, a potem szkol w Fenbridge, gdy questy ciągną cię i tak w bagno. Strażnik bagien niesie cię do 50, a strażnik bajor do 75; po tym Owijacze Mrocznej Skóry, przepis trzeciego poziomu na sześć rud osmium, trzy Nieskazitelne Skóry, dwie surowe skóry i Środek Garbujący, płaci pełny przyrost do 99 i połowę potem, około 75 wytworzeń na ostatnie pięćdziesiąt punktów do pułapu 125.\n\nMobilna garbarnia liczy się bardziej dla tego fachu niż dla jakiegokolwiek innego: wyspecjalizuj się przy 75, a torba skór staje się gotowym ekwipunkiem przy ognisku zamiast spaceru z powrotem do Fenbridge. Zamówienie robocze garbarni Heska kupuje osiem surowych skór co 30 minut, schludny zwrot za skóry, które i tak zbierałeś, a Księga Czynów zaznacza Rzemiosło Garbarza przy umiejętności 50 i Arcymistrzostwo Garbarstwa przy pułapie.',
   'guide.profPages.craftProse.cooking.identityHeading': 'Garnek, który karmi drużynę',
-  'guide.profPages.craftProse.cooking.identityBody':
-    'Zjedz gotowany posiłek, a będzie cię leczył przez 18 sekund odpoczynku, czyli najtańsze leczenie w grze między pociągnięciami. Drabinka biegnie od Pieczonej Rzecznej Okoni za 90 zdrowia aż po Wielki Pieczeń Marlowa za 980, największy sit-heal, jaki istnieje.\n\nNa pierścieniu Gotowanie siedzi między Alchemią a Garbarstwem. Jego żywą parą jest Aptekarz, Alchemia i Gotowanie, przysięgnięte przed Kucharką Marlow w kuchniach Eastbrook po upolowaniu czterech dzikich dzików do garnka; para Łapacza z Garbarstwem jest nazwana na pierścieniu, ale nie ma jeszcze zadania przysięgi.',
   'guide.profPages.craftProse.cooking.materialsHeading': 'Spiżarnia karmiona wędką i nożem',
-  'guide.profPages.craftProse.cooking.materialsBody':
-    'Wędkarstwo dostarcza charakterystycznych składników strefę po strefie: lustrzane pstrągi i rzeczne okonie z wód Doliny Eastbrook, szczupaki bagienne i węgorze z Bagien Mirefen, lodowate pstrągi i łupkowate karpie z Wyżyn Thornpeak. Każdy szczebel drabinki gotuje ryby swojego poziomu, więc kucharz, który wędkuje, nigdy nie wyczerpie zapasów.\n\nStrona jatki pochodzi z zebranych zwłok: mięso dziczyzny z dzików i im podobnych, oraz przy rzadkim lub lepszym żniwie ze zwłok sygnowany Polędwiczek, centralny element wielkiego pieczenia. Zioła przyprawiają lepsze potrawy, jeden bał drewna ashwood wędzi węgorza, a Sól Kucharska kosztuje 8 miedzianych za saszetkę ze straganu Marlowa.',
   'guide.profPages.craftProse.cooking.ladderHeading': 'Od soloniny do wielkiego pieczenia',
   'guide.profPages.craftProse.cooking.ladderBody':
-    'Solona Solonina to przepis polowy: znany od początku, jedna noga pająka, można wytworzyć wszędzie, jedzenie drogi każdego świeżego poszukiwacza przygód. Drabinka mistrza gotuje w kuchniach Eastbrook po zachodniej stronie placu: darmowy szczebel przy umiejętności 0 (okoń, Szaszłyk z Dziczyzny Myśliwego, Ziołowy Szczupak Bagienny), środkowy szczebel przy umiejętności 25 za 25 srebrnych za przepis (Wędzony Węgorz Ashwood, Gulasz z Dziczyzny Złotolistnej, Zupa Lodowata), a rzadki szczebel przy umiejętności 50 za 1 złoty za przepis (Kolacja z Posrebrzanego Karpia, Półmisek Uczty Wędkarskiej, Wielki Pieczeń Marlowa).\n\nPotrawy porcjowe rozciągają składniki: wędzony węgorz i gulasz z dziczyzny obsługują dwie porcje za jedno wytworzenie, a półmisek uczty trzy. Marlow uczy każdego szczebla w chwili, gdy twój poziom w Gotowaniu go osiągnie.',
+    'Solona Solonina to przepis polowy: znany od początku, jedna noga pająka, można wytworzyć wszędzie, jedzenie drogi każdego świeżego poszukiwacza przygód. Drabinka mistrza gotuje w kuchniach Eastbrook po wschodniej stronie placu: darmowy szczebel przy umiejętności 0 (okoń, Szaszłyk z Dziczyzny Myśliwego, Ziołowy Szczupak Bagienny), środkowy szczebel przy umiejętności 25 za 25 srebrnych za przepis (Wędzony Węgorz Ashwood, Gulasz z Dziczyzny Złotolistnej, Zupa Lodowata), a rzadki szczebel przy umiejętności 50 za 1 złoty za przepis (Kolacja z Posrebrzanego Karpia, Półmisek Uczty Wędkarskiej, Wielki Pieczeń Marlowa).\n\nPotrawy porcjowe rozciągają składniki: wędzony węgorz i gulasz z dziczyzny obsługują dwie porcje za jedno wytworzenie, a półmisek uczty trzy. Marlow uczy każdego szczebla w chwili, gdy twój poziom w Gotowaniu go osiągnie.',
   'guide.profPages.craftProse.cooking.routeHeading':
     'Specjalizacja, nie arcydzieła, i droga do 125',
   'guide.profPages.craftProse.cooking.routeBody':
     'Gotowanie to uczciwy wyjątek od historii arcydzieł: posiłek nie ma linii statystyk do poprawienia, więc potrawy nigdy ich nie procują, i żaden kucharz nie powinien za nimi gonić. Mistrzostwo fachu to specjalizacja przy 75: piąta część mniej każdego składnika, co szybko się kumuluje na potrawach porcjowych, oraz przenośna kuchnia polowa, by uczta była gotowana przy drzwiach do lochu.\n\nGotuj to, co łowisz: para wspinaczki z sesją wędkarską i dwa fachy karmią się nawzajem po całej drodze w górę. Solonina i darmowy szczebel niosą cię do 25 za punkt na wytworzenie, środkowy szczebel do 50, a rzadki do 75; po 75 żadne wyższe danie jeszcze nie zostało wydane, więc rzadkie potrawy zanikają do połowy, a potem ćwierci przyrostu, mniej więcej 150 dodatkowych wytworzeń do pułapu. Traktuj to jako zaopatrywanie, nie harówkę: gildia zjada każdą porcję.\n\nZamówienie robocze kuchni Marlowa kupuje osiem sztuk mięsa dziczyzny co 30 minut za monetę i PD, a Księga Czynów zaznacza Doświadczonego Kucharza przy umiejętności 50 na drodze do tytułu Arcymistrza Gotowania przy 125.',
   'guide.profPages.craftProse.alchemy.identityHeading': 'Butelki, które wygrywają walki',
-  'guide.profPages.craftProse.alchemy.identityBody':
-    'Fach jest uprawiany w aptece w Highwatch, domu Alchemistki Verane, Mistrzyni Apteki, która uczy drabinki przepisów, sprzedaje Szklane Fiolki po 12 miedzianych i płaci monetą za zioła przez swoje zamówienie robocze.\n\nNa pierścieniu rzemiosł Alchemia siedzi z fachami prób i błędów, obok Inżynierii z jednej strony i Gotowania z drugiej. To daje jej dwie tożsamości parowe: Bombardiera (Inżynieria i Alchemia, podjęte przed Konstruktorem Gizzelem w Eastbrook) i Aptekarza (Alchemia i Gotowanie, przysięgniete przed Kucharką Marlow). Dostrój się do jednej z par, by zrobić z Alchemii specjalizację i otworzyć umiejętność aż do jej pułapu; do tego czasu działa do rzadkiej jakości jak każdy niezadeklarowany fach.',
   'guide.profPages.craftProse.alchemy.materialsHeading': 'Zioła, gruczoły i szkło',
   'guide.profPages.craftProse.alchemy.materialsBody':
     'Każdy wywar potrzebuje Szklanej Fiolki i ziół dopasowanych do swojego szczebla: lśnolist rośnie w Dolinie Eastbrook, złotolist w Bagnach Mirefen, a słonecznopłatek w Wyżynach Thornpeak, jedno zioło na strefę, więc twoje fiolki wspinają się przez świat razem z tobą. Zielarstwo to naturalny fach partnerski, choć kupowanie od zbieraczy lub na rynku działa równie dobrze; głębsze strefy mają łany wyższego poziomu, które wymagają lepszego sierpa, więc trzymaj narzędzie aktualne, jeśli zbierasz własne.\n\nLinia eliksirów dodaje składnik myśliwski: Gruczoły Jadowe zbierane z jadowitych zwłok, a najlepszy eliksir wymaga Nieskalanego Gruczołu Jadowego, sygnowanego rzadkiego okazu, który pojawia się przy szczęśliwym żniwie ze zwłok. Jeśli sam nie zbierasz, to są dokładnie te towary, o które warto poprosić przyjaciela myśliwego.',
   'guide.profPages.craftProse.alchemy.ladderHeading': 'Drabinka przepisów',
-  'guide.profPages.craftProse.alchemy.ladderBody':
-    'Każdy zna Drobny Eliksir Leczący od samego początku i może go mieszać wszędzie, bez potrzeby stacji. Prawdziwa drabinka to dziewięć przepisów nauczanych przez Verane w aptece, trzy na każdym szczeblu: przepisy na umiejętności 0 są darmowe, szczebel umiejętności 25 kosztuje 25 srebrnych za przepis, a szczebel umiejętności 50 kosztuje 1 złoty za przepis. Każdy szczebel to wywar leczący, manowy i eliksir wytrzymałości, wspinając się od pospolitych fiolek z lśnolistem (120 zdrowia, 160 many) przez niepospolite ze złotolistem (200 zdrowia, 260 many) po rzadkie ze słonecznopłatkiem (280 zdrowia, 360 many).\n\nEliksiry wspinają się tak samo: Eliksir Dzika nadaje 6 Wytrzymałości na 10 minut, Eliksir Jadoognisty 9 na 15 minut, a Eliksir Węża 12 na 15 minut, warząc dwie fiolki za jedno wytworzenie. Jeden dodatkowy przepis stoi z boku: Eliksir Niedźwiedzia, kombinowany wywar, którego Verane uczy za 25 srebrnych, gdy twoja Alchemia osiągnie 25, do zawarcia wszędzie, ale tylko przez dostrojonego Bombardiera z Alchemią i Inżynierią na poziomie 25.',
   'guide.profPages.craftProse.alchemy.routeHeading': 'Droga piwowara do 125',
-  'guide.profPages.craftProse.alchemy.routeBody':
-    'Wywary i eliksiry nigdy nie tworują arcydzieł; ten procent należy do ekwipunku ze statystykami. Twoje imię i tak podróżuje: rzadkie wywary ze słonecznopłatkiem są warzone po jednej fiolce i trafiają podpisane znakiem wytwórcy, podczas gdy podwójny Eliksir Węża pozostaje anonimowy. Przy umiejętności 75 się specjalizujesz, a każdy przepis Alchemii kosztuje od tej chwili 20 procent mniej materiałów.\n\nWez Zielarstwo wcześnie i zbieraj podczas poziomowania: lśnolist jest wszędzie w Dolinie, a gdy dotrzesz do ławy Verane, darmowy szczebel przeprowadzi cię czysto do umiejętności 25 na ziołach, które i tak zbierałbyś. Naucz się szczebla 25 w chwili, gdy się odblokuje, przenieś zbiory do bagien po złotolist i pozwól zamówieniu roboczemu Verane (sześć Ziół Złotolistnych za 45 miedzianych, powtarzalne co 30 minut) oddawać ci trochę monety po drodze.\n\nOd 50 wzwyż warzyj wywary ze słonecznopłatkiem i partie Węża z ziół Thornpeak. Ostatni odcinek od 100 do 125 to celowe sączenie, więc warzyj to, co faktycznie sprzedajesz, zamiast palić zioła dla samej liczby, i pamiętaj, że środki spożywcze to jeden wytworzony towar, który wszyscy kupują na nowo w nieskończoność. Księga Czynów zaznacza Dziwne Wywary przy umiejętności 50 i Arcymistrzostwo Alchemii przy pułapie.',
   'guide.profPages.craftProse.engineering.identityHeading': 'Monopol wytwórcy narzędzi',
-  'guide.profPages.craftProse.engineering.identityBody':
-    'Fach jest uprawiany w warsztatach narzędziowych w południowo-wschodnim rogu Placu Eastbrook, domu Konstruktora Gizzela, Mistrza Warsztatów. Poziomy 1 do 3 każdej linii narzędzi to zwykły towar u sprzedawców; poziomy 4 i 5 istnieją tylko przez inżyniera.\n\nNa pierścieniu siedzi z fachami prób i błędów, obok Alchemii i Wytwarzania Pancerzy, co daje mu dwie tożsamości parowe: Bombardiera (Inżynieria i Alchemia, podjęte przed samym Gizzelem) i Zębatkowca (Wytwarzanie Pancerzy i Inżynieria, nazwane, ale jeszcze nieprzysiężone). Jedno ostrzeżenie ma tu większe znaczenie niż gdziekolwiek indziej: obydwa szczeble przepisów Inżynierii siedzą powyżej pułapu rzadkiego poziomu, pod którym pracują hobby i niezadeklarowani rzemieślnicy, więc liczba umiejętności przesuwa się tylko dla rzemieślnika, którego specjalizacje obejmują Inżynierię, co dziś oznacza Bombardiera. Każdy wciąż może zbudować narzędzia; niedostrojony rzemieślnik po prostu niczego przy tym nie uczy.',
   'guide.profPages.craftProse.engineering.materialsHeading': 'Reagenty i poprzednie narzędzia',
-  'guide.profPages.craftProse.engineering.materialsBody':
-    'Każdy przepis narzędzia zużywa narzędzie o jeden poziom niżej plus materiał premium: cztery Rudy Osmium i Niebiosrebrny Kilof Górniczy stają się Osmiumowym Kilofem Górniczym, a potem dwie Sztabki Glifostalu i tamten kilof osmiumowy stają się Glifostalowym Kilofem Górniczym, a linie siekier i sierpów odzwierciedlają ten sam kształt z Kłodami Jesionowymi i Wysokiej Sosny, Ziołami Złotolistnymi i Słonecznopłatkowymi.\n\nGizzel trzyma wszystkie sześć premiumowych reagentów w warsztatach, jeśli chcesz szybkości ponad marżę, ale rudy, kłody i zioła da się zebrać w Bagnach Mirefen i Wyżynach Thornpeak, i zebrany towar to miejsce, gdzie leży zysk. Jedynym wyjątkiem jest Sztabka Glifostalu, dostępna tylko u sprzedawcy, więc każde narzędzie glifostalowego poziomu ma wbudowany stały monetowy próg w swój koszt.',
   'guide.profPages.craftProse.engineering.ladderHeading': 'Drabinka narzędzi',
-  'guide.profPages.craftProse.engineering.ladderBody':
-    'Cała drabinka to sześć przepisów, wszystkie ograniczone do stacji warsztatów i wszystkie znane automatycznie, bez żadnej opłaty za mistrza: kilof, siekiera i sierp poziomu 4 przy umiejętności 75, oraz wersje poziomu 5 przy umiejętności 150. Ta druga liczba nie jest literówką i siedzi powyżej obecnego pułapu 125 celowo: wymagania umiejętności nigdy nie blokują wytworzenia, tylko kształtują przyrost umiejętności, więc możesz zbudować narzędzie poziomu 5 w dniu, gdy masz jego reagenty i poprzednik poziomu 4.\n\nKażde ukończone narzędzie jest rzadkiej lub epickiej jakości i wychodzi podpisane, więc twoje imię jeździ po strefach na narzędziownikach innych graczy. Inżynieria trzyma też połowę jednego przepisu kombinowanego: Eliksir Niedźwiedzia, warzony przez dostrojonego Bombardiera z Inżynierią i Alchemią na poziomie 25.',
   'guide.profPages.craftProse.engineering.routeHeading': 'Droga inżyniera do 125',
   'guide.profPages.craftProse.engineering.routeBody':
     'Narzędzia nie mają statystyk bojowych, więc nigdy nie tworzą arcydzieł; ten procent należy do ekwipunku ze statystykami. Specjalizacja wciąż ląduje przy umiejętności 75: 20 procent mniej materiałów za wytworzenie oraz tymczasowe polowe warsztaty, które zamieniają każdą wyprawę zbieracką w warsztat. Matematyka przyrostów prawie nie zanika tu: przepisy umiejętności 75 płacą pełny przyrost do 100 i połowę potem, a przepisy umiejętności 150 płacą pełny przyrost przez cały pułap 125, więc prawdziwym ograniczeniem są reagenty i moneta, nigdy szare przepisy.\n\nWybierz swoją parę najpierw, bo nic bez niej się nie rusza: weź attunement Bombardiera od Konstruktora Gizzela. Potem zasilaj drabinkę: rozwijaj Górnictwo, Drwala lub Zielarstwo samemu albo zaprzyjaźnij się ze zbieraczami, kup narzędzia poziomu 3 od sprzedawców i traktuj zamówienie robocze Gizzela (osiem Kłód Żelazokory za 16 miedzianych, powtarzalne co 30 minut) jako pieniądze na spacer.\n\nInżynieria to prestiżowy fach małej objętości, mniej więcej jeden punkt umiejętności za ukończone narzędzie, więc traktuj każde wytworzenie jako towar do sprzedaży. Tekst sprzedaży do klientów pisze się sam: każdy poziom narzędzia powyżej własnego poziomu węzła skraca czas rzucania zbioru 2,5-sekundowego o 0,4 sekundy (do podłogi 1,5 sekundy), więc narzędzie poziomu 5 to przyspieszenie na każdym węźle w świecie, i tylko ty możesz jedno zrobić. Księga Czynów zaznacza Tryby i Sprężyny przy umiejętności 50 i Arcymistrzostwo Inżynierii przy 125.',
   'guide.profPages.craftProse.enchanting.identityHeading': 'Ekwipunek rozebrany, moc z powrotem',
-  'guide.profPages.craftProse.enchanting.identityBody':
-    'Nie ma stacji, nie ma mistrza, i nie ma listy przepisów do kupienia: każde zaklęcie jest znane od początku, każdy może rozbroić od pierwszego dnia, a umiejętność ma pułap 125 jak każdy fach.\n\nNa pierścieniu siedzi między Inskrypcją a Jubilerstwem, więc jego dwie tożsamości parowe to Arkanysta (Inskrypcja i Zaklinanie) oraz Kamieniobindacz (Zaklinanie i Jubilerstwo). Żadnej nie można jeszcze przysięgnąć, bo obaj sąsiedzi czekają na swoje pierwsze przepisy, więc dziś Zaklinanie wspina się jako fach dla wszystkich: bezpłatnie do rzadkiego poziomu przed jakąkolwiek przysięgą, i naturalny wybór hobby dla Bombardiera lub Aptekarza. Zaklniacze też trzymają w ruchu świat zbieractwa: trzy efekty narzędzi do slotowania to robota Zaklinacza, a oryginalny wytwórca ładuje ich własne efekty ze zniżką, jeszcze głębszą po specjalizacji.',
   'guide.profPages.craftProse.enchanting.levelingHeading': 'Jak Zaklinanie się poziomuje',
-  'guide.profPages.craftProse.enchanting.levelingBody':
-    'Dwie czynności przesuwają umiejętność: rozbrojenie elementu i nałożenie zaklęcia. Każdy sukces jest wart do jednego punktu, skalowanego przez powagę pracy: rzadkość rozbijanego elementu lub poziom reagenta nakładanego zaklęcia. Pospolite rozbrojenia i zaklęcia tylko na pył punktują jako robota pospolita; niepospolite rozbrojenia i zaklęcia esencji jako niepospolita; rzadkie rozbrojenia i każde zaklęcie Runiczne lub Wyższe jako rzadkie; epickie i legendarne rozbrojenia jeszcze wyżej.\n\nZnajome zanikanie mistrzostwa stosuje się na 25-punktowych poziomach, więc robota pospolitego stopnia staje się szarą przy umiejętności 75, niepospolita przy 100, a rzadkiego poziomu dokładnie przy pułapie 125. Zaklinanie ma też jeden własny przywilej: wkład powyżej pułapu twojego archetypu jest zaokrąglany w dół do tego pułapu zamiast zerowania, więc przed dostrojeniem epickie rozbrojenie po prostu punktuje jako rzadkie zamiast niczego nie uczyć. Jeśli Zaklinanie stanie się uśpione za inną tożsamością, wszystko punktuje jako robota pospolita i wspinaczka zatrzyma się przy 75; zachowaj je jako swoje hobby, a robota rzadkiego poziomu wciąż płaci, tylko wolniej po 75.',
   'guide.profPages.craftProse.enchanting.marketHeading': 'Zaczarowane kopie, proweniencja i rynek',
-  'guide.profPages.craftProse.enchanting.marketBody':
-    'Nałożenie zaklęcia zużywa reagenty i oznacza jedną konkretną kopię przedmiotu. Wskaż kopię w torbie, a otrzymasz odrębną zaczarowaną kopię; wskaż element, który już nosisz, a zostanie zaczarowany na miejscu, bez zdejmowania i ponownego zakładania. Tak czy inaczej premia podąża za elementem na zawsze, przez zdejmowanie, wizyty w banku i handlowanie. Jedno zaklęcie na element: nałożenie innego zaklęcia na zaczarowaną kopię najpierw prosi o potwierdzenie, a potem wprost zastępuje stare zaklęcie, niszcząc je bez zwrotu materiałów. Sprzedaż, wyrzucanie i rozbrajanie preferują najpierw zwykłe kopie, więc twój ukończony element nie zostanie przypadkowo pochłonięty. Identycznie zaczarowane kopie nawet się na siebie układają w twoich torbach.\n\nEkwipunek arcydzieła i zaklinanie to przyjaciele: element arcydzieła pozostaje w pełni czarowalny, a zaklęcie dodaje się na wierzch premii arcydzieła bez naruszania jej ani podpisu wytwórcy. Łącząc każde źródło, sygnowane arcydzieło noszące wyższe zaklęcie to szczyt dla wytwarzanego elementu, który wciąż jest poniżej łupów z rajdu z projektu.\n\nNa rynku Rynek Świata pośredniczy tylko w zwykłym, niezmodyfikowanym towarem, więc zaczarowane i sygnowane elementy zmieniają właściciela twarzą w twarz przez okno handlowe. Materiały to zbywalny element fachu: Pył, Esencja i Odłamki wystawiają się swobodnie, wystawienie nic nie kosztuje, a Kupiec bierze tylko 5 procent ukończonej sprzedaży. To sprawia, że dwa klasyczne dochody zaklinacza to sprzedaż materiałów na rynku oraz wzięcie elementu klienta w handel, zaczarowanie go i oddanie z powrotem.',
   'guide.profPages.howHeading': 'Jak działa wytwarzanie',
-  'guide.profPages.howBody':
-    "Otwórz okno wytwarzania (domyślny klawisz T), a wszystkie znane ci przepisy są wylistowane wraz z potrzebymi składnikami i tym, co masz przy sobie. Przepisy stacjonarne wymagają stania w promieniu 20 jardów od odpowiedniej stacji w mieście, przepisy polowe wytwarza się wszędzie, a Zaklinanie nigdy nie potrzebuje stacji. Nie ma rzutu na niepowodzenie: wytwarzanie przy dostępnych materiałach zawsze się udaje.\n\nDwie drobne przeszkody dbają o uczciwość ekonomii. Każde udane wytwarzanie wiąże się z opłatą 2 miedzi za każdy punkt budżetu statystyk przedmiotu, a czynności wytwórcze mają wspólne tempo: co najwyżej 10 wytworzeń, rozszarowań, zaklinań lub salvage'ów w dowolnych 60 sekundach. Żadne z nich nie przeszkodzi w normalnej sesji; oba zatrzymują zmaksymalizowanego specjalistę przed zalewaniem rynku.",
   'guide.profPages.recipesHeading': 'Przepisy',
   'guide.profPages.recipesNote':
     'Wszystkie przepisy danego rzemiosła: dokładny wymóg umiejętności i materiały, skąd są nabywane i za jaką opłatę, oraz trzy wartości umiejętności, przy których przyrost spada do połowy, ćwierci i zera.',
@@ -207,11 +1079,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.masteryBody':
     'Każdy przepis w oknie nosi swój stan przyrostu w klasycznych kolorach: pomarańczowy oznacza pełny przyrost, żółty połowę, zielony ćwierć, szary nic. Granice są dokładne, każde {step} umiejętności to poziom, a przepis blednie o jeden kolor za każdy poziom poniżej twojego.\n\nPonieważ przyrosty są deterministyczne (wytworzenie z pełnym przyrostem zawsze przesuwa cię o dokładnie jeden punkt), możesz zaplanować całą wspinaczkę z listy: pracuj na danym szczeblu, gdy jest pomarańczowy, ucz się następnego, gdy żółknie, i nigdy nie wydawaj materiałów na szary przepis oczekując postępu. Po osiągnięciu limitu {cap} liczba staje, ale przepisy, szansa na arcydzieło i zyski nadal działają.',
   'guide.profPages.masterworkHeading': 'Arcydzieła',
-  'guide.profPages.masterworkBody':
-    'Każde udane wytwarzanie daje dokładnie to, co obiecuje przepis, a czasem trochę więcej: arcydzieło kończy ten sam przedmiot o jeden poziom jakości wyżej, z dołączonymi bonusowymi statystykami w chwili wytworzenia. To wyłącznie premia, nigdy obniżka, i pozostaje poniżej pułapu nalotkowego - wytworzony ekwipunek może być doskonały, nie wypierając zdobyczy z nalotu.\n\nSzansa jest ujawniona, nie mistyczna: {base}% podstawy, plus {perTier}% za każdy poziom, o który twoja umiejętność przewyższa przepis, plus {signed}% gdy dodany zostaje jakikolwiek podpisany składnik, plus {spec}% po specjalizacji, przy czym materiały wyższego poziomu dodają 1 do 2% więcej, a wszystko razem nie może przekroczyć {cap}%. Tylko przedmiot z prawdziwymi statystykami może ulec poprawie, więc bezstatystyczne towary zwykłe, narzędzia i materiały eksploatacyjne nigdy nie dają arcydzieła; uśpione rzemiosło nigdy go nie wyprodukuje, a hobby nie może tworzyć arcydzieł powyżej swojego rzadkiego pułapu.\n\nDobre rzemiosło niesie imię swego twórcy. Rzadkie i lepsze egzemplarze jednej kopii są podpisane (Wytworzony przez; materiały zbierackie niosą Zebrany przez), arcydzieło jest zawsze podpisane bez względu na jakość, a identycznie podpisane egzemplarze nadal się łączą w stosy. Podpis to proweniencja, nie zamknięcie: podpisane towary swobodnie się handluje.',
   'guide.profPages.trainingHeading': 'Trening',
-  'guide.profPages.trainingBody':
-    'Przepisy trenerskie pochodzą od rezydujących mistrzów, uczonych przy ich stacjach. Zasada jest prosta: mistrz uczy przepisu, gdy twój poziom w danym rzemiośle osiągnął poziom przepisu - i nic innego go nie blokuje, nie twój poziom postaci ani archetyp. Szczeble drabiny trenerskiej to dziś umiejętności 0, 25 i 50, więc nowy szczebel otwiera się z każdym osiągniętym poziomem.\n\nOpłaty są jednorazowe i stałe według szczebla: szczebel startowy jest bezpłatny, szczebel przy umiejętności 25 kosztuje {tier1} za przepis, a szczebel przy umiejętności 50 kosztuje {tier2}. Musisz stać przy prawdziwej stacji mistrza, żeby się uczyć, a mobilna stacja nigdy nie liczy. Powszechne przepisy polowe i przepisy na narzędzia nie wymagają treningu: każda postać zna je od początku.',
   'guide.profPages.specializationHeading': 'Specjalizacja',
   'guide.profPages.specializationBody':
     'Przy umiejętności {at} dane rzemiosło cię specjalizuje, bez żadnego zadania: od tej chwili przepisy kosztują {pct}% mniej materiałów, a specjalizacja dodaje też własną premię do szansy na arcydzieło.\n\nSpecjaliści uczą się też zabierać warsztat ze sobą: wyspecjalizowany rzemieślnik może rozstawić mobilną stację w terenie na dziesięć minut, dzięki czemu przepisy stacjonarne można realizować przy wejściu do kopalni zamiast wracać do miasta. Ograniczenia są celowe: mobilna stacja nigdy nie liczy się jako trening u mistrza ani do odwiązywania zamówionych przedmiotów i wygasa po odliczeniu czasu niezależnie od tego, czy jej użyłeś.',
@@ -225,8 +1093,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.ench.meleeWeapons': 'Bronie do walki wręcz',
   'guide.profPages.ench.timberWeapons': 'Laski, różdżki, łuki i kusze',
   'guide.profPages.ench.enchantsHeading': 'Zaklęcia',
-  'guide.profPages.ench.enchantsNote':
-    'Zaklęcia dzielą się na trzy poziomy. Podstawowy poziom opiera się na Pyle Kuranta (z odrobiną Esencji na wyższym końcu) i obejmuje slot broni oraz każdy slot zbroi, z wystarczającą liczbą opcji osi statystyk, by każdy build znalazł coś dla każdego slotu. Poziom Wyższy kosztuje jeden Odłamek Kuranta plus Esencję i jest jedynym zastosowaniem Odłamków: silniejsze bonusy na slotach o największym wpływie.\n\nPomiędzy nimi leży pięć zaklęć Runicznych, jedno dla każdego typowanego drugorzędnego, więc nic, co zmielisz, nigdy nie jest ślepą uliczką: Runiczne Ostrze (broń, Siła, zużywa Rezonującą Stal), Runiczny Fokus (broń, Intelekt, Rezonujące Drewno), Runisplot (pierś, Ducha, Rezonujący Wątek), Runicza Skóra (nogi, Zwinność, Rezonująca Skóra) i Runiczne Ogniwa (hełm, Wytrzymałość, Rezonujące Ogniwa). Każde wymaga też dwóch Esencji Kuranta i plasuje się między swoim podstawowym a Wyższym odpowiednikiem pod względem siły; dokładne bonusy znajdują się w poniższej tabeli.',
   'guide.profPages.ench.colEnchant': 'Zaklęcie',
   'guide.profPages.ench.colSlot': 'Slot',
   'guide.profPages.ench.colTier': 'Poziom',
@@ -238,42 +1104,23 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.ench.salvageNote':
     'Odzyskiwanie to brat zwykłych ludzi dla rozkładania zaklęć: te same bronie i zbroje, nie wymaga umiejętności i żadnej nie daje, zwracając zwykłe rzemieślnicze złomy według jakości zamiast czegokolwiek arkanicznego. Może to robić każdy, zaklinacz czy nie. Gdy trzymasz przedmiot wart rozbicia, wybór jest prosty: od rzadkiego wzwyż rozkładanie zaklęć jest bezwzględnie lepszą ofertą, a przy pospolitym oba plony sprzedają się za mniej więcej tyle samo, więc rozbijaj w stronę materiału, którego faktycznie potrzebujesz.',
   'guide.profPages.ench.bonusFmt': '+{value} {stat}',
-  'guide.profPages.gatherIntro.mining':
-    'Górnictwo wydobywa rudę wprost ze skalnego łona świata: miedź w Dolinie Wschodniego Strumienia, żelazo na Trzęsawisku Mokrzawia i osmium wysoko na Wyżynach Ciernistego Szczytu, zasilając rzemiosła kowalskie. Dostępne dla każdego od 1 poziomu: wystarczy kilof górniczy w torbach, za 20 miedziaków w ośrodku każdej strefy. Śledzone na własnym liczniku do limitu 100.',
-  'guide.profPages.gatherIntro.logging':
-    'Drwalstwo wycina drewno z drzewostanów we wszystkich trzech strefach: żelaznokora w Dolinie Wschodniego Strumienia, jesionowe drewno na Trzęsawisku Mokrzawia i wysoka sosna na Wyżynach Ciernistego Szczytu, surowiec na drzewca, kije i stół inżyniera. Dostępne dla każdego od 1 poziomu, o ile masz w torbach siekierę drwala (20 miedziaków w ośrodku każdej strefy), śledzone na własnym liczniku do limitu 100.',
-  'guide.profPages.gatherIntro.herbalism':
-    'Zielarstwo zbiera to, co rośnie dziko: lśnolist w Dolinie Wschodniego Strumienia, złotolist na Trzęsawisku Mokrzawia i słoneczny płatek na Wyżynach Ciernistego Szczytu, liść i łodygę, dzięki którym aptekarskie warsztaty nie stoją. Dostępne dla każdego od 1 poziomu, o ile masz w torbach sierp zielarski (20 miedziaków w ośrodku każdej strefy), śledzone na własnym liczniku do limitu 100.',
-  'guide.profPages.gatherIntro.fishing':
-    'Wędkarstwo to wyjątek wśród zawodów zbierackich, i to najgłębszy: prawdziwa mini-gra z braniem i holowaniem, własne tabele połowów w każdej strefie i limit biegłości 200 - dwukrotnie wyższy niż u pozostałych. Kup wędkę, stań nad otwartą wodą i rzuć.',
   'guide.profPages.rhythmHeading': 'Rytm zbierania',
-  'guide.profPages.rhythmBody':
-    'Zebranie to krótkie widoczne rzucanie, nie natychmiastowy chwyt: {base} sekund bazowo, nigdy poniżej dolnej granicy {floor} sekundy. Posiadanie narzędzia o poziomie wyższym niż poziom węzła przyspiesza cię o {tool} sekundy za każdy poziom powyżej, a każdy przekroczony pas biegłości skraca czas o kolejne {band} sekundy; samo spełnienie wymogu narzędzia wpuszcza cię do środka, ale to poziomy powyżej czynią cię szybkim.\n\nPełna torba grzecznie odmawia rzucania, zanim się zacznie, więc nic nie marnuje się w połowie, a każde zebranie przynosi mały wycinek PD postaci skalowanych poziomem węzła względem twojego tak jak PD za zabicie: trywialny szary węzeł nie uczy zmaksymalizowanej postaci niczego.',
-  'guide.profPages.gainBody':
-    'Przyrost jest deterministyczny, nigdy rzutem na podniesienie umiejętności: węzeł na poziomie twojego pułapu przyrostu lub wyższym daje pełny punkt za każde zebranie, a każde {step} biegłości to jeden poziom oceniany względem węzła. Węzły poziomu 1 płacą w pełni poniżej 25, połowę do 49, ćwierć do 74, nic od 75 wzwyż; węzły poziomu 2 płacą w pełni do 49; jedyny węzeł poziomu 3 płaci w pełni do 74 i połowę aż do limitu {cap}.\n\nZamierzona trasa jest prosta: ucz się na węzłach startowych Doliny, przenieś się na bagna i dokończ wspinaczkę na wyżynach Szczytu Cierni. Po osiągnięciu limitu nauka się zatrzymuje, ale plony nie: zbieracz z maksymalną umiejętnością nadal wyciąga materiały najwyższej jakości.',
   'guide.profPages.nodesHeading': 'Węzły według stref',
   'guide.profPages.nodesNote':
     'Gdzie są węzły, ich poziom, potrzebne narzędzie i co dają. Każdy węzeł odradza się dla ciebie {respawn} sekund po twoim własnym zebraniu, a ten timer jest tylko twój: inny zbieracz pracujący przy tym samym węźle nigdy nie opóźnia twojego, więc nie ma wyścigów o węzły ani wyczekiwania. Każda strefa wyżej w hierarchii przynosi lepszy materiał z twardszego podłoża.',
   'guide.profPages.toolsHeading': 'Narzędzia',
-  'guide.profPages.toolsNote':
-    'Każdy węzeł wymaga narzędzia swojego fachu w twoich torbach, także na poziomie 1: bez kilofa nie ma rudy, bez wędki nie ma ryb. Drabina sprzedawców obejmuje poziomy od 1 do 3 i jest dostępna w ośrodku każdej strefy; wystarczy, że narzędzie leży w twoich torbach, nie ma slotu na ekwipunek ani trwałości, więc każde to jednorazowy zakup. Liczy się tylko poziom przy bramce: kolor rzadkości narzędzia jest kosmetyczny.\n\nPowyżej drabiny sprzedawców są dwa wytwarzane narzędzia, poziomy 4 i 5, produkowane w warsztacie przez inżynierów i nigdy niesprzedawane przez żadnego BNP. Żaden dzisiejszy węzeł nie wymaga więcej niż poziomu 3, więc ich wartość teraz to szybkość: najlepsze narzędzie sprowadza rzucanie do dolnej granicy na niższych węzłach i będzie biletem wstępu, gdy pojawi się wyższy poziom terenu.',
   'guide.profPages.toolCrafted': 'Wytworzony ({craft})',
   'guide.profPages.toolVendor': '{name} ({hub})',
   'guide.profPages.toolUnavailable': 'Niesprzedawany',
-  'guide.profPages.priceNone': 'Niesprzedawany',
   'guide.profPages.toolTierReq': 'Narzędzie poziomu {tier}',
   'guide.profPages.yieldsHeading': 'Co przynosi zebranie',
   'guide.profPages.yieldsBody':
     'Każde zebranie losuje jakość dla tego, co przynosi, a twoja biegłość to cały mechanizm tego losowania. Zupełnie nowy zbieracz zawsze wyciąga pospolity materiał; każdy punkt umiejętności stale przesuwa wagę z pospolitego na wyższe gatunki i nigdy wstecz, aż przy limicie 100 jakość pospolita znika całkowicie: 60 procent niezwykłego, 30 procent rzadkiego, 8 procent epickiego i 2 procent legendarnego, za każdym razem.\n\nJakość to też ilość: pospolitość daje 1 jednostkę, niezwykły i rzadki 2, epicki 3, a legendarny 4. Każde rzadkie, epickie lub legendarne ciągnie jako podpisany egzemplarz ze stemplem Zebrany przez ciebie: przy limicie to cztery zebrania na dziesięć noszące twoje imię, a zasady proweniencji na stronie Ekonomii Wytwarzania wyjaśniają, dlaczego rzemieślnicy płacą ekstra właśnie za te stosy.',
   'guide.profPages.bandsHeading': 'Pasma biegłości',
-  'guide.profPages.bandsBody':
-    'Pasma biegłości to wspólna drabinka 0/100/200 nad licznikiem danego fachu: każde przekroczone pasmo skraca czas rzucania zbioru, a w wędkarstwie pasma dodatkowo wybierają tablice połowów (z odpowiednią wędką). Fachy lądowe mają pułap 100, więc pasmo 1 to ich sufit; tylko wędkarstwo sięga pasma 2.',
   'guide.profPages.bandFmt': 'Pasmo {band}: od biegłości {at}',
   'guide.profPages.rareHeading': 'Rzadkie znaleziska',
   'guide.profPages.rareBody':
     'Każde zebranie, niezależnie od twojej umiejętności, ma szansę 1 na {oneIn} na rzadkie znalezisko: pierwotna żyła w rudzie, starożytne twarde drewno w drewnie, rozkwitły w blasku księżyca kwiat wśród ziół. Znalezisko mnoży plon z tego zebrania {mult} razy, każda jednostka przychodzi z twoim podpisem niezależnie od wylosowanej jakości, a cała strefa słyszy o tym z imienia i nazwiska. Każdy rodzaj zapisuje też własny czyn o zerowej Renomie w twojej Księdze Czynów - znak kolekcjonera istniejący wyłącznie po to, by udowodnić, że ci się przydarzyło.',
-  'guide.profPages.specimenBody':
-    'Zostaw trochę miejsca w torbie, gdy farmujesz: nieoczekiwany łup potrzebuje wolnych slotów, by wylądować podpisany, a jeśli nic nie pasuje, plon nadal się pojawia, ale podpis ginie. Zbieranie ze zwłok ma też własną gałąź jackpota: około {pct}% zebrań ze zwłok losuje rzadki wynik lub lepszy, podpisując plon i, w przypadku rodzin okazów, przyznając podpisany doskonały okaz.',
   'guide.profPages.gatherDeedsHeading': 'Czyny po drodze',
   'guide.profPages.gatherDeeds.mining':
     'Pierwszy węzeł jakiegokolwiek zawodu przynosi czyn Plony Pola, a osiągnięcie limitu 100 w górnictwie wpisuje tytuł Ruda we Krwi. Osiągnięcie 100 w dowolnych trzech spośród górnictwa, drwalstwa, zielarstwa i wędkarstwa daje Mistrza Zbieracza za 25 Renomy, a odkucie pierwotnej żyły zapisuje własny znak kolekcjonera. Żaden z tych czynów nie daje mocy: to tytuły i Renoma, zapis dróg, którymi kroczyłeś.',
@@ -281,31 +1128,19 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Pierwszy węzeł jakiegokolwiek zawodu przynosi czyn Plony Pola, a osiągnięcie limitu 100 w drwalstwie wpisuje tytuł Rąbiarz Twardego Drewna. Osiągnięcie 100 w dowolnych trzech spośród górnictwa, drwalstwa, zielarstwa i wędkarstwa daje Mistrza Zbieracza za 25 Renomy, a uderzenie w starożytne twarde drewno zapisuje własny znak kolekcjonera. Czyny to wyłącznie tytuły i Renoma, nigdy moc.',
   'guide.profPages.gatherDeeds.herbalism':
     'Pierwszy węzeł jakiegokolwiek zawodu przynosi czyn Plony Pola, a osiągnięcie limitu 100 w zielarstwie wpisuje tytuł Mistrz Łąki. Osiągnięcie 100 w dowolnych trzech spośród górnictwa, drwalstwa, zielarstwa i wędkarstwa daje Mistrza Zbieracza za 25 Renomy, a zebranie rozkwitłego w blasku księżyca ziela zapisuje własny znak kolekcjonera. Czyny to wyłącznie tytuły i Renoma, nigdy moc.',
-  'guide.profPages.gatherDeeds.fishing':
-    'Kamień milowy 100 wpisuje tytuł Stary Solony, a 200 tytuł Mistrz Wędkarstwa; wędkarstwo wlicza się też do Mistrza Zbieracza, zdobywanego po osiągnięciu 100 w dowolnych trzech zawodach zbierackich. Pierwsza ryba z wód każdej strefy wypełnia własną stronę, a Karpik Słonecznoblask zapisuje Przebłysk Nadziei, więc podróżnicy z wędką w tobołku wypełniają swoją księgę szybciej, niż się spodziewają.',
   'guide.profPages.fish.startHeading': 'Pierwsze kroki',
-  'guide.profPages.fish.startBody':
-    'Prosta wędka kosztuje 20 miedzi u Rybaka Brandta we Wschodnim Potoku (szukaj Starego Solonego wpatrzonego ze wschodniego skraju miasta w Lustrzane Jezioro); wędki sprzedają też Majster Gizzel, Zaopatrzeniowiec Hale w Fennmoście i Kwatermistrz Bree w Wysokiej Straży. Użyj wędki zwrócony ku wodzie wystarczająco głębokiej, by pomieściła ryby, do około 24 jardów przed sobą, a spławik wyląduje na wodzie.\n\nNie możesz rzucać podczas walki, pływania ani po śmierci: wędkowanie z brzegu to zamierzona postawa, a każda sadzawka w każdej strefie nadaje się do łowienia.',
   'guide.profPages.fish.biteHeading': 'Branie i wyciąganie',
-  'guide.profPages.fish.biteBody':
-    'Po rzucie branie następuje w ukrytym momencie między {min} a {max} sekundami; opóźnienie jest decydowane, gdy linia ląduje, więc żadne dwa rzuty nie czują się tak samo. Gdy spławik bierze, masz okno {reel} sekund, by nacisnąć wędkę ponownie i wyciągnąć: wyciągnij w jego granicach, a połów ląduje; zwlekaj dłużej, a ryba ucieka bez śladu. Cała sesja ma pułap {cap} sekund, więc nawet spokojny rzut rozstrzyga się szybko.\n\nLepsze wędki wyostrzają oba krańce minigry: każdy poziom wędki powyżej pierwszego skraca {rod} sekund z najdłuższego możliwego oczekiwania i dodaje {reelRod} sekund do okna wyciągania, więc Żelazny Kołowrotek ściąga najgorsze oczekiwanie do 6,5 sekundy przy oknie 3,75 sekundy, a Srebrny Strumień do 5 i 4,5. Najkrótsze brania nigdy się nie zmieniają niezależnie od tego, co trzymasz, a wędka musi być tylko w torbie, by liczyć.',
   'guide.profPages.fish.scheduleHeading': 'Przyrost biegłości',
-  'guide.profPages.fish.scheduleNote':
-    'Przyrost w wędkarstwie odbywa się według stałego harmonogramu, bez rzutów kośćmi: pełny punkt za każdy połów poniżej 50 biegłości, pół punktu poniżej 100, jedna dziesiąta poniżej 150 i powolny strumyczek 0,02 od 150 do 200. Ten ostatni odcinek to droga przez tysiące połowów z założenia: 200 to osiągnięcie, a nie kolejny etap na drodze do czegoś innego.\n\nŚmieci przestają cokolwiek uczyć przy {cutoff}: od tej chwili chwasty i stary but to po prostu chwasty i but. Każdy udany połów przyznaje przyrost zgodnie z harmonogramem, więc łów tam, gdzie i tak byś łowił, i pozwól licznikowi rosnąć.',
   'guide.profPages.fish.colProficiency': 'Biegłość',
   'guide.profPages.fish.colGain': 'Zysk za połów',
   'guide.profPages.fish.belowFmt': 'Poniżej {below}',
   'guide.profPages.fish.tablesHeading': 'Tabele połowów',
-  'guide.profPages.fish.tablesNote':
-    'Twoja biegłość przypisuje cię do jednego z trzech pasów połowów: pas 0 od początku, pas 1 przy 100, pas 2 przy 200 - każdy kolejny przenosi wagę ze śmieci i pustych haków na prawdziwe ryby, strefa po strefie. Każdy pas powyżej pierwszego wymaga też odpowiedniej wędki: pas 1 wymaga poziomu 2 Żelaznego Kołowrotka, pas 2 poziomu 3 Srebrnego Strumienia. Twój efektywny pas to niższa wartość spośród tego, co osiągnęła twoja umiejętność, i tego, co obsługuje twoja wędka, a pułap działa po cichu: ze słabszą wędką nadal łowisz, tylko z tabeli niższego pasa - jeśli twoje połowy wydają się stać w miejscu, choć umiejętność rośnie, najpierw sprawdź wędkę.\n\nWody każdej strefy skrywają własną parę ryb jadalnych, leczących tym więcej, im głębsza strefa, a wszystkie są surowcem do gotowania i całkiem dobrym surowym jedzeniem prosto z żyłki. Reszta tabeli to podatek wędkarza: chwasty, okazjonalny but i pusty hak, który nigdy całkowicie nie znika. {rare} to ta sama mała szansa na każdej żyłce, przy stałych szansach, które nie zmieniają się z umiejętnością, więc najnowszy wędkarz na pomoście ma taką samą szansę jak Mistrz Wędkarstwa.',
   'guide.profPages.fish.bandHeading': 'Pasmo {band}: biegłość od {at} wzwyż, poziom wędki {rod}',
   'guide.profPages.fish.colCatch': 'Połów',
   'guide.profPages.fish.colOdds': 'Szanse',
   'guide.profPages.fish.pctFmt': '{pct}%',
   'guide.profPages.fish.emptyHook': 'Nic nie bierze',
   'guide.profPages.fish.koiHeading': 'Karpik Słonecznoblask',
-  'guide.profPages.fish.koiBody':
-    'Każdy zbiornik wodny w grze kryje tę samą nagrodę: Karpika Słonecznoblask, rzadki blask na żyłce wart 75 miedzi u sprzedawcy i o wiele więcej dla twojej dumy. Jego szanse to stałe 3 procent na złowiony połów (4 procent w zimnych wodach Ciernistego Grzbietu) przy każdym paśmie, a złowienie go zapisuje Przebłysk Nadziei w twojej Księdze Czynów, znak kolekcjonerski bez Renomy. Gdy to nastąpi, dziennik daje ci znać.',
   'guide.profPages.econ.title': 'Gospodarka Wytwarzania',
   'guide.profPages.econ.intro':
     'Jak monety przepływają przez rzemiosła: dokładne opłaty i odpływy, co naprawdę się sprzedaje, zasady Rynku Świata, zlecenia robocze, zamówienia i dlaczego wytwarzana moc zatrzymuje się poniżej progu rajdowego.',
@@ -321,8 +1156,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.feeUnbind': 'Opłata za odwiązanie',
   'guide.profPages.econ.feeUnbindValue': '{uncommon} niepospolity, {rare} rzadki, {epic} epicki',
   'guide.profPages.econ.trainingHeading': 'Opłaty szkoleniowe',
-  'guide.profPages.econ.trainingNote':
-    'Jedna stała opłata za poziom przepisu, pobierana raz, gdy mistrz go uczy; wyższe poziomy tabeli czekają na przyszłą zawartość.',
   'guide.profPages.econ.trainingTierFmt': 'Poziom {tier}: {fee}',
   'guide.profPages.econ.free': 'Bezpłatne',
   'guide.profPages.econ.sellsHeading': 'Co się sprzedaje i dlaczego',
@@ -342,14 +1175,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.commissionsBody':
     'Zamówienie to wyrób stworzony dla kogoś. Podczas wytwarzania broni, elementu zbroi lub trzymanego oburącz (na miksturze nie można umieścić więzi), rzemieślnik może oznaczyć wyrób jako zamówienie: gotowy przedmiot zachowuje się normalnie w rękach wytwórcy, ale w chwili zmiany rąk podczas wymiany wiąże się z osobą, która go otrzymała. To jest Więź Wytwórcy: kupujący dostaje swój przedmiot, a przedmiot nie może być przekazywany ani odsprzedawany.\n\nWięzi nie są wieczne, tylko kosztowne. Każdy mistrz stacji odwiąże związany przedmiot, gdy staniesz przy jego stacji (ruchoma stacja nigdy tej usługi nie oferuje), za opłatą zależną od jakości przedmiotu: 25 srebrnych za niepospolity, 1 złoty za rzadki, 4 złote za epicki, z legendarnym płacącym stawkę epicką, a pospolitym wyrobem na zamówienie stawkę niepospolitą.\n\nOpłata kupuje czysty zapis, nie lekarstwo: przedmiot nadal jest zamówieniem, więc wiąże się ponownie z tym, kto go otrzyma w następnej wymianie, a wszystko inne, podpis, arcydzieło i zaklęcia, pozostaje nienaruszone.',
   'guide.profPages.econ.provenanceHeading': 'Podpisane dzieła',
-  'guide.profPages.econ.provenanceBody':
-    'Niektóre przedmioty noszą imię. Najedź na jeden, a podpowiedź powie Zebrane przez kogoś-tam na surowcu lub Wytworzone przez kogoś-tam na gotowym wyrobie: ten sam znak, sformułowany stosownie do tego, jak przedmiot powstał. Podpis jest częścią samego przedmiotu, podróżuje z nim przez wymiany i bank i nigdy nie blaknie.\n\nZbieranie podpisuje swoje najlepsze dzieła automatycznie: każdy zbiór, który wylosuje rzadką jakość lub lepszą, przybywa podpisany, rzadkie znaleziska podpisują cały pięciokrotny łup, a szczęśliwy rzut ze zbioru z tuszy podpisuje jego plon, łącznie z nieskażonymi okazami. Wytwarzanie podpisuje wzdłuż tej samej linii: pojedyncza kopia wyjścia rzadkiej jakości lub lepszej jest wybijana podpisana, a arcydzieło zawsze podpisuje cokolwiek wytworzy, niezależnie od jakości, więc najlepsza wersja każdego przedmiotu zawsze nosi imię wytwórcy. Jedyną rzeczą, która może cię kosztować podpis, jest pełna torba: podpisana jednostka potrzebuje własnego miejsca, lub pasującego podpisanego stosu, by wylądować w niej.\n\nStos przedmiotów dzieli jedną tożsamość, więc dwie kopie łączą się tylko wtedy, gdy każdy znacznik pasuje dokładnie: ten sam przedmiot, ten sam podpisujący, te same statystyki arcydzieła, to samo zaklęcie, ta sama więź. Podpisana kłoda nigdy nie dołączy do zwykłego stosu w żadnym kierunku (scalanie wymazałoby czyjś podpis), ale identyczne ładunki scalają się chętnie, więc dwadzieścia rud podpisanych przez tego samego zbieracza leży w jednym stosie, a łut szczęścia nie niszczy twoich toreb.\n\nPodpisy odwzajemniają się rzemieślnikom: zużycie dowolnego podpisanego surowca, przez kogokolwiek podpisanego, dodaje 2 punkty procentowe szansy na arcydzieło, a trzymanie surowca podpisanego własną ręką zmniejsza wymaganą ilość tego surowca o jeden (nigdy poniżej jednego). Twoje własne podpisane dzieło rzadkie lub lepsze wciąż cię uczy: gdy przedmiot przez ciebie podpisany działa w twoich własnych rękach, wypita w odpowiednim momencie mikstura, zadany cios kończący, noszona zbroja przy zabójstwie, małe korzyści z umiejętności płyną z powrotem do rzemiosła, które go stworzyło, o ile to rzemiosło jest jedną z twoich aktywnych specjalizacji.',
   'guide.profPages.econ.collectorsHeading': 'Kolekcjonerzy, trofea i cena historii',
   'guide.profPages.econ.collectorsBody':
     'Sprzedawcy są ślepi na pochodzenie: podpisany przedmiot sprzedaje się NPC za dokładnie jego zwykłą cenę. Premia za podpis istnieje wyłącznie między graczami, co sprawia, że jest właśnie interesująca: stos przypadkowo znalezionej rudy podpisany przez sławnego zbieracza, Najlepszy Kawałek ze szczęśliwego zbioru, mistrzowskie ostrze z imieniem kowala, który już dawno skończył grę, wszystko kosztuje tyle, ile czyjś sentyment mówi, że jest warte.\n\nKsięga Czynów opiera się na tym samym instynkcie: Nieskażona Żyła, Pradawne Drzewo Serca, Księżycowy Kwiat, Doskonały Okaz i Przebłysk Nadziei to znaki kolekcjonerskie bez Renomy, które istnieją wyłącznie po to, by udowodnić, że pewien moment ci się przydarzył. Zachowaj przedmiot, który przyniósł czyn, a będziesz mieć pokwitowanie. Żadna z tych rzeczy nie daje mocy; proweniencja nie kupuje statystyk i nie wygrywa walk, to papierowy ślad gry po dobrych dniach.',
-  'guide.profPages.econ.throttleHeading': 'Ogranicznik akcji',
-  'guide.profPages.econ.throttleBody':
-    'Produkcja ma pułap: wytwarzanie, rozkładanie zaklęć, zaklinanie i odzyskiwanie współdzielą jeden budżet {actions} udanych akcji na kroczące {seconds} sekund. Odrzucona próba nic nie kosztuje i nie zużywa budżetu. Nigdy tego nie poczujesz podczas normalnej gry; istnieje po to, by maksymalnie rozwinięty specjalista z pełnym bankiem nie mógł zalać Rynku, niezależnie od umiejętności czy zapasów.',
   'guide.profPages.econ.doctrineHeading': 'Gracze handlują z graczami',
   'guide.profPages.econ.doctrineBody':
     'Gospodarka wytwarzania opiera się na jednej idei: gracze zaopatrują graczy. Zbieracze karmią rzemieślników, rzemieślnicy karmią poszukiwaczy zadań i rajdowców, a rozkładacze karmią zaklinaczy, a sprzedawcy i mistrzowie stacji stoją na krawędziach, by pochłaniać rupiecie i monety, a nie konkurować z tobą. Jeśli chcesz zarabiać na profesji, twoim klientem jest człowiek: dowiedz się, co inni gracze zużywają, wyceniaj względem Rynku Świata i traktuj systemy NPC jako dolną granicę twoich cen, a nie jako sam rynek.\n\nWytwarzany ekwipunek jest dostrojony, by pozostawać poniżej progu rajdowego: nawet arcydzieło jest zawsze tylko o jeden poziom jakości powyżej swojego przepisu, nigdy nie osiągając legendarnego, a jego budżet statystyk pozostaje poniżej pasma łupów rajdowych. Kuźnia przygotowuje cię na najtrudniejszą zawartość; nie zastępuje jej. To utrzymuje rzemieślników, rajdowców i rynek w stabilnym trójkącie: łupy rajdowe pozostają aspiracyjne, a wyroby rzemieślnicze pozostają najlepszym ekwipunkiem, jaki można realnie kupić za pieniądze.',
@@ -366,20 +1194,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.a3':
     'Jedno naciśnięcie obejmuje oba. Wszystko, co tusza zawiera, monety i łupy plus wszelkie zbieralne składniki, otwiera się w tym samym oknie: łupy podążają za normalnymi zasadami łupów, a zbieranie to strona profesji, ściągająca materiały z samej tuszy.\n\nZbieranie odbywa się na zasadzie kto pierwszy, jednorazowe użycie: każda tusza może być zebrana dokładnie raz, przez tego, kto ją pierwszy zgłosi, także online. Twoje Priorytety Miasta kształtują to, co dostaniesz: stojąc w centrum miasta, możesz rozłożyć 10 punktów priorytetu na typy składników, na których ci zależy, a każdy priorytetowy składnik wylosuje lepszy poziom (co 5 punktów podnosi go o krok, co najwyżej dwa kroki) i da więcej (10 procent za punkt). Niepiorytetowane składniki nigdy nie są pogarszane.',
   'guide.profPages.faq.q4': 'Dlaczego moja Kłoda Żelaznej Kory jest podpisana?',
-  'guide.profPages.faq.a4':
-    'Trafiłeś na łut szczęścia. Mniej więcej 1 zbiór na 90 wywołuje rzadkie zdarzenie zbierania (pradawne drzewo serca na drzewie, nieskażona żyła na rudzie, księżycowy kwiat na ziołach): mnoży plon pięć razy, podpisuje każdą jednostkę twoim imieniem i ogłasza znalezisko całej strefie. Rzadka jakość lub lepsza przy zwykłym zbiorze też podpisuje plon.\n\nPodpisane materiały warto zachować lub sprzedawać drogo: zużycie dowolnego podpisanego surowca przy wyrobie dodaje 2 procent do szansy na arcydzieło. Pamiętaj tylko, że układają się w stos wyłącznie z identycznie podpisanymi kopiami, więc zajmują własny slot w torbie.',
   'guide.profPages.faq.q5': 'Jak odwiązać zamówiony przedmiot i ile to kosztuje?',
   'guide.profPages.faq.a5':
     'Podejdź do dowolnej stacji rzemieślniczej z przedmiotem w torbie i zapłać mistrzowi. Opłata zależy od jakości przedmiotu: 25 srebrnych za niepospolity, 1 złoty za rzadki, 4 złote za epicki; legendarny płaci stawkę epicką, a pospolity wyrób na zamówienie stawkę niepospolitą. Musi to być prawdziwa stacja: ruchoma stacja nigdy tej usługi nie oferuje.\n\nOpłata kupuje czysty zapis, nie lekarstwo: przedmiot pozostaje zamówieniem, więc wiąże się ponownie z tym, kto go otrzyma w następnej wymianie. Jeśli kilka związanych kopii dzieli stos, jedna kopia jest oddzielana i odwiązywana za każdą płatność.',
   'guide.profPages.faq.q6': 'Gdzie uczę się przepisów i ile kosztują?',
-  'guide.profPages.faq.a6':
-    'Dziewięć pospolitych przepisów polnych i przepisy na narzędzia są znane każdemu od początku, podobnie jak trzy przywiązane do stacji zwieńczenia (Naramiennik Piecołuski, Kaptur Odzianowelnowy i Owijacze Mrocznej Skóry), które nie wymagają trenera, tylko ich stacji. Wszystko inne uczy mistrzów rezydentów przy stacjach w trzech miastach centralnych: większość stoi w Eastbrook, garbarko prowadzi garbarnie w Fenbridge, a alchemik prowadzi aptekę w Highwatch.\n\nPrzepisy od trenera przychodzą w poziomach przy umiejętności 0, 25 i 50, wycenianych bezpłatnie, 25 srebrnych i 1 złoty jako jednorazowa opłata. Mistrz uczy przepisu, gdy twoje pasmo biegłości w danym rzemiośle osiągnęło własne pasmo przepisu, i musisz stać przy jego stacji, by się uczyć: ruchoma stacja nie liczy się.',
   'guide.profPages.faq.q7': 'Dlaczego moje zbieranie nagle zwolniło?',
-  'guide.profPages.faq.a7':
-    'Rzut zbierania zaczyna się od 2,5 sekundy i skraca się na dwa sposoby: 0,4 sekundy za każdy poziom narzędzia, który posiadasz powyżej własnego poziomu węzła, i 0,15 sekundy za każde pasmo biegłości, które przekroczyłeś (przy 100 i 200), z podłogą 1,5 sekundy. Przejdź z węzłów pierwszego poziomu do węzłów trzeciego poziomu, a twoja nadwyżka znika, więc ta sama kilof huśta się wolniej. Posiadanie dokładnie wymaganego poziomu nie kupuje prędkości; tylko otwiera węzeł.\n\nZysk umiejętności zanika tak samo jak przy wytwarzaniu: węzeł szarzeje, gdy twoja biegłość mija jego poziom (węzły pierwszego poziomu niczego nie uczą od biegłości 75 wzwyż), więc odpowiedzią na powolne zyski są węzły wyższego poziomu, które wymagają narzędzia co najmniej ich poziomu (gołe ręce liczą się jako poziom 1). Wędkarstwo podąża za własnym zawężeniem: pełny zysk poniżej biegłości 50, połowa poniżej 100, mały zysk 0,1 poniżej 150 i 0,02 poniżej 200, a śmieciowe połowy w ogóle niczego nie uczą od 100 wzwyż.',
   'guide.profPages.faq.q8': 'Czy mogę wytwarzać z dala od miasta?',
-  'guide.profPages.faq.a8':
-    'Częściowo. Dziewięć pospolitych przepisów polnych (podstawowe bronie, zbroje, jedzenie i mikstury) wytwarza się wszędzie, w każdej chwili. Wszystko powyżej nich jest przywiązane do typu stacji: kuźnia, kuchnia, apteka, garbarnia, krosna lub warsztaty, i musisz być w promieniu 20 jardów od stacji, by wyrób przeszedł.\n\nPrzy umiejętności 75 w rzemiośle specjalizujesz się, i wraz z 20-procentową zniżką na materiały otrzymujesz ruchomą stację: rozstaw ją w terenie, a stoi przez 10 minut, obsługując przepisy tego rzemiosła tak, jakbyś był przy prawdziwej. Ruchoma stacja służy wyłącznie do wytwarzania: nauka przepisów i odwiązywanie zamówień zawsze wymagają prawdziwej stacji w mieście.',
   'hud.logs.keptBoundOne': 'Zachowano {count} zawiązaną kopię.',
   'hud.logs.keptBoundMany': 'Zachowano {count} zawiązanych kopii.',
   'hud.pet.waterJet': 'Strumień wody',
@@ -495,6 +1315,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.card_master.name': 'Mistrz Kart',
   'entities.npcs.card_master.title': 'Rozdający Los',
   'entities.quests.q_stalker_pelts.title': 'Pierwszy Szron w Wysokiej Straży',
+  'entities.quests.q_the_codfather.text':
+    'Dorszny Ojciec to nie jest zwykła ryba, {playerName}, to zimnokrwisty morderca. Starzy wyjadacze przysięgają, że zjada Bagiennych Czających na śniadanie, a nawet Wdowy z Mokrzawia ze zwykłej grozy nie przędą sieci w pobliżu Płycizn Głębokiego Trzęsawiska. On rządzi tamtymi wodami, a na bagienną wodę trzeba nie byle czego, bo Wędki z żelaznym kołowrotkiem; moja lada je sprzedaje. Zdobądź jedną, wywlecz tego starego diabła z jego wód, a przyznam, że dołączyłeś do rodziny.',
+  'entities.quests.q_nythraxis_graves.text':
+    'Widziałem już te znaki, na trzech starych grobach wokół północnego pola bitwy. Kapitan Aldren spoczywa na zachodnim wzniesieniu, Najwyższy Kapłan Malric dalej na południe wzdłuż zachodniej krawędzi, a Królewski Zabójca Voss przy wschodnim urwisku. Dotknij każdego grobu i słuchaj, {playerName}. Umarli mogą pamiętać to, o czym żywi zapomnieli.',
   'entities.quests.q_prof_hobby_switch.completion':
     'Lżejszy wybór, ale przydatny. Podążaj za tą ciekawością, tak daleko jak rzadka praca może ją zaprowadzić.',
   'entities.quests.q_prof_hobby_switch.objectives.0.label': 'Łan ziół zebrany',
@@ -505,12 +1329,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Widzisz? Ruda zebrana i odciski na rękach. Nie przerywaj wydobycia, ścinki drzew i zbierania ziół w trakcie podróży po drogach, a gdy wrócisz do miasta, zerknij na Tablicę Skupienia przy rynku i pobliskie stoisko rzemieślnicze. Jest w tym uczciwy zarobek, jeśli go zechcesz.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Żyła rudy wydobyta',
   'entities.quests.q_prof_intro.text':
-    'Każda dusza w Eastbrook uprawia jakiś fach oprócz miecza, {playerName}. W skałach wokół Miedzianego Wykopu, na południowym zachodzie od miasta, są żyły rudy. Idź i wydobądź własnoręcznie 5 z nich; poznam różnicę.',
+    'Każda dusza w Eastbrook uprawia jakiś fach oprócz miecza, {playerName}. W skałach wokół Miedzianego Wykopu, na południowym wschodzie od miasta, są żyły rudy. Idź i wydobądź własnoręcznie 5 z nich; poznam różnicę.',
   'entities.quests.q_prof_amends_apothecary.completion':
     'Stary smak powraca. Alchemia i Gotowanie wróciły do twojego pieca jako specjalizacje. Tym razem zostań trochę dłużej.',
   'entities.quests.q_prof_amends_apothecary.objectives.0.label': 'Dziki dzik upolowany',
   'entities.quests.q_prof_amends_apothecary.text':
-    'A, kto tu wraca do mojego garnka. Bez urazy, {playerName}, kuchnia zawsze ma miejsce, ale wiesz, że rachunek rośnie za każdym razem, gdy z niej wychodzisz. Idź przerzedzić dziki dziki na wschodniej łące, bo uczciwy pot jest pierwszym składnikiem i przypomni twoim rękom o pracy.',
+    'A, kto tu wraca do mojego garnka. Bez urazy, {playerName}, kuchnia zawsze ma miejsce, ale wiesz, że rachunek rośnie za każdym razem, gdy z niej wychodzisz. Idź przerzedzić dziki dziki na zachodniej łące, bo uczciwy pot jest pierwszym składnikiem i przypomni twoim rękom o pracy.',
   'entities.quests.q_prof_amends_apothecary.title': 'Z powrotem do pieca',
   'entities.quests.q_prof_amends_bombardier.completion':
     'No i jest ta nerwowość rąk. Inżynieria i Alchemia znowu twoimi specjalizacjami, no dawaj, idź zrób huk. Tym razem zostań, co?',
@@ -522,7 +1346,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Znowu ustabilizowany. Garbarstwo i Krawiectwo wracają do twoich rąk jako specjalizacje. Mierz dwa razy nim znowu pójdziesz w świat.',
   'entities.quests.q_prof_amends_outfitter.objectives.0.label': 'Pająk sieciowy wybity',
   'entities.quests.q_prof_amends_outfitter.text':
-    'Znowu przy moim warsztacie po tym wszystkim. Nie mam urazy, {playerName}, ale nić pamięta rękę, która ją puściła, i koszt jej ponownego podjęcia jest z każdym razem odrobinę wyższy. Wybij pająki sieciowe tłoczące się w zachodnich lasach, a praca ustabilizuje twoje ręce zanim dotkną ponownie dobrego jedwabiu.',
+    'Znowu przy moim warsztacie po tym wszystkim. Nie mam urazy, {playerName}, ale nić pamięta rękę, która ją puściła, i koszt jej ponownego podjęcia jest z każdym razem odrobinę wyższy. Wybij pająki sieciowe tłoczące się we wschodnich lasach, a praca ustabilizuje twoje ręce zanim dotkną ponownie dobrego jedwabiu.',
   'entities.quests.q_prof_amends_outfitter.title': 'Powrót do warsztatu',
   'entities.quests.q_prof_amends_smith.completion':
     'Rytm wrócił do twoich rąk. Wytwarzanie Broni i Wytwarzanie Pancerzy znowu twoimi specjalizacjami. Nie rób z tego nawyku.',
@@ -862,6 +1686,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootMaybe': 'Co najwyżej jeden z tych może wypaść:',
   'hudChrome.finder.mech.deathless_rage':
     'Nieśmiertelna Furia (przerywana przy kamieniach wardowych)',
+  'hudChrome.finder.mech.dread_curse':
+    'Klątwa Grozy (tylko heroiczna, kumulowany efekt do zmiany tanka)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Kosiące Cięcie Łowcy Śmierci (frontalne cięcie)',
   'hudChrome.finder.mech.enrage': 'Wpada w szał przy niskim zdrowiu',
   'hudChrome.finder.mech.grave_cleaver': 'Grobowe Cięcie (frontalne cięcie)',
@@ -1448,6 +2274,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.wildgrowth_leggings.name': 'Nogawice Dzikiego Wzrostu',
   'entities.items.wildsoul_maul.name': 'Obuch Dzikich Dusz',
   'entities.items.wyrmchoir_handwraps.name': 'Owijki żmijowego chóru',
+  'entities.items.basin_stalkers_tunic.name': 'Tunika Tropiciela z Kotliny',
+  'entities.items.verdant_heart_vestment.name': 'Szata Zieleniejącego Serca',
+  'entities.items.sunbone_ritual_hauberk.name': 'Słonecznokoścista Kolczuga Rytualna',
+  'entities.items.greatfang_of_the_basin.name': 'Wielki Kieł Kotliny',
+  'entities.items.sunbone_oracles_crown.name': 'Korona Słonecznokościstej Wyroczni',
+  'entities.items.bloodmane_war_legguards.name': 'Wojenne Nagolenniki Krwistej Grzywy',
   'entities.items.wyrmcult_spellgrips.name': 'Czarodziejskie rękawice kultu żmija',
   'entities.items.yumis_keepsake_locket.name': 'Pamiątkowy medalionik Yumi',
   'entities.items.zense_meridian.name': 'Meridian Zense',
@@ -2046,7 +2878,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Nareszcie padł. Górale przysięgali, że ten kot przeżyje sam mur. Tropiciele będą się teraz trzymać swoich wysokich śniegów, {playerName}, a moje patrole przejdą drogą bez krwawienia. Cała grań jest cichsza dzięki twojej pracy.',
   'entities.quests.q_old_cragmaw.objectives.0.label': 'Zabity Stary Skalogryz',
   'entities.quests.q_old_cragmaw.text':
-    'Górale nadali imię śladom, które znalazła moja zwiadowczyni: Stary Skalogryz, pokryty bliznami tyran wśród kotów, który przeżył trzy pokolenia własnego stada. To przez niego tropiciele zalewają moją drogę, {playerName}. Jego legowisko leży na zachodniej grani nad drogą na południe. Weź towarzysza i połóż starego diabła.',
+    'Górale nadali imię śladom, które znalazła moja zwiadowczyni: Stary Skalogryz, pokryty bliznami tyran wśród kotów, który przeżył trzy pokolenia własnego stada. To przez niego tropiciele zalewają moją drogę, {playerName}. Jego legowisko leży na wschodniej grani nad drogą na południe. Weź towarzysza i połóż starego diabła.',
   'entities.quests.q_old_cragmaw.title': 'Stary Skalogryz',
   'entities.quests.q_stalker_cloaks.completion':
     'Dziesięć dobrych skór, grubych jak mało która... nie, spójrz na nie, {playerName}. Połowa rozdarta, i to nie ostrzem ani włócznią. Ślady pazurów szerokie jak moja dłoń, na wylot przez zimowe futro. Coś na tej grani szarpie własny gatunek.',
@@ -2080,9 +2912,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Brat Halven zaznacza na swoich mapach: dobry dzień, by stawić czoła Zawalonemu Relikwiarzowi.',
   'hudChrome.calendar.events.delveDay.title': 'Dzień Wyprawy',
-  'hudChrome.calendar.events.fiestaNight.note':
-    'Ring Fiesty 2v2 przyciąga dziś wieczorem najgłośniejsze tłumy.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Noc Fiesty',
   'hudChrome.calendar.events.fishingDerby.note':
     'Wędkarze obstawiają jeziora. Weź wędkę i powymieniaj się rybackimi opowieściami.',
   'hudChrome.calendar.events.fishingDerby.title': 'Zawody Wędkarskie',
@@ -2158,6 +2987,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': 'Tego listu nie ma już w twojej skrzynce.',
   'hudChrome.mailbox.result.needRecipient': 'Wskaż odbiorcę listu.',
   'hudChrome.mailbox.result.noMailQuestItems': 'Nie możesz wysyłać pocztą przedmiotów zadań.',
+  'hudChrome.mailbox.result.noMailBound':
+    'Ten przedmiot jest przywiązany i nie można go wysłać pocztą.',
   'hudChrome.mailbox.result.noRecipient': 'Nikt o tym imieniu nie ma tu skrzynki pocztowej.',
   'hudChrome.mailbox.result.notEnoughItems': 'Nie masz aż tylu do wysłania.',
   'hudChrome.mailbox.result.recipientBoxFull': 'Skrzynka odbiorcy jest pełna.',
@@ -2182,6 +3013,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': 'Przyjazny',
   'hudChrome.mobTooltip.hostile': 'Wrogi',
   'hudChrome.mobTooltip.levelFamily': 'Poziom {level}: {family}',
+  'hudChrome.mobTooltip.elite': 'Elita',
+  'hudChrome.mobTooltip.boss': 'Boss',
   'hudChrome.options.aurasOnPlayerFrame': 'Wzmocnienia na ramce gracza',
   'hudChrome.options.playerFrameScale': 'Skala ramki gracza',
   'hudChrome.options.showDailyRewardsChest': 'Pokaż skrzynię codziennych nagród',
@@ -2348,6 +3181,22 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.fishing': 'Wędkarstwo',
   'abilityUi.cast.gathering': 'Zbieranie',
   'abilityUi.cast.thunzharrStormcall': 'Zew burzy',
+  'abilityUi.cast.rift_arcane_execution': 'Szczelina Pustki',
+  'abilityUi.cast.rift_arcane_strike': 'Eteryczna Anihilacja',
+  'abilityUi.cast.rift_brute_execution': 'Rozłam Ziemi',
+  'abilityUi.cast.rift_brute_strike': 'Ostateczny Wyrok',
+  'abilityUi.cast.rift_ember_execution': 'Studnia Magmy',
+  'abilityUi.cast.rift_ember_strike': 'Stopienie Rdzenia',
+  'abilityUi.cast.rift_frost_execution': 'Lodowaty Grób',
+  'abilityUi.cast.rift_frost_strike': 'Zero Absolutne',
+  'abilityUi.cast.rift_necro_execution': 'Grób Dusz',
+  'abilityUi.cast.rift_necro_strike': 'Wyrok Śmierci',
+  'abilityUi.cast.rift_storm_execution': 'Piorunochron',
+  'abilityUi.cast.rift_storm_strike': 'Gniew Przyzywacza Burzy',
+  'abilityUi.cast.rift_tide_execution': 'Otchłanna Paszcza',
+  'abilityUi.cast.rift_tide_strike': 'Miażdżąca Głębia',
+  'abilityUi.cast.rift_venom_execution': 'Kałuża Jadu',
+  'abilityUi.cast.rift_venom_strike': 'Znamię Matki Roju',
   'abilityUi.forms.bear': 'Niedźwiedź',
   'abilityUi.forms.cat': 'Wilk',
   'abilityUi.resources.energy': 'Energia',
@@ -3202,6 +4051,16 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.sunken_bastion.enterText': 'Brodzisz w dół, do Zatopionego Bastionu...',
   'entities.dungeons.sunken_bastion.leaveText': 'Wydostajesz się z topielnej ciemności.',
   'entities.dungeons.sunken_bastion.name': 'Zatopiony Bastion',
+  'entities.dungeons.the_last_keep.enterText':
+    'Wchodzisz w zimne, ciche korytarze Ostatniej Twierdzy.',
+  'entities.dungeons.the_last_keep.leaveText':
+    'Zamykasz za sobą bramę twierdzy i wracasz w wiatr Smoczych Ziem.',
+  'entities.dungeons.the_last_keep.name': 'Ostatnia Twierdza',
+  'entities.dungeons.wildheart_basin.enterText':
+    'Ciepły deszcz syczy na starym kamieniu. Kotlina Dzikiego Serca otwiera się przed tobą.',
+  'entities.dungeons.wildheart_basin.leaveText':
+    'Przechodzisz z powrotem pod kamiennymi kłami w słońce Palmowego Wybrzeża.',
+  'entities.dungeons.wildheart_basin.name': 'Kotlina Dzikiego Serca',
   'entities.items.acolytes_circlet.name': 'Diadem akolity',
   'entities.items.alien_armor_plate.name': 'Obca płyta pancerna',
   'entities.items.amber_crimson_armor_plate.name': 'Bursztynowy karmazyn',
@@ -3248,6 +4107,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.crag_warden_cudgel.name': 'Maczuga strażnika urwiska',
   'entities.items.craghorn_staff.name': 'Kostur Skalnego Rogu',
   'entities.items.cragmaw_huntcord.name': 'Łowiecki pas Cragmawa',
+  'entities.items.cragmaw_huntquiver.name': 'Łowiecki kołczan Cragmawa',
   'entities.items.cragmaw_prowlboots.name': 'Skradające buty Cragmawa',
   'entities.items.cragwalker_boots.name': 'Buty skalnego wędrowca',
   'entities.items.crimson_amber_armor_plate.name': 'Karmazynowy bursztyn',
@@ -3327,6 +4187,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.gravewardens_shiv.name': 'Zaostrzony nóż grobowego strażnika',
   'entities.items.gravewoven_raiment.name': 'Grobowo tkane szaty',
   'entities.items.gravewyrm_gauntlets.name': 'Rękawice Grobowego Żmija',
+  'entities.items.gravewyrm_bone_quiver.name': 'Kostny kołczan Grobowego Żmija',
   'entities.items.gravewyrm_mantle.name': 'Peleryna Grobowego Żmija',
   'entities.items.gravewyrm_sabatons.name': 'Buty płytowe Grobowego Żmija',
   'entities.items.gravewyrm_scale_hauberk.name': 'Łuskowy kaftan Grobowego Żmija',
@@ -3387,6 +4248,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.mistveil_grips.name': 'Rękawice mglistej zasłony',
   'entities.items.moggers_copper_cudgel.name': 'Miedziana maczuga Moggera',
   'entities.items.moggers_shiv.name': 'Nóż Moggera',
+  'entities.items.moggers_hide_quiver.name': 'Skórzany kołczan Moggera',
   'entities.items.moggers_stomper_boots.name': 'Tupiące buty Moggera',
   'entities.items.monarch_crown_helm.name': 'Korona monarchy',
   'entities.items.copper_mining_pick.name': 'Miedziany Kilof Górniczy',
@@ -3510,6 +4372,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_spaulders.name': 'Naramienniki Galecall',
   'entities.items.bonewrought_greatsword.name': 'Wielki miecz Bonewrought',
   'entities.items.direfang_greatblade.name': 'Wielkie ostrze Direfang',
+  'entities.items.direfang_quiver.name': 'Kołczan Direfang',
   'entities.items.bonewrought_bulwark.name': 'Bastion Bonewrought',
   'entities.items.wraithfire_orb.name': 'Kula Wraithfire',
   'entities.items.stormshard_leggings.name': 'Nogawice burzowego odłamka',
@@ -3846,7 +4709,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     'To pismo... ostatni raz widziałem takie w grymuarze Morthena, w Eastbrook. Ta sama ręka kierowała każdym grobem, o który walczyliśmy, {playerName}.',
   'entities.quests.q_cult_orders.objectives.0.label': 'Zabity zelota Kultu Żmija',
-  'entities.quests.q_cult_orders.objectives.1.label': 'Rozkazy Kultu Żmija',
   'entities.quests.q_cult_orders.text':
     'Zeloci poruszają się teraz celowo: wystawiają warty, liczą zapasy niczym żołnierze przed oblężeniem. Kultyści, którzy się organizują, to kultyści wykonujący rozkazy, {playerName}. Zabij jeszcze ośmiu i przynieś mi cztery komplety ich pisemnych rozkazów. Chciałbym poznać rękę, która nimi dowodzi.',
   'entities.quests.q_cult_orders.title': 'Rozkazy z głębi',
@@ -4005,7 +4867,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Mogger w końcu nie żyje. Pola Eastbrook są bezpieczniejsze, a ty opuszczasz Dolinę z kolejną opowieścią wartą powtarzania.',
   'entities.quests.q_mogger.objectives.0.label': 'Mogger pokonany',
   'entities.quests.q_mogger.text':
-    'Mogger rozłupywał wozy, równał z ziemią płoty i wybił dość bydła, by ogołocić pół Doliny. Nie stawaj mu czoła w pojedynkę. Weź dwóch krzepkich towarzyszy na wschodnią łąkę i ubij tego brutala raz na zawsze.',
+    'Mogger rozłupywał wozy, równał z ziemią płoty i wybił dość bydła, by ogołocić pół Doliny. Nie stawaj mu czoła w pojedynkę. Weź dwóch krzepkich towarzyszy na zachodnią łąkę i ubij tego brutala raz na zawsze.',
   'entities.quests.q_mogger.title': 'Mogger musi paść',
   'entities.quests.q_murlocs.completion': 'Ha! To ich nauczy, by pilnowały własnych bajor.',
   'entities.quests.q_murlocs.objectives.0.label': 'Czaiciel z Błotnopłetwych pokonany',
@@ -4021,15 +4883,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_necromancers.completion':
     'Niech Światło nam wybaczy. Te trzymają zmarłych z Doliny i z trzęsawiska - każdego trupa, jakiego Grobozwańcy kiedykolwiek podnieśli, zebranego jak żniwo. Oni nigdy nie budowali armii, {playerName}. Oni ściągali daninę.',
   'entities.quests.q_necromancers.objectives.0.label': 'Nekromanta Kultu Żmija pokonany',
-  'entities.quests.q_necromancers.objectives.1.label': 'Rytualne filakterium',
   'entities.quests.q_necromancers.text':
     'Rozkazy mówią o "kręgu filakteriów" - naczyniach dusz, {playerName}, rozstawionych wokół Sanktuarium, by je karmić. Nekromanci kultu noszą je niczym święte relikwie. Zabij ośmiu nekromantów i przynieś mi trzy nienaruszone filakteria. Muszę wiedzieć, jakie dusze przechowują.',
   'entities.quests.q_necromancers.title': 'Krąg filakteriów',
   'entities.quests.q_no_rest.completion':
     'Okazujesz zmarłym więcej litości, niż kiedykolwiek ich panowie. Weź to - z nawiązką na to zasłużyłeś.',
   'entities.quests.q_no_rest.objectives.0.label': 'Utopiony Zmarły ułożony do spoczynku',
-  'entities.quests.q_no_rest.text':
-    'Obrzęd na tych kadzielnicach sprawia, że utopieni powstają wszędzie tam, gdzie sięga ich bagno - a bagno sięga wszędzie. Nie będzie spoczynku w tych szuwarach, póki zmarli nie przewyższą liczebnie żywych. Nie potrafimy jeszcze cofnąć obrzędu, ale możemy pozbawić go żołnierzy. Ułóż do spoczynku 14 kolejnych Utopionych Zmarłych.',
   'entities.quests.q_no_rest.title': 'Brak spoczynku w szuwarach',
   'entities.quests.q_nythraxis_bound_guardian.completion':
     'Trzy relikwie opowiadają tę samą historię: Aldren walczył w obronie swego króla, Malric przełamał granicę śmierci, a Voss próbował powstrzymać to, co nastąpiło. Pieczęć słabnie, a ten sygnet jest kluczem do grobowca Nythraxis. Jesteś teraz dostrojony, by wejść do Krypty Nythraxis. Wróć do opuszczonej krypty, otwórz królewskie wrota i stań przeciw Nythraxis, nim furia starego króla rozleje się poza Ciernisty Szczyt.',
@@ -4046,8 +4905,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_graves.objectives.1.label': 'Wizja przy grobie arcykapłana Malrica',
   'entities.quests.q_nythraxis_graves.objectives.2.label':
     'Wizja przy grobie królewskiego skrytobójcy Vossa',
-  'entities.quests.q_nythraxis_graves.text':
-    'Widziałem już te znaki, na trzech starych grobach wokół północnego pola bitwy. Kapitan Aldren spoczywa na wschodnim wzniesieniu, arcykapłan Malric przy środkowej zerwanej drodze, a królewski skrytobójca Voss przy zachodnim urwisku. Dotknij każdego grobu i posłuchaj, {playerName}. Zmarli mogą pamiętać to, o czym żywi zapomnieli.',
   'entities.quests.q_nythraxis_graves.title': 'Groby zapomnianych',
   'entities.quests.q_nythraxis_restless_dead.completion':
     'Ten sam znak widnieje na każdym odłamku... korona. Widziałem to już wcześniej, wyryte w starych grobach, których żadna kronika Eastbrook nie pamięta.',
@@ -4067,7 +4924,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_sealed_crypt.objectives.1.label': 'Dolna połowa klucza krypty',
   'entities.quests.q_nythraxis_sealed_crypt.objectives.2.label': 'Pradawny dziennik',
   'entities.quests.q_nythraxis_sealed_crypt.text':
-    'Wizje wskazują na opuszczoną kryptę w zachodnim urwisku. Jest stara legenda, że w krypcie złożono króla. Być może Ciernisty Szczyt zapieczętował go w dole po tym, jak rytuał Malrica wypaczył go w coś nieśmiertelnego. Wejdź do krypty i zobacz, co pozostało w środku.',
+    'Wizje wskazują na opuszczoną kryptę we wschodnim urwisku. Jest stara legenda, że w krypcie złożono króla. Być może Ciernisty Szczyt zapieczętował go w dole po tym, jak rytuał Malrica wypaczył go w coś nieśmiertelnego. Wejdź do krypty i zobacz, co pozostało w środku.',
   'entities.quests.q_nythraxis_sealed_crypt.title': 'Opuszczona krypta',
   'entities.quests.q_ogre_bounty.completion':
     'Nagroda wypłacona w pełni. W podgórzu jest ciszej - teraz zajmiemy się tymi, którzy ich przekupują.',
@@ -4192,7 +5049,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_supplies.completion': 'Moje skrzynie! Ledwie zarysowane. Jesteś cudem.',
   'entities.quests.q_supplies.objectives.0.label': 'Skradziona skrzynia z zaopatrzeniem',
   'entities.quests.q_supplies.text':
-    'Ci bandyci napadli na mój ostatni wóz i zwiali z czterema skrzyniami towarów - narzędziami, solą, dobrym płótnem z Eastbrook. Skrzynie są ułożone wokół ich obozu na południowo-wschodnich wzgórzach. Ukradnij mi je z powrotem, dobrze?',
+    'Ci bandyci napadli na mój ostatni wóz i zwiali z czterema skrzyniami towarów - narzędziami, solą, dobrym płótnem z Eastbrook. Skrzynie są ułożone wokół ich obozu na południowo-zachodnich wzgórzach. Ukradnij mi je z powrotem, dobrze?',
   'entities.quests.q_supplies.title': 'Skradzione zaopatrzenie',
   'entities.quests.q_tarn_waders.completion':
     'Dziesięć z powrotem w wodzie. Nie czują zimna, {playerName}, ani strachu — jedynie przyciąganie tych wrót. Cokolwiek im śpiewa, śpiewa głośno.',
@@ -4203,8 +5060,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_the_codfather.completion':
     'Na wilgotnych świętych... Sam Dorszny Ojciec. Spójrz na te wąsy. Fenbridge będzie się zajadać opowieściami o tym połowie przez rok, {playerName}.',
   'entities.quests.q_the_codfather.objectives.0.label': 'Dorszny Ojciec',
-  'entities.quests.q_the_codfather.text':
-    'Dorszny Ojciec to nie jest zwykła ryba, {playerName}, to zimnokrwisty zabójca. Starzy ludzie przysięgają, że pożera Czaicieli z trzęsawiska na śniadanie, a nawet Wdowy z Mokrzawia nie przędą sieci w pobliżu Głębokich Płycizn ze szczerego przerażenia. On rządzi tymi wodami. Chwyć wędkę, wywlecz tego starego diabła z jego wód, a przyznam, że dołączyłeś do rodziny.',
   'entities.quests.q_the_codfather.title': 'Dorszny Ojciec',
   'entities.quests.q_troll_fetishes.completion':
     'Ten sam wytwórca, co sztandary w obozie kultu. Trolle to najemne łopaty, nic więcej. Dobra robota, {playerName}.',
@@ -4299,6 +5154,116 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.9.label': 'Sanktuarium Grobowego Żmija',
   'entities.zones.thornpeak_heights.welcome':
     'Kapitan Thessaly utrzymuje mur w Wysokiej Strażnicy, ledwie.',
+  'entities.zones.amberfall.name': 'Bursztynowa Dolina',
+  'entities.zones.amberfall.pois.0.label': 'Lanternmere',
+  'entities.zones.amberfall.pois.1.label': 'Złoty Roztop',
+  'entities.zones.amberfall.pois.2.label': 'Złocony Sad',
+  'entities.zones.amberfall.pois.3.label': 'Żniwna Kotlina',
+  'entities.zones.amberfall.pois.4.label': 'Wielkie Jezioro',
+  'entities.zones.amberfall.pois.5.label': 'Wzgórze Popiołowych Klonów',
+  'entities.zones.amberfall.pois.6.label': 'Pochylony Monolit',
+  'entities.zones.amberfall.welcome':
+    'Każdy liść płonie tu złotem i czerwienią, a jednak żaden nigdy nie opada. Latarnie Lanternmere płoną dla ciebie.',
+  'entities.zones.drakelands.name': 'Smocze Ziemie',
+  'entities.zones.drakelands.pois.0.label': 'Wyrmwatch',
+  'entities.zones.drakelands.pois.1.label': 'Wrotny Bór',
+  'entities.zones.drakelands.pois.2.label': 'Popiołowe Wydmy',
+  'entities.zones.drakelands.pois.3.label': 'Wiec Trolli',
+  'entities.zones.drakelands.pois.4.label': 'Ostatnia Twierdza',
+  'entities.zones.drakelands.pois.5.label': 'Pola Krwistego Szkła',
+  'entities.zones.drakelands.pois.6.label': 'Kaldera Smoczej Paszczy',
+  'entities.zones.drakelands.welcome':
+    'Gorący wiatr wieje znad pustkowi. Smoki krążą nad Kalderą Smoczej Paszczy, a ognie trolli płoną na wydmach.',
+  'entities.zones.eastbrook_vale.pois.11.label': 'Grobla Dalekiego Wybrzeża',
+  'entities.zones.evergarden.name': 'Wieczny Ogród',
+  'entities.zones.evergarden.pois.0.label': 'Hedgewick',
+  'entities.zones.evergarden.pois.1.label': 'Brama Ogrodu',
+  'entities.zones.evergarden.pois.2.label': 'Aleja Parterowa',
+  'entities.zones.evergarden.pois.3.label': 'Zamek Brzasku',
+  'entities.zones.evergarden.pois.4.label': 'Staw Płatków',
+  'entities.zones.evergarden.pois.5.label': 'Wielki Labirynt',
+  'entities.zones.evergarden.pois.6.label': 'Dziedziniec Fontanny',
+  'entities.zones.evergarden.pois.7.label': 'Stary Młyn',
+  'entities.zones.evergarden.pois.8.label': 'Północna Strażnica',
+  'entities.zones.evergarden.pois.9.label': 'Kotlina Lilii',
+  'entities.zones.evergarden.welcome':
+    'Ktoś wciąż przycina żywopłoty, choć od stu lat nikt nie widział ogrodnika. Uważaj na labirynt: on też uważa na ciebie.',
+  'entities.zones.farshore_isle.name': 'Dalekie Wybrzeże',
+  'entities.zones.farshore_isle.pois.0.label': 'Gullhaven',
+  'entities.zones.farshore_isle.pois.1.label': 'Przystań',
+  'entities.zones.farshore_isle.pois.2.label': 'Łąka Straży',
+  'entities.zones.farshore_isle.pois.3.label': 'Rozłupane Klify',
+  'entities.zones.farshore_isle.pois.4.label': 'Pola Szczelin',
+  'entities.zones.farshore_isle.welcome':
+    'Przekrocz mieliznę, a dzwon Gullhaven znajdzie cię, zanim zrobi to miasto. Wyłomy pękają bez ostrzeżenia, a redoubt broni tego wybrzeża przed wszystkim, co przez nie przenika. Czekali długo na kogoś takiego jak ty.',
+  'entities.zones.frostveil.name': 'Szronowa Kraina',
+  'entities.zones.frostveil.pois.0.label': 'Icemantle',
+  'entities.zones.frostveil.pois.1.label': 'Linia Śniegu',
+  'entities.zones.frostveil.pois.2.label': 'Lodowcowe Jeziorko',
+  'entities.zones.frostveil.pois.3.label': 'Stopnie Zorzy',
+  'entities.zones.frostveil.pois.4.label': 'Drżące Mokradła',
+  'entities.zones.frostveil.pois.5.label': 'Wyjące Tarasy',
+  'entities.zones.frostveil.welcome':
+    'Śnieg pochłania każdy dźwięk. Pod tańczącymi światłami sam chłód zdaje się czuwać.',
+  'entities.zones.galecrest.name': 'Wichrowy Grzbiet',
+  'entities.zones.galecrest.pois.0.label': 'Wickharbor',
+  'entities.zones.galecrest.pois.1.label': 'Wietrzny Szlak',
+  'entities.zones.galecrest.pois.2.label': 'Wyjące Wzgórza',
+  'entities.zones.galecrest.pois.3.label': 'Stara Latarnia',
+  'entities.zones.galecrest.pois.4.label': 'Urwisko',
+  'entities.zones.galecrest.pois.5.label': 'Pola Wraków',
+  'entities.zones.galecrest.pois.6.label': 'Lustrzane Jeziorko',
+  'entities.zones.galecrest.pois.7.label': 'Stajnie Wichrowego Grzbietu',
+  'entities.zones.galecrest.welcome':
+    'Wiatr nigdy tu nie ustaje, a Stara Latarnia nigdy nie gaśnie. Wickharbor prosi tylko, byś zamknął za sobą drzwi karczmy.',
+  'entities.zones.nightbloom.name': 'Nocny Kwiat',
+  'entities.zones.nightbloom.pois.0.label': 'Moonrest',
+  'entities.zones.nightbloom.pois.1.label': 'Nocna Brama',
+  'entities.zones.nightbloom.pois.2.label': 'Księżycowa Studnia',
+  'entities.zones.nightbloom.pois.3.label': 'Gloamfield',
+  'entities.zones.nightbloom.pois.4.label': 'Wieczne Czuwanie',
+  'entities.zones.nightbloom.pois.5.label': 'Bezsenny Kurhan',
+  'entities.zones.nightbloom.welcome':
+    'Za Nocną Bramą sam powietrze śni. Podążaj za kwietnym blaskiem do Moonrest i uważaj na uśpiony świat zawieszony na niebie.',
+  'entities.zones.palmreach.name': 'Palmowe Wybrzeże',
+  'entities.zones.palmreach.pois.0.label': 'Drifthaven',
+  'entities.zones.palmreach.pois.1.label': 'Ujście Gęstwiny',
+  'entities.zones.palmreach.pois.2.label': 'Palmowa Plaża',
+  'entities.zones.palmreach.pois.3.label': 'Szmaragdowa Gęstwina',
+  'entities.zones.palmreach.pois.4.label': 'Wodospad Pnączy',
+  'entities.zones.palmreach.pois.5.label': 'Szafirowa Laguna',
+  'entities.zones.palmreach.pois.6.label': 'Zatopiony Idol',
+  'entities.zones.palmreach.welcome':
+    'Ciepły piasek, głośne ptaki i dżungla, która pochłania horyzont. Drifthaven trzyma dla ciebie zapalone ognisko na plaży.',
+  'entities.zones.veiled_hollow.name': 'Zasłonięta Kotlina',
+  'entities.zones.veiled_hollow.pois.0.label': 'Eldergleam',
+  'entities.zones.veiled_hollow.pois.1.label': 'Jaskinia Zmierzchu',
+  'entities.zones.veiled_hollow.pois.2.label': 'Punkt Widokowy Zmierzchu',
+  'entities.zones.veiled_hollow.pois.3.label': 'Prastary Gaj',
+  'entities.zones.veiled_hollow.pois.4.label': 'Kotlina Spadających Gwiazd',
+  'entities.zones.veiled_hollow.pois.5.label': 'Zatopiony Dziedziniec',
+  'entities.zones.veiled_hollow.pois.6.label': 'Krystaliczne Mielizny',
+  'entities.zones.veiled_hollow.pois.7.label': 'Lśniąca Głębia',
+  'entities.zones.veiled_hollow.welcome':
+    'Powietrze brzęczy od starej magii. Odszukaj Strażniczkę Saelwyn pod wielkim drzewem Eldergleam.',
+  'entities.zones.willowfen.name': 'Wierzbowe Mokradła',
+  'entities.zones.willowfen.pois.0.label': 'Bridgemere',
+  'entities.zones.willowfen.pois.1.label': 'Bursztynowe Stopnie',
+  'entities.zones.willowfen.pois.2.label': 'Liliowe Wrzosowiska',
+  'entities.zones.willowfen.pois.3.label': 'Błyszczące Bagienka',
+  'entities.zones.willowfen.pois.4.label': 'Willowweep',
+  'entities.zones.willowfen.pois.5.label': 'Senne Rozlewiska',
+  'entities.zones.willowfen.welcome':
+    'Mokradła brzęczą od ważek i pszczół. Przejdź przez most do Bridgemere i odpocznij tam trochę.',
+  'entities.zones.wraithwood.name': 'Widmowy Bór',
+  'entities.zones.wraithwood.pois.0.label': 'Gallowmere',
+  'entities.zones.wraithwood.pois.1.label': 'Wronia Brama',
+  'entities.zones.wraithwood.pois.2.label': 'Gąszcz Wdowy',
+  'entities.zones.wraithwood.pois.3.label': 'Polana Wisielców',
+  'entities.zones.wraithwood.pois.4.label': 'Kaplica Kamienia Żałoby',
+  'entities.zones.wraithwood.pois.5.label': 'Polana Łowczego',
+  'entities.zones.wraithwood.welcome':
+    'Korony drzew zamykają się nad drogą jak wieko. Trzymaj się latarni Gallowmere i nie odpowiadaj, jeśli las zawoła cię po imieniu.',
   'errors.api.accountBanned': 'To konto zostało zbanowane.',
   'errors.api.accountSuspended': 'To konto jest zawieszone do {date}.',
   'errors.api.alreadyInWorld': 'Postać jest już w świecie.',
@@ -4382,6 +5347,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     '+25% obrażeń fizycznych i +10% kryt. Stań się zagrożeniem.',
   'fiesta.augment.aug_warlords_might.name': 'Potęga Wodza',
   'fiesta.augment.choose': 'Wybierz wzmocnienie',
+  'fiesta.augment.cardAria': '{name} ({category}) - {description}',
   'fiesta.banner.augmentGained': 'Zdobyto wzmocnienie: {name}!',
   'fiesta.banner.powerup': '{name}!',
   'fiesta.banner.wave': 'FALA {wave}/{total}, WYBIERZ WZMOCNIENIE!',
@@ -4394,7 +5360,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'fiesta.end.draw': 'REMIS W FIESCIE! Zbyt wyrównane!',
   'fiesta.end.loss': 'FIESTA PRZEGRANA! Zagraj jeszcze raz!',
   'fiesta.end.win': 'FIESTA WYGRANA! 🎉 Co za zabawa!',
-  'fiesta.enterQueue': 'Dołącz do Fiesty!',
   'fiesta.error.leaderOnly': 'Tylko przywódca drużyny może zapisać waszą drużynę do {label}.',
   'fiesta.error.noAugment': 'Nie masz teraz żadnego wzmocnienia do wyboru.',
   'fiesta.error.notOnOffer': 'Tego wzmocnienia nie ma w ofercie.',
@@ -4411,9 +5376,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'fiesta.powerup.pow_colossus.name': 'Kolos',
   'fiesta.powerup.pow_moon_boots.name': 'Księżycowe Buty',
   'fiesta.powerup.pow_speed_demon.name': 'Demon Prędkości',
-  'fiesta.practice': '🎉 Trening z botami',
-  'fiesta.practiceNote':
-    'Trening offline: przyzywa 3 boty SI i zapisuje cię do Fiesty 2v2. Kliknij ponownie, by przerwać.',
   'fiesta.queue.join': 'Dołączasz do kolejki Fiesty 2v2. Szykuj się na ZABAWĘ…',
   'fiesta.queue.leave': 'Opuszczasz kolejkę Fiesty 2v2.',
   'fiesta.queue.teamLeave': 'Twoja drużyna opuszcza kolejkę Fiesty 2v2.',
@@ -4649,38 +5611,18 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.thorns': 'Chroni sojusznika tak, że atakujący wręcz ranią się przy uderzeniu.',
   'guide.abilityHook.thunder_clap': 'Uderza we wszystko wokół ciebie i spowalnia ataki wrogów.',
   'guide.abilityHook.wrath': 'Pocisk natury ciskany w cel z dystansu, twój podstawowy atak.',
-  'guide.arenaPage.augmentsNote':
-    'Ulepszenia i wzmocnienia działają tylko podczas meczu. Chodzi w nich o swobodne, doraźne buildy, a nie o trwałą potęgę, więc nikt nie kupi sobie zwycięstwa.',
   'guide.arenaPage.coliseumBody':
     'Koloseum to arena królestwa, gdzie stajesz naprzeciw innych graczy w meczach rankingowych, jeden na jednego lub dwóch na dwóch. Każdy przedział ma własny ranking, więc zwycięstwo wynosi cię po tej drabinie na oczach całego królestwa. Otwórz okno Areny, aby zapisać się do przedziału, samotnie lub ze swoim partnerem.',
   'guide.arenaPage.coliseumHeading': 'Popielne Koloseum',
   'guide.arenaPage.duelsBody':
     'Wyzwij dowolnego napotkanego gracza na przyjacielski pojedynek. Stawką jest tylko duma, więc to najprostszy sposób, by poznać starcie lub rozstrzygnąć przyjacielski spór.',
   'guide.arenaPage.duelsHeading': 'Pojedynki',
-  'guide.arenaPage.fiestaBody':
-    'Fiesta to szybka bijatyka dwóch na dwóch, toczona jako jedno nieprzerwane starcie, w którym każdy walczący zostaje sprowadzony do równych szans. W trakcie walki dobierasz ulepszenia, szybkie wzmocnienia, które w locie przekształcają twój zestaw, więc żaden mecz nie jest taki sam.',
-  'guide.arenaPage.fiestaHeading': 'Fiesta dwóch na dwóch',
   'guide.arenaPage.heading': 'Arena i PvP',
   'guide.arenaPage.intro':
     'Chcesz sprawdzić się przeciwko innym graczom? Tryb gracz kontra gracz jest wbudowany i zawsze sam go wybierasz, nigdy nie jest ci narzucony.',
   'guide.arenaPage.ladderBody':
     'Rozgrywka rankingowa śledzi twoją pozycję w czasie. Sprawdź ranking, by zobaczyć, gdzie jesteś i kto dzierży szczyt królestwa.',
   'guide.arenaPage.ladderHeading': 'Wspinaczka po drabinie rankingowej',
-  'guide.arenaPage.powerupsBody':
-    'Na arenę w trakcie walki spadają też świecące kule, dostępne dla tego, kto pierwszy do nich dotrze. Są celowo przesadne i działają tylko przez chwilę: Demon Prędkości dla mgnienia oślepiającego tempa, Kolos, by rozrosnąć się w ociężałego giganta, Księżycowe Buty dla skocznego susu w niskiej grawitacji oraz Berserker dla nagłego przypływu furii.',
-  'guide.arenaPage.powerupsTitle': 'Wzmocnienia na ringu',
-  'guide.arenaPage.waveGoldBody':
-    'Środkowa fala: obosieczne kombinacje, w których twój build zaczyna nabierać kształtu i rozbrzmiewać.',
-  'guide.arenaPage.waveGoldTitle': 'Złoto',
-  'guide.arenaPage.wavePrismaticBody':
-    'Ostatnia fala: definiujące build, rozsadzające ekran skoki mocy, które mają wydawać się absurdalne w najlepszym tego słowa znaczeniu.',
-  'guide.arenaPage.wavePrismaticTitle': 'Pryzmatyczny',
-  'guide.arenaPage.waveSilverBody':
-    'Pierwsza fala: czyste wzmocnienia pojedynczej cechy, które wyostrzają podstawy twojej klasy.',
-  'guide.arenaPage.waveSilverTitle': 'Srebro',
-  'guide.arenaPage.wavesBody':
-    'Starcie Fiesty podsuwa ci nowe wybory w miarę trwania, a stają się one coraz śmielsze, im dłużej toczy się walka. Budujesz od fali do fali, za każdym razem wybierając jedną z kilku opcji i zachowując ją do końca starcia.',
-  'guide.arenaPage.wavesTitle': 'Ulepszenia napływają falami',
   'guide.bestiary.flavor.gravecaller_cultist':
     'Odziani w szaty słudzy kultu śmierci, których dzieło plugawi groby od Doliny po szczyty. Gdzie się gromadzą, zmarli nie zaznają spoczynku.',
   'guide.bestiary.flavor.grubjaw':
@@ -4922,6 +5864,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.family.undead.desc':
     'Niespokojni zmarli, wskrzeszeni przez mroczniejsze ręce. Nie męczą się i nie uciekają.',
   'guide.family.undead.name': 'Nieumarli',
+  'guide.family.demon.desc':
+    'Najeźdźcy zza szczelin, sami z ognia i złośliwości. Gdzie stoi jeden z nich, wyłom nigdy nie jest daleko.',
+  'guide.family.demon.name': 'Demony',
   'guide.faqPage.a1':
     'Tak. Cała gra jest darmowa do maksymalnego poziomu, a kod źródłowy jest otwarty na GitHubie.',
   'guide.faqPage.a10':
@@ -5153,6 +6098,21 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Jedna ciągła kraina, trzy strefy, od cichych dolin po zamarznięte szczyty.',
   'guide.home.world.valeBlurb': 'Zielone wzgórza i stare lasy, gdzie zaczyna się każda przygoda.',
   'guide.home.world.valeName': 'Dolina Wschodniego Strumienia',
+  'guide.home.world.amberBlurb':
+    'Za zachodnimi klifami trwa jesień, która nigdy się nie kończy, a nad złotym jeziorem płoną latarnie.',
+  'guide.home.world.amberName': 'Bursztynowa Dolina',
+  'guide.home.world.duskBlurb':
+    'Kraina zapieczętowana pod górami, jeśli szepty o istnieniu wejścia są prawdziwe.',
+  'guide.home.world.duskName': 'Zasłonięta Kotlina',
+  'guide.home.world.emberBlurb':
+    'Za Bladą Groblą zieleń ustępuje popiołowi, a nad pustkowiami panuje coś starożytnego.',
+  'guide.home.world.emberName': 'Smocze Ziemie',
+  'guide.home.world.fenBlurb':
+    'Za jesienną koroną leży jasne mokradło pełne wierzb i spokojnej wody, a za fosą kryje się miasteczko.',
+  'guide.home.world.fenName': 'Wierzbowe Mokradła',
+  'guide.home.world.frostBlurb':
+    'Ośnieżone wzgórza poza wszelkimi mapami, dostrzegane jedynie w tańczących światłach.',
+  'guide.home.world.frostName': 'Szronowa Kraina',
   'guide.howToPlay.basicsHeading': 'Podstawy',
   'guide.howToPlay.controlsLink': 'Zobacz pełne odniesienie sterowania',
   'guide.howToPlay.deathBody':
@@ -5641,6 +6601,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hud.combat.floatingMiss': 'Pudło',
   'hud.combat.healOther': 'Twój {ability} leczy {target} o {amount}.',
   'hud.combat.healOtherCrit': 'Twój {ability} leczy krytycznie {target} o {amount}.',
+  'hud.combat.healSelfFull': 'Twój {ability} trafia, ale masz już pełne zdrowie.',
+  'hud.combat.healOtherFull': 'Twój {ability} trafia w {target}, ale cel ma już pełne zdrowie.',
   'hud.combat.healSelf': 'Twój {ability} leczy cię o {amount}.',
   'hud.combat.healSelfCrit': 'Twój {ability} leczy cię krytycznie o {amount}.',
   'hud.combat.miss': 'Twój {ability} chybia {target}.',
@@ -5675,7 +6637,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapCanvasLabel': 'Mapa',
   'hud.core.mapSummary': 'Mapa {zone}.',
   'hud.core.maxLevel': 'MAKS. POZIOM',
-  'hud.core.mobileArena': 'Arena',
   'hud.core.mobileAttack': 'Atak',
   'hud.core.mobileCamera': 'Kamera — dotknij dwukrotnie, aby wyśrodkować',
   'hud.core.mobileChat': 'Czat',
@@ -5701,6 +6662,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hud.core.you': 'ty',
   'hud.core.zoomIn': 'Przybliż',
   'hud.core.zoomOut': 'Oddal',
+  'hud.core.riftLabel': '{name}',
+  'hud.core.riftLabelRanked': '{name} ({rank})',
   'hud.errors.abilityNotReady': 'Ta umiejętność nie jest jeszcze gotowa.',
   'hud.errors.alreadyInParty': '{name} jest już w drużynie.',
   'hud.errors.arenaAlreadyInMatch': 'Jesteś już w meczu na arenie.',
@@ -5755,10 +6718,13 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hud.errors.targetMustDodge': 'Twój cel musi najpierw zrobić unik.',
   'hud.errors.targetTooFar': 'Cel jest zbyt daleko.',
   'hud.errors.tradeBound': 'Ten przedmiot jest przywiązany i nie można go wymienić.',
+  'hud.errors.marketListBound':
+    'Ten przedmiot jest przywiązany i nie można go wystawić na sprzedaż.',
   'hud.errors.tooClose': 'Zbyt blisko!',
   'hud.errors.tradeExpired': 'Prośba o wymianę wygasła.',
   'hud.errors.tradeFailed': 'Wymiana nieudana: przedmioty lub pieniądze są już niedostępne.',
   'hud.errors.tradeInProgress': 'Wymiana już trwa.',
+  'hud.errors.tradeAlreadyTrading': 'Ten gracz już prowadzi wymianę.',
   'hud.errors.tradeTooFar': 'Cel jest zbyt daleko, by handlować.',
   'hud.errors.travel': 'Fleet',
   'hud.errors.unknownCommand': 'Nieznane polecenie: {command}. Spróbuj /s /y /w /p /g.',
@@ -5766,7 +6732,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hud.errors.whisperMissing': "Nie ma w sieci gracza o imieniu '{name}'.",
   'hud.errors.whisperSelf': 'Mamroczesz do siebie. Nikt tego nie słyszy.',
   'hud.keybinds.actions.actionBarSlot': 'Pasek akcji {slot}',
-  'hud.keybinds.actions.arena': 'Arena (Popielne Koloseum)',
   'hud.keybinds.actions.attack': 'Atak',
   'hud.keybinds.actions.attackMove': 'Atak w ruchu',
   'hud.keybinds.actions.autorun': 'Przełącz autobieg',
@@ -6171,6 +7136,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.twoFactorDisabledMsg': 'Uwierzytelnianie dwuskładnikowe jest wyłączone.',
   'hudChrome.account.twoFactorDone': 'Gotowe',
   'hudChrome.account.twoFactorDownloadCodes': 'Pobierz kody',
+  'hudChrome.account.recoveryCodesFileHeader': 'Kody odzyskiwania {brand}',
+  'hudChrome.account.recoveryCodesFileAccount': 'Konto: {username}',
+  'hudChrome.account.recoveryCodesFileHint':
+    'Każdego kodu można użyć raz, jeśli stracisz dostęp do aplikacji uwierzytelniającej.',
+  'hudChrome.account.recoveryCodesFileWarn':
+    'Przechowuj ten plik w bezpiecznym i prywatnym miejscu.',
   'hudChrome.account.twoFactorEnabledMsg': 'Uwierzytelnianie dwuskładnikowe jest teraz włączone.',
   'hudChrome.account.twoFactorOpenApp': 'Otwórz w aplikacji uwierzytelniającej',
   'hudChrome.account.twoFactorRecoveryHint':
@@ -6264,6 +7235,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.nothingSelectedYields':
     'Z tego truchła nie zbierzesz żadnej z wybranych części.',
   'hudChrome.corpseHarvest.componentAria': 'Zbierz: {component}',
+  'hudChrome.corpseHarvest.componentNoYield': 'jeszcze nic',
+  'hudChrome.corpseHarvest.componentAriaNoYield': 'Zbierz: {component}, {note}',
+  'hudChrome.corpseHarvest.yieldTierHint':
+    'Im mniej części faktycznie zabierze zbieranie, tym wyższy poziom zbioru każdej z nich.',
   'hudChrome.corpseHarvest.components.claw': 'Pazur',
   'hudChrome.corpseHarvest.components.fang': 'Kieł',
   'hudChrome.corpseHarvest.components.gills': 'Skrzela',
@@ -6272,12 +7247,11 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.silk': 'Jedwab',
   'hudChrome.corpseHarvest.components.tusk': 'Cios',
   'hudChrome.corpseHarvest.components.venomSac': 'Worek jadowy',
-  'hudChrome.corpseHarvest.concentrateHint':
-    'Im mniej części wybierzesz, tym wyższa jakość każdej z nich.',
   'hudChrome.corpseHarvest.harvestButton': 'Zbierz',
   'hudChrome.corpseHarvest.harvestTooltip':
     'Zbiera zaznaczone komponenty. Każde zwloki można zebrać raz, pierwszemu podejdzie. Nie zabiera łupów.',
   'hudChrome.corpseHarvest.title': 'Zbieranie',
+  'hudChrome.emoteEditor.close': 'Zamknij emotki',
   'hudChrome.emoteEditor.done': 'Gotowe',
   'hudChrome.emoteEditor.title': 'Emotki',
   'hudChrome.emoteWheel.edit': 'Edytuj',
@@ -6319,6 +7293,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_neck_agility': 'Zaklinanie naszyjnika - Zwinność',
   'hudChrome.enchantName.enchant_neck_intellect': 'Zaklinanie naszyjnika - Intelekt',
   'hudChrome.enchantName.enchant_neck_spirit': 'Zaklinanie naszyjnika - Duch',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'Zaklinanie ręki dodatkowej - Wytrzymałość',
   'hudChrome.enchantName.enchant_ring_agility': 'Zaklinanie pierścienia - Zwinność',
   'hudChrome.enchantName.enchant_ring_intellect': 'Zaklinanie pierścienia - Intelekt',
   'hudChrome.enchantName.enchant_ring_spirit': 'Zaklinanie pierścienia - Duch',
@@ -6340,13 +7315,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     'To niszczy specjalną kopię {item} (podpisaną, mistrzowską lub zaklinowaną) i daje materiały arkaniczne. Nie można tego cofnąć.',
   'hudChrome.enchanting.disenchantConfirmTitle': 'Rozbroić {item}?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Rozbrajasz zbyt szybko. Poczekaj chwilę i spróbuj ponownie.',
   'hudChrome.enchanting.disenchantedLine': 'Rozbrajasz {item}.',
   'hudChrome.enchanting.enchantAppliedLine': 'Zaklinasz {item} za pomocą {enchant}.',
   'hudChrome.enchanting.enchantInsufficient': 'Nie masz materiałów na to zaklinanie.',
-  'hudChrome.enchanting.enchantThrottled':
-    'Zaklinasz zbyt szybko. Poczekaj chwilę i spróbuj ponownie.',
   'hudChrome.enchanting.enchantUnknown': 'To zaklinanie nie istnieje.',
   'hudChrome.enchanting.enchantWrongSlot':
     'To zaklinanie nie może być zastosowane do tego przedmiotu.',
@@ -6361,8 +7332,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     'To niszczy specjalną kopię {item} (podpisaną, mistrzowską lub zaklinowaną) i daje materiały rzemieślnicze. Nie można tego cofnąć.',
   'hudChrome.enchanting.salvageConfirmTitle': 'Odzyskać {item}?',
-  'hudChrome.enchanting.salvageThrottled':
-    'Odzyskujesz zbyt szybko. Poczekaj chwilę i spróbuj ponownie.',
   'hudChrome.enchanting.salvagedLine': 'Odzyskujesz {item}.',
   'hudChrome.enchanting.targetTitle': 'Wybierz przedmiot do zaklinania',
   'hudChrome.keybinds.emoteWheel': 'Koło emotek',
@@ -6378,10 +7347,21 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Bierze monety i wypadłe przedmioty. Nie zużywa zebranych zasobów.',
   'hudChrome.loot.unifiedPressHint':
     'Klawisz interakcji bierze łup i zbiera zasoby jednym naciśnięciem, korzystając z priorytetów miasta.',
+  'hudChrome.meters.move': 'Przeciągnij, aby przesunąć ten licznik',
+  'hudChrome.meters.resize': 'Przeciągnij, aby zmienić rozmiar tego licznika',
+  'hudChrome.meters.dock': 'Zadokuj ten licznik z powrotem w oknie liczników',
+  'hudChrome.meters.separate': 'Odłącz {meter}',
+  'hudChrome.meters.regroup': 'Zgrupuj {meter} ponownie',
   'hudChrome.meters.minutesSeconds': '{m}m {s}s',
   'hudChrome.meters.perSecond': '{value}/s',
   'hudChrome.meters.perSecondRow': '{total} ({rate})',
   'hudChrome.meters.seconds': '{s}s',
+  'hudChrome.meters.breakdownOther': 'Inne ({count})',
+  'hudChrome.meters.breakdownRow': '{value} ({percent})',
+  'hudChrome.meters.breakdownSummary': '{tab}: {value}',
+  'hudChrome.meters.melee': 'Walka wręcz',
+  'hudChrome.meters.percent': '{value}%',
+  'hudChrome.meters.petAbility': '{pet}: {ability}',
   'hudChrome.mobile.haptics': 'Wibracje',
   'hudChrome.mobile.hapticsOff': 'Wibracje wył.',
   'hudChrome.mobile.hotbarPage': 'Umiejętności',
@@ -6601,6 +7581,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Grupa {n}',
   'hudChrome.unitFrame.partyLabel': 'Twoja drużyna',
   'hudChrome.unitFrame.playerLabel': 'Twój bohater',
+  'hudChrome.unitFrame.petLabel': 'Twoje zwierzę',
   'hudChrome.unitFrame.targetAnnounce': 'Oznacz {name}',
   'hudChrome.unitFrame.targetLabel': 'Twój cel',
   'hudChrome.widgets.clockTitle': 'Czas lokalny - kliknij, aby przełączyć format 12/24-godzinny',
@@ -6641,6 +7622,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.quest': 'Przedmiot zadania',
   'itemUi.kind.tool': 'Narzędzie',
   'itemUi.kind.weapon': 'Broń',
+  'itemUi.kind.mount': 'Wierzchowiec',
   'itemUi.logs.boughtBackItem': 'Odkupiono {item} za {money}.',
   'itemUi.logs.boughtItem': 'Kupiono {item} za {money}.',
   'itemUi.logs.collectedMoney': 'Odbierasz {money} od kupca.',
@@ -7004,6 +7986,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.incomplete': 'To zadanie nie jest ukończone.',
   'questUi.errors.notInLog': 'Tego zadania nie ma w twoim dzienniku.',
   'questUi.errors.tooFar': 'Za daleko.',
+  'questUi.errors.escortAway':
+    'Osoba, którą masz eskortować, nie jest teraz na miejscu. Wróci tam wkrótce.',
   'questUi.errors.turnInMissing': 'Miejsca oddania tego zadania nie ma w pobliżu.',
   'questUi.errors.unavailable': 'To zadanie jest niedostępne.',
   'questUi.log.abandon': 'Porzuć zadanie',
@@ -7146,6 +8130,57 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'sim.lockpick.tierMedium': 'Średnie',
   'sim.lockpick.tierPremium': 'Premium',
   'sim.lockpick.toolSlips': 'To narzędzie ślizga się po tym zamku.',
+  'sim.rift.allUnstable': 'Wszystkie Szczeliny są obecnie niestabilne. Spróbuj ponownie wkrótce.',
+  'sim.rift.alreadyCleared': 'Ta Szczelina została już oczyszczona przez {names}.',
+  'sim.rift.deadEntry': 'Nie możesz wejść do Szczeliny, gdy jesteś martwy.',
+  'sim.rift.deadEntryCombat':
+    'Twoja drużyna wciąż jest w walce. Martwi mogą wrócić, gdy walka się zakończy.',
+  'sim.rift.descendFloor': 'Schodzisz głębiej w {name}.',
+  'sim.rift.detonateAbsoluteZero': 'Zero Absolutne wybucha!',
+  'sim.rift.detonateAbyssalMaw': 'Otchłanna Paszcza zamyka się!',
+  'sim.rift.detonateArcaneAnnihilation': 'Eteryczna Anihilacja wybucha!',
+  'sim.rift.detonateBloodRite': 'Krwawy Rytuał spada!',
+  'sim.rift.detonateBroodmothersMark': 'Znamię Matki Roju eksploduje!',
+  'sim.rift.detonateCoreMeltdown': 'Stopienie Rdzenia eksploduje!',
+  'sim.rift.detonateCrushingDepth': 'Miażdżąca Głębia miażdży!',
+  'sim.rift.detonateDeathSentence': 'Wyrok Śmierci spada!',
+  'sim.rift.detonateEarthshatter': 'Rozłam Ziemi eksploduje!',
+  'sim.rift.detonateFinalJudgment': 'Ostateczny Wyrok trafia!',
+  'sim.rift.detonateGlacialGrave': 'Lodowaty Grób eksploduje!',
+  'sim.rift.detonateHellfireBrand': 'Piekielny Płomień eksploduje!',
+  'sim.rift.detonateLightningRod': 'Piorunochron uderza!',
+  'sim.rift.detonateMagmaWell': 'Studnia Magmy wybucha!',
+  'sim.rift.detonatePactSeal': 'Pieczęć Paktu eksploduje!',
+  'sim.rift.detonatePitSentence': 'Wyrok Otchłani eksploduje!',
+  'sim.rift.detonateSoulGrave': 'Grób Dusz eksploduje!',
+  'sim.rift.detonateStormcallersWrath': 'Gniew Przyzywacza Burzy wybucha!',
+  'sim.rift.detonateVenomPool': 'Kałuża Jadu wybucha!',
+  'sim.rift.detonateVoidRift': 'Szczelina Pustki eksploduje!',
+  'sim.rift.enterFloor': 'Przechodzisz przez Szczelinę do {name}.',
+  'sim.rift.exitOpens': 'Szczelina drży. Droga do domu rozdziera się za poległymi.',
+  'sim.rift.forgeEnchanted': 'Ukończono zaklęcie Szczeliny dla {name}.',
+  'sim.rift.forgeSocketed': 'Osadzono klejnot Szczeliny w {name}.',
+  'sim.rift.forgeUpgraded': 'Ukończono ulepszenie Szczeliny dla {name}.',
+  'sim.rift.gateOpen': 'Brama otwiera się ze zgrzytem.',
+  'sim.rift.iceGoalLit': 'Mroźny symbol rozbłyska. Droga porusza się.',
+  'sim.rift.levelGate':
+    'Tylko poszukiwacze przygód na poziomie {level} lub wyższym mogą wejść do tej Szczeliny.',
+  'sim.rift.orbOpensGate': 'Krwawa Kula rozbłyska. Bramy świątyni otwierają się ze zgrzytem.',
+  'sim.rift.orbSealed': 'Kula jest zapieczętowana przez rytuał poniżej.',
+  'sim.rift.orbWakes': 'Płomień pentagramu gaśnie. Coś budzi się na ołtarzu.',
+  'sim.rift.portalCollapses': 'Szczelina rangi {tier} w {zone} zapada się.',
+  'sim.rift.portalOpens': 'Szczelina rangi {tier} rozdziera się w {zone}!',
+  'sim.rift.portalSealed': 'Szczelina rangi {tier} w {zone} została zapieczętowana.',
+  'sim.rift.pylonLit': 'Pylon run rozbłyska życiem ({lit}/{total}).',
+  'sim.rift.raceLost': 'Szczelina została już oczyszczona przez {names}. Twój bieg się kończy.',
+  'sim.rift.raceLostBanner': 'Szczelina już oczyszczona',
+  'sim.rift.raceWinBanner': 'Wygrano wyścig Szczeliny - {seconds}s',
+  'sim.rift.raceWorldWin': '{names} wygrali wyścig Szczeliny rangi {tier} w {seconds}s!',
+  'sim.rift.seqProgress': 'Runy odpowiadają po kolei ({step}/{total}).',
+  'sim.rift.seqReset': 'Runy gasną. Zacznij od nowa.',
+  'sim.rift.socketsShut': 'Gniazda zamykają się ze zgrzytem. Droga porusza się.',
+  'sim.rift.stepBack': 'Cofasz się przez Szczelinę.',
+  'sim.rift.wayDownOpens': 'Droga w dół rozdziera się.',
   'skinEvent.close': 'Zamknij',
   'skinEvent.lockIn': 'Zatwierdź',
   'skinEvent.locked': 'Zablokowane',
@@ -7423,6 +8458,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Odparto',
+  'hud.combat.floatingHealFull': 'Pełne',
   'hud.combat.resisted': '{target} odpiera twoje {ability}.',
   'hudChrome.abilityScaling.bonus': '(+{value})',
   'hudChrome.itemArmorType.cloth': 'Tkanina',
@@ -7554,6 +8590,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': 'Ogłoś rajd, spotkanie lub wydarzenie',
   'hudChrome.discord.relay.help.label': 'Potrzebuję pomocy',
   'hudChrome.discord.relay.help.hint': 'Poproś społeczność o pomoc',
+  'hudChrome.options.hideUnusedActionSlots': 'Ukryj nieużywane pola akcji',
   'hudChrome.options.showSecondaryActionBar': 'Pokaż dodatkowy pasek akcji',
   'errors.api.desktopCodeInvalid':
     'Kod logowania do aplikacji jest nieprawidłowy lub wygasł. Spróbuj ponownie.',
@@ -7562,10 +8599,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.quit': 'Zakończ',
   'desktop.crash.reload': 'Załaduj ponownie',
   'desktop.crash.title': 'World of ClaudeCraft',
-  'desktop.update.downloading': 'Pobieranie aktualizacji {version}...',
+  'desktop.update.downloadingTitle': 'Pobieranie aktualizacji {version}...',
   'desktop.update.later': 'Później',
-  'desktop.update.ready':
-    'Aktualizacja {version} jest gotowa. Zainstaluje się przy zamknięciu lub uruchom ponownie teraz.',
+  'desktop.update.readyTitle': 'Aktualizacja {version} jest gotowa',
+  'desktop.update.readyBody': 'Zainstaluje się przy zamknięciu lub uruchom ponownie teraz.',
   'desktop.update.restart': 'Uruchom ponownie teraz',
   'hudChrome.dailyRewards.close': 'Zamknij codzienne nagrody',
   'hudChrome.dailyRewards.endsIn': 'Kończy się za {time}',
@@ -7803,7 +8840,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Wszystko na tej stronie jest obecne w grze: naciśnij Esc, aby otworzyć opcje. Menu otwiera się na Przeglądzie przypiętych najważniejszych ustawień, z kategoriami na listwie obok: opisane niżej ustawienia znajdziesz w grupie Ekran, pod Grafiką, Interfejsem i Dostępnością, a Nakładkę wydajności pod Systemem. Jeszcze szybciej: wpisz nazwę w pole wyszukiwania na górze i przejdź prosto do niej.',
   'guide.settingsPage.whyLabel': 'Dlaczego to działa:',
   'hudChrome.crafting.close': 'Zamknij rzemiosło',
-  'hudChrome.crafting.craft': 'Rzemiosło',
   'hudChrome.crafting.craftedToast': 'Wykonane: {name}',
   'hudChrome.crafting.empty': 'Nie są jeszcze znane żadne przepisy.',
   'hudChrome.crafting.insufficientMaterials': 'Nie masz na to materiałów.',
@@ -7888,9 +8924,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Rozdziera pancerz celu, zmniejszając go o {damage}% za każde nałożenie. Kumuluje się do 5 razy. Generuje dużą ilość zagrożenia.',
   'entities.mobs.training_dummy.name': 'Manekin treningowy',
   'entities.mobs.yumi_cat.name': 'Yumi',
-  'guide.arenaPage.yumiBody':
-    'Ochrona Yumi to drużynowy tryb z zadaniem, rozgrywany w labiryncie: każda strona strzeże własnego kociego chowańca, jednocześnie polując na cudzego. Co jakiś czas oba koty przeskakują w nowe zakątki labiryntu, więc walka waha się między obroną, polowaniem i wyścigiem, by znaleźć je na nowo. Zapisuj się w trybie trzech na trzech lub pięciu na pięciu; upadek w boju odstawia cię jedynie na chwilę.',
-  'guide.arenaPage.yumiHeading': 'Ochrona Yumi',
   'hudChrome.archetypeTitle.hobbyLabel': 'Pasja',
   'hudChrome.auraEffect.armorPct': 'Zmniejsza pancerz o {pct}%',
   'hudChrome.auraEffect.armorPctStacks': 'Zmniejsza pancerz o {pct}% ({stacks} nałożeń)',
@@ -7900,7 +8933,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': 'Zwiększa Intelekt o {pct}%',
   'hudChrome.auraEffect.increasePct.sta': 'Zwiększa Wytrzymałość o {pct}%',
   'hudChrome.crafting.recipeNotLearned': 'Nie nauczyłeś się jeszcze tego przepisu.',
-  'hudChrome.crafting.throttled': 'Wytwarzasz zbyt szybko. Zaczekaj chwilę i spróbuj ponownie.',
   'hudChrome.mobile.chatPlaceholder': 'Powiedz coś...',
   'hudChrome.mobile.hideKeyboard': 'Ukryj klawiaturę',
   'hudChrome.unitFrame.partyChip': 'Drużyna',
@@ -7910,7 +8942,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'yumi.bracket5': 'Yumi 5 na 5',
   'yumi.end.loss': 'PORAŻKA! Twoja Yumi padła.',
   'yumi.end.win': 'ZWYCIĘSTWO! Yumi jest bezpieczna!',
-  'yumi.enterQueue': 'Dołącz do Ochrony Yumi!',
   'yumi.error.partyTooBig3': 'Ochrona Yumi 3 na 3 pozwala na drużynę liczącą do trzech osób.',
   'yumi.error.partyTooBig5': 'Ochrona Yumi 5 na 5 pozwala na drużynę liczącą do pięciu osób.',
   'yumi.hud.aria': 'Twoja Yumi ma {mine} z {max} zdrowia, wroga Yumi ma {theirs}.',
@@ -7945,6 +8976,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.resetErrInvalid':
     'Ten link do resetowania jest nieprawidłowy lub wygasł. Poproś o nowy.',
   'apiError.deeds.invalid_input': 'Nieprawidłowe dane.',
+  'apiError.ota_updates.invalid_input': 'Nieprawidłowe dane.',
   'apiError.steam.account_taken': 'To konto Steam jest już połączone z innym kontem.',
   'apiError.steam.already_linked': 'Twoje konto ma już połączone konto Steam.',
   'apiError.steam.banned': 'Tego konta Steam nie można połączyć.',
@@ -8001,7 +9033,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.rewardsHeading': 'Tytuły i obramowania',
   'guide.nav.deeds': 'Księga Czynów',
   'hudChrome.deeds.broadcastLine': '{name} dokonuje czynu: {deed}',
-  'hudChrome.deeds.broadcastsLabel': 'Ogłaszaj zdobyte czyny gildii i znajomym',
   'hudChrome.deeds.catChronicle': 'Kroniki',
   'hudChrome.deeds.catCollection': 'Kolekcja',
   'hudChrome.deeds.catCombat': 'Walka',
@@ -8077,6 +9108,668 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_stormfeather_griffin.name': 'Wodze Burzopióra Podniebnego',
   'entities.items.reins_thunderstrut_gobbler.name': 'Wodze Gromostępa, Wielkiego Indora',
   'entities.quests.q_prof_intro.title': 'Fach dla każdej dłoni',
+  'entities.quests.q_af_amber_from_the_herd.completion':
+    'Sześć grudek, czystych jak wylany miód. Te rękawice są uszyte z ostatniej partii, {playerName}: usztywnione sokiem i cieplejsze, niż wyglądają.',
+  'entities.quests.q_af_amber_from_the_herd.objectives.0.label': 'Złocona Grudka Soku',
+  'entities.quests.q_af_amber_from_the_herd.text':
+    'Złocone jelenie kładą się pod moimi najstarszymi drzewami, a sok kapie złotem na ich sierść przez całą noc. Wyczesane z niej grudki to najczystszy bursztyn w tej puszczy. Przynieś mi sześć, {playerName}. Jelenie ci nie podziękują, ale też nie będą tęsknić za tym.',
+  'entities.quests.q_af_amber_from_the_herd.title': 'Bursztyn od Stada',
+  'entities.quests.q_af_foxes_in_the_lamplight.completion':
+    'Dziesięć, i zeszłej nocy zapasy pozostały nietknięte po raz pierwszy w tym sezonie. Latarnicy przesyłają swoje podziękowania, {playerName}.',
+  'entities.quests.q_af_foxes_in_the_lamplight.objectives.0.label': 'Zabity Lis Mroku',
+  'entities.quests.q_af_foxes_in_the_lamplight.text':
+    'Lisy mroku nauczyły się, ile są warte zapasy do latarni, {playerName}. Każdego zmierzchu wślizgują się przez płoty i wynoszą łój, który wytłaczamy do lamp promowych. Miękkie łapy, jeszcze miększe sumienie. Wybij dziesięć z nich, a reszta zapamięta, by bać się miasta.',
+  'entities.quests.q_af_foxes_in_the_lamplight.title': 'Lisy w Świetle Latarni',
+  'entities.quests.q_af_goldmelt_road.completion':
+    'Cicho na Złotym Roztopie, a podróżnik ze śniegiem we włosach jest tego dowodem. Sorrel zbyt dobrze pełni swoją straż, by przesyłać puste wieści. Bądź mile widziany w Lanternmere, {playerName}. Latarnie płoną dla ciebie.',
+  'entities.quests.q_af_goldmelt_road.objectives.0.label': 'Zgłoś się do Zarządczyni Ottoline',
+  'entities.quests.q_af_goldmelt_road.text':
+    'Przeszedłeś przez Złoty Roztop, {playerName}, ze śniegiem wciąż na butach. Utrzymuję tę świątynię, by Lanternmere wiedziało, kto przychodzi z zimna, a ostatnio niewiele miałem do zgłoszenia. Zejdź złotą drogą do miasta, znajdź Zarządczynię Ottoline przy studni i powiedz jej, że przełęcz jest cicha.',
+  'entities.quests.q_af_goldmelt_road.title': 'Złota Droga w Dół',
+  'entities.quests.q_af_lanterns_on_the_water.completion':
+    'Wszystkie trzy, wciąż płonące. Latarnie promowe nie gasną w wodzie, {playerName}. O to w nich chodzi. Martwi mnie to, co je oderwało.',
+  'entities.quests.q_af_lanterns_on_the_water.objectives.0.label': 'Odzyskana Latarnia Promowa',
+  'entities.quests.q_af_lanterns_on_the_water.text':
+    'Każdy prom na jeziorze niesie rufową latarnię, {playerName}, a trzy z moich łodzi wróciły o świcie bez swoich. Mgła je zabrała, albo coś w mgle to zrobiło. Wyrzuca je na wschodni brzeg, gdy zmienia się wiatr. Idź drogą wzdłuż brzegu i przynieś moje latarnie z powrotem.',
+  'entities.quests.q_af_lanterns_on_the_water.title': 'Latarnie na Wodzie',
+  'entities.quests.q_af_orchard_call.completion':
+    'Zarządczyni liczy swoje wozy, tak? Cóż, może liczyć je jako brakujące jeszcze przez chwilę. Spójrz na moje rzędy, {playerName}. Mam większe problemy niż spóźniona dostawa.',
+  'entities.quests.q_af_orchard_call.objectives.0.label': 'Znajdź Sadowniczkę Pomeline',
+  'entities.quests.q_af_orchard_call.text':
+    'Sadowniczka Pomeline dogląda Złoconego Sadu przy zachodniej drodze, a jej wozy z sokiem spóźniają się już trzy dni. Całe miasto żyje z tego bursztynowego soku, {playerName}: żywica do lamp, słodzik, żniwne piwo. Idź zachodnią drogą i dowiedz się, co ją zatrzymuje.',
+  'entities.quests.q_af_orchard_call.title': 'Wóz dla Sadu',
+  'entities.quests.q_af_sprites_and_spigots.completion':
+    'Cztery wiadra z powrotem na hakach, a rzędy ucichły. Masz cięższą rękę do chochlików niż ja, {playerName}, i dziś się z tego cieszę.',
+  'entities.quests.q_af_sprites_and_spigots.objectives.0.label': 'Przepędzony Chochlik Żniw',
+  'entities.quests.q_af_sprites_and_spigots.objectives.1.label':
+    'Odzyskane Wiadro do Zbierania Soku',
+  'entities.quests.q_af_sprites_and_spigots.text':
+    'Chochliki żniw, {playerName}. Wyrywają moje krany z pni dla słodyczy w środku i rzucają wiadra w trawę. Przepędź osiem z tych małych złodziei i przynieś z powrotem cztery moje wiadra, a wozy znów ruszą.',
+  'entities.quests.q_af_sprites_and_spigots.title': 'Chochliki i Krany',
+  'entities.quests.q_af_the_meredark.completion':
+    'Mgła uniosła się nad jeziorem dziś rano, {playerName}, i całe miasto to widziało. Promy znów będą pływać nocnymi przeprawami, a każda latarnia na wodzie będzie płonąć w twoim imieniu. Weź to: zostało wydobyte z zatopionego pomostu, i nikt nie ma większego prawa, by to nosić.',
+  'entities.quests.q_af_the_meredark.objectives.0.label': 'Pokonany Meredark',
+  'entities.quests.q_af_the_meredark.text':
+    'Starzy przewoźnicy mają imię, które wymawiają tylko na brzegu: Meredark, pierwszy czyhacz, stary jak jezioro i dwukrotnie bardziej cierpliwy. Powstał raz wcześniej, w roku, gdy zatopiony pomost poszedł pod wodę, a teraz powstaje znowu. O zmierzchu wygrzewa się na ruinach pomostu przy południowym brzegu, {playerName}. Weź przyjaciela, weź dwóch, i zakończ to, dopóki jeszcze można to zakończyć.',
+  'entities.quests.q_af_the_meredark.title': 'Meredark',
+  'entities.quests.q_af_what_took_the_moorings.completion':
+    'Osiem mniej kształtów na mieliznach, a przeprawa dziś przebiegła na czas po raz pierwszy od dwóch tygodni. Ale śmiałe czyhacze to popędzane czyhacze, {playerName}. Coś pod jeziorem je porusza.',
+  'entities.quests.q_af_what_took_the_moorings.objectives.0.label': 'Pokonany Czyhacz Jeziora',
+  'entities.quests.q_af_what_took_the_moorings.text':
+    'Teraz powiem ci to, czego nie powiedziałem przed miastem. Cumy nie zostały poluzowane, zostały przegryzione. Czyhacze jeziora, coraz śmielsi każdej nocy, szarpiący liny i stery. Wyślij osiem z nich z powrotem pod wodę na dobre, {playerName}, zanim jakiś przewoźnik pójdzie z nimi.',
+  'entities.quests.q_af_what_took_the_moorings.title': 'Co Zabrało Cumy',
+  'entities.quests.q_calming_the_deep.completion':
+    'Zrobiłeś to, czego ja nie mogłem znieść. Zbieracze wciąż śpiewają w południowych kręgach; dzięki tobie będą śpiewać dalej.',
+  'entities.quests.q_calming_the_deep.objectives.0.label': 'Uspokojony Skażony Zarodnik',
+  'entities.quests.q_calming_the_deep.text':
+    'Zarodniki Lśniącej Głębi były łagodnym ludem, zanim rozdarcie dotknęło ich kręgów. Czego zepsucie zabiera, tego nie oddaje. Daj skażonym spokój, {playerName}: dziesięciu z nich, na północy Głębi.',
+  'entities.quests.q_calming_the_deep.title': 'Uspokojenie Głębi',
+  'entities.quests.q_dk_ash_on_the_wind.completion':
+    'Dziesięć ostrzy mniej na wydmach, a ogniska zbiórek płonęły niżej zeszłej nocy. Moi wartownicy spali, czego nie robili od tygodnia. Dobrze powalone, {playerName}.',
+  'entities.quests.q_dk_ash_on_the_wind.objectives.0.label': 'Pokonany Najeźdźca Popiołokości',
+  'entities.quests.q_dk_ash_on_the_wind.text':
+    'Spójrz na południe od palisady, {playerName}. Te ognie na wydmach to nie ogniska trolli, to zbiórki Popiołokości, i każdej nocy jest ich więcej. Umarli wychodzą z kościanych pól z piaskiem wciąż w zębach. Powal dziesięciu najeźdźców, zanim wytną drogę do mojej bramy.',
+  'entities.quests.q_dk_ash_on_the_wind.title': 'Popiół na Wietrze',
+  'entities.quests.q_dk_banners_over_the_dunes.completion':
+    'Trzy sztandary trzepoczące na gorącym wietrze, dokładnie tam, gdzie moja luneta może je znaleźć. Gdy pięciu zwoływaczy uciszono, cokolwiek odpowiada na ich wezwanie, przyjdzie wolniej. Kupiłeś nam czas, {playerName}.',
+  'entities.quests.q_dk_banners_over_the_dunes.objectives.0.label':
+    'Pokonany Wojenny Zwoływacz Popiołokości',
+  'entities.quests.q_dk_banners_over_the_dunes.objectives.1.label':
+    'Zatknięty Sztandar Ostrzegawczy',
+  'entities.quests.q_dk_banners_over_the_dunes.text':
+    'Popiołokości zbierają się przy starych grobach kościanych pól, {playerName}, a moje patrole nie potrafią odczytać wydm tak, jak odczytują mur. Zabij pięciu ich zwoływaczy wojennych, tych, którzy wykrzykują umarłych na nogi, i zatknij sztandar ostrzegawczy na każdym miejscu zbiórki, by moi wartownicy mogli je oznaczyć z grani.',
+  'entities.quests.q_dk_banners_over_the_dunes.title': 'Sztandary nad Wydmami',
+  'entities.quests.q_dk_marrow_and_ash.completion':
+    'Sześć naznaczeń, i ten sam znak wypalony na każdym z nich. To nie jest zwykła zbiórka najazdowa, {playerName}. Każdy zastęp na wydmach odpowiada przed wojenną bramą poniżej nas, trolle nazywają ją Orkadia, i żadnych pięciu żołnierzy, z którymi kiedykolwiek służyłem, nie zdołałoby złamać tego, co bije za tymi drzwiami. Może pięciu takich jak ty.',
+  'entities.quests.q_dk_marrow_and_ash.objectives.0.label': 'Wojenny Znak Popiołokości',
+  'entities.quests.q_dk_marrow_and_ash.text':
+    'Każdy najeźdźca Popiołokości nosi wojenne naznaczenie, {playerName}: osmalony znak zastępu, pod którym maszeruje. Naliczyłem cztery zastępy z tej grani, ale domysły to nie wywiad. Przynieś mi sześć naznaczeń od najeźdźców i ich zwoływaczy, a przekażę Brannocowi kształt nadchodzącej wojny.',
+  'entities.quests.q_dk_marrow_and_ash.title': 'Szpik i Popiół',
+  'entities.quests.q_dk_matriarch_of_the_maw.completion':
+    'Niebo nad Smoczą Paszczą jest puste od dwóch dni, a teraz przechodzisz przez moją bramę z krwią matriarchini na butach. Wyrmwatch stał na straży czterdzieści lat dokładnie w oczekiwaniu na to, {playerName}. Weź te naramienniki z łusek paszczy, wykute przez naszego własnego kowala. Noś je tam, gdzie smoki mogą je zobaczyć.',
+  'entities.quests.q_dk_matriarch_of_the_maw.objectives.0.label':
+    'Pokonana Cindraleth, Matriarchini Paszczy',
+  'entities.quests.q_dk_matriarch_of_the_maw.text':
+    'Łuski mówiły prawdę, {playerName}. Wspiąłem się na krawędź o świcie i zobaczyłem ją na dnie krateru: Cindraleth, matriarchinię, pod którą wylągł się każdy żarolot na tym niebie, złotą jak węgiel gotowy się zająć. Dopóki wysiaduje, smoki stają się śmielsze, a Wyrmwatch nie może walczyć jednocześnie ze smokami i Popiołokośćmi. Zakończ jej życie w jej kraterze, a potem zanieś wieść Kapitanowi Bramy Brannocowi. Nie idź sam.',
+  'entities.quests.q_dk_matriarch_of_the_maw.title': 'Matriarchini Paszczy',
+  'entities.quests.q_dk_scales_of_the_maw.completion':
+    'Spójrz na spód tej, {playerName}: osmalona w spiralę, a tylko jedno gnieździ się w kręgach. Te smoki to strażnicy legowiska. Coś w Smoczej Paszczy jest matką.',
+  'entities.quests.q_dk_scales_of_the_maw.objectives.0.label': 'Łuska Żarolotu',
+  'entities.quests.q_dk_scales_of_the_maw.text':
+    'Gdy wiatr wieje znad Smoczej Paszczy, smoki żaroloty szybują nad moim obozem na tyle nisko, że można policzyć ich zęby, {playerName}. Zapuszczają się coraz dalej każdego dnia, a coś w tym kraterze je popędza. Przynieś mi trzy ich łuski. Łuski pamiętają ciepło, a ja mogę odczytać po spaleniźnie, gdzie smok się gnieździł.',
+  'entities.quests.q_dk_scales_of_the_maw.title': 'Łuski Paszczy',
+  'entities.quests.q_dk_scorched_stores.completion':
+    'Osmalone na czarno, a każde zapięcie wciąż trzyma. Kowal dostaje swoje gwoździe, płatnerz swoje cięciwy, a ty dostajesz buty, które trzymałem dla tego, kto przyniesie moje skrzynie z powrotem, {playerName}.',
+  'entities.quests.q_dk_scorched_stores.objectives.0.label':
+    'Odzyskana Osmalona Skrzynia Zaopatrzeniowa',
+  'entities.quests.q_dk_scorched_stores.text':
+    'Ostatni wóz spłonął, {playerName}, ale skrzynie okute żelazem nie przepalają się na wylot. Cztery z nich wciąż leżą osmalone wzdłuż drogi przez wydmy, z zapasem soli, gwoździ i cięciw w środku na cały sezon. Przynieś moje zapasy do domu, zanim trolle zorientują się, jak je otworzyć.',
+  'entities.quests.q_dk_scorched_stores.title': 'Osmalone Zapasy',
+  'entities.quests.q_dk_trolls_on_the_road.completion':
+    'Osiem, a moi woźnice przestali pisać listy pożegnalne przed każdym kursem. Garnizon je dzięki tobie, {playerName}.',
+  'entities.quests.q_dk_trolls_on_the_road.objectives.0.label': 'Pokonany Troll Wydmowy',
+  'entities.quests.q_dk_trolls_on_the_road.text':
+    'Trolle wydmowe nauczyły się rozpoznawać dźwięk wozu z zaopatrzeniem, {playerName}. Uderzyły na drogę przez Popiołowe Wydmy trzy razy w tym miesiącu, a ostatni woźnica wszedł, niosąc jedynie lejce. Osiem trolli z tej drogi, a moje wozy znów pojadą.',
+  'entities.quests.q_dk_trolls_on_the_road.title': 'Trolle na Drodze',
+  'entities.quests.q_dk_watcher_at_the_wargate.completion':
+    'Brannoc cię przysłał? Więc mój ostatni goniec nigdy nie dotarł. Ścisz głos i usiądź, {playerName}. Widzisz tę bramę poniżej? Policz sztandary wojenne przed nią, a zrozumiesz, dlaczego przestałam zapisywać rzeczy.',
+  'entities.quests.q_dk_watcher_at_the_wargate.objectives.0.label': 'Znajdź Zwiadowcę Yerrin',
+  'entities.quests.q_dk_watcher_at_the_wargate.text':
+    'Coś ciągnie Popiołokości na wschód, {playerName}, i wysłałem moją najlepszą zwiadowczynię, by się dowiedzieć co. Zwiadowca Yerrin obozuje od miesiąca na dalekich wydmach za Wiecem Trolli, w zasięgu wzroku bramy, której nikt nie zbudował za mojego życia. Jej raporty ustały dziesięć dni temu. Znajdź jej obóz i przynieś mi jej spostrzeżenia.',
+  'entities.quests.q_dk_watcher_at_the_wargate.title': 'Obserwator przy Wojennej Bramie',
+  'entities.quests.q_eg_bloom_clippings.completion':
+    'Spójrz tutaj: liście zwijają się same w sobie, każda sadzonka taka sama. Ogród się boi, {playerName}. Przez sto lat nigdy nie widziałem go przestraszonego.',
+  'entities.quests.q_eg_bloom_clippings.objectives.0.label': 'Przycięty Kwietny Sadzonek',
+  'entities.quests.q_eg_bloom_clippings.text':
+    'Chcesz zrozumieć ten ogród? To czytaj go tak, jak ja to robię. Jelenie pasące się na trawnikach hodują najprawdziwszą zieleń: każdy liść na nich to strona. Przynieś mi sześć świeżych sadzonek od żywopłotowych jeleni, {playerName}. Nie podziękują ci za przycinanie, ale odrosną. Wszystko tu odrasta.',
+  'entities.quests.q_eg_bloom_clippings.title': 'Sadzonki z Żywej Zieleni',
+  'entities.quests.q_eg_bull_of_the_court.completion':
+    'Poczułem to, tutaj, gdy się rozpadł. Sto lat pracy, i miałeś rację, by to zakończyć. Weź ten płaszcz: skroiłem go dla kogoś, kto okaże się silniejszy niż moje najlepsze dzieło. Dziedziniec dziś w nocy jest tylko fontanną, {playerName}, a ogród jest tylko ogrodem. Może teraz Główna Ogrodniczka i ja będziemy mogli oboje spać.',
+  'entities.quests.q_eg_bull_of_the_court.objectives.0.label': 'Zniszczony Żywopłotowy Byk',
+  'entities.quests.q_eg_bull_of_the_court.text':
+    'Teraz prawda, {playerName}. Byk w sercu labiryntu był moim arcydziełem: ukształtowałem go, by strzegł Dziedzińca Fontanny, i przez sto lat tak robił. Ale strach w zieleni dosięgnął go, i teraz niczego już nie strzeże, poluje. Labirynt karmi go każdym, kto się w nim zabłąka. Jestem zbyt stary, by go rozczarować, a musi to być rozczarowanie, korzeń i gałąź. Weź przyjaciela, przejdź przez labirynt do dziedzińca i powal mojego byka.',
+  'entities.quests.q_eg_bull_of_the_court.title': 'Byk Dziedzińca Fontanny',
+  'entities.quests.q_eg_four_statues.completion':
+    'Cztery odciski, cztery siostry, i żadna z nich nie zapłakała marmurem. Ogród cię osądził, {playerName}, i nie znalazł w tobie żadnej wady. Teraz mogę wysłać cię tam, gdzie naprawdę tkwi problem.',
+  'entities.quests.q_eg_four_statues.objectives.0.label': 'Odwiedzony Posąg Ogrodu',
+  'entities.quests.q_eg_four_statues.text':
+    'Gdy ogród był młody, pierwsi ogrodnicy wznieśli cztery marmurowe siostry, by pilnowały jego ćwiartek: jedną nad Dzikimi Różami, jedną na alei przy stawie na wschód od labiryntu, jedną na zachodnim trawniku, gdzie gnomy mają swoją norę, i jedną na południowym trawniku za żywopłotami. Labirynt wyrósł między nimi, i większość ludzi nigdy nie widzi wszystkich czterech. Przejdź przez ćwiartki, {playerName}, i przyłóż dłoń do każdej siostry. Gdy ogród obejrzy cię ze wszystkich czterech stron, otworzy miejsca, które trzyma z dala od obcych.',
+  'entities.quests.q_eg_four_statues.title': 'Cztery Ciche Siostry',
+  'entities.quests.q_eg_gate_report.completion':
+    'Poruszyły się, tak. Pell zgłasza to co tydzień, i co tydzień ma rację. Wybacz moje oczy, {playerName}, nie spałam całej nocy od lat: ktoś musi patrzeć, jak ogród patrzy na nas. Witaj w Hedgewick.',
+  'entities.quests.q_eg_gate_report.objectives.0.label':
+    'Zgłoś się do Głównej Ogrodniczki Amaranth',
+  'entities.quests.q_eg_gate_report.text':
+    'Trawniki za tą bramą przycinają się same od stu lat, {playerName}, a ostatnio zaczęły przycinać też odwiedzających. Główna Ogrodniczka Amaranth prowadzi księgi w Hedgewick, drogą w górę za trawnikami przy bramie. Powiedz jej, że przeszedł kolejny podróżnik, i powiedz jej, że żywopłoty przy bramie poruszyły się zeszłej nocy.',
+  'entities.quests.q_eg_gate_report.title': 'Wieść przez Bramę',
+  'entities.quests.q_eg_gnomes_in_the_green.completion':
+    'Trzy wózki z powrotem i kołki znów pełne. Niech małe diabły dąsają się w swoich żywopłotach: Hedgewick też pracuje na tych trawnikach.',
+  'entities.quests.q_eg_gnomes_in_the_green.objectives.0.label': 'Przepędzony Gnom Żywopłotowy',
+  'entities.quests.q_eg_gnomes_in_the_green.objectives.1.label': 'Odzyskany Wózek Narzędziowy',
+  'entities.quests.q_eg_gnomes_in_the_green.text':
+    'Nożyce to był tylko początek, {playerName}. Zeszłej nocy gnomy przewróciły nasze wózki narzędziowe w zieleni, jeden przy ich norze na zachód od labiryntu, jeden po drugiej stronie ogrodu na alei przy stawie, i rozrzuciły sto lat dobrego żelaza w trawie. Przepędź osiem z tych małych diabłów i przywieź wywrócone wózki do domu.',
+  'entities.quests.q_eg_gnomes_in_the_green.title': 'Uraza Ogrodników',
+  'entities.quests.q_eg_hungry_shapes.completion':
+    'Dziesięć kupek przyciętych gałązek tam, gdzie stało dziesięć wilków. To powinno wydawać się ogrodnictwem, {playerName}. Dlaczego wydaje się wojną?',
+  'entities.quests.q_eg_hungry_shapes.objectives.0.label': 'Pokonany Żywopłotowy Wilk',
+  'entities.quests.q_eg_hungry_shapes.text':
+    'Ktokolwiek kształtuje ten ogród, stał się nieostrożny albo okrutny. Kształty wilków na Dzikich Różach były przycinane na pokaz, a jednak ostatnio polują: zielone szczęki, brak brzuchów, i żadnego powodu, by kiedykolwiek przestać. Powal dziesięć żywopłotowych wilków, {playerName}, i niech trawniki znów będą trawnikami przez chwilę.',
+  'entities.quests.q_eg_hungry_shapes.title': 'Przycięci ku Głodowi',
+  'entities.quests.q_eg_stolen_shears.completion':
+    'Sześć par, a moja własna wśród nich, rozpoznałabym to wyszczerbienie na ostrzu wszędzie. Proszę, te rękawice zostały zrobione do prac przycinających. Ciepłe dłonie utrzymują pewne nożyce.',
+  'entities.quests.q_eg_stolen_shears.objectives.0.label': 'Skradzione Nożyce z Hedgewick',
+  'entities.quests.q_eg_stolen_shears.text':
+    'Każda para nożyc w Hedgewick zniknęła w ciągu dwóch tygodni, {playerName}: z kołków, z zamkniętych szop, jedna para z mojego własnego fartucha, gdy drzemałam. To gnomy żywopłotowe, mali ogrodnicy, którzy nienawidzą, gdy chodzimy po ich trawnikach. Odzyskaj sześć par, zanim cała osada zostanie z samymi nożami kuchennymi.',
+  'entities.quests.q_eg_stolen_shears.title': 'Skradzione Nożyce',
+  'entities.quests.q_eg_who_trims_the_hedges.completion':
+    'Więc dom w końcu kogoś przysłał. Sto lat chodzę po tych trawnikach, {playerName}, a ogród i ja mamy porozumienie: przycinam to, co prosi o przycięcie. Usiądź. Żywopłoty mogą obejść się bez ciebie przez godzinę.',
+  'entities.quests.q_eg_who_trims_the_hedges.objectives.0.label':
+    'Znajdź ogrodnika przy Kotlinie Lilii',
+  'entities.quests.q_eg_who_trims_the_hedges.text':
+    'Prowadzę te księgi od trzydziestu lat, {playerName}, i nie spałam porządnie od dziesięciu z nich, bo rachunki się nie zgadzają. Trawa chce być koszona, a żywopłoty chcą być kształtowane, i nikt tu nie robi ani jednego, ani drugiego, a jednak każdego świtu ogród stoi przycięty. Ostatnio leśny lud przysięga, że widzi starca z taczką na dalekich południowych trawnikach, za labiryntem przy Kotlinie Lilii. Znajdź go. Jeśli jest prawdziwy, w końcu będę mogła spać. Jeśli nie, chyba nigdy nie będę.',
+  'entities.quests.q_eg_who_trims_the_hedges.title': 'Kto Przycina Żywopłoty',
+  'entities.quests.q_fs_bell_at_the_landing.completion':
+    'Grobla trzyma się, a Tam wciąż ma dość tchu, by żartować o trzech uderzeniach. Dobrze. Jesteśmy wyspą w oblężeniu, {playerName}, a każda para rąk, która przekracza tę mieliznę, to para, przez którą wyłomy muszą się przebić, zanim dotrą do moich ludzi. Witaj w Gullhaven.',
+  'entities.quests.q_fs_bell_at_the_landing.objectives.0.label': 'Zgłoś się do Strażnika Coalfasta',
+  'entities.quests.q_fs_bell_at_the_landing.text':
+    'Przeszedłeś przez Promowy Szlak, {playerName}? W takim razie jesteś pierwszym od tygodnia, a Strażnik będzie chciał cię obejrzeć. Gullhaven leży w górę drogi wybrzeża, za suszarniami, o które nikt już nie dba. Powiedz Strażnikowi Coalfastowi, że grobla wciąż stoi i że Tam nie uderzył dziś jeszcze w trzy dzwony. Jeszcze.',
+  'entities.quests.q_fs_bell_at_the_landing.title': 'Dzwon przy Przystani',
+  'entities.quests.q_fs_bram_come_home.completion':
+    'Bram! Przyprowadziłeś go do mnie całego, {playerName}. Oboje płakaliśmy i żadne z nas się tego nie wstydzi. Cokolwiek wyłomy zabiorą z tej wyspy następnym razem, nie dostaną mojej rodziny. Już nie.',
+  'entities.quests.q_fs_bram_come_home.objectives.0.label':
+    'Rybak Bram bezpiecznie odprowadzony do Gullhaven',
+  'entities.quests.q_fs_bram_come_home.text':
+    'Mój Bram wypłynął łodzią rano, gdy otworzył się Wyłom Sieci, a morze wyrzuciło go gdzieś za Przystanią. Słyszałam go trzy noce temu, {playerName}, wołającego nad wodą, i byłam zbyt przerażona, by iść. Wciąż jestem zbyt przerażona. Proszę. Jego łódź leży rozbita na południowym brzegu. Odprowadź go do mnie do domu.',
+  'entities.quests.q_fs_bram_come_home.title': 'Bram Wraca do Domu',
+  'entities.quests.q_fs_hold_the_riftfields.completion':
+    'Dziesięciu mniej, a robotnicy polowi już kłócą się o to, kto pierwszy wyjdzie. To nie potrwa długo, wyłomy nigdy nie odpoczywają długo, ale miasto, które je, to miasto, które przetrwa.',
+  'entities.quests.q_fs_hold_the_riftfields.objectives.0.label': 'Pokonany Nędznik Wyłomu',
+  'entities.quests.q_fs_hold_the_riftfields.text':
+    'Na wschód od miasta rzędy zboża popadły w ruinę, a nędznicy, którzy przeszli przez wyłom Pól Szczelin, teraz obskubują je do czysta. Moi ludzie nie mogą doglądać pola, na którym nie mogą stanąć, {playerName}. Wybij dziesięciu nędzników i oddaj rolnikom ich ziemię.',
+  'entities.quests.q_fs_hold_the_riftfields.title': 'Utrzymać Pola Szczelin',
+  'entities.quests.q_fs_moss_and_mending.completion':
+    'Mech w jednej ręce, a cichszy brzeg w drugiej. Uzupełniłeś cały mój gabinet, {playerName}. Wyświadcz mi tę uprzejmość, że nie zostaniesz moim kolejnym pacjentem.',
+  'entities.quests.q_fs_moss_and_mending.objectives.0.label': 'Pokonany Pomiot Szczeliny',
+  'entities.quests.q_fs_moss_and_mending.objectives.1.label': 'Słony Mech z Dalekiego Wybrzeża',
+  'entities.quests.q_fs_moss_and_mending.text':
+    'Słony mech, który rośnie wzdłuż linii przypływu, to najlepszy opatrunek na rany, jaki znam, a pomioty szczeliny opanowały każdy odcinek brzegu, na którym rośnie. Noszą jego kłaki zaczepione na skórze, ze wszystkich rzeczy. Oczyść sześć z nich na wschodnich rozlewiskach, {playerName}, i zbierz mi cztery dobre garści mchu z tego, co stratowały.',
+  'entities.quests.q_fs_moss_and_mending.title': 'Mech i Opatrunki',
+  'entities.quests.q_fs_song_before_the_break.completion':
+    'Strażnik cię przysłał? Dobrze. To znaczy, że miasto w końcu zaczęło słuchać. Teraz zamilcz na chwilę, {playerName}. Tam, pod wiatrem, słyszysz to? Klify śpiewają, i nie podoba mi się ta melodia.',
+  'entities.quests.q_fs_song_before_the_break.objectives.0.label': 'Znajdź Szczelinostrażcę Ollun',
+  'entities.quests.q_fs_song_before_the_break.text':
+    'Jest człowiek, który słyszy wyłomy, zanim się otworzą. Szczelinostrażca Ollun: uczony albo szaleniec, a ostatnio nie stać mnie na tę różnicę. Czuwa na Łące Straży, w górę drogi na południowy wschód od miasta. Znajdź go, {playerName}, i zapytaj, co wyspa zamierza zrobić nam następnym razem.',
+  'entities.quests.q_fs_song_before_the_break.title': 'Pieśń przed Wyłomem',
+  'entities.quests.q_fs_stalkers_off_the_light.completion':
+    'Osiem nocy okrążania, zakończonych w jedną. Ogniska płoną już stabilniej, a może to tylko moje ręce. Tak czy inaczej łąka znów jest moja, i słyszę, jak wyspa myśli.',
+  'entities.quests.q_fs_stalkers_off_the_light.objectives.0.label': 'Pokonany Tropiciel Pustki',
+  'entities.quests.q_fs_stalkers_off_the_light.text':
+    'Tropiciele polują w ciemności między ogniami wartowniczymi, i każdej nocy okrążają moją łąkę coraz bliżej. Nie są bezmyślne, {playerName}, są cierpliwe, a cierpliwość to jedyna rzecz, której nie przetrzymam. Zabij osiem i odepchnij ciemność z powrotem do klifów, przez które przyszła.',
+  'entities.quests.q_fs_stalkers_off_the_light.title': 'Tropiciele z Dala od Światła',
+  'entities.quests.q_fs_steel_for_the_redoubt.completion':
+    'Wyżarta solą i naznaczona wyłomem, a i tak utrzyma ostrze. Proszę, sama podszyłam te uchwyty. Stal za stal, {playerName}: to jedyny handel, jaki prowadzi teraz Dalekie Wybrzeże.',
+  'entities.quests.q_fs_steel_for_the_redoubt.objectives.0.label': 'Stal Naznaczona Wyłomem',
+  'entities.quests.q_fs_steel_for_the_redoubt.text':
+    'Każde ostrze, które rozdaję, to takie, które oddało morze, albo takie, które wyrwałam zmarłym, {playerName}. Nędznicy przenoszą złom przez wyłomy: zawiasy, haki, złamaną stal mieczy, sroczy dobytek, ale to daje się dobrze wykuć. Przynieś mi sześć kawałków ich zebranej stali, a linia barykad odzyska swoje zęby.',
+  'entities.quests.q_fs_steel_for_the_redoubt.title': 'Stal dla Redoubtu',
+  'entities.quests.q_fs_the_great_break.completion':
+    'Ollun przesłał wiadomość naprzód: śpiew ustał. Całe moje miasto usłyszało ciszę, {playerName}, a połowa z nich zapłakała na dźwięk zupełnie niczego. Noś ten płaszcz. Dalekie Wybrzeże nie zapomina, kto obronił jego brzeg.',
+  'entities.quests.q_fs_the_great_break.objectives.0.label': 'Pokonany Rozdarty Koszmar',
+  'entities.quests.q_fs_the_great_break.text':
+    'Każda pieśń, którą śpiewa ta wyspa, kończy się tą samą niską nutą, a dochodzi ona z Rozłupanych Klifów. Coś przeszło przez wielki wyłom tam, {playerName}, coś, co same klify pękły, by wpuścić, i to wciąż rośnie. Jeśli ruszy na północ, żaden dzwon nie będzie miał znaczenia. Weź przyjaciela, weź dwóch, i zakończ to. Potem powiedz Coalfastowi, że melodia się zmieniła.',
+  'entities.quests.q_fs_the_great_break.title': 'Wielki Wyłom',
+  'entities.quests.q_fs_the_three_bells.completion':
+    'Trzy głosy, trzy odpowiedzi, niesione czysto nad wodą. Śpij dziś w Gullhaven, {playerName}, i wiedz, że jeśli dzwon cię obudzi, będzie to moją ręką i we właściwym czasie.',
+  'entities.quests.q_fs_the_three_bells.objectives.0.label': 'Uderzony Dzwon Wartowniczy',
+  'entities.quests.q_fs_the_three_bells.text':
+    'Trzy dzwony wartownicze stoją na wybrzeżu poza moim własnym: jeden na Przystani, jeden na południowej plaży, jeden przy brzegu Pól Szczelin. Jeśli lina zgniła albo serce dzwonu zostało zabrane, miasto dowiaduje się o wyłomie, gdy jest już na ulicach. Przejdź wybrzeżem, {playerName}, i uderz w każdy dzwon raz, żebym wiedziała, że wciąż ma głos.',
+  'entities.quests.q_fs_the_three_bells.title': 'Trzy Dzwony',
+  'entities.quests.q_fv_aurora_motes.completion':
+    'Sześć drobin, wciąż jarzących się. Spójrz na nie, {playerName}: pulsują w rytm ze sobą. Światła to nie pogoda. To sygnał.',
+  'entities.quests.q_fv_aurora_motes.objectives.0.label': 'Drobina Zorzy',
+  'entities.quests.q_fv_aurora_motes.text':
+    'Wispy, które dryfują po tych stopniach, są zrzucane przez same światła, i każdy niesie w swoim sercu drobinę zorzy. Potrzebuję sześciu, by odczytać to, co pisze niebo, {playerName}. Wispy nie walczą. Czy to sprawia, że praca jest łatwiejsza czy trudniejsza, to sprawa między tobą a twoim sumieniem.',
+  'entities.quests.q_fv_aurora_motes.title': 'Drobiny Zorzy',
+  'entities.quests.q_fv_ember_caches.completion':
+    'Wciąż ciepłe, każda z nich. Kupiłeś domowi całą zimę łaski, {playerName}.',
+  'entities.quests.q_fv_ember_caches.objectives.0.label': 'Odzyskana Skrytka Żaru',
+  'entities.quests.q_fv_ember_caches.text':
+    'Sanie ze skrytkami żaru przewróciły się zeszłej nocy na drodze przez jeziorko: żelazne kotły, które utrzymują żywy ogień przez miesiąc. Trzy z nich wciąż leżą w śniegu, {playerName}, a dom nie może obejść się bez tego, co zawierają. Przynieś ogień do domu.',
+  'entities.quests.q_fv_ember_caches.title': 'Żar na Drodze przez Jeziorko',
+  'entities.quests.q_fv_frostmane_tyrant.completion':
+    'Gdy zeszłej nocy wiatr ucichł, cała wioska usłyszała ciszę tam, gdzie kiedyś była Szronogrzywa. Kraina jest ci winna dług, który będzie spłacać latami, {playerName}. Noś to, a każde drzwi w Icemantle będą dla ciebie otwarte.',
+  'entities.quests.q_fv_frostmane_tyrant.objectives.0.label': 'Pokonana Szronogrzywa',
+  'entities.quests.q_fv_frostmane_tyrant.text':
+    'Wyjce nie polowały, gdy schodziły z tarasów. Uciekały. Yeti zajęła wyżyny, górski lud nazywa ją Szronogrzywą, i nawet stada nie chcą dzielić z nią zbocza. To musi się skończyć, {playerName}, zanim zima zapędzi ją do moich murów. Weź przyjaciela. Weź dwóch.',
+  'entities.quests.q_fv_frostmane_tyrant.title': 'Tyran Szronogrzywy',
+  'entities.quests.q_fv_howl_above.completion':
+    'Osiem, i zmierzchowy chór jest przez to cichszy. Ale wyjce nie opuszczają wierzchołków bez powodu. Coś tam na górze je poruszyło, i obawiam się, że to coś ma imię.',
+  'entities.quests.q_fv_howl_above.objectives.0.label': 'Pokonany Wyjec Tarasów',
+  'entities.quests.q_fv_howl_above.text':
+    'Słyszysz to o zmierzchu, {playerName}: wycie z Wyjących Tarasów, które nie należy do stad zasp śnieżnych. Większe gardła. Wyjce tarasowe zeszły z wierzchołków po raz pierwszy od czasów, gdy ten posterunek trzymała moja babka, i to one wypchnęły wilki na moją drogę. Wybij osiem i odepchnij je z powrotem.',
+  'entities.quests.q_fv_howl_above.title': 'Wycie na Tarasach',
+  'entities.quests.q_fv_lights_over_steps.completion':
+    'Kaldra cię przysłała? Więc w końcu się martwi, i słusznie. Usiądź, {playerName}. Popatrz na niebo ze mną przez chwilę.',
+  'entities.quests.q_fv_lights_over_steps.objectives.0.label': 'Znajdź Zorzoznawczynię Veylę',
+  'entities.quests.q_fv_lights_over_steps.text':
+    'Zorza płonęła zielono każdej nocy w tym miesiącu, a starzy ludzie nie chcą pod nią chodzić. Jedna kobieta może wiedzieć dlaczego: Veyla, Zorzoznawczyni. Obozuje sama na Stopniach Zorzy, na południowy wschód za jeziorkiem. Znajdź jej obóz, {playerName}, i wysłuchaj, co powiedziały jej światła.',
+  'entities.quests.q_fv_lights_over_steps.title': 'Światła nad Stopniami',
+  'entities.quests.q_fv_rime_unbound.completion':
+    'Noc już wydaje się cieńsza. Cokolwiek je budzi, jeszcze nie skończyło, ale kupiłeś Stopniom trochę spokoju.',
+  'entities.quests.q_fv_rime_unbound.objectives.0.label': 'Pokonany Żywiołak Szronu',
+  'entities.quests.q_fv_rime_unbound.text':
+    'Gdy zorza płonie tak jasno, chłód wstaje i chodzi: żywiołaki szronu, mróz obdarzony wolą. Gromadzą się tam, gdzie światła dotykają progów, i każdej nocy podchodzą bliżej mojego obozu. Rozbij osiem z nich, {playerName}, zanim jeden z nich rozbije mnie.',
+  'entities.quests.q_fv_rime_unbound.title': 'Uwolniony Szron',
+  'entities.quests.q_fv_seeing_wren_home.completion':
+    'Dziewczyna jest w środku, owinięta w połowę moich koców i gadająca tak, że gwiazdy pospadałyby z nieba. Zrobiłeś dziś coś dobrego, {playerName}. Kraina niewiele takich rzeczy widuje.',
+  'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
+    'Uczennica Wren bezpiecznie odprowadzona do Stopni Zorzy',
+  'entities.quests.q_fv_seeing_wren_home.text':
+    'Moja uczennica Wren wyszła dwa dni temu, by przejść linię Złotego Roztopu, i nigdy nie wróciła. Znalazłam jej ślady, schowała się pod znacznikami drogi na północny wschód od Stopni Zorzy, zbyt przerażona wilkami, by się ruszyć. Nie mogę opuścić mokradła, {playerName}. Odprowadź ją do obozu Veyli na Stopniach. Będzie bezpieczna pod światłami.',
+  'entities.quests.q_fv_seeing_wren_home.title': 'Odprowadzenie Wren do Domu',
+  'entities.quests.q_fv_silent_trapline.completion':
+    'Maeve cię przysłała? Ha. Jedenaście lat, a ta kobieta wciąż myśli, że mokradło mnie pożre. Cóż... w tym roku może mieć rację. Spójrz, co zrobiło z moimi liniami.',
+  'entities.quests.q_fv_silent_trapline.objectives.0.label': 'Znajdź Trapera Broska',
+  'entities.quests.q_fv_silent_trapline.text':
+    'Stary Brosk obsługuje linię pułapek na Drżących Mokradłach na zachód stąd, i przez jedenaście lat co tydzień wysyłał wiązkę futer saniami z drewnem. Teraz od dwóch tygodni nic. Jest zbyt uparty, by zamarznąć, i zbyt ostrożny, by się utopić, {playerName}, więc coś innego jest nie tak. Znajdź jego obóz na mokradłach i upewnij się, że oddycha.',
+  'entities.quests.q_fv_silent_trapline.title': 'Cicha Linia Pułapek',
+  'entities.quests.q_fv_snowline_report.completion':
+    'Przełęcz się trzyma, więc. Einna trzyma ten obóz przez burze, które zasypują znaczniki drogi, i ani razu nie przesłała mi pustych wieści. Witaj w Icemantle, {playerName}.',
+  'entities.quests.q_fv_snowline_report.objectives.0.label': 'Zgłoś się do Strażniczki Kaldry',
+  'entities.quests.q_fv_snowline_report.text':
+    'Każda dusza, która wspina się poza Smocze Ziemie, mija moje ognisko, {playerName}, a każdego tygodnia jest ich mniej. Strażniczka Kaldra dogląda Icemantle w górę północnej drogi. Powiedz jej, że przełęcz jest wciąż otwarta, i powiedz jej, że obcy przeszedł ją sam.',
+  'entities.quests.q_fv_snowline_report.title': 'Wieść z Linii Śniegu',
+  'entities.quests.q_fv_sprung_traps.completion':
+    'Cztery dobre pułapki z powrotem, a trzciny ucichły. Łapiesz cięższą ręką niż ja, {playerName}, ale nie mogę kłócić się z wynikami.',
+  'entities.quests.q_fv_sprung_traps.objectives.0.label': 'Przepędzony Chochlik Mokradeł',
+  'entities.quests.q_fv_sprung_traps.objectives.1.label': 'Odzyskana Pułapka',
+  'entities.quests.q_fv_sprung_traps.text':
+    'Chochliki mokradeł, {playerName}. Te małe diabły uruchamiają moje pułapki dla zabawy i rozrzucają żelazo w trzcinach. Przepędź je, osiem powinno nauczyć resztę, i zbierz to, co zostało z moich linii pułapek, skoro już tam jesteś.',
+  'entities.quests.q_fv_sprung_traps.title': 'Chochliki w Pułapkach',
+  'entities.quests.q_fv_winter_pelts.completion':
+    'Futro takie jak to jest jedynym argumentem, którego słucha zima. Weź te buty, są podszyte z ostatniej partii.',
+  'entities.quests.q_fv_winter_pelts.objectives.0.label': 'Gruba Zimowa Skóra',
+  'entities.quests.q_fv_winter_pelts.text':
+    'Drewno na opał utrzymuje ciało przy życiu, {playerName}, ale wełna nie odeprze tego chłodu, tylko wilcze futro to potrafi. Sześć grubych zimowych skór ze stad zasp śnieżnych, a będę mogła podszyć posłania dla wszystkich, których dom chroni.',
+  'entities.quests.q_fv_winter_pelts.title': 'Skóry dla Domu',
+  'entities.quests.q_fv_wolves_at_the_door.completion':
+    'Dziesięć cieni mniej między tu a jeziorkiem. Drwale już kłócą się o to, kto pierwszy wyjdzie.',
+  'entities.quests.q_fv_wolves_at_the_door.objectives.0.label': 'Pokonany Wilk Zasp Śnieżnych',
+  'entities.quests.q_fv_wolves_at_the_door.text':
+    'Stada zasp śnieżnych trzymały się kiedyś wysokich progów. Teraz przecinają drogę przez jeziorko w biały dzień, a moi drwale nie chcą opuszczać murów. Przerzedź stada, {playerName}, dziesięć z nich, a droga znów będzie drogą.',
+  'entities.quests.q_fv_wolves_at_the_door.title': 'Wilki przy Drzwiach',
+  'entities.quests.q_gc_dead_mens_cargo.completion':
+    'Sześć załóg ciszej, a trzy skrzynie suche i bezpieczne. Odzyskujesz cięższą ręką niż ja, {playerName}, ale rejestr się tym nie przejmuje. Połowa tego należy do ciebie z mocy prawa, a przez prawo rozumiem to, że tak mówię.',
+  'entities.quests.q_gc_dead_mens_cargo.objectives.0.label': 'Uspokojony Utopiony Majtek',
+  'entities.quests.q_gc_dead_mens_cargo.objectives.1.label': 'Odzyskana Skrzynia z Wraku',
+  'entities.quests.q_gc_dead_mens_cargo.text':
+    'Prawo odzysku jest proste, {playerName}: to, co morze daje plaży, jest moje. Utopieni majtkowie się nie zgadzają. Powstają ze swoich kadłubów i ciągną każdą skrzynię, którą ułożę, z powrotem poniżej linii przypływu. Powal sześciu z nich na dobre, a póki plaża jest cicha, wciągnij trzy skrzynie z wraku, zanim przypływ zgłosi swój sprzeciw.',
+  'entities.quests.q_gc_dead_mens_cargo.title': 'Ładunek Zmarłych',
+  'entities.quests.q_gc_down_the_windway.completion':
+    'Przez przełęcz pieszo, w taką pogodę? Maren przysyła mi wystarczająco mało imion, a jeszcze mniej przychodzi osobiście, by za nie odpowiedzieć. Witaj w Wickharbor, {playerName}. Zamknij za sobą drzwi karczmy.',
+  'entities.quests.q_gc_down_the_windway.objectives.0.label': 'Zgłoś się do Kapitan Portu Odile',
+  'entities.quests.q_gc_down_the_windway.text':
+    'Dokonałeś wspinaczki, {playerName}, więc wiatr postanowił cię zatrzymać. Wickharbor leży na wschód wzdłuż drogi przez wzgórza, schowane w zaciszu swojej zatoczki. Kapitan Portu Odile liczy każdą duszę, która przechodzi przez przełęcz, i będzie chciała policzyć ciebie. Powiedz jej, że Wietrzny Szlak jest wciąż otwarty.',
+  'entities.quests.q_gc_down_the_windway.title': 'W Dół Wietrznego Szlaku',
+  'entities.quests.q_gc_keeper_of_the_flame.completion':
+    'Odile przysłała cię całą tę drogę, by sprawdzić, czy wiatr mnie zabrał? Ha. Powiedz jej, że lampa płonie, i ja też. Ale skoro już dokonałeś wspinaczki, {playerName}, zostań na chwilę. Latarnia ma pracę, do której nadaje się chyba tylko obcy.',
+  'entities.quests.q_gc_keeper_of_the_flame.objectives.0.label': 'Znajdź Stróża Brama',
+  'entities.quests.q_gc_keeper_of_the_flame.text':
+    'Stary Bram doglada Latarni na wysokim cyplu na północny wschód od miasta, i od dwóch tygodni nie schodził po zapasy. Lampa wciąż płonie, więc żyje, ale człowiek w jego wieku sam na tym cyplu w taki wiatr, {playerName}. Wejdź drogą do latarni i sprawdź, czy wciąż stoi.',
+  'entities.quests.q_gc_keeper_of_the_flame.title': 'Stróż Płomienia',
+  'entities.quests.q_gc_lanterns_on_the_shear.completion':
+    'Cztery punkty światła na klifowej drodze, dokładnie tam, gdzie powinny być. Stąd z góry wygląda to tak, jakby wybrzeże znów otworzyło oczy. Masz w sobie zadatki na stróża, {playerName}.',
+  'entities.quests.q_gc_lanterns_on_the_shear.objectives.0.label':
+    'Ponownie zapalona Latarnia Sztormowa',
+  'entities.quests.q_gc_lanterns_on_the_shear.text':
+    'Latarnia to wielkie światło, {playerName}, ale to sztormowe latarnie prowadzą nocnego podróżnika drogą klifową nad Urwiskiem. Zeszłej nocy wichura zgasiła każdą z nich, a ta droga po ciemku to długi upadek z krótkim zakończeniem. Weź moje krzesiwo i zapal na nowo cztery wzdłuż klifu.',
+  'entities.quests.q_gc_lanterns_on_the_shear.title': 'Latarnie na Urwisku',
+  'entities.quests.q_gc_scuttlers_in_the_pots.completion':
+    'Dziesięć skorup mniej na mojej drodze, a sieci wyszły dziś rano pełne. Sieciarze nazywają cię dobrym omenem, {playerName}. W Wickharbor to najcieplejsza pochwała, jaką można usłyszeć.',
+  'entities.quests.q_gc_scuttlers_in_the_pots.objectives.0.label': 'Pokonany Czołgacz Mielizn',
+  'entities.quests.q_gc_scuttlers_in_the_pots.text':
+    'Czołgacze mielizn nauczyły się wspinać na klifową drogę i rozłupywać nasze sieci na kraby o kamienie, {playerName}. Połowa połowu przepadła w tym tygodniu, a jeden sieciarz ma rękę, której nie będzie mógł użyć przez miesiąc. Rozbij dziesięć z nich, a reszta zapamięta, dlaczego trzymała się mielizn.',
+  'entities.quests.q_gc_scuttlers_in_the_pots.title': 'Czołgacze w Sieciach',
+  'entities.quests.q_gc_the_far_shore.completion':
+    'Bram obserwuje teraz moje wybrzeże ze swojej wieży, tak? Starzec ma rację, że się martwi, {playerName}. Umarli chodzą po swoich własnych wrakach nocami, i ostatnio przestali się przejmować tym, czy słońce świeci.',
+  'entities.quests.q_gc_the_far_shore.objectives.0.label': 'Znajdź Odzyskiwaczkę Eddę',
+  'entities.quests.q_gc_the_far_shore.text':
+    'Z tej latarniowej komnaty widzę całe wybrzeże, {playerName}, a to, co widzę na północy, mi się nie podoba. Zielone światła chodzą po Polach Wraków przy odpływie, kadłub po kadłubie. Jedna kobieta pracuje na tym brzegu samotnie: Edda, odzyskiwaczka. Idź drogą klifową na północ za Urwisko, aż zaczną się wraki, i sprawdź, czy wciąż oddycha.',
+  'entities.quests.q_gc_the_far_shore.title': 'Dalekie Wybrzeże',
+  'entities.quests.q_gc_the_wreck_warden.completion':
+    'Plaża ucichła w chwili, gdy padł, {playerName}. Pierwsza cisza, jaką słyszałam na tym brzegu przez dziesięć lat pracy na nim. Załogi to teraz tylko kości, spoczywające kości. Weź płaszcz z wierzchu skarbu, i tak zawsze pasowałby lepiej na żywe plecy.',
+  'entities.quests.q_gc_the_wreck_warden.objectives.0.label': 'Powalony Strażnik Wraku',
+  'entities.quests.q_gc_the_wreck_warden.text':
+    'Teraz wiesz, dlaczego majtkowie powstają, {playerName}. Coś nosi pokrytą pąklami zbroję pierwszego wraku, jaki kiedykolwiek rozbił się na tym brzegu, i strzeże każdego kadłuba na plaży jak cmentarza, który wynajęto go pilnować. Trzyma skarb, który pożądam od dziesięciu lat, i załogę, którą wolałabym widzieć spoczywającą. Zakończ istnienie Strażnika Wraku. Weź przyjaciela, umarli dobrze pilnują.',
+  'entities.quests.q_gc_the_wreck_warden.title': 'Strażnik Wraku',
+  'entities.quests.q_gc_wind_against_the_wick.completion':
+    'Lampa nawet nie zamigotała zeszłej nocy, pierwszy raz od miesiąca. Wiatr wciąż nas nienawidzi, {playerName}, ale wrócił do uczciwej nienawiści.',
+  'entities.quests.q_gc_wind_against_the_wick.objectives.0.label': 'Rozproszony Wisp Wichru',
+  'entities.quests.q_gc_wind_against_the_wick.text':
+    'Wispy wichru to wiatr, który stał się złośliwy, {playerName}. Gromadzą się na wysokich wzgórzach przy Lustrzanym Jeziorku, i każdy płomień, jaki znajdą, gaszą: latarnię, ognisko, pewnego dnia tę lampę. Trzydzieści dziewięć lat utrzymywałem Latarnię płonącą, i nie stracę jej przez pogodę żywiącą urazę. Rozprosz osiem z nich.',
+  'entities.quests.q_gc_wind_against_the_wick.title': 'Wiatr przeciw Knotowi',
+  'entities.quests.q_gc_wool_off_the_downs.completion':
+    'Runo takie jak to jest powodem, dla którego barany stoją tam grube i zadowolone z siebie w pogodzie, która zabija ludzi. Prządki będą się tym zajmować przy świetle lamp. Weź te buty, {playerName}, są podszyte z ostatniego strzyżenia.',
+  'entities.quests.q_gc_wool_off_the_downs.objectives.0.label': 'Tłusta Wełna Barania',
+  'entities.quests.q_gc_wool_off_the_downs.text':
+    'Moje załogi łodziowe wiosłują w wichurę, która przecina ceratę jak papier, {playerName}. Tylko jedno odpiera ten wiatr: tłusta wełna z baranów wrzosowisk, gruba na sposób Wickharbor. Stada pasą się na Wyjących Wzgórzach na zachód od miasta. Sześć dobrych runa, a każda załoga wiosłuje w cieple przez ten sezon.',
+  'entities.quests.q_gc_wool_off_the_downs.title': 'Wełna ze Wzgórz',
+  'entities.quests.q_gleaming_antlers.completion':
+    'Spójrz, jak trzymają światło! Bez płomienia, bez dymu, tylko blask. Kotlina zaopatruje.',
+  'entities.quests.q_gleaming_antlers.objectives.0.label': 'Lśniące Poroże',
+  'entities.quests.q_gleaming_antlers.text':
+    'Zasłonięte jelenie roztaczają światło tam, gdzie się pasą, a ich zrzucone poroża zatrzymują je na lata. Pięć z nich, od stad na otwartej polanie w sercu doliny, a moje latarnie będą płonąć przez zimę bez oleju. Jeleniom nie trzeba wyrządzać krzywdy, ale nie rozstają się z nimi łatwo.',
+  'entities.quests.q_gleaming_antlers.title': 'Lśniące Poroża',
+  'entities.quests.q_grove_menace.completion':
+    'Nocny targ może się znów otworzyć. Masz klienta na całe życie, albo przynajmniej zniżkę.',
+  'entities.quests.q_grove_menace.objectives.0.label': 'Rozproszony Wisp Zmierzchu',
+  'entities.quests.q_grove_menace.text':
+    'Wispy zmierzchu zaczęły dryfować między moimi straganami po zmroku, {playerName}, a ich chłód psuje wszystko, czego dotknie. Przerzedź je dla mnie: dziesięć z nich, gdziekolwiek zasłona się rozdarła.',
+  'entities.quests.q_grove_menace.title': 'Zagrożenie na Polanie',
+  'entities.quests.q_hollow_first_of_the_herd.completion':
+    'Więc Pierwszy pada z ręki ostatniego. Stado jest już spokojniejsze, czujesz to? Wyświadczyłeś dziś Kotlinie przysługę, nawet jeśli tak to nie wygląda.',
+  'entities.quests.q_hollow_first_of_the_herd.objectives.0.label': 'Aurelhorn obdarzony spokojem',
+  'entities.quests.q_hollow_first_of_the_herd.text':
+    'Drugie imię trudniej wymówić. Aurelhorn prowadził te stada, gdy moja babka trzymała tę wartownię, a cokolwiek obudziło się w Kotlinie, obudziło go źle. Depcze to, czego kiedyś strzegł, a stado nie przetrwa jego szaleństwa. Wędruje po łąkach w pobliżu starych dróg dworskich. Zakończ jego życie z miłosierdziem, {playerName}, i weź przyjaciela, by podzielić ten ciężar.',
+  'entities.quests.q_hollow_first_of_the_herd.title': 'Pierwszy ze Stada',
+  'entities.quests.q_hollow_old_marrowshell.completion':
+    'Mielizny są znów tylko wodą. Widziałem, jak ta skorupa łamała lepszych łowców niż ja, {playerName}. Nie ciebie.',
+  'entities.quests.q_hollow_old_marrowshell.objectives.0.label': 'Pokonany Stary Szpikoskorupiec',
+  'entities.quests.q_hollow_old_marrowshell.text':
+    'Pierwsze imię to Stary Szpikoskorupiec, krab wielkości wozu, który poluje na wschodnich mieliznach, odkąd Eldergleam miało jeszcze bramę. Wędruje, {playerName}, więc będziesz musiał iść wzdłuż brzegu, aż natkniesz się na jego trop. Nie idź sam i nie ufaj jego bezruchowi.',
+  'entities.quests.q_hollow_old_marrowshell.title': 'Stara Skorupa Mielizn',
+  'entities.quests.q_hollow_the_huntsman.completion':
+    'Fenna cię przysłała? Dobrze. Więc ci ufa, a ja mam dwa imiona, które trzeba wykreślić.',
+  'entities.quests.q_hollow_the_huntsman.objectives.0.label': 'Znajdź Łowczego Derala',
+  'entities.quests.q_hollow_the_huntsman.text':
+    'Wyglądasz jak ktoś, kto poradzi sobie z czymś więcej niż wispy, {playerName}. Łowczy Deral trzyma swoją wartownię wśród łąk jeleni na wschód stąd, i od tygodni pyta o zdolne ręce. Cokolwiek tam tropi, nie powie tego głośno w wiosce.',
+  'entities.quests.q_hollow_the_huntsman.title': 'Strażnik Stad',
+  'entities.quests.q_monument_tour.completion':
+    'Punkt widokowy, dziedziniec i zapomniany zakątek... i wszystkie trzy zwrotki pieśni zapieczętowania, razem po raz pierwszy od czasu, gdy zostały zaśpiewane. Uczyniłeś starego czytelnika bardzo szczęśliwym.',
+  'entities.quests.q_monument_tour.objectives.0.label': 'Odczytany pomnik przy Punkcie Widokowym',
+  'entities.quests.q_monument_tour.objectives.1.label': 'Odczytany pomnik na Dziedzińcu',
+  'entities.quests.q_monument_tour.objectives.2.label': 'Odczytany zapomniany pomnik',
+  'entities.quests.q_monument_tour.text':
+    'Trzy pomniki wciąż stoją sprzed czasu zapieczętowania: jeden przy Punkcie Widokowym Zmierzchu, jeden na Zatopionym Dziedzińcu, i jeden zagubiony daleko na północnym wschodzie, gdzie nikt nie chodzi. Odczytaj je dla mnie, {playerName}. Moje kolana odmówiły posłuszeństwa dwa wieki schodów temu.',
+  'entities.quests.q_monument_tour.title': 'Co Pamiętają Kamienie',
+  'entities.quests.q_nb_charts_of_the_stones.completion':
+    'Nie zostały żadne wątpliwości. Każdy namiar przesunął się w stronę Bezsennego Kurhanu, jakby samo niebo pochylało się nad tym kopcem, by patrzeć. Starzy królowie nie bez powodu zostali pochowani pod ustawionymi gwiazdami, {playerName}.',
+  'entities.quests.q_nb_charts_of_the_stones.objectives.0.label': 'Odczytana Mapa Gwiazd',
+  'entities.quests.q_nb_charts_of_the_stones.text':
+    'Kamienie Czuwania są starsze niż Moonrest, starsze niż nocnorodni, którzy się nimi opiekują, a ich powierzchnie są wyryte mapami gwiazd, które całe życie uczyłem się odczytywać. Niebo się przesunęło, {playerName}, i muszę wiedzieć, jak daleko. Odczytaj mapy na trzech kamieniach i przynieś mi ich namiary.',
+  'entities.quests.q_nb_charts_of_the_stones.title': 'Mapy w Kamieniach',
+  'entities.quests.q_nb_eyes_on_the_vigil.completion':
+    'Lira cię przysłała? Więc ogrody też to czują. Usiądź na chwilę przy lunecie, {playerName}. Gwiazdy są niespokojne od miesiąca, a każda mapa, jaką rysuję, przechyla się na północ, ku kurhanowi.',
+  'entities.quests.q_nb_eyes_on_the_vigil.objectives.0.label':
+    'Znajdź Astronoma Cassiana przy Wiecznym Czuwaniu',
+  'entities.quests.q_nb_eyes_on_the_vigil.text':
+    'Coś sprawia, że wędrowce są śmiałe, a stada niespokojne, {playerName}, i nie potrafię tego odczytać z kwiatów. Cassian potrafi odczytać to z nieba. Trzyma swój obserwatoryjny obóz przy Wiecznym Czuwaniu na wschód stąd, gdzie nocnorodni dryfują między kamieniami. Znajdź go i zapytaj, co mówią gwiazdy.',
+  'entities.quests.q_nb_eyes_on_the_vigil.title': 'Oczy na Czuwaniu',
+  'entities.quests.q_nb_night_gardens.completion':
+    'Wciąż jarzące się, każdy płatek. Świątynia będzie pachnieć nocą przez tydzień, i Moonrest śpi przez to spokojniej.',
+  'entities.quests.q_nb_night_gardens.objectives.0.label': 'Zebrany Kwiat Nocnego Rozkwitu',
+  'entities.quests.q_nb_night_gardens.text':
+    'Nocny kwiat otwiera się tylko pod tym niebem, a Gloamfield kryje najstarsze grządki w krainie. Potrzebuję czterech świeżych kwiatów na girlandy do świątyni, {playerName}. Zerwij je delikatnie: grządka pamięta szorstką rękę przez cały sezon.',
+  'entities.quests.q_nb_night_gardens.title': 'Nocne Ogrody',
+  'entities.quests.q_nb_restless_mounds.completion':
+    'Grobowe złoto, wciąż zimne od ziemi. Upiory nie powstają same z siebie, {playerName}: coś pod wielkim kopcem je przywołuje, i obawiam się, że mapy już zdradziły nam jego imię.',
+  'entities.quests.q_nb_restless_mounds.objectives.0.label': 'Pokonany Upiór Kurhanu',
+  'entities.quests.q_nb_restless_mounds.objectives.1.label': 'Odzyskana Ofiara Grobowa',
+  'entities.quests.q_nb_restless_mounds.text':
+    'Mapy były ostrzeżeniem, a pole kurhanów to dowodzi: kopce otwierają się od spodu. Upiory chodzą po rzędach grobów, nosząc dawne zaszczyty, a ofiary, które utrzymywały ich sen, leżą rozrzucone w trawie. Powal osiem z nich, {playerName}, i zbierz cztery ofiary z powrotem do mnie.',
+  'entities.quests.q_nb_restless_mounds.title': 'Niespokojne Kopce',
+  'entities.quests.q_nb_road_of_lanterns.completion':
+    'Lampy wciąż płoną, a droga wciąż przynosi nam obcych. Sorrel utrzymuje tę bramę dłużej, niż ktokolwiek w Moonrest pamięta. Witaj, {playerName}, w krainie, która nigdy nie świta.',
+  'entities.quests.q_nb_road_of_lanterns.objectives.0.label': 'Znajdź Lirę Dewsong w Moonrest',
+  'entities.quests.q_nb_road_of_lanterns.text':
+    'Tutaj na górze słońce nigdy nie podąża, {playerName}, tylko lampy, które utrzymuję zapalone wzdłuż wspinaczki. Moonrest leży na północy, gdzie zbiera się kwietny blask. Znajdź Lirę Dewsong wśród jej ogrodów i powiedz jej, że lampy Nocnej Bramy wciąż płoną.',
+  'entities.quests.q_nb_road_of_lanterns.title': 'Droga Latarni',
+  'entities.quests.q_nb_striders_in_the_dark.completion':
+    'Dziesięciu wędrowców mniej, a stada już pasą się spokojniej. Ogrody mają swoje własne godziny, ale dziś w nocy zachowują je w spokoju.',
+  'entities.quests.q_nb_striders_in_the_dark.objectives.0.label': 'Pokonany Wędrowiec Mroku',
+  'entities.quests.q_nb_striders_in_the_dark.text':
+    'Wędrowce mroku zawsze były cierpliwymi łowcami, {playerName}, ale ostatnio wślizgują się prosto w grządki kwiatów i porywają jagnięta z księżycowego runa pod naszymi latarniami. Wybij dziesięć z nich i oddaj wzgórzom ich spokój.',
+  'entities.quests.q_nb_striders_in_the_dark.title': 'Wędrowce w Ciemności',
+  'entities.quests.q_nb_the_barrow_king.completion':
+    'Gwiazdy uspokoiły się po raz pierwszy od sezonu, {playerName}. Kopce są zamknięte, nocnorodni znieruchomieli przy swoich kamieniach, a król znów śpi pod ziemią. Noś ten płaszcz: Moonrest skroiło go dla kogoś, komu noc w końcu zaufała.',
+  'entities.quests.q_nb_the_barrow_king.objectives.0.label': 'Uspokojony Król Kurhanu',
+  'entities.quests.q_nb_the_barrow_king.text':
+    'Każdy namiar, każda niespokojna gwiazda, każdy otwarty kopiec wskazuje na jedno: Król Kurhanu budzi się pod wielkim kopcem, a ta kraina nie ma świtu, by go powstrzymać. Musi zostać uśpiony, zanim przypomni sobie o swojej koronie, {playerName}. Nie idź sam: weź przyjaciela i miej kwietny blask za plecami.',
+  'entities.quests.q_nb_the_barrow_king.title': 'Król Kurhanu się Budzi',
+  'entities.quests.q_nb_wool_by_moonlight.completion':
+    'Srebrne jak światło gwiazd i dwa razy bardziej miękkie. Proszę, {playerName}: rękawice z ostatniej partii, podszyte tak, jak tylko księżycowe runo potrafi podszyć.',
+  'entities.quests.q_nb_wool_by_moonlight.objectives.0.label': 'Kłak Księżycowego Runa',
+  'entities.quests.q_nb_wool_by_moonlight.text':
+    'Nic nie grzeje jak księżycowe runo, {playerName}, i nic nie przędzie się tak dobrze. Wypasacze noszą swoją srebrną wełnę luźno w kłakach, gdy dryfują po wzgórzach. Przynieś mi sześć dobrych kłaków ze stad, a utkam ci coś wartego tej wędrówki.',
+  'entities.quests.q_nb_wool_by_moonlight.title': 'Wełna w Blasku Księżyca',
+  'entities.quests.q_pr_boars_in_the_gardens.completion':
+    'Suszarnie stoją, a ogrody można obsadzić na nowo. Dziki nie wybrały same z siebie, by wyjść na piasek, {playerName}. Zapamiętaj to: coś je poruszyło.',
+  'entities.quests.q_pr_boars_in_the_gardens.objectives.0.label': 'Przepędzony Dzik Gąszczu',
+  'entities.quests.q_pr_boars_in_the_gardens.text':
+    'Cokolwiek porusza się w głębokiej zieleni, wypycha dziki gąszczu na naszą plażę. Przekopały tarasy ogrodowe już dwa razy w tym tygodniu, a następne będą suszarnie. Dziesięć dzików, {playerName}, i odepchnij resztę z powrotem pod drzewa.',
+  'entities.quests.q_pr_boars_in_the_gardens.title': 'Dziki w Ogrodach',
+  'entities.quests.q_pr_canopy_silk.completion':
+    'Dobry, mocny jedwab. Moje dzwoneczki będą śpiewać jeszcze przez chwilę, i nic nie chodzi po tych ścieżkach w nocy bez mojej wiedzy, {playerName}. Ostatnio coś chodzi tu często.',
+  'entities.quests.q_pr_canopy_silk.objectives.0.label': 'Motek Jedwabiu z Korony Drzew',
+  'entities.quests.q_pr_canopy_silk.text':
+    'Spójrz w górę, {playerName}. Każda korona drzew stąd aż do idola jest opleciona jak sieć rybacka, a tkacze stają się śmielsi z każdym sezonem. Rozciągam ich własny jedwab przez ścieżki, dzwoneczki na linkach, by dżungla nie mogła się do mnie zakraść. Sześć dobrych motków od tkaczy korony odnowi moje linie.',
+  'entities.quests.q_pr_canopy_silk.title': 'Jedwab z Korony Drzew',
+  'entities.quests.q_pr_down_to_drifthaven.completion':
+    'Pell cię przysłała? Więc przeszedłeś całą drogę przez Ujście Gęstwiny sam, i to dla mnie wystarczająca rekomendacja. Witaj w Drifthaven, {playerName}. Chwyć linę, brakuje nam rąk do pracy.',
+  'entities.quests.q_pr_down_to_drifthaven.objectives.0.label':
+    'Zgłoś się do Szefowej Odzysku Ryny',
+  'entities.quests.q_pr_down_to_drifthaven.text':
+    'Poza czarnymi drzewami i w słońce, {playerName}. Podążaj drogą wybrzeża na północ, a dotrzesz do Drifthaven, zanim odwróci się przypływ. Zapytaj o Szefową Odzysku Rynę, ma pracę dla każdej pary rąk od czasu burzy, i powiedz jej, że droga przez Ujście Gęstwiny wciąż jest otwarta.',
+  'entities.quests.q_pr_down_to_drifthaven.title': 'W Dół do Drifthaven',
+  'entities.quests.q_pr_idol_guardian.completion':
+    'Powaliłeś coś, czego sama dżungla nie chciała dotknąć. Spójrz tam, za idolem: Strażnik nigdy nie strzegł kolumn, {playerName}, strzegł schodów pod nimi. Bębny ucichły dziś w nocy. Cokolwiek śpi pod Kotliną Dzikiego Serca, teraz zna twoje imię.',
+  'entities.quests.q_pr_idol_guardian.objectives.0.label': 'Pokonany Strażnik Idola',
+  'entities.quests.q_pr_idol_guardian.text':
+    'Idol jest starszy niż wyspa, {playerName}. Starszy niż bębny, starszy niż nazwa Palmowe Wybrzeże. Jego Strażnik stał w tym zatopionym kręgu, zanim wyrosły palmy, a teraz budzi się i chodzi między kolumnami nocą. Cokolwiek karmią te ofiary, Strażnik jest jego strażą bramną. Weź przyjaciela i pokonaj go.',
+  'entities.quests.q_pr_idol_guardian.title': 'Strażnik Idola',
+  'entities.quests.q_pr_scuttler_cull.completion':
+    'Dziesięć szczypiec mniej w przybrzeżnych falach. Moje załogi już brną z powrotem, i żadna z nich nie podziękowała, więc ja to zrobię: dziękuję, {playerName}.',
+  'entities.quests.q_pr_scuttler_cull.objectives.0.label': 'Rozłupany Czołgacz Przypływu',
+  'entities.quests.q_pr_scuttler_cull.text':
+    'Każdy wrak na tym wybrzeżu przyciąga czołgacze przypływu, a Pearlwake przyciągnęła połowę rafy. Moje załogi odzysku nie będą pracować przy linii, mając te szczypce na mieliznach. Rozłup dziesięć z nich, {playerName}, a linia wraków znów będzie nasza.',
+  'entities.quests.q_pr_scuttler_cull.title': 'Skorupiaste Złodzieje',
+  'entities.quests.q_pr_the_lost_navigator.completion':
+    'Suli jest przy ognisku, wciąż przysięgając, że mogłaby to przepłynąć. Przyprowadziłeś z powrotem jedyną czytelniczkę map na tym wybrzeżu, {playerName}. To z jej morskiej skrzyni, za jej błogosławieństwem.',
+  'entities.quests.q_pr_the_lost_navigator.objectives.0.label':
+    'Nawigatorka Suli bezpiecznie odprowadzona do Drifthaven',
+  'entities.quests.q_pr_the_lost_navigator.text':
+    'Wyciągnęliśmy każdą rękę z Pearlwake oprócz jednej: Nawigatorki Suli, która popłynęła w stronę dalekiej plaży i nigdy nie doszła. Nurek dostrzegł ją zaszytą w wraku dziobu za Palmową Plażą, żywą, ale zbyt wyczerpaną, by samotnie przejść przez to piekło. Odprowadź ją do domu drogą wzdłuż brzegu, {playerName}. Krabom się to nie spodoba, a dżungli jeszcze mniej.',
+  'entities.quests.q_pr_the_lost_navigator.title': 'Zaginiona Nawigatorka',
+  'entities.quests.q_pr_the_man_who_went_in.completion':
+    'Isha cię przysłała? Perłowa Matka nie wymawiała mojego imienia od lat. Usiądź poza zasięgiem pnączy, {playerName}, a powiem ci, co wiem: bębny nie są zagrożeniem. Są ostrzeżeniem.',
+  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label':
+    'Znajdź Okku przy Wodospadzie Pnączy',
+  'entities.quests.q_pr_the_man_who_went_in.text':
+    'Nurkowie nie przekroczą linii drzew, {playerName}, i nie będę ich o to prosił. Na pewno słyszałeś już bębny: każdy je słyszy, do drugiej nocy. Jeden człowiek na tej wyspie kiedykolwiek szedł w stronę tego dźwięku i wrócił. Okku. Obozuje pod wielkimi banianami przy Wodospadzie Pnączy, głęboko w górę drogi przez Gęstwinę. Znajdź go i zapytaj, co ukrywa zieleń.',
+  'entities.quests.q_pr_the_man_who_went_in.title': 'Człowiek, Który Wszedł',
+  'entities.quests.q_pr_what_the_drums_guard.completion':
+    'Mech, perłowa skorupa i krew dzika, ubite palcami. Coś w tej ruinie wciąż podtrzymuje swoje rytuały, {playerName}, a Strażnik trzyma z dala wszystko inne. Czas, byśmy mówili o tym otwarcie.',
+  'entities.quests.q_pr_what_the_drums_guard.objectives.0.label': 'Powalony Tkacz Korony Drzew',
+  'entities.quests.q_pr_what_the_drums_guard.objectives.1.label':
+    'Zebrana Napełniona na Nowo Misa Ofiarna',
+  'entities.quests.q_pr_what_the_drums_guard.text':
+    'Podszedłem tak blisko Zatopionego Idola, jak tylko żywy człowiek się odważy, i zobaczyłem dwie rzeczy: tkacze zasłonili drogę do idola pajęczyną, a stare misy ofiarne wzdłuż niej zostały ponownie napełnione. Świeżo, {playerName}. Zetnij osiem tkaczy z drogi i przynieś mi trzy z tych ofiar. Chciałbym wiedzieć, czyja ręka wciąż karmi martwego boga.',
+  'entities.quests.q_pr_what_the_drums_guard.title': 'Czego Strzegą Bębny',
+  'entities.quests.q_pr_wreck_line_cargo.completion':
+    'Poplamione solą, ale nienaruszone, wszystkie trzy. Nurkowie jedzą w tym miesiącu dzięki tobie, {playerName}.',
+  'entities.quests.q_pr_wreck_line_cargo.objectives.0.label':
+    'Odzyskana Skrzynia Ładunkowa Pearlwake',
+  'entities.quests.q_pr_wreck_line_cargo.text':
+    'Burza sprzed trzech nocy wpędziła Pearlwake na rafę, a jej ładunek jest rozrzucony na całej długości linii wraków między tu a Palmową Plażą. Trzy skrzynie towarów handlowych wciąż leżą w przybrzeżnych falach, {playerName}. Przynieś je, zanim przypływ albo kraby zagarną to, co zostało.',
+  'entities.quests.q_pr_wreck_line_cargo.title': 'Linia Wraków',
+  'entities.quests.q_seal_restored.completion':
+    'Poczułem, jak się zamyka stąd, delikatnie jak zmierzch. Kotlina pamięta swoich przyjaciół, {playerName}. Bez względu na to, jak daleko podróżujesz, zawsze będzie dla ciebie światło pod wielkim drzewem.',
+  'entities.quests.q_seal_restored.objectives.0.label': 'Pieczęć umieszczona z powrotem w kamieniu',
+  'entities.quests.q_seal_restored.text':
+    'Zanieś pieczęć Strażnika do kamienia pieczęci w sercu dziedzińca i ustaw ją z powrotem tam, skąd została strącona. Wtedy Kotlina będzie mogła zacząć się goić, a ty, {playerName}, dokonasz tego, czego nikt z twojego rodu nie dokonał wcześniej.',
+  'entities.quests.q_seal_restored.title': 'Przywrócona Pieczęć',
+  'entities.quests.q_shards_of_starfall.completion':
+    'Spójrz na te prążkowania! Jesień. Kotlina została zapieczętowana jesienią. Dwieście lat sporów rozstrzygniętych przez sześć małych kamyków.',
+  'entities.quests.q_shards_of_starfall.objectives.0.label': 'Odłamek Gwiezdnego Spadku',
+  'entities.quests.q_shards_of_starfall.text':
+    'Gdy wispy zmierzchu przechodzą nad kryształowymi polami, drzazgi starego światła gwiazd przywierają do nich jak rzepy. Sześć odłamków, {playerName}, a będę mógł datować zapieczętowanie na dokładny sezon, w którym zostało zaśpiewane.',
+  'entities.quests.q_shards_of_starfall.title': 'Odłamki Gwiezdnego Spadku',
+  'entities.quests.q_spore_hearts.completion':
+    'Proszę. Oczyszczone i ciche. Każde z nich nosi ten sam znak: cień płynie Z Zatopionego Dziedzińca. Powiedz Saelwyn.',
+  'entities.quests.q_spore_hearts.objectives.0.label': 'Serce Zarodnika',
+  'entities.quests.q_spore_hearts.text':
+    'Gdy zarodnik ulega ciemności, jego serce wciąż bije pożyczonym cieniem. Cztery z tych serc, oczyszczone w świątyni, mogą nauczyć nas, jak rozprzestrzenia się skażenie. To ponura praca, {playerName}, ale to praca naprawcza.',
+  'entities.quests.q_spore_hearts.title': 'Serca Kręgu',
+  'entities.quests.q_spore_tide.completion':
+    'Kręgi na północy znów śpiewają dziś w nocy. Cicho, ale śpiewają.',
+  'entities.quests.q_spore_tide.objectives.0.label': 'Uspokojony Skażony Zarodnik',
+  'entities.quests.q_spore_tide.text':
+    'Balsam broni Gaju, ale skażenie naciska mocniej na Głębię z każdym zmierzchem. Dwanaścioro więcej skażonych musi zostać uspokojonych, zanim zbieracze będą mogli odzyskać swoje północne kręgi, {playerName}.',
+  'entities.quests.q_spore_tide.title': 'Przeciw Fali Zarodników',
+  'entities.quests.q_sunken_court.completion':
+    'Osiem strażników, uciszonych. Pamiętam, kiedy zostali wzniesieni, {playerName}. Nie wyglądaj na tak zaskoczonego; Kotlina długo trzyma swoich stróżów.',
+  'entities.quests.q_sunken_court.objectives.0.label': 'Uciszony Prastary Strażnik',
+  'entities.quests.q_sunken_court.text':
+    'Bryn dobrze odczytała serca: rozdarcie przebiega przez stary dziedziniec na wschodzie, a jego strażnicy obudzili się źle. Zostali zbudowani, by chronić pieczęć; teraz zmiażdżą każdego, kto się do niej zbliży. Oczyść osiem z nich z ruin.',
+  'entities.quests.q_sunken_court.title': 'Zatopiony Dziedziniec',
+  'entities.quests.q_treant_accord.completion':
+    'Grube i solidne, wszystkie cztery. Balsam będzie warzył się tydzień, a jego działanie potrwa sto lat. Drzewa mierzą życzliwość inaczej.',
+  'entities.quests.q_treant_accord.objectives.0.label': 'Kora Starszego',
+  'entities.quests.q_treant_accord.text':
+    'Starsi Gaju zrzucają swoją zewnętrzną korę, gdy skażenie gryzie ich korzenie. Cztery kawałki tego, a będę mógł uwarzyć balsam dla całego Gaju. Nie podziękują ci, gdy będziesz go odrywać, {playerName}, ale przetrwają dzięki temu o wiek dłużej.',
+  'entities.quests.q_treant_accord.title': 'Porozumienie z Drzewcami',
+  'entities.quests.q_veil_thinned.completion':
+    'Zimne, każde z nich. Kotlina ma może sezon, zanim rozdarcie stanie się szczeliną. Mamy pracę do wykonania, ty i ja.',
+  'entities.quests.q_veil_thinned.objectives.0.label': 'Esencja Wispa Zmierzchu',
+  'entities.quests.q_veil_thinned.text':
+    'Więc jaskinia otworzyła się dla ciebie. W takim razie pieczęć jest słabsza, niż się obawiałem, {playerName}. Tam, gdzie zasłona się rozdziera, wispy stają się ciemne i zimne. Przynieś mi osiem esencji od wispów zmierzchu, a odczytam, jak głęboko sięga rana.',
+  'entities.quests.q_veil_thinned.title': 'Ścieńczała Zasłona',
+  'entities.quests.q_waking_warden.completion':
+    'Dzwon jego głosu jest cichy. Poczułem to stąd, jak ciężar zdjęty z całej doliny.',
+  'entities.quests.q_waking_warden.objectives.0.label': 'Pokonany Budzący się Strażnik',
+  'entities.quests.q_waking_warden.text':
+    'Dziedziniec jest cichy, ale jego pan nie jest. Strażnik, który trzyma pieczęć, obudził się wypaczony, i póki stoi, pieczęć nie może zostać naprawiona. Nie padnie łatwo; weź przyjaciela, jeśli możesz go znaleźć, {playerName}. Weź dwóch, jeśli możesz znaleźć dwóch.',
+  'entities.quests.q_waking_warden.title': 'Budzący się Strażnik',
+  'entities.quests.q_wardens_echoes.completion':
+    'Echo słabnie za każdym razem. Wkrótce dziedziniec będzie zawierał jedynie wiatr i bluszcz, tak jak przystoi ruinie.',
+  'entities.quests.q_wardens_echoes.objectives.0.label': 'Uciszony Prastary Strażnik',
+  'entities.quests.q_wardens_echoes.text':
+    'Nawet gdy ich pan został uciszony, strażnicy dziedzińca powtarzają jego ostatni rozkaz jak echo, które nie chce ucichnąć. Dopóki pieczęć nie zostanie umieszczona z powrotem, będą się wciąż budzić, {playerName}. Uciszy jeszcze dziesięciu z nich, by murarze mogli dotrzeć do kamienia pieczęci.',
+  'entities.quests.q_wardens_echoes.title': 'Echa Strażnika',
+  'entities.quests.q_wisp_lights.completion':
+    'Miękkie jak pierwsze gwiazdy. Postaw je tutaj przy ołtarzu; świątynia zrobi resztę.',
+  'entities.quests.q_wisp_lights.objectives.0.label': 'Drobina Wispa',
+  'entities.quests.q_wisp_lights.text':
+    'Migoczące wispy niosą drobiny starego światła gwiazd, które spadło tutaj, gdy Kotlina została zapieczętowana. Sześć drobin, a lampy świątyni będą płonąć przez rok. Bierz tylko od tych, które gasną; Kotlina daje dość bez chciwości.',
+  'entities.quests.q_wisp_lights.title': 'Światła Mielizn',
+  'entities.quests.q_wf_across_the_fenway.completion':
+    'Pell utrzymuje ten ogień płonący przez każdą mgłę, jaką mokradło może na nią tchnąć. Jeśli mówi, że Stopnie są otwarte, to są otwarte. Witaj w Bridgemere, {playerName}. Uważaj na krok na moich deskach, a dogadamy się świetnie.',
+  'entities.quests.q_wf_across_the_fenway.objectives.0.label': 'Zgłoś się do Mostownika Aldena',
+  'entities.quests.q_wf_across_the_fenway.text':
+    'Łagodna kraina, te Wierzbowe Mokradła, ale łagodność to nie to samo, co bezpieczeństwo, {playerName}. Podążaj drogą na północ do grobli Fenway i przejdź do Bridgemere. Powiedz Mostownikowi Aldenowi, że Stopnie są otwarte, a ognisko obozu przydrożnego płonie.',
+  'entities.quests.q_wf_across_the_fenway.title': 'Przez Fenway',
+  'entities.quests.q_wf_croakers_hush.completion':
+    'Słuchaj, {playerName}. Nic. Pierwsza prawdziwa cisza nad tym mokradłem od trzydziestu lat, i połowa miasta nie zaśnie dziś w nocy z powodu tej dziwności. Wierzby dziękują na swój sposób. Noś to, utkane z jego własnego łoża lilii, a mokradło rozpozna cię jako przyjaciela, gdziekolwiek sięga woda.',
+  'entities.quests.q_wf_croakers_hush.objectives.0.label': 'Pokonany Senny Rechotacz',
+  'entities.quests.q_wf_croakers_hush.text':
+    'Teraz znasz imię chrapiącego, {playerName}: Senny Rechotacz, stary król-ropucha na Sennych Rozlewiskach. Każdego roku jego rechot staje się cięższy, i każdego roku więcej mokradła zapomina się obudzić. Amulety utrzymają twoje oczy otwarte, ale jego masa to inna sprawa: weź przyjaciela i nie walcz z nim w wodzie. Uśpij starego króla cichszym snem.',
+  'entities.quests.q_wf_croakers_hush.title': 'Cisza Rechotacza',
+  'entities.quests.q_wf_eels_for_the_smokehouse.completion':
+    'Sześć dobrych węgorzy, ledwie posiniaczonych. Wędzarnia będzie pachnieć pieniędzmi do rana. Proszę, te buty do brodzenia były moje, gdy byłem szybszy: skóra węgorza odpycha wilgoć jak nic innego.',
+  'entities.quests.q_wf_eels_for_the_smokehouse.objectives.0.label': 'Tłusty Węgorz Mokradłowy',
+  'entities.quests.q_wf_eels_for_the_smokehouse.text':
+    'Bagienne ropuchy nie tylko jedzą moje liny, {playerName}, jedzą też mój połów: połykają węgorze w całości, prosto z pułapek. Uwolnij sześć tłustych spod tych żarłocznych stworzeń, zanim mięso się zepsuje, a ognie wędzarni pozostaną zapalone.',
+  'entities.quests.q_wf_eels_for_the_smokehouse.title': 'Węgorze dla Wędzarni',
+  'entities.quests.q_wf_mind_the_moorings.completion':
+    'Spójrz na to: czyste ugryzienia, każde z nich, ale zostało dość liny, by ją zszyć. Zaoszczędziłeś mi miesiąc grosza, a sieciarzom miesiąc narzekania, {playerName}.',
+  'entities.quests.q_wf_mind_the_moorings.objectives.0.label':
+    'Odzyskana Przecięta Lina Cumownicza',
+  'entities.quests.q_wf_mind_the_moorings.text':
+    'Dobra lina jest tu droga, {playerName}: każda przegryziona przez ropuchy to tydzień węgorzowych pieniędzy stracony. Przecięte końce wciąż leżą wzdłuż brzegu fosy, gdzie łodzie je zgubiły. Idź kładkami i przynieś mi z powrotem cztery liny, a zszyję je na nowo, dobre jak nowe.',
+  'entities.quests.q_wf_mind_the_moorings.title': 'Uważaj na Cumy',
+  'entities.quests.q_wf_rope_chewers.completion':
+    'Dziesięć zestawów zębów mniej w mojej fosie. Łódki wytrzymały na cumach całą noc po raz pierwszy od miesiąca, {playerName}. Masz podziękowania od każdego sieciarza w mieście.',
+  'entities.quests.q_wf_rope_chewers.objectives.0.label': 'Pokonana Bagienna Ropucha',
+  'entities.quests.q_wf_rope_chewers.text':
+    'Bagienne ropuchy, {playerName}. Wychodzą z fosy nocą i przegryzają moje liny cumownicze, jakby to były łodygi trzciny. Trzy łódki odpłynęły w zeszłym tygodniu, a jedna z nich miała na pokładzie moją dobrą wciągarkę. Przerzedź je, dziesięć tych tłustych stworzeń, a łodzie zostaną tam, gdzie je przywiążemy.',
+  'entities.quests.q_wf_rope_chewers.title': 'Gryzące Liny',
+  'entities.quests.q_wf_toll_and_tangle.completion':
+    'Trzy skrzynie, a moneta wciąż sucha w środku. Chochliki będą dąsać się w wikliniach przez tydzień, {playerName}, a miasto zawdzięcza ci swój zimowy chleb.',
+  'entities.quests.q_wf_toll_and_tangle.objectives.0.label': 'Przepędzony Chochlik Wierzby',
+  'entities.quests.q_wf_toll_and_tangle.objectives.1.label': 'Odzyskana Skrzynia Mytnicza',
+  'entities.quests.q_wf_toll_and_tangle.text':
+    'Chochliki wierzby uważają, że odcięcie promu to świetna zabawa, {playerName}, a w zeszłym tygodniu łódka z mytem przewróciła się na wschodnim szlaku z całosezonowym mytem mostowym na pokładzie. Skrzynie zatonęły na mieliznach, a chochliki tańczą na kładkach, jakby były ich własne. Przepędź osiem i wyciągnij trzy skrzynie mytnicze, a Bridgemere będzie miało co jeść tej zimy.',
+  'entities.quests.q_wf_toll_and_tangle.title': 'Myto i Zamęt',
+  'entities.quests.q_wf_wisplight_charms.completion':
+    'Sześć kul, wciąż ciepłych od śnienia. Daj mi czas do wschodu księżyca, a utkam amulety dla ciebie i dla każdego, kto będzie na tyle odważny, by stanąć przy tobie.',
+  'entities.quests.q_wf_wisplight_charms.objectives.0.label': 'Kula Światła Wispów',
+  'entities.quests.q_wf_wisplight_charms.text':
+    'Wispy nad sadzawkami to mokradło śniące na głos, {playerName}, a ich światło to jedyna rzecz, która opiera się kołysance Rechotacza. Wplatam je w wierzbowe amulety: jeden na szyi, a chrapanie nie ściągnie ci powiek w dół. Przynieś mi sześć kul światła wispów. Wispy nie będą o nie walczyć, co czyni to albo dobrocią, albo kradzieżą, zależnie od tego, jak to poniesiesz.',
+  'entities.quests.q_wf_wisplight_charms.title': 'Amulety Światła Wispów',
+  'entities.quests.q_wf_witch_of_willowweep.completion':
+    'Alden przysłał cię całą tę drogę, by zapytać o chrapanie? Więc ludzie z mostu w końcu słuchają. Usiądź z dala od wilgoci, {playerName}. Ten dźwięk ma imię i gardło, i czekałam na kogoś na tyle głupiego, by pomóc mi go uciszyć.',
+  'entities.quests.q_wf_witch_of_willowweep.objectives.0.label': 'Znajdź Matkę Sedge',
+  'entities.quests.q_wf_witch_of_willowweep.text':
+    'Na pewno już to słyszałeś, {playerName}: chrapanie. Wolne i ciężkie, za Sennymi Rozlewiskami, jakby samo mokradło przewracało się we śnie. Ropuchy, chochliki, wispy płonące w południe: wszystko zaczęło się, gdy zaczął się ten dźwięk. Jedna dusza może wiedzieć, co to jest. Matka Sedge trzyma obóz w Willowweep, na zachód wokół fosy i w dół dalekiego brzegu. Znajdź ją i zapytaj, co śpi pośrodku mojego mokradła.',
+  'entities.quests.q_wf_witch_of_willowweep.title': 'Wiedźma z Willowweep',
+  'entities.quests.q_ww_bells_of_gallowmere.completion':
+    'Cobb wysłał cię drogą w górę całego, tak? Dobry człowiek. Utrzymuje te latarnie bramowe zapalone od trzydziestu lat, a las nigdy go nie ominął. Witaj w Gallowmere, {playerName}. Uważaj na dzwony.',
+  'entities.quests.q_ww_bells_of_gallowmere.objectives.0.label': 'Zgłoś się do Grabarza Marrow',
+  'entities.quests.q_ww_bells_of_gallowmere.text':
+    'Słyszysz to bicie dzwonów, {playerName}? To Gallowmere, w górę północnej drogi, wydzwania swoich zmarłych do snu. Grabarz Marrow prowadzi rejestr każdej duszy pod baldachimem drzew, żywej i pochowanej. Idź i zostań policzony, zanim las policzy cię sam.',
+  'entities.quests.q_ww_bells_of_gallowmere.title': 'Dzwony Gallowmere',
+  'entities.quests.q_ww_candles_at_the_bounds.completion':
+    'Wszystkie cztery płoną? To odetchnij, {playerName}. Ty tego nie słyszałeś, ale cała wioska tak: dzwony zabrzmiały lżej w chwili, gdy zapłonął ostatni knot.',
+  'entities.quests.q_ww_candles_at_the_bounds.objectives.0.label':
+    'Ponownie zapalona Nagrobna Świeca',
+  'entities.quests.q_ww_candles_at_the_bounds.text':
+    'Cztery kamienie graniczne otaczają Gallowmere, {playerName}, jeden na każdej drodze wyjściowej, a na każdym kamieniu płonie nagrobna świeca. Póki płoną, pochowani pozostają pochowani. Mżawka je zgasiła, wszystkie cztery, a ja jestem zbyt stary, by chodzić po granicach samemu. Weź moją świecę i zapal je na nowo, szybko.',
+  'entities.quests.q_ww_candles_at_the_bounds.title': 'Świece na Granicach',
+  'entities.quests.q_ww_horn_of_the_huntsman.completion':
+    'Róg urwał się w połowie nuty. Każdy dzwon w Gallowmere zabrzmiał raz, sam z siebie, a potem las ucichł bardziej, niż słyszałam od trzydziestu lat. Dokonałeś obrzędu, którego ja nie mogłam, {playerName}. Noś to i chodź pod baldachimem bez strachu.',
+  'entities.quests.q_ww_horn_of_the_huntsman.objectives.0.label': 'Strącony z konia Blady Łowca',
+  'entities.quests.q_ww_horn_of_the_huntsman.text':
+    'Na pewno już słyszałeś róg, {playerName}, cienki i daleki, dźwięk, na który cały las wstrzymuje oddech. Blady Łowca jeździ po swojej polanie na północ stąd, a każdy grób, który mija, staje się płytszy. Kiedyś był człowiekiem, i został pochowany źle, a ja przestałam udawać, że modlitwa to naprawi. Weź przyjaciela, weź dwóch, i strąć go z konia.',
+  'entities.quests.q_ww_horn_of_the_huntsman.title': 'Róg Łowczego',
+  'entities.quests.q_ww_silk_in_the_eaves.completion':
+    'Dziesięć prządek mniej pod okapem. Latarnicy będą dziś w nocy chodzić na obchód, nie patrząc w górę, a to tutaj jest warte więcej, niż myślisz.',
+  'entities.quests.q_ww_silk_in_the_eaves.objectives.0.label': 'Pokonana Prządka Wdowiego Jedwabiu',
+  'entities.quests.q_ww_silk_in_the_eaves.text':
+    'Spójrz w górę, gdy idziesz zachodnią drogą, {playerName}, a zobaczysz je: owinięte kształty w koronie drzew, kołyszące się tam, gdzie nie dociera żaden wiatr. Prządki wdowiego jedwabiu wypełzły z Gąszczu i rozciągnęły swoje spiżarnie nad moimi latarniami. Zabij dziesięć, a droga znów będzie drogą.',
+  'entities.quests.q_ww_silk_in_the_eaves.title': 'Jedwab pod Okapem',
+  'entities.quests.q_ww_the_last_vicar.completion':
+    'Marrow martwi się o mnie? To coś nowego. Powiedz mu, że Kamień Żałoby stoi, w pewnym sensie, i ja też. Zostań na chwilę, {playerName}. Jeziorko szepcze, a wolałbym nie słuchać sam.',
+  'entities.quests.q_ww_the_last_vicar.objectives.0.label': 'Znajdź Wikarego Creela',
+  'entities.quests.q_ww_the_last_vicar.text':
+    'Na południe stąd Kaplica Kamienia Żałoby niszczeje przy swoim czarnym jeziorku, a jeden człowiek wciąż jej doglada: Wikary Creel, który nie odszedł, gdy zawalił się dach. Zna stare rytuały lepiej niż moje dzwony, {playerName}, i nie przesłał wieści od miesiąca. Idź drogą do kaplicy i sprawdź, czy wciąż oddycha.',
+  'entities.quests.q_ww_the_last_vicar.title': 'Ostatni Wikary',
+  'entities.quests.q_ww_walking_mosley_home.completion':
+    'Przeszedł przez bramę na własnych nogach, przysięgając, że od teraz nie wykopie niczego głębszego niż grządka rzepy. Wróci na cmentarz do niedzieli, zawsze wracają. Dziękuję, {playerName}. Gallowmere zatrzymuje swoich ludzi, to całe nasze prawo.',
+  'entities.quests.q_ww_walking_mosley_home.objectives.0.label':
+    'Grabarz Mosley bezpiecznie odprowadzony do Gallowmere',
+  'entities.quests.q_ww_walking_mosley_home.text':
+    'Mój grabarz Mosley wyruszył drogą do kaplicy trzy dni temu, by otworzyć grób na starym cmentarzu, i wykop zawalił się na niego. Wygrzebał się na zewnątrz, głupiec żyje, ale kuli się przy grobach kaplicy i nie ruszy się z powodu prządek na drodze. Odprowadź go do domu, {playerName}. Nie mogę bić w dzwony dla żywego człowieka.',
+  'entities.quests.q_ww_walking_mosley_home.title': 'Odprowadzenie Mosleya do Domu',
+  'entities.quests.q_ww_what_the_bark_holds.completion':
+    'Trzy dusze z powrotem pod uczciwą ziemią przed zapadnięciem nocy. Wleczyste odrosną, kora zawsze odrasta, ale dziś w nocy polana wisi pusta, a to wystarczy.',
+  'entities.quests.q_ww_what_the_bark_holds.objectives.0.label': 'Powalony Grobowy Wleczysty',
+  'entities.quests.q_ww_what_the_bark_holds.objectives.1.label':
+    'Zdjęte Szczątki Owinięte Jedwabiem',
+  'entities.quests.q_ww_what_the_bark_holds.text':
+    'Na Polanie Wisielców na wschód od Gallowmere prządki wieszają swoich owiniętych jedwabiem zmarłych na konarach, a grobowe wleczyste stoją na straży pod spodem jak cierpliwi żałobnicy niosący trumnę. To nasi ludzie tam w górze, {playerName}. Powal pięć wleczystych, zetnij trzech owiniętych zmarłych i przynieś ich do domu, do ziemi.',
+  'entities.quests.q_ww_what_the_bark_holds.title': 'Co Kryje Kora',
+  'entities.quests.q_ww_widows_skeins.completion':
+    'Sześć motków, miękkich jak wstrzymany oddech. Zmarli będą leżeć w tym spokojniej. Weź te owijacze, uszyłam je z ostatniej partii, i las nigdy ich nie przegryzł.',
+  'entities.quests.q_ww_widows_skeins.objectives.0.label': 'Motek Wdowiego Jedwabiu',
+  'entities.quests.q_ww_widows_skeins.text':
+    'Prządki zabierają naszych zmarłych do swoich spiżarni, {playerName}, więc ja zabieram ich jedwab na nasze całuny. Pali się czysto i trzyma błogosławieństwo lepiej, niż kiedykolwiek robiło to płótno. Przynieś mi sześć motków wdowiego jedwabiu, a następna dusza, którą pochowamy, odejdzie owinięta i chroniona.',
+  'entities.quests.q_ww_widows_skeins.title': 'Motki Wdowy',
+  'entities.quests.q_ww_wraiths_of_the_tarn.completion':
+    'Ośmiu strażników w końcu spoczęło. Nie nazwę tego miłosierdziem w biały dzień, ale między nami, {playerName}, tym było.',
+  'entities.quests.q_ww_wraiths_of_the_tarn.objectives.0.label': 'Pokonana Zjawa Lasu',
+  'entities.quests.q_ww_wraiths_of_the_tarn.text':
+    'Zjawy lasu były kiedyś strażnikami kaplicy, {playerName}, wyrosłymi z drzew posadzonych nad uczczonymi zmarłymi. Odkąd jeziorko poczerniało, zapomniały o swoim urzędzie, a teraz dryfują przez mój cmentarz, szarpiąc ziemię. Rozbij osiem z nich, zanim dokończą to, co zaczęły.',
+  'entities.quests.q_ww_wraiths_of_the_tarn.title': 'Zjawy Jeziorka',
   'hudChrome.auth.appleChoiceExpired':
     'To logowanie przez Apple wygasło. Zaloguj się ponownie przez Apple.',
   'hudChrome.auth.appleChoiceIntro': 'Utwórz nowe konto albo połącz Apple z istniejącym kontem.',
@@ -8091,7 +9784,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Zwierzę: Atak',
   'hudChrome.keybinds.petDefensive': 'Zwierzę: Obronne',
   'hudChrome.keybinds.petStop': 'Zwierzę: Zatrzymaj',
+  'hudChrome.keybinds.targetPet': 'Zwierzę: Obierz',
   'hudChrome.keybinds.petTaunt': 'Zwierzę: Prowokacja',
+  'hudChrome.keybinds.mount': 'Dosiądź / Zsiądź',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Wyślij o jedną sztukę {item} mniej',
   'hudChrome.mailbox.parcelQtyIncreaseAria': 'Wyślij o jedną sztukę {item} więcej',
   'hudChrome.mailbox.parcelQtyAria': 'Liczba {item} do wysłania',
@@ -8257,6 +9952,76 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.worldBossBody':
     'Wysoko na Ciernistym Szczycie burza nad Stormcrag czasem przybiera kształt. Thunzharr, Budzący się Szczyt powstaje tam w stałym rytmie, żywiołak o sile rajdowej zwalczany w otwartym świecie przez każdego, kto odpowie na wezwanie, i staje się tym potężniejszy, im więcej wyzywających staje przeciw niemu. Każdy, kto dołączy do walki, otrzymuje własne losowanie jego zdobyczy, honorowane na zasadach blokady rajdowej, a jego upadek trwa dość długo, by polegli zdążyli wrócić po swoje. Zbierz więcej mieczy, niż sądzisz, że potrzebujesz.',
   'guide.worldPage.worldBossTitle': 'Gdy szczyt się budzi: boss świata',
+  'guide.worldPage.amberBlurb':
+    'Wieczna jesień złotych i czerwonych liści, które nigdy nie opadają, skupiona wokół oświetlonego latarniami miasteczka Lanternmere.',
+  'guide.worldPage.amberGreeter': 'Latarnik, Lanternmere',
+  'guide.worldPage.amberGreeting':
+    'Każdy liść płonie tu złotem i czerwienią, a jednak żaden nigdy nie opada. Latarnie płoną dla ciebie; uważaj na Złoty Roztop po drodze w górę.',
+  'guide.worldPage.amberPlaceNotes':
+    'Lanternmere jaśnieje w samym sercu żniw. Złoty Roztop to śliska od bursztynu przełęcz prowadząca do środka; Złocony Sad i Żniwna Kotlina kryją najsłodsze zbiory i najzuchwalszych złodziei; Wielkie Jezioro odbija płonące liście; Wzgórze Popiołowych Klonów wznosi się najwyżej i płonie najczerwieniej; a Pochylony Monolit pamięta coś starszego niż jesień.',
+  'guide.worldPage.duskBlurb':
+    'Dolina wiecznego zmierzchu pod wielkim drzewem Eldergleam, gdzie kryształowe ruiny jarzą się, a powietrze brzęczy od starej magii.',
+  'guide.worldPage.duskGreeter': 'Strażniczka Saelwyn, Eldergleam',
+  'guide.worldPage.duskGreeting':
+    'Niewielu z twojego rodu stało pod tymi konarami. Stąpaj delikatnie i bądź mile widziany.',
+  'guide.worldPage.duskPlaceNotes':
+    'Eldergleam skupia się pod wielkim drzewem. Jaskinia Zmierzchu i jej Punkt Widokowy to wejście i pierwszy widok na dolinę; Prastary Gaj i Kotlina Spadających Gwiazd strzegą cichego południa; Zatopiony Dziedziniec kryje zarośnięte ruiny na wschodzie; a Lśniąca Głębia i Krystaliczne Mielizny jarzą się na północy.',
+  'guide.worldPage.emberBlurb':
+    'Oświetlone burzami pustkowia popiołu i krwistego szkła, gdzie smoki krążą nad kalderą, a ognie trolli płoną wśród wydm, obserwowane z bramnego miasta Wyrmwatch.',
+  'guide.worldPage.emberGreeter': 'Strażnik bramy, Wyrmwatch',
+  'guide.worldPage.emberGreeting':
+    'Gorący wiatr znad pustkowi, smoki nad Kalderą Smoczej Paszczy i ognie trolli na wydmach. Napij się, zanim tam wyruszysz.',
+  'guide.worldPage.emberPlaceNotes':
+    'Wyrmwatch strzeże bramy. Wrotny Bór to ostatnia zieleń przed pustkowiem; Popiołowe Wydmy niosą popiół i coś gorszego; Wiec Trolli to miejsce, gdzie wydmowe trolle gromadzą swoje ognie; Pola Krwistego Szkła lśnią ostrymi jak brzytwa odłamkami; a Kaldera Smoczej Paszczy to dymiąca korona, nad którą krążą smoki.',
+  'guide.worldPage.fenBlurb':
+    'Jasne, brzęczące mokradło pełne lilii i wolno płynącej wody, przemierzane starymi kładkami z mostowego miasteczka Bridgemere.',
+  'guide.worldPage.fenGreeter': 'Strażnik mostu, Bridgemere',
+  'guide.worldPage.fenGreeting':
+    'Mokradło brzęczy od ważek i pszczół. Przejdź przez most, odpocznij chwilę, a za sadzawkami trzymaj się kładek.',
+  'guide.worldPage.fenPlaceNotes':
+    'Bridgemere leży okrakiem na powolnej wodzie. Bursztynowe Stopnie schodzą z krainy żniw; Liliowe Wrzosowiska i Błyszczące Bagienka lśnią od wispów i ważek; Willowweep zanurza swoje gałęzie w jeziorze; a Senne Rozlewiska są najłagodniejszym miejscem w tej krainie.',
+  'guide.worldPage.frostBlurb':
+    'Cisza śniegu i ciemnych sosen pod zorzą, gdzie sam chłód zdaje się czuwać, a Icemantle podtrzymuje swoje ognie.',
+  'guide.worldPage.frostGreeter': 'Strażniczka ogniska, Icemantle',
+  'guide.worldPage.frostGreeting':
+    'Śnieg za murem pochłania każdy dźwięk. Jeśli światła zaczną tańczyć, mów cicho i pilnuj ognia.',
+  'guide.worldPage.frostPlaceNotes':
+    'Icemantle utrzymuje ostatnie ciepłe ognisko. Linia Śniegu wyznacza miejsce, gdzie zaspy przejmują władzę; Lodowcowe Jeziorko to czarna, nieruchoma woda pod lodem; Stopnie Zorzy wznoszą się pod tańczącymi światłami; Drżące Mokradła to zamarznięte trzęsawisko, które nigdy do końca nie zasypia; a Wyjące Tarasy każdej nocy zasługują na swoją nazwę.',
+  'guide.worldPage.galeBlurb':
+    'Nadmorskie klify i wyjące wzgórza, gdzie wiatr nigdy nie odpoczywa, Stara Latarnia nigdy nie gaśnie, a Wickharbor szczelnie zamyka swoje drzwi.',
+  'guide.worldPage.galeGreeter': 'Strażnik latarni, Wickharbor',
+  'guide.worldPage.galeGreeting':
+    'Wiatr nigdy tu nie ustał, a Stara Latarnia nigdy nie zgasła. Zamknij za sobą drzwi karczmy.',
+  'guide.worldPage.galePlaceNotes':
+    'Wickharbor pochyla się pod wiatr. Wietrzny Szlak to klifowa droga prowadząca do środka; Wyjące Wzgórza toczą się bezdrzewne pod wichrem; Stara Latarnia płonie odkąd ktokolwiek pamięta; Urwisko opada stromo ku wodzie; Pola Wraków utrzymują wybrzeże w uczciwości; a Lustrzane Jeziorko to jedyna nieruchoma rzecz w całej krainie.',
+  'guide.worldPage.gardenBlurb':
+    'Ogrodowa kraina żywopłotowego labiryntu, wciąż przycinana przez ogrodnika, którego nikt nigdy nie widział, do której wchodzi się przez Hedgewick i jego dziedzińce z fontannami.',
+  'guide.worldPage.gardenGreeter': 'Strażnik bramy, Hedgewick',
+  'guide.worldPage.gardenGreeting':
+    'Ktoś wciąż przycina żywopłoty, choć od stu lat nikt nie widział ogrodnika. Uważaj na labirynt: on też uważa na ciebie.',
+  'guide.worldPage.gardenPlaceNotes':
+    'Hedgewick czeka przy Bramie Ogrodu. Aleja Parterowa kwitnie w przyciętych barwach; Zamek Brzasku musztruje swoich rycerzy za nowymi murami; Staw Płatków dryfuje różowo przez cały rok; Stary Młyn obraca własne kręgi grządek; Wielki Labirynt zmienia swoje układy dla każdego gościa, a jego łuki obserwują liściaste lisy; Północna Strażnica strzeże drogi wyjścia; Kotlina Lilii spoczywa poza tym wszystkim; a Dziedziniec Fontanny wciąż płynie czysto w sercu ogrodu.',
+  'guide.worldPage.hauntBlurb':
+    'Nawiedzony las pod olbrzymimi koronami drzew, gdzie latarnie Gallowmere są jedynym uczciwym światłem na drodze.',
+  'guide.worldPage.hauntGreeter': 'Latarnik, Gallowmere',
+  'guide.worldPage.hauntGreeting':
+    'Trzymaj się latarni, podróżniku. A jeśli las zawoła cię po imieniu z dala od drogi, nie odpowiadaj.',
+  'guide.worldPage.hauntPlaceNotes':
+    'Gallowmere kuli się we własnych latarniach. Wronia Brama to ponure wejście do lasu; Gąszcz Wdowy jest gęsto oplątany pajęczyną; Polana Wisielców i Kaplica Kamienia Żałoby kryją najstarsze żale lasu; a Polana Łowczego należy do tego, co wciąż tam poluje.',
+  'guide.worldPage.jungleBlurb':
+    'Tropikalna gęstwina palm, białego piasku i głośnych ptaków, gdzie nadmorskie miasteczko Drifthaven utrzymuje ognisko na plaży.',
+  'guide.worldPage.jungleGreeter': 'Kapitanka portu, Drifthaven',
+  'guide.worldPage.jungleGreeting':
+    'Ciepły piasek, głośne ptaki i dżungla, która pochłania horyzont. Utrzymujemy ognisko na plaży; spróbuj do niego wrócić.',
+  'guide.worldPage.junglePlaceNotes':
+    'Drifthaven utrzymuje swoje ognisko na plaży. Ujście Gęstwiny to miejsce, gdzie rzeka spotyka zieloną ścianę; Palmowa Plaża ciągnie się biało i ciepło wzdłuż fal; Szmaragdowa Gęstwina i Wodospad Pnączy pochłaniają wnętrze wyspy; Szafirowa Laguna jarzy się czysto i głęboko; a Zatopiony Idol obserwuje spod wody.',
+  'guide.worldPage.nightBlurb':
+    'Kraina gwiaździstej północy, gdzie kwiaty oświetlają ścieżki, a Moonrest utrzymuje ciche czuwanie pod śniącym niebem.',
+  'guide.worldPage.nightGreeter': 'Strażnik czuwania, Moonrest',
+  'guide.worldPage.nightGreeting':
+    'Za Nocną Bramą sam powietrze śni. Podążaj za kwietnym blaskiem i uważaj na uśpiony świat zawieszony na niebie.',
+  'guide.worldPage.nightPlaceNotes':
+    'Moonrest utrzymuje czuwanie. Nocna Brama to droga do krainy północy; Księżycowa Studnia zawiera światło gwiazd, przy którym możesz stanąć; Gloamfield kwitnie w ciemności; Wieczne Czuwanie obserwuje, nigdy się nie poruszając; a Bezsenny Kurhan to jedyne miejsce tutaj, które nigdy nie śni.',
   'entities.abilities.chain_heal.description':
     'Leczy sojusznika za dużą wartość, a następnie przeskakuje do maksymalnie 2 pobliskich sojuszników, lecząc o 50% mniej przy każdym skoku. (Sztandarowa zdolność Odnowy)',
   'entities.abilities.chain_heal.name': 'Leczenie Łańcuchowe',
@@ -8702,8 +10467,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cold_snap.description':
     'Kończy czas odnowienia Migotliwego kroku, Mroźnej zasłony i Większej niewidzialności. (talent maga)',
   'entities.abilities.greater_invisibility.name': 'Większa niewidzialność',
-  'entities.abilities.greater_invisibility.description':
-    'Znikasz na 20 sek.: usuwa 2 efekty obrażeń rozłożonych w czasie, a podczas niewidzialności i krótko po niej otrzymujesz o 90% mniej obrażeń. (talent maga)',
   'entities.abilities.hot_streak.name': 'Gorąca seria',
   'entities.abilities.hot_streak.description':
     'Bierne: dwa trafienia krytyczne z rzędu twoimi zaklęciami Ognia (Żarowy pocisk, Deszcz żaru, Poparzenie, Ognista lanca lub Ognista nawała) sprawiają, że twoja następna Ognista lanca lub Ognista nawała jest natychmiastowa i darmowa. Zaklęcia zużywające efekt liczą się do NASTĘPNEJ serii, również darmowe użycia; Ognista nawała liczy się raz bez względu na liczbę trafionych wrogów i zawsze liczy się tylko pierwsze uderzenie. (Ogień)',
@@ -8732,6 +10495,107 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_water_elemental.description':
     'Przywołuje Żywiołaka Wody, który walczy u twego boku, miota Pociski Wody w twój cel i podtrzymuje Strumień Wody. (Mróz)',
   'entities.mobs.water_elemental.name': 'Żywiołak wody',
+  'entities.mobs.ancient_guardian.name': 'Prastary Strażnik',
+  'entities.mobs.apprentice_wren.name': 'Uczennica Wren',
+  'entities.mobs.ashbone_raider.name': 'Najeźdźca Popiołokości',
+  'entities.mobs.ashbone_warcaller.name': 'Wojenny Zwoływacz Popiołokości',
+  'entities.mobs.aurelhorn.name': 'Aurelhorn, Pierwszy ze Stada',
+  'entities.mobs.barrow_king.name': 'Król Kurhanu',
+  'entities.mobs.barrow_wight.name': 'Upiór Kurhanu',
+  'entities.mobs.bogtoad.name': 'Bagienna Ropucha',
+  'entities.mobs.breach_wretch.name': 'Nędznik Wyłomu',
+  'entities.mobs.canopy_weaver.name': 'Tkacz Korony Drzew',
+  'entities.mobs.castaway_navigator.name': 'Nawigatorka Suli',
+  'entities.mobs.cindraleth_maw_matriarch.name': 'Cindraleth, Matriarchini Paszczy',
+  'entities.mobs.corrupted_sporeling.name': 'Skażony Zarodnik',
+  'entities.mobs.downs_bandit.name': 'Bandyta ze Wzgórz',
+  'entities.mobs.drowned_deckhand.name': 'Utopiony Majtek',
+  'entities.mobs.drowsy_croaker.name': 'Senny Rechotacz',
+  'entities.mobs.dune_troll.name': 'Troll Wydmowy',
+  'entities.mobs.duskwisp.name': 'Wisp Zmierzchu',
+  'entities.mobs.emberwing_drake.name': 'Smok Żarolot',
+  'entities.mobs.fen_sprite.name': 'Chochlik Mokradeł',
+  'entities.mobs.fisher_bram.name': 'Rybak Bram',
+  'entities.mobs.frostmane_yeti.name': 'Yeti Szronogrzywy',
+  'entities.mobs.gale_wisp.name': 'Wisp Wichru',
+  'entities.mobs.gilded_stag.name': 'Złocony Jeleń',
+  'entities.mobs.gleamstag.name': 'Lśniący Jeleń',
+  'entities.mobs.glimmerwisp.name': 'Migoczący Wisp',
+  'entities.mobs.gloam_fox.name': 'Lis Mroku',
+  'entities.mobs.gloam_strider.name': 'Wędrowiec Mroku',
+  'entities.mobs.gravedigger_mosley.name': 'Grabarz Mosley',
+  'entities.mobs.gravenbark_shambler.name': 'Grobowy Wleczysty',
+  'entities.mobs.harvest_sprite.name': 'Chochlik Żniw',
+  'entities.mobs.hedge_gnome.name': 'Gnom Żywopłotowy',
+  'entities.mobs.hedge_knight.name': 'Rycerz Zamku Brzasku',
+  'entities.mobs.ice_wisp.name': 'Wisp Lodu',
+  'entities.mobs.idol_guardian.name': 'Strażnik Idola',
+  'entities.mobs.lily_wisp.name': 'Wisp Lilii',
+  'entities.mobs.mere_lurker.name': 'Czyhacz Jeziora',
+  'entities.mobs.moonfleece_grazer.name': 'Wypasacz Księżycowego Runa',
+  'entities.mobs.moor_ram.name': 'Baran Wrzosowisk',
+  'entities.mobs.mushroom_pixie.name': 'Chochlik Lśniącego Ludu',
+  'entities.mobs.nightkin_stargazer.name': 'Nocny Obserwator Gwiazd',
+  'entities.mobs.old_marrowshell.name': 'Stary Szpikoskorupiec',
+  'entities.mobs.orchard_treant.name': 'Drzewiec Sadu',
+  'entities.mobs.pale_huntsman.name': 'Blady Łowca',
+  'entities.mobs.rift_boneclad.name': 'Wojownik Okuty Kośćmi',
+  'entities.mobs.rift_bonewalker.name': 'Powstały Kościsty Wędrowiec',
+  'entities.mobs.rift_boss_arcane.name': 'Archont Nyxaris',
+  'entities.mobs.rift_boss_brute.name': 'Watażka Grask',
+  'entities.mobs.rift_boss_ember.name': 'Tyran Żarowej Kuźni',
+  'entities.mobs.rift_boss_frost.name': 'Strażnik Szronu',
+  'entities.mobs.rift_boss_necro.name': 'Władca Kości Xarreth',
+  'entities.mobs.rift_boss_pitlord.name': 'Azgorath, Władca Otchłani',
+  'entities.mobs.rift_boss_ritualist.name': "Mag Vel'Kor Związany Paktem",
+  'entities.mobs.rift_boss_storm.name': 'Sztormowiec Vharok',
+  'entities.mobs.rift_boss_tide.name': 'Otchłanna Paszcza',
+  'entities.mobs.rift_boss_venom.name': 'Matka Roju Vysska',
+  'entities.mobs.rift_deep_lurker.name': 'Czyhacz Głębin',
+  'entities.mobs.rift_dread_stalker.name': 'Tropiciel Grozy',
+  'entities.mobs.rift_ember_fiend.name': 'Demon Żaru',
+  'entities.mobs.rift_frost_revenant.name': 'Zjawa Skuta Mrozem',
+  'entities.mobs.rift_hellguard.name': 'Piekłostrażnik',
+  'entities.mobs.rift_magma_brute.name': 'Brutal Magmy',
+  'entities.mobs.rift_marrow_troll.name': 'Troll Szpikowy',
+  'entities.mobs.rift_pact_acolyte.name': 'Akolita Paktu',
+  'entities.mobs.rift_rime_elemental.name': 'Żywiołak Szronu',
+  'entities.mobs.rift_spawnling.name': 'Pomiot Szczeliny',
+  'entities.mobs.rift_stone_ogre.name': 'Kamienny Ogr',
+  'entities.mobs.rift_storm_caller.name': 'Przyzywacz Burzy',
+  'entities.mobs.rift_stormscale.name': 'Smok Burzołuski',
+  'entities.mobs.rift_thornback.name': 'Tropiciel Cierniogrzbiety',
+  'entities.mobs.rift_tide_thrall.name': 'Niewolnik Przypływu',
+  'entities.mobs.rift_venom_weaver.name': 'Tkacz Jadu',
+  'entities.mobs.rift_void_acolyte.name': 'Akolita Blizny Pustki',
+  'entities.mobs.riftspawn.name': 'Szczelinowy Pomiot',
+  'entities.mobs.rime_elemental.name': 'Żywiołak Szronu',
+  'entities.mobs.shoal_scuttler.name': 'Czołgacz Mielizn',
+  'entities.mobs.snowdrift_wolf.name': 'Wilk Zasp Śnieżnych',
+  'entities.mobs.sporeling_gatherer.name': 'Zbieracz Zarodników',
+  'entities.mobs.sundered_horror.name': 'Rozdarty Koszmar',
+  'entities.mobs.terrace_howler.name': 'Wyjec Tarasów',
+  'entities.mobs.the_meredark.name': 'Meredark',
+  'entities.mobs.the_topiary_bull.name': 'Żywopłotowy Byk',
+  'entities.mobs.the_wreck_warden.name': 'Strażnik Wraku',
+  'entities.mobs.thicket_boar.name': 'Dzik Gąszczu',
+  'entities.mobs.tide_scuttler.name': 'Czołgacz Przypływu',
+  'entities.mobs.topiary_stag.name': 'Żywopłotowy Jeleń',
+  'entities.mobs.topiary_wolf.name': 'Żywopłotowy Wilk',
+  'entities.mobs.treant_elder.name': 'Starszy Drzewiec',
+  'entities.mobs.veiled_doe.name': 'Zasłonięta Łania',
+  'entities.mobs.veiled_stag.name': 'Zasłonięty Jeleń',
+  'entities.mobs.void_stalker.name': 'Tropiciel Pustki',
+  'entities.mobs.waking_warden.name': 'Budzący się Strażnik',
+  'entities.mobs.widowsilk_spinner.name': 'Prządka Wdowiego Jedwabiu',
+  'entities.mobs.wildheart_beastmaster.name': 'Kłolord, Pogromca Bestii',
+  'entities.mobs.wildheart_hexcaller.name': 'Słonecznokościsty Przyzywacz Klątw',
+  'entities.mobs.wildheart_high_priest.name': 'Zulgar, Głos Kotliny',
+  'entities.mobs.wildheart_ravager.name': 'Pustoszyciel Krwistej Grzywy',
+  'entities.mobs.wildheart_stalker.name': 'Pnączoszponi Tropiciel',
+  'entities.mobs.willow_sprite.name': 'Chochlik Wierzby',
+  'entities.mobs.wood_wraith.name': 'Zjawa Lasu',
+  'entities.mobs.wreck_thief.name': 'Złodziej Pola Wraków',
   'entities.items.conjured_bread4.name': 'Wyczarowany bochen biesiadny',
   'entities.items.conjured_water4.name': 'Wyczarowana woda źródlana',
   'devCommand.actions.attune.description': 'Oznacz wszystkie wymagania dostrojenia jako spełnione.',
@@ -8866,6 +10730,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetTitle': 'Resetowanie instancji',
   'guide.dungeonsPage.resetBody':
     'Jeśli zmienisz trudność, gdy grupa wciąż ma zajęte podejścia, stare przypisania pozostaną przez pewien czas. Przywódca może porzucić je natychmiast, wybierając Resetuj wszystkie instancje w menu własnego portretu albo wpisując /dungeon reset. Trudność musi faktycznie zostać zmieniona, wewnątrz nie może pozostać nikt żywy ani poległy, a kolejne resety dzieli krótki czas odnowienia. Przy wejściu na złej trudności gra ostrzeże przed rozpoczęciem. Rajdu nie resetuje się w ten sposób; obowiązują jego własne zasady blokady.',
+  'guide.dungeonsPage.wildheartBody':
+    'Przesiąknięta deszczem dżunglowa kaldera, gdzie dwa wzniesione szlaki łowieckie okrążają jadeitowy cenote. Przemierz nory bestii i ruiny przodków, po czym wspnij się na rytualną piramidę, by zobaczyć, kto czeka na szczycie.',
   'guide.gear.itemLevelBody':
     'Aby szybko porównać dwa przedmioty, włącz w opcjach Pokaż poziom przedmiotu. Wyposażenie o znanym źródle, zdobyte z wrogów, zadań i profesji rzemieślniczych, pokazuje wtedy poziom przedmiotu: jedną liczbę przybliżającą jego moc na podstawie pochodzenia, co ułatwia ocenę ulepszeń nawet między różnymi miejscami. Przedmioty bez takiego źródła, jak podstawowe towary kupców i sprzęt startowy, nie pokazują poziomu; brak liczby jest normalny.',
   'hudChrome.auraEffect.battleStance': 'Postawa bojowa: generowanie wściekłości zwiększone o 10%',
@@ -8891,8 +10757,11 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Twoja szansa na całkowite sparowanie ataku wręcz z przodu, bez otrzymania obrażeń. Ciosu zadanego od tyłu nie można sparować.',
   'hud.combat.floatingParry': 'Parowanie',
   'hud.combat.parried': 'Twój {ability} zostaje sparowany przez {target}.',
+  'hud.combat.floatingEvade': 'Uniknięcie',
+  'hud.combat.evaded': '{target} unika twojego {ability}.',
   'hudChrome.options.mouseoverCast': 'Rzucanie po najechaniu na ramki drużyny',
   'hudChrome.options.showTargetOfTarget': 'Pokaż cel celu',
+  'hudChrome.options.showPetFrame': 'Pokaż swoje zwierzę',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Cel celu',
   'itemUi.market.rarityLegendary': 'Legendarny',
   'loading.reconnectingAttempt':
@@ -8972,6 +10841,93 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.tanning_agent.name': 'Środek garbujący',
   'entities.items.venom_gland.name': 'Gruczoł Jadowy',
   'entities.items.whetted_iron_dirk.name': 'Zaostrzony żelazny sztylet',
+  'entities.items.abyssal_loop.name': 'Otchłanna Obręcz',
+  'entities.items.abysswrought_band.name': 'Obręcz Kuta w Otchłani',
+  'entities.items.amberfall_sap_bucket.name': 'Wiadro do Zbierania Soku',
+  'entities.items.ashbone_war_brand.name': 'Wojenny Znak Popiołokości',
+  'entities.items.aurora_mote.name': 'Drobina Zorzy',
+  'entities.items.barrow_grave_offering.name': 'Rozrzucona Ofiara Grobowa',
+  'entities.items.barrowshade_mantle.name': 'Płaszcz Kurhanowego Cienia',
+  'entities.items.bonelord_mantle.name': 'Płaszcz Władcy Kości',
+  'entities.items.breakscarred_steel.name': 'Stal Naznaczona Wyłomem',
+  'entities.items.bridgemere_toll_chest.name': 'Zatopiona Skrzynia Myta',
+  'entities.items.broodmother_carapace.name': 'Pancerz Matki Roju',
+  'entities.items.canopy_silk_hank.name': 'Motek Jedwabiu z Korony Drzew',
+  'entities.items.cinderwalk_treads.name': 'Buty Popiołochodu',
+  'entities.items.eelskin_mudwaders.name': 'Błotne Buty z Węgorzowej Skóry',
+  'entities.items.emberforge_gauntlets.name': 'Rękawice Żarowej Kuźni',
+  'entities.items.emberforged_bulwark.name': 'Tarcza Kuta w Żarze',
+  'entities.items.emberwing_scale.name': 'Łuska Żarolotu',
+  'entities.items.evergarden_bloom_clipping.name': 'Przycięty Kwietny Sadzonek',
+  'entities.items.evergarden_statue_rubbing.name': 'Odcisk Posągu',
+  'entities.items.farshore_salt_moss.name': 'Słony Mech z Dalekiego Wybrzeża',
+  'entities.items.fenway_mooring_line.name': 'Przecięta Lina Cumownicza',
+  'entities.items.fountain_court_mantle.name': 'Płaszcz Dziedzińca Fontanny',
+  'entities.items.frostmane_mantle.name': 'Płaszcz Szronogrzywego',
+  'entities.items.galecrest_ram_wool.name': 'Tłusta Wełna Barania',
+  'entities.items.gallowmere_grave_candle.name': 'Nagrobna Świeca',
+  'entities.items.gilded_sap_clot.name': 'Złocona Grudka Soku',
+  'entities.items.gloamfield_nightbloom.name': 'Kwiat Nocnego Rozkwitu',
+  'entities.items.graskbreaker_girdle.name': 'Pas Pogromcy Graska',
+  'entities.items.gravebound_silk_wraps.name': 'Jedwabne Owinięcia Grobowe',
+  'entities.items.gullhaven_watchbell.name': 'Nadmorski Dzwon Strażniczy',
+  'entities.items.heart_of_the_rift.name': 'Serce Szczeliny',
+  'entities.items.hearth_ember_cache.name': 'Skrytka Żaru',
+  'entities.items.hearthlined_treads.name': 'Buty Podszyte Ogniskiem',
+  'entities.items.hedgewick_shears.name': 'Skradzione Nożyce z Hedgewick',
+  'entities.items.hedgewick_tool_cart.name': 'Wywrócony Wózek Narzędziowy',
+  'entities.items.hoarfrost_edge.name': 'Ostrze Szronu',
+  'entities.items.last_keep_signet.name': 'Sygnet Ostatniej Twierdzy',
+  'entities.items.lilybed_mantle.name': 'Płaszcz Liliowego Łoża',
+  'entities.items.mantle_of_the_meredark.name': 'Płaszcz Meredarka',
+  'entities.items.mantle_of_the_unbroken_shore.name': 'Płaszcz Niezłomnego Wybrzeża',
+  'entities.items.mantle_of_the_unhorsed.name': 'Płaszcz Zrzuconego z Konia',
+  'entities.items.mawscale_pauldrons.name': 'Naramienniki z Łusek Paszczy',
+  'entities.items.mere_ferry_lantern.name': 'Latarnia Promowa',
+  'entities.items.moonfleece_mitts.name': 'Rękawice z Księżycowego Runa',
+  'entities.items.moonfleece_tuft.name': 'Kłak Księżycowego Runa',
+  'entities.items.orchard_sapbinder_grips.name': 'Uchwyty Spoiwa Soku',
+  'entities.items.pactbound_vestments.name': 'Szaty Związane Paktem',
+  'entities.items.pearlwake_cargo_crate.name': 'Skrzynia Ładunkowa Pearlwake',
+  'entities.items.pitlords_cleaver.name': 'Tasak Władcy Otchłani',
+  'entities.items.plump_fen_eel.name': 'Tłusty Węgorz Mokradłowy',
+  'entities.items.riding_training.name': 'Trening Jeździecki',
+  'entities.items.rift_essence.name': 'Esencja Szczeliny',
+  'entities.items.rift_gem_azure.name': 'Lazurowy Klejnot Szczeliny',
+  'entities.items.rift_gem_crimson.name': 'Karmazynowy Klejnot Szczeliny',
+  'entities.items.rift_gem_verdant.name': 'Zielony Klejnot Szczeliny',
+  'entities.items.riftbound_band_of_guile.name': 'Obręcz Szczeliny Przebiegłości',
+  'entities.items.riftbound_band_of_insight.name': 'Obręcz Szczeliny Wglądu',
+  'entities.items.riftbound_band_of_might.name': 'Obręcz Szczeliny Mocy',
+  'entities.items.saltforged_grips.name': 'Uchwyty Kute w Soli',
+  'entities.items.saltwalker_sandals.name': 'Sandały Wędrowca Soli',
+  'entities.items.scorched_supply_crate.name': 'Osmalona Skrzynia Zaopatrzeniowa',
+  'entities.items.shear_storm_lantern.name': 'Zgaszona Latarnia Sztormowa',
+  'entities.items.shearkeeper_gloves.name': 'Rękawice Stróża Urwiska',
+  'entities.items.silkbound_remains.name': 'Szczątki Owinięte Jedwabiem',
+  'entities.items.sprung_trap.name': 'Zatrzaśnięta Pułapka Mokradłowa',
+  'entities.items.stormscale_treads.name': 'Buty z Burzowej Łuski',
+  'entities.items.stormsunder_hood.name': 'Kaptur Rozdzieracza Burz',
+  'entities.items.sunken_idol_mantle.name': 'Płaszcz Zatopionego Idola',
+  'entities.items.sunken_offering_bowl.name': 'Napełniona na Nowo Misa Ofiarna',
+  'entities.items.thick_winter_pelt.name': 'Gruba Zimowa Skóra',
+  'entities.items.vigil_star_chart.name': 'Mapa Gwiazd Czuwania',
+  'entities.items.voidscar_handwraps.name': 'Owinięcia Dłoni Blizny Pustki',
+  'entities.items.voidsong_dirk.name': 'Pieśń Pustki, Sztylet Rozdartej Zasłony',
+  'entities.items.voidweave_mantle.name': 'Płaszcz Tkaniny Pustki',
+  'entities.items.wickspun_treads.name': 'Buty Snute z Knota',
+  'entities.items.widowsilk_skein.name': 'Motek Wdowiego Jedwabiu',
+  'entities.items.wildheart_fangknife.name': 'Kłonóż Zulgara',
+  'entities.items.fanglords_beastspear.name': 'Włócznia Bestii Kłolorda',
+  'entities.items.bloodmane_warleggings.name': 'Wojenne Nogawice Krwistej Grzywy',
+  'entities.items.vineclaw_stalking_breeches.name': 'Pnączoszponie Spodnie Skradania',
+  'entities.items.sunbone_ritual_sarong.name': 'Słonecznokościsty Sarong Rytualny',
+  'entities.items.wildheart_hexwood_staff.name': 'Kostur Zaklętego Drewna Kotliny',
+  'entities.items.wildheart_tuskblade.name': 'Kłowe Ostrze Dzikiego Serca',
+  'entities.items.wisplight_globe.name': 'Kula Światła Wispów',
+  'entities.items.wreck_wardens_mantle.name': 'Płaszcz Strażnika Wraku',
+  'entities.items.wreckfield_flotsam_crate.name': 'Skrzynia z Wraku',
+  'entities.items.wyrmwatch_warning_banner.name': 'Sztandar Ostrzegawczy Wyrmwatch',
   'entities.letters.guild_trend_alchemy_cooking.body':
     'Rzemieślnik,\n\nDo Gildii docierają wieści o twojej pracy w Alchemii i Gotowaniu: gotowane na wolnym ogniu wywary i przyprawione potrawy, a oba rzemiosła karmią się nawzajem. Sąsiednie rzemiosła współpracujące wyznaczają rękę gotową do dostrojenia. Ci, którzy zwiążą tę parę, z czasem zyskają miano Aptekarza. Odszukaj Kowala Haldrena, płatnerza z Eastbrook: na razie przemawia on w imieniu mistrzów. Udowodnij mu swoje rzemiosło, wykonując pracę własnych rąk, a on zobaczy, że twoje dwie specjalności są zestrojone.\n\nZ wyrazami szacunku,\nGildia Rzemieślnicza',
   'entities.letters.guild_trend_alchemy_cooking.sender': 'Gildia Rzemieślnicza',
@@ -9128,6 +11084,196 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Uważaj na wątki, {className}. Pewna ręka na krośnie bije silną.',
   'entities.npcs.weaver_ottilie.name': 'Tkaczka Ottilie',
   'entities.npcs.weaver_ottilie.title': 'Mistrz krosna',
+  'entities.npcs.archivist_tullo.greeting':
+    'Te pomniki tam na zewnątrz nie przemówiły do nikogo od wieków. Może czekały na świeże uszy.',
+  'entities.npcs.archivist_tullo.name': 'Archiwista Tullo',
+  'entities.npcs.archivist_tullo.title': 'Czytelnik Kamieni',
+  'entities.npcs.astronomer_cassian.greeting':
+    'Cicho teraz. Niebo nigdy tu nie świta, więc nigdy też nie przestaje mówić.',
+  'entities.npcs.astronomer_cassian.name': 'Astronom Cassian',
+  'entities.npcs.astronomer_cassian.title': 'Obserwator przy Czuwaniu',
+  'entities.npcs.aurorist_veyla.greeting':
+    'Cicho. Światła mówią dziś w nocy, a nie powtarzają się.',
+  'entities.npcs.aurorist_veyla.name': 'Zorzoznawczyni Veyla',
+  'entities.npcs.aurorist_veyla.title': 'Czytelniczka Świateł',
+  'entities.npcs.bellkeeper_tam.greeting':
+    'Dzwon to jedyne ostrzeżenie, jakie dają nam wyłomy, {className}. Jedno uderzenie za pola, dwa za klify, trzy, gdy jest już tak blisko, że ucieczka nie pomoże. Miej go na uchu, a może zachowasz się w całości.',
+  'entities.npcs.bellkeeper_tam.name': 'Strażnik Dzwonu Tam',
+  'entities.npcs.bellkeeper_tam.title': 'Stróż Dzwonu Wartowniczego',
+  'entities.npcs.bridgewright_alden.greeting':
+    'Każda deska w tym mieście jest moja do utrzymania, a mokradło gryzie każdą z nich.',
+  'entities.npcs.bridgewright_alden.name': 'Mostownik Alden',
+  'entities.npcs.bridgewright_alden.title': 'Mistrz Fenway',
+  'entities.npcs.ferrymaster_caddow.greeting':
+    'Mgła znów wisi nad jeziorem. Gdy latarnie gasną na wodzie, mądrzy ludzie zostają na brzegu.',
+  'entities.npcs.ferrymaster_caddow.name': 'Mistrz Promowy Caddow',
+  'entities.npcs.ferrymaster_caddow.title': 'Stróż Latarniowych Promów',
+  'entities.npcs.fisher_nell.greeting':
+    'Otworzyło się dokładnie tam, gdzie suszą się sieci. Właśnie tam, gdzie stałam co rano przez całe życie. Już nie schodzę na brzeg. Właściwie nigdzie już nie chodzę.',
+  'entities.npcs.fisher_nell.name': 'Przerażona Nell',
+  'entities.npcs.fisher_nell.title': 'Rybaczka z Gullhaven',
+  'entities.npcs.gardener_yew.greeting':
+    'Podasz mi tę taczkę? Te trawniki same się nie przystrzygą, cokolwiek myśli sobie ta osada.',
+  'entities.npcs.gardener_yew.name': 'Ogrodnik Yew',
+  'entities.npcs.gardener_yew.title': 'Ostatni Ogrodnik',
+  'entities.npcs.gatecaptain_brannoc.greeting':
+    'Wyrmwatch broni bramy. Broni jej od czterdziestu lat. Będzie jej bronić i dziś w nocy.',
+  'entities.npcs.gatecaptain_brannoc.name': 'Kapitan Bramy Brannoc',
+  'entities.npcs.gatecaptain_brannoc.title': 'Dowódca Wyrmwatch',
+  'entities.npcs.gatewarden_pell.greeting':
+    'Uważaj, jak stąpasz po trawnikach. Ogród je przystrzyga i lubi mieć je zadbane.',
+  'entities.npcs.gatewarden_pell.name': 'Stróż Bramy Pell',
+  'entities.npcs.gatewarden_pell.title': 'Strażnik Bramy Ogrodu',
+  'entities.npcs.harbormaster_odile.greeting':
+    'Każda łódź w tej zatoczce zawdzięcza swój stępkę Starej Latarni. Mów szybko, przypływ nie poczeka.',
+  'entities.npcs.harbormaster_odile.name': 'Kapitan Portu Odile',
+  'entities.npcs.harbormaster_odile.title': 'Kapitan Portu Wickharbor',
+  'entities.npcs.head_gardener_amaranth.greeting':
+    'Nie zwracaj uwagi na cienie pod moimi oczami. Ktoś musi czuwać, gdy ogród śni.',
+  'entities.npcs.head_gardener_amaranth.name': 'Główna Ogrodniczka Amaranth',
+  'entities.npcs.head_gardener_amaranth.title': 'Główna Ogrodniczka Wiecznego Ogrodu',
+  'entities.npcs.hearthkeeper_maeve.greeting':
+    'Wejdź, schroń się przed zimnem. Ogień w domu nigdy nie gaśnie, dopóki oddycham.',
+  'entities.npcs.hearthkeeper_maeve.name': 'Stróżka Ogniska Maeve',
+  'entities.npcs.hearthkeeper_maeve.title': 'Strażniczka Domu Ogniska',
+  'entities.npcs.hermit_okku.greeting':
+    'Cicho teraz. Bębny liczą wszystko, co chodzi pod drzewami, a ciebie już policzyły.',
+  'entities.npcs.hermit_okku.name': 'Okku',
+  'entities.npcs.hermit_okku.title': 'Człowiek, Który Wszedł',
+  'entities.npcs.huntsman_deral.greeting':
+    'Cicho teraz. Stado zna każdy dźwięk, jaki wydaje ta dolina, i ja też go znam.',
+  'entities.npcs.huntsman_deral.name': 'Łowczy Deral',
+  'entities.npcs.huntsman_deral.title': 'Strażnik Stad',
+  'entities.npcs.keeper_bram.greeting':
+    'Trzydzieści dziewięć lat ta lampa płonęła pod moją strażą. Nie zgaśnie za twojej.',
+  'entities.npcs.keeper_bram.name': 'Stróż Bram',
+  'entities.npcs.keeper_bram.title': 'Strażnik Starej Latarni',
+  'entities.npcs.keeper_saelwyn.greeting':
+    'Niewielu z twojego rodu stało pod tymi konarami, {className}. Stąpaj delikatnie i bądź mile widziany.',
+  'entities.npcs.keeper_saelwyn.name': 'Strażniczka Saelwyn',
+  'entities.npcs.keeper_saelwyn.title': 'Strażniczka Kotliny',
+  'entities.npcs.lamplighter_sorrel.greeting':
+    'Pilnuj latarni, przyjacielu. Za tą bramą słońce się poddaje, a kwiaty przejmują władzę.',
+  'entities.npcs.lamplighter_sorrel.name': 'Latarniczka Sorrel',
+  'entities.npcs.lamplighter_sorrel.title': 'Strażniczka Nocnej Bramy',
+  'entities.npcs.lampman_cobb.greeting':
+    'Zostań w świetle latarni, przyjacielu. Las liczy każdego, kto przechodzi przez bramę.',
+  'entities.npcs.lampman_cobb.name': 'Latarnik Cobb',
+  'entities.npcs.lampman_cobb.title': 'Stróż Latarni Wroniej Bramy',
+  'entities.npcs.lira_dewsong.greeting': 'Witaj w Moonrest, gdzie kwiaty świtają za nas.',
+  'entities.npcs.lira_dewsong.name': 'Lira Dewsong',
+  'entities.npcs.lira_dewsong.title': 'Nocna Ogrodniczka Moonrest',
+  'entities.npcs.loremother_bryn.greeting':
+    'Każde światło w tej dolinie coś pamięta, {playerName}. Pomóż mi słuchać.',
+  'entities.npcs.loremother_bryn.name': 'Matka Wiedzy Bryn',
+  'entities.npcs.loremother_bryn.title': 'Głos Świątyni',
+  'entities.npcs.mender_saul.greeting':
+    'W tym jednym miesiącu nastawiłem więcej kości niż przez dziesięć lat leczenia upadków rybaków. Wyłomy niewiele zostawiają z tego, co zabierają. Wróć do mnie cały, jeśli dasz radę.',
+  'entities.npcs.mender_saul.name': 'Uzdrowiciel Saul',
+  'entities.npcs.mender_saul.title': 'Chirurg Polowy',
+  'entities.npcs.mother_sedge.greeting':
+    'Wierzby powiedziały mi, że nadchodzisz, zanim twoje buty opuściły most.',
+  'entities.npcs.mother_sedge.name': 'Matka Sedge',
+  'entities.npcs.mother_sedge.title': 'Mokradłowa Wiedźma z Willowweep',
+  'entities.npcs.netter_maris.greeting':
+    'Czujesz to? Wędzony węgorz. Połowa tego miasta stoi na palach, które za niego kupiłem.',
+  'entities.npcs.netter_maris.name': 'Sieciarz Maris',
+  'entities.npcs.netter_maris.title': 'Łowca Węgorzy z Bridgemere',
+  'entities.npcs.orchardist_pomeline.greeting':
+    'Uważaj, gdzie stawiasz stopy. Każdy korzeń w tych rzędach jest starszy niż miasto i wszystko pamięta.',
+  'entities.npcs.orchardist_pomeline.name': 'Sadowniczka Pomeline',
+  'entities.npcs.orchardist_pomeline.title': 'Stróżka Złoconych Rzędów',
+  'entities.npcs.pearlmother_isha.greeting':
+    'Morze daje, piasek zatrzymuje, a dżungla zabiera. Trzymaj się plaży, obcy.',
+  'entities.npcs.pearlmother_isha.name': 'Perłowa Matka Isha',
+  'entities.npcs.pearlmother_isha.title': 'Starsza Nurków',
+  'entities.npcs.provisioner_fenna.greeting':
+    'Chleb wciąż ciepły, woda wciąż słodka. Kotlina zaopatruje, i ja też.',
+  'entities.npcs.provisioner_fenna.name': 'Zaopatrzeniowiec Fenna',
+  'entities.npcs.provisioner_fenna.title': 'Zaopatrzeniowiec Eldergleam',
+  'entities.npcs.quartermaster_edda.greeting':
+    'Stal i sól, {className}, to wszystko, co mi zostało do rozdania. Weź to i spraw, by wyłomy pożałowały, że otworzyły się tam, gdzie mogłam po nie sięgnąć.',
+  'entities.npcs.quartermaster_edda.name': 'Kwatermistrzyni Edda',
+  'entities.npcs.quartermaster_edda.title': 'Zbrojmistrzyni Redoubtu',
+  'entities.npcs.quartermaster_sela.greeting':
+    'Każda skrzynia na tym dziedzińcu przebyła czterdzieści mil popiołu, by tu dotrzeć. Obchodź się z nimi łagodnie.',
+  'entities.npcs.quartermaster_sela.name': 'Kwatermistrzyni Sela',
+  'entities.npcs.quartermaster_sela.title': 'Stróżka Zapasów Garnizonu',
+  'entities.npcs.reeve_ottoline.greeting':
+    'Witaj w Lanternmere, gdzie żniwa nigdy się nie kończą, a praca też nie.',
+  'entities.npcs.reeve_ottoline.name': 'Zarządczyni Ottoline',
+  'entities.npcs.reeve_ottoline.title': 'Zarządczyni Lanternmere',
+  'entities.npcs.riftwatch_ollun.greeting':
+    'Każdy wyłom śpiewa, zanim się otworzy, jeśli masz do tego ucho. Słyszę teraz trzy poruszające się na wyspie, a jeden z nich jest blisko.',
+  'entities.npcs.riftwatch_ollun.name': 'Szczelinostrażca Ollun',
+  'entities.npcs.riftwatch_ollun.title': 'Uczony Wyłomów',
+  'entities.npcs.salvage_boss_ryna.greeting':
+    '{className} ze sprawnymi rękami, dobrze. Linia wraków dobrze płaci, jeśli kraby zostawią ci wystarczająco dużo palców, by to policzyć.',
+  'entities.npcs.salvage_boss_ryna.name': 'Szefowa Odzysku Ryna',
+  'entities.npcs.salvage_boss_ryna.title': 'Pani Linii Wraków',
+  'entities.npcs.salvager_edda.greeting':
+    'Drewno z wraków, liny i ładunek zmarłych. Morze płaci mi pensję, gdy Strażnik na to pozwala.',
+  'entities.npcs.salvager_edda.name': 'Odzyskiwaczka Edda',
+  'entities.npcs.salvager_edda.title': 'Zbieraczka z Pola Wraków',
+  'entities.npcs.scout_einna.greeting':
+    'Przeszłaś przełęcz żywa. Dobrze. Icemantle powinno o tym usłyszeć.',
+  'entities.npcs.scout_einna.name': 'Zwiadowczyni Einna',
+  'entities.npcs.scout_einna.title': 'Zwiadowczyni Linii Śniegu',
+  'entities.npcs.scout_yerrin.greeting':
+    'Trzymaj się nisko. Dźwięk niesie się dziwnie od szkła, a brama poniżej ma uszy.',
+  'entities.npcs.scout_yerrin.name': 'Zwiadowca Yerrin',
+  'entities.npcs.scout_yerrin.title': 'Obserwator Dalekich Wydm',
+  'entities.npcs.sexton_marrow.greeting':
+    'Grzebiemy ich tu głęboko i bijemy w dzwony, by pamiętali, żeby zostać pod ziemią.',
+  'entities.npcs.sexton_marrow.name': 'Grabarz Marrow',
+  'entities.npcs.sexton_marrow.title': 'Grabarz Gallowmere',
+  'entities.npcs.strandwatcher_pell.greeting':
+    'Nareszcie poza czarnymi drzewami. Odetchnij, obcy, słońce trzyma się po tej stronie przełęczy.',
+  'entities.npcs.strandwatcher_pell.name': 'Strażniczka Wybrzeża Pell',
+  'entities.npcs.strandwatcher_pell.title': 'Stróżka Ujścia Gęstwiny',
+  'entities.npcs.trapper_brosk.greeting':
+    'Mokradło zabrało trzy moje linie w tym tygodniu. Przez dwadzieścia lat mokradło nigdy nie zabrało żadnej linii.',
+  'entities.npcs.trapper_brosk.name': 'Traper Brosk',
+  'entities.npcs.trapper_brosk.title': 'Traper Drżących Mokradeł',
+  'entities.npcs.vicar_creel.greeting':
+    'Kaplica zawaliła się lata temu. Zmarli pod nią tego nie zauważyli, więc zostałem.',
+  'entities.npcs.vicar_creel.name': 'Wikary Creel',
+  'entities.npcs.vicar_creel.title': 'Ostatni Wikary Kamienia Żałoby',
+  'entities.npcs.warden_coalfast.greeting':
+    'Wyłomom nie obchodzi, że Gullhaven jest małe, {className}. Bronimy tego wybrzeża, albo nie zostanie żadne wybrzeże do obrony. Stań z nami, a nie zapomnę o tym.',
+  'entities.npcs.warden_coalfast.name': 'Strażnik Coalfast',
+  'entities.npcs.warden_coalfast.title': 'Dowódca Redoubtu',
+  'entities.npcs.warden_kaldra.greeting': 'Uważaj na progi, obcy. Śnieg zatrzymuje to, co zabiera.',
+  'entities.npcs.warden_kaldra.name': 'Strażniczka Kaldra',
+  'entities.npcs.warden_kaldra.title': 'Strażniczka Icemantle',
+  'entities.npcs.wardsmith_orun.greeting':
+    'Te kuźnie ostygły wieki temu, {className}, ale ich dzieło wciąż trzyma ostrze.',
+  'entities.npcs.wardsmith_orun.name': 'Runokowal Orun',
+  'entities.npcs.wardsmith_orun.title': 'Stróż Starych Kuźni',
+  'entities.npcs.watcher_maren.greeting':
+    'Uważaj na krok za bramą. Wiatr tutaj najpierw zabiera kapelusze, a pytań nigdy.',
+  'entities.npcs.watcher_maren.name': 'Obserwatorka Maren',
+  'entities.npcs.watcher_maren.title': 'Straż Wietrznego Szlaku',
+  'entities.npcs.waykeeper_pell.greeting':
+    'W dół Stopniami i w miękką krainę. Uważaj, gdzie stawiasz swoje buty.',
+  'entities.npcs.waykeeper_pell.name': 'Stróżka Szlaku Pell',
+  'entities.npcs.waykeeper_pell.title': 'Strażniczka Bursztynowych Stopni',
+  'entities.npcs.waywatcher_sorrel.greeting':
+    'Śnieg za tobą, złoto przed tobą. Niewielu przemierza Złoty Roztop dwukrotnie, więc niech ta przeprawa się liczy.',
+  'entities.npcs.waywatcher_sorrel.name': 'Stróżka Drogi Sorrel',
+  'entities.npcs.waywatcher_sorrel.title': 'Strażniczka Złotego Roztopu',
+  'entities.npcs.weaver_amelle.greeting':
+    'Czujesz to? Księżycowe runo na krosnach. Cieplejsze niż jakikolwiek ogień, przy którym siedziałeś.',
+  'entities.npcs.weaver_amelle.name': 'Tkaczka Amelle',
+  'entities.npcs.weaver_amelle.title': 'Tkaczka Księżycowego Runa',
+  'entities.npcs.wickmother_sorrel.greeting':
+    'Wejdź, usiądź, na ogniu grzeje się nalewka. Tylko trzymaj rękę na wszystkim, co żelazne: gnomy ostatnio mają lepkie palce.',
+  'entities.npcs.wickmother_sorrel.name': 'Matka Gospody Sorrel',
+  'entities.npcs.wickmother_sorrel.title': 'Strażniczka Gospody Hedgewick',
+  'entities.npcs.widow_tansy.greeting':
+    'Świeca na każdy grób, i żadna nie może zgasnąć. Żadna, słyszysz mnie?',
+  'entities.npcs.widow_tansy.name': 'Wdowa Tansy',
+  'entities.npcs.widow_tansy.title': 'Świecarka z Gallowmere',
   'gatherEvent.ancientHeartwood': '{finder} ściął starożytną twardziel!',
   'gatherEvent.moonlitBloom': '{finder} odkrył rozkwit w świetle księżyca!',
   'gatherEvent.pristineVein': '{finder} trafił w nieskazitelną żyłę!',
@@ -9170,6 +11316,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.harvestLineQty': 'Oprawiasz: {name} x{qty}.',
   'hudChrome.gathering.harvestSpecimenLine': 'Otrzymujesz też {name}.',
   'hudChrome.mobile.professions': 'Zawody',
+  'hudChrome.mobile.mounts': 'Wierzchowce',
   'hudChrome.options.showThirdActionBar': 'Pokaż trzeci pasek akcji',
   'hudChrome.playerMenu.streamerBadgeTitle': 'Zweryfikowany streamer',
   'hudChrome.professions.ceilingCommon': 'Wspólna czapka',
@@ -9251,6 +11398,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.unbound':
     'Odwiązano {name} za {fee}. Przywiąże się ponownie przy kolejnej transakcji.',
   'hud.combat.auraGainOther': '{target} zyskuje {name}.',
+  'hud.combat.floatingHealAbsorbed': 'Pochłonięte',
+  'hud.combat.healOtherAbsorbed': 'Twoje {ability} zostaje pochłonięte przez zarazę na {target}.',
+  'hud.combat.healSelfAbsorbed': 'Twoje {ability} zostaje pochłonięte przez zarazę na tobie.',
   'hudChrome.corpseHarvest.components.cloth': 'Tkanina',
   'hudChrome.corpseHarvest.components.meat': 'Mięso',
   'hudChrome.crafting.noBagSpace': 'Nie masz miejsca na wytworzony przedmiot.',
@@ -9335,11 +11485,15 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.tier.greater': 'Zaklęcia wyższe',
   'hudChrome.enchanting.tier.runed': 'Zaklęcia runiczne',
   'hudChrome.enchanting.wornTag': 'Założone ({slot})',
+  'hudChrome.enchanting.wornTagIndexed': 'Założone ({slot} {index})',
   'hudChrome.enchanting.yieldHeader': 'Oczekiwane materiały:',
   'hudChrome.enchanting.yieldLineExact': '{count} {item}',
   'hudChrome.enchanting.yieldLineRange': 'od {min} do {max} {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Zaklęty',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Zaklęty)',
+  'hudChrome.itemTooltip.riftSockets': 'Klejnoty Szczeliny {used}/{total}',
+  'hudChrome.itemTooltip.riftTier': 'Przedmiot Szczeliny rangi {tier}',
+  'hudChrome.itemTooltip.riftUpgrade': 'Ulepszenie Szczeliny {level}/{max}',
   'hudChrome.marketIndicator.aria': 'Przychody lub przedmioty z Rynku Świata czekają',
   'hudChrome.marketIndicator.tip':
     'Przychody ze sprzedaży lub zwrócone przedmioty czekają na ciebie u Kupca.',
@@ -9392,4 +11546,181 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Znak twórcy',
   'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Premia arcydzieła',
   'hudChrome.enchanting.replaceConfirmKeepsBond': 'Więź zlecenia',
+  'hudChrome.continentMap.levels': 'Poziomy od {min} do {max}',
+  'hudChrome.continentMap.summary': 'Mapa świata. Wybierz strefę, aby otworzyć jej mapę.',
+  'hudChrome.continentMap.title': 'Mapa Świata',
+  'hudChrome.continentMap.toWorld': 'Mapa świata',
+  'hudChrome.continentMap.toZone': 'Mapa strefy',
+  'hudChrome.continentMap.toggleAria': 'Przełącz między mapą świata a mapą strefy',
+  'hudChrome.mountRace.cancelButton': 'Anuluj wyścig',
+  'hudChrome.mountRace.finished': 'Ukończono w {seconds}s!',
+  'hudChrome.mountRace.go': 'START!',
+  'hudChrome.mountRace.progress': 'Bramy {n} z {total}',
+  'hudChrome.mountRace.start': 'Start! Pokonaj każdy skok, a następnie wróć przez łuk.',
+  'hudChrome.mountRace.startButton': 'Rozpocznij wyścig',
+  'hudChrome.mountRace.timeLeft': '{seconds}s',
+  'hudChrome.mountRace.timeout': 'Wyścig nieudany',
+  'hudChrome.mountRace.toFinish': 'Wróć przez łuk!',
+  'hudChrome.mountTraining.begin': 'Rozpocznij lekcję',
+  'hudChrome.mountTraining.mountPrompt': 'Naciśnij {key}, aby dosiąść treningowego Rumaka Męstwa.',
+  'hudChrome.mountTraining.ownedMountPrompt':
+    'Twoje wodze są w twoich torbach. Użyj ich, aby jeździć.',
+  'hudChrome.mountTraining.returnToMarla':
+    'Wróć do Marli w stajniach, aby kupić wodze Rumaka Męstwa za 10 złota.',
+  'hudChrome.mountTraining.ridePrompt':
+    'Podążaj za świecącym znacznikiem do linii startu, a następnie naciśnij Rozpocznij wyścig.',
+  'hudChrome.mountTraining.success': 'Oswoiłeś Rumaka Męstwa.',
+  'hudChrome.mounts.clickManage': 'Kliknij, aby wybrać wierzchowca',
+  'hudChrome.mounts.close': 'Zamknij',
+  'hudChrome.mounts.desc_aether_hover_cycle':
+    'Potężny magitechniczny motocykl zaprojektowany do szybkiego, nisko unoszącego się przemieszczania w walce.',
+  'hudChrome.mounts.desc_grag_bear':
+    'Wytrzymały, pewny kroku niedźwiedź, który zapewnia zwiększoną prędkość podróżowania.',
+  'hudChrome.mounts.desc_shadowjump_toad':
+    'Ogromna, pewna kroku olbrzymia ropucha, wyszkolona w błyskawicznych, cienistych skokach, które pokonują każdy teren.',
+  'hudChrome.mounts.desc_stalkglider_snail':
+    'Krzepki, powoli, lecz niezmordowanie pełznący ślimak, który zapewnia zwiększoną prędkość podróżowania.',
+  'hudChrome.mounts.desc_stormfeather_griffin':
+    'Dostojny gryf burzy, który skrada się po ziemi na szponach okutych runami, ze złożonymi skrzydłami.',
+  'hudChrome.mounts.desc_thunderstrut_gobbler':
+    'Kolosalny, wylęgły z burzy indyk, który dumnie kroczy z Przebudzonego Szczytu, z ogonem rozłożonym jak burzowa chmura.',
+  'hudChrome.mounts.desc_valorsteed':
+    'Wytrzymały, pewny kroku rumak, który zapewnia zwiększoną prędkość podróżowania.',
+  'hudChrome.mounts.dismount': 'Zsiądź',
+  'hudChrome.mounts.emptyDropHint':
+    'Rzadsze wierzchowce wypadają z bossów lochów heroicznych i ukończeń Szczelin.',
+  'hudChrome.mounts.emptyStableHint':
+    'Osiągnij poziom 20 i weź lekcje jeździectwa u Stajennej Marli w Stajniach Highwatch, na zachód od Highwatch.',
+  'hudChrome.mounts.emptyTitle': 'Brak zebranych wierzchowców',
+  'hudChrome.mounts.mount': 'Dosiądź',
+  'hudChrome.mounts.name_aether_hover_cycle': 'Eteryczny Motocykl Turniejowca',
+  'hudChrome.mounts.name_grag_bear': 'Goliat Niedźwiedź Grag',
+  'hudChrome.mounts.name_shadowjump_toad': 'Kama-Kage, Cienioskacząca Ropucha',
+  'hudChrome.mounts.name_stalkglider_snail': 'Omszałoskorupny Ślizgacz',
+  'hudChrome.mounts.name_stormfeather_griffin': 'Niebosiężny Burzopiór',
+  'hudChrome.mounts.name_thunderstrut_gobbler': 'Grzmotokroczek, Wielki Indyk',
+  'hudChrome.mounts.name_valorsteed': 'Rumak Męstwa',
+  'hudChrome.mounts.rarity_common': 'Zwykły',
+  'hudChrome.mounts.rarity_epic': 'Epicki',
+  'hudChrome.mounts.rarity_rare': 'Rzadki',
+  'hudChrome.mounts.riding': 'Jeździectwo',
+  'hudChrome.mounts.select': 'Wybierz',
+  'hudChrome.mounts.selected': 'Wybrano',
+  'hudChrome.mounts.spec_speed': '+{pct}% dodatkowej mobilności',
+  'hudChrome.mounts.title': 'Wierzchowce',
+  'hudChrome.mounts.useToRide': 'Użyj, aby przywołać tego wierzchowca.',
+  'hudChrome.unstuck.alreadyActive': 'Wyzwolenie już odlicza czas.',
+  'hudChrome.unstuck.alreadySafe': 'Już znajdujesz się w bezpiecznym, osiągalnym miejscu.',
+  'hudChrome.unstuck.busy': 'Zakończ bieżącą czynność, zanim użyjesz Wyzwolenia.',
+  'hudChrome.unstuck.cancelledBusy': 'Wyzwolenie anulowane, ponieważ rozpocząłeś inną czynność.',
+  'hudChrome.unstuck.cancelledCombat': 'Wyzwolenie anulowane, ponieważ wszedłeś do walki.',
+  'hudChrome.unstuck.cancelledDamaged': 'Wyzwolenie anulowane, ponieważ otrzymałeś obrażenia.',
+  'hudChrome.unstuck.cancelledDisconnected': 'Wyzwolenie anulowane, ponieważ rozłączyłeś się.',
+  'hudChrome.unstuck.cancelledMoved': 'Wyzwolenie anulowane, ponieważ się poruszyłeś.',
+  'hudChrome.unstuck.cancelledState': 'Wyzwolenie anulowane, ponieważ zmienił się twój stan.',
+  'hudChrome.unstuck.combat': 'Nie możesz używać Wyzwolenia podczas walki.',
+  'hudChrome.unstuck.completed': 'Przeniesiono do najbliższego osiągalnego bezpiecznego miejsca.',
+  'hudChrome.unstuck.completedAtGraveyard':
+    'Twój duch powrócił na najbliższy cmentarz. Porozmawiaj z Bladym Strażnikiem, aby przyjąć Opłatę Strażnika.',
+  'hudChrome.unstuck.controlled': 'Nie możesz używać Wyzwolenia, gdy twój ruch jest ograniczony.',
+  'hudChrome.unstuck.cooldown': 'Wyzwolenie będzie gotowe za {seconds} sekund.',
+  'hudChrome.unstuck.countdown': 'Wyzwolenie: {seconds}',
+  'hudChrome.unstuck.dead': 'Nie możesz używać Wyzwolenia, gdy jesteś martwy lub w formie ducha.',
+  'hudChrome.unstuck.help':
+    'Ratunek: /unstuck rozpoczyna nieruchome odliczanie, które przeniesie cię do pobliskiego, osiągalnego bezpiecznego miejsca.',
+  'hudChrome.unstuck.helpAtGraveyard':
+    'Ratunek: /unstuck rozpoczyna nieruchome odliczanie, a następnie wysyła twojego ducha na najbliższy cmentarz. Powrót przez Bladego Strażnika wymaga Opłaty Strażnika.',
+  'hudChrome.unstuck.helpUnstuckSickness':
+    'Ratunek: /unstuck rozpoczyna nieruchome odliczanie, a następnie przenosi cię na najbliższy cmentarz i wskrzesza, jeśli padłeś. Choroba Wyzwolenia pozostaje na tobie do 5 minut.',
+  'hudChrome.unstuck.menuButton': 'Wyzwolenie',
+  'hudChrome.unstuck.movedToGraveyard':
+    'Zostałeś przeniesiony na najbliższy cmentarz. Choroba Wyzwolenia ciąży na tobie.',
+  'hudChrome.unstuck.noSafePosition':
+    'Nie znaleziono w pobliżu żadnego osiągalnego bezpiecznego miejsca. Nie zostałeś przeniesiony.',
+  'hudChrome.unstuck.revivedAtGraveyard':
+    'Zostałeś przeniesiony na najbliższy cmentarz i wskrzeszony. Opłata Strażnika ciąży na tobie.',
+  'hudChrome.unstuck.revivedAtGraveyardUnstuck':
+    'Zostałeś przeniesiony na najbliższy cmentarz i wskrzeszony. Choroba Wyzwolenia ciąży na tobie.',
+  'hudChrome.unstuck.standStill': 'Stój nieruchomo na stałym gruncie, zanim użyjesz Wyzwolenia.',
+  'hudChrome.unstuck.standStillAnywhere': 'Stój nieruchomo, zanim użyjesz Wyzwolenia.',
+  'hudChrome.unstuck.started':
+    'Wyzwolenie za {seconds} sekund. Poruszenie się, walka, otrzymanie obrażeń lub rozpoczęcie innej czynności anuluje je.',
+  'hudChrome.unstuck.unavailable': 'Wyzwolenie jest niedostępne w twoim obecnym stanie.',
+  'hudChrome.riftTracker.title': 'Szczelina',
+  'hudChrome.riftTracker.floor': 'Piętro {current} z {total}',
+  'hudChrome.riftTracker.closesIn': 'Zamyka się za {time}',
+  'hudChrome.riftTracker.clockMs': '{minutes}:{seconds}',
+  'hudChrome.riftTracker.clockHms': '{hours}:{minutes}:{seconds}',
+  'hud.prompts.guildInviteCancelled':
+    'Oczekujące zaproszenie do gildii zostało anulowane, ponieważ gildia zmieniła nazwę.',
+  'hud.prompts.guildRenamed':
+    'Twoja gildia została przemianowana na {name} przez zespół moderacji.',
+  'hud.core.chatChannels.moveHint':
+    'Zmień kolejność karty {channel}: przeciągnij ją lub użyj Alt+Lewo i Alt+Prawo',
+  'itemUi.vendor.buyStack': 'Kup {count}',
+  'itemUi.vendor.buyStackAria': 'Kup {count} {item} za {price}',
+  'auth.face': 'Twarz',
+  'auth.faceNose': 'Nos',
+  'auth.faceEyes': 'Wielkość oczu',
+  'auth.faceJaw': 'Szczęka',
+  'auth.faceBrow': 'Brwi',
+  'auth.faceCheeks': 'Policzki',
+  'auth.faceChin': 'Podbródek',
+  'auth.mouth': 'Usta',
+  'auth.mouthNeutral': 'Neutralne',
+  'auth.mouthLips': 'Pełne usta',
+  'auth.mouthSmile': 'Uśmiech',
+  'auth.mouthFrown': 'Grymas',
+  'auth.mouthWide': 'Szerokie',
+  'auth.mouthPout': 'Dąsy',
+  'auth.mouthGrin': 'Uśmiech z zębami',
+  'auth.mouthOpen': 'Otwarte',
+  'auth.mouthAwe': 'Zdumienie',
+  'auth.faceEars': 'Uszy',
+  'auth.faceSmirk': 'Uśmieszek',
+  'auth.eyeShape': 'Kształt oczu',
+  'auth.eyeColor': 'Kolor oczu',
+  'auth.earShape': 'Kształt uszu',
+  'auth.browFlat': 'Płaskie',
+  'auth.browArched': 'Łukowate',
+  'auth.browThin': 'Cienkie',
+  'auth.browBushy': 'Krzaczaste',
+  'auth.browWorried': 'Zmartwione',
+  'auth.browSharp': 'Ostre',
+  'auth.browRound': 'Okrągłe',
+  'auth.eyeRound': 'Okrągłe',
+  'auth.eyeAlmond': 'Migdałowe',
+  'auth.eyeNarrow': 'Wąskie',
+  'auth.eyeWide': 'Szerokie',
+  'auth.eyeSharp': 'Ostre',
+  'auth.eyeDroopy': 'Opadające',
+  'auth.eyeSleepy': 'Senne',
+  'auth.eyeWideset': 'Szeroko rozstawione',
+  'auth.eyeCat': 'Kocie',
+  'auth.eyeDoe': 'Sarnie',
+  'auth.earRound': 'Okrągłe',
+  'auth.earPointed': 'Spiczaste',
+  'auth.earSmall': 'Małe',
+  'auth.earWide': 'Szerokie',
+  'auth.customize': 'Dostosuj',
+  'auth.body': 'Ciało',
+  'auth.genderMale': 'Mężczyzna',
+  'auth.genderFemale': 'Kobieta',
+  'auth.hair': 'Włosy',
+  'auth.brows': 'Brwi',
+  'auth.skinTone': 'Odcień skóry',
+  'auth.hairColor': 'Kolor włosów',
+  'auth.lightness': 'Jasne / Ciemne',
+  'auth.colorWheelAria': 'Koło kolorów {label}: przeciągnij, aby wybrać barwę i nasycenie',
+  'auth.lightnessAria': 'Jasność {label}',
+  'auth.hairBald': 'Łysy',
+  'auth.browNone': 'Brak',
+  'auth.browSoft': 'Delikatne',
+  'auth.browThick': 'Gęste',
+  'auth.browAngled': 'Skośne',
+  'hudChrome.paperdoll.hideHelmAria': 'Ukryj hełm',
+  'hudChrome.paperdoll.showHelmAria': 'Pokaż hełm',
+  'hudChrome.options.waterRipples': 'Zmarszczki na wodzie (kilwater)',
+  'hudChrome.breath.label': 'Oddech',
+  'hudChrome.breath.drowning': 'Toniesz!',
 };

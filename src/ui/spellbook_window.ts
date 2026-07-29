@@ -12,9 +12,43 @@
 // Ability icons resolve via iconDataUrl (the procedural ability-icon source), not
 // the PainterHost item-icon helper: that helper paints ItemDef rows, and the
 // spellbook renders abilities. It is NOT a canvas window (colors live in the
-// extracted stylesheet, no literal hex/px in TS). refreshHotbarControls
-// is the one not-cold touch: hud.update() calls it while the window is open so the
-// +/- toggles track action-bar changes without a full rebuild.
+// extracted stylesheet, no literal hex/px in TS).
+//
+// THIS IS THE ONE WINDOW Hud.update() DRIVES ON THE PER-FRAME BAND
+// (tests/hud_update_drive.test.ts records it as such), so the per-frame contract in
+// src/ui/CLAUDE.md applies to `tickOpen` and everything it reaches: refs resolved
+// once, no per-frame allocation, every repeated write elided. An unchanged frame
+// costs two in-place comparisons and makes no element lookup, no allocation and no
+// DOM write at all. The two gates that buy that are `knownChanged` (rebuild the
+// rows only when a resolved ability's numbers moved) and `takeControlChange`
+// (repaint the +/- toggles only when the bar state they render moved). Both compare
+// retained values in place rather than through a derived id list or a joined
+// signature string: a gate that allocates to decide it has nothing to do keeps most
+// of the cost it was meant to save. What is NOT inside that claim, since it sits at
+// the Hud call site rather than in here: the `isOpen` check that decides whether to
+// tick at all still resolves `#spellbook` by id every frame.
+//
+// It stays a COLD painter in tests/hud_perf_budget.test.ts rather than moving into
+// HOT_PAINTERS, and #2519 settled that rather than leaving it open. Two reasons,
+// neither of them "windows are cold":
+//   - The hot bucket's write contract is a per-FILE token count pinned EXACTLY, and
+//     the count cannot tell CADENCE, which is the only thing #2519 was about. Most
+//     of this file's raw-write tokens are build-time writes in render() /
+//     appendAttackRow() / appendRow(), a minority are the repaint writes in
+//     paintHotbarControls, and several are not writes at all (the style.display
+//     read in isOpen, the classList.contains reads that pick a refocus target).
+//     Pinning the total makes every ordinary edit to the markup a diff line in the
+//     gate while saying nothing about which bucket a given write is in. Re-derive
+//     the numbers with the gate's own instrument (stripComments plus RAW_WRITES in
+//     tests/hud_perf_budget.test.ts) rather than from a figure quoted here, which
+//     would rot: this comment quoted one for exactly one commit before the change
+//     it describes deleted the per-row `dataset` read and falsified it.
+//   - The other half of the contract does not fit at all: the PainterHost writers
+//     elide through Maps KEYED BY ELEMENT, and this window replaces its whole row
+//     set on every rebuild, so routing its build-time writes through the facet
+//     would strand a cache entry per destroyed node.
+// The instrument that does answer a cadence question is behavioral, and it is
+// tests/spellbook_tick_repaint.test.ts.
 
 import { audio } from '../game/audio';
 import { ABILITIES, CLASSES } from '../sim/data';
@@ -28,6 +62,7 @@ import {
   encodeHotbarAction,
   HOTBAR_ACTION_MIME,
   HOTBAR_ATTACK_MIME,
+  type HotbarAction,
   isAbilityActionBarEligible,
 } from './hud/action_bar/hotbar';
 import { formatNumber, t } from './i18n';
@@ -53,11 +88,19 @@ export interface SpellbookWindowDeps {
   abilitySummary(known: ResolvedAbility): string;
   /** The full ability tooltip markup (Hud-owned). */
   abilityTooltip(known: ResolvedAbility): string;
-  /** Ability ids currently on the action bar. */
-  barAbilityIds(): string[];
-  /** The hotbar's ability id per bar slot (index 0 = barSlot 1), used to derive
-   *  each row's mobile action-ring page (Phase 4, touch-only presentation). */
-  abilityIdByBarSlot(): (string | null)[];
+  /**
+   * The action bar's LIVE ability slots (index 0 = barSlot 1, Hud.hotbarActions'
+   * own convention; slot 0 is the Attack control and is not in here).
+   *
+   * Handed over as the slot array rather than as a derived id list because the
+   * per-frame change check below walks it on every frame the window is open, and
+   * has to allocate nothing while it does. The two derived views this window used
+   * to take instead (the on-bar id list, the per-slot id list the mobile page
+   * label reads) were a `flatMap` and a `map` over 33 slots, i.e. 34 and 1 fresh
+   * arrays per call, and the check called one of them 60 times a second. Both are
+   * now derived at render time, where the allocation is paid once per rebuild.
+   */
+  barActions(): readonly HotbarAction[];
   /** The action bar has at least one empty slot. */
   hasFreeSlot(): boolean;
   /** The Attack toggle currently occupies bar slot 0 (showAttackButton on). */
@@ -78,23 +121,108 @@ export interface SpellbookWindowDeps {
   clearActionDropTargets(): void;
 }
 
+/** The ability on a bar slot, or null for an empty slot or an item. */
+function slotAbilityId(action: HotbarAction): string | null {
+  return action !== null && action.type === 'ability' ? action.id : null;
+}
+
+/** One row's +/- toggle and the ability it belongs to, captured as the row is built. */
+interface RowToggle {
+  readonly abilityId: string;
+  readonly btn: HTMLButtonElement;
+}
+
 export class SpellbookWindow {
   private openerFocus: HTMLElement | null = null;
-  // Signature of the resolved abilities the last render painted (id/rank/cost/
-  // cast/cooldown). Talent allocation while the window is open reassigns
-  // world.known with new numbers; comparing this per frame lets tickOpen rebuild
-  // the row summaries so their cost/cast/cooldown never go stale (tooltip parity).
-  private lastKnownSig = '';
+  // The resolved abilities the last render painted, as the fields a row summary
+  // displays: one id per ability in `knownIds`, and its rank / cost / castTime /
+  // cooldown packed four to an ability in `knownNums`. Talent allocation while the
+  // window is open reassigns world.known with new numbers; comparing this per frame
+  // lets tickOpen rebuild the row summaries so their cost/cast/cooldown never go
+  // stale (tooltip parity).
+  //
+  // Two retained arrays rather than the joined signature STRING this started as,
+  // for the same reason the bar state below is compared in place: the comparison
+  // runs on every frame the window is open, and building a signature over every
+  // known ability allocated a string of a thousand-odd characters per frame only to
+  // throw it away on the (overwhelmingly common) unchanged one. Comparing in place
+  // also stops at the first field that moved instead of always walking the whole
+  // set. Reference equality on world.known would be cheaper still and is WRONG: the
+  // online mirror rebuilds that array every snapshot, so only the VALUES tell us a
+  // talent actually changed a number.
+  private readonly knownIds: string[] = [];
+  private readonly knownNums: number[] = [];
+  // The +/- toggles the last render painted, COLLECTED AS THOSE ROWS ARE BUILT
+  // rather than re-queried from the tick. Before #2519 the per-frame refresh ran a
+  // querySelector for the Attack toggle plus a querySelectorAll subtree walk over
+  // every ability row, on every frame the window was open, which is the shape
+  // src/ui/CLAUDE.md bans ("resolve element refs ONCE, never querySelector from a
+  // per-frame path").
+  //
+  // Capturing at BUILD time rather than re-querying at the end of render() (the
+  // shape lockpick_window had to use, whose nodes arrive from an innerHTML string)
+  // costs zero queries even on a rebuild, and hands each row's ability id over
+  // with its node, so the refresh does not read `dataset` per row either.
+  //
+  // The refs are dropped and re-collected in render(), which is the ONLY thing
+  // that replaces these nodes: its innerHTML write destroys the whole list and
+  // appendAttackRow / appendRow rebuild it. close() deliberately does not clear
+  // them, because it only hides the root (the nodes stay attached and correct, and
+  // re-opening re-renders anyway).
+  private attackToggle: HTMLButtonElement | null = null;
+  private readonly rowToggles: RowToggle[] = [];
+  // The action-bar state those toggles were painted from. Everything the refresh
+  // writes is a function of exactly these three, so an unchanged frame has nothing
+  // to paint; see takeControlChange.
+  private lastAttackOnBar = false;
+  private lastHasFree = false;
+  private readonly lastSlotIds: (string | null)[] = [];
 
   constructor(private readonly deps: SpellbookWindowDeps) {}
 
-  // Cheap content signature of the fields a row summary displays. Reference
-  // equality on world.known will not do: the online mirror rebuilds that array
-  // every snapshot, so only the VALUES tell us a talent actually changed a number.
-  private static knownSig(known: readonly ResolvedAbility[]): string {
-    let sig = '';
-    for (const k of known) sig += `${k.def.id}:${k.rank}:${k.cost}:${k.castTime}:${k.cooldown}|`;
-    return sig;
+  /** Number fields packed per known ability in `knownNums`: rank, cost, castTime, cooldown. */
+  private static readonly KNOWN_FIELDS = 4;
+
+  /**
+   * Did any field a row summary displays move since the last render?
+   *
+   * Walks in place against the retained copy and returns at the first difference,
+   * so an unchanged frame costs a bounded run of primitive comparisons and no
+   * allocation at all.
+   *
+   * The length check is not redundant with the id compare below it: a set that
+   * SHRANK at the tail leaves every surviving index matching, so without it an
+   * unlearned last ability would keep its row (and its live +/- toggle) for the
+   * rest of the session.
+   *
+   * What it covers is the RESOLVED ABILITY, which is what the summary is built
+   * from, and no more. `deps.abilitySummary` also folds in live player state (the
+   * resource type, spell haste), so a change to those alone does not rebuild here.
+   * That limit predates this gate (the signature string it replaced covered the
+   * same five fields) and is left as it was.
+   */
+  private knownChanged(known: readonly ResolvedAbility[]): boolean {
+    if (known.length !== this.knownIds.length) return true;
+    for (let i = 0; i < known.length; i++) {
+      const k = known[i];
+      if (k.def.id !== this.knownIds[i]) return true;
+      const at = i * SpellbookWindow.KNOWN_FIELDS;
+      if (k.rank !== this.knownNums[at]) return true;
+      if (k.cost !== this.knownNums[at + 1]) return true;
+      if (k.castTime !== this.knownNums[at + 2]) return true;
+      if (k.cooldown !== this.knownNums[at + 3]) return true;
+    }
+    return false;
+  }
+
+  /** Latch the resolved-ability numbers this render is painting. */
+  private captureKnown(known: readonly ResolvedAbility[]): void {
+    this.knownIds.length = 0;
+    this.knownNums.length = 0;
+    for (const k of known) {
+      this.knownIds.push(k.def.id);
+      this.knownNums.push(k.rank, k.cost, k.castTime, k.cooldown);
+    }
   }
 
   get isOpen(): boolean {
@@ -127,17 +255,38 @@ export class SpellbookWindow {
     this.openerFocus = null;
   }
 
-  // Per-frame entry while the window is open. Rebuilds the whole list only when a
-  // resolved ability's numbers changed (a talent allocation reassigns world.known),
-  // so row summaries reflect current cost/cast/cooldown; otherwise it just does the
-  // cheap in-place +/- toggle refresh. Hover tooltips resolve live regardless (see
-  // appendRow), so this covers the always-visible row text, not the tooltip.
+  // Per-frame entry while the window is open, and the ONLY window on that band.
+  //
+  // Two gates, and NEITHER fall-through does work on an unchanged frame. The first
+  // rebuilds the whole list when a resolved ability's numbers changed (a talent
+  // allocation reassigns world.known), so row summaries reflect current
+  // cost/cast/cooldown. The second repaints the +/- toggles when the bar state they
+  // render changed. A frame where neither moved costs the two comparisons and
+  // nothing else: no subtree query, no allocation, no DOM write. Hover tooltips
+  // resolve live regardless (see appendRow), so this covers the always-visible row
+  // text, not the tooltip.
   tickOpen(): void {
-    if (SpellbookWindow.knownSig(this.deps.world().known) !== this.lastKnownSig) {
+    if (this.knownChanged(this.deps.world().known)) {
       this.rerenderPreservingView();
       return;
     }
-    this.refreshHotbarControls();
+    this.refreshHotbarControlsIfChanged();
+  }
+
+  /**
+   * Re-localize after an in-game language switch (the Hud's woc:languagechange
+   * fan-out). Self-gated on isOpen so the fan-out can call it unconditionally.
+   *
+   * tickOpen only rebuilds when a resolved ability's id, rank, cost, cast time
+   * or cooldown moved, and the hotbar toggles elide their accessible names on
+   * the on-bar state, all of it text-independent, so an open spellbook would
+   * otherwise keep the old locale until the player learned something. Goes
+   * through the scroll- and focus-preserving path for the same reason it exists:
+   * the list rebuild is an innerHTML write on the scroll container.
+   */
+  relocalize(): void {
+    if (!this.isOpen) return;
+    this.rerenderPreservingView();
   }
 
   // render() rebuilds the list via innerHTML, and the window root is the scroll
@@ -167,7 +316,14 @@ export class SpellbookWindow {
   render(): void {
     const el = this.deps.root();
     const world = this.deps.world();
-    this.lastKnownSig = SpellbookWindow.knownSig(world.known);
+    this.captureKnown(world.known);
+    // Drop the toggle refs BEFORE the innerHTML write below destroys their nodes,
+    // and re-latch the bar state this paint is about to render from, so the next
+    // tick compares against what actually went on screen rather than repainting a
+    // fresh list. After this call lastSlotIds / lastHasFree / lastAttackOnBar
+    // mirror the live bar, which is what the view inputs below read.
+    this.forgetToggles();
+    this.takeControlChange();
     const classId = world.cfg.playerClass;
     const cls = CLASSES[classId];
     // The kit list is the display order, but spec signatures and other talent grants are
@@ -181,10 +337,15 @@ export class SpellbookWindow {
       classId,
       abilities: [...kit, ...grantedExtra],
       known: world.known,
-      barAbilityIds: this.deps.barAbilityIds(),
-      abilityIdByBarSlot: this.deps.abilityIdByBarSlot(),
-      hasFreeSlot: this.deps.hasFreeSlot(),
-      attackOnBar: this.deps.attackOnBar(),
+      // Both bar views are derived from the one latched slot list: one allocation
+      // per rebuild, where the per-frame path pays none. abilityIdByBarSlot feeds
+      // the touch-only "Page N" chip, which appendRow emits at BUILD time and no
+      // repaint touches, so moving an ability between bar slots leaves that chip
+      // until the next rebuild. Pre-existing, and left as it was.
+      barAbilityIds: this.lastSlotIds.filter((id): id is string => id !== null),
+      abilityIdByBarSlot: this.lastSlotIds,
+      hasFreeSlot: this.lastHasFree,
+      attackOnBar: this.lastAttackOnBar,
       hasFormBars: this.deps.hasFormBars(),
       spec: world.talentSpec,
       level: world.player.level,
@@ -220,18 +381,87 @@ export class SpellbookWindow {
     });
   }
 
-  // In-place refresh of the per-row hotbar toggles, called from hud.update() while
-  // the window is open so the +/- state tracks action-bar changes (drag-drop,
-  // keybind use) without a full rebuild. Mirrors the inline refreshSpellbookHotbar
-  // controls but scoped to this window's root.
+  // Force the +/- toggles to match the bar as it stands right now.
+  //
+  // Public because Hud drives it after a bar change it made ITSELF and does not
+  // want to wait a frame for (the login-time action-bar layout restore, the
+  // reset-form-bar command), and because this window's own click handlers use it to
+  // reflect a toggle press immediately. Latching first is what keeps that free:
+  // the state this paint renders is recorded, so the tick that follows sees an
+  // unchanged frame and repaints nothing.
   refreshHotbarControls(): void {
+    this.takeControlChange();
+    this.paintHotbarControls();
+  }
+
+  /**
+   * The per-frame fall-through: repaint the toggles only when the bar state they
+   * render actually moved.
+   *
+   * This is the half #2519 was about. Everything paintHotbarControls writes is a
+   * function of exactly the three inputs takeControlChange reads, so a frame where
+   * none of them moved has nothing to paint, and returning here costs no subtree
+   * query, no allocation and no DOM write. Before that gate, the fall-through ran
+   * two element lookups (one of them a full subtree walk over every ability row),
+   * allocated a Set from a freshly built id list, and wrote `disabled` on every row
+   * unelided, sixty times a second for as long as the window was open.
+   */
+  private refreshHotbarControlsIfChanged(): void {
+    if (!this.takeControlChange()) return;
+    this.paintHotbarControls();
+  }
+
+  /**
+   * Read the three bar inputs the toggles render, report whether any of them
+   * moved, and latch the new values when they did.
+   *
+   * ALLOCATION-FREE on the unchanged path, which is the whole point of taking the
+   * bar as its live slot array (see `barActions`): the comparison walks that array
+   * in place against the retained copy and stops at the first difference, instead
+   * of building an id list or a joined signature string it would throw away on
+   * every frame. Only a frame that really changed pays the copy back.
+   *
+   * `hasFreeSlot` is read separately rather than derived from the slot array here,
+   * so the action bar keeps owning that rule (a slot can be occupied by an item,
+   * and the controller decides what counts as free).
+   */
+  private takeControlChange(): boolean {
+    const attackOnBar = this.deps.attackOnBar();
+    const hasFree = this.deps.hasFreeSlot();
+    const actions = this.deps.barActions();
+    if (!this.controlsMoved(attackOnBar, hasFree, actions)) return false;
+    this.lastAttackOnBar = attackOnBar;
+    this.lastHasFree = hasFree;
+    this.lastSlotIds.length = 0;
+    for (const action of actions) this.lastSlotIds.push(slotAbilityId(action));
+    return true;
+  }
+
+  private controlsMoved(
+    attackOnBar: boolean,
+    hasFree: boolean,
+    actions: readonly HotbarAction[],
+  ): boolean {
+    if (attackOnBar !== this.lastAttackOnBar) return true;
+    if (hasFree !== this.lastHasFree) return true;
+    if (actions.length !== this.lastSlotIds.length) return true;
+    for (let i = 0; i < actions.length; i++) {
+      if (slotAbilityId(actions[i]) !== this.lastSlotIds[i]) return true;
+    }
+    return false;
+  }
+
+  // In-place repaint of the hotbar toggles from the latched bar state, over the
+  // refs render() collected. Runs only behind one of the two entry points above,
+  // never on an unchanged frame.
+  private paintHotbarControls(): void {
     // The Attack toggle tracks the Interface showAttackButton setting, which can
     // flip while the window is open (the options window, or a right-click on the
     // slot-0 button itself). Same elision discipline as the ability toggles:
     // rewrite only when the on-bar state actually flips.
-    const attackBtn = this.deps.root().querySelector<HTMLButtonElement>('[data-attack-toggle]');
+    const attackBtn = this.attackToggle;
     if (attackBtn) {
-      const onBar = this.deps.attackOnBar();
+      const onBar = this.lastAttackOnBar;
       if ((attackBtn.getAttribute('aria-pressed') === 'true') !== onBar) {
         attackBtn.textContent = onBar ? '-' : '+';
         attackBtn.classList.toggle('remove', onBar);
@@ -244,45 +474,48 @@ export class SpellbookWindow {
         );
       }
     }
-    const barIds = new Set(this.deps.barAbilityIds());
-    const hasFree = this.deps.hasFreeSlot();
-    this.deps
-      .root()
-      .querySelectorAll<HTMLButtonElement>('.spell-hotbar-toggle')
-      .forEach((btn) => {
-        const id = btn.dataset.abilityId;
-        if (!id) return;
-        const onBar = barIds.has(id);
-        // Elide the toggle-state writes: this runs every frame while the window is
-        // open, but the +/- text, the remove class, and the accessible name only
-        // change when on-bar membership flips (a drag-drop / keybind use), which
-        // aria-pressed already records. Recomputing the i18n name + rewriting the
-        // attribute every frame was avoidable churn (matches the elided-writer
-        // doctrine). `disabled` stays per-frame: it also depends
-        // on hasFree, which can change without an on-bar flip.
-        if ((btn.getAttribute('aria-pressed') === 'true') !== onBar) {
-          btn.textContent = onBar ? '-' : '+';
-          btn.classList.toggle('remove', onBar);
-          btn.setAttribute('aria-pressed', onBar ? 'true' : 'false');
-          // Keep the accessible name in sync with the toggle state: a spoken
-          // action ("Add/Remove {name} to action bar"), not a bare +/- glyph.
-          // Same key pair as appendRow.
-          const def = ABILITIES[id];
-          if (def)
-            btn.setAttribute(
-              'aria-label',
-              t(
-                onBar
-                  ? 'hudChrome.spellbook.removeFromBarAria'
-                  : 'hudChrome.spellbook.addToBarAria',
-                {
-                  name: this.abilityName(def),
-                },
-              ),
-            );
-        }
-        btn.disabled = !onBar && !hasFree;
-      });
+    const hasFree = this.lastHasFree;
+    for (const { abilityId, btn } of this.rowToggles) {
+      const onBar = this.lastSlotIds.includes(abilityId);
+      // Elide the toggle-state writes per row: a repaint fires when ANY of the
+      // three inputs moved, but the +/- text, the remove class, and the accessible
+      // name only change when this row's on-bar membership flips, which
+      // aria-pressed already records. Recomputing the i18n name + rewriting the
+      // attribute for every row on every repaint was avoidable churn (matches the
+      // elided-writer doctrine).
+      if ((btn.getAttribute('aria-pressed') === 'true') !== onBar) {
+        btn.textContent = onBar ? '-' : '+';
+        btn.classList.toggle('remove', onBar);
+        btn.setAttribute('aria-pressed', onBar ? 'true' : 'false');
+        // Keep the accessible name in sync with the toggle state: a spoken
+        // action ("Add/Remove {name} to action bar"), not a bare +/- glyph.
+        // Same key pair as appendRow.
+        const def = ABILITIES[abilityId];
+        if (def)
+          btn.setAttribute(
+            'aria-label',
+            t(
+              onBar ? 'hudChrome.spellbook.removeFromBarAria' : 'hudChrome.spellbook.addToBarAria',
+              {
+                name: this.abilityName(def),
+              },
+            ),
+          );
+      }
+      // `disabled` needs its own elision rather than riding the aria-pressed
+      // branch above: it also depends on hasFree, which can change without any
+      // on-bar flip (the bar filling up disables every off-bar row's add control
+      // while no row's membership moved). Diffed against the live property so a
+      // repaint writes only the rows that actually flipped.
+      const disabled = !onBar && !hasFree;
+      if (btn.disabled !== disabled) btn.disabled = disabled;
+    }
+  }
+
+  /** Drop the toggle refs whose nodes the next render() is about to replace. */
+  private forgetToggles(): void {
+    this.attackToggle = null;
+    this.rowToggles.length = 0;
   }
 
   // The pinned basic Attack row, first in the list (classic spellbooks lead with
@@ -324,6 +557,9 @@ export class SpellbookWindow {
       audio.click();
       this.refreshHotbarControls();
     });
+    // Hold the ref the refresh repaints, instead of re-finding this node by its
+    // data-attack-toggle marker on every frame.
+    this.attackToggle = toggle;
     el.appendChild(toggle);
     // Attack drags onto the action bar like any ability row. It has no ability/item
     // id, so it cannot ride the HotbarAction path: the dragstart carries the dedicated
@@ -410,13 +646,19 @@ export class SpellbookWindow {
         ev.preventDefault();
         ev.stopPropagation();
         const id = known.def.id;
-        const changed = this.deps.barAbilityIds().includes(id)
-          ? this.deps.removeFromBar(id)
-          : this.deps.addToBar(id);
+        // Read the bar LIVE here rather than off the latched slot list: the latch
+        // is at most one frame old, and a keybind that moved this ability in that
+        // frame would otherwise send the click down the wrong branch, where
+        // addToBar reports no change and the press does nothing at all.
+        const onBar = this.deps.barActions().some((action) => slotAbilityId(action) === id);
+        const changed = onBar ? this.deps.removeFromBar(id) : this.deps.addToBar(id);
         if (!changed) return;
         audio.click();
         this.refreshHotbarControls();
       });
+      // Hold the ref (with its ability id) the refresh repaints, instead of
+      // walking the whole list for `.spell-hotbar-toggle` on every frame.
+      this.rowToggles.push({ abilityId: known.def.id, btn: toggle });
       el.appendChild(toggle);
       el.draggable = true;
       el.addEventListener('dragstart', (e) => {

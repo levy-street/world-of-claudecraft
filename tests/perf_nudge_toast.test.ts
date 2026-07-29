@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 import { beforeEach, describe, expect, it } from 'vitest';
 import { initPerfNudgeToast } from '../src/ui/perf_nudge_toast';
 

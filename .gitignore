@@ -7,6 +7,7 @@ node_modules
 # build outputs
 dist/
 dist-env/
+dist-ota/
 dist-server/
 release/
 release-steam/
@@ -44,7 +45,7 @@ tmp/
 # public/ copy (the whole client build dies in prepare-out-dir).
 public/models/sfx-studio-security-*.glb
 # PR-assist screenshot tour output + its CI-only ephemerals
-pr-shots/
+pr-shots*/
 pr.diff
 .devpid
 .codex-research/
@@ -62,8 +63,9 @@ pr.diff
 # Vitest Browser Mode failure screenshots + attachments (opt-in test:browser suite)
 tests/browser/__screenshots__/
 .vitest-attachments/
-# Mobile safe-area E2E before/after PNG output (scripts/mobile_*_safe_area.mjs)
-screenshots/
+# Mobile safe-area E2E before/after PNG output (scripts/mobile_*_safe_area.mjs,
+# root-anchored: a bare screenshots/ would swallow new files under docs/screenshots/)
+/screenshots/
 
 # i18n release-fill worklist (generated; regenerate via `npm run i18n:worklist`)
 docs/i18n-scaling/worklist/
@@ -95,6 +97,8 @@ Thumbs.db
 !.claude/commands/
 !.claude/hooks/
 !.claude/settings.json
+# Per-session QA/build scratch (gate logs, probe scripts); never committed.
+.claude-scratch/
 .cursor/
 
 # local SDK/tooling dump (extracted command-line tools, not project source)
@@ -103,6 +107,14 @@ postgres/
 pr-assets-2fa
 
 .vite/
+# Vitest experimental.fsModuleCache default lives under node_modules/ (already
+# ignored). Keep an explicit entry if a worktree ever overrides fsModuleCachePath
+# to a repo-root path, and never commit transform cache.
+.experimental-vitest-cache/
+node_modules/.experimental-vitest-cache/
+
+# Turborepo local task cache (Phase 8 gate pure-artifact steps)
+.turbo/
 
 # Discord app credentials + bot token, never commit it
 discord_bot_info.txt
@@ -128,3 +140,4 @@ docs/music/renders/
 /scripts/hunter_agents.sh
 /scripts/gravewyrm_trio.mjs
 /TESTING-TALENTS-2-0.md
+parse-spool/

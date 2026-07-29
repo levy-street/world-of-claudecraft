@@ -290,6 +290,21 @@
   .np-marker.active {
     color: #b9b9b9;
   }
+  /* repeatable turn-in (completed at least once): the rare-item blue "!",
+     matching the map/minimap repeat tokens */
+  .np-marker.repeat {
+    color: #0070dd;
+    text-shadow:
+      0 0 6px #0070dd88,
+      1px 1px 2px #000;
+  }
+  /* a work order inside its cadence window: the blue mark dimmed at the same
+     0.55 the canvas surfaces blit with, where the plate showed nothing */
+  .np-marker.cooldown {
+    color: #0070dd;
+    opacity: 0.55;
+    text-shadow: 1px 1px 2px #000;
+  }
   .np-marker.loot {
     color: var(--gold);
     font-size: 14px;
@@ -579,24 +594,86 @@
     min-width: 0;
     max-width: 520px;
   }
+  /* How far the player frame's centred content row sits from the left edge of its
+     612px box: (612 - (portrait + the 520px bar column)) / 2. The pet frame hangs
+     beneath with a shorter row, so it cannot reach the same column by centring and
+     pays this inset explicitly instead. Held as one token so the two cannot drift
+     apart; measured against the rendered frames, not derived on paper. */
+  #actionbar-stack {
+    --unit-frame-content-inset: 18px;
+  }
   /* The player frame once MOVED (MovableFrame sets pf-detached alongside the
      saved left/top): hud.ts reparents it from the action-bar stack to #ui (a
      transformed #bottom-bar ancestor would hijack the positioning), where it
-     sits absolutely like the target frame and drops to the target frame's
-     compact bar width, so the two frames read as a pair. Desktop only; the
-     mobile stylesheet owns its own placement (the controller clears the inline
-     position and this class on the mobile layout). */
+     sits absolutely like the target frame while keeping the full player-frame
+     width. Desktop only; the mobile stylesheet owns its own placement (the
+     controller clears the inline position and this class on the mobile layout). */
   #player-frame.pf-detached {
     position: absolute;
     top: 12px;
-    width: auto;
+    width: 612px;
     margin: 0;
     justify-content: flex-start;
     z-index: 6;
   }
-  #player-frame.pf-detached .uf-bars {
+  /* Pet cluster: ONE row above the player frame holding the pet command bar on the
+     left and the pet's health frame on the right. Stacking the two as separate rows
+     spent about 52px of vertical space on what is one subject, and left the health
+     strip reading as a satellite of the player frame rather than part of the pet UI.
+     Side by side they measure ~294px (two 3-button groups) plus ~270px (portrait +
+     bars), which fits the 612px stack with room to spare.
+
+     The stack is bottom-anchored (#bottom-bar sits at bottom: 6px), so this grows it
+     UPWARD: the action bars and the player frame keep their positions and the
+     cluster appears above them. #petbar drops its absolute top:-52px seat here and
+     becomes an ordinary flex item; the mobile sheet keeps the two apart instead (see
+     hud.mobile.css), because there the command bar belongs under the thumb at the top
+     of the screen while the health strip belongs in the bottom-centre column. */
+  #pet-cluster {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    width: 612px;
+    margin: 0 auto;
+    padding-left: var(--unit-frame-content-inset);
+  }
+  #pet-cluster > #petbar {
+    position: static;
+    margin-bottom: 4px;
+  }
+  /* The health half of the cluster. Hidden until the player actually has a pet; the
+     family painter sets the inline display:flex, which outranks the `none` here. It
+     takes no width or centring of its own (the cluster row owns the layout) and no
+     extra zoom, so it scales with the player frame rather than drifting from it. */
+  #pet-frame {
+    position: relative;
+    top: auto;
+    left: auto;
+    margin: 0 0 4px;
+    display: none;
+    align-items: center;
+    justify-content: flex-start;
+    cursor: pointer;
+  }
+  #pet-frame > * {
+    zoom: var(--player-frame-scale, 1);
+  }
+  #pet-frame .uf-bars {
     flex: none;
-    width: 190px;
+    width: 210px;
+  }
+  #pet-frame:hover {
+    outline: 1px solid var(--gold-dim);
+  }
+  #pet-frame:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  /* A dead pet stays visible and selectable (Revive lives on the pet bar), so it
+     dims rather than hiding, matching the party frames' dead treatment. */
+  #pet-frame.dead {
+    opacity: 0.7;
   }
   #target-frame {
     left: 12px;
@@ -699,7 +776,6 @@
     border: 1px solid #4a3d1d;
     border-radius: 50%;
     background: radial-gradient(circle at 35% 30%, #2c2c3a, #15151f);
-    color: var(--color-text-muted);
     cursor: var(--cursor-point);
     opacity: 0.6;
     z-index: 7;
@@ -1697,6 +1773,22 @@
     cursor: default;
     box-shadow: inset 0 0 10px #000;
   }
+  /* Issue 2429: the "Hide Unused Action Slots" Interface option (hideUnusedActionSlots,
+     applied as this body class by main.ts). A slot with no ability or item bound loses
+     its black background, border, and keybind label so an unlearned class's bar reads
+     clean instead of a wall of empty squares; the box stays in the flex row (no
+     display: none) so it neither shifts a bound neighbor on the extra rows nor disturbs
+     the deliberate slot layout those rows exist for. The .action-btn:hover rule above
+     still applies (border-color: var(--gold)), so the slot stays a discoverable drop
+     target for dragging a new ability or item in. */
+  body.hide-unused-action-slots .action-btn.empty {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+  }
+  body.hide-unused-action-slots .action-btn.empty .keybind {
+    display: none;
+  }
   .action-btn .keybind {
     position: absolute;
     top: 1px;
@@ -2014,6 +2106,60 @@
     }
   }
 
+  /* On-bar action-bar key-binding mode (issue #1238): a plain banner (no window
+     chrome) anchored above the visible action bar(s) via #actionbar-stack's own
+     position: relative. Built/removed by hud.ts on enter/exit. */
+  #actionbar-bind-banner {
+    position: absolute;
+    left: 50%;
+    bottom: 100%;
+    transform: translateX(-50%);
+    margin-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: max-content;
+    max-width: 90vw;
+    padding: 8px 14px;
+    border: 2px solid var(--color-border-focus);
+    border-radius: 6px;
+    background: linear-gradient(170deg, #15131fee, #09080eee);
+    box-shadow: 0 2px 10px #000c;
+    color: var(--color-text-light);
+    font-family: var(--ui-font);
+    text-align: center;
+    z-index: 25;
+  }
+  .actionbar-bind-hint {
+    font-size: 13px;
+  }
+  .actionbar-bind-status {
+    min-height: 14px;
+    font-size: 12px;
+    color: var(--gold);
+  }
+  .actionbar-bind-actions {
+    display: flex;
+    gap: 8px;
+  }
+  /* The slot awaiting a keypress: a gold ring distinct from both the .used
+     (currently bound to the ability on the swing/cast state) and :hover looks,
+     so it reads clearly mid-capture. */
+  .action-btn.bind-selected {
+    border-color: var(--gold);
+    box-shadow:
+      0 0 10px #ffd100cc,
+      inset 0 0 0 2px var(--gold);
+  }
+  /* While the mode is active every slot is a click target, whether or not it
+     currently holds anything: a dashed hover ring is the only extra affordance
+     needed, the bar otherwise looks exactly as it does in normal play. */
+  body.actionbar-bind-active .action-btn:hover {
+    outline: 2px dashed var(--gold);
+    outline-offset: 1px;
+  }
+
   /* ---------- chat frame ---------- */
   /* width shrinks on narrower screens so the chat never overlaps the centred
      bottom bar (≈612px wide); caps at 370px when there's room. */
@@ -2065,6 +2211,22 @@
     color: var(--gold);
     border-color: #6f5a2a;
     background: linear-gradient(#2a2436, #161220);
+  }
+  /* Drag-to-reorder affordance, matching the bags' grab/drop-target language
+     (components.css `.bag-item[draggable="true"]` / `.bag-item.drop-target`)
+     so the gesture reads as intentional rather than a blind drop. */
+  /* Matches the specificity of the `#chatlog-tabs .chat-tab` cursor rule below
+     so the grab cursor actually wins instead of losing to it on ID weight. */
+  #chatlog-tabs .chat-tab[draggable="true"] {
+    cursor: var(--cursor-grab);
+  }
+  .chat-tab.chat-tab-dragging {
+    opacity: 0.45;
+  }
+  .chat-tab.drop-target {
+    outline: 2px dashed rgba(255, 218, 160, 0.85);
+    outline-offset: -2px;
+    box-shadow: 0 0 10px rgba(202, 164, 114, 0.45);
   }
   /* "add channel" (+) tab: square, icon-only, slightly de-emphasised. Sticks to
      the right edge so it stays inline and reachable even when the tabs scroll. */
@@ -2326,6 +2488,22 @@
     outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
   }
+  /* Deed chat link (the unlock/broadcast announcements): the color inherits
+     the line's own announcement color (gold for your unlock, guild green for
+     a broadcast), so the underline and hover are what mark it as a jump. */
+  .chat-deed-link {
+    cursor: var(--cursor-point);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+  .chat-deed-link:hover {
+    filter: brightness(1.25);
+  }
+  .chat-deed-link:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
   .chat-pane::-webkit-scrollbar {
     width: 8px;
   }
@@ -2533,6 +2711,15 @@
   #quest-tracker .qt-title:hover {
     color: #fff;
   }
+  /* Bag-hover highlight: matching quest title while a quest stack is hovered
+     in bags. Information-add, always-on (no --fx gate). Quest gold wash, not
+     a second yellow. Shape of the title row is unchanged. */
+  #quest-tracker .qt-title.qt-bag-hover {
+    color: var(--color-quest-tracker-bag-hover);
+    text-shadow:
+      0 0 6px color-mix(in srgb, var(--color-quest-tracker-bag-hover) 55%, transparent),
+      1px 1px 2px #000;
+  }
   #quest-tracker .qt-title:focus-visible {
     outline: 2px solid var(--gold);
     outline-offset: 2px;
@@ -2566,6 +2753,26 @@
   .qd-obj.done,
   .quest-complete {
     color: var(--color-text-success);
+  }
+  /* Repeatable-quest glyphs and tags (the phase 23 blue "!"): the rare-item
+     blue, matching the map/minimap repeat tokens. Plain color classes so the
+     marker reads on every graphics tier (fairness invariant). */
+  .quest-repeat {
+    color: #0070dd;
+  }
+  /* The map tooltip's TAG texts are 13.5px prose over the panel gradient,
+     where #0070dd reads 4.07:1 (under the 4.5:1 AA floor for text) and a
+     0.55 dim about 2:1, so the TEXT channel lifts to the theme-repaired
+     tag token at full opacity; the glyph channels (the gossip '!', the
+     nameplate marks, both canvas painters) keep the #0070dd anchor and
+     carry the dim. One grouped rule so the accessible blue is stated once,
+     both arms #tooltip-scoped so a future reuse outside the tooltip never
+     silently inherits the text lift: .quest-repeat falls back to its glyph
+     rule above, and .quest-cooldown (tooltip-tag-only, no base rule) would
+     surface unstyled as a prompt to decide its channel. */
+  #tooltip .quest-cooldown,
+  #tooltip .quest-repeat {
+    color: var(--color-quest-tag-text, #3d9bff);
   }
 
   /* ---------- deed tracker ---------- */
@@ -2717,8 +2924,39 @@
     cursor: help;
   }
 
+  /* ---------- rift floor tracker ---------- */
+  /* Floor progress + the "closes in" event countdown (issue #2655). Same shape
+     as the delve tracker above; actionable pacing info, so it stays visible on
+     every graphics tier (docs/design/graphics-settings-fairness.md). */
+  #rift-tracker {
+    width: 100%;
+    font-size: 12px;
+    color: var(--gold);
+    text-shadow: 1px 1px 2px #000;
+    pointer-events: none;
+    display: none;
+  }
+  #rift-tracker .rt-header {
+    font-family: var(--title-font);
+    font-size: 14px;
+    border-bottom: 1px solid #ffd10044;
+    margin-bottom: 4px;
+    padding-bottom: 2px;
+  }
+  #rift-tracker .rt-obj {
+    color: #e8e0c8;
+    font-size: 11px;
+    margin-left: 8px;
+    margin-top: 4px;
+  }
+
   /* ---------- combat meters ---------- */
-  #meters-window {
+  /* The damage window and the two detachable meters (Healing, Threat) share one
+     panel shape. Undisturbed they sit in the bottom-right HUD stack exactly as
+     the meters window always has; once the player drags or resizes one,
+     meters_frame.ts switches it to absolute left/top/width/height and stamps
+     .mt-framed, which is what turns it into a fixed-height scrolling column. */
+  .mt-panel {
     width: 240px;
     padding: 8px 10px;
     display: none;
@@ -2726,12 +2964,78 @@
     margin-bottom: 6px;
     text-align: left;
   }
-  #meters-window .panel-title {
+  .mt-panel .panel-title {
     margin-bottom: 4px;
+  }
+  /* A framed panel owns its height, so the bar list takes the leftover space and
+     scrolls rather than pushing the panel taller than the player sized it. */
+  /* The framed column's `display: flex` is written inline alongside the box (the
+     panel's open/closed state is an inline display too, so the class cannot win
+     that tie); this carries the rest of the framed layout. */
+  .mt-panel.mt-framed {
+    flex-direction: column;
+    z-index: 21;
+  }
+  .mt-panel.mt-framed .mt-rows {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  /* The title bar is the move handle. Buttons inside keep their own cursor and
+     their own pointerdown (meters_frame.ts ignores a press that lands on one). */
+  .mt-panel .mt-move-handle {
+    cursor: var(--cursor-point);
+    touch-action: none;
+  }
+  .mt-panel .mt-move-handle button {
+    touch-action: auto;
+  }
+  .mt-title-label {
+    font-family: var(--title-font);
+    color: var(--gold);
+  }
+  body.meter-frame-dragging,
+  body.meter-frame-dragging * {
+    user-select: none;
+  }
+  /* Corner resize grip, the same classic diagonal hatch the chat frame uses. */
+  .panel-resize-grip {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 16px;
+    height: 16px;
+    cursor: nwse-resize;
+    z-index: 3;
+    opacity: 0.45;
+    background: linear-gradient(
+      135deg,
+      transparent 0 45%,
+      #95886a 45% 55%,
+      transparent 55% 70%,
+      #95886a 70% 80%,
+      transparent 80%
+    );
+  }
+  .panel-resize-grip:hover {
+    opacity: 0.9;
+  }
+  .mt-panel {
+    position: relative;
+  }
+  /* Desktop-only chrome, mirroring the chat grip and the unit-frame move button:
+     on mobile the stylesheet owns panel placement. */
+  body.mobile-touch .panel-resize-grip {
+    display: none;
+  }
+  body.mobile-touch .mt-panel .mt-move-handle {
+    cursor: default;
+    touch-action: auto;
   }
   .mt-tab {
     background: #1a1410;
-    border: 1px solid var(--color-border-showcase);
+    border: 1px solid var(--gold);
     border-radius: 3px;
     color: var(--color-text-muted);
     font-size: 11px;
@@ -2799,6 +3103,571 @@
     color: #ffe;
     text-shadow: 1px 1px 1px #000;
   }
+  /* Each bar is focusable so its hover breakdown is reachable by keyboard, not
+     by pointer only (attachTooltip shows on focusin and on a long-press). */
+  .mt-row:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: -1px;
+  }
+
+  /* ---------- target aura window ---------- */
+  .ta-panel {
+    width: 220px;
+    height: var(--ta-preferred-height, 534px);
+    max-height: calc(100vh - 16px);
+    padding: 3px;
+    flex-direction: column;
+    container-type: inline-size;
+  }
+  /* The panel itself is only a positioning surface. Aura rows provide their
+     own meter-like plates; the outer box stays invisible like the reference
+     layout, including under frosted/custom panel themes. */
+  #target-auras-window {
+    border: 0;
+    outline: 0;
+    border-radius: 0;
+    background: transparent;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: none;
+  }
+  .ta-panel .panel-title {
+    min-height: 18px;
+    margin-bottom: 4px;
+    padding: 0 1px 2px;
+    justify-content: flex-start;
+    border-bottom: 1px dashed color-mix(in srgb, var(--gold-dim) 55%, transparent);
+    background: transparent;
+    opacity: 0.58;
+  }
+  .ta-panel .panel-title:hover,
+  .ta-panel.ta-unlocked .panel-title {
+    opacity: 0.9;
+  }
+  .ta-panel .ta-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    font-size: clamp(10px, 5.5cqw, 15px);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .ta-panel.empty .ta-target,
+  .ta-panel.empty .ta-sections {
+    display: none;
+  }
+  /* Unlocking doubles as a resize preview: empty columns return with one
+     skeletal row, so the player can judge both halves before real auras arrive. */
+  .ta-panel.empty.ta-unlocked .ta-sections {
+    display: grid;
+  }
+  .ta-panel.ta-unlocked {
+    outline: 1px dashed color-mix(in srgb, var(--gold) 62%, transparent);
+    outline-offset: 2px;
+  }
+  .ta-move-btn {
+    position: relative;
+    flex: 0 0 24px;
+    width: 24px;
+    height: 24px;
+    margin-left: auto;
+    padding: 0;
+    border: 1px solid color-mix(in srgb, var(--color-text-muted) 42%, transparent);
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--color-bg-input) 72%, transparent);
+    color: var(--color-text-muted);
+    cursor: var(--cursor-point);
+    opacity: 0.78;
+    box-shadow:
+      inset 0 1px 0 #ffffff14,
+      0 1px 3px #0009;
+  }
+  .ta-rows-config-btn {
+    position: relative;
+    flex: 0 0 24px;
+    width: 24px;
+    height: 24px;
+    margin-left: auto;
+    padding: 0;
+    border: 1px solid color-mix(in srgb, var(--color-text-muted) 42%, transparent);
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--color-bg-input) 72%, transparent);
+    color: var(--color-text-muted);
+    cursor: var(--cursor-point);
+    opacity: 0.78;
+  }
+  .ta-rows-config-btn::before {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    background-color: currentColor;
+    -webkit-mask:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M3%205h10v2H3V5zm0%206h14v2H3v-2zm0%206h18v2H3v-2zm14-13h4v4h-4V4zm-4%206h4v4h-4v-4zm4%206h4v4h-4v-4z'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+    mask:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M3%205h10v2H3V5zm0%206h14v2H3v-2zm0%206h18v2H3v-2zm14-13h4v4h-4V4zm-4%206h4v4h-4v-4zm4%206h4v4h-4v-4z'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+  }
+  .ta-rows-config-btn:hover,
+  .ta-rows-config-btn:focus-visible,
+  .ta-rows-config-btn[aria-expanded="true"] {
+    color: var(--gold);
+    border-color: var(--gold);
+    opacity: 1;
+  }
+  .ta-rows-config-btn:focus-visible,
+  .ta-visible-rows-step:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .ta-visible-rows-control {
+    position: absolute;
+    top: 28px;
+    right: auto;
+    left: 0;
+    z-index: 3;
+    align-items: center;
+    flex-wrap: wrap;
+    width: min(150px, calc(100vw - 16px));
+    gap: 2px;
+    padding: 3px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 3px;
+    background: var(--color-bg-input);
+    box-shadow: 0 2px 6px #0009;
+  }
+  .ta-visible-rows-step,
+  .ta-visible-rows-value {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+  }
+  .ta-visible-rows-step {
+    padding: 0;
+    border: 1px solid color-mix(in srgb, var(--gold-dim) 60%, transparent);
+    border-radius: 2px;
+    background: color-mix(in srgb, var(--color-bg-dark) 82%, transparent);
+    color: var(--color-text-light);
+    cursor: var(--cursor-point);
+    font-size: 18px;
+    line-height: 1;
+  }
+  .ta-visible-rows-step:hover,
+  .ta-visible-rows-step:focus-visible,
+  .ta-source-toggle.on {
+    color: var(--gold);
+    border-color: var(--gold);
+  }
+  .ta-visible-rows-step[aria-disabled="true"] {
+    cursor: default;
+    opacity: 0.35;
+  }
+  .ta-visible-rows-value {
+    color: var(--gold);
+    font-variant-numeric: tabular-nums;
+  }
+  .ta-source-toggle {
+    position: relative;
+    margin-left: 6px;
+  }
+  .ta-source-toggle::before {
+    content: "";
+    position: absolute;
+    inset: 6px;
+    background-color: currentColor;
+    -webkit-mask:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%2012a4%204%200%201%200%200-8%204%204%200%200%200%200%208zm0%202c-4.4%200-8%202.2-8%205v1h16v-1c0-2.8-3.6-5-8-5z'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+    mask:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%2012a4%204%200%201%200%200-8%204%204%200%200%200%200%208zm0%202c-4.4%200-8%202.2-8%205v1h16v-1c0-2.8-3.6-5-8-5z'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+  }
+  .ta-opacity-control {
+    display: flex;
+    flex: 1 0 100%;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  .ta-opacity-slider {
+    flex: 1 1 auto;
+    min-width: 0;
+    accent-color: var(--gold);
+    cursor: var(--cursor-point);
+  }
+  .ta-opacity-value {
+    flex: 0 0 38px;
+    color: var(--color-text-light);
+    font-size: 10px;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+  .ta-move-btn::before {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    background-color: currentColor;
+    -webkit-mask:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%201.5%208.5%205H11v6H5V8.5L1.5%2012%205%2015.5V13h6v6H8.5L12%2022.5%2015.5%2019H13v-6h6v2.5L22.5%2012%2019%208.5V11h-6V5h2.5z'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+    mask:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%201.5%208.5%205H11v6H5V8.5L1.5%2012%205%2015.5V13h6v6H8.5L12%2022.5%2015.5%2019H13v-6h6v2.5L22.5%2012%2019%208.5V11h-6V5h2.5z'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+  }
+  .ta-move-btn.active {
+    color: var(--gold);
+    border-color: var(--gold);
+    opacity: 1;
+  }
+  .ta-move-btn.active::before {
+    -webkit-mask:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M7%2010V7a5%205%200%200%201%2010%200v3h1.2A1.8%201.8%200%200%201%2020%2011.8v7.4A1.8%201.8%200%200%201%2018.2%2021H5.8A1.8%201.8%200%200%201%204%2019.2v-7.4A1.8%201.8%200%200%201%205.8%2010H7zm2%200h6V7a3%203%200%200%200-6%200v3z'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+    mask:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M7%2010V7a5%205%200%200%201%2010%200v3h1.2A1.8%201.8%200%200%201%2020%2011.8v7.4A1.8%201.8%200%200%201%2018.2%2021H5.8A1.8%201.8%200%200%201%204%2019.2v-7.4A1.8%201.8%200%200%201%205.8%2010H7zm2%200h6V7a3%203%200%200%200-6%200v3z'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+  }
+  .ta-move-btn:hover,
+  .ta-move-btn:focus-visible {
+    color: var(--gold);
+    border-color: var(--gold);
+    opacity: 1;
+  }
+  .ta-move-btn:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .ta-panel:not(.ta-unlocked) .panel-resize-grip {
+    display: none;
+  }
+  .ta-target {
+    margin: 0 0 6px;
+    overflow: hidden;
+    color: var(--color-text-muted);
+    font-size: 11px;
+    line-height: 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .ta-filters {
+    display: flex;
+    flex: 1 0 100%;
+    flex-wrap: nowrap;
+    width: 100%;
+    gap: 2px;
+    margin: 0;
+  }
+  .ta-filters .mt-tab {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 24px;
+    padding: 1px 3px;
+    overflow: hidden;
+    font-size: 9px;
+    line-height: 16px;
+    text-overflow: clip;
+    white-space: nowrap;
+  }
+  .ta-filters .mt-tab.on {
+    background: color-mix(in srgb, var(--gold-dim) 22%, transparent);
+  }
+  .ta-section {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+  }
+  .ta-sections {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px;
+    min-height: 0;
+    flex: 1 1 auto;
+  }
+  .ta-panel.ta-filter-debuffs .ta-sections,
+  .ta-panel.ta-filter-buffs .ta-sections {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ta-buff-section {
+    padding-left: 8px;
+    border-left: 1px solid color-mix(in srgb, var(--gold-dim) 40%, transparent);
+  }
+  .ta-sections.only-one .ta-section:not(.empty-section) {
+    grid-column: 1 / -1;
+    padding-left: 0;
+    border-left: 0;
+  }
+  .ta-section.empty-section {
+    display: none;
+  }
+  .ta-panel.ta-unlocked .ta-section.empty-section {
+    display: flex;
+  }
+  .ta-panel.ta-filter-debuffs .ta-section.ta-buff-section,
+  .ta-panel.ta-filter-buffs .ta-section.ta-debuff-section {
+    display: none;
+  }
+  .ta-panel.ta-unlocked.ta-filter-all .ta-sections.only-one .ta-section:not(.empty-section) {
+    grid-column: auto;
+    padding-left: 0;
+    border-left: 0;
+  }
+  .ta-section-title {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 3px;
+    color: var(--color-text-muted);
+    font-family: var(--title-font);
+    font-size: 10px;
+    line-height: 14px;
+    text-transform: uppercase;
+  }
+  .ta-debuff-section .ta-section-title {
+    color: var(--color-hostile);
+  }
+  .ta-buff-section .ta-section-title {
+    color: var(--gold);
+  }
+  .ta-rows {
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  .ta-panel .ta-rows {
+    flex: 1 1 auto;
+    max-height: var(--ta-visible-rows-height, 468px);
+  }
+  .ta-panel.ta-unlocked .empty-section .ta-rows::before {
+    content: "";
+    display: block;
+    height: clamp(17px, 4.2cqw, 20px);
+    border: 1px dashed color-mix(in srgb, var(--gold-dim) 48%, transparent);
+    border-radius: 2px;
+    background: repeating-linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-bg-input) 48%, transparent) 0 7px,
+      transparent 7px 14px
+    );
+    opacity: 0.6;
+  }
+  .ta-row {
+    --ta-row-height: clamp(17px, 4.2cqw, 20px);
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--ta-row-height) minmax(0, 1fr) auto;
+    grid-template-rows: 1fr;
+    height: var(--ta-row-height);
+    margin-bottom: 3px;
+    overflow: hidden;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 2px;
+    background: var(--color-bg-input);
+    opacity: var(--ta-row-opacity, 1);
+  }
+  .ta-row.own {
+    border-color: var(--gold);
+    box-shadow:
+      inset 3px 0 0 color-mix(in srgb, var(--gold) 82%, transparent),
+      inset 0 0 12px color-mix(in srgb, var(--gold) 13%, transparent);
+  }
+  .ta-row.debuff {
+    border-left-color: var(--color-hostile);
+  }
+  .ta-row.debuff.own {
+    border-left-color: var(--gold);
+  }
+  .ta-show-sources .ta-row {
+    --ta-row-height: clamp(36px, 8.5cqw, 46px);
+    grid-template-rows: 55% 45%;
+  }
+  .ta-show-sources.ta-unlocked .empty-section .ta-rows::before {
+    height: clamp(36px, 8.5cqw, 46px);
+  }
+  .ta-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    z-index: 0;
+    background: color-mix(in srgb, var(--gold-dim) 28%, transparent);
+  }
+  .ta-row.debuff .ta-fill {
+    background: color-mix(in srgb, var(--color-hostile) 25%, transparent);
+  }
+  .ta-icon {
+    position: relative;
+    z-index: 1;
+    grid-column: 1;
+    grid-row: 1 / 3;
+    width: calc(var(--ta-row-height) - 2px);
+    height: calc(var(--ta-row-height) - 2px);
+    border-right: 1px solid var(--color-border-showcase);
+    background-position: center;
+    background-size: cover;
+  }
+  .ta-stacks {
+    position: absolute;
+    right: 1px;
+    bottom: 0;
+    color: var(--color-text-light);
+    font-size: 10px;
+    font-weight: bold;
+    text-shadow: 1px 1px 1px var(--color-bg-dark);
+  }
+  .ta-stacks.empty {
+    display: none;
+  }
+  .ta-name,
+  .ta-source,
+  .ta-time {
+    position: relative;
+    z-index: 1;
+  }
+  .ta-name {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+    overflow: hidden;
+    padding-left: 5px;
+    color: var(--color-text-light);
+    font-size: clamp(10.5px, 2.8cqw, 13px);
+    font-weight: bold;
+    line-height: 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .ta-row.own .ta-name {
+    padding-left: 12px;
+  }
+  .ta-source {
+    display: none;
+    grid-column: 2;
+    grid-row: 2;
+    overflow: hidden;
+    padding-left: 5px;
+    color: var(--color-text-muted);
+    font-size: clamp(9.5px, 2.3cqw, 11px);
+    line-height: 14px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .ta-show-sources .ta-name {
+    align-self: end;
+  }
+  .ta-show-sources .ta-source {
+    display: block;
+  }
+  .ta-time {
+    grid-column: 3;
+    grid-row: 1 / 3;
+    align-self: center;
+    padding: 0 5px;
+    color: var(--color-text-light);
+    font-size: clamp(10.5px, 2.5cqw, 12px);
+    font-variant-numeric: tabular-nums;
+  }
+  .ta-own-marker {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  .ta-row.own::after {
+    content: "";
+    position: absolute;
+    z-index: 2;
+    left: calc(var(--ta-row-height) - 4px);
+    top: 50%;
+    width: 6px;
+    height: 6px;
+    border: 1px solid #fff2b0;
+    background: var(--gold);
+    box-shadow: 0 0 4px #000;
+    transform: translateY(-50%) rotate(45deg);
+  }
+  .ta-row:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: -2px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .ta-row.expiring .ta-icon {
+      animation: aura-expire-blink 0.8s ease-in-out infinite;
+    }
+  }
+  /* Expiry remains visible on Low without keeping a compositor animation alive
+     for every expiring target aura. Full tiers retain the blink above. */
+  :root[data-fx-level="low"] .ta-row.expiring .ta-icon {
+    animation: none;
+    filter: brightness(1.4);
+  }
+  /* Low retains the actionable own-aura stripe and diamond while dropping the
+     per-row glow. Higher presets keep the subtle inset tint. */
+  :root[data-fx-level="low"] .ta-row.own {
+    box-shadow: inset 3px 0 0 color-mix(in srgb, var(--gold) 82%, transparent);
+  }
+  /* Hover breakdown painted into the shared #tooltip box (meters.ts): one row
+     per ability, or per contributor on the Threat tab. The mini bar sits behind
+     the text the same way .mt-fill does on the bar itself. */
+  #tooltip .mt-tip-sub {
+    color: var(--color-text-muted);
+    font-size: 11px;
+    margin-bottom: 4px;
+  }
+  #tooltip .mt-tip-row {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    min-width: 180px;
+    padding: 1px 4px;
+    line-height: 1.5;
+  }
+  #tooltip .mt-tip-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background: #ffffff14;
+    border-radius: 2px;
+  }
+  #tooltip .mt-tip-name {
+    position: relative;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #tooltip .mt-tip-val {
+    position: relative;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+  /* Contributor subtotal on the damage/healing breakdown: the member, then each
+     pet that acted. It reads as a heading over the abilities nested beneath it,
+     which is what lets a hunter separate their own output from the pet's. */
+  #tooltip .mt-tip-head {
+    color: var(--color-text);
+    font-weight: 600;
+    margin-top: 3px;
+  }
+  #tooltip .mt-tip-head:first-child {
+    margin-top: 0;
+  }
+  #tooltip .mt-tip-head .mt-tip-val {
+    color: var(--color-text);
+  }
+  /* The abilities belonging to the subtotal directly above. Indented rather than
+     boxed: the tooltip is narrow, and a border would compete with the mini bars
+     already drawn behind every row. */
+  #tooltip .mt-tip-group {
+    padding-left: 10px;
+  }
+  #tooltip .mt-tip-group .mt-tip-name {
+    color: var(--color-text-muted);
+  }
   body.mobile-touch #meters-window .mt-rows {
     max-height: 82px;
     overflow-y: auto;
@@ -2862,16 +3731,17 @@
     color: #fff;
     border-color: #c9a86a;
   }
-  /* day/night dial: a small satellite disc on the top-right rim of the minimap
-     (mirrors the #raid-lockout button placement), showing the 12h world cycle.
-     Purely informational, so it ignores pointer input. */
+  /* day/night dial: a satellite disc on the top-right rim of the minimap
+     (mirrors the #raid-lockout button placement), showing the world day/night
+     cycle. Sized to read at a glance; purely informational, so it ignores
+     pointer input. */
   #minimap-daynight {
     position: absolute;
-    top: 6px;
-    right: 6px;
+    top: 2px;
+    right: 2px;
     z-index: 3;
-    width: 30px;
-    height: 30px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     border: 2px solid var(--border);
     background: #14141d;
@@ -3317,9 +4187,9 @@
   body.native-app #mobile-donate,
   body.native-app #token-ca,
   body.native-app #nav-btn-download,
-  body.native-app .cs-wallet,
-  body.native-app .cs-wallet-hidden-note,
-  body.native-app .account-wallet-card,
+  body.native-app:not(.seeker-wallet-enabled) .cs-wallet,
+  body.native-app:not(.seeker-wallet-enabled) .cs-wallet-hidden-note,
+  body.native-app:not(.seeker-wallet-enabled) .account-wallet-card,
   body.native-app #performance-tip,
   body.native-app .official-site-copy {
     display: none !important;
@@ -3401,6 +4271,15 @@
   #tooltip.mob-tooltip .tt-green {
     font-size: calc(14px * var(--tooltip-scale, 1));
   }
+  /* Elite/Boss rank badge (mob_tooltip_view.ts), between the level/family line
+     and any quest lines. Mirrors the target frame's gold, letter-spaced
+     #tf-elite-tag styling so the two rank cues read as the same chrome. */
+  #tooltip.mob-tooltip .tt-rank {
+    color: var(--gold);
+    font-family: var(--title-font);
+    letter-spacing: 1px;
+    font-size: calc(12px * var(--tooltip-scale, 1));
+  }
   /* The map quest-giver glyph tooltip: the quest's level-requirement line,
      dimmed under its gold title so the name stays the focus. */
   #tooltip .tt-quest-req {
@@ -3445,6 +4324,12 @@
   #tooltip .tt-row .tt-armor.tt-armor-bad {
     color: #ff5040;
   }
+  /* Unique-equipped tag (legendaries): sits in the same right-aligned seat as
+     the armor weight, in the soulbound gold. A rule cue, not a warning, so it
+     never takes the red bad-class treatment. */
+  #tooltip .tt-row .tt-unique {
+    color: var(--gold);
+  }
   /* Weapon type (Sword/Dagger/Mace/...): its own plain line under the quality/kind
      line, above the slot. Keeps the muted tt-sub color, deliberately NOT brightened
      or class-colored like armor weight: any class can equip most weapon types, so
@@ -3473,6 +4358,17 @@
     color: var(--color-accent);
     margin-top: 4px;
     font-size: 11.5px;
+  }
+  /* Profession affinity on honest materials ("Used by Leatherworking, ...").
+     Soft craft-teal wash on the accent so multi-use reagents scan apart from
+     food/potion use lines without inventing a new rarity color. The color is
+     a theme-emitted token (src/ui/theme.ts), NOT a color-mix over
+     --color-accent: mixing a fixed light teal into the contrast-repaired
+     accent re-lightens it below the large-text floor on the light Parchment
+     panel, so the wash is repaired per preset like --color-quest-tag-text.
+     Always-on (no --fx gate; fairness). */
+  #tooltip .tt-desc.tt-material-use {
+    color: var(--color-material-use, #d6ce3b);
   }
   #tooltip .tt-stat {
     color: #fff;
@@ -3584,9 +4480,10 @@
      el.style.color onto a class the pooled fct_painter toggles (no hex
      in TS). Each class carries the exact hex the live fct() passed, grouped by colour:
      miss/dodge keyed self (#bbb) vs other (#fff); damage done by ability (#ffe97a) vs
-     auto-attack (#fff); damage taken (#ff5544); heal (#3ce63c); xp (#d9a3ff); rested
-     xp (#6db8ff); Honor (#ffd100); the self note (#ff8c66). Crit stays the separate
-     .fct.crit class. */
+     auto-attack (#fff); damage taken (#ff5544); a shield block done (#b8c4d9, steel grey,
+     a landed hit blunted) vs taken (#7ec8e3, a cooler steel blue, a landed block you made);
+     heal (#3ce63c); xp (#d9a3ff); rested xp (#6db8ff); Honor (#ffd100); the self note
+     (#ff8c66). Crit stays the separate .fct.crit class. */
   .fct-miss-self,
   .fct-dodge-self {
     color: #bbb;
@@ -3601,6 +4498,12 @@
   }
   .fct-damage-taken {
     color: #ff5544;
+  }
+  .fct-damage-done-block {
+    color: #b8c4d9;
+  }
+  .fct-damage-taken-block {
+    color: #7ec8e3;
   }
   .fct-absorb {
     color: #9fd7ff;
@@ -4499,6 +5402,13 @@
     font-weight: 600;
     letter-spacing: 0;
   }
+  /* A banner may carry SEVERAL secondary lines (the battleground verdict: the
+     score and rating swing, why the match ended, the first-win bonus). Only the
+     first one needs the gap under the title; the rest stack tight so three lines
+     still read as one block rather than a list. */
+  #banner .banner-subtext + .banner-subtext {
+    margin-top: 2px;
+  }
   #banner.banner-with-art {
     display: flex;
     align-items: center;
@@ -4511,6 +5421,80 @@
     height: 46px;
     object-fit: contain;
     filter: drop-shadow(var(--art-shadow-lg));
+  }
+  /* Art AND subtext on one plate (hud.ts paintBanner's .banner-art-copy
+     wrapper): has-subtext alone stacks title over subtext; with art the
+     plate becomes a row and the title/detail column moves into the wrapper.
+     Variant-agnostic on purpose: any future art-plus-detail banner lays out
+     correctly without borrowing a variant's cosmetic class. */
+  #banner.banner-with-art.has-subtext {
+    flex-direction: row;
+    align-items: center;
+  }
+  #banner.banner-with-art.has-subtext .banner-art-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    min-width: 0;
+  }
+  /* The Book of Deeds variant (hud.ts showBanner variant='deed'). A deed
+     unlock used to fire this element with the level-up's exact colour, size
+     and lifetime, and since an early character trips several deeds inside its
+     first few gathering actions, that is a known cause of players reading
+     routine gathering as leveling. So the deed moment gets its OWN language:
+     a framed parchment plate in the Book of Deeds palette, at a quieter size,
+     against the level-up's bare oversized gold text. Copy and lifetime are
+     untouched: presentation only, never information. */
+  #banner.banner-deed {
+    color: var(--color-deed-banner-text);
+    font-size: 26px;
+    letter-spacing: 0.5px;
+    padding: 8px 22px;
+    border: 1px solid var(--color-deed-banner-border);
+    border-radius: 8px;
+    background: var(--color-deed-banner-bg);
+    /* Scales with the graphics tier like every other decorative shadow here:
+       at the low preset --fx-shadow is 0 and the plate sheds its lift with
+       the rest of the HUD instead of keeping a full-blur outlier. */
+    box-shadow: 0 3px calc(14px * var(--fx-shadow, 1)) var(--color-art-shadow);
+    text-shadow:
+      0 0 10px #00000088,
+      1px 1px 4px #000;
+  }
+  /* Gathering skill milestone plate (hud.ts showBanner variant='skill').
+     Framed copper craft card with the profession crest: distinct from the
+     bare gold character level-up AND the parchment deed plate, so a Mining
+     milestone never steals the "I leveled" reading. Layout comes from the
+     variant-agnostic banner-with-art rules above; this class is cosmetic. */
+  #banner.banner-skill {
+    color: var(--color-skill-banner-text);
+    font-size: 28px;
+    letter-spacing: 0.6px;
+    padding: 10px 26px 12px;
+    border: 1px solid var(--color-skill-banner-border);
+    border-radius: 10px;
+    background: var(--skill-banner-bg);
+    box-shadow:
+      0 0 0 1px var(--color-skill-banner-inset) inset,
+      0 4px calc(18px * var(--fx-shadow, 1)) var(--color-art-shadow);
+    text-shadow:
+      0 0 12px #00000099,
+      1px 1px 4px #000;
+  }
+  #banner.banner-skill .banner-subtext {
+    color: var(--color-skill-banner-subtext);
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    margin-top: 4px;
+  }
+  #banner.banner-skill.banner-with-art {
+    gap: 12px;
+  }
+  #banner.banner-skill .banner-art {
+    width: 52px;
+    height: 52px;
   }
   /* Reduced-motion celebrations (hud.ts showBanner motion=false): the banner
      appears and clears instantly, same text and duration, no fade. */
@@ -5022,6 +6006,57 @@
     background: color-mix(in srgb, var(--color-friendly) 55%, transparent);
     pointer-events: none;
   }
+  /* The pet health sliver on a member's row. NOT class `bar` on purpose: the two
+     rules just below select every non-hp `.bar` child, so a `.bar` here would be
+     hidden by the Show Resource toggle and collapsed onto the resource bar by raid
+     style. Thinner than the member's own bars so it reads as subordinate, and it is
+     its own clickable control (clicking it selects the pet, not the member). */
+  .party-frame .pfm-pet {
+    position: relative;
+    height: 5px;
+    margin-top: 2px;
+    background: #0c0c14;
+    border: 1px solid #000;
+    border-radius: 2px;
+    overflow: hidden;
+    cursor: var(--cursor-point);
+  }
+  .party-frame .pfm-pet-fill {
+    height: 100%;
+    width: 100%;
+    transform-origin: left center;
+    background: linear-gradient(180deg, #6fbf5a, #3f8a33);
+  }
+  /* A dead pet is ALWAYS hp 0, so its fill is scaleX(0) and has no pixels: styling
+     the fill here rendered nothing and left a dead pet identical to an empty track.
+     The dead state goes on the TRACK, which is the part that still has area, so a
+     hunter can tell "dead, revive it" from "alive and nearly dead" at a glance. */
+  .party-frame .pfm-pet.dead {
+    background: repeating-linear-gradient(135deg, #3a3a3a, #3a3a3a 2px, #262626 2px, #262626 4px);
+    border-color: #555;
+  }
+  .party-frame .pfm-pet:hover {
+    outline: 1px solid var(--gold-dim);
+  }
+  /* Raid style compacts the row to a fixed height with overflow hidden, so the
+     sliver rides as a second thin strip directly above the resource strip rather
+     than in flow, where it would be clipped. */
+  #party-frames.party-style-raid .party-frame .pfm-pet {
+    position: absolute;
+    /* 2px is far below any usable hit target, and a stray click here would
+       stopPropagation away the member selection a healer actually meant. Raid style
+       makes the sliver purely informational; the row keeps the whole click area.
+       Keyboard focus is unaffected, so the pet stays reachable without a mouse. */
+    pointer-events: none;
+    left: 0;
+    right: 0;
+    bottom: 3px;
+    height: 2px;
+    margin: 0;
+    z-index: 4;
+    border: 0;
+    border-radius: 0;
+  }
   .party-frame.pf-hide-resource > .bar:not(.hp),
   .party-frame.pf-hide-auras .pfm-auras {
     display: none;
@@ -5410,6 +6445,20 @@
   .prompt .prompt-number:focus {
     outline: 1px solid var(--gold-dim);
   }
+  /* Touch floor for the .prompt family's action buttons: the three quantity
+     prompts (bags discard/sell, bank withdraw/deposit, vendor buy-quantity)
+     plus the generic invite/trade/duel/ready-check prompts that share the
+     class. The base .btn renders around 30px tall, under the 40px
+     coarse-pointer tap target the rest of the vendor family floors; the
+     vendor prompt made this a mobile PURCHASE surface, so the floor lives on
+     the shared rule and lifts every prompt at once. */
+  @media (pointer: coarse) {
+    .prompt .btn {
+      min-width: 40px;
+      min-height: 40px;
+      box-sizing: border-box;
+    }
+  }
 
   /* ---------- trade window ---------- */
   #trade-window {
@@ -5642,12 +6691,17 @@
   }
   /* ---------- World Market collect indicator ---------- */
   /* The Merchant's coin: sale proceeds or returned items wait for collection.
-     Same rim-satellite family as the envelope; claims the top-RIGHT corner
-     (raid-lockout owns bottom-left, the envelope bottom-right; guarded by
-     tests/minimap_rim_badges.test.ts). */
+     Same rim-satellite family as the envelope, and it claims the top-LEFT
+     corner (raid-lockout owns bottom-left, the envelope bottom-right, the
+     day/night dial top-right). It shipped at top/right, which the dial already
+     held, and the dial is later in the DOM at the same z-index, so the coin was
+     painted over completely: an actionable control buried under an aria-hidden
+     decoration, visible together only when proceeds happen to be waiting, which
+     is why it went unnoticed. tests/minimap_rim_badges.test.ts keeps the four
+     corners one-to-one and holds the touch sheet's re-anchoring to match. */
   #market-indicator {
     position: absolute;
-    right: 4px;
+    left: 4px;
     top: 4px;
     z-index: 3;
     display: inline-flex;
@@ -5940,6 +6994,265 @@
      the lit rules below override it with a quick ON transition so the bird still
      lights crisply. Shared by the fire and the Chronomancy variants. */
   transition: opacity 0.7s ease;
+}
+
+/* Configurable Warrior proc frames. The cold controller owns placement and
+   appearance vars; the hot painter only toggles .active. */
+@layer components {
+  #aura-overlays {
+    position: fixed;
+    inset: 0 auto auto 0;
+    width: var(--app-vw, 100vw);
+    height: var(--app-vh, 100vh);
+    z-index: 31;
+    pointer-events: none;
+  }
+  #aura-overlays.placement {
+    z-index: 34;
+    pointer-events: auto;
+  }
+  .aura-overlay-frame {
+    --aura-color: var(--color-aura-rpg-gold);
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    color: var(--aura-color);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      opacity 0.16s ease,
+      filter 0.16s ease;
+  }
+  .aura-overlay-arcs-shell {
+    position: absolute;
+    left: var(--aura-arcs-x);
+    top: var(--aura-arcs-y);
+    width: 300px;
+    height: 220px;
+    translate: -50% -50%;
+    scale: var(--aura-arcs-scale);
+    pointer-events: none;
+  }
+  .aura-overlay-frame.active:not(.disabled) {
+    opacity: var(--aura-opacity);
+  }
+  #aura-overlays.placement .aura-overlay-frame {
+    opacity: 0;
+  }
+  #aura-overlays.placement .aura-overlay-frame.placement-preview {
+    opacity: 0.28;
+  }
+  #aura-overlays.placement .aura-overlay-frame.placement-target {
+    opacity: var(--aura-opacity);
+  }
+  #aura-overlays.placement .aura-overlay-frame.placement-preview .aura-overlay-icon,
+  #aura-overlays.placement .aura-overlay-frame.placement-preview .aura-overlay-timer,
+  #aura-overlays.placement .aura-overlay-frame.placement-preview .aura-overlay-arcs-shell {
+    display: block;
+  }
+  #aura-overlays.placement .aura-overlay-frame.placement-preview .aura-overlay-icon {
+    pointer-events: auto;
+    cursor: pointer;
+    touch-action: none;
+  }
+  #aura-overlays.placement .aura-overlay-frame.placement-target.placement-icon .aura-overlay-icon,
+  #aura-overlays.placement
+    .aura-overlay-frame.placement-target.placement-arcs
+    .aura-overlay-arcs-shell {
+    pointer-events: auto;
+    outline: 1px dashed var(--gold);
+    outline-offset: 4px;
+    touch-action: none;
+  }
+  #aura-overlays.placement .aura-overlay-frame.placement-target.placement-icon .aura-overlay-icon {
+    cursor: grab;
+  }
+  #aura-overlays.placement
+    .aura-overlay-frame.placement-target.placement-arcs
+    .aura-overlay-arcs-shell {
+    cursor: pointer;
+  }
+  #aura-overlays.placement
+    :is(.aura-overlay-arcs-shell, .aura-overlay-icon, .aura-overlay-move-handle).dragging {
+    cursor: grabbing;
+    filter: brightness(1.25);
+  }
+  .aura-overlay-arc {
+    position: absolute;
+    top: 18px;
+    width: 72px;
+    height: 184px;
+    pointer-events: none;
+    filter: drop-shadow(0 0 calc(var(--aura-glow-core) * var(--fx-shadow, 1)) currentColor)
+      drop-shadow(0 0 calc(var(--aura-glow-halo) * var(--fx-shadow, 1)) currentColor);
+  }
+  .aura-overlay-arc-left {
+    left: 20px;
+    border-left: 9px solid currentColor;
+    border-radius: 100% 0 0 100%;
+  }
+  .aura-overlay-arc-right {
+    right: 20px;
+    border-right: 9px solid currentColor;
+    border-radius: 0 100% 100% 0;
+  }
+  .aura-overlay-icon {
+    position: absolute;
+    left: clamp(
+      calc(var(--aura-icon-half) + env(safe-area-inset-left, 0px)),
+      var(--aura-icon-x),
+      calc(var(--app-vw, 100vw) - var(--aura-icon-half) - env(safe-area-inset-right, 0px))
+    );
+    top: clamp(
+      calc(var(--aura-icon-half) + env(safe-area-inset-top, 0px)),
+      var(--aura-icon-y),
+      calc(var(--app-vh, 100vh) - var(--aura-icon-half) - env(safe-area-inset-bottom, 0px))
+    );
+    width: 58px;
+    height: 58px;
+    translate: -50% -50%;
+    scale: var(--aura-icon-scale);
+    border: 2px solid currentColor;
+    border-radius: 9px;
+    box-shadow:
+      0 0 calc(var(--aura-glow-core) * var(--fx-shadow, 1)) currentColor,
+      0 0 calc(var(--aura-glow-halo) * var(--fx-shadow, 1)) currentColor;
+    opacity: 0.88;
+  }
+  .aura-overlay-timer {
+    position: absolute;
+    z-index: 1;
+    left: clamp(
+      calc(var(--aura-icon-half) + env(safe-area-inset-left, 0px)),
+      var(--aura-icon-x),
+      calc(var(--app-vw, 100vw) - var(--aura-icon-half) - env(safe-area-inset-right, 0px))
+    );
+    top: clamp(
+      calc(var(--aura-icon-half) + env(safe-area-inset-top, 0px)),
+      var(--aura-icon-y),
+      calc(var(--app-vh, 100vh) - var(--aura-icon-half) - env(safe-area-inset-bottom, 0px))
+    );
+    display: grid;
+    width: 58px;
+    height: 58px;
+    place-items: center;
+    translate: -50% -50%;
+    scale: var(--aura-icon-scale);
+    border-radius: 7px;
+    background: conic-gradient(
+      from 0deg,
+      transparent var(--aura-remaining-ratio, 0%),
+      rgb(0 0 0 / 62%) 0
+    );
+    color: white;
+    font-size: 20px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    text-shadow:
+      0 1px 2px black,
+      0 0 4px black;
+    pointer-events: none;
+  }
+  .aura-overlay-move-handle {
+    position: absolute;
+    z-index: 2;
+    display: none;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 50%;
+    background: var(--panel-bg);
+    cursor: var(--cursor-point);
+    pointer-events: auto;
+    touch-action: none;
+    color: var(--gold);
+  }
+  .aura-overlay-move-handle::before {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    background: currentColor;
+    -webkit-mask:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%202l4%204h-3v5h5V8l4%204-4%204v-3h-5v5h3l-4%204-4-4h3v-5H6v3l-4-4%204-4v3h5V6H8l4-4z'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+    mask:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%202l4%204h-3v5h5V8l4%204-4%204v-3h-5v5h3l-4%204-4-4h3v-5H6v3l-4-4%204-4v3h5V6H8l4-4z'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+  }
+  #aura-overlays.placement .placement-target.placement-icon .aura-overlay-move-handle {
+    display: block;
+  }
+  #aura-overlays.placement .placement-target.placement-icon .aura-overlay-move-handle {
+    left: var(--aura-icon-x);
+    top: var(--aura-icon-y);
+    translate: 24px -48px;
+  }
+  #aura-overlays.placement .placement-target.placement-arcs .aura-overlay-move-handle {
+    left: var(--aura-arcs-x);
+    top: var(--aura-arcs-y);
+    translate: 126px -124px;
+  }
+  body.mobile-touch .aura-overlay-move-handle {
+    width: 40px;
+    height: 40px;
+  }
+  .aura-overlay-frame.hide-icon :is(.aura-overlay-icon, .aura-overlay-timer),
+  .aura-overlay-frame.hide-arcs .aura-overlay-arcs-shell {
+    display: none;
+  }
+  .aura-overlay-frame.loadout-hidden {
+    display: none;
+  }
+  .aura-overlay-battle {
+    --aura-color: var(--color-aura-rpg-electric);
+  }
+  .aura-overlay-death {
+    --aura-color: var(--color-aura-rpg-violet);
+  }
+  .aura-overlay-victory {
+    --aura-color: var(--color-aura-rpg-gold);
+  }
+  .aura-overlay-fire {
+    --aura-color: #ff8a33;
+  }
+  .aura-overlay-frost {
+    --aura-color: #54d9ff;
+  }
+  .aura-overlay-arcane {
+    --aura-color: #bd63ff;
+  }
+  .aura-overlay-paladin {
+    --aura-color: var(--color-aura-rpg-gold);
+  }
+  .aura-overlay-hunter {
+    --aura-color: var(--color-aura-rpg-gold);
+  }
+  .aura-overlay-rogue {
+    --aura-color: var(--color-aura-rpg-violet);
+  }
+  .aura-overlay-priest {
+    --aura-color: var(--color-aura-rpg-electric);
+  }
+  .aura-overlay-shaman {
+    --aura-color: var(--color-aura-rpg-electric);
+  }
+  .aura-overlay-warlock {
+    --aura-color: var(--color-aura-rpg-violet);
+  }
+  .aura-overlay-druid {
+    --aura-color: var(--color-aura-rpg-gold);
+  }
+  body.reduce-motion .aura-overlay-frame {
+    transition: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .aura-overlay-frame {
+      transition: none;
+    }
+  }
 }
 /* The login preview: for a few seconds after entering the world the whole
    bird glows dimly, so the player can see where it lives and drag it BEFORE
@@ -6589,4 +7902,60 @@ body.reduce-motion #proc-overlay.frost .frost-crystal,
 body.reduce-motion #proc-overlay.frost .frost-bird::before,
 body.reduce-motion #proc-overlay.frost .frost-bird::after {
   animation: none !important;
+}
+
+/* WoW-style breath mirror bar (src/ui/breath_bar.ts): top-center, blue,
+   only present while the lungful is spent or refilling. */
+.breath-bar {
+  position: absolute;
+  top: 78px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 240px;
+  height: 16px;
+  background: rgba(8, 14, 24, 0.72);
+  border: 1px solid rgba(150, 190, 230, 0.55);
+  border-radius: 4px;
+  overflow: hidden;
+  display: none;
+  pointer-events: none;
+  z-index: 30;
+}
+.breath-bar.breath-bar-show {
+  display: block;
+}
+.breath-bar-fill {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(180deg, #6fc2ff 0%, #2f7fd4 100%);
+  transition: width 0.12s linear;
+}
+.breath-bar.breath-bar-drowning .breath-bar-fill {
+  background: linear-gradient(180deg, #ff7d6f 0%, #c22f2f 100%);
+}
+.breath-bar.breath-bar-drowning {
+  animation: breath-drown-pulse 1s ease-in-out infinite;
+}
+@keyframes breath-drown-pulse {
+  0%,
+  100% {
+    border-color: rgba(255, 120, 100, 0.9);
+  }
+  50% {
+    border-color: rgba(255, 60, 40, 0.4);
+  }
+}
+.breath-bar-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: #eaf4ff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+body.reduce-motion .breath-bar.breath-bar-drowning {
+  animation: none;
 }

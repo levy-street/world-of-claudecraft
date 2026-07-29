@@ -7,6 +7,102 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: 'Banner i Hånden',
+    desc: 'Erobr et flag i Tornehulemarkerne.',
+  },
+  pvp_bg_first_win: {
+    name: 'Den Hule Holder Stand',
+    desc: 'Vind en Tornehulemarkerne-slagmark.',
+  },
+  pvp_bg_wins_25: {
+    name: 'Hulens Vogter',
+    desc: 'Vind 25 Tornehulemarkerne-slagmarke.',
+    title: 'Flagbærer',
+  },
+  pvp_bg_captures_100: {
+    name: 'Hundrede Bannere',
+    desc: 'Erobr 100 flag i Tornehulemarkerne i løbet af din karriere.',
+  },
+  dgn_rift: {
+    name: 'Riftvandrer',
+    desc: 'Ryd en Rift ved at besejre dens etageboss.',
+  },
+  dgn_rift_s_rank: {
+    name: 'Riftsuveræn',
+    desc: 'Ryd en S-rangs Rift, det hårdeste niveau en Rift-portal kan spawne.',
+  },
+  pvp_honor_sergeant: {
+    name: 'Sergent',
+    desc: 'Optjen 10.000 Ære i din levetid. At bruge den koster dig aldrig rangen.',
+    title: 'Sergent',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: 'Ridderløjtnant',
+    desc: 'Optjen 40.000 Ære i din levetid, en hel sæsons rigtig krig bag dig.',
+    title: 'Ridderløjtnant',
+  },
+  pvp_honor_field_marshal: {
+    name: 'Feltmarskal',
+    desc: 'Optjen 150.000 Ære i din levetid. Sjælden på ethvert rige, og sådan bør det være.',
+    title: 'Feltmarskal',
+  },
+  chr_drakemaw_broodlord: {
+    name: 'Yngelknuseren',
+    desc: 'Dræb en Dragegabets Yngelherre midt blandt dens æg, gennem brølet, kløvningen og ilden.',
+  },
+  chr_maw_matriarch: {
+    name: 'Himlen Bliver Stille',
+    desc: 'Dræb Cindraleth Gabmatriarken i hendes kraterrede over Dragegabet.',
+  },
+  chr_frostveil_gatherer: {
+    name: 'Host pa terrasserne',
+    desc: 'Host en malmare, en traestand og et urtebed i Frostveil.',
+  },
+  chr_frostveil_first_cast: {
+    name: 'Forste is pa tarnen',
+    desc: 'Fang en fisk i Frostveils vande.',
+  },
+  chr_amberfall_gatherer: {
+    name: 'Amberfalls host',
+    desc: 'Host en malmare, en traestand og et urtebed i Amberfall.',
+  },
+  chr_amberfall_first_cast: {
+    name: 'En fangst fra den store mose',
+    desc: 'Fang en fisk i Amberfalls vande.',
+  },
+  chr_nightbloom_gatherer: {
+    name: 'Den drommende host',
+    desc: 'Host en malmare, en traestand og et urtebed i Nightbloom.',
+  },
+  chr_nightbloom_first_cast: {
+    name: 'En ring pa manebronden',
+    desc: 'Fang en fisk i Nightblooms vande.',
+  },
+  chr_wraithwood_gatherer: {
+    name: 'Host under kronerne',
+    desc: 'Host en malmare, en traestand og et urtebed i Wraithwood.',
+  },
+  chr_wraithwood_first_cast: {
+    name: 'Et kast i spejlbugten',
+    desc: 'Fang en fisk i Wraithwoods vande.',
+  },
+  chr_palmreach_gatherer: {
+    name: 'Host pa palmstranden',
+    desc: 'Host en malmare, en traestand og et urtebed i Palmreach.',
+  },
+  chr_palmreach_first_cast: {
+    name: 'Kast i safirlagunen',
+    desc: 'Fang en fisk i Palmreachs vande.',
+  },
+  chr_evergarden_gatherer: {
+    name: 'Parterrets rigdom',
+    desc: 'Host en malmare, en traestand og et urtebed i Evergarden.',
+  },
+  chr_evergarden_first_cast: {
+    name: 'Et kast pa kronbladsdammen',
+    desc: 'Fang en fisk i Evergardens vande.',
+  },
   pvp_card_duel_first_win: {
     name: 'Husets Regler',
     desc: 'Vind en Kortduel hos Kortmesteren.',
@@ -743,5 +839,85 @@ export const table: DeedLocaleTable = {
   soc_salvage_50: {
     name: 'Ophuggerens Plads',
     desc: 'Bjærg 50 stykker udstyr tilbage til råmaterialer.',
+  },
+  dgn_wildheart_basin: {
+    name: 'Bassinet Bider Igen',
+    desc: 'Besejr Zulgar, Bassinets Stemme, i Vildhjertebassinet.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Heroisk: Vildhjertebassinet',
+    desc: 'Besejr Zulgar, Bassinets Stemme, i Vildhjertebassinet på heroisk sværhedsgrad.',
+  },
+  chr_peaks_gatherer: {
+    name: 'Høst fra Højderne',
+    desc: 'Høst en malmåre, en skovbevoksning og et urtebed i Tornetop Højder.',
+  },
+  chr_marsh_rares_ii: {
+    name: 'Den Grådige, Gjort Op',
+    desc: 'Dræb Gravekæft den Grådige, en fjerde navngiven rædsel i Mosekær Sump, som blev glemt i den første optælling.',
+  },
+  chr_peaks_rares_ii: {
+    name: 'Flere Navne Hugget i Klippen',
+    desc: 'Dræb Gamle Klippekæft og Skårherre Kazzix, to navngivne rædsler mere i Tornetop Højder, som blev glemt i den første optælling.',
+  },
+  chr_gleamstag: {
+    name: 'Legenden Der Aldrig Slog Først',
+    desc: 'Dræb Glimmerhjorten, en sjælden og sky elite, der kun angriber, når den trænges op i en krog.',
+  },
+  chr_hollow_rares: {
+    name: 'Flokken Husker',
+    desc: 'Dræb Gamle Marvskal og Aurelhorn, Første af Flokken, de to omstrejfende sjældne bosser i Den Tilslørede Hule.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Kærets Overflod',
+    desc: 'Høst en malmåre, en skovbevoksning og et urtebed i Pilekæret.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Ringe i Liljemoserne',
+    desc: 'Fang en fisk i Pilekærets vande.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Høst på Næsset',
+    desc: 'Høst en malmåre, en skovbevoksning og et urtebed i Stormkammen.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'En Snøre i Spejltjørnet',
+    desc: 'Fang en fisk i Stormkammens vande.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Øens Proviant',
+    desc: 'Høst en malmåre, en skovbevoksning og et urtebed på Fjernkysten.',
+  },
+  chr_farshore_first_cast: {
+    name: 'Hvad Mågerne Ved',
+    desc: 'Fang en fisk i Fjernkystens vande.',
+  },
+  prog_engineering_rare: {
+    name: 'Præcisionsingeniørkunst',
+    desc: 'Skab dit første sjældne udstyrsstykke i Ingeniørkunst.',
+  },
+  prog_alchemy_rare: {
+    name: 'En sjælden årgang',
+    desc: 'Skab dit første sjældne udstyrsstykke i Alkymi.',
+  },
+  prog_cooking_rare: {
+    name: 'En ret at huske',
+    desc: 'Skab dit første sjældne udstyrsstykke i Madlavning.',
+  },
+  prog_leatherworking_rare: {
+    name: 'Fin garvning',
+    desc: 'Skab dit første sjældne udstyrsstykke i Læderhåndværk.',
+  },
+  prog_tailoring_rare: {
+    name: 'Et mesterligt sting',
+    desc: 'Skab dit første sjældne udstyrsstykke i Skræderi.',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Hærdet til glans',
+    desc: 'Skab dit første sjældne udstyrsstykke i Våbenfremstilling.',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Pladet til perfektion',
+    desc: 'Skab dit første sjældne udstyrsstykke i Rustningsfremstilling.',
   },
 };

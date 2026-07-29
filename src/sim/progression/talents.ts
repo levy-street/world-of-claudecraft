@@ -223,6 +223,7 @@ function stripOrphanedFormAuras(ctx: SimContext, meta: PlayerMeta, e: Entity | u
 function talentLockReason(ctx: SimContext, p: Entity): string | null {
   if (p.inCombat) return 'You cannot change talents in combat.';
   if (ctx.arenaMatches.has(p.id)) return 'You cannot change talents during an arena match.';
+  if (ctx.bgMatches.has(p.id)) return 'You cannot change talents during a battleground.';
   return null;
 }
 
@@ -404,8 +405,12 @@ export function saveTalentLoadout(
   const r = ctx.resolve(pid);
   if (!r) return -1;
   const revisionBeforeMutation = r.meta.wireRev;
+  const clean = name.toString().trim().slice(0, 24);
+  if (!clean) {
+    ctx.error(r.e.id, 'Loadout name cannot be empty.');
+    return -1;
+  }
   if (alloc && !commitTalentAllocation(ctx, r.meta, r.e, alloc, null)) return -1;
-  const clean = (name || 'Build').toString().slice(0, 24);
   const safeBar = Array.isArray(bar)
     ? bar.slice(0, SAVED_LOADOUT_BAR_SLOTS).map((b) => (typeof b === 'string' ? b : null))
     : [];

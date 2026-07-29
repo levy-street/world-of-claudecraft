@@ -31,7 +31,9 @@ in place; the sampler must snapshot, never retain a live reference).
 Every new `Entity`/`PlayerMeta` field interacts with this harness; decide once, in the
 same change. **Gameplay-affecting** (persisted, sim-read): leave it sampled (the
 default) and regenerate goldens via `UPDATE_PARITY=1` in its own reviewed commit
-(precedent: `craftThrottle`). **Session-only / presentation / derived from sampled
+(precedent: `enchantCastBagSlot`, stored 1-based so its resting value is the
+omitted 0; `craftThrottle` was the old exemplar until the throttle retired and
+it moved to `META_EXCLUDE` as inert). **Session-only / presentation / derived from sampled
 inputs**: add it to `ENTITY_EXCLUDE`/`META_EXCLUDE` in `trace.ts` with a one-line
 justification comment mirroring the existing entries (precedent: `wireRev`,
 `bankBonusSources`, `marketQuery`), or every golden churns for no gameplay reason.
@@ -93,10 +95,27 @@ confirmed each):
   same change.
 - **Transient Sim-owned collections are not sampled directly.** `arenaMatches`,
   `delveRuns`, `marketListings`/`marketCollections`, `instances`, `groundAoEs`,
-  `pendingMobRespawns` are pinned only via their entity/event/`PlayerMeta`
-  projection. Extracting one of these should add a scenario that drives it (the
+  `pendingMobRespawns`, `pendingLootRolls` are pinned only via their
+  entity/event/`PlayerMeta` projection. `pendingLootRolls` is the sharpest case:
+  a roll's `choices` map is wiped by `convertMasterRollToNeedGreed` and deleted by
+  `resolveLootRoll`, so a mid-window write to it that draws no rng leaves the whole
+  trace byte-identical. `master_loot` reaches around that with a `rec.notes`
+  readout (its refused curate-phase votes assert `choices.size === 0`); anything
+  else that must pin an unresolved roll needs the same trick. Extracting one of these should add a scenario that drives it (the
   precedents: `market_round_trip`, `bank_round_trip`, `dungeon_instances`) or sample
   the collection directly.
+- **A fishing SESSION is never driven.** Every fishing reference in this directory
+  hand-assigns `castingAbility = FISHING_CAST_ID` to exercise the `cancelCast` arm;
+  `startFishing` and `completeFishing` are called nowhere here, so no golden covers
+  the bite delay draw, the catch table draw, or the deny arms. Fishing IS
+  stream-visible (its table draws sit in the shared `sim.rng`), so a change to the
+  catch tables or the cast gates moves other subsystems' draw indices while every
+  golden here stays byte-identical. Read a green parity run as saying nothing about
+  fishing, and when you extract or re-tune it, add a scenario that runs a real cast,
+  bite and reel plus one denied cast. The live coverage today is
+  `tests/professions_fishing.test.ts` (literal catch sequences off a fixed seed) and
+  `tests/professions_deeds_playthrough.test.ts` (hunted indices across one shared
+  stream), not this gate.
 - **Construction-time draws + ambient world mobs.** The `Rng` is born inside the Sim
   ctor, so ctor draws are not in the draw digest; ambient camp mobs are spawned but
   never tracked. A same-draw-count reorder of ctor spawns that changes only

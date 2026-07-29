@@ -325,6 +325,54 @@ describe('command facet tags (bank)', () => {
   });
 });
 
+// Guild Bank: append the guild-bank cluster's tags (Phase 2, the reserved
+// guild_bank_* tokens the BANK_TAGS comment above promised: their OWN strings,
+// never a bank_* reuse). The table-consistency invariants in the W6 block above
+// (no orphan tag, no dispatch-only leak) already cover these new entries; this
+// block pins the exact facet per command, keyed on the WIRE strings, and that
+// the proximity + officer-rank gated guildBankInfo read stays untagged (no wire
+// send). Append-only: never edit a tag.
+const GUILD_BANK_TAGS: Readonly<Record<string, string>> = {
+  guild_bank_deposit_gold: 'IWorldGuildBank',
+  guild_bank_withdraw_gold: 'IWorldGuildBank',
+  guild_bank_deposit: 'IWorldGuildBank',
+  guild_bank_withdraw: 'IWorldGuildBank',
+  guild_bank_buy_slots: 'IWorldGuildBank',
+  // The activity log READ request. Tagged like the mutations because it is the
+  // same facet's surface; unlike them it answers on its own one-shot frame.
+  guild_bank_log: 'IWorldGuildBank',
+};
+
+describe('command facet tags (guild bank)', () => {
+  const tags = COMMAND_FACETS as Readonly<Record<string, string>>;
+
+  it('tags every guild-bank command with the IWorldGuildBank facet', () => {
+    for (const [cmd, facet] of Object.entries(GUILD_BANK_TAGS)) {
+      expect(tags[cmd], `facet tag for '${cmd}'`).toBe(facet);
+    }
+  });
+
+  it('keeps the guild-bank cluster distinct from the personal bank_* tokens', () => {
+    // The six wire strings, pinned literally: a rename is a protocol break.
+    expect(Object.keys(GUILD_BANK_TAGS).sort()).toEqual([
+      'guild_bank_buy_slots',
+      'guild_bank_deposit',
+      'guild_bank_deposit_gold',
+      'guild_bank_log',
+      'guild_bank_withdraw',
+      'guild_bank_withdraw_gold',
+    ]);
+    // And none of them shadows or reuses a personal-bank tag.
+    for (const cmd of Object.keys(GUILD_BANK_TAGS)) {
+      expect(BANK_TAGS[cmd]).toBeUndefined();
+    }
+  });
+
+  it('does not tag guildBankInfo (proximity + rank gated snapshot read, no wire command)', () => {
+    expect('guildBankInfo' in tags).toBe(false);
+  });
+});
+
 // Deeds: append the Book of Deeds cluster's tag. The table-consistency
 // invariants in the W6 block above (no orphan tag, no dispatch-only leak)
 // already cover the new entry; this block pins the exact facet for the one

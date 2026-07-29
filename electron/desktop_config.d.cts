@@ -4,7 +4,7 @@
 
 import type { UpdateChannel } from './update_guard.cjs';
 
-export type Distribution = 'website' | 'steam';
+export type Distribution = 'website' | 'steam' | 'epic';
 
 export interface DesktopConfigInput {
   packagedMetadata?: {
@@ -13,6 +13,9 @@ export interface DesktopConfigInput {
       crashSubmitUrl?: unknown;
       apiOrigin?: unknown;
       loginOrigin?: unknown;
+      epicProductId?: unknown;
+      epicDeploymentId?: unknown;
+      epicClientId?: unknown;
     };
   } | null;
   env?: Record<string, string | undefined>;

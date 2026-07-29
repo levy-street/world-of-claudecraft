@@ -1,0 +1,11 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/terrorspark_groundshaker/terrorspark_groundshaker-final.glb",
+      "out": "models/mounts/terrorspark_groundshaker.glb",
+      "type": "character",
+      "keepClips": ["Idle", "Walk", "Run", "Death"],
+      "keepExtras": true
+    }
+  ]
+}

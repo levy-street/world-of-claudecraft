@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
-[![Version](https://img.shields.io/badge/version-0.31.0-blue)](../../package.json)
+[![Version](https://img.shields.io/badge/version-0.35.1-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.pt_BR.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -92,7 +92,7 @@ npm install
 npm run dev        # then open http://localhost:5173 and choose Play Offline
 ```
 
-Dê um nome ao seu personagem, escolha qualquer uma das nove classes e comece em **Eastbrook Vale** (níveis 1-7), uma cidade comercial cercada por polos: tocaias de lobos ao norte, prados de javalis a leste, os bosques Sableweb a oeste, Mirror Lake a noroeste, uma escavação de cobre infestada de burrowers a sudoeste e uma capela em ruínas dos mortos inquietos a nordeste, com o acampamento de bandidos de Gorrak a sudeste. A estrada do norte sobe um passo na montanha até **Mirefen Marsh** (6-13, polo Fenbridge) e continua subindo até **Thornpeak Heights** (13-20, polo Highwatch). A semente do mundo é fixa em `src/main.ts`, então é o mesmo lugar a cada visita.
+Dê um nome ao seu personagem, escolha qualquer uma das nove classes e comece em **Eastbrook Vale** (níveis 1-7), uma cidade comercial cercada por polos: tocaias de lobos ao norte, prados de javalis a leste, os bosques Sableweb a oeste, Mirror Lake a noroeste, uma escavação de cobre infestada de burrowers a sudoeste e uma capela em ruínas dos mortos inquietos a nordeste, com o acampamento de bandidos de Gorrak a sudeste. A estrada do norte sobe um passo na montanha até **Mirefen Marsh** (6-13, polo Fenbridge) e continua subindo até **Thornpeak Heights** (13-20, polo Highwatch). A semente do mundo é fixa em `src/sim/world_seed.ts`, então é o mesmo lugar a cada visita.
 
 ### Apps de desktop para Windows, Linux e macOS
 

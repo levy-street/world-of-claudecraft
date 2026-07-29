@@ -444,6 +444,43 @@ describe('keyboard-nav: the market filter listbox (dropdownKeyNav wiring)', () =
     expect(root.querySelector('[data-market-filter-menu="primaryStat"]')).toBeNull();
   });
 
+  it('keeps search and armor filters aligned in shared columns as the window narrows', () => {
+    const root = openMarket();
+    pickItemType(root, 'armor');
+    const controls = req(root.querySelector<HTMLElement>('.mkt-controls'), 'market controls');
+    const search = req(root.querySelector<HTMLElement>('.mkt-search'), 'market search');
+    const fields = Array.from(root.querySelectorAll<HTMLElement>('.mkt-filter'));
+    expect(fields).toHaveLength(5);
+
+    const layout = (width: number) => {
+      controls.style.width = `${width}px`;
+      const fieldRects = fields.map((field) => field.getBoundingClientRect());
+      const typeButton = req(
+        fields[0].querySelector<HTMLElement>('.mkt-select-btn'),
+        'item type filter button',
+      ).getBoundingClientRect();
+      const searchRect = search.getBoundingClientRect();
+      return {
+        columns: getComputedStyle(controls).gridTemplateColumns.split(' ').length,
+        fieldWidths: fieldRects.map((rect) => Math.round(rect.width)),
+        searchWidth: Math.round(searchRect.width),
+        searchBottom: Math.round(searchRect.bottom),
+        typeButtonBottom: Math.round(typeButton.bottom),
+      };
+    };
+
+    // With an 8px column gap: (832 - 2 * 8) / 3 = 272, (596 - 8) / 2 = 294.
+    const wide = layout(832);
+    expect(wide.columns).toBe(3);
+    expect(new Set([...wide.fieldWidths, wide.searchWidth])).toEqual(new Set([272]));
+    expect(wide.searchBottom).toBe(wide.typeButtonBottom);
+
+    const compact = layout(596);
+    expect(compact.columns).toBe(2);
+    expect(new Set([...compact.fieldWidths, compact.searchWidth])).toEqual(new Set([294]));
+    expect(compact.searchBottom).toBe(compact.typeButtonBottom);
+  });
+
   // Issue #2189: bags matched no item-type option at all, so this asserts the whole
   // rendered chain for the new category: the option exists, its capacity menu is built
   // from the catalog-derived sizes, the labels are the localized bag strings (NOT the

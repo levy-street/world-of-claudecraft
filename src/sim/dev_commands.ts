@@ -10,12 +10,14 @@ import { mountItemId, mountOwned } from './mounts';
 import { MOUNT_TRAIN_MIN_LEVEL } from './mounts_training';
 import { isGatheringProfessionId, queueGatheringGrant } from './professions/gathering';
 import { placeMobileStationForPlayer } from './professions/mobile_station';
+import { cancelProfessionSessionOnDisplacement } from './professions/session_teardown';
 import { completeAllQuestsForDev } from './quests/dev_quest_commands';
 import { RIFT_RANK_BASE_LEVEL, riftRankForBaseLevel } from './rift/ranks';
 import { generateRiftPlan, isSetPieceSeed } from './rift/rift_gen';
 import { scenarioById, startScenario } from './scenarios/scenarios';
 import type { SentChat } from './sim';
 import type { SimContext } from './sim_context';
+import { bgQueueJoin, bgQueueSize, devEndBg, devStartBg } from './social/battleground';
 import { revivePlayerAt } from './spirit';
 import { MAX_LEVEL, type RiftTier } from './types';
 
@@ -143,6 +145,7 @@ export function handleDevChat(
   if (teleportMatch) {
     const entity = ctx.entities.get(pid);
     if (entity) {
+      cancelProfessionSessionOnDisplacement(ctx, entity);
       const pos = ctx.groundPos(Number(teleportMatch[1]), Number(teleportMatch[2]));
       entity.pos = pos;
       entity.prevPos = { ...pos };
@@ -274,6 +277,9 @@ export function handleDevChat(
       const leveled = entity.level < gate;
       if (leveled) ctx.setPlayerLevel(gate, pid);
       meta.copper += 100 * 10000;
+      // Every teleport, the dev ones included, runs the one session teardown
+      // (the same call /dev tp makes above).
+      cancelProfessionSessionOnDisplacement(ctx, entity);
       const pos = ctx.groundPos(marla.pos.x + 2, marla.pos.z + 1);
       entity.pos = pos;
       entity.prevPos = { ...pos };
@@ -365,6 +371,58 @@ export function handleDevChat(
     return null;
   }
 
+  if (/^\/(?:dev\s+bg|devbg)\s+end\s*$/i.test(raw)) {
+    // End the caller's live match early, resolving on the current score (ties
+    // draw) through the normal result screen + release flow.
+    if (devEndBg(ctx, pid))
+      emitDevLog(ctx, pid, '[dev] Thornhollow Fields resolved early on score.');
+    else ctx.error(pid, '[dev] You are not in an unresolved battleground.');
+    return null;
+  }
+
+  if (/^\/(?:dev\s+bg|devbg)\s*$/i.test(raw)) {
+    if (ctx.bgMatches.has(pid)) {
+      ctx.error(pid, '[dev] You are already in a battleground.');
+      return null;
+    }
+    bgQueueJoin(ctx, pid, { bypassLevel: true });
+    // The join can refuse (dead, inside an instance, oversize party); it
+    // already told the caller why, so bail before padding leaks a bot.
+    if (!ctx.bgQueue.some((g) => g.pids.includes(pid))) return null;
+    if (bgQueueSize(ctx) < 2) {
+      // Solo walk-around: pad the queue with one stationary dev bot (reusing an
+      // idle one if a previous /dev bg left it behind) so the force-start below
+      // has an opposing side. Partied bots stay untouched: queueing one would
+      // drag its whole party in.
+      let botPid = -1;
+      for (const meta of ctx.players.values()) {
+        const id = meta.entityId;
+        const e = ctx.entities.get(id);
+        if (meta.isDevBot && e && !e.dead && !ctx.bgMatches.has(id) && !ctx.partyOf(id)) {
+          botPid = id;
+          break;
+        }
+      }
+      // The suffix loop only exists to step past name collisions with
+      // player-spawned "/dev bot" dummies; nine tries is plenty.
+      for (let i = 1; i <= 9 && botPid < 0; i++)
+        botPid = ctx.spawnDevBot(i === 1 ? 'Riftbot' : `Riftbot${i}`);
+      if (botPid >= 0) bgQueueJoin(ctx, botPid, { bypassLevel: true });
+    }
+    devStartBg(ctx);
+    const match = ctx.bgMatches.get(pid);
+    if (match) {
+      const count = match.teams[0].length + match.teams[1].length;
+      emitDevLog(ctx, pid, `[dev] Thornhollow Fields force-started with ${count} champions.`);
+    } else {
+      ctx.error(
+        pid,
+        '[dev] Could not force-start Thornhollow Fields (needs 2 queued players and a free slot).',
+      );
+    }
+    return null;
+  }
+
   if (/^\/(?:dev\s+vendor|devvendor)\s*$/i.test(raw)) {
     const vendorId = ctx.spawnDevVendor(pid);
     if (vendorId < 0) ctx.error(pid, '[dev] Could not spawn the test vendor.');
@@ -405,10 +463,14 @@ export function handleDevChat(
     const craftId = mobileStationMatch[1].toLowerCase();
     const station = placeMobileStationForPlayer(ctx, craftId, pid);
     if (!station) {
-      ctx.error(
-        pid,
-        `[dev] Could not place a mobile ${craftId} station (specialization required).`,
-      );
+      // The module's dead gate already printed the real reason for a dead
+      // caller; the specialization line would state the wrong one on top.
+      if (!ctx.resolve(pid)?.e.dead) {
+        ctx.error(
+          pid,
+          `[dev] Could not place a mobile ${craftId} station (specialization required).`,
+        );
+      }
     } else {
       const minutes = Math.round((station.expiresAtTick - station.placedAtTick) / (20 * 60));
       emitDevLog(ctx, pid, `[dev] Mobile ${craftId} station placed here for ${minutes} minutes.`);
@@ -647,7 +709,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev heal, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev heal, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
     );
     return null;
   }

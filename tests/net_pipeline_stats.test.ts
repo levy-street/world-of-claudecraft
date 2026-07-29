@@ -1,9 +1,9 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   createNetPipelineStats,
   type NetPipelineSnapshotSample,
 } from '../src/net/net_pipeline_stats';
-import { ClientWorld } from '../src/net/online';
+import { bareClient } from './helpers/bare_client';
 
 function sample(overrides: Partial<NetPipelineSnapshotSample> = {}): NetPipelineSnapshotSample {
   return {
@@ -136,58 +136,6 @@ describe('net pipeline stats module', () => {
   });
 });
 
-// A ClientWorld without the WebSocket plumbing (the snapshots.test.ts pattern):
-// Object.create skips field initializers, which is exactly what the lazy-init
-// holder in online.ts must survive.
-function bareClient(pid: number): ClientWorld {
-  const c: any = Object.create(ClientWorld.prototype);
-  c.cfg = { seed: 20061, playerClass: 'warrior' };
-  c.entities = new Map();
-  c.playerId = pid;
-  c.ownPlayerId = pid;
-  c.ownPlayerClass = 'warrior';
-  c.spectating = null;
-  c.cupInfo = null;
-  c.lastVcupRemainder = null;
-  c.lastVcupShared = null;
-  c.sportRole = null;
-  c.moveInput = {};
-  c.inventory = [];
-  c.vendorBuyback = [];
-  c.equipment = {};
-  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
-  c.copper = 0;
-  c.honor = 0;
-  c.lifetimeHonor = 0;
-  c.xp = 0;
-  c.known = [];
-  c.questLog = new Map();
-  c.questsDone = new Set();
-  c.pendingQuestCommands = new Map();
-  c.partyInfo = null;
-  c.selectedDungeonDifficulty = 'normal';
-  c.tradeInfo = null;
-  c.duelInfo = null;
-  c.lastSnapAt = 0;
-  c.snapInterval = 50;
-  c.serverTickHz = null;
-  c.missingSince = new Map();
-  c.pendingFacingDelta = 0;
-  c.connected = true;
-  c.eventQueue = [];
-  c.mouselookFacing = null;
-  c.lastInputSentAt = 0;
-  c.lastInputSig = '';
-  c.inputSeq = 0;
-  c.pendingInputSeqSentAt = new Map();
-  c.ackedInputSeq = 0;
-  c.inputEchoSamples = [];
-  c.spectateFacingPending = false;
-  c.pendingSpectateFacing = null;
-  c.nodeCooldowns = new Map();
-  return c;
-}
-
 function wirePlayer(id: number, name: string) {
   return {
     id,
@@ -232,41 +180,38 @@ describe('bare client integration through the real onMessage path', () => {
     expect(client.entities.get(2)?.name).toBe('Bud');
   });
 
-  it('reads the raw gap BEFORE applySnapshot moves lastSnapAt so a stall gap survives', async () => {
+  it('reads the raw gap BEFORE applySnapshot moves lastSnapAt so a stall gap survives', () => {
     // applySnapshot sets lastSnapAt = now; if the raw-gap read moved below the
     // apply call, every recorded gap would collapse to about zero and the
     // stall outliers (the whole point of the raw ring) would vanish.
     //
     // performance.now() starts near ZERO in a fresh vitest worker, and the
     // recorder reads lastSnapAt <= 0 as the no-prior-snapshot sentinel, so the
-    // rewind below must land STRICTLY positive: wait out the worker's first
-    // REWIND_MS + MARGIN_MS when a warm-cache full-suite worker reaches this
-    // file that fast (a real full-suite failure mode, not a theoretical one).
-    //
-    // Poll the clock rather than sleeping once, and keep a wide margin. A
-    // single setTimeout takes an integer delay and fires on libuv's
-    // millisecond-truncated loop clock, so one fractional sleep can land up to
-    // about 2 ms SHORT of what performance.now() then reads. The previous 1 ms
-    // of headroom (a 901 ms target for a 900 ms rewind) lost that race in
-    // roughly one fresh worker in 25 and failed here with gapMs.count 0.
-    const REWIND_MS = 900;
-    const SENTINEL_MARGIN_MS = 300;
-    while (performance.now() < REWIND_MS + SENTINEL_MARGIN_MS) {
-      const remaining = REWIND_MS + SENTINEL_MARGIN_MS - performance.now();
-      await new Promise((resolve) => setTimeout(resolve, Math.max(1, Math.ceil(remaining))));
-    }
-    const client = bareClient(1);
-    const internals = client as unknown as { onMessage(raw: string): void };
-    const rewound = performance.now() - REWIND_MS;
-    // Pin the precondition itself, so a future regression here names the clock
-    // instead of the recorder the two assertions below are actually about.
-    expect(rewound).toBeGreaterThan(0);
-    (client as any).lastSnapAt = rewound;
-    internals.onMessage(JSON.stringify({ t: 'snap', ents: [wirePlayer(2, 'Bud')], keep: [] }));
+    // rewind below must land STRICTLY positive. Fake performance.now() (same
+    // idiom as tests/interest.test.ts) so the precondition is instant and
+    // exact instead of a real sleep loop racing libuv's millisecond-truncated
+    // timer clock.
+    vi.useFakeTimers({ toFake: ['performance'] });
+    try {
+      const REWIND_MS = 900;
+      const SENTINEL_MARGIN_MS = 300;
+      vi.advanceTimersByTime(REWIND_MS + SENTINEL_MARGIN_MS);
 
-    const s = client.netPipeline().summary();
-    expect(s.gapMs.count).toBe(1);
-    expect(s.gapMs.max).toBeGreaterThanOrEqual(500);
+      const client = bareClient(1);
+      const internals = client as unknown as { onMessage(raw: string): void };
+      const rewound = performance.now() - REWIND_MS;
+      // Pin the precondition itself, so a future regression here names the clock
+      // instead of the recorder the two assertions below are actually about.
+      expect(rewound).toBeGreaterThan(0);
+      (client as unknown as { lastSnapAt: number }).lastSnapAt = rewound;
+      internals.onMessage(JSON.stringify({ t: 'snap', ents: [wirePlayer(2, 'Bud')], keep: [] }));
+
+      const s = client.netPipeline().summary();
+      expect(s.gapMs.count).toBe(1);
+      expect(s.gapMs.max).toBeGreaterThanOrEqual(500);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('counts an omitted keep list as zero keeps instead of failing', () => {
@@ -287,7 +232,7 @@ describe('bare client integration through the real onMessage path', () => {
     internals.onMessage(JSON.stringify({ t: 'snap', ents: [], keep: [2] }));
     expect(client.netPipeline().summary().gapMs.count).toBe(1);
 
-    (client as any).reconnectAttempts = 1;
+    (client as unknown as { reconnectAttempts: number }).reconnectAttempts = 1;
     internals.onMessage(JSON.stringify({ t: 'hello', pid: 1, seed: 20061 }));
     internals.onMessage(JSON.stringify({ t: 'snap', ents: [wirePlayer(2, 'Bud')], keep: [] }));
 

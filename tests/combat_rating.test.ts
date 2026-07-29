@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { effectiveSpellHit, spellResistChance } from '../src/sim/combat/spell_resist';
 import { aggregateSetBonuses } from '../src/sim/content/item_sets';
+import { FURY_STOCK } from '../src/sim/content/pvp_honor';
 import { ITEMS } from '../src/sim/data';
 import { itemLevel } from '../src/sim/item_level';
 import { Sim } from '../src/sim/sim';
@@ -157,7 +158,9 @@ describe('combat-rating tier ladder', () => {
   it('every ilvl-31 heroic boss-set piece carries exactly one rating', async () => {
     const { HEROIC_ITEMS } = await import('../src/sim/content/heroic_loot');
     const pieces = Object.values(HEROIC_ITEMS).filter((item) => itemLevel(item) === 31);
-    expect(pieces).toHaveLength(28);
+    // 28 pre-Wildheart pieces + the 6 Zulgar heroic drops (Tier-2 basin loot
+    // pass, incl. the crown/legguards replacing the retired-hole dup-paths).
+    expect(pieces).toHaveLength(34);
     for (const item of pieces) {
       expect(ratingCount(item), item.id).toBe(1);
       expect(ratingValues(item), item.id).toEqual([item.weapon ? 50 : 40]);
@@ -188,20 +191,40 @@ describe('combat-rating tier ladder', () => {
       expect(ratingCount(item), item.id).toBe(0);
     }
 
-    // The 8 Nythraxis set pieces plus the 4 offhand-slot / two-hander epics
-    // (bonewrought_greatsword/bulwark, direfang_greatblade, wraithfire_orb) and
-    // the feral ladder's raid capstone (maul_of_the_scourged_wilds).
+    // The 8 Nythraxis set pieces plus the 5 offhand-slot / two-hander epics
+    // (bonewrought_greatsword/bulwark, direfang_greatblade, wraithfire_orb, and
+    // the hunter's direfang_quiver) and the feral ladder's raid capstone
+    // (maul_of_the_scourged_wilds).
     const ilvl29 = allGear.filter((item) => itemLevel(item) === 29);
-    expect(ilvl29).toHaveLength(13);
+    expect(ilvl29).toHaveLength(14);
     for (const item of ilvl29) expect(ratingValues(item), item.id).toEqual([20]);
 
     // ilvl-31: heroic five-man boss pieces (40 rating) + rift clear-time epics
-    // (armor pieces 40, ring 25). Every ilvl-31 gear piece carries exactly one rating.
+    // (armor pieces 40, ring 25). Every ilvl-31 PvE gear piece carries exactly one
+    // rating, and the WARFARE honor tier is the one deliberate hole in the ladder:
+    // it sits at ilvl 31 carrying ZERO combat ratings. That is load-bearing rather
+    // than an oversight. It is what stops a complete honor kit from substituting
+    // for the heroic tier: same item level, a 10 percent primary-stat discount,
+    // no ratings at all, and set bonuses that contribute nothing outside PvP.
+    // Carved out by id rather than filtered by "has no rating", which would
+    // silently absorb any future PvE piece that lost its rating by accident.
+    const warfareIds = new Set<string>(FURY_STOCK);
     const ilvl31 = allGear.filter((item) => itemLevel(item) === 31);
     expect(ilvl31.length).toBeGreaterThan(0);
     for (const item of ilvl31) {
-      expect(ratingCount(item), `${item.id} (ilvl 31) carries one rating`).toBe(1);
+      const expected = warfareIds.has(item.id) ? 0 : 1;
+      expect(ratingCount(item), `${item.id} (ilvl 31) carries ${expected} rating(s)`).toBe(
+        expected,
+      );
     }
+    // The replacement POSITIVE pin: the carve-out must stay a known, bounded set
+    // rather than growing quietly, and both arms must be non-vacuous.
+    const warfareAtIlvl31 = ilvl31.filter((item) => warfareIds.has(item.id));
+    expect(warfareAtIlvl31, 'the whole WARFARE catalog sits at ilvl 31').toHaveLength(47);
+    expect(
+      ilvl31.length - warfareAtIlvl31.length,
+      'ilvl-31 PvE epics still carry their ratings',
+    ).toBeGreaterThan(0);
 
     const directHeroicRaidWeapons = new Set([
       'scepter_of_the_deathless_court',
@@ -215,10 +238,10 @@ describe('combat-rating tier ladder', () => {
         (ilvl === 37 && item.heroicOf !== undefined)
       );
     });
-    // 13 pre-existing pieces plus the 5 generated heroic raid variants of the
-    // normal-raid epics (greatsword, greatblade, bulwark, orb, and the feral
-    // ladder capstone maul_of_the_scourged_wilds).
-    expect(heroicRaidGear).toHaveLength(18);
+    // 13 pre-existing pieces plus the 6 generated heroic raid variants of the
+    // normal-raid epics (greatsword, greatblade, bulwark, orb, the hunter's
+    // direfang_quiver, and the feral ladder capstone maul_of_the_scourged_wilds).
+    expect(heroicRaidGear).toHaveLength(19);
     for (const item of heroicRaidGear) {
       const ilvl = itemLevel(item);
       const expectedPrimary = ilvl === 37 ? 70 : item.weapon ? 65 : 55;

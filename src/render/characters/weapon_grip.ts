@@ -89,13 +89,21 @@ export const WEAPON_GRIP_OVERRIDES: Record<string, WeaponGripOverride> = {
   winterbite: {
     pos: [-0.0439, -0.0034, 0.0066],
     rot: [-164.6994, -29.0522, -148.7048],
-    scale: 1.05,
+    scale: 1.39,
   },
   cinderlatch: {
     pos: [0.1565, 0.1562, -0.0917],
     rot: [94.6767, -12.6224, 138.9958],
     scale: 0.65,
   },
+  // Both bows are 1.80 tall natively, the LONGEST ranged models in the pack,
+  // but shipped at about native scale while the sword skins take a 1.3 to 1.4
+  // hero bump. Rendered, that put a bow at 1.89 against a sword's 2.80 on a
+  // 2.6-unit body: the sword read as a hero weapon and the bow as an accessory
+  // at the hip. 1.39 brings a bow to 2.50, exactly level with that sword rather
+  // than past it (1.55 would make the bow the largest weapon in the game).
+  // The VAR_BOW family clamp (maxHeight 2.0) never binds at 1.80, so nothing
+  // was shrinking them; this is the only knob that moves a bow's presence.
   // The encore star-cannon reads correctly at the family default grip (muzzle
   // forward off the right hand); the scale-up is the point, a legendary gun
   // longer than the hunter is tall.
@@ -120,7 +128,7 @@ export const WEAPON_GRIP_OVERRIDES: Record<string, WeaponGripOverride> = {
     scale: 1.1,
   },
   lacquered_rod: { pos: [0.0606, 0.1259, -0.0094], rot: [0, 0, -46.2693] },
-  fletcher_s_guild_bow: { pos: [-0.2237, 0, 0.0851] },
+  fletcher_s_guild_bow: { pos: [-0.2237, 0, 0.0851], scale: 1.39 },
   shard_of_everwinter: { pos: [0, 0.0687, 0.1538], rot: [35.7041, 0, 0] },
 };
 

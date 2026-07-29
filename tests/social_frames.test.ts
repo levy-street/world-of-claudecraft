@@ -14,10 +14,11 @@ vi.mock('../server/db', () => ({
 }));
 
 import { type ClientSession, GameServer } from '../server/game';
-import { ClientWorld } from '../src/net/online';
+import type { ClientWorld } from '../src/net/online';
 import { grantDeed } from '../src/sim/deeds';
 import type { PlayerClass } from '../src/sim/types';
 import type { FriendInfo, SocialInfo } from '../src/world_api/social_graph';
+import { bareClient } from './helpers/bare_client';
 
 // W9 ULTRACODE: event-frame parity for the two NON-SNAPSHOT facets the W0a
 // round-trip gate is structurally blind to. `IWorldSocialGraph.socialInfo` rides
@@ -60,47 +61,6 @@ function joinServer(
 
 function broadcast(server: GameServer): void {
   (server as any).broadcastSnapshots();
-}
-
-// A ClientWorld without the WebSocket plumbing, so we can feed it raw server frames
-// via the private onMessage and drive applySnapshot directly (the snapshots.test.ts
-// scaffolding).
-function bareClient(pid: number): ClientWorld {
-  const c: any = Object.create(ClientWorld.prototype);
-  c.cfg = { seed: 20061, playerClass: 'warrior' };
-  c.entities = new Map();
-  c.playerId = pid;
-  c.moveInput = {};
-  c.inventory = [];
-  c.vendorBuyback = [];
-  c.equipment = {};
-  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
-  c.copper = 0;
-  c.xp = 0;
-  c.known = [];
-  c.questLog = new Map();
-  c.questsDone = new Set();
-  c.pendingQuestCommands = new Map();
-  c.partyInfo = null;
-  c.tradeInfo = null;
-  c.duelInfo = null;
-  c.socialInfo = null;
-  c.arenaInfo = null;
-  c.lockpickState = null;
-  c.lastSnapAt = 0;
-  c.snapInterval = 50;
-  c.missingSince = new Map();
-  c.pendingFacingDelta = 0;
-  c.connected = true;
-  c.eventQueue = [];
-  c.mouselookFacing = null;
-  c.lastInputSentAt = 0;
-  c.lastInputSig = '';
-  c.inputSeq = 0;
-  c.pendingInputSeqSentAt = new Map();
-  c.ackedInputSeq = 0;
-  c.inputEchoSamples = [];
-  return c;
 }
 
 function feed(c: ClientWorld, frame: Record<string, unknown>): void {
@@ -215,6 +175,46 @@ describe('W9 socialInfo via the social/socialpos frames (non-snapshot)', () => {
     expect(members.find((m) => m.name === 'NeverSeen')?.lastLogin).toBeNull();
   });
 
+  it('the `social` frame carries each guild member joinedAt (epoch ms) through unchanged', () => {
+    const c = bareClient(7);
+    const joined = Date.UTC(2026, 0, 2, 3, 4, 5);
+    feed(c, {
+      t: 'social',
+      guild: {
+        id: 1,
+        name: 'Guild',
+        rank: 'leader',
+        members: [
+          {
+            id: 3,
+            name: 'Dated',
+            cls: 'priest',
+            level: 9,
+            realm: 'R1',
+            online: false,
+            rank: 'member',
+            lastLogin: null,
+            joinedAt: joined,
+          },
+          {
+            id: 4,
+            name: 'Undated',
+            cls: 'mage',
+            level: 2,
+            realm: 'R1',
+            online: false,
+            rank: 'member',
+            lastLogin: null,
+            joinedAt: null,
+          },
+        ],
+      },
+    });
+    const members = c.socialInfo!.guild!.members;
+    expect(members.find((m) => m.name === 'Dated')?.joinedAt).toBe(joined);
+    expect(members.find((m) => m.name === 'Undated')?.joinedAt).toBeNull();
+  });
+
   it('`socialpos` merges position in place for matched ids and leaves unmatched rows untouched', () => {
     const c = bareClient(7);
     const social: SocialInfo = {
@@ -266,6 +266,7 @@ describe('W9 socialInfo via the social/socialpos frames (non-snapshot)', () => {
             online: false,
             rank: 'member',
             lastLogin: null,
+            joinedAt: Date.UTC(2026, 0, 2, 3, 4, 5),
           },
         ],
         events: [],
@@ -302,6 +303,9 @@ describe('W9 socialInfo via the social/socialpos frames (non-snapshot)', () => {
     const m4 = c.socialInfo!.guild!.members.find((m) => m.id === 4)!;
     expect(m4).toMatchObject({ x: 30, z: 40, zone: 'Westwood', status: 'dungeon', online: true });
     expect(m4.activeTitle).toBeNull();
+    // the in-place merge must never clobber joinedAt (tenure badges would
+    // silently vanish on the first position push after login)
+    expect(m4.joinedAt).toBe(Date.UTC(2026, 0, 2, 3, 4, 5));
   });
 
   it('`socialpos` is a no-op when there is no prior socialInfo (guarded)', () => {
@@ -435,5 +439,34 @@ describe('socialpos carries the live active title (Book of Deeds)', () => {
     const row2 = lastSocialPos(watcherFc.sent).list.find((r: any) => r.id === changer.characterId);
     // the key is always present so a clear propagates as an explicit null
     expect(row2.title).toBeNull();
+  });
+
+  it('drops a tracked id from the periodic position push once either side has blocked the other', () => {
+    // A stale friend/guild edge (never cleaned by blockAdd on the OTHER side) can
+    // leave a tracked id in session.socialTrackedIds long after a block; the
+    // per-tick position push must still refuse to leak live x/z across it, the
+    // same way /who already refuses to list a mutually-blocked pair.
+    const server = new GameServer();
+    const watcherFc = fakeWs();
+    const watcher = joinServer(server, watcherFc, 1, 'Watcher');
+    const trackedFc = fakeWs();
+    const tracked = joinServer(server, trackedFc, 2, 'Tracked');
+    watcher.socialTrackedIds = [tracked.characterId];
+
+    // Direction 1: the tracked player blocked the watcher.
+    tracked.blockedIds = new Set([watcher.characterId]);
+    (server as any).broadcastSocialPositions();
+    expect(lastSocialPos(watcherFc.sent)).toBeNull();
+
+    // Direction 2: the watcher blocked the tracked player instead.
+    tracked.blockedIds = new Set();
+    watcher.blockedIds = new Set([tracked.characterId]);
+    (server as any).broadcastSocialPositions();
+    expect(lastSocialPos(watcherFc.sent)).toBeNull();
+
+    // Sanity: with no block either way, the position push goes through.
+    watcher.blockedIds = new Set();
+    (server as any).broadcastSocialPositions();
+    expect(lastSocialPos(watcherFc.sent)).not.toBeNull();
   });
 });

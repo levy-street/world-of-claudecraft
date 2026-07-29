@@ -19,7 +19,8 @@
 // both a Sim-shaped and a ClientWorld-mirror-shaped snapshot.
 
 import { ITEMS } from '../sim/data';
-import type { ItemDef } from '../sim/types';
+import { isTransferLockedInstance } from '../sim/item_instance_transfer';
+import type { ItemDef, ItemInstancePayload } from '../sim/types';
 import type { MarketInfo, MarketListingView } from '../world_api';
 import {
   MARKET_ARMOR_TYPE_FILTERS,
@@ -67,10 +68,14 @@ export type MarketBrowseBody =
 export interface MarketSellForm {
   itemId: string;
   item: ItemDef;
-  /** How many of this item the player holds (the quantity cap). */
+  /** How many of this item the player holds (the quantity cap). Always 1 for
+   *  an instanced staging: instanced listings are single-copy. */
   have: number;
   /** A gentle starting ask, pre-split into gold / silver / copper inputs. */
   suggested: { gold: number; silver: number; copper: number };
+  /** The staged copy's payload (issue 1165): present when the player clicked an
+   *  instanced copy, which lists as ITSELF via marketListInstance. */
+  instance?: ItemInstancePayload;
 }
 
 /**
@@ -94,12 +99,38 @@ export interface MarketSellMeta {
 export interface MarketCollectRow {
   item: ItemDef;
   count: number;
+  /** The returned copy's payload (issue 1165): an expired instanced listing waits
+   *  here with its enchant/signature intact, and the tooltip shows it. */
+  instance?: ItemInstancePayload;
+}
+
+/**
+ * One Collect row on the SALES side: a completed sale the proceeds line sums up.
+ * Distinct from MarketCollectRow above, which is goods coming BACK (an expired or
+ * reclaimed listing); these goods are gone and what waits is the gold.
+ */
+export interface MarketCollectSaleRow {
+  item: ItemDef;
+  count: number;
+  /** Net copper this sale contributed, after the Merchant's cut. */
+  proceeds: number;
+  buyerName: string;
 }
 
 /** The Collect tab body: nothing to collect, or proceeds + item stacks. */
 export type MarketCollectBody =
   | { state: 'empty' }
-  | { state: 'items'; proceeds: number; rows: MarketCollectRow[] };
+  | {
+      state: 'items';
+      proceeds: number;
+      /** Itemized sales behind `proceeds`, oldest first. */
+      sales: MarketCollectSaleRow[];
+      /** Sales not listed in `sales`: dropped by the sim's ledger cap, or skipped
+       *  here because the item id no longer resolves. Their gold is still in
+       *  `proceeds`, so the tab reports the count instead of quietly under-listing. */
+      salesOmitted: number;
+      rows: MarketCollectRow[];
+    };
 
 /**
  * The full market view-model: the data-absent state, or one of the three tab
@@ -120,6 +151,8 @@ export interface MarketViewInput {
   sellItemId: string | null;
   /** How many of `sellItemId` the player holds (0 when nothing staged). */
   sellHave: number;
+  /** The staged copy's payload when an instanced copy was clicked (issue 1165). */
+  sellInstance?: ItemInstancePayload | null;
 }
 
 /** True when any dropdown is narrowing the browse. */
@@ -173,12 +206,20 @@ export function buildMarketBrowse(info: MarketInfo, filters: MarketFilters): Mar
   };
 }
 
-/** Build the Sell tab body for the staged item (`sellHave` is its bag count). */
-export function buildMarketSell(sellItemId: string | null, sellHave: number): MarketSellBody {
+/** Build the Sell tab body for the staged item (`sellHave` is its bag count).
+ *  `sellInstance` is the staged copy's payload: an instanced staging is a
+ *  single-copy form (have 1, no quantity stepper), and a transfer-locked copy
+ *  (defence in depth; the bags click already blocks it) cannot market. */
+export function buildMarketSell(
+  sellItemId: string | null,
+  sellHave: number,
+  sellInstance?: ItemInstancePayload | null,
+): MarketSellBody {
   const item = sellItemId ? ITEMS[sellItemId] : null;
   if (!sellItemId || !item || sellHave <= 0) return { state: 'pick-empty' };
   if (item.kind === 'quest' || item.noMarketList || item.soulbound)
     return { state: 'cannot-market' };
+  if (sellInstance && isTransferLockedInstance(sellInstance)) return { state: 'cannot-market' };
   // A gentle starting ask: the vendor shop price when the item has one, but
   // never more than 10x its vendor sell value (the recipe-economy rework re-priced
   // four commons' sellValues while deliberately keeping their historical shop
@@ -194,22 +235,52 @@ export function buildMarketSell(sellItemId: string | null, sellHave: number): Ma
   const copper = suggested % COPPER_PER_SILVER;
   return {
     state: 'form',
-    form: { itemId: sellItemId, item, have: sellHave, suggested: { gold, silver, copper } },
+    form: {
+      itemId: sellItemId,
+      item,
+      have: sellInstance ? 1 : sellHave,
+      suggested: { gold, silver, copper },
+      ...(sellInstance ? { instance: sellInstance } : {}),
+    },
   };
 }
 
 /** Build the Collect tab body from a snapshot. */
 export function buildMarketCollect(info: MarketInfo): MarketCollectBody {
-  if (info.collectionCopper <= 0 && info.collectionItems.length === 0) {
+  // A sale whose proceeds floored to 0 copper still leaves a ledger row, so the
+  // empty test reads the ledger too: an empty body would strand it unshown.
+  if (
+    info.collectionCopper <= 0 &&
+    info.collectionItems.length === 0 &&
+    info.collectionSales.length === 0
+  ) {
     return { state: 'empty' };
   }
   const rows: MarketCollectRow[] = [];
   for (const slot of info.collectionItems) {
     const item = ITEMS[slot.itemId];
     if (!item) continue;
-    rows.push({ item, count: slot.count });
+    rows.push({ item, count: slot.count, ...(slot.instance ? { instance: slot.instance } : {}) });
   }
-  return { state: 'items', proceeds: info.collectionCopper, rows };
+  const sales: MarketCollectSaleRow[] = [];
+  // An id a content edit retired can no longer be named, so the row is dropped
+  // like the returns above; it counts as omitted rather than vanishing, because
+  // its gold is still inside the proceeds total this list is explaining.
+  let salesOmitted = info.collectionSalesOmitted;
+  for (const sale of info.collectionSales) {
+    const item = ITEMS[sale.itemId];
+    if (!item) {
+      salesOmitted += 1;
+      continue;
+    }
+    sales.push({
+      item,
+      count: sale.count,
+      proceeds: sale.proceeds,
+      buyerName: sale.buyerName,
+    });
+  }
+  return { state: 'items', proceeds: info.collectionCopper, sales, salesOmitted, rows };
 }
 
 /**
@@ -224,7 +295,7 @@ export function buildMarketView(input: MarketViewInput): MarketView {
   if (tab === 'sell') {
     return {
       kind: 'sell',
-      body: buildMarketSell(input.sellItemId, input.sellHave),
+      body: buildMarketSell(input.sellItemId, input.sellHave, input.sellInstance),
       meta: {
         cutPct: info.cutPct,
         myListingCount: info.myListingCount,
@@ -296,7 +367,12 @@ export function marketFilterMenus(itemType: MarketItemTypeFilter): MarketFilterM
  */
 export function marketCollectBadgeCount(info: MarketInfo | null): number {
   if (!info) return 0;
-  return (info.collectionCopper > 0 ? 1 : 0) + info.collectionItems.length;
+  // The purse counts ONCE however many sales fill it: the ledger itemizes the same
+  // gold the purse already stands for, so counting rows too would double it. The
+  // ledger only widens WHEN the purse counts, for the 0-copper sale that leaves a
+  // row and no coin (a 1-copper listing against the Merchant's cut).
+  const purse = info.collectionCopper > 0 || info.collectionSales.length > 0 ? 1 : 0;
+  return purse + info.collectionItems.length;
 }
 
 /** The minimap-corner collect indicator (the mailIndicatorView pattern). */

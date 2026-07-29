@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 // The bag money row's own staleness refresh (issue #2373), driven against the REAL
 // BagsWindow painter in jsdom (the bags_window_instance_marker.test.ts idiom).
 //
@@ -80,6 +80,8 @@ function harness(startCopper = 1000, inventory: InvSlot[] = SWORD): Harness {
     isMarketSell: () => false,
     isMailAttach: () => false,
     isBankOpen: () => false,
+    isPersonalBankTab: () => false,
+    isGuildBankTab: () => false,
     pendingPetFeed: () => false,
     closeVendor: noop,
     closeBank: noop,
@@ -99,6 +101,8 @@ function harness(startCopper = 1000, inventory: InvSlot[] = SWORD): Harness {
     isTouchHud: () => false,
     markEquipDropTargets: noop,
     dropOnEquipSlot: noop,
+    dropOnActionSlot: noop,
+    dropOnActionRingSlot: noop,
     openItemActionMenu: noop,
   };
   return {

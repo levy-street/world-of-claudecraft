@@ -37,6 +37,10 @@ export interface GuideClassInfo {
   abilities: GuideAbilityRef[];
   model: string;
   tint?: string;
+  /** Manifest tint strength (0..1) for this figure's model, when tinted. Feeds the still's
+   *  filename identity (still_key.mjs) alongside model/tint; the live viewer reads its own
+   *  copy off GuideModelSpec.tintStrength, so this is not consumed for rendering. */
+  tintStrength?: number;
   /** Pre-rendered transparent still (public/guide-stills/), the default poster. */
   still?: string;
 }
@@ -63,13 +67,13 @@ export interface GuideDungeon {
   name?: string;
 }
 
-export interface GuideWarlockPet { id: string; name: string; model: string; tint?: string; still?: string; }
+export interface GuideWarlockPet { id: string; name: string; model: string; tint?: string; tintStrength?: number; still?: string; }
 
 // Druid shapeshift forms. Unnamed on purpose: the gallery labels them with guide.models.form*
 // keys so the names localize like the rest of the picker chrome.
-export interface GuideDruidForm { id: string; model: string; tint?: string; still?: string; }
+export interface GuideDruidForm { id: string; model: string; tint?: string; tintStrength?: number; still?: string; }
 
-export interface GuideCreature { name: string; min: number; max: number; rare: boolean; templateId: string; model: string; tint?: string; still?: string; }
+export interface GuideCreature { name: string; min: number; max: number; rare: boolean; templateId: string; model: string; tint?: string; tintStrength?: number; still?: string; }
 export interface GuideFamily { family: string; creatures: GuideCreature[]; }
 
 export interface GuideDelveKeeper { name: string; title: string; }
@@ -161,6 +165,18 @@ export interface GuideProfTool {
   priceCopper: number | null;
   vendors: { name: string; hub: string }[];
   craftedBy?: string;
+  /** Delve Marks price, for a tool a delve counter stocks. Absent otherwise. */
+  priceMarks?: number;
+  /** Total delve clears the Marks row unlocks after (shop.ts 'clears:N').
+   *  Consumed today by the tests/guide.test.ts gate pin only: the source
+   *  cell keeps the count as an English literal until the deferred locale
+   *  re-fill adds a {clears} token (R64, the packet review doc). */
+  marksClears?: number;
+  /** True when the Marks row unlocks after a Heroic clear. */
+  marksHeroicClear?: boolean;
+  /** R22 wield requirement (proficiency in the tool's own trade) for land
+   *  tools above tier 1. Absent for tier 1 and for every fishing rod. */
+  wieldProficiency?: number;
 }
 
 export interface GuideProfNodeRow {
@@ -251,7 +267,16 @@ export interface GuideProfWorkOrder {
 
 export interface GuideProfEconomy {
   craftFeeCopperPerBudgetPoint: number;
-  actionThrottle: { windowSeconds: number; maxActions: number };
+  castPace: {
+    fieldSec: number;
+    skill25Sec: number;
+    skill50Sec: number;
+    skill75Sec: number;
+    comboSec: number;
+    enchantFamilySec: number;
+    rechargeSec: number;
+    batchMax: number;
+  };
   marketCutPct: number;
   listingDepositCopper: number;
   trainingFeeCopperByTier: number[];
@@ -368,6 +393,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "pummel",
         "name": "Jawcrack"
+      },
+      {
+        "id": "berserker_rage",
+        "name": "Seething Fury"
       },
       {
         "id": "execute",
@@ -975,7 +1004,8 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     ],
     "model": "player_priest",
     "tint": "#f0e9d6",
-    "still": "/guide-stills/player_priest__f0e9d6.webp"
+    "tintStrength": 0.12,
+    "still": "/guide-stills/player_priest__f0e9d6__s12.webp"
   },
   {
     "id": "shaman",
@@ -1079,7 +1109,8 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     ],
     "model": "player_shaman",
     "tint": "#6f8fc9",
-    "still": "/guide-stills/player_shaman__6f8fc9.webp"
+    "tintStrength": 0.12,
+    "still": "/guide-stills/player_shaman__6f8fc9__s12.webp"
   },
   {
     "id": "mage",
@@ -1457,7 +1488,8 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     ],
     "model": "player_warlock",
     "tint": "#8d5fd3",
-    "still": "/guide-stills/player_warlock__8d5fd3.webp"
+    "tintStrength": 0.12,
+    "still": "/guide-stills/player_warlock__8d5fd3__s12.webp"
   },
   {
     "id": "druid",
@@ -1767,7 +1799,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "welcome": "The air hums with old magic. Seek Keeper Saelwyn beneath the great tree of Eldergleam.",
     "families": [
       "beast",
-      "kobold",
+      "burrower",
       "elemental"
     ]
   },
@@ -1790,7 +1822,8 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "welcome": "Hot wind rolls off the wastes ahead. Dragons wheel over the Drakemaw, and troll fires burn in the dunes.",
     "families": [
       "troll",
-      "undead"
+      "undead",
+      "dragonkin"
     ]
   },
   {
@@ -1811,7 +1844,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "welcome": "Snow swallows every sound. Under the dancing lights, the cold itself feels awake.",
     "families": [
       "beast",
-      "kobold",
+      "burrower",
       "elemental"
     ]
   },
@@ -1834,8 +1867,8 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "welcome": "Every leaf here burns gold and red, yet none ever fall. The lanterns of Lanternmere are lit for you.",
     "families": [
       "beast",
-      "murloc",
-      "kobold"
+      "mudfin",
+      "burrower"
     ]
   },
   {
@@ -1855,8 +1888,8 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     ],
     "welcome": "The fen hums with dragonflies and bees. Cross the bridge into Bridgemere and rest your feet awhile.",
     "families": [
-      "murloc",
-      "kobold",
+      "mudfin",
+      "burrower",
       "elemental"
     ]
   },
@@ -1879,7 +1912,8 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "families": [
       "beast",
       "undead",
-      "elemental"
+      "elemental",
+      "reptile"
     ]
   },
   {
@@ -1948,7 +1982,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "welcome": "Someone is still trimming the hedges, though no gardener has been seen for a hundred years. Mind the maze: it minds you back.",
     "families": [
       "beast",
-      "kobold",
+      "burrower",
       "humanoid"
     ]
   },
@@ -1972,8 +2006,9 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "welcome": "The wind has never once stopped here, and the Old Beacon has never once gone out. Wickharbor asks only that you close the inn door behind you.",
     "families": [
       "beast",
-      "kobold",
-      "undead"
+      "burrower",
+      "undead",
+      "elemental"
     ]
   },
   {
@@ -1995,7 +2030,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "welcome": "Step off the ferry and Gullhaven's bell will find you before the town does. The breaks tear open without warning, and the redoubt holds its shore against whatever pours through. They have been waiting a long while for someone like you.",
     "families": [
       "beast",
-      "kobold",
+      "burrower",
       "demon"
     ]
   }
@@ -2057,49 +2092,56 @@ export const GUIDE_WARLOCK_PETS: GuideWarlockPet[] = [
     "name": "Emberkin",
     "model": "mob_demon",
     "tint": "#ff7a2a",
-    "still": "/guide-stills/mob_demon__ff7a2a.webp"
+    "tintStrength": 0.5,
+    "still": "/guide-stills/mob_demon__ff7a2a__s50.webp"
   },
   {
     "id": "gloomshade",
     "name": "Gloomshade",
     "model": "mob_demon",
     "tint": "#3a3a6e",
-    "still": "/guide-stills/mob_demon__3a3a6e.webp"
+    "tintStrength": 0.5,
+    "still": "/guide-stills/mob_demon__3a3a6e__s50.webp"
   },
   {
     "id": "duskborn",
     "name": "Duskborn",
     "model": "mob_demon",
     "tint": "#c6469b",
-    "still": "/guide-stills/mob_demon__c6469b.webp"
+    "tintStrength": 0.5,
+    "still": "/guide-stills/mob_demon__c6469b__s50.webp"
   },
   {
     "id": "spellhound",
     "name": "Spellhound",
     "model": "mob_demonalt",
     "tint": "#4a7d4a",
-    "still": "/guide-stills/mob_demonalt__4a7d4a.webp"
+    "tintStrength": 0.35,
+    "still": "/guide-stills/mob_demonalt__4a7d4a__s35.webp"
   },
   {
     "id": "warfiend",
     "name": "Warfiend",
     "model": "mob_demonalt",
     "tint": "#6e5a2a",
-    "still": "/guide-stills/mob_demonalt__6e5a2a.webp"
+    "tintStrength": 0.35,
+    "still": "/guide-stills/mob_demonalt__6e5a2a__s35.webp"
   },
   {
     "id": "pyre_colossus",
     "name": "Pyre Colossus",
     "model": "mob_demonalt",
     "tint": "#d24a2a",
-    "still": "/guide-stills/mob_demonalt__d24a2a.webp"
+    "tintStrength": 0.35,
+    "still": "/guide-stills/mob_demonalt__d24a2a__s35.webp"
   },
   {
     "id": "wraithborn",
     "name": "Wraithborn",
     "model": "mob_demonalt",
     "tint": "#7a3a8e",
-    "still": "/guide-stills/mob_demonalt__7a3a8e.webp"
+    "tintStrength": 0.35,
+    "still": "/guide-stills/mob_demonalt__7a3a8e__s35.webp"
   }
 ];
 
@@ -2107,14 +2149,14 @@ export const GUIDE_DRUID_FORMS: GuideDruidForm[] = [
   {
     "id": "form_bear",
     "model": "form_bear",
-    "tint": "#5a4030",
-    "still": "/guide-stills/form_bear__5a4030.webp"
+    "still": "/guide-stills/form_bear.webp"
   },
   {
     "id": "form_cat",
     "model": "form_cat",
     "tint": "#d08b45",
-    "still": "/guide-stills/form_cat__d08b45.webp"
+    "tintStrength": 0.35,
+    "still": "/guide-stills/form_cat__d08b45__s35.webp"
   },
   {
     "id": "form_travel",
@@ -2135,7 +2177,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "forest_wolf",
         "model": "mob_wolf",
         "tint": "#7f8c8d",
-        "still": "/guide-stills/mob_wolf__7f8c8d.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_wolf__7f8c8d__s35.webp"
       },
       {
         "name": "Wild Boar",
@@ -2145,6 +2188,7 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "wild_boar",
         "model": "mob_boar",
         "tint": "#935116",
+        "tintStrength": 0.4,
         "still": "/guide-stills/mob_boar__935116.webp"
       },
       {
@@ -2164,7 +2208,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "void_stalker",
         "model": "mob_wolf",
         "tint": "#2f2a44",
-        "still": "/guide-stills/mob_wolf__2f2a44.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_wolf__2f2a44__s35.webp"
       },
       {
         "name": "Mire Prowler",
@@ -2174,7 +2219,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "mire_prowler",
         "model": "mob_wolf",
         "tint": "#4d5656",
-        "still": "/guide-stills/mob_wolf__4d5656.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_wolf__4d5656__s35.webp"
       },
       {
         "name": "Bog Bloat",
@@ -2184,7 +2230,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "bog_bloat",
         "model": "mob_murloc",
         "tint": "#6b8e23",
-        "still": "/guide-stills/mob_murloc__6b8e23.webp"
+        "tintStrength": 0.45,
+        "still": "/guide-stills/mob_murloc__6b8e23__s45.webp"
       },
       {
         "name": "Ridge Stalker",
@@ -2194,7 +2241,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "ridge_stalker",
         "model": "mob_wolf",
         "tint": "#8c8270",
-        "still": "/guide-stills/mob_wolf__8c8270.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_wolf__8c8270__s35.webp"
       },
       {
         "name": "Veiled Doe",
@@ -2222,7 +2270,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "snowdrift_wolf",
         "model": "mob_wolf",
         "tint": "#eef4f8",
-        "still": "/guide-stills/mob_wolf__eef4f8.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_wolf__eef4f8__s35.webp"
       },
       {
         "name": "Gilded Stag",
@@ -2232,7 +2281,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "gilded_stag",
         "model": "mob_stag",
         "tint": "#d8a848",
-        "still": "/guide-stills/mob_stag__d8a848.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_stag__d8a848__s35.webp"
       },
       {
         "name": "Gloam Fox",
@@ -2242,7 +2292,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "gloam_fox",
         "model": "mob_fox",
         "tint": "#d87838",
-        "still": "/guide-stills/mob_fox__d87838.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_fox__d87838__s35.webp"
       },
       {
         "name": "Terrace Howler",
@@ -2252,17 +2303,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "terrace_howler",
         "model": "mob_wolf",
         "tint": "#9db4c8",
-        "still": "/guide-stills/mob_wolf__9db4c8.webp"
-      },
-      {
-        "name": "Gloam Strider",
-        "min": 20,
-        "max": 20,
-        "rare": false,
-        "templateId": "gloam_strider",
-        "model": "mob_raptor",
-        "tint": "#4c4a72",
-        "still": "/guide-stills/mob_raptor__4c4a72.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_wolf__9db4c8__s35.webp"
       },
       {
         "name": "Moonfleece Grazer",
@@ -2272,7 +2314,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "moonfleece_grazer",
         "model": "mob_alpaca",
         "tint": "#e6e9f4",
-        "still": "/guide-stills/mob_alpaca__e6e9f4.webp"
+        "tintStrength": 0.3,
+        "still": "/guide-stills/mob_alpaca__e6e9f4__s30.webp"
       },
       {
         "name": "Moor Ram",
@@ -2282,7 +2325,19 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "moor_ram",
         "model": "mob_alpaca",
         "tint": "#d8d0c0",
-        "still": "/guide-stills/mob_alpaca__d8d0c0.webp"
+        "tintStrength": 0.3,
+        "still": "/guide-stills/mob_alpaca__d8d0c0__s30.webp"
+      },
+      {
+        "name": "Shoal Scuttler",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "shoal_scuttler",
+        "model": "mob_crab",
+        "tint": "#8898a8",
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_crab__8898a8__s35.webp"
       },
       {
         "name": "Thicket Boar",
@@ -2292,6 +2347,7 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "thicket_boar",
         "model": "mob_boar",
         "tint": "#6a4e38",
+        "tintStrength": 0.4,
         "still": "/guide-stills/mob_boar__6a4e38.webp"
       },
       {
@@ -2302,7 +2358,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "tide_scuttler",
         "model": "mob_crab",
         "tint": "#e86848",
-        "still": "/guide-stills/mob_crab__e86848.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_crab__e86848__s35.webp"
       },
       {
         "name": "Topiary Stag",
@@ -2312,7 +2369,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "topiary_stag",
         "model": "mob_stag",
         "tint": "#3f7e3c",
-        "still": "/guide-stills/mob_stag__3f7e3c.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_stag__3f7e3c__s35.webp"
       },
       {
         "name": "Topiary Wolf",
@@ -2322,7 +2380,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "topiary_wolf",
         "model": "mob_wolf",
         "tint": "#4a8a4e",
-        "still": "/guide-stills/mob_wolf__4a8a4e.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_wolf__4a8a4e__s35.webp"
       }
     ]
   },
@@ -2337,7 +2396,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "webwood_spider",
         "model": "mob_spider",
         "tint": "#4a235a",
-        "still": "/guide-stills/mob_spider__4a235a.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_spider__4a235a__s35.webp"
       },
       {
         "name": "Mirefen Widow",
@@ -2347,7 +2407,17 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "mire_widow",
         "model": "mob_spider",
         "tint": "#283747",
-        "still": "/guide-stills/mob_spider__283747.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_spider__283747__s35.webp"
+      },
+      {
+        "name": "Broodmother Egg",
+        "min": 10,
+        "max": 10,
+        "rare": false,
+        "templateId": "spider_egg",
+        "model": "mob_spider_egg_sac",
+        "still": "/guide-stills/mob_spider_egg_sac.webp"
       },
       {
         "name": "Canopy Weaver",
@@ -2357,7 +2427,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "canopy_weaver",
         "model": "mob_spider",
         "tint": "#4e8a3c",
-        "still": "/guide-stills/mob_spider__4e8a3c.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_spider__4e8a3c__s35.webp"
       },
       {
         "name": "Widowsilk Spinner",
@@ -2367,7 +2438,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "widowsilk_spinner",
         "model": "mob_spider",
         "tint": "#3a3440",
-        "still": "/guide-stills/mob_spider__3a3440.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_spider__3a3440__s35.webp"
       }
     ]
   },
@@ -2382,7 +2454,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "mudfin_murloc",
         "model": "mob_murloc",
         "tint": "#52be80",
-        "still": "/guide-stills/mob_murloc__52be80.webp"
+        "tintStrength": 0.45,
+        "still": "/guide-stills/mob_murloc__52be80__s45.webp"
       },
       {
         "name": "Deepfen Snapper",
@@ -2392,7 +2465,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "deepfen_murloc",
         "model": "mob_murloc",
         "tint": "#45b39d",
-        "still": "/guide-stills/mob_murloc__45b39d.webp"
+        "tintStrength": 0.45,
+        "still": "/guide-stills/mob_murloc__45b39d__s45.webp"
       },
       {
         "name": "Glimmermere Wader",
@@ -2402,22 +2476,19 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "glimmermere_wader",
         "model": "mob_murloc",
         "tint": "#8fb6c4",
-        "still": "/guide-stills/mob_murloc__8fb6c4.webp"
-      }
-    ]
-  },
-  {
-    "family": "murloc",
-    "creatures": [
+        "tintStrength": 0.45,
+        "still": "/guide-stills/mob_murloc__8fb6c4__s45.webp"
+      },
       {
         "name": "Bogtoad",
         "min": 19,
         "max": 20,
         "rare": false,
         "templateId": "bogtoad",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+        "model": "mob_murloc",
+        "tint": "#7aa848",
+        "tintStrength": 0.45,
+        "still": "/guide-stills/mob_murloc__7aa848__s45.webp"
       },
       {
         "name": "Mere Lurker",
@@ -2425,15 +2496,27 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 20,
         "rare": false,
         "templateId": "mere_lurker",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+        "model": "mob_murloc",
+        "tint": "#a8b048",
+        "tintStrength": 0.45,
+        "still": "/guide-stills/mob_murloc__a8b048__s45.webp"
       }
     ]
   },
   {
     "family": "burrower",
     "creatures": [
+      {
+        "name": "Breach Wretch",
+        "min": 3,
+        "max": 5,
+        "rare": false,
+        "templateId": "breach_wretch",
+        "model": "mob_kobold",
+        "tint": "#5a4a78",
+        "tintStrength": 0.2,
+        "still": "/guide-stills/mob_kobold__5a4a78__s20.webp"
+      },
       {
         "name": "Deeprock Digger",
         "min": 4,
@@ -2442,7 +2525,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "tunnel_rat",
         "model": "mob_kobold",
         "tint": "#9c640c",
-        "still": "/guide-stills/mob_kobold__9c640c.webp"
+        "tintStrength": 0.2,
+        "still": "/guide-stills/mob_kobold__9c640c__s20.webp"
       },
       {
         "name": "Deeprock Tunneler",
@@ -2452,22 +2536,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "deeprock_kobold",
         "model": "mob_kobold",
         "tint": "#9c7a3c",
-        "still": "/guide-stills/mob_kobold__9c7a3c.webp"
-      }
-    ]
-  },
-  {
-    "family": "kobold",
-    "creatures": [
-      {
-        "name": "Breach Wretch",
-        "min": 3,
-        "max": 5,
-        "rare": false,
-        "templateId": "breach_wretch",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+        "tintStrength": 0.2,
+        "still": "/guide-stills/mob_kobold__9c7a3c__s20.webp"
       },
       {
         "name": "Gleamfolk Pixie",
@@ -2477,7 +2547,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "mushroom_pixie",
         "model": "mob_mushroom_pixie",
         "tint": "#d8c4f0",
-        "still": "/guide-stills/mob_mushroom_pixie__d8c4f0.webp"
+        "tintStrength": 0.2,
+        "still": "/guide-stills/mob_mushroom_pixie__d8c4f0__s20.webp"
       },
       {
         "name": "Sporeling Gatherer",
@@ -2487,7 +2558,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "sporeling_gatherer",
         "model": "mob_glub",
         "tint": "#d8b98a",
-        "still": "/guide-stills/mob_glub__d8b98a.webp"
+        "tintStrength": 0.45,
+        "still": "/guide-stills/mob_glub__d8b98a__s45.webp"
       },
       {
         "name": "Corrupted Sporeling",
@@ -2497,7 +2569,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "corrupted_sporeling",
         "model": "mob_glub",
         "tint": "#5e4a72",
-        "still": "/guide-stills/mob_glub__5e4a72.webp"
+        "tintStrength": 0.45,
+        "still": "/guide-stills/mob_glub__5e4a72__s45.webp"
       },
       {
         "name": "Fen Sprite",
@@ -2505,9 +2578,10 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 18,
         "rare": false,
         "templateId": "fen_sprite",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+        "model": "mob_kobold",
+        "tint": "#cfe0ea",
+        "tintStrength": 0.2,
+        "still": "/guide-stills/mob_kobold__cfe0ea__s20.webp"
       },
       {
         "name": "Harvest Sprite",
@@ -2515,9 +2589,10 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 19,
         "rare": false,
         "templateId": "harvest_sprite",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+        "model": "mob_kobold",
+        "tint": "#e8c878",
+        "tintStrength": 0.2,
+        "still": "/guide-stills/mob_kobold__e8c878__s20.webp"
       },
       {
         "name": "Willow Sprite",
@@ -2525,9 +2600,10 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 20,
         "rare": false,
         "templateId": "willow_sprite",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+        "model": "mob_kobold",
+        "tint": "#c8e0b8",
+        "tintStrength": 0.2,
+        "still": "/guide-stills/mob_kobold__c8e0b8__s20.webp"
       },
       {
         "name": "Downs Bandit",
@@ -2535,9 +2611,10 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 20,
         "rare": false,
         "templateId": "downs_bandit",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+        "model": "mob_kobold",
+        "tint": "#5a8a46",
+        "tintStrength": 0.2,
+        "still": "/guide-stills/mob_kobold__5a8a46__s20.webp"
       },
       {
         "name": "Hedge Gnome",
@@ -2545,9 +2622,10 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 20,
         "rare": false,
         "templateId": "hedge_gnome",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+        "model": "mob_kobold",
+        "tint": "#5a8a46",
+        "tintStrength": 0.2,
+        "still": "/guide-stills/mob_kobold__5a8a46__s20.webp"
       },
       {
         "name": "Wreckfield Thief",
@@ -2555,9 +2633,10 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 20,
         "rare": false,
         "templateId": "wreck_thief",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+        "model": "mob_kobold",
+        "tint": "#5a8a46",
+        "tintStrength": 0.2,
+        "still": "/guide-stills/mob_kobold__5a8a46__s20.webp"
       }
     ]
   },
@@ -2572,7 +2651,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "vale_bandit",
         "model": "mob_bandit",
         "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+        "tintStrength": 0.3,
+        "still": "/guide-stills/mob_bandit__6b3a32__s30.webp"
       },
       {
         "name": "Gravecaller Cultist",
@@ -2582,7 +2662,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "gravecaller_cultist",
         "model": "mob_dark_caster",
         "tint": "#6c3483",
-        "still": "/guide-stills/mob_dark_caster__6c3483.webp"
+        "tintStrength": 0.5,
+        "still": "/guide-stills/mob_dark_caster__6c3483__s50.webp"
       },
       {
         "name": "Gravecaller Mender",
@@ -2592,7 +2673,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "gravecaller_mender",
         "model": "mob_bandit",
         "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+        "tintStrength": 0.3,
+        "still": "/guide-stills/mob_bandit__6b3a32__s30.webp"
       },
       {
         "name": "Gravecaller Summoner",
@@ -2602,7 +2684,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "gravecaller_summoner",
         "model": "mob_dark_caster",
         "tint": "#884ea0",
-        "still": "/guide-stills/mob_dark_caster__884ea0.webp"
+        "tintStrength": 0.5,
+        "still": "/guide-stills/mob_dark_caster__884ea0__s50.webp"
       },
       {
         "name": "Wyrmcult Zealot",
@@ -2612,7 +2695,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "wyrmcult_zealot",
         "model": "mob_bandit",
         "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+        "tintStrength": 0.3,
+        "still": "/guide-stills/mob_bandit__6b3a32__s30.webp"
       },
       {
         "name": "Wyrmcult Necromancer",
@@ -2622,7 +2706,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "wyrmcult_necromancer",
         "model": "mob_dark_caster",
         "tint": "#533566",
-        "still": "/guide-stills/mob_dark_caster__533566.webp"
+        "tintStrength": 0.5,
+        "still": "/guide-stills/mob_dark_caster__533566__s50.webp"
       },
       {
         "name": "Dawnhold Knight",
@@ -2646,7 +2731,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "fen_troll",
         "model": "mob_troll",
         "tint": "#229954",
-        "still": "/guide-stills/mob_troll__229954.webp"
+        "tintStrength": 0.12,
+        "still": "/guide-stills/mob_troll__229954__s12.webp"
       },
       {
         "name": "Grubjaw the Glutton",
@@ -2654,9 +2740,10 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 12,
         "rare": true,
         "templateId": "grubjaw",
-        "model": "mob_troll",
+        "model": "mob_grubjaw",
         "tint": "#145a32",
-        "still": "/guide-stills/mob_troll__145a32.webp"
+        "tintStrength": 0.04,
+        "still": "/guide-stills/mob_grubjaw__145a32__s4.webp"
       },
       {
         "name": "Dune Troll",
@@ -2666,7 +2753,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "dune_troll",
         "model": "mob_troll",
         "tint": "#b07040",
-        "still": "/guide-stills/mob_troll__b07040.webp"
+        "tintStrength": 0.12,
+        "still": "/guide-stills/mob_troll__b07040__s12.webp"
       }
     ]
   },
@@ -2681,7 +2769,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "thornpeak_ogre",
         "model": "mob_ogre",
         "tint": "#9e7b53",
-        "still": "/guide-stills/mob_ogre__9e7b53.webp"
+        "tintStrength": 0.2,
+        "still": "/guide-stills/mob_ogre__9e7b53__s20.webp"
       },
       {
         "name": "Gravenbark Shambler",
@@ -2691,7 +2780,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "gravenbark_shambler",
         "model": "mob_treant",
         "tint": "#4e4a3a",
-        "still": "/guide-stills/mob_treant__4e4a3a.webp"
+        "tintStrength": 0.72,
+        "still": "/guide-stills/mob_treant__4e4a3a__s72.webp"
       }
     ]
   },
@@ -2706,7 +2796,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "restless_bones",
         "model": "skel_minion",
         "tint": "#d5dbdb",
-        "still": "/guide-stills/skel_minion__d5dbdb.webp"
+        "tintStrength": 0.25,
+        "still": "/guide-stills/skel_minion__d5dbdb__s25.webp"
       },
       {
         "name": "Drowned Dead",
@@ -2716,7 +2807,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "drowned_dead",
         "model": "skel_minion",
         "tint": "#7fb3d5",
-        "still": "/guide-stills/skel_minion__7fb3d5.webp"
+        "tintStrength": 0.25,
+        "still": "/guide-stills/skel_minion__7fb3d5__s25.webp"
       },
       {
         "name": "Drowned Votary",
@@ -2726,7 +2818,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "drowned_votary",
         "model": "skel_minion",
         "tint": "#6c8f8a",
-        "still": "/guide-stills/skel_minion__6c8f8a.webp"
+        "tintStrength": 0.25,
+        "still": "/guide-stills/skel_minion__6c8f8a__s25.webp"
       },
       {
         "name": "Ashbone Raider",
@@ -2736,7 +2829,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "ashbone_raider",
         "model": "skel_minion",
         "tint": "#e8dcc8",
-        "still": "/guide-stills/skel_minion__e8dcc8.webp"
+        "tintStrength": 0.25,
+        "still": "/guide-stills/skel_minion__e8dcc8__s25.webp"
       },
       {
         "name": "Ashbone Warcaller",
@@ -2746,7 +2840,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "ashbone_warcaller",
         "model": "skel_minion",
         "tint": "#d8c8a8",
-        "still": "/guide-stills/skel_minion__d8c8a8.webp"
+        "tintStrength": 0.25,
+        "still": "/guide-stills/skel_minion__d8c8a8__s25.webp"
       },
       {
         "name": "Boneclad Revenant",
@@ -2756,7 +2851,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "boneclad_revenant",
         "model": "skel_warrior",
         "tint": "#cacfd2",
-        "still": "/guide-stills/skel_warrior__cacfd2.webp"
+        "tintStrength": 0.25,
+        "still": "/guide-stills/skel_warrior__cacfd2__s25.webp"
       },
       {
         "name": "Barrow Wight",
@@ -2766,7 +2862,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "barrow_wight",
         "model": "skel_minion",
         "tint": "#9fb0c4",
-        "still": "/guide-stills/skel_minion__9fb0c4.webp"
+        "tintStrength": 0.25,
+        "still": "/guide-stills/skel_minion__9fb0c4__s25.webp"
       },
       {
         "name": "Drowned Deckhand",
@@ -2776,7 +2873,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "drowned_deckhand",
         "model": "skel_minion",
         "tint": "#86988e",
-        "still": "/guide-stills/skel_minion__86988e.webp"
+        "tintStrength": 0.25,
+        "still": "/guide-stills/skel_minion__86988e__s25.webp"
       }
     ]
   },
@@ -2809,7 +2907,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "ice_wisp",
         "model": "mob_ghost",
         "tint": "#bfe4ff",
-        "still": "/guide-stills/mob_ghost__bfe4ff.webp"
+        "tintStrength": 0.55,
+        "still": "/guide-stills/mob_ghost__bfe4ff__s55.webp"
       },
       {
         "name": "Stormcrag Elemental",
@@ -2819,6 +2918,7 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "stormcrag_elemental",
         "model": "mob_elemental",
         "tint": "#5dade2",
+        "tintStrength": 0.4,
         "still": "/guide-stills/mob_elemental__5dade2.webp"
       },
       {
@@ -2829,6 +2929,7 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "rime_elemental",
         "model": "mob_elemental",
         "tint": "#9fd0f0",
+        "tintStrength": 0.4,
         "still": "/guide-stills/mob_elemental__9fd0f0.webp"
       },
       {
@@ -2839,6 +2940,7 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "shardlord_kazzix",
         "model": "mob_elemental",
         "tint": "#aed6f1",
+        "tintStrength": 0.4,
         "still": "/guide-stills/mob_elemental__aed6f1.webp"
       },
       {
@@ -2849,7 +2951,19 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "lily_wisp",
         "model": "mob_ghost",
         "tint": "#d0f2c8",
-        "still": "/guide-stills/mob_ghost__d0f2c8.webp"
+        "tintStrength": 0.55,
+        "still": "/guide-stills/mob_ghost__d0f2c8__s55.webp"
+      },
+      {
+        "name": "Gale Wisp",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "gale_wisp",
+        "model": "mob_elemental",
+        "tint": "#bfe0e8",
+        "tintStrength": 0.4,
+        "still": "/guide-stills/mob_elemental__bfe0e8.webp"
       },
       {
         "name": "Nightkin Stargazer",
@@ -2859,7 +2973,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "nightkin_stargazer",
         "model": "mob_nightkin",
         "tint": "#8fa8e0",
-        "still": "/guide-stills/mob_nightkin__8fa8e0.webp"
+        "tintStrength": 0.3,
+        "still": "/guide-stills/mob_nightkin__8fa8e0__s30.webp"
       },
       {
         "name": "Wood Wraith",
@@ -2869,7 +2984,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "wood_wraith",
         "model": "mob_ghost",
         "tint": "#9ab4a0",
-        "still": "/guide-stills/mob_ghost__9ab4a0.webp"
+        "tintStrength": 0.55,
+        "still": "/guide-stills/mob_ghost__9ab4a0__s55.webp"
       }
     ]
   },
@@ -2884,7 +3000,30 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "sethrael_palecoil",
         "model": "mob_dragonkin",
         "tint": "#bcd2e6",
-        "still": "/guide-stills/mob_dragonkin__bcd2e6.webp"
+        "tintStrength": 0.2,
+        "still": "/guide-stills/mob_dragonkin__bcd2e6__s20.webp"
+      },
+      {
+        "name": "Dragonkin Broodguard",
+        "min": 19,
+        "max": 20,
+        "rare": false,
+        "templateId": "dragonkin_broodguard",
+        "model": "mob_dragonkin_broodguard",
+        "tint": "#3e6b4f",
+        "tintStrength": 0.1,
+        "still": "/guide-stills/mob_dragonkin_broodguard__3e6b4f__s10.webp"
+      },
+      {
+        "name": "Dragonkin Egg",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "dragonkin_egg",
+        "model": "mob_dragon_egg",
+        "tint": "#69a06a",
+        "tintStrength": 0.08,
+        "still": "/guide-stills/mob_dragon_egg__69a06a__s8.webp"
       }
     ]
   },
@@ -2899,7 +3038,24 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "riftspawn",
         "model": "mob_demonalt",
         "tint": "#7a3fb0",
-        "still": "/guide-stills/mob_demonalt__7a3fb0.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_demonalt__7a3fb0__s35.webp"
+      }
+    ]
+  },
+  {
+    "family": "reptile",
+    "creatures": [
+      {
+        "name": "Gloam Strider",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "gloam_strider",
+        "model": "mob_raptor",
+        "tint": "#4c4a72",
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_raptor__4c4a72__s35.webp"
       }
     ]
   }
@@ -4450,7 +4606,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "name": "House Rules",
     "category": "pvp",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/pvp_card_duel_first_win.webp"
   },
   {
     "id": "prog_guildsworn",
@@ -4676,14 +4833,318 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "name": "The Basin Bites Back",
     "category": "dungeon",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_wildheart_basin.webp"
   },
   {
     "id": "dgn_wildheart_basin_heroic",
     "name": "Heroic: The Wildheart Basin",
     "category": "dungeon",
     "renown": 10,
+    "feat": false,
+    "crest": "/ui/deeds/dgn_wildheart_basin_heroic.webp"
+  },
+  {
+    "id": "chr_peaks_gatherer",
+    "name": "Harvest of the Heights",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/chr_peaks_gatherer.webp"
+  },
+  {
+    "id": "chr_marsh_rares_ii",
+    "name": "The Glutton, Reckoned",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/chr_marsh_rares_ii.webp"
+  },
+  {
+    "id": "chr_peaks_rares_ii",
+    "name": "More Names Cut into the Crag",
+    "category": "chronicle",
+    "renown": 10,
+    "feat": false,
+    "crest": "/ui/deeds/chr_peaks_rares_ii.webp"
+  },
+  {
+    "id": "chr_gleamstag",
+    "name": "The Legend That Would Not Strike First",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/chr_gleamstag.webp"
+  },
+  {
+    "id": "chr_hollow_rares",
+    "name": "The Herd Remembers",
+    "category": "chronicle",
+    "renown": 10,
+    "feat": false,
+    "crest": "/ui/deeds/chr_hollow_rares.webp"
+  },
+  {
+    "id": "pvp_bg_first_capture",
+    "name": "Banner in Hand",
+    "category": "pvp",
+    "renown": 5,
     "feat": false
+  },
+  {
+    "id": "pvp_bg_first_win",
+    "name": "The Hollow Holds",
+    "category": "pvp",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "pvp_bg_wins_25",
+    "name": "Warden of the Hollow",
+    "category": "pvp",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "Flagbearer"
+  },
+  {
+    "id": "pvp_bg_captures_100",
+    "name": "A Hundred Banners",
+    "category": "pvp",
+    "renown": 50,
+    "feat": false
+  },
+  {
+    "id": "chr_willowfen_gatherer",
+    "name": "Fenland Bounty",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/chr_willowfen_gatherer.webp"
+  },
+  {
+    "id": "chr_willowfen_first_cast",
+    "name": "Ripples in the Lilymoors",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/chr_willowfen_first_cast.webp"
+  },
+  {
+    "id": "chr_galecrest_gatherer",
+    "name": "Harvest on the Headland",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/chr_galecrest_gatherer.webp"
+  },
+  {
+    "id": "chr_galecrest_first_cast",
+    "name": "A Line in the Mirror Tarn",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/chr_galecrest_first_cast.webp"
+  },
+  {
+    "id": "chr_farshore_gatherer",
+    "name": "Island Provisions",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/chr_farshore_gatherer.webp"
+  },
+  {
+    "id": "chr_farshore_first_cast",
+    "name": "What the Gulls Know",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/chr_farshore_first_cast.webp"
+  },
+  {
+    "id": "chr_drakemaw_broodlord",
+    "name": "Clutch Breaker",
+    "category": "chronicle",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "chr_maw_matriarch",
+    "name": "The Sky Goes Quiet",
+    "category": "chronicle",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_rift",
+    "name": "Riftwalker",
+    "category": "dungeon",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "dgn_rift_s_rank",
+    "name": "Rift Sovereign",
+    "category": "dungeon",
+    "renown": 25,
+    "feat": false
+  },
+  {
+    "id": "prog_engineering_rare",
+    "name": "Precision Engineering",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_alchemy_rare",
+    "name": "A Rare Vintage",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_cooking_rare",
+    "name": "A Dish to Remember",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_leatherworking_rare",
+    "name": "Fine Tanning",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_tailoring_rare",
+    "name": "A Master's Stitch",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_weaponcrafting_rare",
+    "name": "Tempered to a Shine",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_armorcrafting_rare",
+    "name": "Plated to Perfection",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "chr_frostveil_gatherer",
+    "name": "Terraced Harvest",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_frostveil_first_cast",
+    "name": "First Ice on the Tarn",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_amberfall_gatherer",
+    "name": "The Amberfall Harvest",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_amberfall_first_cast",
+    "name": "A Catch from the Great Mere",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_nightbloom_gatherer",
+    "name": "The Dreaming Harvest",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_nightbloom_first_cast",
+    "name": "A Ripple on the Moonwell",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_wraithwood_gatherer",
+    "name": "Harvest Under the Canopy",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_wraithwood_first_cast",
+    "name": "A Cast in the Looking-Glass",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_palmreach_gatherer",
+    "name": "Harvest on the Palmstrand",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_palmreach_first_cast",
+    "name": "Casting the Sapphire Lagoon",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_evergarden_gatherer",
+    "name": "The Parterre's Bounty",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_evergarden_first_cast",
+    "name": "A Cast on the Petal Pond",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "pvp_honor_sergeant",
+    "name": "Sergeant",
+    "category": "pvp",
+    "renown": 10,
+    "feat": false,
+    "rewardTitle": "Sergeant"
+  },
+  {
+    "id": "pvp_honor_knight_lieutenant",
+    "name": "Knight-Lieutenant",
+    "category": "pvp",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "Knight-Lieutenant"
+  },
+  {
+    "id": "pvp_honor_field_marshal",
+    "name": "Field Marshal",
+    "category": "pvp",
+    "renown": 50,
+    "feat": false,
+    "rewardTitle": "Field Marshal"
   }
 ];
 
@@ -4862,7 +5323,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
-            "name": "Osmium Ore",
+            "name": "Fine Iron Ore",
             "count": 4
           },
           {
@@ -4896,6 +5357,10 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
             "count": 2
           },
           {
+            "name": "Fine Osmium Ore",
+            "count": 2
+          },
+          {
             "name": "Osmium Mining Pick",
             "count": 1
           }
@@ -4922,7 +5387,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
-            "name": "Ashwood Log",
+            "name": "Fine Ashwood Log",
             "count": 4
           },
           {
@@ -4952,7 +5417,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
-            "name": "Highpine Log",
+            "name": "Fine Highpine Log",
             "count": 2
           },
           {
@@ -4982,7 +5447,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
-            "name": "Goldleaf Herb",
+            "name": "Fine Goldleaf Herb",
             "count": 4
           },
           {
@@ -5012,7 +5477,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
-            "name": "Sunpetal Herb",
+            "name": "Fine Sunpetal Herb",
             "count": 2
           },
           {
@@ -5030,6 +5495,70 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 175,
           "minimalAt": 200,
           "zeroAt": 225
+        }
+      },
+      {
+        "id": "recipe_stormreel_fishing_rod",
+        "name": "Stormreel Fishing Rod",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 40000,
+        "materials": [
+          {
+            "name": "Sunglint Koi",
+            "count": 4
+          },
+          {
+            "name": "Silverstream Fishing Rod",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Stormreel Fishing Rod",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
+        }
+      },
+      {
+        "id": "recipe_tidewrought_fishing_rod",
+        "name": "Tidewrought Fishing Rod",
+        "skillReq": 125,
+        "tier": 5,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 160000,
+        "materials": [
+          {
+            "name": "Sunglint Koi",
+            "count": 2
+          },
+          {
+            "name": "Raw Slatefin Carp",
+            "count": 8
+          },
+          {
+            "name": "Stormreel Fishing Rod",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Tidewrought Fishing Rod",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 150,
+          "minimalAt": 175,
+          "zeroAt": 200
         }
       }
     ]
@@ -6192,6 +6721,14 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "name": "Pristine Claw",
+            "count": 1
+          },
+          {
+            "name": "Sharp Claw",
+            "count": 2
+          },
+          {
             "name": "Rough Hide",
             "count": 4
           },
@@ -6669,7 +7206,76 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       "at": 75,
       "materialDiscountPct": 20
     },
-    "recipes": []
+    "recipes": [
+      {
+        "id": "recipe_gatherers_cache",
+        "name": "Gatherer's Cache",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "name": "Chime Shard",
+            "count": 5
+          },
+          {
+            "name": "Chime Essence",
+            "count": 4
+          },
+          {
+            "name": "Chime Dust",
+            "count": 6
+          }
+        ],
+        "output": {
+          "name": "Gatherer's Cache",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
+      },
+      {
+        "id": "recipe_artisans_eye",
+        "name": "Artisan's Eye",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "name": "Chime Shard",
+            "count": 5
+          },
+          {
+            "name": "Chime Essence",
+            "count": 4
+          },
+          {
+            "name": "Chime Dust",
+            "count": 6
+          }
+        ],
+        "output": {
+          "name": "Artisan's Eye",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
+      }
+    ]
   },
   {
     "id": "weaponcrafting",
@@ -6840,6 +7446,10 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "acquisition": "trainer",
         "feeCopper": 0,
         "materials": [
+          {
+            "name": "Curved Tusk",
+            "count": 2
+          },
           {
             "name": "Ironbark Log",
             "count": 3
@@ -7596,16 +8206,8 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "name": "Iron Mining Pick",
         "tier": 2,
         "quality": "common",
-        "priceCopper": 60,
+        "priceCopper": 120,
         "vendors": [
-          {
-            "name": "Trader Wilkes",
-            "hub": "Eastbrook"
-          },
-          {
-            "name": "Forgemistress Darva",
-            "hub": "Eastbrook"
-          },
           {
             "name": "Provisioner Hale",
             "hub": "Fenbridge"
@@ -7614,27 +8216,21 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
             "name": "Quartermaster Bree",
             "hub": "Highwatch"
           }
-        ]
+        ],
+        "wieldProficiency": 40
       },
       {
         "name": "Skysilver Mining Pick",
         "tier": 3,
         "quality": "uncommon",
-        "priceCopper": 150,
+        "priceCopper": 400,
         "vendors": [
-          {
-            "name": "Trader Wilkes",
-            "hub": "Eastbrook"
-          },
-          {
-            "name": "Forgemistress Darva",
-            "hub": "Eastbrook"
-          },
           {
             "name": "Quartermaster Bree",
             "hub": "Highwatch"
           }
-        ]
+        ],
+        "wieldProficiency": 70
       },
       {
         "name": "Osmium Mining Pick",
@@ -7642,7 +8238,10 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "quality": "rare",
         "priceCopper": null,
         "vendors": [],
-        "craftedBy": "engineering"
+        "craftedBy": "engineering",
+        "priceMarks": 24,
+        "marksClears": 3,
+        "wieldProficiency": 85
       },
       {
         "name": "Glyphsteel Mining Pick",
@@ -7650,7 +8249,10 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "quality": "epic",
         "priceCopper": null,
         "vendors": [],
-        "craftedBy": "engineering"
+        "craftedBy": "engineering",
+        "priceMarks": 56,
+        "marksHeroicClear": true,
+        "wieldProficiency": 100
       }
     ],
     "nodes": [
@@ -7658,21 +8260,21 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "Eastbrook Vale",
         "tier": 1,
         "toolTier": 1,
-        "count": 3,
+        "count": 6,
         "material": "Copper Ore"
       },
       {
         "zone": "Mirefen Marsh",
         "tier": 1,
         "toolTier": 1,
-        "count": 3,
+        "count": 4,
         "material": "Iron Ore"
       },
       {
         "zone": "Mirefen Marsh",
         "tier": 2,
         "toolTier": 2,
-        "count": 1,
+        "count": 2,
         "material": "Iron Ore"
       },
       {
@@ -7700,7 +8302,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "The Farshore",
         "tier": 1,
         "toolTier": 1,
-        "count": 2,
+        "count": 6,
         "material": "Iron Ore"
       },
       {
@@ -7714,7 +8316,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "The Galecrest",
         "tier": 1,
         "toolTier": 1,
-        "count": 2,
+        "count": 6,
         "material": "Osmium Ore"
       },
       {
@@ -7742,7 +8344,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "The Willowfen",
         "tier": 1,
         "toolTier": 1,
-        "count": 2,
+        "count": 6,
         "material": "Osmium Ore"
       },
       {
@@ -7763,18 +8365,18 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "Thornpeak Heights",
         "tier": 2,
         "toolTier": 2,
-        "count": 1,
+        "count": 2,
         "material": "Osmium Ore"
       },
       {
         "zone": "Thornpeak Heights",
         "tier": 3,
         "toolTier": 3,
-        "count": 1,
+        "count": 2,
         "material": "Osmium Ore"
       }
     ],
-    "respawnSeconds": 120
+    "respawnSeconds": 240
   },
   {
     "id": "logging",
@@ -7814,16 +8416,8 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "name": "Felling Axe",
         "tier": 2,
         "quality": "common",
-        "priceCopper": 60,
+        "priceCopper": 120,
         "vendors": [
-          {
-            "name": "Trader Wilkes",
-            "hub": "Eastbrook"
-          },
-          {
-            "name": "Tinker Gizzel",
-            "hub": "Eastbrook"
-          },
           {
             "name": "Provisioner Hale",
             "hub": "Fenbridge"
@@ -7832,27 +8426,21 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
             "name": "Quartermaster Bree",
             "hub": "Highwatch"
           }
-        ]
+        ],
+        "wieldProficiency": 40
       },
       {
         "name": "Ironbark Axe",
         "tier": 3,
         "quality": "uncommon",
-        "priceCopper": 150,
+        "priceCopper": 400,
         "vendors": [
-          {
-            "name": "Trader Wilkes",
-            "hub": "Eastbrook"
-          },
-          {
-            "name": "Tinker Gizzel",
-            "hub": "Eastbrook"
-          },
           {
             "name": "Quartermaster Bree",
             "hub": "Highwatch"
           }
-        ]
+        ],
+        "wieldProficiency": 70
       },
       {
         "name": "Ashwood Axe",
@@ -7860,7 +8448,10 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "quality": "rare",
         "priceCopper": null,
         "vendors": [],
-        "craftedBy": "engineering"
+        "craftedBy": "engineering",
+        "priceMarks": 24,
+        "marksClears": 3,
+        "wieldProficiency": 85
       },
       {
         "name": "Highpine Axe",
@@ -7868,7 +8459,10 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "quality": "epic",
         "priceCopper": null,
         "vendors": [],
-        "craftedBy": "engineering"
+        "craftedBy": "engineering",
+        "priceMarks": 56,
+        "marksHeroicClear": true,
+        "wieldProficiency": 100
       }
     ],
     "nodes": [
@@ -7876,21 +8470,21 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "Eastbrook Vale",
         "tier": 1,
         "toolTier": 1,
-        "count": 3,
+        "count": 6,
         "material": "Ironbark Log"
       },
       {
         "zone": "Mirefen Marsh",
         "tier": 1,
         "toolTier": 1,
-        "count": 3,
+        "count": 4,
         "material": "Ashwood Log"
       },
       {
         "zone": "Mirefen Marsh",
         "tier": 2,
         "toolTier": 2,
-        "count": 1,
+        "count": 2,
         "material": "Ashwood Log"
       },
       {
@@ -7918,7 +8512,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "The Farshore",
         "tier": 1,
         "toolTier": 1,
-        "count": 2,
+        "count": 6,
         "material": "Ashwood Log"
       },
       {
@@ -7932,7 +8526,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "The Galecrest",
         "tier": 1,
         "toolTier": 1,
-        "count": 2,
+        "count": 6,
         "material": "Highpine Log"
       },
       {
@@ -7960,7 +8554,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "The Willowfen",
         "tier": 1,
         "toolTier": 1,
-        "count": 2,
+        "count": 6,
         "material": "Highpine Log"
       },
       {
@@ -7981,18 +8575,18 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "Thornpeak Heights",
         "tier": 2,
         "toolTier": 2,
-        "count": 1,
+        "count": 2,
         "material": "Highpine Log"
       },
       {
         "zone": "Thornpeak Heights",
         "tier": 3,
         "toolTier": 3,
-        "count": 1,
+        "count": 2,
         "material": "Highpine Log"
       }
     ],
-    "respawnSeconds": 120
+    "respawnSeconds": 240
   },
   {
     "id": "herbalism",
@@ -8032,16 +8626,8 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "name": "Bronze Sickle",
         "tier": 2,
         "quality": "common",
-        "priceCopper": 60,
+        "priceCopper": 120,
         "vendors": [
-          {
-            "name": "Trader Wilkes",
-            "hub": "Eastbrook"
-          },
-          {
-            "name": "Tinker Gizzel",
-            "hub": "Eastbrook"
-          },
           {
             "name": "Provisioner Hale",
             "hub": "Fenbridge"
@@ -8050,27 +8636,21 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
             "name": "Quartermaster Bree",
             "hub": "Highwatch"
           }
-        ]
+        ],
+        "wieldProficiency": 40
       },
       {
         "name": "Sheenleaf Sickle",
         "tier": 3,
         "quality": "uncommon",
-        "priceCopper": 150,
+        "priceCopper": 400,
         "vendors": [
-          {
-            "name": "Trader Wilkes",
-            "hub": "Eastbrook"
-          },
-          {
-            "name": "Tinker Gizzel",
-            "hub": "Eastbrook"
-          },
           {
             "name": "Quartermaster Bree",
             "hub": "Highwatch"
           }
-        ]
+        ],
+        "wieldProficiency": 70
       },
       {
         "name": "Goldleaf Sickle",
@@ -8078,7 +8658,10 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "quality": "rare",
         "priceCopper": null,
         "vendors": [],
-        "craftedBy": "engineering"
+        "craftedBy": "engineering",
+        "priceMarks": 24,
+        "marksClears": 3,
+        "wieldProficiency": 85
       },
       {
         "name": "Sunpetal Sickle",
@@ -8086,7 +8669,10 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "quality": "epic",
         "priceCopper": null,
         "vendors": [],
-        "craftedBy": "engineering"
+        "craftedBy": "engineering",
+        "priceMarks": 56,
+        "marksHeroicClear": true,
+        "wieldProficiency": 100
       }
     ],
     "nodes": [
@@ -8094,21 +8680,21 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "Eastbrook Vale",
         "tier": 1,
         "toolTier": 1,
-        "count": 3,
+        "count": 6,
         "material": "Sheenleaf Herb"
       },
       {
         "zone": "Mirefen Marsh",
         "tier": 1,
         "toolTier": 1,
-        "count": 3,
+        "count": 4,
         "material": "Goldleaf Herb"
       },
       {
         "zone": "Mirefen Marsh",
         "tier": 2,
         "toolTier": 2,
-        "count": 1,
+        "count": 2,
         "material": "Goldleaf Herb"
       },
       {
@@ -8136,7 +8722,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "The Farshore",
         "tier": 1,
         "toolTier": 1,
-        "count": 2,
+        "count": 6,
         "material": "Goldleaf Herb"
       },
       {
@@ -8150,7 +8736,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "The Galecrest",
         "tier": 1,
         "toolTier": 1,
-        "count": 2,
+        "count": 6,
         "material": "Sunpetal Herb"
       },
       {
@@ -8178,7 +8764,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "The Willowfen",
         "tier": 1,
         "toolTier": 1,
-        "count": 2,
+        "count": 6,
         "material": "Sunpetal Herb"
       },
       {
@@ -8199,18 +8785,18 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "Thornpeak Heights",
         "tier": 2,
         "toolTier": 2,
-        "count": 1,
+        "count": 2,
         "material": "Sunpetal Herb"
       },
       {
         "zone": "Thornpeak Heights",
         "tier": 3,
         "toolTier": 3,
-        "count": 1,
+        "count": 2,
         "material": "Sunpetal Herb"
       }
     ],
-    "respawnSeconds": 120
+    "respawnSeconds": 240
   },
   {
     "id": "fishing",
@@ -8255,6 +8841,10 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
           {
             "name": "Trader Wilkes",
             "hub": "Eastbrook"
+          },
+          {
+            "name": "Provisioner Hale",
+            "hub": "Fenbridge"
           }
         ]
       },
@@ -8267,15 +8857,39 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
           {
             "name": "Trader Wilkes",
             "hub": "Eastbrook"
+          },
+          {
+            "name": "Quartermaster Bree",
+            "hub": "Highwatch"
           }
         ]
+      },
+      {
+        "name": "Stormreel Fishing Rod",
+        "tier": 4,
+        "quality": "rare",
+        "priceCopper": null,
+        "vendors": [],
+        "craftedBy": "engineering",
+        "priceMarks": 24,
+        "marksClears": 3
+      },
+      {
+        "name": "Tidewrought Fishing Rod",
+        "tier": 5,
+        "quality": "epic",
+        "priceCopper": null,
+        "vendors": [],
+        "craftedBy": "engineering",
+        "priceMarks": 56,
+        "marksHeroicClear": true
       }
     ],
     "fishing": {
       "biteMinSec": 3,
       "biteMaxSec": 8,
       "rodBiteReductionSec": 1.5,
-      "reelWindowSec": 3,
+      "reelWindowSec": 2.5,
       "reelRodBonusSec": 0.75,
       "sessionCapSec": 15,
       "schedule": [
@@ -8309,12 +8923,12 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
               "rows": [
                 {
                   "name": "Raw Mirror Trout",
-                  "pct": 45,
+                  "pct": 46,
                   "quality": "common"
                 },
                 {
                   "name": "Raw River Perch",
-                  "pct": 30,
+                  "pct": 31,
                   "quality": "common"
                 },
                 {
@@ -8324,7 +8938,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
                 },
                 {
                   "name": "Sunglint Koi",
-                  "pct": 3,
+                  "pct": 1,
                   "quality": "uncommon"
                 },
                 {
@@ -8339,32 +8953,32 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
               "rows": [
                 {
                   "name": "Raw Marsh Pike",
-                  "pct": 40,
+                  "pct": 22,
                   "quality": "common"
                 },
                 {
                   "name": "Raw Bog Eel",
-                  "pct": 30,
+                  "pct": 17,
                   "quality": "common"
                 },
                 {
                   "name": "Soggy Boot",
-                  "pct": 8,
+                  "pct": 12,
                   "quality": "poor"
                 },
                 {
                   "name": "Tangled Weed",
-                  "pct": 9,
+                  "pct": 13,
                   "quality": "poor"
                 },
                 {
                   "name": "Sunglint Koi",
-                  "pct": 3,
+                  "pct": 1,
                   "quality": "uncommon"
                 },
                 {
                   "name": null,
-                  "pct": 10,
+                  "pct": 35,
                   "quality": null
                 }
               ]
@@ -8374,27 +8988,27 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
               "rows": [
                 {
                   "name": "Raw Frostgill Trout",
-                  "pct": 40,
+                  "pct": 9,
                   "quality": "common"
                 },
                 {
                   "name": "Raw Slatefin Carp",
-                  "pct": 30,
+                  "pct": 7,
                   "quality": "common"
                 },
                 {
                   "name": "Tangled Weed",
-                  "pct": 14,
+                  "pct": 28,
                   "quality": "poor"
                 },
                 {
                   "name": "Sunglint Koi",
-                  "pct": 4,
+                  "pct": 1,
                   "quality": "uncommon"
                 },
                 {
                   "name": null,
-                  "pct": 12,
+                  "pct": 55,
                   "quality": null
                 }
               ]
@@ -8411,12 +9025,12 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
               "rows": [
                 {
                   "name": "Raw Mirror Trout",
-                  "pct": 48,
+                  "pct": 49,
                   "quality": "common"
                 },
                 {
                   "name": "Raw River Perch",
-                  "pct": 33,
+                  "pct": 32,
                   "quality": "common"
                 },
                 {
@@ -8441,12 +9055,12 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
               "rows": [
                 {
                   "name": "Raw Marsh Pike",
-                  "pct": 43,
+                  "pct": 42,
                   "quality": "common"
                 },
                 {
                   "name": "Raw Bog Eel",
-                  "pct": 33,
+                  "pct": 32,
                   "quality": "common"
                 },
                 {
@@ -8466,7 +9080,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
                 },
                 {
                   "name": null,
-                  "pct": 8,
+                  "pct": 10,
                   "quality": null
                 }
               ]
@@ -8476,27 +9090,27 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
               "rows": [
                 {
                   "name": "Raw Frostgill Trout",
-                  "pct": 43,
+                  "pct": 27,
                   "quality": "common"
                 },
                 {
                   "name": "Raw Slatefin Carp",
-                  "pct": 33,
+                  "pct": 20,
                   "quality": "common"
                 },
                 {
                   "name": "Tangled Weed",
-                  "pct": 10,
+                  "pct": 15,
                   "quality": "poor"
                 },
                 {
                   "name": "Sunglint Koi",
-                  "pct": 4,
+                  "pct": 3,
                   "quality": "uncommon"
                 },
                 {
                   "name": null,
-                  "pct": 10,
+                  "pct": 35,
                   "quality": null
                 }
               ]
@@ -8513,12 +9127,12 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
               "rows": [
                 {
                   "name": "Raw Mirror Trout",
-                  "pct": 51,
+                  "pct": 50,
                   "quality": "common"
                 },
                 {
                   "name": "Raw River Perch",
-                  "pct": 36,
+                  "pct": 34,
                   "quality": "common"
                 },
                 {
@@ -8528,7 +9142,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
                 },
                 {
                   "name": "Sunglint Koi",
-                  "pct": 3,
+                  "pct": 6,
                   "quality": "uncommon"
                 },
                 {
@@ -8543,12 +9157,12 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
               "rows": [
                 {
                   "name": "Raw Marsh Pike",
-                  "pct": 46,
+                  "pct": 43,
                   "quality": "common"
                 },
                 {
                   "name": "Raw Bog Eel",
-                  "pct": 36,
+                  "pct": 34,
                   "quality": "common"
                 },
                 {
@@ -8563,12 +9177,12 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
                 },
                 {
                   "name": "Sunglint Koi",
-                  "pct": 3,
+                  "pct": 6,
                   "quality": "uncommon"
                 },
                 {
                   "name": null,
-                  "pct": 6,
+                  "pct": 8,
                   "quality": null
                 }
               ]
@@ -8578,12 +9192,12 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
               "rows": [
                 {
                   "name": "Raw Frostgill Trout",
-                  "pct": 46,
+                  "pct": 44,
                   "quality": "common"
                 },
                 {
                   "name": "Raw Slatefin Carp",
-                  "pct": 36,
+                  "pct": 34,
                   "quality": "common"
                 },
                 {
@@ -8593,12 +9207,12 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
                 },
                 {
                   "name": "Sunglint Koi",
-                  "pct": 4,
+                  "pct": 6,
                   "quality": "uncommon"
                 },
                 {
                   "name": null,
-                  "pct": 8,
+                  "pct": 10,
                   "quality": null
                 }
               ]
@@ -8730,6 +9344,24 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
         {
           "stat": "int",
           "value": 2
+        }
+      ]
+    },
+    {
+      "id": "enchant_offhand_stamina",
+      "name": "Enchant Offhand - Stamina",
+      "slot": "offhand",
+      "tier": "base",
+      "reagents": [
+        {
+          "name": "Chime Dust",
+          "count": 5
+        }
+      ],
+      "bonus": [
+        {
+          "stat": "sta",
+          "value": 3
         }
       ]
     },
@@ -9542,9 +10174,15 @@ export const GUIDE_PROF_MASTERWORK: GuideProfMasterwork = {
 
 export const GUIDE_PROF_ECONOMY: GuideProfEconomy = {
   "craftFeeCopperPerBudgetPoint": 2,
-  "actionThrottle": {
-    "windowSeconds": 60,
-    "maxActions": 10
+  "castPace": {
+    "fieldSec": 1.75,
+    "skill25Sec": 2.5,
+    "skill50Sec": 3,
+    "skill75Sec": 3.5,
+    "comboSec": 4,
+    "enchantFamilySec": 1.5,
+    "rechargeSec": 1.5,
+    "batchMax": 50
   },
   "marketCutPct": 5,
   "listingDepositCopper": 0,
@@ -9780,7 +10418,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "bone": "handslot.r"
       }
     ],
-    "tintStrength": 0.5
+    "tintStrength": 0.12
   },
   "player_shaman": {
     "url": "models/chars/players/barbarian.glb",
@@ -9799,7 +10437,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "bone": "handslot.l"
       }
     ],
-    "tintStrength": 0.4
+    "tintStrength": 0.12
   },
   "player_mage": {
     "url": "models/chars/players/mage.glb",
@@ -9831,7 +10469,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "gripRef": "Spellbook_open"
       }
     ],
-    "tintStrength": 0.45
+    "tintStrength": 0.12
   },
   "player_druid": {
     "url": "models/chars/players/druid.glb",
@@ -9845,10 +10483,9 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     ]
   },
   "form_bear": {
-    "url": "models/creatures/yetialt.glb",
+    "url": "models/creatures/bear_form.glb",
     "idle": "Idle",
-    "height": 2.4,
-    "tintStrength": 0.55
+    "height": 2.35
   },
   "form_cat": {
     "url": "models/creatures/wolf_basic.glb",
@@ -9930,11 +10567,22 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "height": 2.5,
     "tintStrength": 0.25
   },
+  "mob_spider_egg_sac": {
+    "url": "models/creatures/spider_egg_sac.glb",
+    "idle": "Idle",
+    "height": 1.8
+  },
   "mob_troll": {
     "url": "models/creatures/orc.glb",
     "idle": "Idle",
     "height": 2.4,
     "tintStrength": 0.12
+  },
+  "mob_grubjaw": {
+    "url": "models/creatures/grubjaw.glb",
+    "idle": "Idle",
+    "height": 2.9,
+    "tintStrength": 0.04
   },
   "mob_dark_caster": {
     "url": "models/chars/players/mage.glb",
@@ -10014,6 +10662,18 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "height": 1.4,
     "hover": 0.15,
     "tintStrength": 0.45
+  },
+  "mob_dragon_egg": {
+    "url": "models/creatures/dragon_egg.glb",
+    "idle": "Idle",
+    "height": 0.95,
+    "tintStrength": 0.08
+  },
+  "mob_dragonkin_broodguard": {
+    "url": "models/creatures/dragonkin_mob.glb",
+    "idle": "Idle",
+    "height": 2.2,
+    "tintStrength": 0.1
   },
   "mob_ghost": {
     "url": "models/creatures/ghost.glb",

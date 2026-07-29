@@ -266,7 +266,12 @@ describe('auras: updateRegen', () => {
     const p = sim.player;
     const meta = sim.players.get(p.id) as PlayerMeta;
     p.inCombat = false;
-    p.hp = Math.max(1, p.maxHp - 500);
+    // A big synthetic pool: eating now stacks with natural regen (#1608), so a
+    // realistic deficit would cap out (and stop emitting a food-sourced heal)
+    // partway through 9 ticks. Inflate maxHp so the deficit stays open for the
+    // whole window regardless of the stamina-scaled natural tick's own rate.
+    p.maxHp = 10_000;
+    p.hp = p.maxHp - 5000;
     p.eating = {
       itemId: 'food',
       kind: 'food',

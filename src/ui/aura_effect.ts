@@ -75,6 +75,12 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
   if (a.id === 'convergence_mark' && a.kind === 'internal_cd') {
     return { key: `${KEY}.elementalConvergencePrimed`, nums: {} };
   }
+  // Thornhollow Fields' carried-flag buff. Unlike every other row here it does not
+  // describe a stat: it names the AFFORDANCE, because right-click-to-drop is
+  // otherwise undiscoverable and this hover is the only surface that can teach it.
+  if (a.id === 'bg_carried_flag' && a.kind === 'flag_carried') {
+    return { key: `${KEY}.carriedFlag`, nums: {} };
+  }
   switch (a.kind) {
     case 'dot':
       return {
@@ -142,7 +148,8 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
       return flatStat('allStats', a.value);
     case 'buff_allstats_pct':
       // Percentage drain on the whole stat block (The Keeper's Toll / Resurrection
-      // Sickness: value -0.75 -> "Reduces all attributes by 75%"). Always a drain.
+      // Sickness and Unstuck Sickness both carry value -0.75 -> "Reduces all attributes
+      // by 75%"). Always a drain.
       return { key: `${KEY}.allStatsPctReduce`, nums: { pct: pctFromFrac(a.value) } };
     // Percent raid buffs: value is integer percent POINTS (5 = +5%), rendered directly.
     case 'buff_stats_pct':

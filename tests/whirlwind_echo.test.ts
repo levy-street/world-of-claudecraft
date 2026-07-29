@@ -110,7 +110,11 @@ describe('Bladed Gyre arms the echo', () => {
 
 describe('single-target casts echo onto enemies near the target', () => {
   it('(b) a single strike also hits the second enemy at the echo fraction and spends one charge', () => {
-    const { sim, p } = makeSim();
+    // Seed hunted like (d): the echo replays a RESOLVED amount, so the primary
+    // Bloodletting has to connect for there to be anything to replay. The default
+    // integration seed whiffs it since the Galecrest quest camps (#2887) added
+    // world-gen draws and moved the shared stream. Spares on record: 31340, 31341.
+    const { sim, p } = makeSim(31337);
     const { primary, near, far } = arena(sim, p);
     p.resource = 100;
     sim.castAbility('whirlwind');
@@ -132,7 +136,9 @@ describe('single-target casts echo onto enemies near the target', () => {
   });
 
   it('(c) the third single-target cast after both charges no longer echoes', () => {
-    const { sim, p } = makeSim();
+    // Same hunted seed as (b): only a cast that actually dealt damage spends a
+    // charge, so the 2 -> 1 -> 0 ladder only walks if every Bloodletting connects.
+    const { sim, p } = makeSim(31337);
     const { primary, near } = arena(sim, p);
     p.resource = 100;
     sim.castAbility('whirlwind');
@@ -153,8 +159,8 @@ describe('single-target casts echo onto enemies near the target', () => {
 
   it('(d) Red Harvest consumes ONE charge and echoes all three strikes', () => {
     // This seed lands all three independently rolled weapon strikes. The
-    // default integration seed deterministically dodges the middle strike.
-    const { sim, p } = makeSim(31338);
+    // default integration seed deterministically whiffs one of them.
+    const { sim, p } = makeSim(31337);
     const { primary, near, far } = arena(sim, p);
     p.resource = 100;
     sim.castAbility('whirlwind');

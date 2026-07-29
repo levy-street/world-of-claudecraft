@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { buildingTerrainEnvelope, isEastbrookGrandArmoury } from '../sim/building_layout';
 import type { BuildingDef } from '../sim/types';
 import { loadGltf, releaseGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import {
   eastbrookMaterialUsesAtlas,
   eastbrookSemanticForMaterial,
@@ -18,13 +18,29 @@ const FOUNDATION_SKIRT_COLOR = 0x46505e;
 
 let loadedSource: THREE.Group | null = null;
 let preparedTemplate: THREE.Group | null = null;
+let sourceLoadTask: Promise<void> | null = null;
+
+export function prepareEastbrookGrandArmouryProfileAssets(): Promise<void> {
+  if (loadedSource) return Promise.resolve();
+  if (sourceLoadTask) return sourceLoadTask;
+  sourceLoadTask = loadGltf(ASSET_URL)
+    .then((gltf) => {
+      loadedSource = gltf.scene;
+      sourceLoadTask = null;
+    })
+    .catch((err) => {
+      sourceLoadTask = null;
+      throw err;
+    });
+  return sourceLoadTask;
+}
 
 if (typeof window !== 'undefined') {
-  registerPreload(
-    loadGltf(ASSET_URL).then((gltf) => {
-      loadedSource = gltf.scene;
-    }),
-  );
+  registerDeferredPreload(prepareEastbrookGrandArmouryProfileAssets);
+}
+
+export function resetEastbrookGrandArmouryProfileCaches(): void {
+  preparedTemplate = null;
 }
 
 type GroundAt = (x: number, z: number) => number;

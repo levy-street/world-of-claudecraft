@@ -131,6 +131,7 @@ describe('PgSocialDb roster/friends reads carry the selected title', () => {
         realm: 'R',
         rank: 'member',
         lastLogin: iso,
+        joinedAt: '2026-01-02T03:04:05.000Z',
         active_title: 'col_seven_regalia',
       },
       {
@@ -143,11 +144,31 @@ describe('PgSocialDb roster/friends reads carry the selected title', () => {
         lastLogin: null,
         active_title: '',
       },
+      {
+        id: 3,
+        name: 'BadStamp',
+        cls: 'mage',
+        level: 5,
+        realm: 'R',
+        rank: 'member',
+        lastLogin: null,
+        joinedAt: 'not-a-date',
+        active_title: null,
+      },
     ]);
     const members = await db.guildMembers(4);
     expect(calls[0]).toContain(TITLE_SQL_LITERAL);
+    // The tenure-badge source column: the alias and the epoch-ms map are both
+    // load-bearing (drop either and every joinedAt silently becomes null or a
+    // raw Date, so every roster badge vanishes with a green suite).
+    expect(calls[0]).toContain('gm.joined_at AS "joinedAt"');
     expect(members[0].activeTitle).toBe('col_seven_regalia');
     expect(members[0].lastLogin).toBe(iso);
+    expect(members[0].joinedAt).toBe(Date.UTC(2026, 0, 2, 3, 4, 5));
+    // Absent stamp is the defensive null arm, never epoch 0.
+    expect(members[1].joinedAt).toBeNull();
+    // An unparseable driver value hits the Number.isFinite guard, never NaN.
+    expect(members[2].joinedAt).toBeNull();
     expect(members[1].activeTitle).toBeNull();
     expect('active_title' in members[0]).toBe(false);
   });

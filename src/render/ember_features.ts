@@ -12,7 +12,7 @@ import { emberLilySpots, emberScatterClear } from '../sim/ember_lilies';
 import { hash2 } from '../sim/rng';
 import { EMBER_LAVA_POOLS, terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { GFX } from './gfx';
 
 // the Drakelands prop models (built by build_drakelands_props.mjs)
@@ -29,7 +29,7 @@ const EMBER_PROP_URLS = {
 type EmberPropKey = keyof typeof EMBER_PROP_URLS;
 const propScenes: Partial<Record<EmberPropKey, THREE.Group>> = {};
 for (const key of Object.keys(EMBER_PROP_URLS) as EmberPropKey[]) {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(EMBER_PROP_URLS[key]).then((gltf) => {
       propScenes[key] = gltf.scene;
     }),

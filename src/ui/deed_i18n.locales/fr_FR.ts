@@ -7,6 +7,102 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: 'Bannière en main',
+    desc: 'Capturez un drapeau dans les Champs de Thornhollow.',
+  },
+  pvp_bg_first_win: {
+    name: 'Thornhollow tient bon',
+    desc: 'Remportez une bataille aux Champs de Thornhollow.',
+  },
+  pvp_bg_wins_25: {
+    name: 'Gardien de Thornhollow',
+    desc: 'Remportez 25 batailles aux Champs de Thornhollow.',
+    title: 'Porte-étendard',
+  },
+  pvp_bg_captures_100: {
+    name: 'Cent bannières',
+    desc: 'Capturez 100 drapeaux dans les Champs de Thornhollow au cours de votre carrière.',
+  },
+  dgn_rift: {
+    name: 'Marcheur des failles',
+    desc: "Nettoyez une faille en vainquant son boss d'étage.",
+  },
+  dgn_rift_s_rank: {
+    name: 'Souverain des failles',
+    desc: "Nettoyez une faille de rang S, le palier le plus difficile qu'un portail de faille puisse faire apparaître.",
+  },
+  pvp_honor_sergeant: {
+    name: 'Sergent',
+    desc: "Gagnez 10 000 points d'honneur au cours de votre vie de personnage. Les dépenser ne vous fait jamais perdre ce rang.",
+    title: 'Sergent',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: 'Chevalier-Lieutenant',
+    desc: "Gagnez 40 000 points d'honneur au cours de votre vie de personnage, une vraie saison de guerre derrière vous.",
+    title: 'Chevalier-Lieutenant',
+  },
+  pvp_honor_field_marshal: {
+    name: 'Maréchal',
+    desc: "Gagnez 150 000 points d'honneur au cours de votre vie de personnage. Rare sur n'importe quel royaume, et c'est voulu ainsi.",
+    title: 'Maréchal',
+  },
+  chr_drakemaw_broodlord: {
+    name: 'Brise-Couvée',
+    desc: 'Terrassez un Seigneur de couvée du Drakemaw au milieu de ses œufs, à travers le cri, le fauchage et le feu.',
+  },
+  chr_maw_matriarch: {
+    name: 'Le ciel se tait',
+    desc: 'Terrassez Cindraleth, Matriarche de la Gueule, dans son perchoir de cratère au-dessus du Drakemaw.',
+  },
+  chr_frostveil_gatherer: {
+    name: 'Recolte en terrasses',
+    desc: 'Recoltez un filon de minerai, un bosquet de bois et un carre d herbes a Frostveil.',
+  },
+  chr_frostveil_first_cast: {
+    name: 'Premiere glace sur le lac',
+    desc: 'Pechez un poisson dans les eaux de Frostveil.',
+  },
+  chr_amberfall_gatherer: {
+    name: 'La recolte d Amberfall',
+    desc: 'Recoltez un filon de minerai, un bosquet de bois et un carre d herbes a Amberfall.',
+  },
+  chr_amberfall_first_cast: {
+    name: 'Une prise du grand marais',
+    desc: 'Pechez un poisson dans les eaux d Amberfall.',
+  },
+  chr_nightbloom_gatherer: {
+    name: 'La recolte reveuse',
+    desc: 'Recoltez un filon de minerai, un bosquet de bois et un carre d herbes a Nightbloom.',
+  },
+  chr_nightbloom_first_cast: {
+    name: 'Une ride sur le puits lunaire',
+    desc: 'Pechez un poisson dans les eaux de Nightbloom.',
+  },
+  chr_wraithwood_gatherer: {
+    name: 'Recolte sous la canopee',
+    desc: 'Recoltez un filon de minerai, un bosquet de bois et un carre d herbes a Wraithwood.',
+  },
+  chr_wraithwood_first_cast: {
+    name: 'Un lancer dans la baie miroir',
+    desc: 'Pechez un poisson dans les eaux de Wraithwood.',
+  },
+  chr_palmreach_gatherer: {
+    name: 'Recolte sur la greve aux palmes',
+    desc: 'Recoltez un filon de minerai, un bosquet de bois et un carre d herbes a Palmreach.',
+  },
+  chr_palmreach_first_cast: {
+    name: 'Lancer dans le lagon saphir',
+    desc: 'Pechez un poisson dans les eaux de Palmreach.',
+  },
+  chr_evergarden_gatherer: {
+    name: 'La generosite du parterre',
+    desc: 'Recoltez un filon de minerai, un bosquet de bois et un carre d herbes a Evergarden.',
+  },
+  chr_evergarden_first_cast: {
+    name: 'Un lancer sur l etang aux petales',
+    desc: 'Pechez un poisson dans les eaux d Evergarden.',
+  },
   pvp_card_duel_first_win: {
     name: 'Faire la loi',
     desc: 'Remportez un Duel de cartes auprès du Maître des cartes.',
@@ -846,6 +942,86 @@ export const table: DeedLocaleTable = {
   soc_salvage_50: {
     name: 'La Casse du démolisseur',
     desc: "Récupérez 50 pièces d'équipement pour en extraire les matériaux bruts.",
+  },
+  dgn_wildheart_basin: {
+    name: 'Le bassin riposte',
+    desc: 'Vainquez Zulgar, Voix du Bassin, dans le Bassin du Cœur Sauvage.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Héroïque : le Bassin du Cœur Sauvage',
+    desc: 'Vainquez Zulgar, Voix du Bassin, dans le Bassin du Cœur Sauvage en difficulté héroïque.',
+  },
+  chr_peaks_gatherer: {
+    name: 'Moisson des Hauteurs',
+    desc: "Récolter un filon de minerai, un bosquet de bois et un carré d'herbes dans les Hauteurs de Thornpeak.",
+  },
+  chr_marsh_rares_ii: {
+    name: 'Le Glouton, porté au compte',
+    desc: 'Tuer Grubjaw le Glouton, une quatrième terreur nommée du Marais de Mirefen oubliée du premier décompte.',
+  },
+  chr_peaks_rares_ii: {
+    name: 'D’autres noms gravés dans le roc',
+    desc: 'Tuer le Vieux Cragmaw et le Seigneur des éclats Kazzix, deux terreurs nommées de plus des Hauteurs de Thornpeak oubliées du premier décompte.',
+  },
+  chr_gleamstag: {
+    name: 'La légende qui ne frappait jamais la première',
+    desc: 'Tuer le Cerf-Miroitant, un élite rare et farouche qui n’attaque que si on l’accule.',
+  },
+  chr_hollow_rares: {
+    name: 'Le troupeau se souvient',
+    desc: 'Tuer le Vieux Marrowshell et Aurelhorn, Premier du Troupeau, les deux boss rares errants du Vallon.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Les largesses des Saules',
+    desc: "Récolter un filon de minerai, un bosquet de bois et un carré d'herbes dans le Marais des Saules.",
+  },
+  chr_willowfen_first_cast: {
+    name: 'Des rides sur les Lilymoors',
+    desc: 'Pêcher un poisson dans les eaux du Marais des Saules.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Moisson du promontoire',
+    desc: "Récolter un filon de minerai, un bosquet de bois et un carré d'herbes sur la Crête du Vent.",
+  },
+  chr_galecrest_first_cast: {
+    name: 'Une ligne dans le Lac Miroir',
+    desc: 'Pêcher un poisson dans les eaux de la Crête du Vent.',
+  },
+  chr_farshore_gatherer: {
+    name: "Les vivres de l'île",
+    desc: "Récolter un filon de minerai, un bosquet de bois et un carré d'herbes sur le Rivage Lointain.",
+  },
+  chr_farshore_first_cast: {
+    name: 'Ce que savent les mouettes',
+    desc: 'Pêcher un poisson dans les eaux du Rivage Lointain.',
+  },
+  prog_engineering_rare: {
+    name: 'Ingénierie de précision',
+    desc: 'Fabriquez votre premier objet de qualité rare en Ingénierie.',
+  },
+  prog_alchemy_rare: {
+    name: 'Un millésime rare',
+    desc: 'Fabriquez votre premier objet de qualité rare en Alchimie.',
+  },
+  prog_cooking_rare: {
+    name: 'Un plat inoubliable',
+    desc: 'Fabriquez votre premier objet de qualité rare en Cuisine.',
+  },
+  prog_leatherworking_rare: {
+    name: 'Tannage fin',
+    desc: 'Fabriquez votre premier objet de qualité rare en Travail du cuir.',
+  },
+  prog_tailoring_rare: {
+    name: 'Un point de maître',
+    desc: 'Fabriquez votre premier objet de qualité rare en Couture.',
+  },
+  prog_weaponcrafting_rare: {
+    name: "Trempé jusqu'à l'éclat",
+    desc: "Fabriquez votre premier objet de qualité rare en Fabrication d'armes.",
+  },
+  prog_armorcrafting_rare: {
+    name: 'Blindé à la perfection',
+    desc: "Fabriquez votre premier objet de qualité rare en Fabrication d'armures.",
   },
 };
 

@@ -16,6 +16,12 @@ export interface MoveFlags {
 export interface LookDelta {
   yaw: number;
   pitch: number;
+  // True while the stick is deflected past the deadzone this frame, independent
+  // of whether the scaled yaw/pitch happen to compute to zero (a zero `dt` or
+  // `speed` would otherwise mask a real deflection). Lets a consumer drive a
+  // "look active" signal (see Input.setGamepadLookActive) off the raw stick
+  // state rather than the scaled delta.
+  active: boolean;
 }
 
 // --- W3C "Standard Gamepad" indices --------------------------------------
@@ -185,12 +191,21 @@ export function gamepadButtonLabel(button: number, kind: GamepadKind): string {
 }
 
 // Action ids reuse the keyboard Keybinds registry ids (so the gamepad dispatches
-// through the same InputCallbacks) plus two specials Keybinds doesn't model:
-//   'escape': open/close the game menu (Escape is never a keyboard bind)
-//   'none':   explicitly unbound
+// through the same InputCallbacks) plus four specials Keybinds doesn't model:
+//   'escape':          open/close the game menu (Escape is never a keyboard bind)
+//   'zoomIn'/'zoomOut': step the camera distance, gamepad-only (camera zoom has no
+//                       keyboard bind, only mouse wheel and touch pinch); handled
+//                       in GamepadManager.dispatch() straight against Input.zoomBy,
+//                       so they never reach the host's onAction callback.
+//   'none':            explicitly unbound
 // 'jump' and 'autorun' are real Keybinds ids and handled by Input directly.
 export type GamepadActionId = string;
 export const GAMEPAD_NONE = 'none';
+export const GAMEPAD_ZOOM_IN = 'zoomIn';
+export const GAMEPAD_ZOOM_OUT = 'zoomOut';
+// Matches the step Input's mouse-wheel handler applies per notch (input.ts), so
+// gamepad zoom feels identical in speed to wheel and touch pinch-to-zoom.
+export const GAMEPAD_ZOOM_STEP = 1.4;
 
 // Console-MMO default layout: left stick moves (camera-relative), right stick
 // looks, face/shoulder/d-pad reach the first nine action-bar slots plus the
@@ -262,9 +277,9 @@ export function stickToLook(
   dt: number,
 ): LookDelta {
   const v = applyRadialDeadzone(x, y, dz);
-  if (v.x === 0 && v.y === 0) return { yaw: 0, pitch: 0 };
+  if (v.x === 0 && v.y === 0) return { yaw: 0, pitch: 0, active: false };
   const pitchSign = invertY ? -1 : 1;
-  return { yaw: -v.x * speed * dt, pitch: pitchSign * v.y * speed * dt };
+  return { yaw: -v.x * speed * dt, pitch: pitchSign * v.y * speed * dt, active: true };
 }
 
 /** Indices of buttons that went from up→down between the previous and current

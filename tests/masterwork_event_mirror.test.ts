@@ -8,16 +8,18 @@ import { describe, expect, it } from 'vitest';
 import { ClientWorld } from '../src/net/online';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
+import { runCraft } from './helpers/enchant_family_cast';
 
-// Hunted proc seed, pinned (re-recorded after the Eastbrook camp respacing
-// thinned the zone-1 camp counts and shifted the camp-driven world-gen draw
-// sequence): with a fresh warrior (tailoring 0, no archetype, no self-signed
-// reagent, not specialized) the first craft of
-// recipe_eastbrook_ritual_vestments draws under the 3 percent base masterwork
-// chance at this seed. Pre-verified against this exact grant order (3x
-// linen_scrap then 1x spider_leg, then the craft); seeds 37, 45, 113, and 116
-// also land, kept on record here as spares.
-const PROC_SEED = 2;
+// Hunted proc seed, pinned (re-recorded whenever a content commit shifts the
+// construction-time world-gen draw sequence: after the zones 1-3 quest-dedupe
+// pass, then 53 -> 70 after the v0.35.0 release content commits, which added
+// the enchant and hunter offhands and the deeds catalog): with a fresh warrior
+// (tailoring 0, no archetype, no self-signed reagent, not specialized) the
+// first craft of recipe_eastbrook_ritual_vestments draws under the 3 percent
+// base masterwork chance at this seed. Pre-verified against this exact grant
+// order (3x linen_scrap then 1x spider_leg, then the craft); seeds 94, 128,
+// 130, 131, and 153 also land, kept on record here as spares.
+const PROC_SEED = 53;
 const RECIPE_ID = 'recipe_eastbrook_ritual_vestments';
 const ITEM_ID = 'eastbrook_ritual_vestments';
 
@@ -30,7 +32,7 @@ function craftMasterwork() {
   sim.addItem('spider_leg', 1, pid);
   sim.addItem('homespun_cloth', 3, pid);
   sim.addItem('spool_of_thread', 5, pid);
-  sim.craftItem(RECIPE_ID, false, pid);
+  runCraft(sim, RECIPE_ID, false, pid);
   const events = sim.drainEvents().filter((ev) => ev.type === 'masterwork');
   return { sim, pid, events };
 }
@@ -39,7 +41,10 @@ function craftMasterwork() {
 // bareClient pattern from tests/snapshots.test.ts). Class-field initializers
 // do NOT run under Object.create, which is exactly the liveness point: the
 // lastMasterwork property only comes to exist when the real event-apply path
-// assigns it, so an unwired mirror cannot pass by initializer default.
+// assigns it, so an unwired mirror cannot pass by initializer default. Kept
+// bespoke on purpose (issue #2088): the shared tests/helpers/bare_client.ts
+// bareClient() always sets lastMasterwork, which would defeat this liveness
+// point.
 function bareClient(): ClientWorld {
   const c = Object.create(ClientWorld.prototype) as ClientWorld;
   (c as unknown as { eventQueue: SimEvent[] }).eventQueue = [];
@@ -55,7 +60,7 @@ function feed(client: ClientWorld, ev: unknown): void {
 }
 
 describe('offline Sim host', () => {
-  it('a procced craft emits the id-exact masterwork event and the getter reflects it (seed 2)', () => {
+  it('a procced craft emits the id-exact masterwork event and the getter reflects it (seed 53)', () => {
     const { sim, pid, events } = craftMasterwork();
     // Exactly one proc event, ids only, pid = crafter entity id on both keys.
     expect(events).toEqual([

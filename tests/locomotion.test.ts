@@ -11,7 +11,14 @@ import {
   shouldTriggerWaterImpact,
   waterContactFrameMode,
 } from '../src/render/characters/anim_state';
-import { MOVE_HOLD_TIME, newLocoTrack, updateLocomotion } from '../src/render/locomotion';
+import {
+  MOVE_HOLD_TIME,
+  newLocoState,
+  newLocoTrack,
+  updateLocomotion,
+  updateLocomotionInto,
+} from '../src/render/locomotion';
+import { assertAllocationStable } from './util/alloc_probe';
 
 const FPS = 1 / 60;
 const BASE_ANIM_STATE: AnimState = {
@@ -23,6 +30,9 @@ const BASE_ANIM_STATE: AnimState = {
   dead: false,
   casting: false,
   swimming: false,
+  submerged: false,
+  swimPitch: 0,
+  wading: false,
   sitting: false,
 };
 
@@ -32,6 +42,18 @@ function walkStep(t: ReturnType<typeof newLocoTrack>, dt = FPS, speed = 2.2) {
 }
 
 describe('locomotion hysteresis', () => {
+  it('fills one caller-owned result across entity-frame updates', () => {
+    const track = newLocoTrack();
+    const out = newLocoState();
+    expect(() =>
+      assertAllocationStable(
+        () => updateLocomotionInto(out, track, 0, 0.04, 0, FPS),
+        64,
+        'locomotion state',
+      ),
+    ).not.toThrow();
+  });
+
   it('a steady walk reports moving', () => {
     const t = newLocoTrack();
     let s = walkStep(t);

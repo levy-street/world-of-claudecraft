@@ -32,6 +32,8 @@ const IDLE: MoveInput = {
   strafeLeft: false,
   strafeRight: false,
   jump: false,
+  dive: false,
+  surface: false,
 };
 
 describe('the border ridge vs the ledge grab', () => {

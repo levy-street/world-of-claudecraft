@@ -72,6 +72,40 @@ describe('leaderboard_window: WCAG chrome (live region + focusable controls + fo
   });
 });
 
+describe('leaderboard_window: guild tag beside the ranked name', () => {
+  it('renders the guild as a tag inside the name cell on both the row and the sticky standing', () => {
+    // Inside .lb-name, not a seventh grid column: the row grid is shared by every
+    // tab, so a column here would misalign all of them (the Renown tab's realm tag
+    // is the same treatment).
+    expect(code).toContain('<span class="lb-guild"');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the painter source literally contains this template expression
+    expect(code).toContain('${esc(r.name)}${this.guildTagHtml(r.guild)}');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the painter source literally contains this template expression
+    expect(code).toContain('${esc(standing.name)}${this.guildTagHtml(standing.guild)}');
+  });
+
+  it('escapes the player-authored guild name and labels the tag from the catalog', () => {
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the painter source literally contains this template expression
+    expect(code).toContain('${esc(guild)}');
+    expect(code).not.toMatch(/\$\{guild\}/);
+    expect(code).toContain("t('hudChrome.leaderboard.guildName')");
+  });
+
+  it('renders no tag at all for an unguilded row', () => {
+    expect(code).toMatch(/if \(!guild\) return '';/);
+  });
+
+  it('feeds the viewer their own guild so the sticky standing can carry the tag', () => {
+    expect(code).toContain('guild: world.player.guild');
+  });
+
+  it('writes the angle brackets as HTML entities, not literal markup', () => {
+    // The classic `<Guild>` nameplate convention; a literal '<' here would open a tag.
+    expect(code).toContain('&lt;');
+    expect(code).toContain('&gt;');
+  });
+});
+
 describe('leaderboard_window: async + page wiring contracts (the painter half)', () => {
   it('maps a rejected / offline fetch to the error input (catch sets the result null)', () => {
     // The view test proves buildLeaderboardView({kind:'error'}) -> error; this pins
@@ -303,6 +337,53 @@ describe('leaderboard_window: Renown (deeds) board tab', () => {
     expect(code).toMatch(
       /renderDeedsBoard\([\s\S]{0,500}if \(seq !== this\.renderSeq \|\| el\.style\.display !== 'flex'\) return;/,
     );
+  });
+});
+
+describe('leaderboard_window: rank/level/virtual level/prestige render through formatNumber', () => {
+  // Every other numeric column on these rows (memberCount, mergedPrs, renown,
+  // points, the pager) already routes through formatNumber; rank, level,
+  // virtual level (including the guild board's top-member level, which reuses
+  // the same vlvl column) and prestige rank must match, not render raw.
+  it('formats the rank in every row builder (players, guilds, devs, deeds, daily)', () => {
+    expect(code).toMatch(
+      /class="lb-rank">\$\{formatNumber\(r\.rank, \{ maximumFractionDigits: 0 \}\)\}/,
+    );
+    const matches = code.match(
+      /class="lb-rank">\$\{formatNumber\(r\.rank, \{ maximumFractionDigits: 0 \}\)\}/g,
+    );
+    expect(matches?.length).toBe(5);
+    expect(code).not.toMatch(/class="lb-rank">\$\{r\.rank\}</);
+  });
+
+  it('formats the players-tab level and virtual level (row and sticky standing)', () => {
+    expect(code).toContain(
+      '<span class="lb-lvl">${formatNumber(r.level, { maximumFractionDigits: 0 })}</span>' +
+        '<span class="lb-vlvl">${formatNumber(r.virtualLevel, { maximumFractionDigits: 0 })}</span>',
+    );
+    expect(code).toContain(
+      '<span class="lb-lvl">${formatNumber(standing.level, { maximumFractionDigits: 0 })}</span>' +
+        '<span class="lb-vlvl">${formatNumber(standing.virtualLevel, { maximumFractionDigits: 0 })}</span>',
+    );
+    expect(code).not.toMatch(/\$\{r\.level\}|\$\{r\.virtualLevel\}/);
+    expect(code).not.toMatch(/\$\{standing\.level\}|\$\{standing\.virtualLevel\}/);
+  });
+
+  it('formats the guild board top-member level (the reused vlvl column)', () => {
+    expect(code).toContain(
+      '<span class="lb-vlvl">${formatNumber(r.topLevel, { maximumFractionDigits: 0 })}</span>',
+    );
+    expect(code).not.toMatch(/\$\{r\.topLevel\}/);
+  });
+
+  it('formats the prestige rank badge and its tooltip', () => {
+    expect(code).toMatch(
+      /&starf;\$\{formatNumber\(r\.prestigeRank, \{ maximumFractionDigits: 0 \}\)\}<\/span>/,
+    );
+    expect(code).toMatch(
+      /t\('game\.prestige\.rank'\)\} \$\{formatNumber\(r\.prestigeRank, \{ maximumFractionDigits: 0 \}\)\}/,
+    );
+    expect(code).not.toMatch(/&starf;\$\{r\.prestigeRank\}/);
   });
 });
 

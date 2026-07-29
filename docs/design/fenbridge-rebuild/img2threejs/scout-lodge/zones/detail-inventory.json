@@ -1,0 +1,131 @@
+{
+  "sourceImage": "docs/design/fenbridge-rebuild/references/scout-lodge-turnaround.png",
+  "zonesDir": "docs/design/fenbridge-rebuild/img2threejs/scout-lodge/zones",
+  "detailInventory": {
+    "scanMethod": "four admitted component-zone crops with hero cross-check",
+    "targetMinDetails": 10,
+    "details": [
+      {
+        "id": "steep-gable",
+        "kind": "contour",
+        "description": "A steep teal gable with an oversized timber front frame and small amber dormer dominates the lodge.",
+        "region": { "x": 0.19, "y": 0.14, "width": 0.58, "height": 0.5, "units": "normalized" },
+        "scale": "macro",
+        "affects": "main silhouette",
+        "mapsTo": { "type": "component.localFeatures", "ref": "steep-front-gable" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/scout-lodge/zones/front.png",
+        "confidence": 0.97
+      },
+      {
+        "id": "open-lookout",
+        "kind": "contour",
+        "description": "A narrow offset timber lookout rises above one corner with an open viewing level under a small canopy.",
+        "region": { "x": 0.03, "y": 0.05, "width": 0.27, "height": 0.54, "units": "normalized" },
+        "scale": "macro",
+        "affects": "watchpost identity",
+        "mapsTo": { "type": "component.localFeatures", "ref": "open-lookout-perch" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/scout-lodge/zones/front.png",
+        "confidence": 0.98
+      },
+      {
+        "id": "lookout-rail",
+        "kind": "linework",
+        "description": "Short square balusters create a visible open rail around the lookout platform.",
+        "region": { "x": 0.07, "y": 0.22, "width": 0.22, "height": 0.17, "units": "normalized" },
+        "scale": "meso",
+        "affects": "tower negative space",
+        "mapsTo": { "type": "component.localFeatures", "ref": "lookout-balustrade" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/scout-lodge/zones/hero.png",
+        "confidence": 0.93
+      },
+      {
+        "id": "signal-mast",
+        "kind": "contour",
+        "description": "A tall mast and horizontal crossarm rise above the lookout canopy with a pointed cap.",
+        "region": { "x": 0.07, "y": 0, "width": 0.28, "height": 0.25, "units": "normalized" },
+        "scale": "meso",
+        "affects": "highest skyline landmark",
+        "mapsTo": { "type": "component.localFeatures", "ref": "signal-mast-crossarm" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/scout-lodge/zones/front.png",
+        "confidence": 0.98
+      },
+      {
+        "id": "teal-streamers",
+        "kind": "contour",
+        "description": "Two narrow blank teal streamers trail from the mast crossarm in a single fixed wind pose.",
+        "region": { "x": 0.0, "y": 0.05, "width": 0.3, "height": 0.19, "units": "normalized" },
+        "scale": "meso",
+        "affects": "patrol landmark",
+        "mapsTo": { "type": "component.localFeatures", "ref": "fixed-teal-streamers" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/scout-lodge/zones/hero.png",
+        "confidence": 0.91
+      },
+      {
+        "id": "map-table",
+        "kind": "contour",
+        "description": "A broad sloped timber map table sits under the open right lean-to at service height.",
+        "region": { "x": 0.66, "y": 0.57, "width": 0.29, "height": 0.25, "units": "normalized" },
+        "scale": "meso",
+        "affects": "scout service read",
+        "mapsTo": { "type": "component.localFeatures", "ref": "sloped-map-table" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/scout-lodge/zones/front.png",
+        "confidence": 0.97
+      },
+      {
+        "id": "blank-map-shapes",
+        "kind": "linework",
+        "description": "Warm parchment patches and a few abstract route strokes contain no letters, labels or exact geography.",
+        "region": { "x": 0.68, "y": 0.61, "width": 0.24, "height": 0.13, "units": "normalized" },
+        "scale": "micro",
+        "affects": "map surface readability",
+        "mapsTo": {
+          "type": "material.localOverrides",
+          "ref": "fenbridge-opaque/blank-map-patches"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/scout-lodge/zones/hero.png",
+        "confidence": 0.85
+      },
+      {
+        "id": "weapon-rack",
+        "kind": "linework",
+        "description": "A fixed rack holds simplified spear shafts and one abstract bow silhouette under the lean-to.",
+        "region": { "x": 0.72, "y": 0.42, "width": 0.22, "height": 0.3, "units": "normalized" },
+        "scale": "meso",
+        "affects": "patrol gear cue",
+        "mapsTo": { "type": "component.localFeatures", "ref": "simple-weapon-rack" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/scout-lodge/zones/rear.png",
+        "confidence": 0.9
+      },
+      {
+        "id": "porch-approach",
+        "kind": "contour",
+        "description": "Three broad steps and a clear raised porch align with the centered local x=0 door.",
+        "region": { "x": 0.24, "y": 0.66, "width": 0.48, "height": 0.28, "units": "normalized" },
+        "scale": "macro",
+        "affects": "navigation and grounding",
+        "mapsTo": { "type": "component.localFeatures", "ref": "centered-porch-steps" },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/scout-lodge/zones/front.png",
+        "confidence": 0.98
+      },
+      {
+        "id": "warm-lodge-lights",
+        "kind": "emissive",
+        "description": "Shuttered windows, door lattice and one lean-to lantern use restrained amber light.",
+        "region": { "x": 0.23, "y": 0.4, "width": 0.69, "height": 0.34, "units": "normalized" },
+        "scale": "meso",
+        "affects": "night readability",
+        "mapsTo": {
+          "type": "material.localOverrides",
+          "ref": "fenbridge-emissive/warm-lodge-glow"
+        },
+        "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/scout-lodge/zones/hero.png",
+        "confidence": 0.97
+      }
+    ]
+  },
+  "uncertainty": [
+    "Streamer shape and direction vary with the generated wind pose; one deterministic two-ribbon pose is authoritative.",
+    "Map markings are too small and inconsistent for exact reconstruction; only abstract blank patches are retained.",
+    "Weapon count is fixed and simplified to avoid unsupported detail and triangle growth."
+  ]
+}

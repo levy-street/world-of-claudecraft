@@ -25,6 +25,8 @@ export const MODERATION_ACTIONS = [
   'kill',
   'jail',
   'unjail',
+  'spectate',
+  'unspectate',
   'suspend',
   'unsuspend',
   'ban',
@@ -38,12 +40,19 @@ export const MODERATION_ACTIONS = [
   'daily_rewards_unban',
   'daily_rewards_ip_ban',
   'daily_rewards_ip_unban',
+  'reactivate',
+  'chat_strikes_reset',
   // Account flair. Not punitive (they grant a cosmetic mark, they do not sanction),
   // so unlike every action above they take an OPTIONAL reason. Audited all the same:
   // the AI mark and a streamer's links are visible to every player, so who set them
   // and when has to be recoverable.
   'set_ai',
   'set_streamer',
+  // R35 GM restores (professions tooling): not punitive, but they MINT value
+  // onto a character, so the reason is REQUIRED and the restored thing is
+  // folded into the stored reason text.
+  'restore_item',
+  'restore_slot',
 ] as const;
 export type ModerationActionKind = (typeof MODERATION_ACTIONS)[number];
 
@@ -497,7 +506,7 @@ export async function moderateAccount(input: {
       reason,
       expiresAt: expiresAt ? expiresAt.toISOString() : null,
     });
-    if (input.action !== 'unsuspend') {
+    if (input.action === 'ban' || input.action === 'suspend') {
       await client.query(
         `UPDATE player_reports
          SET status = 'actioned', reviewed_at = now(), reviewed_by_account_id = $2, review_note = $3
@@ -542,6 +551,17 @@ export async function muteAccountChat(input: {
       reason,
       expiresAt,
     });
+    // Mirrors moderateAccount's ban/suspend arm: a chat mute is a punitive
+    // sanction on the reported account, so it resolves whatever open reports
+    // led to it the same way ban/suspend do. Without this, muting a reported
+    // account for its chat left the report sitting open forever, silently
+    // invisible to moderationQueue even though the account was sanctioned.
+    await client.query(
+      `UPDATE player_reports
+       SET status = 'actioned', reviewed_at = now(), reviewed_by_account_id = $2, review_note = $3
+       WHERE reported_account_id = $1 AND status = 'open'`,
+      [input.accountId, input.adminAccountId, reason],
+    );
     await client.query('COMMIT');
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
@@ -576,6 +596,81 @@ export async function liftAccountChatMute(input: {
       reason,
     });
     await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+/**
+ * Reverse a player's self-service account deactivation (admin-only). Mirrors
+ * liftAccountChatMute: a reason is required and the UPDATE plus its audit-log row
+ * commit in one transaction, so an operator can never flip an account back on
+ * without leaving a recoverable trail of who did it and why. Deliberately a fresh
+ * UPDATE here rather than a call into db.ts's setAccountDeactivated: that function
+ * backs the player's own self-deactivation path (server/account.ts) and stays
+ * unaudited and untouched, since a player acting on their own account is not a
+ * moderation action.
+ */
+export async function reactivateAccountAudited(input: {
+  accountId: number;
+  adminAccountId: number;
+  reason: unknown;
+}): Promise<void> {
+  const reason = cleanText(input.reason, ACTION_REASON_MAX);
+  if (!reason) throw new Error('moderation reason is required');
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    await client.query(`UPDATE accounts SET deactivated_at = NULL WHERE id = $1`, [
+      input.accountId,
+    ]);
+    await recordModerationAction(client, 'reactivate', {
+      accountId: input.accountId,
+      adminAccountId: input.adminAccountId,
+      reason,
+    });
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+/**
+ * Zero an account's chat strikes (admin-only). Mirrors liftAccountChatMute: a reason
+ * is required, and the UPDATE plus its audit-log row commit in one transaction. The
+ * audit row is written only when a row was actually reset (found === true), matching
+ * the existing "account not found" 404 the caller derives from the return value: an
+ * audit log entry for a target that never existed would be noise, not a record.
+ */
+export async function resetChatStrikesAudited(input: {
+  accountId: number;
+  adminAccountId: number;
+  reason: unknown;
+}): Promise<boolean> {
+  const reason = cleanText(input.reason, ACTION_REASON_MAX);
+  if (!reason) throw new Error('moderation reason is required');
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const updated = await client.query(`UPDATE accounts SET chat_strikes = 0 WHERE id = $1`, [
+      input.accountId,
+    ]);
+    const found = (updated.rowCount ?? 0) > 0;
+    if (found) {
+      await recordModerationAction(client, 'chat_strikes_reset', {
+        accountId: input.accountId,
+        adminAccountId: input.adminAccountId,
+        reason,
+      });
+    }
+    await client.query('COMMIT');
+    return found;
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
     throw err;
@@ -836,7 +931,7 @@ export async function setDailyRewardsIpBan(input: {
 // Audit-only record for an in-game action whose live effect is owned by the
 // GameServer. Unlike account sanctions, this changes no persistent account state.
 export async function recordInGameAction(input: {
-  action: 'kick' | 'kill' | 'jail' | 'unjail';
+  action: 'kick' | 'kill' | 'jail' | 'unjail' | 'spectate' | 'unspectate';
   accountId: number;
   adminAccountId: number;
   reason: unknown;
@@ -906,4 +1001,47 @@ export async function forceCharacterRename(input: {
   } finally {
     client.release();
   }
+}
+
+/**
+ * R35 GM restore audit row: resolve the character's owner and record the
+ * audited action (the live grant itself happens in the game runtime, AFTER
+ * this lands, so a grant can never exist without its audit row; the runtime
+ * also forces a character save right after the mint so the row cannot long
+ * outlive the grant it records). The folded prefix carries the CHARACTER id
+ * beside what was requested, because account_moderation_actions has no
+ * character column and a multi-character account could not otherwise answer
+ * "which character got the free pick"; it says "requested" because a refusal
+ * AFTER the audit (the leave race, no_tool, already_slotted) is possible and
+ * the handler surfaces it to the operator as a 400. The prefix is applied
+ * after the reason's own cleanText cap, so a restore row can exceed
+ * ACTION_REASON_MAX by the bounded prefix length (allowlisted ids plus a
+ * 1..20 integer): the column is unbounded TEXT and the moderateAccount
+ * expiry suffix sets the same precedent, so 500 is a reason cap, not a row
+ * invariant. The reason is REQUIRED: a restore mints value onto a character.
+ */
+export async function recordProfessionsRestore(input: {
+  characterId: number;
+  adminAccountId: number;
+  action: 'restore_item' | 'restore_slot';
+  detail: string;
+  reason: unknown;
+}): Promise<{ accountId: number }> {
+  const reason = cleanText(input.reason, ACTION_REASON_MAX);
+  if (!reason) throw new Error('moderation reason is required');
+  // Locally enforce the bounded-prefix claim above instead of trusting every
+  // future caller's validation: today's two callers pass allowlisted ids, and
+  // this cap keeps that an invariant rather than a convention.
+  const detail = cleanText(input.detail, 128);
+  const character = await pool.query('SELECT account_id FROM characters WHERE id = $1', [
+    input.characterId,
+  ]);
+  const accountId = character.rows[0]?.account_id;
+  if (!accountId) throw new Error('character not found');
+  await recordModerationAction(pool, input.action, {
+    accountId,
+    adminAccountId: input.adminAccountId,
+    reason: `[requested ${detail} for character ${input.characterId}] ${reason}`,
+  });
+  return { accountId };
 }

@@ -1,0 +1,1853 @@
+{
+  "targetName": "Fenbridge Hesk Tannery",
+  "targetId": "fenbridge-hesk-tannery",
+  "schemaVersion": "2.1",
+  "sourceImage": "docs/design/fenbridge-rebuild/img2threejs/hesk-tannery/zones/hero.png",
+  "suitability": "conditional",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 3,
+    "primitive_decomposition": 3,
+    "material_procedurality": 3,
+    "occlusion_risk": 1,
+    "interaction_fit": 3
+  },
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js exterior building",
+    "geometryTerms": [
+      "silhouette",
+      "assembled solid",
+      "open bay",
+      "surface relief",
+      "piling",
+      "negative space"
+    ],
+    "materialTerms": ["albedo", "roughness", "normal response", "ambient occlusion", "emissive"],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "environment light",
+      "contact shadow",
+      "ACES tone mapping"
+    ],
+    "descriptionRule": "Describe clean exterior craft geometry in object space; no interior, anatomy or gore."
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "wide exterior tannery and leather workshop",
+      "primaryDomain": "object",
+      "formLanguage": ["stylized low-poly", "swamp timber workshop", "open-sided craft bay"],
+      "structureKind": [
+        "closed main shell",
+        "raised dry apron",
+        "lean-to awning",
+        "exterior work scenery"
+      ],
+      "motionPotential": [
+        "static town building",
+        "fixed tannery station socket",
+        "nonblocking attached craft props"
+      ],
+      "materialFamilies": [
+        "dark timber",
+        "damp stone",
+        "oxidized teal shingles",
+        "cured hide",
+        "water and iron"
+      ],
+      "notes": "Hides are abstract non-anatomical stretched panels with no blood or gore."
+    },
+    "complexity": {
+      "tier": "complex",
+      "scores": {
+        "silhouetteComplexity": 3,
+        "componentCount": 3,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 2,
+        "materialLayerCount": 2,
+        "localDetailDensity": 3,
+        "occlusionRisk": 2,
+        "actionReadinessNeed": 2
+      },
+      "estimatedCounts": {
+        "macroComponents": 2,
+        "mesoComponents": 4,
+        "microFeatureGroups": 13,
+        "materialLayers": 2,
+        "repetitionSystems": 3
+      },
+      "reasoning": [
+        "The tall left workshop and lower open right work bay create the macro silhouette.",
+        "Hide frames, vat, drain and bench must be separately readable exterior service systems.",
+        "Occluded drain routing and variable small-prop counts are fixed as restrained approximations."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "complex",
+      "minimumComponentLevels": ["macro", "meso", "micro"],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "The open work bay requires real negative space and distinct attached craft modules."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "four admitted component-zone crops with hero cross-check",
+      "targetMinDetails": 10,
+      "details": [
+        {
+          "id": "asymmetric-workshop-awning",
+          "kind": "contour",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "open-right-work-bay"
+          }
+        },
+        {
+          "id": "raised-dry-apron",
+          "kind": "contour",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "piled-dry-apron"
+          }
+        },
+        {
+          "id": "roof-smokestack",
+          "kind": "seam",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "smokestack-courses"
+          }
+        },
+        {
+          "id": "hide-frame-pair",
+          "kind": "contour",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "stretched-hide-pair"
+          }
+        },
+        {
+          "id": "hide-lacing",
+          "kind": "linework",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "hide-frame-lacing"
+          }
+        },
+        {
+          "id": "shallow-vat",
+          "kind": "contour",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "shallow-tanning-vat"
+          }
+        },
+        {
+          "id": "vat-water",
+          "kind": "gloss",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "fenbridge-opaque/vat-water-sheen"
+          }
+        },
+        {
+          "id": "drainage-trough",
+          "kind": "groove",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "front-drainage-trough"
+          }
+        },
+        {
+          "id": "workbench-tools",
+          "kind": "linework",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "bench-hook-and-roll-system"
+          }
+        },
+        {
+          "id": "cured-hide-matte",
+          "kind": "stain",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "fenbridge-opaque/cured-hide-matte"
+          }
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false
+    }
+  },
+  "qualityContract": {
+    "qualityBar": "complex game-ready exterior",
+    "definitionOfDone": [
+      "A floor-seated 9 by 7.2 by 7 yard shell reads as Hesk's tannery, keeps the local x=0 entry clear and exposes its hide, vat and drain service scenery without an interior."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 2,
+      "mesoComponents": 4,
+      "microFeatureGroups": 10,
+      "materialLayers": 2,
+      "repetitionSystems": 2,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "tannery-silhouette",
+        "name": "Asymmetric workshop and open awning",
+        "required": true,
+        "qualityCriteria": ["Tall shell, lower work bay, smokestack and apron remain distinct."],
+        "evidenceRefs": ["front", "hero"],
+        "failureModes": ["reads as a generic longhouse"]
+      },
+      {
+        "id": "hide-system",
+        "name": "Two clean stretched hide frames",
+        "required": true,
+        "qualityCriteria": ["Both abstract panels sit visibly in timber frames without gore."],
+        "evidenceRefs": ["front", "side", "rear"],
+        "failureModes": ["craft function is ambiguous"]
+      },
+      {
+        "id": "vat-drain-system",
+        "name": "Shallow vat and drainage trough",
+        "required": true,
+        "qualityCriteria": ["Vat, water and front drain stay attached and clear of approach."],
+        "evidenceRefs": ["front", "hero"],
+        "failureModes": ["station cue is absent"]
+      },
+      {
+        "id": "material-separation",
+        "name": "Timber, teal roof, hide, iron and water separation",
+        "required": true,
+        "qualityCriteria": ["Two-bucket merge preserves clean workshop material families."],
+        "evidenceRefs": ["hero"],
+        "failureModes": ["bay becomes undifferentiated clutter"]
+      }
+    ],
+    "visualDeltaChecks": [
+      "asymmetric tall-and-low silhouette",
+      "open work-bay void",
+      "two hide panels",
+      "vat rim and water",
+      "clear x=0 doorway"
+    ],
+    "antiShallowSpecRules": [
+      "Do not close the work awning.",
+      "Keep every craft cue exterior and attached."
+    ],
+    "mustNotDo": ["No interior.", "No blood or gore.", "No loose service-lane clutter."]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.7,
+    "mustMatch": [
+      "asymmetric workshop",
+      "open work awning",
+      "two hide frames",
+      "shallow vat",
+      "dry apron and drain"
+    ],
+    "niceToHave": ["abstract hook silhouettes", "rolled hides"],
+    "reviewViewpoints": ["front", "left-side", "rear", "front-three-quarter"]
+  },
+  "coordinateFrame": {
+    "front": "+Z",
+    "up": "+Y",
+    "right": "+X",
+    "units": "world-yards",
+    "scaleReference": "native bounds 9 x 7.2 x 7"
+  },
+  "assumptions": [
+    "The result is a stylized game-ready approximation.",
+    "Hide outlines are clean abstract panels with no anatomy or gore.",
+    "The drain ends in a short attached trough outside the x=0 approach where the reference is occluded."
+  ],
+  "silhouette": {
+    "boundingShape": "tall left timber workshop and low open right awning sharing one raised apron",
+    "aspectRatios": [
+      "width:height about 1.25",
+      "depth:width about 0.78",
+      "awning width:total width about 0.4"
+    ],
+    "symmetry": "strongly asymmetric massing with paired hide frames inside the right bay",
+    "dominantCurves": ["shallow roof sag", "round vat rim", "four-lobed hide outlines"],
+    "negativeSpaces": ["open work bay", "gaps around hide frames", "space beneath raised apron"],
+    "landmarks": [
+      "dark smokestack",
+      "right lean-to",
+      "two stretched hides",
+      "shallow vat",
+      "centered steps",
+      "warm work lantern"
+    ]
+  },
+  "viewEvidence": [
+    {
+      "id": "front",
+      "view": "front",
+      "path": "docs/design/fenbridge-rebuild/img2threejs/hesk-tannery/zones/front.png",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": ["asymmetric masses", "x=0 doorway", "two hide frames", "vat", "workbench"],
+      "confidence": 0.98
+    },
+    {
+      "id": "side",
+      "view": "left-side",
+      "path": "docs/design/fenbridge-rebuild/img2threejs/hesk-tannery/zones/side.png",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": ["open bay depth", "hide-frame spacing", "awning supports", "vat depth"],
+      "confidence": 0.95
+    },
+    {
+      "id": "rear",
+      "view": "rear",
+      "path": "docs/design/fenbridge-rebuild/img2threejs/hesk-tannery/zones/rear.png",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": ["rear wall bays", "awning back rail", "hide silhouettes", "roof depth"],
+      "confidence": 0.94
+    },
+    {
+      "id": "hero",
+      "view": "front-three-quarter",
+      "path": "docs/design/fenbridge-rebuild/img2threejs/hesk-tannery/zones/hero.png",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": [
+        "complete volume",
+        "raised apron",
+        "clear steps",
+        "vat-water read",
+        "lantern"
+      ],
+      "confidence": 0.98
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "workshop-shell",
+      "name": "Closed timber workshop and low foundation",
+      "level": "macro",
+      "role": "building-shell",
+      "importance": 1,
+      "confidence": 0.98,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "The main shop is a closed set of planar timber wall bays over a low masonry base.",
+      "parent": null,
+      "dimensions": {
+        "width": 5.8,
+        "height": 4.45,
+        "depth": 6,
+        "units": "yards",
+        "confidence": 0.95
+      },
+      "transform": {
+        "position": [-1.3, 2.5, -0.15],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "material": "fenbridge-opaque",
+      "materialLayers": ["fenbridge-opaque"],
+      "localFeatures": [
+        {
+          "id": "centered-workshop-door",
+          "type": "contour",
+          "geometryEffect": "broad closed door and steps align exactly at asset-local x=0",
+          "placement": "front facade",
+          "confidence": 1
+        },
+        {
+          "id": "timber-workshop-bays",
+          "type": "seam",
+          "geometryEffect": "dark vertical planks are divided by stout post and rail framing",
+          "placement": "front, side and rear",
+          "confidence": 0.94
+        }
+      ],
+      "evidenceRefs": ["front", "rear", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(52, 39, 30, 1)",
+        "secondaryAlbedo": "rgba(78, 86, 80, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.96
+      }
+    },
+    {
+      "id": "roof-system",
+      "name": "Teal roof, dormer and masonry smokestack",
+      "level": "macro",
+      "role": "roof-shell",
+      "importance": 0.94,
+      "confidence": 0.96,
+      "primitive": "extrude",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "A broad faceted gable shell supports a separate dormer and stepped masonry stack.",
+      "parent": "workshop-shell",
+      "dimensions": {
+        "width": 6.2,
+        "height": 2.7,
+        "depth": 6.4,
+        "units": "yards",
+        "confidence": 0.92
+      },
+      "transform": {
+        "position": [-1.3, 4.4, -0.15],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "material": "fenbridge-opaque",
+      "materialLayers": ["fenbridge-opaque", "fenbridge-emissive"],
+      "localFeatures": [
+        {
+          "id": "smokestack-courses",
+          "type": "seam",
+          "geometryEffect": "stacked dark-stone blocks and cap project above the ridge",
+          "placement": "roof center-left",
+          "confidence": 0.97
+        },
+        {
+          "id": "front-dormer-window",
+          "type": "contour",
+          "geometryEffect": "small teal gabled dormer encloses an amber grid",
+          "placement": "front slope",
+          "confidence": 0.96
+        }
+      ],
+      "evidenceRefs": ["front", "side", "rear", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(23, 98, 105, 1)",
+        "secondaryAlbedo": "rgba(46, 52, 49, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.84
+      }
+    },
+    {
+      "id": "dry-apron",
+      "name": "Raised continuous timber work apron",
+      "level": "meso",
+      "role": "service-apron",
+      "importance": 0.96,
+      "confidence": 0.97,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "A rigid plank deck, short piles and centered steps create the dry work surface and ground contact.",
+      "parent": "workshop-shell",
+      "dimensions": {
+        "width": 8.8,
+        "height": 0.9,
+        "depth": 6.5,
+        "units": "yards",
+        "confidence": 0.94
+      },
+      "transform": {
+        "position": [0, 0.55, 0.2],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "material": "fenbridge-opaque",
+      "materialLayers": ["fenbridge-opaque"],
+      "localFeatures": [
+        {
+          "id": "piled-dry-apron",
+          "type": "contour",
+          "geometryEffect": "continuous plank deck stands on short rope-banded piles with open lower gaps",
+          "placement": "full building footprint",
+          "confidence": 0.97
+        },
+        {
+          "id": "front-drainage-trough",
+          "type": "groove",
+          "geometryEffect": "three shallow stone channels run along the work bay without crossing the steps",
+          "placement": "front-right apron edge",
+          "confidence": 0.76
+        }
+      ],
+      "evidenceRefs": ["front", "side", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(82, 59, 41, 1)",
+        "secondaryAlbedo": "rgba(116, 119, 107, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.95
+      }
+    },
+    {
+      "id": "work-awning",
+      "name": "Open right-side work awning",
+      "level": "meso",
+      "role": "open-work-bay",
+      "importance": 1,
+      "confidence": 0.98,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Posts, beams and a shallow roof surround genuine open space rather than a closed annex.",
+      "parent": "dry-apron",
+      "dimensions": {
+        "width": 3.3,
+        "height": 3.6,
+        "depth": 5.1,
+        "units": "yards",
+        "confidence": 0.95
+      },
+      "transform": {
+        "position": [2.7, 2.1, 0.7],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "material": "fenbridge-opaque",
+      "materialLayers": ["fenbridge-opaque", "fenbridge-emissive"],
+      "localFeatures": [
+        {
+          "id": "open-right-work-bay",
+          "type": "contour",
+          "geometryEffect": "four posts and high beams preserve open front and side voids below a low teal canopy",
+          "placement": "right half of apron",
+          "confidence": 0.98
+        },
+        {
+          "id": "warm-work-lantern",
+          "type": "emissive",
+          "geometryEffect": "one caged amber lantern marks the outer bay post",
+          "placement": "front-right corner",
+          "confidence": 0.95
+        }
+      ],
+      "evidenceRefs": ["front", "side", "rear", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(39, 106, 111, 1)",
+        "secondaryAlbedo": "rgba(52, 39, 30, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.9
+      }
+    },
+    {
+      "id": "hide-frame-system",
+      "name": "Paired stretched-hide frames",
+      "level": "meso",
+      "role": "craft-display",
+      "importance": 1,
+      "confidence": 0.96,
+      "primitive": "extrude",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Each system combines a rigid rectangular timber frame with a shallow clean four-lobed hide panel and geometric ties.",
+      "parent": "work-awning",
+      "dimensions": {
+        "width": 2.4,
+        "height": 2,
+        "depth": 2.9,
+        "units": "yards",
+        "confidence": 0.91
+      },
+      "transform": {
+        "position": [2.7, 2, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "material": "fenbridge-opaque",
+      "materialLayers": ["fenbridge-opaque"],
+      "localFeatures": [
+        {
+          "id": "stretched-hide-pair",
+          "type": "contour",
+          "geometryEffect": "two clean tan four-lobed panels sit within separate timber frames",
+          "placement": "front-readable plane beneath awning",
+          "confidence": 0.98
+        },
+        {
+          "id": "hide-frame-lacing",
+          "type": "linework",
+          "geometryEffect": "short diagonal rope ties connect panel corners to frame rails",
+          "placement": "around each hide perimeter",
+          "confidence": 0.84
+        }
+      ],
+      "evidenceRefs": ["front", "side", "rear", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(158, 116, 73, 1)",
+        "secondaryAlbedo": "rgba(82, 59, 41, 1)",
+        "materialClass": "fabric",
+        "materialClassConfidence": 0.82
+      }
+    },
+    {
+      "id": "vat-and-bench",
+      "name": "Shallow tanning vat, workbench and attached craft clutter",
+      "level": "meso",
+      "role": "station-scenery",
+      "importance": 0.95,
+      "confidence": 0.91,
+      "primitive": "lathe",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "The low-sided vat, rigid bench and simplified attached tools are grouped exterior station scenery.",
+      "parent": "dry-apron",
+      "dimensions": {
+        "width": 7.4,
+        "height": 1.7,
+        "depth": 1.4,
+        "units": "yards",
+        "confidence": 0.85
+      },
+      "transform": {
+        "position": [0, 1.1, 2.4],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "material": "fenbridge-opaque",
+      "materialLayers": ["fenbridge-opaque"],
+      "localFeatures": [
+        {
+          "id": "shallow-tanning-vat",
+          "type": "contour",
+          "geometryEffect": "broad low faceted timber tub and thick rim expose a recessed water disk",
+          "placement": "front-right work bay",
+          "confidence": 0.96
+        },
+        {
+          "id": "bench-hook-and-roll-system",
+          "type": "linework",
+          "geometryEffect": "left bench carries fixed low pots, hooks and rolled-hide cylinders",
+          "placement": "front-left workshop wall",
+          "confidence": 0.88
+        }
+      ],
+      "evidenceRefs": ["front", "side", "hero"],
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(82, 59, 41, 1)",
+        "secondaryAlbedo": "rgba(25, 77, 89, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.91
+      }
+    }
+  ],
+  "materials": [
+    {
+      "id": "fenbridge-opaque",
+      "name": "Merged Fenbridge opaque vertex-color material",
+      "type": "standard-with-low-lambert-path",
+      "shaderModel": "MeshStandardMaterial on Standard/Ultra and semantic vertex-color Lambert-compatible Low path",
+      "baseColor": "#FFFFFF",
+      "albedo": {
+        "dominant": "semantic COLOR_0",
+        "secondary": ["dark timber", "damp stone", "teal shingles", "cured hide", "iron", "water"],
+        "samplingNotes": "Reference values define semantic families; no baked highlight becomes albedo."
+      },
+      "colorVariation": {
+        "palette": ["#34271E", "#4E5650", "#176269", "#9E7449", "#34383A", "#194D59"],
+        "pattern": "bounded semantic vertex-color regions",
+        "amplitude": 0.1
+      },
+      "roughness": {
+        "base": 0.84,
+        "variation": 0.28,
+        "map": "independent shared Fenbridge roughness atlas"
+      },
+      "metalness": {
+        "base": 0.04,
+        "variation": 0.14
+      },
+      "normal": {
+        "pattern": "independent shared Fenbridge normal atlas",
+        "strength": 0.18
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.24,
+        "contactShadowBias": 0.36
+      },
+      "localOverrides": [
+        {
+          "id": "cured-hide-matte",
+          "region": "two stretched panels and rolled hides",
+          "pattern": "warm tan with restrained darker perimeter mottling",
+          "roughness": 0.9,
+          "evidenceRefs": ["front", "side", "hero"]
+        },
+        {
+          "id": "vat-water-sheen",
+          "region": "recessed vat water disk",
+          "pattern": "flat pale blue-gray surface independent of timber albedo",
+          "roughness": 0.24,
+          "evidenceRefs": ["front", "hero"]
+        },
+        {
+          "id": "wet-timber-grain",
+          "region": "wall, apron, awning and frame timbers",
+          "pattern": "axial grain with damp lower band",
+          "roughness": 0.87,
+          "evidenceRefs": ["front", "rear", "hero"]
+        }
+      ]
+    },
+    {
+      "id": "fenbridge-emissive",
+      "name": "Merged Fenbridge warm emissive material",
+      "type": "standard-emissive",
+      "shaderModel": "MeshStandardMaterial emissive bucket",
+      "baseColor": "#FFA43A",
+      "albedo": {
+        "dominant": "#FFA43A",
+        "secondary": ["#FFDD77"],
+        "samplingNotes": "Windows and one work lantern only; no embedded punctual light."
+      },
+      "colorVariation": {
+        "palette": ["#FFA43A", "#FFDD77"],
+        "pattern": "pane and lantern core value lift",
+        "amplitude": 0.08
+      },
+      "roughness": {
+        "base": 0.3,
+        "variation": 0.06,
+        "map": "independent scalar policy"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "geometry only",
+        "strength": 0.01
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.08,
+        "contactShadowBias": 0.18
+      },
+      "localOverrides": [
+        {
+          "id": "warm-work-light",
+          "region": "windows and one outer awning lantern",
+          "emissiveColor": "#FFB14A",
+          "emissiveIntensity": 1.2,
+          "roughness": 0.28,
+          "evidenceRefs": ["front", "hero"]
+        }
+      ]
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "hide-frame-pair-system",
+      "componentRef": "hide-frame-system",
+      "method": "two fixed mirrored frame-and-panel modules",
+      "count": 2,
+      "distribution": "inside open awning",
+      "buildsGeometry": true,
+      "geometry": "box rails plus shallow shaped panels and tie beams",
+      "drawCallPolicy": "merge into FenbridgeOpaque"
+    },
+    {
+      "id": "apron-pile-system",
+      "componentRef": "dry-apron",
+      "method": "fixed repeated short posts",
+      "countMax": 12,
+      "distribution": "perimeter and bay corners",
+      "buildsGeometry": true,
+      "geometry": "low-sided cylinders and rope bands",
+      "drawCallPolicy": "merge into FenbridgeOpaque"
+    },
+    {
+      "id": "bench-clutter-system",
+      "componentRef": "vat-and-bench",
+      "method": "fixed bounded craft modules",
+      "countMax": 8,
+      "distribution": "bench and awning rail",
+      "buildsGeometry": true,
+      "geometry": "pots, rolls and hook silhouettes",
+      "drawCallPolicy": "merge by semantic bucket"
+    }
+  ],
+  "lookDevTargets": {
+    "qualityPriority": "game-ready-reference-informed",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": true,
+      "normalOrBumpRequired": true,
+      "localOverridesRequired": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "acceptedLimitation": "studio-lit concept pixels are material-family evidence, not exact PBR recovery"
+      }
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "environment light",
+        "exposure",
+        "ACES tone mapping",
+        "contact shadow"
+      ],
+      "mustAvoid": ["ambient-only lighting", "water gloss applied to cured hide"]
+    },
+    "screenshotReview": [
+      "Compare tall-left/open-right silhouette.",
+      "Check both hides and vat from front and side.",
+      "Check clear x=0 entry and station apron."
+    ]
+  },
+  "lightingFromPhoto": [
+    "Neutral upper-left key reveals roof courses, frame depth and vat rim; exposure 1.0 with ACES tone mapping.",
+    "Soft frontal fill keeps clean hide panels and bench tools readable beneath the awning.",
+    "Neutral environment rim plus floor contact shadow proves apron piles, bay void and vat seating."
+  ],
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.7,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Review grouped identity systems from the same comparison pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": ["continue", "refine-spec", "refine-code", "request-input", "stop"],
+    "specRefineTriggers": [
+      "work awning closes visually",
+      "hide or vat system missing",
+      "x=0 approach obstructed"
+    ],
+    "codeRefineTriggers": ["implementation diverges from sound spec", "budget exceeded"],
+    "stopCriteria": ["all critical features reach 0.70", "new input required"],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "interaction-pass"
+      ],
+      "preferredCapture": "repo preview renderer",
+      "fallbackCapture": "browser screenshot",
+      "minimumEvidence": "reference, render, comparison sheet and feature scores",
+      "reviewPairRule": "match admitted crop and camera",
+      "acceptanceAuthority": "agent visual review"
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "hesk-silhouette",
+      "name": "Tall workshop, low open awning, smokestack and raised apron",
+      "tier": "critical",
+      "passIds": ["blockout", "form-refinement"],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": ["workshop-shell", "roof-system", "dry-apron", "work-awning"],
+      "evidenceRefs": ["front", "hero"]
+    },
+    {
+      "id": "centered-tannery-entry",
+      "name": "Accessible local x=0 door and clear steps",
+      "tier": "critical",
+      "passIds": ["structural-pass", "interaction-pass"],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": ["workshop-shell", "dry-apron"],
+      "evidenceRefs": ["front", "hero"]
+    },
+    {
+      "id": "clean-hide-frame-pair",
+      "name": "Two clean non-gory stretched hide frames and ties",
+      "tier": "critical",
+      "passIds": ["structural-pass", "form-refinement"],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": ["work-awning", "hide-frame-system"],
+      "evidenceRefs": ["front", "side", "rear", "hero"]
+    },
+    {
+      "id": "vat-drain-station",
+      "name": "Shallow vat, visible water, workbench and drainage trough",
+      "tier": "critical",
+      "passIds": ["form-refinement", "interaction-pass"],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": ["dry-apron", "vat-and-bench"],
+      "evidenceRefs": ["front", "hero"]
+    },
+    {
+      "id": "tannery-material-read",
+      "name": "Timber, roof, hide, water, iron and warm light separation",
+      "tier": "critical",
+      "passIds": ["material-pass"],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": ["roof-system", "hide-frame-system", "vat-and-bench"],
+      "evidenceRefs": ["front", "side", "hero"]
+    },
+    {
+      "id": "deterministic-clean-clutter",
+      "name": "Hooks, pots and rolls remain fixed, attached and non-gory",
+      "tier": "important",
+      "passIds": ["form-refinement", "optimization-pass"],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": ["vat-and-bench"],
+      "evidenceRefs": ["front", "hero"]
+    },
+    {
+      "id": "shipping-budget",
+      "name": "Exterior-only model stays within 5,000 triangles and 350 KiB",
+      "tier": "important",
+      "passIds": ["optimization-pass"],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": ["workshop-shell"],
+      "evidenceRefs": ["front", "side", "rear", "hero"]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Lock native bounds and asymmetric silhouette.",
+      "componentRefs": ["workshop-shell", "roof-system", "dry-apron", "work-awning"],
+      "acceptance": ["Tall-left/open-right massing matches front and hero."]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build open bay and station hierarchy.",
+      "componentRefs": ["dry-apron", "work-awning", "hide-frame-system", "vat-and-bench"],
+      "acceptance": ["Bay remains open and local x=0 approach remains clear."]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Add hides, ties, vat, drain, bench and work lights.",
+      "componentRefs": ["roof-system", "hide-frame-system", "vat-and-bench"],
+      "acceptance": ["Every inventoried component detail has geometry."]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Apply clean semantic workshop colors and two-bucket response.",
+      "componentRefs": ["workshop-shell", "roof-system", "hide-frame-system", "vat-and-bench"],
+      "acceptance": ["Low and Ultra preserve hide, water and structure separation."]
+    },
+    {
+      "id": "interaction-pass",
+      "goal": "Verify station, door and apron clearance.",
+      "componentRefs": ["dry-apron", "work-awning", "vat-and-bench"],
+      "acceptance": ["No work scenery blocks the x=0 entrance or station standing point."]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Merge and verify shipping budgets.",
+      "componentRefs": ["workshop-shell"],
+      "acceptance": ["At most two primitives, no interior, at most 5,000 triangles and 350 KiB."]
+    }
+  ],
+  "sculptPipeline": {
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "complete",
+    "completedPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "passGateMode": "locked-sequential",
+    "nextRequiredEvidence": [],
+    "lastCompletedPass": "optimization-pass",
+    "blockedReason": "all build passes completed"
+  },
+  "actionReadiness": {
+    "contract": "Static exterior hierarchy with stable tannery-station and entrance sockets; collision remains runtime-owned.",
+    "defaultRigType": "static-town-asset",
+    "rootMotionNode": "workshop-shell",
+    "requiredComponentFields": ["semantic id", "parent", "native transform"],
+    "transformChannels": ["root translate", "root rotate", "visibility", "material state"],
+    "authoringRules": ["No detachable craft clutter.", "No shipping collision mesh."],
+    "destructionPolicy": {
+      "defaultBreakable": false
+    }
+  },
+  "performanceBudget": {
+    "targetTriangles": 3800,
+    "hardTriangleCeiling": 5000,
+    "hardByteCeiling": 358400,
+    "maxShippingPrimitives": 2,
+    "texturePolicy": "three shared external Fenbridge support maps; no embedded raster texture"
+  },
+  "proceduralStrategy": [
+    "Build a closed offset workshop and continuous piled apron.",
+    "Construct a genuinely open post-and-beam work awning.",
+    "Use deterministic shaped panels for clean hides and a low-sided vat with recessed water.",
+    "Merge all geometry into opaque and emissive shipping buckets."
+  ],
+  "risks": [
+    "Drain endpoint is inferred from partially occluded views.",
+    "Small tool and roll counts vary and are fixed deterministically.",
+    "Hide panels are deliberately abstract and non-anatomical."
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Fenbridge Hesk tannery workshop hide frames vat drainage awning procedural low-poly",
+    "indexFingerprint": "6857e5ab528b42ac12f4f411f862610a0bffce8e47aee3610a7603c318072fe8",
+    "sourceRefs": [
+      "grimoire/glossary/3d_vocabulary.md",
+      "grimoire/intake/surface_topology.md",
+      "grimoire/build/geometry_patterns.md"
+    ],
+    "evidenceRefs": ["core.topology-intent", "core.pbr-hand-painted-vs-pbr-texture"]
+  },
+  "visualEvidence": [
+    {
+      "timestamp": "2026-08-04T00:46:20.331286+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.8,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.76,
+        "componentStructure": 0.86,
+        "formDetail": 0.79,
+        "materialSurface": 0.79,
+        "lightingCamera": 0.81
+      },
+      "featureReviews": [
+        {
+          "id": "hesk-silhouette",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed tall workshop, low open awning, smokestack and raised apron at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "centered-tannery-entry",
+          "visible": true,
+          "score": 0.87,
+          "notes": "Independent visual audit passed accessible local x=0 door and clear steps at 0.87 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clean-hide-frame-pair",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed two clean non-gory stretched hide frames and ties at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "vat-drain-station",
+          "visible": true,
+          "score": 0.83,
+          "notes": "Independent visual audit passed shallow vat, visible water, workbench and drainage trough at 0.83 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "tannery-material-read",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed timber, roof, hide, water, iron and warm light separation at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "deterministic-clean-clutter",
+          "visible": true,
+          "score": 0.81,
+          "notes": "Independent visual audit passed hooks, pots and rolls remain fixed, attached and non-gory at 0.81 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 1,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 5,000 triangles and 350 kib at 1.00 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/hesk-tannery-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.80."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.375234+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.8,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.76,
+        "componentStructure": 0.86,
+        "formDetail": 0.79,
+        "materialSurface": 0.79,
+        "lightingCamera": 0.81
+      },
+      "featureReviews": [
+        {
+          "id": "hesk-silhouette",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed tall workshop, low open awning, smokestack and raised apron at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "centered-tannery-entry",
+          "visible": true,
+          "score": 0.87,
+          "notes": "Independent visual audit passed accessible local x=0 door and clear steps at 0.87 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clean-hide-frame-pair",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed two clean non-gory stretched hide frames and ties at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "vat-drain-station",
+          "visible": true,
+          "score": 0.83,
+          "notes": "Independent visual audit passed shallow vat, visible water, workbench and drainage trough at 0.83 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "tannery-material-read",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed timber, roof, hide, water, iron and warm light separation at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "deterministic-clean-clutter",
+          "visible": true,
+          "score": 0.81,
+          "notes": "Independent visual audit passed hooks, pots and rolls remain fixed, attached and non-gory at 0.81 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 1,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 5,000 triangles and 350 kib at 1.00 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/hesk-tannery-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.80."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.419975+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.8,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.76,
+        "componentStructure": 0.86,
+        "formDetail": 0.79,
+        "materialSurface": 0.79,
+        "lightingCamera": 0.81
+      },
+      "featureReviews": [
+        {
+          "id": "hesk-silhouette",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed tall workshop, low open awning, smokestack and raised apron at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "centered-tannery-entry",
+          "visible": true,
+          "score": 0.87,
+          "notes": "Independent visual audit passed accessible local x=0 door and clear steps at 0.87 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clean-hide-frame-pair",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed two clean non-gory stretched hide frames and ties at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "vat-drain-station",
+          "visible": true,
+          "score": 0.83,
+          "notes": "Independent visual audit passed shallow vat, visible water, workbench and drainage trough at 0.83 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "tannery-material-read",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed timber, roof, hide, water, iron and warm light separation at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "deterministic-clean-clutter",
+          "visible": true,
+          "score": 0.81,
+          "notes": "Independent visual audit passed hooks, pots and rolls remain fixed, attached and non-gory at 0.81 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 1,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 5,000 triangles and 350 kib at 1.00 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/hesk-tannery-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.80."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.469068+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.8,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.76,
+        "componentStructure": 0.86,
+        "formDetail": 0.79,
+        "materialSurface": 0.79,
+        "lightingCamera": 0.81
+      },
+      "featureReviews": [
+        {
+          "id": "hesk-silhouette",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed tall workshop, low open awning, smokestack and raised apron at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "centered-tannery-entry",
+          "visible": true,
+          "score": 0.87,
+          "notes": "Independent visual audit passed accessible local x=0 door and clear steps at 0.87 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clean-hide-frame-pair",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed two clean non-gory stretched hide frames and ties at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "vat-drain-station",
+          "visible": true,
+          "score": 0.83,
+          "notes": "Independent visual audit passed shallow vat, visible water, workbench and drainage trough at 0.83 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "tannery-material-read",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed timber, roof, hide, water, iron and warm light separation at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "deterministic-clean-clutter",
+          "visible": true,
+          "score": 0.81,
+          "notes": "Independent visual audit passed hooks, pots and rolls remain fixed, attached and non-gory at 0.81 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 1,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 5,000 triangles and 350 kib at 1.00 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/hesk-tannery-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.80."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.515760+00:00",
+      "passId": "interaction-pass",
+      "estimatedFidelity": 0.8,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.76,
+        "componentStructure": 0.86,
+        "formDetail": 0.79,
+        "materialSurface": 0.79,
+        "lightingCamera": 0.81
+      },
+      "featureReviews": [
+        {
+          "id": "hesk-silhouette",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed tall workshop, low open awning, smokestack and raised apron at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "centered-tannery-entry",
+          "visible": true,
+          "score": 0.87,
+          "notes": "Independent visual audit passed accessible local x=0 door and clear steps at 0.87 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clean-hide-frame-pair",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed two clean non-gory stretched hide frames and ties at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "vat-drain-station",
+          "visible": true,
+          "score": 0.83,
+          "notes": "Independent visual audit passed shallow vat, visible water, workbench and drainage trough at 0.83 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "tannery-material-read",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed timber, roof, hide, water, iron and warm light separation at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "deterministic-clean-clutter",
+          "visible": true,
+          "score": 0.81,
+          "notes": "Independent visual audit passed hooks, pots and rolls remain fixed, attached and non-gory at 0.81 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 1,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 5,000 triangles and 350 kib at 1.00 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/hesk-tannery-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.80."
+    }
+  ],
+  "reviewHistory": [
+    {
+      "timestamp": "2026-08-04T00:46:20.331286+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.8,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.76,
+        "componentStructure": 0.86,
+        "formDetail": 0.79,
+        "materialSurface": 0.79,
+        "lightingCamera": 0.81
+      },
+      "featureReviews": [
+        {
+          "id": "hesk-silhouette",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed tall workshop, low open awning, smokestack and raised apron at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "centered-tannery-entry",
+          "visible": true,
+          "score": 0.87,
+          "notes": "Independent visual audit passed accessible local x=0 door and clear steps at 0.87 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clean-hide-frame-pair",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed two clean non-gory stretched hide frames and ties at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "vat-drain-station",
+          "visible": true,
+          "score": 0.83,
+          "notes": "Independent visual audit passed shallow vat, visible water, workbench and drainage trough at 0.83 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "tannery-material-read",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed timber, roof, hide, water, iron and warm light separation at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "deterministic-clean-clutter",
+          "visible": true,
+          "score": 0.81,
+          "notes": "Independent visual audit passed hooks, pots and rolls remain fixed, attached and non-gory at 0.81 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 1,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 5,000 triangles and 350 kib at 1.00 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed blockout for hesk_tannery.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-comparison.png"
+      ],
+      "mapStrippedRender": "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-procedural-contact.png",
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/hesk-tannery-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.80."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.375234+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.8,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.76,
+        "componentStructure": 0.86,
+        "formDetail": 0.79,
+        "materialSurface": 0.79,
+        "lightingCamera": 0.81
+      },
+      "featureReviews": [
+        {
+          "id": "hesk-silhouette",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed tall workshop, low open awning, smokestack and raised apron at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "centered-tannery-entry",
+          "visible": true,
+          "score": 0.87,
+          "notes": "Independent visual audit passed accessible local x=0 door and clear steps at 0.87 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clean-hide-frame-pair",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed two clean non-gory stretched hide frames and ties at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "vat-drain-station",
+          "visible": true,
+          "score": 0.83,
+          "notes": "Independent visual audit passed shallow vat, visible water, workbench and drainage trough at 0.83 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "tannery-material-read",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed timber, roof, hide, water, iron and warm light separation at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "deterministic-clean-clutter",
+          "visible": true,
+          "score": 0.81,
+          "notes": "Independent visual audit passed hooks, pots and rolls remain fixed, attached and non-gory at 0.81 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 1,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 5,000 triangles and 350 kib at 1.00 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed structural-pass for hesk_tannery.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/hesk-tannery-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.80."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.419975+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.8,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.76,
+        "componentStructure": 0.86,
+        "formDetail": 0.79,
+        "materialSurface": 0.79,
+        "lightingCamera": 0.81
+      },
+      "featureReviews": [
+        {
+          "id": "hesk-silhouette",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed tall workshop, low open awning, smokestack and raised apron at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "centered-tannery-entry",
+          "visible": true,
+          "score": 0.87,
+          "notes": "Independent visual audit passed accessible local x=0 door and clear steps at 0.87 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clean-hide-frame-pair",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed two clean non-gory stretched hide frames and ties at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "vat-drain-station",
+          "visible": true,
+          "score": 0.83,
+          "notes": "Independent visual audit passed shallow vat, visible water, workbench and drainage trough at 0.83 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "tannery-material-read",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed timber, roof, hide, water, iron and warm light separation at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "deterministic-clean-clutter",
+          "visible": true,
+          "score": 0.81,
+          "notes": "Independent visual audit passed hooks, pots and rolls remain fixed, attached and non-gory at 0.81 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 1,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 5,000 triangles and 350 kib at 1.00 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed form-refinement for hesk_tannery.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/hesk-tannery-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.80."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.469068+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.8,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.76,
+        "componentStructure": 0.86,
+        "formDetail": 0.79,
+        "materialSurface": 0.79,
+        "lightingCamera": 0.81
+      },
+      "featureReviews": [
+        {
+          "id": "hesk-silhouette",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed tall workshop, low open awning, smokestack and raised apron at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "centered-tannery-entry",
+          "visible": true,
+          "score": 0.87,
+          "notes": "Independent visual audit passed accessible local x=0 door and clear steps at 0.87 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clean-hide-frame-pair",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed two clean non-gory stretched hide frames and ties at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "vat-drain-station",
+          "visible": true,
+          "score": 0.83,
+          "notes": "Independent visual audit passed shallow vat, visible water, workbench and drainage trough at 0.83 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "tannery-material-read",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed timber, roof, hide, water, iron and warm light separation at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "deterministic-clean-clutter",
+          "visible": true,
+          "score": 0.81,
+          "notes": "Independent visual audit passed hooks, pots and rolls remain fixed, attached and non-gory at 0.81 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 1,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 5,000 triangles and 350 kib at 1.00 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed material-pass for hesk_tannery.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/hesk-tannery-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.80."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.515760+00:00",
+      "passId": "interaction-pass",
+      "estimatedFidelity": 0.8,
+      "aiVisionScore": 0.8,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.76,
+        "componentStructure": 0.86,
+        "formDetail": 0.79,
+        "materialSurface": 0.79,
+        "lightingCamera": 0.81
+      },
+      "featureReviews": [
+        {
+          "id": "hesk-silhouette",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed tall workshop, low open awning, smokestack and raised apron at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "centered-tannery-entry",
+          "visible": true,
+          "score": 0.87,
+          "notes": "Independent visual audit passed accessible local x=0 door and clear steps at 0.87 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "clean-hide-frame-pair",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed two clean non-gory stretched hide frames and ties at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "vat-drain-station",
+          "visible": true,
+          "score": 0.83,
+          "notes": "Independent visual audit passed shallow vat, visible water, workbench and drainage trough at 0.83 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "tannery-material-read",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed timber, roof, hide, water, iron and warm light separation at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "deterministic-clean-clutter",
+          "visible": true,
+          "score": 0.81,
+          "notes": "Independent visual audit passed hooks, pots and rolls remain fixed, attached and non-gory at 0.81 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "shipping-budget",
+          "visible": true,
+          "score": 1,
+          "notes": "Independent machine and serialized audit passed exterior-only model stays within 5,000 triangles and 350 kib at 1.00 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed interaction-pass for hesk_tannery.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/hesk-tannery-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.80."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:20.553428+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.8,
+      "aiVisionScore": null,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {},
+      "featureReviews": [],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed optimization-pass for hesk_tannery.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/hesk_tannery-comparison.png"
+      ]
+    }
+  ]
+}

@@ -1,29 +1,41 @@
 // Visual capture for #2513: the corpse loot popup on a template whose every
-// component family is unmapped (fen_troll: claw, tusk). Before the fix the popup
-// carried a full Harvest picker whose every submit the sim refused after
-// spending the corpse's single-use claim; after it, the popup is loot only.
+// component family is unmapped. Before the fix the popup carried a full
+// Harvest picker whose every submit the sim refused after spending the
+// corpse's single-use claim; after it, the popup is loot only.
 //
-// Staging note: fen_troll lives in mirefen_marsh, not the starting zone, so this
-// forces `templateId` on a corpse in the loaded zone rather than teleporting.
-// That is the honest minimum, because `templateId` is exactly the input under
-// test: everything downstream (corpseLootAvailability, corpseHarvestView, the
-// loot window controller) is the real shipped code reading the real content
+// Staging note: no SHIPPED template is all-unmapped any more (#2905 wired claw
+// and tusk, retiring fen_troll, the original fixture here), so this forces
+// `templateId` on a corpse in the loaded zone AND retags that template with
+// the two still-unmapped families via the __game.MOBS debug surface: the same
+// withUnmappedTemplate idiom the test suites use
+// (tests/corpse_harvest_sim.test.ts, tests/loot_window_controller.test.ts).
+// Everything downstream (corpseLootAvailability, corpseHarvestView, the loot
+// window controller) is still the real shipped code reading the real content
 // table. Pass SHOT_OUT to name the file.
 //
 // Usage (with `npm run dev` on GAME_URL):
 //   GAME_URL=http://localhost:5199 SHOT_OUT=after node scripts/shot_2513_unmapped_corpse.mjs
+// Mixed control case (picker must stay):
+//   SHOT_TEMPLATE=sethrael_palecoil SHOT_TEMPLATE_NAME='Sethrael Palecoil' \
+//   SHOT_TAGS= SHOT_EXPECT_PICKER=1 SHOT_OUT=control node scripts/shot_2513_unmapped_corpse.mjs
 
 import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH as EDGE } from './browser_path.mjs';
 
-const URL = (process.env.GAME_URL ?? 'http://localhost:5173') + '/?gfx=ultra';
+const URL = `${process.env.GAME_URL ?? 'http://localhost:5173'}/?gfx=ultra`;
 const OUT = process.env.SHOT_OUT ?? 'after';
 const MOBILE = process.env.SHOT_MOBILE === '1';
 // SHOT_TEMPLATE lets the same rig capture the control case (a MIXED template,
-// whose picker this change must not move).
-const TEMPLATE = process.env.SHOT_TEMPLATE ?? 'fen_troll';
-const TEMPLATE_NAME = process.env.SHOT_TEMPLATE_NAME ?? 'Mirefen Troll';
+// whose picker this change must not move). SHOT_TAGS retags the template for
+// the run (comma-separated; empty keeps its real tags), and SHOT_EXPECT_PICKER
+// declares the staged truth so a premise drift fails loudly instead of
+// shipping a shot of the wrong state (what happened when #2905 mapped
+// fen_troll's families out from under the old default here).
+const TEMPLATE = process.env.SHOT_TEMPLATE ?? 'warlock_imp';
+const TEMPLATE_NAME = process.env.SHOT_TEMPLATE_NAME ?? 'Fen Horror';
+const TAGS = (process.env.SHOT_TAGS ?? 'gills,horn').split(',').filter(Boolean);
+const EXPECT_PICKER = process.env.SHOT_EXPECT_PICKER === '1';
 const BOOT_VIEW = { width: 1600, height: 900, deviceScaleFactor: 2 };
 const SHOT_VIEW = MOBILE ? { width: 844, height: 390, deviceScaleFactor: 2 } : BOOT_VIEW;
 fs.mkdirSync('tmp', { recursive: true });
@@ -111,12 +123,13 @@ await page.keyboard.press('Escape');
 await sleep(500);
 
 await page.evaluate(
-  ([tpl, name, mobile]) => {
+  ([tpl, name, mobile, tags]) => {
     window.__shotTemplate = tpl;
     window.__shotTemplateName = name;
     window.__shotMobile = mobile;
+    window.__shotTags = tags;
   },
-  [TEMPLATE, TEMPLATE_NAME, MOBILE],
+  [TEMPLATE, TEMPLATE_NAME, MOBILE, TAGS],
 );
 const staged = await page.evaluate(() => {
   const g = window.__game;
@@ -124,8 +137,16 @@ const staged = await page.evaluate(() => {
   const p = sim.player;
   const mob = [...sim.entities.values()].find((e) => e.kind === 'mob' && !e.dead);
   if (!mob) return { error: 'no live mob found in loaded zone' };
-  // The one forced input: the template whose componentTags all miss the yield
-  // table. Everything the popup reads flows from here.
+  if (!g.MOBS?.[window.__shotTemplate]) {
+    return { error: `template ${window.__shotTemplate} not in __game.MOBS` };
+  }
+  // The two forced inputs: the template id, and (when SHOT_TAGS is set) that
+  // template's componentTags, retagged the way the test suites do it, since no
+  // shipped template is all-unmapped since #2905. Everything the popup reads
+  // flows from here through the real content table.
+  if (window.__shotTags.length) {
+    g.MOBS[window.__shotTemplate].componentTags = [...window.__shotTags];
+  }
   mob.templateId = window.__shotTemplate;
   mob.name = window.__shotTemplateName;
   mob.tappedById = p.id;
@@ -158,6 +179,16 @@ const staged = await page.evaluate(() => {
 });
 console.log('staged:', JSON.stringify(staged));
 if (staged.error) {
+  await browser.close();
+  process.exit(1);
+}
+// Fail loudly rather than shipping a shot of the wrong predicate state: the
+// staged harvest section must match what this run declares it evidences.
+if (staged.harvestSection !== EXPECT_PICKER) {
+  console.log(
+    `ABORT: staged harvestSection=${staged.harvestSection} but SHOT_EXPECT_PICKER=${EXPECT_PICKER};` +
+      ' the staged premise has drifted (did a harvest family get mapped or unmapped?)',
+  );
   await browser.close();
   process.exit(1);
 }

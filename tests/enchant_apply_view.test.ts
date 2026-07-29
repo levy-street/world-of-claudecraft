@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { ITEMS } from '../src/sim/data';
-import type { InvSlot, ItemSlot } from '../src/sim/types';
+import type { InvSlot, ItemDef, ItemSlot } from '../src/sim/types';
 import {
   ENCHANT_PRESERVED_TRAITS,
   ENCHANT_TIER_ORDER,
@@ -27,7 +27,14 @@ import {
 } from '../src/ui/enchant_apply_view';
 import { itemDisplayName } from '../src/ui/entity_i18n';
 import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
+import { translations } from '../src/ui/i18n.resolved.generated';
 import { wornTooltipInstance } from '../src/ui/item_instance_tooltip';
+
+/** The one slice of a resolved locale table the completeness sweep below reads:
+ *  the item name rows itemDisplayName resolves through. Narrowed locally rather
+ *  than typed against the full generated table, which is one dense literal per
+ *  locale and carries every key in the game. */
+type LocaleTable = { entities?: { items?: Record<string, { name?: string }> } };
 
 // A real item id for a slot, taken from live content so the def.slot match is
 // exercised against ITEMS exactly as the runtime picker reads it.
@@ -441,9 +448,11 @@ describe('enchant_apply_view: wornEnchantTargets', () => {
 
   it('lists BOTH rings separately: an item declaring slot "ring" matches ring1 and ring2', () => {
     const rows = wornEnchantTargets({ ring1: RING, ring2: RING }, {}, RING_ENCHANT);
+    // Each finger also carries its shared-label ordinal (#2466), since the one
+    // "Finger" label cannot tell the two rows apart on its own.
     expect(rows).toEqual([
-      { itemId: RING, slot: 'ring1' },
-      { itemId: RING, slot: 'ring2' },
+      { itemId: RING, slot: 'ring1', slotIndex: 1 },
+      { itemId: RING, slot: 'ring2', slotIndex: 2 },
     ]);
   });
 
@@ -908,22 +917,24 @@ describe('enchant_apply_view: mixedHolding (#2421)', () => {
     expect(Object.hasOwn(targets[0], 'mixedHolding')).toBe(false);
   });
 
-  // The KNOWN LIMIT, pinned so it reads as a scoped decision rather than as
-  // coverage: mixedHolding keys on the item ID, and itemDisplayName resolves a
-  // heroic variant to its base item's name, so a base/heroic pair is two ids
-  // that render one string and neither row is flagged. Pre-existing (the pair
-  // collides on the base branch too) and tracked as #2466; this test fails the
-  // day the flag is generalized, which is the reminder to delete it.
-  it('does NOT flag a base/heroic pair, which shares a display NAME across two ids', () => {
+  // The #2465 limit pin, INVERTED by #2466. mixedHolding still keys on the item
+  // ID, which is right, because it reports a difference of STATE between two
+  // copies of one item; a base/heroic pair is a difference of NAME between two
+  // ids, and the `heroic` discriminator is what answers that. So the pair is
+  // still unflagged here AND is no longer ambiguous, which the flag alone could
+  // never have told apart from the old broken state.
+  it('does not flag a base/heroic pair, and marks the heroic row instead', () => {
     const found = Object.keys(ITEMS).find((id) => {
       const def = ITEMS[id];
       return def.heroicOf !== undefined && ITEMS[def.heroicOf]?.slot === 'chest';
     });
     // Asserted, never an early return: content HAS heroic chest variants, and a
     // silent skip would let this pin rot into a test that proves nothing.
-    expect(found, 'content carries a heroic chest variant to pin the limit with').toBeDefined();
+    expect(found, 'content carries a heroic chest variant to pin the case with').toBeDefined();
     const heroic = found as string;
     const base = ITEMS[heroic].heroicOf as string;
+    // The premise: two ids, ONE rendered name. Without a discriminator the two
+    // rows below are byte-identical to a reader and to a screen reader.
     expect(itemDisplayName(ITEMS[heroic])).toBe(itemDisplayName(ITEMS[base]));
     const targets = enchantTargets(
       [
@@ -932,7 +943,12 @@ describe('enchant_apply_view: mixedHolding (#2421)', () => {
       ],
       'enchant_chest_stamina',
     );
-    expect(targets).toHaveLength(2);
+    expect(targets).toEqual([
+      { itemId: base, count: 1 },
+      { itemId: heroic, count: 1, heroic: true },
+    ]);
+    // Neither is a mixed holding: both copies are plain, so "Not enchanted"
+    // would still say nothing that told them apart.
     for (const row of targets) expect(Object.hasOwn(row, 'mixedHolding')).toBe(false);
   });
 
@@ -953,5 +969,201 @@ describe('enchant_apply_view: mixedHolding (#2421)', () => {
       'enchant_chest_stamina',
     );
     expect(denied.map((row) => row.mixedHolding)).toEqual([true, true]);
+  });
+});
+
+// #2466: the two NAME discriminators. A target list may hold rows whose item
+// display names collide (a heroic variant renders its base item's name) or whose
+// worn-slot labels collide (both fingers read "Finger"), and a row is a
+// role=button whose accessible name is computed from its contents, so two such
+// rows are told apart by nothing a player or a screen reader can reach.
+describe('enchant_apply_view: name discriminators (#2466)', () => {
+  const CHEST_ENCHANT = 'enchant_chest_stamina';
+  const OTHER_CHEST_ENCHANT = 'enchant_chest_spirit';
+  const RING_ENCHANT = 'enchant_ring_spirit';
+
+  /** A live base/heroic pair in an enchant-eligible slot, from real content. */
+  function heroicPair(slot: ItemSlot): { base: string; heroic: string } {
+    const heroic = Object.keys(ITEMS).find((id) => {
+      const def = ITEMS[id];
+      return def.heroicOf !== undefined && ITEMS[def.heroicOf]?.slot === slot;
+    });
+    expect(heroic, `content carries a heroic ${slot} variant`).toBeDefined();
+    return { base: ITEMS[heroic as string].heroicOf as string, heroic: heroic as string };
+  }
+
+  it('marks a heroic BAGGED row and leaves an ordinary one unmarked', () => {
+    const { base, heroic } = heroicPair('chest');
+    expect(
+      enchantTargets([{ itemId: heroic, count: 1 }], CHEST_ENCHANT)[0].heroic,
+      'the heroic copy carries the mark',
+    ).toBe(true);
+    // Absent, never false: the flag reads as "this row says something extra",
+    // the mixedHolding idiom, so an ordinary list carries no new fields at all.
+    expect(
+      Object.hasOwn(enchantTargets([{ itemId: base, count: 1 }], CHEST_ENCHANT)[0], 'heroic'),
+    ).toBe(false);
+  });
+
+  it('marks the heroic REPLACE row, the pair the state tags could never separate', () => {
+    // Two ids, one name, and the SAME doomed enchant: both rows would have read
+    // "<name> / Replaces Chest Spirit", down to the byte, and both stayed
+    // activatable. This is the worst case the issue names.
+    const { base, heroic } = heroicPair('chest');
+    const targets = enchantTargets(
+      [
+        { itemId: base, count: 1, instance: { enchant: OTHER_CHEST_ENCHANT } },
+        { itemId: heroic, count: 1, instance: { enchant: OTHER_CHEST_ENCHANT } },
+      ],
+      CHEST_ENCHANT,
+    );
+    expect(targets).toEqual([
+      {
+        itemId: base,
+        count: 1,
+        replace: { enchantId: OTHER_CHEST_ENCHANT, sameEnchant: false },
+      },
+      {
+        itemId: heroic,
+        count: 1,
+        replace: { enchantId: OTHER_CHEST_ENCHANT, sameEnchant: false },
+        heroic: true,
+      },
+    ]);
+  });
+
+  it('marks a heroic WORN row too, on the replace arm as well as the plain one', () => {
+    const { base, heroic } = heroicPair('mainhand');
+    const [picked, worn] = Object.keys(ENCHANTS).filter(
+      (id) => ENCHANTS[id].itemSlot === 'mainhand',
+    );
+    expect(worn, 'content carries two mainhand enchants').toBeDefined();
+    expect(wornEnchantTargets({ mainhand: heroic }, {}, picked)).toEqual([
+      { itemId: heroic, slot: 'mainhand', heroic: true },
+    ]);
+    // The replace arm pushes its row and CONTINUES inside the slot loop, so it
+    // needs its own case: a discriminator applied on one arm only is the whole
+    // bug again, one arm narrower.
+    const replaced = wornEnchantTargets(
+      { mainhand: heroic },
+      { mainhand: { enchant: worn } },
+      picked,
+    );
+    expect(replaced[0]?.replace, 'the worn copy is a replace row').toBeDefined();
+    expect(replaced[0]?.heroic).toBe(true);
+    expect(
+      Object.hasOwn(wornEnchantTargets({ mainhand: base }, {}, picked)[0], 'heroic'),
+      'the base copy carries no mark',
+    ).toBe(false);
+  });
+
+  // The tooltip marks BOTH heroic shapes (hud.ts gates on `heroicOf || heroic`),
+  // and no content def sets the bespoke `heroic` flag today, so the only way to
+  // hold the picker to the same condition is to author one. Without this the
+  // narrower predicate (heroicOf alone) would pass every other test in the file
+  // while leaving a bespoke heroic piece marked on its tooltip and unmarked here.
+  it('marks a BESPOKE heroic piece too, on the same condition the tooltip uses', () => {
+    const base = itemForSlot('chest');
+    const bespoke = 'zz_test_bespoke_heroic_chest';
+    ITEMS[bespoke] = { ...ITEMS[base], id: bespoke, heroic: true };
+    try {
+      const rows = enchantTargets(
+        [
+          { itemId: base, count: 1 },
+          { itemId: bespoke, count: 1 },
+        ],
+        CHEST_ENCHANT,
+      );
+      // It keeps its OWN name key (unlike a heroicOf variant), so this arm is
+      // about agreeing with the tooltip rather than about a name collision.
+      expect(rows.map((row) => row.heroic)).toEqual([undefined, true]);
+      expect(wornEnchantTargets({ chest: bespoke }, {}, CHEST_ENCHANT)[0]?.heroic).toBe(true);
+    } finally {
+      delete ITEMS[bespoke];
+    }
+  });
+
+  it('numbers the two FINGERS, so identical rings worn on both stand apart', () => {
+    // One item id in both fingers is the reachable shape (content has no heroic
+    // ring), and it emitted two rows whose only difference was an invisible
+    // data-act: ring1 and ring2 share the one "Finger" label.
+    const ring = itemForSlot('ring');
+    const rows = wornEnchantTargets({ ring1: ring, ring2: ring }, {}, RING_ENCHANT);
+    expect(rows).toEqual([
+      { itemId: ring, slot: 'ring1', slotIndex: 1 },
+      { itemId: ring, slot: 'ring2', slotIndex: 2 },
+    ]);
+    // Numbered on the replace arm too, including the disabled same-enchant pair:
+    // a row is read before it is activated, so an inert row still has to say
+    // which finger it describes.
+    const enchanted = wornEnchantTargets(
+      { ring1: ring, ring2: ring },
+      { ring1: { enchant: RING_ENCHANT }, ring2: { enchant: RING_ENCHANT } },
+      RING_ENCHANT,
+    );
+    expect(enchanted.map((row) => [row.slot, row.slotIndex, row.replace?.sameEnchant])).toEqual([
+      ['ring1', 1, true],
+      ['ring2', 2, true],
+    ]);
+  });
+
+  it('numbers nothing when the slot label already names the slot alone', () => {
+    // The selectivity half: a dual-wielded pair reads "Main Hand" / "Off Hand"
+    // already, so numbering it would be noise. Both arms of the same list.
+    const sword = itemForSlot('mainhand');
+    const enchantId = Object.keys(ENCHANTS).find((id) => ENCHANTS[id].itemSlot === 'mainhand');
+    const rows = wornEnchantTargets({ mainhand: sword, offhand: sword }, {}, enchantId as string);
+    expect(rows.map((row) => row.slot)).toEqual(['mainhand', 'offhand']);
+    for (const row of rows) expect(Object.hasOwn(row, 'slotIndex')).toBe(false);
+  });
+
+  // The COMPLETENESS premise, stated as the exact property one BOOLEAN
+  // discriminator can carry: every eligible item is unique in (display name,
+  // heroic) across the whole eligible catalog. Two ordinary items sharing a name
+  // would collide with nothing to separate them; so would two heroic variants of
+  // one base, or a heroicOf chain (itemDisplayName recurses, so B and C both
+  // resolve to A's name and isHeroicItem is true for both). Asserting the pair
+  // shape instead ("one plain id plus variants of it") would pass all three.
+  //
+  // Swept over EVERY LOCALE's resolved table, not only English: itemDisplayName
+  // resolves through t(), so a translation that collapses two distinct items onto
+  // one name re-opens #2466 in that locale alone, where no test running under
+  // `en` can see it. Two chest robes really did collide in cs_CZ and tr_TR.
+  it('has no (display name, heroic) collision in an eligible slot, in ANY locale', () => {
+    const eligibleSlots = new Set(Object.values(ENCHANTS).map((enchant) => enchant.itemSlot));
+    const eligible = Object.values(ITEMS).filter(
+      (def) => def.slot !== undefined && eligibleSlots.has(def.slot),
+    );
+    expect(eligible.length, 'content carries enchant-eligible items').toBeGreaterThan(0);
+    // The heroic condition the picker actually uses, restated here rather than
+    // imported: this pin exists to hold the CONTENT premise, so it must not move
+    // whenever the core's predicate does.
+    const heroic = (def: ItemDef): boolean => def.heroicOf !== undefined || def.heroic === true;
+    let sharedNames = 0;
+    for (const [lang, table] of Object.entries(translations) as [string, LocaleTable][]) {
+      const byKey = new Map<string, string[]>();
+      const byName = new Map<string, string[]>();
+      for (const def of eligible) {
+        // itemDisplayName's own resolution: a heroicOf variant reads its BASE
+        // item's name row, every other item reads its own.
+        const nameId = def.heroicOf ?? def.id;
+        const name = table.entities?.items?.[nameId]?.name;
+        expect(name, `${lang} carries a name for ${nameId}`).toBeTruthy();
+        const key = `${name} ${heroic(def) ? 'heroic' : 'plain'}`;
+        byKey.set(key, [...(byKey.get(key) ?? []), def.id]);
+        byName.set(name as string, [...(byName.get(name as string) ?? []), def.id]);
+      }
+      for (const [key, ids] of byKey) {
+        expect(
+          ids,
+          `${lang}: ${ids.join(', ')} share (name, heroic) ${JSON.stringify(key)}`,
+        ).toHaveLength(1);
+      }
+      sharedNames += [...byName.values()].filter((ids) => ids.length > 1).length;
+    }
+    // Non-vacuity, and the reason the mark is load-bearing rather than
+    // decoration: names ARE shared in live content, and the assertion above
+    // passes only because the mark separates the rows that share them.
+    expect(sharedNames, 'live content shares display names across ids').toBeGreaterThan(0);
   });
 });

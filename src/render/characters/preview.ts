@@ -3,7 +3,13 @@ import { CLASSES } from '../../sim/data';
 import type { PlayerClass } from '../../sim/types';
 import { trackWebGLContext } from '../context_release';
 import { mechAssetsReady, preloadMechAssets } from './assets';
-import type { WeaponLayoutOverride } from './manifest';
+import { modularVisualKey, VISUALS, type WeaponLayoutOverride } from './manifest';
+import {
+  type ArmorLoadout,
+  type ModularAppearance,
+  type ModularLook,
+  modularBuildSignature,
+} from './modular';
 import {
   appearanceSignature,
   type PreviewAppearance,
@@ -33,6 +39,9 @@ const PREVIEW_ANIM_STATE = {
   dead: false,
   casting: false,
   swimming: false,
+  submerged: false,
+  swimPitch: 0,
+  wading: false,
   sitting: false,
 };
 
@@ -56,6 +65,8 @@ export class CharacterPreview {
   // Identity of the appearance last requested via setAppearance, so an async mech
   // re-apply can bail out if a newer selection superseded it.
   private appearanceSig: string | null = null;
+  /** Look handed to the next modular rebuild (setVisualKey reads it back). */
+  private pendingLook: ModularLook | null = null;
   private clock = new THREE.Clock();
   private animationFrameId: number | null = null;
   private resizeObserver: ResizeObserver | null = null;
@@ -187,6 +198,36 @@ export class CharacterPreview {
    *  turntable). The asset must already be loaded — callers preload first.
    *  `weaponOverride` lets a cosmetic body adopt a class hand layout (including
    *  shields and dual wield), matching the in-world render. */
+  /** Show the composed modular body (character creation's live turntable) for
+   *  a class: its modular def carries the class clips and hand layout, and the
+   *  starter weapons default from the class. Any change to gender/hair/brows/
+   *  colour is a geometry or material change on a shared cached variant, so
+   *  this just rebuilds, the variant cache makes a repeat selection nearly
+   *  free. */
+  setModular(
+    app: ModularAppearance,
+    worn: ArmorLoadout = {},
+    cls: PlayerClass = 'warrior',
+    weaponItemId?: string | null,
+    // Both hands default to the class starters (creation, where nothing is
+    // equipped yet). The character sheet passes what is ACTUALLY worn, so the
+    // composed turntable holds the same shield / dual wield the world draws.
+    offhandItemId?: string | null,
+  ): void {
+    if (this.destroyed) return;
+    this.appearanceSig = null;
+    this.pendingLook = { app, worn };
+    const weapon = weaponItemId !== undefined ? weaponItemId : (CLASSES[cls].startWeapon ?? null);
+    const offhand =
+      offhandItemId !== undefined ? offhandItemId : (CLASSES[cls].startOffhand ?? null);
+    this.setVisualKey(modularVisualKey(cls), weapon, null, offhand);
+    // The face/body sliders ride the live body rather than the rebuild
+    // signature (see modularBuildSignature): the creator emits on every `input`
+    // event, so a drag would otherwise dispose and recompose the character per
+    // 5% step. Harmless after a rebuild, which composed with these already.
+    this.currentVisual?.applyModularSliders(app);
+  }
+
   setVisualKey(
     visualKey: string,
     weaponItemId: string | null = null,
@@ -194,7 +235,14 @@ export class CharacterPreview {
     offhandItemId: string | null = null,
   ): void {
     if (this.destroyed) return;
-    const nextSig = JSON.stringify([visualKey, weaponItemId, weaponOverride, offhandItemId]);
+    const look = VISUALS[visualKey]?.modular ? this.pendingLook : null;
+    const nextSig = JSON.stringify([
+      visualKey,
+      weaponItemId,
+      weaponOverride,
+      offhandItemId,
+      look ? modularBuildSignature(look.app, look.worn) : null,
+    ]);
     if (this.currentVisual && this.currentVisualSig === nextSig) return;
     this.closeupCache.clear();
     if (this.currentVisual) {
@@ -215,6 +263,7 @@ export class CharacterPreview {
         weaponItemId,
         weaponOverride,
         offhandItemId,
+        look,
       );
       this.currentVisualSig = nextSig;
       this.characterGroup.add(this.currentVisual.root);

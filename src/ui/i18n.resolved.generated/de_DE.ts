@@ -337,31 +337,34 @@ export const de_DE: EnTranslations = {
       "healerConfirmCancel": "Abbrechen"
     },
     "unstuck": {
-      "menuButton": "Unstuck",
-      "help": "Recovery: /unstuck starts a stationary countdown to move you to a nearby reachable safe spot.",
-      "helpAtGraveyard": "Recovery: /unstuck starts a stationary countdown, then sends your spirit to the nearest graveyard. Returning through the Pale Keeper requires The Keeper's Toll.",
-      "started": "Unstuck in {seconds} seconds. Moving, fighting, taking damage, or starting another action cancels it.",
-      "countdown": "Unstuck: {seconds}",
-      "completed": "Moved to the nearest reachable safe spot.",
-      "completedAtGraveyard": "Your spirit has returned to the nearest graveyard. Speak to the Pale Keeper to accept The Keeper's Toll.",
-      "revivedAtGraveyard": "You have been returned to the nearest graveyard and revived. The Keeper's Toll weighs on you.",
-      "cancelledMoved": "Unstuck cancelled because you moved.",
-      "cancelledDamaged": "Unstuck cancelled because you took damage.",
-      "cancelledCombat": "Unstuck cancelled because you entered combat.",
-      "cancelledBusy": "Unstuck cancelled because you started another action.",
-      "cancelledState": "Unstuck cancelled because your state changed.",
-      "cancelledDisconnected": "Unstuck cancelled because you disconnected.",
-      "noSafePosition": "No reachable safe spot was found nearby. You were not moved.",
-      "alreadyActive": "Unstuck is already counting down.",
-      "alreadySafe": "You are already in a safe, reachable position.",
-      "cooldown": "Unstuck will be ready in {seconds} seconds.",
-      "dead": "You cannot use Unstuck while dead or in spirit form.",
-      "combat": "You cannot use Unstuck during combat.",
-      "controlled": "You cannot use Unstuck while movement is impaired.",
-      "standStill": "Stand still on solid ground before using Unstuck.",
-      "standStillAnywhere": "Stand still before using Unstuck.",
-      "busy": "Finish your current action before using Unstuck.",
-      "unavailable": "Unstuck is unavailable in your current state."
+      "menuButton": "Befreien",
+      "help": "Rettung: /unstuck startet einen Countdown im Stehen, der dich zu einer nahen, erreichbaren sicheren Stelle bewegt.",
+      "helpAtGraveyard": "Rettung: /unstuck startet einen Countdown im Stehen und schickt deinen Geist dann zum nächsten Friedhof. Die Rückkehr über den Bleichen Hüter erfordert den Hüterzoll.",
+      "helpUnstuckSickness": "Rettung: /unstuck startet einen Countdown im Stehen und bringt dich dann zum nächsten Friedhof, wobei du wiederbelebt wirst, falls du gefallen warst. Die Befreiungskrankheit bleibt bis zu 5 Minuten auf dir.",
+      "started": "Befreien in {seconds} Sekunden. Bewegen, Kämpfen, Schaden erleiden oder eine andere Aktion beginnen bricht es ab.",
+      "countdown": "Befreien: {seconds}",
+      "completed": "Zur nächsten erreichbaren sicheren Stelle bewegt.",
+      "completedAtGraveyard": "Dein Geist ist zum nächsten Friedhof zurückgekehrt. Sprich mit dem Bleichen Hüter, um den Hüterzoll anzunehmen.",
+      "revivedAtGraveyard": "Du wurdest zum nächsten Friedhof zurückgebracht und wiederbelebt. Der Hüterzoll lastet auf dir.",
+      "movedToGraveyard": "Du wurdest zum nächsten Friedhof gebracht. Die Befreiungskrankheit lastet auf dir.",
+      "revivedAtGraveyardUnstuck": "Du wurdest zum nächsten Friedhof gebracht und wiederbelebt. Die Befreiungskrankheit lastet auf dir.",
+      "cancelledMoved": "Befreien abgebrochen, weil du dich bewegt hast.",
+      "cancelledDamaged": "Befreien abgebrochen, weil du Schaden erlitten hast.",
+      "cancelledCombat": "Befreien abgebrochen, weil du in den Kampf eingetreten bist.",
+      "cancelledBusy": "Befreien abgebrochen, weil du eine andere Aktion begonnen hast.",
+      "cancelledState": "Befreien abgebrochen, weil sich dein Zustand geändert hat.",
+      "cancelledDisconnected": "Befreien abgebrochen, weil die Verbindung getrennt wurde.",
+      "noSafePosition": "In der Nähe wurde keine erreichbare sichere Stelle gefunden. Du wurdest nicht bewegt.",
+      "alreadyActive": "Befreien zählt bereits herunter.",
+      "alreadySafe": "Du befindest dich bereits an einer sicheren, erreichbaren Position.",
+      "cooldown": "Befreien ist in {seconds} Sekunden bereit.",
+      "dead": "Du kannst Befreien nicht benutzen, während du tot oder in Geistform bist.",
+      "combat": "Du kannst Befreien nicht im Kampf benutzen.",
+      "controlled": "Du kannst Befreien nicht benutzen, solange deine Bewegung beeinträchtigt ist.",
+      "standStill": "Steh still auf festem Boden, bevor du Befreien benutzt.",
+      "standStillAnywhere": "Steh still, bevor du Befreien benutzt.",
+      "busy": "Schließe deine aktuelle Aktion ab, bevor du Befreien benutzt.",
+      "unavailable": "Befreien ist in deinem aktuellen Zustand nicht verfügbar."
     },
     "scene": {
       "skipHint": "Skip scene (Esc)",
@@ -393,7 +396,8 @@ export const de_DE: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emotes",
-      "done": "Fertig"
+      "done": "Fertig",
+      "close": "Emotes schließen"
     },
     "dailyRewards": {
       "title": "Tägliche Belohnungen",
@@ -776,6 +780,10 @@ export const de_DE: EnTranslations = {
       "ready": "Schwung",
       "seconds": "{seconds}s"
     },
+    "breath": {
+      "label": "Atem",
+      "drowning": "Ertrinken!"
+    },
     "rest": {
       "resting": "Erholung"
     },
@@ -788,6 +796,7 @@ export const de_DE: EnTranslations = {
       "targetAnnounce": "Ziel: {name}",
       "targetOfTargetLabel": "Ziel des Ziels",
       "partyLabel": "Eure Gruppe",
+      "petLabel": "Euer Begleiter",
       "partyChip": "Gruppe",
       "partyGroup": "Gruppe {n}",
       "durationUnitSeconds": "s",
@@ -889,6 +898,13 @@ export const de_DE: EnTranslations = {
       "heroicName": "Heroisch {name}",
       "heroicLocked": "Du bist für Heroisch {name} gesperrt."
     },
+    "riftTracker": {
+      "title": "Riss",
+      "floor": "Ebene {current} von {total}",
+      "closesIn": "Schließt in {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "N",
       "NE": "NO",
@@ -904,7 +920,36 @@ export const de_DE: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m} Min. {s} Sek.",
       "seconds": "{s} Sek.",
-      "autoShowHint": "Zeilen erscheinen automatisch, sobald deine Gruppe Schaden verursacht oder heilt, und dieses Segment schliessen sich einige Sekunden nach Kampfende."
+      "autoShowHint": "Zeilen erscheinen automatisch, sobald deine Gruppe Schaden verursacht oder heilt, und dieses Segment schliessen sich einige Sekunden nach Kampfende.",
+      "threatFallback": "Keine aktive Bedrohung: zeigt Schaden an {name}",
+      "breakdownSummary": "{tab}: {value}",
+      "breakdownRow": "{value} ({percent})",
+      "breakdownOther": "Andere ({count})",
+      "percent": "{value}%",
+      "petAbility": "{pet}: {ability}",
+      "melee": "Nahkampf",
+      "move": "Ziehen, um diese Anzeige zu verschieben",
+      "resize": "Ziehen, um die Größe dieser Anzeige zu ändern",
+      "dock": "Diese Anzeige wieder in das Anzeigenfenster andocken",
+      "separate": "{meter} trennen",
+      "regroup": "{meter} wieder eingliedern"
+    },
+    "targetAuras": {
+      "title": "Auren des Ziels",
+      "keybindLabel": "Stärkungs- und Schwächungszauber des Ziels",
+      "all": "Alle",
+      "debuffs": "Schwächungszauber",
+      "buffs": "Stärkungszauber",
+      "unlock": "Fenster der Zielauren verschieben",
+      "lock": "Fenster der Zielauren sperren",
+      "configureRows": "Auren des Ziels konfigurieren",
+      "fewerRows": "Weniger Aura-Reihen bevorzugen",
+      "moreRows": "Mehr Aura-Reihen bevorzugen",
+      "visibleRows": "Bevorzugte Aura-Reihen: {count}",
+      "showSources": "Aura-Quellen anzeigen",
+      "hideSources": "Aura-Quellen ausblenden",
+      "ownAura": "Deine Aura",
+      "opacity": "Aura-Deckkraft: {percent}"
     },
     "petFeed": {
       "disabledFullHp": "Begleiter hat volle Gesundheit",
@@ -916,18 +961,42 @@ export const de_DE: EnTranslations = {
       "targetFriendlyNext": "Freundliches Ziel wechseln",
       "discord": "Discord",
       "valecup": "Talpokal",
+      "bgFlag": "Schlachtfeld-Flaggenaktion",
       "sheathe": "Waffe einstecken/ziehen",
+      "dive": "Nach unten schwimmen",
       "categoryPet": "Begleiter",
       "petAttack": "Begleiter: Angreifen",
       "petStop": "Begleiter: Stopp",
       "petTaunt": "Begleiter: Verspotten",
       "petDefensive": "Begleiter: Defensiv",
       "petAggressive": "Begleiter: Aggressiv",
-      "mount": "Aufsitzen / Absitzen"
+      "targetPet": "Begleiter: Anvisieren",
+      "mount": "Aufsitzen / Absitzen",
+      "mouseHint": "Maustasten funktionieren ebenfalls: Drücke beim Belegen die mittlere Maustaste (M3) oder eine Daumentaste (M4, M5). Links und rechts bleiben der Kamera, dem Klicken zum Bewegen und dem Anklicken von Objekten in der Welt vorbehalten."
+    },
+    "actionBar": {
+      "editKeys": "Aktionsleisten-Tasten bearbeiten",
+      "editKeysHint": "Klicke einen Platz auf der Aktionsleiste an, dann drücke eine Taste, um ihn zu belegen.",
+      "bannerHint": "Klicke einen Platz an, dann drücke eine Taste, um ihn zu belegen. Klicke zum Abschluss auf Fertig.",
+      "bannerCapturing": "Drücke eine Taste, um diesen Platz zu belegen...",
+      "boundToKey": "Belegt mit {key}.",
+      "reset": "Zurücksetzen",
+      "done": "Fertig",
+      "cancel": "Abbrechen",
+      "resetConfirmTitle": "Aktionsleisten-Tasten zurücksetzen?",
+      "resetConfirmBody": "Die erste Leiste kehrt zu ihren Standardtasten zurück. Die zweite und dritte Leiste verlieren ihre Belegung. Das lässt sich nicht rückgängig machen."
     },
     "mounts": {
       "mount": "Aufsitzen",
-      "useToRide": "Benutzen, um dieses Reittier zu beschwören.",
+      "dismount": "Absitzen",
+      "useToRide": "Benutzen, um dieses Reittier herbeizurufen.",
+      "emptyTitle": "Keine Reittiere gesammelt",
+      "emptyStableHint": "Erreicht Stufe 20 und nehmt bei Stallmeisterin Marla in den Ställen westlich von Highwatch Reitstunden.",
+      "emptyDropHint": "Seltenere Reittiere lassen Dungeon- und Schlachtzugsbosse fallen.",
+      "clickManage": "Anklicken, um Euer Reittier zu wählen",
+      "rarity_common": "Verbreitet",
+      "rarity_rare": "Selten",
+      "rarity_epic": "Episch",
       "spec_speed": "+{pct}% zusätzliche Mobilität",
       "name_valorsteed": "Valorross",
       "name_grag_bear": "Goliath-Gragbär",
@@ -936,32 +1005,123 @@ export const de_DE: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage die Schattensprungkröte",
       "name_stormfeather_griffin": "Himmelsgreif Sturmfeder",
       "name_thunderstrut_gobbler": "Donnerstolz der Große Puter",
+      "name_terrorspark_groundshaker": "Schreckfunke, der Bodenerschütterer",
+      "name_drakemaw_raptor": "Drakenrachen-Raptor",
       "desc_valorsteed": "Ein robustes, trittsicheres Ross, das die Reisegeschwindigkeit erhöht.",
       "desc_grag_bear": "Ein robuster, trittsicherer Bär, der die Reisegeschwindigkeit erhöht.",
       "desc_stalkglider_snail": "Eine herzhafte, ausdauernde Schnecke, die die Reisegeschwindigkeit erhöht.",
       "desc_aether_hover_cycle": "Ein mächtiges Magitech-Rad für schnelles, bodennah schwebendes Kampfmanövrieren.",
       "desc_shadowjump_toad": "Eine massige, trittsichere Riesenkröte, geschult in blitzschnellen Schattensprüngen über jedes Gelände.",
       "desc_stormfeather_griffin": "Ein königlicher Sturmgreif, der mit runenbeschlagenen Klauen und angelegten Schwingen über den Boden pirscht.",
-      "desc_thunderstrut_gobbler": "Ein kolossaler sturmgeborener Puter, der vom Erwachenden Gipfel herabstolziert, den Schwanz gefächert wie eine Gewitterfront."
+      "desc_thunderstrut_gobbler": "Ein kolossaler sturmgeborener Puter, der vom Erwachenden Gipfel herabstolziert, den Schwanz gefächert wie eine Gewitterfront.",
+      "desc_terrorspark_groundshaker": "Eine kompakte gepanzerte Maschine mit schweren Ketten, einer großkalibrigen Kanone und einem Sattel für furchtlose Piloten.",
+      "desc_drakemaw_raptor": "Ein zugerittener Brutraptor aus der Drakenrachen-Caldera, ganz Sehne und Sprint, der noch schwach nach Asche riecht."
     },
     "mountTraining": {
-      "mountPrompt": "Press {key} to mount the training Valorsteed.",
-      "buyReinsPrompt": "Riding learned. Buy Valorsteed reins from Marla for 10 gold, then use them to ride.",
-      "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
-      "begin": "Begin Lesson",
-      "success": "You have tamed the Valorsteed.",
-      "returnToMarla": "Return to Marla at the stables to buy your Valorsteed reins for 10g."
+      "mountPrompt": "Drücke {key}, um das Übungs-Valorross zu besteigen.",
+      "ownedMountPrompt": "Deine Zügel sind in deinen Taschen. Benutze sie, um zu reiten.",
+      "ridePrompt": "Folge der leuchtenden Markierung zur Startlinie und drücke dann Rennen starten.",
+      "begin": "Reitstunde beginnen",
+      "success": "Du hast das Valorross gezähmt.",
+      "returnToMarla": "Kehre zu Marla in den Ställen zurück, um deine Valorross-Zügel für 10g zu kaufen."
     },
     "mountRace": {
-      "startButton": "Start Race",
-      "cancelButton": "Cancel Race",
-      "go": "GO!",
-      "start": "Go! Clear every jump, then ride back through the arch.",
-      "toFinish": "Ride back through the arch!",
-      "finished": "Finished in {seconds}s!",
-      "timeout": "Race Failed",
-      "progress": "Gates {n} of {total}",
+      "startButton": "Rennen starten",
+      "cancelButton": "Rennen abbrechen",
+      "go": "LOS!",
+      "start": "Los! Überspringe jedes Hindernis und reite dann zurück durch den Bogen.",
+      "toFinish": "Reite zurück durch den Bogen!",
+      "finished": "Beendet in {seconds}s!",
+      "timeout": "Rennen gescheitert",
+      "progress": "Tore {n} von {total}",
       "timeLeft": "{seconds}s"
+    },
+    "pvp": {
+      "launcherTitle": "PvP",
+      "mobileLabel": "PvP",
+      "bracket1v1": "1v1",
+      "bracket2v2": "2v2"
+    },
+    "bg": {
+      "title": "Thornhollow-Felder",
+      "blurb": "Zwei zerstörte Festungen stehen sich in einer ummauerten Senke im Schatten des Thornpeak gegenüber: Karmesin im Süden, Azur im Norden, und der ältere Ruinenhof dazwischen, den keine von beiden je gehalten hat. Fünf gegen fünf, je ein Banner, und wer zuerst drei der gegnerischen heimbringt, gewinnt das Feld.",
+      "modeTag": "5v5 Flaggenraub",
+      "offlineNote": "Thornhollow-Felder synchronisiert sich. Die Warteschlange öffnet, sobald das Reich antwortet.",
+      "ratingSummary": "Wertung. {wins} Siege / {losses} Niederlagen",
+      "careerCaptures": "Eroberungen der Karriere: {count}",
+      "enterQueue": "In Warteschlange",
+      "enterQueueParty": "In Warteschlange (Gruppe von {count})",
+      "leaveQueue": "Warteschlange verlassen",
+      "searching": "Suche. {count}/{size} in der Warteschlange.",
+      "queuedParty": "Gruppe von {count}.",
+      "queueNote": "Zwei Teams zu fünft. Stehlt das gegnerische Banner und bringt es zu Eurer Festung. Wer zuerst 3 Eroberungen erreicht, gewinnt. Gruppiert Euch zu bis zu 5 und reiht Euch gemeinsam ein; schnappt Euch Sprint-Runen und nutzt die Deckung, um Eure Verfolger abzuschütteln.",
+      "matchInProgress": "Kampf läuft. {crimson}:{azure}.",
+      "ladderAllTime": "Rangliste. Gesamt",
+      "noRanked": "Noch keine Champions in der Wertung. Seid die Ersten.",
+      "ladderOnline": "Rangliste. Jetzt online",
+      "noChallengers": "Gerade keine Champions online. Seid die Ersten.",
+      "playerLevelClassTitle": "{name}. Stufe {level} {className}",
+      "playerClassTitle": "{name}. {className}",
+      "crimson": "Karmesin",
+      "azure": "Azur",
+      "yourTeamTitle": "Euer Team",
+      "clock": "{minutes}:{seconds}",
+      "formUp": "Antreten: {seconds}",
+      "firstTo": "Zuerst auf {caps} Eroberungen",
+      "flagState": {
+        "home": "Flagge in der Festung",
+        "carried": "Flagge gestohlen!",
+        "dropped": "Flagge am Boden"
+      },
+      "respawnIn": "Nächste Welle: Wiederbelebung in {seconds}",
+      "resultVictory": "Sieg!",
+      "resultDefeat": "Niederlage",
+      "resultDraw": "Unentschieden",
+      "leavingIn": "Verlasst das Schlachtfeld in {seconds}",
+      "killFeed": "{killer} hat {victim} niedergestreckt",
+      "killFeedFallen": "{victim} ist gefallen",
+      "foundBanner": "Kampf gefunden. Ihr kämpft für die {team}!",
+      "countdownBanner": "Thornhollow-Felder beginnt in {seconds}",
+      "startBanner": "Erobert die Flagge!",
+      "flagTakenLog": "{name} hat die {team}-Flagge genommen!",
+      "flagDroppedLog": "Die {team}-Flagge wurde fallen gelassen.",
+      "flagReturnedLog": "Die {team}-Flagge wurde zurückgebracht.",
+      "dropFlagConfirmTitle": "Flagge fallen lassen?",
+      "dropFlagConfirmBody": "Ihr tragt die gegnerische Flagge. Wenn Ihr sie fallen lasst, bleibt sie am Boden liegen, wo beide Teams sie erreichen können.",
+      "dropFlagConfirmAccept": "Flagge fallen lassen",
+      "boardToggleLabel": "Spielstatistik. Drückt Eingabe, um die vollständige Tafel angeheftet zu öffnen.",
+      "levelRequirement": "Ihr müsst Stufe {level} erreichen, um Euch für dieses Schlachtfeld einreihen zu können.",
+      "board": {
+        "kills": "Kills",
+        "assists": "Unterstützungen",
+        "deaths": "Tode",
+        "captures": "Eroberungen"
+      },
+      "flagTakenBanner": "Die {takers} haben die {team}-Flagge genommen!",
+      "flagReturnedBanner": "Die {team}-Flagge wurde zurückgebracht!",
+      "capturedTeamBanner": "Die {takers} haben die {team}-Flagge erobert! {crimson}:{azure}",
+      "capturedLog": "{name} hat die {team}-Flagge erobert. Punktestand {crimson}:{azure}.",
+      "victoryBanner": "Sieg! Thornhollow-Felder {crimson}:{azure}. Wertung {rating} ({delta})",
+      "defeatBanner": "Niederlage. Thornhollow-Felder {crimson}:{azure}. Wertung {rating} ({delta})",
+      "drawBanner": "Thornhollow-Felder unentschieden {crimson}:{azure}. Wertung {rating} ({delta})",
+      "endBannerDetail": "Thornhollow-Felder {crimson}:{azure}. Wertung {rating} ({delta})",
+      "endLog": "Thornhollow-Felder endete {crimson}:{azure}. Wertung {rating} ({delta}).",
+      "endedTimer": "Zeit abgelaufen",
+      "endedForfeit": "Das Spiel wurde aufgegeben",
+      "endedTimerLog": "Die Spielzeit lief ab; der höhere Punktestand gewann das Feld.",
+      "endedForfeitLog": "Das Spiel wurde aufgegeben.",
+      "firstWinBonusLine": "Erster Sieg des Tages: +{honor} Ehre",
+      "firstWinBonusLog": "Erster Sieg des Tages: Ihr erhaltet {honor} Bonus-Ehre.",
+      "timeWarningMinutes": "{minutes} Minuten verbleiben",
+      "timeWarningOneMinute": "Eine Minute verbleibt",
+      "timeWarningMinutesLog": "{minutes} Minuten verbleiben im Kampf.",
+      "timeWarningOneMinuteLog": "Eine Minute verbleibt im Kampf.",
+      "map": {
+        "crimsonKeep": "Karmesinfeste",
+        "azureKeep": "Azurfeste",
+        "ruinCourtyard": "Der Ruinenhof",
+        "graveyard": "Friedhof"
+      }
     },
     "vcup": {
       "title": "Der Talpokal",
@@ -985,6 +1145,7 @@ export const de_DE: EnTranslations = {
       },
       "awayNote": "Fliegen beide Seiten dasselbe Banner, spielt die Auswärtsseite in den umgekehrten Farben.",
       "rolesHeading": "Sportrolle",
+      "rolesSmallBracketNote": "In den Staffeln 1v1 und 2v2 spielt jeder Kämpfer das Allrounder-Repertoire. Taten, die die Staffel 3v3 oder größer verlangen, lassen sich hier nicht erringen.",
       "role": {
         "allrounder": {
           "name": "Allrounder",
@@ -1026,6 +1187,7 @@ export const de_DE: EnTranslations = {
       "guildBoardWl": "{wins} S, {losses} N",
       "practice": "Training gegen Bots",
       "practiceNote": "Startet sofort ein privates Bot-Spiel auf deinem eigenen Trainingsplatz.",
+      "practiceUnratedNote": "Trainingsspiele sind ungewertet: Siegertafel und Fortschritt im Buch der Taten zählen nicht.",
       "practicingNow": "Gerade im Training ({count}):",
       "clock": "{minutes}:{seconds}",
       "indicatorQueued": "Talpokal-Warteschlange: {bracket}, Position {position} von {count}",
@@ -1068,6 +1230,8 @@ export const de_DE: EnTranslations = {
         "rule5": "Jeder kann vorbeikommen und dich von den Rängen aus anfeuern.",
         "kitHeading": "Deine Ausrüstung",
         "kitNote": "Diese Manöver ersetzen für das Spiel deine Klassenfähigkeiten.",
+        "unratedNote": "Bots stehen auf dem Platz, daher ist diese Partie ungewertet: Die Siegertafel bewegt sich nicht, und Taten für Tore, Paraden und Spiele ohne Gegentor zählen nicht.",
+        "practiceUnratedNote": "Dies ist ein Trainingsspiel und damit ungewertet: Die Siegertafel bewegt sich nicht, und Fortschritt im Buch der Taten zählt nicht.",
         "rosterHeading": "Die Aufstellung",
         "you": "Du",
         "bot": "Bot",
@@ -1109,6 +1273,33 @@ export const de_DE: EnTranslations = {
       "browserEffectsReduced": "Reduziert",
       "browserEffectsMinimal": "Minimal",
       "browserEffectsNote": "Der Automatikmodus reduziert aufwendige CSS-Effekte (Unschärfe, Leuchten, Hintergrundbewegung) je nach Browser und Gerät. Senke ihn manuell, wenn sich die Oberfläche träge anfühlt.",
+      "graphicsApply": "Grafik anwenden",
+      "graphicsApplying": "Grafikeinstellungen werden angewendet...",
+      "graphicsApplied": "Grafikeinstellungen angewendet.",
+      "graphicsSaved": "Grafikeinstellungen gespeichert. Der aktive Renderer entspricht ihnen bereits.",
+      "graphicsFailed": "Grafik konnte nicht angewendet werden. Deine vorherigen Einstellungen sind weiterhin aktiv.",
+      "graphicsRetry": "Grafik erneut versuchen",
+      "graphicsFatal": "Grafik-Wiederherstellung fehlgeschlagen. Lade das Spiel neu, um fortzufahren.",
+      "graphicsReload": "Spiel neu laden",
+      "graphicsDraftChanged": "Grafikänderungen sind bereit zum Anwenden.",
+      "gfxSectionQuality": "Qualität",
+      "gfxSectionWorld": "Weltdetail",
+      "gfxSectionLighting": "Licht und Effekte",
+      "gfxSectionCamera": "Kamera",
+      "gfxSectionDisplay": "Anzeige",
+      "gfxSectionSystem": "System",
+      "gfxSectionTouch": "Touch-Steuerung",
+      "gfxViewDistance": "Sichtweite",
+      "gfxWaterQuality": "Wasserqualität",
+      "gfxCharacterDetail": "Charakterdetail",
+      "gfxAmbientOcclusion": "Ambient Occlusion",
+      "gfxBloom": "Bloom",
+      "gfxAntiAliasing": "Anti-Aliasing",
+      "gfxDynamicLights": "Dynamische Lichter",
+      "gfxParticleEffects": "Partikeleffekte",
+      "gfxHalf": "Halb",
+      "gfxCustomNote": "Das Ändern eines Reglers wechselt die Qualitätsvoreinstellung zu Erweitert: eine eigene Mischung auf Grundlage der Hoch-Qualitätsstufe, ausgehend von den Werten deiner aktuellen Voreinstellung.",
+      "gfxEffectsNote": "Ambient Occlusion, Bloom und Anti-Aliasing laufen über die Nachbearbeitungskette: Ist Licht und Effekte auf Niedrig gestellt, ist die Kette deaktiviert und sie haben keine Wirkung.",
       "interfaceMode": "Steuerungsmodus",
       "interfaceModeAuto": "Auto",
       "interfaceModeDesktop": "Desktop",
@@ -1130,6 +1321,7 @@ export const de_DE: EnTranslations = {
       "aurasOnPlayerFrame": "Stärkungszauber am Spielerfenster",
       "highContrastBackground": "Hintergrund mit hohem Kontrast",
       "startAttackOnAbility": "Auto-Angriff bei Fähigkeitseinsatz",
+      "stopAutoAttackOnTargetSwitch": "Automatischen Angriff bei Zielwechsel stoppen",
       "walkByAutoloot": "Plündern im Vorbeigehen",
       "groundReticle": "Bodenziel-Fadenkreuz",
       "mouseoverCast": "Mouseover-Wirken auf Gruppenfenstern",
@@ -1139,7 +1331,11 @@ export const de_DE: EnTranslations = {
       "itemScoreLine": "Wertung {score}",
       "showSecondaryActionBar": "Zweite Aktionsleiste anzeigen",
       "showThirdActionBar": "Dritte Aktionsleiste anzeigen",
+      "hideUnusedActionSlots": "Ungenutzte Aktionsfelder ausblenden",
+      "lockActionBars": "Aktionsleisten sperren",
       "showTargetOfTarget": "Ziel des Ziels anzeigen",
+      "showPetFrame": "Euren Begleiter anzeigen",
+      "waterRipples": "Wasserwellen (Kielwasser)",
       "showAttackButton": "Angriffs-Schaltflache anzeigen",
       "showDailyRewardsChest": "Truhe der täglichen Belohnungen anzeigen",
       "mobileCameraJoystick": "Kamera-Joystick",
@@ -1176,6 +1372,8 @@ export const de_DE: EnTranslations = {
       "buttons": "Tastenbelegung",
       "resetButtons": "Tastenbelegung zurücksetzen",
       "menuAction": "Spielmenü",
+      "zoomIn": "Einzoomen",
+      "zoomOut": "Auszoomen",
       "help": "Linker Stick bewegt, rechter Stick steuert die Kamera. Öffne ein Fenster, um den Bildschirmzeiger zu verwenden."
     },
     "perf": {
@@ -1250,26 +1448,99 @@ export const de_DE: EnTranslations = {
         "offline": "Offline"
       }
     },
+    "auraOverlay": {
+      "title": "Auren",
+      "currentClass": "Aktuelle Klasse: {class}",
+      "previewHint": "Nutze Positionen einrichten, um eine Aura zu verschieben, ohne das Menü zu verdecken.",
+      "noProcs": "Für diesen Charakter ist kein unterstützter Proc verfügbar.",
+      "enabled": "Aura anzeigen",
+      "icon": "Zaubersymbol",
+      "arcs": "Seitliche Halbmonde",
+      "groundRing": "Bodenring",
+      "groundRingSpellOrder": "Bodenring: Zauberreihenfolge",
+      "crescentsSpellOrder": "Seitliche Halbmonde: Zauberreihenfolge",
+      "size": "Größe",
+      "iconSize": "Symbolgröße",
+      "crescentBlockSize": "Blockgröße der Halbmonde",
+      "groundRingBlockSize": "Blockgröße des Bodenrings",
+      "opacity": "Deckkraft",
+      "color": "Farbe",
+      "allOn": "Alle an",
+      "allOff": "Alle aus",
+      "reposition": "Positionen einrichten",
+      "positioning": "Positionierung: {aura}",
+      "selectAura": "Aura",
+      "done": "Fertig",
+      "moveLeft": "Nach links",
+      "moveUp": "Nach oben",
+      "moveDown": "Nach unten",
+      "moveRight": "Nach rechts",
+      "moveEarlier": "Zauber nach innen verschieben",
+      "moveLater": "Zauber nach außen verschieben",
+      "screenPosition": "Bildschirmposition",
+      "spellOrder": "Zauberreihenfolge",
+      "reset": "Position zurücksetzen",
+      "spellPosition": "Zauberreihenfolge {position} / {count}",
+      "procs": {
+        "revenge": "Rache!",
+        "battleTrance": "Kampftrance",
+        "overpowerCharge": "Rothand-Stärkung",
+        "suddenDeath": "Plötzlicher Tod",
+        "victoryRush": "Siegesrausch",
+        "enrage": "Gemetzel: Rasend",
+        "heatingUp": "Aufheizen",
+        "arcaneCharge": "Arkane Ladungen",
+        "aetherRush": "Aether-Ansturm"
+      }
+    },
     "playerCard": {
       "showWalletBadge": "Wallet-Abzeichen anzeigen"
     },
     "landing": {
       "highContrast": "Hoher Kontrast",
-      "highContrastAria": "Hintergrund mit hohem Kontrast umschalten: deaktiviert den bewegten Trailer, damit der Text des Startbildschirms lesbar bleibt"
+      "highContrastAria": "Hintergrund mit hohem Kontrast umschalten: deaktiviert den bewegten Trailer, damit der Text des Startbildschirms lesbar bleibt",
+      "browserSupport": {
+        "title": "Achtung: nicht unterstützter Browser",
+        "body": "In diesem Browser kann es zu verringerter Leistung kommen. Für das beste Erlebnis lade dir die Desktop-App für Windows, macOS oder Linux herunter. Du spielst lieber im Browser? Chrome läuft am besten, und Firefox sowie Safari werden ebenfalls unterstützt.",
+        "getDesktopApp": "Desktop-App herunterladen",
+        "continueInBrowser": "Im Browser fortfahren",
+        "dismissAria": "Hinweis zum nicht unterstützten Browser schließen"
+      }
     },
     "warfare": {
       "honorAmount": "{amount} Ehre",
       "dualPrice": "{money} + {honor}",
       "balance": "Ehre: {amount}",
       "honorFloat": "+{amount} Ehre",
+      "honorFloatReason": "+{amount} Ehre ({reason})",
       "honorGain": "Du erhältst {amount} Ehre ({reason}).",
       "notEnoughHonor": "Nicht genug Ehre.",
       "reasons": {
         "arenaWin": "Arenasieg",
         "fiestaKill": "Fiesta-Ausschaltung",
         "fiestaComplete": "Fiesta abgeschlossen",
-        "fiestaWin": "Fiesta-Sieg"
+        "fiestaWin": "Fiesta-Sieg",
+        "battlegroundWin": "Thornhollow-Felder-Sieg",
+        "battlegroundFirstWin": "erster heutiger Sieg in den Thornhollow-Feldern",
+        "battlegroundComplete": "Kampf um die Thornhollow-Felder ausgetragen",
+        "battlegroundKill": "ehrenhafte Ausschaltung",
+        "battlegroundAssist": "Unterstützung beim Todesstoß"
+      },
+      "floatReasons": {
+        "kill": "Ausschaltung",
+        "assist": "Unterstützung",
+        "firstWin": "Erster Sieg"
       }
+    },
+    "warfareShop": {
+      "gossipOption": "Kriegsführungs-Sets durchsuchen",
+      "gossipOptionAria": "Den von {name} angebotenen Kriegsführungs-Set-Laden durchsuchen",
+      "jewelry": "Schmuck",
+      "weapons": "Waffen",
+      "owned": "Im Besitz",
+      "buyAria": "{item} für {honor} kaufen",
+      "buyOwnedAria": "{item} für {honor} kaufen, bereits im Besitz",
+      "buyConfirmBody": "{item} für {honor} kaufen? Käufe mit Ehre können nicht erstattet werden."
     },
     "charSheet": {
       "offense": "Angriff",
@@ -1341,6 +1612,7 @@ export const de_DE: EnTranslations = {
     },
     "itemHeroicTag": "[HEROISCH]",
     "itemSoulbound": "Seelengebunden",
+    "itemUniqueEquipped": "Einzigartig (ausgerüstet)",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1427,7 +1699,9 @@ export const de_DE: EnTranslations = {
     },
     "paperdoll": {
       "unequipAria": "{item} ablegen",
-      "unequipHint": "Klicke auf ×, Rechtsklick oder in die Taschen ziehen zum Ablegen"
+      "unequipHint": "Klicke auf ×, Rechtsklick oder in die Taschen ziehen zum Ablegen",
+      "hideHelmAria": "Helm verbergen",
+      "showHelmAria": "Helm anzeigen"
     },
     "account": {
       "title": "Konto",
@@ -1493,6 +1767,10 @@ export const de_DE: EnTranslations = {
       "twoFactorRecoveryTitle": "Speichert Eure Wiederherstellungscodes",
       "twoFactorRecoveryHint": "Jeder Code funktioniert nur einmal. Bewahrt sie an einem sicheren Ort auf: Sie sind der einzige Weg zurück, falls Ihr Eure Authentifizierungs-App verliert.",
       "twoFactorDownloadCodes": "Codes herunterladen",
+      "recoveryCodesFileHeader": "{brand}-Wiederherstellungscodes",
+      "recoveryCodesFileAccount": "Konto: {username}",
+      "recoveryCodesFileHint": "Jeder Code kann einmal verwendet werden, falls Ihr den Zugriff auf Eure Authentifizierungs-App verliert.",
+      "recoveryCodesFileWarn": "Bewahrt diese Datei an einem sicheren, privaten Ort auf.",
       "twoFactorDone": "Fertig",
       "twoFactorDisableHint": "Gebt Euer Passwort ein, um die Zwei-Faktor-Authentifizierung zu deaktivieren. Eure Wiederherstellungscodes werden verworfen.",
       "twoFactorDisableBtn": "Zwei-Faktor deaktivieren",
@@ -1534,10 +1812,12 @@ export const de_DE: EnTranslations = {
       "title": "Verwerten",
       "harvestButton": "Verwerten",
       "harvestTooltip": "Verwirft die markierten Komponenten. Jeder Kadaver kann einmal verwertet werden, wer zuerst kommt. Nimmt nicht die Beute.",
-      "concentrateHint": "Je weniger Teile du wählst, desto höher ist die Qualitätsstufe jedes einzelnen Teils.",
+      "yieldTierHint": "Je weniger Teile eine Verwertung tatsächlich entnimmt, desto höher ist die Sammelstufe jedes einzelnen Teils.",
       "nothingSelectedYields": "An diesem Kadaver gibt es nichts aus deiner Auswahl zu verwerten.",
       "alreadyHarvested": "Dieser Kadaver wurde bereits verwertet.",
       "componentAria": "{component} verwerten",
+      "componentNoYield": "noch nichts",
+      "componentAriaNoYield": "{component} verwerten: {note}",
       "components": {
         "hide": "Haut",
         "fang": "Fangzahn",
@@ -1560,7 +1840,13 @@ export const de_DE: EnTranslations = {
       "saveButton": "Fokus speichern",
       "notInTownHint": "Du musst in der Stadt sein, um deinen Fokus festzulegen.",
       "increaseAria": "Fokus auf {component} erhöhen",
-      "decreaseAria": "Fokus auf {component} verringern"
+      "decreaseAria": "Fokus auf {component} verringern",
+      "respecTierLabel": "Umverteilungstempo",
+      "respecTierTimeOption": "Kostenlos (Zeit lassen)",
+      "respecTierPartialOption": "Schneller (geringe Kosten)",
+      "respecTierInstantOption": "Sofort (voller Preis)",
+      "respecCostFree": "Kostenlos",
+      "respecCostLine": "Kostet {coin} und {materials}"
     },
     "party": {
       "promoteLeader": "Zum Anführer befördern",
@@ -1618,13 +1904,16 @@ export const de_DE: EnTranslations = {
       "itemAriaEnchanted": "{item}, Menge {count}, verzauberte Kopie",
       "itemAriaBound": "{item}, Menge {count}, gebundene Kopie",
       "itemAriaMasterwork": "{item}, Menge {count}, Meisterwerk",
+      "itemAriaQuest": "{item}, Menge {count}, Questgegenstand",
       "filterGroupAria": "Taschen nach Kategorie filtern",
       "filterAll": "Alle",
       "filterWeapon": "Waffen",
       "filterArmor": "Rüstung",
       "filterConsumable": "Verbrauchbares",
       "filterMaterial": "Materialien",
+      "filterTool": "Werkzeuge",
       "filterQuest": "Quest",
+      "filterQuestCountAria": "Quest, {count} Gegenstände",
       "filterMount": "Reittiere",
       "sortAria": "Taschengegenstände sortieren",
       "sortRecent": "Neueste",
@@ -1633,6 +1922,7 @@ export const de_DE: EnTranslations = {
       "searchPlaceholder": "Gegenstände durchsuchen",
       "searchAria": "Taschengegenstände nach Namen durchsuchen",
       "noMatch": "Keine Gegenstände entsprechen Euren Filtern.",
+      "noQuestItems": "Keine Questgegenstände in Euren Taschen.",
       "capacity": "{used}/{total}",
       "capacityAria": "Belegte Taschenplätze: {used} von {total}",
       "backpack": "Rucksack",
@@ -1666,6 +1956,7 @@ export const de_DE: EnTranslations = {
       "dmgDoneReduce": "Verringert den verursachten Schaden um {pct}%",
       "heatingUp": "Dein nächster aufeinanderfolgender kritischer Feuer-Builderstreffer gewährt Heiße Serie; ein nicht-kritischer Builder entfernt Aufheizen",
       "elementalConvergencePrimed": "Dein nächster Zauber der anderen Elementarschule gewährt Elementarkonvergenz",
+      "carriedFlag": "Ihr tragt die gegnerische Flagge. Hebt diesen Effekt auf, um sie fallen zu lassen.",
       "battleStance": "Kampfhaltung: 10% mehr Wuterzeugung",
       "berserkerStance": "Berserkerhaltung: Kritische Treffer gelingen 3% öfter und treffen 3% härter",
       "crit": "Erhöht kritische Trefferchance um {pct}%",
@@ -1801,7 +2092,9 @@ export const de_DE: EnTranslations = {
       "levelFamily": "Stufe {level} {family}",
       "familyDemon": "Dämon",
       "hostile": "Feindlich",
-      "friendly": "Freundlich"
+      "friendly": "Freundlich",
+      "elite": "Elite",
+      "boss": "Boss"
     },
     "targetFrame": {
       "unlock": "Zielfenster verschieben",
@@ -1836,6 +2129,8 @@ export const de_DE: EnTranslations = {
       "showResource": "Mana, Wut und Energie anzeigen",
       "showAbsorbs": "Absorptionsschilde anzeigen",
       "showAuras": "Stärkungs- und Schwächungseffekte anzeigen",
+      "showPets": "Begleiter anzeigen",
+      "petHealth": "Begleiter {name}, {pct} Gesundheit",
       "showSelf": "Eigenen Rahmen anzeigen"
     },
     "frameReset": {
@@ -1843,13 +2138,16 @@ export const de_DE: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "Benötigt Stufe {level}",
-      "riftTier": "{tier}-rank Rift item",
-      "riftUpgrade": "Rift upgrade {level}/{max}",
-      "riftSockets": "Rift gems {used}/{total}",
+      "riftTier": "Riss-Gegenstand (Rang {tier})",
+      "riftUpgrade": "Riss-Aufwertung {level}/{max}",
+      "riftSockets": "Riss-Edelsteine {used}/{total}",
       "statEnchanted": "+{value} {stat} (Verzaubert)",
       "enchantedFallback": "Verzaubert"
     },
     "materialHint": {
+      "fineGrade": "Feine Güte. An einer Ader voller Stufe mit einem Werkzeug über dem Rang des Materials gesammelt; zählt überall dort als die gewöhnliche Version, wo diese verlangt wird.",
+      "cookingCatch": "Kochzutat. Muss vor dem Verzehr gekocht werden.",
+      "usedBy": "Verwendet von {crafts}.",
       "arcaneDust": "Verzauberungsreagenz. Entzaubert aus gewöhnlicher und ungewöhnlicher Ausrüstung.",
       "arcaneEssence": "Verzauberungsreagenz. Entzaubert aus seltener Ausrüstung.",
       "arcaneShard": "Verzauberungsreagenz. Entzaubert aus epischer und legendärer Ausrüstung.",
@@ -2047,6 +2345,14 @@ export const de_DE: EnTranslations = {
       "benefits": "Verknüpfe dein Steam-Konto über die Desktop-App, um die Taten, die du erringst, als Steam-Errungenschaften zu spiegeln.",
       "noTicket": "Steam hat kein Verknüpfungsticket geliefert. Starte Steam und versuch es dann erneut."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Epic verknüpfen",
+      "unlink": "Epic-Verknüpfung aufheben",
+      "linked": "Mit Epic-Konto {id} verknüpft",
+      "benefits": "Verknüpfe dein Epic-Konto über die Epic-Desktop-App, um deine erspielten Taten als Epic-Erfolge zu spiegeln.",
+      "noProof": "Epic hat keinen Verknüpfungsnachweis geliefert. Starte über den Epic Games Store und versuche es erneut."
+    },
     "mailbox": {
       "title": "Briefkasten",
       "subtitle": "Die Rabenpost",
@@ -2091,6 +2397,7 @@ export const de_DE: EnTranslations = {
         "noRecipient": "Niemand mit diesem Namen unterhält hier einen Briefkasten.",
         "tooManyParcels": "Ein Brief trägt höchstens {count} Pakete.",
         "noMailQuestItems": "Questgegenstände können nicht verschickt werden.",
+        "noMailBound": "Dieser Gegenstand ist gebunden und kann nicht verschickt werden.",
         "notEnoughItems": "So viele davon hast du nicht zum Versenden.",
         "cantAffordPostage": "Du kannst dir das Porto nicht leisten.",
         "recipientBoxFull": "Der Briefkasten des Empfängers ist voll.",
@@ -2122,6 +2429,7 @@ export const de_DE: EnTranslations = {
       "depositHint": "Klicke, um einzulagern",
       "depositPartialHint": "Umschalt-Klick, um eine Teilmenge einzulagern",
       "cannotDeposit": "Kann nicht eingelagert werden",
+      "cannotDepositNow": "Kann derzeit nicht eingelagert werden",
       "depositQuantityTitle": "{item} einlagern",
       "depositQuantityInput": "Einzulagernde Menge",
       "depositQuantityConfirm": "Einlagern",
@@ -2132,6 +2440,7 @@ export const de_DE: EnTranslations = {
       "sortAria": "Bankgegenstände sortieren",
       "searchAria": "Bankgegenstände nach Namen durchsuchen",
       "depositAll": "Alle Materialien einlagern",
+      "depositAllTooltip": "Sendet jeden Handwerksreagenz und Ramschgegenstand aus deinen Taschen in einem Rutsch zur Bank. Sammelwerkzeuge, angelegte Ausrüstung, Questgegenstände und Verbrauchsgüter werden nie angetastet.",
       "depositAllDone": "Eingelagerte Materialien: {count}.",
       "depositAllFull": "Eingelagerte Materialien: {count}. Die Bank ist jetzt voll.",
       "depositAllNone": "Bank voll: nichts eingelagert.",
@@ -2147,7 +2456,52 @@ export const de_DE: EnTranslations = {
       "bonusAdvertWallet": "Verknüpfe eine Wallet und erhalte 2 Fächer.",
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "Lade einen Freund ein: Erreicht er Stufe 10, erhaltet ihr beide 2 Fächer, bis zu 5 Freunde.",
-      "bonusSectionAria": "Bonus-Bankfächer und wie du mehr davon verdienst"
+      "bonusSectionAria": "Bonus-Bankfächer und wie du mehr davon verdienst",
+      "tabsAria": "Bank-Reiter",
+      "personalTab": "Persönlich",
+      "guildTab": "Gilde",
+      "guildCapacityAria": "Belegte Gildenbankfächer: {used} von {total}",
+      "guildEmpty": "Die Gildenbank ist leer.",
+      "guildTreasury": "Gildenkasse",
+      "guildDepositGold": "Geld einzahlen",
+      "guildWithdrawGold": "Geld abheben",
+      "guildDepositGoldTitle": "Geld in die Gildenkasse einzahlen",
+      "guildWithdrawGoldTitle": "Geld aus der Gildenkasse abheben",
+      "guildGoldAvailable": "Verfügbar: {amount}",
+      "guildBuyConfirm": "{count} zusätzliche Gildenbankfächer für {price} aus der Gildenkasse kaufen?",
+      "guildBuyNote": "Aus der Gildenkasse bezahlt",
+      "guildTreasuryShort": "Kasse reicht nicht",
+      "guildOpenBank": "Die Gildenbank eröffnen",
+      "guildOpenConfirm": "Die Gildenbank für {price} eröffnen? Dies wird aus Eurem eigenen Geld bezahlt.",
+      "guildOpenAccept": "Eröffnen",
+      "guildOpenNote": "Aus Eurem eigenen Geld bezahlt, nicht aus der Gildenkasse",
+      "guildPurseShort": "Nicht genug Geld",
+      "guildReadOnlyNote": "Nur Gildenoffiziere dürfen Änderungen an der Gildenbank vornehmen.",
+      "guildUnopenedNote": "Die Gildenbank wurde noch nicht eröffnet.",
+      "guildDormantNote": "Gesperrte Gegenstände können nicht entnommen werden und verhindern die Auflösung der Gilde.",
+      "guildDormantHint": "Dieser Gegenstand ist in der Gildenbank gesperrt und kann nicht entnommen werden.",
+      "guildDormantAria": "{item}, Menge {count}, kann nicht entnommen werden",
+      "guildUnknownItem": "Unbekannter Gegenstand",
+      "guildDepositHint": "Klickt, um in die Gildenbank einzulagern",
+      "guildCannotDeposit": "Kann nicht in die Gildenbank gelegt werden",
+      "guildGoldCannotMove": "Dieser Betrag kann derzeit nicht bewegt werden.",
+      "guildViewsAria": "Gildenbank-Ansichten",
+      "guildContentsTab": "Inhalt",
+      "guildLogTab": "Protokoll",
+      "logAria": "Aktivitätsprotokoll der Gildenbank",
+      "logNote": "Die {count} letzten Aktionen der Gildenbank.",
+      "logLoading": "Protokoll der Gildenbank wird geladen...",
+      "logEmpty": "Es wurde noch nichts in die Gildenbank eingelagert oder aus ihr entnommen.",
+      "logUnavailable": "Das Protokoll der Gildenbank kann derzeit nicht gelesen werden.",
+      "logFormerMember": "Ein ehemaliges Gildenmitglied",
+      "logDepositItem": "{actor} hat {count} {item} eingelagert",
+      "logWithdrawItem": "{actor} hat {count} {item} entnommen",
+      "logDepositMoney": "{actor} hat {amount} eingezahlt",
+      "logWithdrawMoney": "{actor} hat {amount} abgehoben",
+      "logBuySlots": "{actor} hat eine Bankerweiterung für {amount} gekauft",
+      "logOpenBank": "{actor} hat die Gildenbank für {amount} eröffnet",
+      "logCharterFee": "{actor} hat die Gildengründungsgebühr von {amount} bezahlt",
+      "logAdminPurge": "Ein Administrator hat {count} {item} entfernt"
     },
     "calendar": {
       "title": "Ereigniskalender",
@@ -2185,10 +2539,6 @@ export const de_DE: EnTranslations = {
           "title": "Markttag",
           "note": "Der Händler erwartet frische Ware. Ein guter Tag, um auf dem Weltmarkt zu stöbern."
         },
-        "fiestaNight": {
-          "title": "Fiesta-Nacht",
-          "note": "Der 2v2-Fiesta-Ring zieht heute Nacht sein lautestes Publikum an."
-        },
         "arenaClash": {
           "title": "Arena-Schlagabtausch",
           "note": "Duellanten strömen zum Aschenkolosseum. Stell dich an und erklimm die Rangliste."
@@ -2225,6 +2575,7 @@ export const de_DE: EnTranslations = {
       "billboard": {
         "label": "Gildenpinnwand",
         "empty": "Noch nichts an der Pinnwand.",
+        "loginLine": "Gildenpinnwand: {text}",
         "setBy": "Festgelegt von {name}",
         "save": "Speichern",
         "placeholder": "Schreib eine Nachricht für die Gilde...",
@@ -2250,6 +2601,7 @@ export const de_DE: EnTranslations = {
       "catchLine": "Du holst ein: {name}",
       "biteLine": "Etwas nimmt den Köder!",
       "gotAwayLine": "Es ist entkommen.",
+      "earlyReelLine": "Du holst zu früh ein. Nichts hatte angebissen.",
       "nodeName": {
         "ore": "Erzader",
         "wood": "Holzstand",
@@ -2268,7 +2620,8 @@ export const de_DE: EnTranslations = {
       "toolTierUnmet": {
         "mining": "Du brauchst eine Bergbau-Spitzhacke der Stufe {tier}, um diese Ader abzubauen.",
         "logging": "Du brauchst eine Holzfäller-Axt der Stufe {tier}, um diesen Stand zu fällen.",
-        "herbalism": "Du brauchst eine Kräuterkunde-Sichel der Stufe {tier}, um diese Pflanze zu sammeln."
+        "herbalism": "Du brauchst eine Kräuterkunde-Sichel der Stufe {tier}, um diese Pflanze zu sammeln.",
+        "fishing": "Du brauchst eine Angelrute der Stufe {tier}, um in diesen Gewässern zu angeln."
       },
       "toolRequired": {
         "mining": "Du brauchst eine Bergbau-Spitzhacke, um diese Ader abzubauen.",
@@ -2281,6 +2634,12 @@ export const de_DE: EnTranslations = {
         "logging": "In Reichweite ist keine Baumgruppe.",
         "herbalism": "In Reichweite ist keine Kräuterpflanze."
       },
+      "wieldUnmet": {
+        "mining": "Du brauchst Bergbau {skill}, um die Spitzhacke in deinen Taschen zu schwingen.",
+        "logging": "Du brauchst Holzfällen {skill}, um die Axt in deinen Taschen zu schwingen.",
+        "herbalism": "Du brauchst Kräuterkunde {skill}, um die Sichel in deinen Taschen zu führen."
+      },
+      "wieldUnmetCorpse": "Du brauchst Sammelfertigkeit {skill}, um dein bestes Werkzeug einzusetzen.",
       "toolTierUnmetCorpse": "Du brauchst ein Sammelwerkzeug der Stufe {tier}, um die feinsten Materialien zu gewinnen.",
       "toolTooltip": {
         "kind": {
@@ -2292,7 +2651,8 @@ export const de_DE: EnTranslations = {
         "unlocks": {
           "mining": "Erforderlich, um Erzadern bis Stufe {tier} abzubauen.",
           "logging": "Erforderlich, um Baumgruppen bis Stufe {tier} zu fällen.",
-          "herbalism": "Erforderlich, um Kräuterpflanzen bis Stufe {tier} zu sammeln."
+          "herbalism": "Erforderlich, um Kräuterpflanzen bis Stufe {tier} zu sammeln.",
+          "fishing": "Erforderlich, um in Gewässern bis Stufe {tier} zu angeln."
         },
         "use": {
           "mining": "Benutzen: Baut eine Erzader in der Nähe ab.",
@@ -2307,8 +2667,12 @@ export const de_DE: EnTranslations = {
       },
       "downgradeMark": "Taschen voll: der Fund wurde ohne Sammelzeichen gespeichert.",
       "downgradeFind": "Taschen voll: ein makelloser Fund ist entkommen.",
+      "emptyHookNote": "Nichts am Haken",
       "stateReady": "Bereit",
-      "stateCooldown": "Nachwachsen"
+      "stateCooldown": "Nachwachsen",
+      "stateCooldownTimed": "Nachwachsen in {time}",
+      "respawnClock": "{minutes}:{seconds}",
+      "fineGradePreview": "Dein Werkzeug veredelt diesen Ertrag zu feiner Güte."
     },
     "archetypeTitle": {
       "label": "Titel",
@@ -2342,6 +2706,7 @@ export const de_DE: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Waffe verzaubern - Macht",
       "enchant_weapon_intellect": "Waffe verzaubern - Zaubermacht",
+      "enchant_offhand_stamina": "Nebenhand verzaubern - Ausdauer",
       "enchant_helmet_fortitude": "Helm verzaubern - Ausdauerkraft",
       "enchant_neck_spirit": "Amulett verzaubern - Geist",
       "enchant_shoulder_agility": "Schultern verzaubern - Beweglichkeit",
@@ -2398,6 +2763,45 @@ export const de_DE: EnTranslations = {
       "ceilingRare": "Seltene Grenze",
       "ceilingCommon": "Gewöhnliche Grenze",
       "skillValue": "{skill} / {max}",
+      "toolEffectCharges": "{charges} von {max} Ladungen",
+      "toolEffectSpent": "Verbraucht, muss aufgeladen werden",
+      "toolEffectDepleted": "Werkzeugeffekt verbraucht",
+      "toolEffectRechargePrice": "Aufladen: {count} x {material}",
+      "toolEffectModeAsk": "Bei jeder Nutzung fragen",
+      "toolEffectModePrompt": "Fragt bei jeder Nutzung",
+      "toolEffectConfirmTitle": "{effect} einsetzen?",
+      "toolEffectConfirmBody": "Eine Ladung für diese Ernte einsetzen? Bei Ablehnung sammelst du trotzdem, nur ohne den Bonus. Verbleibende Ladungen: {charges}.",
+      "toolEffectConfirmAccept": "Ladung einsetzen",
+      "toolEffectConfirmDecline": "Ohne sammeln",
+      "toolEffectName": {
+        "gatherersCache": "Vorrat des Sammlers",
+        "artisansEye": "Auge des Handwerkers",
+        "quickeningCharm": "Federkraft-Talisman"
+      },
+      "toolEffectTooltip": {
+        "kind": "Werkzeug-Talisman",
+        "bonus": {
+          "gatherersCache": "+1 Ertrag pro Ernte, solange aufgeladen.",
+          "artisansEye": "Erhöht die Erntegüte um eine Werkzeugstufe, solange aufgeladen.",
+          "quickeningCharm": "Verkürzt die Zeit, bis der ausgelöste Knoten nachwächst."
+        },
+        "howToSlot": "Auf ein Bergbau-, Holzfäller- oder Kräuterkunde-Werkzeug im Berufe-Fenster einsetzen. Wird beim Einsetzen verbraucht.",
+        "charges": "Startet mit {base} Ladungen auf einem gewöhnlichen Werkzeug (+{bonus} pro Seltenheitsstufe).",
+        "landOnly": "Lässt sich nicht auf Angelruten einsetzen.",
+        "openProfessions": "Öffne die Berufe, um dies auf ein Sammelwerkzeug einzusetzen."
+      },
+      "toolEffectSlotButton": "{effect} einsetzen",
+      "toolEffectRechargeButton": "Aufladen",
+      "toolEffectSlotted": "{effect} auf {profession} eingesetzt.",
+      "toolEffectSlotInvalid": "{effect} lässt sich dort nicht einsetzen.",
+      "toolEffectNoTool": "Du brauchst zuerst ein echtes {profession}-Werkzeug.",
+      "toolEffectNoCharm": "In deinen Taschen fehlt ein gefertigter Talisman für {effect}.",
+      "toolEffectNoGain": "{effect} ist bereits eingesetzt und voll aufgeladen.",
+      "toolEffectRecharged": "{effect} aufgeladen: {material} x{count} verbraucht.",
+      "toolEffectRechargeNoSlot": "Auf {profession} ist kein Effekt eingesetzt.",
+      "toolEffectRechargeFull": "{effect} ist bereits voll aufgeladen.",
+      "toolEffectRechargeToolCapped": "Trage ein besseres {profession}-Werkzeug, um {effect} weiter aufzuladen.",
+      "toolEffectRechargeMaterials": "Zum Aufladen von {effect} wird {material} x{count} benötigt.",
       "tierPipAria": "Stufe {tier}",
       "nextUnlockTier": "Noch {points} Punkte bis zur nächsten Stufe: Meisterwerkchance steigt",
       "nextUnlockSpecialized": "Noch {points} Punkte bis zur Spezialisierung: Materialkosten sinken",
@@ -2422,9 +2826,27 @@ export const de_DE: EnTranslations = {
     "crafting": {
       "title": "Basteln",
       "close": "Enges Basteln",
-      "craft": "Handwerk",
+      "dialogOption": "Basteln",
+      "dialogOptionAria": "Bastelfenster für {craft} öffnen",
+      "crafting": "Basteln",
+      "create": "Erstellen",
+      "createAll": "Alle erstellen",
+      "createAllAria": "Die maximale Anzahl dieses Rezepts aus den vorhandenen Materialien erstellen",
+      "qtyRowAria": "Herstellungsmenge",
+      "qtyDecreaseAria": "Herstellungsmenge verringern, aktuell {count}",
+      "qtyIncreaseAria": "Herstellungsmenge erhöhen, aktuell {count}",
+      "qtyValueAria": "Herstellungsmenge, {count}",
+      "batchRemaining": "{remaining} von {total} verbleibend",
+      "batchRemainingAria": "{remaining} von {total} Herstellungen verbleibend",
+      "durationChip": "{seconds}s",
+      "durationAria": "Herstellungszeit: {seconds} Sekunden",
+      "progressAria": "Herstellungsfortschritt",
+      "announceStart": "Stelle {name} her",
+      "announceComplete": "{name} hergestellt",
+      "announceCancel": "Herstellung abgebrochen",
       "reagentsNeeded": "Erfordert:",
       "reagentLine": "{name}: {have}/{required}",
+      "reagentFineSub": "(verbraucht {count} feiner Güte)",
       "empty": "Noch keine Rezepte bekannt.",
       "resultAria": "Basteln {name}",
       "craftedToast": "Hergestellt: {name}",
@@ -2466,6 +2888,8 @@ export const de_DE: EnTranslations = {
         "colSkill": "Fertigkeit",
         "colRole": "Rolle",
         "colCap": "Grenze",
+        "allCrafts": "Alle Berufe",
+        "skillListAria": "Handwerkliche Fähigkeiten",
         "tutorial": "Erste Stufe: Erreiche Fertigkeit {skill} in einem Beruf. Erfolgreiche Rezepte verbessern diesen Beruf, ohne Kenntnisse anderswo zu löschen.",
         "nearTier": "{craft} ist {points} Fertigkeitspunkte von der nächsten Stufe entfernt.",
         "dormantKnowledge": "Kenntnisse in {craft} bleiben erhalten, sind aber inaktiv, bis sein Paar oder Hobby aktiv ist."
@@ -2479,7 +2903,7 @@ export const de_DE: EnTranslations = {
         "loom": "Webstuhl",
         "toolworks": "Werkzeugmacherei"
       },
-      "throttled": "Ihr stellt zu schnell her. Wartet einen Moment und versucht es erneut.",
+      "busy": "Du bist beschäftigt.",
       "recipeNotLearned": "Ihr habt dieses Rezept noch nicht erlernt.",
       "noBagSpace": "Du hast keinen Platz für den hergestellten Gegenstand.",
       "skillReqLine": "Erfordert {craft} {skill}",
@@ -2493,6 +2917,8 @@ export const de_DE: EnTranslations = {
       "masterworkToast": "Meisterwerk! {name}",
       "masterworkZoneLine": "{crafter} hat das Meisterwerk {name} hergestellt!",
       "tierUpToast": "{craft} auf Stufe {tier} aufgestiegen!",
+      "skillUpToast": "{skill}-Fertigkeit auf {level} gestiegen!",
+      "skillUpSubtext": "Fertigkeit auf {level} gestiegen!",
       "trendNudge": "Deine Hände neigen zum {archetype}. Seine Abstimmung wartet bei {master}.",
       "trendNudgeNoMaster": "Deine Hände neigen zum {archetype}. Suche einen Handwerksmeister, um es aufzunehmen.",
       "attunedZoneLine": "{name} hat sich als {archetype} abgestimmt!",
@@ -2532,9 +2958,9 @@ export const de_DE: EnTranslations = {
       "notHeld": "Du hast diesen Gegenstand nicht.",
       "notDisenchantable": "Du kannst das nicht entzaubern.",
       "notSalvageable": "Du kannst das nicht zerlegen.",
-      "disenchantThrottled": "Du entzauberst zu schnell. Warte einen Moment und versuche es erneut.",
-      "salvageThrottled": "Du zerlegst zu schnell. Warte einen Moment und versuche es erneut.",
-      "enchantThrottled": "Du verzauberst zu schnell. Warte einen Moment und versuche es erneut.",
+      "disenchantBusy": "Du bist beschäftigt.",
+      "salvageBusy": "Du bist beschäftigt.",
+      "enchantBusy": "Du bist beschäftigt.",
       "enchantWrongSlot": "Diese Verzauberung kann nicht auf diesen Gegenstand angewendet werden.",
       "enchantUnknown": "Diese Verzauberung existiert nicht.",
       "enchantInsufficient": "Du hast nicht die Materialien für diese Verzauberung.",
@@ -2552,6 +2978,7 @@ export const de_DE: EnTranslations = {
       "noEnchants": "Keine Verzauberung verwendet dieses Reagenz.",
       "noTargets": "Kein geeigneter Gegenstand zum Verzaubern.",
       "wornTag": "Angelegt ({slot})",
+      "wornTagIndexed": "Angelegt ({slot} {index})",
       "tier": {
         "base": "Basisverzauberungen",
         "runed": "Runen-Verzauberungen",
@@ -2616,6 +3043,59 @@ export const de_DE: EnTranslations = {
       "cannotAfford": "Du kannst die Entbindungsgebühr nicht bezahlen.",
       "outOfRange": "Du musst dich an einer Handwerksstation befinden, um zu entbinden.",
       "noSpace": "Du hast keinen Platz für die entbundene Kopie."
+    },
+    "commissionBoard": {
+      "title": "Aufträge",
+      "close": "Aufträge schließen",
+      "openButton": "Aufträge",
+      "openButtonAria": "Das Auftragsbrett öffnen",
+      "intro": "Beauftrage einen Handwerker mit einem Stück, oder übernimm den Auftrag einer anderen Person.",
+      "formTitle": "Auftrag erteilen",
+      "recipeLabel": "Gegenstand",
+      "recipeEmpty": "Du kennst noch keine herstellbaren Ausrüstungsrezepte.",
+      "scopeLabel": "Wer annehmen kann",
+      "scopeOpen": "Jeder (offenes Brett)",
+      "scopeCrafter": "Ein bestimmter Handwerker",
+      "crafterNameLabel": "Name des Handwerkers",
+      "crafterNamePlaceholder": "Charaktername",
+      "openSubmit": "Auftrag einstellen",
+      "sectionMine": "Meine Anfragen",
+      "sectionToCraft": "Meine Aufträge",
+      "sectionBoard": "Offenes Brett",
+      "boardEmpty": "Gerade keine offenen Aufträge.",
+      "mineEmpty": "Du hast noch keine Aufträge erteilt.",
+      "toCraftEmpty": "Du fertigst gerade für niemanden einen Auftrag.",
+      "rowFor": "{item} für {requester}",
+      "rowTargeted": "{item} für {requester} (für {crafter})",
+      "acceptedBy": "Angenommen von {name}",
+      "statusOpen": "Offen",
+      "statusAccepted": "Angenommen",
+      "statusDelivered": "Geliefert",
+      "statusCancelled": "Storniert",
+      "statusExpired": "Abgelaufen",
+      "cancelButton": "Abbrechen",
+      "acceptButton": "Annehmen",
+      "deliverButton": "Liefern",
+      "deliverHint": "Stelle das beauftragte Stück her (mit aktiviertem Auftragsschalter) und komm dann hierher zurück, um es zu liefern.",
+      "opened": "Du stellst einen Auftrag für {item} ein.",
+      "cancelled": "Du brichst den Auftrag für {item} ab.",
+      "accepted": "Du nimmst den Auftrag für {item} an.",
+      "delivered": "Du lieferst {item} an {name}.",
+      "denyUnknownRecipe": "Dieses Rezept existiert nicht.",
+      "denyNotCommissionEligible": "Dieses Rezept kann nicht in Auftrag gegeben werden.",
+      "denyUnknownCrafter": "Kein Charakter mit diesem Namen ist bekannt.",
+      "denySelfCrafter": "Du kannst dich nicht selbst beauftragen.",
+      "denyTooManyOpen": "Du hast bereits zu viele offene Aufträge.",
+      "denyUnknownOrder": "Dieser Auftrag existiert nicht mehr.",
+      "denyOrderNotOpen": "Dieser Auftrag ist nicht mehr offen.",
+      "denySelfOrder": "Du kannst deinen eigenen Auftrag nicht annehmen.",
+      "denyNotEligibleCrafter": "Dieser Auftrag wurde für jemand anderen eingestellt.",
+      "denyNotYourOrder": "Das ist nicht dein Auftrag.",
+      "denyOrderNotAccepted": "Dieser Auftrag wurde noch nicht angenommen.",
+      "denyNotYourAcceptance": "Du hast diesen Auftrag nicht angenommen.",
+      "denyNotCrafted": "Stelle zuerst das beauftragte Stück her (mit aktiviertem Auftragsschalter).",
+      "denyOutOfRange": "Du musst in der Nähe des Auftraggebers sein, um einen Auftrag zu liefern.",
+      "denyNoSpace": "Der Auftraggeber hat keinen Platz in den Taschen."
     },
     "finder": {
       "title": "Instanzfinder",
@@ -2715,7 +3195,8 @@ export const de_DE: EnTranslations = {
         "raise_fallen": "Gefallene erheben (periodische Verstarkungswellen)",
         "soul_rend": "Seelenzerfetzung (markierte Spieler mussen sich verteilen und geheilt werden)",
         "deathless_rage": "Unsterbliche Raserei (an den Schutzsteinen unterbrochen)",
-        "wardstones": "Schutzstein-Kanale (Phasenubergang)"
+        "wardstones": "Schutzstein-Kanale (Phasenubergang)",
+        "dread_curse": "Schreckensfluch (nur heroisch, stapelnder Schwachungseffekt fur Tankwechsel)"
       }
     },
     "deeds": {
@@ -2727,6 +3208,7 @@ export const de_DE: EnTranslations = {
       "countLabel": "{earned}/{total} Taten",
       "completionAria": "Errungene Taten: {earned} von {total}",
       "recentLabel": "Zuletzt:",
+      "recentJumpAria": "Zu {name} springen",
       "nearestLabel": "Kurz davor:",
       "filterGroupAria": "Taten filtern",
       "filterAll": "Alle",
@@ -2780,16 +3262,16 @@ export const de_DE: EnTranslations = {
       "lbSelfAccount": "Dein Konto: Rang {rank}, top {percent} Prozent, {renown} Ansehen",
       "lbSelfRank": "Dein Konto: Rang {rank}, top {percent} Prozent",
       "lbEmpty": "Noch keine platzierten Chronisten.",
-      "broadcastsLabel": "Errungene Taten mit Gilde und Freunden teilen",
+      "broadcastsLabel": "Taten-Freischaltungen mit Gildenmitgliedern und Followern teilen, sowie Taten- und Meisterwerkkarten mit dem Discord-Feed",
       "titledName": "{name} [{title}]"
     },
     "continentMap": {
-      "title": "World Map",
-      "summary": "World map. Choose a zone to open its map.",
-      "toWorld": "World map",
-      "toZone": "Zone map",
-      "toggleAria": "Switch between the world map and the zone map",
-      "levels": "Levels {min} to {max}"
+      "title": "Weltkarte",
+      "summary": "Weltkarte. Wähle eine Zone, um ihre Karte zu öffnen.",
+      "toWorld": "Weltkarte",
+      "toZone": "Zonenkarte",
+      "toggleAria": "Zwischen Weltkarte und Zonenkarte wechseln",
+      "levels": "Stufe {min} bis {max}"
     }
   },
   "lb": {
@@ -2929,8 +3411,29 @@ export const de_DE: EnTranslations = {
       "account_taken": "Dieses Steam-Konto ist bereits mit einem anderen Konto verknüpft.",
       "upstream": "Steam hat nicht geantwortet. Versuch es gleich noch einmal."
     },
+    "epic": {
+      "disabled": "Die Epic-Verknüpfung ist derzeit nicht verfügbar.",
+      "invalid_token": "Epic konnte diese Verknüpfungsanfrage nicht bestätigen. Versuche es erneut über die Desktop-App.",
+      "banned": "Dieses Epic-Konto kann nicht verknüpft werden.",
+      "already_linked": "Dein Konto ist bereits mit einem Epic-Konto verknüpft.",
+      "account_taken": "Dieses Epic-Konto ist bereits mit einem anderen Konto verknüpft.",
+      "upstream": "Epic hat nicht geantwortet. Versuche es gleich noch einmal."
+    },
     "wallet": {
       "handoff_invalid": "Diese Wallet-Autorisierung ist abgelaufen oder konnte nicht verifiziert werden. Bitte versuche es erneut."
+    },
+    "ota_updates": {
+      "invalid_input": "Ungültige Eingabe."
+    },
+    "seeker": {
+      "native_only": "Die Seeker-Berechtigung ist nur in der nativen App verfügbar.",
+      "attestation_failed": "Geräteverifizierung fehlgeschlagen. Bitte versuche es erneut.",
+      "solana_artifact_required": "Nutze die Solana Store App, um fortzufahren.",
+      "wallet_required": "Verknüpfe und verifiziere zuerst eine Wallet.",
+      "genesis_token_required": "Ein verifizierter Seeker Genesis Token ist erforderlich.",
+      "genesis_token_claimed": "Dieser Seeker Genesis Token wurde bereits beansprucht.",
+      "entitlement_required": "Eine verifizierte Seeker-Berechtigung ist erforderlich.",
+      "current_ownership_required": "Der Seeker Genesis Token muss sich aktuell in deinem Besitz befinden."
     }
   },
   "guide": {
@@ -2964,6 +3467,7 @@ export const de_DE: EnTranslations = {
       "talents": "Talente",
       "arena": "Arena und PvP",
       "valeCup": "Talpokal",
+      "thornhollow": "Thornhollow-Felder",
       "deeds": "Buch der Taten",
       "glossary": "Glossar",
       "wishIKnew": "Was ich gern früher gewusst hätte",
@@ -3052,16 +3556,16 @@ export const de_DE: EnTranslations = {
         "marshBlurb": "Versunkene Sümpfe und von der Flut zernagte Ruinen, Heimat von Mudfins und Schlimmerem.",
         "peaksName": "Thornpeak-Höhen",
         "peaksBlurb": "Windgepeitschte Grate, die zu den kältesten Gefahren des Reichs emporsteigen.",
-        "duskName": "The Veiled Hollow",
-        "duskBlurb": "A realm sealed beneath the mountains, if the whispers of a way in are true.",
-        "emberName": "The Drakelands",
-        "emberBlurb": "Across the Pale Causeway the green gives way to cinder, and something old rules the wastes.",
-        "frostName": "The Frostveil Reach",
-        "frostBlurb": "A snowbound height beyond every map, glimpsed only in the dancing lights.",
-        "amberName": "The Amberfall",
-        "amberBlurb": "Behind the western cliffs an autumn that never ends, and lanterns on a golden mere.",
-        "fenName": "The Willowfen",
-        "fenBlurb": "Past the autumn crown, a bright fen of willows and still water, and a town behind a moat."
+        "duskName": "Die Schleiersenke",
+        "duskBlurb": "Ein Reich, versiegelt unter den Bergen, wenn die Flüstereien von einem Weg hinein wahr sind.",
+        "emberName": "Die Drakenlande",
+        "emberBlurb": "Jenseits des Bleichen Damms weicht das Grün der Asche, und etwas Altes herrscht über die Ödnis.",
+        "frostName": "Der Frostschleier",
+        "frostBlurb": "Eine schneebedeckte Höhe jenseits jeder Karte, nur in den tanzenden Lichtern zu erahnen.",
+        "amberName": "Der Bernsteinfall",
+        "amberBlurb": "Hinter den westlichen Klippen ein Herbst, der niemals endet, und Laternen auf einem goldenen See.",
+        "fenName": "Das Weidenmoor",
+        "fenBlurb": "Hinter der herbstlichen Krone ein helles Sumpfland aus Weiden und stillem Wasser, und eine Stadt hinter einem Wallgraben."
       },
       "group": {
         "heading": "Schließt euch für die harten Stellen zusammen",
@@ -3133,16 +3637,21 @@ export const de_DE: EnTranslations = {
       "groupInterface": "Interface",
       "groupCamera": "Kamera",
       "talents": "Talente",
+      "professions": "Berufe",
       "arena": "Arena",
       "leaderboard": "Bestenliste",
       "deeds": "Buch der Taten",
+      "sheathe": "Waffe einstecken/ziehen",
       "crafting": "Handwerk",
       "valeCup": "Talpokal",
+      "mount": "Aufsitzen / Absitzen",
       "calendar": "Ereigniskalender",
+      "dungeonFinder": "Instanzfinder",
       "discord": "Discord",
       "abilities": "Aktionsleisten-Fähigkeiten einsetzen (die Zahlenreihe; eine zweite Leiste liegt auf dem Nummernblock)",
       "targetFriendly": "Nächstes freundliches Ziel anvisieren",
       "cycleFriendly": "Freundliches Ziel durchschalten",
+      "targetAuras": "Verstärkungen und Schwächungen des Ziels",
       "gameMenu": "Spielmenü und Optionen öffnen",
       "bothMouse": "Beide Maustasten",
       "runForward": "Vorwärtslaufen",
@@ -3531,17 +4040,9 @@ export const de_DE: EnTranslations = {
         "name": "Reptilien",
         "desc": "Kaltblutige Jaeger mit ihrem ganz eigenen Zischen und Schnappen, deutlich verschieden von den warmblutigen Bestien."
       },
-      "murloc": {
-        "name": "Croakfins",
-        "desc": "Croaking fish-folk of lake shore and tide pool, quick to swarm anything that wades too close."
-      },
-      "kobold": {
-        "name": "Scamps",
-        "desc": "Skittering scavengers and sprites of glade and hedgerow, more nuisance than menace until they gather in numbers."
-      },
       "demon": {
-        "name": "Demons",
-        "desc": "Invaders from beyond the rifts, all fire and spite. Where one stands, a breach is never far."
+        "name": "Dämonen",
+        "desc": "Eindringlinge von jenseits der Risse, ganz Feuer und Bosheit. Wo einer steht, ist ein Durchbruch nie fern."
       }
     },
     "worldPage": {
@@ -3555,55 +4056,55 @@ export const de_DE: EnTranslations = {
       "valeBlurb": "Das grüne Starttal, wo neue Helden sich an Wölfen und Banditen rund um die Stadt Eastbrook ihre ersten Sporen verdienen.",
       "marshBlurb": "Ein ertrunkenes Land aus Nebel und Ruinen. Mudfins überschwemmen das Seichte, und etwas Älteres regt sich unter dem Wasser, beobachtet aus der Brückenstadt Fenbridge.",
       "peaksBlurb": "Windgepeitschte Grate und alte Minenwerke, die zu den kältesten, höchsten Gefahren des Reichs emporsteigen, gehalten vom Außenposten Highwatch.",
-      "duskBlurb": "A valley of permanent dusk beneath the great tree of Eldergleam, where crystal ruins glow and the air hums with old magic.",
-      "emberBlurb": "Storm-lit wastes of ash and bloodglass where drakes wheel over the caldera and troll fires burn among the dunes, watched from the gate-town of Wyrmwatch.",
-      "frostBlurb": "A hush of snow and dark pines under the aurora, where the cold itself feels awake and Icemantle keeps its fires burning.",
-      "amberBlurb": "An eternal autumn of gold and red leaves that never fall, gathered around the lantern-lit town of Lanternmere.",
-      "fenBlurb": "A bright, humming wetland of lilies and slow water, crossed on old boardwalks from the bridge-town of Bridgemere.",
-      "nightBlurb": "A realm of starry midnight where flowers light the paths and Moonrest keeps a quiet vigil under a dreaming sky.",
-      "hauntBlurb": "A haunted forest under giant canopies, where the lanterns of Gallowmere are the only honest light on the road.",
-      "galeBlurb": "Sea-cliffs and howling downs where the wind never rests, the Old Beacon never goes out, and Wickharbor shuts its doors tight.",
-      "jungleBlurb": "A tropical tangle of palms, white sand, and loud birds, with the beach-town of Drifthaven keeping a fire lit on the strand.",
-      "gardenBlurb": "A hedge-maze garden realm still trimmed by no gardener anyone has seen, entered past Hedgewick and its fountain courts.",
+      "duskBlurb": "Ein Tal ewiger Dämmerung unter dem großen Baum von Eldergleam, wo Kristallruinen leuchten und die Luft von alter Magie summt.",
+      "emberBlurb": "Sturmerleuchtete Ödländer aus Asche und Blutglas, wo Drachen über der Caldera kreisen und Trollfeuer zwischen den Dünen brennen, überwacht von der Torstadt Wyrmwacht.",
+      "frostBlurb": "Eine Stille aus Schnee und dunklen Kiefern unter der Aurora, wo die Kälte selbst wach zu sein scheint und Icemantle seine Feuer brennend hält.",
+      "amberBlurb": "Ein ewiger Herbst aus goldenen und roten Blättern, die niemals fallen, versammelt um die laternenerleuchtete Stadt Lanternmere.",
+      "fenBlurb": "Ein helles, summendes Feuchtgebiet aus Lilien und trägem Wasser, durchquert auf alten Bohlenwegen von der Brückenstadt Bridgemere aus.",
+      "nightBlurb": "Ein Reich sternenklarer Mitternacht, wo Blumen die Pfade erleuchten und Moonrest eine stille Mahnwache unter einem träumenden Himmel hält.",
+      "hauntBlurb": "Ein verwunschener Wald unter riesigen Baumkronen, wo die Laternen von Gallowmere das einzige ehrliche Licht auf der Straße sind.",
+      "galeBlurb": "Meeresklippen und heulende Hügel, wo der Wind nie ruht, das Alte Leuchtfeuer nie erlischt, und Wickharbor seine Türen fest verschließt.",
+      "jungleBlurb": "Ein tropisches Gewirr aus Palmen, weißem Sand und lauten Vögeln, mit der Strandstadt Drifthaven, die ein Feuer am Ufer brennend hält.",
+      "gardenBlurb": "Ein Gartenreich aus Heckenlabyrinthen, noch immer gestutzt von keinem Gärtner, den je jemand gesehen hat, betreten hinter Hedgewick und seinen Brunnenhöfen.",
       "valeGreeting": "Halt deine Klinge griffbereit. Das Tal ist nicht mehr, was es war.",
       "valeGreeter": "Marschall Redbrook, Eastbrook",
       "marshGreeting": "Halt am Tor. Jenseits dieses Schilfs erledigt das Moor das Töten für uns.",
       "marshGreeter": "Wächter Fenwick, Fenbridge",
       "peaksGreeting": "Zweihundert Jahre hat diese Mauer gehalten. Unter meiner Wache wird sie nicht brechen, doch sie ächzt.",
       "peaksGreeter": "Hauptmann Thessaly, Highwatch",
-      "duskGreeting": "Few of your kind have stood beneath these boughs. Walk gently, and be welcome.",
-      "duskGreeter": "Keeper Saelwyn, Eldergleam",
-      "emberGreeting": "Hot wind off the wastes, dragons over the Drakemaw, and troll fires in the dunes. Drink before you walk out there.",
-      "emberGreeter": "The gatewarden, Wyrmwatch",
-      "frostGreeting": "Snow swallows every sound out past the wall. If the lights start dancing, keep your voice down and your fire lit.",
-      "frostGreeter": "The hearthkeeper, Icemantle",
-      "amberGreeting": "Every leaf here burns gold and red, yet none ever fall. The lanterns are lit for you; mind the Goldmelt on your way up.",
-      "amberGreeter": "The lanternwright, Lanternmere",
-      "fenGreeting": "The fen hums with dragonflies and bees. Cross the bridge, rest your feet awhile, and stay on the boards past the pools.",
-      "fenGreeter": "The bridgekeeper, Bridgemere",
-      "nightGreeting": "Past the Nightgate the air itself dreams. Follow the flower-light, and mind the sleeping world that hangs in the sky.",
-      "nightGreeter": "The vigil-warden, Moonrest",
-      "hauntGreeting": "Keep to the lanterns, traveler. And if the wood calls your name from off the road, do not answer it.",
-      "hauntGreeter": "The lamplighter, Gallowmere",
-      "galeGreeting": "The wind has never once stopped here, and the Old Beacon has never once gone out. Close the inn door behind you.",
-      "galeGreeter": "The beacon-keeper, Wickharbor",
-      "jungleGreeting": "Warm sand, loud birds, and a jungle that eats the horizon. We keep a fire lit on the beach; try to come back to it.",
-      "jungleGreeter": "The harbormistress, Drifthaven",
-      "gardenGreeting": "Someone is still trimming the hedges, though no gardener has been seen for a hundred years. Mind the maze: it minds you back.",
-      "gardenGreeter": "The gatekeeper, Hedgewick",
+      "duskGreeting": "Nur wenige deiner Art haben unter diesen Ästen gestanden. Geh sanft, und sei willkommen.",
+      "duskGreeter": "Hüter Saelwyn, Eldergleam",
+      "emberGreeting": "Heißer Wind von den Ödländern, Drachen über dem Drakenrachen, und Trollfeuer in den Dünen. Trink etwas, bevor du dort hinausgehst.",
+      "emberGreeter": "Der Torwächter, Wyrmwacht",
+      "frostGreeting": "Jenseits der Mauer verschluckt der Schnee jeden Laut. Wenn die Lichter zu tanzen beginnen, halte deine Stimme leise und dein Feuer brennend.",
+      "frostGreeter": "Der Herdwächter, Icemantle",
+      "amberGreeting": "Jedes Blatt hier brennt in Gold und Rot, doch keines fällt jemals. Die Laternen sind für dich entzündet; achte auf den Goldmelt auf deinem Weg hinauf.",
+      "amberGreeter": "Der Laternenmacher, Lanternmere",
+      "fenGreeting": "Das Moor summt von Libellen und Bienen. Überquere die Brücke, lass deine Füße eine Weile ruhen, und bleib an den Tümpeln vorbei auf den Bohlen.",
+      "fenGreeter": "Der Brückenwärter, Bridgemere",
+      "nightGreeting": "Hinter dem Nachttor träumt die Luft selbst. Folge dem Blütenlicht, und achte auf die schlafende Welt, die am Himmel hängt.",
+      "nightGreeter": "Der Wachhüter, Moonrest",
+      "hauntGreeting": "Halte dich an die Laternen, Reisender. Und wenn der Wald deinen Namen abseits der Straße ruft, antworte ihm nicht.",
+      "hauntGreeter": "Der Laternenanzünder, Gallowmere",
+      "galeGreeting": "Der Wind hat hier noch nie aufgehört zu wehen, und das Alte Leuchtfeuer ist noch nie erloschen. Schließe die Wirtshaustür hinter dir.",
+      "galeGreeter": "Der Leuchtfeuerwärter, Wickharbor",
+      "jungleGreeting": "Warmer Sand, laute Vögel und ein Dschungel, der den Horizont verschlingt. Wir halten ein Feuer am Strand brennend; versuche, zu ihm zurückzukehren.",
+      "jungleGreeter": "Die Hafenmeisterin, Drifthaven",
+      "gardenGreeting": "Jemand stutzt noch immer die Hecken, doch seit hundert Jahren wurde kein Gärtner gesehen. Achte auf das Labyrinth: Es achtet auch auf dich.",
+      "gardenGreeter": "Der Torwächter, Hedgewick",
       "valePlaceNotes": "Eastbrook ist deine erste Heimatbasis. Der Wolfslauf und die Eberwiese sind sanftes Jagdgebiet; der Spiegelsee ist gutes Wasser zum Angeln, wenn auch Schlammflossen seine Untiefen durchschwärmen; das Sableweb und die Kupfergrube verbergen Spinnen und erzgierige Schaufler; ein Banditenlager und die Gefallene Kapelle bergen rauere Arbeit; der Reliquiarhügel führt hinab in das Eingestürzte Reliquiar, den ersten Tiefgang des Reichs; Brightwood Glade ist ein ruhiger, sonnenheller Hain im Norden; und das Saufeld ist Eastbrooks ummauerter Keilerball-Platz, auf dem der Talpokal unter einem Erntefrieden ausgetragen wird.",
       "marshPlaceNotes": "Fenbridge bewacht die einzige trockene Straße. Das Pirscher-Schilf und die Deepfen-Untiefen wimmeln von Moorbestien und Mudfins; das Witwendickicht ist dicht mit Netzen versponnen; die Ertrunkene Kapelle und die Trollhügel bergen ältere Gefahren, und die Ertrunkene Litanei, der eigene Tiefgang des Moores, öffnet sich gleich nördlich der Hügel; das Gravecaller-Lager ist der eingegrabene Kult, und die versunkene Bastion ist das instanzierte Herz des Moores.",
       "peaksPlaceNotes": "Highwatch hält die Mauer. Der Pirscherkamm und die Deeprock-Baue gehören Bergkatzen und Wühlern; die Ogervorberge und Drogmars Kriegslager den Schlägern für Sold; Stormcrag knistert vor Elementaren, und darunter leuchtet der Glimmermere, der Bergsee, an dessen Ufer das Tor aus fahlem Licht hinab zum Ertränkten Tempel liegt; die Wyrmkultzelte und die Wiedergängerfelder umringen das Hochland des Kults, mit dem Gravewyrm-Heiligtum auf seinem Gipfel.",
-      "duskPlaceNotes": "Eldergleam gathers beneath the great tree. The Duskfall Cave and its overlook are the way in and the first sight of the valley; Elder Grove and Starfall Basin keep the quiet south; the Sunken Court holds overgrown ruins in the east; and the Gleaming Deep and Crystalline Shallows glow across the north.",
-      "emberPlaceNotes": "Wyrmwatch holds the gate. The Gatewood is the last green before the waste; the Cinder Dunes drift with ash and worse; the Trollmoot is where the dune trolls gather their fires; the Bloodglass Fields glitter with razor shards; and the Drakemaw Caldera is the smoking crown the drakes circle.",
-      "frostPlaceNotes": "Icemantle keeps the last warm hearth. The Snowline marks where the drifts take over; Glacier Tarn is black, still water under the ice; the Aurora Steps climb beneath the dancing lights; the Shiverfen is a frozen mire that never quite sleeps; and the Howling Terraces earn their name every night.",
-      "amberPlaceNotes": "Lanternmere glows at the heart of the harvest. The Goldmelt is the amber-slick pass in; the Gilded Orchard and Harvest Hollow keep the sweetest pickings and the boldest thieves; the Great Mere mirrors the burning leaves; Cindermaple Rise stands tallest and reddest; and the Leaning Monolith remembers something older than autumn.",
-      "fenPlaceNotes": "Bridgemere sits astride the slow water. The Amberfen Steps come down from the harvest country; the Lilymoors and Bogshine Pools glitter with wisps and dragonflies; Willowweep trails its branches into the mere; and the Drowsy Flats are as gentle as this land gets.",
-      "nightPlaceNotes": "Moonrest keeps the vigil. The Nightgate is the way into the midnight country; the Moonwell holds starlight you can stand beside; Gloamfield blooms in the dark; the Standing Vigil watches without ever moving; and the Sleepless Barrow is the one place here that never dreams.",
-      "hauntPlaceNotes": "Gallowmere huddles inside its lanterns. The Crowgate is the wood's grim front door; Widow's Thicket is spun thick with web; the Hanging Glade and the Mournstone Chapel keep the forest's oldest griefs; and the Huntsman's Clearing belongs to whatever still hunts there.",
-      "galePlaceNotes": "Wickharbor leans into the wind. The Windway is the cliff road in; the Howling Downs roll treeless under the gale; the Old Beacon has burned for as long as anyone can say; the Shear drops sheer to the water; the Wreckfields keep the coast honest; and the Mirror Tarn is the one still thing in the whole realm.",
-      "junglePlaceNotes": "Drifthaven keeps its fire on the beach. The Tanglemouth is where the river meets the green wall; the Palmstrand runs white and warm along the surf; the Emerald Tangle and the Vinefall swallow the interior; the Sapphire Lagoon glows clear and deep; and the Sunken Idol watches from beneath the water.",
-      "gardenPlaceNotes": "Hedgewick waits at the Garden Gate. The Parterre Walk blooms in clipped color; Dawnhold Castle drills its knights behind new walls; the Petal Pond drifts pink the year round; the Old Mill turns over its own ring beds; the Great Maze rearranges its manners for every guest, its arches watched by leafy foxes; the North Watch keeps the exit road; the Lily Basin rests beyond it all; and the Fountain Court still runs clear at the garden heart.",
+      "duskPlaceNotes": "Eldergleam versammelt sich unter dem großen Baum. Die Duskfall-Höhle und ihre Aussicht sind der Weg hinein und der erste Blick auf das Tal; der Alte Hain und das Sternenfallbecken bewahren den stillen Süden; der Versunkene Hof birgt überwucherte Ruinen im Osten; und die Gleißende Tiefe und die Kristallinen Untiefen leuchten im ganzen Norden.",
+      "emberPlaceNotes": "Wyrmwacht hält das Tor. Der Torwald ist das letzte Grün vor der Ödnis; die Aschendünen wehen mit Asche und Schlimmerem; das Trollmoot ist, wo die Dünentrolle ihre Feuer versammeln; die Blutglasfelder glitzern mit rasiermesserscharfen Splittern; und die Drakenrachen-Caldera ist die rauchende Krone, um die die Drachen kreisen.",
+      "frostPlaceNotes": "Icemantle bewahrt den letzten warmen Herd. Die Schneegrenze markiert, wo die Verwehungen die Herrschaft übernehmen; der Gletschersee ist schwarzes, stilles Wasser unter dem Eis; die Aurorastufen steigen unter den tanzenden Lichtern empor; The Shiverfen ist ein gefrorenes Moor, das niemals ganz schläft; und die Heulenden Terrassen verdienen sich ihren Namen jede Nacht.",
+      "amberPlaceNotes": "Lanternmere leuchtet im Herzen der Ernte. Der Goldmelt ist der bernsteinglatte Pass hinein; der Vergoldete Obstgarten und die Erntemulde bewahren die süßeste Beute und die kühnsten Diebe; der Große See spiegelt die brennenden Blätter; die Aschenahorn-Höhe steht am höchsten und rötesten; und der Schiefe Monolith erinnert sich an etwas Älteres als den Herbst.",
+      "fenPlaceNotes": "Bridgemere liegt über dem trägen Wasser. Die Amberfen-Stufen kommen aus dem Erntegebiet herab; die Lilienmoore und die Moorglanz-Tümpel glitzern mit Irrlichtern und Libellen; Weidenweinen lässt seine Zweige in den See hängen; und die Schläfrigen Ebenen sind so sanft, wie dieses Land nur werden kann.",
+      "nightPlaceNotes": "Moonrest hält die Mahnwache. Das Nachttor ist der Weg in das Mitternachtsland; der Mondbrunnen birgt Sternenlicht, neben dem du stehen kannst; Dämmerfeld blüht im Dunkeln; die Immerwährende Wache wacht, ohne sich je zu bewegen; und der Schlaflose Grabhügel ist der einzige Ort hier, der niemals träumt.",
+      "hauntPlaceNotes": "Gallowmere duckt sich hinter seine Laternen. Das Krähentor ist die düstere Vordertür des Waldes; das Witwendickicht ist dick mit Spinnweben durchzogen; die Hängende Lichtung und die Mournstone-Kapelle bewahren die ältesten Leiden des Waldes; und die Lichtung des Jägers gehört dem, was dort immer noch jagt.",
+      "galePlaceNotes": "Wickharbor stemmt sich gegen den Wind. Der Windweg ist die Klippenstraße hinein; die Heulenden Hügel rollen baumlos unter dem Sturm; das Alte Leuchtfeuer brennt, solange sich irgendjemand erinnern kann; der Abbruch fällt senkrecht zum Wasser; die Wrackfelder halten die Küste ehrlich; und der Spiegelweiher ist das einzig Stille im ganzen Reich.",
+      "junglePlaceNotes": "Drifthaven hält sein Feuer am Strand. Die Wirrmündung ist, wo der Fluss auf die grüne Wand trifft; der Palmenstrand verläuft weiß und warm entlang der Brandung; das Smaragddickicht und der Rankenfall verschlingen das Landesinnere; die Saphirlagune leuchtet klar und tief; und das Versunkene Idol wacht unter dem Wasser.",
+      "gardenPlaceNotes": "Hedgewick wartet am Gartentor. Der Parterreweg blüht in gestutzter Farbenpracht; Schloss Dawnhold drillt seine Ritter hinter neuen Mauern; der Blütenteich treibt das ganze Jahr über rosa dahin; die Alte Mühle dreht ihre eigenen Ringbeete; das Große Labyrinth ändert für jeden Gast seine Gepflogenheiten, seine Bögen bewacht von belaubten Füchsen; die Nordwacht hält die Ausfallstraße; das Lilienbecken ruht jenseits von allem; und der Brunnenhof läuft noch immer klar im Herzen des Gartens.",
       "gladeTitle": "Eine stille Ecke: Brightwood Glade",
       "gladeBody": "Nicht jede Geschichte im Tal handelt von den Toten. Im Norden bewahrt ein sonnenheller Hain namens Brightwood Glade seinen eigenen, sanfteren Rhythmus, ganz aus stillen Pfaden und geflecktem Licht unter den Zweigen. Er ist ein sanfter Gegenklang zu der Spur, der du folgst, und einen Blick wert, wenn die Straße dir Raum zum Umherstreifen lässt.",
       "worldBossTitle": "Wenn der Gipfel erwacht: der Weltboss",
@@ -3677,7 +4178,7 @@ export const de_DE: EnTranslations = {
       "bastionBody": "Eine überflutete Festung, ans Moor verloren, gehalten von ertrunkenen Verteidigern und der steigenden Flut selbst.",
       "templeBody": "Ein versunkener Schrein abseits der Moorstraße, ein Nebenweg für die Neugierigen und gut Vorbereiteten.",
       "sanctumBody": "Das dunkle Herz von Thornpeak, wo das lange Wirken des Kults seinen schrecklichen Höhepunkt erreicht.",
-      "wildheartBody": "A rain-soaked jungle caldera where two raised hunting trails circle a jade cenote. Cross beast dens and ancestor ruins, then climb the ritual pyramid to face Zulgar.",
+      "wildheartBody": "Eine regendurchtränkte Dschungelcaldera, in der zwei erhöhte Jagdpfade einen jadegrünen Cenote umkreisen. Durchquere Tierhöhlen und Ahnenruinen, dann erklimme die Ritualpyramide, um zu sehen, wer oben wartet.",
       "raidName": "Der Endgame-Schlachtzug",
       "raidBody": "Hinter einer versiegelten königlichen Tür wartet eine Prüfung für zehn Spieler: ein Kampf über mehrere Phasen und eine todlose Macht, die der ganze Schlachtzug gemeinsam ausschalten muss. Verdiene dir den Zutritt und bring dann neun Freunde mit.",
       "heroicTitle": "Heroischer Modus",
@@ -3742,23 +4243,25 @@ export const de_DE: EnTranslations = {
       "duelsBody": "Fordere jeden Spieler, dem du begegnest, zu einem freundschaftlichen Duell heraus. Es steht nichts auf dem Spiel außer dem Stolz, also ist es der einfachste Weg, eine Paarung zu lernen oder eine freundschaftliche Wette zu klären.",
       "coliseumHeading": "Das Aschene Kolosseum",
       "coliseumBody": "Das Kolosseum ist die Arena des Reichs, wo du in gewerteten Matches gegen andere Spieler antrittst, eins gegen eins oder zwei gegen zwei. Jede Wertungsklasse hat ihre eigene Rangliste, ein Sieg hebt dich also auf dieser Leiter empor, für das ganze Reich sichtbar. Öffne das Arenafenster, um dich für eine Wertungsklasse anzumelden, allein oder mit deinem Partner.",
-      "fiestaHeading": "Zwei gegen Zwei Fiesta",
-      "fiestaBody": "Fiesta ist ein schneller Zwei-gegen-Zwei-Kampf, als ein durchgehendes Gefecht ausgetragen, bei dem jeder Kämpfer auf gleiche Ausgangslage gebracht wird. Während der Kampf läuft, draftest du Augmentierungen, schnelle Boosts, die dein Repertoire spontan umformen, sodass kein Match dem anderen gleicht.",
-      "augmentsNote": "Augmentierungen und Verstärkungen halten nur für das Match. Es geht um verspielte Builds aus dem Moment heraus, nicht um anhaltende Macht, sodass sich niemand den Sieg erkaufen kann.",
-      "wavesTitle": "Augmentierungen kommen in Wellen",
-      "wavesBody": "Ein Fiesta-Gefecht reicht dir im Verlauf frische Auswahlmöglichkeiten, und sie werden mutiger, je länger der Kampf dauert. Du baust von einer Welle zur nächsten auf, wählst jedes Mal eine von wenigen Optionen und behältst sie für den Rest des Gefechts.",
-      "waveSilverTitle": "Silber",
-      "waveSilverBody": "Die Eröffnungswelle: klare Boosts auf einen einzelnen Wert, die die Grundlagen deiner Klasse schärfen.",
-      "waveGoldTitle": "Gold",
-      "waveGoldBody": "Die mittlere Welle: zweischneidige Kombinationen, in denen dein Build allmählich Gestalt annimmt und zu glänzen beginnt.",
-      "wavePrismaticTitle": "Prismatisch",
-      "wavePrismaticBody": "Die letzte Welle: build-prägende, bildschirmschmelzende Ausschläge, die sich auf die beste Art lächerlich anfühlen sollen.",
-      "yumiHeading": "Yumi beschützen",
-      "yumiBody": "Yumi beschützen ist ein Team-Zielmodus, der in einem Labyrinth ausgetragen wird: Jede Seite bewacht ihren eigenen Katzenbegleiter und jagt zugleich den der Gegner. Immer wieder blinzeln beide Katzen in neue Ecken des Labyrinths, sodass der Kampf zwischen Verteidigen, Jagen und dem Wettlauf, sie erneut aufzuspüren, hin und her schwingt. Melde dich als drei gegen drei oder fünf gegen fünf an; wer im Kampf fällt, muss nur einen Moment pausieren.",
-      "powerupsTitle": "Powerups im Ring",
-      "powerupsBody": "Mitten im Kampf fallen außerdem leuchtende Kugeln in die Arena, frei für den, der sie zuerst erreicht. Sie sind absichtlich völlig übertrieben und halten nur kurz an: Geschwindigkeitsdämon für einen Wimpernschlag blendenden Tempos, Koloss, um dich zu einem schwerfälligen Riesen anschwellen zu lassen, Mondstiefel für einen federnden Sprung bei niedriger Schwerkraft und Berserker für einen plötzlichen Schub an Raserei.",
       "ladderHeading": "Die Rangleiter erklimmen",
       "ladderBody": "Das gewertete Spiel verfolgt dein Ansehen über die Zeit. Wirf einen Blick auf die Bestenliste, um zu sehen, wo du stehst und wer die Spitze des Reichs hält."
+    },
+    "thornhollowPage": {
+      "heading": "Thornhollow-Felder",
+      "intro": "Ein gewertetes 5-gegen-5-Flaggenraub-Schlachtfeld, ausgetragen in einer ummauerten Senke im alten Baumbestand unterhalb von Thornpeak, wo sich zwei zerstörte Festungen über die Länge einer Schlucht gegenüberstehen und ein älterer Hof dazwischenliegt, den keine von beiden je gehalten hat. Zwei Teams zu fünft, zwei Festungen, ein Ziel: Stiehl das gegnerische Banner und bring es nach Hause, bevor sie deins bringen.",
+      "queueHeading": "Einreihen",
+      "queueBody": "Öffne das Thornhollow-Felder-Panel und reih dich allein ein, oder bring eine Gruppe von bis zu fünf mit und reiht euch gemeinsam ein: Gruppen bleiben immer auf einem Team, und die übrigen Plätze füllen sich mit Solo-Champions. Sobald zehn bereitstehen, setzt das Spiel beide Teams für ein kurzes Antreten an ihren Festungen ein, bevor die Flaggen aktiv werden.",
+      "fieldHeading": "Das Feld",
+      "fieldBody": "Ein ummauertes, offenes Feld, in drei Kammern gegliedert: Jedes Team hat sein eigenes Feld vor seiner Festung, und der ummauerte Ruinenhof liegt dazwischen. Zwei Ringmauern überspannen die volle Breite, und jeder Wechsel zwischen den Kammern führt durch einen umkämpften Übergang: das breite Haupttor oder das Torhaus, ein kleiner Raum, der die Mauer überspannt, dessen versetzte Türen einen Sprung an einer Hinterhaltsecke vorbei erzwingen. Jede Festung ist bis auf ihre Mündung verschlossen, sodass jeder Flaggenlauf durch dieselbe Öffnung beginnt und endet, und eine niedrige Barrikade bricht den geraden Sturmlauf hinein. Der Hof birgt die hohle Ruine im Herzen und die zwei flankierenden Sprint-Runen; die anderen zwei warten an den Flaggenzugängen. Eine Kampf- oder Schutzrune (mehr zugefügter Schaden oder weniger erlittener Schaden für ein paar Sekunden) wartet an der Hofmündung jedes Haupttors: Beide Felder eröffnen das Spiel auf derselben Seite und wechseln bei jeder Einnahme.",
+      "flagsHeading": "Flaggen",
+      "flagsBody": "Jede Festung hält ihre Teamflagge. Nimm die gegnerische Flagge und trag sie zu deinem eigenen Ständer, um zu punkten; das erste Team mit drei Eroberungen gewinnt, und ein Kampf, dessen Zeit abläuft, wird nach Punktestand entschieden. Ein gefallener Träger lässt die Flagge dort fallen, wo er gefallen ist: Ein Gegner kann sie erneut aufnehmen, während das eigene Team sie sofort nach Hause bringt, sobald es sie erreicht. Die Flagge verweigert sich auch dem Verstecken: Sie aufzuheben bricht Tarnung, und ein Träger, der sich auf irgendeine Weise unsichtbar macht, lässt sie augenblicklich fallen.",
+      "pickupNote": "Eine Flagge aufzuheben ist immer ein bewusster Druck auf die Schlachtfeld-Aktionstaste: Niemand wird je durch Vorbeilaufen an der falschen Stelle zum Träger.",
+      "respawnHeading": "Im Kampf fallen",
+      "respawnBody": "Der Tod folgt dem klassischen Ritus: Deine Leiche liegt dort, wo sie gefallen ist, bis DU dich löst, und der Geist erhebt sich auf dem eingezäunten Friedhof neben deiner Festung, dort gebannt bis zur nächsten Wiederbelebungswelle deines Teams. Die Welle erweckt alle wartenden Geister gemeinsam, und die beiden Teamwellen sind bewusst versetzt, sodass der Kampf nie vollständig auf einmal zurückgesetzt wird. Es gibt keinen Leichenlauf und keinen Handel mit dem Geistheiler: lösen, die Welle abwarten, kämpfen.",
+      "carrierHeading": "Die Flagge tragen",
+      "carrierBody": "Ein Träger, der die gegnerische Flagge zu lange hält, wird immer verwundbarer und erleidet stetig steigenden Schaden, bis die Flagge erobert, fallen gelassen oder zurückgebracht wird. Sich mit der Flagge zu verstecken, ist ein Verlustplan; sie nach Hause zu bringen, ist der Gewinnplan.",
+      "ladderHeading": "Die Rangliste",
+      "ladderBody": "Jedes Spiel verändert eine dauerhafte, charaktergebundene Schlachtfeld-Wertung, ob Sieg oder Niederlage, und die Bestenliste aller Zeiten führt die Champions des Reichs. Siege und hart erkämpfte Niederlagen zahlen außerdem Ehre über das Kriegsführungssystem aus."
     },
     "valeCupPage": {
       "heading": "Der Talpokal",
@@ -3900,6 +4403,8 @@ export const de_DE: EnTranslations = {
       "sourcesBody": "Die meisten deiner frühen Verbesserungen sind Questbelohnungen, es zahlt sich also aus, Quests abzuschließen, statt zu grinden. Feinde lassen Ausrüstung fallen, wenn du sie bezwingst, Händler in der Stadt verkaufen solide Grundausstattung, Handwerker verwandeln gesammelte Materialien in tragbare Stücke, und der Spielermarkt lässt dich von anderen Abenteurern kaufen. Ganz oben auf dem Berg kaufen zwei Marken-Währungen Ausrüstung, die es sonst nirgends gibt: Tiefgang-Marken beim Tiefgang-Hüter und Heroische Marken beim heroischen Quartiermeister.",
       "soulboundTitle": "Seelengebunden: dein und nur dein",
       "soulboundBody": "Einige besondere Belohnungen sind seelengebunden, von dem Moment an, in dem du sie erringst, an deinen Charakter gebunden. Ein seelengebundener Gegenstand lässt sich nicht handeln, verschicken, an einen Händler verkaufen oder auf dem Markt einstellen; er gehört dir und dir allein. Heute schützt das Preis-Tokens wie Heroische Marken, während die Ausrüstung, die du gewinnst, dir gehört und frei gehandelt, verkauft oder geteilt werden kann.",
+      "uniqueTitle": "Einzigartig ausgerüstet: nur ein Legendäres pro Art",
+      "uniqueBody": "Legendäre Gegenstände sind einzigartig ausgerüstet: Dein Charakter kann von einem bestimmten Legendären immer nur eine Kopie gleichzeitig tragen, und seine heroische Version zählt als derselbe Gegenstand. Eine zweite Kopie kann in deinen Taschen, in der Bank oder auf dem Markt liegen, aber der Versuch, beide gleichzeitig zu tragen, wird verweigert, und der Tooltip trägt eine goldene Markierung Einzigartig (ausgerüstet), damit du die Regel siehst, bevor du einen Build um zwei davon herum planst.",
       "setsTitle": "Sets und Set-Boni",
       "setsBody": "Manche Rüstung kommt in zusammengehörigen Familien, mehreren Teilen, die darauf zugeschnitten sind, als Einheit auszusehen und zu kämpfen. Trage genug Teile einer Familie gleichzeitig, und das Set erwacht und gewährt Boni zusätzlich zu den eigenen Werten jedes Teils, und je mehr Teile du trägst, desto stärker wird es. Einige wenige solcher Familien tauchen als begehrte Beute auf, während du aufsteigst; die größten von ihnen stammen aus dem härtesten Gruppeninhalt nahe der Höchststufe, weshalb die Jagd nach einem vollständigen Set ein klassisches Endgame-Ziel ist.",
       "consumablesTitle": "Verbrauchsgüter",
@@ -3921,7 +4426,7 @@ export const de_DE: EnTranslations = {
     "professions": {
       "intro": "Jenseits von Kampf und Quests belohnt dich die Welt für die Arbeit an Land und Esse: Rohstoffe sammeln, sie über zehn Handwerksgewerbe hinweg zu Ausrüstung und Waren verarbeiten und in eine Identität als einer der zehn Archetypen hineinwachsen, für die diese Gewerbe stehen.",
       "harvestTitle": "Die Jagd selbst ernten",
-      "harvestBody": "Das Sammeln hört nicht bei Knoten auf. Viele erlegte Tiere können jeweils einmal geerntet werden, nach dem Prinzip Erster kommt, Erster mahlt, für Häute, Fangzähne, Seide und Fleisch, direkt von der Leiche neben der gewöhnlichen Beute; ein Tastendruck öffnet beides. Die Wahl liegt auch jedes Mal bei dir: Streife alles ab, was die Leiche bietet, oder konzentriere dich auf weniger Komponenten und nimm eine messbar feinere Güte dessen mit, was du nimmst.\n\nEin seltener oder besserer Erntewurf bei einer exemplartragenden Familie gewährt zudem ein signiertes makelloses Exemplar (eine Makellose Haut, Makellose Seide, eine Unberührte Giftdrüse oder ein Erstklassiges Filet) zusätzlich zum gewöhnlichen Ertrag und vermerkt Ein makelloses Exemplar in deinem Buch der Taten. Jeder Charakter kann ernten, ohne Ausbildung, und jedes Sammelwerkzeug, das du besitzt, zählt für den Gütegewinn, gleichgültig, zu welchem Beruf es gehört.",
+      "harvestBodyChoice": "Das Sammeln hört nicht bei Knoten auf. Viele erlegte Tiere können jeweils einmal geerntet werden, nach dem Prinzip Erster kommt, Erster mahlt, für Häute, Fangzähne, Seide und Fleisch, direkt von der Leiche neben der gewöhnlichen Beute; ein Tastendruck öffnet beides. Trägt ein Tier mehr als eine verwertbare Komponente, so liegt die Wahl bei dir: Nimm alles mit, was es hergeben kann, oder konzentriere dich auf weniger Komponenten und nimm eine messbar feinere Güte dessen mit, was du nimmst.\n\nEin seltener oder besserer Erntewurf bei einer exemplartragenden Familie gewährt zudem ein signiertes makelloses Exemplar (eine Makellose Haut, Makellose Seide, eine Unberührte Giftdrüse oder ein Erstklassiges Filet) zusätzlich zum gewöhnlichen Ertrag und vermerkt Ein makelloses Exemplar in deinem Buch der Taten. Jeder Charakter kann ernten, ohne Ausbildung, und jedes Sammelwerkzeug, das du besitzt, zählt für den Gütegewinn, gleichgültig, zu welchem Beruf es gehört.",
       "focusTitle": "Stadtfokus",
       "focusBody": "Jede größere Stadt hält ein Stadtfokus-Panel für vorbeikommende Sammler bereit: Stell dich in die Stadt, öffne es neben der Minikarte und richte ein kleines Budget an Fokuspunkten auf die Komponententypen, die dir wichtig sind. Je mehr Fokus du einer Komponente gibst, desto feiner und reicher fällt sie von jeder späteren Leiche ab; deine Verteilung folgt deinem Charakter, wohin er auch zieht, und du kannst sie bei jedem späteren Besuch in der Stadt kostenlos umarbeiten.",
       "craftHowTitle": "Das Handwerksfenster",
@@ -3929,9 +4434,9 @@ export const de_DE: EnTranslations = {
       "craftMasteryBody": "Ehrliche Erwartungen: Der Aufstieg zur Obergrenze von 125 eines Handwerks umfasst mindestens 125 erfolgreiche Herstellungen, da jede vollwirksame Herstellung genau einen Punkt einbringt, und in der Praxis etwas mehr, da Rezepte zwischen den Lehrmeister-Sprossen verblassen. Das Handwerken selbst geht schnell; es zu versorgen ist die eigentliche Reise, also plane ein paar gewidmete Abende zum Sammeln und Handwerken pro Beruf.\n\nDie Sammelberufe erreichen ihre Obergrenze von 100 auf dem normalen Levelweg, wenn du beim Reisen erntest, wobei die letzte Strecke die höherstufigen Knoten des hohen Nordens verlangt. Angeln ist von Natur aus der lange Weg: Nach seinem eigenen Zuwachsplan erfordert Fertigkeit 200 mehr als dreitausend Fänge. Meisterangler ist ein Titel, den man in einer Saison ruhiger Abende verdient, nicht an einem Wochenende.",
       "archetypeChooseTitle": "Der Gildenbrief und das Umdenken",
       "archetypeChooseBody": "Du musst nichts davon selbst suchen. Arbeite an deinen Berufen, und sobald deine Handwerksfertigkeit zum ersten Mal eine klare Neigung zu einem Paar zeigt, bemerkt es die Handwerksgilde und schickt dir einen Ravenpost-Brief, der den aufzusuchenden Meister und die anzunehmende Quest nennt. Er trifft einmal pro Charakter ein, und nur dann, wenn du dich noch keinem Paar verschrieben hast.",
-      "archetypeSwitchBody": "Eine Erklärung ist auch kein lebenslanger Bund. Ein Paar, dem du noch nie angehört hast, ist schlicht eine frische Einstimmungs-Quest, während die Rückkehr zu einem Paar, das du verlassen hast, zunächst Wiedergutmachung verlangt: fünf Aufgaben beim ersten Mal, und drei weitere für jeden Wechsel, den du bereits vollzogen hast. Die Wahl bleibt bedeutsam, ohne jemals dauerhaft eine Tür zu schließen.",
+      "archetypeSwitchBody": "Eine Erklärung ist auch kein lebenslanges Urteil. Ein Paar, das du nie gehalten hast, ist schlicht eine frische Abstimmungsquest, während die Rückkehr zu einem Paar, das du verlassen hast, zuerst Sühne verlangt: fünf Aufgaben beim ersten Mal und drei weitere für jede Rückkehr, die du bereits hinter dir hast (ein brandneues Paar aufzunehmen erhöht die Zahl nie). Die Wahl bleibt bedeutsam, ohne je eine Tür für immer zu verschließen.",
       "whatHeading": "Ein Handwerk neben dem Schwert",
-      "whatBody": "Berufe sind das Arbeitsleben der Welt: Vier Sammelberufe, die Rohmaterial direkt aus dem Land ziehen, und ein Ring aus zehn Handwerken, der es zu Ausrüstung, Mahlzeiten, Tränken und Werkzeug verarbeitet. Alles versorgt hier etwas anderes. Das Erz, das du förderst, wird zu einer Klinge, die Klinge erhält eine Verzauberung, und die Verzauberung braucht Staub, der aus alter Ausrüstung entzaubert wird, also sind ein Sammler, ein Handwerker und ein Bastler alle Glieder in einer Kette.\n\nEs gibt keine Berufsbeschränkung, über die man sich den Kopf zerbrechen müsste. Jeder Charakter kann alle acht Berufe mit Inhalt heute und alle vier Sammelberufe parallel steigern; die einzige exklusive Wahl ist dein Archetyp, die Identität, auf die du dich irgendwann einschworst, obwohl die Berufe, die nach der Einstimmung hinter ihr ruhend werden, aufhören zu steigen. Fertigkeit sinkt nie, und nichts, was du lernst, wird je weggenommen.",
+      "whatBody": "Berufe sind das Arbeitsleben dieser Welt: vier Sammelberufe, die Rohmaterial direkt aus dem Land holen, und ein Ring aus zehn Handwerken, die daraus Ausrüstung, Mahlzeiten, Tränke und Werkzeuge machen. Hier speist alles etwas anderes. Das Erz, das du abbaust, wird zu einer Klinge, die Klinge nimmt eine Verzauberung auf, und die Verzauberung braucht Pulver, das aus alter Ausrüstung herausgebrochen wurde, ein Sammler, ein Handwerker und ein Tüftler sind also alle Glieder einer Kette.\n\nEs gibt keine Berufsgrenze, über der man grübeln müsste. Jeder Charakter kann sieben der acht Handwerke, die heute Inhalt haben, und alle vier Sammelberufe nebeneinander steigern (die Ingenieurskunst ist die eine Ausnahme: Ihre Rezepte beginnen alle über der freien Decke, ihre Leiter wartet also auf den Eid des Bombardiers); die einzige ausschließende Wahl ist dein Archetyp, die Identität, auf die du dich irgendwann schwörst, wobei die Handwerke, die dahinter inaktiv werden, sobald du dich abgestimmt hast, nur noch an ihren gewöhnlichen Rezepten steigen, und über Fertigkeit 75 hinaus gar nicht mehr. Fertigkeit sinkt nie, und nichts, was du lernst, wird dir je wieder genommen.",
       "ringHeading": "Das Handwerksrad",
       "ringBody": "Jeder Beruf mit Inhalt heute hat eine Obergrenze von 125 Fertigkeit: Waffenherstellung, Rüstungsherstellung, Schneiderei, Lederverarbeitung, Kochen, Alchemie, Ingenieurswesen und Verzauberung. An einer Obergrenze arbeitet das Gewerbe weiter, Ernten liefern noch, Herstellungen gelingen noch, und Meisterwerke können noch entstehen; nur die Zahl hört auf zu steigen. Wähle unten eine Karte für die vollständigen Rezepttabellen und Werte eines Berufs.",
       "ringWaveNote": "Zwei Berufe auf dem Rad, Juwelierkunst und Beschriftung, halten ihre Plätze, aber liefern noch keine Rezepte. Das ist bewusst statt versehentlich: Ihr Inhalt kommt mit zukünftigen Zonen, und die Obergrenzen oben steigen ebenso, sodass ein Beruf auf Höchststand heute ein Vorsprung auf diese Erweiterung ist, kein Ziel.",
@@ -3940,7 +4445,7 @@ export const de_DE: EnTranslations = {
       "gatherHubHeading": "Sammeln",
       "gatherHubBody": "Vier Sammelberufe versorgen das Rad vom Feld aus: Bergbau, Holzfällen und Kräuterkunde fördern Erz, Holz und Kräuter aus dem Land und erreichen eine Obergrenze von 100 Fertigkeit, während Angeln im eigenen Biss-und-Einhol-Rhythmus bis 200 läuft. Jede Seite unten enthält die genauen Knotenkarten, Werkzeugstufenleitern und Chancen.",
       "archetypesHeading": "Das Rad und seine Archetypen",
-      "archetypesBody": "Die zehn Berufe sitzen auf einem festen Rad, und die Geographie auf diesem Rad spielt eine Rolle. Je zwei Nachbarn bilden ein benanntes Paar: Schmied für Waffen- und Rüstungsherstellung, Ausstatter für Lederverarbeitung und Schneiderei, Apotheker für Alchemie und Kochen, Bombardier für Ingenieurswesen und Alchemie, und sechs weitere um das Rad.\n\nSich auf ein Paar einzustimmen ist eine Quest, kein Menüklick. Vier Paare können heute beigetreten werden (Schmied, Ausstatter, Apotheker und Bombardier), jedes verankert durch einen ansässigen Meister in Eastbrook, dessen Aufnahme-Quest den ganzen Vertrag im Voraus offenbart, bevor du ihn annimmst. Bis du dich erklärst, steigt jeder Beruf frei anhand von Rezepten bis zur seltenen Qualitätsstufe, sodass du alles ausprobieren kannst, bevor du wählst.\n\nSobald du dich eingestimmt hast, werden deine zwei Paarberufe deine Hauptberufe ohne Deckel bis zur Obergrenze. Der Rest des Rades geht nicht dunkel: Ein Beruf gegenüber deinen Hauptberufen bleibt als Hobby, das weiter bis zur seltenen Qualitätsstufe aufsteigt (eine wiederholbare Quest an Schmied Haldrens Schmiede lässt dich tauschen, welches das ist), und jeder andere Beruf wird ruhend. Ein ruhender Beruf behält seine Fertigkeit und seine gewöhnlichen Rezepte; er steigt einfach nicht mehr auf und produziert kein Meisterwerk, solange er ruht.",
+      "archetypesBody": "Die zehn Handwerke sitzen auf einem festen Rad, und die Geografie auf diesem Rad zählt. Je zwei Nachbarn bilden ein benanntes Paar: Schmied für Waffenherstellung und Rüstungsherstellung, Ausrüster für Lederverarbeitung und Schneiderei, Apotheker für Alchemie und Kochen, Bombardier für Ingenieurskunst und Alchemie, und sechs weitere rund um den Ring.\n\nSich auf ein Paar abzustimmen ist eine Quest, kein Klick im Menü. Vier Paare lassen sich heute eingehen (Schmied, Ausrüster, Apotheker und Bombardier), jedes verankert bei einem ansässigen Meister in Eastbrook, dessen Aufnahmequest den ganzen Handel vorab benennt, bevor du ihn eingehst. Bis du dich erklärst, steigt jedes Handwerk frei an Rezepten bis hinauf zur Selten-Stufe (jedes Rezept, das Fertigkeit 74 oder weniger verlangt), du kannst also fast alles ausprobieren, bevor du wählst (allein die Ingenieurskunst hat kein Rezept so weit unten, ihre Zahl wartet daher).\n\nSobald du dich abstimmst, werden deine beiden Paar-Handwerke zu deinen Hauptberufen, ohne jede Decke unterhalb der Obergrenze. Der Rest des Rades erlischt darum nicht: Ein Handwerk gegenüber deinen Hauptberufen bleibt als Hobby bestehen, das weiter bis durch die Selten-Stufe steigt (eine wiederholbare Quest an der Schmiede von Schmied Haldren lässt dich tauschen, welches es ist), und jedes andere Handwerk wird inaktiv. Ein inaktives Handwerk behält seine Fertigkeit und seine gewöhnlichen Rezepte, die es auf der normalen Kurve weiter lehren, bis sie bei 75 grau werden; alles über Gewöhnlich hört auf einen Schlag auf zu zahlen, und ein inaktives Handwerk bringt im Ruhen nie ein Meisterwerk hervor.",
       "pairFmt": "{a} und {b}",
       "curveHeading": "Die Meisterkurve",
       "curveBody": "Der Fertigkeitszuwachs folgt überall einer Regel, der vierstufigen Meisterkurve. Jede {step} Fertigkeitspunkte sind eine Stufe, und jedes Rezept wird danach bewertet, wo es gegenüber deiner Fertigkeit liegt: Auf oder oberhalb deiner Stufe gewährt es vollen Zuwachs, eine Stufe darunter halb, zwei Stufen darunter ein Viertel, und drei oder mehr Stufen darunter gar nichts.\n\nDas Handwerksfenster malt dies direkt auf die Rezeptliste in den klassischen Farben: Orange für vollen Zuwachs, Gelb für reduzierten, Grün für ein Rinnsal, Grau für keinen. Der Zuwachs ist deterministisch, niemals ein Fertigkeitswurf, also bewegt dieselbe Herstellung auf derselben Stufe deine Fertigkeit immer um genau denselben Betrag, und ein Rezept, das gelb wird, ist dein Hinweis, die nächste Stufe zu lernen.\n\nSammeln läuft auf derselben Kurve mit demselben Stufenschritt, bewertet gegen den Knoten statt gegen ein Rezept: Leichte Knoten werden grau, wenn du sie passierst, und die reichhaltigeren Knoten der späteren Zonen vollenden den Aufstieg. Angeln hält einen eigenen Plan: Ein voller Punkt pro Fang unter 50 Fertigkeit, halb bis 100, ein Zehntel bis 150 und ein langsames Ende bis 200, wobei Plunderfänge ab 100 nichts mehr lehren.",
@@ -3951,7 +4456,7 @@ export const de_DE: EnTranslations = {
       "deedsHeading": "Taten, die die Reise erinnern",
       "deedsBody": "Das Buch der Taten begleitet jeden Schritt davon. Deine erste Einstimmung verdient Handwerksgeschworen und dein erstes Meisterwerk verdient Meisterwerk-Macher, beides als Titel tragbar. Jeder der acht erwerbbaren Berufe verzeichnet eine Meilenstein-Tat bei 50 Fertigkeit und krönt seine Obergrenze mit einem Großmeister-Titel, während Angeln ab 100 Fertigkeit den Alten Salzfisch und den Meisterangler-Titel ab 200 erhält.\n\nEs gibt auch ruhigere Seiten: Taten für deine erste Ernte und erste Herstellung, für die seltenen Funde, die das Glück im Feld aufdeckt, und für das Aufnehmen von Zerlegen. All das ist kosmetisch, nur Titel und Ansehen. Eine Tat verleiht nie Macht; sie beweist nur, dass du dabei warst.",
       "startHeading": "Wo man anfängt",
-      "startBody": "Frisch von der Straße in Eastbrook? Finde Vormann Odell und nimm Ein Handwerk für jede Hand: Er wird dich zu den Erzadern rund um die Kupferschürfe südwestlich der Stadt führen und dir deine ersten Schwielen einbringen. Von da an ernte jede Ader, jeden Baumstand und jeden Kräuterfleck, an dem du beim Questen vorbeikommst; Fertigkeit kommt Reisenden von selbst.\n\nZurück in der Stadt drückst du T, um das Handwerksfenster zu öffnen, und bearbeitest die gewöhnlichen Rezepte, die jeder Charakter von Anfang an kennt. Besuche die Meister an der Schmiede, in der Küche, am Webstuhl und in der Werkzeugmacherei, um zu sehen, was sie lehren, und nimm ihre Arbeitsaufträge für stetigen Coin. Wenn der Brief der Gilde dich findet, wirst du bereits wissen, welches Paar sich wie zu Hause anfühlt.",
+      "startBody": "Frisch von der Straße in Eastbrook angekommen? Such Vorarbeiter Odell und nimm Ein Handwerk für jede Hand an: Er weist dich auf die Erzadern rund um die Kupfergrube südöstlich der Stadt hin und verschafft dir deine ersten Schwielen. Aber Vorsicht bei der Grube selbst: Die Deeprock-Gräber, die dort lagern, stehen ein paar Stufen über einem frischen Ankömmling, arbeite also zuerst die äußeren Adern ab und heb dir das Herz des Lagers auf, bis du ein wenig aufgestiegen bist. Von da an ernte jede Ader, jede Baumgruppe und jede Kräuterpflanze, an der du beim Questen vorbeikommst; Reisenden fällt die Fertigkeit von allein zu.\n\nZurück in der Stadt drückst du T, um das Handwerksfenster zu öffnen, und arbeitest die gewöhnlichen Rezepte ab, die jeder Charakter von Anfang an kennt. Besuch die Meister an der Schmiede, den Küchen, dem Webstuhl und der Werkzeugmacherei, um zu sehen, was sie lehren, und nimm ihre Werkaufträge für stetige Münzen an. Wenn dich der Gildenbrief erreicht, weißt du längst, welches Paar sich wie Zuhause anfühlt.",
       "colStation": "Station",
       "colHub": "Knotenpunkt",
       "colMaster": "Meister",
@@ -3996,27 +4501,27 @@ export const de_DE: EnTranslations = {
         "leatherworking": "Lederverarbeitung gerbt Beweglichkeits- und Ausdauerausrüstung für die Klassen, die ausweichen statt zu blocken, von den Fenbridge-Leder-Grundmodellen bis zum seltenen Sumpfwächter-Set, und es ist das einzige Tiefhandwerk, das im Sumpf ausgebildet wird.",
         "cooking": "Kochen verwandelt die Tagesbeute in Mahlzeiten, die 18 Sekunden lang Ruhe-Heilung gewähren, die günstigste Heilung im Spiel, von Gesalzenem Dörrfleisch bis zu Marlows Festtagsbraten. Jeder isst, daher ist kein Handwerk in einer Gruppe universeller willkommen.",
         "alchemy": "Alchemie verwandelt Kräuter, Drüsen und Glas in Flaschen, die Kämpfe entscheiden: Heil- und Manatränke für den Moment, wenn es schiefgeht, und Ausdauerelixiere, die während eines ganzen Dungeons auf deiner Verbesserungsleiste bleiben.",
-        "engineering": "Ingenieurskunst baut die Werkzeuge, die jeder ernsthafte Sammler irgendwann haben will: die Spitzhacken, Äxte und Sicheln des Rangs 4 und 5, die kein Händler je führen wird, wobei jedes Werkzeug das vorherige verbraucht.",
-        "enchanting": "Verzauberung zerlegt Ausrüstung und verwandelt die Kraft: Zerstöre unerwünschte Stücke in arkane Materialien, dann gib sie für einen dauerhaften Statusbonus auf ein Stück aus, das du behalten willst. Keine Station, kein Lehrmeister, und jeder kann schon am ersten Tag damit anfangen."
+        "engineering": "Ingenieurskunst baut die Werkzeuge, die jeder ernsthafte Sammler früher oder später haben will: die Spitzhacken, Äxte, Sicheln und Angelruten von Rang 4 und Rang 5, die kein Händler je gegen Münze verkauft, jedes davon verbraucht das Werkzeug darunter.",
+        "enchanting": "Verzauberung zerlegt Ausrüstung und gibt die Kraft wieder hinein: Zerbrich ungewollte Stücke zu arkanen Materialien und gib sie dann für einen dauerhaften Attributbonus an einem Stück aus, das du behalten willst. Zerbrechen und Verzaubern brauchen weder Station noch Lehrmeister, und jeder kann am ersten Tag anfangen; nur die beiden Talisman-Rezepte verlangen mehr, gelehrt in der Werkzeugmacherei."
       },
       "craftProse": {
         "weaponcrafting": {
           "identityHeading": "Die Klinge, die jeder Kämpfer sucht",
           "identityBody": "Jemand in jeder Gruppe will die Arbeit dieses Handwerks, denn die seltene Sprosse allein deckt alle drei Vorlieben ab: die Osmium-Kriegsklinge für Stärke-Nahkämpfer, die Glyphstahl-Kriegsaxt für Beweglichkeits-Kämpfer und den Hochfichten-Kampfstab, einen Intellekt-und-Geist-Stab für die Gewand-Fraktion.\n\nAuf dem Handwerksrad steht es zwischen Rüstungsherstellung und Juwelierkunst. Seine lebende Identität ist der Schmied, das Paar aus Waffenherstellung und Rüstungsherstellung, geschworen vor Schmiedemeisterin Darva an der Schmiede nach dem Bearbeiten von drei Erzadern mit eigenen Händen; das Klingenschmied-Paar mit Juwelierkunst ist auf dem Rad ebenfalls benannt, kann aber noch nicht geschworen werden, da Juwelierkunst erst mit einer späteren Zonen-Erweiterung Rezepte erhält.",
           "materialsHeading": "Was die Schmiede trinkt",
-          "materialsBody": "Bergbau ist das Fundament. Kupfererz kommt von den Erzadern der Stufe 1 in Eastbrook Vale, Eisenerz aus dem Mirefen-Sumpf und Osmiumerz von den Thornpeak-Höhen, und jede Sprosse der Leiter geht denselben Weg nach oben. Holzfällen spielt eine größere Rolle, als du vielleicht erwartest: Eisenrindenholz schäftet den Eberspeer, Aschenholz trägt den Streitkolben, und ein einziger Hochfichtenscheit bildet den Kampfstab.\n\nDer Rest kommt von der Jagd und der Theke. Raues Fell für Griffe wird direkt von Wolf- und Eberleichen gewonnen, Knochenfragmente fallen bei gewöhnlichen Tötungen, und die Schmiedeleiter verbraucht Schmiedefluss, 20 Kupfer das Glas bei Schmiedemeisterin Darva selbst. Wenn dein eigener Bergbau hinterherhinkt, verkauft Darva Osmiumerz an der Schmiede und Tüftler Gizzel hält Glyphstahlbarren in der Werkzeugmacherei vorrätig, zu einem Aufpreis, der Sammelfreunde günstig erscheinen lässt.",
+          "materialsBody": "Bergbau ist das Rückgrat. Kupfererz kommt von den Rang-1-Adern des Eastbrook-Tals, Eisenerz aus dem Mirefen-Moor und Osmiumerz aus den Thornpeak-Höhen, und jede Sprosse der Leiter steigt auf dieselbe Weise mit. Holzfällen zählt mehr, als du vielleicht erwartest: Eisenrinde schäftet den Eberspeer, Aschenholz trägt den Kriegshammer, und ein einzelnes Hochfichtenscheit bildet den Kampfstab.\n\nDer Rest kommt von der Jagd und vom Tresen. Raues Fell für die Griffe wird direkt von Wolfs- und Eberleichen geerntet, Knochenfragmente stammen von den ruhelosen Toten oder aus zerlegter gewöhnlicher Ausrüstung, und die Schmiedeleiter verbrennt Schmiedefluss, 20 Kupfer der Krug bei Darva selbst. Hinkt dein eigener Bergbau hinterher, rettet dich beim Erz kein Tresen: Osmium kommt von den Thornpeak-Adern, von den Startadern jeder jüngeren Zone außer der Fernküste (deren Adern Eisen graben) oder aus dem Stapel eines anderen Spielers, per Handel oder über den Weltmarkt. Nur der Glyphstahlbarren wird gegen Münze gekauft, bei Tüftler Gizzel in der Werkzeugmacherei oder bei Quartiermeisterin Bree in Highwatch.",
           "ladderHeading": "Die Leiter, Sprosse für Sprosse",
           "ladderBody": "Ein Feldrezept, das Eastbrook-Wehrschwert, ist jedem von Anfang an bekannt und kann überall aus Jagdbeute hergestellt werden (ein paar Wolfsfangzähne und Knochensplitter) plus sechs Schmiedefluss vom Schmiedezähler. Die eigentliche Leiter besteht aus neun Lehrmeister-Rezepten in drei Sprossen, alle schmieden-gebunden: Die Kupfer-Sprosse (Bartaxt, Flanschstreitkolben, Eberspeer) ist bei Fertigkeit 0 kostenlos zu lernen, die Eisen-Sprosse (Langschwert, Kriegshammer, Dolch) öffnet bei Fertigkeit 25 für 25 Silber pro Rezept, und die Osmium-Sprosse (Kriegsklinge, Kriegsaxt, Kampfstab) öffnet bei Fertigkeit 50 für 1 Gold das Stück. Darva lehrt ein Rezept, sobald dein Rang im Handwerk seinen eigenen erreicht, sodass jede Sprosse genau dann freischaltet, wenn ihre Fertigkeitsstufe beginnt.\n\nEin weiteres Rezept gehört zum Paar: die Gravewyrm-Stulpen, ein vom Lehrmeister gelehrtes Kombinationsstück, das nur ein abgestimmter Schmied mit Waffenherstellung und Rüstungsherstellung auf Fertigkeit 25 herstellen kann, ohne jegliche Station.",
           "routeHeading": "Meisterwerke und ein funktionierender Weg bis 125",
-          "routeBody": "Jedes Stück mit einer echten Wertelinie, was auf dieser Leiter ab der Eisensprosse und aufwärts gilt, kann als Meisterwerk vom Amboss kommen; die attributlosen Kupfergemeinteile legen nie einen Proc, weil es in ihnen nichts zu verbessern gibt. Eisen gilt als Material der Stufe 1 für den Meisterwerkbonus, Hochfichte und Glyphstahl als Stufe 2, also proccen die obersten Sprossen etwas häufiger.\n\nReit die Kupfersprosse bis 25, lerne die Eisensprosse an dem Tag, an dem sie sich öffnet, und reit sie bis 50, dann die Osmiumerzsprosse bis 75. Jenseits von 75 ist noch nichts Höheres verfügbar, also verblassen die Osmiumrezepte auf halben und dann vierteljährlichen Gewinn: Plane grob 150 weitere Herstellungen, um die Obergrenze von 125 zu erreichen, und denk an die gemeinsame Drosselung von zehn Herstellungsaktionen pro Minute, wenn du dich zum Stapelhandwerk hinsetzt.\n\nFinanziere den Aufstieg im Laufe: Darvas Schmiedeauftrag nimmt dir alle 30 Minuten acht Kupfererzbrocken ab und zahlt dafür ein paar Münzen und EP, und die Eisen- und Osmiumsprossen verkaufen sich ehrlich an aufsteigende Nahkämpfer. Das Buch der Taten vermerkt Schärfe und Härte bei Fertigkeit 50 und krönt den Großmeister der Waffenherstellung bei 125."
+          "routeBody": "Jedes Stück mit einer echten Attributzeile, was auf dieser Leiter die Eisen-Sprosse und aufwärts bedeutet, kann als Meisterwerk vom Amboss kommen, solange die feinere Qualität in deine Rang-Grenze passt; die attributlosen Kupfer-Allgemeinstücke proc’en nie, weil es an ihnen nichts zu verbessern gibt. Eisen und Osmium zählen für den Meisterwerk-Bonus als Rang-1-Material, Hochfichte und Glyphstahl als Rang-2-Material, und Fertigkeit oberhalb des eigenen Rangs eines Rezepts fügt je Rang einen eigenen Punkt hinzu, sodass unter den drei Osmium-Stücken die Kriegsaxt und der Kampfstab den Materialvorteil tragen und eine Sprosse weiterhin besser proc’t, nachdem du ihr entwachsen bist.\n\nReite die Kupfer-Sprosse auf 25, lerne die Eisen-Sprosse an dem Tag, an dem sie sich öffnet, und reite sie auf 50, dann die Osmium-Sprosse auf 75. Jenseits von 75 gibt es bisher nichts Höheres, also lassen die Osmium-Rezepte auf halben und dann viertel Gewinn nach: Rechne mit rund 150 weiteren Herstellungen bis zur Obergrenze von 125, und denk an die gemeinsame Drosselung von zehn Handwerksaktionen pro Minute, wenn du dich zum Chargenlauf hinsetzt.\n\nFinanziere den Aufstieg unterwegs: Darvas Schmiede-Arbeitsauftrag nimmt dir alle 30 Minuten acht Kupfererz für ein wenig Münze und EP ab, und die Eisen- und Osmium-Sprossen verkaufen sich ehrlich an aufsteigende Nahkämpfer. Das Buch der Taten markiert Schneide und Härtung bei Fertigkeit 50 und krönt Großmeister-Waffenherstellung bei 125."
         },
         "armorcrafting": {
           "identityHeading": "Kettenpanzer für die Front",
-          "identityBody": "Die Leiter der Rüstungsherstellung liest sich wie die Karriere eines Soldaten: die schlichten genieteten Kupfer-Schürze, -Stiefel und -Handschuhe am Anfang, der Eisenketten-Waffenrock, -Beinschützer und -Schultern mit ihren ersten echten Statuszeilen, und der seltene Osmiumschuppen-Großhelm, -Küraß und -Beinlinge, Stärke- und Ausdauerstücke mit den höchsten Rüstungswerten, die ein Handwerker herstellen kann.\n\nEs hat auch eine ruhigere Seite: die Eastbrook-Gewappneten Beinlinge, ein zauberkräftebasiertes Feld-Allgemeinstück, und der Brennschuppenmantel, eine seltene Intellekt- und Geist-Kettenrüstungsschulter bei Fertigkeit 75, halten die zauberfokussierten Kettenpanzer-Träger in der Kundenliste. Auf dem Rad steht es zwischen Waffenherstellung und Ingenieurskunst; das Schmied-Paar mit Waffenherstellung wird vor Schmiedemeisterin Darva geschworen, während das Zahnradschmied-Paar mit Ingenieurskunst benannt, aber noch ohne Eid-Quest ist.",
+          "identityBody": "Die Leiter der Rüstungsherstellung liest sich wie die Laufbahn eines Soldaten: zu Beginn der schlichte genietete Kupfergürtel, die Sabatons und die Stulpen, dann die Eisenglieder-Halsberge, die Beinschützer und die Schulterstücke mit ihren ersten echten Attributzeilen, und schließlich der seltene Osmiumschuppen-Großhelm, der Küraß und die Beinlinge, Stärke- und Ausdauerstücke mit Rüstungswerten an der äußersten Spitze der Handwerkskunst.\n\nEs hat auch eine leisere Seite: Die Eastbrook-Schutzbeinlinge, ein Feld-Allgemeinstück mit Zauberwirker-Attributen, und der Brennschuppenmantel, eine seltene Intellekt-und-Geist-Kettenschulter bei Fertigkeit 75, halten die zauberkundigen Kettenträger auf der Kundenliste. Auf dem Rad sitzt es zwischen Waffenherstellung und Ingenieurskunst; das Schmied-Paar mit Waffenherstellung wird vor Schmiedemeisterin Darva geschworen, während das Zahnradschmied-Paar mit Ingenieurskunst zwar benannt ist, aber noch keine Eid-Quest hat.",
           "materialsHeading": "Erz sackweise",
-          "materialsBody": "Kein Handwerk verbraucht Erz schneller. Der Eisenketten-Waffenrock allein benötigt fünf Eisenerz, und jedes Osmiumschuppen-Stück will drei oder vier Osmium plus einen Glyphstahlbarren, daher baut ein ernsthafter Rüstungshersteller im Sumpfnebel-Moor und in den Dornkuppen-Höhen ab oder bezahlt jemanden, der es tut. Kupfer versorgt die erste Sprosse, direkt aus den Adern bei der Kupfergrube.\n\nUm das Metall herum kommen die weichen Teile: raues Leder von Wolf- und Eber-Leichen geerntet, Knochensplitter und Leinenreste aus dem gewöhnlichen Jagdgeschäft, und ein Glas Schmiedefluss (20 Kupfer an der Schmiede) in fast jedem Rezept. Darva verkauft Osmiumerz über den Tresen für die Ungeduldigen.",
+          "materialsBody": "Kein Handwerk frisst Erz schneller. Allein die Eisenglieder-Halsberge nimmt fünf Eisenerz, und jedes Osmiumschuppen-Stück will drei oder vier Osmium plus einen Glyphstahlbarren, also baut ein ernsthafter Rüstungsschmied im Mirefen-Moor und in den Thornpeak-Höhen selbst ab oder bezahlt jemanden, der es tut. Kupfer speist die erste Sprosse, direkt aus den Adern bei der Kupferschürfe.\n\nUm das Metall herum kommen die weichen Teile: Raues Fell, von Wolfs- und Eberleichen geerntet, Knochenfragmente von den ruhelosen Toten (oder aus gewöhnlicher Ausrüstung zerlegt) und Schmiedefluss-Krüge (je 20 Kupfer an der Schmiede) in fast jedem Rezept. Kein Händler verkauft Osmium: Die Ungeduldigen kaufen es anderen Spielern ab oder bauen es selbst ab, in Thornpeak oder an den Startadern von zehn der elf jüngeren Zonen (allein die Fernküste gräbt Eisen).",
           "ladderHeading": "Lernen bei Darvas Schmiede",
-          "ladderBody": "Zwei Feld-Allgemeinstücke, das Eastbrook-Kettenpanzer-Leibchen und die Gewappneten Beinlinge, sind von Anfang an bekannt und können überall hergestellt werden. Die Lehrmeister-Leiter besteht aus neun Rezepten in drei Sprossen an der Eastbrook-Schmiede: Die Kupfer-Sprosse ist bei Fertigkeit 0 kostenlos, die Eisenketten-Sprosse kostet 25 Silber pro Rezept ab Fertigkeit 25, und die Osmiumschuppen-Sprosse kostet 1 Gold pro Stück ab Fertigkeit 50, wobei jede Sprosse lehrbar wird, sobald dein Rang sie erreicht.\n\nJenseits der Leiter gibt es zwei Besondere. Der Gebundstein-Helm ist das Schmied-Kombinationsrezept, vom Lehrmeister gelehrt, ohne Station, und nur von einem abgestimmten Schmied mit beiden Handwerken auf Fertigkeit 25 herstellbar. Der Brennschuppenmantel braucht keinen Lehrer: Jeder kennt ihn, aber bei Fertigkeit 75 und schmiede-gebunden ist er das Rang-3-Abschlussrezept des Handwerks.",
+          "ladderBody": "Zwei Feld-Allgemeinstücke, die Eastbrook-Kettenweste und die Schutzbeinlinge, sind von Anfang an bekannt und überall herstellbar. Die Lehrmeister-Leiter besteht aus neun Rezepten in drei Sprossen an der Eastbrook-Schmiede: Die Kupfer-Sprosse ist bei Fertigkeit 0 kostenlos, die Eisenglieder-Sprosse kostet bei Fertigkeit 25 je 25 Silber pro Rezept, und die Osmiumschuppen-Sprosse kostet bei Fertigkeit 50 je 1 Gold, wobei jede Sprosse in dem Moment lernbar wird, in dem dein Rang sie erreicht.\n\nJenseits der Leiter stehen zwei Sonderfälle. Der Gebundstein-Helm ist eines der beiden Schmied-Kombinationsrezepte (die Gravewyrm-Stulpen sind sein Geschwisterstück auf der Waffenseite), vom Lehrmeister gelehrt, ohne Station und nur von einem abgestimmten Schmied mit beiden Handwerken auf Fertigkeit 25 zu bearbeiten. Der Brennschuppenmantel braucht überhaupt keinen Lehrer: Jeder kennt ihn von Anfang an, und nichts außer der Schmiede und den Materialien beschränkt die Arbeit daran. Die angegebene Fertigkeit 75 betrifft den Gewinn, nicht die Erlaubnis: Mit Rüstungsherstellung als Hauptberuf zahlt er vom allerersten Hammerschlag an vollen Fertigkeitsgewinn bis 99, sodass ein Schmied mit Osmium im Überfluss früh darauf setzen kann. Unterhalb der Grenze eines Hauptberufs lehrt das Rang-3-Rezept nichts, also arbeitet ein nicht abgestimmter oder Hobby-Rüstungsschmied daran für das Stück, nicht für die Punkte.",
           "routeHeading": "Meisterwerke und ein funktionierender Weg auf 125",
           "routeBody": "Ab der Eisenketten-Sprosse aufwärts rollt jede Herstellung auf die Meisterwerk-Chance; die nur-Rüstung-Kupfer-Allgemeinstücke können nicht proc'en, da ein Meisterwerk Statuswerte verbessert und sie keine haben. Eisen gilt als Rang-1-Material für den Proc und Glyphstahl als Rang-2-Material.\n\nDer Aufstieg ist der Standard-Dreisprosse-Weg: Kupfer auf 25, Eisenketten auf 50, Osmiumschuppen auf 75, jede Sprosse am Tag ihrer Öffnung lernen. Wo Rüstungsherstellung Glück hat, ist die Strecke nach 75: Der Brennschuppenmantel ist ein Rang-3-Rezept und zahlt daher vollen Gewinn bis 99 und die Hälfte danach, was bedeutet, dass die letzten fünfzig Punkte etwa 75 Herstellungen statt der 150 benötigen, die ein Handwerk ohne Abschlussrezept braucht. Jeder Schulter kostet sieben Osmiumerz und fünf Schmiedefluss, also bevorraten in den Dornkuppen und am Schmiedezähler vor dem Lauf.\n\nDarvas Arbeitsauftrag kauft acht Kupfererz alle 30 Minuten für Münze und EP, ein schöner Abnehmer für das Niedrigrang-Erz, das du ausgewachsen bist. Das Buch der Taten markiert Hammer und Platte bei Fertigkeit 50, und Großmeister-Rüstungsherstellung wartet beim Deckel von 125."
         },
@@ -4034,61 +4539,61 @@ export const de_DE: EnTranslations = {
           "identityHeading": "Leder für die Schnellen",
           "identityBody": "Die Leiter steigt von den schlichten Fenbridge-Leder-Beinlingen, -Stiefeln und -Gürteln über die ungewöhnliche Marschpirscherwams, -kapuze und -schultern bis zum seltenen Sumpfwächter-Set, dem besten Leder, das ein Handwerker zuschneiden kann. Zwei Zauberwirker-Stücke runden es ab: das Eastbrook-Druiden-Leder-Feld-Allgemeinstück und die Dämmerfell-Wickel bei Fertigkeit 75.\n\nAuf dem Rad sitzt es zwischen Kochen und Schneiderei. Sein lebendes Paar ist der Ausrüster, Lederverarbeitung und Schneiderei, geschworen vor Weberin Ottilie in Eastbrook; das Fallensteller-Paar mit Kochen ist auf dem Rad benannt, hat aber noch keine Eid-Quest.",
           "materialsHeading": "Die Jagd ist die Ernte",
-          "materialsBody": "Lederverarbeitung ist das Handwerk, bei dem dein Level-Weg und deine Versorgungslinie dasselbe sind: Rohes Leder wird direkt von leder-tragenden Leichen geerntet, vor allem Wölfen und Ebern, und jede Leiche dient nur einem Ernter, wer zuerst kommt mahlt zuerst. Ein seltener oder besserer Erntewurf gewährt auch ein Makelloses Leder, ein signiertes Exemplar, nach dem das Sumpfwächterwams verlangt, also banne jedes gefundene Exemplar.\n\nDie Nebenbesetzung ist überschaubar: Spinnenbeine und Seide, Rohleinen von Humanoiden, ein einzelnes Osmiumerz in jedem seltenen Sumpfwächter-Stück (sechs in den Dämmerfell-Wickel-Abschlussrezept) und ein Gerbmittel für 16 Kupfer am Gerbereizähler. Gerber Hesk verkauft auch Osmiumerz, wenn du lieber nicht abbauen möchtest.",
+          "materialsBody": "Lederverarbeitung ist das Handwerk, bei dem dein Aufstiegsweg und deine Versorgungslinie dasselbe sind: Raues Fell wird direkt von fellführenden Leichen geerntet, vor allem von Wölfen und Ebern, und jede Leiche bedient nur einen Ernter, wer zuerst kommt, mahlt zuerst. Ein seltener oder besserer Erntewurf gewährt außerdem ein Unberührtes Fell, ein signiertes Exemplar, nach dem das Sumpfwächterwams verlangt, also lege jedes zur Bank, das du findest.\n\nDie Nebenrollen sind wenige: Spinnenbeine und Spinnenseide, Selbstgesponnener Stoff von Humanoiden, ein einzelnes Osmiumerz in jedem seltenen Sumpfwächter-Stück (sechs im Abschlussrezept der Dämmerfell-Wickel) und ein Gerbmittel für 16 Kupfer am Tresen der Gerberei. Osmium selbst wird nie beim Händler gekauft: Bau es selbst ab, in Thornpeak oder an den Startadern fast jeder jüngeren Zone (allein die Fernküste gräbt Eisen), oder kaufe es einem anderen Spieler ab.",
           "ladderHeading": "Ausgebildet in Fenbridge",
-          "ladderBody": "Hier liegt die Besonderheit: Die Gerberei steht in Fenbridge, an der Straße zum Sumpfnebel-Moor, was Lederverarbeitung zum einzigen Tiefhandwerk macht, das außerhalb von Eastbrook ausgebildet wird. Gerber Hesk lehrt die Leiter an seinen Bottichen: Die Fenbridge-Leder-Sprosse kostenlos bei Fertigkeit 0, die Marschpirsch-Sprosse für 25 Silber pro Rezept ab Fertigkeit 25 und die Sumpfwächter-Sprosse für 1 Gold das Stück ab Fertigkeit 50, wobei jede Sprosse öffnet, sobald dein Rang sie erreicht.\n\nZwei Rezepte überspringen den Lehrmeister: Die Feld-Allgemeinstücke (das Gegerbte-Leder-Wams und das Druiden-Leder) können überall von Anfang an hergestellt werden, und die Dämmerfell-Wickel sind jedem bekannt, aber bei Fertigkeit 75 gerberei-gebunden. Beachte, dass der Ausrüster-Eid selbst zurück in Eastbrook bei Ottilie geschworen wird; nur die Ausbildung findet im Moor statt.",
+          "ladderBody": "Hier ist der Haken: Die Gerberei steht in Fenbridge, an der Straße ins Mirefen-Moor, was Lederverarbeitung zum einzigen Tiefhandwerk macht, das draußen im Moor ausgebildet wird. Gerber Hesk lehrt die Leiter an seinen Bottichen: die Fenbridge-Leder-Sprosse kostenlos bei Fertigkeit 0, die Marschpirscher-Sprosse für 25 Silber pro Rezept ab Fertigkeit 25 und die Sumpfwächter-Sprosse für je 1 Gold ab Fertigkeit 50, wobei sich jede Sprosse öffnet, sobald dein Rang sie erreicht.\n\nDrei Rezepte umgehen den Lehrmeister: Die Feld-Allgemeinstücke (das Gegerbte Lederwams und die Eastbrook-Druidenhaut) lassen sich von Anfang an überall herstellen, und die Dämmerfell-Wickel kennt jeder, doch sie sitzen bei Fertigkeit 75 und sind an die Gerberei gebunden. Beachte, dass der Ausrüster-Eid selbst zurück in Eastbrook bei Ottilie geschworen wird; nur der Unterricht findet im Moor statt.",
           "routeHeading": "Meisterwerke und ein funktionierender Weg auf 125",
-          "routeBody": "Ab der Marschpirsch-Sprosse aufwärts rollt jede Herstellung auf die Meisterwerk-Chance, und das Makellose Leder in einem Sumpfwächterwams gibt den Signiert-Reagenz-Bonus automatisch; Osmium gilt als Rang-1-Material für den Proc. Die statuslosen Leder-Allgemeinstücke können nicht proc'en.\n\nSteigere es auf natürlichem Weg: Ernte jeden Wolf und Eber, den du ab Stufe eins tötest, stelle die Leder-Sprosse auf 25 her, wo immer du stehst, dann bilde dich in Fenbridge aus, wenn die Quests dich ohnehin ins Moor ziehen. Marschpirsch trägt dich auf 50 und Sumpfwächter auf 75; ab da zahlen die Dämmerfell-Wickel, ein Rang-3-Rezept aus sechs Osmiumerz, drei Makellosen Ledern, zwei Rohen Ledern und einem Gerbmittel, vollen Gewinn bis 99 und die Hälfte danach, etwa 75 Herstellungen für die letzten fünfzig Punkte bis zum Deckel von 125.\n\nDie mobile Gerberei zählt für dieses Handwerk mehr als für jedes andere: Spezialisiere dich bei 75 und eine Satteltasche voller Leder wird am Lagerfeuer zu fertiger Ausrüstung statt eines Fußmarsches zurück nach Fenbridge. Hesks Gerberei-Arbeitsauftrag kauft acht Rohe Leder alle 30 Minuten, ein ordentlicher Ertrag für Häute, die du ohnehin sammelst, und das Buch der Taten markiert Gerbers Gewerbe bei Fertigkeit 50 mit Großmeister-Lederverarbeitung beim Deckel."
+          "routeBody": "Jedes Stück mit echten Attributen würfelt auf die Meisterwerk-Chance, solange die feinere Qualität in deine Rang-Grenze passt, die attributtragende Eastbrook-Druidenhaut eingeschlossen, und ein signiertes Unberührtes Fell in einem Sumpfwächterwams liefert den Signiert-Reagenz-Bonus automatisch; Osmium zählt für den Proc als Rang-1-Material. Die attributlosen Leder-Allgemeinstücke können nicht proc’en.\n\nSteigere es auf natürlichem Weg: Ernte ab Stufe eins jeden Wolf und jeden Eber, den du erlegst, lass dich von den beiden Feld-Allgemeinstücken bis 25 tragen, wo immer du gerade stehst, und lerne dann die Leder-Sprosse an den Bottichen, wenn dich die Quests ohnehin ins Moor ziehen. Marschpirscher trägt dich auf 50 und Sumpfwächter auf 75; danach zahlen die Dämmerfell-Wickel, ein Rang-3-Rezept aus sechs Osmiumerz, drei Unberührten Fellen, zwei Rauen Fellen und einem Gerbmittel, einem abgestimmten Ausrüster vollen Gewinn bis 99 und danach die Hälfte, rund 75 Herstellungen für die letzten fünfzig Punkte bis zur Obergrenze von 125; unterhalb der Grenze eines Hauptberufs lehrt das Rang-3-Rezept nichts.\n\nDie mobile Gerberei zählt für dieses Handwerk mehr als für jedes andere: Spezialisiere dich bei 75, und eine Satteltasche voller Felle wird am Lagerfeuer zu fertiger Ausrüstung statt zu einem Rückweg nach Fenbridge. Hesks Gerberei-Arbeitsauftrag kauft alle 30 Minuten acht Raue Felle, ein hübscher Ertrag für Häute, die du ohnehin gesammelt hast, und das Buch der Taten markiert Das Gerberhandwerk bei Fertigkeit 50, mit Großmeister-Lederverarbeitung an der Obergrenze."
         },
         "cooking": {
           "identityHeading": "Der Topf, der die Gruppe ernährt",
-          "identityBody": "Iss eine gekochte Mahlzeit und sie heilt dich über 18 Sekunden Ruhe, was zwischen Pulls die günstigste Heilung im Spiel ist. Die Leiter reicht von einem 90-Gesundheit-Gebratenen Flussbarsch bis zu Marlows Festtagsbraten mit 980, der größten Sitzend-Heilung, die es gibt.\n\nAuf dem Rad sitzt Kochen zwischen Alchemie und Lederverarbeitung. Sein lebendes Paar ist der Apotheker, Alchemie und Kochen, geschworen vor Köchin Marlow in den Eastbrook-Küchen nach der Jagd auf vier Wildschweine für den Topf; das Fallensteller-Paar mit Lederverarbeitung ist auf dem Rad benannt, hat aber noch keine Eid-Quest.",
+          "identityBody": "Iss eine gekochte Mahlzeit, und sie heilt dich über 18 Sekunden Rast hinweg, was zwischen zwei Pulls die billigste Heilung im Spiel ist. Die Leiter reicht vom In der Pfanne gebratenen Flussbarsch mit 90 Leben bis hinauf zu Marlows Festtagsbraten mit 980, einer Sitzheilung, die nichts im Spiel übertrifft.\n\nAuf dem Rad sitzt Kochen zwischen Alchemie und Lederverarbeitung. Sein lebendes Paar ist der Apotheker, Alchemie und Kochen, geschworen vor Koch Marlow in den Eastbrook-Küchen, nachdem vier Wildeber für den Topf erlegt wurden; das Fallensteller-Paar mit Lederverarbeitung ist auf dem Rad benannt, hat aber noch keine Eid-Quest.",
           "materialsHeading": "Eine Vorratskammer, gespeist von Angel und Messer",
-          "materialsBody": "Angeln bestückt die Signatur-Zutaten, Zone für Zone: Spiegelforelle und Flussbarsch aus den Gewässern des Eastbrook-Tals, Sumpfhecht und Mooraal aus dem Sumpfnebel-Moor, Frostkiemen-Forelle und Schieferflossen-Karpfen aus den Dornkuppen-Höhen. Jede Sprosse der Leiter kocht den Fisch ihres Rangs, sodass einem Koch, der angelt, nie die Zutaten ausgehen.\n\nDie Fleischer-Seite kommt von geernteten Leichen: Wildfleisch von Ebern und ihren Verwandten, und bei einem seltenen oder besserem Erntewurf ein signiertes Erstklassiges Filet, der Mittelpunkt des großen Bratens. Kräuter würzen die besseren Gerichte, ein Aschenholzscheit räuchert den Aal, und Kochsalz kostet 8 Kupfer pro Beutel an Marlows eigenem Stand.",
+          "materialsBody": "Angeln liefert die kennzeichnenden Zutaten, Zone für Zone: Spiegelforelle und Flussbarsch aus den Gewässern des Eastbrook-Tals, Sumpfhecht und Mooraal aus dem Mirefen-Moor, Frostkiemen-Forelle und Silberkarpfen aus den Thornpeak-Höhen. Die Sprossen mischen die Zonen frei (die kostenlose Sprosse will bereits Sumpfhecht, die mittlere Thornpeaks Frostkieme, und das seltene Abendmahl faltet die Spiegelforelle des Tals wieder ein), sodass einem Koch, der überall angelt, wohin ihn die Straße führt, nie der Vorrat ausgeht.\n\nDie Metzgerseite kommt von geernteten Leichen: Wildfleisch von Ebern und ihresgleichen und, bei einem seltenen oder besseren Erntewurf, ein signiertes Erstklassiges Stück, das Herzstück des Festtagsbratens. Kräuter würzen die besseren Gerichte, ein Aschenholzscheit räuchert den Aal, und Kochsalz kostet 8 Kupfer pro Beutel an Marlows eigenem Stand.",
           "ladderHeading": "Von Dörrfleisch zum großen Braten",
-          "ladderBody": "Gesalzenes Dörrfleisch ist das Feldrezept: von Anfang an bekannt, ein Spinnenbein, überall herstellbar, die Wegzehrung jedes frischen Abenteurers. Die Lehrmeister-Leiter wird in den Eastbrook-Küchen auf der Westseite des Platzes gekocht: die kostenlose Sprosse bei Fertigkeit 0 (der Barsch, der Jägers Wildspieß, der Kräuter-Sumpfhecht), die mittlere Sprosse bei Fertigkeit 25 für 25 Silber pro Rezept (Eschenholz-Räucheraal, Goldblatt-Wildeintopf, Frostkiemensuppe) und die seltene Sprosse bei Fertigkeit 50 für 1 Gold das Stück (Abendmahl vom Silberkarpfen, Anglers Festmahlschale, Marlows Festtagsbraten).\n\nChargen-Gerichte strecken deine Zutaten: Der Räucheraal und der Wildeintopf servieren zwei pro Herstellung und die Festmahlschale drei. Marlow lehrt jede Sprosse, sobald dein Rang im Kochen sie erreicht.",
+          "ladderBody": "Gesalzenes Dörrfleisch ist das Feldrezept: von Anfang an bekannt, ein Spinnenbein, überall herstellbar, die Wegzehrung jedes frischen Abenteurers. Die Lehrmeister-Leiter wird in den Eastbrook-Küchen auf der Ostseite des Platzes gekocht: die kostenlose Sprosse bei Fertigkeit 0 (der Barsch, der Jägers Wildspieß, der Kräuter-Sumpfhecht), die mittlere Sprosse bei Fertigkeit 25 für 25 Silber pro Rezept (Eschenholz-Räucheraal, Goldblatt-Wildeintopf, Frostkiemensuppe) und die seltene Sprosse bei Fertigkeit 50 für 1 Gold das Stück (Abendmahl vom Silberkarpfen, Anglers Festmahlschale, Marlows Festtagsbraten).\n\nChargen-Gerichte strecken deine Zutaten: Der Räucheraal und der Wildeintopf servieren zwei pro Herstellung und die Festmahlschale drei. Marlow lehrt jede Sprosse, sobald dein Rang im Kochen sie erreicht.",
           "routeHeading": "Spezialisierung, nicht Meisterwerke, und der Weg auf 125",
           "routeBody": "Kochen ist die ehrliche Ausnahme zur Meisterwerk-Geschichte: Eine Mahlzeit hat keine Statuszeile zur Verbesserung, daher liefern Gerichte nie einen Meisterwerk-Proc, und kein Koch sollte danach streben. Die Meisterschaft des Handwerks ist die Spezialisierung bei 75: ein Fünftel weniger von jeder Zutat, was sich bei Chargen-Gerichten schnell kumuliert, und eine mobile Feldküche, damit das Festmahl vor der Dungeon-Tür gekocht werden kann.\n\nKoch, was du fängst: Kombiniere den Aufstieg mit einer Angelsession und die beiden Gewerbe speisen sich gegenseitig bis ganz oben. Dörrfleisch und die kostenlose Sprosse tragen dich auf 25 mit einem Punkt pro Herstellung, die mittlere Sprosse auf 50 und die seltene auf 75; ab 75 gibt es bisher kein höheres Gericht, sodass die seltenen Gerichte auf halben und dann viertel Gewinn nachlassen, grob 150 weitere Herstellungen bis zum Deckel. Behandle es als Einlagern, nicht als Schleifen: Eine Gilde isst jede Portion.\n\nMarlows Küchenarbeitsauftrag kauft acht Wildfleisch alle 30 Minuten für Münze und EP, und das Buch der Taten markiert Erfahrener Koch bei Fertigkeit 50 auf dem Weg zum Großmeister-Kochen-Titel bei 125."
         },
         "alchemy": {
           "identityHeading": "Flaschen, die Kämpfe entscheiden",
-          "identityBody": "Das Handwerk wird in der Apotheke in Highwatch betrieben, der Heimat von Alchemistin Verane, Meisterin der Apotheke, die die Rezeptleiter lehrt, Glasfläschchen zu je 12 Kupfer verkauft und Münzen für Kräuter über ihren Arbeitsauftrag zahlt.\n\nAuf dem Handwerksrad sitzt Alchemie bei den Versuch-und-Irrtum-Gewerben, neben Ingenieurskunst auf einer Seite und Kochen auf der anderen. Das ergibt zwei Paaridentitäten: den Bombardier (Ingenieurskunst und Alchemie, geschworen vor Tüftlerin Gizzel in Eastbrook) und den Apotheker (Alchemie und Kochen, geschworen vor Köchin Marlow). Stimme dich auf eines der Paare ab, um Alchemie zu einem Hauptberuf zu machen und das Gewerbe bis zu seinem Deckel zu öffnen; bis dahin arbeitet es bis zur seltenen Stufe wie jedes nicht erklärte Handwerk.",
+          "identityBody": "Das Handwerk wird an der Apotheke in Highwatch ausgeübt, dem Sitz von Alchemist Verane, Meister der Apotheke: Verane lehrt die Rezeptleiter, verkauft Glasfläschchen für 12 Kupfer und zahlt über den eigenen Arbeitsauftrag Münze für Kräuter.\n\nAuf dem Handwerksrad sitzt Alchemie bei den Versuch-und-Irrtum-Gewerben, auf der einen Seite neben Ingenieurskunst, auf der anderen neben Kochen. Das gibt ihr zwei Paar-Identitäten: den Bombardier (Ingenieurskunst und Alchemie, aufgenommen vor Tüftler Gizzel in Eastbrook) und den Apotheker (Alchemie und Kochen, geschworen vor Koch Marlow). Stimme dich auf eines der beiden Paare ab, um Alchemie zu einem Hauptberuf zu machen und deine eigene signierte Arbeit dich zurücklehren zu lassen; das Bombardier-Paar öffnet zudem sein Kombinationsgebräu, das Elixier des Bären, während das Apotheker-Paar noch kein Kombinationsrezept mitbringt. Die Leiter selbst wartet allerdings nie, denn jedes Alchemie-Rezept liegt innerhalb des seltenen Rangs, unter dem nicht abgestimmte Handwerke arbeiten, sodass der gesamte Aufstieg bis zur Obergrenze schon vor jedem Eid offensteht.",
           "materialsHeading": "Kräuter, Drüsen und Glas",
           "materialsBody": "Jeder Trank benötigt ein Glasfläschchen plus Kräuter passend zu seiner Sprosse: Schimmerblatt wächst im Eastbrook-Tal, Goldblatt im Sumpfnebel-Moor und Sonnenblüte in den Dornkuppen-Höhen, ein Kraut pro Zone, sodass deine Tränke die Welt mit dir erklimmen. Kräutersammeln ist das natürliche Partnerskill, obwohl das Kaufen von Sammlern oder auf dem Markt genauso funktioniert; tiefere Zonen beherbergen Felder höherer Stufe, die eine bessere Sichel erfordern, also halte dein Werkzeug aktuell, wenn du selbst pflückst.\n\nDie Elixierlinie fügt eine Jäger-Zutat hinzu: Giftdrüsen, geerntet von giftigen Leichen, und das oberste Elixier verlangt eine Makellose Giftdrüse, das signierte seltene Exemplar, das ein glücklicher Leichen-Ernte-Wurf liefert. Wenn du nicht selbst erntst, sind das genau die Waren, für die es sich lohnt, einen Jägerfreund um Mitbringsel zu bitten.",
           "ladderHeading": "Die Rezeptleiter",
-          "ladderBody": "Jeder kennt den Geringen Heiltrank von Anfang an und kann ihn überall mischen, ohne Station. Die eigentliche Leiter besteht aus neun Rezepten, die Verane in der Apotheke lehrt, drei auf jeder Sprosse: Die Fertigkeit-0-Rezepte sind kostenlos, die Fertigkeit-25-Sprosse kostet 25 Silber pro Rezept und die Fertigkeit-50-Sprosse 1 Gold pro Rezept. Jede Sprosse enthält einen Heiltrank, einen Manatrank und ein Ausdauerelixier, aufsteigend von gewöhnlichen Schimmerblatt-Flaschen (120 Gesundheit, 160 Mana) über ungewöhnliche Goldblatt-Tränke (200 Gesundheit, 260 Mana) bis zu seltenen Sonnenblüten-Tränken (280 Gesundheit, 360 Mana).\n\nDie Elixiere steigen auf dieselbe Weise: Das Elixier des Ebers gewährt 6 Ausdauer für 10 Minuten, das Giftseuche-Elixier 9 für 15 Minuten und das Elixier der Schlange 12 für 15 Minuten, wobei zwei Flaschen pro Herstellung gebraut werden. Ein weiteres Rezept steht für sich: das Elixier des Bären, ein Kombinationsgebräu, das Verane für 25 Silber lehrt, sobald deine Alchemie 25 erreicht, überall mischbar, aber nur von einem abgestimmten Bombardier mit Alchemie und Ingenieurskunst auf 25.",
+          "ladderBody": "Jeder kennt den Geringen Heiltrank von Anfang an und kann ihn überall mischen, ganz ohne Station. Die eigentliche Leiter besteht aus neun Rezepten, die Verane in der Apotheke lehrt, drei je Sprosse: Die Rezepte bei Fertigkeit 0 sind kostenlos, die Sprosse bei Fertigkeit 25 kostet 25 Silber pro Rezept, und die Sprosse bei Fertigkeit 50 kostet 1 Gold pro Rezept. Jede Sprosse besteht aus einem Heiltrank, einem Manatrank und einem Ausdauerelixier und steigt von den gewöhnlichen Schimmerblatt-Flaschen (120 Leben, 160 Mana) über ungewöhnliches Goldblatt (200 Leben, 260 Mana) bis zur seltenen Sonnenblüte (280 Leben, 360 Mana).\n\nDie Elixiere steigen genauso: Das Elixier des Ebers gewährt 6 Ausdauer für 10 Minuten, das Vipersear-Elixier 9 für 15 Minuten und das Elixier der Schlange 12 für 15 Minuten, wobei allein die Schlange zwei Flaschen pro Herstellung braut. Ein weiteres Rezept steht abseits: das Elixier des Bären, ein Kombinationsgebräu, das Verane für 25 Silber lehrt, sobald deine Alchemie 25 erreicht, überall mischbar, aber nur von einem abgestimmten Bombardier mit Alchemie und Ingenieurskunst je auf 25.",
           "routeHeading": "Der Brauer-Weg auf 125",
-          "routeBody": "Tränke und Elixiere liefern nie Meisterwerke; dieser Effekt gehört zur statusbehafteten Ausrüstung. Dein Name reist dennoch mit: Die seltenen Sonnenblüten-Tränke werden einzeln gebraut und kommen mit dem Markenzeichen des Herstellers, während das Doppelchargen-Elixier der Schlange schlicht bleibt. Bei Fertigkeit 75 spezialisierst du dich, und jedes Alchemie-Rezept verbraucht ab dann 20 Prozent weniger Materialien.\n\nNimm Kräutersammeln früh und pflücke beim Leveln: Schimmerblatt gibt es überall im Tal, und sobald du Veranes Bank erreichst, trägt dich die kostenlose Sprosse sauber auf Fertigkeit 25 mit Kräutern, die du ohnehin gepflückt hättest. Lerne die 25er-Sprosse, sobald sie verfügbar ist, verlagere deine Ernte ins Moor für Goldblatt und lass Veranes Arbeitsauftrag (sechs Goldblatt-Kräuter für 45 Kupfer, alle 30 Minuten wiederholbar) dabei etwas Münze einbringen.\n\nAb 50 braue Sonnenblüten-Tränke und Schlangen-Chargen aus den Dornkuppen-Kräutern. Die letzte Strecke von 100 bis 125 ist bewusst langsam, also braue das, was sich tatsächlich verkauft, statt Kräuter für die Zahl zu verbrennen, und denke daran, dass Verbrauchsgüter das einzige hergestellte Gut sind, das jeder für immer nachkauft. Das Buch der Taten markiert Seltsame Gebräue bei Fertigkeit 50 und Großmeister-Alchemie beim Deckel."
+          "routeBody": "Tränke und Elixiere würfeln nie auf Meisterwerke; dieser Proc gehört zur statusbehafteten Ausrüstung. Dein Name reist trotzdem mit: Die seltenen Sonnenblüten-Tränke kommen mit der Signatur ihres Herstellers an, und ebenso jede Flasche des doppelt gebrauten Elixiers der Schlange, sodass in diesem Handwerk nichts Seltenes die Werkbank unsigniert verlässt. Bei Fertigkeit 75 spezialisierst du dich, und jedes Alchemie-Rezept kostet von da an 20 Prozent weniger Material.\n\nNimm Kräuterkunde früh und pflücke beim Aufsteigen: Schimmerblatt wächst überall im Tal, und sobald du Veranes Werkbank erreichst, trägt dich die kostenlose Sprosse sauber bis Fertigkeit 25, und zwar mit Kräutern, die du ohnehin gepflückt hättest. Lerne die 25er-Sprosse in dem Moment, in dem sie aufgeht, verlege dein Pflücken für Goldblatt ins Moor, und lass Veranes Arbeitsauftrag (sechs Goldblattkräuter für 45 Kupfer, alle 30 Minuten wiederholbar) unterwegs ein wenig Münze zurückgeben.\n\nAb 50 braust du Sonnenblüten-Tränke und Schlangen-Chargen aus Thornpeak-Sonnenblüte, mit ein wenig Grün aus dem Tal und dem Moor noch im Ansatz. Die letzte Strecke von 100 auf 125 ist ein bewusstes Rinnsal, also braue, was sich tatsächlich verkauft, statt Kräuter für die Zahl zu verbrennen, und denk daran, dass Verbrauchsgüter die eine gefertigte Ware sind, die jeder für immer nachkauft. Das Buch der Taten markiert Seltsame Gebräue bei Fertigkeit 50 und Großmeister-Alchemie an der Obergrenze."
         },
         "engineering": {
           "identityHeading": "Das Monopol des Werkzeugmachers",
-          "identityBody": "Das Handwerk wird in der Werkzeugmacherei in der südöstlichen Ecke des Eastbrook-Platzes betrieben, der Heimat von Tüftlerin Gizzel, Meisterin der Werkzeugmacherei. Rang 1 bis 3 jeder Werkzeugline sind gewöhnliches Händlersortiment; Rang 4 und 5 gibt es nur durch einen Ingenieur.\n\nAuf dem Rad sitzt es bei den Versuch-und-Irrtum-Gewerben, neben Alchemie und Rüstungsherstellung, was ihm zwei Paaridentitäten gibt: den Bombardier (Ingenieurskunst und Alchemie, geschworen vor Gizzel selbst) und den Zahnradschmied (Rüstungsherstellung und Ingenieurskunst, benannt, aber noch nicht schwörbar). Eine Warnung zählt hier mehr als irgendwo sonst: Beide Rezept-Sprossen der Ingenieurskunst liegen über der selten-Rang-Grenze, unter der Hobbys und nicht erklärte Handwerker arbeiten, sodass sich die Fertigkeitszahl nur für einen Handwerker bewegt, dessen Hauptberufe Ingenieurskunst umfassen, was heute den Bombardier bedeutet. Jeder kann die Werkzeuge dennoch bauen; ein nicht abgestimmter Handwerker lernt beim Tun nur nichts.",
+          "identityBody": "Das Handwerk wird in der Werkzeugmacherei in der Südwestecke des Eastbrook-Platzes ausgeübt, dem Sitz von Tüftler Gizzel, Meister der Werkzeugmacherei. Rang 1 bis 3 jeder Werkzeuglinie sind gewöhnliche Händlerware; Rang 4 und 5 kommen von der Werkbank eines Ingenieurs oder vom Tiefgang-Tresen der Ertrunkenen Litanei gegen Tiefgang-Marken hinter deren Räumungsschranken, und niemals gegen Münze aus irgendeiner Kasse.\n\nAuf dem Rad sitzt sie bei den Versuch-und-Irrtum-Gewerben, neben Alchemie und Rüstungsherstellung, was ihr zwei Paar-Identitäten gibt: den Bombardier (Ingenieurskunst und Alchemie, aufgenommen vor Gizzel höchstpersönlich) und den Zahnradschmied (Rüstungsherstellung und Ingenieurskunst, benannt, aber noch nicht schwörbar). Eine Warnung wiegt hier schwerer als irgendwo sonst: Jede einzelne Rezeptsprosse der Ingenieurskunst liegt über der Grenze des seltenen Rangs, unter der Hobbys und nicht abgestimmte Handwerker arbeiten, sodass sich die Fertigkeitszahl nur für jemanden bewegt, dessen Hauptberufe Ingenieurskunst einschließen, was heute den Bombardier bedeutet. Die Landwerkzeuge kann trotzdem jeder bauen; ein nicht abgestimmter Handwerker lernt dabei nur nichts, und die beiden Ruten-Rezepte verlangen obendrein Gizzels Unterricht.",
           "materialsHeading": "Reagenzien und Vorgänger-Werkzeuge",
-          "materialsBody": "Jedes Werkzeug-Rezept verbraucht das Werkzeug einen Rang darunter plus ein Premium-Material: Vier Osmiumerz und einen Himmelssilber-Grabpickel ergeben den Osmium-Grabpickel, dann zwei Glyphstahlbarren und diesen Osmium-Grabpickel ergeben den Glyphstahl-Grabpickel, und die Axt- und Sichellinien spiegeln dieselbe Form mit Eschenholz- und Hochfichten-Stämmen, Goldblatt- und Sonnenblüten-Kräutern.\n\nGizzel führt alle sechs Premium-Reagenzien in der Werkzeugmacherei, wenn du Geschwindigkeit über Marge stellst, aber Erz, Stämme und Kräuter sind alle in Sumpfnebel-Moor und Dornkuppen-Höhen sammelbar, und geernteter Vorrat ist der Ort, wo der Gewinn liegt. Die einzige Ausnahme ist der Glyphstahlbarren, der nur beim Händler erhältlich ist, sodass jedes Glyphstahl-Rang-Werkzeug einen festen Münz-Bodenwert hat, der in seinen Kosten eingebaut ist.",
+          "materialsBody": "Jedes Landwerkzeug-Rezept verbraucht das Werkzeug einen Rang unter sich plus ein FEINES Material, und diese Paarung ist die ganze Landleiter: Vier Feine Eisenerze und eine Himmelsilber-Spitzhacke werden zur Osmium-Spitzhacke, dann werden zwei Glyphstahlbarren, zwei Feine Osmiumerze und eben diese Osmium-Spitzhacke zur Glyphstahl-Spitzhacke. Die Axt- und die Sichellinie spiegeln dieselbe Form aus Feinmaterial plus Vorgängerwerkzeug mit Feinen Aschenholz- und Feinen Hochfichtenscheiten sowie Feinen Goldblatt- und Feinen Sonnenblütenkräutern, doch ihre Rang-5-Sprossen verlangen keine Glyphstahlbarren: Die Spitzhacke ist die eine Linie, die oben teurer wird. Die beiden Ruten-Rezepte brechen das Muster mit Absicht: Die Sturmrolle nimmt vier Sonnenschimmer-Kois und eine Silberbach-Rute, die Gezeitengeschmiedete zwei Kois, acht Rohe Silberkarpfen und eben diese Sturmrolle, sodass die Spitze der Anglerleiter auf dem Wasser bezahlt wird und nicht an einer Ader.\n\nEin feines Material wird nirgends verkauft und fällt bei einer gewöhnlichen Ernte nicht an: Du bekommst es, indem du eine der vollwertigen Adern einer Zone mit einem Werkzeug bearbeitest, das höher eingestuft ist als das Material selbst, was in der Praxis das Werkzeug eine Sprosse unter dem bedeutet, das du bauen willst (die leichteren Adern, die eine Zone für Reisende bereithält, geben das schlichte Material her, ganz gleich, womit du zuschlägst). Das ist Absicht. Auf dem Handwerksweg entsteht ein Werkzeug von Rang 5 daraus, dass man das von Rang 4 tatsächlich schwingt, nicht aus einem Einkaufsbummel; der Tresen für Tiefgang-Marken ist der eine Weg daran vorbei. Die einzige Ausnahme ist der Glyphstahlbarren, raffiniert und nur beim Händler zu haben, 1 Silber 60 Kupfer je Barren bei Quartiermeisterin Bree in Highwatch oder an Gizzels eigenem Tresen, sodass allein die Glyphstahl-Spitzhacke einen festen Münzboden in ihren Kosten trägt.",
           "ladderHeading": "Die Werkzeug-Leiter",
-          "ladderBody": "Die gesamte Leiter besteht aus sechs Rezepten, alle an die Werkzeugmacherei-Station gebunden und alle automatisch bekannt, ohne Lehrmeister-Gebühr je: die Rang-4-Spitzhacke, -Axt und -Sichel bei Fertigkeit 75 und die Rang-5-Versionen bei Fertigkeit 150. Diese zweite Zahl ist kein Tippfehler, und sie liegt absichtlich über dem aktuellen Deckel von 125: Fertigkeitsanforderungen sperren hier nie ein Handwerk aus, sie formen nur den Fertigkeitsgewinn, sodass du ein Rang-5-Werkzeug an dem Tag bauen kannst, an dem du seine Reagenzien und seinen Rang-4-Vorgänger hast.\n\nJedes fertige Werkzeug ist von seltener oder epischer Qualität und kommt signiert heraus, sodass dein Name auf den Werkzeuggürteln anderer Spieler durch die Zonen reist. Ingenieurskunst hält auch die Hälfte eines Kombinationsrezepts: das Elixier des Bären, gebraut von einem abgestimmten Bombardier mit Ingenieurskunst und Alchemie auf 25.",
+          "ladderBody": "Die Leiter besteht aus acht Rezepten, alle an die Station der Werkzeugmacherei gebunden. Die sechs Landwerkzeug-Rezepte sind automatisch bekannt, nie mit einer Lehrmeistergebühr: die Spitzhacke, die Axt und die Sichel von Rang 4 bei Fertigkeit 75 und die Versionen von Rang 5 bei Fertigkeit 150. Diese zweite Zahl ist kein Tippfehler, und sie liegt mit Absicht über der aktuellen Obergrenze von 125: Fertigkeitsanforderungen sperren hier nie ein Handwerk, sie formen nur den Fertigkeitsgewinn, sodass du ein Werkzeug von Rang 5 an dem Tag bauen kannst, an dem du seine Reagenzien und seinen Rang-4-Vorgänger in Händen hältst. Die beiden gefertigten Ruten sind die gelehrte Ausnahme: Gizzel lehrt die Sturmrolle bei Fertigkeit 75 für 4 Gold und die Gezeitengeschmiedete bei Fertigkeit 125 für 16 Gold, jede in dem Moment, in dem dein Rang im Handwerk ihren eigenen erreicht.\n\nJedes fertige Werkzeug hat seltene oder epische Qualität und kommt signiert heraus, sodass dein Name an den Werkzeuggürteln anderer Spieler durch die Zonen reist. Ingenieurskunst hält außerdem die Hälfte eines Kombinationsrezepts: das Elixier des Bären, gebraut von einem abgestimmten Bombardier mit Ingenieurskunst und Alchemie je auf 25.",
           "routeHeading": "Der Ingenieur-Weg auf 125",
           "routeBody": "Werkzeuge haben keine Kampfstatistiken, daher liefern sie nie Meisterwerke; dieser Proc gehört zur statusbehafteten Ausrüstung. Spezialisierung setzt dennoch bei Fertigkeit 75 ein: 20 Prozent weniger Materialien pro Herstellung und eine temporäre Feld-Werkzeugmacherei, die jeden Sammelausflug zur Werkstatt macht. Die Gewinnrechnung verblasst hier kaum: Die Fertigkeit-75-Rezepte zahlen vollen Gewinn bis 100 und die Hälfte danach, und die Fertigkeit-150-Rezepte zahlen vollen Gewinn bis zum Deckel von 125, sodass die echte Einschränkung Reagenzien und Münze ist, nie graue Rezepte.\n\nWähle zuerst dein Paar, denn ohne es bewegt sich nichts: Nimm die Bombardier-Abstimmung von Tüftlerin Gizzel. Dann füttere die Leiter: Lerne Bergbau, Holzfällen oder Kräutersammeln selbst oder befreunde dich mit Sammlern, kaufe die Rang-3-Werkzeuge von Händlern und behandle Gizzels Arbeitsauftrag (acht Eisenrinden-Stämme für 16 Kupfer, alle 30 Minuten wiederholbar) als Taschengeld.\n\nIngenieurskunst ist ein niedrig-volume Prestige-Gewerbe, grob ein Fertigkeitspunkt pro fertigem Werkzeug, also behandle jede Herstellung als Lagerbestand zum Verkauf. Das Verkaufsargument für deine Kunden schreibt sich von selbst: Jede Werkzeug-Stufe über einem Knoten-Eigenrang verkürzt die 2,5-Sekunden-Erntezeit um 0,4 Sekunden (bis zu einem Boden von 1,5 Sekunden), sodass ein Rang-5-Werkzeug ein Tempo-Upgrade an jedem Knoten der Welt ist, und nur du kannst eines herstellen. Das Buch der Taten markiert Zahnräder und Schrauben bei Fertigkeit 50 und Großmeister-Ingenieurskunst bei 125."
         },
         "enchanting": {
           "identityHeading": "Ausrüstung zerlegen, Kraft zurückgewinnen",
-          "identityBody": "Es gibt keine Station, keinen Lehrmeister und keine Rezeptliste zu kaufen: Jede Verzauberung ist von Anfang an bekannt, jeder kann schon am ersten Tag entzaubern, und das Gewerbe ist bei 125 gedeckelt wie jedes andere Handwerk.\n\nAuf dem Rad sitzt es zwischen Inschriftenkunde und Juwelierkunst, daher sind seine zwei Paaridentitäten der Arkanist (Inschriftenkunde und Verzauberung) und der Edelsteinbinder (Verzauberung und Juwelierkunst). Keines kann noch geschworen werden, da beide Nachbarn auf ihre ersten Rezepte warten, also steigt Verzauberung heute als Handwerk aller: kostenlos bis zur seltenen Stufe vor jedem Eid, und eine natürliche Hobby-Wahl für einen Bombardier oder Apotheker. Verzauberer halten auch die Sammelwelt am Laufen: Die drei einsetzbaren Werkzeugeffekte sind Verzaubererarbeit, und ein Original-Hersteller lädt seine eigenen Effekte zu einem Rabatt nach, noch tiefer nach der Spezialisierung.",
+          "identityBody": "Jede Verzauberung ist von Anfang an bekannt, jeder kann vom ersten Tag an entzaubern, und beides braucht nie eine Station; die Fertigkeit endet wie bei jedem Handwerk bei 125. Die eine gelehrte Ecke des Gewerbes sind seine beiden Talisman-Rezepte: Tüftler Gizzel lehrt den Hort des Sammlers und das Auge des Handwerkers in der Werkzeugmacherei in der Südwestecke des Eastbrook-Platzes, für die übliche Ranggebühr, sobald deine Verzauberung 25 erreicht, und die Talismane selbst werden an seiner Station gefertigt.\n\nAuf dem Rad sitzt sie zwischen Inschriftenkunde und Juwelenkunde, also sind ihre beiden Paar-Identitäten der Arkanist (Inschriftenkunde und Verzauberung) und der Edelsteinbinder (Verzauberung und Juwelenkunde). Keines von beiden lässt sich bisher schwören, da beide Nachbarn noch auf ihre ersten Rezepte warten, und so steigt Verzauberung heute als Handwerk für alle: bis zum seltenen Rang frei vor jedem Eid und eine natürliche Hobbywahl für einen Bombardier oder einen Apotheker. Verzauberer halten außerdem die Sammelwelt am Laufen: Die beiden einsetzbaren Werkzeugeffekte sind Verzaubererarbeit, und wer sie ursprünglich gefertigt hat, lädt die eigenen Effekte vergünstigt wieder auf, nach der Spezialisierung sogar noch günstiger.",
           "levelingHeading": "Wie Verzauberung sich steigert",
-          "levelingBody": "Zwei Handlungen steigern das Gewerbe: das Entzaubern eines Stücks und das Anwenden einer Verzauberung. Jeder Erfolg ist bis zu einem Punkt wert, skaliert nach der Schwere der Arbeit: die Seltenheit des Stücks, das du zerbrichst, oder der Reagenzrang des Zaubers, den du anwendest. Gewöhnliche Entzauberungen und nur-Staub-Verzauberungen zählen als gewöhnliche Arbeit; ungewöhnliche Entzauberungen und Essenz-Verzauberungen als ungewöhnlich; seltene Entzauberungen und jede Runisch-Verzauberung oder Große Verzauberung als selten; epische und legendäre Entzauberungen noch höher.\n\nDas bekannte Meisterschafts-Abschwächen gilt auf 25-Punkt-Stufen, sodass gewöhnliche Arbeit bei Fertigkeit 75 grau wird, ungewöhnliche bei 100, und seltene Arbeit genau beim Deckel von 125. Verzauberung hat auch eine eigene Freundlichkeit: Input über deiner Archetyp-Grenze wird auf diese Grenze abgerundet statt auf null gesetzt, sodass eine epische Entzauberung vor der Abstimmung einfach als selten gewertet wird statt nichts zu lehren. Wenn Verzauberung hinter einer anderen Identität inaktiv wird, zählt alles als gewöhnliche Arbeit und der Aufstieg stockt bei 75; behalte es als Hobby und seltene Arbeit zahlt sich immer noch aus, wenn auch langsamer ab 75.",
+          "levelingBody": "Drei Handlungen bewegen die Fertigkeit: ein Stück entzaubern, eine Verzauberung anwenden und die beiden Talismane herstellen, die der gewöhnlichen Handwerkskurve folgen. Jeder Erfolg ist bis zu einen Punkt wert, skaliert danach, wie ernsthaft die Arbeit ist: nach der Seltenheit des Stücks, das du zerbrichst, oder nach dem Reagenzrang der Verzauberung, die du anwendest. Gewöhnliche Entzauberungen und reine Staub-Verzauberungen zählen als gewöhnliche Arbeit; ungewöhnliche Entzauberungen und Essenz-Verzauberungen als ungewöhnliche; seltene Entzauberungen und jede Runen- oder Große Verzauberung als seltene; epische und legendäre Entzauberungen stehen auf der Tabelle noch höher, doch da heute keine Verzauberungs-Identität über die seltene Sprosse hinausreicht, zahlen sie in der Praxis dasselbe wie seltene Arbeit. Eine Ehrlichkeit regiert die Zerbrecherbank: Ein Stück, das von einer Spielerwerkbank stammt (gefertigt, signiert oder als Meisterwerk), zerfällt zwar weiterhin zu Materialien, lehrt aber nichts, sodass eine Herstellen-und-Zerbrechen-Schleife niemanden aufsteigen lässt: Die Lektionen stecken in der Ausrüstung, die die Welt hergibt.\n\nDas vertraute Meisterschaftsverblassen greift in 25-Punkte-Stufen, also wird Arbeit gewöhnlicher Güte bei Fertigkeit 75 grau, ungewöhnliche bei 100 und Arbeit seltenen Rangs genau an der Obergrenze von 125. Verzauberung hat außerdem eine eigene Freundlichkeit: Was oberhalb deiner Archetyp-Grenze hereinkommt, wird auf diese Grenze abgerundet statt auf null gesetzt, sodass eine epische Entzauberung vor deiner Abstimmung schlicht als selten zählt, statt gar nichts zu lehren. Ruht die Verzauberung hinter einer anderen Identität, zählen Zerbrechen und Anwenden als gewöhnliche Arbeit und der Aufstieg bleibt bei 75 stehen, während die beiden Talismane, die der Handwerkskurve oberhalb der gewöhnlichen Grenze folgen, einem ruhenden Verzauberer überhaupt nichts beibringen; behalte sie als Hobby, und Arbeit seltenen Rangs zahlt weiterhin, nur langsamer jenseits von 75.",
           "marketHeading": "Verzauberte Kopien, Herkunft und der Markt",
-          "marketBody": "Das Anwenden einer Verzauberung verbraucht die Reagenzien und markiert eine bestimmte Kopie des Gegenstands. Auf eine eingetütete Kopie angewandt erhältst du eine eigenständige verzauberte Kopie zurück; auf ein bereits angelegtes Stück angewandt wird es an Ort und Stelle verzaubert, ganz ohne Ablegen und Wiederanlegen. So oder so folgt der Bonus dem Stück für immer, durch Ablegen, Banktransporte und Handel. Eine Verzauberung pro Stück: Eine andere Verzauberung auf eine verzauberte Kopie anzuwenden fragt erst nach Bestätigung und ersetzt dann die alte Verzauberung direkt; sie wird zerstört, ohne dass ihre Materialien erstattet werden. Verkaufen, Wegwerfen und Entzaubern bevorzugen zuerst einfache Kopien, sodass dein fertiges Stück nicht versehentlich aufgebraucht wird. Identisch verzauberte Kopien können sich sogar in deinen Taschen stapeln.\n\nMeisterwerk-Ausrüstung und Verzauberung sind Freunde: Ein Meisterwerk-Stück bleibt vollständig verzauberbar, und die Verzauberung kommt obendrauf auf den Meisterwerk-Bonus, ohne ihn oder die Hersteller-Signatur zu stören. Alle Quellen gestapelt ist ein signiertes Meisterwerk mit einer Großen Verzauberung das Beste, was ein hergestelltes Stück erreichen kann, und es bleibt by design unter Raidbeute.\n\nAuf dem Markt führt der Weltmarkt nur einfaches, unmodifiziertes Angebot, daher wechseln verzauberte und signierte Stücke von Angesicht zu Angesicht über das Handelsfenster. Die Materialien sind die vermarktbare Hälfte des Handwerks: Staub, Essenz und Scherben werden frei gelistet, das Einstellen kostet nichts, und der Händler nimmt 5 Prozent eines abgeschlossenen Verkaufs. Das macht die zwei klassischen Verzauberer-Einnahmen aus: Materialien auf dem Markt verkaufen und das Stück eines Kunden im Handel entgegennehmen, verzaubern und zurückgeben."
+          "marketBody": "Eine Verzauberung anzuwenden verbraucht die Reagenzien und kennzeichnet genau eine Kopie des Gegenstands. Richte sie auf eine Kopie in der Tasche, und du bekommst eine eigene verzauberte Kopie zurück; richte sie auf ein Stück, das du bereits trägst, und es wird an Ort und Stelle verzaubert, genau dort, wo es sitzt, ohne das Ablegen-und-wieder-Anlegen-Theater. So oder so folgt der Bonus diesem Stück für immer, durch Ablegen, Bankgänge und Handel. Eine Verzauberung pro Stück: Wendest du eine andere Verzauberung auf eine verzauberte Kopie an, wird erst nachgefragt, und danach ersetzt sie die alte Verzauberung vollständig und zerstört sie ohne Erstattung ihrer Materialien. Verkaufen, Wegwerfen und Entzaubern greifen alle zuerst nach schlichten Kopien, damit dein fertiges Stück nicht aus Versehen verschlungen wird.\n\nMeisterwerk-Ausrüstung und Verzauberung sind Freunde: Ein Meisterwerkstück bleibt voll verzauberbar, und die Verzauberung legt sich auf den Meisterwerk-Bonus obendrauf, ohne ihn oder die Signatur des Herstellers anzutasten. Rechnet man jede Quelle zusammen, ist ein signiertes Meisterwerk mit einer Großen Verzauberung das Beste, was ein gefertigtes Stück erreicht, und es liegt konstruktionsbedingt immer noch unter Schlachtzugsbeute.\n\nAuf dem Markt wird ein verzaubertes oder signiertes Stück wie alles andere eingestellt: Es geht als eigenes Einzelstück-Angebot hoch, der Tooltip zeigt die Verzauberung und die Signatur des Herstellers, und die Rabenpost trägt es ebenso zuverlässig. Die Materialien bleiben die stetige Hälfte des Handwerks: Staub, Essenz und Splitter lassen sich frei einstellen, das Einstellen kostet nichts, und der Händler nimmt nur 5 Prozent eines abgeschlossenen Verkaufs. Damit sind die beiden klassischen Verzauberer-Einkommen der Verkauf von Materialien und der Verkauf fertiger Arbeit: über den Markt, per Rabe oder von Angesicht zu Angesicht im Handelsfenster."
         }
       },
       "howHeading": "Wie Handwerk funktioniert",
-      "howBody": "Öffne das Handwerksfenster (Standardtaste T) und jedes Rezept, das du kennst, ist mit dem aufgelistet, was es benötigt und was du zur Hand hast. Stationsgebundene Rezepte verlangen, dass du innerhalb von 20 Metern der richtigen Station in der Stadt stehst, Feldrezepte werden überall hergestellt, und Verzauberung braucht überhaupt keine Station. Es gibt keinen Fehlerwurf: Eine Herstellung mit den Materialien zur Hand gelingt immer.\n\nZwei kleine Reibungspunkte halten die Wirtschaft ehrlich. Jede erfolgreiche Herstellung kostet eine Gebühr von 2 Kupfer pro Punkt des Statuswerts des Gegenstands, und Handwerksaktionen teilen sich ein Tempo: höchstens 10 Herstellungen, Entzauberungen, Verzauberungen oder Zerlegungen in jeweils 60 Sekunden. Keines davon wird eine normale Spielsitzung beeinträchtigen; beide verhindern, dass ein auf Höchststand spezialisierter Handwerker den Markt überschwemmt.",
+      "howBody": "Öffne das Handwerksfenster (Standardtaste T), und jedes Rezept, das du kennst, steht dort mit dem, was es braucht, und dem, was du zur Hand hast. Stationsgebundene Rezepte verlangen, dass du höchstens 20 Meter von der passenden Station in der Stadt entfernt stehst, Feldrezepte lassen sich überall herstellen, und Entzaubern und Verzaubern in der Verzauberung brauchen überhaupt keine Station (nur ihre beiden Talisman-Rezepte sind Stationsarbeit, an der Werkzeugmacherei). Es gibt keinen Fehlschlagswurf: Eine Herstellung mit den Materialien in der Hand gelingt immer.\n\nZwei kleine Reibungen halten die Wirtschaft ehrlich. Jede erfolgreiche Herstellung kostet eine Gebühr von 2 Kupfer pro Punkt des Wertebudgets des Gegenstands, und Handwerksaktionen teilen sich ein Tempo: höchstens 10 Herstellungen, Entzauberungen, Verzauberungen, Zerlegungen oder Werkzeugaufladungen in jedem Fenster von 60 Sekunden. Keine von beiden wird eine normale Sitzung stören; beide hindern einen Spezialisten am Maximum daran, den Markt zu überschwemmen.",
       "recipesHeading": "Rezepte",
       "recipesNote": "Jedes Rezept des Berufs: seine genaue Fertigkeitsanforderung und Materialien, wo es erlernt wird und zu welcher Gebühr, sowie die drei Fertigkeitswerte, bei denen sein Zuwachs auf halb, ein Viertel und nichts sinkt.",
       "masteryHeading": "Fertigkeitszuwachs",
       "masteryBody": "Jedes Rezept im Fenster zeigt seinen Zuwachsstatus in den klassischen Farben: Orange bedeutet voller Zuwachs, Gelb halb, Grün ein Viertel, Grau nichts. Die Grenzen sind exakt, jede {step} Fertigkeit ist eine Stufe, und ein Rezept verblasst eine Farbe für jede Stufe, die es unter deiner liegt.\n\nDa der Zuwachs deterministisch ist (eine vollwertige Herstellung bewegt dich immer genau um einen Punkt), kannst du den gesamten Aufstieg aus der Liste planen: Arbeite eine Stufe, solange sie orange ist, lerne die nächste Stufe, wenn sie gelb wird, und verschwende nie Materialien für eine graue Herstellung in Erwartung von Fortschritt. An der Obergrenze von {cap} stoppt die Zahl, aber die Rezepte, die Meisterwerkchance und die Gewinne laufen weiter.",
       "masterworkHeading": "Meisterwerke",
-      "masterworkBody": "Jede erfolgreiche Herstellung ist genau das, was das Rezept verspricht, und manchmal ein bisschen mehr: Ein Meisterwerk schließt dasselbe Stück eine Qualitätsstufe feiner ab, mit den Boni bereits beim Herstellen eingearbeitet. Es ist rein additiv, niemals eine Verschlechterung, und es bleibt unterhalb des Schlachtzug-Niveaus, sodass hergestellte Ausrüstung exzellent sein kann, ohne einen Schlachtzugsfund zu ersetzen.\n\nDie Chance ist veröffentlicht, nicht rätselhaft: {base}% Grundchance, plus {perTier}% pro Stufe, die deine Fertigkeit über dem Rezept liegt, plus {signed}%, wenn ein signiertes Reagenz eingeht, plus {spec}%, sobald du spezialisiert bist, wobei höherstufige Materialien jeweils 1 bis 2% mehr hinzufügen, alles gedeckelt bei {cap}%. Nur ein Stück mit echten Statuswerten kann sich verbessern, also lösen statuslose gewöhnliche Gegenstände, Werkzeuge und Verbrauchsgüter niemals eines aus; eine ruhende Herstellung erzeugt kein Meisterwerk, und eine Hobby-Herstellung kann nicht über ihre seltene Decke hinaus als Meisterwerk enden.\n\nFeine Arbeit trägt den Namen ihres Schöpfers. Seltene und bessere Einzelexemplare sind signiert (Hergestellt von; gesammelte Materialien tragen Gesammelt von), ein Meisterwerk ist immer signiert, unabhängig von seiner Qualität, und identisch signierte Stücke stapeln sich trotzdem. Eine Signatur ist Herkunftsnachweis, keine Sperre: signierte Waren werden frei gehandelt.",
+      "masterworkBody": "Jede erfolgreiche Herstellung ist genau das, was das Rezept verspricht, und manchmal ein wenig mehr: Ein Meisterwerk schließt dasselbe Stück eine Qualitätsstufe feiner ab, mit den Bonuswerten, die schon beim Herstellen eingebacken werden. Es kommt nur hinzu, nie als Verschlechterung, und es bleibt unter der Schlachtzugsgrenze, hergestellte Ausrüstung kann also hervorragend sein, ohne einen Schlachtzugsfund zu ersetzen.\n\nDie Chance ist veröffentlicht, nicht mystisch: {base}% Basis, plus {perTier}% je Stufe, die deine Fertigkeit über dem Rezept liegt, plus {signed}%, wenn ein signiertes Reagenz hineingeht, plus {spec}%, sobald du spezialisiert bist, wobei Materialien höherer Stufe 1 bis 2% mehr beisteuern, alles gedeckelt bei {cap}%. Nur ein Stück mit echten Werten kann sich verbessern, gewöhnliche Stücke ohne Werte, Werkzeuge und Verbrauchsgüter lösen also nie aus; ein inaktives Handwerk bringt nie eines hervor, und ein Hobby-Handwerk kann über seine Selten-Decke hinaus kein Meisterwerk schaffen.\n\nFeine Arbeit trägt ihren Schöpfer. Ergebnisse von Selten aufwärts sind signiert, jede einzelne Kopie (Hergestellt von; gesammelte Materialien tragen Gesammelt von), ein Meisterwerk ist immer signiert, welche Qualität es auch hat. Eine Signatur ist ein Herkunftsnachweis, kein Schloss: Signierte Waren lassen sich frei handeln, verschicken und auf dem Weltmarkt einstellen.",
       "trainingHeading": "Ausbildung",
-      "trainingBody": "Ausbilderrezepte kommen von den ansässigen Meistern, gelehrt an ihren Stationen. Die Regel lautet in einem Satz: Ein Meister lehrt ein Rezept, sobald deine Stufe im Beruf die Stufe des Rezepts erreicht hat, und nichts anderes sperrt es, nicht dein Level, nicht dein Archetyp. Die Ausbilderleiter liegt heute bei Fertigkeit 0, 25 und 50, sodass sich mit jeder Stufe, die du erklimmst, eine neue Stufe öffnet.\n\nGebühren sind einmalig und nach Stufe pauschal: Die Einsteigerstufe ist kostenlos, die Fertigkeit-25-Stufe kostet {tier1} pro Rezept, und die Fertigkeit-50-Stufe kostet {tier2}. Du musst an der echten Station des Meisters stehen, um zu lernen, und eine mobile Station zählt nie. Die gewöhnlichen Feldrezepte und die Werkzeugrezepte benötigen überhaupt keine Ausbildung; jeder Charakter kennt sie von Anfang an.",
+      "trainingBody": "Ausbilderrezepte kommen von den ansässigen Meistern und werden an ihren Stationen gelehrt. Die Regel passt in eine Zeile: Ein Meister lehrt ein Rezept, sobald deine Stufe in dem Handwerk die Stufe des Rezepts erreicht hat, und sonst verriegelt es nichts, weder dein Level noch dein Archetyp. Die Leitern für Ausrüstung und Verbrauchsgüter legen ihre Sprossen auf Fertigkeit 0, 25 und 50; die beiden Rutenlektionen der Ingenieurskunst führen die Leiter bei 75 und 125 weiter, und die beiden Talisman-Rezepte der Verzauberung sitzen auf der 25er-Sprosse, sodass eine frische Sprosse aufgeht, während deine Stufen steigen.\n\nDie Gebühren sind einmalig und je Sprosse einheitlich: Die Anfangssprosse ist kostenlos, die Sprosse bei Fertigkeit 25 kostet {tier1} pro Rezept, die Sprosse bei Fertigkeit 50 {tier2}, und die Rutenlektionen darüber tragen ihre eigenen Gebühren, in der Tabelle neben jedem Rezept aufgeführt. Zum Lernen musst du an der tatsächlichen Station des Meisters stehen, und eine mobile Station zählt nie. Die gewöhnlichen Feldrezepte und die sechs herstellbaren Landwerkzeug-Rezepte brauchen überhaupt keine Ausbildung; jeder Charakter kennt sie von Anfang an.",
       "specializationHeading": "Spezialisierung",
       "specializationBody": "Ab Fertigkeit {at} spezialisiert sich dieser Beruf für dich, ohne dass eine Quest nötig ist: Rezepte kosten von da an {pct}% weniger Materialien, und die Spezialisierung fügt der Meisterwerkchance einen eigenen Bonus hinzu.\n\nSpezialisierte Handwerker lernen außerdem, die Werkstatt mit sich zu nehmen: Ein spezialisierter Handwerker kann im Feld eine mobile Station für jeweils zehn Minuten errichten, sodass stationsgebundene Rezepte am Eingang der Mine statt in der Stadt bearbeitet werden können. Ihre Grenzen sind bewusst gesetzt: Sie zählt nie für das Training bei einem Meister oder für das Entbinden einer Auftragsarbeit, und sie läuft nach ihrem Timer ab, ob du sie genutzt hast oder nicht.",
       "ench": {
@@ -4100,7 +4605,7 @@ export const de_DE: EnTranslations = {
         "meleeWeapons": "Nahkampfwaffen",
         "timberWeapons": "Stäbe, Zauberstäbe, Bögen und Armbrüste",
         "enchantsHeading": "Verzauberungen",
-        "enchantsNote": "Verzauberungen gibt es in drei Stufen. Die Basisstufe verwendet Glockenpulver (mit etwas Essenz am oberen Ende) und deckt den Waffenplatz sowie jeden Rüstungsplatz ab, mit genügend Attributoptionen, dass jeder Spielstil für jeden Platz etwas findet. Die Großartige Stufe kostet einen Glockensplitter plus Essenz und ist das Einzige, wofür Splitter verwendet werden: stärkere Boni auf den wirkungsvollsten Plätzen.\n\nDazwischen liegen die fünf Runen-Verzauberungen, eine je typisiertem Sekundärmaterial, sodass nichts, was du zermahlst, je eine Sackgasse ist: Runenschneide (Waffe, Stärke, verbraucht Resonanten Stahl), Runenfokus (Waffe, Intellekt, Resonantes Holz), Runenweben (Brust, Willenskraft, Resonanter Faden), Runenfell (Beine, Beweglichkeit, Resonantes Fell) und Runenglieder (Helm, Ausdauer, Resonante Kettenglieder). Jede verbraucht außerdem zwei Glockenessenz und liegt von der Stärke her zwischen ihrer Basis- und Großartigen Schwester; die genauen Boni stehen alle in der Tabelle unten.",
+        "enchantsNote": "Verzauberungen gibt es in drei Stufen. Die Basisstufe läuft auf Glockenpulver (am oberen Ende mit ein wenig Essenz) und deckt den Waffenplatz sowie jeden Rüstungsplatz außer der Nebenhand ab, mit genug Auswahl entlang der Werteachsen, dass jeder Build für jeden Platz etwas findet. Die Große Stufe kostet einen Glockensplitter plus Essenz: stärkere Boni auf den wirkungsvollsten Plätzen. Splitter speisen außerdem zwei weitere Abflüsse, die beiden Talisman-Rezepte zu je fünf Stück und die oberste Sprosse der Werkzeugeffekt-Aufladungen, lege also ein paar zurück, bevor du sie ausgibst.\n\nDazwischen liegen die fünf Runen-Verzauberungen, je ein Abnehmer pro typisiertem Sekundärmaterial, sodass nichts, was du zermahlst, jemals eine Sackgasse ist: Runenschneide (Waffe, Stärke, verbraucht Resonanten Stahl), Runenfokus (Waffe, Intellekt, Resonantes Holz), Runenweberei (Brust, Geist, Resonanter Faden), Runenfell (Hose, Beweglichkeit, Resonantes Fell) und Runenkette (Helm, Ausdauer, Resonante Kettenglieder). Jede nimmt zusätzlich zwei Glockenessenzen; wo es für einen Platz und einen Wert sowohl eine Basis- als auch eine Große Verzauberung gibt, landet der Runenbonus dazwischen, während die Runenweberei rundheraus die stärkste Geist-Verzauberung für die Brust ist und das Runenfell die einzige Beweglichkeits-Verzauberung für die Hose überhaupt. Die genauen Boni stehen alle in der Tabelle unten.",
         "colEnchant": "Verzauberung",
         "colSlot": "Platz",
         "colTier": "Stufe",
@@ -4115,57 +4620,62 @@ export const de_DE: EnTranslations = {
         "bonusFmt": "+{value} {stat}"
       },
       "gatherIntro": {
-        "mining": "Bergbau fördert Erz direkt aus dem Fels der Welt: Kupfer im Eastbrook-Tal, Eisen im Mirefen-Moor und Osmium oben in den Thornpeak-Höhen, Nahrung für die Schmiedeberufe. Für jeden ab Stufe 1 zugänglich: Alles, was du brauchst, ist eine Bergbau-Spitzhacke in deinen Taschen, 20 Kupfer in jeder größeren Stadt. Auf einem eigenen Zähler bis zu einer Obergrenze von 100 verfolgt.",
-        "logging": "Holzfällen fällt Holz aus Baumgruppen in allen drei Zonen: Eisenrinde im Eastbrook-Tal, Eschenholz im Mirefen-Moor und Hochfichte in den Thornpeak-Höhen, das Rohmaterial für Schäfte, Stäbe und die Ingenieursbank. Für jeden ab Stufe 1 zugänglich, mit einer Holzfäller-Axt in deinen Taschen (20 Kupfer in jeder größeren Stadt), auf einem eigenen Zähler bis zu einer Obergrenze von 100 verfolgt.",
-        "herbalism": "Kräuterkunde sammelt, was wild wächst: Schimmerblatt im Eastbrook-Tal, Goldblatt im Mirefen-Moor und Sonnenblüte in den Thornpeak-Höhen, das Blatt und der Stiel, die die Apothekarberufe am Köcheln halten. Für jeden ab Stufe 1 zugänglich, mit einer Kräuterkunde-Sichel in deinen Taschen (20 Kupfer in jeder größeren Stadt), auf einem eigenen Zähler bis zu einer Obergrenze von 100 verfolgt.",
-        "fishing": "Angeln ist das Sonderglied unter den Sammelberufen und das tiefgründigste: ein echtes Biss-und-Einhol-Minispiel, eigene Fangtabellen in jeder Zone und eine Fertigkeitsobergrenze von 200, doppelt so viel wie die anderen. Kaufe eine Angel, blicke auf offenes Wasser und wirf."
+        "mining": "Bergbau holt Erz direkt aus dem Fels der Welt: Kupfer im Eastbrook-Tal, Eisen im Mirefen-Moor und Thorium oben in den Thornpeak-Höhen, dazu Anfängeradern, verstreut über jede jüngere Zone dahinter, und speist damit die Schmiedeberufe. Ab Stufe 1 für jeden offen: Eine Bergbau-Spitzhacke für 20 Kupfer von einem Tresen in Eastbrook, Fenbridge oder Highwatch öffnet jede Anfängerader, und die höheren Sprossen der Spitzhacken-Leiter erwachen, sobald dein eigener Zähler sie verdient. Auf einem eigenen Zähler bis zu einer Obergrenze von 100 verfolgt.",
+        "logging": "Holzfällen schlägt Holz aus Baumgruppen in der ganzen Welt: Eisenrinde im Eastbrook-Tal, Aschenholz im Mirefen-Moor, Altholz in den Thornpeak-Höhen und Anfänger-Baumgruppen in jeder jüngeren Zone, das Rohmaterial für Schäfte, Stäbe und die Werkbank des Ingenieurs. Ab Stufe 1 für jeden offen, sofern eine Holzfäller-Axt in deinen Taschen liegt (20 Kupfer an den Tresen von Eastbrook, Fenbridge und Highwatch), auf einem eigenen Zähler bis zu einer Obergrenze von 100 verfolgt.",
+        "herbalism": "Kräuterkunde sammelt, was wild wächst: Silberblatt im Eastbrook-Tal, Goldblatt im Mirefen-Moor, Sonnenblüte in den Thornpeak-Höhen und Anfängerpflanzen in jeder jüngeren Zone, Blatt und Stängel, die die Apothekerberufe am Brauen halten. Ab Stufe 1 für jeden offen, sofern eine Kräuterkunde-Sichel in deinen Taschen liegt (20 Kupfer an den Tresen von Eastbrook, Fenbridge und Highwatch), auf einem eigenen Zähler bis zu einer Obergrenze von 100 verfolgt.",
+        "fishing": "Angeln ist der Sonderling unter den Sammelberufen und zugleich der tiefgründigste: ein echtes Biss-und-Einhol-Minispiel, eigene Fangtabellen in jeder der drei Kernlandzonen (die jungen Gewässer dahinter bedienen vorerst alle die Tabelle des Tals) und eine Fertigkeitsobergrenze von 200, doppelt so hoch wie bei den anderen. Kauf eine Angel, stell dich mit Blick aufs offene Wasser und wirf aus."
       },
       "rhythmHeading": "Der Sammelrhythmus",
-      "rhythmBody": "Eine Ernte ist ein kurzer sichtbarer Wurfvorgang, kein sofortiges Greifen: {base} Sekunden Basis, nie unter einem Boden von {floor} Sekunden. Ein Werkzeug oberhalb der Knotenstufe beschleunigt dich um {tool} Sekunden pro Stufe darüber, und jedes Fertigkeitsband, das du überschreitest, kürzt weitere {band} Sekunden ab; das Werkzeug nur auf der Knotenstufe zu haben öffnet die Tür, es sind die Stufen darüber, die dich schnell machen.\n\nEin voller Beutel lehnt den Wurfvorgang höflich ab, bevor er beginnt, sodass nichts mitten im Vorgang verschwendet wird, und jede Ernte zahlt eine kleine Menge Charakter-Erfahrung, skaliert mit der Stufe des Knotens gegen deine eigene, so wie Kill-Erfahrung skaliert: Ein trivial-grauer Knoten lehrt einen Charakter auf Höchststand nichts.",
-      "gainBody": "Der Zuwachs ist deterministisch, niemals ein Fertigkeitswurf: Ein Knoten auf oder oberhalb deiner Zuwachsstufe lehrt einen vollen Punkt pro Ernte, und jede {step} Fertigkeit ist eine Stufe, die gegen den Knoten bewertet wird. Knoten der Stufe 1 zahlen unter 25 voll, halb bis 49, ein Viertel bis 74 und nichts ab 75 aufwärts; Knoten der Stufe 2 zahlen bis 49 voll; der einzige Knoten der Stufe 3 zahlt bis 74 voll und halb bis zur Obergrenze von {cap}.\n\nDer vorgesehene Weg ist klar: Lerne an den Einsteiger-Knoten des Tals, wechsle dann zum Sumpf und beende den Aufstieg auf dem Hochplateau der Thornpeak-Höhen. An der Obergrenze hört das Lernen auf, aber die Erträge nicht: Ein Sammler auf Höchststand zieht für immer Materialien höchster Qualität.",
+      "rhythmBody": "Eine Ernte ist ein kurzer sichtbarer Vorgang, kein sofortiger Griff: {base} Sekunden Basis, nie unter einem Minimum von {floor} Sekunden. Ein Werkzeug über der Stufe des Knotens mitzuführen, eines, das deine Fertigkeit dich auch führen lässt, beschleunigt dich um {tool} Sekunden je Stufe darüber, und jede Fertigkeitsstufe, die du überschreitest, kürzt weitere {band} Sekunden; die Stufe des Knotens bloß zu treffen bringt dich durch die Tür, schnell machen dich erst die Stufen darüber.\n\nEine volle Tasche lehnt den Vorgang höflich ab, bevor er beginnt, sodass mitten im Schwung nichts verschwendet wird, und jede Ernte zahlt ein kleines Stück Charakter-EP, skaliert nach der Stufe des Knotens gegen deine eigene, so wie die EP für Kills skalieren: Ein trivialer grauer Knoten lehrt einen Charakter am Maximum nichts.",
+      "gainBody": "Der Zuwachs ist deterministisch, nie ein Fertigkeitswurf: Ein Knoten auf oder über deiner Zuwachsstufe lehrt einen vollen Punkt pro Ernte, und je {step} Fertigkeitspunkte sind eine Stufe, die gegen den Knoten gewertet wird. Knoten der Stufe 1 zahlen unter 25 voll, bis 49 die Hälfte, bis 74 ein Viertel und ab 75 nichts mehr; Knoten der Stufe 2 zahlen bis 49 voll; die beiden Knoten der Stufe 3 jedes Berufs zahlen bis 74 voll und bis zur Obergrenze von {cap} die Hälfte.\n\nDer vorgesehene Weg ist schlicht: Lerne an den Anfängerknoten des Tals, zieh weiter ins Moor und beende den Aufstieg auf dem Hochland der Thornpeak-Höhen. An der Obergrenze endet das Lernen, die Erträge aber nicht: Ein Sammler am Deckel würfelt für immer weiter auf die besten Chancen, die der Beruf zu bieten hat.",
       "nodesHeading": "Knoten nach Zone",
       "nodesNote": "Wo die Knoten sind, ihre Stufe, das Werkzeug, das sie benötigen, und was sie abwerfen. Jeder Knoten wächst {respawn} Sekunden nach deiner eigenen Ernte wieder für dich nach, und dieser Timer gehört nur dir: Ein anderer Sammler, der denselben Knoten bearbeitet, verzögert deinen nie, also gibt es kein Knotenrennen und kein Lauern. Jede Zone auf der Leiter bringt ein besseres Material aus härterem Boden.",
       "toolsHeading": "Werkzeuge",
-      "toolsNote": "Jeder Knoten verlangt das Werkzeug seines Berufs in deinen Taschen, Stufe 1 eingeschlossen: ohne Spitzhacke kein Erz, ohne Angel kein Fisch. Die Händlerleiter deckt Stufe 1 bis 3 ab und wird in jeder größeren Stadt geführt; ein Werkzeug muss nur in deinen Taschen sein, es gibt keinen Ausrüstungsplatz und keine Haltbarkeit, sodass jedes ein Einmalkauf ist. Nur die Stufe ist für die Voraussetzung relevant: Die Seltenheitsfarbe eines Werkzeugs ist kosmetisch.\n\nOberhalb der Händlerleiter sitzen zwei hergestellte Werkzeuge, Stufe 4 und Stufe 5, gefertigt in der Werkzeugmacherei von Ingenieuren und von keinem NSC verkauft. Kein Knoten benötigt heute mehr als Stufe 3, daher liegt ihr Wert im Moment in der Geschwindigkeit: Ein Spitzenwerkzeug fixiert die Sammelzeit bei niedrigeren Knoten auf ihrem Minimum, und es wird die Eintrittskarte sein, wenn höherstufiges Gelände erscheint.",
+      "toolsNote": "Jeder Knoten verlangt das Werkzeug seines Berufs in deinen Taschen, Stufe 1 eingeschlossen: keine Spitzhacke, kein Erz, und keine Angel, kein Fisch. Die Händlerleiter deckt die Stufen 1 bis 3 in den drei Kernland-Knotenpunkten ab: Das Werkzeug der Stufe 1 wird in allen dreien verkauft, die Sprossen darüber dort, wo das Gelände beginnt, das sie verlangt (Fenbridge kommt mit Stufe 2 dazu, Highwatch mit Stufe 3), und die jüngeren Siedlungen dahinter führen überhaupt keine Werkzeuge, rüste dich also aus, bevor du reist. Jeder Tresen verkauft jede Sprosse, die er führt, ohne Einschränkung, und jedes Werkzeug lässt sich direkt weiterhandeln; jede Sprosse lässt sich außerdem auf dem Markt einstellen und per Post verschicken, außer den drei Landanfängern für 20 Kupfer: Die kauft man an einem Tresen oder gibt sie von Hand zu Hand weiter, und sie werden nie zurückverkauft, verschickt oder eingestellt. Verriegelt ist das Führen. Ein Landwerkzeug über Stufe 1 arbeitet erst, wenn deine Fertigkeit im eigenen Beruf es verdient hat, {tier2Prof} für Stufe 2, {tier3Prof} für Stufe 3 und 85 und 100 für die beiden hergestellten Sprossen, und die Händlerzeile, der Tooltip und die Tabelle unten nennen die Anforderung alle vorab. Bis dahin wartet ein im Voraus gekauftes Werkzeug einfach in deinen Taschen, öffnet kein Gelände, kauft kein Tempo und prägt keine feinen Güten, und lässt sich in dem Moment führen, in dem dein Zähler seine Zahl berührt. Angelruten sind die eine Ausnahme: Keine Rute trägt eine Führungsanforderung, und Händler Wilkes in Eastbrook führt die Ruten der Stufen 2 und 3 bewusst für Angler, die im Voraus kaufen. Ein Werkzeug belegt nie einen Ausrüstungsplatz und nutzt sich nie ab, jedes ist also ein einmaliger Kauf, und für die Schranke zählt nur die Stufe: Ein selteneres Werkzeug derselben Stufe öffnet nichts zusätzlich. Seltenheit ist allerdings nicht nur Farbe. Sie lässt einen eingesetzten Werkzeugeffekt länger halten, und bei einer Rute verbreitert sie das Einholfenster.\n\nEin besseres Werkzeug kauft drei Dinge, nicht zwei. Es öffnet Gelände höherer Stufe, es verkürzt den Vorgang, und es verbessert, was herauskommt: Bearbeite eine Ader mit einem Werkzeug, das ÜBER dem eigenen Material der Zone rangiert, und die Ernte liefert dessen feine Güte statt der schlichten. Die Ader muss eine der vollwertigen der Zone sein, die leichteren Adern, die eine Zone für Reisende bereithält, liefern also weiterhin das gewöhnliche Material. Feine Materialien sind das, was die Rezepte der hergestellten Werkzeuge verbrauchen, und eine feine Güte zählt überall dort als ihre gewöhnliche Fassung, wo ein Rezept oder ein Werkauftrag danach verlangt, ein Aufstieg lässt dich also nie stranden: Er bedeutet nur, dass dein Kupfererz als Feines Kupfererz ankommt.\n\nÜber der Händlerleiter hat jeder Beruf zwei hergestellte Werkzeuge, Stufe 4 und Stufe 5, gefertigt an der Werkzeugmacherei (jeder Charakter kennt die Landrezepte; die Fertigkeit, die bei dieser Arbeit steigt, ist die der Ingenieurskunst), oder gekauft mit Tiefgang-Marken am Tresen der Ertrunkenen Litanei, sobald ihre Abschluss-Schranken erfüllt sind: Die Tabelle unten führt den Markenpreis und die Abschlüsse, die jede Sprosse verlangt. Kein Händler verkauft sie je für Münzen. Angeln hat sein eigenes Paar, und diese werden beim Werkzeugmacher gelernt statt von Anfang an gekannt. Kein Knoten und kein Gewässer verlangt heute mehr als Stufe 3, die obersten beiden Sprossen kaufen also Tempo, Güte und ein freundlicheres Einholfenster statt Zugang, und sie werden die Eintrittskarte sein, wenn Gelände höherer Stufe kommt.",
       "toolCrafted": "Hergestellt ({craft})",
+      "toolCraftedOrMarks": "Hergestellt ({craft}) oder {marks} Tiefgang-Marken nach drei Abschlüssen der Ertrunkenen Litanei",
+      "toolCraftedOrMarksHeroic": "Hergestellt ({craft}) oder {marks} Tiefgang-Marken nach einem heroischen Abschluss der Ertrunkenen Litanei",
       "toolVendor": "{name} ({hub})",
       "toolUnavailable": "Nicht erhältlich",
-      "priceNone": "Nicht erhältlich",
+      "priceNone": "Nicht für Münzen erhältlich",
       "toolTierReq": "Werkzeug der Stufe {tier}",
+      "colWield": "Einsatz ab",
+      "wieldNone": "Beliebig",
       "yieldsHeading": "Was eine Ernte einbringt",
       "yieldsBody": "Jede Ernte würfelt eine Qualität für das, was sie gewährt, und deine Fertigkeit ist die ganze Geschichte dieses Wurfs. Ein brandneuer Sammler zieht immer gewöhnliches Material; jeder Fertigkeitspunkt verschiebt das Gewicht stetig weg von Gewöhnlich hin zu den höheren Qualitätsstufen und nie zurück, bis an der Obergrenze von 100 die gewöhnliche Qualität vollständig verschwindet: 60 Prozent ungewöhnlich, 30 Prozent selten, 8 Prozent episch und 2 Prozent legendär, immer.\n\nQualität bedeutet auch Menge: Ein gewöhnlicher Wurf ergibt 1 Einheit, Ungewöhnlich und Selten ergeben 2, Episch 3 und Legendär 4. Jeder seltene, epische oder legendäre Fund kommt als signiertes Exemplar gestempelt mit Gesammelt von dir an: An der Obergrenze tragen vier von zehn Ernten deinen Namen, und die Herkunftsregeln auf der Seite Handwerkswirtschaft erklären, warum Handwerker genau für diese Stapel extra zahlen.",
       "bandsHeading": "Fertigkeitsstufen",
-      "bandsBody": "Fertigkeitsstufen sind die gemeinsame Leiter aus 0/100/200 über dem Zähler eines Gewerbes: Jede Stufe, die du überquerst, verkürzt die Sammelzeit, und beim Angeln bestimmen die Stufen auch die Fangtabellen (mit passender Rute). Die Landgewerbe sind bei 100 gedeckelt, sodass Stufe 1 ihre Obergrenze ist; nur das Angeln erreicht Stufe 2.",
+      "bandsBody": "Fertigkeitsstufen sind die gemeinsame 0/100/200-Leiter über dem Zähler eines Gewerbes. Bei den Landgewerben verkürzt die bei 100 überschrittene Stufe die Sammelzeit, und ihre Obergrenze macht Stufe 1 zur Decke. Die Stufen des Angelns verkürzen gar nichts: Sie wählen die Fangtabellen aus (mit passender Rute dazu), nur Angeln erreicht Stufe 2, und der Aufstieg selbst ist es, der einen Angler in tiefere Gewässer zieht, wo die besseren Tabellen und die weiteren Lektionen beide zu Hause sind.",
       "bandFmt": "Stufe {band}: ab Fertigkeit {at}",
       "rareHeading": "Seltene Funde",
       "rareBody": "Jede Ernte, unabhängig von deiner Fertigkeit, hat eine Chance von 1 zu {oneIn} auf einen seltenen Fund: eine makellose Ader bei Erz, uraltes Kernholz bei Holz, eine mondscheinbeleuchtete Blüte unter den Kräutern. Der Fund vervielfacht den Ertrag dieser Ernte um das {mult}-Fache, jede Einheit kommt unabhängig von der gewürfelten Qualität mit deinem Namen signiert an, und die gesamte Zone erfährt es namentlich. Jede Art hinterlässt auch ihr eigenes Sammlerzeichen mit null Ansehen in deinem Buch der Taten, ein Kennzeichen, das einzig beweist, dass es dir passiert ist.",
-      "specimenBody": "Halte etwas Platz in der Tasche frei, wenn du farmst: Ein Glücksfund braucht offene Plätze, um signiert anzukommen, und wenn nichts passt, kommt der Ertrag trotzdem, aber ohne Signatur. Das Ernte-an-Leichen-System hat auch seinen eigenen Jackpot: Etwa {pct}% der Leichenernten würfeln selten oder besser, signieren den Ertrag und gewähren bei Exemplarfamilien ein signiertes perfektes Exemplar.",
+      "specimenBody": "Halte beim Farmen ein wenig Taschenplatz frei: Ein signierter Glücksfund braucht einen eigenen Platz oder einen passenden signierten Stapel, in dem er landen kann, und wenn nichts passt, kommt der Ertrag zwar trotzdem an, aber die Signatur geht verloren. Auch die Leichenernte hat ihren eigenen Jackpot-Arm: Etwa {pct}% jeder geernteten Komponente fallen als Selten oder besser aus. Eine Familie, die ein makelloses Exemplar zu geben hat (Haut, Seide, Gift, Fleisch), belässt ihren gewöhnlichen Ertrag schlicht und prägt das signierte Exemplar daneben; jede andere Familie signiert den Ertrag selbst.",
       "gatherDeedsHeading": "Taten entlang des Weges",
       "gatherDeeds": {
         "mining": "Dein erster Knoten eines beliebigen Berufs bringt Früchte des Feldes ein, und die Fertigkeit 100 in Bergbau verewigt Erz im Blut. Wenn du in beliebigen drei von Bergbau, Holzfällen, Kräuterkunde und Angeln 100 erreichst, wird Meistersammler mit 25 Ansehen hinzugefügt, und das Aufbrechen einer makellosen Ader verzeichnet ihr eigenes Sammlerzeichen. Keines davon verleiht Macht: Taten sind Titel und Ansehen, ein Zeugnis der Wege, die du gegangen bist.",
         "logging": "Dein erster Knoten eines beliebigen Berufs bringt Früchte des Feldes ein, und die Fertigkeit 100 in Holzfällen verewigt Kernholzhauer. Wenn du in beliebigen drei von Bergbau, Holzfällen, Kräuterkunde und Angeln 100 erreichst, wird Meistersammler mit 25 Ansehen hinzugefügt, und ein Hieb in uraltes Kernholz verzeichnet sein eigenes Sammlerzeichen. Taten sind nur Titel und Ansehen, niemals Macht.",
         "herbalism": "Dein erster Knoten eines beliebigen Berufs bringt Früchte des Feldes ein, und die Fertigkeit 100 in Kräuterkunde verewigt Meister der Aue. Wenn du in beliebigen drei von Bergbau, Holzfällen, Kräuterkunde und Angeln 100 erreichst, wird Meistersammler mit 25 Ansehen hinzugefügt, und eine mondscheinbeleuchtete Blüte verzeichnet ihr eigenes Sammlerzeichen. Taten sind nur Titel und Ansehen, niemals Macht.",
-        "fishing": "Der Meilenstein bei 100 verewigt den Alten Salzfisch und 200 verewigt den Meisterangler mitsamt seinem Titel, dem Gipfel der Anglerkunst; Angeln zählt außerdem zum Meistersammler, der bei 100 in beliebigen drei Sammelberufen erworben wird. Ein erster Fisch aus den Gewässern jeder Zone füllt seine eigene Seite, und der Sonnenschimmer-Koi verzeichnet Schimmer der Hoffnung, sodass Reisende mit einer Angel im Gepäck ihr Buch schneller füllen, als sie es erwarten."
+        "fishing": "Der Meilenstein 100 verewigt den Alten Salzfisch und 200 den Meisterangler samt seinem Titel, die absolute Spitze der Anglerkunst; Angeln zählt außerdem für Meistersammler, errungen mit 100 in beliebigen drei Sammelberufen. Ein erster Fisch aus den Gewässern jeder von sechs Zonen füllt eine eigene Seite, die drei Kernlandzonen sowie das Weidenmoor, der Windkamm und die Fernküste dahinter, und der Sonnenschimmer-Koi verzeichnet Schimmer der Hoffnung, sodass Reisende mit einer Angel im Gepäck ihr Buch schneller füllen, als sie erwarten."
       },
       "fish": {
         "startHeading": "Erste Schritte",
-        "startBody": "Eine Einfache Angel kostet 20 Kupfer bei Fischer Brandt in Eastbrook (suche den Alten Salzfisch, der Mirror Lake vom östlichen Stadtrand aus mit grimmigem Blick beobachtet); Tüftler Gizzel, Händler Hale in Fenbridge und Quartiermeister Bree in Highwatch führen ebenfalls Angeln. Benutze die Angel, während du auf ausreichend tiefes Wasser blickst, bis zu etwa 24 Meter vor dir, und dein Schwimmer fliegt hinaus.\n\nDu kannst nicht werfen, während du im Kampf bist, schwimmst oder tot bist: Werfen vom Ufer aus ist die vorgesehene Haltung, und jedes angelbare Gewässer funktioniert, in jeder Zone.",
+        "startBody": "Eine Einfache Angel kostet 20 Kupfer bei Fischer Brandt in Eastbrook (halte am Ostrand der Stadt nach dem Alten Seebären Ausschau, an der Straße zum Spiegelsee); auch Tüftler Gizzel, Proviantmeister Hale in Fenbridge und Quartiermeisterin Bree in Highwatch führen Angeln. Benutze die Angel mit Blick auf Wasser, das tief genug für Fische ist, bis etwa 24 Meter vor dir, und deine Pose fliegt hinaus.\n\nDu kannst nicht auswerfen, während du im Kampf bist, schwimmst oder tot bist: Der Wurf vom Ufer aus ist die vorgesehene Haltung. Das Wasser wird allerdings genauso anspruchsvoll wie das Land: Das Moor verlangt mindestens die Eisenrolle der Stufe 2 und die Höhen den Silberbach der Stufe 3, und eine Schnur, die ohne die vom Wasser geforderte Rute ausgeworfen wird, verlässt deine Hand nie. Zwei Ruten stehen darüber, die Sturmrolle und die Flutgeschmiedete: Ingenieure fertigen sie an der Werkzeugmacherei aus dem, was eine Schnur heraufholt, und der Tiefgang-Tresen der Ertrunkenen Litanei verkauft sie hinter ihren Abschluss-Schranken für Tiefgang-Marken, doch nie für Münzen. Kein Gewässer verlangt sie, sie kaufen also eine kürzere Wartezeit und ein breiteres Einholfenster statt Zugang, was auf der obersten Sprosse einen Biss nach glatten drei Sekunden bedeutet.",
         "biteHeading": "Biss und Einholen",
-        "biteBody": "Nach dem Auswerfen kommt ein Biss zu einem verborgenen Zeitpunkt zwischen {min} und {max} Sekunden; die Verzögerung wird festgelegt, wenn die Schnur landet, sodass sich keine zwei Würfe ganz gleich anfühlen. Wenn der Schwimmer anbeißt, hast du ein {reel}-Sekunden-Fenster, um die Rute erneut zu drücken und einzuholen: Hol innerhalb davon ein und der Fang landet, zögerst du darüber hinaus, kommt der Fisch weg ohne etwas zu hinterlassen. Eine ganze Sitzung ist auf {cap} Sekunden begrenzt, sodass selbst ein ruhiger Wurf schnell aufgelöst wird.\n\nBessere Ruten schärfen beide Enden des Minispiels: Jede Rutenstufe über der ersten kürzt {rod} Sekunden von der längstmöglichen Wartezeit und fügt {reelRod} Sekunden zum Einholzeitraum hinzu, sodass die Eisenhaspel die schlimmste Wartezeit auf 6,5 Sekunden mit einem 3,75-Sekunden-Fenster drückt und die Silberströmung auf 5 und 4,5. Die schnellsten Bisse ändern sich nie, egal was du hältst, und eine Rute muss nur in deinen Beuteln sein, um zu zählen.",
+        "biteBody": "Nach dem Auswerfen kommt der Biss in einem verborgenen Moment zwischen {min} und {max} Sekunden; die Verzögerung wird festgelegt, sobald die Schnur aufs Wasser trifft, keine zwei Würfe fühlen sich also ganz gleich an. Wenn die Pose anbeißt, hast du ein Fenster von {reel} Sekunden, um die Angel erneut zu drücken und einzuholen: Holst du darin ein, landet der Fang, zögerst du darüber hinaus, entkommt der Fisch, und du hast nichts vorzuweisen. Ein ganzer Durchgang ist bei {cap} Sekunden gedeckelt, selbst ein ruhiger Wurf ist also schnell entschieden.\n\nBessere Ruten schärfen beide Enden des Minispiels: Jede Rutenstufe über der ersten kürzt die längstmögliche Wartezeit um {rod} Sekunden, nie unter das Minimum von drei Sekunden, das die oberste Rute ohnehin schon streift, und legt {reelRod} Sekunden auf das Einholfenster, sodass die Eisenrolle die schlimmste Wartezeit auf 6,5 Sekunden mit einem Fenster von 3,25 Sekunden drückt und der Silberbach auf 5 mit einem Fenster jenseits von 4, wobei seine Seltenheit das Einholen noch etwas weiter öffnet, als die Stufe allein zahlt. Die schnellsten Bisse ändern sich nie, was du auch hältst, und eine Rute muss nur in deinen Taschen liegen, um zu zählen.",
+        "earlyReelNote": "Eine Warnung für ungeduldige Finger: Drückst du die Angel erneut, bevor etwas anbeißt, holst du eine leere Leine ein und beendest den Wurf (ein kurzer Gnadenmoment direkt nach dem Auswerfen verzeiht einen versehentlichen Doppeldruck). Geduld ist das ganze Spiel: Warte auf den Biss, dann schlag an.",
         "scheduleHeading": "Fertigkeitszuwachs",
-        "scheduleNote": "Der Angelzuwachs folgt einem festen Plan ohne Zufallswürfe: ein voller Punkt pro Fang unter 50 Fertigkeit, ein halber Punkt unter 100, ein Zehntel unter 150 und ein langsames Rieseln von 0,02 von 150 bis 200. Dieser letzte Abschnitt ist bewusst eine Reise von tausenden Würfen: 200 ist eine Aussage, kein Zwischenstopp auf dem Weg zu etwas anderem.\n\nPlunder hört ab {cutoff} vollständig auf zu lehren: Von da an sind Algen und Stiefel nur noch Algen und Stiefel. Jeder gelandete Fang gewinnt ansonsten nach dem festgelegten Plan, also angle dort, wo du sowieso angelst, und lass den Zähler steigen.",
+        "scheduleNote": "Der Angelzuwachs folgt einem festen Plan ohne Würfel: ein voller Punkt pro Fang unter Fertigkeit 50, ein halber Punkt unter 100, ein Zehntel unter 150 und ein langsames Rinnsal von 0,02 von 150 bis 200. Diese letzte Strecke ist mit Absicht eine Reise über Tausende von Fängen: 200 ist eine Aussage, keine Zwischenstation auf dem Weg zu etwas anderem.\n\nPlunder hört bei {cutoff} vollständig auf zu lehren: Von da an sind Kraut und Stiefel eben nur Kraut und Stiefel. Auch das Gewässer selbst deckelt die Lektion: Die Gewässer der Stufe 1 im Tal (und jede junge Küste jenseits des Kernlands) lehren über 100 hinaus nichts mehr, die des Moores hören bei 150 auf, und nur die von Thornpeak schulen einen Angler den ganzen Weg bis 200. Jeder gelandete Fang bringt ansonsten den planmäßigen Zuwachs, wenn der Zähler also stockt, sagt dir der Plan, dass du tieferes Wasser suchen sollst.",
         "colProficiency": "Fertigkeit",
         "colGain": "Gewinn pro Fang",
         "belowFmt": "Unter {below}",
         "tablesHeading": "Fangtabellen",
-        "tablesNote": "Deine Fertigkeit wählt eines von drei Fangbändern aus: Band 0 von Anfang an, Band 1 ab 100, Band 2 ab 200, wobei jedes Band das Gewicht weg von Plunder und leeren Haken hin zu echten Fischen verschiebt, Zone für Zone. Jedes Band oberhalb des ersten erfordert auch eine Rute: Band 1 verlangt die Eisenrollen-Angelrute der Stufe 2, Band 2 die Silberbach-Angelrute der Stufe 3. Dein tatsächliches Band ist das niedrigere von dem, was deine Fertigkeit verdient hat, und dem, was deine Rute unterstützt, und die Obergrenze ist still: Mit einer schwächeren Rute angelst du noch immer, nur nach der Tabelle des niedrigeren Bandes, also überprüfe zuerst deine Rute, wenn deine Fänge stagnieren, während deine Fertigkeit steigt.\n\nDie Gewässer jeder Zone beherbergen ihr eigenes Paar Speisefische, die umso mehr heilen, je tiefer die Zone liegt, alle als Kochzutaten geeignet und als direkte Mahlzeit frisch von der Leine. Der Rest der Tabelle ist die Steuer des Anglers: Algen, gelegentlich ein Stiefel und der leere Haken, der nie ganz verschwindet. Der {rare} hat auf jeder Leine dieselben langen Quoten, zu festen Chancen, die sich mit der Fertigkeit nie ändern, also hat der neueste Angler am Steg dieselbe Chance wie ein Meisterangler.",
+        "tablesNote": "Deine Fertigkeit wählt eines von drei Fangbändern: Band 0 von Anfang an, Band 1 ab 100, Band 2 ab 200, und jedes verschiebt Gewicht von Plunder und leeren Haken zu echten Fischen, Zone für Zone. Jedes Band über dem ersten verlangt außerdem eine Rute: Band 1 will die Eisenrolle der Stufe 2, Band 2 den Silberbach der Stufe 3. Dein wirksames Band ist das niedrigere aus dem, was deine Fertigkeit verdient hat, und dem, was deine Rute trägt, und der Deckel bleibt stumm: Mit einer schwächeren Rute fängst du weiter, nur eben von der Tabelle des niedrigeren Bandes, wenn deine Fänge sich also festgefahren anfühlen, während deine Fertigkeit steigt, sieh zuerst nach deiner Rute.\n\nDie Gewässer jeder Zone halten ihr eigenes Paar Speisefische bereit, die umso mehr heilen, je tiefer die Zone liegt, allesamt Zutaten fürs Kochen und roh von der Schnur weg vollwertige Verpflegung zum Hinsetzen und Essen. Der Rest der Tabelle ist die Steuer des Anglers: Kraut, gelegentlich ein Stiefel und der leere Haken, der nie ganz verschwindet. Wie hoch sie ausfällt, hängt von dem Wasser ab, in dem deine Pose landet, nicht davon, wo du stehst: Ein Wurf reicht bis zu 24 Meter, und die Rute, die das Wasser verlangt, die Tabelle, aus der es zieht, die Tat, die es gutschreibt, und wie weit es lehrt, richten sich alle nach der Zone, zu der dieses Wasser gehört, entschieden in dem Moment, in dem die Schnur aufkommt. Das Wasser jeder Zone ist für ein eigenes Band geschrieben, das Tal für Band 0, das Moor für Band 1, die Höhen für Band 2, und ein Band darunter zu angeln macht rund ein Drittel deiner Würfe zu leeren Haken, zwei Bänder darunter mehr als die Hälfte. Die Rute bringt dich ans Wasser; die Fertigkeit ist es, die es einträglich macht, und der Aufstieg ist es, der einen Angler in die Tiefe zieht, denn bessere Bänder bringen nicht nur besseren Lohn: Jenseits des Tals sind sie die einzigen Gewässer, die weiter lehren. Der {rare} ist die eine Zeile, die sich nach deinem Fangband richtet und nach nichts sonst: dieselben Chancen in jeder Zone und bei Band 2 sechsmal wahrscheinlicher als bei Band 0, das Seltenste am Steg ist also genau das, worin ein Meisterangler wirklich besser ist.",
         "bandHeading": "Band {band}: Fertigkeit {at} und aufwärts, Rutenstufe {rod}",
         "colCatch": "Fang",
         "colOdds": "Chancen",
         "pctFmt": "{pct}%",
         "emptyHook": "Nichts beißt an",
         "koiHeading": "Der Sonnenschimmer-Koi",
-        "koiBody": "Jedes Gewässer im Spiel birgt denselben Schatz: den Sonnenschimmer-Koi, einen ungewöhnlichen Glanz an der Schnur, der einem Händler 75 Kupfer wert ist und deinem Stolz noch einiges mehr. Seine Chancen stehen fest bei 3 Prozent pro gelungenem Fang (4 Prozent in Thornpeaks kaltem Wasser) in jedem Band, und einen zu landen vermerkt Schimmer der Hoffnung in deinem Buch der Taten, eine Sammlertat mit null Ansehen. Wenn es passiert, sorgt das Logbuch dafür, dass du es weißt."
+        "koiBody": "Jedes Gewässer im Spiel verbirgt denselben Preis: den Sonnenschimmer-Koi, einen ungewöhnlichen Glanz an der Schnur, einem Händler 75 Kupfer wert und deinem Stolz einiges mehr. Seine Chancen richten sich nach deinem Fangband und nach nichts sonst, in jeder Zone gleich: eine Zeile der Fangtabelle mit 1 Prozent bei Band 0, 3 bei Band 1 und 6 bei Band 2, gezogen bei jedem eingeholten Wurf, der Koi kommt also zu dem Angler, der sich die tiefen Tabellen verdient hat. Einen zu landen verzeichnet Schimmer der Hoffnung in deinem Buch der Taten, ein Sammlerzeichen ohne Ansehen. Wenn es passiert, sorgt das Protokoll dafür, dass du es mitbekommst."
       },
       "econ": {
         "title": "Handwerkswirtschaft",
@@ -4181,7 +4691,7 @@ export const de_DE: EnTranslations = {
         "feeUnbind": "Entbindungsgebühr",
         "feeUnbindValue": "{uncommon} Ungewöhnlich, {rare} Selten, {epic} Episch",
         "trainingHeading": "Trainingsgebühren",
-        "trainingNote": "Eine Pauschalgebühr pro Rezeptsprosse, einmalig erhoben, wenn ein Meister sie lehrt; die höheren Stufen der Tabelle warten auf zukünftige Inhalte.",
+        "trainingNote": "Eine einheitliche Gebühr pro Rezeptsprosse, einmalig fällig, wenn ein Meister sie lehrt; jede Sprosse der Tabelle unten ist heute im Einsatz, von den kostenlosen Anfängerrezepten bis zu den Rutenlektionen des Werkzeugmachers ganz oben.",
         "trainingTierFmt": "Stufe {tier}: {fee}",
         "free": "Kostenlos",
         "sellsHeading": "Was sich verkauft und warum",
@@ -4197,11 +4707,19 @@ export const de_DE: EnTranslations = {
         "commissionsHeading": "Auftragsarbeiten und die Herstellerbindung",
         "commissionsBody": "Eine Auftragsarbeit ist ein Handwerk, das für jemanden gefertigt wird. Beim Herstellen einer Waffe, eines Rüstungsteils oder eines gehaltenen Nebenhandgegenstands (ein Trank kann keine Bindung tragen) kann der Handwerker das Stück als Auftragsarbeit kennzeichnen: Das fertige Stück verhält sich in den Händen des Herstellers normal, aber in dem Moment, in dem es beim Handel den Besitzer wechselt, bindet es sich an die Person, die es erhalten hat. Das ist die Herstellerbindung: Der Käufer bekommt sein Stück, und das Stück kann nicht weitergegeben oder wiederverkauft werden.\n\nBindungen sind nicht für immer, nur kostspielig. Jeder Stationsmeister kann ein gebundenes Stück lösen, solange du an seiner Station stehst (eine mobile Station bietet diesen Dienst nie), gegen eine Gebühr, die von der Qualität des Gegenstands abhängt: 25 Silber für Ungewöhnlich, 1 Gold für Selten, 4 Gold für Episch; ein Legendäres zahlt den Episch-Tarif, ein beauftragtes Gewöhnliches den Ungewöhnlich-Tarif.\n\nDie Gebühr kauft eine saubere Weste, keine Heilung: Das Stück ist noch immer eine Auftragsarbeit, also bindet es sich beim nächsten Handel erneut an denjenigen, der es erhält, und alles andere an ihm, Signatur, Meisterwerk und Verzauberungen, bleibt unberührt.",
         "provenanceHeading": "Signierte Arbeit",
-        "provenanceBody": "Manche Gegenstände tragen einen Namen. Fahre mit der Maus darüber und der Tooltip sagt Gesammelt von Soundso bei einem Rohstoff, oder Hergestellt von Soundso bei einem fertigen Stück: dieselbe Markierung, formuliert für die Art, wie der Gegenstand entstanden ist. Eine Signatur ist Teil des Gegenstands selbst, reist mit ihm durch Handel und Bank und verblasst nie.\n\nSammeln signiert seine beste Arbeit automatisch: Jede Ernte, die selten oder besser ausfällt, kommt signiert an, seltene Funde signieren ihren gesamten fünffachen Glücksfall, und der Glückstreffer bei einer Leichenernte signiert seinen Ertrag, makellose Exemplare eingeschlossen. Handwerk signiert nach derselben Linie: Ein Einzelstück-Ertrag von seltener oder besserer Qualität wird signiert geprägt, und ein Meisterwerk signiert immer, welche Qualität auch immer, sodass die feinste Version jedes Stücks stets den Namen seines Herstellers trägt. Das Einzige, was dir eine Signatur kosten kann, ist ein voller Beutel: Ein signiertes Stück braucht einen eigenen Platz oder einen passenden signierten Stapel, um landen zu können.\n\nEin Stapel von Gegenständen teilt eine Identität, also verschmelzen zwei Kopien nur, wenn alle Markierungen genau übereinstimmen: gleicher Gegenstand, gleicher Unterzeichner, gleiche Meisterwerkattribute, gleiche Verzauberung, gleiche Bindung. Ein signierter Stamm schließt sich nie einem unmarkierten Stapel an, in keiner Richtung (Zusammenführen würde jemandes Namen auslöschen), aber identische Nutzlasten verschmelzen problemlos, sodass zwanzig Erz, signiert vom selben Sammler, in einem Stapel liegen und ein Glücksfall deine Beutel nicht zerschreddert.\n\nSignaturen zahlen Handwerker zurück: Das Verbrauchen eines signierten Reagenzes, egal von wem signiert, fügt 2 Prozentpunkte Meisterwerkchance hinzu, und das Halten eines Reagenzes, das von deiner eigenen Hand signiert wurde, senkt die benötigte Menge dieses Reagenzes um eins (niemals unter eins). Deine eigene signierte seltene oder bessere Arbeit lehrt dich sogar weiterhin: Wenn ein von dir signiertes Stück in deinen eigenen Händen wirkt, ein zum richtigen Moment getrunkener Trank, ein tödlicher Schlag, getragene Rüstung bei einem Tötungsschlag, fließt ein kleiner Fertigkeitsstrom zurück zum Handwerk, das es gemacht hat, solange dieses Handwerk eines deiner aktiven Hauptberufe ist.",
+        "provenanceBody": "Manche Gegenstände tragen einen Namen. Fahre mit dem Zeiger darüber, und der Tooltip sagt bei einem Rohstoff Gesammelt von Soundso oder bei einem fertigen Stück Hergestellt von Soundso: dieselbe Marke, nur danach formuliert, wie der Gegenstand entstanden ist. Eine Signatur ist Teil des Gegenstands selbst, reist mit ihm durch Handel, Bank, Post, den Weltmarkt und sogar einen Händler-Rückkauf und verblasst nie.\n\nSammeln signiert seine beste Arbeit von selbst: Jede Ernte, die selten oder besser würfelt, kommt signiert an, und seltene Funde signieren ihren gesamten fünffachen Segen. Der Glückswurf einer Leichenernte signiert den Ertrag dort, wo die Familie kein Exemplar zu geben hat, und wo sie eines hat, bleibt der Ertrag schlicht und daneben entsteht das signierte makellose Exemplar. Handwerk signiert nach derselben Regel: Jede Kopie einer seltenen oder besseren Ausgabe entsteht signiert, und ein Meisterwerk signiert immer, welche Qualität es auch hat, sodass die feinste Fassung jedes Stücks stets seinen Hersteller nennt. Das Einzige, was dich eine Signatur kosten kann, ist eine volle Tasche: Eine signierte Einheit braucht einen eigenen Platz oder einen passenden signierten Stapel, in dem sie landen kann.\n\nEin Stapel Gegenstände teilt sich eine Identität, also verschmelzen zwei Kopien nur dann, wenn jede Marke exakt übereinstimmt: gleicher Gegenstand, gleicher Unterzeichner, gleiche Meisterwerk-Attribute, gleiche Verzauberung, gleiche Bindung. Ein signiertes Scheit gesellt sich in keine Richtung zu einem schlichten Haufen (das Verschmelzen würde jemandes Namen auslöschen), doch identische Ladungen verschmelzen bereitwillig, sodass zwanzig vom selben Sammler signierte Erze in einem Stapel sitzen und ein Segensfund deine Taschen nicht zerfetzt.\n\nSignaturen zahlen sich für Handwerker aus: Hältst du an der Werkbank irgendeine signierte Kopie eines benötigten Reagenzes, gleich wer sie signiert hat, steigt die Meisterwerk-Chance um 2 Prozentpunkte, und hältst du ein von eigener Hand signiertes Reagenz, sinkt die benötigte Menge dieses Reagenzes um eins (nie unter eins). Deine eigene signierte seltene oder bessere Arbeit lehrt dich sogar weiter, heute allein über die Flasche: Trink einen Trank, den du signiert hast, und ein kleines Rinnsal Fertigkeit fließt zurück in das Handwerk, das ihn gebraut hat, solange dieses Handwerk einer deiner aktiven Hauptberufe ist.",
         "collectorsHeading": "Sammler, Trophäen und der Preis einer Geschichte",
         "collectorsBody": "Händler sind blind für Provenienz: Ein signierter Gegenstand verkauft sich an einen NSC für genau seinen schlichten Preis. Der Aufpreis für eine Signatur besteht nur zwischen Spielern, und genau das macht ihn interessant: ein Stapel Glückserz, signiert von einem berühmten Sammler, ein Erstklassiges Stück aus einer glücklichen Ernte, eine Meisterwerksklinge mit dem Namen eines längst zurückgezogenen Schmieds, all das kostet, was jemandes Erinnerung sagt, dass es wert ist.\n\nDas Buch der Taten spielt mit demselben Instinkt: Makellose Ader, Altes Herzholz, Mondlichtblüte, Ein Makelloses Exemplar und Schimmer der Hoffnung sind Sammlertaten mit null Ansehen, die einzig dazu da sind, zu beweisen, dass dir ein Moment passiert ist. Behalte den Gegenstand, der die Tat verdient hat, und du hältst den Beleg. Das ist keine Macht; Provenienz kauft keine Attributpunkte und gewinnt keine Kämpfe, sie ist die Papierspur der Welt an guten Tagen.",
-        "throttleHeading": "Die Aktionsdrosselung",
-        "throttleBody": "Der Ausstoß hat eine Obergrenze: Herstellen, Entzaubern, Verzaubern und Zerlegen teilen sich ein Budget von {actions} erfolgreichen Aktionen pro rollenden {seconds} Sekunden. Ein abgelehnter Versuch kostet nichts und verbraucht kein Budget. Du wirst es im normalen Spiel nie bemerken; es existiert, damit ein ausgemaxter Spezialist mit einer vollen Bank den Markt nicht überschwemmen kann, egal wie hoch seine Fertigkeit oder sein Vorrat ist.",
+        "castPaceHeading": "Herstellungszeit und der Goldabfluss",
+        "castPaceBody": "Berufsaktionen brauchen echte Herstellungszeit: Rezepte reichen von knapp zwei Sekunden für einfache Feldarbeit bis zu einigen Sekunden an der Spitze der Leiter, und Entzaubern, Verzaubern, Zerlegen und das Aufladen von Werkzeugeffekten dauern jeweils einen festen, kurzen Vorgang. Brichst du mitten im Vorgang ab, verlierst du nichts. Jede erfolgreiche Herstellung zahlt außerdem eine Kupfergebühr, die sich am Gegenstandsbudget bemisst. Zusammen mit Materialien, Stationen und Fertigkeitsobergrenzen hält dieses Tempo den Markt ehrlich, ohne ein gesondertes Aktionslimit. Die genauen Zeiten nach Fertigkeitsband sind unten aufgeführt.",
+        "castPaceField": "Feldrezepte (keine Fertigkeitsanforderung): {seconds} Sek. Herstellungszeit",
+        "castPaceSkill25": "Rezepte bis Fertigkeit 25: {seconds} Sek. Herstellungszeit",
+        "castPaceSkill50": "Rezepte bis Fertigkeit 50: {seconds} Sek. Herstellungszeit",
+        "castPaceSkill75": "Rezepte bis Fertigkeit 75: {seconds} Sek. Herstellungszeit",
+        "castPaceCombo": "Rezepte an der Spitze der Leiter und Kombi-Rezepte: {seconds} Sek. Herstellungszeit",
+        "castPaceEnchantFamily": "Entzaubern, Verzaubern und Zerlegen: {seconds} Sek. Herstellungszeit",
+        "castPaceRecharge": "Aufladen von Werkzeugeffekten: {seconds} Sek. Herstellungszeit",
+        "castPaceBatch": "Stapelherstellung: bis zu {count} in einem Auftrag, je ein Herstellungsvorgang",
         "doctrineHeading": "Spieler handeln mit Spielern",
         "doctrineBody": "Die Handwerkswirtschaft beruht auf einem Gedanken: Spieler versorgen Spieler. Sammler beliefern Handwerker, Handwerker versorgen Quester und Schlachtzügler, und Zerbrecher beliefern Verzauberer, während Händler und Stationsmeister an den Rändern stehen, um Plunder und Münzen aufzunehmen, anstatt mit dir zu konkurrieren. Wenn du mit einem Beruf Geld verdienen willst, ist dein Kunde ein Mensch: Lerne, was andere Spieler verbrauchen, richte deine Preise am Weltmarkt aus und behandle die NSC-Systeme als Boden unter deinen Preisen, nicht als den Markt selbst.\n\nGefertigte Ausrüstung ist so ausgewogen, dass sie unterhalb des Schlachtzugbodens liegt: Selbst ein Meisterwerk ist immer nur eine Qualitätsstufe über seinem Rezept, nie jenseits von Legendär, und sein Attributbudget bleibt unter dem Schlachtzugsbeute-Band. Die Schmiede macht dich bereit für den härtesten Inhalt; sie ersetzt ihn nicht. Das hält Handwerker, Schlachtzügler und den Markt in einem stabilen Dreieck: Schlachtzugsbeute bleibt erstrebenswert, und gefertigte Stücke bleiben die beste Ausrüstung, die man für Geld kaufen kann."
       },
@@ -4215,15 +4733,15 @@ export const de_DE: EnTranslations = {
         "q3": "Was ist der Unterschied zwischen Plündern und Ernten einer Leiche?",
         "a3": "Ein Tastendruck deckt beides ab. Alles, was eine Leiche hält, Münzen und Drops plus alle erntbaren Komponenten, öffnet sich in demselben Fenster: Beute folgt den normalen Beuteregeln, und das Ernten ist die Berufsseite, wobei Materialien direkt von der Leiche selbst abgestreift werden.\n\nErnten ist nach dem Prinzip Erster kommt, einzelne Nutzung: Jede Leiche kann genau einmal geerntet werden, von wem auch immer sie zuerst beansprucht, inklusive online. Dein Stadtfokus beeinflusst, was du bekommst: Während du in einem Stadthub stehst, kannst du 10 Fokuspunkte auf die Komponententypen verteilen, die dir wichtig sind, und jede fokussierte Komponente würfelt eine bessere Güte (alle 5 Punkte erhöht sich diese um eine Stufe, maximal um zwei Stufen) und ergibt mehr (10 Prozent pro Punkt). Unfokussierte Komponenten werden nie verschlechtert.",
         "q4": "Warum ist mein Eisenrindenholz signiert?",
-        "a4": "Du hast einen Glücksfall getroffen. Etwa 1 von 90 Ernten löst ein seltenes Sammelereignis aus (Altes Herzholz an einem Baum, eine Makellose Ader bei Erz, eine Mondlichtblüte bei Kräutern): Es multipliziert den Ertrag fünfmal, signiert jede Einheit mit deinem Namen und kündigt den Fund der gesamten Zone an. Ein seltenes oder besseres Qualitätswürfeln bei einer gewöhnlichen Ernte signiert den Ertrag ebenfalls.\n\nSignierte Materialien lohnt es sich zu behalten oder teuer zu verkaufen: Das Verbrauchen eines signierten Reagenzes bei einer Herstellung fügt 2 Prozent zur Meisterwerkchance hinzu. Denk nur daran, dass sie sich nur mit identisch signierten Kopien stapeln, sodass sie ihren eigenen Beutelplatz behalten.",
+        "a4": "Du hattest einen Glücksfund. Etwa 1 von 90 Ernten löst ein seltenes Sammelereignis aus (uraltes Kernholz an einem Baum, eine makellose Ader beim Erz, eine mondscheinbeleuchtete Blüte bei Kräutern): Es verfünffacht den Ertrag, signiert jede Einheit mit deinem Namen und verkündet den Fund der ganzen Zone. Auch ein Seltenheitswurf von Selten oder besser bei einer gewöhnlichen Ernte signiert den Ertrag.\n\nSignierte Materialien lohnt es sich aufzuheben oder teuer zu verkaufen: Wer an der Werkbank irgendeine signierte Kopie eines benötigten Reagenz hält, erhält 2 Prozentpunkte mehr Meisterwerkchance. Denk nur daran, dass sie sich nur mit identisch signierten Kopien stapeln und deshalb einen eigenen Taschenplatz belegen.",
         "q5": "Wie entbinde ich eine Auftragsarbeit und was kostet es?",
         "a5": "Gehe zu einer Handwerksstation mit dem Stück in deinen Beuteln und bezahle den Meister. Die Gebühr richtet sich nach der Qualität des Gegenstands: 25 Silber für ein ungewöhnliches Stück, 1 Gold für ein seltenes, 4 Gold für ein episches; ein legendäres zahlt den Episch-Tarif, und ein beauftragtes gewöhnliches Stück den Ungewöhnlich-Tarif. Es muss eine echte Station sein: eine mobile Station bietet diesen Dienst nie.\n\nDie Gebühr kauft eine saubere Weste, keine Heilung: Das Stück bleibt eine Auftragsarbeit, also bindet es sich beim nächsten Handel erneut an denjenigen, der es erhält. Wenn mehrere gebundene Kopien einen Stapel teilen, wird eine Kopie abgelöst und pro Zahlung entbunden.",
         "q6": "Wo lerne ich Rezepte und was kosten sie?",
-        "a6": "Die neun gewöhnlichen Feldrezepte und die Werkzeugrezepte kennt jeder von Anfang an, und auch drei stationsgebundene Höhepunkte (der Brennschuppenmantel, die Banngewebe-Gugel und die Dämmerfell-Wickel), die keinen Trainer benötigen, nur ihre Station. Alles andere wird von den ansässigen Meistern an ihren Stationen in den drei Stadtknoten gelehrt: Die meisten stehen in Eastbrook, der Gerber hält die Gerberei in Fenbridge, und der Alchemist hält die Apotheke in Highwatch.\n\nTrainerrezepte gibt es in Sprossen bei Fertigkeit 0, 25 und 50, zu Preisen von kostenlos, 25 Silber und 1 Gold als einmalige Gebühr. Ein Meister lehrt ein Rezept, sobald deine Klammer in diesem Handwerk die Klammer des Rezepts erreicht hat, und du musst an seiner Station stehen, um es zu erlernen: eine mobile Station zählt nicht.",
+        "a6": "Die neun gewöhnlichen Feldrezepte und die sechs herstellbaren Landwerkzeug-Rezepte kennt jeder von Anfang an, ebenso drei stationsgebundene Abschlussrezepte (den Brennschuppenmantel, die Banngewebe-Gugel und die Dämmerfell-Wickel), die keinen Ausbilder brauchen, nur ihre Station. Alles andere lehren die ansässigen Meister an ihren Stationen in den drei größeren Städten: Die meisten stehen in Eastbrook, der Gerber führt die Gerberei in Fenbridge, und der Alchemist führt die Apotheke in Highwatch.\n\nAusbilderrezepte laufen in Sprossen: Fertigkeit 0, 25 und 50 für die Ausrüstungs- und Verbrauchsgüterberufe, als einmalige Gebühren kostenlos, 25 Silber und 1 Gold; die beiden Talisman-Rezepte der Verzauberung sitzen auf der 25er-Sprosse, und der Werkzeugmacher lehrt die beiden herstellbaren Angelruten bei 75 und 125 für 4 und 16 Gold. Ein Meister lehrt ein Rezept, sobald deine Stufe in diesem Handwerk die Stufe des Rezepts erreicht hat, und du musst zum Lernen an seiner Station stehen: Eine mobile Station zählt nicht.",
         "q7": "Warum hat sich mein Sammeln plötzlich verlangsamt?",
-        "a7": "Die Sammelwirkzeit beginnt bei 2,5 Sekunden und wird auf zwei Wegen verkürzt: 0,4 Sekunden für jede Werkzeugstufe, die du über der eigenen Stufe des Vorkommens besitzt, und 0,15 Sekunden für jedes Fertigkeitsband, das du überschritten hast (bei 100 und 200), mit einem Boden von 1,5 Sekunden. Wechsle von Vorkommen der Stufe 1 zu Vorkommen der Stufe 3 und dein Überschuss schwindet, sodass dieselbe Spitzhacke wieder langsamer schwingt. Den exakt erforderlichen Typ zu besitzen bringt keine Geschwindigkeit; es öffnet nur das Vorkommen.\n\nFertigkeitsgewinn verblasst genauso wie beim Handwerk: Ein Vorkommen wird grau, wenn deine Fertigkeit über seine Stufe hinaussteigt (Vorkommen der Stufe 1 lehren ab Fertigkeit 75 nichts mehr), also ist die Antwort auf langsamen Gewinn Vorkommen höherer Stufe, die ein Werkzeug mindestens ihrer Stufe benötigen (bloße Hände zählen als Stufe 1). Angeln folgt seiner eigenen Verjüngung: voller Gewinn unter Fertigkeit 50, halb unter 100, ein Rinnsal von 0,1 unter 150 und 0,02 unter 200, und Schrottfänge lehren ab 100 gar nichts mehr.",
+        "a7": "Der Sammelvorgang beginnt bei 2,5 Sekunden und wird auf zwei Wegen gekürzt: um 0,4 Sekunden für jede Werkzeugstufe, die du über der Stufe des Knotens mitführst und auch führen darfst, und um 0,15 Sekunden, sobald der Zähler deines Berufs seine 100er-Stufe überschreitet, bei einem Minimum von 1,5 Sekunden. Wechselst du von Knoten der Stufe 1 hinauf zu Knoten der Stufe 3, verschwindet dein Überschuss, und dieselbe Spitzhacke schwingt wieder langsamer. Genau die geforderte Stufe zu halten kauft kein Tempo; sie öffnet nur den Knoten.\n\nDer Fertigkeitszuwachs verblasst genauso wie beim Herstellen: Ein Knoten wird grau, während deine Fertigkeit über seine Stufe hinaussteigt (Knoten der Stufe 1 lehren ab Fertigkeit 75 nichts mehr), die Antwort auf langsamen Zuwachs sind also Knoten höherer Stufe. Die verlangen ein Werkzeug mindestens ihrer eigenen Stufe in deinen Taschen (kein Knoten wird je mit bloßen Händen bearbeitet, Stufe 1 eingeschlossen), und ein Landwerkzeug über Stufe 1 will zuerst seine Führungsmarke, 40/70/85/100 im eigenen Beruf für die Stufen 2 bis 5. Angeln folgt seiner eigenen Verjüngung: voller Zuwachs unter Fertigkeit 50, die Hälfte unter 100, ein Rinnsal von 0,1 unter 150 und 0,02 unter 200, Plunderfänge lehren ab 100 überhaupt nichts mehr, und das Gewässer selbst deckelt die Lektion (Gewässer der Stufe 1 hören bei 100 auf zu lehren, das Moor bei 150), ein stockender Zähler kann also auch bedeuten, dass du dem Gewässer entwachsen bist.",
         "q8": "Kann ich außerhalb der Stadt herstellen?",
-        "a8": "Teilweise. Die neun gewöhnlichen Feldrezepte (die einfachen Waffen-, Rüstungs-, Nahrungs- und Trank-Grundlagen) können überall und jederzeit hergestellt werden. Alles darüber ist an einen Stationstyp gebunden: Schmiede, Küchen, Apotheke, Gerberei, Webstuhl oder Werkzeugmacherei, und du musst innerhalb von 20 Metern der Station sein, damit die Herstellung durchgeht.\n\nBei Fertigkeit 75 in einem Handwerk spezialisierst du dich, und neben einem Materialrabatt von 20 Prozent erhältst du eine mobile Station: Platziere sie im Gelände und sie steht 10 Minuten lang und bedient die Rezepte dieses Handwerks, als wärst du am echten Ort. Die mobile Station ist nur zum Herstellen: Rezepte erlernen und Auftragsarbeiten entbinden erfordern immer die echte Station in der Stadt."
+        "a8": "Teilweise. Die neun gewöhnlichen Feldrezepte (die Grundausstattung an Waffe, Rüstung, Essen und Trank für den Anfang) lassen sich überall und jederzeit herstellen, und die drei Kombinationsrezepte der geschworenen Paare ebenso. Alles darüber ist an einen Stationstyp gebunden: Schmiede, Küchen, Apotheke, Gerberei, Webstuhl oder Werkzeugmacherei, und du musst höchstens 20 Meter von der Station entfernt sein, damit die Herstellung durchgeht.\n\nBei Fertigkeit 75 in einem Handwerk spezialisierst du dich, und zusammen mit 20 Prozent Materialrabatt erhältst du eine mobile Station: Stell sie im Feld auf, und sie steht 10 Minuten lang und bedient die Rezepte dieses Handwerks, als stündest du an der echten. Die mobile Station ist nur zum Herstellen da: Rezepte lernen und Auftragsarbeiten entbinden verlangen immer die echte Station in der Stadt."
       }
     },
     "economy": {
@@ -4659,6 +5177,7 @@ export const de_DE: EnTranslations = {
       "terrainCapReached": "Limit für Geländebearbeitungen erreicht ({max}). Überzählige Formstempel wurden nicht hinzugefügt.",
       "placementCapReached": "Platzierungslimit erreicht ({max}). Überzählige Assets wurden nicht hinzugefügt.",
       "blockerCapReached": "Sperrwand-Limit erreicht ({max}). Die neue Wand wurde nicht hinzugefügt.",
+      "campCapReached": "Lager-Limit erreicht ({max}). Das neue Lager wurde nicht hinzugefügt.",
       "autosaveOff": "Automatisches Speichern ausgeschaltet: {reason} Speichere manuell und schalte es dann wieder ein."
     },
     "confirm": {
@@ -4933,6 +5452,199 @@ export const de_DE: EnTranslations = {
     "realm": "Welt",
     "newCharacter": "Neuer Charakter",
     "appearance": "Aussehen",
+    "customize": "Anpassen",
+    "body": "Körper",
+    "genderMale": "Männlich",
+    "genderFemale": "Weiblich",
+    "hair": "Haare",
+    "brows": "Augenbrauen",
+    "skinTone": "Hautton",
+    "hairColor": "Haarfarbe",
+    "lightness": "Hell / Dunkel",
+    "colorWheelAria": "Farbrad {label}: Ziehen, um Farbton und Sättigung zu wählen",
+    "lightnessAria": "Helligkeit {label}",
+    "customColor": "Eigene",
+    "colorPresetAria": "{label}-Preset {n}",
+    "beard": "Bart",
+    "face": "Gesicht",
+    "faceNose": "Nase",
+    "faceEyes": "Augengröße",
+    "faceJaw": "Kiefer",
+    "faceBrow": "Brauen",
+    "faceCheeks": "Wangen",
+    "faceChin": "Kinn",
+    "bodyShoulders": "Schultern",
+    "bodyChest": "Brust",
+    "bodyHips": "Hüften",
+    "bodyHands": "Handgröße",
+    "bodyElbows": "Ellbogen",
+    "bodyKnees": "Knie",
+    "bodyFeet": "Füße",
+    "mouth": "Mund",
+    "mouthNeutral": "Neutral",
+    "mouthLips": "Volle Lippen",
+    "mouthSmile": "Lächeln",
+    "mouthFrown": "Stirnrunzeln",
+    "mouthWide": "Breit",
+    "mouthPout": "Schmollmund",
+    "mouthGrin": "Grinsen",
+    "mouthOpen": "Offen",
+    "mouthAwe": "Staunen",
+    "faceEars": "Ohren",
+    "faceSmirk": "Grinsen",
+    "eyeShape": "Augenform",
+    "eyeColor": "Augenfarbe",
+    "earShape": "Ohrform",
+    "lashes": "Wimpern",
+    "lashesOn": "Ein",
+    "lashesOff": "Aus",
+    "lashColor": "Wimpernfarbe",
+    "outfit": "Outfitfarbe",
+    "outfitClassic": "Klassisch",
+    "outfitCrimson": "Karmesin",
+    "outfitEmber": "Glut",
+    "outfitGold": "Gold",
+    "outfitForest": "Waldgrün",
+    "outfitEmerald": "Smaragd",
+    "outfitTeal": "Petrol",
+    "outfitAzure": "Azurblau",
+    "outfitRoyal": "Königsblau",
+    "outfitViolet": "Violett",
+    "outfitMagenta": "Magenta",
+    "outfitRose": "Rosé",
+    "outfitOnyx": "Onyx",
+    "outfitIvory": "Elfenbein",
+    "outfitGilded": "Vergoldet",
+    "outfitBonewrought": "Knochengeschmiedet",
+    "outfitObsidian": "Obsidian",
+    "outfitVerdigris": "Grünspan",
+    "outfitBloodforged": "Blutgeschmiedet",
+    "lipstick": "Lippenstift",
+    "blush": "Rouge",
+    "eyeshadow": "Lidschatten",
+    "makeupNone": "Keines",
+    "shadeRose": "Rosé",
+    "shadeCoral": "Koralle",
+    "shadeRuby": "Rubin",
+    "shadeBerry": "Beere",
+    "shadePlum": "Pflaume",
+    "shadeNude": "Nude",
+    "shadePeach": "Pfirsich",
+    "shadeWarm": "Warm",
+    "shadeMauve": "Mauve",
+    "shadeSmoke": "Rauch",
+    "shadeBronze": "Bronze",
+    "shadeTeal": "Petrol",
+    "randomize": "Zufälliges Aussehen",
+    "randomizeShort": "Zufällig",
+    "helmPreview": "Helm anzeigen",
+    "style": "Stil",
+    "resetLook": "Aussehen zurücksetzen",
+    "resetShort": "Zurücksetzen",
+    "browFlat": "Flach",
+    "browArched": "Gebogen",
+    "browThin": "Dünn",
+    "browBushy": "Buschig",
+    "browWorried": "Besorgt",
+    "browSharp": "Scharf",
+    "browRound": "Rund",
+    "eyeRound": "Rund",
+    "eyeAlmond": "Mandel",
+    "eyeNarrow": "Schmal",
+    "eyeWide": "Weit",
+    "eyeSharp": "Scharf",
+    "eyeDroopy": "Hängend",
+    "eyeSleepy": "Müde",
+    "eyeWideset": "Weit auseinander",
+    "eyeCat": "Katze",
+    "eyeDoe": "Reh",
+    "earRound": "Rund",
+    "earPointed": "Spitz",
+    "earSmall": "Klein",
+    "earWide": "Breit",
+    "hairBald": "Glatze",
+    "hairBuzz": "Kurzrasur",
+    "hairCrew": "Maschinenschnitt",
+    "hairCrewcut": "Texturierter Crewcut",
+    "hairPixie": "Pixie Cut",
+    "hairSweptpixie": "Zurückgekämmter Pixie",
+    "hairQuiff": "Toupierter Quiff",
+    "hairSidepart": "Klassischer Seitenscheitel",
+    "hairMessy": "Zerzauste Spikes",
+    "hairCurlycap": "Kurze Lockenkappe",
+    "hairPompadour": "Kurzer Pompadour",
+    "hairSweptback": "Mittellang zurückgekämmt",
+    "hairFauxhawk": "Faux Hawk",
+    "hairMohawk": "Voller Irokese",
+    "hairTopknot": "Top Knot",
+    "hairWarriorbraid": "Kriegerzopf",
+    "hairHighbun": "Hoher Dutt",
+    "hairLowbun": "Tiefer Dutt",
+    "hairBraidcrown": "Zopfkranz",
+    "hairAfro": "Runder Afro",
+    "hairCurlyafro": "Lockiger Afro",
+    "hairChinbob": "Kinnlanger Bob",
+    "hairBluntbangs": "Bob mit Pony",
+    "hairWavybob": "Wellenbob",
+    "hairAsymbob": "Asymmetrischer Bob",
+    "hairCurtains": "Vorhang-Mittelscheitel",
+    "hairHighpony": "Hoher Pferdeschwanz",
+    "hairSidepony": "Seitlicher Pferdeschwanz",
+    "hairHalfbun": "Halber Dutt",
+    "hairLayered": "Schulterlang gestuft",
+    "hairCurls": "Lockere Locken",
+    "hairLongwavy": "Lange Wellen",
+    "hairLongcenterpart": "Langer Mittelscheitel",
+    "hairLongpart": "Langer glatter Mittelscheitel",
+    "hairMullet": "Kräftiger Vokuhila",
+    "hairTwinbraids": "Zwei Zöpfe",
+    "hairLowpony": "Tiefer Pferdeschwanz",
+    "hairFantasybraid": "Fantasiezopf",
+    "beardNone": "Keiner",
+    "beardStubble": "Stoppeln",
+    "beardScruff": "Stoppelbart",
+    "beardMutton": "Koteletten",
+    "beardGoatee": "Ziegenbart",
+    "beardChinpuff": "Kinnbüschel",
+    "beardStache": "Schnurrbart",
+    "beardHorseshoe": "Hufeisenbart",
+    "beardShortbox": "Boxbart",
+    "beardFull": "Voll",
+    "beardVikingb": "Geflochten",
+    "beardWizard": "Zauberbart",
+    "beardStubbleBeard": "Starke Stoppeln",
+    "browNone": "Keine",
+    "browSoft": "Weich",
+    "browThick": "Dicht",
+    "browAngled": "Schräg",
+    "earrings": "Ohrringe",
+    "jewelMaterial": "Schmuckmaterial",
+    "jewelDefault": "Wie geschmiedet",
+    "jewelGold": "Gold",
+    "jewelSilver": "Silber",
+    "jewelBone": "Knochen",
+    "jewelIron": "Eisen",
+    "jewelCopper": "Kupfer",
+    "jewelBronze": "Bronze",
+    "jewelObsidian": "Obsidian",
+    "jewelJade": "Jade",
+    "jewelAmethyst": "Amethyst",
+    "jewelRuby": "Rubin",
+    "jewelPearl": "Perle",
+    "jewelTurquoise": "Türkis",
+    "earNone": "Keine",
+    "earStud": "Stecker",
+    "earHoop": "Ring",
+    "earBone": "Knochenanhänger",
+    "earBonehoop": "Knochenring",
+    "earMoon": "Mondsichel",
+    "earMoonstar": "Mondstern",
+    "earRunic": "Runenstein",
+    "earChain": "Perlentropfen",
+    "earSeptum": "Nasenring",
+    "earWarden": "Wärtereisen",
+    "earCuff": "Ohrklemme",
+    "earFeather": "Feder",
     "class": "Klasse",
     "name": "Name",
     "chromaOption": "Chroma {n}",
@@ -5014,6 +5726,7 @@ export const de_DE: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "Inhaberboni sind aktiv. Verbindet die App, wenn Ihr unterschreiben oder ausgeben müsst.",
     "extensionHelp": "Damit hier eine Wallet erscheint, halte eine Browser-Wallet-Erweiterung wie Solflare Wallet aktiv.",
     "mobileAppHelp": "Wähle Phantom oder Solflare. Deine Wallet-App wird um Genehmigung bitten. Halte dieses Spiel geöffnet und kehre zu ihm zurück, wenn du fertig bist.",
+    "seekerAppHelp": "Weiter mit Seed Vault Wallet. Prüfe die Verbindungs- und Verifizierungsanfragen in Seed Vault und kehre dann zum Spiel zurück.",
     "standaloneAppHelp": "Wallet-Verbindungen sind in der Startbildschirm-App noch nicht verfügbar. Öffne World of ClaudeCraft in Safari oder Chrome, um Phantom oder Solflare zu nutzen.",
     "openAppTitle": "Weiter in {wallet}",
     "openAppHelp": "Öffne {wallet}, um diese Anfrage zu prüfen. Halte diesen Spieltab geöffnet, während die Wallet-App aktiv ist.",
@@ -5213,55 +5926,55 @@ export const de_DE: EnTranslations = {
   },
   "sim": {
     "rift": {
-      "allUnstable": "All rifts are unstable right now. Try again soon.",
-      "enterFloor": "You step through the rift into {name}.",
-      "descendFloor": "You descend deeper into {name}.",
-      "stepBack": "You step back through the rift.",
-      "pylonLit": "A rune pylon flares to life ({lit}/{total}).",
-      "wayDownOpens": "The way down tears open.",
-      "exitOpens": "The rift shudders. A way home tears open behind the fallen.",
-      "portalOpens": "A {tier}-rank rift tears open in {zone}!",
-      "portalSealed": "The {tier}-rank rift in {zone} has been sealed.",
-      "portalCollapses": "The {tier}-rank rift in {zone} collapses.",
-      "levelGate": "Only adventurers of level {level} or higher may enter this rift.",
-      "deadEntry": "You cannot enter a rift while dead.",
-      "deadEntryCombat": "Your party is still in combat. The dead may re-enter once the fighting stops.",
-      "iceGoalLit": "The frost sigil blazes. The way stirs.",
-      "socketsShut": "The sockets grind shut. The way stirs.",
-      "seqProgress": "The runes answer in turn ({step}/{total}).",
-      "seqReset": "The runes go dark. Begin again.",
-      "gateOpen": "The gate grinds open.",
-      "orbSealed": "The orb is sealed by the ritual below.",
-      "orbWakes": "The pentagram's flame gutters out. Something wakes on the altar.",
-      "orbOpensGate": "The Blood Orb flares. The gates of the temple grind open.",
-      "alreadyCleared": "This rift has already been cleared by {names}.",
-      "raceLost": "The rift has already been cleared by {names}. Your run ends.",
-      "raceWorldWin": "{names} won the {tier}-rank Rift race in {seconds}s!",
-      "raceWinBanner": "Rift Race Won - {seconds}s",
-      "raceLostBanner": "Rift Already Cleared",
-      "forgeUpgraded": "Rift upgrade completed for {name}.",
-      "forgeEnchanted": "Rift enchant completed for {name}.",
-      "forgeSocketed": "Rift gem socketed for {name}.",
-      "detonateGlacialGrave": "Glacial Grave detonates!",
-      "detonateAbsoluteZero": "Absolute Zero erupts!",
-      "detonateMagmaWell": "Magma Well erupts!",
-      "detonateCoreMeltdown": "Core Meltdown detonates!",
-      "detonateVenomPool": "Venom Pool erupts!",
-      "detonateBroodmothersMark": "Broodmother's Mark detonates!",
-      "detonateSoulGrave": "Soul Grave detonates!",
-      "detonateDeathSentence": "Death Sentence falls!",
-      "detonateEarthshatter": "Earthshatter detonates!",
-      "detonateFinalJudgment": "Final Judgment lands!",
-      "detonateVoidRift": "Void Rift detonates!",
-      "detonateArcaneAnnihilation": "Arcane Annihilation erupts!",
-      "detonateLightningRod": "Lightning Rod strikes!",
-      "detonateStormcallersWrath": "Stormcaller's Wrath erupts!",
-      "detonateAbyssalMaw": "Abyssal Maw closes!",
-      "detonateCrushingDepth": "Crushing Depth crushes!",
-      "detonatePactSeal": "Pact Seal detonates!",
-      "detonateBloodRite": "Blood Rite falls!",
-      "detonatePitSentence": "Pit Sentence detonates!",
-      "detonateHellfireBrand": "Hellfire Brand detonates!"
+      "allUnstable": "Alle Risse sind gerade instabil. Versuche es bald noch einmal.",
+      "enterFloor": "Du trittst durch den Riss nach {name}.",
+      "descendFloor": "Du steigst tiefer hinab in {name}.",
+      "stepBack": "Du trittst zurück durch den Riss.",
+      "pylonLit": "Ein Runenpylon erwacht flammend zum Leben ({lit}/{total}).",
+      "wayDownOpens": "Der Weg hinab reißt auf.",
+      "exitOpens": "Der Riss erzittert. Hinter den Gefallenen reißt ein Weg nach Hause auf.",
+      "portalOpens": "Ein Riss vom Rang {tier} reißt in {zone} auf!",
+      "portalSealed": "Der Riss vom Rang {tier} in {zone} wurde versiegelt.",
+      "portalCollapses": "Der Riss vom Rang {tier} in {zone} bricht zusammen.",
+      "levelGate": "Nur Abenteurer der Stufe {level} oder höher dürfen diesen Riss betreten.",
+      "deadEntry": "Du kannst keinen Riss betreten, während du tot bist.",
+      "deadEntryCombat": "Deine Gruppe befindet sich noch im Kampf. Die Toten können erneut eintreten, sobald der Kampf endet.",
+      "iceGoalLit": "Das Frostsiegel entflammt. Der Weg regt sich.",
+      "socketsShut": "Die Fassungen schließen sich knirschend. Der Weg regt sich.",
+      "seqProgress": "Die Runen antworten nacheinander ({step}/{total}).",
+      "seqReset": "Die Runen erlöschen. Beginne von vorn.",
+      "gateOpen": "Das Tor öffnet sich knirschend.",
+      "orbSealed": "Die Kugel ist durch das Ritual darunter versiegelt.",
+      "orbWakes": "Die Flamme des Pentagramms erlischt flackernd. Etwas erwacht auf dem Altar.",
+      "orbOpensGate": "Die Blutkugel flammt auf. Die Tore des Tempels öffnen sich knirschend.",
+      "alreadyCleared": "Dieser Riss wurde bereits von {names} bereinigt.",
+      "raceLost": "Der Riss wurde bereits von {names} bereinigt. Dein Lauf endet.",
+      "raceWorldWin": "{names} hat das Riss-Rennen vom Rang {tier} in {seconds}s gewonnen!",
+      "raceWinBanner": "Riss-Rennen gewonnen - {seconds}s",
+      "raceLostBanner": "Riss bereits bereinigt",
+      "forgeUpgraded": "Riss-Aufwertung für {name} abgeschlossen.",
+      "forgeEnchanted": "Riss-Verzauberung für {name} abgeschlossen.",
+      "forgeSocketed": "Riss-Edelstein für {name} eingesetzt.",
+      "detonateGlacialGrave": "Gletschergrab detoniert!",
+      "detonateAbsoluteZero": "Absoluter Nullpunkt bricht aus!",
+      "detonateMagmaWell": "Magmaquelle bricht aus!",
+      "detonateCoreMeltdown": "Kernschmelze detoniert!",
+      "detonateVenomPool": "Gifttümpel bricht aus!",
+      "detonateBroodmothersMark": "Mal der Brutmutter detoniert!",
+      "detonateSoulGrave": "Seelengrab detoniert!",
+      "detonateDeathSentence": "Todesurteil fällt!",
+      "detonateEarthshatter": "Erdspalter detoniert!",
+      "detonateFinalJudgment": "Letztes Urteil trifft ein!",
+      "detonateVoidRift": "Leerenriss detoniert!",
+      "detonateArcaneAnnihilation": "Arkane Auslöschung bricht aus!",
+      "detonateLightningRod": "Blitzableiter schlägt ein!",
+      "detonateStormcallersWrath": "Zorn des Sturmrufers bricht aus!",
+      "detonateAbyssalMaw": "Abgrundrachen schließt sich!",
+      "detonateCrushingDepth": "Erdrückende Tiefe zermalmt!",
+      "detonatePactSeal": "Paktsiegel detoniert!",
+      "detonateBloodRite": "Blutritus fällt!",
+      "detonatePitSentence": "Grubenurteil detoniert!",
+      "detonateHellfireBrand": "Höllenfeuerbrand detoniert!"
     },
     "delve": {
       "cannotEnterNow": "Du kannst jetzt keinen Tiefgang betreten.",
@@ -5641,7 +6354,6 @@ export const de_DE: EnTranslations = {
   "yumi": {
     "bracket3": "Yumi 3 gegen 3",
     "bracket5": "Yumi 5 gegen 5",
-    "enterQueue": "Yumi beschützen beitreten!",
     "queue": {
       "join": "Ihr tretet der Warteschlange für Yumi beschützen bei. Bewacht Euren Begleiter…",
       "leave": "Ihr verlasst die Warteschlange für Yumi beschützen.",
@@ -5679,9 +6391,6 @@ export const de_DE: EnTranslations = {
   },
   "fiesta": {
     "bracket": "Fiesta",
-    "enterQueue": "Tretet der Fiesta bei!",
-    "practice": "🎉 Übung gegen Bots",
-    "practiceNote": "Offline-Übung: erzeugt 3 KI-Bots und meldet Euch für eine 2-gegen-2-Fiesta an. Klickt erneut zum Beenden.",
     "banner": {
       "wave": "WELLE {wave}/{total} — WÄHLT EINE AUGMENTIERUNG!",
       "augmentGained": "Augmentierung erhalten: {name}!",
@@ -5746,6 +6455,7 @@ export const de_DE: EnTranslations = {
     },
     "augment": {
       "choose": "Wählt eine Augmentierung",
+      "cardAria": "{name} ({category}): {description}",
       "aug_brutality": {
         "name": "Brutalität",
         "desc": "Eure physischen Schläge treffen 15% härter."
@@ -5937,10 +6647,16 @@ export const de_DE: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "Update {version} wird heruntergeladen...",
-      "ready": "Update {version} ist bereit. Es wird beim Beenden installiert, oder starte jetzt neu.",
+      "checkingTitle": "Suche nach Updates...",
+      "checkingBody": "Neue Versionen werden heruntergeladen, während du spielst.",
+      "uptodateTitle": "Du bist auf dem neuesten Stand",
+      "downloadingTitle": "Update {version} wird heruntergeladen...",
+      "downloadingBody": "Du kannst weiterspielen. Es installiert sich, wenn du das Spiel beendest.",
+      "readyTitle": "Update {version} ist bereit",
+      "readyBody": "Es wird beim Beenden installiert, oder starte jetzt neu.",
       "restart": "Jetzt neu starten",
-      "later": "Später"
+      "later": "Später",
+      "dismiss": "Schließen"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -6133,6 +6849,7 @@ export const de_DE: EnTranslations = {
         "add": "Chatkanal hinzufügen",
         "addTitle": "Kanal hinzufügen",
         "close": "Reiter {channel} schließen",
+        "moveHint": "Reiter {channel} neu anordnen: ziehen Sie ihn, oder verwenden Sie Alt+Links und Alt+Rechts",
         "sendingTo": "Nachricht an {channel}",
         "names": {
           "say": "Sagen",
@@ -6155,7 +6872,6 @@ export const de_DE: EnTranslations = {
       "mobileMore": "Mehr",
       "mobileMoreAria": "Weitere Menüs anzeigen",
       "mobileSocial": "Soziales",
-      "mobileArena": "Arena",
       "mobileMenu": "Menü",
       "mobileSettings": "Einstellungen",
       "mobileUse": "Benutzen",
@@ -6189,11 +6905,15 @@ export const de_DE: EnTranslations = {
       "graphicsPresetMedium": "Mittel",
       "graphicsPresetHigh": "Hoch",
       "graphicsPresetUltra": "Ultra",
+      "graphicsPresetInsane": "Extrem",
       "graphicsPresetAdvanced": "Erweitert",
       "terrainDetail": "Geländedetail",
       "foliageDensity": "Pflanzendichte",
       "effectsQuality": "Effekte und Licht",
       "shadowQuality": "Schattenqualität",
+      "surfaceDetail": "Oberflächendetail",
+      "surfaceDetailBasic": "Einfach",
+      "surfaceDetailFull": "Voll",
       "terrainLow": "Niedrig",
       "terrainHigh": "Hoch",
       "touchOpacity": "Deckkraft der Touch-Steuerung",
@@ -6268,7 +6988,7 @@ export const de_DE: EnTranslations = {
         "nameplates": "Namensplaketten umschalten",
         "meters": "Schadensanzeigen",
         "social": "Freunde & Gilde",
-        "arena": "Arena (Aschenes Kolosseum)",
+        "arena": "PvP (Thornhollow-Felder und Arenen)",
         "chat": "Chat öffnen",
         "attack": "Angreifen",
         "actionBarSlot": "Aktionsleiste {slot}"
@@ -6357,6 +7077,8 @@ export const de_DE: EnTranslations = {
       "joinParty": "Gruppe beitreten",
       "guildInvite": "{name} lädt Euch ein, {guild} beizutreten.",
       "joinGuild": "Gilde beitreten",
+      "guildInviteCancelled": "Eine ausstehende Gildeneinladung wurde storniert, da die Gilde umbenannt wurde.",
+      "guildRenamed": "Eure Gilde wurde vom Moderationsteam in {name} umbenannt.",
       "tradeRequest": "{name} möchte mit Euch handeln.",
       "openTrade": "Handel öffnen",
       "duelRequest": "{name} hat Euch zu einem Duell herausgefordert!",
@@ -6370,6 +7092,10 @@ export const de_DE: EnTranslations = {
       "floatingDodge": "Ausgewichen",
       "floatingParry": "Pariert",
       "floatingResist": "Widerstand",
+      "floatingEvade": "Entgangen",
+      "floatingBlock": "{amount} Block",
+      "floatingHealFull": "Voll",
+      "floatingHealAbsorbed": "Absorbiert",
       "cannotMove": "Bewegungsunfähig!",
       "attack": "Angriff",
       "damageDone": "Euer {ability} trifft {target} für {amount}.",
@@ -6380,10 +7106,17 @@ export const de_DE: EnTranslations = {
       "dodged": "{target} weicht Eurem {ability} aus.",
       "parried": "Deine {ability} wird von {target} pariert.",
       "resisted": "{target} widersteht Eurem {ability}.",
+      "evaded": "{target} entgeht deiner {ability}.",
+      "blockedDone": "{target} blockt Euer {ability} und trifft für {amount}.",
+      "blockedTaken": "Ihr blockt {source}s Angriff und nehmt {amount}.",
       "healSelf": "Euer {ability} heilt Euch um {amount}.",
       "healSelfCrit": "Euer {ability} heilt Euch kritisch um {amount}.",
       "healOther": "Euer {ability} heilt {target} um {amount}.",
       "healOtherCrit": "Euer {ability} heilt {target} kritisch um {amount}.",
+      "healSelfFull": "Euer {ability} landet, aber Ihr habt bereits volle Gesundheit.",
+      "healOtherFull": "Euer {ability} landet auf {target}, aber das Ziel hat bereits volle Gesundheit.",
+      "healSelfAbsorbed": "Dein {ability} wird von der Seuche auf dir verschlungen.",
+      "healOtherAbsorbed": "Dein {ability} wird von der Seuche auf {target} verschlungen.",
       "death": "{name} stirbt.",
       "auraGain": "Ihr erhaltet {name}.",
       "auraFade": "{name} schwindet von Euch.",
@@ -6392,6 +7125,11 @@ export const de_DE: EnTranslations = {
     },
     "system": {
       "playerDeath": "Ihr seid gestorben.",
+      "deathRecapKillerAbility": "Ihr seid gestorben. Erschlagen durch {killer}s {ability}.",
+      "deathRecapKiller": "Ihr seid gestorben. Erschlagen von {killer}.",
+      "deathRecapAbility": "Ihr seid gestorben. Erschlagen durch {ability}.",
+      "deathRecapFalling": "Ihr seid gestorben. Ihr seid in den Tod gestürzt.",
+      "deathRecapDrowned": "Ihr seid gestorben. Ihr seid ertrunken.",
       "respawn": "Ihr fühlt Euch wieder ausgeruht und unversehrt.",
       "ignoringChat": "Chat von {name} wird ignoriert.",
       "noLongerIgnoring": "{name} wird nicht mehr ignoriert.",
@@ -6472,10 +7210,12 @@ export const de_DE: EnTranslations = {
       "arenaQueueTrading": "Beendet Euren Handel, bevor Ihr Euch anmeldet.",
       "arenaQueueInstance": "Aus einer Instanz heraus könnt Ihr Euch nicht anmelden.",
       "tradeInProgress": "Es läuft bereits ein Handel.",
+      "tradeAlreadyTrading": "Dieser Spieler handelt bereits.",
       "tradeTooFar": "Das Ziel ist zu weit entfernt zum Handeln.",
       "tradeExpired": "Die Handelsanfrage ist abgelaufen.",
       "tradeFailed": "Handel fehlgeschlagen: Gegenstände oder Geld sind nicht mehr verfügbar.",
-      "tradeBound": "Dieser Gegenstand ist gebunden und kann nicht gehandelt werden."
+      "tradeBound": "Dieser Gegenstand ist gebunden und kann nicht gehandelt werden.",
+      "marketListBound": "Dieser Gegenstand ist gebunden und kann nicht zum Verkauf angeboten werden."
     },
     "logs": {
       "standUp": "Ihr steht auf.",
@@ -6635,6 +7375,10 @@ export const de_DE: EnTranslations = {
         "officer": "Offizier",
         "member": "Mitglied"
       },
+      "tenure": {
+        "recruit": "Rekrut",
+        "veteran": "Veteran"
+      },
       "guildHeadOne": "Ihr seid {rank}, {count} Mitglied",
       "guildHeadMany": "Ihr seid {rank}, {count} Mitglieder"
     },
@@ -6741,24 +7485,29 @@ export const de_DE: EnTranslations = {
     "cast": {
       "fishing": "Angeln",
       "gathering": "Sammeln",
+      "crafting": "Basteln",
+      "disenchanting": "Entzaubern",
+      "enchanting_apply": "Verzaubern",
+      "salvaging": "Zerlegen",
+      "tool_recharge": "Aufladen",
       "demonHeal": "Dämonenheilung",
       "thunzharrStormcall": "Sturmruf",
-      "rift_frost_execution": "Glacial Grave",
-      "rift_frost_strike": "Absolute Zero",
-      "rift_ember_execution": "Magma Well",
-      "rift_ember_strike": "Core Meltdown",
-      "rift_venom_execution": "Venom Pool",
-      "rift_venom_strike": "Broodmother's Mark",
-      "rift_necro_execution": "Soul Grave",
-      "rift_necro_strike": "Death Sentence",
-      "rift_brute_execution": "Earthshatter",
-      "rift_brute_strike": "Final Judgment",
-      "rift_arcane_execution": "Void Rift",
-      "rift_arcane_strike": "Arcane Annihilation",
-      "rift_storm_execution": "Lightning Rod",
-      "rift_storm_strike": "Stormcaller's Wrath",
-      "rift_tide_execution": "Abyssal Maw",
-      "rift_tide_strike": "Crushing Depth"
+      "rift_frost_execution": "Gletschergrab",
+      "rift_frost_strike": "Absoluter Nullpunkt",
+      "rift_ember_execution": "Magmaquelle",
+      "rift_ember_strike": "Kernschmelze",
+      "rift_venom_execution": "Gifttümpel",
+      "rift_venom_strike": "Mal der Brutmutter",
+      "rift_necro_execution": "Seelengrab",
+      "rift_necro_strike": "Todesurteil",
+      "rift_brute_execution": "Erdspalter",
+      "rift_brute_strike": "Letztes Urteil",
+      "rift_arcane_execution": "Leerenriss",
+      "rift_arcane_strike": "Arkane Auslöschung",
+      "rift_storm_execution": "Blitzableiter",
+      "rift_storm_strike": "Zorn des Sturmrufers",
+      "rift_tide_execution": "Abgrundrachen",
+      "rift_tide_strike": "Erdrückende Tiefe"
     }
   },
   "questUi": {
@@ -6766,7 +7515,8 @@ export const de_DE: EnTranslations = {
       "title": "Quests",
       "complete": "Abgeschlossen",
       "showOnMap": "{name} auf der Karte anzeigen",
-      "hideFromMap": "{name} auf der Karte ausblenden"
+      "hideFromMap": "{name} auf der Karte ausblenden",
+      "unknownQuest": "Unbekannte Quest ({id})"
     },
     "log": {
       "title": "Questlog",
@@ -6778,6 +7528,8 @@ export const de_DE: EnTranslations = {
       "activeStatus": "Aktiv",
       "readyStatus": "Abgeschlossen",
       "completedStatus": "Abgeschlossen",
+      "repeatableStatus": "Wiederholbar",
+      "cooldownStatus": "Bald wieder verfügbar",
       "returnTo": "Kehrt zu {name} zurück",
       "abandon": "Quest aufgeben",
       "abandonConfirmTitle": "Quest aufgeben",
@@ -6791,6 +7543,7 @@ export const de_DE: EnTranslations = {
       "greetingFallback": "Seid gegrüßt.",
       "availableQuestAria": "Verfügbare Quest: {name}",
       "readyQuestAria": "Quest bereit zur Abgabe: {name}",
+      "repeatableQuestAria": "Wiederholbare Quest: {name}",
       "discussQuest": "{name} besprechen.",
       "discussQuestAria": "Quest besprechen: {name}",
       "profIntroHint": "Sprich mit {name} wegen \"{quest}\".",
@@ -6831,7 +7584,8 @@ export const de_DE: EnTranslations = {
       "incomplete": "Diese Quest ist nicht abgeschlossen.",
       "giverMissing": "Der Questgeber ist nicht in der Nähe.",
       "turnInMissing": "Die Abgabe dieser Quest ist nicht in der Nähe.",
-      "tooFar": "Ihr seid zu weit entfernt."
+      "tooFar": "Ihr seid zu weit entfernt.",
+      "escortAway": "Eure Eskorte ist gerade nicht an ihrem Platz. Sie kehrt in Kürze dorthin zurück."
     }
   },
   "itemUi": {
@@ -6870,6 +7624,8 @@ export const de_DE: EnTranslations = {
       "armor": "Rüstung",
       "quest": "Questgegenstand",
       "junk": "Plunder",
+      "fineMaterial": "Feines Material",
+      "material": "Material",
       "food": "Essen",
       "drink": "Getränk",
       "tool": "Werkzeug",
@@ -6901,8 +7657,14 @@ export const de_DE: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Benutzen: Stellt über {seconds} Sek. {amount} Gesundheit wieder her. Ihr müsst beim Essen sitzen bleiben.",
       "useDrink": "Benutzen: Stellt über {seconds} Sek. {amount} Mana wieder her. Ihr müsst beim Trinken sitzen bleiben.",
+      "useElixir": "Benutzen: Erhöht Euer {stat} {minutes} Min. lang um {value}. Im Kampf nutzbar.",
+      "useElixirAura": "Benutzen: Gewährt {minutes} Min. lang {aura}. Im Kampf nutzbar.",
       "questItem": "Questgegenstand",
+      "questRelated": "Quest: {quest}",
+      "questRules": "Kann nicht verkauft, eingelagert oder gehandelt werden.",
+      "questOrphaned": "Für keine aktive Quest benötigt.",
       "classes": "Klassen: {classes}",
+      "maxStack": "Max. Stapel: {count}",
       "sellPrice": "Verkaufspreis: {money}",
       "clickBuy": "Zum Kaufen klicken",
       "clickSell": "Zum Verkaufen klicken",
@@ -6929,7 +7691,13 @@ export const de_DE: EnTranslations = {
       "stackCount": "x{count}",
       "destroyTitle": "{item} zerstören",
       "destroyConfirm": "Zerstören",
-      "destroyCancel": "Abbrechen"
+      "destroyCancel": "Abbrechen",
+      "unknownItem": "Unbekannter Gegenstand",
+      "unknownItemAria": "Unbekannter Gegenstand {id}, Menge {count}",
+      "unknownItemAriaMasterwork": "Unbekannter Gegenstand {id}, Menge {count}, Meisterwerk",
+      "unknownItemAriaEnchanted": "Unbekannter Gegenstand {id}, Menge {count}, verzauberte Kopie",
+      "unknownItemAriaBound": "Unbekannter Gegenstand {id}, Menge {count}, gebundene Kopie",
+      "unknownItemAriaInstanced": "Unbekannter Gegenstand {id}, Menge {count}, herstellermarkierte Kopie"
     },
     "equipment": {
       "empty": "Leer",
@@ -6940,6 +7708,19 @@ export const de_DE: EnTranslations = {
       "close": "Händler schließen",
       "hint": "Klickt auf einen Gegenstand in Euren Taschen, um ihn zu verkaufen, solange dieses Fenster geöffnet ist.",
       "buyAria": "{item} für {price} kaufen",
+      "buyAriaWithRequirement": "{item} für {price} kaufen. {requirement}",
+      "buyStack": "{count} kaufen",
+      "buyStackAria": "{count} {item} für {price} kaufen",
+      "qtyRowAria": "Kaufmenge",
+      "qtyMultiple": "{count}x",
+      "qtyMultipleAria": "Jeweils {count} auf einmal kaufen",
+      "qtyCustom": "Eigene",
+      "qtyCustomAria": "Eine eigene Kaufmenge wählen",
+      "buyCountAria": "{count} {item} für {price} kaufen",
+      "buyCountAriaWithRequirement": "{count} {item} für {price} kaufen. {requirement}",
+      "buyQuantityTitle": "Wie viele {item} kaufen? Bis zu {max}.",
+      "buyQuantityInput": "Zu kaufende Menge",
+      "buyQuantityConfirm": "Kaufen",
       "buybackTitle": "Rückkauf",
       "buybackEmpty": "Keine Gegenstände",
       "buybackAria": "{item} für {price} zurückkaufen",
@@ -7018,6 +7799,12 @@ export const de_DE: EnTranslations = {
       "reclaim": "Zurückholen",
       "buyAria": "{item} für {price} kaufen",
       "reclaimAria": "{item} zurückholen",
+      "buyConfirmTitle": "Kauf bestätigen",
+      "buyConfirmBody": "{item} für {price} kaufen?",
+      "buyConfirmBodyStack": "{item} x{count} für {price} kaufen ({each} pro Stück)?",
+      "buyConfirmAccept": "Kaufen",
+      "buyConfirmCancel": "Abbrechen",
+      "buyChanged": "Dieses Angebot hat sich geändert, bevor Ihr bestätigt habt. Prüft den Preis und versucht es erneut.",
       "sellNote": "Stellt Waren aus Euren Taschen ein. Der Händler nimmt {cut}% beim Verkauf. Ihr nutzt {used}/{max} Verkaufsplätze.",
       "sellPickEmpty": "Klickt auf einen Gegenstand in Euren Taschen, um ihn zu verkaufen.",
       "quantity": "Menge",
@@ -7028,6 +7815,8 @@ export const de_DE: EnTranslations = {
       "collectEmpty": "Nichts wartet. Verkaufserlöse und abgelaufene Angebote werden hier abgeholt.",
       "collectNote": "Erlöse und zurückgegebene Waren, die der Händler für Euch hält.",
       "saleProceeds": "Verkaufserlöse",
+      "saleBuyer": "Verkauft an {buyer}",
+      "saleOlder": "Zuzüglich {count} früherer Verkäufe, in der Summe enthalten.",
       "collectAll": "Alles abholen"
     },
     "logs": {
@@ -7219,7 +8008,7 @@ export const de_DE: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Große Unsichtbarkeit",
-        "description": "Ihr verschwindet 20 Sek. lang: Entfernt 2 Effekte mit regelmäßigem Schaden und verringert Euren erlittenen Schaden während der Unsichtbarkeit und kurz danach um 90%. (Magiertalent)"
+        "description": "Verschwindet für 20 Sek. und entfernt 2 Effekte mit Schaden über Zeit. Wenn die Unsichtbarkeit endet, erleidet Ihr 2 Sek. lang 90% weniger Schaden. (Magiertalent)"
       },
       "hot_streak": {
         "name": "Heiße Serie",
@@ -8505,6 +9294,18 @@ export const de_DE: EnTranslations = {
       "fen_muster_order": {
         "name": "Musterungsbefehl von Fenbridge"
       },
+      "firebottle": {
+        "name": "Feuerflasche"
+      },
+      "murloc_hut": {
+        "name": "Mudfin-Hütte"
+      },
+      "restless_skull": {
+        "name": "Ruheloser Schädel"
+      },
+      "vanguard_bone": {
+        "name": "Vorhut-Knochen"
+      },
       "mire_prowler_pelt": {
         "name": "Balg eines Moorpirschers"
       },
@@ -9030,6 +9831,27 @@ export const de_DE: EnTranslations = {
       "cinderweave_slippers": {
         "name": "Schuhe aus Glutgewebe"
       },
+      "thornhide_headdress": {
+        "name": "Dornhaut-Kopfschmuck"
+      },
+      "thornhide_mantle": {
+        "name": "Dornhautmantel"
+      },
+      "thornhide_vestment": {
+        "name": "Dornhautgewand"
+      },
+      "thornhide_cinch": {
+        "name": "Dornhaut-Gürtel"
+      },
+      "thornhide_leggings": {
+        "name": "Dornhautgamaschen"
+      },
+      "thornhide_gloves": {
+        "name": "Dornhauthandschuhe"
+      },
+      "thornhide_boots": {
+        "name": "Dornhautstiefel"
+      },
       "final_oath_medallion": {
         "name": "Medaillon des letzten Eides"
       },
@@ -9420,6 +10242,39 @@ export const de_DE: EnTranslations = {
       "resonant_timber": {
         "name": "Resonantes Holz"
       },
+      "fine_copper_ore": {
+        "name": "Feines Kupfererz"
+      },
+      "fine_iron_ore": {
+        "name": "Feines Eisenerz"
+      },
+      "fine_thorium_ore": {
+        "name": "Feines Thoriumerz"
+      },
+      "fine_ironbark_log": {
+        "name": "Feines Eisenrindenholz"
+      },
+      "fine_ashwood_log": {
+        "name": "Feines Aschenholzscheit"
+      },
+      "fine_elderwood_log": {
+        "name": "Feines Altholzscheit"
+      },
+      "fine_silverleaf_herb": {
+        "name": "Feines Silberblattkraut"
+      },
+      "fine_goldleaf_herb": {
+        "name": "Feines Goldblattkraut"
+      },
+      "fine_sunpetal_herb": {
+        "name": "Feines Sonnenblütenkraut"
+      },
+      "stormreel_fishing_rod": {
+        "name": "Sturmrollen-Angelrute"
+      },
+      "tidewrought_fishing_rod": {
+        "name": "Gezeitengeschmiedete Angelrute"
+      },
       "duskwisp_essence": {
         "name": "Dämmerirrlicht-Essenz"
       },
@@ -9481,250 +10336,295 @@ export const de_DE: EnTranslations = {
         "name": "Schleiertuch-Robe"
       },
       "rift_essence": {
-        "name": "Rift Essence"
+        "name": "Riss-Essenz"
       },
       "rift_gem_crimson": {
-        "name": "Crimson Rift Gem"
+        "name": "Karminroter Riss-Edelstein"
       },
       "rift_gem_azure": {
-        "name": "Azure Rift Gem"
+        "name": "Azurblauer Riss-Edelstein"
       },
       "rift_gem_verdant": {
-        "name": "Verdant Rift Gem"
+        "name": "Grüner Riss-Edelstein"
       },
       "riftbound_band_of_might": {
-        "name": "Riftbound Band of Might"
+        "name": "Rissgebundener Reif der Macht"
       },
       "riftbound_band_of_insight": {
-        "name": "Riftbound Band of Insight"
+        "name": "Rissgebundener Reif der Einsicht"
       },
       "riftbound_band_of_guile": {
-        "name": "Riftbound Band of Guile"
+        "name": "Rissgebundener Reif der Arglist"
       },
       "hoarfrost_edge": {
-        "name": "Hoarfrost Edge"
+        "name": "Raureifklinge"
       },
       "emberforge_gauntlets": {
-        "name": "Emberforge Gauntlets"
+        "name": "Glutschmiede-Stulpen"
       },
       "broodmother_carapace": {
-        "name": "Broodmother Carapace"
+        "name": "Brutmutter-Panzer"
       },
       "bonelord_mantle": {
-        "name": "Bonelord Mantle"
+        "name": "Knochenfürst-Umhang"
       },
       "graskbreaker_girdle": {
-        "name": "Graskbreaker Girdle"
+        "name": "Graskbrecher-Gürtel"
       },
       "voidscar_handwraps": {
-        "name": "Voidscar Handwraps"
+        "name": "Leerennarbe-Handbandagen"
       },
       "stormscale_treads": {
-        "name": "Stormscale Treads"
+        "name": "Sturmschuppen-Tritte"
       },
       "abyssal_loop": {
-        "name": "Abyssal Loop"
+        "name": "Abgrundreif"
       },
       "pactbound_vestments": {
-        "name": "Pactbound Vestments"
+        "name": "Paktgebundenes Gewand"
       },
       "pitlords_cleaver": {
-        "name": "Pit Lord's Cleaver"
+        "name": "Hackmesser des Grubenfürsten"
       },
       "emberforged_bulwark": {
-        "name": "Emberforged Bulwark"
+        "name": "Glutgeschmiedetes Bollwerk"
       },
       "stormsunder_hood": {
-        "name": "Stormsunder Hood"
+        "name": "Sturmspalter-Kapuze"
       },
       "voidweave_mantle": {
-        "name": "Voidweave Mantle"
+        "name": "Leerengewebe-Umhang"
       },
       "abysswrought_band": {
-        "name": "Abysswrought Band"
+        "name": "Abgrundgeschmiedeter Reif"
       },
       "heart_of_the_rift": {
-        "name": "Heart of the Rift"
+        "name": "Herz des Risses"
       },
       "voidsong_dirk": {
-        "name": "Voidsong, Dirk of the Sundered Veil"
+        "name": "Voidsong, Dolch des Zerrissenen Schleiers"
       },
       "wildheart_tuskblade": {
-        "name": "Wildheart Tuskblade"
+        "name": "Wildheart-Stoßzahnklinge"
       },
       "wildheart_hexwood_staff": {
-        "name": "Hexwood Staff of the Basin"
+        "name": "Hexenwald-Stab des Beckens"
       },
       "wildheart_fangknife": {
-        "name": "Fangknife of Zulgar"
+        "name": "Zulgars Fangmesser"
+      },
+      "fanglords_beastspear": {
+        "name": "Bestienspeer des Fangfürsten"
+      },
+      "bloodmane_warleggings": {
+        "name": "Blutmähnen-Kriegsbeinschützer"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Rankenklauen-Pirschhose"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Sonnenknochen-Ritualsarong"
       },
       "thick_winter_pelt": {
-        "name": "Thick Winter Pelt"
+        "name": "Dickes Winterfell"
       },
       "aurora_mote": {
-        "name": "Aurora Mote"
+        "name": "Aurorafunke"
       },
       "hearth_ember_cache": {
-        "name": "Ember Cache"
+        "name": "Glutversteck"
       },
       "sprung_trap": {
-        "name": "Sprung Fen Trap"
+        "name": "Ausgelöste Moorfalle"
       },
       "hearthlined_treads": {
-        "name": "Hearth-Lined Treads"
+        "name": "Herdgefütterte Tritte"
       },
       "frostmane_mantle": {
-        "name": "Mantle of the Frostmane"
+        "name": "Umhang der Frostmähne"
       },
       "ashbone_war_brand": {
-        "name": "Ashbone War-Brand"
+        "name": "Aschenknochen-Kriegsklinge"
       },
       "emberwing_scale": {
-        "name": "Emberwing Scale"
+        "name": "Glutschwingen-Schuppe"
       },
       "scorched_supply_crate": {
-        "name": "Scorched Supply Crate"
+        "name": "Versengte Vorratskiste"
       },
       "wyrmwatch_warning_banner": {
-        "name": "Wyrmwatch Warning Banner"
+        "name": "Wyrmwacht-Warnbanner"
       },
       "cinderwalk_treads": {
-        "name": "Cinderwalk Treads"
+        "name": "Aschenpfad-Tritte"
       },
       "mawscale_pauldrons": {
-        "name": "Mawscale Pauldrons"
+        "name": "Rachenschuppen-Schulterstücke"
       },
       "gilded_sap_clot": {
-        "name": "Gilded Sap Clot"
+        "name": "Vergoldeter Harzklumpen"
       },
       "amberfall_sap_bucket": {
-        "name": "Sap-Tap Bucket"
+        "name": "Harzzapf-Eimer"
       },
       "mere_ferry_lantern": {
-        "name": "Ferry Lantern"
+        "name": "Fährlaterne"
       },
       "orchard_sapbinder_grips": {
-        "name": "Sapbinder Grips"
+        "name": "Harzbinder-Griffe"
       },
       "mantle_of_the_meredark": {
-        "name": "Mantle of the Meredark"
+        "name": "Umhang des Seedunkels"
       },
       "plump_fen_eel": {
-        "name": "Plump Fen Eel"
+        "name": "Praller Moor-Aal"
       },
       "wisplight_globe": {
-        "name": "Wisplight Globe"
+        "name": "Irrlichtkugel"
       },
       "fenway_mooring_line": {
-        "name": "Cut Mooring Line"
+        "name": "Durchtrennte Festmacherleine"
       },
       "bridgemere_toll_chest": {
-        "name": "Sunken Toll-Chest"
+        "name": "Versunkene Zolltruhe"
       },
       "eelskin_mudwaders": {
-        "name": "Eelskin Mudwaders"
+        "name": "Aalhaut-Schlammwatstiefel"
       },
       "lilybed_mantle": {
-        "name": "Mantle of the Lily-Bed"
+        "name": "Umhang des Lilienbeets"
       },
       "moonfleece_tuft": {
-        "name": "Moonfleece Tuft"
+        "name": "Mondvlies-Büschel"
       },
       "gloamfield_nightbloom": {
-        "name": "Nightbloom Blossom"
+        "name": "Nachtblüte"
       },
       "vigil_star_chart": {
-        "name": "Vigil Star Chart"
+        "name": "Sternenkarte der Wache"
       },
       "barrow_grave_offering": {
-        "name": "Scattered Grave Offering"
+        "name": "Verstreute Grabgabe"
       },
       "moonfleece_mitts": {
-        "name": "Moonfleece Mitts"
+        "name": "Mondvlies-Handschuhe"
       },
       "barrowshade_mantle": {
-        "name": "Barrowshade Mantle"
+        "name": "Grabhügelschatten-Umhang"
       },
       "widowsilk_skein": {
-        "name": "Widowsilk Skein"
+        "name": "Witwenseiden-Strang"
       },
       "gallowmere_grave_candle": {
-        "name": "Grave-Candle"
+        "name": "Grabkerze"
       },
       "silkbound_remains": {
-        "name": "Silkbound Remains"
+        "name": "Seidenumhüllte Überreste"
       },
       "gravebound_silk_wraps": {
-        "name": "Gravebound Silk Wraps"
+        "name": "Grabgebundene Seidenbandagen"
       },
       "mantle_of_the_unhorsed": {
-        "name": "Mantle of the Unhorsed"
+        "name": "Umhang des Entsattelten"
       },
       "pearlwake_cargo_crate": {
-        "name": "Pearlwake Cargo Crate"
+        "name": "Pearlwake-Frachtkiste"
       },
       "canopy_silk_hank": {
-        "name": "Canopy Silk Hank"
+        "name": "Kronendach-Seidenstrang"
       },
       "sunken_offering_bowl": {
-        "name": "Refilled Offering Bowl"
+        "name": "Nachgefüllte Opferschale"
       },
       "saltwalker_sandals": {
-        "name": "Saltwalker Sandals"
+        "name": "Salzwanderer-Sandalen"
       },
       "sunken_idol_mantle": {
-        "name": "Mantle of the Sunken Idol"
+        "name": "Umhang des Versunkenen Idols"
       },
       "hedgewick_shears": {
-        "name": "Stolen Hedgewick Shears"
+        "name": "Gestohlene Hedgewick-Schere"
       },
       "evergarden_bloom_clipping": {
-        "name": "Pruned Bloom Clipping"
+        "name": "Gestutzter Blütenschnitt"
       },
       "hedgewick_tool_cart": {
-        "name": "Spilled Tool Cart"
+        "name": "Umgekippter Werkzeugkarren"
       },
       "evergarden_statue_rubbing": {
-        "name": "Statue Rubbing"
+        "name": "Statuenabdruck"
       },
       "shearkeeper_gloves": {
-        "name": "Shearkeeper Gloves"
+        "name": "Abbruchwächter-Handschuhe"
       },
       "fountain_court_mantle": {
-        "name": "Mantle of the Fountain Court"
+        "name": "Umhang des Brunnenhofs"
       },
       "galecrest_ram_wool": {
-        "name": "Greasy Ram Wool"
+        "name": "Fettige Widderwolle"
       },
       "shear_storm_lantern": {
-        "name": "Doused Storm-Lantern"
+        "name": "Gelöschte Sturmlaterne"
       },
       "wreckfield_flotsam_crate": {
-        "name": "Flotsam Crate"
+        "name": "Strandgutkiste"
       },
       "wickspun_treads": {
-        "name": "Wickspun Treads"
+        "name": "Dochtgesponnene Tritte"
       },
       "wreck_wardens_mantle": {
-        "name": "Mantle of the Wreck Warden"
+        "name": "Umhang des Wrackwächters"
       },
       "breakscarred_steel": {
-        "name": "Break-Scarred Steel"
+        "name": "Bruchvernarbter Stahl"
       },
       "farshore_salt_moss": {
-        "name": "Farshore Salt Moss"
+        "name": "Farshore-Salzmoos"
       },
       "gullhaven_watchbell": {
-        "name": "Coastal Watchbell"
+        "name": "Küstenwachglocke"
       },
       "saltforged_grips": {
-        "name": "Saltforged Grips"
+        "name": "Salzgeschmiedete Griffe"
       },
       "mantle_of_the_unbroken_shore": {
-        "name": "Mantle of the Unbroken Shore"
+        "name": "Umhang der Ungebrochenen Küste"
       },
       "last_keep_signet": {
-        "name": "Signet of the Last Keep"
+        "name": "Siegelring von Last Keep"
+      },
+      "gatherers_cache": {
+        "name": "Hort des Sammlers"
+      },
+      "artisans_eye": {
+        "name": "Auge des Handwerkers"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "Zündschlüssel: Schreckfunke, der Bodenerschütterer"
+      },
+      "reins_drakemaw_raptor": {
+        "name": "Zügel des Drakenrachen-Raptors"
+      },
+      "moggers_hide_quiver": {
+        "name": "Moggers Fellköcher"
+      },
+      "cragmaw_huntquiver": {
+        "name": "Jagdköcher von Cragmaw"
+      },
+      "gravewyrm_bone_quiver": {
+        "name": "Gravewyrm-Knochenköcher"
+      },
+      "direfang_quiver": {
+        "name": "Direfang-Köcher"
+      },
+      "sharp_claw": {
+        "name": "Scharfe Klaue"
+      },
+      "curved_tusk": {
+        "name": "Gebogener Hauer"
+      },
+      "pristine_claw": {
+        "name": "Unberührte Klaue"
       },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"
@@ -10302,6 +11202,24 @@ export const de_DE: EnTranslations = {
       "wyrmchoir_handwraps": {
         "name": "Wyrmchor-Handwickel"
       },
+      "basin_stalkers_tunic": {
+        "name": "Tunika des Beckenpirschers"
+      },
+      "verdant_heart_vestment": {
+        "name": "Grünherz-Gewand"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Sonnenknochen-Ritualkettenhemd"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Großfang des Beckens"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Sonnenknochen-Orakelkrone"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Blutmähnen-Kriegsbeinschienen"
+      },
       "deathless_greatblade": {
         "name": "Todlose Großklinge"
       },
@@ -10459,7 +11377,7 @@ export const de_DE: EnTranslations = {
         "name": "Gürtelschutz des Sturmrufers"
       },
       "riding_training": {
-        "name": "Riding Training"
+        "name": "Reitausbildung"
       },
       "reins_valorsteed": {
         "name": "Zügel des Valorross"
@@ -10703,6 +11621,21 @@ export const de_DE: EnTranslations = {
       "spider_egg_sac": {
         "name": "Spinnen-Eikokon"
       },
+      "spider_egg": {
+        "name": "Brutmutter-Ei"
+      },
+      "widow_hatchling": {
+        "name": "Witwen-Schlüpfling"
+      },
+      "drowned_warlord": {
+        "name": "Der Ertrunkene Kriegsherr"
+      },
+      "brakka_wallbreaker": {
+        "name": "Brakka der Mauerbrecher"
+      },
+      "threnos_first_voice": {
+        "name": "Threnos, die Erste Stimme"
+      },
       "grave_silt_bulwark": {
         "name": "Grabschlick-Bollwerk"
       },
@@ -10734,280 +11667,292 @@ export const de_DE: EnTranslations = {
         "name": "Stallpferd"
       },
       "rift_spawnling": {
-        "name": "Rift Spawnling"
+        "name": "Riss-Brutling"
       },
       "rift_bonewalker": {
-        "name": "Risen Bonewalker"
+        "name": "Erstandener Knochenwandler"
       },
       "rift_frost_revenant": {
-        "name": "Frostbound Revenant"
+        "name": "Frostgebundener Wiedergänger"
       },
       "rift_rime_elemental": {
-        "name": "Rime Elemental"
+        "name": "Reif-Elementar"
       },
       "rift_ember_fiend": {
-        "name": "Ember Fiend"
+        "name": "Glutdämon"
       },
       "rift_magma_brute": {
-        "name": "Magma Brute"
+        "name": "Magmakoloss"
       },
       "rift_venom_weaver": {
-        "name": "Venom Weaver"
+        "name": "Giftweber"
       },
       "rift_thornback": {
-        "name": "Thornback Stalker"
+        "name": "Dornrücken-Pirscher"
       },
       "rift_boneclad": {
-        "name": "Boneclad Warrior"
+        "name": "Knochengepanzerter Krieger"
       },
       "rift_marrow_troll": {
-        "name": "Marrow Troll"
+        "name": "Knochenmark-Troll"
       },
       "rift_void_acolyte": {
-        "name": "Voidscar Acolyte"
+        "name": "Leerennarbe-Akolyth"
       },
       "rift_dread_stalker": {
-        "name": "Dread Stalker"
+        "name": "Furchtpirscher"
       },
       "rift_storm_caller": {
-        "name": "Storm Caller"
+        "name": "Sturmrufer"
       },
       "rift_stormscale": {
-        "name": "Stormscale Drake"
+        "name": "Sturmschuppen-Drache"
       },
       "rift_tide_thrall": {
-        "name": "Tide Thrall"
+        "name": "Gezeitenknecht"
       },
       "rift_deep_lurker": {
-        "name": "Deep Lurker"
+        "name": "Tiefenlauerer"
       },
       "rift_stone_ogre": {
-        "name": "Stone Ogre"
+        "name": "Steinoger"
       },
       "rift_boss_frost": {
-        "name": "Hoarfrost Warden"
+        "name": "Raureif-Wächter"
       },
       "rift_boss_ember": {
-        "name": "Emberforge Tyrant"
+        "name": "Glutschmiede-Tyrann"
       },
       "rift_boss_venom": {
-        "name": "Broodmother Vysska"
+        "name": "Brutmutter Vysska"
       },
       "rift_boss_necro": {
-        "name": "Bonelord Xarreth"
+        "name": "Knochenfürst Xarreth"
       },
       "rift_boss_brute": {
-        "name": "Warlord Grask"
+        "name": "Kriegsherr Grask"
       },
       "rift_boss_arcane": {
-        "name": "Archon Nyxaris"
+        "name": "Archont Nyxaris"
       },
       "rift_boss_storm": {
-        "name": "Tempest Vharok"
+        "name": "Sturmfürst Vharok"
       },
       "rift_boss_tide": {
-        "name": "Abyssal Maw"
+        "name": "Abgrundrachen"
       },
       "glimmerwisp": {
-        "name": "Glimmerwisp"
+        "name": "Glimmerirrlicht"
       },
       "duskwisp": {
-        "name": "Duskwisp"
+        "name": "Dämmerirrlicht"
       },
       "veiled_stag": {
-        "name": "Veiled Stag"
+        "name": "Verschleierter Hirsch"
       },
       "veiled_doe": {
-        "name": "Veiled Doe"
+        "name": "Verschleierte Hirschkuh"
       },
       "gleamstag": {
-        "name": "The Gleamstag"
+        "name": "Der Glanzhirsch"
       },
       "sporeling_gatherer": {
-        "name": "Sporeling Gatherer"
+        "name": "Sporenling-Sammler"
       },
       "corrupted_sporeling": {
-        "name": "Corrupted Sporeling"
+        "name": "Verdorbener Sporenling"
       },
       "mushroom_pixie": {
-        "name": "Gleamfolk Pixie"
+        "name": "Glanzvolk-Fee"
       },
       "treant_elder": {
-        "name": "Treant Elder"
+        "name": "Alter Baumhüter"
       },
       "ancient_guardian": {
-        "name": "Ancient Guardian"
+        "name": "Alter Wächter"
       },
       "waking_warden": {
-        "name": "The Waking Warden"
+        "name": "Der Erwachende Wächter"
       },
       "old_marrowshell": {
-        "name": "Old Marrowshell"
+        "name": "Alter Marrowshell"
       },
       "aurelhorn": {
-        "name": "Aurelhorn, First of the Herd"
+        "name": "Aurelhorn, Erster der Herde"
       },
       "snowdrift_wolf": {
-        "name": "Snowdrift Wolf"
+        "name": "Schneewehen-Wolf"
       },
       "ice_wisp": {
-        "name": "Ice Wisp"
+        "name": "Eisirrlicht"
       },
       "rime_elemental": {
-        "name": "Rime Elemental"
+        "name": "Reif-Elementar"
       },
       "fen_sprite": {
-        "name": "Fen Sprite"
+        "name": "Moorwicht"
       },
       "frostmane_yeti": {
-        "name": "Frostmane Yeti"
+        "name": "Frostmähnen-Yeti"
       },
       "terrace_howler": {
-        "name": "Terrace Howler"
+        "name": "Terrassenheuler"
       },
       "apprentice_wren": {
-        "name": "Apprentice Wren"
+        "name": "Lehrling Wren"
       },
       "emberwing_drake": {
-        "name": "Emberwing Drake"
+        "name": "Glutschwingen-Drache"
       },
       "ashbone_raider": {
-        "name": "Ashbone Raider"
+        "name": "Aschenknochen-Plünderer"
       },
       "ashbone_warcaller": {
-        "name": "Ashbone Warcaller"
+        "name": "Aschenknochen-Kriegsrufer"
       },
       "dune_troll": {
-        "name": "Dune Troll"
+        "name": "Dünentroll"
       },
       "cindraleth_maw_matriarch": {
-        "name": "Cindraleth the Maw Matriarch"
+        "name": "Cindraleth, die Rachen-Matriarchin"
+      },
+      "dragonkin_egg": {
+        "name": "Drachkin-Ei"
+      },
+      "dragonkin_whelp": {
+        "name": "Drachkin-Welpe"
+      },
+      "dragonkin_broodguard": {
+        "name": "Drachkin-Brutwächter"
+      },
+      "drakemaw_broodlord": {
+        "name": "Drakenrachen-Brutfürst"
       },
       "gilded_stag": {
-        "name": "Gilded Stag"
+        "name": "Vergoldeter Hirsch"
       },
       "gloam_fox": {
-        "name": "Gloam Fox"
+        "name": "Dämmerfuchs"
       },
       "orchard_treant": {
-        "name": "Orchard Treant"
+        "name": "Obstgarten-Baumhüter"
       },
       "the_meredark": {
-        "name": "The Meredark"
+        "name": "Der Seedunkel"
       },
       "harvest_sprite": {
-        "name": "Harvest Sprite"
+        "name": "Erntewicht"
       },
       "mere_lurker": {
-        "name": "Mere Lurker"
+        "name": "Seelauerer"
       },
       "bogtoad": {
-        "name": "Bogtoad"
+        "name": "Sumpfkröte"
       },
       "drowsy_croaker": {
-        "name": "The Drowsy Croaker"
+        "name": "Der Schläfrige Quaker"
       },
       "lily_wisp": {
-        "name": "Lily Wisp"
+        "name": "Lilienirrlicht"
       },
       "willow_sprite": {
-        "name": "Willow Sprite"
+        "name": "Weidenwicht"
       },
       "moonfleece_grazer": {
-        "name": "Moonfleece Grazer"
+        "name": "Mondvlies-Weidetier"
       },
       "gloam_strider": {
-        "name": "Gloam Strider"
+        "name": "Dämmerschreiter"
       },
       "nightkin_stargazer": {
-        "name": "Nightkin Stargazer"
+        "name": "Nachtvolk-Sternseher"
       },
       "barrow_king": {
-        "name": "The Barrow King"
+        "name": "Der Grabhügelkönig"
       },
       "barrow_wight": {
-        "name": "Barrow Wight"
+        "name": "Grabhügel-Wiedergänger"
       },
       "widowsilk_spinner": {
-        "name": "Widowsilk Spinner"
+        "name": "Witwenseiden-Spinner"
       },
       "wood_wraith": {
-        "name": "Wood Wraith"
+        "name": "Waldschemen"
       },
       "gravenbark_shambler": {
-        "name": "Gravenbark Shambler"
+        "name": "Grabrinden-Schlurfer"
       },
       "pale_huntsman": {
-        "name": "The Pale Huntsman"
+        "name": "Der Bleiche Jäger"
       },
       "gravedigger_mosley": {
-        "name": "Gravedigger Mosley"
+        "name": "Totengräber Mosley"
       },
       "tide_scuttler": {
-        "name": "Tide Scuttler"
+        "name": "Gezeitenkrabbler"
       },
       "thicket_boar": {
-        "name": "Thicket Boar"
+        "name": "Dickichteber"
       },
       "canopy_weaver": {
-        "name": "Canopy Weaver"
+        "name": "Kronendachweber"
       },
       "idol_guardian": {
-        "name": "The Idol Guardian"
+        "name": "Der Idolwächter"
       },
       "castaway_navigator": {
-        "name": "Navigator Suli"
+        "name": "Navigatorin Suli"
       },
       "topiary_stag": {
-        "name": "Topiary Stag"
+        "name": "Formschnitt-Hirsch"
       },
       "topiary_wolf": {
-        "name": "Topiary Wolf"
+        "name": "Formschnitt-Wolf"
       },
       "hedge_gnome": {
-        "name": "Hedge Gnome"
+        "name": "Heckengnom"
       },
       "hedge_knight": {
-        "name": "Dawnhold Knight"
+        "name": "Ritter von Dawnhold"
       },
       "the_topiary_bull": {
-        "name": "The Topiary Bull"
+        "name": "Der Formschnitt-Stier"
       },
       "moor_ram": {
-        "name": "Moor Ram"
+        "name": "Moorwidder"
       },
       "gale_wisp": {
-        "name": "Gale Wisp"
+        "name": "Sturmirrlicht"
       },
       "shoal_scuttler": {
-        "name": "Shoal Scuttler"
+        "name": "Untiefen-Krabbler"
       },
       "downs_bandit": {
-        "name": "Downs Bandit"
+        "name": "Hügelland-Bandit"
       },
       "wreck_thief": {
-        "name": "Wreckfield Thief"
+        "name": "Wrackfeld-Dieb"
       },
       "the_wreck_warden": {
-        "name": "The Wreck Warden"
+        "name": "Der Wrackwächter"
       },
       "drowned_deckhand": {
-        "name": "Drowned Deckhand"
+        "name": "Ertrunkener Decksmann"
       },
       "riftspawn": {
-        "name": "Riftspawn"
+        "name": "Rissbrut"
       },
       "breach_wretch": {
-        "name": "Breach Wretch"
+        "name": "Breschenwicht"
       },
       "void_stalker": {
-        "name": "Void Stalker"
+        "name": "Leerenpirscher"
       },
       "sundered_horror": {
-        "name": "The Sundered Horror"
+        "name": "Der Zerrissene Schrecken"
       },
       "fisher_bram": {
-        "name": "Fisher Bram"
+        "name": "Fischer Bram"
       },
       "lb_actor_coalfast": {
         "name": "Warden Coalfast"
@@ -11028,31 +11973,31 @@ export const de_DE: EnTranslations = {
         "name": "The Tidemill Stalker"
       },
       "rift_hellguard": {
-        "name": "Hellguard"
+        "name": "Höllenwächter"
       },
       "rift_pact_acolyte": {
-        "name": "Pact Acolyte"
+        "name": "Pakt-Akolyth"
       },
       "rift_boss_ritualist": {
-        "name": "Magus Vel'Kor the Pactbound"
+        "name": "Magus Vel'Kor der Paktgebundene"
       },
       "rift_boss_pitlord": {
-        "name": "Azgorath, Lord of the Pit"
+        "name": "Azgorath, Fürst der Grube"
       },
       "wildheart_stalker": {
-        "name": "Vineclaw Stalker"
+        "name": "Rankenklauen-Pirscher"
       },
       "wildheart_ravager": {
-        "name": "Bloodmane Ravager"
+        "name": "Blutmähnen-Verwüster"
       },
       "wildheart_hexcaller": {
-        "name": "Sunbone Hexcaller"
+        "name": "Sonnenknochen-Hexenrufer"
       },
       "wildheart_beastmaster": {
-        "name": "Fanglord Beastmaster"
+        "name": "Fangfürst, Bestienmeister"
       },
       "wildheart_high_priest": {
-        "name": "Zulgar, Voice of the Basin"
+        "name": "Zulgar, Stimme des Beckens"
       },
       "ironvein_foreman": {
         "name": "Eisenader-Vorarbeiter"
@@ -11272,6 +12217,11 @@ export const de_DE: EnTranslations = {
         "title": "Ehrenquartiermeister",
         "greeting": "Der Sand erinnert sich an jeden Sieg. Gib deine Ehre mit Bedacht aus."
       },
+      "warmarshal_draven_kole": {
+        "name": "Kriegsmarschall Draven Kole",
+        "title": "Meister der Kriegsführungsvorräte",
+        "greeting": "Ehre ist die einzige Münze, die ich annehme, und die Vorräte der Kriegsführung sind meine, um sie zu bewachen. Verdiene dir deinen Rang auf dem Schlachtfeld, und ich rüste dich für das nächste."
+      },
       "loremaster_caddis": {
         "name": "Lehrmeister Caddis",
         "title": "Lehrmeister",
@@ -11343,244 +12293,244 @@ export const de_DE: EnTranslations = {
         "greeting": "Der Berg vergisst nichts, {playerName}, und ich ebenso wenig. Sehen wir uns an, was du vollbracht hast."
       },
       "keeper_saelwyn": {
-        "name": "Keeper Saelwyn",
-        "title": "Keeper of the Hollow",
-        "greeting": "Few of your kind have stood beneath these boughs, {className}. Walk gently, and be welcome."
+        "name": "Hüter Saelwyn",
+        "title": "Hüter von Veiled Hollow",
+        "greeting": "Nur wenige deiner Art haben unter diesen Ästen gestanden, {className}. Geh sanft, und sei willkommen."
       },
       "loremother_bryn": {
-        "name": "Loremother Bryn",
-        "title": "Voice of the Shrine",
-        "greeting": "Every light in this valley remembers something, {playerName}. Help me listen."
+        "name": "Wissensmutter Bryn",
+        "title": "Stimme des Schreins",
+        "greeting": "Jedes Licht in diesem Tal erinnert sich an etwas, {playerName}. Hilf mir zuzuhören."
       },
       "provisioner_fenna": {
-        "name": "Provisioner Fenna",
-        "title": "Eldergleam Provisioner",
-        "greeting": "Bread still warm, water still sweet. The Hollow provides, and so do I."
+        "name": "Versorgerin Fenna",
+        "title": "Versorgerin von Eldergleam",
+        "greeting": "Brot noch warm, Wasser noch süß. Veiled Hollow versorgt, und ich auch."
       },
       "wardsmith_orun": {
-        "name": "Wardsmith Orun",
-        "title": "Keeper of the Old Forges",
-        "greeting": "These forges cooled centuries ago, {className}, but their work still holds an edge."
+        "name": "Bannschmied Orun",
+        "title": "Hüter der Alten Schmieden",
+        "greeting": "Diese Schmieden erkalteten vor Jahrhunderten, {className}, aber ihre Arbeit hält noch immer eine Schneide."
       },
       "archivist_tullo": {
-        "name": "Archivist Tullo",
-        "title": "Reader of Stones",
-        "greeting": "The monuments out there have not spoken to anyone in an age. Perhaps they were waiting for fresh ears."
+        "name": "Archivar Tullo",
+        "title": "Leser der Steine",
+        "greeting": "Die Monumente da draußen haben seit einer Ewigkeit zu niemandem gesprochen. Vielleicht warteten sie auf frische Ohren."
       },
       "huntsman_deral": {
-        "name": "Huntsman Deral",
-        "title": "Warden of the Herds",
-        "greeting": "Quiet now. The herd knows every sound this valley makes, and so do I."
+        "name": "Jäger Deral",
+        "title": "Wächter der Herden",
+        "greeting": "Still jetzt. Die Herde kennt jeden Laut, den dieses Tal macht, und ich auch."
       },
       "warden_kaldra": {
-        "name": "Warden Kaldra",
-        "title": "Warden of Icemantle",
-        "greeting": "Mind the benches, stranger. The snow keeps what it takes."
+        "name": "Wächterin Kaldra",
+        "title": "Wächterin von Icemantle",
+        "greeting": "Achte auf die Bänke, Fremder. Der Schnee behält, was er nimmt."
       },
       "hearthkeeper_maeve": {
-        "name": "Hearthkeeper Maeve",
-        "title": "Keeper of the Hearth-Lodge",
-        "greeting": "Come in off the cold. The lodge fire never goes out, so long as I draw breath."
+        "name": "Herdhüterin Maeve",
+        "title": "Hüterin der Herdhütte",
+        "greeting": "Komm herein aus der Kälte. Das Hüttenfeuer erlischt nie, solange ich noch atme."
       },
       "scout_einna": {
-        "name": "Scout Einna",
-        "title": "Snowline Scout",
-        "greeting": "You walked the pass alive. Good. Icemantle should hear of it."
+        "name": "Späherin Einna",
+        "title": "Kundschafterin der Schneegrenze",
+        "greeting": "Du bist den Pass lebend gegangen. Gut. Icemantle sollte davon hören."
       },
       "aurorist_veyla": {
-        "name": "Aurorist Veyla",
-        "title": "Reader of the Lights",
-        "greeting": "Hush. The lights are speaking tonight, and they do not repeat themselves."
+        "name": "Aurora-Deuterin Veyla",
+        "title": "Deuterin der Lichter",
+        "greeting": "Still. Die Lichter sprechen heute Nacht, und sie wiederholen sich nicht."
       },
       "trapper_brosk": {
-        "name": "Trapper Brosk",
-        "title": "Shiverfen Trapper",
-        "greeting": "Fen took three of my lines this week. Fen never took a line in twenty years."
+        "name": "Fallensteller Brosk",
+        "title": "Fallensteller von Shiverfen",
+        "greeting": "Das Moor hat mir diese Woche drei Leinen genommen. Das Moor hat in zwanzig Jahren nie eine Leine genommen."
       },
       "gatecaptain_brannoc": {
-        "name": "Gatecaptain Brannoc",
-        "title": "Commander of Wyrmwatch",
-        "greeting": "Wyrmwatch holds the gate. Has held it forty years. It will hold it tonight."
+        "name": "Torhauptmann Brannoc",
+        "title": "Kommandant von Wyrmwacht",
+        "greeting": "Wyrmwacht hält das Tor. Hat es vierzig Jahre lang gehalten. Wird es heute Nacht halten."
       },
       "quartermaster_sela": {
-        "name": "Quartermaster Sela",
-        "title": "Keeper of the Garrison Stores",
-        "greeting": "Every crate in this yard crossed forty miles of ash to get here. Treat them kindly."
+        "name": "Quartiermeisterin Sela",
+        "title": "Hüterin der Garnisonsvorräte",
+        "greeting": "Jede Kiste in diesem Hof hat vierzig Meilen Asche überquert, um hierherzukommen. Behandle sie gut."
       },
       "scout_yerrin": {
-        "name": "Scout Yerrin",
-        "title": "Far-Dune Watcher",
-        "greeting": "Keep low. Sound carries strangely off the glass, and the gate below has ears."
+        "name": "Späherin Yerrin",
+        "title": "Wächterin der Fernen Dünen",
+        "greeting": "Bleib niedrig. Der Schall trägt sich seltsam über das Glas, und das Tor unten hat Ohren."
       },
       "reeve_ottoline": {
-        "name": "Reeve Ottoline",
-        "title": "Reeve of Lanternmere",
-        "greeting": "Welcome to Lanternmere, where the harvest never ends and neither does the work."
+        "name": "Vogtin Ottoline",
+        "title": "Vogtin von Lanternmere",
+        "greeting": "Willkommen in Lanternmere, wo die Ernte nie endet und die Arbeit auch nicht."
       },
       "waywatcher_sorrel": {
-        "name": "Waywatcher Sorrel",
-        "title": "Watcher of the Goldmelt",
-        "greeting": "Snow behind you, gold ahead. Few walk the Goldmelt twice, so make the crossing count."
+        "name": "Wegwächterin Sorrel",
+        "title": "Wächterin des Goldmelt",
+        "greeting": "Schnee hinter dir, Gold voraus. Nur wenige gehen den Goldmelt zweimal, also lass die Überquerung zählen."
       },
       "ferrymaster_caddow": {
-        "name": "Ferrymaster Caddow",
-        "title": "Keeper of the Lantern Ferries",
-        "greeting": "Fog is on the Mere again. When the lanterns go out on the water, wise folk stay ashore."
+        "name": "Fährmeister Caddow",
+        "title": "Hüter der Laternenfähren",
+        "greeting": "Nebel liegt wieder auf dem See. Wenn die Laternen auf dem Wasser erlöschen, bleiben kluge Leute an Land."
       },
       "orchardist_pomeline": {
-        "name": "Orchardist Pomeline",
-        "title": "Keeper of the Gilded Rows",
-        "greeting": "Mind where you step. Every root in these rows is older than the town, and they remember."
+        "name": "Obstgärtnerin Pomeline",
+        "title": "Hüterin der Vergoldeten Reihen",
+        "greeting": "Achte auf deine Schritte. Jede Wurzel in diesen Reihen ist älter als die Stadt, und sie erinnern sich."
       },
       "waykeeper_pell": {
-        "name": "Waykeeper Pell",
-        "title": "Keeper of the Amberfen Steps",
-        "greeting": "Down the Steps and into the soft country. Mind where you plant your boots."
+        "name": "Wegwart Pell",
+        "title": "Hüter der Amberfen-Stufen",
+        "greeting": "Die Stufen hinab und hinein ins sanfte Land. Achte darauf, wo du deine Stiefel hinsetzt."
       },
       "bridgewright_alden": {
-        "name": "Bridgewright Alden",
-        "title": "Master of the Fenway",
-        "greeting": "Every plank in this town is mine to keep, and the fen chews on all of them."
+        "name": "Brückenbaumeister Alden",
+        "title": "Meister des Fenway",
+        "greeting": "Jedes Brett in dieser Stadt ist meins zu hüten, und das Moor nagt an ihnen allen."
       },
       "netter_maris": {
-        "name": "Netter Maris",
-        "title": "Eel-Netter of Bridgemere",
-        "greeting": "Smell that? Smoked eel. Half this town stands on stilts I bought with it."
+        "name": "Netzerin Maris",
+        "title": "Aalfängerin von Bridgemere",
+        "greeting": "Riechst du das? Geräucherter Aal. Die halbe Stadt steht auf Pfählen, die ich damit bezahlt habe."
       },
       "mother_sedge": {
-        "name": "Mother Sedge",
-        "title": "Fen-Witch of Willowweep",
-        "greeting": "The willows told me you were coming before your boots left the bridge."
+        "name": "Mutter Sedge",
+        "title": "Moorhexe von Willowweep",
+        "greeting": "Die Weiden erzählten mir, dass du kommst, bevor deine Stiefel die Brücke verließen."
       },
       "lamplighter_sorrel": {
-        "name": "Lamplighter Sorrel",
-        "title": "Keeper of the Nightgate",
-        "greeting": "Mind the lamps, friend. Past this gate the sun gives up and the flowers take over."
+        "name": "Laternenanzünderin Sorrel",
+        "title": "Hüterin des Nachttors",
+        "greeting": "Achte auf die Laternen, Freund. Hinter diesem Tor gibt die Sonne auf, und die Blumen übernehmen."
       },
       "lira_dewsong": {
         "name": "Lira Dewsong",
-        "title": "Night-Gardener of Moonrest",
-        "greeting": "Welcome to Moonrest, where the flowers do our dawning for us."
+        "title": "Nacht-Gärtnerin von Moonrest",
+        "greeting": "Willkommen in Moonrest, wo die Blumen für uns dämmern."
       },
       "weaver_amelle": {
-        "name": "Weaver Amelle",
-        "title": "Moonfleece Weaver",
-        "greeting": "Feel that? Moonfleece on the loom. Warmer than any fire you have sat beside."
+        "name": "Weberin Amelle",
+        "title": "Moonfleece-Weberin",
+        "greeting": "Fühlst du das? Moonfleece auf dem Webstuhl. Wärmer als jedes Feuer, neben dem du je gesessen hast."
       },
       "astronomer_cassian": {
-        "name": "Astronomer Cassian",
-        "title": "Watcher at the Vigil",
-        "greeting": "Hush now. The sky never dawns here, so it never stops talking either."
+        "name": "Astronom Cassian",
+        "title": "Wächter an der Mahnwache",
+        "greeting": "Still jetzt. Der Himmel dämmert hier nie, also hört er auch nie auf zu sprechen."
       },
       "lampman_cobb": {
-        "name": "Lampman Cobb",
-        "title": "Keeper of the Crowgate Lanterns",
-        "greeting": "Stay in the lamplight, friend. The wood counts everyone who passes the gate."
+        "name": "Laternenmann Cobb",
+        "title": "Hüter der Krähentor-Laternen",
+        "greeting": "Bleib im Laternenlicht, Freund. Der Wald zählt jeden, der das Tor passiert."
       },
       "sexton_marrow": {
-        "name": "Sexton Marrow",
-        "title": "Sexton of Gallowmere",
-        "greeting": "We bury them deep here, and we ring the bells so they remember to stay down."
+        "name": "Küster Marrow",
+        "title": "Küster von Gallowmere",
+        "greeting": "Wir begraben sie hier tief, und wir läuten die Glocken, damit sie daran denken, unten zu bleiben."
       },
       "widow_tansy": {
-        "name": "Widow Tansy",
-        "title": "Candlewright of Gallowmere",
-        "greeting": "A candle for every grave, and not one may go out. Not one, do you hear me?"
+        "name": "Witwe Tansy",
+        "title": "Kerzenmacherin von Gallowmere",
+        "greeting": "Eine Kerze für jedes Grab, und keine einzige darf erlöschen. Keine einzige, hörst du mich?"
       },
       "vicar_creel": {
-        "name": "Vicar Creel",
-        "title": "Last Vicar of the Mournstone",
-        "greeting": "The chapel fell years ago. The dead beneath it did not notice, and so I stayed."
+        "name": "Vikar Creel",
+        "title": "Letzter Vikar des Mournstone",
+        "greeting": "Die Kapelle fiel vor Jahren. Die Toten darunter bemerkten es nicht, also blieb ich."
       },
       "strandwatcher_pell": {
-        "name": "Strandwatcher Pell",
-        "title": "Watcher of the Tanglemouth",
-        "greeting": "Out of the black trees at last. Breathe, stranger, the sun holds this side of the pass."
+        "name": "Strandwächter Pell",
+        "title": "Wächter der Wirrmündung",
+        "greeting": "Endlich aus den schwarzen Bäumen heraus. Atme, Fremder, die Sonne hält diese Seite des Passes."
       },
       "salvage_boss_ryna": {
-        "name": "Salvage-Boss Ryna",
-        "title": "Mistress of the Wreck Line",
-        "greeting": "A {className} with working arms, good. The wreck line pays well, if the crabs leave you enough fingers to count it."
+        "name": "Bergungschefin Ryna",
+        "title": "Herrin der Wracklinie",
+        "greeting": "Eine {className} mit tauglichen Armen, gut. Die Wracklinie zahlt gut, wenn die Krabben dir genug Finger lassen, um es zu zählen."
       },
       "pearlmother_isha": {
-        "name": "Pearl-Mother Isha",
-        "title": "Elder of the Divers",
-        "greeting": "The sea gives, the sand keeps, and the jungle takes. Stay on the strand, stranger."
+        "name": "Perlenmutter Isha",
+        "title": "Älteste der Taucher",
+        "greeting": "Das Meer gibt, der Sand bewahrt, und der Dschungel nimmt. Bleib auf dem Strand, Fremder."
       },
       "hermit_okku": {
         "name": "Okku",
-        "title": "The Man Who Went In",
-        "greeting": "Quiet now. The drums count everything that walks under the trees, and they have already counted you."
+        "title": "Der Mann, der hineinging",
+        "greeting": "Still jetzt. Die Trommeln zählen alles, was unter den Bäumen wandelt, und sie haben dich bereits gezählt."
       },
       "gatewarden_pell": {
-        "name": "Gatewarden Pell",
-        "title": "Keeper of the Garden Gate",
-        "greeting": "Mind how you go on the lawns. The garden keeps them trimmed, and it likes them tidy."
+        "name": "Torwächter Pell",
+        "title": "Hüter des Gartentors",
+        "greeting": "Achte darauf, wie du über die Rasenflächen gehst. Der Garten hält sie gestutzt, und er mag sie ordentlich."
       },
       "head_gardener_amaranth": {
-        "name": "Head Gardener Amaranth",
-        "title": "Head Gardener of the Evergarden",
-        "greeting": "Do not mind the shadows under my eyes. Someone has to stay awake while the garden dreams."
+        "name": "Obergärtnerin Amaranth",
+        "title": "Obergärtnerin des Evergarden",
+        "greeting": "Kümmere dich nicht um die Schatten unter meinen Augen. Jemand muss wach bleiben, während der Garten träumt."
       },
       "wickmother_sorrel": {
-        "name": "Wickmother Sorrel",
-        "title": "Keeper of the Hedgewick Inn",
-        "greeting": "Come in, sit, there is cordial on the fire. Just keep a hand on anything iron: the gnomes are light-fingered of late."
+        "name": "Dochtmutter Sorrel",
+        "title": "Hüterin des Hedgewick-Gasthauses",
+        "greeting": "Komm herein, setz dich, es gibt Likör am Feuer. Halt nur eine Hand an allem aus Eisen: die Gnome sind in letzter Zeit langfingrig."
       },
       "gardener_yew": {
-        "name": "Gardener Yew",
-        "title": "The Last Gardener",
-        "greeting": "Hand me that barrow, would you? These lawns do not walk themselves, whatever the hamlet thinks."
+        "name": "Gärtner Yew",
+        "title": "Der letzte Gärtner",
+        "greeting": "Reich mir die Schubkarre, ja? Diese Rasenflächen laufen nicht von allein, was auch immer der Weiler denkt."
       },
       "watcher_maren": {
-        "name": "Watcher Maren",
-        "title": "The Windway Watch",
-        "greeting": "Mind your footing past the gate. The wind up here takes hats first and questions never."
+        "name": "Wächterin Maren",
+        "title": "Die Windweg-Wache",
+        "greeting": "Achte auf deinen Tritt hinter dem Tor. Der Wind hier oben nimmt zuerst Hüte und niemals Fragen."
       },
       "harbormaster_odile": {
-        "name": "Harbormaster Odile",
-        "title": "Harbormaster of Wickharbor",
-        "greeting": "Every boat in this cove owes the Old Beacon its keel. Speak quick, the tide will not wait."
+        "name": "Hafenmeisterin Odile",
+        "title": "Hafenmeisterin von Wickharbor",
+        "greeting": "Jedes Boot in dieser Bucht verdankt dem Alten Leuchtfeuer seinen Kiel. Sprich schnell, die Flut wartet nicht."
       },
       "keeper_bram": {
-        "name": "Keeper Bram",
-        "title": "Keeper of the Old Beacon",
-        "greeting": "Nine and thirty years this lamp has burned on my watch. It will not go dark on yours."
+        "name": "Hüter Bram",
+        "title": "Hüter des Alten Leuchtfeuers",
+        "greeting": "Neununddreißig Jahre hat diese Lampe unter meiner Wache gebrannt. Sie wird unter deiner nicht erlöschen."
       },
       "salvager_edda": {
-        "name": "Salvager Edda",
-        "title": "Wreckfield Salvager",
-        "greeting": "Wreckwood, rope, and dead men's cargo. The sea pays my wage, when the Warden lets it."
+        "name": "Bergerin Edda",
+        "title": "Bergerin des Wrackfelds",
+        "greeting": "Wrackholz, Tauwerk und die Fracht toter Männer. Das Meer zahlt meinen Lohn, wenn der Wächter es zulässt."
       },
       "warden_coalfast": {
-        "name": "Warden Coalfast",
-        "title": "Redoubt Commander",
-        "greeting": "The breaks do not care that Gullhaven is small, {className}. We hold this shore, or there is no shore left to hold. Stand with us and I will not forget it."
+        "name": "Wächter Coalfast",
+        "title": "Kommandant der Schanze",
+        "greeting": "Die Risse kümmert es nicht, dass Gullhaven klein ist, {className}. Wir halten diese Küste, oder es bleibt keine Küste zu halten. Steh mit uns, und ich werde es nicht vergessen."
       },
       "riftwatch_ollun": {
-        "name": "Riftwatch Ollun",
-        "title": "Breach Scholar",
-        "greeting": "Every break sings before it opens, if you have the ear for it. I can hear three of them stirring on the island right now, and one of them is close."
+        "name": "Risswache Ollun",
+        "title": "Gelehrter der Risse",
+        "greeting": "Jeder Riss singt, bevor er sich öffnet, wenn du das Ohr dafür hast. Ich kann gerade drei davon auf der Insel rühren hören, und einer von ihnen ist nah."
       },
       "quartermaster_edda": {
-        "name": "Quartermaster Edda",
-        "title": "Redoubt Armorer",
-        "greeting": "Steel and salt, {className}, it is all I have left to hand out. Take it and make the breaks regret opening where I could reach them."
+        "name": "Quartiermeisterin Edda",
+        "title": "Waffenmeisterin der Schanze",
+        "greeting": "Stahl und Salz, {className}, das ist alles, was ich noch auszuteilen habe. Nimm es, und lass die Risse bereuen, dass sie sich dort öffneten, wo ich sie erreichen konnte."
       },
       "mender_saul": {
-        "name": "Mender Saul",
-        "title": "Field Surgeon",
-        "greeting": "I have set more bones this one month than in ten years of mending fishing falls. The breaks do not leave much of what they take. Come back to me whole, if you can manage it."
+        "name": "Heiler Saul",
+        "title": "Feldchirurg",
+        "greeting": "Ich habe in diesem einen Monat mehr Knochen gerichtet als in zehn Jahren des Ausbesserns von Angelstürzen. Die Risse lassen nicht viel von dem übrig, was sie nehmen. Komm heil zu mir zurück, wenn du es schaffst."
       },
       "bellkeeper_tam": {
-        "name": "Bellkeeper Tam",
-        "title": "Watchbell Keeper",
-        "greeting": "The bell is the only warning the breaks give us, {className}. One toll for the fields, two for the cliffs, three when it is close enough that running will not help. Keep an ear on it, and it may keep you whole."
+        "name": "Glockenwärter Tam",
+        "title": "Hüter der Wachglocke",
+        "greeting": "Die Glocke ist die einzige Warnung, die uns die Risse geben, {className}. Ein Schlag für die Felder, zwei für die Klippen, drei, wenn es nah genug ist, dass Weglaufen nicht mehr hilft. Behalte sie im Ohr, und sie könnte dich heil erhalten."
       },
       "fisher_nell": {
-        "name": "Frightened Nell",
-        "title": "Gullhaven Fisher",
-        "greeting": "It opened right where the nets dry. Right there, where I stood every morning of my life. I do not go down to the shore anymore. I do not go much of anywhere anymore."
+        "name": "Verängstigte Nell",
+        "title": "Fischerin von Gullhaven",
+        "greeting": "Es öffnete sich genau dort, wo die Netze trocknen. Genau dort, wo ich jeden Morgen meines Lebens gestanden habe. Ich gehe nicht mehr zum Ufer hinunter. Ich gehe überhaupt nicht mehr viel irgendwohin."
       },
       "ferryman_ewald": {
         "name": "Ferryman Ewald",
@@ -11636,7 +12586,7 @@ export const de_DE: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Ein Handwerk für jede Hand",
-        "text": "Jede Seele in Eastbrook betreibt neben dem Schwert noch ein Handwerk, {playerName}. Im Gestein rund um die Kupferschürfe südwestlich der Stadt gibt es Erzadern. Geh selbst mit der Spitzhacke ran und bearbeite 5 davon; ich werde den Unterschied merken.",
+        "text": "Jede Seele in Eastbrook betreibt neben dem Schwert noch ein Handwerk, {playerName}. Im Gestein rund um die Kupferschürfe südöstlich der Stadt gibt es Erzadern. Geh selbst mit der Spitzhacke ran und bearbeite 5 davon; ich werde den Unterschied merken.",
         "completion": "Siehst du? Erz gesammelt und Schwielen an den Händen. Betreibe Bergbau, Holzfällen und Kräutersammeln weiter auf deinen Reisen, und wenn du wieder in der Stadt bist, schau auf das Stadtfokus-Brett beim Markt und die Werkbank in der Nähe. Da steckt ein fairer Handel drin, wenn du ihn willst.",
         "objectives": {
           "0": {
@@ -11719,7 +12669,7 @@ export const de_DE: EnTranslations = {
       },
       "q_supplies": {
         "title": "Gestohlene Vorräte",
-        "text": "Die Banditen raubten meinen letzten Wagen: Werkzeug, Salz und gutes Eastbrook-Leinen. Hol 4 Kisten aus ihrem Lager im Südosten zurück.",
+        "text": "Die Banditen raubten meinen letzten Wagen: Werkzeug, Salz und gutes Eastbrook-Leinen. Hol 4 Kisten aus ihrem Lager im Südwesten zurück.",
         "completion": "Meine Kisten! Kaum ein Kratzer. Du bist ein Wunder.",
         "objectives": {
           "0": {
@@ -11948,7 +12898,7 @@ export const de_DE: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Keine Ruhe im Schilf",
-        "text": "Dieser Ritus lässt Ertrunkene überall auferstehen, wo das Moor sie berührt. Wir können ihn noch nicht brechen; nimm ihren Herren 14 Soldaten.",
+        "text": "Der Ritus auf jenen Räuchergefäßen zwingt die Ertrunkenen, sich zu erheben, und nun hat er einen erweckt, der stark genug ist, sie zu führen. Die Wärter nennen ihn den Ertrunkenen Kriegsherrn, und solange er die Ertrunkene Kapelle hält, halten die Toten ihre Reihen. Brich ihn, {playerName}, und der Rest zerstreut sich zurück ins Moor.",
         "completion": "Du schenkst den Toten mehr Gnade als ihre Meister. Nimm dies, du hast es verdient.",
         "objectives": {
           "0": {
@@ -12101,7 +13051,7 @@ export const de_DE: EnTranslations = {
       },
       "q_old_cragmaw": {
         "title": "Der Alte Cragmaw",
-        "text": "Das Bergvolk hat den Spuren, die meine Späherin fand, einen Namen gegeben: der Alte Cragmaw, ein narbenfelliger Tyrann von einer Katze, der drei Generationen seines eigenen Rudels überlebt hat. Er ist der Grund, warum die Pirscher meine Straße überfluten, {playerName}. Sein Bau liegt auf dem Westgrat über der Straße nach Süden. Bring einen Freund mit und streck den alten Teufel nieder.",
+        "text": "Das Bergvolk hat den Spuren, die meine Späherin fand, einen Namen gegeben: der Alte Cragmaw, ein narbenfelliger Tyrann von einer Katze, der drei Generationen seines eigenen Rudels überlebt hat. Er ist der Grund, warum die Pirscher meine Straße überfluten, {playerName}. Sein Bau liegt auf dem Ostgrat über der Straße nach Süden. Bring einen Freund mit und streck den alten Teufel nieder.",
         "completion": "Endlich erlegt. Das Bergvolk schwor, diese Katze würde die Mauer selbst überdauern. Die Pirscher bleiben nun in ihren hohen Schneefeldern, {playerName}, und meine Patrouillen gehen die Straße, ohne dafür zu bluten. Der ganze Grat ist dank deiner Arbeit stiller.",
         "objectives": {
           "0": {
@@ -12226,9 +13176,6 @@ export const de_DE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Wyrmkult-Eiferer getötet"
-          },
-          "1": {
-            "label": "Befehle des Wyrmkults"
           }
         }
       },
@@ -12239,9 +13186,6 @@ export const de_DE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Wyrmkult-Nekromant getötet"
-          },
-          "1": {
-            "label": "Rituelles Seelengefäß"
           }
         }
       },
@@ -12340,7 +13284,7 @@ export const de_DE: EnTranslations = {
       },
       "q_the_codfather": {
         "title": "Der Kabeljaupate",
-        "text": "Der Kabeljaupate ist nicht nur ein Fisch, {playerName}, er ist ein kaltblütiger Mörder. Die Alten schwören, er frisst Moorpirscher zum Frühstück, und selbst die Mirefen-Witwen spinnen aus blanker Furcht keine Netze nahe den Deepfen-Untiefen. Er herrscht über diese Wasser. Schnapp dir eine Angel, zieh diesen alten Teufel aus seinen Gewässern, und ich gebe zu, dass du zur Familie gehörst.",
+        "text": "Der Kabeljaupate ist nicht bloß ein Fisch, {playerName}, er ist ein kaltblütiger Killer. Die alten Hasen schwören, er frisst Moorpirscher zum Frühstück, und selbst die Mirefen-Witwen spinnen aus schierem Entsetzen kein Netz in der Nähe der Deepfen-Untiefen. Er beherrscht diese Gewässer, und Sumpfwasser verlangt nach nichts Geringerem als einer Eisenrollen-Angelrute; an meinem Tresen gibt es welche. Besorg dir eine, zerr den alten Teufel aus seinem Wasser, und ich gebe zu, dass du zur Familie gehörst.",
         "completion": "Bei den klammen Heiligen... Der Kabeljaupate höchstpersönlich. Sieh dir diese Barteln an. Fenbridge wird ein Jahr lang Geschichten von diesem Fang erzählen, {playerName}.",
         "objectives": {
           "0": {
@@ -12360,7 +13304,7 @@ export const de_DE: EnTranslations = {
       },
       "q_nythraxis_graves": {
         "title": "Gräber der Vergessenen",
-        "text": "Ich habe diese Zeichen schon gesehen, auf drei alten Gräbern rund um das nördliche Schlachtfeld. Hauptmann Aldren liegt auf der östlichen Anhöhe, Hohepriester Malric nahe der zerbrochenen mittleren Straße und der königliche Assassine Voss an der westlichen Klippe. Berühre jedes Grab und lausche, {playerName}. Die Toten erinnern sich vielleicht an das, was die Lebenden vergessen haben.",
+        "text": "Diese Zeichen habe ich schon einmal gesehen, auf drei alten Gräbern rund um das nördliche Schlachtfeld. Hauptmann Aldren liegt auf der westlichen Anhöhe, Hohepriester Malric weiter südlich am Westrand, und der königliche Assassine Voss an der Ostklippe. Berühre jedes Grab und horche, {playerName}. Die Toten erinnern sich vielleicht an das, was die Lebenden vergessen haben.",
         "completion": "Aldren blieb treu, Malric weigerte sich, den Tod zu akzeptieren, und Voss erkannte die Gefahr vor allen anderen. Alle drei dienten demselben vergessenen König.",
         "objectives": {
           "0": {
@@ -12376,7 +13320,7 @@ export const de_DE: EnTranslations = {
       },
       "q_nythraxis_sealed_crypt": {
         "title": "Die verlassene Krypta",
-        "text": "Die Visionen weisen auf die verlassene Krypta in der westlichen Klippe. Eine alte Legende sagt, die Krypta habe einen König beherbergt. Vielleicht versiegelte Thornpeak ihn dort unten, nachdem Malrics Ritual ihn zu etwas Todeslosem verzerrt hatte. Betritt die Krypta und sieh nach, was darin geblieben ist.",
+        "text": "Die Visionen weisen auf die verlassene Krypta in der östlichen Klippe. Eine alte Legende sagt, die Krypta habe einen König beherbergt. Vielleicht versiegelte Thornpeak ihn dort unten, nachdem Malrics Ritual ihn zu etwas Todeslosem verzerrt hatte. Betritt die Krypta und sieh nach, was darin geblieben ist.",
         "completion": "Die beiden Schlüsselhälften passen zusammen, und Voss Tagebuch nennt, was sie versiegelten: den Siegelring von König Nythraxis. Wenn das Tagebuch wahr ist, ist dieser Ring der Schlüssel zu seinem Grab.",
         "objectives": {
           "0": {
@@ -12418,7 +13362,7 @@ export const de_DE: EnTranslations = {
       },
       "q_mogger": {
         "title": "Mogger muss fallen",
-        "text": "Mogger hat Karren gespalten, Zäune plattgewalzt und genug Vieh getötet, um das halbe Tal zu leeren. Stell dich ihm nicht allein. Nimm zwei starke Gefährten zur östlichen Wiese und leg den Grobian endgültig um.",
+        "text": "Mogger hat Karren gespalten, Zäune plattgewalzt und genug Vieh getötet, um das halbe Tal zu leeren. Stell dich ihm nicht allein. Nimm zwei starke Gefährten zur westlichen Wiese und leg den Grobian endgültig um.",
         "completion": "Mogger ist endlich tot. Eastbrooks Felder sind sicherer, und du verlässt das Tal mit einer weiteren Geschichte, die es wert ist erzählt zu werden.",
         "objectives": {
           "0": {
@@ -12478,7 +13422,7 @@ export const de_DE: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "Fäden wiederverknüpft",
-        "text": "Doch wieder an meinem Webstuhl. Ich hege keinen Groll, {playerName}, aber der Faden erinnert sich an eine Hand, die ihn losgelassen hat, und die Kosten, ihn wieder aufzunehmen, werden jedesmal länger bemessen. Lichte die Webholz-Spinnen, die den westlichen Wald bevölkern, und die Mühe wird deine Hände beruhigen, bevor sie wieder gute Seide berühren.",
+        "text": "Doch wieder an meinem Webstuhl. Ich hege keinen Groll, {playerName}, aber der Faden erinnert sich an eine Hand, die ihn losgelassen hat, und die Kosten, ihn wieder aufzunehmen, werden jedesmal länger bemessen. Lichte die Webholz-Spinnen, die den östlichen Wald bevölkern, und die Mühe wird deine Hände beruhigen, bevor sie wieder gute Seide berühren.",
         "completion": "Wieder stabil. Lederverarbeitung und Schneiderei kehren als Hauptberufe in deine Hände zurück. Miss zweimal ab, bevor du das nächste Mal wanderst.",
         "objectives": {
           "0": {
@@ -12488,7 +13432,7 @@ export const de_DE: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "Zurück am Herd",
-        "text": "Schau an, wer wieder an meinem Herd steht. Keine harten Gefühle, {playerName}, eine Küche hat immer Platz, aber du weißt, dass die Rechnung bei jeder Rückkehr länger wird. Geh, lichte die Wildschweine auf der östlichen Wiese, denn ehrlicher Schweiß ist die erste Zutat, und es wird deinen Händen die Arbeit wieder in Erinnerung rufen.",
+        "text": "Schau an, wer wieder an meinem Herd steht. Keine harten Gefühle, {playerName}, eine Küche hat immer Platz, aber du weißt, dass die Rechnung bei jeder Rückkehr länger wird. Geh, lichte die Wildschweine auf der westlichen Wiese, denn ehrlicher Schweiß ist die erste Zutat, und es wird deinen Händen die Arbeit wieder in Erinnerung rufen.",
         "completion": "Da ist der alte Geschmack. Alchemie und Kochen sind wieder als Hauptberufe auf deinem Herd. Bleib diesmal eine Weile.",
         "objectives": {
           "0": {
@@ -12577,178 +13521,178 @@ export const de_DE: EnTranslations = {
         }
       },
       "q_veil_thinned": {
-        "title": "The Thinned Veil",
-        "text": "So the cave opened for you. Then the seal is weaker than I feared, {playerName}. Where the veil tears, the wisps turn dark and cold. Bring me eight essences from the duskwisps and I will read how deep the wound runs.",
-        "completion": "Cold, every one of them. The Hollow has perhaps a season before the tear becomes a rift. We have work to do, you and I.",
+        "title": "Der ausgedünnte Schleier",
+        "text": "Die Höhle hat sich also für dich geöffnet. Dann ist das Siegel schwächer, als ich befürchtet habe, {playerName}. Wo der Schleier sich spaltet, werden die Irrlichter dunkel und kalt. Bring mir acht Essenzen von den Dämmerirrlichtern, und ich werde lesen, wie tief die Wunde reicht.",
+        "completion": "Kalt, jede einzelne. Veiled Hollow hat vielleicht noch eine Jahreszeit, bevor der Spalt zu einem Riss wird. Wir haben Arbeit vor uns, du und ich.",
         "objectives": {
           "0": {
-            "label": "Duskwisp Essence"
+            "label": "Dämmerirrlicht-Essenz"
           }
         }
       },
       "q_gleaming_antlers": {
-        "title": "Gleaming Antlers",
-        "text": "The veiled stags shed light where they graze, and their cast antlers hold it for years. Five of them, from the herds in the open glade at the heart of the valley, and my lanterns burn through the winter without oil. The stags need not be harmed, but they do not part with them easily.",
-        "completion": "Look how they hold the light! No flame, no smoke, just the glow. The Hollow provides.",
+        "title": "Glänzende Geweihe",
+        "text": "Die verschleierten Hirsche verlieren Licht, wo sie weiden, und ihre abgeworfenen Geweihe halten es jahrelang. Fünf davon, von den Herden auf der offenen Lichtung im Herzen des Tals, und meine Laternen brennen den ganzen Winter ohne Öl. Den Hirschen muss kein Leid geschehen, aber sie trennen sich nicht leicht davon.",
+        "completion": "Sieh nur, wie sie das Licht halten! Keine Flamme, kein Rauch, nur das Glühen. Veiled Hollow versorgt.",
         "objectives": {
           "0": {
-            "label": "Gleaming Antler"
+            "label": "Glänzendes Geweih"
           }
         }
       },
       "q_wisp_lights": {
-        "title": "Lights of the Shallows",
-        "text": "The glimmerwisps carry motes of the old starlight that fell here when the Hollow was sealed. Six motes, and the shrine lamps will burn for a year. Take only from those that fade; the Hollow gives enough without greed.",
-        "completion": "Soft as the first stars. Set them here by the altar; the shrine will do the rest.",
+        "title": "Lichter der Untiefen",
+        "text": "Die Glimmerirrlichter tragen Funken des alten Sternenlichts, das hier fiel, als Veiled Hollow versiegelt wurde. Sechs Funken, und die Schreinlampen werden ein Jahr lang brennen. Nimm nur von denen, die verblassen; Veiled Hollow gibt genug, ohne Gier.",
+        "completion": "Weich wie die ersten Sterne. Leg sie hier neben den Altar; der Schrein wird den Rest tun.",
         "objectives": {
           "0": {
-            "label": "Wisp Mote"
+            "label": "Irrlichtstaub"
           }
         }
       },
       "q_calming_the_deep": {
-        "title": "Calming the Deep",
-        "text": "The sporelings of the Gleaming Deep were gentle folk before the tear touched their rings. What the corruption takes, it does not give back. Grant the corrupted ones rest, {playerName}: ten of them, in the north of the Deep.",
-        "completion": "You did what I could not bear to. The gatherers still sing in the south rings; because of you, they will keep singing.",
+        "title": "Die Tiefe beruhigen",
+        "text": "Die Sporenlinge der Gleißenden Tiefe waren ein sanftes Volk, bevor der Riss ihre Ringe berührte. Was die Verderbnis nimmt, gibt sie nicht zurück. Gewähre den Verdorbenen Ruhe, {playerName}: zehn von ihnen, im Norden der Tiefe.",
+        "completion": "Du hast getan, was ich nicht ertragen konnte. Die Sammler singen noch in den Südringen; deinetwegen werden sie weiter singen.",
         "objectives": {
           "0": {
-            "label": "Corrupted Sporeling laid to rest"
+            "label": "Verdorbener Sporenling zur Ruhe gebettet"
           }
         }
       },
       "q_spore_hearts": {
-        "title": "Hearts of the Ring",
-        "text": "When a sporeling falls to the dark, its heart keeps beating with borrowed shadow. Four of those hearts, cleansed at the shrine, may teach us how the corruption spreads. It is grim work, {playerName}, but it is mending work.",
-        "completion": "There. Cleansed, and quiet. Each one shows the same mark: the shadow flows FROM the Sunken Court. Tell Saelwyn.",
+        "title": "Herzen des Rings",
+        "text": "Wenn ein Sporenling der Dunkelheit erliegt, schlägt sein Herz mit geliehenem Schatten weiter. Vier dieser Herzen, gereinigt am Schrein, könnten uns lehren, wie sich die Verderbnis ausbreitet. Es ist eine grimmige Arbeit, {playerName}, aber es ist heilende Arbeit.",
+        "completion": "Da. Gereinigt, und still. Jedes zeigt dasselbe Zeichen: Der Schatten strömt VOM Versunkenen Hof. Sag es Saelwyn.",
         "objectives": {
           "0": {
-            "label": "Spore Heart"
+            "label": "Sporenherz"
           }
         }
       },
       "q_monument_tour": {
-        "title": "What the Stones Remember",
-        "text": "Three monuments still stand from before the sealing: one at the Duskfall Overlook, one in the Sunken Court, and one lost in the far northeast where nobody walks. Read them for me, {playerName}. My knees gave out two centuries of stairs ago.",
-        "completion": "An overlook, a court, and a forgotten corner... and all three verses of the sealing song, together for the first time since it was sung. You have made an old reader very happy.",
+        "title": "Was die Steine erinnern",
+        "text": "Drei Monumente stehen noch aus der Zeit vor der Versiegelung: eines bei der Duskfall-Aussicht, eines im Versunkenen Hof, und eines verloren im fernen Nordosten, wo niemand geht. Lies sie mir vor, {playerName}. Meine Knie haben vor zwei Jahrhunderten Treppen aufgegeben.",
+        "completion": "Eine Aussicht, ein Hof, und eine vergessene Ecke... und alle drei Verse des Versiegelungslieds, zum ersten Mal beisammen, seit es gesungen wurde. Du hast einen alten Leser sehr glücklich gemacht.",
         "objectives": {
           "0": {
-            "label": "The Overlook monument read"
+            "label": "Das Monument der Aussicht gelesen"
           },
           "1": {
-            "label": "The Court monument read"
+            "label": "Das Monument des Hofes gelesen"
           },
           "2": {
-            "label": "The forgotten monument read"
+            "label": "Das vergessene Monument gelesen"
           }
         }
       },
       "q_grove_menace": {
-        "title": "Menace in the Glade",
-        "text": "Duskwisps have started drifting in among my stalls after dark, {playerName}, and their chill spoils everything it touches. Thin them out for me: ten of them, wherever the veil has torn.",
-        "completion": "The night market can open again. You have a customer for life, or at least a discount.",
+        "title": "Bedrohung in der Lichtung",
+        "text": "Dämmerirrlichter treiben in letzter Zeit nach Einbruch der Dunkelheit zwischen meine Stände, {playerName}, und ihre Kälte verdirbt alles, was sie berührt. Dünne sie für mich aus: zehn davon, wo immer der Schleier gerissen ist.",
+        "completion": "Der Nachtmarkt kann wieder öffnen. Du hast einen Kunden fürs Leben, oder zumindest einen Rabatt.",
         "objectives": {
           "0": {
-            "label": "Duskwisp dispersed"
+            "label": "Dämmerirrlicht zerstreut"
           }
         }
       },
       "q_shards_of_starfall": {
-        "title": "Shards of Starfall",
-        "text": "When the duskwisps pass over the crystal fields, slivers of old starlight cling to them like burrs. Six shards, {playerName}, and I can date the sealing to the very season it was sung.",
-        "completion": "Look at the striations! Autumn. The Hollow was sealed in autumn. Two hundred years of argument, settled by six little stones.",
+        "title": "Scherben des Sternenfalls",
+        "text": "Wenn die Dämmerirrlichter über die Kristallfelder ziehen, haften Splitter alten Sternenlichts an ihnen wie Kletten. Sechs Scherben, {playerName}, und ich kann die Versiegelung auf die genaue Jahreszeit datieren, in der sie gesungen wurde.",
+        "completion": "Sieh dir die Streifen an! Herbst. Veiled Hollow wurde im Herbst versiegelt. Zweihundert Jahre Streit, beigelegt von sechs kleinen Steinen.",
         "objectives": {
           "0": {
-            "label": "Starfall Shard"
+            "label": "Sternenfall-Scherbe"
           }
         }
       },
       "q_treant_accord": {
-        "title": "The Treant Accord",
-        "text": "The elders of the Grove shed their outer bark as the corruption gnaws at their roots. Four lengths of it, and I can brew a salve for the whole Grove. They will not thank you while you pry it loose, {playerName}, but they will stand a century longer for it.",
-        "completion": "Thick and sound, all four. The salve will take a week to brew and a hundred years to finish its work. Trees measure kindness differently.",
+        "title": "Der Baumhüter-Pakt",
+        "text": "Die Ältesten des Hains werfen ihre äußere Rinde ab, während die Verderbnis an ihren Wurzeln nagt. Vier Stücke davon, und ich kann eine Salbe für den ganzen Hain brauen. Sie werden es dir nicht danken, während du sie losbrichst, {playerName}, aber sie werden dafür ein Jahrhundert länger stehen.",
+        "completion": "Dick und gesund, alle vier. Die Salbe wird eine Woche zum Brauen brauchen und hundert Jahre, um ihre Wirkung zu vollenden. Bäume messen Freundlichkeit anders.",
         "objectives": {
           "0": {
-            "label": "Elder Bark"
+            "label": "Ältestenrinde"
           }
         }
       },
       "q_spore_tide": {
-        "title": "Against the Spore Tide",
-        "text": "The salve holds the Grove, but the corruption presses harder at the Deep with every dusk. Twelve more of the corrupted must be laid to rest before the gatherers can reclaim their north rings, {playerName}.",
-        "completion": "The rings in the north are singing again tonight. Quietly, but singing.",
+        "title": "Gegen die Sporenflut",
+        "text": "Die Salbe hält den Hain, aber die Verderbnis drängt mit jeder Dämmerung härter auf die Tiefe. Zwölf weitere der Verdorbenen müssen zur Ruhe gebettet werden, bevor die Sammler ihre Nordringe zurückgewinnen können, {playerName}.",
+        "completion": "Die Ringe im Norden singen heute Nacht wieder. Leise, aber sie singen.",
         "objectives": {
           "0": {
-            "label": "Corrupted Sporeling laid to rest"
+            "label": "Verdorbener Sporenling zur Ruhe gebettet"
           }
         }
       },
       "q_sunken_court": {
-        "title": "The Sunken Court",
-        "text": "Bryn read the hearts true: the tear runs through the old court in the east, and its guardians have woken wrong. They were built to protect the seal; now they will crush anyone who nears it. Clear eight of them from the ruins.",
-        "completion": "Eight guardians, stilled. I remember when they were raised, {playerName}. Do not look so surprised; the Hollow keeps its keepers a long time.",
+        "title": "Der Versunkene Hof",
+        "text": "Bryn hat die Herzen richtig gelesen: Der Riss verläuft durch den alten Hof im Osten, und seine Wächter sind falsch erwacht. Sie wurden erschaffen, um das Siegel zu schützen; jetzt zerquetschen sie jeden, der sich ihm nähert. Räume acht von ihnen aus den Ruinen.",
+        "completion": "Acht Wächter, zum Stillstand gebracht. Ich erinnere mich, als sie errichtet wurden, {playerName}. Sieh nicht so überrascht aus; Veiled Hollow behält seine Hüter lange.",
         "objectives": {
           "0": {
-            "label": "Ancient Guardian stilled"
+            "label": "Alter Wächter zum Stillstand gebracht"
           }
         }
       },
       "q_wardens_echoes": {
-        "title": "Echoes of the Warden",
-        "text": "Even with their master silenced, the court guardians repeat its last command like an echo that will not fade. Until the seal is set back, they will keep waking, {playerName}. Still ten more of them so the masons can reach the sealstone.",
-        "completion": "The echo grows fainter each time. Soon the court will hold nothing but wind and ivy, the way a ruin should.",
+        "title": "Echos des Wächters",
+        "text": "Selbst mit zum Schweigen gebrachtem Meister wiederholen die Hofwächter seinen letzten Befehl wie ein Echo, das nicht verklingen will. Bis das Siegel wieder eingesetzt ist, werden sie weiter erwachen, {playerName}. Bring zehn weitere von ihnen zur Ruhe, damit die Steinmetze den Siegelstein erreichen können.",
+        "completion": "Das Echo wird jedes Mal schwächer. Bald wird der Hof nichts mehr enthalten als Wind und Efeu, so wie es sich für eine Ruine gehört.",
         "objectives": {
           "0": {
-            "label": "Ancient Guardian stilled"
+            "label": "Alter Wächter zum Stillstand gebracht"
           }
         }
       },
       "q_waking_warden": {
-        "title": "The Waking Warden",
-        "text": "The court is quiet, but its master is not. The Warden that holds the seal has woken twisted, and while it stands, the seal cannot be mended. It will not fall easily; bring a friend if you can find one, {playerName}. Bring two if you can find two.",
-        "completion": "The bell of its voice is silent. I felt it from here, like a weight lifted off the whole valley.",
+        "title": "Der erwachende Wächter",
+        "text": "Der Hof ist still, doch sein Meister ist es nicht. Der Wächter, der das Siegel hält, ist verdreht erwacht, und solange er steht, kann das Siegel nicht ausgebessert werden. Er wird nicht leicht fallen; bring einen Freund mit, wenn du einen findest, {playerName}. Bring zwei mit, wenn du zwei findest.",
+        "completion": "Die Glocke seiner Stimme ist verstummt. Ich fühlte es von hier aus, wie eine Last, die vom ganzen Tal genommen wurde.",
         "objectives": {
           "0": {
-            "label": "The Waking Warden defeated"
+            "label": "Der erwachende Wächter besiegt"
           }
         }
       },
       "q_seal_restored": {
-        "title": "The Seal Restored",
-        "text": "Take the Warden's seal to the sealstone at the heart of the court and set it back where it was struck loose. Then the Hollow can begin to heal, and you, {playerName}, will have done what no one of your kind has done before.",
-        "completion": "I felt it close from here, gentle as dusk. The Hollow remembers its friends, {playerName}. However far you travel, there will always be a light for you beneath the great tree.",
+        "title": "Das wiederhergestellte Siegel",
+        "text": "Bring das Siegel des Wächters zum Siegelstein im Herzen des Hofes und setze es dort wieder ein, wo es losgeschlagen wurde. Dann kann Veiled Hollow zu heilen beginnen, und du, {playerName}, wirst getan haben, was niemand deiner Art zuvor getan hat.",
+        "completion": "Ich fühlte es von hier aus sich schließen, sanft wie die Dämmerung. Veiled Hollow erinnert sich an seine Freunde, {playerName}. Wie weit du auch reist, es wird immer ein Licht für dich unter dem großen Baum geben.",
         "objectives": {
           "0": {
-            "label": "The seal set back in the sealstone"
+            "label": "Das Siegel im Siegelstein wiedereingesetzt"
           }
         }
       },
       "q_hollow_the_huntsman": {
-        "title": "The Warden of the Herds",
-        "text": "You look like someone who can handle more than wisps, {playerName}. Huntsman Deral keeps his lookout among the stag meadows east of here, and he has been asking after capable hands for weeks. Whatever he is tracking out there, he will not say it aloud in the village.",
-        "completion": "Fenna sent you? Good. Then she trusts you, and I have two names that need crossing out.",
+        "title": "Der Wächter der Herden",
+        "text": "Du siehst aus wie jemand, der mit mehr als nur Irrlichtern fertigwerden kann, {playerName}. Jäger Deral hält seinen Ausguck zwischen den Hirschwiesen östlich von hier, und er fragt seit Wochen nach tauglichen Händen. Was auch immer er dort draußen aufspürt, im Dorf spricht er es nicht laut aus.",
+        "completion": "Fenna hat dich geschickt? Gut. Dann vertraut sie dir, und ich habe zwei Namen, die durchgestrichen werden müssen.",
         "objectives": {
           "0": {
-            "label": "Find Huntsman Deral"
+            "label": "Jäger Deral finden"
           }
         }
       },
       "q_hollow_old_marrowshell": {
-        "title": "The Old Shell of the Shallows",
-        "text": "The first name is Old Marrowshell, a crab the size of a cart that has hunted the eastern shallows since before Eldergleam had a gate. It wanders, {playerName}, so you will have to walk the shoreline until you cross its track. Do not go alone, and do not trust its stillness.",
-        "completion": "The shallows are just water again. I have watched that shell break better hunters than me, {playerName}. Not you.",
+        "title": "Die alte Schale der Untiefen",
+        "text": "Der erste Name ist Alter Marrowshell, eine Krabbe von der Größe eines Karrens, die die östlichen Untiefen gejagt hat, seit Eldergleam noch kein Tor hatte. Er wandert, {playerName}, also musst du die Küstenlinie entlanggehen, bis du seine Spur kreuzt. Geh nicht allein, und traue seiner Stille nicht.",
+        "completion": "Die Untiefen sind wieder nur Wasser. Ich habe gesehen, wie diese Schale bessere Jäger gebrochen hat als mich, {playerName}. Nicht dich.",
         "objectives": {
           "0": {
-            "label": "Old Marrowshell slain"
+            "label": "Alter Marrowshell erlegt"
           }
         }
       },
       "q_hollow_first_of_the_herd": {
-        "title": "First of the Herd",
-        "text": "The second name is harder to say. Aurelhorn led these herds when my grandmother kept this lookout, and whatever woke in the Hollow woke him wrong. He tramples what he once warded, and the herd will not survive his madness. He roams the meadows near the old court roads. End him with mercy, {playerName}, and bring a friend to share the weight of it.",
-        "completion": "So the First falls to the last. The herd is already calmer, do you feel it? You did the Hollow a kindness today, even if it does not look like one.",
+        "title": "Erster der Herde",
+        "text": "Der zweite Name ist schwerer auszusprechen. Aurelhorn führte diese Herden, als meine Großmutter diesen Ausguck hielt, und was auch immer in Veiled Hollow erwachte, erweckte ihn falsch. Er zertrampelt, was er einst beschützte, und die Herde wird seinen Wahnsinn nicht überleben. Er streift durch die Wiesen nahe den alten Hofstraßen. Beende ihn in Gnade, {playerName}, und bring einen Freund mit, um die Last zu teilen.",
+        "completion": "So fällt der Erste durch den Letzten. Die Herde ist schon ruhiger, spürst du es? Du hast Veiled Hollow heute einen Gefallen getan, auch wenn es nicht danach aussieht.",
         "objectives": {
           "0": {
-            "label": "Aurelhorn given peace"
+            "label": "Aurelhorn Frieden geschenkt"
           }
         }
       },
@@ -12763,819 +13707,819 @@ export const de_DE: EnTranslations = {
         }
       },
       "q_fv_snowline_report": {
-        "title": "Word from the Snowline",
-        "text": "Every soul who climbs out of the Drakelands passes my fire, {playerName}, and fewer climb every week. Warden Kaldra holds Icemantle up the north road. Tell her the pass is still open, and tell her a stranger walked it alone.",
-        "completion": "The pass holds, then. Einna sits that waycamp through storms that bury the road markers, and she has never once sent me idle news. Welcome to Icemantle, {playerName}.",
+        "title": "Nachricht von der Schneegrenze",
+        "text": "Jede Seele, die aus den Drakelands heraufsteigt, kommt an meinem Feuer vorbei, {playerName}, und jede Woche werden es weniger. Wächterin Kaldra hält Icemantle die Nordstraße hinauf. Sag ihr, der Pass sei noch offen, und sag ihr, eine Fremde sei ihn allein gegangen.",
+        "completion": "Der Pass hält also. Einna hält dieses Wegelager durch Stürme aus, die die Wegmarkierungen begraben, und sie hat mir noch nie müßige Neuigkeiten geschickt. Willkommen in Icemantle, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Report to Warden Kaldra"
+            "label": "Bei Wächterin Kaldra melden"
           }
         }
       },
       "q_fv_wolves_at_the_door": {
-        "title": "Wolves at the Door",
-        "text": "The snowdrift packs used to keep to the high benches. Now they cross the tarn road in daylight and my woodcutters will not leave the walls. Thin the packs, {playerName}, ten of them, and the road is a road again.",
-        "completion": "Ten fewer shadows between here and the tarn. The woodcutters are already arguing over who goes out first.",
+        "title": "Wölfe vor der Tür",
+        "text": "Die Schneewehen-Rudel hielten sich früher an die hohen Bänke. Jetzt überqueren sie die Seestraße bei Tageslicht, und meine Holzfäller wollen die Mauern nicht mehr verlassen. Dünne die Rudel aus, {playerName}, zehn von ihnen, und die Straße ist wieder eine Straße.",
+        "completion": "Zehn Schatten weniger zwischen hier und dem See. Die Holzfäller streiten schon darüber, wer zuerst hinausgeht.",
         "objectives": {
           "0": {
-            "label": "Snowdrift Wolf slain"
+            "label": "Schneewehen-Wolf erlegt"
           }
         }
       },
       "q_fv_winter_pelts": {
-        "title": "Pelts for the Lodge",
-        "text": "Firewood keeps a body alive, {playerName}, but wool will not turn this cold, only wolf-fur will. Six thick winter pelts off the snowdrift packs and I can line bedrolls for everyone the lodge shelters.",
-        "completion": "Fur like this is the only argument winter listens to. Take these treads, they are lined with the last batch.",
+        "title": "Felle für die Hütte",
+        "text": "Feuerholz hält einen Körper am Leben, {playerName}, aber Wolle wird diese Kälte nicht abwenden, nur Wolfsfell wird das. Sechs dicke Winterfelle von den Schneewehen-Rudeln, und ich kann Schlafrollen für jeden füttern, den die Hütte beherbergt.",
+        "completion": "Fell wie dieses ist das einzige Argument, auf das der Winter hört. Nimm diese Tritte, sie sind mit der letzten Charge gefüttert.",
         "objectives": {
           "0": {
-            "label": "Thick Winter Pelt"
+            "label": "Dickes Winterfell"
           }
         }
       },
       "q_fv_ember_caches": {
-        "title": "Embers on the Tarn Road",
-        "text": "A sledge of ember caches overturned on the tarn road in last night: iron kettles that hold a banked fire alive for a month. Three of them are still lying in the snow, {playerName}, and the lodge cannot spare what they hold. Bring the fire home.",
-        "completion": "Still warm, every one. You have bought the lodge a whole winter of mercy, {playerName}.",
+        "title": "Glut auf der Seestraße",
+        "text": "Ein Schlitten mit Glutverstecken kippte letzte Nacht auf der Seestraße um: eiserne Kessel, die ein gebändigtes Feuer einen Monat lang am Leben halten. Drei davon liegen noch im Schnee, {playerName}, und die Hütte kann nicht entbehren, was sie enthalten. Bring das Feuer heim.",
+        "completion": "Noch warm, jedes einzelne. Du hast der Hütte einen ganzen Winter Gnade erkauft, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Ember Cache recovered"
+            "label": "Glutversteck geborgen"
           }
         }
       },
       "q_fv_lights_over_steps": {
-        "title": "Lights over the Steps",
-        "text": "The aurora has burned green every night this month, and the old folk will not walk under it. One woman might know why: Veyla, the Aurorist. She camps alone on the Aurora Steps, southeast past the tarn. Find her camp, {playerName}, and hear what the lights have told her.",
-        "completion": "Kaldra sent you? Then she is finally worried, and she is right to be. Sit, {playerName}. Watch the sky with me a while.",
+        "title": "Lichter über den Stufen",
+        "text": "Die Aurora hat diesen Monat jede Nacht grün gebrannt, und die Alten wollen nicht darunter gehen. Eine Frau könnte wissen, warum: Veyla, die Aurora-Deuterin. Sie lagert allein auf den Aurorastufen, südöstlich hinter dem See. Finde ihr Lager, {playerName}, und höre, was ihr die Lichter erzählt haben.",
+        "completion": "Kaldra hat dich geschickt? Dann macht sie sich endlich Sorgen, und das zu Recht. Setz dich, {playerName}. Beobachte eine Weile mit mir den Himmel.",
         "objectives": {
           "0": {
-            "label": "Find Aurorist Veyla"
+            "label": "Aurora-Deuterin Veyla finden"
           }
         }
       },
       "q_fv_silent_trapline": {
-        "title": "The Silent Trapline",
-        "text": "Old Brosk works the Shiverfen trapline west of here, and every week for eleven years he has sent a bundle of furs up with the wood sledge. Two weeks now, nothing. He is too stubborn to freeze and too careful to drown, {playerName}, so something else is wrong. Find his camp at the fen and see him breathing.",
-        "completion": "Maeve sent you? Ha. Eleven years and the woman still thinks the fen will eat me. Well... this year she might be right. Look at what it's done to my lines.",
+        "title": "Die stille Fallenlinie",
+        "text": "Der alte Brosk arbeitet die Fallenlinie von Shiverfen westlich von hier, und seit elf Jahren schickt er jede Woche ein Bündel Felle mit dem Holzschlitten herauf. Seit zwei Wochen nun nichts. Er ist zu stur, um zu erfrieren, und zu vorsichtig, um zu ertrinken, {playerName}, also stimmt etwas anderes nicht. Finde sein Lager am Moor und sieh, ob er noch atmet.",
+        "completion": "Maeve hat dich geschickt? Ha. Elf Jahre, und die Frau denkt immer noch, das Moor wird mich fressen. Nun... dieses Jahr könnte sie recht haben. Sieh dir an, was es meinen Linien angetan hat.",
         "objectives": {
           "0": {
-            "label": "Find Trapper Brosk"
+            "label": "Fallensteller Brosk finden"
           }
         }
       },
       "q_fv_aurora_motes": {
-        "title": "Motes of the Aurora",
-        "text": "The wisps that drift these steps are shed by the lights themselves, and each carries a mote of the aurora in its heart. I need six to read what the sky is writing, {playerName}. The wisps do not fight back. Whether that makes the work easier or harder is between you and your conscience.",
-        "completion": "Six motes, still glowing. Look at them, {playerName}: they pulse in time with each other. The lights are not weather. They are a signal.",
+        "title": "Funken der Aurora",
+        "text": "Die Irrlichter, die über diese Stufen treiben, werden von den Lichtern selbst abgeworfen, und jedes trägt einen Funken der Aurora in seinem Herzen. Ich brauche sechs, um zu lesen, was der Himmel schreibt, {playerName}. Die Irrlichter wehren sich nicht. Ob das die Arbeit leichter oder schwerer macht, ist Sache zwischen dir und deinem Gewissen.",
+        "completion": "Sechs Funken, noch immer glühend. Sieh sie dir an, {playerName}: Sie pulsieren im Gleichtakt miteinander. Die Lichter sind kein Wetter. Sie sind ein Signal.",
         "objectives": {
           "0": {
-            "label": "Aurora Mote"
+            "label": "Aurorafunke"
           }
         }
       },
       "q_fv_rime_unbound": {
-        "title": "Rime Unbound",
-        "text": "When the aurora burns this bright, the cold stands up and walks: rime elementals, frost given a will. They gather where the lights touch the benches, and they are wandering closer to my camp each night. Break eight of them apart, {playerName}, before one of them breaks me.",
-        "completion": "The night feels thinner already. Whatever wakes them is not done, but you have bought the Steps some quiet.",
+        "title": "Entfesselter Reif",
+        "text": "Wenn die Aurora so hell brennt, steht die Kälte auf und geht: Reif-Elementare, Frost mit eigenem Willen. Sie versammeln sich, wo die Lichter die Terrassenbänke berühren, und sie wandern jede Nacht näher an mein Lager heran. Zerbrich acht von ihnen, {playerName}, bevor eines von ihnen mich zerbricht.",
+        "completion": "Die Nacht fühlt sich schon dünner an. Was auch immer sie weckt, ist noch nicht fertig, aber du hast den Stufen etwas Ruhe erkauft.",
         "objectives": {
           "0": {
-            "label": "Rime Elemental slain"
+            "label": "Reif-Elementar erlegt"
           }
         }
       },
       "q_fv_sprung_traps": {
-        "title": "Sprites in the Traps",
-        "text": "Fen sprites, {playerName}. The little devils spring my traps for sport and scatter the iron in the reeds. Drive them off, eight should teach the rest, and gather up what is left of my traplines while you are out there.",
-        "completion": "Four good traps back and the reeds gone quiet. You trap with a heavier hand than I do, {playerName}, but I cannot argue with the results.",
+        "title": "Wichte in den Fallen",
+        "text": "Moorwichte, {playerName}. Die kleinen Teufel lösen meine Fallen zum Vergnügen aus und verstreuen das Eisen im Schilf. Vertreibe sie, acht sollten den Rest lehren, und sammle ein, was von meinen Fallenlinien übrig ist, während du dort draußen bist.",
+        "completion": "Vier gute Fallen zurück, und das Schilf ist ruhig geworden. Du fängst mit einer härteren Hand als ich, {playerName}, aber ich kann den Ergebnissen nicht widersprechen.",
         "objectives": {
           "0": {
-            "label": "Fen Sprite driven off"
+            "label": "Moorwicht vertrieben"
           },
           "1": {
-            "label": "Trap recovered"
+            "label": "Falle geborgen"
           }
         }
       },
       "q_fv_howl_above": {
-        "title": "The Howl on the Terraces",
-        "text": "You hear it at dusk, {playerName}: a howl off the Howling Terraces that is not the snowdrift packs. Bigger throats. The terrace howlers have come down from the peaks for the first time since my grandmother held this post, and they are what pushed the wolves onto my road. Cull eight and push them back.",
-        "completion": "Eight, and the dusk chorus is thinner for it. But howlers do not leave the peaks for nothing. Something up there moved them, and I fear it has a name.",
+        "title": "Das Heulen auf den Terrassen",
+        "text": "Du hörst es bei Dämmerung, {playerName}: ein Heulen von den Heulenden Terrassen, das nicht von den Schneewehen-Rudeln stammt. Größere Kehlen. Die Terrassenheuler sind zum ersten Mal seit meine Großmutter diesen Posten hielt von den Gipfeln herabgekommen, und sie sind es, die die Wölfe auf meine Straße getrieben haben. Erlege acht und dränge sie zurück.",
+        "completion": "Acht, und der Dämmerungschor ist dadurch dünner geworden. Doch Heuler verlassen die Gipfel nicht ohne Grund. Etwas dort oben hat sie vertrieben, und ich fürchte, es hat einen Namen.",
         "objectives": {
           "0": {
-            "label": "Terrace Howler slain"
+            "label": "Terrassenheuler erlegt"
           }
         }
       },
       "q_fv_seeing_wren_home": {
-        "title": "Seeing Wren Home",
-        "text": "My apprentice Wren went out to walk the Goldmelt line two days ago and never came back. I found her tracks, she is holed up under the road markers southwest of the Aurora Steps, too scared of the wolves to move. I cannot leave the fen, {playerName}. Walk her to Veyla's camp on the Steps. She will be safe under the lights.",
-        "completion": "The girl is inside, wrapped in half my blankets and talking the stars out of the sky. You did a kind thing today, {playerName}. The Reach doesn't see many of those.",
+        "title": "Wren sicher heimbringen",
+        "text": "Meine Lehrling Wren ging vor zwei Tagen los, um die Goldmelt-Linie abzugehen, und kam nie zurück. Ich fand ihre Spuren, sie hat sich unter den Wegmarkierungen nordöstlich der Aurorastufen verkrochen, zu verängstigt vor den Wölfen, um sich zu bewegen. Ich kann das Moor nicht verlassen, {playerName}. Bring sie zu Veylas Lager auf den Stufen. Dort wird sie unter den Lichtern sicher sein.",
+        "completion": "Das Mädchen ist drinnen, in die Hälfte meiner Decken gewickelt, und redet den Sternen den Himmel voll. Du hast heute etwas Gutes getan, {playerName}. Davon sieht der Reach nicht viel.",
         "objectives": {
           "0": {
-            "label": "Apprentice Wren seen safely to the Aurora Steps"
+            "label": "Lehrling Wren sicher zu den Aurorastufen gebracht"
           }
         }
       },
       "q_fv_frostmane_tyrant": {
-        "title": "The Frostmane Tyrant",
-        "text": "The howlers were not hunting when they came down the terraces. They were fleeing. A yeti has claimed the high ground, the mountain folk call it the Frostmane, and even the packs will not share a slope with it. It has to end, {playerName}, before winter drives it down to my walls. Bring a friend. Bring two.",
-        "completion": "When the wind dropped last night the whole village heard the silence where the Frostmane used to be. The Reach owes you a debt it will be years in paying, {playerName}. Wear this, and every door in Icemantle is open to you.",
+        "title": "Der Frostmähnen-Tyrann",
+        "text": "Die Heuler jagten nicht, als sie die Terrassen herabkamen. Sie flohen. Ein Yeti hat sich das Hochland angeeignet, das Bergvolk nennt es die Frostmähne, und selbst die Rudel wollen keinen Hang mit ihm teilen. Es muss enden, {playerName}, bevor der Winter es zu meinen Mauern treibt. Bring einen Freund mit. Bring zwei.",
+        "completion": "Als der Wind letzte Nacht nachließ, hörte das ganze Dorf die Stille, wo die Frostmähne einst war. Der Reach schuldet dir eine Schuld, die er Jahre brauchen wird, um sie abzuzahlen, {playerName}. Trag dies, und jede Tür in Icemantle steht dir offen.",
         "objectives": {
           "0": {
-            "label": "The Frostmane slain"
+            "label": "Die Frostmähne erlegt"
           }
         }
       },
       "q_dk_ash_on_the_wind": {
-        "title": "Ash on the Wind",
-        "text": "Look south off the palisade, {playerName}. Those fires in the dunes are not troll cookfires, they are ashbone musters, and every night there are more. The dead come up out of the bonefields with sand still in their teeth. Cut down ten raiders before they cut a road to my gate.",
-        "completion": "Ten fewer blades in the dunes, and the muster fires burned lower last night. My sentries slept, which they have not done in a week. Well cut, {playerName}.",
+        "title": "Asche im Wind",
+        "text": "Blick südlich von der Palisade, {playerName}. Diese Feuer in den Dünen sind keine Kochfeuer der Trolle, es sind Aschenknochen-Aufmärsche, und jede Nacht werden es mehr. Die Toten steigen aus den Knochenfeldern mit Sand noch zwischen den Zähnen. Erlege zehn Plünderer, bevor sie sich einen Weg zu meinem Tor schlagen.",
+        "completion": "Zehn Klingen weniger in den Dünen, und die Aufmarschfeuer brannten letzte Nacht niedriger. Meine Wachen schliefen, was sie seit einer Woche nicht getan hatten. Gut erledigt, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Ashbone Raider slain"
+            "label": "Aschenknochen-Plünderer erlegt"
           }
         }
       },
       "q_dk_trolls_on_the_road": {
-        "title": "Trolls on the Road",
-        "text": "The dune trolls have learned the sound of a supply wagon, {playerName}. They hit the Cinder Dunes road three times this month, and the last driver walked in carrying nothing but the reins. Eight trolls off that road and my wagons roll again.",
-        "completion": "Eight, and my drivers have stopped writing farewell letters before every run. The garrison eats because of you, {playerName}.",
+        "title": "Trolle auf der Straße",
+        "text": "Die Dünentrolle haben gelernt, wie ein Versorgungswagen klingt, {playerName}. Sie schlugen diesen Monat dreimal auf der Aschendünen-Straße zu, und der letzte Fuhrmann kam mit nichts als den Zügeln herein. Acht Trolle weniger auf dieser Straße, und meine Wagen rollen wieder.",
+        "completion": "Acht, und meine Fuhrleute haben aufgehört, vor jeder Fahrt Abschiedsbriefe zu schreiben. Die Garnison isst deinetwegen, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Dune Troll slain"
+            "label": "Dünentroll erlegt"
           }
         }
       },
       "q_dk_scorched_stores": {
-        "title": "Scorched Stores",
-        "text": "The last wagon burned, {playerName}, but iron-strapped crates do not burn through. Four of them are still lying scorched along the dunes road with a season of salt, nails, and bowstrings inside. Bring my stores home before the trolls work out how to open them.",
-        "completion": "Scorched black and every latch still holding. The smith gets his nails, the fletcher her strings, and you get the boots I was saving for whoever brought my crates back, {playerName}.",
+        "title": "Versengte Vorräte",
+        "text": "Der letzte Wagen brannte, {playerName}, aber eisenbeschlagene Kisten brennen nicht durch. Vier davon liegen noch versengt entlang der Dünenstraße, mit einer Saison Salz, Nägeln und Bogensehnen darin. Bring meine Vorräte heim, bevor die Trolle herausfinden, wie man sie öffnet.",
+        "completion": "Schwarz versengt, und jeder Riegel hält noch. Der Schmied bekommt seine Nägel, die Pfeilmacherin ihre Sehnen, und du bekommst die Stiefel, die ich für denjenigen aufgehoben habe, der meine Kisten zurückbringt, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Scorched supply crate recovered"
+            "label": "Versengte Vorratskiste geborgen"
           }
         }
       },
       "q_dk_banners_over_the_dunes": {
-        "title": "Banners over the Dunes",
-        "text": "The ashbone muster at the old bonefield graves, {playerName}, and my patrols cannot read the dunes the way they read a wall. Kill five of their warcallers, the ones that scream the dead upright, and plant a warning banner on each muster ground so my sentries can mark it from the ridge.",
-        "completion": "Three banners snapping in the hot wind, right where my glass can find them. With five warcallers silenced, whatever answers their call will come slower. You bought us time, {playerName}.",
+        "title": "Banner über den Dünen",
+        "text": "Die Aschenknochen versammeln sich an den alten Knochenfeldgräbern, {playerName}, und meine Patrouillen können die Dünen nicht lesen, wie sie eine Mauer lesen. Töte fünf ihrer Kriegsrufer, jene, die die Toten aufrecht schreien, und pflanze auf jedem Aufmarschgelände ein Warnbanner, damit meine Wachen es vom Grat aus markieren können.",
+        "completion": "Drei Banner flattern im heißen Wind, genau dort, wo mein Fernrohr sie finden kann. Mit fünf zum Schweigen gebrachten Kriegsrufern wird das, was auf ihren Ruf antwortet, langsamer kommen. Du hast uns Zeit erkauft, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Ashbone Warcaller slain"
+            "label": "Aschenknochen-Kriegsrufer erlegt"
           },
           "1": {
-            "label": "Warning banner planted"
+            "label": "Warnbanner gepflanzt"
           }
         }
       },
       "q_dk_watcher_at_the_wargate": {
-        "title": "The Watcher at the Wargate",
-        "text": "Something is pulling the ashbone east, {playerName}, and I sent my best to learn what. Scout Yerrin has camped a month in the far dunes past Trollmoot, in sight of a gate nobody built in my lifetime. Her reports stopped ten days ago. Find her camp and get me her eyes.",
-        "completion": "Brannoc sent you? Then my last runner never made it. Keep your voice down and sit, {playerName}. You see that gate below? Count the war-banners in front of it, and you will understand why I stopped writing things down.",
+        "title": "Der Wächter am Kriegstor",
+        "text": "Etwas zieht die Aschenknochen nach Osten, {playerName}, und ich schickte meinen Besten los, um herauszufinden, was. Späherin Yerrin hat einen Monat lang in den fernen Dünen hinter dem Trollmoot gelagert, in Sichtweite eines Tores, das niemand zu meinen Lebzeiten erbaut hat. Ihre Berichte blieben vor zehn Tagen aus. Finde ihr Lager und bring mir ihre Augen.",
+        "completion": "Brannoc hat dich geschickt? Dann hat es mein letzter Bote nie geschafft. Sprich leise und setz dich, {playerName}. Siehst du das Tor da unten? Zähl die Kriegsbanner davor, und du wirst verstehen, warum ich aufgehört habe, Dinge aufzuschreiben.",
         "objectives": {
           "0": {
-            "label": "Find Scout Yerrin"
+            "label": "Späherin Yerrin finden"
           }
         }
       },
       "q_dk_marrow_and_ash": {
-        "title": "Marrow and Ash",
-        "text": "Every ashbone raider carries a war-brand, {playerName}: a scorched tally of the host it marches under. I have counted four hosts from this ridge, but guesses are not intelligence. Bring me six brands off the raiders and their warcallers, and I will give Brannoc the shape of the war that is coming.",
-        "completion": "Six brands, and one mark burned into every one of them. This is no raid muster, {playerName}. Every host in the dunes answers to the wargate below us, the trolls call it Orkadia, and no five soldiers I ever served with could break what drums behind that door. Perhaps five like you.",
+        "title": "Mark und Asche",
+        "text": "Jeder Aschenknochen-Plünderer trägt eine Kriegsklinge, {playerName}: eine versengte Zählmarke des Heeres, unter dem er marschiert. Ich habe von diesem Grat aus vier Heere gezählt, aber Vermutungen sind keine Aufklärung. Bring mir sechs Klingen von den Plünderern und ihren Kriegsrufern, und ich werde Brannoc die Gestalt des kommenden Krieges geben.",
+        "completion": "Sechs Klingen, und in jede von ihnen ein Zeichen gebrannt. Das ist kein Überfallsaufmarsch, {playerName}. Jedes Heer in den Dünen antwortet auf das Kriegstor unter uns, die Trolle nennen es Orkadia, und keine fünf Soldaten, mit denen ich je gedient habe, könnten aufbrechen, was hinter dieser Tür trommelt. Vielleicht fünf wie dich.",
         "objectives": {
           "0": {
-            "label": "Ashbone War-Brand"
+            "label": "Aschenknochen-Kriegsklinge"
           }
         }
       },
       "q_dk_scales_of_the_maw": {
-        "title": "Scales of the Maw",
-        "text": "When the wind turns off the Drakemaw, the emberwing drakes ride it over my camp low enough to count their teeth, {playerName}. They range farther every day, and something in that crater drives them. Bring me three of their scales. Scales remember heat, and I can read where a drake has been roosting by the burn.",
-        "completion": "Look at the underside of this one, {playerName}: scorched in a spiral, and only one thing nests in circles. These drakes are brood-guards. Something in the Drakemaw is a mother.",
+        "title": "Schuppen des Rachens",
+        "text": "Wenn der Wind vom Drakenrachen dreht, reiten die Glutschwingen-Drachen so tief über mein Lager, dass ich ihre Zähne zählen kann, {playerName}. Sie streifen jeden Tag weiter, und etwas in diesem Krater treibt sie an. Bring mir drei ihrer Schuppen. Schuppen erinnern sich an Hitze, und ich kann an der Verbrennung ablesen, wo ein Drache genächtigt hat.",
+        "completion": "Sieh dir die Unterseite von dieser hier an, {playerName}: spiralförmig versengt, und nur eine Sache nistet in Kreisen. Diese Drachen sind Brutwächter. Etwas im Drakenrachen ist eine Mutter.",
         "objectives": {
           "0": {
-            "label": "Emberwing Scale"
+            "label": "Glutschwingen-Schuppe"
           }
         }
       },
       "q_dk_matriarch_of_the_maw": {
-        "title": "Matriarch of the Maw",
-        "text": "The scales told it true, {playerName}. I climbed the rim at dawn and saw her on the crater floor: Cindraleth, the matriarch every emberwing in this sky was hatched under, gold as a coal about to catch. While she broods, the drakes grow bolder, and Wyrmwatch cannot fight dragons and the ashbone both. End her in her crater, then carry the word to Gatecaptain Brannoc. Do not go alone.",
-        "completion": "The sky over the Drakemaw has been empty for two days, and now you walk through my gate with a matriarch's blood on your boots. Wyrmwatch has stood forty years on watch for exactly this, {playerName}. Take these pauldrons, mawscale, worked by our own smith. Wear them where the drakes can see.",
+        "title": "Matriarchin des Rachens",
+        "text": "Die Schuppen sagten die Wahrheit, {playerName}. Ich erklomm bei Morgengrauen den Kraterrand und sah sie auf dem Kraterboden: Cindraleth, die Matriarchin, unter der jede Glutschwinge an diesem Himmel geschlüpft ist, golden wie eine Kohle kurz vorm Entflammen. Solange sie brütet, werden die Drachen kühner, und Wyrmwacht kann nicht Drachen und Aschenknochen zugleich bekämpfen. Beende sie in ihrem Krater, und trage dann das Wort zu Torhauptmann Brannoc. Geh nicht allein.",
+        "completion": "Der Himmel über dem Drakenrachen war zwei Tage lang leer, und jetzt gehst du durch mein Tor mit dem Blut einer Matriarchin an deinen Stiefeln. Wyrmwacht hat vierzig Jahre lang genau hierfür Wache gehalten, {playerName}. Nimm diese Schulterstücke, Rachenschuppen, von unserem eigenen Schmied gearbeitet. Trag sie, wo die Drachen sie sehen können.",
         "objectives": {
           "0": {
-            "label": "Cindraleth the Maw Matriarch slain"
+            "label": "Cindraleth, die Rachen-Matriarchin, erlegt"
           }
         }
       },
       "q_af_goldmelt_road": {
-        "title": "The Gold Road Down",
-        "text": "You came over the Goldmelt, {playerName}, snow still on your boots. I keep this shrine so Lanternmere knows who walks in from the cold, and lately I have had little to report. Take the gold road down to the town, find Reeve Ottoline by the well, and tell her the pass is quiet.",
-        "completion": "Quiet on the Goldmelt, and a traveler with snow in their hair to prove it. Sorrel keeps her watch too well to send idle word. Be welcome in Lanternmere, {playerName}. The lanterns burn for you.",
+        "title": "Die Goldstraße hinab",
+        "text": "Du kamst über den Goldmelt, {playerName}, noch Schnee an den Stiefeln. Ich hüte diesen Schrein, damit Lanternmere weiß, wer aus der Kälte hereinkommt, und in letzter Zeit hatte ich wenig zu berichten. Nimm die Goldstraße hinab in die Stadt, finde Vogtin Ottoline am Brunnen, und sag ihr, der Pass sei ruhig.",
+        "completion": "Ruhe auf dem Goldmelt, und eine Reisende mit Schnee im Haar als Beweis. Sorrel hält ihre Wache zu gut, um müßige Worte zu senden. Sei willkommen in Lanternmere, {playerName}. Die Laternen brennen für dich.",
         "objectives": {
           "0": {
-            "label": "Report to Reeve Ottoline"
+            "label": "Bei Vogtin Ottoline melden"
           }
         }
       },
       "q_af_foxes_in_the_lamplight": {
-        "title": "Foxes in the Lamplight",
-        "text": "The gloam foxes have learned what the lantern stores are worth, {playerName}. Every dusk they slip the fences and carry off the tallow we press for the ferry lamps. Soft paws, softer conscience. Cull ten of them and the rest will remember to fear the town.",
-        "completion": "Ten, and the stores went untouched last night for the first time this season. The lamplighters send their thanks, {playerName}.",
+        "title": "Füchse im Laternenlicht",
+        "text": "Die Dämmerfüchse haben gelernt, was die Laternenvorräte wert sind, {playerName}. Jede Dämmerung schlüpfen sie durch die Zäune und tragen den Talg davon, den wir für die Fährlampen pressen. Weiche Pfoten, weicheres Gewissen. Erlege zehn von ihnen, und die übrigen werden sich daran erinnern, die Stadt zu fürchten.",
+        "completion": "Zehn, und die Vorräte blieben letzte Nacht zum ersten Mal in dieser Saison unberührt. Die Laternenanzünder senden dir ihren Dank, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Gloam Fox slain"
+            "label": "Dämmerfuchs erlegt"
           }
         }
       },
       "q_af_lanterns_on_the_water": {
-        "title": "Lanterns on the Water",
-        "text": "Every ferry on the Mere carries a stern lantern, {playerName}, and three of my boats came back at dawn without theirs. The fog took them, or something in the fog did. They wash up along the east shore when the wind turns. Walk the shore road and bring my lanterns home.",
-        "completion": "All three, and still burning. Ferry lanterns do not go out in water, {playerName}. That is the point of them. What worries me is what pulled them loose.",
+        "title": "Laternen auf dem Wasser",
+        "text": "Jede Fähre auf dem See trägt eine Hecklaterne, {playerName}, und drei meiner Boote kehrten bei Morgengrauen ohne ihre zurück. Der Nebel nahm sie, oder etwas im Nebel tat es. Sie schwemmen ans Ostufer, wenn der Wind dreht. Geh die Uferstraße entlang und bring meine Laternen heim.",
+        "completion": "Alle drei, und noch immer brennend. Fährlaternen erlöschen nicht im Wasser, {playerName}. Das ist ja der Sinn von ihnen. Was mich beunruhigt, ist, was sie losgerissen hat.",
         "objectives": {
           "0": {
-            "label": "Ferry Lantern recovered"
+            "label": "Fährlaterne geborgen"
           }
         }
       },
       "q_af_orchard_call": {
-        "title": "A Cart for the Orchard",
-        "text": "Orchardist Pomeline keeps the Gilded Orchard on the west road, and her sap carts are three days overdue. The whole town runs on that amber sap, {playerName}: lamp resin, sweetening, the harvest ale. Walk the west road and find out what keeps her.",
-        "completion": "The Reeve counts her carts, does she? Well, she can count them missing a while longer. Look at my rows, {playerName}. I have greater troubles than a late delivery.",
+        "title": "Ein Karren für den Obstgarten",
+        "text": "Obstgärtnerin Pomeline hütet den Vergoldeten Obstgarten an der Weststraße, und ihre Saftkarren sind drei Tage überfällig. Die ganze Stadt läuft auf diesem Bernsteinsaft, {playerName}: Lampenharz, Süßung, das Erntebier. Geh die Weststraße entlang und finde heraus, was sie aufhält.",
+        "completion": "Die Vogtin zählt ihre Karren, ja? Nun, sie kann sie noch eine Weile als fehlend zählen. Sieh dir meine Reihen an, {playerName}. Ich habe größere Sorgen als eine späte Lieferung.",
         "objectives": {
           "0": {
-            "label": "Find Orchardist Pomeline"
+            "label": "Obstgärtnerin Pomeline finden"
           }
         }
       },
       "q_af_amber_from_the_herd": {
-        "title": "Amber off the Herd",
-        "text": "The gilded stags bed down beneath my oldest trees, and the sap drips gold into their coats all night. Combed clots of it are the purest amber in the weald. Bring me six, {playerName}. The stags will not thank you, but they will not miss it either.",
-        "completion": "Six clots, clean as poured honey. These gloves are stitched with the last batch, {playerName}: sap-stiffened, and warmer than they look.",
+        "title": "Bernstein von der Herde",
+        "text": "Die vergoldeten Hirsche lagern unter meinen ältesten Bäumen, und der Saft tropft die ganze Nacht golden in ihr Fell. Ausgekämmte Klumpen davon sind der reinste Bernstein im Weald. Bring mir sechs, {playerName}. Die Hirsche werden es dir nicht danken, aber sie werden es auch nicht vermissen.",
+        "completion": "Sechs Klumpen, rein wie gegossener Honig. Diese Handschuhe sind mit der letzten Charge genäht, {playerName}: harzversteift, und wärmer, als sie aussehen.",
         "objectives": {
           "0": {
-            "label": "Gilded Sap Clot"
+            "label": "Vergoldeter Harzklumpen"
           }
         }
       },
       "q_af_what_took_the_moorings": {
-        "title": "What Took the Moorings",
-        "text": "Now I will tell you what I did not say in front of the town. The moorings were not slipped, they were bitten through. Mere lurkers, bolder every night, dragging at the ropes and the rudders. Put eight of them back under the water for good, {playerName}, before a ferryman goes with them.",
-        "completion": "Eight fewer shapes in the shallows, and the crossing ran on time today for the first time in a fortnight. But bold lurkers are driven lurkers, {playerName}. Something beneath the Mere is moving them.",
+        "title": "Was die Vertäuungen nahm",
+        "text": "Jetzt sage ich dir, was ich vor der Stadt nicht gesagt habe. Die Vertäuungen lösten sich nicht, sie wurden durchgebissen. Seelauerer, jede Nacht kühner, zerren an den Seilen und den Rudern. Schick acht von ihnen für immer zurück unter das Wasser, {playerName}, bevor ein Fährmann mit ihnen geht.",
+        "completion": "Acht Gestalten weniger in den Untiefen, und die Überfahrt lief heute zum ersten Mal seit zwei Wochen pünktlich. Doch kühne Lauerer sind getriebene Lauerer, {playerName}. Etwas unter dem See bewegt sie.",
         "objectives": {
           "0": {
-            "label": "Mere Lurker slain"
+            "label": "Seelauerer erlegt"
           }
         }
       },
       "q_af_sprites_and_spigots": {
-        "title": "Sprites and Spigots",
-        "text": "Harvest sprites, {playerName}. They pry my sap-taps from the trunks for the sweetness inside and fling the buckets into the grass. Drive off eight of the little thieves and bring back four of my buckets, and the carts roll again.",
-        "completion": "Four buckets back on their hooks and the rows gone quiet. You have a heavier hand with sprites than I do, {playerName}, and today I am glad of it.",
+        "title": "Wichte und Zapfhähne",
+        "text": "Erntewichte, {playerName}. Sie brechen meine Zapfhähne aus den Stämmen wegen der Süße darin und schleudern die Eimer ins Gras. Vertreibe acht der kleinen Diebe und bring vier meiner Eimer zurück, und die Karren rollen wieder.",
+        "completion": "Vier Eimer wieder an ihren Haken, und die Reihen sind ruhig geworden. Du hast eine härtere Hand mit Wichten als ich, {playerName}, und heute bin ich froh darüber.",
         "objectives": {
           "0": {
-            "label": "Harvest Sprite driven off"
+            "label": "Erntewicht vertrieben"
           },
           "1": {
-            "label": "Sap-Tap Bucket recovered"
+            "label": "Harzzapf-Eimer geborgen"
           }
         }
       },
       "q_af_the_meredark": {
-        "title": "The Meredark",
-        "text": "The old ferrymen have a name they only say ashore: the Meredark, the first lurker, old as the lake and twice as patient. It rose once before, the year the drowned jetty went under, and it is rising now. At dusk it suns itself on the jetty ruin off the south shore, {playerName}. Take a friend, take two, and end it while it can still be ended.",
-        "completion": "The fog lifted off the Mere this morning, {playerName}, and the whole town saw it. The ferries will run the night crossing again, and every lantern on the water will burn in your name. Take this: it was dredged from the drowned jetty, and no one has better right to wear it.",
+        "title": "Der Seedunkel",
+        "text": "Die alten Fährleute haben einen Namen, den sie nur an Land aussprechen: der Seedunkel, der erste Lauerer, alt wie der See und doppelt so geduldig. Er erhob sich schon einmal, in dem Jahr, als der versunkene Steg unterging, und er erhebt sich jetzt wieder. Bei Dämmerung sonnt er sich auf der Stegruine vor dem Südufer, {playerName}. Nimm einen Freund mit, nimm zwei, und beende es, solange es noch beendet werden kann.",
+        "completion": "Der Nebel hob sich heute Morgen vom See, {playerName}, und die ganze Stadt sah es. Die Fähren werden die Nachtüberfahrt wieder fahren, und jede Laterne auf dem Wasser wird in deinem Namen brennen. Nimm dies: Es wurde aus dem versunkenen Steg geborgen, und niemand hat mehr Recht, es zu tragen.",
         "objectives": {
           "0": {
-            "label": "The Meredark slain"
+            "label": "Der Seedunkel erlegt"
           }
         }
       },
       "q_wf_across_the_fenway": {
-        "title": "Across the Fenway",
-        "text": "A gentle country, the Willowfen, but gentle is not the same as safe, {playerName}. Follow the road north to the Fenway causeway and cross into Bridgemere. Tell Bridgewright Alden the Steps are open and the waycamp fire is lit.",
-        "completion": "Pell keeps that fire burning through every fog the fen can breathe at her. If she says the Steps are open, they are open. Welcome to Bridgemere, {playerName}. Watch your step on my planks and we will get along fine.",
+        "title": "Über den Fenway",
+        "text": "Ein sanftes Land, die Willowfen, doch sanft ist nicht dasselbe wie sicher, {playerName}. Folge der Straße nach Norden zum Fenway-Damm und überquere ihn nach Bridgemere. Sag Brückenbaumeister Alden, die Stufen seien offen und das Wegelagerfeuer brenne.",
+        "completion": "Pell hält dieses Feuer durch jeden Nebel brennend, den das Moor ihr entgegenatmet. Wenn sie sagt, die Stufen sind offen, dann sind sie offen. Willkommen in Bridgemere, {playerName}. Achte auf deinen Schritt auf meinen Planken, und wir werden gut miteinander auskommen.",
         "objectives": {
           "0": {
-            "label": "Report to Bridgewright Alden"
+            "label": "Bei Brückenbaumeister Alden melden"
           }
         }
       },
       "q_wf_rope_chewers": {
-        "title": "The Rope-Chewers",
-        "text": "Bogtoads, {playerName}. They haul up out of the moat at night and chew through my mooring ropes like they were reed stems. Three skiffs went drifting last week, and one of them had my good winch aboard. Thin them out, ten of the fat things, and the boats stay where we tie them.",
-        "completion": "Ten fewer sets of teeth in my moat. The skiffs sat their moorings all night for the first time in a month, {playerName}. You have the thanks of every netter in town.",
+        "title": "Die Seilkauer",
+        "text": "Sumpfkröten, {playerName}. Sie kriechen nachts aus dem Graben und kauen sich durch meine Vertäuungsseile, als wären es Schilfhalme. Drei Kähne trieben letzte Woche ab, und einer von ihnen hatte meine gute Winde an Bord. Dünne sie aus, zehn der fetten Dinger, und die Boote bleiben, wo wir sie festmachen.",
+        "completion": "Zehn Sätze Zähne weniger in meinem Graben. Die Kähne blieben zum ersten Mal seit einem Monat die ganze Nacht an ihrer Vertäuung, {playerName}. Du hast den Dank jedes Netzers in der Stadt.",
         "objectives": {
           "0": {
-            "label": "Bogtoad slain"
+            "label": "Sumpfkröte erlegt"
           }
         }
       },
       "q_wf_eels_for_the_smokehouse": {
-        "title": "Eels for the Smokehouse",
-        "text": "The bogtoads are not just eating my ropes, {playerName}, they are eating my catch: they gulp the eels down whole, straight out of the traps. Cut six plump ones free of the greedy things before the meat spoils, and the smokehouse fires stay lit.",
-        "completion": "Six good eels, barely bruised. The smokehouse will smell like money by morning. Here, these waders were mine when I was quicker: eelskin turns the wet like nothing else.",
+        "title": "Aale für das Räucherhaus",
+        "text": "Die Sumpfkröten fressen nicht nur meine Seile, {playerName}, sie fressen meinen Fang: Sie schlingen die Aale ganz herunter, direkt aus den Fallen. Schneide sechs pralle davon frei von den gierigen Dingern, bevor das Fleisch verdirbt, und die Räucherhausfeuer bleiben brennen.",
+        "completion": "Sechs gute Aale, kaum angeschlagen. Das Räucherhaus wird bis zum Morgen nach Geld riechen. Hier, diese Watstiefel gehörten mir, als ich noch schneller war: Aalhaut hält die Nässe ab wie nichts sonst.",
         "objectives": {
           "0": {
-            "label": "Plump Fen Eel"
+            "label": "Praller Moor-Aal"
           }
         }
       },
       "q_wf_mind_the_moorings": {
-        "title": "Mind the Moorings",
-        "text": "Good rope is dear out here, {playerName}: every line the toads bite through is a week of eel-money gone. The cut ends are still lying along the moat shore where the boats slipped them. Walk the boardwalks and bring me back four lines, and I can splice them good as new.",
-        "completion": "Look at that: clean bites, every one, but there is rope enough left to splice. You have saved me a month of coin and the netters a month of grumbling, {playerName}.",
+        "title": "Achte auf die Vertäuungen",
+        "text": "Gutes Seil ist hier draußen teuer, {playerName}: jede Leine, die die Kröten durchbeißen, ist eine Woche Aalgeld dahin. Die durchtrennten Enden liegen noch am Grabenufer, wo die Boote sie verloren haben. Geh die Bohlenwege entlang und bring mir vier Leinen zurück, und ich kann sie gut wie neu spleißen.",
+        "completion": "Sieh dir das an: saubere Bisse, jede einzelne, aber genug Seil übrig zum Spleißen. Du hast mir einen Monat Münze und den Netzern einen Monat Gemurre erspart, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Cut Mooring Line recovered"
+            "label": "Durchtrennte Festmacherleine geborgen"
           }
         }
       },
       "q_wf_witch_of_willowweep": {
-        "title": "The Witch of Willowweep",
-        "text": "You have heard it by now, {playerName}: the snore. Slow and heavy, out past the Drowsy Flats, like the fen itself turning over in its sleep. The toads, the sprites, the wisps burning at noon: it all started when that sound did. One soul might know what it is. Mother Sedge keeps a camp at Willowweep, west around the moat and down the far shore. Find her, and ask her what sleeps at the middle of my fen.",
-        "completion": "Alden sent you all this way to ask about the snoring? Then the bridge-folk are finally listening. Sit down out of the damp, {playerName}. That sound has a name, and a throat, and I have been waiting for someone fool enough to help me quiet it.",
+        "title": "Die Hexe von Willowweep",
+        "text": "Du hast es inzwischen gehört, {playerName}: das Schnarchen. Langsam und schwer, draußen hinter den Schläfrigen Ebenen, als würde sich das Moor selbst im Schlaf umdrehen. Die Kröten, die Wichte, die Irrlichter, die am Mittag brennen: alles begann, als dieser Klang begann. Eine Seele könnte wissen, was es ist. Mutter Sedge hält ein Lager bei Willowweep, westlich um den Graben und das ferne Ufer hinab. Finde sie, und frag sie, was in der Mitte meines Moors schläft.",
+        "completion": "Alden hat dich den ganzen Weg geschickt, um nach dem Schnarchen zu fragen? Dann hört das Brückenvolk endlich zu. Setz dich, weg von der Feuchtigkeit, {playerName}. Dieser Klang hat einen Namen, und eine Kehle, und ich habe auf jemanden gewartet, der töricht genug ist, mir zu helfen, ihn zum Schweigen zu bringen.",
         "objectives": {
           "0": {
-            "label": "Find Mother Sedge"
+            "label": "Mutter Sedge finden"
           }
         }
       },
       "q_wf_toll_and_tangle": {
-        "title": "Toll and Tangle",
-        "text": "The willow sprites think it is a fine game to cut a ferry loose, {playerName}, and last week the toll skiff went over on the east track with a season of bridge-toll aboard. The chests went down in the shallows and the sprites dance on the boardwalks like they own them. Drive off eight and haul up three toll-chests, and Bridgemere eats this winter.",
-        "completion": "Three chests, and the coin still dry inside. The sprites will sulk in the withies for a week, {playerName}, and the town owes you its winter bread.",
+        "title": "Zoll und Gewirr",
+        "text": "Die Weidenwichte halten es für ein feines Spiel, eine Fähre loszuschneiden, {playerName}, und letzte Woche kenterte der Zollkahn auf der Ostroute mit einer Saison Brückenzoll an Bord. Die Truhen sanken in den Untiefen, und die Wichte tanzen auf den Bohlenwegen, als gehörten sie ihnen. Vertreibe acht und hol drei Zolltruhen herauf, und Bridgemere isst diesen Winter.",
+        "completion": "Drei Truhen, und die Münzen noch trocken darin. Die Wichte werden eine Woche lang in den Weidenruten schmollen, {playerName}, und die Stadt schuldet dir ihr Winterbrot.",
         "objectives": {
           "0": {
-            "label": "Willow Sprite driven off"
+            "label": "Weidenwicht vertrieben"
           },
           "1": {
-            "label": "Toll-Chest recovered"
+            "label": "Zolltruhe geborgen"
           }
         }
       },
       "q_wf_wisplight_charms": {
-        "title": "Wisplight Charms",
-        "text": "The wisps over the pools are the fen dreaming out loud, {playerName}, and their light is the only thing that holds against the Croaker's lull. I weave it into willow charms: one round your neck and the snore cannot drag your eyelids down. Bring me six wisplight globes. The wisps will not fight you for them, which makes it a kindness or a theft, depending on how you carry it.",
-        "completion": "Six globes, still warm with dreaming. Give me till moonrise and I will have charms woven for you and whoever is brave enough to stand beside you.",
+        "title": "Irrlicht-Amulette",
+        "text": "Die Irrlichter über den Tümpeln sind das Moor, das laut träumt, {playerName}, und ihr Licht ist das Einzige, das gegen das Wiegenlied des Quakers standhält. Ich webe es in Weidenamulette: eines um deinen Hals, und das Schnarchen kann deine Lider nicht herabziehen. Bring mir sechs Irrlichtkugeln. Die Irrlichter werden nicht um sie kämpfen, was es zu einer Gnade oder einem Diebstahl macht, je nachdem, wie du es trägst.",
+        "completion": "Sechs Kugeln, noch warm vom Träumen. Gib mir bis zum Mondaufgang, und ich werde Amulette gewoben haben für dich und jeden, der mutig genug ist, an deiner Seite zu stehen.",
         "objectives": {
           "0": {
-            "label": "Wisplight Globe"
+            "label": "Irrlichtkugel"
           }
         }
       },
       "q_wf_croakers_hush": {
-        "title": "The Croaker's Hush",
-        "text": "Now you know the snorer's name, {playerName}: the Drowsy Croaker, the old toad-king out on the Drowsy Flats. Every year his croak grows heavier, and every year more of the fen forgets to wake. The charms will keep your eyes open, but his bulk is another matter: bring a friend, and do not fight him in the water. Put the old king to a quieter sleep.",
-        "completion": "Listen, {playerName}. Nothing. The first true silence over this fen in thirty years, and half the town will not sleep tonight for the strangeness of it. The willows say thank you, in their way. Wear this, woven from his own lily-bed, and the fen will know you for a friend wherever the water reaches.",
+        "title": "Die Stille des Quakers",
+        "text": "Jetzt kennst du den Namen des Schnarchers, {playerName}: der Schläfrige Quaker, der alte Krötenkönig draußen auf den Schläfrigen Ebenen. Jedes Jahr wird sein Quaken schwerer, und jedes Jahr vergisst mehr vom Moor aufzuwachen. Die Amulette werden deine Augen offen halten, aber seine Wucht ist eine andere Sache: bring einen Freund mit, und kämpfe nicht im Wasser gegen ihn. Leg den alten König in einen ruhigeren Schlaf.",
+        "completion": "Horch, {playerName}. Nichts. Die erste wahre Stille über diesem Moor seit dreißig Jahren, und die halbe Stadt wird heute Nacht vor lauter Fremdheit nicht schlafen. Die Weiden sagen Dank, auf ihre Art. Trag dies, gewoben aus seinem eigenen Lilienbeet, und das Moor wird dich als Freund erkennen, wohin auch das Wasser reicht.",
         "objectives": {
           "0": {
-            "label": "The Drowsy Croaker slain"
+            "label": "Der Schläfrige Quaker erlegt"
           }
         }
       },
       "q_nb_road_of_lanterns": {
-        "title": "The Road of Lanterns",
-        "text": "Up here the sun never follows, {playerName}, only the lamps I keep lit along the climb. Moonrest lies north where the flower-light gathers. Find Lira Dewsong among her gardens and tell her the Nightgate lamps still burn.",
-        "completion": "The lamps still burn, and the road still carries strangers to us. Sorrel has kept that gate longer than anyone in Moonrest remembers. Welcome, {playerName}, to the realm that never dawns.",
+        "title": "Die Straße der Laternen",
+        "text": "Hier oben folgt die Sonne nie, {playerName}, nur die Lampen, die ich entlang des Aufstiegs brennend halte. Moonrest liegt im Norden, wo sich das Blütenlicht sammelt. Finde Lira Dewsong in ihren Gärten und sag ihr, die Lampen des Nachttors brennen noch.",
+        "completion": "Die Lampen brennen noch, und die Straße trägt uns noch immer Fremde zu. Sorrel hütet dieses Tor länger, als sich irgendjemand in Moonrest erinnert. Willkommen, {playerName}, im Reich, das nie dämmert.",
         "objectives": {
           "0": {
-            "label": "Find Lira Dewsong in Moonrest"
+            "label": "Lira Dewsong in Moonrest finden"
           }
         }
       },
       "q_nb_striders_in_the_dark": {
-        "title": "Striders in the Dark",
-        "text": "The gloam striders were always patient hunters, {playerName}, but of late they slip right into the flower beds and take moonfleece lambs beneath our lanterns. Cull ten of them and give the downs back their quiet.",
-        "completion": "Ten striders fewer, and the herds already graze easier. The gardens keep their own hours, but tonight they keep them in peace.",
+        "title": "Schreiter im Dunkeln",
+        "text": "Die Dämmerschreiter waren immer geduldige Jäger, {playerName}, doch in letzter Zeit schleichen sie sich direkt in die Blumenbeete und nehmen Mondvlies-Lämmer unter unseren Laternen. Erlege zehn von ihnen und gib den Hügeln ihre Ruhe zurück.",
+        "completion": "Zehn Schreiter weniger, und die Herden weiden schon ruhiger. Die Gärten halten ihre eigenen Stunden, doch heute Nacht halten sie sie in Frieden.",
         "objectives": {
           "0": {
-            "label": "Gloam Strider slain"
+            "label": "Dämmerschreiter erlegt"
           }
         }
       },
       "q_nb_wool_by_moonlight": {
-        "title": "Wool by Moonlight",
-        "text": "Nothing warms like moonfleece, {playerName}, and nothing spins so fine. The grazers carry their silver wool loose in tufts as they drift the downs. Bring me six good tufts off the herds and I will weave you something worth the walking.",
-        "completion": "Silver as starlight and twice as soft. Here, {playerName}: mitts from the last batch, lined the way only moonfleece lines.",
+        "title": "Wolle bei Mondlicht",
+        "text": "Nichts wärmt wie Mondvlies, {playerName}, und nichts spinnt sich so fein. Die Weidetiere tragen ihre silberne Wolle lose in Büscheln, während sie über die Hügel ziehen. Bring mir sechs gute Büschel von den Herden, und ich webe dir etwas, das den Weg wert ist.",
+        "completion": "Silbern wie Sternenlicht und doppelt so weich. Hier, {playerName}: Handschuhe aus der letzten Charge, gefüttert, wie nur Mondvlies füttert.",
         "objectives": {
           "0": {
-            "label": "Moonfleece Tuft"
+            "label": "Mondvlies-Büschel"
           }
         }
       },
       "q_nb_night_gardens": {
-        "title": "The Night Gardens",
-        "text": "The nightbloom opens only under this sky, and Gloamfield holds the oldest beds in the realm. I need four fresh blossoms for the shrine garlands, {playerName}. Cut them gently: a bed remembers a rough hand for a season.",
-        "completion": "Still glowing, every petal. The shrine will smell of night for a week, and Moonrest sleeps easier for it.",
+        "title": "Die Nachtgärten",
+        "text": "Die Nachtblüte öffnet sich nur unter diesem Himmel, und Dämmerfeld birgt die ältesten Beete des Reichs. Ich brauche vier frische Blüten für die Schreingirlanden, {playerName}. Schneide sie sanft: Ein Beet erinnert sich eine ganze Jahreszeit lang an eine grobe Hand.",
+        "completion": "Noch immer leuchtend, jedes Blütenblatt. Der Schrein wird eine Woche lang nach Nacht duften, und Moonrest schläft dafür ruhiger.",
         "objectives": {
           "0": {
-            "label": "Nightbloom Blossom gathered"
+            "label": "Nachtblüte gesammelt"
           }
         }
       },
       "q_nb_eyes_on_the_vigil": {
-        "title": "Eyes on the Vigil",
-        "text": "Something has the striders bold and the herds uneasy, {playerName}, and I cannot read it in the flowers. Cassian can read it in the sky. He keeps his observatory camp by the Standing Vigil east of here, where the nightkin drift among the stones. Find him, and ask what the stars are saying.",
-        "completion": "Lira sent you? Then the gardens feel it too. Sit by the glass a moment, {playerName}. The stars have been restless for a month, and every chart I draw leans north toward the barrow.",
+        "title": "Augen auf die Wache",
+        "text": "Etwas macht die Schreiter kühn und die Herden unruhig, {playerName}, und ich kann es nicht in den Blumen lesen. Cassian kann es im Himmel lesen. Er hält sein Observatoriumslager bei der Immerwährenden Wache östlich von hier, wo das Nachtvolk zwischen den Steinen umherzieht. Finde ihn, und frag, was die Sterne sagen.",
+        "completion": "Lira hat dich geschickt? Dann spüren es die Gärten auch. Setz dich einen Moment neben das Fernrohr, {playerName}. Die Sterne sind seit einem Monat unruhig, und jede Karte, die ich zeichne, neigt sich nach Norden zum Grabhügel.",
         "objectives": {
           "0": {
-            "label": "Find Astronomer Cassian at the Standing Vigil"
+            "label": "Astronom Cassian bei der Immerwährenden Wache finden"
           }
         }
       },
       "q_nb_charts_of_the_stones": {
-        "title": "The Charts in the Stones",
-        "text": "The Vigil stones are older than Moonrest, older than the nightkin who tend them, and their faces are cut with star charts I have spent my life learning to read. The sky has shifted, {playerName}, and I must know how far. Read the charts on three of the stones and bring me their bearings.",
-        "completion": "No doubt is left. Every bearing has crept toward the Sleepless Barrow, as if the sky itself leans over that mound to watch. The old kings were buried under aligned stars for a reason, {playerName}.",
+        "title": "Die Karten in den Steinen",
+        "text": "Die Wachtsteine sind älter als Moonrest, älter als das Nachtvolk, das sie pflegt, und ihre Flächen sind mit Sternenkarten geschnitten, die zu lesen ich mein Leben verbracht habe zu lernen. Der Himmel hat sich verschoben, {playerName}, und ich muss wissen, wie weit. Lies die Karten auf drei der Steine und bring mir ihre Peilungen.",
+        "completion": "Kein Zweifel bleibt. Jede Peilung ist zum Schlaflosen Grabhügel gekrochen, als würde sich der Himmel selbst über diesen Hügel beugen, um zu wachen. Die alten Könige wurden nicht ohne Grund unter ausgerichteten Sternen begraben, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Star chart read"
+            "label": "Sternenkarte gelesen"
           }
         }
       },
       "q_nb_restless_mounds": {
-        "title": "The Restless Mounds",
-        "text": "The charts were a warning, and the barrow field proves it: the mounds are opening from beneath. Wights walk the grave rows wearing the old honors, and the offerings that kept them sleeping lie scattered in the grass. Put eight of them down, {playerName}, and gather four of the offerings back to me.",
-        "completion": "Grave gold, still cold from the soil. The wights are not rising on their own, {playerName}: something beneath the great mound is calling them out, and I fear the charts have already told us its name.",
+        "title": "Die ruhelosen Hügel",
+        "text": "Die Karten waren eine Warnung, und das Grabhügelfeld beweist es: Die Hügel öffnen sich von unten. Wiedergänger wandeln die Grabreihen entlang, die alten Ehrenzeichen tragend, und die Opfergaben, die sie schlafen hielten, liegen verstreut im Gras. Leg acht von ihnen nieder, {playerName}, und sammle vier der Opfergaben zurück zu mir.",
+        "completion": "Grabgold, noch kalt von der Erde. Die Wiedergänger erheben sich nicht von selbst, {playerName}: Etwas unter dem großen Hügel ruft sie heraus, und ich fürchte, die Karten haben uns seinen Namen bereits verraten.",
         "objectives": {
           "0": {
-            "label": "Barrow Wight slain"
+            "label": "Grabhügel-Wiedergänger erlegt"
           },
           "1": {
-            "label": "Grave offering recovered"
+            "label": "Grabgabe geborgen"
           }
         }
       },
       "q_nb_the_barrow_king": {
-        "title": "The Barrow King Wakes",
-        "text": "Every bearing, every restless star, every opened mound points to one thing: the Barrow King is waking beneath the great mound, and this realm has no dawn to hold him back. He must be put to rest before he remembers his crown, {playerName}. Do not go alone: bring a friend, and keep the flower-light at your back.",
-        "completion": "The stars have settled for the first time in a season, {playerName}. The mounds are closed, the nightkin have gone still at their stones, and the king sleeps below once more. Wear this mantle: Moonrest cut it for whoever the night finally trusted.",
+        "title": "Der Grabhügelkönig erwacht",
+        "text": "Jede Peilung, jeder unruhige Stern, jeder geöffnete Hügel deutet auf eines hin: Der Grabhügelkönig erwacht unter dem großen Hügel, und dieses Reich hat keine Morgenröte, um ihn zurückzuhalten. Er muss zur Ruhe gebettet werden, bevor er sich an seine Krone erinnert, {playerName}. Geh nicht allein: Bring einen Freund mit, und halte das Blütenlicht im Rücken.",
+        "completion": "Die Sterne haben sich zum ersten Mal seit einer Jahreszeit beruhigt, {playerName}. Die Hügel sind geschlossen, das Nachtvolk ist an seinen Steinen still geworden, und der König schläft wieder unten. Trag diesen Umhang: Moonrest schnitt ihn für denjenigen, dem die Nacht endlich vertraute.",
         "objectives": {
           "0": {
-            "label": "The Barrow King put to rest"
+            "label": "Der Grabhügelkönig zur Ruhe gebettet"
           }
         }
       },
       "q_ww_bells_of_gallowmere": {
-        "title": "The Bells of Gallowmere",
-        "text": "Hear that tolling, {playerName}? That is Gallowmere, up the north road, ringing its dead to sleep. Sexton Marrow keeps the count of every soul under the canopy, living and buried. Go and be counted, before the wood counts you itself.",
-        "completion": "Cobb sent you up the road whole, did he? Good man. He has kept those gate lanterns lit for thirty years, and the wood has never once got past him. Welcome to Gallowmere, {playerName}. Mind the bells.",
+        "title": "Die Glocken von Gallowmere",
+        "text": "Hörst du das Läuten, {playerName}? Das ist Gallowmere, die Nordstraße hinauf, das seine Toten in den Schlaf läutet. Küster Marrow führt Buch über jede Seele unter dem Blätterdach, lebend und begraben. Geh und lass dich zählen, bevor der Wald dich selbst zählt.",
+        "completion": "Cobb hat dich unversehrt die Straße hinaufgeschickt, ja? Guter Mann. Er hat diese Torlaternen dreißig Jahre lang brennend gehalten, und der Wald ist nie an ihm vorbeigekommen. Willkommen in Gallowmere, {playerName}. Achte auf die Glocken.",
         "objectives": {
           "0": {
-            "label": "Report to Sexton Marrow"
+            "label": "Bei Küster Marrow melden"
           }
         }
       },
       "q_ww_silk_in_the_eaves": {
-        "title": "Silk in the Eaves",
-        "text": "Look up when you walk the west road, {playerName}, and you will see them: wrapped shapes in the canopy, swaying where no wind reaches. The widowsilk spinners have crept out of the Thicket and strung their larders over my lanterns. Kill ten, and the road is a road again.",
-        "completion": "Ten fewer weavers in the eaves. The lamplighters will walk their rounds tonight without looking up, and that is worth more here than you know.",
+        "title": "Seide im Geäst",
+        "text": "Sieh nach oben, wenn du die Weststraße gehst, {playerName}, und du wirst sie sehen: eingewickelte Gestalten im Blätterdach, schwankend, wo kein Wind hinreicht. Die Witwenseiden-Spinner sind aus dem Dickicht gekrochen und haben ihre Vorratskammern über meinen Laternen aufgespannt. Töte zehn, und die Straße ist wieder eine Straße.",
+        "completion": "Zehn Weber weniger im Geäst. Die Laternenanzünder werden heute Nacht ihre Runden gehen, ohne nach oben zu sehen, und das ist hier mehr wert, als du weißt.",
         "objectives": {
           "0": {
-            "label": "Widowsilk Spinner slain"
+            "label": "Witwenseiden-Spinner erlegt"
           }
         }
       },
       "q_ww_widows_skeins": {
-        "title": "The Widow's Skeins",
-        "text": "The spinners take our dead for their larders, {playerName}, so I take their silk for our shrouds. It burns clean and it holds a blessing better than linen ever did. Bring me six skeins of widowsilk, and the next soul we bury goes down wrapped and warded.",
-        "completion": "Six skeins, soft as a held breath. The dead will lie easier in this. Take these wraps, I sewed them from the last batch, and the wood has never once bitten through them.",
+        "title": "Die Stränge der Witwe",
+        "text": "Die Spinner nehmen unsere Toten für ihre Vorratskammern, {playerName}, also nehme ich ihre Seide für unsere Leichentücher. Sie brennt sauber, und sie hält einen Segen besser, als Leinen es je tat. Bring mir sechs Stränge Witwenseide, und die nächste Seele, die wir begraben, geht eingehüllt und beschützt hinab.",
+        "completion": "Sechs Stränge, weich wie ein angehaltener Atem. Die Toten werden darin ruhiger liegen. Nimm diese Bandagen, ich habe sie aus der letzten Charge genäht, und der Wald hat sich noch nie durch sie hindurchgebissen.",
         "objectives": {
           "0": {
-            "label": "Widowsilk Skein"
+            "label": "Witwenseiden-Strang"
           }
         }
       },
       "q_ww_candles_at_the_bounds": {
-        "title": "Candles at the Bounds",
-        "text": "Four boundary stones ring Gallowmere, {playerName}, one on each road out, and a grave-candle burns on every stone. While they burn, the buried stay buried. The drizzle has drowned them, all four, and I am too old to walk the bounds alone. Take my taper and relight them, quickly.",
-        "completion": "All four burning? Then breathe, {playerName}. You did not hear it, but the whole village did: the bells rang easier the moment the last wick caught.",
+        "title": "Kerzen an den Grenzen",
+        "text": "Vier Grenzsteine umringen Gallowmere, {playerName}, einer an jeder ausgehenden Straße, und auf jedem Stein brennt eine Grabkerze. Solange sie brennen, bleiben die Begrabenen begraben. Der Nieselregen hat sie alle vier ertränkt, und ich bin zu alt, um die Grenzen allein abzugehen. Nimm meine Kerze und entzünde sie neu, schnell.",
+        "completion": "Alle vier brennen? Dann atme durch, {playerName}. Du hast es nicht gehört, aber das ganze Dorf hat es gehört: Die Glocken läuteten leichter in dem Moment, als der letzte Docht Feuer fing.",
         "objectives": {
           "0": {
-            "label": "Grave-candle relit"
+            "label": "Grabkerze neu entzündet"
           }
         }
       },
       "q_ww_the_last_vicar": {
-        "title": "The Last Vicar",
-        "text": "South of here the Mournstone Chapel moulders by its black tarn, and one man still tends it: Vicar Creel, who would not leave when the roof came down. He knows the old rites better than my bells do, {playerName}, and he has not sent word in a month. Walk the chapel road and see him breathing.",
-        "completion": "Marrow worries after me? That is new. Tell him the Mournstone stands, after a fashion, and so do I. Stay a while, {playerName}. The tarn has been whispering, and I would rather not listen alone.",
+        "title": "Der letzte Vikar",
+        "text": "Südlich von hier verfällt die Mournstone-Kapelle an ihrem schwarzen See, und ein Mann pflegt sie noch: Vikar Creel, der nicht gehen wollte, als das Dach einstürzte. Er kennt die alten Riten besser als meine Glocken, {playerName}, und er hat seit einem Monat kein Wort geschickt. Geh die Kapellenstraße entlang und sieh, ob er noch atmet.",
+        "completion": "Marrow sorgt sich um mich? Das ist neu. Sag ihm, der Mournstone stehe noch, auf seine Art, und ich auch. Bleib eine Weile, {playerName}. Der See hat geflüstert, und ich würde lieber nicht allein zuhören.",
         "objectives": {
           "0": {
-            "label": "Find Vicar Creel"
+            "label": "Vikar Creel finden"
           }
         }
       },
       "q_ww_wraiths_of_the_tarn": {
-        "title": "Wraiths of the Tarn",
-        "text": "The wood wraiths were the chapel wardens once, {playerName}, grown from trees planted over the honored dead. Since the tarn turned black they have forgotten their office, and now they drift through my graveyard pulling at the soil. Break eight of them apart before they finish what they have started.",
-        "completion": "Eight wardens laid down at last. I will not call it a mercy in daylight, but between us, {playerName}, it was one.",
+        "title": "Schemen des Sees",
+        "text": "Die Waldschemen waren einst die Kapellenwächter, {playerName}, gewachsen aus Bäumen, die über den geehrten Toten gepflanzt wurden. Seit der See sich schwarz färbte, haben sie ihr Amt vergessen, und jetzt treiben sie durch meinen Friedhof und zerren an der Erde. Zerbrich acht von ihnen, bevor sie vollenden, was sie begonnen haben.",
+        "completion": "Acht Wächter endlich zur Ruhe gelegt. Ich werde es bei Tageslicht keine Gnade nennen, aber unter uns, {playerName}, war es eine.",
         "objectives": {
           "0": {
-            "label": "Wood Wraith slain"
+            "label": "Waldschemen erlegt"
           }
         }
       },
       "q_ww_what_the_bark_holds": {
-        "title": "What the Bark Holds",
-        "text": "In the Hanging Glade east of Gallowmere the spinners hang their silk-wrapped dead from the boughs, and the gravenbark shamblers stand guard beneath like patient pallbearers. Those are our people up there, {playerName}. Break five shamblers, cut down three of the wrapped dead, and bring them home to soil.",
-        "completion": "Three souls back under honest ground before nightfall. The shamblers will grow back, bark always does, but tonight the glade hangs empty, and that is enough.",
+        "title": "Was die Rinde birgt",
+        "text": "In der Hängenden Lichtung östlich von Gallowmere hängen die Spinner ihre seidenumhüllten Toten von den Ästen, und die Grabrinden-Schlurfer stehen darunter Wache wie geduldige Sargträger. Das sind unsere Leute dort oben, {playerName}. Zerbrich fünf Schlurfer, schneide drei der eingewickelten Toten herab, und bring sie heim in die Erde.",
+        "completion": "Drei Seelen zurück unter ehrlicher Erde vor Einbruch der Nacht. Die Schlurfer werden nachwachsen, Rinde tut das immer, aber heute Nacht hängt die Lichtung leer, und das ist genug.",
         "objectives": {
           "0": {
-            "label": "Gravenbark Shambler felled"
+            "label": "Grabrinden-Schlurfer gefällt"
           },
           "1": {
-            "label": "Silkbound remains cut down"
+            "label": "Seidenumhüllte Überreste herabgeschnitten"
           }
         }
       },
       "q_ww_walking_mosley_home": {
-        "title": "Walking Mosley Home",
-        "text": "My gravedigger Mosley took the chapel road three days ago to open a plot in the old yard, and the dig came down on top of him. He clawed his way out, the fool is alive, but he is huddled by the chapel graves and will not move for spinners on the road. Walk him home, {playerName}. I cannot ring the bells for a living man.",
-        "completion": "He came through the gate on his own two feet, swearing he will dig nothing deeper than a turnip bed from now on. He will be back at the yard by Sunday, they always are. Thank you, {playerName}. Gallowmere keeps its people, that is the whole of our law.",
+        "title": "Mosley heimbringen",
+        "text": "Mein Totengräber Mosley nahm vor drei Tagen die Kapellenstraße, um auf dem alten Hof ein Grab auszuheben, und die Grube stürzte über ihm ein. Er hat sich freigekrallt, der Narr lebt, aber er kauert bei den Kapellengräbern und will sich wegen der Spinner auf der Straße nicht bewegen. Bring ihn heim, {playerName}. Ich kann für einen lebenden Mann nicht die Glocken läuten.",
+        "completion": "Er kam auf seinen eigenen zwei Füßen durch das Tor, und schwor, er werde von nun an nichts tiefer graben als ein Rübenbeet. Er wird bis Sonntag wieder auf dem Hof sein, das sind sie immer. Danke, {playerName}. Gallowmere behält sein Volk, das ist unser ganzes Gesetz.",
         "objectives": {
           "0": {
-            "label": "Gravedigger Mosley walked safely back to Gallowmere"
+            "label": "Totengräber Mosley sicher nach Gallowmere zurückgebracht"
           }
         }
       },
       "q_ww_horn_of_the_huntsman": {
-        "title": "The Horn of the Huntsman",
-        "text": "You have heard the horn by now, {playerName}, thin and far off, the sound the whole wood holds its breath for. The Pale Huntsman rides his clearing north of here, and every grave he passes grows shallower. He was a man once, and he was buried wrong, and I am done pretending prayer will do it. Take a friend, take two, and unhorse him.",
-        "completion": "The horn stopped mid-note. Every bell in Gallowmere rang once, on its own, and then the wood went quieter than I have heard it in thirty years. You have done the rite I could not, {playerName}. Wear this, and walk under the canopy unafraid.",
+        "title": "Das Horn des Jägers",
+        "text": "Du hast das Horn inzwischen gehört, {playerName}, dünn und fern, den Klang, für den der ganze Wald den Atem anhält. Der Bleiche Jäger reitet seine Lichtung nördlich von hier, und jedes Grab, an dem er vorbeireitet, wird flacher. Er war einst ein Mann, und er wurde falsch begraben, und ich gebe es auf, so zu tun, als würde ein Gebet reichen. Nimm einen Freund mit, nimm zwei, und wirf ihn vom Pferd.",
+        "completion": "Das Horn hielt mitten im Klang inne. Jede Glocke in Gallowmere läutete einmal, von selbst, und dann wurde der Wald stiller, als ich ihn seit dreißig Jahren gehört habe. Du hast den Ritus vollzogen, den ich nicht konnte, {playerName}. Trag dies, und geh unter dem Blätterdach ohne Furcht.",
         "objectives": {
           "0": {
-            "label": "The Pale Huntsman unhorsed"
+            "label": "Der Bleiche Jäger vom Pferd geworfen"
           }
         }
       },
       "q_pr_down_to_drifthaven": {
-        "title": "Down to Drifthaven",
-        "text": "Out of the black trees and into the sun, {playerName}. Follow the shore road north and you will strike Drifthaven before the tide turns. Ask for Salvage-Boss Ryna, she has work for any pair of hands since the storm, and tell her the Tanglemouth road is still open.",
-        "completion": "Pell sent you? Then you walked the whole Tanglemouth road alone, and that is reference enough for me. Welcome to Drifthaven, {playerName}. Grab a rope, we are short-handed.",
+        "title": "Hinab nach Drifthaven",
+        "text": "Aus den schwarzen Bäumen heraus und in die Sonne, {playerName}. Folge der Uferstraße nach Norden, und du erreichst Drifthaven, bevor die Flut dreht. Frag nach Bergungschefin Ryna, sie hat seit dem Sturm Arbeit für jedes Paar Hände, und sag ihr, die Straße zur Wirrmündung sei noch offen.",
+        "completion": "Pell hat dich geschickt? Dann bist du die ganze Straße zur Wirrmündung allein gegangen, und das ist mir Empfehlung genug. Willkommen in Drifthaven, {playerName}. Schnapp dir ein Seil, wir sind unterbesetzt.",
         "objectives": {
           "0": {
-            "label": "Report to Salvage-Boss Ryna"
+            "label": "Bei Bergungschefin Ryna melden"
           }
         }
       },
       "q_pr_wreck_line_cargo": {
-        "title": "The Wreck Line",
-        "text": "The storm three nights back drove the Pearlwake onto the reef, and her cargo is strewn the whole length of the wreck line between here and the Palmstrand. Three crates of trade goods are still lying in the surf, {playerName}. Bring them in before the tide, or the crabs, claim what is left.",
-        "completion": "Salt-stained but sound, all three. The divers eat this month because of you, {playerName}.",
+        "title": "Die Wracklinie",
+        "text": "Der Sturm vor drei Nächten trieb die Pearlwake auf das Riff, und ihre Fracht liegt über die ganze Länge der Wracklinie zwischen hier und dem Palmenstrand verstreut. Drei Kisten Handelsgüter liegen noch in der Brandung, {playerName}. Bring sie herein, bevor die Flut, oder die Krabben, sich holen, was übrig ist.",
+        "completion": "Salzfleckig, aber unversehrt, alle drei. Die Taucher essen diesen Monat deinetwegen, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Pearlwake Cargo recovered"
+            "label": "Pearlwake-Fracht geborgen"
           }
         }
       },
       "q_pr_scuttler_cull": {
-        "title": "Shellbacked Thieves",
-        "text": "Every wreck on this coast draws the tide scuttlers, and the Pearlwake has drawn half the reef. My salvage crews will not work a line with those claws in the shallows. Crack ten of them, {playerName}, and the wreck line is ours again.",
-        "completion": "Ten fewer claws in the surf. My crews are already wading back out, and not one of them said thank you, so I will: thank you, {playerName}.",
+        "title": "Schalenrückige Diebe",
+        "text": "Jedes Wrack an dieser Küste zieht die Gezeitenkrabbler an, und die Pearlwake hat das halbe Riff angezogen. Meine Bergungsmannschaften werden keine Linie bearbeiten, solange diese Klauen in den Untiefen sind. Zerschlag zehn von ihnen, {playerName}, und die Wracklinie gehört wieder uns.",
+        "completion": "Zehn Klauen weniger in der Brandung. Meine Mannschaften waten schon wieder hinaus, und keine von ihnen hat sich bedankt, also tue ich es: Danke, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Tide Scuttler cracked"
+            "label": "Gezeitenkrabbler zerschlagen"
           }
         }
       },
       "q_pr_boars_in_the_gardens": {
-        "title": "Boars in the Gardens",
-        "text": "Whatever stirs in the deep green, it pushes the thicket boars out onto our strand. They have rooted up the garden terraces twice this week, and they will have the drying racks next. Ten boars, {playerName}, and push the rest back under the trees.",
-        "completion": "The racks stand and the gardens can be replanted. The boars did not choose to come onto the sand, {playerName}. Remember that: something moved them.",
+        "title": "Eber in den Gärten",
+        "text": "Was auch immer sich im tiefen Grün regt, es drängt die Dickichteber auf unseren Strand hinaus. Sie haben die Gartenterrassen diese Woche schon zweimal umgewühlt, und als Nächstes sind die Trockengestelle dran. Zehn Eber, {playerName}, und dräng die übrigen zurück unter die Bäume.",
+        "completion": "Die Gestelle stehen, und die Gärten können neu bepflanzt werden. Die Eber haben sich nicht ausgesucht, auf den Sand zu kommen, {playerName}. Denk daran: Etwas hat sie vertrieben.",
         "objectives": {
           "0": {
-            "label": "Thicket Boar driven off"
+            "label": "Dickichteber vertrieben"
           }
         }
       },
       "q_pr_the_man_who_went_in": {
-        "title": "The Man Who Went In",
-        "text": "The divers will not step past the treeline, {playerName}, and I will not ask them to. You have heard the drums by now: everyone does, by the second night. One man on this island ever walked toward that sound and came back. Okku. He camps under the great banyans at the Vinefall, deep up the Tangle road. Find him, and ask him what the green is hiding.",
-        "completion": "Isha sent you? The Pearl-Mother has not spoken my name in years. Sit out of the vines' reach, {playerName}, and I will tell you what I know: the drums are not the danger. They are the warning.",
+        "title": "Der Mann, der hineinging",
+        "text": "Die Taucher werden die Baumgrenze nicht überschreiten, {playerName}, und ich werde sie nicht darum bitten. Du hast die Trommeln inzwischen gehört: jeder tut das, bis zur zweiten Nacht. Ein Mann auf dieser Insel ist je auf diesen Klang zugegangen und zurückgekommen. Okku. Er lagert unter den großen Banyanbäumen am Rankenfall, tief die Wirrstraße hinauf. Finde ihn, und frag ihn, was das Grün verbirgt.",
+        "completion": "Isha hat dich geschickt? Die Perlenmutter hat meinen Namen seit Jahren nicht mehr ausgesprochen. Setz dich außerhalb der Reichweite der Ranken, {playerName}, und ich werde dir sagen, was ich weiß: Die Trommeln sind nicht die Gefahr. Sie sind die Warnung.",
         "objectives": {
           "0": {
-            "label": "Find Okku at the Vinefall"
+            "label": "Okku am Rankenfall finden"
           }
         }
       },
       "q_pr_canopy_silk": {
-        "title": "Silk from the Canopy",
-        "text": "Look up, {playerName}. Every canopy from here to the idol is webbed like a fishing net, and the weavers grow bolder each season. I string their own silk across the paths, tripline bells, so the jungle cannot creep up on me. Six good hanks off the canopy weavers will restring my lines.",
-        "completion": "Good, strong silk. My bells will sing a while longer, and nothing walks these paths at night without me knowing, {playerName}. Lately, something has been walking often.",
+        "title": "Seide vom Kronendach",
+        "text": "Sieh nach oben, {playerName}. Jedes Kronendach von hier bis zum Idol ist mit Netzen überzogen wie ein Fischernetz, und die Weber werden jede Saison kühner. Ich spanne ihre eigene Seide über die Pfade, Stolperdraht-Glocken, damit sich der Dschungel nicht an mich heranschleichen kann. Sechs gute Stränge von den Kronendachwebern werden meine Leinen neu bespannen.",
+        "completion": "Gute, starke Seide. Meine Glocken werden noch eine Weile singen, und nichts geht nachts diese Pfade, ohne dass ich es weiß, {playerName}. In letzter Zeit geht etwas oft.",
         "objectives": {
           "0": {
-            "label": "Canopy Silk Hank"
+            "label": "Kronendach-Seidenstrang"
           }
         }
       },
       "q_pr_the_lost_navigator": {
-        "title": "The Lost Navigator",
-        "text": "We pulled every hand off the Pearlwake but one: Navigator Suli, who swam for the far strand and never walked in. A diver spotted her holed up in the bow wreckage past the Palmstrand, alive, and too spent to run the gauntlet alone. Walk her home along the shore road, {playerName}. The crabs will not like it, and the jungle likes it less.",
-        "completion": "Suli is by the fire, still swearing she could have swum it. You brought back the only chart-reader on this coast, {playerName}. These are from her sea chest, with her blessing.",
+        "title": "Die verlorene Navigatorin",
+        "text": "Wir haben jede Hand von der Pearlwake gerettet bis auf eine: Navigatorin Suli, die zum fernen Strand schwamm und nie hereinkam. Ein Taucher entdeckte sie, verkrochen im Bugwrack hinter dem Palmenstrand, am Leben, aber zu erschöpft, um den Spießrutenlauf allein zu bestehen. Bring sie die Uferstraße entlang heim, {playerName}. Den Krabben wird es nicht gefallen, und dem Dschungel noch weniger.",
+        "completion": "Suli sitzt am Feuer und schwört immer noch, sie hätte es schwimmend geschafft. Du hast die einzige Kartenleserin an dieser Küste zurückgebracht, {playerName}. Diese hier sind aus ihrer Seetruhe, mit ihrem Segen.",
         "objectives": {
           "0": {
-            "label": "Navigator Suli seen safely to Drifthaven"
+            "label": "Navigatorin Suli sicher nach Drifthaven gebracht"
           }
         }
       },
       "q_pr_what_the_drums_guard": {
-        "title": "What the Drums Guard",
-        "text": "I have walked as near the Sunken Idol as a living man dares, and I saw two things: the weavers have curtained the idol road in web, and the old offering bowls along it have been filled again. Freshly, {playerName}. Cut eight weavers off the road and bring me three of those offerings. I would know what hand still feeds a dead god.",
-        "completion": "Moss, pearl-shell, and boar blood, packed by fingers. Something in that ruin still keeps its rites, {playerName}, and the Guardian keeps everything else out. It is time we spoke of it plainly.",
+        "title": "Was die Trommeln bewachen",
+        "text": "Ich bin so nah an das Versunkene Idol herangegangen, wie ein Lebender es wagt, und ich sah zwei Dinge: Die Weber haben die Idolstraße mit Netzen verhängt, und die alten Opferschalen entlang des Weges wurden erneut gefüllt. Frisch, {playerName}. Häute acht Weber von der Straße und bring mir drei dieser Opfergaben. Ich möchte wissen, welche Hand noch immer einen toten Gott füttert.",
+        "completion": "Moos, Perlmuschel, und Eberblut, von Fingern hineingepackt. Etwas in dieser Ruine hält noch immer seine Riten, {playerName}, und der Wächter hält alles andere fern. Es ist Zeit, dass wir offen darüber sprechen.",
         "objectives": {
           "0": {
-            "label": "Canopy Weaver cut down"
+            "label": "Kronendachweber niedergestreckt"
           },
           "1": {
-            "label": "Refilled Offering Bowl gathered"
+            "label": "Nachgefüllte Opferschale gesammelt"
           }
         }
       },
       "q_pr_idol_guardian": {
-        "title": "The Idol Guardian",
-        "text": "The idol is older than the island, {playerName}. Older than the drums, older than the name Palmreach. Its Guardian has stood in that drowned ring since before the palms grew, and now it wakes and walks the columns at night. Whatever the offerings feed, the Guardian is its door-ward. Bring a friend, and break it.",
-        "completion": "You felled a thing the jungle itself would not touch. Look there, behind the idol: the Guardian was never guarding the columns, {playerName}, it was guarding the steps beneath them. The drums have gone quiet tonight. Whatever sleeps below the Wildheart Basin now knows your name.",
+        "title": "Der Idolwächter",
+        "text": "Das Idol ist älter als die Insel, {playerName}. Älter als die Trommeln, älter als der Name Palmreach. Sein Wächter hat in diesem versunkenen Ring gestanden, seit bevor die Palmen wuchsen, und jetzt erwacht er und wandelt nachts zwischen den Säulen. Was auch immer die Opfergaben nähren, der Wächter ist dessen Türhüter. Bring einen Freund mit, und zerbrich ihn.",
+        "completion": "Du hast etwas gefällt, das selbst der Dschungel nicht anrühren wollte. Sieh dort, hinter dem Idol: Der Wächter bewachte nie die Säulen, {playerName}, er bewachte die Stufen darunter. Die Trommeln sind heute Nacht still geworden. Was auch immer unterhalb von Wildheart Basin schläft, kennt jetzt deinen Namen.",
         "objectives": {
           "0": {
-            "label": "The Idol Guardian broken"
+            "label": "Der Idolwächter zerbrochen"
           }
         }
       },
       "q_eg_gate_report": {
-        "title": "Word Through the Gate",
-        "text": "The lawns past this gate have trimmed themselves for a hundred years, {playerName}, and lately they have started trimming visitors. Head Gardener Amaranth keeps the books in Hedgewick, up the road past the gate lawns. Tell her another traveler has come through, and tell her the hedges by the gate moved last night.",
-        "completion": "Moved, did they. Pell reports that every week, and every week he is right. Forgive my eyes, {playerName}, I have not slept a whole night in years: someone has to watch the garden watch us. Welcome to Hedgewick.",
+        "title": "Wort durch das Tor",
+        "text": "Die Rasenflächen hinter diesem Tor haben sich hundert Jahre lang selbst gestutzt, {playerName}, und in letzter Zeit haben sie begonnen, Besucher zu stutzen. Obergärtnerin Amaranth führt die Bücher in Hedgewick, die Straße hinauf hinter den Torrasen. Sag ihr, dass ein weiterer Reisender durchgekommen ist, und sag ihr, dass sich die Hecken am Tor letzte Nacht bewegt haben.",
+        "completion": "Bewegt, so, so. Pell meldet das jede Woche, und jede Woche hat er recht. Verzeih meine Augen, {playerName}, ich habe seit Jahren keine ganze Nacht mehr geschlafen: Jemand muss beobachten, wie der Garten uns beobachtet. Willkommen in Hedgewick.",
         "objectives": {
           "0": {
-            "label": "Report to Head Gardener Amaranth"
+            "label": "Bei Obergärtnerin Amaranth melden"
           }
         }
       },
       "q_eg_hungry_shapes": {
-        "title": "Pruned into Hunger",
-        "text": "Whoever shapes this garden has grown careless, or cruel. The wolf shapes out in the Rose Wilds were clipped for show, yet lately they hunt: green jaws, no bellies, and no reason ever to stop. Cut down ten topiary wolves, {playerName}, and let the lawns be lawns again for a while.",
-        "completion": "Ten heaps of clippings where ten wolves stood. It should feel like gardening, {playerName}. Why does it feel like war?",
+        "title": "In den Hunger gestutzt",
+        "text": "Wer auch immer diesen Garten formt, ist nachlässig geworden, oder grausam. Die Wolfsformen draußen in der Rosenwildnis wurden zur Schau gestutzt, doch in letzter Zeit jagen sie: grüne Kiefer, keine Bäuche, und kein Grund, je aufzuhören. Fälle zehn Formschnitt-Wölfe, {playerName}, und lass die Rasenflächen eine Weile wieder Rasenflächen sein.",
+        "completion": "Zehn Haufen Schnittgut, wo zehn Wölfe standen. Es sollte sich wie Gartenarbeit anfühlen, {playerName}. Warum fühlt es sich wie Krieg an?",
         "objectives": {
           "0": {
-            "label": "Topiary Wolf slain"
+            "label": "Formschnitt-Wolf erlegt"
           }
         }
       },
       "q_eg_stolen_shears": {
-        "title": "The Stolen Shears",
-        "text": "Every pair of shears in Hedgewick has walked off in a fortnight, {playerName}: off the pegs, out of locked sheds, one pair out of my own apron while I dozed. It is the hedge gnomes, the little groundskeepers who hate us walking their lawns. Get six pairs back before the whole hamlet is down to kitchen knives.",
-        "completion": "Six pairs, and my own among them, I would know the nick in the blade anywhere. Here, these gloves were knitted for pruning work. Warm hands make steady shears.",
+        "title": "Die gestohlenen Scheren",
+        "text": "Jede Schere in Hedgewick ist innerhalb von zwei Wochen verschwunden, {playerName}: von den Haken, aus verschlossenen Schuppen, ein Paar aus meiner eigenen Schürze, während ich döste. Es sind die Heckengnome, die kleinen Platzwarte, die es hassen, wenn wir über ihre Rasenflächen gehen. Bring sechs Paare zurück, bevor der ganze Weiler auf Küchenmesser reduziert ist.",
+        "completion": "Sechs Paare, meine eigene darunter, ich würde die Kerbe in der Klinge überall erkennen. Hier, diese Handschuhe wurden für Schnittarbeit gestrickt. Warme Hände machen ruhige Scheren.",
         "objectives": {
           "0": {
-            "label": "Stolen Hedgewick Shears"
+            "label": "Gestohlene Hedgewick-Schere"
           }
         }
       },
       "q_eg_who_trims_the_hedges": {
-        "title": "Who Trims the Hedges",
-        "text": "I have kept the ledgers thirty years, {playerName}, and not slept properly for ten of them, because the sums will not close. Grass wants cutting and hedges want shaping, and nobody here does either, yet every dawn the garden stands trimmed. Lately the woodfolk swear they see an old man with a barrow on the far south lawns, past the maze by the Lily Basin. Find him. If he is real, I can finally sleep. If he is not, I suppose I never will.",
-        "completion": "So the house finally sent someone. A hundred years I have walked these lawns, {playerName}, and the garden and I have an understanding: I trim what asks to be trimmed. Sit. The hedges can spare you an hour.",
+        "title": "Wer die Hecken stutzt",
+        "text": "Ich führe die Bücher seit dreißig Jahren, {playerName}, und habe zehn davon nicht richtig geschlafen, weil die Summen nicht aufgehen. Gras will geschnitten und Hecken wollen geformt werden, und niemand hier tut eines von beidem, doch jeden Morgen steht der Garten gestutzt da. In letzter Zeit schwört das Waldvolk, einen alten Mann mit einer Schubkarre auf den fernen Südrasen zu sehen, hinter dem Labyrinth beim Lilienbecken. Finde ihn. Wenn er wirklich ist, kann ich endlich schlafen. Wenn nicht, werde ich es wohl nie.",
+        "completion": "So, das Haus hat also endlich jemanden geschickt. Hundert Jahre bin ich diese Rasenflächen gegangen, {playerName}, und der Garten und ich haben eine Abmachung: Ich stutze, was danach verlangt, gestutzt zu werden. Setz dich. Die Hecken können dir eine Stunde entbehren.",
         "objectives": {
           "0": {
-            "label": "Find the gardener by the Lily Basin"
+            "label": "Den Gärtner am Lilienbecken finden"
           }
         }
       },
       "q_eg_gnomes_in_the_green": {
-        "title": "The Groundskeepers Grudge",
-        "text": "The shears were only the start, {playerName}. Last night the gnomes tipped our tool carts into the green, one out by their warren west of the maze, one clean across the garden on the pond walk, and scattered a hundred years of good iron in the grass. Drive off eight of the little devils and haul the spilled carts home.",
-        "completion": "Three carts back and the pegs full again. Let the little devils sulk in their hedges: Hedgewick works these lawns too.",
+        "title": "Der Groll der Platzwarte",
+        "text": "Die Scheren waren nur der Anfang, {playerName}. Letzte Nacht kippten die Gnome unsere Werkzeugkarren ins Grün, einen draußen bei ihrem Bau westlich des Labyrinths, einen quer durch den ganzen Garten am Teichweg, und verstreuten hundert Jahre gutes Eisen im Gras. Vertreibe acht der kleinen Teufel und bring die umgekippten Karren heim.",
+        "completion": "Drei Karren zurück und die Haken wieder voll. Lass die kleinen Teufel in ihren Hecken schmollen: Hedgewick bearbeitet diese Rasenflächen auch.",
         "objectives": {
           "0": {
-            "label": "Hedge Gnome driven off"
+            "label": "Heckengnom vertrieben"
           },
           "1": {
-            "label": "Tool cart recovered"
+            "label": "Werkzeugkarren geborgen"
           }
         }
       },
       "q_eg_bloom_clippings": {
-        "title": "Clippings from the Living Green",
-        "text": "You want to understand this garden? Then read it the way I do. The stags that graze the lawns grow the truest green: every leaf on them is a page. Bring me six fresh clippings from the topiary stags, {playerName}. They will not thank you for the pruning, but they will regrow. Everything here regrows.",
-        "completion": "Look here: the leaves are curling in on themselves, every clipping the same. The garden is afraid, {playerName}. In a hundred years I have never once known it afraid.",
+        "title": "Schnitt vom lebenden Grün",
+        "text": "Du willst diesen Garten verstehen? Dann lies ihn so, wie ich es tue. Die Hirsche, die die Rasenflächen abweiden, tragen das wahrste Grün: Jedes Blatt an ihnen ist eine Seite. Bring mir sechs frische Schnitte von den Formschnitt-Hirschen, {playerName}. Sie werden dir den Schnitt nicht danken, aber sie werden nachwachsen. Hier wächst alles nach.",
+        "completion": "Sieh her: Die Blätter rollen sich in sich selbst ein, jeder Schnitt derselbe. Der Garten hat Angst, {playerName}. In hundert Jahren habe ich ihn noch nie ängstlich erlebt.",
         "objectives": {
           "0": {
-            "label": "Pruned Bloom Clipping"
+            "label": "Gestutzter Blütenschnitt"
           }
         }
       },
       "q_eg_four_statues": {
-        "title": "The Four Quiet Sisters",
-        "text": "When the garden was young, the first gardeners raised four marble sisters to watch its quarters: one above the Rose Wilds, one on the pond walk east of the maze, one on the west lawn where the gnomes keep their warren, and one on the south lawn past the hedges. The maze grew up between them, and most folk never see all four. Walk the quarters, {playerName}, and press your palm to each sister. When the garden has looked you over from all four sides, it will open places it keeps from strangers.",
-        "completion": "Four rubbings, four sisters, and not one of them wept marble. The garden has taken your measure, {playerName}, and it did not find you wanting. Now I can send you where the trouble truly lives.",
+        "title": "Die vier stillen Schwestern",
+        "text": "Als der Garten jung war, errichteten die ersten Gärtner vier Marmorschwestern, um über seine Viertel zu wachen: eine über der Rosenwildnis, eine am Teichweg östlich des Labyrinths, eine auf dem Westrasen, wo die Gnome ihren Bau halten, und eine auf dem Südrasen hinter den Hecken. Das Labyrinth wuchs zwischen ihnen empor, und die meisten Leute sehen nie alle vier. Geh die Viertel ab, {playerName}, und lege deine Handfläche an jede Schwester. Wenn der Garten dich von allen vier Seiten betrachtet hat, wird er Orte öffnen, die er vor Fremden verbirgt.",
+        "completion": "Vier Abdrücke, vier Schwestern, und keine von ihnen weinte Marmor. Der Garten hat dich vermessen, {playerName}, und er fand dich nicht unzulänglich. Jetzt kann ich dich dorthin schicken, wo die Not wirklich wohnt.",
         "objectives": {
           "0": {
-            "label": "Garden statue visited"
+            "label": "Gartenstatue besucht"
           }
         }
       },
       "q_eg_bull_of_the_court": {
-        "title": "The Bull of the Fountain Court",
-        "text": "Now the truth, {playerName}. The bull at the heart of the maze was my masterwork: I shaped him to guard the Fountain Court, and for a hundred years he did. But the fear in the green has reached him, and he guards nothing now, he hunts. The maze feeds him whoever wanders in. I am too old to unmake him, and it must be unmaking, root and branch. Bring a friend, walk the maze to the court, and cut my bull down.",
-        "completion": "I felt it, here, when he came apart. A hundred years of work, and you were right to end it. Take this mantle: I cut it for whoever proved stronger than my best. The court is only a fountain tonight, {playerName}, and the garden is only a garden. Perhaps now the Head Gardener and I can both sleep.",
+        "title": "Der Stier des Brunnenhofs",
+        "text": "Nun die Wahrheit, {playerName}. Der Stier im Herzen des Labyrinths war mein Meisterwerk: Ich formte ihn, um den Brunnenhof zu bewachen, und hundert Jahre lang tat er das. Doch die Furcht im Grün hat ihn erreicht, und jetzt bewacht er nichts mehr, er jagt. Das Labyrinth füttert ihn mit jedem, der hineinwandert. Ich bin zu alt, ihn ungeschehen zu machen, und es muss ein Ungeschehenmachen sein, mit Wurzel und Ast. Bring einen Freund mit, geh durch das Labyrinth zum Hof, und fälle meinen Stier.",
+        "completion": "Ich fühlte es, hier, als er auseinanderfiel. Hundert Jahre Arbeit, und du hattest recht, es zu beenden. Nimm diesen Umhang: Ich schnitt ihn für denjenigen zurecht, der sich stärker erweisen würde als mein Bestes. Der Hof ist heute Nacht nur ein Brunnen, {playerName}, und der Garten ist nur ein Garten. Vielleicht können die Obergärtnerin und ich jetzt beide schlafen.",
         "objectives": {
           "0": {
-            "label": "The Topiary Bull unmade"
+            "label": "Der Formschnitt-Stier bezwungen"
           }
         }
       },
       "q_fs_bell_at_the_landing": {
-        "title": "The Bell at the Landing",
-        "text": "You came in on the ferry, {playerName}? Then you are the first in a week, and the Warden will want to look you over. Gullhaven sits up from the harbor, past the drying racks nobody tends anymore. Tell Warden Coalfast the crossing still runs, and that Tam has not rung a three-toll today. Yet.",
-        "completion": "The crossing holds, and Tam still has breath enough to joke about the three-toll. Good. We are an island under siege, {playerName}, and every pair of hands the ferry carries over is a pair the breaks must get through before they reach my people. Welcome to Gullhaven.",
+        "title": "Die Glocke an der Anlegestelle",
+        "text": "Du kamst über den Fährweg, {playerName}? Dann bist du der Erste seit einer Woche, und der Wächter wird dich in Augenschein nehmen wollen. Gullhaven liegt die Uferstraße hinauf, vorbei an den Trockengestellen, um die sich niemand mehr kümmert. Sag Wächter Coalfast, der Damm stehe noch, und dass Tam heute noch keinen Dreifachschlag geläutet hat. Noch nicht.",
+        "completion": "Der Damm hält, und Tam hat noch genug Atem, um über den Dreifachschlag zu scherzen. Gut. Wir sind eine belagerte Insel, {playerName}, und jedes Paar Hände, das diese Sandbank überquert, ist ein Paar, das sich die Risse erst durchkämpfen müssen, bevor sie mein Volk erreichen. Willkommen in Gullhaven.",
         "objectives": {
           "0": {
-            "label": "Report to Warden Coalfast"
+            "label": "Bei Wächter Coalfast melden"
           }
         }
       },
       "q_fs_hold_the_riftfields": {
-        "title": "Hold the Riftfields",
-        "text": "East of town the grain rows have gone to wrack, and the wretches that came through the Riftfields break now pick them clean. My people cannot tend a field they cannot stand in, {playerName}. Cull ten of the wretches and give the farmers back their ground.",
-        "completion": "Ten fewer, and the field hands are already arguing over who walks out first. It will not last, the breaks never rest long, but a town that eats is a town that holds.",
+        "title": "Die Rissfelder halten",
+        "text": "Östlich der Stadt sind die Getreidereihen verwahrlost, und die Elenden, die durch den Riss der Rissfelder kamen, plündern sie jetzt kahl. Mein Volk kann kein Feld bestellen, auf dem es nicht stehen kann, {playerName}. Erlege zehn der Elenden und gib den Bauern ihren Grund zurück.",
+        "completion": "Zehn weniger, und die Feldarbeiter streiten schon darüber, wer zuerst hinausgeht. Es wird nicht von Dauer sein, die Risse ruhen nie lange, aber eine Stadt, die isst, ist eine Stadt, die hält.",
         "objectives": {
           "0": {
-            "label": "Breach Wretch slain"
+            "label": "Breschenwicht erlegt"
           }
         }
       },
       "q_fs_steel_for_the_redoubt": {
-        "title": "Steel for the Redoubt",
-        "text": "Every blade I hand out is one the sea gave back or one I pried off the dead, {playerName}. The wretches carry scrap through the breaks, hinges, hooks, broken sword-steel, magpie stuff, but it hammers out true. Bring me six pieces of their scavenged steel and the barricade line gets its teeth back.",
-        "completion": "Salt-pitted and break-scarred, and it will hold an edge all the same. Here, I lined these grips myself. Steel for steel, {playerName}: it is the only trade the Farshore runs these days.",
+        "title": "Stahl für die Schanze",
+        "text": "Jede Klinge, die ich austeile, ist eine, die das Meer zurückgegeben hat, oder eine, die ich den Toten entrissen habe, {playerName}. Die Elenden tragen Schrott durch die Risse, Scharniere, Haken, zerbrochener Schwertstahl, Elsterkram, aber es hämmert sich wahr aus. Bring mir sechs Stücke ihres erbeuteten Stahls, und die Barrikadenlinie bekommt ihre Zähne zurück.",
+        "completion": "Salzzerfressen und rissvernarbt, und trotzdem hält es eine Schneide. Hier, diese Griffe habe ich selbst gefüttert. Stahl für Stahl, {playerName}: Das ist der einzige Handel, den die Farshore heutzutage betreibt.",
         "objectives": {
           "0": {
-            "label": "Break-Scarred Steel"
+            "label": "Bruchvernarbter Stahl"
           }
         }
       },
       "q_fs_the_three_bells": {
-        "title": "The Three Bells",
-        "text": "Three watchbells stand the coast beyond my own: one on the Landing point, one on the south strand, one out by the Riftfields shore. If a rope has rotted or a clapper has been carried off, the town learns of a break when it is already in the streets. Walk the coast, {playerName}, and ring each bell once, so I know it still has a voice.",
-        "completion": "Three voices, three answers, carried clean over the water. Sleep in Gullhaven tonight, {playerName}, and know that if a bell wakes you, it will be by my hand and in good time.",
+        "title": "Die drei Glocken",
+        "text": "Drei Wachglocken stehen an der Küste jenseits meiner eigenen: eine an der Landspitze, eine am Südstrand, eine draußen an der Küste der Rissfelder. Wenn ein Seil verrottet oder ein Klöppel entwendet wurde, erfährt die Stadt erst von einem Riss, wenn er schon in den Straßen ist. Geh die Küste entlang, {playerName}, und läute jede Glocke einmal, damit ich weiß, dass sie noch eine Stimme hat.",
+        "completion": "Drei Stimmen, drei Antworten, klar über das Wasser getragen. Schlaf heute Nacht in Gullhaven, {playerName}, und wisse, dass, wenn dich eine Glocke weckt, es durch meine Hand geschieht, und zur rechten Zeit.",
         "objectives": {
           "0": {
-            "label": "Watchbell rung"
+            "label": "Wachglocke geläutet"
           }
         }
       },
       "q_fs_song_before_the_break": {
-        "title": "The Song Before the Break",
-        "text": "There is a man who hears the breaks before they open. Riftwatch Ollun: a scholar, or a madman, and lately I cannot afford the difference. He keeps his vigil at the Watch Meadow, up the road southeast of town. Find him, {playerName}, and ask him what the island is about to do to us next.",
-        "completion": "The Warden sent you? Good. That means the town has finally started listening. Now be still a moment, {playerName}. There, under the wind, do you hear it? The cliffs are singing, and I do not like the tune.",
+        "title": "Das Lied vor dem Riss",
+        "text": "Es gibt einen Mann, der die Risse hört, bevor sie sich öffnen. Risswache Ollun: ein Gelehrter, oder ein Wahnsinniger, und in letzter Zeit kann ich mir den Unterschied nicht leisten. Er hält seine Wache an der Wachwiese, die Straße hinauf südöstlich der Stadt. Finde ihn, {playerName}, und frag ihn, was die Insel als Nächstes mit uns vorhat.",
+        "completion": "Der Wächter hat dich geschickt? Gut. Das heißt, die Stadt hat endlich angefangen zuzuhören. Jetzt sei einen Moment still, {playerName}. Da, unter dem Wind, hörst du es? Die Klippen singen, und mir gefällt die Melodie nicht.",
         "objectives": {
           "0": {
-            "label": "Find Riftwatch Ollun"
+            "label": "Risswache Ollun finden"
           }
         }
       },
       "q_fs_moss_and_mending": {
-        "title": "Moss and Mending",
-        "text": "The salt moss that grows along the tideline is the best wound-packing I know, and the riftspawn have claimed every stretch of shore it grows on. They carry tufts of it snagged on their hides, of all things. Clear six of them off the east reaches, {playerName}, and pull me four good handfuls of moss from what they have trampled through.",
-        "completion": "Moss in one hand and a quieter shoreline in the other. You have restocked my whole surgery, {playerName}. Do me the kindness of not becoming my next patient.",
+        "title": "Moos und Heilung",
+        "text": "Das Salzmoos, das entlang der Gezeitenlinie wächst, ist der beste Wundverband, den ich kenne, und die Rissbrut hat jeden Küstenabschnitt beansprucht, auf dem es wächst. Ausgerechnet sie tragen Büschel davon in ihren Häuten verfangen. Räume sechs von ihnen von den östlichen Ufern, {playerName}, und pflücke mir vier gute Hände voll Moos aus dem, was sie zertrampelt haben.",
+        "completion": "Moos in der einen Hand und eine ruhigere Küste in der anderen. Du hast meine ganze Praxis wieder aufgefüllt, {playerName}. Tu mir den Gefallen und werde nicht mein nächster Patient.",
         "objectives": {
           "0": {
-            "label": "Riftspawn slain"
+            "label": "Rissbrut erlegt"
           },
           "1": {
-            "label": "Farshore Salt Moss"
+            "label": "Farshore-Salzmoos"
           }
         }
       },
       "q_fs_bram_come_home": {
-        "title": "Bram Come Home",
-        "text": "My Bram took the boat out the morning the nets-break opened, and the sea threw him back somewhere past the Landing point. I heard him three nights ago, {playerName}, calling over the water, and I was too afraid to go. I am still too afraid. Please. His boat lies wrecked on the north shore. Walk him home to me.",
-        "completion": "Bram! You brought him back to me whole, {playerName}. We both wept and neither of us is ashamed. Whatever the breaks take from this island next, they do not get my family. Not anymore.",
+        "title": "Bram, komm heim",
+        "text": "Mein Bram nahm das Boot hinaus an dem Morgen, als sich der Netzriss öffnete, und das Meer warf ihn irgendwo hinter der Landspitze zurück. Ich hörte ihn vor drei Nächten, {playerName}, rufend über das Wasser, und ich hatte zu viel Angst zu gehen. Ich habe immer noch zu viel Angst. Bitte. Sein Boot liegt zerschellt am Südufer. Bring ihn heim zu mir.",
+        "completion": "Bram! Du hast ihn mir unversehrt zurückgebracht, {playerName}. Wir haben beide geweint, und keiner von uns schämt sich dafür. Was auch immer die Risse dieser Insel als Nächstes nehmen, meine Familie bekommen sie nicht. Nicht mehr.",
         "objectives": {
           "0": {
-            "label": "Fisher Bram seen safely home to Gullhaven"
+            "label": "Fischer Bram sicher nach Gullhaven heimgebracht"
           }
         }
       },
       "q_fs_stalkers_off_the_light": {
-        "title": "Stalkers off the Light",
-        "text": "The stalkers hunt the dark between the watchfires, and every night they circle my meadow a little closer. They are not mindless, {playerName}, they are patient, and patience is the one thing I cannot outlast. Kill eight and push the dark back to the cliffs it came through.",
-        "completion": "Eight nights of circling, ended in one. The fires burn steadier already, or perhaps that is only my hands. Either way the meadow is mine again, and I can hear the island think.",
+        "title": "Pirscher außerhalb des Lichts",
+        "text": "Die Pirscher jagen im Dunkel zwischen den Wachfeuern, und jede Nacht umkreisen sie meine Wiese ein Stück enger. Sie sind nicht hirnlos, {playerName}, sie sind geduldig, und Geduld ist das Einzige, was ich nicht überdauern kann. Töte acht und dränge die Dunkelheit zurück zu den Klippen, aus denen sie kam.",
+        "completion": "Acht Nächte des Umkreisens, in einer beendet. Die Feuer brennen schon ruhiger, oder vielleicht sind das nur meine Hände. So oder so ist die Wiese wieder meine, und ich kann die Insel denken hören.",
         "objectives": {
           "0": {
-            "label": "Void Stalker slain"
+            "label": "Leerenpirscher erlegt"
           }
         }
       },
       "q_fs_the_great_break": {
-        "title": "The Great Break",
-        "text": "Every song this island sings ends on the same low note, and it comes from the Sundered Cliffs. Something came through the great break there, {playerName}, something the cliffs themselves cracked open to admit, and it is still growing. If it walks north, no bell will matter. Take a friend, take two, and end it. Then tell Coalfast the tune has changed.",
-        "completion": "Ollun sent word ahead: the singing stopped. My whole town heard the quiet, {playerName}, and half of them wept at the sound of nothing at all. Wear this mantle. The Farshore does not forget who held its shore.",
+        "title": "Der große Riss",
+        "text": "Jedes Lied, das diese Insel singt, endet auf derselben tiefen Note, und sie kommt von den Zerklüfteten Klippen. Etwas kam dort durch den großen Riss, {playerName}, etwas, das die Klippen selbst aufbrachen, um es einzulassen, und es wächst noch immer. Wenn es nach Norden zieht, wird keine Glocke mehr zählen. Nimm einen Freund mit, nimm zwei, und beende es. Sag dann Coalfast, dass sich die Melodie geändert hat.",
+        "completion": "Ollun hat vorab Bescheid gesagt: Das Singen hörte auf. Meine ganze Stadt hörte die Stille, {playerName}, und die Hälfte von ihnen weinte beim Klang von gar nichts. Trag diesen Umhang. Die Farshore vergisst nicht, wer ihre Küste hielt.",
         "objectives": {
           "0": {
-            "label": "The Sundered Horror slain"
+            "label": "Der Zerrissene Schrecken erlegt"
           }
         }
       },
@@ -13596,95 +14540,95 @@ export const de_DE: EnTranslations = {
         }
       },
       "q_gc_down_the_windway": {
-        "title": "Down the Windway",
-        "text": "You made the climb, {playerName}, so the wind has decided to keep you. Wickharbor sits east along the downs road, tucked in the lee of its cove. Harbormaster Odile counts every soul who comes over the pass, and she will want to count you. Tell her the Windway is still open.",
-        "completion": "Over the pass on foot, in this weather? Maren sends me few enough names, and fewer still walk in to answer for themselves. Welcome to Wickharbor, {playerName}. Close the inn door behind you.",
+        "title": "Den Windweg hinab",
+        "text": "Du hast den Aufstieg geschafft, {playerName}, also hat der Wind beschlossen, dich zu behalten. Wickharbor liegt östlich an der Hügellandstraße, geschützt im Windschatten seiner Bucht. Hafenmeisterin Odile zählt jede Seele, die über den Pass kommt, und sie wird dich zählen wollen. Sag ihr, der Windweg sei noch offen.",
+        "completion": "Zu Fuß über den Pass, bei diesem Wetter? Maren schickt mir ohnehin wenige Namen, und noch weniger kommen selbst herein, um für sich einzustehen. Willkommen in Wickharbor, {playerName}. Schließ die Wirtshaustür hinter dir.",
         "objectives": {
           "0": {
-            "label": "Report to Harbormaster Odile"
+            "label": "Bei Hafenmeisterin Odile melden"
           }
         }
       },
       "q_gc_wool_off_the_downs": {
-        "title": "Wool off the Downs",
-        "text": "My boat crews row into a gale that cuts through oilskin like paper, {playerName}. Only one thing turns this wind: the greasy wool off the moor rams, spun thick the Wickharbor way. The herds graze the Howling Downs west of town. Six good fleeces and every crew rows warm this season.",
-        "completion": "Fleece like this is why the rams stand out there fat and smug in weather that kills men. The spinners will be at it by lamplight. Take these treads, {playerName}, they are lined from the last shearing.",
+        "title": "Wolle vom Hügelland",
+        "text": "Meine Bootsmannschaften rudern in einen Sturm, der Ölzeug wie Papier durchschneidet, {playerName}. Nur eine Sache hält diesen Wind ab: die fettige Wolle der Moorwidder, dick gesponnen nach Wickharbor-Art. Die Herden weiden auf den Heulenden Hügeln westlich der Stadt. Sechs gute Vliese, und jede Mannschaft rudert diese Saison warm.",
+        "completion": "Vlies wie dieses ist der Grund, warum die Widder da draußen fett und selbstgefällig stehen, bei Wetter, das Menschen tötet. Die Spinnerinnen werden bei Laternenschein daran arbeiten. Nimm diese Tritte, {playerName}, sie sind von der letzten Schur gefüttert.",
         "objectives": {
           "0": {
-            "label": "Greasy Ram Wool"
+            "label": "Fettige Widderwolle"
           }
         }
       },
       "q_gc_scuttlers_in_the_pots": {
-        "title": "Scuttlers in the Pots",
-        "text": "The shoal scuttlers have learned to climb the cliff road and crack our crab pots open on the stones, {playerName}. Half the catch gone this week, and one potman with a hand he will not be using for a month. Break ten of them and the rest will remember why they kept to the shoals.",
-        "completion": "Ten fewer shells on my road, and the pots came up full this morning. The potmen are calling you a good omen, {playerName}. In Wickharbor that is as warm as praise gets.",
+        "title": "Krabbler in den Reusen",
+        "text": "Die Untiefen-Krabbler haben gelernt, die Klippenstraße zu erklimmen und unsere Krabbenreusen an den Steinen aufzubrechen, {playerName}. Diese Woche ist der halbe Fang weg, und ein Reusenmann hat eine Hand, die er einen Monat lang nicht benutzen wird. Zerschlag zehn von ihnen, und die übrigen werden sich erinnern, warum sie sich an die Untiefen hielten.",
+        "completion": "Zehn Panzer weniger auf meiner Straße, und die Reusen kamen heute Morgen voll herauf. Die Reusenmänner nennen dich ein gutes Omen, {playerName}. In Wickharbor ist das so herzlich, wie Lob nur wird.",
         "objectives": {
           "0": {
-            "label": "Shoal Scuttler slain"
+            "label": "Untiefen-Krabbler erlegt"
           }
         }
       },
       "q_gc_keeper_of_the_flame": {
-        "title": "The Keeper of the Flame",
-        "text": "Old Bram keeps the Beacon on the high head northeast of town, and he has not come down for his stores in two weeks. The lamp still burns, so he lives, but a man his age alone on that head in this wind, {playerName}. Climb the beacon road and see him standing.",
-        "completion": "Odile sent you all this way to see if the wind had taken me? Ha. Tell her the lamp burns and so do I. But since you have made the climb, {playerName}, stay a moment. The Beacon has work only a stranger seems fit to do.",
+        "title": "Der Hüter der Flamme",
+        "text": "Der alte Bram hütet das Leuchtfeuer auf der hohen Landzunge nordöstlich der Stadt, und er ist seit zwei Wochen nicht mehr für seine Vorräte heruntergekommen. Die Lampe brennt noch, also lebt er, aber ein Mann seines Alters, allein auf dieser Landzunge bei diesem Wind, {playerName}. Steig die Leuchtfeuerstraße hinauf und sieh, ob er noch steht.",
+        "completion": "Odile hat dich den ganzen Weg geschickt, um zu sehen, ob mich der Wind geholt hat? Ha. Sag ihr, die Lampe brennt, und ich auch. Aber da du nun schon den Aufstieg gemacht hast, {playerName}, bleib einen Moment. Das Leuchtfeuer hat Arbeit, für die nur ein Fremder geeignet scheint.",
         "objectives": {
           "0": {
-            "label": "Find Keeper Bram"
+            "label": "Hüter Bram finden"
           }
         }
       },
       "q_gc_lanterns_on_the_shear": {
-        "title": "Lanterns on the Shear",
-        "text": "The Beacon is the great light, {playerName}, but it is the storm-lanterns that walk a night traveler down the cliff road above the Shear. Last night the gale doused every one of them, and that road in the dark is a long fall with a short ending. Take my striker and relight the four along the cliff.",
-        "completion": "Four points of light on the cliff road, right where they belong. From up here it looks like the coast has opened its eyes again. You have the makings of a keeper, {playerName}.",
+        "title": "Laternen am Abbruch",
+        "text": "Das Leuchtfeuer ist das große Licht, {playerName}, aber es sind die Sturmlaternen, die einen nächtlichen Reisenden die Klippenstraße über dem Abbruch hinabgeleiten. Letzte Nacht hat der Sturm jede einzelne davon gelöscht, und diese Straße im Dunkeln ist ein langer Fall mit einem kurzen Ende. Nimm meinen Feuerstahl und entzünde die vier entlang der Klippe neu.",
+        "completion": "Vier Lichtpunkte auf der Klippenstraße, genau dort, wo sie hingehören. Von hier oben sieht es aus, als hätte die Küste ihre Augen wieder geöffnet. Du hast das Zeug zu einem Hüter, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Storm-lantern relit"
+            "label": "Sturmlaterne neu entzündet"
           }
         }
       },
       "q_gc_wind_against_the_wick": {
-        "title": "Wind Against the Wick",
-        "text": "The gale wisps are the wind gone spiteful, {playerName}. They gather on the high downs by the Mirror Tarn, and every flame they find, they snuff, a lantern, a hearth, one day this lamp. Thirty-nine years I have kept the Beacon lit, and I will not lose it to weather with a grudge. Scatter eight of them.",
-        "completion": "The lamp did not so much as gutter last night, first time in a month. The wind still hates us, {playerName}, but it has gone back to hating us fairly.",
+        "title": "Wind gegen den Docht",
+        "text": "Die Sturmirrlichter sind der Wind, boshaft geworden, {playerName}. Sie versammeln sich auf dem Hügelland beim Spiegelweiher, und jede Flamme, die sie finden, löschen sie, eine Laterne, ein Herd, eines Tages diese Lampe. Neununddreißig Jahre habe ich das Leuchtfeuer brennend gehalten, und ich werde es nicht an ein Wetter mit einem Groll verlieren. Zerstreue acht von ihnen.",
+        "completion": "Die Lampe flackerte letzte Nacht nicht einmal, zum ersten Mal seit einem Monat. Der Wind hasst uns immer noch, {playerName}, aber er hasst uns wieder auf faire Weise.",
         "objectives": {
           "0": {
-            "label": "Gale Wisp scattered"
+            "label": "Sturmirrlicht zerstreut"
           }
         }
       },
       "q_gc_the_far_shore": {
-        "title": "The Far Shore",
-        "text": "From this lamp room I can see the whole coast, {playerName}, and what I see in the north I do not like. Green lights walking the Wreckfields at low tide, hull by hull. One woman works that shore alone: Edda, the salvager. Follow the cliff road north past the Shear until the wrecks begin, and see that she still draws breath.",
-        "completion": "Bram watches my shore from his tower now, does he? The old man is right to worry, {playerName}. The dead have been walking their own wrecks at night, and lately they have stopped caring whether the sun is up.",
+        "title": "Das ferne Ufer",
+        "text": "Von diesem Laternenraum aus sehe ich die ganze Küste, {playerName}, und was ich im Norden sehe, gefällt mir nicht. Grüne Lichter, die bei Ebbe die Wrackfelder entlanggehen, Rumpf für Rumpf. Eine Frau arbeitet allein an dieser Küste: Edda, die Bergerin. Folge der Klippenstraße nordwärts hinter dem Abbruch, bis die Wracks beginnen, und sieh nach, ob sie noch atmet.",
+        "completion": "Bram beobachtet also jetzt von seinem Turm aus meine Küste? Der Alte hat recht, sich zu sorgen, {playerName}. Die Toten sind nachts auf ihren eigenen Wracks umhergegangen, und in letzter Zeit kümmert es sie nicht mehr, ob die Sonne scheint.",
         "objectives": {
           "0": {
-            "label": "Find Salvager Edda"
+            "label": "Bergerin Edda finden"
           }
         }
       },
       "q_gc_dead_mens_cargo": {
-        "title": "Dead Men's Cargo",
-        "text": "Salvage law is simple, {playerName}: what the sea gives the beach is mine. The drowned deckhands disagree. They rise from their hulls and drag every crate I stack back below the tideline. Put six of them down for good, and while the beach is quiet, haul in three flotsam crates before the tide files its counterclaim.",
-        "completion": "Six crews quieter and three crates high and dry. You salvage with a heavier hand than I do, {playerName}, but the ledger does not care. Half of this is yours by law, and by law I mean I say so.",
+        "title": "Die Fracht toter Männer",
+        "text": "Das Bergungsrecht ist einfach, {playerName}: Was das Meer dem Strand gibt, gehört mir. Die ertrunkenen Decksleute sehen das anders. Sie erheben sich aus ihren Rümpfen und schleifen jede Kiste, die ich stapele, zurück unter die Gezeitenlinie. Schick sechs von ihnen für immer zur Ruhe, und solange der Strand still ist, hol drei Strandgutkisten herein, bevor die Flut ihren Gegenanspruch einreicht.",
+        "completion": "Sechs Mannschaften ruhiger, und drei Kisten hoch und trocken. Du bargest mit einer härteren Hand als ich, {playerName}, aber das Kontobuch kümmert das nicht. Die Hälfte davon gehört dir von Rechts wegen, und mit Recht meine ich, dass ich es sage.",
         "objectives": {
           "0": {
-            "label": "Drowned Deckhand laid to rest"
+            "label": "Ertrunkener Decksmann zur Ruhe gebettet"
           },
           "1": {
-            "label": "Flotsam Crate salvaged"
+            "label": "Strandgutkiste geborgen"
           }
         }
       },
       "q_gc_the_wreck_warden": {
-        "title": "The Wreck Warden",
-        "text": "Now you know why the deckhands rise, {playerName}. Something wears the barnacled plate of the first wreck ever to break on this shore, and it wardens every hull on the beach like a graveyard it was hired to keep. It holds a hoard I have coveted for ten years and a crew I would rather see resting. End the Wreck Warden. Bring a friend, the dead keep good watch.",
-        "completion": "The beach went silent the moment it fell, {playerName}. First silence I have heard on this shore in ten years of working it. The crews are just bones now, resting bones. Take the mantle off the top of the hoard, it was always going to fit a living back better.",
+        "title": "Der Wrackwächter",
+        "text": "Jetzt weißt du, warum die Decksleute sich erheben, {playerName}. Etwas trägt die entenmuschelbewachsene Platte des ersten Wracks, das je an dieser Küste zerbrach, und es bewacht jeden Rumpf am Strand wie einen Friedhof, den zu hüten es beauftragt wurde. Es hütet einen Hort, den ich seit zehn Jahren begehre, und eine Mannschaft, die ich lieber ruhen sähe. Beende den Wrackwächter. Bring einen Freund mit, die Toten halten gute Wache.",
+        "completion": "Der Strand wurde still in dem Moment, als es fiel, {playerName}. Die erste Stille, die ich in zehn Jahren Arbeit an dieser Küste gehört habe. Die Mannschaften sind jetzt nur noch Knochen, ruhende Knochen. Nimm den Umhang von der Spitze des Horts, er würde ohnehin immer besser einem lebenden Rücken passen.",
         "objectives": {
           "0": {
-            "label": "The Wreck Warden felled"
+            "label": "Der Wrackwächter gefällt"
           }
         }
       },
@@ -13791,7 +14735,7 @@ export const de_DE: EnTranslations = {
             "label": "Das Saufeld"
           },
           "11": {
-            "label": "The Farshore Ferry"
+            "label": "Der Farshore-Damm"
           }
         }
       },
@@ -13862,302 +14806,296 @@ export const de_DE: EnTranslations = {
         }
       },
       "veiled_hollow": {
-        "name": "The Veiled Hollow",
-        "welcome": "The air hums with old magic. Seek Keeper Saelwyn beneath the great tree of Eldergleam.",
+        "name": "Die Schleiersenke",
+        "welcome": "Die Luft summt von alter Magie. Suche Hüter Saelwyn unter dem großen Baum von Eldergleam.",
         "pois": {
           "0": {
             "label": "Eldergleam"
           },
           "1": {
-            "label": "Duskfall Cave"
+            "label": "Duskfall-Höhle"
           },
           "2": {
-            "label": "Duskfall Overlook"
+            "label": "Duskfall-Aussicht"
           },
           "3": {
-            "label": "Elder Grove"
+            "label": "Der Alte Hain"
           },
           "4": {
-            "label": "Starfall Basin"
+            "label": "Sternenfallbecken"
           },
           "5": {
-            "label": "The Sunken Court"
+            "label": "Der Versunkene Hof"
           },
           "6": {
-            "label": "Crystalline Shallows"
+            "label": "Kristalline Untiefen"
           },
           "7": {
-            "label": "The Gleaming Deep"
+            "label": "Die Gleißende Tiefe"
           }
         }
       },
       "drakelands": {
-        "name": "The Drakelands",
-        "welcome": "Hot wind rolls off the wastes ahead. Dragons wheel over the Drakemaw, and troll fires burn in the dunes.",
+        "name": "Die Drakenlande",
+        "welcome": "Heißer Wind weht von den Ödländern voraus. Drachen kreisen über dem Drakenrachen, und Trollfeuer brennen in den Dünen.",
         "pois": {
           "0": {
-            "label": "Wyrmwatch"
+            "label": "Wyrmwacht"
           },
           "1": {
-            "label": "The Gatewood"
+            "label": "Der Torwald"
           },
           "2": {
-            "label": "Cinder Dunes"
+            "label": "Aschendünen"
           },
           "3": {
             "label": "Trollmoot"
           },
           "4": {
-            "label": "The Last Keep"
+            "label": "Die Letzte Feste"
           },
           "5": {
-            "label": "Bloodglass Fields"
+            "label": "Blutglasfelder"
           },
           "6": {
-            "label": "Drakemaw Caldera"
+            "label": "Drakenrachen-Caldera"
           }
         }
       },
       "frostveil": {
-        "name": "The Frostveil Reach",
-        "welcome": "Snow swallows every sound. Under the dancing lights, the cold itself feels awake.",
+        "name": "Der Frostschleier",
+        "welcome": "Schnee verschluckt jeden Laut. Unter den tanzenden Lichtern fühlt sich die Kälte selbst wach an.",
         "pois": {
           "0": {
             "label": "Icemantle"
           },
           "1": {
-            "label": "The Snowline"
+            "label": "Die Schneegrenze"
           },
           "2": {
-            "label": "Glacier Tarn"
+            "label": "Gletschersee"
           },
           "3": {
-            "label": "The Aurora Steps"
+            "label": "Die Aurorastufen"
           },
           "4": {
-            "label": "The Shiverfen"
+            "label": "Das Zitterried"
           },
           "5": {
-            "label": "The Howling Terraces"
+            "label": "Die Heulenden Terrassen"
           }
         }
       },
       "amberfall": {
-        "name": "The Amberfall",
-        "welcome": "Every leaf here burns gold and red, yet none ever fall. The lanterns of Lanternmere are lit for you.",
+        "name": "Der Bernsteinfall",
+        "welcome": "Jedes Blatt hier brennt in Gold und Rot, doch keines fällt jemals. Die Laternen von Lanternmere sind für dich entzündet.",
         "pois": {
           "0": {
             "label": "Lanternmere"
           },
           "1": {
-            "label": "The Goldmelt"
+            "label": "Die Goldschmelze"
           },
           "2": {
-            "label": "The Gilded Orchard"
+            "label": "Der Vergoldete Obstgarten"
           },
           "3": {
-            "label": "Harvest Hollow"
+            "label": "Erntemulde"
           },
           "4": {
-            "label": "The Great Mere"
+            "label": "Der Große See"
           },
           "5": {
-            "label": "Cindermaple Rise"
+            "label": "Aschenahorn-Höhe"
           },
           "6": {
-            "label": "The Leaning Monolith"
+            "label": "Der Schiefe Monolith"
           }
         }
       },
       "willowfen": {
-        "name": "The Willowfen",
-        "welcome": "The fen hums with dragonflies and bees. Cross the bridge into Bridgemere and rest your feet awhile.",
+        "name": "Das Weidenmoor",
+        "welcome": "Das Moor summt von Libellen und Bienen. Überquere die Brücke nach Bridgemere und lass deine Füße eine Weile ruhen.",
         "pois": {
           "0": {
             "label": "Bridgemere"
           },
           "1": {
-            "label": "The Amberfen Steps"
+            "label": "Die Amberfen-Stufen"
           },
           "2": {
-            "label": "The Lilymoors"
+            "label": "Die Lilienmoore"
           },
           "3": {
-            "label": "Bogshine Pools"
+            "label": "Moorglanz-Tümpel"
           },
           "4": {
-            "label": "Willowweep"
+            "label": "Weidenweinen"
           },
           "5": {
-            "label": "The Drowsy Flats"
+            "label": "Die Schläfrigen Ebenen"
           }
         }
       },
       "nightbloom": {
-        "name": "The Nightbloom",
-        "welcome": "Past the Nightgate the air itself dreams. Follow the flower-light to Moonrest, and mind the sleeping world that hangs in the sky.",
+        "name": "Die Nachtblüte",
+        "welcome": "Hinter dem Nachttor träumt die Luft selbst. Folge dem Blütenlicht nach Moonrest, und achte auf die schlafende Welt, die am Himmel hängt.",
         "pois": {
           "0": {
             "label": "Moonrest"
           },
           "1": {
-            "label": "The Nightgate"
+            "label": "Das Nachttor"
           },
           "2": {
-            "label": "The Moonwell"
+            "label": "Der Mondbrunnen"
           },
           "3": {
-            "label": "Gloamfield"
+            "label": "Dämmerfeld"
           },
           "4": {
-            "label": "The Standing Vigil"
+            "label": "Die Immerwährende Wache"
           },
           "5": {
-            "label": "The Sleepless Barrow"
+            "label": "Der Schlaflose Grabhügel"
           }
         }
       },
       "wraithwood": {
-        "name": "The Wraithwood",
-        "welcome": "The canopy closes over the road like a lid. Keep to the lanterns of Gallowmere, and do not answer if the wood calls your name.",
+        "name": "Der Gespensterwald",
+        "welcome": "Das Blätterdach schließt sich über der Straße wie ein Deckel. Halte dich an die Laternen von Gallowmere, und antworte nicht, wenn der Wald deinen Namen ruft.",
         "pois": {
           "0": {
             "label": "Gallowmere"
           },
           "1": {
-            "label": "The Crowgate"
+            "label": "Das Krähentor"
           },
           "2": {
-            "label": "Widow's Thicket"
+            "label": "Witwendickicht"
           },
           "3": {
-            "label": "The Hanging Glade"
+            "label": "Die Hängende Lichtung"
           },
           "4": {
-            "label": "The Mournstone Chapel"
+            "label": "Mournstone-Kapelle"
           },
           "5": {
-            "label": "The Huntsman's Clearing"
+            "label": "Die Lichtung des Jägers"
           }
         }
       },
       "palmreach": {
-        "name": "The Palmreach",
-        "welcome": "Warm sand, loud birds, and a jungle that eats the horizon. Drifthaven keeps a fire lit on the beach for you.",
+        "name": "Die Palmenbucht",
+        "welcome": "Warmer Sand, laute Vögel und ein Dschungel, der den Horizont verschlingt. Drifthaven hält ein Feuer für dich am Strand entzündet.",
         "pois": {
           "0": {
             "label": "Drifthaven"
           },
           "1": {
-            "label": "The Tanglemouth"
+            "label": "Die Wirrmündung"
           },
           "2": {
-            "label": "The Palmstrand"
+            "label": "Der Palmenstrand"
           },
           "3": {
-            "label": "The Emerald Tangle"
+            "label": "Das Smaragddickicht"
           },
           "4": {
-            "label": "The Vinefall"
+            "label": "Der Rankenfall"
           },
           "5": {
-            "label": "The Sapphire Lagoon"
+            "label": "Die Saphirlagune"
           },
           "6": {
-            "label": "The Sunken Idol"
+            "label": "Das Versunkene Idol"
           }
         }
       },
       "evergarden": {
-        "name": "The Evergarden",
-        "welcome": "Someone is still trimming the hedges, though no gardener has been seen for a hundred years. Mind the maze: it minds you back.",
+        "name": "Der Immergarten",
+        "welcome": "Jemand stutzt noch immer die Hecken, doch seit hundert Jahren wurde kein Gärtner gesehen. Achte auf das Labyrinth: Es achtet auch auf dich.",
         "pois": {
           "0": {
             "label": "Hedgewick"
           },
           "1": {
-            "label": "The Garden Gate"
+            "label": "Das Gartentor"
           },
           "2": {
-            "label": "The Parterre Walk"
+            "label": "Der Parterreweg"
           },
           "3": {
-            "label": "Dawnhold Castle"
+            "label": "Schloss Dawnhold"
           },
           "4": {
-            "label": "The Petal Pond"
+            "label": "Der Blütenteich"
           },
           "5": {
-            "label": "The Great Maze"
+            "label": "Das Große Labyrinth"
           },
           "6": {
-            "label": "The Fountain Court"
+            "label": "Der Brunnenhof"
           },
           "7": {
-            "label": "The Old Mill"
+            "label": "Die Alte Mühle"
           },
           "8": {
-            "label": "The North Watch"
+            "label": "Die Nordwacht"
           },
           "9": {
-            "label": "The Lily Basin"
+            "label": "Das Lilienbecken"
           }
         }
       },
       "galecrest": {
-        "name": "The Galecrest",
-        "welcome": "The wind has never once stopped here, and the Old Beacon has never once gone out. Wickharbor asks only that you close the inn door behind you.",
+        "name": "Der Windkamm",
+        "welcome": "Der Wind hat hier noch nie aufgehört zu wehen, und das Alte Leuchtfeuer ist noch nie erloschen. Wickharbor bittet nur darum, dass du die Wirtshaustür hinter dir schließt.",
         "pois": {
           "0": {
             "label": "Wickharbor"
           },
           "1": {
-            "label": "The Windway"
+            "label": "Der Windweg"
           },
           "2": {
-            "label": "The Howling Downs"
+            "label": "Die Heulenden Hügel"
           },
           "3": {
-            "label": "The Old Beacon"
+            "label": "Das Alte Leuchtfeuer"
           },
           "4": {
-            "label": "The Shear"
+            "label": "Der Abbruch"
           },
           "5": {
-            "label": "The Wreckfields"
+            "label": "Die Wrackfelder"
           },
           "6": {
-            "label": "The Mirror Tarn"
+            "label": "Der Spiegelweiher"
           },
           "7": {
-            "label": "The Galecrest Stables"
+            "label": "Die Galecrest-Ställe"
           }
         }
       },
       "farshore_isle": {
-        "name": "The Farshore",
-        "welcome": "Step off the ferry and Gullhaven's bell will find you before the town does. The breaks tear open without warning, and the redoubt holds its shore against whatever pours through. They have been waiting a long while for someone like you.",
+        "name": "Die Fernküste",
+        "welcome": "Überquere die Sandbank, und Gullhavens Glocke wird dich finden, bevor es die Stadt tut. Die Risse reißen ohne Vorwarnung auf, und die Schanze hält ihre Küste gegen alles, was hindurchströmt. Man wartet hier schon lange auf jemanden wie dich.",
         "pois": {
           "0": {
             "label": "Gullhaven"
           },
           "1": {
-            "label": "The Landing"
+            "label": "Die Anlegestelle"
           },
           "2": {
-            "label": "The Watch Meadow"
+            "label": "Die Wachwiese"
           },
           "3": {
-            "label": "The Sundered Cliffs"
+            "label": "Die Zerklüfteten Klippen"
           },
           "4": {
-            "label": "The Riftfields"
-          },
-          "5": {
-            "label": "The Breach"
-          },
-          "6": {
-            "label": "The Wreckfields"
+            "label": "Die Rissfelder"
           }
         }
       }
@@ -14189,14 +15127,14 @@ export const de_DE: EnTranslations = {
         "leaveText": "Ihr kehrt in die kalte Luft von Thornpeak zurück."
       },
       "wildheart_basin": {
-        "name": "The Wildheart Basin",
-        "enterText": "Warm rain hisses on old stone. The Wildheart Basin opens before you.",
-        "leaveText": "You pass back beneath the stone fangs into the Palmreach sun."
+        "name": "Das Wildherzbecken",
+        "enterText": "Warmer Regen zischt auf altem Stein. The Wildheart Basin öffnet sich vor dir.",
+        "leaveText": "Du gehst zurück unter den Steinzähnen hindurch in die Sonne von Palmreach."
       },
       "the_last_keep": {
-        "name": "The Last Keep",
-        "enterText": "You step into the cold, silent halls of the Last Keep.",
-        "leaveText": "You pull the keep door shut and step back into the Drakelands wind."
+        "name": "Die Letzte Feste",
+        "enterText": "Du trittst in die kalten, stillen Hallen von Last Keep ein.",
+        "leaveText": "Du ziehst die Burgtür zu und trittst zurück in den Wind von Drakelands."
       },
       "lb_tidemill": {
         "name": "The Tidemill",
@@ -14491,6 +15429,36 @@ export const de_DE: EnTranslations = {
       "vale_arcanist": {
         "name": "Ornat des Talarkanisten",
         "bonus3": "Erhöht Angriffs- und Zaubertempo um 15%."
+      },
+      "warfare_ashstalker": {
+        "name": "Aschenpirscher-Ausrüstung",
+        "bonus2": "Erhöht KRIEGSFÜHRUNGS-Verteidigungswertung um 40.",
+        "bonus4": "Erhöht KRIEGSFÜHRUNGS-Angriffswertung um 40, und von feindlichen Spielern auf Euch gewirkte Massenkontrolle hält 15% kürzer an.",
+        "bonus7": "Erhöht KRIEGSFÜHRUNGS-Angriffs- und Verteidigungswertung um 80. Das Töten eines feindlichen Spielers gewährt Ascheschritt, was das Bewegungstempo 6 Sek. lang um 40% erhöht."
+      },
+      "warfare_cinderweave": {
+        "name": "Gewänder aus Glutgewebe",
+        "bonus2": "Erhöht KRIEGSFÜHRUNGS-Verteidigungswertung um 40.",
+        "bonus4": "Erhöht KRIEGSFÜHRUNGS-Angriffswertung um 40, und von feindlichen Spielern auf Euch gewirkte Massenkontrolle hält 15% kürzer an.",
+        "bonus7": "Erhöht KRIEGSFÜHRUNGS-Angriffs- und Verteidigungswertung um 80. Eure Zauber haben eine Chance von 15%, Glutwacht zu gewähren, was 8 Sek. lang 120 Schaden absorbiert."
+      },
+      "warfare_furyforged": {
+        "name": "Zorngeschmiedete Kriegstracht",
+        "bonus2": "Erhöht KRIEGSFÜHRUNGS-Verteidigungswertung um 40.",
+        "bonus4": "Erhöht KRIEGSFÜHRUNGS-Angriffswertung um 40, und von feindlichen Spielern auf Euch gewirkte Massenkontrolle hält 15% kürzer an.",
+        "bonus7": "Erhöht KRIEGSFÜHRUNGS-Angriffs- und Verteidigungswertung um 80. Das Töten eines feindlichen Spielers gewährt Ungebrochenen Eid, was 10 Sek. lang 200 Schaden absorbiert."
+      },
+      "warfare_stormbound": {
+        "name": "Sturmgebundene Gewänder",
+        "bonus2": "Erhöht KRIEGSFÜHRUNGS-Verteidigungswertung um 40.",
+        "bonus4": "Erhöht KRIEGSFÜHRUNGS-Angriffswertung um 40, und von feindlichen Spielern auf Euch gewirkte Massenkontrolle hält 15% kürzer an.",
+        "bonus7": "Erhöht KRIEGSFÜHRUNGS-Angriffs- und Verteidigungswertung um 80. Eure Zauber haben eine Chance von 15%, Glutwacht zu gewähren, was 8 Sek. lang 120 Schaden absorbiert."
+      },
+      "warfare_thornhide": {
+        "name": "Dornhautgewandung",
+        "bonus2": "Erhöht KRIEGSFÜHRUNGS-Verteidigungswertung um 40.",
+        "bonus4": "Erhöht KRIEGSFÜHRUNGS-Angriffswertung um 40, und von feindlichen Spielern auf Euch gewirkte Massenkontrolle hält 15% kürzer an.",
+        "bonus7": "Erhöht KRIEGSFÜHRUNGS-Angriffs- und Verteidigungswertung um 80. Eure Zauber haben eine Chance von 15%, Dornwacht zu gewähren, was die Ausweichchance 6 Sek. lang um 15% erhöht."
       },
       "wyrmshadow": {
         "name": "Nightfang-Gewänder",

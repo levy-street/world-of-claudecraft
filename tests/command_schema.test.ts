@@ -30,14 +30,24 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // (card_queue_join/leave, play_card, card_forfeit), Professions 2.0's
 // place_mobile_station, train_recipe, the three enchanting actions
 // (disenchant_item, apply_enchant, salvage_item), unbind_item (the
-// Maker's Bond unbind service), and the Rift + mounts surface (rift and
-// forge commands, learn_riding, reins use).
-// The Last Bell scene_skip and scene_choice commands add two sends and two
-// dispatch arms on top of that upstream surface; mount_select has left the wire
-// now that reins are usable items.
-const EXPECTED_SEND_COUNT = 175;
-const EXPECTED_DISPATCH_COUNT = 186;
-const EXPECTED_DISPATCH_ONLY_COUNT = 11;
+// Maker's Bond unbind service), the Rift + mounts surface (rift and
+// forge commands, learn_riding, mount selection), market_list_instance
+// (the instance-payload market pipe), the commission order board
+// (issue #1298: open/cancel/accept/deliver_commission_order), the
+// profiler-only dev_profiler_invulnerable dispatch token, slot_tool_effect
+// (attach a catalog effect to one gathering profession's tool, keyed per
+// profession rather than per tool item because the live harvest path
+// resolves a tier and never a tool), recharge_tool_effect (the acquisition
+// craft), the guild_bank_* cluster (Guild Bank Phase 2) plus guild_bank_log
+// (the activity log's on-demand READ request; its answer comes back on its own
+// one-shot 'gbanklog' frame, not the snapshot), the battleground surface
+// (bg_queue/bg_leave/bg_flag sends plus the dev-only bg_queue force start),
+// and stopAutoAttackOnTargetSwitch joining as a send + dispatch pair (issue #1358).
+// This branch adds set_helm as a send + dispatch pair (the paperdoll
+// helmet-visibility eye; helmHidden persists per character like weaponStowed).
+const EXPECTED_SEND_COUNT = 191;
+const EXPECTED_DISPATCH_COUNT = 204;
+const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch
 // (session.rememberedChat.channel)`) is NOT a msg.cmd dispatch; its labels must

@@ -181,6 +181,8 @@ export class SelfMotionPredictor {
     strafeLeft: false,
     strafeRight: false,
     jump: false,
+    dive: false,
+    surface: false,
   };
   private readonly out: Vec3Like = { x: 0, y: 0, z: 0 };
 
@@ -297,6 +299,8 @@ export class SelfMotionPredictor {
         onGround: true,
         jumping: false,
         fallStartY: ay,
+        swimStroke: 0,
+        swimDiving: false,
       };
       this.actor = actor;
       this.acc = 0;
@@ -341,6 +345,15 @@ export class SelfMotionPredictor {
     inp.strafeLeft = frame.moveInput.strafeLeft;
     inp.strafeRight = frame.moveInput.strafeRight;
     inp.jump = frame.moveInput.jump;
+    // The vertical half of swimming is held intent too, and predicting it is
+    // what makes a camera-steered dive answer the mouse instead of the round
+    // trip: without these the depth column only ever moved on the server's
+    // echo, so aiming the view down felt like a request rather than a control.
+    // The kernel branch is the same one the server runs (swimVerticalPass), and
+    // it is inert unless the body is actually in water.
+    inp.dive = frame.moveInput.dive;
+    inp.surface = frame.moveInput.surface;
+    inp.swimSteer = frame.moveInput.swimSteer;
     // A blocked step needs NO special handling, and must never get any. The
     // kernel runs the same swept static collision as the server, so when the
     // display stops at a wall it is already RIGHT and the authoritative anchor

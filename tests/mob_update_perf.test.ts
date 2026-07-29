@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import type { Entity } from '../src/sim/types';
+import { angleTo, type Entity } from '../src/sim/types';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
-const WORLD_SEED = 20061;
 const CLUSTER = { x: 0, z: 60 };
 // Enough clustered engaged mobs to exercise a high-load realm shape (the fresh
 // world already spawns ~400 mobs/npcs/objects and this adds 100 players + the pack).
@@ -89,6 +89,54 @@ describe('mob.update high-load regression budget', () => {
 
     expect(distant.wanderTimer).toBe(10);
     if (defaultTwin?.kind === 'mob') expect(defaultTwin.wanderTimer).toBeLessThan(10);
+  });
+
+  it('skips the wander step for an immobile mob but keeps its bearing and position', () => {
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
+    const p = sim.entities.get(sim.playerId);
+    expect(p).toBeDefined();
+    if (!p) return;
+    // Well clear of the egg's 3 yd proximity crack and the 4 yd detection floor,
+    // so the shell stays whole and idle for the whole window.
+    const egg = createMob(
+      sim.nextId++,
+      MOBS.dragonkin_egg,
+      20,
+      sim.groundPos(p.pos.x + 60, p.pos.z + 60),
+    );
+    sim.addEntity(egg);
+
+    // ctx.moveToward is bound at Sim construction, so the ctx property IS the
+    // seam every caller reaches; patching the instance method would miss it.
+    const inner = sim.ctx.moveToward;
+    let eggSteps = 0;
+    let moverSteps = 0;
+    sim.ctx.moveToward = (e, dest, speed, ignoreObstacles) => {
+      if (e.id === egg.id) eggSteps++;
+      else if (e.kind === 'mob' && (MOBS[e.templateId]?.moveSpeed ?? 0) > 0) moverSteps++;
+      return inner(e, dest, speed, ignoreObstacles);
+    };
+
+    const spawnPos = { ...egg.pos };
+    egg.wanderTimer = 0.01; // draw a wander pick on the very next tick
+    for (let i = 0; i < 40; i++) sim.tick();
+
+    // It really is holding a pick it can never reach, so the old path took the
+    // full slide-fan step on all 40 of those ticks.
+    expect(egg.dead).toBe(false);
+    expect(egg.wanderTarget).not.toBeNull();
+    expect(eggSteps).toBe(0);
+    // Not a blanket kill: mobs that can actually move still take their step.
+    expect(moverSteps).toBeGreaterThan(0);
+
+    // Behavior-preserving. Position and ground height are untouched (they always
+    // were: a zero-speed step could never move the shell)...
+    expect(egg.pos.x).toBe(spawnPos.x);
+    expect(egg.pos.z).toBe(spawnPos.z);
+    expect(egg.pos.y).toBe(spawnPos.y);
+    // ...and the bearing is still exactly the one moveToward wrote, so the
+    // broadcast facing (`f` in the snapshot payload) is unchanged.
+    if (egg.wanderTarget) expect(egg.facing).toBe(angleTo(egg.pos, egg.wanderTarget));
   });
 
   it('bounds mob.update per-tick cost and tags every mob lap for zone attribution', () => {

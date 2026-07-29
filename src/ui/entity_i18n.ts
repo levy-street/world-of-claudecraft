@@ -30,6 +30,7 @@ import {
   t,
   tOptional,
 } from './i18n';
+import { ownEntry } from './known_item';
 
 export type EntityTranslationGroup = 'classAbility' | 'item' | 'itemSet' | 'world';
 export type EntityTranslationKind =
@@ -46,6 +47,27 @@ export type EntityTranslationKind =
   | 'delve'
   | 'itemSet'
   | 'letter';
+/** An item set's per-tier bonus field, keyed by the tier's PIECE COUNT rather
+ *  than a fixed 2/3/4 triple. Every shipped set used 2, 3 and 4 pieces, and that
+ *  assumption was hard coded here, in the i18n catalog builder, and in the
+ *  tooltip's field selection, so a set authored with any other breakpoint (the
+ *  WARFARE families' 2/4/7) rendered the WRONG tier's text instead of failing.
+ *  Generalizing keeps every existing entities.itemSets.*.bonus2/bonus3/bonus4
+ *  key byte-stable in the locale overlays and mints only the new counts. */
+export type ItemSetBonusField = `bonus${number}`;
+
+/** The piece count a bonus field names, or null when the field is not a bonus
+ *  field at all. The ONE place the field-to-count mapping lives. */
+export function itemSetBonusPieces(field: string): number | null {
+  const matched = /^bonus([1-9][0-9]*)$/.exec(field);
+  return matched ? Number(matched[1]) : null;
+}
+
+/** The bonus field naming a tier of `pieces` pieces. */
+export function itemSetBonusField(pieces: number): ItemSetBonusField {
+  return `bonus${pieces}`;
+}
+
 export type EntityTranslationField =
   | 'name'
   | 'description'
@@ -57,9 +79,7 @@ export type EntityTranslationField =
   | 'welcome'
   | 'enterText'
   | 'leaveText'
-  | 'bonus2'
-  | 'bonus3'
-  | 'bonus4'
+  | ItemSetBonusField
   | 'sender'
   | 'subject'
   | 'body';
@@ -71,7 +91,7 @@ export type EntityTranslationRequest =
   | {
       kind: 'itemSet';
       id: string;
-      field: 'name' | 'bonus2' | 'bonus3' | 'bonus4';
+      field: 'name' | ItemSetBonusField;
       values?: InterpolationValues;
     }
   | { kind: 'mob'; id: string; field: 'name'; values?: InterpolationValues }
@@ -174,6 +194,13 @@ for (const byTier of Object.values(MASTER_TIER_LETTERS)) {
   for (const letter of Object.values(byTier)) LETTERS_BY_ID[letter.letterId] = letter;
 }
 
+/** Whether THIS bundle ships the authored letter (stale-client guard, R34):
+ *  the mail window falls back to the WIRE-shipped sender/subject/body for an
+ *  id this bundle predates, instead of rendering the raw letter id. */
+export function knownLetterId(letterId: string): boolean {
+  return Object.hasOwn(LETTERS_BY_ID, letterId);
+}
+
 function entityPathSegment(value: string): string {
   return value.replace(/[^A-Za-z0-9_]/g, '_');
 }
@@ -235,24 +262,35 @@ function canonicalEntityText(request: EntityTranslationRequest): string {
     }
     case 'item':
       return ITEMS[request.id]?.name ?? request.id;
+    // Every Record-indexed arm below reads through ownEntry (known_item.ts):
+    // these ids can arrive from the wire (the quest log, chat links, snapshot
+    // template ids), and on a prototype-bearing Record a bare truthiness test
+    // sends 'constructor' down the known arm, where the Function's missing
+    // fields render as "Object"/undefined or throw (set.bonuses.find). The
+    // raw-id fallback is the R34 contract for every unknown id, prototype
+    // keys included.
     case 'itemSet': {
-      const set = ITEM_SETS[request.id];
+      const set = ownEntry(ITEM_SETS, request.id);
       if (!set) return request.id;
       if (request.field === 'name') return set.name;
-      const pieces = request.field === 'bonus2' ? 2 : request.field === 'bonus3' ? 3 : 4;
+      // Piece-count agnostic (see ItemSetBonusField): the field NAMES its tier,
+      // so a 7-piece breakpoint resolves without a fifth ternary arm, and an
+      // unknown field falls back to the raw id like every other R34 miss.
+      const pieces = itemSetBonusPieces(request.field);
+      if (pieces === null) return request.id;
       return set.bonuses.find((b) => b.pieces === pieces)?.text ?? request.id;
     }
     case 'mob':
-      return MOBS[request.id]?.name ?? request.id;
+      return ownEntry(MOBS, request.id)?.name ?? request.id;
     case 'npc': {
-      const npc = NPCS[request.id];
+      const npc = ownEntry(NPCS, request.id);
       if (!npc) return request.id;
       if (request.field === 'title') return npc.title;
       if (request.field === 'greeting') return npc.greeting;
       return npc.name;
     }
     case 'quest': {
-      const quest = QUESTS[request.id];
+      const quest = ownEntry(QUESTS, request.id);
       if (!quest) return request.id;
       if (request.field === 'text') return quest.text;
       if (request.field === 'completion') return quest.completionText;
@@ -260,7 +298,7 @@ function canonicalEntityText(request: EntityTranslationRequest): string {
     }
     case 'questObjective':
       return (
-        QUESTS[request.questId]?.objectives[request.objectiveIndex]?.label ??
+        ownEntry(QUESTS, request.questId)?.objectives[request.objectiveIndex]?.label ??
         `${request.questId}.${request.objectiveIndex}`
       );
     case 'zone': {
@@ -401,6 +439,17 @@ export function dungeonDisplayName(dungeonId: string): string {
   return tEntity({ kind: 'dungeon', id: dungeonId, field: 'name' });
 }
 
+/** The label a live rift floor (IWorld.riftFloor) shows wherever a surface needs
+ *  display text for it: the generated floor name, plus its C/B/A/S rank in
+ *  parens (omitted for a dev-portal run, whose tier is null). Not a tEntity
+ *  wrapper (the name/rank come from the generated RiftFloorView, not a content
+ *  id lookup); the single shared home so the minimap, the world map, and the
+ *  map-window summary format it identically instead of each re-declaring the
+ *  same rank ? label ternary. */
+export function riftFloorLabel(name: string, rank: string | null): string {
+  return rank ? t('hud.core.riftLabelRanked', { name, rank }) : t('hud.core.riftLabel', { name });
+}
+
 export function resetEntityTranslationFallbackLog(): void {
   fallbackLog.clear();
 }
@@ -463,12 +512,14 @@ export function entityTranslationManifest(): EntityTranslationManifestEntry[] {
     );
   }
   for (const set of Object.values(ITEM_SETS).sort(compareById)) {
-    // Only tiers the set actually has: the leveling haste kits carry a single
-    // 3-piece tier, so registering a bonus2 row would emit an id-fallback string.
-    const fields: ('name' | 'bonus2' | 'bonus3' | 'bonus4')[] = ['name'];
-    if (set.bonuses.some((b) => b.pieces === 2)) fields.push('bonus2');
-    if (set.bonuses.some((b) => b.pieces === 3)) fields.push('bonus3');
-    if (set.bonuses.some((b) => b.pieces === 4)) fields.push('bonus4');
+    // Only tiers the set actually has, at WHATEVER piece counts it authored:
+    // the leveling haste kits carry a single 3-piece tier (so registering a
+    // bonus2 row would emit an id-fallback string) and the WARFARE families
+    // carry 2/4/7. Ascending and de-duplicated so the manifest order is stable.
+    const fields: ('name' | ItemSetBonusField)[] = ['name'];
+    for (const pieces of [...new Set(set.bonuses.map((b) => b.pieces))].sort((a, b) => a - b)) {
+      fields.push(itemSetBonusField(pieces));
+    }
     for (const field of fields) {
       entries.push(
         entry(

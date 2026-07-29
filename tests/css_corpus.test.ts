@@ -207,6 +207,9 @@ const INDEX_SECTIONS = [
   // standalone touch layout (hud.mobile.css); both modules load in both entries.
   'deeds',
   'mobile deeds (standalone window + tracker)',
+  // The set-divided WARFARE quartermaster shop (components.css); loads in both
+  // entries, so it is not a PLAY_OMITS row.
+  'WARFARE quartermaster shop',
 ];
 
 // The two index-only sections play.html does not ship, so its count is 58 (plus the
@@ -218,12 +221,12 @@ const PLAY_SECTIONS = INDEX_SECTIONS.filter((name) => !PLAY_OMITS.includes(name)
 const MANIFEST = INDEX_SECTIONS;
 
 describe('css_corpus section manifest', () => {
-  it('pins a non-vacuous manifest: 69 index + 67 play sections, no duplicate names', () => {
-    expect(INDEX_SECTIONS.length).toBe(69);
-    expect(PLAY_SECTIONS.length).toBe(67);
-    expect(MANIFEST.length).toBe(69);
-    expect(new Set(INDEX_SECTIONS).size).toBe(69);
-    expect(new Set(PLAY_SECTIONS).size).toBe(67);
+  it('pins a non-vacuous manifest: 70 index + 68 play sections, no duplicate names', () => {
+    expect(INDEX_SECTIONS.length).toBe(70);
+    expect(PLAY_SECTIONS.length).toBe(68);
+    expect(MANIFEST.length).toBe(70);
+    expect(new Set(INDEX_SECTIONS).size).toBe(70);
+    expect(new Set(PLAY_SECTIONS).size).toBe(68);
   });
 
   it('captures the live corpus markers (the marker regex is non-vacuous, not a zero match)', () => {

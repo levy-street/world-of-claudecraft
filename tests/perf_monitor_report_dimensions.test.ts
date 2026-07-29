@@ -25,6 +25,7 @@ function installBrowserGlobals(search = ''): { appendChild: ReturnType<typeof vi
     createElement: () => ({
       style: {},
       addEventListener: () => {},
+      appendChild: () => {},
     }),
   };
   Object.defineProperty(globalThis, 'navigator', {
@@ -70,6 +71,13 @@ describe('perf monitor ungated mainMs buckets', () => {
     ).toThrow('boom');
     // Both calls recorded even though the second threw (finally arm).
     expect(perf.snapshot(1000).mainMs.events.count).toBe(2);
+  });
+
+  it('records the same bucket through the allocation-free start and finish seam', () => {
+    const perf = new PerfMonitor(null);
+    const start = perf.startTime();
+    perf.finishTime('renderer', start);
+    expect(perf.snapshot(1000).mainMs.renderer.count).toBe(1);
   });
 
   it('keeps the overlay mount, input chain, and dev-trace spans gated while buckets record', () => {

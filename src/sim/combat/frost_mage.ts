@@ -24,7 +24,7 @@
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { AbilityDef, Aura, Entity } from '../types';
-import { isRooted } from './cc';
+import { MOVEMENT_LOCK_AURA_KINDS } from './cc';
 
 export const FINGERS_OF_FROST_CHANCE = 0.15;
 export const FINGERS_OF_FROST_MAX_STACKS = 2;
@@ -35,7 +35,7 @@ export const WINTERS_CHILL_CHARGES = 2;
 export const WINTERS_CHILL_DURATION = 5;
 // Shatter: additive spell crit chance against a target this cast treats as
 // frozen. Stacks with the Coldsnap Break row's critVsRooted on a
-// really-frozen target by design.
+// mage-frozen target by design.
 export const SHATTER_CRIT_BONUS = 0.5;
 // Ice Lance "deals 200% more damage" against a frozen-counting target.
 export const ICE_LANCE_FROZEN_MULT = 3;
@@ -246,10 +246,10 @@ export const INERT_FROZEN: FrozenCastState = { treatAsFrozen: false, damageMult:
 
 /** Resolve whether this cast treats its target as frozen, spending at most
  *  one enabling state in the owner's order:
- *    1. really frozen (a root aura): spends NOTHING,
+ *    1. held by a mage's own hard CC: spends NOTHING,
  *    2. Fingers of Frost (Ice Lance only): spends one stack,
  *    3. Winter's Chill (compatible spells): spends one charge.
- *  A really-frozen target Shatters EVERY spell (the Nova window); the proc
+ *  A mage-frozen target Shatters EVERY spell (the Nova window); the proc
  *  states only empower their own spenders. Deterministic reads, no rng. */
 export function resolveFrozenCast(
   ctx: SimContext,
@@ -261,7 +261,7 @@ export function resolveFrozenCast(
   if (!target || ability.school === 'physical') return INERT_FROZEN;
   if (!isCommittedFrost(ctx, meta)) return INERT_FROZEN;
   const lanceMult = ability.id === 'ice_lance' ? ICE_LANCE_FROZEN_MULT : 1;
-  if (isRooted(target)) return { treatAsFrozen: true, damageMult: lanceMult };
+  if (isMageFrozen(ctx, target)) return { treatAsFrozen: true, damageMult: lanceMult };
   if (ability.id === 'ice_lance' && consumeFingersCharge(ctx, p)) {
     return { treatAsFrozen: true, damageMult: lanceMult };
   }
@@ -269,6 +269,20 @@ export function resolveFrozenCast(
     return { treatAsFrozen: true, damageMult: lanceMult };
   }
   return INERT_FROZEN;
+}
+
+// "Frozen" is the mage's OWN hard CC, whatever kind it lands as: Deadfrost is a
+// `stun`, Temporal Hourglass a `stasis`, Polymorph its own kind, Frost Nova and
+// Ring of Frost `root`. The pin is the full movement-lock set (never a narrower
+// list, which is how Deadfrost silently lost its 3x Ice Lance) PLUS the source
+// class, so another class's hold, a druid's Entangling Roots above all, no
+// longer hands the mage a free Shatter. Class is the pin rather than the aura's
+// school because it is the mage's own kit that should pay for the window.
+function isMageFrozen(ctx: SimContext, target: Entity): boolean {
+  return target.auras.some(
+    (aura) =>
+      MOVEMENT_LOCK_AURA_KINDS.has(aura.kind) && ctx.players.get(aura.sourceId)?.cls === 'mage',
+  );
 }
 
 /** Post-impact rider, called once at the end of runEffects: frostbolt rolls

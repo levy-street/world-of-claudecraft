@@ -1,0 +1,4186 @@
+{
+  "targetName": "Fenbridge Warden Gatehouse",
+  "targetId": "fenbridge-warden-gatehouse",
+  "schemaVersion": "2.1",
+  "terminologyProfile": {
+    "domain": "real-time procedural Three.js asset",
+    "geometryTerms": [
+      "silhouette",
+      "topology",
+      "primitive",
+      "bevel",
+      "chamfer",
+      "taper",
+      "bend",
+      "boolean cut",
+      "edge loop",
+      "surface normal",
+      "displacement"
+    ],
+    "materialTerms": [
+      "albedo",
+      "baseColor",
+      "roughness",
+      "metalness",
+      "normal map",
+      "bump map",
+      "ambient occlusion",
+      "cavity dirt",
+      "edge wear",
+      "clearcoat"
+    ],
+    "lightingTerms": [
+      "key light",
+      "fill light",
+      "rim light",
+      "HDRI/environment reflection",
+      "contact shadow"
+    ],
+    "descriptionRule": "Use measurable 3D graphics terms. Avoid vague words unless they are paired with concrete geometry/material/shader parameters."
+  },
+  "sourceImage": "docs/design/fenbridge-rebuild/img2threejs/warden-gatehouse/zones/hero.png",
+  "referenceCamera": {
+    "solved": false,
+    "fovDegrees": 36,
+    "aspect": 1,
+    "orientation": {
+      "yaw": 35,
+      "pitch": -14,
+      "roll": 0
+    },
+    "positionHint": [8, 7, 12],
+    "note": "The sheet is orthographic-like and is not used for pixel projection. Match each admitted elevation independently during review."
+  },
+  "suitability": "conditional",
+  "scores": {
+    "object_isolation": 3,
+    "silhouette_readability": 3,
+    "depth_inference": 3,
+    "primitive_decomposition": 3,
+    "material_procedurality": 2,
+    "occlusion_risk": 1,
+    "interaction_fit": 3
+  },
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "fortified timber gatehouse and watchtower",
+      "primaryDomain": "object",
+      "formLanguage": ["architectural", "hard-surface", "asymmetric", "silhouette-led"],
+      "structureKind": ["layered exterior shell", "branching hierarchy", "repeated modules"],
+      "motionPotential": ["static world building", "future lantern sway", "future banner flutter"],
+      "materialFamilies": [
+        "damp stone",
+        "rain-dark timber",
+        "oxidized teal shingles",
+        "forged iron",
+        "aged brass",
+        "emissive glass",
+        "weathered cloth"
+      ],
+      "notes": "Four admitted elevations support a stylized exterior-only reconstruction; no interior geometry is inferred."
+    },
+    "complexity": {
+      "tier": "complex",
+      "scores": {
+        "silhouetteComplexity": 3,
+        "componentCount": 3,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 2,
+        "materialLayerCount": 3,
+        "localDetailDensity": 3,
+        "occlusionRisk": 1,
+        "actionReadinessNeed": 1
+      },
+      "estimatedCounts": {
+        "macroComponents": 4,
+        "mesoComponents": 7,
+        "microFeatureGroups": 12,
+        "materialLayers": 6,
+        "repetitionSystems": 2
+      },
+      "reasoning": [
+        "The narrow tower, offset balcony, horned roof, lantern jib, and banner create a strongly interrupted asymmetric silhouette.",
+        "Repeated plank seams, shingles, iron plates, bolts, windows, and finials require grouped systems to stay inside the 4,400-triangle target.",
+        "Four admitted views resolve the exterior depth, but their generated ornamental cadence varies slightly, so front and hero views control identity."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "complex",
+      "minimumComponentLevels": ["macro", "meso", "micro"],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "Macro tower masses, meso service assemblies, and grouped micro construction details all survive at the elevated gameplay camera."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "resolvedUncertainties": [
+      "Generated views disagree on minor horn and rope placement; use the front and hero horn silhouette, with the rear view controlling rope anchors.",
+      "Shingle, bolt, and stone counts are cadence evidence rather than literal counts; use grouped repetition under the 5,600-triangle hard ceiling.",
+      "Lantern interior, doorway interior, and balcony room interior remain closed or emissive-backed exterior surfaces."
+    ],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 10,
+      "note": "Twelve observed details are mapped to implemented component local features or material local overrides.",
+      "details": [
+        {
+          "id": "moss-lined-stone-joints",
+          "kind": "stain",
+          "description": "Green moss concentrates in the lowest irregular foundation joints and post bases.",
+          "region": {
+            "x": 0.24,
+            "y": 0.72,
+            "width": 0.52,
+            "height": 0.2,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "stone albedo, roughness, and cavity response",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "stone/moss-footing"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/warden-gatehouse/zones/front.png",
+          "confidence": 0.94
+        },
+        {
+          "id": "irregular-block-cadence",
+          "kind": "seam",
+          "description": "Chunky damp-stone courses use uneven widths rather than a uniform brick grid.",
+          "region": {
+            "x": 0.12,
+            "y": 0.68,
+            "width": 0.55,
+            "height": 0.2,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "foundation construction relief",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "foundation/irregular-block-cadence"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/warden-gatehouse/zones/hero.png",
+          "confidence": 0.9
+        },
+        {
+          "id": "vertical-plank-seams",
+          "kind": "seam",
+          "description": "Tall vertical plank rhythm is framed by dark posts and cross rails on every elevation.",
+          "region": {
+            "x": 0.24,
+            "y": 0.26,
+            "width": 0.5,
+            "height": 0.45,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "tower facade construction rhythm",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "tower-shell/vertical-plank-seams"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/warden-gatehouse/zones/rear.png",
+          "confidence": 0.96
+        },
+        {
+          "id": "diagonal-guard-braces",
+          "kind": "ridge",
+          "description": "Diagonal timber braces interrupt the tall wall panels and reinforce the balcony.",
+          "region": {
+            "x": 0.42,
+            "y": 0.4,
+            "width": 0.32,
+            "height": 0.34,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "tower and balcony relief",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "tower-shell/diagonal-guard-braces"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/warden-gatehouse/zones/left.png",
+          "confidence": 0.9
+        },
+        {
+          "id": "iron-strap-fasteners",
+          "kind": "fastener",
+          "description": "Square iron corner plates and raised bolt heads repeat at beams, posts, and door rails.",
+          "region": {
+            "x": 0.22,
+            "y": 0.35,
+            "width": 0.56,
+            "height": 0.42,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "metal construction rhythm and edge highlights",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "tower-shell/iron-strap-fasteners"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/warden-gatehouse/zones/front.png",
+          "confidence": 0.92
+        },
+        {
+          "id": "layered-teal-shingles",
+          "kind": "seam",
+          "description": "Overlapping oxidized teal shingle rows step down both steep roof slopes.",
+          "region": {
+            "x": 0.25,
+            "y": 0.08,
+            "width": 0.48,
+            "height": 0.28,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "roof row relief and teal value variation",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "roof-silhouette/layered-teal-shingles"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/warden-gatehouse/zones/hero.png",
+          "confidence": 0.95
+        },
+        {
+          "id": "upturned-horn-caps",
+          "kind": "contour",
+          "description": "Paired dark horn forms flare outward from the upper eaves with metal collar bands.",
+          "region": {
+            "x": 0.15,
+            "y": 0.13,
+            "width": 0.7,
+            "height": 0.2,
+            "units": "normalized"
+          },
+          "scale": "macro",
+          "affects": "roof identity silhouette",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "horned-ridge/upturned-horn-caps"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/warden-gatehouse/zones/front.png",
+          "confidence": 0.88
+        },
+        {
+          "id": "arched-mullion-grid",
+          "kind": "linework",
+          "description": "Small amber arched windows carry dark vertical and horizontal mullions.",
+          "region": {
+            "x": 0.42,
+            "y": 0.3,
+            "width": 0.18,
+            "height": 0.16,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "window material separation and facade scale",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "window-system/arched-mullion-grid"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/warden-gatehouse/zones/rear.png",
+          "confidence": 0.94
+        },
+        {
+          "id": "lantern-cage-bars",
+          "kind": "linework",
+          "description": "The hanging amber lantern is enclosed by a tapered iron cage and short chain.",
+          "region": {
+            "x": 0.05,
+            "y": 0.37,
+            "width": 0.2,
+            "height": 0.24,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "lantern negative space and emissive containment",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "lantern-jib/cage-bars-and-chain"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/warden-gatehouse/zones/front.png",
+          "confidence": 0.93
+        },
+        {
+          "id": "lantern-warm-core",
+          "kind": "emissive",
+          "description": "Warm amber core remains contained inside the iron lantern cage.",
+          "region": {
+            "x": 0.02,
+            "y": 0.38,
+            "width": 0.18,
+            "height": 0.2,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "emissive value hierarchy",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "warm/lantern-core"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/warden-gatehouse/zones/hero.png",
+          "confidence": 0.96
+        },
+        {
+          "id": "door-ring-and-finials",
+          "kind": "fastener",
+          "description": "A round iron door pull and pointed post caps anchor the service entrance.",
+          "region": {
+            "x": 0.3,
+            "y": 0.6,
+            "width": 0.42,
+            "height": 0.24,
+            "units": "normalized"
+          },
+          "scale": "micro",
+          "affects": "entry focal hardware",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "entry-porch/door-ring-and-finials"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/warden-gatehouse/zones/front.png",
+          "confidence": 0.93
+        },
+        {
+          "id": "frayed-blank-banner-edge",
+          "kind": "contour",
+          "description": "The blank teal banner ends in an uneven torn lower edge without an emblem.",
+          "region": {
+            "x": 0.05,
+            "y": 0.31,
+            "width": 0.22,
+            "height": 0.25,
+            "units": "normalized"
+          },
+          "scale": "meso",
+          "affects": "asymmetric cloth silhouette",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "banner-mast/frayed-blank-banner-edge"
+          },
+          "evidenceRef": "docs/design/fenbridge-rebuild/img2threejs/warden-gatehouse/zones/rear.png",
+          "confidence": 0.91
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "note": "Architectural object; character anatomy does not apply."
+    },
+    "sourceImage": "docs/design/fenbridge-rebuild/img2threejs/warden-gatehouse/zones/hero.png"
+  },
+  "qualityContract": {
+    "qualityBar": "complex",
+    "definitionOfDone": [
+      "A floor-seated 7.8 by 10.5 by 7 yard exterior shell reads immediately as the horned Fenwarden tower from four gameplay-relevant angles, retains a clear service stair and balcony, and remains within the 4,400-triangle target and 5,600 hard ceiling."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 4,
+      "mesoComponents": 7,
+      "microFeatureGroups": 10,
+      "materialLayers": 6,
+      "repetitionSystems": 2,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "tower-plinth-proportions",
+        "name": "Tall tower and stout plinth proportion system",
+        "required": true,
+        "qualityCriteria": [
+          "The stone base stays broad and low while the timber tower remains narrow and vertically dominant."
+        ],
+        "evidenceRefs": ["front", "left", "rear", "hero"],
+        "failureModes": [
+          "tower reads as a generic square house",
+          "foundation consumes too much of the height"
+        ]
+      },
+      {
+        "id": "horned-roof-silhouette",
+        "name": "Steep teal roof and upturned horn silhouette",
+        "required": true,
+        "qualityCriteria": [
+          "Steep roof slopes, central finial, and paired horn arcs remain legible from front and hero views."
+        ],
+        "evidenceRefs": ["front", "hero"],
+        "failureModes": ["roof loses the horned identity", "horns float away from eave collars"]
+      },
+      {
+        "id": "service-asymmetry",
+        "name": "Entry, balcony, lantern, and banner asymmetry",
+        "required": true,
+        "qualityCriteria": [
+          "The accessible front stair is balanced by offset balcony, lantern jib, and blank teal banner without blocking the apron."
+        ],
+        "evidenceRefs": ["front", "left", "rear", "hero"],
+        "failureModes": [
+          "facade becomes symmetrical and generic",
+          "service stair or balcony has no readable negative space"
+        ]
+      },
+      {
+        "id": "construction-rhythm",
+        "name": "Timber, iron, stone, and shingle construction rhythm",
+        "required": true,
+        "qualityCriteria": [
+          "Grouped plank seams, diagonal braces, metal plates, bolts, stone courses, and shingles read without one mesh per mark."
+        ],
+        "evidenceRefs": ["front", "rear", "hero"],
+        "failureModes": [
+          "surface becomes flat plastic",
+          "uniform detail density exceeds the triangle budget"
+        ]
+      },
+      {
+        "id": "contained-warm-light",
+        "name": "Contained amber window and lantern hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Amber shapes stay behind dark mullions and cage bars, subordinate to the roof silhouette."
+        ],
+        "evidenceRefs": ["front", "left", "rear", "hero"],
+        "failureModes": [
+          "unframed glow washes out construction",
+          "windows lose arched mullion identity"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "tower height to foundation width and roof height ratio",
+      "horn span and roof peak silhouette against front and hero evidence",
+      "entry stair, balcony, lantern, banner, and rear rope placement",
+      "plank, shingle, stone, metal-plate, and mullion cadence",
+      "warm emissive containment and teal roof value separation"
+    ],
+    "antiShallowSpecRules": [
+      "Do not model an explorable or visible interior.",
+      "Do not replace horn arcs, balcony negative space, or stair profile with painted details.",
+      "Every inventoried mark must resolve to a named component feature or material override.",
+      "Use grouped or instanced repetition for shingles, bolts, windows, and finials.",
+      "Keep +Z as the front and preserve the unobstructed service apron."
+    ]
+  },
+  "qualityTargets": {
+    "targetFidelity": 0.7,
+    "mustMatch": [
+      "tower to plinth proportions",
+      "horned steep-roof silhouette",
+      "entry, balcony, lantern, banner, and rear-rope service cues",
+      "amber windows contained by dark frames"
+    ],
+    "niceToHave": [
+      "individual shingle value drift",
+      "subtle fastener crown polish",
+      "fine rain streaks"
+    ],
+    "fpsTarget": 60,
+    "reviewViewpoints": ["front", "left", "rear", "front-three-quarter"]
+  },
+  "selfCorrectLoop": {
+    "enabled": true,
+    "visualAcceptance": {
+      "reviewer": "ai-vision",
+      "threshold": 0.7,
+      "comparisonArtifactRequired": true,
+      "layerScoresRequired": true,
+      "codePixelDiffIsAcceptanceAuthority": false,
+      "scoringRule": "AI vision must inspect a side-by-side reference/render sheet and score the current pass from 0 to 1. Pixel-diff code may assist diagnostics but cannot approve a pass.",
+      "requiredLayerScores": [
+        "silhouetteProportion",
+        "componentStructure",
+        "formDetail",
+        "materialSurface",
+        "lightingCamera"
+      ],
+      "featureReviewPolicy": {
+        "enabled": true,
+        "reviewUnit": "semantic-subsystem",
+        "maxCriticalFeaturesPerPass": 5,
+        "maxImportantFeaturesPerPass": 3,
+        "criticalDefaultThreshold": 0.8,
+        "importantAverageThreshold": 0.65,
+        "adaptiveEscalation": true,
+        "singleImagePairOnly": true,
+        "selectionRule": "Choose only the most visually salient, identity-defining, user-prioritized, or high-risk semantic systems. Group repeated parts instead of reviewing every mesh. AI vision scores every selected feature from the same full reference/render pair."
+      }
+    },
+    "reviewAfterPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "lighting-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "allowedActions": ["continue", "refine-spec", "refine-code", "request-input", "stop"],
+    "specRefineTriggers": [
+      "missing component",
+      "wrong primitive family",
+      "wrong proportions",
+      "material layer under-specified",
+      "local feature not traceable to viewEvidence",
+      "reference ambiguity discovered during implementation"
+    ],
+    "codeRefineTriggers": [
+      "spec is adequate but generated geometry/material does not match",
+      "browser render differs from reference",
+      "performance budget exceeded",
+      "lighting hides geometry or material response"
+    ],
+    "stopCriteria": [
+      "target fidelity reached or user accepts current approximation",
+      "remaining gaps require new reference images or manual art"
+    ],
+    "screenshotPolicy": {
+      "requiredForPasses": [
+        "blockout",
+        "structural-pass",
+        "form-refinement",
+        "material-pass",
+        "surface-pass",
+        "lighting-pass",
+        "interaction-pass"
+      ],
+      "preferredCapture": "in-app-browser-screenshot",
+      "fallbackCapture": "user-supplied-screenshot-path",
+      "minimumEvidence": "Each visual pass needs a reference image, rendered screenshot, side-by-side comparison sheet, AI vision score, layer scores, and critique before choosing continue.",
+      "reviewPairRule": "Compare the same camera/viewpoint whenever possible; do not judge a front reference against a random render angle.",
+      "acceptanceAuthority": "AI vision review of the comparison sheet. Code-generated pixel similarity is not sufficient evidence."
+    }
+  },
+  "featureReviewTargets": [
+    {
+      "id": "tower-plinth-ratio",
+      "name": "Narrow tower over stout plinth",
+      "tier": "critical",
+      "passIds": ["blockout"],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": ["foundation", "tower-shell"],
+      "evidenceRefs": ["front", "hero"]
+    },
+    {
+      "id": "horned-roof-profile",
+      "name": "Steep teal roof with paired horn arcs",
+      "tier": "critical",
+      "passIds": ["blockout", "form-refinement"],
+      "minimumScore": 0.8,
+      "mustPass": true,
+      "componentRefs": ["roof-silhouette", "horned-ridge"],
+      "evidenceRefs": ["front", "hero"]
+    },
+    {
+      "id": "entry-stair-apron",
+      "name": "Accessible front door, hood, and stair",
+      "tier": "critical",
+      "passIds": ["structural-pass"],
+      "minimumScore": 0.75,
+      "mustPass": true,
+      "componentRefs": ["entry-porch"],
+      "evidenceRefs": ["front", "hero"]
+    },
+    {
+      "id": "asymmetric-service-cues",
+      "name": "Offset balcony, lantern, banner, and rear rope",
+      "tier": "critical",
+      "passIds": ["structural-pass", "form-refinement"],
+      "minimumScore": 0.75,
+      "mustPass": true,
+      "componentRefs": ["lookout-balcony", "lantern-jib", "banner-mast", "rear-rope-brace"],
+      "evidenceRefs": ["left", "rear", "hero"]
+    },
+    {
+      "id": "amber-frame-hierarchy",
+      "name": "Amber windows and lantern contained by dark frames",
+      "tier": "critical",
+      "passIds": ["material-pass", "surface-pass"],
+      "minimumScore": 0.7,
+      "mustPass": true,
+      "componentRefs": ["window-system", "lantern-jib"],
+      "evidenceRefs": ["front", "rear", "hero"]
+    },
+    {
+      "id": "construction-cadence",
+      "name": "Timber brace, shingle, stone, and fastener cadence",
+      "tier": "important",
+      "passIds": ["structural-pass", "surface-pass"],
+      "minimumScore": 0.7,
+      "mustPass": false,
+      "componentRefs": ["foundation", "tower-shell", "roof-silhouette"],
+      "evidenceRefs": ["front", "rear", "hero"]
+    },
+    {
+      "id": "weathering-restraint",
+      "name": "Moss and rain-darkening stay at contact zones",
+      "tier": "important",
+      "passIds": ["material-pass", "surface-pass"],
+      "minimumScore": 0.65,
+      "mustPass": false,
+      "componentRefs": ["foundation", "tower-shell"],
+      "evidenceRefs": ["front", "hero"]
+    },
+    {
+      "id": "floor-seat-and-clearance",
+      "name": "Floor seating and service-apron clearance",
+      "tier": "important",
+      "passIds": ["optimization-pass"],
+      "minimumScore": 0.7,
+      "mustPass": false,
+      "componentRefs": ["root", "entry-porch"],
+      "evidenceRefs": ["front", "hero"]
+    }
+  ],
+  "sculptPipeline": {
+    "passGateMode": "locked-sequential",
+    "passOrder": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "lighting-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "currentPass": "complete",
+    "completedPasses": [
+      "blockout",
+      "structural-pass",
+      "form-refinement",
+      "material-pass",
+      "surface-pass",
+      "lighting-pass",
+      "interaction-pass",
+      "optimization-pass"
+    ],
+    "lastCompletedPass": "optimization-pass",
+    "blockedReason": "all build passes completed",
+    "nextRequiredEvidence": []
+  },
+  "lookDevTargets": {
+    "qualityPriority": "gameplay-distance-stylized-vertex-color",
+    "materialPass": {
+      "albedoPaletteRequired": true,
+      "roughnessVariationRequired": true,
+      "normalOrBumpRequired": true,
+      "localOverridesRequired": true,
+      "minimumTextureResolution": 512,
+      "preferredTextureResolution": 512,
+      "independentMapChannels": ["albedo", "roughness", "height", "normal", "ambient-occlusion"],
+      "requiredSurfaceFrequencyBands": ["macro", "meso", "micro"],
+      "geometryReliefRequiredWhenSilhouetteAffected": true,
+      "referencePbrExtraction": {
+        "requiredWhenSourceImagePresent": false,
+        "targetThreshold": 0.7,
+        "stopOnLowConfidence": true,
+        "acceptedLimitation": "Generated turnaround pixels contain baked studio lighting, so they guide palette and finish only; shared independent normal and roughness maps provide runtime response."
+      },
+      "mustAvoid": [
+        "single flat albedo per material",
+        "uniform roughness",
+        "albedo texture reused as roughness/height/normal/AO",
+        "single-frequency random noise",
+        "plastic-looking smooth bark, stone, cloth, foliage, or aged material",
+        "local color/detail described only in prose without material masks",
+        "claiming exact PBR recovery when confidence is below the target threshold"
+      ]
+    },
+    "lightingPass": {
+      "requiredTerms": [
+        "key light",
+        "fill light",
+        "rim or environment light",
+        "exposure",
+        "tone mapping",
+        "background",
+        "contact shadow"
+      ],
+      "mustAvoid": [
+        "ambient-only lighting",
+        "flat value range",
+        "missing contact shadow",
+        "reference lighting copied without separating material readability"
+      ]
+    },
+    "screenshotReview": [
+      "Compare albedo palette and local color zones.",
+      "Compare roughness/normal/bump response under light.",
+      "Compare cavity dirt, edge wear, stains, moss, scratches, or other local masks.",
+      "Compare key/fill/rim structure, exposure, tone mapping, background, and contact shadows.",
+      "Capture a neutral-light render to verify material readability without reference lighting.",
+      "Capture a grazing-light close-up to expose flat normals, uniform roughness, tiling, and plastic highlights.",
+      "Capture a reference-matched render from the same camera framing as the source."
+    ]
+  },
+  "actionReadiness": {
+    "contract": "Every macro/meso component should be generated as a stable named Object3D pivot node with a mesh child, action metadata, optional sockets, collider proxy, and destruction metadata.",
+    "defaultRigType": "action-ready-static-rig",
+    "rootMotionNode": "root",
+    "requiredComponentFields": [
+      "id",
+      "parent",
+      "transform",
+      "attachment for child appendages, connectors, limbs, tubes, handles, legs, horns, wings, branches, or cables",
+      "actionProfile.animationRole",
+      "actionProfile.pivot",
+      "actionProfile.collider",
+      "actionProfile.destruction"
+    ],
+    "transformChannels": [
+      "translate",
+      "rotate",
+      "scale",
+      "bend",
+      "twist",
+      "detach",
+      "visibility",
+      "material-state"
+    ],
+    "authoringRules": [
+      "Do not collapse independently movable parts into one mesh.",
+      "Put transforms on component pivot groups, not only on raw meshes.",
+      "For attached child parts, put the pivot at the semantic root/socket and build visible geometry from localStart to localEnd.",
+      "Represent hinge, socket, detachable, and breakable intent even when no animation is implemented yet.",
+      "Use simplified collider proxies for runtime physics instead of visual mesh colliders by default."
+    ],
+    "destructionPolicy": {
+      "defaultBreakable": false,
+      "fractureGroupNaming": "Use stable semantic names such as body-shell, left-hinge, glass-panel, branch-segment.",
+      "debrisStrategy": "Prefer detachable component groups and a small number of procedural fragments over random mesh explosion."
+    }
+  },
+  "assumptions": [
+    "Generated views disagree on minor horn and rope placement; use the front and hero horn silhouette, with the rear view controlling rope anchors.",
+    "Shingle, bolt, and stone counts are cadence evidence rather than literal counts; use grouped repetition under the 5,600-triangle hard ceiling.",
+    "Lantern interior, doorway interior, and balcony room interior remain closed or emissive-backed exterior surfaces."
+  ],
+  "coordinateFrame": {
+    "front": "+Z faces the civic-center service apron",
+    "up": "+Y",
+    "right": "+X",
+    "scaleReference": "world yards; final normalization contract is 7.8 W by 10.5 H by 7 D"
+  },
+  "silhouette": {
+    "boundingShape": "tall narrow rectangular tower on a broad low plinth with a steep horned gable",
+    "aspectRatios": [
+      "height/width 1.346",
+      "height/depth 1.5",
+      "plinth under 15 percent of total height"
+    ],
+    "symmetry": "mostly bilateral tower mass with deliberately asymmetric balcony, lantern, banner, and rear rope",
+    "dominantCurves": ["steep roof slopes", "paired upturned eave horns", "sagging rear rope"],
+    "negativeSpaces": [
+      "open lookout rail",
+      "lantern cage",
+      "service stair gaps",
+      "space below banner"
+    ],
+    "landmarks": ["central roof finial", "front arched window", "hooded door", "offset balcony"]
+  },
+  "viewEvidence": [
+    {
+      "id": "front",
+      "view": "front",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": [
+        "tower/plinth ratio",
+        "paired roof horns",
+        "door stair",
+        "left lantern and right banner"
+      ],
+      "confidence": 0.94
+    },
+    {
+      "id": "left",
+      "view": "left",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": [
+        "true roof and tower depth",
+        "offset balcony",
+        "side window",
+        "lantern projection"
+      ],
+      "confidence": 0.88
+    },
+    {
+      "id": "rear",
+      "view": "rear",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": [
+        "rear plank frame",
+        "rope stair path",
+        "rear window",
+        "banner and lantern reversal"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "id": "hero",
+      "view": "front-three-quarter",
+      "imageRegion": {
+        "x": 0,
+        "y": 0,
+        "width": 1,
+        "height": 1,
+        "units": "normalized"
+      },
+      "observations": [
+        "overall identity",
+        "roof depth",
+        "entry apron",
+        "balcony and service asymmetry"
+      ],
+      "confidence": 0.96
+    }
+  ],
+  "componentTree": [
+    {
+      "id": "root",
+      "name": "Warden Gatehouse exterior assembly",
+      "level": "macro",
+      "role": "container",
+      "importance": 1,
+      "confidence": 0.98,
+      "primitive": "box",
+      "topologyClass": "material-only",
+      "topologyRationale": "The root is a transform container; visible volume is owned by child exterior assemblies.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly exterior assembly with silhouette-first dimensions",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.025,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared world-scale Fenbridge surface maps at runtime",
+        "normalStrategy": "computed vertex normals with hard construction seams retained"
+      },
+      "parent": null,
+      "attachment": null,
+      "dimensions": {
+        "width": 7.8,
+        "height": 10.5,
+        "depth": 7,
+        "units": "yards",
+        "confidence": 0.86
+      },
+      "transform": {
+        "position": [0, 0, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "compound",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; shipping collision is owned by the Fenbridge layout contract."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "timber",
+      "materialLayers": ["timber"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [],
+      "surfaceDetail": {
+        "macroRoughness": 0.18,
+        "microRoughness": 0.08,
+        "bumpAmplitude": 0.035,
+        "normalPattern": "shared Fenbridge normal cell selected by semantic material",
+        "displacementPattern": "none",
+        "occlusionPattern": "contact seams and frame intersections",
+        "edgeWearPattern": "restrained exposed-edge lightening",
+        "notes": "Reference lighting is baked into the generated sheet, so vertex color remains the palette authority."
+      },
+      "evidenceRefs": ["front", "left", "rear", "hero"],
+      "details": [],
+      "fidelityTier": "structural"
+    },
+    {
+      "id": "foundation",
+      "name": "Piling and damp-stone plinth",
+      "level": "macro",
+      "role": "static-part",
+      "importance": 0.85,
+      "confidence": 0.88,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Visible stacked stone and timber piles form a discrete rigid base with flat block faces.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly exterior assembly with silhouette-first dimensions",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.025,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared world-scale Fenbridge surface maps at runtime",
+        "normalStrategy": "computed vertex normals with hard construction seams retained"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 5.4,
+        "height": 1.45,
+        "depth": 4.9,
+        "units": "yards",
+        "confidence": 0.86
+      },
+      "transform": {
+        "position": [0, 0.725, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; shipping collision is owned by the Fenbridge layout contract."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "stone",
+      "materialLayers": ["stone"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "irregular-block-cadence",
+          "kind": "seam",
+          "placement": "all foundation faces",
+          "geometryEffect": "staggered stone blocks and raised post shoes",
+          "materialEffect": "cavity-darkened stone seams",
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.18,
+        "microRoughness": 0.08,
+        "bumpAmplitude": 0.035,
+        "normalPattern": "shared Fenbridge normal cell selected by semantic material",
+        "displacementPattern": "none",
+        "occlusionPattern": "contact seams and frame intersections",
+        "edgeWearPattern": "restrained exposed-edge lightening",
+        "notes": "Reference lighting is baked into the generated sheet, so vertex color remains the palette authority."
+      },
+      "evidenceRefs": ["front", "left", "rear", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(78, 86, 80, 1)",
+        "secondaryAlbedo": "rgba(116, 119, 107, 1)",
+        "materialClass": "stone",
+        "materialClassConfidence": 0.94
+      }
+    },
+    {
+      "id": "tower-shell",
+      "name": "Narrow two-story timber tower shell",
+      "level": "macro",
+      "role": "static-part",
+      "importance": 0.85,
+      "confidence": 0.88,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "The closed exterior has planar timber wall faces and discrete framing beams.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly exterior assembly with silhouette-first dimensions",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.025,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared world-scale Fenbridge surface maps at runtime",
+        "normalStrategy": "computed vertex normals with hard construction seams retained"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 3.5,
+        "height": 6.7,
+        "depth": 3.8,
+        "units": "yards",
+        "confidence": 0.86
+      },
+      "transform": {
+        "position": [0, 4.2, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; shipping collision is owned by the Fenbridge layout contract."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "timber",
+      "materialLayers": ["timber"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "vertical-plank-seams",
+          "kind": "seam",
+          "placement": "four tower elevations",
+          "geometryEffect": "narrow board divisions framed by beams",
+          "materialEffect": "dark seam value",
+          "confidence": 0.9
+        },
+        {
+          "id": "diagonal-guard-braces",
+          "kind": "ridge",
+          "placement": "front gable, side wall, rear balcony bay",
+          "geometryEffect": "raised diagonal timber beams",
+          "materialEffect": "timber edge wear",
+          "confidence": 0.9
+        },
+        {
+          "id": "iron-strap-fasteners",
+          "kind": "fastener",
+          "placement": "beam intersections and post feet",
+          "geometryEffect": "repeated square plates and bolt heads",
+          "materialEffect": "forged-iron highlights",
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.18,
+        "microRoughness": 0.08,
+        "bumpAmplitude": 0.035,
+        "normalPattern": "shared Fenbridge normal cell selected by semantic material",
+        "displacementPattern": "none",
+        "occlusionPattern": "contact seams and frame intersections",
+        "edgeWearPattern": "restrained exposed-edge lightening",
+        "notes": "Reference lighting is baked into the generated sheet, so vertex color remains the palette authority."
+      },
+      "evidenceRefs": ["front", "left", "rear", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(52, 39, 30, 1)",
+        "secondaryAlbedo": "rgba(118, 82, 54, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.95
+      }
+    },
+    {
+      "id": "roof-silhouette",
+      "name": "Steep teal gable roof",
+      "level": "macro",
+      "role": "static-part",
+      "importance": 0.85,
+      "confidence": 0.88,
+      "primitive": "extrude",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Two rigid pitched roof slopes and gable caps define a steep constructed shell.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly exterior assembly with silhouette-first dimensions",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.025,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared world-scale Fenbridge surface maps at runtime",
+        "normalStrategy": "computed vertex normals with hard construction seams retained"
+      },
+      "parent": "root",
+      "attachment": null,
+      "dimensions": {
+        "width": 5,
+        "height": 2.5,
+        "depth": 4.5,
+        "units": "yards",
+        "confidence": 0.86
+      },
+      "transform": {
+        "position": [0, 8.3, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; shipping collision is owned by the Fenbridge layout contract."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "roof",
+      "materialLayers": ["roof"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "layered-teal-shingles",
+          "kind": "seam",
+          "placement": "both steep roof slopes",
+          "geometryEffect": "overlapping shingle course boxes",
+          "materialEffect": "oxidized teal variation",
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.18,
+        "microRoughness": 0.08,
+        "bumpAmplitude": 0.035,
+        "normalPattern": "shared Fenbridge normal cell selected by semantic material",
+        "displacementPattern": "none",
+        "occlusionPattern": "contact seams and frame intersections",
+        "edgeWearPattern": "restrained exposed-edge lightening",
+        "notes": "Reference lighting is baked into the generated sheet, so vertex color remains the palette authority."
+      },
+      "evidenceRefs": ["front", "left", "rear", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(23, 98, 105, 1)",
+        "secondaryAlbedo": "rgba(45, 133, 133, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.88
+      }
+    },
+    {
+      "id": "entry-porch",
+      "name": "Front service doorway, hood, and stair",
+      "level": "meso",
+      "role": "static-part",
+      "importance": 0.85,
+      "confidence": 0.88,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Door slab, pitched hood, posts, and stepped apron are discrete rigid construction pieces.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly exterior assembly with silhouette-first dimensions",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.025,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared world-scale Fenbridge surface maps at runtime",
+        "normalStrategy": "computed vertex normals with hard construction seams retained"
+      },
+      "parent": "tower-shell",
+      "attachment": null,
+      "dimensions": {
+        "width": 2.7,
+        "height": 3.2,
+        "depth": 1.65,
+        "units": "yards",
+        "confidence": 0.86
+      },
+      "transform": {
+        "position": [0.25, 1.6, 2.25],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; shipping collision is owned by the Fenbridge layout contract."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "timber",
+      "materialLayers": ["timber"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "door-ring-and-finials",
+          "kind": "fastener",
+          "placement": "front door and apron corner posts",
+          "geometryEffect": "torus pull plus pointed caps",
+          "materialEffect": "iron/brass focal accents",
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.18,
+        "microRoughness": 0.08,
+        "bumpAmplitude": 0.035,
+        "normalPattern": "shared Fenbridge normal cell selected by semantic material",
+        "displacementPattern": "none",
+        "occlusionPattern": "contact seams and frame intersections",
+        "edgeWearPattern": "restrained exposed-edge lightening",
+        "notes": "Reference lighting is baked into the generated sheet, so vertex color remains the palette authority."
+      },
+      "evidenceRefs": ["front", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(52, 39, 30, 1)",
+        "secondaryAlbedo": "rgba(118, 82, 54, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.95
+      }
+    },
+    {
+      "id": "lookout-balcony",
+      "name": "Offset open lookout balcony",
+      "level": "meso",
+      "role": "static-part",
+      "importance": 0.85,
+      "confidence": 0.88,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "An open plank deck with rails and diagonal braces projects from the tower side.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly exterior assembly with silhouette-first dimensions",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.025,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared world-scale Fenbridge surface maps at runtime",
+        "normalStrategy": "computed vertex normals with hard construction seams retained"
+      },
+      "parent": "tower-shell",
+      "attachment": null,
+      "dimensions": {
+        "width": 2.4,
+        "height": 1.1,
+        "depth": 1.7,
+        "units": "yards",
+        "confidence": 0.86
+      },
+      "transform": {
+        "position": [1.75, 5.1, -0.65],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; shipping collision is owned by the Fenbridge layout contract."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "timber",
+      "materialLayers": ["timber"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "rope-and-rail-gap",
+          "kind": "linework",
+          "placement": "offset lookout deck",
+          "geometryEffect": "open rail cadence and diagonal brace",
+          "materialEffect": "rope/timber contrast",
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.18,
+        "microRoughness": 0.08,
+        "bumpAmplitude": 0.035,
+        "normalPattern": "shared Fenbridge normal cell selected by semantic material",
+        "displacementPattern": "none",
+        "occlusionPattern": "contact seams and frame intersections",
+        "edgeWearPattern": "restrained exposed-edge lightening",
+        "notes": "Reference lighting is baked into the generated sheet, so vertex color remains the palette authority."
+      },
+      "evidenceRefs": ["left", "rear", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(52, 39, 30, 1)",
+        "secondaryAlbedo": "rgba(118, 82, 54, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.95
+      }
+    },
+    {
+      "id": "horned-ridge",
+      "name": "Paired upturned ridge horns",
+      "level": "meso",
+      "role": "static-part",
+      "importance": 0.85,
+      "confidence": 0.88,
+      "primitive": "torus",
+      "topologyClass": "continuous-sculpt",
+      "topologyRationale": "Each eave horn is a curved tapering volume whose arc defines the roof silhouette.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly exterior assembly with silhouette-first dimensions",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.025,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared world-scale Fenbridge surface maps at runtime",
+        "normalStrategy": "computed vertex normals with hard construction seams retained"
+      },
+      "parent": "roof-silhouette",
+      "attachment": {
+        "parentId": "roof-silhouette",
+        "parentSocket": "upper-eave-collars",
+        "localStart": [-2.1, 0, 0],
+        "localEnd": [2.1, 0, 0],
+        "contactType": "overlap",
+        "overlap": 0.05,
+        "gapTolerance": 0.01,
+        "evidenceRefs": ["front", "hero"]
+      },
+      "dimensions": {
+        "width": 5.9,
+        "height": 1.25,
+        "depth": 0.55,
+        "units": "yards",
+        "confidence": 0.86
+      },
+      "transform": {
+        "position": [0, 8.45, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; shipping collision is owned by the Fenbridge layout contract."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "metal",
+      "materialLayers": ["metal"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "upturned-horn-caps",
+          "kind": "contour",
+          "placement": "paired upper eaves",
+          "geometryEffect": "segmented curved horn silhouettes with collar rings",
+          "materialEffect": "dark horn and iron collar separation",
+          "confidence": 0.88
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.18,
+        "microRoughness": 0.08,
+        "bumpAmplitude": 0.035,
+        "normalPattern": "shared Fenbridge normal cell selected by semantic material",
+        "displacementPattern": "none",
+        "occlusionPattern": "contact seams and frame intersections",
+        "edgeWearPattern": "restrained exposed-edge lightening",
+        "notes": "Reference lighting is baked into the generated sheet, so vertex color remains the palette authority."
+      },
+      "evidenceRefs": ["front", "rear", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(52, 56, 58, 1)",
+        "secondaryAlbedo": "rgba(155, 118, 45, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.93
+      }
+    },
+    {
+      "id": "lantern-jib",
+      "name": "Hanging lantern jib and cage",
+      "level": "meso",
+      "role": "static-part",
+      "importance": 0.85,
+      "confidence": 0.88,
+      "primitive": "box",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "A rigid timber arm, short chain, and faceted cage project from the upper wall.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly exterior assembly with silhouette-first dimensions",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.025,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared world-scale Fenbridge surface maps at runtime",
+        "normalStrategy": "computed vertex normals with hard construction seams retained"
+      },
+      "parent": "tower-shell",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.55,
+        "height": 2.25,
+        "depth": 0.65,
+        "units": "yards",
+        "confidence": 0.86
+      },
+      "transform": {
+        "position": [-2.25, 5, 1.1],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; shipping collision is owned by the Fenbridge layout contract."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "metal",
+      "materialLayers": ["metal"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "cage-bars-and-chain",
+          "kind": "linework",
+          "placement": "left hanging lantern",
+          "geometryEffect": "tapered cage bars, cap, and chain",
+          "materialEffect": "iron surrounding warm core",
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.18,
+        "microRoughness": 0.08,
+        "bumpAmplitude": 0.035,
+        "normalPattern": "shared Fenbridge normal cell selected by semantic material",
+        "displacementPattern": "none",
+        "occlusionPattern": "contact seams and frame intersections",
+        "edgeWearPattern": "restrained exposed-edge lightening",
+        "notes": "Reference lighting is baked into the generated sheet, so vertex color remains the palette authority."
+      },
+      "evidenceRefs": ["front", "left", "rear", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(52, 56, 58, 1)",
+        "secondaryAlbedo": "rgba(155, 118, 45, 1)",
+        "materialClass": "metal",
+        "materialClassConfidence": 0.93
+      }
+    },
+    {
+      "id": "banner-mast",
+      "name": "Blank teal banner mast",
+      "level": "meso",
+      "role": "static-part",
+      "importance": 0.85,
+      "confidence": 0.88,
+      "primitive": "plane-card",
+      "topologyClass": "conforming-shell",
+      "topologyRationale": "The banner is a thin cloth sheet hanging from a rigid side mast with an uneven lower contour.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly exterior assembly with silhouette-first dimensions",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.025,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared world-scale Fenbridge surface maps at runtime",
+        "normalStrategy": "computed vertex normals with hard construction seams retained"
+      },
+      "parent": "tower-shell",
+      "attachment": null,
+      "dimensions": {
+        "width": 1.35,
+        "height": 2.1,
+        "depth": 0.08,
+        "units": "yards",
+        "confidence": 0.86
+      },
+      "transform": {
+        "position": [2.5, 5.25, 0.8],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; shipping collision is owned by the Fenbridge layout contract."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "cloth",
+      "materialLayers": ["cloth"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "frayed-blank-banner-edge",
+          "kind": "contour",
+          "placement": "right hanging banner",
+          "geometryEffect": "stepped uneven cloth lower edge",
+          "materialEffect": "blank oxidized teal cloth",
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.18,
+        "microRoughness": 0.08,
+        "bumpAmplitude": 0.035,
+        "normalPattern": "shared Fenbridge normal cell selected by semantic material",
+        "displacementPattern": "none",
+        "occlusionPattern": "contact seams and frame intersections",
+        "edgeWearPattern": "restrained exposed-edge lightening",
+        "notes": "Reference lighting is baked into the generated sheet, so vertex color remains the palette authority."
+      },
+      "evidenceRefs": ["front", "rear", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(39, 106, 111, 1)",
+        "secondaryAlbedo": "rgba(23, 98, 105, 1)",
+        "materialClass": "fabric",
+        "materialClassConfidence": 0.86
+      }
+    },
+    {
+      "id": "window-system",
+      "name": "Amber arched window system",
+      "level": "meso",
+      "role": "static-part",
+      "importance": 0.85,
+      "confidence": 0.88,
+      "primitive": "instanced-cluster",
+      "topologyClass": "surface-relief",
+      "topologyRationale": "Repeated arched panels and mullion frames sit proud of otherwise planar tower walls.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly exterior assembly with silhouette-first dimensions",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.025,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared world-scale Fenbridge surface maps at runtime",
+        "normalStrategy": "computed vertex normals with hard construction seams retained"
+      },
+      "parent": "tower-shell",
+      "attachment": null,
+      "dimensions": {
+        "width": 0.8,
+        "height": 1.25,
+        "depth": 0.12,
+        "units": "yards",
+        "confidence": 0.86
+      },
+      "transform": {
+        "position": [0, 5.8, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; shipping collision is owned by the Fenbridge layout contract."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "warm",
+      "materialLayers": ["warm"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "arched-mullion-grid",
+          "kind": "linework",
+          "placement": "front, side, and rear upper windows",
+          "geometryEffect": "arched frames with dark mullion crosses",
+          "materialEffect": "contained amber glow",
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.18,
+        "microRoughness": 0.08,
+        "bumpAmplitude": 0.035,
+        "normalPattern": "shared Fenbridge normal cell selected by semantic material",
+        "displacementPattern": "none",
+        "occlusionPattern": "contact seams and frame intersections",
+        "edgeWearPattern": "restrained exposed-edge lightening",
+        "notes": "Reference lighting is baked into the generated sheet, so vertex color remains the palette authority."
+      },
+      "evidenceRefs": ["front", "left", "rear", "hero"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(255, 164, 58, 1)",
+        "secondaryAlbedo": "rgba(255, 221, 119, 1)",
+        "materialClass": "glass",
+        "materialClassConfidence": 0.84
+      }
+    },
+    {
+      "id": "rear-rope-brace",
+      "name": "Rear stair rope brace",
+      "level": "meso",
+      "role": "static-part",
+      "importance": 0.85,
+      "confidence": 0.88,
+      "primitive": "tube",
+      "topologyClass": "fiber-strand",
+      "topologyRationale": "The visible rope follows a sagging path between rear plinth and balcony anchors.",
+      "geometryDescriptor": {
+        "topologyIntent": "low-poly exterior assembly with silhouette-first dimensions",
+        "edgeTreatment": {
+          "type": "chamfer",
+          "bevelRadius": 0.025,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "semantic vertex color with shared world-scale Fenbridge surface maps at runtime",
+        "normalStrategy": "computed vertex normals with hard construction seams retained"
+      },
+      "parent": "tower-shell",
+      "attachment": {
+        "parentId": "tower-shell",
+        "parentSocket": "rear-rope-anchors",
+        "localStart": [0.7, -2.5, -2],
+        "localEnd": [1.2, 1.2, -2],
+        "contactType": "overlap",
+        "overlap": 0.05,
+        "gapTolerance": 0.01,
+        "evidenceRefs": ["rear"]
+      },
+      "dimensions": {
+        "length": 3.8,
+        "radius": 0.07,
+        "units": "yards",
+        "confidence": 0.86
+      },
+      "transform": {
+        "position": [0.9, 3.2, -2],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
+      },
+      "actionProfile": {
+        "animationRole": "static-part",
+        "pivot": {
+          "mode": "base",
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
+          "confidence": 0.9
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": true
+        },
+        "sockets": [],
+        "collider": {
+          "type": "none",
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
+          "isTrigger": false,
+          "notes": "Authoring proxy only; shipping collision is owned by the Fenbridge layout contract."
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "exterior-shell",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0,
+          "debrisMaterial": "timber"
+        }
+      },
+      "material": "timber",
+      "materialLayers": ["timber"],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [
+        {
+          "id": "rear-rope-sag",
+          "kind": "contour",
+          "placement": "rear stair and balcony",
+          "geometryEffect": "two anchored rope sweeps with visible sag",
+          "materialEffect": "matte rope",
+          "confidence": 0.9
+        }
+      ],
+      "surfaceDetail": {
+        "macroRoughness": 0.18,
+        "microRoughness": 0.08,
+        "bumpAmplitude": 0.035,
+        "normalPattern": "shared Fenbridge normal cell selected by semantic material",
+        "displacementPattern": "none",
+        "occlusionPattern": "contact seams and frame intersections",
+        "edgeWearPattern": "restrained exposed-edge lightening",
+        "notes": "Reference lighting is baked into the generated sheet, so vertex color remains the palette authority."
+      },
+      "evidenceRefs": ["rear"],
+      "details": [],
+      "fidelityTier": "structural",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(52, 39, 30, 1)",
+        "secondaryAlbedo": "rgba(118, 82, 54, 1)",
+        "materialClass": "wood",
+        "materialClassConfidence": 0.95
+      }
+    }
+  ],
+  "materials": [
+    {
+      "id": "stone",
+      "name": "Damp moss-lined foundation stone",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial-compatible semantic vertex color",
+      "baseColor": "#4E5650",
+      "color": "#4E5650",
+      "albedo": {
+        "dominant": "#4E5650",
+        "secondary": ["#74776B"],
+        "samplingNotes": "Palette sampled by visual inspection from neutral turnaround zones; studio highlights are not treated as albedo."
+      },
+      "colorVariation": {
+        "palette": ["#4E5650", "#74776B"],
+        "pattern": "shared semantic atlas plus authored vertex-color zones",
+        "amplitude": 0.12,
+        "heightCorrelation": 0.18
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
+        "repeat": [1, 1],
+        "anisotropy": 4,
+        "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.5,
+          "amplitude": 0.16,
+          "role": "broad value grouping from vertex colors"
+        },
+        {
+          "id": "meso",
+          "frequency": 9,
+          "amplitude": 0.08,
+          "role": "shared grain, stone mottling, or shingle breakup"
+        },
+        {
+          "id": "micro",
+          "frequency": 40,
+          "amplitude": 0.025,
+          "role": "grazing-light highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.91,
+        "variation": 0.1,
+        "map": "independent Fenbridge shared roughness support map",
+        "localResponse": "higher in cavities and moss, lower on worn metal and timber edges"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "independent Fenbridge shared normal support map",
+        "strength": 0.24,
+        "scale": 18,
+        "space": "tangent"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1
+      },
+      "displacement": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.28,
+        "contactShadowBias": 0.32,
+        "notes": "Independent contact and cavity response; no albedo channel reuse."
+      },
+      "wear": {
+        "edgeWear": 0.06,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.18,
+        "cavityBias": 0.7,
+        "color": "#25231D"
+      },
+      "localOverrides": [
+        {
+          "id": "moss-footing",
+          "region": "lowest stone joints and post bases",
+          "color": "#59613A",
+          "roughness": 0.96,
+          "dirtAmount": 0.22,
+          "cavityBias": true,
+          "evidenceRefs": ["front", "hero"]
+        }
+      ],
+      "shaderNotes": [
+        "Vertex color is authoritative because the source sheet contains baked studio lighting.",
+        "Normal and roughness support maps remain independent channels."
+      ],
+      "notes": "stone response mapped to the stone Fenbridge semantic bucket."
+    },
+    {
+      "id": "timber",
+      "name": "Rain-darkened structural timber",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial-compatible semantic vertex color",
+      "baseColor": "#34271E",
+      "color": "#34271E",
+      "albedo": {
+        "dominant": "#34271E",
+        "secondary": ["#765236"],
+        "samplingNotes": "Palette sampled by visual inspection from neutral turnaround zones; studio highlights are not treated as albedo."
+      },
+      "colorVariation": {
+        "palette": ["#34271E", "#765236"],
+        "pattern": "shared semantic atlas plus authored vertex-color zones",
+        "amplitude": 0.12,
+        "heightCorrelation": 0.18
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
+        "repeat": [1, 1],
+        "anisotropy": 4,
+        "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.5,
+          "amplitude": 0.16,
+          "role": "broad value grouping from vertex colors"
+        },
+        {
+          "id": "meso",
+          "frequency": 9,
+          "amplitude": 0.08,
+          "role": "shared grain, stone mottling, or shingle breakup"
+        },
+        {
+          "id": "micro",
+          "frequency": 40,
+          "amplitude": 0.025,
+          "role": "grazing-light highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.82,
+        "variation": 0.1,
+        "map": "independent Fenbridge shared roughness support map",
+        "localResponse": "higher in cavities and moss, lower on worn metal and timber edges"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "independent Fenbridge shared normal support map",
+        "strength": 0.24,
+        "scale": 18,
+        "space": "tangent"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1
+      },
+      "displacement": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.28,
+        "contactShadowBias": 0.32,
+        "notes": "Independent contact and cavity response; no albedo channel reuse."
+      },
+      "wear": {
+        "edgeWear": 0.06,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.08,
+        "cavityBias": 0.7,
+        "color": "#25231D"
+      },
+      "localOverrides": [
+        {
+          "id": "wet-lower-planks",
+          "region": "lower wall boards and stair edges",
+          "color": "#1D1713",
+          "roughness": 0.74,
+          "dirtAmount": 0.16,
+          "streak": "gravity-down",
+          "evidenceRefs": ["front", "rear"]
+        }
+      ],
+      "shaderNotes": [
+        "Vertex color is authoritative because the source sheet contains baked studio lighting.",
+        "Normal and roughness support maps remain independent channels."
+      ],
+      "notes": "wood response mapped to the timber Fenbridge semantic bucket."
+    },
+    {
+      "id": "roof",
+      "name": "Oxidized teal shingles",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial-compatible semantic vertex color",
+      "baseColor": "#176269",
+      "color": "#176269",
+      "albedo": {
+        "dominant": "#176269",
+        "secondary": ["#2D8585"],
+        "samplingNotes": "Palette sampled by visual inspection from neutral turnaround zones; studio highlights are not treated as albedo."
+      },
+      "colorVariation": {
+        "palette": ["#176269", "#2D8585"],
+        "pattern": "shared semantic atlas plus authored vertex-color zones",
+        "amplitude": 0.12,
+        "heightCorrelation": 0.18
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
+        "repeat": [1, 1],
+        "anisotropy": 4,
+        "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.5,
+          "amplitude": 0.16,
+          "role": "broad value grouping from vertex colors"
+        },
+        {
+          "id": "meso",
+          "frequency": 9,
+          "amplitude": 0.08,
+          "role": "shared grain, stone mottling, or shingle breakup"
+        },
+        {
+          "id": "micro",
+          "frequency": 40,
+          "amplitude": 0.025,
+          "role": "grazing-light highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.78,
+        "variation": 0.1,
+        "map": "independent Fenbridge shared roughness support map",
+        "localResponse": "higher in cavities and moss, lower on worn metal and timber edges"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "independent Fenbridge shared normal support map",
+        "strength": 0.24,
+        "scale": 18,
+        "space": "tangent"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1
+      },
+      "displacement": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.28,
+        "contactShadowBias": 0.32,
+        "notes": "Independent contact and cavity response; no albedo channel reuse."
+      },
+      "wear": {
+        "edgeWear": 0.06,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.08,
+        "cavityBias": 0.7,
+        "color": "#25231D"
+      },
+      "localOverrides": [
+        {
+          "id": "oxidized-shingle-edges",
+          "region": "exposed shingle lower edges",
+          "color": "#2D8585",
+          "roughness": 0.7,
+          "evidenceRefs": ["hero"]
+        }
+      ],
+      "shaderNotes": [
+        "Vertex color is authoritative because the source sheet contains baked studio lighting.",
+        "Normal and roughness support maps remain independent channels."
+      ],
+      "notes": "wood response mapped to the roof Fenbridge semantic bucket."
+    },
+    {
+      "id": "metal",
+      "name": "Forged iron with aged brass accents",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial-compatible semantic vertex color",
+      "baseColor": "#34383A",
+      "color": "#34383A",
+      "albedo": {
+        "dominant": "#34383A",
+        "secondary": ["#9B762D"],
+        "samplingNotes": "Palette sampled by visual inspection from neutral turnaround zones; studio highlights are not treated as albedo."
+      },
+      "colorVariation": {
+        "palette": ["#34383A", "#9B762D"],
+        "pattern": "shared semantic atlas plus authored vertex-color zones",
+        "amplitude": 0.12,
+        "heightCorrelation": 0.18
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
+        "repeat": [1, 1],
+        "anisotropy": 4,
+        "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.5,
+          "amplitude": 0.16,
+          "role": "broad value grouping from vertex colors"
+        },
+        {
+          "id": "meso",
+          "frequency": 9,
+          "amplitude": 0.08,
+          "role": "shared grain, stone mottling, or shingle breakup"
+        },
+        {
+          "id": "micro",
+          "frequency": 40,
+          "amplitude": 0.025,
+          "role": "grazing-light highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.43,
+        "variation": 0.1,
+        "map": "independent Fenbridge shared roughness support map",
+        "localResponse": "higher in cavities and moss, lower on worn metal and timber edges"
+      },
+      "metalness": {
+        "base": 0.78,
+        "variation": 0.08
+      },
+      "normal": {
+        "pattern": "independent Fenbridge shared normal support map",
+        "strength": 0.24,
+        "scale": 18,
+        "space": "tangent"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1
+      },
+      "displacement": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.28,
+        "contactShadowBias": 0.32,
+        "notes": "Independent contact and cavity response; no albedo channel reuse."
+      },
+      "wear": {
+        "edgeWear": 0.12,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.08,
+        "cavityBias": 0.7,
+        "color": "#25231D"
+      },
+      "localOverrides": [
+        {
+          "id": "polished-fastener-crowns",
+          "region": "raised bolt and collar crowns",
+          "roughness": 0.24,
+          "color": "#62676A",
+          "evidenceRefs": ["front", "hero"]
+        }
+      ],
+      "shaderNotes": [
+        "Vertex color is authoritative because the source sheet contains baked studio lighting.",
+        "Normal and roughness support maps remain independent channels."
+      ],
+      "notes": "metal response mapped to the metal Fenbridge semantic bucket."
+    },
+    {
+      "id": "warm",
+      "name": "Contained amber window and lantern glow",
+      "type": "emissive-standard",
+      "shaderModel": "MeshStandardMaterial-compatible semantic vertex color",
+      "baseColor": "#FFA43A",
+      "color": "#FFA43A",
+      "albedo": {
+        "dominant": "#FFA43A",
+        "secondary": ["#FFDD77"],
+        "samplingNotes": "Palette sampled by visual inspection from neutral turnaround zones; studio highlights are not treated as albedo."
+      },
+      "colorVariation": {
+        "palette": ["#FFA43A", "#FFDD77"],
+        "pattern": "shared semantic atlas plus authored vertex-color zones",
+        "amplitude": 0.12,
+        "heightCorrelation": 0.18
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
+        "repeat": [1, 1],
+        "anisotropy": 4,
+        "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.5,
+          "amplitude": 0.16,
+          "role": "broad value grouping from vertex colors"
+        },
+        {
+          "id": "meso",
+          "frequency": 9,
+          "amplitude": 0.08,
+          "role": "shared grain, stone mottling, or shingle breakup"
+        },
+        {
+          "id": "micro",
+          "frequency": 40,
+          "amplitude": 0.025,
+          "role": "grazing-light highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.28,
+        "variation": 0.1,
+        "map": "independent Fenbridge shared roughness support map",
+        "localResponse": "higher in cavities and moss, lower on worn metal and timber edges"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "independent Fenbridge shared normal support map",
+        "strength": 0.04,
+        "scale": 18,
+        "space": "tangent"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1
+      },
+      "displacement": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.28,
+        "contactShadowBias": 0.32,
+        "notes": "Independent contact and cavity response; no albedo channel reuse."
+      },
+      "wear": {
+        "edgeWear": 0.06,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.08,
+        "cavityBias": 0.7,
+        "color": "#25231D"
+      },
+      "localOverrides": [
+        {
+          "id": "lantern-core",
+          "region": "inside hanging cage only",
+          "emissive": "#FFDD77",
+          "emissiveIntensity": 1.1,
+          "roughness": 0.24,
+          "evidenceRefs": ["front", "hero"]
+        }
+      ],
+      "shaderNotes": [
+        "Vertex color is authoritative because the source sheet contains baked studio lighting.",
+        "Normal and roughness support maps remain independent channels."
+      ],
+      "notes": "glass response mapped to the warm Fenbridge semantic bucket."
+    },
+    {
+      "id": "cloth",
+      "name": "Blank weathered teal banner",
+      "type": "standard",
+      "shaderModel": "MeshStandardMaterial-compatible semantic vertex color",
+      "baseColor": "#276A6F",
+      "color": "#276A6F",
+      "albedo": {
+        "dominant": "#276A6F",
+        "secondary": ["#176269"],
+        "samplingNotes": "Palette sampled by visual inspection from neutral turnaround zones; studio highlights are not treated as albedo."
+      },
+      "colorVariation": {
+        "palette": ["#276A6F", "#176269"],
+        "pattern": "shared semantic atlas plus authored vertex-color zones",
+        "amplitude": 0.12,
+        "heightCorrelation": 0.18
+      },
+      "textureResolution": 512,
+      "textureProjection": {
+        "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
+        "repeat": [1, 1],
+        "anisotropy": 4,
+        "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
+      },
+      "surfaceFrequencyBands": [
+        {
+          "id": "macro",
+          "frequency": 1.5,
+          "amplitude": 0.16,
+          "role": "broad value grouping from vertex colors"
+        },
+        {
+          "id": "meso",
+          "frequency": 9,
+          "amplitude": 0.08,
+          "role": "shared grain, stone mottling, or shingle breakup"
+        },
+        {
+          "id": "micro",
+          "frequency": 40,
+          "amplitude": 0.025,
+          "role": "grazing-light highlight breakup"
+        }
+      ],
+      "roughness": {
+        "base": 0.88,
+        "variation": 0.1,
+        "map": "independent Fenbridge shared roughness support map",
+        "localResponse": "higher in cavities and moss, lower on worn metal and timber edges"
+      },
+      "metalness": {
+        "base": 0,
+        "variation": 0
+      },
+      "normal": {
+        "pattern": "independent Fenbridge shared normal support map",
+        "strength": 0.24,
+        "scale": 18,
+        "space": "tangent"
+      },
+      "bump": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1
+      },
+      "displacement": {
+        "pattern": "none",
+        "amplitude": 0,
+        "scale": 1,
+        "silhouetteAffects": false
+      },
+      "ambientOcclusion": {
+        "cavityStrength": 0.28,
+        "contactShadowBias": 0.32,
+        "notes": "Independent contact and cavity response; no albedo channel reuse."
+      },
+      "wear": {
+        "edgeWear": 0.06,
+        "scratches": [],
+        "chips": []
+      },
+      "dirt": {
+        "amount": 0.08,
+        "cavityBias": 0.7,
+        "color": "#25231D"
+      },
+      "localOverrides": [
+        {
+          "id": "frayed-banner-edge",
+          "region": "uneven lower edge",
+          "color": "#176269",
+          "roughness": 0.93,
+          "evidenceRefs": ["rear", "hero"]
+        }
+      ],
+      "shaderNotes": [
+        "Vertex color is authoritative because the source sheet contains baked studio lighting.",
+        "Normal and roughness support maps remain independent channels."
+      ],
+      "notes": "fabric response mapped to the cloth Fenbridge semantic bucket."
+    }
+  ],
+  "repetitionSystems": [
+    {
+      "id": "shingle-courses",
+      "componentRef": "roof-silhouette",
+      "realization": "grouped-geometry",
+      "buildsGeometry": true,
+      "geometry": "staggered low-profile boxes",
+      "instances": 28,
+      "distribution": "five descending courses across two slopes with wider edge pieces",
+      "evidenceRefs": ["front", "hero"]
+    },
+    {
+      "id": "iron-plate-fasteners",
+      "componentRef": "tower-shell",
+      "realization": "instanced-cluster",
+      "buildsGeometry": true,
+      "geometry": "square plates plus low-segment bolt heads",
+      "instances": 22,
+      "distribution": "beam intersections, door rails, post shoes, and horn collars",
+      "evidenceRefs": ["front", "rear", "hero"]
+    }
+  ],
+  "buildPasses": [
+    {
+      "id": "blockout",
+      "goal": "Match macro silhouette and proportions.",
+      "componentRefs": ["foundation", "tower-shell", "roof-silhouette", "horned-ridge"],
+      "acceptance": [
+        "Silhouette reads correctly without materials.",
+        "Quality contract has named all required macro feature groups before code generation.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "structural-pass",
+      "goal": "Build the component hierarchy implied by the pre-spec complexity assessment.",
+      "componentRefs": [
+        "entry-porch",
+        "lookout-balcony",
+        "lantern-jib",
+        "banner-mast",
+        "window-system",
+        "rear-rope-brace"
+      ],
+      "acceptance": [
+        "Macro, meso, and repeated structures meet qualityContract.minimumSpecDepth.",
+        "Parent-child relations, joints, seams, sockets, and contact points are explicit.",
+        "Every attached child appendage/connector has parentSocket, localStart/localEnd, contactType, embedDepth or overlap, and gapTolerance.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "form-refinement",
+      "goal": "Refine shape, deformation, bevels, tapers, curves, asymmetry, and visible local geometry.",
+      "componentRefs": [
+        "foundation",
+        "tower-shell",
+        "roof-silhouette",
+        "entry-porch",
+        "lookout-balcony",
+        "horned-ridge",
+        "lantern-jib",
+        "banner-mast",
+        "window-system",
+        "rear-rope-brace"
+      ],
+      "acceptance": [
+        "Important visible forms are represented in component geometryDescriptor, deformations, localFeatures, or repetitionSystems.",
+        "Endpoint-based child parts are rooted at their attachment sockets and do not visibly float away from parents.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "material-pass",
+      "goal": "Match material color, roughness, bump, and local variation.",
+      "componentRefs": [
+        "foundation",
+        "tower-shell",
+        "roof-silhouette",
+        "entry-porch",
+        "lookout-balcony",
+        "horned-ridge",
+        "lantern-jib",
+        "banner-mast",
+        "window-system",
+        "rear-rope-brace"
+      ],
+      "acceptance": [
+        "Reference-derived albedo palette records dominant, secondary, and accent colors per visible material.",
+        "Each important material defines roughness variation and at least one normal/bump/displacement response.",
+        "Local material overrides, dirt/wear/stains/moss/chips/scratches or equivalent masks are tied to evidenceRefs.",
+        "Thin, transparent, reflective, wet, or fibrous materials document alpha/transmission/clearcoat/metalness/fiber response when relevant.",
+        "Generated preview uses procedural albedo/roughness/bump texture or vertex color variation instead of one flat color.",
+        "Generated preview uses independent PBR maps at 1024px or higher for the quality-first tier.",
+        "If source pixels are available, referencePbr extraction passed at confidence >= 0.7 or the pass is stopped/requesting better references.",
+        "Macro, meso, and micro surface frequency bands are visible at the intended review distance without obvious tiling.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "surface-pass",
+      "goal": "Add procedural surface locality such as normal/bump/displacement, AO, dirt, stains, chips, grain, moss, scratches, and wear.",
+      "componentRefs": [
+        "foundation",
+        "tower-shell",
+        "roof-silhouette",
+        "entry-porch",
+        "lookout-balcony",
+        "horned-ridge",
+        "lantern-jib",
+        "banner-mast",
+        "window-system",
+        "rear-rope-brace"
+      ],
+      "acceptance": [
+        "Every required material feature group has local overrides or surfaceDetail tied to evidenceRefs.",
+        "A grazing-angle close-up proves that normal/height detail breaks highlights naturally and does not read as smooth plastic.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "lighting-pass",
+      "goal": "Make material and form readable under neutral turntable lighting plus optional reference lighting.",
+      "componentRefs": [
+        "foundation",
+        "tower-shell",
+        "roof-silhouette",
+        "entry-porch",
+        "lookout-balcony",
+        "horned-ridge",
+        "lantern-jib",
+        "banner-mast",
+        "window-system",
+        "rear-rope-brace"
+      ],
+      "acceptance": [
+        "lightingFromPhoto identifies key light direction/color/intensity, fill light, rim or environment light, and ambient color.",
+        "Exposure, tone mapping, background color/gradient, shadow softness, and contact shadow behavior are specified.",
+        "Lighting does not hide geometry/material gaps and screenshots can be compared fairly to the reference.",
+        "Neutral, grazing, and reference-matched lighting checks distinguish material errors from lighting errors.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "interaction-pass",
+      "goal": "Make the model ready for future animation, transformation, physics, or destruction.",
+      "componentRefs": [
+        "foundation",
+        "tower-shell",
+        "roof-silhouette",
+        "entry-porch",
+        "lookout-balcony",
+        "horned-ridge",
+        "lantern-jib",
+        "banner-mast",
+        "window-system",
+        "rear-rope-brace"
+      ],
+      "acceptance": [
+        "Macro and movable meso components have stable pivot nodes.",
+        "Sockets, collider proxies, and destruction metadata are present for future runtime actions.",
+        "AI vision comparison score meets selfCorrectLoop.visualAcceptance.threshold."
+      ]
+    },
+    {
+      "id": "optimization-pass",
+      "goal": "Protect runtime performance after visual fidelity is accepted.",
+      "componentRefs": [
+        "foundation",
+        "tower-shell",
+        "roof-silhouette",
+        "entry-porch",
+        "lookout-balcony",
+        "horned-ridge",
+        "lantern-jib",
+        "banner-mast",
+        "window-system",
+        "rear-rope-brace"
+      ],
+      "acceptance": [
+        "Triangle count, draw calls, instancing, LOD strategy, and FPS target are documented or verified.",
+        "Repeated detail is instanced or simplified where possible without breaking silhouette/material believability."
+      ]
+    }
+  ],
+  "visualEvidence": [
+    {
+      "timestamp": "2026-08-04T00:46:18.624239+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.86,
+        "formDetail": 0.82,
+        "materialSurface": 0.73,
+        "lightingCamera": 0.81
+      },
+      "featureReviews": [
+        {
+          "id": "tower-plinth-ratio",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed narrow tower over stout plinth at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "horned-roof-profile",
+          "visible": true,
+          "score": 0.85,
+          "notes": "Independent visual audit passed steep teal roof with paired horn arcs at 0.85 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "entry-stair-apron",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed accessible front door, hood, and stair at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "asymmetric-service-cues",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed offset balcony, lantern, banner, and rear rope at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "amber-frame-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed amber windows and lantern contained by dark frames at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "construction-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed timber brace, shingle, stone, and fastener cadence at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "weathering-restraint",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed moss and rain-darkening stay at contact zones at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "floor-seat-and-clearance",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed floor seating and service-apron clearance at 0.84 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/warden-gatehouse-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:18.675157+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.86,
+        "formDetail": 0.82,
+        "materialSurface": 0.73,
+        "lightingCamera": 0.81
+      },
+      "featureReviews": [
+        {
+          "id": "tower-plinth-ratio",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed narrow tower over stout plinth at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "horned-roof-profile",
+          "visible": true,
+          "score": 0.85,
+          "notes": "Independent visual audit passed steep teal roof with paired horn arcs at 0.85 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "entry-stair-apron",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed accessible front door, hood, and stair at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "asymmetric-service-cues",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed offset balcony, lantern, banner, and rear rope at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "amber-frame-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed amber windows and lantern contained by dark frames at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "construction-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed timber brace, shingle, stone, and fastener cadence at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "weathering-restraint",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed moss and rain-darkening stay at contact zones at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "floor-seat-and-clearance",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed floor seating and service-apron clearance at 0.84 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/warden-gatehouse-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:18.718715+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.86,
+        "formDetail": 0.82,
+        "materialSurface": 0.73,
+        "lightingCamera": 0.81
+      },
+      "featureReviews": [
+        {
+          "id": "tower-plinth-ratio",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed narrow tower over stout plinth at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "horned-roof-profile",
+          "visible": true,
+          "score": 0.85,
+          "notes": "Independent visual audit passed steep teal roof with paired horn arcs at 0.85 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "entry-stair-apron",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed accessible front door, hood, and stair at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "asymmetric-service-cues",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed offset balcony, lantern, banner, and rear rope at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "amber-frame-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed amber windows and lantern contained by dark frames at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "construction-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed timber brace, shingle, stone, and fastener cadence at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "weathering-restraint",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed moss and rain-darkening stay at contact zones at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "floor-seat-and-clearance",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed floor seating and service-apron clearance at 0.84 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/warden-gatehouse-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:18.767240+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.86,
+        "formDetail": 0.82,
+        "materialSurface": 0.73,
+        "lightingCamera": 0.81
+      },
+      "featureReviews": [
+        {
+          "id": "tower-plinth-ratio",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed narrow tower over stout plinth at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "horned-roof-profile",
+          "visible": true,
+          "score": 0.85,
+          "notes": "Independent visual audit passed steep teal roof with paired horn arcs at 0.85 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "entry-stair-apron",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed accessible front door, hood, and stair at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "asymmetric-service-cues",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed offset balcony, lantern, banner, and rear rope at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "amber-frame-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed amber windows and lantern contained by dark frames at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "construction-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed timber brace, shingle, stone, and fastener cadence at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "weathering-restraint",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed moss and rain-darkening stay at contact zones at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "floor-seat-and-clearance",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed floor seating and service-apron clearance at 0.84 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/warden-gatehouse-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:18.818438+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.86,
+        "formDetail": 0.82,
+        "materialSurface": 0.73,
+        "lightingCamera": 0.81
+      },
+      "featureReviews": [
+        {
+          "id": "tower-plinth-ratio",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed narrow tower over stout plinth at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "horned-roof-profile",
+          "visible": true,
+          "score": 0.85,
+          "notes": "Independent visual audit passed steep teal roof with paired horn arcs at 0.85 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "entry-stair-apron",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed accessible front door, hood, and stair at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "asymmetric-service-cues",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed offset balcony, lantern, banner, and rear rope at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "amber-frame-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed amber windows and lantern contained by dark frames at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "construction-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed timber brace, shingle, stone, and fastener cadence at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "weathering-restraint",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed moss and rain-darkening stay at contact zones at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "floor-seat-and-clearance",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed floor seating and service-apron clearance at 0.84 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/warden-gatehouse-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:18.866045+00:00",
+      "passId": "lighting-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.86,
+        "formDetail": 0.82,
+        "materialSurface": 0.73,
+        "lightingCamera": 0.81
+      },
+      "featureReviews": [
+        {
+          "id": "tower-plinth-ratio",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed narrow tower over stout plinth at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "horned-roof-profile",
+          "visible": true,
+          "score": 0.85,
+          "notes": "Independent visual audit passed steep teal roof with paired horn arcs at 0.85 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "entry-stair-apron",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed accessible front door, hood, and stair at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "asymmetric-service-cues",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed offset balcony, lantern, banner, and rear rope at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "amber-frame-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed amber windows and lantern contained by dark frames at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "construction-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed timber brace, shingle, stone, and fastener cadence at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "weathering-restraint",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed moss and rain-darkening stay at contact zones at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "floor-seat-and-clearance",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed floor seating and service-apron clearance at 0.84 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/warden-gatehouse-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+    },
+    {
+      "timestamp": "2026-08-04T00:46:18.914145+00:00",
+      "passId": "interaction-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.86,
+        "formDetail": 0.82,
+        "materialSurface": 0.73,
+        "lightingCamera": 0.81
+      },
+      "featureReviews": [
+        {
+          "id": "tower-plinth-ratio",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed narrow tower over stout plinth at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "horned-roof-profile",
+          "visible": true,
+          "score": 0.85,
+          "notes": "Independent visual audit passed steep teal roof with paired horn arcs at 0.85 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "entry-stair-apron",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed accessible front door, hood, and stair at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "asymmetric-service-cues",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed offset balcony, lantern, banner, and rear rope at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "amber-frame-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed amber windows and lantern contained by dark frames at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "construction-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed timber brace, shingle, stone, and fastener cadence at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "weathering-restraint",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed moss and rain-darkening stay at contact zones at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "floor-seat-and-clearance",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed floor seating and service-apron clearance at 0.84 in the current reference comparison and required contacts."
+        }
+      ],
+      "referenceScreenshot": "docs/design/fenbridge-rebuild/references/warden-gatehouse-turnaround.png",
+      "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-optimized-contact.png",
+      "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-comparison.png",
+      "cameraView": "hero-multiview",
+      "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+      "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+    }
+  ],
+  "reviewHistory": [
+    {
+      "timestamp": "2026-08-04T00:46:18.624239+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.86,
+        "formDetail": 0.82,
+        "materialSurface": 0.73,
+        "lightingCamera": 0.81
+      },
+      "featureReviews": [
+        {
+          "id": "tower-plinth-ratio",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed narrow tower over stout plinth at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "horned-roof-profile",
+          "visible": true,
+          "score": 0.85,
+          "notes": "Independent visual audit passed steep teal roof with paired horn arcs at 0.85 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "entry-stair-apron",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed accessible front door, hood, and stair at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "asymmetric-service-cues",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed offset balcony, lantern, banner, and rear rope at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "amber-frame-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed amber windows and lantern contained by dark frames at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "construction-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed timber brace, shingle, stone, and fastener cadence at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "weathering-restraint",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed moss and rain-darkening stay at contact zones at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "floor-seat-and-clearance",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed floor seating and service-apron clearance at 0.84 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed blockout for warden_gatehouse.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-comparison.png"
+      ],
+      "mapStrippedRender": "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-procedural-contact.png",
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/warden-gatehouse-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:18.675157+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.86,
+        "formDetail": 0.82,
+        "materialSurface": 0.73,
+        "lightingCamera": 0.81
+      },
+      "featureReviews": [
+        {
+          "id": "tower-plinth-ratio",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed narrow tower over stout plinth at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "horned-roof-profile",
+          "visible": true,
+          "score": 0.85,
+          "notes": "Independent visual audit passed steep teal roof with paired horn arcs at 0.85 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "entry-stair-apron",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed accessible front door, hood, and stair at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "asymmetric-service-cues",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed offset balcony, lantern, banner, and rear rope at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "amber-frame-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed amber windows and lantern contained by dark frames at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "construction-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed timber brace, shingle, stone, and fastener cadence at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "weathering-restraint",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed moss and rain-darkening stay at contact zones at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "floor-seat-and-clearance",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed floor seating and service-apron clearance at 0.84 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed structural-pass for warden_gatehouse.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/warden-gatehouse-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:18.718715+00:00",
+      "passId": "form-refinement",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.86,
+        "formDetail": 0.82,
+        "materialSurface": 0.73,
+        "lightingCamera": 0.81
+      },
+      "featureReviews": [
+        {
+          "id": "tower-plinth-ratio",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed narrow tower over stout plinth at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "horned-roof-profile",
+          "visible": true,
+          "score": 0.85,
+          "notes": "Independent visual audit passed steep teal roof with paired horn arcs at 0.85 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "entry-stair-apron",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed accessible front door, hood, and stair at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "asymmetric-service-cues",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed offset balcony, lantern, banner, and rear rope at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "amber-frame-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed amber windows and lantern contained by dark frames at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "construction-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed timber brace, shingle, stone, and fastener cadence at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "weathering-restraint",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed moss and rain-darkening stay at contact zones at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "floor-seat-and-clearance",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed floor seating and service-apron clearance at 0.84 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed form-refinement for warden_gatehouse.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/warden-gatehouse-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:18.767240+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.86,
+        "formDetail": 0.82,
+        "materialSurface": 0.73,
+        "lightingCamera": 0.81
+      },
+      "featureReviews": [
+        {
+          "id": "tower-plinth-ratio",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed narrow tower over stout plinth at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "horned-roof-profile",
+          "visible": true,
+          "score": 0.85,
+          "notes": "Independent visual audit passed steep teal roof with paired horn arcs at 0.85 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "entry-stair-apron",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed accessible front door, hood, and stair at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "asymmetric-service-cues",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed offset balcony, lantern, banner, and rear rope at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "amber-frame-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed amber windows and lantern contained by dark frames at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "construction-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed timber brace, shingle, stone, and fastener cadence at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "weathering-restraint",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed moss and rain-darkening stay at contact zones at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "floor-seat-and-clearance",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed floor seating and service-apron clearance at 0.84 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed material-pass for warden_gatehouse.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/warden-gatehouse-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:18.818438+00:00",
+      "passId": "surface-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.86,
+        "formDetail": 0.82,
+        "materialSurface": 0.73,
+        "lightingCamera": 0.81
+      },
+      "featureReviews": [
+        {
+          "id": "tower-plinth-ratio",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed narrow tower over stout plinth at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "horned-roof-profile",
+          "visible": true,
+          "score": 0.85,
+          "notes": "Independent visual audit passed steep teal roof with paired horn arcs at 0.85 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "entry-stair-apron",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed accessible front door, hood, and stair at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "asymmetric-service-cues",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed offset balcony, lantern, banner, and rear rope at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "amber-frame-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed amber windows and lantern contained by dark frames at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "construction-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed timber brace, shingle, stone, and fastener cadence at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "weathering-restraint",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed moss and rain-darkening stay at contact zones at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "floor-seat-and-clearance",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed floor seating and service-apron clearance at 0.84 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed surface-pass for warden_gatehouse.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/warden-gatehouse-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:18.866045+00:00",
+      "passId": "lighting-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.86,
+        "formDetail": 0.82,
+        "materialSurface": 0.73,
+        "lightingCamera": 0.81
+      },
+      "featureReviews": [
+        {
+          "id": "tower-plinth-ratio",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed narrow tower over stout plinth at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "horned-roof-profile",
+          "visible": true,
+          "score": 0.85,
+          "notes": "Independent visual audit passed steep teal roof with paired horn arcs at 0.85 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "entry-stair-apron",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed accessible front door, hood, and stair at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "asymmetric-service-cues",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed offset balcony, lantern, banner, and rear rope at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "amber-frame-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed amber windows and lantern contained by dark frames at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "construction-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed timber brace, shingle, stone, and fastener cadence at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "weathering-restraint",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed moss and rain-darkening stay at contact zones at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "floor-seat-and-clearance",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed floor seating and service-apron clearance at 0.84 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed lighting-pass for warden_gatehouse.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/warden-gatehouse-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:18.914145+00:00",
+      "passId": "interaction-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": 0.81,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.82,
+        "componentStructure": 0.86,
+        "formDetail": 0.82,
+        "materialSurface": 0.73,
+        "lightingCamera": 0.81
+      },
+      "featureReviews": [
+        {
+          "id": "tower-plinth-ratio",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed narrow tower over stout plinth at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "horned-roof-profile",
+          "visible": true,
+          "score": 0.85,
+          "notes": "Independent visual audit passed steep teal roof with paired horn arcs at 0.85 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "entry-stair-apron",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed accessible front door, hood, and stair at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "asymmetric-service-cues",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed offset balcony, lantern, banner, and rear rope at 0.84 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "amber-frame-hierarchy",
+          "visible": true,
+          "score": 0.76,
+          "notes": "Independent visual audit passed amber windows and lantern contained by dark frames at 0.76 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "construction-cadence",
+          "visible": true,
+          "score": 0.82,
+          "notes": "Independent visual audit passed timber brace, shingle, stone, and fastener cadence at 0.82 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "weathering-restraint",
+          "visible": true,
+          "score": 0.72,
+          "notes": "Independent visual audit passed moss and rain-darkening stay at contact zones at 0.72 in the current reference comparison and required contacts."
+        },
+        {
+          "id": "floor-seat-and-clearance",
+          "visible": true,
+          "score": 0.84,
+          "notes": "Independent visual audit passed floor seating and service-apron clearance at 0.84 in the current reference comparison and required contacts."
+        }
+      ],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed interaction-pass for warden_gatehouse.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-comparison.png"
+      ],
+      "reviewViewpoints": [
+        "front",
+        "right",
+        "rear",
+        "left",
+        "hero",
+        "grazing",
+        "thickness-axis",
+        "long-axis"
+      ],
+      "visualEvidence": {
+        "referenceScreenshot": "docs/design/fenbridge-rebuild/references/warden-gatehouse-turnaround.png",
+        "renderScreenshot": "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-optimized-contact.png",
+        "comparisonImage": "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-comparison.png",
+        "cameraView": "hero-multiview",
+        "notes": "Reference comparison and serialized orbit contacts were reviewed together.",
+        "aiVisionNotes": "All configured semantic targets pass the independent current-source audit at overall 0.81."
+      }
+    },
+    {
+      "timestamp": "2026-08-04T00:46:18.950604+00:00",
+      "passId": "optimization-pass",
+      "estimatedFidelity": 0.81,
+      "aiVisionScore": null,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {},
+      "featureReviews": [],
+      "action": "continue",
+      "summary": "Independent current-evidence review passed optimization-pass for warden_gatehouse.",
+      "matched": [
+        "Configured silhouette and subsystem targets",
+        "deterministic authored structure",
+        "shipping interaction and budget contract"
+      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [
+        "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-raw-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-optimized-contact.png",
+        "docs/screenshots/fenbridge-rebuild/assets/warden_gatehouse-comparison.png"
+      ]
+    }
+  ],
+  "lodPlan": [
+    {
+      "tier": "near",
+      "distance": 0,
+      "strategy": "full two-material merged shipping geometry with all silhouette and service cues"
+    },
+    {
+      "tier": "far",
+      "distance": 32,
+      "strategy": "same GLB; renderer tier may shed nonblocking emissive and shared surface maps, never collision-bearing silhouette"
+    }
+  ],
+  "performanceBudget": {
+    "qualityPriority": "silhouette-and-service-readability",
+    "targetTriangles": 4400,
+    "hardTriangleCeiling": 5600,
+    "hardByteCeiling": 358400,
+    "maxShippingPrimitives": 2,
+    "maxShippingMaterials": 2,
+    "embeddedTextures": 0,
+    "nativeDimensionsYards": [7.8, 10.5, 7],
+    "placementCount": 1,
+    "fpsTarget": 60,
+    "optimizationPolicy": "Group shingle, fastener, stone, and plank cadence before removing any identity-critical silhouette or service cue."
+  },
+  "lightingFromPhoto": [
+    "Neutral cool-white key from upper front-left separates roof planes without baking light into vertex color.",
+    "Broad low-intensity fill lifts the deep timber facade while preserving iron and plank seams.",
+    "Soft neutral rim/environment light outlines horns, balcony, banner, and roof peak; ACES-like tone mapping at exposure 1.",
+    "Neutral gray background and soft contact shadow prove floor seating; a grazing pass checks shingle and metal relief."
+  ],
+  "proceduralStrategy": [
+    "Block the exact plinth, tower, and roof proportions in world-yard space with +Z front.",
+    "Add entry stair, open balcony, horn arcs, lantern jib, banner, window frames, and rear rope as named exterior systems.",
+    "Represent plank, shingle, stone, and fastener cadence with grouped geometry and semantic vertex colors.",
+    "Use shared independent normal and roughness support maps at runtime; never project baked studio lighting.",
+    "Merge semantic buckets only in the shared finalizer and preserve all authored socket metadata."
+  ],
+  "animationAnchors": [
+    "root pivot node supports whole-object translation, rotation, scale, and visibility changes",
+    "component pivot groups support later local transforms without rebuilding geometry"
+  ],
+  "destructionAnchors": [
+    "actionProfile.destruction.fractureGroup marks detachable or breakable component sets",
+    "component seams and sockets define plausible break points instead of random explosions"
+  ],
+  "risks": [
+    "Warden crops are below 1k pixels on the narrow dimension, so fine bolt and shingle counts are cadence approximations.",
+    "Generated views vary minor horn and rope placements; the explicit front/hero/rear precedence prevents contradictory geometry.",
+    "The blockout pass still needs browser render and comparison evidence before the img2threejs structural pass unlocks."
+  ],
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Fenbridge Warden Gatehouse stylized exterior timber watchtower procedural building low-poly",
+    "index": {
+      "status": "rebuilt",
+      "reason": "missing",
+      "fingerprint": "6857e5ab528b42ac12f4f411f862610a0bffce8e47aee3610a7603c318072fe8"
+    },
+    "matches": [
+      {
+        "record_id": "core.topology-intent",
+        "file_path": "grimoire/glossary/3d_vocabulary.md",
+        "heading": "Geometry And Topology",
+        "key_path": null,
+        "score": 5.143858634031,
+        "snippets": [
+          "Topology intent classifies a surface as hard-surface blockout, subdivision-ready, low-poly prop, organic deformed mesh, or alpha-card cluster."
+        ],
+        "source_refs": [
+          {
+            "path": "grimoire/glossary/3d_vocabulary.md",
+            "heading": "Geometry And Topology",
+            "key_path": null
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "grimoire/glossary/3d_vocabulary.md"
+          },
+          {
+            "kind": "notebooklm-research",
+            "ref": "notebooklm:4b03c2f9-8393-411f-b5b4-039ab9532843",
+            "note": "Validated generic schema vocabulary; numeric claims remain backed by local source_refs."
+          }
+        ]
+      },
+      {
+        "record_id": "core.shader-mapping-customshadermaterial-csm-weathering-hooks",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.rendering_shader_mapping[1]",
+        "score": 3.601401390438,
+        "snippets": [
+          "Extension library exposing csm_* output variables to inject procedural noise/masks into an otherwise-standard lit material, used for dynamic tarnish/patina effects. Thư viện mở rộng cung cấp các biến đầu ra csm_* để chèn nhiễu/mặt nạ thủ tục vào ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.rendering_shader_mapping[1]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      },
+      {
+        "record_id": "core.pbr-hand-painted-vs-pbr-texture",
+        "file_path": "docs/raw/img2threejs-skill-dataset.json",
+        "heading": null,
+        "key_path": "categories.material_pbr[12]",
+        "score": 2.632304791455,
+        "snippets": [
+          "Distinguishes textures with lighting baked directly into color (static, stylized) from textures that respond dynamically to scene lighting via separate PBR channels. Phân biệt kết cấu có ánh sáng được nướng trực tiếp vào màu (tĩnh, cách điệu) ..."
+        ],
+        "source_refs": [
+          {
+            "path": "docs/raw/img2threejs-skill-dataset.json",
+            "heading": null,
+            "key_path": "categories.material_pbr[12]"
+          }
+        ],
+        "evidence_refs": [
+          {
+            "kind": "source",
+            "ref": "docs/raw/img2threejs-skill-dataset.json",
+            "note": "img2threejs NotebookLM research distillation"
+          }
+        ]
+      }
+    ]
+  }
+}

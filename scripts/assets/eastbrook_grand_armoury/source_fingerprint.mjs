@@ -13,7 +13,7 @@ export const EASTBROOK_GRAND_ARMOURY_SOURCE_FILES = Object.freeze([
   'scripts/assets/specs/eastbrook_grand_armoury.json',
   'scripts/assets/eastbrook_grand_armoury/source_fingerprint.mjs',
   'scripts/assets/build_assets.mjs',
-  'package-lock.json',
+  'pnpm-lock.yaml',
 ]);
 
 function lengthDelimiter(byteLength) {

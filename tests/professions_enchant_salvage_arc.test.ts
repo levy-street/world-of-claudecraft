@@ -25,10 +25,26 @@ vi.mock('../server/db', () => ({
 }));
 
 import { type ClientSession, GameServer } from '../server/game';
-import { ClientWorld } from '../src/net/online';
+import type { ClientWorld } from '../src/net/online';
+import { MARKET_MAX_LISTINGS } from '../src/sim/market';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
-import type { Entity, InvSlot, PlayerClass, SimEvent } from '../src/sim/types';
+import * as tradeMod from '../src/sim/social/trade';
+import type { Entity, InvSlot, SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
+import { bareClient } from './helpers/bare_client';
+import {
+  completeEnchantFamilyCast,
+  runApplyEnchant,
+  runCraft,
+  runDisenchant,
+  runSalvage,
+} from './helpers/enchant_family_cast';
+
+/** Complete a running enchant-family cast on the server sim and route events. */
+function flushEnchantFamilyCast(server: GameServer, pid: number): void {
+  completeEnchantFamilyCast(server.sim as unknown as import('../src/sim/sim').Sim, pid);
+  routeTick(server);
+}
 
 const RARE_WEAPON = 'moggers_copper_cudgel'; // rare mace -> resonant_steel
 const COMMON_WEAPON = 'eastbrook_arming_sword';
@@ -49,53 +65,6 @@ type WireMsg = {
 type SnapMsg = WireMsg & {
   t: 'snap';
   self: Record<string, unknown>;
-};
-
-type BareClientWorldState = {
-  cfg: { seed: number; playerClass: PlayerClass };
-  entities: Map<number, Entity>;
-  playerId: number;
-  ownPlayerId: number;
-  ownPlayerClass: PlayerClass;
-  spectating: null;
-  cupInfo: null;
-  lastVcupRemainder: null;
-  lastVcupShared: null;
-  sportRole: null;
-  moveInput: Record<string, never>;
-  inventory: InvSlot[];
-  vendorBuyback: InvSlot[];
-  equipment: Record<string, never>;
-  accountCosmetics: { completedQuestIds: string[]; mechChromaIds: string[] };
-  copper: number;
-  honor: number;
-  lifetimeHonor: number;
-  xp: number;
-  known: string[];
-  questLog: Map<string, unknown>;
-  questsDone: Set<string>;
-  pendingQuestCommands: Map<string, unknown>;
-  partyInfo: null;
-  selectedDungeonDifficulty: 'normal';
-  tradeInfo: null;
-  duelInfo: null;
-  lastSnapAt: number;
-  snapInterval: number;
-  serverTickHz: null;
-  missingSince: Map<number, number>;
-  pendingFacingDelta: number;
-  connected: boolean;
-  eventQueue: SimEvent[];
-  mouselookFacing: null;
-  lastInputSentAt: number;
-  lastInputSig: string;
-  inputSeq: number;
-  pendingInputSeqSentAt: Map<number, number>;
-  ackedInputSeq: number;
-  inputEchoSamples: unknown[];
-  spectateFacingPending: boolean;
-  pendingSpectateFacing: null;
-  nodeCooldowns: Map<string, number>;
 };
 
 function fakeWs(): { sent: WireMsg[]; ws: unknown } {
@@ -185,55 +154,6 @@ function craftedVestSlotIndex(sim: Sim, pid: number): number {
   );
 }
 
-function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWorld {
-  const c = Object.create(ClientWorld.prototype) as BareClientWorldState;
-  c.cfg = { seed: 20061, playerClass };
-  c.entities = new Map();
-  c.playerId = pid;
-  c.ownPlayerId = pid;
-  c.ownPlayerClass = playerClass;
-  c.spectating = null;
-  c.cupInfo = null;
-  c.lastVcupRemainder = null;
-  c.lastVcupShared = null;
-  c.sportRole = null;
-  c.moveInput = {};
-  c.inventory = [];
-  c.vendorBuyback = [];
-  c.equipment = {};
-  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
-  c.copper = 0;
-  c.honor = 0;
-  c.lifetimeHonor = 0;
-  c.xp = 0;
-  c.known = [];
-  c.questLog = new Map();
-  c.questsDone = new Set();
-  c.pendingQuestCommands = new Map();
-  c.partyInfo = null;
-  c.selectedDungeonDifficulty = 'normal';
-  c.tradeInfo = null;
-  c.duelInfo = null;
-  c.lastSnapAt = 0;
-  c.snapInterval = 50;
-  c.serverTickHz = null;
-  c.missingSince = new Map();
-  c.pendingFacingDelta = 0;
-  c.connected = true;
-  c.eventQueue = [];
-  c.mouselookFacing = null;
-  c.lastInputSentAt = 0;
-  c.lastInputSig = '';
-  c.inputSeq = 0;
-  c.pendingInputSeqSentAt = new Map();
-  c.ackedInputSeq = 0;
-  c.inputEchoSamples = [];
-  c.spectateFacingPending = false;
-  c.pendingSpectateFacing = null;
-  c.nodeCooldowns = new Map();
-  return c as unknown as ClientWorld;
-}
-
 function applySnap(client: ClientWorld, snap: unknown): void {
   (client as unknown as { applySnapshot(s: unknown): void }).applySnapshot(snap);
 }
@@ -249,6 +169,19 @@ function moveToVendor(sim: Sim): void {
   player.prevPos = { ...player.pos };
 }
 
+// The World Market's Merchant NPC (market.ts nearMerchant), distinct from
+// trader_wilkes above (vendor buyback only, never market: true).
+function moveToMerchant(sim: Sim, pid: number): void {
+  const merchant = [...sim.ctx.entities.values()].find((e) => e.templateId === 'the_merchant');
+  if (!merchant) throw new Error('missing the_merchant');
+  const player = sim.ctx.entities.get(pid);
+  if (!player) throw new Error(`missing player ${pid}`);
+  player.pos.x = merchant.pos.x + 2;
+  player.pos.z = merchant.pos.z;
+  player.pos.y = terrainHeight(player.pos.x, player.pos.z, sim.cfg.seed);
+  player.prevPos = { ...player.pos };
+}
+
 describe('offline Sim end-to-end (IWorld surface)', () => {
   it('crafted Eastbrook Chainmail Vest stacks yield materials but never teach Enchanting', () => {
     const sim = new Sim({ seed: 20260726, playerClass: 'warrior', autoEquip: false });
@@ -256,26 +189,26 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     const meta = metaFor(sim, pid);
 
     grantVestMaterials(sim, pid);
-    sim.craftItem(CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
+    runCraft(sim, CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
     expect(sim.lastCraftResult?.ok).toBe(true);
     const firstSlotIndex = craftedVestSlotIndex(sim, pid);
     expect(firstSlotIndex).toBeGreaterThanOrEqual(0);
     expect(simInv(sim, pid)[firstSlotIndex].instance).toBeUndefined();
 
     const dustBefore = sim.countItem(DUST, pid);
-    sim.disenchantItem(CRAFTED_COMMON_ARMOR, pid, firstSlotIndex);
+    runDisenchant(sim, CRAFTED_COMMON_ARMOR, pid, firstSlotIndex);
     expect(sim.lastDisenchantResult?.ok).toBe(true);
     expect(sim.countItem(DUST, pid)).toBeGreaterThan(dustBefore);
     expect(sim.countItem(CRAFTED_COMMON_ARMOR, pid)).toBe(0);
     expect(meta.craftSkills.enchanting).toBe(0);
 
     grantVestMaterials(sim, pid);
-    sim.craftItem(CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
+    runCraft(sim, CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
     expect(sim.lastCraftResult?.ok).toBe(true);
     const secondSlotIndex = craftedVestSlotIndex(sim, pid);
     expect(secondSlotIndex).toBeGreaterThanOrEqual(0);
 
-    sim.disenchantItem(CRAFTED_COMMON_ARMOR, pid, secondSlotIndex);
+    runDisenchant(sim, CRAFTED_COMMON_ARMOR, pid, secondSlotIndex);
     expect(sim.lastDisenchantResult?.ok).toBe(true);
     expect(sim.countItem(CRAFTED_COMMON_ARMOR, pid)).toBe(0);
     expect(meta.craftSkills.enchanting).toBe(0);
@@ -287,7 +220,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     const meta = metaFor(sim, pid);
 
     grantVestMaterials(sim, pid);
-    sim.craftItem(CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
+    runCraft(sim, CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
     expect(sim.lastCraftResult?.ok).toBe(true);
     const craftedSlotIndex = craftedVestSlotIndex(sim, pid);
     expect(craftedSlotIndex).toBeGreaterThanOrEqual(0);
@@ -303,7 +236,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     expect(returnedSlotIndex).toBeGreaterThanOrEqual(0);
 
     const dustBefore = sim.countItem(DUST, pid);
-    sim.disenchantItem(CRAFTED_COMMON_ARMOR, pid, returnedSlotIndex);
+    runDisenchant(sim, CRAFTED_COMMON_ARMOR, pid, returnedSlotIndex);
     expect(sim.lastDisenchantResult?.ok).toBe(true);
     expect(sim.countItem(DUST, pid)).toBeGreaterThan(dustBefore);
     expect(sim.countItem(CRAFTED_COMMON_ARMOR, pid)).toBe(0);
@@ -316,7 +249,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     const meta = metaFor(sim, pid);
 
     grantVestMaterials(sim, pid);
-    sim.craftItem(CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
+    runCraft(sim, CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
     expect(sim.lastCraftResult?.ok).toBe(true);
 
     sim.equipItem(CRAFTED_COMMON_ARMOR, pid);
@@ -325,7 +258,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     const returnedSlotIndex = craftedVestSlotIndex(sim, pid);
     expect(returnedSlotIndex).toBeGreaterThanOrEqual(0);
 
-    sim.disenchantItem(CRAFTED_COMMON_ARMOR, pid, returnedSlotIndex);
+    runDisenchant(sim, CRAFTED_COMMON_ARMOR, pid, returnedSlotIndex);
     expect(sim.lastDisenchantResult?.ok).toBe(true);
     expect(meta.craftSkills.enchanting).toBe(0);
   });
@@ -337,7 +270,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     moveToVendor(sim);
 
     grantVestMaterials(sim, pid);
-    sim.craftItem(CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
+    runCraft(sim, CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
     expect(sim.lastCraftResult?.ok).toBe(true);
     const craftedSlotIndex = craftedVestSlotIndex(sim, pid);
     expect(craftedSlotIndex).toBeGreaterThanOrEqual(0);
@@ -356,11 +289,196 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     expect(boughtBackSlotIndex).toBeGreaterThanOrEqual(0);
 
     const dustBefore = sim.countItem(DUST, pid);
-    sim.disenchantItem(CRAFTED_COMMON_ARMOR, pid, boughtBackSlotIndex);
+    runDisenchant(sim, CRAFTED_COMMON_ARMOR, pid, boughtBackSlotIndex);
     expect(sim.lastDisenchantResult?.ok).toBe(true);
     expect(sim.countItem(DUST, pid)).toBeGreaterThan(dustBefore);
     expect(sim.countItem(CRAFTED_COMMON_ARMOR, pid)).toBe(0);
     expect(meta.craftSkills.enchanting).toBe(0);
+  });
+
+  // BUG #9: the same craftedRecipeId marker used to have no equivalent on
+  // PendingGrant (social/trade.ts), so a plain crafted stack re-granted to the
+  // trade recipient with no marker at all, laundering its provenance and
+  // letting the recipient disenchant it for full Enchanting skill.
+  it('crafted Eastbrook Chainmail Vest keeps provenance across a player trade before disenchant', () => {
+    const sim = new Sim({
+      seed: 20260731,
+      playerClass: 'warrior',
+      autoEquip: false,
+      noPlayer: true,
+    });
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const buyer = sim.addPlayer('warrior', 'Buyer');
+    const sellerEntity = sim.ctx.entities.get(seller);
+    const buyerEntity = sim.ctx.entities.get(buyer);
+    if (!sellerEntity || !buyerEntity) throw new Error('missing trade entities');
+    buyerEntity.pos.x = sellerEntity.pos.x + 2;
+    buyerEntity.pos.z = sellerEntity.pos.z;
+
+    grantVestMaterials(sim, seller);
+    runCraft(sim, CRAFTED_COMMON_ARMOR_RECIPE, false, seller);
+    expect(metaFor(sim, seller).lastCraftResult?.ok).toBe(true);
+    expect(craftedVestSlotIndex(sim, seller)).toBeGreaterThanOrEqual(0);
+
+    tradeMod.tradeRequest(sim.ctx, buyer, seller);
+    tradeMod.tradeAccept(sim.ctx, buyer);
+    tradeMod.tradeSetOffer(sim.ctx, [{ itemId: CRAFTED_COMMON_ARMOR, count: 1 }], 0, seller);
+    tradeMod.tradeConfirm(sim.ctx, seller);
+    tradeMod.tradeConfirm(sim.ctx, buyer);
+
+    expect(sim.countItem(CRAFTED_COMMON_ARMOR, seller)).toBe(0);
+    expect(sim.countItem(CRAFTED_COMMON_ARMOR, buyer)).toBe(1);
+    const buyerSlotIndex = craftedVestSlotIndex(sim, buyer);
+    expect(buyerSlotIndex).toBeGreaterThanOrEqual(0);
+
+    runDisenchant(sim, CRAFTED_COMMON_ARMOR, buyer, buyerSlotIndex);
+    expect(sim.lastDisenchantResultFor(buyer)?.ok).toBe(true);
+    expect(metaFor(sim, buyer).craftSkills.enchanting).toBe(0);
+  });
+
+  // BUG #9's other half: MarketListing had no craftedRecipeId field either, so a
+  // crafted stack bought off the World Market re-granted to the buyer bare,
+  // with the same skill-farming consequence.
+  it('crafted Eastbrook Chainmail Vest keeps provenance across a World Market sale before disenchant', () => {
+    const sim = new Sim({
+      seed: 20260732,
+      playerClass: 'warrior',
+      autoEquip: false,
+      noPlayer: true,
+    });
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const buyer = sim.addPlayer('warrior', 'Buyer');
+    moveToMerchant(sim, seller);
+    moveToMerchant(sim, buyer);
+    metaFor(sim, buyer).copper = 1000;
+
+    grantVestMaterials(sim, seller);
+    runCraft(sim, CRAFTED_COMMON_ARMOR_RECIPE, false, seller);
+    expect(metaFor(sim, seller).lastCraftResult?.ok).toBe(true);
+    expect(craftedVestSlotIndex(sim, seller)).toBeGreaterThanOrEqual(0);
+
+    sim.marketList(CRAFTED_COMMON_ARMOR, 1, 100, seller);
+    expect(sim.countItem(CRAFTED_COMMON_ARMOR, seller)).toBe(0);
+    const listing = sim.marketListings.find((l) => l.itemId === CRAFTED_COMMON_ARMOR && !l.house);
+    expect(listing).toBeDefined();
+    expect(listing?.craftedRecipeId).toBe(CRAFTED_COMMON_ARMOR_RECIPE);
+
+    sim.marketBuy(listing!.id, buyer);
+    expect(sim.countItem(CRAFTED_COMMON_ARMOR, buyer)).toBe(1);
+    const buyerSlotIndex = craftedVestSlotIndex(sim, buyer);
+    expect(buyerSlotIndex).toBeGreaterThanOrEqual(0);
+
+    runDisenchant(sim, CRAFTED_COMMON_ARMOR, buyer, buyerSlotIndex);
+    expect(sim.lastDisenchantResultFor(buyer)?.ok).toBe(true);
+    expect(metaFor(sim, buyer).craftSkills.enchanting).toBe(0);
+  });
+
+  // BUG #9 edge case the fix must not reopen: some items are BOTH craftable and
+  // drop-sourced (recipes.ts: boundstone_helm off two dungeon bosses), so a
+  // seller can hold a crafted stack and a plain (dropped) stack of the same
+  // item id at once. Listing both together must split into two listings, one
+  // per provenance, rather than merging the crafted units into a marker-free
+  // listing (which would silently launder them the same way BUG #9 did).
+  it('a sell request spanning two provenance buckets splits into two listings, prices summing to the ask', () => {
+    const sim = new Sim({
+      seed: 20260734,
+      playerClass: 'warrior',
+      autoEquip: false,
+      noPlayer: true,
+    });
+    const seller = sim.addPlayer('warrior', 'Seller');
+    moveToMerchant(sim, seller);
+    const meta = metaFor(sim, seller);
+    const BOUNDSTONE_HELM = 'boundstone_helm';
+    const BOUNDSTONE_HELM_RECIPE = 'recipe_ironbound_warplate_helm';
+    meta.inventory.push({ itemId: BOUNDSTONE_HELM, count: 1 }); // dungeon-dropped, no marker
+    meta.inventory.push({
+      itemId: BOUNDSTONE_HELM,
+      count: 1,
+      craftedRecipeId: BOUNDSTONE_HELM_RECIPE,
+    });
+
+    sim.marketList(BOUNDSTONE_HELM, 2, 101, seller);
+    expect(sim.countItem(BOUNDSTONE_HELM, seller)).toBe(0);
+    const listings = sim.marketListings.filter((l) => l.itemId === BOUNDSTONE_HELM && !l.house);
+    expect(listings).toHaveLength(2);
+    const plain = listings.find((l) => l.craftedRecipeId === undefined);
+    const crafted = listings.find((l) => l.craftedRecipeId === BOUNDSTONE_HELM_RECIPE);
+    expect(plain?.count).toBe(1);
+    expect(crafted?.count).toBe(1);
+    // No copper minted or lost by the split: the two rows' prices sum to the
+    // exact ask the seller named for the whole batch.
+    expect((plain?.price ?? 0) + (crafted?.price ?? 0)).toBe(101);
+  });
+
+  // Review follow-up on #2605: the provenance split must not reopen the two
+  // per-seller invariants marketList already enforced for a single-bucket
+  // listing. A dual-provenance stack turns one sell request into two rows,
+  // so both gates must account for the split BEFORE anything leaves the bag.
+  it('refuses a dual-provenance sell that would push the seller over MARKET_MAX_LISTINGS', () => {
+    const sim = new Sim({
+      seed: 20260735,
+      playerClass: 'warrior',
+      autoEquip: false,
+      noPlayer: true,
+    });
+    const seller = sim.addPlayer('warrior', 'Seller');
+    moveToMerchant(sim, seller);
+    const meta = metaFor(sim, seller);
+    const BOUNDSTONE_HELM = 'boundstone_helm';
+    const BOUNDSTONE_HELM_RECIPE = 'recipe_ironbound_warplate_helm';
+    meta.inventory.push({ itemId: BOUNDSTONE_HELM, count: 1 });
+    meta.inventory.push({
+      itemId: BOUNDSTONE_HELM,
+      count: 1,
+      craftedRecipeId: BOUNDSTONE_HELM_RECIPE,
+    });
+    // Fill the seller up to one below the cap with unrelated single-row listings.
+    for (let i = 0; i < MARKET_MAX_LISTINGS - 1; i++) {
+      meta.inventory.push({ itemId: COMMON_WEAPON, count: 1 });
+      sim.marketList(COMMON_WEAPON, 1, 10, seller);
+    }
+    const mineBefore = sim.marketListings.filter((l) => l.sellerKey === String(seller)).length;
+    expect(mineBefore).toBe(MARKET_MAX_LISTINGS - 1);
+
+    // The dual-provenance sell would add 2 rows and land at cap + 1: refused,
+    // and neither item leaves the seller's bag.
+    sim.marketList(BOUNDSTONE_HELM, 2, 101, seller);
+    expect(sim.countItem(BOUNDSTONE_HELM, seller)).toBe(2);
+    expect(sim.marketListings.filter((l) => l.itemId === BOUNDSTONE_HELM && !l.house)).toHaveLength(
+      0,
+    );
+    expect(sim.marketListings.filter((l) => l.sellerKey === String(seller)).length).toBe(
+      mineBefore,
+    );
+  });
+
+  it('refuses a dual-provenance sell whose ask cannot give every bucket at least 1 copper', () => {
+    const sim = new Sim({
+      seed: 20260736,
+      playerClass: 'warrior',
+      autoEquip: false,
+      noPlayer: true,
+    });
+    const seller = sim.addPlayer('warrior', 'Seller');
+    moveToMerchant(sim, seller);
+    const meta = metaFor(sim, seller);
+    const BOUNDSTONE_HELM = 'boundstone_helm';
+    const BOUNDSTONE_HELM_RECIPE = 'recipe_ironbound_warplate_helm';
+    meta.inventory.push({ itemId: BOUNDSTONE_HELM, count: 1 });
+    meta.inventory.push({
+      itemId: BOUNDSTONE_HELM,
+      count: 1,
+      craftedRecipeId: BOUNDSTONE_HELM_RECIPE,
+    });
+
+    // ask=1 for a 2-bucket split cannot give both rows >= MARKET_MIN_PRICE:
+    // refused rather than pricing one row at 0 copper.
+    sim.marketList(BOUNDSTONE_HELM, 2, 1, seller);
+    expect(sim.countItem(BOUNDSTONE_HELM, seller)).toBe(2);
+    expect(sim.marketListings.filter((l) => l.itemId === BOUNDSTONE_HELM && !l.house)).toHaveLength(
+      0,
+    );
   });
 
   it('a non-crafted eligible item still gains Enchanting skill when disenchanted', () => {
@@ -369,7 +487,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     const meta = metaFor(sim, pid);
 
     sim.addItem(COMMON_WEAPON, 1, pid);
-    sim.disenchantItem(COMMON_WEAPON, pid);
+    runDisenchant(sim, COMMON_WEAPON, pid);
 
     expect(sim.lastDisenchantResult?.ok).toBe(true);
     expect(sim.countItem(COMMON_WEAPON, pid)).toBe(0);
@@ -383,7 +501,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     // 1. Rare disenchant: fixed 1 essence + exactly 1 armed resonant_steel.
     const essenceBefore = sim.countItem(ESSENCE);
     sim.addItem(RARE_WEAPON, 1);
-    sim.disenchantItem(RARE_WEAPON);
+    runDisenchant(sim, RARE_WEAPON);
     const denc = sim.lastDisenchantResult;
     expect(denc?.ok).toBe(true);
     expect(denc?.materialItemId).toBe(ESSENCE);
@@ -397,7 +515,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     expect(sim.countItem(RARE_WEAPON)).toBe(0);
 
     // Replay of the same action cannot double-grant: item is gone -> not_held.
-    sim.disenchantItem(RARE_WEAPON);
+    runDisenchant(sim, RARE_WEAPON);
     expect(sim.lastDisenchantResult?.ok).toBe(false);
     expect(sim.lastDisenchantResult?.reason).toBe('not_held');
     expect(sim.countItem(ESSENCE)).toBe(essenceBefore + 1);
@@ -407,7 +525,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     sim.addItem(RARE_WEAPON, 1);
     sim.addItem(ESSENCE, 2);
     const essencePre = sim.countItem(ESSENCE);
-    sim.applyEnchant(RARE_WEAPON, ENCHANT);
+    runApplyEnchant(sim, RARE_WEAPON, ENCHANT);
     const ench = sim.lastEnchantResult;
     expect(ench?.ok).toBe(true);
     expect(ench?.enchantId).toBe(ENCHANT);
@@ -421,7 +539,7 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
 
     // 3. Salvage a common weapon: materials granted, item consumed.
     sim.addItem(COMMON_WEAPON, 1);
-    sim.salvageItem(COMMON_WEAPON);
+    runSalvage(sim, COMMON_WEAPON);
     const salv = sim.lastSalvageResult;
     expect(salv?.ok).toBe(true);
     expect(salv?.materialItemId).toBeTruthy();
@@ -452,7 +570,7 @@ describe('online end-to-end (live GameServer, wire commands + self-deltas)', () 
       (slot) => slot.itemId === COMMON_WEAPON && slot.instance?.signer,
     );
 
-    sim.disenchantItem(COMMON_WEAPON, pid, selectedIndex);
+    runDisenchant(sim, COMMON_WEAPON, pid, selectedIndex);
 
     expect(sim.lastDisenchantResult?.ok).toBe(true);
     const remaining = simInv(sim, pid).filter((slot) => slot.itemId === COMMON_WEAPON);
@@ -476,7 +594,7 @@ describe('online end-to-end (live GameServer, wire commands + self-deltas)', () 
     );
 
     cmd(server, st, { cmd: 'disenchant_item', item: COMMON_WEAPON, slot: selectedIndex });
-    routeTick(server);
+    flushEnchantFamilyCast(server, st.pid);
 
     const dencEvents = eventsFor(fc.sent, 'disenchantResult');
     expect(dencEvents).toHaveLength(1);
@@ -496,7 +614,7 @@ describe('online end-to-end (live GameServer, wire commands + self-deltas)', () 
     server.sim.addItem(RARE_WEAPON, 1, st.pid);
     const essenceBefore = server.sim.countItem(ESSENCE, st.pid);
     cmd(server, st, { cmd: 'disenchant_item', item: RARE_WEAPON });
-    routeTick(server);
+    flushEnchantFamilyCast(server, st.pid);
     const dencEvents = eventsFor(fc.sent, 'disenchantResult');
     expect(dencEvents.length).toBe(1);
     const dev = dencEvents[0];
@@ -509,7 +627,7 @@ describe('online end-to-end (live GameServer, wire commands + self-deltas)', () 
     // Duplicated command: denied server-side, no double grant.
     const mark = fc.sent.length;
     cmd(server, st, { cmd: 'disenchant_item', item: RARE_WEAPON });
-    routeTick(server);
+    flushEnchantFamilyCast(server, st.pid);
     const dup = eventsFor(fc.sent, 'disenchantResult', mark);
     expect(dup.length).toBe(1);
     if (dup[0].type !== 'disenchantResult') throw new Error('expected disenchantResult');
@@ -522,7 +640,7 @@ describe('online end-to-end (live GameServer, wire commands + self-deltas)', () 
     server.sim.addItem(RARE_WEAPON, 1, st.pid);
     server.sim.addItem(ESSENCE, 2, st.pid);
     cmd(server, st, { cmd: 'apply_enchant', item: RARE_WEAPON, enchant: ENCHANT });
-    routeTick(server);
+    flushEnchantFamilyCast(server, st.pid);
     const enchEvents = eventsFor(fc.sent, 'enchantResult');
     expect(enchEvents.length).toBe(1);
     if (enchEvents[0].type !== 'enchantResult') throw new Error('expected enchantResult');
@@ -536,7 +654,7 @@ describe('online end-to-end (live GameServer, wire commands + self-deltas)', () 
     // Salvage over the wire.
     server.sim.addItem(COMMON_WEAPON, 1, st.pid);
     cmd(server, st, { cmd: 'salvage_item', item: COMMON_WEAPON });
-    routeTick(server);
+    flushEnchantFamilyCast(server, st.pid);
     const salvEvents = eventsFor(fc.sent, 'salvageResult');
     expect(salvEvents.length).toBe(1);
     if (salvEvents[0].type !== 'salvageResult') throw new Error('expected salvageResult');
@@ -556,5 +674,117 @@ describe('online end-to-end (live GameServer, wire commands + self-deltas)', () 
     expect(client.lastSalvageResult).toEqual(server.sim.lastSalvageResultFor(st.pid));
     expect(client.lastEnchantResult?.ok).toBe(true);
     expect(client.lastSalvageResult?.ok).toBe(true);
+  });
+});
+
+describe('apply-enchant keeps the crafted-provenance marker (the anti-farm gate)', () => {
+  const CHEST_ENCHANT = 'enchant_chest_stamina';
+  const reagentsFor = (sim: Sim, pid: number): void => {
+    sim.addItem('arcane_dust', 10, pid);
+    sim.addItem('arcane_essence', 10, pid);
+  };
+  const vest = (sim: Sim, pid: number) =>
+    simInv(sim, pid).find((s) => s.itemId === CRAFTED_COMMON_ARMOR);
+  const markerOf = (
+    slot: { craftedRecipeId?: string; instance?: { craftedRecipeId?: string } } | undefined,
+  ) => slot?.craftedRecipeId ?? slot?.instance?.craftedRecipeId;
+
+  it('a PLAIN crafted stack keeps its slot marker through the enchant mint', () => {
+    // The bug: a common crafted piece carries its provenance on the SLOT with no
+    // `instance` at all, and the mint rebuilt the copy from the consumed
+    // PAYLOAD only, so the marker had nowhere to survive.
+    const sim = new Sim({ seed: 20260901, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    grantVestMaterials(sim, pid);
+    runCraft(sim, CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
+    expect(sim.lastCraftResult?.ok).toBe(true);
+    reagentsFor(sim, pid);
+
+    runApplyEnchant(sim, CRAFTED_COMMON_ARMOR, CHEST_ENCHANT, undefined, undefined, pid);
+    expect(sim.lastEnchantResultFor(pid)?.ok).toBe(true);
+    const after = vest(sim, pid);
+    expect(after?.instance?.enchant).toBe(CHEST_ENCHANT);
+    expect(markerOf(after)).toBe(CRAFTED_COMMON_ARMOR_RECIPE);
+  });
+
+  it('disenchanting that enchanted self-crafted piece still pays NO enchanting skill', () => {
+    // The behaviour the marker exists for. Without it, craft -> enchant ->
+    // disenchant is a self-serve skill loop on the player's own gear.
+    const sim = new Sim({ seed: 20260902, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    const meta = metaFor(sim, pid);
+    grantVestMaterials(sim, pid);
+    runCraft(sim, CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
+    reagentsFor(sim, pid);
+    runApplyEnchant(sim, CRAFTED_COMMON_ARMOR, CHEST_ENCHANT, undefined, undefined, pid);
+    const afterApply = meta.craftSkills.enchanting;
+
+    runDisenchant(
+      sim,
+      CRAFTED_COMMON_ARMOR,
+      pid,
+      simInv(sim, pid).findIndex((s) => s.itemId === CRAFTED_COMMON_ARMOR),
+    );
+    expect(sim.lastDisenchantResult?.ok).toBe(true);
+    expect(meta.craftSkills.enchanting - afterApply).toBe(0);
+  });
+
+  it('a FOUND piece still pays skill: the gate denies provenance, not enchanting', () => {
+    // The negative arm. If this ever went to 0 the fix would be over-broad,
+    // silently killing the legitimate disenchant faucet.
+    const sim = new Sim({ seed: 20260903, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    const meta = metaFor(sim, pid);
+    sim.addItem(CRAFTED_COMMON_ARMOR, 1, pid); // granted, never crafted: no marker
+    reagentsFor(sim, pid);
+    runApplyEnchant(sim, CRAFTED_COMMON_ARMOR, CHEST_ENCHANT, undefined, undefined, pid);
+    const afterApply = meta.craftSkills.enchanting;
+
+    runDisenchant(
+      sim,
+      CRAFTED_COMMON_ARMOR,
+      pid,
+      simInv(sim, pid).findIndex((s) => s.itemId === CRAFTED_COMMON_ARMOR),
+    );
+    expect(sim.lastDisenchantResult?.ok).toBe(true);
+    expect(meta.craftSkills.enchanting - afterApply).toBeGreaterThan(0);
+  });
+
+  it('a masterwork crafted copy keeps seal, signer, AND marker through the mint', () => {
+    const sim = new Sim({ seed: 20260904, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    sim.addItemInstance(
+      CRAFTED_COMMON_ARMOR,
+      { signer: 'Ana', rolled: { masterwork: true, stats: { sta: 5 } } },
+      pid,
+      1,
+      { craftedRecipeId: CRAFTED_COMMON_ARMOR_RECIPE },
+    );
+    reagentsFor(sim, pid);
+
+    runApplyEnchant(sim, CRAFTED_COMMON_ARMOR, CHEST_ENCHANT, undefined, undefined, pid);
+    const after = vest(sim, pid);
+    expect(after?.instance?.signer).toBe('Ana');
+    expect(after?.instance?.rolled?.masterwork).toBe(true);
+    // The enchant's bonus sums ON TOP of the masterwork bake, not over it.
+    expect(after?.instance?.rolled?.stats?.sta).toBe(9);
+    expect(markerOf(after)).toBe(CRAFTED_COMMON_ARMOR_RECIPE);
+  });
+
+  it('the REPLACE arm keeps the marker too', () => {
+    const sim = new Sim({ seed: 20260905, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    grantVestMaterials(sim, pid);
+    runCraft(sim, CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
+    reagentsFor(sim, pid);
+    runApplyEnchant(sim, CRAFTED_COMMON_ARMOR, CHEST_ENCHANT, undefined, undefined, pid);
+    reagentsFor(sim, pid);
+
+    // Replacing with a different chest enchant, explicitly confirmed.
+    runApplyEnchant(sim, CRAFTED_COMMON_ARMOR, 'enchant_chest_spirit', undefined, true, pid);
+    expect(sim.lastEnchantResultFor(pid)?.ok).toBe(true);
+    const after = vest(sim, pid);
+    expect(after?.instance?.enchant).toBe('enchant_chest_spirit');
+    expect(markerOf(after)).toBe(CRAFTED_COMMON_ARMOR_RECIPE);
   });
 });

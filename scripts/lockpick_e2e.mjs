@@ -30,7 +30,7 @@ const browser = await puppeteer.launch({
   executablePath: BROWSER_PATH,
   headless: 'new',
   protocolTimeout: 60000,
-  userDataDir: `C:/Users/Sud0S/AppData/Local/Temp/woc-lockpick-e2e-${Date.now()}`,
+  userDataDir: `C:woc-lockpick-e2e-${Date.now()}`,
   args: [
     '--window-size=1280,800',
     '--use-angle=swiftshader',

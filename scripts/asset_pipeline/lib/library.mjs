@@ -121,7 +121,11 @@ export function parseVisualUrls(src) {
   };
   // visualKey: { url: `${DIR}/file.glb` ... } blocks, including nested attach
   // urls; attribute each url between this key and the next to the key.
-  const keyRe = /^\s{2}([a-z0-9_]+):\s*\{/gm;
+  // A def may be WRAPPED in a helper call (`player_warrior: swims({ ... })`,
+  // which layers the shared swim strokes on), so the opening brace can sit
+  // behind an identifier and a paren. Missing that does not just drop the key:
+  // its urls get attributed to whichever key was matched before it.
+  const keyRe = /^\s{2}([a-z0-9_]+):\s*(?:[A-Za-z_$][\w$]*\()?\{/gm;
   const keys = [...src.matchAll(keyRe)].map((m) => ({ key: m[1], at: m.index }));
   for (let i = 0; i < keys.length; i++) {
     const end = keys[i + 1]?.at ?? src.length;
@@ -743,6 +747,12 @@ export async function serveLibrary({ port = 5180, refresh = null } = {}) {
       if (url === '/wizard_ui.js') return send(res, 200, MIME['.js'], pageModule('wizard_ui.js'));
       if (url === '/' || url === '/index.html') return void serveIndex(res);
       if (url === '/three.bundle.js') return send(res, 200, MIME['.js'], threeBundle);
+      if (url === '/basis/basis_transcoder.js' || url === '/basis/basis_transcoder.wasm') {
+        // Shipped GLB textures are KTX2; the viewer's KTX2Loader fetches its
+        // transcoder from the same origin, mirroring the game client.
+        const p = pjoin(REPO_ROOT, 'public', url.slice(1));
+        return send(res, 200, MIME[extname(p)] ?? 'application/octet-stream', rf(p));
+      }
       if (url === '/viewer_live.js')
         return send(res, 200, MIME['.js'], pageModule('viewer_live.js'));
       if (url === '/weapon_vfx.js') return send(res, 200, MIME['.js'], pageModule('weapon_vfx.js'));

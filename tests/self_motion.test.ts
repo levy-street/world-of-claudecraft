@@ -29,6 +29,8 @@ const mi = (over: Partial<MoveInput> = {}): MoveInput => ({
   strafeLeft: false,
   strafeRight: false,
   jump: false,
+  dive: false,
+  surface: false,
   ...over,
 });
 
@@ -165,7 +167,7 @@ describe('SelfMotionPredictor', () => {
       type: 'unstuck',
       phase: 'completed',
       pid: 7,
-      reason: 'nearest_graveyard',
+      reason: 'moved_to_graveyard',
       area: { kind: 'overworld', id: 'eastbrook_vale' },
       origin: { x: 0, y: 0, z: 0, localX: 0, localZ: 0 },
       destination: { x: 0, y: 0, z: 4, localX: 0, localZ: 4 },

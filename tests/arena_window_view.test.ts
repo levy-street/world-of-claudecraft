@@ -61,7 +61,6 @@ function input(over: Partial<ArenaViewInput> = {}): ArenaViewInput {
     playerName: 'Me',
     party: null,
     allTime: {},
-    practiceAvailable: false,
     ...over,
   };
 }
@@ -107,8 +106,6 @@ describe('buildArenaView: bracket resolution + commit', () => {
   it('uses the selected bracket when idle and does not commit it', () => {
     const v = live(buildArenaView(input({ selectedBracket: '2v2' })));
     expect(v.bracket).toBe('2v2');
-    expect(v.commitBracket).toBe(false);
-    expect(v.canSwitchBracket).toBe(true);
   });
 
   it('forces + commits the match bracket regardless of selection', () => {
@@ -117,8 +114,6 @@ describe('buildArenaView: bracket resolution + commit', () => {
     } as Partial<ArenaInfo>);
     const v = live(buildArenaView(input({ info, selectedBracket: '1v1' })));
     expect(v.bracket).toBe('fiesta');
-    expect(v.commitBracket).toBe(true);
-    expect(v.canSwitchBracket).toBe(false);
     expect(v.action).toEqual({ kind: 'in-match', oppName: 'Foe' });
   });
 
@@ -126,16 +121,7 @@ describe('buildArenaView: bracket resolution + commit', () => {
     const info = makeArenaInfo('sim', { queued: true, queueSize: 3, format: '2v2' });
     const v = live(buildArenaView(input({ info, selectedBracket: '1v1' })));
     expect(v.bracket).toBe('2v2');
-    expect(v.commitBracket).toBe(true);
-    expect(v.canSwitchBracket).toBe(false);
     expect(v.action).toEqual({ kind: 'queued', queueSize: 3 });
-    // Locked brackets are the inactive ones while queued.
-    expect(v.brackets.filter((b) => b.locked).map((b) => b.fmt)).toEqual([
-      '1v1',
-      'fiesta',
-      'yumi3',
-      'yumi5',
-    ]);
   });
 });
 
@@ -206,18 +192,6 @@ describe('buildArenaView: ladder + all-time rows', () => {
 
   it('omits the all-time section when the cache has no rows for the bracket', () => {
     expect(live(buildArenaView(input())).allTime).toBeNull();
-  });
-
-  it('shows the practice affordance only on Fiesta when the hook is wired', () => {
-    expect(
-      live(buildArenaView(input({ selectedBracket: 'fiesta', practiceAvailable: true }))).practice,
-    ).toBe(true);
-    expect(
-      live(buildArenaView(input({ selectedBracket: 'fiesta', practiceAvailable: false }))).practice,
-    ).toBe(false);
-    expect(
-      live(buildArenaView(input({ selectedBracket: '1v1', practiceAvailable: true }))).practice,
-    ).toBe(false);
   });
 });
 

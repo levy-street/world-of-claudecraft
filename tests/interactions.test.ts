@@ -130,6 +130,22 @@ describe('hoverCursorKind', () => {
 });
 
 describe('activePvpOpponentIds', () => {
+  it('clears and refills a caller-owned set', () => {
+    const player = stubEntity({ id: 1, kind: 'player' });
+    const ids = new Set([99]);
+    const result = activePvpOpponentIds(
+      {
+        playerId: 1,
+        player,
+        duelInfo: { otherPid: 2, otherName: 'Duelist', state: 'active' },
+      },
+      ids,
+    );
+
+    expect(result).toBe(ids);
+    expect([...ids]).toEqual([2]);
+  });
+
   it('includes active duel and every arena enemy', () => {
     const player = stubEntity({ id: 1, kind: 'player' });
     const ids = activePvpOpponentIds({

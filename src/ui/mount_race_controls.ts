@@ -45,6 +45,18 @@ export class MountRaceControls {
 
   /** Per-frame realign to authoritative state: the Start Race button visibility
    *  and the center-screen countdown / GO flash. Cheap: only touches style/text. */
+  // Re-localize after an in-game language switch. The gates here are a
+  // visibility flag, a countdown mode and the countdown NUMBER, none of which
+  // move when the locale does, so the Start/Cancel label and the GO text would
+  // stay in the old language. Clearing the memos forces one repaint with fresh
+  // t(); update() self-gates, so this is safe to call unconditionally.
+  relocalize(): void {
+    this.lastButtonVisible = null;
+    this.lastCountdownMode = null;
+    this.lastCountdownNumber = -1;
+    this.update();
+  }
+
   update(): void {
     const view = this.deps.getState();
     this.paintButton(

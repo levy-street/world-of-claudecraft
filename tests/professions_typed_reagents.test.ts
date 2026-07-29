@@ -11,7 +11,7 @@
 import { describe, expect, it } from 'vitest';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { ITEMS } from '../src/sim/data';
-import { CRAFT_THROTTLE_MAX_PER_WINDOW } from '../src/sim/professions/action_throttle';
+
 import { typedSecondaryFor } from '../src/sim/professions/disenchant_reagents';
 import { disenchantYield, resolveDisenchant } from '../src/sim/professions/enchanting';
 import { Sim } from '../src/sim/sim';
@@ -257,23 +257,21 @@ describe('disenchant yield model (professions/enchanting.ts)', () => {
     expect(run()).toBe(run());
   });
 
-  it('the shared action throttle gates disenchant before any rng draw or grant', () => {
+  it('Phase 5: exhausted craftThrottle does not gate disenchant (cast paces, not quota)', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const meta = sim.ctx.resolve(pid)!.meta;
-    sim.addItem('gravewyrm_cleaver', 1, pid); // epic: a success would draw once
-    // Exhaust the shared 10-per-60s window.
+    sim.addItem('gravewyrm_cleaver', 1, pid); // epic: a success draws once
     meta.craftThrottle.windowStart = sim.ctx.time;
-    meta.craftThrottle.count = CRAFT_THROTTLE_MAX_PER_WINDOW;
+    meta.craftThrottle.count = 999;
     const { result, draws } = countDraws(sim, () =>
       resolveDisenchant(sim.ctx, pid, 'gravewyrm_cleaver'),
     );
-    expect(result.ok).toBe(false);
-    expect(result.reason).toBe('throttled');
-    expect(draws).toBe(0); // gated before the secondary-count draw
-    expect(sim.countItem('gravewyrm_cleaver', pid)).toBe(1); // nothing consumed
-    expect(sim.countItem('arcane_shard', pid)).toBe(0);
-    for (const mat of TYPED_MATERIALS) expect(sim.countItem(mat, pid)).toBe(0);
+    expect(result.ok).toBe(true);
+    expect(result.reason).not.toBe('throttled');
+    expect(draws).toBeGreaterThan(0);
+    expect(sim.countItem('gravewyrm_cleaver', pid)).toBe(0);
+    expect(meta.craftThrottle.count).toBe(999);
   });
 });
 

@@ -1,0 +1,636 @@
+{
+  "scenario": "delve_lockpick_tries_exhausted",
+  "seed": 2024,
+  "sampleEvery": 10,
+  "ticks": 71,
+  "coverage": [
+    "delve run (collapsed_reliquary finale)",
+    "lockpick minigame (server-authoritative timeout -> unsolved consolation grant)",
+    "tickLockpickTimeout -> lockpickStepTimeout -> lockpickBurnTry -> lockpickSucceed(solved=false)",
+    "chest opens at LOW tier (attemptAvailable=false, looted=true), no deed, no coffer + surface exit opens"
+  ],
+  "draws": 5,
+  "drawDigest": "50aeceb5",
+  "frames": [
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 964,
+      "state": "56ea11a2",
+      "events": "741638a5",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "init",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "rogue",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "rusty_dagger"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 959,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 42,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.0625,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0625,
+          "dualWielding": true,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 62,
+          "id": 959,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 62,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "rusty_dagger",
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resource": 100,
+          "resourceType": "energy",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 6,
+          "stats": {
+            "agi": 25,
+            "armor": 104,
+            "int": 11,
+            "spi": 12,
+            "sta": 17,
+            "str": 17
+          },
+          "templateId": "rogue",
+          "weapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          }
+        }
+      ]
+    },
+    {
+      "tick": 10,
+      "time": 0.5,
+      "nextId": 978,
+      "state": "280e963a",
+      "events": "682fd366",
+      "rng": {
+        "draws": 3,
+        "digest": "8261aa7c"
+      }
+    },
+    {
+      "tick": 20,
+      "time": 1,
+      "nextId": 978,
+      "state": "038b6104",
+      "events": "cc147418",
+      "rng": {
+        "draws": 3,
+        "digest": "8261aa7c"
+      }
+    },
+    {
+      "tick": 30,
+      "time": 1.5,
+      "nextId": 978,
+      "state": "313dcd72",
+      "events": "741638a5",
+      "rng": {
+        "draws": 3,
+        "digest": "8261aa7c"
+      }
+    },
+    {
+      "tick": 40,
+      "time": 2,
+      "nextId": 978,
+      "state": "bb037bf8",
+      "events": "741638a5",
+      "rng": {
+        "draws": 3,
+        "digest": "8261aa7c"
+      }
+    },
+    {
+      "tick": 50,
+      "time": 2.5,
+      "nextId": 978,
+      "state": "993a985a",
+      "events": "741638a5",
+      "rng": {
+        "draws": 3,
+        "digest": "8261aa7c"
+      }
+    },
+    {
+      "tick": 60,
+      "time": 3,
+      "nextId": 978,
+      "state": "9cbd9794",
+      "events": "741638a5",
+      "rng": {
+        "draws": 3,
+        "digest": "8261aa7c"
+      }
+    },
+    {
+      "tick": 69,
+      "time": 3.45,
+      "nextId": 979,
+      "state": "2f37661e",
+      "events": "af3f35f7",
+      "rng": {
+        "draws": 5,
+        "digest": "50aeceb5"
+      },
+      "label": "lockpick-tries-exhausted",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "rogue",
+          "companionUpgrades": {},
+          "copper": 10,
+          "counters": {
+            "damageDealt": 636,
+            "kills": 1,
+            "xpGained": 898
+          },
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 636,
+              "kills": 1
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "rusty_dagger"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
+            [
+              "dlv_reliquary",
+              ""
+            ],
+            [
+              "dlv_varric_ringers",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
+          "delveClears": {
+            "collapsed_reliquary:normal": 1
+          },
+          "delveDaily": {
+            "firstClearXp": [
+              "collapsed_reliquary:normal"
+            ],
+            "markClears": 1
+          },
+          "delveLoreUnlocked": [
+            "eastbrook_ledger"
+          ],
+          "delveMarks": 1,
+          "entityId": 959,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "lifetimeXp": 12098,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "renown": 30,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "xp": 898
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 66,
+          "combatTimer": 3.45,
+          "comboUntil": -1,
+          "critChance": 0.0715,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0715,
+          "dualWielding": true,
+          "fiveSecondRule": 102.45,
+          "hp": 50000,
+          "id": 959,
+          "inCombat": true,
+          "kind": "player",
+          "level": 7,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 50000,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "rusty_dagger",
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 104200,
+            "z": -1176
+          },
+          "potionCooldownUntil": -1,
+          "resource": 100,
+          "resourceType": "energy",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 6,
+          "stats": {
+            "agi": 43,
+            "armor": 188,
+            "int": 11,
+            "spi": 12,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "rogue",
+          "weapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": 3.141593,
+          "fiveSecondRule": 99,
+          "hp": 1,
+          "id": 977,
+          "kind": "object",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "lootable": true,
+          "maxHp": 1,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 104200,
+            "z": -1176
+          },
+          "potionCooldownUntil": -1,
+          "respawnTimer": -0.05,
+          "spawnPos": {
+            "x": 104200,
+            "z": -1176
+          },
+          "stats": {},
+          "templateId": "delve_reward_chest",
+          "weapon": {
+            "max": 2,
+            "min": 1,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 70,
+      "time": 3.5,
+      "nextId": 979,
+      "state": "cd7fec20",
+      "events": "741638a5",
+      "rng": {
+        "draws": 5,
+        "digest": "50aeceb5"
+      }
+    },
+    {
+      "tick": 71,
+      "time": 3.55,
+      "nextId": 979,
+      "state": "a441ef16",
+      "events": "741638a5",
+      "rng": {
+        "draws": 5,
+        "digest": "50aeceb5"
+      },
+      "label": "final",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "rogue",
+          "companionUpgrades": {},
+          "copper": 10,
+          "counters": {
+            "damageDealt": 636,
+            "kills": 1,
+            "xpGained": 898
+          },
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 636,
+              "kills": 1
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "rusty_dagger"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
+            [
+              "dlv_reliquary",
+              ""
+            ],
+            [
+              "dlv_varric_ringers",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ]
+          ],
+          "delveClears": {
+            "collapsed_reliquary:normal": 1
+          },
+          "delveDaily": {
+            "firstClearXp": [
+              "collapsed_reliquary:normal"
+            ],
+            "markClears": 1
+          },
+          "delveLoreUnlocked": [
+            "eastbrook_ledger"
+          ],
+          "delveMarks": 1,
+          "entityId": 959,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "lifetimeXp": 12098,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "renown": 30,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "xp": 898
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 66,
+          "combatTimer": 3.55,
+          "comboUntil": -1,
+          "critChance": 0.0715,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0715,
+          "dualWielding": true,
+          "fiveSecondRule": 102.55,
+          "hp": 50000,
+          "id": 959,
+          "inCombat": true,
+          "kind": "player",
+          "level": 7,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 50000,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "rusty_dagger",
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 104200,
+            "z": -1176
+          },
+          "potionCooldownUntil": -1,
+          "resource": 100,
+          "resourceType": "energy",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 6,
+          "stats": {
+            "agi": 43,
+            "armor": 188,
+            "int": 11,
+            "spi": 12,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "rogue",
+          "weapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "facing": 3.141593,
+          "fiveSecondRule": 99,
+          "hp": 1,
+          "id": 977,
+          "kind": "object",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "lootable": true,
+          "maxHp": 1,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 104200,
+            "z": -1176
+          },
+          "potionCooldownUntil": -1,
+          "respawnTimer": -0.05,
+          "spawnPos": {
+            "x": 104200,
+            "z": -1176
+          },
+          "stats": {},
+          "templateId": "delve_reward_chest",
+          "weapon": {
+            "max": 2,
+            "min": 1,
+            "speed": 2
+          }
+        }
+      ]
+    }
+  ]
+}

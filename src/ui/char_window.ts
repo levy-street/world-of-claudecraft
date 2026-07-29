@@ -19,21 +19,23 @@
 
 import { audio } from '../game/audio';
 import { ITEMS } from '../sim/data';
-import type { EquipSlot } from '../sim/types';
+import { type EquipSlot, isMechWearer } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { STAT_PANELS } from './char_stats_view';
 import { buildPaperdollView, type PaperdollSlot } from './char_view';
+import { craftNameText } from './craft_name_view';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName, itemDisplayName } from './entity_i18n';
 import { dropRequiredLevel, paperdollDropAction } from './equip_drop_core';
 import { esc } from './esc';
+import { gatheringProfessionNameKey } from './gathering_profession_name';
 import { buildGatheringProficiencyRows } from './gathering_view';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
 import type { ItemDragState } from './item_drag_state';
 import { wornTooltipInstance } from './item_instance_tooltip';
 import type { PainterHostPresentation } from './painter_host';
-import { hydratePortraits, portraitChipHtml } from './portrait_chip';
+import { hydratePortraits, modularLookFor, portraitChipHtml } from './portrait_chip';
 import { archetypeImageUrl, professionImageUrl } from './profession_art';
 import { qualityGlowShadow } from './quality_glow';
 import { tSim } from './sim_i18n';
@@ -66,21 +68,12 @@ const ARCHETYPE_PAIR_TITLE_KEYS: Record<string, TranslationKey> = {
   'armorcrafting+engineering': 'hudChrome.archetypePair.armorcrafting+engineering',
 };
 
-// The ten per-craft display-name keys, one per craft id on the ring (see
-// src/sim/content/professions.ts CRAFT_RING). Used wherever a CRAFT (not a
-// title) is meant: the hobby line, skill rows, section headers, combo labels.
-const CRAFT_NAME_KEYS: Record<string, TranslationKey> = {
-  armorcrafting: 'hudChrome.craftName.armorcrafting',
-  weaponcrafting: 'hudChrome.craftName.weaponcrafting',
-  jewelcrafting: 'hudChrome.craftName.jewelcrafting',
-  alchemy: 'hudChrome.craftName.alchemy',
-  engineering: 'hudChrome.craftName.engineering',
-  cooking: 'hudChrome.craftName.cooking',
-  inscription: 'hudChrome.craftName.inscription',
-  enchanting: 'hudChrome.craftName.enchanting',
-  tailoring: 'hudChrome.craftName.tailoring',
-  leatherworking: 'hudChrome.craftName.leatherworking',
-};
+// The per-craft display-name table lives in the shared craft_name_view.ts
+// pure core (the material_profession_hint_view Used-by line reads it too, and
+// a pure core may not import a *_window module). Re-exported here so the
+// historical import sites (crafting window, identity card, quest dialog,
+// train window, professions window, hud) keep resolving unchanged.
+export { craftNameText };
 
 /** Localized text for the granted pair-archetype title (the input is the
  *  canonical pair id from IWorld `archetypeTitle`), or the "no title yet" copy
@@ -88,14 +81,6 @@ const CRAFT_NAME_KEYS: Record<string, TranslationKey> = {
  *  somehow unrecognized). Exported for the view-model test. */
 export function archetypeTitleText(pairId: string | null): string {
   const key = pairId !== null ? ARCHETYPE_PAIR_TITLE_KEYS[pairId] : undefined;
-  return t(key ?? 'hudChrome.archetypeTitle.none');
-}
-
-/** Localized display name for one craft on the ring, or the same "none" copy
- *  for null/unrecognized ids. Exported for the crafting window, identity card,
- *  and quest dialog (every surface that names a CRAFT rather than a title). */
-export function craftNameText(craftId: string | null): string {
-  const key = craftId !== null ? CRAFT_NAME_KEYS[craftId] : undefined;
   return t(key ?? 'hudChrome.archetypeTitle.none');
 }
 
@@ -148,18 +133,12 @@ export interface CharWindowDeps extends PainterHostPresentation {
   renderBags(): void;
   /** Refusal toast for a drop the socket will not take. */
   showError(text: string): void;
+  /** The paperdoll eye toggle's current state: is the composed kit helm hidden? */
+  helmHidden(): boolean;
+  /** Flip the helmet-visibility preference. HUD-owned side effects (wire
+   *  command, stored choice, portrait re-snapshot, sheet repaint). */
+  toggleHelm(): void;
 }
-
-// Maps each gathering profession id to its hud_chrome display-name key (issue
-// 1124). String-keyed like the sibling professions_window.ts GATHERING_NAME_KEYS
-// (and this file's CRAFT_NAME_KEYS): an id with no key here renders no row
-// (fishing landed with Professions 2.0).
-const GATHERING_PROFESSION_LABEL_KEY: Record<string, TranslationKey> = {
-  mining: 'hudChrome.gathering.mining',
-  logging: 'hudChrome.gathering.logging',
-  herbalism: 'hudChrome.gathering.herbalism',
-  fishing: 'hudChrome.gathering.fishing',
-};
 
 const SHARE_GLYPH =
   '<svg class="pc-share-ico" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M18 16.1a3 3 0 0 0-2.3 1.1l-6.7-3.9a3 3 0 0 0 0-2.6l6.7-3.9A3 3 0 1 0 15 4l-6.7 3.9a3 3 0 1 0 0 8.2L15 20a3 3 0 1 0 3-3.9z"/></svg>';
@@ -215,7 +194,7 @@ export class CharWindow {
       world.hobbyCraft !== null
         ? `<span class="panel-subtitle char-hobby-craft">${esc(t('hudChrome.archetypeTitle.hobbyLabel'))}: ${esc(hobbyCraft)}</span>`
         : '';
-    let html = `<div class="panel-title char-title-portrait">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md' })}<span class="char-title-text" id="char-title">${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level, className }))}</span><span class="panel-subtitle char-archetype-title">${archetypeCrest}${esc(t('hudChrome.archetypeTitle.label'))}: ${esc(archetypeTitle)}</span>${hobbyRow}<span class="panel-subtitle char-honor-balance">${esc(t('hudChrome.warfare.balance', { amount: formatNumber(world.honor, { maximumFractionDigits: 0 }) }))}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
+    let html = `<div class="panel-title char-title-portrait">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md', catalog: p.skinCatalog, look: isMechWearer(world.player) ? null : modularLookFor(world.player) })}<span class="char-title-text" id="char-title">${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level, className }))}</span><span class="panel-subtitle char-archetype-title">${archetypeCrest}${esc(t('hudChrome.archetypeTitle.label'))}: ${esc(archetypeTitle)}</span>${hobbyRow}<span class="panel-subtitle char-honor-balance">${esc(t('hudChrome.warfare.balance', { amount: formatNumber(world.honor, { maximumFractionDigits: 0 }) }))}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
     html += `<div class="paperdoll">
       <div class="equip-col" id="equip-col-left"></div>
       <div class="char-model-panel">
@@ -274,17 +253,24 @@ export class CharWindow {
   // The "Gathering" section (issue 1124): one row per gathering profession, showing
   // the viewer's own proficiency points (IWorldProfessions#professionsState).
   // Data comes from the pure gathering_view.ts core; this painter only formats it.
+  // The value renders "12 / 100" through the SAME hudChrome.professions.skillValue
+  // key the professions window uses, never a bare integer: an unbounded number
+  // that ticks up +1 per harvest is what players read as a character level.
   private gatheringHtml(world: IWorld): string {
     const rows = buildGatheringProficiencyRows(world);
     const items = rows
       .map((r) => {
-        const key = GATHERING_PROFESSION_LABEL_KEY[r.professionId];
+        const key = gatheringProfessionNameKey(r.professionId);
         if (key === undefined) return '';
         const imageUrl = professionImageUrl(`gather_${r.professionId}`);
         const icon = imageUrl
           ? `<img class="char-gather-icon" src="${esc(imageUrl)}" alt="" draggable="false">`
           : '';
-        return `<span class="char-gather-row">${icon}<span>${esc(t(key))}: <b>${formatNumber(r.displayValue, { maximumFractionDigits: 0 })}</b></span></span>`;
+        const skillValue = t('hudChrome.professions.skillValue', {
+          skill: formatNumber(r.displayValue, { maximumFractionDigits: 0 }),
+          max: formatNumber(r.maxSkill, { maximumFractionDigits: 0 }),
+        });
+        return `<span class="char-gather-row">${icon}<span>${esc(t(key))}: <b>${esc(skillValue)}</b></span></span>`;
       })
       .join('');
     return `<div class="char-progression"><div class="cp-title">${esc(t('hudChrome.gathering.title'))}</div><div class="char-stats cp-stats">${items}</div></div>`;
@@ -310,6 +296,29 @@ export class CharWindow {
       : `<img class="item-icon" style="border-color:${SLOT_EMPTY_BORDER_COLOR}" src="${iconDataUrl('item', 'slot_empty')}" alt="" draggable="false">`;
     row.innerHTML = `${icon}
         <div><div class="slot-name">${esc(this.deps.slotName(slot))}</div><div class="slot-item" style="color:${qColor}">${item ? esc(itemDisplayName(item)) : esc(t('itemUi.equipment.empty'))}</div></div>`;
+    // The helmet-visibility eye (head socket only): a standing wardrobe control,
+    // so unlike the corner x it is always visible, and it rides the socket
+    // because that is where the player looks for "my helmet". State + side
+    // effects are HUD-owned through deps (the wire command, the stored choice,
+    // the portrait re-snapshot).
+    if (slot === 'helmet') {
+      const hidden = this.deps.helmHidden();
+      const labelKey = hidden
+        ? 'hudChrome.paperdoll.showHelmAria'
+        : 'hudChrome.paperdoll.hideHelmAria';
+      const eye = document.createElement('button');
+      eye.type = 'button';
+      eye.className = 'equip-helm-eye';
+      eye.innerHTML = svgIcon(hidden ? 'eye-off' : 'eye');
+      eye.setAttribute('aria-label', t(labelKey));
+      eye.setAttribute('aria-pressed', hidden ? 'true' : 'false');
+      this.deps.attachTooltip(eye, () => esc(t(labelKey)));
+      eye.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        this.deps.toggleHelm();
+      });
+      row.appendChild(eye);
+    }
     if (item) {
       // Soft glow in the item's quality color (derived, no getComputedStyle).
       const iconEl = row.querySelector<HTMLImageElement>('.item-icon');
@@ -370,7 +379,14 @@ export class CharWindow {
     if (!item) return;
     const world = this.deps.world();
     switch (
-      paperdollDropAction(item, slot, world.cfg.playerClass, world.player.level, world.talentSpec)
+      paperdollDropAction(
+        item,
+        slot,
+        world.cfg.playerClass,
+        world.player.level,
+        world.talentSpec,
+        world.equipment,
+      )
     ) {
       case 'blockedSlot':
         this.deps.showError(tSim('error.wrongEquipSlot'));
@@ -384,6 +400,9 @@ export class CharWindow {
             level: formatNumber(dropRequiredLevel(item), { maximumFractionDigits: 0 }),
           }),
         );
+        return;
+      case 'blockedUnique':
+        this.deps.showError(tSim('error.uniqueEquipped'));
         return;
       case 'equip':
         world.equipItemToSlot(itemId, slot);
@@ -412,6 +431,7 @@ export class CharWindow {
           world.cfg.playerClass,
           world.player.level,
           world.talentSpec,
+          world.equipment,
         ) === 'equip';
       row.classList.toggle('drop-target', accepts);
     }
@@ -434,6 +454,7 @@ export class CharWindow {
           world.cfg.playerClass,
           world.player.level,
           world.talentSpec,
+          world.equipment,
         ) !== 'equip'
       )
         return;

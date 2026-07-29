@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
-[![Version](https://img.shields.io/badge/version-0.31.0-blue)](../../package.json)
+[![Version](https://img.shields.io/badge/version-0.35.1-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.id_ID.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -92,7 +92,7 @@ npm install
 npm run dev        # then open http://localhost:5173 and choose Play Offline
 ```
 
-Beri nama karakter Anda, pilih salah satu dari sembilan class, dan Anda mulai di **Eastbrook Vale** (level 1-7), sebuah kota pasar yang dikelilingi hub: jalur serigala di utara, padang babi hutan di timur, hutan Sableweb di barat, Mirror Lake di barat laut, galian tembaga yang dipenuhi burrower di barat daya, dan kapel reruntuhan berisi mayat gelisah di timur laut, dengan kamp bandit Gorrak di tenggara. Jalan utara mendaki celah gunung menuju **Mirefen Marsh** (6-13, hub Fenbridge) dan terus naik ke **Thornpeak Heights** (13-20, hub Highwatch). Seed dunia ditetapkan di `src/main.ts`, jadi ini tempat yang sama di setiap kunjungan.
+Beri nama karakter Anda, pilih salah satu dari sembilan class, dan Anda mulai di **Eastbrook Vale** (level 1-7), sebuah kota pasar yang dikelilingi hub: jalur serigala di utara, padang babi hutan di timur, hutan Sableweb di barat, Mirror Lake di barat laut, galian tembaga yang dipenuhi burrower di barat daya, dan kapel reruntuhan berisi mayat gelisah di timur laut, dengan kamp bandit Gorrak di tenggara. Jalan utara mendaki celah gunung menuju **Mirefen Marsh** (6-13, hub Fenbridge) dan terus naik ke **Thornpeak Heights** (13-20, hub Highwatch). Seed dunia ditetapkan di `src/sim/world_seed.ts`, jadi ini tempat yang sama di setiap kunjungan.
 
 ### Aplikasi desktop untuk Windows, Linux, dan macOS
 

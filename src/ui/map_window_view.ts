@@ -4,7 +4,8 @@
 // Conventions; reference delve_map.ts / delve_map_painter.ts). It maps IWorld
 // state plus the committed zone to a flat geometry model in canvas-pixel space:
 // the background blit rect, the zoomed-detail overlay, and every label / portal /
-// npc glyph / player arrow / ally dot already projected to (mx, my). No DOM, no
+// npc glyph / player arrow / ally dot / party dot / gather-node marker already
+// projected to (mx, my). No DOM, no
 // Three, no 2D context, no i18n, no color: the painter owns the context and
 // resolves the --color-map-* tokens + the localized label text. The delve branch
 // of the map is owned by delve_map_painter.ts; this core models only the
@@ -12,21 +13,31 @@
 //
 // DOM-free / i18n-free / deterministic so tests/map_window_view.test.ts can drive
 // it directly with both a Sim-shaped and a ClientWorld-mirror-shaped IWorld stub.
-// Markers carry the identity (zoneId / poiIndex / dungeonId / cls)
+// Markers carry the identity (zoneId / poiIndex / dungeonId / cls / nodeId)
 // the painter needs to resolve their localized text, never the resolved string.
 
+import type { GatheringProfessionId } from '../sim/content/professions';
 import {
   DUNGEON_LIST,
+  GATHER_NODES,
+  isBgPos,
   isDelvePos,
-  QUESTS,
   STRIP_MAX_X,
   STRIP_MIN_X,
   type ZoneDef,
 } from '../sim/data';
-import { type QuestObjectiveRef, questObjectiveAreas } from '../sim/quest_targets';
-import { type BuildingDef, isQuestTurnInNpc, type ZonePropsDef } from '../sim/types';
+import { NODE_HARVEST_TABLE } from '../sim/professions/gathering';
+import { canGatherTier } from '../sim/professions/tools';
+import {
+  type MapQuestMarkerKind,
+  type QuestObjectiveRef,
+  questGiverNpcMarkers,
+  questObjectiveAreas,
+} from '../sim/quest_targets';
+import type { BuildingDef, GatherNodeType, ZonePropsDef } from '../sim/types';
 import type { Decoration } from '../sim/world';
 import type { FriendInfo, IWorld } from '../world_api';
+import { viewerUsableToolTier } from './gathering_view';
 import { overworldDungeonPortals } from './map_dungeon_portals';
 import { questNumbersByLog } from './map_quest_list_view';
 
@@ -63,8 +74,11 @@ const CAMPFIRE_MIN_RADIUS = 1.4;
 const CAMPFIRE_RADIUS_PPU = 0.5;
 
 /** Which world-map surface a given world renders: the delve schematic (owned by
- *  delve_map_painter) or the overworld map (this core). */
-export type MapWindowMode = 'delve' | 'overworld';
+ *  delve_map_painter), the Thornhollow Fields battleground band (routed to the plain
+ *  overworld surface: the band sits past WORLD_MAX_X, so the player/ally
+ *  markers self-suppress; the minimap owns the in-band field raster), or the
+ *  overworld map (this core). */
+export type MapWindowMode = 'delve' | 'battleground' | 'overworld';
 
 /** A map region in world coords, used with two meanings for spanX/spanZ. The
  *  internal `full` rect carries the current-zone square (its full spans). The
@@ -96,26 +110,37 @@ export interface MapPortalMarker {
   dungeonId: string;
 }
 
-/** One quest carried by a map quest-giver glyph, for its hover tooltip. */
+/** One quest carried by a map quest-giver glyph, for its hover tooltip:
+ *  'ready' (the '?' state), 'available' (first-offer gold '!'), 'repeat'
+ *  (completed-repeatable blue '!'), or 'cooldown' (a work order inside its
+ *  cadence window, the dimmed '!'). The type is the four-member
+ *  MapQuestMarkerKind, so consumers see only drawable kinds; the tooltip
+ *  tag table switches exhaustively over them (the painter resolves glyph
+ *  and color by comparison). */
 export interface MapNpcQuestRef {
   questId: string;
-  /** true = ready to turn in (the '?' state); false = available to pick up. */
-  ready: boolean;
+  kind: MapQuestMarkerKind;
 }
 
-/** A quest-giver glyph: '?' (turn-in ready) wins over '!' (available). Carries
- *  the quest identities behind the glyph so the hover tooltip can resolve
- *  their localized titles + level requirements (this core stays i18n-free). */
+/** A quest-giver glyph: `kind` is the strongest state present under the
+ *  shared quest_marker_kind fold ('?' turn-in ready wins over every '!'
+ *  variant). Carries the quest identities behind the glyph so the hover
+ *  tooltip can resolve their localized titles + level requirements (this
+ *  core stays i18n-free). */
 export interface MapNpcMarker {
   mx: number;
   my: number;
-  ready: boolean;
+  kind: MapQuestMarkerKind;
   quests: MapNpcQuestRef[];
 }
 
 /** The glyph hit radius for the map hover tooltip, in canvas px: the '?'/'!'
  *  glyphs draw at a ~15px font, and a touch of slack keeps the hover forgiving. */
 export const MAP_NPC_GLYPH_HIT_RADIUS = 10;
+
+/** Hit radius for a zone-map gather node icon (ready radius ~5px plus slack for
+ *  the type silhouette and soft glow). Same nearest-wins rule as NPC glyphs. */
+export const MAP_GATHER_NODE_HIT_RADIUS = 10;
 
 /** The nearest quest-giver glyph within the hit radius of a canvas point, or
  *  null. Nearest (not first) so two adjacent givers resolve intuitively. */
@@ -127,6 +152,45 @@ export function npcMarkerAt(
   let best: MapNpcMarker | null = null;
   let bestD2 = MAP_NPC_GLYPH_HIT_RADIUS * MAP_NPC_GLYPH_HIT_RADIUS;
   for (const n of npcs) {
+    const dx = mx - n.mx;
+    const dy = my - n.my;
+    const d2 = dx * dx + dy * dy;
+    if (d2 <= bestD2) {
+      bestD2 = d2;
+      best = n;
+    }
+  }
+  return best;
+}
+
+/** A gatherable world node on the zone map (ore / wood / herb). Positions come
+ *  from static content (never entities), so the online interest radius never
+ *  hides a far-away vein. `ready` / `locked` mirror the minimap's two
+ *  dimensions (per-viewer respawn + wield-filtered tool tier) so both surfaces
+ *  agree. Actionable info on every graphics tier (fairness: never preset-gated).
+ *  Distinct from quest-objective gather blobs in quest_targets: those cluster
+ *  only active-quest collect targets; this layer marks every node in the zone. */
+export interface MapGatherNodeMarker {
+  mx: number;
+  my: number;
+  /** Authored content id; the hover tooltip reuses buildGatherNodeTooltip. */
+  nodeId: string;
+  type: GatherNodeType;
+  ready: boolean;
+  locked: boolean;
+}
+
+/** The nearest gather-node marker within the hit radius of a canvas point, or
+ *  null. Nearest (not first) so a tight resource field resolves to the closest
+ *  icon under the cursor. */
+export function gatherNodeMarkerAt(
+  nodes: readonly MapGatherNodeMarker[],
+  mx: number,
+  my: number,
+): MapGatherNodeMarker | null {
+  let best: MapGatherNodeMarker | null = null;
+  let bestD2 = MAP_GATHER_NODE_HIT_RADIUS * MAP_GATHER_NODE_HIT_RADIUS;
+  for (const n of nodes) {
     const dx = mx - n.mx;
     const dy = my - n.my;
     const d2 = dx * dx + dy * dy;
@@ -190,6 +254,18 @@ export interface MapAllyMarker {
   my: number;
   name: string;
   kind: 'friend' | 'guild';
+}
+
+/** A party member dot (issue 2652): identity only, the class color and the
+ *  dead-state token are resolved by the painter, matching this file's stated
+ *  convention for every other marker. Works offline and online (both worlds
+ *  populate `partyInfo.members[].x/z/cls/dead` identically). */
+export interface MapPartyMarker {
+  mx: number;
+  my: number;
+  name: string;
+  cls: string;
+  dead: boolean;
 }
 
 /** A vegetation dot in the detail overlay (rock vs pine/oak foliage). */
@@ -260,7 +336,7 @@ export interface OverworldMapModel {
   /** Drag cursor when zoomed past the full-zone view. */
   cursor: 'grab' | 'default';
   /** The visible world rect. The painter composites the current zone's cached
-   *  background into it (+X is map-left, +Z map-down) over an ocean fill. */
+   *  background into it (+X is map-left, +Z map-up; R61) over an ocean fill. */
   region: { minX: number; maxX: number; minZ: number; maxZ: number };
   /** The committed zone id (the painter localizes the on-canvas title + summary). */
   zoneId: string;
@@ -268,12 +344,22 @@ export interface OverworldMapModel {
   portals: MapPortalMarker[];
   npcs: MapNpcMarker[];
   questAreas: MapQuestAreaMarker[];
+  /** Gather nodes in the committed zone (all zoom levels). Empty only when
+   *  the zone has no authored nodes in view. */
+  gatherNodes: MapGatherNodeMarker[];
   player: MapPlayerMarker | null;
   allies: MapAllyMarker[];
+  /** Party members other than self, live world position (issue 2652). Empty
+   *  solo or with no party formed. */
+  party: MapPartyMarker[];
   /** The zoomed-detail overlay, or null below MAP_DETAIL_ZOOM. */
   detail: MapDetail | null;
   /** Canvas-space "Show on Map" highlight, or null when absent / out of view. */
   ping: { mx: number; my: number } | null;
+  /** When the player is inside a rift, its floor name + C/B/A/S rank (rank null
+   *  for dev-portal runs), so the painter can show this instead of the
+   *  overworld zone title. Mirrors MinimapModel.rift; null outside a rift. */
+  rift: { name: string; rank: string | null } | null;
 }
 
 /** Inputs the painter feeds the builder each redraw. The cached terrain bg + the
@@ -299,21 +385,28 @@ export interface OverworldMapInput {
 /** Which world-map surface this world renders. Delve when the player stands in a
  *  delve band and a run is active (matches the inline guard); overworld otherwise. */
 export function mapWindowMode(world: IWorld): MapWindowMode {
+  if (isBgPos(world.player.pos.x)) return 'battleground';
   return isDelvePos(world.player.pos.x) && world.delveRun ? 'delve' : 'overworld';
 }
 
 /**
  * Build the overworld map draw model. Reads only IWorld members (player /
- * entities / socialInfo / questState / questLog) plus the committed zone and
- * shared world content (zone bounds, dungeon portals, camps, props,
- * decorations), so the offline Sim and the online ClientWorld mirror produce
- * identical output. Every
- * position is projected to canvas pixels here; the painter only resolves colors +
- * localized text and strokes.
+ * socialInfo / questState / questLog) plus the committed zone and shared world
+ * content (ZONES bounds, dungeon portals, camps, props, decorations, NPCS), so
+ * the offline Sim and the online ClientWorld mirror produce identical output.
+ * Every position is projected to canvas pixels here; the painter only resolves
+ * colors + localized text and strokes.
  */
 export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapModel {
   const { world, props, zone, zoom, center, canvasSize: S, decorations } = input;
   const p = world.player;
+
+  // Inside a rift the overworld zone (the current-zone frame below still keys
+  // off `zone`, which the player's far-off rift x displaces past any real
+  // band) is the wrong title; surface the generated rift floor name + rank
+  // instead, mirroring minimap_markers.ts's identical override.
+  const rf = world.riftFloor;
+  const rift = rf ? { name: rf.name, rank: rf.tier } : null;
 
   // Frame only the committed zone. A square frame preserves world scale; a
   // rectangular zone therefore gets ocean letterboxing on its shorter axis,
@@ -346,7 +439,10 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     maxZ: cz + spanZ / 2,
   };
 
-  // +X is map-left (east = -X); +Z is map-down.
+  // +X is map-left (east = -X); +Z is map-up (north = +Z): my shrinks as z
+  // grows. This projection is the compass authority for player-facing
+  // direction words (R61, docs/design/professions-tuning-packet-review.md);
+  // the layout files' legacy +x=east names are raw coordinates, not compass.
   const toMap = (x: number, z: number): { mx: number; my: number } => ({
     mx: ((region.maxX - x) / spanX) * S,
     my: ((region.maxZ - z) / spanZ) * S,
@@ -417,31 +513,56 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     portals.push({ mx, my, dungeonId: portal.id });
   }
 
-  // Quest-giver glyphs show at every zoom (actionable markers, unlike the
-  // zoom-gated zone/POI text labels), culled to the visible map rect.
-  const npcs: MapNpcMarker[] = [];
-  for (const e of world.entities.values()) {
-    if (e.kind !== 'npc') continue;
-    if (!inZone(e.pos.x, e.pos.z) || !inView(e.pos.x, e.pos.z)) continue;
-    const avail = e.questIds.filter(
-      (q) => QUESTS[q].giverNpcId === e.templateId && world.questState(q) === 'available',
-    );
-    const readyQuests = e.questIds.filter(
-      (q) => isQuestTurnInNpc(QUESTS[q], e.templateId) && world.questState(q) === 'ready',
-    );
-    if (avail.length > 0 || readyQuests.length > 0) {
-      const { mx, my } = toMap(e.pos.x, e.pos.z);
-      npcs.push({
-        mx,
-        my,
-        ready: readyQuests.length > 0,
-        // turn-ins first: the '?' state wins the glyph, so its quests lead the tooltip
-        quests: [
-          ...readyQuests.map((questId) => ({ questId, ready: true })),
-          ...avail.map((questId) => ({ questId, ready: false })),
-        ],
-      });
+  // Gather nodes (ore / wood / herb) for the committed zone: static content
+  // positions, same ready/locked dimensions as the minimap. Zone-id filter
+  // first so a pan across a neighbour never leaks foreign nodes; then inView
+  // so a panned sub-rect only pays for what is on screen. Tool-tier memo is
+  // per-build and per-profession (the minimap shape): empty inventory locks
+  // every node, and a tool picked up between redraws re-resolves next paint.
+  // Cap is tiny (at most six of each type per zone in content), so individual
+  // markers stay cheap at every zoom, including the full-zone frame.
+  const gatherNodes: MapGatherNodeMarker[] = [];
+  let bestToolTiers: Map<GatheringProfessionId, number> | null = null;
+  let proficiency: Readonly<Record<string, number>> | undefined;
+  for (const node of GATHER_NODES) {
+    if (node.zoneId !== zone.id) continue;
+    if (!inView(node.pos.x, node.pos.z)) continue;
+    bestToolTiers ??= new Map();
+    const professionId = NODE_HARVEST_TABLE[node.type].professionId;
+    let best = bestToolTiers.get(professionId);
+    if (best === undefined) {
+      proficiency ??= world.gatheringProficiency;
+      best = viewerUsableToolTier(world, professionId, proficiency);
+      bestToolTiers.set(professionId, best);
     }
+    const { mx, my } = toMap(node.pos.x, node.pos.z);
+    gatherNodes.push({
+      mx,
+      my,
+      nodeId: node.id,
+      type: node.type,
+      ready: world.nodeHarvestableByMe(node.id),
+      locked: !canGatherTier(best, node.tier),
+    });
+  }
+
+  // Quest-giver glyphs, resolved from the static NPCS content table (like the
+  // quest-area blobs above) rather than world.entities, so the online interest
+  // radius never hides a distant giver's '!'/'?' glyph. questsDone and the
+  // cadence-blocked set feed the shared quest_marker_kind rule (the repeat
+  // and cooldown variants); both are IWorld members on both worlds, so the
+  // offline map and the online mirror classify identically.
+  const npcs: MapNpcMarker[] = [];
+  const blocked = world.craftingIdentity?.cadenceBlockedQuests;
+  const cadenceBlocked = blocked && blocked.length > 0 ? new Set(blocked) : undefined;
+  for (const marker of questGiverNpcMarkers(
+    (q) => world.questState(q),
+    world.questsDone,
+    cadenceBlocked,
+  )) {
+    if (!inZone(marker.pos.x, marker.pos.z) || !inView(marker.pos.x, marker.pos.z)) continue;
+    const { mx, my } = toMap(marker.pos.x, marker.pos.z);
+    npcs.push({ mx, my, kind: marker.kind, quests: marker.quests });
   }
 
   let player: MapPlayerMarker | null = null;
@@ -450,9 +571,31 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     player = { mx, my, angle: -p.facing };
   }
 
+  // Party members (issue 2652): the minimap's already-consumed
+  // partyInfo.members, projected the same way as every other in-zone marker.
+  // Self is excluded (the player already has its own arrow); gated on `labels`
+  // like the ally dots above, since a party marker also carries a name label.
+  // Built before the ally loop so `partyNames` can gate it (see below).
+  const party: MapPartyMarker[] = [];
+  const partyNames = new Set<string>();
+  const partyInfo = world.partyInfo;
+  if (labels && partyInfo) {
+    for (const m of partyInfo.members) {
+      if (m.pid === p.id) continue;
+      partyNames.add(m.name);
+      if (!inZone(m.x, m.z) || !inView(m.x, m.z)) continue;
+      const { mx, my } = toMap(m.x, m.z);
+      party.push({ mx, my, name: m.name, cls: m.cls, dead: m.dead !== 0 });
+    }
+  }
+
   // Friends (green) and guild members (blue), plotted from the live positions the
   // server streams for online allies. socialInfo is null offline, so this is
-  // online-only; friends are plotted first and win ties (dedup by id).
+  // online-only; friends are plotted first and win ties (dedup by id). A friend
+  // or guildmate who is also a party member is skipped here: the party loop
+  // above already draws them with their class color, matching how
+  // minimap_markers.ts excludes partyPids from its entity loop to avoid the
+  // same double dot.
   const allies: MapAllyMarker[] = [];
   const social = world.socialInfo;
   if (labels && social) {
@@ -464,7 +607,8 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
         m.x === undefined ||
         m.z === undefined ||
         m.name === selfName ||
-        drawn.has(m.id)
+        drawn.has(m.id) ||
+        partyNames.has(m.name)
       )
         return;
       if (!inZone(m.x, m.z) || !inView(m.x, m.z)) return;
@@ -485,10 +629,13 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     portals,
     npcs,
     questAreas,
+    gatherNodes,
     player,
     allies,
+    party,
     detail,
     ping,
+    rift,
   };
 }
 

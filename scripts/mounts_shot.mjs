@@ -62,7 +62,19 @@ await page.waitForFunction(
 await page.evaluate(() => window.__game.sim.chat('/dev mounts'));
 await page.waitForFunction(() => {
   const sim = window.__game.sim;
-  return sim.ridingTrained() && sim.ownedMounts().length === 7;
+  sim.setPlayerLevel(20, sim.playerId);
+  for (const id of [
+    'reins_valorsteed',
+    'reins_grag_bear',
+    'reins_stalkglider_snail',
+    'reins_aether_hover_cycle',
+    'reins_shadowjump_toad',
+    'reins_stormfeather_griffin',
+    'reins_thunderstrut_gobbler',
+    'reins_drakemaw_raptor',
+    'reins_terrorspark_groundshaker',
+  ])
+    sim.addItem(id, 1);
 });
 await sleep(300);
 

@@ -56,6 +56,22 @@ describe('admin route permission map', () => {
     expect(permissionForAdminRoute('GET', '/admin/api/accounts/42/daily-rewards-events')).toBe(
       'accounts.read',
     );
+    expect(permissionForAdminRoute('GET', '/admin/api/guilds')).toBe('accounts.read');
+    expect(permissionForAdminRoute('GET', '/admin/api/guilds/42')).toBe('accounts.read');
+    expect(permissionForAdminRoute('GET', '/admin/api/guilds/42/history')).toBe('moderation.read');
+    expect(permissionForAdminRoute('POST', '/admin/api/guilds/42/rename')).toBe('moderation.act');
+    // The guild bank READ is deliberately wider than the purge it serves:
+    // reading destroys nothing, so it sits with the sibling audit panel on the
+    // same detail page rather than behind the superadmin-only hatch.
+    expect(permissionForAdminRoute('GET', '/admin/api/guilds/42/bank')).toBe('moderation.read');
+    // ...and it is a READ: no POST reaches the live book through this path.
+    expect(permissionForAdminRoute('POST', '/admin/api/guilds/42/bank')).toBeNull();
+    // The guild bank escape hatch destroys player property, so it carries its
+    // OWN permission: a moderator with moderation.act must not reach it.
+    expect(permissionForAdminRoute('POST', '/admin/api/guilds/42/bank/purge-slot')).toBe(
+      'guildbank.purge',
+    );
+    expect(permissionForAdminRoute('GET', '/admin/api/guilds/42/bank/purge-slot')).toBeNull();
     expect(permissionForAdminRoute('POST', '/admin/api/accounts/42/reset-password')).toBe(
       'accounts.password',
     );
@@ -80,6 +96,36 @@ describe('admin route permission map', () => {
     expect(permissionForAdminRoute('POST', '/admin/api/maps/9/unpublish')).toBe('content.moderate');
     expect(permissionForAdminRoute('GET', '/admin/api/me')).toBe('any');
     expect(permissionForAdminRoute('POST', '/admin/api/staff/roles')).toBe('staff.manage');
+    // R35 GM professions tooling: the inspector is a read; the two restores
+    // MINT value onto a character, so the write permission is the whole gate
+    // (a downgrade to a read permission would let any viewer mint items).
+    expect(permissionForAdminRoute('GET', '/admin/api/characters/42/professions')).toBe(
+      'accounts.read',
+    );
+    expect(
+      permissionForAdminRoute('POST', '/admin/api/moderation/characters/42/restore-item'),
+    ).toBe('moderation.act');
+    expect(
+      permissionForAdminRoute('POST', '/admin/api/moderation/characters/42/restore-slot'),
+    ).toBe('moderation.act');
+  });
+
+  it('serves the guild bank purge ladder arm AFTER the central permission gate', () => {
+    // The legacy arm has no per-route auth of its own: it relies on the ONE
+    // central gate in handleAdminApi's preamble. An arm placed above that gate
+    // (the way /admin/api/login deliberately is) would be unauthenticated, so
+    // pin the ordering rather than trusting it transitively.
+    const source = readFileSync('server/admin.ts', 'utf8');
+    const gate = source.indexOf(
+      'const routePermission = permissionForAdminRoute(req.method, path);',
+    );
+    const purgeArm = source.indexOf('const guildBankPurgeMatch =');
+    expect(gate).toBeGreaterThan(-1);
+    expect(purgeArm).toBeGreaterThan(gate);
+    // The only route handled before the gate stays the login endpoint.
+    const preamble = source.slice(0, gate);
+    const early = [...preamble.matchAll(/path === '(\/admin\/api\/[^']+)'/g)].map((m) => m[1]);
+    expect(early).toEqual(['/admin/api/login']);
   });
 
   it('distinguishes wrong-method hits from unknown paths', () => {

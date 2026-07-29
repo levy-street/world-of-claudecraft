@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>WOC Fit Studio</title>
+<link rel="stylesheet" href="/fit_studio/style.css" />
+<!-- Drawn, not an emoji glyph: the repo bans emojis in source, and a bare
+     <text> favicon also renders as the platform's own emoji font anyway. -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' rx='3' fill='%23272a33'/><path d='M4 11.5 11 4.5M9.5 3l3.5 3.5-2 2L7.5 5z' stroke='%23d8c08a' stroke-width='1.6' fill='none' stroke-linecap='round'/></svg>" />
+</head>
+<body>
+<!-- The shell is just named containers; every control inside them is built by
+     the modules in /fit_studio/*.js so widgets stay consistent. -->
+<div id="app">
+  <header id="topbar"></header>
+  <aside id="library">
+    <div id="lib-search"></div>
+    <div id="lib-sections"></div>
+  </aside>
+  <main id="viewport">
+    <div id="readout" hidden></div>
+    <div id="vp-hint"></div>
+  </main>
+  <aside id="inspector">
+    <div id="insp-tabs"></div>
+    <div id="insp-body"></div>
+  </aside>
+  <footer id="statusbar"></footer>
+</div>
+<div id="toasts"></div>
+<div id="cheat"></div>
+<script type="module" src="/fit_studio/main.js"></script>
+</body>
+</html>

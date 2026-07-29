@@ -29,6 +29,21 @@ export const CONSTRAINED_PREWARM_KEEP: readonly string[] = [
   'render.settle-passes',
 ];
 
+/**
+ * Entries the minimal manifest still SKIPS at entry but whose explicit resume
+ * units run afterwards, in the same bounded background lane a deadline-dropped
+ * entry uses. This is the constrained-device answer to warm-up work that is too
+ * expensive for the entry window yet guaranteed to be needed seconds later: the
+ * ability-VFX impact sheets are procedurally drawn canvases whose first use is
+ * the first spell impact of that school, i.e. mid-combat.
+ *
+ * Membership is an opt-in per entry, never a blanket rule: everything else the
+ * minimal manifest skips is skipped for GPU-footprint reasons (the phone-class
+ * per-process memory ceiling) and must stay skipped. An id here is by
+ * construction NOT in CONSTRAINED_PREWARM_KEEP.
+ */
+export const CONSTRAINED_PREWARM_RESUME: readonly string[] = ['vfx.ability-primitives'];
+
 export const CONSTRAINED_TEXTURE_BATCH_SIZE = 4;
 export const CONSTRAINED_TEXTURE_MAX_MS = 1200;
 export const CONSTRAINED_ENTRY_VIEW_RAMP_MS = 300;
@@ -112,6 +127,8 @@ export interface PrewarmPolicyInput {
   asyncCompileSupported: boolean;
   /** LOW_GFX: the Lambert/no-shadow tier (its own smaller view budget already). */
   lowGfx: boolean;
+  /** Keep desktop Insane's full manifest behind the entry cover instead of resuming it live. */
+  finishFullManifestBeforeReveal: boolean;
   /** Desktop defaults, injected so the constants stay owned by renderer.ts. */
   defaultMaxMs: number;
   constrainedMaxMs: number;
@@ -143,6 +160,29 @@ export interface PrewarmPolicy {
   textureBatchSize: number;
   /** Maximum wall-clock time for the bounded constrained texture pass. */
   textureMaxMs: number;
+  /** Ignore the soft manifest deadline so expensive work cannot spill into first live frames. */
+  finishFullManifestBeforeReveal: boolean;
+}
+
+/** True when a soft-deadline manifest entry should resume after world reveal. */
+export function prewarmEntryShouldDefer(
+  entryStartedMs: number,
+  deadlineMs: number,
+  deadlineExempt: boolean,
+  finishFullManifestBeforeReveal: boolean,
+): boolean {
+  return entryStartedMs >= deadlineMs && !deadlineExempt && !finishFullManifestBeforeReveal;
+}
+
+/** Build cutoff paired with the entry policy; full Insane prewarm does not trim archetypes. */
+export function prewarmBuildDeadline(
+  deadlineMs: number,
+  reserveMs: number,
+  finishFullManifestBeforeReveal: boolean,
+): number {
+  return finishFullManifestBeforeReveal
+    ? Number.MAX_SAFE_INTEGER
+    : deadlineMs - Math.max(0, reserveMs);
 }
 
 /**
@@ -165,6 +205,7 @@ export function resolvePrewarmPolicy(input: PrewarmPolicyInput): PrewarmPolicy {
       minimalManifest: false,
       textureBatchSize: 0,
       textureMaxMs: 0,
+      finishFullManifestBeforeReveal: input.finishFullManifestBeforeReveal,
     };
   }
   return {
@@ -185,6 +226,9 @@ export function resolvePrewarmPolicy(input: PrewarmPolicyInput): PrewarmPolicy {
     minimalManifest: true,
     textureBatchSize: CONSTRAINED_TEXTURE_BATCH_SIZE,
     textureMaxMs: CONSTRAINED_TEXTURE_MAX_MS,
+    // Never extend the loading gate on the constrained WebKit profile: its
+    // smaller manifest and hard deadline are process-survival requirements.
+    finishFullManifestBeforeReveal: false,
   };
 }
 
@@ -215,6 +259,16 @@ export function remainingPrewarmViewBudget(maxViews: number, createdViews: numbe
 export function prewarmEntryRuns(id: string, policy: PrewarmPolicy): boolean {
   if (!policy.minimalManifest) return true;
   return CONSTRAINED_PREWARM_KEEP.includes(id);
+}
+
+/**
+ * True when a minimal-manifest skip should still hand this entry's explicit
+ * units to the background resume lane. Only meaningful for an entry
+ * prewarmEntryRuns already rejected, so the unconstrained arm is always false.
+ */
+export function prewarmEntryResumesAfterSkip(id: string, policy: PrewarmPolicy): boolean {
+  if (!policy.minimalManifest) return false;
+  return CONSTRAINED_PREWARM_RESUME.includes(id);
 }
 
 /**

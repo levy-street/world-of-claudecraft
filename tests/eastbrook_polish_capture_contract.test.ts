@@ -6,6 +6,7 @@ const captureContract =
   // @ts-expect-error The executable capture contract intentionally ships as plain Node ESM.
   await import('../scripts/assets/eastbrook_grand_armoury/capture_contract.mjs');
 const {
+  assertTownCaptureMetadata,
   assertTownAttributionTargetState,
   assertTownMotionEvidence,
   assertTownNpcFacingOverlay,
@@ -40,6 +41,48 @@ interface AttributionTargetFixture {
   visible: boolean;
   childMeshCount: number;
 }
+
+// The live composite pin. Mint history (kept from the previous in-place
+// comments): re-pinned across the pnpm-lock migration (which moved the
+// three GLB *SourceFingerprint leaves, since the lockfile is a hashed input
+// of every GLB source fingerprint), and then across PR #2720's
+// fence-removal layout evidence, the v0.34.0 Bear Form rig (#2842), the live
+// graphics rebuild (#2799), far-field impostors and fog-free vista (#2793),
+// brood shout/flourish wiring, the worldObjectBurning fire-burst cue, the
+// Thornhollow renderer sync, and the release/v0.35.0 into AAA-enhancements
+// merge, each of which moved a runtimeRender leaf (usually
+// src/render/renderer.ts); every mint used
+// scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
+// Across all of those mints no GLB pipeline input or geometry value changed
+// and no capture was retaken here: Eastbrook itself is untouched, and the
+// one capture retake (by the release) was adopted verbatim with its swept
+// metadata and performance JSONs. Re-derive whenever renderer.ts changes.
+// On a mismatch the test prints the full diagnostics (moved leaves,
+// dirty-input verdict, the one-step remint command) instead of a raw object
+// diff; see provenance_diagnostics.mjs for the 2026-08-05 stale-mint root
+// cause this legibility exists to prevent.
+// Re-pinned for the PR #2982 merge: the release-side weapon-skin apply
+// queue moves src/render/renderer.ts, and the PR-side ability VFX warm-up
+// moves src/render/renderer.ts plus src/render/prewarm_policy.ts. Those
+// runtimeRender leaves re-mint the composite. No Eastbrook input, geometry
+// value, or capture moved.
+// Re-pinned for the PR #2983 revert: the rendererIntegration leaf moved
+// back while PR #2982's prewarm policy remains in the release.
+// Re-pinned for the PR #2983 re-land: the weapon-skin apply queue and the
+// vfx.weapon-skins prewarm entry move src/render/renderer.ts forward again,
+// on top of the bow-aim renderer edit the release landed after the revert.
+// No Eastbrook input, geometry value, or capture moved.
+// Re-minted again for the second release/v0.35.0 merge (the swimming strokes PR
+// and the v0.35.0 batch both move the renderer leaf on the release side).
+// Re-minted for the merge of release/v0.35.0 into this branch: both sides moved
+// the rendererIntegration leaf (the release's PR #2983 re-land, this branch's
+// creator review pass), so the merged tree mints a value matching neither
+// parent. Captures adopted verbatim; no measured value moved on either side.
+// Re-minted for the VFX per-frame cost work: the rendererIntegration leaf
+// follows the anchor seam, the weapon-skin fade and the census tag. No capture
+// was retaken; every measured value is adopted verbatim.
+const PINNED_POLISH_COMPOSITE_FINGERPRINT =
+  'de0f1454a0d7b6599d8a7f536042c577659fb6726d1131125503bf8dc0a27fd7';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
@@ -208,7 +251,7 @@ describe('Eastbrook polish capture contract', () => {
       sourceComparison: 'feature-worktree',
       views: EASTBROOK_TOWN_CAPTURE_VIEWS,
       placementInventory: EASTBROOK_TOWN_REBUILD_PLACEMENT_INVENTORY,
-      townTriangles: 29_644,
+      townTriangles: 29_436,
       attributionTargets: [
         {
           key: 'town-root',
@@ -232,7 +275,7 @@ describe('Eastbrook polish capture contract', () => {
       sourceComparison: 'polish-baseline-worktree',
       views: EASTBROOK_TOWN_POLISH_MATCHED_CAPTURE_VIEWS,
       placementInventory: EASTBROOK_TOWN_REBUILD_PLACEMENT_INVENTORY,
-      townTriangles: 29_644,
+      townTriangles: 29_436,
       attributionTargets: [
         {
           key: 'town-root',
@@ -254,7 +297,7 @@ describe('Eastbrook polish capture contract', () => {
       layoutId: 'eastbrook_civic_layout_v2',
       sourceComparison: 'polish-v2-worktree',
       placementInventory: EASTBROOK_TOWN_POLISH_V2_PLACEMENT_INVENTORY,
-      townTriangles: 28_330,
+      townTriangles: 28_902,
       attributionTargets: [
         {
           key: 'town-root',
@@ -354,19 +397,41 @@ describe('Eastbrook polish capture contract', () => {
       noticeboardSourceFingerprint: noticeboardFingerprint.eastbrookNoticeboardSourceFingerprint(),
       noticeboardGlbSha256: await fileSha256(EASTBROOK_POLISH_PROVENANCE_INPUTS.noticeboardGlb),
     });
+    // On a mismatch the diagnostics module names the moved leaf against the
+    // committed evidence seal, reports whether any fingerprinted input is
+    // dirty vs HEAD (the stale-mint hazard: the 2026-08-05 craft-cast pin
+    // was minted and then renderer.ts moved again before commit, so the pin
+    // matched no tree), and prints the one-step remint command. The plain
+    // toMatchObject diff buried all three of those answers.
+    if (provenance.fingerprint !== PINNED_POLISH_COMPOSITE_FINGERPRINT) {
+      const [diagnostics, { fileURLToPath }] = await Promise.all([
+        import('../scripts/assets/eastbrook_grand_armoury/provenance_diagnostics.mjs'),
+        import('node:url'),
+      ]);
+      // The whole composition (seal read, path collection, git verdict,
+      // formatting) lives in the builder so the glue that only ever runs
+      // when a pin is already stale stays unit-tested with injected
+      // seal-reader and git (tests/eastbrook_provenance_diagnostics.test.ts).
+      expect.fail(
+        diagnostics.buildPolishProvenanceMismatchReport({
+          pinnedFingerprint: PINNED_POLISH_COMPOSITE_FINGERPRINT,
+          computed: provenance,
+          repoRoot: fileURLToPath(repoRoot),
+          inputs: EASTBROOK_POLISH_PROVENANCE_INPUTS,
+          sourceFileLists: [
+            townFingerprint.EASTBROOK_TOWN_SOURCE_FILES,
+            mailboxFingerprint.EASTBROOK_MAILBOX_SOURCE_FILES,
+            noticeboardFingerprint.EASTBROOK_NOTICEBOARD_SOURCE_FILES,
+          ],
+        }),
+      );
+    }
     expect(provenance).toMatchObject({
       schemaVersion: 1,
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned for the campaign/base integration: the seal
-      // fingerprints src/render/renderer.ts, so it re-mints whenever the
-      // renderer coordinator moves. Exactly one component leaf moves here,
-      // runtimeRender.renderer.sha256, folding in the campaign scene-camera
-      // and harbor integration. Those paths are inactive in the accepted
-      // Eastbrook captures, so the evidence still depicts this tree. No
-      // recapture.
-      fingerprint: 'a1c6138023c9ec079e1ae60439c826442d9721c09d13155c090181070156a5e2',
+      fingerprint: PINNED_POLISH_COMPOSITE_FINGERPRINT,
       components: {
         captureContract: {
           id: 'polish-v2',
@@ -577,11 +642,55 @@ describe('Eastbrook polish capture contract', () => {
         shadowEnabled: true,
         ...(contractId ? { contractId } : {}),
       });
-    expect(() => assertPerf(29_644)).not.toThrow();
-    expect(() => assertPerf(29_644, 'rebuild-v1')).not.toThrow();
-    expect(() => assertPerf(29_644, 'polish-baseline')).not.toThrow();
-    expect(() => assertPerf(28_330, 'polish-v2')).not.toThrow();
+    expect(() => assertPerf(29_436)).not.toThrow();
+    expect(() => assertPerf(29_436, 'rebuild-v1')).not.toThrow();
+    expect(() => assertPerf(29_436, 'polish-baseline')).not.toThrow();
+    expect(() => assertPerf(28_902, 'polish-v2')).not.toThrow();
     expect(() => assertPerf(29_644, 'polish-v2')).toThrow('draw stats');
+  });
+
+  it('rejects mismatched historical capture and performance snapshots before validation', () => {
+    const mismatchedSnapshot = structuredClone(EASTBROOK_TOWN_CAPTURE_CONTRACTS['polish-v2']);
+    mismatchedSnapshot.id = 'rebuild-v1';
+    expect(() =>
+      assertTownCaptureMetadata({
+        metadata: {
+          schemaVersion: 2,
+          captureScope: 'town',
+          townContract: { id: 'polish-v2' },
+        },
+        contractId: 'polish-v2',
+        captureContractSnapshot: mismatchedSnapshot,
+      }),
+    ).toThrow('town capture contract snapshot id does not match the requested contract');
+    expect(() =>
+      assertTownPerformanceBlockState({
+        raw: {},
+        label: 'mismatched-snapshot',
+        rootVisible: true,
+        shadowEnabled: true,
+        contractId: 'polish-v2',
+        captureContractSnapshot: mismatchedSnapshot,
+      }),
+    ).toThrow('town performance contract snapshot id does not match the requested contract');
+    expect(() => expectedTownPlacementInventory(true, 'polish-v2', mismatchedSnapshot)).toThrow(
+      'town placement contract snapshot id does not match the requested contract',
+    );
+    expect(() =>
+      assertTownAttributionTargetState({
+        targets: [],
+        contractId: 'polish-v2',
+        requestedVisible: true,
+        captureContractSnapshot: mismatchedSnapshot,
+      }),
+    ).toThrow('town attribution contract snapshot id does not match the requested contract');
+    expect(() =>
+      assertTownMotionEvidence({
+        evidence: null,
+        contractId: 'polish-v2',
+        captureContractSnapshot: mismatchedSnapshot,
+      }),
+    ).toThrow('town motion contract snapshot id does not match the requested contract');
   });
 
   it('aims every added view at a collision-clear point beside its stable layout subject', () => {
@@ -848,6 +957,27 @@ describe('Eastbrook polish capture contract', () => {
     const unsharedAtlas = validPolishAttributionTargets();
     unsharedAtlas[2].surfaceAtlas.textureUuid = 'different-atlas';
     expect(() => assertTargets(unsharedAtlas)).toThrow('share one atlas texture identity');
+
+    const snapshot = structuredClone(EASTBROOK_TOWN_CAPTURE_CONTRACTS['polish-v2']);
+    snapshot.attributionTargets[0].key = 'historical-town-root';
+    const snapshotTargets = validPolishAttributionTargets();
+    snapshotTargets[0].key = 'historical-town-root';
+    expect(() =>
+      assertTownAttributionTargetState({
+        targets: snapshotTargets,
+        contractId: 'polish-v2',
+        requestedVisible: false,
+        captureContractSnapshot: snapshot,
+      }),
+    ).not.toThrow();
+    expect(() =>
+      assertTownAttributionTargetState({
+        targets,
+        contractId: 'polish-v2',
+        requestedVisible: false,
+        captureContractSnapshot: snapshot,
+      }),
+    ).toThrow('stable layout ids');
   });
 
   it('validates NPC-facing arrows as stable layout records', () => {

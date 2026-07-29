@@ -437,6 +437,97 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     sellValue: 15000,
     requiredClass: FERAL,
   },
+  // ================= Heroic Wildheart Basin: Zulgar =================
+  basin_stalkers_tunic: {
+    id: 'basin_stalkers_tunic',
+    name: "Basin Stalker's Tunic",
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'chest',
+    quality: 'epic',
+    requiredLevel: 20,
+    // Fills the agi-leather chest hole left by the retired scourgehide_carapace,
+    // which was AGILE_WILD: feral druids lost their only ilvl-31 agi-leather
+    // chest in that retirement too, so the replacement keeps their access.
+    stats: { armor: 172, agi: 13, sta: 9 },
+    hitRating: ARMOR_RATING,
+    sellValue: 14000,
+    requiredClass: AGILE_WILD,
+  },
+  verdant_heart_vestment: {
+    id: 'verdant_heart_vestment',
+    name: 'Verdant-Heart Vestment',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'chest',
+    quality: 'epic',
+    requiredLevel: 20,
+    // The first druid int-leather chest anywhere in the game.
+    stats: { armor: 172, int: 13, spi: 9 },
+    hasteRating: ARMOR_RATING,
+    sellValue: 14000,
+    requiredClass: HEAL_LEATHER,
+  },
+  sunbone_ritual_hauberk: {
+    id: 'sunbone_ritual_hauberk',
+    name: 'Sunbone Ritual Hauberk',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'chest',
+    quality: 'epic',
+    requiredLevel: 20,
+    // Fills the int-mail chest hole left by the retired soulforged_warplate.
+    stats: { armor: 335, int: 12, spi: 10 },
+    hasteRating: ARMOR_RATING,
+    sellValue: 14000,
+    requiredClass: HEAL_MAIL,
+  },
+  greatfang_of_the_basin: {
+    id: 'greatfang_of_the_basin',
+    name: 'Greatfang of the Basin',
+    kind: 'weapon',
+    slot: 'mainhand',
+    hand: 'twohand',
+    quality: 'epic',
+    requiredLevel: 20,
+    // The first five-man HEAVY two-hander: 2H dps on the weaponDpsBudget(31) x
+    // TWOHAND_DPS_MULT curve (~18.4 at speed 3.4), stat budget 29.
+    weapon: { min: 50, max: 75, speed: 3.4 },
+    stats: { str: 17, sta: 12 },
+    hitRating: FIVE_MAN_WEAPON_RATING,
+    sellValue: 15000,
+    requiredClass: HEAVY,
+  },
+  // Fills the CASTER helmet hole left by the retired soulrend_diadem (same
+  // armor 76 / budget 18, plus the one rating every live heroic piece carries).
+  sunbone_oracles_crown: {
+    id: 'sunbone_oracles_crown',
+    name: "Sunbone Oracle's Crown",
+    kind: 'armor',
+    armorType: 'cloth',
+    slot: 'helmet',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { armor: 76, int: 11, spi: 7 },
+    critRating: ARMOR_RATING,
+    sellValue: 12000,
+    requiredClass: CASTER,
+  },
+  // Fills the HEAVY legs hole left by the retired deathless_warguard_legmail
+  // (same armor 315 / budget 20, plus the rating).
+  bloodmane_war_legguards: {
+    id: 'bloodmane_war_legguards',
+    name: 'Bloodmane War-Legguards',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'legs',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { armor: 315, str: 11, sta: 9 },
+    hitRating: ARMOR_RATING,
+    sellValue: 12000,
+    requiredClass: HEAVY,
+  },
   // ================= Heroic Nythraxis, Scourge of Thornpeak (raid) =================
   scepter_of_the_deathless_court: {
     id: 'scepter_of_the_deathless_court',
@@ -605,6 +696,31 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     { itemId: 'wyrmchoir_handwraps', chance: 0.25, rollGroup: 'korzul_heroic2' },
     { itemId: 'wildsoul_maul', chance: 0.25, rollGroup: 'korzul_heroic2' },
     // Rare mount (0.1%): heroic-gated only, never on a normal table.
+    { itemId: 'reins_stalkglider_snail', chance: HEROIC_BLUE_MOUNT_CHANCE },
+  ],
+  wildheart_high_priest: [
+    // Two groups of three DISTINCT items, the shape every other heroic
+    // five-man uses: per-item rates stay at the house 0.33-0.34 (the earlier
+    // dup-path version pushed the re-listed chests to 0.56-0.66 per kill,
+    // well above any other heroic item in the game).
+    { itemId: 'basin_stalkers_tunic', chance: 0.34, rollGroup: 'wildheart_heroic' },
+    { itemId: 'verdant_heart_vestment', chance: 0.33, rollGroup: 'wildheart_heroic' },
+    { itemId: 'sunbone_ritual_hauberk', chance: 0.33, rollGroup: 'wildheart_heroic' },
+    { itemId: 'greatfang_of_the_basin', chance: 0.34, rollGroup: 'wildheart_heroic2' },
+    { itemId: 'sunbone_oracles_crown', chance: 0.33, rollGroup: 'wildheart_heroic2' },
+    { itemId: 'bloodmane_war_legguards', chance: 0.33, rollGroup: 'wildheart_heroic2' },
+    // Rare mounts (0.1% each). The basin is the FIFTH heroic five-man and the
+    // catalog's two blues are already paired to Ysolei and Korzul, so rather
+    // than a fifth signature mount it carries equal-rate SECONDARY paths to
+    // both, exactly as the Nythraxis heroic raid does for all four five-man
+    // mounts. Per-MOUNT rate parity is the invariant that matters (0.1%
+    // wherever a blue drops), so the basin is never a cheaper route to either
+    // one. It does make the basin the only five-man offering two blues, so its
+    // aggregate blue rate is 0.2% per heroic clear against Ysolei's and
+    // Korzul's 0.1% (owner call, 2026-08-01). Epic mounts stay rift-S
+    // exclusive and never appear here. Appended AFTER the gear roll groups so
+    // the gear draw order stays byte-identical.
+    { itemId: 'reins_grag_bear', chance: HEROIC_BLUE_MOUNT_CHANCE },
     { itemId: 'reins_stalkglider_snail', chance: HEROIC_BLUE_MOUNT_CHANCE },
   ],
   nythraxis_scourge_of_thornpeak: [

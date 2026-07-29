@@ -31,6 +31,9 @@ const anim = (over: Partial<AnimState> = {}): AnimState => ({
   dead: false,
   casting: false,
   swimming: false,
+  submerged: false,
+  swimPitch: 0,
+  wading: false,
   sitting: false,
   ...over,
 });
@@ -38,16 +41,48 @@ const anim = (over: Partial<AnimState> = {}): AnimState => ({
 /** The training dummy's whole ClipMap, as a minimally real GLB. */
 function stubGltf() {
   const scene = new THREE.Group();
-  const mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshStandardMaterial());
+  const rootBone = new THREE.Bone();
+  rootBone.name = 'RigRoot';
+  const childBone = new THREE.Bone();
+  childBone.name = 'RigChild';
+  childBone.position.y = 1;
+  rootBone.add(childBone);
+  const geometry = new THREE.BoxGeometry(1, 2, 1);
+  const vertexCount = geometry.getAttribute('position').count;
+  const skinIndices = new Uint16Array(vertexCount * 4);
+  const skinWeights = new Float32Array(vertexCount * 4);
+  for (let i = 0; i < vertexCount; i++) {
+    skinIndices[i * 4] = 1;
+    skinWeights[i * 4] = 1;
+  }
+  geometry.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(skinIndices, 4));
+  geometry.setAttribute('skinWeight', new THREE.Float32BufferAttribute(skinWeights, 4));
+  const mesh = new THREE.SkinnedMesh(geometry, new THREE.MeshStandardMaterial());
   mesh.name = 'body';
+  mesh.add(rootBone);
+  mesh.bind(new THREE.Skeleton([rootBone, childBone]));
   scene.add(mesh);
-  const clip = (name: string) => new THREE.AnimationClip(name, 1, []);
+  const clip = (name: string) =>
+    new THREE.AnimationClip(name, 1, [
+      new THREE.NumberKeyframeTrack('RigChild.position[x]', [0, 1], [0, 1]),
+    ]);
   return { scene, animations: ['Idle', 'Walk', 'Run', 'Attack', 'Hit', 'Death'].map(clip) };
 }
 
 /** The mixer state the visual keeps private; reading it is the only way to
  *  measure the bind-pose deficit that the bug renders as a T-pose. */
-type MixerPeek = { actions: Map<string, THREE.AnimationAction> };
+type MixerPeek = {
+  actions: Map<string, THREE.AnimationAction>;
+  current: THREE.AnimationAction | null;
+  mixer: THREE.AnimationMixer;
+  model: THREE.Object3D;
+  pendingDt: number;
+  hitCooldown: number;
+  holdT: number;
+  holdCooldown: number;
+  wasDead: boolean;
+  starvedFrames: number;
+};
 
 function poseWeight(visual: CharacterVisual): number {
   const actions = (visual as unknown as MixerPeek).actions;
@@ -85,6 +120,105 @@ describe('CharacterVisual keeps something driving the rig', () => {
   it('starts and stays driven while a held state runs', () => {
     for (let i = 0; i < 10; i++) visual.update(FRAME, anim({ moving: true, speed: 2 }), true);
     expect(poseWeight(visual)).toBeGreaterThan(1 - POSE_DRIVE_MIN_WEIGHT);
+  });
+
+  it('checks only the current action on a healthy steady-state frame', () => {
+    const { actions, current } = visual as unknown as MixerPeek;
+    expect(current).not.toBeNull();
+    if (!current) throw new Error('healthy visual has no current action');
+    const scheduledSpies = [...actions.values()].map((action) => vi.spyOn(action, 'isScheduled'));
+    const weightSpies = [...actions.values()].map((action) =>
+      vi.spyOn(action, 'getEffectiveWeight'),
+    );
+
+    visual.update(FRAME, anim(), false);
+
+    const currentIndex = [...actions.values()].indexOf(current);
+    expect(scheduledSpies.map((spy) => spy.mock.calls.length)).toEqual(
+      scheduledSpies.map((_, index) => (index === currentIndex ? 1 : 0)),
+    );
+    expect(weightSpies.map((spy) => spy.mock.calls.length)).toEqual(
+      weightSpies.map((_, index) => (index === currentIndex ? 1 : 0)),
+    );
+  });
+
+  it('invalidates the live skeleton palette after CharacterVisual advances its mixer', () => {
+    const { model } = visual as unknown as MixerPeek;
+    const skeletons: THREE.Skeleton[] = [];
+    model.traverse((object) => {
+      const mesh = object as THREE.SkinnedMesh;
+      if (mesh.isSkinnedMesh) skeletons.push(mesh.skeleton);
+    });
+    const skeleton = skeletons[0];
+    expect(skeleton).toBeDefined();
+    if (!skeleton) throw new Error('test visual has no skeleton');
+
+    visual.root.updateMatrixWorld(true);
+    skeleton.update();
+    const firstPalette = [...skeleton.boneMatrices];
+
+    visual.update(FRAME, anim(), true);
+    visual.root.updateMatrixWorld(true);
+    skeleton.update();
+
+    expect([...skeleton.boneMatrices]).not.toEqual(firstPalette);
+    expect(visual.skeletonUpdateStats()).toMatchObject({ requests: 2, updates: 2, skips: 0 });
+  });
+
+  it('sleeps off-screen pose work while preserving bounded transition clocks', () => {
+    const peek = visual as unknown as MixerPeek;
+    const mixerUpdate = vi.spyOn(peek.mixer, 'update');
+
+    visual.playHit();
+    expect(peek.hitCooldown).toBeGreaterThan(0);
+    const hitCooldown = peek.hitCooldown;
+    visual.holdFrame(0.08, 0.1);
+    expect(peek.holdT).toBeGreaterThan(0);
+
+    visual.advanceOffscreen(0.2);
+
+    expect(mixerUpdate).not.toHaveBeenCalled();
+    expect(peek.hitCooldown).toBeCloseTo(hitCooldown - 0.2, 9);
+    expect(peek.holdT).toBeLessThanOrEqual(0);
+    expect(peek.holdCooldown).toBeGreaterThan(0);
+
+    visual.advanceOffscreen(1);
+    expect(mixerUpdate).not.toHaveBeenCalled();
+    expect(peek.pendingDt).toBeCloseTo(0.3, 9);
+    expect(peek.hitCooldown).toBe(0);
+
+    visual.update(FRAME, anim(), true);
+    expect(mixerUpdate).toHaveBeenCalledTimes(1);
+    expect(mixerUpdate).toHaveBeenLastCalledWith(0.3);
+    expect(peek.pendingDt).toBe(0);
+  });
+
+  it('reconciles death and revival on re-entry without exposing bind pose', () => {
+    const peek = visual as unknown as MixerPeek;
+
+    visual.advanceOffscreen(1);
+    visual.update(FRAME, anim({ dead: true }), true);
+
+    expect(peek.wasDead).toBe(true);
+    expect(poseWeight(visual)).toBeGreaterThan(1 - POSE_DRIVE_MIN_WEIGHT);
+
+    visual.advanceOffscreen(1);
+    visual.update(FRAME, anim({ dead: false }), true);
+
+    expect(peek.wasDead).toBe(false);
+    expect(poseWeight(visual)).toBeGreaterThan(1 - POSE_DRIVE_MIN_WEIGHT);
+  });
+
+  it('resets watchdog starvation on the healthy current-action fast path', () => {
+    const peek = visual as unknown as MixerPeek;
+    peek.starvedFrames = ANIM_REPAIR_FRAMES - 1;
+
+    visual.update(FRAME, anim(), false);
+    expect(peek.starvedFrames).toBe(0);
+
+    for (const action of peek.actions.values()) action.stop();
+    visual.update(FRAME, anim(), false);
+    expect(peek.starvedFrames).toBe(1);
   });
 
   it('re-drives a rig that was left with no action at all, within the debounce window', () => {

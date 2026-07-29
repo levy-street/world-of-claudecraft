@@ -2,7 +2,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const crestCanvas = {} as HTMLCanvasElement;
 vi.mock('../src/ui/icons', () => ({ iconCanvas: vi.fn(() => crestCanvas) }));
-vi.mock('../src/render/characters/portrait', () => ({ playerPortraitDataUrl: vi.fn() }));
+vi.mock('../src/render/characters/portrait', () => ({
+  playerPortraitDataUrl: vi.fn(),
+  visualPortraitDataUrl: vi.fn(),
+  modularPortraitDataUrl: vi.fn(),
+}));
 
 import { UnitPortraitPainter } from '../src/ui/unit_portrait_painter';
 

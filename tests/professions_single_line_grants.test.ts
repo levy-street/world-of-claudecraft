@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
 // The single-line grant contract (#2430), tested through the REAL hud event
 // switch rather than through source-text pins.
@@ -69,6 +69,7 @@ interface GrantLineHarness {
     playerId: number;
     craftingIdentity: { synced: boolean };
     craftSkills: Record<string, number>;
+    gatheringProficiency: Record<string, number>;
   };
   renderer: { handleEvent: ReturnType<typeof vi.fn> };
   playEventSfx: ReturnType<typeof vi.fn>;
@@ -92,7 +93,12 @@ interface GrantLineHarness {
 
 function makeHud(): GrantLineHarness {
   const hud = Object.create(Hud.prototype) as unknown as GrantLineHarness;
-  hud.sim = { playerId: PLAYER_ID, craftingIdentity: { synced: false }, craftSkills: {} };
+  hud.sim = {
+    playerId: PLAYER_ID,
+    craftingIdentity: { synced: false },
+    craftSkills: {},
+    gatheringProficiency: {},
+  };
   hud.renderer = { handleEvent: vi.fn() };
   hud.playEventSfx = vi.fn();
   hud.meters = { onEvent: vi.fn() };
@@ -248,7 +254,16 @@ describe('one profession action prints exactly one grant line', () => {
     const hud = makeHud();
     hud.handleEvents([
       professionGrant(ORE, 1),
-      { type: 'fishingResult', pid: PLAYER_ID, itemId: ORE, quality: 'common' } as SimEvent,
+      // Fully-populated union member (no shape-hiding cast): a future
+      // required-field addition must red this fixture, not skip it.
+      {
+        type: 'fishingResult',
+        pid: PLAYER_ID,
+        itemId: ORE,
+        quality: 'common',
+        zoneId: 'eastbrook_vale',
+        band: 0,
+      } satisfies SimEvent,
     ]);
     expect(lines(hud)).toEqual([`You reel in: [${itemDisplayName(ITEMS[ORE])}]`]);
     // The double-cue half of #2430: the reel cue fires, the generic loot ding

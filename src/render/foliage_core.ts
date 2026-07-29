@@ -1,5 +1,6 @@
 import { isEastbrookGrandArmoury } from '../sim/building_layout';
 import { EASTBROOK_LAYOUT } from '../sim/eastbrook_layout';
+import { FENBRIDGE_LAYOUT } from '../sim/fenbridge_layout';
 import type { BuildingDef, NoticeboardDef } from '../sim/types';
 
 export type EastbrookGrassExclusion =
@@ -79,10 +80,10 @@ function buildingObb(building: BuildingDef): EastbrookGrassExclusion {
 }
 
 /**
- * Snapshot the geometry that must remain grass-free. Built-in Eastbrook uses
- * the canonical layout (including wall, civic furniture, and service aprons),
- * while custom worlds only honor landmarks explicitly present in their own
- * prop table and never inherit fixed Eastbrook coordinates.
+ * Snapshot the geometry that must remain grass-free. Built-in towns use their
+ * canonical layouts (including walls, civic furniture, repeated boardwalks,
+ * and service aprons), while custom worlds only honor landmarks explicitly
+ * present in their own prop table and never inherit fixed world coordinates.
  */
 export function eastbrookGrassExclusions(
   buildings: readonly BuildingDef[],
@@ -126,6 +127,99 @@ export function eastbrookGrassExclusions(
     }
     for (const wall of EASTBROOK_LAYOUT.wall.segments) {
       exclusions.push(layoutObb(wall.id, wall.footprint));
+    }
+
+    for (const building of FENBRIDGE_LAYOUT.buildings) {
+      exclusions.push(layoutObb(building.id, building.footprint));
+      exclusions.push({
+        kind: 'circle',
+        id: `${building.id}:serviceApron`,
+        x: building.frontStandingPoint.x,
+        z: building.frontStandingPoint.z,
+        radius: 1.5,
+      });
+    }
+    const cistern = FENBRIDGE_LAYOUT.civic.cistern;
+    exclusions.push({
+      kind: 'circle',
+      id: cistern.id,
+      x: cistern.position.x,
+      z: cistern.position.z,
+      radius: cistern.radius,
+    });
+    exclusions.push(
+      layoutObb(
+        FENBRIDGE_LAYOUT.civic.provisionStall.id,
+        FENBRIDGE_LAYOUT.civic.provisionStall.footprint,
+      ),
+    );
+    for (const [id, point] of [
+      [
+        `${FENBRIDGE_LAYOUT.civic.provisionStall.id}:customerApron`,
+        FENBRIDGE_LAYOUT.civic.provisionStall.customerStandingPoint,
+      ],
+      [
+        `${FENBRIDGE_LAYOUT.civic.provisionStall.id}:vendorApron`,
+        FENBRIDGE_LAYOUT.civic.provisionStall.vendorStandingPoint,
+      ],
+      [
+        `${FENBRIDGE_LAYOUT.services.bank.teller.id}:serviceApron`,
+        FENBRIDGE_LAYOUT.services.bank.teller.standingPoint,
+      ],
+      [
+        'fenbridge_lantern_chapel_archive:serviceApron',
+        FENBRIDGE_LAYOUT.services.npcs.find((npc) => npc.id === 'chronicler_osric_fenn')?.position,
+      ],
+      [
+        `${FENBRIDGE_LAYOUT.services.stations[0].id}:serviceApron`,
+        FENBRIDGE_LAYOUT.services.stations[0].position,
+      ],
+      [
+        `${FENBRIDGE_LAYOUT.services.mailbox.id}:serviceApron`,
+        FENBRIDGE_LAYOUT.services.mailbox.frontStandingPoint,
+      ],
+    ] as const) {
+      if (!point) continue;
+      exclusions.push({ kind: 'circle', id, x: point.x, z: point.z, radius: 1.2 });
+    }
+    exclusions.push(
+      layoutObb(
+        FENBRIDGE_LAYOUT.civic.musterBoard.id,
+        FENBRIDGE_LAYOUT.civic.musterBoard.footprint,
+      ),
+    );
+    exclusions.push({
+      kind: 'circle',
+      id: `${FENBRIDGE_LAYOUT.civic.musterBoard.id}:serviceApron`,
+      x: FENBRIDGE_LAYOUT.civic.musterBoard.frontStandingPoint.x,
+      z: FENBRIDGE_LAYOUT.civic.musterBoard.frontStandingPoint.z,
+      radius: 1.2,
+    });
+    for (const wall of FENBRIDGE_LAYOUT.wall.segments) {
+      exclusions.push(layoutObb(wall.id, wall.footprint));
+    }
+    for (const gate of FENBRIDGE_LAYOUT.wall.gates) {
+      for (const jamb of gate.arch.jambs) exclusions.push(layoutObb(jamb.id, jamb));
+    }
+    for (const boardwalk of FENBRIDGE_LAYOUT.repeated.boardwalks) {
+      exclusions.push({
+        kind: 'obb',
+        id: boardwalk.id,
+        x: boardwalk.position.x,
+        z: boardwalk.position.z,
+        halfWidth: boardwalk.nativeDimensions.width / 2,
+        halfDepth: boardwalk.nativeDimensions.depth / 2,
+        rotation: boardwalk.rotation,
+      });
+    }
+    for (const order of FENBRIDGE_LAYOUT.repeated.musterOrders) {
+      exclusions.push({
+        kind: 'circle',
+        id: order.id,
+        x: order.position.x,
+        z: order.position.z,
+        radius: 0.7,
+      });
     }
   }
 

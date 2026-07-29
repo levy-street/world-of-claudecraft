@@ -7,6 +7,102 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: 'Vessillo in Mano',
+    desc: 'Cattura una bandiera ai Campi di Thornhollow.',
+  },
+  pvp_bg_first_win: {
+    name: 'La Valletta Resiste',
+    desc: 'Vinci una battaglia ai Campi di Thornhollow.',
+  },
+  pvp_bg_wins_25: {
+    name: 'Guardiano della Valletta',
+    desc: 'Vinci 25 battaglie ai Campi di Thornhollow.',
+    title: 'Portabandiera',
+  },
+  pvp_bg_captures_100: {
+    name: 'Cento Vessilli',
+    desc: 'Cattura 100 bandiere ai Campi di Thornhollow nel corso della tua carriera.',
+  },
+  dgn_rift: {
+    name: 'Camminasquarci',
+    desc: 'Completa uno Squarcio sconfiggendo il suo boss di piano.',
+  },
+  dgn_rift_s_rank: {
+    name: 'Sovrano degli Squarci',
+    desc: 'Completa uno Squarcio di rango S, il livello più difficile che un portale di Squarcio può generare.',
+  },
+  pvp_honor_sergeant: {
+    name: 'Sergente',
+    desc: 'Guadagna 10.000 Onore nel corso della tua vita. Spenderlo non ti farà mai perdere il grado.',
+    title: 'Sergente',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: 'Cavaliere-Luogotenente',
+    desc: 'Guadagna 40.000 Onore nel corso della tua vita, una stagione di guerra vera alle spalle.',
+    title: 'Cavaliere-Luogotenente',
+  },
+  pvp_honor_field_marshal: {
+    name: 'Maresciallo di Campo',
+    desc: 'Guadagna 150.000 Onore nel corso della tua vita. Raro in qualsiasi reame, ed è giusto che sia così.',
+    title: 'Maresciallo di Campo',
+  },
+  chr_drakemaw_broodlord: {
+    name: 'Spezzacovata',
+    desc: 'Uccidi un Signore della covata di Drakemaw tra le sue uova, superando il grido, il fendente e il fuoco.',
+  },
+  chr_maw_matriarch: {
+    name: 'Il Cielo Tace',
+    desc: 'Uccidi Cindraleth, la Matriarca delle Fauci, nel suo nido nel cratere sopra il Drakemaw.',
+  },
+  chr_frostveil_gatherer: {
+    name: 'Raccolto sui terrazzamenti',
+    desc: 'Raccogli una vena di minerale, un gruppo di legna e un appezzamento d erbe nel Frostveil.',
+  },
+  chr_frostveil_first_cast: {
+    name: 'Primo ghiaccio sul lago',
+    desc: 'Pesca un pesce nelle acque del Frostveil.',
+  },
+  chr_amberfall_gatherer: {
+    name: 'Il raccolto di Amberfall',
+    desc: 'Raccogli una vena di minerale, un gruppo di legna e un appezzamento d erbe ad Amberfall.',
+  },
+  chr_amberfall_first_cast: {
+    name: 'Una preda dalla grande palude',
+    desc: 'Pesca un pesce nelle acque di Amberfall.',
+  },
+  chr_nightbloom_gatherer: {
+    name: 'Il raccolto sognante',
+    desc: 'Raccogli una vena di minerale, un gruppo di legna e un appezzamento d erbe a Nightbloom.',
+  },
+  chr_nightbloom_first_cast: {
+    name: 'Un increspatura sul pozzo lunare',
+    desc: 'Pesca un pesce nelle acque di Nightbloom.',
+  },
+  chr_wraithwood_gatherer: {
+    name: 'Raccolto sotto la volta',
+    desc: 'Raccogli una vena di minerale, un gruppo di legna e un appezzamento d erbe nel Wraithwood.',
+  },
+  chr_wraithwood_first_cast: {
+    name: 'Un lancio nella baia dello specchio',
+    desc: 'Pesca un pesce nelle acque del Wraithwood.',
+  },
+  chr_palmreach_gatherer: {
+    name: 'Raccolto sulla spiaggia di palme',
+    desc: 'Raccogli una vena di minerale, un gruppo di legna e un appezzamento d erbe a Palmreach.',
+  },
+  chr_palmreach_first_cast: {
+    name: 'Lancio nella laguna di zaffiro',
+    desc: 'Pesca un pesce nelle acque di Palmreach.',
+  },
+  chr_evergarden_gatherer: {
+    name: 'Il dono del parterre',
+    desc: 'Raccogli una vena di minerale, un gruppo di legna e un appezzamento d erbe a Evergarden.',
+  },
+  chr_evergarden_first_cast: {
+    name: 'Un lancio sullo stagno dei petali',
+    desc: 'Pesca un pesce nelle acque di Evergarden.',
+  },
   pvp_card_duel_first_win: {
     name: 'Regole di Casa',
     desc: 'Vinci un Duello di Carte dal Maestro delle Carte.',
@@ -843,5 +939,85 @@ export const table: DeedLocaleTable = {
   soc_salvage_50: {
     name: 'Il Cantiere dei Demolitore',
     desc: "Smantella 50 pezzi d'equipaggiamento ricavandone materie prime.",
+  },
+  dgn_wildheart_basin: {
+    name: 'Il Bacino Morde Ancora',
+    desc: 'Sconfiggi Zulgar, Voce del Bacino, nel Bacino di Wildheart.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Eroico: Il Bacino di Wildheart',
+    desc: 'Sconfiggi Zulgar, Voce del Bacino, nel Bacino di Wildheart in difficoltà Eroica.',
+  },
+  chr_peaks_gatherer: {
+    name: 'Raccolto delle Alture',
+    desc: "Raccogli una vena di minerale, un ceppo di legname e una macchia d'erbe sulle Alture di Thornpeak.",
+  },
+  chr_marsh_rares_ii: {
+    name: 'Il Ghiottone, Messo in Conto',
+    desc: 'Uccidi Grubjaw il Ghiottone, un quarto terrore famigerato della Palude di Mirefen rimasto fuori dal primo conteggio.',
+  },
+  chr_peaks_rares_ii: {
+    name: 'Altri Nomi Incisi nella Rupe',
+    desc: 'Uccidi il Vecchio Cragmaw e il Signore delle Schegge Kazzix, altri due terrori famigerati delle Alture di Thornpeak rimasti fuori dal primo conteggio.',
+  },
+  chr_gleamstag: {
+    name: 'La Leggenda che Non Colpiva per Prima',
+    desc: 'Uccidi il Cervo Lucente, un élite raro e schivo che non attacca se non viene messo alle strette.',
+  },
+  chr_hollow_rares: {
+    name: 'Il Branco Ricorda',
+    desc: 'Uccidi il Vecchio Marrowshell e Aurelhorn, Primo del Branco, i due boss rari erranti della Valletta.',
+  },
+  chr_willowfen_gatherer: {
+    name: "L'Abbondanza del Willowfen",
+    desc: "Raccogli una vena di minerale, un ceppo di legname e una macchia d'erbe nel Willowfen.",
+  },
+  chr_willowfen_first_cast: {
+    name: 'Increspature nelle Lilymoors',
+    desc: 'Pesca un pesce nelle acque del Willowfen.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Raccolto sul Promontorio',
+    desc: "Raccogli una vena di minerale, un ceppo di legname e una macchia d'erbe nel Galecrest.",
+  },
+  chr_galecrest_first_cast: {
+    name: 'Una Lenza nel Laghetto Specchio',
+    desc: 'Pesca un pesce nelle acque del Galecrest.',
+  },
+  chr_farshore_gatherer: {
+    name: "Provviste dell'Isola",
+    desc: "Raccogli una vena di minerale, un ceppo di legname e una macchia d'erbe sul Farshore.",
+  },
+  chr_farshore_first_cast: {
+    name: 'Ciò che Sanno i Gabbiani',
+    desc: 'Pesca un pesce nelle acque del Farshore.',
+  },
+  prog_engineering_rare: {
+    name: 'Ingegneria di precisione',
+    desc: 'Forgia il tuo primo oggetto di qualità rara in Ingegneria.',
+  },
+  prog_alchemy_rare: {
+    name: "Un'annata rara",
+    desc: 'Forgia il tuo primo oggetto di qualità rara in Alchimia.',
+  },
+  prog_cooking_rare: {
+    name: 'Un piatto da ricordare',
+    desc: 'Forgia il tuo primo oggetto di qualità rara in Cucina.',
+  },
+  prog_leatherworking_rare: {
+    name: 'Concia raffinata',
+    desc: 'Forgia il tuo primo oggetto di qualità rara in Lavorazione del Cuoio.',
+  },
+  prog_tailoring_rare: {
+    name: 'Un punto da maestro',
+    desc: 'Forgia il tuo primo oggetto di qualità rara in Sartoria.',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Temprato fino a brillare',
+    desc: 'Forgia il tuo primo oggetto di qualità rara in Forgiatura di Armi.',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Placcato alla perfezione',
+    desc: 'Forgia il tuo primo oggetto di qualità rara in Forgiatura di Armature.',
   },
 };

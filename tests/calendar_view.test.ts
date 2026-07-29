@@ -27,12 +27,20 @@ const guildEvent = (over: Partial<GuildEventInfo>): GuildEventInfo => ({
 
 describe('systemEventIdsOn', () => {
   it('expands weekly and monthly rules', () => {
-    // 2026-07-03 is a Friday; 2026-07-07 the monthly delve day; 2026-07-15 mid-month.
-    expect(systemEventIdsOn('2026-07-03')).toContain('fiesta_night');
+    // 2026-07-04 is a Saturday; 2026-07-07 the monthly delve day; 2026-07-15 mid-month.
+    expect(systemEventIdsOn('2026-07-04')).toContain('arena_clash');
     expect(systemEventIdsOn('2026-07-07')).toContain('delve_day');
     expect(systemEventIdsOn('2026-07-15')).toContain('moongate_communion');
     // 2026-07-06 is a Monday: nothing recurs on Mondays.
     expect(systemEventIdsOn('2026-07-06')).toEqual([]);
+  });
+
+  // Fiesta and Protect Yumi stay unqueueable, so the calendar must not advertise
+  // a Fiesta Night: an entry for a mode nobody can queue is false advertising.
+  it('advertises no unqueueable mode (no Fiesta Night row)', () => {
+    expect(SYSTEM_EVENTS.map((e) => e.id)).not.toContain('fiesta_night');
+    // 2026-07-03 is a Friday, the weekday the removed row used to claim.
+    expect(systemEventIdsOn('2026-07-03')).toEqual([]);
   });
 
   it('every system event recurs within the next two months', () => {

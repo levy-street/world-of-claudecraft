@@ -27,6 +27,7 @@ import type { ItemDef, MobTemplate } from '../types';
 import { DUNGEON_DEFS } from './dungeons';
 import { NYTHRAXIS_RAID_BOSS_ID, NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL } from './heroic_loot';
 import { TEMPLE_DUNGEON_DEFS } from './temple';
+import { WILDHEART_DUNGEON_DEFS } from './wildheart';
 
 // The id of the Heroic variant of a base item (a stable, pure prefix).
 export function heroicVariantId(baseId: string): string {
@@ -132,18 +133,23 @@ function makeHeroicVariant(base: ItemDef, sourceLevel = HEROIC_VARIANT_SOURCE_LE
   return variant as ItemDef;
 }
 
-// The five dungeon/raid instances that have a heroic difficulty. Only mobs that
+// The six dungeon/raid instances that have a heroic difficulty. Only mobs that
 // spawn inside one of these instances can drop a heroic-upgraded variant.
 const HEROIC_INSTANCE_IDS = new Set([
   'hollow_crypt',
   'sunken_bastion',
   'drowned_temple',
   'gravewyrm_sanctum',
+  'wildheart_basin',
   'nythraxis_boss_arena',
 ]);
 
 const HEROIC_ELIGIBLE_MOBS = new Set<string>();
-for (const def of [...Object.values(DUNGEON_DEFS), ...Object.values(TEMPLE_DUNGEON_DEFS)]) {
+for (const def of [
+  ...Object.values(DUNGEON_DEFS),
+  ...Object.values(TEMPLE_DUNGEON_DEFS),
+  ...Object.values(WILDHEART_DUNGEON_DEFS),
+]) {
   if (!HEROIC_INSTANCE_IDS.has(def.id)) continue;
   for (const spawn of def.spawns) HEROIC_ELIGIBLE_MOBS.add(spawn.mobId);
 }

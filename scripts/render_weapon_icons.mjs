@@ -10,8 +10,10 @@
 //   node scripts/render_weapon_icons.mjs [srcDir=tmp/weapon_src] [outDir] [px=128]
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH } from './browser_path.mjs';
+import { ktx2TranscoderScriptTag } from './lib/ktx2_assets.mjs';
 
 const SRC = process.argv[2] || 'tmp/weapon_src';
 const OUT = process.argv[3] || 'tmp/weapon_thumbs';
@@ -24,7 +26,10 @@ if (!existsSync(BUNDLE)) {
   process.exit(1);
 }
 const bundle = readFileSync(BUNDLE, 'utf8');
-const html = `<!doctype html><html><head><meta charset="utf8"><style>html,body{margin:0;background:#000}</style></head><body><script>${bundle}</script></body></html>`;
+const ktx2Tag = ktx2TranscoderScriptTag(
+  path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'),
+);
+const html = `<!doctype html><html><head><meta charset="utf8"><style>html,body{margin:0;background:#000}</style></head><body>${ktx2Tag}<script>${bundle}</script></body></html>`;
 
 const browser = await puppeteer.launch({
   executablePath: BROWSER_PATH,

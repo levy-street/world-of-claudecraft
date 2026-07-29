@@ -8,6 +8,10 @@
 //   up to LEDGE_GRAB_MAX       a jump GRABS it and climbs up           (climb)
 //   above that                 it is a wall
 //
+// The first three rungs meet with no gap on purpose: MANTLE_REACH equals
+// MAX_STEP_HEIGHT equals LEDGE_GRAB_MIN, so no standable top is ever a wall to
+// an airborne body that a grounded body would have strided straight over.
+//
 // Everything here is a pure query against the same extruded-2D collider set
 // and heightfield the solver uses, so a climb can only ever start onto a
 // surface the body could legitimately stand on: a standable prop top (crate,

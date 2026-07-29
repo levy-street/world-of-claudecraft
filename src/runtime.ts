@@ -46,9 +46,11 @@ export function runtimeWebSocketUrl(
 }
 
 // One auto-update event forwarded by the shell (electron/update_events.cjs
-// whitelists the payloads; 'progress' carries percent, the others version).
+// whitelists the payloads; 'progress' carries percent, 'available' and
+// 'downloaded' carry version, and 'checking'/'not-available'/'error' are bare
+// notifications: 'error' never carries a message by design).
 export interface DesktopUpdateEvent {
-  type: 'available' | 'progress' | 'downloaded';
+  type: 'checking' | 'available' | 'progress' | 'downloaded' | 'not-available' | 'error';
   version?: string;
   percent?: number;
 }
@@ -95,6 +97,18 @@ export interface DesktopBridge {
   // cancel the outstanding Steam auth ticket promptly (Valve's CancelAuthTicket
   // contract). Absent on older shells: feature-check before use.
   steamLinkSettled?(): Promise<unknown>;
+  // An Epic link proof (string) for POST /api/epic/link, or null when Epic is
+  // unavailable (website/steam build, no launcher session, adapter missing).
+  // Feature-check before use like the other post-trio methods.
+  epicLinkProof?(): Promise<string | null>;
+  // Whether the shell can mint Epic link proofs at all (false on packaged
+  // website/steam builds). Capability may be true even when epicLinkProof
+  // returns null without native EOS. Absent on older shells: fall back to
+  // epicLinkProof presence. Feature-check before use.
+  epicLinkSupported?(): Promise<boolean>;
+  // Signals that the Epic link POST settled so any cancelable adapter handle
+  // can be released. Absent on older shells: feature-check before use.
+  epicLinkSettled?(): Promise<unknown>;
 }
 
 export function desktopBridge(): DesktopBridge | null {

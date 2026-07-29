@@ -340,11 +340,14 @@ export const zh_CN: EnTranslations = {
       "menuButton": "脱困",
       "help": "脱困：/unstuck 会启动原地倒计时，随后将你移动到附近可到达的安全位置。",
       "helpAtGraveyard": "脱困：/unstuck 会启动原地倒计时，结束后将你的灵魂送往最近的墓地。你必须向灵魂医者接受守护者的代价才能复活。",
+      "helpUnstuckSickness": "脱困：/unstuck 会启动原地倒计时，结束后将你移动到最近的墓地，若你已倒下则会复活你。你将带着脱困后遗症，最多持续 5 分钟。",
       "started": "将在 {seconds} 秒后脱困。移动、战斗、受到伤害或开始其他动作都会取消。",
       "countdown": "脱困：{seconds}",
       "completed": "已移动到最近且可到达的安全位置。",
       "completedAtGraveyard": "你的灵魂已返回最近的墓地。与灵魂医者交谈并接受守护者的代价。",
       "revivedAtGraveyard": "你已被送回最近的墓地并复活。守护者的代价正压在你身上。",
+      "movedToGraveyard": "你已被移动到最近的墓地。脱困后遗症正压在你身上。",
+      "revivedAtGraveyardUnstuck": "你已被移动到最近的墓地并复活。脱困后遗症正压在你身上。",
       "cancelledMoved": "你进行了移动，脱困已取消。",
       "cancelledDamaged": "你受到了伤害，脱困已取消。",
       "cancelledCombat": "你进入了战斗，脱困已取消。",
@@ -393,7 +396,8 @@ export const zh_CN: EnTranslations = {
     },
     "emoteEditor": {
       "title": "表情",
-      "done": "完成"
+      "done": "完成",
+      "close": "关闭表情"
     },
     "dailyRewards": {
       "title": "每日奖励",
@@ -776,6 +780,10 @@ export const zh_CN: EnTranslations = {
       "ready": "挥击",
       "seconds": "{seconds}秒"
     },
+    "breath": {
+      "label": "呼吸",
+      "drowning": "溺水！"
+    },
     "rest": {
       "resting": "休息中"
     },
@@ -788,6 +796,7 @@ export const zh_CN: EnTranslations = {
       "targetAnnounce": "目标：{name}",
       "targetOfTargetLabel": "目标的目标",
       "partyLabel": "你的队伍",
+      "petLabel": "你的宠物",
       "partyChip": "小队",
       "partyGroup": "小队 {n}",
       "durationUnitSeconds": "秒",
@@ -821,7 +830,7 @@ export const zh_CN: EnTranslations = {
       "targetCycleShort": "目标",
       "spellbookPageLabel": "页{page}",
       "hideKeyboard": "隐藏键盘",
-      "chatPlaceholder": "说点什么..."
+      "chatPlaceholder": "说点什么...（! 显示社区指令）"
     },
     "tutorial": {
       "moveBodyTouch": "使用摇杆移动，拖动屏幕环顾四周。先走几步开始吧。",
@@ -889,6 +898,13 @@ export const zh_CN: EnTranslations = {
       "heroicName": "英雄难度：{name}",
       "heroicLocked": "你已被锁定至英雄难度的{name}。"
     },
+    "riftTracker": {
+      "title": "裂隙",
+      "floor": "第 {current} 层，共 {total} 层",
+      "closesIn": "裂隙将在 {time} 后关闭",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "北",
       "NE": "东北",
@@ -904,7 +920,36 @@ export const zh_CN: EnTranslations = {
       "perSecondRow": "{total}（{rate}）",
       "minutesSeconds": "{m}分{s}秒",
       "seconds": "{s}秒",
-      "autoShowHint": "一旦你的小队造成伤害或治疗，行数就会自动出现，此区段会在战斗结束几秒后关闭。"
+      "autoShowHint": "一旦你的小队造成伤害或治疗，行数就会自动出现，此区段会在战斗结束几秒后关闭。",
+      "threatFallback": "无实时仇恨：显示对{name}造成的伤害",
+      "breakdownSummary": "{tab}：{value}",
+      "breakdownRow": "{value}（{percent}）",
+      "breakdownOther": "其他（{count}）",
+      "percent": "{value}%",
+      "petAbility": "{pet}：{ability}",
+      "melee": "近战",
+      "move": "拖动以移动此统计面板",
+      "resize": "拖动以调整此统计面板大小",
+      "dock": "将此统计停靠回统计窗口",
+      "separate": "分离{meter}",
+      "regroup": "合并{meter}"
+    },
+    "targetAuras": {
+      "title": "目标光环",
+      "keybindLabel": "目标增益和减益效果",
+      "all": "全部",
+      "debuffs": "减益",
+      "buffs": "增益",
+      "unlock": "移动目标光环窗口",
+      "lock": "锁定目标光环窗口",
+      "configureRows": "设置目标光环",
+      "fewerRows": "减少光环行数",
+      "moreRows": "增加光环行数",
+      "visibleRows": "首选光环行数：{count}",
+      "showSources": "显示光环施放者",
+      "hideSources": "隐藏光环施放者",
+      "ownAura": "你的光环",
+      "opacity": "光环不透明度：{percent}"
     },
     "petFeed": {
       "disabledFullHp": "宠物生命值已满",
@@ -916,14 +961,30 @@ export const zh_CN: EnTranslations = {
       "targetFriendlyNext": "切换友方目标",
       "discord": "Discord",
       "valecup": "溪谷杯",
+      "bgFlag": "战场夺旗动作",
       "sheathe": "收起/拔出武器",
+      "dive": "下潜",
       "categoryPet": "宠物",
       "petAttack": "宠物：攻击",
       "petStop": "宠物：停止",
       "petTaunt": "宠物：嘲讽",
       "petDefensive": "宠物：防御",
       "petAggressive": "宠物：攻击性",
-      "mount": "骑乘 / 下骑"
+      "targetPet": "宠物：选中",
+      "mount": "骑乘 / 下骑",
+      "mouseHint": "鼠标按键同样可用：绑定时按下中键 (M3) 或拇指键 (M4、M5)。左键和右键保留给镜头、点击移动和点击世界中的目标使用。"
+    },
+    "actionBar": {
+      "editKeys": "编辑动作条按键",
+      "editKeysHint": "点击动作条上的一个槽位，然后按下按键进行绑定。",
+      "bannerHint": "点击一个槽位，然后按下按键进行绑定。完成后点击“完成”。",
+      "bannerCapturing": "按下按键以绑定该槽位……",
+      "boundToKey": "已绑定至 {key}。",
+      "reset": "重置",
+      "done": "完成",
+      "cancel": "取消",
+      "resetConfirmTitle": "重置动作条按键？",
+      "resetConfirmBody": "第一条动作条将恢复为默认按键，第二条和第三条动作条将变为未绑定状态。此操作无法撤销。"
     },
     "mounts": {
       "mount": "骑乘",
@@ -936,13 +997,17 @@ export const zh_CN: EnTranslations = {
       "name_shadowjump_toad": "影跃蟾蜍卡玛影",
       "name_stormfeather_griffin": "凌天风暴之羽",
       "name_thunderstrut_gobbler": "雷霆阔步大火鸡",
+      "name_terrorspark_groundshaker": "惊雷撼地者",
+      "name_drakemaw_raptor": "龙喉迅猛龙",
       "desc_valorsteed": "一匹坚韧稳健的骏马，可提升旅行速度。",
       "desc_grag_bear": "一头坚韧稳健的巨熊，可提升旅行速度。",
       "desc_stalkglider_snail": "一只坚毅耐久的蜗牛，可提升旅行速度。",
       "desc_aether_hover_cycle": "一辆强大的魔导机车，专为快速贴地悬浮的战斗穿行而设计。",
       "desc_shadowjump_toad": "一只体型庞大、步伐稳健的巨蟾，受训于闪电般的暗影跳跃，可跨越任何地形。",
       "desc_stormfeather_griffin": "一头威严的风暴狮鹫，收拢双翼，以符文利爪行走于大地。",
-      "desc_thunderstrut_gobbler": "一只风暴所生的庞然大火鸡，从觉醒之峰昂首阔步而下，尾羽如雷云般展开。"
+      "desc_thunderstrut_gobbler": "一只风暴所生的庞然大火鸡，从觉醒之峰昂首阔步而下，尾羽如雷云般展开。",
+      "desc_terrorspark_groundshaker": "一台紧凑的装甲机械，配备重型履带、大口径火炮，以及为无畏驾驶员打造的鞍座。",
+      "desc_drakemaw_raptor": "来自龙喉火山口的驯服巢生迅猛龙，浑身筋肉、疾若奔雷，身上仍带着淡淡的灰烬气味。"
     },
     "mountTraining": {
       "mountPrompt": "按 {key} 键骑上训练用英勇战马。",
@@ -955,13 +1020,100 @@ export const zh_CN: EnTranslations = {
     "mountRace": {
       "startButton": "开始比赛",
       "cancelButton": "取消比赛",
-      "go": "GO!",
+      "go": "出发！",
       "start": "出发！跳过每一道障碍，再骑回拱门冲线。",
       "toFinish": "骑回拱门冲线！",
       "finished": "完成！用时 {seconds} 秒！",
       "timeout": "比赛失败",
       "progress": "障碍 {n} / {total}",
-      "timeLeft": "{seconds}s"
+      "timeLeft": "{seconds}秒"
+    },
+    "pvp": {
+      "launcherTitle": "PvP",
+      "mobileLabel": "PvP",
+      "bracket1v1": "1v1",
+      "bracket2v2": "2v2"
+    },
+    "bg": {
+      "title": "荆谷原野",
+      "blurb": "两座废弃的要塞隔着棘峰阴影下的围墙山谷遥遥相望：绯红在南，蔚蓝在北，而两者之间的古老废墟庭院，谁都不曾真正占据。每方五人，各持一面战旗，先将对方战旗夺回本方三次者赢得战场。",
+      "modeTag": "5v5夺旗战",
+      "offlineNote": "荆谷原野正在同步。待王国响应后即可排队。",
+      "ratingSummary": "评分。{wins}胜 / {losses}负",
+      "careerCaptures": "生涯夺旗:{count}",
+      "enterQueue": "加入队列",
+      "enterQueueParty": "加入队列({count}人小队)",
+      "leaveQueue": "离开队列",
+      "searching": "搜索中。队列 {count}/{size}。",
+      "queuedParty": "{count}人小队。",
+      "queueNote": "两队各五人。夺取敌方军旗并送回己方要塞。先夺得3次者获胜。可组满5人小队一同排队;拾取疾行符文,并利用掩体甩开追兵。",
+      "matchInProgress": "战斗进行中。{crimson}:{azure}。",
+      "ladderAllTime": "天梯。历史总榜",
+      "noRanked": "尚无勇士上榜。争当第一。",
+      "ladderOnline": "天梯。当前在线",
+      "noChallengers": "当前没有勇士在线。争当第一。",
+      "playerLevelClassTitle": "{name}。{level}级{className}",
+      "playerClassTitle": "{name}。{className}",
+      "crimson": "赤红队",
+      "azure": "蔚蓝队",
+      "yourTeamTitle": "你的队伍",
+      "clock": "{minutes}:{seconds}",
+      "formUp": "列队:{seconds}",
+      "firstTo": "先夺得{caps}次旗帜",
+      "flagState": {
+        "home": "旗帜在要塞",
+        "carried": "旗帜被夺!",
+        "dropped": "旗帜落地"
+      },
+      "respawnIn": "下一波:{seconds}秒后复活",
+      "resultVictory": "胜利!",
+      "resultDefeat": "战败",
+      "resultDraw": "平局",
+      "leavingIn": "{seconds}秒后离开战场",
+      "killFeed": "{killer}击杀了{victim}",
+      "killFeedFallen": "{victim}倒下了",
+      "foundBanner": "战斗已就绪。你为{team}而战!",
+      "countdownBanner": "荆谷原野{seconds}秒后开战",
+      "startBanner": "夺取旗帜!",
+      "flagTakenLog": "{name}夺走了{team}的旗帜!",
+      "flagDroppedLog": "{team}的旗帜掉落了。",
+      "flagReturnedLog": "{team}的旗帜已归还。",
+      "dropFlagConfirmTitle": "丢下旗帜？",
+      "dropFlagConfirmBody": "你正携带敌方旗帜。丢下后旗帜会留在地上，双方都可以拾取。",
+      "dropFlagConfirmAccept": "丢下旗帜",
+      "boardToggleLabel": "比赛记分板。按回车键固定展开完整榜单。",
+      "levelRequirement": "你需要达到{level}级才能解锁此战场的排队。",
+      "board": {
+        "kills": "击杀",
+        "assists": "助攻",
+        "deaths": "死亡",
+        "captures": "夺旗"
+      },
+      "flagTakenBanner": "{takers}夺走了{team}的旗帜!",
+      "flagReturnedBanner": "{team}的旗帜已归还!",
+      "capturedTeamBanner": "{takers}夺取了{team}的旗帜!{crimson}:{azure}",
+      "capturedLog": "{name}夺取了{team}的旗帜。比分{crimson}:{azure}。",
+      "victoryBanner": "胜利!荆谷原野{crimson}:{azure}。评分{rating}({delta})",
+      "defeatBanner": "战败。荆谷原野{crimson}:{azure}。评分{rating}({delta})",
+      "drawBanner": "荆谷原野平局{crimson}:{azure}。评分{rating}({delta})",
+      "endBannerDetail": "荆谷原野{crimson}:{azure}。评分{rating}({delta})",
+      "endLog": "荆谷原野结束,{crimson}:{azure}。评分{rating}({delta})。",
+      "endedTimer": "时间到",
+      "endedForfeit": "本场比赛以弃权告终",
+      "endedTimerLog": "比赛时间耗尽,由比分较高的一方拿下战场。",
+      "endedForfeitLog": "本场比赛以弃权告终。",
+      "firstWinBonusLine": "每日首胜:+{honor}荣誉",
+      "firstWinBonusLog": "每日首胜:你额外获得{honor}点荣誉。",
+      "timeWarningMinutes": "还剩{minutes}分钟",
+      "timeWarningOneMinute": "还剩一分钟",
+      "timeWarningMinutesLog": "本场战斗还剩{minutes}分钟。",
+      "timeWarningOneMinuteLog": "本场战斗还剩一分钟。",
+      "map": {
+        "crimsonKeep": "绯红要塞",
+        "azureKeep": "蔚蓝要塞",
+        "ruinCourtyard": "废墟庭院",
+        "graveyard": "墓地"
+      }
     },
     "vcup": {
       "title": "溪谷杯",
@@ -985,6 +1137,7 @@ export const zh_CN: EnTranslations = {
       },
       "awayNote": "若双方举同一面旗帜，客队将使用反转配色。",
       "rolesHeading": "运动位置",
+      "rolesSmallBracketNote": "在1对1和2对2赛级中，所有选手都以全能型出场。要求3对3或更大赛级的功绩在此无法达成。",
       "role": {
         "allrounder": {
           "name": "全能型",
@@ -1026,6 +1179,7 @@ export const zh_CN: EnTranslations = {
       "guildBoardWl": "{wins} 胜，{losses} 负",
       "practice": "与机器人练习赛",
       "practiceNote": "立即在母猪场开始一场完整的机器人比赛。",
+      "practiceUnratedNote": "练习赛不计入评级：战绩与功绩之书进度均不计算。",
       "practicingNow": "正在练习（{count}）：",
       "clock": "{minutes}:{seconds}",
       "indicatorQueued": "溪谷杯队列：{bracket}，第 {position} 位，共 {count} 人",
@@ -1068,6 +1222,8 @@ export const zh_CN: EnTranslations = {
         "rule5": "任何人都可以走上前，在看台上为你助威。",
         "kitHeading": "你的技能",
         "kitNote": "比赛期间，这些动作将取代你的职业技能。",
+        "unratedNote": "场上有机器人，因此本场为非评级赛：战绩不会变动，进球、扑救与零封的功绩均不计算。",
+        "practiceUnratedNote": "这是练习赛，因此不计入评级：战绩不会变动，功绩之书进度也不计算。",
         "rosterHeading": "出场名单",
         "you": "你",
         "bot": "电脑",
@@ -1109,6 +1265,33 @@ export const zh_CN: EnTranslations = {
       "browserEffectsReduced": "精简",
       "browserEffectsMinimal": "最低",
       "browserEffectsNote": "自动模式会根据你的浏览器和设备调低高开销的 CSS 特效（模糊、光晕、背景动画）。如果界面感觉卡顿，可手动降低。",
+      "graphicsApply": "应用图形设置",
+      "graphicsApplying": "正在应用图形设置...",
+      "graphicsApplied": "图形设置已应用。",
+      "graphicsSaved": "图形设置已保存。当前渲染器已与这些设置一致。",
+      "graphicsFailed": "无法应用图形设置。之前的图形设置仍然有效。",
+      "graphicsRetry": "重试图形设置",
+      "graphicsFatal": "图形恢复失败。请重新加载游戏以继续。",
+      "graphicsReload": "重新加载游戏",
+      "graphicsDraftChanged": "图形更改已准备好应用。",
+      "gfxSectionQuality": "画质",
+      "gfxSectionWorld": "世界细节",
+      "gfxSectionLighting": "光照与特效",
+      "gfxSectionCamera": "镜头",
+      "gfxSectionDisplay": "显示",
+      "gfxSectionSystem": "系统",
+      "gfxSectionTouch": "触控操作",
+      "gfxViewDistance": "视野距离",
+      "gfxWaterQuality": "水面质量",
+      "gfxCharacterDetail": "角色细节",
+      "gfxAmbientOcclusion": "环境光遮蔽",
+      "gfxBloom": "泛光",
+      "gfxAntiAliasing": "抗锯齿",
+      "gfxDynamicLights": "动态光源",
+      "gfxParticleEffects": "粒子特效",
+      "gfxHalf": "半",
+      "gfxCustomNote": "调整任一细节旋钮会将画质预设切换为“高级”：一套基于“高”画质基础、以当前预设所示等级为起点的自定义组合。",
+      "gfxEffectsNote": "环境光遮蔽、泛光与抗锯齿依赖后期处理链：当“特效与光照”为低时，处理链关闭，这些选项不起作用。",
       "interfaceMode": "界面模式",
       "interfaceModeAuto": "自动",
       "interfaceModeDesktop": "桌面",
@@ -1130,6 +1313,7 @@ export const zh_CN: EnTranslations = {
       "aurasOnPlayerFrame": "增益显示在玩家框",
       "highContrastBackground": "高对比度背景",
       "startAttackOnAbility": "使用技能时自动攻击",
+      "stopAutoAttackOnTargetSwitch": "切换目标时停止自动攻击",
       "walkByAutoloot": "路过自动拾取",
       "groundReticle": "地面瞄准指示圈",
       "mouseoverCast": "队伍头像上鼠标悬停施法",
@@ -1139,7 +1323,11 @@ export const zh_CN: EnTranslations = {
       "itemScoreLine": "评分 {score}",
       "showSecondaryActionBar": "显示副动作条",
       "showThirdActionBar": "显示第三动作条",
+      "hideUnusedActionSlots": "隐藏未使用的动作栏位",
+      "lockActionBars": "锁定动作条",
       "showTargetOfTarget": "显示目标的目标",
+      "showPetFrame": "显示你的宠物",
+      "waterRipples": "水面涟漪（尾波）",
       "showAttackButton": "显示攻击按钮",
       "showDailyRewardsChest": "显示每日奖励宝箱",
       "mobileCameraJoystick": "摄像机摇杆",
@@ -1176,6 +1364,8 @@ export const zh_CN: EnTranslations = {
       "buttons": "按键布局",
       "resetButtons": "重置按键布局",
       "menuAction": "游戏菜单",
+      "zoomIn": "放大",
+      "zoomOut": "缩小",
       "help": "左摇杆移动，右摇杆控制镜头。打开窗口即可使用屏幕指针。"
     },
     "perf": {
@@ -1250,26 +1440,99 @@ export const zh_CN: EnTranslations = {
         "offline": "离线"
       }
     },
+    "auraOverlay": {
+      "title": "光环",
+      "currentClass": "当前职业：{class}",
+      "previewHint": "使用“设置位置”移动光环，避免挡住菜单。",
+      "noProcs": "此角色没有可用的支持触发效果。",
+      "enabled": "显示光环",
+      "icon": "法术图标",
+      "arcs": "侧边弧形",
+      "groundRing": "地面圆环",
+      "groundRingSpellOrder": "地面圆环：法术顺序",
+      "crescentsSpellOrder": "侧边弧形：法术顺序",
+      "size": "大小",
+      "iconSize": "图标大小",
+      "crescentBlockSize": "弧形区块大小",
+      "groundRingBlockSize": "地面圆环区块大小",
+      "opacity": "不透明度",
+      "color": "颜色",
+      "allOn": "全部开启",
+      "allOff": "全部关闭",
+      "reposition": "设置位置",
+      "positioning": "定位：{aura}",
+      "selectAura": "光环",
+      "done": "完成",
+      "moveLeft": "向左移动",
+      "moveUp": "向上移动",
+      "moveDown": "向下移动",
+      "moveRight": "向右移动",
+      "moveEarlier": "将法术向内移动",
+      "moveLater": "将法术向外移动",
+      "screenPosition": "屏幕位置",
+      "spellOrder": "法术顺序",
+      "reset": "重置位置",
+      "spellPosition": "法术顺序 {position} / {count}",
+      "procs": {
+        "revenge": "复仇！",
+        "battleTrance": "战斗冥想",
+        "overpowerCharge": "赤手充能",
+        "suddenDeath": "猝死",
+        "victoryRush": "乘胜追击",
+        "enrage": "狂乱：激怒",
+        "heatingUp": "热身",
+        "arcaneCharge": "奥术充能",
+        "aetherRush": "以太奔涌"
+      }
+    },
     "playerCard": {
       "showWalletBadge": "显示钱包徽章"
     },
     "landing": {
       "highContrast": "高对比度",
-      "highContrastAria": "切换高对比度背景：关闭动态预告片，使开始界面文字保持清晰"
+      "highContrastAria": "切换高对比度背景：关闭动态预告片，使开始界面文字保持清晰",
+      "browserSupport": {
+        "title": "提示：不受支持的浏览器",
+        "body": "此浏览器中性能可能会下降。为获得最佳体验，请下载适用于 Windows、macOS 或 Linux 的桌面客户端。想在浏览器中游玩？Chrome 性能最佳，Firefox 和 Safari 也受支持。",
+        "getDesktopApp": "获取桌面客户端",
+        "continueInBrowser": "继续在浏览器中游玩",
+        "dismissAria": "关闭不受支持浏览器的提示"
+      }
     },
     "warfare": {
       "honorAmount": "{amount} 点荣誉",
       "dualPrice": "{money} + {honor}",
       "balance": "荣誉：{amount}",
       "honorFloat": "+{amount} 荣誉",
+      "honorFloatReason": "+{amount} 荣誉（{reason}）",
       "honorGain": "你获得了 {amount} 点荣誉（{reason}）。",
       "notEnoughHonor": "荣誉不足。",
       "reasons": {
         "arenaWin": "竞技场胜利",
         "fiestaKill": "嘉年华击倒",
         "fiestaComplete": "完成嘉年华",
-        "fiestaWin": "嘉年华胜利"
+        "fiestaWin": "嘉年华胜利",
+        "battlegroundWin": "荆谷原野胜利",
+        "battlegroundFirstWin": "荆谷原野每日首胜",
+        "battlegroundComplete": "荆谷原野参战",
+        "battlegroundKill": "荣誉击杀",
+        "battlegroundAssist": "助攻击杀"
+      },
+      "floatReasons": {
+        "kill": "击杀",
+        "assist": "助攻",
+        "firstWin": "首胜"
       }
+    },
+    "warfareShop": {
+      "gossipOption": "浏览战争套装",
+      "gossipOptionAria": "浏览 {name} 提供的战争套装商店",
+      "jewelry": "饰品",
+      "weapons": "武器",
+      "owned": "已拥有",
+      "buyAria": "以 {honor} 购买 {item}",
+      "buyOwnedAria": "以 {honor} 购买 {item}，已拥有",
+      "buyConfirmBody": "用 {honor} 购买 {item}？荣誉购买后无法退款。"
     },
     "charSheet": {
       "offense": "攻击",
@@ -1341,6 +1604,7 @@ export const zh_CN: EnTranslations = {
     },
     "itemHeroicTag": "[英雄]",
     "itemSoulbound": "灵魂绑定",
+    "itemUniqueEquipped": "装备唯一",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1427,7 +1691,9 @@ export const zh_CN: EnTranslations = {
     },
     "paperdoll": {
       "unequipAria": "卸下 {item}",
-      "unequipHint": "点击 ×、右键点击或拖到背包以卸下"
+      "unequipHint": "点击 ×、右键点击或拖到背包以卸下",
+      "hideHelmAria": "隐藏头盔",
+      "showHelmAria": "显示头盔"
     },
     "account": {
       "title": "账户",
@@ -1493,6 +1759,10 @@ export const zh_CN: EnTranslations = {
       "twoFactorRecoveryTitle": "保存你的恢复码",
       "twoFactorRecoveryHint": "每个恢复码只能使用一次。请妥善保管：如果你丢失了身份验证器应用，它们是你唯一的找回方式。",
       "twoFactorDownloadCodes": "下载恢复码",
+      "recoveryCodesFileHeader": "{brand} 恢复码",
+      "recoveryCodesFileAccount": "账户：{username}",
+      "recoveryCodesFileHint": "如果你无法访问身份验证器应用，每个代码只能使用一次。",
+      "recoveryCodesFileWarn": "请将此文件保存在安全且私密的地方。",
       "twoFactorDone": "完成",
       "twoFactorDisableHint": "请输入你的密码以关闭双重验证。你的恢复码将被作废。",
       "twoFactorDisableBtn": "关闭双重验证",
@@ -1534,10 +1804,12 @@ export const zh_CN: EnTranslations = {
       "title": "采集",
       "harvestButton": "采集",
       "harvestTooltip": "采集勾选的部位。每具尸体只能被采集一次，先到先得。不会拾取战利品。",
-      "concentrateHint": "选择的部位越少，每个部位的品质越高。",
+      "yieldTierHint": "一次采集实际取得的部位越少，每个部位的品阶越高。",
       "nothingSelectedYields": "你选择的部位都无法从这具尸体上采集。",
       "alreadyHarvested": "这具尸体已经被采集过了。",
       "componentAria": "采集{component}",
+      "componentNoYield": "暂无产出",
+      "componentAriaNoYield": "采集{component}：{note}",
       "components": {
         "hide": "兽皮",
         "fang": "尖牙",
@@ -1560,7 +1832,13 @@ export const zh_CN: EnTranslations = {
       "saveButton": "保存专注",
       "notInTownHint": "你必须在城镇中才能设置专注。",
       "increaseAria": "增加对{component}的专注",
-      "decreaseAria": "减少对{component}的专注"
+      "decreaseAria": "减少对{component}的专注",
+      "respecTierLabel": "重新分配速度",
+      "respecTierTimeOption": "免费（花费时间）",
+      "respecTierPartialOption": "更快（少量花费）",
+      "respecTierInstantOption": "即时（全额花费）",
+      "respecCostFree": "免费",
+      "respecCostLine": "花费 {coin} 和 {materials}"
     },
     "party": {
       "promoteLeader": "提升为队长",
@@ -1618,13 +1896,16 @@ export const zh_CN: EnTranslations = {
       "itemAriaEnchanted": "{item}，数量 {count}，已附魔的副本",
       "itemAriaBound": "{item}，数量 {count}，已绑定的副本",
       "itemAriaMasterwork": "{item}，数量 {count}，杰作",
+      "itemAriaQuest": "{item}，数量 {count}，任务物品",
       "filterGroupAria": "按类别筛选背包",
       "filterAll": "全部",
       "filterWeapon": "武器",
       "filterArmor": "护甲",
       "filterConsumable": "消耗品",
       "filterMaterial": "材料",
+      "filterTool": "工具",
       "filterQuest": "任务",
+      "filterQuestCountAria": "任务，{count} 件物品",
       "filterMount": "坐骑",
       "sortAria": "排序背包物品",
       "sortRecent": "最近",
@@ -1633,6 +1914,7 @@ export const zh_CN: EnTranslations = {
       "searchPlaceholder": "搜索物品",
       "searchAria": "按名称搜索背包物品",
       "noMatch": "没有符合筛选条件的物品。",
+      "noQuestItems": "背包中没有任务物品。",
       "capacity": "{used}/{total}",
       "capacityAria": "背包格已用：{used}/{total}",
       "backpack": "背包",
@@ -1666,6 +1948,7 @@ export const zh_CN: EnTranslations = {
       "dmgDoneReduce": "造成的伤害降低 {pct}%",
       "heatingUp": "你的下一个火焰生成技能若连续造成暴击，会获得炽热连击；未造成暴击则移除热力迸发",
       "elementalConvergencePrimed": "你的下一个不同元素学派法术将触发元素汇聚",
+      "carriedFlag": "你正携带敌方旗帜。取消该增益即可丢下旗帜。",
       "battleStance": "战斗姿态：怒气产生提高 10%",
       "berserkerStance": "狂暴姿态：暴击几率提高 3%，暴击伤害提高 3%",
       "crit": "暴击几率提高 {pct}%",
@@ -1801,7 +2084,9 @@ export const zh_CN: EnTranslations = {
       "levelFamily": "等级 {level} {family}",
       "familyDemon": "恶魔",
       "hostile": "敌对",
-      "friendly": "友方"
+      "friendly": "友方",
+      "elite": "精英",
+      "boss": "首领"
     },
     "targetFrame": {
       "unlock": "移动目标框",
@@ -1836,6 +2121,8 @@ export const zh_CN: EnTranslations = {
       "showResource": "显示法力、怒气和能量",
       "showAbsorbs": "显示吸收护盾",
       "showAuras": "显示增益和减益",
+      "showPets": "显示宠物",
+      "petHealth": "宠物{name}，生命值{pct}",
       "showSelf": "显示你的框体"
     },
     "frameReset": {
@@ -1850,6 +2137,9 @@ export const zh_CN: EnTranslations = {
       "enchantedFallback": "已附魔"
     },
     "materialHint": {
+      "fineGrade": "优质品级。以等级高于该材料的工具在满级矿脉采集所得，在任何需要普通版本的地方均可替代使用。",
+      "cookingCatch": "烹饪材料。必须先烹饪后才能食用。",
+      "usedBy": "用于制作{crafts}。",
       "arcaneDust": "附魔材料。分解普通和优秀品质的装备可得。",
       "arcaneEssence": "附魔材料。分解精良品质的装备可得。",
       "arcaneShard": "附魔材料。分解史诗和传说品质的装备可得。",
@@ -2047,6 +2337,14 @@ export const zh_CN: EnTranslations = {
       "benefits": "在桌面客户端中关联你的 Steam 账号，将你获得的功绩同步为 Steam 成就。",
       "noTicket": "Steam 未提供关联凭据。请先启动 Steam，然后重试。"
     },
+    "epic": {
+      "title": "Epic",
+      "link": "关联 Epic",
+      "unlink": "取消关联 Epic",
+      "linked": "已关联 Epic 账号 {id}",
+      "benefits": "在 Epic 桌面客户端中关联你的 Epic 账号，将你获得的功绩同步为 Epic 成就。",
+      "noProof": "Epic 未提供关联凭据。请从 Epic Games Store 启动，然后重试。"
+    },
     "mailbox": {
       "title": "邮箱",
       "subtitle": "渡鸦邮驿",
@@ -2091,6 +2389,7 @@ export const zh_CN: EnTranslations = {
         "noRecipient": "这里没有叫这个名字的邮箱主人。",
         "tooManyParcels": "一封信最多可携带 {count} 个包裹。",
         "noMailQuestItems": "你不能邮寄任务物品。",
+        "noMailBound": "该物品已绑定，无法邮寄。",
         "notEnoughItems": "你没有那么多可寄送的物品。",
         "cantAffordPostage": "你付不起邮资。",
         "recipientBoxFull": "对方的邮箱已满。",
@@ -2122,6 +2421,7 @@ export const zh_CN: EnTranslations = {
       "depositHint": "点击存入",
       "depositPartialHint": "Shift+点击存入部分数量",
       "cannotDeposit": "无法存入银行",
+      "cannotDepositNow": "暂时无法存入",
       "depositQuantityTitle": "存入 {item}",
       "depositQuantityInput": "要存入的数量",
       "depositQuantityConfirm": "存入",
@@ -2132,6 +2432,7 @@ export const zh_CN: EnTranslations = {
       "sortAria": "排序银行物品",
       "searchAria": "按名称搜索银行物品",
       "depositAll": "存入所有材料",
+      "depositAllTooltip": "将背包中的所有制作材料和废品一次性存入银行。采集工具、已装备的装备、任务物品和消耗品不会受到影响。",
       "depositAllDone": "已存入材料：{count}。",
       "depositAllFull": "已存入材料：{count}。银行已满。",
       "depositAllNone": "银行已满：未存入任何物品。",
@@ -2147,7 +2448,52 @@ export const zh_CN: EnTranslations = {
       "bonusAdvertWallet": "绑定钱包可获得 2 个格子。",
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "邀请好友：当好友升到 10 级，你们各获得 2 个格子，最多 5 位好友。",
-      "bonusSectionAria": "奖励银行格子及获取方式"
+      "bonusSectionAria": "奖励银行格子及获取方式",
+      "tabsAria": "银行标签页",
+      "personalTab": "个人",
+      "guildTab": "公会",
+      "guildCapacityAria": "公会银行格已用：{used}/{total}",
+      "guildEmpty": "公会银行是空的。",
+      "guildTreasury": "公会金库",
+      "guildDepositGold": "存入金钱",
+      "guildWithdrawGold": "取出金钱",
+      "guildDepositGoldTitle": "向公会金库存入金钱",
+      "guildWithdrawGoldTitle": "从公会金库取出金钱",
+      "guildGoldAvailable": "可用：{amount}",
+      "guildBuyConfirm": "花费公会金库的 {price} 购买 {count} 个额外的公会银行格子吗？",
+      "guildBuyNote": "由公会金库支付",
+      "guildTreasuryShort": "金库不足",
+      "guildOpenBank": "开启公会银行",
+      "guildOpenConfirm": "花费 {price} 开启公会银行吗？这笔费用由你自己支付。",
+      "guildOpenAccept": "开启",
+      "guildOpenNote": "由你自己支付，而非公会金库",
+      "guildPurseShort": "金钱不足",
+      "guildReadOnlyNote": "只有公会官员才能更改公会银行。",
+      "guildUnopenedNote": "公会银行尚未开通。",
+      "guildDormantNote": "锁定的物品无法取出，并会阻止解散公会。",
+      "guildDormantHint": "该物品已锁定在公会银行中，无法取出。",
+      "guildDormantAria": "{item}，数量 {count}，无法取出",
+      "guildUnknownItem": "未知物品",
+      "guildDepositHint": "点击存入公会银行",
+      "guildCannotDeposit": "无法放入公会银行",
+      "guildGoldCannotMove": "目前无法转移该金额。",
+      "guildViewsAria": "公会银行视图",
+      "guildContentsTab": "内容",
+      "guildLogTab": "日志",
+      "logAria": "公会银行活动日志",
+      "logNote": "最近 {count} 条公会银行操作。",
+      "logLoading": "正在加载公会银行日志...",
+      "logEmpty": "公会银行中尚未存入或取出任何物品。",
+      "logUnavailable": "目前无法读取公会银行日志。",
+      "logFormerMember": "一位已离开的公会成员",
+      "logDepositItem": "{actor} 存入了 {count} 个 {item}",
+      "logWithdrawItem": "{actor} 取出了 {count} 个 {item}",
+      "logDepositMoney": "{actor} 存入了 {amount}",
+      "logWithdrawMoney": "{actor} 取出了 {amount}",
+      "logBuySlots": "{actor} 花费 {amount} 购买了银行扩容",
+      "logOpenBank": "{actor} 花费 {amount} 开启了公会银行",
+      "logCharterFee": "{actor} 支付了 {amount} 的公会创建费用",
+      "logAdminPurge": "管理员移除了 {count} 个 {item}"
     },
     "calendar": {
       "title": "活动日历",
@@ -2185,10 +2531,6 @@ export const zh_CN: EnTranslations = {
           "title": "集市日",
           "note": "商人正等着新货。今天很适合逛逛世界市场。"
         },
-        "fiestaNight": {
-          "title": "狂欢之夜",
-          "note": "今晚 2v2 狂欢擂台的人气最旺。"
-        },
         "arenaClash": {
           "title": "竞技场之战",
           "note": "决斗者涌向灰烬斗兽场。排队开打，向天梯进发。"
@@ -2225,6 +2567,7 @@ export const zh_CN: EnTranslations = {
       "billboard": {
         "label": "公会公告板",
         "empty": "公告板上还没有内容。",
+        "loginLine": "公会公告板：{text}",
         "setBy": "由 {name} 设置",
         "save": "保存",
         "placeholder": "给公会写一条消息",
@@ -2250,6 +2593,7 @@ export const zh_CN: EnTranslations = {
       "catchLine": "你钓上了：{name}",
       "biteLine": "有东西上钩了！",
       "gotAwayLine": "它跑掉了。",
+      "earlyReelLine": "收线太早了，还没有鱼上钩。",
       "nodeName": {
         "ore": "矿脉",
         "wood": "林木",
@@ -2268,7 +2612,8 @@ export const zh_CN: EnTranslations = {
       "toolTierUnmet": {
         "mining": "你需要{tier}阶采矿镐才能开采这条矿脉。",
         "logging": "你需要{tier}阶伐木斧才能砍伐这片林木。",
-        "herbalism": "你需要{tier}阶草药镰才能采集这片草药丛。"
+        "herbalism": "你需要{tier}阶草药镰才能采集这片草药丛。",
+        "fishing": "你需要{tier}阶钓竿才能在这片水域垂钓。"
       },
       "toolRequired": {
         "mining": "你需要采矿镐才能开采这条矿脉。",
@@ -2281,6 +2626,12 @@ export const zh_CN: EnTranslations = {
         "logging": "附近没有林木可供砍伐。",
         "herbalism": "附近没有草药丛可供采集。"
       },
+      "wieldUnmet": {
+        "mining": "你需要采矿{skill}才能挥动背包里已有的采矿镐。",
+        "logging": "你需要伐木{skill}才能挥动背包里已有的伐木斧。",
+        "herbalism": "你需要草药学{skill}才能使用背包里已有的草药镰。"
+      },
+      "wieldUnmetCorpse": "你需要采集技能{skill}才能让最上等的工具派上用场。",
       "toolTierUnmetCorpse": "你需要{tier}阶采集工具才能取得最上等的材料。",
       "toolTooltip": {
         "kind": {
@@ -2292,7 +2643,8 @@ export const zh_CN: EnTranslations = {
         "unlocks": {
           "mining": "开采最高{tier}阶的矿脉所需。",
           "logging": "砍伐最高{tier}阶的林木所需。",
-          "herbalism": "采集最高{tier}阶的草药丛所需。"
+          "herbalism": "采集最高{tier}阶的草药丛所需。",
+          "fishing": "在最高{tier}阶的水域垂钓所需。"
         },
         "use": {
           "mining": "使用：开采附近的矿脉。",
@@ -2307,8 +2659,12 @@ export const zh_CN: EnTranslations = {
       },
       "downgradeMark": "背包已满：这份收获未能留下采集者的印记。",
       "downgradeFind": "背包已满：一件完美的收获溜走了。",
+      "emptyHookNote": "空钩",
       "stateReady": "可采集",
-      "stateCooldown": "恢复中"
+      "stateCooldown": "恢复中",
+      "stateCooldownTimed": "{time}后恢复",
+      "respawnClock": "{minutes}:{seconds}",
+      "fineGradePreview": "使用当前工具采集可获得优质品级。"
     },
     "archetypeTitle": {
       "label": "称号",
@@ -2342,6 +2698,7 @@ export const zh_CN: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "武器附魔 - 威力",
       "enchant_weapon_intellect": "武器附魔 - 法术强度",
+      "enchant_offhand_stamina": "副手附魔 - 耐力",
       "enchant_helmet_fortitude": "头盔附魔 - 坚韧",
       "enchant_neck_spirit": "项链附魔 - 精神",
       "enchant_shoulder_agility": "肩甲附魔 - 敏捷",
@@ -2398,6 +2755,45 @@ export const zh_CN: EnTranslations = {
       "ceilingRare": "稀有品质上限",
       "ceilingCommon": "普通品质上限",
       "skillValue": "{skill} / {max}",
+      "toolEffectCharges": "剩余 {charges} / {max} 次",
+      "toolEffectSpent": "已耗尽，需要充能",
+      "toolEffectDepleted": "工具效果已耗尽",
+      "toolEffectRechargePrice": "充能：{material} x{count}",
+      "toolEffectModeAsk": "每次使用前询问",
+      "toolEffectModePrompt": "每次使用前会询问",
+      "toolEffectConfirmTitle": "使用{effect}？",
+      "toolEffectConfirmBody": "本次采集消耗 1 次充能（剩余 {charges} 次）？拒绝后仍会采集，只是没有加成。",
+      "toolEffectConfirmAccept": "消耗充能",
+      "toolEffectConfirmDecline": "直接采集",
+      "toolEffectName": {
+        "gatherersCache": "采集者储囊",
+        "artisansEye": "匠人之眼",
+        "quickeningCharm": "回春符"
+      },
+      "toolEffectTooltip": {
+        "kind": "工具符咒",
+        "bonus": {
+          "gatherersCache": "充能期间每次采集产出+1。",
+          "artisansEye": "充能期间将收获品级提升1个工具等级。",
+          "quickeningCharm": "缩短其触发的资源节点重生计时。"
+        },
+        "howToSlot": "在专业窗口中将其镶嵌到采矿、伐木或草药学工具上。镶嵌后即消耗。",
+        "charges": "普通品质工具初始有{base}次充能（稀有度每升一级+{bonus}次）。",
+        "landOnly": "无法镶嵌到鱼竿上。",
+        "openProfessions": "打开专业窗口，将其镶嵌到采集工具上。"
+      },
+      "toolEffectSlotButton": "镶嵌{effect}",
+      "toolEffectRechargeButton": "充能",
+      "toolEffectSlotted": "{effect}已镶嵌到{profession}。",
+      "toolEffectSlotInvalid": "{effect}无法镶嵌在那里。",
+      "toolEffectNoTool": "你需要先拥有真正的{profession}工具。",
+      "toolEffectNoCharm": "背包里需要一枚制作好的{effect}。",
+      "toolEffectNoGain": "{effect}已镶嵌且能量充盈。",
+      "toolEffectRecharged": "{effect}已充能：消耗{material}x{count}。",
+      "toolEffectRechargeNoSlot": "{profession}上没有镶嵌任何效果。",
+      "toolEffectRechargeFull": "{effect}已充满能量。",
+      "toolEffectRechargeToolCapped": "携带更好的{profession}工具才能继续为{effect}充能。",
+      "toolEffectRechargeMaterials": "为{effect}充能需要{material}x{count}。",
       "tierPipAria": "阶级 {tier}",
       "nextUnlockTier": "距离下一阶级还差 {points} 点：打造大师之作的几率将提升",
       "nextUnlockSpecialized": "距离专精还差 {points} 点：材料消耗将降低",
@@ -2422,9 +2818,27 @@ export const zh_CN: EnTranslations = {
     "crafting": {
       "title": "制作",
       "close": "关闭制作",
-      "craft": "制作",
+      "dialogOption": "制作",
+      "dialogOptionAria": "打开{craft}制作窗口",
+      "crafting": "制作中",
+      "create": "制作",
+      "createAll": "全部制作",
+      "createAllAria": "按当前材料可制作的最大数量制作该配方",
+      "qtyRowAria": "制作数量",
+      "qtyDecreaseAria": "减少制作数量（当前 {count}）",
+      "qtyIncreaseAria": "增加制作数量（当前 {count}）",
+      "qtyValueAria": "制作数量，{count}",
+      "batchRemaining": "剩余 {remaining}/{total}",
+      "batchRemainingAria": "还剩 {remaining} 个，共 {total} 个",
+      "durationChip": "{seconds}秒",
+      "durationAria": "施放时间：{seconds} 秒",
+      "progressAria": "制作进度",
+      "announceStart": "正在制作 {name}",
+      "announceComplete": "已完成制作 {name}",
+      "announceCancel": "制作已取消",
       "reagentsNeeded": "需要:",
       "reagentLine": "{name}: {have}/{required}",
+      "reagentFineSub": "（消耗 {count} 个优质品级）",
       "empty": "尚无已知配方。",
       "resultAria": "制作{name}",
       "craftedToast": "已制作:{name}",
@@ -2466,6 +2880,8 @@ export const zh_CN: EnTranslations = {
         "colSkill": "技能",
         "colRole": "定位",
         "colCap": "上限",
+        "allCrafts": "所有专业",
+        "skillListAria": "专业技能",
         "tutorial": "第一个阶级：将一门技艺提升到技能 {skill}。成功完成配方会提升对应技艺，且不会抹去其他知识。",
         "nearTier": "{craft}距离下一阶级还差 {points} 点技能。",
         "dormantKnowledge": "{craft}知识已保留，但在其组合或爱好未启用时处于休眠状态。"
@@ -2479,7 +2895,7 @@ export const zh_CN: EnTranslations = {
         "loom": "织机",
         "toolworks": "工坊"
       },
-      "throttled": "你制作得太快了，请稍等片刻后再试。",
+      "busy": "你正忙着。",
       "recipeNotLearned": "你还没有学会这个配方。",
       "noBagSpace": "背包空间不足，无法存放制作的物品。",
       "skillReqLine": "需要{craft} {skill}",
@@ -2493,6 +2909,8 @@ export const zh_CN: EnTranslations = {
       "masterworkToast": "杰作！{name}",
       "masterworkZoneLine": "{crafter}制作出了杰作{name}！",
       "tierUpToast": "{craft}提升至阶级 {tier}！",
+      "skillUpToast": "{skill}技能提升至 {level}！",
+      "skillUpSubtext": "技能提升至 {level}！",
       "trendNudge": "你的双手正倾向于{archetype}之道。其调谐任务在{master}处等候。",
       "trendNudgeNoMaster": "你的双手正倾向于{archetype}之道。去寻找一位工艺大师来踏上此道吧。",
       "attunedZoneLine": "{name}已调谐为{archetype}！",
@@ -2532,9 +2950,9 @@ export const zh_CN: EnTranslations = {
       "notHeld": "你没有那件物品。",
       "notDisenchantable": "你无法分解那件物品。",
       "notSalvageable": "你无法拆解那件物品。",
-      "disenchantThrottled": "你分解得太快了，请稍等片刻后再试。",
-      "salvageThrottled": "你拆解得太快了，请稍等片刻后再试。",
-      "enchantThrottled": "你附魔得太快了，请稍等片刻后再试。",
+      "disenchantBusy": "你正忙着。",
+      "salvageBusy": "你正忙着。",
+      "enchantBusy": "你正忙着。",
       "enchantWrongSlot": "该附魔无法施加于那件物品。",
       "enchantUnknown": "该附魔不存在。",
       "enchantInsufficient": "你没有该附魔所需的材料。",
@@ -2552,6 +2970,7 @@ export const zh_CN: EnTranslations = {
       "noEnchants": "没有附魔会用到这种材料。",
       "noTargets": "没有可供附魔的物品。",
       "wornTag": "已装备（{slot}）",
+      "wornTagIndexed": "已装备（{slot}{index}）",
       "tier": {
         "base": "基础附魔",
         "runed": "符文附魔",
@@ -2616,6 +3035,59 @@ export const zh_CN: EnTranslations = {
       "cannotAfford": "你付不起解绑费用。",
       "outOfRange": "你必须站在工作台旁才能解绑。",
       "noSpace": "背包空间不足，无法存放解绑后的物品。"
+    },
+    "commissionBoard": {
+      "title": "委托订单",
+      "close": "关闭委托订单",
+      "openButton": "订单",
+      "openButtonAria": "打开委托订单板",
+      "intro": "委托一位工匠为你制作一件物品，或接下别人发布的订单。",
+      "formTitle": "发布委托",
+      "recipeLabel": "物品",
+      "recipeEmpty": "你还不会制作任何可委托的装备配方。",
+      "scopeLabel": "谁可以接单",
+      "scopeOpen": "任何人（公开板）",
+      "scopeCrafter": "指定工匠",
+      "crafterNameLabel": "工匠名称",
+      "crafterNamePlaceholder": "角色名称",
+      "openSubmit": "发布订单",
+      "sectionMine": "我的委托",
+      "sectionToCraft": "我承接的委托",
+      "sectionBoard": "公开委托板",
+      "boardEmpty": "目前没有公开的委托订单。",
+      "mineEmpty": "你还没有发布任何委托。",
+      "toCraftEmpty": "你目前没有承接任何人的委托。",
+      "rowFor": "{item}，委托人：{requester}",
+      "rowTargeted": "{item}，委托人：{requester}（指定工匠：{crafter}）",
+      "acceptedBy": "已由{name}接单",
+      "statusOpen": "待接单",
+      "statusAccepted": "已接单",
+      "statusDelivered": "已交付",
+      "statusCancelled": "已取消",
+      "statusExpired": "已过期",
+      "cancelButton": "取消",
+      "acceptButton": "接单",
+      "deliverButton": "交付",
+      "deliverHint": "先制作出委托的物品（勾选委托选项），再回到这里交付。",
+      "opened": "你发布了一份{item}的委托订单。",
+      "cancelled": "你取消了{item}的委托订单。",
+      "accepted": "你接下了{item}的委托订单。",
+      "delivered": "你将{item}交付给了{name}。",
+      "denyUnknownRecipe": "该配方不存在。",
+      "denyNotCommissionEligible": "该配方无法委托制作。",
+      "denyUnknownCrafter": "未找到该名称的角色。",
+      "denySelfCrafter": "你不能委托自己。",
+      "denyTooManyOpen": "你的待接单委托订单已达上限。",
+      "denyUnknownOrder": "该委托订单已不存在。",
+      "denyOrderNotOpen": "该委托订单已不再开放。",
+      "denySelfOrder": "你不能接下自己发布的委托订单。",
+      "denyNotEligibleCrafter": "该委托订单是发给另一位工匠的。",
+      "denyNotYourOrder": "这不是你的委托订单。",
+      "denyOrderNotAccepted": "该委托订单尚未被接单。",
+      "denyNotYourAcceptance": "你并未接下该委托订单。",
+      "denyNotCrafted": "请先制作出委托物品（勾选委托选项）。",
+      "denyOutOfRange": "你必须靠近委托人才能交付委托。",
+      "denyNoSpace": "委托人的背包空间不足。"
     },
     "finder": {
       "title": "地下城查找器",
@@ -2715,7 +3187,8 @@ export const zh_CN: EnTranslations = {
         "raise_fallen": "亡者复生（周期性召唤小怪）",
         "soul_rend": "灵魂撕裂（被标记者需分散并接受治疗）",
         "deathless_rage": "不死之怒（需在护符石处打断）",
-        "wardstones": "护符石引导（阶段转换）"
+        "wardstones": "护符石引导（阶段转换）",
+        "dread_curse": "恐惧诅咒（仅英雄难度，累加坦克轮换减益）"
       }
     },
     "deeds": {
@@ -2727,6 +3200,7 @@ export const zh_CN: EnTranslations = {
       "countLabel": "{earned}/{total} 项功绩",
       "completionAria": "已获得功绩：{earned}/{total}",
       "recentLabel": "最近：",
+      "recentJumpAria": "跳转到{name}",
       "nearestLabel": "即将达成：",
       "filterGroupAria": "筛选功绩",
       "filterAll": "全部",
@@ -2780,14 +3254,14 @@ export const zh_CN: EnTranslations = {
       "lbSelfAccount": "你的账号：第 {rank} 名，位居前 {percent}%，名望 {renown}",
       "lbSelfRank": "你的账号：第 {rank} 名，位居前 {percent}%",
       "lbEmpty": "暂无上榜的编年史家。",
-      "broadcastsLabel": "与公会和好友分享功绩达成",
+      "broadcastsLabel": "与公会成员和关注者分享功绩达成，并向 Discord 动态分享功绩与杰作卡片",
       "titledName": "{name}【{title}】"
     },
     "continentMap": {
       "title": "世界地图",
       "summary": "世界地图。选择一个地区以打开其地图。",
       "toWorld": "世界地图",
-      "toZone": "Zone map",
+      "toZone": "地区地图",
       "toggleAria": "在世界地图和地区地图之间切换",
       "levels": "等级 {min} 到 {max}"
     }
@@ -2929,8 +3403,29 @@ export const zh_CN: EnTranslations = {
       "account_taken": "该 Steam 账号已关联到另一个账号。",
       "upstream": "Steam 未响应。请稍后重试。"
     },
+    "epic": {
+      "disabled": "Epic 关联当前不可用。",
+      "invalid_token": "Epic 无法验证此关联请求。请在桌面客户端中重试。",
+      "banned": "该 Epic 账号无法关联。",
+      "already_linked": "你的账号已关联一个 Epic 账号。",
+      "account_taken": "该 Epic 账号已关联到另一个账号。",
+      "upstream": "Epic 未响应。请稍后重试。"
+    },
     "wallet": {
       "handoff_invalid": "钱包授权已过期或无法验证。请重试。"
+    },
+    "ota_updates": {
+      "invalid_input": "输入无效。"
+    },
+    "seeker": {
+      "native_only": "Seeker 权益仅可在原生应用中使用。",
+      "attestation_failed": "设备验证失败。请重试。",
+      "solana_artifact_required": "请使用 Solana Store 版应用继续。",
+      "wallet_required": "请先关联并验证钱包。",
+      "genesis_token_required": "需要已验证的 Seeker Genesis Token。",
+      "genesis_token_claimed": "该 Seeker Genesis Token 已被领取。",
+      "entitlement_required": "需要已验证的 Seeker 权益。",
+      "current_ownership_required": "需要当前持有 Seeker Genesis Token。"
     }
   },
   "guide": {
@@ -2964,6 +3459,7 @@ export const zh_CN: EnTranslations = {
       "talents": "天赋",
       "arena": "竞技场与 PvP",
       "valeCup": "溪谷杯",
+      "thornhollow": "荆谷原野",
       "deeds": "功绩之书",
       "glossary": "术语表",
       "wishIKnew": "我希望早点知道的事",
@@ -3133,16 +3629,21 @@ export const zh_CN: EnTranslations = {
       "groupInterface": "界面",
       "groupCamera": "镜头",
       "talents": "天赋",
+      "professions": "专业",
       "arena": "竞技场",
       "leaderboard": "排行榜",
       "deeds": "功绩之书",
+      "sheathe": "收起/拔出武器",
       "crafting": "制作",
       "valeCup": "溪谷杯",
+      "mount": "骑乘 / 下骑",
       "calendar": "活动日历",
+      "dungeonFinder": "地下城查找器",
       "discord": "Discord",
       "abilities": "使用动作条技能（数字键行；第二条动作条位于小键盘）",
       "targetFriendly": "选中最近的友方",
       "cycleFriendly": "循环选择友方目标",
+      "targetAuras": "目标增益和减益效果",
       "gameMenu": "打开游戏菜单与选项",
       "bothMouse": "鼠标左右键",
       "runForward": "向前奔跑",
@@ -3153,7 +3654,7 @@ export const zh_CN: EnTranslations = {
       "mobileHeading": "移动端操作",
       "mobileBody": "在手机和平板上会自动出现触控操作：左侧是移动摇杆，在其他任意位置拖动即可环顾四周，用两根手指捏合可缩放镜头，屏幕上还有用于使用技能和打开菜单的按钮。左上角的一个小箭头可以显示或隐藏菜单按钮，那里的“更多”按钮则收纳着你其余的窗口。",
       "controllerHeading": "使用手柄",
-      "controllerBody": "手柄同样可用，且默认开启手柄支持。左摇杆控制移动，右摇杆控制镜头，正面按键与肩部按键则负责你的技能、跳跃和互动。打开像背包这样的窗口即可调出屏幕指针，而游戏菜单则可用方向键和正面按键直接操作。你可以在选项的手柄设置中重新映射按键，并调整摇杆死区、镜头速度、震动以及反转视角。"
+      "controllerBody": "手柄同样可用，且默认开启手柄支持。左摇杆控制移动，右摇杆控制镜头，正面按键与肩部按键则负责你的技能、跳跃和互动。打开像背包这样的窗口即可调出屏幕指针，而游戏菜单则可用方向键和正面按键直接操作。你可以在选项的手柄设置中重新映射按键，并调整摇杆死区、镜头速度、震动以及反转视角，还可以将一个按键绑定为拉近或拉远镜头（默认未绑定）。"
     },
     "settingsPage": {
       "heading": "设置和性能",
@@ -3531,14 +4032,6 @@ export const zh_CN: EnTranslations = {
         "name": "爬行类",
         "desc": "冷血的猎手，带着独有的嘶声与撕咬，与温血的野兽截然不同。"
       },
-      "murloc": {
-        "name": "蛙鳍族",
-        "desc": "湖岸与潮池间呱呱叫的鱼人族群，谁涉水靠得太近，它们便会一拥而上。"
-      },
-      "kobold": {
-        "name": "林间小妖",
-        "desc": "在林间空地与树篱下窜来窜去的拾荒者和小妖精，单个不过讨人嫌，聚成一群才成祸患。"
-      },
       "demon": {
         "name": "恶魔",
         "desc": "来自裂隙彼端的入侵者，浑身是火焰与怨毒。只要有一只现身，裂口就绝不会远。"
@@ -3677,7 +4170,7 @@ export const zh_CN: EnTranslations = {
       "bastionBody": "一座沉入沼泽、被淹没守军和不断上涨的潮水所占据的失落要塞。",
       "templeBody": "沼泽小路旁一座沉没的圣殿，是为好奇者与有备而来者准备的岔路。",
       "sanctumBody": "棘峰的黑暗核心，邪教漫长的图谋在此达到可怖的顶点。",
-      "wildheartBody": "一座被暖雨浸透的丛林火山口，两条高起的猎径环绕着碧色深潭。穿过兽巢与先祖遗迹，在仪式金字塔上迎战祖尔加。",
+      "wildheartBody": "一座被暖雨浸透的丛林火山口，两条高起的猎径环绕着碧色深潭。穿过兽巢与先祖遗迹，在仪式金字塔顶端看看是谁在等待。",
       "raidName": "终局团队副本",
       "raidBody": "在一扇封印的皇家大门之后，等待着一场十人试炼：一场多阶段的战斗，以及一股不死之力，需要整支团队齐心协力将其镇压。先赢得入场资格，再带上九位好友。",
       "heroicTitle": "英雄模式",
@@ -3742,23 +4235,25 @@ export const zh_CN: EnTranslations = {
       "duelsBody": "可以向你遇到的任何玩家发起一场友好的决斗。除了荣誉，没有任何东西被押上，因此这是了解某种对局，或友好地一较高下的最简单方式。",
       "coliseumHeading": "灰烬角斗场",
       "coliseumBody": "斗技场是王国的竞技场，你将在排名赛中对阵其他玩家，一对一或二对二皆可。每个组别都各自记录排名，因此一场胜利便能让你在那条天梯上攀升，让全王国的人都看得见。打开竞技场窗口，即可独自或与你的搭档一同报名参加某个组别。",
-      "fiestaHeading": "二对二嘉年华",
-      "fiestaBody": "嘉年华是一种快节奏的二对二混战，以一场连续不断的对局进行，每位战斗者都被拉到同一起跑线上。随着战斗推进，你会选取增幅，即时重塑你套路的快速强化，因此没有哪两场比赛的玩法会完全相同。",
-      "augmentsNote": "增幅和强化只在本场比赛中有效。它们关乎的是趣味、即兴的临场构筑，而非长久的强势，因此没人能靠花钱赢得胜利。",
-      "wavesTitle": "增幅分波登场",
-      "wavesBody": "嘉年华的每一场对局都会随着进程递给你全新的选择，比赛持续得越久，可选的强化就愈发大胆。你从一波构筑到下一波，每次从寥寥几个选项中挑选其一，并在这场对局余下的时间里一直保留它。",
-      "waveSilverTitle": "白银",
-      "waveSilverBody": "开场一波：干净利落的单项属性提升，磨砺你职业的基本功。",
-      "waveGoldTitle": "黄金",
-      "waveGoldBody": "中段一波：双刃组合，你的构筑在此开始成型、绽放光彩。",
-      "wavePrismaticTitle": "棱彩",
-      "wavePrismaticBody": "最后一波：足以定义构筑、炸裂屏幕的爆发，意在以最酣畅淋漓的方式让你直呼离谱。",
-      "yumiHeading": "守护Yumi",
-      "yumiBody": "Protect Yumi是一种在迷宫中进行的团队目标模式：每队守护自己的猫咪使魔，同时猎杀对方的。两只猫咪会不时闪现到迷宫的新角落，战斗在防守、追猎与寻回之间不断摇摆。可选择3对3或5对5排队；阵亡只会让你短暂离场。",
-      "powerupsTitle": "竞技场中的强化道具",
-      "powerupsBody": "激战正酣时，发光的能量球还会落入竞技场，谁先抢到便归谁。它们刻意夸张到极致，且只持续片刻：极速恶魔让你瞬间快得令人目眩，巨像将你膨胀成步履蹒跚的庞然大物，月靴带来低重力的弹跳腾跃，狂战士则让你猛然涌起一股暴怒。",
       "ladderHeading": "攀登天梯",
       "ladderBody": "排名对战会长期追踪你的排名。查看排行榜，看看你身处何处，以及谁占据着这片位面的榜首。"
+    },
+    "thornhollowPage": {
+      "heading": "荆谷原野",
+      "intro": "一场排位 5v5 夺旗战场，战场位于棘峰之下老林中的围墙山谷：两座废弃要塞沿着峡谷两端遥遥相对，中间是一座更古老的庭院，谁都不曾真正占据。每方五人，两座要塞，一个目标：夺走敌方战旗并抢在对方之前带回家。",
+      "queueHeading": "排队参战",
+      "queueBody": "打开荆谷原野面板即可单人排队,也可以组一支最多五人的小队一同排队:小队总在同一边,空位由单人勇士补齐。十人就位后,比赛会把双方安置在各自要塞,短暂列队后旗帜生效。",
+      "fieldHeading": "战场地形",
+      "fieldBody": "一片有围墙的露天战场,被隔成三个区域:两队各自的前场,以及夹在中间的废墟中庭。两道横贯全场的隔墙划出边界,穿行区域之间必须经过争夺点:宽阔的正门,或是骑跨在隔墙上的门楼小屋,其错位的两扇门逼你绕过伏击死角。每座要塞除正门外全部封死,夺旗进出只有这一个口;正门前还有一道矮壁垒挡住直冲的路线。中庭里有空心的中央废墟与两枚侧翼疾行符文,另外两枚守在两旗的接近路上。每个正门的中庭入口处还有一枚战斗或守护符文(短时间内提升伤害或减免伤害):两个符文台开局同面,每次拾取后翻面。",
+      "flagsHeading": "旗帜",
+      "flagsBody": "每座要塞守着本队军旗。夺取敌旗并送到己方旗座即可得分;先夺得三次者获胜,超时的战斗按比分定胜负。旗手阵亡时旗帜就地掉落:敌人可以再次拾起,而本队队员只需靠近便能立即将其送回。军旗也绝不藏身:拾旗会解除潜行,旗手若以任何方式隐身,旗帜都会当场掉落。",
+      "pickupNote": "拾旗永远需要主动按下战场动作键:没有人会因为跑过旗帜而意外成为旗手。",
+      "respawnHeading": "战场阵亡",
+      "respawnBody": "死亡保留经典仪式:尸体停在原地,直到你亲自释放灵魂;灵魂会在你方主堡旁的围栏墓地中升起,并被结界束缚,直到你方下一波复活潮。复活潮会同时唤起所有等待的灵魂;两队的复活潮刻意错开,战斗永远不会同时完全重置。这里没有跑尸,也没有灵魂医者的交易:释放、等潮、再战。",
+      "carrierHeading": "扛旗",
+      "carrierBody": "扛着敌旗太久的旗手会越来越脆弱,承受的伤害持续增加,直到旗帜被夺回、掉落或归还。抱旗躲藏是败招;把旗送回家才是胜途。",
+      "ladderHeading": "天梯",
+      "ladderBody": "每场比赛无论胜负都会移动角色的战场评分,历史总榜记录王国的冠军。胜利与鏖战到底的失利也会通过战争体系发放荣誉。"
     },
     "valeCupPage": {
       "heading": "溪谷杯",
@@ -3900,6 +4395,8 @@ export const zh_CN: EnTranslations = {
       "sourcesBody": "早期的升级大多来自任务奖励，所以与其刷怪，不如完成任务更划算。敌人被击败时会掉落装备，城镇里的商人贩售扎实的基础货色，制作者能把采集来的材料打造成可穿戴的装备，玩家市场则让你能从其他冒险者那里买东西。而在山顶，两种特殊货币能买到别处绝无仅有的装备：探秘看守人处的探秘印记，以及英雄军需官处的英雄徽记。",
       "soulboundTitle": "灵魂绑定：唯你独有",
       "soulboundBody": "许多珍贵的装备都是灵魂绑定的，从你获得的那一刻起便与你的角色绑定。灵魂绑定的物品无法交易、无法邮寄、无法卖给商人，也无法在市场上挂单；它如今是你故事的一部分，无人能替你携带。",
+      "uniqueTitle": "装备唯一：同一件传说只能穿一件",
+      "uniqueBody": "传说物品是装备唯一的：你的角色同一时间只能穿戴某件传说物品的一份，其英雄版本也算作同一件物品。第二份可以放在背包、银行或市场里，但试图同时穿戴两份会被拒绝。物品提示上还带有金色的\"装备唯一\"标签，让你在围绕两件传说规划配装之前就能看到这条规则。",
       "setsTitle": "套装与套装效果",
       "setsBody": "有些护甲成套出现，数件装备在外观与战斗风格上浑然一体。同时穿戴足够多的同套部件，套装便会苏醒，在每件单品自身属性之外额外授予加成，而你穿的部件越多，加成就越强。少数这样的套系会在你升级途中作为珍贵掉落现身；其中最了不起的那些则来自接近等级上限的最高难度组队内容，因此凑齐一整套是经典的终局目标。",
       "consumablesTitle": "消耗品",
@@ -3921,7 +4418,7 @@ export const zh_CN: EnTranslations = {
     "professions": {
       "intro": "除了战斗和任务之外，这个世界还会奖励你耕耘土地与执掌熔炉：采集原材料，通过十种制作行业将其打造成装备与货物，并在这些行业所代表的十种命途之一中确立自己的身份。",
       "harvestTitle": "收获狩猎本身",
-      "harvestBody": "采集并不止步于资源节点。有些被击杀的野兽也可以从尸体上采集出材料：兽皮、尖牙、丝线，以及更稀奇的东西，与它的普通战利品一并直接取自尸体。每具尸体只容一位收获者：谁先采集，就归谁所有。每次如何取舍也由你决定：把尸体能给的全部取走，或专注于单一一种材料，换取它更精细的品级。任何角色都可以采集，无需行业也无需训练，而一件格外精良的材料上，甚至会带着采集者的名字。",
+      "harvestBodyChoice": "采集并不止步于资源节点。许多被击杀的野兽都可以被采集一次，先到先得：兽皮、尖牙、丝线与兽肉，与它的普通战利品一并直接取自尸体，一次按键就会同时打开两者。当一头野兽身上不止一种可用材料时，如何取舍便由你决定：把它能给的全部取走，或专注于更少的材料，换取你所取之物明显更精细的品级。\n\n在能产出标本的族群身上掷出精良或更高的采集品质时，除普通产出之外还会额外获得一件署名的完美标本（一块Pristine Hide、一块Pristine Silk、一枚Pristine Venom Gland或一份Prime Cut），并在你的功绩之书中记下A Perfect Specimen。任何角色都可以采集，无需训练；而你拥有的任何采集工具，无论属于哪一门行业，都会计入最上等材料的判定。",
       "focusTitle": "城镇专注",
       "focusBody": "每座主城都为过路的采集者备有一块城镇专注面板：站在城镇里，从小地图旁打开它，把一小笔专注点数投向你在意的那些材料种类。此后每具尸体上产出的受专注材料都会精细一个品级、也略微丰厚一些；你的分配会跟随你的角色走遍各地，而且日后任何一次回到城镇，都可以免费重新调整。",
       "craftHowTitle": "制作窗口",
@@ -3951,7 +4448,7 @@ export const zh_CN: EnTranslations = {
       "deedsHeading": "铭记旅程的功业",
       "deedsBody": "功业之书伴随这一切：首次调谐获得Craftsworn，首次杰作获得Masterwright，均可作为头衔佩戴。八种可修行业各在技能50设有里程碑功业，并在上限125加冕Grandmaster头衔；钓鱼在100熟练获得Old Salt，200获得Master Angler头衔。\n\n此外还有更静默的篇章：首次采集与首次制作的功业、野外奇遇中的意外收获，以及拾起拆解之路的印记。这一切皆为装饰，只有头衔与声望。功业永不赋予力量，它只证明你曾在场。",
       "startHeading": "从哪里开始",
-      "startBody": "初到Eastbrook？找Foreman Odell接下A Trade for Every Hand，他会指给你镇西南Copper Dig一带的矿脉。此后旅途中经过的每处矿脉、树木与草药都值得采集。回到镇上按T打开制作窗口，先做人人都会的普通配方，再去锻造坊、厨房、织机与工坊拜访诸位大师，顺便接下他们的工作订单换取稳定的铜板。等公会的信找到你时，你早已知道哪一对行业才是归宿。",
+      "startBody": "初到Eastbrook？找Foreman Odell接下A Trade for Every Hand，他会指给你镇东南Copper Dig一带的矿脉。此后旅途中经过的每处矿脉、树木与草药都值得采集。回到镇上按T打开制作窗口，先做人人都会的普通配方，再去锻造坊、厨房、织机与工坊拜访诸位大师，顺便接下他们的工作订单换取稳定的铜板。等公会的信找到你时，你早已知道哪一对行业才是归宿。",
       "colStation": "工位",
       "colHub": "主城",
       "colMaster": "大师",
@@ -4046,7 +4543,7 @@ export const zh_CN: EnTranslations = {
           "materialsHeading": "钓竿与猎刀供养的食柜",
           "materialsBody": "钓鱼按区域供应招牌食材：Eastbrook Vale的镜鳟与河鲈，Mirefen Marsh的沼狗鱼与泥鳗，Thornpeak Heights的霜鳃鳟与板鳍鲤，每一档都烹本档的鱼。屠夫的一侧来自尸体采集：野味肉，以及精良采集掷出的署名Prime Cut（大烤肉的核心）。草药调味，梣木熏鳗，Cooking Salt在Marlow摊位8铜一袋。",
           "ladderHeading": "从肉干到大烤肉",
-          "ladderBody": "Salted Jerky是野外配方：初始即会、一条蛛腿、随处可做。训练师梯子在广场西侧的Eastbrook厨房：免费档技能0（河鲈、Hunter's Game Skewer、Herbed Marsh Pike），中档技能25每个25银（Ashwood Smoked Eel、Goldleaf Game Stew、Frostgill Chowder），精良档技能50每个1金（Silvered Carp Supper、Angler's Feast Platter、Marlow's Grand Roast）。批量菜省料：熏鳗与炖肉每次两份，宴会拼盘三份。",
+          "ladderBody": "Salted Jerky是野外配方：初始即会、一条蛛腿、随处可做。训练师梯子在广场东侧的Eastbrook厨房：免费档技能0（河鲈、Hunter's Game Skewer、Herbed Marsh Pike），中档技能25每个25银（Ashwood Smoked Eel、Goldleaf Game Stew、Frostgill Chowder），精良档技能50每个1金（Silvered Carp Supper、Angler's Feast Platter、Marlow's Grand Roast）。批量菜省料：熏鳗与炖肉每次两份，宴会拼盘三份。",
           "routeHeading": "专精而非杰作，以及通往125之路",
           "routeBody": "烹饪是杰作故事里诚实的例外：菜肴没有属性可提升，永不触发，也不必追。这门手艺的精通在于75的专精：每样食材省五分之一（批量菜上叠加极快），外加移动野外厨房，让宴席在副本门口出锅。边钓边做，两门技能互相供养：免费档到25，中档到50，精良档到75；此后精良菜衰减为半速与四分之一，到上限约再做150次。Marlow的订单每30分钟收八块野味肉。技能50记下Seasoned Chef，125是Grandmaster Cooking头衔。"
         },
@@ -4076,7 +4573,7 @@ export const zh_CN: EnTranslations = {
           "levelingHeading": "附魔如何升级",
           "levelingBody": "两种行动推动技能：分解与施加附魔，每次成功最多一点，按工作的分量折算：普通分解与纯粉尘附魔算普通活；优秀分解与精华附魔算优秀活；精良分解与所有Runed或Greater附魔算精良活；史诗与传说分解更高。熟悉的精通衰减按25点层级作用：普通活在技能75变灰，优秀活在100，精良活恰在125上限。附魔另有一份仁慈：高于命途上限的输入向下取整而非归零，宣誓前史诗分解按精良计而非一无所获；若附魔沦为休眠，一切按普通活计，爬升停在75；作为爱好则精良活仍有收益，只是75之后变慢。",
           "marketHeading": "附魔副本、出处与市场",
-          "marketBody": "施加附魔消耗材料并标记特定的一件副本。用在背包中的副本上，交还一件独立的附魔副本；用在已穿戴的装备上，则就地附魔，无需脱下再穿上。无论哪种，加成都永远跟随。一件一附魔：对附魔副本施加另一个附魔会先要求确认，然后直接替换旧附魔，旧附魔被摧毁且不退还材料；出售、丢弃与分解都优先取用普通副本，成品不会被误吞；完全相同的附魔副本还能叠放。杰作与附魔是朋友：杰作完全可附魔，附魔叠加在杰作加成与署名之上互不干扰；署名杰作配Greater附魔是工艺品的极致，仍按设计低于团本战利品。世界市场只经手无标记的普通货，附魔与署名件都面对面交易；材料才是可上市的一半：粉尘、精华与碎片自由挂单，挂单免费，成交才抽5%。"
+          "marketBody": "施加附魔消耗材料并标记特定的一件副本。用在背包中的副本上，交还一件独立的附魔副本；用在已穿戴的装备上，则就地附魔，无需脱下再穿上。无论哪种，加成都永远跟随。一件一附魔：对附魔副本施加另一个附魔会先要求确认，然后直接替换旧附魔，旧附魔被摧毁且不退还材料；出售、丢弃与分解都优先取用普通副本，成品不会被误吞；完全相同的附魔副本还能叠放。杰作与附魔是朋友：杰作完全可附魔，附魔叠加在杰作加成与署名之上互不干扰；署名杰作配Greater附魔是工艺品的极致，仍按设计低于团本战利品。附魔与署名件如今也能上架：每件以单件挂单出售，物品提示会显示附魔与制作者印记，渡鸦邮驿同样可以寄送；材料依旧是稳定的一半：粉尘、精华与碎片自由挂单，挂单免费，成交才抽5%。"
         }
       },
       "howHeading": "制作流程",
@@ -4126,12 +4623,16 @@ export const zh_CN: EnTranslations = {
       "nodesHeading": "各区域节点",
       "nodesNote": "节点的位置、阶级、所需工具与产出；每个节点在你采集后{respawn}秒才会为你本人刷新。",
       "toolsHeading": "工具",
-      "toolsNote": "每一处节点都需要背包里备有对应行业的工具，1阶节点也不例外：没有采矿镐就采不到矿石，没有鱼竿就钓不上鱼。商人阶梯覆盖1到3阶，各主城均有备货；工具只需放在背包里即可，没有装备栏位，也没有耐久，因此每件都是一次性购置。门槛只看阶级：工具的品质颜色纯属外观。\n\n商人阶梯之上还有两件制作工具，4阶与5阶，由工程师在工坊打造，任何NPC都不出售。目前没有任何节点需要3阶以上的工具，因此它们眼下的价值在于速度：顶级工具能把低阶节点的采集读条压到时间下限；等更高阶的地界开放时，它们便是入场券。",
+      "toolsNote": "每处资源点都需要对应行业的工具放在背包里，第 1 级也不例外：没有镐就采不到矿，没有鱼竿就钓不到鱼。商人阶梯覆盖第 1 到 3 级，每个聚落只出售自己周边地形用得上的等级，因此第 1 级工具在每个区域聚落都有售，更高的等级则在需要它们的矿脉附近出售。购买这些更高等级时，商人还会要求你在该行业中具备熟练度，第 2 级需要 {tier2Prof}，第 3 级需要 {tier3Prof}，商品行会注明该要求。工具只需放在背包中即可，没有装备栏也没有耐久度，因此每件都是一次性购买，你已经拥有的工具会一直有效。只有等级会影响限制：同等级中更稀有的工具并不会多开放任何东西。不过稀有度并不只是颜色，它会让镶嵌的工具效果持续更久，装在鱼竿上还会加宽收线时机。\n\n更好的工具带来三样东西，而不是两样。它开放更高等级的地形，缩短采集时间，还会提升产出：用等级高于该区域自身材料的工具开采矿脉，收获的将是精制品级而非普通品级。该矿脉必须是这个区域的完整品级矿脉，因此区域为旅行者保留的简易矿脉依然产出普通材料。精制材料正是制作工具配方所消耗的东西，而且在任何配方或工单要求普通版本的地方，精制品级都可以顶替，所以升级永远不会让你陷入困境：只是你的铜矿石会以精制铜矿石的形式到手。\n\n在商人阶梯之上，每个行业还有两件制作工具，第 4 级和第 5 级，由工程师在工具工坊制作，或在溺诵秘所的柜台用秘境印记购买。任何商人都不会用金币出售它们。钓鱼有自己的一对鱼竿，它们需要向工具匠学习，而非一开始就会。目前没有任何资源点或水域需要超过第 3 级，因此最高的两级买到的是速度、品级和更宽松的收线时机而非准入资格，等更高等级的地形出现时，它们将成为入场券。",
       "toolCrafted": "制作获得（{craft}）",
+      "toolCraftedOrMarks": "由{craft}制作，或用 {marks} 秘境印记购买",
+      "toolCraftedOrMarksHeroic": "由{craft}制作，或在溺亡连祷英雄难度通关后用 {marks} 秘境印记购买",
       "toolVendor": "{name}（{hub}）",
       "toolUnavailable": "无出售",
       "priceNone": "无出售",
       "toolTierReq": "{tier}阶工具",
+      "colWield": "使用熟练度",
+      "wieldNone": "不限",
       "yieldsHeading": "一次采集的收获",
       "yieldsBody": "每次采集都会掷出品质，而熟练度决定一切：新手永远采到普通品，熟练度越高，权重越向高品质移动，绝不倒退。到100上限时普通品完全消失：60%优秀、30%精良、8%史诗、2%传说。品质也意味着数量：普通1个，优秀与精良2个，史诗3个，传说4个。精良及以上的收获都会以你的名字署名（Gathered by），封顶时十次采集有四次带着你的名字。",
       "bandsHeading": "熟练度区间",
@@ -4152,6 +4653,7 @@ export const zh_CN: EnTranslations = {
         "startBody": "一根Simple Fishing Pole在Eastbrook的Fisherman Brandt处只卖20铜（他在镇东缘望着Mirror Lake）；Tinker Gizzel、Fenbridge的Provisioner Hale和Highwatch的Quartermaster Bree也有存货。面向前方约24码内足够深的水面使用鱼竿即可抛竿。战斗中、游泳时或死亡时无法抛竿：站在岸上钓才是正途，任何区域的可钓水域都行。",
         "biteHeading": "咬钩与收线",
         "biteBody": "抛竿后{min}到{max}秒之间鱼会咬钩（更好的鱼竿最多缩短{rod}秒等待），收线窗口持续{reel}秒、鱼竿每高一阶再加{reelRod}秒，单次垂钓最长{cap}秒。",
+        "earlyReelNote": "心急的钓手注意：鱼咬钩之前再按鱼竿，只会收回空线并结束这次垂钓（抛竿后的短暂宽限会原谅误触的连点）。耐心就是钓鱼的全部：等咬钩，再收线。",
         "scheduleHeading": "熟练度成长",
         "scheduleNote": "钓鱼成长按熟练度遵循固定档位，且从{cutoff}起，钓上杂物不再有任何成长。",
         "colProficiency": "熟练度",
@@ -4187,7 +4689,7 @@ export const zh_CN: EnTranslations = {
         "sellsHeading": "什么好卖，为什么",
         "sellsBody": "最稳的生意是消耗品，因为用掉就要再买：药水、熟食与附魔都随使用而消失。杰作是高端市场：无法定制，想要的人只能出高价，而上面的署名就是行走的招牌。原料是第三支柱：分解所得的奥术材料、直接从拆解者流向附魔师的各类Resonant次级材料，以及追逐杰作触发的工匠愿意溢价收购的署名采集品。",
         "marketHeading": "世界市场与抽成",
-        "marketBody": "世界市场是全服交易所，由Eastbrook的Merchant与Highwatch的Auctioneer Voss主持。挂单免费，没有押金，流拍原样退回；只在成交时抽取5%。重要限制：市场只经手无标记的普通货，署名、杰作、附魔或已绑定的副本一律不收，这些特殊物品只能面对面通过交易窗口转手。",
+        "marketBody": "世界市场是全服交易所，由Eastbrook的Merchant与Highwatch的Auctioneer Voss主持。挂单免费，没有押金，流拍原样退回；只在成交时抽取5%。特殊物品同样欢迎：署名、杰作或附魔的副本会以单件挂单上架，提示中带着完整的身份与署名，且绝不与普通堆叠混同。唯一拒收的是已绑定的副本：被制作者之约锁定（或仍待绑定）的物品既不能上市也不能邮寄，绑定无法被洗白。特殊物品请自行定价；普通挂单只能告诉你普通版的行情。",
         "workOrdersHeading": "工作订单",
         "workOrdersNote": "每位大师都会以商店价的{pct}%收购一批本行常用材料，每{minutes}分钟可重复一次。",
         "colOrder": "工作订单",
@@ -4200,8 +4702,16 @@ export const zh_CN: EnTranslations = {
         "provenanceBody": "精良及以上的成品与发现都带有制作者的署名，而署名完全相同的物品仍可堆叠。",
         "collectorsHeading": "收藏家、战利品与故事的价格",
         "collectorsBody": "商人看不见出处：署名物品卖给NPC只值普通价，签名的溢价只存在于玩家之间。名家署名的横财矿石、一块Prime Cut、一柄署着已退隐工匠之名的杰作之刃，价格全凭记忆开价。功业之书里的Pristine Vein、Ancient Heartwood、Moonlit Bloom、A Perfect Specimen与Glimmer of Hope都是零声望的收藏印记，只为证明那一刻发生在你身上。出处不买属性也不赢战斗，它是这游戏里美好日子的存根。",
-        "throttleHeading": "操作限频",
-        "throttleBody": "制作、分解、附魔与回收共用一个限频：每{seconds}秒最多{actions}次操作。",
+        "castPaceHeading": "读条时间与金币消耗",
+        "castPaceBody": "专业动作需要真实读条时间：简单的野外配方不到两秒，高阶阶梯配方则需要数秒；分解、附魔、拆解与工具效果充能各自有固定的短读条。中途取消不会损失材料。每次成功制作还会按物品预算支付铜币费用。加上材料、工作台与技能上限，这种节奏在不设额外动作配额的情况下，也能让市场保持健康。各技能区间的精确读条时间见下表。",
+        "castPaceField": "无技能要求的野外配方：施放 {seconds} 秒",
+        "castPaceSkill25": "技能25以下配方：施放 {seconds} 秒",
+        "castPaceSkill50": "技能50以下配方：施放 {seconds} 秒",
+        "castPaceSkill75": "技能75以下配方：施放 {seconds} 秒",
+        "castPaceCombo": "顶级与组合配方：施放 {seconds} 秒",
+        "castPaceEnchantFamily": "分解、附魔与拆解：施放 {seconds} 秒",
+        "castPaceRecharge": "工具效果充能：施放 {seconds} 秒",
+        "castPaceBatch": "批量制作：单次最多 {count} 件，逐件施放",
         "doctrineHeading": "玩家与玩家交易",
         "doctrineBody": "制作装备的强度始终低于团队副本的底线，而上述费用会把货物推向玩家之间的交易，而非商店循环。"
       },
@@ -4246,7 +4756,7 @@ export const zh_CN: EnTranslations = {
       "tradeBody": "你可以与站在身旁的任何人面对面交易。双方将物品与钱币放入一个共享窗口，唯有两人都确认后才会完成交换，因此谁也不会吃亏。这是把掉落物递给朋友或敲定一笔买卖最简单的方式。",
       "mailTitle": "渡鸦邮驿",
       "mailBody": "每座主城都立着一根雕成渡鸦的石柱：那是渡鸦邮驿的邮箱，这个王国的信件服务。站在柱旁，便可按名字写信给任何角色，无论对方在线还是久未登录，并支付少许邮资，在信中附上钱币或货物。渡鸦要飞上一小段时间；当它降落时，一个信封指示标会提醒收件人有东西在等着。",
-      "mailHow": "领取则是同样的流程反过来：站在任意石柱旁阅读你的信件，把信中所附收入钱袋与背包。信件不会永远等候，所以要赶在渡鸦对你失去耐心之前领取。有两样东西邮驿一概拒收：灵魂绑定的物品与任务物品，它们只随你本人同行。另外，漂亮地交还一个任务之后，记得留意石柱；有些任务发布者是会写信的。",
+      "mailHow": "领取则是同样的流程反过来：站在任意石柱旁阅读你的信件，把信中所附收入钱袋与背包。信件不会永远等候，所以要赶在渡鸦对你失去耐心之前领取。有几样东西邮驿一概拒收：灵魂绑定的物品、任务物品，以及已绑定或将随交易绑定的物品，它们只随你本人同行。另外，漂亮地交还一个任务之后，记得留意石柱；有些任务发布者是会写信的。",
       "dailyTitle": "每日奖励",
       "dailyBody": "屏幕上有一个宝箱按钮，点击即可打开每日奖励窗口。每天都会列出几项任务：完成任务、在灰烬斗技场中作战、赢下一场溪谷杯比赛，还提供一次免费的转盘抽奖，这些都能为当天的排名累积积分；当日积分最高者会共享一个奖池，面向持有可选社区代币的玩家。这一切都不会赋予游戏中的战力。窗口本身会写明当天的规则与参赛资格，展示排行榜，并保留你的历史记录。",
       "marketTitle": "世界市场",
@@ -4659,6 +5169,7 @@ export const zh_CN: EnTranslations = {
       "terrainCapReached": "已达到地形编辑上限（{max}）。多余的雕刻印记未被添加。",
       "placementCapReached": "已达到放置上限（{max}）。多余的资源未被添加。",
       "blockerCapReached": "已达到空气墙上限（{max}）。新墙未被添加。",
+      "campCapReached": "已达到营地上限（{max}）。新营地未被添加。",
       "autosaveOff": "自动保存已关闭：{reason} 请手动保存后再重新开启。"
     },
     "confirm": {
@@ -4933,6 +5444,199 @@ export const zh_CN: EnTranslations = {
     "realm": "服务器",
     "newCharacter": "新建角色",
     "appearance": "外观",
+    "customize": "自定义",
+    "body": "体型",
+    "genderMale": "男性",
+    "genderFemale": "女性",
+    "hair": "发型",
+    "brows": "眉毛",
+    "skinTone": "肤色",
+    "hairColor": "发色",
+    "lightness": "明暗",
+    "colorWheelAria": "{label}色轮：拖动以选择色相和饱和度",
+    "lightnessAria": "{label}明暗",
+    "customColor": "自定义",
+    "colorPresetAria": "{label}预设 {n}",
+    "beard": "胡须",
+    "face": "脸型",
+    "faceNose": "鼻子",
+    "faceEyes": "眼睛大小",
+    "faceJaw": "下颌",
+    "faceBrow": "眉骨",
+    "faceCheeks": "脸颊",
+    "faceChin": "下巴",
+    "bodyShoulders": "肩膀",
+    "bodyChest": "胸部",
+    "bodyHips": "臀部",
+    "bodyHands": "手部大小",
+    "bodyElbows": "手肘",
+    "bodyKnees": "膝盖",
+    "bodyFeet": "脚部",
+    "mouth": "嘴巴",
+    "mouthNeutral": "普通",
+    "mouthLips": "丰唇",
+    "mouthSmile": "微笑",
+    "mouthFrown": "皱眉",
+    "mouthWide": "宽阔",
+    "mouthPout": "撅嘴",
+    "mouthGrin": "咧嘴笑",
+    "mouthOpen": "张开",
+    "mouthAwe": "惊讶",
+    "faceEars": "耳朵",
+    "faceSmirk": "坏笑",
+    "eyeShape": "眼型",
+    "eyeColor": "瞳色",
+    "earShape": "耳型",
+    "lashes": "睫毛",
+    "lashesOn": "开启",
+    "lashesOff": "关闭",
+    "lashColor": "睫毛颜色",
+    "outfit": "套装颜色",
+    "outfitClassic": "经典",
+    "outfitCrimson": "绯红",
+    "outfitEmber": "余烬",
+    "outfitGold": "金色",
+    "outfitForest": "森林绿",
+    "outfitEmerald": "翡翠绿",
+    "outfitTeal": "青色",
+    "outfitAzure": "蔚蓝",
+    "outfitRoyal": "宝蓝",
+    "outfitViolet": "紫罗兰",
+    "outfitMagenta": "洋红",
+    "outfitRose": "玫瑰",
+    "outfitOnyx": "玛瑙黑",
+    "outfitIvory": "象牙白",
+    "outfitGilded": "鎏金",
+    "outfitBonewrought": "骸骨铸造",
+    "outfitObsidian": "黑曜石",
+    "outfitVerdigris": "铜绿",
+    "outfitBloodforged": "血锻",
+    "lipstick": "口红",
+    "blush": "腮红",
+    "eyeshadow": "眼影",
+    "makeupNone": "无",
+    "shadeRose": "玫瑰色",
+    "shadeCoral": "珊瑚色",
+    "shadeRuby": "宝石红",
+    "shadeBerry": "莓果色",
+    "shadePlum": "李子色",
+    "shadeNude": "裸色",
+    "shadePeach": "蜜桃色",
+    "shadeWarm": "暖调",
+    "shadeMauve": "藕荷色",
+    "shadeSmoke": "烟灰色",
+    "shadeBronze": "古铜色",
+    "shadeTeal": "青色",
+    "randomize": "随机外观",
+    "randomizeShort": "随机",
+    "helmPreview": "显示头盔",
+    "style": "风格",
+    "resetLook": "重置外观",
+    "resetShort": "重置",
+    "browFlat": "平直",
+    "browArched": "拱形",
+    "browThin": "细眉",
+    "browBushy": "浓眉",
+    "browWorried": "八字",
+    "browSharp": "锐利",
+    "browRound": "圆润",
+    "eyeRound": "圆眼",
+    "eyeAlmond": "杏眼",
+    "eyeNarrow": "细眼",
+    "eyeWide": "大眼",
+    "eyeSharp": "锐眼",
+    "eyeDroopy": "垂眼",
+    "eyeSleepy": "睡眼",
+    "eyeWideset": "宽间距",
+    "eyeCat": "猫眼",
+    "eyeDoe": "鹿眼",
+    "earRound": "圆耳",
+    "earPointed": "尖耳",
+    "earSmall": "小耳",
+    "earWide": "宽耳",
+    "hairBald": "光头",
+    "hairBuzz": "寸头",
+    "hairCrew": "板寸",
+    "hairCrewcut": "层次板寸",
+    "hairPixie": "精灵短发",
+    "hairSweptpixie": "侧梳精灵短发",
+    "hairQuiff": "蓬松背头",
+    "hairSidepart": "经典侧分",
+    "hairMessy": "凌乱刺发",
+    "hairCurlycap": "短卷发",
+    "hairPompadour": "飞机头",
+    "hairSweptback": "中长后梳",
+    "hairFauxhawk": "假莫西干",
+    "hairMohawk": "莫西干",
+    "hairTopknot": "头顶发髻",
+    "hairWarriorbraid": "战士辫",
+    "hairHighbun": "高发髻",
+    "hairLowbun": "低发髻",
+    "hairBraidcrown": "编发皇冠",
+    "hairAfro": "爆炸头",
+    "hairCurlyafro": "卷发爆炸头",
+    "hairChinbob": "齐下巴波波头",
+    "hairBluntbangs": "齐刘海波波头",
+    "hairWavybob": "波浪波波头",
+    "hairAsymbob": "不对称波波头",
+    "hairCurtains": "中分窗帘",
+    "hairHighpony": "高马尾",
+    "hairSidepony": "侧马尾",
+    "hairHalfbun": "半扎丸子头",
+    "hairLayered": "及肩层次",
+    "hairCurls": "蓬松卷发",
+    "hairLongwavy": "长卷波浪发",
+    "hairLongcenterpart": "长发中分",
+    "hairLongpart": "长直中分",
+    "hairMullet": "厚重鲻鱼头",
+    "hairTwinbraids": "双麻花辫",
+    "hairLowpony": "低马尾",
+    "hairFantasybraid": "奇幻长辫",
+    "beardNone": "无",
+    "beardStubble": "胡茬",
+    "beardScruff": "短须",
+    "beardMutton": "大鬓角",
+    "beardGoatee": "山羊胡",
+    "beardChinpuff": "下巴胡",
+    "beardStache": "胡子",
+    "beardHorseshoe": "马蹄胡",
+    "beardShortbox": "方形胡",
+    "beardFull": "络腮胡",
+    "beardVikingb": "编织胡",
+    "beardWizard": "法师长须",
+    "beardStubbleBeard": "浓密胡茬",
+    "browNone": "无",
+    "browSoft": "柔和",
+    "browThick": "浓密",
+    "browAngled": "上扬",
+    "earrings": "耳环",
+    "jewelMaterial": "首饰材质",
+    "jewelDefault": "原样",
+    "jewelGold": "黄金",
+    "jewelSilver": "白银",
+    "jewelBone": "骨质",
+    "jewelIron": "玄铁",
+    "jewelCopper": "紫铜",
+    "jewelBronze": "青铜",
+    "jewelObsidian": "黑曜石",
+    "jewelJade": "翡翠",
+    "jewelAmethyst": "紫水晶",
+    "jewelRuby": "红宝石",
+    "jewelPearl": "珍珠",
+    "jewelTurquoise": "绿松石",
+    "earNone": "无",
+    "earStud": "耳钉",
+    "earHoop": "圆环",
+    "earBone": "骨饰",
+    "earBonehoop": "骨环",
+    "earMoon": "新月",
+    "earMoonstar": "月华之星",
+    "earRunic": "符文石",
+    "earChain": "串珠坠",
+    "earSeptum": "鼻环",
+    "earWarden": "守望者之铁",
+    "earCuff": "耳骨夹",
+    "earFeather": "羽毛",
     "class": "职业",
     "name": "名称",
     "chromaOption": "配色 {n}",
@@ -5014,6 +5718,7 @@ export const zh_CN: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "持有者特权已启用。需要签名或消费时请连接应用。",
     "extensionHelp": "若要在此处看到钱包，请保持 Solflare Wallet 等浏览器钱包扩展处于启用状态。",
     "mobileAppHelp": "选择 Phantom 或 Solflare。钱包应用会请求批准。请保持游戏打开，完成后返回游戏。",
+    "seekerAppHelp": "使用 Seed Vault Wallet 继续。在 Seed Vault 中查看连接和验证请求，然后返回游戏。",
     "standaloneAppHelp": "主屏幕应用暂不支持连接钱包。若要使用 Phantom 或 Solflare，请在 Safari 或 Chrome 中打开 World of ClaudeCraft。",
     "openAppTitle": "在 {wallet} 中继续",
     "openAppHelp": "打开 {wallet} 查看此请求。钱包应用处于活动状态时，请保持此游戏标签页打开。",
@@ -5641,7 +6346,6 @@ export const zh_CN: EnTranslations = {
   "yumi": {
     "bracket3": "Yumi 3v3",
     "bracket5": "Yumi 5v5",
-    "enterQueue": "加入Protect Yumi！",
     "queue": {
       "join": "你加入了Protect Yumi队列。守好你的使魔……",
       "leave": "你离开了Protect Yumi队列。",
@@ -5679,9 +6383,6 @@ export const zh_CN: EnTranslations = {
   },
   "fiesta": {
     "bracket": "Fiesta",
-    "enterQueue": "加入Fiesta！",
-    "practice": "🎉 对战机器人练习",
-    "practiceNote": "离线练习：生成3个AI机器人并将你排入2v2 Fiesta队列。再次点击即可停止。",
     "banner": {
       "wave": "第{wave}/{total}波——选择一项强化！",
       "augmentGained": "获得强化：{name}！",
@@ -5746,6 +6447,7 @@ export const zh_CN: EnTranslations = {
     },
     "augment": {
       "choose": "选择一项强化",
+      "cardAria": "{name}（{category}）：{description}",
       "aug_brutality": {
         "name": "残暴",
         "desc": "你的物理打击造成的伤害提高15%。"
@@ -5937,10 +6639,16 @@ export const zh_CN: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "正在下载更新 {version}...",
-      "ready": "更新 {version} 已就绪。退出游戏时将自动安装，也可立即重启。",
+      "checkingTitle": "正在检查更新...",
+      "checkingBody": "游戏会自动保持最新版本。",
+      "uptodateTitle": "当前已是最新版本。",
+      "downloadingTitle": "正在下载更新 {version}...",
+      "downloadingBody": "可以继续游戏，更新将在退出游戏时安装。",
+      "readyTitle": "更新 {version} 已就绪",
+      "readyBody": "退出游戏时将自动安装，也可立即重启。",
       "restart": "立即重启",
-      "later": "稍后"
+      "later": "稍后",
+      "dismiss": "关闭"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -6128,11 +6836,12 @@ export const zh_CN: EnTranslations = {
       "releaseSpirit": "释放灵魂",
       "chatTab": "聊天",
       "combatLogTab": "战斗记录",
-      "chatPlaceholder": "说点什么...（/s 说话，/w 名字 密语，/r 回复，/p 队伍，/gu 公会，/o 官员，/general 综合）",
+      "chatPlaceholder": "说点什么...（/s 说话，/w 名字 密语，/r 回复，/p 队伍，/gu 公会，/o 官员，/general 综合，! 显示社区指令）",
       "chatChannels": {
         "add": "添加聊天频道",
         "addTitle": "添加频道",
         "close": "关闭{channel}标签",
+        "moveHint": "重新排列{channel}标签：拖动，或使用 Alt+左和 Alt+右",
         "sendingTo": "发送至{channel}",
         "names": {
           "say": "说话",
@@ -6155,7 +6864,6 @@ export const zh_CN: EnTranslations = {
       "mobileMore": "更多",
       "mobileMoreAria": "显示更多菜单",
       "mobileSocial": "社交",
-      "mobileArena": "竞技场",
       "mobileMenu": "菜单",
       "mobileSettings": "设置",
       "mobileUse": "使用",
@@ -6189,11 +6897,15 @@ export const zh_CN: EnTranslations = {
       "graphicsPresetMedium": "中",
       "graphicsPresetHigh": "高",
       "graphicsPresetUltra": "超高",
+      "graphicsPresetInsane": "极致",
       "graphicsPresetAdvanced": "高级",
       "terrainDetail": "地形细节",
       "foliageDensity": "植被密度",
       "effectsQuality": "特效和光照",
       "shadowQuality": "阴影质量",
+      "surfaceDetail": "表面细节",
+      "surfaceDetailBasic": "基础",
+      "surfaceDetailFull": "完整",
       "terrainLow": "低",
       "terrainHigh": "高",
       "touchOpacity": "触控控件透明度",
@@ -6268,7 +6980,7 @@ export const zh_CN: EnTranslations = {
         "nameplates": "切换姓名板",
         "meters": "伤害统计",
         "social": "好友与公会",
-        "arena": "竞技场（灰烬斗技场）",
+        "arena": "PvP(荆谷原野与竞技场)",
         "chat": "打开聊天",
         "attack": "攻击",
         "actionBarSlot": "动作条 {slot}"
@@ -6357,6 +7069,8 @@ export const zh_CN: EnTranslations = {
       "joinParty": "加入队伍",
       "guildInvite": "{name} 邀请你加入 {guild}。",
       "joinGuild": "加入公会",
+      "guildInviteCancelled": "由于公会已重命名，一项待处理的公会邀请已取消。",
+      "guildRenamed": "你的公会已被管理团队重命名为 {name}。",
       "tradeRequest": "{name} 想与你交易。",
       "openTrade": "打开交易",
       "duelRequest": "{name} 向你发起了决斗挑战！",
@@ -6370,6 +7084,10 @@ export const zh_CN: EnTranslations = {
       "floatingDodge": "闪避",
       "floatingParry": "招架",
       "floatingResist": "抵抗",
+      "floatingEvade": "回避",
+      "floatingBlock": "{amount} 格挡",
+      "floatingHealFull": "已满",
+      "floatingHealAbsorbed": "被吸收",
       "cannotMove": "无法移动！",
       "attack": "攻击",
       "damageDone": "你的{ability}击中{target}，造成 {amount} 点伤害。",
@@ -6380,10 +7098,17 @@ export const zh_CN: EnTranslations = {
       "dodged": "{target}闪避了你的{ability}。",
       "parried": "{target}招架了你的{ability}。",
       "resisted": "{target}抵抗了你的{ability}。",
+      "evaded": "{target}回避了你的{ability}。",
+      "blockedDone": "{target}格挡了你的{ability}，造成 {amount} 点伤害。",
+      "blockedTaken": "你格挡了{source}的攻击，受到 {amount} 点伤害。",
       "healSelf": "你的{ability}为你恢复 {amount} 点生命。",
       "healSelfCrit": "你的{ability}对你造成暴击治疗，恢复 {amount} 点生命。",
       "healOther": "你的{ability}为{target}恢复 {amount} 点生命。",
       "healOtherCrit": "你的{ability}对{target}造成暴击治疗，恢复 {amount} 点生命。",
+      "healSelfFull": "你的{ability}生效了，但你的生命值已满。",
+      "healOtherFull": "你的{ability}在{target}身上生效了，但目标的生命值已满。",
+      "healSelfAbsorbed": "你的{ability}被你身上的枯萎吞噬了。",
+      "healOtherAbsorbed": "你的{ability}被{target}身上的枯萎吞噬了。",
       "death": "{name}死亡。",
       "auraGain": "你获得了 {name}。",
       "auraFade": "{name}从你身上消失。",
@@ -6392,6 +7117,11 @@ export const zh_CN: EnTranslations = {
     },
     "system": {
       "playerDeath": "你已经死亡。",
+      "deathRecapKillerAbility": "你已经死亡。被{killer}的{ability}击杀。",
+      "deathRecapKiller": "你已经死亡。被{killer}击杀。",
+      "deathRecapAbility": "你已经死亡。死于{ability}。",
+      "deathRecapFalling": "你已经死亡。你摔死了。",
+      "deathRecapDrowned": "你已经死亡。你淹死了。",
       "respawn": "你再次感到精力恢复、身体完整。",
       "ignoringChat": "已屏蔽来自 {name} 的聊天。",
       "noLongerIgnoring": "不再屏蔽 {name}。",
@@ -6472,10 +7202,12 @@ export const zh_CN: EnTranslations = {
       "arenaQueueTrading": "请先完成交易再加入队列。",
       "arenaQueueInstance": "你不能在副本内加入队列。",
       "tradeInProgress": "已有交易正在进行。",
+      "tradeAlreadyTrading": "该玩家已在交易中。",
       "tradeTooFar": "目标太远，无法交易。",
       "tradeExpired": "交易请求已过期。",
       "tradeFailed": "交易失败：物品或金钱已不可用。",
-      "tradeBound": "该物品已绑定，无法交易。"
+      "tradeBound": "该物品已绑定，无法交易。",
+      "marketListBound": "该物品已绑定，无法上架。"
     },
     "logs": {
       "standUp": "你站了起来。",
@@ -6635,6 +7367,10 @@ export const zh_CN: EnTranslations = {
         "officer": "官员",
         "member": "成员"
       },
+      "tenure": {
+        "recruit": "新兵",
+        "veteran": "老兵"
+      },
       "guildHeadOne": "你是{rank}，{count}名成员",
       "guildHeadMany": "你是{rank}，{count}名成员"
     },
@@ -6741,24 +7477,29 @@ export const zh_CN: EnTranslations = {
     "cast": {
       "fishing": "钓鱼",
       "gathering": "采集",
+      "crafting": "制作",
+      "disenchanting": "分解",
+      "enchanting_apply": "附魔",
+      "salvaging": "拆解",
+      "tool_recharge": "充能",
       "demonHeal": "恶魔治疗",
       "thunzharrStormcall": "风暴召唤",
-      "rift_frost_execution": "Glacial Grave",
-      "rift_frost_strike": "Absolute Zero",
-      "rift_ember_execution": "Magma Well",
-      "rift_ember_strike": "Core Meltdown",
-      "rift_venom_execution": "Venom Pool",
-      "rift_venom_strike": "Broodmother's Mark",
-      "rift_necro_execution": "Soul Grave",
-      "rift_necro_strike": "Death Sentence",
-      "rift_brute_execution": "Earthshatter",
-      "rift_brute_strike": "Final Judgment",
-      "rift_arcane_execution": "Void Rift",
-      "rift_arcane_strike": "Arcane Annihilation",
-      "rift_storm_execution": "Lightning Rod",
-      "rift_storm_strike": "Stormcaller's Wrath",
-      "rift_tide_execution": "Abyssal Maw",
-      "rift_tide_strike": "Crushing Depth"
+      "rift_frost_execution": "冰川之墓",
+      "rift_frost_strike": "绝对零度",
+      "rift_ember_execution": "岩浆泉",
+      "rift_ember_strike": "核心熔毁",
+      "rift_venom_execution": "毒液池",
+      "rift_venom_strike": "蜘蛛母后之印",
+      "rift_necro_execution": "灵魂之墓",
+      "rift_necro_strike": "死亡判决",
+      "rift_brute_execution": "碎地之力",
+      "rift_brute_strike": "终极审判",
+      "rift_arcane_execution": "虚空裂隙",
+      "rift_arcane_strike": "奥术湮灭",
+      "rift_storm_execution": "避雷针",
+      "rift_storm_strike": "风暴召唤者之怒",
+      "rift_tide_execution": "深渊之口",
+      "rift_tide_strike": "粉碎深渊"
     }
   },
   "questUi": {
@@ -6766,7 +7507,8 @@ export const zh_CN: EnTranslations = {
       "title": "任务",
       "complete": "完成",
       "showOnMap": "在地图上显示{name}",
-      "hideFromMap": "在地图上隐藏{name}"
+      "hideFromMap": "在地图上隐藏{name}",
+      "unknownQuest": "未知任务（{id}）"
     },
     "log": {
       "title": "任务日志",
@@ -6778,6 +7520,8 @@ export const zh_CN: EnTranslations = {
       "activeStatus": "进行中",
       "readyStatus": "完成",
       "completedStatus": "已完成",
+      "repeatableStatus": "可重复",
+      "cooldownStatus": "稍后可再次接取",
       "returnTo": "返回 {name} 处",
       "abandon": "放弃任务",
       "abandonConfirmTitle": "放弃任务",
@@ -6791,6 +7535,7 @@ export const zh_CN: EnTranslations = {
       "greetingFallback": "你好。",
       "availableQuestAria": "可接任务：{name}",
       "readyQuestAria": "可交付任务：{name}",
+      "repeatableQuestAria": "可重复任务：{name}",
       "discussQuest": "谈论{name}。",
       "discussQuestAria": "谈论任务：{name}",
       "profIntroHint": "请找{name}接取《{quest}》。",
@@ -6831,7 +7576,8 @@ export const zh_CN: EnTranslations = {
       "incomplete": "该任务尚未完成。",
       "giverMissing": "该任务发布者不在附近。",
       "turnInMissing": "该任务交付点不在附近。",
-      "tooFar": "距离太远。"
+      "tooFar": "距离太远。",
+      "escortAway": "你要护送的人现在不在原处，稍后就会回来。"
     }
   },
   "itemUi": {
@@ -6870,6 +7616,8 @@ export const zh_CN: EnTranslations = {
       "armor": "护甲",
       "quest": "任务物品",
       "junk": "杂物",
+      "fineMaterial": "优质材料",
+      "material": "材料",
       "food": "食物",
       "drink": "饮料",
       "tool": "工具",
@@ -6901,8 +7649,14 @@ export const zh_CN: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "使用：在 {seconds} 秒内恢复 {amount} 点生命值。进食时必须保持坐下。",
       "useDrink": "使用：在 {seconds} 秒内恢复 {amount} 点法力值。饮水时必须保持坐下。",
+      "useElixir": "使用：使你的{stat}提高 {value} 点，持续 {minutes} 分钟。战斗中可用。",
+      "useElixirAura": "使用：获得{aura}效果，持续 {minutes} 分钟。战斗中可用。",
       "questItem": "任务物品",
+      "questRelated": "任务：{quest}",
+      "questRules": "无法出售、存入银行或交易。",
+      "questOrphaned": "当前没有进行中的任务需要此物品。",
       "classes": "职业：{classes}",
+      "maxStack": "最大堆叠：{count}",
       "sellPrice": "出售价格：{money}",
       "clickBuy": "点击购买",
       "clickSell": "点击出售",
@@ -6929,7 +7683,13 @@ export const zh_CN: EnTranslations = {
       "stackCount": "x{count}",
       "destroyTitle": "摧毁 {item}",
       "destroyConfirm": "摧毁",
-      "destroyCancel": "取消"
+      "destroyCancel": "取消",
+      "unknownItem": "未知物品",
+      "unknownItemAria": "未知物品 {id}，数量 {count}",
+      "unknownItemAriaMasterwork": "未知物品 {id}，数量 {count}，杰作",
+      "unknownItemAriaEnchanted": "未知物品 {id}，数量 {count}，已附魔的副本",
+      "unknownItemAriaBound": "未知物品 {id}，数量 {count}，已绑定的副本",
+      "unknownItemAriaInstanced": "未知物品 {id}，数量 {count}，带工匠印记的物品"
     },
     "equipment": {
       "empty": "空",
@@ -6940,6 +7700,19 @@ export const zh_CN: EnTranslations = {
       "close": "关闭商人",
       "hint": "此窗口打开时，点击背包中的物品即可出售。",
       "buyAria": "以 {price} 购买 {item}",
+      "buyAriaWithRequirement": "以 {price} 购买 {item}。{requirement}",
+      "buyStack": "购买 {count} 个",
+      "buyStackAria": "以 {price} 购买 {count} 个 {item}",
+      "qtyRowAria": "购买数量",
+      "qtyMultiple": "{count}个",
+      "qtyMultipleAria": "每次购买 {count} 份",
+      "qtyCustom": "自定义",
+      "qtyCustomAria": "选择自定义购买数量",
+      "buyCountAria": "以 {price} 购买 {count} 个 {item}",
+      "buyCountAriaWithRequirement": "以 {price} 购买 {count} 个 {item}。{requirement}",
+      "buyQuantityTitle": "购买多少 {item}？最多 {max}。",
+      "buyQuantityInput": "要购买的数量",
+      "buyQuantityConfirm": "购买",
       "buybackTitle": "回购",
       "buybackEmpty": "没有物品",
       "buybackAria": "以 {price} 回购 {item}",
@@ -7018,6 +7791,12 @@ export const zh_CN: EnTranslations = {
       "reclaim": "取回",
       "buyAria": "以 {price} 购买 {item}",
       "reclaimAria": "取回 {item}",
+      "buyConfirmTitle": "确认购买",
+      "buyConfirmBody": "以 {price} 购买 {item}？",
+      "buyConfirmBodyStack": "以 {price} 购买 {item} x{count}（每个 {each}）？",
+      "buyConfirmAccept": "购买",
+      "buyConfirmCancel": "取消",
+      "buyChanged": "该上架在你确认前发生了变化。请核对价格后重试。",
       "sellNote": "从背包上架货物。物品售出时商人抽取 {cut}%。你正在使用 {used}/{max} 个上架位。",
       "sellPickEmpty": "点击背包中的物品来选择要出售的货物。",
       "quantity": "数量",
@@ -7028,6 +7807,8 @@ export const zh_CN: EnTranslations = {
       "collectEmpty": "没有待领取内容。销售收益和过期上架会在这里领取。",
       "collectNote": "商人为你保管的收益和退回货物。",
       "saleProceeds": "销售收益",
+      "saleBuyer": "售予{buyer}",
+      "saleOlder": "另有 {count} 笔较早的交易，已计入总额。",
       "collectAll": "全部领取"
     },
     "logs": {
@@ -7219,7 +8000,7 @@ export const zh_CN: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "强效隐形术",
-        "description": "消失 20 秒：移除 2 个持续伤害效果，并使你在隐形期间及结束后短时间内受到的伤害降低 90%。（法师天赋）"
+        "description": "消失 20 秒并移除 2 个持续伤害效果。隐形结束时，受到的伤害降低 90%，持续 2 秒。（法师天赋）"
       },
       "hot_streak": {
         "name": "炽热连击",
@@ -8505,6 +9286,18 @@ export const zh_CN: EnTranslations = {
       "fen_muster_order": {
         "name": "芬桥集结令"
       },
+      "firebottle": {
+        "name": "火油瓶"
+      },
+      "murloc_hut": {
+        "name": "泥鳍茅屋"
+      },
+      "restless_skull": {
+        "name": "不宁颅骨"
+      },
+      "vanguard_bone": {
+        "name": "先锋之骨"
+      },
       "mire_prowler_pelt": {
         "name": "泥沼潜伏者毛皮"
       },
@@ -9030,6 +9823,27 @@ export const zh_CN: EnTranslations = {
       "cinderweave_slippers": {
         "name": "织烬便鞋"
       },
+      "thornhide_headdress": {
+        "name": "荆棘兜帽"
+      },
+      "thornhide_mantle": {
+        "name": "荆棘披肩"
+      },
+      "thornhide_vestment": {
+        "name": "荆棘法衣"
+      },
+      "thornhide_cinch": {
+        "name": "荆棘腰带"
+      },
+      "thornhide_leggings": {
+        "name": "荆棘护腿"
+      },
+      "thornhide_gloves": {
+        "name": "荆棘护手"
+      },
+      "thornhide_boots": {
+        "name": "荆棘软靴"
+      },
       "final_oath_medallion": {
         "name": "最终誓约勋章"
       },
@@ -9420,6 +10234,39 @@ export const zh_CN: EnTranslations = {
       "resonant_timber": {
         "name": "共鸣木材"
       },
+      "fine_copper_ore": {
+        "name": "优质铜矿石"
+      },
+      "fine_iron_ore": {
+        "name": "优质铁矿石"
+      },
+      "fine_thorium_ore": {
+        "name": "优质锇矿石"
+      },
+      "fine_ironbark_log": {
+        "name": "优质铁皮木原木"
+      },
+      "fine_ashwood_log": {
+        "name": "优质灰木原木"
+      },
+      "fine_elderwood_log": {
+        "name": "优质高松原木"
+      },
+      "fine_silverleaf_herb": {
+        "name": "优质润光叶草"
+      },
+      "fine_goldleaf_herb": {
+        "name": "优质金叶草"
+      },
+      "fine_sunpetal_herb": {
+        "name": "优质阳瓣草"
+      },
+      "stormreel_fishing_rod": {
+        "name": "风暴轮钓竿"
+      },
+      "tidewrought_fishing_rod": {
+        "name": "潮铸钓竿"
+      },
       "duskwisp_essence": {
         "name": "暮光灵精华"
       },
@@ -9557,6 +10404,18 @@ export const zh_CN: EnTranslations = {
       },
       "wildheart_fangknife": {
         "name": "祖尔加的獠牙匕首"
+      },
+      "fanglords_beastspear": {
+        "name": "獠牙领主的兽矛"
+      },
+      "bloodmane_warleggings": {
+        "name": "血鬃战争护腿"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "藤爪潜行马裤"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "日骨仪式纱笼"
       },
       "thick_winter_pelt": {
         "name": "厚实的冬季毛皮"
@@ -9725,6 +10584,39 @@ export const zh_CN: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "最后的堡垒印戒"
+      },
+      "gatherers_cache": {
+        "name": "采集者储囊"
+      },
+      "artisans_eye": {
+        "name": "匠人之眼"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "惊雷撼地者点火钥匙"
+      },
+      "reins_drakemaw_raptor": {
+        "name": "龙喉迅猛龙的缰绳"
+      },
+      "moggers_hide_quiver": {
+        "name": "莫格的兽皮箭袋"
+      },
+      "cragmaw_huntquiver": {
+        "name": "裂颚的狩猎箭袋"
+      },
+      "gravewyrm_bone_quiver": {
+        "name": "墓龙骨箭袋"
+      },
+      "direfang_quiver": {
+        "name": "恐牙箭袋"
+      },
+      "sharp_claw": {
+        "name": "锋利的爪"
+      },
+      "curved_tusk": {
+        "name": "弯曲的獠牙"
+      },
+      "pristine_claw": {
+        "name": "完美的爪"
       },
       "conjured_water4": {
         "name": "魔法泉水"
@@ -10302,6 +11194,24 @@ export const zh_CN: EnTranslations = {
       "wyrmchoir_handwraps": {
         "name": "龙唱裹手"
       },
+      "basin_stalkers_tunic": {
+        "name": "盆地潜猎者外衣"
+      },
+      "verdant_heart_vestment": {
+        "name": "翠心法衣"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "日骨仪式锁甲"
+      },
+      "greatfang_of_the_basin": {
+        "name": "盆地巨牙"
+      },
+      "sunbone_oracles_crown": {
+        "name": "日骨先知之冠"
+      },
+      "bloodmane_war_legguards": {
+        "name": "血鬃战争腿甲"
+      },
       "deathless_greatblade": {
         "name": "不死巨刃"
       },
@@ -10703,6 +11613,21 @@ export const zh_CN: EnTranslations = {
       "spider_egg_sac": {
         "name": "蜘蛛卵囊"
       },
+      "spider_egg": {
+        "name": "蛛母之卵"
+      },
+      "widow_hatchling": {
+        "name": "寡妇蛛幼体"
+      },
+      "drowned_warlord": {
+        "name": "溺亡督军"
+      },
+      "brakka_wallbreaker": {
+        "name": "破墙者布拉卡"
+      },
+      "threnos_first_voice": {
+        "name": "初声瑟雷诺斯"
+      },
       "grave_silt_bulwark": {
         "name": "墓淤壁垒"
       },
@@ -10882,6 +11807,18 @@ export const zh_CN: EnTranslations = {
       },
       "cindraleth_maw_matriarch": {
         "name": "辛德拉蕾丝，龙喉之母"
+      },
+      "dragonkin_egg": {
+        "name": "龙裔卵"
+      },
+      "dragonkin_whelp": {
+        "name": "龙裔幼崽"
+      },
+      "dragonkin_broodguard": {
+        "name": "龙裔巢卫"
+      },
+      "drakemaw_broodlord": {
+        "name": "龙喉巢主"
       },
       "gilded_stag": {
         "name": "鎏金雄鹿"
@@ -11272,6 +12209,11 @@ export const zh_CN: EnTranslations = {
         "title": "荣誉军需官",
         "greeting": "战场黄沙铭记每一场胜利。愿你妥善运用这份荣誉。"
       },
+      "warmarshal_draven_kole": {
+        "name": "战帅德拉文·科尔",
+        "title": "战争军备库总管",
+        "greeting": "我只收荣誉这一种货币，战争军备库由我看守。在战场上挣得你的军阶，我便为你披上迎接下一战的甲胄。"
+      },
       "loremaster_caddis": {
         "name": "凯迪斯博学者",
         "title": "博学者",
@@ -11636,7 +12578,7 @@ export const zh_CN: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "人人都有一技之长",
-        "text": "东溪人人除了舞刀弄剑，还得有门手艺，{playerName}。镇子西南的铜矿坑周围岩石里有矿脉。拿起矿镐，亲手开采5处；别想蒙我，我看得出差别。",
+        "text": "东溪人人除了舞刀弄剑，还得有门手艺，{playerName}。镇子东南的铜矿坑周围岩石里有矿脉。拿起矿镐，亲手开采5处；别想蒙我，我看得出差别。",
         "completion": "看吧？矿石采到了，手上也磨出了茧。赶路时继续采矿、伐木和采药；回城后，别忘了市场旁的城镇专注告示板和附近的制作台。只要你愿意，这些手艺都能换来公道的生计。",
         "objectives": {
           "0": {
@@ -11719,7 +12661,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_supplies": {
         "title": "被盗的补给",
-        "text": "强盗抢走了我的最后一辆货车，工具、盐和东溪亚麻都在里面。去东南山丘的营地夺回4个补给箱。",
+        "text": "强盗抢走了我的最后一辆货车，工具、盐和东溪亚麻都在里面。去西南山丘的营地夺回4个补给箱。",
         "completion": "我的箱子！几乎没有划痕。你真让人惊喜。",
         "objectives": {
           "0": {
@@ -11948,7 +12890,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_no_rest": {
         "title": "芦苇中不得安息",
-        "text": "香炉上的仪式会让溺亡者在湿地触及之处复起。我们还无法破除它，只能先少给敌人14名士兵。",
+        "text": "香炉上的仪式会让溺亡者复起，如今它已唤起一个强大到足以统领他们的存在。守望者称他为溺亡督军，只要他还占据沉没的礼拜堂，死者便阵列不散。打倒他，{playerName}，其余的自会溃散回泥沼。",
         "completion": "你给了死者比他们主人更多的怜悯。拿着，你早已应得。",
         "objectives": {
           "0": {
@@ -12101,7 +13043,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_old_cragmaw": {
         "title": "老裂颚",
-        "text": "山民给我斥候找到的爪印起过名字：老裂颚，一只满身伤疤的暴君巨猫，熬死了自己族群的三代。潜猎者涌上我的道路，就是因为它，{playerName}。它的巢穴在南路上方的西侧山脊。带个帮手去，了结那老魔头。",
+        "text": "山民给我斥候找到的爪印起过名字：老裂颚，一只满身伤疤的暴君巨猫，熬死了自己族群的三代。潜猎者涌上我的道路，就是因为它，{playerName}。它的巢穴在南路上方的东侧山脊。带个帮手去，了结那老魔头。",
         "completion": "它终于倒下了。山民曾发誓那只猫会比城墙活得还久。如今潜猎者会守在高处的雪原了，{playerName}，我的巡逻队走这条路也不必再流血。整条山脊都因你安静了下来。",
         "objectives": {
           "0": {
@@ -12226,9 +13168,6 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "击败龙教狂热者"
-          },
-          "1": {
-            "label": "龙教命令"
           }
         }
       },
@@ -12239,9 +13178,6 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "击败龙教死灵法师"
-          },
-          "1": {
-            "label": "仪式护命匣"
           }
         }
       },
@@ -12340,7 +13276,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_the_codfather": {
         "title": "鳕鱼教父",
-        "text": "鳕鱼教父不只是一条鱼，{playerName}，它是个冷血杀手。老人们发誓说它拿湿地徘徊者当早饭，就连米尔芬寡妇也会因恐惧而不敢在深沼浅滩附近结网。那片水域归它统治。拿上鱼竿，把那个老恶魔从它的水域里拖出来，我就承认你入了这个家族。",
+        "text": "鳕鱼教父不只是一条鱼，{playerName}，它是个冷血杀手。老人们发誓说它拿湿地徘徊者当早饭，就连米尔芬寡妇也会因恐惧而不敢在深沼浅滩附近结网。那片水域归它统治，而沼泽水域非得用一根铁轮钓竿不可，我柜台上就有卖。拿上一根，把那个老恶魔从它的水域里拖出来，我就承认你入了这个家族。",
         "completion": "湿地诸圣在上……鳕鱼教父本尊。看看那些胡须。芬桥会把这次收获讲上一整年，{playerName}。",
         "objectives": {
           "0": {
@@ -12360,7 +13296,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_nythraxis_graves": {
         "title": "被遗忘者的坟墓",
-        "text": "我以前见过这些标记，就在北方战场周围的三座旧坟上。奥德伦队长葬在东侧高地，马尔里克大祭司在中央破路旁，皇家刺客沃斯则在西侧峭壁边。触碰每座坟墓并倾听，{playerName}。死者或许记得生者遗忘的事。",
+        "text": "我以前见过这些标记，就在北方战场周围的三座旧坟上。奥德伦队长葬在西侧高地，马尔里克大祭司在西侧边缘更往南处，皇家刺客沃斯则在东侧峭壁边。触碰每座坟墓并倾听，{playerName}。死者或许记得生者遗忘的事。",
         "completion": "奥德伦依旧忠诚，马尔里克拒绝接受死亡，而沃斯比任何人都更早看见危险。他们三人都侍奉同一位被遗忘的国王。",
         "objectives": {
           "0": {
@@ -12376,7 +13312,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_nythraxis_sealed_crypt": {
         "title": "废弃墓穴",
-        "text": "幻象指向西侧峭壁中的废弃墓穴。古老传说称，那座墓穴曾安置一位国王。也许在马尔里克的仪式把他扭曲成不死之物后，荆峰将他封在了下面。进入墓穴，看看里面还剩下什么。",
+        "text": "幻象指向东侧峭壁中的废弃墓穴。古老传说称，那座墓穴曾安置一位国王。也许在马尔里克的仪式把他扭曲成不死之物后，荆峰将他封在了下面。进入墓穴，看看里面还剩下什么。",
         "completion": "钥石的两半合在了一起，而沃斯的日记写明了它们封印之物：尼思拉克西斯国王的印戒。如果日记属实，那枚印戒就是通往他陵墓的钥匙。",
         "objectives": {
           "0": {
@@ -12418,7 +13354,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_mogger": {
         "title": "莫格必须倒下",
-        "text": "莫格劈裂货车，踏平栅栏，杀死的牲口足以让半个谷地空掉。不要独自面对它。带两名强壮同伴去东边草地，把那蛮兽彻底放倒。",
+        "text": "莫格劈裂货车，踏平栅栏，杀死的牲口足以让半个谷地空掉。不要独自面对它。带两名强壮同伴去西边草地，把那蛮兽彻底放倒。",
         "completion": "莫格终于死了。东溪的田地更安全了，而你离开谷地时又多了一个值得传颂的故事。",
         "objectives": {
           "0": {
@@ -12478,7 +13414,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "重续经纬",
-        "text": "到底还是回到我的织机前了。我不记恨，{playerName}，可丝线记得那只放它走的手，而重新拾起的代价，每一次都量得更长。去剿除挤满西边树林的墨网潜伏者，这份苦工会在你的手再次触到好丝之前，先把它安顿稳当。",
+        "text": "到底还是回到我的织机前了。我不记恨，{playerName}，可丝线记得那只放它走的手，而重新拾起的代价，每一次都量得更长。去剿除挤满东边树林的墨网潜伏者，这份苦工会在你的手再次触到好丝之前，先把它安顿稳当。",
         "completion": "又稳了。制皮和裁缝作为主修技艺回到你手中。这一次，在你游荡之前先量两次。",
         "objectives": {
           "0": {
@@ -12488,7 +13424,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "重回灶台",
-        "text": "瞧瞧，谁又回到我的锅边了。不计前嫌，{playerName}，厨房里总有位置，可你知道，你每撂挑子走一回，这笔账就赊得更长。去东边草地里把野猪清一清，因为实打实的汗水是第一味料，它会让你的手重新记起这份活计。",
+        "text": "瞧瞧，谁又回到我的锅边了。不计前嫌，{playerName}，厨房里总有位置，可你知道，你每撂挑子走一回，这笔账就赊得更长。去西边草地里把野猪清一清，因为实打实的汗水是第一味料，它会让你的手重新记起这份活计。",
         "completion": "这才是那股老味道。炼金术和烹饪重新回到你的灶台上，成为主修技艺。这一次多留一阵吧。",
         "objectives": {
           "0": {
@@ -12867,7 +13803,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "送雯恩回家",
-        "text": "我的学徒雯恩两天前出门去巡融金线，就再没回来。我找到了她的足迹，她正躲在极光台阶西南边的路标底下，怕狼怕得不敢挪窝。我离不开这片沼泽，{playerName}。送她去台阶上薇拉的营地吧。在极光底下她会安全的。",
+        "text": "我的学徒雯恩两天前出门去巡融金线，就再没回来。我找到了她的足迹，她正躲在极光台阶东北边的路标底下，怕狼怕得不敢挪窝。我离不开这片沼泽，{playerName}。送她去台阶上薇拉的营地吧。在极光底下她会安全的。",
         "completion": "姑娘已经在帐里了，裹着我一半的毯子，叽叽喳喳快把星星都聊下来了。你今天做了件善事，{playerName}。这样的事，霜幕之境可不多见。",
         "objectives": {
           "0": {
@@ -13551,7 +14487,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "布拉姆回家",
-        "text": "晾网场的裂隙开启那天早晨，我的布拉姆出海了，海把他抛回了登岸口岬角外的什么地方。三夜之前我听见了他，{playerName}，隔着水面呼喊，而我吓得不敢去。现在也还是不敢。求求你。他的船就搁浅在北岸。把他领回家，交到我手上。",
+        "text": "晾网场的裂隙开启那天早晨，我的布拉姆出海了，海把他抛回了登岸口岬角外的什么地方。三夜之前我听见了他，{playerName}，隔着水面呼喊，而我吓得不敢去。现在也还是不敢。求求你。他的船就搁浅在南岸。把他领回家，交到我手上。",
         "completion": "布拉姆！你把他完完整整地带回来了，{playerName}。我们俩都哭了，谁也不觉得丢人。往后裂隙不管再从这座岛夺走什么，都别想夺走我的家人。再也不会了。",
         "objectives": {
           "0": {
@@ -14491,6 +15427,36 @@ export const zh_CN: EnTranslations = {
       "vale_arcanist": {
         "name": "谷地秘法师法衣",
         "bonus3": "攻击速度和施法速度提高 15%。"
+      },
+      "warfare_ashstalker": {
+        "name": "灰烬追猎者装备",
+        "bonus2": "战争防御等级提高 40 点。",
+        "bonus4": "战争攻击等级提高 40 点，敌对玩家对你施放的控制效果持续时间缩短 15%。",
+        "bonus7": "战争攻击等级和防御等级提高 80 点。击杀敌对玩家会触发“灰烬疾行”，使移动速度提高 40%，持续 6 秒。"
+      },
+      "warfare_cinderweave": {
+        "name": "烬织法衣",
+        "bonus2": "战争防御等级提高 40 点。",
+        "bonus4": "战争攻击等级提高 40 点，敌对玩家对你施放的控制效果持续时间缩短 15%。",
+        "bonus7": "战争攻击等级和防御等级提高 80 点。你的法术有 15% 的几率触发“余烬护壁”，吸收 120 点伤害，持续 8 秒。"
+      },
+      "warfare_furyforged": {
+        "name": "怒铸战装",
+        "bonus2": "战争防御等级提高 40 点。",
+        "bonus4": "战争攻击等级提高 40 点，敌对玩家对你施放的控制效果持续时间缩短 15%。",
+        "bonus7": "战争攻击等级和防御等级提高 80 点。击杀敌对玩家会触发“不破誓约”，吸收 200 点伤害，持续 10 秒。"
+      },
+      "warfare_stormbound": {
+        "name": "缚雷法衣",
+        "bonus2": "战争防御等级提高 40 点。",
+        "bonus4": "战争攻击等级提高 40 点，敌对玩家对你施放的控制效果持续时间缩短 15%。",
+        "bonus7": "战争攻击等级和防御等级提高 80 点。你的法术有 15% 的几率触发“余烬护壁”，吸收 120 点伤害，持续 8 秒。"
+      },
+      "warfare_thornhide": {
+        "name": "荆棘皮甲",
+        "bonus2": "战争防御等级提高 40 点。",
+        "bonus4": "战争攻击等级提高 40 点，敌对玩家对你施放的控制效果持续时间缩短 15%。",
+        "bonus7": "战争攻击等级和防御等级提高 80 点。你的法术有 15% 的几率触发“棘刺护身”，躲闪几率提高 15%，持续 6 秒。"
       },
       "wyrmshadow": {
         "name": "夜牙法衣",

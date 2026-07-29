@@ -1,5 +1,5 @@
 // Every enterable landform must be leavable on foot (the rule the Drakemaw
-// caldera suite enforces, tests/terrain_escape.test.ts). The Frostveil's
+// caldera suite enforces, tests/terrain_escape_walkout.test.ts). The Frostveil's
 // Glacier Tarn broke it: the tarn and its northern finger carve one merged
 // bowl whose sandy pond floor sits 10 to 25yd under a terraced icy rim, and a
 // player who jumped in could not climb back out at any azimuth (the player
@@ -20,6 +20,7 @@ import {
   WATER_LEVEL,
   waterLevelAt,
 } from '../src/sim/world';
+import { expectDefined } from './helpers/defined';
 
 // The production seed: the report is seed-pinned world geometry.
 const SEED = 20061;
@@ -42,9 +43,11 @@ function makeWalker(spot: { x: number; z: number }) {
   const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true });
   sim.setPlayerLevel(20);
   const p = sim.player;
-  const meta = (
-    sim as unknown as { players: Map<number, { moveInput: { forward: boolean } }> }
-  ).players.get((sim as unknown as { playerId: number }).playerId)!;
+  const meta = expectDefined(
+    (sim as unknown as { players: Map<number, { moveInput: { forward: boolean } }> }).players.get(
+      (sim as unknown as { playerId: number }).playerId,
+    ),
+  );
   p.pos.x = spot.x;
   p.pos.z = spot.z;
   p.pos.y = groundHeight(spot.x, spot.z, SEED) + 0.05;
@@ -106,23 +109,38 @@ describe('the Glacier Tarn bowl is leavable on foot', () => {
   });
 
   it('walks back down the ramp into the bowl without a fall', { timeout: 60_000 }, () => {
-    // start on the bench above the ramp top and walk down to the water
+    // start on the bench above the ramp top and walk down to the water,
+    // stopping AT arrival: a fixed-length walk overshoots once the descent
+    // is smooth, swimming clear across the tarn onto the far shore's
+    // elemental beach (whose aggro is that camp working as authored, not a
+    // ramp defect)
     const top = { x: r.bx - 4, z: r.bz };
     const { sim, p, meta } = makeWalker(top);
-    const startHp = p.hp;
     let airborneTicks = 0;
-    for (let i = 0; i < 20 * 10; i++) {
+    const fallDamage: number[] = [];
+    for (let i = 0; i < 20 * 20; i++) {
       meta.moveInput.forward = true;
       p.facing = DOWN_THE_RAMP;
-      sim.tick();
+      // Heal through the Rime Elementals camped in the bowl, the idiom the sweep
+      // walkers above use: their swings land on the way down and must never be
+      // read as the terrain hurting the walker (nor stop him by killing him).
+      p.hp = p.maxHp;
+      (p as unknown as { dead: boolean }).dead = false;
+      for (const e of sim.tick()) {
+        if (e.type === 'damage' && e.targetId === p.id && e.ability === 'Falling') {
+          fallDamage.push(e.amount);
+        }
+      }
       if (!p.onGround) airborneTicks++;
+      if (isInWaterBody(p.pos.x, p.pos.z) && p.pos.y < WATER_LEVEL + 1.5) break;
     }
     meta.moveInput.forward = false;
     // a slope no steeper than the climb gate is snapped down, never fallen
     // off (player_motion maxStepDown), so the descent must never go airborne
     expect(airborneTicks, 'the descent must never enter free fall').toBe(0);
-    expect(p.hp, 'the descent must cost no health').toBe(startHp);
-    expect((p as unknown as { dead: boolean }).dead).toBe(false);
+    // and the drop must never be billed to the walker: 'Falling' is the label
+    // player_motion puts on the environmental fall hit it deals on landing
+    expect(fallDamage, 'the descent must cost no health').toEqual([]);
     // and it must actually arrive in the bowl, at the pond
     expect(isInWaterBody(p.pos.x, p.pos.z), `ended at (${p.pos.x}, ${p.pos.z})`).toBe(true);
     expect(p.pos.y, 'the walker must end down at the pond, not on the rim').toBeLessThan(
@@ -142,7 +160,7 @@ describe('the Glacier Tarn ramp keeps the tarn intact', () => {
 
   it('holds water in both tarn lakes', () => {
     for (const lake of [TARN, TARN_FINGER]) {
-      expect(waterLevelAt(lake.x, lake.z)).toBe(WATER_LEVEL);
+      expect(waterLevelAt(lake.x, lake.z, SEED)).toBe(WATER_LEVEL);
       expect(terrainHeight(lake.x, lake.z, SEED), 'the basin must stay under water').toBeLessThan(
         WATER_LEVEL,
       );
@@ -151,7 +169,9 @@ describe('the Glacier Tarn ramp keeps the tarn intact', () => {
         const rad = (a * Math.PI) / 180;
         const x = lake.x + Math.sin(rad) * lake.radius * 0.6;
         const z = lake.z + Math.cos(rad) * lake.radius * 0.6;
-        expect(waterLevelAt(x, z), `water at ${a}deg of (${lake.x}, ${lake.z})`).toBe(WATER_LEVEL);
+        expect(waterLevelAt(x, z, SEED), `water at ${a}deg of (${lake.x}, ${lake.z})`).toBe(
+          WATER_LEVEL,
+        );
       }
     }
   });
@@ -161,14 +181,17 @@ describe('the Glacier Tarn ramp keeps the tarn intact', () => {
     // WEST FLANK and must not lift or dig the pond it runs down into. (The
     // east shallow at (60, 1630.4) is the tarn's own organic shore wobble,
     // above the waterline before the fix and after it.)
+    // (re-captured for the natural-relief heightfield: the tarn's partial-
+    // carve blend reads the base field, so these drift with any deliberate
+    // terrain change; the pin's job is unchanged, the RAMP must not move them)
     const bed: [number, number, number][] = [
-      [60, 1640, -7.6],
-      [69.6, 1640, -6.6074798367305],
-      [60, 1630.4, -4.421488179551974],
-      [58, 1634, -6.9929825395840535],
-      [48, 1652, -7.6],
-      [53.4, 1652, -7.597759267257777],
-      [42.6, 1652, -7.401574172538028],
+      [60, 1640, -7.4],
+      [69.6, 1640, -6.41885341413167],
+      [60, 1630.4, -4.236579941196264],
+      [58, 1634, -6.801476616934744],
+      [48, 1652, -7.4],
+      [53.4, 1652, -7.397785868179671],
+      [42.6, 1652, -7.204025313789661],
     ];
     for (const [x, z, h] of bed) {
       expect(terrainHeight(x, z, SEED), `pond bed at (${x}, ${z})`).toBeCloseTo(h, 10);
@@ -196,7 +219,7 @@ describe('the Glacier Tarn ramp keeps the tarn intact', () => {
   it('leaves the Rime Elemental camp ground untouched', () => {
     // the camp center's pre-fix height, pinned to the literal: the ramp is on
     // the far (west) flank and must never reshape the elementals' beach
-    expect(terrainHeight(66, 1622, SEED)).toBeCloseTo(-3.9529135048925803, 10);
+    expect(terrainHeight(66, 1622, SEED)).toBeCloseTo(-3.8278704295586854, 10);
   });
 
   it('never re-sharpens the ramp centerline past the climb gate', () => {
