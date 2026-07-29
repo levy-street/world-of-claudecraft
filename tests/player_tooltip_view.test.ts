@@ -17,7 +17,7 @@ const deps: PlayerTooltipI18n = { t: fakeT, fmt: fakeFmt };
 const model = (over: Partial<PlayerTooltipModel> = {}): PlayerTooltipModel => ({
   name: 'Aldwin',
   classLabel: 'Mage',
-  classColor: '#69ccf0',
+  classColor: '#33c1f1',
   level: 12,
   ...over,
 });
@@ -26,7 +26,7 @@ describe('playerTooltipHtml', () => {
   it('renders a class-colored name and localized level/class line', () => {
     const html = playerTooltipHtml(model(), deps);
 
-    expect(html).toContain('<div class="tt-title" style="color:#69ccf0">Aldwin</div>');
+    expect(html).toContain('<div class="tt-title" style="color:#33c1f1">Aldwin</div>');
     expect(html).toContain(
       '<div class="tt-sub">itemUi.equipment.levelClass(level=12,className=Mage)</div>',
     );

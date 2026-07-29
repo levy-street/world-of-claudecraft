@@ -7,6 +7,102 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: 'Vaandel in de Hand',
+    desc: 'Verover een vlag in Doornholte-Velden.',
+  },
+  pvp_bg_first_win: {
+    name: 'De Holte Houdt Stand',
+    desc: 'Win een Doornholte-Velden-slagveldwedstrijd.',
+  },
+  pvp_bg_wins_25: {
+    name: 'Wachter van de Holte',
+    desc: 'Win 25 Doornholte-Velden-slagveldwedstrijden.',
+    title: 'Vlaggendrager',
+  },
+  pvp_bg_captures_100: {
+    name: 'Honderd Vaandels',
+    desc: 'Verover in je carrière 100 vlaggen in Doornholte-Velden.',
+  },
+  dgn_rift: {
+    name: 'Riftloper',
+    desc: 'Ontruim een Rift door de baas van de verdieping te verslaan.',
+  },
+  dgn_rift_s_rank: {
+    name: 'Rift-Soeverein',
+    desc: 'Ontruim een S-rangs Rift, de zwaarste rang die een Riftportaal kan voortbrengen.',
+  },
+  pvp_honor_sergeant: {
+    name: 'Sergeant',
+    desc: 'Verdien 10.000 eer in je levensloop. Ze uitgeven kost je nooit de rang.',
+    title: 'Sergeant',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: 'Ridder-Luitenant',
+    desc: 'Verdien 40.000 eer in je levensloop, een heus seizoen oorlog achter de rug.',
+    title: 'Ridder-Luitenant',
+  },
+  pvp_honor_field_marshal: {
+    name: 'Veldmaarschalk',
+    desc: 'Verdien 150.000 eer in je levensloop. Zeldzaam op elk rijk, en dat hoort ook zo.',
+    title: 'Veldmaarschalk',
+  },
+  chr_drakemaw_broodlord: {
+    name: 'Broedselbreker',
+    desc: 'Versla een Drakenmuil-Broedheer te midden van zijn eieren, door het gebrul, de maaislag en het vuur heen.',
+  },
+  chr_maw_matriarch: {
+    name: 'De Hemel Valt Stil',
+    desc: 'Versla Cindraleth de Muilmatriarch in haar kraternest boven de Drakenmuil.',
+  },
+  chr_frostveil_gatherer: {
+    name: 'Oogst op de terrassen',
+    desc: 'Oogst een ertsader, een houtopstand en een kruidenbed in Frostveil.',
+  },
+  chr_frostveil_first_cast: {
+    name: 'Eerste ijs op het tarn',
+    desc: 'Vang een vis in de wateren van Frostveil.',
+  },
+  chr_amberfall_gatherer: {
+    name: 'De oogst van Amberfall',
+    desc: 'Oogst een ertsader, een houtopstand en een kruidenbed in Amberfall.',
+  },
+  chr_amberfall_first_cast: {
+    name: 'Een vangst uit het grote moeras',
+    desc: 'Vang een vis in de wateren van Amberfall.',
+  },
+  chr_nightbloom_gatherer: {
+    name: 'De dromende oogst',
+    desc: 'Oogst een ertsader, een houtopstand en een kruidenbed in Nightbloom.',
+  },
+  chr_nightbloom_first_cast: {
+    name: 'Een rimpel op de maanbron',
+    desc: 'Vang een vis in de wateren van Nightbloom.',
+  },
+  chr_wraithwood_gatherer: {
+    name: 'Oogst onder het bladerdak',
+    desc: 'Oogst een ertsader, een houtopstand en een kruidenbed in Wraithwood.',
+  },
+  chr_wraithwood_first_cast: {
+    name: 'Een worp in de spiegelbaai',
+    desc: 'Vang een vis in de wateren van Wraithwood.',
+  },
+  chr_palmreach_gatherer: {
+    name: 'Oogst op het palmenstrand',
+    desc: 'Oogst een ertsader, een houtopstand en een kruidenbed in Palmreach.',
+  },
+  chr_palmreach_first_cast: {
+    name: 'Werpen in de saffierlagune',
+    desc: 'Vang een vis in de wateren van Palmreach.',
+  },
+  chr_evergarden_gatherer: {
+    name: 'De overvloed van het parterre',
+    desc: 'Oogst een ertsader, een houtopstand en een kruidenbed in Evergarden.',
+  },
+  chr_evergarden_first_cast: {
+    name: 'Een worp op de bloemblaadjesvijver',
+    desc: 'Vang een vis in de wateren van Evergarden.',
+  },
   pvp_card_duel_first_win: {
     name: 'Eigen Spelregels',
     desc: 'Win een Kaartduel bij de Kaartmeester.',
@@ -85,7 +181,7 @@ export const table: DeedLocaleTable = {
   },
   prog_master_gatherer: {
     name: 'Meesterverzamelaar',
-    desc: 'Bereik 100 vaardigheid in Mijnbouw, Houthakken en Kruidenkunde.',
+    desc: 'Bereik 100 vaardigheid in drie van de vier verzamelberoepen Mijnbouw, Houthakken, Kruidenkunde en Vissen.',
   },
   prog_first_craft: { name: 'Handwerk', desc: 'Voltooi je eerste geslaagde ambachtswerk.' },
   prog_craft_specialist: {
@@ -409,7 +505,7 @@ export const table: DeedLocaleTable = {
     desc: 'Ontdek elk onderdeel van de Mournweave-Dracht.',
   },
   col_set_crownforged: {
-    name: 'Bonewrought-Regalia',
+    name: 'Beengetemperde Regalia',
     desc: 'Ontdek elk onderdeel van de Bonewrought-Regalia.',
   },
   col_set_nighttalon: {
@@ -417,7 +513,7 @@ export const table: DeedLocaleTable = {
     desc: 'Ontdek elk onderdeel van de Direfang-Vacht.',
   },
   col_set_soulflame: {
-    name: 'Wraithfire-Regalia',
+    name: 'Schimvuur-Regalia',
     desc: 'Ontdek elk onderdeel van de Wraithfire-Regalia.',
   },
   col_set_stormcallers: {
@@ -441,7 +537,10 @@ export const table: DeedLocaleTable = {
     name: 'Vaste Klant',
     desc: 'Ontdek alle tien de stukken uit de voorraad van de Heroïsche Kwartiermeester.',
   },
-  col_glimmerfin: { name: 'Een Glansje Hoop', desc: 'Vang een Glansvin-Koi.' },
+  col_glimmerfin: {
+    name: 'Een Glansje Hoop',
+    desc: 'Vang een Zonglinstering-Koi.',
+  },
   col_full_creel: {
     name: 'Volle Viskorf',
     desc: 'Ontdek alle zes de gewone vangsten uit de wateren van het Dal, het Moeras en de Hoogten.',
@@ -623,7 +722,10 @@ export const table: DeedLocaleTable = {
     name: 'Iets Glinsterends',
     desc: 'Raap een fonkelend voorwerp op van de grond.',
   },
-  exp_first_ore: { name: 'De Eerste Ader', desc: 'Oogst je eerste ertsader.' },
+  exp_first_ore: {
+    name: 'Hak Ontmoet Steen',
+    desc: 'Oogst je eerste ertsader.',
+  },
   exp_first_timber: { name: 'Van Onderen!', desc: 'Oogst je eerste houtvindplaats.' },
   exp_first_herb: { name: 'Groene Vingers', desc: 'Oogst je eerste kruidenvindplaats.' },
   feat_era_cap: {
@@ -695,5 +797,200 @@ export const table: DeedLocaleTable = {
   chr_marsh_first_cast: {
     name: 'Alen in het Riet',
     desc: 'Vang een vis in de wateren van Slijkveenmoeras.',
+  },
+  prog_guildsworn: {
+    name: 'Ambachtsgetrouwe',
+    desc: 'Stem je af op een archetypepaar en neem zijn ambachten ernstig ter hand.',
+    title: 'Ambachtsgetrouwe',
+  },
+  prog_masterwright: {
+    name: 'Meestersmaker',
+    desc: 'Vervaardigt je eerste meesterwerk, een stuk zo fijn dat de hele zone er van hoort.',
+    title: 'Meestersmaker',
+  },
+  prog_fishing_100: {
+    name: 'Oude Zout',
+    desc: 'Bereik 100 vaardigheid in Vissen.',
+  },
+  prog_master_angler: {
+    name: 'Meesterhengelaar',
+    desc: 'Bereik 200 vaardigheid in Vissen, het absolute toppunt van de visserskunst.',
+    title: 'Meesterhengelaar',
+  },
+  prog_engineering_50: {
+    name: 'Tandraderen en Veren',
+    desc: 'Bereik 50 vaardigheid in Knutselwerk.',
+  },
+  prog_alchemy_50: {
+    name: 'Vreemde Brouwsels',
+    desc: 'Bereik 50 vaardigheid in Alchemie.',
+  },
+  prog_cooking_50: {
+    name: 'Ervaren Kok',
+    desc: 'Bereik 50 vaardigheid in Koken.',
+  },
+  prog_leatherworking_50: {
+    name: 'Looiers-Handel',
+    desc: 'Bereik 50 vaardigheid in Leerbewerken.',
+  },
+  prog_tailoring_50: {
+    name: 'Een Verfijnde Naad',
+    desc: 'Bereik 50 vaardigheid in Kleermaken.',
+  },
+  prog_enchanting_50: {
+    name: 'Een Glinstering van het Arcane',
+    desc: 'Bereik 50 vaardigheid in Betovering.',
+  },
+  prog_weaponcrafting_50: {
+    name: 'Snijvlak en Warmte',
+    desc: 'Bereik 50 vaardigheid in Wapensmeden.',
+  },
+  prog_armorcrafting_50: {
+    name: 'Hamer en Plaat',
+    desc: 'Bereik 50 vaardigheid in Harnasmaken.',
+  },
+  prog_grandmaster_engineering: {
+    name: 'Grootmeester-Knutselwerk',
+    desc: 'Bereik 125 vaardigheid in Knutselwerk, het absolute toppunt van het ambacht.',
+    title: 'Grootmeester-Knutselwerk',
+  },
+  prog_grandmaster_alchemy: {
+    name: 'Grootmeester-Alchemie',
+    desc: 'Bereik 125 vaardigheid in Alchemie, het absolute toppunt van het ambacht.',
+    title: 'Grootmeester-Alchemie',
+  },
+  prog_grandmaster_cooking: {
+    name: 'Grootmeester-Koken',
+    desc: 'Bereik 125 vaardigheid in Koken, het absolute toppunt van het ambacht.',
+    title: 'Grootmeester-Koken',
+  },
+  prog_grandmaster_leatherworking: {
+    name: 'Grootmeester-Leerbewerken',
+    desc: 'Bereik 125 vaardigheid in Leerbewerken, het absolute toppunt van het ambacht.',
+    title: 'Grootmeester-Leerbewerken',
+  },
+  prog_grandmaster_tailoring: {
+    name: 'Grootmeester-Kleermaken',
+    desc: 'Bereik 125 vaardigheid in Kleermaken, het absolute toppunt van het ambacht.',
+    title: 'Grootmeester-Kleermaken',
+  },
+  prog_grandmaster_enchanting: {
+    name: 'Grootmeester-Betovering',
+    desc: 'Bereik 125 vaardigheid in Betovering, het absolute toppunt van het ambacht.',
+    title: 'Grootmeester-Betovering',
+  },
+  prog_grandmaster_weaponcrafting: {
+    name: 'Grootmeester-Wapensmeden',
+    desc: 'Bereik 125 vaardigheid in Wapensmeden, het absolute toppunt van het ambacht.',
+    title: 'Grootmeester-Wapensmeden',
+  },
+  prog_grandmaster_armorcrafting: {
+    name: 'Grootmeester-Harnasmaken',
+    desc: 'Bereik 125 vaardigheid in Harnasmaken, het absolute toppunt van het ambacht.',
+    title: 'Grootmeester-Harnasmaken',
+  },
+  col_pristine_vein: {
+    name: 'Ongerept Ader',
+    desc: 'Breek een ongerepte ader open en laat de hele zone er van horen.',
+  },
+  col_ancient_heartwood: {
+    name: 'Oud Hardhout',
+    desc: 'Ontlok een stuk oud hardhout aan een gevelde boom.',
+  },
+  col_moonlit_bloom: {
+    name: 'Maanbloesem',
+    desc: 'Oogst een maanbloesem op het exacte moment dat hij openbarst.',
+  },
+  col_perfect_specimen: {
+    name: 'Een Perfect Exemplaar',
+    desc: 'Haal een perfect exemplaar van een geslacht beest, zonder een snee of een vlek.',
+  },
+  soc_first_salvage: {
+    name: 'Niets Weggooien',
+    desc: 'Salvage een stuk uitrusting terug tot ruwe grondstoffen.',
+  },
+  soc_salvage_50: {
+    name: 'Het Slopersveld',
+    desc: 'Salvage 50 stuks uitrusting terug tot ruwe grondstoffen.',
+  },
+  dgn_wildheart_basin: {
+    name: 'Het Bekken Bijt Terug',
+    desc: 'Versla Zulgar, Stem van het Bekken, in het Wildhartbekken.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Heroïsch: Het Wildhartbekken',
+    desc: 'Versla Zulgar, Stem van het Bekken, in het Wildhartbekken op Heroïsche moeilijkheidsgraad.',
+  },
+  chr_peaks_gatherer: {
+    name: 'Oogst van de Hoogten',
+    desc: 'Oogst een ertsader, een houtopstand en een kruidenveldje in Doorntop-Hoogten.',
+  },
+  chr_marsh_rares_ii: {
+    name: 'De Veelvraat, Verrekend',
+    desc: 'Dood Wroetkaak de Veelvraat, een vierde naamdragende verschrikking van Slijkveenmoeras die buiten de eerste telling viel.',
+  },
+  chr_peaks_rares_ii: {
+    name: 'Meer Namen in de Rots Gekerfd',
+    desc: 'Dood de Oude Rotsmuil en Scherfheer Kazzix, nog twee naamdragende verschrikkingen van Doorntop-Hoogten die buiten de eerste telling vielen.',
+  },
+  chr_gleamstag: {
+    name: 'De Legende Die Nooit Als Eerste Toesloeg',
+    desc: 'Dood het Glanshert, een zeldzame, schuwe elite die alleen aanvalt wanneer hij in het nauw wordt gedreven.',
+  },
+  chr_hollow_rares: {
+    name: 'De Kudde Vergeet Niet',
+    desc: 'Dood de Oude Mergschelp en Aurelhorn, Eerste van de Kudde, de twee rondzwervende zeldzame bazen van de Sluierholte.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Overvloed van het Veenland',
+    desc: 'Oogst een ertsader, een houtopstand en een kruidenveldje in het Wilgenveen.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Rimpelingen in de Liliemoerassen',
+    desc: 'Vang een vis in de wateren van het Wilgenveen.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Oogst op de Landtong',
+    desc: 'Oogst een ertsader, een houtopstand en een kruidenveldje op de Windkam.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'Een Lijn in de Spiegelplas',
+    desc: 'Vang een vis in de wateren van de Windkam.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Eilandproviand',
+    desc: 'Oogst een ertsader, een houtopstand en een kruidenveldje op de Verrekust.',
+  },
+  chr_farshore_first_cast: {
+    name: 'Wat de Meeuwen Weten',
+    desc: 'Vang een vis in de wateren van de Verrekust.',
+  },
+  prog_engineering_rare: {
+    name: 'Precisie-ingenieurswerk',
+    desc: 'Vervaardig je eerste zeldzame stuk in Knutselwerk.',
+  },
+  prog_alchemy_rare: {
+    name: 'Een zeldzame jaargang',
+    desc: 'Vervaardig je eerste zeldzame stuk in Alchemie.',
+  },
+  prog_cooking_rare: {
+    name: 'Een onvergetelijk gerecht',
+    desc: 'Vervaardig je eerste zeldzame stuk in Koken.',
+  },
+  prog_leatherworking_rare: {
+    name: 'Fijn looien',
+    desc: 'Vervaardig je eerste zeldzame stuk in Leerbewerken.',
+  },
+  prog_tailoring_rare: {
+    name: 'Een meesterlijke steek',
+    desc: 'Vervaardig je eerste zeldzame stuk in Kleermaken.',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Gehard tot glans',
+    desc: 'Vervaardig je eerste zeldzame stuk in Wapensmeden.',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Geplaat tot perfectie',
+    desc: 'Vervaardig je eerste zeldzame stuk in Harnasmaken.',
   },
 };

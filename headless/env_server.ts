@@ -41,6 +41,14 @@ interface EnvConfig {
   };
 }
 
+interface EnvStepResult {
+  obs: number[];
+  reward: number;
+  terminated: boolean;
+  truncated: boolean;
+  info: object;
+}
+
 const DEFAULT_CONFIG: EnvConfig = {
   frameSkip: 5, // 4 decisions per sim-second
   // the cap is level 20 across three zones now — episodes need room to breathe
@@ -85,6 +93,7 @@ class Env {
       playerClass,
       respawnSeconds: this.config.respawnSeconds,
       autoEquip: true,
+      idleMobTickRadius: 80,
     });
     if (playerLevel !== 1) this.sim.setPlayerLevel(playerLevel);
     if (talents && !this.sim.applyTalents(talents)) throw new Error('invalid talents');
@@ -93,7 +102,7 @@ class Env {
     return { obs: encodeObs(this.sim), info: this.infoDict() };
   }
 
-  step(action: number): object {
+  step(action: number): EnvStepResult {
     if (!this.sim || !this.prev) throw new Error('call reset first');
     const sim = this.sim;
     applyAction(sim, action);
@@ -145,18 +154,22 @@ class Env {
 function bench(): void {
   const env = new Env();
   env.reset(1, 'warrior', {});
-  const N = 200_000;
+  const targetSeconds = 20;
+  let steps = 0;
   // exercise a realistic action mix
   const start = process.hrtime.bigint();
-  for (let i = 0; i < N; i++) {
-    const a = i % 11 === 0 ? 8 : i % 7 === 0 ? 9 : i % 5 === 0 ? 10 : 1;
-    const res = env.step(a) as any;
-    if (res.terminated || res.truncated) env.reset(i, 'warrior', {});
+  let elapsed = 0;
+  while (elapsed < targetSeconds) {
+    const a = steps % 11 === 0 ? 8 : steps % 7 === 0 ? 9 : steps % 5 === 0 ? 10 : 1;
+    const res = env.step(a);
+    steps++;
+    if (res.terminated || res.truncated) env.reset(steps, 'warrior', {});
+    if (steps % 100 === 0) elapsed = Number(process.hrtime.bigint() - start) / 1e9;
   }
-  const elapsed = Number(process.hrtime.bigint() - start) / 1e9;
-  const sps = Math.round(N / elapsed);
+  elapsed = Number(process.hrtime.bigint() - start) / 1e9;
+  const sps = Math.round(steps / elapsed);
   const tps = sps * DEFAULT_CONFIG.frameSkip;
-  console.log(`steps: ${N}, elapsed: ${elapsed.toFixed(2)}s`);
+  console.log(`steps: ${steps}, elapsed: ${elapsed.toFixed(2)}s`);
   console.log(`env steps/sec: ${sps} (${tps} sim ticks/sec) on a single core`);
 }
 

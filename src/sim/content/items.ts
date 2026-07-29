@@ -5,6 +5,35 @@ import type { ItemDef, PlayerClass } from '../types';
 const WAR: PlayerClass[] = ['warrior', 'paladin', 'shaman'];
 const MAG: PlayerClass[] = ['mage', 'priest', 'warlock', 'druid'];
 const ROG: PlayerClass[] = ['rogue', 'hunter'];
+// Feral druid weapons. A bespoke, druid-only lock: it is NOT one of the three
+// weapon-proficiency groups, so weaponArchetypeForItem returns null and
+// canEquipItem falls through to this literal list (see src/sim/equipment_rules.ts).
+// Bear form swings with the equipped weapon, so these carry real 2H dps + str/agi/sta.
+export const FERAL: PlayerClass[] = ['druid'];
+// Every caster class, for held-offhand stat sticks (no armor class / weapon
+// proficiency: the literal requiredClass list is the whole rule for held_offhand).
+export const CASTER_ALL: PlayerClass[] = [
+  'mage',
+  'priest',
+  'warlock',
+  'shaman',
+  'paladin',
+  'druid',
+];
+// Quivers: the hunter's held-offhand stat sticks. A bespoke, hunter-only lock
+// like FERAL above, and deliberately NOT the ROG group: rogues already reach the
+// offhand slot by dual wielding, so sharing the lock would hand them a second
+// way to fill a slot hunters have no way at all to fill. Like every held_offhand
+// this is the whole equip rule (src/sim/equipment_rules.ts canEquipItem).
+export const HUNTER_ONLY: PlayerClass[] = ['hunter'];
+const CASTER_WEAPON_CLASSES: PlayerClass[] = [
+  'mage',
+  'priest',
+  'warlock',
+  'shaman',
+  'paladin',
+  'druid',
+];
 
 // ---------------------------------------------------------------------------
 // Items
@@ -109,7 +138,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 7, max: 12, speed: 3.0 },
     stats: { int: 3, sta: 1 },
     sellValue: 120,
-    requiredClass: MAG,
+    requiredClass: CASTER_WEAPON_CLASSES,
   },
   keen_dirk: {
     id: 'keen_dirk',
@@ -339,29 +368,48 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   // The horse's reins: the ONLY purchasable mount, sold by Stablemaster Marla
   // Hitchen for 10 gold after the player has learned Riding (ridingTrained gate
-  // in items.ts buyItem). Soulbound like every reins item, so owning it IS owning
-  // the horse (src/sim/mounts.ts mountOwned) and it never transfers.
-  // sellValue 0: bought, never sold back.
+  // in items.ts buyItem). Not soulbound: owning the item IS owning the horse
+  // (src/sim/mounts.ts mountOwned), and like every player reins it can trade
+  // hands. The buy path's mountOwned gate therefore only stops duplicates in
+  // your own containers: buy, give away, buy again is allowed, making this an
+  // elastic market good with a 10g vendor floor (deliberate; no copper mint,
+  // since it never sells back). noVendorSell + sellValue 0: an accidental
+  // 0-copper sale that buyback rotation could eat would destroy the mount.
   reins_valorsteed: {
     id: 'reins_valorsteed',
     name: 'Reins of the Valorsteed',
     kind: 'mount',
     mount: 'valorsteed',
     quality: 'common',
-    soulbound: true,
+    noVendorSell: true,
     noDiscard: true,
     sellValue: 0,
     buyValue: 100_000, // 10 gold in copper
   },
   // Collectible mount (Morthen the Gravecaller, The Hollow Crypt). Owning the
-  // reins item IS owning the mount (src/sim/mounts.ts mountOwned): soulbound,
-  // so ownership never transfers, and it stays valid from the bank too.
+  // reins item IS owning the mount (src/sim/mounts.ts mountOwned); it stays
+  // valid from the bank too, and it transfers like any other unbound item.
   reins_grag_bear: {
     id: 'reins_grag_bear',
     name: 'Reins of the Goliath Grag-Bear',
     kind: 'mount',
     mount: 'grag_bear',
-    quality: 'common',
+    quality: 'rare',
+    noVendorSell: true,
+    noDiscard: true,
+    sellValue: 0,
+  },
+  // Developer-only mount. It is intentionally absent from vendors, quests,
+  // creature loot, heroic loot, and Rift reward pools. Use /dev mounts or
+  // /dev give reins_terrorspark_groundshaker while the feature remains under development.
+  // Unlike the player reins it STAYS soulbound: it has no acquisition path, so
+  // tradability would turn a dev grant into an economy leak.
+  reins_terrorspark_groundshaker: {
+    id: 'reins_terrorspark_groundshaker',
+    name: 'Ignition Key: Terrorspark Groundshaker',
+    kind: 'mount',
+    mount: 'terrorspark_groundshaker',
+    quality: 'epic',
     soulbound: true,
     noDiscard: true,
     sellValue: 0,
@@ -475,7 +523,16 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     bagSlots: 14,
     sellValue: 9000,
   },
-  // --- food & drink (vendor) ---
+  // --- food & drink (vendor, fished, conjured; see also zone2.ts/zone3.ts and
+  // profession_items.ts for the higher zone-bracket and crafted-cooking tiers).
+  // #1608: eating now STACKS with natural hp regen instead of replacing it
+  // (combat/auras.ts updateRegen), matching how drinking already stacks with
+  // mana regen, so every tier below is worth sitting down for at any stamina:
+  // there is no longer a crossover stamina past which it loses to standing
+  // still. The foodHp/drinkMana VALUES are unchanged: they already form a
+  // clear vendor -> fished -> conjured -> next-zone upgrade ladder (61 -> 90 ->
+  // 117 here, continuing to 243/432 in zone2 and 552/874 in zone3), and the
+  // stacking fix is what makes every rung of it worth the bag slot.
   baked_bread: {
     id: 'baked_bread',
     name: 'Cottage Loaf',
@@ -503,9 +560,75 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 4,
     buyValue: 20,
   },
+  // Tiered fishing rods (Professions 2.0): gatherTool items like the
+  // picks/axes/sickles below, same tier pricing ladder. Their use still routes
+  // to startFishing (src/sim/items.ts useItem), so a rod casts exactly like
+  // the simple pole; the tier caps which catch rarity band the cast can land
+  // (band b needs tier b + 1, professions/fishing.ts). The simple pole stays
+  // `use: { type: 'fishing' }`: effective tier 1 via the bare-hands floor.
+  ironreel_fishing_rod: {
+    id: 'ironreel_fishing_rod',
+    name: 'Ironreel Fishing Rod',
+    kind: 'tool',
+    quality: 'common',
+    use: { type: 'gatherTool', professionId: 'fishing', tier: 2 },
+    sellValue: 10,
+    buyValue: 60,
+  },
+  silverstream_fishing_rod: {
+    id: 'silverstream_fishing_rod',
+    name: 'Silverstream Fishing Rod',
+    kind: 'tool',
+    quality: 'uncommon',
+    use: { type: 'gatherTool', professionId: 'fishing', tier: 3 },
+    sellValue: 25,
+    buyValue: 150,
+  },
   // Base gathering tools (#1123). Each is infinite-durability (this repo has
   // no durability field on ItemDef) and tiered: `use.tier` gates which
   // node/material tiers it can gather (see src/sim/professions/tools.ts).
+  //
+  // PRICES: 20 / 120 / 400 up the three vendor rungs, pinned as literals in
+  // tests/professions_tools.test.ts so a rebalance has to touch that claim
+  // rather than drift past it. The two steps up are deliberately steep against
+  // a first-zone solo quest income (measured during planning, and the figure
+  // itself is not pinned anywhere, so treat it as the reason for the shape
+  // rather than as a live number). Tier 1 stays the trivial one-time purchase
+  // the #2343 no-strand story rests on; the rungs above it are a real decision
+  // rather than pocket change, which is what makes the proficiency gate on them
+  // (content/vendor_row_gates.ts) a pace rather than a formality. Thousands
+  // would have been a wall instead of a pace.
+  //
+  // The tiered fishing RODS below deliberately no longer share this ladder:
+  // they kept 60 and 150 while the land tools moved, because the reason to
+  // raise a price here is the node ladder these three tools gate, and fishing
+  // has no nodes. Their pricing belongs with the rest of the fishing work.
+  //
+  // The three TIER-1 tools carry BOTH noVendorSell and noMarketList, and only
+  // those three. The gather quests hand a pick or a sickle over through
+  // requiredItems (zone1.ts), re-granting a missing one on accept, and
+  // q_prof_hobby_switch is repeatable, so the grant needs both flags:
+  //
+  // - noVendorSell closes the copper MINT. Without it, accept, sell for 4,
+  //   abandon, repeat prints copper out of nothing.
+  // - noMarketList closes the market route AND the mail route: the market
+  //   refuses the listing and the mail attach path refuses the flag too, so
+  //   a minted copy can neither be sold to players nor posted away.
+  //
+  // Where a minted copy CAN go, stated truthfully: the bank is open (it is
+  // the player's own storage), and direct trade is open BY RULING (R10, a
+  // deliberate transfer route). Vendor, market, and mail are closed. The
+  // accept-time re-grant predicate (quests/quest_item_presence.ts) spans
+  // bags, bank, mail, and market escrow, so banking a tool no longer
+  // conjures another on re-accept; the quest's repeatCadenceTicks bounds the
+  // TURN-IN loop only (the cadence arms at turn-in, never at abandon), so
+  // the trade route still mints one copy per accept-abandon cycle, and the
+  // flags above are what cap that supply's value at zero copper.
+  //
+  // handaxe is flagged for SYMMETRY, not because it closes anything: no quest
+  // has a wood objective, so no quest ever grants it. Three tier-1 tools that
+  // behave alike beat two that do and one that does not. Tiers 2 and 3 are
+  // bought, never granted, so they stay sellable and listable.
   copper_mining_pick: {
     id: 'copper_mining_pick',
     name: 'Copper Mining Pick',
@@ -514,6 +637,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     use: { type: 'gatherTool', professionId: 'mining', tier: 1 },
     sellValue: 4,
     buyValue: 20,
+    noVendorSell: true,
+    noMarketList: true,
   },
   iron_mining_pick: {
     id: 'iron_mining_pick',
@@ -522,16 +647,16 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     use: { type: 'gatherTool', professionId: 'mining', tier: 2 },
     sellValue: 10,
-    buyValue: 60,
+    buyValue: 120,
   },
   mithril_mining_pick: {
     id: 'mithril_mining_pick',
-    name: 'Mithril Mining Pick',
+    name: 'Skysilver Mining Pick',
     kind: 'tool',
     quality: 'uncommon',
     use: { type: 'gatherTool', professionId: 'mining', tier: 3 },
     sellValue: 25,
-    buyValue: 150,
+    buyValue: 400,
   },
   handaxe: {
     id: 'handaxe',
@@ -541,6 +666,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     use: { type: 'gatherTool', professionId: 'logging', tier: 1 },
     sellValue: 4,
     buyValue: 20,
+    noVendorSell: true,
+    noMarketList: true,
   },
   felling_axe: {
     id: 'felling_axe',
@@ -549,7 +676,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     use: { type: 'gatherTool', professionId: 'logging', tier: 2 },
     sellValue: 10,
-    buyValue: 60,
+    buyValue: 120,
   },
   ironbark_axe: {
     id: 'ironbark_axe',
@@ -558,7 +685,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'uncommon',
     use: { type: 'gatherTool', professionId: 'logging', tier: 3 },
     sellValue: 25,
-    buyValue: 150,
+    buyValue: 400,
   },
   gathering_sickle: {
     id: 'gathering_sickle',
@@ -568,6 +695,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     use: { type: 'gatherTool', professionId: 'herbalism', tier: 1 },
     sellValue: 4,
     buyValue: 20,
+    noVendorSell: true,
+    noMarketList: true,
   },
   bronze_sickle: {
     id: 'bronze_sickle',
@@ -576,32 +705,36 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     use: { type: 'gatherTool', professionId: 'herbalism', tier: 2 },
     sellValue: 10,
-    buyValue: 60,
+    buyValue: 120,
   },
   silverleaf_sickle: {
     id: 'silverleaf_sickle',
-    name: 'Silverleaf Sickle',
+    name: 'Sheenleaf Sickle',
     kind: 'tool',
     quality: 'uncommon',
     use: { type: 'gatherTool', professionId: 'herbalism', tier: 3 },
     sellValue: 25,
-    buyValue: 150,
+    buyValue: 400,
   },
   // Crafted base tools, tier 4 and 5 (#1135). Same shape and gating as the
   // vendor tools above (infinite-durability, `use.tier` gates node AND
   // monster-material tier access via src/sim/professions/tools.ts), but these
-  // are produced by a profession (see COMMON_RECIPES in content/recipes.ts),
-  // never sold by any vendor: no `buyValue` and deliberately absent from
-  // every NPC `vendorItems` list. `quality` (rarity) is independent of
-  // `use.tier` and never affects gating: only the tool's `use.tier` value is
-  // read by the gate.
-  // are produced by a profession, never sold by any vendor: no `buyValue` and
-  // deliberately absent from every NPC `vendorItems` list. `quality` (rarity)
-  // is independent of `use.tier` and never affects gating: only the tool's
-  // `use.tier` value is read by the gate.
+  // are produced by a profession (see COMMON_RECIPES in content/recipes.ts) or
+  // bought with delve Marks, and NEVER sold for copper: no `buyValue`, and
+  // deliberately absent from every NPC `vendorItems` list and from
+  // HEROIC_VENDOR_STOCK. The Marks rows live in content/delves/shop.ts and are
+  // what gives a non-crafter a route to the top of the ladder.
+  //
+  // `quality` (rarity) never affects GATING: only `use.tier` is read by the
+  // gate, and that is the part which must never change. It is no longer
+  // value-only, though. Rarity now buys narrow bonuses that cannot affect
+  // access: charges on a slotted effect (professions/tools.ts
+  // startingDurabilityFor) and, on a rod, a wider reel window
+  // (professions/fishing.ts fishReelWindowSecFor). An epic tool opens no node a
+  // common tool of the same tier cannot.
   thorium_mining_pick: {
     id: 'thorium_mining_pick',
-    name: 'Thorium Mining Pick',
+    name: 'Osmium Mining Pick',
     kind: 'tool',
     quality: 'rare',
     use: { type: 'gatherTool', professionId: 'mining', tier: 4 },
@@ -609,7 +742,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   arcanite_mining_pick: {
     id: 'arcanite_mining_pick',
-    name: 'Arcanite Mining Pick',
+    name: 'Glyphsteel Mining Pick',
     kind: 'tool',
     quality: 'epic',
     use: { type: 'gatherTool', professionId: 'mining', tier: 5 },
@@ -625,7 +758,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   elderwood_axe: {
     id: 'elderwood_axe',
-    name: 'Elderwood Axe',
+    name: 'Highpine Axe',
     kind: 'tool',
     quality: 'epic',
     use: { type: 'gatherTool', professionId: 'logging', tier: 5 },
@@ -647,11 +780,41 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     use: { type: 'gatherTool', professionId: 'herbalism', tier: 5 },
     sellValue: 150,
   },
+  // The crafted rods, tier 4 and 5 (D9). Same shape, pricing and
+  // never-vendor-sold rule as the six land tools above, and made at the same
+  // toolworks, but their ladder is built out of what a rod CATCHES rather than
+  // out of fine gathered grades: fishing has no world nodes, so no fine
+  // material exists for it (professions/material_grades.ts owns the nine that
+  // do). See ROD_RECIPES in content/recipes.ts for what each rung consumes and
+  // why that is a weaker self-gate than the land ladder's.
+  //
+  // What the top two rungs actually buy: no new catch band (there are three
+  // bands and tier 3 already reaches the last one) and no new zone (there are
+  // three zones and tier 3 already opens the deepest). They buy the minigame
+  // itself, a shorter worst-case wait and a wider reel window, plus the
+  // standing they read as. Tier 5 sits flat on the bite-delay floor, which is
+  // the ladder ending rather than a rounding error.
+  stormreel_fishing_rod: {
+    id: 'stormreel_fishing_rod',
+    name: 'Stormreel Fishing Rod',
+    kind: 'tool',
+    quality: 'rare',
+    use: { type: 'gatherTool', professionId: 'fishing', tier: 4 },
+    sellValue: 60,
+  },
+  tidewrought_fishing_rod: {
+    id: 'tidewrought_fishing_rod',
+    name: 'Tidewrought Fishing Rod',
+    kind: 'tool',
+    quality: 'epic',
+    use: { type: 'gatherTool', professionId: 'fishing', tier: 5 },
+    sellValue: 150,
+  },
   // Tier 4/5 crafting reagents for the tools directly above (#1135's
   // `TOOL_RECIPE_STUBS`, de-stubbed into src/sim/content/recipes.ts once
   // #1127's crafting action existed to consume them). `kind: 'junk'`, same
   // generic-material shape as bone_fragments/linen_scrap/spider_leg below:
-  // The ore/log/herb entries are also node-gathered since Phase 4 (the
+  // The ore/log/herb entries are also node-gathered (the
   // mirefen_marsh/thornpeak_heights rows of gathering.ts NODE_MATERIAL_TABLE);
   // arcanite_bar stays vendor-only.
   // Sold by Quartermaster Bree at the Highwatch hub (zone3.ts) so every hub
@@ -665,7 +828,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // rarity color. Enforced by tests/crafting_materials_quality.test.ts.
   thorium_ore: {
     id: 'thorium_ore',
-    name: 'Thorium Ore',
+    name: 'Osmium Ore',
     kind: 'junk',
     quality: 'common',
     sellValue: 15,
@@ -673,7 +836,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   arcanite_bar: {
     id: 'arcanite_bar',
-    name: 'Arcanite Bar',
+    name: 'Glyphsteel Bar',
     kind: 'junk',
     quality: 'common',
     sellValue: 40,
@@ -689,7 +852,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   elderwood_log: {
     id: 'elderwood_log',
-    name: 'Elderwood Log',
+    name: 'Highpine Log',
     kind: 'junk',
     quality: 'common',
     sellValue: 40,
@@ -711,7 +874,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 40,
     buyValue: 160,
   },
-  // Low-tier gathering-node materials (Professions 2.0 Phase 4): the
+  // Low-tier gathering-node materials (Professions 2.0): the
   // eastbrook_vale and mirefen_marsh rows of gathering.ts NODE_MATERIAL_TABLE.
   // Node-gathered only, so no buyValue (not vendor-stocked); tier is read from
   // sellValue exactly like the reagents above, and the same common-quality
@@ -739,10 +902,102 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   silverleaf_herb: {
     id: 'silverleaf_herb',
-    name: 'Silverleaf Herb',
+    name: 'Sheenleaf Herb',
     kind: 'junk',
     quality: 'common',
     sellValue: 4,
+  },
+  // Fine grades of the nine node materials (D8, the fine-material axis). A
+  // harvest yields one of these INSTEAD of its base id when the player's tool
+  // is strictly above the material's zone tier at a full-grade vein
+  // (professions/material_grades.ts); same unit count, same rarity roll, same
+  // two rng draws. The six crafted tool recipes consume the fine grade, which
+  // is what makes the tool below each rung the only route to it.
+  //
+  // Priced at twice the base sellValue, with the delisted-material
+  // convention's 4x buyValue on top. Both halves are deliberate:
+  // - Doubling the sell price is the whole reward for a harvest that a
+  //   worse tool would have spent on the plain grade.
+  // - buyValue is the ECONOMY BASIS, not a stock row, exactly as
+  //   docs/design/professions.md restates the ruling and
+  //   tests/professions_master_stock.test.ts pins it for the delisted five.
+  //   No NPC stocks any of these. Omitting it would silently drop three
+  //   re-specced tool recipes out of the counterfactually-vendor-fed set in
+  //   tests/recipe_economy.test.ts, which is the tighter of the two economy
+  //   bounds: the loop would keep passing over a smaller set, which is the
+  //   failure mode that arm was rewritten to prevent.
+  // Common quality like every other reagent, or sellAllJunk would vendor them.
+  fine_copper_ore: {
+    id: 'fine_copper_ore',
+    name: 'Fine Copper Ore',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 8,
+    buyValue: 32,
+  },
+  fine_iron_ore: {
+    id: 'fine_iron_ore',
+    name: 'Fine Iron Ore',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 16,
+    buyValue: 64,
+  },
+  fine_thorium_ore: {
+    id: 'fine_thorium_ore',
+    name: 'Fine Osmium Ore',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 30,
+    buyValue: 120,
+  },
+  fine_ironbark_log: {
+    id: 'fine_ironbark_log',
+    name: 'Fine Ironbark Log',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 8,
+    buyValue: 32,
+  },
+  fine_ashwood_log: {
+    id: 'fine_ashwood_log',
+    name: 'Fine Ashwood Log',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 30,
+    buyValue: 120,
+  },
+  fine_elderwood_log: {
+    id: 'fine_elderwood_log',
+    name: 'Fine Highpine Log',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 80,
+    buyValue: 320,
+  },
+  fine_silverleaf_herb: {
+    id: 'fine_silverleaf_herb',
+    name: 'Fine Sheenleaf Herb',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 8,
+    buyValue: 32,
+  },
+  fine_goldleaf_herb: {
+    id: 'fine_goldleaf_herb',
+    name: 'Fine Goldleaf Herb',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 30,
+    buyValue: 120,
+  },
+  fine_sunpetal_herb: {
+    id: 'fine_sunpetal_herb',
+    name: 'Fine Sunpetal Herb',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 80,
+    buyValue: 320,
   },
   // Cosmetic event reward: using it rolls a rarity rank (server-side) and opens
   // the skin-select overlay. See src/sim/content/skins.ts. Dev-grant for now.
@@ -774,9 +1029,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   raw_mirror_trout: {
     id: 'raw_mirror_trout',
     name: 'Raw Mirror Trout',
-    kind: 'food',
+    kind: 'junk',
     quality: 'common',
-    foodHp: 61,
     sellValue: 3,
   },
   tangled_weed: {
@@ -786,46 +1040,47 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'poor',
     sellValue: 1,
   },
-  // --- fishing catches (see FISHING_TABLES below). Food heals scale with the
-  // depth/level of the zone you fish in; junk just vendors for coppers. ---
+  // --- fishing catches (see FISHING_TABLES below). Every raw catch is a
+  // cooking reagent (kind junk, no foodHp); cooked meals and vendor/conjured
+  // food are the sit-heal path. Grey junk (weed/boot) just vendors for copper.
+  // Zone tier still shapes which catch drops, not a raw heal curve. ---
   raw_river_perch: {
     id: 'raw_river_perch',
     name: 'Raw River Perch',
-    kind: 'food',
+    kind: 'junk',
     quality: 'common',
-    foodHp: 45,
     sellValue: 2,
   },
   raw_marsh_pike: {
     id: 'raw_marsh_pike',
     name: 'Raw Marsh Pike',
-    kind: 'food',
+    kind: 'junk',
     quality: 'common',
-    foodHp: 90,
     sellValue: 6,
   },
   raw_bog_eel: {
     id: 'raw_bog_eel',
     name: 'Raw Bog Eel',
-    kind: 'food',
+    kind: 'junk',
     quality: 'common',
-    foodHp: 90,
     sellValue: 6,
   },
   raw_frostgill_trout: {
     id: 'raw_frostgill_trout',
     name: 'Raw Frostgill Trout',
-    kind: 'food',
+    kind: 'junk',
     quality: 'common',
-    foodHp: 117,
     sellValue: 10,
   },
+  // The id/name divergence here is permanent: the id shipped in v0.28.0 (ids
+  // in live saves are frozen API, see tests/shipped_item_ids.test.ts) while
+  // the display name already carried the original Slatefin coin.
+  // Ids are never player-visible, so the display name is the one that matters.
   raw_stonescale_carp: {
     id: 'raw_stonescale_carp',
     name: 'Raw Slatefin Carp',
-    kind: 'food',
+    kind: 'junk',
     quality: 'common',
-    foodHp: 117,
     sellValue: 10,
   },
   soggy_boot: {
@@ -835,13 +1090,13 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'poor',
     sellValue: 1,
   },
-  // The prized rare catch, reelable from any water, a lucky hook.
+  // The prized rare catch, reelable from any water, a lucky hook. Cooking and
+  // rod-ladder reagent, never edible raw.
   glimmerfin_koi: {
     id: 'glimmerfin_koi',
-    name: 'Glimmerfin Koi',
-    kind: 'food',
+    name: 'Sunglint Koi',
+    kind: 'junk',
     quality: 'uncommon',
-    foodHp: 117,
     sellValue: 75,
   },
   roasted_boar: {
@@ -855,12 +1110,27 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   // --- combat potions (vendor): instant, usable in combat, 2-minute shared cooldown.
   // Restore less than sitting to eat/drink, the price you pay for not sitting (#103).
+  //
+  // Target fraction (#1608): each tier is sized against the LEAST tanky class for
+  // its resource (priest for potionHp, hunter for potionMana; see
+  // tests/consumables.test.ts) at BASE stats (no gear) at the TOP level of its
+  // intended zone bracket (ZONE1/2/3_ZONE.levelRange[1] in content/zone{1,2,3}.ts:
+  // 7/13/20), the hardest point in the bracket for the tier to still feel worth
+  // the cooldown. That lands potionHp around 80-90% and potionMana around 65-70%
+  // of the reference pool: a real, meaningful topper-upper rather than a sliver,
+  // with headroom against a geared character's larger pool (gear only grows the
+  // pool from here, so a geared cast of the same level sees a SMALLER fraction
+  // than the pinned floor, same as any flat-value consumable; the fix is that the
+  // floor itself is now generous, not that it tracks gear). Every tier in this
+  // ladder must stay BELOW the matching profession_items.ts alchemy draught (the
+  // crafted line is a strict upgrade over the vendor equivalent): keep the two in
+  // lockstep if either changes.
   minor_healing_potion: {
     id: 'minor_healing_potion',
     name: 'Minor Healing Potion',
     kind: 'potion',
     quality: 'common',
-    potionHp: 90,
+    potionHp: 110,
     sellValue: 8,
     buyValue: 40,
   },
@@ -869,7 +1139,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Minor Mana Potion',
     kind: 'potion',
     quality: 'common',
-    potionMana: 120,
+    potionMana: 145,
     sellValue: 8,
     buyValue: 40,
   },
@@ -892,7 +1162,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Lesser Healing Potion',
     kind: 'potion',
     quality: 'common',
-    potionHp: 150,
+    potionHp: 190,
     sellValue: 16,
     buyValue: 85,
   },
@@ -901,7 +1171,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Lesser Mana Potion',
     kind: 'potion',
     quality: 'common',
-    potionMana: 200,
+    potionMana: 250,
     sellValue: 16,
     buyValue: 85,
   },
@@ -910,7 +1180,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Healing Potion',
     kind: 'potion',
     quality: 'common',
-    potionHp: 280,
+    potionHp: 320,
     sellValue: 32,
     buyValue: 170,
   },
@@ -919,7 +1189,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Mana Potion',
     kind: 'potion',
     quality: 'common',
-    potionMana: 360,
+    potionMana: 410,
     sellValue: 32,
     buyValue: 170,
   },
@@ -1086,7 +1356,11 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     slot: 'chest',
     quality: 'common',
     stats: { armor: 40 },
-    sellValue: 160,
+    // Economy invariant: sellValue re-priced below
+    // the reworked craft input (88); buyValue is the armorer's shop price and
+    // deliberately keeps the old 10x-of-160 figure so the vendor catalog is
+    // untouched by the economy fix.
+    sellValue: 80,
     buyValue: 1600,
   },
   hobnail_boots: {
@@ -1123,7 +1397,12 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     slot: 'chest',
     quality: 'uncommon',
     stats: { armor: 30, int: 2, spi: 1 },
-    sellValue: 210,
+    // Economy invariant: re-priced below the
+    // reworked craft input (85); this also retires the piece as the cheapest
+    // disenchant fodder (the evidence review's dust-mill row). Not vendored;
+    // buyValue keeps its historical figure, and its one live reader (the
+    // market suggested ask, market_view.ts) clamps to 10x sellValue.
+    sellValue: 72,
     buyValue: 2100,
   },
   eastbrook_druids_hide: {
@@ -1134,7 +1413,10 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     slot: 'chest',
     quality: 'uncommon',
     stats: { armor: 52, int: 2, spi: 1 },
-    sellValue: 230,
+    // Economy invariant: re-priced below the
+    // reworked craft input (93). Not vendored; buyValue kept, read only by
+    // the market suggested ask, which clamps to 10x sellValue.
+    sellValue: 84,
     buyValue: 2300,
   },
   eastbrook_warded_leggings: {
@@ -1145,11 +1427,14 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     slot: 'legs',
     quality: 'uncommon',
     stats: { armor: 50, int: 2, spi: 1 },
-    sellValue: 220,
+    // Economy invariant: re-priced below the
+    // reworked craft input (117). Not vendored; buyValue kept, read only by
+    // the market suggested ask, which clamps to 10x sellValue.
+    sellValue: 105,
     buyValue: 2200,
   },
   // Hub-tier (level-20, crafting-hub-gated) caster pieces, one per craft,
-  // mirroring TOOL_RECIPES' thorium tier. Budgeted at the recipe's resulting ITEM
+  // mirroring TOOL_RECIPES' osmium tier. Budgeted at the recipe's resulting ITEM
   // level (source level 20 + the rare QUALITY_ILVL_BONUS of 3 = 23, see
   // item_budget.ts and item_level.ts), matching the level-20 rares in the same
   // slots (boundstone_helm, gravewyrm_gauntlets, gravewyrm_mantle; pinned by
@@ -1176,13 +1461,19 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   sootscale_mantle: {
     id: 'sootscale_mantle',
-    name: 'Sootscale Mantle',
+    name: 'Kilnscale Mantle',
     kind: 'armor',
     armorType: 'mail',
     slot: 'shoulder',
     quality: 'rare',
     stats: { armor: 78, int: 6, spi: 4 },
-    sellValue: 470,
+    // Economy invariant, discount-aware arm: both reagents are vendor-stocked
+    // at the forge, and a specialized crafter holding a self-signed ore
+    // consumes as little as 4 ore + 3 flux = 300c, so the old 470 vendor-back
+    // sat gold-positive. Re-priced below that cheapest achievable
+    // input (the v0.29.0 output-re-price precedent); the vendor-loop bound is
+    // pinned by tests/recipe_economy.test.ts.
+    sellValue: 280,
   },
   // --- Hollow Crypt rewards (rare/blue) ---
   // Item-level showcase: these rares are NORMALIZED to the stat budget their item
@@ -1342,7 +1633,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 11, max: 18, speed: 3.0 },
     stats: { int: 5, spi: 2 },
     sellValue: 880,
-    requiredClass: MAG,
+    requiredClass: CASTER_WEAPON_CLASSES,
   },
   gravewardens_shiv: {
     id: 'gravewardens_shiv',
@@ -1365,6 +1656,100 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     stats: { int: 4, spi: 3 },
     sellValue: 850,
   },
+  // --- Class/spec gap fill (uncommon/green leveling pieces) ---
+  // Budgeted via primaryStatBudget(item level, uncommon, slot); see
+  // src/sim/item_budget.ts. The leather int/spi pieces open the druid caster
+  // line, the mail int/spi pieces the shaman/paladin caster line, and the
+  // FERAL-locked two-handers start the bear-form weapon ladder (bear form
+  // swings the equipped weapon, src/sim/combat/form_swing.ts).
+  mosshide_vest: {
+    id: 'mosshide_vest',
+    name: 'Mosshide Vest',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'chest',
+    quality: 'uncommon',
+    // Sableweb Lurkers (level 4) -> item level 5, chest budget 2.
+    stats: { armor: 40, int: 1, spi: 1 },
+    sellValue: 130,
+  },
+  thornling_grips: {
+    id: 'thornling_grips',
+    name: 'Thornling Grips',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'gloves',
+    quality: 'uncommon',
+    // Deeprock Diggers (level 6) -> item level 7, gloves budget 2.
+    stats: { armor: 24, int: 1, spi: 1 },
+    sellValue: 140,
+  },
+  acolyte_chain_grips: {
+    id: 'acolyte_chain_grips',
+    name: 'Acolyte Chain Grips',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'gloves',
+    quality: 'uncommon',
+    // Old Greyjaw (level 4 rare) -> item level 5, gloves budget 1.
+    stats: { armor: 22, int: 1 },
+    sellValue: 120,
+  },
+  votive_chain_belt: {
+    id: 'votive_chain_belt',
+    name: 'Votive Chain Belt',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'waist',
+    quality: 'uncommon',
+    // Gorrak (level 6 boss) -> item level 7, waist budget 2.
+    stats: { armor: 28, int: 1, spi: 1 },
+    sellValue: 150,
+  },
+  briarroot_staff: {
+    id: 'briarroot_staff',
+    name: 'Briarroot Staff',
+    kind: 'weapon',
+    slot: 'mainhand',
+    hand: 'twohand',
+    quality: 'uncommon',
+    // Grix the Tunnelking (level 7 rare elite) -> item level 8: the 2H stat
+    // budget round(primaryStatBudget(8, uncommon, mainhand) = 3 x
+    // TWOHAND_STAT_MULT) = 4, dps on the weaponDpsBudget(8) x TWOHAND_DPS_MULT
+    // curve (~10.47 at speed 3.3).
+    weapon: { min: 29, max: 40, speed: 3.3 },
+    stats: { str: 2, sta: 2 },
+    sellValue: 320,
+    requiredClass: FERAL,
+  },
+  valefire_lantern: {
+    id: 'valefire_lantern',
+    name: 'Valefire Lantern',
+    kind: 'held_offhand',
+    slot: 'offhand',
+    quality: 'uncommon',
+    // Mogger (level 6 rare elite) -> item level 7, offhand budget 2. The first
+    // low-level held offhand; equips by the literal CASTER_ALL list.
+    stats: { int: 1, spi: 1 },
+    sellValue: 160,
+    requiredClass: CASTER_ALL,
+  },
+  moggers_hide_quiver: {
+    id: 'moggers_hide_quiver',
+    name: "Mogger's Hide Quiver",
+    kind: 'held_offhand',
+    slot: 'offhand',
+    quality: 'uncommon',
+    // The hunter counterpart to valefire_lantern, off the same rare elite:
+    // Mogger (level 6) -> item level 7, offhand budget 2. Hunters are the one
+    // class no offhand rule admits (equipment_rules canDualWield excludes them,
+    // and no shield or held offhand names them), so the slot sat empty and its
+    // stat budget went uncollected. Held offhands equip by the literal
+    // requiredClass alone, which is what lets a hunter-only list work here.
+    stats: { agi: 1, sta: 1 },
+    sellValue: 160,
+    requiredClass: HUNTER_ONLY,
+  },
   // --- quest items ---
   boar_hide: {
     id: 'boar_hide',
@@ -1372,6 +1757,24 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     kind: 'quest',
     sellValue: 0,
     questId: 'q_boars',
+  },
+  // Thrown at murloc huts for "Back to the Shallows" (q_deepfen_purge). Reusable:
+  // it is not consumed, so a 5s throw cooldown paces the burns instead.
+  firebottle: {
+    id: 'firebottle',
+    name: 'Firebottle',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_deepfen_purge',
+    use: { type: 'throw' },
+  },
+  // Name/label entry for the burnable murloc-hut world objects (q_deepfen_purge).
+  murloc_hut: {
+    id: 'murloc_hut',
+    name: 'Mudfin Hut',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_deepfen_purge',
   },
   gravecaller_sigil: {
     id: 'gravecaller_sigil',
@@ -1393,6 +1796,13 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     kind: 'quest',
     sellValue: 0,
     questId: 'q_rite',
+  },
+  restless_skull: {
+    id: 'restless_skull',
+    name: 'Restless Skull',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_bones',
   },
   webwood_silk: {
     id: 'webwood_silk',
@@ -1485,11 +1895,16 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 320,
   },
   // --- junk (gray) ---
+  // wolf_fang became a crafting reagent
+  // (recipe_eastbrook_arming_sword, recipe_ironbound_warplate_helm), so it
+  // follows the same convention as spider_leg/bone_fragments/linen_scrap
+  // below: common (white), NOT 'poor', or sellAllJunk would sweep it. Its
+  // sellValue is unchanged. See tests/crafting_materials_quality.test.ts.
   wolf_fang: {
     id: 'wolf_fang',
     name: 'Cracked Wolf Fang',
     kind: 'junk',
-    quality: 'poor',
+    quality: 'common',
     sellValue: 4,
   },
   bandit_bandana: {
@@ -1559,24 +1974,110 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // material kind).
   arcane_dust: {
     id: 'arcane_dust',
-    name: 'Arcane Dust',
+    name: 'Chime Dust',
     kind: 'junk',
     quality: 'common',
     sellValue: 6,
   },
   arcane_essence: {
     id: 'arcane_essence',
-    name: 'Arcane Essence',
+    name: 'Chime Essence',
     kind: 'junk',
     quality: 'uncommon',
     sellValue: 18,
   },
   arcane_shard: {
     id: 'arcane_shard',
-    name: 'Arcane Shard',
+    name: 'Chime Shard',
     kind: 'junk',
     quality: 'rare',
     sellValue: 55,
+  },
+
+  // --- Tool-effect charms (the acquisition craft) ---------------------------
+  // The item form of the two live TOOL_EFFECTS entries
+  // (src/sim/content/professions.ts): Enchanter work, minted by the
+  // TOOL_EFFECT_RECIPES (content/recipes.ts) and consumed by the
+  // slot_tool_effect command through resolveSlotToolEffect
+  // (src/sim/professions/tools.ts). Item id deliberately EQUALS the effect id:
+  // one identity, one icon key, one display name. `quality: 'rare'` is
+  // load-bearing, not cosmetic: the craft signing rule (crafting.ts, #1149)
+  // mints every rare-or-better output as a signed instance carrying
+  // `{ signer: crafterName }`, and the slot copies that signer into the slot's
+  // `craftedBy`, which is what the original-crafter recharge discount reads. A
+  // signed instance kept charms hand-to-hand under the pre-v0.33.0 exchange
+  // rules; since the v0.33.0 instanced exchange pipes (#2507) a signed copy
+  // lists on the World Market and mails like any instanced item, so restoring
+  // R45's hand-to-hand-only intent would need an explicit noMarketList or
+  // soulbound flag here (maintainer decision, flagged by the v0.33.0 merge
+  // audit). No Springback (quickening_charm)
+  // item exists ON PURPOSE: the R9 slot policy refuses that effect everywhere,
+  // and no path may mint what another path refuses (the craftable set is
+  // derived from these defs against the policy in
+  // tests/professions_tool_effect_craft.test.ts). `kind: 'tool'` (not 'junk'):
+  // a charm is an implement accessory, and the tool kind's stack size of 1
+  // keeps each signed copy its own provenance-carrying slot entry.
+  gatherers_cache: {
+    id: 'gatherers_cache',
+    name: "Gatherer's Cache",
+    kind: 'tool',
+    quality: 'rare',
+    use: { type: 'toolEffect', effectId: 'gatherers_cache' },
+    sellValue: 60,
+  },
+  artisans_eye: {
+    id: 'artisans_eye',
+    name: "Artisan's Eye",
+    kind: 'tool',
+    quality: 'rare',
+    use: { type: 'toolEffect', effectId: 'artisans_eye' },
+    sellValue: 60,
+  },
+
+  // --- Typed disenchant secondaries (Professions 2.0) -------------
+  // A rare-or-better disenchant yields, alongside the universal ladder material
+  // above, exactly one typed secondary keyed by the salvaged piece's material
+  // (src/sim/professions/disenchant_reagents.ts): armor by its armor class,
+  // weapons by family. Each is the sole reagent of one always-known ENCHANTS
+  // row (content/enchants.ts), so none is a dead-end currency. They are granted
+  // bind-on-trade (ItemInstancePayload.bindOnTrade), so a disenchant windfall
+  // stays with the disenchanter rather than being freely resold. Same 'junk'
+  // reuse as the arcane materials (this repo has no dedicated material kind);
+  // all quality 'rare', so sellAllJunk (poor-only) never sweeps them.
+  resonant_thread: {
+    id: 'resonant_thread',
+    name: 'Resonant Thread',
+    kind: 'junk',
+    quality: 'rare',
+    sellValue: 40,
+  },
+  resonant_hide: {
+    id: 'resonant_hide',
+    name: 'Resonant Hide',
+    kind: 'junk',
+    quality: 'rare',
+    sellValue: 40,
+  },
+  resonant_links: {
+    id: 'resonant_links',
+    name: 'Resonant Links',
+    kind: 'junk',
+    quality: 'rare',
+    sellValue: 40,
+  },
+  resonant_steel: {
+    id: 'resonant_steel',
+    name: 'Resonant Steel',
+    kind: 'junk',
+    quality: 'rare',
+    sellValue: 40,
+  },
+  resonant_timber: {
+    id: 'resonant_timber',
+    name: 'Resonant Timber',
+    kind: 'junk',
+    quality: 'rare',
+    sellValue: 40,
   },
 
   // --- Quartermaster's Consignment ---------------------------------------
@@ -1751,7 +2252,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 9, max: 15, speed: 3.0 },
     stats: { int: 3, spi: 2 },
     sellValue: 175,
-    requiredClass: MAG,
+    requiredClass: CASTER_WEAPON_CLASSES,
   },
   caravan_warden_dirk: {
     id: 'caravan_warden_dirk',
@@ -1858,102 +2359,147 @@ export interface FishingEntry {
   weight: number;
 }
 
-// Catch rarity ladder (Professions 2.0 Phase 11): fishing proficiency selects
+// Catch rarity ladder (Professions 2.0): fishing proficiency selects
 // one of three per-zone tables (bands). As proficiency rises the weight shifts
-// out of the junk rows (tangled_weed / soggy_boot) and the empty-hook null row
-// and into the zone's food-fish rows (the cooking inputs). The moves are
-// strictly monotonic per band step (each food fish non-decreasing, each junk /
-// null row non-increasing), the rare glimmerfin_koi weight is deliberately flat
-// across every band (its odds never scale with skill), every band still sums to
-// exactly 100, and the empty-hook null row is always present with weight >= 1.
-// Band boundaries and selection live in src/sim/professions/fishing.ts
+// out of the grey-junk rows (tangled_weed / soggy_boot) and the empty-hook null
+// row and into the zone's cooking-catch rows (raw fish reagents). The moves are
+// strictly monotonic per band step (each cooking catch non-decreasing, each
+// grey junk / null row non-increasing), every band still sums to exactly 100,
+// and the empty-hook null row is always present with weight >= 1. Band
+// boundaries and selection live in src/sim/professions/fishing.ts
 // (fishingBandFor); FISHING_TABLES_BY_BAND[band][zoneId] is the resolved table,
 // with the eastbrook_vale row as the fallback for any zone without its own.
+//
+// THE AXIS THESE NINE CELLS ARE AUTHORED AGAINST (D9). A cell is not "how good
+// is this angler", it is "how far is this angler from what this water asks".
+// Each zone names a required band (professions/fishing_zones.ts, derived from
+// the rod tier its water takes), and a cell's whole character follows from the
+// distance between that and the band the cell is for:
+//
+//   empty hook   at the requirement 10, one band above 8, two above 6;
+//                one band SHORT 35, two short 55
+//   rare koi     1 / 3 / 6 by band, in every zone: the one row that reads
+//                skill alone, because it is the rod ladder's reagent and a
+//                seasoned angler should be the one who farms it
+//   grey junk    carries the zone's own flavor (the marsh keeps its boots) and
+//                swells with the shortfall, roughly doubling or worse against
+//                the same zone's at-requirement cell
+//   cooking catch whatever is left, split in each zone's shipped proportion
+//
+// So Eastbrook, which asks for nothing, keeps its shipped shape, and Thornpeak
+// at band 0 pays 55 empty hooks and 28 grey junk out of 100 to a level-1 angler
+// who borrowed a rod good enough to cast there. That is the whole point: the
+// water is the difficulty, not the reel click. tests/fishing_zones.test.ts
+// derives every number above from the schedule and fails on a cell edited past
+// it.
 export const FISHING_TABLES_BY_BAND: Record<string, FishingEntry[]>[] = [
-  // Band 0 (proficiency 0-99): byte-identical to the shipped starter tables, so
-  // every pre-Phase-11 seed reproduces the exact same catch sequence.
+  // Band 0 (proficiency 0-99). Eastbrook asks for band 0, so its cell is the
+  // shipped starter table with the koi row moved onto the skill scale; the two
+  // zones above it are where a band-0 angler pays for fishing over their head.
   {
     eastbrook_vale: [
-      { itemId: 'raw_mirror_trout', weight: 45 },
-      { itemId: 'raw_river_perch', weight: 30 },
+      { itemId: 'raw_mirror_trout', weight: 46 },
+      { itemId: 'raw_river_perch', weight: 31 },
       { itemId: 'tangled_weed', weight: 12 },
-      { itemId: 'glimmerfin_koi', weight: 3 },
+      { itemId: 'glimmerfin_koi', weight: 1 },
       { itemId: null, weight: 10 },
     ],
     mirefen_marsh: [
-      { itemId: 'raw_marsh_pike', weight: 40 },
-      { itemId: 'raw_bog_eel', weight: 30 },
-      { itemId: 'soggy_boot', weight: 8 },
-      { itemId: 'tangled_weed', weight: 9 },
-      { itemId: 'glimmerfin_koi', weight: 3 },
-      { itemId: null, weight: 10 },
+      { itemId: 'raw_marsh_pike', weight: 22 },
+      { itemId: 'raw_bog_eel', weight: 17 },
+      { itemId: 'soggy_boot', weight: 12 },
+      { itemId: 'tangled_weed', weight: 13 },
+      { itemId: 'glimmerfin_koi', weight: 1 },
+      { itemId: null, weight: 35 },
     ],
     thornpeak_heights: [
-      { itemId: 'raw_frostgill_trout', weight: 40 },
-      { itemId: 'raw_stonescale_carp', weight: 30 },
-      { itemId: 'tangled_weed', weight: 14 },
-      { itemId: 'glimmerfin_koi', weight: 4 },
-      { itemId: null, weight: 12 },
+      { itemId: 'raw_frostgill_trout', weight: 9 },
+      { itemId: 'raw_stonescale_carp', weight: 7 },
+      { itemId: 'tangled_weed', weight: 28 },
+      { itemId: 'glimmerfin_koi', weight: 1 },
+      { itemId: null, weight: 55 },
     ],
   },
-  // Band 1 (proficiency 100-199): junk and empty hooks give way to more food fish.
+  // Band 1 (proficiency 100-199): Mirefen's own band. Its water fishes
+  // normally now, Eastbrook is one band over and thins further, and Thornpeak
+  // is still one band short.
   {
     eastbrook_vale: [
-      { itemId: 'raw_mirror_trout', weight: 48 },
-      { itemId: 'raw_river_perch', weight: 33 },
+      { itemId: 'raw_mirror_trout', weight: 49 },
+      { itemId: 'raw_river_perch', weight: 32 },
       { itemId: 'tangled_weed', weight: 8 },
       { itemId: 'glimmerfin_koi', weight: 3 },
       { itemId: null, weight: 8 },
     ],
     mirefen_marsh: [
-      { itemId: 'raw_marsh_pike', weight: 43 },
-      { itemId: 'raw_bog_eel', weight: 33 },
+      { itemId: 'raw_marsh_pike', weight: 42 },
+      { itemId: 'raw_bog_eel', weight: 32 },
       { itemId: 'soggy_boot', weight: 6 },
       { itemId: 'tangled_weed', weight: 7 },
       { itemId: 'glimmerfin_koi', weight: 3 },
-      { itemId: null, weight: 8 },
-    ],
-    thornpeak_heights: [
-      { itemId: 'raw_frostgill_trout', weight: 43 },
-      { itemId: 'raw_stonescale_carp', weight: 33 },
-      { itemId: 'tangled_weed', weight: 10 },
-      { itemId: 'glimmerfin_koi', weight: 4 },
       { itemId: null, weight: 10 },
     ],
+    thornpeak_heights: [
+      { itemId: 'raw_frostgill_trout', weight: 27 },
+      { itemId: 'raw_stonescale_carp', weight: 20 },
+      { itemId: 'tangled_weed', weight: 15 },
+      { itemId: 'glimmerfin_koi', weight: 3 },
+      { itemId: null, weight: 35 },
+    ],
   },
-  // Band 2 (proficiency 200+): a seasoned angler; food fish dominate, an empty
-  // hook is rare but never impossible.
+  // Band 2 (proficiency 200, fishing's cap): Thornpeak's own band, and the
+  // only place every zone fishes at or above what it asks. Cooking catches
+  // dominate, an empty hook is rare but never impossible, and the koi finally
+  // pays out at the rate its recipes are priced against.
   {
     eastbrook_vale: [
-      { itemId: 'raw_mirror_trout', weight: 51 },
-      { itemId: 'raw_river_perch', weight: 36 },
+      { itemId: 'raw_mirror_trout', weight: 50 },
+      { itemId: 'raw_river_perch', weight: 34 },
       { itemId: 'tangled_weed', weight: 4 },
-      { itemId: 'glimmerfin_koi', weight: 3 },
+      { itemId: 'glimmerfin_koi', weight: 6 },
       { itemId: null, weight: 6 },
     ],
     mirefen_marsh: [
-      { itemId: 'raw_marsh_pike', weight: 46 },
-      { itemId: 'raw_bog_eel', weight: 36 },
+      { itemId: 'raw_marsh_pike', weight: 43 },
+      { itemId: 'raw_bog_eel', weight: 34 },
       { itemId: 'soggy_boot', weight: 4 },
       { itemId: 'tangled_weed', weight: 5 },
-      { itemId: 'glimmerfin_koi', weight: 3 },
-      { itemId: null, weight: 6 },
+      { itemId: 'glimmerfin_koi', weight: 6 },
+      { itemId: null, weight: 8 },
     ],
     thornpeak_heights: [
-      { itemId: 'raw_frostgill_trout', weight: 46 },
-      { itemId: 'raw_stonescale_carp', weight: 36 },
+      { itemId: 'raw_frostgill_trout', weight: 44 },
+      { itemId: 'raw_stonescale_carp', weight: 34 },
       { itemId: 'tangled_weed', weight: 6 },
-      { itemId: 'glimmerfin_koi', weight: 4 },
-      { itemId: null, weight: 8 },
+      { itemId: 'glimmerfin_koi', weight: 6 },
+      { itemId: null, weight: 10 },
     ],
   },
 ];
 
-// The band-0 tables, kept under the original export name so pre-Phase-11
+// The band-0 tables, kept under the original export name so existing
 // consumers (the deeds zone-key guard in tests/deeds_content.test.ts) resolve
-// unchanged. Identical object as FISHING_TABLES_BY_BAND[0], so its rows are the
-// shipped rows byte for byte.
+// unchanged. The SAME object as FISHING_TABLES_BY_BAND[0], never a copy.
 export const FISHING_TABLES: Record<string, FishingEntry[]> = FISHING_TABLES_BY_BAND[0];
 
 // The rare catch worth a celebratory shout in the combat log.
 export const FISHING_RARE_ID = 'glimmerfin_koi';
+
+// Every raw fishing catch that is a cooking (and rod-ladder) reagent, never
+// edible. Pure id set for useItem refuse, material/UI reuse (Phase 2 labels
+// and icons), and tests that must not detect catches via kind === 'food'.
+// Locked ids: docs/raw-fish-cooking-reagents/state.md.
+export const RAW_COOKING_CATCH_IDS: ReadonlySet<string> = new Set([
+  'raw_mirror_trout',
+  'raw_river_perch',
+  'raw_marsh_pike',
+  'raw_bog_eel',
+  'raw_frostgill_trout',
+  'raw_stonescale_carp',
+  'glimmerfin_koi',
+]);
+
+/** True when `itemId` is a raw fishing catch (cooking reagent, refuse-use). */
+export function isRawCookingCatch(itemId: string): boolean {
+  return RAW_COOKING_CATCH_IDS.has(itemId);
+}

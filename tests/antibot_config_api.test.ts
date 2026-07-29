@@ -12,9 +12,13 @@ vi.mock('../server/db', () => ({
   findAccount: vi.fn(),
   touchLogin: vi.fn(),
   saveToken: vi.fn(),
-  accountForToken: vi.fn(),
+  accountAndScopeForToken: vi.fn(),
   isAdminAccount: vi.fn(),
   accountMailTarget: vi.fn(async () => null),
+  moderationStatusForAccount: vi.fn(async () => ({ locked: false, message: '' })),
+  createCompanionToken: vi.fn(),
+  listCompanionTokens: vi.fn(async () => []),
+  revokeCompanionToken: vi.fn(),
 }));
 vi.mock('../server/antibot_config_db', () => ({
   loadAntibotConfig: vi.fn(async () => ({ data: {}, updatedAt: null })),
@@ -38,7 +42,7 @@ import {
   saveAntibotConfigChange,
 } from '../server/antibot_config_db';
 import type { ConfigField } from '../server/bot_detector/contract';
-import { accountForToken, isAdminAccount } from '../server/db';
+import { accountAndScopeForToken, isAdminAccount } from '../server/db';
 import { adminRolesForAccount } from '../server/staff_db';
 
 const VALID_TOKEN = 'a'.repeat(64);
@@ -126,7 +130,7 @@ async function settle(res: FakeResponse): Promise<void> {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  vi.mocked(accountForToken).mockResolvedValue(7);
+  vi.mocked(accountAndScopeForToken).mockResolvedValue({ accountId: 7, scope: 'full' });
   vi.mocked(isAdminAccount).mockResolvedValue(true);
   vi.mocked(adminRolesForAccount).mockResolvedValue({
     username: 'admin',
@@ -146,7 +150,7 @@ describe('GET /admin/api/antibot-config', () => {
     await handleAdminApi(fakeReq(), res, game);
     expect(res.statusCode).toBe(200);
     expect(res.body.data?.updatedAt).toBe('2026-07-04T00:00:00.000Z');
-    expect((res.body.data?.fields as ConfigField[])[0].id).toBe('gate.kick_score');
+    expect((res.body.data?.fields as ConfigField[] | undefined)?.[0]?.id).toBe('gate.kick_score');
   });
 });
 
@@ -173,7 +177,7 @@ describe('POST /admin/api/antibot-config', () => {
       7,
       'Tune after calibration',
     );
-    expect((res.body.data?.fields as ConfigField[])[0].value).toBe(1.5);
+    expect((res.body.data?.fields as ConfigField[] | undefined)?.[0]?.value).toBe(1.5);
     expect(res.body.data?.updatedAt).toBe('2026-07-04T00:00:01.000Z');
   });
 

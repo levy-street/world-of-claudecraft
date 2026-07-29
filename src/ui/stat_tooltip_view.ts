@@ -69,10 +69,13 @@ export function statEffectText(e: StatEffect, deps: StatTooltipI18n): string {
   }
 }
 
-// Crit and dodge are shown as percents (one decimal); every other stat's source
-// values are whole numbers.
+// Crit, dodge, and parry are shown as percents (one decimal); every other
+// stat's source values are whole numbers.
 const isPercentStat = (model: StatTooltipModel) =>
-  model.stat === 'critChance' || model.stat === 'dodge' || model.stat === 'warfare';
+  model.stat === 'critChance' ||
+  model.stat === 'dodge' ||
+  model.stat === 'parry' ||
+  model.stat === 'warfare';
 
 /** The catalog key for a stat's display name. Most reuse the shared
  *  itemUi.stats.* labels; Spell Power is a character-sheet-only stat whose label
@@ -198,9 +201,10 @@ export function statTooltipAria(model: StatTooltipModel, deps: StatTooltipI18n):
   return parts.join(' ');
 }
 
-/** The stat cell's displayed value text: a one-decimal percent for crit/dodge,
- *  a one-decimal number for the dps estimate, otherwise a whole number. Sourced
- *  from model.statValue so the cell and the tooltip it opens cannot disagree. */
+/** The stat cell's displayed value text: a one-decimal percent for
+ *  crit/dodge/parry, a one-decimal number for the dps estimate, otherwise a
+ *  whole number. Sourced from model.statValue so the cell and the tooltip it
+ *  opens cannot disagree. */
 export function statValueText(model: StatTooltipModel, deps: StatTooltipI18n): string {
   if (model.stat === 'warfare') {
     return deps.t('hudChrome.statInfo.warfareValue', {
@@ -208,24 +212,40 @@ export function statValueText(model: StatTooltipModel, deps: StatTooltipI18n): s
       reduction: dec1(deps, model.warfareDamageReduction ?? model.statValue),
     });
   }
-  if (model.stat === 'critChance' || model.stat === 'dodge')
+  if (model.stat === 'critChance' || model.stat === 'dodge' || model.stat === 'parry')
     return `${dec1(deps, model.statValue)}%`;
   if (model.stat === 'dps') return dec1(deps, model.statValue);
   return int0(deps, model.statValue);
 }
 
-/** Build one focusable character-sheet stat cell: "Name: <b>value</b>" plus a
- *  visually-hidden, aria-describedby breakdown carrying the same live numbers as
- *  the (sighted-only) floating tooltip. The HUD attaches the tooltip afterwards
- *  by matching the data-stat attribute. The value comes from formatNumber, so it
- *  is left unescaped (digits / separators / percent only). */
-export function statCellHtml(model: StatTooltipModel, deps: StatTooltipI18n): string {
+/** Layout options for a stat cell. `colon: false` drops the "Name:" colon (the
+ *  showcase sheet's tiles + Offense/Defense panels position the label and value
+ *  with flexbox, so the literal separator is redundant); everything else about
+ *  the cell (data-stat, tabindex, the aria-describedby breakdown) is unchanged. */
+export interface StatCellOptions {
+  colon?: boolean;
+}
+
+/** Build one focusable character-sheet stat cell: "Name: <b>value</b>" (or
+ *  "Name <b>value</b>" with `colon: false`) plus a visually-hidden,
+ *  aria-describedby breakdown carrying the same live numbers as the
+ *  (sighted-only) floating tooltip. The HUD attaches the tooltip afterwards by
+ *  matching the data-stat attribute. The value comes from formatNumber, so it is
+ *  left unescaped (digits / separators / percent only). */
+export function statCellHtml(
+  model: StatTooltipModel,
+  deps: StatTooltipI18n,
+  opts?: StatCellOptions,
+): string {
   const name = esc(deps.t(statNameKey(model.stat)));
   const value = statValueText(model, deps);
   const aria = esc(statTooltipAria(model, deps));
+  // Default keeps the classic "Name:" colon; the showcase sheet passes colon:false
+  // and lets flex layout separate the label from the value.
+  const sep = opts?.colon === false ? ' ' : ': ';
   return (
     `<span class="stat-cell" data-stat="${model.stat}" tabindex="0" aria-describedby="statdesc-${model.stat}">` +
-    `${name}: <b>${value}</b>` +
+    `${name}${sep}<b>${value}</b>` +
     `<span id="statdesc-${model.stat}" class="visually-hidden">${aria}</span></span>`
   );
 }

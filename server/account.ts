@@ -24,7 +24,6 @@ import {
   accountAndScopeForToken,
   accountById,
   accountByUnsubscribeToken,
-  accountForToken,
   accountMailTarget,
   accountTwoFactorEnabled,
   backfillAccountEmailIfEmpty,
@@ -83,10 +82,10 @@ import {
 const TOTP_ISSUER = 'World of ClaudeCraft';
 
 // How long an email-change verification link stays valid.
-const EMAIL_CHANGE_TTL_HOURS = 24;
+export const EMAIL_CHANGE_TTL_HOURS = 24;
 // How long a password-reset link stays valid. Shorter than the email-change TTL:
 // a reset is higher-value and the user acts on it immediately.
-const PASSWORD_RESET_TTL_HOURS = 1;
+export const PASSWORD_RESET_TTL_HOURS = 1;
 
 // Hooks main.ts injects so the deactivate path can consult and tear down live
 // game sessions without account.ts importing the GameServer (which pulls in the
@@ -94,9 +93,20 @@ const PASSWORD_RESET_TTL_HOURS = 1;
 export interface AccountGameHooks {
   /** True when any of the account's characters is currently in a live session. */
   anyCharacterOnline(characterIds: number[]): boolean;
-  /** Close any established socket for the account right after deactivation. */
+  /** Close any established socket for the account, unconditionally. */
   disconnectAccount(accountId: number, reason: string): void;
 }
+
+// The narrower hook a credential-change handler needs: just the live-WS
+// teardown, not the online-character check the deactivate flow uses.
+type DisconnectHook = Pick<AccountGameHooks, 'disconnectAccount'>;
+
+// Disconnect reason for the live-WS kick a password change/reset forces. Byte-
+// identical to admin.ts's IP_BLOCK_KICK_MESSAGE, which the client already
+// localizes (api_error_i18n.ts): reusing the exact literal needs no new i18n
+// work and matches the same "credentials changed, an open socket is no longer
+// trustworthy" posture as the admin-initiated reset-password handlers.
+const CREDENTIAL_CHANGE_KICK_MESSAGE = 'Connection to the server was lost.';
 
 // GET /api/account: whoami; re-validates a stored token on reload + feeds the
 // portal header. characterCount is account-wide (every realm), matching the
@@ -125,12 +135,23 @@ export async function handleAccountWhoami(
 // POST /api/account/password: re-verify current, then revoke every OTHER token
 // so a password change signs out other devices while keeping this one alive.
 // callerToken is resolved by main.ts; it must never be null here (validated up
-// the stack) so the revoke below can never accidentally nuke this session.
+// the stack) so the revoke below can never accidentally nuke this session. Token
+// revocation alone does not close an already-open WS (an attacker who is
+// already in-world stays connected), so we also force-disconnect every live
+// session for the account, mirroring handleAccountDeactivate below. This
+// deliberately does NOT try to spare the caller's own live session: a bearer
+// token is a reusable wire credential, not a per-socket identity, so a stolen
+// token could authenticate an attacker's live session too, and an exemption
+// keyed on token equality could just as easily spare the attacker instead of
+// the legitimate device. Any of the account's own other tabs simply
+// reconnects with the fresh credentials, the same as password reset already
+// requires.
 export async function handleAccountChangePassword(
   req: http.IncomingMessage,
   res: http.ServerResponse,
   accountId: number,
   callerToken: string,
+  hooks: DisconnectHook,
 ): Promise<void> {
   if (!rateLimited(req).allowed) return json(res, 429, { error: 'too many attempts, slow down' });
   const body = await readBody(req);
@@ -161,6 +182,7 @@ export async function handleAccountChangePassword(
   }
   await updatePasswordHash(accountId, await hashPassword(next));
   await revokeTokensExcept(accountId, callerToken);
+  hooks.disconnectAccount(accountId, CREDENTIAL_CHANGE_KICK_MESSAGE);
   // Best-effort security notice; never blocks the password change on mail state.
   emailPasswordChanged(acct);
   return json(res, 200, { ok: true });
@@ -199,10 +221,15 @@ export async function handleAccountPasswordForgot(
 // Unauthenticated: complete a reset with the emailed token + a new password. The
 // token is validated, the new password applied, and every session revoked, all in
 // one atomic DB call. Invalid and expired tokens return the same 400 so neither a
-// bad guess nor an old link reveals anything.
+// bad guess nor an old link reveals anything. Revoking tokens alone does not close
+// an already-open WS (this reset exists precisely because the account may be
+// recovering from a compromise, and a compromised session may already be
+// in-world), so we also force-disconnect any live session for the account right
+// after the reset lands, mirroring handleAccountDeactivate below.
 export async function handleAccountPasswordReset(
   req: http.IncomingMessage,
   res: http.ServerResponse,
+  hooks: DisconnectHook,
 ): Promise<void> {
   if (!rateLimited(req).allowed) return json(res, 429, { error: 'too many attempts, slow down' });
   const body = await readBody(req);
@@ -217,6 +244,7 @@ export async function handleAccountPasswordReset(
   }
   const applied = await consumePasswordResetRequest(hashEmailToken(raw), await hashPassword(next));
   if (!applied) return json(res, 400, { error: 'invalid or expired link' });
+  hooks.disconnectAccount(applied.accountId, CREDENTIAL_CHANGE_KICK_MESSAGE);
   // Best-effort "your password changed" notice; never blocks the reset on mail state.
   const target = await accountMailTarget(applied.accountId);
   if (target) emailPasswordChanged(target);
@@ -496,7 +524,7 @@ export async function handleAccount2faDisable(
   return json(res, 200, { ok: true });
 }
 
-// Login-time second-factor check, shared by the /api/login handler. Accepts a
+// Login-time second-factor check shared by ordinary and admin login. Accepts a
 // live TOTP code (replay-guarded: a code is good for at most one login inside its
 // 30s window) OR a single-use recovery code. Returns true on success. Never
 // throws: any unexpected state resolves to a denied second factor.
@@ -622,31 +650,45 @@ function useRuntime(): AccountGameHooks {
 // Db seam. The bearer-resolution + companion-token reads/writes, bundled once
 // behind a test-only setter so the guards and companion handlers can be driven
 // with a fake and no Postgres. Production never calls the setter, so
-// REAL_ACCOUNT_DB is the only runtime binding and it references the exact
-// functions the legacy arms call. scopeAllowsMutation is pure (no DB), so it
-// stays a direct import rather than a seam member. The handleAccount* domain
-// functions keep their own direct db.ts imports (driven by the existing
-// account_server.test.ts pg-mock harness); this seam covers only the NEW code.
+// makeRealAccountDb is the only runtime binding and it references the exact
+// functions the legacy arms call. It is lazy so importing one independent
+// account helper (for example admin login's shared 2FA verifier) does not
+// eagerly dereference every db export under a focused partial mock.
+// scopeAllowsMutation is pure (no DB), so it stays a direct import rather than
+// a seam member. The handleAccount* domain functions keep their own direct
+// db.ts imports (driven by the existing account_server.test.ts pg-mock
+// harness); this seam covers only the NEW code.
 // ---------------------------------------------------------------------------
 
-const REAL_ACCOUNT_DB = {
-  accountAndScopeForToken,
-  accountForToken,
-  moderationStatusForAccount,
-  createCompanionToken,
-  listCompanionTokens,
-  revokeCompanionToken,
-};
-let accountDb = REAL_ACCOUNT_DB;
+function makeRealAccountDb() {
+  return {
+    accountAndScopeForToken,
+    moderationStatusForAccount,
+    createCompanionToken,
+    listCompanionTokens,
+    revokeCompanionToken,
+  };
+}
+
+type AccountDb = ReturnType<typeof makeRealAccountDb>;
+let realAccountDb: AccountDb | undefined;
+let accountDbOverride: AccountDb | undefined;
+
+function accountDb(): AccountDb {
+  if (accountDbOverride) return accountDbOverride;
+  realAccountDb ??= makeRealAccountDb();
+  return realAccountDb;
+}
 
 /** Override the account db bundle with a fake (test-only; merges over the real reads). */
-export function setAccountDbForTests(overrides: Partial<typeof REAL_ACCOUNT_DB>): void {
-  accountDb = { ...REAL_ACCOUNT_DB, ...overrides };
+export function setAccountDbForTests(overrides: Partial<AccountDb>): void {
+  realAccountDb ??= makeRealAccountDb();
+  accountDbOverride = { ...realAccountDb, ...overrides };
 }
 
 /** Restore the real account db bundle after a setAccountDbForTests override (test-only). */
 export function resetAccountDbForTests(): void {
-  accountDb = REAL_ACCOUNT_DB;
+  accountDbOverride = undefined;
 }
 
 // ---------------------------------------------------------------------------
@@ -670,7 +712,7 @@ async function resolveBearerScope(
 ): Promise<{ accountId: number; scope: 'read' | 'full' } | null> {
   const token = bearerToken(req);
   if (token === null) return null;
-  return accountDb.accountAndScopeForToken(token);
+  return accountDb().accountAndScopeForToken(token);
 }
 
 /** Mutating + account-scoped gate (mirrors server/main.ts bearerActiveAccount). */
@@ -684,7 +726,7 @@ const activeGuard: Middleware = async (ctx, next) => {
     json(ctx.res, 403, READ_ONLY_TOKEN);
     return;
   }
-  const status = await accountDb.moderationStatusForAccount(info.accountId);
+  const status = await accountDb().moderationStatusForAccount(info.accountId);
   if (status.locked) {
     json(ctx.res, 403, moderationErrorBody(status));
     return;
@@ -697,12 +739,12 @@ const activeGuard: Middleware = async (ctx, next) => {
  * Logout gate (mirrors the legacy /api/account/logout arm): any bearer token that
  * still maps to an account may proceed, with NO scope or moderation gate, so a
  * banned/suspended/deactivated account can still sign out this device. A missing
- * token 401s DB-free; a present-but-unknown token 401s after the accountForToken
- * lookup, exactly as the legacy arm did.
+ * token 401s DB-free; a present-but-unknown token 401s after the scoped lookup,
+ * exactly as the legacy arm did.
  */
 const logoutGuard: Middleware = async (ctx, next) => {
   const token = bearerToken(ctx.req);
-  if (token === null || (await accountDb.accountForToken(token)) === null) {
+  if (token === null || (await accountDb().accountAndScopeForToken(token)) === null) {
     json(ctx.res, 401, NOT_AUTHENTICATED);
     return;
   }
@@ -729,7 +771,13 @@ async function passwordHandler(ctx: Ctx): Promise<void> {
     json(ctx.res, 401, NOT_AUTHENTICATED);
     return;
   }
-  return handleAccountChangePassword(ctx.req, ctx.res, ctxAccountId(ctx), callerToken);
+  return handleAccountChangePassword(
+    ctx.req,
+    ctx.res,
+    ctxAccountId(ctx),
+    callerToken,
+    useRuntime(),
+  );
 }
 
 /** POST /api/account/logout: revoke this device's bearer token. */
@@ -805,7 +853,7 @@ async function companionCreateHandler(ctx: Ctx): Promise<void> {
   const rawLabel = typeof body.label === 'string' ? body.label.trim().slice(0, 64) : '';
   const label = rawLabel || null;
   const token = newToken();
-  await accountDb.createCompanionToken(token, accountId, label, COMPANION_TOKEN_TTL_HOURS);
+  await accountDb().createCompanionToken(token, accountId, label, COMPANION_TOKEN_TTL_HOURS);
   return json(ctx.res, 200, {
     token,
     label,
@@ -816,7 +864,9 @@ async function companionCreateHandler(ctx: Ctx): Promise<void> {
 
 /** GET /api/account/companion-token: list the account's companion tokens (no secrets). */
 async function companionListHandler(ctx: Ctx): Promise<void> {
-  return json(ctx.res, 200, { tokens: await accountDb.listCompanionTokens(ctxAccountId(ctx)) });
+  return json(ctx.res, 200, {
+    tokens: await accountDb().listCompanionTokens(ctxAccountId(ctx)),
+  });
 }
 
 /** DELETE /api/account/companion-token: revoke a companion token by prefix. */
@@ -824,7 +874,7 @@ async function companionRevokeHandler(ctx: Ctx): Promise<void> {
   const accountId = ctxAccountId(ctx);
   const body = await readBody(ctx.req);
   const prefix = typeof body.prefix === 'string' ? body.prefix.trim().toLowerCase() : '';
-  const ok = await accountDb.revokeCompanionToken(accountId, prefix);
+  const ok = await accountDb().revokeCompanionToken(accountId, prefix);
   return json(ctx.res, ok ? 200 : 404, ok ? { ok: true } : COMPANION_TOKEN_NOT_FOUND);
 }
 

@@ -68,4 +68,57 @@ describe('Ground aim reticle visual', () => {
     visual.dispose();
     expect(scene.getObjectByName('ground-aim-reticle')).toBeUndefined();
   });
+
+  it('elides terrain sampling and buffer uploads for an identical visible aim', () => {
+    const scene = new THREE.Scene();
+    let heightSamples = 0;
+    const visual = new GroundAimReticleVisual(scene, () => {
+      heightSamples++;
+      return 2;
+    });
+    const first = { x: 3, z: 7, radius: 5, color: 0x72cfff, dimmed: false };
+    visual.setAim(first);
+
+    const root = scene.getObjectByName('ground-aim-reticle') as THREE.Group;
+    const objects = [
+      root.getObjectByName('ground-aim-outer-edge') as THREE.LineLoop,
+      root.getObjectByName('ground-aim-inner-guide') as THREE.LineLoop,
+      root.getObjectByName('ground-aim-band') as THREE.Mesh,
+      root.getObjectByName('ground-aim-ticks') as THREE.LineSegments,
+    ];
+    const positions = objects.map(
+      (object) => object.geometry.getAttribute('position') as THREE.BufferAttribute,
+    );
+    const firstVersions = positions.map((position) => position.version);
+    const firstSamples = heightSamples;
+
+    visual.setAim({ ...first, color: 0xff5a16, dimmed: true });
+    expect(heightSamples).toBe(firstSamples);
+    expect(positions.map((position) => position.version)).toEqual(firstVersions);
+    for (const object of objects) {
+      expect((object.material as THREE.Material & { color: THREE.Color }).color.getHex()).toBe(
+        0xff5a16,
+      );
+    }
+
+    visual.setAim({ ...first, x: 3.25 });
+    expect(heightSamples).toBeGreaterThan(firstSamples);
+    expect(positions.map((position) => position.version)).toEqual(
+      firstVersions.map((version) => version + 1),
+    );
+
+    visual.setAim({ ...first, x: 3.25, radius: -1 });
+    const zeroRadiusSamples = heightSamples;
+    const zeroRadiusVersions = positions.map((position) => position.version);
+    visual.setAim({ ...first, x: 3.25, radius: -2 });
+    expect(heightSamples).toBe(zeroRadiusSamples);
+    expect(positions.map((position) => position.version)).toEqual(zeroRadiusVersions);
+
+    visual.setAim(null);
+    visual.setAim({ ...first, x: 3.25, radius: -2 });
+    expect(heightSamples).toBeGreaterThan(zeroRadiusSamples);
+    expect(positions.map((position) => position.version)).toEqual(
+      zeroRadiusVersions.map((version) => version + 1),
+    );
+  });
 });

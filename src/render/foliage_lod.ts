@@ -2,20 +2,24 @@
 // from foliage.ts so the decision itself is pure: no Three, no DOM, no GFX
 // singleton, unit-testable in Node (tests/foliage_lod.test.ts).
 //
-// THE IMPOSTOR IS A LOD, NOT A PLACEHOLDER. Past the tree-detail distance a real
-// GLB tree is swapped for a cheap stand-in (a cone for pines, a blob for oaks;
-// farTreeProxyGeo in foliage.ts). Nothing about it is meant to be legible: it
-// only works while the zone's fog has already swallowed the swap, which is why
-// the two windows are exact complements rather than a cross-fade.
+// TWO ARMS, TWO LAWS. On the sprite arm (GFX.standardMaterials and not
+// leanFoliage) the far field belongs to baked sprite impostors of the real
+// models (foliage_impostor.ts), which are legible in clear air, so the
+// real-model handoff follows the BUDGET: spriteSwapDistance in
+// foliage_impostor_core.ts. This module keeps the shared plumbing (the
+// distance tables, the governor scales, the fog cull, bucketVisible) plus the
+// LEAN arm's law below.
 //
-// That held while every zone's fog closed at ~340u and the detail distance was a
-// flat 300u: the impostor band sat inside the murk. Zones now open the view out
-// to 470-560u, and a build-time constant cannot know that, so the cones ended up
-// standing in clear air. Hence the rule below: the detail distance follows the
-// FOG, and an impostor may only appear where fog has already blended it at least
-// IMPOSTOR_MIN_FOG_BLEND of the way to solid. A short-fog zone keeps the old,
-// cheaper radius (the max() never shrinks it), so this costs nothing where the
-// view was already closed in.
+// THE LEAN ARM HAS NO IMPOSTORS AT ALL: past the tree-detail distance its
+// trees simply end. That is why treeDetailDistance still follows the FOG: the
+// forest may only end where fog has already blended it at least
+// IMPOSTOR_MIN_FOG_BLEND of the way to solid, else the world visibly runs out
+// of trees in clear air. The short-fog realms need the OPPOSITE guard: their
+// budgeted radius overshoots the foliage fog cull entirely (marsh: detail
+// 216-300u against a cull at 129-165u), so the boundary retreats to the fog
+// floor, the deepest-in-the-murk point the blend law allows. If even the
+// floor sits past the cull (very low model quality), trees run to the cull
+// line and the blend law holds vacuously.
 
 export interface LodDists {
   barkFar: number;
@@ -49,9 +53,30 @@ export function lodDistsFor(leanFoliage: boolean): LodDists {
 }
 
 /**
- * How far the fog must have swallowed a tree before it is allowed to become an
- * impostor. 0 would permit a cone in clear air; 1 would forbid impostors
- * entirely (and hand the far field back its full triangle cost).
+ * The adaptive budget's foliage lever (render_budget.ts pulls foliage down
+ * first under load) mapped to the distance multiplier every build-time cap
+ * uses. Lives here, next to treeDetailDistance, because the two are one
+ * dial: tests that starve one must starve the other the same way.
+ */
+export function foliageDistanceScale(modelQuality: number, leanFoliage: boolean): number {
+  return leanFoliage ? 0.56 + 0.44 * modelQuality : 0.72 + 0.28 * modelQuality;
+}
+
+/**
+ * Buckets entirely past this line are pure overdraw: fog has swallowed them.
+ * Model quality claws a little of the wall back before the preset distance.
+ */
+export function foliageFogLimit(fogFar: number, modelQuality: number): number {
+  return fogFar * (0.78 + 0.22 * modelQuality);
+}
+
+/**
+ * The LEAN arm's blend law: how far the fog must have swallowed a tree before
+ * the forest is allowed to END there (the lean tier has no impostors, so past
+ * the boundary there is simply nothing). 0 would let the treeline stop in
+ * clear air; 1 would hand the far field back its full triangle cost. The
+ * sprite arm retired this law: a baked sprite is legible anywhere, so its
+ * handoff follows the budget (foliage_impostor_core.ts spriteSwapDistance).
  */
 export const IMPOSTOR_MIN_FOG_BLEND = 0.7;
 
@@ -62,7 +87,8 @@ export function fogBlendAt(dist: number, fogNear: number, fogFar: number): numbe
 }
 
 /**
- * Distance at which a real tree gives way to its impostor.
+ * Distance at which the LEAN arm's real trees end (the sprite arm hands off
+ * to sprites at foliage_impostor_core.ts spriteSwapDistance instead).
  *
  * `distanceScale` is the adaptive frame budget's lever (render_budget.ts pulls
  * foliage down first under load). It may still shrink the detail radius, but
@@ -70,17 +96,38 @@ export function fogBlendAt(dist: number, fogNear: number, fogFar: number): numbe
  * assets decode and shaders compile used to drag the boundary in to ~216u and
  * park cones in plain view until the budget recovered, which read as "the trees
  * are still cones until they load".
+ *
+ * `fogLimit` (foliageFogLimit) caps it from the other side: a swap at or past
+ * the foliage fog cull would draw real trees the cull is about to drop and
+ * starve the impostor band to nothing, which is exactly what happened in every
+ * short-fog realm. When the budgeted radius overshoots the cull, the swap
+ * retreats to the fog floor (the nearest point the blend law allows), and the
+ * band between floor and cull goes to impostors. The result always satisfies
+ * detailFar <= fogLimit.
+ *
+ * INPUT CONTRACT: `fogNear`/`fogFar` are the ATMOSPHERIC fog, the authored
+ * preset times the day-night scale, never the residency-clamped live values.
+ * The streaming clamp can pin the live view at a 45u wall (and briefly leave
+ * near above far while near eases after far snaps); fed those, the retreat
+ * would park impostor cones a few strides from the camera for the length of
+ * every streaming window. With atmospheric values the floor stays where the
+ * realm's real murk is, and the min() against `fogLimit` (which IS live) is
+ * what keeps the swap behind the wall meanwhile. The degenerate arm below is
+ * defense in depth for a malformed preset, not the clamp transient.
  */
 export function treeDetailDistance(
   base: number,
   fogNear: number,
   fogFar: number,
   distanceScale: number,
+  fogLimit: number,
 ): number {
   const budgeted = base * distanceScale;
-  if (!(fogFar > fogNear)) return budgeted;
+  if (!(fogFar > fogNear)) return Math.min(budgeted, fogLimit);
   const fogFloor = fogNear + IMPOSTOR_MIN_FOG_BLEND * (fogFar - fogNear);
-  return Math.max(budgeted, fogFloor);
+  const detail = Math.max(budgeted, fogFloor);
+  if (detail < fogLimit) return detail;
+  return Math.min(fogFloor, fogLimit);
 }
 
 export interface BucketWindowInput {
@@ -92,12 +139,13 @@ export interface BucketWindowInput {
   minDist?: number;
   maxDist?: number;
   /**
-   * Bounds that additionally track the runtime tree-detail swap: the impostor
-   * starts there (minAtDetail), the real model ends there (maxAtDetail). It is
-   * the one edge that cannot be known at build time, because it follows the
-   * zone's fog. A bucket can carry BOTH a numeric cap and the detail cap (the
-   * near-fill half of a species culls at treeFillFar OR at the swap, whichever
-   * comes first), so these compose rather than replace.
+   * Bounds that additionally track the runtime handoff: the sprite starts
+   * there (minAtDetail), the real model ends there (maxAtDetail). It is the
+   * one edge that cannot be known at build time, because it follows the
+   * governor and the zone's fog. A bucket can carry BOTH a numeric cap and
+   * the detail cap, and the per-instance shader windows
+   * (foliage_collapse.ts) resolve whatever the coarse slab tests let
+   * through, so these compose rather than replace.
    */
   minAtDetail?: boolean;
   maxAtDetail?: boolean;
@@ -109,6 +157,19 @@ export interface BucketWindowInput {
   revealScale: number;
   /** buckets entirely behind the fog wall are pure overdraw */
   fogLimit: number;
+  /**
+   * Sprite rows (the merged per-bucket impostor meshes). Their instances
+   * begin at each one's own jittered handoff (detailFar carries the row's
+   * category swap), and they die at the LIVE fog wall (spriteFar) rather
+   * than the model-quality-trimmed foliage cull: a sprite is ~2 triangles,
+   * so trimming it before the fog swallows it saves nothing and pops the
+   * picture.
+   */
+  spriteRow?: boolean;
+  /** per-instance handoff jitter span (defaults to 0) */
+  swapFade?: number;
+  /** live fog wall for sprite rows (defaults to fogLimit) */
+  spriteFar?: number;
 }
 
 /**
@@ -118,11 +179,24 @@ export interface BucketWindowInput {
  * edge would keep every bucket alive for another half-bucket past its cap and
  * quietly multiply the triangles they exist to cut.
  *
- * The tree-detail swap is the exception: it is measured from the NEAR EDGE. Keyed
- * on the center, a bucket you are standing at the edge of could already have
- * flipped to impostors, putting cones a few strides away. Both sides of the swap
- * read that same quantity, so a species' real-model and impostor windows stay
- * exact complements: never drawn together, never both dropped.
+ * The tree-detail swap is the exception: its two arms are COVERAGE tests, not a
+ * partition. The real model draws while any part of the bucket is inside the
+ * swap (near edge), the impostor while any part is outside it (far edge), so a
+ * bucket straddling the boundary draws both meshes and the per-instance windows
+ * (instanceCullWindows, enforced in the vertex shader) split the trees exactly.
+ * Keyed on the center, a bucket you are standing at the edge of could already
+ * have flipped to impostors, putting cones a few strides away; keyed near-edge
+ * only, as this was before the shader owned the boundary, every tree in a
+ * 540x240u slab drew at full detail until the whole slab left the swap.
+ *
+ * The shadow-only clones do NOT come through here at all. They are the one row
+ * with no fallback once the bucket drops (no impostor takes over, and the
+ * per-instance collapse cannot reach three's shadow depth material), which
+ * briefly made the numeric cap measure from their near edge: that inflated
+ * their kept radius by a bucket bounding radius, ~290u on the shipped
+ * ~500x240u slabs, and roughly tripled the shadow pass. The right axis for that
+ * row was never distance from the camera, it is the key light's own shadow
+ * volume, so it lives in foliage_shadow_core.ts now.
  */
 export function bucketVisible(w: BucketWindowInput): boolean {
   const nearEdge = w.centerDist - w.radius;
@@ -134,8 +208,14 @@ export function bucketVisible(w: BucketWindowInput): boolean {
       : w.maxDist * w.distanceScale * w.revealScale;
   if (w.centerDist < minCap || w.centerDist >= maxCap) return false;
 
-  if (w.minAtDetail && nearEdge < w.detailFar) return false;
+  if (w.minAtDetail) {
+    // Sprite rows come alive at the earliest per-instance handoff their
+    // instances can take (jitter pulls each swap in by up to the fade span);
+    // legacy rows key on the detail boundary alone.
+    const minBase = w.spriteRow ? w.detailFar - (w.swapFade ?? 0) : w.detailFar;
+    if (w.centerDist + w.radius < minBase) return false;
+  }
   if (w.maxAtDetail && nearEdge >= w.detailFar) return false;
 
-  return nearEdge < w.fogLimit;
+  return nearEdge < (w.spriteRow ? (w.spriteFar ?? w.fogLimit) : w.fogLimit);
 }

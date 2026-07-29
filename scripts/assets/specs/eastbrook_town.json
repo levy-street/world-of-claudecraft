@@ -1,0 +1,58 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/eastbrook_town/bank-final.glb",
+      "out": "models/props/eastbrook_bank.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/eastbrook_town/smithy-final.glb",
+      "out": "models/props/eastbrook_smithy.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/eastbrook_town/inn-final.glb",
+      "out": "models/props/eastbrook_inn.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/eastbrook_town/chapel-final.glb",
+      "out": "models/props/eastbrook_chapel.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/eastbrook_town/weaving_workshop-final.glb",
+      "out": "models/props/eastbrook_weaving_workshop.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/eastbrook_town/toolworks-final.glb",
+      "out": "models/props/eastbrook_toolworks.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/eastbrook_town/civic_well_beacon-final.glb",
+      "out": "models/props/eastbrook_civic_well_beacon.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/eastbrook_town/market_stall-final.glb",
+      "out": "models/props/eastbrook_market_stall.glb",
+      "type": "static",
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/eastbrook_town/wall_wing-final.glb",
+      "out": "models/props/eastbrook_wall_wing.glb",
+      "type": "static",
+      "keepExtras": true
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-// Pure view core for the Phase 9 recipe-training window: master-to-station
+// Pure view core for the recipe-training window: master-to-station
 // resolution, the tri-state row predicate (known / teachable / locked,
 // mirroring isRecipeKnown + teachTierMet exactly), the always-present locked
 // ladder with its named requirement, the stable sort, fees and
@@ -10,6 +10,7 @@ import { STATIONS } from '../src/sim/content/professions';
 import { COMBO_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import {
+  availableTrainCopper,
   buildTrainView,
   isRecipeKnownForViewer,
   isStationMasterNpc,
@@ -19,6 +20,7 @@ import {
 // Base deps: nothing learned, no skill, comfortable purse.
 function deps(over: Partial<TrainViewDeps> & Record<string, unknown> = {}): TrainViewDeps {
   return {
+    stations: STATIONS,
     knownRecipes: [],
     craftSkills: {},
     copper: 100000,
@@ -40,12 +42,13 @@ describe('isStationMasterNpc', () => {
     // master from recognition (a non-combo master included) must fail here,
     // not just the two combo-teaching ones.
     for (const station of STATIONS) {
-      expect(isStationMasterNpc(station.masterNpcId), station.masterNpcId).toBe(true);
+      expect(isStationMasterNpc(station.masterNpcId, STATIONS), station.masterNpcId).toBe(true);
     }
     expect(STATIONS).toHaveLength(6);
-    expect(isStationMasterNpc('marshal_redbrook')).toBe(false);
-    expect(isStationMasterNpc('smith_haldren')).toBe(false); // the stall smith is NOT the forge master
-    expect(isStationMasterNpc('')).toBe(false);
+    expect(isStationMasterNpc('marshal_redbrook', STATIONS)).toBe(false);
+    expect(isStationMasterNpc('smith_haldren', STATIONS)).toBe(false); // the stall smith is NOT the forge master
+    expect(isStationMasterNpc('', STATIONS)).toBe(false);
+    expect(isStationMasterNpc('forgemistress_darva', [])).toBe(false);
   });
 });
 
@@ -123,7 +126,7 @@ describe('buildTrainView', () => {
 
   it('locked rows are ALWAYS present and carry the named tier requirement', () => {
     // Skill 0 everywhere: every trainer recipe above the free floor locks (the
-    // skillReq-0 Phase 10 ladder rungs stay teachable at tier 0), and each
+    // skillReq-0 ladder rungs stay teachable at tier 0), and each
     // locked row names its craft and the flat threshold tier * TIER_SKILL_STEP.
     // forgemistress_darva serves both forge crafts, so her locked ladder is the
     // two combo recipes plus the tier-1 (skillReq 25) and tier-2 (skillReq 50)
@@ -181,6 +184,132 @@ describe('buildTrainView', () => {
     expect(known?.feeCopper).toBe(0);
   });
 
+  it('availableTrainCopper reserves every pending fee except the priced row', () => {
+    // Pure helper pin: one ironlink fee (2500) in flight against a 2500 purse
+    // leaves 0 for a sibling and the full 2500 when the pending row prices
+    // itself (so its gold chip stays under the disabled pending opacity).
+    const pending = new Set(['recipe_ironlink_hauberk']);
+    expect(availableTrainCopper(2500, pending, 'recipe_ironlink_legguards')).toBe(0);
+    expect(availableTrainCopper(2500, pending, 'recipe_ironlink_hauberk')).toBe(2500);
+    expect(availableTrainCopper(2500, undefined)).toBe(2500);
+    expect(availableTrainCopper(2500, new Set())).toBe(2500);
+    // EVERY fee sums: two 2500 flights against a 10000 purse leave 5000 for a
+    // third row (an accumulator downgraded to plain assignment fails here).
+    expect(
+      availableTrainCopper(
+        10000,
+        new Set(['recipe_ironlink_hauberk', 'recipe_ironlink_legguards']),
+        'recipe_riveted_copper_girdle',
+      ),
+    ).toBe(5000);
+    // The clamp is a LIVE arm, not defensive: online the debited copper can
+    // mirror while a flight is still open, and an unclamped negative purse
+    // would wrongly disable free tier-0 rows (fee 0 needs spendable >= 0).
+    expect(availableTrainCopper(1000, pending)).toBe(0);
+    // An id recipeById cannot resolve reserves nothing: a stale entry must
+    // neither throw mid-ladder nor distort the purse.
+    expect(availableTrainCopper(2500, new Set(['recipe_not_a_real_id']))).toBe(2500);
+  });
+
+  it('a pending Learn reserves its fee so sibling teachable rows reprice immediately', () => {
+    // Two ironlink-rung armor recipes cost 25 silver each. With exactly one
+    // fee on hand, learning the first must not leave the second gold-chip
+    // ready while the flight is open (the click-then-cannot-afford trap).
+    const pendingId = 'recipe_ironlink_hauberk';
+    const siblingId = 'recipe_ironlink_legguards';
+    const bothTeachable = {
+      craftSkills: { armorcrafting: 25 },
+      copper: 2500,
+      knownRecipes: [] as string[],
+    };
+    // Baseline without a flight: both teachable rows advertise affordable
+    // even though the purse covers only one fee (the pre-fix trap).
+    const open = buildTrainView('forgemistress_darva', deps(bothTeachable));
+    const openPending = open.rows.find((row) => row.recipeId === pendingId);
+    const openSibling = open.rows.find((row) => row.recipeId === siblingId);
+    expect(openPending?.state).toBe('teachable');
+    expect(openPending?.feeCopper).toBe(2500);
+    expect(openPending?.affordable).toBe(true);
+    expect(openSibling?.state).toBe('teachable');
+    expect(openSibling?.feeCopper).toBe(2500);
+    expect(openSibling?.affordable).toBe(true);
+
+    const inFlight = buildTrainView(
+      'forgemistress_darva',
+      deps({
+        ...bothTeachable,
+        pendingRecipes: new Set([pendingId]),
+      }),
+    );
+    const flightPending = inFlight.rows.find((row) => row.recipeId === pendingId);
+    const flightSibling = inFlight.rows.find((row) => row.recipeId === siblingId);
+    // The row in flight keeps its own affordability (gold chip under pending
+    // opacity) and carries the pending flag.
+    expect(flightPending?.pending).toBe(true);
+    expect(flightPending?.affordable).toBe(true);
+    // The sibling no longer advertises a fee the reserved purse cannot cover.
+    expect(flightSibling?.pending).toBeUndefined();
+    expect(flightSibling?.affordable).toBe(false);
+  });
+
+  it('a mirror-known learn stops reserving: the debited purse is never double-counted', () => {
+    // Offline shape: Sim.trainRecipe debits AND grants synchronously before
+    // the click repaint, so the flight is still open while the mirror already
+    // knows the recipe. The purse covered two fees (5000), one was debited
+    // (2500 left): the sibling must stay affordable, not be priced at the
+    // debited purse minus the same fee a second time.
+    const view = buildTrainView(
+      'forgemistress_darva',
+      deps({
+        craftSkills: { armorcrafting: 25 },
+        copper: 2500,
+        knownRecipes: ['recipe_ironlink_hauberk'],
+        pendingRecipes: new Set(['recipe_ironlink_hauberk']),
+      }),
+    );
+    const learned = view.rows.find((row) => row.recipeId === 'recipe_ironlink_hauberk');
+    const sibling = view.rows.find((row) => row.recipeId === 'recipe_ironlink_legguards');
+    expect(learned?.state).toBe('known');
+    expect(sibling?.state).toBe('teachable');
+    expect(sibling?.affordable).toBe(true);
+  });
+
+  it('a confirmed-but-unmirrored learn keeps its fee reserved until the mirror lands', () => {
+    // Online shape: trainResult ok cleared the flight and joined the confirmed
+    // overlay, but neither the cprof grant nor the copper debit has mirrored
+    // yet. The sibling must NOT flash back to a gold chip on the stale purse.
+    const confirmed = buildTrainView(
+      'forgemistress_darva',
+      deps({
+        craftSkills: { armorcrafting: 25 },
+        copper: 2500,
+        knownRecipes: [],
+        confirmedRecipes: new Set(['recipe_ironlink_hauberk']),
+      }),
+    );
+    expect(confirmed.rows.find((row) => row.recipeId === 'recipe_ironlink_hauberk')?.state).toBe(
+      'known',
+    );
+    expect(
+      confirmed.rows.find((row) => row.recipeId === 'recipe_ironlink_legguards')?.affordable,
+    ).toBe(false);
+    // Once the self-frame lands (grant mirrored, copper debited) the reserve
+    // must drop even if a stale confirmed entry lingers: the mirror-known
+    // filter, not confirmedIds' pruning, is what guarantees no double-count.
+    const settled = buildTrainView(
+      'forgemistress_darva',
+      deps({
+        craftSkills: { armorcrafting: 25 },
+        copper: 2500,
+        knownRecipes: ['recipe_ironlink_hauberk'],
+        confirmedRecipes: new Set(['recipe_ironlink_hauberk']),
+      }),
+    );
+    expect(
+      settled.rows.find((row) => row.recipeId === 'recipe_ironlink_legguards')?.affordable,
+    ).toBe(true);
+  });
+
   it('the apothecary master lists the alchemy ladder with its combo teachable at tier 1', () => {
     const view = buildTrainView('alchemist_verane', deps({ craftSkills: { alchemy: 25 } }));
     expect(view.stationType).toBe('apothecary');
@@ -188,6 +317,49 @@ describe('buildTrainView', () => {
     expect(combo?.state).toBe('teachable');
     // Every row belongs to the station's craft.
     for (const row of view.rows) expect(row.professionId, row.recipeId).toBe('alchemy');
+  });
+
+  it('a pending flight marks ONLY its teachable row (issue #2342)', () => {
+    // armorcrafting 25 makes ironbound teachable; forgeguard stays locked at
+    // weaponcrafting 0 and the arming sword reads known: only the teachable
+    // row may carry the pending flag, even when all three ids are in flight.
+    const pending = new Set([
+      'recipe_ironbound_warplate_helm',
+      'recipe_forgeguard_bulwark_gauntlets',
+      'recipe_eastbrook_arming_sword',
+    ]);
+    const view = buildTrainView(
+      'forgemistress_darva',
+      deps({ craftSkills: { armorcrafting: 25 }, pendingRecipes: pending }),
+    );
+    const byId = new Map(view.rows.map((row) => [row.recipeId, row]));
+    expect(byId.get('recipe_ironbound_warplate_helm')?.state).toBe('teachable');
+    expect(byId.get('recipe_ironbound_warplate_helm')?.pending).toBe(true);
+    expect(byId.get('recipe_forgeguard_bulwark_gauntlets')?.pending).toBeUndefined();
+    expect(byId.get('recipe_eastbrook_arming_sword')?.pending).toBeUndefined();
+    // A teachable row NOT in flight stays flag-free.
+    const untouched = view.rows.find(
+      (row) => row.state === 'teachable' && !pending.has(row.recipeId),
+    );
+    expect(untouched?.pending).toBeUndefined();
+  });
+
+  it('a confirmed learn reads known before the mirror carries it, and knownness beats pending', () => {
+    // The trainResult-ok overlay: knownRecipes (the cprof mirror) does NOT
+    // list the recipe yet, but the confirmed set does; the row must already
+    // read known, and a stale pending entry for the same id must not mark it.
+    const id = 'recipe_ironbound_warplate_helm';
+    const view = buildTrainView(
+      'forgemistress_darva',
+      deps({
+        craftSkills: { armorcrafting: 25 },
+        confirmedRecipes: new Set([id]),
+        pendingRecipes: new Set([id]),
+      }),
+    );
+    const row = view.rows.find((entry) => entry.recipeId === id);
+    expect(row?.state).toBe('known');
+    expect(row?.pending).toBeUndefined();
   });
 
   it('rows resolve their result item defs for the painter', () => {

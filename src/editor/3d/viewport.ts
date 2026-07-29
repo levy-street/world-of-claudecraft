@@ -1,3 +1,4 @@
+import { WORLD_SEED } from '../../sim/world_seed';
 // The 3D in-world editor viewport. Reuses the real game Renderer over a frozen Sim
 // built from the editor's CustomMap, drives a free editor camera, and applies edits
 // through the Renderer's live editing APIs: chunk-local terrain rebuilds during a
@@ -12,7 +13,7 @@
 // content and pushes render updates.
 
 import * as THREE from 'three';
-import { assetsReady } from '../../render/assets/preload';
+import { assetsReady, beginDeferredPreloads } from '../../render/assets/preload';
 import { type SeatRegion, unionRegion } from '../../render/placed_assets';
 import { Renderer } from '../../render/renderer';
 import { FENCE_HALF_DEPTH } from '../../sim/colliders';
@@ -84,7 +85,7 @@ export class Editor3DViewport {
   private raf = 0;
   private lastT = 0;
   private disposed = false;
-  private seed = 20061;
+  private seed = WORLD_SEED;
   private map: CustomMap;
   // Bumped by start()/reload()/dispose(); an in-flight start() that awoke with a
   // stale token abandons, so a reload during the assets await never leaves two
@@ -169,6 +170,11 @@ export class Editor3DViewport {
     if (!this.canvas.isConnected) this.createSurfaces();
     this.seed = this.map.meta.seed;
     const world = customMapToWorldContent(this.map);
+    // The editor is its own host: world-content fetches sit parked in the
+    // deferred lane until someone opens it (startGame does this for the game
+    // client), and a Renderer built over an unopened lane throws "asset not
+    // preloaded". Idempotent, so repeated start() calls are fine.
+    beginDeferredPreloads();
     await assetsReady();
     if (this.disposed || gen !== this.generation) return;
     // The live PlacedAssetsView owns placements, so strip them from the Sim's
@@ -178,7 +184,12 @@ export class Editor3DViewport {
       playerClass: 'warrior',
       world: { ...world, placements: undefined },
     });
-    this.renderer = new Renderer(this.sim, this.canvas, this.nameplates);
+    // Polite far-vista pacing: this construction happens against live editor
+    // frames on every document load, never behind an opaque curtain, so the
+    // eager macrotask build lane must stay off (see RendererCreateOptions).
+    this.renderer = new Renderer(this.sim, this.canvas, this.nameplates, {
+      eagerFarVista: false,
+    });
     this.renderer.placedAssets.rebuildAll(placementsToRenderAssets(this.map.placements), true);
     // A fresh build reflects the whole document: drop any hidden-time debts
     // (before the spawn ring below, which must build even while hidden).
@@ -606,14 +617,16 @@ export class Editor3DViewport {
     cancelAnimationFrame(this.raf);
     this.raf = 0;
     if (this.renderer) {
-      try {
-        this.renderer.editorCam = null;
-        this.renderer.webgl.setAnimationLoop(null);
-        this.renderer.webgl.dispose();
-        this.renderer.webgl.forceContextLoss();
-      } catch {
-        // GL teardown is best-effort.
-      }
+      const renderer = this.renderer;
+      renderer.editorCam = null;
+      void renderer
+        .shutdown()
+        .then(({ context }) => {
+          context.getExtension('WEBGL_lose_context')?.loseContext();
+        })
+        .catch(() => {
+          // GL teardown is best-effort.
+        });
     }
     this.renderer = null;
     this.sim = null;
@@ -640,7 +653,7 @@ export class Editor3DViewport {
     const ground = terrainHeight(this.cam.target.x, this.cam.target.z, this.seed);
     if (this.cam.target.y < ground + 0.5) this.cam.target.y = ground + 0.5;
     // Teleport the frozen player (hidden below) to the ground under the camera
-    // target so foliage/critter LOD stays populated under the cursor (the
+    // target so foliage LOD stays populated under the cursor (the
     // renderer re-centers dressing on the player).
     const player = this.sim.player;
     if (player) {

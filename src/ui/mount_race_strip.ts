@@ -44,6 +44,19 @@ export class MountRaceStrip {
   /** Per-frame safety net, mirroring lockpick's repaintIfChanged: realign the
    *  DOM to authoritative state (the countdown mostly). Cheap: repaints only on
    *  a sig change (bucketed to whole seconds). */
+  // Re-localize after an in-game language switch. The repaint gate is the race
+  // id, the phase and the whole SECOND remaining, all text-independent, so a
+  // language change never moves it on its own and the strip would keep the old
+  // locale until the clock ticked. Clearing the memo forces exactly one repaint
+  // with fresh t(). Unconditional-call safe: repaintIfChanged self-gates on there
+  // being a live race.
+  relocalize(): void {
+    this.lastRaceId = '';
+    this.lastPhase = null;
+    this.lastSecond = -1;
+    this.repaintIfChanged();
+  }
+
   repaintIfChanged(): void {
     const el = this.element;
     if (!el || el.style.display === 'none') return;

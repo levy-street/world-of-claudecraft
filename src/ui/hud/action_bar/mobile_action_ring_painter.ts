@@ -50,13 +50,27 @@ export class MobileActionRingPainter {
    *  rebuild + write entirely on an unchanged page). The toggle's aria-label is
    *  the static "Switch action page" action name (its purpose never changes);
    *  the indicator span shows the dynamic "Page X of Y" text. */
-  paint(state: ActionBarState, page: number, pageCount: number, showAttackButton = true): void {
-    this.writers.setDisplay(this.descriptor.bar.slots[0].btn, showAttackButton ? '' : 'none');
+  paint(
+    state: ActionBarState,
+    page: number,
+    pageCount: number,
+    totalSourceSlotsOrShowAttackButton: number | boolean | undefined = undefined,
+    showAttackButton = true,
+  ): void {
+    const totalSourceSlots =
+      typeof totalSourceSlotsOrShowAttackButton === 'number'
+        ? totalSourceSlotsOrShowAttackButton
+        : undefined;
+    const attackButtonVisible =
+      typeof totalSourceSlotsOrShowAttackButton === 'boolean'
+        ? totalSourceSlotsOrShowAttackButton
+        : showAttackButton;
+    this.writers.setDisplay(this.descriptor.bar.slots[0].btn, attackButtonVisible ? '' : 'none');
     this.barPainter.paint(state);
     for (let buttonIndex = 0; buttonIndex < 5; buttonIndex++) {
       this.writers.setDisplay(
         this.descriptor.bar.slots[buttonIndex + 1].btn,
-        mobileButtonHasSourceSlot(page, buttonIndex) ? '' : 'none',
+        mobileButtonHasSourceSlot(page, buttonIndex, totalSourceSlots) ? '' : 'none',
       );
     }
 
@@ -73,5 +87,17 @@ export class MobileActionRingPainter {
         this.t(PAGE_TOGGLE_ARIA_KEY),
       );
     }
+  }
+
+  /** Re-localize after an in-game language switch (the Hud's woc:languagechange
+   *  fan-out). Both writes at the end of paint() are keyed on the page/count
+   *  pair, which is two integers, so a switch alone never moves them and the ring
+   *  would keep the old locale's "Page X of Y" and toggle name. Dropping the
+   *  latch makes the NEXT paint rewrite both, the same in-place shape the party
+   *  rows use; there is nothing to repaint from here, since the page and count
+   *  arrive per call rather than being retained. */
+  relocalize(): void {
+    this.lastPage = -1;
+    this.lastPageCount = -1;
   }
 }

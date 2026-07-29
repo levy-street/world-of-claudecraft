@@ -19,7 +19,9 @@
 // Three/render/ui/game/net, no Math.random/Date.now), so it runs unchanged in Node,
 // the browser, and the headless RL env (enforced by tests/architecture.test.ts).
 
+import { corpseInteractionAvailability } from './corpse_interaction';
 import { deadTargetSelectable } from './dead_target';
+import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { isVcupCrossTeam } from './social/vale_cup';
 import { orderTabTargets, TAB_QUERY_RADIUS } from './tab_target';
@@ -37,6 +39,24 @@ export class Targeting {
   // Target selection (tab / nearest / friendly cycle)
   // ---------------------------------------------------------------------------
 
+  // Optional QoL preference (issue #1358): mirrors the client's
+  // `stopAutoAttackOnTargetSwitch` setting onto the authoritative PlayerMeta so
+  // every selector below (targetEntity, tabTarget, targetNearestEnemy,
+  // targetNearestFriendly, friendlyTabTarget) can gate on it consistently.
+  setStopAutoAttackOnTargetSwitch(enabled: boolean, pid?: number): void {
+    const r = this.ctx.resolve(pid);
+    if (!r) return;
+    r.meta.stopAutoAttackOnTargetSwitch = enabled;
+  }
+
+  // Whether a switch to `nextTargetId` should disengage auto-attack under the
+  // player's `stopAutoAttackOnTargetSwitch` preference: only when the setting is
+  // on, auto-attack is currently running, and the switch is actually a CHANGE
+  // (re-selecting the same target is a no-op, not a switch).
+  private stopsAutoAttackOnSwitch(meta: PlayerMeta, p: Entity, nextTargetId: number): boolean {
+    return !!meta.stopAutoAttackOnTargetSwitch && p.autoAttack && p.targetId !== nextTargetId;
+  }
+
   targetEntity(id: number | null, pid?: number): void {
     const r = this.ctx.resolve(pid);
     if (!r) return;
@@ -50,9 +70,18 @@ export class Targeting {
       return;
     }
     const e = this.ctx.entities.get(id);
-    if (!e || (e.dead && !deadTargetSelectable(e, p.id))) return;
+    if (!e || (e.dead && !this.deadEntitySelectableFor(e, p.id))) return;
+    if (this.stopsAutoAttackOnSwitch(r.meta, p, id)) p.autoAttack = false;
     p.targetId = id;
     if (!this.ctx.isHostileTo(p, e) || e.dead) p.autoAttack = false;
+  }
+
+  private deadEntitySelectableFor(e: Entity, viewerId: number): boolean {
+    if (!deadTargetSelectable(e, viewerId)) return false;
+    if (e.kind === 'mob' && e.lootable) {
+      return corpseInteractionAvailability(this.ctx, e, viewerId, true).canInteract;
+    }
+    return true;
   }
 
   tabTarget(pid?: number): void {
@@ -69,24 +98,27 @@ export class Targeting {
         dx: c.e.pos.x - p.pos.x,
         dz: c.e.pos.z - p.pos.z,
         d: c.d,
-        engaged: c.e.aggroTargetId === p.id || c.e.targetId === p.id,
+        engaged: this.isEnemyEngagedWith(c.e, p),
       })),
       p.facing,
     );
     const curIdx = ids.indexOf(p.targetId ?? -1);
+    let nextId: number;
     if (curIdx === -1) {
       // No (or no longer valid) target: grab the priority enemy, cluster first.
-      p.targetId = ids[0];
+      nextId = ids[0];
     } else if (curIdx < primaryCount) {
       // Cycling the near fight cluster: wrap back to its first (priority) mob
       // instead of stepping out to a distant idle enemy still in range.
-      p.targetId = ids[(curIdx + 1) % primaryCount];
+      nextId = ids[(curIdx + 1) % primaryCount];
     } else {
       // Sitting on a distant fallback target: walk the rest of the fallback,
       // then wrap back into the near cluster.
       const next = curIdx + 1;
-      p.targetId = next < ids.length ? ids[next] : ids[0];
+      nextId = next < ids.length ? ids[next] : ids[0];
     }
+    if (this.stopsAutoAttackOnSwitch(r.meta, p, nextId)) p.autoAttack = false;
+    p.targetId = nextId;
   }
 
   targetNearestEnemy(pid?: number): void {
@@ -94,15 +126,24 @@ export class Targeting {
     if (!r) return;
     const p = r.e;
     let best: Entity | null = null;
+    let bestEngaged = false;
     let bestD2 = TAB_QUERY_RADIUS * TAB_QUERY_RADIUS;
     this.ctx.grid.forEachInRadius(p.pos.x, p.pos.z, TAB_QUERY_RADIUS, (e, d2) => {
       if (!this.isEnemyTargetCandidate(p, e)) return;
-      if (d2 < bestD2) {
+      const engaged = this.isEnemyEngagedWith(e, p);
+      if (
+        (engaged && !bestEngaged) ||
+        (engaged === bestEngaged && (d2 < bestD2 || (d2 === bestD2 && (!best || e.id < best.id))))
+      ) {
+        bestEngaged = engaged;
         bestD2 = d2;
         best = e;
       }
     });
-    if (best) p.targetId = (best as Entity).id;
+    if (best) {
+      if (this.stopsAutoAttackOnSwitch(r.meta, p, (best as Entity).id)) p.autoAttack = false;
+      p.targetId = (best as Entity).id;
+    }
   }
 
   private enemyCandidates(p: Entity): { e: Entity; d: number }[] {
@@ -113,6 +154,10 @@ export class Targeting {
       out.push({ e, d: Math.sqrt(d2) });
     });
     return out;
+  }
+
+  private isEnemyEngagedWith(target: Entity, attacker: Entity): boolean {
+    return target.aggroTargetId === attacker.id || target.targetId === attacker.id;
   }
 
   private isEnemyTargetCandidate(attacker: Entity, target: Entity): boolean {
@@ -171,7 +216,10 @@ export class Targeting {
         best = c.e;
       }
     }
-    if (best) p.targetId = best.id;
+    if (best) {
+      if (this.stopsAutoAttackOnSwitch(r.meta, p, best.id)) p.autoAttack = false;
+      p.targetId = best.id;
+    }
   }
 
   friendlyTabTarget(pid?: number): void {
@@ -183,6 +231,7 @@ export class Targeting {
     candidates.sort((a, b) => a.d - b.d);
     const curIdx = candidates.findIndex((c) => c.e.id === p.targetId);
     const next = candidates[(curIdx + 1) % candidates.length];
+    if (this.stopsAutoAttackOnSwitch(r.meta, p, next.e.id)) p.autoAttack = false;
     p.targetId = next.e.id;
   }
 

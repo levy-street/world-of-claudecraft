@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const data = {
   ip: '203.0.113.7',
   blocked: true,
+  blockable: true,
   total: 2,
   page: 1,
   limit: 25,
@@ -155,5 +156,16 @@ describe('IP associations', () => {
       reason: 'investigation',
       expiresAt: expect.any(String),
     });
+  });
+
+  it('does not offer block actions for the stored unknown marker', async () => {
+    currentData = { ...data, ip: 'unknown', blocked: false, blockable: false };
+    render(IpAssociations, { ip: 'unknown' });
+
+    expect(await screen.findByText('alice')).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: t('ipAssociations.blockAction') }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: t('blockedIps.unblock') })).not.toBeInTheDocument();
   });
 });

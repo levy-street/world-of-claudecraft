@@ -4,11 +4,11 @@
 // site) to a UNIT VIEW (the values the painter writes). It has NO hardcoded
 // element id and NO single-instance assumption: it is a pure function of the
 // descriptor, so the same descriptor always yields the same view (DOM-free,
-// i18n-free, no Math.random / Date.now / performance.now). The player frame is the
-// FIRST instance through this seam; target and party are added as further
-// instances of the EXACT seam with no core change, so the descriptor deliberately
-// carries the FULL field set target and party need even though the player leaves
-// some at their always-present values.
+// translation-free (no t()/tEntity), no Math.random / Date.now / performance.now).
+// The player frame is the FIRST instance through this seam; target and party are
+// added as further instances of the EXACT seam with no core change, so the
+// descriptor deliberately carries the FULL field set target and party need even
+// though the player leaves some at their always-present values.
 //
 // What the core actually computes (the rest is a typed pass-through that pins the
 // contract): the present/hidden gate (a unit may be absent), the absorb-shield
@@ -17,10 +17,31 @@
 // block's `rage : energy : mana` ternary and adds the `none` case a target frame
 // with no resource bar needs). Health/resource fractions and the hp/resource TEXT
 // are preformatted at the call site (allocation-light: no raw entity references,
-// no per-element garbage), exactly as the inline player block computed them.
+// no per-element garbage), exactly as the inline player block computed them; the
+// ONE exception is the absorb-shield total appended to hpText ("523 / 600 (60)"),
+// which the core derives itself from the raw absorb input via absorbBarView and so
+// cannot be preformatted upstream. That number is routed through formatNumber
+// (useGrouping:false, matching hud_frames.ts) so its digits follow the active
+// locale like every other unit-frame number.
 
 import type { ResourceType } from '../sim/types';
-import { type AbsorbBarInput, absorbBarView } from './absorb_bar';
+import {
+  type AbsorbBarInput,
+  type AbsorbBarView,
+  absorbBarView,
+  absorbBarViewInto,
+} from './absorb_bar';
+import { formatNumber } from './i18n';
+
+// The absorb-total suffix appended to hpText ("523 / 600 (60)") runs through
+// formatNumber with useGrouping:false so its digits follow the active locale
+// like every other unit-frame number, matching hud_frames.ts. This is the
+// core's one narrow, deliberate use of the i18n runtime: it calls no
+// t()/tEntity (see tests/unit_frame.test.ts), so it still emits no
+// translated STRINGS, only locale-correct digits for a number it derives
+// internally (absorbBarView's total) that the call site has no way to
+// preformat itself.
+const ABSORB_TEXT_OPTS: Intl.NumberFormatOptions = { maximumFractionDigits: 0, useGrouping: false };
 
 /**
  * The resource-bar discriminator the painter routes to a class on the resource
@@ -120,6 +141,14 @@ export interface UnitFrameView {
   outOfRange: boolean;
 }
 
+export interface UnitFrameBuffer {
+  view: UnitFrameView;
+  absorb: AbsorbBarView;
+  absorbTextBase: string;
+  absorbTextTotal: number;
+  absorbText: string;
+}
+
 // The not-present view: every field at a no-op default. A shared constant (no
 // allocation) because the painter ignores everything but `present` when hidden.
 const HIDDEN: UnitFrameView = {
@@ -171,7 +200,10 @@ export function unitResourceClass(kind: UnitResourceKind): UnitResourceClass {
 export function unitFrameView(d: UnitFrameDescriptor): UnitFrameView {
   if (!d.present) return HIDDEN;
   const absorb = d.absorb ? absorbBarView(d.absorb) : NO_ABSORB;
-  const hpText = d.showAbsorbText && absorb.total > 0 ? `${d.hpText} (${absorb.total})` : d.hpText;
+  const hpText =
+    d.showAbsorbText && absorb.total > 0
+      ? `${d.hpText} (${formatNumber(absorb.total, ABSORB_TEXT_OPTS)})`
+      : d.hpText;
   return {
     present: true,
     hpFrac: d.hpFrac,
@@ -191,4 +223,96 @@ export function unitFrameView(d: UnitFrameDescriptor): UnitFrameView {
     dead: d.dead,
     outOfRange: d.outOfRange,
   };
+}
+
+/** Allocate the long-lived buffers used by one HUD unit-frame instance. */
+export function newUnitFrameBuffer(): UnitFrameBuffer {
+  return {
+    view: {
+      present: false,
+      hpFrac: 0,
+      hpText: '',
+      resClass: 'none',
+      resFrac: 0,
+      resText: '',
+      levelText: null,
+      name: '',
+      titlePre: '',
+      titlePost: '',
+      portraitKey: '',
+      absorbFrac: 0,
+      absorbStartFrac: 0,
+      absorbSizeFrac: 0,
+      absorbOvershield: false,
+      dead: false,
+      outOfRange: false,
+    },
+    absorb: {
+      total: 0,
+      fillFrac: 0,
+      startFrac: 0,
+      sizeFrac: 0,
+      overshield: false,
+    },
+    absorbTextBase: '',
+    absorbTextTotal: 0,
+    absorbText: '',
+  };
+}
+
+/**
+ * Fill one caller-owned unit-frame view. This is the per-frame HUD path; the
+ * allocating unitFrameView wrapper remains available to pure callers/tests.
+ */
+export function unitFrameViewInto(buffer: UnitFrameBuffer, d: UnitFrameDescriptor): UnitFrameView {
+  const out = buffer.view;
+  if (!d.present) {
+    out.present = false;
+    out.hpFrac = 0;
+    out.hpText = '';
+    out.resClass = 'none';
+    out.resFrac = 0;
+    out.resText = '';
+    out.levelText = null;
+    out.name = '';
+    out.titlePre = '';
+    out.titlePost = '';
+    out.portraitKey = '';
+    out.absorbFrac = 0;
+    out.absorbStartFrac = 0;
+    out.absorbSizeFrac = 0;
+    out.absorbOvershield = false;
+    out.dead = false;
+    out.outOfRange = false;
+    return out;
+  }
+
+  const absorb = d.absorb ? absorbBarViewInto(buffer.absorb, d.absorb) : NO_ABSORB;
+  out.present = true;
+  out.hpFrac = d.hpFrac;
+  if (d.showAbsorbText && absorb.total > 0) {
+    if (d.hpText !== buffer.absorbTextBase || absorb.total !== buffer.absorbTextTotal) {
+      buffer.absorbTextBase = d.hpText;
+      buffer.absorbTextTotal = absorb.total;
+      buffer.absorbText = `${d.hpText} (${formatNumber(absorb.total, ABSORB_TEXT_OPTS)})`;
+    }
+    out.hpText = buffer.absorbText;
+  } else {
+    out.hpText = d.hpText;
+  }
+  out.resClass = unitResourceClass(d.resourceKind);
+  out.resFrac = d.resFrac;
+  out.resText = d.resText;
+  out.levelText = d.levelText;
+  out.name = d.name;
+  out.titlePre = d.titlePre ?? '';
+  out.titlePost = d.titlePost ?? '';
+  out.portraitKey = d.portraitKey;
+  out.absorbFrac = absorb.fillFrac;
+  out.absorbStartFrac = absorb.startFrac;
+  out.absorbSizeFrac = absorb.sizeFrac;
+  out.absorbOvershield = absorb.overshield;
+  out.dead = d.dead;
+  out.outOfRange = d.outOfRange;
+  return out;
 }

@@ -2,27 +2,30 @@
 // the nearest blip regardless of where the player is looking. Reproduces the
 // bug where Tab selected an off-screen mob behind the player over a visible one.
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { Sim } from '../src/sim/sim';
 
 const SEED = 31337;
 
 function spawnMob(sim: Sim, id: number, dx: number, dz: number) {
-  const p = sim.entities.get(sim.playerId)!;
-  const mob = createMob(id, MOBS.ridge_stalker, 13, { x: p.pos.x + dx, y: p.pos.y, z: p.pos.z + dz });
-  sim.entities.set(mob.id, mob);
-  (sim as any).rebucket(mob);
+  const p = sim.player;
+  const mob = createMob(id, MOBS.ridge_stalker, 13, {
+    x: p.pos.x + dx,
+    y: p.pos.y,
+    z: p.pos.z + dz,
+  });
+  sim.addEntity(mob);
   return mob;
 }
 
 describe('Sim.tabTarget on-screen / in-combat cycling', () => {
   it('targets the on-screen enemy and does not cycle to an unseen one behind', () => {
     const sim = new Sim({ seed: SEED, playerClass: 'warrior' });
-    const p = sim.entities.get(sim.playerId)!;
+    const p = sim.player;
     p.facing = 0; // facing +Z
-    (sim as any).rebucket(p);
-    const behindClose = spawnMob(sim, 900001, 0, -6); // behind, near, idle
+    sim.rebucket(p);
+    spawnMob(sim, 900001, 0, -6); // behind, near, idle
     const frontFar = spawnMob(sim, 900002, 0, 25); // in front, far, idle
 
     sim.tabTarget();
@@ -36,9 +39,9 @@ describe('Sim.tabTarget on-screen / in-combat cycling', () => {
 
   it('falls back to an unseen enemy only when nothing visible is in the cluster', () => {
     const sim = new Sim({ seed: SEED, playerClass: 'warrior' });
-    const p = sim.entities.get(sim.playerId)!;
+    const p = sim.player;
     p.facing = 0; // facing +Z
-    (sim as any).rebucket(p);
+    sim.rebucket(p);
     const behindClose = spawnMob(sim, 900003, 0, -6); // behind, near, idle (off screen)
 
     // No on-screen / engaged enemy exists, so Tab still targets the only mob.
@@ -48,9 +51,9 @@ describe('Sim.tabTarget on-screen / in-combat cycling', () => {
 
   it('ignores an engaged enemy behind the player and Tabs a fresh mob in front (charge-escape)', () => {
     const sim = new Sim({ seed: SEED, playerClass: 'warrior' });
-    const p = sim.entities.get(sim.playerId)!;
+    const p = sim.player;
     p.facing = 0; // facing +Z, away from the fight
-    (sim as any).rebucket(p);
+    sim.rebucket(p);
     const chaser = spawnMob(sim, 900031, 0, -10); // behind, engaged with the player
     chaser.aggroTargetId = p.id;
     const freshFront = spawnMob(sim, 900032, 0, 16); // in front, idle, the charge target
@@ -66,10 +69,10 @@ describe('Sim.tabTarget on-screen / in-combat cycling', () => {
 
   it('prefers an enemy engaged with the player', () => {
     const sim = new Sim({ seed: SEED, playerClass: 'warrior' });
-    const p = sim.entities.get(sim.playerId)!;
+    const p = sim.player;
     p.facing = 0;
-    (sim as any).rebucket(p);
-    const idleNear = spawnMob(sim, 900011, 0, 6); // on screen, idle, near
+    sim.rebucket(p);
+    spawnMob(sim, 900011, 0, 6); // on screen, idle, near
     const engagedFar = spawnMob(sim, 900012, 0, 28); // on screen, far, aggroed
     engagedFar.aggroTargetId = p.id;
 
@@ -79,12 +82,13 @@ describe('Sim.tabTarget on-screen / in-combat cycling', () => {
 
   it('walks the fallback band from a clicked fallback target, then wraps into the cluster', () => {
     const sim = new Sim({ seed: SEED, playerClass: 'warrior' });
-    const p = sim.entities.get(sim.playerId)!;
+    const p = sim.player;
     p.facing = 0; // facing +Z
-    (sim as any).rebucket(p);
+    sim.rebucket(p);
     // Isolate from world-spawned mobs so the fallback ordering is exactly ours.
+    const internals = sim as unknown as { dropEntity(id: number): void };
     for (const id of [...sim.entities.keys()]) {
-      if (id !== sim.playerId) (sim as any).dropEntity(id);
+      if (id !== sim.playerId) internals.dropEntity(id);
     }
     const near = spawnMob(sim, 900041, 0, 10); // on screen, idle, near: the cluster
     const behindA = spawnMob(sim, 900042, 0, -8); // off screen behind: fallback
@@ -106,9 +110,9 @@ describe('Sim.tabTarget on-screen / in-combat cycling', () => {
 
   it('cycles only the near fight cluster and wraps back, ignoring a distant idle mob', () => {
     const sim = new Sim({ seed: SEED, playerClass: 'warrior' });
-    const p = sim.entities.get(sim.playerId)!;
+    const p = sim.player;
     p.facing = 0; // facing +Z
-    (sim as any).rebucket(p);
+    sim.rebucket(p);
     // Three on-screen mobs within the near radius (the current fight) and one
     // idle mob two screens away but still inside the 40 yd query.
     const near1 = spawnMob(sim, 900021, 0, 8);
@@ -132,5 +136,41 @@ describe('Sim.tabTarget on-screen / in-combat cycling', () => {
       sim.tabTarget();
       expect(p.targetId).not.toBe(farIdle.id);
     }
+  });
+
+  it('prioritizes melee attackers around the player over a distant idle mob', () => {
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior' });
+    const p = sim.player;
+    p.facing = 0; // facing +Z, toward the distant idle mob
+    sim.rebucket(p);
+    const idleBoar = spawnMob(sim, 900051, 0, -45);
+    p.targetId = idleBoar.id;
+    const engagedLeft = spawnMob(sim, 900052, -4, 0);
+    const engagedRight = spawnMob(sim, 900053, 4, 0);
+    const idleGreyjaw = spawnMob(sim, 900054, 0, 35);
+    engagedLeft.aggroTargetId = p.id;
+    engagedRight.aggroTargetId = p.id;
+
+    sim.tabTarget();
+    expect(p.targetId).toBe(engagedLeft.id);
+    sim.tabTarget();
+    expect(p.targetId).toBe(engagedRight.id);
+    sim.tabTarget();
+    expect(p.targetId).toBe(engagedLeft.id);
+    expect(p.targetId).not.toBe(idleGreyjaw.id);
+  });
+
+  it('targetNearestEnemy also prefers a melee attacker over a distant idle mob', () => {
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior' });
+    const p = sim.player;
+    p.facing = 0;
+    sim.rebucket(p);
+    const engagedWolf = spawnMob(sim, 900061, -4, 0);
+    const idleGreyjaw = spawnMob(sim, 900062, 0, 35);
+    engagedWolf.aggroTargetId = p.id;
+
+    sim.targetNearestEnemy();
+    expect(p.targetId).toBe(engagedWolf.id);
+    expect(p.targetId).not.toBe(idleGreyjaw.id);
   });
 });

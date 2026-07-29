@@ -1,8 +1,10 @@
 // Render the procedural soundtrack themes from src/game/music.ts to WAV files
-// so they can be auditioned outside the game. Drives a headless browser
+// so they can be auditioned, remixed, and remastered outside the game (the
+// shipped client streams the remastered mp3s under public/audio/music/, and
+// this render is where they start). Drives a headless browser
 // (puppeteer-core + system Chrome via browser_path.mjs) running an esbuild
 // bundle of scripts/music_render_entry.ts; the page renders each theme through
-// an OfflineAudioContext with the exact in-game synth voices and mix chain.
+// an OfflineAudioContext with the synth voices and the authoring mix chain.
 //
 // Run:
 //   node scripts/render_music.mjs [outDir=tmp/music_renders] [theme ...]

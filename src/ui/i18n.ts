@@ -160,13 +160,22 @@ if (typeof window !== 'undefined' && window.location) {
   currentLanguage = getStoredLanguage() ?? currentLanguage;
 }
 
+let resolutionRevision = pseudoActive || currentLanguage !== 'en' ? 1 : 0;
+
 export function getLanguage(): SupportedLanguage {
   return currentLanguage;
 }
 
+/** Monotonic token for cached UI whose resolved catalog text can change. */
+export function getI18nRevision(): number {
+  return resolutionRevision;
+}
+
 export function setLanguage(lang: SupportedLanguage): void {
+  const resolutionChanged = pseudoActive || currentLanguage !== lang;
   pseudoActive = false; // selecting a real locale leaves the dev pseudo-locale
   currentLanguage = lang;
+  if (resolutionChanged) resolutionRevision++;
   setStoredLanguage(lang);
 }
 
@@ -218,6 +227,7 @@ export async function ensureLocaleLoaded(lang: SupportedLanguage): Promise<void>
       resident[lang] =
         (mod as { default?: EnTranslations }).default ??
         (mod as Record<string, EnTranslations>)[lang];
+      if (lang === currentLanguage) resolutionRevision++;
       inflight.delete(lang);
     })
     .catch((err) => {
@@ -447,6 +457,25 @@ export function formatDuration(seconds: number, lang: SupportedLanguage = curren
     unit: 'second',
     unitDisplay: 'long',
   }).format(seconds);
+}
+
+// Locale-aware conjunction lists ("A, B, and C" / "A, B et C"): the list
+// separator and conjunction are locale data, never string concat. One
+// formatter is cached per language tag (mirrors numberFormatCache);
+// ListFormat instances are immutable, so sharing is safe. First consumer is
+// the material_profession_hint_view Used-by tooltip line.
+const listFormatCache = new Map<string, Intl.ListFormat>();
+export function formatList(
+  items: readonly string[],
+  lang: SupportedLanguage = currentLanguage,
+): string {
+  const tag = languageTag(lang);
+  let fmt = listFormatCache.get(tag);
+  if (!fmt) {
+    fmt = new Intl.ListFormat(tag, { style: 'long', type: 'conjunction' });
+    listFormatCache.set(tag, fmt);
+  }
+  return fmt.format(items);
 }
 
 export function formatDateTime(

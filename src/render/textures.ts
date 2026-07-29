@@ -276,7 +276,10 @@ const DEFAULT_FLOWER_KINDS: FlowerKind[] = [
   { p: [245, 195, 60], c: [150, 90, 20] }, // buttercup
 ];
 
-export function flowerTuftTexture(kinds: FlowerKind[] = DEFAULT_FLOWER_KINDS): THREE.Texture {
+export function flowerTuftTexture(
+  kinds: FlowerKind[] = DEFAULT_FLOWER_KINDS,
+  balanced = false,
+): THREE.Texture {
   // Ground-cover flowers on a card: green stems with leaf pairs topped by
   // layered petal heads (white daisies, pink cosmos, golden buttercups),
   // drawn realistically enough to read as flowers at tuft scale. Same
@@ -288,9 +291,13 @@ export function flowerTuftTexture(kinds: FlowerKind[] = DEFAULT_FLOWER_KINDS): T
   const ctx = c.getContext('2d')!;
   ctx.clearRect(0, 0, S, S);
 
-  const head = (x: number, y: number, rad: number): void => {
+  // balanced mode cycles the kinds list so every colour is guaranteed a
+  // head on the card (the random pick can starve rare entries); the random
+  // draw still happens either way so unbalanced cards stay byte-identical
+  const head = (x: number, y: number, rad: number, palOverride?: FlowerKind): void => {
     const petals = 6 + Math.floor(rnd() * 3);
-    const pal = kinds[Math.floor(rnd() * kinds.length) % kinds.length];
+    const pal = palOverride ?? kinds[Math.floor(rnd() * kinds.length) % kinds.length];
+    if (palOverride) rnd();
     for (let i = 0; i < petals; i++) {
       const a = (i / petals) * Math.PI * 2 + rnd() * 0.25;
       const px = x + Math.cos(a) * rad * 0.62;
@@ -322,6 +329,7 @@ export function flowerTuftTexture(kinds: FlowerKind[] = DEFAULT_FLOWER_KINDS): T
   };
 
   const stems = 5 + Math.floor(rnd() * 2);
+  let headIdx = 0;
   for (let i = 0; i < stems; i++) {
     const x = 16 + (i + rnd() * 0.7) * ((S - 32) / stems);
     const h = S * (0.4 + rnd() * 0.4);
@@ -349,7 +357,7 @@ export function flowerTuftTexture(kinds: FlowerKind[] = DEFAULT_FLOWER_KINDS): T
     }
     // flower head or bud
     if (rnd() < 0.82) {
-      head(topX, topY, 7 + rnd() * 4.5);
+      head(topX, topY, 7 + rnd() * 4.5, balanced ? kinds[headIdx++ % kinds.length] : undefined);
     } else {
       ctx.fillStyle = 'rgba(150,190,90,0.95)';
       ctx.beginPath();

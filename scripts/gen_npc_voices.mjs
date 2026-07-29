@@ -25,7 +25,11 @@ const previewDir = path.join(root, 'tmp/voice_previews');
 
 const force = process.argv.includes('--force');
 
-try { process.loadEnvFile(); } catch { /* no .env — rely on the ambient env */ }
+try {
+  process.loadEnvFile();
+} catch {
+  /* no .env, rely on the ambient env */
+}
 const KEY = process.env.ELEVENLABS_API_KEY;
 if (!KEY) {
   console.error('ELEVENLABS_API_KEY is not set (env or .env). Aborting.');
@@ -37,7 +41,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 // Stable 31-bit seed per NPC so a re-run designs the same voice.
 function seedFor(id) {
   let h = 2166136261;
-  for (let i = 0; i < id.length; i++) { h ^= id.charCodeAt(i); h = Math.imul(h, 16777619); }
+  for (let i = 0; i < id.length; i++) {
+    h ^= id.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
   return (h >>> 1) % 2147483647;
 }
 
@@ -46,18 +53,30 @@ function seedFor(id) {
 // auto-accept, so its exact wording is immaterial).
 function previewText(sample) {
   let text = sample.trim();
-  const filler = ' Step closer, traveller, and hear me out — there is more to say, and the road is long, so let us speak plainly while there is time.';
+  const filler =
+    ' Step closer, traveller, and hear me out, there is more to say, and the road is long, so let us speak plainly while there is time.';
   while (text.length < 100) text += filler;
   return text.slice(0, 1000);
 }
 
 async function api(endpoint, body, { retries = 4 } = {}) {
   for (let attempt = 0; ; attempt++) {
-    const res = await fetch(`${API}${endpoint}`, {
-      method: 'POST',
-      headers: { 'xi-api-key': KEY, 'content-type': 'application/json' },
-      body: JSON.stringify(body),
-    });
+    // A transport failure ("fetch failed") throws instead of returning a status. Retry it
+    // like a 429/5xx so one dropped socket cannot abort a whole-catalog design run.
+    let res;
+    try {
+      res = await fetch(`${API}${endpoint}`, {
+        method: 'POST',
+        headers: { 'xi-api-key': KEY, 'content-type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+    } catch (err) {
+      if (attempt >= retries) throw new Error(`${endpoint} -> ${err.message}`);
+      const wait = 1500 * (attempt + 1);
+      console.warn(`  ${endpoint} -> ${err.message}; retrying in ${wait}ms`);
+      await sleep(wait);
+      continue;
+    }
     if (res.ok) return res.json();
     const detail = await res.text().catch(() => '');
     const retryable = res.status === 429 || res.status >= 500;
@@ -84,7 +103,10 @@ async function designAndFinalize(p) {
   // Save the auditioned preview so a human can sanity-check the cast later.
   if (preview.audio_base_64) {
     mkdirSync(previewDir, { recursive: true });
-    writeFileSync(path.join(previewDir, `${p.npcId}.mp3`), Buffer.from(preview.audio_base_64, 'base64'));
+    writeFileSync(
+      path.join(previewDir, `${p.npcId}.mp3`),
+      Buffer.from(preview.audio_base_64, 'base64'),
+    );
   }
 
   const created = await api('/v1/text-to-voice', {
@@ -98,7 +120,11 @@ async function designAndFinalize(p) {
 
 function loadIds() {
   if (!existsSync(idsPath)) return {};
-  try { return JSON.parse(readFileSync(idsPath, 'utf8')); } catch { return {}; }
+  try {
+    return JSON.parse(readFileSync(idsPath, 'utf8'));
+  } catch {
+    return {};
+  }
 }
 
 const ids = force ? {} : loadIds();
@@ -128,5 +154,7 @@ for (const p of VOICE_PROMPTS) {
   }
 }
 
-console.log(`\nDone: ${made} created, ${skipped} skipped, ${Object.keys(ids).length}/${VOICE_PROMPTS.length} voices in ${path.relative(root, idsPath)}`);
+console.log(
+  `\nDone: ${made} created, ${skipped} skipped, ${Object.keys(ids).length}/${VOICE_PROMPTS.length} voices in ${path.relative(root, idsPath)}`,
+);
 if (made > 0) console.log(`Auditions saved to ${path.relative(root, previewDir)}/`);

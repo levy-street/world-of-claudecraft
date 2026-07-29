@@ -27,6 +27,7 @@ import {
   type Entity,
   emptyMoveInput,
   MELEE_RANGE,
+  normAngle,
   type PlayerClass,
   steadyAngleTo,
 } from '../types';
@@ -82,6 +83,7 @@ export function stopFiestaPractice(sim: Sim): void {
     if (sim.entities.has(pid)) sim.removePlayer(pid);
   }
   sim.fiestaBotPids = [];
+  sim.fiestaBotSteer.clear();
 }
 
 // Keep idle practice participants in the queue so bouts flow back-to-back.
@@ -108,6 +110,98 @@ export function updateFiestaBots(sim: Sim): void {
   for (const pid of sim.fiestaBotPids) driveFiestaBot(sim, pid);
 }
 
+// Straight-at-target steering wedges on the coliseum's cover: a bot that
+// re-aims at a target behind a pillar or approach screen every tick converges
+// to a zero-progress equilibrium against the obstacle. Track per-bot progress
+// and, when a forward-moving bot stops making any, detour perpendicular for a
+// beat. Fixed-length alternating detours can limit-cycle over a gap (each leg
+// retraces the last), so consecutive failed attempts alternate sides with
+// ESCALATING leg lengths; the growing sweep clears any cover pocket in the
+// pit, and a sustained stretch of free pursuit resets the escalation. Pure
+// position/tick bookkeeping, no rng. The state lives on `Sim` as
+// `fiestaBotSteer` (the E1 "state stays on Sim" pattern, like fiestaBotPids):
+// session-only, never serialized, and invisible to the parity harness (which
+// samples PlayerMeta/Entity only).
+export interface BotSteer {
+  x: number;
+  z: number;
+  stuck: number;
+  free: number;
+  detour: number;
+  attempts: number;
+  sign: 1 | -1;
+}
+export function freshBotSteer(): BotSteer {
+  // NaN start position: the first sample reads as progress, never as a wedge.
+  return { x: Number.NaN, z: Number.NaN, stuck: 0, free: 0, detour: 0, attempts: 0, sign: 1 };
+}
+export const BOT_STUCK_EPSILON = 0.05; // yd/tick; an unblocked bot covers ~0.3
+export const BOT_STUCK_TICKS = 10; // half a second of no progress means wedged
+export const BOT_DETOUR_TICKS = 20; // base sideways leg: one second
+export const BOT_DETOUR_MAX_LEGS = 6; // escalation cap (a 6s leg out-walks any cover run)
+export const BOT_FREE_TICKS = 20; // a second of unblocked pursuit resets escalation
+
+// Advance one tick of stuck-recovery steering and return the heading to move
+// along: the goal heading while progress is being made, a perpendicular
+// detour heading while rounding cover. The heading is always derived from
+// goalAngle (never from accumulated facing, which would compound the bend).
+// A leg that itself stops making progress (wedged on a wall) aborts early
+// instead of riding out and then escalating. `maxDetourTicks` lets a caller
+// with a more urgent goal (escaping the hazard ring) cap any in-flight leg.
+// Pure state-machine core, exported for direct unit tests.
+export function advanceBotSteer(
+  st: BotSteer,
+  x: number,
+  z: number,
+  goalAngle: number,
+  maxDetourTicks = Number.POSITIVE_INFINITY,
+): number {
+  const moved = Math.hypot(x - st.x, z - st.z);
+  st.x = x;
+  st.z = z;
+  const wedged = moved < BOT_STUCK_EPSILON; // NaN compares false: first sample is progress
+  if (st.detour > maxDetourTicks) st.detour = maxDetourTicks;
+  if (st.detour > 0) {
+    if (wedged) {
+      st.stuck++;
+      if (st.stuck >= BOT_STUCK_TICKS) {
+        st.detour = 0;
+        st.stuck = 0;
+        return goalAngle;
+      }
+    } else {
+      st.stuck = 0;
+    }
+    st.detour--;
+    return normAngle(goalAngle + st.sign * (Math.PI / 2));
+  }
+  if (wedged) {
+    st.free = 0;
+    st.stuck++;
+    if (st.stuck >= BOT_STUCK_TICKS) {
+      st.stuck = 0;
+      st.attempts = Math.min(st.attempts + 1, BOT_DETOUR_MAX_LEGS);
+      st.detour = Math.min(BOT_DETOUR_TICKS * st.attempts, maxDetourTicks);
+      st.sign = st.sign === 1 ? -1 : 1;
+      return normAngle(goalAngle + st.sign * (Math.PI / 2));
+    }
+    return goalAngle;
+  }
+  st.stuck = 0;
+  st.free++;
+  if (st.free >= BOT_FREE_TICKS) st.attempts = 0;
+  return goalAngle;
+}
+
+function steerState(sim: Sim, pid: number): BotSteer {
+  let st = sim.fiestaBotSteer.get(pid);
+  if (!st) {
+    st = freshBotSteer();
+    sim.fiestaBotSteer.set(pid, st);
+  }
+  return st;
+}
+
 function driveFiestaBot(sim: Sim, pid: number): void {
   const e = sim.entities.get(pid);
   const meta = sim.players.get(pid);
@@ -119,7 +213,12 @@ function driveFiestaBot(sim: Sim, pid: number): void {
     if (offer?.choices.length) sim.arenaAugmentPick(sim.rng.pick(offer.choices), pid);
   }
   meta.moveInput = emptyMoveInput();
-  if (e.dead || !match?.fiesta || match.state !== 'active') return;
+  if (e.dead || !match?.fiesta || match.state !== 'active') {
+    // Drop steering state whenever the bot is not actively fighting, so a
+    // detour begun in one bout can never fire out of context in the next.
+    sim.fiestaBotSteer.delete(pid);
+    return;
+  }
 
   const team = arenaMod.arenaTeamOf(sim.ctx, match, pid);
   const enemyPids = team === 'A' ? match.teamB : match.teamA;
@@ -141,8 +240,17 @@ function driveFiestaBot(sim: Sim, pid: number): void {
     cz = origin.z + FIESTA_RING_CZ;
   const distCenter = Math.hypot(e.pos.x - cx, e.pos.z - cz);
   if (distCenter > match.fiesta.ringRadius - 2.5) {
-    e.facing = angleTo(e.pos, { x: cx, y: 0, z: cz });
     meta.moveInput.forward = true;
+    // Escaping the burning ring still needs cover recovery (a pillar between
+    // bot and centre wedges it in the fire), but caps any in-flight chase
+    // detour at one base leg: never ride out a long escalated sweep here.
+    e.facing = advanceBotSteer(
+      steerState(sim, pid),
+      e.pos.x,
+      e.pos.z,
+      angleTo(e.pos, { x: cx, y: 0, z: cz }),
+      BOT_DETOUR_TICKS,
+    );
     return;
   }
   if (!target) return;
@@ -151,7 +259,16 @@ function driveFiestaBot(sim: Sim, pid: number): void {
   // Form-aware (rangedAutoProfile): bots never shapeshift today, but if one
   // ever does, a wandless form correctly collapses its standoff to melee.
   const engageRange = rangedAutoProfile(e, meta.cls) ? 22 : MELEE_RANGE * 0.9;
-  if (best > engageRange) meta.moveInput.forward = true;
+  // Close in when out of range, and ALSO when nominally in range but cover
+  // blocks the shot: two bots parked on opposite faces of a pillar are within
+  // melee reach yet no attack can land, so keep pushing (the detour steering
+  // rounds the pillar) until the target is actually hittable.
+  if (best > engageRange || !sim.ctx.hasLineOfSight(e, target)) {
+    meta.moveInput.forward = true;
+    // The steering goal is the raw target bearing, recomputed every tick:
+    // never the (possibly already bent) facing, which would compound bends.
+    e.facing = advanceBotSteer(steerState(sim, pid), e.pos.x, e.pos.z, angleTo(e.pos, target.pos));
+  }
   e.targetId = target.id;
   if (!e.autoAttack) sim.startAutoAttack(pid);
   // Fire an offensive ability now and then (staggered per bot by pid). A press that

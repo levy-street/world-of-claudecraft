@@ -8,6 +8,7 @@ import { Sim } from '../src/sim/sim';
 import {
   type Aura,
   dist2d,
+  FISHING_CAST_ID,
   MAX_LEVEL,
   meleeMissChance,
   mobXpValue,
@@ -131,6 +132,49 @@ describe('world generation', () => {
     expect(objects.length).toBeGreaterThanOrEqual(6);
   });
 
+  it('keeps later camp rolls stable when an established camp grows on a private stream', () => {
+    const firstCamp = {
+      mobId: 'riftspawn',
+      center: { x: 30, z: -30 },
+      radius: 8,
+      count: 2,
+    };
+    const laterCamp = {
+      mobId: 'forest_wolf',
+      center: { x: -30, z: -30 },
+      radius: 8,
+      count: 2,
+    };
+    const build = (expanded: boolean) =>
+      new Sim({
+        seed: 4242,
+        playerClass: 'warrior',
+        noPlayer: true,
+        world: {
+          ...EMPTY_TEST_WORLD,
+          camps: [
+            expanded ? { ...firstCamp, count: 4, sharedRngCount: firstCamp.count } : firstCamp,
+            laterCamp,
+          ],
+        },
+      });
+
+    const base = build(false);
+    const expanded = build(true);
+    const laterState = (sim: Sim) =>
+      [...sim.entities.values()]
+        .filter((entity) => entity.kind === 'mob' && entity.templateId === laterCamp.mobId)
+        .map((entity) => ({
+          level: entity.level,
+          pos: entity.pos,
+          facing: entity.facing,
+          wanderTimer: entity.wanderTimer,
+        }));
+
+    expect(laterState(expanded)).toEqual(laterState(base));
+    expect(expanded.rng.next()).toBe(base.rng.next());
+  });
+
   it('terrain is deterministic, town is flat, lake is below water level', () => {
     expect(terrainHeight(10, 10, 42)).toBe(terrainHeight(10, 10, 42));
     expect(Math.abs(terrainHeight(0, 0, 42) - terrainHeight(8, 8, 42))).toBeLessThan(1.5);
@@ -184,7 +228,7 @@ describe('movement directions', () => {
     expect(sim.player.pos.z).toBeCloseTo(zAfterForward, 1);
   });
 
-  it('preserves launch momentum while airborne', () => {
+  it('keeps launch momentum while airborne and steers with air control', () => {
     const sim = makeScopedSim(EMPTY_TEST_WORLD, 'warrior');
     teleportTo(sim, 0, -40);
     sim.player.facing = 0;
@@ -192,13 +236,21 @@ describe('movement directions', () => {
     sim.moveInput.jump = true;
     sim.tick();
     expect(sim.player.onGround).toBe(false);
+    // Every key released mid-air: the launch velocity carries unchanged.
     sim.moveInput.forward = false;
-    sim.moveInput.strafeRight = true;
+    sim.moveInput.jump = false;
     const xAtLaunch = sim.player.pos.x;
     const zAtLaunch = sim.player.pos.z;
-    for (let i = 0; i < 4; i++) sim.tick();
+    sim.tick();
     expect(sim.player.pos.z).toBeGreaterThan(zAtLaunch);
-    expect(Math.abs(sim.player.pos.x - xAtLaunch)).toBeLessThan(0.05);
+    expect(Math.abs(sim.player.pos.x - xAtLaunch)).toBeLessThan(1e-9);
+    // A held strafe now steers the arc (air control) while the forward
+    // momentum still carries: rightward drift is -x at facing 0.
+    sim.moveInput.strafeRight = true;
+    const zBeforeSteer = sim.player.pos.z;
+    for (let i = 0; i < 4; i++) sim.tick();
+    expect(sim.player.pos.z).toBeGreaterThan(zBeforeSteer);
+    expect(sim.player.pos.x).toBeLessThan(xAtLaunch - 0.2);
   });
 
   it('walks down a walkable slope without going airborne', () => {
@@ -443,6 +495,10 @@ describe('combat', () => {
     facePlayerAt(sim, wolf);
     for (let i = 0; i < 20 * 30 && !wolf.dead; i++) sim.tick();
     expect(wolf.dead).toBe(true);
+    // Consume BOTH halves (harvest then loot); a tagged corpse with
+    // an unclaimed harvest would otherwise hold its 30s grace window and defer
+    // the respawn past this loop.
+    sim.harvestCorpse(wolf.id);
     sim.lootCorpse(wolf.id);
     for (let i = 0; i < 20 * 10 && wolf.dead; i++) sim.tick();
     expect(wolf.dead).toBe(false);
@@ -869,5 +925,17 @@ describe('friendly targeting (#133)', () => {
     sim.tick();
     sim.friendlyTabTarget();
     expect(sim.player.targetId).toBe(77);
+  });
+});
+
+describe('action bar layout restore (IWorldActionBar, offline arm)', () => {
+  // IWorldActionBar.takeActionBarLayoutRestore is documented as one-shot at
+  // world entry: consumed once, subsequent calls return undefined. ClientWorld
+  // honors this by nulling out its stored decision; the offline Sim must match.
+  it('returns the resolved value once, then undefined on every later call', () => {
+    const sim = makeSim();
+    expect(sim.takeActionBarLayoutRestore()).toEqual({ source: 'noop' });
+    expect(sim.takeActionBarLayoutRestore()).toBeUndefined();
+    expect(sim.takeActionBarLayoutRestore()).toBeUndefined();
   });
 });

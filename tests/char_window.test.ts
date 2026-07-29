@@ -1,17 +1,27 @@
+// @vitest-environment happy-dom
+
 import { readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import { join } from 'node:path';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { CRAFT_RING } from '../src/sim/content/professions';
 import { ARCHETYPE_PAIR_TARGETS } from '../src/sim/professions/archetype';
-import { archetypeTitleText, craftNameText, hobbyCraftText } from '../src/ui/char_window';
+import { STAT_DEFENSE, STAT_GRID } from '../src/ui/char_stats_view';
+import {
+  archetypeTitleText,
+  CharWindow,
+  craftNameText,
+  hobbyCraftText,
+} from '../src/ui/char_window';
 import { hasTranslation } from '../src/ui/i18n';
+import { ItemDragState } from '../src/ui/item_drag_state';
 
-// The character window painter is a DOM module; driving the live DOM + events is
-// the opt-in browser suite. This is the no-DOM-suite
-// equivalent: it asserts the painter source carries the a11y
-// attributes + focus-return, the token discipline, and that the
-// Three.js preview + skin-event randomness stay out of the painter (HUD-owned),
-// driving the paperdoll off the pure core.
-const painter = readFileSync(new URL('../src/ui/char_window.ts', import.meta.url), 'utf8');
+// The character window painter is a DOM module. Most guards below inspect its
+// source, while the profession-art arm opts into jsdom and drives the real
+// painter. Under jsdom import.meta.url is an http URL, so resolve source from
+// Vitest's injected filesystem dirname.
+const painter = readFileSync(join(__dirname, '../src/ui/char_window.ts'), 'utf8');
+
+afterEach(() => vi.restoreAllMocks());
 
 describe('char_window: no magic values', () => {
   it('carries no literal color in TS (colors live in tokens/stylesheet)', () => {
@@ -55,6 +65,207 @@ describe('char_window: WCAG 2.2 AA', () => {
   });
 });
 
+describe('char_window: profession art placements', () => {
+  it('renders gathering rows with their dedicated painted icons', () => {
+    expect(painter).toMatch(/professionImageUrl\(`gather_\$\{r\.professionId\}`\)/);
+    expect(painter).toContain('class="char-gather-icon"');
+    expect(painter).toContain('class="char-gather-row"');
+  });
+
+  it('shows the current pair crest inline without inventing a tiny tooltip target', () => {
+    expect(painter).toContain('archetypeImageUrl(world.archetypeTitle)');
+    expect(painter).toContain('class="char-archetype-title-crest"');
+    expect(painter).not.toContain('class="char-archetype-tooltip-crest"');
+    expect(painter).toContain('alt=""');
+  });
+
+  it('paints the exact four gathering assets and replaces the inline pair crest', () => {
+    let canvasContext: unknown;
+    canvasContext = new Proxy(
+      {},
+      {
+        get: () => () => canvasContext,
+        set: () => true,
+      },
+    );
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(canvasContext as never);
+    vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL').mockReturnValue(
+      'data:image/png;base64,stub',
+    );
+    const root = document.createElement('div');
+    let world = {
+      cfg: { playerClass: 'warrior' },
+      player: { name: 'Aurelia', level: 60, skin: 0 },
+      equipment: {},
+      honor: 0,
+      archetypeTitle: 'weaponcrafting+armorcrafting' as string | null,
+      hobbyCraft: 'jewelcrafting',
+      professionsState: {
+        skills: [
+          { professionId: 'mining', skill: 11, maxSkill: 125 },
+          { professionId: 'logging', skill: 12, maxSkill: 125 },
+          { professionId: 'herbalism', skill: 13, maxSkill: 125 },
+          { professionId: 'fishing', skill: 14, maxSkill: 125 },
+        ],
+      },
+    };
+    const attachTooltip = vi.fn();
+    const win = new CharWindow({
+      root: () => root,
+      world: () => world as never,
+      closeOthers: vi.fn(),
+      hideTooltip: vi.fn(),
+      captureFocus: () => null,
+      restoreFocus: vi.fn(),
+      slotName: (slot) => slot,
+      statCellHtml: () => '',
+      statTooltipHtml: () => '',
+      talentSummaryHtml: () => '',
+      progressionHtml: () => '',
+      unequip: vi.fn(),
+      beginUnequipDrag: vi.fn(),
+      endUnequipDrag: vi.fn(),
+      renderPreview: vi.fn(),
+      renderSkinPicker: vi.fn(),
+      openPlayerCard: vi.fn(),
+      openPrestige: vi.fn(),
+      openDeeds: vi.fn(),
+      dragState: new ItemDragState(),
+      renderBags: vi.fn(),
+      showError: vi.fn(),
+      helmHidden: () => false,
+      toggleHelm: vi.fn(),
+      itemIcon: () => '',
+      moneyHtml: () => '',
+      itemTooltip: () => '',
+      attachTooltip,
+    });
+
+    win.render();
+    expect(
+      [...root.querySelectorAll<HTMLImageElement>('.char-gather-icon')].map((img) =>
+        img.getAttribute('src'),
+      ),
+    ).toEqual([
+      '/ui/professions/gather_mining.webp',
+      '/ui/professions/gather_logging.webp',
+      '/ui/professions/gather_herbalism.webp',
+      '/ui/professions/gather_fishing.webp',
+    ]);
+    const crest = root.querySelector<HTMLImageElement>('.char-archetype-title-crest');
+    expect(crest?.getAttribute('src')).toBe('/ui/professions/archetype_smith.webp');
+    expect(crest?.getAttribute('alt')).toBe('');
+    expect(attachTooltip.mock.calls.some(([target]) => target === crest?.parentElement)).toBe(
+      false,
+    );
+
+    world = {
+      ...world,
+      archetypeTitle: 'engineering+alchemy',
+      hobbyCraft: 'cooking',
+    };
+    win.render();
+    expect(root.querySelectorAll('.char-archetype-title-crest')).toHaveLength(1);
+    expect(
+      root.querySelector<HTMLImageElement>('.char-archetype-title-crest')?.getAttribute('src'),
+    ).toBe('/ui/professions/archetype_bombardier.webp');
+    expect(root.innerHTML).not.toContain('/ui/professions/archetype_smith.webp');
+
+    world = { ...world, archetypeTitle: null };
+    win.render();
+    expect(root.querySelector('.char-archetype-title-crest')).toBeNull();
+    expect(root.innerHTML).not.toContain('/ui/professions/archetype_bombardier.webp');
+  });
+
+  it('floors a fractional gathering proficiency in the rendered row (issue 2339)', () => {
+    // The sheet must never claim an uncrossed threshold: the deed evaluator
+    // and the band ladder compare the raw value with >=, so 99.5 renders 99
+    // (the professions-window floor convention), never a rounded 100.
+    let canvasContext: unknown;
+    canvasContext = new Proxy(
+      {},
+      {
+        get: () => () => canvasContext,
+        set: () => true,
+      },
+    );
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(canvasContext as never);
+    vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL').mockReturnValue(
+      'data:image/png;base64,stub',
+    );
+    const root = document.createElement('div');
+    const world = {
+      cfg: { playerClass: 'warrior' },
+      player: { name: 'Aurelia', level: 60, skin: 0 },
+      equipment: {},
+      honor: 0,
+      archetypeTitle: null,
+      hobbyCraft: 'jewelcrafting',
+      professionsState: {
+        skills: [
+          { professionId: 'mining', skill: 99.75, maxSkill: 100 },
+          { professionId: 'logging', skill: 12, maxSkill: 100 },
+          { professionId: 'herbalism', skill: 100, maxSkill: 100 },
+          { professionId: 'fishing', skill: 99.5, maxSkill: 200 },
+        ],
+      },
+    };
+    const win = new CharWindow({
+      root: () => root,
+      world: () => world as never,
+      closeOthers: vi.fn(),
+      hideTooltip: vi.fn(),
+      captureFocus: () => null,
+      restoreFocus: vi.fn(),
+      slotName: (slot) => slot,
+      statCellHtml: () => '',
+      statTooltipHtml: () => '',
+      talentSummaryHtml: () => '',
+      progressionHtml: () => '',
+      unequip: vi.fn(),
+      beginUnequipDrag: vi.fn(),
+      endUnequipDrag: vi.fn(),
+      renderPreview: vi.fn(),
+      renderSkinPicker: vi.fn(),
+      openPlayerCard: vi.fn(),
+      openPrestige: vi.fn(),
+      openDeeds: vi.fn(),
+      dragState: new ItemDragState(),
+      renderBags: vi.fn(),
+      showError: vi.fn(),
+      helmHidden: () => false,
+      toggleHelm: vi.fn(),
+      itemIcon: () => '',
+      moneyHtml: () => '',
+      itemTooltip: () => '',
+      attachTooltip: vi.fn(),
+    });
+
+    win.render();
+    const values = [...root.querySelectorAll('.char-gather-row b')].map((b) => b.textContent);
+    // The row renders a BOUNDED "skill / max", never a bare integer. The floor
+    // still holds (99.75 and 99.5 read 99, never a fake crossed 100), and
+    // fishing's denominator is its own 200 cap, not the 100 the other three
+    // share.
+    expect(values).toEqual(['99 / 100', '12 / 100', '100 / 100', '99 / 200']);
+    // Decisive against a regression to the bare integer: no row may render a
+    // lone number with no denominator.
+    for (const value of values) expect(value).toMatch(/^\d+ \/ \d+$/);
+  });
+
+  it('renders the gathering denominator through the shared professions skillValue key', () => {
+    // The same key the professions window uses, so the two surfaces cannot
+    // drift apart and a locale owns the separator. Never a concatenated
+    // '/' literal in the painter.
+    // Strip whole-line comments first: gatheringHtml's own comment names this
+    // key in prose, so an uncommented read is one reword from self-satisfying.
+    const code = painter.replace(/^\s*\/\/.*$/gm, '');
+    expect(code).toContain("t('hudChrome.professions.skillValue'");
+    expect(code).toMatch(/skill:\s*formatNumber\(r\.displayValue/);
+    expect(code).toMatch(/max:\s*formatNumber\(r\.maxSkill/);
+  });
+});
+
 describe('char_window: paperdoll core + HUD-owned preview boundary', () => {
   it('registers every computed character-stat label used while opening the window', () => {
     for (const stat of [
@@ -74,10 +285,15 @@ describe('char_window: paperdoll core + HUD-owned preview boundary', () => {
     }
   });
 
-  it('renders one player-facing Warfare stat row', () => {
-    expect(painter).toContain("'warfare'");
-    expect(painter).not.toContain("'pvpOffense'");
-    expect(painter).not.toContain("'pvpDefense'");
+  it('renders one player-facing Warfare stat row (never the raw pvpOffense/pvpDefense stats)', () => {
+    // The stat partition now lives in the char_stats_view core; the sheet shows a
+    // single Warfare summary and never the internal pvpOffense/pvpDefense ids.
+    expect(STAT_DEFENSE).toContain('warfare');
+    expect(STAT_GRID).not.toContain('pvpOffense' as unknown as (typeof STAT_GRID)[number]);
+    expect(STAT_GRID).not.toContain('pvpDefense' as unknown as (typeof STAT_GRID)[number]);
+    // And the painter composes those groups off the pure core, not an inline grid.
+    expect(painter).toContain("from './char_stats_view'");
+    expect(painter).toContain('STAT_PANELS');
   });
 
   it('shows the current spendable Honor balance in the character-sheet header', () => {
@@ -133,12 +349,12 @@ describe('archetypeTitleText (#1130, pair-named): id-to-key view model', () => {
     'alchemy+cooking': 'Apothecary',
     'cooking+leatherworking': 'Trapper',
     'leatherworking+tailoring': 'Outfitter',
-    'tailoring+inscription': 'Mageweaver',
+    'tailoring+inscription': 'Inkweaver',
     'inscription+enchanting': 'Arcanist',
     'enchanting+jewelcrafting': 'Gembinder',
     'jewelcrafting+weaponcrafting': 'Bladewright',
     'weaponcrafting+armorcrafting': 'Smith',
-    'armorcrafting+engineering': 'Cogsmith',
+    'armorcrafting+engineering': 'Gearwright',
   };
 
   it('has exactly one expected title per selectable pair (test table stays in sync)', () => {
@@ -216,14 +432,15 @@ describe('hobbyCraftText (#1294): id-to-key view model', () => {
   });
 });
 
-describe('char_window: own-paperdoll per-copy tooltip threading (Phase 6)', () => {
-  it('resolves the worn instance from the owner inventory facet inside the tooltip closure', () => {
-    // The procedural-dungeons world API exposes the own worn set directly on
-    // IWorldInventory. Read it per slot at hover time (a closure over
-    // deps.world(), never a stale capture) and forward it into the widened
-    // itemTooltip dep, preserving v0.28 maker marks alongside Rift payloads.
-    expect(painter).toContain(
-      'this.deps.itemTooltip(item, this.deps.world().equipmentInstances[slot])',
-    );
+describe('char_window: own-paperdoll per-copy tooltip threading', () => {
+  it('resolves the worn instance from the self entity mirror inside the tooltip closure', () => {
+    // Both worlds mirror the own worn set on the self entity
+    // (equippedInstances), so the paperdoll tooltip must read it per slot at
+    // hover time (a closure over deps.world(), never a stale capture) and
+    // forward it into the widened itemTooltip dep. Dropping either line
+    // reverts the own paperdoll to def-only tooltips while every pure-core
+    // suite stays green.
+    expect(painter).toContain('world.entities.get(world.playerId)?.equippedInstances?.[slot]');
+    expect(painter).toContain('this.deps.itemTooltip(item, instance)');
   });
 });

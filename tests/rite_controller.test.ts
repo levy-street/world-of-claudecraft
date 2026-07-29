@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { FocusTrapHandle } from '../src/ui/focus_manager';
@@ -12,7 +12,7 @@ function harness() {
   const focusFirst = vi.fn();
   const release = vi.fn();
   const choose = vi.fn();
-  const trap: FocusTrapHandle = { focusFirst, release };
+  const trap: FocusTrapHandle = { focusFirst, release, opener: vi.fn(() => null) };
   const openFocusTrap = vi.fn(() => trap);
   const controller = new RiteController({ panel, openFocusTrap, choose });
   return { controller, panel, focusFirst, release, choose, openFocusTrap };

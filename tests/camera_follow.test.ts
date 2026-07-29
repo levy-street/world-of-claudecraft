@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   cameraFollowShouldSettle,
   cameraIsManual,
+  isRespawnFacingResyncEdge,
   updateFollowCameraYaw,
   wrapAngle,
 } from '../src/game/camera_follow';
@@ -103,7 +104,7 @@ describe('camera follow', () => {
 
   it('does not auto-follow while the camera drives the facing (mouse-camera move)', () => {
     // facing is slaved to camYaw this frame, so the follower must leave camYaw
-    // untouched — chasing its own output is what produced the wobble.
+    // untouched: chasing its own output is what produced the wobble.
     const next = updateFollowCameraYaw({
       camYaw: 1.0,
       interpFacing: 0.2,
@@ -152,7 +153,7 @@ describe('camera follow', () => {
     expect(cameraIsManual(true, false)).toBe(true); // classic right-mouse mouselook
     expect(cameraIsManual(false, true)).toBe(true); // Mouse Camera mode (always on)
     expect(cameraIsManual(true, true)).toBe(true);
-    expect(cameraIsManual(false, false)).toBe(false); // classic, hands off — follow runs
+    expect(cameraIsManual(false, false)).toBe(false); // classic, hands off, follow runs
   });
 
   it('keeps the camera locked to the drag in mouse-camera mode (no follow drift)', () => {
@@ -212,5 +213,95 @@ describe('camera follow', () => {
     expect(Math.PI - large.camYaw).toBeGreaterThan(0);
     expect(Math.PI - large.camYaw).toBeLessThan(0.01);
     expect(0.25 - small.camYaw).toBeGreaterThan(Math.PI - large.camYaw);
+  });
+
+  describe('respawn/release-spirit facing resync', () => {
+    it('flags the release-spirit and revive edges (ghost rises, or dead clears), not death itself', () => {
+      // release-spirit: dead stays true, ghost rises false -> true.
+      expect(isRespawnFacingResyncEdge(true, false, true, true)).toBe(true);
+      // any revive (corpse rez, spirit healer, instance reentry, delve respawn):
+      // dead flips true -> false, whether or not a ghost stage preceded it.
+      expect(isRespawnFacingResyncEdge(true, true, false, false)).toBe(true);
+      expect(isRespawnFacingResyncEdge(true, false, false, false)).toBe(true);
+      // dying itself (alive -> dead) does not force a facing reset: no edge.
+      expect(isRespawnFacingResyncEdge(false, false, true, false)).toBe(false);
+      // steady states: no edge.
+      expect(isRespawnFacingResyncEdge(false, false, false, false)).toBe(false);
+      expect(isRespawnFacingResyncEdge(true, true, true, true)).toBe(false);
+    });
+
+    // Reproduces the bug numerically: the sim-side facing=0/prevFacing=0 pairing
+    // makes the render-interpolated facing land cleanly on 0, but the camera's
+    // OWN lastInterpFacing (tracked in main.ts, independent of the entity) still
+    // holds the pre-death heading. The rigid-follow term reads that as a turn,
+    // but because lastInterpFacing re-syncs to interpFacing every call regardless
+    // of whether camYaw caught up, only ONE frame's worth of the correction is
+    // ever applied before the term goes quiet again: a spurious partial turn that
+    // sticks. This is why a prevFacing-only fix does not reliably resolve it: the
+    // stale value lives on the camera side, not the sim.
+    it('without a resync, a stale camera lastInterpFacing applies one spurious partial turn after a respawn', () => {
+      const dt = 1 / 60;
+      // Camera was settled in behind the player before death (camYaw in sync with
+      // the pre-death facing).
+      let camYaw = 2.5;
+      let lastInterpFacing: number | null = 2.5;
+      // Respawn/release-spirit forces facing (now also prevFacing, per the sim
+      // fix) to 0; the player does not move afterward (moving stays false).
+      for (let f = 0; f < 10; f++) {
+        const next = updateFollowCameraYaw({
+          camYaw,
+          interpFacing: 0,
+          lastInterpFacing,
+          frameDt: dt,
+          mouselook: false,
+          moving: false,
+          orbiting: false,
+        });
+        camYaw = next.camYaw;
+        lastInterpFacing = next.lastInterpFacing;
+      }
+      // The large gap from facing 0 (camYaw stays near 2.5) is expected: the
+      // rigid-follow term only settles the camera while the player is moving,
+      // and that persists after the fix too. What the fix removes is the ONE
+      // spurious capped step (~0.06 rad at MAX_AUTO_YAW_SPEED) the stale
+      // lastInterpFacing otherwise applies on this frame, dropping camYaw from
+      // 2.5 to about 2.44 before the term goes quiet again.
+      expect(camYaw).toBeGreaterThan(2.2);
+      expect(camYaw).toBeLessThan(2.5);
+    });
+
+    it('resyncing lastInterpFacing on the respawn edge (mirroring the click-to-move release resync) leaves the camera exactly where it was, no spurious partial turn', () => {
+      const dt = 1 / 60;
+      let camYaw = 2.5;
+      let lastInterpFacing: number | null = 2.5;
+      let prevDead = true;
+      let prevGhost = false;
+      // The revive edge (dead: true -> false) lands on this frame; main.ts
+      // detects it via isRespawnFacingResyncEdge and resyncs before calling
+      // updateFollowCameraYaw, exactly like the click-to-move release resync.
+      const dead = false;
+      const ghost = false;
+      if (isRespawnFacingResyncEdge(prevDead, prevGhost, dead, ghost)) {
+        lastInterpFacing = 0; // this frame's interpFacing
+      }
+      prevDead = dead;
+      prevGhost = ghost;
+      for (let f = 0; f < 10; f++) {
+        const next = updateFollowCameraYaw({
+          camYaw,
+          interpFacing: 0,
+          lastInterpFacing,
+          frameDt: dt,
+          mouselook: false,
+          moving: false,
+          orbiting: false,
+        });
+        camYaw = next.camYaw;
+        lastInterpFacing = next.lastInterpFacing;
+      }
+      // No spurious jump or stuck offset: the camera holds its pre-respawn yaw
+      // (the player has not moved, so nothing has asked the camera to turn).
+      expect(camYaw).toBeCloseTo(2.5, 6);
+    });
   });
 });

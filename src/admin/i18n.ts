@@ -180,12 +180,18 @@ export function t(key: string, params?: Record<string, string | number>): string
 // Server-sent operator-error bodies (server/admin.ts) mapped to localized admin
 // strings. Unknown / transport / code-diagnostic errors fall through to English on
 // purpose (the localization design principle: only operator-facing UI is translated).
-const ADMIN_ERROR_KEYS: Record<string, string> = {
+// Exported for the tests/admin coupling guard: every server error prose a
+// handler emits must have a row here, or an operator sees raw English.
+export const ADMIN_ERROR_KEYS: Record<string, string> = {
   'too many attempts, wait a minute and try again': 'error.tooManyAttempts',
+  'too many failed attempts, wait a few minutes and try again': 'error.tooManyFailedAttempts',
   'invalid username or password': 'error.invalidCredentials',
+  'invalid authentication code': 'error.invalidAuthenticationCode',
   'this account does not have admin access': 'error.noAdminAccess',
+  'invalid authentication code': 'error.invalidTwoFactorCode',
   'admin accounts cannot be suspended or banned': 'error.cannotModerateAdmin',
   'open report not found': 'error.reportNotFound',
+  'open bug report not found': 'error.bugReportNotFound',
   'account not found': 'error.accountNotFound',
   'account is not suspended': 'error.accountNotSuspended',
   'moderation action failed': 'error.moderationFailed',
@@ -196,6 +202,26 @@ const ADMIN_ERROR_KEYS: Record<string, string> = {
   'moderation reason is required': 'error.moderationReasonRequired',
   'suspension expiry must be in the future': 'error.moderationExpiryFuture',
   'character not found': 'error.characterNotFound',
+  'guild not found': 'error.guildNotFound',
+  'guild name is already taken': 'error.guildNameTaken',
+  'guild name must change': 'error.guildNameUnchanged',
+  'a moderation reason is required (500 chars max)': 'error.guildReasonInvalid',
+  'guild member limit exceeded': 'error.guildMemberLimit',
+  // The guild bank dormant-slot escape hatch (server/admin.ts).
+  'a slot index is required': 'error.guildBankSlotRequired',
+  'the item id in that slot is required': 'error.guildBankItemRequired',
+  'that guild has no loaded bank': 'error.guildBankNotLoaded',
+  'no member of that guild is online to persist the change': 'error.guildBankNoCarrier',
+  'that slot is not a stuck item': 'error.guildBankSlotNotStuck',
+  'the change could not be saved and was rolled back': 'error.guildBankSaveFailed',
+  'that guild is being deleted, so its bank is closed': 'error.guildBankDeleting',
+  'the guild bank change was refused': 'error.guildBankPurgeRefused',
+  'guild name must be 3-24 letters with single spaces': 'error.guildNameInvalid',
+  // The guild list's 503 single-flight busy path (the one guild prose the
+  // release left unmapped; surfaced by the merge-audit gate run). Mapped to
+  // the same key the guild directory already renders for ANY failed list
+  // read, so a localized operator sees exactly what the release shipped.
+  'guild list busy, try again': 'guilds.loadFailed',
   'invalid streamer link': 'error.invalidStreamerLink',
   'admin accounts cannot be chat muted': 'error.cannotChatMuteAdmin',
   'tier must be "soft" or "hard"': 'error.invalidWordTier',
@@ -215,6 +241,38 @@ const ADMIN_ERROR_KEYS: Record<string, string> = {
   'password reset failed': 'error.resetPasswordFailed',
   'password must be at least 6 chars': 'error.passwordTooShort',
   'password must be at most 128 chars': 'error.passwordTooLong',
+  // R35 GM professions tooling (inspector + restores).
+  'character is not online on this realm': 'error.characterNotOnline',
+  'unknown item id': 'error.unknownItemId',
+  'count must be a whole number between 1 and 20': 'error.restoreCountRange',
+  'unknown gathering profession id': 'error.unknownGatheringProfession',
+  'unknown tool effect id': 'error.unknownToolEffect',
+  'the character owns no tool for that profession': 'error.restoreNoTool',
+  'that profession already has a slotted effect': 'error.restoreAlreadySlotted',
+  // Pre-existing prose the phase 15 scan guard surfaced as unmatched.
+  'an overrides object is required': 'error.antibotOverridesRequired',
+  asset_not_found: 'error.assetNotFound',
+  map_not_found: 'error.mapNotFound',
+  'internal error': 'error.internal',
+  'unknown admin endpoint': 'error.unknownEndpoint',
+  'that effect cannot be slotted on that profession': 'error.restoreBadPair',
+  'character went offline before the restore landed': 'error.restoreWentOffline',
+  'item restore failed': 'error.restoreItemFailed',
+  'slot restore failed': 'error.restoreSlotFailed',
+  // Named-constant, multi-line, and `err.message ?? literal` fallback prose the
+  // widened phase 15 scan guard surfaced (it now flattens the source, resolves
+  // single-identifier arguments through server/admin.ts's own constants, and
+  // reads the ternary fallback literal).
+  'ai must be a boolean': 'error.aiFlagRequired',
+  'streamer must be a boolean': 'error.streamerFlagRequired',
+  'a links object is required': 'error.streamerLinksRequired',
+  'failed to update account flair': 'error.accountFlairFailed',
+  'a valid daily rewards date is required': 'error.dailyRewardDayRequired',
+  'daily rewards moderation failed': 'error.dailyRewardsModerationFailed',
+  'daily rewards ip moderation failed': 'error.dailyRewardsIpModerationFailed',
+  'failed to add note': 'error.addNoteFailed',
+  'chat strikes reset failed': 'error.chatStrikesResetFailed',
+  'reactivation failed': 'error.reactivationFailed',
 };
 export function localizeAdminError(message: string): string {
   const key = ADMIN_ERROR_KEYS[message.trim().toLowerCase()];

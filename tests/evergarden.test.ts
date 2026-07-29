@@ -1,25 +1,31 @@
 // The Evergarden: zone registration, and the Great Maze contract. The maze
-// hedges are pure terrain (world.ts GARDEN_MAZE), so these tests are what
-// keeps an edit to the grid honest: the corridors must stay walkable, the
-// walls must stay unclimbable, and the entrance must still reach the
-// Fountain Court.
+// hedges are MODELED walls over flat lawn (world.ts GARDEN_MAZE owns the
+// grid; movement blocks on its piece boxes and garden_features.ts draws the
+// same cells), so these tests are what keeps an edit to the grid honest:
+// the corridors must stay walkable, the walls must stay impassable, and the
+// entrance must still reach the Fountain Court and the north exit.
 
 import { describe, expect, it } from 'vitest';
 import { resolveMovement } from '../src/sim/colliders';
 import {
   EVERGARDEN_CAMPS,
+  EVERGARDEN_KNIGHT_CAMPS,
   EVERGARDEN_PROPS,
   EVERGARDEN_ROADS,
   EVERGARDEN_ZONE,
 } from '../src/sim/content/evergarden';
 import { PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
+import { Sim } from '../src/sim/sim';
 import {
+  crossesGardenHedge,
   GARDEN_MAZE_GRID,
+  gardenMazeCellPieces,
   inGardenMaze,
   inGardenMazeWall,
   MAZE_CELL,
   MAZE_COLS,
   MAZE_ROWS,
+  MAZE_WALL_DEPTH,
   MAZE_X0,
   MAZE_Z1,
   terrainHeight,
@@ -91,22 +97,21 @@ describe('the Great Maze', () => {
     }
   });
 
-  it('is solvable: the entrance reaches the Fountain Court', () => {
-    // BFS over open cells from the south entrance (last row's gap).
+  it('is solvable: the entrance reaches the Fountain Court and the north exit', () => {
+    // Full BFS flood over open cells from the south entrance (last row's
+    // gap): the court, the exit, and in fact EVERY corridor cell must be
+    // reachable, so no grid edit can strand a pocket of unreachable lawn.
     const entranceCol = GARDEN_MAZE_GRID[MAZE_ROWS - 1].indexOf('.');
+    const exitCol = GARDEN_MAZE_GRID[0].indexOf('.');
     expect(entranceCol).toBeGreaterThanOrEqual(0);
+    expect(exitCol).toBeGreaterThanOrEqual(0);
     const court = { c: 7, r: 8 }; // the open 3x3 center
     expect(GARDEN_MAZE_GRID[court.r][court.c]).toBe('.');
     const seen = new Set<string>([`${entranceCol},${MAZE_ROWS - 1}`]);
     const queue = [{ c: entranceCol, r: MAZE_ROWS - 1 }];
-    let reached = false;
     while (queue.length > 0) {
       const cur = queue.shift();
       if (!cur) break;
-      if (cur.c === court.c && cur.r === court.r) {
-        reached = true;
-        break;
-      }
       for (const [dc, dr] of [
         [1, 0],
         [-1, 0],
@@ -123,54 +128,53 @@ describe('the Great Maze', () => {
         queue.push({ c, r });
       }
     }
-    expect(reached).toBe(true);
+    expect(seen.has(`${court.c},${court.r}`), 'court reachable').toBe(true);
+    expect(seen.has(`${exitCol},0`), 'exit reachable').toBe(true);
+    let openCells = 0;
+    for (const row of GARDEN_MAZE_GRID) for (const ch of row) if (ch === '.') openCells++;
+    expect(seen.size, 'every corridor cell reachable').toBe(openCells);
   });
 
-  it('keeps wall runs seamless: full height across shared edges, tall corners', () => {
-    // Two failure shapes this pins down: a dip along the shared edge of two
-    // adjacent wall cells (a visible seam splitting one hedge run into
-    // slabs), and a taper-to-ground at a run's corner where it meets a
-    // junction (a see-through notch). Both read as walls "not seamed".
+  it('covers every wall cell with hedge pieces and keeps every corridor open', () => {
+    // The modeled-wall contract: every wall cell carries at least one piece
+    // and its center is blocked ground; every corridor cell center is open;
+    // and along a wall RUN the pieces join seamlessly (the shared-edge
+    // midpoint of two run neighbors is still blocked, so no gap a player
+    // could slip through mid-run).
     for (let r = 0; r < MAZE_ROWS; r++) {
       for (let c = 0; c < MAZE_COLS; c++) {
-        if (GARDEN_MAZE_GRID[r][c] !== '#') continue;
         const center = cellCenter(c, r);
-        const hWall = terrainHeight(center.x, center.z, SEED);
-        // shared edge midpoints with east/south wall neighbors
-        for (const [dc, dr] of [
-          [1, 0],
-          [0, 1],
-        ]) {
-          const oc = c + dc;
-          const or = r + dr;
-          if (oc >= MAZE_COLS || or >= MAZE_ROWS) continue;
-          if (GARDEN_MAZE_GRID[or][oc] !== '#') continue;
-          const other = cellCenter(oc, or);
-          const mid = { x: (center.x + other.x) / 2, z: (center.z + other.z) / 2 };
-          const hMid = terrainHeight(mid.x, mid.z, SEED);
-          expect(hWall - hMid, `seam dip between ${c},${r} and ${oc},${or}`).toBeLessThan(1.5);
-        }
-        // corners: a yard inside each cell corner the hedge is already tall
-        for (const [sx, sz] of [
-          [1, 1],
-          [1, -1],
-          [-1, 1],
-          [-1, -1],
-        ]) {
-          const px = center.x + sx * (MAZE_CELL / 2 - 1);
-          const pz = center.z + sz * (MAZE_CELL / 2 - 1);
-          const lawn = terrainHeight(center.x, center.z, SEED) - 12; // approx local ground
-          const h = terrainHeight(px, pz, SEED);
-          expect(h - lawn, `low corner in wall ${c},${r}`).toBeGreaterThan(5);
+        const pieces = gardenMazeCellPieces(c, r);
+        if (GARDEN_MAZE_GRID[r][c] === '#') {
+          expect(pieces, `wall ${c},${r} has pieces`).not.toBeNull();
+          expect(pieces && (pieces.h || pieces.v), `wall ${c},${r} carries a piece`).toBe(true);
+          expect(inGardenMazeWall(center.x, center.z), `wall ${c},${r} blocks`).toBe(true);
+          for (const [dc, dr] of [
+            [1, 0],
+            [0, 1],
+          ]) {
+            const oc = c + dc;
+            const or = r + dr;
+            if (oc >= MAZE_COLS || or >= MAZE_ROWS) continue;
+            if (GARDEN_MAZE_GRID[or][oc] !== '#') continue;
+            const other = cellCenter(oc, or);
+            const mid = { x: (center.x + other.x) / 2, z: (center.z + other.z) / 2 };
+            expect(inGardenMazeWall(mid.x, mid.z), `seam between ${c},${r} and ${oc},${or}`).toBe(
+              true,
+            );
+          }
+        } else {
+          expect(pieces, `corridor ${c},${r}`).toBeNull();
+          expect(inGardenMazeWall(center.x, center.z), `corridor ${c},${r} open`).toBe(false);
         }
       }
     }
   });
 
-  it('raises hedge walls the climb gate cannot beat', () => {
-    // Every wall cell adjacent to a corridor must present a slope steeper
-    // than the player's climb limit on the straight approach from the
-    // corridor center to the wall center.
+  it('blocks the straight crossing from every corridor into its wall neighbors', () => {
+    // The modeled hedges are the barrier now, not terrain: the segment from
+    // a corridor center to an adjacent wall center must cross blocked
+    // ground (crossesGardenHedge is exactly what resolveMovement consults).
     for (let r = 0; r < MAZE_ROWS; r++) {
       for (let c = 0; c < MAZE_COLS; c++) {
         if (GARDEN_MAZE_GRID[r][c] !== '#') continue;
@@ -186,32 +190,45 @@ describe('the Great Maze', () => {
           if (GARDEN_MAZE_GRID[or][oc] !== '.') continue;
           const from = cellCenter(oc, or);
           const to = cellCenter(c, r);
-          // walk the approach in half-yard steps; the steepest step must
-          // exceed the climbable slope
-          let maxSlope = 0;
-          const steps = 18;
-          let prev = terrainHeight(from.x, from.z, SEED);
-          for (let i = 1; i <= steps; i++) {
-            const t = i / steps;
-            const x = from.x + (to.x - from.x) * t;
-            const z = from.z + (to.z - from.z) * t;
-            const h = terrainHeight(x, z, SEED);
-            const stepLen = Math.hypot(to.x - from.x, to.z - from.z) / steps;
-            maxSlope = Math.max(maxSlope, (h - prev) / stepLen);
-            prev = h;
-          }
-          expect(maxSlope, `wall ${c},${r} from ${oc},${or}`).toBeGreaterThan(
-            PLAYER_MAX_CLIMB_SLOPE,
-          );
+          expect(
+            crossesGardenHedge(from.x, from.z, to.x, to.z),
+            `wall ${c},${r} from ${oc},${or}`,
+          ).toBe(true);
+        }
+      }
+    }
+  });
+
+  it('lays the maze over flat lawn: no terrain wall remains', () => {
+    // The old terrain hedges are gone: a wall cell's ground is the same
+    // lawn as its corridor neighbors, so the modeled pieces meet the grass
+    // with no raised plinth and no leftover unclimbable mound.
+    for (let r = 0; r < MAZE_ROWS; r++) {
+      for (let c = 0; c < MAZE_COLS; c++) {
+        if (GARDEN_MAZE_GRID[r][c] !== '#') continue;
+        const center = cellCenter(c, r);
+        const hWall = terrainHeight(center.x, center.z, SEED);
+        for (const [dc, dr] of [
+          [1, 0],
+          [-1, 0],
+          [0, 1],
+          [0, -1],
+        ]) {
+          const oc = c + dc;
+          const or = r + dr;
+          if (oc < 0 || oc >= MAZE_COLS || or < 0 || or >= MAZE_ROWS) continue;
+          if (GARDEN_MAZE_GRID[or][oc] !== '.') continue;
+          const other = cellCenter(oc, or);
+          const hOpen = terrainHeight(other.x, other.z, SEED);
+          expect(Math.abs(hWall - hOpen), `wall ${c},${r} vs corridor ${oc},${or}`).toBeLessThan(2);
         }
       }
     }
   });
 
   it('keeps corridors flat across their full width', () => {
-    // The wall skirt must live inside the wall cells: at a corridor cell's
-    // edges (1yd off the wall face) the hedge offset stays out of the way,
-    // so the walkable lane is the whole 9yd cell, not a narrow center strip.
+    // The modeled walls live inside the wall cells, so the walkable lane is
+    // the whole 9yd corridor cell, not a narrow center strip.
     for (let r = 0; r < MAZE_ROWS; r++) {
       for (let c = 0; c < MAZE_COLS; c++) {
         if (GARDEN_MAZE_GRID[r][c] !== '.') continue;
@@ -278,10 +295,11 @@ describe('the hedge walls are hard colliders', () => {
     const from = cellCenter(wall.c - 1, wall.r);
     const to = cellCenter(wall.c + 1, wall.r);
     const end = resolveMovement(SEED, from.x, from.z, to.x, to.z, 0.5);
-    // never inside the hedge, and never on the far side
+    // never inside the hedge, and never on the far side: the mover stops at
+    // the piece's west face (the wall box is centered in its cell)
     expect(inGardenMazeWall(end.x, end.z)).toBe(false);
-    const wallWest = MAZE_X0 + wall.c * MAZE_CELL;
-    expect(end.x).toBeLessThan(wallWest + 1);
+    const face = MAZE_X0 + wall.c * MAZE_CELL + (MAZE_CELL - MAZE_WALL_DEPTH) / 2;
+    expect(end.x).toBeLessThan(face + 0.3);
   });
 
   it('blocks the diagonal cheese over a hedge', () => {
@@ -298,8 +316,8 @@ describe('the hedge walls are hard colliders', () => {
       z = step.z;
     }
     expect(inGardenMazeWall(x, z)).toBe(false);
-    const wallWest = MAZE_X0 + wall.c * MAZE_CELL;
-    expect(x, 'slid along the hedge, never across it').toBeLessThan(wallWest + 1);
+    const face = MAZE_X0 + wall.c * MAZE_CELL + (MAZE_CELL - MAZE_WALL_DEPTH) / 2;
+    expect(x, 'slid along the hedge, never across it').toBeLessThan(face + 0.3);
   });
 
   it('lets movement flow freely along a corridor', () => {
@@ -309,5 +327,54 @@ describe('the hedge walls are hard colliders', () => {
     const to = cellCenter(entranceCol, MAZE_ROWS - 3);
     const end = resolveMovement(SEED, from.x, from.z, to.x, to.z, 0.5);
     expect(Math.hypot(end.x - to.x, end.z - to.z)).toBeLessThan(1);
+  });
+});
+
+describe('the maze patrol', () => {
+  it('posts each patrol knight in a dead-end corridor, leashed to its cell', () => {
+    const patrols = EVERGARDEN_KNIGHT_CAMPS.filter((c) => inGardenMaze(c.center.x, c.center.z));
+    expect(patrols.length).toBeGreaterThanOrEqual(2);
+    expect(patrols.length).toBeLessThanOrEqual(3);
+    for (const camp of patrols) {
+      const c = Math.floor((camp.center.x - MAZE_X0) / MAZE_CELL);
+      const r = Math.floor((MAZE_Z1 - camp.center.z) / MAZE_CELL);
+      expect(GARDEN_MAZE_GRID[r][c], `camp (${camp.center.x},${camp.center.z}) corridor`).toBe('.');
+      const openNeighbors = [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1],
+      ].filter(([dc, dr]) => GARDEN_MAZE_GRID[r + dr]?.[c + dc] === '.').length;
+      expect(openNeighbors, `camp (${camp.center.x},${camp.center.z}) dead end`).toBe(1);
+      expect(camp.radius, 'leash stays inside the corridor').toBeLessThanOrEqual(3);
+      expect(camp.count).toBe(1);
+    }
+  });
+
+  it('keeps the patrol out of the hedges while it paces', () => {
+    // the live sim: the knights idle-wander their dead ends for 30 seconds
+    // and must never stand inside a wall piece (moveToward consults
+    // crossesGardenHedge, the same barrier players hit)
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
+    const entities = (
+      sim as unknown as {
+        entities: Map<number, { templateId?: string; pos: { x: number; z: number } }>;
+      }
+    ).entities;
+    const knights = [...entities.values()].filter(
+      (e) => e.templateId === 'hedge_knight' && inGardenMaze(e.pos.x, e.pos.z),
+    );
+    expect(knights.length).toBeGreaterThanOrEqual(2);
+    for (let i = 0; i < 20 * 30; i++) {
+      sim.tick();
+      if (i % 20 === 0) {
+        for (const k of knights) {
+          expect(
+            inGardenMazeWall(k.pos.x, k.pos.z),
+            `knight in a hedge at (${k.pos.x.toFixed(1)},${k.pos.z.toFixed(1)}) t${i}`,
+          ).toBe(false);
+        }
+      }
+    }
   });
 });

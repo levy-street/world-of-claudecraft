@@ -43,8 +43,8 @@ function equipmentOf(items: ItemDef[]): PlayerEquipment {
 }
 
 describe('spell crit shared core', () => {
-  it('gear crit rating raises spell crit by exactly rating/1000', () => {
-    // Arrange: a mage wearing a chest with 20 crit rating (20/1000 = 2%).
+  it('gear crit rating raises spell crit by exactly rating/2000', () => {
+    // Arrange: a mage wearing a chest with 20 crit rating (20/2000 = 1%).
     const itemId = '__test_spell_crit_chest';
     const item: ItemDef = {
       id: itemId,
@@ -70,8 +70,8 @@ describe('spell crit shared core', () => {
       // Assert: the rating lands in the shared core and in spell crit, exactly.
       expect(p.critRating).toBe(20);
       expect(p.sharedCritBonus).toBeCloseTo(critFractionFromRating(20), 10);
-      expect(sim.ctx.spellCrit(p)).toBeCloseTo(0.05 + p.stats.int * 0.0008 + 0.02, 10);
-      expect(sim.ctx.spellCrit(p)).toBeCloseTo(before + 0.02, 10);
+      expect(sim.ctx.spellCrit(p)).toBeCloseTo(0.05 + p.stats.int * 0.0008 + 0.01, 10);
+      expect(sim.ctx.spellCrit(p)).toBeCloseTo(before + 0.01, 10);
     } finally {
       delete ITEMS[itemId];
     }

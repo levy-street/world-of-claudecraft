@@ -7,8 +7,9 @@ content artifact and the event's atomic first-clear claim.
 
 ## Runtime flow
 
-1. `rift/portals.ts` selects an explicitly eligible new-world zone and opens a
-   deterministic C/B/A/S portal on a deterministic 2-4 hour schedule.
+1. `rift/portals.ts` keeps one deterministic C/B/A/S portal open in EVERY
+   eligible new-world zone, cycling hourly (a zone's next portal opens one
+   cycle after the previous one opened).
 2. The existing procedural generator creates the draft and remains authoritative
    for layouts, colliders, mechanics, and safe spawn points.
 3. `rift/upgrader_draft.ts` immediately builds a validated heuristic upgrade. The
@@ -16,8 +17,13 @@ content artifact and the event's atomic first-clear claim.
 4. Entry freezes the artifact (`contentLocked`) and allocates one independent
    instance per group. Every competing instance receives the same artifact hash.
 5. `rift/race.ts` performs the single-threaded check-and-write first-clear claim.
-   The winner receives race rewards; all other instances for that event are
-   notified, ejected to their saved overworld return positions, and torn down.
+   The winner receives the race rewards; every other instance keeps running and
+   completes as the race loser when its own boss falls, with an egress but NO
+   completion loot (no gear ladder, no sealed cache, no first-clear extras): a
+   loser keeps only what dropped off the mobs. The first mob kill marks an
+   instance PROGRESSED, which binds its members to it WoW-raid style; unspoiled
+   instances recycle when their members regroup, so a freshly formed party
+   shares one clean run.
 6. `rift/persistence.ts` saves portal deadlines, event history, winner metadata,
    scheduler state, and upgrade artifacts. Runtime party instances are never
    restored after a realm restart.
@@ -45,6 +51,30 @@ Direct OpenAI Responses API mode is selected only when both are present:
 `RIFT_UPGRADER_OPENAI_URL` may override the official Responses endpoint. Secrets
 remain server-side and are never emitted, persisted in Rift state, or sent to a
 client.
+
+## Rank difficulty
+
+Rank (C/B/A/S) is the ONLY difficulty axis: a rift never scales with party size,
+and mob levels are capped at 22 (23 at S), so all four ranks differ purely
+through the spawn-time stat transform in `rift/ranks.ts`, the rank mechanic
+budget (C=1 .. S=4 of a boss's `rankMechanics` kit), and the hazard gate.
+Rifts are group content at every rank including C.
+
+The ladder is calibrated onto the v0.30 dungeon ladder: C is a normal dungeon
+(normal Gravewyrm Sanctum's own line), B is the heroic five-man line at 1.0x, A
+is 1.2x heroic, S is 1.33x heroic. Health and damage are split by mob class
+(spawn-list trash, boss, boss-summoned add), because one multiplier per rank
+cannot serve two classes at once. The full derivation, the Monte Carlo benches,
+the decision ledger, and pre-measured fallback options are in
+[../rift-rank-monte-carlo-analysis.md](../rift-rank-monte-carlo-analysis.md);
+every tuning literal and floor is pinned by
+`tests/rift_difficulty_floors.test.ts`. Re-run the benches with
+`npm run sim:rift`.
+
+Note that only SPAWN-LIST templates (`RIFT_TRASH_IDS`) may be substituted into a
+floor roster by an upgrade manifest. The shared summoned-add templates are
+non-boss and appear in the bone, void and citadel theme rosters, but they are
+non-elite and carry no loot table, so `applyRiftUpgrade` filters them out.
 
 ## Monster and asset safety
 

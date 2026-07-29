@@ -38,6 +38,14 @@ export const ru_RU: EnTranslations = {
     "filterLabel": "Фильтр команд",
     "filterPlaceholder": "Поиск в этой категории",
     "noMatches": "Нет подходящих команд.",
+    "itemSearchPlaceholder": "Поиск по названию или идентификатору",
+    "itemResultsAria": "Подходящие предметы",
+    "itemNoMatches": "Нет подходящих предметов.",
+    "itemMore": "Показано {shown} из {total}. Продолжайте вводить, чтобы сузить список.",
+    "itemChosen": "Выбрано: {name}",
+    "itemUnknown": "Нет предмета с таким идентификатором.",
+    "itemHeroicTag": "Героический",
+    "kitCurrentSpec": "Текущая специализация",
     "serverRequirement": "Для серверных читов всё ещё требуется ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Выберите допустимые значения перед запуском этой команды.",
     "sent": "Отправлено: {command}",
@@ -55,7 +63,8 @@ export const ru_RU: EnTranslations = {
       "z": "Z",
       "dungeon": "Подземелье",
       "difficulty": "Сложность",
-      "name": "Имя"
+      "name": "Имя",
+      "spec": "Специализация"
     },
     "difficulty": {
       "normal": "Обычная",
@@ -113,6 +122,10 @@ export const ru_RU: EnTranslations = {
       "give": {
         "label": "Дать предмет",
         "description": "Добавить предмет в инвентарь игрока."
+      },
+      "kit": {
+        "label": "Экипировать комплект свежего 20 уровня",
+        "description": "Надеть комплект уровня 20 (до Sanctum) для выбранной специализации, сначала сумки. Только снаряжение."
       },
       "gold": {
         "label": "Добавить золото",
@@ -327,10 +340,14 @@ export const ru_RU: EnTranslations = {
       "menuButton": "Выбраться",
       "help": "Спасение: /unstuck запускает неподвижный отсчёт, после которого вы окажетесь в ближайшем доступном безопасном месте.",
       "helpAtGraveyard": "Спасение: /unstuck запускает неподвижный отсчёт, после которого ваш дух отправится на ближайшее кладбище. Чтобы вернуться к жизни, примите Подать Хранителя у Целителя душ.",
+      "helpUnstuckSickness": "Спасение: /unstuck запускает неподвижный отсчёт, после которого вас перенесёт на ближайшее кладбище и воскресит, если вы пали. Болезнь спасения останется на вас до 5 минут.",
       "started": "Перемещение из ловушки через {seconds} сек. Движение, бой, получение урона или другое действие отменят его.",
       "countdown": "Выбраться: {seconds}",
       "completed": "Вы перемещены в ближайшее доступное безопасное место.",
       "completedAtGraveyard": "Ваш дух вернулся на ближайшее кладбище. Поговорите с Целителем душ и примите Подать Хранителя.",
+      "revivedAtGraveyard": "Вас вернули на ближайшее кладбище и воскресили. Подать Хранителя тяготит вас.",
+      "movedToGraveyard": "Вас перенесли на ближайшее кладбище. Болезнь спасения тяготит вас.",
+      "revivedAtGraveyardUnstuck": "Вас перенесли на ближайшее кладбище и воскресили. Болезнь спасения тяготит вас.",
       "cancelledMoved": "Перемещение отменено, потому что вы сдвинулись с места.",
       "cancelledDamaged": "Перемещение отменено, потому что вы получили урон.",
       "cancelledCombat": "Перемещение отменено, потому что вы вступили в бой.",
@@ -379,13 +396,15 @@ export const ru_RU: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Эмоции",
-      "done": "Готово"
+      "done": "Готово",
+      "close": "Закрыть эмоции"
     },
     "dailyRewards": {
       "title": "Ежедневные награды",
       "close": "Закрыть ежедневные награды",
       "loading": "Загрузка ежедневных наград...",
       "error": "Не удалось загрузить ежедневные награды.",
+      "disabled": "Ежедневные награды сейчас отключены. Мы сообщим об обновлениях этой функции в канале Discord.",
       "intro": "Держите достаточно WOC в подтвержденном кошельке, чтобы открыть ежедневные награды. Зарабатывайте очки за один ежедневный спин и сменяющиеся задания, затем поднимайтесь в ежедневной таблице лидеров ради доли призового фонда.",
       "disclaimer": "Цена WOC может быстро меняться. Мы рекомендуем держать больше минимальных $20 USD, чтобы обычные колебания цены не заблокировали награды. Это не финансовый совет.",
       "prize": "Призовой фонд",
@@ -640,7 +659,8 @@ export const ru_RU: EnTranslations = {
         "staff": "Посох",
         "wand": "Жезл",
         "bow": "Лук",
-        "crossbow": "Арбалет"
+        "crossbow": "Арбалет",
+        "polearm": "Древковое оружие"
       },
       "badge": {
         "flagship": "Флагман",
@@ -682,7 +702,7 @@ export const ru_RU: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "Скидка 20%",
+      "railWocDiscount": "Скидка {percent}%",
       "railWocUnavailable": "Цена WOC сейчас недоступна.",
       "railNativeUnavailable": "SOL/WOC недоступны",
       "amountLabel": "Количество",
@@ -736,6 +756,12 @@ export const ru_RU: EnTranslations = {
       "collapseHint": "Свернуть трекер заданий",
       "expandHint": "Развернуть трекер заданий"
     },
+    "interfaceTabs": {
+      "general": "Общие",
+      "frames": "Рамки",
+      "chat": "Чат",
+      "combat": "Бой"
+    },
     "chatTimestamps": {
       "show": "Показывать время в чате",
       "format": "Формат времени",
@@ -754,6 +780,10 @@ export const ru_RU: EnTranslations = {
       "ready": "Замах",
       "seconds": "{seconds} сек."
     },
+    "breath": {
+      "label": "Дыхание",
+      "drowning": "Вы тонете!"
+    },
     "rest": {
       "resting": "Отдых"
     },
@@ -766,6 +796,7 @@ export const ru_RU: EnTranslations = {
       "targetAnnounce": "Цель: {name}",
       "targetOfTargetLabel": "Цель цели",
       "partyLabel": "Ваша группа",
+      "petLabel": "Ваш питомец",
       "partyChip": "Группа",
       "partyGroup": "Группа {n}",
       "durationUnitSeconds": "с",
@@ -785,7 +816,6 @@ export const ru_RU: EnTranslations = {
       "leaderboard": "Рейтинг",
       "dailyRewards": "Магазин",
       "deeds": "Деяния",
-      "mounts": "Транспорт",
       "professions": "Профессии",
       "nameplates": "Имена",
       "haptics": "Вибрация",
@@ -800,7 +830,7 @@ export const ru_RU: EnTranslations = {
       "targetCycleShort": "Цель",
       "spellbookPageLabel": "Страница {page}",
       "hideKeyboard": "Скрыть клавиатуру",
-      "chatPlaceholder": "Напишите сообщение..."
+      "chatPlaceholder": "Напишите сообщение... (! команды сообщества)"
     },
     "tutorial": {
       "moveBodyTouch": "Используйте джойстик передвижения, чтобы двигаться, и проведите по экрану, чтобы осмотреться. Сделайте несколько шагов, чтобы начать.",
@@ -868,6 +898,13 @@ export const ru_RU: EnTranslations = {
       "heroicName": "Героический режим: {name}",
       "heroicLocked": "Вы закреплены за героическим подземельем: {name}."
     },
+    "riftTracker": {
+      "title": "Разлом",
+      "floor": "Этаж {current} из {total}",
+      "closesIn": "Разлом закроется через {time}",
+      "clockMs": "{minutes}:{seconds}",
+      "clockHms": "{hours}:{minutes}:{seconds}"
+    },
     "compass": {
       "N": "С",
       "NE": "СВ",
@@ -883,7 +920,36 @@ export const ru_RU: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m} мин {s} сек.",
       "seconds": "{s} сек.",
-      "autoShowHint": "Строки появляются автоматически, как только ваша группа наносит урон или лечит, и этот раздел закрывается через несколько секунд после окончания боя."
+      "autoShowHint": "Строки появляются автоматически, как только ваша группа наносит урон или лечит, и этот раздел закрывается через несколько секунд после окончания боя.",
+      "threatFallback": "Нет данных об угрозе: показан урон по {name}",
+      "breakdownSummary": "{tab}: {value}",
+      "breakdownRow": "{value} ({percent})",
+      "breakdownOther": "Прочее ({count})",
+      "percent": "{value}%",
+      "petAbility": "{pet}: {ability}",
+      "melee": "Ближний бой",
+      "move": "Перетащите, чтобы переместить счётчик",
+      "resize": "Перетащите, чтобы изменить размер счётчика",
+      "dock": "Вернуть счётчик в окно счётчиков",
+      "separate": "Отделить: {meter}",
+      "regroup": "Вернуть: {meter}"
+    },
+    "targetAuras": {
+      "title": "Ауры цели",
+      "keybindLabel": "Усиления и ослабления цели",
+      "all": "Все",
+      "debuffs": "Ослабления",
+      "buffs": "Усиления",
+      "unlock": "Переместить окно аур цели",
+      "lock": "Закрепить окно аур цели",
+      "configureRows": "Настроить ауры цели",
+      "fewerRows": "Уменьшить число строк аур",
+      "moreRows": "Увеличить число строк аур",
+      "visibleRows": "Предпочтительное число строк аур: {count}",
+      "showSources": "Показать создателей аур",
+      "hideSources": "Скрыть создателей аур",
+      "ownAura": "Ваша аура",
+      "opacity": "Непрозрачность аур: {percent}"
     },
     "petFeed": {
       "disabledFullHp": "Питомец полностью здоров",
@@ -895,33 +961,34 @@ export const ru_RU: EnTranslations = {
       "targetFriendlyNext": "Следующий союзник",
       "discord": "Discord",
       "valecup": "Кубок Долины",
+      "bgFlag": "Действие с флагом",
       "sheathe": "Убрать/обнажить оружие",
+      "dive": "Нырнуть",
       "categoryPet": "Питомец",
       "petAttack": "Питомец: атака",
       "petStop": "Питомец: стоп",
       "petTaunt": "Питомец: провокация",
       "petDefensive": "Питомец: защита",
       "petAggressive": "Питомец: агрессия",
-      "mount": "Сесть / Спешиться"
+      "targetPet": "Питомец: цель",
+      "mount": "Сесть / Спешиться",
+      "mouseHint": "Кнопки мыши тоже работают: во время назначения нажмите среднюю кнопку (M3) или боковую (M4, M5). Левая и правая остаются зарезервированы для камеры, перемещения кликом и кликов по миру."
+    },
+    "actionBar": {
+      "editKeys": "Настроить клавиши панели действий",
+      "editKeysHint": "Щёлкните ячейку на панели действий, затем нажмите клавишу, чтобы назначить её.",
+      "bannerHint": "Щёлкните ячейку, затем нажмите клавишу, чтобы назначить её. По завершении нажмите «Готово».",
+      "bannerCapturing": "Нажмите клавишу, чтобы назначить её этой ячейке...",
+      "boundToKey": "Назначено на {key}.",
+      "reset": "Сбросить",
+      "done": "Готово",
+      "cancel": "Отмена",
+      "resetConfirmTitle": "Сбросить клавиши панели действий?",
+      "resetConfirmBody": "Первая панель вернётся к клавишам по умолчанию, а вторая и третья панели останутся без назначенных клавиш. Это действие нельзя отменить."
     },
     "mounts": {
-      "title": "Транспорт",
-      "close": "Закрыть",
-      "select": "Выбрать",
-      "selected": "Выбран",
-      "riding": "Верхом",
       "mount": "Сесть",
-      "dismount": "Спешиться",
-      "requiresLevel": "Требуется {level} уровень",
-      "pickFirst": "Выберите транспорт для езды.",
-      "keybindHint": "Нажмите клавишу «Сесть / Спешиться», чтобы поехать.",
-      "emptyTitle": "Скакунов пока нет",
-      "emptyStableHint": "Достигните 20 уровня и возьмите урок верховой езды у старшей конюшей Марлы в конюшнях к западу от Хайвотча.",
-      "emptyDropHint": "Более редких скакунов выбивают боссы героических подземелий или получают за прохождение Разломов.",
-      "clickManage": "Нажмите, чтобы выбрать транспорт",
-      "rarity_common": "Обычный",
-      "rarity_rare": "Редкий",
-      "rarity_epic": "Эпический",
+      "useToRide": "Используйте, чтобы призвать это ездовое животное.",
       "spec_speed": "+{pct}% к скорости передвижения",
       "name_valorsteed": "Доблестный скакун",
       "name_grag_bear": "Голиаф Граг-медведь",
@@ -930,17 +997,21 @@ export const ru_RU: EnTranslations = {
       "name_shadowjump_toad": "Кама-Кагэ, жаба теневых прыжков",
       "name_stormfeather_griffin": "Штормокрыл Поднебесный",
       "name_thunderstrut_gobbler": "Громоступ, великий индюк",
+      "name_terrorspark_groundshaker": "Страхоискр, сотрясатель земли",
+      "name_drakemaw_raptor": "Раптор Дрейкмо",
       "desc_valorsteed": "Выносливый и твердо стоящий на ногах скакун, повышающий скорость передвижения.",
       "desc_grag_bear": "Выносливый и твердо стоящий на лапах медведь, повышающий скорость передвижения.",
       "desc_stalkglider_snail": "Стойкая неторопливая улитка, повышающая скорость передвижения.",
       "desc_aether_hover_cycle": "Мощный магитех-байк для быстрых боевых рейдов на бреющем ходу.",
       "desc_shadowjump_toad": "Огромная устойчивая жаба, обученная молниеносным теневым прыжкам по любой местности.",
       "desc_stormfeather_griffin": "Величавый штормовой грифон, ступающий по земле на рунных когтях со сложенными крыльями.",
-      "desc_thunderstrut_gobbler": "Исполинский индюк, рожденный бурей: он важно спускается с Пробуждающегося пика, распустив хвост, словно грозовой фронт."
+      "desc_thunderstrut_gobbler": "Исполинский индюк, рожденный бурей: он важно спускается с Пробуждающегося пика, распустив хвост, словно грозовой фронт.",
+      "desc_terrorspark_groundshaker": "Компактная бронированная машина с тяжёлыми гусеницами, крупнокалиберной пушкой и седлом для бесстрашных пилотов.",
+      "desc_drakemaw_raptor": "Приученный к седлу выводковый раптор из кальдеры Дрейкмо: сплошные жилы и бег, и от него всё ещё едва пахнет пеплом."
     },
     "mountTraining": {
       "mountPrompt": "Нажми {key}, чтобы оседлать учебного Доблестного скакуна.",
-      "ownedMountPrompt": "Нажми {key}, чтобы оседлать скакуна",
+      "buyReinsPrompt": "Верховая езда изучена. Купите у Марлы поводья Доблестного скакуна за 10 золотых и используйте их, чтобы сесть верхом.",
       "ridePrompt": "Следуй за светящейся меткой к линии старта и нажми «Начать заезд».",
       "begin": "Начать урок",
       "success": "Ты приручил Доблестного скакуна.",
@@ -949,13 +1020,100 @@ export const ru_RU: EnTranslations = {
     "mountRace": {
       "startButton": "Начать заезд",
       "cancelButton": "Отменить заезд",
-      "go": "GO!",
+      "go": "Вперёд!",
       "start": "Вперёд! Бери все препятствия и скачи назад через арку.",
       "toFinish": "Скачи назад через арку!",
       "finished": "Финиш за {seconds} с!",
       "timeout": "Заезд провален",
       "progress": "Барьеры {n} из {total}",
-      "timeLeft": "{seconds}s"
+      "timeLeft": "{seconds} сек."
+    },
+    "pvp": {
+      "launcherTitle": "PvP",
+      "mobileLabel": "PvP",
+      "bracket1v1": "1 на 1",
+      "bracket2v2": "2 на 2"
+    },
+    "bg": {
+      "title": "Терновая Лощина",
+      "blurb": "Две разрушенные крепости смотрят друг на друга через обнесённую стеной лощину в тени Тернового пика: Багровые на юге, Лазурные на севере, а между ними старый Двор Руин, который так и не достался никому. Пятеро на пятеро, по одному знамени, и первый, кто три раза донесёт чужое знамя домой, забирает поле.",
+      "modeTag": "Захват флага 5 на 5",
+      "offlineNote": "Терновая Лощина синхронизируется. Очередь откроется после ответа мира.",
+      "ratingSummary": "Рейтинг. Побед: {wins} / поражений: {losses}",
+      "careerCaptures": "Захватов за карьеру: {count}",
+      "enterQueue": "Встать в очередь",
+      "enterQueueParty": "Встать в очередь (группа из {count})",
+      "leaveQueue": "Покинуть очередь",
+      "searching": "Поиск. В очереди {count}/{size}.",
+      "queuedParty": "Группа из {count}.",
+      "queueNote": "Две команды по пять бойцов. Украдите вражеское знамя и принесите его в свою крепость. Побеждает команда, первой захватившая флаг 3 раза. Собирайте группу до 5 человек и вставайте в очередь вместе; подбирайте руны спринта и уходите от погони между укрытиями.",
+      "matchInProgress": "Идет битва. {crimson}:{azure}.",
+      "ladderAllTime": "Таблица. За все время",
+      "noRanked": "Пока никто не в рейтинге. Станьте первым.",
+      "ladderOnline": "Таблица. Сейчас в сети",
+      "noChallengers": "Сейчас в сети нет бойцов. Станьте первым.",
+      "playerLevelClassTitle": "{name}. Уровень {level}, {className}",
+      "playerClassTitle": "{name}. {className}",
+      "crimson": "Багровые",
+      "azure": "Лазурные",
+      "yourTeamTitle": "Ваша команда",
+      "clock": "{minutes}:{seconds}",
+      "formUp": "Построение: {seconds}",
+      "firstTo": "До {caps} захватов",
+      "flagState": {
+        "home": "Флаг в крепости",
+        "carried": "Флаг украден!",
+        "dropped": "Флаг на земле"
+      },
+      "respawnIn": "Следующая волна: возрождение через {seconds}",
+      "resultVictory": "Победа!",
+      "resultDefeat": "Поражение",
+      "resultDraw": "Ничья",
+      "leavingIn": "Вы покинете поле боя через {seconds}",
+      "killFeed": "{killer} сразил(а) {victim}",
+      "killFeedFallen": "{victim} пал(а) в бою",
+      "foundBanner": "Битва найдена. Вы сражаетесь за {team}!",
+      "countdownBanner": "Терновая Лощина начнется через {seconds}",
+      "startBanner": "Захватите флаг!",
+      "flagTakenLog": "{name} забирает флаг команды {team}!",
+      "flagDroppedLog": "Флаг команды {team} уронен.",
+      "flagReturnedLog": "Флаг команды {team} возвращен.",
+      "dropFlagConfirmTitle": "Бросить флаг?",
+      "dropFlagConfirmBody": "Вы несете вражеский флаг. Если бросить его, он останется на земле и его сможет подобрать любая команда.",
+      "dropFlagConfirmAccept": "Бросить флаг",
+      "boardToggleLabel": "Табло матча. Нажмите Enter, чтобы закрепить полную таблицу.",
+      "levelRequirement": "Очередь на это поле боя открывается на уровне {level}.",
+      "board": {
+        "kills": "Убийства",
+        "assists": "Помощь",
+        "deaths": "Смерти",
+        "captures": "Захваты"
+      },
+      "flagTakenBanner": "Команда {takers} забирает флаг команды {team}!",
+      "flagReturnedBanner": "Флаг команды {team} возвращен!",
+      "capturedTeamBanner": "Команда {takers} захватывает флаг команды {team}! {crimson}:{azure}",
+      "capturedLog": "{name} захватывает флаг команды {team}. Счет {crimson}:{azure}.",
+      "victoryBanner": "Победа! Терновая Лощина {crimson}:{azure}. Рейтинг {rating} ({delta})",
+      "defeatBanner": "Поражение. Терновая Лощина {crimson}:{azure}. Рейтинг {rating} ({delta})",
+      "drawBanner": "Ничья в Терновой Лощине {crimson}:{azure}. Рейтинг {rating} ({delta})",
+      "endBannerDetail": "Терновая Лощина {crimson}:{azure}. Рейтинг {rating} ({delta})",
+      "endLog": "Терновая Лощина завершена, {crimson}:{azure}. Рейтинг {rating} ({delta}).",
+      "endedTimer": "Время вышло",
+      "endedForfeit": "Бой завершён отказом",
+      "endedTimerLog": "Время боя истекло; поле забрала команда с большим счётом.",
+      "endedForfeitLog": "Бой завершён отказом.",
+      "firstWinBonusLine": "Первая победа за день: +{honor} чести",
+      "firstWinBonusLog": "Первая победа за день: вы получаете {honor} очк. чести дополнительно.",
+      "timeWarningMinutes": "Осталось {minutes} мин.",
+      "timeWarningOneMinute": "Осталась одна минута",
+      "timeWarningMinutesLog": "До конца боя осталось {minutes} мин.",
+      "timeWarningOneMinuteLog": "До конца боя осталась одна минута.",
+      "map": {
+        "crimsonKeep": "Багровая крепость",
+        "azureKeep": "Лазурная крепость",
+        "ruinCourtyard": "Двор Руин",
+        "graveyard": "Кладбище"
+      }
     },
     "vcup": {
       "title": "Кубок Долины",
@@ -979,6 +1137,7 @@ export const ru_RU: EnTranslations = {
       },
       "awayNote": "Если обе стороны подняли одно знамя, гости играют в инвертированных цветах.",
       "rolesHeading": "Игровая роль",
+      "rolesSmallBracketNote": "В категориях 1 на 1 и 2 на 2 каждый игрок выходит как Универсал. Деяния, требующие категории 3 на 3 или больше, здесь получить нельзя.",
       "role": {
         "allrounder": {
           "name": "Универсал",
@@ -1020,6 +1179,7 @@ export const ru_RU: EnTranslations = {
       "guildBoardWl": "{wins} побед, {losses} поражений",
       "practice": "Тренировка с ботами",
       "practiceNote": "Немедленно начинает полный матч с ботами на Свином поле.",
+      "practiceUnratedNote": "Тренировочные матчи не рейтинговые: счёт и прогресс Книги деяний не засчитываются.",
       "practicingNow": "Сейчас тренируются ({count}):",
       "clock": "{minutes}:{seconds}",
       "indicatorQueued": "Очередь Кубка Долины: {bracket}, место {position} из {count}",
@@ -1062,6 +1222,8 @@ export const ru_RU: EnTranslations = {
         "rule5": "Любой может подойти и поболеть за вас с трибун.",
         "kitHeading": "Ваш набор",
         "kitNote": "На время матча эти приёмы заменяют способности класса.",
+        "unratedNote": "На поле есть боты, поэтому этот матч не рейтинговый: результаты не меняются, а деяния за голы, сейвы и сухие матчи не засчитываются.",
+        "practiceUnratedNote": "Это тренировочный матч, поэтому он не рейтинговый: результаты не меняются, а прогресс Книги деяний не засчитывается.",
         "rosterHeading": "Список состава",
         "you": "Вы",
         "bot": "Бот",
@@ -1103,6 +1265,33 @@ export const ru_RU: EnTranslations = {
       "browserEffectsReduced": "Сниженные",
       "browserEffectsMinimal": "Минимальные",
       "browserEffectsNote": "Авто снижает тяжёлые CSS-эффекты (размытие, свечение, движение фона) в зависимости от браузера и устройства. Если интерфейс тормозит, понизьте вручную.",
+      "graphicsApply": "Применить графику",
+      "graphicsApplying": "Применение настроек графики...",
+      "graphicsApplied": "Настройки графики применены.",
+      "graphicsSaved": "Настройки графики сохранены. Активный рендерер уже им соответствует.",
+      "graphicsFailed": "Не удалось применить настройки графики. Предыдущие настройки остаются активными.",
+      "graphicsRetry": "Повторить применение",
+      "graphicsFatal": "Не удалось восстановить графику. Перезагрузите игру, чтобы продолжить.",
+      "graphicsReload": "Перезагрузить игру",
+      "graphicsDraftChanged": "Изменения графики готовы к применению.",
+      "gfxSectionQuality": "Качество",
+      "gfxSectionWorld": "Детализация мира",
+      "gfxSectionLighting": "Освещение и эффекты",
+      "gfxSectionCamera": "Камера",
+      "gfxSectionDisplay": "Экран",
+      "gfxSectionSystem": "Система",
+      "gfxSectionTouch": "Сенсорное управление",
+      "gfxViewDistance": "Дальность обзора",
+      "gfxWaterQuality": "Качество воды",
+      "gfxCharacterDetail": "Детализация персонажей",
+      "gfxAmbientOcclusion": "Затенение окружения",
+      "gfxBloom": "Свечение",
+      "gfxAntiAliasing": "Сглаживание",
+      "gfxDynamicLights": "Динамические источники света",
+      "gfxParticleEffects": "Эффекты частиц",
+      "gfxHalf": "Наполовину",
+      "gfxCustomNote": "Изменение любого регулятора переключает пресет качества на «Расширенное»: собственный набор на основе базы «Высокое», начинающийся с уровней, показанных для текущего пресета.",
+      "gfxEffectsNote": "Затенение окружения, свечение и сглаживание работают через цепочку постобработки: при низком уровне «Эффекты и освещение» цепочка отключена, и эти настройки не действуют.",
       "interfaceMode": "Режим интерфейса",
       "interfaceModeAuto": "Авто",
       "interfaceModeDesktop": "Компьютер",
@@ -1117,21 +1306,28 @@ export const ru_RU: EnTranslations = {
       "showWalletOnPlayerCard": "Показывать кошелек на карточке игрока",
       "showDevBadges": "Показывать значки разработчика",
       "showOwnNameplate": "Показывать свою табличку с именем",
+      "showPlayerNameplates": "Показывать таблички с именами игроков",
       "uiScale": "Масштаб интерфейса",
       "playerFrameScale": "Размер рамки игрока",
       "targetFrameScale": "Размер рамки цели",
       "aurasOnPlayerFrame": "Баффы у рамки игрока",
       "highContrastBackground": "Фон высокой контрастности",
       "startAttackOnAbility": "Автоатака при использовании способности",
+      "stopAutoAttackOnTargetSwitch": "Останавливать автоатаку при смене цели",
       "walkByAutoloot": "Автосбор добычи при проходе",
       "groundReticle": "Прицел наземного наведения",
       "mouseoverCast": "Применение по наведению на рамки группы",
+      "stickyTarget": "Сохранять цель при клике по земле",
       "showItemLevel": "Показывать уровень предмета",
       "itemLevelLine": "Уровень предмета {level}",
       "itemScoreLine": "Оценка {score}",
       "showSecondaryActionBar": "Показывать вторичную панель действий",
       "showThirdActionBar": "Показывать третью панель действий",
+      "hideUnusedActionSlots": "Скрыть неиспользуемые ячейки действий",
+      "lockActionBars": "Заблокировать панели действий",
       "showTargetOfTarget": "Показывать цель цели",
+      "showPetFrame": "Показывать вашего питомца",
+      "waterRipples": "Рябь на воде (кильватер)",
       "showAttackButton": "Показывать кнопку атаки",
       "showDailyRewardsChest": "Показывать сундук ежедневных наград",
       "mobileCameraJoystick": "Джойстик камеры",
@@ -1168,6 +1364,8 @@ export const ru_RU: EnTranslations = {
       "buttons": "Раскладка кнопок",
       "resetButtons": "Сбросить раскладку кнопок",
       "menuAction": "Игровое меню",
+      "zoomIn": "Приблизить",
+      "zoomOut": "Отдалить",
       "help": "Левый стик — движение, правый — камера. Откройте окно, чтобы использовать экранный указатель."
     },
     "perf": {
@@ -1242,26 +1440,103 @@ export const ru_RU: EnTranslations = {
         "offline": "Не в сети"
       }
     },
+    "auraOverlay": {
+      "title": "Ауры",
+      "currentClass": "Текущий класс: {class}",
+      "previewHint": "Используйте «Настроить позиции», чтобы сдвинуть ауру и не перекрывать меню.",
+      "noProcs": "Для этого персонажа нет поддерживаемых срабатываний.",
+      "enabled": "Показывать ауру",
+      "icon": "Значок заклинания",
+      "arcs": "Боковые серпы",
+      "groundRing": "Кольцо на земле",
+      "groundRingSpellOrder": "Кольцо на земле: порядок заклинаний",
+      "crescentsSpellOrder": "Боковые серпы: порядок заклинаний",
+      "size": "Размер",
+      "iconSize": "Размер значка",
+      "crescentBlockSize": "Размер блока серпа",
+      "groundRingBlockSize": "Размер блока кольца",
+      "opacity": "Непрозрачность",
+      "color": "Цвет",
+      "allOn": "Все вкл.",
+      "allOff": "Все выкл.",
+      "reposition": "Настроить позиции",
+      "positioning": "Позиция: {aura}",
+      "selectAura": "Аура",
+      "done": "Готово",
+      "moveLeft": "Влево",
+      "moveUp": "Вверх",
+      "moveDown": "Вниз",
+      "moveRight": "Вправо",
+      "moveEarlier": "Сдвинуть заклинание внутрь",
+      "moveLater": "Сдвинуть заклинание наружу",
+      "screenPosition": "Позиция на экране",
+      "spellOrder": "Порядок заклинаний",
+      "reset": "Сбросить позицию",
+      "spellPosition": "Порядок заклинаний {position} / {count}",
+      "procs": {
+        "revenge": "Месть!",
+        "battleTrance": "Боевой транс",
+        "overpowerCharge": "Усиление красной руки",
+        "suddenDeath": "Внезапная смерть",
+        "victoryRush": "Победный натиск",
+        "enrage": "Хаос: Ярость",
+        "heatingUp": "Разогрев",
+        "arcaneCharge": "Чародейские заряды",
+        "aetherRush": "Эфирный натиск"
+      }
+    },
     "playerCard": {
       "showWalletBadge": "Показывать значок кошелька"
     },
     "landing": {
       "highContrast": "Высокая контрастность",
-      "highContrastAria": "Переключить фон высокой контрастности: отключает движущийся ролик, чтобы текст начального экрана оставался читаемым"
+      "highContrastAria": "Переключить фон высокой контрастности: отключает движущийся ролик, чтобы текст начального экрана оставался читаемым",
+      "browserSupport": {
+        "title": "Внимание: неподдерживаемый браузер",
+        "body": "В этом браузере производительность может быть снижена. Для наилучшего результата установите настольное приложение для Windows, macOS или Linux. Предпочитаете играть в браузере? Chrome обеспечивает наилучшую производительность, также поддерживаются Firefox и Safari.",
+        "getDesktopApp": "Получить настольное приложение",
+        "continueInBrowser": "Продолжить в браузере",
+        "dismissAria": "Закрыть уведомление о неподдерживаемом браузере"
+      }
     },
     "warfare": {
       "honorAmount": "{amount} очк. чести",
       "dualPrice": "{money} + {honor}",
       "balance": "Честь: {amount}",
       "honorFloat": "+{amount} чести",
+      "honorFloatReason": "+{amount} чести ({reason})",
       "honorGain": "Вы получаете {amount} очк. чести ({reason}).",
       "notEnoughHonor": "Недостаточно чести.",
       "reasons": {
         "arenaWin": "Победа на арене",
         "fiestaKill": "Устранение на Фиесте",
         "fiestaComplete": "Завершение Фиесты",
-        "fiestaWin": "Победа на Фиесте"
+        "fiestaWin": "Победа на Фиесте",
+        "battlegroundWin": "Победа в Терновой Лощине",
+        "battlegroundFirstWin": "Первая победа в Терновой Лощине за день",
+        "battlegroundComplete": "Битва в Терновой Лощине",
+        "battlegroundKill": "Почётное убийство",
+        "battlegroundAssist": "Помощь в убийстве"
+      },
+      "floatReasons": {
+        "kill": "Убийство",
+        "assist": "Помощь",
+        "firstWin": "Первая победа"
       }
+    },
+    "warfareShop": {
+      "gossipOption": "Просмотреть комплекты Боевой мощи",
+      "gossipOptionAria": "Просмотреть магазин комплектов Боевой мощи у {name}",
+      "jewelry": "Украшения",
+      "weapons": "Оружие",
+      "owned": "Получено",
+      "buyAria": "Купить {item} за {honor}",
+      "buyOwnedAria": "Купить {item} за {honor}, уже получено",
+      "buyConfirmBody": "Купить {item} за {honor}? Покупки за честь не подлежат возврату."
+    },
+    "charSheet": {
+      "offense": "Атака",
+      "defense": "Защита"
     },
     "statInfo": {
       "fromYour": "От вашей характеристики ({value} {stat}):",
@@ -1329,6 +1604,7 @@ export const ru_RU: EnTranslations = {
     },
     "itemHeroicTag": "[ГЕРОИЧЕСКИЙ]",
     "itemSoulbound": "Персональный",
+    "itemUniqueEquipped": "Уникальный (экипируется)",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1415,7 +1691,9 @@ export const ru_RU: EnTranslations = {
     },
     "paperdoll": {
       "unequipAria": "Снять {item}",
-      "unequipHint": "Нажмите ×, ПКМ или перетащите в сумку, чтобы снять"
+      "unequipHint": "Нажмите ×, ПКМ или перетащите в сумку, чтобы снять",
+      "hideHelmAria": "Скрыть шлем",
+      "showHelmAria": "Показать шлем"
     },
     "account": {
       "title": "Аккаунт",
@@ -1481,6 +1759,10 @@ export const ru_RU: EnTranslations = {
       "twoFactorRecoveryTitle": "Сохраните коды восстановления",
       "twoFactorRecoveryHint": "Каждый код работает один раз. Храните их в надёжном месте: это единственный способ войти, если вы потеряете приложение-аутентификатор.",
       "twoFactorDownloadCodes": "Скачать коды",
+      "recoveryCodesFileHeader": "Коды восстановления {brand}",
+      "recoveryCodesFileAccount": "Аккаунт: {username}",
+      "recoveryCodesFileHint": "Каждый код можно использовать один раз, если вы потеряете доступ к приложению-аутентификатору.",
+      "recoveryCodesFileWarn": "Храните этот файл в надёжном и защищённом месте.",
       "twoFactorDone": "Готово",
       "twoFactorDisableHint": "Введите пароль, чтобы отключить двухфакторную аутентификацию. Ваши коды восстановления будут удалены.",
       "twoFactorDisableBtn": "Отключить двухфакторную аутентификацию",
@@ -1521,10 +1803,13 @@ export const ru_RU: EnTranslations = {
     "corpseHarvest": {
       "title": "Сбор",
       "harvestButton": "Собрать",
-      "harvestButtonTooltip": "Добыча: собрать с этого трупа материалы для крафта (шкура, клык, шелк и подобные компоненты) отдельно от добычи. Добывать может любой, но каждый труп может обработать только один игрок.",
-      "concentrateHint": "Чем меньше выбрано компонентов, тем выше их качество.",
+      "harvestTooltip": "Собирает отмеченные компоненты. Каждый труп можно обработать только один раз, кто успел первым. Добычу при этом не забирает.",
+      "yieldTierHint": "Чем меньше компонентов забирает сбор, тем выше уровень добычи каждого из них.",
+      "nothingSelectedYields": "С этого трупа нельзя собрать ничего из выбранного.",
       "alreadyHarvested": "Этот труп уже был собран.",
       "componentAria": "Собрать {component}",
+      "componentNoYield": "пока ничего",
+      "componentAriaNoYield": "Собрать {component}: {note}",
       "components": {
         "hide": "Шкура",
         "fang": "Клык",
@@ -1533,17 +1818,27 @@ export const ru_RU: EnTranslations = {
         "gills": "Жабры",
         "claw": "Коготь",
         "horn": "Рог",
-        "tusk": "Бивень"
+        "tusk": "Бивень",
+        "meat": "Мясо",
+        "cloth": "Ткань"
       }
     },
     "townFocus": {
       "title": "Фокус города",
       "hint": "Очки фокуса добавляют бонус поверх базового выхода каждого компонента. Компоненты без фокуса остаются на базовом уровне.",
+      "tierHint": "Каждые {points} очков на компоненте повышают уровень его добычи на одну ступень, максимум на {steps} ступени; меньше {points} очков по-прежнему увеличивают выход.",
+      "townOnlyHint": "Фокус можно менять только в городе.",
       "budgetLabel": "Осталось очков: {remaining} / {budget}",
       "saveButton": "Сохранить фокус",
       "notInTownHint": "Чтобы задать фокус, нужно находиться в городе.",
       "increaseAria": "Увеличить фокус на {component}",
-      "decreaseAria": "Уменьшить фокус на {component}"
+      "decreaseAria": "Уменьшить фокус на {component}",
+      "respecTierLabel": "Скорость перераспределения",
+      "respecTierTimeOption": "Бесплатно (не торопясь)",
+      "respecTierPartialOption": "Быстрее (небольшая плата)",
+      "respecTierInstantOption": "Мгновенно (полная плата)",
+      "respecCostFree": "Бесплатно",
+      "respecCostLine": "Стоит {coin} и {materials}"
     },
     "party": {
       "promoteLeader": "Назначить лидером",
@@ -1597,13 +1892,20 @@ export const ru_RU: EnTranslations = {
       "dragEquipHint": "Перетащите на персонажа, чтобы надеть",
       "dragDestroyHint": "Перетащите в мир, чтобы уничтожить",
       "reorderNeedsRecent": "Сбросьте фильтр и выберите сортировку «Недавние», чтобы менять порядок в сумках",
+      "itemAriaInstanced": "{item}, количество {count}, копия с клеймом мастера",
+      "itemAriaEnchanted": "{item}, количество {count}, зачарованный экземпляр",
+      "itemAriaBound": "{item}, количество {count}, привязанный экземпляр",
+      "itemAriaMasterwork": "{item}, количество {count}, шедевр",
+      "itemAriaQuest": "{item}, количество {count}, предмет задания",
       "filterGroupAria": "Фильтровать сумки по категории",
       "filterAll": "Все",
       "filterWeapon": "Оружие",
       "filterArmor": "Броня",
       "filterConsumable": "Расходники",
       "filterMaterial": "Материалы",
+      "filterTool": "Инструменты",
       "filterQuest": "Задания",
+      "filterQuestCountAria": "Задания, предметов: {count}",
       "filterMount": "Транспорт",
       "sortAria": "Сортировать предметы в сумках",
       "sortRecent": "Недавние",
@@ -1612,6 +1914,7 @@ export const ru_RU: EnTranslations = {
       "searchPlaceholder": "Поиск предметов",
       "searchAria": "Поиск предметов в сумках по названию",
       "noMatch": "Нет предметов, соответствующих фильтрам.",
+      "noQuestItems": "В сумках нет предметов заданий.",
       "capacity": "{used}/{total}",
       "capacityAria": "Занято ячеек сумок: {used} из {total}",
       "backpack": "Рюкзак",
@@ -1645,6 +1948,7 @@ export const ru_RU: EnTranslations = {
       "dmgDoneReduce": "Снижает наносимый урон на {pct}%",
       "heatingUp": "Следующий критический удар огненного заклинания в серии дает «Полосу везения»; некритический удар снимает «Разогрев»",
       "elementalConvergencePrimed": "Следующее заклинание другой стихийной школы активирует Стихийное слияние",
+      "carriedFlag": "Вы несете вражеский флаг. Отмените этот эффект, чтобы бросить его.",
       "battleStance": "Боевая стойка: на 10% больше создания ярости",
       "berserkerStance": "Стойка берсерка: крит. удары на 3% чаще и на 3% сильнее",
       "crit": "Повышает шанс критического удара на {pct}%",
@@ -1763,7 +2067,9 @@ export const ru_RU: EnTranslations = {
     },
     "loot": {
       "chestTitle": "Сундук",
-      "takeAllTooltip": "Взять все: забрать все монеты и предметы из этого окна добычи."
+      "takeLootButton": "Взять добычу",
+      "takeLootTooltip": "Забирает монеты и выпавшие предметы. Возможность сбора не расходуется.",
+      "unifiedPressHint": "Клавиша взаимодействия одним нажатием забирает добычу и собирает компоненты, следуя фокусу города."
     },
     "spellbook": {
       "addToBarAria": "Добавить {name} на панель действий",
@@ -1771,13 +2077,16 @@ export const ru_RU: EnTranslations = {
     },
     "nameplate": {
       "mobLevel": "{level}",
-      "mobEliteLevel": "{level}+"
+      "mobEliteLevel": "{level}+",
+      "afkTag": "AFK"
     },
     "mobTooltip": {
       "levelFamily": "Уровень {level} {family}",
       "familyDemon": "Демон",
       "hostile": "Враждебный",
-      "friendly": "Дружественный"
+      "friendly": "Дружественный",
+      "elite": "Элита",
+      "boss": "Босс"
     },
     "targetFrame": {
       "unlock": "Переместить рамку цели",
@@ -1812,6 +2121,8 @@ export const ru_RU: EnTranslations = {
       "showResource": "Показывать ману, ярость и энергию",
       "showAbsorbs": "Показывать щиты поглощения",
       "showAuras": "Показывать усиления и ослабления",
+      "showPets": "Показывать питомцев",
+      "petHealth": "Питомец {name}, здоровье {pct}",
       "showSelf": "Показывать вашу рамку"
     },
     "frameReset": {
@@ -1821,7 +2132,22 @@ export const ru_RU: EnTranslations = {
       "requiresLevel": "Требуется уровень {level}",
       "riftTier": "Предмет разлома ранга {tier}",
       "riftUpgrade": "Улучшение разлома {level}/{max}",
-      "riftSockets": "Самоцветы разлома {used}/{total}"
+      "riftSockets": "Самоцветы разлома {used}/{total}",
+      "statEnchanted": "+{value} {stat} (зачаровано)",
+      "enchantedFallback": "Зачаровано"
+    },
+    "materialHint": {
+      "fineGrade": "Отборный сорт. Добывается на жиле полного уровня инструментом выше самого материала и засчитывается вместо обычной версии везде, где она требуется.",
+      "cookingCatch": "Ингредиент для готовки. Сначала нужно приготовить.",
+      "usedBy": "Используется в {crafts}.",
+      "arcaneDust": "Реагент для наложения чар. Выпадает при распылении обычного и необычного снаряжения.",
+      "arcaneEssence": "Реагент для наложения чар. Выпадает при распылении редкого снаряжения.",
+      "arcaneShard": "Реагент для наложения чар. Выпадает при распылении эпического и легендарного снаряжения.",
+      "resonantThread": "Реагент для наложения чар. Выпадает при распылении тканевой брони редкого качества и выше.",
+      "resonantHide": "Реагент для наложения чар. Выпадает при распылении кожаной брони редкого качества и выше.",
+      "resonantLinks": "Реагент для наложения чар. Выпадает при распылении кольчужной брони редкого качества и выше.",
+      "resonantSteel": "Реагент для наложения чар. Выпадает при распылении оружия ближнего боя редкого качества и выше.",
+      "resonantTimber": "Реагент для наложения чар. Выпадает при распылении посохов, жезлов, луков и арбалетов редкого качества и выше."
     },
     "discord": {
       "title": "Discord",
@@ -1913,6 +2239,7 @@ export const ru_RU: EnTranslations = {
         "legend": "ЛЕГЕНДА",
         "shill": "ГЛАШАТАЙ"
       },
+      "roleTagChatTitle": "Подтвержденная роль на сервере: {role}",
       "guildMember": "Подтвержденный участник",
       "notMember": "Еще не на сервере",
       "joinCta": "Присоединиться к Discord",
@@ -2010,6 +2337,14 @@ export const ru_RU: EnTranslations = {
       "benefits": "Привяжите аккаунт Steam в настольном приложении, чтобы ваши деяния отражались в достижениях Steam.",
       "noTicket": "Steam не выдал билет для привязки. Запустите Steam и повторите попытку."
     },
+    "epic": {
+      "title": "Epic",
+      "link": "Привязать Epic",
+      "unlink": "Отвязать Epic",
+      "linked": "Привязан аккаунт Epic {id}",
+      "benefits": "Привяжите аккаунт Epic в настольном приложении Epic, чтобы ваши деяния отражались в достижениях Epic.",
+      "noProof": "Epic не выдал подтверждение для привязки. Запустите игру из Epic Games Store и повторите попытку."
+    },
     "mailbox": {
       "title": "Почтовый ящик",
       "subtitle": "Вороновая почта",
@@ -2037,6 +2372,7 @@ export const ru_RU: EnTranslations = {
       "removeParcelAria": "Убрать {item} из письма",
       "parcelQtyDecreaseAria": "Отправить на один {item} меньше",
       "parcelQtyIncreaseAria": "Отправить на один {item} больше",
+      "parcelQtyAria": "Количество {item} для отправки",
       "sendButton": "Отправить письмо",
       "postageNote": "Почтовый сбор: {amount}. Ворон летит около {seconds} с.",
       "arrivedBanner": "Ворон прилетел: письмо от {name}.",
@@ -2053,12 +2389,20 @@ export const ru_RU: EnTranslations = {
         "noRecipient": "Здесь нет почтового ящика на это имя.",
         "tooManyParcels": "Одно письмо вмещает не более {count} посылок.",
         "noMailQuestItems": "Нельзя отправлять почтой квестовые предметы.",
+        "noMailBound": "Этот предмет привязан и не может быть отправлен по почте.",
         "notEnoughItems": "У вас нет столько предметов для отправки.",
         "cantAffordPostage": "Вам не хватает на почтовый сбор.",
         "recipientBoxFull": "Почтовый ящик получателя переполнен.",
         "letterGone": "Этого письма больше нет в вашем ящике.",
         "takeParcelsFirst": "Сначала заберите посылки, затем удаляйте письмо."
       }
+    },
+    "marketIndicator": {
+      "aria": "Выручка или предметы с Мирового рынка ожидают",
+      "tip": "Выручка от продаж или возвращенные предметы ждут вас у Торговца."
+    },
+    "noticeboard": {
+      "empty": "Похоже, здесь ничего не опубликовано."
     },
     "bank": {
       "title": "Банк",
@@ -2077,6 +2421,7 @@ export const ru_RU: EnTranslations = {
       "depositHint": "Нажмите, чтобы положить",
       "depositPartialHint": "Shift+клик, чтобы положить часть",
       "cannotDeposit": "Нельзя хранить в банке",
+      "cannotDepositNow": "Сейчас положить нельзя",
       "depositQuantityTitle": "Положить {item}",
       "depositQuantityInput": "Количество для внесения",
       "depositQuantityConfirm": "Положить",
@@ -2087,6 +2432,7 @@ export const ru_RU: EnTranslations = {
       "sortAria": "Сортировать предметы в банке",
       "searchAria": "Поиск предметов в банке по названию",
       "depositAll": "Положить все материалы",
+      "depositAllTooltip": "Отправляет в банк все материалы для крафта и хлам из ваших сумок за один раз. Инструменты для добычи, надетое снаряжение, квестовые предметы и расходники не затрагиваются.",
       "depositAllDone": "Материалов положено: {count}.",
       "depositAllFull": "Материалов положено: {count}. Банк заполнен.",
       "depositAllNone": "Банк заполнен: ничего не положено.",
@@ -2102,7 +2448,52 @@ export const ru_RU: EnTranslations = {
       "bonusAdvertWallet": "Привяжите кошелёк, чтобы получить 2 ячейки.",
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "Пригласите друга: когда он достигнет 10 уровня, вы оба получите по 2 ячейки, до 5 друзей.",
-      "bonusSectionAria": "Бонусные ячейки банка и способы их получить"
+      "bonusSectionAria": "Бонусные ячейки банка и способы их получить",
+      "tabsAria": "Вкладки банка",
+      "personalTab": "Личный",
+      "guildTab": "Гильдия",
+      "guildCapacityAria": "Занято ячеек банка гильдии: {used} из {total}",
+      "guildEmpty": "Банк гильдии пуст.",
+      "guildTreasury": "Казна гильдии",
+      "guildDepositGold": "Положить деньги",
+      "guildWithdrawGold": "Забрать деньги",
+      "guildDepositGoldTitle": "Положить деньги в казну гильдии",
+      "guildWithdrawGoldTitle": "Забрать деньги из казны гильдии",
+      "guildGoldAvailable": "Доступно: {amount}",
+      "guildBuyConfirm": "Купить {count} дополнительных ячеек банка гильдии за {price} из казны гильдии?",
+      "guildBuyNote": "Оплачивается из казны гильдии",
+      "guildTreasuryShort": "В казне не хватает",
+      "guildOpenBank": "Открыть гильдейский банк",
+      "guildOpenConfirm": "Открыть гильдейский банк за {price}? Оплата спишется из ваших собственных денег.",
+      "guildOpenAccept": "Открыть",
+      "guildOpenNote": "Оплачивается из ваших собственных денег, а не из казны гильдии",
+      "guildPurseShort": "Недостаточно денег",
+      "guildReadOnlyNote": "Вносить изменения в банк гильдии могут только офицеры гильдии.",
+      "guildUnopenedNote": "Банк гильдии пока не открыт.",
+      "guildDormantNote": "Заблокированные предметы нельзя забрать, и они не дают распустить гильдию.",
+      "guildDormantHint": "Этот предмет заблокирован в банке гильдии, его нельзя забрать.",
+      "guildDormantAria": "{item}, количество {count}, нельзя забрать",
+      "guildUnknownItem": "Неизвестный предмет",
+      "guildDepositHint": "Нажмите, чтобы положить в банк гильдии",
+      "guildCannotDeposit": "Нельзя положить в банк гильдии",
+      "guildGoldCannotMove": "Сейчас эту сумму переместить нельзя.",
+      "guildViewsAria": "Виды банка гильдии",
+      "guildContentsTab": "Содержимое",
+      "guildLogTab": "Журнал",
+      "logAria": "Журнал операций банка гильдии",
+      "logNote": "{count} последних операций банка гильдии.",
+      "logLoading": "Загрузка журнала банка гильдии...",
+      "logEmpty": "В банк гильдии пока ничего не клали и ничего из него не брали.",
+      "logUnavailable": "Журнал банка гильдии сейчас недоступен.",
+      "logFormerMember": "Бывший член гильдии",
+      "logDepositItem": "{actor} положил(а) {count} шт. {item}",
+      "logWithdrawItem": "{actor} взял(а) {count} шт. {item}",
+      "logDepositMoney": "{actor} положил(а) {amount}",
+      "logWithdrawMoney": "{actor} взял(а) {amount}",
+      "logBuySlots": "{actor} купил(а) расширение банка за {amount}",
+      "logOpenBank": "{actor} открыл(а) банк гильдии за {amount}",
+      "logCharterFee": "{actor} оплатил(а) устав гильдии: {amount}",
+      "logAdminPurge": "Администратор удалил {count} шт. {item}"
     },
     "calendar": {
       "title": "Календарь событий",
@@ -2140,10 +2531,6 @@ export const ru_RU: EnTranslations = {
           "title": "Ярмарочный день",
           "note": "Торговец ждёт свежий товар. Отличный день, чтобы заглянуть на Мировой рынок."
         },
-        "fiestaNight": {
-          "title": "Ночь фиесты",
-          "note": "Сегодня ринг фиесты 2 на 2 собирает самые шумные толпы."
-        },
         "arenaClash": {
           "title": "Битва на арене",
           "note": "Дуэлянты стекаются в Пепельный Колизей. Вставайте в очередь и поднимайтесь по лестнице."
@@ -2172,7 +2559,24 @@ export const ru_RU: EnTranslations = {
       "blockSearchPlaceholder": "Имя персонажа",
       "blockAction": "Заблокировать",
       "nowBlocking": "{name} заблокирован.",
-      "stopBlockingTitle": "Разблокировать {name}"
+      "stopBlockingTitle": "Разблокировать {name}",
+      "onlineHeader": "В сети ({n})",
+      "offlineHeader": "Не в сети ({n})",
+      "hideOffline": "Скрыть офлайн",
+      "hideOfflineTitle": "Скрыть офлайн участников гильдии",
+      "billboard": {
+        "label": "Доска объявлений гильдии",
+        "empty": "На доске объявлений пока пусто.",
+        "loginLine": "Доска объявлений гильдии: {text}",
+        "setBy": "Разместил(а): {name}",
+        "save": "Сохранить",
+        "placeholder": "Напишите сообщение для гильдии",
+        "inputLabel": "Сообщение на доске объявлений гильдии",
+        "result": {
+          "set": "Доска объявлений гильдии обновлена.",
+          "notOfficer": "Редактировать доску объявлений могут только офицеры и глава гильдии."
+        }
+      }
     },
     "gathering": {
       "title": "Собирательство",
@@ -2183,7 +2587,84 @@ export const ru_RU: EnTranslations = {
       "notReady": "Этот ресурсный узел еще не восстановился для вас.",
       "gatherLine": "Вы добываете: {name}.",
       "gatherLineQty": "Вы добываете: {name} x{qty}.",
-      "catchLine": "Вы выуживаете: {name}"
+      "harvestLine": "Вы собираете: {name}.",
+      "harvestLineQty": "Вы собираете: {name} x{qty}.",
+      "harvestSpecimenLine": "Вы также получаете {name}.",
+      "catchLine": "Вы выуживаете: {name}",
+      "biteLine": "Что-то клюнуло!",
+      "gotAwayLine": "Добыча сорвалась.",
+      "earlyReelLine": "Вы подсекли слишком рано. Рыба ещё не клюнула.",
+      "nodeName": {
+        "ore": "Рудная жила",
+        "wood": "Древостой",
+        "herb": "Заросли трав"
+      },
+      "tierRequired": {
+        "mining": "Требуется шахтерская кирка {tier} уровня",
+        "logging": "Требуется лесорубный топор {tier} уровня",
+        "herbalism": "Требуется серп травника {tier} уровня"
+      },
+      "requiresTool": {
+        "mining": "Требуется шахтерская кирка",
+        "logging": "Требуется лесорубный топор",
+        "herbalism": "Требуется серп травника"
+      },
+      "toolTierUnmet": {
+        "mining": "Чтобы разработать эту жилу, нужна шахтерская кирка {tier} уровня.",
+        "logging": "Чтобы срубить этот древостой, нужен лесорубный топор {tier} уровня.",
+        "herbalism": "Чтобы собрать эти заросли, нужен серп травника {tier} уровня.",
+        "fishing": "Чтобы рыбачить в этих водах, нужна удочка {tier} уровня."
+      },
+      "toolRequired": {
+        "mining": "Чтобы разработать эту жилу, нужна шахтерская кирка.",
+        "logging": "Чтобы срубить этот древостой, нужен лесорубный топор.",
+        "herbalism": "Чтобы собрать эти заросли, нужен серп травника.",
+        "fishing": "Чтобы рыбачить, нужна удочка."
+      },
+      "noNodeNearby": {
+        "mining": "Поблизости нет рудной жилы.",
+        "logging": "Поблизости нет древостоя.",
+        "herbalism": "Поблизости нет зарослей трав."
+      },
+      "wieldUnmet": {
+        "mining": "Чтобы махать шахтерской киркой, которая уже лежит в ваших сумках, нужен навык горного дела {skill}.",
+        "logging": "Чтобы махать лесорубным топором, который уже лежит в ваших сумках, нужен навык лесозаготовки {skill}.",
+        "herbalism": "Чтобы работать серпом травника, который уже лежит в ваших сумках, нужен навык травничества {skill}."
+      },
+      "wieldUnmetCorpse": "Чтобы пустить в ход свой лучший инструмент, нужен навык сбора {skill}.",
+      "toolTierUnmetCorpse": "Чтобы добыть лучшие материалы, нужен инструмент сбора {tier} уровня.",
+      "toolTooltip": {
+        "kind": {
+          "mining": "Шахтерский инструмент ({tier} уровень)",
+          "logging": "Лесорубный инструмент ({tier} уровень)",
+          "herbalism": "Инструмент травника ({tier} уровень)",
+          "fishing": "Удочка ({tier} уровень)"
+        },
+        "unlocks": {
+          "mining": "Нужна для добычи рудных жил до {tier} уровня.",
+          "logging": "Нужен для валки древостоев до {tier} уровня.",
+          "herbalism": "Нужен для сбора зарослей трав до {tier} уровня.",
+          "fishing": "Нужна для рыбалки в водах до {tier} уровня."
+        },
+        "use": {
+          "mining": "Использование: добыть руду из ближайшей жилы.",
+          "logging": "Использование: срубить ближайший древостой.",
+          "herbalism": "Использование: собрать травы из ближайших зарослей."
+        },
+        "speed": "Быстрее собирает на узлах ниже {tier} уровня.",
+        "rodRequired": "Нужна для рыбалки.",
+        "rodBite": "Рыба клюет до {seconds} с быстрее.",
+        "rodReel": "Продлевает окно подсечки на {seconds} с.",
+        "rodBand": "Открывает более богатый улов при навыке рыбалки от {skill}."
+      },
+      "downgradeMark": "Сумки полны: добыча сохранена без метки сборщика.",
+      "downgradeFind": "Сумки полны: превосходная находка ускользнула.",
+      "emptyHookNote": "Пустой крючок",
+      "stateReady": "Готово",
+      "stateCooldown": "Восстанавливается",
+      "stateCooldownTimed": "Восстановится через {time}",
+      "respawnClock": "{minutes}:{seconds}",
+      "fineGradePreview": "Ваш инструмент даёт здесь отборный сорт добычи."
     },
     "archetypeTitle": {
       "label": "Титул",
@@ -2195,7 +2676,7 @@ export const ru_RU: EnTranslations = {
       "alchemy+cooking": "Аптекарь",
       "cooking+leatherworking": "Зверолов",
       "leatherworking+tailoring": "Экипировщик",
-      "tailoring+inscription": "Чароткач",
+      "tailoring+inscription": "Чернилоткач",
       "inscription+enchanting": "Чародей",
       "enchanting+jewelcrafting": "Камневяз",
       "jewelcrafting+weaponcrafting": "Клинкодел",
@@ -2214,6 +2695,50 @@ export const ru_RU: EnTranslations = {
       "tailoring": "Портняжное дело",
       "leatherworking": "Кожевничество"
     },
+    "enchantName": {
+      "enchant_weapon_might": "Зачарование оружия - Мощь",
+      "enchant_weapon_intellect": "Зачарование оружия - Сила заклинаний",
+      "enchant_offhand_stamina": "Зачарование левой руки - Выносливость",
+      "enchant_helmet_fortitude": "Зачарование шлема - Стойкость",
+      "enchant_neck_spirit": "Зачарование ожерелья - Дух",
+      "enchant_shoulder_agility": "Зачарование наплечников - Ловкость",
+      "enchant_chest_stamina": "Зачарование нагрудника - Выносливость",
+      "enchant_waist_stamina": "Зачарование пояса - Выносливость",
+      "enchant_legs_stamina": "Зачарование поножей - Выносливость",
+      "enchant_gloves_agility": "Зачарование перчаток - Ловкость",
+      "enchant_gloves_intellect": "Зачарование перчаток - Сила заклинаний",
+      "enchant_feet_agility": "Зачарование сапог - Ловкость",
+      "enchant_ring_spirit": "Зачарование кольца - Дух",
+      "enchant_weapon_agility": "Зачарование оружия - Ловкость",
+      "enchant_helmet_intellect": "Зачарование шлема - Интеллект",
+      "enchant_helmet_armor": "Зачарование шлема - Укрепление",
+      "enchant_neck_intellect": "Зачарование ожерелья - Интеллект",
+      "enchant_neck_agility": "Зачарование ожерелья - Ловкость",
+      "enchant_shoulder_strength": "Зачарование наплечников - Сила",
+      "enchant_shoulder_intellect": "Зачарование наплечников - Интеллект",
+      "enchant_chest_spirit": "Зачарование нагрудника - Дух",
+      "enchant_chest_armor": "Зачарование нагрудника - Укрепление",
+      "enchant_waist_strength": "Зачарование пояса - Сила",
+      "enchant_waist_agility": "Зачарование пояса - Ловкость",
+      "enchant_legs_intellect": "Зачарование поножей - Интеллект",
+      "enchant_gloves_strength": "Зачарование перчаток - Сила",
+      "enchant_feet_strength": "Зачарование сапог - Сила",
+      "enchant_feet_stamina": "Зачарование сапог - Выносливость",
+      "enchant_ring_strength": "Зачарование кольца - Сила",
+      "enchant_ring_agility": "Зачарование кольца - Ловкость",
+      "enchant_ring_intellect": "Зачарование кольца - Интеллект",
+      "enchant_weapon_greater_might": "Зачарование оружия - Высшая мощь",
+      "enchant_weapon_greater_spellpower": "Зачарование оружия - Высшая сила заклинаний",
+      "enchant_helmet_greater_fortitude": "Зачарование шлема - Высшая стойкость",
+      "enchant_chest_greater_stamina": "Зачарование нагрудника - Высшая выносливость",
+      "enchant_legs_greater_stamina": "Зачарование поножей - Высшая выносливость",
+      "enchant_gloves_greater_agility": "Зачарование перчаток - Высшая ловкость",
+      "enchant_weapon_runed_edge": "Зачарование оружия - Рунная кромка",
+      "enchant_weapon_runed_focus": "Зачарование оружия - Рунная печать",
+      "enchant_chest_runeweave": "Зачарование нагрудника - Рунное плетение",
+      "enchant_legs_runed_hide": "Зачарование поножей - Рунная шкура",
+      "enchant_helmet_runed_links": "Зачарование шлема - Рунные звенья"
+    },
     "professions": {
       "title": "Профессии",
       "close": "Закрыть профессии",
@@ -2230,10 +2755,49 @@ export const ru_RU: EnTranslations = {
       "ceilingRare": "Потолок редкого",
       "ceilingCommon": "Потолок обычного качества",
       "skillValue": "{skill} / {max}",
+      "toolEffectCharges": "Осталось зарядов: {charges} из {max}",
+      "toolEffectSpent": "Израсходовано, нужна подзарядка",
+      "toolEffectDepleted": "Эффект инструмента израсходован",
+      "toolEffectRechargePrice": "Подзарядка: {material} x{count}",
+      "toolEffectModeAsk": "Спрашивать при каждом использовании",
+      "toolEffectModePrompt": "Спрашивает при каждом использовании",
+      "toolEffectConfirmTitle": "Использовать {effect}?",
+      "toolEffectConfirmBody": "Потратить заряд на эту добычу? Если отказаться, добыча всё равно произойдёт, но без бонуса. Осталось зарядов: {charges}.",
+      "toolEffectConfirmAccept": "Потратить заряд",
+      "toolEffectConfirmDecline": "Добыть без бонуса",
+      "toolEffectName": {
+        "gatherersCache": "Сумка собирателя",
+        "artisansEye": "Глаз ремесленника",
+        "quickeningCharm": "Оберег возрождения"
+      },
+      "toolEffectTooltip": {
+        "kind": "Талисман для инструмента",
+        "bonus": {
+          "gatherersCache": "Пока есть заряды, каждый сбор приносит +1 к добыче.",
+          "artisansEye": "Пока есть заряды, повышает класс добычи на 1 уровень инструмента.",
+          "quickeningCharm": "Сокращает таймер возрождения источника, на котором сработал."
+        },
+        "howToSlot": "Устанавливается на инструмент для горного дела, лесозаготовки или травничества в окне профессий. Расходуется при установке.",
+        "charges": "На обычном инструменте изначально {base} зарядов (+{bonus} за каждую ступень редкости).",
+        "landOnly": "На удочку не устанавливается.",
+        "openProfessions": "Откройте окно профессий, чтобы установить талисман на инструмент для сбора."
+      },
+      "toolEffectSlotButton": "Установить {effect}",
+      "toolEffectRechargeButton": "Перезарядить",
+      "toolEffectSlotted": "{effect} установлен: {profession}.",
+      "toolEffectSlotInvalid": "{effect} нельзя установить сюда.",
+      "toolEffectNoTool": "Сначала нужен настоящий инструмент ({profession}).",
+      "toolEffectNoCharm": "В сумках нужен изготовленный талисман: {effect}.",
+      "toolEffectNoGain": "{effect} уже установлен и полностью заряжен.",
+      "toolEffectRecharged": "{effect} перезаряжен: израсходовано {material} x{count}.",
+      "toolEffectRechargeNoSlot": "Эффект не установлен: {profession}.",
+      "toolEffectRechargeFull": "{effect} уже полностью заряжен.",
+      "toolEffectRechargeToolCapped": "Чтобы зарядить {effect} дальше, возьмите инструмент получше ({profession}).",
+      "toolEffectRechargeMaterials": "Для перезарядки {effect} нужно {material} x{count}.",
       "tierPipAria": "Ранг {tier}",
       "nextUnlockTier": "До следующего ранга {points} навыка: шанс шедевра повысится",
       "nextUnlockSpecialized": "До специализации {points} навыка: расход материалов снизится",
-      "nextUnlockMax": "Навык на максимуме",
+      "nextUnlockMastered": "Освоено, пока что",
       "perkSpecializedLine": "{craft}: Специалист, расход материалов -{pct}%",
       "perkSpecializedAt": "Специализация при навыке {threshold}",
       "switchCost": "Следующая смена архетипа потребует искупления: {cost}",
@@ -2241,6 +2805,7 @@ export const ru_RU: EnTranslations = {
       "tutorialLine": "Достигните навыка {target} в любом ремесле, чтобы открыть первый ранг.",
       "ctaHeader": "Следующий шаг",
       "ctaRaise": "Продолжайте развивать {craft}: до следующего ранга {points} навыка.",
+      "ctaRaiseSpecialized": "Продолжайте развивать {craft}: до специализации {points} навыка, расход материалов снизится.",
       "ctaStart": "Чтобы начать, создайте предмет или соберите ресурсы любой профессией.",
       "unattunedIdentity": "Вы ещё не настроены на архетип. Развивайте ремёсла и завершите настройку, чтобы выбрать пару.",
       "nudgeNearTier": "{craft}: до следующего ранга {points} навыка",
@@ -2253,12 +2818,31 @@ export const ru_RU: EnTranslations = {
     "crafting": {
       "title": "Крафт",
       "close": "Закрыть крафт",
-      "craft": "Создать",
+      "dialogOption": "Крафт",
+      "dialogOptionAria": "Открыть окно крафта: {craft}",
+      "crafting": "Изготовление",
+      "create": "Создать",
+      "createAll": "Создать всё",
+      "createAllAria": "Создать максимальное число копий этого рецепта из имеющихся материалов",
+      "qtyRowAria": "Количество",
+      "qtyDecreaseAria": "Уменьшить количество (сейчас {count})",
+      "qtyIncreaseAria": "Увеличить количество (сейчас {count})",
+      "qtyValueAria": "Количество, {count}",
+      "batchRemaining": "Осталось {remaining} из {total}",
+      "batchRemainingAria": "Осталось {remaining} из {total} созданий",
+      "durationChip": "{seconds} сек.",
+      "durationAria": "Время применения: {seconds} с",
+      "progressAria": "Прогресс изготовления",
+      "announceStart": "Изготавливается: {name}",
+      "announceComplete": "Изготовлено: {name}",
+      "announceCancel": "Изготовление отменено",
       "reagentsNeeded": "Требуется:",
       "reagentLine": "{name}: {have}/{required}",
+      "reagentFineSub": "(потратит отборный сорт: {count})",
       "empty": "Известных рецептов пока нет.",
       "resultAria": "Создать {name}",
       "craftedToast": "Создано: {name}",
+      "craftedToastQty": "Создано: {name} x{qty}",
       "insufficientMaterials": "У вас недостаточно материалов.",
       "unknownRecipe": "Такого рецепта не существует.",
       "comboRequirementUnmet": "У вас нет обоих требуемых ремесел нужного уровня для этого рецепта.",
@@ -2274,6 +2858,7 @@ export const ru_RU: EnTranslations = {
       "pairOptionLabel": "{pair} ({craftA} + {craftB})",
       "attunementPreview": "Результат: титул «{title}»; {majorA} и {majorB} станут главными ремёслами без потолка; {hobby} станет увлечением с потолком редкого качества; все остальные навыки сохранятся, но в неактивном состоянии будут ограничены обычным качеством.",
       "hobbyPreview": "Результат: {hobby} станет увлечением с потолком редкого качества. Оба главных ремесла и все сохранённые значения навыков останутся без изменений.",
+      "attunementReturnCost": "Если вы покинете эту пару, возвращение к ней позже обойдётся в {cost} заданий искупления.",
       "identity": {
         "title": "Ремесленная специализация",
         "syncing": "Ожидаем ремесленную специализацию от сервера.",
@@ -2295,6 +2880,8 @@ export const ru_RU: EnTranslations = {
         "colSkill": "Навык",
         "colRole": "Роль",
         "colCap": "Потолок",
+        "allCrafts": "Все ремёсла",
+        "skillListAria": "Навыки ремёсел",
         "tutorial": "Первый ранг: достигните навыка {skill} в одном ремесле. Успешные рецепты развивают это ремесло, не стирая остальные знания.",
         "nearTier": "Ремеслу {craft} не хватает {points} навыка до следующего ранга.",
         "dormantKnowledge": "Знания ремесла {craft} сохранены, но неактивны, пока не выбрана его пара или увлечение."
@@ -2308,20 +2895,105 @@ export const ru_RU: EnTranslations = {
         "loom": "Ткацкий станок",
         "toolworks": "Мастерская"
       },
-      "throttled": "Вы создаете предметы слишком быстро. Подождите немного и попробуйте снова.",
+      "busy": "Вы заняты.",
       "recipeNotLearned": "Вы еще не изучили этот рецепт.",
+      "noBagSpace": "В сумках нет места для созданного предмета.",
       "skillReqLine": "Требуется {craft} {skill}",
       "difficultyFull": "Полный рост навыка",
       "difficultyReduced": "Сниженный рост навыка",
+      "difficultyMinimal": "Минимальный рост навыка",
       "difficultyNone": "Без роста навыка",
       "stationBadge": "Станция",
       "stationOutOfRangeNamed": "Подойдите к станции \"{station}\", чтобы изготовить это.",
+      "learnMoreAtStation": "{master} у станции «{station}» научит вас новым рецептам ремесла «{craft}».",
       "masterworkToast": "Шедевр! {name}",
       "masterworkZoneLine": "Шедевр от {crafter}: {name}!",
       "tierUpToast": "{craft}: достигнут ранг {tier}!",
+      "skillUpToast": "{skill}: навык повышен до {level}!",
+      "skillUpSubtext": "Навык повышен до {level}!",
+      "trendNudge": "Ваши руки склоняются к пути «{archetype}». Настройка на него ждёт у {master}.",
+      "trendNudgeNoMaster": "Ваши руки склоняются к пути «{archetype}». Найдите мастера ремесла, чтобы встать на него.",
+      "attunedZoneLine": "{name} настроился как «{archetype}»!",
+      "attunedBanner": "Настройка: {title}",
+      "tierTutorial": {
+        "title": "Ваш первый ранг",
+        "tierCap": "Ремесло достигает первого ранга при навыке {skill}, и каждый ранг улучшает то, что можно создать. Но превзойти работу редкого качества ремесло может, лишь став одним из двух ваших главных.",
+        "radar": "Ваши ремёсла образуют колесо. Настройтесь на соседнюю пару, и эти два ремесла станут главными без потолка, одно ремесло напротив станет увлечением с потолком редкого качества, а остальные уснут: их знания сохранятся, но будут ограничены обычным качеством, пока вы снова не возьмётесь за них.",
+        "masters": "Мастера ремёсел в городах дают задания настройки. Зайдите к одному из них, когда будете готовы, и выберите свою пару. Ничто из выученного не теряется.",
+        "dismiss": "Понятно"
+      },
       "makersMark": "Создатель: {name}",
+      "gatheredBy": "Сборщик: {name}",
       "masterworkSeal": "Шедевр",
-      "enchantedLine": "Зачаровано"
+      "commissionToggle": "Изделие на заказ",
+      "commissionToggleHint": "Привязывается к первому персонажу, получившему его при обмене.",
+      "commissionUnbound": "Изделие на заказ: привяжется к первому получателю",
+      "commissionBound": "Изделие на заказ: привязано к получателю"
+    },
+    "itemMenu": {
+      "use": "Использовать",
+      "equip": "Надеть",
+      "disenchant": "Распылить",
+      "salvage": "Разобрать",
+      "applyEnchant": "Наложить чары"
+    },
+    "enchanting": {
+      "disenchantedLine": "Вы распыляете {item}.",
+      "disenchantedYield": "Вы распыляете {item} в {material}.",
+      "disenchantedYieldQty": "Вы распыляете {item} в {material} x{qty}.",
+      "disenchantedAlso": "Вы также получаете {material}.",
+      "disenchantedAlsoQty": "Вы также получаете {material} x{qty}.",
+      "salvagedLine": "Вы разбираете {item}.",
+      "salvagedYield": "Вы разбираете {item} на {material}.",
+      "salvagedYieldQty": "Вы разбираете {item} на {material} x{qty}.",
+      "enchantAppliedLine": "Вы накладываете на {item} чары «{enchant}».",
+      "notHeld": "У вас нет этого предмета.",
+      "notDisenchantable": "Это нельзя распылить.",
+      "notSalvageable": "Это нельзя разобрать.",
+      "disenchantBusy": "Вы заняты.",
+      "salvageBusy": "Вы заняты.",
+      "enchantBusy": "Вы заняты.",
+      "enchantWrongSlot": "Эти чары нельзя наложить на этот предмет.",
+      "enchantUnknown": "Таких чар не существует.",
+      "enchantInsufficient": "У вас нет материалов для этих чар.",
+      "disenchantNoSpace": "В сумках нет места для чародейских материалов.",
+      "salvageNoSpace": "В сумках нет места для материалов от разбора.",
+      "enchantNoSpace": "В сумках нет места для зачарованного предмета.",
+      "disenchantConfirmTitle": "Распылить {item}?",
+      "disenchantConfirmBody": "Это уничтожит {item} и даст тайные материалы. Действие необратимо.",
+      "disenchantConfirmBodySpecial": "Это уничтожит особый экземпляр предмета {item} (подписанный, шедевр или зачарованный) и даст тайные материалы. Действие необратимо.",
+      "salvageConfirmTitle": "Разобрать {item}?",
+      "salvageConfirmBody": "Это уничтожит {item} и даст ремесленные материалы. Действие необратимо.",
+      "salvageConfirmBodySpecial": "Это уничтожит особый экземпляр предмета {item} (подписанный, шедевр или зачарованный) и даст ремесленные материалы. Действие необратимо.",
+      "pickerTitle": "Наложить чары",
+      "targetTitle": "Выберите предмет для зачарования",
+      "noEnchants": "Нет чар, использующих этот реагент.",
+      "noTargets": "Нет подходящего предмета для зачарования.",
+      "wornTag": "Надето ({slot})",
+      "wornTagIndexed": "Надето ({slot} {index})",
+      "tier": {
+        "base": "Базовые чары",
+        "runed": "Рунные чары",
+        "greater": "Высшие чары"
+      },
+      "yieldHeader": "Ожидаемые материалы:",
+      "yieldLineExact": "{item}: {count}",
+      "yieldLineRange": "{item}: {min}-{max}",
+      "alreadyEnchanted": "Этот предмет уже зачарован.",
+      "sameEnchant": "На этом предмете уже есть эти чары.",
+      "replaceTag": "Заменяет «{enchant}»",
+      "sameEnchantTag": "Уже наложено",
+      "plainTag": "Без чар",
+      "replaceConfirmTitle": "Заменить чары на {item}?",
+      "replaceConfirmBody": "Чары «{old}» на {item} будут заменены на «{new}».",
+      "replaceConfirmNoRefund": "Старые чары уничтожаются, их материалы не возвращаются. Это действие нельзя отменить.",
+      "replaceConfirmKeeps": "Без изменений: {kept}",
+      "replaceConfirmKeepsSigner": "Клеймо создателя",
+      "replaceConfirmKeepsMasterwork": "Бонус шедевра",
+      "replaceConfirmKeepsBond": "Привязка изделия на заказ",
+      "replaceConfirmCost": "Стоимость: {cost}",
+      "replaceConfirmCostItem": "{name}: {count}",
+      "replaceConfirmAccept": "Заменить"
     },
     "training": {
       "title": "Обучение: {name}",
@@ -2331,8 +3003,10 @@ export const ru_RU: EnTranslations = {
       "stateKnown": "Изучено",
       "stateTeachable": "Доступно",
       "stateLocked": "Недоступно",
+      "statePending": "Изучается",
       "requirement": "Обучение при {craft} {skill}",
       "trainAria": "Изучить {name} за {fee}",
+      "pendingAria": "Изучается {name}",
       "dialogOption": "Обучение",
       "dialogOptionAria": "Пройти обучение у {name}",
       "learned": "Рецепт изучен: {recipe}",
@@ -2341,6 +3015,79 @@ export const ru_RU: EnTranslations = {
       "notTaughtHere": "Этот рецепт здесь не преподают.",
       "alreadyKnown": "Вы уже знаете этот рецепт.",
       "outOfRange": "Для обучения нужно стоять у мастерской."
+    },
+    "unbind": {
+      "title": "Снятие привязки: {name}",
+      "close": "Закрыть снятие привязки",
+      "intro": "Мастер может снять привязку с изделия на заказ за плату.",
+      "empty": "У вас нет привязанных изделий на заказ.",
+      "rowSub": "Снимает привязку; при следующем обмене изделие привяжется снова.",
+      "unbindAria": "Снять привязку с {name} за {fee}",
+      "dialogOption": "Снятие привязки",
+      "dialogOptionAria": "Снять привязку с изделия на заказ у {name}",
+      "confirmTitle": "Снять привязку с изделия",
+      "confirmBody": "Снять привязку с {name} за {fee}?",
+      "confirmOk": "Снять привязку",
+      "confirmCancel": "Отмена",
+      "unbound": "Привязка с {name} снята за {fee}. При следующем обмене изделие привяжется снова.",
+      "notEligible": "С этого предмета нельзя снять привязку.",
+      "notBound": "Этот предмет не привязан.",
+      "cannotAfford": "Вам не хватает денег на снятие привязки.",
+      "outOfRange": "Для снятия привязки нужно стоять у мастерской.",
+      "noSpace": "В сумках нет места для предмета со снятой привязкой."
+    },
+    "commissionBoard": {
+      "title": "Доска заказов",
+      "close": "Закрыть доску заказов",
+      "openButton": "Заказы",
+      "openButtonAria": "Открыть доску заказов",
+      "intro": "Закажите ремесленнику изготовление предмета или возьмите чужой заказ.",
+      "formTitle": "Разместить заказ",
+      "recipeLabel": "Предмет",
+      "recipeEmpty": "Вы пока не знаете рецептов снаряжения, доступных для заказа.",
+      "scopeLabel": "Кто может принять",
+      "scopeOpen": "Любой (открытая доска)",
+      "scopeCrafter": "Определённый мастер",
+      "crafterNameLabel": "Имя мастера",
+      "crafterNamePlaceholder": "Имя персонажа",
+      "openSubmit": "Разместить заказ",
+      "sectionMine": "Мои заказы",
+      "sectionToCraft": "Заказы, которые я выполняю",
+      "sectionBoard": "Открытая доска",
+      "boardEmpty": "Сейчас нет открытых заказов.",
+      "mineEmpty": "Вы ещё не разместили ни одного заказа.",
+      "toCraftEmpty": "Сейчас вы не выполняете ничей заказ.",
+      "rowFor": "{item} для {requester}",
+      "rowTargeted": "{item} для {requester} (мастеру {crafter})",
+      "acceptedBy": "Принял: {name}",
+      "statusOpen": "Открыт",
+      "statusAccepted": "Принят",
+      "statusDelivered": "Доставлен",
+      "statusCancelled": "Отменён",
+      "statusExpired": "Истёк",
+      "cancelButton": "Отменить",
+      "acceptButton": "Принять",
+      "deliverButton": "Доставить",
+      "deliverHint": "Сначала изготовьте изделие на заказ (включив переключатель заказа), затем вернитесь сюда, чтобы доставить его.",
+      "opened": "Вы разместили заказ на {item}.",
+      "cancelled": "Вы отменили заказ на {item}.",
+      "accepted": "Вы приняли заказ на {item}.",
+      "delivered": "Вы доставили {item} игроку {name}.",
+      "denyUnknownRecipe": "Такого рецепта не существует.",
+      "denyNotCommissionEligible": "Этот рецепт нельзя заказать.",
+      "denyUnknownCrafter": "Персонаж с таким именем не найден.",
+      "denySelfCrafter": "Нельзя заказать предмет самому себе.",
+      "denyTooManyOpen": "У вас уже слишком много открытых заказов.",
+      "denyUnknownOrder": "Этот заказ больше не существует.",
+      "denyOrderNotOpen": "Этот заказ больше не открыт.",
+      "denySelfOrder": "Нельзя принять собственный заказ.",
+      "denyNotEligibleCrafter": "Этот заказ размещён для другого мастера.",
+      "denyNotYourOrder": "Это не ваш заказ.",
+      "denyOrderNotAccepted": "Этот заказ ещё не принят.",
+      "denyNotYourAcceptance": "Вы не принимали этот заказ.",
+      "denyNotCrafted": "Сначала изготовьте изделие на заказ (включив переключатель заказа).",
+      "denyOutOfRange": "Чтобы доставить заказ, нужно быть рядом с заказчиком.",
+      "denyNoSpace": "У заказчика нет места в сумках."
     },
     "finder": {
       "title": "Поиск подземелий",
@@ -2428,7 +3175,7 @@ export const ru_RU: EnTranslations = {
         "lunar_tide": "Лунный прилив (периодический урон по области)",
         "enrage": "Приходит в ярость при низком здоровье",
         "shuddering_stomp": "Сотрясающий топот (оглушение по области)",
-        "necrotic_shockwave": "Некротическая ударная волна (высокий урон по области)",
+        "grave_inferno": "Могильный инферно (канализируемый огненный AoE, держите дистанцию)",
         "grave_cleaver": "Могильный секач (рассекающий удар спереди)",
         "shadow_nova": "Кольцо тьмы (взрыв по области)",
         "profane_mending": "Нечестивое исцеление (лечит союзников)",
@@ -2440,7 +3187,8 @@ export const ru_RU: EnTranslations = {
         "raise_fallen": "Поднятие павших (периодические волны прислужников)",
         "soul_rend": "Разрыв души (отмеченным разойтись и получать лечение)",
         "deathless_rage": "Бессмертная ярость (прерывается у охранных камней)",
-        "wardstones": "Охранные камни (смена фазы)"
+        "wardstones": "Охранные камни (смена фазы)",
+        "dread_curse": "Проклятие ужаса (только на героическом, накапливающийся дебафф смены танка)"
       }
     },
     "deeds": {
@@ -2452,6 +3200,7 @@ export const ru_RU: EnTranslations = {
       "countLabel": "Деяния: {earned}/{total}",
       "completionAria": "Получено деяний: {earned} из {total}",
       "recentLabel": "Недавние:",
+      "recentJumpAria": "Перейти к {name}",
       "nearestLabel": "Почти готово:",
       "filterGroupAria": "Фильтр деяний",
       "filterAll": "Все",
@@ -2505,8 +3254,16 @@ export const ru_RU: EnTranslations = {
       "lbSelfAccount": "Ваша учётная запись: место {rank}, лучшие {percent} процентов, Известность {renown}",
       "lbSelfRank": "Ваша учётная запись: место {rank}, лучшие {percent} процентов",
       "lbEmpty": "В рейтинге пока нет летописцев.",
-      "broadcastsLabel": "Делиться деяниями с гильдией и друзьями",
+      "broadcastsLabel": "Делиться деяниями с согильдейцами и подписчиками, а карточками деяний и шедевров с лентой Discord",
       "titledName": "{name} [{title}]"
+    },
+    "continentMap": {
+      "title": "Карта мира",
+      "summary": "Карта мира. Выберите зону, чтобы открыть её карту.",
+      "toWorld": "Карта мира",
+      "toZone": "Карта региона",
+      "toggleAria": "Переключение между картой мира и картой региона",
+      "levels": "Уровни {min} до {max}"
     }
   },
   "lb": {
@@ -2646,11 +3403,29 @@ export const ru_RU: EnTranslations = {
       "account_taken": "Этот аккаунт Steam уже привязан к другому аккаунту.",
       "upstream": "Steam не отвечает. Повторите попытку чуть позже."
     },
+    "epic": {
+      "disabled": "Привязка Epic сейчас недоступна.",
+      "invalid_token": "Epic не смог подтвердить этот запрос на привязку. Повторите попытку из настольного приложения.",
+      "banned": "Этот аккаунт Epic нельзя привязать.",
+      "already_linked": "К вашему аккаунту уже привязан аккаунт Epic.",
+      "account_taken": "Этот аккаунт Epic уже привязан к другому аккаунту.",
+      "upstream": "Epic не отвечает. Повторите попытку чуть позже."
+    },
     "wallet": {
       "handoff_invalid": "Срок действия авторизации кошелька истек или ее не удалось проверить. Повторите попытку."
     },
-    "welcome": {
-      "invalid_input": "Неверные входные данные."
+    "ota_updates": {
+      "invalid_input": "Недопустимые данные."
+    },
+    "seeker": {
+      "native_only": "Права Seeker доступны только в нативном приложении.",
+      "attestation_failed": "Не удалось подтвердить устройство. Повторите попытку.",
+      "solana_artifact_required": "Продолжите в версии приложения из Solana Store.",
+      "wallet_required": "Сначала привяжите и подтвердите кошелек.",
+      "genesis_token_required": "Требуется подтвержденный Seeker Genesis Token.",
+      "genesis_token_claimed": "Этот Seeker Genesis Token уже был зарегистрирован.",
+      "entitlement_required": "Требуются подтвержденные права Seeker.",
+      "current_ownership_required": "Требуется текущее владение Seeker Genesis Token."
     }
   },
   "guide": {
@@ -2684,6 +3459,7 @@ export const ru_RU: EnTranslations = {
       "talents": "Таланты",
       "arena": "Арена и PvP",
       "valeCup": "Кубок Долины",
+      "thornhollow": "Терновая Лощина",
       "deeds": "Книга деяний",
       "glossary": "Глоссарий",
       "wishIKnew": "Что бы я хотел знать заранее",
@@ -2853,16 +3629,21 @@ export const ru_RU: EnTranslations = {
       "groupInterface": "Интерфейс",
       "groupCamera": "Камера",
       "talents": "Таланты",
+      "professions": "Ремесла",
       "arena": "Арена",
       "leaderboard": "Таблица лидеров",
       "deeds": "Книга деяний",
+      "sheathe": "Убрать/обнажить оружие",
       "crafting": "Крафт",
       "valeCup": "Кубок Долины",
+      "mount": "Сесть / Спешиться",
       "calendar": "Календарь событий",
+      "dungeonFinder": "Поиск подземелий",
       "discord": "Discord",
       "abilities": "Использовать способности панели команд (цифровой ряд; вторая панель — на цифровом блоке)",
       "targetFriendly": "Ближайший союзник",
       "cycleFriendly": "Следующий союзник",
+      "targetAuras": "Усиления и ослабления цели",
       "gameMenu": "Открыть игровое меню и настройки",
       "bothMouse": "Обе кнопки мыши",
       "runForward": "Бег вперёд",
@@ -2873,7 +3654,7 @@ export const ru_RU: EnTranslations = {
       "mobileHeading": "На мобильных устройствах",
       "mobileBody": "На телефонах и планшетах сенсорное управление появляется автоматически: джойстик передвижения слева, перетаскивание в любой другой точке для обзора, щипок двумя пальцами для приближения камеры и экранные кнопки для способностей и меню. Маленькая стрелка в верхнем левом углу показывает или скрывает кнопки меню, а кнопка «Ещё» рядом хранит остальные ваши окна.",
       "controllerHeading": "На контроллере",
-      "controllerBody": "Геймпады тоже поддерживаются, и поддержка контроллера включена по умолчанию. Левый стик отвечает за передвижение, правый наводит камеру, а лицевые кнопки и бамперы закрывают ваши способности, прыжки и взаимодействие. Откройте окно вроде сумок, чтобы вызвать экранный указатель, а по игровому меню можно перемещаться напрямую крестовиной и лицевыми кнопками. Вы можете переназначить кнопки и настроить мёртвую зону стиков, скорость камеры, вибрацию и инверсию обзора в настройках контроллера в параметрах."
+      "controllerBody": "Геймпады тоже поддерживаются, и поддержка контроллера включена по умолчанию. Левый стик отвечает за передвижение, правый наводит камеру, а лицевые кнопки и бамперы закрывают ваши способности, прыжки и взаимодействие. Откройте окно вроде сумок, чтобы вызвать экранный указатель, а по игровому меню можно перемещаться напрямую крестовиной и лицевыми кнопками. Вы можете переназначить кнопки и настроить мёртвую зону стиков, скорость камеры, вибрацию и инверсию обзора в настройках контроллера в параметрах, а также назначить кнопку для приближения и отдаления камеры (по умолчанию не назначена)."
     },
     "settingsPage": {
       "heading": "Настройки и производительность",
@@ -3251,14 +4032,6 @@ export const ru_RU: EnTranslations = {
         "name": "Рептилии",
         "desc": "Хладнокровные охотники со своим особым шипением и хваткой, непохожие на теплокровных зверей."
       },
-      "murloc": {
-        "name": "Квакопёры",
-        "desc": "Квакающий рыбий народец озёрных берегов и приливных луж, что мигом накидывается стаей на всякого, кто зайдёт в воду слишком близко."
-      },
-      "kobold": {
-        "name": "Проныры",
-        "desc": "Суетливые мусорщики и духи полян и живых изгородей, скорее докука, чем угроза, пока их не наберётся много."
-      },
       "demon": {
         "name": "Демоны",
         "desc": "Захватчики из-за разломов, сплошь огонь и злоба. Где стоит один из них, там и прорыв недалеко."
@@ -3323,7 +4096,7 @@ export const ru_RU: EnTranslations = {
       "hauntPlaceNotes": "Гэллоумир жмётся к своим фонарям. Вороньи Врата, это мрачная парадная дверь леса; Вдовья Чаща густо оплетена паутиной; Висельная Поляна и Часовня Скорбного Камня хранят самые старые скорби этого леса; а Поляна Ловчего принадлежит тому, что до сих пор там охотится.",
       "galePlaceNotes": "Викхарбор стоит, накренившись против ветра. Ветровой Проход, это дорога по утёсам на входе; Воющие Холмы катятся под бурей без единого дерева; Старый Маяк горит столько, сколько кто-либо может припомнить; Отвесный Срез обрывается прямо к воде; Поля Кораблекрушений держат побережье в строгости; а Зеркальное Озеро, единственная неподвижная вещь во всём этом краю.",
       "junglePlaceNotes": "Дрифтхейвен держит костёр на берегу. Заросшее Устье, это место, где река встречает зелёную стену; Пальмовая Коса тянется белой тёплой полосой вдоль прибоя; Изумрудная Чаща и Лианопад поглощают всё, что дальше от берега; Сапфировая Лагуна светится, прозрачная и глубокая; а Затонувший Идол наблюдает из-под воды.",
-      "gardenPlaceNotes": "Хеджвик ждёт у Садовых Врат. Аллея Статуй хранит своё безмолвное общество; Дикие Розы давно переросли свои клумбы; Лепестковый Пруд круглый год розовеет от лепестков; Великий Лабиринт меняет свои манеры под каждого гостя; а Фонтанный Двор всё так же бежит чистой водой в самом сердце сада.",
+      "gardenPlaceNotes": "Хеджвик ждёт у Садовых Врат. Аллея Цветников цветёт подстриженными красками; Замок Донхолд муштрует рыцарей за новыми стенами; Лепестковый Пруд круглый год розовеет от лепестков; Старая Мельница вертится над собственными кольцевыми клумбами; Великий Лабиринт меняет свои манеры под каждого гостя, а за его арками следят лиственные лисы; Северный Дозор стережёт дорогу от выхода; Лилейная Заводь покоится за всем этим; а Фонтанный Двор всё так же бежит чистой водой в самом сердце сада.",
       "gladeTitle": "Тихий уголок: Поляна Брайтвуда",
       "gladeBody": "Не всякая история в Vale рассказывает о мёртвых. На севере солнечная роща под названием Brightwood Glade живёт в собственном, более мягком ритме: сплошь тихие тропы и пятнистый свет под ветвями. Это спокойный контрапункт следу, по которому вы идёте, и его стоит увидеть, когда дорога даст время побродить.",
       "worldBossTitle": "Когда пик пробуждается: мировой босс",
@@ -3397,8 +4170,7 @@ export const ru_RU: EnTranslations = {
       "bastionBody": "Затопленная крепость, поглощенная топью, что удерживают утонувшие защитники и сам прибывающий прилив.",
       "templeBody": "Утонувшее святилище в стороне от болотной дороги, ответвление для любопытных и хорошо подготовленных.",
       "sanctumBody": "Темное сердце Терновых высот, где долгий труд культа достигает своего ужасающего пика.",
-      "orkadiaBody": "Жестокий орочий военный лагерь в чёрном вулканическом камне Дрейкленда: открытое поле, освещённое ядовито-зелёными боевыми кострами. Прорубитесь сквозь пехотинцев Кровавого Клыка и мародёров Железношкурых, чтобы добраться до полководца Громмока Черепокола на его помосте из черепов.",
-      "wildheartBody": "Залитая тёплым дождём лесная кальдера, где две высокие охотничьи тропы огибают нефритовый сенот. Пройдите через звериные логова и руины предков, затем поднимитесь на ритуальную пирамиду к Зулгару.",
+      "wildheartBody": "Залитая тёплым дождём лесная кальдера, где две высокие охотничьи тропы огибают нефритовый сенот. Пройдите через звериные логова и руины предков, затем поднимитесь на ритуальную пирамиду, чтобы увидеть, кто ждёт на вершине.",
       "raidName": "Финальный рейд",
       "raidBody": "За запечатанной королевской дверью ждёт испытание для десяти игроков: многофазная битва и не знающая смерти сила, которую весь рейд должен пресечь сообща. Заслужите право войти, а затем приведите девятерых друзей.",
       "heroicTitle": "Героический режим",
@@ -3463,23 +4235,25 @@ export const ru_RU: EnTranslations = {
       "duelsBody": "Вызовите любого встречного игрока на дружескую дуэль. На кону только гордость, так что это самый простой способ изучить противостояние или разрешить дружеский спор.",
       "coliseumHeading": "Пепельный Колизей",
       "coliseumBody": "Колизей, это арена королевства, где вы сходитесь с другими игроками в рейтинговых матчах: один на один или два на два. У каждой категории своя таблица рейтинга, так что победа поднимает вас по этой лестнице на виду у всего королевства. Откройте окно арены, чтобы записаться в категорию, в одиночку или с напарником.",
-      "fiestaHeading": "Фиеста два на два",
-      "fiestaBody": "Фиеста, это быстрая схватка два на два, что идёт одним непрерывным боем, где все бойцы уравнены в силах. По ходу боя вы набираете улучшения, быстрые усиления, которые на ходу меняют ваш набор, так что нет двух одинаковых матчей.",
-      "augmentsNote": "Улучшения и усиления действуют только в рамках матча. Они нужны для забавных импровизированных сборок, а не для постоянного превосходства, так что никто не сможет купить себе победу.",
-      "wavesTitle": "Улучшения приходят волнами",
-      "wavesBody": "Бой Фиесты по ходу подкидывает вам свежий выбор, и варианты становятся всё смелее, чем дольше длится схватка. Вы выстраиваете сборку от волны к волне, каждый раз беря один из нескольких вариантов и оставляя его до конца боя.",
-      "waveSilverTitle": "Серебро",
-      "waveSilverBody": "Первая волна: чистые усиления одной характеристики, что оттачивают основы вашего класса.",
-      "waveGoldTitle": "Золото",
-      "waveGoldBody": "Средняя волна: двусторонние сочетания, в которых ваша сборка начинает обретать форму и звучать в полную силу.",
-      "wavePrismaticTitle": "Радужный",
-      "wavePrismaticBody": "Финальная волна: определяющие сборку, выжигающие экран всплески, которым положено казаться нелепо мощными в самом лучшем смысле.",
-      "yumiHeading": "Защитите Yumi",
-      "yumiBody": "Protect Yumi: командный режим с целью, который разыгрывается в лабиринте. Каждая команда защищает свою кошку-фамильяра и охотится на чужую. Время от времени обе кошки переносятся в новые углы лабиринта, и бой качается между защитой, охотой и поиском. Очередь на 3 на 3 или 5 на 5; павший лишь ненадолго садится на скамью.",
-      "powerupsTitle": "Усиления на ринге",
-      "powerupsBody": "Прямо посреди схватки на арену падают и светящиеся сферы, доступные тому, кто доберётся до них первым. Они нарочно сделаны вызывающе яркими и держатся лишь короткий миг: Демон скорости дарит вспышку слепящей прыти, Колосс раздувает вас в неповоротливого великана, Лунные ботинки превращают шаг в прыжок при пониженной гравитации, а Берсерк дарует внезапный прилив неистовства.",
       "ladderHeading": "Восхождение по рейтингу",
       "ladderBody": "Рейтинговые бои отслеживают ваш ранг со временем. Загляните в таблицу лидеров, чтобы увидеть свое место и тех, кто держит вершину королевства."
+    },
+    "thornhollowPage": {
+      "heading": "Терновая Лощина",
+      "intro": "Рейтинговое поле боя 5 на 5 за захват флага в обнесённой стеной лощине среди старого леса под Терновым пиком, где две разрушенные крепости смотрят друг на друга вдоль ущелья, а между ними лежит двор постарше, так и не доставшийся никому. Две команды по пять, две крепости, одна цель: унести чужое знамя домой раньше, чем унесут ваше.",
+      "queueHeading": "Очередь",
+      "queueBody": "Откройте панель Терновой Лощины и встаньте в очередь в одиночку или соберите группу до пяти человек и вставайте вместе: группа всегда попадает в одну команду, а свободные места заполняют одиночные бойцы. Когда готовы десять, матч рассаживает обе команды по крепостям для короткого построения, после чего флаги оживают.",
+      "fieldHeading": "Поле",
+      "fieldBody": "Обнесенное стенами открытое поле разделено на три зоны: собственное поле каждой команды и Двор Руин между ними. Две куртины во всю ширину образуют границы, и любой переход между зонами идет через спорную точку: широкие главные ворота или надвратный дом, оседлавший куртину, чьи смещенные двери заставляют огибать угол засады. Каждая крепость наглухо закрыта со всех сторон, кроме входа, так что путь к флагу и от него лежит через один и тот же проем, а низкая баррикада у ворот ломает прямой натиск. Во дворе ждут полое сердце руин и две фланговые руны спринта; еще две стоят на подходах к флагам.У дворового входа каждых главных ворот ждет руна битвы или руна защиты (ненадолго больше урона или меньше получаемого урона): оба постамента открывают матч одной стороной и переворачиваются с каждым захватом.",
+      "flagsHeading": "Флаги",
+      "flagsBody": "Каждая крепость хранит флаг своей команды. Возьмите вражеский флаг и донесите его до своей стойки, чтобы забить: побеждает команда, первой захватившая флаг три раза, а истекшее время решается по счету. Павший знаменосец роняет флаг на месте: враг может подхватить его снова, а своя команда возвращает его домой мгновенно, просто добравшись до него. Флаг не терпит скрытности: подбирая его, вы выходите из невидимости, а знаменосец, ставший невидимым любым способом, роняет флаг на месте.",
+      "pickupNote": "Поднять флаг можно только осознанным нажатием клавиши действия на поле боя: никто не станет знаменосцем, случайно пробежав по флагу.",
+      "respawnHeading": "Гибель в бою",
+      "respawnBody": "Смерть хранит классический обряд: тело лежит там, где пало, пока ВЫ не отпустите дух; дух поднимается на огороженном кладбище подле вашей крепости, связанный оберегом до следующей волны возрождения вашей команды. Волна поднимает всех ожидающих духов разом; волны двух команд нарочно смещены, так что бой никогда не обнуляется целиком. Здесь нет бега за телом и сделки с Целителем душ: отпустил, дождался волны, в бой.",
+      "carrierHeading": "Ноша знаменосца",
+      "carrierBody": "Знаменосец, слишком долго удерживающий вражеский флаг, становится все уязвимее и получает все больше урона, пока флаг не будет захвачен, уронен или возвращен. Прятаться с флагом значит проиграть; нести его домой значит победить.",
+      "ladderHeading": "Рейтинг",
+      "ladderBody": "Каждый матч, победный или нет, двигает постоянный рейтинг персонажа, а таблица за все время хранит чемпионов мира. Победы и доигранные до конца поражения также приносят Честь через систему Войны."
     },
     "valeCupPage": {
       "heading": "Кубок Долины",
@@ -3621,6 +4395,8 @@ export const ru_RU: EnTranslations = {
       "sourcesBody": "Большинство ваших ранних улучшений, это награды за задания, так что выгоднее выполнять задания, а не гриндить. Враги роняют снаряжение, когда вы их побеждаете, торговцы в городе продают добротную основу, ремесленники превращают собранные материалы в носимые вещи, а игровой рынок позволяет покупать у других искателей приключений. На самой вершине два вида валюты покупают снаряжение, которого не найти больше нигде: Метки Вылазок у хранителя вылазок и Героические знаки у героического интенданта.",
       "soulboundTitle": "Персональные предметы: ваши и только ваши",
       "soulboundBody": "Многие ценные вещи персональны: они привязаны к вашему персонажу с момента получения. Персональный предмет нельзя передать, отправить почтой, продать торговцу или выставить на рынок; отныне он часть вашей истории, и никто другой не понесёт его за вас.",
+      "uniqueTitle": "Уникальный (экипируется): только одна легендарка каждого вида",
+      "uniqueBody": "Легендарные предметы уникальны при экипировке: персонаж может носить только одну копию данного легендарного предмета одновременно, и его героическая версия считается тем же предметом. Вторую копию можно держать в сумках, банке или на рынке, но попытка надеть обе сразу будет отклонена. В подсказке предмета есть золотая метка \"Уникальный (экипируется)\", так что вы увидите это правило до того, как построите план на два таких предмета.",
       "setsTitle": "Комплекты и бонусы комплектов",
       "setsBody": "Часть брони выходит подобранными семействами, несколько частей, скроенных, чтобы выглядеть и сражаться как одно целое. Наденьте достаточно частей одного семейства разом, и комплект пробуждается, даруя бонусы поверх характеристик каждой части, и чем больше частей на вас, тем он сильнее. Несколько таких семейств попадаются ценными трофеями, пока вы растёте в уровнях; величайшие же приходят из самого сложного группового контента у предельного уровня, так что погоня за полным комплектом, это классическая цель максимального уровня.",
       "consumablesTitle": "Расходники",
@@ -3641,38 +4417,324 @@ export const ru_RU: EnTranslations = {
     },
     "professions": {
       "intro": "Помимо боя и заданий, мир вознаграждает тех, кто трудится на земле и у горна: собирайте сырьё, превращайте его в снаряжение и товары в десяти ремёслах и обретайте облик одного из десяти призваний, которые эти ремёсла олицетворяют.",
-      "gatherTitle": "Сбор: горное дело, лесозаготовка и травничество",
-      "gatherIntro": "Три ремесла сбора позволяют добывать сырьё прямо из мира: горное дело выбивает руду и камень из жил, лесозаготовка валит древесину в рощах, а травничество собирает дикорастущие травы и растения. Каждое отслеживается отдельно, так что развитие в одном никогда не замедляет прогресс в другом. Всё это в новинку? Бригадир Оделл в Иствруке держит короткое поручение «Ремесло на любые руки», которое проведёт вас через первый сбор.",
-      "gatherWhatTitle": "Узлы ресурсов",
-      "gatherWhatBody": "Рудные жилы, рощи и травяные поляны размещены по Долине и топям как видимые, ничейные объекты. Подойдите к узлу и взаимодействуйте с ним, чтобы собрать то, что в нём есть. Собрав узел, вы должны подождать, пока он восстановится, прежде чем сможете собрать его снова лично, но это никогда не мешает другим: другой игрок может собрать тот же самый узел в это время.",
-      "gatherProficiencyTitle": "Мастерство",
-      "gatherProficiencyBody": "Каждый успешный сбор повышает ваше мастерство в этом ремесле сбора, а лист персонажа ведёт учёт по каждому ремеслу отдельно. Практика никогда не вредит вашему прогрессу, она лишь добавляет к нему.",
-      "gatherToolsTitle": "Инструменты ремесла",
-      "gatherToolsBody": "Торговцы продают базовые инструменты для каждого ремесла сбора, а лучшие можно скрафтить. Сегодня никакой инструмент для работы с узлом не нужен: инструменты, это задел под более богатые узлы в будущем, где кирки, топоры и серпы высокого уровня станут способом к ним подступиться.",
       "harvestTitle": "Добыча с самой охоты",
-      "harvestBody": "Сбор не кончается на узлах. С некоторых убитых зверей можно собирать компоненты, шкуры, клыки, шёлк и вещи постраннее, прямо с трупа, рядом с его обычной добычей. Один добытчик на убийство: кто собрал первым, тому и достаётся всё. И выбор всякий раз за вами: забрать всё, что предлагает труп, или сосредоточиться на одном компоненте и взять его более высокого качества. Собирать может любой персонаж, без ремесла и обучения, а особенно тонкий компонент даже носит имя того, кто его добыл.",
+      "harvestBodyChoice": "Сбор не кончается на узлах. Со многих убитых зверей можно собрать шкуры, клыки, шёлк и мясо, по одному разу с каждого и кто успел первым, прямо с трупа, рядом с его обычной добычей: одно нажатие открывает и то и другое. Если зверь несёт больше одного пригодного компонента, выбор за вами: забрать всё, что он способен дать, или сосредоточиться на меньшем числе компонентов и взять то, что берёте, заметно более высокого уровня.\n\nРедкий или лучший результат сбора у семейства, дающего образцы, сверх обычного выхода приносит ещё и именной безупречный образец (Безупречную шкуру, Безупречный паучий шелк, Безупречную ядовитую железу или Отборную вырезку) и записывает «Безупречный трофей» в вашу Книгу деяний. Собирать может любой персонаж, без всякого обучения, а любой имеющийся у вас инструмент сбора идёт в зачёт улучшенного броска, к какому бы ремеслу он ни принадлежал.",
       "focusTitle": "Фокус города",
       "focusBody": "В каждом узловом городе для заезжих добытчиков есть панель «Фокус города»: стоя в городе, откройте её рядом с миникартой и направьте небольшой запас очков фокуса на те виды компонентов, что вам важны. Компоненты под фокусом сходят с каждого следующего трупа на ступень качественнее и чуть богаче, ваше распределение следует за персонажем, куда бы он ни забрёл, а переделать его можно бесплатно при любом следующем визите в город.",
-      "craftTitle": "Десять ремесел",
-      "craftIntro": "Десять ремесел превращают собранные материалы в готовое снаряжение и вещи: бронеделие, оружейное дело и ювелирное дело придают сырью форму носимого снаряжения; алхимия и инженерия основаны на пробах и ошибках; кулинария, начертание и зачарование каждое дорабатывает продукцию других ремесел; портняжное дело и кожевничество работают по точным выкройкам. Вместе они образуют колесо, в котором каждое ремесло соседствует с двумя другими и противостоит одному.",
-      "craftRingTitle": "Колесо специальностей",
-      "craftRingBody": "Десять ремесел расположены на фиксированном колесе, и то, где ремесло находится на этом колесе, имеет значение: соседние на колесе ремесла имеют между собой больше общего, чем ремесла на противоположных сторонах. Посвятить себя одному ремеслу должно ощущаться как присоединение к семье родственных занятий, а не выбор изолированного навыка.",
-      "craftRecipesTitle": "Рецепты и реагенты",
-      "craftRecipesBody": "Каждый рецепт требует конкретных реагентов, которые вы собираете или покупаете. Самые простые рецепты просят лишь обычные материалы и доступны с самого начала, так что вы можете взяться за ремесло сразу же, как только его освоите. Списки рецептов ещё пополняются: несколько ремёсел ждут своих первых рецептов, а новые появляются по мере роста ремёсел.",
       "craftHowTitle": "Окно ремесла",
-      "craftHowBody": "Откройте окно ремесла (клавиша по умолчанию T), чтобы увидеть все известные вам рецепты, что нужно для каждого и что у вас есть под рукой; когда материалы на месте, один щелчок делает всю работу. Обычные рецепты можно изготавливать где угодно в мире. А несколько продвинутых рецептов, среди них инструменты высших ступеней и редкие доспехи заклинателей, требуют встать у ремесленного узла в Хайвотче.",
       "craftMasteryTitle": "Навык и мастерство",
       "craftMasteryBody": "Успешное изготовление повышает навык в этом ремесле, и навык никогда не запирает рецепты: если вы знаете рецепт и держите его материалы, вы можете попытаться его создать. Каждый рецепт выдаёт ровно ту вещь, что обещает, а набитая рука порой создаёт шедевр: ту же вещь, но тоньше отделанную и с толикой дополнительной силы. Единственное исключение, это комбинированные рецепты: они открываются лишь мастеру, настроенному на архетип, который соединяет их два ремесла, с проверенным навыком в обоих.",
-      "craftComboTitle": "Комбинированные рецепты",
-      "craftComboBody": "Помимо собственного списка рецептов одного ремесла, колесо также поддерживает комбинированные рецепты, требующие сразу двух соседних ремёсел, вознаграждая персонажа, вложившегося в соседние ремёсла на кольце, а не в одно изолированное. Ремесленник должен владеть обоими ремёслами сам; навык напарника не заменит ни одну из половин.",
-      "archetypeTitle": "Десять призваний",
-      "archetypeIntro": "Каждое из десяти ремесел также олицетворяет призвание — более широкую идентичность, которую можно принять помимо простого занятия этим ремеслом. Ваше текущее призвание — это единственный выбор в один момент времени, а не список: вы носите одно, и при желании можете позже сменить его на другое.",
       "archetypeChooseTitle": "Выбор призвания",
       "archetypeChooseBody": "Заявление призвания, это сюжетный момент: задание, которое официально принимает вас в эту идентичность. Пока вы не заявили о себе, навык каждого ремесла растёт вплоть до редкой ступени. Когда вы принимаете пару, оба её ремесла открываются полностью; одно ремесло с дальней стороны колеса остаётся с вами как увлечение и по-прежнему работает до редкой ступени, а все остальные ремёсла держатся на обычной ступени, пока вы несёте эту идентичность.",
-      "archetypeSwitchTitle": "Перемена решения",
       "archetypeSwitchBody": "Не станет заявление и пожизненным приговором. Задумано повторяемое искупление перед прежним ремеслом, прежде чем взяться за новое, и с каждой сменой искупление становится всё тяжелее, так что выбор остаётся значимым, а не бесплатным. Как и само заявление, всё это ещё в пути.",
-      "archetypeIdentityTitle": "Что значит ваше призвание",
-      "archetypeIdentityBody": "Ваше текущее призвание — это заявление о том, кем является ваш персонаж в этом мире, отражающееся в том, как к вам обращаются другие и сам мир. Конкретные награды и признание, связанные с ним, еще уточняются; загляните позже, когда система будет доработана."
+      "whatHeading": "Ремесло рядом с мечом",
+      "whatBody": "Профессии составляют трудовую жизнь мира: четыре собирательских ремесла, что добывают сырье прямо из земли, и кольцо из десяти ремесел, которые превращают его в снаряжение, еду, зелья и инструменты. Здесь все питает что-то другое. Добытая руда становится клинком, клинок принимает чары, а для чар нужна пыль, разобранная из старого снаряжения, так что собиратель, ремесленник и мастеровой оказываются звеньями одной цепи.\n\nНад числом профессий мучиться не нужно. Любой персонаж может поднимать все восемь ремесел, у которых сегодня есть содержание, и все четыре собирательских профессии разом; единственный исключающий выбор, это ваш архетип, призвание, которому вы в итоге присягнете, хотя после настройки ремесла, ушедшие в спячку, перестают расти. Навык никогда не падает, и ничто из выученного у вас не отнимается.",
+      "ringHeading": "Кольцо ремесел",
+      "ringBody": "Десять ремесел расположены на одном кольце, и каждое ведет свой навык отдельно; откройте карточку, чтобы увидеть полные таблицы рецептов и точные числа.",
+      "ringWaveNote": "Ювелирное дело и начертание уже стоят на кольце, но пока не имеют рецептов; их наполнение придет вместе с расширением новых зон.",
+      "capFmt": "Предел {cap}",
+      "comingSoon": "Рецептов пока нет",
+      "gatherHubHeading": "Сбор",
+      "gatherHubBody": "Четыре ремесла сбора кормят производство: горное дело, лесозаготовка и травничество ограничены 100, рыбная ловля 200.",
+      "archetypesHeading": "Десять призваний",
+      "archetypesBody": "Настройка на два соседних ремесла дарует парный титул: две основные специальности растут до полного предела, одно противоположное ремесло остается хобби с пределом на редком уровне, а прочие отдыхают на обычном.",
+      "pairFmt": "{a} и {b}",
+      "curveHeading": "Кривая мастерства",
+      "curveBody": "Каждые {step} очков навыка дают одну ступень: рецепт на вашей ступени или выше дает полный рост, а по мере того как рецепт опускается ниже вас, рост падает вдвое, вчетверо и затем прекращается.",
+      "provenanceHeading": "Происхождение",
+      "provenanceBody": "Работа редкого качества и выше несет имя мастера, шедевр поднимает качество на ступень, а изделие на заказ привязывается к получателю (Узы мастера).",
+      "stationsHeading": "Станки и мастера",
+      "stationsBody": "Шесть типовых станков в трех городах; при них живут мастера, которые учат рецептам и выдают рабочие заказы.",
+      "deedsHeading": "Деяния, что хранят память о пути",
+      "deedsBody": "Книга деяний идет рядом с каждым шагом. Первая настройка приносит титул Присягнувшего ремеслу, а первый шедевр, Мастера-шедевральника, и оба носятся как титулы. Каждое из восьми зарабатываемых ремесел отмечает рубежное деяние на 50 навыке и венчает свой предел титулом Grandmaster, а Fishing дает Old Salt на 100 мастерства и титул Master Angler на 200.\n\nЕсть и более тихие страницы: деяния за первый сбор и первое изделие, за редкие находки, что удача подбрасывает в поле, и за то, что вы взялись за утилизацию. Все это чисто косметическое, только титулы и Известность. Деяние никогда не дает силы; оно лишь свидетельствует, что вы там были.",
+      "startHeading": "С чего начать",
+      "startBody": "Только с дороги в Eastbrook? Найдите Foreman Odell и возьмите A Trade for Every Hand: он укажет вам на рудные жилы вокруг Copper Dig к юго-востоку от города и набьет вам первые мозоли. С этого момента собирайте каждую жилу, лесопосадку и грядку трав, что встречаете в странствиях; мастерство приходит к путешественникам само собой.\n\nВ городе нажмите T, чтобы открыть окно ремесла и работать над общими рецептами, которые каждый персонаж знает с самого начала. Загляните к мастерам у forge, kitchens, loom и toolworks, посмотрите, чему они учат, и берите их рабочие заказы ради устойчивого дохода. К тому времени, как вас найдет письмо Гильдии, вы уже будете знать, какая пара ощущается домом.",
+      "colStation": "Станок",
+      "colHub": "Город",
+      "colMaster": "Мастер",
+      "masterCellFmt": "{name}, {title}"
+    },
+    "profPages": {
+      "back": "Назад к ремеслам",
+      "capLabel": "Предел навыка",
+      "stationLabel": "Станок",
+      "stationNone": "Станок не нужен",
+      "stationAnywhere": "Где угодно",
+      "mastersLabel": "Мастера",
+      "masterFmt": "{name} ({hub})",
+      "specializationLabel": "Специализация",
+      "specializationFact": "Навык {at}: материалы дешевле на {pct}%",
+      "matFmt": "{name} x{count}",
+      "outputFmt": "{name} x{count}",
+      "comboReq": "Нужны {a} и {b}",
+      "sourceTrainerFee": "Учитель, {fee}",
+      "sourceTrainerFree": "Учитель, бесплатно",
+      "sourceKnown": "Известен с самого начала",
+      "gainFmt": "{reduced} / {minimal} / {zero}",
+      "colRecipe": "Рецепт",
+      "colSkill": "Навык",
+      "colSource": "Источник",
+      "colStation": "Станок",
+      "colMaterials": "Материалы",
+      "colQuality": "Качество",
+      "colGain": "Рост угасает на",
+      "colMaterial": "Материал",
+      "colTool": "Инструмент",
+      "colTier": "Уровень",
+      "colPrice": "Цена",
+      "colZone": "Зона",
+      "colNodes": "Залежей",
+      "colNodeTier": "Уровень залежи",
+      "colToolNeeded": "Нужен инструмент",
+      "craftIntro": {
+        "weaponcrafting": "Оружейное дело кует топоры, булавы, клинки, копья и даже посохи заклинателей в кузнице Иствердья: от медных новичковых образцов до редких осмиевых и глифостальных работ. Оружие, это самый ощутимый апгрейд, который может купить уровень, так что оружейник, это друг, которого все помнят завести.",
+        "armorcrafting": "Бронное дело кует кольчужные доспехи в кузнице Иствердья: от клепаной меди до редкой осмиевой чешуи.",
+        "tailoring": "Портняжное дело ткет ткань для заклинателей и вместительную сумку у станка Иствердья: от домотканых основ через набор золочёного плетения до редкого солнечного плетения.",
+        "leatherworking": "Кожевничество выделывает ловкие кожаные доспехи в дубильне Фенбриджа: от простых шкур до редких изделий стража топей.",
+        "cooking": "Кулинария превращает рыбу, дичь и травы в сытные блюда на кухнях Иствердья, вплоть до редких пиршественных яств.",
+        "alchemy": "Алхимия варит зелья лечения и маны, а также эликсиры выносливости в аптекарской Хайвотча.",
+        "engineering": "Инженерное дело собирает инструменты сбора 4 и 5 уровня в мастерской Иствердья, и каждый поглощает инструмент ступенью ниже.",
+        "enchanting": "Наложение чар распыляет ненужное снаряжение в чародейные материалы и вкладывает их в постоянные чары на снаряжение; станок не нужен."
+      },
+      "craftProse": {
+        "weaponcrafting": {
+          "identityHeading": "Клинок, за которым идет каждый боец",
+          "identityBody": "Работа этого ремесла нужна кому-нибудь в любой группе, ведь одна лишь редкая ступень покрывает все три аппетита: Osmium Warblade для силового ближнего боя, Glyphsteel War Axe для ловких бойцов и Highpine Battle Staff, посох на Интеллект и Дух для носителей мантий.\n\nНа кольце ремесел оно стоит между Armorcrafting и Jewelcrafting. Его живое лицо, это Smith, пара Weaponcrafting и Armorcrafting, присягаемая перед Forgemistress Darva у горна работой над тремя рудными жилами собственными руками; пара Bladewright с Jewelcrafting тоже названа на кольце, но присягнуть ей пока нельзя, ведь Jewelcrafting не даст рецептов до расширения зон в будущем.",
+          "materialsHeading": "Чем поят горн",
+          "materialsBody": "Mining, это костяк. Copper ore добывается с жил 1-го уровня Eastbrook Vale, iron ore в Mirefen Marsh, а osmium ore в Thornpeak Heights, и каждая ступень лестницы шагает так же. Logging важнее, чем можно подумать: ironbark идет на древко boar spear, ashwood держит maul, а одно бревно горной сосны образует battle staff.\n\nОстальное приходит с охоты и из-за прилавка. Rough hide для рукоятей снимается прямо с туш волков и вепрей, bone fragments падают с обычных убийств, а лестница горна жжет Smithing Flux, 20 меди за банку у самой Darva. Если ваша добыча отстает, Darva продает osmium ore у горна, а Tinker Gizzel держит слитки глифостали в toolworks по цене, на фоне которой друзья-собиратели кажутся дешевыми.",
+          "ladderHeading": "Лестница, ступень за ступенью",
+          "ladderBody": "Один полевой рецепт, Eastbrook Arming Sword, известен всем с самого начала и куется где угодно из охотничьих трофеев (пара wolf fangs и bone fragments) плюс шесть Smithing Flux с прилавка forge. Настоящая лестница, это девять рецептов у тренера в трех ступенях, все привязаны к forge: медная ступень (bearded axe, flanged mace, boar spear) учится бесплатно на 0 навыке, железная ступень (longsword, maul, dirk) открывается на 25 навыке по 25 серебра за рецепт, а осмиевая ступень (warblade, war axe, battle staff) открывается на 50 навыке по 1 золоту каждый. Darva учит рецепту, как только ваш разряд в ремесле достигает его собственного, так что каждая ступень открывается ровно с началом своей полосы навыка.\n\nЕще один рецепт едет с парой: Gravewyrm Gauntlets, комбинированная вещь от тренера, над которой может работать только настроенный Smith с Weaponcrafting и Armorcrafting на 25 навыке, и станок ей вовсе не нужен.",
+          "routeHeading": "Шедевры и рабочий путь к 125",
+          "routeBody": "Любая вещь с настоящей строкой характеристик, а на этой лестнице это железная ступень и выше, может сойти с наковальни шедевром; безхарактерные медные обычки не срабатывают никогда, ведь улучшать в них нечего. Iron считается материалом 1-го уровня для бонуса шедевра, горная сосна и глифосталь, 2-го, так что верхняя ступень срабатывает чуть чаще.\n\nПрокатитесь на медной ступени до 25, обучите железную в день ее открытия и катитесь до 50, затем осмиевую до 75. За 75 пока нет ничего выше, так что осмиевые рецепты гаснут до половины, а потом до четверти отдачи: заложите около 150 изделий до предела в 125 и помните об общем пределе в десять действий ремесла в минуту, когда садитесь за партию.\n\nФинансируйте подъем по ходу: рабочий заказ горна Darva забирает у вас восемь copper ore каждые 30 минут за немного монет и опыта, а железная и осмиевая ступени честно продаются растущим воинам ближнего боя. Книга деяний отмечает Edge and Temper на 50 навыке и венчает Grandmaster Weaponcrafting на 125."
+        },
+        "armorcrafting": {
+          "identityHeading": "Кольчуга для передовой",
+          "identityBody": "Лестница Armorcrafting читается как карьера солдата: простой клепаный медный girdle, sabatons и gauntlets для начала, ironlink hauberk, legguards и spaulders с первыми настоящими характеристиками, и редкие osmiumscale greathelm, cuirass и leggings, вещи на Силу и Стойкость с самыми большими показателями брони, что может сделать ремесленник.\n\nЕсть у него и более тихая сторона: Eastbrook Warded Leggings, полевой обычок с характеристиками заклинателя, и Мантия печной чешуи, редкое наплечье кольчуги на Интеллект и Дух на 75 навыке, держат в списке клиентов и носителей кольчуги, склонных к магии. На кольце оно стоит между Weaponcrafting и Engineering; пара Smith с Weaponcrafting присягается перед Forgemistress Darva, а пара Шестерёнщика с Engineering названа, но пока не имеет задания клятвы.",
+          "materialsHeading": "Руда мешками",
+          "materialsBody": "Ни одно ремесло не ест руду быстрее. Один только ironlink hauberk берет пять iron ore, а каждая osmiumscale вещь хочет три-четыре osmium плюс слиток глифостали, так что серьезный armorcrafter добывает в Mirefen Marsh и Thornpeak Heights или платит тому, кто добывает. Copper кормит первую ступень, прямо с жил у Copper Dig.\n\nВокруг металла идут мягкие части: rough hide, снятая с туш волков и вепрей, bone fragments и linen scraps с обычной охоты, и банка Smithing Flux (20 меди у горна) почти в каждом рецепте. Darva продает osmium ore через прилавок для нетерпеливых.",
+          "ladderHeading": "Обучение у горна Darva",
+          "ladderBody": "Два полевых обычка, Eastbrook Chainmail Vest и Warded Leggings, известны с начала и куются где угодно. Лестница тренера, это девять рецептов в трех ступенях у горна Eastbrook: медная ступень бесплатна на 0 навыке, ступень ironlink стоит 25 серебра за рецепт на 25 навыке, а ступень osmiumscale стоит 1 золото каждый на 50 навыке, и каждая ступень доступна к обучению, как только ваш разряд ее достигает.\n\nЗа лестницей сидят два особых. Boundstone Helm, это комбинированный рецепт Smith, учится у тренера, не требует станка и работается только настроенным Smith с обоими ремеслами на 25 навыке. Мантии печной чешуи не нужен учитель вовсе: ее знают все, но на 75 навыке и привязанная к forge, она венчает 3-й уровень ремесла.",
+          "routeHeading": "Шедевры и рабочий путь к 125",
+          "routeBody": "От ступени ironlink и выше каждое изделие катит шанс шедевра; медные обычки, что только для брони, сработать не могут, ведь шедевр улучшает характеристики, а их у них нет. Iron считается материалом 1-го уровня для срабатывания, а глифосталь, 2-го.\n\nПодъем, это стандартная трехступенчатая поездка: copper до 25, ironlink до 50, osmiumscale до 75, обучая каждую ступень в день ее открытия. Где Armorcrafting везет, так это на отрезке после 75: Мантия печной чешуи, это рецепт 3-го уровня, так что он платит полную отдачу до 99 и половину после, а значит последние пятьдесят очков берут около 75 изделий вместо 150, что нужны ремеслу без венца. Каждая мантия стоит семь osmium ore и пять Smithing Flux, так что запаситесь в Thornpeak и у прилавка forge перед забегом.\n\nРабочий заказ Darva покупает восемь copper ore каждые 30 минут за монеты и опыт, приятный сток для низкой руды, из которой вы вырастаете. Книга деяний отмечает Hammer and Plate на 50 навыке, а Grandmaster Armorcrafting ждет на пределе в 125."
+        },
+        "tailoring": {
+          "identityHeading": "Ткань для заклинателей, сумки для всех",
+          "identityBody": "Лестница поднимается от домотканых основ через набор золочёного плетения к редкой ступени: Silkbinder's Raiment и вещи sunweave. Ее второе ремесло всеобще: Silkspun Satchel, это сумка на десять ячеек, и нет класса, специализации или уровня, что не хотел бы больше места в сумках.\n\nНа кольце Tailoring сидит между Leatherworking и Inscription. Ее живая пара, это Outfitter, Leatherworking и Tailoring вместе, присягаемая перед Weaver Ottilie у loom Eastbrook после выбраковки четырех webwood spiders ради их шелка; пара Inkweaver с Inscription названа на кольце, но ждет первых рецептов Inscription, прежде чем ей можно будет присягнуть.",
+          "materialsHeading": "Нить, шелк и, да, травы",
+          "materialsBody": "Loom работает на том, что роняет охота и растят поля. Linen scraps и homespun cloth снимаются с гуманоидных убийств, spider silk собирается с туш пауков, а центральная часть редкой ступени, Silkbinder's Raiment, хочет Pristine Silk, подписанный образец, что подбрасывает удачный сбор с туши.\n\nHerbalism кормит tailoring больше любого другого ремесла снаряжения: трава глянцелист отделывает тапочки, goldleaf красит набор золочёного плетения, а sunpetal прошивает всю редкую ступень, так что портной, что собирает свои травы, стабильно экономит. Spool of Thread стоит 12 меди у Ottilie, а loom не просит ни капли металла: даже капстоун Wardweave Cowl соткан из премиальных трав, Pristine Silk, spider silk и нити.",
+          "ladderHeading": "Обучение у loom Ottilie",
+          "ladderBody": "Два полевых обычка, Eastbrook Wool Trousers и Ritual Vestments, известны с начала и куются где угодно. Лестница тренера идет у loom к югу от колодца Eastbrook: ступень homespun (hood, mitts, slippers) бесплатна на 0 навыке, ступень gildenweave (robe, leggings и Silkspun Satchel) стоит 25 серебра за рецепт на 25 навыке, а редкая ступень (raiment, mantle, treads) стоит 1 золото каждый на 50 навыке.\n\nWardweave Cowl не нужен тренер: ее знают все, но она сидит на 75 навыке, привязанная к loom, как венец 3-го уровня ремесла. Как и везде, Ottilie учит рецепту, как только ваш разряд в Tailoring достигает разряда самого рецепта.",
+          "routeHeading": "Шедевры и рабочий путь к 125",
+          "routeBody": "Pristine Silk в raiment сам по себе покрывает бонус шедевра за подписанный реагент, а goldleaf и sunpetal считаются материалами 1-го и 2-го уровня для срабатывания, так что редкая ступень, это где шансы на пике. Простая безхарактерная работа вроде satchel не срабатывает никогда: шедевр улучшает характеристики, а у сумки их нет.\n\nШейте ступень homespun до 25, обучите gildenweave в день ее открытия и катитесь до 50, затем редкую ступень до 75. С 75 бразды берет Wardweave Cowl: рецепт 3-го уровня, полная отдача до 99 и половина за ним, примерно 75 изделий на последние пятьдесят очков, каждое ценой два Pristine Silk, четыре spider silk, по паре трав sunpetal и goldleaf и две нити.\n\nПусть подъем окупается: satchels продаются буквально всем, а рабочий заказ loom Ottilie покупает шесть spider silk каждые 30 минут. Книга деяний отмечает A Fine Seam на 50 навыке, а Grandmaster Tailoring ждет на пределе в 125."
+        },
+        "leatherworking": {
+          "identityHeading": "Кожа для быстрых",
+          "identityBody": "Лестница поднимается от простых Fenbridge hide leggings, boots и belt через необычные marshstalker jerkin, hood и spaulders к редкому набору mirewarden, лучшей коже, что может выкроить ремесленник. Две вещи заклинателя ее дополняют: полевой обычок Eastbrook Druid's Hide и Duskhide Wraps на 75 навыке.\n\nНа кольце оно сидит между Cooking и Tailoring. Его живая пара, это Outfitter, Leatherworking и Tailoring, присягаемая перед Weaver Ottilie в Eastbrook; пара Trapper с Cooking названа на кольце, но пока не имеет задания клятвы.",
+          "materialsHeading": "Охота, это и есть добыча",
+          "materialsBody": "Leatherworking, это ремесло, где ваш маршрут прокачки и линия снабжения, это одно и то же: rough hide снимается прямо с туш, несущих шкуру, прежде всего волков и вепрей, и каждая туша служит лишь одному сборщику, кто первый, того и добыча. Редкий или лучше бросок сбора также дает Pristine Hide, подписанный образец, что зовет Mirewarden Jerkin, так что берегите каждый, что найдете.\n\nВспомогательный состав невелик: spider legs и silk, homespun cloth с гуманоидов, одна osmium ore в каждой редкой вещи mirewarden (шесть в капстоуне Duskhide Wraps) и Tanning Agent за 16 меди у прилавка tannery. Tanner Hesk продает osmium ore тоже, если вы предпочитаете не добывать.",
+          "ladderHeading": "Обучение в Fenbridge",
+          "ladderBody": "Вот загвоздка: tannery стоит в Fenbridge, на дороге Mirefen Marsh, что делает Leatherworking единственным глубоким ремеслом, которому учат за пределами Eastbrook. Tanner Hesk учит лестнице у своих чанов: ступень Fenbridge hide бесплатна на 0 навыке, ступень marshstalker по 25 серебра за рецепт с 25 навыка, а ступень mirewarden по 1 золоту каждый с 50 навыка, и каждая ступень открывается, как только ваш разряд ее достигает.\n\nДва рецепта минуют тренера: полевые обычки (Tanned Leather Jerkin и Druid's Hide) куются где угодно с начала, а Duskhide Wraps известны всем, но сидят на 75 навыке, привязанные к tannery. Заметьте, что сама клятва Outfitter приносится обратно в Eastbrook у Ottilie; только обучение происходит на болоте.",
+          "routeHeading": "Шедевры и рабочий путь к 125",
+          "routeBody": "От ступени marshstalker и выше каждое изделие катит шанс шедевра, а Pristine Hide в Mirewarden Jerkin дает бонус за подписанный реагент автоматически; osmium считается материалом 1-го уровня для срабатывания. Безхарактерные обычки из hide сработать не могут.\n\nПрокачивайте естественным путем: собирайте с каждого волка и вепря, которых убиваете с первого уровня, куйте ступень hide до 25 где стоите, затем учитесь в Fenbridge, ведь задания все равно тянут вас на болото. Marshstalker несет вас до 50, а mirewarden до 75; за этим Duskhide Wraps, рецепт 3-го уровня ценой шесть osmium ore, три Pristine Hide, два rough hide и Tanning Agent, платит полную отдачу до 99 и половину после, около 75 изделий на последние пятьдесят очков до предела в 125.\n\nМобильная tannery значит для этого ремесла больше, чем для любого другого: специализируйтесь на 75, и седельная сумка шкур становится готовым снаряжением у костра вместо похода обратно в Fenbridge. Рабочий заказ tannery Hesk покупает восемь rough hides каждые 30 минут, ладный доход со шкур, что вы и так собирали, а Книга деяний отмечает Tanner's Trade на 50 навыке и Grandmaster Leatherworking на пределе."
+        },
+        "cooking": {
+          "identityHeading": "Котел, что кормит группу",
+          "identityBody": "Съешьте приготовленное блюдо, и оно лечит вас за 18 секунд отдыха, что между заходами, это самое дешевое лечение в игре. Лестница идет от Pan-Seared River Perch на 90 здоровья до самого Marlow's Grand Roast на 980, крупнейшего сидячего лечения, что существует.\n\nНа кольце Cooking сидит между Alchemy и Leatherworking. Его живая пара, это Apothecary, Alchemy и Cooking, присягаемая перед Cook Marlow у кухонь Eastbrook после охоты на четырех диких вепрей для котла; пара Trapper с Leatherworking названа на кольце, но пока не имеет задания клятвы.",
+          "materialsHeading": "Кладовая, что кормится удочкой и ножом",
+          "materialsBody": "Fishing поставляет фирменные ингредиенты, зона за зоной: mirror trout и river perch из вод Eastbrook Vale, marsh pike и bog eel из Mirefen Marsh, frostgill trout и slatefin carp из Thornpeak Heights. Каждая ступень лестницы готовит рыбу своего уровня, так что повар, что ловит, никогда не остается без запаса.\n\nМясницкая сторона приходит с туш, прошедших сбор: game meat с вепрей и их родни, а на редкий или лучше бросок сбора, подписанный Prime Cut, центральная часть grand roast. Травы приправляют лучшие блюда, одно бревно ashwood коптит eel, а Cooking Salt идет по 8 меди за мешочек у собственного лотка Marlow.",
+          "ladderHeading": "От вяленого мяса до grand roast",
+          "ladderBody": "Salted Jerky, это полевой рецепт: известен с начала, одна spider leg, куется где угодно, походная еда каждого свежего искателя приключений. Лестница тренера готовит у кухонь Eastbrook на восточной стороне площади: бесплатная ступень на 0 навыке (perch, Hunter's Game Skewer, Herbed Marsh Pike), средняя ступень на 25 навыке по 25 серебра за рецепт (Ashwood Smoked Eel, Goldleaf Game Stew, Frostgill Chowder) и редкая ступень на 50 навыке по 1 золоту каждый (Silvered Carp Supper, Angler's Feast Platter, Marlow's Grand Roast).\n\nПартийные блюда растягивают ингредиенты: smoked eel и game stew дают по две порции за готовку, а feast platter, три. Marlow учит каждой ступени в тот миг, как ваш разряд в Cooking ее достигает.",
+          "routeHeading": "Специализация, а не шедевры, и путь к 125",
+          "routeBody": "Cooking, это честное исключение из истории шедевров: у блюда нет строки характеристик для улучшения, так что блюда не срабатывают никогда, и ни одному повару не стоит за этим гнаться. Мастерство ремесла, это специализация на 75: на пятую часть меньше каждого ингредиента, что быстро складывается на партийных блюдах, и мобильная полевая кухня, чтобы пир готовился у дверей подземелья.\n\nГотовьте то, что ловите: сочетайте подъем с рыбалкой, и два навыка кормят друг друга всю дорогу вверх. Jerky и бесплатная ступень несут вас до 25 по очку за готовку, средняя ступень до 50, а редкая до 75; за 75 пока нет блюда выше, так что редкие блюда гаснут до половины, а потом до четверти отдачи, примерно 150 готовок до предела. Относитесь к этому как к запасанию, а не гринду: гильдия съедает каждую порцию.\n\nРабочий заказ кухонь Marlow покупает восемь game meat каждые 30 минут за монеты и опыт, а Книга деяний отмечает Seasoned Chef на 50 навыке по пути к титулу Grandmaster Cooking на 125."
+        },
+        "alchemy": {
+          "identityHeading": "Бутылки, что выигрывают бои",
+          "identityBody": "Ремесло работается у apothecary в Highwatch, доме Alchemist Verane, Master of the Apothecary, что учит лестнице рецептов, продает Glass Vials по 12 меди и платит монетой за травы через свой рабочий заказ.\n\nНа кольце ремесел Alchemy сидит с ремеслами проб и ошибок, рядом с Engineering с одной стороны и Cooking с другой. Это дает ему два лица пары: Bombardier (Engineering и Alchemy, берется перед Tinker Gizzel в Eastbrook) и Apothecary (Alchemy и Cooking, присягаемая перед Cook Marlow). Настройтесь на любую пару, чтобы сделать Alchemy основным и открыть навык до самого предела; до тех пор оно работает до редкого уровня, как любое необъявленное ремесло.",
+          "materialsHeading": "Травы, железы и стекло",
+          "materialsBody": "Каждый draught хочет Glass Vial плюс травы под свою ступень: трава глянцелист растет в Eastbrook Vale, goldleaf в Mirefen Marsh, а sunpetal в Thornpeak Heights, по одной траве на зону, так что ваши бутылки взбираются по миру вместе с вами. Herbalism, это естественный напарник, хотя покупка у собирателей или на рынке работает ровно так же; более глубокие зоны держат грядки высших уровней, что просят лучший sickle, так что держите инструмент актуальным, если собираете сами.\n\nЛиния elixir добавляет охотничий ингредиент: Venom Glands, снятые с ядовитых туш, а верхний elixir просит Pristine Venom Gland, подписанный редкий образец, что подбрасывает удачный сбор с туши. Если вы не собираете сами, это ровно те товары, что стоит попросить принести друга-охотника.",
+          "ladderHeading": "Лестница рецептов",
+          "ladderBody": "Каждый знает Minor Healing Potion с начала и может смешать ее где угодно, без станка. Настоящая лестница, это девять рецептов, которым учит Verane у apothecary, три на каждой ступени: рецепты на 0 навыке бесплатны, ступень на 25 навыке стоит 25 серебра за рецепт, а ступень на 50 навыке, 1 золото за рецепт. Каждая ступень, это исцеляющий draught, draught маны и elixir стойкости, шагая от обычных бутылок с травой глянцелист (120 здоровья, 160 маны) через необычные goldleaf (200 здоровья, 260 маны) к редким sunpetal (280 здоровья, 360 маны).\n\nElixirs взбираются так же: Elixir of the Boar дает 6 Стойкости на 10 минут, Vipersear Elixir, 9 на 15 минут, а Elixir of the Serpent, 12 на 15 минут, варя по две бутылки за готовку. Еще один рецепт сидит в стороне: Elixir of the Bear, комбинированное варево, которому Verane учит за 25 серебра, как только ваш Alchemy достигает 25, смешиваемое где угодно, но только настроенным Bombardier с Alchemy и Engineering на 25.",
+          "routeHeading": "Путь пивовара к 125",
+          "routeBody": "Draughts и elixirs не катят шедевры никогда; это срабатывание принадлежит снаряжению с характеристиками. Ваше имя все же путешествует: редкие draughts sunpetal варятся по одной бутылке за раз и приходят с подписью мастера, тогда как двойная партия Elixir of the Serpent остается простой. На 75 навыке вы специализируетесь, и каждый рецепт Alchemy стоит на 20 процентов меньше материалов с этого момента.\n\nВозьмите Herbalism рано и собирайте по мере прокачки: трава глянцелист повсюду в Vale, и как только вы доберетесь до стола Verane, бесплатная ступень чисто донесет вас до 25 навыка на травах, что вы и так бы собрали. Выучите ступень 25 в тот миг, как она включится, перенесите сбор на болото за goldleaf и пусть рабочий заказ Verane (шесть Goldleaf Herbs за 45 меди, повторяемый каждые 30 минут) возвращает немного монет по ходу.\n\nС 50 варите draughts sunpetal и партии Serpent из трав Thornpeak. Последний отрезок с 100 до 125, это намеренный ручеек, так что варите то, что реально продается, а не жгите травы ради числа, и помните, что расходники, это единственный крафтовый товар, который каждый перекупает вечно. Книга деяний отмечает Strange Brews на 50 навыке и Grandmaster Alchemy на пределе."
+        },
+        "engineering": {
+          "identityHeading": "Монополия мастера инструментов",
+          "identityBody": "Ремесло работается в toolworks в юго-восточном углу Eastbrook Square, доме Tinker Gizzel, Master of the Toolworks. Уровни с 1 по 3 каждой линии инструментов, это обычный товар торговца; уровни 4 и 5 существуют только через инженера.\n\nНа кольце оно сидит с ремеслами проб и ошибок, рядом с Alchemy и Armorcrafting, давая ему два лица пары: Bombardier (Engineering и Alchemy, берется перед самим Gizzel) и Шестерёнщик (Armorcrafting и Engineering, названа, но пока не присягаема). Одно предупреждение важнее здесь, чем где-либо: обе ступени рецептов Engineering сидят выше потолка редкого уровня, под которым работают хобби и необъявленные ремесленники, так что число навыка движется только у ремесленника, чьи основные включают Engineering, а сегодня это Bombardier. Строить инструменты может любой; ненастроенный ремесленник просто ничему не учится, делая их.",
+          "materialsHeading": "Реагенты и прежние инструменты",
+          "materialsBody": "Каждый рецепт инструмента потребляет инструмент на уровень ниже плюс премиальный материал: четыре Osmium Ore и Небосеребряная кирка становятся Osmium Mining Pick, затем два слитка глифостали и та осмиевая кирка становятся Glyphsteel Mining Pick, а линии axe и sickle повторяют ту же форму с Ashwood и бревнами горной сосны, Goldleaf и Sunpetal Herbs.\n\nGizzel держит все шесть премиальных реагентов в toolworks, если вам нужна скорость вместо маржи, но руда, бревна и травы все добываются в Mirefen Marsh и Thornpeak Heights, и именно в добытом запасе живет прибыль. Единственное исключение, это слиток глифостали, что только у торговца, так что каждый инструмент уровня glyphsteel несет фиксированный монетный пол, встроенный в его цену.",
+          "ladderHeading": "Лестница инструментов",
+          "ladderBody": "Вся лестница, это шесть рецептов, все привязаны к станку toolworks и все известны автоматически, никакой платы тренеру: инструменты 4-го уровня pick, axe и sickle на 75 навыке, а версии 5-го уровня на 150 навыке. Это второе число не опечатка, и оно сидит выше нынешнего предела в 125 нарочно: требования навыка здесь никогда не запирают ремесло, они лишь формируют его прирост, так что вы можете построить инструмент 5-го уровня в тот день, как держите его реагенты и его предшественника 4-го уровня.\n\nКаждый готовый инструмент редкого или эпического качества и выходит подписанным, так что ваше имя катается по зонам на поясах других игроков. Engineering также держит половину одного комбинированного рецепта: Elixir of the Bear, который варит настроенный Bombardier с Engineering и Alchemy на 25.",
+          "routeHeading": "Путь инженера к 125",
+          "routeBody": "Инструменты не несут боевых характеристик, так что они не катят шедевры никогда; это срабатывание принадлежит снаряжению с характеристиками. Специализация все же приходит на 75 навыке: на 20 процентов меньше материалов за готовку и временный полевой toolworks, что превращает любую вылазку за добычей в мастерскую. Математика прироста здесь почти не гаснет: рецепты 75 навыка платят полную отдачу до 100 и половину после, а рецепты 150 навыка платят полную отдачу до самого предела в 125, так что реальное ограничение, это реагенты и монеты, а не серые рецепты.\n\nСначала выберите пару, ведь без нее ничего не движется: возьмите настройку Bombardier у Tinker Gizzel. Затем кормите лестницу: качайте Mining, Logging или Herbalism сами или заводите друзей-собирателей, покупайте инструменты 3-го уровня у торговцев и относитесь к рабочему заказу Gizzel (восемь Ironbark Logs за 16 меди, повторяемый каждые 30 минут) как к карманным деньгам.\n\nEngineering, это малотиражное престижное ремесло, примерно одно очко навыка за готовый инструмент, так что относитесь к каждой готовке как к товару на продажу. Реклама для клиентов пишется сама: каждый уровень инструмента выше уровня жилы срезает 0,4 секунды с 2,5-секундного заброса сбора (до пола в 1,5 секунды), так что инструмент 5-го уровня, это ускорение на каждой жиле в мире, а сделать его можете только вы. Книга деяний отмечает Cogs and Sprockets на 50 навыке и Grandmaster Engineering на 125."
+        },
+        "enchanting": {
+          "identityHeading": "Снаряжение врозь, сила обратно внутрь",
+          "identityBody": "Нет ни станка, ни тренера, ни списка рецептов для покупки: каждые чары известны с начала, разбирать может любой с первого дня, а навык упирается в 125, как у каждого ремесла.\n\nНа кольце оно сидит между Inscription и Jewelcrafting, так что два его лица пары, это Arcanist (Inscription и Enchanting) и Gembinder (Enchanting и Jewelcrafting). Ни одной пока нельзя присягнуть, ведь оба соседа ждут своих первых рецептов, так что сегодня Enchanting взбирается как ремесло каждого: бесплатное до редкого уровня до любой клятвы и естественный выбор хобби для Bombardier или Apothecary. Enchanters также держат мир сбора на ходу: три вставляемых эффекта инструментов, это работа Enchanter, а исходный мастер перезаряжает свои эффекты со скидкой, еще глубже после специализации.",
+          "levelingHeading": "Как растет enchanting",
+          "levelingBody": "Навык движут два действия: разбор вещи и наложение чар. Каждый успех стоит до одного очка, масштабируясь по серьезности работы: редкость вещи, что вы ломаете, или уровень реагента чар, что вы накладываете. Обычные разборы и чары только на пыли считаются как обычная работа; необычные разборы и чары на essence, как необычная; редкие разборы и каждые Runed или Greater чары, как редкая; эпические и легендарные разборы, еще выше.\n\nЗнакомое угасание мастерства работает на 25-очковых уровнях, так что работа обычного сорта сереет на 75 навыке, необычная работа на 100, а работа редкого уровня ровно на пределе в 125. У Enchanting есть и своя доброта: вход выше потолка вашего архетипа округляется вниз до этого потолка, а не обнуляется, так что до настройки эпический разбор просто считается как редкий, а не учит ничему. Если Enchanting окажется спящим за другим призванием, все считается как обычная работа, и подъем застревает на 75; держите его хобби, и работа редкого уровня все еще платит, просто медленнее за 75.",
+          "marketHeading": "Зачарованные копии, происхождение и рынок",
+          "marketBody": "Наложение чар потребляет реагенты и помечает одну конкретную копию вещи. Направьте их на копию в сумке, и вы получите отдельную зачарованную копию; направьте на уже надетую вещь, и она зачаровывается на месте, без снятия и повторного надевания. В любом случае бонус следует за вещью вечно, через снятия, походы в банк и обмены. Одни чары на вещь: наложение других чар на зачарованную копию сначала просит подтверждения, а затем прямо заменяет старые чары, уничтожая их без возврата материалов. Продажа, выброс и разбор все предпочитают сначала простые копии, так что ваша готовая вещь не съедается по случайности. Одинаково зачарованные копии даже складываются вместе в ваших сумках.\n\nСнаряжение-шедевр и enchanting дружат: вещь-шедевр остается полностью зачаровываемой, а чары добавляются поверх бонуса шедевра, не тревожа ни его, ни подпись мастера. Складывая все источники, подписанный шедевр с чарами Greater, это лучшее, что бывает у крафтовой вещи, и он все равно сидит ниже рейдовой добычи по замыслу.\n\nНа рынке зачарованная или подписанная вещь выставляется как любая другая: отдельной позицией на одну штуку, подсказка показывает чары и метку мастера, а Вранья почта доставляет ее так же исправно. Материалы остаются надежной половиной ремесла: Dust, Essence и Shards выставляются свободно, выставление ничего не стоит, а Торговец берет 5 процентов только с завершенной продажи. Это делает два классических дохода enchanter продажей материалов на рынке и приемом вещи клиента в обмен, зачаровыванием ее и возвратом."
+        }
+      },
+      "howHeading": "Как устроено ремесло",
+      "howBody": "Откройте окно ремесла (клавиша T по умолчанию) с материалами на руках; рецепты, привязанные к станку, требуют стоять у нужного станка, а полевые рецепты доступны где угодно.",
+      "recipesHeading": "Рецепты",
+      "recipesNote": "Каждый рецепт, его точные требования к навыку и материалам, место обучения и значения навыка, на которых его рост угасает.",
+      "masteryHeading": "Рост навыка",
+      "masteryBody": "Каждые {step} очков навыка дают одну ступень: рецепт на вашей ступени или выше дает полный рост, на ступень ниже дает половину, на две ступени четверть, а на три и более ничего; предел этого ремесла {cap}.",
+      "masterworkHeading": "Шедевры",
+      "masterworkBody": "Каждое удачное изделие имеет {base}% шанса стать шедевром, плюс {perTier}% за каждую ступень выше рецепта, {signed}% за любой подписанный реагент и {spec}% при специализации, но не выше {cap}%.",
+      "trainingHeading": "Обучение",
+      "trainingBody": "Мастер учит рецепту, когда ваша ступень в этом ремесле достигает ступени самого рецепта: рецепты ступени 0 бесплатны, ступень 1 стоит {tier1}, ступень 2 стоит {tier2}.",
+      "specializationHeading": "Специализация",
+      "specializationBody": "Достигнув навыка {at}, вы специализируетесь в этом ремесле, и материалы рецептов дешевеют на {pct}%.",
+      "ench": {
+        "disenchantHeading": "Распыление",
+        "disenchantNote": "Распыление берет любое оружие или доспех обычного качества и выше и уничтожает одну копию, сперва обычную, а не зачарованную; если остались только зачарованные копии, одна из них уничтожается вместе с чарами. Обычные и необычные вещи дробятся в горсть пыли перезвона, чуть богаче для более редких и высокоуровневых вещей; от редкого и выше выход меняет форму: ровно одна эссенция перезвона из редкой вещи или один осколок перезвона из эпической или легендарной, плюс типовой дополнительный материал, привязанный к тому, из чего была сделана вещь.",
+        "typedHeading": "Типовые побочные материалы",
+        "typedNote": "Вещи редкого качества и выше дают еще и типовой побочный материал с привязкой при передаче: {rare} с редкой вещи, от {epicMin} до {epicMax} с эпической или легендарной.",
+        "colSource": "Из чего",
+        "meleeWeapons": "Оружие ближнего боя",
+        "timberWeapons": "Посохи, жезлы, луки и арбалеты",
+        "enchantsHeading": "Чары",
+        "enchantsNote": "Чары делятся на три уровня. Базовый уровень работает на пыли перезвона (с небольшим добавлением эссенции на высоком конце) и покрывает слот оружия плюс каждый слот доспеха кроме второй руки, с достаточным выбором по осям характеристик, чтобы каждая сборка нашла что-то для каждого слота. Высший уровень стоит один осколок перезвона плюс эссенцию и единственное применение осколков: более сильные бонусы для слотов с наибольшим влиянием.\n\nМежду ними пять рунных зачарований, по одному на каждый типовой дополнительный материал, так что ничто из того, что вы дробите, не становится тупиком: Runed Edge (оружие, Сила, расходует Resonant Steel), Runed Sigil (оружие, Интеллект, Resonant Timber), Runed Weave (нагрудник, Дух, Resonant Thread), Runed Hide (поножи, Ловкость, Resonant Hide) и Runed Links (шлем, Стойкость, Resonant Links). Каждое также берет две эссенции перезвона; там, где слот и характеристика имеют и базовое, и высшее зачарование, рунный бонус располагается между ними, тогда как Runed Weave, это самое сильное зачарование нагрудника на Дух вообще, а Runed Hide, это единственное зачарование поножей на Ловкость вовсе. Точные бонусы все в таблице ниже.",
+        "colEnchant": "Чары",
+        "colSlot": "Слот",
+        "colTier": "Ступень",
+        "colBonus": "Бонус",
+        "tier": {
+          "base": "Базовые",
+          "runed": "Рунные",
+          "greater": "Великие"
+        },
+        "salvageHeading": "Утилизация",
+        "salvageNote": "Любой может разобрать оружие или доспех на обычные материалы согласно качеству; навык наложения чар не нужен.",
+        "bonusFmt": "+{value} к {stat}"
+      },
+      "gatherIntro": {
+        "mining": "Горное дело добывает руду прямо из камня мира: медь в Истврукской долине, железо в Мирефенской топи и осмий на Терновых высотах, питая кузнечные ремёсла. Открыто для всех с 1 уровня: нужна лишь кирка в сумках, 20 меди в любом узловом городе. Ведётся на собственном счётчике до предела в 100.",
+        "logging": "Лесозаготовка валит лес в рощах всех трёх зон: железнокорое дерево в Истврукской долине, пепельное дерево в Мирефенской топи и горную сосну на Терновых высотах, сырьё для древков, посохов и стола инженера. Открыта для всех с 1 уровня, нужен лишь лесорубный топор в сумках (20 меди в любом узловом городе), ведётся на собственном счётчике до предела в 100.",
+        "herbalism": "Травничество собирает дикорастущее: глянцелист в Истврукской долине, золотолист в Мирефенской топи и солнцелепест на Терновых высотах, лист и стебель, на которых держатся аптечные ремёсла. Открыто для всех с 1 уровня, нужен лишь серп травника в сумках (20 меди в любом узловом городе), ведётся на собственном счётчике до предела в 100.",
+        "fishing": "Рыбная ловля тянет улов из открытой воды каждой зоны в ритме поклевки и подсечки и ограничена 200."
+      },
+      "rhythmHeading": "Ритм сбора",
+      "rhythmBody": "Сбор идет как видимое действие: базовые {base} секунды, не короче {floor}; каждая ступень инструмента выше залежи срезает {tool} секунды, а каждый разряд мастерства еще {band}.",
+      "gainBody": "Каждые {step} мастерства дают одну ступень роста, сверяемую с уровнем залежи: низкие залежи постепенно перестают учить, а залежи повыше доводят до предела {cap}.",
+      "nodesHeading": "Залежи по зонам",
+      "nodesNote": "Где лежат залежи, их уровень, нужный инструмент и добыча; каждая залежь возрождается лично для вас через {respawn} секунд после вашего сбора.",
+      "toolsHeading": "Инструменты",
+      "toolsNote": "Для каждой залежи нужен инструмент её ремесла в сумках, включая 1-й уровень: нет кирки, нет руды, нет удочки, нет рыбы. Торговая лестница охватывает уровни с 1-го по 3-й, и каждый узел держит только те уровни, которых требует его собственная земля, поэтому инструмент 1-го уровня продаётся в узле каждой зоны, а ступени выше продаются там, где лежат жилы, которым они нужны. За эти ступени торговцы спрашивают ещё и мастерство в самом ремесле инструмента: {tier2Prof} для 2-го уровня и {tier3Prof} для 3-го, и строка называет это требование. Инструменту достаточно лежать в сумках, ячейки экипировки и прочности у него нет, так что каждый покупается один раз, а то, чем вы уже владеете, продолжает работать. На ограничение влияет только уровень: более редкий инструмент того же уровня не открывает ничего сверх того. Но редкость не только цвет. Она продлевает вставленный эффект инструмента, а на удочке расширяет окно подсечки.\n\nХороший инструмент даёт три вещи, а не две. Он открывает землю более высокого уровня, сокращает сбор и улучшает то, что выходит: обработайте жилу инструментом рангом ВЫШЕ собственного материала зоны, и добыча даст тонкий сорт вместо обычного. Жила должна быть одной из полносортных жил зоны, поэтому лёгкие жилы, которые зона хранит для странников, по-прежнему дают обычный материал. Тонкие материалы — это то, что потребляют рецепты кованых инструментов, и тонкий сорт считается своей обычной версией всюду, где рецепт или наряд просит обычную, так что улучшение никогда не заводит в тупик: ваша медная руда просто приходит как тонкая медная руда.\n\nВыше торговой лестницы у каждого ремесла есть два кованых инструмента, 4-го и 5-го уровня, сделанные инженерами в мастерской инструментов или купленные за метки вылазок у стойки Утонувшей литании. Ни один торговец не продаёт их за монету. У рыбалки своя пара, и ей учат у мастера инструментов, а не знают с самого начала. Сегодня ни одна залежь и ни одна вода не требуют больше 3-го уровня, поэтому две верхние ступени покупают скорость, сорт и более щадящее окно подсечки, а не доступ, и они станут входным билетом, когда появится земля более высокого уровня.",
+      "toolCrafted": "Создается ({craft})",
+      "toolCraftedOrMarks": "Изготовление ({craft}) или {marks} меток вылазок",
+      "toolCraftedOrMarksHeroic": "Изготовление ({craft}) или {marks} меток вылазок после героического прохождения Утонувшей Литании",
+      "toolVendor": "{name} ({hub})",
+      "toolUnavailable": "Не продается",
+      "priceNone": "Не продается",
+      "toolTierReq": "Инструмент {tier} уровня",
+      "colWield": "Нужно мастерство",
+      "wieldNone": "Любое",
+      "yieldsHeading": "Что дает сбор",
+      "yieldsBody": "Каждый сбор катит качество для того, что он дает, и ваше мастерство, это вся история этого броска. Совсем новый собиратель всегда тянет обычный материал; каждое очко навыка стабильно переносит вес из обычного в высшие сорта и никогда назад, пока на пределе в 100 обычный сорт не исчезнет совсем: 60 процентов необычного, 30 процентов редкого, 8 процентов эпического и 2 процента легендарного, каждый раз.\n\nКачество означает и количество: обычный бросок дает 1 единицу, необычный и редкий дают 2, эпический 3, а легендарный 4. Любая редкая, эпическая или легендарная добыча приходит подписанным экземпляром с клеймом Gathered by you: на пределе это четыре сбора из десяти несут ваше имя, а правила происхождения на странице Crafting Economy объясняют, почему ремесленники платят сверху ровно за такие стопки.",
+      "bandsHeading": "Разряды мастерства",
+      "bandsBody": "Разряды мастерства ускоряют сбор, а в рыбной ловле еще и открывают таблицы улова.",
+      "bandFmt": "Разряд {band}: с {at} мастерства",
+      "rareHeading": "Редкие находки",
+      "rareBody": "Каждый сбор с шансом 1 к {oneIn} оборачивается редкой находкой: добыча умножается на {mult}, всегда подписана, и о ней узнает вся зона.",
+      "specimenBody": "Разделка туш может принести подписанный безупречный образец: примерно {pct}% разделок выпадают редкими или выше.",
+      "gatherDeedsHeading": "Деяния по пути",
+      "gatherDeeds": {
+        "mining": "Ваша первая жила любого ремесла зарабатывает Fruits of the Field, а предел в 100 в Mining вписывает Ore in the Blood. Достижение 100 в любых трех из Mining, Logging, Herbalism и Fishing добавляет Master Gatherer при 25 Известности, а вскрытие pristine vein записывает собственную коллекционную отметку. Ничто из этого не дает силы: деяния, это титулы и Известность, летопись дорог, что вы прошли.",
+        "logging": "Ваша первая жила любого ремесла зарабатывает Fruits of the Field, а предел в 100 в Logging вписывает Heartwood Hewer. Достижение 100 в любых трех из Mining, Logging, Herbalism и Fishing добавляет Master Gatherer при 25 Известности, а срез ancient heartwood записывает собственную коллекционную отметку. Деяния, это только титулы и Известность, никогда не сила.",
+        "herbalism": "Ваша первая жила любого ремесла зарабатывает Fruits of the Field, а предел в 100 в Herbalism вписывает Master of the Meadow. Достижение 100 в любых трех из Mining, Logging, Herbalism и Fishing добавляет Master Gatherer при 25 Известности, а moonlit bloom записывает собственную коллекционную отметку. Деяния, это только титулы и Известность, никогда не сила.",
+        "fishing": "Рубеж в 100 вписывает Old Salt, а 200 вписывает Master Angler с его титулом, самую вершину искусства рыбака; Fishing также засчитывается в Master Gatherer, зарабатываемый при 100 в любых трех собирательских ремеслах. Первая рыба из вод каждой зоны заполняет свою страницу, а Кои солнечного блика записывает Glimmer of Hope, так что путники с удочкой в котомке заполняют книгу быстрее, чем ожидают."
+      },
+      "fish": {
+        "startHeading": "С чего начать",
+        "startBody": "Simple Fishing Pole стоит 20 меди у Fisherman Brandt в Eastbrook (ищите Old Salt, что зыркает на Mirror Lake с восточной окраины города); Tinker Gizzel, Provisioner Hale в Fenbridge и Quartermaster Bree в Highwatch тоже держат удочки. Используйте удочку лицом к воде, достаточно глубокой, чтобы держать рыбу, примерно до 24 ярдов перед вами, и ваш поплавок улетает.\n\nНельзя забрасывать в бою, вплавь или мертвым: заброс с берега, это задуманная поза, и любая рыбная вода годится, в каждой зоне.",
+        "biteHeading": "Поклевка и подсечка",
+        "biteBody": "Поклевка приходит через {min}-{max} секунд после заброса (хорошее удилище срезает до {rod} секунд ожидания), окно подсечки длится {reel} секунды плюс {reelRod} за каждую ступень удилища выше первой, а сессия не дольше {cap} секунд.",
+        "earlyReelNote": "Предостережение нетерпеливым: нажмите на удочку до поклевки, и вы вытянете пустую леску, а заброс закончится (короткая передышка сразу после заброса прощает случайное двойное нажатие). Терпение и есть вся рыбалка: дождитесь поклевки, потом подсекайте.",
+        "scheduleHeading": "Рост мастерства",
+        "scheduleNote": "Рост в рыбной ловле идет по жесткой шкале мастерства, а хлам с {cutoff} и дальше не учит ничему.",
+        "colProficiency": "Мастерство",
+        "colGain": "Рост за улов",
+        "belowFmt": "Ниже {below}",
+        "tablesHeading": "Таблицы улова",
+        "tablesNote": "Точные шансы улова по зонам для каждого разряда; в каждой строке редким уловом остается {rare}.",
+        "bandHeading": "Разряд {band}: мастерство от {at}, удилище {rod} уровня",
+        "colCatch": "Улов",
+        "colOdds": "Шанс",
+        "pctFmt": "{pct}%",
+        "emptyHook": "Не клюет",
+        "koiHeading": "Кои солнечного блика",
+        "koiBody": "Каждый водоем в игре прячет один и тот же приз: Кои солнечного блика, необычный проблеск на леске стоимостью 75 меди для торговца и куда больше для вашей гордости. Его шансы, это ровные 3 процента за пойманный улов (4 процента в холодной воде Thornpeak) на каждой полосе, и поимка одного записывает Glimmer of Hope в вашу Книгу деяний, коллекционную отметку с нулевой Известностью. Когда это случается, журнал позаботится, чтобы вы узнали."
+      },
+      "econ": {
+        "title": "Экономика ремесел",
+        "intro": "Точные пошлины, стоки и выплаты, на которых держится экономика ремесел.",
+        "feesHeading": "Пошлины и стоки",
+        "feesNote": "Все ремесленные пошлины: от золотого стока за изделие до доли рынка.",
+        "feeCraft": "Плата за изделие",
+        "feeCraftValue": "{fee} за очко бюджета предмета",
+        "feeMarket": "Доля рынка",
+        "feeMarketValue": "{pct}% с завершенной продажи",
+        "feeDeposit": "Залог за лот",
+        "feeDepositValue": "Нет",
+        "feeUnbind": "Снятие привязки",
+        "feeUnbindValue": "{uncommon} за необычное, {rare} за редкое, {epic} за эпическое",
+        "trainingHeading": "Плата за обучение",
+        "trainingNote": "Одна фиксированная плата за ступень рецепта, взимается один раз при обучении у мастера.",
+        "trainingTierFmt": "Ступень {tier}: {fee}",
+        "free": "Бесплатно",
+        "sellsHeading": "Что продается и почему",
+        "sellsBody": "Самый стабильный бизнес, это расходники, ведь их тратят и покупают снова. Зелья, приготовленная еда и чары все исчезают с использованием: боец, что купил меч однажды, будет покупать исцеляющие зелья вечно, а каждая свежая вещь снаряжения, это свежий шанс продать чары.\n\nВещи-шедевры, это премиальный край. Их нельзя сделать на заказ, так что одна желанная вещь берет реальную наценку, а ваша подпись на ней, это ходячая реклама. Реагенты, это третий столп: арканные материалы с разбора, типизированные вторичные Resonant, что текут прямо от ломателя к enchanter, и подписанные добытые материалы, за которые ремесленники, гонящиеся за срабатыванием шедевра, платят сверх меры.",
+        "marketHeading": "Мировой рынок и его доля",
+        "marketBody": "Мировой рынок, это общая для королевства биржа, что держат Merchant в Eastbrook и Auctioneer Voss в Highwatch. Выставление бесплатно: депозита нет, а непроданная позиция просто возвращается к вам. Дом берет свою долю только когда что-то реально продается: 5 процентов от цены продажи, а остальное ждет, чтобы вы забрали.\n\nОсобые вещи тоже принимаются: подписанная, шедевральная или зачарованная копия выставляется отдельной позицией на одну штуку, и подсказка несет ее полную личность, с подписью и всем; с простой стопкой она никогда не смешивается. Единственный отказ, это связанная копия: вещь, запертая Узами Мастера или еще ждущая привязки, не попадает ни на Рынок, ни в почту, так что узы нельзя отмыть. Оценивайте особую работу сами; простые позиции лишь говорят, что берет простая версия.",
+        "workOrdersHeading": "Рабочие заказы",
+        "workOrdersNote": "Каждый мастер платит {pct}% от торговой цены за связку своего ходового материала, и заказ повторяется каждые {minutes} минут.",
+        "colOrder": "Заказ",
+        "colMaster": "Мастер",
+        "colAsks": "Просит",
+        "colPays": "Платит",
+        "commissionsHeading": "Заказы и Узы мастера",
+        "commissionsBody": "Добровольное изделие на заказ несет Узы мастера: вещь привязывается к тому, кто получит ее в обмене, и любой мастер у станка снимет привязку за ступенчатую плату.",
+        "provenanceHeading": "Подписанные работы",
+        "provenanceBody": "Изделия и находки редкого качества и выше несут подпись мастера, и одинаково подписанные вещи по-прежнему складываются в стопки.",
+        "collectorsHeading": "Коллекционеры, трофеи и цена истории",
+        "collectorsBody": "Торговцы слепы к происхождению: подписанная вещь продается NPC ровно по своей простой цене. Наценка за подпись существует только между игроками, что как раз и делает ее интересной: стопка руды-находки, подписанная знаменитым собирателем, Prime Cut с удачного сбора, шедевральный клинок с именем ремесленника, что с тех пор ушел на покой, все стоят столько, сколько говорит чья-то память.\n\nКнига деяний играет на том же инстинкте: Pristine Vein, Ancient Heartwood, Moonlit Bloom, A Perfect Specimen и Glimmer of Hope, это коллекционные отметки с нулевой Известностью, что существуют лишь ради доказательства, что миг случился с вами. Сохраните вещь, что заработала деяние, и вы держите расписку. Ничто из этого не сила; происхождение не покупает характеристик и не выигрывает боев, это бумажный след хороших дней игры.",
+        "castPaceHeading": "Время применения и золотой сток",
+        "castPaceBody": "Действия профессий занимают реальное время: простые полевые рецепты занимают чуть меньше двух секунд, высокие ступени лестницы несколько секунд, а распыление, наложение чар, разбор и перезарядка эффектов инструментов имеют короткую фиксированную длительность. Отмена посреди применения ничего не тратит. За каждое успешное изготовление также взимается медный сбор, пропорциональный бюджету предмета. Вместе с материалами, станками и потолками навыка этот темп удерживает рынок без отдельной квоты действий. Точные длительности по диапазонам навыка перечислены ниже.",
+        "castPaceField": "Полевые рецепты (без требования к навыку): применение {seconds} с",
+        "castPaceSkill25": "Рецепты до навыка 25: применение {seconds} с",
+        "castPaceSkill50": "Рецепты до навыка 50: применение {seconds} с",
+        "castPaceSkill75": "Рецепты до навыка 75: применение {seconds} с",
+        "castPaceCombo": "Вершина лестницы и комбинированные рецепты: применение {seconds} с",
+        "castPaceEnchantFamily": "Распыление, наложение чар и разбор: применение {seconds} с",
+        "castPaceRecharge": "Перезарядка эффекта инструмента: применение {seconds} с",
+        "castPaceBatch": "Партия: до {count} за один заказ, каждое изделие со своим применением",
+        "doctrineHeading": "Игроки торгуют с игроками",
+        "doctrineBody": "Сила созданных вещей всегда ниже рейдового порога, а перечисленные пошлины гонят товары в обмен между игроками, а не по кругу торговцев."
+      },
+      "faq": {
+        "title": "Ремесла: вопросы и ответы",
+        "intro": "Короткие ответы на вопросы, которые мастера задают чаще всего.",
+        "q1": "Сколько ремесел можно выучить?",
+        "a1": "Каждый персонаж может поднять все восемь прокачиваемых ремесел и все четыре ремесла сбора; единственным выбором остается призвание.",
+        "q2": "Где учат рецептам?",
+        "a2": "Рецепты учительской лестницы дают мастера у своих станков, а девять общих полевых рецептов и рецепты инструментов известны всем с самого начала.",
+        "q3": "Нужен ли инструмент для сбора?",
+        "a3": "Залежи 1 уровня берутся голыми руками; залежи 2 и 3 уровня требуют подходящий инструмент не ниже их уровня.",
+        "q4": "Почему навык перестал расти?",
+        "a4": "Кривая мастерства гасит рост до половины, четверти и нуля по мере того, как рецепт опускается ниже вас, и каждое ремесло останавливается на своем пределе.",
+        "q5": "Что такое шедевр?",
+        "a5": "У каждого изделия есть небольшой шанс (от 3% до предела 15%) выйти на ступень качества выше, но никогда выше рейдового порога.",
+        "q6": "Что значит подпись мастера на вещи?",
+        "a6": "Девять общих полевых рецептов и рецепты инструментов известны каждому с самого начала, как и три привязанных к станции высших рецепта (Мантия печной чешуи, Капюшон Стражеткани и Обмотки Сумеречной шкуры): им не нужен наставник, нужна только их станция. Всему остальному учат мастера при своих станциях в трёх узловых городах: большинство находится в Истбруке, кожевник держит дубильню в Фенбридже, а алхимик держит аптеку в Хайвотче.\n\nРецепты наставников идут ступенями на уровнях навыка 0, 25 и 50 и стоят единовременно бесплатно, 25 серебра и 1 золото. Мастер обучает рецепту, как только ваш разряд в этом ремесле достигает разряда самого рецепта, и учиться нужно стоя у его станции: передвижная станция не считается.",
+        "q7": "Что такое Узы мастера?",
+        "a7": "Изделие на заказ привязывается к тому, кто получит его в обмене, и любой мастер у станка снимет привязку за ступенчатую плату.",
+        "q8": "Можно ли сменить призвание?",
+        "a8": "Пара, которой вы никогда не держали, берется одним новым заданием настройки, а возврат к прежней паре требует искупительного поручения, дорожающего с каждой сменой."
+      }
     },
     "economy": {
       "intro": "Монеты смазывают весь мир: на них покупают снаряжение, припасы и походный набор, и они переходят из рук в руки между игроками. Всё это приходит к вам просто по ходу игры, так что считайте эту страницу картой того, откуда берутся и куда уходят ваши деньги.",
@@ -3694,7 +4756,7 @@ export const ru_RU: EnTranslations = {
       "tradeBody": "Вы можете торговать лицом к лицу с любым, кто стоит рядом с вами. Вы оба кладёте предметы и монеты в общее окно, и обмен происходит, только когда вы оба его подтвердите, так что ни одну из сторон не обманут. Это простой способ передать другу добычу или уладить сделку.",
       "mailTitle": "Вороновая почта",
       "mailBody": "В каждом узловом городе стоит резной вороний столб: почтовый ящик Вороновой почты, почтовой службы королевства. Встаньте у него, чтобы написать любому персонажу по имени, другу в сети или давно вышедшему, и приложите к письму монеты или вещи за небольшой почтовый сбор. Ворону нужно время на перелёт; когда он приземляется, значок конверта сообщает получателю, что его что-то ждёт.",
-      "mailHow": "Получение работает так же, только наоборот: встаньте у любого столба, чтобы прочесть письма и забрать их содержимое в кошелёк и сумки. Письма не ждут вечно, так что забирайте их, пока ворон не махнул на вас крылом. Две вещи почта отвергает наотрез: персональные предметы и квестовые вещи путешествуют с вами или никак. И поглядывайте на столб после удачной сдачи задания; иные из тех, кто выдаёт задания, пишут письма.",
+      "mailHow": "Получение работает так же, только наоборот: встаньте у любого столба, чтобы прочесть письма и забрать их содержимое в кошелёк и сумки. Письма не ждут вечно, так что забирайте их, пока ворон не махнул на вас крылом. Кое-что почта отвергает наотрез: персональные предметы, квестовые вещи и связанные, или ждущие привязки при обмене, предметы путешествуют с вами или никак. И поглядывайте на столб после удачной сдачи задания; иные из тех, кто выдаёт задания, пишут письма.",
       "dailyTitle": "Ежедневные награды",
       "dailyBody": "Кнопка с сундуком на экране открывает окно ежедневных наград. Каждый день предлагает несколько задач: выполнять задания, сражаться в Пепельном Колизее, выигрывать матч Кубка Долины, а также даёт бесплатный поворот колеса призов, и всё это приносит очки в дневной зачёт, а лучшие за день делят призовой фонд для владельцев необязательного токена сообщества. Ничто из этого не даёт силы в игре. Само окно разъясняет правила дня и условия участия, показывает таблицу лидеров и хранит вашу историю.",
       "marketTitle": "Мировой рынок",
@@ -4107,6 +5169,7 @@ export const ru_RU: EnTranslations = {
       "terrainCapReached": "Достигнут лимит правок рельефа ({max}). Лишние штампы не были добавлены.",
       "placementCapReached": "Достигнут лимит размещений ({max}). Лишние объекты не были добавлены.",
       "blockerCapReached": "Достигнут предел невидимых стен ({max}). Новая стена не добавлена.",
+      "campCapReached": "Достигнут предел лагерей ({max}). Новый лагерь не добавлен.",
       "autosaveOff": "Автосохранение отключено: {reason} Сохраните вручную, затем включите снова."
     },
     "confirm": {
@@ -4288,6 +5351,7 @@ export const ru_RU: EnTranslations = {
   "stats": {
     "title": "Статус игрового мира",
     "accountsCreated": "Игроки",
+    "charactersCreated": "Персонажей создано",
     "playersOnline": "Игроков в сети",
     "realmName": "Название игрового мира"
   },
@@ -4321,7 +5385,9 @@ export const ru_RU: EnTranslations = {
     "error": "Не удалось загрузить обновления. Попробуйте позже.",
     "empty": "Обновлений пока нет: загляните позже.",
     "prerelease": "Предварительная версия",
-    "viewOnGithub": "Открыть на GitHub"
+    "viewOnGithub": "Открыть на GitHub",
+    "new": "Новое",
+    "viewAll": "Смотреть все обновления на GitHub"
   },
   "download": {
     "title": "Скачать загрузчик для ПК",
@@ -4378,6 +5444,199 @@ export const ru_RU: EnTranslations = {
     "realm": "Мир",
     "newCharacter": "Новый персонаж",
     "appearance": "Внешность",
+    "customize": "Настройка",
+    "body": "Телосложение",
+    "genderMale": "Мужчина",
+    "genderFemale": "Женщина",
+    "hair": "Волосы",
+    "brows": "Брови",
+    "skinTone": "Тон кожи",
+    "hairColor": "Цвет волос",
+    "lightness": "Светлее / темнее",
+    "colorWheelAria": "Цветовой круг {label}: перетаскивайте, чтобы выбрать оттенок и насыщенность",
+    "lightnessAria": "Яркость {label}",
+    "customColor": "Свой цвет",
+    "colorPresetAria": "{label}: образец {n}",
+    "beard": "Борода",
+    "face": "Лицо",
+    "faceNose": "Нос",
+    "faceEyes": "Размер глаз",
+    "faceJaw": "Челюсть",
+    "faceBrow": "Бровь",
+    "faceCheeks": "Щёки",
+    "faceChin": "Подбородок",
+    "bodyShoulders": "Плечи",
+    "bodyChest": "Грудь",
+    "bodyHips": "Бёдра",
+    "bodyHands": "Размер кистей",
+    "bodyElbows": "Локти",
+    "bodyKnees": "Колени",
+    "bodyFeet": "Ступни",
+    "mouth": "Рот",
+    "mouthNeutral": "Обычный",
+    "mouthLips": "Пухлые губы",
+    "mouthSmile": "Улыбка",
+    "mouthFrown": "Хмурый",
+    "mouthWide": "Широкий",
+    "mouthPout": "Надутый",
+    "mouthGrin": "Улыбка с зубами",
+    "mouthOpen": "Открытый",
+    "mouthAwe": "Изумление",
+    "faceEars": "Уши",
+    "faceSmirk": "Ухмылка",
+    "eyeShape": "Форма глаз",
+    "eyeColor": "Цвет глаз",
+    "earShape": "Форма ушей",
+    "lashes": "Ресницы",
+    "lashesOn": "Вкл.",
+    "lashesOff": "Выкл.",
+    "lashColor": "Цвет ресниц",
+    "outfit": "Цвет наряда",
+    "outfitClassic": "Классика",
+    "outfitCrimson": "Багряный",
+    "outfitEmber": "Тлеющий уголь",
+    "outfitGold": "Золото",
+    "outfitForest": "Лесной",
+    "outfitEmerald": "Изумруд",
+    "outfitTeal": "Бирюзовый",
+    "outfitAzure": "Лазурный",
+    "outfitRoyal": "Королевский синий",
+    "outfitViolet": "Фиолетовый",
+    "outfitMagenta": "Пурпурный",
+    "outfitRose": "Розовый",
+    "outfitOnyx": "Оникс",
+    "outfitIvory": "Слоновая кость",
+    "outfitGilded": "Позолота",
+    "outfitBonewrought": "Костяная работа",
+    "outfitObsidian": "Обсидиан",
+    "outfitVerdigris": "Патина",
+    "outfitBloodforged": "Кровавая ковка",
+    "lipstick": "Помада",
+    "blush": "Румяна",
+    "eyeshadow": "Тени для век",
+    "makeupNone": "Нет",
+    "shadeRose": "Розовый",
+    "shadeCoral": "Коралловый",
+    "shadeRuby": "Рубиновый",
+    "shadeBerry": "Ягодный",
+    "shadePlum": "Сливовый",
+    "shadeNude": "Нюдовый",
+    "shadePeach": "Персиковый",
+    "shadeWarm": "Тёплый",
+    "shadeMauve": "Лиловый",
+    "shadeSmoke": "Дымчатый",
+    "shadeBronze": "Бронзовый",
+    "shadeTeal": "Бирюзовый",
+    "randomize": "Случайный облик",
+    "randomizeShort": "Случайно",
+    "helmPreview": "Показать шлем",
+    "style": "Стиль",
+    "resetLook": "Сбросить облик",
+    "resetShort": "Сброс",
+    "browFlat": "Прямые",
+    "browArched": "Дугой",
+    "browThin": "Тонкие",
+    "browBushy": "Густые",
+    "browWorried": "Домиком",
+    "browSharp": "Резкие",
+    "browRound": "Круглые",
+    "eyeRound": "Круглые",
+    "eyeAlmond": "Миндалевидные",
+    "eyeNarrow": "Узкие",
+    "eyeWide": "Широкие",
+    "eyeSharp": "Резкие",
+    "eyeDroopy": "Опущенные",
+    "eyeSleepy": "Сонные",
+    "eyeWideset": "Широко посаженные",
+    "eyeCat": "Кошачьи",
+    "eyeDoe": "Оленьи",
+    "earRound": "Круглые",
+    "earPointed": "Острые",
+    "earSmall": "Малые",
+    "earWide": "Широкие",
+    "hairBald": "Лысый",
+    "hairBuzz": "Ёжик",
+    "hairCrew": "Короткие",
+    "hairCrewcut": "Текстурная стрижка",
+    "hairPixie": "Пикси",
+    "hairSweptpixie": "Растрёпанное пикси",
+    "hairQuiff": "Зачёс наверх",
+    "hairSidepart": "Классический пробор",
+    "hairMessy": "Взъерошенный ёршик",
+    "hairCurlycap": "Короткие кудри",
+    "hairPompadour": "Помпадур",
+    "hairSweptback": "Средние зачёсанные назад",
+    "hairFauxhawk": "Фальш-ирокез",
+    "hairMohawk": "Ирокез",
+    "hairTopknot": "Пучок сверху",
+    "hairWarriorbraid": "Коса воина",
+    "hairHighbun": "Высокий пучок",
+    "hairLowbun": "Низкий пучок",
+    "hairBraidcrown": "Коса-корона",
+    "hairAfro": "Афро",
+    "hairCurlyafro": "Кудрявое афро",
+    "hairChinbob": "Боб до подбородка",
+    "hairBluntbangs": "Боб с прямой чёлкой",
+    "hairWavybob": "Волнистый боб",
+    "hairAsymbob": "Асимметричный боб",
+    "hairCurtains": "Шторки с пробором",
+    "hairHighpony": "Высокий хвост",
+    "hairSidepony": "Боковой хвост",
+    "hairHalfbun": "Полупучок",
+    "hairLayered": "Каскад до плеч",
+    "hairCurls": "Мягкие кудри",
+    "hairLongwavy": "Длинные волны",
+    "hairLongcenterpart": "Длинные с прямым пробором",
+    "hairLongpart": "Длинные с прямым пробором",
+    "hairMullet": "Пышный маллет",
+    "hairTwinbraids": "Две косы",
+    "hairLowpony": "Низкий хвост",
+    "hairFantasybraid": "Сказочная коса",
+    "beardNone": "Нет",
+    "beardStubble": "Щетина",
+    "beardScruff": "Небритость",
+    "beardMutton": "Бараньи бакенбарды",
+    "beardGoatee": "Эспаньолка",
+    "beardChinpuff": "Клинышек",
+    "beardStache": "Усы",
+    "beardHorseshoe": "Подкова",
+    "beardShortbox": "Короткая",
+    "beardFull": "Полная",
+    "beardVikingb": "Заплетённая",
+    "beardWizard": "Борода мага",
+    "beardStubbleBeard": "Густая щетина",
+    "browNone": "Нет",
+    "browSoft": "Мягкие",
+    "browThick": "Густые",
+    "browAngled": "Наклонные",
+    "earrings": "Серьги",
+    "jewelMaterial": "Материал украшений",
+    "jewelDefault": "Как выковано",
+    "jewelGold": "Золото",
+    "jewelSilver": "Серебро",
+    "jewelBone": "Кость",
+    "jewelIron": "Железо",
+    "jewelCopper": "Медь",
+    "jewelBronze": "Бронза",
+    "jewelObsidian": "Обсидиан",
+    "jewelJade": "Нефрит",
+    "jewelAmethyst": "Аметист",
+    "jewelRuby": "Рубин",
+    "jewelPearl": "Жемчуг",
+    "jewelTurquoise": "Бирюза",
+    "earNone": "Нет",
+    "earStud": "Гвоздик",
+    "earHoop": "Кольцо",
+    "earBone": "Костяной оберег",
+    "earBonehoop": "Костяное кольцо",
+    "earMoon": "Полумесяц",
+    "earMoonstar": "Лунная звезда",
+    "earRunic": "Рунный камень",
+    "earChain": "Бисерная подвеска",
+    "earSeptum": "Кольцо в носу",
+    "earWarden": "Железо Стража",
+    "earCuff": "Клипса",
+    "earFeather": "Перо",
     "class": "Класс",
     "name": "Имя",
     "chromaOption": "Расцветка {n}",
@@ -4459,6 +5718,7 @@ export const ru_RU: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "Привилегии держателя активны. Подключайте приложение, когда нужно подписать или потратить.",
     "extensionHelp": "Чтобы кошелек появился здесь, держите активным браузерное расширение кошелька, например Solflare Wallet.",
     "mobileAppHelp": "Выберите Phantom или Solflare. Приложение кошелька запросит подтверждение. Не закрывайте игру и вернитесь в нее после завершения.",
+    "seekerAppHelp": "Продолжите с Seed Vault Wallet. Проверьте запросы на подключение и подтверждение в Seed Vault, затем вернитесь в игру.",
     "standaloneAppHelp": "Подключение кошелька пока недоступно в приложении с главного экрана. Для Phantom или Solflare откройте World of ClaudeCraft в Safari или Chrome.",
     "openAppTitle": "Продолжить в {wallet}",
     "openAppHelp": "Откройте {wallet}, чтобы проверить этот запрос. Не закрывайте вкладку с игрой, пока открыто приложение кошелька.",
@@ -5086,7 +6346,6 @@ export const ru_RU: EnTranslations = {
   "yumi": {
     "bracket3": "Yumi 3 на 3",
     "bracket5": "Yumi 5 на 5",
-    "enterQueue": "В бой за Yumi!",
     "queue": {
       "join": "Вы встаёте в очередь Protect Yumi. Берегите своего фамильяра…",
       "leave": "Вы покидаете очередь Protect Yumi.",
@@ -5124,9 +6383,6 @@ export const ru_RU: EnTranslations = {
   },
   "fiesta": {
     "bracket": "Fiesta",
-    "enterQueue": "Присоединиться к Fiesta!",
-    "practice": "🎉 Тренировка с ботами",
-    "practiceNote": "Тренировка офлайн: создаёт 3 ботов с ИИ и записывает вас на Fiesta 2 на 2. Нажмите снова, чтобы остановить.",
     "banner": {
       "wave": "ВОЛНА {wave}/{total} — ВЫБЕРИТЕ УСИЛЕНИЕ!",
       "augmentGained": "Получено усиление: {name}!",
@@ -5191,6 +6447,7 @@ export const ru_RU: EnTranslations = {
     },
     "augment": {
       "choose": "Выберите усиление",
+      "cardAria": "{name} ({category}): {description}",
       "aug_brutality": {
         "name": "Жестокость",
         "desc": "Твои физические удары бьют на 15% сильнее."
@@ -5327,8 +6584,10 @@ export const ru_RU: EnTranslations = {
     "reconnectingNow": "Соединение потеряно. Повторное подключение сейчас... (попытка {attempt}/{maxAttempts})",
     "slowConnection": "Загрузка занимает больше времени, чем обычно. Проверьте подключение к интернету.",
     "connectionRejected": "Сервер закрыл соединение.",
+    "incompatibleWorldVersion": "Версии игры и сервера несовместимы. Перезагрузите или обновите игру, затем повторите попытку.",
     "realmFull": "Этот мир сейчас переполнен. Пожалуйста, попробуйте снова через несколько минут.",
     "tooManyConnections": "Из вашей сети открыто слишком много подключений к этому миру. Пожалуйста, закройте лишние игровые окна или попробуйте снова через несколько минут.",
+    "messageRateExceeded": "Вы были отключены за слишком быструю отправку действий. Пожалуйста, подождите немного и войдите снова.",
     "tips": {
       "classes": "Совет: все 9 классов играются по-разному. Попробуйте несколько, прежде чем выбрать один.",
       "talents": "Совет: вы можете сбросить таланты в любое время вне боя, так что ранний выбор никогда не станет ловушкой.",
@@ -5380,10 +6639,16 @@ export const ru_RU: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "Загрузка обновления {version}...",
-      "ready": "Обновление {version} готово. Оно установится при выходе из игры, либо перезапустите сейчас.",
+      "checkingTitle": "Проверка обновлений...",
+      "checkingBody": "Игра обновляется автоматически.",
+      "uptodateTitle": "У вас последняя версия игры.",
+      "downloadingTitle": "Загрузка обновления {version}...",
+      "downloadingBody": "Можно продолжать играть. Обновление установится при выходе из игры.",
+      "readyTitle": "Обновление {version} готово",
+      "readyBody": "Оно установится при выходе из игры, либо перезапустите сейчас.",
       "restart": "Перезапустить сейчас",
-      "later": "Позже"
+      "later": "Позже",
+      "dismiss": "Закрыть"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -5396,6 +6661,12 @@ export const ru_RU: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "Игра работает без GPU-ускорения и будет сильно тормозить. Обновите драйверы видеокарты и перезапустите игру. В Windows также выберите для игры режим «Высокая производительность» в разделе Параметры > Система > Дисплей > Графика.",
     "bodyWeb": "Игра работает без GPU-ускорения и будет сильно тормозить. Включите аппаратное ускорение в настройках браузера, обновите драйверы видеокарты и перезапустите браузер.",
+    "dismiss": "Закрыть"
+  },
+  "perfNudge": {
+    "integratedGpu": "Игра работает на встроенном (энергосберегающем) графическом процессоре. Если в этом компьютере есть и игровая видеокарта, выберите для браузера режим «Высокая производительность» в разделе Параметры > Система > Дисплей > Графика в Windows, затем перезапустите браузер. Настольная версия выбирает игровую видеокарту автоматически.",
+    "hardwareAccelerationDesktop": "Игра работает без GPU-ускорения и поэтому сильно тормозит. Обновите драйверы видеокарты и перезапустите игру. В Windows также выберите для игры режим «Высокая производительность» в разделе Параметры > Система > Дисплей > Графика.",
+    "hardwareAccelerationWeb": "Игра работает без GPU-ускорения и поэтому сильно тормозит. Включите аппаратное ускорение в настройках браузера, обновите драйверы видеокарты и перезапустите браузер.",
     "dismiss": "Закрыть"
   },
   "realm": {
@@ -5539,29 +6810,6 @@ export const ru_RU: EnTranslations = {
     "body": "Мы перезапускаем игровой сервис и ожидаем, что Claudemoon скоро вернется. Эта страница продолжит проверку автоматически.",
     "status": "Скоро вернется"
   },
-  "welcome": {
-    "back": "С возвращением, {name}",
-    "level": "Уровень {level}",
-    "lastPlayed": "Последняя игра: {when}",
-    "continue": "Войти в мир",
-    "continueHint": "Enter, чтобы продолжить, Esc, чтобы пропустить",
-    "continueHintTouch": "Нажмите, чтобы продолжить",
-    "discord": {
-      "title": "Сообщество живёт в Discord",
-      "sub": "Превью патчей, события, чат разработчиков и 2 бонусных банковских слота за привязку.",
-      "join": "Присоединиться к Discord"
-    },
-    "chest": {
-      "ready": "Ежедневный сундук готов"
-    },
-    "armory": {
-      "cta": "Открыть и просмотреть Арсенал"
-    },
-    "news": {
-      "new": "Новое",
-      "viewAll": "Смотреть все обновления на GitHub"
-    }
-  },
   "hud": {
     "core": {
       "elite": "ЭЛИТА",
@@ -5588,11 +6836,12 @@ export const ru_RU: EnTranslations = {
       "releaseSpirit": "Освободить дух",
       "chatTab": "Чат",
       "combatLogTab": "Журнал боя",
-      "chatPlaceholder": "Напишите сообщение... (/w имя шепот, /r ответ, /p группа, /gu гильдия, /o офицеры, /general общий)",
+      "chatPlaceholder": "Напишите сообщение... (/w имя шепот, /r ответ, /p группа, /gu гильдия, /o офицеры, /general общий, ! команды сообщества)",
       "chatChannels": {
         "add": "Добавить канал чата",
         "addTitle": "Добавить канал",
         "close": "Закрыть вкладку {channel}",
+        "moveHint": "Изменить порядок вкладки {channel}: перетащите или используйте Alt+влево и Alt+вправо",
         "sendingTo": "Сообщение в {channel}",
         "names": {
           "say": "Сказать",
@@ -5615,7 +6864,6 @@ export const ru_RU: EnTranslations = {
       "mobileMore": "Еще",
       "mobileMoreAria": "Показать еще меню",
       "mobileSocial": "Общение",
-      "mobileArena": "Арена",
       "mobileMenu": "Меню",
       "mobileSettings": "Настройки",
       "mobileUse": "Использовать",
@@ -5649,11 +6897,15 @@ export const ru_RU: EnTranslations = {
       "graphicsPresetMedium": "Среднее",
       "graphicsPresetHigh": "Высокое",
       "graphicsPresetUltra": "Ультра",
+      "graphicsPresetInsane": "Экстремальное",
       "graphicsPresetAdvanced": "Расширенное",
       "terrainDetail": "Детализация местности",
       "foliageDensity": "Плотность растительности",
       "effectsQuality": "Эффекты и освещение",
       "shadowQuality": "Качество теней",
+      "surfaceDetail": "Детализация поверхностей",
+      "surfaceDetailBasic": "Базовая",
+      "surfaceDetailFull": "Полная",
       "terrainLow": "Низкая",
       "terrainHigh": "Высокая",
       "touchOpacity": "Прозрачность сенсорного управления",
@@ -5728,7 +6980,7 @@ export const ru_RU: EnTranslations = {
         "nameplates": "Индикаторы здоровья",
         "meters": "Счетчики урона",
         "social": "Друзья и гильдия",
-        "arena": "Арена (Пепельный Колизей)",
+        "arena": "PvP (Терновая Лощина и арены)",
         "chat": "Открыть чат",
         "attack": "Атака",
         "actionBarSlot": "Панель действий {slot}"
@@ -5817,6 +7069,8 @@ export const ru_RU: EnTranslations = {
       "joinParty": "Вступить в группу",
       "guildInvite": "{name} приглашает вас в {guild}.",
       "joinGuild": "Вступить в гильдию",
+      "guildInviteCancelled": "Ожидающее приглашение в гильдию отменено, потому что гильдия была переименована.",
+      "guildRenamed": "Команда модерации переименовала вашу гильдию в {name}.",
       "tradeRequest": "{name} хочет торговать с вами.",
       "openTrade": "Открыть обмен",
       "duelRequest": "{name} вызвал вас на дуэль!",
@@ -5830,6 +7084,10 @@ export const ru_RU: EnTranslations = {
       "floatingDodge": "Уклон",
       "floatingParry": "Парировано",
       "floatingResist": "Сопротивление",
+      "floatingEvade": "Ускользание",
+      "floatingBlock": "{amount} Блок",
+      "floatingHealFull": "Полное",
+      "floatingHealAbsorbed": "Поглощено",
       "cannotMove": "Не двигается!",
       "attack": "атака",
       "damageDone": "Ваше {ability} поражает {target} на {amount}.",
@@ -5840,17 +7098,30 @@ export const ru_RU: EnTranslations = {
       "dodged": "{target} уклоняется от вашего {ability}.",
       "parried": "{target} парирует ваш {ability}.",
       "resisted": "{target} сопротивляется вашему {ability}.",
+      "evaded": "{target} ускользает от вашего {ability}.",
+      "blockedDone": "{target} блокирует ваш {ability}, нанося {amount} урона.",
+      "blockedTaken": "Вы блокируете атаку {source}, получая {amount} урона.",
       "healSelf": "Ваше {ability} исцеляет вас на {amount}.",
       "healSelfCrit": "Ваше {ability} критически исцеляет вас на {amount}.",
       "healOther": "Ваше {ability} исцеляет {target} на {amount}.",
       "healOtherCrit": "Ваше {ability} критически исцеляет {target} на {amount}.",
+      "healSelfFull": "Ваше {ability} срабатывает, но у вас уже полное здоровье.",
+      "healOtherFull": "Ваше {ability} срабатывает на {target}, но у цели уже полное здоровье.",
+      "healSelfAbsorbed": "Ваше «{ability}» поглощено порчей на вас.",
+      "healOtherAbsorbed": "Ваше «{ability}» поглощено порчей на цели {target}.",
       "death": "{name} умирает.",
       "auraGain": "Вы получаете {name}.",
       "auraFade": "{name} спадает с вас.",
-      "auraAfflicted": "{target} поражен эффектом {name}."
+      "auraAfflicted": "{target} поражен эффектом {name}.",
+      "auraGainOther": "{target} получает {name}."
     },
     "system": {
       "playerDeath": "Вы погибли.",
+      "deathRecapKillerAbility": "Вы погибли. Убиты: {killer} ({ability}).",
+      "deathRecapKiller": "Вы погибли. Убиты: {killer}.",
+      "deathRecapAbility": "Вы погибли. Причина: {ability}.",
+      "deathRecapFalling": "Вы погибли. Вы разбились насмерть.",
+      "deathRecapDrowned": "Вы погибли. Вы утонули.",
       "respawn": "Вы снова чувствуете себя отдохнувшим и целым.",
       "ignoringChat": "Чат от {name} игнорируется.",
       "noLongerIgnoring": "{name} больше не игнорируется.",
@@ -5931,9 +7202,12 @@ export const ru_RU: EnTranslations = {
       "arenaQueueTrading": "Завершите обмен перед постановкой в очередь.",
       "arenaQueueInstance": "Нельзя вставать в очередь из подземелья.",
       "tradeInProgress": "Обмен уже идет.",
+      "tradeAlreadyTrading": "Этот игрок уже торгует.",
       "tradeTooFar": "Цель слишком далеко для обмена.",
       "tradeExpired": "Запрос обмена истек.",
-      "tradeFailed": "Обмен не удался: предметы или деньги больше недоступны."
+      "tradeFailed": "Обмен не удался: предметы или деньги больше недоступны.",
+      "tradeBound": "Этот предмет привязан и не может быть обменян.",
+      "marketListBound": "Этот предмет привязан и не может быть выставлен на продажу."
     },
     "logs": {
       "standUp": "Вы встаете.",
@@ -5949,6 +7223,7 @@ export const ru_RU: EnTranslations = {
       "arenaJoin": "Вы вступаете в очередь Пепельного Колизея. Ожидайте достойного соперника...",
       "arenaLeave": "Вы покидаете очередь Пепельного Колизея.",
       "arenaSands": "Вы выходите на песок Пепельного Колизея.",
+      "arenaSandsDrowned": "Вы ступаете на затопленные камни Затонувшего Двора.",
       "tradeRequestSent": "Вы запросили обмен с {name}.",
       "tradeOpened": "Окно обмена открыто.",
       "tradeComplete": "Обмен завершен.",
@@ -5959,6 +7234,8 @@ export const ru_RU: EnTranslations = {
       "soldItem": "Вы продали {item} за {money}.",
       "soldJunkOne": "Вы продали {count} серый предмет за {money}.",
       "soldJunkMany": "Вы продали серые предметы ({count}) за {money}.",
+      "keptBoundOne": "Оставлена {count} привязанная копия.",
+      "keptBoundMany": "Оставлены привязанные копии ({count}).",
       "friendOnline": "{name} вошел в игру.",
       "friendOffline": "{name} вышел из игры."
     },
@@ -6081,13 +7358,18 @@ export const ru_RU: EnTranslations = {
         "offline": "Не в сети",
         "combat": "В бою",
         "dungeon": "В подземелье",
-        "dead": "Мертв"
+        "dead": "Мертв",
+        "afk": "Отошел"
       },
       "statusWithZone": "{status} - {zone}",
       "ranks": {
         "leader": "Глава гильдии",
         "officer": "Офицер",
         "member": "Участник"
+      },
+      "tenure": {
+        "recruit": "Новобранец",
+        "veteran": "Ветеран"
       },
       "guildHeadOne": "вы {rank}, {count} участник",
       "guildHeadMany": "вы {rank}, {count} участников"
@@ -6114,6 +7396,11 @@ export const ru_RU: EnTranslations = {
       "playerLevelClassTitle": "{name} - ур. {level} {className}",
       "noChallengers": "Рейтинговых претендентов пока нет - станьте первым.",
       "matchInProgress": "Бой идет против {name}.",
+      "mapName": "Карта: {name}",
+      "map": {
+        "coliseum": "Пепельный Колизей",
+        "drownedCourt": "Затонувший Двор"
+      },
       "leaveQueue": "Покинуть очередь",
       "searching": "Поиск соперника... ({count} в очереди)",
       "enterQueue": "Встать в очередь",
@@ -6189,24 +7476,30 @@ export const ru_RU: EnTranslations = {
     },
     "cast": {
       "fishing": "Рыбная ловля",
+      "gathering": "Сбор ресурсов",
+      "crafting": "Изготовление",
+      "disenchanting": "Распыление",
+      "enchanting_apply": "Наложение чар",
+      "salvaging": "Разбор",
+      "tool_recharge": "Перезарядка",
       "demonHeal": "Исцеление демона",
       "thunzharrStormcall": "Зов бури",
-      "rift_frost_execution": "Glacial Grave",
-      "rift_frost_strike": "Absolute Zero",
-      "rift_ember_execution": "Magma Well",
-      "rift_ember_strike": "Core Meltdown",
-      "rift_venom_execution": "Venom Pool",
-      "rift_venom_strike": "Broodmother's Mark",
-      "rift_necro_execution": "Soul Grave",
-      "rift_necro_strike": "Death Sentence",
-      "rift_brute_execution": "Earthshatter",
-      "rift_brute_strike": "Final Judgment",
-      "rift_arcane_execution": "Void Rift",
-      "rift_arcane_strike": "Arcane Annihilation",
-      "rift_storm_execution": "Lightning Rod",
-      "rift_storm_strike": "Stormcaller's Wrath",
-      "rift_tide_execution": "Abyssal Maw",
-      "rift_tide_strike": "Crushing Depth"
+      "rift_frost_execution": "Ледяная могила",
+      "rift_frost_strike": "Абсолютный ноль",
+      "rift_ember_execution": "Магматический колодец",
+      "rift_ember_strike": "Расплавление ядра",
+      "rift_venom_execution": "Ядовитая лужа",
+      "rift_venom_strike": "Метка паучьей матки",
+      "rift_necro_execution": "Могила душ",
+      "rift_necro_strike": "Смертный приговор",
+      "rift_brute_execution": "Разрушитель земли",
+      "rift_brute_strike": "Окончательный приговор",
+      "rift_arcane_execution": "Разлом пустоты",
+      "rift_arcane_strike": "Тайное уничтожение",
+      "rift_storm_execution": "Громоотвод",
+      "rift_storm_strike": "Гнев призывателя бурь",
+      "rift_tide_execution": "Пасть бездны",
+      "rift_tide_strike": "Сокрушающая глубина"
     }
   },
   "questUi": {
@@ -6214,7 +7507,8 @@ export const ru_RU: EnTranslations = {
       "title": "Задания",
       "complete": "Готово",
       "showOnMap": "Показать {name} на карте",
-      "hideFromMap": "Скрыть {name} с карты"
+      "hideFromMap": "Скрыть {name} с карты",
+      "unknownQuest": "Неизвестное задание ({id})"
     },
     "log": {
       "title": "Журнал заданий",
@@ -6226,6 +7520,8 @@ export const ru_RU: EnTranslations = {
       "activeStatus": "Активно",
       "readyStatus": "Готово",
       "completedStatus": "Завершено",
+      "repeatableStatus": "Повторяемое",
+      "cooldownStatus": "Скоро снова будет доступно",
       "returnTo": "Вернитесь к {name}",
       "abandon": "Отказаться от задания",
       "abandonConfirmTitle": "Отказаться от задания",
@@ -6239,8 +7535,10 @@ export const ru_RU: EnTranslations = {
       "greetingFallback": "Приветствую.",
       "availableQuestAria": "Доступное задание: {name}",
       "readyQuestAria": "Задание готово к сдаче: {name}",
+      "repeatableQuestAria": "Повторяемое задание: {name}",
       "discussQuest": "Обсудить {name}.",
       "discussQuestAria": "Обсудить задание: {name}",
+      "profIntroHint": "Обратитесь к {name} за заданием «{quest}».",
       "nythraxisDeathlessKingWarning": "Три реликвии рассказывают одну историю: Алдрен сражался, защищая своего короля, Малрик нарушил границу смерти, а Восс пытался остановить то, что последовало. Печать слабеет, и заброшенная крипта ведет вниз.",
       "browseGoods": "Покажите ваши товары.",
       "browseGoodsAria": "Посмотреть товары у {name}",
@@ -6278,7 +7576,8 @@ export const ru_RU: EnTranslations = {
       "incomplete": "Это задание не завершено.",
       "giverMissing": "Выдавший это задание не рядом.",
       "turnInMissing": "Место сдачи этого задания не рядом.",
-      "tooFar": "Слишком далеко."
+      "tooFar": "Слишком далеко.",
+      "escortAway": "Тот, кого вы должны сопроводить, сейчас не на месте. Он скоро туда вернётся."
     }
   },
   "itemUi": {
@@ -6317,6 +7616,8 @@ export const ru_RU: EnTranslations = {
       "armor": "Броня",
       "quest": "Задание",
       "junk": "Хлам",
+      "fineMaterial": "Отборный материал",
+      "material": "Материал",
       "food": "Еда",
       "drink": "Напиток",
       "tool": "Инструмент",
@@ -6344,13 +7645,18 @@ export const ru_RU: EnTranslations = {
       "ifYouEquip": "Если надеть это",
       "damageSpeed": "{min} - {max} урона Скорость {speed}",
       "dps": "({dps} урона в секунду)",
-      "dagger": "Кинжал",
       "armorStat": "{value} брони",
       "stat": "+{value} {stat}",
       "useFood": "Использование: восстанавливает {amount} здоровья за {seconds} сек. Нужно оставаться сидя во время еды.",
       "useDrink": "Использование: восстанавливает {amount} маны за {seconds} сек. Нужно оставаться сидя во время питья.",
+      "useElixir": "Использование: повышает {stat} на {value} в течение {minutes} мин. Можно использовать в бою.",
+      "useElixirAura": "Использование: дает эффект \"{aura}\" на {minutes} мин. Можно использовать в бою.",
       "questItem": "Предмет задания",
+      "questRelated": "Задание: {quest}",
+      "questRules": "Нельзя продать, положить в банк или обменять.",
+      "questOrphaned": "Не нужен ни для одного активного задания.",
       "classes": "Классы: {classes}",
+      "maxStack": "Максимум в стопке: {count}",
       "sellPrice": "Цена продажи: {money}",
       "clickBuy": "Нажмите, чтобы купить",
       "clickSell": "Нажмите, чтобы продать",
@@ -6377,7 +7683,13 @@ export const ru_RU: EnTranslations = {
       "stackCount": "x{count}",
       "destroyTitle": "Уничтожить {item}",
       "destroyConfirm": "Уничтожить",
-      "destroyCancel": "Отмена"
+      "destroyCancel": "Отмена",
+      "unknownItem": "Неизвестный предмет",
+      "unknownItemAria": "Неизвестный предмет {id}, количество {count}",
+      "unknownItemAriaMasterwork": "Неизвестный предмет {id}, количество {count}, шедевр",
+      "unknownItemAriaEnchanted": "Неизвестный предмет {id}, количество {count}, зачарованный экземпляр",
+      "unknownItemAriaBound": "Неизвестный предмет {id}, количество {count}, привязанный экземпляр",
+      "unknownItemAriaInstanced": "Неизвестный предмет {id}, количество {count}, копия с клеймом мастера"
     },
     "equipment": {
       "empty": "Пусто",
@@ -6388,6 +7700,19 @@ export const ru_RU: EnTranslations = {
       "close": "Закрыть торговца",
       "hint": "Нажмите на предмет в сумках, чтобы продать его, пока это окно открыто.",
       "buyAria": "Купить {item} за {price}",
+      "buyAriaWithRequirement": "Купить {item} за {price}. {requirement}",
+      "buyStack": "Купить {count}",
+      "buyStackAria": "Купить {count} {item} за {price}",
+      "qtyRowAria": "Количество покупки",
+      "qtyMultiple": "x{count}",
+      "qtyMultipleAria": "Покупать по {count} за раз",
+      "qtyCustom": "Другое",
+      "qtyCustomAria": "Указать своё количество",
+      "buyCountAria": "Купить {count} {item} за {price}",
+      "buyCountAriaWithRequirement": "Купить {count} {item} за {price}. {requirement}",
+      "buyQuantityTitle": "Сколько купить: {item}? Не более {max}.",
+      "buyQuantityInput": "Количество для покупки",
+      "buyQuantityConfirm": "Купить",
       "buybackTitle": "Выкуп",
       "buybackEmpty": "Нет предметов",
       "buybackAria": "Выкупить {item} за {price}",
@@ -6422,18 +7747,29 @@ export const ru_RU: EnTranslations = {
       "pageNextAria": "Следующая страница рынка",
       "pageStatus": "Страница {current} из {total}",
       "filters": "Фильтры рынка",
+      "filterValueAria": "{label}: {value}",
       "filterType": "Тип",
       "filterTypeAll": "Все типы",
       "filterTypeWeapon": "Оружие",
       "filterTypeArmor": "Броня",
+      "filterTypeBag": "Сумки",
       "filterTypeConsumable": "Расходники",
       "filterTypeMaterial": "Материалы",
       "filterTypeCosmetic": "Косметика",
       "filterTypeOther": "Другое",
       "filterArmorType": "Тип брони",
       "filterArmorAll": "Вся броня",
+      "filterArmorSlot": "Слот брони",
+      "filterArmorClassAll": "Все типы брони",
+      "armorCloth": "Ткань",
+      "armorLeather": "Кожа",
+      "armorMail": "Кольчуга",
       "filterWeaponType": "Тип оружия",
       "filterWeaponAll": "Все оружие",
+      "filterBagSize": "Размер сумки",
+      "filterBagAll": "Все сумки",
+      "filterPrimaryStat": "Основная характеристика",
+      "filterPrimaryStatAll": "Любая основная характеристика",
       "filterRarity": "Редкость",
       "filterRarityAll": "Все редкости",
       "weaponSword": "Мечи",
@@ -6455,6 +7791,12 @@ export const ru_RU: EnTranslations = {
       "reclaim": "Вернуть",
       "buyAria": "Купить {item} за {price}",
       "reclaimAria": "Вернуть {item}",
+      "buyConfirmTitle": "Подтвердите покупку",
+      "buyConfirmBody": "Купить {item} за {price}?",
+      "buyConfirmBodyStack": "Купить {item} x{count} за {price} ({each} за штуку)?",
+      "buyConfirmAccept": "Купить",
+      "buyConfirmCancel": "Отмена",
+      "buyChanged": "Этот лот изменился до вашего подтверждения. Проверьте цену и попробуйте снова.",
       "sellNote": "Выставляйте товары из сумок. Торговец берет {cut}% при продаже. Использовано мест: {used}/{max}.",
       "sellPickEmpty": "Нажмите на предмет в сумках, чтобы выбрать товар для продажи.",
       "quantity": "Количество",
@@ -6465,6 +7807,8 @@ export const ru_RU: EnTranslations = {
       "collectEmpty": "Ничего не ждет. Выручка и истекшие лоты собираются здесь.",
       "collectNote": "Выручка и возвращенные товары, которые Торговец хранит для вас.",
       "saleProceeds": "Выручка",
+      "saleBuyer": "Продано: {buyer}",
+      "saleOlder": "Ещё {count} более ранних продаж, включены в общую сумму.",
       "collectAll": "Забрать все"
     },
     "logs": {
@@ -6656,7 +8000,7 @@ export const ru_RU: EnTranslations = {
       },
       "greater_invisibility": {
         "name": "Великая невидимость",
-        "description": "Вы исчезаете на 20 сек.: снимает 2 эффекта периодического урона, а получаемый урон снижается на 90% во время невидимости и ненадолго после неё. (талант мага)"
+        "description": "Исчезаете на 20 сек. и снимаете 2 эффекта периодического урона. Когда невидимость заканчивается, получаемый урон снижается на 90% на 2 сек. (Талант мага)"
       },
       "hot_streak": {
         "name": "Полоса везения",
@@ -7120,7 +8464,7 @@ export const ru_RU: EnTranslations = {
       },
       "bear_form": {
         "name": "Облик бурого",
-        "description": "Вы принимаете облик медведя: броня +90%, значительно повышенная сила атаки, ваши атаки накапливают ярость и создают на 30% больше угрозы. Примените снова, чтобы вернуться к облику заклинателя."
+        "description": "Вы принимаете облик медведя: броня +130%, значительно повышенная сила атаки, ваши атаки накапливают ярость и создают на 30% больше угрозы. Примените снова, чтобы вернуться к облику заклинателя."
       },
       "maul": {
         "name": "Костолом",
@@ -7856,7 +9200,7 @@ export const ru_RU: EnTranslations = {
         "name": "Обмотки Сумеречной шкуры"
       },
       "sootscale_mantle": {
-        "name": "Мантия Пепельной чешуи"
+        "name": "Мантия печной чешуи"
       },
       "gravecaller_blade": {
         "name": "Широкий клинок Могильного Зова"
@@ -7931,16 +9275,28 @@ export const ru_RU: EnTranslations = {
         "name": "Лоскут льна"
       },
       "arcane_dust": {
-        "name": "Тайная пыль"
+        "name": "Пыль перезвона"
       },
       "arcane_essence": {
-        "name": "Тайная эссенция"
+        "name": "Эссенция перезвона"
       },
       "arcane_shard": {
-        "name": "Тайный осколок"
+        "name": "Осколок перезвона"
       },
       "fen_muster_order": {
         "name": "Приказ о сборе в Фенбридже"
+      },
+      "firebottle": {
+        "name": "Зажигательная бутыль"
+      },
+      "murloc_hut": {
+        "name": "Хижина илогривов"
+      },
+      "restless_skull": {
+        "name": "Беспокойный череп"
+      },
+      "vanguard_bone": {
+        "name": "Кость авангарда"
       },
       "mire_prowler_pelt": {
         "name": "Шкура болотного хищника"
@@ -8186,7 +9542,7 @@ export const ru_RU: EnTranslations = {
         "name": "Роба из горной шерсти"
       },
       "stalkerhide_jerkin": {
-        "name": "Куртка из шкуры охотника"
+        "name": "Куртка из шкуры хищника"
       },
       "cragwalker_boots": {
         "name": "Сапоги Камнехода"
@@ -8327,7 +9683,7 @@ export const ru_RU: EnTranslations = {
         "name": "Железная кирка"
       },
       "mithril_mining_pick": {
-        "name": "Мифриловая кирка"
+        "name": "Небосеребряная кирка"
       },
       "handaxe": {
         "name": "Топорик"
@@ -8345,19 +9701,19 @@ export const ru_RU: EnTranslations = {
         "name": "Бронзовый серп"
       },
       "silverleaf_sickle": {
-        "name": "Серебролистный серп"
+        "name": "Глянцелистный серп"
       },
       "thorium_mining_pick": {
-        "name": "Ториевая кирка"
+        "name": "Осмиевая кирка"
       },
       "arcanite_mining_pick": {
-        "name": "Арканитовая кирка"
+        "name": "Глифостальная кирка"
       },
       "ashwood_axe": {
         "name": "Ясеневый топор"
       },
       "elderwood_axe": {
-        "name": "Топор из древнего дерева"
+        "name": "Топор из горной сосны"
       },
       "goldleaf_sickle": {
         "name": "Золотолистный серп"
@@ -8365,77 +9721,17 @@ export const ru_RU: EnTranslations = {
       "sunpetal_sickle": {
         "name": "Солнцелепестковый серп"
       },
-      "duskwisp_essence": {
-        "name": "Сущность сумеречного огонька"
-      },
-      "spore_heart": {
-        "name": "Споровое сердце"
-      },
-      "gleaming_antler": {
-        "name": "Сияющий рог"
-      },
-      "wisp_mote": {
-        "name": "Звёздная пылинка"
-      },
-      "starfall_shard": {
-        "name": "Осколок звездопада"
-      },
-      "elder_bark": {
-        "name": "Кора старейшины"
-      },
-      "hollow_sealstone": {
-        "name": "Печатный камень Лощины"
-      },
-      "monument_overlook": {
-        "name": "Выветренный монумент"
-      },
-      "monument_court": {
-        "name": "Затонувший монумент"
-      },
-      "monument_north": {
-        "name": "Забытый монумент"
-      },
-      "guardian_core": {
-        "name": "Ядро стража"
-      },
-      "wardens_seal": {
-        "name": "Печать Смотрителя"
-      },
-      "gleamstag_charm": {
-        "name": "Оберег Сияющего оленя"
-      },
-      "veilsteel_blade": {
-        "name": "Клинок скрытой стали"
-      },
-      "duskfang_dirk": {
-        "name": "Кинжал сумеречного клыка"
-      },
-      "gleamwood_stave": {
-        "name": "Посох сияющего дерева"
-      },
-      "wardens_oathband": {
-        "name": "Наручи клятвы Смотрителя"
-      },
-      "wardplate_cuirass": {
-        "name": "Кираса стражевых пластин"
-      },
-      "nightweave_tunic": {
-        "name": "Куртка ночного плетения"
-      },
-      "veilcloth_robe": {
-        "name": "Одеяние скрытой ткани"
-      },
       "thorium_ore": {
-        "name": "Ториевая руда"
+        "name": "Осмиевая руда"
       },
       "arcanite_bar": {
-        "name": "Слиток аркана"
+        "name": "Слиток глифостали"
       },
       "ashwood_log": {
         "name": "Бревно пепельного дерева"
       },
       "elderwood_log": {
-        "name": "Бревно древней бузины"
+        "name": "Бревно горной сосны"
       },
       "goldleaf_herb": {
         "name": "Трава золотолист"
@@ -8527,6 +9823,27 @@ export const ru_RU: EnTranslations = {
       "cinderweave_slippers": {
         "name": "Туфли жароткача"
       },
+      "thornhide_headdress": {
+        "name": "Капюшон Терновой шкуры"
+      },
+      "thornhide_mantle": {
+        "name": "Оплечье Терновой шкуры"
+      },
+      "thornhide_vestment": {
+        "name": "Облачение Терновой шкуры"
+      },
+      "thornhide_cinch": {
+        "name": "Кушак Терновой шкуры"
+      },
+      "thornhide_leggings": {
+        "name": "Набедренники Терновой шкуры"
+      },
+      "thornhide_gloves": {
+        "name": "Перчатки Терновой шкуры"
+      },
+      "thornhide_boots": {
+        "name": "Башмаки Терновой шкуры"
+      },
       "final_oath_medallion": {
         "name": "Медальон последней клятвы"
       },
@@ -8563,72 +9880,6 @@ export const ru_RU: EnTranslations = {
       "emberglass_warstaff": {
         "name": "Боевой посох из огненного стекла"
       },
-      "rift_essence": {
-        "name": "Эссенция разлома"
-      },
-      "rift_gem_crimson": {
-        "name": "Багровый самоцвет разлома"
-      },
-      "rift_gem_azure": {
-        "name": "Лазурный самоцвет разлома"
-      },
-      "rift_gem_verdant": {
-        "name": "Зелёный самоцвет разлома"
-      },
-      "riftbound_band_of_might": {
-        "name": "Кольцо разлома могущества"
-      },
-      "riftbound_band_of_insight": {
-        "name": "Кольцо разлома прозрения"
-      },
-      "riftbound_band_of_guile": {
-        "name": "Кольцо разлома хитрости"
-      },
-      "hoarfrost_edge": {
-        "name": "Инеистый клинок"
-      },
-      "emberforge_gauntlets": {
-        "name": "Рукавицы Пепельной кузни"
-      },
-      "broodmother_carapace": {
-        "name": "Панцирь матки выводка"
-      },
-      "bonelord_mantle": {
-        "name": "Наплечье костяного владыки"
-      },
-      "graskbreaker_girdle": {
-        "name": "Пояс сокрушителя Граска"
-      },
-      "voidscar_handwraps": {
-        "name": "Обмотки Пустотного шрама"
-      },
-      "stormscale_treads": {
-        "name": "Ботинки грозовой чешуи"
-      },
-      "abyssal_loop": {
-        "name": "Кольцо бездны"
-      },
-      "pactbound_vestments": {
-        "name": "Облачение пакта"
-      },
-      "pitlords_cleaver": {
-        "name": "Тесак повелителя преисподней"
-      },
-      "emberforged_bulwark": {
-        "name": "Пепелокованый бастион"
-      },
-      "stormsunder_hood": {
-        "name": "Клобук грозолома"
-      },
-      "voidweave_mantle": {
-        "name": "Наплечье пустотного плетения"
-      },
-      "abysswrought_band": {
-        "name": "Кольцо бездновой ковки"
-      },
-      "heart_of_the_rift": {
-        "name": "Сердце разлома"
-      },
       "copper_ore": {
         "name": "Медная руда"
       },
@@ -8639,7 +9890,7 @@ export const ru_RU: EnTranslations = {
         "name": "Бревно железнокорого дерева"
       },
       "silverleaf_herb": {
-        "name": "Трава серебролист"
+        "name": "Трава глянцелист"
       },
       "rough_hide": {
         "name": "Грубая шкура"
@@ -8702,13 +9953,13 @@ export const ru_RU: EnTranslations = {
         "name": "Отточенный железный кинжал"
       },
       "thorium_warblade": {
-        "name": "Ториевый боевой клинок"
+        "name": "Осмиевый боевой клинок"
       },
       "arcanite_war_axe": {
-        "name": "Арканитовый боевой топор"
+        "name": "Глифостальной боевой топор"
       },
       "elderwood_battle_staff": {
-        "name": "Боевой посох из древней бузины"
+        "name": "Боевой посох из горной сосны"
       },
       "riveted_copper_girdle": {
         "name": "Клепаный медный пояс"
@@ -8729,13 +9980,13 @@ export const ru_RU: EnTranslations = {
         "name": "Железные кольчужные наплечники"
       },
       "thoriumscale_greathelm": {
-        "name": "Ториевый чешуйчатый большой шлем"
+        "name": "Осмиевый чешуйчатый большой шлем"
       },
       "thoriumscale_cuirass": {
-        "name": "Ториевая чешуйчатая кираса"
+        "name": "Осмиевая чешуйчатая кираса"
       },
       "thoriumscale_leggings": {
-        "name": "Ториевые чешуйчатые ноговицы"
+        "name": "Осмиевые чешуйчатые ноговицы"
       },
       "homespun_hood": {
         "name": "Домотканый капюшон"
@@ -8744,13 +9995,13 @@ export const ru_RU: EnTranslations = {
         "name": "Домотканые рукавицы"
       },
       "silverthread_slippers": {
-        "name": "Туфли из серебряной нити"
+        "name": "Туфли из бледной нити"
       },
       "goldweave_robe": {
-        "name": "Златотканое одеяние"
+        "name": "Золочёное одеяние"
       },
       "goldweave_leggings": {
-        "name": "Златотканые поножи"
+        "name": "Золочёные поножи"
       },
       "silkspun_satchel": {
         "name": "Шёлкопряденая сумка"
@@ -8819,10 +10070,10 @@ export const ru_RU: EnTranslations = {
         "name": "Роскошное жаркое Марлоу"
       },
       "silverleaf_healing_draught": {
-        "name": "Целебный настой серебролиста"
+        "name": "Целебный настой глянцелиста"
       },
       "silverleaf_mana_draught": {
-        "name": "Настой маны серебролиста"
+        "name": "Настой маны глянцелиста"
       },
       "elixir_of_the_boar": {
         "name": "Эликсир вепря"
@@ -8834,7 +10085,7 @@ export const ru_RU: EnTranslations = {
         "name": "Настой маны золотолиста"
       },
       "venomfire_elixir": {
-        "name": "Эликсир ядопламени"
+        "name": "Эликсир гадючьего жара"
       },
       "sunpetal_healing_draught": {
         "name": "Целебный настой солнцелепеста"
@@ -8845,6 +10096,306 @@ export const ru_RU: EnTranslations = {
       "elixir_of_the_serpent": {
         "name": "Эликсир змея"
       },
+      "mosshide_vest": {
+        "name": "Жилет из мшистой кожи"
+      },
+      "thornling_grips": {
+        "name": "Перчатки Колючки"
+      },
+      "acolyte_chain_grips": {
+        "name": "Кольчужные перчатки послушника"
+      },
+      "votive_chain_belt": {
+        "name": "Кольчужный пояс обета"
+      },
+      "briarroot_staff": {
+        "name": "Посох из тернового корня"
+      },
+      "valefire_lantern": {
+        "name": "Фонарь долинного огня"
+      },
+      "fenbark_leggings": {
+        "name": "Поножи из болотной коры"
+      },
+      "mirebloom_treads": {
+        "name": "Сапоги топкого цветения"
+      },
+      "fenwarden_sabatons": {
+        "name": "Сабатоны болотного стража"
+      },
+      "marshlight_hauberk": {
+        "name": "Хауберк болотного света"
+      },
+      "duskthorn_mantle": {
+        "name": "Оплечье сумеречного терна"
+      },
+      "fenshadow_maul": {
+        "name": "Молот болотной тени"
+      },
+      "wildgrove_cinch": {
+        "name": "Пояс Дикой рощи"
+      },
+      "cragward_pauldrons": {
+        "name": "Наплечники скального стража"
+      },
+      "cragthorn_greatstaff": {
+        "name": "Большой посох скального терна"
+      },
+      "moonbark_vestments": {
+        "name": "Облачение лунной коры"
+      },
+      "peaksong_helm": {
+        "name": "Шлем песни пиков"
+      },
+      "stormchant_gauntlets": {
+        "name": "Рукавицы грозового песнопения"
+      },
+      "cragprowl_belt": {
+        "name": "Пояс скального охотника"
+      },
+      "stormroot_cowl": {
+        "name": "Капюшон грозового корня"
+      },
+      "thunderward_legguards": {
+        "name": "Набедренники грозового стража"
+      },
+      "revenantstep_treads": {
+        "name": "Сапоги шага призрака"
+      },
+      "shardfang_grips": {
+        "name": "Перчатки оскольчатого клыка"
+      },
+      "shardsong_mantle": {
+        "name": "Оплечье песни осколков"
+      },
+      "wyrmcult_spellgrips": {
+        "name": "Перчатки заклинаний культа дракона"
+      },
+      "thornpeak_wildwraps": {
+        "name": "Дикие обмотки Терновых Пиков"
+      },
+      "stormvotive_hauberk": {
+        "name": "Хауберк грозового обета"
+      },
+      "cryptbloom_shoulderguards": {
+        "name": "Наплечники склепного цветения"
+      },
+      "gravewyrm_thornmaul": {
+        "name": "Терновый молот могильного дракона"
+      },
+      "vestments_of_the_waking_grove": {
+        "name": "Облачение Пробуждающейся рощи"
+      },
+      "nightfangs_greatstaff": {
+        "name": "Большой посох Ночного клыка"
+      },
+      "maul_of_the_scourged_wilds": {
+        "name": "Молот опустошенных диких земель"
+      },
+      "tidehymn_slippers": {
+        "name": "Туфли приливного гимна"
+      },
+      "pearlward_aegis": {
+        "name": "Эгида жемчужного стража"
+      },
+      "wildgrowth_leggings": {
+        "name": "Поножи дикого роста"
+      },
+      "grovewardens_grips": {
+        "name": "Перчатки стража рощи"
+      },
+      "verdant_walkers": {
+        "name": "Сапоги зеленого странника"
+      },
+      "lunarward_cinch": {
+        "name": "Пояс лунного стража"
+      },
+      "dreamroot_boots": {
+        "name": "Сапоги корня снов"
+      },
+      "stormbark_mantle": {
+        "name": "Мантия штормовой коры"
+      },
+      "wildsoul_maul": {
+        "name": "Молот дикой души"
+      },
+      "resonant_thread": {
+        "name": "Резонирующая нить"
+      },
+      "resonant_hide": {
+        "name": "Резонирующая шкура"
+      },
+      "resonant_links": {
+        "name": "Резонирующие звенья"
+      },
+      "resonant_steel": {
+        "name": "Резонирующая сталь"
+      },
+      "resonant_timber": {
+        "name": "Резонирующая древесина"
+      },
+      "fine_copper_ore": {
+        "name": "Отборная медная руда"
+      },
+      "fine_iron_ore": {
+        "name": "Отборная железная руда"
+      },
+      "fine_thorium_ore": {
+        "name": "Отборная осмиевая руда"
+      },
+      "fine_ironbark_log": {
+        "name": "Отборное бревно железнокорого дерева"
+      },
+      "fine_ashwood_log": {
+        "name": "Отборное бревно пепельного дерева"
+      },
+      "fine_elderwood_log": {
+        "name": "Отборное бревно горной сосны"
+      },
+      "fine_silverleaf_herb": {
+        "name": "Отборная трава глянцелист"
+      },
+      "fine_goldleaf_herb": {
+        "name": "Отборная трава золотолист"
+      },
+      "fine_sunpetal_herb": {
+        "name": "Отборная трава солнцелепест"
+      },
+      "stormreel_fishing_rod": {
+        "name": "Удочка со штормовой катушкой"
+      },
+      "tidewrought_fishing_rod": {
+        "name": "Удочка приливной ковки"
+      },
+      "duskwisp_essence": {
+        "name": "Сущность сумеречного огонька"
+      },
+      "spore_heart": {
+        "name": "Споровое сердце"
+      },
+      "gleaming_antler": {
+        "name": "Сияющий рог"
+      },
+      "wisp_mote": {
+        "name": "Звёздная пылинка"
+      },
+      "starfall_shard": {
+        "name": "Осколок звездопада"
+      },
+      "elder_bark": {
+        "name": "Кора старейшины"
+      },
+      "hollow_sealstone": {
+        "name": "Печатный камень Лощины"
+      },
+      "monument_overlook": {
+        "name": "Выветренный монумент"
+      },
+      "monument_court": {
+        "name": "Затонувший монумент"
+      },
+      "monument_north": {
+        "name": "Забытый монумент"
+      },
+      "guardian_core": {
+        "name": "Ядро стража"
+      },
+      "wardens_seal": {
+        "name": "Печать Смотрителя"
+      },
+      "gleamstag_charm": {
+        "name": "Оберег Сияющего оленя"
+      },
+      "veilsteel_blade": {
+        "name": "Клинок скрытой стали"
+      },
+      "duskfang_dirk": {
+        "name": "Кинжал сумеречного клыка"
+      },
+      "gleamwood_stave": {
+        "name": "Посох сияющего дерева"
+      },
+      "wardens_oathband": {
+        "name": "Наручи клятвы Смотрителя"
+      },
+      "wardplate_cuirass": {
+        "name": "Кираса стражевых пластин"
+      },
+      "nightweave_tunic": {
+        "name": "Куртка ночного плетения"
+      },
+      "veilcloth_robe": {
+        "name": "Одеяние скрытой ткани"
+      },
+      "rift_essence": {
+        "name": "Эссенция разлома"
+      },
+      "rift_gem_crimson": {
+        "name": "Багровый самоцвет разлома"
+      },
+      "rift_gem_azure": {
+        "name": "Лазурный самоцвет разлома"
+      },
+      "rift_gem_verdant": {
+        "name": "Зелёный самоцвет разлома"
+      },
+      "riftbound_band_of_might": {
+        "name": "Кольцо разлома могущества"
+      },
+      "riftbound_band_of_insight": {
+        "name": "Кольцо разлома прозрения"
+      },
+      "riftbound_band_of_guile": {
+        "name": "Кольцо разлома хитрости"
+      },
+      "hoarfrost_edge": {
+        "name": "Инеистый клинок"
+      },
+      "emberforge_gauntlets": {
+        "name": "Рукавицы Пепельной кузни"
+      },
+      "broodmother_carapace": {
+        "name": "Панцирь матки выводка"
+      },
+      "bonelord_mantle": {
+        "name": "Наплечье костяного владыки"
+      },
+      "graskbreaker_girdle": {
+        "name": "Пояс сокрушителя Граска"
+      },
+      "voidscar_handwraps": {
+        "name": "Обмотки Пустотного шрама"
+      },
+      "stormscale_treads": {
+        "name": "Ботинки грозовой чешуи"
+      },
+      "abyssal_loop": {
+        "name": "Кольцо бездны"
+      },
+      "pactbound_vestments": {
+        "name": "Облачение пакта"
+      },
+      "pitlords_cleaver": {
+        "name": "Тесак повелителя преисподней"
+      },
+      "emberforged_bulwark": {
+        "name": "Пепелокованый бастион"
+      },
+      "stormsunder_hood": {
+        "name": "Клобук грозолома"
+      },
+      "voidweave_mantle": {
+        "name": "Наплечье пустотного плетения"
+      },
+      "abysswrought_band": {
+        "name": "Кольцо бездновой ковки"
+      },
+      "heart_of_the_rift": {
+        "name": "Сердце разлома"
+      },
+      "voidsong_dirk": {
+        "name": "Песнь Пустоты, кинжал расколотой завесы"
+      },
       "wildheart_tuskblade": {
         "name": "Клыкастый клинок Дикого Сердца"
       },
@@ -8853,6 +10404,18 @@ export const ru_RU: EnTranslations = {
       },
       "wildheart_fangknife": {
         "name": "Клыковый нож Зулгара"
+      },
+      "fanglords_beastspear": {
+        "name": "Звериное копье Повелителя клыков"
+      },
+      "bloodmane_warleggings": {
+        "name": "Боевые поножи Кровавой Гривы"
+      },
+      "vineclaw_stalking_breeches": {
+        "name": "Штаны лазутчика Лозокогтя"
+      },
+      "sunbone_ritual_sarong": {
+        "name": "Ритуальный саронг Солнечной Кости"
       },
       "thick_winter_pelt": {
         "name": "Плотная зимняя шкура"
@@ -9019,6 +10582,42 @@ export const ru_RU: EnTranslations = {
       "mantle_of_the_unbroken_shore": {
         "name": "Мантия несломленного берега"
       },
+      "last_keep_signet": {
+        "name": "Печатка Последнего оплота"
+      },
+      "gatherers_cache": {
+        "name": "Сумка собирателя"
+      },
+      "artisans_eye": {
+        "name": "Глаз ремесленника"
+      },
+      "reins_terrorspark_groundshaker": {
+        "name": "Ключ зажигания Страхоискра"
+      },
+      "reins_drakemaw_raptor": {
+        "name": "Поводья раптора Дрейкмо"
+      },
+      "moggers_hide_quiver": {
+        "name": "Кожаный колчан Моггера"
+      },
+      "cragmaw_huntquiver": {
+        "name": "Охотничий колчан Крэгмо"
+      },
+      "gravewyrm_bone_quiver": {
+        "name": "Костяной колчан Могильного Вирма"
+      },
+      "direfang_quiver": {
+        "name": "Колчан Лютого Клыка"
+      },
+      "sharp_claw": {
+        "name": "Острый коготь"
+      },
+      "curved_tusk": {
+        "name": "Изогнутый клык"
+      },
+      "pristine_claw": {
+        "name": "Безупречный коготь"
+      },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
       },
@@ -9173,7 +10772,7 @@ export const ru_RU: EnTranslations = {
         "name": "Ступни Ночного Клыка"
       },
       "glimmerfin_koi": {
-        "name": "Карп кои с мерцающими плавниками"
+        "name": "Кои солнечного блика"
       },
       "raw_bog_eel": {
         "name": "Сырой болотный угорь"
@@ -9264,6 +10863,12 @@ export const ru_RU: EnTranslations = {
       },
       "verlans_oathblade": {
         "name": "Клинок клятвы Верлана"
+      },
+      "ironreel_fishing_rod": {
+        "name": "Удочка с железной катушкой"
+      },
+      "silverstream_fishing_rod": {
+        "name": "Удочка серебряного ручья"
       },
       "briny_idol": {
         "name": "Просоленный идол"
@@ -9588,6 +11193,24 @@ export const ru_RU: EnTranslations = {
       },
       "wyrmchoir_handwraps": {
         "name": "Обмотки змеиного хора"
+      },
+      "basin_stalkers_tunic": {
+        "name": "Туника лазутчика Котловины"
+      },
+      "verdant_heart_vestment": {
+        "name": "Облачение Зеленеющего Сердца"
+      },
+      "sunbone_ritual_hauberk": {
+        "name": "Ритуальная кольчуга Солнечной Кости"
+      },
+      "greatfang_of_the_basin": {
+        "name": "Великий клык Котловины"
+      },
+      "sunbone_oracles_crown": {
+        "name": "Корона оракула Солнечной Кости"
+      },
+      "bloodmane_war_legguards": {
+        "name": "Боевые набедренники Кровавой Гривы"
       },
       "deathless_greatblade": {
         "name": "Бессмертный великий клинок"
@@ -9990,6 +11613,21 @@ export const ru_RU: EnTranslations = {
       "spider_egg_sac": {
         "name": "Паучий Яйцевой Кокон"
       },
+      "spider_egg": {
+        "name": "Яйцо Матки выводка"
+      },
+      "widow_hatchling": {
+        "name": "Детеныш вдовы"
+      },
+      "drowned_warlord": {
+        "name": "Утопший военачальник"
+      },
+      "brakka_wallbreaker": {
+        "name": "Бракка Стенолом"
+      },
+      "threnos_first_voice": {
+        "name": "Тренос Первый Голос"
+      },
       "grave_silt_bulwark": {
         "name": "Могильно-илистый Бастион"
       },
@@ -10170,6 +11808,18 @@ export const ru_RU: EnTranslations = {
       "cindraleth_maw_matriarch": {
         "name": "Синдралет, Матриарх Дрейкмо"
       },
+      "dragonkin_egg": {
+        "name": "Яйцо драконида"
+      },
+      "dragonkin_whelp": {
+        "name": "Драконид-детёныш"
+      },
+      "dragonkin_broodguard": {
+        "name": "Выводковый страж драконидов"
+      },
+      "drakemaw_broodlord": {
+        "name": "Выводковый лорд Дрейкмо"
+      },
       "gilded_stag": {
         "name": "Золочёный олень"
       },
@@ -10254,6 +11904,9 @@ export const ru_RU: EnTranslations = {
       "hedge_gnome": {
         "name": "Гном живой изгороди"
       },
+      "hedge_knight": {
+        "name": "Рыцарь Донхолда"
+      },
       "the_topiary_bull": {
         "name": "Фигурный бык"
       },
@@ -10265,6 +11918,12 @@ export const ru_RU: EnTranslations = {
       },
       "shoal_scuttler": {
         "name": "Отмельный краб"
+      },
+      "downs_bandit": {
+        "name": "Бандит с холмов"
+      },
+      "wreck_thief": {
+        "name": "Расхититель кораблекрушений"
       },
       "the_wreck_warden": {
         "name": "Страж Кораблекрушений"
@@ -10287,6 +11946,24 @@ export const ru_RU: EnTranslations = {
       "fisher_bram": {
         "name": "Рыбак Брам"
       },
+      "lb_actor_coalfast": {
+        "name": "Смотритель Хладоуголь"
+      },
+      "lb_actor_ollun": {
+        "name": "Стражеразлома Оллун"
+      },
+      "lb_actor_edda": {
+        "name": "Интендант Эдда"
+      },
+      "lb_actor_saul": {
+        "name": "Врачеватель Саул"
+      },
+      "lb_actor_tam": {
+        "name": "Звонарь Там"
+      },
+      "tidemill_stalker": {
+        "name": "Ловчий Приливной Мельницы"
+      },
       "rift_hellguard": {
         "name": "Адский страж"
       },
@@ -10298,30 +11975,6 @@ export const ru_RU: EnTranslations = {
       },
       "rift_boss_pitlord": {
         "name": "Азгорат, Владыка Бездны"
-      },
-      "orkadia_grunt": {
-        "name": "Пехотинец Кровавого Клыка"
-      },
-      "orkadia_marauder": {
-        "name": "Мародёр Железношкурый"
-      },
-      "orkadia_axethrower": {
-        "name": "Метатель топоров Кровавого Клыка"
-      },
-      "orkadia_fel_shaman": {
-        "name": "Шаман Пепельной Кости"
-      },
-      "orkadia_beast_handler": {
-        "name": "Укротитель боевых зверей Железной Шкуры"
-      },
-      "orkadia_siege_brute": {
-        "name": "Осадный громила Оркадии"
-      },
-      "orkadia_banner_captain": {
-        "name": "Капитан Чёрного Знамени"
-      },
-      "orkadia_warlord": {
-        "name": "Полководец Громмок Черепокол"
       },
       "wildheart_stalker": {
         "name": "Лазутчик Лозокогтя"
@@ -10555,6 +12208,11 @@ export const ru_RU: EnTranslations = {
         "name": "Фьюри",
         "title": "Интендант чести",
         "greeting": "Пески поля боя помнят каждую победу. Распорядись своей честью достойно."
+      },
+      "warmarshal_draven_kole": {
+        "name": "Военный маршал Дравен Коул",
+        "title": "Хранитель складов Боевой мощи",
+        "greeting": "Я принимаю только одну монету, честь, и склады Боевой мощи под моей охраной. Заслужи звание в бою, и я снаряжу тебя для следующего."
       },
       "loremaster_caddis": {
         "name": "Хранитель знаний Каддис",
@@ -10866,6 +12524,21 @@ export const ru_RU: EnTranslations = {
         "title": "Рыбачка Чаячьей Гавани",
         "greeting": "Он раскрылся прямо там, где сушат сети. Прямо там, где я стояла каждое утро всей своей жизни. Я больше не спускаюсь к берегу. Я вообще почти никуда больше не хожу."
       },
+      "ferryman_ewald": {
+        "name": "Паромщик Эвальд",
+        "title": "Переправа на Дальний Берег",
+        "greeting": "На Дальний Берег, значит? Ради рыбалки туда давно уже никто не ездит, друг. Поднимайся на борт, когда будешь готов, и прислушайся к колоколу после высадки: жители города слушают его так же, как ты следишь за погодой."
+      },
+      "ferrykeeper_odda": {
+        "name": "Смотрительница парома Одда",
+        "title": "Переправа на Дальний Берег",
+        "greeting": "На материк? Корабль отправится, когда ты будешь на борту, не раньше. И если колокол начнёт отсчёт, пока мы отдаём швартовы, не проси меня повернуть назад: никто не гребёт навстречу третьему удару."
+      },
+      "sergeant_marsh": {
+        "name": "Сержант Марш",
+        "title": "Городское ополчение",
+        "greeting": "Обучен? Тогда вот как всё будет сегодня ночью. Моя шеренга держит дорогу. Если прорыв выплюнет нечто, с чем нам не совладать, я укажу на тебя. Мельница твоя: ничто не войдёт туда следом за тобой и ничто не пройдёт мимо нас к городу. Ступай."
+      },
       "forgemistress_darva": {
         "name": "Мастерица кузни Дарва",
         "title": "Хозяйка кузни",
@@ -10905,7 +12578,7 @@ export const ru_RU: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Ремесло для каждой руки",
-        "text": "В Иствруке каждый владеет каким-нибудь ремеслом помимо меча, {playerName}. В скалах вокруг Медного прииска к юго-западу от города есть рудные жилы. Берите кирку и сами разработайте 5 жил — меня не обманешь, я замечу разницу.",
+        "text": "В Иствруке каждый владеет каким-нибудь ремеслом помимо меча, {playerName}. В скалах вокруг Медного прииска к юго-востоку от города есть рудные жилы. Берите кирку и сами разработайте 5 жил — меня не обманешь, я замечу разницу.",
         "completion": "Вот видите? Руда добыта, а на руках появились мозоли. В дороге продолжайте добывать руду, рубить лес и собирать травы. Вернувшись в город, не забудьте о доске городского направления у рынка и ремесленном столе рядом. Если захотите, все эти занятия обеспечат честный заработок.",
         "objectives": {
           "0": {
@@ -10988,7 +12661,7 @@ export const ru_RU: EnTranslations = {
       },
       "q_supplies": {
         "title": "Украденные припасы",
-        "text": "Бандиты увели мой последний воз: инструменты, соль и добрый истврукский лен. Верните 4 ящика из лагеря на юго-востоке.",
+        "text": "Бандиты увели мой последний воз: инструменты, соль и добрый истврукский лен. Верните 4 ящика из лагеря на юго-западе.",
         "completion": "Мои ящики! Почти без царапин. Вы просто чудо.",
         "objectives": {
           "0": {
@@ -11217,7 +12890,7 @@ export const ru_RU: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Нет покоя в камышах",
-        "text": "Этот обряд поднимает утопших всюду, где топь их коснется. Мы еще не можем разрушить его, но можем лишить хозяев 14 солдат.",
+        "text": "Этот обряд на курильницах поднимает утопших, а теперь он поднял того, кто способен их возглавить. Смотрители зовут его Утопшим военачальником, и, пока он держит Затонувшую часовню, мертвецы не покидают строя. Сразите его, {playerName}, и остальные разбегутся обратно в топь.",
         "completion": "Вы дали мертвым больше милости, чем их господа. Возьмите это.",
         "objectives": {
           "0": {
@@ -11339,7 +13012,7 @@ export const ru_RU: EnTranslations = {
         }
       },
       "q_stalker_pelts": {
-        "title": "Зима идет в Хайвотч",
+        "title": "Первые заморозки в Хайвотче",
         "text": "Зима на этой горе не стучит, {playerName}, а вышибает дверь. 8 шкур хребтовых охотников утеплят плащи для стены.",
         "completion": "Толстые, как моя рука. В этом году дозор не замерзнет.",
         "objectives": {
@@ -11370,7 +13043,7 @@ export const ru_RU: EnTranslations = {
       },
       "q_old_cragmaw": {
         "title": "Старый Крэгмо",
-        "text": "Горцы знают имя тому, чьи следы нашла моя разведчица: Старый Крэгмо, покрытый шрамами кот-тиран, переживший три поколения собственной стаи. Это из-за него охотники заполонили мою дорогу, {playerName}. Его логово на западном хребте над южной дорогой. Возьмите напарника и покончите со старым дьяволом.",
+        "text": "Горцы знают имя тому, чьи следы нашла моя разведчица: Старый Крэгмо, покрытый шрамами кот-тиран, переживший три поколения собственной стаи. Это из-за него охотники заполонили мою дорогу, {playerName}. Его логово на восточном хребте над южной дорогой. Возьмите напарника и покончите со старым дьяволом.",
         "completion": "Наконец-то он пал. Горцы клялись, что этот кот переживет саму стену. Теперь охотники останутся в своих высоких снегах, {playerName}, и мои патрули пройдут по дороге, не проливая крови. Весь хребет затих благодаря вам.",
         "objectives": {
           "0": {
@@ -11495,9 +13168,6 @@ export const ru_RU: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Фанатик Культа Вирма: убито"
-          },
-          "1": {
-            "label": "Приказы Культа Вирма"
           }
         }
       },
@@ -11508,9 +13178,6 @@ export const ru_RU: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Некромант Культа Вирма: убито"
-          },
-          "1": {
-            "label": "Ритуальная филактерия"
           }
         }
       },
@@ -11609,7 +13276,7 @@ export const ru_RU: EnTranslations = {
       },
       "q_the_codfather": {
         "title": "Крестная треска",
-        "text": "Крестная треска не просто рыба, {playerName}, а хладнокровный убийца. Старики клянутся, что она ест болотных рыскунов на завтрак, и даже мирефенские вдовы от ужаса не плетут паутину у отмелей Дипфена. Она правит этими водами. Возьми удочку, вытащи этого старого дьявола из его вод, и я признаю, что ты вошел в семью.",
+        "text": "Крестная треска не просто рыба, {playerName}, а хладнокровный убийца. Старики клянутся, что она ест болотных рыскунов на завтрак, и даже мирефенские вдовы от ужаса не плетут паутину у отмелей Дипфена. Она правит этими водами, а болотная вода требует ни много ни мало удочку с железной катушкой - такие продаются у моего прилавка. Возьми ее в руки, вытащи этого старого дьявола из его вод, и я признаю, что ты вошел в семью.",
         "completion": "Во имя промокших святых... Сама Крестная треска. Только взгляни на эти усы. Фенбридж будет целый год кормиться историями об этом улове, {playerName}.",
         "objectives": {
           "0": {
@@ -11629,7 +13296,7 @@ export const ru_RU: EnTranslations = {
       },
       "q_nythraxis_graves": {
         "title": "Могилы забытых",
-        "text": "Я уже видел эти знаки на трех старых могилах вокруг северного поля боя. Капитан Алдрен лежит на восточной возвышенности, верховный жрец Малрик - у разбитой центральной дороги, а королевский убийца Восс - у западного утеса. Коснитесь каждой могилы и слушайте, {playerName}. Мертвые могут помнить то, что живые забыли.",
+        "text": "Я уже видел эти знаки на трех старых могилах вокруг северного поля боя. Капитан Алдрен лежит на западной возвышенности, верховный жрец Малрик - южнее, вдоль западного края, а королевский убийца Восс - у восточного утеса. Коснитесь каждой могилы и слушайте, {playerName}. Мертвые могут помнить то, что живые забыли.",
         "completion": "Алдрен остался верен, Малрик отказался принять смерть, а Восс увидел опасность раньше всех. Все трое служили одному забытому королю.",
         "objectives": {
           "0": {
@@ -11645,7 +13312,7 @@ export const ru_RU: EnTranslations = {
       },
       "q_nythraxis_sealed_crypt": {
         "title": "Заброшенный склеп",
-        "text": "Видения указывают на заброшенную крипту в западном утесе. Есть старая легенда, что в крипте покоился король. Возможно, Терновые высоты запечатали его там после того, как ритуал Малрика исказил его во что-то бессмертное. Войдите в крипту и посмотрите, что осталось внутри.",
+        "text": "Видения указывают на заброшенную крипту в восточном утесе. Есть старая легенда, что в крипте покоился король. Возможно, Терновые высоты запечатали его там после того, как ритуал Малрика исказил его во что-то бессмертное. Войдите в крипту и посмотрите, что осталось внутри.",
         "completion": "Две половины ключ-камня сходятся, а дневник Восса называет то, что они запечатали: перстень короля Нитраксиса. Если дневник говорит правду, этот перстень - ключ к его гробнице.",
         "objectives": {
           "0": {
@@ -11687,7 +13354,7 @@ export const ru_RU: EnTranslations = {
       },
       "q_mogger": {
         "title": "Моггер должен пасть",
-        "text": "Моггер расколол повозки, расплющил изгороди и перебил столько скота, что хватило бы опустошить половину долины. Не выходите против него в одиночку. Возьмите двух сильных спутников на восточный луг и добейте зверя навсегда.",
+        "text": "Моггер расколол повозки, расплющил изгороди и перебил столько скота, что хватило бы опустошить половину долины. Не выходите против него в одиночку. Возьмите двух сильных спутников на западный луг и добейте зверя навсегда.",
         "completion": "Моггер наконец мертв. Поля Истврука стали безопаснее, а вы покидаете долину с еще одной историей, достойной пересказа.",
         "objectives": {
           "0": {
@@ -11695,23 +13362,143 @@ export const ru_RU: EnTranslations = {
           }
         }
       },
-      "q_archetype_acceptance": {
-        "title": "Ремесло по душе",
-        "text": "Мастерство — это знание, {playerName}, а настройка — обещание. Выберите два соседних ремесла, которые станут вашими основными, а затем принесите мне руду, добытую вами в долине.",
-        "completion": "Обещание скреплено. Эти два ремесла теперь ваши основные, а знание напротив них стало вашим увлечением.",
+      "q_prof_attune_smith": {
+        "title": "Обещание кузнеца",
+        "text": "Сталь не прощает блуждающей руки, потому скажу прямо, прежде чем ты дашь клятву. Скрепи себя с моей кузней, и оружейное дело с бронным делом станут твоими двумя основными ремёслами, единственными, что ты сможешь вести дальше работы редкого качества. Ремесло напротив них по кругу осядет как твоё увлечение, доведённое до редкого качества и не выше. Остальные твои ремёсла не сгорают, {playerName}: они просто затихают, дремлют, пока ты не позовёшь их обратно. И знай ещё до того, как падёт молот: бросишь эту пару ради другой, и возвращаться придётся честным трудом, пять врагов повержены в первый раз по возвращении, восемь в следующий, одиннадцать после, и всё больше с каждым уходом. Всё ещё стоишь тут? Тогда принеси мне три рудные жилы, добытые в Долине собственными руками, и будем считать обещание скреплённым.",
+        "completion": "Хорошая руда и хорошие руки, чтобы её обработать. Оружейное дело и бронное дело теперь твои, осваивай их до мастерства. Остальное заслужи.",
         "objectives": {
           "0": {
             "label": "Рудная жила разработана"
           }
         }
       },
-      "q_prof_make_amends": {
-        "title": "Искупление",
-        "text": "Вы уже владели этой парой ремёсел, {playerName}. Возвращение — не новая клятва. Помогите расчистить дорогу в долине, и работа напомнит вашим рукам прежние навыки.",
-        "completion": "Прежний ритм вернулся. Ваша старая пара ремёсел снова активна.",
+      "q_prof_attune_outfitter": {
+        "title": "Мерка экипировщика",
+        "text": "Отмерь цену, прежде чем резать, таково первое правило у моего станка. Выбери меня, и кожевничество с портняжным делом станут твоими двумя основными ремёслами, парой, которую ты сможешь вести дальше работы редкого качества; ремесло напротив них осядет как твоё увлечение, доведённое до редкого качества и оставленное там. Ремёсла, что ты отложишь, не распускаются, {playerName}, лишь убираются в сторону, дремлют, пока ты не возьмёшься за них вновь. Но будь уверен: покинешь эту пару, а после захочешь вернуть, и дорога домой оплачивается трудом, что удлиняется всякий раз, сперва пятеро истреблённых, затем восемь, затем одиннадцать, и каждый раз немного больше. Если решено, истреби четырёх пауков-скрытней Сейблвеба и принеси их шёлк к станку, ведь всякий добрый наряд начинается с доброй нити.",
+        "completion": "Ровная нить, ровная рука. Кожевничество и портняжное дело теперь твои, неси их так далеко, как достанет твоё умение. Отмеряй дважды, и они тебя не подведут.",
+        "objectives": {
+          "0": {
+            "label": "Паук-скрытень Сейблвеба истреблён"
+          }
+        }
+      },
+      "q_prof_attune_apothecary": {
+        "title": "Рецепт, что стоит хранить",
+        "text": "Всякое доброе блюдо, это два вкуса, что созданы друг для друга, и доброе ремесло такое же, {playerName}. Присядь со мной, и алхимия с кулинарией станут твоими двумя основными ремёслами, теми, что ты сможешь томить дальше работы редкого качества; ремесло на дальней стороне круга, это твоё увлечение, приправленное до редкого качества и не горячее. Остальные твои ремёсла постоят в кладовой, дремлют, не портятся, готовы, как только ты за ними вернёшься. Честно предупреждаю, пока котёл ещё холодный: уйдёшь к другой паре, и возвращение станет заботой, что растёт, пятеро зверей улажены в первый раз, восемь в следующий, одиннадцать в тот, что после, и всё тяжелее с каждой порцией. Всё ещё голоден до этого? Тогда добудь мне четырёх диких кабанов, ведь стоящая кухня начинается с хорошего мяса.",
+        "completion": "Вот это начало, с мясцом. Алхимия и кулинария теперь твои, готовь на них так высоко, как захочешь. Возвращайся голодным.",
+        "objectives": {
+          "0": {
+            "label": "Дикий кабан добыт"
+          }
+        }
+      },
+      "q_prof_attune_bombardier": {
+        "title": "Взрывоопасная договорённость",
+        "text": "О, о, тебе нужно то самое, громкое, да? Слушай, слушай, прежде чем трогать что-нибудь тикающее: только скажи, и инженерное дело с алхимией станут твоими двумя основными ремёслами, единственными, что ты сможешь толкать дальше работы редкого качества (вот тут и начинается ВЕСЕЛЬЕ, поверь мне). Ремесло напротив ляжет тебе в карман увлечением, до редкого качества и не дальше, не дуйся. Остальные твои ремёсла? Не пропали, {playerName}, просто дремлют, буди их когда угодно. Но (всегда есть но, придержи фитиль) бросишь эту пару и приковыляешь обратно позже, и это будет стоить пота, что копится, пять штук уложены в первый раз, восемь в следующий, одиннадцать после, больше, больше, всякий раз, как струсишь. Да? ДА? Тогда иди набери мне три участка трав, взрывоопасных, не спрашивай каких, они все немножко взрывоопасны, если хорошенько поверить.",
+        "completion": "ХА. Реактивы, настоящие, и все пальцы на месте, хорошо, хорошо. Инженерное дело и алхимия, твои, иди смастери что-нибудь, что об этом пожалеет. Ступай.",
+        "objectives": {
+          "0": {
+            "label": "Собран участок трав"
+          }
+        }
+      },
+      "q_prof_amends_smith": {
+        "title": "Снова к кузне",
+        "text": "Значит, ты вернулся к кузне. Не стану притворяться, что это не задевает, {playerName}, но рука у меня честная, и работа честная. Ты знаешь цену возвращения: труд, и его тем больше, чем чаще ты уходил. Уложи волков, что терзают северную дорогу, и этот замах напомнит твоим рукам, чего когда-то требовала эта пара.",
+        "completion": "Ритм снова в твоих руках. Оружейное дело и бронное дело опять твои основные ремёсла. Не заводи привычку уходить.",
         "objectives": {
           "0": {
             "label": "Лесной волк убит"
+          }
+        }
+      },
+      "q_prof_amends_outfitter": {
+        "title": "Нити воссоединены",
+        "text": "Всё же снова у моего станка. Я не держу обиды, {playerName}, но нить помнит руку, что её отпустила, и цена, чтобы взяться за неё вновь, отмеряется длиннее всякий раз. Истреби пауков-скрытней Сейблвеба, что заполонили восточный лес, и этот труд успокоит твои руки, прежде чем они снова коснутся доброго шёлка.",
+        "completion": "Снова твёрдо. Кожевничество и портняжное дело возвращаются к тебе основными ремёслами. На этот раз отмерь дважды, прежде чем уходить.",
+        "objectives": {
+          "0": {
+            "label": "Паук-скрытень Сейблвеба истреблён"
+          }
+        }
+      },
+      "q_prof_amends_apothecary": {
+        "title": "Снова на плите",
+        "text": "Ну, гляди-ка, кто вернулся к моему котлу. Без обид, {playerName}, на кухне всегда найдётся место, но ты знаешь, что счёт растёт всякий раз, как ты уходишь. Ступай проредить диких кабанов на западном лугу, ведь честный пот, это первый ингредиент, и он напомнит твоим рукам о работе.",
+        "completion": "Вот он, прежний вкус. Алхимия и кулинария снова на твоей плите как основные ремёсла. На этот раз задержись подольше.",
+        "objectives": {
+          "0": {
+            "label": "Дикий кабан добыт"
+          }
+        }
+      },
+      "q_prof_amends_bombardier": {
+        "title": "Гроссбух растёт",
+        "text": "Ты ВЕРНУЛСЯ, ха, они всегда возвращаются, у громких штук есть притяжение, да? От меня никакого ворчания, {playerName}, но гроссбух, ох, гроссбух, он пухнет всякий раз, как ты сбегаешь, больше с каждым возвращением, и это только справедливо. Иди вычисти для меня глубокоскальных копателей из раскопа, сперва пот, потом искры, вот правило, которое я только что выдумал.",
+        "completion": "ВОТ оно, зуд снова в твоих руках. Инженерное дело и алхимия, опять основные, давай, иди устрой грохот. Постарайся на этот раз усидеть на месте, а?",
+        "objectives": {
+          "0": {
+            "label": "Глубокоскальный копатель истреблён"
+          }
+        }
+      },
+      "q_prof_workorder_forge": {
+        "title": "Наряд на работу: кузня",
+        "text": "Кузню всегда надо кормить, {playerName}. Принеси мне восемь кусков медной руды, и я прослежу, чтобы тебе заплатили за груз. Без церемоний, только руда и монеты.",
+        "completion": "Хороший вес, без шлака. Вот твоя доля. Кузня довольно скоро снова проголодается.",
+        "objectives": {
+          "0": {
+            "label": "Медная руда доставлена"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens": {
+        "title": "Наряд на работу: кухни",
+        "text": "Моя кладовая опустела, {playerName}, а от пустых кладовых повара делаются ворчливыми. Принеси мне восемь кусков мяса дичи, и тебе за это будут монеты, а ещё моя вечная благодарность, что стоит поменьше, зато вкуснее.",
+        "completion": "Вот теперь кладовая полна. Вот твоя плата. Возвращайся, когда сумки снова потяжелеют.",
+        "objectives": {
+          "0": {
+            "label": "Мясо дичи доставлено"
+          }
+        }
+      },
+      "q_prof_workorder_loom": {
+        "title": "Наряд на работу: ткацкий станок",
+        "text": "Станок стоит без дела, а праздные руки тратят дневной свет впустую, {playerName}. Принеси мне шесть мотков паучьего шёлка, и я заплачу по честной ставке, отсчитанной до последней медной монеты.",
+        "completion": "Прекрасный шёлк, ровно спрядён. Твои монеты, отмерены точно. Станок благодарит тебя, и я тоже.",
+        "objectives": {
+          "0": {
+            "label": "Паучий шёлк доставлен"
+          }
+        }
+      },
+      "q_prof_workorder_toolworks": {
+        "title": "Наряд на работу: мастерская",
+        "text": "Топорища, рукояти, ложа, я извожу дерево так, будто оно выходит из моды, а оно НЕ выходит, дерево вечно, {playerName}. Притащи мне восемь брёвен железнокорого дерева, и я тебе заплачу, монетой, настоящей монетой, не услугой, обещаю, почти.",
+        "completion": "Отлично, отлично, ровная текстура, без гнили. Вот, твои монеты, видишь, я держу слово (почти). Тащи ещё, как споткнёшься о дерево.",
+        "objectives": {
+          "0": {
+            "label": "Бревно железнокорого дерева доставлено"
+          }
+        }
+      },
+      "q_prof_workorder_tannery": {
+        "title": "Наряд на работу: дубильня",
+        "text": "Чаны пусты. Принеси восемь грубых шкур. Монеты, когда принесёшь.",
+        "completion": "Хорошие шкуры. Честная плата. Ещё, когда будут.",
+        "objectives": {
+          "0": {
+            "label": "Грубая шкура доставлена"
+          }
+        }
+      },
+      "q_prof_workorder_apothecary": {
+        "title": "Наряд на работу: аптека",
+        "text": "Моим полкам нужен золотолист, а товар на рынке, что предсказуемо, разбавлен подделкой. Принеси мне шесть трав золотолиста, не помятых, и тебе воздастся ровно по счёту. Помятые листья будут отклонены, так что следи за своей сумкой.",
+        "completion": "Приемлемо. Сильнодействующий и обращались с ним как должно. Твоя плата, отсчитана до монеты. Только не давай этому ударить в голову, это уже другой реактив.",
+        "objectives": {
+          "0": {
+            "label": "Трава золотолист доставлена"
           }
         }
       },
@@ -12016,7 +13803,7 @@ export const ru_RU: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Проводить Рен домой",
-        "text": "Моя ученица Рен два дня назад ушла обходить линию у Золотой Проталины и не вернулась. Я нашёл её следы: она забилась под дорожные вехи к юго-западу от Ступеней Сияния и от страха перед волками не может сдвинуться с места. Мне нельзя оставить топь, {playerName}. Доведи её до лагеря Вейлы на Ступенях. Под огнями она будет в безопасности.",
+        "text": "Моя ученица Рен два дня назад ушла обходить линию у Золотой Проталины и не вернулась. Я нашёл её следы: она забилась под дорожные вехи к северо-востоку от Ступеней Сияния и от страха перед волками не может сдвинуться с места. Мне нельзя оставить топь, {playerName}. Доведи её до лагеря Вейлы на Ступенях. Под огнями она будет в безопасности.",
         "completion": "Девочка внутри, закутана в половину моих одеял и болтает так, что звёзды с неба сыплются. Ты сделал сегодня доброе дело, {playerName}. Предел таких видит немного.",
         "objectives": {
           "0": {
@@ -12700,7 +14487,7 @@ export const ru_RU: EnTranslations = {
       },
       "q_fs_bram_come_home": {
         "title": "Вернись домой, Брам",
-        "text": "Мой Брам вывел лодку в то самое утро, когда раскрылся прорыв у сетей, и море выбросило его где-то за мысом у Пристани. Три ночи назад я слышала его, {playerName}, — он звал через воду, а я побоялась пойти. Я и сейчас боюсь. Прошу тебя. Его лодка лежит разбитой на северном берегу. Доведи его до дома, ко мне.",
+        "text": "Мой Брам вывел лодку в то самое утро, когда раскрылся прорыв у сетей, и море выбросило его где-то за мысом у Пристани. Три ночи назад я слышала его, {playerName}, — он звал через воду, а я побоялась пойти. Я и сейчас боюсь. Прошу тебя. Его лодка лежит разбитой на южном берегу. Доведи его до дома, ко мне.",
         "completion": "Брам! Ты вернул мне его целым, {playerName}. Мы оба плакали, и никому из нас не стыдно. Что бы прорывы ни забрали у этого острова дальше, моей семьи им не видать. Больше никогда.",
         "objectives": {
           "0": {
@@ -12725,6 +14512,22 @@ export const ru_RU: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Расколотый Ужас убит"
+          }
+        }
+      },
+      "q_lb_q0_ashore": {
+        "title": "На берегу",
+        "text": "Чаячья Гавань терпит прорывы днём и ночью, но всё ещё держится. Если хочешь встать рядом с её защитниками, начни там, где город истекает кровью: на линии ополчения у Дозорного Луга, к востоку от портовых ступеней и старой статуи.",
+        "completion": "Тварь на мельнице ты убил в одиночку, и Там не преувеличивал насчёт носилок. Разведчиков у меня не хватает, зато полей в избытке. Сегодня ты удержал землю, которую не обязан был защищать, и в этом вся наша служба. Добро пожаловать в дозор.",
+        "objectives": {
+          "0": {
+            "label": "Доложить сержанту Маршу у Дозорного Луга"
+          },
+          "1": {
+            "label": "Убить порождений разлома"
+          },
+          "2": {
+            "label": "Уничтожить то, что скрывается в Приливной Мельнице"
           }
         }
       },
@@ -12991,9 +14794,6 @@ export const ru_RU: EnTranslations = {
           },
           "9": {
             "label": "Святилище Могильного Вирма"
-          },
-          "10": {
-            "label": "Конюшни Хайвотча"
           }
         }
       },
@@ -13044,9 +14844,12 @@ export const ru_RU: EnTranslations = {
             "label": "Тролльмут"
           },
           "4": {
-            "label": "Кровостеклянные поля"
+            "label": "Последний оплот"
           },
           "5": {
+            "label": "Кровостеклянные поля"
+          },
+          "6": {
             "label": "Кальдера Дрейкмо"
           }
         }
@@ -13212,10 +15015,10 @@ export const ru_RU: EnTranslations = {
             "label": "Садовые Врата"
           },
           "2": {
-            "label": "Аллея Статуй"
+            "label": "Аллея Цветников"
           },
           "3": {
-            "label": "Дикие Розы"
+            "label": "Замок Донхолд"
           },
           "4": {
             "label": "Лепестковый Пруд"
@@ -13225,6 +15028,15 @@ export const ru_RU: EnTranslations = {
           },
           "6": {
             "label": "Фонтанный Двор"
+          },
+          "7": {
+            "label": "Старая Мельница"
+          },
+          "8": {
+            "label": "Северный Дозор"
+          },
+          "9": {
+            "label": "Лилейная Заводь"
           }
         }
       },
@@ -13252,6 +15064,9 @@ export const ru_RU: EnTranslations = {
           },
           "6": {
             "label": "Зеркальное Озеро"
+          },
+          "7": {
+            "label": "Конюшни Гейлкреста"
           }
         }
       },
@@ -13309,15 +15124,60 @@ export const ru_RU: EnTranslations = {
         "enterText": "Вы проходите через запечатанную королевскую дверь.",
         "leaveText": "Вы возвращаетесь в холодный воздух Терновых высот."
       },
-      "orkadia": {
-        "name": "Оркадия",
-        "enterText": "Боевые костры вспыхивают зелёным. Военный лагерь Оркадии знает о вашем приходе.",
-        "leaveText": "Прорубаясь, вы выбираетесь обратно на пепельный ветер Дрейкленда."
-      },
       "wildheart_basin": {
         "name": "Котловина Дикого Сердца",
         "enterText": "Тёплый дождь шипит на древнем камне. Перед вами открывается Котловина Дикого Сердца.",
         "leaveText": "Вы проходите под каменными клыками и возвращаетесь к солнцу Палмрича."
+      },
+      "the_last_keep": {
+        "name": "Последний оплот",
+        "enterText": "Вы входите в холодные безмолвные залы Последнего оплота.",
+        "leaveText": "Вы затворяете дверь оплота и возвращаетесь под ветер Земель Драконов."
+      },
+      "lb_tidemill": {
+        "name": "Приливная Мельница",
+        "enterText": "Дверь мельницы поддаётся. Внутри тьма прислушивается.",
+        "leaveText": "Ты выходишь из Приливной Мельницы в вечерний воздух."
+      },
+      "lb_riftline": {
+        "name": "Линия прорыва в сумерках",
+        "enterText": "Ворота луга закрываются за патрулём. Эта ночь принадлежит линии обороны.",
+        "leaveText": "Ты оставляешь линию прорыва рассветному дозору."
+      },
+      "lb_vault": {
+        "name": "Затонувший Первый редут",
+        "enterText": "Верёвка уходит во тьму. Внизу старый редут лежит там, куда рухнул.",
+        "leaveText": "Ты поднимаешься по утёсной верёвке обратно к дневному свету."
+      },
+      "lb_council": {
+        "name": "Совет редута",
+        "enterText": "В зале совета стоят шесть кресел. Одно пустует.",
+        "leaveText": "Ты выходишь из редута."
+      },
+      "lb_landing": {
+        "name": "Ночной плацдарм",
+        "enterText": "Сигнальные костры догорают вдоль пляжа. Флот ждёт за отмелями.",
+        "leaveText": "Ты оставляешь берег плацдарма позади."
+      },
+      "lb_riftfields": {
+        "name": "Подступы к Полям Разломов",
+        "enterText": "Четыре места оберегов окружают прорыв. Обряд держал его закрытым двенадцать веков.",
+        "leaveText": "Ты спускаешься обратно с Полей Разломов."
+      },
+      "lb_breach": {
+        "name": "Внутри Прорыва",
+        "enterText": "Свет неправильный, а небо ещё хуже. Сердце лежит впереди на открытом месте.",
+        "leaveText": "Ты переступаешь порог и возвращаешься в обычный ночной воздух."
+      },
+      "lb_lastwatch": {
+        "name": "Последний дозор",
+        "enterText": "Редут чист и пуст. Кто-то должен завершить этот дозор.",
+        "leaveText": "Ты закрываешь за собой дверь редута."
+      },
+      "lb_willowfen": {
+        "name": "Ивовый Плач",
+        "enterText": "Ива не шевелится. Вода тоже.",
+        "leaveText": "Ты оставляешь иву в её тишине."
       },
       "drowned_temple": {
         "name": "Утонувший храм",
@@ -13412,6 +15272,111 @@ export const ru_RU: EnTranslations = {
         "sender": "Гильдия ремесленников",
         "subject": "О вашей работе: бронное дело и инженерное дело",
         "body": "Ремесленник!\n\nДо гильдии дошли вести о вашей работе: бронное дело и инженерное дело, пластины склёпаны, шестерни выверены, и два ремесла питают друг друга. Соседние ремесла, освоенные вместе, выдают руку, готовую к настройке. Разыщите кузнеца Халдрена в Истбруке: пока он говорит от лица мастеров. Докажите ему своё умение работой собственных рук, и он настроит эти два ремесла как ваши основные.\n\nС уважением,\nГильдия ремесленников"
+      },
+      "mastery_reset_notice": {
+        "sender": "Дом гильдии",
+        "subject": "Мастерство по-честному",
+        "body": "Собрат по гильдии!\n\nГильдия приняла новую меру мастерства. Каждый начинает подъём заново: ваши навыки ремесла и сноровка добытчика обнулены.\n\nВсё остальное осталось при вас, нетронутым: рецепты, инструменты и материалы, банк и золото, настройки и титулы, деяния и известность, задания и почта.\n\nТеперь подъём честен. Дешёвая работа наверх не вывезет. Ищите рецепты посложнее, жилы побогаче и воды поглубже.\n\nС уважением,\nДом гильдии"
+      },
+      "prof_tier_weaponcrafting_armorcrafting_1": {
+        "sender": "Мастерица кузни Дарва",
+        "subject": "Искра, что стоит отметить",
+        "body": "До моей кузни дошла весть, что одно из твоих основных ремёсел держится теперь на работе необычного качества. Это самая нижняя ступень долгого подъёма, но ты заслужил её у наковальни, а не выпрашиванием. Держи огонь жарким."
+      },
+      "prof_tier_weaponcrafting_armorcrafting_2": {
+        "sender": "Мастерица кузни Дарва",
+        "subject": "Работа редкого качества, и заслуженная",
+        "body": "Мне сказали, что одно из твоих основных ремёсел достигло работы редкого качества. Это та ступень, где неряшливые руки отсеиваются, а настоящие кузнецы остаются на ногах. Ты всё ещё на ногах. Хорошо."
+      },
+      "prof_tier_weaponcrafting_armorcrafting_3": {
+        "sender": "Мастерица кузни Дарва",
+        "subject": "Металл теперь тебе отвечает",
+        "body": "Одно из твоих основных ремёсел поднялось выше редкого качества, в серьёзную работу. Металл отвечает такой руке, больше не противится ей. Не дай похвале размягчить твою руку."
+      },
+      "prof_tier_weaponcrafting_armorcrafting_4": {
+        "sender": "Мастерица кузни Дарва",
+        "subject": "Почти на вершине лестницы",
+        "body": "Одно из твоих основных ремёсел стоит в одной ступени от мастерства. Немногие руки из тех, что я знала, достигали этой высоты, и ещё меньше сохраняли здесь свою остроту. Заверши подъём."
+      },
+      "prof_tier_weaponcrafting_armorcrafting_5": {
+        "sender": "Мастерица кузни Дарва",
+        "subject": "Мастерство, наконец",
+        "body": "Одно из твоих основных ремёсел достигло мастерства, высшего, куда может подняться рука. Я не раздаю похвалу задаром, потому услышь это единожды: кузня тобой гордится. А теперь ступай, научи огонь чему-нибудь новому."
+      },
+      "prof_tier_leatherworking_tailoring_1": {
+        "sender": "Ткачиха Оттилия",
+        "subject": "Ровный первый ряд",
+        "body": "Гильдия отмечает, что одно из твоих основных ремёсел достигло работы необычного качества. Это лишь первый ряд из многих, но он ровен и верен. Отмерь следующий так же тщательно."
+      },
+      "prof_tier_leatherworking_tailoring_2": {
+        "sender": "Ткачиха Оттилия",
+        "subject": "Работа редкого качества, хорошо отмеренная",
+        "body": "Одно из твоих основных ремёсел поднялось до работы редкого качества. Именно там небрежная рука выдаёт каждую спущенную петлю, а твоя не выдала. Я тихо довольна."
+      },
+      "prof_tier_leatherworking_tailoring_3": {
+        "sender": "Ткачиха Оттилия",
+        "subject": "Узор проясняется",
+        "body": "Одно из твоих основных ремёсел прошло редкое качество и вошло в работу потоньше. Узор проясняется для руки на этом уровне, больше никаких догадок. Продолжай отмерять дважды."
+      },
+      "prof_tier_leatherworking_tailoring_4": {
+        "sender": "Ткачиха Оттилия",
+        "subject": "Один ряд до вершины",
+        "body": "Одно из твоих основных ремёсел в одном ряду от мастерства. Последний ряд всегда труднее всего удержать ровным. Не спеши теперь."
+      },
+      "prof_tier_leatherworking_tailoring_5": {
+        "sender": "Ткачиха Оттилия",
+        "subject": "Последний стежок",
+        "body": "Одно из твоих основных ремёсел достигло мастерства. Я отмерила твою работу дважды, как отмеряю всё, и она держит. Немногие руки завязывают последний стежок так чисто. Я горжусь, а я не говорю такого впустую."
+      },
+      "prof_tier_alchemy_cooking_1": {
+        "sender": "Повар Марлоу",
+        "subject": "Вкус того, что грядёт",
+        "body": "До моей кухни доносится весть, что одно из твоих основных ремёсел достигло работы необычного качества. Это первый вкус, не более, но многообещающий. Не давай котлу остывать."
+      },
+      "prof_tier_alchemy_cooking_2": {
+        "sender": "Повар Марлоу",
+        "subject": "Работа редкого качества, и без подгоревших краёв",
+        "body": "Мне говорят, что одно из твоих основных ремёсел дотомилось до работы редкого качества. Это тот жар, на котором большинство поваров сжигают блюдо, а ты нет. Присядь, но ненадолго."
+      },
+      "prof_tier_alchemy_cooking_3": {
+        "sender": "Повар Марлоу",
+        "subject": "Вот теперь ты готовишь",
+        "body": "Одно из твоих основных ремёсел пробулькало сквозь редкое качество к настоящей глубине. Вот теперь ты готовишь, как говорится. Приправляй смело и пробуй почаще."
+      },
+      "prof_tier_alchemy_cooking_4": {
+        "sender": "Повар Марлоу",
+        "subject": "Одно блюдо до пира",
+        "body": "Одному из твоих основных ремёсел не хватает единственного блюда до мастерства. Последнее всегда самое насыщенное и его легче всего переборщить. Держи руку с половником твёрдой."
+      },
+      "prof_tier_alchemy_cooking_5": {
+        "sender": "Повар Марлоу",
+        "subject": "Мастерство, подано горячим",
+        "body": "Одно из твоих основных ремёсел достигло мастерства, самой верхней полки всей кладовой. Я кормлю всех, но немногие дотягивают готовкой досюда. Горжусь тобой, честно. А теперь ступай, сготовь что-нибудь, от чего они расплачутся за столом."
+      },
+      "prof_tier_engineering_alchemy_1": {
+        "sender": "Механик Гиззел",
+        "subject": "ПЕРВАЯ искра, ха",
+        "body": "Эй, цифры говорят, что одно из твоих основных ремёсел только что дало работу необычного качества, мелочь, крохи, но оно ХЛОПНУЛО, да? Первая искра всегда самая милая. Больше искр. Пошёл."
+      },
+      "prof_tier_engineering_alchemy_2": {
+        "sender": "Механик Гиззел",
+        "subject": "Редкое, о, РЕДКОЕ",
+        "body": "Мне говорят, одно из твоих основных ремёсел поднялось до работы редкого качества, а редкое, это где всё становится по-настоящему опасным (в хорошем смысле). Большинство рук сдаются до самого веселья. Но не ты. ХА."
+      },
+      "prof_tier_engineering_alchemy_3": {
+        "sender": "Механик Гиззел",
+        "subject": "Вот теперь станет громко",
+        "body": "Одно из твоих основных ремёсел проскочило редкое качество прямо в серьёзные штуки, о, вот тут и становится ГРОМКО. Не останавливайся теперь, что бы ты ни делал, разгон, это всё, ещё фитили."
+      },
+      "prof_tier_engineering_alchemy_4": {
+        "sender": "Механик Гиззел",
+        "subject": "Одна ступень, ОДНА, до вершины",
+        "body": "Одно из твоих основных ремёсел в ОДНОЙ ступени от мастерства, одной, единственной, чувствуешь, как гудит? Последний шаг, это самый большой грохот. Не моргай."
+      },
+      "prof_tier_engineering_alchemy_5": {
+        "sender": "Механик Гиззел",
+        "subject": "МАСТЕРСТВО, бабах",
+        "body": "Одно из твоих основных ремёсел достигло мастерства, самой ВЕРХУШКИ, бабах, вся лестница, готово. Я не раздаю похвалу, я раздаю фитили, но вот, бери и то и другое: ты блистателен и слегка пугающ. Иди, заставь горы понервничать."
       }
     },
     "itemSets": {
@@ -13463,6 +15428,36 @@ export const ru_RU: EnTranslations = {
         "name": "Регалии арканиста Долины",
         "bonus3": "Скорость атаки и произнесения заклинаний повышается на 15%."
       },
+      "warfare_ashstalker": {
+        "name": "Снаряжение пепельного ловчего",
+        "bonus2": "Рейтинг защиты Боевой мощи повышается на 40.",
+        "bonus4": "Рейтинг атаки Боевой мощи повышается на 40, а контроль, применённый к вам враждебными игроками, длится на 15% меньше.",
+        "bonus7": "Рейтинг атаки и защиты Боевой мощи повышается на 80. Убийство враждебного игрока дарует «Пепельный шаг», повышающий скорость передвижения на 40% на 6 сек."
+      },
+      "warfare_cinderweave": {
+        "name": "Регалии Тлеющего плетения",
+        "bonus2": "Рейтинг защиты Боевой мощи повышается на 40.",
+        "bonus4": "Рейтинг атаки Боевой мощи повышается на 40, а контроль, применённый к вам враждебными игроками, длится на 15% меньше.",
+        "bonus7": "Рейтинг атаки и защиты Боевой мощи повышается на 80. Ваши заклинания с вероятностью 15% даруют «Тлеющий оберег», поглощающий 120 ед. урона в течение 8 сек."
+      },
+      "warfare_furyforged": {
+        "name": "Яростнокованый боевой доспех",
+        "bonus2": "Рейтинг защиты Боевой мощи повышается на 40.",
+        "bonus4": "Рейтинг атаки Боевой мощи повышается на 40, а контроль, применённый к вам враждебными игроками, длится на 15% меньше.",
+        "bonus7": "Рейтинг атаки и защиты Боевой мощи повышается на 80. Убийство враждебного игрока дарует «Нерушимую клятву», поглощающую 200 ед. урона в течение 10 сек."
+      },
+      "warfare_stormbound": {
+        "name": "Одеяние Уз Бури",
+        "bonus2": "Рейтинг защиты Боевой мощи повышается на 40.",
+        "bonus4": "Рейтинг атаки Боевой мощи повышается на 40, а контроль, применённый к вам враждебными игроками, длится на 15% меньше.",
+        "bonus7": "Рейтинг атаки и защиты Боевой мощи повышается на 80. Ваши заклинания с вероятностью 15% даруют «Тлеющий оберег», поглощающий 120 ед. урона в течение 8 сек."
+      },
+      "warfare_thornhide": {
+        "name": "Одеяние Терновой шкуры",
+        "bonus2": "Рейтинг защиты Боевой мощи повышается на 40.",
+        "bonus4": "Рейтинг атаки Боевой мощи повышается на 40, а контроль, применённый к вам враждебными игроками, длится на 15% меньше.",
+        "bonus7": "Рейтинг атаки и защиты Боевой мощи повышается на 80. Ваши заклинания с вероятностью 15% даруют «Терновый покров», повышающий шанс уклонения на 15% на 6 сек."
+      },
       "wyrmshadow": {
         "name": "Облачение Ночного Клыка",
         "bonus2": "Сила атаки повышается на 40.",
@@ -13484,6 +15479,7 @@ export const ru_RU: EnTranslations = {
     "delveRiteShrineCandleInteract": "Святилище свечи: нажмите F, чтобы коснуться",
     "delveRiteShrineReedInteract": "Святилище тростника: нажмите F, чтобы коснуться",
     "delveRiteShrineSkullInteract": "Святилище черепа: нажмите F, чтобы коснуться",
-    "mailboxName": "Почтовый ящик"
+    "mailboxName": "Почтовый ящик",
+    "noticeboardName": "Доска объявлений"
   }
 };

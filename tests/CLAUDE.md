@@ -30,8 +30,17 @@ Subdirectories (plus one shared fixture):
 - `browser/`: OPT-IN real-browser Playwright suite (`*.browser.test.ts`,
   `npm run test:browser`) for WebKit/Safari CSS, axe, target-size; never a bare `vitest run`.
 - `progression/`: mirrors `src/sim/progression/` (unit tests for the extracted modules).
-- `helpers/` + `util/`: shared cross-suite utilities (`fake_dom.ts`, the reusable
-  hand-rolled fake DOM for controller suites, `i18n_determinism.ts`, `alloc_probe.ts`).
+- `helpers/` + `util/`: shared cross-suite utilities (`bare_client.ts`, the shared
+  `bareClient()`/`fakeWs()`/`lastSnap()`/`joinServer()`/`broadcast()` family, see
+  "Server tests" below; `fake_dom.ts`, the reusable hand-rolled fake DOM for controller
+  suites, `i18n_determinism.ts`, `ts_files_under.ts`
+  and `css_tree_under.ts`, the two source walks, `scan_guard_self_audit.ts`, the pin that
+  keeps a guard from re-growing its own directory read, `method_call_sites.ts`, the
+  `ts.createSourceFile` walk that reports the calls a class method evaluates, each with the
+  `if` chain guarding each, `test_block_calls.ts`, the `ts.createSourceFile` walk that reports
+  every `describe`/`it`/`test`/`suite` call in a source tagged with the block enclosing it,
+  `driver_callback_bodies.ts`, the `ts.createSourceFile` walk that resolves a repeating
+  driver's callback and every same-module body one of its ticks can reach, `alloc_probe.ts`).
 - `global_setup.ts`: runs on every vitest invocation (`vite.config.ts` `test.globalSetup`);
   mints the SFX Studio temp root (`WOC_SFX_STUDIO_TEST_ROOT`).
 
@@ -57,13 +66,42 @@ Postgres is mocked at the top: `vi.mock('../server/db', () => ({ pool, saveChara
 (hoisted; keep it ABOVE the `server/game` import). Drive `new GameServer()` with a
 fake socket: `fakeWs()` collects `JSON.parse`'d sends; `server.join(...)`,
 `server.handleMessage(session, JSON.stringify({t:'cmd',...}))`, `(server as any).broadcastSnapshots()`.
-For the online client path, build a `ClientWorld` with `Object.create(ClientWorld.prototype)`
-(see `bareClient` in `snapshots.test.ts`/`talents.test.ts`) and call `applySnapshot(...)`.
+For the online client path, build a `ClientWorld` without the WebSocket plumbing by importing
+`bareClient(pid, overrides?)` from `tests/helpers/bare_client.ts` (also hosts the `fakeWs`/
+`lastSnap`/`joinServer`/`broadcast` family above) and call `applySnapshot(...)` on the result;
+it mirrors every field `ClientWorld` declares a static default for, so a new field never needs
+a manual sweep across suites. Import it rather than hand-rolling `Object.create(ClientWorld.prototype)`
+again, unless the suite genuinely needs a narrower or differently-shaped fixture (a few do, each
+marked with a one-line "kept bespoke on purpose" comment, issue #2088).
 `server/social.ts` etc. take injected interfaces: implement an in-memory `FakeDb`/
 transport (see `social_system.test.ts`) rather than mocking. REST/RouteDef endpoints
 use the `tests/server/helpers/` fakes (see Map), not a bespoke GameServer rig.
 
 ## Coverage & guards
+- **A guard that scans a directory of sources walks it with a shared walker, never its own
+  `readdirSync`:** `helpers/ts_files_under.ts` for `.ts`, `helpers/css_tree_under.ts` for
+  the `src/styles` sheets. A single-level read is a defect, not a style choice: the
+  day the scanned root grows a subdirectory, everything inside leaves the scan and the
+  guard stays green over a quietly smaller surface (#2485, then #2489 three times over,
+  then #2502 four more). Apart from `src/ui`, every scan root is flat today, so no
+  assertion over the real tree can tell a recursive walk from a flat one: pin the
+  recursion with a `mkdtemp` fixture that drives the guard's OWN producer, and keep the
+  vacuity floor near the real count (a floor sitting under it is what lets a moved file
+  hide, and `it.each` over an empty list registers no cases at all). Where the root IS
+  deep, a file-count floor over the real tree pins it directly, as
+  `mobile_window_coverage` does. Add `expectScansOnlyThroughSharedWalkers(import.meta.url,
+  [...])` (`helpers/scan_guard_self_audit.ts`) too: the fixture pins the producer, that pins
+  that no second reader was hand-rolled beside it, which over a flat root nothing else can.
+- **A scan that stays single-level BY DECISION says so where the read is, and checks its
+  own premise.** The `src/styles` case: a guard that models the sheets an entry LOADS
+  (`css_corpus`'s section corpus, `mobile_window_coverage`'s mobile-rule text) must not
+  credit a sheet parked in a subfolder, so it REFUSES rather than filtering: it throws on
+  `cssTreeUnder(...).dirs`, from the same read, naming the directory. (Refusing, not
+  filtering, is the point. A filter would keep the guard green over a surface that quietly
+  stopped matching the ruling behind it.) A guard whose miss is a silent pass
+  (`css_value_validity`, `focus_visible_guard`) recurses instead. Either way the reasoning
+  is written at the read, and a subdirectory fails loudly rather than narrowing the scan
+  (#2499, #2502).
 - `tests/parity/` is the golden-trace gate: ANY sim behavior change turns it red by
   design. Read `tests/parity/CLAUDE.md` first; regenerate only deliberately via
   `UPDATE_PARITY=1 npx vitest run tests/parity`, in its own reviewed commit.
@@ -71,13 +109,52 @@ use the `tests/server/helpers/` fakes (see Map), not a bespoke GameServer rig.
   render/ui/game/net/three import, a DOM global, or `Math.random`/`Date.now`/`performance.now`;
   run it after any `src/sim/` change. It ALSO completeness-checks the UI/render pure cores: a NEW
   pure core MUST follow the `*_view`/`*_core` naming (a bare name escapes the reverse sweep) and
-  be registered in `UI_PURE_CORES`/`RENDER_PURE_CORES`, or the guard fails.
+  be registered in `UI_PURE_CORES`/`RENDER_PURE_CORES`, or the guard fails. It then classifies
+  every REMAINING `src/ui` module (the ones the pure-core and `*_painter` name families miss,
+  window painters included: a `*_window.ts` is covered here AND by the painter gate below): one
+  that reaches for a browser global must be registered in `UI_PAINTER_HELPERS` (a host-agnostic
+  painter-side helper, which then may only mint its own canvas and must stay deterministic and
+  colorless) or in `UI_DOM_MODULES` (it owns browser state), and anything unregistered must touch
+  no browser global at all.
+- **Never register the same block twice.** `duplicate_test_blocks.test.ts` walks every `.ts`
+  under `tests/` and fails on any `describe`/`it`/`test`/`suite` call whose source text repeats
+  an earlier SIBLING's byte for byte. Vitest runs duplicate titles silently, so nothing else
+  can say so, and this defect arrives through MERGES: #2506 deleted the same two
+  `gathering.test.ts` blocks that `a1a8cfd56` had already deleted once. Byte-identical and
+  sibling-scoped on purpose: the same body under two different describes is ordinary (each
+  parent brings its own setup), and a same-TITLE rule would be a different, red guard
+  (`professions_crafting.test.ts` names two distinct blocks `self-gathered crafting bonus
+  (#1145)`). A duplicate is always deleted, never renamed apart.
 - `guide.test.ts` is the wiki freshness gate: new/changed player-facing content in
   `src/sim/content/` fails it until `npm run wiki:content` regenerates (auto in `pretest`).
 - `css_corpus.test.ts` guards the CSS union corpus + brace balance (a dropped closing
   brace silently discards all later CSS); re-run after touching `src/styles/` or entry inline styles.
 - Perf budgets: `hud_perf_budget` (baseline in `hud_perf_budget.baseline.md`), `render_budget`,
   `tests/server/perf_gate` + `tick_perf_capture`, `alloc_probe` (probe in `tests/util/`).
+  `hud_perf_budget` also owns the painter half of the `src/ui` classification, over all three
+  DOM-adapter names (`*_painter.ts`, `*_window.ts`, `*_controller.ts`): a painter is facet-routed
+  (`HOT_PAINTERS`, no raw per-frame write and no forced-reflow read), canvas
+  (`CANVAS_PAINTERS`, same scans plus an identity proof that it really draws on a 2D context),
+  or cold, the registration-free default for a window (no forced-reflow read and no repeating
+  driver of its own, at any cadence). The raw-write scan is waived for cold NOT because a
+  window is cold, which this tree contradicts, but because a COUNT cannot tell a build-time
+  write from a repeated one; see the bucket 3 comment for the cadences involved. Inside a
+  granted driver's callback it CAN, so a `driverAllow` entry now costs a `drivers` entry per
+  call site: the cadence, pinned against the source literal, plus exact counts of raw writes,
+  element re-queries and IDL-property writes over everything ONE TICK reaches
+  (`helpers/driver_callback_bodies.ts`). The unit is the callback body PLUS every same-module
+  function it calls, because a body-only scan is vacuous over this tree: all three live
+  callbacks are a guard and a method call, and the writes that motivated the rule are one hop
+  further in.
+- `hud_update_drive.test.ts` answers the cadence question that gate refuses to: one
+  hand-written row per call `Hud.update()` evaluates, carrying its band
+  (`frame`/`fast`/`medium`/`slow`), the exact condition text gating it, what it repaints, and
+  for a window the source line its invalidation guard is spelled on. Diffed BOTH ways against
+  a `ts.createSourceFile` walk (`helpers/method_call_sites.ts`), so adding, deleting,
+  re-banding or re-gating a call in `update()` fails until the table says so, and deleting a
+  guard it names fails too. It registers the WHOLE body rather than only the windows on
+  purpose: a table naming a handful when half the family qualifies reads as a complete
+  classification and is not one. Touching `update()` means touching this file.
 - SFX gates: the `sfx_*` suites (`sfx_conform`, `sfx_studio_server_security`,
   `tests/server/static_sfx_serving`, ...) mirror `npm run sfx:check`.
 - `malware_scan.test.ts` is the release-gate backstop (signatures from `scripts/malware_scan.mjs`,
@@ -96,8 +173,14 @@ yourself or the S3 guard throws "status.json is missing".
   completeness + placeholder parity per locale). Add or change a sim/server player string and update
   the matcher in the SAME change or this fails.
 - **Two tiers via `I18N_RELEASE_TIER`** (also read by `localization_coverage`, `i18n_status_registry`,
-  `i18n_t_behavior`): unset = PR tier (registration/key-existence only, English-only legal); `=1` =
-  release tier (hard-fails on any `pending` locale row + full-localization checks).
+  `i18n_t_behavior`, `deed_i18n`): unset = PR tier (registration/key-existence only, English-only
+  legal); `=1` = release tier (hard-fails on any `pending` locale row + full-localization checks).
+  The tier runs as its OWN job / gate step over exactly those suites (`release-i18n` in
+  `.github/workflows/ci.yml`, `vitest (release-tier i18n)` locally), never over the whole suite:
+  a release branch is red for un-filled locales through most of a cycle, and fusing that with
+  the test signal let a real regression hide inside expected noise (#2820). Adding a suite that
+  reads the flag means adding it to `I18N_RELEASE_TIER_SUITES` (`scripts/lib/gate_steps.mjs`) and
+  the ci.yml job; `tests/release_i18n_tier_coverage.test.ts` fails until all three agree.
 
 ## Running & adding
 - Single file (preferred while iterating): `npx vitest run tests/<file>.test.ts`.

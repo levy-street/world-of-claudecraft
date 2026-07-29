@@ -60,6 +60,9 @@ export const COPIED_ALLOW_IDS = [
   'admin::de_DE::moderation.colStatus',
   'admin::de_DE::moderation.badgeOnline',
   'admin::de_DE::detail.lengthHours',
+  // Admin restore item-id entry field: the placeholder must show a literal item id
+  // that operators can paste into the restore form, not a translated phrase.
+  'admin::de_DE::profInspect.itemIdPlaceholder',
   'admin::de_DE::chatMod.status',
   'admin::pt_BR::app.title',
   'admin::pt_BR::detail.status',
@@ -266,6 +269,104 @@ export const COPIED_ALLOW_IDS = [
   'admin::pt_BR::detail.streamerLabel',
   'admin::sv_SE::detail.streamerLabel',
   'admin::vi_VN::detail.streamerLabel',
+  // Unstuck-reports dashboard (v0.32.0). Three genuine cognates rather than
+  // re-coined words: French "Destination" and German "Hotspots" are the normal
+  // terms in those languages, and Indonesian "area" is a standard loanword.
+  // fr_CA carries no own row for colDestination, so it inherits fr_FR's value
+  // and needs its own shadow entry (the same pairing as who.statusCombat above).
+  'admin::fr_FR::unstuckReports.colDestination',
+  'admin::fr_CA::unstuckReports.colDestination',
+  'admin::de_DE::unstuckReports.hotspotsTitle',
+  'admin::id_ID::unstuckReports.areaId',
+  // Admin Guilds panel (v0.34.0, #2590). "Online"/"Offline" and "Status" repeat
+  // moderation.badgeOnline / detail.status / moderation.colStatus, already
+  // blocked as genuine cognates for these exact locales above; the guild member
+  // table's status column reuses the same established word for consistency
+  // with the moderation panel's status badge elsewhere in the same dashboard.
+  'admin::it_IT::guilds.online',
+  'admin::it_IT::guilds.offline',
+  'admin::de_DE::guilds.online',
+  'admin::de_DE::guilds.offline',
+  'admin::de_DE::guilds.memberStatus',
+  'admin::pt_BR::guilds.online',
+  'admin::pt_BR::guilds.offline',
+  'admin::pt_BR::guilds.memberStatus',
+  'admin::cs_CZ::guilds.online',
+  'admin::cs_CZ::guilds.offline',
+  'admin::nl_NL::guilds.online',
+  'admin::nl_NL::guilds.offline',
+  'admin::nl_NL::guilds.memberStatus',
+  'admin::pl_PL::guilds.online',
+  'admin::pl_PL::guilds.offline',
+  'admin::pl_PL::guilds.memberStatus',
+  'admin::id_ID::guilds.memberStatus',
+  'admin::sv_SE::guilds.online',
+  'admin::sv_SE::guilds.offline',
+  'admin::sv_SE::guilds.memberStatus',
+  'admin::da_DK::guilds.online',
+  'admin::da_DK::guilds.offline',
+  'admin::da_DK::guilds.memberStatus',
+  // "Officer" repeats hud.social.ranks.officer, the game client's own established
+  // (unmodified) rank name for these two locales specifically; every OTHER
+  // locale translates that rank (e.g. de_DE "Offizier", it_IT "Ufficiale"), so
+  // this is locale-specific precedent, not a blanket cognate.
+  'admin::sv_SE::guilds.rank.officer',
+  'admin::da_DK::guilds.rank.officer',
+  // The professions-inspect panel (v0.34.0). Two of its rows are structurally
+  // English in every locale: itemIdPlaceholder shows a literal item id
+  // ("copper_mining_pick"), which is a code identifier an operator types back
+  // verbatim, and restoreSummary ("{id} x{count}") is a bare format string whose
+  // only non-placeholder character is the multiplication "x". Locales that front
+  // them with a native lead-in (ja_JP "例: ", ru_RU "например, ") do not appear here.
+  'admin::cs_CZ::profInspect.itemIdPlaceholder',
+  'admin::da_DK::profInspect.itemIdPlaceholder',
+  'admin::de_DE::profInspect.itemIdPlaceholder',
+  'admin::es::profInspect.itemIdPlaceholder',
+  'admin::es_ES::profInspect.itemIdPlaceholder',
+  'admin::fr_FR::profInspect.itemIdPlaceholder',
+  'admin::fr_CA::profInspect.itemIdPlaceholder',
+  'admin::id_ID::profInspect.itemIdPlaceholder',
+  'admin::it_IT::profInspect.itemIdPlaceholder',
+  'admin::nl_NL::profInspect.itemIdPlaceholder',
+  'admin::pl_PL::profInspect.itemIdPlaceholder',
+  'admin::pt_BR::profInspect.itemIdPlaceholder',
+  'admin::sv_SE::profInspect.itemIdPlaceholder',
+  'admin::tr_TR::profInspect.itemIdPlaceholder',
+  'admin::vi_VN::profInspect.itemIdPlaceholder',
+  'admin::cs_CZ::profInspect.restoreSummary',
+  'admin::da_DK::profInspect.restoreSummary',
+  'admin::de_DE::profInspect.restoreSummary',
+  'admin::es::profInspect.restoreSummary',
+  'admin::es_ES::profInspect.restoreSummary',
+  'admin::fr_FR::profInspect.restoreSummary',
+  'admin::fr_CA::profInspect.restoreSummary',
+  'admin::id_ID::profInspect.restoreSummary',
+  'admin::it_IT::profInspect.restoreSummary',
+  'admin::ja_JP::profInspect.restoreSummary',
+  'admin::nl_NL::profInspect.restoreSummary',
+  'admin::pl_PL::profInspect.restoreSummary',
+  'admin::pt_BR::profInspect.restoreSummary',
+  'admin::ru_RU::profInspect.restoreSummary',
+  'admin::sv_SE::profInspect.restoreSummary',
+  'admin::tr_TR::profInspect.restoreSummary',
+  'admin::vi_VN::profInspect.restoreSummary',
+  'admin::zh_CN::profInspect.restoreSummary',
+  'admin::zh_TW::profInspect.restoreSummary',
+  // True cognates: "Charges" is the ordinary French noun (the game client already
+  // ships it in hudChrome.professions.toolEffectCharges), and Dutch spells the
+  // noun "Effect" exactly as English does.
+  'admin::fr_FR::profInspect.colCharges',
+  'admin::fr_CA::profInspect.colCharges',
+  'admin::nl_NL::profInspect.colEffect',
+  'admin::nl_NL::profInspect.effectLabel',
+  // True cognates: "Status" is the ordinary native noun for the guild-bank
+  // status column in German, Dutch, Swedish, Danish, and Indonesian (the same
+  // Latin-derived spelling as English).
+  'admin::de_DE::guilds.bankColStatus',
+  'admin::nl_NL::guilds.bankColStatus',
+  'admin::sv_SE::guilds.bankColStatus',
+  'admin::da_DK::guilds.bankColStatus',
+  'admin::id_ID::guilds.bankColStatus',
 ];
 
 export const V07_SLASH = [
@@ -313,7 +414,6 @@ export const V07_SLASH = [
   'Quest log (5): Aki.',
   'Spellbook (5): Aki.',
   'Target: Aki (level 5 Aki) — Aki.',
-  'That player is already trading.',
   'Threat is only tracked on enemies; Aki is not one.',
   'Threat on Aki (5): Aki.',
   'Time played this session: Aki.',
@@ -323,7 +423,17 @@ export const V07_SLASH = [
   'You are Aki.',
   'You are airborne and rising — Akiyd above the ground.',
   'You are falling — Akiyd above the ground.Aki',
-  'You are fishing — Akis of Akis remaining.',
+  // Gather-cast rewords: the fishing readout dropped its countdown (no bite
+  // leak) and the gather cast readout joined the same /cast backstop surface.
+  'You are fishing. Waiting for a bite.',
+  'You are gathering: Akis of Akis remaining.',
+  // Craft-family cast readouts (Craft Cast System): same /cast backstop surface
+  // as gather. S3 substituter fills remaining/total with "Aki" + "s" units.
+  'You are crafting: Akis of Akis remaining.',
+  'You are disenchanting: Akis of Akis remaining.',
+  'You are enchanting: Akis of Akis remaining.',
+  'You are salvaging: Akis of Akis remaining.',
+  'You are recharging a tool effect: Akis of Akis remaining.',
   'You are in Aki (levels Aki–Aki) at (5, 5).',
   'You are in Aki.',
   'You are in combat (enemies still engaged).',

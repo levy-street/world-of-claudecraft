@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { ClientWorld } from '../src/net/online';
 import { MOUNT_KEYS, MOUNTS } from '../src/sim/content/mounts';
 import { BUILTIN_WORLD, MOBS, NPCS, zoneAt } from '../src/sim/data';
 import { grantDeed } from '../src/sim/deeds';
@@ -11,6 +10,7 @@ import type { SimContext } from '../src/sim/sim_context';
 import * as chatMod from '../src/sim/social/chat';
 import type { SimEvent, WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import { bareClient } from './helpers/bare_client';
 
 // Chat/emote/presence tests only ever talk between hand-added players (the
 // /played and /playtime timelines tick a minute-plus of world time), so none
@@ -848,30 +848,6 @@ describe('trade completion event', () => {
 });
 
 describe('snapshot interpolation continuity', () => {
-  function bareClient(pid: number): any {
-    const c: any = Object.create(ClientWorld.prototype);
-    c.cfg = { seed: 42, playerClass: 'warrior' };
-    c.entities = new Map();
-    c.playerId = pid;
-    c.inventory = [];
-    c.equipment = {};
-    c.copper = 0;
-    c.xp = 0;
-    c.known = [];
-    c.questLog = new Map();
-    c.questsDone = new Set();
-    c.partyInfo = null;
-    c.tradeInfo = null;
-    c.duelInfo = null;
-    c.lastSnapAt = 0;
-    c.snapInterval = 50;
-    c.pendingFacingDelta = 0;
-    c.connected = true;
-    c.eventQueue = [];
-    c.mouselookFacing = null;
-    return c;
-  }
-
   const wire = (id: number, x: number) => ({
     id,
     k: 'player',
@@ -887,7 +863,7 @@ describe('snapshot interpolation continuity', () => {
   });
 
   it('re-anchors prevPos at the rendered pose instead of the last server pose', () => {
-    const c = bareClient(7);
+    const c = bareClient(7, { cfg: { seed: 42, playerClass: 'warrior' } });
     const self = (x: number) => ({
       ...wire(7, x),
       res: 0,
@@ -904,15 +880,15 @@ describe('snapshot interpolation continuity', () => {
       stats: { str: 1, agi: 1, sta: 1, int: 1, spi: 1, armor: 0 },
       weapon: { min: 1, max: 2, speed: 2 },
     });
-    c.applySnapshot({ t: 'snap', tick: 1, time: 0, self: self(0), ents: [] });
-    const e = c.entities.get(7);
+    (c as any).applySnapshot({ t: 'snap', tick: 1, time: 0, self: self(0), ents: [] });
+    const e = c.entities.get(7)!;
     // second snapshot lands: the player moved server-side from x=0 to x=10
-    c.applySnapshot({ t: 'snap', tick: 2, time: 0.05, self: self(10), ents: [] });
+    (c as any).applySnapshot({ t: 'snap', tick: 2, time: 0.05, self: self(10), ents: [] });
     // third snapshot from x=10 to x=20: prevPos must sit on the segment the
     // renderer was drawing (between 0 and 10, or slightly past 10 when the
     // frame extrapolated) — never reset all the way back to the old pose
     // unless no time passed at all
-    c.applySnapshot({ t: 'snap', tick: 3, time: 0.1, self: self(20), ents: [] });
+    (c as any).applySnapshot({ t: 'snap', tick: 3, time: 0.1, self: self(20), ents: [] });
     expect(e.pos.x).toBe(20);
     expect(e.prevPos.x).toBeGreaterThanOrEqual(0);
     expect(e.prevPos.x).toBeLessThanOrEqual(12.5); // <= 1.25 extrapolation cap
@@ -921,7 +897,7 @@ describe('snapshot interpolation continuity', () => {
   });
 
   it('mirrors overhead emotes from snapshots and clears them when absent', () => {
-    const c = bareClient(7);
+    const c = bareClient(7, { cfg: { seed: 42, playerClass: 'warrior' } });
     const self = (emo?: string, emoSeq?: number) => ({
       ...wire(7, 0),
       ...(emo ? { emo, emoSeq } : {}),
@@ -939,14 +915,14 @@ describe('snapshot interpolation continuity', () => {
       stats: { str: 1, agi: 1, sta: 1, int: 1, spi: 1, armor: 0 },
       weapon: { min: 1, max: 2, speed: 2 },
     });
-    c.applySnapshot({ t: 'snap', tick: 1, time: 0, self: self('laugh', 4), ents: [] });
+    (c as any).applySnapshot({ t: 'snap', tick: 1, time: 0, self: self('laugh', 4), ents: [] });
     expect(c.entities.get(7)?.overheadEmoteId).toBe('laugh');
     expect(c.entities.get(7)?.overheadEmoteSeq).toBe(4);
 
-    c.applySnapshot({ t: 'snap', tick: 2, time: 0.05, self: self('laugh', 5), ents: [] });
+    (c as any).applySnapshot({ t: 'snap', tick: 2, time: 0.05, self: self('laugh', 5), ents: [] });
     expect(c.entities.get(7)?.overheadEmoteSeq).toBe(5);
 
-    c.applySnapshot({ t: 'snap', tick: 3, time: 0.1, self: self(), ents: [] });
+    (c as any).applySnapshot({ t: 'snap', tick: 3, time: 0.1, self: self(), ents: [] });
 
     expect(c.entities.get(7)?.overheadEmoteId).toBeNull();
   });
@@ -1029,6 +1005,55 @@ describe('/afk and /dnd presence', () => {
     sim.chat('back now', a);
     const out = logEvents(sim.tick());
     expect(out.some((m) => m.pid === a && /no longer marked as away/.test(m.text))).toBe(true);
+  });
+
+  it('/afk sets the entity display flag; /dnd does not; toggling clears it', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.tick();
+    const e = sim.entities.get(a)!;
+
+    expect(e.afk).toBe(false);
+    sim.chat('/afk', a);
+    sim.tick();
+    expect(e.afk).toBe(true); // the wire/nameplate/presence display bit
+
+    sim.chat('/afk', a); // repeat toggles off
+    sim.tick();
+    expect(e.afk).toBe(false);
+
+    // Do Not Disturb is a private state: it never lights the public AFK tag.
+    sim.chat('/dnd raiding', a);
+    sim.tick();
+    expect(sim.meta(a)!.away?.mode).toBe('dnd');
+    expect(e.afk).toBe(false);
+  });
+
+  it('moving under your own input clears AFK (Do Not Disturb survives)', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.tick();
+    const e = sim.entities.get(a)!;
+
+    sim.chat('/afk', a);
+    sim.tick();
+    expect(e.afk).toBe(true);
+
+    sim.meta(a)!.moveInput.forward = true;
+    const moved = logEvents(sim.tick());
+    expect(e.afk).toBe(false);
+    expect(sim.meta(a)!.away).toBe(null);
+    expect(moved.some((m) => m.pid === a && /no longer Away From Keyboard/.test(m.text))).toBe(
+      true,
+    );
+
+    // Do Not Disturb is deliberate: movement leaves it in place.
+    sim.meta(a)!.moveInput.forward = false;
+    sim.chat('/dnd', a);
+    sim.tick();
+    sim.meta(a)!.moveInput.forward = true;
+    sim.tick();
+    expect(sim.meta(a)!.away?.mode).toBe('dnd');
   });
 });
 
@@ -1205,12 +1230,17 @@ describe('chat module (direct, no Sim)', () => {
     expect(meta).toBeDefined();
     // Every catalog mount is owned (the reins item is in the bags)...
     expect(ownedMounts(meta as any)).toEqual([...MOUNT_KEYS]);
-    // ...and the level 1 rider was raised to the highest riding gate (20), so
-    // every granted mount is ridable immediately.
-    const maxGate = Math.max(...MOUNT_KEYS.map((k) => MOUNTS[k].level));
-    expect(sim.entities.get(pid)?.level).toBe(maxGate);
+    expect(ownedMounts(meta as any)).toContain('terrorspark_groundshaker');
+    // ...and the level 1 rider was raised to 20, the stablemaster's buy gate and
+    // the only level that still matters in the mount flow (mounts themselves have
+    // no per-mount level gate).
+    expect(sim.entities.get(pid)?.level).toBe(20);
+    // 9 since the Drakemaw Raptor joined the catalog. Spelled as a literal on
+    // purpose rather than derived from MOUNT_KEYS.length: the row above already
+    // proves ownership against the catalog, so deriving this one too would let a
+    // catalog that silently lost a mount pass both.
     expect(
-      events.some((e: any) => e.type === 'log' && /^\[dev\] Granted 7 mount reins/.test(e.text)),
+      events.some((e: any) => e.type === 'log' && /^\[dev\] Granted 9 mount reins/.test(e.text)),
     ).toBe(true);
     // A second run is idempotent: everything already owned, nothing granted twice.
     sim.chat('/dev mounts', pid);
@@ -1235,7 +1265,7 @@ describe('chat module (direct, no Sim)', () => {
     const e = sim.entities.get(pid);
     // Level 20 (the riding-lesson gate), exactly 100g richer, standing in
     // Marla's yard beside her authored position.
-    expect(e?.level).toBe(MOUNTS.valorsteed.level);
+    expect(e?.level).toBe(20); // MOUNT_TRAIN_MIN_LEVEL
     expect(sim.meta(pid)?.copper).toBe(copperBefore + 100 * 10000);
     const marla = NPCS.stablemaster_marla;
     expect(Math.hypot((e?.pos.x ?? 0) - marla.pos.x, (e?.pos.z ?? 0) - marla.pos.z)).toBeLessThan(
@@ -1248,7 +1278,7 @@ describe('chat module (direct, no Sim)', () => {
     // never re-levels, and the [dev] line drops the level note.
     sim.chat('/dev mountquest', pid);
     const again = sim.drainEvents();
-    expect(sim.entities.get(pid)?.level).toBe(MOUNTS.valorsteed.level);
+    expect(sim.entities.get(pid)?.level).toBe(20);
     expect(sim.meta(pid)?.copper).toBe(copperBefore + 2 * 100 * 10000);
     expect(again.some((ev: any) => ev.type === 'log' && /^\[dev\] 100g added/.test(ev.text))).toBe(
       true,

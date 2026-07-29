@@ -31,7 +31,7 @@ import type {
   MountSummonBarState,
 } from '../render/cast_bar';
 import { formatNumber, type TranslationKey, t } from './i18n';
-import { mountDisplayName } from './mount_picker';
+import { mountDisplayName } from './mount_labels';
 import type { PainterHostWriters } from './painter_host';
 
 // The channel class drives the draining (vs filling) fill color via CSS; a channel,
@@ -75,6 +75,9 @@ export interface CastBarOptions {
   /** Clear the inner fill/label/timer + channel class when the bar is hidden (the
    *  player's inline block did; the target only set display:none). */
   clearOnHide?: boolean;
+  /** Display value when shown (default 'block'; the crafting window's cast
+   *  strip is a flex row). */
+  shownDisplay?: string;
 }
 
 /** The per-frame source the painter draws from. */
@@ -141,7 +144,7 @@ export class CastBarPainter {
   // blocks (display, channel, width, label, timer) so the elided-writer cache keys
   // line up byte-for-byte and the skip-rate accounting is unchanged.
   private paintBar(channel: boolean, fill: number, label: string, remaining: number): void {
-    this.writers.setDisplay(this.el.bar, SHOWN_DISPLAY);
+    this.writers.setDisplay(this.el.bar, this.opts.shownDisplay ?? SHOWN_DISPLAY);
     this.writers.toggleClass(this.el.bar, CHANNEL_CLASS, channel);
     this.writers.setWidth(this.el.fill, `${(fill * 100).toFixed(PERCENT_FRACTION_DIGITS)}%`);
     this.writers.setText(this.el.label, label);

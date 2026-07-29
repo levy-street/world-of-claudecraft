@@ -151,6 +151,26 @@ export class TutorialOverlay {
     this.updateArrow(world, renderer);
   }
 
+  /**
+   * Re-localize after an in-game language switch (the Hud's woc:languagechange
+   * fan-out). Self-gated on there being a card on screen, so the fan-out can
+   * call it unconditionally.
+   *
+   * update() repaints only when the STEP changes or Interface Mode flips, so a
+   * card that is already up would keep its old-locale copy for the whole step.
+   * Takes the world and keybinds the same way update() does, since the card's
+   * copy interpolates the live keybind labels and the player's name.
+   */
+  relocalize(world: IWorld, keybinds: Keybinds): void {
+    if (this.completed || !this.engaged || this.step === null) return;
+    // The same defense update() and isFreshCharacter take: player is typed as an
+    // Entity but is absent in the online pre-snapshot window, and renderPanel
+    // reads player.name. A throw here would unwind the whole fan-out and skip
+    // every arm after this one.
+    if (!world.player) return;
+    this.renderPanel(world, keybinds);
+  }
+
   // ---- internals --------------------------------------------------------
 
   private findEntity(world: IWorld, kind: string, templateId: string) {

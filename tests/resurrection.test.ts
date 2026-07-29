@@ -1,6 +1,7 @@
-// The shared death/respawn leaf module (src/sim/resurrection.ts): the level-scaled
-// Resurrection Sickness ("The Keeper's Toll") duration and the "which auras survive
-// death" predicate, shared by every player death/respawn site so the rule cannot drift.
+// The shared death/respawn leaf module (src/sim/resurrection.ts): the two level-scaled
+// sickness durations (Resurrection Sickness, aka "The Keeper's Toll", and the shorter
+// Unstuck Sickness) and the "which auras survive death" predicate, shared by every player
+// death/respawn site so the rule cannot drift.
 
 import { describe, expect, it } from 'vitest';
 import {
@@ -8,8 +9,15 @@ import {
   RES_SICKNESS_DURATION,
   RES_SICKNESS_MIN_DURATION,
   RES_SICKNESS_MIN_LEVEL,
+  RES_SICKNESS_STAT_MULT,
   RESURRECTION_SICKNESS_ID,
   resSicknessDuration,
+  UNSTUCK_SICKNESS_DURATION,
+  UNSTUCK_SICKNESS_ID,
+  UNSTUCK_SICKNESS_MIN_DURATION,
+  UNSTUCK_SICKNESS_MIN_LEVEL,
+  UNSTUCK_SICKNESS_STAT_MULT,
+  unstuckSicknessDuration,
 } from '../src/sim/resurrection';
 import { type Aura, MAX_LEVEL } from '../src/sim/types';
 
@@ -55,12 +63,59 @@ describe('resurrection: level-scaled sickness duration', () => {
   });
 });
 
+describe('unstuck: level-scaled sickness duration', () => {
+  it('is zero below the minimum level (the same classic exemption)', () => {
+    expect(unstuckSicknessDuration(1)).toBe(0);
+    expect(unstuckSicknessDuration(UNSTUCK_SICKNESS_MIN_LEVEL - 1)).toBe(0);
+  });
+
+  it('is exactly the minimum duration at the minimum level', () => {
+    expect(unstuckSicknessDuration(UNSTUCK_SICKNESS_MIN_LEVEL)).toBe(UNSTUCK_SICKNESS_MIN_DURATION);
+  });
+
+  it('tops out at five minutes, half the Pale Keeper ceiling', () => {
+    expect(UNSTUCK_SICKNESS_DURATION).toBe(300);
+    expect(UNSTUCK_SICKNESS_DURATION).toBe(RES_SICKNESS_DURATION / 2);
+    expect(unstuckSicknessDuration(MAX_LEVEL)).toBe(UNSTUCK_SICKNESS_DURATION);
+  });
+
+  it('scales linearly and monotonically between the bounds', () => {
+    const mid = (UNSTUCK_SICKNESS_MIN_LEVEL + MAX_LEVEL) / 2;
+    expect(unstuckSicknessDuration(mid)).toBe(
+      Math.round(
+        UNSTUCK_SICKNESS_MIN_DURATION +
+          0.5 * (UNSTUCK_SICKNESS_DURATION - UNSTUCK_SICKNESS_MIN_DURATION),
+      ),
+    );
+    expect(unstuckSicknessDuration(UNSTUCK_SICKNESS_MIN_LEVEL + 1)).toBeGreaterThan(
+      UNSTUCK_SICKNESS_MIN_DURATION,
+    );
+    expect(unstuckSicknessDuration(MAX_LEVEL - 1)).toBeLessThan(UNSTUCK_SICKNESS_DURATION);
+  });
+
+  it('is strictly shorter than The Keeper’s Toll above the minimum level, and weighs the same', () => {
+    expect(unstuckSicknessDuration(MAX_LEVEL)).toBeLessThan(resSicknessDuration(MAX_LEVEL));
+    expect(unstuckSicknessDuration(UNSTUCK_SICKNESS_MIN_LEVEL + 1)).toBeLessThan(
+      resSicknessDuration(RES_SICKNESS_MIN_LEVEL + 1),
+    );
+    expect(UNSTUCK_SICKNESS_STAT_MULT).toBe(RES_SICKNESS_STAT_MULT);
+    expect(UNSTUCK_SICKNESS_ID).not.toBe(RESURRECTION_SICKNESS_ID);
+  });
+});
+
 describe('resurrection: aurasSurvivingDeath predicate', () => {
   it('keeps only Resurrection Sickness and drops every other aura', () => {
     const auras = [aura('rejuvenation'), aura(RESURRECTION_SICKNESS_ID), aura('blessing_of_might')];
     const survivors = aurasSurvivingDeath(auras);
     expect(survivors).toHaveLength(1);
     expect(survivors[0].id).toBe(RESURRECTION_SICKNESS_ID);
+  });
+
+  it('keeps Unstuck Sickness too, so dying cannot shed it', () => {
+    const auras = [aura('rejuvenation'), aura(UNSTUCK_SICKNESS_ID), aura('blessing_of_might')];
+    const survivors = aurasSurvivingDeath(auras);
+    expect(survivors).toHaveLength(1);
+    expect(survivors[0].id).toBe(UNSTUCK_SICKNESS_ID);
   });
 
   it('keeps encounter-owned unbreakable control until its script releases it', () => {

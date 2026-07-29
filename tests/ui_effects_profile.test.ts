@@ -3,12 +3,20 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
   EFFECTS_QUALITY_LOW_CUTOFF,
+  loadingCurtainFadeMs,
   resolveUiEffectsProfile,
   type UiEffectsProfile,
   uiEffectsAllowFctCrit,
   uiEffectsProfilesEqual,
   uiEffectsTokens,
 } from '../src/game/ui_effects_profile';
+
+describe('loading curtain reduced-motion timing', () => {
+  it('keeps the visual fade normally and removes it immediately under reduced motion', () => {
+    expect(loadingCurtainFadeMs(false)).toBe(350);
+    expect(loadingCurtainFadeMs(true)).toBe(0);
+  });
+});
 
 // The resolver is the ONLY place the HUD effect precedence lives. These tests pin
 // every documented rule so a regression (a dropped clamp, glass dropped under
@@ -24,7 +32,7 @@ const ULTRA: UiEffectsProfile = {
 
 // The resolver takes a single object input; a tiny helper keeps the cases terse.
 function resolve(
-  presetLabel: 'low' | 'medium' | 'high' | 'ultra' | 'advanced',
+  presetLabel: 'low' | 'medium' | 'high' | 'ultra' | 'insane' | 'advanced',
   effectsQuality: number,
   reduceMotion: boolean,
 ): UiEffectsProfile {
@@ -36,6 +44,10 @@ describe('resolveUiEffectsProfile - base preset mapping', () => {
     expect(resolve('ultra', 1, false)).toEqual(ULTRA);
     expect(resolve('high', 1, false)).toEqual({ ...ULTRA, tier: 'high' });
     expect(resolve('medium', 1, false)).toEqual({ ...ULTRA, tier: 'medium' });
+  });
+
+  it('insane is a 3D-render preset only: the HUD effect ladder tops out at ultra', () => {
+    expect(resolve('insane', 1, false)).toEqual(ULTRA);
   });
 
   it('low preset cuts cost (no heavy shadows, paused ambient, no FCT crit) independent of motion', () => {

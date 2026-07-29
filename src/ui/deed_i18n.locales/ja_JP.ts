@@ -7,6 +7,102 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: '手中の軍旗',
+    desc: 'ソーンホロウ平原で旗を奪う。',
+  },
+  pvp_bg_first_win: {
+    name: 'ソーンホロウ初陣を飾る',
+    desc: 'ソーンホロウ平原で勝利する。',
+  },
+  pvp_bg_wins_25: {
+    name: 'ソーンホロウの番人',
+    desc: 'ソーンホロウ平原で25回勝利する。',
+    title: '旗手',
+  },
+  pvp_bg_captures_100: {
+    name: '百の軍旗',
+    desc: 'ソーンホロウ平原で通算100枚の旗を奪う。',
+  },
+  dgn_rift: {
+    name: 'リフト踏破者',
+    desc: 'フロアボスを倒してリフトを攻略する。',
+  },
+  dgn_rift_s_rank: {
+    name: 'リフトの君主',
+    desc: 'Sランクのリフトを攻略する。リフトポータルが出現させうる最高難度の階級だ。',
+  },
+  pvp_honor_sergeant: {
+    name: '軍曹',
+    desc: '生涯名誉10,000を獲得する。使っても階級を失うことはない。',
+    title: '軍曹',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: '騎士中尉',
+    desc: '生涯名誉40,000を獲得する。本物の戦を一シーズン戦い抜いてきた証だ。',
+    title: '騎士中尉',
+  },
+  pvp_honor_field_marshal: {
+    name: '元帥',
+    desc: '生涯名誉150,000を獲得する。どのレルムでも希少であり、それでいい。',
+    title: '元帥',
+  },
+  chr_drakemaw_broodlord: {
+    name: '卵砕き',
+    desc: '咆哮と薙ぎ払い、そして業火をくぐり抜け、卵に囲まれた火口の巣主を討ち取れ。',
+  },
+  chr_maw_matriarch: {
+    name: '空の静寂',
+    desc: 'ドレイクモウを見下ろす火口のねぐらで、シンドラレス、火口の母竜を討ち取れ。',
+  },
+  chr_frostveil_gatherer: {
+    name: '段丘の収穫',
+    desc: 'Frostveilで鉱脈、木立、薬草畑を収穫する。',
+  },
+  chr_frostveil_first_cast: {
+    name: '湖沼の初氷',
+    desc: 'Frostveilの水辺で魚を釣る。',
+  },
+  chr_amberfall_gatherer: {
+    name: 'Amberfallの収穫',
+    desc: 'Amberfallで鉱脈、木立、薬草畑を収穫する。',
+  },
+  chr_amberfall_first_cast: {
+    name: '大湿原の一匹',
+    desc: 'Amberfallの水辺で魚を釣る。',
+  },
+  chr_nightbloom_gatherer: {
+    name: '夢見る収穫',
+    desc: 'Nightbloomで鉱脈、木立、薬草畑を収穫する。',
+  },
+  chr_nightbloom_first_cast: {
+    name: '月の井戸の波紋',
+    desc: 'Nightbloomの水辺で魚を釣る。',
+  },
+  chr_wraithwood_gatherer: {
+    name: '樹冠の下の収穫',
+    desc: 'Wraithwoodで鉱脈、木立、薬草畑を収穫する。',
+  },
+  chr_wraithwood_first_cast: {
+    name: '鏡の入り江への一投',
+    desc: 'Wraithwoodの水辺で魚を釣る。',
+  },
+  chr_palmreach_gatherer: {
+    name: '椰子浜の収穫',
+    desc: 'Palmreachで鉱脈、木立、薬草畑を収穫する。',
+  },
+  chr_palmreach_first_cast: {
+    name: 'サファイア潟への一投',
+    desc: 'Palmreachの水辺で魚を釣る。',
+  },
+  chr_evergarden_gatherer: {
+    name: '花壇の恵み',
+    desc: 'Evergardenで鉱脈、木立、薬草畑を収穫する。',
+  },
+  chr_evergarden_first_cast: {
+    name: '花びら池への一投',
+    desc: 'Evergardenの水辺で魚を釣る。',
+  },
   pvp_card_duel_first_win: {
     name: '我が流儀',
     desc: 'カードマスターのもとでカードデュエルに勝利する。',
@@ -50,7 +146,7 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: '野辺の名人', desc: '薬草学の熟練度100に到達する。' },
   prog_master_gatherer: {
     name: '採集の達人',
-    desc: '採掘、伐採、薬草学のすべてで熟練度100に到達する。',
+    desc: '採掘、伐採、薬草学、釣りのうち、いずれか3つの熟練度100に到達する。',
   },
   prog_first_craft: { name: '手仕事の味', desc: '初めての製作を成功させる。' },
   prog_craft_specialist: {
@@ -364,7 +460,10 @@ export const table: DeedLocaleTable = {
     name: 'お得意様',
     desc: '補給係ヴェックスの品揃え全10点を発見する。',
   },
-  col_glimmerfin: { name: '希望のきらめき', desc: 'きらめきヒレの錦鯉を釣り上げる。' },
+  col_glimmerfin: {
+    name: '希望のきらめき',
+    desc: '日映えの錦鯉を釣り上げる。',
+  },
   col_full_creel: {
     name: '満杯の魚籠',
     desc: '渓谷、湿地、高地の水辺で釣れるコモンの獲物6種をすべて発見する。',
@@ -501,7 +600,15 @@ export const table: DeedLocaleTable = {
     title: '旅人',
   },
   exp_something_shiny: { name: 'きらりと光るもの', desc: '地面できらめく物を拾い上げる。' },
-  exp_first_ore: { name: '大地を穿て', desc: '初めての鉱脈から鉱石を採掘する。' },
+  prog_guildsworn: {
+    name: '技巧に誓いし者',
+    desc: 'アーキタイプの組み合わせに調律し、その製作技を本格的に磨き始める。',
+    title: '技巧に誓いし者',
+  },
+  exp_first_ore: {
+    name: 'つるはし、石を打つ',
+    desc: '初めての鉱脈から鉱石を採掘する。',
+  },
   exp_first_timber: { name: '倒れるぞーっ！', desc: '初めての立ち木を伐採する。' },
   exp_first_herb: { name: '緑の指', desc: '初めての薬草を摘み取る。' },
   feat_era_cap: { name: '第一の時代の申し子', desc: '第一の時代のさなかにレベル20へ到達した。' },
@@ -556,4 +663,194 @@ export const table: DeedLocaleTable = {
     desc: '放棄された地下墓所へ足を踏み入れ、その守護者たちから要石の両片と古い日誌を回収する。',
   },
   chr_marsh_first_cast: { name: '葦間のウナギ', desc: 'マイアフェン湿地の水辺で魚を釣り上げる。' },
+  prog_masterwright: {
+    name: '名工',
+    desc: '初めての傑作を打ち上げる。あまりの出来栄えに、ゾーン全体にその名が轟く。',
+    title: '名工',
+  },
+  prog_fishing_100: {
+    name: '塩の古株',
+    desc: '釣りの熟練度100に到達する。',
+  },
+  prog_master_angler: {
+    name: '釣りの達人',
+    desc: '釣りの熟練度200に到達し、釣り師の技の頂点に立つ。',
+    title: '釣りの達人',
+  },
+  prog_engineering_50: {
+    name: '歯車と弾薬',
+    desc: '工作のスキルで50に到達する。',
+  },
+  prog_alchemy_50: {
+    name: '奇妙な調合',
+    desc: '錬金術のスキルで50に到達する。',
+  },
+  prog_cooking_50: {
+    name: '百戦錬磨の料理人',
+    desc: '料理のスキルで50に到達する。',
+  },
+  prog_leatherworking_50: {
+    name: 'なめし師の生業',
+    desc: '皮革加工のスキルで50に到達する。',
+  },
+  prog_tailoring_50: {
+    name: '細やかな縫い目',
+    desc: '裁縫のスキルで50に到達する。',
+  },
+  prog_enchanting_50: {
+    name: '秘術のきらめき',
+    desc: 'エンチャントのスキルで50に到達する。',
+  },
+  prog_weaponcrafting_50: {
+    name: '刃と焼き入れ',
+    desc: '武器鍛冶のスキルで50に到達する。',
+  },
+  prog_armorcrafting_50: {
+    name: '鎚と板金',
+    desc: '防具鍛冶のスキルで50に到達する。',
+  },
+  prog_grandmaster_engineering: {
+    name: '工作の大師',
+    desc: '工作のスキルで125に到達し、その道の極みに立つ。',
+    title: '工作の大師',
+  },
+  prog_grandmaster_alchemy: {
+    name: '錬金術の大師',
+    desc: '錬金術のスキルで125に到達し、その道の極みに立つ。',
+    title: '錬金術の大師',
+  },
+  prog_grandmaster_cooking: {
+    name: '料理の大師',
+    desc: '料理のスキルで125に到達し、その道の極みに立つ。',
+    title: '料理の大師',
+  },
+  prog_grandmaster_leatherworking: {
+    name: '皮革加工の大師',
+    desc: '皮革加工のスキルで125に到達し、その道の極みに立つ。',
+    title: '皮革加工の大師',
+  },
+  prog_grandmaster_tailoring: {
+    name: '裁縫の大師',
+    desc: '裁縫のスキルで125に到達し、その道の極みに立つ。',
+    title: '裁縫の大師',
+  },
+  prog_grandmaster_enchanting: {
+    name: 'エンチャントの大師',
+    desc: 'エンチャントのスキルで125に到達し、その道の極みに立つ。',
+    title: 'エンチャントの大師',
+  },
+  prog_grandmaster_weaponcrafting: {
+    name: '武器鍛冶の大師',
+    desc: '武器鍛冶のスキルで125に到達し、その道の極みに立つ。',
+    title: '武器鍛冶の大師',
+  },
+  prog_grandmaster_armorcrafting: {
+    name: '防具鍛冶の大師',
+    desc: '防具鍛冶のスキルで125に到達し、その道の極みに立つ。',
+    title: '防具鍛冶の大師',
+  },
+  col_pristine_vein: {
+    name: '純粋な鉱脈',
+    desc: '純粋な鉱脈を掘り当て、その報せをゾーン全体に轟かせる。',
+  },
+  col_ancient_heartwood: {
+    name: '太古の心木',
+    desc: '倒れた大木から太古の心木の一節を切り出す。',
+  },
+  col_moonlit_bloom: {
+    name: '月光の花',
+    desc: '月光の花が咲き開くまさにその瞬間に摘み取る。',
+  },
+  col_perfect_specimen: {
+    name: '申し分なき標本',
+    desc: '解体した獣から、傷ひとつ汚れひとつない完璧な標本を取り出す。',
+  },
+  soc_first_salvage: {
+    name: '無駄にするな',
+    desc: '装備品を解体して素材に戻す。',
+  },
+  soc_salvage_50: {
+    name: '解体師の庭',
+    desc: '装備品を50点解体して素材に戻す。',
+  },
+  dgn_wildheart_basin: {
+    name: '盆地の逆襲',
+    desc: 'ワイルドハート盆地で盆地の声ズルガーを倒す。',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: '英雄: ワイルドハート盆地',
+    desc: '英雄難易度のワイルドハート盆地で盆地の声ズルガーを倒す。',
+  },
+  chr_peaks_gatherer: {
+    name: '高嶺の実り',
+    desc: 'ソーンピーク高地で鉱脈、木立、薬草の茂みをそれぞれ採取する。',
+  },
+  chr_marsh_rares_ii: {
+    name: '大食らい、勘定に載る',
+    desc: '最初の勘定から漏れていたマイアフェン湿地の4体目の恐怖、大食らいのグラブジョーを討ち倒す。',
+  },
+  chr_peaks_rares_ii: {
+    name: '岩山にさらに刻まれし名',
+    desc: '最初の勘定から漏れていたソーンピーク高地のさらなる2体の恐怖、老いたるクラグモーと砕片王カジックスを討ち倒す。',
+  },
+  chr_gleamstag: {
+    name: '先に手を出さぬ伝説',
+    desc: '追い詰められない限り襲ってこない、稀少で人目を避けるエリート、グリームスタッグを討ち倒す。',
+  },
+  chr_hollow_rares: {
+    name: '群れは忘れない',
+    desc: 'ヴェールの幽谷を彷徨う2体の稀少ボス、老いたるマロウシェルと群れの長アウレルホーンを討ち倒す。',
+  },
+  chr_willowfen_gatherer: {
+    name: 'フェンの恵み',
+    desc: 'ウィローフェンで鉱脈、木立、薬草の茂みをそれぞれ採取する。',
+  },
+  chr_willowfen_first_cast: {
+    name: 'リリームーアの波紋',
+    desc: 'ウィローフェンの水辺で魚を釣り上げる。',
+  },
+  chr_galecrest_gatherer: {
+    name: '岬の収穫',
+    desc: 'ゲイルクレストで鉱脈、木立、薬草の茂みをそれぞれ採取する。',
+  },
+  chr_galecrest_first_cast: {
+    name: 'ミラーターンに糸を垂れて',
+    desc: 'ゲイルクレストの水辺で魚を釣り上げる。',
+  },
+  chr_farshore_gatherer: {
+    name: '島の糧',
+    desc: '遠つ岸で鉱脈、木立、薬草の茂みをそれぞれ採取する。',
+  },
+  chr_farshore_first_cast: {
+    name: 'カモメは知っている',
+    desc: '遠つ岸の水辺で魚を釣り上げる。',
+  },
+  prog_engineering_rare: {
+    name: '精密工作',
+    desc: '工作で初めてのレア級アイテムを作る。',
+  },
+  prog_alchemy_rare: {
+    name: '稀少な逸品',
+    desc: '錬金術で初めてのレア級アイテムを作る。',
+  },
+  prog_cooking_rare: {
+    name: '忘れられぬ一皿',
+    desc: '料理で初めてのレア級アイテムを作る。',
+  },
+  prog_leatherworking_rare: {
+    name: '上質ななめし',
+    desc: '皮革加工で初めてのレア級アイテムを作る。',
+  },
+  prog_tailoring_rare: {
+    name: '名匠の一針',
+    desc: '裁縫で初めてのレア級アイテムを作る。',
+  },
+  prog_weaponcrafting_rare: {
+    name: '磨き上げた輝き',
+    desc: '武器鍛冶で初めてのレア級アイテムを作る。',
+  },
+  prog_armorcrafting_rare: {
+    name: '完璧な装甲',
+    desc: '防具鍛冶で初めてのレア級アイテムを作る。',
+  },
 };

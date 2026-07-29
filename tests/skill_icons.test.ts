@@ -1,6 +1,8 @@
+import { createHash } from 'node:crypto';
 import { closeSync, existsSync, openSync, readdirSync, readFileSync, readSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import { ABILITY_IMAGE_IDS, abilityImageUrl } from '../src/ui/icons';
 
@@ -56,6 +58,25 @@ function isValidWebp(file: string): boolean {
 
 const webpFiles = (): string[] =>
   walk(skillsDir).filter((p) => path.extname(p).toLowerCase() === '.webp');
+
+interface MissingWaveAbilityPin {
+  kind: string;
+  id: string;
+  class: string;
+  runtimeUrl: string;
+  acceptedSha256: string;
+  acceptedBytes: number;
+}
+
+function missingWaveAbilityPins(): MissingWaveAbilityPin[] {
+  const manifest = JSON.parse(
+    readFileSync(
+      path.join(repoRoot, 'docs/achievements/missing-painted-icons-accepted-art.json'),
+      'utf8',
+    ),
+  ) as { assets: MissingWaveAbilityPin[] };
+  return manifest.assets.filter((asset) => asset.kind === 'ability');
+}
 
 describe('class ability webp icons', () => {
   it('has image-backed ability ids wired (guards the fixture)', () => {
@@ -141,5 +162,71 @@ describe('class ability webp icons', () => {
       orphans,
       'unwired or misplaced webp(s) committed; remove dead-weight art or wire the id into ABILITY_IMAGE_IDS',
     ).toEqual([]);
+  });
+
+  it('D) the 90 generated additions decode as unique, opaque, exact 128px reviewed art', async () => {
+    const pins = missingWaveAbilityPins();
+    expect(pins).toHaveLength(90);
+    const hashes = new Set<string>();
+    const mapped = new Set<string>();
+    for (const className of [
+      'druid',
+      'hunter',
+      'mage',
+      'paladin',
+      'priest',
+      'rogue',
+      'shaman',
+      'warlock',
+      'warrior',
+    ]) {
+      const mapping = JSON.parse(
+        readFileSync(path.join(skillsDir, className, 'mapping.json'), 'utf8'),
+      ) as {
+        abilities: Array<{
+          abilityId: string;
+          sourcePack: string;
+          source?: string;
+          owner?: string;
+          license?: string;
+        }>;
+      };
+      for (const entry of mapping.abilities.filter(
+        ({ sourcePack }) => sourcePack === 'woc_openai_missing_painted_icons_2026_08_01',
+      )) {
+        expect(entry.source, entry.abilityId).toBe('OpenAI built-in image generation');
+        expect(entry.owner, entry.abilityId).toBe('World of ClaudeCraft');
+        expect(entry.license, entry.abilityId).toContain('project asset');
+        expect(entry.license, entry.abilityId).not.toContain('CraftPix');
+        mapped.add(entry.abilityId);
+      }
+    }
+    expect([...mapped].sort()).toEqual(pins.map(({ id }) => id).sort());
+
+    for (const pin of pins) {
+      expect(ABILITY_IMAGE_IDS.has(pin.id), `${pin.id} registry wiring`).toBe(true);
+      expect(abilityImageUrl(pin.id), `${pin.id} runtime URL`).toBe(pin.runtimeUrl);
+      const file = path.join(publicDir, pin.runtimeUrl.replace(/^\//, ''));
+      const bytes = readFileSync(file);
+      expect(bytes.length, `${pin.id} accepted bytes`).toBe(pin.acceptedBytes);
+      expect(bytes.length, `${pin.id} weight ceiling`).toBeLessThanOrEqual(15 * 1024);
+      expect(createHash('sha256').update(bytes).digest('hex'), `${pin.id} accepted hash`).toBe(
+        pin.acceptedSha256,
+      );
+      expect(hashes.has(pin.acceptedSha256), `${pin.id} duplicate painted encoding`).toBe(false);
+      hashes.add(pin.acceptedSha256);
+      const decoded = await sharp(bytes).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+      expect(decoded.info.width, `${pin.id} width`).toBe(128);
+      expect(decoded.info.height, `${pin.id} height`).toBe(128);
+      let opaque = true;
+      for (let offset = 3; offset < decoded.data.length; offset += decoded.info.channels) {
+        if (decoded.data[offset] !== 255) {
+          opaque = false;
+          break;
+        }
+      }
+      expect(opaque, `${pin.id} must keep its full-square opaque background`).toBe(true);
+    }
+    expect(hashes.size).toBe(90);
   });
 });

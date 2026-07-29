@@ -33,6 +33,9 @@ export function objectDisplayName(entity: Entity): string {
   if (entity.templateId === 'lb_breach_maw') {
     return t('lb.fixture.breach');
   }
+  if (entity.templateId === 'noticeboard_eastbrook') {
+    return t('worldContent.noticeboardName');
+  }
   if (entity.templateId === 'delve_locked_chest') {
     return t('worldContent.delveLockedChestInteract');
   }

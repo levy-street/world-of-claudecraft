@@ -123,6 +123,7 @@ describe('party frame member selection', () => {
       showResource: true,
       showAbsorbs: true,
       showAuras: true,
+      showPets: true,
       healthText: 1,
       sort: 0,
       presentation: 0,
@@ -148,6 +149,7 @@ describe('party frame member selection', () => {
       showResource: true,
       showAbsorbs: true,
       showAuras: true,
+      showPets: true,
       healthText: 1,
       sort: 1,
       presentation: 0,
@@ -298,6 +300,7 @@ describe('party frame signature (the per-frame short-circuit)', () => {
       { showResource: false },
       { showAbsorbs: false },
       { showAuras: false },
+      { showPets: false },
       { healthText: 2 as const },
       { sort: 1 as const },
       { presentation: 2 as const },
@@ -369,5 +372,165 @@ describe('ClientWorld-vs-Sim out-of-range parity', () => {
     };
     expect(selectPartyFrameMembers(sim, 1, playerPos)[0].oor).toBe(true);
     expect(selectPartyFrameMembers(mirror, 1, playerPos)[0].oor).toBe(false);
+  });
+});
+
+// The pet sliver is fed from the client's own entity roster, not the party wire, so
+// nothing on the wire moves when a party member's pet takes damage. If the signature
+// did not fold pet health, updatePartyFrames would short-circuit and the sliver would
+// freeze at whatever it first painted. These pin both halves of that.
+describe('party pets in the selector and the signature', () => {
+  // `member` is module-scoped above; the party fixture is local to this block.
+  const info = (): PartyInfo => ({
+    leader: 1,
+    raid: false,
+    master: { enabled: false, looter: 0, threshold: 'uncommon' },
+    members: [member(1, 1), member(2, 1, 10, 0), member(3, 1, 20, 0)],
+  });
+  const pets = (
+    over: Partial<{ hp: number; maxHp: number; dead: boolean; id: number; name: string }> = {},
+  ) => new Map([[2, { id: 90, name: 'Fang', hp: 30, maxHp: 40, dead: false, ...over }]]);
+
+  it('attaches a member pet from the roster map', () => {
+    const rows = selectPartyFrameMembers(
+      info(),
+      1,
+      { x: 0, z: 0 },
+      undefined,
+      {
+        ...DEFAULT_PARTY_FRAME_DISPLAY,
+      },
+      pets(),
+    );
+    const withPet = rows.find((r) => r.pid === 2);
+    expect(withPet?.pet?.name).toBe('Fang');
+    expect(withPet?.pet?.id).toBe(90);
+  });
+
+  it('leaves members with no pet in the map untouched', () => {
+    const rows = selectPartyFrameMembers(
+      info(),
+      1,
+      { x: 0, z: 0 },
+      undefined,
+      {
+        ...DEFAULT_PARTY_FRAME_DISPLAY,
+      },
+      pets(),
+    );
+    for (const r of rows) if (r.pid !== 2) expect(r.pet).toBeUndefined();
+  });
+
+  it('attaches nothing when Show Pets is off', () => {
+    const rows = selectPartyFrameMembers(
+      info(),
+      1,
+      { x: 0, z: 0 },
+      undefined,
+      {
+        ...DEFAULT_PARTY_FRAME_DISPLAY,
+        showPets: false,
+      },
+      pets(),
+    );
+    expect(rows.every((r) => r.pet === undefined)).toBe(true);
+  });
+
+  it('MOVES the signature when a pet loses health', () => {
+    const party = info();
+    const pos = { x: 0, z: 0 };
+    const before = partyFrameSignature(
+      party,
+      1,
+      pos,
+      undefined,
+      DEFAULT_PARTY_FRAME_DISPLAY,
+      pets(),
+    );
+    const after = partyFrameSignature(
+      party,
+      1,
+      pos,
+      undefined,
+      DEFAULT_PARTY_FRAME_DISPLAY,
+      pets({ hp: 12 }),
+    );
+    expect(after).not.toBe(before);
+  });
+
+  // renamePet changes ONLY the name; every other pet and member field stays put. The
+  // sliver's accessible label is built from that name, so if the signature ignored it
+  // updatePartyFrames would short-circuit and a screen-reader user would keep hearing
+  // the old name. Everything paintPet reads has to be folded, not just the numbers.
+  it('MOVES the signature when a pet is RENAMED and nothing else changes', () => {
+    const party = info();
+    const pos = { x: 0, z: 0 };
+    const before = partyFrameSignature(
+      party,
+      1,
+      pos,
+      undefined,
+      DEFAULT_PARTY_FRAME_DISPLAY,
+      pets(),
+    );
+    const renamed = partyFrameSignature(
+      party,
+      1,
+      pos,
+      undefined,
+      DEFAULT_PARTY_FRAME_DISPLAY,
+      pets({ name: 'Shadowfang' }),
+    );
+    expect(renamed).not.toBe(before);
+  });
+
+  it('MOVES the signature when a pet dies, is dismissed, or is swapped', () => {
+    const party = info();
+    const pos = { x: 0, z: 0 };
+    const live = partyFrameSignature(party, 1, pos, undefined, DEFAULT_PARTY_FRAME_DISPLAY, pets());
+    const dead = partyFrameSignature(
+      party,
+      1,
+      pos,
+      undefined,
+      DEFAULT_PARTY_FRAME_DISPLAY,
+      pets({ dead: true }),
+    );
+    const gone = partyFrameSignature(
+      party,
+      1,
+      pos,
+      undefined,
+      DEFAULT_PARTY_FRAME_DISPLAY,
+      new Map(),
+    );
+    const swapped = partyFrameSignature(
+      party,
+      1,
+      pos,
+      undefined,
+      DEFAULT_PARTY_FRAME_DISPLAY,
+      pets({ id: 91 }),
+    );
+    expect(dead).not.toBe(live);
+    expect(gone).not.toBe(live);
+    expect(swapped).not.toBe(live);
+  });
+
+  it('ignores the pet map entirely when Show Pets is off', () => {
+    const party = info();
+    const pos = { x: 0, z: 0 };
+    const cfg = { ...DEFAULT_PARTY_FRAME_DISPLAY, showPets: false };
+    expect(partyFrameSignature(party, 1, pos, undefined, cfg, pets())).toBe(
+      partyFrameSignature(party, 1, pos, undefined, cfg, new Map()),
+    );
+  });
+
+  it('is stable across repeated calls with the same pet state', () => {
+    const party = info();
+    const pos = { x: 0, z: 0 };
+    expect(partyFrameSignature(party, 1, pos, undefined, DEFAULT_PARTY_FRAME_DISPLAY, pets())).toBe(
+      partyFrameSignature(party, 1, pos, undefined, DEFAULT_PARTY_FRAME_DISPLAY, pets()),
+    );
   });
 });

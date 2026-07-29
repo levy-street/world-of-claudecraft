@@ -1,0 +1,6 @@
+interface:
+  display_name: "World of ClaudeCraft image-to-GLB"
+  short_description: "Build a shipping GLB from a reference image through the repo pipeline"
+  default_prompt: "Use $woc-image-to-glb to build or update a World of ClaudeCraft GLB asset from a reference image."
+policy:
+  allow_implicit_invocation: true

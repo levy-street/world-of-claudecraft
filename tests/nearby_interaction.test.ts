@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { tryNearbyInteraction } from '../src/game/nearby_interaction';
-import type { Entity, GatherNodeDef } from '../src/sim/types';
+import type { Entity, GatherNodeDef, QuestProgress } from '../src/sim/types';
 
 function entity(overrides: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Entity {
   return {
@@ -26,9 +26,19 @@ function rig(targets: Entity[] = [], nodes: GatherNodeDef[] = []) {
       [player.id, player],
       ...targets.map((target): [number, Entity] => [target.id, target]),
     ]),
+    questLog: new Map<string, QuestProgress>(),
+    targetEntity: (id: number | null) => {
+      calls.push(`target:${id}`);
+    },
+    interact: () => {
+      calls.push('interact');
+    },
     lootCorpse: (id: number) => {
       calls.push(`loot:${id}`);
       return true;
+    },
+    harvestCorpse: (id: number) => {
+      calls.push(`harvestCorpse:${id}`);
     },
     delveInteract: (id: number) => {
       calls.push(`delve:${id}`);
@@ -67,7 +77,18 @@ function rig(targets: Entity[] = [], nodes: GatherNodeDef[] = []) {
 }
 
 function interact(r: ReturnType<typeof rig>) {
-  return tryNearbyInteraction(r.world, r.hud, r.nodes, 'too far', 'not ready', 'nothing');
+  // null nodeToolGateFor: the tier-agnostic legacy shape (the gate arm has its
+  // own dedicated test below).
+  return tryNearbyInteraction(
+    r.world,
+    r.hud,
+    r.nodes,
+    null,
+    'too far',
+    'not ready',
+    'escort away',
+    'nothing',
+  );
 }
 
 describe('tryNearbyInteraction', () => {
@@ -140,6 +161,60 @@ describe('tryNearbyInteraction', () => {
   });
 
   it.each([
+    ['inside', 3.99, true, ['pickup:2']],
+    ['exactly at', 4, true, ['pickup:2']],
+    ['outside', 4.01, false, ['error:nothing']],
+  ] as const)(
+    'uses the authored noticeboard radius when the board is %s the boundary',
+    (_position, distance, expectedOutcome, expectedCalls) => {
+      const board = entity({
+        id: 2,
+        kind: 'object',
+        templateId: 'noticeboard_eastbrook',
+        lootable: true,
+        pos: { x: distance, y: 0, z: 0 },
+      });
+      const r = rig([board]);
+
+      expect(interact(r)).toBe(expectedOutcome);
+      expect(r.calls).toEqual(expectedCalls);
+    },
+  );
+
+  it('does not let an out-of-range noticeboard mask a closer valid NPC', () => {
+    const board = entity({
+      id: 2,
+      kind: 'object',
+      templateId: 'noticeboard_eastbrook',
+      lootable: true,
+      pos: { x: 4.5, y: 0, z: 0 },
+    });
+    const npc = entity({
+      id: 3,
+      kind: 'npc',
+      templateId: 'elder_maren',
+      pos: { x: 2, y: 0, z: 0 },
+    });
+    const r = rig([board, npc]);
+
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['quest:3']);
+  });
+
+  it('preserves the generic five-yard object interaction range', () => {
+    const object = entity({
+      id: 2,
+      kind: 'object',
+      lootable: true,
+      pos: { x: 4.5, y: 0, z: 0 },
+    });
+    const r = rig([object]);
+
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['pickup:2']);
+  });
+
+  it.each([
     ['quest', 'elder_maren', 'quest:2'],
     ['delve board', 'brother_halven_marsh', 'board:2'],
   ])('opens the nearby %s interaction', (_name, templateId, expected) => {
@@ -156,6 +231,7 @@ describe('tryNearbyInteraction', () => {
       type: 'ore',
       pos: { x: 1, z: 0 },
       level: 1,
+      tier: 1,
     } as const;
     const ready = rig([], [node]);
     expect(interact(ready)).toBe(true);
@@ -184,6 +260,7 @@ describe('tryNearbyInteraction', () => {
       type: 'ore',
       pos: { x: 1, z: 0 },
       level: 1,
+      tier: 1,
     } as const;
     const cases = [
       { targets: [corpse, delve, object, npc], expected: 'loot:5' },
@@ -239,6 +316,55 @@ describe('tryNearbyInteraction', () => {
     expect(r.calls).toEqual(['error:nothing']);
   });
 
+  it('threads nodeToolGateFor to the picked node and surfaces the unmet line', () => {
+    const lockedNode = {
+      id: 'ore_t2',
+      zoneId: 'zone',
+      type: 'ore',
+      pos: { x: 1, z: 0 },
+      level: 10,
+      tier: 2,
+    } as const;
+    const r = rig([], [lockedNode]);
+    const seen: string[] = [];
+    const gateFor = (node: { id: string; tier: number }) => {
+      seen.push(node.id);
+      return { nodeTier: node.tier, viewerToolTier: 1, unmetText: 'needs tier 2' };
+    };
+    expect(
+      tryNearbyInteraction(
+        r.world,
+        r.hud,
+        r.nodes,
+        gateFor,
+        'too far',
+        'not ready',
+        'escort away',
+        'nothing',
+      ),
+    ).toBe(false);
+    // The resolver ran against the PICKED node, and the tool denial won over
+    // both harvest and not-ready (the node reads locked, not cooling).
+    expect(seen).toEqual(['ore_t2']);
+    expect(r.calls).toEqual(['error:needs tier 2']);
+
+    // The met arm: a sufficient viewer tier lets the harvest through untouched.
+    const met = rig([], [lockedNode]);
+    expect(
+      tryNearbyInteraction(
+        met.world,
+        met.hud,
+        met.nodes,
+        (node) => ({ nodeTier: node.tier, viewerToolTier: 2, unmetText: 'needs tier 2' }),
+        'too far',
+        'not ready',
+        'escort away',
+        'nothing',
+      ),
+    ).toBe(true);
+    expect(met.calls).toEqual(['harvest:ore_t2']);
+  });
+
   it('returns a rejected authoritative pickup result', async () => {
     const target = entity({ id: 2, kind: 'object', lootable: true });
     const r = rig([target]);
@@ -249,5 +375,49 @@ describe('tryNearbyInteraction', () => {
 
     await expect(interact(r)).resolves.toBe(false);
     expect(r.calls).toEqual(['pickup:2']);
+  });
+});
+
+// Unified corpse press: the interact key selects by canOpen (either
+// half remaining makes the corpse a target) and dispatches each half gated by
+// the availability predicate, harvest strictly before loot. The halves are
+// separate commands: a denied harvest never blocks the loot half.
+describe('tryNearbyInteraction unified corpse press', () => {
+  function wolfCorpse(overrides: Partial<Entity> = {}): Entity {
+    return entity({
+      id: 2,
+      kind: 'mob',
+      // forest_wolf carries componentTags (#1140): a harvestable corpse.
+      templateId: 'forest_wolf',
+      dead: true,
+      lootable: true,
+      loot: { copper: 1, items: [] },
+      pos: { x: 1, y: 0, z: 0 },
+      ...overrides,
+    });
+  }
+
+  it('dispatches BOTH halves on a corpse with loot and an unclaimed harvest, harvest first', () => {
+    const r = rig([wolfCorpse()]);
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['harvestCorpse:2', 'loot:2']);
+  });
+
+  it('dispatches loot only once the harvest claim is taken', () => {
+    const r = rig([wolfCorpse({ harvestClaimedBy: 9 })]);
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['loot:2']);
+  });
+
+  it('dispatches harvest only on a loot-exhausted corpse inside the grace window', () => {
+    const r = rig([wolfCorpse({ loot: null })]);
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['harvestCorpse:2']);
+  });
+
+  it('dispatches neither on a claimed lootless corpse: it is no target at all', () => {
+    const r = rig([wolfCorpse({ loot: null, harvestClaimedBy: 9 })]);
+    expect(interact(r)).toBe(false);
+    expect(r.calls).toEqual(['error:nothing']);
   });
 });

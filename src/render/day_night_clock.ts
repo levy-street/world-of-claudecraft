@@ -6,7 +6,7 @@
 // the HUD (minimap dial) both read currentDayNightPhase(), so a single override
 // drives them together and they never disagree.
 
-import { cyclePhase, DAY_ONLY } from './day_night_core';
+import { cyclePhase, DAY_ONLY, lunarPhase } from './day_night_core';
 
 /** Phase 0.5 is solar noon (see globalDayness in day_night_core). While DAY_ONLY
  *  holds, the live clock reports this instead of the UTC-anchored phase. */
@@ -31,4 +31,25 @@ export function dayNightPhaseOverride(): number | null {
 export function currentDayNightPhase(): number {
   if (phaseOverride !== null) return phaseOverride;
   return DAY_ONLY ? NOON_PHASE : cyclePhase(Date.now());
+}
+
+let moonOverride: number | null = null;
+
+/** Freeze the moon's shape at a lunar phase (0 = new, 0.5 = full), or pass
+ *  null to resume the lunar clock. The `/daynight moon` dev command. */
+export function setLunarPhaseOverride(phase: number | null): void {
+  moonOverride = phase == null ? null : ((phase % 1) + 1) % 1;
+}
+
+/** The active lunar override, or null while the real lunar clock runs. */
+export function lunarPhaseOverride(): number | null {
+  return moonOverride;
+}
+
+/** The current lunar phase (0 = new, 0.5 = full): the dev override when set,
+ *  else the epoch-anchored lunar clock. Deliberately NOT pinned by DAY_ONLY:
+ *  the moon's shape is pure cosmetics and keeps drifting either way. */
+export function currentLunarPhase(): number {
+  if (moonOverride !== null) return moonOverride;
+  return lunarPhase(Date.now());
 }

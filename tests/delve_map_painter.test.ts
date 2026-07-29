@@ -5,16 +5,19 @@
 //
 // The write-elision facet (makeWriterFacet) is exercised in painter_host.test.ts
 // (grew to six writers); this file keeps only the delve-specific path.
-// The painter's canvas/DOM methods (paintMinimapDelve / paintWorldMapDelve) need a
-// real 2D context + getComputedStyle, so they are NOT exercised here; this Node
-// suite drives the PURE path (delveDrawModel), which is exactly the contract the
-// per-frame painters lean on.
+// Full pixel-level rendering of paintMinimapDelve / paintWorldMapDelve needs a
+// real 2D context + getComputedStyle, so that end-to-end coverage lives in the
+// opt-in tests/browser/delve_map_painter.browser.test.ts. This Node suite mostly
+// drives the PURE path (delveDrawModel), the contract the per-frame painters lean
+// on, plus one narrow behavioral pin (relocalize's cache-bust) over a hand-rolled
+// fake 2D context, mirroring tests/map_window_painter.test.ts's fake-context idiom.
 
 import { readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { DELVE_MODULE_LAYOUTS } from '../src/sim/delve_layout';
 import { delveLocalToCanvas, delveSchematicStatic } from '../src/ui/hud/delve/delve_map';
-import { delveDrawModel } from '../src/ui/hud/delve/delve_map_painter';
+import { DelveMapPainter, delveDrawModel } from '../src/ui/hud/delve/delve_map_painter';
+import type { PainterHostWriters } from '../src/ui/painter_host';
 import type { IWorld } from '../src/world_api';
 
 // --- Pure draw model: Sim-vs-ClientWorld parity + both-sites determinism --------
@@ -173,6 +176,135 @@ describe('delveDrawModel (pure draw model)', () => {
   });
 });
 
+// --- relocalize(): the cached schematic background (incl. the baked compass-N
+// glyph) is keyed only on module id, never locale, so a language switch alone can
+// never bust it; relocalize() must force exactly one rebuild. ------------------
+
+/** A minimal 2D-context stub covering every call drawSchematic/paintMinimapDelve
+ *  makes for the non-litany reliquary module (no clipToOutline prims -> no
+ *  Path2D). Mirrors the hand-rolled fake in tests/map_window_painter.test.ts;
+ *  this file only needs it not to throw, not to record draws. */
+function fakeDelveCtx(): CanvasRenderingContext2D {
+  const ctx = {
+    fillStyle: '',
+    strokeStyle: '',
+    lineWidth: 1,
+    font: '',
+    textAlign: 'start',
+    textBaseline: 'alphabetic',
+    imageSmoothingEnabled: false,
+    globalAlpha: 1,
+    save(): void {},
+    restore(): void {},
+    beginPath(): void {},
+    moveTo(): void {},
+    lineTo(): void {},
+    closePath(): void {},
+    ellipse(): void {},
+    arc(): void {},
+    clip(): void {},
+    fill(): void {},
+    stroke(): void {},
+    fillRect(): void {},
+    strokeRect(): void {},
+    clearRect(): void {},
+    drawImage(): void {},
+    translate(): void {},
+    rotate(): void {},
+    strokeText(): void {},
+    fillText(): void {},
+  };
+  return ctx as unknown as CanvasRenderingContext2D;
+}
+
+/** Stubs `document`/`getComputedStyle` for the painter's offscreen-canvas cache
+ *  and color resolution, counting every `document.createElement('canvas')` so a
+ *  cache hit vs. a rebuild is observable without inspecting private fields. */
+function installDelveStyleGlobals(): { canvasesCreated: () => number } {
+  let created = 0;
+  vi.stubGlobal('document', {
+    documentElement: {},
+    createElement(tag: string): unknown {
+      if (tag !== 'canvas') throw new Error(`unexpected createElement(${tag})`);
+      created++;
+      const bg = fakeDelveCtx();
+      return { width: 0, height: 0, getContext: (kind: string) => (kind === '2d' ? bg : null) };
+    },
+  });
+  vi.stubGlobal('getComputedStyle', () => ({
+    getPropertyValue: (): string => 'paint:token',
+  }));
+  return { canvasesCreated: () => created };
+}
+
+function delveWorldForPainter(): IWorld {
+  const p = { id: 1, kind: 'player', dead: false, pos: { x: 0, z: 20 }, facing: 0 };
+  return {
+    player: p,
+    entities: new Map([[1, p]]),
+    partyInfo: null,
+    delveRun: {
+      delveId: 'collapsed_reliquary',
+      modules: [MODULE_ID],
+      moduleIndex: 0,
+      origin: { x: 0, z: 0 },
+    },
+  } as unknown as IWorld;
+}
+
+describe('DelveMapPainter.relocalize', () => {
+  it('busts the cached minimap background so the next paint rebuilds it exactly once', () => {
+    const trace = installDelveStyleGlobals();
+    try {
+      const writers = {
+        setText: (el: HTMLElement, text: string): void => {
+          (el as unknown as { textContent: string }).textContent = text;
+        },
+      } as unknown as PainterHostWriters;
+      const painter = new DelveMapPainter(writers, () => 'white');
+      const world = delveWorldForPainter();
+      const zoneLabel = { textContent: '' } as unknown as HTMLElement;
+      const ctx = fakeDelveCtx();
+
+      painter.paintMinimapDelve(ctx, world, zoneLabel, MINIMAP.size);
+      expect(trace.canvasesCreated()).toBe(1); // first paint bakes the bg canvas
+
+      painter.paintMinimapDelve(ctx, world, zoneLabel, MINIMAP.size);
+      expect(trace.canvasesCreated()).toBe(1); // same module: cache hit, no rebuild
+
+      painter.relocalize();
+      painter.paintMinimapDelve(ctx, world, zoneLabel, MINIMAP.size);
+      expect(trace.canvasesCreated()).toBe(2); // relocalize forced exactly one rebuild
+
+      painter.paintMinimapDelve(ctx, world, zoneLabel, MINIMAP.size);
+      expect(trace.canvasesCreated()).toBe(2); // re-latched: no further rebuild
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('busts the world-map background cache independently of the minimap one', () => {
+    const trace = installDelveStyleGlobals();
+    try {
+      const writers = { setText: (): void => {} } as unknown as PainterHostWriters;
+      const painter = new DelveMapPainter(writers, () => 'white');
+      const world = delveWorldForPainter();
+      const ctx = fakeDelveCtx();
+
+      painter.paintWorldMapDelve(ctx, world, WORLDMAP.size);
+      expect(trace.canvasesCreated()).toBe(1);
+      painter.paintWorldMapDelve(ctx, world, WORLDMAP.size);
+      expect(trace.canvasesCreated()).toBe(1);
+
+      painter.relocalize();
+      painter.paintWorldMapDelve(ctx, world, WORLDMAP.size);
+      expect(trace.canvasesCreated()).toBe(2);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+});
+
 // --- No-magic-values canvas guard (MANDATORY for a Canvas painter) --
 
 describe('delve_map_painter: no magic values', () => {
@@ -233,8 +365,10 @@ describe('vendor window WCAG-chrome (compositional, markup intact)', () => {
   });
 
   it('keeps the accessible vendor markup (focusable buttons + aria labels)', () => {
-    // Close control: a real button with an aria-label.
-    expect(vendor).toContain('data-close aria-label=');
+    // Close control: a real button with an aria-label ON THE SAME TAG. A
+    // regex rather than an adjacency literal: the focus-restore key landed
+    // between the two attributes, and the claim was never about adjacency.
+    expect(vendor).toMatch(/data-close[^>]*aria-label=/);
     // Item rows: real <button>s with per-row aria-labels (keyboard reachable,
     // native target size), unchanged by the composition.
     expect(vendor).toContain("row.type = 'button'");

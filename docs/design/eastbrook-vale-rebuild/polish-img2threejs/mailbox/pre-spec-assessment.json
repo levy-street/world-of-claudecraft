@@ -1,0 +1,193 @@
+{
+  "targetName": "Eastbrook Ravenpost Mailbox",
+  "sourceImage": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/front-three-quarter.png",
+  "referenceAdmission": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/reference-admission.json",
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "freestanding civic mailbox",
+      "primaryDomain": "object",
+      "formLanguage": ["stylized hard-surface", "architectural miniature", "low-poly"],
+      "structureKind": ["compound object", "layered shell", "repeated modules"],
+      "motionPotential": ["static prop", "effect-emitter socket", "future rear-door hinge"],
+      "materialFamilies": ["wood", "stone", "painted roof", "metal"],
+      "notes": "A floor-seated Ravenpost service landmark with a house-shaped mail body on one post. Runtime mail state remains external to the GLB."
+    },
+    "complexity": {
+      "tier": "complex",
+      "scores": {
+        "silhouetteComplexity": 2,
+        "componentCount": 3,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 2,
+        "materialLayerCount": 3,
+        "localDetailDensity": 3,
+        "occlusionRisk": 1,
+        "actionReadinessNeed": 2
+      },
+      "estimatedCounts": {
+        "macroComponents": 3,
+        "mesoComponents": 9,
+        "microFeatureGroups": 16,
+        "materialLayers": 2,
+        "repetitionSystems": 3
+      },
+      "reasoning": [
+        "The silhouette is simple at distance but depends on the gabled roof, elevated mail body, single post, triangular braces, and stepped stone foot.",
+        "Identity depends on several nested systems: slot and frame, Ravenpost relief, rear shutter, side badges, roof courses, trim, and collar hardware.",
+        "Seven admitted views reduce hidden-side risk and support a complete volume rather than a facade card.",
+        "A named interaction socket, unread-effect socket, floor socket, and compound collider make the prop action-ready without increasing shipping draw count."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "complex",
+      "minimumComponentLevels": ["macro", "meso", "micro"],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "A shallow house-on-post blockout would miss the slot, Ravenpost identity, rear construction, roof rhythm, and grounded service scale."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "grid-3x3 plus admitted multi-angle cross-check",
+      "targetMinDetails": 12,
+      "inventoryPath": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/detail-inventory.json",
+      "details": [
+        {
+          "id": "roof-course-seams",
+          "kind": "seam",
+          "mapsTo": { "type": "component.localFeatures", "ref": "roof-shell/roof-course-seams" }
+        },
+        {
+          "id": "ridge-cap-bevel",
+          "kind": "bevel",
+          "mapsTo": { "type": "component.localFeatures", "ref": "roof-shell/ridge-cap-chamfer" }
+        },
+        {
+          "id": "blue-roof-edge-wear",
+          "kind": "stain",
+          "mapsTo": { "type": "material.localOverrides", "ref": "town-opaque/roof-edge-wear" }
+        },
+        {
+          "id": "mail-slot-opening",
+          "kind": "hole",
+          "mapsTo": { "type": "component.localFeatures", "ref": "mail-slot/mail-slot-opening" }
+        },
+        {
+          "id": "mail-slot-frame-bevel",
+          "kind": "bevel",
+          "mapsTo": { "type": "component.localFeatures", "ref": "mail-slot/slot-frame-chamfer" }
+        },
+        {
+          "id": "raven-emblem-relief",
+          "kind": "ridge",
+          "mapsTo": { "type": "component.localFeatures", "ref": "front-crest/raven-relief" }
+        },
+        {
+          "id": "facade-board-seams",
+          "kind": "linework",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "mailhouse-body/facade-board-seams"
+          }
+        },
+        {
+          "id": "rear-door-seams",
+          "kind": "seam",
+          "mapsTo": { "type": "component.localFeatures", "ref": "rear-panel/rear-panel-seams" }
+        },
+        {
+          "id": "gold-bolt-system",
+          "kind": "fastener",
+          "mapsTo": { "type": "component.localFeatures", "ref": "front-trim/gold-fastener-heads" }
+        },
+        {
+          "id": "side-diamond-relief",
+          "kind": "ridge",
+          "mapsTo": { "type": "component.localFeatures", "ref": "side-badges/diamond-relief" }
+        },
+        {
+          "id": "post-collar-fasteners",
+          "kind": "fastener",
+          "mapsTo": { "type": "component.localFeatures", "ref": "post-collar/collar-studs" }
+        },
+        {
+          "id": "stone-block-joints",
+          "kind": "groove",
+          "mapsTo": { "type": "component.localFeatures", "ref": "stone-plinth/stone-joint-grooves" }
+        },
+        {
+          "id": "stone-edge-chamfer",
+          "kind": "bevel",
+          "mapsTo": { "type": "component.localFeatures", "ref": "stone-plinth/stone-edge-chamfers" }
+        },
+        {
+          "id": "base-cavity-dirt",
+          "kind": "stain",
+          "mapsTo": { "type": "material.localOverrides", "ref": "town-opaque/base-cavity-dirt" }
+        },
+        {
+          "id": "timber-grain",
+          "kind": "linework",
+          "mapsTo": { "type": "material.localOverrides", "ref": "town-opaque/timber-grain" }
+        },
+        {
+          "id": "bracket-join-seams",
+          "kind": "seam",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "support-brackets/bracket-join-seams"
+          }
+        }
+      ]
+    },
+    "anatomy": { "applies": false }
+  },
+  "qualityContract": {
+    "qualityBar": "complex game-ready stylization",
+    "definitionOfDone": [
+      "The complete accepted 1.65 by 1.05 by 2.9 yard volume reads as a Ravenpost mailbox from every admitted angle and beside the 2.6-yard player rig.",
+      "The gabled cobalt roof, warm timber house, gold-framed open slot, raven relief, single post, braces, collar, and stepped stone footing all survive Low-tier rendering.",
+      "The result stays within the 2,000 triangle target and 3,000 triangle hard ceiling with two merged primitives, two materials, zero embedded textures, and zero animations.",
+      "Named mail-interaction, unread-effect, and ground sockets plus a compound collider contract remain stable after optimization."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 3,
+      "mesoComponents": 9,
+      "microFeatureGroups": 12,
+      "materialLayers": 2,
+      "repetitionSystems": 2,
+      "reviewViewpoints": 7
+    },
+    "requiredRepeatedSystems": [
+      "Two roof slopes use four irregular but deterministic cobalt courses each.",
+      "Gold fastener heads follow bounded symmetric rows and never become one-off draw calls.",
+      "Stone footing blocks form two centered courses with explicit joints and no floating pieces."
+    ],
+    "requiredMaterialLayers": [
+      "One merged opaque vertex-color material and one merged metal accent material carry independent semantic zones and the external shared Eastbrook atlas.",
+      "Runtime unread glow attaches at Socket_UnreadGlow and is not baked into the mailbox GLB."
+    ],
+    "requiredReviewViewpoints": [
+      "front",
+      "right",
+      "rear-detail",
+      "left",
+      "front-three-quarter",
+      "rear-three-quarter",
+      "grazing",
+      "player-scale",
+      "neutral",
+      "dusk",
+      "mobile-low"
+    ],
+    "blockingFailureModes": [
+      "A boxy generic birdhouse replaces the reference roof-to-body proportions.",
+      "The mail slot is painted rather than a recessed opening with a thick gold frame.",
+      "The post, braces, body, or stone courses float or penetrate visibly.",
+      "The raven relief, cobalt roof, or gold wayfinding trim disappears on Low.",
+      "The asset requires embedded PBR maps or exceeds any hard budget.",
+      "A critical feature scores below 0.7 even when the aggregate review score passes."
+    ]
+  }
+}

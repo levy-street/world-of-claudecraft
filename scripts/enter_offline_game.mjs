@@ -24,6 +24,10 @@
 //   dismissMobilePreflight  wait for and dismiss the touch-only gate (default true)
 //   mobilePreflightTimeoutMs  maximum wait for the touch-only gate (default 5000)
 //   gameBootTimeoutMs  maximum wait for window.__game.sim.player (default 30000)
+//   selectorTimeoutMs  maximum wait for the class card to become visible (default
+//                      15000; the cards get their box only after the procedural
+//                      icons render, which under SwiftShader or CPU contention
+//                      can outlast the default)
 // Returns true when the world boot hook appeared before gameBootTimeoutMs, otherwise false.
 export async function enterOfflineGame(page, opts = {}) {
   const {
@@ -33,12 +37,13 @@ export async function enterOfflineGame(page, opts = {}) {
     dismissMobilePreflight = true,
     mobilePreflightTimeoutMs = 5000,
     gameBootTimeoutMs = 30000,
+    selectorTimeoutMs = 15000,
   } = opts;
   const card = `#offline-select .mini-class[data-class="${charClass}"]`;
   await page.waitForSelector('#btn-offline', { timeout: 30000 });
   // Hidden legacy hook: fire its handler in-page rather than page.click (no clickable point).
   await page.evaluate(() => document.querySelector('#btn-offline')?.click());
-  await page.waitForSelector(card, { visible: true, timeout: 15000 });
+  await page.waitForSelector(card, { visible: true, timeout: selectorTimeoutMs });
   // Drive name / class / Enter World in-page too: on small touch viewports these can fail
   // puppeteer's clickable-point check, the same reason #btn-offline does.
   await page.evaluate((name) => {
@@ -61,18 +66,6 @@ export async function enterOfflineGame(page, opts = {}) {
       .catch(() => {});
     await page.evaluate(() => document.querySelector('#mobile-preflight-continue')?.click());
   }
-  // The post-login Welcome Screen (news, Discord strip, Continue) now sits between
-  // Enter World and the actual game boot on every entry whose DOM has #welcome-screen
-  // (index.html; absent on /play). Continue enables immediately offline (no connection
-  // to wait on), so click through it the moment it appears. No-op when the screen is
-  // absent (a future pre-game UI change stays a one-line fix here, per the file header).
-  await page
-    .waitForSelector('#ws-continue:not([disabled])', { visible: true, timeout: 5000 })
-    .catch(() => {});
-  await page.evaluate(() => {
-    const btn = document.querySelector('#ws-continue');
-    if (btn && !btn.disabled) btn.click();
-  });
   // Wait for the world to actually boot (the window.__game debug hook appears post-start)
   // rather than guessing with a fixed delay, so post-entry code that reads window.__game.sim
   // does not race the loader. Falls back to the settle delay if the hook never shows.

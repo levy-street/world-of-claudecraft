@@ -1,0 +1,10 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/eastbrook_grand_armoury/eastbrook_grand_armoury-final.glb",
+      "out": "models/props/eastbrook_grand_armoury.glb",
+      "type": "static",
+      "keepExtras": true
+    }
+  ]
+}

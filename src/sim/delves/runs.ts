@@ -20,6 +20,7 @@
 // and the headless RL env (enforced by tests/architecture.test.ts).
 
 import type { DelveCompanionInfo } from '../../world_api';
+import { bagsFullError } from '../bags';
 import type { DelveShopGate, DelveShopOffer } from '../data';
 import {
   COMPANION_UPGRADE_COSTS,
@@ -49,6 +50,8 @@ import { isLitanyModuleId, litanyModuleGeometry } from '../delve_litany_layout';
 import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from '../dungeon_layout';
 import { createGroundObject, createMob, recalcPlayerStats } from '../entity';
 import { restorePetFromDelveStash, stowPetForDelve } from '../pet/pet_commands';
+import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
+import { delveExitDropZ } from '../prop_layout';
 import { aurasSurvivingDeath } from '../resurrection';
 import { Rng } from '../rng';
 import type { PlayerMeta } from '../sim';
@@ -340,6 +343,7 @@ export function canEnterDelve(ctx: SimContext, pid: number): string | null {
   if (ctx.tradeFor(pid)) return 'You cannot enter a delve while trading.';
   if (ctx.duelFor(pid)) return 'You cannot enter a delve during a duel.';
   if (ctx.arenaMatches.has(pid)) return 'You cannot enter a delve during an arena match.';
+  if (ctx.bgMatches.has(pid)) return 'You cannot enter a delve during a battleground.';
   return null;
 }
 
@@ -393,10 +397,13 @@ export function enterDelve(ctx: SimContext, delveId: string, tierId: string, pid
   const slotIndex = ctx.partyMembersForKey(key).length;
   const pos = delveMemberSpawnPos(ctx, entry, slotIndex);
   const p = r.e;
+  // A live gather/fishing session never survives a delve teleport.
+  cancelProfessionSessionOnDisplacement(ctx, p);
   p.pos = pos;
   p.prevPos = { ...pos };
   ctx.rebucket(p);
   p.facing = 0;
+  p.prevFacing = 0;
   p.targetId = null;
   p.autoAttack = false;
   run.emptyFor = 0;
@@ -427,7 +434,8 @@ export function leaveDelve(ctx: SimContext, pid?: number): void {
   if (run?.companion) ctx.despawnDelveCompanion(run);
   restorePetFromDelveStash(ctx, r.meta.entityId);
   const p = r.e;
-  p.pos = ctx.groundPos(delve.doorPos.x, delve.doorPos.z - 4);
+  cancelProfessionSessionOnDisplacement(ctx, p);
+  p.pos = ctx.groundPos(delve.doorPos.x, delveExitDropZ(delve.doorPos.z, delve.id));
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
   p.targetId = null;
@@ -634,12 +642,15 @@ export function ejectToDelveDoor(
   const r = ctx.resolve(pid);
   if (!r) return;
   const p = r.e;
+  // A live free eject (nobody died) still displaces: end any session first.
+  cancelProfessionSessionOnDisplacement(ctx, p);
   p.dead = false;
-  const door = ctx.groundPos(delve.doorPos.x, delve.doorPos.z - 4);
+  const door = ctx.groundPos(delve.doorPos.x, delveExitDropZ(delve.doorPos.z, delve.id));
   p.pos = delveMemberSpawnPos(ctx, door, slotIndex);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
   p.facing = 0;
+  p.prevFacing = 0;
   // The Keeper's Toll survives a delve eject too (see resurrection.ts); all else clears.
   p.auras = aurasSurvivingDeath(p.auras);
   p.ccDr.clear();
@@ -998,11 +1009,13 @@ export function advanceDelveModule(ctx: SimContext, run: DelveRun): void {
   members.forEach((pid, i) => {
     const p = ctx.entities.get(pid);
     if (!p || p.dead) return;
+    cancelProfessionSessionOnDisplacement(ctx, p);
     const pos = delveMemberSpawnPos(ctx, entry, i);
     p.pos = pos;
     p.prevPos = { ...pos };
     ctx.rebucket(p);
     p.facing = 0;
+    p.prevFacing = 0;
     ctx.emit({
       type: 'log',
       text: `You pass through the tombstone into ${modName}.`,
@@ -1076,10 +1089,19 @@ export function tickDelvePressurePlates(ctx: SimContext, run: DelveRun): void {
 export function tickDelveRaiseDeadChannel(ctx: SimContext, run: DelveRun): void {
   const channel = run.raiseDeadChannel;
   if (!channel) return;
+  const boss = ctx.entities.get(channel.bossId);
+  // The boss can enter 'evade' (leash break, or any other reset path) well before
+  // it finishes walking home to resetEvadingMob's arrival check. Drop the channel
+  // the moment that happens instead of letting it keep counting down in the
+  // background: a wipe/leash mid-channel must not still ambush the next pull with
+  // stale adds once the boss looks freshly reset.
+  if (!boss || boss.dead || boss.aiState === 'evade') {
+    run.raiseDeadChannel = null;
+    return;
+  }
   channel.remaining -= DT;
   if (channel.remaining > 0) return;
   run.raiseDeadChannel = null;
-  const boss = ctx.entities.get(channel.bossId);
   if (boss && !boss.dead) {
     ctx.spawnBossAdds(boss, channel.mobId, channel.count);
     // Raise Dead resolved uninterrupted (PRD §7.4 telegraph): mirror of the
@@ -1277,6 +1299,17 @@ export function startDelveRaiseDeadChannel(
   return true;
 }
 
+// Evade/wipe reset: an in-flight Raise Dead channel is DelveRun-level state
+// (not an Entity field), so the generic resetEvadingMob (mob/locomotion.ts)
+// cannot reach it directly. If the boss going home mid-channel is the one who
+// started it, drop it: mirrors the manual grave-interrupt cancel in
+// delveInteract below, so a stale channel never outlives the reset and spawns
+// unowned adds a few seconds after the pull was supposed to have ended.
+export function clearDelveRaiseDeadChannel(ctx: SimContext, boss: Entity): void {
+  const run = delveRunForMob(ctx, boss.id);
+  if (run?.raiseDeadChannel?.bossId === boss.id) run.raiseDeadChannel = null;
+}
+
 // ----- interact + reward delivery --------------------------------------------
 
 export function delveInteract(ctx: SimContext, objectId: number, pid?: number): boolean {
@@ -1384,13 +1417,10 @@ export function delveInteract(ctx: SimContext, objectId: number, pid?: number): 
       });
       return false;
     }
-    if (!state.attemptAvailable) {
-      ctx.error(
-        r.meta.entityId,
-        'The lock is jammed beyond picking. Clear the delve again for another attempt.',
-      );
-      return false;
-    }
+    // attemptAvailable only ever goes false alongside `looted` (see
+    // lockpick_controller.ts lockpickSucceed), so the `state.looted` check
+    // above already covers a spent chest; no separate jammed guard is
+    // reachable here.
     if (run.lockpick && run.lockpick.state === 'IN_PROGRESS') {
       // Someone is already picking it (single interactor, v1).
       if (run.lockpick.ownerId !== r.meta.entityId) {
@@ -1515,12 +1545,33 @@ export function delveRiteChoose(ctx: SimContext, intensity: RiteIntensity, pid?:
 
 // ----- companion economy + shop + wire getters -------------------------------
 
+// Reach for Brother Halven's Marks shop and the companion upgrade board: the
+// same 12-yard radius around the delve door the WS dispatch handler already
+// pre-gates on (server/game.ts 'delve_buy' / 'companion_upgrade'), enforced
+// here too as defense-in-depth, matching every other location-gated spend in
+// the sim (market.ts nearMerchant, bank.ts nearBanker, mail/post_office.ts
+// nearMailbox, items.ts buyItem's dist2d check, instances/heroic_vendor.ts
+// heroicVendorInRange, professions/training.ts isAtStation).
+const DELVE_SHOP_RANGE = 12;
+
+function nearDelveDoor(pos: Pick<Vec3, 'x' | 'z'>, delve: DelveDef): boolean {
+  return Math.hypot(pos.x - delve.doorPos.x, pos.z - delve.doorPos.z) <= DELVE_SHOP_RANGE;
+}
+
 export function companionUpgrade(ctx: SimContext, companionId: string, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const def = DELVE_COMPANIONS[companionId];
   if (!def) {
     ctx.error(r.meta.entityId, 'Unknown companion.');
+    return;
+  }
+  // The companion is ranked up at Brother Halven, not from anywhere in the
+  // world: find the delve this companion belongs to and require the player
+  // stand at its door.
+  const delve = Object.values(DELVES).find((d) => d.autoCompanionId === companionId);
+  if (!delve || !nearDelveDoor(r.e.pos, delve)) {
+    ctx.error(r.meta.entityId, 'Too far away.');
     return;
   }
   const rank = r.meta.companionUpgrades[companionId] ?? 1;
@@ -1578,10 +1629,11 @@ export function delveClearsFor(ctx: SimContext, pid: number): Record<string, num
   return { ...(ctx.players.get(pid)?.delveClears ?? {}) };
 }
 
-// Server-authoritative Marks-vendor purchase. Re-validates the gate + balance
-// here regardless of what the client shows; the client only sends intent. The
-// server geo-gates this to the board NPC (see the `delve_buy` command) so a
-// player must be standing at Brother Halven, mirroring `enter_delve`.
+// Server-authoritative Marks-vendor purchase. Re-validates the door range, the
+// gate, and the balance here regardless of what the client shows; the client
+// only sends intent. The WS dispatch (see the `delve_buy` command) pre-gates
+// the same 12-yard door range so a player must be standing at Brother Halven,
+// mirroring `enter_delve`; the check below is defense-in-depth.
 export function delveBuyShopItem(
   ctx: SimContext,
   delveId: string,
@@ -1601,12 +1653,25 @@ export function delveBuyShopItem(
     ctx.error(meta.entityId, 'That item is not for sale.');
     return;
   }
+  const delve = DELVES[delveId];
+  if (!delve || !nearDelveDoor(r.e.pos, delve)) {
+    ctx.error(meta.entityId, 'Too far away.');
+    return;
+  }
   if (!delveShopGateMet(meta, delveId, entry.gate)) {
     ctx.error(meta.entityId, 'You have not unlocked that item yet.');
     return;
   }
   if (meta.delveMarks < entry.marks) {
     ctx.error(meta.entityId, `You need ${entry.marks} Delve Marks to buy ${def.name}.`);
+    return;
+  }
+  // Capacity BEFORE the spend, the buyItem shape: the grant hub deliberately
+  // never capacity-caps (a mid-flight grant must not vanish), so without this
+  // gate a full-bag purchase landed PAST capacity, making the one counter
+  // every other buy path gates an overflow loophole.
+  if (!ctx.canAddItem(itemId, 1, meta.entityId)) {
+    bagsFullError(ctx, meta.entityId);
     return;
   }
   meta.delveMarks -= entry.marks;

@@ -15,14 +15,21 @@ import { randomUUID } from 'node:crypto';
 import type { EventEmitter } from 'node:events';
 import type * as http from 'node:http';
 import type { WebSocket, WebSocketServer } from 'ws';
-import { type BankBonusSource, STABLE_TIMER_WIRE_VERSION } from '../src/world_api';
+import {
+  type BankBonusSource,
+  ONLINE_WORLD_AUTH_TYPE,
+  ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
+  STABLE_TIMER_WIRE_VERSION,
+} from '../src/world_api';
 import type {
   AccountChatMuteStatus,
   AccountCosmetics,
   AccountModerationStatus,
   CharacterRow,
+  TokenScope,
 } from './db';
 import type { GameServer } from './game';
+import type { HandshakeFlushMode } from './ws_buffer';
 
 // The {t:'error', error} rejection strings, by the exact value the client reads
 // and localizes. Each is part of the wire contract (see the module header).
@@ -51,9 +58,19 @@ const WS_AUTH_ERROR = {
   tooManyConnections: 'too many connections from your network',
   forceRename: 'This character must be renamed before entering the world.',
   authTimedOut: 'authentication timed out',
+  incompatibleWorldLayout: ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
 } as const;
 
 // The first auth frame must arrive within this window or the socket is closed.
+// Scope, established by the phase 16 load review: the timer is cleared the
+// moment the FIRST frame arrives (the ws.once('message') handler below runs
+// clearTimeout synchronously before authenticateWebSocket), so this bounds
+// upgrade-to-first-frame ONLY, never the handshake's database work. A slow
+// handshake that REJECTS (a pool checkout or statement timeout) surfaces as
+// the caught rejection in that same handler, which relabels it with the
+// authTimedOut wire literal (a slow-but-successful handshake surfaces as
+// nothing at all); do not read that client-facing string as this deadline
+// firing.
 const AUTH_TIMEOUT_MS = 10_000;
 
 // Only this upgrade path is accepted; any other path is destroyed at the socket.
@@ -69,7 +86,9 @@ function rejectHandshake(ws: WebSocket, error: string): void {
 
 export interface WsAuthDeps {
   game: GameServer;
-  accountForToken: (token: string) => Promise<number | null>;
+  accountAndScopeForToken: (
+    token: string,
+  ) => Promise<{ accountId: number; scope: TokenScope } | null>;
   moderationStatusForAccount: (accountId: number) => Promise<AccountModerationStatus>;
   getCharacter: (accountId: number, characterId: number) => Promise<CharacterRow | null>;
   chatMuteStatusForAccount: (accountId: number) => Promise<AccountChatMuteStatus>;
@@ -95,7 +114,10 @@ export interface WsAuthDeps {
     ipSessions: number;
     hardLimit: number;
   }) => boolean;
-  bufferHandshakeMessages: (ws: EventEmitter, maxFrames?: number) => () => void;
+  bufferHandshakeMessages: (
+    ws: EventEmitter,
+    maxFrames?: number,
+  ) => (mode?: HandshakeFlushMode) => void;
   requestMetadata: (req: http.IncomingMessage) => { ip: string; userAgent: string };
   maxWsPerIpHard: number;
   // The realm player admission cap: a FRESH WS join is refused (with the realmFull
@@ -134,7 +156,7 @@ export interface WsAuthHandlers {
 export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
   const {
     game,
-    accountForToken,
+    accountAndScopeForToken,
     moderationStatusForAccount,
     getCharacter,
     chatMuteStatusForAccount,
@@ -233,8 +255,16 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       rejectHandshake(ws, WS_AUTH_ERROR.badAuthMessage);
       return;
     }
-    if (msg?.t !== 'auth') {
-      rejectHandshake(ws, WS_AUTH_ERROR.authRequired);
+    if (msg?.t !== ONLINE_WORLD_AUTH_TYPE) {
+      const authType = msg?.t;
+      const isWorldAuthAttempt =
+        authType === 'auth' ||
+        (typeof authType === 'string' &&
+          (authType === 'auth-world' || authType.startsWith('auth-world-')));
+      rejectHandshake(
+        ws,
+        isWorldAuthAttempt ? WS_AUTH_ERROR.incompatibleWorldLayout : WS_AUTH_ERROR.authRequired,
+      );
       return;
     }
 
@@ -245,11 +275,12 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
     // strings, booleans, and unknown future versions stay on the legacy wire.
     const timerWireVersion: 1 | typeof STABLE_TIMER_WIRE_VERSION =
       msg.timerWire === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1;
-    const accountId = await accountForToken(token);
-    if (accountId === null || !Number.isFinite(characterId)) {
+    const account = await accountAndScopeForToken(token);
+    if (account === null || account.scope !== 'full' || !Number.isFinite(characterId)) {
       rejectHandshake(ws, WS_AUTH_ERROR.notAuthenticated);
       return;
     }
+    const accountId = account.accountId;
     const status = await moderationStatusForAccount(accountId);
     if (status.locked) {
       rejectHandshake(ws, status.message);
@@ -297,6 +328,9 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       adminPermissions,
       clientSeed,
       timerWireVersion,
+      // The character's stored action-bar layout, sent once to the owning client
+      // so it restores at login on any device (game.join re-validates it).
+      hotbarLayout: character.hotbar_layout ?? null,
     };
     // Two genuinely concurrent handshakes for one character would race to stamp
     // the lease nonce; admit only the first and refuse the rest (never queue).
@@ -432,6 +466,33 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       ws.on('pong', () => {
         if (session.ws === ws) session.awaitingPong = false;
       });
+      // The socket can die DURING the handshake's awaits, before the close
+      // handler above exists; that close event is gone forever, and the
+      // session it just created would otherwise be a PERMANENT zombie: not
+      // linkdead (so the grace sweep skips it), readyState not OPEN (so
+      // pingLiveSessions skips it and sendRaw silently drops every frame),
+      // holding a realm slot and a character lease its heartbeat renews
+      // forever while planJoin refuses every re-login as 'character already
+      // in world' (the phase 16 load rig hit exactly this). Re-checking
+      // AFTER the handlers are attached closes the race: a death before this
+      // line lands here, a death after it lands in the close handler, and
+      // socketClosed is idempotent per socket so both never double-fire.
+      //
+      // withMarket: false is exclusive to THIS call site. This session
+      // processed zero input (game.join returns synchronously and the re-check
+      // runs before any message handling), so it cannot have touched the
+      // realm-global market or mail escrow and the market halves of the safety
+      // flush would write nothing new. Skipping them matters because the death
+      // this catches happens exactly when the pool is exhausted: one
+      // whole-realm market+mail transaction per dead handshake, all of them
+      // serialized on the process-global market queue, is a feedback loop on
+      // the very resource that caused the death. The character blob still
+      // saves. Every other socketClosed caller keeps the market halves.
+      if (ws.readyState !== ws.OPEN && game.socketClosed(session, ws, { withMarket: false })) {
+        console.log(
+          `~ ${character.name} socket died mid-handshake, entering linkdead, ${game.clients.size} online`,
+        );
+      }
     } finally {
       // The join is decided (a session now lives in sessionsByCharacterId, or the
       // handshake was rejected), so a later handshake sees hasSessionForCharacter
@@ -459,13 +520,33 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       }
     });
 
+    // A clean pre-auth disconnect (the client hangs up before sending its first
+    // frame) leaves nothing to authenticate, so drop the deadline instead of
+    // letting it run its full window and fire a send-then-close at a socket
+    // that is already gone. The post-auth close handler that starts the
+    // linkdead grace is attached separately inside authenticateWebSocket, as
+    // its own listener, so this one never displaces it.
+    ws.once('close', () => {
+      clearTimeout(authTimer);
+    });
+
     ws.once('message', (data) => {
       clearTimeout(authTimer);
+      // The auth deadline above (like every reject path) SENDS its frame and
+      // then closes the socket, but this listener stays armed. Without the
+      // guard, a first frame that arrives after that close still runs the whole
+      // handshake (every DB read, the lease acquire, game.join) for a
+      // connection the server already rejected, and the mid-handshake death
+      // re-check then hands the session it just created to socketClosed: a
+      // linkdead ghost holding a realm-cap slot and the character lease for the
+      // full grace window, refusing the player's every re-login meanwhile.
+      // Nothing to authenticate on a socket that is not OPEN.
+      if (ws.readyState !== ws.OPEN) return;
       // Buffer any frames the client sends while the async auth/join handshake
       // is still in flight, then replay them once authenticateWebSocket has
       // attached the permanent message handler. Without this the frames are
       // silently dropped (see ws_buffer.ts).
-      const flush = bufferHandshakeMessages(ws);
+      const flushHandshakeBuffer = bufferHandshakeMessages(ws);
       void authenticateWebSocket(ws, String(data), req)
         .catch((err) => {
           // A database rejection under a slow or unreachable Postgres (a pool
@@ -481,7 +562,16 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
           console.error('ws auth: handshake rejected, closing socket', err);
           if (ws.readyState === ws.OPEN) rejectHandshake(ws, WS_AUTH_ERROR.authTimedOut);
         })
-        .finally(flush);
+        .finally(() => {
+          // Replay ONLY into a socket that is still live. Every reject path
+          // closed the socket without attaching a message handler, and a
+          // session whose socket died during the handshake has already been
+          // handed to socketClosed with its movement zeroed, so replaying there
+          // would push captured input straight back into a linkdead session
+          // with nothing gating it. Discard instead; either mode takes the
+          // capture listener back off the socket.
+          flushHandshakeBuffer(ws.readyState === ws.OPEN ? 'replay' : 'discard');
+        });
     });
   }
 

@@ -31,7 +31,7 @@ import {
   validateTalentTree,
 } from '../src/sim/content/talents';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
-import { ALL_CLASSES, MAX_LEVEL, type PlayerClass } from '../src/sim/types';
+import { ALL_CLASSES, MAX_LEVEL, type PlayerClass, type SimEvent } from '../src/sim/types';
 import { talentRowOptionIconRef } from '../src/ui/talent_icons';
 
 // 'personal_barrier' is the shieldConsumed SLOT sentinel (combat/talent_procs.ts):
@@ -561,6 +561,31 @@ describe('Sim loadouts and stable hot-path bake', () => {
       expect(sim.saveLoadout(`L${index}`, [])).toBe(index);
     }
     expect(sim.saveLoadout('overflow', [])).toBe(-1);
+  });
+
+  it('rejects an empty or whitespace-only loadout name instead of a hardcoded default', () => {
+    const sim = warriorAtCap();
+    expect(sim.saveLoadout('', [], allocation('arms'))).toBe(-1);
+    const emptyErr = sim
+      .drainEvents()
+      .find((e): e is Extract<SimEvent, { type: 'error' }> => e.type === 'error');
+    expect(emptyErr?.text).toBe('Loadout name cannot be empty.');
+
+    expect(sim.saveLoadout('   ', [])).toBe(-1);
+    const whitespaceErr = sim
+      .drainEvents()
+      .find((e): e is Extract<SimEvent, { type: 'error' }> => e.type === 'error');
+    expect(whitespaceErr?.text).toBe('Loadout name cannot be empty.');
+
+    expect(sim.loadouts).toHaveLength(0);
+  });
+
+  it('rejects an empty-named save without committing the submitted talent allocation', () => {
+    const sim = warriorAtCap();
+    const before = cloneAllocation(sim.talents);
+    expect(sim.saveLoadout('   ', [], allocation('arms', { 5: 'war_row_double_charge' }))).toBe(-1);
+    expect(sim.loadouts).toHaveLength(0);
+    expect(sim.talents).toEqual(before);
   });
 
   it('repairs an untrusted next loadout before auto-applying it on deletion', () => {

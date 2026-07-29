@@ -11,6 +11,8 @@ export interface PreviewAppearance {
   skin: number;
   skinCatalog: 'class' | 'mech';
   mainhandItemId: string | null;
+  /** The active Armory weapon-skin cosmetic, or null/absent for none. */
+  weaponSkinId?: string | null;
   /** Optional for older character-summary callers; absent renders no offhand. */
   offhandItemId?: string | null;
 }
@@ -40,5 +42,8 @@ export function previewAppearanceVisual(a: PreviewAppearance): PreviewVisual {
 /** Stable identity of an appearance, so an async mech re-apply can bail out if a
  *  newer selection superseded it. */
 export function appearanceSignature(a: PreviewAppearance): string {
-  return `${a.cls}|${a.skin}|${a.skinCatalog}|${a.mainhandItemId ?? ''}|${a.offhandItemId ?? ''}`;
+  // weaponSkinId is part of the identity: without it, applying or removing an
+  // Armory skin while a preview is mounted elides as "same appearance" and the
+  // stale weapon model survives the repaint.
+  return `${a.cls}|${a.skin}|${a.skinCatalog}|${a.mainhandItemId ?? ''}|${a.offhandItemId ?? ''}|${a.weaponSkinId ?? ''}`;
 }

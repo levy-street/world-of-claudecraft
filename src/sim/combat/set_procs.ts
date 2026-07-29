@@ -19,6 +19,14 @@ export function applySetProcs(
     // differently than before, keeping the rng stream stable for old procs.
     const recipient = proc.applyTo === 'target' ? target : source;
     if (!recipient || recipient.dead) continue;
+    // WARFARE gating, checked BEFORE the chance roll so a gated proc draws no
+    // rng outside hostile player-versus-player combat and every PvE run stays
+    // byte-identical. isHostileTo comes off the SimContext seam rather than
+    // being reimplemented here.
+    if (proc.pvpOnly) {
+      if (source.kind !== 'player' || !target || target.kind !== 'player') continue;
+      if (source.id === target.id || !ctx.isHostileTo(source, target)) continue;
+    }
     if (!ctx.rng.chance(proc.chance)) continue;
 
     source.procReadyAt[proc.id] = ctx.time + (proc.icd ?? 0);

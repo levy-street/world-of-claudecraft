@@ -2,7 +2,9 @@ import * as THREE from 'three';
 import type { PlayerClass } from '../../sim/types';
 import { assetsReady } from '../assets/preload';
 import { trackWebGLContext } from '../context_release';
+import { ensureSkinTexture } from './assets';
 import { VISUALS } from './manifest';
+import { type ModularLook, modularSignature } from './modular';
 import { type PortraitFraming, portraitFrameParams } from './portrait_framing';
 import { CharacterVisual } from './visual';
 
@@ -32,6 +34,9 @@ const PORTRAIT_ANIM_STATE = {
   dead: false,
   casting: false,
   swimming: false,
+  submerged: false,
+  swimPitch: 0,
+  wading: false,
   sitting: false,
 };
 
@@ -47,9 +52,12 @@ let renderer: THREE.WebGLRenderer | null = null;
 let scene: THREE.Scene | null = null;
 let camera: THREE.PerspectiveCamera | null = null;
 let mount: THREE.Group | null = null;
+let unregisterContext: (() => void) | null = null;
 
 const cache = new Map<string, string>();
 const readyListeners = new Set<() => void>();
+const updateListeners = new Set<(visualKey: string, skin: number) => void>();
+const pendingAtlases = new Map<string, Promise<void>>();
 let assetsAreReady = false;
 void assetsReady()
   .then(() => {
@@ -75,7 +83,7 @@ function ensureRig(): void {
   renderer.setSize(PORTRAIT_SIZE, PORTRAIT_SIZE, false);
   renderer.shadowMap.enabled = false;
   // Hand this offscreen context back on page teardown (see context_release.ts).
-  trackWebGLContext(renderer);
+  unregisterContext = trackWebGLContext(renderer);
 
   scene = new THREE.Scene();
   // fov/position/aim are recomputed per-model per-framing from its bounding
@@ -124,10 +132,82 @@ export function visualPortraitDataUrl(
   if (cached) return cached;
   if (!assetsAreReady) return null;
 
+  // Tight-memory iOS hosts defer the boot skin-atlas sweep (assets.ts), so a
+  // non-default skin's atlas may not be resident yet. Do not capture the
+  // embedded default as if it were the requested chroma. Return the normal
+  // fallback and notify mounted consumers once the real atlas arrives.
+  const atlasPending = ensureSkinTexture(visualKey, skin);
+  if (atlasPending) {
+    const atlasKey = `${visualKey}:${skin}`;
+    if (!pendingAtlases.has(atlasKey)) {
+      pendingAtlases.set(atlasKey, atlasPending);
+      void atlasPending.then(
+        () => {
+          pendingAtlases.delete(atlasKey);
+          for (const cb of updateListeners) cb(visualKey, skin);
+        },
+        () => {
+          pendingAtlases.delete(atlasKey);
+        },
+      );
+    }
+    return null;
+  }
+
+  return capture(key, visualKey, () => new CharacterVisual(visualKey, 0xffffff, skin), framing);
+}
+
+/**
+ * A headshot of a COMPOSED character, the player's own body, hair, face and
+ * makeup, rather than the generic portrait for their class.
+ *
+ * Keyed on the look's full signature, which is what makes "the picture of me is
+ * me" true after every change in the customizer. That key is unbounded (a
+ * colour wheel has a lot of values in it), so unlike the class portraits these
+ * entries are capped and evicted oldest-first: a creation session that drags a
+ * slider around would otherwise hold a PNG per position.
+ */
+const MODULAR_PORTRAIT_CACHE_MAX = 24;
+const modularKeys: string[] = [];
+
+export function modularPortraitDataUrl(
+  visualKey: string,
+  look: ModularLook,
+  framing: PortraitFraming = 'headshot',
+): string | null {
+  const key = `${visualKey}:mod:${modularSignature(look.app, look.worn)}:${framing}`;
+  const cached = cache.get(key);
+  if (cached) return cached;
+  if (!assetsAreReady) return null;
+  const url = capture(
+    key,
+    visualKey,
+    () => new CharacterVisual(visualKey, 0xffffff, 0, null, null, null, look),
+    framing,
+  );
+  if (url) {
+    modularKeys.push(key);
+    while (modularKeys.length > MODULAR_PORTRAIT_CACHE_MAX) {
+      const oldest = modularKeys.shift();
+      if (oldest) cache.delete(oldest);
+    }
+  }
+  return url;
+}
+
+/** Render one visual into the offscreen rig and return it as a PNG data URL.
+ *  Shared by the class portraits and the composed ones, the only difference
+ *  between them is which CharacterVisual gets built. */
+function capture(
+  key: string,
+  visualKey: string,
+  build: () => CharacterVisual,
+  framing: PortraitFraming,
+): string | null {
   let visual: CharacterVisual | null = null;
   try {
     ensureRig();
-    visual = new CharacterVisual(visualKey, 0xffffff, skin);
+    visual = build();
     mount!.add(visual.root);
     mount!.rotation.y = 0;
     // Settle the rig into a stable idle frame before measuring/capturing.
@@ -191,7 +271,37 @@ export function onPortraitsReady(cb: () => void): void {
   else readyListeners.add(cb);
 }
 
+/** Subscribe to newly available deferred atlases so mounted portrait consumers
+ * can replace their fallback without waiting for an unrelated repaint. */
+export function onPortraitUpdate(cb: (visualKey: string, skin: number) => void): void {
+  updateListeners.add(cb);
+}
+
 /** True once portraits can be generated synchronously. */
 export function portraitsReady(): boolean {
   return assetsAreReady;
+}
+
+/**
+ * Drop the profile-bound offscreen renderer and its captured PNGs before a
+ * live graphics rebuild. Asset readiness/listeners remain valid; the next
+ * portrait request lazily creates one context against the newly active profile.
+ */
+export function resetPortraitRendererForGraphicsRebuild(): void {
+  cache.clear();
+  if (mount && scene) scene.remove(mount);
+  unregisterContext?.();
+  unregisterContext = null;
+  if (renderer) {
+    try {
+      renderer.forceContextLoss();
+    } catch {
+      // The context may already have been evicted by the browser.
+    }
+    renderer.dispose();
+  }
+  renderer = null;
+  scene = null;
+  camera = null;
+  mount = null;
 }

@@ -1,6 +1,6 @@
 import type * as http from 'node:http';
 import {
-  accountForToken,
+  accountAndScopeForToken,
   type ClientPerfReportInsert,
   getCharacter,
   insertClientPerfReport,
@@ -10,7 +10,35 @@ import { json, readBody } from './http_util';
 import { rateLimitNow, requestIp, windowedRateLimitOutcome } from './ratelimit';
 import { REALM } from './realm';
 
-const PERF_REPORT_SCHEMA_VERSION = 1;
+// Bumped to 2 for the packet 0 report dimensions (zone, crowd, views,
+// worst-10s; ruling R6); the intIn clamp below keeps version-1 clients valid.
+const PERF_REPORT_SCHEMA_VERSION = 2;
+
+// Fixed crowd labels (ruling R3). server/ cannot import src/game, so this is
+// a deliberate copy of src/game/crowd_bucket.ts CROWD_BUCKET_LABELS;
+// tests/perf_report.test.ts pins the two catalogs equal.
+const CROWD_BUCKET_LABELS = ['lt10', '10-24', '25-49', '50-99', '100plus', 'unknown'] as const;
+// Client-computed perf-doctor suggestion ids (ruling R14). Same deliberate-copy
+// pattern as the crowd labels: server/ cannot import src/game, so this mirrors
+// src/game/perf_doctor.ts PERF_SUGGESTION_IDS and the cross-boundary pin in
+// tests/perf_suggestion_id_parity.test.ts is the drift guard. Everything else
+// from the wire is dropped before it can reach storage or admin aggregates.
+const KNOWN_PERF_SUGGESTION_IDS = [
+  'hardware-acceleration',
+  'integrated-gpu',
+  'high-dpi',
+  'forced-high-graphics',
+  'low-memory',
+  'browser-stalls',
+  'heap-pressure',
+  'context-loss',
+] as const;
+// The client analyzer caps its output at 3 suggestions per report; the server
+// re-imposes the same ceiling so a hostile payload cannot widen the column.
+const PERF_SUGGESTION_IDS_MAX = 3;
+// A legitimate payload is at most 3 entries; scanning stops far above that so
+// the sanitizer stays O(1) even if the body-size cap ever loosens upstream.
+const PERF_SUGGESTION_IDS_SCAN_MAX = 64;
 const PERF_REPORT_MAX_PER_MINUTE = 30;
 const PERF_REPORT_WINDOW_MS = 60_000;
 const PERF_REPORT_MAX_TRACKED_IPS = 5000;
@@ -111,6 +139,23 @@ function choiceIn(value: unknown, choices: readonly string[], fallback: string):
   return choices.includes(text) ? text : fallback;
 }
 
+// Allowlist-filter, dedupe, and cap the client-supplied suggestion ids (ruling
+// R14): unknown ids, non-string entries, duplicates, and everything past the
+// cap are dropped silently (a beacon is never rejected over its diagnostics).
+function suggestionIdsIn(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  const out: string[] = [];
+  for (const entry of value.slice(0, PERF_SUGGESTION_IDS_SCAN_MAX)) {
+    if (typeof entry !== 'string') continue;
+    const id = entry.trim();
+    if (!(KNOWN_PERF_SUGGESTION_IDS as readonly string[]).includes(id)) continue;
+    if (out.includes(id)) continue;
+    out.push(id);
+    if (out.length >= PERF_SUGGESTION_IDS_MAX) break;
+  }
+  return out;
+}
+
 function browserFamily(userAgent: string): string {
   const ua = userAgent.toLowerCase();
   if (ua.includes('edg/')) return 'edge';
@@ -180,6 +225,38 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value && typeof value === 'object' && !Array.isArray(value));
 }
 
+// A genuine browser stall can legitimately run for several seconds (that is
+// the whole point of longTasks.max as corroboration for a multi-second
+// freeze), so the ceiling is generous rather than the sub-second bound the
+// per-frame fields use.
+const LONG_TASK_RAW_MS_MAX = 60_000;
+// lastAge is time SINCE the last recorded long task, not a task duration: it
+// can legitimately span a whole reporting interval between beacons, so its
+// ceiling is scaled to that instead of a single task's length. -1 is the
+// client's "no long task observed yet" sentinel (src/game/perf.ts).
+const LONG_TASK_RAW_AGE_MS_MAX = 30 * 60_000;
+
+// browser.longTasks.{totalMs,avg,max,lastAge} (issue #2479): the four
+// longtask fields the client observer computes but the beacon used to drop.
+// They ride inside raw_summary (JSONB, no DDL) rather than as new typed
+// columns, but still get the same kind of numeric bound the typed frame
+// columns get so a hostile payload cannot inject an absurd number into the
+// admin raw-report reader. Applied unconditionally in rawSummary() (not only
+// on the compact path), unlike compactPrewarmSummary below.
+function sanitizeBrowserSummary(value: unknown): Record<string, unknown> | undefined {
+  if (!isRecord(value)) return undefined;
+  const longTasks = value.longTasks;
+  if (!isRecord(longTasks)) return undefined;
+  return {
+    longTasks: {
+      totalMs: nullableNumberIn(longTasks.totalMs, 0, LONG_TASK_RAW_MS_MAX) ?? 0,
+      avg: nullableNumberIn(longTasks.avg, 0, LONG_TASK_RAW_MS_MAX) ?? 0,
+      max: nullableNumberIn(longTasks.max, 0, LONG_TASK_RAW_MS_MAX) ?? 0,
+      lastAge: nullableNumberIn(longTasks.lastAge, -1, LONG_TASK_RAW_AGE_MS_MAX) ?? -1,
+    },
+  };
+}
+
 function compactPrewarmSummary(value: unknown): Record<string, unknown> | null {
   if (!isRecord(value)) return null;
   const out: Record<string, unknown> = {};
@@ -243,6 +320,9 @@ function compactRawSummary(value: Record<string, unknown>): Record<string, unkno
     'rendererQualityBuckets',
     'input',
     'hud',
+    'netPipeline',
+    'heapSawtooth',
+    'browser',
   ]) {
     if (value[key] !== undefined) out[key] = value[key];
   }
@@ -257,6 +337,9 @@ function rawSummary(value: unknown, devTraceAllowed = false): Record<string, unk
     const text = JSON.stringify(value);
     const parsed = JSON.parse(text) as Record<string, unknown>;
     if (!devTraceAllowed) delete parsed.devTrace;
+    const browser = sanitizeBrowserSummary(parsed.browser);
+    if (browser) parsed.browser = browser;
+    else delete parsed.browser;
     const boundedText = JSON.stringify(parsed);
     const maxBytes = devTraceAllowed ? RAW_SUMMARY_DEV_TRACE_MAX_BYTES : RAW_SUMMARY_MAX_BYTES;
     if (Buffer.byteLength(boundedText) > maxBytes) {
@@ -272,7 +355,8 @@ function rawSummary(value: unknown, devTraceAllowed = false): Record<string, unk
 async function authenticatedAccountId(req: http.IncomingMessage): Promise<number | null> {
   const m = /^Bearer ([a-f0-9]{64})$/.exec(req.headers.authorization ?? '');
   if (!m) return null;
-  return accountForToken(m[1]);
+  const info = await accountAndScopeForToken(m[1]);
+  return info?.scope === 'full' ? info.accountId : null;
 }
 
 async function authenticatedCharacterId(
@@ -323,10 +407,10 @@ export async function handlePerfReport(
     realm: REALM,
     graphicsPreset: choiceIn(
       body.graphicsPreset,
-      ['auto', 'low', 'medium', 'high', 'ultra', 'advanced'],
+      ['auto', 'low', 'medium', 'high', 'ultra', 'insane', 'advanced'],
       'auto',
     ),
-    gfxTier: choiceIn(body.gfxTier, ['low', 'medium', 'high', 'ultra'], 'low'),
+    gfxTier: choiceIn(body.gfxTier, ['low', 'medium', 'high', 'ultra', 'insane'], 'low'),
     autoGovernor: Boolean(body.autoGovernor),
     targetFps: intIn(body.targetFps, 0, 240, 0),
     renderScale: numberIn(body.renderScale, 0.3, 1.5, 1),
@@ -367,6 +451,12 @@ export async function handlePerfReport(
       source === 'benchmark' ? 'benchmark' : 'gameplay',
     ),
     source,
+    crowdBucket: choiceIn(body.crowdBucket, CROWD_BUCKET_LABELS, 'unknown'),
+    simEntities: intIn(body.simEntities, 0, 100_000, 0),
+    activeViews: intIn(body.activeViews, 0, 100_000, 0),
+    visibleViews: intIn(body.visibleViews, 0, 100_000, 0),
+    worst10sFrameP95Ms: numberIn(body.worst10sFrameP95Ms, 0, 1000, 0),
+    suggestionIds: suggestionIdsIn(body.suggestionIds),
     rawSummary: rawSummary(body.rawSummary, devTraceAllowed),
   };
 
@@ -382,4 +472,10 @@ export const perfReportInternalsForTest = {
   allowDevTrace,
   rawSummary,
   shouldStorePerfReport,
+  suggestionIdsIn,
+  CROWD_BUCKET_LABELS,
+  KNOWN_PERF_SUGGESTION_IDS,
+  PERF_REPORT_SCHEMA_VERSION,
+  LONG_TASK_RAW_MS_MAX,
+  LONG_TASK_RAW_AGE_MS_MAX,
 };

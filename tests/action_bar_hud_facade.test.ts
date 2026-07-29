@@ -1,11 +1,16 @@
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Hud } from '../src/ui/hud';
+import {
+  ACTION_BAR_ABILITY_SLOTS,
+  ActionBarController,
+} from '../src/ui/hud/action_bar/action_bar_controller';
 
 vi.mock('../src/render/characters', () => ({ CharacterPreview: class {} }));
 vi.mock('../src/render/characters/assets', () => ({ preloadMechAssets: vi.fn() }));
 vi.mock('../src/render/characters/portrait', () => ({
   onPortraitsReady: vi.fn(),
+  onPortraitUpdate: vi.fn(),
   playerPortraitDataUrl: vi.fn(),
   visualPortraitDataUrl: vi.fn(),
 }));
@@ -13,6 +18,31 @@ vi.mock('../src/render/characters/portrait', () => ({
 afterEach(() => vi.unstubAllGlobals());
 
 describe('Hud action-bar facade', () => {
+  it('routes both configurable slot paths through the Shift-only clear gesture', () => {
+    const source = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+    const buildStart = source.indexOf('private buildActionBar(): void');
+    const configurableStart = source.indexOf('if (slot >= 1) {', buildStart);
+    const attackSlotStart = source.indexOf('// Slot 0 (Attack).', configurableStart);
+    const configurableSlots = source.slice(configurableStart, attackSlotStart);
+
+    expect(configurableSlots.match(/btn\.addEventListener\('contextmenu'/g)).toHaveLength(1);
+    expect(configurableSlots).toContain('handleShiftClearContextMenu(e, clearSlot)');
+    expect(configurableSlots).toContain(
+      'this.hotbarActions = clearHotbarSlot(this.hotbarActions, slot - 1);',
+    );
+    expect(configurableSlots).toContain('this.saveSlotMap();');
+
+    const actionBarBuild = source.slice(
+      buildStart,
+      source.indexOf('private buildCastBar()', buildStart),
+    );
+    expect(actionBarBuild.match(/handleShiftClearContextMenu\(/g)).toHaveLength(2);
+    expect(actionBarBuild.match(/handleShiftClearKeydown\(/g)).toHaveLength(2);
+    expect(actionBarBuild).toContain('handleShiftClearContextMenu(e, clearAttackSlotAction);');
+    expect(actionBarBuild).toContain('this.attackSlotAction = null;');
+    expect(actionBarBuild).toContain('this.saveAttackSlotAction();');
+  });
+
   it('checks drag eligibility before normal-bar and configurable slot 0 drops', () => {
     const source = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
     expect(source.match(/actionBarController\.isAssignableAction\(/g)).toHaveLength(4);
@@ -58,5 +88,46 @@ describe('Hud action-bar facade', () => {
     expect(hud.dragAction).toBeNull();
     expect(hud.mobileHotbarDrag).toBeNull();
     expect(clearTimeout).toHaveBeenCalledWith(99);
+  });
+
+  it('activates assigned reins through the shared item slot path', () => {
+    const useItem = vi.fn();
+    const flashActionSlot = vi.fn();
+    vi.stubGlobal('document', {
+      querySelector: () => ({ style: { display: 'none' } }),
+    });
+    const hud = Object.create(Hud.prototype) as any;
+    hud.isGroundAimActive = () => false;
+    hud.attackSlotIsAttack = () => false;
+    hud.actionBarController = new ActionBarController({
+      storage: {
+        getItem: () => null,
+        setItem: () => {},
+        removeItem: () => {},
+      },
+      playerClass: 'warrior',
+      playerName: 'ReinsFacade',
+      knownAbilityIds: () => [],
+      hasAura: () => false,
+      isInSportMatch: () => false,
+      showAttackButton: () => true,
+    });
+    hud.actionBarController.replaceActions(
+      Array.from({ length: ACTION_BAR_ABILITY_SLOTS }, (_, index) =>
+        index === 0 ? { type: 'item', id: 'reins_grag_bear' } : null,
+      ),
+    );
+    hud.tryGatherToolUse = () => false;
+    hud.sim = { tradeInfo: null, useItem };
+    hud.flashActionSlot = flashActionSlot;
+
+    hud.castSlot(1);
+
+    expect(useItem).toHaveBeenCalledTimes(1);
+    expect(useItem).toHaveBeenCalledWith('reins_grag_bear');
+    expect(flashActionSlot).toHaveBeenCalledWith(1);
+    expect(
+      hud.actionBarController.isAssignableAction(hud.actionBarController.actionForSlot(1)),
+    ).toBe(true);
   });
 });

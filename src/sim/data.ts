@@ -27,6 +27,7 @@ import type {
 
 export type { FishingEntry } from './content/items';
 
+import { CASTLE_BLOCKERS } from './castle_layout';
 import {
   AMBERFALL_CAMPS,
   AMBERFALL_ITEMS,
@@ -51,6 +52,7 @@ import {
   DROWNED_LITANY_MODULES,
 } from './content/delves';
 import {
+  DRAKELANDS_BROOD_CAMPS,
   DRAKELANDS_CAMPS,
   DRAKELANDS_ITEMS,
   DRAKELANDS_MOBS,
@@ -67,6 +69,7 @@ import { DUNGEON_DEFS, DUNGEON_MOBS } from './content/dungeons';
 import {
   EVERGARDEN_CAMPS,
   EVERGARDEN_ITEMS,
+  EVERGARDEN_KNIGHT_CAMPS,
   EVERGARDEN_MOBS,
   EVERGARDEN_NPCS,
   EVERGARDEN_OBJECTS,
@@ -132,10 +135,12 @@ import { LAST_BELL_DUNGEON_DEFS } from './content/last_bell';
 import {
   LAST_BELL_CAMPAIGN_MOBS,
   LAST_BELL_CAMPAIGN_NPCS,
+  LAST_BELL_CAMPAIGN_QUEST_ORDER,
   LAST_BELL_CAMPAIGN_QUESTS,
 } from './content/last_bell_campaign';
 import { LAST_BELL_SQUAD_MOBS } from './content/last_bell_squad';
 import { MAGE_PET_MOBS } from './content/mage_pets';
+import { MAILBOXES } from './content/mailboxes';
 import {
   NIGHTBLOOM_CAMPS,
   NIGHTBLOOM_ITEMS,
@@ -150,7 +155,7 @@ import {
   NIGHTBLOOM_ROADS,
   NIGHTBLOOM_ZONE,
 } from './content/nightbloom';
-import { ORKADIA_DUNGEON_DEFS, ORKADIA_MOBS } from './content/orkadia';
+import { MUSTER_BOARDS, NOTICEBOARDS } from './content/noticeboards';
 import {
   PALMREACH_CAMPS,
   PALMREACH_ESCORTS,
@@ -165,6 +170,7 @@ import {
   PALMREACH_ROADS,
   PALMREACH_ZONE,
 } from './content/palmreach';
+import { STATIONS } from './content/professions';
 import {
   REALM_CAMPS,
   REALM_ITEMS,
@@ -269,7 +275,8 @@ import {
   ZONE3_ROADS,
   ZONE3_ZONE,
 } from './content/zone3';
-import { DUNGEON_WALL_HW } from './dungeon_layout';
+import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from './dungeon_layout';
+import { EASTBROOK_LAYOUT } from './eastbrook_layout';
 import { HARBOR_TERRAIN_EDITS } from './harbor_layout';
 import { JAIL_BLOCKERS, JAIL_TERRAIN_EDITS } from './jail';
 
@@ -306,7 +313,6 @@ function mergeItems(...parts: Record<string, ItemDef>[]): Record<string, ItemDef
 export type { ClassDef } from './content/classes';
 export { ABILITIES, abilitiesKnownAt, CLASSES } from './content/classes';
 export { GATHER_NODE_TYPES } from './content/gather_nodes';
-export { STATIONS } from './content/professions';
 // Re-export content shapes so existing `from './data'` imports keep working.
 export type {
   BiomeId,
@@ -321,6 +327,7 @@ export type {
   ZoneDef,
   ZonePropsDef,
 } from './types';
+export { STATIONS };
 
 // ---------------------------------------------------------------------------
 // Merged content tables
@@ -369,7 +376,6 @@ export const MOBS: Record<string, MobTemplate> = {
   ...YUMI_MOBS,
   ...REALM_MOBS,
   ...DRAKELANDS_MOBS,
-  ...ORKADIA_MOBS,
   ...WILDHEART_MOBS,
   ...FROSTVEIL_MOBS,
   ...AMBERFALL_MOBS,
@@ -462,6 +468,7 @@ export const QUEST_ORDER: string[] = [
   ...EVERGARDEN_QUEST_ORDER,
   ...GALECREST_QUEST_ORDER,
   ...FARSHORE_QUEST_ORDER,
+  ...LAST_BELL_CAMPAIGN_QUEST_ORDER,
 ];
 
 // The Book of Deeds catalog (content/deeds.ts) is deliberately NOT re-exported
@@ -504,6 +511,13 @@ export const CAMPS: CampDef[] = [
   ...WILLOWFEN_QUEST_CAMPS,
   ...NIGHTBLOOM_QUEST_CAMPS,
   ...GALECREST_QUEST_CAMPS,
+  // Dawnhold's knights arrived after every camp above shipped: they spread
+  // LAST so no earlier camp's world-gen rng draw moves (see the draw-order
+  // comment at the top of this array).
+  ...EVERGARDEN_KNIGHT_CAMPS,
+  // The Drakelands dragonkin brood belt (v0.35 rework) arrived after the
+  // knights: same append-last rule, so every camp above keeps its draws.
+  ...DRAKELANDS_BROOD_CAMPS,
 ];
 
 // Escort quest runs (src/sim/escort.ts): defs authored per realm, merged here
@@ -602,11 +616,14 @@ function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
     // ?? [] here would silently drop every harbor from the merged world
     harbors: sets.flatMap((s) => s.harbors ?? []),
     tents: sets.flatMap((s) => s.tents),
+    marshReeds: sets.flatMap((s) => s.marshReeds),
     crates: sets.flatMap((s) => s.crates),
     campfires: sets.flatMap((s) => s.campfires),
     mudHuts: sets.flatMap((s) => s.mudHuts),
     ruinRings: sets.flatMap((s) => s.ruinRings),
     fences: sets.flatMap((s) => s.fences),
+    benches: sets.flatMap((s) => s.benches ?? []),
+    walls: sets.flatMap((s) => s.walls ?? []),
     graveyards: sets.flatMap((s) => s.graveyards),
     // optional per-zone field, was being dropped here, so the delve entrance
     // marker (name slab + arch) never reached the renderer (props.ts)
@@ -687,7 +704,7 @@ export const WORLD_MAX_X = Math.max(...ZONES.map((zn) => zn.xMax ?? STRIP_MAX_X)
 export const WORLD_MIN_Z = Math.min(...ZONES.map((zn) => zn.zMin));
 export const WORLD_MAX_Z = Math.max(...ZONES.map((zn) => zn.zMax));
 
-export const PLAYER_START = { x: 2, z: -2 };
+export const PLAYER_START = { ...EASTBROOK_LAYOUT.services.playerStart.position };
 
 // ---------------------------------------------------------------------------
 // Active world content registry.
@@ -710,7 +727,16 @@ export const BUILTIN_WORLD: WorldContent = {
   roads: ROADS,
   props: PROPS,
   playerStart: PLAYER_START,
-  blockers: JAIL_BLOCKERS,
+  services: {
+    stations: STATIONS,
+    mailboxes: MAILBOXES,
+    noticeboards: NOTICEBOARDS,
+    musterBoards: MUSTER_BOARDS,
+    graveyards: OVERWORLD_GRAVEYARDS,
+  },
+  // invisible collision walls: the moderation cage plus the Last Keep's
+  // sealed building slot (castle_layout.ts CASTLE_BLOCKERS)
+  blockers: [...JAIL_BLOCKERS, ...CASTLE_BLOCKERS],
   // The jail cage floor plus the harbor shore grading (harbor_layout.ts):
   // both are pure HeightStamp data applied through terrainHeight's edit layer.
   terrainEdits: [...JAIL_TERRAIN_EDITS, ...HARBOR_TERRAIN_EDITS],
@@ -744,20 +770,48 @@ export function setActiveWorldContent(world: WorldContent | null): void {
 // as always) and x picks the column within it. Every zone without an
 // explicit x-range spans the original full-width strip, so a one-column
 // world behaves exactly as before.
-// The world's northmost zone, for clamping beyond the north end (append
-// order stopped meaning stack order when the first column landed).
-const NORTHMOST_ZONE: ZoneDef = ZONES.reduce((a, b) => (b.zMax > a.zMax ? b : a));
-
+// Walks the ACTIVE content's zones, not the builtin const, so every
+// consumer (the fishing rod gate, catch tables, deed credit, chat
+// readouts) resolves the same world the water and terrain reads resolve.
+// Byte-identical on every shipped host: BUILTIN_WORLD.zones IS the ZONES
+// reference. A content with an EMPTY zone list (the editor rejects one,
+// but a hand-built WorldContent can carry it) falls back to the builtin
+// zones so the declared non-null return stays true, exactly the totality
+// the builtin walk had. The beyond-the-north-end clamp resolves the
+// RESOLVED list's northmost zone (append order stopped meaning stack
+// order when the first column landed), so a custom map clamps to its own
+// north end; on shipped hosts that reduce sees ZONES.
 export function zoneAt(x: number, z: number): ZoneDef {
+  const active = getActiveWorldContent().zones;
+  const zones = active.length > 0 ? active : BUILTIN_WORLD.zones;
   let fallback: ZoneDef | null = null;
-  for (const zone of ZONES) {
+  for (const zone of zones) {
     if (z >= zone.zMax) continue;
     if (fallback === null || zone.zMax < fallback.zMax) fallback = zone; // southmost band containing z
     const x0 = zone.xMin ?? STRIP_MIN_X;
     const x1 = zone.xMax ?? STRIP_MAX_X;
     if (z >= zone.zMin && x >= x0 && x < x1) return zone;
   }
-  return fallback ?? NORTHMOST_ZONE;
+  return fallback ?? zones.reduce((a, b) => (b.zMax > a.zMax ? b : a));
+}
+
+// Strict rect containment: the zone whose rectangle literally contains (x, z),
+// or null when the point lies outside every authored zone. Unlike zoneAt, which
+// clamps through a southmost-band fallback so an overworld query always yields a
+// zone, this reports "nowhere" honestly. Callers that must distinguish the open
+// world from an instanced interior (the far-east dungeon/arena/delve plane at
+// INSTANCE_X_BASE, which zoneAt would misreport as a real zone) use this one.
+// Reads the static ZONES deliberately, UNLIKE zoneAt (which resolves the
+// active world content so an editor play-test map can reshape lookups): a
+// custom play-test map's zones never redefine world policy.
+export function zoneContaining(x: number, z: number): ZoneDef | null {
+  for (const zone of ZONES) {
+    if (z < zone.zMin || z >= zone.zMax) continue;
+    const x0 = zone.xMin ?? STRIP_MIN_X;
+    const x1 = zone.xMax ?? STRIP_MAX_X;
+    if (x >= x0 && x < x1) return zone;
+  }
+  return null;
 }
 
 // The original strip column and the east/west columns beside it. Sequential
@@ -783,10 +837,21 @@ function sm01(raw: number): number {
 export function columnBlendAt(zone: ZoneDef, x: number, z: number): number {
   const x0 = zone.xMin ?? STRIP_MIN_X;
   const x1 = zone.xMax ?? STRIP_MAX_X;
-  const xT =
-    x0 >= STRIP_MAX_X
-      ? sm01((x - (x0 - 30)) / 65) // an east column, entered moving +x
-      : 1 - sm01((x - (x1 - 35)) / 65); // a west column, entered moving -x
+  const finite = Number.isFinite(x) && Number.isFinite(z);
+  if (finite && (z <= zone.zMin - 30 || z >= zone.zMax + 35)) {
+    // One zT sm01 arm is saturated at these bounds, so zT and the final
+    // product are exactly +0. Skipping both blends is bit-identical.
+    return 0;
+  }
+  const east = x0 >= STRIP_MAX_X;
+  if (finite && (east ? x <= x0 - 30 : x >= x1 + 30)) {
+    // xT is exactly +0 on this side of the column transition, so the final
+    // product is exactly +0. The outer side stays blended until coast shaping.
+    return 0;
+  }
+  const xT = east
+    ? sm01((x - (x0 - 30)) / 65) // an east column, entered moving +x
+    : 1 - sm01((x - (x1 - 35)) / 65); // a west column, entered moving -x
   const zT = sm01((z - (zone.zMin - 30)) / 65) * (1 - sm01((z - (zone.zMax - 30)) / 65));
   return xT * zT;
 }
@@ -794,24 +859,78 @@ export function columnBlendAt(zone: ZoneDef, x: number, z: number): number {
 // East-west extent of the world at a given z: the union of the zone rects
 // in that row. One column today (the original strip everywhere); a column
 // added east or west widens its own rows and nothing else. Beyond the world
-// ends this clamps to the nearest band, like zoneAt.
-export function worldXBoundsAt(z: number): { min: number; max: number } {
+// ends this clamps to the nearest band, like zoneAt. Walks the same RESOLVED
+// zone list zoneAt walks (the active content, builtin fallback): the fallback
+// arm probes zoneAt, so a static-ZONES loop here would return
+// {Infinity, -Infinity} the moment a custom map's bands disagree with the
+// builtin, and that pair reaches the terrain height smoothstep as NaN.
+function computeWorldXBounds(z: number): Readonly<{ min: number; max: number }> {
+  const active = getActiveWorldContent().zones;
+  const zones = active.length > 0 ? active : BUILTIN_WORLD.zones;
   let min = Infinity;
   let max = -Infinity;
-  for (const zone of ZONES) {
+  for (const zone of zones) {
     if (z < zone.zMin || z >= zone.zMax) continue;
     min = Math.min(min, zone.xMin ?? STRIP_MIN_X);
     max = Math.max(max, zone.xMax ?? STRIP_MAX_X);
   }
   if (min > max) {
     const band = zoneAt(0, z);
-    for (const zone of ZONES) {
+    for (const zone of zones) {
       if (zone.zMin !== band.zMin || zone.zMax !== band.zMax) continue;
       min = Math.min(min, zone.xMin ?? STRIP_MIN_X);
       max = Math.max(max, zone.xMax ?? STRIP_MAX_X);
     }
   }
-  return { min, max };
+  return Object.freeze({ min, max });
+}
+
+interface WorldXBoundsIndex {
+  starts: readonly number[];
+  rows: readonly Readonly<{ min: number; max: number }>[];
+  south: Readonly<{ min: number; max: number }>;
+  nan: Readonly<{ min: number; max: number }>;
+}
+
+let worldXBoundsGeneration = -1;
+let worldXBoundsIndex: WorldXBoundsIndex | null = null;
+
+function buildWorldXBoundsIndex(): WorldXBoundsIndex {
+  // The SAME resolved list computeWorldXBounds walks: a custom map's band
+  // boundaries must seed the index rows, or every row between two custom
+  // boundaries reuses bounds computed at the wrong builtin boundary.
+  const active = getActiveWorldContent().zones;
+  const zones = active.length > 0 ? active : BUILTIN_WORLD.zones;
+  const starts = [...new Set(zones.flatMap((zone) => [zone.zMin, zone.zMax]))].sort(
+    (a, b) => a - b,
+  );
+  return {
+    starts,
+    rows: starts.map((z) => computeWorldXBounds(z)),
+    south: computeWorldXBounds(Number.NEGATIVE_INFINITY),
+    nan: computeWorldXBounds(Number.NaN),
+  };
+}
+
+export function worldXBoundsAt(z: number): Readonly<{ min: number; max: number }> {
+  const generation = getContentGeneration();
+  if (generation !== worldXBoundsGeneration || worldXBoundsIndex === null) {
+    worldXBoundsIndex = buildWorldXBoundsIndex();
+    worldXBoundsGeneration = generation;
+  }
+  if (Number.isNaN(z)) return worldXBoundsIndex.nan;
+  if (z < worldXBoundsIndex.starts[0]) return worldXBoundsIndex.south;
+
+  let lo = 0;
+  let hi = worldXBoundsIndex.starts.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >>> 1;
+    if (worldXBoundsIndex.starts[mid] <= z) lo = mid + 1;
+    else hi = mid;
+  }
+  // Zone membership is constant between sorted z boundaries. Reusing the
+  // frozen row removes the zone scan and result allocation bit-identically.
+  return worldXBoundsIndex.rows[lo - 1];
 }
 
 export function zoneWelcomeText(
@@ -871,25 +990,23 @@ export function instanceSlotForZ(z: number): number {
 export const DUNGEONS: Record<string, DungeonDef> = {
   ...DUNGEON_DEFS,
   ...TEMPLE_DUNGEON_DEFS,
-  ...ORKADIA_DUNGEON_DEFS,
   ...WILDHEART_DUNGEON_DEFS,
   ...LAST_BELL_DUNGEON_DEFS,
 };
 
 export const DUNGEON_LIST: DungeonDef[] = Object.values(DUNGEONS).sort((a, b) => a.index - b.index);
 
+// Indexed lookup: dungeonAt runs inside groundHeight's dungeon branch (per
+// entity per tick in a populated instance), so the per-call find() scan and
+// its closure are not welcome there.
+const DUNGEON_BY_INDEX: (DungeonDef | undefined)[] = [];
+for (const d of DUNGEON_LIST) DUNGEON_BY_INDEX[d.index] = d;
+
 export function dungeonByIndex(index: number): DungeonDef | null {
-  return DUNGEON_LIST.find((d) => d.index === index) ?? null;
+  return DUNGEON_BY_INDEX[index] ?? null;
 }
 
 // Which dungeon a far-off instance position belongs to, by x-band.
-// Dungeons occupy the instance x-band from the first slot up to (but not
-// including) the delve band. The Ashen Coliseum sits at a half-slot inside that
-// range (ARENA_X, between dungeon index 5 and 6), so its own tight band is
-// excluded explicitly. This lets the Orkadia slot (index 6, instance origin
-// ARENA_X + 300: past the arena footprint, west of the delve band) resolve as a
-// dungeon instead of being swallowed by the old `x >= ARENA_X_MIN` cutoff, which
-// left its interior unbuilt and its colliders unresolved (a pitch-black room).
 export function dungeonAt(x: number): DungeonDef | null {
   if (x >= DUNGEON_OVERFLOW_X_BASE - 300) {
     const index = DUNGEON_OVERFLOW_INDEX + Math.round((x - DUNGEON_OVERFLOW_X_BASE) / 600);
@@ -910,24 +1027,22 @@ export function dungeonAt(x: number): DungeonDef | null {
 // ---------------------------------------------------------------------------
 
 export const ARENA_X = INSTANCE_X_BASE + 4200; // arena instances share this x; slots stack along z
-export const ARENA_X_MIN = ARENA_X; // x at/after this = an arena instance, not a dungeon
-// The arena band is a TIGHT column bracketing ARENA_X (all slots share this x;
-// the pit footprint is only ~±24u). It deliberately does NOT stretch to the
-// delve band: the gap east of the arena holds the Orkadia dungeon slot (index 6,
-// origin ARENA_X + 300), which must classify as a dungeon, not the arena. The
-// bound sits at the midpoint between the arena and the Orkadia slot so each
-// footprint stays comfortably on its own side.
+// Include the complete west wall plus one yard of routing headroom. Collision,
+// line of sight, camera sweeps, and dungeon lookup all select their instance
+// geometry through this boundary, so using the centreline would leave the
+// arena's entire west half attached to the neighboring dungeon band.
+export const ARENA_X_MIN = ARENA_X - (DUNGEON_WALL_X + DUNGEON_WALL_HW + 1);
 export const ARENA_X_MAX = ARENA_X + 150; // x at/after this = past the arena band
 export const ARENA_SLOT_COUNT = 4; // concurrent 1v1 matches the world can host
 const ARENA_Z0 = -1250;
-const ARENA_SLOT_SPACING = 120; // > the pit footprint (~44yd) so slots never overlap
+const ARENA_SLOT_SPACING = 120; // > the pit footprint (~52yd) so slots never overlap
 
 export function arenaOrigin(slot: number): { x: number; z: number } {
   return { x: ARENA_X, z: ARENA_Z0 + slot * ARENA_SLOT_SPACING };
 }
 
 export function isArenaPos(x: number): boolean {
-  return x >= ARENA_X_MIN && x < ARENA_X_MAX;
+  return x >= ARENA_X_MIN && x < DELVE_BAND_X_MIN;
 }
 
 // Nearest arena instance origin to a far-off position, matched by z-band (the
@@ -974,10 +1089,10 @@ export const CRYPT_SPAWNS = DUNGEONS.hollow_crypt.spawns;
 
 // ---------------------------------------------------------------------------
 // Delves, private party instances past the arena x-band (see docs/prd/delves.md).
-// DELVE_X_MIN must stay above ARENA_X_MIN (4000) and ARENA_X (4200).
+// DELVE_X_MIN must stay above the full arena footprint around ARENA_X.
 // ---------------------------------------------------------------------------
 
-// 4800 sits clear of the v0.10.0 layout: dungeons end at ARENA_X_MIN (4000) and
+// 4800 sits clear of the v0.10.0 layout: the widest dungeon ends west of
 // the arena pit is centred at ARENA_X (4200, ~±22u footprint). The delve band's
 // west edge (DELVE_BAND_X_MIN = 4773) leaves a comfortable margin past the arena.
 export const DELVE_X_MIN = INSTANCE_X_BASE + 4800;
@@ -1049,9 +1164,12 @@ export const RIFT_BAND_X_MIN = RIFT_X_MIN - 40;
 // only RIFT_REGION_HALF_X wide either side; 1000u of headroom keeps it clear of the
 // relocated Protect Yumi maze band (YUMI_BAND_X_MIN) that now sits past it.
 export const RIFT_BAND_X_MAX = RIFT_X_MIN + 1000;
-export const RIFT_SLOT_COUNT = 8; // normal concurrent-rift capacity
-export const COMMUNITY_RIFT_SLOT_COUNT = 24; // opt-in public-test capacity
-const RIFT_LAYOUT_SLOT_COUNT = COMMUNITY_RIFT_SLOT_COUNT;
+// Concurrent-rift capacity for every host. With one portal per eligible zone
+// and per-event instance caps enforced at entry, the bound is population, not
+// events; slots are only backing records until a group enters, so a large pool
+// costs nothing at rest.
+export const RIFT_SLOT_COUNT = 64;
+const RIFT_LAYOUT_SLOT_COUNT = RIFT_SLOT_COUNT;
 export const RIFT_MAX_FLOORS = 6; // matches rift_gen MAX_FLOORS
 const RIFT_Z0 = -1250;
 // Each FLOOR gets its own z-stacked origin within a slot, so descending builds a
@@ -1147,6 +1265,61 @@ export function yumiMazeOriginAt(z: number): { x: number; z: number; slot: numbe
   return { x: o.x, z: o.z, slot: best };
 }
 
+// ---------------------------------------------------------------------------
+// Thornhollow Fields, the 5v5 capture-the-flag battleground. Its match
+// instances sit on the far-east instance plane like every other instanced
+// region, offset from INSTANCE_X_BASE rather than from world zero: the plane
+// moved east wholesale (see migrateLegacyInstancePos), so a raw offset would
+// land these matches in the OVERWORLD. The band is placed well past the
+// overflow-dungeon growth zone (DUNGEON_OVERFLOW_X_BASE + 600 per dungeon), so
+// adding dungeons can never walk into it.
+//
+// Unlike every other far-east band, this one has REAL terrain: the Thornhollow
+// field's sculpted heightfield (sim/battleground_field.ts serves world.ground
+// Height's band arm), and its per-slot colliders are registered into the
+// open-world spatial grid rather than scanned as one instance-local set
+// (sim/colliders.ts bandSlotColliders).
+// ---------------------------------------------------------------------------
+
+// x at/after this = a Thornhollow Fields instance.
+export const BG_BAND_X_MIN = INSTANCE_X_BASE + 30_000;
+// Two-sided cap, the Yumi-band move: the band never claims everything east, so
+// a later band stays classifiable.
+export const BG_BAND_X_MAX = INSTANCE_X_BASE + 34_000;
+// Battleground instances share this x; slots stack along z.
+export const BG_X = INSTANCE_X_BASE + 30_400;
+export const BG_SLOT_COUNT = 3; // concurrent 5v5 matches the world can host
+const BG_Z0 = -1500;
+const BG_SLOT_SPACING = 920; // way past the 100x280 field, so cross-slot player
+// pairs stay over 600yd apart: beyond even the RAISED in-band interest radius,
+// which applies to SAME-slot pairs only (server/game.ts BG_MATCH_DROP_RADIUS).
+// The band has the room, and physical separation is a cheaper guarantee than
+// relying on the same-slot filter alone.
+
+export function battlegroundOrigin(slot: number): { x: number; z: number } {
+  return { x: BG_X, z: BG_Z0 + slot * BG_SLOT_SPACING };
+}
+
+export function isBgPos(x: number): boolean {
+  return x >= BG_BAND_X_MIN && x < BG_BAND_X_MAX;
+}
+
+// Nearest battleground instance origin to a far-off position, matched by
+// z-band (the x is shared across slots). Mirrors arenaOriginAt.
+export function bgOriginAt(z: number): { x: number; z: number; slot: number } {
+  let best = 0,
+    bestD = Infinity;
+  for (let i = 0; i < BG_SLOT_COUNT; i++) {
+    const d = Math.abs(z - battlegroundOrigin(i).z);
+    if (d < bestD) {
+      bestD = d;
+      best = i;
+    }
+  }
+  const o = battlegroundOrigin(best);
+  return { x: o.x, z: o.z, slot: best };
+}
+
 export const DELVES: Record<string, DelveDef> = {
   [COLLAPSED_RELIQUARY_DELVE.id]: COLLAPSED_RELIQUARY_DELVE,
   [DROWNED_LITANY_DELVE.id]: DROWNED_LITANY_DELVE,
@@ -1206,7 +1379,7 @@ export function delveSlotAt(delveIndex: number, z: number, modules: readonly str
 }
 
 // Memoized: the default chain is a pure function of the static DELVES table, and
-// callers (collision/camera fallback) hit it per-frame inside the delve band, so
+// callers (collision and render fallbacks) hit it per-frame inside the delve band, so
 // cache one frozen array per delve id instead of reallocating each call.
 const DEFAULT_DELVE_MODULES = new Map<string, readonly string[]>();
 

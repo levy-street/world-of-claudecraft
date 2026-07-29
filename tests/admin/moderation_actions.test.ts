@@ -8,6 +8,7 @@ import {
   forceRename,
   liftChatMute,
   moderateDailyRewardsIp,
+  resetChatStrikes,
   resetPassword,
   suspendCustom,
   suspendHours,
@@ -113,6 +114,17 @@ describe('moderation_actions', () => {
     const built = liftChatMute(42, 'appeal accepted');
     if (!('pending' in built)) throw new Error('expected pending');
     expect(built.pending.endpoint).toBe('/admin/api/moderation/accounts/42/lift-mute');
+    expect(built.pending.body).toEqual({ reason: 'appeal accepted' });
+  });
+
+  it('requires a reason to reset chat strikes', () => {
+    expect(resetChatStrikes(42, '')).toEqual({ errorKey: 'alert.noteRequired' });
+  });
+
+  it('builds an audited chat strikes reset request', () => {
+    const built = resetChatStrikes(42, 'appeal accepted');
+    if (!('pending' in built)) throw new Error('expected pending');
+    expect(built.pending.endpoint).toBe('/admin/api/moderation/accounts/42/reset-strikes');
     expect(built.pending.body).toEqual({ reason: 'appeal accepted' });
   });
 

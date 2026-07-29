@@ -1,4 +1,4 @@
-// Drowned Reliquary Rite finale for The Drowned Litany (Phase 7). Replaces the
+// Drowned Reliquary Rite finale for The Drowned Litany. Replaces the
 // lockpick chest with a seeded shrine-sequence puzzle after Sister Nhalia dies.
 
 import { drownedLitanyChestItemsForTier } from '../content/delves/drowned_litany_loot';

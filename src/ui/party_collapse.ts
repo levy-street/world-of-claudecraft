@@ -16,6 +16,8 @@
 // input is the player's own persisted choice (default collapsed, the product
 // decision) plus whether they are in a party on mobile.
 
+import { safeLocalStorage } from './safe_local_storage';
+
 // The persisted collapse flag's localStorage key. Its own key, like the haptics
 // toggle's woc_haptics_on: '1' means collapsed, '0' means expanded. Collapsed is
 // the default, so a MISSING key (never toggled) reads as collapsed.
@@ -97,12 +99,4 @@ export function partyChipState(inputs: PartyChipInputs): PartyChipState {
   const chipVisible = inputs.inParty && inputs.mobile;
   const framesExpanded = chipVisible ? !inputs.collapsed : inputs.inParty;
   return { chipVisible, framesExpanded };
-}
-
-function safeLocalStorage(): Pick<Storage, 'getItem' | 'setItem'> | null {
-  try {
-    return typeof localStorage !== 'undefined' ? localStorage : null;
-  } catch {
-    return null;
-  }
 }

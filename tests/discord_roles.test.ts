@@ -3,6 +3,7 @@ import {
   DISCORD_SPECIAL_ROLES,
   specialRoleByKey,
   specialRoleByName,
+  specialRoleChatTag,
   specialRoleColor,
   topSpecialRole,
 } from '../src/sim/discord_roles';
@@ -223,5 +224,26 @@ describe('discord role tag labels - single source', () => {
     }
     expect(discordRoleTagKey('not-a-role')).toBeUndefined();
     expect(discordRoleTagKey(undefined)).toBeUndefined();
+  });
+});
+
+describe('discord special roles - the chat-tag staff set', () => {
+  it('pins exactly the staff roles as chat-tagged (the anti-impersonation set)', () => {
+    // The chat tag is a pure authority signal: adding a community role here
+    // (or dropping a staff one) must be a deliberate, reviewable change.
+    const tagged = DISCORD_SPECIAL_ROLES.filter((r) => r.chatTag).map((r) => r.key);
+    expect(tagged).toEqual([
+      'levyst',
+      'admin',
+      'coredevs',
+      'devs',
+      'seniormods',
+      'mods',
+      'juniormods',
+    ]);
+    expect(specialRoleChatTag('mods')).toBe(true);
+    expect(specialRoleChatTag('legend')).toBe(false);
+    expect(specialRoleChatTag('shill')).toBe(false);
+    expect(specialRoleChatTag(undefined)).toBe(false);
   });
 });

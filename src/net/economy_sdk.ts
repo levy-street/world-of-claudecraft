@@ -85,6 +85,7 @@ export interface ClaudiumNativePrice {
   rail: ClaudiumNativeRail;
   claudium: number | null;
   amountBase: string | null;
+  discountBps: number | null;
   reason?: string;
 }
 
@@ -294,13 +295,25 @@ export class EconomyClient {
     return this.get('/api/claudium/native/rails', OFF_NATIVE_RAILS);
   }
 
-  nativePrice(rail: ClaudiumNativeRail, sku: string): Promise<ClaudiumNativePrice> {
-    return this.get(`/api/claudium/native/price/${rail}?sku=${encodeURIComponent(sku)}`, {
-      rail,
-      claudium: null,
-      amountBase: null,
-      reason: 'unavailable',
-    });
+  async nativePrice(rail: ClaudiumNativeRail, sku: string): Promise<ClaudiumNativePrice> {
+    const price = await this.get(
+      `/api/claudium/native/price/${rail}?sku=${encodeURIComponent(sku)}`,
+      {
+        rail,
+        claudium: null,
+        amountBase: null,
+        discountBps: null,
+        reason: 'unavailable',
+      },
+    );
+    const discountBps =
+      Number.isInteger(price.discountBps) &&
+      price.discountBps !== null &&
+      price.discountBps >= 0 &&
+      price.discountBps <= 9000
+        ? price.discountBps
+        : null;
+    return { ...price, discountBps };
   }
 
   solBalance(owner: string): Promise<ClaudiumSolBalance> {

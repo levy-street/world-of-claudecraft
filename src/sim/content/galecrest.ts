@@ -4,10 +4,9 @@
 // the shared edge (no teleport; the border ridge is real ground, opened at
 // westPassZ). Salt-silvered downs roll to grey sea cliffs; the fishing town
 // of Wickharbor keeps its boats in the lee of the harbor cove; the Old
-// Beacon burns on the highest head, sea stacks stand off the Shear, and the
-// Wreckfields beach its bones in the north. Terrain: the GALE_* tables in
-// world.ts; the lighthouse, sea stacks, and wreck ribs live in
-// render/gale_features.ts.
+// Beacon burns on the highest head, and the Wreckfields beach their bones
+// in the north. Terrain: the GALE_* tables in world.ts; the lighthouse,
+// harbor decks, and wreck ribs live in render/gale_features.ts.
 
 import type {
   CampDef,
@@ -47,6 +46,7 @@ export const GALECREST_ZONE: ZoneDef = {
     { x: 455, z: 535, label: 'The Shear', id: 'the_shear' },
     { x: 340, z: 645, label: 'The Wreckfields', id: 'the_wreckfields' },
     { x: 300, z: 560, label: 'The Mirror Tarn', id: 'the_mirror_tarn' },
+    { x: 378, z: 598, label: 'The Galecrest Stables', id: 'the_galecrest_stables' },
   ],
   welcome:
     'The wind has never once stopped here, and the Old Beacon has never once gone out. Wickharbor asks only that you close the inn door behind you.',
@@ -70,9 +70,11 @@ export const GALECREST_ROADS: { x: number; z: number }[][] = [
     { x: 420, z: 360 },
     { x: 432, z: 440 },
     { x: 446, z: 512 },
-    { x: 410, z: 588 },
+    { x: 438, z: 552 },
+    { x: 434, z: 610 },
+    { x: 390, z: 634 },
     { x: 352, z: 636 },
-  ], // Wickharbor -> above the Shear -> the Wreckfields
+  ], // Wickharbor -> above the Shear -> past the stables' east fence -> the Wreckfields
   [
     { x: 420, z: 360 },
     { x: 352, z: 342 },
@@ -89,6 +91,27 @@ export const GALECREST_ROADS: { x: number; z: number }[][] = [
     { x: 396, z: 698 },
   ], // the Wreckfields -> up to the Garden Gate (onto the lawns)
 ] as { x: number; z: number }[][];
+
+// Authored always-bloom flower circles (render/foliage.ts reads these the
+// way the dusk realm reads REALM_FLOWER_MEADOWS): the little fenced gardens
+// behind the beacon-road houses, and the Mirror Tarn's flowering banks.
+export const GALECREST_FLOWER_MEADOWS: { x: number; z: number; r: number }[] = [
+  { x: 428.5, z: 340, r: 2.2 },
+  { x: 444, z: 354, r: 2.2 },
+  { x: 439, z: 331, r: 2 },
+  { x: 471, z: 308, r: 2.2 },
+  { x: 286, z: 556, r: 7 },
+  { x: 292, z: 541, r: 5 },
+  { x: 458, z: 606, r: 6 },
+  { x: 462, z: 613, r: 5 },
+  { x: 447, z: 595, r: 4 },
+  { x: 440, z: 634, r: 4 },
+  { x: 474, z: 630, r: 4 },
+  { x: 306, z: 540, r: 5 },
+  { x: 310, z: 548, r: 7 },
+  { x: 306, z: 572, r: 7 },
+  { x: 290, z: 572, r: 7 },
+];
 
 // No portals: walked into through the Windway.
 export const GALECREST_PORTALS: PortalDef[] = [];
@@ -109,9 +132,13 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 13, // a fleece the wind gave up on
     moveSpeed: 8.5,
     aggroRadius: 0, // grazing the downs, braced side-on to the gale
-    loot: [{ itemId: 'galecrest_ram_wool', chance: 0.65, questId: 'q_gc_wool_off_the_downs' }],
+    loot: [
+      { copper: 105, chance: 1 },
+      { itemId: 'galecrest_ram_wool', chance: 0.65, questId: 'q_gc_wool_off_the_downs' },
+    ],
     scale: 1.1,
     color: 0xd8d0c0,
+    componentTags: ['hide', 'meat'],
   },
   gale_wisp: {
     id: 'gale_wisp',
@@ -127,7 +154,7 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 9,
     moveSpeed: 9,
     aggroRadius: 11, // a knot of living wind, and it resents shelter
-    loot: [],
+    loot: [{ copper: 105, chance: 1 }],
     scale: 1.25,
     color: 0xbfe0e8,
   },
@@ -145,9 +172,54 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 14, // storm-shell
     moveSpeed: 7,
     aggroRadius: 8,
-    loot: [],
+    loot: [{ copper: 105, chance: 1 }],
     scale: 1.2,
     color: 0x8898a8,
+    componentTags: ['meat'],
+  },
+  downs_bandit: {
+    id: 'downs_bandit',
+    name: 'Downs Bandit',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'burrower',
+    hpBase: 52,
+    hpPerLevel: 18,
+    dmgBase: 11,
+    dmgPerLevel: 2.2,
+    attackSpeed: 1.8,
+    armorPerLevel: 10,
+    moveSpeed: 8.5,
+    aggroRadius: 10, // squatting the old raider tents, and keeping them
+    loot: [
+      { copper: 100, chance: 1 },
+      { itemId: 'bandit_bandana', chance: 0.5 },
+      { itemId: 'linen_scrap', chance: 0.3 },
+    ],
+    scale: 0.95,
+    color: 0x5a8a46,
+  },
+  wreck_thief: {
+    id: 'wreck_thief',
+    name: 'Wreckfield Thief',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'burrower',
+    hpBase: 52,
+    hpPerLevel: 18,
+    dmgBase: 11,
+    dmgPerLevel: 2.2,
+    attackSpeed: 1.8,
+    armorPerLevel: 10,
+    moveSpeed: 8.5,
+    aggroRadius: 10, // every beached cargo on this coast is theirs by claim
+    loot: [
+      { copper: 100, chance: 1 },
+      { itemId: 'bandit_bandana', chance: 0.5 },
+      { itemId: 'linen_scrap', chance: 0.3 },
+    ],
+    scale: 0.95,
+    color: 0x5a8a46,
   },
   the_wreck_warden: {
     id: 'the_wreck_warden',
@@ -164,7 +236,10 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 8,
     aggroRadius: 14, // every hull on that beach is a grave he keeps
     elite: true,
-    loot: [],
+    loot: [
+      { copper: 100, chance: 1 },
+      { itemId: 'bone_fragments', chance: 1 },
+    ],
     scale: 1.45,
     color: 0x7a8a86,
   },
@@ -186,7 +261,10 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 13,
     moveSpeed: 7.5,
     aggroRadius: 12,
-    loot: [],
+    loot: [
+      { copper: 100, chance: 1 },
+      { itemId: 'bone_fragments', chance: 0.5 },
+    ],
     scale: 1.05,
     color: 0x86988e,
   },
@@ -228,8 +306,12 @@ export const GALECREST_NPCS: Record<string, NpcDef> = {
     id: 'keeper_bram',
     name: 'Keeper Bram',
     title: 'Keeper of the Old Beacon',
-    pos: { x: 496, z: 310 },
-    facing: 2.6,
+    // on the Beacon's upper balcony (BEACON_SPIRAL deck2, +19), a couple of
+    // paces along the deck from where the second flight tops out, looking back
+    // at the stair head. Keep him clear of the tower column: inside coreR the
+    // ground snap hands out the plug height and he ends up on the roof cap.
+    pos: { x: 503, z: 309 },
+    facing: -0.46,
     color: 0xc8b06a,
     questIds: [
       'q_gc_keeper_of_the_flame',
@@ -496,11 +578,18 @@ export const GALECREST_ITEMS: Record<string, ItemDef> = {
 export const GALECREST_CAMPS: CampDef[] = [
   { mobId: 'moor_ram', center: { x: 292, z: 312 }, radius: 11, count: 3 },
   { mobId: 'moor_ram', center: { x: 262, z: 360 }, radius: 10, count: 3 },
-  { mobId: 'gale_wisp', center: { x: 302, z: 522 }, radius: 11, count: 3 },
-  { mobId: 'gale_wisp', center: { x: 366, z: 570 }, radius: 10, count: 3 },
-  { mobId: 'shoal_scuttler', center: { x: 444, z: 438 }, radius: 10, count: 3 },
-  { mobId: 'shoal_scuttler', center: { x: 386, z: 622 }, radius: 9, count: 2 },
+  { mobId: 'topiary_wolf', center: { x: 302, z: 522 }, radius: 11, count: 3 },
+  // the pack hunts the empty downs southwest of the tarn, far from the
+  // lakeside barns and every building
+  { mobId: 'topiary_wolf', center: { x: 250, z: 505 }, radius: 8, count: 3 },
+  { mobId: 'wreck_thief', center: { x: 444, z: 438 }, radius: 10, count: 3 },
+  { mobId: 'moor_ram', center: { x: 386, z: 622 }, radius: 9, count: 2 },
   { mobId: 'the_wreck_warden', center: { x: 330, z: 638 }, radius: 5, count: 1 },
+  // the outskirt raider camps (appended: camp order is world-gen rng order):
+  // bandits hold the north and Windway camps, thieves the coast road camps
+  { mobId: 'downs_bandit', center: { x: 252, z: 250 }, radius: 4, count: 2 },
+  { mobId: 'downs_bandit', center: { x: 210, z: 410 }, radius: 4, count: 2 },
+  { mobId: 'wreck_thief', center: { x: 354, z: 664 }, radius: 4, count: 2 },
 ];
 export const GALECREST_OBJECTS: GroundObjectDef[] = [
   {
@@ -538,47 +627,215 @@ export const GALECREST_OBJECTS: GroundObjectDef[] = [
 export const GALECREST_QUEST_CAMPS: CampDef[] = [
   { mobId: 'drowned_deckhand', center: { x: 352, z: 662 }, radius: 10, count: 3 },
   { mobId: 'drowned_deckhand', center: { x: 306, z: 618 }, radius: 9, count: 3 },
+  // Shoal scuttlers along the cliff road above Wickharbor's cove
+  // (q_gc_scuttlers_in_the_pots): they climbed up from the shoals to raid
+  // the crab pots, so their two camps flank the road south of town, clear
+  // of the wreck_thief camp further down at (444, 438).
+  { mobId: 'shoal_scuttler', center: { x: 410, z: 400 }, radius: 9, count: 5, offStream: true },
+  { mobId: 'shoal_scuttler', center: { x: 440, z: 460 }, radius: 8, count: 5, offStream: true },
+  // Gale wisps on the high downs beside the Mirror Tarn
+  // (q_gc_wind_against_the_wick): kept east of the tarn itself and clear of
+  // the topiary_wolf pack that already holds its southwest bank.
+  { mobId: 'gale_wisp', center: { x: 330, z: 565 }, radius: 9, count: 4, offStream: true },
+  { mobId: 'gale_wisp', center: { x: 355, z: 585 }, radius: 8, count: 4, offStream: true },
 ];
 
 export const GALECREST_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
-  // Wickharbor: a fishing town in the lee of the harbor cove
+  // Wickharbor: the coast's medieval harbor city, laid out along its four
+  // street spokes (the roads above): every house fronts a street with open
+  // ground around it, the blue-roofed KayKit quarter (decorProps below)
+  // holds the square and the corners, and the walkable stilt piers of the
+  // harbor (sim/gale_harbor.ts) run out over the bay from the dock district
   buildings: [
-    { kind: 'inn', x: 412, z: 352, w: 6, d: 7, rot: 0.4 },
-    { kind: 'house', x: 428, z: 368, w: 5, d: 5, rot: -1.2 },
-    { kind: 'house', x: 410, z: 370, w: 5, d: 5, rot: 2.2 },
+    // the inn on the south square's west side, timber houses down the roads
+    { kind: 'inn', x: 405, z: 371, w: 6, d: 7, rot: Math.PI },
+    { kind: 'house', x: 376, z: 371, w: 5, d: 5, rot: Math.PI },
+    { kind: 'house', x: 413, z: 381, w: 5, d: 5, rot: 1.62 },
+    { kind: 'house', x: 434, z: 390, w: 5, d: 5, rot: -1.48 },
+    { kind: 'house', x: 417, z: 405, w: 5, d: 6, rot: 1.52 },
+    { kind: 'house', x: 409, z: 394, w: 5, d: 5, rot: 1.68 },
   ],
-  wells: [{ x: 420, z: 362, r: 1.5 }],
+  wells: [{ x: 427, z: 362, r: 1.5 }],
   stalls: [
-    { x: 426, z: 354, rot: 0.6, r: 1.6 },
-    { x: 414, z: 360, rot: -1.4, r: 1.6 },
+    // the square market, flanking the south road out of the junction
+    { x: 415, z: 373, rot: 0.7, r: 1.6 },
+    { x: 419, z: 352, rot: -2.2, r: 1.6 },
+    // the harbor market: vendors working the shore behind the boardwalk
+    { x: 464, z: 345, rot: 1.2, r: 1.6 },
+    { x: 452, z: 370, rot: -0.7, r: 1.6 },
   ],
   crates: [
-    [432, 356],
-    [408, 358],
+    [437, 365],
+    [402, 366],
     [364, 633], // Edda's stacked salvage on the Wreckfields shore
     [357, 627],
   ],
   campfires: [
-    [420, 356],
+    [432, 361], // the square's fire, in the lee of the market hall
     [196, 434], // the Windway's waycamp
-    [498, 313], // Keeper Bram's brazier at the Beacon's foot
+    [455, 363], // the dockers' brazier behind the boardwalk
+    // Keeper Bram's brazier at the Beacon's foot: out on the lawn at d 8.5
+    // from the tower axis, clear of the spiral stair's footprint. Anywhere
+    // inside beaconSpiralLift's reach the brazier would sit UNDER the raised
+    // stair (props seat on terrainHeight, the stair on groundHeight), buried
+    // in the plinth masonry, and its collider (which has no height) would
+    // pinch the flight it stands beneath. It also stays off the stair-foot
+    // approach, which comes in around bearing 116 to 138 degrees.
+    [498, 316.5],
     [362, 633], // Salvager Edda's camp above the Wreckfields
   ],
   tents: [
     { x: 365, z: 627, rot: 1.9, scale: 1 }, // Edda's storm-lashed tent
   ],
-  // the harbor: a working dock running into the cove east of town (hw/hd 0: no hut)
-  docks: [{ x: 436, z: 372, rot: 2.2, hutLocal: { x: 40, z: 40, hw: 0, hd: 0 } }],
+  // (no pirate-kit mini docks here: Wickharbor's piers are the walkable
+  // stilt decks in sim/gale_harbor.ts, drawn by render/gale_features.ts)
+  docks: [],
   fences: [
-    // windbreak lines, the only fences that matter here
-    { x1: 406, z1: 346, x2: 434, z2: 346 },
-    { x1: 406, z1: 376, x2: 434, z2: 376 },
+    // Wickharbor's stone garden walls (the KayKit scalloped fence): the
+    // townhall's back wall, the walled churchyard, the West Street edging
+    // by the inn, and the road-side house gardens down the south road
+    { x1: 406, z1: 334, x2: 422, z2: 334, kind: 'stone' },
+    { x1: 394, z1: 336, x2: 394, z2: 348, kind: 'stone' },
+    { x1: 394, z1: 348, x2: 406, z2: 348, kind: 'stone' },
+    { x1: 396, z1: 366, x2: 402, z2: 366, kind: 'stone' },
+    { x1: 408, z1: 366, x2: 414, z2: 366, kind: 'stone' },
+    { x1: 409, z1: 376, x2: 409, z2: 386, kind: 'stone' },
+    { x1: 430, z1: 385, x2: 430, z2: 394, kind: 'stone' },
+    // little fenced flower gardens behind the beacon-road houses (wood
+    // rails; the matching bloom circles live in GALECREST_FLOWER_MEADOWS)
+    { x1: 424, z1: 337, x2: 433, z2: 337 },
+    { x1: 424, z1: 337, x2: 424, z2: 344 },
+    { x1: 438, z1: 351, x2: 447, z2: 351 },
+    { x1: 447, z1: 351, x2: 447, z2: 360 },
+    { x1: 436, z1: 327, x2: 443, z2: 327 },
+    { x1: 436, z1: 327, x2: 436, z2: 336 },
+    { x1: 466, z1: 305, x2: 475, z2: 305 },
+    { x1: 475, z1: 305, x2: 475, z2: 313 },
+    // the stables' walled south yard: stone runs close the barn yard's open
+    // side, leaving a gateway in line with the race-yard gate (Marla's post)
+    { x1: 332, z1: 606, x2: 360, z2: 606, kind: 'stone' },
+    { x1: 372, z1: 606, x2: 378, z2: 606, kind: 'stone' },
+    // the grooms' hamlet garden, facing the paddock across the lane
+    { x1: 322, z1: 592, x2: 322, z2: 603, kind: 'stone' },
+    // the raider camps' spiked palisades (two runs guarding each camp's
+    // open flank; layouts mirror the KayKit encampment reference)
+    { x1: 243, z1: 238, x2: 257, z2: 236, kind: 'palisade' },
+    { x1: 238, z1: 242, x2: 242, z2: 251, kind: 'palisade' },
+    { x1: 198, z1: 398, x2: 212, z2: 395, kind: 'palisade' },
+    { x1: 194, z1: 403, x2: 197, z2: 412, kind: 'palisade' },
+    { x1: 344, z1: 650, x2: 356, z2: 648, kind: 'palisade' },
+    { x1: 341, z1: 654, x2: 344, z2: 663, kind: 'palisade' },
   ],
-  // an old watch ruin on the Howling Downs, and the beacon's fallen forecourt
-  ruinRings: [
-    { x: 288, z: 328, ringR: 7, columns: 5 },
-    { x: 492, z: 316, ringR: 6, columns: 4 },
+  // the blue-roofed medieval quarter, the dock district, the Beacon's
+  // keepers, and the stables hamlet (float: hulls ride at their draft)
+  decorProps: [
+    // the square: townhall north, market hall east, tavern by the shore
+    { key: 'hexbTownhall', x: 414, z: 342, rot: 0.5, scale: 8, r: 6.5, h: 15 },
+    { key: 'hexbMarket', x: 433, z: 369, rot: -1.9, scale: 6, r: 4.5, h: 7 },
+    { key: 'hexbTavern', x: 441, z: 380, rot: -1.45, scale: 7.5, r: 5.5, h: 11 },
+    { key: 'hexbWorkshop', x: 390, z: 373, rot: Math.PI, scale: 7, r: 6, h: 8 },
+    // homes fronting the beacon road and the downs road
+    { key: 'hexbHomeA', x: 429, z: 342, rot: 0.64, scale: 7.5, r: 4.5, h: 8 },
+    { key: 'hexbHomeB', x: 442, z: 356, rot: -2.5, scale: 7.5, r: 5, h: 10 },
+    { key: 'hexbHomeA', x: 441, z: 332, rot: 0.64, scale: 7.5, r: 4.5, h: 8 },
+    { key: 'hexbHomeB', x: 386, z: 336, rot: -0.28, scale: 7.5, r: 5, h: 10 },
+    // the dock district, breathing room on both sides of the beacon road:
+    // the shipwright's yard alone by the north shingle, and the ship
+    // monument ACROSS the road on the inland rise, the anchor at its side
+    { key: 'hexbShipyard', x: 477, z: 336, rot: 1.3, scale: 7, r: 6.5, h: 10 },
+    { key: 'shipMonument', x: 447, z: 321, rot: 2.2, scale: 7, r: 3.4, h: 7 },
+    { key: 'hexAnchor', x: 452, z: 326, rot: -0.6, scale: 7 },
+    // the fleet, moored on the piers' open sides only (berths verified
+    // against the deck rectangles in sim/gale_harbor.ts; the r4 collider
+    // stays clear of every walkway so nobody wedges between hull and rail)
+    { key: 'hexShipBlue', x: 492.9, z: 350.2, rot: -1.84, scale: 6, r: 4, h: 9, float: 0.55 },
+    { key: 'hexShipBlue', x: 475.1, z: 368.7, rot: 1.45, scale: 6, r: 4, h: 9, float: 0.55 },
+    { key: 'hexShipBlue', x: 487, z: 370.1, rot: -1.69, scale: 6, r: 4, h: 9, float: 0.55 },
+    { key: 'hexShipBlue', x: 456.6, z: 382.8, rot: 1.3, scale: 6, r: 4, h: 9, float: 0.55 },
+    { key: 'hexShipBlue', x: 468.1, z: 386, rot: -1.84, scale: 6, r: 4, h: 9, float: 0.55 },
+    // the Beacon dock's pair, alongside the lighthouse pier
+    { key: 'hexShipBlue', x: 519.2, z: 329.6, rot: 0.79, scale: 6, r: 4, h: 9, float: 0.55 },
+    { key: 'hexShipBlue', x: 515.9, z: 345.5, rot: -2.36, scale: 6, r: 4, h: 9, float: 0.55 },
+    // dinghies: two on the water, one hauled out by the rack on the shingle
+    { key: 'hexBoat', x: 474, z: 354, rot: 0.7, scale: 6, float: 0.1 },
+    { key: 'hexBoat', x: 479, z: 357.5, rot: -1.8, scale: 6, float: 0.1 },
+    { key: 'hexBoat', x: 484, z: 346, rot: 2.3, scale: 6 },
+    { key: 'hexBoatrack', x: 486, z: 340, rot: 0.9, scale: 6 },
+    // harbor cargo around the office and the stalls
+    { key: 'hexCrateBig', x: 457, z: 362, rot: 0.4, scale: 5 },
+    { key: 'hexCrateOpen', x: 447, z: 362, rot: 1.7, scale: 5 },
+    { key: 'hexSack', x: 462, z: 357, rot: 2.8, scale: 5 },
+    { key: 'hexSack', x: 437, z: 372, rot: 0.9, scale: 5 },
+    { key: 'hexCrateBig', x: 446, z: 383, rot: 2.1, scale: 5 },
+    // the Beacon's keepers, spread across the head: the cottage across the
+    // road on the inland side, the store wide on the headland
+    { key: 'hexbHomeA', x: 470, z: 310, rot: 0.64, scale: 7.5, r: 4.5, h: 8 },
+    { key: 'hexbWorkshop', x: 515, z: 305, rot: -1.57, scale: 6.5, r: 6, h: 8 },
+
+    // the golden horse rears beside the stables' race-yard entrance
+    { key: 'goldenHorseStatue', x: 374, z: 591.5, rot: Math.PI, scale: 5.5, r: 2.4, h: 6 },
+    // the stable barns on the Mirror Tarn's level north bank (across the
+    // lake from the beach), the grooms' cottage by the paddock, and the
+    // farrier's shop off the south fence
+    { key: 'hexbStables', x: 293, z: 531, rot: 0.15, scale: 7, r: 5.5, h: 9 },
+    { key: 'hexbStables', x: 305, z: 529, rot: -0.2, scale: 7, r: 5.5, h: 9 },
+    { key: 'hexbHomeA', x: 317, z: 598, rot: 0.6, scale: 7.5, r: 4.5, h: 8 },
+    { key: 'hexbWorkshop', x: 346, z: 620, rot: -0.4, scale: 6, r: 5, h: 8 },
+    { key: 'hexHaybale', x: 299, z: 536, rot: 0.7, scale: 5 },
+    { key: 'hexHaybale', x: 309, z: 533, rot: 2.1, scale: 5 },
+    { key: 'hexTrough', x: 297, z: 527, rot: Math.PI / 2, scale: 5 },
+    // and the road side of the stables: homes and a third barn spread
+    // evenly along the Wreckfields road, east and south of the paddock
+    { key: 'hexbHomeA', x: 448, z: 558, rot: -1.5, scale: 7.5, r: 4.5, h: 8 },
+    { key: 'hexbStables', x: 450, z: 576, rot: -1.57, scale: 7, r: 5.5, h: 9 },
+    // (this home sits east of Salvager Edda's storm camp at 362..365, 627..633;
+    // keep the gap so her tent and salvage crates stay clear of the walls)
+    { key: 'hexbHomeB', x: 380, z: 634, rot: Math.PI, scale: 7.5, r: 5, h: 10 },
+    { key: 'hexbHomeA', x: 394, z: 620, rot: 2.9, scale: 7.5, r: 4.5, h: 8 },
+    { key: 'hexbStables', x: 404, z: 612, rot: 0.5, scale: 7, r: 5.5, h: 9 },
+    // the flower mill on the southeast downs above the Shear: a turning
+    // windmill and a cottage ringed in blooms (meadow circles below)
+    { key: 'hexbWindmill', x: 460, z: 618, rot: 0.5, scale: 7, r: 4, h: 12 },
+    { key: 'hexbHomeA', x: 458, z: 606, rot: -0.4, scale: 7.5, r: 4.5, h: 8 },
+    { key: 'hexbHomeB', x: 446, z: 592, rot: 0.9, scale: 7.5, r: 5, h: 10 },
+    { key: 'hexbHomeA', x: 438, z: 638, rot: -0.6, scale: 7.5, r: 4.5, h: 8 },
+    { key: 'hexbHomeB', x: 476, z: 634, rot: 2.3, scale: 7.5, r: 5, h: 10 },
+    { key: 'hexHaybale', x: 446, z: 581, rot: 1.3, scale: 5 },
+    { key: 'hexHaybale', x: 409, z: 618, rot: 0.2, scale: 5 },
+    { key: 'hexTrough', x: 453, z: 570, rot: 0.1, scale: 5 },
+    // the raider encampments on the outer downs (KayKit hide tents, spiked
+    // palisades, and watchtowers; the wind keeps what the raiders left):
+    // camp A on the far north downs
+    { key: 'hexrTent', x: 245, z: 245, rot: 0.9, scale: 7, r: 4.5, h: 5 },
+    { key: 'hexrTent', x: 259, z: 246, rot: -0.8, scale: 7, r: 4.5, h: 5 },
+    { key: 'hexrTent', x: 254, z: 259, rot: 2.4, scale: 7, r: 4.5, h: 5 },
+    { key: 'hexrWatchtower', x: 243, z: 256, rot: 0.7, scale: 6, r: 2.6, h: 9 },
+    { key: 'hexFlagRed', x: 249, z: 252, rot: 0.3, scale: 5 },
+    { key: 'hexFlagRed', x: 259, z: 253, rot: 2.1, scale: 5 },
+    { key: 'hexBarrel', x: 256, z: 242, rot: 0.8, scale: 5 },
+    { key: 'hexTarget', x: 263, z: 258, rot: -1.2, scale: 5 },
+    // camp B on the rise above the Windway road
+    { key: 'hexrTent', x: 204, z: 404, rot: 0.4, scale: 7, r: 4.5, h: 5 },
+    { key: 'hexrTent', x: 217, z: 405, rot: -1.3, scale: 7, r: 4.5, h: 5 },
+    { key: 'hexrTent', x: 212, z: 417, rot: 2.9, scale: 7, r: 4.5, h: 5 },
+    { key: 'hexrWatchtower', x: 201, z: 417, rot: 1.2, scale: 6, r: 2.6, h: 9 },
+    { key: 'hexFlagRed', x: 208, z: 411, rot: 1.1, scale: 5 },
+    { key: 'hexFlagRed', x: 216, z: 412, rot: -0.4, scale: 5 },
+    { key: 'hexBarrel', x: 214, z: 399, rot: 2.3, scale: 5 },
+    { key: 'hexTarget', x: 220, z: 416, rot: 0.6, scale: 5 },
+    // camp C on the downs above the Wreckfields, watching the Garden Gate
+    // road from its west shoulder
+    { key: 'hexrTent', x: 352, z: 655, rot: 1.1, scale: 7, r: 4.5, h: 5 },
+    { key: 'hexrTent', x: 361, z: 660, rot: -0.9, scale: 7, r: 4.5, h: 5 },
+    { key: 'hexrTent', x: 356, z: 673, rot: 2.6, scale: 7, r: 4.5, h: 5 },
+    { key: 'hexrWatchtower', x: 345, z: 670, rot: 0.9, scale: 6, r: 2.6, h: 9 },
+    { key: 'hexFlagRed', x: 351, z: 666, rot: 1.9, scale: 5 },
+    { key: 'hexFlagRed', x: 361, z: 667, rot: -0.7, scale: 5 },
+    { key: 'hexBarrel', x: 358, z: 656, rot: 1.4, scale: 5 },
+    { key: 'hexTarget', x: 365, z: 672, rot: 2.2, scale: 5 },
   ],
+  // an old watch ruin out on the Howling Downs
+  ruinRings: [{ x: 288, z: 328, ringR: 7, columns: 5 }],
   graveyards: [{ x: 400, z: 342 }],
 };

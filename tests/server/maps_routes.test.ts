@@ -471,7 +471,9 @@ describe('the optional-auth public :id read', () => {
   it('resolves a presented bearer to the viewer account (owner sees a private map)', async () => {
     const getMapForViewer = vi.fn(async () => mapRecord());
     fakeService({ getMapForViewer });
-    setMapsGuardDbForTests({ accountForToken: async () => CALLER });
+    setMapsGuardDbForTests({
+      accountAndScopeForToken: async () => ({ accountId: CALLER, scope: 'read' }),
+    });
     const res = await runRoute('GET', '/api/maps/:id', {
       headers: { authorization: BEARER },
       params: { id: '5' },

@@ -1,10 +1,19 @@
 import { describe, expect, it } from 'vitest';
+import { WEAPON_TYPE_BY_ITEM } from '../src/sim/content/weapon_skin_rules';
 import { CLASSES, ITEMS } from '../src/sim/data';
 import { canEquipItem } from '../src/sim/equipment_rules';
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 
 const ALL_CLASSES = Object.keys(CLASSES) as PlayerClass[];
+const CASTER_WEAPON_CLASSES: PlayerClass[] = [
+  'mage',
+  'priest',
+  'warlock',
+  'shaman',
+  'paladin',
+  'druid',
+];
 
 function equip(cls: Parameters<Sim['addPlayer']>[0], itemId: string) {
   const sim = new Sim({ seed: 42, playerClass: cls, noPlayer: true, autoEquip: false });
@@ -69,6 +78,28 @@ describe('armor proficiencies', () => {
     expect(equip('warrior', 'staff_of_the_gravewyrm').equipment.mainhand).not.toBe(
       'staff_of_the_gravewyrm',
     );
+  });
+
+  it('lets a shaman equip Lunar Tide Greatstaff through the live equip path', () => {
+    expect(equip('shaman', 'lunar_tide_greatstaff').equipment.mainhand).toBe(
+      'lunar_tide_greatstaff',
+    );
+  });
+
+  it('allows every caster and hybrid caster to equip every staff', () => {
+    const staffIds = Object.entries(WEAPON_TYPE_BY_ITEM)
+      .filter(([, type]) => type === 'staff')
+      .map(([id]) => id);
+
+    expect(staffIds).toContain('lunar_tide_greatstaff');
+    for (const itemId of staffIds) {
+      const item = ITEMS[itemId];
+      expect(item, `${itemId}: staff definition`).toBeDefined();
+      if (item.requiredClass?.length === 1 && item.requiredClass[0] === 'druid') continue;
+      for (const cls of CASTER_WEAPON_CLASSES) {
+        expect(canEquipItem(cls, item), `${itemId}: ${cls} staff proficiency`).toBe(true);
+      }
+    }
   });
 });
 

@@ -89,6 +89,17 @@ export type DailyRewardPayoutModerationResult =
   | { outcome: 'not_found' }
   | { outcome: 'invalid_status'; status: string };
 
+/**
+ * markPayout's answer, split so the caller can tell a real write from an
+ * idempotent replay: 'updated' stamped the row, 'already' matched an
+ * already-paid row with the same signature and wrote NOTHING (the payout
+ * runner re-posting a paid mark after a dropped response), 'missing' matched
+ * nothing at all. The split exists because the winners-cache bust must ride
+ * real writes only; busting on every replay would evict a healthy snapshot
+ * exactly when the runner is retrying (Phase 5 QA, fresh-eyes round).
+ */
+export type DailyRewardPayoutMarkOutcome = 'updated' | 'already' | 'missing';
+
 export type DailyRewardPayoutClaimResult =
   | { outcome: 'claimed' | 'existing'; payout: DailyRewardInternalPayoutRow }
   | { outcome: 'not_found' }
@@ -106,12 +117,32 @@ export type DailyRewardPayoutAttemptClaimResult =
   | { outcome: 'not_found' }
   | { outcome: 'invalid_status'; status: string };
 
+export type DailyRewardFinalizeOutcome = 'finalized' | 'already_finalized';
+
+/**
+ * One winner row as the Discord announcement ships it: the fields the bot's
+ * message builder renders (rank, name, points, prize math) plus the payout
+ * status. Deliberately NARROWER than DailyRewardInternalPayoutRow: the wide
+ * row carried tx_signature, wallet pubkeys, and the voided_by_* operator
+ * identity to a caller that never used them, and the byte-parity pin against
+ * the standalone winners GET that blocked narrowing retired with that route
+ * (#2791). The ops/admin reads keep the full row.
+ */
+export interface DailyRewardWinnerPayoutRow {
+  rank: number;
+  username: string;
+  points: number;
+  prizePercent: number;
+  prizeUsd: number;
+  status: string;
+}
+
 export interface DailyRewardWinnerAnnouncement {
   day: string;
   realm: string;
   prizePoolUsd: number;
   finalizedAt: string | null;
-  payouts: DailyRewardInternalPayoutRow[];
+  payouts: DailyRewardWinnerPayoutRow[];
 }
 
 export interface DailyRewardDb {
@@ -146,7 +177,11 @@ export interface DailyRewardDb {
     meta?: Record<string, unknown>,
   ): Promise<boolean>;
   recentPayouts(limit: number): Promise<DailyRewardPayoutRow[]>;
-  finalizeDay(day: string, prizePoolUsd: number, splits: readonly number[]): Promise<void>;
+  finalizeDay(
+    day: string,
+    prizePoolUsd: number,
+    splits: readonly number[],
+  ): Promise<DailyRewardFinalizeOutcome>;
   dayFinalized(day: string, realm: string): Promise<boolean>;
   pendingPayouts(limit: number, day?: string): Promise<DailyRewardInternalPayoutRow[]>;
   unannouncedWinnerDays(limit: number): Promise<DailyRewardWinnerAnnouncement[]>;
@@ -157,7 +192,7 @@ export interface DailyRewardDb {
     status: string,
     txSignature: string | null,
     error: string | null,
-  ): Promise<boolean>;
+  ): Promise<DailyRewardPayoutMarkOutcome>;
   claimPayout(
     day: string,
     rank: number,
@@ -243,6 +278,17 @@ function internalPayoutRow(row: Record<string, unknown>): DailyRewardInternalPay
   };
 }
 
+function winnerPayoutRow(row: Record<string, unknown>): DailyRewardWinnerPayoutRow {
+  return {
+    rank: Number(row.rank),
+    username: String(row.username),
+    points: Number(row.points),
+    prizePercent: Number(row.prize_percent),
+    prizeUsd: Number(row.prize_usd),
+    status: String(row.status),
+  };
+}
+
 function dateString(value: unknown): string | null {
   if (value instanceof Date) return value.toISOString();
   return optionalString(value);
@@ -256,6 +302,19 @@ function scoreRow(row: Record<string, unknown>): DailyRewardScoreRow {
     rank: Number(row.rank),
   };
 }
+
+// The winner-announcement payouts query, exported so a test can pin the RAW
+// text the call site executes: announcement-narrow on purpose
+// (DailyRewardWinnerPayoutRow), with no tx_signature, wallet pubkey (nor the
+// wallet_links join), or voided_by_* operator identity, because announcing
+// renders none of them (#2791). Widening this SELECT again is a data-exposure
+// decision, not a refactor; the pin makes it a deliberate one.
+export const DAILY_REWARD_WINNER_PAYOUTS_SQL = `SELECT p.rank, p.username, p.points, p.prize_percent, p.prize_usd, p.status
+           FROM daily_reward_payouts p
+          WHERE p.day = $1 AND p.realm = $2
+            AND NOT EXISTS (SELECT 1 FROM daily_reward_excluded_accounts b WHERE b.account_id = p.account_id)
+          ORDER BY p.rank ASC
+          LIMIT 10`;
 
 // banForAccount's query text, exported so an integration suite can execute the
 // real text against a scoped schema.
@@ -286,6 +345,16 @@ export const DAILY_REWARD_BAN_FOR_ACCOUNT_SQL = `SELECT reason, expires_at
          ) restrictions
         ORDER BY priority
         LIMIT 1`;
+
+export const DAILY_REWARD_OPEN_DAY_LOCK_SQL = `SELECT finalized_at
+   FROM daily_reward_days
+  WHERE day = $1 AND realm = $2
+  FOR SHARE`;
+
+export const DAILY_REWARD_FINALIZE_DAY_SQL = `UPDATE daily_reward_days
+    SET finalized_at = now()
+  WHERE day = $1 AND realm = $2 AND finalized_at IS NULL
+  RETURNING 1`;
 
 export class PgDailyRewardDb implements DailyRewardDb {
   async banForAccount(
@@ -577,14 +646,52 @@ export class PgDailyRewardDb implements DailyRewardDb {
     outcomeKey: string,
     points: number,
   ): Promise<boolean> {
-    const res = await pool.query(
-      `INSERT INTO daily_reward_spins (day, realm, account_id, outcome_key, points)
-       SELECT $1, $2, $3, $4, $5
-       WHERE NOT EXISTS (SELECT 1 FROM daily_reward_excluded_accounts WHERE account_id = $3)
-       ON CONFLICT (day, realm, account_id) DO NOTHING`,
-      [day, REALM, accountId, outcomeKey, points],
-    );
-    return (res.rowCount ?? 0) > 0;
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      const openDay = await client.query(DAILY_REWARD_OPEN_DAY_LOCK_SQL, [day, REALM]);
+      if (!openDay.rows[0] || openDay.rows[0].finalized_at !== null) {
+        await client.query('ROLLBACK');
+        return false;
+      }
+      const spin = await client.query(
+        `INSERT INTO daily_reward_spins (day, realm, account_id, outcome_key, points)
+         SELECT $1, $2, $3, $4, $5
+         WHERE NOT EXISTS (SELECT 1 FROM daily_reward_excluded_accounts WHERE account_id = $3)
+         ON CONFLICT (day, realm, account_id) DO NOTHING`,
+        [day, REALM, accountId, outcomeKey, points],
+      );
+      if ((spin.rowCount ?? 0) === 0) {
+        await client.query('ROLLBACK');
+        return false;
+      }
+      const event = await client.query(
+        `INSERT INTO daily_reward_events
+          (day, realm, account_id, kind, points, idempotency_key, meta)
+         SELECT $1, $2, $3, 'spin', $4, 'spin', $5::jsonb
+         WHERE NOT EXISTS (SELECT 1 FROM daily_reward_excluded_accounts WHERE account_id = $3)`,
+        [day, REALM, accountId, points, JSON.stringify({ outcome: outcomeKey })],
+      );
+      if ((event.rowCount ?? 0) === 0) {
+        await client.query('ROLLBACK');
+        return false;
+      }
+      await client.query(
+        `INSERT INTO daily_reward_scores (day, realm, account_id, points)
+         VALUES ($1, $2, $3, $4)
+         ON CONFLICT (day, realm, account_id) DO UPDATE
+            SET points = daily_reward_scores.points + EXCLUDED.points,
+                updated_at = now()`,
+        [day, REALM, accountId, Math.max(0, Math.floor(points))],
+      );
+      await client.query('COMMIT');
+      return true;
+    } catch (err) {
+      await client.query('ROLLBACK').catch(() => undefined);
+      throw err;
+    } finally {
+      client.release();
+    }
   }
 
   async addPoints(
@@ -598,6 +705,14 @@ export class PgDailyRewardDb implements DailyRewardDb {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
+      // Share-lock the day row before every ledger/score write. finalizeDay's
+      // conditional UPDATE takes the conflicting row lock, establishing one
+      // database-authoritative cutoff across all game processes.
+      const openDay = await client.query(DAILY_REWARD_OPEN_DAY_LOCK_SQL, [day, REALM]);
+      if (!openDay.rows[0] || openDay.rows[0].finalized_at !== null) {
+        await client.query('ROLLBACK');
+        return false;
+      }
       const event = await client.query(
         `INSERT INTO daily_reward_events
           (day, realm, account_id, kind, points, idempotency_key, meta)
@@ -658,16 +773,19 @@ export class PgDailyRewardDb implements DailyRewardDb {
     return res.rows.map(payoutRow);
   }
 
-  async finalizeDay(day: string, prizePoolUsd: number, splits: readonly number[]): Promise<void> {
+  async finalizeDay(
+    day: string,
+    prizePoolUsd: number,
+    splits: readonly number[],
+  ): Promise<DailyRewardFinalizeOutcome> {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
-      await client.query(
-        `UPDATE daily_reward_days
-            SET finalized_at = COALESCE(finalized_at, now())
-          WHERE day = $1 AND realm = $2`,
-        [day, REALM],
-      );
+      const finalized = await client.query(DAILY_REWARD_FINALIZE_DAY_SQL, [day, REALM]);
+      if ((finalized.rowCount ?? 0) === 0) {
+        await client.query('COMMIT');
+        return 'already_finalized';
+      }
       const winners = await client.query(
         `SELECT s.account_id, a.username, wl.pubkey AS wallet_pubkey, s.points,
                 row_number() OVER (ORDER BY s.points DESC, s.updated_at ASC, s.account_id ASC) AS rank
@@ -703,6 +821,7 @@ export class PgDailyRewardDb implements DailyRewardDb {
         );
       }
       await client.query('COMMIT');
+      return 'finalized';
     } catch (err) {
       await client.query('ROLLBACK').catch(() => undefined);
       throw err;
@@ -754,25 +873,16 @@ export class PgDailyRewardDb implements DailyRewardDb {
     );
     const out: DailyRewardWinnerAnnouncement[] = [];
     for (const day of days.rows) {
-      const payouts = await pool.query(
-        `SELECT p.day, p.realm, p.rank, p.account_id, p.username,
-                COALESCE(p.wallet_pubkey, wl.pubkey) AS wallet_pubkey, p.points,
-                p.prize_percent, p.prize_usd, p.status, p.tx_signature, p.paid_at,
-                p.void_reason, p.voided_by_id, p.voided_by_username, p.voided_at
-           FROM daily_reward_payouts p
-           LEFT JOIN wallet_links wl ON wl.account_id = p.account_id
-          WHERE p.day = $1 AND p.realm = $2
-            AND NOT EXISTS (SELECT 1 FROM daily_reward_excluded_accounts b WHERE b.account_id = p.account_id)
-          ORDER BY p.rank ASC
-          LIMIT 10`,
-        [String(day.day), String(day.realm)],
-      );
+      const payouts = await pool.query(DAILY_REWARD_WINNER_PAYOUTS_SQL, [
+        String(day.day),
+        String(day.realm),
+      ]);
       out.push({
         day: String(day.day),
         realm: String(day.realm),
         prizePoolUsd: Number(day.prize_pool_usd),
         finalizedAt: dateString(day.finalized_at),
-        payouts: payouts.rows.map(internalPayoutRow),
+        payouts: payouts.rows.map(winnerPayoutRow),
       });
     }
     return out;
@@ -794,7 +904,7 @@ export class PgDailyRewardDb implements DailyRewardDb {
     status: string,
     txSignature: string | null,
     error: string | null,
-  ): Promise<boolean> {
+  ): Promise<DailyRewardPayoutMarkOutcome> {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
@@ -811,8 +921,8 @@ export class PgDailyRewardDb implements DailyRewardDb {
             )`,
         [day, REALM, rank, status, txSignature, error],
       );
-      let updated = (res.rowCount ?? 0) === 1;
-      if (!updated && status === 'paid' && txSignature) {
+      let outcome: DailyRewardPayoutMarkOutcome = (res.rowCount ?? 0) === 1 ? 'updated' : 'missing';
+      if (outcome === 'missing' && status === 'paid' && txSignature) {
         const existing = await client.query(
           `SELECT 1
              FROM daily_reward_payouts
@@ -820,7 +930,7 @@ export class PgDailyRewardDb implements DailyRewardDb {
               AND status = 'paid' AND tx_signature = $4`,
           [day, REALM, rank, txSignature],
         );
-        updated = (existing.rowCount ?? 0) === 1;
+        if ((existing.rowCount ?? 0) === 1) outcome = 'already';
       }
       if ((res.rowCount ?? 0) === 1 && txSignature) {
         await client.query(
@@ -832,7 +942,7 @@ export class PgDailyRewardDb implements DailyRewardDb {
         );
       }
       await client.query('COMMIT');
-      return updated;
+      return outcome;
     } catch (err) {
       await client.query('ROLLBACK').catch(() => undefined);
       throw err;

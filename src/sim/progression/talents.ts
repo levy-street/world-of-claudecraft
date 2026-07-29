@@ -129,7 +129,17 @@ function normalizeAbilityCharges(
   if (!player.abilityCharges) return;
   for (const [abilityId, state] of Object.entries(player.abilityCharges)) {
     const ability = meta.known.find((known) => known.def.id === abilityId);
-    if (!ability || ability.cooldown <= 0) {
+    if (!ability) {
+      // Temporarily unlearned talent abilities can come back through another
+      // spec or loadout switch. Keep their recharge state aging instead of
+      // turning a switch away and back into a free reset.
+      const def = ABILITIES[abilityId];
+      if (def?.cooldown && def.cooldown > 0) continue;
+      delete player.abilityCharges[abilityId];
+      player.cooldowns.delete(abilityId);
+      continue;
+    }
+    if (ability.cooldown <= 0) {
       delete player.abilityCharges[abilityId];
       player.cooldowns.delete(abilityId);
       continue;
@@ -213,6 +223,7 @@ function stripOrphanedFormAuras(ctx: SimContext, meta: PlayerMeta, e: Entity | u
 function talentLockReason(ctx: SimContext, p: Entity): string | null {
   if (p.inCombat) return 'You cannot change talents in combat.';
   if (ctx.arenaMatches.has(p.id)) return 'You cannot change talents during an arena match.';
+  if (ctx.bgMatches.has(p.id)) return 'You cannot change talents during a battleground.';
   return null;
 }
 
@@ -394,8 +405,12 @@ export function saveTalentLoadout(
   const r = ctx.resolve(pid);
   if (!r) return -1;
   const revisionBeforeMutation = r.meta.wireRev;
+  const clean = name.toString().trim().slice(0, 24);
+  if (!clean) {
+    ctx.error(r.e.id, 'Loadout name cannot be empty.');
+    return -1;
+  }
   if (alloc && !commitTalentAllocation(ctx, r.meta, r.e, alloc, null)) return -1;
-  const clean = (name || 'Build').toString().slice(0, 24);
   const safeBar = Array.isArray(bar)
     ? bar.slice(0, SAVED_LOADOUT_BAR_SLOTS).map((b) => (typeof b === 'string' ? b : null))
     : [];

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { CharacterState } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 
-// JSONB character-state back-compat round-trip (Phase 20).
+// JSONB character-state back-compat round-trip.
 //
 // WHAT THIS PINS: character state is persisted as a JSONB blob and reloaded
 // through Sim.addPlayer, which applies defensive `??` defaults for fields that

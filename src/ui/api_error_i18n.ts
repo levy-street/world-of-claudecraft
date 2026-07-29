@@ -116,8 +116,23 @@ export const API_ERROR_KEYS = {
   'steam.already_linked': 'apiError.steam.already_linked',
   'steam.account_taken': 'apiError.steam.account_taken',
   'steam.upstream': 'apiError.steam.upstream',
+  // epic: the env-gated Epic link family (server/epic/).
+  'epic.disabled': 'apiError.epic.disabled',
+  'epic.invalid_token': 'apiError.epic.invalid_token',
+  'epic.banned': 'apiError.epic.banned',
+  'epic.already_linked': 'apiError.epic.already_linked',
+  'epic.account_taken': 'apiError.epic.account_taken',
+  'epic.upstream': 'apiError.epic.upstream',
   'wallet.handoff_invalid': 'apiError.wallet.handoff_invalid',
-  'welcome.invalid_input': 'apiError.welcome.invalid_input',
+  'ota_updates.invalid_input': 'apiError.ota_updates.invalid_input',
+  'seeker.native_only': 'apiError.seeker.native_only',
+  'seeker.attestation_failed': 'apiError.seeker.attestation_failed',
+  'seeker.solana_artifact_required': 'apiError.seeker.solana_artifact_required',
+  'seeker.wallet_required': 'apiError.seeker.wallet_required',
+  'seeker.genesis_token_required': 'apiError.seeker.genesis_token_required',
+  'seeker.genesis_token_claimed': 'apiError.seeker.genesis_token_claimed',
+  'seeker.entitlement_required': 'apiError.seeker.entitlement_required',
+  'seeker.current_ownership_required': 'apiError.seeker.current_ownership_required',
 } satisfies Record<string, TranslationKey>;
 
 /** The message of an Error, or the string form of any other thrown value. */
@@ -317,6 +332,12 @@ export function userFacingApiError(err: unknown): string {
   // WebSocket disconnect reasons surfaced through the fatal overlay (net/online.ts).
   if (normalized === 'connection to the server was lost.') return t('loading.connectionLost');
   if (normalized === 'rejected by server') return t('loading.connectionRejected');
+  // The inbound flood kick. 'message rate exceeded' is a byte-exact wire contract
+  // with server/msg_rate_limit.ts (MSG_RATE_KICK_REASON), passed by both limiter
+  // kick arms in server/game.ts and deliberately session-fatal: reconnect_policy
+  // has no transient arm for it, since an immediately reconnecting flooder
+  // re-floods (lockstep pinned by tests/localization_fixes.test.ts).
+  if (normalized === 'message rate exceeded') return t('loading.messageRateExceeded');
   // The realm admission cap refused a fresh join. 'realm is full' is a byte-exact
   // wire contract with server/ws_auth.ts (WS_AUTH_ERROR).
   if (normalized === 'realm is full') return t('loading.realmFull');
@@ -324,6 +345,11 @@ export function userFacingApiError(err: unknown): string {
   // network' is a byte-exact wire contract with server/ws_auth.ts (WS_AUTH_ERROR).
   if (normalized === 'too many connections from your network')
     return t('loading.tooManyConnections');
+  // A rolling deploy paired client and server binaries whose authoritative
+  // world layouts disagree. The wire literal remains actionable to legacy
+  // clients that lack this matcher; current clients render the localized form.
+  if (normalized === 'game and server versions are incompatible. reload or update, then try again.')
+    return t('loading.incompatibleWorldVersion');
   // NOTE: protocol/transport diagnostics ('bad auth message', 'authentication timed out',
   // etc.) are intentionally NOT translated, they are developer/diagnostic errors and must
   // stay English so browser logs and support reports match the server source.

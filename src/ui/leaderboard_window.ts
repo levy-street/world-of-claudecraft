@@ -110,8 +110,14 @@ export class LeaderboardWindow {
     else this.playerPage = value;
   }
 
+  // Open is an inline display:flex, not display:block: the window is a flex COLUMN
+  // (see #leaderboard-window in src/styles/components.css) so that .lb-body, marked
+  // .window-fill, can absorb the leftover height once the user drags the window to a
+  // size. A stylesheet display can never override the inline one, so the open value
+  // itself has to carry it, the way #mailbox-window does. Closed is still 'none', and
+  // every render guard below compares against this same value.
   get isOpen(): boolean {
-    return this.deps.root().style.display === 'block';
+    return this.deps.root().style.display === 'flex';
   }
 
   /** Open if closed, close if open (the minimap / menu leaderboard button). */
@@ -130,14 +136,14 @@ export class LeaderboardWindow {
     this.deedsPage = 0;
     this.devPage = 0;
     this.dailyPage = 0;
-    this.deps.root().style.display = 'block';
+    this.deps.root().style.display = 'flex';
     this.deps.onVisibilityChange?.();
     void this.render('open');
   }
 
   close(): void {
     const el = this.deps.root();
-    if (el.style.display !== 'block') {
+    if (el.style.display !== 'flex') {
       this.openerFocus = null;
       return;
     }
@@ -197,7 +203,7 @@ export class LeaderboardWindow {
     }
     // A newer render may own the body now, or the panel may have been closed,
     // while the fetch was in flight.
-    if (seq !== this.renderSeq || el.style.display !== 'block') return;
+    if (seq !== this.renderSeq || el.style.display !== 'flex') return;
     const body = el.querySelector('.lb-body');
     if (!body) return;
 
@@ -212,6 +218,9 @@ export class LeaderboardWindow {
               level: world.player.level,
               lifetimeXp: world.lifetimeXp,
               title: world.activeTitle,
+              // The viewer's own guild, off the same passive entity field the
+              // nameplate reads, so the sticky standing row carries the tag too.
+              guild: world.player.guild,
             },
           },
     );
@@ -254,7 +263,7 @@ export class LeaderboardWindow {
     } catch {
       result = null;
     }
-    if (seq !== this.renderSeq || el.style.display !== 'block') return;
+    if (seq !== this.renderSeq || el.style.display !== 'flex') return;
     const body = el.querySelector('.lb-body');
     if (!body) return;
 
@@ -301,7 +310,7 @@ export class LeaderboardWindow {
     } catch {
       result = null;
     }
-    if (seq !== this.renderSeq || el.style.display !== 'block') return;
+    if (seq !== this.renderSeq || el.style.display !== 'flex') return;
     const body = el.querySelector('.lb-body');
     if (!body) return;
 
@@ -351,7 +360,7 @@ export class LeaderboardWindow {
     } catch {
       result = null;
     }
-    if (seq !== this.renderSeq || el.style.display !== 'block') return;
+    if (seq !== this.renderSeq || el.style.display !== 'flex') return;
     const body = el.querySelector('.lb-body');
     if (!body) return;
 
@@ -392,7 +401,7 @@ export class LeaderboardWindow {
     } catch {
       result = null;
     }
-    if (seq !== this.renderSeq || el.style.display !== 'block') return;
+    if (seq !== this.renderSeq || el.style.display !== 'flex') return;
     const body = el.querySelector('.lb-body');
     if (!body) return;
     if (result === null) {
@@ -438,8 +447,13 @@ export class LeaderboardWindow {
 
   // The in-flight state carries aria-busy + role=status (the lazy-load a11y
   // contract) so a screen reader announces the pending board.
+  //
+  // window-fill marks this as the child that absorbs the leftover height once the
+  // user drags the window to a size (the resized-window fill contract in
+  // src/styles/components.css). It is emitted here, not stamped once at open,
+  // because every render() rebuilds the window's innerHTML from scratch.
   private loadingBodyHtml(): string {
-    return `<div class="lb-body" id="lb-body-panel" role="tabpanel"><div class="lb-loading" role="status" aria-busy="true">${esc(t('game.leaderboard.loading'))}</div></div>`;
+    return `<div class="lb-body window-fill" id="lb-body-panel" role="tabpanel"><div class="lb-loading" role="status" aria-busy="true">${esc(t('game.leaderboard.loading'))}</div></div>`;
   }
 
   // The Players / Guilds / Daily tab bar. A WAI-ARIA role=tablist with roving
@@ -524,10 +538,10 @@ export class LeaderboardWindow {
 
   private guildRowHtml(r: GuildLeaderboardRow): string {
     return (
-      `<div class="lb-row lb-row-guild"><span class="lb-rank">${r.rank}</span>` +
+      `<div class="lb-row lb-row-guild"><span class="lb-rank">${formatNumber(r.rank, { maximumFractionDigits: 0 })}</span>` +
       `<span class="lb-name">${esc(r.name)}</span>` +
       `<span class="lb-members">${formatNumber(r.memberCount, { maximumFractionDigits: 0 })}</span>` +
-      `<span class="lb-vlvl">${r.topLevel}</span>` +
+      `<span class="lb-vlvl">${formatNumber(r.topLevel, { maximumFractionDigits: 0 })}</span>` +
       `<span class="lb-xp">${formatXp(r.totalLifetimeXp)}</span></div>`
     );
   }
@@ -554,7 +568,7 @@ export class LeaderboardWindow {
     const tierName = def ? devTierDisplayName(def) : '';
     const you = r.me ? ` <span class="lb-you">(${esc(t('game.leaderboard.you'))})</span>` : '';
     return (
-      `<div class="lb-row lb-row-dev${r.me ? ' lb-mine' : ''}"><span class="lb-rank">${r.rank}</span>` +
+      `<div class="lb-row lb-row-dev${r.me ? ' lb-mine' : ''}"><span class="lb-rank">${formatNumber(r.rank, { maximumFractionDigits: 0 })}</span>` +
       `<span class="lb-name">${badge}@${esc(r.login)}${you}</span>` +
       `<span class="lb-dev-tier">${esc(tierName)}</span>` +
       `<span class="lb-commits">${formatNumber(r.mergedPrs, { maximumFractionDigits: 0 })}</span></div>`
@@ -593,7 +607,7 @@ export class LeaderboardWindow {
     const you = r.me ? ` <span class="lb-you">(${esc(t('game.leaderboard.you'))})</span>` : '';
     const titleText = r.title ? deedTitleText(r.title) : '';
     return (
-      `<div class="lb-row lb-row-deeds${r.me ? ' lb-mine' : ''}"><span class="lb-rank">${r.rank}</span>` +
+      `<div class="lb-row lb-row-deeds${r.me ? ' lb-mine' : ''}"><span class="lb-rank">${formatNumber(r.rank, { maximumFractionDigits: 0 })}</span>` +
       `<span class="lb-name"${clsTitle}>${esc(r.name)}${you} <span class="lb-realm">${esc(r.realm)}</span></span>` +
       `<span class="lb-renown">${formatNumber(r.renown, { maximumFractionDigits: 0 })}</span>` +
       `<span class="lb-deed-title">${esc(titleText)}</span></div>`
@@ -637,17 +651,28 @@ export class LeaderboardWindow {
   private dailyRowHtml(r: DailyRewardStatus['leaderboard'][number]): string {
     const you = r.me ? ` <span class="lb-you">(${esc(t('game.leaderboard.you'))})</span>` : '';
     return (
-      `<div class="lb-row lb-daily${r.me ? ' lb-mine' : ''}"><span class="lb-rank">${r.rank}</span>` +
+      `<div class="lb-row lb-daily${r.me ? ' lb-mine' : ''}"><span class="lb-rank">${formatNumber(r.rank, { maximumFractionDigits: 0 })}</span>` +
       `<span class="lb-name">${esc(r.name)}${you}</span>` +
       `<span class="lb-xp">${formatNumber(r.points, { maximumFractionDigits: 0 })}</span></div>`
     );
+  }
+
+  // The `<Guild>` tag that rides INSIDE the name cell, the treatment the Renown
+  // tab already uses for its realm tag, so the guild reads beside the name without
+  // adding a column to the shared row grid (and the mobile stack keeps working).
+  // Angle brackets are HTML entities: the classic nameplate convention
+  // (nameplate_painter.ts), not markup. Empty for an unguilded row, so the cell is
+  // byte-unchanged for a player with no guild.
+  private guildTagHtml(guild: string | null): string {
+    if (!guild) return '';
+    return ` <span class="lb-guild" title="${esc(t('hudChrome.leaderboard.guildName'))}">&lt;${esc(guild)}&gt;</span>`;
   }
 
   private rowHtml(r: LeaderboardRow): string {
     // &starf; renders the prestige star without a literal symbol glyph in source.
     const star =
       r.prestigeRank > 0
-        ? `<span class="lb-prestige" title="${esc(`${t('game.prestige.rank')} ${r.prestigeRank}`)}">&starf;${r.prestigeRank}</span> `
+        ? `<span class="lb-prestige" title="${esc(`${t('game.prestige.rank')} ${formatNumber(r.prestigeRank, { maximumFractionDigits: 0 })}`)}">&starf;${formatNumber(r.prestigeRank, { maximumFractionDigits: 0 })}</span> `
         : '';
     const title = r.knownClass ? ` title="${esc(classDisplayName(r.cls))}"` : '';
     const you = r.me ? ` <span class="lb-you">(${esc(t('game.leaderboard.you'))})</span>` : '';
@@ -655,9 +680,9 @@ export class LeaderboardWindow {
     // localized here; '' (untitled/stale) renders an empty cell.
     const deedTitle = r.title ? deedTitleText(r.title) : '';
     return (
-      `<div class="lb-row lb-row-players${r.me ? ' lb-mine' : ''}"><span class="lb-rank">${r.rank}</span>` +
-      `<span class="lb-name"${title}>${star}${esc(r.name)}${you}</span>` +
-      `<span class="lb-lvl">${r.level}</span><span class="lb-vlvl">${r.virtualLevel}</span>` +
+      `<div class="lb-row lb-row-players${r.me ? ' lb-mine' : ''}"><span class="lb-rank">${formatNumber(r.rank, { maximumFractionDigits: 0 })}</span>` +
+      `<span class="lb-name"${title}>${star}${esc(r.name)}${this.guildTagHtml(r.guild)}${you}</span>` +
+      `<span class="lb-lvl">${formatNumber(r.level, { maximumFractionDigits: 0 })}</span><span class="lb-vlvl">${formatNumber(r.virtualLevel, { maximumFractionDigits: 0 })}</span>` +
       `<span class="lb-xp">${formatXp(r.lifetimeXp)}</span>` +
       `<span class="lb-deed-title">${esc(deedTitle)}</span></div>`
     );
@@ -673,8 +698,8 @@ export class LeaderboardWindow {
     const deedTitle = standing.title ? deedTitleText(standing.title) : '';
     return (
       `<div class="lb-sticky"><div class="lb-row lb-row-players lb-mine"><span class="lb-rank">&mdash;</span>` +
-      `<span class="lb-name">${esc(standing.name)} <span class="lb-you">(${esc(t('game.leaderboard.you'))})</span></span>` +
-      `<span class="lb-lvl">${standing.level}</span><span class="lb-vlvl">${standing.virtualLevel}</span>` +
+      `<span class="lb-name">${esc(standing.name)}${this.guildTagHtml(standing.guild)} <span class="lb-you">(${esc(t('game.leaderboard.you'))})</span></span>` +
+      `<span class="lb-lvl">${formatNumber(standing.level, { maximumFractionDigits: 0 })}</span><span class="lb-vlvl">${formatNumber(standing.virtualLevel, { maximumFractionDigits: 0 })}</span>` +
       `<span class="lb-xp">${formatXp(standing.lifetimeXp)}</span>` +
       `<span class="lb-deed-title">${esc(deedTitle)}</span></div></div>`
     );

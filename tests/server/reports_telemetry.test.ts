@@ -14,7 +14,7 @@
 // server/db.ts builds a pg Pool at module load and throws if DATABASE_URL is unset;
 // reports.ts (via perf_report.ts) imports it, so set a dummy URL. The pool never
 // connects: insertClientPerfReport / recordSitePresence are vi.fn fakes, and the
-// happy-path requests carry no bearer so perf-report's accountForToken / getCharacter
+// happy-path requests carry no bearer so perf-report's scoped lookup / getCharacter
 // reads are never reached.
 process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_phase15_telemetry';
 
@@ -30,7 +30,7 @@ import { routes } from '../../server/reports';
 import { type FakeRes, fakeCtx } from './helpers';
 
 // perf-report self-reads its body and, for an authed caller only, reads
-// accountForToken / getCharacter; our happy-path requests carry no bearer, so only
+// accountAndScopeForToken / getCharacter; our happy-path requests carry no bearer, so only
 // insertClientPerfReport is reached. Replace it with a fake; the ...actual spread
 // keeps every other db export real.
 vi.mock('../../server/db', async (importActual) => {
@@ -204,6 +204,29 @@ describe('POST /api/perf-report (public perf beacon)', () => {
 
   it('is public (no auth middleware)', () => {
     expect(routeFor('POST', '/api/perf-report').middleware).toBeUndefined();
+  });
+
+  it('sanitizes suggestion ids on the RouteDef arm before they reach storage', async () => {
+    // Phase 05 (ruling R14): the allowlist/dedupe/cap sanitizer must hold on
+    // the ROUTE path, not just in the handler unit suite, so a hostile beacon
+    // through the registered route stores only known, deduped ids.
+    const r = await runRoute('POST', '/api/perf-report', {
+      body: {
+        sessionId: 's-suggestions',
+        suggestionIds: [
+          'integrated-gpu',
+          'bogus; DROP TABLE accounts',
+          'integrated-gpu',
+          42,
+          'hardware-acceleration',
+        ],
+      },
+    });
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({ ok: true });
+    expect(vi.mocked(insertClientPerfReport)).toHaveBeenCalledWith(
+      expect.objectContaining({ suggestionIds: ['integrated-gpu', 'hardware-acceleration'] }),
+    );
   });
 
   it('swallows a repeat beacon with a 200 (throttle never 429s), inserting once', async () => {

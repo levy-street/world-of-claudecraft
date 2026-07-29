@@ -37,6 +37,8 @@ import {
   consumeDiscordPendingLogin,
   createDiscordOAuthState,
   createDiscordPendingLogin,
+  type DiscordLinkRow,
+  discordFlexRowsForDiscordIds,
   discordForAccount,
   grantRewardPoints,
   linkDiscordToAccount,
@@ -47,6 +49,7 @@ import {
   setDiscordLinkEmail,
   unlinkDiscord,
 } from './discord_db';
+import { enqueueLinkChange } from './discord_link_changes';
 import {
   buildAuthorizeUrl,
   buildGuildJoinRequest,
@@ -68,6 +71,12 @@ import {
   parseTokenResponse,
   pkceChallengeFromVerifier,
 } from './discord_oauth';
+import {
+  configureDiscordStatusCache,
+  type DiscordStatusCore,
+  type DiscordStatusLink,
+  readDiscordStatusCore,
+} from './discord_status_cache';
 import { deleteUnusedFederatedProvision } from './federated_auth_db';
 import { ctxAccountId } from './http/context';
 import type { ErrorCode } from './http/error_codes';
@@ -94,7 +103,7 @@ import {
   recordAuthFailure,
   requestIp,
 } from './ratelimit';
-import { publicOriginFromRequest, REALM_PUBLIC_ORIGIN } from './realm';
+import { publicOriginFromRequest, REALM, REALM_PUBLIC_ORIGIN } from './realm';
 
 const STATE_TTL_MINUTES = 10;
 // A first-time login's "create new or link existing?" choice is parked this long
@@ -104,6 +113,12 @@ const PENDING_LOGIN_TTL_MINUTES = 15;
 const DEFAULT_INVITE = 'https://discord.com/invite/worldofclaudecraft';
 const NATIVE_DISCORD_REDIRECT = 'worldofclaudecraft://discord-auth';
 const NATIVE_REDIRECT_STATE_PREFIX = `${NATIVE_DISCORD_REDIRECT}?challenge=`;
+// Marks a login start that ran in the desktop app's SYSTEM BROWSER (Electron/Steam,
+// via shell.openExternal), not the native mobile app: the callback must bounce back
+// to /desktop-login (which mints the worldofclaudecraft:// deep-link code the shell
+// is waiting for) instead of the plain web '/'. Distinct from the `native` PKCE
+// handoff above, which is mobile-only and never runs a browser redirect at all.
+const DESKTOP_REDIRECT_MARKER = 'desktop-login';
 
 // Lightweight local instrumentation hook. Admin-dashboard usage metrics require a
 // registered typed key + per-locale label, which is more coupling than this
@@ -210,6 +225,7 @@ export async function handleDiscordStart(
     native?: boolean;
     nativeChallenge?: string;
     nativeAttestation?: unknown;
+    desktop?: boolean;
   },
 ): Promise<void> {
   note('discord.start.request');
@@ -237,7 +253,11 @@ export async function handleDiscordStart(
     codeVerifier,
     mode: opts.mode,
     accountId: opts.accountId,
-    redirectTo: opts.native ? `${NATIVE_REDIRECT_STATE_PREFIX}${opts.nativeChallenge}` : null,
+    redirectTo: opts.native
+      ? `${NATIVE_REDIRECT_STATE_PREFIX}${opts.nativeChallenge}`
+      : opts.desktop
+        ? DESKTOP_REDIRECT_MARKER
+        : null,
     ttlMinutes: STATE_TTL_MINUTES,
   });
   const url = buildAuthorizeUrl({
@@ -291,8 +311,9 @@ export async function handleDiscordCallback(
   const mode: DiscordLinkMode = isDiscordLinkMode(stateRow.mode) ? stateRow.mode : 'login';
   const nativeChallenge = nativeChallengeFromState(stateRow.redirect_to);
   const native = nativeChallenge !== null;
+  const desktopReturn = !native && stateRow.redirect_to === DESKTOP_REDIRECT_MARKER;
   const respond = (status: number, payload: BouncePayload): void =>
-    discordOAuthResponse(req, res, status, payload, native);
+    discordOAuthResponse(req, res, status, payload, native, desktopReturn);
 
   if (isIpBlocked(requestIp(req))) {
     return respond(403, { ok: false, mode, error: 'server_error' });
@@ -349,6 +370,10 @@ async function completeLink(
   mode: DiscordLinkMode,
 ): Promise<void> {
   if (accountId === null) return respond(400, { ok: false, mode, error: 'no_session' });
+  // Read the existing link before the upsert: linkDiscordToAccount returns only a
+  // boolean, so this is the one chance to learn that this account is REPOINTING off
+  // an older Discord id. One extra query on a rare, user-initiated OAuth path.
+  const previousLink = await discordForAccount(pool, accountId);
   const linked = await linkDiscordToAccount(pool, accountId, {
     discordUserId: user.id,
     username: discordDisplayName(user),
@@ -360,6 +385,18 @@ async function completeLink(
     note('discord.link.conflict');
     return respond(409, { ok: false, mode, error: 'already_linked' });
   }
+  // A repoint strands the old Discord user, so it is an unlink of that id plus a
+  // link of the new one. The feed dedupes per account, so these two normally merge
+  // into a single item carrying kinds ['unlink','link'] and the OLD id (first id
+  // observed wins); that is the designed shape, and the drain resolves the
+  // authoritative link anyway.
+  if (previousLink && previousLink.discord_user_id !== user.id) {
+    enqueueLinkChange(
+      { accountId, discordId: previousLink.discord_user_id, kinds: ['unlink'] },
+      Date.now(),
+    );
+  }
+  enqueueLinkChange({ accountId, discordId: user.id, kinds: ['link'] }, Date.now());
   await captureDiscordEmail(accountId, user.email, user.emailVerified);
   await grantLinkRewards(accountId, guildMember);
   note('discord.link.success');
@@ -520,6 +557,11 @@ export async function handleDiscordLoginNew(
       } else {
         accountId = account.id;
         username = account.username;
+        // Fresh-provision arm only: the account was created moments ago, so this is
+        // a guaranteed unlinked-to-linked transition with no prior id to strand. The
+        // existing-owner arm below is not a link transition (the link already
+        // existed); its guild grant rides the points site in grantRewardPoints.
+        enqueueLinkChange({ accountId, discordId: user.id, kinds: ['link'] }, Date.now());
         await grantLinkRewards(accountId, pending.guild_member);
         note('discord.login.provisioned');
       }
@@ -601,6 +643,10 @@ export async function handleDiscordLoginLink(
   // Commit: consume the token (single-use guard) only now, then link + mint.
   const consumed = await consumeDiscordPendingLogin(pool, linkToken);
   if (!consumed) return json(res, 400, { error: 'expired', code: 'discord.expired' });
+  // Same pre-read rationale as completeLink: the chooser can attach a Discord id to
+  // an account that already carries a different one, and the upsert's boolean cannot
+  // report that. Rare, user-initiated, password-verified path.
+  const previousLink = await discordForAccount(pool, account.id);
   const linked = await linkDiscordToAccount(pool, account.id, {
     discordUserId: consumed.discord_user_id,
     username: consumed.discord_username,
@@ -609,6 +655,18 @@ export async function handleDiscordLoginLink(
     guildMember: consumed.guild_member,
   });
   if (!linked) return json(res, 409, { error: 'already_linked', code: 'discord.already_linked' });
+  // A repoint strands the old Discord user; per-account dedupe normally merges the
+  // pair into one item with kinds ['unlink','link'] carrying the OLD id.
+  if (previousLink && previousLink.discord_user_id !== consumed.discord_user_id) {
+    enqueueLinkChange(
+      { accountId: account.id, discordId: previousLink.discord_user_id, kinds: ['unlink'] },
+      Date.now(),
+    );
+  }
+  enqueueLinkChange(
+    { accountId: account.id, discordId: consumed.discord_user_id, kinds: ['link'] },
+    Date.now(),
+  );
   // Seed the existing account's recovery email from the captured Discord address
   // if it still has none (never overwrites an owner-set one).
   await captureDiscordEmail(account.id, consumed.discord_email, consumed.discord_email_verified);
@@ -783,13 +841,66 @@ export async function handleDiscordStatus(
   return json(res, 200, await discordStatusPayload(accountId));
 }
 
-export async function discordStatusPayload(accountId: number): Promise<Record<string, unknown>> {
+/**
+ * The link-row projection the status cache stores: EXACTLY the four fields the
+ * payload serves, and never discord_email (the safety of setDiscordLinkEmail's
+ * missing bust rests on that absence, so the key set is pinned by an exact
+ * Object.keys test in tests/discord_server.test.ts; widening this projection
+ * means wiring the new field's writers' busts in the same change).
+ */
+export function projectDiscordStatusLink(row: DiscordLinkRow): DiscordStatusLink {
+  return {
+    discordUserId: row.discord_user_id,
+    username: row.discord_username,
+    avatar: row.discord_avatar,
+    guildMember: row.guild_member,
+  };
+}
+
+/**
+ * The database-backed part of the status payload, refreshed on a cache miss.
+ * Every field a write can change funnels through here, and every such write
+ * site busts the account's entry (see the bust wiring in discord_db.ts/db.ts),
+ * so a caller is never served stale data after a change it just made.
+ */
+async function fetchDiscordStatusCore(accountId: number): Promise<DiscordStatusCore> {
   const [link, reward, claimedSwagIds, acct] = await Promise.all([
     discordForAccount(pool, accountId),
     loadRewardState(pool, accountId),
     listSwagClaims(pool, accountId),
     accountById(accountId),
   ]);
+  // Frozen at mint, nested parts included: the cache hands EVERY reader of an
+  // entry this one object by reference, so a consumer mutation would corrupt
+  // that account's later responses until the next bust or TTL expiry. The
+  // treat-as-immutable contract (readDiscordStatusCore's JSDoc) is made
+  // structural here: modules run in strict mode, so a mutation attempt throws
+  // loudly at the offending call site instead of silently poisoning the cache.
+  return Object.freeze({
+    link: link ? Object.freeze(projectDiscordStatusLink(link)) : null,
+    points: reward.points,
+    lifetimePoints: reward.lifetimePoints,
+    claimedSwagIds: Object.freeze(claimedSwagIds) as string[],
+    // Whether the account has a real (owner-chosen) password. The client reads this
+    // to decide whether unlinking must first set one (a Discord-only account with no
+    // usable password would otherwise be stranded). Defaults true if the account row
+    // is somehow missing, so we never wrongly demand a password.
+    passwordSet: acct?.password_set ?? true,
+  });
+}
+// Installed at module load; the cache itself builds lazily on the first status
+// read, so no clock or env value binds before a test can inject its own.
+configureDiscordStatusCache(fetchDiscordStatusCore);
+
+// Shared by BOTH /api/discord arms (the RouteDef handler and the frozen legacy
+// arm in server/main.ts), which is what keeps the cache and the response
+// parity-identical by construction (D9 needs no dual edit here). Only the
+// database-backed core above is cached (D17); presence and the env-derived
+// config fields are composed fresh on EVERY request, so the presence block is
+// never frozen behind the payload TTL (ruling R10).
+export async function discordStatusPayload(accountId: number): Promise<Record<string, unknown>> {
+  const core = await readDiscordStatusCore(accountId);
+  const link = core.link;
   const presence = discordPresenceCache();
   const cfg = discordConfig();
   return {
@@ -799,21 +910,17 @@ export async function discordStatusPayload(accountId: number): Promise<Record<st
     // Discord. Null when no guild is configured.
     widgetUrl: cfg?.guildId ? `https://discord.com/widget?id=${cfg.guildId}&theme=dark` : null,
     linked: link !== null,
-    // Whether the account has a real (owner-chosen) password. The client reads this
-    // to decide whether unlinking must first set one (a Discord-only account with no
-    // usable password would otherwise be stranded). Defaults true if the account row
-    // is somehow missing, so we never wrongly demand a password.
-    passwordSet: acct?.password_set ?? true,
-    username: link?.discord_username ?? null,
+    passwordSet: core.passwordSet,
+    username: link?.username ?? null,
     // Discord profile picture (CDN), shown in the HUD widget. Null for a default
     // (avatar-less) Discord account.
-    avatar: link ? discordAvatarUrl(link.discord_user_id, link.discord_avatar, 64) : null,
-    guildMember: link?.guild_member ?? false,
-    points: reward.points,
-    lifetimePoints: reward.lifetimePoints,
+    avatar: link ? discordAvatarUrl(link.discordUserId, link.avatar, 64) : null,
+    guildMember: link?.guildMember ?? false,
+    points: core.points,
+    lifetimePoints: core.lifetimePoints,
     // Unlinked accounts are unranked (tier 0); only a linked account climbs rungs.
-    statusTier: link ? discordStatusIndexForPoints(reward.lifetimePoints) : 0,
-    claimedSwagIds,
+    statusTier: link ? discordStatusIndexForPoints(core.lifetimePoints) : 0,
+    claimedSwagIds: core.claimedSwagIds,
     inviteUrl: discordInviteUrl(),
     presence: {
       onlineCount: presence.onlineCount,
@@ -853,7 +960,19 @@ export async function handleDiscordUnlink(
     await updatePasswordHash(accountId, await hashPassword(next));
     note('discord.unlink.set_password');
   }
+  // The only way to carry the Discord id into the change feed: unlinkDiscord deletes
+  // by account_id and returns void. It also settles whether this is a real
+  // transition, because that DELETE is an unconditional idempotent no-op, so a
+  // repeat unlink on an already-unlinked account must enqueue NOTHING rather than a
+  // phantom unlink the bot would act on. Rare, user-initiated cold path.
+  const existingLink = await discordForAccount(pool, accountId);
   await unlinkDiscord(pool, accountId);
+  if (existingLink) {
+    enqueueLinkChange(
+      { accountId, discordId: existingLink.discord_user_id, kinds: ['unlink'] },
+      Date.now(),
+    );
+  }
   note('discord.unlink');
   return json(res, 200, { unlinked: true });
 }
@@ -959,6 +1078,66 @@ export async function discordFlexForAccount(accountId: number): Promise<DiscordF
   };
 }
 
+/** One entry of a batched flex read: the single-flex payload plus its Discord id. */
+export interface DiscordFlexBatchEntry extends DiscordFlex {
+  discord_user_id: string;
+  /** Always true: an entry only exists because a discord_links row matched. */
+  linked: true;
+}
+
+/**
+ * The flex payload for MANY Discord ids at once, for the bot's sweep.
+ *
+ * Field-for-field identical to discordFlexForAccount for any LINKED id, so the
+ * bot can render a batch entry and a single-endpoint payload through the same
+ * code. It costs one round trip for the whole batch instead of four per user.
+ *
+ * "Identical" is exact for every field a real character produces, and the ONE
+ * place the two can disagree is a malformed `state.level`, where the batch path
+ * is the better-behaved of the two. This path projects the level in SQL through
+ * a total guard (see discordFlexRowsForDiscordIds), so a float rounds to an int
+ * and a non-numeric value falls back to the `level` COLUMN; the per-account path
+ * is a bare `ch.state?.level ?? ch.level` in TypeScript, so it hands back 41.6
+ * for a float and the STRING "boom" in a field typed number. The sim only ever
+ * writes an integer there, so neither case is reachable from real data; the
+ * divergence is recorded rather than papered over because the parity test mocks
+ * the batched read and therefore cannot see it.
+ *
+ * UNLINKED ids are ABSENT from the result rather than carrying a fabricated
+ * payload: the per-id endpoint answers { linked: false } for them, and the
+ * batch's equivalent of that answer is omission. Order follows the database's
+ * row order, so callers must key on discord_user_id, never on position.
+ */
+export async function discordFlexForAccounts(
+  discordUserIds: readonly string[],
+): Promise<DiscordFlexBatchEntry[]> {
+  if (discordUserIds.length === 0) return [];
+  const rows = await discordFlexRowsForDiscordIds(pool, discordUserIds, REALM);
+  const origin = REALM_PUBLIC_ORIGIN || '';
+  return rows.map((row) => {
+    const name = row.character_name;
+    return {
+      discord_user_id: row.discord_user_id,
+      linked: true as const,
+      found: name !== null,
+      username: row.discord_username,
+      // Every row IS a link row, so the tier is always derived (the per-account
+      // path's `link ? ... : 0` fork only exists to answer for an unlinked id).
+      statusTier: discordStatusIndexForPoints(row.lifetime_points),
+      points: row.points,
+      character:
+        name !== null
+          ? {
+              name,
+              class: row.character_class ?? '',
+              level: row.character_level ?? 0,
+              profileUrl: `${origin}/c/${encodeURIComponent(name)}`,
+            }
+          : null,
+    };
+  });
+}
+
 // ── small local helpers ────────────────────────────────────────────────────────
 
 // readBody is re-implemented narrowly here to avoid importing the wallet shell's
@@ -1007,9 +1186,10 @@ function discordOAuthResponse(
   status: number,
   payload: BouncePayload,
   native: boolean,
+  desktopReturn = false,
 ): void {
   if (!native) {
-    bouncePage(res, status, payload);
+    bouncePage(res, status, payload, desktopReturn);
     return;
   }
   const url = new URL(NATIVE_DISCORD_REDIRECT);
@@ -1054,7 +1234,12 @@ export async function handleNativeDiscordExchange(
 // Render the callback result as an HTML page that messages the SPA. Works whether
 // the OAuth flow ran in a popup (postMessage to the opener + close) or as a
 // top-level redirect (store the session + go to the app).
-function bouncePage(res: http.ServerResponse, status: number, payload: BouncePayload): void {
+function bouncePage(
+  res: http.ServerResponse,
+  status: number,
+  payload: BouncePayload,
+  desktopReturn = false,
+): void {
   // Escape '<'/'>' (blocks </script> + <!-- breakout) and the JS line separators
   // U+2028/U+2029 (legal in JSON, illegal in a pre-ES2019 JS string) inside the
   // inlined JSON so a value can never break out of or corrupt the <script>.
@@ -1069,6 +1254,7 @@ function bouncePage(res: http.ServerResponse, status: number, payload: BouncePay
 </head><body><main><p id="m">Connecting Discord...</p></main><script>
 (function(){
   var p = ${data};
+  var target = ${JSON.stringify(desktopReturn ? '/desktop-login' : '/')};
   try {
     if (p.ok && p.mode === 'login' && p.token) {
       localStorage.setItem('woc_session', JSON.stringify({ token: p.token, username: p.username }));
@@ -1081,9 +1267,9 @@ function bouncePage(res: http.ServerResponse, status: number, payload: BouncePay
   var msg = { source: 'woc-discord', ok: p.ok, mode: p.mode, error: p.error || null };
   if (window.opener) {
     try { window.opener.postMessage(msg, location.origin); } catch (e) {}
-    setTimeout(function(){ try { window.close(); } catch (e) {} location.replace('/'); }, 200);
+    setTimeout(function(){ try { window.close(); } catch (e) {} location.replace(target); }, 200);
   } else {
-    location.replace('/');
+    location.replace(target);
   }
 })();
 </script></body></html>`;
@@ -1269,12 +1455,14 @@ async function discordStartHandler(ctx: Ctx): Promise<void> {
   const native = ctx.url.searchParams.get('native') === '1';
   const nativeChallenge = ctx.url.searchParams.get('challenge') ?? undefined;
   const body = native ? await readJsonBody(ctx.req) : {};
+  const desktop = mode === 'login' && ctx.url.searchParams.get('desktop') === '1';
   return handleDiscordStart(ctx.req, ctx.res, {
     mode,
     accountId,
     native,
     nativeChallenge,
     nativeAttestation: body.nativeAttestation,
+    desktop,
   });
 }
 

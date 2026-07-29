@@ -3,17 +3,11 @@
 // shard is tests/sim.test.ts.
 import { describe, expect, it } from 'vitest';
 import { GROUND_PICKUP_LINES } from '../src/sim/content/ground_pickup_lines';
-import { DEEPFEN_SHALLOWS_LAKE, GROUND_OBJECTS, ITEMS, LAKE, NPCS } from '../src/sim/data';
+import { DEEPFEN_SHALLOWS_LAKE, GROUND_OBJECTS, ITEMS, LAKE, NPCS, QUESTS } from '../src/sim/data';
 import { ACTIONS, applyAction, encodeObs, obsSize } from '../src/sim/obs';
 import { completeFishing } from '../src/sim/professions/fishing';
 import { Sim } from '../src/sim/sim';
-import {
-  dist2d,
-  FISHING_CAST_ID,
-  FISHING_CAST_TIME,
-  type SimEvent,
-  xpForLevel,
-} from '../src/sim/types';
+import { dist2d, FISHING_CAST_ID, type SimEvent, xpForLevel } from '../src/sim/types';
 import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
 import {
   despawnMobs,
@@ -127,7 +121,7 @@ describe('food, drink, vendor', () => {
     sim.player.combatTimer = 99;
 
     sim.useItem('minor_mana_potion');
-    expect(sim.player.resource).toBe(10 + 120); // instant, no sitting
+    expect(sim.player.resource).toBe(10 + (ITEMS.minor_mana_potion.potionMana ?? 0)); // instant, no sitting
     expect(sim.player.sitting).toBe(false);
     expect(sim.countItem('minor_mana_potion')).toBe(1);
 
@@ -259,7 +253,7 @@ describe('food, drink, vendor', () => {
     teleportTo(sim2, wilkes2.pos.x + 2, wilkes2.pos.z);
 
     expect(sim2.meta(pid2)?.vendorBuyback).toEqual([{ itemId: 'apprentice_staff', count: 1 }]);
-    sim2.buyBackItem('apprentice_staff', pid2);
+    sim2.buyBackItem('apprentice_staff', undefined, undefined, pid2);
     expect(sim2.countItem('apprentice_staff', pid2)).toBe(1);
     expect(sim2.meta(pid2)?.vendorBuyback).toEqual([]);
   });
@@ -319,29 +313,33 @@ describe('food, drink, vendor', () => {
     const wilkes = [...sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
     teleportTo(sim, wilkes.pos.x + 2, wilkes.pos.z);
     sim.copper = 0;
-    sim.addItem('wolf_fang', 2); // poor (gray), sellValue 4 -> 8
+    // wolf_fang is a crafting reagent now (quality common, never
+    // swept), so this sweep uses mudfin_scale as its gray fodder.
+    sim.addItem('mudfin_scale', 2); // poor (gray), sellValue 5 -> 10
     sim.addItem('bandit_bandana', 1); // poor (gray), sellValue 6
+    sim.addItem('wolf_fang', 1); // reagent (common, white) -> kept
     sim.addItem('apprentice_staff', 1); // not poor -> kept
     sim.addItem('boar_hide', 1); // quest item -> kept
 
     sim.sellAllJunk();
 
     // only the gray items leave the bags
-    expect(sim.countItem('wolf_fang')).toBe(0);
+    expect(sim.countItem('mudfin_scale')).toBe(0);
     expect(sim.countItem('bandit_bandana')).toBe(0);
+    expect(sim.countItem('wolf_fang')).toBe(1);
     expect(sim.countItem('apprentice_staff')).toBe(1);
     expect(sim.countItem('boar_hide')).toBe(1);
-    // proceeds = 2*4 + 6 = 14 copper
-    expect(sim.copper).toBe(14);
+    // proceeds = 2*5 + 6 = 16 copper
+    expect(sim.copper).toBe(16);
     // each sold gray stack is recorded for buyback
-    expect(sim.vendorBuyback.some((s) => s.itemId === 'wolf_fang' && s.count === 2)).toBe(true);
+    expect(sim.vendorBuyback.some((s) => s.itemId === 'mudfin_scale' && s.count === 2)).toBe(true);
     expect(sim.vendorBuyback.some((s) => s.itemId === 'bandit_bandana' && s.count === 1)).toBe(
       true,
     );
     // exactly one summary loot line (not one per stack)
     const sold = sim.events.filter((e) => e.type === 'loot' && /^Sold /.test(e.text));
     expect(sold).toHaveLength(1);
-    expect(sold[0]).toMatchObject({ text: 'Sold 3 junk items for 14c.' });
+    expect(sold[0]).toMatchObject({ text: 'Sold 3 junk items for 16c.' });
   });
 
   it('Sell Junk needs a vendor in range and no-ops cleanly with nothing to sell', () => {
@@ -402,30 +400,43 @@ describe('food, drink, vendor', () => {
     );
   });
 
-  it('starts a five-second fishing cast near and facing Mirror Lake', () => {
+  it('starts the capped fishing session near and facing Mirror Lake with the one bite-delay draw', () => {
     const sim = makeScopedSim(VENDOR_TEST_WORLD, 'warrior');
     const spot = mirrorLakeFishingSpot(sim.cfg.seed);
     teleportTo(sim, spot.x, spot.z);
     sim.player.facing = spot.facing;
     sim.addItem('simple_fishing_pole', 1);
     sim.events = [];
-    sim.useItem('simple_fishing_pole');
+    // The cast start draws EXACTLY the one hidden bite delay; the
+    // visible timer is the constant session cap and leaks nothing.
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+    try {
+      sim.useItem('simple_fishing_pole');
+    } finally {
+      sim.rng.setObserver(null);
+    }
+    expect(draws).toBe(1);
     expect(sim.player.castingAbility).toBe(FISHING_CAST_ID);
-    expect(sim.player.castTotal).toBe(FISHING_CAST_TIME);
-    expect(sim.player.castRemaining).toBe(FISHING_CAST_TIME);
+    // Literal 15, not the imported constant: the broadcast session cap is a
+    // wire-visible contract, so this pin must red if the constant moves (the
+    // packet's constant-self-comparison trap).
+    expect(sim.player.castTotal).toBe(15);
+    expect(sim.player.castRemaining).toBe(15);
     expect(sim.player.channeling).toBe(false);
     expect(sim.events).toContainEqual(
       expect.objectContaining({
         type: 'castStart',
         ability: FISHING_CAST_ID,
-        time: FISHING_CAST_TIME,
+        time: 15,
       }),
     );
   });
 
-  it('rolls the fishing catch table only when the cast completes', () => {
+  it('rolls the fishing catch table only at a reel press inside the bite window', () => {
     const sim = makeScopedSim(VENDOR_TEST_WORLD, 'warrior');
     const spot = mirrorLakeFishingSpot(sim.cfg.seed);
+    despawnMobs(sim);
     teleportTo(sim, spot.x, spot.z);
     sim.player.facing = spot.facing;
     sim.addItem('simple_fishing_pole', 1);
@@ -433,14 +444,25 @@ describe('food, drink, vendor', () => {
     sim.useItem('simple_fishing_pole');
     expect(valeCatchCount(sim)).toBe(0);
 
+    // Tick the LIVE loop to the bite (the hidden seeded delay caps at 8 s);
+    // nothing rolls and nothing lands while the line is merely waiting.
     const events: SimEvent[] = [];
-    for (let i = 0; i < 20 * 6 && sim.player.castingAbility; i++) events.push(...sim.tick());
+    for (let i = 0; i < 20 * 10 && !events.some((e) => e.type === 'fishingBite'); i++) {
+      events.push(...sim.tick());
+    }
+    expect(events.some((e) => e.type === 'fishingBite')).toBe(true);
+    expect(valeCatchCount(sim)).toBe(0);
+    expect(sim.player.castingAbility).toBe(FISHING_CAST_ID);
 
+    // The reel press inside the window resolves the single table draw (which
+    // may still be the empty-hook row) and ends the session.
+    sim.events = [];
+    sim.useItem('simple_fishing_pole');
     const catchCount = valeCatchCount(sim);
     expect(sim.player.castingAbility).toBe(null);
     expect(catchCount === 1 || catchCount === 0).toBe(true);
     if (catchCount === 0) {
-      expect(events).toContainEqual(
+      expect(sim.events).toContainEqual(
         expect.objectContaining({
           type: 'log',
           text: 'No fish are biting.',
@@ -463,15 +485,28 @@ describe('food, drink, vendor', () => {
     teleportTo(sim, spot.x, spot.z);
     sim.player.facing = spot.facing;
     sim.addItem('simple_fishing_pole', 1);
+    // The Deepfen Shallows are Mirefen water, which takes the tier-2 rod
+    // (professions/fishing_zones.ts). The pole stays in the bags because the
+    // not-consumed assertion at the end is about the item pressed, and the
+    // press still routes through the pole.
+    sim.addItem('ironreel_fishing_rod', 1);
     sim.useItem('simple_fishing_pole');
     expect(sim.player.castingAbility).toBe(FISHING_CAST_ID);
 
+    // Drive the bite, then reel: the codfather force-lands at the reel press
+    // (its early return rolls no table), never before it.
     const events: SimEvent[] = [];
-    for (let i = 0; i < 20 * 6 && sim.player.castingAbility; i++) events.push(...sim.tick());
-
+    for (let i = 0; i < 20 * 10 && !events.some((e) => e.type === 'fishingBite'); i++) {
+      events.push(...sim.tick());
+    }
+    expect(events.some((e) => e.type === 'fishingBite')).toBe(true);
+    expect(sim.countItem('the_codfather')).toBe(0);
+    sim.events = [];
+    sim.useItem('simple_fishing_pole'); // the reel
+    expect(sim.events).toContainEqual(expect.objectContaining({ type: 'castStop', success: true }));
     expect(sim.player.castingAbility).toBe(null);
-    expect(events).toContainEqual(expect.objectContaining({ type: 'castStop', success: true }));
     expect(sim.countItem('the_codfather')).toBe(1);
+    sim.tick();
     expect(sim.questState('q_the_codfather')).toBe('ready');
     expect(sim.countItem('simple_fishing_pole')).toBe(1);
   });
@@ -483,8 +518,18 @@ describe('food, drink, vendor', () => {
     teleportTo(deepfenSim, deepfenSpot.x, deepfenSpot.z);
     deepfenSim.player.facing = deepfenSpot.facing;
     deepfenSim.addItem('simple_fishing_pole', 1);
+    // Mirefen water takes the tier-2 rod. Without it the cast would be
+    // refused and this test would pass for the wrong reason: no codfather
+    // because no session, rather than no codfather because no quest.
+    deepfenSim.addItem('ironreel_fishing_rod', 1);
     deepfenSim.useItem('simple_fishing_pole');
-    for (let i = 0; i < 20 * 6 && deepfenSim.player.castingAbility; i++) deepfenSim.tick();
+    expect(deepfenSim.player.castingAbility).toBe(FISHING_CAST_ID);
+    const events: SimEvent[] = [];
+    for (let i = 0; i < 20 * 10 && !events.some((e) => e.type === 'fishingBite'); i++) {
+      events.push(...deepfenSim.tick());
+    }
+    expect(events.some((e) => e.type === 'fishingBite')).toBe(true);
+    deepfenSim.useItem('simple_fishing_pole'); // reel: at most a normal table catch
     expect(deepfenSim.countItem('the_codfather')).toBe(0);
   });
 
@@ -501,7 +546,11 @@ describe('food, drink, vendor', () => {
     mirrorSim.player.facing = mirrorSpot.facing;
     mirrorSim.addItem('simple_fishing_pole', 1);
     mirrorSim.useItem('simple_fishing_pole');
-    for (let i = 0; i < 20 * 6 && mirrorSim.player.castingAbility; i++) mirrorSim.tick();
+    const mirrorEvents: SimEvent[] = [];
+    for (let i = 0; i < 20 * 10 && !mirrorEvents.some((e) => e.type === 'fishingBite'); i++) {
+      mirrorEvents.push(...mirrorSim.tick());
+    }
+    mirrorSim.useItem('simple_fishing_pole'); // reel
     expect(mirrorSim.countItem('the_codfather')).toBe(0);
   });
 
@@ -679,6 +728,24 @@ describe('food, drink, vendor', () => {
     expect(sim.countItem('wolf_fang')).toBe(0);
   });
 
+  // Regression: "Sell amount to NPC" (Discord #bug-reports, Corotexus). A custom
+  // amount typed into the sell-quantity dialog above one stack's size (wolf_fang
+  // has no explicit stackSize, so it defaults to 20, see sim/bags.ts stackSizeOf)
+  // must sell the FULL amount by pulling from every stack the player holds, not
+  // silently cap at one stack's worth.
+  it('vendor sells a custom amount greater than one stack size, drawing from every stack', () => {
+    const sim = makeScopedSim(VENDOR_TEST_WORLD, 'warrior');
+    const wilkes = [...sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
+    teleportTo(sim, wilkes.pos.x + 2, wilkes.pos.z);
+    sim.addItem('wolf_fang', 100); // spread across five 20-stacks
+    expect(sim.inventory.filter((s) => s.itemId === 'wolf_fang')).toHaveLength(5);
+
+    sim.sellItem('wolf_fang', 100);
+
+    expect(sim.copper).toBe(400);
+    expect(sim.countItem('wolf_fang')).toBe(0);
+  });
+
   it('vendor ignores invalid sell quantities', () => {
     const sim = makeScopedSim(VENDOR_TEST_WORLD, 'warrior');
     const wilkes = [...sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
@@ -745,7 +812,9 @@ describe('quests', () => {
 
   it('collect quest tracks inventory and consumes items on turn-in', () => {
     const sim = makeSim('warrior');
-    teleportTo(sim, -7, 1);
+    const giver = NPCS[QUESTS.q_boars.giverNpcId];
+    if (!giver) throw new Error('q_boars giver fixture missing');
+    teleportTo(sim, giver.pos.x, giver.pos.z);
     sim.interact();
     expect(sim.questState('q_boars')).toBe('active');
     sim.addItem('boar_hide', 5);

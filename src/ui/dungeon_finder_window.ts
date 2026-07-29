@@ -143,6 +143,9 @@ export class DungeonFinderWindow {
       playerId: world.playerId,
       specRole: world.talentRole,
       party: party ? { leader: party.leader, size: party.members.length } : null,
+      partyLeaderName: party
+        ? (party.members.find((m) => m.pid === party.leader)?.name ?? null)
+        : null,
       lockouts: world.raidLockouts(),
       tab: this.tab,
       selectedActivityId: this.selectedActivityId,
@@ -165,8 +168,15 @@ export class DungeonFinderWindow {
     }
     this.lastSig = sig;
     this.deps.hideTooltip();
+    // .df-rail (not #dungeon-finder-window) is the catalogue's scroll container; it
+    // is recreated on every rebuild, so capture its scroll offset and reapply it to
+    // the fresh one, else selecting a row near the bottom snaps the list back to the
+    // top and scrolls the just-picked dungeon out of view (the bank/spellbook idiom).
+    const prevRailScrollTop = el.querySelector('.df-rail')?.scrollTop ?? 0;
     el.innerHTML = this.liveHtml(view);
     this.wire(el, view);
+    const rail = el.querySelector('.df-rail');
+    if (rail) rail.scrollTop = prevRailScrollTop;
     this.cacheClockSlots(el);
     this.lastClockText.clear();
     this.updateClocks(view.clocks);

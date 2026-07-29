@@ -207,7 +207,12 @@ export const DEEDS: Record<string, DeedDef> = {
   prog_master_gatherer: {
     id: 'prog_master_gatherer',
     name: 'Master Gatherer',
-    desc: 'Reach 100 proficiency in Mining, Logging, and Herbalism.',
+    // Desc reword (fishing joined the gathering ring, and the any-three
+    // trigger counts it): the desc names all four professions.
+    // The trigger itself is untouched (rule 9); the stale locale desc fills
+    // were dropped with the reword and refill at release (deed_i18n.locales,
+    // English fallback until then).
+    desc: 'Reach 100 proficiency in any three of Mining, Logging, Herbalism, and Fishing.',
     category: 'progression',
     renown: 25,
     trigger: { kind: 'gathering', amount: 100, count: 3 },
@@ -1261,7 +1266,7 @@ export const DEEDS: Record<string, DeedDef> = {
   col_glimmerfin: {
     id: 'col_glimmerfin',
     name: 'Glimmer of Hope',
-    desc: 'Catch a Glimmerfin Koi.',
+    desc: 'Catch a Sunglint Koi.',
     category: 'collection',
     renown: 0,
     trigger: { kind: 'collectItems', itemIds: ['glimmerfin_koi'] },
@@ -1434,7 +1439,7 @@ export const DEEDS: Record<string, DeedDef> = {
   pvp_vcup_first_save: {
     id: 'pvp_vcup_first_save',
     name: 'Safe Hands',
-    desc: 'Make a save as keeper in a rated Vale Cup match.',
+    desc: 'Make a save as keeper in a rated Vale Cup match, in the 3v3 bracket or larger. Only a shot moving fast enough to test your grip counts: a soft catch does not.',
     category: 'pvp',
     renown: 5,
     trigger: { kind: 'manual' },
@@ -1442,7 +1447,7 @@ export const DEEDS: Record<string, DeedDef> = {
   pvp_vcup_clean_sheet: {
     id: 'pvp_vcup_clean_sheet',
     name: 'Nothing Gets Past Me',
-    desc: 'Win a rated Vale Cup match as keeper without conceding a goal.',
+    desc: 'Win a rated Vale Cup match as keeper without conceding a goal, in the 3v3 bracket or larger.',
     category: 'pvp',
     renown: 25,
     trigger: { kind: 'manual' },
@@ -1751,7 +1756,7 @@ export const DEEDS: Record<string, DeedDef> = {
   },
   exp_first_ore: {
     id: 'exp_first_ore',
-    name: 'Strike the Earth',
+    name: 'Pick Meets Stone',
     desc: 'Harvest your first ore node.',
     category: 'exploration',
     renown: 5,
@@ -1937,18 +1942,18 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 5,
     trigger: { kind: 'quest', questId: 'q_prof_intro' },
   },
-  // Reagent sourcing: every toolworks recipe requires one of the six tier
-  // 4/5 reagents (thorium_ore, arcanite_bar, ashwood_log, elderwood_log,
-  // goldleaf_herb, sunpetal_herb), sold by Quartermaster Bree at the
-  // Highwatch hub (zone3.ts), so this deed (and feat_book_complete through
-  // it) is completable in live play. The vendor-to-craft-to-grant chain is
-  // pinned by tests/professions_crafting_hub.test.ts. The stat key stays
-  // 'hubCraftsPerformed' (persisted): since Phase 8 it counts station-bound
+  // Completability: the trigger is ONE station-bound craft at ANY station, not
+  // a toolworks tool recipe and not any single vendor's stock, so no change to
+  // what a counter sells can strand this deed (or feat_book_complete through
+  // it). What it does need is that every station recipe has a live reagent
+  // source, a vendor row or a gather node, which is what
+  // tests/professions_crafting_hub.test.ts pins. The stat key stays
+  // 'hubCraftsPerformed' (persisted): it counts station-bound
   // crafts at any station (see professions/crafting.ts craftItem).
   prog_tools_of_the_trade: {
     id: 'prog_tools_of_the_trade',
     name: 'Tools of the Trade',
-    // Phase 8 reword (stations replaced the single Highwatch hub): the stale
+    // Desc reword (stations replaced the single Highwatch hub): the stale
     // locale desc fills were dropped with it and refill at release
     // (deed_i18n.locales, English fallback until then).
     desc: 'Complete a craft at a crafting station.',
@@ -1980,24 +1985,239 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 5,
     trigger: { kind: 'stat', stat: 'cardDuelsWon', count: 1 },
   },
-  // Orkadia orc war-camp dungeon (Drakelands). Appended per the append-only
-  // DEED_ORDER contract; normal + heroic clear pair like every other dungeon.
-  dgn_orkadia: {
-    id: 'dgn_orkadia',
-    name: 'Warbreaker of Orkadia',
-    desc: 'Defeat Warlord Grommok Skullcleaver in Orkadia.',
-    category: 'dungeon',
-    renown: 10,
-    trigger: { kind: 'dungeonClears', dungeonId: 'orkadia', count: 1 },
+
+  // Professions 2.0 additions (append-only tail, grouped by category
+  // within this block only). Craft-skill thresholds reference ONLY resolved
+  // caps or below: every CRAFT_RING craft caps at 125 (craftMaxSkillFor),
+  // fishing at 200, the other gathering professions at 100
+  // (content/professions.ts maxSkill). Jewelcrafting and Inscription have no
+  // live skill-gain path yet (zero recipes, no enchanting-style action), so
+  // their milestone and Grandmaster deeds stay deferred with prog_ringwright
+  // rather than shipping visible-but-unearnable.
+  prog_guildsworn: {
+    id: 'prog_guildsworn',
+    name: 'Craftsworn',
+    desc: 'Attune yourself to an archetype pair and take up its trades in earnest.',
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'stat', stat: 'attunementsCompleted', count: 1 },
+    reward: { kind: 'title', text: 'Craftsworn' },
   },
-  dgn_orkadia_heroic: {
-    id: 'dgn_orkadia_heroic',
-    name: 'Heroic: Orkadia',
-    desc: 'Defeat Warlord Grommok Skullcleaver in Orkadia on Heroic difficulty.',
-    category: 'dungeon',
-    renown: 10,
-    trigger: { kind: 'dungeonClears', dungeonId: 'orkadia', difficulty: 'heroic', count: 1 },
+  prog_masterwright: {
+    id: 'prog_masterwright',
+    name: 'Masterwright',
+    desc: 'Craft your first masterwork, a piece so fine the whole zone hears of it.',
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'stat', stat: 'masterworksCrafted', count: 1 },
+    reward: { kind: 'title', text: 'Masterwright' },
   },
+  prog_fishing_100: {
+    id: 'prog_fishing_100',
+    name: 'Old Salt',
+    desc: 'Reach 100 Fishing proficiency.',
+    category: 'progression',
+    renown: 10,
+    trigger: { kind: 'gathering', professionId: 'fishing', amount: 100 },
+  },
+  prog_master_angler: {
+    id: 'prog_master_angler',
+    name: 'Master Angler',
+    desc: "Reach 200 Fishing proficiency, the very top of the angler's art.",
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'gathering', professionId: 'fishing', amount: 200 },
+    reward: { kind: 'title', text: 'Master Angler' },
+  },
+  prog_engineering_50: {
+    id: 'prog_engineering_50',
+    name: 'Cogs and Sprockets',
+    desc: 'Reach 50 skill in Engineering.',
+    category: 'progression',
+    renown: 5,
+    trigger: { kind: 'craftSkill', craftId: 'engineering', level: 50 },
+  },
+  prog_alchemy_50: {
+    id: 'prog_alchemy_50',
+    name: 'Strange Brews',
+    desc: 'Reach 50 skill in Alchemy.',
+    category: 'progression',
+    renown: 5,
+    trigger: { kind: 'craftSkill', craftId: 'alchemy', level: 50 },
+  },
+  prog_cooking_50: {
+    id: 'prog_cooking_50',
+    name: 'Seasoned Chef',
+    desc: 'Reach 50 skill in Cooking.',
+    category: 'progression',
+    renown: 5,
+    trigger: { kind: 'craftSkill', craftId: 'cooking', level: 50 },
+  },
+  prog_leatherworking_50: {
+    id: 'prog_leatherworking_50',
+    name: "Tanner's Trade",
+    desc: 'Reach 50 skill in Leatherworking.',
+    category: 'progression',
+    renown: 5,
+    trigger: { kind: 'craftSkill', craftId: 'leatherworking', level: 50 },
+  },
+  prog_tailoring_50: {
+    id: 'prog_tailoring_50',
+    name: 'A Fine Seam',
+    desc: 'Reach 50 skill in Tailoring.',
+    category: 'progression',
+    renown: 5,
+    trigger: { kind: 'craftSkill', craftId: 'tailoring', level: 50 },
+  },
+  prog_enchanting_50: {
+    id: 'prog_enchanting_50',
+    name: 'A Glimmer of Arcana',
+    desc: 'Reach 50 skill in Enchanting.',
+    category: 'progression',
+    renown: 5,
+    trigger: { kind: 'craftSkill', craftId: 'enchanting', level: 50 },
+  },
+  prog_weaponcrafting_50: {
+    id: 'prog_weaponcrafting_50',
+    name: 'Edge and Temper',
+    desc: 'Reach 50 skill in Weaponcrafting.',
+    category: 'progression',
+    renown: 5,
+    trigger: { kind: 'craftSkill', craftId: 'weaponcrafting', level: 50 },
+  },
+  prog_armorcrafting_50: {
+    id: 'prog_armorcrafting_50',
+    name: 'Hammer and Plate',
+    desc: 'Reach 50 skill in Armorcrafting.',
+    category: 'progression',
+    renown: 5,
+    trigger: { kind: 'craftSkill', craftId: 'armorcrafting', level: 50 },
+  },
+  prog_grandmaster_engineering: {
+    id: 'prog_grandmaster_engineering',
+    name: 'Grandmaster Engineering',
+    desc: 'Reach 125 skill in Engineering, the very top of the craft.',
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'craftSkill', craftId: 'engineering', level: 125 },
+    reward: { kind: 'title', text: 'Grandmaster Engineering' },
+  },
+  prog_grandmaster_alchemy: {
+    id: 'prog_grandmaster_alchemy',
+    name: 'Grandmaster Alchemy',
+    desc: 'Reach 125 skill in Alchemy, the very top of the craft.',
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'craftSkill', craftId: 'alchemy', level: 125 },
+    reward: { kind: 'title', text: 'Grandmaster Alchemy' },
+  },
+  prog_grandmaster_cooking: {
+    id: 'prog_grandmaster_cooking',
+    name: 'Grandmaster Cooking',
+    desc: 'Reach 125 skill in Cooking, the very top of the craft.',
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'craftSkill', craftId: 'cooking', level: 125 },
+    reward: { kind: 'title', text: 'Grandmaster Cooking' },
+  },
+  prog_grandmaster_leatherworking: {
+    id: 'prog_grandmaster_leatherworking',
+    name: 'Grandmaster Leatherworking',
+    desc: 'Reach 125 skill in Leatherworking, the very top of the craft.',
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'craftSkill', craftId: 'leatherworking', level: 125 },
+    reward: { kind: 'title', text: 'Grandmaster Leatherworking' },
+  },
+  prog_grandmaster_tailoring: {
+    id: 'prog_grandmaster_tailoring',
+    name: 'Grandmaster Tailoring',
+    desc: 'Reach 125 skill in Tailoring, the very top of the craft.',
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'craftSkill', craftId: 'tailoring', level: 125 },
+    reward: { kind: 'title', text: 'Grandmaster Tailoring' },
+  },
+  prog_grandmaster_enchanting: {
+    id: 'prog_grandmaster_enchanting',
+    name: 'Grandmaster Enchanting',
+    desc: 'Reach 125 skill in Enchanting, the very top of the craft.',
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'craftSkill', craftId: 'enchanting', level: 125 },
+    reward: { kind: 'title', text: 'Grandmaster Enchanting' },
+  },
+  prog_grandmaster_weaponcrafting: {
+    id: 'prog_grandmaster_weaponcrafting',
+    name: 'Grandmaster Weaponcrafting',
+    desc: 'Reach 125 skill in Weaponcrafting, the very top of the craft.',
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'craftSkill', craftId: 'weaponcrafting', level: 125 },
+    reward: { kind: 'title', text: 'Grandmaster Weaponcrafting' },
+  },
+  prog_grandmaster_armorcrafting: {
+    id: 'prog_grandmaster_armorcrafting',
+    name: 'Grandmaster Armorcrafting',
+    desc: 'Reach 125 skill in Armorcrafting, the very top of the craft.',
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'craftSkill', craftId: 'armorcrafting', level: 125 },
+    reward: { kind: 'title', text: 'Grandmaster Armorcrafting' },
+  },
+  // Rare-find deeds: luck-based, so renown 0 and no title (docs/design/deeds.md
+  // rule 2), and VISIBLE like col_glimmerfin (the hid_ shelf is for spoiler
+  // delights, not public zone-wide celebrations). Each keys on the finder-only
+  // gather_event mark its announce site writes.
+  col_pristine_vein: {
+    id: 'col_pristine_vein',
+    name: 'Pristine Vein',
+    desc: 'Crack open a pristine vein and let the whole zone hear about it.',
+    category: 'collection',
+    renown: 0,
+    trigger: { kind: 'visit', markId: 'gather_event:pristine_vein' },
+  },
+  col_ancient_heartwood: {
+    id: 'col_ancient_heartwood',
+    name: 'Ancient Heartwood',
+    desc: 'Coax a length of ancient heartwood from a felled stand.',
+    category: 'collection',
+    renown: 0,
+    trigger: { kind: 'visit', markId: 'gather_event:ancient_heartwood' },
+  },
+  col_moonlit_bloom: {
+    id: 'col_moonlit_bloom',
+    name: 'Moonlit Bloom',
+    desc: 'Gather a moonlit bloom at the very moment it opens.',
+    category: 'collection',
+    renown: 0,
+    trigger: { kind: 'visit', markId: 'gather_event:moonlit_bloom' },
+  },
+  col_perfect_specimen: {
+    id: 'col_perfect_specimen',
+    name: 'A Perfect Specimen',
+    desc: 'Take a perfect specimen from a harvested beast, without a nick or a blemish.',
+    category: 'collection',
+    renown: 0,
+    trigger: { kind: 'visit', markId: 'gather_event:perfect_specimen' },
+  },
+  soc_first_salvage: {
+    id: 'soc_first_salvage',
+    name: 'Waste Not',
+    desc: 'Salvage a piece of gear back into raw materials.',
+    category: 'social',
+    renown: 5,
+    trigger: { kind: 'stat', stat: 'salvagesPerformed', count: 1 },
+  },
+  soc_salvage_50: {
+    id: 'soc_salvage_50',
+    name: "The Breaker's Yard",
+    desc: 'Salvage 50 pieces of gear back into raw materials.',
+    category: 'social',
+    renown: 10,
+    trigger: { kind: 'stat', stat: 'salvagesPerformed', count: 50 },
+  },
+
   // Wildheart Basin (Palmreach). New records stay at the append-only tail.
   dgn_wildheart_basin: {
     id: 'dgn_wildheart_basin',
@@ -2019,6 +2239,468 @@ export const DEEDS: Record<string, DeedDef> = {
       difficulty: 'heroic',
       count: 1,
     },
+  },
+  // The zone-3 rung of the per-zone gatherer chronicle line (R21): the
+  // gather:thornpeak_heights:* marks have been written by completeGatherCast
+  // since the t3 veins shipped, with no consumer until this deed. Unlike its
+  // vale and marsh siblings it is NOT a chapter prerequisite: the peaks
+  // chapter deedIds were already shipped, and shipped triggers are frozen
+  // (authoring rule 9), so this deed stands alone.
+  chr_peaks_gatherer: {
+    id: 'chr_peaks_gatherer',
+    name: 'Harvest of the Heights',
+    desc: 'Harvest an ore vein, a wood stand, and an herb patch in Thornpeak Heights.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: {
+      kind: 'visits',
+      markIds: [
+        'gather:thornpeak_heights:ore',
+        'gather:thornpeak_heights:wood',
+        'gather:thornpeak_heights:herb',
+      ],
+    },
+  },
+  // Two camp rares shipped alongside their zones but were left off the first
+  // reckoning of named terrors (chr_marsh_rares / chr_peaks_rares). Design
+  // rule 9 forbids widening those shipped trigger lists, so the missed
+  // rares get their own NEW deeds instead of a retro-edit.
+  chr_marsh_rares_ii: {
+    id: 'chr_marsh_rares_ii',
+    name: 'The Glutton, Reckoned',
+    desc: 'Slay Grubjaw the Glutton, a fourth named terror of Mirefen Marsh left off the first reckoning.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'slain:grubjaw' },
+  },
+  chr_peaks_rares_ii: {
+    id: 'chr_peaks_rares_ii',
+    name: 'More Names Cut into the Crag',
+    desc: 'Slay Old Cragmaw and Shardlord Kazzix, two more named terrors of Thornpeak Heights left off the first reckoning.',
+    category: 'chronicle',
+    renown: 10,
+    trigger: { kind: 'visits', markIds: ['slain:old_cragmaw', 'slain:shardlord_kazzix'] },
+  },
+  // The Gleamstag shipped with the Wildheart Basin content wave as another
+  // persistent camp rare with a unique display name, and was likewise never
+  // wired into the deed credit system; see the RARE_SLAIN_TEMPLATES coverage
+  // test in tests/deeds_content.test.ts.
+  chr_gleamstag: {
+    id: 'chr_gleamstag',
+    name: 'The Legend That Would Not Strike First',
+    desc: 'Slay the Gleamstag, a rare and reclusive elite that will not attack unless cornered.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'slain:gleamstag' },
+  },
+  // Old Marrowshell and Aurelhorn are the Hollow's two wandering rare bosses
+  // (huntsman_deral's chain points at both) but neither their kill quests
+  // nor RARE_SLAIN_TEMPLATES fed a deed; same gap class, found by the same
+  // coverage test.
+  chr_hollow_rares: {
+    id: 'chr_hollow_rares',
+    name: 'The Herd Remembers',
+    desc: 'Slay Old Marrowshell and Aurelhorn, First of the Herd, the two wandering rare bosses of the Hollow.',
+    category: 'chronicle',
+    renown: 10,
+    trigger: { kind: 'visits', markIds: ['slain:old_marrowshell', 'slain:aurelhorn'] },
+  },
+
+  // --- Thornhollow Fields, the 5v5 capture-the-flag battleground (src/sim/social/
+  // battleground.ts). Meters read the persisted PlayerMeta standing (bgWins /
+  // bgCaptures), so they count OUTCOMES, never attendance (rule 6), and
+  // retro-grant on load like every meter.
+  //
+  // The career-100 captures deed paces off BG_CAPS_TO_WIN, which was retuned
+  // from 5 to 3: a dominant winner now banks at most 3 captures per match
+  // rather than 5, so that deed's tail lengthens by roughly the same ratio.
+  // Left AS IS deliberately. The meter is career-cumulative with no time
+  // window, deeds are cosmetic-only (a title and Renown, never power), and
+  // re-cutting the threshold every time the match target moves would keep
+  // re-basing a number players are already partway through.
+  pvp_bg_first_capture: {
+    id: 'pvp_bg_first_capture',
+    name: 'Banner in Hand',
+    desc: 'Capture a flag in Thornhollow Fields.',
+    category: 'pvp',
+    renown: 5,
+    trigger: { kind: 'meter', meter: 'bgCaptures', amount: 1 },
+  },
+  pvp_bg_first_win: {
+    id: 'pvp_bg_first_win',
+    name: 'The Hollow Holds',
+    desc: 'Win a Thornhollow Fields battleground.',
+    category: 'pvp',
+    renown: 5,
+    trigger: { kind: 'meter', meter: 'bgWins', amount: 1 },
+  },
+  pvp_bg_wins_25: {
+    id: 'pvp_bg_wins_25',
+    name: 'Warden of the Hollow',
+    desc: 'Win 25 Thornhollow Fields battlegrounds.',
+    category: 'pvp',
+    renown: 25,
+    trigger: { kind: 'meter', meter: 'bgWins', amount: 25 },
+    reward: { kind: 'title', text: 'Flagbearer' },
+  },
+  pvp_bg_captures_100: {
+    id: 'pvp_bg_captures_100',
+    name: 'A Hundred Banners',
+    desc: 'Capture 100 flags in Thornhollow Fields across your career.',
+    category: 'pvp',
+    renown: 50,
+    trigger: { kind: 'meter', meter: 'bgCaptures', amount: 100 },
+  },
+
+  // The phase 20 density pass brought the three bottom-map zones to the
+  // strip's own gathering density (Q26 in
+  // docs/design/professions-tuning-packet-review.md): each gets the zone
+  // chronicle pair the strip zones carry, the gatherer chronicle (the R21
+  // line) and the first-cast deed. The gather marks have been written by
+  // completeGatherCast since the v0.32.0 starter kits shipped; the fish
+  // marks fire through ZONE_FISH rows listing the Vale-fallback draws these
+  // zones' waters actually yield until the zone-4 pass authors their own
+  // catch tables. Standalone chronicles with no chapter meta (the
+  // chr_peaks_gatherer precedent; shipped chapter triggers are frozen,
+  // authoring rule 9).
+  chr_willowfen_gatherer: {
+    id: 'chr_willowfen_gatherer',
+    name: 'Fenland Bounty',
+    desc: 'Harvest an ore vein, a wood stand, and an herb patch in the Willowfen.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: {
+      kind: 'visits',
+      markIds: ['gather:willowfen:ore', 'gather:willowfen:wood', 'gather:willowfen:herb'],
+    },
+  },
+  chr_willowfen_first_cast: {
+    id: 'chr_willowfen_first_cast',
+    name: 'Ripples in the Lilymoors',
+    desc: 'Catch a fish from the waters of the Willowfen.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'fish:willowfen' },
+  },
+  chr_galecrest_gatherer: {
+    id: 'chr_galecrest_gatherer',
+    name: 'Harvest on the Headland',
+    desc: 'Harvest an ore vein, a wood stand, and an herb patch in the Galecrest.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: {
+      kind: 'visits',
+      markIds: ['gather:galecrest:ore', 'gather:galecrest:wood', 'gather:galecrest:herb'],
+    },
+  },
+  chr_galecrest_first_cast: {
+    id: 'chr_galecrest_first_cast',
+    name: 'A Line in the Mirror Tarn',
+    desc: 'Catch a fish from the waters of the Galecrest.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'fish:galecrest' },
+  },
+  chr_farshore_gatherer: {
+    id: 'chr_farshore_gatherer',
+    name: 'Island Provisions',
+    desc: 'Harvest an ore vein, a wood stand, and an herb patch on the Farshore.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: {
+      kind: 'visits',
+      markIds: [
+        'gather:farshore_isle:ore',
+        'gather:farshore_isle:wood',
+        'gather:farshore_isle:herb',
+      ],
+    },
+  },
+  chr_farshore_first_cast: {
+    id: 'chr_farshore_first_cast',
+    name: 'What the Gulls Know',
+    desc: 'Catch a fish from the waters of the Farshore.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'fish:farshore_isle' },
+  },
+  // The Drakelands dragonkin brood rework (v0.35): the Drakemaw Broodlords
+  // are the zone's new standing elites (shout, egg clutch, cleave, breath,
+  // counter-stun), and Cindraleth, the shipped quest capstone, was never
+  // wired into slain-mark credit (the Gleamstag gap class; both templates
+  // now sit in RARE_SLAIN_TEMPLATES).
+  chr_drakemaw_broodlord: {
+    id: 'chr_drakemaw_broodlord',
+    name: 'Clutch Breaker',
+    desc: 'Slay a Drakemaw Broodlord amid its eggs, through the shout, the cleave, and the fire.',
+    category: 'chronicle',
+    renown: 10,
+    trigger: { kind: 'visit', markId: 'slain:drakemaw_broodlord' },
+  },
+  chr_maw_matriarch: {
+    id: 'chr_maw_matriarch',
+    name: 'The Sky Goes Quiet',
+    desc: 'Slay Cindraleth the Maw Matriarch in her crater roost above the Drakemaw.',
+    category: 'chronicle',
+    renown: 10,
+    // Rides the shipped kill quest (retro-grantable for every veteran who
+    // already finished the chain), so the boss template needs no rare flag.
+    trigger: { kind: 'quest', questId: 'q_dk_matriarch_of_the_maw' },
+  },
+
+  // Rifts (src/sim/rift/): the procedural infinite-dungeon system, ranked C
+  // through S. No single dungeonId exists to key a dungeonClears trigger
+  // against (every rift regenerates from a seed), so both deeds read a
+  // lifetime counter instead, bumped in rift/runs.ts on run completion.
+  dgn_rift: {
+    id: 'dgn_rift',
+    name: 'Riftwalker',
+    desc: 'Clear a Rift by defeating its floor boss.',
+    category: 'dungeon',
+    renown: 5,
+    trigger: { kind: 'stat', stat: 'riftClears', count: 1 },
+  },
+  dgn_rift_s_rank: {
+    id: 'dgn_rift_s_rank',
+    name: 'Rift Sovereign',
+    desc: 'Clear an S-rank Rift, the hardest tier a Rift portal can spawn.',
+    category: 'dungeon',
+    renown: 25,
+    trigger: { kind: 'stat', stat: 'riftSRankClears', count: 1 },
+  },
+
+  // Basic universal profession deeds, issue #2055: per-craft rare-tier
+  // milestones. Each fires off the craft_rare:<craftId> mark
+  // (professions/crafting.ts craftItem) the first time a player crafts a
+  // rare-or-better output IN THAT CRAFT. Output quality is a static fact of
+  // the recipe's result def (the Professions 2.0 output roll is retired), so
+  // this is never luck-based, only whether the player knows the recipe and
+  // holds the reagents: standard renown, no title, same tier as the other
+  // moderate profession-depth milestones (prog_fishing_100). Covers exactly
+  // the seven crafts that ship a rare-or-better recipe today (see
+  // tests/deeds_content.test.ts for the derivation): enchanting has no
+  // item-def output to grade, and jewelcrafting/inscription stay deferred
+  // with prog_ringwright (docs/design/deeds.md, no live recipes yet).
+  prog_engineering_rare: {
+    id: 'prog_engineering_rare',
+    name: 'Precision Engineering',
+    desc: 'Craft your first rare-tier item in Engineering.',
+    category: 'progression',
+    renown: 10,
+    trigger: { kind: 'visit', markId: 'craft_rare:engineering' },
+  },
+  prog_alchemy_rare: {
+    id: 'prog_alchemy_rare',
+    name: 'A Rare Vintage',
+    desc: 'Craft your first rare-tier item in Alchemy.',
+    category: 'progression',
+    renown: 10,
+    trigger: { kind: 'visit', markId: 'craft_rare:alchemy' },
+  },
+  prog_cooking_rare: {
+    id: 'prog_cooking_rare',
+    name: 'A Dish to Remember',
+    desc: 'Craft your first rare-tier item in Cooking.',
+    category: 'progression',
+    renown: 10,
+    trigger: { kind: 'visit', markId: 'craft_rare:cooking' },
+  },
+  prog_leatherworking_rare: {
+    id: 'prog_leatherworking_rare',
+    name: 'Fine Tanning',
+    desc: 'Craft your first rare-tier item in Leatherworking.',
+    category: 'progression',
+    renown: 10,
+    trigger: { kind: 'visit', markId: 'craft_rare:leatherworking' },
+  },
+  prog_tailoring_rare: {
+    id: 'prog_tailoring_rare',
+    name: "A Master's Stitch",
+    desc: 'Craft your first rare-tier item in Tailoring.',
+    category: 'progression',
+    renown: 10,
+    trigger: { kind: 'visit', markId: 'craft_rare:tailoring' },
+  },
+  prog_weaponcrafting_rare: {
+    id: 'prog_weaponcrafting_rare',
+    name: 'Tempered to a Shine',
+    desc: 'Craft your first rare-tier item in Weaponcrafting.',
+    category: 'progression',
+    renown: 10,
+    trigger: { kind: 'visit', markId: 'craft_rare:weaponcrafting' },
+  },
+  prog_armorcrafting_rare: {
+    id: 'prog_armorcrafting_rare',
+    name: 'Plated to Perfection',
+    desc: 'Craft your first rare-tier item in Armorcrafting.',
+    category: 'progression',
+    renown: 10,
+    trigger: { kind: 'visit', markId: 'craft_rare:armorcrafting' },
+  },
+  // The remaining starter-tier zones from the v0.32.0 expansion pick up the
+  // same chronicle pair the phase 20 pass gave Willowfen, Galecrest, and
+  // Farshore: identical infrastructure (starter-kit gather nodes plus the
+  // Vale-fallback catch table), just never wired to a deed. Drakelands
+  // already picked up its own pair (chr_drakemaw_broodlord,
+  // chr_maw_matriarch) with the v0.35.0 dragonkin brood rework, so this
+  // batch covers only the six zones that rework never touched. Copied
+  // line-for-line from the template above; renown 5 each.
+  chr_frostveil_gatherer: {
+    id: 'chr_frostveil_gatherer',
+    name: 'Terraced Harvest',
+    desc: 'Harvest an ore vein, a wood stand, and an herb patch in the Frostveil.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: {
+      kind: 'visits',
+      markIds: ['gather:frostveil:ore', 'gather:frostveil:wood', 'gather:frostveil:herb'],
+    },
+  },
+  chr_frostveil_first_cast: {
+    id: 'chr_frostveil_first_cast',
+    name: 'First Ice on the Tarn',
+    desc: 'Catch a fish from the waters of the Frostveil.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'fish:frostveil' },
+  },
+  chr_amberfall_gatherer: {
+    id: 'chr_amberfall_gatherer',
+    name: 'The Amberfall Harvest',
+    desc: 'Harvest an ore vein, a wood stand, and an herb patch in the Amberfall.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: {
+      kind: 'visits',
+      markIds: ['gather:amberfall:ore', 'gather:amberfall:wood', 'gather:amberfall:herb'],
+    },
+  },
+  chr_amberfall_first_cast: {
+    id: 'chr_amberfall_first_cast',
+    name: 'A Catch from the Great Mere',
+    desc: 'Catch a fish from the waters of the Amberfall.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'fish:amberfall' },
+  },
+  chr_nightbloom_gatherer: {
+    id: 'chr_nightbloom_gatherer',
+    name: 'The Dreaming Harvest',
+    desc: 'Harvest an ore vein, a wood stand, and an herb patch in the Nightbloom.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: {
+      kind: 'visits',
+      markIds: ['gather:nightbloom:ore', 'gather:nightbloom:wood', 'gather:nightbloom:herb'],
+    },
+  },
+  chr_nightbloom_first_cast: {
+    id: 'chr_nightbloom_first_cast',
+    name: 'A Ripple on the Moonwell',
+    desc: 'Catch a fish from the waters of the Nightbloom.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'fish:nightbloom' },
+  },
+  chr_wraithwood_gatherer: {
+    id: 'chr_wraithwood_gatherer',
+    name: 'Harvest Under the Canopy',
+    desc: 'Harvest an ore vein, a wood stand, and an herb patch in the Wraithwood.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: {
+      kind: 'visits',
+      markIds: ['gather:wraithwood:ore', 'gather:wraithwood:wood', 'gather:wraithwood:herb'],
+    },
+  },
+  chr_wraithwood_first_cast: {
+    id: 'chr_wraithwood_first_cast',
+    name: 'A Cast in the Looking-Glass',
+    desc: 'Catch a fish from the waters of the Wraithwood.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'fish:wraithwood' },
+  },
+  chr_palmreach_gatherer: {
+    id: 'chr_palmreach_gatherer',
+    name: 'Harvest on the Palmstrand',
+    desc: 'Harvest an ore vein, a wood stand, and an herb patch in the Palmreach.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: {
+      kind: 'visits',
+      markIds: ['gather:palmreach:ore', 'gather:palmreach:wood', 'gather:palmreach:herb'],
+    },
+  },
+  chr_palmreach_first_cast: {
+    id: 'chr_palmreach_first_cast',
+    name: 'Casting the Sapphire Lagoon',
+    desc: 'Catch a fish from the waters of the Palmreach.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'fish:palmreach' },
+  },
+  chr_evergarden_gatherer: {
+    id: 'chr_evergarden_gatherer',
+    name: "The Parterre's Bounty",
+    desc: 'Harvest an ore vein, a wood stand, and an herb patch in the Evergarden.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: {
+      kind: 'visits',
+      markIds: ['gather:evergarden:ore', 'gather:evergarden:wood', 'gather:evergarden:herb'],
+    },
+  },
+  chr_evergarden_first_cast: {
+    id: 'chr_evergarden_first_cast',
+    name: 'A Cast on the Petal Pond',
+    desc: 'Catch a fish from the waters of the Evergarden.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'fish:evergarden' },
+  },
+
+  // The WARFARE lifetime-honor ladder: what honor is FOR once the set is
+  // bought. The meter reads PlayerMeta.lifetimeHonor, which is monotonic
+  // (grantHonor only ever adds), so spending at the quartermaster can never
+  // take a rank back, and a veteran who earned the honor before these deeds
+  // shipped is credited by the join-time retro pass. Rank names follow the
+  // classic-era PvP ladder and lead up to Warmarshal Draven Kole, so the
+  // quartermaster reads as the top of the chain of command being climbed.
+  // Thresholds derive from a modelled ~900 honor per committed day of
+  // Thornhollow Fields (result honor plus the uncapped per-kill drip, after the
+  // per-opponent daily decay in src/sim/pvp/honor.ts), so roughly 11, 44 and 167
+  // committed days. Sergeant deliberately lands a little AFTER the 7,550-honor
+  // complete kit, so the first title rewards finishing the gear grind rather than
+  // being a step along it. The thresholds are the tunable here; the income
+  // assumption they rest on is written down so they can be moved with evidence
+  // rather than by feel.
+  pvp_honor_sergeant: {
+    id: 'pvp_honor_sergeant',
+    name: 'Sergeant',
+    desc: 'Earn 10,000 honor in your lifetime. Spending it never costs you the rank.',
+    category: 'pvp',
+    renown: 10,
+    trigger: { kind: 'meter', meter: 'lifetimeHonor', amount: 10_000 },
+    reward: { kind: 'title', text: 'Sergeant' },
+  },
+  pvp_honor_knight_lieutenant: {
+    id: 'pvp_honor_knight_lieutenant',
+    name: 'Knight-Lieutenant',
+    desc: 'Earn 40,000 honor in your lifetime, a season of real war behind you.',
+    category: 'pvp',
+    renown: 25,
+    trigger: { kind: 'meter', meter: 'lifetimeHonor', amount: 40_000 },
+    reward: { kind: 'title', text: 'Knight-Lieutenant' },
+  },
+  pvp_honor_field_marshal: {
+    id: 'pvp_honor_field_marshal',
+    name: 'Field Marshal',
+    desc: 'Earn 150,000 honor in your lifetime. Rare on any realm, and it should be.',
+    category: 'pvp',
+    renown: 50,
+    trigger: { kind: 'meter', meter: 'lifetimeHonor', amount: 150_000 },
+    reward: { kind: 'title', text: 'Field Marshal' },
   },
 };
 

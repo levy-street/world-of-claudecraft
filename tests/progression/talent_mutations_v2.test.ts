@@ -163,6 +163,38 @@ describe('canonical Talent V2 live mutations', () => {
     expect(warrior.player.cooldowns.get('raging_gale')).toBe(8);
   });
 
+  it('keeps talent-granted ability cooldowns aging across spec and build switches', () => {
+    const warrior = maxLevelWarrior();
+    expect(warrior.setSpec('fury')).toBe(true);
+    warrior.player.abilityCharges = {
+      raging_gale: { charges: 0, maxCharges: 2, recharge: 8, rechargeLength: 8 },
+    };
+    warrior.player.cooldowns.set('raging_gale', 8);
+
+    expect(warrior.setSpec('arms')).toBe(true);
+    for (let tick = 0; tick < 20; tick++) updateTimers(warrior.player);
+    expect(warrior.player.abilityCharges?.raging_gale?.recharge).toBeCloseTo(7, 6);
+    expect(warrior.player.cooldowns.get('raging_gale')).toBeCloseTo(7, 6);
+
+    expect(warrior.setSpec('fury')).toBe(true);
+    expect(warrior.player.abilityCharges?.raging_gale).toMatchObject({
+      charges: 0,
+      maxCharges: 2,
+      rechargeLength: 8,
+    });
+    expect(warrior.player.abilityCharges?.raging_gale?.recharge).toBeCloseTo(7, 6);
+    expect(warrior.player.cooldowns.get('raging_gale')).toBeCloseTo(7, 6);
+
+    expect(warrior.selectTalentRow(8, 'war_row_die_by_the_sword')).toBe(true);
+    warrior.player.cooldowns.set('die_by_sword', 120);
+    expect(warrior.selectTalentRow(8, 'war_row_victory_rush')).toBe(true);
+    for (let tick = 0; tick < 20; tick++) updateTimers(warrior.player);
+    expect(warrior.player.cooldowns.get('die_by_sword')).toBeCloseTo(119, 6);
+
+    expect(warrior.selectTalentRow(8, 'war_row_die_by_the_sword')).toBe(true);
+    expect(warrior.player.cooldowns.get('die_by_sword')).toBeCloseTo(119, 6);
+  });
+
   it('cleans removed proc payoffs and partial counters at the recompute choke point', () => {
     const rogue = new Sim({ seed: 74, playerClass: 'rogue', autoEquip: false });
     rogue.setPlayerLevel(20);

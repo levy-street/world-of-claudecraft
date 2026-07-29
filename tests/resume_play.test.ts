@@ -10,6 +10,7 @@ import {
   RESUME_MAX_AGE_MS,
   readPlayMarker,
   refreshPlayMarker,
+  resumeRoute,
   savePlayMarker,
   serializeMarker,
 } from '../src/net/resume_play';
@@ -271,14 +272,32 @@ describe('main.ts resume wiring', () => {
     expect(mainTs).toContain(
       "if (document.visibilityState === 'hidden') {\n      refreshPlayMarker(Date.now());",
     );
+    expect(mainTs).toContain("window.addEventListener('pagehide', () => {");
+    // Both lifecycle moments disarm the probe. Pinned as behavior rather than
+    // alongside a console echo: those echoes fired on every tab switch and were
+    // removed as log noise, which has no bearing on what this test guards.
     expect(mainTs).toContain(
-      "window.addEventListener('pagehide', () => {\n    refreshPlayMarker(Date.now());",
+      'refreshPlayMarker(Date.now());\n      // A page that leaves the foreground mid-entry',
     );
     // The same hide/pagehide moments also disarm the world-entry crash probe: leaving
     // the foreground (or a deliberate reload) is not a foreground entry crash, so it
     // must never cost the player a graphics tier (entry_crash_guard.ts).
     expect(mainTs).toContain(
-      "window.addEventListener('pagehide', () => {\n    refreshPlayMarker(Date.now());\n    clearEntryProbe();\n  });",
+      'refreshPlayMarker(Date.now());\n    stopActiveEntryDiagnostics();\n    clearEntryProbe();',
     );
+  });
+});
+
+describe('resumeRoute', () => {
+  it('routes a fresh marker into the world only on runtimes with involuntary reloads', () => {
+    // The native app and the mobile web client both suffer OS WebView
+    // eviction reloads mid-play; auto-entering the world there is recovery.
+    expect(resumeRoute({ nativeApp: true, mobileTouch: true })).toBe('world');
+    expect(resumeRoute({ nativeApp: true, mobileTouch: false })).toBe('world');
+    expect(resumeRoute({ nativeApp: false, mobileTouch: true })).toBe('world');
+  });
+
+  it('lands a desktop browser reload on character select, never straight in-world', () => {
+    expect(resumeRoute({ nativeApp: false, mobileTouch: false })).toBe('charselect');
   });
 });

@@ -15,6 +15,7 @@
 import puppeteer from 'puppeteer-core';
 import WebSocket from 'ws';
 import { BROWSER_PATH } from './browser_path.mjs';
+import { worldAuthMessage } from './lib/world_auth.mjs';
 
 const BASE = process.env.GAME_URL ?? 'http://localhost:8787';
 const WS_BASE = BASE.replace(/^http/, 'ws');
@@ -84,7 +85,7 @@ class Bot {
       this.ws = new WebSocket(`${WS_BASE}/ws`, { headers: { 'X-Forwarded-For': this.ip } });
       const to = setTimeout(() => reject(new Error('join timeout')), 10000);
       this.ws.on('open', () =>
-        this.ws.send(JSON.stringify({ t: 'auth', token: reg.body.token, character: ch.body.id })),
+        this.ws.send(JSON.stringify(worldAuthMessage(reg.body.token, ch.body.id))),
       );
       this.ws.on('message', (d) => {
         const m = JSON.parse(String(d));

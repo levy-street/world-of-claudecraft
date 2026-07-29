@@ -277,7 +277,7 @@ describe('main /api characterization: arena ladder + project-stats (cold-cache d
     await characterize('arena_default', makeReq({ method: 'GET', url: '/api/arena/leaderboard' }));
   });
 
-  it('GET /api/project-stats degrades to accounts_created 0', async () => {
+  it('GET /api/project-stats degrades to accounts_created 0 and characters_created 0', async () => {
     await characterize('project_stats', makeReq({ method: 'GET', url: '/api/project-stats' }));
   });
 });

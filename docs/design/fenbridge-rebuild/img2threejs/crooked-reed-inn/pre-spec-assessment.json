@@ -1,0 +1,208 @@
+{
+  "targetName": "Fenbridge Crooked Reed Inn",
+  "sourceImage": "docs/design/fenbridge-rebuild/img2threejs/crooked-reed-inn/zones/hero.png",
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "raised exterior-only marsh inn and provision house",
+      "primaryDomain": "object",
+      "formLanguage": ["stylized low-poly", "crooked timber construction", "swamp vernacular"],
+      "structureKind": [
+        "closed timber shell",
+        "raised porch",
+        "layered roof",
+        "attached service facade"
+      ],
+      "motionPotential": [
+        "static town building",
+        "fixed service sockets",
+        "nonblocking attached clutter"
+      ],
+      "materialFamilies": [
+        "dark timber",
+        "damp stone",
+        "oxidized teal shingles",
+        "rope and reeds",
+        "warm glass"
+      ],
+      "notes": "The four admitted crops, not the rejected fragmented whole-sheet mask, are the geometry evidence."
+    },
+    "complexity": {
+      "tier": "complex",
+      "scores": {
+        "silhouetteComplexity": 3,
+        "componentCount": 3,
+        "hierarchyDepth": 2,
+        "repetitionDensity": 2,
+        "materialLayerCount": 2,
+        "localDetailDensity": 3,
+        "occlusionRisk": 2,
+        "actionReadinessNeed": 1
+      },
+      "estimatedCounts": {
+        "macroComponents": 2,
+        "mesoComponents": 4,
+        "microFeatureGroups": 12,
+        "materialLayers": 2,
+        "repetitionSystems": 3
+      },
+      "reasoning": [
+        "The identity depends on a broad raised shell, deep full-width porch and a high bent teal roof rather than a generic house block.",
+        "Repeated porch posts, rope rails, warm window grids and roof courses must survive the merged two-primitive shipping contract.",
+        "Rear and hero crops confirm real depth for the provision counter, chimney, dormer and porch undercroft.",
+        "The exact underside of the roof and reed bundle is not exposed; those regions use restrained low-poly inferred depth."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "complex",
+      "minimumComponentLevels": ["macro", "meso", "micro"],
+      "needsRepetitionSystems": true,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": true,
+      "rationale": "Service readability depends on attached exterior systems and multi-angle depth, not an interior."
+    },
+    "unknownsToResolveBeforeImplementation": [],
+    "detailInventory": {
+      "scanMethod": "four admitted component-zone crops with hero cross-check",
+      "targetMinDetails": 10,
+      "details": [
+        {
+          "id": "bent-roof-ridge",
+          "kind": "contour",
+          "mapsTo": { "type": "component.localFeatures", "ref": "bent-ridge-profile" }
+        },
+        {
+          "id": "layered-teal-eaves",
+          "kind": "ridge",
+          "mapsTo": { "type": "component.localFeatures", "ref": "layered-eave-courses" }
+        },
+        {
+          "id": "raised-porch-undercroft",
+          "kind": "contour",
+          "mapsTo": { "type": "component.localFeatures", "ref": "open-piling-undercroft" }
+        },
+        {
+          "id": "rope-rail-net",
+          "kind": "linework",
+          "mapsTo": { "type": "component.localFeatures", "ref": "rope-rail-and-net" }
+        },
+        {
+          "id": "provision-rain-awning",
+          "kind": "contour",
+          "mapsTo": { "type": "component.localFeatures", "ref": "counter-rain-awning" }
+        },
+        {
+          "id": "hanging-reed-bundle",
+          "kind": "contour",
+          "mapsTo": { "type": "component.localFeatures", "ref": "reed-bundle-sign" }
+        },
+        {
+          "id": "dormer-window-grid",
+          "kind": "linework",
+          "mapsTo": { "type": "component.localFeatures", "ref": "dormer-window-grid" }
+        },
+        {
+          "id": "chimney-masonry-courses",
+          "kind": "seam",
+          "mapsTo": { "type": "component.localFeatures", "ref": "chimney-cap-courses" }
+        },
+        {
+          "id": "wet-timber-grain",
+          "kind": "linework",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "fenbridge-opaque/wet-timber-grain"
+          }
+        },
+        {
+          "id": "warm-window-glow",
+          "kind": "emissive",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "fenbridge-emissive/amber-window-glow"
+          }
+        }
+      ]
+    },
+    "anatomy": { "applies": false }
+  },
+  "qualityContract": {
+    "qualityBar": "complex game-ready exterior",
+    "definitionOfDone": [
+      "At gameplay distance the inn reads as the reference's broad raised provision house through its bent teal roof, deep porch, reed sign and side counter.",
+      "All visible clutter is attached inside the footprint; the offset local x=-2.8 entrance steps and service apron remain clear."
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 2,
+      "mesoComponents": 4,
+      "microFeatureGroups": 10,
+      "materialLayers": 2,
+      "repetitionSystems": 2,
+      "reviewViewpoints": 4
+    },
+    "featureGroups": [
+      {
+        "id": "inn-silhouette",
+        "name": "Raised broad inn and bent roof",
+        "required": true,
+        "qualityCriteria": ["Broad width, lifted floor, chimney and bent ridge remain legible."],
+        "evidenceRefs": ["front", "hero"],
+        "failureModes": ["reads as a generic cottage"]
+      },
+      {
+        "id": "porch-system",
+        "name": "Deep porch and clear entrance",
+        "required": true,
+        "qualityCriteria": [
+          "Posts, steps, undercroft and rope rail create real depth without blocking entry."
+        ],
+        "evidenceRefs": ["front", "hero"],
+        "failureModes": ["porch collapses into facade trim"]
+      },
+      {
+        "id": "provision-service",
+        "name": "Provision counter and rain awning",
+        "required": true,
+        "qualityCriteria": [
+          "Counter remains exterior, attached and readable from the civic-facing side."
+        ],
+        "evidenceRefs": ["side", "hero"],
+        "failureModes": ["service identity is absent"]
+      },
+      {
+        "id": "material-separation",
+        "name": "Swamp material and warm-light separation",
+        "required": true,
+        "qualityCriteria": [
+          "Dark timber, damp stone, teal roof, rope and amber glazing remain distinct."
+        ],
+        "evidenceRefs": ["front", "rear", "hero"],
+        "failureModes": ["two-bucket merge flattens semantic colors"]
+      }
+    ],
+    "visualDeltaChecks": [
+      "bent ridge and porch silhouette",
+      "porch negative space",
+      "counter awning depth",
+      "reed sign placement",
+      "teal-to-timber-to-amber separation"
+    ],
+    "antiShallowSpecRules": [
+      "Do not substitute a straight generic gable for the bent roof.",
+      "Do not model an inaccessible interior.",
+      "Do not detach clutter into the player approach."
+    ],
+    "mustNotDo": ["No readable sign.", "No loose porch clutter.", "No hidden backface detail."]
+  },
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Fenbridge Crooked Reed Inn stylized exterior timber inn porch procedural building low-poly",
+    "indexFingerprint": "6857e5ab528b42ac12f4f411f862610a0bffce8e47aee3610a7603c318072fe8",
+    "sourceRefs": [
+      "grimoire/glossary/3d_vocabulary.md",
+      "grimoire/intake/surface_topology.md",
+      "grimoire/build/geometry_patterns.md"
+    ],
+    "evidenceRefs": ["core.topology-intent", "core.pbr-hand-painted-vs-pbr-texture"]
+  }
+}

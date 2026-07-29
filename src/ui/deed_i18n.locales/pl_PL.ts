@@ -7,6 +7,102 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: 'Sztandar w dłoni',
+    desc: 'Przechwyć flagę na Polach Ciernistej Kotliny.',
+  },
+  pvp_bg_first_win: {
+    name: 'Kotlina się broni',
+    desc: 'Wygraj bitwę na Polach Ciernistej Kotliny.',
+  },
+  pvp_bg_wins_25: {
+    name: 'Strażnik Kotliny',
+    desc: 'Wygraj 25 bitew na Polach Ciernistej Kotliny.',
+    title: 'Chorąży',
+  },
+  pvp_bg_captures_100: {
+    name: 'Sto Sztandarów',
+    desc: 'Przechwyć 100 flag na Polach Ciernistej Kotliny w ciągu swojej kariery.',
+  },
+  dgn_rift: {
+    name: 'Wędrowiec Szczelin',
+    desc: 'Oczyść Szczelinę, pokonując jej bossa piętra.',
+  },
+  dgn_rift_s_rank: {
+    name: 'Władca Szczelin',
+    desc: 'Oczyść Szczelinę rangi S, najtrudniejszy poziom, jaki może wygenerować portal Szczeliny.',
+  },
+  pvp_honor_sergeant: {
+    name: 'Sierżant',
+    desc: 'Zdobądź 10 000 Honoru w ciągu całej kariery. Wydawanie go nigdy nie kosztuje cię rangi.',
+    title: 'Sierżant',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: 'Rycerz-Porucznik',
+    desc: 'Zdobądź 40 000 Honoru w ciągu całej kariery, mając za sobą sezon prawdziwej wojny.',
+    title: 'Rycerz-Porucznik',
+  },
+  pvp_honor_field_marshal: {
+    name: 'Marszałek Polny',
+    desc: 'Zdobądź 150 000 Honoru w ciągu całej kariery. Rzadkość na każdym królestwie, i tak powinno być.',
+    title: 'Marszałek Polny',
+  },
+  chr_drakemaw_broodlord: {
+    name: 'Pogromca Wylęgu',
+    desc: 'Zgładź Władcę Wylęgu Smoczej Paszczy pośród jego jaj, przez ryk, rozcinający cios i ogień.',
+  },
+  chr_maw_matriarch: {
+    name: 'Niebo Milknie',
+    desc: 'Zgładź Cindraleth, Matriarchinię Paszczy, w jej kraterowym gnieździe nad Smoczą Paszczą.',
+  },
+  chr_frostveil_gatherer: {
+    name: 'Zbiory na tarasach',
+    desc: 'Zbierz zyle rudy, kepke drewna i grzadke ziol we Frostveilu.',
+  },
+  chr_frostveil_first_cast: {
+    name: 'Pierwszy lod na jeziorze',
+    desc: 'Zlow rybe w wodach Frostveilu.',
+  },
+  chr_amberfall_gatherer: {
+    name: 'Zbiory Amberfallu',
+    desc: 'Zbierz zyle rudy, kepke drewna i grzadke ziol w Amberfallu.',
+  },
+  chr_amberfall_first_cast: {
+    name: 'Polow z wielkich mokradel',
+    desc: 'Zlow rybe w wodach Amberfallu.',
+  },
+  chr_nightbloom_gatherer: {
+    name: 'Sniace zbiory',
+    desc: 'Zbierz zyle rudy, kepke drewna i grzadke ziol w Nightbloomie.',
+  },
+  chr_nightbloom_first_cast: {
+    name: 'Kragi na ksiezycowej studni',
+    desc: 'Zlow rybe w wodach Nightbloomu.',
+  },
+  chr_wraithwood_gatherer: {
+    name: 'Zbiory pod koronami',
+    desc: 'Zbierz zyle rudy, kepke drewna i grzadke ziol w Wraithwoodzie.',
+  },
+  chr_wraithwood_first_cast: {
+    name: 'Rzut w lustrzanej zatoce',
+    desc: 'Zlow rybe w wodach Wraithwoodu.',
+  },
+  chr_palmreach_gatherer: {
+    name: 'Zbiory na palmowej plazy',
+    desc: 'Zbierz zyle rudy, kepke drewna i grzadke ziol w Palmreachu.',
+  },
+  chr_palmreach_first_cast: {
+    name: 'Rzut w szafirowej lagunie',
+    desc: 'Zlow rybe w wodach Palmreachu.',
+  },
+  chr_evergarden_gatherer: {
+    name: 'Dar parteru',
+    desc: 'Zbierz zyle rudy, kepke drewna i grzadke ziol w Evergardenie.',
+  },
+  chr_evergarden_first_cast: {
+    name: 'Rzut na platkowym stawie',
+    desc: 'Zlow rybe w wodach Evergardenu.',
+  },
   pvp_card_duel_first_win: {
     name: 'Zasady Domu',
     desc: 'Wygraj Pojedynek Karciany u Mistrza Kart.',
@@ -79,7 +175,7 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: 'Mistrz Łąk', desc: 'Osiągnij 100 biegłości w Zielarstwie.' },
   prog_master_gatherer: {
     name: 'Mistrz Zbieractwa',
-    desc: 'Osiągnij 100 biegłości w Górnictwie, Drwalnictwie i Zielarstwie.',
+    desc: 'Osiągnij 100 biegłości w dowolnych trzech spośród Górnictwa, Drwalnictwa, Zielarstwa i Wędkarstwa.',
   },
   prog_first_craft: { name: 'Własnoręczna Robota', desc: 'Ukończ swój pierwszy udany wyrób.' },
   prog_craft_specialist: {
@@ -429,7 +525,10 @@ export const table: DeedLocaleTable = {
     name: 'Stały klient',
     desc: 'Odkryj wszystkie dziesięć przedmiotów z zapasów Kwatermistrza Vexa.',
   },
-  col_glimmerfin: { name: 'Promyk nadziei', desc: 'Złów Lśniącopłetwego karpia koi.' },
+  col_glimmerfin: {
+    name: 'Promyk nadziei',
+    desc: 'Złów Karpika Słonecznoblask.',
+  },
   col_full_creel: {
     name: 'Pełen kosz',
     desc: 'Odkryj wszystkie sześć pospolitych ryb z wód Doliny, Trzęsawiska i Wyżyn.',
@@ -612,7 +711,7 @@ export const table: DeedLocaleTable = {
   },
   exp_something_shiny: { name: 'Błyskotka', desc: 'Podnieś z ziemi migoczący przedmiot.' },
   exp_first_ore: {
-    name: 'Kilofem w ziemię!',
+    name: 'Kilof spotyka Kamień',
     desc: 'Wydobądź surowce ze swojego pierwszego złoża rudy.',
   },
   exp_first_timber: { name: 'Uwaga, drzewo!', desc: 'Pozyskaj swoje pierwsze stanowisko drewna.' },
@@ -683,5 +782,200 @@ export const table: DeedLocaleTable = {
   chr_marsh_first_cast: {
     name: 'Węgorze w trzcinach',
     desc: 'Złów rybę w wodach Trzęsawiska Mokrzawia.',
+  },
+  prog_guildsworn: {
+    name: 'Zaprzysiężony Rzemiosłu',
+    desc: 'Dostroić się do pary archetypów i podjąć na serio jej rzemiosła.',
+    title: 'Zaprzysiężony Rzemiosłu',
+  },
+  prog_masterwright: {
+    name: 'Mistrz Wyrobu',
+    desc: 'Wykonać swoje pierwsze arcydzieło, coś tak znakomitego, że sława o nim rozlega się po całej strefie.',
+    title: 'Mistrz Wyrobu',
+  },
+  prog_fishing_100: {
+    name: 'Stary Solony',
+    desc: 'Osiągnij 100 biegłości w Wędkarstwie.',
+  },
+  prog_master_angler: {
+    name: 'Mistrz Wędkarstwa',
+    desc: 'Osiągnij 200 biegłości w Wędkarstwie, sam szczyt sztuki wędkarskiej.',
+    title: 'Mistrz Wędkarstwa',
+  },
+  prog_engineering_50: {
+    name: 'Tryby i Sprężyny',
+    desc: 'Osiągnij 50 umiejętności w Inżynierii.',
+  },
+  prog_alchemy_50: {
+    name: 'Dziwne Wywary',
+    desc: 'Osiągnij 50 umiejętności w Alchemii.',
+  },
+  prog_cooking_50: {
+    name: 'Doświadczony Kucharz',
+    desc: 'Osiągnij 50 umiejętności w Gotowaniu.',
+  },
+  prog_leatherworking_50: {
+    name: 'Rzemiosło Garbarza',
+    desc: 'Osiągnij 50 umiejętności w Garbarstwie.',
+  },
+  prog_tailoring_50: {
+    name: 'Dobre Szycie',
+    desc: 'Osiągnij 50 umiejętności w Krawiectwie.',
+  },
+  prog_enchanting_50: {
+    name: 'Blask Arkany',
+    desc: 'Osiągnij 50 umiejętności w Czarodziejstwie.',
+  },
+  prog_weaponcrafting_50: {
+    name: 'Ostrze i Zahartowanie',
+    desc: 'Osiągnij 50 umiejętności w Wytwarzaniu Broni.',
+  },
+  prog_armorcrafting_50: {
+    name: 'Młot i Płyta',
+    desc: 'Osiągnij 50 umiejętności w Wytwarzaniu Pancerzy.',
+  },
+  prog_grandmaster_engineering: {
+    name: 'Arcymistrzostwo Inżynierii',
+    desc: 'Osiągnij 125 umiejętności w Inżynierii, sam szczyt rzemiosła.',
+    title: 'Arcymistrzostwo Inżynierii',
+  },
+  prog_grandmaster_alchemy: {
+    name: 'Arcymistrzostwo Alchemii',
+    desc: 'Osiągnij 125 umiejętności w Alchemii, sam szczyt rzemiosła.',
+    title: 'Arcymistrzostwo Alchemii',
+  },
+  prog_grandmaster_cooking: {
+    name: 'Arcymistrzostwo Gotowania',
+    desc: 'Osiągnij 125 umiejętności w Gotowaniu, sam szczyt rzemiosła.',
+    title: 'Arcymistrzostwo Gotowania',
+  },
+  prog_grandmaster_leatherworking: {
+    name: 'Arcymistrzostwo Garbarstwa',
+    desc: 'Osiągnij 125 umiejętności w Garbarstwie, sam szczyt rzemiosła.',
+    title: 'Arcymistrzostwo Garbarstwa',
+  },
+  prog_grandmaster_tailoring: {
+    name: 'Arcymistrzostwo Krawiectwa',
+    desc: 'Osiągnij 125 umiejętności w Krawiectwie, sam szczyt rzemiosła.',
+    title: 'Arcymistrzostwo Krawiectwa',
+  },
+  prog_grandmaster_enchanting: {
+    name: 'Arcymistrzostwo Czarodziejstwa',
+    desc: 'Osiągnij 125 umiejętności w Czarodziejstwie, sam szczyt rzemiosła.',
+    title: 'Arcymistrzostwo Czarodziejstwa',
+  },
+  prog_grandmaster_weaponcrafting: {
+    name: 'Arcymistrzostwo Wytwarzania Broni',
+    desc: 'Osiągnij 125 umiejętności w Wytwarzaniu Broni, sam szczyt rzemiosła.',
+    title: 'Wielki Mistrz Wytwarzania Broni',
+  },
+  prog_grandmaster_armorcrafting: {
+    name: 'Arcymistrzostwo Wytwarzania Pancerzy',
+    desc: 'Osiągnij 125 umiejętności w Wytwarzaniu Pancerzy, sam szczyt rzemiosła.',
+    title: 'Arcymistrzostwo Wytwarzania Pancerzy',
+  },
+  col_pristine_vein: {
+    name: 'Nieskazitelna Żyła',
+    desc: 'Rozbij nieskazitelną żyłę i niech cała strefa się o tym dowie.',
+  },
+  col_ancient_heartwood: {
+    name: 'Starożytna Twardziel',
+    desc: 'Wydobyć polano starożytnej twardzieli z powalonego drzewostanu.',
+  },
+  col_moonlit_bloom: {
+    name: 'Rozkwit w Blasku Księżyca',
+    desc: 'Zebrać rozkwit w blasku księżyca w chwili, gdy się rozchyla.',
+  },
+  col_perfect_specimen: {
+    name: 'Nieskazitelny Okaz',
+    desc: 'Wydobyć nieskazitelny okaz z upolowanej bestii, bez żadnej rysy ani skazy.',
+  },
+  soc_first_salvage: {
+    name: 'Nic Się Nie Marnuje',
+    desc: 'Odzyskaj część ekwipunku, rozkładając ją na surowce.',
+  },
+  soc_salvage_50: {
+    name: 'Dziedziniec Rozbieraczy',
+    desc: 'Odzyskaj 50 sztuk ekwipunku, rozkładając je na surowce.',
+  },
+  dgn_wildheart_basin: {
+    name: 'Kotlina Odgryza Się',
+    desc: 'Pokonaj Zulgara, Głos Kotliny, w Kotlinie Dzikiego Serca.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Heroiczna: Kotlina Dzikiego Serca',
+    desc: 'Pokonaj Zulgara, Głos Kotliny, w Kotlinie Dzikiego Serca na heroicznym poziomie trudności.',
+  },
+  chr_peaks_gatherer: {
+    name: 'Plon z wyżyn',
+    desc: 'Pozyskaj żyłę rudy, drzewostan i kępę ziół na Wyżynach Ciernistego Szczytu.',
+  },
+  chr_marsh_rares_ii: {
+    name: 'Żarłok, doliczony',
+    desc: 'Zabij Robakopaszczego Żarłoka, czwartą osławioną zgrozę Trzęsawiska Mokrzawia pominiętą w pierwszym rachunku.',
+  },
+  chr_peaks_rares_ii: {
+    name: 'Więcej imion wyrytych w skale',
+    desc: 'Zabij Starego Skalnopaszczego i Odłamkowładcę Kazzixa, dwie kolejne osławione zgrozy Wyżyn Ciernistego Szczytu pominięte w pierwszym rachunku.',
+  },
+  chr_gleamstag: {
+    name: 'Legenda, która nigdy nie uderzała pierwsza',
+    desc: 'Zabij Lśniącego Jelenia, rzadkiego i płochliwego elitarnego przeciwnika, który atakuje tylko osaczony.',
+  },
+  chr_hollow_rares: {
+    name: 'Stado pamięta',
+    desc: 'Zabij Starego Szpikoskorupa i Aurelhorna, Pierwszego ze Stada, dwóch wędrownych rzadkich bossów Zasłoniętej Kotliny.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Obfitość mokradeł',
+    desc: 'Pozyskaj żyłę rudy, drzewostan i kępę ziół na Wierzbowych Mokradłach.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Kręgi na Liliowych Wrzosowiskach',
+    desc: 'Złów rybę w wodach Wierzbowych Mokradeł.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Zbiory na przylądku',
+    desc: 'Pozyskaj żyłę rudy, drzewostan i kępę ziół na Wichrowym Grzbiecie.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'Żyłka w Lustrzanym Jeziorku',
+    desc: 'Złów rybę w wodach Wichrowego Grzbietu.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Wyspiarskie zapasy',
+    desc: 'Pozyskaj żyłę rudy, drzewostan i kępę ziół na Dalekim Wybrzeżu.',
+  },
+  chr_farshore_first_cast: {
+    name: 'Co wiedzą mewy',
+    desc: 'Złów rybę w wodach Dalekiego Wybrzeża.',
+  },
+  prog_engineering_rare: {
+    name: 'Precyzyjna inżynieria',
+    desc: 'Wykonaj swój pierwszy przedmiot rzadkiej jakości w Inżynierii.',
+  },
+  prog_alchemy_rare: {
+    name: 'Rzadki rocznik',
+    desc: 'Wykonaj swój pierwszy przedmiot rzadkiej jakości w Alchemii.',
+  },
+  prog_cooking_rare: {
+    name: 'Danie do zapamiętania',
+    desc: 'Wykonaj swój pierwszy przedmiot rzadkiej jakości w Gotowaniu.',
+  },
+  prog_leatherworking_rare: {
+    name: 'Precyzyjne garbowanie',
+    desc: 'Wykonaj swój pierwszy przedmiot rzadkiej jakości w Garbarstwie.',
+  },
+  prog_tailoring_rare: {
+    name: 'Mistrzowski ścieg',
+    desc: 'Wykonaj swój pierwszy przedmiot rzadkiej jakości w Krawiectwie.',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Hartowane na połysk',
+    desc: 'Wykonaj swój pierwszy przedmiot rzadkiej jakości w Wytwarzaniu Broni.',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Opancerzone do perfekcji',
+    desc: 'Wykonaj swój pierwszy przedmiot rzadkiej jakości w Wytwarzaniu Pancerzy.',
   },
 };

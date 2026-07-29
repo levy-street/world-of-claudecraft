@@ -11,6 +11,7 @@ import type { FocusTrapHandle } from '../../focus_manager';
 import type { PainterHostWriters } from '../../painter_host';
 import {
   choicePromptOpen,
+  choicePromptSync,
   choiceResolve,
   createSceneChoiceState,
   sceneChoiceView,
@@ -19,6 +20,7 @@ import { SceneChoiceWindow } from './scene_choice_window';
 import {
   createSceneOverlayState,
   overlayApplyOp,
+  overlayApplySync,
   overlayShowReply,
   sceneOverlayView,
 } from './scene_overlay_view';
@@ -63,6 +65,36 @@ export class SceneHudController {
   /** Route one drained SimEvent (Hud.handleEvents already pid-gated it). */
   onEvent(ev: SimEvent): void {
     const nowSec = this.deps.now() / 1000;
+    if (ev.type === 'sceneSync') {
+      overlayApplySync(this.overlay, ev.state);
+      return;
+    }
+    if (ev.type === 'sceneChoiceSync') {
+      this.releaseTrap();
+      const state = ev.state;
+      choicePromptSync(
+        this.choice,
+        state === null
+          ? null
+          : {
+              choiceId: state.choiceId,
+              promptKey: state.promptKey,
+              options: state.options,
+              windowSeconds: state.windowSeconds,
+              defaultOptionId: state.defaultOptionId,
+              leaderPid: state.leaderPid,
+              values: state.values,
+            },
+        state?.remainingSeconds ?? null,
+        nowSec,
+      );
+      this.update();
+      if (state !== null && state.leaderPid === this.deps.world().playerId) {
+        this.trap = this.deps.openFocusTrap(this.choiceWindow.root);
+        this.trap.focusFirst('.scene-choice-option');
+      }
+      return;
+    }
     if (ev.type === 'scene') {
       overlayApplyOp(this.overlay, ev.op, nowSec);
       return;
@@ -106,6 +138,13 @@ export class SceneHudController {
       sceneChoiceView(this.choice, nowSec, this.deps.world().playerId),
       this.leaderName(),
     );
+  }
+
+  /** Re-resolve all construction-time and cold-rendered scene chrome. */
+  relocalize(): void {
+    this.overlayWindow.relocalize();
+    this.choiceWindow.relocalize();
+    this.update();
   }
 
   private leaderName(): string {

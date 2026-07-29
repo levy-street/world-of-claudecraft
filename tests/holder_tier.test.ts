@@ -1,11 +1,19 @@
 import { describe, expect, it } from 'vitest';
 import {
-  HOLDER_TIER_DEFS, holderTierByIndex as sharedHolderTierByIndex,
+  HOLDER_TIER_DEFS,
   holderTierIndexForBalance,
+  holderTierByIndex as sharedHolderTierByIndex,
 } from '../src/sim/holder_tier';
 import {
-  HOLDER_TIERS, WOC_MAX_SUPPLY, holderTierForBalance, holderTierByIndex,
-  tierSupplyShare, holderTierBadgeDataUrl,
+  HOLDER_TIERS,
+  type HolderTier,
+  holderCardBadgeClass,
+  holderTierBadgeDataUrl,
+  holderTierByIndex,
+  holderTierForBalance,
+  holderTierIsRegalia,
+  tierSupplyShare,
+  WOC_MAX_SUPPLY,
 } from '../src/ui/holder_tier';
 
 describe('holder-tier ladder', () => {
@@ -33,7 +41,9 @@ describe('holder-tier ladder', () => {
   });
 
   it('keeps UI presentation rungs aligned with the shared pure tier definitions', () => {
-    expect(HOLDER_TIERS.map(({ index, key, threshold }) => ({ index, key, threshold }))).toEqual(HOLDER_TIER_DEFS);
+    expect(HOLDER_TIERS.map(({ index, key, threshold }) => ({ index, key, threshold }))).toEqual(
+      HOLDER_TIER_DEFS,
+    );
   });
 
   it('returns null with no wallet or a sub-threshold balance', () => {
@@ -96,24 +106,26 @@ describe('holder-tier ladder', () => {
     expect(tierSupplyShare(vaultwarden)).toBeCloseTo(0.0001, 10);
   });
 
-  it('builds an SVG data URL embedding the rung ring colour', () => {
-    const ember = HOLDER_TIERS[0];
-    const url = holderTierBadgeDataUrl(ember);
-    expect(url.startsWith('data:image/svg+xml,')).toBe(true);
-    expect(decodeURIComponent(url)).toContain(ember.ring);
-    expect(decodeURIComponent(url)).toContain('<svg');
+  it('builds a valid 64-viewBox SVG data URL for every rung', () => {
+    for (const tier of HOLDER_TIERS) {
+      const url = holderTierBadgeDataUrl(tier);
+      expect(url.startsWith('data:image/svg+xml,')).toBe(true);
+      const svg = decodeURIComponent(url.slice('data:image/svg+xml,'.length));
+      expect(svg).toContain('<svg');
+      expect(svg).toContain('viewBox="0 0 64 64"');
+    }
   });
 
-  it('embeds both gradient stops, the radial gradient, and the glyph for a tier whose glow differs from its ring', () => {
-    const sovereign = HOLDER_TIERS[17];
-    // Guard the premise: this assertion only proves the glow stop is present
-    // if glow is a distinct colour from ring.
-    expect(sovereign.glow).not.toBe(sovereign.ring);
-    const svg = decodeURIComponent(holderTierBadgeDataUrl(sovereign));
-    expect(svg).toContain(sovereign.ring);
-    expect(svg).toContain(sovereign.glow);
-    expect(svg).toContain('radialGradient');
-    expect(svg).toContain(sovereign.glyph);
+  it('parameterises the band III sigil plate from the rung ring and glow hues', () => {
+    // Band III (2%-9% of supply) is the one band whose SVG is drawn straight from
+    // the tier ring/glow hues (they double as the halo drivers); bands I/II/IV
+    // carry their own material palettes.
+    const stormcaller = holderTierByIndex(10)!; // 3% of supply, band III
+    expect(stormcaller.glow).not.toBe(stormcaller.ring);
+    const svg = decodeURIComponent(holderTierBadgeDataUrl(stormcaller));
+    expect(svg).toContain(stormcaller.ring);
+    expect(svg).toContain(stormcaller.glow);
+    expect(svg).toContain('Gradient'); // gradient fill (no <filter>)
   });
 
   it('computes each rung supply share as its own threshold over 1e9', () => {
@@ -161,14 +173,121 @@ describe('holder-tier ladder', () => {
     }
   });
 
-  it('builds a decodable SVG badge embedding the ring colour for all eighteen rungs', () => {
+  it('builds a decodable SVG badge for all eighteen rungs', () => {
     expect(HOLDER_TIERS.length).toBe(18);
     for (const t of HOLDER_TIERS) {
       const url = holderTierBadgeDataUrl(t);
       expect(url.startsWith('data:image/svg+xml,')).toBe(true);
       const svg = decodeURIComponent(url.slice('data:image/svg+xml,'.length));
       expect(svg).toContain('<svg');
-      expect(svg).toContain(`stop-color="${t.ring}"`);
     }
+  });
+});
+
+// The frozen ring/glow hue ramp: the reskin KEEPS these (they are CSS hooks, and
+// now also drive the per-tier halo). A drift here is a data regression, caught
+// independently of the sim ladder pin below.
+const EXPECTED_HUES: Record<string, { ring: string; glow: string }> = {
+  ember: { ring: '#ff8a4c', glow: '#ff5e1f' },
+  coinbearer: { ring: '#d79a4e', glow: '#b9792e' },
+  coppercrest: { ring: '#d27d45', glow: '#a8551f' },
+  silverbound: { ring: '#cbd6e2', glow: '#9fb2c9' },
+  gilded: { ring: '#ffd24a', glow: '#e0a52a' },
+  vaultwarden: { ring: '#57e0b9', glow: '#1fae86' },
+  whale: { ring: '#4ea8ff', glow: '#1f6fe0' },
+  leviathan: { ring: '#9b6cff', glow: '#6a37e0' },
+  tidelord: { ring: '#a66af2', glow: '#7736d1' },
+  stormcaller: { ring: '#b168e5', glow: '#8434c3' },
+  krakencrown: { ring: '#bc67d8', glow: '#9133b4' },
+  titanforged: { ring: '#c765cb', glow: '#9e31a5' },
+  starhoard: { ring: '#d363be', glow: '#ab3096' },
+  voidwarden: { ring: '#de61b1', glow: '#b82e88' },
+  realmshaper: { ring: '#e95fa4', glow: '#c52d79' },
+  worldforger: { ring: '#f45e97', glow: '#d22b6a' },
+  worldbearer: { ring: '#ff5c8a', glow: '#e02a5c' },
+  sovereign: { ring: '#ffe27a', glow: '#ffaa00' },
+};
+
+// --- Ascendant Sigils reskin: badge-art regression pins. ---
+describe('Ascendant Sigils holder badges', () => {
+  const decode = (tier: HolderTier, px = 64) =>
+    decodeURIComponent(holderTierBadgeDataUrl(tier, px).slice('data:image/svg+xml,'.length));
+
+  it('produces eighteen pairwise-distinct badge data URLs', () => {
+    // The shipped placeholder art leaned on one shared gem device across the whole
+    // 2%-9% band (visually near-identical, differing only by dot count); this pins
+    // that the reskin keeps every rung its own distinguishable badge.
+    const urls = HOLDER_TIERS.map((t) => holderTierBadgeDataUrl(t, 64));
+    expect(new Set(urls).size).toBe(18);
+  });
+
+  it('lights exactly N of the nine sockets on the band III plate for an N% rung', () => {
+    // Each 2%-9% rung lights that many sockets. The lit-socket cream pip (an
+    // r="1" cream circle) is the stable per-lit-socket marker in the SVG; unlit
+    // sockets have none. Red before the reskin (the old art had zero sockets).
+    for (let percent = 2; percent <= 9; percent++) {
+      const tier = holderTierForBalance(percent * 10_000_000)!; // 20M..90M
+      const lit = (decode(tier).match(/r="1" fill="#fff6df"/g) ?? []).length;
+      expect(lit).toBe(percent);
+    }
+  });
+
+  it('emits no SVG <filter> in any badge (gradients and strokes only)', () => {
+    for (const t of HOLDER_TIERS) {
+      expect(decode(t)).not.toContain('<filter');
+      // Also guard the URI-encoded form the browser actually parses. The word
+      // "filter" appears nowhere legitimately, so any occurrence is a smell.
+      expect(holderTierBadgeDataUrl(t, 64).toLowerCase()).not.toContain('filter');
+    }
+  });
+
+  it('freezes the ring/glow hue ramp and keeps the ladder keys/thresholds in lockstep with sim', () => {
+    // The reskin must not drift the data the sim, CSS hooks, and halo depend on.
+    expect(HOLDER_TIERS.map((t) => t.key)).toEqual(HOLDER_TIER_DEFS.map((d) => d.key));
+    expect(HOLDER_TIERS.map((t) => t.threshold)).toEqual(HOLDER_TIER_DEFS.map((d) => d.threshold));
+    for (const t of HOLDER_TIERS) {
+      const hues = EXPECTED_HUES[t.key];
+      expect(hues).toBeDefined();
+      expect(t.ring).toBe(hues.ring);
+      expect(t.glow).toBe(hues.glow);
+    }
+  });
+
+  it('marks only the two band IV rungs (Worldbearer, Sovereign) as regalia for the stronger halo', () => {
+    for (const t of HOLDER_TIERS) {
+      expect(holderTierIsRegalia(t)).toBe(t.index >= 17);
+    }
+    expect(holderTierIsRegalia(holderTierByIndex(17)!)).toBe(true); // worldbearer
+    expect(holderTierIsRegalia(holderTierByIndex(18)!)).toBe(true); // sovereign
+    expect(holderTierIsRegalia(holderTierByIndex(16)!)).toBe(false); // worldforger, band III
+  });
+
+  it('opts the player-card badge into the halo, with the strong modifier only for regalia', () => {
+    // Pins the wiring the inspect/player card threads: every rung gets the halo
+    // opt-in class, and only the two band IV regalia get the stronger-halo class.
+    for (const t of HOLDER_TIERS) {
+      const cls = holderCardBadgeClass(t);
+      expect(cls).toContain('inspect-holder-badge');
+      expect(cls).toContain('inspect-holder-halo');
+      expect(cls.includes('inspect-holder-halo-strong')).toBe(t.index >= 17);
+    }
+    // The non-regalia class must not accidentally carry the strong modifier as a
+    // substring artifact.
+    expect(holderCardBadgeClass(holderTierByIndex(16)!)).toBe(
+      'inspect-holder-badge inspect-holder-halo',
+    );
+    expect(holderCardBadgeClass(holderTierByIndex(18)!)).toBe(
+      'inspect-holder-badge inspect-holder-halo inspect-holder-halo-strong',
+    );
+  });
+
+  it('embeds the band II Leviathan full-creature glyph', () => {
+    const leviathan = holderTierByIndex(8)!;
+    expect(leviathan.name).toBe('Leviathan');
+    const svg = decode(leviathan);
+    // The bioluminescent flank light and the glowing eye pupil are part of the
+    // Leviathan glyph.
+    expect(svg).toContain('#b99bff');
+    expect(svg).toContain('#e8dcff');
   });
 });

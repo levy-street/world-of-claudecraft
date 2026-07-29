@@ -20,6 +20,7 @@ import {
   moveBetweenContainers,
   sanitizeBankState,
 } from '../src/sim/bank';
+import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { BUILTIN_WORLD, ITEMS, QUESTS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type {
@@ -228,6 +229,42 @@ describe('deposit rules', () => {
     expect(m.inventory.find((s) => s.itemId === 'wolf_fang' && s.instance)!.instance).toEqual({
       signer: 'Ana',
     });
+  });
+
+  it('a deposit merges into an existing byte-equal bank stack and a withdraw merges back', () => {
+    const sim = makeSim();
+    const m = meta(sim);
+    // Seed the bank with a signed stack of 2, then deposit another byte-equal copy.
+    sim.addItemInstance('wolf_fang', { signer: 'Ana' }, sim.playerId);
+    sim.addItemInstance('wolf_fang', { signer: 'Ana' }, sim.playerId);
+    sim.bankDeposit(m.inventory.findIndex((s) => s.itemId === 'wolf_fang' && s.instance));
+    sim.addItemInstance('wolf_fang', { signer: 'Ana' }, sim.playerId);
+    sim.bankDeposit(m.inventory.findIndex((s) => s.itemId === 'wolf_fang' && s.instance));
+    const banked = m.bank.inventory.filter((s) => s.itemId === 'wolf_fang');
+    expect(banked).toHaveLength(1);
+    expect(banked[0].count).toBe(3);
+    expect(banked[0].instance).toEqual({ signer: 'Ana' });
+    // The return trip: with a byte-equal stack already in the bags, the
+    // withdrawal merges back instead of opening a second carried slot.
+    sim.addItemInstance('wolf_fang', { signer: 'Ana' }, sim.playerId);
+    sim.bankWithdraw(m.bank.inventory.findIndex((s) => s.instance));
+    const carried = m.inventory.filter((s) => s.itemId === 'wolf_fang');
+    expect(carried).toHaveLength(1);
+    expect(carried[0].count).toBe(4);
+    expect(carried[0].instance).toEqual({ signer: 'Ana' });
+    expect(m.bank.inventory.some((s) => s.itemId === 'wolf_fang')).toBe(false);
+  });
+
+  it('a differently-signed deposit still lands in its own bank slot', () => {
+    const sim = makeSim();
+    const m = meta(sim);
+    sim.addItemInstance('wolf_fang', { signer: 'Ana' }, sim.playerId);
+    sim.bankDeposit(m.inventory.findIndex((s) => s.itemId === 'wolf_fang'));
+    sim.addItemInstance('wolf_fang', { signer: 'Bru' }, sim.playerId);
+    sim.bankDeposit(m.inventory.findIndex((s) => s.itemId === 'wolf_fang'));
+    const banked = m.bank.inventory.filter((s) => s.itemId === 'wolf_fang');
+    expect(banked).toHaveLength(2);
+    expect(banked.map((s) => s.instance?.signer).sort()).toEqual(['Ana', 'Bru']);
   });
 
   it('refuses a deposit at capacity and refuses a partial-fit deposit entirely (all-or-nothing)', () => {
@@ -501,6 +538,50 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
     expect(dst[1]).toEqual({ itemId: 'wolf_fang', count: 1, instance: { signer: 'Ana' } });
   });
 
+  it('merges an instanced move into a byte-equal destination stack', () => {
+    const src: InvSlot[] = [{ itemId: 'wolf_fang', count: 3, instance: { signer: 'Ana' } }];
+    const dst: InvSlot[] = [
+      { itemId: 'wolf_fang', count: 5 },
+      { itemId: 'wolf_fang', count: 2, instance: { signer: 'Ana' } },
+    ];
+    // Destination is at capacity: only the byte-equal stack's room admits it.
+    expect(moveBetweenContainers(src, 0, undefined, dst, 2)).toEqual({ moved: 3 });
+    expect(src).toEqual([]);
+    expect(dst).toEqual([
+      { itemId: 'wolf_fang', count: 5 },
+      { itemId: 'wolf_fang', count: 5, instance: { signer: 'Ana' } },
+    ]);
+  });
+
+  it('refuses an instanced move all-or-nothing when the byte-equal room cannot take it whole', () => {
+    // 19 + 3 would overflow the 20-cap stack and no free slot exists: nothing moves.
+    const src: InvSlot[] = [{ itemId: 'wolf_fang', count: 3, instance: { signer: 'Ana' } }];
+    const dst: InvSlot[] = [{ itemId: 'wolf_fang', count: 19, instance: { signer: 'Ana' } }];
+    const srcSnap = clone(src);
+    const dstSnap = clone(dst);
+    expect(moveBetweenContainers(src, 0, undefined, dst, 1)).toEqual({
+      moved: 0,
+      refusal: 'no_fit',
+    });
+    expect(src).toEqual(srcSnap);
+    expect(dst).toEqual(dstSnap);
+    // AT the boundary: exactly one unit of room admits exactly a one-unit move.
+    const one: InvSlot[] = [{ itemId: 'wolf_fang', count: 1, instance: { signer: 'Ana' } }];
+    expect(moveBetweenContainers(one, 0, undefined, dst, 1)).toEqual({ moved: 1 });
+    expect(dst).toEqual([{ itemId: 'wolf_fang', count: 20, instance: { signer: 'Ana' } }]);
+  });
+
+  it('a differently-signed instanced move still demands its own free destination slot', () => {
+    const src: InvSlot[] = [{ itemId: 'wolf_fang', count: 1, instance: { signer: 'Bru' } }];
+    const dst: InvSlot[] = [{ itemId: 'wolf_fang', count: 2, instance: { signer: 'Ana' } }];
+    expect(moveBetweenContainers(src, 0, undefined, dst, 1)).toEqual({
+      moved: 0,
+      refusal: 'no_fit',
+    });
+    expect(moveBetweenContainers(src, 0, undefined, dst, 2)).toEqual({ moved: 1 });
+    expect(dst).toHaveLength(2);
+  });
+
   it('refuses a distinct-item move into a full destination (no_fit) and mutates nothing', () => {
     const src: InvSlot[] = [{ itemId: 'wolf_fang', count: 5 }];
     const dst: InvSlot[] = [{ itemId: 'linen_scrap', count: 1 }];
@@ -527,6 +608,30 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
     expect(dst).toEqual(dstSnap);
   });
 
+  it('preserves craftedRecipeId on a plain (non-instanced) move, merging only into a same-recipe stack', () => {
+    // A crafted plain stack round-tripping through moveBetweenContainers (the
+    // bank's deposit/withdraw primitive) must keep its craftedRecipeId; losing it
+    // erases the crafted-provenance marker isCraftedDisenchantVictim relies on to
+    // deny a disenchant skill-up (enchanting.ts).
+    const src: InvSlot[] = [{ itemId: 'wolf_fang', count: 5, craftedRecipeId: 'recipe_a' }];
+    const dst: InvSlot[] = [];
+    expect(moveBetweenContainers(src, 0, undefined, dst, 10)).toEqual({ moved: 5 });
+    expect(src).toEqual([]);
+    expect(dst).toEqual([{ itemId: 'wolf_fang', count: 5, craftedRecipeId: 'recipe_a' }]);
+
+    // A plain (no-recipe) move must not merge into the crafted-provenance stack.
+    const src2: InvSlot[] = [{ itemId: 'wolf_fang', count: 2 }];
+    expect(moveBetweenContainers(src2, 0, undefined, dst, 10)).toEqual({ moved: 2 });
+    expect(dst).toHaveLength(2);
+    expect(dst).toContainEqual({ itemId: 'wolf_fang', count: 5, craftedRecipeId: 'recipe_a' });
+    expect(dst).toContainEqual({ itemId: 'wolf_fang', count: 2 });
+
+    // A same-recipe move DOES merge into the existing crafted stack.
+    const src3: InvSlot[] = [{ itemId: 'wolf_fang', count: 3, craftedRecipeId: 'recipe_a' }];
+    expect(moveBetweenContainers(src3, 0, undefined, dst, 10)).toEqual({ moved: 3 });
+    expect(dst).toContainEqual({ itemId: 'wolf_fang', count: 8, craftedRecipeId: 'recipe_a' });
+  });
+
   it('returns an invalid refusal for a bad index or non-positive / over-count, mutating nothing', () => {
     const base: InvSlot[] = [{ itemId: 'wolf_fang', count: 5 }];
     for (const [i, c] of [
@@ -542,6 +647,108 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
       expect(src).toEqual(base);
       expect(dst).toEqual([]);
     }
+  });
+
+  // Review follow-up on PR #2605 (EnriqueGF, high): the bank laundered a crafted
+  // item's provenance because moveBetweenContainers dropped the plain-stack
+  // craftedRecipeId marker (bags.ts InvSlot.craftedRecipeId), the same class of bug
+  // the trade/market fix closed for those two paths. A deposit/withdraw round trip
+  // must keep the marker, and a crafted stack must never silently merge with a
+  // drop-sourced stack of the same item.
+  it('carries the craftedRecipeId marker through a deposit/withdraw round trip', () => {
+    const src: InvSlot[] = [{ itemId: 'wolf_fang', count: 3, craftedRecipeId: 'r_wolf_fang' }];
+    const dst: InvSlot[] = [];
+    expect(moveBetweenContainers(src, 0, undefined, dst, 10)).toEqual({ moved: 3 });
+    expect(src).toEqual([]);
+    expect(dst).toEqual([{ itemId: 'wolf_fang', count: 3, craftedRecipeId: 'r_wolf_fang' }]);
+    // And back the other way (withdraw is the same primitive, source/dest swapped).
+    const back: InvSlot[] = [];
+    expect(moveBetweenContainers(dst, 0, undefined, back, 10)).toEqual({ moved: 3 });
+    expect(back).toEqual([{ itemId: 'wolf_fang', count: 3, craftedRecipeId: 'r_wolf_fang' }]);
+  });
+
+  it('never merges a crafted stack into a plain stack of the same item id, or vice versa', () => {
+    const src: InvSlot[] = [{ itemId: 'wolf_fang', count: 3, craftedRecipeId: 'r_wolf_fang' }];
+    const dst: InvSlot[] = [{ itemId: 'wolf_fang', count: 5 }];
+    expect(moveBetweenContainers(src, 0, undefined, dst, 2)).toEqual({ moved: 3 });
+    expect(dst).toEqual([
+      { itemId: 'wolf_fang', count: 5 },
+      { itemId: 'wolf_fang', count: 3, craftedRecipeId: 'r_wolf_fang' },
+    ]);
+  });
+
+  // The SAME defect, one arm over. The fix above threaded craftedRecipeId
+  // through the PLAIN arm and left the INSTANCED arm omitting it, so a slot
+  // carrying BOTH an instance payload and a craft marker (a crafted weapon
+  // that was worn while enchanted is exactly that shape) still lost the marker
+  // on one bank round trip. This is the SHIPPED personal bank, not just the
+  // guild bank: it launders a self-crafted item into an indistinguishable
+  // found one and it then disenchants for the enchanting skill the anti-farm
+  // gate exists to deny.
+  it('carries craftedRecipeId through the INSTANCED arm too, in both directions', () => {
+    const payload = { signer: 'Ana' };
+    const src: InvSlot[] = [
+      { itemId: 'wolf_fang', count: 3, instance: { ...payload }, craftedRecipeId: 'r_wolf_fang' },
+    ];
+    const dst: InvSlot[] = [];
+    expect(moveBetweenContainers(src, 0, undefined, dst, 10)).toEqual({ moved: 3 });
+    expect(dst).toEqual([
+      { itemId: 'wolf_fang', count: 3, instance: payload, craftedRecipeId: 'r_wolf_fang' },
+    ]);
+    const back: InvSlot[] = [];
+    expect(moveBetweenContainers(dst, 0, undefined, back, 10)).toEqual({ moved: 3 });
+    expect(back).toEqual([
+      { itemId: 'wolf_fang', count: 3, instance: payload, craftedRecipeId: 'r_wolf_fang' },
+    ]);
+  });
+
+  it('never merges a crafted INSTANCED stack into a same-payload uncrafted one', () => {
+    // The stacking key is three-dimensional (id, payload, provenance): merging
+    // across the provenance line is how the marker disappears without any
+    // single call looking wrong.
+    const src: InvSlot[] = [
+      {
+        itemId: 'wolf_fang',
+        count: 3,
+        instance: { signer: 'Ana' },
+        craftedRecipeId: 'r_wolf_fang',
+      },
+    ];
+    const dst: InvSlot[] = [{ itemId: 'wolf_fang', count: 5, instance: { signer: 'Ana' } }];
+    expect(moveBetweenContainers(src, 0, undefined, dst, 10)).toEqual({ moved: 3 });
+    expect(dst).toEqual([
+      { itemId: 'wolf_fang', count: 5, instance: { signer: 'Ana' } },
+      {
+        itemId: 'wolf_fang',
+        count: 3,
+        instance: { signer: 'Ana' },
+        craftedRecipeId: 'r_wolf_fang',
+      },
+    ]);
+  });
+
+  it('keeps the FIT CHECK and the GRANT on the same key: no_fit, never an overflow', () => {
+    // Threading the marker into only ONE of countFit/addStacked would make the
+    // two disagree about which dest stacks are mergeable, so a move could pass
+    // the fit check and then need a slot the capacity does not have. Capacity
+    // 1, already full with a same-payload UNCRAFTED stack that has room: the
+    // crafted copy cannot merge into it, so the move must be refused rather
+    // than appending a second slot.
+    const src: InvSlot[] = [
+      {
+        itemId: 'wolf_fang',
+        count: 1,
+        instance: { signer: 'Ana' },
+        craftedRecipeId: 'r_wolf_fang',
+      },
+    ];
+    const dst: InvSlot[] = [{ itemId: 'wolf_fang', count: 1, instance: { signer: 'Ana' } }];
+    expect(moveBetweenContainers(src, 0, undefined, dst, 1)).toEqual({
+      moved: 0,
+      refusal: 'no_fit',
+    });
+    expect(dst).toHaveLength(1);
+    expect(src).toHaveLength(1); // nothing moved, nothing lost
   });
 });
 
@@ -803,6 +1010,71 @@ describe('persistence and back-compat', () => {
     });
   });
 
+  it('deposit -> withdraw preserves craftedRecipeId on a plain crafted stack', () => {
+    // A common crafted item stays a PLAIN stack (InvSlot.craftedRecipeId, no
+    // `instance`), so it must round-trip through the bank exactly like the
+    // instanced case above. Losing the marker here would silently launder a
+    // crafted item into an ordinary drop for enchanting.ts's
+    // isCraftedDisenchantVictim check, granting a disenchant skill-up that
+    // should have been denied.
+    const sim = makeSim();
+    const m = meta(sim);
+    sim.addItem('wolf_fang', 5, sim.playerId, { craftedRecipeId: 'recipe_test_crafted' });
+    const idx = m.inventory.findIndex((s) => s.itemId === 'wolf_fang');
+    expect(m.inventory[idx].craftedRecipeId).toBe('recipe_test_crafted');
+    sim.bankDeposit(idx);
+    const banked = m.bank.inventory.find((s) => s.itemId === 'wolf_fang')!;
+    expect(banked.craftedRecipeId).toBe('recipe_test_crafted');
+    // The return trip: withdraw the banked slot and the marker survives.
+    sim.bankWithdraw(m.bank.inventory.findIndex((s) => s.itemId === 'wolf_fang'));
+    expect(m.bank.inventory.some((s) => s.itemId === 'wolf_fang')).toBe(false);
+    const returned = m.inventory.find((s) => s.itemId === 'wolf_fang')!;
+    expect(returned.craftedRecipeId).toBe('recipe_test_crafted');
+  });
+
+  it('survives a serializeCharacter -> load round trip on a plain crafted bank stack', () => {
+    // The previous test only proves the marker survives a bank move WITHIN one
+    // live session. sanitizeBankState (the one load path, run on relog) rebuilt
+    // every bank slot field by field and dropped craftedRecipeId, so a deposit
+    // then relog then withdraw laundered the item exactly like the pre-fix
+    // moveBetweenContainers bug, just one step later. Drive the real save/load
+    // boundary to pin the whole path closed.
+    const sim = makeSim();
+    const m = meta(sim);
+    sim.addItem('wolf_fang', 5, sim.playerId, { craftedRecipeId: 'recipe_test_crafted' });
+    const idx = m.inventory.findIndex((s) => s.itemId === 'wolf_fang');
+    sim.bankDeposit(idx);
+    expect(m.bank.inventory.find((s) => s.itemId === 'wolf_fang')?.craftedRecipeId).toBe(
+      'recipe_test_crafted',
+    );
+
+    const state = sim.serializeCharacter(sim.playerId)!;
+    expect(
+      (state.bank as { inventory: InvSlot[] }).inventory.find((s) => s.itemId === 'wolf_fang')
+        ?.craftedRecipeId,
+    ).toBe('recipe_test_crafted');
+
+    const sim2 = new Sim({
+      seed: 1,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: BANK_TEST_WORLD,
+    });
+    const pid = sim2.addPlayer('warrior', 'Reloaded', { state });
+    const m2 = meta(sim2, pid);
+    const reloadedBanked = m2.bank.inventory.find((s) => s.itemId === 'wolf_fang');
+    expect(reloadedBanked?.craftedRecipeId).toBe('recipe_test_crafted');
+
+    moveToBanker(sim2, pid);
+    sim2.bankWithdraw(
+      m2.bank.inventory.findIndex((s) => s.itemId === 'wolf_fang'),
+      undefined,
+      pid,
+    );
+    const returned = m2.inventory.find((s) => s.itemId === 'wolf_fang')!;
+    expect(returned.craftedRecipeId).toBe('recipe_test_crafted');
+  });
+
   it('loads a legacy save with no bank field, defaulting to an empty bank', () => {
     const sim = makeSim();
     const state = sim.serializeCharacter(sim.playerId)!;
@@ -932,11 +1204,13 @@ describe('sanitizeBankState', () => {
     ]);
   });
 
-  it('clamps count to Math.max(1, floor) and forces instanced entries to count 1', () => {
+  it('clamps count to Math.max(1, floor) and caps an instanced entry at its stack size', () => {
     const raw = {
       inventory: [
         { itemId: 'wolf_fang', count: -5 },
         { itemId: 'wolf_fang', count: 2.9 },
+        // worn_sword is an UNSTACKED weapon (stackSize 1): the pre-12d force-1
+        // behavior falls out of the stack-cap clamp.
         { itemId: 'worn_sword', count: 5, instance: { signer: 'Ana' } },
       ],
       purchasedSlots: 0,
@@ -946,6 +1220,35 @@ describe('sanitizeBankState', () => {
     expect(out[0].count).toBe(1);
     expect(out[1].count).toBe(2);
     expect(out[2]).toEqual({ itemId: 'worn_sword', count: 1, instance: { signer: 'Ana' } });
+  });
+
+  it('preserves a counted instanced stack while still flooring and capping garbage', () => {
+    const raw = {
+      inventory: [
+        // A legitimate identical-payload stack: count survives the load intact.
+        { itemId: 'wolf_fang', count: 3, instance: { signer: 'Ana' } },
+        // AT the cap (stackSize 20) survives; one past it clamps back to 20
+        // (a merge can only ever have reached the cap).
+        { itemId: 'wolf_fang', count: 20, instance: { signer: 'Ana' } },
+        { itemId: 'wolf_fang', count: 21, instance: { signer: 'Ana' } },
+        // Garbage floors to 1 exactly like the fungible arm.
+        { itemId: 'wolf_fang', count: -5, instance: { signer: 'Ana' } },
+        // A charge-bearing payload stays one-per-slot regardless of count: a
+        // counted stack shares ONE payload object, so a tampered count would
+        // mint shared-charge copies.
+        { itemId: 'wolf_fang', count: 4, instance: { signer: 'Ana', charges: { zap: 2 } } },
+        // An unknown item def (removed content) is dormant recoverable data:
+        // the merge-legal ceiling does not apply (12d QA), but the charge cap
+        // still does (the shared-payload dupe guard is def-independent).
+        { itemId: 'unknown_id_xyz', count: 30, instance: { signer: 'Ana' } },
+        { itemId: 'unknown_id_xyz', count: 4, instance: { charges: { zap: 1 } } },
+      ],
+      purchasedSlots: 0,
+      bonusSlots: 0,
+    };
+    const out = sanitizeBankState(raw).inventory;
+    expect(out.map((s) => s.count)).toEqual([3, 20, 20, 1, 1, 30, 1]);
+    expect(out[0]).toEqual({ itemId: 'wolf_fang', count: 3, instance: { signer: 'Ana' } });
   });
 
   it('floors purchasedSlots to a multiple of 6 within [0, 72]', () => {
@@ -1426,5 +1729,68 @@ describe('server-stamped bank bonus', () => {
     info!.bonusSources.push({ id: 'fake', slots: 2, maxSlots: 2 });
     const m = meta(sim, pid);
     expect(m.bankBonusSources).toEqual(SOURCES);
+  });
+});
+
+describe('the instanced move keeps the slot-level crafted marker (round 5)', () => {
+  it('an instanced marker-bearing slot round-trips the bank with craftedRecipeId intact', () => {
+    // The instanced arm used to call addStacked without slot.craftedRecipeId,
+    // so a deposit stripped the crafted-provenance marker from exactly the
+    // shape that carries it ONLY at slot level (commissioned sub-rare
+    // equipment: instance holds bind data, the marker rides the slot).
+    const source: import('../src/sim/types').InvSlot[] = [
+      {
+        itemId: 'eastbrook_arming_sword',
+        count: 1,
+        instance: { boundTo: 41 },
+        craftedRecipeId: 'recipe_eastbrook_arming_sword',
+      },
+    ];
+    const dest: import('../src/sim/types').InvSlot[] = [];
+    const r = moveBetweenContainers(source, 0, undefined, dest, 24);
+    expect(r.moved).toBe(1);
+    expect(dest[0]).toEqual({
+      itemId: 'eastbrook_arming_sword',
+      count: 1,
+      instance: { boundTo: 41 },
+      craftedRecipeId: 'recipe_eastbrook_arming_sword',
+    });
+    // And back out, still intact.
+    const home: import('../src/sim/types').InvSlot[] = [];
+    const r2 = moveBetweenContainers(dest, 0, undefined, home, 24);
+    expect(r2.moved).toBe(1);
+    expect(home[0]?.craftedRecipeId).toBe('recipe_eastbrook_arming_sword');
+    // The merge predicate still separates marked from unmarked: an unmarked
+    // byte-equal instanced stack does not absorb the marked one.
+    const mixed: import('../src/sim/types').InvSlot[] = [
+      { itemId: 'eastbrook_arming_sword', count: 1, instance: { boundTo: 41 } },
+    ];
+    const r3 = moveBetweenContainers(home, 0, undefined, mixed, 24);
+    expect(r3.moved).toBe(1);
+    expect(mixed).toHaveLength(2);
+    // Existence arm: the fixture pair is real shipped content, so a rename
+    // cannot leave this test exercising the unknown-item fallback.
+    expect(ITEMS.eastbrook_arming_sword).toBeTruthy();
+    expect(ALL_RECIPES.some((r) => r.id === 'recipe_eastbrook_arming_sword')).toBe(true);
+  });
+
+  it('a marked instanced slot does not count an unmarked stack as room (the stricter fit)', () => {
+    // The user-visible half of threading the marker through countFit: on a
+    // FULL destination whose only same-item stack is unmarked, the deposit
+    // now refuses no_fit instead of laundering the marker into that stack.
+    const dest: import('../src/sim/types').InvSlot[] = [
+      { itemId: 'eastbrook_arming_sword', count: 1, instance: { boundTo: 41 } },
+    ];
+    const source: import('../src/sim/types').InvSlot[] = [
+      {
+        itemId: 'eastbrook_arming_sword',
+        count: 1,
+        instance: { boundTo: 41 },
+        craftedRecipeId: 'recipe_eastbrook_arming_sword',
+      },
+    ];
+    const r = moveBetweenContainers(source, 0, undefined, dest, 1); // capacity 1: full
+    expect(r).toEqual({ moved: 0, refusal: 'no_fit' });
+    expect(source).toHaveLength(1); // all-or-nothing: nothing moved
   });
 });

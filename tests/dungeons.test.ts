@@ -17,6 +17,7 @@ import {
   MOBS,
 } from '../src/sim/data';
 import { spawnNythraxisAdds } from '../src/sim/encounters/nythraxis';
+import { COMBAT_EXIT_MEMORY_SECONDS } from '../src/sim/instance_exit_memory';
 import {
   awardHeroicMarks,
   enterDungeon,
@@ -27,6 +28,7 @@ import {
   updateDoorTriggers,
   updateInstances,
 } from '../src/sim/instances/dungeons';
+import { resetEvadingMob } from '../src/sim/mob/locomotion';
 import { Sim } from '../src/sim/sim';
 import {
   dist2d,
@@ -109,20 +111,21 @@ function mobInInstance(sim: AnySim, inst: any, templateId: string): AnyEntity {
 // record, independently of mobTemplateForDungeonDifficulty, mirroring createMob's
 // formulas. Dropping any multiplier from the transform reddens these pins even
 // though forcing level 22 alone would already raise the per-level stats.
+// Per-mob health overrides (healthMultiplierByMob) take precedence over the
+// dungeon-wide healthMultiplier -- e.g. 2026-07-24 nerf: skeleton adds at 2.22x
+// their normal-mode pool (3,768 HP) via healthMultiplierByMob.nythraxis_skeleton_warrior.
 function expectedHeroicStats(template: MobTemplate, dungeonId: string) {
   const tuning = HEROIC_DUNGEON_TUNING[dungeonId];
   const levelUps = tuning.level - 1;
   const hpMult = template.elite ? 2.3 : 1;
   const dmgMult = template.elite ? 1.5 : 1;
+  const tuningDmg = tuning.damageMultiplierByMob?.[template.id] ?? tuning.damageMultiplier;
+  const tuningHp = tuning.healthMultiplierByMob?.[template.id] ?? tuning.healthMultiplier;
   const dmg =
-    (template.dmgBase * tuning.damageMultiplier +
-      template.dmgPerLevel * tuning.damageMultiplier * levelUps) *
-    dmgMult;
+    (template.dmgBase * tuningDmg + template.dmgPerLevel * tuningDmg * levelUps) * dmgMult;
   return {
     maxHp: Math.round(
-      (template.hpBase * tuning.healthMultiplier +
-        template.hpPerLevel * tuning.healthMultiplier * levelUps) *
-        hpMult,
+      (template.hpBase * tuningHp + template.hpPerLevel * tuningHp * levelUps) * hpMult,
     ),
     weaponMin: Math.round(dmg * 0.8),
     weaponMax: Math.round(dmg * 1.25),
@@ -252,6 +255,225 @@ describe('dungeons: door-trigger entry/exit', () => {
     expect(mob.threat.has(a)).toBe(false);
     expect(mob.threat.get(b)).toBeGreaterThan(0);
     expect(mob.aggroTargetId).toBe(b);
+  });
+
+  // Issue #2653: a mid-combat door exit still scrubs the leaver immediately (the
+  // #1955 anti-exit-kiting fix above stays load-bearing), but the exact threat
+  // dropped is now remembered on the claim for a short window so the party
+  // cannot chain exits into a free, instant, unengaged combat reset.
+  describe('mid-combat exit memory (no free combat reset)', () => {
+    it('re-entering the same claim within the memory window resumes the fight', () => {
+      const sim = makeSim();
+      const pid = sim.addPlayer('warrior', 'Fickle');
+      const p = sim.entities.get(pid) as AnyEntity;
+      enterDungeon(sim.ctx, 'hollow_crypt', pid);
+      const inst = claimedHollow(sim);
+
+      const mob = mobInInstance(sim, inst, 'crypt_shambler');
+      teleport(sim, p, mob.pos.x + 3, mob.pos.z);
+      p.maxHp = p.hp = 1_000_000;
+      sim.dealDamage(p, mob, 25, false, 'physical', 'Strike', 'hit', true);
+      expect(mob.inCombat).toBe(true);
+      const priorThreat = mob.threat.get(pid);
+      expect(priorThreat).toBeGreaterThan(0);
+
+      leaveDungeon(sim.ctx, pid);
+      // The #1955 fix still stands: the leaver is dropped immediately, no dancing.
+      expect(mob.threat.has(pid)).toBe(false);
+      expect(mob.aggroTargetId).toBeNull();
+
+      // A prompt return, well inside the memory window.
+      sim.time += 5;
+      enterDungeon(sim.ctx, 'hollow_crypt', pid);
+
+      expect(mob.threat.get(pid)).toBe(priorThreat); // resumed, not a fresh pull
+      expect(mob.aggroTargetId).toBe(pid);
+      expect(mob.aiState).toBe('chase');
+      expect(mob.inCombat).toBe(true);
+      expect(inst.combatExitMemory.size).toBe(0); // consumed, not left dangling
+    });
+
+    it('waiting past the memory window earns a genuine reset, not a resumed fight', () => {
+      const sim = makeSim();
+      const pid = sim.addPlayer('warrior', 'Patient');
+      const p = sim.entities.get(pid) as AnyEntity;
+      enterDungeon(sim.ctx, 'hollow_crypt', pid);
+      const inst = claimedHollow(sim);
+
+      const mob = mobInInstance(sim, inst, 'crypt_shambler');
+      teleport(sim, p, mob.pos.x + 3, mob.pos.z);
+      p.maxHp = p.hp = 1_000_000;
+      sim.dealDamage(p, mob, 25, false, 'physical', 'Strike', 'hit', true);
+      expect(mob.threat.get(pid)).toBeGreaterThan(0);
+
+      leaveDungeon(sim.ctx, pid);
+
+      // Well past the memory window: the exit has genuinely lapsed.
+      sim.time += COMBAT_EXIT_MEMORY_SECONDS + 1;
+      enterDungeon(sim.ctx, 'hollow_crypt', pid);
+
+      expect(mob.threat.has(pid)).toBe(false); // no restore: a real fresh pull
+      expect(mob.aggroTargetId).toBeNull();
+    });
+
+    it('an out-of-combat walk-out leaves no combat-exit memory (mob never aggroed)', () => {
+      const sim = makeSim();
+      const pid = sim.addPlayer('warrior', 'Casual');
+      enterDungeon(sim.ctx, 'hollow_crypt', pid);
+      const inst = claimedHollow(sim);
+      expect(inst.combatExitMemory.size).toBe(0);
+
+      leaveDungeon(sim.ctx, pid);
+
+      expect(inst.combatExitMemory.size).toBe(0);
+    });
+
+    it('a full party chaining exits and returning within the window resumes the SAME hate split, not a fresh pull', () => {
+      const sim = makeSim();
+      const a = sim.addPlayer('warrior', 'Left1');
+      const b = sim.addPlayer('mage', 'Left2');
+      sim.partyInvite(b, a);
+      sim.partyAccept(b);
+      const ea = sim.entities.get(a) as AnyEntity;
+      const eb = sim.entities.get(b) as AnyEntity;
+      enterDungeon(sim.ctx, 'hollow_crypt', a);
+      enterDungeon(sim.ctx, 'hollow_crypt', b);
+      const inst = claimedHollow(sim);
+
+      const mob = mobInInstance(sim, inst, 'crypt_shambler');
+      teleport(sim, ea, mob.pos.x + 3, mob.pos.z);
+      teleport(sim, eb, mob.pos.x - 3, mob.pos.z);
+      ea.maxHp = ea.hp = 1_000_000;
+      eb.maxHp = eb.hp = 1_000_000;
+      sim.dealDamage(ea, mob, 100, false, 'physical', 'Strike', 'hit', true);
+      sim.dealDamage(eb, mob, 10, false, 'fire', 'Bolt', 'hit', true);
+      expect(mob.aggroTargetId).toBe(a);
+      const threatA = mob.threat.get(a);
+      const threatB = mob.threat.get(b);
+
+      // Chained exits: the WHOLE pack is scrubbed, not just partially.
+      leaveDungeon(sim.ctx, a);
+      leaveDungeon(sim.ctx, b);
+      expect(mob.threat.size).toBe(0);
+      expect(mob.aggroTargetId).toBeNull();
+
+      // Both walk back in inside the window: the fight resumes with the SAME
+      // hate distribution instead of a free, unengaged full-pack reset.
+      sim.time += 5;
+      enterDungeon(sim.ctx, 'hollow_crypt', a);
+      enterDungeon(sim.ctx, 'hollow_crypt', b);
+
+      expect(mob.threat.get(a)).toBe(threatA);
+      expect(mob.threat.get(b)).toBe(threatB);
+      expect(mob.aggroTargetId).toBe(a); // still the higher-threat attacker
+      expect(mob.inCombat).toBe(true);
+    });
+
+    it('a forced evade-home reset is deferred while a live exit memory could still apply, so a mid-window fresh re-pull can never happen', () => {
+      const sim = makeSim();
+      const a = sim.addPlayer('warrior', 'Wanderer');
+      const ea = sim.entities.get(a) as AnyEntity;
+      enterDungeon(sim.ctx, 'hollow_crypt', a);
+      const inst = claimedHollow(sim);
+
+      const mob = mobInInstance(sim, inst, 'crypt_shambler');
+      teleport(sim, ea, mob.pos.x + 3, mob.pos.z);
+      ea.maxHp = ea.hp = 1_000_000;
+      sim.dealDamage(ea, mob, mob.maxHp - 40, false, 'physical', 'Strike', 'hit', true);
+      expect(mob.threat.get(a)).toBeGreaterThan(0);
+
+      leaveDungeon(sim.ctx, a);
+      expect(inst.combatExitMemory.size).toBe(1);
+
+      // Something (a stray leash break, a manual call) tries to run the
+      // evade-home reset while A's exit memory is still live: it must defer
+      // rather than heal/clear the pack out from under a same-claim return.
+      resetEvadingMob(sim.ctx, mob);
+      expect(mob.inCombat).toBe(true);
+      expect(mob.hp).toBeLessThan(mob.maxHp); // never healed
+
+      // A returns inside the window: the exact fight resumes, HP included.
+      sim.time += 5;
+      enterDungeon(sim.ctx, 'hollow_crypt', a);
+      expect(mob.threat.get(a)).toBeGreaterThan(0);
+      expect(mob.aggroTargetId).toBe(a);
+      expect(mob.inCombat).toBe(true);
+    });
+
+    it('re-entering after a REAL tick loop (leave, natural evade-home reset, return before expiry) resumes the exact fight, not a fresh healed pull', () => {
+      const sim = makeSim();
+      const pid = sim.addPlayer('warrior', 'Ticker');
+      const p = sim.entities.get(pid) as AnyEntity;
+      enterDungeon(sim.ctx, 'hollow_crypt', pid);
+      const inst = claimedHollow(sim);
+
+      const mob = mobInInstance(sim, inst, 'crypt_shambler');
+      teleport(sim, p, mob.pos.x + 3, mob.pos.z);
+      p.maxHp = p.hp = 1_000_000;
+      sim.dealDamage(p, mob, mob.maxHp - 40, false, 'physical', 'Strike', 'hit', true);
+      const damagedHp = mob.hp;
+      expect(damagedHp).toBeLessThan(mob.maxHp);
+      const priorThreat = mob.threat.get(pid);
+      expect(priorThreat).toBeGreaterThan(0);
+
+      leaveDungeon(sim.ctx, pid);
+
+      // Run the REAL tick loop well past the time the mob would normally have
+      // walked home and fully reset (a few seconds is plenty for a mob that
+      // never moved far from spawn), but still inside the memory window.
+      for (let i = 0; i < 20 * 10; i++) sim.tick();
+
+      // Held, not reset: no heal, no idle, no dropped hate table.
+      expect(mob.hp).toBe(damagedHp);
+      expect(mob.aiState).toBe('evade');
+      expect(mob.inCombat).toBe(true);
+
+      // Structurally unpullable while held: an 'evade' mob is damage-immune
+      // (combat/damage.ts), so nobody can fresh-pull it out from under the
+      // pending resume.
+      const strangerPid = sim.addPlayer('warrior', 'Stranger');
+      const stranger = sim.entities.get(strangerPid) as AnyEntity;
+      teleport(sim, stranger, mob.pos.x + 3, mob.pos.z);
+      stranger.maxHp = stranger.hp = 1_000_000;
+      sim.dealDamage(stranger, mob, 25, false, 'physical', 'Strike', 'hit', true);
+      expect(mob.threat.has(strangerPid)).toBe(false);
+      expect(mob.hp).toBe(damagedHp);
+
+      enterDungeon(sim.ctx, 'hollow_crypt', pid);
+
+      expect(mob.threat.get(pid)).toBe(priorThreat);
+      expect(mob.aggroTargetId).toBe(pid);
+      expect(mob.aiState).toBe('chase');
+      expect(mob.hp).toBe(damagedHp); // the exact fight resumed, not a fresh healed pack
+    });
+
+    it('re-entering after a REAL tick loop past the full window earns a genuine reset (full heal, idle, empty hate table)', () => {
+      const sim = makeSim();
+      const pid = sim.addPlayer('warrior', 'TooLate');
+      const p = sim.entities.get(pid) as AnyEntity;
+      enterDungeon(sim.ctx, 'hollow_crypt', pid);
+      const inst = claimedHollow(sim);
+
+      const mob = mobInInstance(sim, inst, 'crypt_shambler');
+      teleport(sim, p, mob.pos.x + 3, mob.pos.z);
+      p.maxHp = p.hp = 1_000_000;
+      sim.dealDamage(p, mob, mob.maxHp - 40, false, 'physical', 'Strike', 'hit', true);
+      expect(mob.hp).toBeLessThan(mob.maxHp);
+
+      leaveDungeon(sim.ctx, pid);
+
+      // Tick well past COMBAT_EXIT_MEMORY_SECONDS: the hold lapses and the
+      // deferred reset finally fires.
+      for (let i = 0; i < 20 * (COMBAT_EXIT_MEMORY_SECONDS + 5); i++) sim.tick();
+
+      expect(mob.hp).toBe(mob.maxHp);
+      expect(mob.aiState).toBe('idle');
+      expect(mob.inCombat).toBe(false);
+
+      enterDungeon(sim.ctx, 'hollow_crypt', pid);
+      expect(mob.threat.has(pid)).toBe(false); // a real fresh pull, no restore
+      expect(inst.combatExitMemory.size).toBe(0); // the lapsed record was consumed, not left dangling
+    });
   });
 });
 
@@ -897,21 +1119,24 @@ describe('dungeons: heroic difficulty', () => {
     expect(heroicMorthen.weapon.min).toBeGreaterThan(normalMorthen.weapon.min);
     expect(normalMorthen.mechanicDamageMult).toBeUndefined();
     expect(normalMorthen.mechanicHealMult).toBeUndefined();
-    // Normal Morthen keeps his template speed and stays controllable.
+    // Normal Morthen keeps his template speed. He is still CC- and snare-immune,
+    // but through the TEMPLATE flags (bosses are immune on both difficulties,
+    // tests/dungeon_difficulty.test.ts): the heroic entity stamp stays heroic-only.
     expect(normalMorthen.moveSpeed).toBe(7);
+    expect(normalMorthen.ccImmune).toBeUndefined();
+    expect(normalMorthen.slowImmune).toBeUndefined();
     (normal as any).applyAura(normalMorthen, stunAura(normalPid));
     (normal as any).applyAura(normalMorthen, slowAura(normalPid));
-    expect(normalMorthen.auras.some((a: any) => a.id === 'test_stun')).toBe(true);
-    expect(normalMorthen.auras.some((a: any) => a.id === 'test_slow')).toBe(true);
+    expect(normalMorthen.auras.some((a: any) => a.id === 'test_stun')).toBe(false);
+    expect(normalMorthen.auras.some((a: any) => a.id === 'test_slow')).toBe(false);
   });
 
-  it('supports heroic mode across all six five-player dungeons', () => {
+  it('supports heroic mode across all five five-player dungeons', () => {
     const finalBosses = [
       ['hollow_crypt', 'morthen'],
       ['sunken_bastion', 'vael_the_mistcaller'],
       ['drowned_temple', 'ysolei'],
       ['gravewyrm_sanctum', 'korzul_the_gravewyrm'],
-      ['orkadia', 'orkadia_warlord'],
       ['wildheart_basin', 'wildheart_high_priest'],
     ] as const;
 
@@ -1316,17 +1541,20 @@ describe('dungeons: heroic boss drops', () => {
     expect(new Set(weaponIds).size).toBe(3);
     expect(weaponEntries.reduce((sum, e) => sum + e.chance, 0)).toBeCloseTo(1, 10);
     for (const id of weaponIds) expect(ITEMS[id]?.kind, id).toBe('weapon');
+    // The heroic raid carries the two RARE mounts and the two UNCOMMON ones. The
+    // hover-cycle is deliberately absent: it is epic now, and epic mounts are rift
+    // S-clear exclusive, so the raid must not be a back door to one.
     expect(mountEntries.map((e) => e.itemId).sort()).toEqual([
-      'reins_aether_hover_cycle',
       'reins_grag_bear',
       'reins_shadowjump_toad',
       'reins_stalkglider_snail',
+      'reins_stormfeather_griffin',
     ]);
-    // Blues at 0.1%, greens at 0.5% - check each individually.
+    // Rates follow rarity, derived rather than hand-listed: rare 0.1%, uncommon 0.5%.
     for (const e of mountEntries) {
-      const isBlue =
-        e.itemId === 'reins_aether_hover_cycle' || e.itemId === 'reins_shadowjump_toad';
-      expect(e.chance, `${e.itemId} chance`).toBe(isBlue ? 0.001 : 0.005);
+      const quality = ITEMS[e.itemId!]?.quality;
+      expect(quality, `${e.itemId} is a drop-tier mount`).not.toBe('epic');
+      expect(e.chance, `${e.itemId} (${quality}) chance`).toBe(quality === 'rare' ? 0.001 : 0.005);
     }
 
     const droppedWeapons = new Set<string>();
@@ -1921,20 +2149,24 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
       expect(add.templateId).toBe(NYTHRAXIS_ADD_ID);
       expect(add.level).toBe(22);
       expect(add.maxHp).toBe(addPins.maxHp);
+      // Encounter add waves ride the per-mob override (7.5x holds the Royal
+      // Guard at the heroic 500 floor), not the boss's dungeon-wide 8.75x.
       expect(add.mechanicDamageMult).toBe(
-        HEROIC_DUNGEON_TUNING.nythraxis_boss_arena.damageMultiplier,
+        HEROIC_DUNGEON_TUNING.nythraxis_boss_arena.damageMultiplierByMob?.[NYTHRAXIS_ADD_ID],
       );
     }
   });
 
-  it('a normal raid claim is untransformed; a heroic kill pays marks to every raider', () => {
+  it('a normal raid claim carries the normal retune; a heroic kill pays marks to every raider', () => {
     const normal = raidSetup('normal');
     const nBoss = mobInInstance(normal.sim, normal.inst, NYTHRAXIS_BOSS_ID);
-    expect(nBoss.maxHp).toBe(60000); // the untransformed raid boss (60k on normal)
-    expect(nBoss.mechanicDamageMult).toBeUndefined();
+    // Normal Nythraxis rides NORMAL_DUNGEON_TUNING (economy retune): doubled
+    // health (was 60000) and the 5x per-mob multiplier stamped for mechanics.
+    expect(nBoss.maxHp).toBe(120000);
+    expect(nBoss.mechanicDamageMult).toBe(5);
     spawnNythraxisAdds(normal.sim.ctx, nBoss);
     const nAdd = normal.sim.entities.get((nBoss.summonedIds as number[])[0]) as AnyEntity;
-    expect(nAdd.mechanicDamageMult).toBeUndefined();
+    expect(nAdd.mechanicDamageMult).toBe(5);
 
     const { sim, raiders, inst } = raidSetup('heroic');
     const boss = mobInInstance(sim, inst, NYTHRAXIS_BOSS_ID);
@@ -2319,6 +2551,25 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
 
     expect(sim.players.get(fallen)!.raidLockouts.has('nythraxis_boss_arena:heroic')).toBe(true);
     expect(sim.countItem(HEROIC_MARK_ITEM_ID, fallen)).toBe(0);
+  });
+
+  it('the empty-instance reaper never frees the arena while raiders stand in its wide outer floor', () => {
+    const { sim, raiders, inst } = raidSetup('normal');
+    const origin = instanceOriginOf(inst);
+    // NYTHRAXIS_LAYOUT (dungeon_layout.ts) authors tomb alcoves at local
+    // x = +/-210, legitimately inside the wide wallX:230/floorHalfX:228 raid
+    // room (and within instanceClaimContains's NYTHRAXIS_ROOM_RADIUS carve-out),
+    // but outside the generic 120yd box that instanceContains checks. Standing
+    // there is a real, in-fight position, not an edge case.
+    const tombX = origin.x + 210;
+    const tombZ = origin.z + 20;
+    raiders.forEach((pid) => {
+      teleport(sim, sim.entities.get(pid) as AnyEntity, tombX, tombZ);
+    });
+    inst.emptyFor = 100000; // even pre-loaded, an occupied check must reset it
+    updateInstances(sim.ctx);
+    expect(inst.partyKey).not.toBeNull();
+    expect(inst.emptyFor).toBe(0);
   });
 });
 

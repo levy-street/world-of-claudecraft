@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 // Source-guard suite for the Crafting window launchers (issue #1865, the
 // deeds_window.test.ts pattern): the desktop micro-menu button and the mobile
 // More-tray button in BOTH entry HTMLs, the hud.ts click + keycap wiring, the
@@ -79,7 +79,7 @@ describe('shared behavior across all screen sizes', () => {
   });
 
   it('registers the crafting glyph so hydrateIcons does not silently skip it', () => {
-    expect(uiIcons).toMatch(/\|\s*'crafting';/);
+    expect(uiIcons).toMatch(/\|\s*'crafting'(?:\s*\||;)/);
     expect(uiIcons).toMatch(/crafting:\n?\s*'<path /);
   });
 
@@ -92,6 +92,45 @@ describe('shared behavior across all screen sizes', () => {
         /id="mobile-crafting"[^>]*>\s*<span class="mobile-label" data-i18n="hudChrome\.crafting\.title">/,
       );
     }
+  });
+});
+
+describe('gossip Crafting shortcut launcher (station masters)', () => {
+  it('routes the quest dialog dep into openCrafting and pre-selects the tab like a tab click', () => {
+    expect(hud).toContain('openCrafting: (craftId) => this.openCrafting(craftId),');
+    // Pin the method BODY (sliced to the method's own 2-space closing brace),
+    // so the same-tab guard, the craftOwnsTab persist gate, the persistence,
+    // the repaint, and the focus handoff must all live inside openCrafting
+    // itself, not merely somewhere in hud.ts. The behavioral halves are unit
+    // tested where they are pure: craftOwnsTab and resolveSelectedCraft in
+    // tests/crafting_window_tabs.test.ts.
+    const start = hud.indexOf('openCrafting(craftId?: string): void {');
+    expect(start).toBeGreaterThan(-1);
+    // Guard the terminator too: an unmatched end would slice to EOF and let
+    // every arm pass vacuously (the slice(start, -1) trap). The length
+    // ceiling keeps the slice ONE method even if the brace style shifts.
+    const end = hud.indexOf('\n  }', start);
+    expect(end).toBeGreaterThan(start);
+    // Strip comment lines so a comment quoting a call can never keep an arm
+    // green after the real call is deleted.
+    const body = hud
+      .slice(start, end)
+      .split('\n')
+      .filter((line) => !line.trim().startsWith('//'))
+      .join('\n');
+    expect(body.length).toBeLessThan(2000);
+    expect(body).toContain('craftId !== this.selectedCraftTab');
+    // The persist gate, matched per argument rather than as one long literal
+    // so a biome re-wrap of the call cannot false-red the pin.
+    expect(body).toContain('craftOwnsTab(');
+    expect(body).toContain('this.sim.recipeList');
+    expect(body).toContain('this.sim.craftingIdentity.knownRecipes');
+    expect(body).toContain('this.selectedCraftTab = craftId;');
+    expect(body).toContain('this.persistCraftingTab();');
+    expect(body).toContain('this.renderCrafting();');
+    // The gossip route's focus handoff: the dialog released its trap without
+    // restoring, so openCrafting must land focus on the selected tab.
+    expect(body).toContain("querySelector('.crafting-tab.sel')");
   });
 });
 
@@ -309,5 +348,28 @@ describe('desktop launcher behavior (jsdom)', () => {
     // no-op for unknown names, so a missing registration would leave no svg.
     hydrateIcons(document.body);
     expect(btn.querySelector('.ui-icon')).not.toBeNull();
+  });
+});
+
+describe('side rail flyout stacking (col-b hover labels over col-a)', () => {
+  // The hover flyout is a ::before at z-index: -1 so it tucks 6px under its
+  // own button. In the shared #side-buttons stacking context that also painted
+  // it under EVERY rail button, so the leftward-growing labels of col-b (the
+  // column hugging the screen edge) were clipped by col-a's buttons (v0.29.0
+  // bug: hovering the Game Menu gear showed "Game M" cut off by the Crafting
+  // tankard). Col-b must form its own stacking context above col-a: the flyout
+  // then still paints under its own column's buttons but over the neighbor's.
+  it('keeps the flyout tucked under its own button (z-index -1)', () => {
+    const flyout = /\.micro-btn::before \{([^}]*)\}/.exec(hudCss)?.[1] ?? '';
+    expect(flyout).toMatch(/z-index:\s*-1;/);
+  });
+
+  it('lifts #side-buttons-col-b into a stacking context above col-a', () => {
+    const colB = /#side-buttons-col-b \{([^}]*)\}/.exec(hudCss)?.[1] ?? '';
+    expect(colB, 'a #side-buttons-col-b rule must exist in hud.css').not.toBe('');
+    expect(colB).toMatch(/position:\s*relative;/);
+    expect(colB).toMatch(/z-index:\s*1;/);
+    // col-a must not be lifted too, or the fix cancels itself out.
+    expect(/#side-buttons-col-a \{[^}]*z-index/.test(hudCss)).toBe(false);
   });
 });

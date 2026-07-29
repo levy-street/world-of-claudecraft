@@ -38,7 +38,7 @@
   content: "";
   flex: 1 1 auto;
   height: 1px;
-  background: #463a1c;
+  background: var(--color-border-showcase);
 }
 /* The shared .auth-or has a bottom-only margin, which leaves the first-login chooser's
    "already have an account?" divider hugging the Create button instead of centered
@@ -110,7 +110,7 @@
   border-radius: 7px;
   background: #2a2414;
   color: #d8cba0;
-  border: 1px solid #463a1c;
+  border: 1px solid var(--color-border-showcase);
 }
 .uf-dc-chip.role {
   color: #100;
@@ -131,7 +131,7 @@
   position: fixed;
   z-index: 70;
   background: #14110a;
-  border: 1px solid #463a1c;
+  border: 1px solid var(--color-border-showcase);
   border-radius: 8px;
   box-shadow: 0 8px 24px -6px #000a;
   overflow: hidden;

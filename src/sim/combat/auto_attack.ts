@@ -27,12 +27,15 @@
 // `src/sim`-pure: no DOM/Three, no Math.random/Date.now; all randomness is the shared
 // `ctx.rng` stream, drawn in the exact pre-move positions.
 
-import { CLASSES, isArenaPos, MOBS } from '../data';
+import { CLASSES, ITEMS, isArenaPos, MOBS } from '../data';
+import { weaponHand } from '../equipment_rules';
+import { TWOHAND_DPS_MULT } from '../item_budget';
 import { forceDismount } from '../mounts';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { addThreat } from '../threat';
+import { resolveTalentHitMult } from '../talent_hit_mult';
+import { addThreat, hasEscapeStealth } from '../threat';
 import {
   angleTo,
   armorReduction,
@@ -46,6 +49,7 @@ import {
   normAngle,
   STANCE_MASTERY_BERSERKER_HASTE,
   swingMissChance,
+  type WeaponHand,
   type WeaponInfo,
 } from '../types';
 import { drawWeapon } from '../weapon_stow';
@@ -70,6 +74,23 @@ const RANGED_WEAPON_COEFF = 0.6;
 const DUAL_WIELD_WHITE_MISS_PENALTY = 0.1;
 const SUDDEN_DEATH_CHANCE = 0.1;
 const SUDDEN_DEATH_DURATION = 10;
+const ONE_HAND_AUTO_ATTACK_BASE_SPEED = 2;
+const OFFHAND_AUTO_ATTACK_DMG_MULT = 0.5;
+
+type AutoAttackHand = Extract<WeaponHand, 'onehand' | 'twohand'> | 'offhand';
+
+function autoAttackWeaponDamageMult(hand: AutoAttackHand, speed: number): number {
+  const speedMult = Math.max(0.1, speed) / ONE_HAND_AUTO_ATTACK_BASE_SPEED;
+  const handMult = hand === 'twohand' ? TWOHAND_DPS_MULT : 1;
+  const offhandMult = hand === 'offhand' ? OFFHAND_AUTO_ATTACK_DMG_MULT : 1;
+  return speedMult * handMult * offhandMult;
+}
+
+function mainhandAutoAttackHand(attacker: Entity): AutoAttackHand {
+  const item = attacker.mainhandItemId ? ITEMS[attacker.mainhandItemId] : undefined;
+  if (item?.kind !== 'weapon') return 'onehand';
+  return weaponHand(item) === 'twohand' ? 'twohand' : 'onehand';
+}
 
 export function startAutoAttack(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
@@ -87,7 +108,10 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
   // still-alive snapshot just as quietly. A genuinely invalid target (none, or a
   // friendly) still reports the error.
   if (t?.dead) return;
-  if (!t || !ctx.isHostileTo(p, t)) {
+  // Vanish (hasEscapeStealth) makes the target fully undetectable, same as a
+  // mob that lost line of sight on a stealthed player (mob/targeting.ts): a
+  // fresh engage against it is refused exactly like any other invalid target.
+  if (!t || !ctx.isHostileTo(p, t) || hasEscapeStealth(t)) {
     ctx.error(p.id, 'Invalid attack target.');
     return;
   }
@@ -139,7 +163,11 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
   }
   if (!p.autoAttack || p.castingAbility) return;
   const t = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
-  if (!t || t.dead || !ctx.isHostileTo(p, t)) {
+  // A target that slips into Vanish's escape stealth mid-fight must drop the
+  // swing too (issue #2426): the client stops rendering it as targeted, but
+  // without this the swing kept connecting on a target the caster could no
+  // longer see, the same detection the mob AI already honors (mobCanSeeTarget).
+  if (!t || t.dead || !ctx.isHostileTo(p, t) || hasEscapeStealth(t)) {
     p.autoAttack = false;
     return;
   }
@@ -184,6 +212,12 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
     let abilityName: string | null = null;
     let threatFlat = 0;
     let threatMult = 1;
+    // The resolved talent/mastery damage multiplier for the queued on-swing
+    // ability (weaponMult, mirroring weaponStrike's own field): meleeSwing
+    // applies it to the WHOLE swing (weapon roll + AP), not just `bonus`, so a
+    // "+X%" mastery/talent reaches the weapon+AP portion of a Heroic Strike /
+    // Raptor Strike style on-next-swing hit too (issue #1803).
+    let weaponMult = 1;
     if (p.queuedOnSwing) {
       const queued = ctx.resolvedAbility(p.queuedOnSwing, p.id);
       if (queued) {
@@ -202,6 +236,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
           abilityName = queued.def.name;
           threatFlat = queued.threatFlat;
           threatMult = queued.threatMult;
+          weaponMult = resolveTalentHitMult(queued.def, ctx.playerMods(meta)).dmgMult;
         }
       }
       p.queuedOnSwing = null;
@@ -209,8 +244,10 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
       delete p.queuedOnSwingCostMultiplier;
     }
     const connected = meleeSwing(ctx, p, t, bonus, abilityName, {
+      autoAttackHand: 'mainhand',
       threatFlat,
       threatMult,
+      weaponMult,
       whiteDualWieldPenalty: p.dualWielding && abilityName === null,
     });
     // Thuggery mastery (Sword Specialization shape): a landed mainhand auto has
@@ -219,6 +256,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
     const extraAttackPct = ctx.playerMods(meta).global.extraAttackPct;
     if (connected && abilityName === null && extraAttackPct > 0 && ctx.rng.chance(extraAttackPct)) {
       meleeSwing(ctx, p, t, 0, null, {
+        autoAttackHand: 'mainhand',
         whiteDualWieldPenalty: p.dualWielding,
       });
     }
@@ -236,7 +274,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
     const offhand = p.offhandWeapon;
     const connected = meleeSwing(ctx, p, t, 0, null, {
       weapon: offhand,
-      weaponMult: 0.5,
+      autoAttackHand: 'offhand',
       apSwingSpeed: offhand.speed,
       whiteDualWieldPenalty: true,
     });
@@ -384,6 +422,7 @@ export function meleeSwing(
     cannotBeDodged?: boolean;
     weapon?: WeaponInfo;
     weaponMult?: number;
+    autoAttackHand?: AutoAttackHand | 'mainhand';
     apSwingSpeed?: number;
     threatFlat?: number;
     threatMult?: number;
@@ -394,6 +433,14 @@ export function meleeSwing(
     critBonus?: number;
     onDealt?: (amount: number) => void;
     whiteDualWieldPenalty?: boolean;
+    // The casting ability's stable content id, threaded onto the landed-hit
+    // damage event's abilityId field (the weaponStrike path only; a plain
+    // auto-attack swing has no ability and leaves this unset). abilityName
+    // above stays the display label, so a client-side impact-cue lookup
+    // keyed off it silently breaks on the next rename (review finding, PR
+    // #2861: this is what left Ambush/Backstab/Sinister Strike's dedicated
+    // impact cues unreachable).
+    abilityId?: string | null;
   },
 ): boolean {
   const missChance =
@@ -452,12 +499,16 @@ export function meleeSwing(
   }
   const mult = opts.weaponMult ?? 1;
   const weapon = opts.weapon ?? attacker.weapon;
+  const autoAttackHand =
+    opts.autoAttackHand === 'mainhand' ? mainhandAutoAttackHand(attacker) : opts.autoAttackHand;
+  const weaponRollMult =
+    autoAttackHand === undefined ? 1 : autoAttackWeaponDamageMult(autoAttackHand, weapon.speed);
   const apSwingSpeed = opts.apSwingSpeed ?? baseSwingSpeed(attacker);
   // weapon imbues (seals, rockbiter) add flat damage to every swing
   let imbueBonus = 0;
   for (const a of attacker.auras) if (a.kind === 'imbue') imbueBonus += a.value;
   let dmg =
-    (ctx.rng.range(weapon.min, weapon.max) +
+    (ctx.rng.range(weapon.min, weapon.max) * weaponRollMult +
       // Normalize the attack-power contribution to the SAME cadence the swing
       // fires at: Wolf Form swings at the rogue speed (baseSwingSpeed), so its
       // AP-per-swing must use that speed too, not the slow staff's, or feral
@@ -477,7 +528,8 @@ export function meleeSwing(
     opts.forceCrit === true;
   if (crit) dmg *= 2 + attacker.critDmgPhysBonus;
   dmg *= 1 - armorReduction(ctx.effectiveArmor(target), attacker.level);
-  if (blockChance > 0 && roll < missChance + dodgeChance + parryChance + blockChance) {
+  const blocked = blockChance > 0 && roll < missChance + dodgeChance + parryChance + blockChance;
+  if (blocked) {
     dmg = Math.max(1, dmg - target.blockValue);
   }
   const dealtAmount = Math.max(1, Math.round(dmg));
@@ -488,12 +540,18 @@ export function meleeSwing(
     crit,
     'physical',
     abilityName,
-    'hit',
+    blocked ? 'block' : 'hit',
     false,
     {
       flat: opts.threatFlat ?? 0,
       mult: opts.threatMult ?? 1,
     },
+    true,
+    false,
+    false,
+    // Cue-presentation only on this path: onSpellCrit skips the physical
+    // school, so the id can never newly arm an ability-filtered proc here.
+    opts.abilityId ?? null,
   );
   opts.onDealt?.(resolvedAmount);
   // 4-piece set procs keyed to weapon crits (melee arm; covers auto-attack AND

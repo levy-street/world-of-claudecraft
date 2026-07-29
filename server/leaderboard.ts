@@ -53,6 +53,10 @@ import {
   searchCharacters,
 } from './db';
 import { type RecentDeedRow, recentDeedsForCharacter } from './deeds_db';
+// From the config module directly (not the ./steam or ./epic barrels): the
+// barrels drag routes.ts and its load-time middleware construction into this
+// module's graph, which partial db mocks in tests cannot serve.
+import { epicEnabled } from './epic/config';
 import { requireAccount } from './http/middleware/require_account';
 import type { Ctx, RouteDef } from './http/types';
 import { json } from './http_util';
@@ -60,9 +64,6 @@ import type { LiveReportTarget } from './moderation_db';
 import { recordUsageMetric } from './provider_usage';
 import { publicReadRateLimited } from './ratelimit';
 import { REALM, REALM_DIRECTORY } from './realm';
-// From the config module directly (not the ./steam barrel): the barrel drags
-// routes.ts and its load-time middleware construction into this module's
-// graph, which partial db mocks in tests cannot serve.
 import { steamEnabled } from './steam/config';
 
 // ---------------------------------------------------------------------------
@@ -148,6 +149,9 @@ export interface LeaderboardRuntime {
   /** Cache-fronted accounts-created count for project-stats (main.ts
    *  getAccountsCreatedCount): the moderation-invariant COUNT(*), its own 60s TTL. */
   getAccountsCreatedCount(): Promise<number>;
+  /** Cache-fronted characters-created count for project-stats (main.ts
+   *  getCharactersCreatedCount): realm-scoped COUNT(*), same 60s TTL. */
+  getCharactersCreatedCount(): Promise<number>;
   /** Cache-fronted GitHub releases proxy read (main.ts getReleases). */
   getReleases(): Promise<ReleaseEntry[]>;
   /** The repo slug the releases feed reports (main.ts GITHUB_REPO). */
@@ -384,9 +388,10 @@ export async function readRealms(
   return { current: realm, realms: directory, characters };
 }
 
-/** DB read project-stats needs (account-scoped, so not on the character Db). */
+/** DB read project-stats needs (account-scoped for accounts; realm-scoped for characters). */
 interface ProjectStatsReadDb {
   getAccountsCount(): Promise<number>;
+  getCharactersCount(realm: string): Promise<number>;
 }
 
 /** GET /api/project-stats body. */
@@ -394,9 +399,22 @@ export async function readProjectStats(
   db: ProjectStatsReadDb,
   playersOnline: number,
   realm: string,
-): Promise<{ accounts_created: number; players_online: number; realm: string }> {
-  const accountsCount = await db.getAccountsCount();
-  return { accounts_created: accountsCount, players_online: playersOnline, realm };
+): Promise<{
+  accounts_created: number;
+  characters_created: number;
+  players_online: number;
+  realm: string;
+}> {
+  const [accountsCount, charactersCount] = await Promise.all([
+    db.getAccountsCount(),
+    db.getCharactersCount(realm),
+  ]);
+  return {
+    accounts_created: accountsCount,
+    characters_created: charactersCount,
+    players_online: playersOnline,
+    realm,
+  };
 }
 
 /** DB reads the public character sheet needs. */
@@ -564,8 +582,8 @@ async function releasesHandler(ctx: Ctx): Promise<void> {
   json(ctx.res, 200, { repo: rt.githubRepo, releases: entries.slice(0, limit) });
 }
 
-/** GET /api/project-stats: accounts created, players online, realm. The
- *  accounts-created COUNT is served from the cache-fronted runtime (the same 60s
+/** GET /api/project-stats: characters created, players online, realm. The
+ *  characters-created COUNT is served from the cache-fronted runtime (the same 60s
  *  cache the legacy main.ts arm reads); players_online stays a live per-request
  *  read, so it is re-attached here rather than cached. Now an anonymous DB-fronted
  *  read, it carries publicReadRateLimited in-handler (the same per-IP public-read
@@ -577,8 +595,13 @@ async function projectStatsHandler(ctx: Ctx): Promise<void> {
     return;
   }
   const rt = useRuntime();
+  const [accountsCreated, charactersCreated] = await Promise.all([
+    rt.getAccountsCreatedCount(),
+    rt.getCharactersCreatedCount(),
+  ]);
   json(ctx.res, 200, {
-    accounts_created: await rt.getAccountsCreatedCount(),
+    accounts_created: accountsCreated,
+    characters_created: charactersCreated,
     players_online: rt.playersOnline(),
     realm: REALM,
   });
@@ -588,10 +611,20 @@ async function projectStatsHandler(ctx: Ctx): Promise<void> {
  * GET /api/status: the public realm + online snapshot. LABELED knownDeviation
  * (status-name-list-trim): the online player name-list the legacy arm returned is
  * dropped here, so the public endpoint exposes counts only, not who is online.
- * steam.enabled is the capability advert clients read before rendering any
- * Steam link UI (dual-arm edit: the legacy main.ts twin carries the same field).
+ * steam.enabled / epic.enabled are the capability adverts clients read before
+ * rendering any Steam / Epic link UI (dual-arm edit: the legacy main.ts twin
+ * carries the same fields).
  * players_cap is the configured realm player cap (0 when disabled), also a dual-arm
  * edit: the legacy main.ts twin carries the same field with the same semantics.
+ * dev_commands is the capability advert for the /dev GUI: the dev_* cheats ride the
+ * WEBSOCKET dispatcher, which both ladders serve identically, so unlike steam.enabled
+ * this one reports the real env on BOTH arms (dual-arm edit: the legacy main.ts twin
+ * carries the same field). Read live per request, mirroring the /api/perf gate. It
+ * advertises only; every cheat is still re-gated server-side on each message, so a
+ * forged true buys a client nothing.
+ * profiler_invulnerability is a narrower capability advert for the online profiler.
+ * Its presence proves the server supports the idempotent command, and its value is
+ * true only when that command's ALLOW_DEV_COMMANDS gate is armed.
  */
 async function statusHandler(ctx: Ctx): Promise<void> {
   const rt = useRuntime();
@@ -601,6 +634,9 @@ async function statusHandler(ctx: Ctx): Promise<void> {
     players_online: rt.playersOnline(),
     players_cap: rt.playersCap(),
     steam: { enabled: steamEnabled() },
+    epic: { enabled: epicEnabled() },
+    dev_commands: process.env.ALLOW_DEV_COMMANDS === '1',
+    profiler_invulnerability: process.env.ALLOW_DEV_COMMANDS === '1',
   });
 }
 

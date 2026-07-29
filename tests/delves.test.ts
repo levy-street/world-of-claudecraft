@@ -177,19 +177,15 @@ describe('delve spatial band', () => {
     expect(isDelvePos(ARENA_X)).toBe(false);
   });
 
-  it('pins the delve boundary against the arena and Orkadia seams (relocation regression)', () => {
+  it('pins the delve boundary against the arena seam (relocation regression)', () => {
     // DELVE_X_MIN moved 3600 -> 4800 when v0.10.0 pushed the arena to x=4200,
     // and the whole instance plane moved east by INSTANCE_X_BASE when the
     // world went grid (stage 2). Pin the load-bearing offset and the exact
-    // arena/dungeon/delve seams so a respacing that re-introduces overlap fails here.
+    // arena/delve seam so a respacing that re-introduces overlap fails here.
     expect(DELVE_X_MIN).toBe(INSTANCE_X_BASE + 4800);
-    // Three regions sit west of the delve band: the tight arena column (ARENA_X),
-    // the Orkadia dungeon slot (index 6, past the arena), then the delve band. The
-    // x just below the delve band is the Orkadia slot, NOT the arena, so the arena
-    // band no longer stretches across the whole gap (that was the pitch-black-room bug).
-    expect(isArenaPos(DELVE_BAND_X_MIN - 1)).toBe(false);
+    // The seam: DELVE_BAND_X_MIN is the first delve x; the x just below it is arena.
+    expect(isArenaPos(DELVE_BAND_X_MIN - 1)).toBe(true);
     expect(isDelvePos(DELVE_BAND_X_MIN - 1)).toBe(false);
-    expect(dungeonAt(DELVE_BAND_X_MIN - 1)?.interior).toBe('orkadia');
     expect(isDelvePos(DELVE_BAND_X_MIN)).toBe(true);
     expect(isArenaPos(DELVE_BAND_X_MIN)).toBe(false);
     // Keep a real gap between the arena anchor and the delve band.
@@ -573,6 +569,70 @@ describe('delve interactables and affixes', () => {
     for (let i = 0; i < 20 * 6; i++) sim.tick();
     const after = [...sim.entities.values()].filter(
       (e) => e.templateId === 'reliquary_bonewalker',
+    ).length;
+    expect(after).toBe(before);
+  });
+
+  it('an evade/wipe reset cancels Deacon Varric in-flight Raise Dead channel', () => {
+    const sim = makeSim();
+    enterReliquary(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    run.modules = ['reliquary_finale'];
+    run.moduleIndex = 0;
+    (sim as any).spawnDelveModule(run);
+    const boss = [...sim.entities.values()].find((e) => e.templateId === 'deacon_varric')!;
+    boss.inCombat = true;
+    boss.hp = Math.ceil(boss.maxHp * 0.55);
+    (sim as any).updateBossMechanics(boss);
+    expect(run.raiseDeadChannel).not.toBeNull();
+
+    // Party wipes (or the boss is kited past the leash) before the channel
+    // resolves: resetEvadingMob is the one reset path every delve/dungeon boss
+    // goes through, and it must cancel the stale channel too, same as the manual
+    // grave-interrupt path above, or it keeps counting down after the "reset"
+    // and spawns unowned adds a few seconds later.
+    (sim as any).resetEvadingMob(boss);
+    expect(run.raiseDeadChannel).toBeNull();
+
+    const before = [...sim.entities.values()].filter(
+      (e) => e.templateId === 'reliquary_funeral_ringer',
+    ).length;
+    for (let i = 0; i < 20 * 6; i++) sim.tick();
+    const after = [...sim.entities.values()].filter(
+      (e) => e.templateId === 'reliquary_funeral_ringer',
+    ).length;
+    expect(after).toBe(before);
+  });
+
+  it('entering evade (leash break) cancels the in-flight Raise Dead channel before the boss walks home', () => {
+    const sim = makeSim();
+    enterReliquary(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    run.modules = ['reliquary_finale'];
+    run.moduleIndex = 0;
+    (sim as any).spawnDelveModule(run);
+    const boss = [...sim.entities.values()].find((e) => e.templateId === 'deacon_varric')!;
+    boss.inCombat = true;
+    boss.hp = Math.ceil(boss.maxHp * 0.55);
+    (sim as any).updateBossMechanics(boss);
+    expect(run.raiseDeadChannel).not.toBeNull();
+
+    // Mirror the real leash path: updateMobCombatProfile flips aiState to
+    // 'evade' the instant the boss crosses the leash, well before it finishes
+    // walking home to resetEvadingMob's arrival check. The channel must be
+    // dropped at that point, not left ticking down in the background where it
+    // could still fire spawnBossAdds while the boss is mid-walk.
+    boss.aiState = 'evade';
+    expect(run.raiseDeadChannel).not.toBeNull(); // not yet ticked
+    sim.tick();
+    expect(run.raiseDeadChannel).toBeNull();
+
+    const before = [...sim.entities.values()].filter(
+      (e) => e.templateId === 'reliquary_funeral_ringer',
+    ).length;
+    for (let i = 0; i < 20 * 6; i++) sim.tick();
+    const after = [...sim.entities.values()].filter(
+      (e) => e.templateId === 'reliquary_funeral_ringer',
     ).length;
     expect(after).toBe(before);
   });
@@ -1384,6 +1444,10 @@ describe('Tessa percent-of-health heal + rank cap', () => {
     meta.delveMarks = 100;
     meta.copper = 100;
     meta.companionUpgrades = { companion_tessa: 1 };
+    // Rank-up happens at Brother Halven's board (the delve door), not from
+    // inside the run: step back to the door before spending.
+    const door = DELVES.collapsed_reliquary.doorPos;
+    teleport(sim, door.x, door.z);
     sim.companionUpgrade('companion_tessa');
     expect(meta.companionUpgrades.companion_tessa).toBe(2);
     expect(meta.delveMarks).toBe(97);

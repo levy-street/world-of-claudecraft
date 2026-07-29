@@ -13,21 +13,27 @@
 
 import { audio } from '../game/audio';
 import { ITEMS } from '../sim/data';
-import type { InvSlot } from '../sim/types';
+import { itemInstancePayloadsEqual } from '../sim/item_instance_merge';
+import { isTransferLockedInstance } from '../sim/item_instance_transfer';
+import type { InvSlot, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { markDialogRoot } from './dialog_root';
-import { itemDisplayName, tEntity } from './entity_i18n';
+import { itemDisplayName, knownLetterId, tEntity } from './entity_i18n';
 import { esc } from './esc';
+import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
+import { captureFormDraft, restoreFormDraft } from './form_draft';
 import { formatMoney, formatNumber, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import {
   buildMailboxView,
+  canStageInstancedCopy,
   clampParcelQty,
   type MailInboxBody,
   type MailInboxRow,
   type MailSendBody,
   type MailTab,
   mailSendBlocked,
+  parseParcelQty,
   recipientSuggestions,
   wrappedSuggestionIndex,
 } from './mailbox_view';
@@ -117,8 +123,11 @@ export class MailboxWindow {
     this.openerFocus = null;
   }
 
-  /** Stage a bag stack as a parcel (called by the bags window on click). */
-  stageParcel(itemId: string): void {
+  /** Stage a bag stack as a parcel (called by the bags window on click).
+   *  `instance` is the clicked slot's payload (issue 1165): an instanced copy
+   *  stages as ITSELF, a fixed single-copy parcel (the qty stepper stays
+   *  fungible-only); a plain stack stages fungibly exactly as before. */
+  stageParcel(itemId: string, instance?: ItemInstancePayload): void {
     if (!this.isSendTab) return;
     const info = this.deps.world().mailInfo;
     const max = info?.maxAttachments ?? 3;
@@ -130,12 +139,39 @@ export class MailboxWindow {
       );
       return;
     }
-    if (this.attachments.some((s) => s.itemId === itemId)) return;
+    if (instance) {
+      // One chip per COPY, not per distinct payload: byte-equal copies are
+      // interchangeable and the sim escrows each named entry separately, so a
+      // player holding several identical signed copies can send several in one
+      // letter (bounded by what they hold unlocked and by the parcel limit
+      // above). Differently-instanced copies of one item id each get their own
+      // chip as before.
+      if (
+        !canStageInstancedCopy(
+          this.attachments,
+          itemId,
+          instance,
+          this.ownedInstancedCountFor(itemId, instance),
+          max,
+        )
+      )
+        return;
+      this.attachments.push({ itemId, count: 1, instance });
+      audio.click();
+      this.renderParcels();
+      return;
+    }
+    if (this.attachments.some((s) => s.itemId === itemId && !s.instance)) return;
     const count = this.ownedCountFor(itemId);
     if (count < 1) return;
     this.attachments.push({ itemId, count });
     audio.click();
-    this.render();
+    // Targeted repaint, NOT this.render(): the full render rebuilds the send
+    // form via innerHTML with empty inputs, wiping the typed recipient,
+    // subject, body, and coin amounts the moment a parcel was attached. The
+    // stepper and remove paths already repaint this way (#1695); attach was
+    // the one parcel mutation still running the full rebuild.
+    this.renderParcels();
   }
 
   /**
@@ -151,14 +187,48 @@ export class MailboxWindow {
       .reduce((n, s) => n + s.count, 0);
   }
 
+  /**
+   * Held copies of one item id whose payload is byte-equal to `instance` AND
+   * are not transfer-locked: the instanced twin of ownedCountFor above, and the
+   * exact mirror of the sim's escrow validation (item_instance_transfer.ts
+   * countMatchingUnlocked), so the staging ceiling can never exceed what the
+   * send path will actually escrow.
+   */
+  private ownedInstancedCountFor(itemId: string, instance: ItemInstancePayload): number {
+    return this.deps
+      .world()
+      .inventory.filter(
+        (s) =>
+          s.itemId === itemId &&
+          !!s.instance &&
+          !isTransferLockedInstance(s.instance) &&
+          itemInstancePayloadsEqual(s.instance, instance),
+      )
+      .reduce((n, s) => n + s.count, 0);
+  }
+
   /** Nudge a staged parcel's quantity from the +/- stepper (#1444). */
   private adjustParcelQty(itemId: string, delta: number): void {
-    const slot = this.attachments.find((s) => s.itemId === itemId);
+    const slot = this.attachments.find((s) => s.itemId === itemId && !s.instance);
     if (!slot) return;
     const next = clampParcelQty(slot.count, delta, this.ownedCountFor(itemId));
     if (next === slot.count) return;
     slot.count = next;
     audio.click();
+    this.renderParcels();
+  }
+
+  /** Commit a TYPED parcel quantity (the chip input's change event). Always
+   *  repaints, even when the count is unchanged, so a normalized-away entry
+   *  ("007", "", "999" over stock) snaps the field back to the real value. */
+  private setParcelQty(itemId: string, raw: string): void {
+    const slot = this.attachments.find((s) => s.itemId === itemId && !s.instance);
+    if (!slot) return;
+    const next = parseParcelQty(raw, this.ownedCountFor(itemId), slot.count);
+    if (next !== slot.count) {
+      slot.count = next;
+      audio.click();
+    }
     this.renderParcels();
   }
 
@@ -200,23 +270,76 @@ export class MailboxWindow {
       return;
     }
     if (this.tab === 'send') return; // typed inputs: rebuilt only on actions
-    const sig = JSON.stringify([this.tab, this.openedId, info.messages, info.unread]);
+    const sig = this.sig(info);
     if (sig === this.lastSig) return;
     this.lastSig = sig;
     this.render();
   }
 
+  // The inbox repaint signature: the tab, the open letter, and the mail mirror.
+  // Ids and counts only, so a language switch alone can never move it, which is
+  // why relocalize() exists below.
+  private sig(info: NonNullable<IWorld['mailInfo']>): string {
+    return JSON.stringify([this.tab, this.openedId, info.messages, info.unread]);
+  }
+
+  /**
+   * Re-localize after an in-game language switch (the Hud's woc:languagechange
+   * fan-out). Self-gated on the open flag so the fan-out can call it
+   * unconditionally.
+   *
+   * The Send tab is the reason this cannot be a bare render(): renderSend
+   * rebuilds the form via innerHTML with an empty recipient, subject, body and
+   * zeroed coin fields, so the repaint that fixes the language would wipe a
+   * half-written letter. That is the same loss #1695 fixed for the parcel path,
+   * where the answer was to repaint less; a language switch cannot narrow that
+   * way, since every label in the window is what moved, so the draft is carried
+   * across the rebuild instead. The suggestion list needs no extra handling:
+   * renderSend clears the pending search and its timer itself.
+   *
+   * The signature is RE-LATCHED, not cleared, so the next slow tick early-returns
+   * instead of rebuilding a second time over the restored draft. It is skipped
+   * when the mail mirror is absent, since the sig is built from it and
+   * refreshIfChanged returns before reading it in that state.
+   */
+  relocalize(): void {
+    if (!this.opened) return;
+    const root = this.deps.root();
+    const draft = captureFormDraft(root);
+    this.render({ revealBags: false });
+    restoreFormDraft(root, draft);
+    const info = this.deps.world().mailInfo;
+    if (info) this.lastSig = this.sig(info);
+  }
+
   private senderLabel(row: MailInboxRow): string {
-    if (row.letterId) return tEntity({ kind: 'letter', id: row.letterId, field: 'sender' });
+    // Localized when THIS bundle ships the letter; an authored letter this
+    // bundle predates falls back to the WIRE-shipped English the server
+    // already sends beside the id (R34: raw ids are for ids, not prose).
+    if (row.letterId && knownLetterId(row.letterId)) {
+      return tEntity({ kind: 'letter', id: row.letterId, field: 'sender' });
+    }
     return row.senderName;
   }
 
   private subjectLabel(row: MailInboxRow): string {
-    if (row.letterId) return tEntity({ kind: 'letter', id: row.letterId, field: 'subject' });
+    if (row.letterId && knownLetterId(row.letterId)) {
+      return tEntity({ kind: 'letter', id: row.letterId, field: 'subject' });
+    }
     return row.subject.length > 0 ? row.subject : t('hudChrome.mailbox.noSubject');
   }
 
-  render(): void {
+  /**
+   * Full rebuild of the window chrome plus its current tab.
+   *
+   * `revealBags` exists for the language fan-out and is the one thing a caller
+   * ever needs to turn off: the Send tab's paint normally REVEALS the bags
+   * window so parcels can be clicked straight onto the letter, and a language
+   * switch must not re-open a bags window the player deliberately closed. It is
+   * an argument rather than a mode flag on the instance so the decision is
+   * visible at the call site that makes it.
+   */
+  render({ revealBags = true }: { revealBags?: boolean } = {}): void {
     const el = this.deps.root();
     this.deps.hideTooltip();
     markDialogRoot(el, { label: t('hudChrome.mailbox.title') });
@@ -247,10 +370,10 @@ export class MailboxWindow {
         (this.deps.root().querySelector(`[data-tab="${next}"]`) as HTMLElement | null)?.focus();
       });
     });
-    this.renderContent();
+    this.renderContent(revealBags);
   }
 
-  private renderContent(): void {
+  private renderContent(revealBags: boolean): void {
     const body = this.deps.root().querySelector<HTMLElement>('#mailbox-body');
     if (!body) return;
     const view = buildMailboxView({
@@ -267,7 +390,7 @@ export class MailboxWindow {
       this.renderInbox(body, view.body);
       return;
     }
-    this.renderSend(body, view.body);
+    this.renderSend(body, view.body, revealBags);
   }
 
   private renderInbox(body: HTMLElement, view: MailInboxBody): void {
@@ -320,9 +443,10 @@ export class MailboxWindow {
   private renderReading(body: HTMLElement, opened: MailInboxRow & { body: string }): void {
     const sender = this.senderLabel(opened);
     const subject = this.subjectLabel(opened);
-    const letterBody = opened.letterId
-      ? tEntity({ kind: 'letter', id: opened.letterId, field: 'body' })
-      : opened.body;
+    const letterBody =
+      opened.letterId && knownLetterId(opened.letterId)
+        ? tEntity({ kind: 'letter', id: opened.letterId, field: 'body' })
+        : opened.body;
     body.innerHTML =
       `<div class="mail-reading">` +
       `<button type="button" class="mail-back" data-mail-back>${svgIcon('prev')}<span>${esc(t('hudChrome.mailbox.back'))}</span></button>` +
@@ -355,7 +479,7 @@ export class MailboxWindow {
           const stack =
             slot.count > 1 ? ` x${formatNumber(slot.count, { maximumFractionDigits: 0 })}` : '';
           chip.innerHTML = `${this.deps.itemIcon(item)}<span style="color:${qColor}">${esc(itemDisplayName(item))}${esc(stack)}</span>`;
-          this.deps.attachTooltip(chip, () => this.deps.itemTooltip(item));
+          this.deps.attachTooltip(chip, () => this.deps.itemTooltip(item, slot.instance));
         } else {
           chip.textContent = slot.itemId;
         }
@@ -394,7 +518,7 @@ export class MailboxWindow {
     }
   }
 
-  private renderSend(body: HTMLElement, view: MailSendBody): void {
+  private renderSend(body: HTMLElement, view: MailSendBody, revealBags: boolean): void {
     window.clearTimeout(this.recipientSuggestTimer);
     this.recipientSuggest = { items: [], index: -1 };
     body.innerHTML =
@@ -423,7 +547,11 @@ export class MailboxWindow {
       `</div>`;
     this.renderParcels();
     // Bags ride alongside so parcels can be clicked straight onto the letter.
-    this.deps.syncBags(true);
+    // NOT on the relocalize path (revealBags false): syncBags(true) REVEALS the
+    // bags window, and a language switch must not re-open one the player closed.
+    // The fan-out re-renders an open bags window on its own arm, so an open one
+    // still lands in the new locale.
+    if (revealBags) this.deps.syncBags(true);
     // The coin inputs seed "0": select it on focus so typing replaces the value
     // (clicking into gold and typing 1 must mean 1g, not the 10 you get by
     // appending). The once-only mouseup swallow keeps the click-to-focus gesture
@@ -605,10 +733,11 @@ export class MailboxWindow {
     if (!parcels) return;
     // A +/- click rebuilds this whole container, which would otherwise drop
     // keyboard focus to <body>; remember which control (by item + role) had
-    // it so the rebuilt equivalent can reclaim it below.
-    const focusedEl = document.activeElement as HTMLElement | null;
-    const focusKey =
-      focusedEl && parcels.contains(focusedEl) ? (focusedEl.dataset.focusKey ?? null) : null;
+    // it so the rebuilt equivalent can reclaim it below. The shared helper
+    // (#2528) narrows activeElement and does the containment check; the
+    // container passed is the PARCEL LIST, not the window root, so focus
+    // sitting anywhere else in the mailbox is correctly left alone.
+    const focusKey = captureFocusKey(parcels);
     parcels.innerHTML = '';
     if (this.attachments.length === 0) {
       const hint = document.createElement('span');
@@ -619,11 +748,23 @@ export class MailboxWindow {
     }
     const itemControls = new Map<
       string,
-      { minus?: HTMLButtonElement; plus?: HTMLButtonElement; remove?: HTMLButtonElement }
+      {
+        minus?: HTMLButtonElement;
+        plus?: HTMLButtonElement;
+        qty?: HTMLInputElement;
+        remove?: HTMLButtonElement;
+      }
     >();
-    for (const slot of this.attachments) {
+    for (const [chipIdx, slot] of this.attachments.entries()) {
       const item = ITEMS[slot.itemId];
       if (!item) continue;
+      // Per-chip focus/controls key: a plain stack and an instanced copy of the
+      // same item id are distinct chips and must not collide in the focus map.
+      // The staged-array index keeps two DIFFERENTLY-instanced copies of one
+      // item id distinct too (stageParcel dedups byte-equal payloads only);
+      // the array order is stable across repaints, so the focus restore lands
+      // on the same chip.
+      const chipKey = slot.instance ? `${slot.itemId}#i${chipIdx}` : slot.itemId;
       const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? QUALITY_DEFAULT_COLOR;
       const chip = document.createElement('span');
       chip.className = 'mail-parcel-chip';
@@ -633,15 +774,16 @@ export class MailboxWindow {
       // is a focusin listener on this exact element.
       name.tabIndex = 0;
       name.innerHTML = `${this.deps.itemIcon(item)}<span style="color:${qColor}">${esc(itemDisplayName(item))}</span>`;
-      this.deps.attachTooltip(name, () => this.deps.itemTooltip(item));
+      this.deps.attachTooltip(name, () => this.deps.itemTooltip(item, slot.instance));
       chip.appendChild(name);
       const owned = this.ownedCountFor(slot.itemId);
       const controls: {
         minus?: HTMLButtonElement;
         plus?: HTMLButtonElement;
+        qty?: HTMLInputElement;
         remove?: HTMLButtonElement;
       } = {};
-      if (owned > 1) {
+      if (!slot.instance && owned > 1) {
         const step = document.createElement('span');
         step.className = 'mail-parcel-qty';
         const minus = document.createElement('button');
@@ -655,11 +797,39 @@ export class MailboxWindow {
           t('hudChrome.mailbox.parcelQtyDecreaseAria', { item: itemDisplayName(item) }),
         );
         minus.addEventListener('click', () => this.adjustParcelQty(slot.itemId, -1));
-        const qty = document.createElement('span');
-        qty.className = 'mail-parcel-qty-value';
+        // Typeable quantity (was a read-only span): validated on change/blur,
+        // never per keystroke, so typing is not interrupted by the repaint.
+        // Purely client UX: the sim's post office re-validates every send
+        // (floors counts, rejects < 1, checks fungible stock) authoritatively.
+        const qty = document.createElement('input');
+        qty.type = 'number';
+        qty.min = '1';
+        qty.max = String(owned);
+        qty.inputMode = 'numeric';
+        qty.className = 'mail-parcel-qty-input';
+        qty.value = String(slot.count);
+        qty.dataset.focusKey = `${slot.itemId}:qty`;
+        // Still a live region even as an input: a +/- stepper click changes
+        // this value while focus sits on the BUTTON, and without aria-live a
+        // screen reader hears nothing about the new count.
         qty.setAttribute('aria-live', 'polite');
-        qty.textContent = t('itemUi.bags.stackCount', {
-          count: formatNumber(slot.count, { maximumFractionDigits: 0 }),
+        qty.setAttribute(
+          'aria-label',
+          t('hudChrome.mailbox.parcelQtyAria', { item: itemDisplayName(item) }),
+        );
+        // The coin-input focus contract: select the value so typing replaces it
+        // (clicking into "2" and typing 5 must mean 5, not 25); the once-only
+        // mouseup swallow keeps click-to-focus from collapsing the selection.
+        qty.addEventListener('focus', () => {
+          qty.select();
+          qty.addEventListener('mouseup', (e) => e.preventDefault(), { once: true });
+        });
+        qty.addEventListener('change', () => this.setParcelQty(slot.itemId, qty.value));
+        qty.addEventListener('keydown', (ke) => {
+          if (ke.key === 'Enter') {
+            ke.preventDefault();
+            qty.blur();
+          }
         });
         const plus = document.createElement('button');
         plus.type = 'button';
@@ -676,45 +846,73 @@ export class MailboxWindow {
         chip.appendChild(step);
         controls.minus = minus;
         controls.plus = plus;
+        controls.qty = qty;
       }
       const remove = document.createElement('button');
       remove.type = 'button';
       remove.className = 'mail-parcel-remove-btn';
       remove.innerHTML = svgIcon('close', { cls: 'mail-parcel-remove' });
-      remove.dataset.focusKey = `${slot.itemId}:remove`;
+      remove.dataset.focusKey = `${chipKey}:remove`;
       remove.setAttribute(
         'aria-label',
         t('hudChrome.mailbox.removeParcelAria', { item: itemDisplayName(item) }),
       );
       remove.addEventListener('click', () => {
-        this.attachments = this.attachments.filter((s) => s.itemId !== slot.itemId);
+        // Reference identity, not item id: with a plain stack AND an instanced
+        // copy of one item staged, removing one chip must not sweep the other.
+        this.attachments = this.attachments.filter((s) => s !== slot);
         audio.click();
         this.renderParcels();
       });
       chip.appendChild(remove);
       controls.remove = remove;
-      itemControls.set(slot.itemId, controls);
+      itemControls.set(chipKey, controls);
       parcels.appendChild(chip);
     }
     if (focusKey) {
       const [itemId, role] = focusKey.split(':');
       const controls = itemControls.get(itemId);
+      // The qty input matters most here: a number input's arrow keys fire
+      // `change` WITHOUT blurring, so the repaint runs while the input is
+      // focused; falling through to Remove would turn the player's next
+      // Enter/Space into removing the parcel mid-adjustment.
       const preferred = controls
         ? role === 'minus'
           ? controls.minus
           : role === 'plus'
             ? controls.plus
-            : controls.remove
+            : role === 'qty'
+              ? controls.qty
+              : controls.remove
         : undefined;
       // The just-activated control (or its whole item) can vanish on rebuild
       // (disabled at a bound, or the stepper dropped once owned <= 1): fall
-      // back to the nearest still-focusable control for the same item.
-      let target: HTMLButtonElement | undefined;
-      if (preferred && !preferred.disabled) target = preferred;
-      else if (controls?.minus && !controls.minus.disabled) target = controls.minus;
-      else if (controls?.plus && !controls.plus.disabled) target = controls.plus;
-      else target = controls?.remove;
-      target?.focus();
+      // back to the nearest still-focusable control for the same item. This
+      // ladder is the panel's own; the shared helper (#2528) owns only the
+      // walk, skipping any candidate that is absent or came back disabled.
+      // Note that the qty input and Remove are never disabled in this painter,
+      // so the skip changes nothing for them: they are the two rungs the old
+      // hand-rolled chain took without a disabled check.
+      // `minus` and `plus` are DEFENSIVE rungs, not reachable fallbacks, and
+      // were equally unreachable in the chain this replaced: all three stepper
+      // controls are minted together under `owned > 1` above and qty is never
+      // disabled, so qty always intercepts before them. They earn their place
+      // the day qty can be disabled, and they cost nothing meanwhile. The
+      // reachable rungs are the preferred control, qty, and Remove (the last
+      // only when the stepper vanishes because owned dropped under two).
+      // KNOWN GAP, pre-existing and not this ladder's to fix: pressing Remove
+      // itself lands on <body>, because the parcel is gone from `attachments`
+      // so every rung for that item resolves undefined (and with one parcel
+      // staged, the empty-list return above skips the restore entirely).
+      // Degrading to a surviving parcel, or to the parcels container, needs a
+      // cross-item fallback this per-item ladder does not have.
+      restoreFirstEnabled([
+        preferred,
+        controls?.qty,
+        controls?.minus,
+        controls?.plus,
+        controls?.remove,
+      ]);
     }
   }
 }

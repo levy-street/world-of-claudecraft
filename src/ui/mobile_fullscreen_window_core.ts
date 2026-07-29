@@ -13,15 +13,15 @@
 // forbids. Hud owns the DOM class toggle; this core keeps the decision
 // independently testable.
 //
-// bags is NOT actually fullscreen in the three "paired cluster" layouts
-// (body.vendor-open, body.bank-open, body.char-bags-paired): those blocks in
-// hud.mobile.css deliberately reserve the bottom 72px so the player frame
-// stays visible underneath the docked pair. Hiding the bottom bar there
-// would hide HP/resource while the world keeps running (talking to a vendor
-// or opening the bank/character sheet does not pause combat) and leave an
-// empty 72px band where the frame used to be. Neither half of a paired
-// cluster is fullscreen, so this returns false whenever any of the three
-// disqualifying body classes is set. The three flags are taken separately
+// bags is NOT actually fullscreen in the four "paired cluster" layouts
+// (body.vendor-open, body.bank-open, body.market-open, body.char-bags-paired):
+// those blocks in hud.mobile.css deliberately reserve the bottom 72px so the
+// player frame stays visible underneath the docked pair. Hiding the bottom bar
+// there would hide HP/resource while the world keeps running (talking to a
+// vendor or opening the bank/market/character sheet does not pause combat) and
+// leave an empty 72px band where the frame used to be. Neither half of a
+// paired cluster is fullscreen, so this returns false whenever any of the four
+// disqualifying body classes is set. The four flags are taken separately
 // (rather than pre-reduced by the caller) so the disqualifying-class list
 // itself is part of what a test can pin down.
 
@@ -30,8 +30,9 @@ export function isMobileFullscreenWindowOpen(
   charWindowVisible: boolean,
   vendorOpen: boolean,
   bankOpen: boolean,
+  marketOpen: boolean,
   charBagsPaired: boolean,
 ): boolean {
-  if (vendorOpen || bankOpen || charBagsPaired) return false; // no half of a paired cluster is fullscreen
+  if (vendorOpen || bankOpen || marketOpen || charBagsPaired) return false; // no half of a paired cluster is fullscreen
   return bagsVisible || charWindowVisible;
 }

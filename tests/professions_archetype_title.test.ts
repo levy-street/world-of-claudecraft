@@ -1,4 +1,4 @@
-// Archetype title (issue #1130, pair-named under the Professions 2.0 Phase 1
+// Archetype title (issue #1130, pair-named under the Professions 2.0
 // blueprint): a player's currently-active adjacent-pair attunement (see
 // src/sim/professions/archetype.ts, issue #1129) grants the named title for
 // that PAIR, identified by the canonical pair id (archetypePairId). There is no

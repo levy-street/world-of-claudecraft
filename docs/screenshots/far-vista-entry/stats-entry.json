@@ -1,0 +1,113 @@
+{
+  "method": "headless Chromium (SwiftShader, gfx=high), entry probe sampling renderer far-grid build and scene fog every 250ms; reveal = first frame after the loading screen hides",
+  "before": {
+    "source": "release/v0.35.0 base, local dev server, unthrottled",
+    "summary": {
+      "label": "sanity-dev",
+      "throttling": {
+        "rttMs": 0,
+        "mbps": 10000,
+        "cpuRate": 1
+      },
+      "revealAtMs": 151074,
+      "atReveal": {
+        "t": 151074,
+        "loadingVisible": false,
+        "boot": true,
+        "built": 12,
+        "planned": 12,
+        "fogNear": 601,
+        "fogFar": 1501,
+        "detailFogFar": 142
+      },
+      "gridDoneAtMs": 151074,
+      "gridDoneAfterRevealMs": 0,
+      "last": {
+        "t": 174448,
+        "loadingVisible": false,
+        "boot": true,
+        "built": 12,
+        "planned": 12,
+        "fogNear": 1511,
+        "fogFar": 3883,
+        "detailFogFar": 170
+      }
+    },
+    "postRevealFogEase": [
+      {
+        "t": 151074,
+        "loadingVisible": false,
+        "boot": true,
+        "built": 12,
+        "planned": 12,
+        "fogNear": 601,
+        "fogFar": 1501,
+        "detailFogFar": 142
+      },
+      {
+        "t": 174448,
+        "loadingVisible": false,
+        "boot": true,
+        "built": 12,
+        "planned": 12,
+        "fogNear": 1511,
+        "fogFar": 3883,
+        "detailFogFar": 170
+      }
+    ],
+    "note": "fog easing on screen after the cut: 1501 at reveal, 3883 at +23s, target 5120; under a loaded production boot the base far grid additionally takes its idle timeout ceiling (~164 slices x 200ms, tens of seconds of classic fog) before the vista can flip at all"
+  },
+  "after": {
+    "source": "fix branch deployed to dev.worldofclaudecraft.com (b3d965040e), real network, fresh account first entry",
+    "summary": {
+      "label": "dev-after",
+      "cpuRate": 1,
+      "revealAtMs": 249059,
+      "atReveal": {
+        "t": 249059,
+        "loadingVisible": false,
+        "boot": true,
+        "built": 12,
+        "planned": 12,
+        "fogNear": 1984,
+        "fogFar": 5120,
+        "detailFogFar": 142
+      },
+      "gridDoneAtMs": 249059,
+      "gridDoneAfterRevealMs": 0,
+      "last": {
+        "t": 261610,
+        "loadingVisible": false,
+        "boot": true,
+        "built": 12,
+        "planned": 12,
+        "fogNear": 1984,
+        "fogFar": 5120,
+        "detailFogFar": 170
+      }
+    },
+    "postRevealFogEase": [
+      {
+        "t": 249059,
+        "loadingVisible": false,
+        "boot": true,
+        "built": 12,
+        "planned": 12,
+        "fogNear": 1984,
+        "fogFar": 5120,
+        "detailFogFar": 142
+      },
+      {
+        "t": 261610,
+        "loadingVisible": false,
+        "boot": true,
+        "built": 12,
+        "planned": 12,
+        "fogNear": 1984,
+        "fogFar": 5120,
+        "detailFogFar": 170
+      }
+    ],
+    "note": "grid 12/12 and fog settled at the exact haze targets (near 1984, far 5120) on the first visible frame; zero post-reveal atmosphere movement"
+  }
+}

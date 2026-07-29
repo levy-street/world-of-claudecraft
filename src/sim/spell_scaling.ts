@@ -71,16 +71,29 @@ function powerScale(def: AbilityDef): number {
 // Flat bonus added to ONE direct (or AoE) spell hit. `castTimeSec` is the
 // rank-resolved cast time (res.castTime), NOT the rank-1 base def.castTime, so
 // higher ranks (and talent-hastened casts) scale correctly. `aoe` applies the
-// AoE penalty.
+// AoE penalty. `mult` is the resolved talent/mastery damage multiplier
+// (`talent_hit_mult.ts`, the same number `applyTalentMods` bakes into the
+// ability's authored base): a "+X%" mastery must reach this SP/AP rider too,
+// not just the base magnitude, so callers pass it through instead of scaling
+// the returned bonus afterward (which would round twice).
 export function directHitBonus(
   power: number,
   def: AbilityDef,
   castTimeSec: number,
   aoe = false,
+  mult = 1,
 ): number {
   const coeff = directSpellCoeff(castTimeSec) * (aoe ? SPELL_AOE_COEFF_MULT : 1);
-  return Math.round(power * coeff * powerScale(def));
+  return Math.round(power * coeff * powerScale(def) * mult);
 }
+
+// Healing scales off DOUBLE Spell Power: with SPELL_POWER_PER_INT at 0.5 this
+// is exactly 1 healing per point of Intellect (the WoW-classic "healing gets
+// twice the spell power budget" convention). Part of the 2026-07 healers-vs-
+// heroics rebalance: pools and mob damage had outscaled heals, and spell power
+// was only 20-30% of heal output, so healing takes a bigger share of the stat.
+// Damage spells are untouched (they keep the 1x rider in directHitBonus).
+export const HEALING_SP_SCALE = 2;
 
 // Flat bonus added to ONE direct heal. Healing always scales off Spell Power at
 // the full cast-time coefficient with no AP scale-down (heals are never "attack
@@ -88,41 +101,71 @@ export function directHitBonus(
 // rank-resolved cast time (res.castTime), so higher ranks and talent-hastened
 // heals scale correctly. `aoe` applies the same per-target coefficient penalty
 // AoE damage takes, so multi-target heals do not triple-dip Spell Power.
-export function directHealBonus(spellPower: number, castTimeSec: number, aoe = false): number {
-  return Math.round(spellPower * directSpellCoeff(castTimeSec) * (aoe ? SPELL_AOE_COEFF_MULT : 1));
+// `mult` is the resolved talent/mastery heal multiplier (`talent_hit_mult.ts`);
+// see the `directHitBonus` note above for why it wraps here rather than at the call site.
+export function directHealBonus(
+  spellPower: number,
+  castTimeSec: number,
+  aoe = false,
+  mult = 1,
+): number {
+  return Math.round(
+    spellPower *
+      HEALING_SP_SCALE *
+      directSpellCoeff(castTimeSec) *
+      (aoe ? SPELL_AOE_COEFF_MULT : 1) *
+      mult,
+  );
 }
 
 // Flat bonus added to an absorb shield with an explicitly authored coefficient.
 // Shields without a coefficient remain fixed by rank.
-export function absorbBonus(spellPower: number, coefficient: number): number {
-  return Math.max(0, Math.round(spellPower * coefficient));
+// NOTE: deliberately NOT scaled by HEALING_SP_SCALE. The only shields with an
+// authored coefficient are the mage personal barriers (damage-class
+// survivability, not healing); the healer shield (Psalm of Warding) carries no
+// coefficient and scales through its rank amounts instead.
+// `mult` is the resolved talent/mastery absorb multiplier (`talent_hit_mult.ts`
+// healMult times the absorbPct global), same reasoning as `directHitBonus`.
+export function absorbBonus(spellPower: number, coefficient: number, mult = 1): number {
+  return Math.max(0, Math.round(spellPower * coefficient * mult));
 }
 
 // Flat bonus added to ONE HoT tick: the total DoT coefficient (duration / 15)
 // split across its ticks, scaling off Spell Power. Mirrors dotTickBonus but never
 // takes the AP scale-down, since HoTs are pure healing.
-export function hotTickBonus(spellPower: number, durationSec: number, intervalSec: number): number {
+// `mult` is the resolved talent/mastery HoT multiplier (`talent_hit_mult.ts`
+// healMult times the hotHealPct global), same reasoning as `directHitBonus`.
+export function hotTickBonus(
+  spellPower: number,
+  durationSec: number,
+  intervalSec: number,
+  mult = 1,
+): number {
   const ticks = intervalSec > 0 ? Math.max(1, durationSec / intervalSec) : 1;
   const coeff = dotTotalCoeff(durationSec) / ticks;
-  return Math.round(spellPower * coeff);
+  return Math.round(spellPower * HEALING_SP_SCALE * coeff * mult);
 }
 
 // Flat bonus added to ONE channel tick (e.g. each Arcane Missile / Mind Flay tick).
-export function channelTickBonus(power: number, def: AbilityDef): number {
+// `mult` is the resolved talent/mastery damage/heal multiplier (`talent_hit_mult.ts`).
+export function channelTickBonus(power: number, def: AbilityDef, mult = 1): number {
   const ch = def.channel;
   if (!ch || ch.ticks <= 0) return 0;
   const coeff = channelSpellCoeff(ch.duration) / ch.ticks;
-  return Math.round(power * coeff * powerScale(def));
+  return Math.round(power * coeff * powerScale(def) * mult);
 }
 
 // Flat bonus added to ONE DoT tick (total DoT coefficient split across its ticks).
+// `mult` is the resolved talent/mastery DoT multiplier (`talent_hit_mult.ts`
+// dmgMult times the dotDmgPct global), same reasoning as `directHitBonus`.
 export function dotTickBonus(
   power: number,
   def: AbilityDef,
   durationSec: number,
   intervalSec: number,
+  mult = 1,
 ): number {
   const ticks = intervalSec > 0 ? Math.max(1, durationSec / intervalSec) : 1;
   const coeff = dotTotalCoeff(durationSec) / ticks;
-  return Math.round(power * coeff * powerScale(def));
+  return Math.round(power * coeff * powerScale(def) * mult);
 }

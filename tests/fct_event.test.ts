@@ -8,9 +8,9 @@
 import { describe, expect, it } from 'vitest';
 import { type FctSpawnShape, fctSpawnShape } from '../src/ui/fct_event';
 
-describe('fctSpawnShape: damage avoidance (miss/dodge/resist)', () => {
-  it('miss/dodge/resist always float; isSelf tracks isPlayerTarget; never crit', () => {
-    for (const damageKind of ['miss', 'dodge', 'resist'] as const) {
+describe('fctSpawnShape: damage avoidance (miss/dodge/resist/evade)', () => {
+  it('miss/dodge/resist/evade always float; isSelf tracks isPlayerTarget; never crit', () => {
+    for (const damageKind of ['miss', 'dodge', 'resist', 'evade'] as const) {
       // player is the target -> isSelf true (the #bbb self colour token)
       expect(
         fctSpawnShape({
@@ -93,6 +93,71 @@ describe('fctSpawnShape: landed hit (damage-done vs damage-taken vs none)', () =
         damageKind: 'hit',
         ability: true,
         crit: true,
+        isPlayerSource: false,
+        isPlayerTarget: false,
+      }),
+    ).toBeNull();
+  });
+});
+
+describe('fctSpawnShape: shield block (a landed hit, distinct from a plain hit)', () => {
+  it('player dealing a hit that gets blocked floats damage-done-block, not damage-done-ability/auto', () => {
+    expect(
+      fctSpawnShape({
+        type: 'damage',
+        damageKind: 'block',
+        ability: true,
+        crit: false,
+        isPlayerSource: true,
+        isPlayerTarget: false,
+      }),
+    ).toEqual<FctSpawnShape>({ kind: 'damage-done-block', isSelf: false, crit: false });
+    // Even an auto-attack block stays 'damage-done-block' (never splits -ability vs -auto
+    // the way a plain hit does; the block distinction takes priority).
+    expect(
+      fctSpawnShape({
+        type: 'damage',
+        damageKind: 'block',
+        ability: false,
+        crit: true,
+        isPlayerSource: true,
+        isPlayerTarget: false,
+      }),
+    ).toEqual<FctSpawnShape>({ kind: 'damage-done-block', isSelf: false, crit: true });
+  });
+
+  it('player taking a blocked hit floats damage-taken-block, not damage-taken', () => {
+    expect(
+      fctSpawnShape({
+        type: 'damage',
+        damageKind: 'block',
+        ability: false,
+        crit: true,
+        isPlayerSource: false,
+        isPlayerTarget: true,
+      }),
+    ).toEqual<FctSpawnShape>({ kind: 'damage-taken-block', isSelf: true, crit: true });
+    // A self-inflicted block (player both source and target) reads as damage-taken-block,
+    // matching the plain-hit priority (isPlayerTarget wins over isPlayerSource).
+    expect(
+      fctSpawnShape({
+        type: 'damage',
+        damageKind: 'block',
+        ability: true,
+        crit: false,
+        isPlayerSource: true,
+        isPlayerTarget: true,
+      }),
+    ).toEqual<FctSpawnShape>({ kind: 'damage-taken-block', isSelf: true, crit: false });
+  });
+
+  it('a block between two non-player entities floats nothing (null)', () => {
+    expect(
+      fctSpawnShape({
+        type: 'damage',
+        damageKind: 'block',
+        ability: false,
+        crit: false,
         isPlayerSource: false,
         isPlayerTarget: false,
       }),

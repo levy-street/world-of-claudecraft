@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DELVES, ITEMS } from '../src/sim/data';
@@ -49,7 +49,7 @@ function makeHarness(validNpc = true) {
   } as unknown as IWorld;
   const focusFirst = vi.fn();
   const release = vi.fn();
-  const trap: FocusTrapHandle = { focusFirst, release };
+  const trap: FocusTrapHandle = { focusFirst, release, opener: vi.fn(() => null) };
   const openFocusTrap = vi.fn(() => trap);
   const closeOtherWindows = vi.fn();
   const hideTooltip = vi.fn();
@@ -183,6 +183,28 @@ describe('DelveBoardController', () => {
     expect(confirm.cancel).toBe('Cancel');
     // Dismissing the dialog (cancel/Escape never runs onOk) sends no command.
     expect(test.delveBuyShopItem).not.toHaveBeenCalled();
+  });
+
+  it('marks the panel a labeled dialog (accessible name, #2808)', () => {
+    const test = makeHarness();
+
+    test.controller.open(7);
+
+    expect(test.panel.getAttribute('role')).toBe('dialog');
+    expect(test.panel.getAttribute('aria-modal')).toBe('false');
+    expect(test.panel.getAttribute('tabindex')).toBe('-1');
+    expect(test.panel.getAttribute('aria-label')).toBe('Delve Board');
+    expect(test.panel.hasAttribute('aria-labelledby')).toBe(false);
+  });
+
+  it('keeps the same dialog name across a tab-switch rebuild', () => {
+    const test = makeHarness();
+    test.controller.open(7);
+
+    test.panel.querySelector<HTMLButtonElement>('[data-board-tab="shop"]')?.click();
+
+    expect(test.panel.getAttribute('role')).toBe('dialog');
+    expect(test.panel.getAttribute('aria-label')).toBe('Delve Board');
   });
 
   it('closes and restores focus if the authoritative NPC disappears', () => {

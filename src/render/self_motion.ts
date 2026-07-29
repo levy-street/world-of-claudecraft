@@ -25,7 +25,7 @@
 // facing_smooth.ts / locomotion.ts. tests/self_motion.test.ts drives it
 // against a real lagging Sim.
 
-import { resolveMovement } from '../sim/colliders';
+import { moverHeight, resolveMovement } from '../sim/colliders';
 import { moveSpeedMult, type PlayerMotionDeps, stepPlayerMotion } from '../sim/player_motion';
 import { DT, type Entity, type MoveInput, RUN_SPEED, type SimEvent } from '../sim/types';
 
@@ -181,6 +181,8 @@ export class SelfMotionPredictor {
     strafeLeft: false,
     strafeRight: false,
     jump: false,
+    dive: false,
+    surface: false,
   };
   private readonly out: Vec3Like = { x: 0, y: 0, z: 0 };
 
@@ -191,8 +193,8 @@ export class SelfMotionPredictor {
     this.deps = {
       seed,
       moveSpeedMult: (e) => moveSpeedMult(e, 0),
-      resolveMove: (fromX, fromZ, nx, nz, r, _e, ignoreFences) =>
-        resolveMovement(seed, fromX, fromZ, nx, nz, r, ignoreFences),
+      resolveMove: (fromX, fromZ, nx, nz, r, e, ignoreFences) =>
+        resolveMovement(seed, fromX, fromZ, nx, nz, r, ignoreFences, undefined, moverHeight(e)),
       resolvedAbility: () => null,
       cancelCast: () => {},
       standUp: () => {},
@@ -297,6 +299,8 @@ export class SelfMotionPredictor {
         onGround: true,
         jumping: false,
         fallStartY: ay,
+        swimStroke: 0,
+        swimDiving: false,
       };
       this.actor = actor;
       this.acc = 0;
@@ -326,10 +330,9 @@ export class SelfMotionPredictor {
     // Mount speed reads the entity mirror (player_motion.moveSpeedMult), so a
     // mid-session mount/dismount must reach the scratch actor the same frame.
     actor.mountKey = self.mountKey;
-    // The kernel roots movement while a mount summon channel is in flight
-    // (mountCastRemaining > 0 with a non-empty mountCastKey); borrow both so the
-    // online display roots in lockstep with the server. A dismount channel
-    // (mountCastKey === '') does not root movement and is move-cancelable.
+    // The kernel cancels a keyed summon on movement and preserves the retired
+    // empty-key transition as a rooted mixed-version compatibility state. Borrow
+    // both fields so online prediction makes the same decision as the server.
     actor.mountCastRemaining = self.mountCastRemaining;
     actor.mountCastKey = self.mountCastKey;
 
@@ -342,6 +345,15 @@ export class SelfMotionPredictor {
     inp.strafeLeft = frame.moveInput.strafeLeft;
     inp.strafeRight = frame.moveInput.strafeRight;
     inp.jump = frame.moveInput.jump;
+    // The vertical half of swimming is held intent too, and predicting it is
+    // what makes a camera-steered dive answer the mouse instead of the round
+    // trip: without these the depth column only ever moved on the server's
+    // echo, so aiming the view down felt like a request rather than a control.
+    // The kernel branch is the same one the server runs (swimVerticalPass), and
+    // it is inert unless the body is actually in water.
+    inp.dive = frame.moveInput.dive;
+    inp.surface = frame.moveInput.surface;
+    inp.swimSteer = frame.moveInput.swimSteer;
     // A blocked step needs NO special handling, and must never get any. The
     // kernel runs the same swept static collision as the server, so when the
     // display stops at a wall it is already RIGHT and the authoritative anchor

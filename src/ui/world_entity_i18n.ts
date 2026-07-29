@@ -2,6 +2,8 @@ import {
   GUILD_TREND_LETTERS,
   HEROIC_MARK_LETTER,
   type LetterDef,
+  MASTER_TIER_LETTERS,
+  MASTERY_RESET_LETTER,
   QUEST_LETTERS,
   WELCOME_LETTER,
 } from '../sim/content/letters';
@@ -99,6 +101,12 @@ const MOB_IDS = [
   'deepfen_spearjaw',
   'mirefen_widowling',
   'spider_egg_sac',
+  // Quest-dedupe pass (zones 1 to 3): the Broodmother clutch and the new elites.
+  'spider_egg',
+  'widow_hatchling',
+  'drowned_warlord',
+  'brakka_wallbreaker',
+  'threnos_first_voice',
   'grave_silt_bulwark',
   'sump_troll_devourer',
   'choir_thrall',
@@ -164,6 +172,10 @@ const MOB_IDS = [
   'ashbone_warcaller',
   'dune_troll',
   'cindraleth_maw_matriarch',
+  'dragonkin_egg',
+  'dragonkin_whelp',
+  'dragonkin_broodguard',
+  'drakemaw_broodlord',
   'gilded_stag',
   'gloam_fox',
   'orchard_treant',
@@ -192,10 +204,13 @@ const MOB_IDS = [
   'topiary_stag',
   'topiary_wolf',
   'hedge_gnome',
+  'hedge_knight',
   'the_topiary_bull',
   'moor_ram',
   'gale_wisp',
   'shoal_scuttler',
+  'downs_bandit',
+  'wreck_thief',
   'the_wreck_warden',
   'drowned_deckhand',
   'riftspawn',
@@ -203,20 +218,19 @@ const MOB_IDS = [
   'void_stalker',
   'sundered_horror',
   'fisher_bram',
+  // Last Bell scenario-only cast and Q0 boss.
+  'lb_actor_coalfast',
+  'lb_actor_ollun',
+  'lb_actor_edda',
+  'lb_actor_saul',
+  'lb_actor_tam',
+  'tidemill_stalker',
   // The Infernal Citadel set-piece (src/sim/content/rift/infernal_citadel.ts).
   'rift_hellguard',
   'rift_pact_acolyte',
   'rift_boss_ritualist',
   'rift_boss_pitlord',
-  // The Orkadia orc war-camp dungeon (src/sim/content/orkadia.ts).
-  'orkadia_grunt',
-  'orkadia_marauder',
-  'orkadia_axethrower',
-  'orkadia_fel_shaman',
-  'orkadia_beast_handler',
-  'orkadia_siege_brute',
-  'orkadia_banner_captain',
-  'orkadia_warlord',
+  // The Wildheart Basin jungle dungeon (src/sim/content/wildheart.ts).
   'wildheart_stalker',
   'wildheart_ravager',
   'wildheart_hexcaller',
@@ -246,6 +260,7 @@ const NPC_IDS = [
   'armorer_hode',
   'heroic_quartermaster', // Heroic Marks vendor (Highwatch, zone 3)
   'fury', // Honor Quartermaster and WARFARE vendor (Eastbrook, zone 1)
+  'warmarshal_draven_kole', // Master of the Warfare Stores, the WARFARE vendor (Highwatch, zone 3)
   'loremaster_caddis',
   'auctioneer_voss', // second World Market auctioneer (Highwatch, zone 3)
   'bursar_fernando', // Gilded Strongbox banker (Eastbrook, zone 1)
@@ -319,6 +334,10 @@ const NPC_IDS = [
   'mender_saul',
   'bellkeeper_tam',
   'fisher_nell',
+  // Last Bell campaign front-door and Watch Meadow cast.
+  'ferryman_ewald',
+  'ferrykeeper_odda',
+  'sergeant_marsh',
   'forgemistress_darva', // crafting-station master: forge (Eastbrook, zone 1)
   'cook_marlow', // crafting-station master: kitchens (Eastbrook, zone 1)
   'weaver_ottilie', // crafting-station master: loom (Eastbrook, zone 1)
@@ -403,8 +422,20 @@ const QUEST_IDS = [
   'q_nythraxis_bound_guardian',
   'q_nythraxis_scourges_end',
   'q_mogger',
-  'q_archetype_acceptance',
-  'q_prof_make_amends',
+  'q_prof_attune_smith',
+  'q_prof_attune_outfitter',
+  'q_prof_attune_apothecary',
+  'q_prof_attune_bombardier',
+  'q_prof_amends_smith',
+  'q_prof_amends_outfitter',
+  'q_prof_amends_apothecary',
+  'q_prof_amends_bombardier',
+  'q_prof_workorder_forge',
+  'q_prof_workorder_kitchens',
+  'q_prof_workorder_loom',
+  'q_prof_workorder_toolworks',
+  'q_prof_workorder_tannery',
+  'q_prof_workorder_apothecary',
   'q_riding_lessons',
   // the Veiled Hollow
   'q_veil_thinned',
@@ -513,6 +544,8 @@ const QUEST_IDS = [
   'q_fs_bram_come_home',
   'q_fs_stalkers_off_the_light',
   'q_fs_the_great_break',
+  // Last Bell campaign opener.
+  'q_lb_q0_ashore',
   // the Galecrest
   'q_gc_down_the_windway',
   'q_gc_wool_off_the_downs',
@@ -547,8 +580,18 @@ const DUNGEON_IDS = [
   'gravewyrm_sanctum',
   'nythraxis_crypt',
   'nythraxis_boss_arena',
-  'orkadia',
   'wildheart_basin',
+  'the_last_keep',
+  // Last Bell story-instance spaces.
+  'lb_tidemill',
+  'lb_riftline',
+  'lb_vault',
+  'lb_council',
+  'lb_landing',
+  'lb_riftfields',
+  'lb_breach',
+  'lb_lastwatch',
+  'lb_willowfen',
 ] as const;
 const DELVE_IDS = ['collapsed_reliquary', 'drowned_litany'] as const;
 // Ravenpost authored letters (src/sim/content/letters.ts): the welcome letter
@@ -559,7 +602,7 @@ const LETTER_IDS = [
   'letter_q_greyjaw',
   'letter_q_hollow',
   'heroic_marks_reward',
-  // Guild trend letters (Professions 2.0 Phase 7), one per canonical adjacent
+  // Guild trend letters (Professions 2.0), one per canonical adjacent
   // pair in CRAFT_RING order (GUILD_TREND_LETTERS in src/sim/content/letters.ts).
   'guild_trend_engineering_alchemy',
   'guild_trend_alchemy_cooking',
@@ -571,6 +614,31 @@ const LETTER_IDS = [
   'guild_trend_jewelcrafting_weaponcrafting',
   'guild_trend_weaponcrafting_armorcrafting',
   'guild_trend_armorcrafting_engineering',
+  // The one-time mastery reset notice (Professions 2.0,
+  // MASTERY_RESET_LETTER in src/sim/content/letters.ts).
+  'mastery_reset_notice',
+  // Master tier-milestone letters (Professions 2.0), one per anchor
+  // master per tier 1..5 (MASTER_TIER_LETTERS in src/sim/content/letters.ts).
+  'prof_tier_weaponcrafting_armorcrafting_1',
+  'prof_tier_weaponcrafting_armorcrafting_2',
+  'prof_tier_weaponcrafting_armorcrafting_3',
+  'prof_tier_weaponcrafting_armorcrafting_4',
+  'prof_tier_weaponcrafting_armorcrafting_5',
+  'prof_tier_leatherworking_tailoring_1',
+  'prof_tier_leatherworking_tailoring_2',
+  'prof_tier_leatherworking_tailoring_3',
+  'prof_tier_leatherworking_tailoring_4',
+  'prof_tier_leatherworking_tailoring_5',
+  'prof_tier_alchemy_cooking_1',
+  'prof_tier_alchemy_cooking_2',
+  'prof_tier_alchemy_cooking_3',
+  'prof_tier_alchemy_cooking_4',
+  'prof_tier_alchemy_cooking_5',
+  'prof_tier_engineering_alchemy_1',
+  'prof_tier_engineering_alchemy_2',
+  'prof_tier_engineering_alchemy_3',
+  'prof_tier_engineering_alchemy_4',
+  'prof_tier_engineering_alchemy_5',
 ] as const;
 
 type MobId = (typeof MOB_IDS)[number];
@@ -616,6 +684,7 @@ type WorldEntityTranslations = {
     delveRiteShrineReedInteract: string;
     delveRiteShrineSkullInteract: string;
     mailboxName: string;
+    noticeboardName: string;
   };
   entities: {
     mobs: MobTranslations;
@@ -706,9 +775,13 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
   const lettersById: Record<string, LetterDef> = {
     [WELCOME_LETTER.letterId]: WELCOME_LETTER,
     [HEROIC_MARK_LETTER.letterId]: HEROIC_MARK_LETTER,
+    [MASTERY_RESET_LETTER.letterId]: MASTERY_RESET_LETTER,
   };
   for (const letter of Object.values(QUEST_LETTERS)) lettersById[letter.letterId] = letter;
   for (const letter of Object.values(GUILD_TREND_LETTERS)) lettersById[letter.letterId] = letter;
+  for (const byTier of Object.values(MASTER_TIER_LETTERS)) {
+    for (const letter of Object.values(byTier)) lettersById[letter.letterId] = letter;
+  }
   const letters = {} as LetterTranslations;
   orderedValues(LETTER_IDS, lettersById).forEach((letter) => {
     letters[letter.letterId as LetterId] = {
@@ -733,6 +806,7 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
       delveRiteShrineReedInteract: 'Reed Shrine: Press F to touch it',
       delveRiteShrineSkullInteract: 'Skull Shrine: Press F to touch it',
       mailboxName: 'Mailbox',
+      noticeboardName: 'Notice Board',
     },
     entities: { mobs, npcs, quests, zones, dungeons, delves, letters },
   };

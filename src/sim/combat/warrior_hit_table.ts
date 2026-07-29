@@ -1,6 +1,6 @@
-// Warrior-only melee defense folded into the existing one-roll hit tables.
-// The class check is deliberate: the redesigned Warrior gains parry and shield
-// block without changing any of the eight other classes or their RNG order.
+// Warrior and Paladin melee defense folded into the existing one-roll hit tables.
+// Warrior keeps the class parry identity; shield block is shared by shield tanks
+// that derive active block stats from an equipped, level-legal shield.
 import type { Entity } from '../types';
 import { angleTo, normAngle } from '../types';
 
@@ -21,14 +21,17 @@ export function warriorParryChance(str: number): number {
 }
 
 export function warriorMeleeDefense(defender: Entity, attacker: Entity): WarriorMeleeDefense {
-  if (defender.kind !== 'player' || defender.templateId !== 'warrior') {
+  if (
+    defender.kind !== 'player' ||
+    (defender.templateId !== 'warrior' && defender.templateId !== 'paladin')
+  ) {
     return { parryChance: 0, blockChance: 0 };
   }
   const inFront =
     Math.abs(normAngle(angleTo(defender.pos, attacker.pos) - defender.facing)) < WARRIOR_FRONT_ARC;
   if (!inFront) return { parryChance: 0, blockChance: 0 };
   return {
-    parryChance: warriorParryChance(defender.stats.str),
+    parryChance: defender.templateId === 'warrior' ? warriorParryChance(defender.stats.str) : 0,
     blockChance: defender.blockValue > 0 && defender.blockChance > 0 ? defender.blockChance : 0,
   };
 }

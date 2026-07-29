@@ -4,6 +4,7 @@
 // dribble carry, body trap, and scoring. Requires ALLOW_DEV_COMMANDS=1 on the
 // server (dev_teleport stages exact positions). Template: scripts/chat_e2e.mjs.
 import WebSocket from 'ws';
+import { worldAuthMessage } from './lib/world_auth.mjs';
 
 const BASE = process.env.SERVER_URL ?? 'http://localhost:8787';
 const WS_BASE = BASE.replace(/^http/, 'ws');
@@ -60,9 +61,7 @@ class Client {
           }
         }
       });
-      this.ws.on('open', () =>
-        this.ws.send(JSON.stringify({ t: 'auth', token, character: characterId })),
-      );
+      this.ws.on('open', () => this.ws.send(JSON.stringify(worldAuthMessage(token, characterId))));
       this.ws.on('error', reject);
     });
   }

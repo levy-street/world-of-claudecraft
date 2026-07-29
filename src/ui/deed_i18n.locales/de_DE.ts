@@ -7,6 +7,102 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: 'Banner in der Hand',
+    desc: 'Erobere eine Flagge in den Thornhollow-Feldern.',
+  },
+  pvp_bg_first_win: {
+    name: 'Die Senke hält',
+    desc: 'Gewinne ein Schlachtfeld in den Thornhollow-Feldern.',
+  },
+  pvp_bg_wins_25: {
+    name: 'Wärter der Senke',
+    desc: 'Gewinne 25 Schlachtfelder in den Thornhollow-Feldern.',
+    title: 'Fahnenträger',
+  },
+  pvp_bg_captures_100: {
+    name: 'Hundert Banner',
+    desc: 'Erobere im Laufe deiner Karriere 100 Flaggen in den Thornhollow-Feldern.',
+  },
+  dgn_rift: {
+    name: 'Risswandler',
+    desc: 'Bereinige einen Riss, indem du seinen Boss besiegst.',
+  },
+  dgn_rift_s_rank: {
+    name: 'Rissherrscher',
+    desc: 'Bereinige einen Riss vom Rang S, der schwersten Stufe, die ein Rissportal erzeugen kann.',
+  },
+  pvp_honor_sergeant: {
+    name: 'Sergeant',
+    desc: 'Verdiene im Laufe deines Lebens 10.000 Ehre. Sie auszugeben kostet dich nie den Rang.',
+    title: 'Sergeant',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: 'Ritter-Leutnant',
+    desc: 'Verdiene im Laufe deines Lebens 40.000 Ehre, eine Saison echten Krieges hinter dir.',
+    title: 'Ritter-Leutnant',
+  },
+  pvp_honor_field_marshal: {
+    name: 'Feldmarschall',
+    desc: 'Verdiene im Laufe deines Lebens 150.000 Ehre. Selten auf jedem Reich, und das sollte es auch sein.',
+    title: 'Feldmarschall',
+  },
+  chr_drakemaw_broodlord: {
+    name: 'Gelegebrecher',
+    desc: 'Einen Drakenrachen-Brutfürsten inmitten seiner Eier erlegen, durch Schrei, Hieb und Feuer hindurch.',
+  },
+  chr_maw_matriarch: {
+    name: 'Der Himmel verstummt',
+    desc: 'Cindraleth, die Rachen-Matriarchin, in ihrem Kraterhorst über dem Drakenrachen erlegen.',
+  },
+  chr_frostveil_gatherer: {
+    name: 'Ernte auf den Terrassen',
+    desc: 'Ernte eine Erzader, einen Holzbestand und ein Krauterbeet im Frostveil.',
+  },
+  chr_frostveil_first_cast: {
+    name: 'Erstes Eis auf dem Bergsee',
+    desc: 'Fange einen Fisch in den Gewassern des Frostveil.',
+  },
+  chr_amberfall_gatherer: {
+    name: 'Die Ernte von Amberfall',
+    desc: 'Ernte eine Erzader, einen Holzbestand und ein Krauterbeet in Amberfall.',
+  },
+  chr_amberfall_first_cast: {
+    name: 'Ein Fang aus dem Grossen Moor',
+    desc: 'Fange einen Fisch in den Gewassern von Amberfall.',
+  },
+  chr_nightbloom_gatherer: {
+    name: 'Die traumende Ernte',
+    desc: 'Ernte eine Erzader, einen Holzbestand und ein Krauterbeet in Nightbloom.',
+  },
+  chr_nightbloom_first_cast: {
+    name: 'Ein Ring auf dem Mondbrunnen',
+    desc: 'Fange einen Fisch in den Gewassern von Nightbloom.',
+  },
+  chr_wraithwood_gatherer: {
+    name: 'Ernte unter dem Blatterdach',
+    desc: 'Ernte eine Erzader, einen Holzbestand und ein Krauterbeet im Wraithwood.',
+  },
+  chr_wraithwood_first_cast: {
+    name: 'Ein Wurf in der Spiegelbucht',
+    desc: 'Fange einen Fisch in den Gewassern des Wraithwood.',
+  },
+  chr_palmreach_gatherer: {
+    name: 'Ernte am Palmenstrand',
+    desc: 'Ernte eine Erzader, einen Holzbestand und ein Krauterbeet in Palmreach.',
+  },
+  chr_palmreach_first_cast: {
+    name: 'Wurf in die Saphirlagune',
+    desc: 'Fange einen Fisch in den Gewassern von Palmreach.',
+  },
+  chr_evergarden_gatherer: {
+    name: 'Die Gabe des Parterres',
+    desc: 'Ernte eine Erzader, einen Holzbestand und ein Krauterbeet in Evergarden.',
+  },
+  chr_evergarden_first_cast: {
+    name: 'Ein Wurf auf dem Blutenteich',
+    desc: 'Fange einen Fisch in den Gewassern von Evergarden.',
+  },
   pvp_card_duel_first_win: {
     name: 'Nach eigenen Regeln',
     desc: 'Gewinne einen Kartenkampf beim Kartenmeister.',
@@ -77,7 +173,7 @@ export const table: DeedLocaleTable = {
   },
   prog_master_gatherer: {
     name: 'Meistersammler',
-    desc: 'Erreiche eine Fertigkeit von 100 in Bergbau, Holzfällerei und Kräuterkunde.',
+    desc: 'Erreiche eine Fertigkeit von 100 in beliebigen drei von Bergbau, Holzfällen, Kräuterkunde und Angeln.',
   },
   prog_first_craft: {
     name: 'Handarbeit',
@@ -436,7 +532,10 @@ export const table: DeedLocaleTable = {
     name: 'Stammkunde',
     desc: 'Entdecke alle zehn Stücke aus dem Vorrat des Heroischen Quartiermeisters.',
   },
-  col_glimmerfin: { name: 'Ein Schimmer Hoffnung', desc: 'Fange einen Schimmerflossen-Koi.' },
+  col_glimmerfin: {
+    name: 'Ein Schimmer Hoffnung',
+    desc: 'Fange einen Sonnenschimmer-Koi.',
+  },
   col_full_creel: {
     name: 'Voller Fangkorb',
     desc: 'Entdecke alle sechs gewöhnlichen Fänge aus den Gewässern des Tals, des Moors und der Höhen.',
@@ -615,7 +714,10 @@ export const table: DeedLocaleTable = {
     name: 'Etwas Glitzerndes',
     desc: 'Hebe ein funkelndes Objekt vom Boden auf.',
   },
-  exp_first_ore: { name: 'Hau in den Fels', desc: 'Baue dein erstes Erzvorkommen ab.' },
+  exp_first_ore: {
+    name: 'Pickel trifft Stein',
+    desc: 'Baue dein erstes Erzvorkommen ab.',
+  },
   exp_first_timber: { name: 'Baum fällt!', desc: 'Ernte dein erstes Holzvorkommen.' },
   exp_first_herb: { name: 'Ein grüner Daumen', desc: 'Ernte dein erstes Kräutervorkommen.' },
   feat_era_cap: {
@@ -687,5 +789,200 @@ export const table: DeedLocaleTable = {
   chr_marsh_first_cast: {
     name: 'Aale im Schilf',
     desc: 'Fange einen Fisch aus den Gewässern des Mirefen-Moors.',
+  },
+  prog_guildsworn: {
+    name: 'Handwerksgeschworen',
+    desc: 'Stimme dich auf ein Archetyp-Paar ein und nimm seine Berufe ernsthaft auf.',
+    title: 'Handwerksgeschworen',
+  },
+  prog_masterwright: {
+    name: 'Meisterwerk-Macher',
+    desc: 'Fertige dein erstes Meisterwerk, ein Stück so fein, dass die ganze Zone davon erfährt.',
+    title: 'Meisterwerk-Macher',
+  },
+  prog_fishing_100: {
+    name: 'Alter Salzfisch',
+    desc: 'Erreiche eine Angelfertigkeit von 100.',
+  },
+  prog_master_angler: {
+    name: 'Meisterangler',
+    desc: 'Erreiche eine Angelfertigkeit von 200, den Gipfel der Anglerkunst.',
+    title: 'Meisterangler',
+  },
+  prog_engineering_50: {
+    name: 'Zahnräder und Schrauben',
+    desc: 'Erreiche eine Fertigkeit von 50 im Ingenieurswesen.',
+  },
+  prog_alchemy_50: {
+    name: 'Seltsame Gebräue',
+    desc: 'Erreiche eine Fertigkeit von 50 in der Alchemie.',
+  },
+  prog_cooking_50: {
+    name: 'Erfahrener Koch',
+    desc: 'Erreiche eine Fertigkeit von 50 im Kochen.',
+  },
+  prog_leatherworking_50: {
+    name: 'Gerbers Gewerbe',
+    desc: 'Erreiche eine Fertigkeit von 50 in der Lederverarbeitung.',
+  },
+  prog_tailoring_50: {
+    name: 'Eine feine Naht',
+    desc: 'Erreiche eine Fertigkeit von 50 in der Schneiderei.',
+  },
+  prog_enchanting_50: {
+    name: 'Ein Schimmer des Arkanen',
+    desc: 'Erreiche eine Fertigkeit von 50 in der Verzauberung.',
+  },
+  prog_weaponcrafting_50: {
+    name: 'Schärfe und Härte',
+    desc: 'Erreiche eine Fertigkeit von 50 in der Waffenherstellung.',
+  },
+  prog_armorcrafting_50: {
+    name: 'Hammer und Platte',
+    desc: 'Erreiche eine Fertigkeit von 50 in der Rüstungsherstellung.',
+  },
+  prog_grandmaster_engineering: {
+    name: 'Großmeister des Ingenieurswesens',
+    desc: 'Erreiche eine Fertigkeit von 125 im Ingenieurswesen, den Gipfel des Handwerks.',
+    title: 'Großmeister des Ingenieurswesens',
+  },
+  prog_grandmaster_alchemy: {
+    name: 'Großmeister der Alchemie',
+    desc: 'Erreiche eine Fertigkeit von 125 in der Alchemie, den Gipfel des Handwerks.',
+    title: 'Großmeister der Alchemie',
+  },
+  prog_grandmaster_cooking: {
+    name: 'Großmeister des Kochens',
+    desc: 'Erreiche eine Fertigkeit von 125 im Kochen, den Gipfel des Handwerks.',
+    title: 'Großmeister des Kochens',
+  },
+  prog_grandmaster_leatherworking: {
+    name: 'Großmeister der Lederverarbeitung',
+    desc: 'Erreiche eine Fertigkeit von 125 in der Lederverarbeitung, den Gipfel des Handwerks.',
+    title: 'Großmeister der Lederverarbeitung',
+  },
+  prog_grandmaster_tailoring: {
+    name: 'Großmeister der Schneiderei',
+    desc: 'Erreiche eine Fertigkeit von 125 in der Schneiderei, den Gipfel des Handwerks.',
+    title: 'Großmeister der Schneiderei',
+  },
+  prog_grandmaster_enchanting: {
+    name: 'Großmeister der Verzauberung',
+    desc: 'Erreiche eine Fertigkeit von 125 in der Verzauberung, den Gipfel des Handwerks.',
+    title: 'Großmeister der Verzauberung',
+  },
+  prog_grandmaster_weaponcrafting: {
+    name: 'Großmeister der Waffenherstellung',
+    desc: 'Erreiche eine Fertigkeit von 125 in der Waffenherstellung, den Gipfel des Handwerks.',
+    title: 'Großmeister der Waffenherstellung',
+  },
+  prog_grandmaster_armorcrafting: {
+    name: 'Großmeister der Rüstungsherstellung',
+    desc: 'Erreiche eine Fertigkeit von 125 in der Rüstungsherstellung, den Gipfel des Handwerks.',
+    title: 'Großmeister der Rüstungsherstellung',
+  },
+  col_pristine_vein: {
+    name: 'Makellose Ader',
+    desc: 'Breche eine makellose Ader auf und lass die ganze Zone davon erfahren.',
+  },
+  col_ancient_heartwood: {
+    name: 'Altes Herzholz',
+    desc: 'Gewinne ein Stück altes Herzholz aus einem gefällten Baumbestand.',
+  },
+  col_moonlit_bloom: {
+    name: 'Mondlichtblüte',
+    desc: 'Ernte eine Mondlichtblüte genau in dem Augenblick, da sie sich öffnet.',
+  },
+  col_perfect_specimen: {
+    name: 'Ein Makelloses Exemplar',
+    desc: 'Entnimm einem erlegten Tier ein makelloses Exemplar, ohne Kerbe und ohne Makel.',
+  },
+  soc_first_salvage: {
+    name: 'Kein Rest verschwendet',
+    desc: 'Zerlege ein Ausrüstungsstück zu Rohmaterialien.',
+  },
+  soc_salvage_50: {
+    name: 'Der Schrottplatz',
+    desc: 'Zerlege 50 Ausrüstungsstücke zu Rohmaterialien.',
+  },
+  dgn_wildheart_basin: {
+    name: 'Das Becken beißt zurück',
+    desc: 'Besiege Zulgar, Stimme des Beckens, im Wildherzbecken.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Heroisch: Das Wildherzbecken',
+    desc: 'Besiege Zulgar, Stimme des Beckens, im Wildherzbecken auf heroischem Schwierigkeitsgrad.',
+  },
+  chr_peaks_gatherer: {
+    name: 'Die Ernte der Höhen',
+    desc: 'Ernte in den Thornpeak-Höhen eine Erzader, ein Gehölz und ein Kräuterbeet.',
+  },
+  chr_marsh_rares_ii: {
+    name: 'Der Vielfraß, nachgetragen',
+    desc: 'Erlege Grubjaw den Vielfraß, einen vierten namhaften Schrecken des Mirefen-Moors, den die erste Zählung ausließ.',
+  },
+  chr_peaks_rares_ii: {
+    name: 'Mehr in den Fels gemeißelte Namen',
+    desc: 'Erlege den Alten Felsmaul und Splitterlord Kazzix, zwei weitere namhafte Schrecken der Thornpeak-Höhen, die die erste Zählung ausließ.',
+  },
+  chr_gleamstag: {
+    name: 'Die Legende, die nie zuerst zuschlug',
+    desc: 'Erlege den Glanzhirsch, einen seltenen, scheuen Elite, der nur angreift, wenn man ihn in die Enge treibt.',
+  },
+  chr_hollow_rares: {
+    name: 'Die Herde vergisst nicht',
+    desc: 'Erlege die Alte Markschale und Aurelhorn, den Ersten der Herde, die beiden wandernden seltenen Bosse der Schleiersenke.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Gaben des Moorlands',
+    desc: 'Ernte im Weidenmoor eine Erzader, ein Gehölz und ein Kräuterbeet.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Wellenkreise in den Lilienmooren',
+    desc: 'Fange einen Fisch aus den Gewässern des Weidenmoors.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Ernte auf der Landzunge',
+    desc: 'Ernte auf dem Windkamm eine Erzader, ein Gehölz und ein Kräuterbeet.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'Eine Schnur im Spiegelweiher',
+    desc: 'Fange einen Fisch aus den Gewässern des Windkamms.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Inselproviant',
+    desc: 'Ernte auf der Fernküste eine Erzader, ein Gehölz und ein Kräuterbeet.',
+  },
+  chr_farshore_first_cast: {
+    name: 'Was die Möwen wissen',
+    desc: 'Fange einen Fisch aus den Gewässern der Fernküste.',
+  },
+  prog_engineering_rare: {
+    name: 'Präzisionsingenieurwesen',
+    desc: 'Fertige dein erstes seltenes Ausrüstungsstück im Ingenieurswesen.',
+  },
+  prog_alchemy_rare: {
+    name: 'Ein seltener Jahrgang',
+    desc: 'Fertige dein erstes seltenes Ausrüstungsstück in der Alchemie.',
+  },
+  prog_cooking_rare: {
+    name: 'Ein unvergessliches Gericht',
+    desc: 'Fertige dein erstes seltenes Ausrüstungsstück im Kochen.',
+  },
+  prog_leatherworking_rare: {
+    name: 'Feine Gerberei',
+    desc: 'Fertige dein erstes seltenes Ausrüstungsstück in der Lederverarbeitung.',
+  },
+  prog_tailoring_rare: {
+    name: 'Ein meisterhafter Stich',
+    desc: 'Fertige dein erstes seltenes Ausrüstungsstück in der Schneiderei.',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Zu Glanz gehärtet',
+    desc: 'Fertige dein erstes seltenes Ausrüstungsstück in der Waffenherstellung.',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Zur Perfektion gepanzert',
+    desc: 'Fertige dein erstes seltenes Ausrüstungsstück in der Rüstungsherstellung.',
   },
 };

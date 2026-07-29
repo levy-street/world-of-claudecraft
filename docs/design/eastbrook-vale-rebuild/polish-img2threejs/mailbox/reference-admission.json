@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "assetId": "ravenpost-mailbox",
+  "sourceSheet": {
+    "path": "docs/screenshots/eastbrook-vale-rebuild/polish/turnarounds/ravenpost-mailbox.png",
+    "sha256": "ea809fe8de8798a58dbfb6d5d293a337cafb42402f60c8f4d42093f4dbc954f4",
+    "width": 1536,
+    "height": 1024,
+    "admission": "conditional",
+    "permittedUse": "palette, scale, component hierarchy, and source provenance only",
+    "limitation": "multi-panel generated sheet; isolated admitted crops are the comparison references"
+  },
+  "semanticSuitability": {
+    "verdict": "pass",
+    "reasoning": [
+      "One complete mailbox is isolated in every crop.",
+      "Front, side, rear, three-quarter, and grazing silhouettes expose the full volume.",
+      "Stone, timber, cobalt roof, and gold zones are visually separable.",
+      "The target is reproducible with deterministic low-poly hard-surface geometry."
+    ],
+    "knownInference": "Minor hidden underside joinery is authored from symmetry and construction logic."
+  },
+  "admittedViews": [
+    {
+      "id": "front",
+      "path": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/front.png",
+      "sha256": "08003690125be17010e015d5ebc5c35d2a39c23efa88d3086a6f6fefd9c33c47",
+      "width": 350,
+      "height": 500,
+      "foregroundCoverage": 0.3335,
+      "largestComponentFraction": 0.9985,
+      "pHash": "16602967006124874345",
+      "verdict": "pass"
+    },
+    {
+      "id": "right",
+      "path": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/right.png",
+      "sha256": "a3c5564c6d8aa5fe673ab85b1c68854bdf5cc579628f64e00f83171eb8f88430",
+      "width": 300,
+      "height": 500,
+      "foregroundCoverage": 0.3367,
+      "largestComponentFraction": 1.0,
+      "pHash": "11833432074659613539",
+      "verdict": "pass"
+    },
+    {
+      "id": "rear-detail",
+      "path": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/rear-detail.png",
+      "sha256": "0b394a8c416f66d518937a4ef821e836c819531c47b0b6d33fdbed26dcbd22ee",
+      "width": 290,
+      "height": 300,
+      "foregroundCoverage": 0.509,
+      "largestComponentFraction": 1.0,
+      "pHash": "16755507835646288221",
+      "verdict": "pass"
+    },
+    {
+      "id": "left",
+      "path": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/left.png",
+      "sha256": "14c9afa9034ed280083bd744b36b35bc4217719f8c35c654f949f73be740ccf2",
+      "width": 336,
+      "height": 500,
+      "foregroundCoverage": 0.2959,
+      "largestComponentFraction": 1.0,
+      "pHash": "16243809390578735668",
+      "verdict": "pass"
+    },
+    {
+      "id": "front-three-quarter",
+      "path": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/front-three-quarter.png",
+      "sha256": "3afb0cba1122d334ecc6261a6390454fd9b4d5bcc4e10042f1d3aa4ef0fae4ad",
+      "width": 500,
+      "height": 524,
+      "foregroundCoverage": 0.2784,
+      "largestComponentFraction": 0.9364,
+      "pHash": "17177455329069930857",
+      "verdict": "pass"
+    },
+    {
+      "id": "rear-three-quarter",
+      "path": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/rear-three-quarter.png",
+      "sha256": "ee5fa76c8964f49c35f11274357c6206750a025bf4ff8b9927988fa5e12dce0f",
+      "width": 500,
+      "height": 524,
+      "foregroundCoverage": 0.2456,
+      "largestComponentFraction": 0.9246,
+      "pHash": "12841116877392235824",
+      "verdict": "pass"
+    },
+    {
+      "id": "grazing",
+      "path": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/grazing.png",
+      "sha256": "f11010d8f1603651f6a751f36dac79dd9d0f159a2828d0fe9c8b3af8bece93ce",
+      "width": 516,
+      "height": 524,
+      "foregroundCoverage": 0.3015,
+      "largestComponentFraction": 0.9409,
+      "pHash": "12699240286410100278",
+      "verdict": "pass"
+    }
+  ],
+  "supplementaryViews": [
+    {
+      "id": "rear-full-provenance-only",
+      "path": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/supplementary-views/rear.png",
+      "sha256": "e05498bfabdefc678d54cb488e430579ac27ea4b7f85bfc5a93d4a22b1cfa815",
+      "width": 300,
+      "height": 500,
+      "foregroundCoverage": 0.3952,
+      "largestComponentFraction": 1.0,
+      "pHash": "16318942261949405817",
+      "verdict": "rejected-as-primary",
+      "reason": "pHash distance 6 from the admitted front silhouette; use rear-detail plus rear-three-quarter as primary evidence"
+    }
+  ],
+  "rejectionRules": [
+    "Reject a future replacement with a changed SHA unless it is re-admitted and visually inspected.",
+    "Reject cropped views that omit the base, roof, mail slot, or complete side depth.",
+    "Reject duplicate angles that do not add independent depth evidence.",
+    "Reject readable text, watermarks, or non-World-of-ClaudeCraft symbols."
+  ]
+}

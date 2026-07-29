@@ -1,0 +1,25 @@
+{
+  "items": [
+    {
+      "src": "garden+hedge+3d+model.glb",
+      "out": "models/props/maze_hedge_wall.glb",
+      "type": "static",
+      "maxTex": 512,
+      "simplify": 0.001
+    },
+    {
+      "src": "hege+arch+3d+model.glb",
+      "out": "models/props/maze_hedge_arch.glb",
+      "type": "static",
+      "maxTex": 512,
+      "simplify": 0.001
+    },
+    {
+      "src": "leafy+fox+statue+3d+model.glb",
+      "out": "models/props/leafy_fox_statue.glb",
+      "type": "static",
+      "maxTex": 512,
+      "simplify": 0.001
+    }
+  ]
+}

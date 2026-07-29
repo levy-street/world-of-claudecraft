@@ -23,6 +23,7 @@ const model = (over: Partial<MobTooltipModel> = {}): MobTooltipModel => ({
   familyLabel: 'Beasts',
   color: '#ffe97a',
   hostile: true,
+  rank: 'normal',
   quests: [],
   ...over,
 });
@@ -57,6 +58,43 @@ describe('mobTooltipHtml', () => {
     const html = mobTooltipHtml(model({ name: '<script>alert(1)</script>' }), deps);
     expect(html).not.toContain('<script>');
     expect(html).toContain('&lt;script&gt;');
+  });
+
+  it('renders no rank badge for a normal mob', () => {
+    const html = mobTooltipHtml(model({ rank: 'normal' }), deps);
+    expect(html).not.toContain('tt-rank');
+    expect(html).not.toContain('hudChrome.mobTooltip.elite');
+    expect(html).not.toContain('hudChrome.mobTooltip.boss');
+  });
+
+  it('renders an Elite badge for an elite mob', () => {
+    const html = mobTooltipHtml(model({ rank: 'elite' }), deps);
+    expect(html).toContain('<div class="tt-rank">hudChrome.mobTooltip.elite</div>');
+    expect(html).not.toContain('hudChrome.mobTooltip.boss');
+  });
+
+  it('renders a Boss badge for a boss mob', () => {
+    const html = mobTooltipHtml(model({ rank: 'boss' }), deps);
+    expect(html).toContain('<div class="tt-rank">hudChrome.mobTooltip.boss</div>');
+    expect(html).not.toContain('hudChrome.mobTooltip.elite');
+  });
+
+  it('places the rank badge after the level/family line and before any quest lines', () => {
+    const html = mobTooltipHtml(
+      model({
+        rank: 'boss',
+        quests: [{ title: 'Wolves at the Door', progress: 'Forest Wolf slain: 3/8' }],
+      }),
+      deps,
+    );
+    const familyAt = html.indexOf('levelFamily');
+    const rankAt = html.indexOf('tt-rank');
+    const questAt = html.indexOf('tt-quest-name');
+    const reactionAt = html.indexOf('tt-red');
+    expect(familyAt).toBeGreaterThanOrEqual(0);
+    expect(rankAt).toBeGreaterThan(familyAt);
+    expect(questAt).toBeGreaterThan(rankAt);
+    expect(reactionAt).toBeGreaterThan(questAt);
   });
 
   it('renders Questie-style quest lines between the family line and the reaction', () => {

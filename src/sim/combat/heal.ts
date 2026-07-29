@@ -113,8 +113,17 @@ export function applyHeal(
       hexOutputMult(ctx, source) *
       healingTakenMult(ctx, target),
   );
+  const beforeAbsorb = healed;
   healed = consumeHealAbsorb(ctx, target, healed);
+  // How much a necrotic blight devoured. Carried on the event because a fully
+  // absorbed heal also lands as amount 0, and the client must not read that as
+  // "already at full health": the target can be at 30 percent and blighted.
+  const absorbed = beforeAbsorb - healed;
+  const beforeClamp = healed;
   healed = Math.min(healed, target.maxHp - target.hp);
+  // Healing lost to the missing-hp clamp, post-absorb so the two never
+  // double-count. Rides the event for parses (fidelity 7.1).
+  const overheal = beforeClamp - healed;
   target.hp += healed;
   ctx.emit({
     type: 'heal2',
@@ -123,8 +132,15 @@ export function applyHeal(
     amount: healed,
     crit,
     ability,
+    ...(absorbed > 0 ? { absorbed } : {}),
+    ...(overheal > 0 ? { overheal } : {}),
   });
   healingThreat(ctx, source, target, healed);
+  // Thornhollow Fields: real healing on an ally is support, and a kill that
+  // ally helps land pays the healer an assist. Only healing that actually
+  // landed counts (a fully overhealed or absorbed cast is not support), and the
+  // battleground module owns every other rule.
+  if (healed > 0 && target.kind === 'player') ctx.bgOnPlayerHealed(target, source);
   // Talent procs listening for critical heals (deterministic, no rng draw).
   if (crit && source.kind === 'player') onSpellCrit(ctx, source, abilityId, target);
   // Legendary on-heal weapon procs (e.g. Deathless Heartwood's Lifebloom). No-op

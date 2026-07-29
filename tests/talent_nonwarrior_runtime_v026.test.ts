@@ -5,6 +5,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { type ResolvedAbility, Sim } from '../src/sim/sim';
 import type { Aura, Entity, PlayerClass } from '../src/sim/types';
+import { placePlayerInOpenField } from './helpers/open_field';
 
 type TestSim = Sim & {
   nextId: number;
@@ -18,6 +19,7 @@ function harness(sim: Sim): TestSim {
 function simWithRows(cls: PlayerClass, rows: Record<number, string>): TestSim {
   const sim = harness(new Sim({ seed: 1756, playerClass: cls, autoEquip: false }));
   sim.setPlayerLevel(20);
+  placePlayerInOpenField(sim);
   expect(sim.applyTalents({ spec: null, rows })).toBe(true);
   return sim;
 }
@@ -122,6 +124,41 @@ describe('retained v0.26 non-Warrior row runtime contracts', () => {
     onCastCompleted(sim.ctx, sim.player, 'sinister_strike', target);
 
     expect(sim.player.resource).toBe(30);
+  });
+
+  it('Borrowed Tempo makes Cutthroat Tempo free without spending banked combo points (issue #2426)', () => {
+    const sim = simWithRows('rogue', { 11: 'rog_r11_improved_slice_and_dice' });
+    const target = addTarget(sim);
+    sim.player.resource = sim.player.maxResource;
+    sim.player.comboPoints = 5;
+
+    // Every 3rd builder arms a next_cast_free empowerment scoped to slice_and_dice.
+    onCastCompleted(sim.ctx, sim.player, 'sinister_strike', target);
+    onCastCompleted(sim.ctx, sim.player, 'sinister_strike', target);
+    onCastCompleted(sim.ctx, sim.player, 'sinister_strike', target);
+    expect(sim.player.auras.some((a) => a.kind === 'next_cast_free')).toBe(true);
+
+    const resourceBefore = sim.player.resource;
+    const comboBefore = sim.player.comboPoints;
+    sim.castAbility('slice_and_dice');
+
+    expect(sim.player.resource).toBe(resourceBefore); // the whole cast was free: no energy spent
+    expect(sim.player.comboPoints).toBe(comboBefore); // combo points banked, not consumed
+    // the finisher still applied its buff, scaled off the banked combo points
+    const haste = sim.player.auras.find((a) => a.kind === 'buff_haste');
+    expect(haste?.duration).toBeCloseTo(9 + 3 * comboBefore, 5);
+  });
+
+  it('a normal (non-empowered) Cutthroat Tempo still spends its combo points', () => {
+    const sim = simWithRows('rogue', {});
+    addTarget(sim);
+    sim.player.resource = sim.player.maxResource;
+    sim.player.comboPoints = 5;
+
+    sim.castAbility('slice_and_dice');
+
+    expect(sim.player.comboPoints).toBe(0);
+    expect(sim.player.resource).toBeLessThan(sim.player.maxResource);
   });
 
   it('adds one talent charge for Twin Fracture and Twin Icebind', () => {

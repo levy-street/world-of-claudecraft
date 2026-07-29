@@ -12,9 +12,13 @@ import {
   GUIDE_DELVES,
   GUIDE_DUNGEONS,
   GUIDE_FAMILIES,
+  GUIDE_PROF_CRAFTS,
+  GUIDE_PROF_GATHERING,
   GUIDE_ZONES,
 } from './content.generated';
 import { GLOSSARY_TERMS } from './pages/glossary';
+import { craftLabel } from './pages/professions_craft';
+import { gatheringLabel } from './pages/professions_gathering';
 import { GUIDE_ROUTES, hrefFor } from './routes';
 
 export interface SearchEntry {
@@ -44,6 +48,17 @@ export function buildIndex(): SearchEntry[] {
     if (r.id === 'home') continue;
     add(t(r.navKey), t('guide.search.typePage'), hrefFor(r.sub));
   }
+  // Professions detail pages (the classes-detail precedent): localized craft
+  // and gathering names land on their own /wiki/professions/<id> pages, plus
+  // the two fixed sub-pages.
+  for (const c of GUIDE_PROF_CRAFTS) {
+    add(craftLabel(c.id), t('guide.search.typePage'), hrefFor(`professions/${c.id}`));
+  }
+  for (const g of GUIDE_PROF_GATHERING) {
+    add(gatheringLabel(g.id), t('guide.search.typePage'), hrefFor(`professions/${g.id}`));
+  }
+  add(t('guide.profPages.econ.title'), t('guide.search.typePage'), hrefFor('professions/economy'));
+  add(t('guide.profPages.faq.title'), t('guide.search.typePage'), hrefFor('professions/faq'));
   for (const c of GUIDE_CLASSES) {
     const cls = t(`classes.${c.id}` as TranslationKey);
     add(

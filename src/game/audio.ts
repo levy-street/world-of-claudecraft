@@ -3,6 +3,7 @@
 // GameAudio keeps the established HUD-facing method surface while delegating
 // playback, loading, voice limits, and volume control to the sampled SFX engine.
 
+import type { GatherNodeType } from '../sim/types';
 import { sfx } from './sfx';
 
 // Minimum seconds between repeats of the SAME error cue: spamming an ability
@@ -11,12 +12,16 @@ import { sfx } from './sfx';
 // so an unrelated error class right after still sounds immediately.
 const ERROR_SFX_COOLDOWN_SECONDS = 1.5;
 
-const UI_CUES = {
+// Exported ONLY so tests/game_audio.test.ts's catalog-completeness guard can
+// walk every leaf key against the real SFX_FIXED_CATALOG_KEYS; not consumed
+// anywhere else (GameAudio's methods are the real call surface).
+export const UI_CUES = {
   bagOpen: 'ui_bag_open',
   bagClose: 'ui_bag_close',
   click: 'ui_click',
   coin: 'ui_coin',
   levelUp: 'ui_level_up',
+  questReady: 'quest_ready',
   achievement: 'ui_achievement',
   cosmeticUnlock: 'ui_cosmetic_unlock',
   lootItem: 'ui_loot_item',
@@ -51,11 +56,80 @@ const UI_CUES = {
   cardReveal: 'ui_card_reveal',
   cardRoundPush: 'ui_card_round_push',
   cardShuffle: 'ui_card_shuffle',
+  // Gathering rhythm (Professions 2.0 Phase 12b, issue #2208): fishCast/
+  // fishBite/fishReel are real, shipped fishing cues. gatherCast branches by
+  // node type (gatherCastByNodeType below); this flat cue is only the
+  // fallback for the rare case gatherCast() is called with no type known.
+  // fishBite is the one gameplay-timing cue of the family (the reel window
+  // opens with it), so it rides the ungated play() arm; the rest are
+  // feedback notifications.
+  gatherCast: 'ui_gather_cast',
+  fishCast: 'ui_fish_cast',
+  fishBite: 'ui_fish_bite',
+  fishReel: 'ui_fish_reel',
+  // Gathering (#1729/#1866 gatherResult event): one cue per GatherNodeType,
+  // replacing the old flat gatherStrike/gatherRare placeholders.
+  gatherByNodeType: {
+    ore: 'ui_gather_ore',
+    wood: 'ui_gather_wood',
+    herb: 'ui_gather_herb',
+  },
+  // The gather-cast "pulling a tool out" affordance, one recording per node
+  // type (mirrors gatherByNodeType above): a pickaxe for ore, an axe for
+  // wood, a knife/pouch for herb.
+  gatherCastByNodeType: {
+    ore: 'ui_gather_cast_ore',
+    wood: 'ui_gather_cast_wood',
+    herb: 'ui_gather_cast_herb',
+  },
+  // Rare-or-better gather stinger: layers alongside the gatherByNodeType cue
+  // above, never a replacement for it, one tier per rolled MaterialRarity
+  // (common/uncommon get none).
+  gatherRareTier: {
+    rare: 'ui_gather_rare',
+    epic: 'ui_gather_epic',
+    legendary: 'ui_gather_legendary',
+  },
+  // Craft-family cast start (Craft Cast System Phase 6): one shared wind-up
+  // for craft, disenchant, apply-enchant, salvage, and tool recharge. Mirrors
+  // gatherCast / fishCast: personal feedback at castStart, distinct from the
+  // completion cues below. Procedural placeholder in scripts/sfx/ui_sfx.mjs
+  // until a custom recording lands.
+  craftCast: 'ui_craft_cast',
+  // Crafting completion: one cue per CRAFT_RING craft family, keyed by the
+  // recipe's professionId (src/sim/content/professions.ts).
+  craftByFamily: {
+    engineering: 'ui_craft_engineering',
+    alchemy: 'ui_craft_alchemy',
+    cooking: 'ui_craft_cooking',
+    leatherworking: 'ui_craft_leatherworking',
+    tailoring: 'ui_craft_tailoring',
+    inscription: 'ui_craft_inscription',
+    enchanting: 'ui_craft_enchanting',
+    jewelcrafting: 'ui_craft_jewelcrafting',
+    weaponcrafting: 'ui_craft_weaponcrafting',
+    armorcrafting: 'ui_craft_armorcrafting',
+  },
+  // Masterwork proc: layers alongside the craftByFamily cue above, never a
+  // replacement for it (Jamie's explicit design call, 2026-07-18).
+  masterwork: 'ui_masterwork',
+  disenchant: 'ui_craft_disenchant',
+  salvage: 'ui_craft_salvage',
+  // Reuses the same recording as craftByFamily.enchanting above (one
+  // enchanting-profession take, no separate apply-enchant recording): that
+  // craftByFamily slot never actually fires (see its comment), so there is
+  // no conflict sharing the file with the real applyEnchant/enchantResult
+  // action here.
+  enchant: 'ui_craft_enchanting',
 } as const;
 
 type UiCue =
-  | Exclude<(typeof UI_CUES)[keyof typeof UI_CUES], readonly string[]>
-  | (typeof UI_CUES.fiestaWords)[number];
+  | Exclude<(typeof UI_CUES)[keyof typeof UI_CUES], readonly string[] | Record<string, string>>
+  | (typeof UI_CUES.fiestaWords)[number]
+  | (typeof UI_CUES.gatherByNodeType)[keyof typeof UI_CUES.gatherByNodeType]
+  | (typeof UI_CUES.gatherCastByNodeType)[keyof typeof UI_CUES.gatherCastByNodeType]
+  | (typeof UI_CUES.gatherRareTier)[keyof typeof UI_CUES.gatherRareTier]
+  | (typeof UI_CUES.craftByFamily)[keyof typeof UI_CUES.craftByFamily];
 
 export class GameAudio {
   private vol = 1;
@@ -94,8 +168,13 @@ export class GameAudio {
     sfx.init();
   }
 
-  private play(key: UiCue, opts?: { cooldown?: number }): void {
-    sfx.playUi(key, { jitter: false, cooldown: opts?.cooldown });
+  private play(key: UiCue, opts?: { cooldown?: number; rate?: number; gain?: number }): void {
+    sfx.playUi(key, {
+      jitter: false,
+      cooldown: opts?.cooldown,
+      rate: opts?.rate,
+      gain: opts?.gain,
+    });
   }
 
   /** Play a cue only when interface/feedback sounds are enabled. The notification
@@ -137,6 +216,13 @@ export class GameAudio {
   // minigame/PvP loss chime (fiesta, Yumi, arena rating, Vale Cup all still
   // use death() below): plays the real custom death vocalization instead of
   // the generic UI stinger.
+  //
+  // player_death_female_1..3 exist under public/audio/sfx but are unwired,
+  // same gap as the other player-voice trigger sites in src/ui/hud.ts (search
+  // player_hurt_female / player_death_female there): no gender field exists
+  // on PlayerMeta yet. This is the site to wire for your OWN character's
+  // death vocalization once that field lands, distinct from the OTHER
+  // players' death cue commented in hud.ts.
   playerDeath(): void {
     this.play(UI_CUES.playerDeath);
   }
@@ -195,6 +281,14 @@ export class GameAudio {
     this.playFeedback(UI_CUES.duelChallenge);
   }
 
+  // Party/group invite gets its own cue, distinct from the shared duelChallenge
+  // invitePrompt() above (resurrectionOffer still uses that one unchanged) and
+  // from guildInvite's own levelUp cue. Feedback-gated the same way: not
+  // time-critical, respects the Interface & Feedback Sounds toggle.
+  partyInvite(): void {
+    this.playFeedback(UI_CUES.questReady);
+  }
+
   duelCountdownTick(): void {
     this.play(UI_CUES.duelCountdown);
   }
@@ -236,6 +330,23 @@ export class GameAudio {
     this.play(UI_CUES.fiestaRevive);
   }
 
+  // Thornhollow Fields flag moments want WEIGHT. No dedicated recordings yet (the SFX
+  // asset flow is a follow-up), so each layers two existing cues into one
+  // bigger hit: a WAR-HORN stack for a take (the challenge horn doubled with
+  // a deep detuned layer carrying the weight and the fight-starts hit on the
+  // front edge; the old down-sting layer read as a boop, owner note), and the
+  // fanfare over the fight-starts hit for a capture.
+  bgFlagTaken(): void {
+    this.play(UI_CUES.duelChallenge, { rate: 0.58 });
+    this.play(UI_CUES.duelChallenge, { rate: 0.87, gain: 0.7 });
+    this.play(UI_CUES.duelStart, { gain: 0.85 });
+  }
+
+  bgCapture(): void {
+    this.play(UI_CUES.achievement);
+    this.play(UI_CUES.duelStart);
+  }
+
   // Card Duel: live in-match feedback, same ungated category as the Fiesta
   // cues above (match win/lose reuse duelEnd()/arenaLoss() directly, no
   // dedicated methods needed for those).
@@ -253,6 +364,69 @@ export class GameAudio {
 
   cardShuffle(): void {
     this.play(UI_CUES.cardShuffle);
+  }
+
+  // Gathering rhythm (Professions 2.0 Phase 12b). All of these are personal
+  // feedback notifications EXCEPT fishBite: the bite opens the live reel
+  // window, so it is a gameplay-timing cue (the ready-check/duel-countdown
+  // category) and deliberately ignores the Interface & Feedback toggle.
+  gatherCast(nodeType?: GatherNodeType): void {
+    this.playFeedback(nodeType ? UI_CUES.gatherCastByNodeType[nodeType] : UI_CUES.gatherCast);
+  }
+
+  fishCast(): void {
+    this.playFeedback(UI_CUES.fishCast);
+  }
+
+  fishBite(): void {
+    this.play(UI_CUES.fishBite);
+  }
+
+  fishReel(): void {
+    this.playFeedback(UI_CUES.fishReel);
+  }
+
+  gather(nodeType: GatherNodeType): void {
+    this.playFeedback(UI_CUES.gatherByNodeType[nodeType]);
+  }
+
+  // Layers alongside gather's own node-type cue above, never a replacement
+  // for it: a rare-or-better material roll (or a rare-event roll) gets an
+  // additional tiered stinger on top of the plain impact.
+  gatherRareTier(tier: 'rare' | 'epic' | 'legendary'): void {
+    this.playFeedback(UI_CUES.gatherRareTier[tier]);
+  }
+
+  // Craft-family cast start (craft / disenchant / apply-enchant / salvage /
+  // tool recharge). Feedback-gated like gatherCast; completion uses the
+  // family-specific cues below.
+  craftCast(): void {
+    this.playFeedback(UI_CUES.craftCast);
+  }
+
+  // recipeFamily is the recipe's professionId (a CRAFT_RING id); an unknown
+  // id (should never happen, every recipe's professionId is one of the ten)
+  // falls back to the generic loot ding rather than throwing.
+  craftSuccess(recipeFamily: string): void {
+    const key = (UI_CUES.craftByFamily as Record<string, string>)[recipeFamily];
+    this.playFeedback((key ?? UI_CUES.lootItem) as UiCue);
+  }
+
+  // Layers alongside craftSuccess's own cue, never a replacement for it.
+  masterwork(): void {
+    this.playFeedback(UI_CUES.masterwork);
+  }
+
+  disenchant(): void {
+    this.playFeedback(UI_CUES.disenchant);
+  }
+
+  salvage(): void {
+    this.playFeedback(UI_CUES.salvage);
+  }
+
+  enchant(): void {
+    this.playFeedback(UI_CUES.enchant);
   }
 }
 

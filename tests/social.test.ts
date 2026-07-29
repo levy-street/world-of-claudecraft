@@ -474,7 +474,9 @@ describe('parties', () => {
       // the common item round-robins to exactly one recipient.
       expect(sim.countItem('worn_sword', a) + sim.countItem('worn_sword', b)).toBe(1);
       // the corpse is fully cleared by the delegated lootCorpse distribution.
-      expect(mob.lootable).toBe(false);
+      // the emptied wolf corpse stays lootable through its
+      // unclaimed-harvest grace window instead of collapsing immediately.
+      expect(mob.lootable).toBe(true);
       expect(mob.loot).toBeNull();
       expect(sim.events.some((e) => e.type === 'error')).toBe(false);
     });
@@ -537,7 +539,9 @@ describe('parties', () => {
       });
       sim.autoLoot(openMob.id, a);
       expect(sim.meta(a)?.copper ?? 0).toBeGreaterThan(0);
-      expect(openMob.lootable).toBe(false);
+      // Grace window: emptied but still owed its unclaimed harvest.
+      expect(openMob.lootable).toBe(true);
+      expect(openMob.loot).toBeNull();
     });
 
     it("does not auto-loot a stranger's corpse after it goes FFA, though a deliberate manual loot still can", () => {
@@ -560,7 +564,9 @@ describe('parties', () => {
       // A deliberate manual loot on the same FFA corpse still works (manual honors FFA).
       sim.lootCorpse(mob.id, a);
       expect(sim.countItem('worn_sword', a)).toBe(1);
-      expect(mob.lootable).toBe(false);
+      // Grace window: emptied but still owed its unclaimed harvest.
+      expect(mob.lootable).toBe(true);
+      expect(mob.loot).toBeNull();
     });
   });
 });
@@ -676,6 +682,48 @@ describe('trading', () => {
     expect(sim.countItem('baked_bread', b)).toBe(breadB - 1);
     expect(sim.meta(a)?.copper).toBe(100 - 30 + 10);
     expect(sim.meta(b)?.copper).toBe(50 - 10 + 30);
+  });
+
+  it('trades counted same-payload instanced stacks on the REAL Sim, merging on receive (12d QA)', () => {
+    // Every other instanced-trade pin drives the stub ctx in tests/trade.test.ts
+    // (a hand-copied removeItem walk); this one drives the real Sim end to end
+    // so stub drift can never hide a real-path regression: partial-stack legs
+    // both directions, BOTH sides offering the same payload in one confirm
+    // (merge-on-receive on both ends), and per-payload unit conservation.
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const b = sim.addPlayer('mage', 'Bet');
+    teleport(sim, a, 0, -40);
+    teleport(sim, b, 3, -40);
+    for (let i = 0; i < 4; i++) sim.addItemInstance('wolf_fang', { signer: 'Cyn' }, a);
+    for (let i = 0; i < 3; i++) sim.addItemInstance('wolf_fang', { signer: 'Cyn' }, b);
+    const fangsOf = (pid: number) =>
+      sim.meta(pid)!.inventory.filter((s) => s.itemId === 'wolf_fang');
+    expect(fangsOf(a)).toEqual([{ itemId: 'wolf_fang', count: 4, instance: { signer: 'Cyn' } }]);
+    expect(fangsOf(b)).toEqual([{ itemId: 'wolf_fang', count: 3, instance: { signer: 'Cyn' } }]);
+
+    sim.drainEvents();
+    sim.tradeRequest(b, a);
+    sim.tradeAccept(b);
+    sim.tradeSetOffer([{ itemId: 'wolf_fang', count: 2 }], 0, a); // partial stack A -> B
+    sim.tradeSetOffer([{ itemId: 'wolf_fang', count: 3 }], 0, b); // whole stack B -> A
+    sim.tradeConfirm(a);
+    sim.tradeConfirm(b);
+    expect(sim.tradeFor(a)).toBe(null);
+    // Merge-on-receive on both ends: one counted slot each, 7 units conserved.
+    expect(fangsOf(a)).toEqual([{ itemId: 'wolf_fang', count: 5, instance: { signer: 'Cyn' } }]);
+    expect(fangsOf(b)).toEqual([{ itemId: 'wolf_fang', count: 2, instance: { signer: 'Cyn' } }]);
+
+    // Second leg back: B returns its remainder; A reunites the full seven.
+    sim.tradeRequest(a, b);
+    sim.tradeAccept(a);
+    sim.tradeSetOffer([{ itemId: 'wolf_fang', count: 2 }], 0, b);
+    sim.tradeSetOffer([], 0, a);
+    sim.tradeConfirm(b);
+    sim.tradeConfirm(a);
+    expect(fangsOf(a)).toEqual([{ itemId: 'wolf_fang', count: 7, instance: { signer: 'Cyn' } }]);
+    expect(fangsOf(b)).toEqual([]);
+    expect(sim.drainEvents().some((e) => e.type === 'error')).toBe(false);
   });
 
   it('does not replace a pending trade request', () => {

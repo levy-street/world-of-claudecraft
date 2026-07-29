@@ -26,7 +26,6 @@ vi.mock('../server/db', () => ({
 
 import { GameServer, wireEntity } from '../server/game';
 import { BOOL_SETTINGS } from '../src/game/settings';
-import { ClientWorld } from '../src/net/online';
 import { ABILITIES, CLASSES } from '../src/sim/content/classes';
 import { emptyModifiers } from '../src/sim/content/talents';
 import { recalcPlayerStats } from '../src/sim/entity';
@@ -36,6 +35,7 @@ import { stunDrCategory } from '../src/sim/stun_dr';
 import type { Aura } from '../src/sim/types';
 import { AVATAR_SCALE, SPELL_AOE_COEFF_MULT } from '../src/sim/types';
 import { targetOfTargetId } from '../src/ui/target_of_target';
+import { bareClient } from './helpers/bare_client';
 
 describe('rogue starting dual wield (classes.ts startOffhand)', () => {
   it('starts rogues with a rusty dagger in BOTH hands', () => {
@@ -154,8 +154,11 @@ describe('selfHotPctMax effect (effect_dispatch)', () => {
 
 describe('offhand surfacing (paperdoll, player card, chat readout)', () => {
   it('shows the offhand cell on the character sheet paperdoll', async () => {
-    const { PAPERDOLL_RIGHT_SLOTS } = await import('../src/ui/char_view');
-    expect(PAPERDOLL_RIGHT_SLOTS).toContain('offhand');
+    // Showcase redesign: the offhand moved to the LEFT column (under Main Hand) to
+    // balance the paperdoll 6/6. It is still surfaced on the sheet, now on the left.
+    const { PAPERDOLL_LEFT_SLOTS, PAPERDOLL_RIGHT_SLOTS } = await import('../src/ui/char_view');
+    expect(PAPERDOLL_LEFT_SLOTS).toContain('offhand');
+    expect(PAPERDOLL_RIGHT_SLOTS).not.toContain('offhand');
   });
 
   it('lists the offhand in the chat gear readout', async () => {
@@ -362,55 +365,6 @@ describe('dev bots auto-accept party invites (party.ts partyInvite)', () => {
 // field + its kind-based client resolution.
 // ---------------------------------------------------------------------------
 
-// A ClientWorld without the WebSocket plumbing (the snapshots.test.ts harness),
-// to drive the REAL applySnapshot decode directly.
-function bareClient(pid: number): ClientWorld {
-  const c = Object.create(ClientWorld.prototype);
-  c.cfg = { seed: 20061, playerClass: 'warrior' };
-  c.entities = new Map();
-  c.playerId = pid;
-  c.ownPlayerId = pid;
-  c.ownPlayerClass = 'warrior';
-  c.spectating = null;
-  c.cupInfo = null;
-  c.sportRole = null;
-  c.moveInput = {};
-  c.inventory = [];
-  c.vendorBuyback = [];
-  c.equipment = {};
-  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
-  c.copper = 0;
-  c.honor = 0;
-  c.lifetimeHonor = 0;
-  c.xp = 0;
-  c.known = [];
-  c.questLog = new Map();
-  c.questsDone = new Set();
-  c.pendingQuestCommands = new Map();
-  c.partyInfo = null;
-  c.selectedDungeonDifficulty = 'normal';
-  c.tradeInfo = null;
-  c.duelInfo = null;
-  c.lastSnapAt = 0;
-  c.snapInterval = 50;
-  c.serverTickHz = null;
-  c.missingSince = new Map();
-  c.pendingFacingDelta = 0;
-  c.connected = true;
-  c.eventQueue = [];
-  c.mouselookFacing = null;
-  c.lastInputSentAt = 0;
-  c.lastInputSig = '';
-  c.inputSeq = 0;
-  c.pendingInputSeqSentAt = new Map();
-  c.ackedInputSeq = 0;
-  c.inputEchoSamples = [];
-  c.spectateFacingPending = false;
-  c.pendingSpectateFacing = null;
-  c.nodeCooldowns = new Map();
-  return c as ClientWorld;
-}
-
 describe('mouseover cast settings + server target routing (game.ts case cast)', () => {
   it('defaults mouseoverCast on and showTargetOfTarget off', () => {
     expect(BOOL_SETTINGS.mouseoverCast.def).toBe(true);
@@ -508,5 +462,29 @@ describe('target-of-target wire field (dynamicFields tgt) and resolution', () =>
     sim.targetEntity(null, a);
     internals.applySnapshot({ t: 'snap', ents: [wireEntity(e)] });
     expect(client.entities.get(a)?.targetId).toBeNull();
+  });
+
+  it('carries taunt forced-target state through the entity wire', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
+    const tank = sim.addPlayer('warrior', 'Tank');
+    const mob = [...sim.entities.values()].find((e) => e.kind === 'mob');
+    if (!mob) throw new Error('missing mob entity');
+    mob.forcedTargetId = tank;
+    mob.forcedTargetTimer = 2.95;
+    expect(wireEntity(mob)).toMatchObject({ ft: tank, ftm: 2.95 });
+
+    const client = bareClient(tank + 1000);
+    const internals = client as unknown as { applySnapshot(snapshot: unknown): void };
+    internals.applySnapshot({ t: 'snap', ents: [wireEntity(mob)] });
+    const mirrored = client.entities.get(mob.id);
+    if (!mirrored) throw new Error('missing mirrored mob');
+    expect(mirrored.forcedTargetId).toBe(tank);
+    expect(mirrored.forcedTargetTimer).toBe(2.95);
+
+    mob.forcedTargetId = null;
+    mob.forcedTargetTimer = 0;
+    internals.applySnapshot({ t: 'snap', ents: [wireEntity(mob)] });
+    expect(client.entities.get(mob.id)?.forcedTargetId).toBeNull();
+    expect(client.entities.get(mob.id)?.forcedTargetTimer).toBe(0);
   });
 });

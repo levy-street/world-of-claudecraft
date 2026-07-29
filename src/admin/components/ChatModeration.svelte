@@ -12,12 +12,10 @@
     account,
     chat,
     onSubmit,
-    onReset,
   }: {
     account: AccountDetail;
     chat: ChatModerationDetail;
     onSubmit: (pending: PendingAction) => boolean | Promise<boolean>;
-    onReset: () => void;
   } = $props();
 </script>
 
@@ -29,7 +27,6 @@
       chatStrikes: chat.chatStrikes,
     }}
     {onSubmit}
-    {onReset}
   />
   <h4>{t('chatMod.recentIncidents')}</h4>
   {#if chat.violations.length === 0}

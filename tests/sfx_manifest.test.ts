@@ -162,11 +162,11 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps the release catalog, mount cues, and all 36 UI cues in one 191-key inventory', () => {
+  it('keeps the release catalog, all 9 mount cues, and all 63 UI cues in one 246-key inventory', () => {
     const keys = new Set(SFX.map((entry) => entry.key));
-    // 188 + the 3 Last Bell harbor cues (bell toll, harbor ambience, cast-off).
-    expect(keys.size).toBe(191);
-    expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(36);
+    expect(keys.size).toBe(246);
+    expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(63);
+    expect(keys.has('ui_craft_cast')).toBe(true);
     for (const key of [
       'cast_lightning_bolt',
       'mob_mudfin_attack',
@@ -184,6 +184,38 @@ describe('buildManifest', () => {
       'lb_bell_toll',
       'lb_harbor_ambience',
       'lb_ship_castoff',
+      'player_eat_food',
+      'player_drink_water',
+      'player_drink_potion',
+      'mount_run_terrorspark_groundshaker',
+      // the Drakemaw Raptor, the ninth mount cue (the brood rework's legendary)
+      'mount_run_drakemaw_raptor',
+      'fear_shout',
+      'fear',
+      'ice_block',
+      'frost_nova',
+      'hammer_of_justice',
+      'entangling_roots',
+      'blind',
+      'cloak_of_shadows',
+      'scorch',
+      'pyroblast',
+      'flamestrike',
+      'frozen_orb',
+      'glacial_spike',
+      'blizzard',
+      'blink',
+      'arcane_blast',
+      'shadowstep',
+      'vanish',
+      'cheap_shot',
+      'ambush',
+      'backstab',
+      'garrote',
+      'sap',
+      'sinister_strike',
+      'eviscerate',
+      'stealth',
     ]) {
       expect(keys.has(key), key).toBe(true);
     }
@@ -196,7 +228,7 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(191);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(246);
   });
 });
 

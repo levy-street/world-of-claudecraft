@@ -166,3 +166,90 @@ describe('dev commands', () => {
     expect(devSpawns(sim)).toEqual([]);
   });
 });
+
+describe('/dev bg (Thornhollow Fields force-start)', () => {
+  it('force-starts a short-handed match from whoever is queued, no bots', () => {
+    const sim = new Sim({ seed: 9, playerClass: 'warrior', noPlayer: true, devCommands: true });
+    const a = sim.addPlayer('warrior', 'Alpha');
+    const b = sim.addPlayer('mage', 'Beta');
+    const c = sim.addPlayer('priest', 'Gamma');
+    for (const p of [a, b, c]) {
+      sim.entities.get(p)!.level = 20; // the queue floor; /dev bg itself bypasses it
+      sim.bgQueueJoin(p);
+    }
+
+    sim.chat('/dev bg', a);
+
+    const match = sim.bgMatchFor(a);
+    expect(match).toBeTruthy();
+    if (!match) throw new Error('missing match');
+    expect(match.teams[0].length + match.teams[1].length).toBe(3);
+    expect(match.teams[0].length).toBeGreaterThan(0);
+    expect(match.teams[1].length).toBeGreaterThan(0);
+    expect([...sim.players.values()].filter((m) => m.isDevBot)).toHaveLength(0);
+  });
+
+  it('queues the caller and pads with one dev bot for a solo walk-around, drawing zero rng', () => {
+    const sim = devSim();
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+
+    sim.chat('/dev bg');
+
+    const match = sim.bgMatchFor(sim.playerId);
+    expect(match).toBeTruthy();
+    if (!match) throw new Error('missing match');
+    const pids = [...match.teams[0], ...match.teams[1]];
+    expect(pids).toHaveLength(2);
+    const botPid = pids.find((p) => p !== sim.playerId);
+    expect(botPid).toBeDefined();
+    expect(sim.players.get(botPid ?? -1)?.isDevBot).toBe(true);
+    // exactly ONE draw: the power-rune opening face rolled at match start
+    // (startBgMatch); queueing, padding, and team-splitting draw nothing.
+    expect(draws).toBe(1);
+  });
+
+  it('errors on a repeat call from inside the match', () => {
+    const sim = devSim();
+    sim.chat('/dev bg');
+    expect(sim.bgMatchFor(sim.playerId)).toBeTruthy();
+    sim.tick();
+
+    sim.chat('/dev bg');
+
+    const errors = sim
+      .tick()
+      .filter((e) => e.type === 'error' && e.pid === sim.playerId)
+      .map((e) => (e.type === 'error' ? e.text : ''));
+    expect(errors).toContain('[dev] You are already in a battleground.');
+  });
+
+  it('a refused queue join (dead caller) starts nothing and leaks no bot', () => {
+    const sim = devSim();
+    sim.player.hp = 0;
+    sim.player.dead = true;
+
+    sim.chat('/dev bg');
+
+    expect(sim.bgMatchFor(sim.playerId)).toBeNull();
+    expect([...sim.players.values()].filter((m) => m.isDevBot)).toHaveLength(0);
+  });
+
+  it('reuses an idle leftover dev bot instead of spawning another', () => {
+    const sim = devSim();
+    sim.chat('/dev bot Riftbot');
+    const botCountBefore = [...sim.players.values()].filter((m) => m.isDevBot).length;
+    expect(botCountBefore).toBe(1);
+
+    sim.chat('/dev bg');
+
+    expect(sim.bgMatchFor(sim.playerId)).toBeTruthy();
+    expect([...sim.players.values()].filter((m) => m.isDevBot)).toHaveLength(1);
+  });
+
+  it('is inert without devCommands', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', devCommands: false });
+    sim.chat('/dev bg');
+    expect(sim.bgMatchFor(sim.playerId)).toBeNull();
+  });
+});

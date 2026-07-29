@@ -9,6 +9,7 @@ import {
   directSpellCoeff,
   dotTickBonus,
   dotTotalCoeff,
+  HEALING_SP_SCALE,
   hotTickBonus,
 } from '../src/sim/spell_scaling';
 import type { AbilityDef } from '../src/sim/types';
@@ -89,6 +90,14 @@ describe('directHitBonus', () => {
     const d = def({ school: 'physical', scalesWith: 'ranged' });
     expect(directHitBonus(rap, d, 3.0)).toBe(Math.round(rap * (3.0 / 3.5) * RANGED_SPELL_AP_SCALE));
   });
+
+  it('mult (the resolved talent/mastery multiplier) wraps the whole rider (#1803)', () => {
+    const sp = 400;
+    const d = def({});
+    expect(directHitBonus(sp, d, 3.0, false, 1.25)).toBe(Math.round(sp * (3.0 / 3.5) * 1.25));
+    // Default mult stays 1: existing callers are unaffected.
+    expect(directHitBonus(sp, d, 3.0)).toBe(Math.round(sp * (3.0 / 3.5)));
+  });
 });
 
 describe('channelTickBonus', () => {
@@ -100,6 +109,12 @@ describe('channelTickBonus', () => {
 
   it('returns 0 for a non-channeled ability', () => {
     expect(channelTickBonus(500, def({}))).toBe(0);
+  });
+
+  it('mult wraps the tick rider (#1803)', () => {
+    const sp = 210;
+    const d = def({ castTime: 0, channel: { duration: 3, ticks: 3 } });
+    expect(channelTickBonus(sp, d, 1.5)).toBe(Math.round(sp * (3 / 3.5 / 3) * 1.5));
   });
 });
 
@@ -119,42 +134,72 @@ describe('dotTickBonus', () => {
       Math.round((rap * (15 / 15) * RANGED_SPELL_AP_SCALE) / 5),
     );
   });
+
+  it('mult wraps the tick rider (#1803)', () => {
+    const sp = 150;
+    const d = def({});
+    expect(dotTickBonus(sp, d, 18, 3, 1.2)).toBe(Math.round((sp * (18 / 15) * 1.2) / 6));
+  });
 });
 
 describe('directHealBonus', () => {
-  it('scales heals off Spell Power at the direct coeff, instants use the 1.5 floor', () => {
+  it('scales heals off DOUBLE Spell Power (1 healing per int) at the direct coeff', () => {
     const sp = 200;
     expect(directHealBonus(sp, 0)).toBe(
-      Math.round(sp * (SPELL_COEFF_MIN_CAST / SPELL_COEFF_DIVISOR)),
+      Math.round(sp * HEALING_SP_SCALE * (SPELL_COEFF_MIN_CAST / SPELL_COEFF_DIVISOR)),
     );
-    expect(directHealBonus(sp, 3.0)).toBe(Math.round(sp * (3.0 / 3.5)));
-    expect(directHealBonus(sp, 3.5)).toBe(sp); // a 3.5s+ heal takes the full Spell Power
+    expect(directHealBonus(sp, 3.0)).toBe(Math.round(sp * HEALING_SP_SCALE * (3.0 / 3.5)));
+    expect(directHealBonus(sp, 3.5)).toBe(sp * HEALING_SP_SCALE); // full coeff at 3.5s+
   });
 
-  it('never takes an AP scale-down (heals are pure Spell Power)', () => {
-    // Same Spell Power and cast time as a full-coeff nuke: heal takes the full 1.0.
+  it('takes exactly HEALING_SP_SCALE times the equivalent nuke rider (no AP path)', () => {
+    // Same Spell Power and cast time as a full-coeff nuke: the heal takes the
+    // healing scale on top, the 2026-07 healers-vs-heroics rebalance.
     const sp = 300;
-    expect(directHealBonus(sp, 3.5)).toBe(directHitBonus(sp, def({ school: 'holy' }), 3.5));
+    expect(HEALING_SP_SCALE).toBe(2);
+    expect(directHealBonus(sp, 3.5)).toBe(
+      HEALING_SP_SCALE * directHitBonus(sp, def({ school: 'holy' }), 3.5),
+    );
+  });
+
+  it('mult wraps the whole rider (#1803)', () => {
+    const sp = 300;
+    expect(directHealBonus(sp, 3.5, false, 1.15)).toBe(
+      Math.round(sp * HEALING_SP_SCALE * 1.0 * 1.15),
+    );
   });
 });
 
 describe('absorbBonus', () => {
-  it('adds the authored fraction of Spell Power to a shield', () => {
+  it('adds the authored fraction of Spell Power to a shield (mage barriers: no heal scale)', () => {
     expect(absorbBonus(123, 0.5)).toBe(62);
     expect(absorbBonus(80, 0)).toBe(0);
+  });
+
+  it('mult wraps the rider (#1803)', () => {
+    expect(absorbBonus(123, 0.5, 1.3)).toBe(Math.round(123 * 0.5 * 1.3));
   });
 });
 
 describe('hotTickBonus', () => {
-  it('splits the total DoT coefficient across HoT ticks off Spell Power', () => {
+  it('splits the total DoT coefficient across HoT ticks off DOUBLE Spell Power', () => {
     const sp = 150;
     // duration 12, interval 3 -> 4 ticks, total coeff 12/15
-    expect(hotTickBonus(sp, 12, 3)).toBe(Math.round((sp * (12 / 15)) / 4));
+    expect(hotTickBonus(sp, 12, 3)).toBe(Math.round((sp * HEALING_SP_SCALE * (12 / 15)) / 4));
   });
 
-  it('matches dotTickBonus for a pure (holy/nature) spell but without any AP path', () => {
+  it('takes HEALING_SP_SCALE times the equivalent DoT tick (no AP path)', () => {
     const sp = 210;
-    expect(hotTickBonus(sp, 15, 3)).toBe(dotTickBonus(sp, def({ school: 'nature' }), 15, 3));
+    expect(hotTickBonus(sp, 15, 3)).toBe(
+      HEALING_SP_SCALE * dotTickBonus(sp, def({ school: 'nature' }), 15, 3),
+    );
+  });
+
+  it('mult wraps the tick rider (#1803)', () => {
+    const sp = 150;
+    expect(hotTickBonus(sp, 12, 3, 1.25)).toBe(
+      Math.round((sp * HEALING_SP_SCALE * (12 / 15) * 1.25) / 4),
+    );
   });
 });
 

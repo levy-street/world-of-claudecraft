@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { Sim } from '../src/sim/sim';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
-const SEED = 20061;
+const SEED = WORLD_SEED;
 
 // Tidebound Acolyte is the seeded carrier of the desperateHeal mechanic.
 function makeAcolyte(sim: Sim, hpFrac: number) {

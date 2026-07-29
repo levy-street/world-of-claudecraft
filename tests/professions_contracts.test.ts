@@ -5,7 +5,9 @@
 // the shared types are importable from the barrel without duplication.
 import { describe, expect, it } from 'vitest';
 import { ClientWorld } from '../src/net/online';
+import { BUILTIN_WORLD, STATIONS, setActiveWorldContent } from '../src/sim/data';
 import type { ProfessionRecord } from '../src/sim/professions';
+import { emptyCraftSkills } from '../src/sim/professions/wheel';
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 
@@ -54,12 +56,14 @@ function makeClientWorld(): ClientWorld {
 describe('professions contracts (#1164)', () => {
   it('IWorldProfessions.professionsState carries the four all-zero gathering skills on a fresh Sim', () => {
     const sim = new Sim({ seed: SIM_SEED, playerClass: PROBE_CLASS });
+    // Pins the enforced per-profession caps
+    // (mining/logging/herbalism 100, fishing 200) replace the old uniform 300.
     expect(sim.professionsState).toEqual({
       skills: [
-        { professionId: 'mining', skill: 0, maxSkill: 300 },
-        { professionId: 'logging', skill: 0, maxSkill: 300 },
-        { professionId: 'herbalism', skill: 0, maxSkill: 300 },
-        { professionId: 'fishing', skill: 0, maxSkill: 300 },
+        { professionId: 'mining', skill: 0, maxSkill: 100 },
+        { professionId: 'logging', skill: 0, maxSkill: 100 },
+        { professionId: 'herbalism', skill: 0, maxSkill: 100 },
+        { professionId: 'fishing', skill: 0, maxSkill: 200 },
       ],
     });
   });
@@ -67,6 +71,57 @@ describe('professions contracts (#1164)', () => {
   it('IWorldProfessions.professionsState is a stub empty view on ClientWorld (not yet mirrored from a snapshot)', () => {
     const client = makeClientWorld();
     expect(client.professionsState).toEqual({ skills: [] });
+  });
+
+  it('serves the builtin station placements through both IWorld implementations', () => {
+    // Identity holds because the active bundle wraps the builtin STATIONS
+    // reference on every shipped host, not because either side pins the
+    // static const anymore.
+    const sim = new Sim({ seed: SIM_SEED, playerClass: PROBE_CLASS });
+    const client = makeClientWorld();
+    expect(sim.stationPlacements).toBe(STATIONS);
+    expect(client.stationPlacements).toBe(STATIONS);
+  });
+
+  it('ClientWorld station placements follow an active-content swap', () => {
+    const client = makeClientWorld();
+    const builtin = BUILTIN_WORLD.services;
+    if (!builtin?.stations?.length) throw new Error('builtin services missing');
+    const custom = {
+      id: 's_swap_test',
+      type: builtin.stations[0].type,
+      zoneId: 'eastbrook_vale',
+      pos: { x: 1, z: 2 },
+      masterNpcId: builtin.stations[0].masterNpcId,
+    };
+    try {
+      setActiveWorldContent({
+        ...BUILTIN_WORLD,
+        services: { ...builtin, stations: [custom] },
+      });
+      expect(client.stationPlacements).toEqual([custom]);
+    } finally {
+      setActiveWorldContent(null);
+    }
+    expect(client.stationPlacements).toBe(STATIONS);
+  });
+
+  it('a fresh pre-sync ClientWorld exposes empty-but-well-formed craft skills', () => {
+    // The real field initializers, not the bareClient Object.create idiom
+    // (which skips them): before any cprof snapshot the identity is unsynced
+    // and every CRAFT_RING craft reads exactly 0, so pre-sync consumers can
+    // index the record without existence checks on either read path.
+    // emptyCraftSkills mints a fresh object per call, so these expectations
+    // are never the aliased live reference.
+    const client = makeClientWorld();
+    expect(client.craftingIdentity.synced).toBe(false);
+    expect(client.craftSkills).toEqual(emptyCraftSkills());
+    expect(Object.values(client.craftSkills).every((v) => v === 0)).toBe(true);
+    expect(client.craftingIdentity.craftSkills).toEqual(emptyCraftSkills());
+    // The derived scalars read the same pre-sync mirror: null until cprof
+    // lands (the retired member-by-member projections behaved identically).
+    expect(client.hobbyCraft).toBeNull();
+    expect(client.archetypeTitle).toBeNull();
   });
 
   it('shared professions types are importable from the barrel', () => {

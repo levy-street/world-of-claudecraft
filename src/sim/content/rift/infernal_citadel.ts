@@ -231,13 +231,17 @@ export const INFERNAL_PIT_DECOR: readonly AuthoredDecor[] = [
 /** Trash placements: (templateId, x, z). Kept inside their rooms and off every
  * decor collider (pinned by tests/rift_infernal.test.ts). */
 const TRASH_PLAN: ReadonlyArray<readonly [string, number, number]> = [
-  // R1 Sacrificial Hall
-  ['rift_hellguard', -10, -5],
-  ['rift_hellguard', 8, -4],
-  ['rift_pact_acolyte', -7, 8],
-  ['rift_hellguard', 9, 9],
-  ['rift_pact_acolyte', -10, 18],
-  ['rift_hellguard', 10, 18],
+  // R1 Sacrificial Hall. The three bands sit at z 4 / 13 / 22 rather than hard against
+  // the gatehouse door: the front band has to clear the arrival point by
+  // RIFT_ENTRY_CLEAR_RADIUS (rift/entry_clearance.ts) or stepping out of the gatehouse
+  // pulls it, and aggro is not line-of-sight gated so the door wall does not help. The
+  // whole hall shifted back together to keep the author's three distinct packs.
+  ['rift_hellguard', -10, 4],
+  ['rift_hellguard', 8, 4],
+  ['rift_pact_acolyte', -7, 13],
+  ['rift_hellguard', 9, 13],
+  ['rift_pact_acolyte', -10, 22],
+  ['rift_hellguard', 10, 22],
   // R2 Relic Gallery
   ['rift_hellguard', 27, -2],
   ['rift_pact_acolyte', 27, 7],
@@ -256,11 +260,13 @@ const TRASH_PLAN: ReadonlyArray<readonly [string, number, number]> = [
 
 /** Pit-floor trash: same placement contract as TRASH_PLAN, on the floor-1 map. */
 const PIT_TRASH_PLAN: ReadonlyArray<readonly [string, number, number]> = [
-  // P1 Nave
-  ['rift_pact_acolyte', -10, -10],
-  ['rift_pact_acolyte', 10, -10],
-  ['rift_hellguard', -8, 8],
-  ['rift_hellguard', 8, 8],
+  // P1 Nave. Same arrival clearance as the halls: the front band moved off the balcony
+  // landing (z -10 was 18.9 yd from the entry, well inside the clamp) to z 2, and the
+  // second band back to z 12 so the nave still reads as three separate pulls.
+  ['rift_pact_acolyte', -10, 2],
+  ['rift_pact_acolyte', 10, 2],
+  ['rift_hellguard', -8, 12],
+  ['rift_hellguard', 8, 12],
   ['rift_hellguard', 0, 24],
   // P2 The pit approach
   ['rift_hellguard', -10, 38],

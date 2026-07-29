@@ -44,6 +44,8 @@ import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer } from '../server/game';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { isInJailCage, JAIL_GATE, JAIL_VISITOR_POS, jailGateTeleport } from '../src/sim/jail';
+import { registerChoice, startChoiceForPlayer } from '../src/sim/scenes/choices';
+import { playSceneForPlayer, registerScene } from '../src/sim/scenes/scenes';
 
 // Moderation acts on player sessions and the fixed jail cage; ambient camps,
 // world npcs and quest objects never take part, and every test here boots one
@@ -73,12 +75,22 @@ type FakeWs = {
 type TestFrame = {
   t?: string;
   name?: string | null;
+  pid?: number;
+  sceneState?: {
+    sceneId: string;
+    remainingSeconds: number;
+    inputLocked: boolean;
+    letterbox: boolean;
+    musicSilenced: boolean;
+  } | null;
+  sceneChoiceState?: unknown;
   list?: { text?: string }[];
   self?: {
     id: number;
     nm: string;
     ack: number;
     party: { members: { pid: number; x: number; z: number }[] };
+    tal?: { alloc: { spec: string | null; rows: Record<number, string> } };
   };
 };
 
@@ -628,7 +640,7 @@ describe('in-game moderation actions', () => {
 });
 
 describe('moderator spectate integration', () => {
-  it('re-scopes snapshots and events, gates gameplay, and restores the moderator', () => {
+  it('re-scopes snapshots and events, gates gameplay, and restores the moderator', async () => {
     const server = new GameServer();
     const moderatorWs = fakeWs();
     const suspectWs = fakeWs();
@@ -650,12 +662,22 @@ describe('moderator spectate integration', () => {
     server.sim.partyAccept(suspect.pid);
 
     command(server, moderator, '/spectate "Suspect"');
+    // The audit write (recordInGameAction) is awaited before the live effect
+    // applies, mirroring kick/kill/jail/unjail: the mocked audit resolves on
+    // the next microtask, so wait for it rather than asserting synchronously.
+    await vi.waitFor(() => expect(moderator.spectating).not.toBeNull());
 
     expect(moderator.spectating?.characterId).toBe(suspect.characterId);
     expect(moderatorEntity.pos.x).toBe(-10_000);
     expect(moderatorEntity.pos.z).toBe(-10_000);
     expect(moderatorEntity.gm).toBe(true);
-    expect(frames(moderatorWs)).toContainEqual({ t: 'spectate', name: 'Suspect' });
+    expect(frames(moderatorWs)).toContainEqual({
+      t: 'spectate',
+      name: 'Suspect',
+      pid: suspect.pid,
+      sceneState: null,
+      sceneChoiceState: null,
+    });
 
     moderatorWs.send.mockClear();
     internals(server).broadcastSnapshots();
@@ -706,32 +728,163 @@ describe('moderator spectate integration', () => {
     expect(eventTexts(moderatorWs)).toContain('Local chat is unavailable while spectating.');
 
     command(server, moderator, '/unspectate');
-    expect(moderator.spectating).toBeNull();
+    await vi.waitFor(() => expect(moderator.spectating).toBeNull());
     expect(moderatorEntity.pos).toEqual(originalPos);
     expect(!!moderatorEntity.gm).toBe(originalGm);
-    expect(frames(moderatorWs)).toContainEqual({ t: 'spectate', name: null });
+    expect(frames(moderatorWs)).toContainEqual({
+      t: 'spectate',
+      name: null,
+      pid: moderator.pid,
+      sceneState: null,
+      sceneChoiceState: null,
+    });
   });
 
-  it('switches targets without moving the saved return point', () => {
+  it('converges represented scene and choice state on spectate enter and exit', () => {
+    registerScene({
+      id: 'scn_test_spectate_lock_convergence',
+      duration: 10,
+      ops: [{ at: 0, kind: 'inputLock', on: true }],
+    });
+    registerChoice({
+      id: 'ch_test_spectate_convergence',
+      promptKey: 'lb.test.spectate.prompt',
+      flag: 'test_spectate_choice',
+      options: [
+        { id: 'stay', key: 'lb.test.spectate.stay' },
+        { id: 'leave', key: 'lb.test.spectate.leave' },
+      ],
+      windowSeconds: 8,
+      defaultOptionId: 'leave',
+    });
     const server = new GameServer();
+    const moderatorWs = fakeWs();
     const moderator = joined(
-      server.join(fakeWs(), 1, 101, 'Watcher', 'mage', null, false, {
+      server.join(moderatorWs, 1, 101, 'Watcher', 'mage', null, false, {
         isAdmin: true,
         adminPermissions: MOD_PERMS,
       }),
     );
-    joined(server.join(fakeWs(), 2, 102, 'First', 'rogue', null));
+    const suspect = joined(server.join(fakeWs(), 2, 102, 'Suspect', 'rogue', null));
+    expect(
+      playSceneForPlayer(server.sim.ctx, suspect.pid, 'scn_test_spectate_lock_convergence'),
+    ).toBe(true);
+    expect(
+      startChoiceForPlayer(server.sim.ctx, suspect.pid, 'ch_test_spectate_convergence', {
+        values: { price: 12 },
+      }),
+    ).toBe(true);
+    server.sim.tick();
+    moderatorWs.send.mockClear();
+
+    command(server, moderator, '/spectate Suspect');
+
+    const entered = frames(moderatorWs).find((frame) => frame.t === 'spectate');
+    expect(entered).toMatchObject({
+      name: 'Suspect',
+      pid: suspect.pid,
+      sceneState: {
+        sceneId: 'scn_test_spectate_lock_convergence',
+        inputLocked: true,
+      },
+      sceneChoiceState: {
+        choiceId: 'ch_test_spectate_convergence',
+        promptKey: 'lb.test.spectate.prompt',
+        options: [
+          { id: 'stay', key: 'lb.test.spectate.stay' },
+          { id: 'leave', key: 'lb.test.spectate.leave' },
+        ],
+        defaultOptionId: 'leave',
+        leaderPid: suspect.pid,
+        values: { price: 12 },
+        windowSeconds: 8,
+      },
+    });
+
+    moderatorWs.send.mockClear();
+    command(server, moderator, '/unspectate');
+
+    expect(frames(moderatorWs)).toContainEqual({
+      t: 'spectate',
+      name: null,
+      pid: moderator.pid,
+      sceneState: null,
+      sceneChoiceState: null,
+    });
+  });
+
+  it('switches targets without moving the saved return point', () => {
+    registerScene({
+      id: 'scn_test_spectate_switch_first',
+      duration: 10,
+      ops: [{ at: 0, kind: 'inputLock', on: true }],
+    });
+    registerScene({
+      id: 'scn_test_spectate_switch_second',
+      duration: 10,
+      ops: [{ at: 0, kind: 'letterbox', on: true }],
+    });
+    for (const suffix of ['first', 'second']) {
+      registerChoice({
+        id: `ch_test_spectate_switch_${suffix}`,
+        promptKey: `lb.test.spectate.switch.${suffix}`,
+        flag: `test_spectate_switch_${suffix}`,
+        options: [{ id: 'continue', key: 'lb.test.spectate.continue' }],
+        windowSeconds: 8,
+        defaultOptionId: 'continue',
+      });
+    }
+    const server = new GameServer();
+    const moderatorWs = fakeWs();
+    const moderator = joined(
+      server.join(moderatorWs, 1, 101, 'Watcher', 'mage', null, false, {
+        isAdmin: true,
+        adminPermissions: MOD_PERMS,
+      }),
+    );
+    const first = joined(server.join(fakeWs(), 2, 102, 'First', 'rogue', null));
     const second = joined(server.join(fakeWs(), 3, 103, 'Second', 'warrior', null));
     const original = { ...entity(server, moderator.pid).pos };
+    expect(playSceneForPlayer(server.sim.ctx, first.pid, 'scn_test_spectate_switch_first')).toBe(
+      true,
+    );
+    expect(playSceneForPlayer(server.sim.ctx, second.pid, 'scn_test_spectate_switch_second')).toBe(
+      true,
+    );
+    expect(startChoiceForPlayer(server.sim.ctx, first.pid, 'ch_test_spectate_switch_first')).toBe(
+      true,
+    );
+    expect(startChoiceForPlayer(server.sim.ctx, second.pid, 'ch_test_spectate_switch_second')).toBe(
+      true,
+    );
+    server.sim.tick();
+    moderatorWs.send.mockClear();
 
     command(server, moderator, '/spectate First');
+    await vi.waitFor(() => expect(moderator.spectating).not.toBeNull());
     if (!moderator.spectating) throw new Error('spectate did not start');
     const saved = { ...moderator.spectating.savedPos };
+    expect(frames(moderatorWs).find((frame) => frame.t === 'spectate')).toMatchObject({
+      name: 'First',
+      pid: first.pid,
+      sceneState: { sceneId: 'scn_test_spectate_switch_first', inputLocked: true },
+      sceneChoiceState: { choiceId: 'ch_test_spectate_switch_first' },
+    });
+    moderatorWs.send.mockClear();
+
     command(server, moderator, '/spectate Second');
+    await vi.waitFor(() => expect(moderator.spectating?.characterId).toBe(second.characterId));
 
     expect(moderator.spectating?.characterId).toBe(second.characterId);
     expect(moderator.spectating?.savedPos).toEqual(saved);
+    expect(frames(moderatorWs).find((frame) => frame.t === 'spectate')).toMatchObject({
+      name: 'Second',
+      pid: second.pid,
+      sceneState: { sceneId: 'scn_test_spectate_switch_second', inputLocked: false },
+      sceneChoiceState: { choiceId: 'ch_test_spectate_switch_second' },
+    });
     command(server, moderator, '/unspectate');
+    await vi.waitFor(() => expect(moderator.spectating).toBeNull());
     expect(server.sim.entities.get(moderator.pid)?.pos).toEqual(original);
   });
 
@@ -752,7 +905,13 @@ describe('moderator spectate integration', () => {
     internals(server).broadcastSnapshots();
 
     expect(moderator.spectating).toBeNull();
-    expect(frames(moderatorWs)).toContainEqual({ t: 'spectate', name: null });
+    expect(frames(moderatorWs)).toContainEqual({
+      t: 'spectate',
+      name: null,
+      pid: moderator.pid,
+      sceneState: null,
+      sceneChoiceState: null,
+    });
     expect(eventTexts(moderatorWs)).toContain('Goneplayer is no longer online; spectate ended.');
 
     const regularWs = fakeWs();
@@ -790,7 +949,7 @@ describe('moderator spectate integration', () => {
     expect(server.sim.petOf(moderator.pid, true)?.name).toBe('Tracker');
 
     command(server, moderator, '/spectate Pettarget');
-    expect(server.sim.petOf(moderator.pid, true)).toBeNull();
+    await vi.waitFor(() => expect(server.sim.petOf(moderator.pid, true)).toBeNull());
     await server.saveCharacter(moderator);
 
     const saved = vi
@@ -801,6 +960,147 @@ describe('moderator spectate integration', () => {
     expect(server.sim.entities.get(moderator.pid)?.pos.x).toBe(-10_000);
 
     command(server, moderator, '/unspectate');
-    expect(server.sim.petOf(moderator.pid, true)?.name).toBe('Tracker');
+    await vi.waitFor(() => expect(server.sim.petOf(moderator.pid, true)?.name).toBe('Tracker'));
+  });
+
+  // Regression for the /spectate talent-reset bug: the heavy self block
+  // (tal/inv/equip/...) is gated on meta.wireRev vs session.lastWireRev, a
+  // comparison keyed to whichever entity's meta is currently being wired.
+  // Neither talent allocation bumps wireRev here (both start at the sim
+  // default, 0), so without forcing selfHeavyDirty on enter/exit, the
+  // moderator's own 'tal' field silently fails to resend after /unspectate
+  // and the client stays mirrored on the spectated target's talents.
+  it('resends the moderator own talents (not the spectated target) after /unspectate', async () => {
+    const server = new GameServer();
+    const moderatorWs = fakeWs();
+    const moderator = joined(
+      server.join(moderatorWs, 1, 101, 'Watcher', 'mage', null, false, {
+        isAdmin: true,
+        adminPermissions: MOD_PERMS,
+      }),
+    );
+    const suspect = joined(server.join(fakeWs(), 2, 102, 'Suspect', 'mage', null));
+    const moderatorMeta = server.sim.meta(moderator.pid);
+    const suspectMeta = server.sim.meta(suspect.pid);
+    if (!moderatorMeta || !suspectMeta) throw new Error('meta missing');
+    moderatorMeta.talents = { spec: 'arcane', rows: { 5: 'arc_r5_arcane_focus' } };
+    suspectMeta.talents = { spec: 'fire', rows: { 5: 'fir_r5_imp_fireball' } };
+
+    // first snapshot as self establishes session.lastWireRev at the
+    // moderator's own (unbumped) wireRev.
+    internals(server).broadcastSnapshots();
+
+    command(server, moderator, '/spectate Suspect');
+    await vi.waitFor(() => expect(moderator.spectating).not.toBeNull());
+    moderatorWs.send.mockClear();
+    internals(server).broadcastSnapshots();
+    const spectateSnap = frames(moderatorWs).find((frame) => frame.t === 'snap');
+    expect(spectateSnap?.self?.tal?.alloc).toEqual(suspectMeta.talents);
+
+    command(server, moderator, '/unspectate');
+    await vi.waitFor(() => expect(moderator.spectating).toBeNull());
+    moderatorWs.send.mockClear();
+    internals(server).broadcastSnapshots();
+    const restoredSnap = frames(moderatorWs).find((frame) => frame.t === 'snap');
+    if (!restoredSnap?.self) throw new Error('restored snapshot missing');
+    expect(restoredSnap.self.tal?.alloc).toEqual(moderatorMeta.talents);
+  });
+});
+
+describe('server-side teleports end a live profession session', () => {
+  it('/jail cancels a running fishing session at the teleport', async () => {
+    const server = new GameServer();
+    const moderatorWs = fakeWs();
+    const targetWs = fakeWs();
+    const moderator = joined(
+      server.join(moderatorWs, 70, 170, 'Moderator', 'warrior', null, false, {
+        isAdmin: true,
+        adminPermissions: MOD_PERMS,
+      }),
+    );
+    const target = joined(server.join(targetWs, 71, 171, 'Angler', 'rogue', null));
+    // A live session by direct assignment (the parity-drive precedent): the
+    // point under test is the jail teleport's teardown, not the cast start.
+    const angler = entity(server, target.pid);
+    angler.castingAbility = 'fishing';
+    angler.castTotal = 15;
+    angler.castRemaining = 15;
+    angler.fishBiteAtTick = server.sim.tickCount + 100;
+    angler.fishCastZoneId = 'eastbrook_vale';
+
+    command(server, moderator, '/jail "Angler" 5 fishing in court');
+
+    await vi.waitFor(() => expect(isInJailCage(entity(server, target.pid).pos)).toBe(true));
+    expect(angler.castingAbility).toBeNull();
+    expect(angler.fishBiteAtTick).toBe(0);
+    expect(angler.fishReelDeadlineTick).toBe(0);
+    expect(angler.fishCastZoneId).toBe('');
+  });
+
+  function assignSession(server: GameServer, pid: number) {
+    const e = entity(server, pid);
+    e.castingAbility = 'fishing';
+    e.castTotal = 15;
+    e.castRemaining = 15;
+    e.fishBiteAtTick = server.sim.tickCount + 100;
+    e.fishCastZoneId = 'eastbrook_vale';
+    return e;
+  }
+
+  function expectEnded(e: ReturnType<typeof assignSession>) {
+    expect(e.castingAbility).toBeNull();
+    expect(e.fishBiteAtTick).toBe(0);
+    expect(e.fishReelDeadlineTick).toBe(0);
+    expect(e.fishCastZoneId).toBe('');
+  }
+
+  it('spectate entry and exit both cancel the moderator own session', async () => {
+    // The moderator is the displaced entity here: /spectate teleports THEM to
+    // limbo and /unspectate teleports them back, so a session of their own
+    // must end at both moves.
+    const server = new GameServer();
+    const moderatorWs = fakeWs();
+    const targetWs = fakeWs();
+    const moderator = joined(
+      server.join(moderatorWs, 72, 172, 'Watcher', 'warrior', null, false, {
+        isAdmin: true,
+        adminPermissions: MOD_PERMS,
+      }),
+    );
+    joined(server.join(targetWs, 73, 173, 'Suspect', 'rogue', null));
+
+    const modEntity = assignSession(server, moderator.pid);
+    command(server, moderator, '/spectate "Suspect"');
+    await vi.waitFor(() =>
+      expect(frames(moderatorWs)).toContainEqual({ t: 'spectate', name: 'Suspect' }),
+    );
+    expectEnded(modEntity);
+
+    assignSession(server, moderator.pid);
+    command(server, moderator, '/unspectate');
+    await vi.waitFor(() =>
+      expect(frames(moderatorWs)).toContainEqual({ t: 'spectate', name: null }),
+    );
+    expectEnded(modEntity);
+  });
+
+  it('the dev_teleport wire arm cancels a session (dev only)', () => {
+    const saved = process.env.ALLOW_DEV_COMMANDS;
+    process.env.ALLOW_DEV_COMMANDS = '1';
+    try {
+      const server = new GameServer();
+      const ws = fakeWs();
+      const session = joined(server.join(ws, 74, 174, 'Tester', 'warrior', null));
+      const e = assignSession(server, session.pid);
+      server.handleMessage(
+        session,
+        JSON.stringify({ t: 'cmd', cmd: 'dev_teleport', x: 50, z: 50 }),
+      );
+      expectEnded(e);
+      expect(e.pos.x).toBeCloseTo(50, 1);
+    } finally {
+      if (saved === undefined) delete process.env.ALLOW_DEV_COMMANDS;
+      else process.env.ALLOW_DEV_COMMANDS = saved;
+    }
   });
 });

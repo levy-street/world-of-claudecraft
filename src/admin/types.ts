@@ -220,10 +220,50 @@ export interface CharacterRow {
   level: number;
   accountId: number;
   username: string;
+  guildId: number | null;
+  guildName: string | null;
+  guildRank: string | null;
   copper: number;
   xp: number;
   createdAt: string;
   updatedAt: string;
+}
+
+// R35 professions inspector (GET /admin/api/characters/:id/professions);
+// matches server/character_professions.ts CharacterProfessionsSheet exactly.
+export interface CharacterProfessionsSheet {
+  characterId: number;
+  name: string;
+  class: string;
+  level: number;
+  accountId: number;
+  username: string;
+  live: boolean;
+  updatedAt: string | null;
+  preMigration: boolean;
+  archetype: {
+    activeArchetype: string | null;
+    pairedMajor: string | null;
+    hobbyCraft: string | null;
+  };
+  gathering: { professionId: string; proficiency: number }[];
+  crafting: { craftId: string; skill: number; tier: number }[];
+  knownRecipes: number;
+  slots: {
+    professionId: string;
+    effectId: string;
+    durability: number;
+    maxDurability: number;
+    craftedBy: string | null;
+    confirmMode: string;
+  }[];
+  nodeTimers: {
+    nodeId: string;
+    zoneId: string | null;
+    nodeType: string | null;
+    remainingSeconds: number;
+  }[];
+  toolEffectIds: string[];
 }
 
 export interface Paginated<T> {
@@ -233,9 +273,79 @@ export interface Paginated<T> {
   limit: number;
 }
 
+export interface GuildSummary {
+  id: number;
+  name: string;
+  realm: string;
+  createdAt: string;
+  memberCount: number;
+  leaderName: string | null;
+}
+
+export interface GuildDetailData {
+  guild: {
+    id: number;
+    name: string;
+    realm: string;
+    createdAt: string;
+    memberCount: number;
+  };
+  members: {
+    characterId: number;
+    characterName: string;
+    accountId: number;
+    username: string;
+    class: string;
+    level: number;
+    rank: string;
+    joinedAt: string;
+    lastLogin: string | null;
+    online: boolean;
+  }[];
+}
+
+export interface GuildRenameHistoryRow {
+  id: number;
+  oldName: string;
+  newName: string;
+  reason: string;
+  createdAt: string;
+  adminAccountId: number | null;
+  adminUsername: string | null;
+}
+
+export interface GuildRenameHistoryData {
+  rows: GuildRenameHistoryRow[];
+}
+
+/** One slot of a guild's live bank as GET /admin/api/guilds/:id/bank answers
+ *  it. `index` is the exact `slot` argument the purge takes and `itemId` is its
+ *  confirmation token; `dormant` means the anonymous-pipe policy refuses the
+ *  copy in both directions, so the guild can neither withdraw it nor disband
+ *  while it sits there, and it is the ONLY thing the purge will remove.
+ *  Deliberately carries no per-copy instance payload (see
+ *  server/admin_guild_bank_view.ts). */
+export interface GuildBankSlot {
+  index: number;
+  itemId: string;
+  count: number;
+  dormant: boolean;
+}
+
+export interface GuildBankStateData {
+  guildId: number;
+  treasury: number;
+  capacity: number;
+  purchasedSlots: number;
+  usedSlots: number;
+  dormantSlots: number;
+  slots: GuildBankSlot[];
+}
+
 export interface IpAssociationsData {
   ip: string;
   blocked: boolean;
+  blockable: boolean;
   accounts: {
     accountId: number;
     username: string;
@@ -295,6 +405,9 @@ export interface AccountDetail {
     name: string;
     class: string;
     level: number;
+    guildId: number | null;
+    guildName: string | null;
+    guildRank: string | null;
     copper: number;
     xp: number;
     pos: { x: number; z: number } | null;
@@ -339,10 +452,15 @@ export interface ModerationHistoryEntry {
 }
 
 export interface ModerationActionHistoryRow extends ModerationHistoryEntry {
-  source: 'account' | 'ip';
+  source: 'account' | 'ip' | 'guild';
   accountId: number | null;
   username: string | null;
   ip: string | null;
+  // Guild renames are audited realm-wide, not per account. guildId is the snapshot
+  // id the audit row carries, so it stays set even after the guild is deleted;
+  // guildName is the guild's current name, falling back to the recorded new name.
+  guildId: number | null;
+  guildName: string | null;
 }
 
 export interface ModerationQueueRow {

@@ -46,7 +46,7 @@ function parseArgs(argv) {
 async function loadRuntime() {
   const entrySource = `
     import './src/sim/content/last_bell_campaign.ts';
-    export { sceneById, registeredSceneIds } from './src/sim/scenes/scenes.ts';
+    export { sceneById, registeredSceneIds } from './src/sim/scenes/registry.ts';
     export {
       evaluateSceneRigPose,
       sceneRigCameraPosition,

@@ -1,10 +1,10 @@
-// Close-up screenshot tour for the 11 procedural -> Tripo-generated GLB
+// Close-up screenshot tour for the procedural -> Tripo-generated GLB
 // replacements (PR: feat(render) replace procedural models with
 // Tripo-generated GLBs). Each shot is framed tight on the single model with
 // the player character standing next to it for scale, at max graphics
 // (Ultra preset, terrain/foliage/effects/shadow sliders maxed).
 //
-// Ambient critters/fish/gather-nodes/mailbox use their real world coordinates
+// Ambient fish, gather nodes, and the mailbox use their real world coordinates
 // from src/sim/content/. The three delve-instance props (cracked grave,
 // destructible wall, fallback crate) have no fixed overworld spawn: this
 // script injects a synthetic ground-object entity with the matching
@@ -164,7 +164,7 @@ async function standNextTo(
   await new Promise((r) => setTimeout(r, 400));
 }
 
-// Ambient critters/fish are RENDER-ONLY (src/render/critters.ts, fish.ts): a
+// Ambient fish are RENDER-ONLY (src/render/fish.ts): a
 // pool that relocates near whichever position the player currently occupies,
 // with no fixed sim/world coordinate to target. Rather than guess a world
 // spot and hope one has wandered into frame, place the player nearby, let the
@@ -297,7 +297,7 @@ const DESKTOP = { width: 1600, height: 900 };
 const MOBILE = { width: 844, height: 390, isMobile: true, hasTouch: true };
 
 // Teleport the player to (x, z) with no camera framing yet, just to trigger
-// the ambient critter/fish pool (src/render/critters.ts, fish.ts) to relocate
+// the ambient fish pool (src/render/fish.ts) to relocate
 // near the new position, then give it a moment to do so.
 async function settleAt(page, x, z) {
   await page.evaluate(
@@ -316,48 +316,23 @@ async function settleAt(page, x, z) {
 // One close-up shot per replaced model. Coordinates for ambient/gather/mailbox
 // content are the real overworld spots from src/sim/content/. Delve props are
 // injected at a quiet spot away from other content.
-// CRITTER_SPOT/FISH_SPOT are settle points (real Eastbrook meadow ground and
-// the Eastbrook Vale shoreline respectively), not the model's own position:
-// critters and fish are render-only ambient pools that relocate near whatever
+// FISH_SPOT is a settle point at the Eastbrook Vale shoreline, not the model's
+// own position: fish are a render-only ambient pool that relocates near whatever
 // spot the player currently occupies (see findNearestVisible above).
-const CRITTER_SPOT = { x: 20, z: 40 };
 const FISH_SPOT = { x: -104, z: 300 };
 // The actual gather-node/mailbox entity coordinates (src/sim/content/gather_nodes.ts
 // ore_eastbrook_1, wood_eastbrook_1, herb_eastbrook_1; src/sim/content/mailboxes.ts
 // Eastbrook). An earlier version of this script mistakenly used the CAMERA'S
 // stand-near position as the target, which put the actual model off to the
 // side out of frame; these are the model's real position.
-const ORE_SPOT = { x: 72, z: 8 };
+// Hand-copied, so re-check them against gather_nodes.ts whenever a node moves.
+// ORE_SPOT was left behind by the earlier move of the ore trio off Boar Meadow
+// and pointed at empty ground 160 yards from any vein until this was corrected.
+const ORE_SPOT = { x: -70, z: -53 };
 const WOOD_SPOT = { x: -62, z: 8 };
-const HERB_SPOT = { x: -86, z: 90 };
+const HERB_SPOT = { x: -59, z: 91 };
 const MAILBOX_SPOT = { x: 7, z: -8 };
 const DELVE_PROP_SPOT = { x: 40, z: -60 };
-
-// Find up to `count` distinct visible critter/fish instances near a settle
-// spot and shoot each at its own real live position.
-async function critterShot(page, excludeKeys) {
-  await settleAt(page, CRITTER_SPOT.x, CRITTER_SPOT.z);
-  const found = await waitForVisibleInstance(
-    page,
-    'critters',
-    CRITTER_SPOT.x,
-    CRITTER_SPOT.z,
-    excludeKeys,
-  );
-  // Critters bolt once the player gets within FLEE_DIST (6 units,
-  // src/render/critters.ts): standNextTo's default ~5-unit approach distance
-  // would spook it mid-settle-wait and it would be gone by the time the
-  // shutter fires. Stand just outside the flee radius instead.
-  const critterStandOpts = { standOffX: 5, standOffZ: -5, yawOffset: 0.4 };
-  if (found) {
-    excludeKeys.push(found.key);
-    await standNextTo(page, found.x, found.z, critterStandOpts);
-  } else {
-    // Fallback: no instance turned up (pool empty/culled this run); still
-    // frame the settle spot rather than leaving the camera undefined.
-    await standNextTo(page, CRITTER_SPOT.x, CRITTER_SPOT.z, critterStandOpts);
-  }
-}
 
 async function fishShot(page) {
   await settleAt(page, FISH_SPOT.x, FISH_SPOT.z);
@@ -366,21 +341,7 @@ async function fishShot(page) {
   await standNextTo(page, target.x, target.z, { standOffX: 3, standOffZ: 0 });
 }
 
-const critterExcludeKeys = [];
-
 const desktopShots = [
-  {
-    file: 'critter-rabbit-desktop.png',
-    place: (p) => critterShot(p, critterExcludeKeys),
-  },
-  {
-    file: 'critter-squirrel-desktop.png',
-    place: (p) => critterShot(p, critterExcludeKeys),
-  },
-  {
-    file: 'critter-songbird-desktop.png',
-    place: (p) => critterShot(p, critterExcludeKeys),
-  },
   {
     file: 'fish-leaping-desktop.png',
     place: (p) => fishShot(p),
@@ -395,8 +356,9 @@ const desktopShots = [
   },
   {
     file: 'gather-node-herb-desktop.png',
-    // The default NE stand offset puts the player in Mirror Lake next door;
-    // approach from the south instead to stay on dry ground.
+    // Keeps the south approach from when this patch sat in the lake itself. The
+    // patch is now on Mirror Lake's dry bank, 33 yards out from the centre, so
+    // the offset is a framing choice rather than a way to stay out of the water.
     place: (p) => standNextTo(p, HERB_SPOT.x, HERB_SPOT.z, { standOffX: -1, standOffZ: -5 }),
   },
   {
@@ -440,10 +402,6 @@ const desktopShots = [
 ];
 
 const mobileShots = [
-  {
-    file: 'critter-rabbit-mobile.png',
-    place: (p) => critterShot(p, []),
-  },
   {
     file: 'fish-leaping-mobile.png',
     place: (p) => fishShot(p),

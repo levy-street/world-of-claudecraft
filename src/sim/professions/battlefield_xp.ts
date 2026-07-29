@@ -16,7 +16,7 @@
 // (isSignableMaterialRarity, the same threshold #1145 already uses to decide
 // whether a harvested/crafted copy gets signed at all) can ever trickle. The
 // rarity read is the instance's legacy rolled.quality when present, else the
-// item DEF's static quality: Phase 2 deterministic crafts sign rare-plus-def
+// item DEF's static quality: deterministic crafts sign rare-plus-def
 // outputs without writing rolled.quality, so the def fallback is what keeps
 // the trickle alive for new crafted instances (legacy signed instances keep
 // their old rolled.quality read).
@@ -109,7 +109,7 @@ export function battlefieldExperienceTrickle(
     observerActiveArchetype,
     observerPairedMajor = null,
   } = observation;
-  // Phase 2 deterministic crafts no longer write rolled.quality, so a new
+  // Deterministic crafts no longer write rolled.quality, so a new
   // rare-plus-def crafted instance reads its def quality here; a legacy
   // instance's own rolled.quality still wins when present.
   const rarity = (instance?.rolled?.quality ?? ITEMS[itemId]?.quality) as

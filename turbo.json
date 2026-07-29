@@ -1,0 +1,167 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "stream",
+  "globalDependencies": ["package.json", "pnpm-lock.yaml", "turbo.json"],
+  "globalPassThroughEnv": [
+    "ALL_VANTAGES",
+    "ARMS",
+    "BOOT_MS",
+    "GATE_MAX_WORKERS",
+    "GATE_WORKER_TIER",
+    "GAME_URL",
+    "GFX",
+    "GFX_TIER",
+    "GITHUB_API_URL",
+    "GITHUB_EVENT_NAME",
+    "GITHUB_EVENT_PATH",
+    "GITHUB_OUTPUT",
+    "GITHUB_REPOSITORY",
+    "GODRAYS",
+    "HEADLESS",
+    "WOC_SKIP_DEP_SYNC",
+    "GATE_SHADOW_LOG",
+    "GATE_SELECT_BASE",
+    "TEST_MODE",
+    "TEST_MODE_REASON",
+    "CHANGED_FILES",
+    "DAY_PHASE",
+    "DEV",
+    "I18N_RELEASE_TIER",
+    "LEAN",
+    "ONLY",
+    "OUT",
+    "PROBE",
+    "SCAN",
+    "SHOT_EXPECT_PICKER",
+    "SHOT_H",
+    "SHOT_MOBILE",
+    "SHOT_OUT",
+    "SHOT_PREFIX",
+    "SHOT_SUFFIX",
+    "SHOT_TAGS",
+    "SHOT_TEMPLATE",
+    "SHOT_TEMPLATE_NAME",
+    "SHOT_W",
+    "SOFTWARE_GL",
+    "SystemRoot",
+    "TEST_DATABASE_URL",
+    "TIME",
+    "UPDATE_PARITY",
+    "UPDATE_TERRAIN_HEIGHT_PARITY",
+    "WOC_SKIP_PRETEST",
+    "CI",
+    "PATH",
+    "HOME",
+    "USERPROFILE",
+    "TMPDIR",
+    "TEMP",
+    "TMP"
+  ],
+  "tasks": {
+    "i18n:gen": {
+      "inputs": [
+        "src/ui/i18n.catalog/**",
+        "src/ui/i18n.locales/**",
+        "src/ui/i18n.ts",
+        "src/admin/i18n.en.ts",
+        "src/admin/i18n.locales/**",
+        "src/admin/i18n.ts",
+        "scripts/i18n_*.mjs",
+        "package.json"
+      ],
+      "outputs": [
+        "src/ui/i18n.resolved.generated/**",
+        "src/admin/i18n.resolved.generated/**",
+        "src/ui/i18n.catalog/translation_keys.generated.ts",
+        "src/ui/i18n.status.json",
+        "src/ui/i18n.status.summary.json"
+      ]
+    },
+    "wiki:content": {
+      "inputs": [
+        "src/sim/**",
+        "src/render/characters/manifest.ts",
+        "src/ui/deed_image_ids.ts",
+        "scripts/wiki/**",
+        "package.json"
+      ],
+      "outputs": ["src/guide/content.generated.ts"]
+    },
+    "sfx:check": {
+      "inputs": [
+        "public/audio/sfx/**",
+        "scripts/sfx_conform.mjs",
+        "scripts/sfx/**",
+        "package.json"
+      ],
+      "outputs": []
+    },
+    "check:types": {
+      "dependsOn": ["i18n:gen"],
+      "inputs": [
+        "src/**",
+        "server/**",
+        "headless/**",
+        "bot/**",
+        "tests/**",
+        "private/**",
+        "tsconfig.json",
+        "tsconfig.admin.json",
+        "tsconfig.bot.json",
+        "package.json"
+      ],
+      "outputs": ["node_modules/.cache/tsc/**"]
+    },
+    "build:env": {
+      "inputs": ["headless/**", "src/sim/**", "package.json"],
+      "outputs": ["dist-env/**"]
+    },
+    "build:server": {
+      "inputs": [
+        "server/**",
+        "src/**",
+        "scripts/build_server.mjs",
+        "scripts/migrate_old_cragmaw_pelt.ts",
+        "private/**",
+        "package.json"
+      ],
+      "outputs": ["dist-server/**"]
+    },
+    "build:bot": {
+      "inputs": ["bot/**", "src/**", "scripts/build_bot.mjs", "tsconfig.json", "package.json"],
+      "outputs": ["dist-bot/**"]
+    },
+    "build:bundle": {
+      "dependsOn": ["i18n:gen", "wiki:content"],
+      "inputs": [
+        "src/**",
+        "public/**",
+        "index.html",
+        "admin.html",
+        "play.html",
+        "guide.html",
+        "editor.html",
+        "vite.config.ts",
+        "tsconfig.json",
+        "scripts/build_sitemap.mjs",
+        "scripts/build_sfx_manifest.mjs",
+        "scripts/build_media_manifest.mjs",
+        "scripts/check_backdrop_survival.mjs",
+        "package.json"
+      ],
+      "outputs": ["dist/**"]
+    },
+    "security:gate": {
+      "cache": false
+    },
+    "ci:changed": {
+      "cache": false
+    },
+    "test": {
+      "cache": false
+    },
+    "test:browser": {
+      "cache": false
+    }
+  }
+}

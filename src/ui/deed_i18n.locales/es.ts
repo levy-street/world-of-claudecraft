@@ -7,6 +7,102 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: 'Bandera en Mano',
+    desc: 'Captura una bandera en Campos Espinosos.',
+  },
+  pvp_bg_first_win: {
+    name: 'La Hondonada Resiste',
+    desc: 'Gana una batalla en Campos Espinosos.',
+  },
+  pvp_bg_wins_25: {
+    name: 'Guardián de la Hondonada',
+    desc: 'Gana 25 batallas en Campos Espinosos.',
+    title: 'Abanderado',
+  },
+  pvp_bg_captures_100: {
+    name: 'Cien Banderas',
+    desc: 'Captura 100 banderas en Campos Espinosos a lo largo de tu carrera.',
+  },
+  dgn_rift: {
+    name: 'Caminante de la Brecha',
+    desc: 'Supera una Brecha derrotando a su jefe de piso.',
+  },
+  dgn_rift_s_rank: {
+    name: 'Soberano de la Brecha',
+    desc: 'Supera una Brecha de rango S, el nivel más difícil que puede abrir un portal de Brecha.',
+  },
+  pvp_honor_sergeant: {
+    name: 'Sargento',
+    desc: 'Gana 10.000 de honor a lo largo de tu vida. Gastarlo nunca te cuesta el rango.',
+    title: 'Sargento',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: 'Caballero Teniente',
+    desc: 'Gana 40.000 de honor a lo largo de tu vida, toda una temporada de guerra real a tus espaldas.',
+    title: 'Caballero Teniente',
+  },
+  pvp_honor_field_marshal: {
+    name: 'Mariscal de Campo',
+    desc: 'Gana 150.000 de honor a lo largo de tu vida. Poco común en cualquier reino, y así debe ser.',
+    title: 'Mariscal de Campo',
+  },
+  chr_drakemaw_broodlord: {
+    name: 'Rompenidos',
+    desc: 'Abate a un Señor de la Nidada de Drakemaw entre sus huevos, sorteando el grito, el tajo y el fuego.',
+  },
+  chr_maw_matriarch: {
+    name: 'El Cielo Enmudece',
+    desc: 'Abate a Cindraleth, la Matriarca de las Fauces, en su nido de cráter sobre el Drakemaw.',
+  },
+  chr_frostveil_gatherer: {
+    name: 'Cosecha en terrazas',
+    desc: 'Recolecta una veta de mineral, un rodal de madera y un bancal de hierbas en Frostveil.',
+  },
+  chr_frostveil_first_cast: {
+    name: 'Primer hielo en el tarn',
+    desc: 'Pesca un pez en las aguas de Frostveil.',
+  },
+  chr_amberfall_gatherer: {
+    name: 'La cosecha de Amberfall',
+    desc: 'Recolecta una veta de mineral, un rodal de madera y un bancal de hierbas en Amberfall.',
+  },
+  chr_amberfall_first_cast: {
+    name: 'Una captura del gran cenagal',
+    desc: 'Pesca un pez en las aguas de Amberfall.',
+  },
+  chr_nightbloom_gatherer: {
+    name: 'La cosecha sonadora',
+    desc: 'Recolecta una veta de mineral, un rodal de madera y un bancal de hierbas en Nightbloom.',
+  },
+  chr_nightbloom_first_cast: {
+    name: 'Una onda en el pozo lunar',
+    desc: 'Pesca un pez en las aguas de Nightbloom.',
+  },
+  chr_wraithwood_gatherer: {
+    name: 'Cosecha bajo el dosel',
+    desc: 'Recolecta una veta de mineral, un rodal de madera y un bancal de hierbas en Wraithwood.',
+  },
+  chr_wraithwood_first_cast: {
+    name: 'Un lance en la bahia del espejo',
+    desc: 'Pesca un pez en las aguas de Wraithwood.',
+  },
+  chr_palmreach_gatherer: {
+    name: 'Cosecha en la playa de palmas',
+    desc: 'Recolecta una veta de mineral, un rodal de madera y un bancal de hierbas en Palmreach.',
+  },
+  chr_palmreach_first_cast: {
+    name: 'Lance en la laguna zafiro',
+    desc: 'Pesca un pez en las aguas de Palmreach.',
+  },
+  chr_evergarden_gatherer: {
+    name: 'La abundancia del parterre',
+    desc: 'Recolecta una veta de mineral, un rodal de madera y un bancal de hierbas en Evergarden.',
+  },
+  chr_evergarden_first_cast: {
+    name: 'Un lance en el estanque de petalos',
+    desc: 'Pesca un pez en las aguas de Evergarden.',
+  },
   pvp_card_duel_first_win: {
     name: 'La baza es mía',
     desc: 'Gana un Duelo de Cartas en el Maestro de Cartas.',
@@ -82,7 +178,7 @@ export const table: DeedLocaleTable = {
   },
   prog_master_gatherer: {
     name: 'Maestro recolector',
-    desc: 'Alcanza 100 de competencia en Minería, Tala y Herboristería.',
+    desc: 'Alcanza 100 de pericia en cualquiera de tres entre Minería, Tala, Herboristería y Pesca.',
   },
   prog_first_craft: { name: 'Hecho a mano', desc: 'Completa con éxito tu primera fabricación.' },
   prog_craft_specialist: {
@@ -438,7 +534,10 @@ export const table: DeedLocaleTable = {
     name: 'Cliente preferente',
     desc: 'Descubre las diez piezas del inventario del Intendente Vex.',
   },
-  col_glimmerfin: { name: 'Un destello de esperanza', desc: 'Pesca un Koi de aletas brillantes.' },
+  col_glimmerfin: {
+    name: 'Un destello de esperanza',
+    desc: 'Pesca un Koi Destello Solar.',
+  },
   col_full_creel: {
     name: 'Nasa llena',
     desc: 'Descubre las seis capturas comunes de las aguas del Valle, la Ciénaga y las Alturas.',
@@ -623,7 +722,10 @@ export const table: DeedLocaleTable = {
     title: 'Caminante',
   },
   exp_something_shiny: { name: 'Algo brillante', desc: 'Recoge un objeto reluciente del suelo.' },
-  exp_first_ore: { name: '¡A picar piedra!', desc: 'Recolecta tu primer nodo de mineral.' },
+  exp_first_ore: {
+    name: 'El pico y la piedra',
+    desc: 'Recolecta tu primer nodo de mineral.',
+  },
   exp_first_timber: { name: '¡Árbol va!', desc: 'Recolecta tu primer nodo de madera.' },
   exp_first_herb: { name: 'Mano verde', desc: 'Recolecta tu primer nodo de hierbas.' },
   feat_era_cap: {
@@ -695,6 +797,201 @@ export const table: DeedLocaleTable = {
   chr_marsh_first_cast: {
     name: 'Anguilas entre los juncos',
     desc: 'Pesca un pez en las aguas de la Ciénaga de Mirefen.',
+  },
+  prog_guildsworn: {
+    name: 'Juramentado del Oficio',
+    desc: 'Sintonízate con un par de arquetipos y toma sus oficios en serio.',
+    title: 'Juramentado del Oficio',
+  },
+  prog_masterwright: {
+    name: 'Gran Artesano',
+    desc: 'Fabrica tu primera obra maestra, una pieza tan fina que toda la zona se entera.',
+    title: 'Gran Artesano',
+  },
+  prog_fishing_100: {
+    name: 'Viejo Sal',
+    desc: 'Alcanza 100 de pericia en Pesca.',
+  },
+  prog_master_angler: {
+    name: 'Pescador Maestro',
+    desc: 'Alcanza 200 de pericia en Pesca, la verdadera cumbre del arte del pescador.',
+    title: 'Pescador Maestro',
+  },
+  prog_engineering_50: {
+    name: 'Tuercas y engranajes',
+    desc: 'Alcanza 50 de habilidad en Ingeniería.',
+  },
+  prog_alchemy_50: {
+    name: 'Brebajes extraños',
+    desc: 'Alcanza 50 de habilidad en Alquimia.',
+  },
+  prog_cooking_50: {
+    name: 'Chef curtido',
+    desc: 'Alcanza 50 de habilidad en Cocina.',
+  },
+  prog_leatherworking_50: {
+    name: 'Oficio del curtidor',
+    desc: 'Alcanza 50 de habilidad en Peletería.',
+  },
+  prog_tailoring_50: {
+    name: 'Costura de primera',
+    desc: 'Alcanza 50 de habilidad en Sastrería.',
+  },
+  prog_enchanting_50: {
+    name: 'Un destello de arcana',
+    desc: 'Alcanza 50 de habilidad en Encantación.',
+  },
+  prog_weaponcrafting_50: {
+    name: 'Filo y temple',
+    desc: 'Alcanza 50 de habilidad en Fabricación de armas.',
+  },
+  prog_armorcrafting_50: {
+    name: 'Martillo y plancha',
+    desc: 'Alcanza 50 de habilidad en Fabricación de armaduras.',
+  },
+  prog_grandmaster_engineering: {
+    name: 'Gran Maestro de Ingeniería',
+    desc: 'Alcanza 125 de habilidad en Ingeniería, la verdadera cumbre del oficio.',
+    title: 'Gran Maestro de Ingeniería',
+  },
+  prog_grandmaster_alchemy: {
+    name: 'Gran Maestro de Alquimia',
+    desc: 'Alcanza 125 de habilidad en Alquimia, la verdadera cumbre del oficio.',
+    title: 'Gran Maestro de Alquimia',
+  },
+  prog_grandmaster_cooking: {
+    name: 'Gran Maestro de Cocina',
+    desc: 'Alcanza 125 de habilidad en Cocina, la verdadera cumbre del oficio.',
+    title: 'Gran Maestro de Cocina',
+  },
+  prog_grandmaster_leatherworking: {
+    name: 'Gran Maestro de Peletería',
+    desc: 'Alcanza 125 de habilidad en Peletería, la verdadera cumbre del oficio.',
+    title: 'Gran Maestro de Peletería',
+  },
+  prog_grandmaster_tailoring: {
+    name: 'Gran Maestro de Sastrería',
+    desc: 'Alcanza 125 de habilidad en Sastrería, la verdadera cumbre del oficio.',
+    title: 'Gran Maestro de Sastrería',
+  },
+  prog_grandmaster_enchanting: {
+    name: 'Gran Maestro de Encantación',
+    desc: 'Alcanza 125 de habilidad en Encantación, la verdadera cumbre del oficio.',
+    title: 'Gran Maestro de Encantación',
+  },
+  prog_grandmaster_weaponcrafting: {
+    name: 'Gran Maestro de Fabricación de armas',
+    desc: 'Alcanza 125 de habilidad en Fabricación de armas, la verdadera cumbre del oficio.',
+    title: 'Gran Maestro de Fabricación de armas',
+  },
+  prog_grandmaster_armorcrafting: {
+    name: 'Gran Maestro de Fabricación de armaduras',
+    desc: 'Alcanza 125 de habilidad en Fabricación de armaduras, la verdadera cumbre del oficio.',
+    title: 'Gran Maestro de Fabricación de armaduras',
+  },
+  col_pristine_vein: {
+    name: 'Vena prístina',
+    desc: 'Abre una vena prístina y deja que toda la zona se entere.',
+  },
+  col_ancient_heartwood: {
+    name: 'Duramen antiguo',
+    desc: 'Extrae un trozo de duramen antiguo de un árbol derribado.',
+  },
+  col_moonlit_bloom: {
+    name: 'Flor iluminada por la luna',
+    desc: 'Cosecha una flor iluminada por la luna en el mismo instante en que se abre.',
+  },
+  col_perfect_specimen: {
+    name: 'Espécimen perfecto',
+    desc: 'Obtén un espécimen perfecto de una bestia cosechada, sin un rasguño ni una mella.',
+  },
+  soc_first_salvage: {
+    name: 'Nada se desperdicia',
+    desc: 'Desguaza una pieza de equipo para recuperar sus materiales en bruto.',
+  },
+  soc_salvage_50: {
+    name: 'El taller del desmontador',
+    desc: 'Desguaza 50 piezas de equipo para recuperar sus materiales en bruto.',
+  },
+  dgn_wildheart_basin: {
+    name: 'La cuenca contraataca',
+    desc: 'Derrota a Zulgar, Voz de la Cuenca, en la Cuenca del Corazón Salvaje.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Heroico: La Cuenca del Corazón Salvaje',
+    desc: 'Derrota a Zulgar, Voz de la Cuenca, en la Cuenca del Corazón Salvaje en dificultad heroica.',
+  },
+  chr_peaks_gatherer: {
+    name: 'Cosecha de las Alturas',
+    desc: 'Recolecta una veta de mineral, un árbol talable y un macizo de hierbas en las Alturas de Thornpeak.',
+  },
+  chr_marsh_rares_ii: {
+    name: 'El Glotón, Contado',
+    desc: 'Mata a Grubjaw el Glotón, un cuarto terror con nombre de la Ciénaga de Mirefen que quedó fuera del primer recuento.',
+  },
+  chr_peaks_rares_ii: {
+    name: 'Más nombres tallados en el risco',
+    desc: 'Mata al Viejo Cragmaw y al Señor de Esquirlas Kazzix, dos terrores con nombre más de las Alturas de Thornpeak que quedaron fuera del primer recuento.',
+  },
+  chr_gleamstag: {
+    name: 'La leyenda que no atacaba primero',
+    desc: 'Mata al Ciervo Fulgurante, un élite raro y esquivo que no ataca a menos que lo acorralen.',
+  },
+  chr_hollow_rares: {
+    name: 'La manada recuerda',
+    desc: 'Mata al Viejo Marrowshell y a Aurelhorn, Primero de la Manada, los dos jefes raros errantes de la Hondonada.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'La abundancia del pantano',
+    desc: 'Recolecta una veta de mineral, un árbol talable y un macizo de hierbas en el Pantano de los Sauces.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Ondas en los Páramos de Lirios',
+    desc: 'Pesca un pez en las aguas del Pantano de los Sauces.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Cosecha en el promontorio',
+    desc: 'Recolecta una veta de mineral, un árbol talable y un macizo de hierbas en la Cresta del Vendaval.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'Un sedal en el Lago Espejo',
+    desc: 'Pesca un pez en las aguas de la Cresta del Vendaval.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Provisiones isleñas',
+    desc: 'Recolecta una veta de mineral, un árbol talable y un macizo de hierbas en la Costa Lejana.',
+  },
+  chr_farshore_first_cast: {
+    name: 'Lo que saben las gaviotas',
+    desc: 'Pesca un pez en las aguas de la Costa Lejana.',
+  },
+  prog_engineering_rare: {
+    name: 'Ingeniería de precisión',
+    desc: 'Fabrica tu primer objeto de calidad rara en Ingeniería.',
+  },
+  prog_alchemy_rare: {
+    name: 'Una cosecha excepcional',
+    desc: 'Fabrica tu primer objeto de calidad rara en Alquimia.',
+  },
+  prog_cooking_rare: {
+    name: 'Un plato para el recuerdo',
+    desc: 'Fabrica tu primer objeto de calidad rara en Cocina.',
+  },
+  prog_leatherworking_rare: {
+    name: 'Curtido fino',
+    desc: 'Fabrica tu primer objeto de calidad rara en Peletería.',
+  },
+  prog_tailoring_rare: {
+    name: 'Una puntada magistral',
+    desc: 'Fabrica tu primer objeto de calidad rara en Sastrería.',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Templado hasta brillar',
+    desc: 'Fabrica tu primer objeto de calidad rara en Fabricación de armas.',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Blindado a la perfección',
+    desc: 'Fabrica tu primer objeto de calidad rara en Fabricación de armaduras.',
   },
 };
 

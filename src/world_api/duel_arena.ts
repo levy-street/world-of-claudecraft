@@ -1,3 +1,4 @@
+import type { ArenaMapId } from '../sim/dungeon_layout';
 import type { ArenaCombatant, ArenaFormat, ArenaStanding, PlayerClass } from '../sim/types';
 
 export interface DuelInfo {
@@ -120,6 +121,12 @@ export interface ArenaInfo {
   match: {
     format: ArenaFormat;
     state: 'countdown' | 'active' | 'over';
+    /** The fixed map of the slot this bout plays in (parity-selected; the
+     *  Protect Yumi brackets play in their own maze band and report the
+     *  default 'coliseum', which their UI never shows). Optional because a
+     *  client can mirror a snapshot from an older server without the field
+     *  during a rolling deploy; the map row simply stays hidden then. */
+    map?: ArenaMapId;
     oppName: string;
     oppClass: PlayerClass;
     oppLevel: number;

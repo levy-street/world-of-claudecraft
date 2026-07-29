@@ -13,7 +13,7 @@ const sfxMock = vi.hoisted(() => ({
 
 vi.mock('../src/game/sfx', () => ({ sfx: sfxMock }));
 
-import { GameAudio } from '../src/game/audio';
+import { GameAudio, UI_CUES } from '../src/game/audio';
 
 const ROOT = join(import.meta.dirname, '..');
 
@@ -65,6 +65,7 @@ describe('sampled GameAudio facade', () => {
       ['arenaLoss', 'ui_arena_loss'],
       ['duelChallenge', 'ui_duel_challenge'],
       ['invitePrompt', 'ui_duel_challenge'],
+      ['partyInvite', 'quest_ready'],
       ['duelCountdownTick', 'ui_duel_countdown'],
       ['duelStart', 'ui_duel_start'],
       ['vcupKickoff', 'ui_vcup_kickoff'],
@@ -107,7 +108,8 @@ describe('sampled GameAudio facade', () => {
     audio.setFeedbackEnabled(false);
     expect(audio.feedbackEnabled).toBe(false);
 
-    // The interface/feedback cues fall silent (loot, level, quest, whisper, etc.).
+    // The interface/feedback cues fall silent (loot, level, quest, whisper,
+    // etc.), including the gating gather/fish rhythm cues that take no args.
     const feedback = [
       'coin',
       'levelUp',
@@ -119,21 +121,39 @@ describe('sampled GameAudio facade', () => {
       'arenaLoss',
       'error',
       'invitePrompt',
+      'partyInvite',
+      'gatherCast',
+      'fishCast',
+      'fishReel',
+      'craftCast',
     ] as const;
     for (const m of feedback) audio[m]();
+    // The parameterized gather/rarity/craft/enchanting cues gate the same way;
+    // exercised separately since they take a required argument.
+    audio.gather('ore');
+    audio.gatherRareTier('rare');
+    audio.craftSuccess('alchemy');
+    audio.masterwork();
+    audio.disenchant();
+    audio.salvage();
+    audio.enchant();
     expect(sfxMock.playUi).not.toHaveBeenCalled();
 
     // Direct-affordance cues (you clicked/opened) and gameplay-timing cues (duel
-    // countdown, fiesta) are NOT gated, so they still play.
+    // countdown, fiesta, the fishing BITE that opens the live reel window) are
+    // NOT gated, so they still play. fishBite on this arm is a fairness
+    // contract: the reaction window must never be silenceable.
     audio.click();
     audio.bagOpen();
     audio.duelCountdownTick();
     audio.fiestaWave();
+    audio.fishBite();
     expect(sfxMock.playUi.mock.calls.map(([k]) => k)).toEqual([
       'ui_click',
       'ui_bag_open',
       'ui_duel_countdown',
       'ui_fiesta_wave',
+      'ui_fish_bite',
     ]);
 
     // Re-enabling restores the feedback cues.
@@ -164,6 +184,94 @@ describe('sampled GameAudio facade', () => {
     ]);
   });
 
+  it('maps each GatherNodeType to its own editable clip', () => {
+    const audio = new GameAudio();
+
+    audio.gather('ore');
+    audio.gather('wood');
+    audio.gather('herb');
+
+    expect(sfxMock.playUi.mock.calls.map(([key]) => key)).toEqual([
+      'ui_gather_ore',
+      'ui_gather_wood',
+      'ui_gather_herb',
+    ]);
+  });
+
+  it('plays the craft-family cast-start wind-up on its own key', () => {
+    const audio = new GameAudio();
+    audio.craftCast();
+    expect(sfxMock.playUi).toHaveBeenLastCalledWith('ui_craft_cast', { jitter: false });
+  });
+
+  it('maps each craft family to its own clip, falling back to the loot ding for an unknown family', () => {
+    const audio = new GameAudio();
+
+    audio.craftSuccess('weaponcrafting');
+    audio.craftSuccess('armorcrafting');
+    audio.craftSuccess('jewelcrafting');
+    audio.craftSuccess('leatherworking');
+    audio.craftSuccess('tailoring');
+    audio.craftSuccess('engineering');
+    audio.craftSuccess('alchemy');
+    audio.craftSuccess('cooking');
+    audio.craftSuccess('inscription');
+    audio.craftSuccess('enchanting');
+    audio.craftSuccess('not_a_real_craft');
+
+    expect(sfxMock.playUi.mock.calls.map(([key]) => key)).toEqual([
+      'ui_craft_weaponcrafting',
+      'ui_craft_armorcrafting',
+      'ui_craft_jewelcrafting',
+      'ui_craft_leatherworking',
+      'ui_craft_tailoring',
+      'ui_craft_engineering',
+      'ui_craft_alchemy',
+      'ui_craft_cooking',
+      'ui_craft_inscription',
+      'ui_craft_enchanting',
+      'ui_loot_item',
+    ]);
+  });
+
+  it('plays the apply-enchant cue on its own key', () => {
+    const audio = new GameAudio();
+    audio.enchant();
+    expect(sfxMock.playUi).toHaveBeenLastCalledWith('ui_craft_enchanting', { jitter: false });
+  });
+
+  it('plays the masterwork sting as its own cue, layered by the caller alongside craftSuccess', () => {
+    const audio = new GameAudio();
+
+    audio.craftSuccess('alchemy');
+    audio.masterwork();
+
+    expect(sfxMock.playUi.mock.calls.map(([key]) => key)).toEqual([
+      'ui_craft_alchemy',
+      'ui_masterwork',
+    ]);
+  });
+
+  it('plays the disenchant cue on its own key', () => {
+    const audio = new GameAudio();
+
+    audio.disenchant();
+
+    expect(sfxMock.playUi).toHaveBeenLastCalledWith('ui_craft_disenchant', { jitter: false });
+  });
+
+  it('gates gather, craftSuccess, masterwork, and disenchant on setFeedbackEnabled', () => {
+    const audio = new GameAudio();
+    audio.setFeedbackEnabled(false);
+
+    audio.gather('ore');
+    audio.craftSuccess('alchemy');
+    audio.masterwork();
+    audio.disenchant();
+
+    expect(sfxMock.playUi).not.toHaveBeenCalled();
+  });
+
   it('removes the ten procedural-only methods that have no call sites', () => {
     const obsolete = [
       'meleeHit',
@@ -182,17 +290,43 @@ describe('sampled GameAudio facade', () => {
 });
 
 describe('deterministic UI SFX catalog', () => {
-  it('adds 14 unique UI cues to the authoritative studio inventory', () => {
+  it('adds 16 unique UI cues to the authoritative studio inventory', () => {
+    // 14 pre-12b cues plus the Phase 12b gathering-rhythm placeholder
+    // (ui_gather_cast) plus the Craft Cast System Phase 6 craft-family
+    // cast-start placeholder (ui_craft_cast). ui_gather_strike/rare and
+    // ui_fish_cast/bite/reel were retired once real per-node-type /
+    // rarity-tier / fishing recordings replaced them (src/game/audio.ts).
     const keys = UI_SFX_CATALOG.map((cue: { key: string }) => cue.key);
     const fullCatalogKeys = new Set(SFX.map((cue: { key: string }) => cue.key));
 
-    expect(keys).toHaveLength(14);
+    expect(keys).toHaveLength(16);
+    expect(keys).toContain('ui_craft_cast');
     expect(new Set(keys).size).toBe(keys.length);
     expect(keys.every((key: string) => key.startsWith('ui_'))).toBe(true);
     expect(UI_SFX_CATALOG.every((cue: { generator: string }) => cue.generator === 'ffmpeg')).toBe(
       true,
     );
     for (const key of keys) expect(fullCatalogKeys.has(key), key).toBe(true);
+  });
+
+  // Closes the class of bug where a UI_CUES entry points at a key nobody
+  // ever registered in sfx_prompts.mjs: GameAudio's methods and
+  // tests/sfx_manifest.test.ts's totals both stay green in that case
+  // (mocked sfx.playUi asserts the key STRING, never that it resolves; the
+  // manifest test pins counts, not membership), so playUi silently no-ops
+  // in production (src/game/sfx.ts's unknown-key path). Walks every leaf
+  // string under UI_CUES (one level of nested plain objects/arrays, the only
+  // shapes it currently has) against the real catalog.
+  it('every UI_CUES leaf key resolves to a real catalog entry', () => {
+    const fullCatalogKeys = new Set(SFX.map((cue: { key: string }) => cue.key));
+    const leaves: string[] = [];
+    for (const value of Object.values(UI_CUES)) {
+      if (typeof value === 'string') leaves.push(value);
+      else if (Array.isArray(value)) leaves.push(...value);
+      else for (const nested of Object.values(value)) leaves.push(nested as string);
+    }
+    expect(leaves.length).toBeGreaterThan(0);
+    for (const key of leaves) expect(fullCatalogKeys.has(key), key).toBe(true);
   });
 
   it('builds stable shell-free FFmpeg arguments with fixed noise seeds', () => {

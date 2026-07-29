@@ -18,7 +18,12 @@ export function hasDeadGroupMember(ctx: SimContext, caster: Entity): boolean {
   });
 }
 
-export function resurrectDeadGroupMembers(ctx: SimContext, caster: Entity, hpFrac: number): void {
+export function resurrectDeadGroupMembers(
+  ctx: SimContext,
+  caster: Entity,
+  hpFrac: number,
+  abilityId: string,
+): void {
   const party = ctx.partyOf(caster.id);
   if (!party) return;
 
@@ -34,6 +39,7 @@ export function resurrectDeadGroupMembers(ctx: SimContext, caster: Entity, hpFra
       school: 'arcane',
       fx: 'nova',
       radius: 2,
+      ability: abilityId,
     });
   }
 }

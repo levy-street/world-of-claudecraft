@@ -206,6 +206,21 @@ export class DelveMapPainter {
     private readonly classColor: (cls: string) => string,
   ) {}
 
+  /** Drop the cached static-schematic backgrounds on a language switch: the
+   *  baked compass-north glyph (northLabel, resolved from `hudChrome.compass.N`)
+   *  is drawn INTO the cached canvas, so it never re-resolves on its own like a
+   *  write-elided string would. Cleared rather than cleared-and-rebuilt so the
+   *  next paint rebuilds through the ordinary cache-miss path (same idiom as
+   *  MapWindowPainter.relocalize, its sibling in the write-elision writeup).
+   *  Hud calls this from its woc:languagechange fan-out, alongside
+   *  mapPainter.relocalize(). */
+  relocalize(): void {
+    this.minimapBg = null;
+    this.minimapBgModuleId = '';
+    this.worldMapBg = null;
+    this.worldMapBgModuleId = '';
+  }
+
   /** Resolve the player-facing delve + module names (the only i18n the painter
    *  does; the pure model takes them already localized). */
   private resolveNames(run: DelveRunInfo): { delveName: string; moduleName: string } {

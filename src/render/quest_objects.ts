@@ -3,8 +3,17 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
+import {
+  FENBRIDGE_SURFACE_NORMAL_SCALE,
+  fenbridgeSemanticForColor,
+  fenbridgeSurfaceAtlasTexture,
+  fenbridgeSurfaceGeometry,
+  fenbridgeSurfaceNormalTexture,
+  fenbridgeSurfaceRoughnessTexture,
+} from './fenbridge_surface_atlas';
 import { GFX, surfaceMat } from './gfx';
+import { applySurfaceDetail, wornFamilyFor } from './worn_stone';
 
 /** Target max height after normalization (~sparkle anchor at 1.35). */
 const TARGET_HEIGHT = 1.35;
@@ -16,7 +25,7 @@ const QUEST_OBJECT_URLS: Record<string, string> = {
   gravecaller_sigil: '/models/quest/gravecaller_sigil.glb',
   gravewyrm_sigil: '/models/quest/gravewyrm_sigil.glb',
   weathered_ledger_page: '/models/quest/weathered_ledger_page.glb',
-  fen_muster_order: '/models/quest/weathered_ledger_page.glb',
+  fen_muster_order: '/models/quest/fenbridge_muster_order.glb',
   highwatch_summons: '/models/quest/weathered_ledger_page.glb',
   morthen_grimoire: '/models/quest/morthen_grimoire.glb',
   rusted_censer: '/models/quest/rusted_censer.glb',
@@ -38,9 +47,16 @@ const QUEST_OBJECT_HEIGHTS: Record<string, number> = {
   grave_sir_aldren: 1.6,
   grave_high_priest_malric: 1.6,
   grave_captain_voss: 1.6,
+  // A closed tome resting on the ground: shorter than the scroll/sigil
+  // pickups, since it lies flat rather than standing upright.
+  royal_seal: 1.5,
 };
 
 const SCROLL_ITEM_IDS = new Set(['weathered_ledger_page', 'fen_muster_order', 'highwatch_summons']);
+// Fenbridge's dedicated replacement GLB already contains its teal binding,
+// wax seal, and three ink/metal lines. Legacy scroll garnish would duplicate
+// that geometry and incorrectly turn the reference-accurate binding gold.
+const AUTHORED_SCROLL_CUE_IDS = new Set(['fen_muster_order']);
 
 interface ScrollStyle {
   parchmentTint?: number;
@@ -84,13 +100,33 @@ const gltfByUrl = new Map<string, GLTF>();
 const preparedByItem = new Map<string, THREE.Group>();
 const proceduralByItem = new Map<string, THREE.Group>();
 
+function castsDynamicShadow(itemId: string): boolean {
+  return !AUTHORED_SCROLL_CUE_IDS.has(itemId);
+}
+
 /** Test-only window into the preload asset set (mirrors delve_props.ts). */
-export const questObjectPreloadInternalsForTest = { questObjectUrl: QUEST_OBJECT_URLS };
+export const questObjectPreloadInternalsForTest = {
+  questObjectUrl: QUEST_OBJECT_URLS,
+  usesLegacyScrollDecoration: (itemId: string) =>
+    SCROLL_ITEM_IDS.has(itemId) && !AUTHORED_SCROLL_CUE_IDS.has(itemId),
+  usesSharedSurfaceDetail: (itemId: string) => !AUTHORED_SCROLL_CUE_IDS.has(itemId),
+  castsDynamicShadow,
+  convertMaterial,
+};
+
+/** Test-only cache reset, so a determinism test can force two independent builds. */
+export const questObjectCacheInternalsForTest = {
+  resetProceduralCaches: () => {
+    preparedByItem.clear();
+    proceduralByItem.clear();
+    measuredHeightByItem.clear();
+  },
+};
 
 if (typeof window !== 'undefined') {
   const urls = [...new Set(Object.values(QUEST_OBJECT_URLS))];
   for (const url of urls) {
-    registerPreload(
+    registerDeferredPreload(() =>
       loadGltf(url)
         .then((g) => {
           gltfByUrl.set(url, g);
@@ -158,26 +194,82 @@ function decorateScroll(root: THREE.Object3D, itemId: string): void {
   }
 }
 
+// Quest materials take the shared triplanar surface-detail layer via the same
+// family table as the props kits ('qprops' routing in worn_stone.ts
+// wornFamilyFor, matched on the SOURCE material name). Metal-named materials
+// now route through the metal family, whose envMapMin supersedes the old
+// METAL_MAT_NAME 1.3 boost. surfaceMat's cache is shared app-wide, so the
+// detailed variant is a one-time CLONE cached here by source material, never
+// a mutation of the shared instance. prepareItem caches the built group per
+// itemId, so this stays a handful of materials for the whole session.
+const surfaceDetailCache = new Map<string, THREE.Material>();
+
+export function resetQuestObjectProfileCaches(): void {
+  preparedByItem.clear();
+  proceduralByItem.clear();
+  surfaceDetailCache.clear();
+}
+
 function convertMaterial(src: THREE.Material, itemId: string): THREE.Material {
   const s = src as THREE.MeshStandardMaterial;
   const ov = ITEM_MAT_OVERRIDES[itemId];
-  const scrollTint = SCROLL_STYLES[itemId]?.parchmentTint;
+  const scrollTint = AUTHORED_SCROLL_CUE_IDS.has(itemId)
+    ? undefined
+    : SCROLL_STYLES[itemId]?.parchmentTint;
   const baseColor = ov?.color ?? scrollTint ?? s.color?.getHex() ?? 0xffffff;
   const color = new THREE.Color(baseColor);
   if (scrollTint !== undefined && s.map) {
     color.lerp(new THREE.Color(scrollTint), 0.35);
   }
-  return surfaceMat({
+  const fenbridgeAtlas = itemId === 'fen_muster_order' ? fenbridgeSurfaceAtlasTexture() : undefined;
+  const fenbridgePbr =
+    itemId === 'fen_muster_order' && GFX.standardMaterials
+      ? {
+          normalMap: fenbridgeSurfaceNormalTexture(),
+          roughnessMap: fenbridgeSurfaceRoughnessTexture(),
+        }
+      : { normalMap: undefined, roughnessMap: undefined };
+  const mat = surfaceMat({
     color: color.getHex(),
-    map: s.map ?? undefined,
-    normalMap: s.normalMap ?? undefined,
-    roughnessMap: s.roughnessMap ?? undefined,
+    map: fenbridgeAtlas ?? s.map ?? undefined,
+    vertexColors: fenbridgeAtlas ? false : s.vertexColors,
+    normalMap: fenbridgePbr.normalMap ?? s.normalMap ?? undefined,
+    roughnessMap: fenbridgePbr.roughnessMap ?? s.roughnessMap ?? undefined,
     roughness: s.roughness ?? 0.88,
     metalness: Math.min(s.metalness ?? 0, 0.75),
     emissive: ov?.emissive,
     emissiveIntensity: ov?.emissiveIntensity,
     flatShading: !GFX.standardMaterials,
   });
+  if (itemId === 'fen_muster_order' && mat instanceof THREE.MeshStandardMaterial && mat.normalMap) {
+    mat.normalScale.setScalar(FENBRIDGE_SURFACE_NORMAL_SCALE);
+    mat.metalness = 1;
+    mat.metalnessMap = mat.roughnessMap;
+  }
+  if (
+    !AUTHORED_SCROLL_CUE_IDS.has(itemId) &&
+    GFX.standardMaterials &&
+    (mat as THREE.MeshStandardMaterial).isMeshStandardMaterial
+  ) {
+    const worn = wornFamilyFor('qprops', s.name, {
+      emissive: (ov?.emissive ?? 0) !== 0,
+      transparent: s.transparent === true,
+      hasOwnMaps: !!(s.normalMap || s.roughnessMap),
+    });
+    if (worn) {
+      const cacheKey = `${itemId}|${mat.uuid}|${worn.family}`;
+      let detailed = surfaceDetailCache.get(cacheKey);
+      if (!detailed) {
+        detailed = mat.clone();
+        applySurfaceDetail(detailed as THREE.MeshStandardMaterial, worn.family, {
+          strength: worn.strength,
+        });
+        surfaceDetailCache.set(cacheKey, detailed);
+      }
+      return detailed;
+    }
+  }
+  return mat;
 }
 
 // The ritual circle's procedural template is a flat, wide set piece (altar +
@@ -314,11 +406,172 @@ function buildRitualCircleTemplate(): THREE.Group {
   return root;
 }
 
+// The royal_seal ("Ancient Diary") ground item has no GLB and never will
+// (see docs comment at the top of this file): it is reconstructed procedurally
+// from the reference icon at public/ui/items/royal_seal.webp, a closed
+// orange-gold leather tome with a sword-through-shield emblem plate stamped
+// on the front cover and gilt corner trim. This is a STYLIZED, APPROXIMATE
+// reconstruction: a single 2D icon shot from the front shows neither the
+// spine nor the back cover, so both are inferred as plain leather rather than
+// measured. Deterministic: every dimension is a fixed literal, no Rng/Math.random.
+function buildRoyalSealTemplate(): THREE.Group {
+  const cached = proceduralByItem.get('royal_seal');
+  if (cached) return cached;
+
+  const root = new THREE.Group();
+  const coverMat = surfaceMat(matProps(0xc9701f));
+  const pageMat = surfaceMat({ ...matProps(0xe8dcb8), roughness: 0.95 });
+  const goldMat = surfaceMat({
+    color: 0xd9a636,
+    roughness: 0.4,
+    metalness: 0.65,
+    flatShading: !GFX.standardMaterials,
+  });
+  const darkGoldMat = surfaceMat({
+    color: 0x8a5a1c,
+    roughness: 0.5,
+    metalness: 0.55,
+    flatShading: !GFX.standardMaterials,
+  });
+
+  const bookWidth = 0.92;
+  const bookDepth = 0.68;
+  const bookHeight = 0.32;
+  const coverThickness = 0.05;
+
+  // Page block between the top and bottom covers, inset on width/depth so the
+  // gilt cover edge reads at the fore-edge and sides.
+  const pages = new THREE.Mesh(
+    new THREE.BoxGeometry(bookWidth * 0.94, bookHeight - coverThickness * 2, bookDepth * 0.94),
+    pageMat,
+  );
+  pages.position.y = bookHeight * 0.5;
+  pages.castShadow = true;
+  pages.receiveShadow = true;
+  root.add(pages);
+
+  // Top and bottom covers: thin horizontal slabs spanning the full footprint,
+  // closing the book so it reads as a closed tome rather than an open tray.
+  for (const dy of [coverThickness * 0.5, bookHeight - coverThickness * 0.5]) {
+    const cover = new THREE.Mesh(
+      new THREE.BoxGeometry(bookWidth, coverThickness, bookDepth),
+      coverMat,
+    );
+    cover.position.set(0, dy, 0);
+    cover.castShadow = true;
+    cover.receiveShadow = true;
+    root.add(cover);
+  }
+
+  // Spine, running along the -X edge, connecting the top and bottom covers.
+  const spine = new THREE.Mesh(new THREE.BoxGeometry(0.06, bookHeight, bookDepth), coverMat);
+  spine.position.set(-bookWidth * 0.5 + 0.03, bookHeight * 0.5, 0);
+  spine.castShadow = true;
+  spine.receiveShadow = true;
+  root.add(spine);
+
+  // Gilt corner trim, four L-shaped corner caps on the top cover only (the
+  // icon shows the front face; the back is inferred plain per the note above).
+  const cornerInset = 0.1;
+  for (const cx of [-1, 1]) {
+    for (const cz of [-1, 1]) {
+      const corner = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.03, 8), goldMat);
+      corner.rotation.x = Math.PI / 2;
+      corner.position.set(
+        cx * (bookWidth * 0.5 - cornerInset),
+        bookHeight + 0.005,
+        cz * (bookDepth * 0.5 - cornerInset),
+      );
+      corner.castShadow = true;
+      root.add(corner);
+    }
+  }
+
+  // Gilt frame border stamped into the top cover.
+  const frameThickness = 0.03;
+  const frameY = bookHeight + 0.006;
+  const frameLenX = bookWidth * 0.72;
+  const frameLenZ = bookDepth * 0.72;
+  for (const dz of [-1, 1]) {
+    const bar = new THREE.Mesh(new THREE.BoxGeometry(frameLenX, 0.012, frameThickness), goldMat);
+    bar.position.set(0, frameY, dz * frameLenZ * 0.5);
+    root.add(bar);
+  }
+  for (const dx of [-1, 1]) {
+    const bar = new THREE.Mesh(new THREE.BoxGeometry(frameThickness, 0.012, frameLenZ), goldMat);
+    bar.position.set(dx * frameLenX * 0.5, frameY, 0);
+    root.add(bar);
+  }
+
+  // Emblem plate: a shield with a sword laid across it, matching the icon's
+  // stamped centerpiece.
+  const plateY = bookHeight + 0.01;
+  const shield = new THREE.Mesh(new THREE.CircleGeometry(0.15, 6), darkGoldMat);
+  shield.rotation.x = -Math.PI / 2;
+  shield.rotation.z = Math.PI / 6;
+  shield.position.set(0, plateY, 0);
+  root.add(shield);
+
+  const swordBlade = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.014, 0.34), goldMat);
+  swordBlade.position.set(0, plateY + 0.008, 0);
+  swordBlade.rotation.y = Math.PI / 4;
+  root.add(swordBlade);
+
+  const swordGuard = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.016, 0.028), goldMat);
+  swordGuard.position.set(0, plateY + 0.009, 0);
+  swordGuard.rotation.y = Math.PI / 4;
+  root.add(swordGuard);
+
+  // Clasp/strap holding the covers shut, on the +X edge opposite the spine.
+  const strap = new THREE.Mesh(new THREE.BoxGeometry(0.05, bookHeight * 1.1, 0.14), darkGoldMat);
+  strap.position.set(bookWidth * 0.5 - 0.02, bookHeight * 0.5, 0);
+  strap.castShadow = true;
+  root.add(strap);
+
+  const claspStud = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.03, 8), goldMat);
+  claspStud.rotation.z = Math.PI / 2;
+  claspStud.position.set(bookWidth * 0.5 + 0.01, bookHeight * 0.5, 0);
+  root.add(claspStud);
+
+  proceduralByItem.set('royal_seal', root);
+  return root;
+}
+
+// Procedural builders for items that have no GLB and never will. Keyed the
+// same way `prepareItem` looks them up, so adding a third no-GLB id here
+// automatically routes past the `supply_crate` fallback instead of silently
+// resolving to an invisible `null` template.
+const PROCEDURAL_NO_URL_BUILDERS: Record<string, () => THREE.Group> = {
+  royal_seal: buildRoyalSealTemplate,
+};
+
+const PROCEDURAL_ITEM_IDS = new Set([
+  'crypt_ritual_circle',
+  ...Object.keys(PROCEDURAL_NO_URL_BUILDERS),
+]);
+
+/**
+ * Measured post-normalization height (`Box3.max.y`) for items whose model is
+ * wider/deeper than it is tall, since `normalizeRoot` scales by the largest
+ * dimension: for those the nameplate/VFX anchor must come from the actual
+ * geometry, not the `QUEST_OBJECT_HEIGHTS` scale target (see the
+ * `RITUAL_CIRCLE_FOOTPRINT` comment above for the same trap on a flat prop).
+ */
+const measuredHeightByItem = new Map<string, number>();
+
 function prepareItem(itemId: string): THREE.Group | null {
   const cached = preparedByItem.get(itemId);
   if (cached) return cached;
   const url = QUEST_OBJECT_URLS[itemId];
-  if (!url) return null;
+  if (!url) {
+    const build = PROCEDURAL_NO_URL_BUILDERS[itemId];
+    if (!build) return null;
+    const template = build();
+    const measuredHeight = normalizeRoot(template, QUEST_OBJECT_HEIGHTS[itemId] ?? TARGET_HEIGHT);
+    measuredHeightByItem.set(itemId, measuredHeight);
+    preparedByItem.set(itemId, template);
+    return template;
+  }
   const gltf = gltfByUrl.get(url);
   if (!gltf) return itemId === 'crypt_ritual_circle' ? buildRitualCircleTemplate() : null;
 
@@ -326,16 +579,32 @@ function prepareItem(itemId: string): THREE.Group | null {
   root.traverse((o) => {
     const mesh = o as THREE.Mesh;
     if (!mesh.isMesh) return;
+    if (itemId === 'fen_muster_order') {
+      const sourceColor = mesh.geometry.getAttribute('color');
+      const materialColor = (mesh.material as THREE.MeshStandardMaterial).color;
+      mesh.geometry = fenbridgeSurfaceGeometry(mesh.geometry, (index) => {
+        const red = sourceColor?.getX(index) ?? materialColor?.r ?? 1;
+        const green = sourceColor?.getY(index) ?? materialColor?.g ?? 1;
+        const blue = sourceColor?.getZ(index) ?? materialColor?.b ?? 1;
+        return fenbridgeSemanticForColor(red, green, blue);
+      });
+    }
     mesh.material = convertMaterial(mesh.material as THREE.Material, itemId);
-    mesh.castShadow = true;
+    // The two authored muster packets are tiny ground pickups in an already
+    // shadowed gate composition. Keeping them receive-only preserves contact
+    // while avoiding two extra town shadow draws beyond the 10-caster cap.
+    mesh.castShadow = castsDynamicShadow(itemId);
     mesh.receiveShadow = true;
   });
   if (itemId === 'crypt_ritual_circle') {
     normalizeRootByFootprint(root, RITUAL_CIRCLE_FOOTPRINT);
   } else {
-    normalizeRoot(root, QUEST_OBJECT_HEIGHTS[itemId] ?? TARGET_HEIGHT);
+    const measuredHeight = normalizeRoot(root, QUEST_OBJECT_HEIGHTS[itemId] ?? TARGET_HEIGHT);
+    measuredHeightByItem.set(itemId, measuredHeight);
   }
-  if (SCROLL_ITEM_IDS.has(itemId)) decorateScroll(root, itemId);
+  if (SCROLL_ITEM_IDS.has(itemId) && !AUTHORED_SCROLL_CUE_IDS.has(itemId)) {
+    decorateScroll(root, itemId);
+  }
   preparedByItem.set(itemId, root);
   return root;
 }
@@ -346,13 +615,16 @@ export function buildGroundQuestObject(
 ): { group: THREE.Group; height: number } {
   const group = new THREE.Group();
   const key =
-    itemId === 'crypt_ritual_circle' || QUEST_OBJECT_URLS[itemId] ? itemId : 'supply_crate';
+    PROCEDURAL_ITEM_IDS.has(itemId) || QUEST_OBJECT_URLS[itemId] ? itemId : 'supply_crate';
   const template = prepareItem(key);
   if (template) {
     const model = template.clone(true);
     group.add(model);
     group.rotation.y = (entityId % 7) * 0.45;
-    return { group, height: QUEST_OBJECT_HEIGHTS[key] ?? TARGET_HEIGHT };
+    return {
+      group,
+      height: measuredHeightByItem.get(key) ?? QUEST_OBJECT_HEIGHTS[key] ?? TARGET_HEIGHT,
+    };
   }
   group.rotation.y = (entityId % 7) * 0.45;
   return { group, height: TARGET_HEIGHT };

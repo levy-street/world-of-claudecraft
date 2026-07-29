@@ -85,6 +85,12 @@ not change the exit code), so the shipped world clips, which predate the mono
 policy, do not break the gate before the one-time re-process. Pass
 `npm run sfx:check -- --strict` to promote them to failures, and
 `npm run sfx:conform` (`--fix`) to conform loudness and downmix in a single pass.
+The 8 `player_hurt_female_1..5` / `player_death_female_1..3` clips under
+`public/audio/sfx/` are an intentional, temporary exception to the naming rule:
+they are staged ahead of the player-gender model swap (no `PlayerMeta` gender
+field exists yet to key playback on), so `--strict` currently flags all 8 as
+"not a catalog key, numbered variant, or mob subfamily file". That is expected
+noise, not a regression, until the swap lands and wires them under a real key.
 
 A third advisory category flags a `custom: true` key whose measured LUFS lands
 suspiciously close to the generated-content target (`TARGET_LUFS`, -14): the
@@ -197,6 +203,7 @@ until that loop stops.
 | `mount_run_shadowjump_toad` | 0.52 | slime spring and damp footfall |
 | `mount_run_stormfeather_griffin` | 0.51 | large wing rush and hard talon contact |
 | `mount_run_thunderstrut_gobbler` | 0.40 | higher feather rush and quick claw contact |
+| `mount_run_terrorspark_groundshaker` | 0.55 | compact tread clatter with a low mechanical drive pulse |
 | `move_jump` | 0.5 | quick light gear/leather exertion and fabric rustle, a person leaping up |
 | `move_land` | 0.6 | a person landing from a jump, boots thud with armor and gear settle |
 | `move_splash` | 0.8 | a body plunging into water, big splash |
@@ -326,6 +333,16 @@ as footstep variant choice, not gameplay-affecting).
 | `amb_rain` | ✓ | global | steady rainfall pattering with occasional distant thunder |
 | `amb_snow` | ✓ | global | a soft muffled snowy wind, quiet and cold |
 
+Point ambience (`amb_campfire`/`amb_forge`) shares the same falloff every
+other positional sound uses by default, but `amb_forge` gets its own,
+narrower audible-distance override (`FORGE_MAX_DISTANCE`, `src/game/sfx.ts`;
+`makePanner`/`loop`/`tooFar` all take an optional refDistance/maxDistance
+override, defaulting to the shared constants so nothing else's range shifts).
+This sets the stage for future station ambiences (Professions 2.0's other
+station types: kitchens, apothecary, tannery, loom, toolworks, see issue
+#2208) to get their own audible radius the same way: a new `AmbientPointSource`
+`kind` plus a named constant, no changes to the override mechanism itself.
+
 ### Interface and personal event cues
 
 These cues are non-positional, preload at startup, and keep the existing
@@ -357,6 +374,18 @@ Fiesta) and every world/spatial sound ignore the toggle.
 | `ui_card_play`, `ui_card_reveal` | Card Duel minigame (`src/sim/social/card_duel.ts`): a card played, and every round's simultaneous reveal. High-frequency (once per round each), multi-take. |
 | `ui_card_round_push` | Card Duel: layers on top of the reveal cue when a round ties (nobody scores), never a replacement for it |
 | `ui_card_shuffle` | Card Duel: the initial deal at match start AND a mid-match reshuffle (discard pile shuffled back into the deck once it empties), same cue for both moments |
+| `ui_gather_cast` | the gather cast starting (Professions 2.0 Phase 12b), a soft tool wind-up; PLACEHOLDER (deterministic synth, issue #2208) ONLY as the flat fallback for when `gatherCast()` is called with no node type known. In practice `ui_gather_cast_<nodeType>` below always takes over: `harvestNode` is the sole gather `castStart` emit site and always sets the type |
+| `ui_gather_cast_ore`, `ui_gather_cast_wood`, `ui_gather_cast_herb` | the real, per-node-type "pulling the tool out" recordings that supersede `ui_gather_cast` above, via `audio.gatherCast(nodeType)` |
+| `ui_fish_cast` | the fishing line cast whoosh and plop |
+| `ui_fish_bite` | the bite signal opening the reel window; the one gameplay-timing cue of this family, so it ignores the Interface & Feedback Sounds toggle (rides `play()`, never `playFeedback()`) |
+| `ui_fish_reel` | the landed reel crank and splash |
+| `ui_gather_ore`, `ui_gather_wood`, `ui_gather_herb` | gathering-node harvest, keyed by `GatherNodeType` (`src/sim/types.ts`) off the `gatherResult` sim event via `audio.gather(nodeType)`; replaces the old flat `ui_gather_strike`/`ui_gather_rare` placeholders |
+| `ui_gather_rare`, `ui_gather_epic`, `ui_gather_legendary` | rare-or-better gather stinger, layered ALONGSIDE the `ui_gather_<nodeType>` cue above via `audio.gatherRareTier(tier)`, never a replacement for it; tier tracks `gatherResult.rarity` 1:1, with a rare-event roll forcing at least the epic tier regardless of the rolled material rarity |
+| `ui_craft_engineering`, `ui_craft_alchemy`, `ui_craft_cooking`, `ui_craft_leatherworking`, `ui_craft_tailoring`, `ui_craft_inscription`, `ui_craft_enchanting`, `ui_craft_jewelcrafting`, `ui_craft_weaponcrafting`, `ui_craft_armorcrafting` | crafting completion, one per `CRAFT_RING` family (`src/sim/content/professions.ts`), resolved from the `craftResult` event's `recipeId` via `audio.craftSuccess(professionId)`; an unrecognized family falls back to `ui_loot_item`. `ui_craft_enchanting` never actually fires: the enchanting profession has no craftable recipes in `recipes.ts`, so `craftResult` can never resolve to it |
+| `ui_masterwork` | masterwork proc: plays via `audio.masterwork()` layered ALONGSIDE the `ui_craft_<family>` cue above on the same `craftResult`, never a replacement for it |
+| `ui_craft_disenchant` | the enchanting profession's disenchant action (`src/sim/professions/enchanting.ts` `disenchantItem`), wired to `audio.disenchant()` on a successful `disenchantResult` |
+| `ui_craft_salvage` | the enchanting profession's salvage action (`src/sim/professions/salvage.ts`), wired to `audio.salvage()` on a successful `salvageResult` |
+| `ui_craft_enchanting` (via `audio.enchant()`) | the enchanting profession's ONE recording, reused for its real action: applying an enchant to a held item (`src/sim/professions/enchanting.ts` `applyEnchant`), wired on a successful `enchantResult`. The same file also sits in `craftByFamily.enchanting` above, harmlessly, since that path never fires |
 
 ---
 

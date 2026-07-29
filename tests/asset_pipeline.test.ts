@@ -32,6 +32,23 @@ const SWORD_GLB = join(ROOT, 'public/models/weapons/sword_a.glb');
 const FOX_GLB = join(ROOT, 'public/models/creatures/fox.glb');
 const BARREL_GLB = join(ROOT, 'public/models/props/barrel.glb');
 const TMP = join(ROOT, 'tmp/asset_pipeline/test');
+const SKINS_DIR_EXPR = '${' + 'SKINS_DIR}';
+
+interface WeaponFamilySpec {
+  grip: string;
+  gripFrac: number;
+  height: number;
+  maxHeight: number;
+  tokens: string[];
+}
+
+interface ClipPlan {
+  game: string;
+  presets: string[];
+}
+
+const WEAPON_FAMILIES = families.WEAPON_FAMILIES as Record<string, WeaponFamilySpec>;
+const BIPED_CLIP_PLAN = families.BIPED_CLIP_PLAN as ClipPlan[];
 
 // ---------------------------------------------------------------------------
 // 1. Weapon families
@@ -53,9 +70,9 @@ describe('weapon families', () => {
   });
 
   it('keeps every family spec internally consistent', () => {
-    const entries = Object.entries(families.WEAPON_FAMILIES);
+    const entries = Object.entries(WEAPON_FAMILIES);
     expect(entries.length).toBeGreaterThan(0);
-    for (const [name, fam] of entries as [string, any][]) {
+    for (const [name, fam] of entries) {
       expect(fam.gripFrac, `${name} gripFrac`).toBeGreaterThan(0);
       expect(fam.gripFrac, `${name} gripFrac`).toBeLessThan(1);
       expect(fam.height, `${name} height vs maxHeight`).toBeLessThanOrEqual(fam.maxHeight + 0.01);
@@ -78,7 +95,7 @@ describe('weapon families', () => {
     // The six families shipped today (VAR_SWORD 2.0, VAR_DAGGER 1.4, VAR_STAFF
     // 2.4, VAR_AXE 1.5, VAR_POLEARM 2.5, VAR_WAND 1.2).
     expect(Object.keys(engine).length).toBeGreaterThanOrEqual(6);
-    for (const [name, fam] of Object.entries(families.WEAPON_FAMILIES) as [string, any][]) {
+    for (const [name, fam] of Object.entries(WEAPON_FAMILIES)) {
       expect(engine[fam.grip], `${name}: engine grip ${fam.grip}`).toBeDefined();
       expect(fam.maxHeight, `${name}: maxHeight vs engine ${fam.grip}`).toBe(engine[fam.grip]);
     }
@@ -157,7 +174,7 @@ describe('anchored registry edits', () => {
     // would land the new entry as a bare expression BEFORE the whole line.
     const SRC = [
       'export const SKINS = {',
-      '  player_paladin: [null, `${SKINS_DIR}/paladin/alt_a.png`],',
+      `  player_paladin: [null, \`${SKINS_DIR_EXPR}/paladin/alt_a.png\`],`,
       '  player_mage: [',
       '    null,',
       '  ],',
@@ -167,10 +184,10 @@ describe('anchored registry edits', () => {
     const out = integrate.insertIntoBlock(
       SRC,
       'player_paladin: [',
-      '    `${SKINS_DIR}/paladin/alt_d.png`,\n',
+      `    \`${SKINS_DIR_EXPR}/paladin/alt_d.png\`,\n`,
     );
     expect(out).toContain(
-      '  player_paladin: [null, `${SKINS_DIR}/paladin/alt_a.png`, `${SKINS_DIR}/paladin/alt_d.png`,],',
+      `  player_paladin: [null, \`${SKINS_DIR_EXPR}/paladin/alt_a.png\`, \`${SKINS_DIR_EXPR}/paladin/alt_d.png\`,],`,
     );
     // The other entries are untouched and bracket balance holds.
     expect(out).toContain('  player_mage: [\n    null,\n  ],');
@@ -546,14 +563,14 @@ describe('prompt builders', () => {
 
 describe('clip plans', () => {
   it('the biped plan covers the required ClipMap fields plus Hit/Cast/Jump', () => {
-    const games = families.BIPED_CLIP_PLAN.map((c: any) => c.game);
+    const games = BIPED_CLIP_PLAN.map((c) => c.game);
     for (const need of ['Idle', 'Walk', 'Run', 'Attack', 'Death', 'Hit', 'Cast', 'Jump']) {
       expect(games, need).toContain(need);
     }
   });
 
   it('every biped preset comes from the biped library', () => {
-    for (const c of families.BIPED_CLIP_PLAN as { game: string; presets: string[] }[]) {
+    for (const c of BIPED_CLIP_PLAN) {
       expect(c.presets.length, c.game).toBeGreaterThan(0);
       for (const p of c.presets) {
         expect(p.startsWith('preset:biped:'), `${c.game}: ${p}`).toBe(true);
@@ -608,7 +625,28 @@ describe('validators calibrated against shipped assets', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 6. normalizeWeapon round-trip (the load-bearing correctness check)
+// 6. Prop normalization configuration identity
+// ---------------------------------------------------------------------------
+
+describe('prop normalization variants', () => {
+  it('invalidates the cached step when height, yaw, or texture ceiling changes', () => {
+    expect(glb.propNormalizeVariant({ height: 5.5, rotateYDeg: 0, maxTex: 256 })).toBe(
+      'r0_h5_5_t256',
+    );
+    expect(glb.propNormalizeVariant({ height: 5.4, rotateYDeg: 0, maxTex: 256 })).not.toBe(
+      glb.propNormalizeVariant({ height: 5.5, rotateYDeg: 0, maxTex: 256 }),
+    );
+    expect(glb.propNormalizeVariant({ height: 5.5, rotateYDeg: 90, maxTex: 256 })).not.toBe(
+      glb.propNormalizeVariant({ height: 5.5, rotateYDeg: 0, maxTex: 256 }),
+    );
+    expect(glb.propNormalizeVariant({ height: 5.5, rotateYDeg: 0, maxTex: 512 })).not.toBe(
+      glb.propNormalizeVariant({ height: 5.5, rotateYDeg: 0, maxTex: 256 }),
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 7. normalizeWeapon round-trip (the load-bearing correctness check)
 // ---------------------------------------------------------------------------
 
 describe('normalizeWeapon round-trip', () => {
@@ -759,6 +797,50 @@ describe('asset library registry parsers', () => {
       `export const WEAPON_VFX_TUNING: twin = {${block?.[1]}\n};`,
     );
     expect(Object.fromEntries(parsed)).toEqual(WORLD_TUNING);
+  });
+
+  it('the viewer twin shell POWERS match src/render/weapon_vfx.ts, and stay above zero', async () => {
+    // The exponent half of the pow() domain, on the offline mirror. The base
+    // half is guarded tree-wide by tests/shader_pow_domain.test.ts, and the
+    // runtime exponents by tests/weapon_vfx_specs.test.ts, but that suite
+    // imports src/ and so says nothing about this file: with the base now
+    // clamped, a mirror shell power edited to 0 makes the offline makeShell
+    // path evaluate pow(0.0, 0.0), which is undefined exactly as a negative
+    // base is, and every other suite stays green.
+    const { TIERS } = await import('../src/render/weapon_vfx');
+    const twinSrc = readFileSync(join(ROOT, 'scripts/asset_pipeline/weapon_vfx.js'), 'utf8');
+    const block = twinSrc.match(/export const TIERS = \{([\s\S]*?)\n\};/);
+    expect(block, 'weapon_vfx.js twin must export TIERS').toBeTruthy();
+    const body = block?.[1] ?? '';
+
+    // Keyed by tier name rather than by position, so a reordered twin compares
+    // the rows a reader would expect it to compare.
+    const headers = [...body.matchAll(/^ {2}(\w+): \{$/gm)];
+    const twinPowers: Record<string, number> = {};
+    for (const [index, header] of headers.entries()) {
+      const end = headers[index + 1]?.index ?? body.length;
+      const section = body.slice(header.index ?? 0, end);
+      const power = section.match(/shell: \{[^}]*\bpower: (-?[\d.]+)/);
+      if (power) twinPowers[header[1]] = Number(power[1]);
+    }
+
+    const realPowers = Object.fromEntries(
+      Object.entries(TIERS).map(([name, tier]) => [name, tier.shell.power]),
+    );
+    expect(twinPowers).toEqual(realPowers);
+    // Vacuity floor: an equality against an empty object passes, and a parser
+    // that silently matched nothing is the way this pin dies quietly.
+    expect(Object.keys(twinPowers).length).toBe(Object.keys(TIERS).length);
+    for (const [name, power] of Object.entries(twinPowers)) {
+      expect(power, `twin tier ${name}: shell power must be > 0`).toBeGreaterThan(0);
+    }
+    // Every shell row in the WHOLE twin, not only the tier table: a per-weapon
+    // override added below WEAPON_VFX reaches the same makeShell.
+    const everyPower = [...twinSrc.matchAll(/shell: \{[^}]*\bpower: (-?[\d.]+)/g)].map((m) =>
+      Number(m[1]),
+    );
+    expect(everyPower.length).toBeGreaterThanOrEqual(Object.keys(TIERS).length);
+    for (const power of everyPower) expect(power).toBeGreaterThan(0);
   });
 
   it('parses WEAPON_VFX_TUNING into weaponKey -> channel multipliers, ignoring comments', async () => {

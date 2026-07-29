@@ -11,10 +11,12 @@ import {
   isChatOpenTab,
   isChatTabChannel,
   parseChatTabs,
+  reorderChatTabs,
   sentLineChannel,
   sentLineTarget,
   sentLineTargetForHost,
   serializeChatTabs,
+  stepChatTab,
   WHISPER_TAB,
   WHISPER_TAB_LABEL_KEY,
 } from '../src/ui/hud/chat/chat_channels';
@@ -67,6 +69,92 @@ describe('chat channel tabs — pure model', () => {
     it('trims and drops empty input', () => {
       expect(composeChatLine('world', '   ')).toBe('');
       expect(composeChatLine('world', '  ping  ')).toBe('/world ping');
+    });
+  });
+
+  describe('reorderChatTabs (drag-to-reorder, issue #1365)', () => {
+    it('moves a tab to sit immediately before a sibling it was dropped on', () => {
+      expect(reorderChatTabs(['world', 'guild', 'party'], 'party', 'world')).toEqual([
+        'party',
+        'world',
+        'guild',
+      ]);
+      expect(reorderChatTabs(['world', 'guild', 'party'], 'world', 'party')).toEqual([
+        'guild',
+        'world',
+        'party',
+      ]);
+    });
+
+    it('moves the tab to the end when dropped on the "+" add button (before = null)', () => {
+      expect(reorderChatTabs(['world', 'guild', 'party'], 'world', null)).toEqual([
+        'guild',
+        'party',
+        'world',
+      ]);
+    });
+
+    it('is a same-reference no-op for an unknown moved id', () => {
+      const tabs: ('world' | 'guild')[] = ['world', 'guild'];
+      expect(reorderChatTabs(tabs, 'lfg' as 'world', 'world')).toBe(tabs);
+    });
+
+    it('is a same-reference no-op for a before id no longer in the list', () => {
+      const tabs: ('world' | 'guild')[] = ['world', 'guild'];
+      expect(reorderChatTabs(tabs, 'world', 'party' as 'guild')).toBe(tabs);
+    });
+
+    it('is a same-reference no-op when dropped on its own position', () => {
+      const tabs: ('world' | 'guild')[] = ['world', 'guild'];
+      expect(reorderChatTabs(tabs, 'world', 'world')).toBe(tabs);
+    });
+
+    it('leaves a single-tab list unchanged (by reference) when dropped on the add button', () => {
+      const tabs: 'world'[] = ['world'];
+      expect(reorderChatTabs(tabs, 'world', null)).toBe(tabs);
+    });
+
+    it('is a same-reference no-op when a tab is dropped on the sibling it already precedes', () => {
+      const tabs: ('world' | 'guild' | 'party')[] = ['world', 'guild', 'party'];
+      expect(reorderChatTabs(tabs, 'world', 'guild')).toBe(tabs);
+    });
+
+    it('is a same-reference no-op when the last tab is dropped on the add button', () => {
+      const tabs: ('world' | 'guild')[] = ['world', 'guild'];
+      expect(reorderChatTabs(tabs, 'guild', null)).toBe(tabs);
+    });
+  });
+
+  describe('stepChatTab (the keyboard-accessible non-drag reorder path)', () => {
+    it('swaps a tab with its right neighbor on step +1', () => {
+      expect(stepChatTab(['world', 'guild', 'party'], 'world', 1)).toEqual([
+        'guild',
+        'world',
+        'party',
+      ]);
+    });
+
+    it('swaps a tab with its left neighbor on step -1', () => {
+      expect(stepChatTab(['world', 'guild', 'party'], 'party', -1)).toEqual([
+        'world',
+        'party',
+        'guild',
+      ]);
+    });
+
+    it('is a same-reference no-op at the left edge', () => {
+      const tabs: ('world' | 'guild')[] = ['world', 'guild'];
+      expect(stepChatTab(tabs, 'world', -1)).toBe(tabs);
+    });
+
+    it('is a same-reference no-op at the right edge', () => {
+      const tabs: ('world' | 'guild')[] = ['world', 'guild'];
+      expect(stepChatTab(tabs, 'guild', 1)).toBe(tabs);
+    });
+
+    it('is a same-reference no-op for an unknown id', () => {
+      const tabs: 'world'[] = ['world'];
+      expect(stepChatTab(tabs, 'guild' as 'world', 1)).toBe(tabs);
     });
   });
 

@@ -14,7 +14,7 @@ import { HEROIC_BOSS_LOOT, RETIRED_HEROIC_ITEMS } from '../src/sim/content/heroi
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import { FURY_STOCK } from '../src/sim/content/pvp_honor';
 import { ITEMS, MOBS, NPCS, QUESTS } from '../src/sim/data';
-import type { MailSave } from '../src/sim/mail/post_office';
+import { MAIL_ATTACHMENT_EXPIRY_SECONDS, type MailSave } from '../src/sim/mail/post_office';
 import type { MarketSave } from '../src/sim/market';
 import { type CharacterState, Sim } from '../src/sim/sim';
 import type { ItemDef } from '../src/sim/types';
@@ -205,7 +205,10 @@ describe('retired heroic items: the four ids v0.25.0 orphaned resolve again', ()
     const marketSave: MarketSave = {
       listings: [
         {
-          id: 7,
+          // A player-band id (>= MARKET_PLAYER_LISTING_ID_BASE), so the round-trip
+          // below stays strict: an id inside the reseeded house band would be
+          // reissued at load by the #2463 repair, which is not this test's charter.
+          id: 1007,
           sellerKey: 'legacy-seller',
           sellerName: 'Legacy Seller',
           itemId: 'soulrend_diadem',
@@ -221,7 +224,7 @@ describe('retired heroic items: the four ids v0.25.0 orphaned resolve again', ()
           items: [{ itemId: 'soulforged_warplate', count: 1 }],
         },
       ],
-      nextListingId: 8,
+      nextListingId: 1008,
     };
     const mailSave: MailSave = {
       mail: [
@@ -250,7 +253,14 @@ describe('retired heroic items: the four ids v0.25.0 orphaned resolve again', ()
     const reserializedMarket = sim.serializeMarket();
     expect(reserializedMarket.listings).toEqual(marketSave.listings);
     expect(reserializedMarket.collections).toEqual(marketSave.collections);
-    expect(sim.serializeMail()).toEqual(mailSave);
+    // Deploy clock: a pre-existing player parcel persisted with the
+    // never sentinel (-1) starts its 30-day attachment window at load, and the
+    // return-cycle flag materializes to false; the retired item id itself (the
+    // charter of this test) still round-trips untouched.
+    expect(sim.serializeMail()).toEqual({
+      ...mailSave,
+      mail: [{ ...mailSave.mail[0], secondsLeft: MAIL_ATTACHMENT_EXPIRY_SECONDS, returned: false }],
+    });
   });
 
   it('renders a real paperdoll cell for an equipped retired id (the Empty-slot regression)', () => {

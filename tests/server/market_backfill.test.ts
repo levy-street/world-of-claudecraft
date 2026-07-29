@@ -210,6 +210,50 @@ describe('mergeMarketSaves', () => {
     expect(incoming.collections[0].copper).toBe(50);
   });
 
+  // The merge SUMS copper, so the pending sale ledger explaining that copper has to
+  // travel with it: dropping it would hand a seller merged gold and no rows saying
+  // where any of it came from.
+  it('carries the pending sale ledger through the merge with the copper it explains', () => {
+    const sale = (itemId: string, proceeds: number) => ({
+      itemId,
+      count: 1,
+      price: proceeds + 10,
+      proceeds,
+      buyerName: 'Buyer',
+    });
+    const existing: MarketSave = {
+      listings: [],
+      collections: [
+        mkCollection({ key: 'A', copper: 100, sales: { entries: [sale('x', 100)], omitted: 1 } }),
+      ],
+      nextListingId: 1,
+    };
+    const incoming: MarketSave = {
+      listings: [],
+      collections: [
+        mkCollection({ key: 'A', copper: 50, sales: { entries: [sale('y', 50)], omitted: 2 } }),
+        mkCollection({ key: 'B', copper: 10, sales: { entries: [sale('z', 10)], omitted: 0 } }),
+        // A collection that never sold anything keeps writing no sales key at all.
+        mkCollection({ key: 'C', copper: 0, items: [{ itemId: 'q', count: 1 }] }),
+      ],
+      nextListingId: 1,
+    };
+
+    const merged = mergeMarketSaves(existing, incoming);
+
+    const a = merged.collections.find((c) => c.key === 'A');
+    expect(a?.copper).toBe(150);
+    expect(a?.sales?.entries.map((e) => e.itemId)).toEqual(['x', 'y']);
+    expect(a?.sales?.omitted).toBe(3); // both sides' dropped counts survive
+    expect(merged.collections.find((c) => c.key === 'B')?.sales?.entries).toHaveLength(1);
+    expect('sales' in (merged.collections.find((c) => c.key === 'C') ?? {})).toBe(false);
+
+    // inputs untouched: the merge must never reach back into either blob's ledger
+    expect(existing.collections[0].sales?.entries).toHaveLength(1);
+    expect(existing.collections[0].sales?.omitted).toBe(1);
+    expect(incoming.collections[0].sales?.entries).toHaveLength(1);
+  });
+
   it('clamps the remap start above a corrupt existing max id to avoid collisions', () => {
     // A healthy blob keeps nextListingId > every listing id (the sim recomputes
     // it on serialize); a corrupt or hand-edited row can violate that, and a

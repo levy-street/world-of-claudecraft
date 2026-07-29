@@ -27,7 +27,11 @@ import type { ActionBarState } from './action_bar_view';
 // painter references no bare DOM string literal.
 const ARIA_LABEL_ATTR = 'aria-label';
 const BACKGROUND_IMAGE_PROP = 'background-image';
-const COOLDOWN_HEIGHT_PROP = 'height';
+const HEIGHT_PROP = 'height';
+// Drives the radial cooldown sweep: a CSS custom property the `.cd-overlay`
+// conic-gradient reads (0% = ready, 100% = full cooldown remaining). Replaces the
+// old bottom-up `height` fill so remaining cooldown reads as a classic clock wipe.
+const COOLDOWN_FILL_PROP = '--cd-fill';
 const CLASS_EMPTY = 'empty';
 const CLASS_UNUSABLE = 'unusable';
 const CLASS_OUT_OF_RANGE = 'oor';
@@ -35,6 +39,9 @@ const CLASS_QUEUED = 'queued';
 const CLASS_PROC = 'proc';
 const CLASS_EMPOWERED = 'empowered';
 const CLASS_MANY_SPELLS = 'many-spells';
+// The count badge gains this class on a charge-pool ability so "2" reads as
+// stored charges, not an item stack (distinct plate + color in hud.css).
+const CLASS_CHARGE_COUNT = 'charge-count';
 
 /** The DOM refs for one slot the painter writes. */
 export interface ActionBarSlotElements {
@@ -44,6 +51,8 @@ export interface ActionBarSlotElements {
   keybindEl: HTMLElement;
   cdOverlay: HTMLElement;
   cdText: HTMLElement;
+  /** The thin recharge strip (a charge regenerating while uses remain). */
+  rechargeOverlay: HTMLElement;
 }
 
 /** The paint descriptor: the container plus the per-slot element refs. Instance
@@ -86,7 +95,9 @@ export class ActionBarPainter {
       }
 
       this.writers.setText(el.countEl, s.count);
-      this.writers.setStyleProp(el.cdOverlay, COOLDOWN_HEIGHT_PROP, `${s.cooldownPercent}%`);
+      this.writers.toggleClass(el.countEl, CLASS_CHARGE_COUNT, s.isCharges);
+      this.writers.setStyleProp(el.cdOverlay, COOLDOWN_FILL_PROP, `${s.cooldownPercent}%`);
+      this.writers.setStyleProp(el.rechargeOverlay, HEIGHT_PROP, `${s.rechargePercent}%`);
       this.writers.setText(el.cdText, s.cdText);
 
       this.writers.toggleClass(el.btn, CLASS_EMPTY, s.kind === 'empty');

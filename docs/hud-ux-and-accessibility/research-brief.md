@@ -869,4 +869,4 @@ Edit-Mode-style layout editor + profiles.
 ---
 
 File written to:
-/Users/fernando/Documents/world-of-claudecraft/docs/hud-ux-and-accessibility/research-brief.md
+docs/hud-ux-and-accessibility/research-brief.md

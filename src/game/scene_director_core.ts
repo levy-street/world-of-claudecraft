@@ -12,7 +12,7 @@
 // ALWAYS releases the input lock and the music silence and starts the camera
 // release, whatever state the scene was in.
 
-import type { SceneCameraShot, SceneWireOp } from '../sim/types';
+import type { SceneCameraShot, SceneReconnectState, SceneWireOp } from '../sim/types';
 import {
   evaluateSceneRigPose,
   type SceneAttachmentResolver,
@@ -124,6 +124,15 @@ export function applySceneOp(
   }
 }
 
+/** Hard convergence after reconnect. Historical camera ops are not replayed:
+ * stale ownership is dropped immediately while authoritative lock state is
+ * restored. */
+export function applySceneSync(s: SceneDirectorState, state: SceneReconnectState | null): void {
+  clearCamera(s);
+  s.sceneActive = state !== null;
+  s.inputLocked = state?.inputLocked ?? false;
+}
+
 function beginRelease(s: SceneDirectorState, nowSec: number): void {
   if (!sceneCameraActive(s)) return;
   if (!s.hasLast) {
@@ -159,7 +168,15 @@ export function scenePose(
   live: SceneLivePose,
   resolveEntity: (id: number) => { x: number; y: number; z: number } | null,
   resolveAttachment?: SceneAttachmentResolver,
+  reducedMotion = false,
 ): ScenePose | null {
+  // Authored camera travel is optional presentation. Reduced-motion players
+  // retain the ordinary gameplay camera while scene input locks, subtitles,
+  // choices, and timing continue unchanged.
+  if (reducedMotion) {
+    clearCamera(s);
+    return null;
+  }
   if (!sceneCameraActive(s)) return null;
   const out = s.pose;
   if (s.releasing) {

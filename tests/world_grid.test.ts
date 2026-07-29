@@ -6,13 +6,25 @@
 // partial spans, pass resolution) against synthetic multi-column worlds.
 
 import { describe, expect, it } from 'vitest';
-import { STRIP_MAX_X, STRIP_MIN_X, worldXBoundsAt, ZONES } from '../src/sim/data';
+import {
+  BUILTIN_WORLD,
+  COLUMN_ZONES,
+  columnBlendAt,
+  STRIP_MAX_X,
+  STRIP_MIN_X,
+  setActiveWorldContent,
+  worldXBoundsAt,
+  ZONES,
+} from '../src/sim/data';
 import type { ZoneDef } from '../src/sim/types';
 import {
   computeBorderEdges,
+  DECORATION_X_END,
+  DECORATION_X_START,
   inBorderLake,
   inHollowOpenSea,
   terrainHeight,
+  terrainRegionCandidateCountsAt,
   WATER_LEVEL,
 } from '../src/sim/world';
 
@@ -33,12 +45,25 @@ function zone(partial: Partial<ZoneDef> & { id: string; zMin: number; zMax: numb
 describe('the continent derives the right border set', () => {
   const edges = computeBorderEdges(ZONES);
 
-  it('has ten horizontal borders and fourteen column edges', () => {
-    // the Farshore rect floats far offshore and shares NO border line with
-    // any other zone (deep sea all around, ferry only), so it contributes
-    // no edges at all: the counts are the mainland grid's alone
-    expect(edges.filter((e) => e.kind === 'h').length).toBe(10);
-    expect(edges.filter((e) => e.kind === 'v').length).toBe(14);
+  it('preserves column blend poison values for non-finite coordinates', () => {
+    const column = COLUMN_ZONES[0];
+    expect(Number.isNaN(columnBlendAt(column, 0, Number.NaN))).toBe(true);
+    expect(Number.isNaN(columnBlendAt(column, Number.NaN, 0))).toBe(true);
+  });
+
+  it('keeps the production terrain path sparse at town coordinates', () => {
+    expect(terrainRegionCandidateCountsAt(2, -2)).toEqual({
+      appliers: 9,
+      camps: 17,
+      hubs: 1,
+    });
+  });
+
+  it('has eleven horizontal borders and fifteen column edges', () => {
+    // the Farshore adds a v-edge against the vale and an h-line under the
+    // Galecrest: both are open-sea borders with no isthmus (ferry only)
+    expect(edges.filter((e) => e.kind === 'h').length).toBe(11);
+    expect(edges.filter((e) => e.kind === 'v').length).toBe(15);
   });
 
   it('every crossing sits where the atlas says', () => {
@@ -91,6 +116,21 @@ describe('the continent derives the right border set', () => {
       expect(worldXBoundsAt(z)).toEqual({ min: -540, max: 540 });
     }
     expect(worldXBoundsAt(2400)).toEqual({ min: 180, max: 540 });
+  });
+
+  it('reuses frozen row bounds and invalidates them on a content generation change', () => {
+    const first = worldXBoundsAt(300);
+    expect(worldXBoundsAt(300)).toBe(first);
+    expect(Object.isFrozen(first)).toBe(true);
+
+    setActiveWorldContent(BUILTIN_WORLD);
+    try {
+      const refreshed = worldXBoundsAt(300);
+      expect(refreshed).not.toBe(first);
+      expect(refreshed).toEqual(first);
+    } finally {
+      setActiveWorldContent(null);
+    }
   });
 });
 

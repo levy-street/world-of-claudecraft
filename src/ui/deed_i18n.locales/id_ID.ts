@@ -7,6 +7,102 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: 'Bendera di Tangan',
+    desc: 'Rebut bendera di Medan Thornhollow.',
+  },
+  pvp_bg_first_win: {
+    name: 'Thornhollow Bertahan',
+    desc: 'Menangkan pertempuran di Medan Thornhollow.',
+  },
+  pvp_bg_wins_25: {
+    name: 'Penjaga Thornhollow',
+    desc: 'Menangkan 25 pertempuran di Medan Thornhollow.',
+    title: 'Pembawa Panji',
+  },
+  pvp_bg_captures_100: {
+    name: 'Seratus Bendera',
+    desc: 'Rebut 100 bendera di Medan Thornhollow sepanjang kariermu.',
+  },
+  dgn_rift: {
+    name: 'Penjelajah Rift',
+    desc: 'Bersihkan Rift dengan mengalahkan bos lantainya.',
+  },
+  dgn_rift_s_rank: {
+    name: 'Penguasa Rift',
+    desc: 'Bersihkan Rift peringkat S, tingkat tersulit yang bisa dimunculkan portal Rift.',
+  },
+  pvp_honor_sergeant: {
+    name: 'Sersan',
+    desc: 'Raih 10.000 kehormatan seumur hidupmu. Membelanjakannya tidak akan pernah menghilangkan pangkat ini.',
+    title: 'Sersan',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: 'Letnan Ksatria',
+    desc: 'Raih 40.000 kehormatan seumur hidupmu, satu musim perang sungguhan di belakangmu.',
+    title: 'Letnan Ksatria',
+  },
+  pvp_honor_field_marshal: {
+    name: 'Marsekal Lapangan',
+    desc: 'Raih 150.000 kehormatan seumur hidupmu. Langka di realm mana pun, dan memang seharusnya begitu.',
+    title: 'Marsekal Lapangan',
+  },
+  chr_drakemaw_broodlord: {
+    name: 'Pemusnah Tetasan',
+    desc: 'Tumpaskan seekor Penguasa Sarang Drakemaw di tengah telur-telurnya, menembus raungan, tebasan, dan apinya.',
+  },
+  chr_maw_matriarch: {
+    name: 'Langit Membisu',
+    desc: 'Tumpaskan Cindraleth Sang Matriark Rahang di sarang kawahnya di atas Drakemaw.',
+  },
+  chr_frostveil_gatherer: {
+    name: 'Panen Teras',
+    desc: 'Panen urat bijih, tegakan kayu, dan petak herba di Frostveil.',
+  },
+  chr_frostveil_first_cast: {
+    name: 'Es Pertama di Tarn',
+    desc: 'Tangkap ikan dari perairan Frostveil.',
+  },
+  chr_amberfall_gatherer: {
+    name: 'Panen Amberfall',
+    desc: 'Panen urat bijih, tegakan kayu, dan petak herba di Amberfall.',
+  },
+  chr_amberfall_first_cast: {
+    name: 'Tangkapan dari Rawa Besar',
+    desc: 'Tangkap ikan dari perairan Amberfall.',
+  },
+  chr_nightbloom_gatherer: {
+    name: 'Panen Bermimpi',
+    desc: 'Panen urat bijih, tegakan kayu, dan petak herba di Nightbloom.',
+  },
+  chr_nightbloom_first_cast: {
+    name: 'Riak di Sumur Bulan',
+    desc: 'Tangkap ikan dari perairan Nightbloom.',
+  },
+  chr_wraithwood_gatherer: {
+    name: 'Panen di Bawah Kanopi',
+    desc: 'Panen urat bijih, tegakan kayu, dan petak herba di Wraithwood.',
+  },
+  chr_wraithwood_first_cast: {
+    name: 'Lemparan di Teluk Cermin',
+    desc: 'Tangkap ikan dari perairan Wraithwood.',
+  },
+  chr_palmreach_gatherer: {
+    name: 'Panen di Pantai Palem',
+    desc: 'Panen urat bijih, tegakan kayu, dan petak herba di Palmreach.',
+  },
+  chr_palmreach_first_cast: {
+    name: 'Melempar di Laguna Safir',
+    desc: 'Tangkap ikan dari perairan Palmreach.',
+  },
+  chr_evergarden_gatherer: {
+    name: 'Karunia Parterre',
+    desc: 'Panen urat bijih, tegakan kayu, dan petak herba di Evergarden.',
+  },
+  chr_evergarden_first_cast: {
+    name: 'Lemparan di Kolam Kelopak',
+    desc: 'Tangkap ikan dari perairan Evergarden.',
+  },
   pvp_card_duel_first_win: {
     name: 'Aturan Sendiri',
     desc: 'Menangkan Duel Kartu di hadapan Ahli Kartu.',
@@ -79,7 +175,7 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: 'Penguasa Padang Rumput', desc: 'Capai 100 kecakapan Herbalisme.' },
   prog_master_gatherer: {
     name: 'Pengumpul Ulung',
-    desc: 'Capai 100 kecakapan dalam Penambangan, Penebangan Kayu, dan Herbalisme.',
+    desc: 'Capai 100 kecakapan pada tiga dari Penambangan, Penebangan Kayu, Herbalisme, dan Memancing.',
   },
   prog_first_craft: { name: 'Buatan Tangan', desc: 'Selesaikan hasil kerajinan sukses pertamamu.' },
   prog_craft_specialist: {
@@ -435,7 +531,10 @@ export const table: DeedLocaleTable = {
     name: 'Pelanggan Kesayangan',
     desc: 'Temukan kesepuluh barang dagangan Kepala Perbekalan Vex.',
   },
-  col_glimmerfin: { name: 'Kilau Harapan', desc: 'Pancing seekor Koi Sirip Kilau.' },
+  col_glimmerfin: {
+    name: 'Kilau Harapan',
+    desc: 'Tangkap seekor Koi Kerlip Surya.',
+  },
   col_full_creel: {
     name: 'Keranjang Ikan Penuh',
     desc: 'Temukan keenam tangkapan umum dari perairan Lembah, Rawa, dan Dataran Tinggi.',
@@ -617,7 +716,10 @@ export const table: DeedLocaleTable = {
     name: 'Sesuatu yang Berkilau',
     desc: 'Pungut sebuah benda berkilauan dari tanah.',
   },
-  exp_first_ore: { name: 'Belah Bumi', desc: 'Panen titik bijih pertamamu.' },
+  exp_first_ore: {
+    name: 'Beliung Menemui Batu',
+    desc: 'Panen titik bijih pertamamu.',
+  },
   exp_first_timber: { name: 'Awas, Tumbang!', desc: 'Panen titik kayu pertamamu.' },
   exp_first_herb: { name: 'Tangan Dingin', desc: 'Panen titik herba pertamamu.' },
   feat_era_cap: {
@@ -689,5 +791,200 @@ export const table: DeedLocaleTable = {
   chr_marsh_first_cast: {
     name: 'Belut di Sela Buluh',
     desc: 'Pancing seekor ikan dari perairan Rawa Mirefen.',
+  },
+  prog_guildsworn: {
+    name: 'Tersumpah Karya',
+    desc: 'Selaraskan dirimu pada sepasang arketipe dan tekuni perdagangan-perdagangannya dengan sungguh-sungguh.',
+    title: 'Tersumpah Karya',
+  },
+  prog_masterwright: {
+    name: 'Pandai Karya',
+    desc: 'Ciptakan karya besarmu yang pertama, sebuah karya sedemikian indah hingga seluruh zona mendengarnya.',
+    title: 'Pandai Karya',
+  },
+  prog_fishing_100: {
+    name: 'Garam Tua',
+    desc: 'Capai 100 kecakapan Memancing.',
+  },
+  prog_master_angler: {
+    name: 'Pemancing Mahir',
+    desc: 'Capai 200 kecakapan Memancing, puncak tertinggi seni memancing.',
+    title: 'Pemancing Mahir',
+  },
+  prog_engineering_50: {
+    name: 'Roda Gigi dan Per',
+    desc: 'Capai 50 keahlian Rekayasa.',
+  },
+  prog_alchemy_50: {
+    name: 'Ramuan Aneh',
+    desc: 'Capai 50 keahlian Alkimia.',
+  },
+  prog_cooking_50: {
+    name: 'Koki Berpengalaman',
+    desc: 'Capai 50 keahlian Memasak.',
+  },
+  prog_leatherworking_50: {
+    name: 'Perdagangan Penyamak',
+    desc: 'Capai 50 keahlian Pengolahan Kulit.',
+  },
+  prog_tailoring_50: {
+    name: 'Jahitan Halus',
+    desc: 'Capai 50 keahlian Menjahit.',
+  },
+  prog_enchanting_50: {
+    name: 'Sekilas Arkana',
+    desc: 'Capai 50 keahlian Pemantraan.',
+  },
+  prog_weaponcrafting_50: {
+    name: 'Bilah dan Tempa',
+    desc: 'Capai 50 keahlian Penempaan Senjata.',
+  },
+  prog_armorcrafting_50: {
+    name: 'Palu dan Pelat',
+    desc: 'Capai 50 keahlian Penempaan Zirah.',
+  },
+  prog_grandmaster_engineering: {
+    name: 'Rekayasa Mahaguru',
+    desc: 'Capai 125 keahlian Rekayasa, puncak tertinggi kerajinan ini.',
+    title: 'Rekayasa Mahaguru',
+  },
+  prog_grandmaster_alchemy: {
+    name: 'Alkimia Mahaguru',
+    desc: 'Capai 125 keahlian Alkimia, puncak tertinggi kerajinan ini.',
+    title: 'Alkimia Mahaguru',
+  },
+  prog_grandmaster_cooking: {
+    name: 'Memasak Mahaguru',
+    desc: 'Capai 125 keahlian Memasak, puncak tertinggi kerajinan ini.',
+    title: 'Memasak Mahaguru',
+  },
+  prog_grandmaster_leatherworking: {
+    name: 'Pengolahan Kulit Mahaguru',
+    desc: 'Capai 125 keahlian Pengolahan Kulit, puncak tertinggi kerajinan ini.',
+    title: 'Pengolahan Kulit Mahaguru',
+  },
+  prog_grandmaster_tailoring: {
+    name: 'Menjahit Mahaguru',
+    desc: 'Capai 125 keahlian Menjahit, puncak tertinggi kerajinan ini.',
+    title: 'Menjahit Mahaguru',
+  },
+  prog_grandmaster_enchanting: {
+    name: 'Pemantraan Mahaguru',
+    desc: 'Capai 125 keahlian Pemantraan, puncak tertinggi kerajinan ini.',
+    title: 'Pemantraan Mahaguru',
+  },
+  prog_grandmaster_weaponcrafting: {
+    name: 'Penempaan Senjata Mahaguru',
+    desc: 'Capai 125 keahlian Penempaan Senjata, puncak tertinggi kerajinan ini.',
+    title: 'Penempaan Senjata Mahaguru',
+  },
+  prog_grandmaster_armorcrafting: {
+    name: 'Penempaan Zirah Mahaguru',
+    desc: 'Capai 125 keahlian Penempaan Zirah, puncak tertinggi kerajinan ini.',
+    title: 'Penempaan Zirah Mahaguru',
+  },
+  col_pristine_vein: {
+    name: 'Urat Murni',
+    desc: 'Pecahkan sebuah urat murni dan biarkan seluruh zona mendengarnya.',
+  },
+  col_ancient_heartwood: {
+    name: 'Kayu Hati Kuno',
+    desc: 'Dapatkan sepotong kayu hati kuno dari pohon yang telah ditebang.',
+  },
+  col_moonlit_bloom: {
+    name: 'Mekar Bulan Purnama',
+    desc: 'Pungut sekuntum mekar bulan purnama tepat pada saat mekarnya.',
+  },
+  col_perfect_specimen: {
+    name: 'Spesimen Sempurna',
+    desc: 'Ambil spesimen sempurna dari bangkai binatang buruan, tanpa satu cacat pun.',
+  },
+  soc_first_salvage: {
+    name: 'Tak Ada yang Terbuang',
+    desc: 'Salvasi sepotong perlengkapan kembali menjadi material mentah.',
+  },
+  soc_salvage_50: {
+    name: 'Halaman Pembongkaran',
+    desc: 'Salvasi 50 potong perlengkapan kembali menjadi material mentah.',
+  },
+  dgn_wildheart_basin: {
+    name: 'Cekungan Membalas',
+    desc: 'Kalahkan Zulgar, Suara Cekungan, di Cekungan Hati Liar.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Heroik: Cekungan Hati Liar',
+    desc: 'Kalahkan Zulgar, Suara Cekungan, di Cekungan Hati Liar pada tingkat kesulitan Heroik.',
+  },
+  chr_peaks_gatherer: {
+    name: 'Tuaian dari Dataran Tinggi',
+    desc: 'Panen satu urat bijih, satu tegakan kayu, dan satu petak herba di Dataran Tinggi Thornpeak.',
+  },
+  chr_marsh_rares_ii: {
+    name: 'Sang Pelahap, Diperhitungkan',
+    desc: 'Bantai Grubjaw sang Pelahap, teror bernama keempat di Rawa Mirefen yang luput dari perhitungan pertama.',
+  },
+  chr_peaks_rares_ii: {
+    name: 'Lebih Banyak Nama Terpahat di Tebing',
+    desc: 'Bantai Cragmaw Tua dan Tuan Serpihan Kazzix, dua teror bernama lagi di Dataran Tinggi Thornpeak yang luput dari perhitungan pertama.',
+  },
+  chr_gleamstag: {
+    name: 'Legenda yang Tak Pernah Menyerang Lebih Dulu',
+    desc: 'Bantai Rusa Kemilau, elite langka dan pemalu yang hanya menyerang bila terdesak.',
+  },
+  chr_hollow_rares: {
+    name: 'Kawanan Itu Ingat',
+    desc: 'Bantai Marrowshell Tua dan Aurelhorn, yang Pertama dari Kawanan, dua bos langka pengembara di Ceruk Terselubung.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Limpahan Tanah Paya',
+    desc: 'Panen satu urat bijih, satu tegakan kayu, dan satu petak herba di Paya Willow.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Riak di Paya Lili',
+    desc: 'Pancing seekor ikan dari perairan Paya Willow.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Tuaian di Ujung Tanjung',
+    desc: 'Panen satu urat bijih, satu tegakan kayu, dan satu petak herba di Puncak Angin.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'Seutas Kail di Danau Cermin',
+    desc: 'Pancing seekor ikan dari perairan Puncak Angin.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Perbekalan dari Pulau',
+    desc: 'Panen satu urat bijih, satu tegakan kayu, dan satu petak herba di Pesisir Jauh.',
+  },
+  chr_farshore_first_cast: {
+    name: 'Yang Diketahui Para Camar',
+    desc: 'Pancing seekor ikan dari perairan Pesisir Jauh.',
+  },
+  prog_engineering_rare: {
+    name: 'Rekayasa Presisi',
+    desc: 'Buat barang bertingkat langka pertamamu dalam Rekayasa.',
+  },
+  prog_alchemy_rare: {
+    name: 'Vintage Langka',
+    desc: 'Buat barang bertingkat langka pertamamu dalam Alkimia.',
+  },
+  prog_cooking_rare: {
+    name: 'Hidangan yang Tak Terlupakan',
+    desc: 'Buat barang bertingkat langka pertamamu dalam Memasak.',
+  },
+  prog_leatherworking_rare: {
+    name: 'Penyamakan Halus',
+    desc: 'Buat barang bertingkat langka pertamamu dalam Pengolahan Kulit.',
+  },
+  prog_tailoring_rare: {
+    name: 'Jahitan Sang Maestro',
+    desc: 'Buat barang bertingkat langka pertamamu dalam Menjahit.',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Ditempa hingga Berkilau',
+    desc: 'Buat barang bertingkat langka pertamamu dalam Penempaan Senjata.',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Dilapisi hingga Sempurna',
+    desc: 'Buat barang bertingkat langka pertamamu dalam Penempaan Zirah.',
   },
 };

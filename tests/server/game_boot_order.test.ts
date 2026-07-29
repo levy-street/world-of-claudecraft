@@ -10,20 +10,26 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 
+const SERVER_MAIN_IMPORT_TIMEOUT_MS = 15_000;
+
 // Replace the real GameServer with a constructor spy. main.ts is the only module
 // that imports it as a value (everything else is `import type`), so this observes
 // exactly the construction liveGame() would perform.
 vi.mock('../../server/game', () => ({ GameServer: vi.fn() }));
 
 describe('deferred GameServer construction (liveGame)', () => {
-  it('a bare import of server/main constructs no GameServer', async () => {
-    // db.ts evaluates a module-scope DATABASE_URL (throws if unset); dummy URL as
-    // in importable_spine.test.ts, no connection is made on Pool construction.
-    process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_phase1_test';
-    const { GameServer } = await import('../../server/game');
-    await import('../../server/main');
-    expect(GameServer).not.toHaveBeenCalled();
-  });
+  it(
+    'a bare import of server/main constructs no GameServer',
+    async () => {
+      // db.ts evaluates a module-scope DATABASE_URL (throws if unset); dummy URL as
+      // in importable_spine.test.ts, no connection is made on Pool construction.
+      process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_phase1_test';
+      const { GameServer } = await import('../../server/game');
+      await import('../../server/main');
+      expect(GameServer).not.toHaveBeenCalled();
+    },
+    SERVER_MAIN_IMPORT_TIMEOUT_MS,
+  );
 });
 
 // startServer() binds a port, opens a WS server, and needs Postgres, so it cannot run
@@ -49,5 +55,18 @@ describe('startServer wires the game loop into /livez liveness (source pin)', ()
     // The registered source must expose the game's completed-pass clock, or /livez reads
     // an absent signal and can never detect a wedge even with the call above present.
     expect(mainSrc).toContain('lastTickAt: () => game.lastTickAt(),');
+  });
+});
+
+describe('startServer wires the discord bot counters exporter (source pin)', () => {
+  const mainSrc = readFileSync('server/main.ts', 'utf8');
+
+  it('registers the bot counters metrics on the live registry, as an ACTIVE call', () => {
+    // Same seam and same reasoning as the liveness pin above: the exporter suite
+    // builds its own private Registry, so deleting this one boot line would leave
+    // every metrics test green while /metrics rendered none of the
+    // woc_discord_bot_* series in production. The `^\s*` anchor rejects a
+    // commented-out call.
+    expect(mainSrc).toMatch(/^\s*registerDiscordBotMetrics\(httpMetrics\.registry\);/m);
   });
 });

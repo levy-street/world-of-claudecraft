@@ -11,12 +11,10 @@ players and people running their own servers at risk.
 
 Instead, report privately using one of these channels:
 
-- **GitHub private advisory (preferred).** Go to the
-  [Security tab](https://github.com/levy-street/world-of-claudecraft/security/advisories/new)
-  and open a draft advisory. This keeps the report private between you and the
-  maintainers until a fix is ready.
-- **Discord.** If you can't use GitHub advisories, send a private message to a
-  member of the **Levy St**, **Admin**, or **Devs** group on the
+- **Email (preferred).** Write to tony@levystreet.com with "Security" in the
+  subject. This reaches the maintainers directly.
+- **Discord.** Send a private message to a member of the **Levy St**, **Admin**,
+  or **Devs** group on the
   [community Discord](https://discord.com/invite/worldofclaudecraft) and ask for a secure way to
   share the details.
 
@@ -24,8 +22,17 @@ Please include as much as you can:
 
 - What the issue is and the kind of impact you think it has.
 - Steps to reproduce, or a proof of concept.
-- Affected area (offline client, online server, authentication, moderation,
-  database, and so on) and any relevant versions or commits.
+- Affected area and any relevant versions or commits.
+
+### Areas we care most about
+
+- Authentication, session and API tokens, and third-party sign-in.
+- Server authority and anti-cheat: anything that lets a client decide an outcome
+  the server is supposed to own, or reach state it should not see.
+- Privilege boundaries: the admin dashboard, moderation tooling, and dev commands.
+- Account data, payment and wallet flows, and anything that exposes another
+  player's private information.
+- Self-hosting defaults that would leave someone else's server exposed.
 
 ## What to expect
 
@@ -41,9 +48,10 @@ without permission.
 
 ## Supported versions
 
-World of ClaudeCraft is under active development and is currently pre-1.0. Security
-fixes land on the `main` branch and ship in the next release, so the most recent
-release and the current `main` are the supported targets. If you run a self-hosted
-server, please keep it up to date.
+World of ClaudeCraft is under active development and is currently pre-1.0. Fixes
+land on the active `release/vX.Y.Z` branch, which merges into `main` when that
+version ships, so the supported targets are the most recent release and the
+current release branch. Older releases do not receive backports. If you run a
+self-hosted server, please keep it up to date.
 
 Thank you for helping keep the community safe.

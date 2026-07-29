@@ -1,9 +1,8 @@
 // ---------------------------------------------------------------------------
 // Rideable ground mounts: the declarative catalog, shared host-agnostic data.
 //
-// Used by the authoritative Sim (level gates, the speed/block/crit hooks), the
-// renderer (key -> mount GLB visual), and the HUD Mounts window (rows render
-// their names/descriptions through the UI's own t() keys, keyed by MountKey).
+// Used by the authoritative Sim (reins ownership and movement speed), renderer
+// (key -> mount GLB visual), and HUD labels/tooltips.
 // It lives in sim/ so it carries no DOM/render imports and runs unchanged on
 // the server, offline, and headless.
 //
@@ -18,92 +17,104 @@ export type MountKey =
   | 'aether_hover_cycle'
   | 'shadowjump_toad'
   | 'stormfeather_griffin'
-  | 'thunderstrut_gobbler';
+  | 'thunderstrut_gobbler'
+  | 'drakemaw_raptor'
+  | 'terrorspark_groundshaker';
 
-export type MountRarity = 'common' | 'rare' | 'epic';
+export type MountRarity = 'common' | 'uncommon' | 'rare' | 'epic';
 
 export interface MountDef {
   key: MountKey;
   /** Canonical English display name (the HUD localizes via hudChrome.mounts.*). */
   name: string;
   rarity: MountRarity;
-  /** Required player level to select or ride (the card's "Mount Level"). */
-  level: number;
   /** Additive move-speed fraction while mounted (0.6 = +60% extra mobility). */
   moveSpeedPct: number;
 }
 
-// Speed/stat tiers (design directive): the purchasable horse is the 60% base;
-// the loot-only specials tier above it (70% commons, 75% rares with a little
-// crit, the 80% epics, the griffin and the gobbler, with the most block and
-// crit). The horse's level gate (20) matches the stablemaster's buy gate; the
-// loot commons ride earlier (10), the rares at 15, the epics at 20.
+// Speed tiers: the purchasable horse is the 60% base, and the collectible or
+// developer-only specials tier above it at 70 / 75 / 80% by rarity. Speed is
+// the only stat a mount grants.
+//
+// There is NO per-mount level gate. It used to exist and never once fired: the
+// reins items carry no requiredLevel, the vendor path has its own hardcoded
+// level-20 buy gate, and every drop source is level-20 content, so a character
+// could not hold a mount before its gate anyway. The single real gate is
+// ridingTrained (purchased from Marla), enforced in src/sim/mounts.ts.
 export const MOUNTS: Record<MountKey, MountDef> = {
-  // The base mount: first in the catalog, the natural default pick, sold by the
-  // stablemaster (the only purchasable mount). Level 20 to match the buy gate.
+  // The base mount: first in the catalog and sold by the stablemaster (the only
+  // purchasable mount).
   valorsteed: {
     key: 'valorsteed',
     name: 'Valorsteed',
     rarity: 'common',
-    level: 20,
     moveSpeedPct: 0.6,
   },
-  grag_bear: {
-    key: 'grag_bear',
-    name: 'Goliath Grag-Bear',
-    rarity: 'common',
-    level: 10,
+  // Uncommon tier (70%): the griffin and the toad. These are the five-man heroic
+  // drops, so they are the first specials most players collect.
+  stormfeather_griffin: {
+    key: 'stormfeather_griffin',
+    name: 'Sky-Reach Stormfeather',
+    rarity: 'uncommon',
     moveSpeedPct: 0.7,
-  },
-  stalkglider_snail: {
-    key: 'stalkglider_snail',
-    name: 'Moss-Shell Stalk-Glider',
-    rarity: 'common',
-    level: 10,
-    moveSpeedPct: 0.7,
-  },
-  aether_hover_cycle: {
-    key: 'aether_hover_cycle',
-    name: 'Aether-Jouster Hover-Cycle',
-    rarity: 'rare',
-    level: 15,
-    moveSpeedPct: 0.75,
   },
   shadowjump_toad: {
     key: 'shadowjump_toad',
     name: 'Kama-Kage the Shadow-Jump Toad',
+    rarity: 'uncommon',
+    moveSpeedPct: 0.7,
+  },
+  // Rare tier (75%): the bear and the snail.
+  grag_bear: {
+    key: 'grag_bear',
+    name: 'Goliath Grag-Bear',
     rarity: 'rare',
-    level: 15,
     moveSpeedPct: 0.75,
   },
-  stormfeather_griffin: {
-    key: 'stormfeather_griffin',
-    name: 'Sky-Reach Stormfeather',
+  stalkglider_snail: {
+    key: 'stalkglider_snail',
+    name: 'Moss-Shell Stalk-Glider',
+    rarity: 'rare',
+    moveSpeedPct: 0.75,
+  },
+  // Epic tier (80%): the hover-cycle and the gobbler come from Rift S clears.
+  // The Terrorspark Groundshaker is developer-only for now and has no
+  // player-facing acquisition, and stays LAST in the catalog (the tests pin the
+  // developer mount as the tail, so a new player-facing mount lands above it).
+  aether_hover_cycle: {
+    key: 'aether_hover_cycle',
+    name: 'Aether-Jouster Hover-Cycle',
     rarity: 'epic',
-    level: 20,
     moveSpeedPct: 0.8,
   },
   thunderstrut_gobbler: {
     key: 'thunderstrut_gobbler',
     name: 'Thunderstrut the Grand Gobbler',
     rarity: 'epic',
-    level: 20,
+    moveSpeedPct: 0.8,
+  },
+  // The Drakemaw legendary: a saddle-broken brood raptor. Its reins
+  // (content/drakelands.ts) currently have NO acquisition path; the broodlord
+  // drop was pulled and a dedicated world boss carries it in a follow-up.
+  drakemaw_raptor: {
+    key: 'drakemaw_raptor',
+    name: 'Drakemaw Raptor',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
+  terrorspark_groundshaker: {
+    key: 'terrorspark_groundshaker',
+    name: 'Terrorspark Groundshaker',
+    rarity: 'epic',
     moveSpeedPct: 0.8,
   },
 };
 
-/** Catalog order for the mount picker: level tier, then declaration order. */
+/** Catalog order: rarity tier, then declaration order. */
 export const MOUNT_KEYS = Object.keys(MOUNTS) as readonly MountKey[];
 
-/** The horse: the default stable pick and the fallback for every unknown/legacy
- *  persisted value. It is no longer free (a fresh player owns nothing): owning
- *  it means holding its reins item (reins_valorsteed), sold by the stablemaster.
- *  A persisted pick may name a mount the player does not own, which is harmless:
- *  toggleMount falls back to the first owned mount. */
-export const DEFAULT_MOUNT: MountKey = 'valorsteed';
-
 /** The steed the riding lesson lends the player. It is the same catalog mount
- *  reins_valorsteed eventually grants, ridden UNOWNED during the lesson (the one
+ *  that reins_valorsteed summons, ridden UNOWNED during the lesson (the one
  *  sanctioned unowned mount; see src/sim/mounts.ts). Shared by src/sim/mounts.ts
  *  (the summon special-case) and src/sim/mounts_training.ts. */
 export const TRAINING_MOUNT_KEY: MountKey = 'valorsteed';
@@ -118,26 +129,21 @@ export function normalizeMountKey(key: string | undefined | null): MountKey | ''
   return key && mountDef(key) ? (key as MountKey) : '';
 }
 
-/** Coerce a persisted/wire SELECTION to a valid catalog key. Unlike the live
- *  riding state (normalizeMountKey, where '' means dismounted), the stable pick
- *  always names a mount: absent/unknown values fall back to the horse. */
-export function normalizeSelectedMount(key: string | undefined | null): MountKey {
-  const normalized = normalizeMountKey(key);
-  return normalized === '' ? DEFAULT_MOUNT : normalized;
-}
-
 /** Additive move-speed fraction of the active mount ('' : 0). */
 export function mountMoveSpeedPct(mountKey: string): number {
   return mountKey ? (mountDef(mountKey)?.moveSpeedPct ?? 0) : 0;
 }
 
 // ---------------------------------------------------------------------------
-// The Highwatch Stables (zone 3): an L-shaped fenced paddock with a narrower NORTH
-// horse pasture above the full-width SOUTH open yard, plus the ambient stable
-// horses. This is the SINGLE SOURCE OF TRUTH for the stable-yard geometry: zone3
-// content (content/zone3.ts) places its fences and horse spawns from it, and
-// ambient.ts clamps the horse wander to it. Keep the numbers here so the fences
-// and horses can never drift.
+// The Galecrest Stables (relocated whole from Highwatch onto the downs
+// between the Shear and the Wreckfields): an L-shaped fenced paddock with a
+// narrower NORTH horse pasture above the full-width SOUTH open yard, plus
+// the ambient stable horses. This is the SINGLE SOURCE OF TRUTH for the
+// stable-yard geometry: zone3 content (content/zone3.ts) still defines the
+// buildings, Marla, and horse spawns (their ids and saves stay stable) but
+// places them at these Galecrest coordinates, and ambient.ts clamps the
+// horse wander to it. Keep the numbers here so the fences and horses can
+// never drift.
 // ---------------------------------------------------------------------------
 
 export interface StablePaddockDef {
@@ -158,16 +164,16 @@ export interface StablePaddockDef {
  *  src/sim/mob/ambient.ts (via STABLE_PASTURE below) as the single source of
  *  truth; do not duplicate these coordinates. Sized so the (enlarged) show-jumping
  *  race ring (MOUNT_RACE_COURSE below) fits south of the divider with clearance.
- *  The south edge (z1) keeps ~3yd clear of the deeprock_kobold camp at (75,625)
- *  r18 (its north edge is z=643), so the flattened apron never swallows the camp. */
+ *  On the Galecrest downs the rect keeps clear of the rerouted cliff road to
+ *  its east, the gale_wisp camp (moved west), and the Shear cliffs. */
 export const STABLE_PADDOCK: StablePaddockDef = {
-  x1: 54,
-  x2: 150,
-  z1: 646,
-  z2: 706,
-  pasture: { x1: 104 },
-  entrance: { x1: 84, x2: 94 },
-  divider: { z: 688 },
+  x1: 330,
+  x2: 426,
+  z1: 546,
+  z2: 606,
+  pasture: { x1: 380 },
+  entrance: { x1: 360, x2: 370 },
+  divider: { z: 588 },
 };
 
 /** The paddock terrain plateau: terrainHeight (src/sim/world.ts) blends the ground
@@ -175,8 +181,8 @@ export const STABLE_PADDOCK: StablePaddockDef = {
  *  `falloff` yards beyond the fence (the Sowfield SOWFIELD_FLAT precedent), so the
  *  course sits on flat, fair ground. Living in terrainHeight means sim collision,
  *  movement, fences, props, and the renderer all agree on the height (the repo's
- *  hard terrain invariant). `height` (7.5) is the mid of the rect's natural range
- *  (samples at seed 20061 spanned ~-2..16, mean ~7.3); `falloff` (10) keeps the
+ *  hard terrain invariant). `height` (4.5) sits just above the rect's natural means
+ *  (seed 20061 mean ~3.5, seed 42 mean ~1.1, both spot-checked dry); `falloff` (10) keeps the
  *  apron a gentle slope, not a cliff. Derived from STABLE_PADDOCK so it can never
  *  drift from the shared yard apron. The full bounding rectangle intentionally
  *  stays level so the barn cluster in the open northwest notch is not left on a
@@ -186,7 +192,7 @@ export const STABLE_FLAT = {
   x2: STABLE_PADDOCK.x2,
   z1: STABLE_PADDOCK.z1,
   z2: STABLE_PADDOCK.z2,
-  height: 7.5,
+  height: 4.5,
   falloff: 10,
 } as const;
 
@@ -201,12 +207,12 @@ export const STABLE_PASTURE = {
   zMax: STABLE_PADDOCK.z2 - PASTURE_MARGIN,
 } as const;
 
-/** Template id of the ambient Highwatch stable horse (content/zone3 mob def). The
+/** Template id of the ambient stable horse (content/zone3 mob def). The
  *  locomotion dispatcher's ambient arm (src/sim/mob/ambient.ts) routes on it. */
 export const STABLE_HORSE_TEMPLATE_ID = 'stable_horse';
 
 // ---------------------------------------------------------------------------
-// The Highwatch show-jumping race (docs-free minigame, always open): a permanent
+// The stables show-jumping race (docs-free minigame, always open): a permanent
 // course inside the paddock's south yard. Stand on the glowing platform behind
 // the start arch to arm your personal timer, clear every jump in riding order,
 // and cross the arch again before the time limit. This block is the SINGLE SOURCE OF TRUTH
@@ -251,10 +257,10 @@ export interface MountRaceCourseDef {
 }
 
 // The ring the course is laid out on: an ellipse centred in the south yard. The
-// enlarged paddock (x 54..150, south yard z 646..688) lets it grow to a proper
-// arena. Ring x spans 66..138, z spans 652..682. Clearances (ring edge to fence):
-// west 12, east 12, south 6, divider 6.
-const RACE_RING = { cx: 102, cz: 667, rx: 36, rz: 15 } as const;
+// paddock (x 330..426, south yard z 546..588) gives it a proper arena. Ring x
+// spans 342..414, z spans 552..582. Clearances (ring edge to fence): west 12,
+// east 12, south 6, divider 6.
+const RACE_RING = { cx: 378, cz: 567, rx: 36, rz: 15 } as const;
 
 /** A point + riding tangent on RACE_RING at parameter t (t=0 is the north point,
  *  increasing t rides CLOCKWISE: east along the top first). */
@@ -266,10 +272,10 @@ function ringGate(t: number, kind: RaceJumpKind): RaceGateDef {
   return { x, z, dir, kind };
 }
 
-/** The Highwatch stables race course: the arch sits east of the ring's north
+/** The stables race course: the arch sits east of the ring's north
  *  point and is ridden EASTWARD, then seven jumps circle the arena. */
 export const MOUNT_RACE_COURSE: MountRaceCourseDef = {
-  arch: { x: 114, z: RACE_RING.cz + RACE_RING.rz, dir: Math.PI / 2 },
+  arch: { x: 390, z: RACE_RING.cz + RACE_RING.rz, dir: Math.PI / 2 },
   // Half-widths of the crossing segments, sized to the bigger fixtures (props.ts):
   // the ~10yd arch and the 7.5-8yd jumps, each a touch wider than the physical
   // gate so brushing a post still counts.

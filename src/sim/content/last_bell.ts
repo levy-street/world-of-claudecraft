@@ -21,7 +21,7 @@ export const LAST_BELL_DUNGEON_DEFS: Record<string, DungeonDef> = {
   lb_tidemill: {
     id: 'lb_tidemill',
     name: 'The Tidemill',
-    index: 8,
+    index: 9,
     doorPos: { x: 930, z: 12 },
     overworldDoor: false,
     entry: { x: 0, z: -18 },
@@ -35,7 +35,7 @@ export const LAST_BELL_DUNGEON_DEFS: Record<string, DungeonDef> = {
   lb_riftline: {
     id: 'lb_riftline',
     name: 'The Rift-Line at Dusk',
-    index: 9,
+    index: 10,
     doorPos: { x: 988, z: 6 },
     overworldDoor: false,
     entry: { x: 0, z: -70 },
@@ -49,7 +49,7 @@ export const LAST_BELL_DUNGEON_DEFS: Record<string, DungeonDef> = {
   lb_vault: {
     id: 'lb_vault',
     name: 'The Drowned First Redoubt',
-    index: 10,
+    index: 11,
     doorPos: { x: 1105, z: -70 },
     overworldDoor: false,
     entry: { x: 0, z: -6 },
@@ -63,7 +63,7 @@ export const LAST_BELL_DUNGEON_DEFS: Record<string, DungeonDef> = {
   lb_council: {
     id: 'lb_council',
     name: 'The Redoubt Council',
-    index: 11,
+    index: 12,
     doorPos: { x: 822, z: 114 },
     overworldDoor: false,
     entry: { x: 0, z: -70 },
@@ -77,7 +77,7 @@ export const LAST_BELL_DUNGEON_DEFS: Record<string, DungeonDef> = {
   lb_landing: {
     id: 'lb_landing',
     name: 'The Landing at Night',
-    index: 12,
+    index: 13,
     doorPos: { x: 780, z: -30 },
     overworldDoor: false,
     entry: { x: 0, z: -50 },
@@ -91,7 +91,7 @@ export const LAST_BELL_DUNGEON_DEFS: Record<string, DungeonDef> = {
   lb_riftfields: {
     id: 'lb_riftfields',
     name: 'The Riftfields Approach',
-    index: 13,
+    index: 14,
     doorPos: { x: 1005, z: -125 },
     overworldDoor: false,
     entry: { x: 0, z: -50 },
@@ -105,7 +105,7 @@ export const LAST_BELL_DUNGEON_DEFS: Record<string, DungeonDef> = {
   lb_breach: {
     id: 'lb_breach',
     name: 'Inside the Breach',
-    index: 14,
+    index: 15,
     doorPos: { x: 1012, z: -160 },
     overworldDoor: false,
     entry: { x: 0, z: -60 },
@@ -119,7 +119,7 @@ export const LAST_BELL_DUNGEON_DEFS: Record<string, DungeonDef> = {
   lb_lastwatch: {
     id: 'lb_lastwatch',
     name: 'The Last Watch',
-    index: 15,
+    index: 16,
     doorPos: { x: 822, z: 114 },
     overworldDoor: false,
     entry: { x: 0, z: -70 },
@@ -133,7 +133,7 @@ export const LAST_BELL_DUNGEON_DEFS: Record<string, DungeonDef> = {
   lb_willowfen: {
     id: 'lb_willowfen',
     name: 'Willowweep',
-    index: 16,
+    index: 17,
     doorPos: { x: 813, z: 128 },
     overworldDoor: false,
     entry: { x: 0, z: -32 },

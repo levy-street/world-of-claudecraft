@@ -6,7 +6,10 @@
 //   idle -> (interact with the quest active) -> walking -> ambush (paused
 //   until the wave is dead) -> ... -> final waypoint -> credit + despawn ->
 //   respawn after def.respawnSeconds. Escortee death fails the run the same
-//   respawn way, so the quest is simply retried.
+//   respawn way, so the quest is simply retried. A wave mob that evades keeps
+//   its normal leash contract (it walks home and resets); once it lands idle
+//   with an empty hate table the driver re-commits it to the escortee, so a
+//   kited wave can never wedge the walk until the timeout.
 //
 // The escortee is an ordinary non-hostile mob entity, so it rides the normal
 // entity snapshot to clients with no new wire plumbing. Players cannot attack
@@ -106,14 +109,6 @@ export function isActiveEscortee(ctx: SimContext, e: Entity): boolean {
   return false;
 }
 
-function idleEscortDefFor(ctx: SimContext, e: Entity): EscortDef | null {
-  for (const state of ctx.escortRuns.values()) {
-    if (state.npcId !== e.id || state.run !== null) continue;
-    return ESCORTS[state.escortId] ?? null;
-  }
-  return null;
-}
-
 // Interact hook: if this player stands near an idle escortee whose quest they
 // have active, start the run. Called with the player's explicit target first,
 // then with a proximity scan fallback (interaction.ts). Returns true when a
@@ -168,7 +163,21 @@ function fireAmbushes(ctx: SimContext, def: EscortDef, state: EscortRunState, np
         npc.pos.z + Math.cos(angle) * radius,
       );
       const mob = createMob(ctx.nextId++, template, template.minLevel, pos);
+      // A slain wave mob unravels once its corpse decays (the summoned-add arm
+      // in mob/locomotion.ts) instead of riding the generic in-place respawn:
+      // a wave that respawned 25s after being cut down would re-enter
+      // ambushIds' live count and wedge (or re-attack) a still-walking run.
+      mob.summonedAdd = true;
       ctx.addEntity(mob);
+      // A wave mob belongs to the RUN, not to the world: it was never placed by
+      // a CAMP, so it must never respawn in place. Without this a killed
+      // ambusher came back as a permanent orphan spawn (handleDeath gives every
+      // mob a respawnTimer and updateMob revives it), so each run silently added
+      // its whole wave to the zone forever. That is the mob-pile players
+      // reported along the escort routes in the July zones.
+      // It also keeps the walk honest: a wave that revived mid-run would make
+      // liveAmbushCount non-zero again and pause the escortee indefinitely.
+      mob.runScoped = true;
       // Commit the wave to the escortee, social_aggro-style; player damage
       // out-threats the seed immediately via the normal pull-over rules.
       mob.aiState = 'chase';
@@ -178,6 +187,33 @@ function fireAmbushes(ctx: SimContext, def: EscortDef, state: EscortRunState, np
       addThreat(mob, npc.id, ESCORT_SEED_THREAT);
       run.ambushIds.push(mob.id);
     }
+  }
+}
+
+// A live wave mob whose evade completed (it walked home, resetEvadingMob ran,
+// and it now sits idle with an empty hate table) re-commits to the escortee,
+// mirroring the spawn seed in fireAmbushes. Strictly `idle`: touching the
+// `evade` state would fire on the leash-break tick itself (the leash prelude
+// clears threat and enters `evade` in one step, and this driver runs later
+// the same tick), re-anchoring the leash at the kite spot and making the wave
+// leash-immune. Waiting for `idle` preserves the full walk-home reset. Never
+// touches an engaged mob (threat non-empty) or a fleeing one (a flee keeps
+// its table). Draws no rng.
+function recommitEvadedAmbushers(
+  ctx: SimContext,
+  run: NonNullable<EscortRunState['run']>,
+  npc: Entity,
+): void {
+  for (const id of run.ambushIds) {
+    const mob = ctx.entities.get(id);
+    if (!mob || mob.dead) continue;
+    if (mob.aiState !== 'idle') continue;
+    if (mob.threat.size > 0) continue;
+    mob.aiState = 'chase';
+    mob.aggroTargetId = npc.id;
+    mob.inCombat = true;
+    mob.leashAnchor = { ...mob.pos };
+    addThreat(mob, npc.id, ESCORT_SEED_THREAT);
   }
 }
 
@@ -198,11 +234,12 @@ function endRun(
   outcome: 'success' | 'fail',
 ): void {
   if (npc) emitMobYell(ctx, npc, outcome === 'success' ? def.successText : def.failText);
-  // Surviving ambush mobs leave with the run (a failed wave never lingers to
-  // camp the respawned escortee).
+  // Ambush mobs leave with the run, DEAD ONES INCLUDED (a failed wave never
+  // lingers to camp the respawned escortee, and a slain one must not be left as
+  // a permanent corpse now that it can no longer respawn away). Dropping by id
+  // covers both states, so nothing from the wave outlives its run.
   for (const id of state.run?.ambushIds ?? []) {
-    const mob = ctx.entities.get(id);
-    if (mob && !mob.dead) ctx.dropEntity(id);
+    if (ctx.entities.has(id)) ctx.dropEntity(id);
   }
   if (state.npcId !== null) ctx.dropEntity(state.npcId);
   state.npcId = null;
@@ -220,7 +257,7 @@ function creditEscort(ctx: SimContext, def: EscortDef, npc: Entity): void {
   const objective = quest.objectives[objectiveIndex];
   for (const meta of ctx.players.values()) {
     const qp = meta.questLog.get(def.questId);
-    if (!qp || qp.state !== 'active') continue;
+    if (qp?.state !== 'active') continue;
     const p = ctx.entities.get(meta.entityId);
     if (!p || p.dead || dist2d(p.pos, npc.pos) > def.creditRadius) continue;
     const required = questObjectiveRequired(quest, qp, objectiveIndex);
@@ -262,8 +299,15 @@ export function updateEscorts(ctx: SimContext): void {
       continue;
     }
     // An ambush wave holds the walk: the escortee waits while any of its
-    // attackers still stands.
-    if (liveAmbushCount(ctx, run) > 0) continue;
+    // attackers still stands. A wave mob that EVADED (a player kited it past
+    // its leash, then died, stealthed, or ran) walks home, resets, and lands
+    // idle with a cleared hate table; it would otherwise stand there until
+    // the run timeout: re-commit it to the escortee so the wave resumes the
+    // attack and the run always resolves one way or the other.
+    if (liveAmbushCount(ctx, run) > 0) {
+      recommitEvadedAmbushers(ctx, run, npc);
+      continue;
+    }
     // Past the last waypoint with every wave down (a final-waypoint ambush
     // resolves here on the tick after its wave dies): the escort succeeds.
     if (run.waypointIndex >= def.waypoints.length) {

@@ -7,6 +7,102 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: 'Vessillo in Mano',
+    desc: 'Cattura una bandiera ai Campi di Thornhollow.',
+  },
+  pvp_bg_first_win: {
+    name: 'La Valletta Resiste',
+    desc: 'Vinci una battaglia ai Campi di Thornhollow.',
+  },
+  pvp_bg_wins_25: {
+    name: 'Guardiano della Valletta',
+    desc: 'Vinci 25 battaglie ai Campi di Thornhollow.',
+    title: 'Portabandiera',
+  },
+  pvp_bg_captures_100: {
+    name: 'Cento Vessilli',
+    desc: 'Cattura 100 bandiere ai Campi di Thornhollow nel corso della tua carriera.',
+  },
+  dgn_rift: {
+    name: 'Camminasquarci',
+    desc: 'Completa uno Squarcio sconfiggendo il suo boss di piano.',
+  },
+  dgn_rift_s_rank: {
+    name: 'Sovrano degli Squarci',
+    desc: 'Completa uno Squarcio di rango S, il livello più difficile che un portale di Squarcio può generare.',
+  },
+  pvp_honor_sergeant: {
+    name: 'Sergente',
+    desc: 'Guadagna 10.000 Onore nel corso della tua vita. Spenderlo non ti farà mai perdere il grado.',
+    title: 'Sergente',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: 'Cavaliere-Luogotenente',
+    desc: 'Guadagna 40.000 Onore nel corso della tua vita, una stagione di guerra vera alle spalle.',
+    title: 'Cavaliere-Luogotenente',
+  },
+  pvp_honor_field_marshal: {
+    name: 'Maresciallo di Campo',
+    desc: 'Guadagna 150.000 Onore nel corso della tua vita. Raro in qualsiasi reame, ed è giusto che sia così.',
+    title: 'Maresciallo di Campo',
+  },
+  chr_drakemaw_broodlord: {
+    name: 'Spezzacovata',
+    desc: 'Uccidi un Signore della covata di Drakemaw tra le sue uova, superando il grido, il fendente e il fuoco.',
+  },
+  chr_maw_matriarch: {
+    name: 'Il Cielo Tace',
+    desc: 'Uccidi Cindraleth, la Matriarca delle Fauci, nel suo nido nel cratere sopra il Drakemaw.',
+  },
+  chr_frostveil_gatherer: {
+    name: 'Raccolto sui terrazzamenti',
+    desc: 'Raccogli una vena di minerale, un gruppo di legna e un appezzamento d erbe nel Frostveil.',
+  },
+  chr_frostveil_first_cast: {
+    name: 'Primo ghiaccio sul lago',
+    desc: 'Pesca un pesce nelle acque del Frostveil.',
+  },
+  chr_amberfall_gatherer: {
+    name: 'Il raccolto di Amberfall',
+    desc: 'Raccogli una vena di minerale, un gruppo di legna e un appezzamento d erbe ad Amberfall.',
+  },
+  chr_amberfall_first_cast: {
+    name: 'Una preda dalla grande palude',
+    desc: 'Pesca un pesce nelle acque di Amberfall.',
+  },
+  chr_nightbloom_gatherer: {
+    name: 'Il raccolto sognante',
+    desc: 'Raccogli una vena di minerale, un gruppo di legna e un appezzamento d erbe a Nightbloom.',
+  },
+  chr_nightbloom_first_cast: {
+    name: 'Un increspatura sul pozzo lunare',
+    desc: 'Pesca un pesce nelle acque di Nightbloom.',
+  },
+  chr_wraithwood_gatherer: {
+    name: 'Raccolto sotto la volta',
+    desc: 'Raccogli una vena di minerale, un gruppo di legna e un appezzamento d erbe nel Wraithwood.',
+  },
+  chr_wraithwood_first_cast: {
+    name: 'Un lancio nella baia dello specchio',
+    desc: 'Pesca un pesce nelle acque del Wraithwood.',
+  },
+  chr_palmreach_gatherer: {
+    name: 'Raccolto sulla spiaggia di palme',
+    desc: 'Raccogli una vena di minerale, un gruppo di legna e un appezzamento d erbe a Palmreach.',
+  },
+  chr_palmreach_first_cast: {
+    name: 'Lancio nella laguna di zaffiro',
+    desc: 'Pesca un pesce nelle acque di Palmreach.',
+  },
+  chr_evergarden_gatherer: {
+    name: 'Il dono del parterre',
+    desc: 'Raccogli una vena di minerale, un gruppo di legna e un appezzamento d erbe a Evergarden.',
+  },
+  chr_evergarden_first_cast: {
+    name: 'Un lancio sullo stagno dei petali',
+    desc: 'Pesca un pesce nelle acque di Evergarden.',
+  },
   pvp_card_duel_first_win: {
     name: 'Regole di Casa',
     desc: 'Vinci un Duello di Carte dal Maestro delle Carte.',
@@ -91,7 +187,7 @@ export const table: DeedLocaleTable = {
   },
   prog_master_gatherer: {
     name: 'Maestro Raccoglitore',
-    desc: 'Raggiungi 100 di competenza in Estrazione, Disboscamento ed Erboristeria.',
+    desc: 'Raggiungi 100 di competenza in almeno tre tra Estrazione, Disboscamento, Erboristeria e Pesca.',
   },
   prog_first_craft: {
     name: 'Fatto a Mano',
@@ -452,7 +548,7 @@ export const table: DeedLocaleTable = {
   },
   col_glimmerfin: {
     name: 'Un Barlume di Speranza',
-    desc: 'Pesca un Koi dalle pinne scintillanti.',
+    desc: 'Cattura un Koi del Bagliore Solare.',
   },
   col_full_creel: {
     name: 'Cesta Piena',
@@ -650,7 +746,10 @@ export const table: DeedLocaleTable = {
     name: 'Qualcosa che Luccica',
     desc: 'Raccogli da terra un oggetto scintillante.',
   },
-  exp_first_ore: { name: 'Giù il Piccone', desc: 'Raccogli il tuo primo nodo di minerale.' },
+  exp_first_ore: {
+    name: 'Il Piccone Incontra la Roccia',
+    desc: 'Raccogli il tuo primo nodo di minerale.',
+  },
   exp_first_timber: { name: "Cade l'Albero!", desc: 'Raccogli il tuo primo nodo di legname.' },
   exp_first_herb: { name: 'Pollice Verde', desc: 'Raccogli il tuo primo nodo di erbe.' },
   feat_era_cap: {
@@ -725,5 +824,200 @@ export const table: DeedLocaleTable = {
   chr_marsh_first_cast: {
     name: 'Anguille tra le Canne',
     desc: 'Pesca un pesce nelle acque della Palude di Mirefen.',
+  },
+  prog_guildsworn: {
+    name: 'Giurato del Mestiere',
+    desc: 'Sintonizzati su una coppia di archetipi e abbraccia i suoi mestieri con dedizione.',
+    title: 'Giurato del Mestiere',
+  },
+  prog_masterwright: {
+    name: 'Mastro Artefice',
+    desc: 'Forgia il tuo primo capolavoro, un pezzo tanto pregiato che tutta la zona ne viene a sapere.',
+    title: 'Mastro Artefice',
+  },
+  prog_fishing_100: {
+    name: 'Vecchio Sale',
+    desc: 'Raggiungi 100 di competenza in Pesca.',
+  },
+  prog_master_angler: {
+    name: 'Maestro Pescatore',
+    desc: "Raggiungi 200 di competenza in Pesca, il vertice assoluto dell'arte del pescatore.",
+    title: 'Maestro Pescatore',
+  },
+  prog_engineering_50: {
+    name: 'Ingranaggi e Molle',
+    desc: 'Raggiungi 50 di abilita in Ingegneria.',
+  },
+  prog_alchemy_50: {
+    name: 'Strane Misture',
+    desc: 'Raggiungi 50 di abilita in Alchimia.',
+  },
+  prog_cooking_50: {
+    name: 'Chef Esperto',
+    desc: 'Raggiungi 50 di abilita in Cucina.',
+  },
+  prog_leatherworking_50: {
+    name: 'Mestiere del Conciatore',
+    desc: 'Raggiungi 50 di abilita in Lavorazione del Cuoio.',
+  },
+  prog_tailoring_50: {
+    name: 'Una Cucitura Pregiata',
+    desc: 'Raggiungi 50 di abilita in Sartoria.',
+  },
+  prog_enchanting_50: {
+    name: 'Un Bagliore di Arcana',
+    desc: 'Raggiungi 50 di abilita in Incantamento.',
+  },
+  prog_weaponcrafting_50: {
+    name: 'Affilato e Temprato',
+    desc: 'Raggiungi 50 di abilita in Forgiatura di Armi.',
+  },
+  prog_armorcrafting_50: {
+    name: 'Martello e Piastra',
+    desc: 'Raggiungi 50 di abilita in Forgiatura di Armature.',
+  },
+  prog_grandmaster_engineering: {
+    name: 'Grande Maestro Ingegneria',
+    desc: 'Raggiungi 125 di abilita in Ingegneria, il vertice assoluto del mestiere.',
+    title: 'Grande Maestro Ingegnere',
+  },
+  prog_grandmaster_alchemy: {
+    name: 'Grande Maestro Alchimia',
+    desc: 'Raggiungi 125 di abilita in Alchimia, il vertice assoluto del mestiere.',
+    title: 'Grande Maestro Alchimista',
+  },
+  prog_grandmaster_cooking: {
+    name: 'Grande Maestro Cucina',
+    desc: 'Raggiungi 125 di abilita in Cucina, il vertice assoluto del mestiere.',
+    title: 'Grande Maestro Cuoco',
+  },
+  prog_grandmaster_leatherworking: {
+    name: 'Grande Maestro Lavorazione del Cuoio',
+    desc: 'Raggiungi 125 di abilita in Lavorazione del Cuoio, il vertice assoluto del mestiere.',
+    title: 'Grande Maestro Conciatore',
+  },
+  prog_grandmaster_tailoring: {
+    name: 'Grande Maestro Sartoria',
+    desc: 'Raggiungi 125 di abilita in Sartoria, il vertice assoluto del mestiere.',
+    title: 'Grande Maestro Sarto',
+  },
+  prog_grandmaster_enchanting: {
+    name: 'Grande Maestro Incantamento',
+    desc: 'Raggiungi 125 di abilita in Incantamento, il vertice assoluto del mestiere.',
+    title: 'Grande Maestro Incantatore',
+  },
+  prog_grandmaster_weaponcrafting: {
+    name: 'Grande Maestro Forgiatura di Armi',
+    desc: 'Raggiungi 125 di abilita in Forgiatura di Armi, il vertice assoluto del mestiere.',
+    title: "Gran Maestro Forgiatore d'Armi",
+  },
+  prog_grandmaster_armorcrafting: {
+    name: 'Grande Maestro Forgiatura di Armature',
+    desc: 'Raggiungi 125 di abilita in Forgiatura di Armature, il vertice assoluto del mestiere.',
+    title: "Grande Maestro Forgiatore d'Armature",
+  },
+  col_pristine_vein: {
+    name: 'Filone Intatto',
+    desc: "Spacca una vena incontaminata e fa' sapere a tutta la zona della scoperta.",
+  },
+  col_ancient_heartwood: {
+    name: 'Cuore di Legno Antico',
+    desc: 'Ricava un tratto di antico durame da un albero abbattuto.',
+  },
+  col_moonlit_bloom: {
+    name: 'Fiore di Luna',
+    desc: 'Cogli una fioritura illuminata dalla luna nel preciso istante in cui si schiude.',
+  },
+  col_perfect_specimen: {
+    name: 'Un Esemplare Perfetto',
+    desc: 'Preleva un esemplare perfetto da una bestia abbattuta, senza un graffio ne un difetto.',
+  },
+  soc_first_salvage: {
+    name: 'Nulla Va Sprecato',
+    desc: "Smantella un pezzo d'equipaggiamento ricavandone materie prime.",
+  },
+  soc_salvage_50: {
+    name: 'Il Cantiere dei Demolitore',
+    desc: "Smantella 50 pezzi d'equipaggiamento ricavandone materie prime.",
+  },
+  dgn_wildheart_basin: {
+    name: 'Il Bacino Morde Ancora',
+    desc: 'Sconfiggi Zulgar, Voce del Bacino, nel Bacino di Wildheart.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Eroico: Il Bacino di Wildheart',
+    desc: 'Sconfiggi Zulgar, Voce del Bacino, nel Bacino di Wildheart in difficoltà Eroica.',
+  },
+  chr_peaks_gatherer: {
+    name: 'Raccolto delle Alture',
+    desc: "Raccogli una vena di minerale, un ceppo di legname e una macchia d'erbe sulle Alture di Thornpeak.",
+  },
+  chr_marsh_rares_ii: {
+    name: 'Il Ghiottone, Messo in Conto',
+    desc: 'Uccidi Grubjaw il Ghiottone, un quarto terrore famigerato della Palude di Mirefen rimasto fuori dal primo conteggio.',
+  },
+  chr_peaks_rares_ii: {
+    name: 'Altri Nomi Incisi nella Rupe',
+    desc: 'Uccidi il Vecchio Cragmaw e il Signore delle Schegge Kazzix, altri due terrori famigerati delle Alture di Thornpeak rimasti fuori dal primo conteggio.',
+  },
+  chr_gleamstag: {
+    name: 'La Leggenda che Non Colpiva per Prima',
+    desc: 'Uccidi il Cervo Lucente, un élite raro e schivo che non attacca se non viene messo alle strette.',
+  },
+  chr_hollow_rares: {
+    name: 'Il Branco Ricorda',
+    desc: 'Uccidi il Vecchio Marrowshell e Aurelhorn, Primo del Branco, i due boss rari erranti della Valletta.',
+  },
+  chr_willowfen_gatherer: {
+    name: "L'Abbondanza del Willowfen",
+    desc: "Raccogli una vena di minerale, un ceppo di legname e una macchia d'erbe nel Willowfen.",
+  },
+  chr_willowfen_first_cast: {
+    name: 'Increspature nelle Lilymoors',
+    desc: 'Pesca un pesce nelle acque del Willowfen.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Raccolto sul Promontorio',
+    desc: "Raccogli una vena di minerale, un ceppo di legname e una macchia d'erbe nel Galecrest.",
+  },
+  chr_galecrest_first_cast: {
+    name: 'Una Lenza nel Laghetto Specchio',
+    desc: 'Pesca un pesce nelle acque del Galecrest.',
+  },
+  chr_farshore_gatherer: {
+    name: "Provviste dell'Isola",
+    desc: "Raccogli una vena di minerale, un ceppo di legname e una macchia d'erbe sul Farshore.",
+  },
+  chr_farshore_first_cast: {
+    name: 'Ciò che Sanno i Gabbiani',
+    desc: 'Pesca un pesce nelle acque del Farshore.',
+  },
+  prog_engineering_rare: {
+    name: 'Ingegneria di precisione',
+    desc: 'Forgia il tuo primo oggetto di qualità rara in Ingegneria.',
+  },
+  prog_alchemy_rare: {
+    name: "Un'annata rara",
+    desc: 'Forgia il tuo primo oggetto di qualità rara in Alchimia.',
+  },
+  prog_cooking_rare: {
+    name: 'Un piatto da ricordare',
+    desc: 'Forgia il tuo primo oggetto di qualità rara in Cucina.',
+  },
+  prog_leatherworking_rare: {
+    name: 'Concia raffinata',
+    desc: 'Forgia il tuo primo oggetto di qualità rara in Lavorazione del Cuoio.',
+  },
+  prog_tailoring_rare: {
+    name: 'Un punto da maestro',
+    desc: 'Forgia il tuo primo oggetto di qualità rara in Sartoria.',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Temprato fino a brillare',
+    desc: 'Forgia il tuo primo oggetto di qualità rara in Forgiatura di Armi.',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Placcato alla perfezione',
+    desc: 'Forgia il tuo primo oggetto di qualità rara in Forgiatura di Armature.',
   },
 };

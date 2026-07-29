@@ -7,6 +7,102 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: 'Banér i hand',
+    desc: 'Erövra en flagga i Törnhålefälten.',
+  },
+  pvp_bg_first_win: {
+    name: 'Hålan håller',
+    desc: 'Vinn en drabbning i Törnhålefälten.',
+  },
+  pvp_bg_wins_25: {
+    name: 'Hålans väktare',
+    desc: 'Vinn 25 drabbningar i Törnhålefälten.',
+    title: 'Flaggbärare',
+  },
+  pvp_bg_captures_100: {
+    name: 'Hundra banér',
+    desc: 'Erövra 100 flaggor i Törnhålefälten under din karriär.',
+  },
+  dgn_rift: {
+    name: 'Revvandrare',
+    desc: 'Rensa en reva genom att besegra dess våningsboss.',
+  },
+  dgn_rift_s_rank: {
+    name: 'Revhärskare',
+    desc: 'Rensa en reva av grad S, den svåraste graden en revportal kan skapa.',
+  },
+  pvp_honor_sergeant: {
+    name: 'Sergeant',
+    desc: 'Tjäna in 10 000 heder under din livstid. Att spendera den kostar dig aldrig rangen.',
+    title: 'Sergeant',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: 'Riddarlöjtnant',
+    desc: 'Tjäna in 40 000 heder under din livstid, en säsong av verkligt krig bakom dig.',
+    title: 'Riddarlöjtnant',
+  },
+  pvp_honor_field_marshal: {
+    name: 'Fältmarskalk',
+    desc: 'Tjäna in 150 000 heder under din livstid. Sällsynt i alla riken, och så borde det vara.',
+    title: 'Fältmarskalk',
+  },
+  chr_drakemaw_broodlord: {
+    name: 'Kullbrytaren',
+    desc: 'Fäll en Drakgapets kullherre bland dess ägg, genom vrålet, klyvhugget och elden.',
+  },
+  chr_maw_matriarch: {
+    name: 'Himlen tystnar',
+    desc: 'Fäll Cindraleth, Gapets matriark, i hennes kraterbo ovanför Drakgapet.',
+  },
+  chr_frostveil_gatherer: {
+    name: 'Skord pa terrasserna',
+    desc: 'Skorda en malmadra, ett tradbestand och en ortbadd i Frostveil.',
+  },
+  chr_frostveil_first_cast: {
+    name: 'Forsta isen pa tjarnen',
+    desc: 'Fanga en fisk i Frostveils vatten.',
+  },
+  chr_amberfall_gatherer: {
+    name: 'Amberfalls skord',
+    desc: 'Skorda en malmadra, ett tradbestand och en ortbadd i Amberfall.',
+  },
+  chr_amberfall_first_cast: {
+    name: 'En fangst fran stormyren',
+    desc: 'Fanga en fisk i Amberfalls vatten.',
+  },
+  chr_nightbloom_gatherer: {
+    name: 'Den drommande skorden',
+    desc: 'Skorda en malmadra, ett tradbestand och en ortbadd i Nightbloom.',
+  },
+  chr_nightbloom_first_cast: {
+    name: 'En ring pa manbrunnen',
+    desc: 'Fanga en fisk i Nightblooms vatten.',
+  },
+  chr_wraithwood_gatherer: {
+    name: 'Skord under lovtaket',
+    desc: 'Skorda en malmadra, ett tradbestand och en ortbadd i Wraithwood.',
+  },
+  chr_wraithwood_first_cast: {
+    name: 'Ett kast i spegelviken',
+    desc: 'Fanga en fisk i Wraithwoods vatten.',
+  },
+  chr_palmreach_gatherer: {
+    name: 'Skord pa palmstranden',
+    desc: 'Skorda en malmadra, ett tradbestand och en ortbadd i Palmreach.',
+  },
+  chr_palmreach_first_cast: {
+    name: 'Kast i safirlagunen',
+    desc: 'Fanga en fisk i Palmreachs vatten.',
+  },
+  chr_evergarden_gatherer: {
+    name: 'Parterrens gava',
+    desc: 'Skorda en malmadra, ett tradbestand och en ortbadd i Evergarden.',
+  },
+  chr_evergarden_first_cast: {
+    name: 'Ett kast pa kronbladsdammen',
+    desc: 'Fanga en fisk i Evergardens vatten.',
+  },
   pvp_card_duel_first_win: {
     name: 'Husregler',
     desc: 'Vinn en kortduell hos Kortmästaren.',
@@ -64,7 +160,7 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: 'Ängens mästare', desc: 'Nå 100 i färdigheten Örtkunskap.' },
   prog_master_gatherer: {
     name: 'Mästersamlare',
-    desc: 'Nå 100 i färdigheterna Gruvdrift, Timmerhuggning och Örtkunskap.',
+    desc: 'Nå 100 i skicklighet i tre valfria av Gruvdrift, Skogsavverkning, Örtkunskap och Fiske.',
   },
   prog_first_craft: { name: 'Handgjort', desc: 'Slutför ditt första lyckade hantverk.' },
   prog_craft_specialist: {
@@ -405,7 +501,10 @@ export const table: DeedLocaleTable = {
     name: 'Stamkund',
     desc: 'Upptäck alla tio delar av den heroiska kvartersmästarens utbud.',
   },
-  col_glimmerfin: { name: 'Ett skimmer av hopp', desc: 'Fånga en skimmerfenad koi.' },
+  col_glimmerfin: {
+    name: 'Ett skimmer av hopp',
+    desc: 'Fanga en Solglintens koi.',
+  },
   col_full_creel: {
     name: 'Full fiskekorg',
     desc: 'Upptäck alla sex vanliga fångster ur dalens, träskets och höjdernas vatten.',
@@ -566,7 +665,10 @@ export const table: DeedLocaleTable = {
     name: 'Något som glimmar',
     desc: 'Plocka upp ett gnistrande föremål från marken.',
   },
-  exp_first_ore: { name: 'Hugg i berget', desc: 'Skörda din första malmådra.' },
+  exp_first_ore: {
+    name: 'Hackan mot stenen',
+    desc: 'Skörda din första malmådra.',
+  },
   exp_first_timber: { name: 'Träd faller!', desc: 'Skörda ditt första timmerbestånd.' },
   exp_first_herb: { name: 'Gröna fingrar', desc: 'Skörda ditt första örtstånd.' },
   feat_era_cap: { name: 'Första erans barn', desc: 'Nådde nivå 20 medan Första eran ännu rådde.' },
@@ -624,4 +726,199 @@ export const table: DeedLocaleTable = {
     desc: 'Trotsa Den övergivna kryptan och återta båda nyckelstenshalvorna och den uråldriga dagboken från dess väktare.',
   },
   chr_marsh_first_cast: { name: 'Ålar i vassen', desc: 'Fånga en fisk ur Dykärrsträskets vatten.' },
+  prog_guildsworn: {
+    name: 'Hantverkssvuren',
+    desc: 'Inrikta dig på ett arketyppar och ta upp dess hantverk på allvar.',
+    title: 'Hantverkssvuren',
+  },
+  prog_masterwright: {
+    name: 'Mästerhantverkaren',
+    desc: 'Slutför ditt första mästerverk, ett alster så fint att hela zonen hör talas om det.',
+    title: 'Mästerhantverkaren',
+  },
+  prog_fishing_100: {
+    name: 'Gamla saltet',
+    desc: 'Nå 100 i skickligheten Fiske.',
+  },
+  prog_master_angler: {
+    name: 'Mästarfiskaren',
+    desc: 'Nå 200 i skickligheten Fiske, den absoluta toppen av fiskarkonsten.',
+    title: 'Mästarfiskaren',
+  },
+  prog_engineering_50: {
+    name: 'Kugghjul och fjädrar',
+    desc: 'Nå 50 i skickligheten Ingenjörskonst.',
+  },
+  prog_alchemy_50: {
+    name: 'Konstiga brygder',
+    desc: 'Nå 50 i skickligheten Alkemi.',
+  },
+  prog_cooking_50: {
+    name: 'Kryddad kock',
+    desc: 'Nå 50 i skickligheten Matlagning.',
+  },
+  prog_leatherworking_50: {
+    name: 'Garvarens handel',
+    desc: 'Nå 50 i skickligheten Läderhantverkeri.',
+  },
+  prog_tailoring_50: {
+    name: 'En fin söm',
+    desc: 'Nå 50 i skickligheten Skrädderi.',
+  },
+  prog_enchanting_50: {
+    name: 'En glimt av arkanamagi',
+    desc: 'Nå 50 i skickligheten Förtrollning.',
+  },
+  prog_weaponcrafting_50: {
+    name: 'Egg och härdning',
+    desc: 'Nå 50 i skickligheten Vapensmide.',
+  },
+  prog_armorcrafting_50: {
+    name: 'Hammare och plåt',
+    desc: 'Nå 50 i skickligheten Rustningssmide.',
+  },
+  prog_grandmaster_engineering: {
+    name: 'Stormästare i Ingenjörskonst',
+    desc: 'Nå 125 i skickligheten Ingenjörskonst, den absoluta toppen av hantverket.',
+    title: 'Stormästare i Ingenjörskonst',
+  },
+  prog_grandmaster_alchemy: {
+    name: 'Stormästare i Alkemi',
+    desc: 'Nå 125 i skickligheten Alkemi, den absoluta toppen av hantverket.',
+    title: 'Stormästare i Alkemi',
+  },
+  prog_grandmaster_cooking: {
+    name: 'Stormästare i Matlagning',
+    desc: 'Nå 125 i skickligheten Matlagning, den absoluta toppen av hantverket.',
+    title: 'Stormästare i Matlagning',
+  },
+  prog_grandmaster_leatherworking: {
+    name: 'Stormästare i Läderhantverkeri',
+    desc: 'Nå 125 i skickligheten Läderhantverkeri, den absoluta toppen av hantverket.',
+    title: 'Stormästare i Läderhantverkeri',
+  },
+  prog_grandmaster_tailoring: {
+    name: 'Stormästare i Skrädderi',
+    desc: 'Nå 125 i skickligheten Skrädderi, den absoluta toppen av hantverket.',
+    title: 'Stormästare i Skrädderi',
+  },
+  prog_grandmaster_enchanting: {
+    name: 'Stormästare i Förtrollning',
+    desc: 'Nå 125 i skickligheten Förtrollning, den absoluta toppen av hantverket.',
+    title: 'Stormästare i Förtrollning',
+  },
+  prog_grandmaster_weaponcrafting: {
+    name: 'Stormästare i Vapensmide',
+    desc: 'Nå 125 i skickligheten Vapensmide, den absoluta toppen av hantverket.',
+    title: 'Stormästare i Vapensmide',
+  },
+  prog_grandmaster_armorcrafting: {
+    name: 'Stormästare i Rustningssmide',
+    desc: 'Nå 125 i skickligheten Rustningssmide, den absoluta toppen av hantverket.',
+    title: 'Stormästare i Rustningssmide',
+  },
+  col_pristine_vein: {
+    name: 'Orörd ådra',
+    desc: 'Spräng upp en orörd ådra och låt hela zonen höra talas om det.',
+  },
+  col_ancient_heartwood: {
+    name: 'Gammal kärnved',
+    desc: 'Bärga ett stycke gammal kärnved ur ett fällt bestånd.',
+  },
+  col_moonlit_bloom: {
+    name: 'Månbelyst blomning',
+    desc: 'Skörda en månbelyst blomning i just det ögonblick den öppnar sig.',
+  },
+  col_perfect_specimen: {
+    name: 'Ett perfekt specimen',
+    desc: 'Ta ett perfekt specimen från ett skördat djur, utan ett enda jack eller en fläck.',
+  },
+  soc_first_salvage: {
+    name: 'Slösa inte',
+    desc: 'Bärga en utrustningspjäs tillbaka till råmaterial.',
+  },
+  soc_salvage_50: {
+    name: 'Rivningsgården',
+    desc: 'Bärga 50 utrustningspjäser tillbaka till råmaterial.',
+  },
+  dgn_wildheart_basin: {
+    name: 'Bassängen bits tillbaka',
+    desc: 'Besegra Zulgar, Bassängens röst, i Vildhjärtats bassäng.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Heroisk: Vildhjärtats bassäng',
+    desc: 'Besegra Zulgar, Bassängens röst, i Vildhjärtats bassäng på heroisk svårighetsgrad.',
+  },
+  chr_peaks_gatherer: {
+    name: 'Höjdernas skörd',
+    desc: 'Skörda en malmåder, en virkesdunge och en örttäppa i Törntoppshöjderna.',
+  },
+  chr_marsh_rares_ii: {
+    name: 'Frossaren, uppräknad',
+    desc: 'Dräp Grävkäft Frossaren, en fjärde namnkunnig fasa i Dykärrsträsket som lämnades utanför den första räkningen.',
+  },
+  chr_peaks_rares_ii: {
+    name: 'Fler namn ristade i klippan',
+    desc: 'Dräp Gamle Klippkäft och Skärvherre Kazzix, två namnkunniga fasor till i Törntoppshöjderna som lämnades utanför den första räkningen.',
+  },
+  chr_gleamstag: {
+    name: 'Legenden som aldrig slog först',
+    desc: 'Dräp Skimmerhjorten, en sällsynt och skygg elit som bara anfaller när den trängs in i ett hörn.',
+  },
+  chr_hollow_rares: {
+    name: 'Hjorden minns',
+    desc: 'Dräp Gamla Märgskal och Aurelhorn, Först i hjorden, Slöjhålans två vandrande sällsynta bossar.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Kärrmarkens gåvor',
+    desc: 'Skörda en malmåder, en virkesdunge och en örttäppa i Pilkärret.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Ringar på Liljemyrarna',
+    desc: 'Fånga en fisk ur Pilkärrets vatten.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Skörd på näset',
+    desc: 'Skörda en malmåder, en virkesdunge och en örttäppa i Stormkammen.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'En lina i Spegeltjärnen',
+    desc: 'Fånga en fisk ur Stormkammens vatten.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Öns proviant',
+    desc: 'Skörda en malmåder, en virkesdunge och en örttäppa på Fjärrkusten.',
+  },
+  chr_farshore_first_cast: {
+    name: 'Det måsarna vet',
+    desc: 'Fånga en fisk ur Fjärrkustens vatten.',
+  },
+  prog_engineering_rare: {
+    name: 'Precisionsingenjörskonst',
+    desc: 'Skapa ditt första sällsynta föremål i Ingenjörskonst.',
+  },
+  prog_alchemy_rare: {
+    name: 'En sällsynt årgång',
+    desc: 'Skapa ditt första sällsynta föremål i Alkemi.',
+  },
+  prog_cooking_rare: {
+    name: 'En rätt att minnas',
+    desc: 'Skapa ditt första sällsynta föremål i Matlagning.',
+  },
+  prog_leatherworking_rare: {
+    name: 'Fin garvning',
+    desc: 'Skapa ditt första sällsynta föremål i Läderhantverkeri.',
+  },
+  prog_tailoring_rare: {
+    name: 'Ett mästerligt stygn',
+    desc: 'Skapa ditt första sällsynta föremål i Skrädderi.',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Härdad till glans',
+    desc: 'Skapa ditt första sällsynta föremål i Vapensmide.',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Pansrad till perfektion',
+    desc: 'Skapa ditt första sällsynta föremål i Rustningssmide.',
+  },
 };

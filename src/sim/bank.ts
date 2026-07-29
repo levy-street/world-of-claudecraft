@@ -16,9 +16,15 @@
 // (enforced by tests/architecture.test.ts). This module draws NO rng.
 
 import type { BankInfo } from '../world_api';
-import { addStacked, bagCapacity, bagsFullError, countFit } from './bags';
+import { addStacked, bagCapacity, bagsFullError, countFit, instancedCountCap } from './bags';
 import { ITEMS } from './data';
 import * as deedsMod from './deeds';
+import {
+  boundCraftedRecipeIdOnLoad,
+  sanitizeItemInstancePayloadOnLoad,
+  warnDroppedInstanceKeys,
+} from './item_instance_load';
+import { sanitizeRiftGearInstance } from './rift/progression';
 import type { SimContext } from './sim_context';
 import { cloneInvSlot, dist2d, type Entity, INTERACT_RANGE, type InvSlot } from './types';
 
@@ -75,12 +81,19 @@ export interface MoveResult {
  *
  *  - `count` undefined = the whole stack.
  *  - An instanced slot (#1165 per-instance payload) moves as ONE indivisible unit
- *    regardless of count: it never merges with a dest stack (a deep clone is pushed
- *    into a fresh slot), so it needs one free dest slot or refuses 'no_fit'.
- *  - A fungible slot reuses the bags.ts stacking rules (countFit/addStacked): the
- *    move fits only when every requested copy fits, then tops up dest stacks and
- *    appends fresh ones. A partial count decrements the source; a whole-stack move
- *    splices the source entry out. */
+ *    regardless of count (its units can never be split from their payload).
+ *    Identical-payload stacking: the units merge into a byte-equal
+ *    mergeable dest stack with room and otherwise land in a fresh deep-cloned
+ *    dest slot (countFit/addStacked carry the payload AND the slot's
+ *    craftedRecipeId, which an instanced slot can carry too), refusing
+ *    'no_fit' only when the whole count cannot land.
+ *  - A fungible slot reuses the bags.ts stacking rules (countFit/addStacked),
+ *    threading slot.craftedRecipeId through both calls so a plain crafted stack
+ *    (InvSlot.craftedRecipeId, no `instance`) keeps its provenance marker and
+ *    only merges with a same-recipe dest stack: the move fits only when every
+ *    requested copy fits, then tops up dest stacks and appends fresh ones. A
+ *    partial count decrements the source; a whole-stack move splices the
+ *    source entry out. */
 export function moveBetweenContainers(
   source: InvSlot[],
   sourceIndex: number,
@@ -93,21 +106,46 @@ export function moveBetweenContainers(
   }
   const slot = source[sourceIndex];
 
-  // Instanced: the whole slot moves as one unit (a per-instance payload can never be
-  // split or merged), so it always needs a fresh dest slot.
+  // Instanced: the whole slot moves as one unit (a per-instance payload can never
+  // be split from its units), merging into a byte-equal dest stack when one has
+  // room and taking a fresh (deep-cloned) dest slot otherwise.
+  // craftedRecipeId is threaded through BOTH calls here for exactly the reason
+  // the plain arm below spells out: countFit and addStacked key their merge on
+  // it, so omitting it strips the marker off any slot that carries an instance
+  // payload AND a craft provenance. Two independent reviews found this arm the
+  // same way: a crafted weapon that was worn while enchanted is precisely that
+  // shape, and so is commissioned sub-rare equipment, whose crafted provenance
+  // lives ONLY at slot level. Either way one bank round trip launders a
+  // self-crafted item into an indistinguishable found one and it disenchants
+  // for the enchanting skill the anti-farm gate exists to deny. addStacked's
+  // merge predicate already compares the marker, so a marker-bearing slot never
+  // merges into an unmarked stack. Both calls take it or neither does:
+  // threading it into only one would make the fit check and the grant disagree
+  // about which stacks are mergeable, which is a no_fit-vs-overflow divergence
+  // rather than a laundering one.
   if (slot.instance) {
-    if (dest.length >= destCapacity) return { moved: 0, refusal: 'no_fit' };
-    dest.push(cloneInvSlot(slot));
+    if (
+      countFit(dest, destCapacity, slot.itemId, slot.count, slot.instance, slot.craftedRecipeId) <
+      slot.count
+    ) {
+      return { moved: 0, refusal: 'no_fit' };
+    }
+    addStacked(dest, slot.itemId, slot.count, slot.instance, slot.craftedRecipeId);
     source.splice(sourceIndex, 1);
     return { moved: slot.count };
   }
 
   const want = count === undefined ? slot.count : Math.floor(count);
   if (!(want > 0) || want > slot.count) return { moved: 0, refusal: 'invalid' };
-  if (countFit(dest, destCapacity, slot.itemId, want) < want) {
+  // Thread the plain-stack craftedRecipeId marker (bags.ts InvSlot.craftedRecipeId)
+  // into BOTH the fit check and the grant: without it a bank deposit/withdraw round
+  // trip strips the marker (addStacked/countFit key their merge on it), silently
+  // laundering a crafted item's disenchant-gate provenance into a plain drop, the
+  // same class of bug the trade/market fix closed.
+  if (countFit(dest, destCapacity, slot.itemId, want, undefined, slot.craftedRecipeId) < want) {
     return { moved: 0, refusal: 'no_fit' };
   }
-  addStacked(dest, slot.itemId, want);
+  addStacked(dest, slot.itemId, want, undefined, slot.craftedRecipeId);
   if (want >= slot.count) source.splice(sourceIndex, 1);
   else slot.count -= want;
   return { moved: want };
@@ -119,8 +157,10 @@ const BANKER_RANGE = INTERACT_RANGE + 2;
 
 /** True when the player entity stands within reach of any live banker NPC. Iterates
  *  the ctx.bankerIds anchor list (seeded by the Sim ctor) against the live entities,
- *  the same liveness checks nearMerchant uses (present + kind 'npc'). */
-function nearBanker(ctx: SimContext, e: Entity): boolean {
+ *  the same liveness checks nearMerchant uses (present + kind 'npc'). Exported so
+ *  the guild bank (guild_bank.ts) shares the ONE proximity gate with the personal
+ *  bank rather than growing a second reach rule. */
+export function nearBanker(ctx: SimContext, e: Entity): boolean {
   for (const id of ctx.bankerIds) {
     const b = ctx.entities.get(id);
     if (b && b.kind === 'npc' && dist2d(e.pos, b.pos) <= BANKER_RANGE) return true;
@@ -283,27 +323,92 @@ export function bankInfoFor(ctx: SimContext, pid: number): BankInfo | null {
  *  items are NEVER destroyed (an unknown-but-string itemId stays as dormant
  *  recoverable data, the mail precedent). Over-capacity inventories are tolerated
  *  (never truncated). purchasedSlots is clamped into range and floored to a whole
- *  expansion so the price indexing stays coherent. */
-export function sanitizeBankState(raw: unknown): BankState {
+ *  expansion so the price indexing stays coherent. Every row's instance payload
+ *  takes the shared load bound (item_instance_load.ts): junk KEYS drop, the row
+ *  itself never does. `owner` names the character in that bound's dev-channel
+ *  log only, and is optional because the unit tests call this with a raw blob
+ *  and no character at all. When the caller passes `droppedSink` (Sim.addPlayer
+ *  does, to aggregate every container into ONE line per character load), drops
+ *  are pushed there instead of logged here; a sink-less call still logs one
+ *  aggregate line per CALL, never one per row. */
+export function sanitizeBankState(
+  raw: unknown,
+  owner?: string,
+  droppedSink?: string[],
+  ownerId?: number,
+): BankState {
   if (!raw || typeof raw !== 'object') {
     return { inventory: [], purchasedSlots: 0, bonusSlots: 0 };
   }
   const r = raw as { inventory?: unknown; purchasedSlots?: unknown; bonusSlots?: unknown };
   const inventory: InvSlot[] = [];
+  const localDrops: string[] = droppedSink ?? [];
   if (Array.isArray(r.inventory)) {
     for (const entry of r.inventory) {
       if (!entry || typeof entry !== 'object') continue;
-      const e = entry as { itemId?: unknown; count?: unknown; instance?: unknown };
+      const e = entry as {
+        itemId?: unknown;
+        count?: unknown;
+        instance?: unknown;
+        craftedRecipeId?: unknown;
+      };
       if (typeof e.itemId !== 'string' || e.itemId === '') continue;
       const hasInstance = !!e.instance && typeof e.instance === 'object';
-      // An instanced slot forces count 1: a count above 1 would mint payload copies.
-      const count = hasInstance ? 1 : Math.max(1, Math.floor(Number(e.count)) || 1);
+      // The ONE shared doctrine helper judges the RAW marker (the fix-wave
+      // review found this arm re-implementing the rule with its own quieter
+      // reporting: a non-string or oversized marker vanished silently here
+      // while the same corruption was reported on the bag and buyback arms).
+      const rawMarker: { itemId: string; craftedRecipeId?: unknown } = {
+        itemId: e.itemId,
+        craftedRecipeId: e.craftedRecipeId,
+      };
+      boundCraftedRecipeIdOnLoad(rawMarker, localDrops, 'bank');
+      const craftedRecipeId = rawMarker.craftedRecipeId as string | undefined;
+      // The shared tamper ceiling (bags.ts instancedCountCap, also applied to
+      // the carried-inventory hydration in Sim.addPlayer): merge-legal stack
+      // cap for a counted instanced slot, 1 for a charge-bearing payload, and
+      // an unknown item def stays dormant uncapped data like the plain arm.
+      const instanceCap = instancedCountCap(
+        ITEMS[e.itemId],
+        hasInstance ? (e.instance as InvSlot['instance']) : undefined,
+      );
+      const count = Math.min(instanceCap, Math.max(1, Math.floor(Number(e.count)) || 1));
       const slot: InvSlot = hasInstance
         ? { itemId: e.itemId, count, instance: e.instance as InvSlot['instance'] }
         : { itemId: e.itemId, count };
-      inventory.push(cloneInvSlot(slot));
+      if (craftedRecipeId !== undefined) slot.craftedRecipeId = craftedRecipeId;
+      const cleaned = cloneInvSlot(slot);
+      // Rift rebuild FIRST, exactly as the bags and equipment arms order it
+      // (the whole-branch review: this arm and the buyback arm skipped the
+      // rebuild, so the bound's deliberate rift skip left banked rift rows
+      // unvalidated). The rebuild reduces a corrupt-but-valid rift row to
+      // bounded keys; a refusal drops the instance silently, the equip arm's
+      // anti-tamper rule. ownerId absent (a sink-less unit caller) skips the
+      // rebuild rather than rebuilding against a wrong owner.
+      if (cleaned.instance?.rift && ownerId !== undefined) {
+        const rebuilt = sanitizeRiftGearInstance(cleaned.itemId, cleaned.instance, ownerId);
+        if (rebuilt) cleaned.instance = rebuilt;
+        else delete cleaned.instance;
+      }
+      // The same load-side payload bound the carried bags and the equipment
+      // map take (item_instance_load.ts), applied to the clone above rather
+      // than to the stored row, which this function never owns.
+      // Banked copies were missed by the first cut and are exactly where a
+      // signed instance sits longest, so an unbounded name here would ride
+      // every autosave of an account that has not logged in for months. The
+      // count clamp above stands: it is computed from the payload AS STORED,
+      // so dropping a junk key can never widen a tampered stack.
+      if (cleaned.instance) {
+        const { payload, dropped } = sanitizeItemInstancePayloadOnLoad(cleaned.instance);
+        for (const d of dropped) localDrops.push(`bank.${cleaned.itemId}.${d}`);
+        if (payload) cleaned.instance = payload;
+        else delete cleaned.instance;
+      }
+      inventory.push(cleaned);
     }
   }
+  // Sink-less callers (the unit tests) still get the aggregate diagnostic.
+  if (!droppedSink) warnDroppedInstanceKeys(owner ?? 'bank', localDrops);
   const maxPurchased = BANK_EXPANSION_PRICES.length * BANK_EXPANSION_SLOTS;
   let purchasedSlots = Math.max(
     0,

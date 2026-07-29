@@ -1,0 +1,49 @@
+{
+  "assetId": "tank",
+  "sourceKind": "user-supplied concept sheet",
+  "sourceRedistributed": false,
+  "confirmationDate": "2026-07-29",
+  "sourceSha256": "fd9a8b6dd1fa7c4c16d2b7eda62c5cc34fa62a6f1d343f4cebb9e5683e9eead5",
+  "permissionContext": "The user supplied the image in this task and asked for a new game asset inspired by it.",
+  "shippingPolicy": "The source image and derived crops are not committed or shipped.",
+  "designBoundary": {
+    "kept": [
+      "compact fantasy tracked vehicle category",
+      "cream and violet armor color relationship",
+      "dark continuous tracks and five-wheel side rhythm",
+      "open brown saddle and green utility panels",
+      "short oversized stepped cannon"
+    ],
+    "excluded": [
+      "source name",
+      "lettering",
+      "tower crest",
+      "exact heraldry",
+      "source artwork pixels and crops"
+    ],
+    "originalTreatment": [
+      "plain shield-shaped prow",
+      "original symbol-free panel layout",
+      "project-authored rear deck and underside",
+      "project-authored material response and mechanical animations"
+    ]
+  },
+  "admittedViews": {
+    "hero": {
+      "description": "Front-left three-quarter vehicle view.",
+      "cropSha256": "529c506e747f7da42604d1c9b376b37b99fd2ded234cc5ca5a82eaaad15e9a4b"
+    },
+    "side": {
+      "description": "Left profile vehicle view.",
+      "cropSha256": "189c800a42f47db692fbb2a854835641d65b295c9fce1a2d7f8e4cf42f8c0f73"
+    },
+    "front": {
+      "description": "Front vehicle view.",
+      "cropSha256": "bfe02e62d661bddc0b67d790c4820c848f0f71daab9f84f7f3a770a393d207d8"
+    },
+    "saddle": {
+      "description": "Turret, saddle, and grab-hoop detail.",
+      "cropSha256": "5e15f59cc6d166de10ffe2e8086a00fd48f0fb958406f14e1a12961086b4c5fc"
+    }
+  }
+}

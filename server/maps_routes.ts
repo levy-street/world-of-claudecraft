@@ -24,7 +24,7 @@
 
 import type * as http from 'node:http';
 import { parsePageParams } from './admin';
-import { accountAndScopeForToken, accountForToken, moderationStatusForAccount, pool } from './db';
+import { accountAndScopeForToken, moderationStatusForAccount, pool } from './db';
 import { ctxAccountId } from './http/context';
 import { createActiveGuard, createReadGuard } from './http/middleware/bearer_active_guard';
 import { MAP_MUTATION_POLICY, PUBLIC_READ_POLICY, rateLimit } from './http/middleware/rate_limit';
@@ -212,7 +212,7 @@ export async function mapSetPublishedCore(
 // mirrors the legacy lane: BEFORE auth, 413 + Connection: close, no body read.
 // ---------------------------------------------------------------------------
 
-const REAL_GUARD_DB = { accountAndScopeForToken, accountForToken, moderationStatusForAccount };
+const REAL_GUARD_DB = { accountAndScopeForToken, moderationStatusForAccount };
 let guardDbBundle = REAL_GUARD_DB;
 
 /** Override the bearer-guard db reads with fakes (test-only). */
@@ -250,7 +250,8 @@ const VIEWER_ACCOUNT = 'maps_viewer_account';
 const BEARER_PATTERN = /^Bearer ([a-f0-9]{64})$/;
 const optionalViewerGuard: Middleware = async (ctx, next) => {
   const m = BEARER_PATTERN.exec(ctx.req.headers.authorization ?? '');
-  const accountId = m ? await guardDbBundle.accountForToken(m[1]) : null;
+  const info = m ? await guardDbBundle.accountAndScopeForToken(m[1]) : null;
+  const accountId = info?.accountId ?? null;
   if (accountId === null && !publicReadRateLimited(ctx.req).allowed) {
     json(ctx.res, 429, RATE_LIMITED);
     return;

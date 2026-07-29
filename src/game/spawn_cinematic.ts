@@ -20,6 +20,53 @@ export interface SpawnCinematic {
   end: CameraPose; // gameplay pose the cinematic lands on exactly
 }
 
+export interface SpawnCinematicPolicyInput {
+  requested: boolean;
+  seen: boolean;
+  playerLevel: number;
+  reducedMotion: boolean;
+  native: boolean;
+  platform: string;
+  engine: string;
+  constrainedMemory: boolean;
+  graphicsPreset: number;
+}
+
+export type SpawnCinematicPolicyReason = 'eligible' | 'ineligible' | 'constrained-ios-webkit';
+
+export interface SpawnCinematicPolicyDecision {
+  play: boolean;
+  reason: SpawnCinematicPolicyReason;
+}
+
+/**
+ * Decide whether to run the first-spawn pan before any DOM or camera mutation.
+ *
+ * Native iOS WebKit has a strict WebContent-process memory ceiling that does
+ * not scale with the phone's total RAM. On Medium and above, the long camera
+ * sweep streams the crowded spawn view while the hidden HUD is revealed at
+ * landing. Retained device diagnostics show that combination can terminate
+ * the process even after scene construction and prewarm succeeded. Low keeps
+ * the cinematic, and ordinary gameplay remains at the player's chosen tier.
+ */
+export function decideSpawnCinematic(
+  input: SpawnCinematicPolicyInput,
+): SpawnCinematicPolicyDecision {
+  if (!input.requested || input.seen || input.playerLevel > 1 || input.reducedMotion) {
+    return { play: false, reason: 'ineligible' };
+  }
+  if (
+    input.native &&
+    input.platform === 'ios' &&
+    input.engine === 'webkit' &&
+    input.constrainedMemory &&
+    input.graphicsPreset >= 2
+  ) {
+    return { play: false, reason: 'constrained-ios-webkit' };
+  }
+  return { play: true, reason: 'eligible' };
+}
+
 // startDist is deliberately beyond the wheel-zoom range (3..22): the opening
 // is an establishing shot of the world around the spawn. The renderer clamps
 // the camera above terrain, so the long path can never dip underground.

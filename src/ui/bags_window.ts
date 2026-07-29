@@ -19,9 +19,11 @@
 
 import { audio } from '../game/audio';
 import { BACKPACK_SLOTS, bagSlotsOf } from '../sim/bags';
-import { ITEMS } from '../sim/data';
-import type { EquipSlot, InvSlot } from '../sim/types';
+import { ITEMS, QUESTS } from '../sim/data';
+import { FIREBOTTLE_COOLDOWN_SECS, FIREBOTTLE_ITEM_ID } from '../sim/interactions/firebottle_hut';
+import type { EquipSlot, InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
+import { bagCornerMark, bagRimClasses } from './bag_corner_mark_view';
 import {
   BAG_CATEGORIES,
   BAG_SORTS,
@@ -29,44 +31,65 @@ import {
   type BagFilterState,
   type BagSort,
   bagOrderIsManual,
+  bagQuestItemCount,
   DEFAULT_BAG_FILTER,
   parseBagFilter,
   serializeBagFilter,
 } from './bag_filter';
+import { bagFineMark } from './bag_fine_mark_view';
+import { bagInstanceGlyphKind } from './bag_instance_glyph_view';
+import { bagItemHasContextActions } from './bag_item_context_menu';
+import { bagQuestMarkKind, bagQuestMarkProgressFromLog } from './bag_quest_mark_view';
+import { BagQuestTrackerHighlight } from './bag_quest_tracker_highlight';
+import { bagQuestTrackerHighlightId } from './bag_quest_tracker_highlight_view';
 import {
   type BagDestroyAction,
   type BagMode,
   bagDestroyAction,
   bagItemAction,
+  bagNoMatchKind,
   bagQualityKey,
   bagShiftLinks,
   bagStackIndex,
+  bagsMoneyRowStale,
   bagTooltipHintKey,
+  bagUnknownAction,
   bankDepositOpensPrompt,
   buildBagBar,
   buildBagGrid,
+  buildBagListRows,
   resolveDepositSubmit,
 } from './bags_view';
+import { showQuantityPrompt } from './bank_quantity_prompt';
+import { markDialogRoot } from './dialog_root';
 import { itemDisplayName } from './entity_i18n';
-import { dropRequiredLevel, isPaperdollDraggable, paperdollDropAction } from './equip_drop_core';
+import { isPaperdollDraggable } from './equip_drop_core';
 import { esc } from './esc';
-import { FOCUSABLE_SELECTOR } from './focus_manager';
+import { captureFocusKey, focusedWithin, restoreFirstEnabled } from './focus_restore';
 import { encodeHotbarAction, HOTBAR_ACTION_MIME } from './hud/action_bar/hotbar';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
 import type { BagItemDrag, ItemDragState } from './item_drag_state';
 import { resolveDropTargetAt } from './item_drop_hit_test';
+import {
+  INSTANCE_GLYPH_ARIA_KEYS,
+  instanceGlyphMarkHtml,
+  UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS,
+} from './item_instance_glyph_mark';
+import { knownItemDef } from './known_item';
 import type { PainterHostPresentation } from './painter_host';
+import {
+  installPromptDialog as installModalPromptDialog,
+  type PromptDialogHandle,
+} from './prompt_dialog';
 import { tSim } from './sim_i18n';
 import { bindTouchItemDrag } from './touch_item_drag';
 import { svgIcon } from './ui_icons';
+import { unknownItemIconHtml } from './unknown_item_icon';
+import { totalHeldCount } from './vendor_sell_quantity';
 import { dropOnWorld } from './world_drop_target';
 
 const BAG_FILTER_KEY = 'woc_bag_filter';
-
-// Monotonic id source for the ad-hoc prompt dialogs' aria-labelledby target, so the
-// id never couples to class ordering (was prompt.classList[last]).
-let promptDialogSeq = 0;
 
 // The ad-hoc discard / sell / bank-deposit quantity prompts mount into #prompt-stack
 // (outside #bags). A window-level close() removes any that are open so it never leaves
@@ -85,12 +108,23 @@ export function dismissBagPrompts(): void {
 // item with no quality field, so no raw hex lives in the painter.
 const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
 
+// Per-copy aria keys and corner-mark HTML live in item_instance_glyph_mark.ts
+// so bags, bank, and guild bank paint the same masterwork seal / glyphs. Quest
+// stacks still use itemAriaQuest here (purpose class outranks copy flags for
+// the spoken name; the rim/wash always marks them as quest for sighted players).
+// Fine-grade stacks deliberately have NO dedicated aria key: every fine id's
+// item NAME already carries the grade word in every locale (Fine Copper Ore),
+// so a grade arm would announce it twice while costing an instanced fine copy
+// its per-copy flag (bound is the flag a player checks before trading). The
+// rim/wash/seal are salience for sighted scanning, not new information.
+
 const BAG_CATEGORY_LABEL_KEYS: Record<BagCategory, TranslationKey> = {
   all: 'hudChrome.bags.filterAll',
   weapon: 'hudChrome.bags.filterWeapon',
   armor: 'hudChrome.bags.filterArmor',
   consumable: 'hudChrome.bags.filterConsumable',
   material: 'hudChrome.bags.filterMaterial',
+  tool: 'hudChrome.bags.filterTool',
   quest: 'hudChrome.bags.filterQuest',
   mount: 'hudChrome.bags.filterMount',
 };
@@ -139,8 +173,18 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   isMarketSell(): boolean;
   /** The Ravenpost mailbox is open on its Send tab (clicks attach parcels). */
   isMailAttach(): boolean;
-  /** The bank window is open (docked beside the bags): a click deposits the stack. */
+  /** The bank window is open (docked beside the bags): the mobile close arm
+   *  collapses the whole cluster through it. NOT the deposit predicate, which
+   *  is isPersonalBankTab below. */
   isBankOpen(): boolean;
+  /** The bank window is open ON ITS PERSONAL TAB: a click deposits the stack.
+   *  Open-and-not-guild is NOT the same test: while the guild pane's Log view
+   *  shows, the personal grid is off screen too, so neither deposit is armed. */
+  isPersonalBankTab(): boolean;
+  /** The bank window is open ON ITS GUILD TAB: a click deposits into the guild
+   *  bank instead (officer-plus only; the tab exists only while guildBankInfo
+   *  is non-null, so this can never be true for a member or offline). */
+  isGuildBankTab(): boolean;
   pendingPetFeed(): boolean;
   // Cross-window commands the bag click fans out to.
   closeVendor(): void;
@@ -154,18 +198,23 @@ export interface BagsWindowDeps extends PainterHostPresentation {
    *  full-screen rule take over instead of leaving a half-width orphan). */
   onClosed(): void;
   addItemToTrade(itemId: string): void;
-  /** Stage a bag item for a Market listing (selects it + repaints the market). */
-  stageMarketSell(itemId: string): void;
-  /** Stage a bag stack as a mail parcel (repaints the mailbox Send tab). */
-  stageMailParcel(itemId: string): void;
+  /** Stage a bag item for a Market listing (selects it + repaints the market).
+   *  `instance` is the clicked slot's payload (issue 1165): an instanced copy stages
+   *  as ITSELF (single-copy listing), a plain stack stages fungibly. */
+  stageMarketSell(itemId: string, instance?: ItemInstancePayload): void;
+  /** Stage a bag stack as a mail parcel (repaints the mailbox Send tab).
+   *  `instance` mirrors stageMarketSell: an instanced copy stages as itself. */
+  stageMailParcel(itemId: string, instance?: ItemInstancePayload): void;
   /** Shift-click: insert a readable item link into the chat input. */
   insertItemChatLink(itemId: string): void;
-  /** Open the character sheet's mount picker highlighting this mount (a click
-   *  on a collected kind:'mount' reins item). */
-  openMountPicker(mountKey: string): void;
+  /** Surface a deps-owned error toast (reins-use denials and drag rejects). */
   showError(text: string): void;
   setPendingPetFeed(active: boolean): void;
   resetPetBarSig(): void;
+  /** Gathering-tool click routing (#2343): true when the interact-style
+   *  handler consumed the use (nearest matching node + autorun stop); false
+   *  falls back to the plain useItem command. */
+  useGatherTool(item: ItemDef): boolean;
   // Hotbar drag plumbing (cross-window drag state lives on the HUD).
   isHotbarItemId(itemId: string): boolean;
   setDragAction(action: { type: 'item'; id: string } | null): void;
@@ -182,6 +231,27 @@ export interface BagsWindowDeps extends PainterHostPresentation {
    *  window owns the paperdoll drop (and its refusals); this is the touch arm's way
    *  in, since a finger release has no drop event to land on that window. */
   dropOnEquipSlot(itemId: string, slot: EquipSlot): void;
+  /** Place a touch-dragged stack on a hotbar seat (the desktop drop's item
+   *  branch, reached by finger): `slot` is the 1-based bar slot a desktop
+   *  row button stamps. The HUD owns eligibility (isHotbarItemId) and the
+   *  layout write; an ineligible item is a silent cancel, the desktop rule. */
+  dropOnActionSlot(itemId: string, slot: number): void;
+  /** Same, released over a mobile action-ring button: `ringIndex` is the
+   *  RING position; the HUD resolves the underlying bar slot from the live
+   *  page at drop time (the paged-ring mapping is HUD state). */
+  dropOnActionRingSlot(itemId: string, ringIndex: number): void;
+  /** Open the bag-item action menu (Disenchant / Salvage / Apply Enchant)
+   *  for a stack at a viewport point. `runDefault` runs the exact classic
+   *  left-click action for the clicked slot, so the menu's first row stays
+   *  byte-identical to a plain click. */
+  openItemActionMenu(
+    def: ItemDef,
+    itemId: string,
+    slotIndex: number,
+    x: number,
+    y: number,
+    runDefault: () => void,
+  ): void;
 }
 
 export class BagsWindow {
@@ -205,7 +275,71 @@ export class BagsWindow {
   // (vendor / mobile), where a null restore is a safe no-op.
   private openerFocus: HTMLElement | null = null;
 
+  // The purse as of the last money-row paint (issue #2373), re-armed by every paint
+  // whatever caused it. -1 is the cold sentinel: a real purse is never negative, so
+  // a window shown without a paint would always converge on the first probe.
+  private lastMoneyCopper = -1;
+
+  // Bag hover/focus -> quest-tracker title highlight. One active row at a time;
+  // cleared on leave/focusout, programmatic tooltip hide, rebuild, and close so
+  // a stale class never sticks after the cell is torn down.
+  private readonly trackerHighlight = new BagQuestTrackerHighlight(document);
+
   constructor(private readonly deps: BagsWindowDeps) {}
+
+  /**
+   * Repaint the money row when the purse moved, the staleness contract this window
+   * owns (issue #2373). Joins the refreshIfChanged family the HUD's slow band drives
+   * (bank / mailbox / market / social / deeds / professions / calendar), so the
+   * coordinator stays a one-line consumer.
+   *
+   * Deliberately NOT a full render(): nothing else inside #bags reads copper, and a
+   * rebuild would tear down the hovered row's tooltip, the bag-search caret and an
+   * armed touch drag. This edge fires from a server credit or a coin-only mob loot
+   * with no user action behind it, so unlike the user-initiated paint paths it must
+   * not move anything the player is holding. Same reason refreshGrid() exists for
+   * live search.
+   */
+  refreshIfChanged(): void {
+    const el = this.deps.root();
+    if (!bagsMoneyRowStale(el.style.display, this.deps.world().copper, this.lastMoneyCopper))
+      return;
+    this.refreshMoneyRow();
+  }
+
+  /** Rewrite ONLY the .money footer in place, re-binding its two launchers. Every
+   *  paint path runs through here (the full render(), the purse probe, and the async
+   *  $WOC / Claudium balance reads), so the latch arms on all of them.
+   *
+   *  Deliberately does NOT restore focus across the rewrite, unlike the
+   *  deeds/professions refocus family. Two reasons, both settled on PR #2377: the
+   *  footer's launchers are BUTTONs, and input.ts leaves a focused button's Enter
+   *  default alone on the chat edge, so parking focus back on one makes the player's
+   *  next Enter open chat AND re-fire the button; and #bags is non-modal and absent
+   *  from isModalOpen(), so canUseGameKeys() stays true and Tab is swallowed by
+   *  target-nearest, which means keyboard focus never lands in here to begin with. */
+  private paintMoneyRow(row: HTMLElement, copper: number): void {
+    row.innerHTML = `${this.deps.wocBalanceHtml()}${this.deps.claudiumLauncherHtml()}${this.deps.moneyHtml(copper)}`;
+    row.querySelector('[data-claudium-launcher]')?.addEventListener('click', () => {
+      this.deps.openClaudium();
+    });
+    row.querySelector('[data-wallet-action]')?.addEventListener('click', () => {
+      this.deps.openWallet();
+    });
+    this.lastMoneyCopper = copper;
+  }
+
+  /** The narrow repaint: find the existing footer and re-paint it. A window that has
+   *  never been rendered has no .money row yet, so this is a no-op rather than a
+   *  partial paint. Public because the async $WOC / Claudium balance reads land on
+   *  their own schedule and need the same footer-only treatment: before this they
+   *  called the HUD's full renderBags() from a promise resolve, which tore the window
+   *  down under a player who had not touched anything. */
+  refreshMoneyRow(): void {
+    const row = this.deps.root().querySelector('.money') as HTMLElement | null;
+    if (!row) return;
+    this.paintMoneyRow(row, this.deps.world().copper);
+  }
 
   /** Record the element that opened the window, so close() can return focus to it.
    *  Called by the HUD's toggleBags on the keyboard/minimap open path. */
@@ -231,6 +365,7 @@ export class BagsWindow {
     dismissBagPrompts();
     el.style.display = 'none';
     el.inert = false;
+    this.clearTrackerHighlight();
     this.deps.hideTooltip();
     this.deps.cancelPetFeed();
     this.deps.restoreFocus(this.openerFocus);
@@ -239,13 +374,30 @@ export class BagsWindow {
   }
 
   render(): void {
+    // Rebuild tears down hovered cells without mouseleave; drop any tracker glow.
+    this.clearTrackerHighlight();
     const el = this.deps.root();
     const world = this.deps.world();
+    // The focused control's identity, carried across the rebuild (the vendor
+    // ladder pattern, the phase 13 QA hand-off): this window rebuilds whole
+    // on the same onInventoryChanged hook the vendor does, and used to drop
+    // keyboard focus to <body> every time a stack changed. Captured BEFORE
+    // teardown, with the focused grid SLOT for the outward-walk rung.
+    const focusKey = captureFocusKey(el);
+    const preRows = [...el.querySelectorAll<HTMLElement>('.bag-grid [data-focus-key]')];
+    const focusedNode = focusedWithin(el);
+    const focusedSlot = focusedNode instanceof HTMLElement ? preRows.indexOf(focusedNode) : -1;
     // .bag-grid (not #bags) is the scroll container; it is recreated on every
     // rebuild, so capture its scroll offset and reapply it to the fresh grid:
     // otherwise using an item (e.g. a potion) snaps the list back to the top.
     const prevScrollTop = el.querySelector('.bag-grid')?.scrollTop ?? 0;
-    el.innerHTML = `<div class="panel-title"><span>${esc(t('itemUi.bags.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('itemUi.bags.close'))}">${svgIcon('close')}</button></div>`;
+    // Bags is a non-modal companion window (vendor / trade / market can be open
+    // alongside it), so it gets the accessible name and role=dialog like every
+    // other window in the family, but NO focus trap: markDialogRoot never installs
+    // one on its own (that is a separate opt-in, see prompt_dialog.ts for the modal
+    // recipe this window's own prompts use).
+    markDialogRoot(el, { label: t('itemUi.bags.title') });
+    el.innerHTML = `<div class="panel-title"><span>${esc(t('itemUi.bags.title'))}</span><button type="button" class="x-btn" data-close data-focus-key="close" aria-label="${esc(t('itemUi.bags.close'))}">${svgIcon('close')}</button></div>`;
     el.appendChild(this.buildBagBar());
     // Skip the chip/search row entirely when the bag is empty: a full filter bar
     // above a grid of empty squares is just noise.
@@ -257,14 +409,36 @@ export class BagsWindow {
     grid.scrollTop = prevScrollTop;
     const moneyRow = document.createElement('div');
     moneyRow.className = 'money';
-    moneyRow.innerHTML = `${this.deps.wocBalanceHtml()}${this.deps.claudiumLauncherHtml()}${this.deps.moneyHtml(world.copper)}`;
     el.appendChild(moneyRow);
-    moneyRow.querySelector('[data-claudium-launcher]')?.addEventListener('click', () => {
-      this.deps.openClaudium();
-    });
-    moneyRow.querySelector('[data-wallet-action]')?.addEventListener('click', () => {
-      this.deps.openWallet();
-    });
+    this.paintMoneyRow(moneyRow, world.copper);
+    // The restore ladder (the vendor contract): the exact control when it
+    // survived, else the same grid slot walking outward (after a consumed
+    // stack the slot holds the NEXT item, the useful landing), else Close.
+    // Every rung resolves by dataset equality (jsdom has no CSS.escape).
+    if (focusKey !== null) {
+      const keyed = [...el.querySelectorAll<HTMLElement>('[data-focus-key]')];
+      const exact = keyed.find((node) => node.dataset.focusKey === focusKey);
+      const rows = [...el.querySelectorAll<HTMLElement>('.bag-grid [data-focus-key]')];
+      const slot = focusedSlot >= 0 ? Math.min(focusedSlot, rows.length - 1) : -1;
+      const neighbors: (HTMLElement | undefined)[] = [];
+      if (slot >= 0) {
+        for (let step = 0; step < rows.length; step++) {
+          if (rows[slot + step]) neighbors.push(rows[slot + step]);
+          // The backward rung is NEAR-dead by construction: the clamp above
+          // guarantees rows[slot] resolves whenever any row survives, so
+          // walking backward only matters if forward rungs are all
+          // disabled. Kept deliberately: restoreFirstEnabled skips
+          // disabled controls, and a grid tail of aria-disabled rows is a
+          // real state (the unknown-cell ladder).
+          if (step > 0 && rows[slot - step]) neighbors.push(rows[slot - step]);
+        }
+      }
+      restoreFirstEnabled([
+        exact,
+        ...neighbors,
+        el.querySelector<HTMLElement>('[data-close]') ?? undefined,
+      ]);
+    }
     el.querySelector('[data-close]')?.addEventListener('click', () => {
       // On touch the vendor / bank clusters hide their LEFT panel's own x-btn, so
       // this bags x-btn is the whole cluster's single close control: it closes the
@@ -305,6 +479,7 @@ export class BagsWindow {
     const backpack = document.createElement('button');
     backpack.type = 'button';
     backpack.className = 'bag-socket backpack';
+    backpack.dataset.focusKey = 'bagsocket:backpack';
     backpack.setAttribute('aria-disabled', 'true');
     backpack.innerHTML = `<img class="item-icon q-common" src="${iconDataUrl('item', 'backpack')}" alt="" draggable="false">`;
     backpack.setAttribute(
@@ -328,6 +503,7 @@ export class BagsWindow {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = `bag-socket q-${bagQualityKey(item)}`;
+        btn.dataset.focusKey = `bagsocket:${socket.socket}`;
         btn.innerHTML = this.deps.itemIcon(item);
         btn.setAttribute(
           'aria-label',
@@ -353,6 +529,7 @@ export class BagsWindow {
         const emptySocket = document.createElement('button');
         emptySocket.type = 'button';
         emptySocket.className = 'bag-socket empty';
+        emptySocket.dataset.focusKey = `bagsocket:${socket.socket}`;
         emptySocket.setAttribute('aria-disabled', 'true');
         emptySocket.setAttribute('aria-label', t('hudChrome.bags.socketEmpty'));
         this.deps.attachTooltip(
@@ -391,6 +568,10 @@ export class BagsWindow {
   private buildFilterBar(): HTMLElement {
     const bar = document.createElement('div');
     bar.className = 'bag-filter-bar';
+    const world = this.deps.world();
+    // Quest chip badge: total stack count of quest items (bagQuestItemCount).
+    // Only painted when N > 0 so an empty bag of quest pieces stays quiet.
+    const questCount = bagQuestItemCount(world.inventory, (id) => knownItemDef(ITEMS, id));
 
     const chips = document.createElement('div');
     chips.className = 'bag-chips';
@@ -400,7 +581,18 @@ export class BagsWindow {
       const chip = document.createElement('button');
       chip.type = 'button';
       chip.className = `bag-chip${this.filter.category === category ? ' active' : ''}`;
-      chip.textContent = t(BAG_CATEGORY_LABEL_KEYS[category]);
+      chip.dataset.focusKey = `bagchip:${category}`;
+      const label = t(BAG_CATEGORY_LABEL_KEYS[category]);
+      if (category === 'quest' && questCount > 0) {
+        const countText = formatNumber(questCount, { maximumFractionDigits: 0 });
+        chip.innerHTML = `${esc(label)}<span class="bag-chip-count" aria-hidden="true">${esc(countText)}</span>`;
+        chip.setAttribute(
+          'aria-label',
+          t('hudChrome.bags.filterQuestCountAria', { count: countText }),
+        );
+      } else {
+        chip.textContent = label;
+      }
       chip.setAttribute('aria-pressed', this.filter.category === category ? 'true' : 'false');
       chip.addEventListener('click', () => {
         if (this.filter.category === category) return;
@@ -419,6 +611,7 @@ export class BagsWindow {
     const search = document.createElement('input');
     search.type = 'search';
     search.className = 'bag-search';
+    search.dataset.focusKey = 'bag-search';
     search.placeholder = t('hudChrome.bags.searchPlaceholder');
     search.setAttribute('aria-label', t('hudChrome.bags.searchAria'));
     search.value = this.filter.search;
@@ -431,6 +624,10 @@ export class BagsWindow {
 
     const sort = document.createElement('select');
     sort.className = 'bag-sort';
+    // The one filter-bar control the ladder missed (the phase 14 QA): its
+    // change handler rebuilds the window, and keyless it fell to <body>
+    // mid-interaction (a closed select fires change per arrow press).
+    sort.dataset.focusKey = 'bag-sort';
     sort.setAttribute('aria-label', t('hudChrome.bags.sortAria'));
     for (const option of BAG_SORTS) {
       const opt = document.createElement('option');
@@ -456,13 +653,24 @@ export class BagsWindow {
   // without rebuilding the filter bar and stealing input focus.
   private fillGrid(grid: HTMLElement): void {
     const world = this.deps.world();
-    const model = buildBagGrid(world.inventory, (id) => ITEMS[id], this.filter, world.bagCapacity);
+    const model = buildBagGrid(
+      world.inventory,
+      (id) => knownItemDef(ITEMS, id),
+      this.filter,
+      world.bagCapacity,
+    );
     if (model.state === 'empty') {
       grid.innerHTML = `<div class="bag-empty">${esc(t('itemUi.bags.empty'))}</div>`;
       return;
     }
     if (model.state === 'noMatch') {
-      grid.innerHTML = `<div class="bag-empty">${esc(t('hudChrome.bags.noMatch'))}</div>`;
+      // Warm purpose-class copy when the Quest chip matches nothing; generic
+      // no-match line for every other filter (bagNoMatchKind pure discriminant).
+      const noMatchKey =
+        bagNoMatchKind(this.filter) === 'quest'
+          ? 'hudChrome.bags.noQuestItems'
+          : 'hudChrome.bags.noMatch';
+      grid.innerHTML = `<div class="bag-empty">${esc(t(noMatchKey))}</div>`;
       return;
     }
     // The pristine view paints the bag's REAL cells (model.cells): every stack sits in
@@ -470,22 +678,58 @@ export class BagsWindow {
     // other view (a filter, a search, a sort) is a derived LIST, whose squares hold no
     // position: those are still drop targets, but the drop is REFUSED with a toast
     // rather than silently doing nothing, which is what a broken drag looks like.
+    // Soft Quest section headers are NEVER inserted here: bagOrderIsManual is true,
+    // and a header node in the cell stream would shift bagIndex drop targets
+    // (state.md locked decision 7). Rim/seal alone marks quest stacks in this view.
     if (model.cells.length > 0) {
       for (let cell = 0; cell < model.cells.length; cell++) {
         const stack = model.cells[cell];
-        const item = stack ? ITEMS[stack.itemId] : undefined;
+        const item = stack ? knownItemDef(ITEMS, stack.itemId) : undefined;
+        // Stale-client guard (R34): a stack whose id this bundle predates is
+        // still an OCCUPIED slot; painting it as an empty square is how a
+        // counted slot turns invisible.
         grid.appendChild(
-          stack && item ? this.buildStackCell(stack, item, cell) : this.buildEmptyCell(cell),
+          stack && item
+            ? this.buildStackCell(stack, item, cell)
+            : stack
+              ? this.buildUnknownStackCell(stack, cell)
+              : this.buildEmptyCell(cell),
         );
       }
       return;
     }
-    for (const s of model.visible) {
-      const item = ITEMS[s.itemId];
-      if (!item) continue;
-      grid.appendChild(this.buildStackCell(s, item, null));
+    // Derived list: soft Quest section headers only when buildBagListRows allows
+    // them (not manual All+recent; mixed quest + non-quest). Section rows are not
+    // drop targets and carry no bag cell index. No `continue` in this loop: the
+    // R34 pin holds fillGrid to zero continues so an unknown stack can never be
+    // skipped (tests/bags_window.test.ts).
+    for (const row of buildBagListRows(
+      model.visible,
+      (id) => knownItemDef(ITEMS, id),
+      this.filter,
+    )) {
+      if (row.kind === 'section') {
+        grid.appendChild(this.buildSectionHeader(row.section));
+      } else {
+        const s = row.slot;
+        const item = knownItemDef(ITEMS, s.itemId);
+        grid.appendChild(
+          item ? this.buildStackCell(s, item, null) : this.buildUnknownStackCell(s, null),
+        );
+      }
     }
     for (let i = 0; i < model.emptyCells; i++) grid.appendChild(this.buildEmptyCell(null));
+  }
+
+  // Soft parchment section caption for a derived bag list (Quest grouping). Not a
+  // drop target, not focusable, not counted as a bag cell.
+  private buildSectionHeader(_section: 'quest'): HTMLElement {
+    const el = document.createElement('div');
+    el.className = 'bag-section-header bag-section-quest';
+    el.setAttribute('role', 'presentation');
+    // Reuse the Quest chip label so the section and filter share one string.
+    el.textContent = t(BAG_CATEGORY_LABEL_KEYS.quest);
+    return el;
   }
 
   // One occupied square. `cell` is the bag CELL it sits in (the drop-target position), or
@@ -499,30 +743,120 @@ export class BagsWindow {
     {
       const row = document.createElement('button');
       row.type = 'button';
-      row.className = `bag-item q-${bagQualityKey(item)}`;
+      // Quest-purpose mark (bag_quest_mark_view.ts): kind===quest gets the
+      // .bag-quest rim/wash class; questReady adds .bag-quest-ready for the
+      // brighter seal. Purpose class, not a quality tier.
+      // Fine-grade mark (bag_fine_mark_view.ts): fine_* materials get .bag-fine
+      // rim/wash + seal so they never read as plain white reagents. Grade class,
+      // not a quality tier; distinct lineage from quest gold. Purpose outranks
+      // grade: bagRimClasses never emits both rim classes at once.
+      const questMark = bagQuestMarkKind(item, this.questMarkProgress(item));
+      const questReady = questMark === 'questReady';
+      const fineMark = bagFineMark(item.id);
+      row.className = `bag-item q-${bagQualityKey(item)}${bagRimClasses(questMark, fineMark)}`;
       // The stack's live inventory INDEX, resolved by REFERENCE (duplicate stacks and
       // instanced copies share an itemId): that is what the move command sends as `from`.
       const index = bagStackIndex(world.inventory, s);
       if (cell !== null) row.dataset.bagIndex = String(cell);
+      // Focus identity for the rebuild ladder (the vendor pattern): itemId
+      // plus the stack's ORDINAL among same-item stacks, not the raw
+      // inventory index (the phase 14 QA): consuming an earlier
+      // different-item stack shifts every later index, and an index-keyed
+      // exact rung then lands focus one stack over. The ordinal only moves
+      // when an earlier SAME-item stack goes, where the same-slot rung is
+      // the honest landing anyway. Distinct 'bagu:' prefix on the
+      // unknown-cell builder keeps the two families from colliding on a
+      // shared miss value.
+      row.dataset.focusKey = `bag:${s.itemId}:${this.stackOrdinal(world.inventory, s)}`;
       this.bindBagCellDrop(row, cell);
       const qColor = QUALITY_COLOR[bagQualityKey(item)] ?? QUALITY_DEFAULT_COLOR;
       const itemName = itemDisplayName(item);
+      // Corner-glyph priority (bag_corner_mark_view.ts, composed from
+      // bag_instance_glyph_view + bag_quest_mark_view + bag_fine_mark_view):
+      // masterwork > quest seal > fine seal > enchanted / signed / bound >
+      // generic wedge. The fine rim/wash is independent of which seal wins the
+      // corner (a masterwork fine stack keeps its rim).
+      const glyphKind = bagInstanceGlyphKind(s.instance);
+      const cornerMark = bagCornerMark(glyphKind, questMark, fineMark);
       row.style.setProperty('--bag-slot-quality', qColor);
+      // Accessible name: quest stacks always announce quest item (the seal is
+      // aria-hidden). Instanced stacks keep their per-copy flag. Plain stacks,
+      // fine included, keep the plain label: a fine id's NAME already carries
+      // the grade word (see the fine-grade aria note above the category map).
+      const itemAriaKey = questMark
+        ? 'hudChrome.bags.itemAriaQuest'
+        : glyphKind
+          ? INSTANCE_GLYPH_ARIA_KEYS[glyphKind]
+          : 'itemUi.bags.itemAria';
       row.setAttribute(
         'aria-label',
-        t('itemUi.bags.itemAria', {
+        t(itemAriaKey, {
           item: itemName,
           count: formatNumber(s.count, { maximumFractionDigits: 0 }),
         }),
       );
-      row.innerHTML = `${this.deps.itemIcon(item)}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+      // Exactly one corner treatment ever renders (cornerMark is a single
+      // discriminant): masterwork seal, quest seal, fine seal, or an instance
+      // glyph/tab. Composes with the bottom-right count badge, always visible
+      // without hover on desktop and touch, identical on every graphics preset
+      // (no --fx gate). Ready seals share the seal markup and brighten via
+      // .bi-quest-seal-ready (static; optional pulse is CSS-only).
+      // The masterwork seal and the per-copy glyph/tab are minted through the
+      // shared item_instance_glyph_mark helper so bank/guild-bank cells paint
+      // the same art; the quest and fine seals stay bag-only.
+      const masterworkSeal = cornerMark === 'masterwork' ? instanceGlyphMarkHtml('masterwork') : '';
+      const questSeal =
+        cornerMark === 'quest'
+          ? `<span class="bi-quest-seal${questReady ? ' bi-quest-seal-ready' : ''}" aria-hidden="true">${svgIcon('questlog')}</span>`
+          : '';
+      const fineSeal =
+        cornerMark === 'fine'
+          ? `<span class="bi-fine-seal" aria-hidden="true">${svgIcon('crafting')}</span>`
+          : '';
+      const instanceMark =
+        cornerMark === 'generic' ||
+        cornerMark === 'enchanted' ||
+        cornerMark === 'signed' ||
+        cornerMark === 'bound'
+          ? instanceGlyphMarkHtml(cornerMark)
+          : '';
+      row.innerHTML = `${this.deps.itemIcon(item)}${instanceMark}${masterworkSeal}${questSeal}${fineSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+      // A firebottle mid-throw-cooldown paints a draining curtain on its slot so the
+      // 5s throw pacing is visible in the bag. The bag is a cold window with no
+      // per-frame driver, so the sweep is a self-contained CSS animation seeded from
+      // the wired remaining seconds (world.player.firebottleCdRemaining), not a
+      // per-frame-repainted --cd-fill like the action bar. Appended after the
+      // innerHTML build so the quest seal markup above is not overwritten.
+      if (item.id === FIREBOTTLE_ITEM_ID && world.player.firebottleCdRemaining > 0) {
+        const remaining = world.player.firebottleCdRemaining;
+        const curtain = document.createElement('span');
+        curtain.className = 'bag-cd-curtain';
+        curtain.setAttribute('aria-hidden', 'true');
+        curtain.style.setProperty(
+          '--cd-start',
+          `${Math.min(100, (remaining / FIREBOTTLE_COOLDOWN_SECS) * 100)}%`,
+        );
+        curtain.style.setProperty('--cd-dur', `${remaining}s`);
+        row.appendChild(curtain);
+      }
+      // Bag hover / keyboard focus lights the matching quest-tracker title
+      // (information-add). Mouse and focus both drive the same highlight so Tab
+      // navigation matches pointer hover; leave/focusout clear it. Touch peek
+      // still relies on the tooltip path alone (no mouseenter on long-press).
+      const trackerQuestId = bagQuestTrackerHighlightId(item);
+      if (trackerQuestId) {
+        row.addEventListener('mouseenter', () => this.trackerHighlight.set(trackerQuestId));
+        row.addEventListener('mouseleave', () => this.clearTrackerHighlight());
+        row.addEventListener('focusin', () => this.trackerHighlight.set(trackerQuestId));
+        row.addEventListener('focusout', () => this.clearTrackerHighlight());
+      }
       row.addEventListener('click', (ev) => {
         // On touch, the click that ends a long-press peek inspects the stack (its
         // tooltip is already shown) instead of running its action (use / sell /
         // deposit / feed): the release dismisses the tooltip and fires nothing. A
         // plain tap / desktop click falls through.
         if (this.deps.consumePeek()) {
-          this.deps.hideTooltip();
+          this.hideTooltipClearingTracker();
           return;
         }
         // The synthetic click that trails a completed touch drag must not ALSO run
@@ -534,6 +868,15 @@ export class BagsWindow {
         }
         if (ev.shiftKey && bagShiftLinks(this.bagMode())) {
           this.deps.insertItemChatLink(s.itemId);
+          return;
+        }
+        // Touch has no right-click, so a tap on an item with an action
+        // (Disenchant / Salvage / Apply Enchant) opens the action menu instead of
+        // running the classic action directly; the menu's first row is that
+        // classic action, so nothing is lost. A plain item taps straight through,
+        // byte-identical to today. Long-press still peeks (handled above).
+        if (this.deps.isTouchHud() && this.itemMenuAvailable(item, s.itemId)) {
+          this.openItemMenuFor(item, s, ev);
           return;
         }
         this.runBagAction(item, s, ev);
@@ -561,10 +904,16 @@ export class BagsWindow {
           this.sellBagItem(s, ev);
           return;
         }
-        // Otherwise right-click runs the SAME action as left-click (use / equip),
-        // the classic binding. It no longer destroys: destroying is the drag-out
-        // gesture (drop the stack on the world), which opens the confirm prompt.
         ev.preventDefault();
+        // An item with an action (Disenchant / Salvage / Apply Enchant)
+        // opens the action menu, whose FIRST row is the classic left-click action
+        // so that binding survives. Every other item keeps today's behavior
+        // byte-identical: right-click runs the SAME action as left-click (use /
+        // equip), never a destroy (destroying is the drag-out-to-world gesture).
+        if (this.itemMenuAvailable(item, s.itemId)) {
+          this.openItemMenuFor(item, s, ev);
+          return;
+        }
         this.runBagAction(item, s, ev);
       });
       // Every bag stack is draggable now, not just the hotbar-eligible ones: the
@@ -591,7 +940,8 @@ export class BagsWindow {
           e.dataTransfer.effectAllowed = 'copyMove';
         }
         this.deps.markEquipDropTargets(s.itemId);
-        this.deps.hideTooltip();
+        // Drag dismisses the tooltip without mouseleave; clear the tracker glow too.
+        this.hideTooltipClearingTracker();
       });
       row.addEventListener('dragend', () => {
         this.deps.dragState.end();
@@ -619,7 +969,7 @@ export class BagsWindow {
               },
         ghostHtml: () => this.deps.itemIcon(item),
         onStart: () => {
-          this.deps.hideTooltip();
+          this.hideTooltipClearingTracker();
           this.deps.markEquipDropTargets(s.itemId);
         },
         onMove: () => {
@@ -636,6 +986,9 @@ export class BagsWindow {
           if (target.kind === 'equip') this.deps.dropOnEquipSlot(s.itemId, target.slot);
           else if (target.kind === 'bagCell')
             this.dropOnBagCell(index >= 0 ? index : null, target.index);
+          else if (target.kind === 'actionSlot') this.deps.dropOnActionSlot(s.itemId, target.slot);
+          else if (target.kind === 'actionRingSlot')
+            this.deps.dropOnActionRingSlot(s.itemId, target.ringIndex);
           else if (target.kind === 'world') this.dropOnWorldToDestroy(s.itemId, count);
         },
         onEnd: () => {
@@ -659,6 +1012,209 @@ export class BagsWindow {
       this.bindBagCellDrop(el, cell);
     }
     return el;
+  }
+
+  // An occupied square whose def this bundle cannot resolve (stale-client
+  // guard, R34): inventory is server truth, so an id minted by content this
+  // bundle predates still holds a real, counted slot. The cell renders the
+  // fallback icon, its count badge, the raw id as its label, and the def-free
+  // corner glyph (the instance payload is wire truth, so a bound or enchanted
+  // copy keeps its marker and its aria flag). It keeps every DEF-FREE
+  // capability and only those: it is a drop target in the pristine view, a
+  // DRAG SOURCE (moveInventoryItem acts on indices alone, the same argument
+  // that keeps the bank's withdraw live), and with the bank open it DEPOSITS
+  // (bankDeposit is index-based too, so the withdraw the guard kept live is
+  // not a one-way trip). Use / sell / equip all need a def, so outside the
+  // bank the cell is a focusable no-op and aria-disabled is honest.
+  // Shift-click chat linking is not wired because it would be a silent no-op
+  // anyway: the send path (insertItemLink) refuses an id with no resolvable
+  // display name. (The "[?]" a stale client can see in chat is the
+  // RECEIVER's degradation of a link a current client sent; nothing here
+  // affects it.) Everything acts again once the client updates.
+  // The same-item ordinal for the focus keys (the phase 14 QA): stable when
+  // an earlier DIFFERENT-item stack goes, unlike the raw index. Computed as
+  // ONE pass per inventory array and cached on the array's identity (both
+  // worlds hand back a stable array between changes; a world that copied
+  // per access would only degrade this to the per-row cost it replaced).
+  private ordinalCache: { inv: readonly InvSlot[]; map: Map<InvSlot, number> } | null = null;
+  private stackOrdinal(inventory: readonly InvSlot[], s: InvSlot): number {
+    if (this.ordinalCache?.inv !== inventory) {
+      const map = new Map<InvSlot, number>();
+      const counts = new Map<string, number>();
+      for (const slot of inventory) {
+        const n = counts.get(slot.itemId) ?? 0;
+        map.set(slot, n);
+        counts.set(slot.itemId, n + 1);
+      }
+      this.ordinalCache = { inv: inventory, map };
+    }
+    return this.ordinalCache.map.get(s) ?? -1;
+  }
+
+  private buildUnknownStackCell(s: InvSlot, cell: number | null): HTMLElement {
+    const row = document.createElement('button');
+    row.type = 'button';
+    row.className = 'bag-item q-common';
+    row.dataset.focusKey = `bagu:${s.itemId}:${
+      cell ?? this.stackOrdinal(this.deps.world().inventory, s)
+    }`;
+    row.style.setProperty('--bag-slot-quality', QUALITY_DEFAULT_COLOR);
+    // The known cell's ladder gives trade, mail-attach, market-sell, and
+    // vendor precedence over the deposit; those four all need a def, so on
+    // the unknown cell an active higher mode means NO action (the honest
+    // aria-disabled no-op), never a deposit that jumps the ladder. The
+    // decision itself lives beside bagItemAction (bags_view.ts
+    // bagUnknownAction) so the two ladders cannot drift apart.
+    const canDeposit = bagUnknownAction(this.bagMode()) === 'bankDeposit';
+    if (!canDeposit) row.setAttribute('aria-disabled', 'true');
+    // The accessible name says UNKNOWN, not just the raw id: the hover
+    // tooltip is mouse-only, and the two channels must agree (the glyph
+    // aria-key rule above). The def-free glyph kind rides the same aria keys
+    // the known cell uses, with the unknown label as the item token.
+    const glyphKind = bagInstanceGlyphKind(s.instance);
+    row.setAttribute(
+      'aria-label',
+      glyphKind
+        ? // A glyphed unknown stack carries BOTH aria facts: the UNKNOWN
+          // signal and the per-copy flag (bound is the one a player checks
+          // before trading). The per-kind unknown keys keep the pair as one
+          // localizable sentence.
+          t(UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS[glyphKind], {
+            id: s.itemId,
+            count: formatNumber(s.count, { maximumFractionDigits: 0 }),
+          })
+        : t('itemUi.bags.unknownItemAria', {
+            id: s.itemId,
+            count: formatNumber(s.count, { maximumFractionDigits: 0 }),
+          }),
+    );
+    if (cell !== null) row.dataset.bagIndex = String(cell);
+    this.bindBagCellDrop(row, cell);
+    // Deliberately no quest or fine mark here: both need the item DEF (quest
+    // kind) or a MATERIAL_GRADES row the client shipped WITH its ITEMS row, so
+    // an unknown-def stack can never honestly claim either. The per-copy
+    // marks are def-free (instance payload only) and do apply, minted through
+    // the shared item_instance_glyph_mark helper.
+    const instanceMark = instanceGlyphMarkHtml(glyphKind);
+    row.innerHTML = `${unknownItemIconHtml(s.itemId)}${instanceMark}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+    if (canDeposit) {
+      row.addEventListener('click', (ev) => {
+        // The same peek and trailing-synthetic-click dance as the known cell:
+        // this cell has a drag source, so a completed touch drag must not
+        // also deposit on release.
+        if (this.deps.consumePeek()) {
+          this.deps.hideTooltip();
+          return;
+        }
+        if (this.suppressNextClick) {
+          this.suppressNextClick = false;
+          return;
+        }
+        // The known cell's bankDeposit arm, def-free by construction: resolve
+        // the exact clicked stack by reference and send the index. The prompt
+        // (shift, multi-count fungible stacks) is def-free too.
+        const index = bagStackIndex(this.deps.world().inventory, s);
+        if (index < 0) return;
+        if (ev.shiftKey && bankDepositOpensPrompt(s)) {
+          this.showDepositQuantityPrompt(index, s, Math.max(1, Math.floor(s.count)));
+        } else {
+          this.deps.world().bankDeposit(index);
+          this.deps.hideTooltip();
+          this.render();
+        }
+      });
+    }
+    // A touch long-press belongs to the tooltip peek here exactly as on the
+    // known cell (Chromium synthesizes contextmenu at ~500ms, beating the
+    // peek timer, and this cell's tooltip is the only channel that explains
+    // it to a sighted touch player); desktop right-click stays inert since
+    // the cell has no secondary action to offer.
+    row.addEventListener('contextmenu', (ev) => {
+      const pointerType = (ev as PointerEvent).pointerType;
+      if (
+        pointerType === 'touch' ||
+        pointerType === 'pen' ||
+        (document.body.classList.contains('mobile-touch') && pointerType !== 'mouse')
+      ) {
+        ev.preventDefault();
+      }
+    });
+    // A fresh press clears any stale suppression, mirroring the known cell's
+    // contract: the flag only ever swallows the ONE synthetic click trailing
+    // the drag that set it, and a drag that ends without that click (release
+    // over another element, a rebuild destroying the source row) must never
+    // eat a later, real deposit tap.
+    row.addEventListener('pointerdown', () => {
+      this.suppressNextClick = false;
+    });
+    this.deps.attachTooltip(
+      row,
+      () =>
+        `<div class="tt-title">${esc(s.itemId)}</div><div class="tt-sub">${esc(t('itemUi.bags.unknownItem'))}</div>`,
+    );
+    // The drag source, trimmed from buildStackCell's wiring: no hotbar
+    // payload (a hotbar action needs a def), and markEquipDropTargets is
+    // def-gated and lights nothing for an unknown id; the world/paperdoll
+    // drop arms no-op the same way, leaving the bag-cell move as the one
+    // live target, which is the point. The click-suppression dance IS here
+    // (the deposit click above, the onDrop flag below, and the pointerdown
+    // reset): with the bank open this cell has a real click action now.
+    const index = bagStackIndex(this.deps.world().inventory, s);
+    row.draggable = !this.deps.tradeOpen() && !this.deps.vendorOpen();
+    row.addEventListener('dragstart', (e) => {
+      this.deps.dragState.begin({
+        itemId: s.itemId,
+        count: Math.max(1, Math.floor(s.count)),
+        index: index >= 0 ? index : null,
+      });
+      if (e.dataTransfer) {
+        e.dataTransfer.setData('text/plain', s.itemId);
+        e.dataTransfer.effectAllowed = 'copyMove';
+      }
+      this.deps.markEquipDropTargets(s.itemId);
+      this.deps.hideTooltip();
+    });
+    row.addEventListener('dragend', () => {
+      this.deps.dragState.end();
+      this.deps.clearActionDropTargets();
+      this.deps.markEquipDropTargets(null);
+    });
+    bindTouchItemDrag(row, {
+      state: this.deps.dragState,
+      isTouchHud: () => this.deps.isTouchHud(),
+      payload: () =>
+        this.deps.tradeOpen() || this.deps.vendorOpen()
+          ? null
+          : {
+              itemId: s.itemId,
+              count: Math.max(1, Math.floor(s.count)),
+              index: index >= 0 ? index : null,
+            },
+      ghostHtml: () => unknownItemIconHtml(s.itemId),
+      onStart: () => {
+        this.deps.hideTooltip();
+        this.deps.markEquipDropTargets(s.itemId);
+      },
+      onMove: () => {
+        /* nothing to light beyond the shared drag ghost */
+      },
+      onDrop: (x, y) => {
+        // Suppress the synthetic click the release fires on the source row
+        // (touch_item_drag.ts contract): with the bank open this cell HAS a
+        // click action now, and without the flag a reorganize drag would
+        // also deposit the stack on release.
+        this.suppressNextClick = true;
+        // Only the bag-cell move is live for a def-less stack: equip and the
+        // world-destroy prompt both need the def, so releasing there is a
+        // plain cancel rather than a half-working action.
+        const target = resolveDropTargetAt(x, y);
+        if (target.kind === 'bagCell') this.dropOnBagCell(index >= 0 ? index : null, target.index);
+      },
+      onEnd: () => {
+        this.deps.markEquipDropTargets(null);
+      },
+    });
+    return row;
   }
 
   // A bag square as a drop target for a stack dragged out of the SAME bag. `cell` is the
@@ -716,7 +1272,7 @@ export class BagsWindow {
   /** What dropping `itemId` on the world does right now (pure decision, shared with
    *  the tooltip hint). Public for the HUD-installed canvas drop target. */
   destroyAction(itemId: string): BagDestroyAction {
-    const item = ITEMS[itemId];
+    const item = knownItemDef(ITEMS, itemId);
     if (!item) return 'none';
     return bagDestroyAction(item, this.bagMode());
   }
@@ -742,7 +1298,7 @@ export class BagsWindow {
   // pure bagItemAction decided. Both buttons run it (right-click is the classic
   // use/equip binding), so the two can never drift apart.
   private runBagAction(item: (typeof ITEMS)[string], s: InvSlot, ev: MouseEvent): void {
-    const action = bagItemAction(item, this.bagMode());
+    const action = bagItemAction(item, this.bagMode(), s.instance);
     switch (action) {
       case 'transferBlockedSoulbound':
         this.deps.showError(t('hudChrome.itemSoulbound'));
@@ -753,8 +1309,11 @@ export class BagsWindow {
       case 'mailAttachBlocked':
         this.deps.showError(t('hudChrome.mailbox.cannotMail'));
         return;
+      case 'mailAttachBlockedBound':
+        this.deps.showError(t('hudChrome.mailbox.cannotMail'));
+        return;
       case 'mailAttach':
-        this.deps.stageMailParcel(s.itemId);
+        this.deps.stageMailParcel(s.itemId, s.instance);
         break;
       case 'marketSellBlockedQuest':
         this.deps.showError(t('itemUi.errors.noQuestItems'));
@@ -762,9 +1321,15 @@ export class BagsWindow {
       case 'marketSellBlockedNoMarket':
         this.deps.showError(t('itemUi.tooltip.cannotMarket'));
         return;
+      case 'marketSellBlockedBound':
+        this.deps.showError(t('hud.errors.marketListBound'));
+        return;
       case 'marketSell':
-        this.deps.stageMarketSell(s.itemId);
+        this.deps.stageMarketSell(s.itemId, s.instance);
         break;
+      case 'vendorSellBlocked':
+        this.deps.showError(t('itemUi.tooltip.cannotVendor'));
+        return;
       case 'vendorSell':
         this.sellBagItem(s, ev);
         break;
@@ -793,6 +1358,43 @@ export class BagsWindow {
         // through the shared showError pipe), and send nothing.
         this.deps.showError(tSim('error.bankQuestItem'));
         return;
+      case 'bankDepositBlockedNoTarget':
+        // The bank is open with no grid on screen to drop into (its guild pane's
+        // Log view). SPEAK, do not go quiet: this is a deliberate click on an
+        // item, in a docked window whose every other click either deposits or
+        // says why it will not, so silence here reads as a broken bag. The line
+        // is the same terse one the hover advertises, matching how the vendor
+        // and market denies reuse their cannot-hint wording.
+        this.deps.showError(t('hudChrome.bank.cannotDepositNow'));
+        return;
+      case 'guildBankDeposit': {
+        // The guild twin of bankDeposit: same reference-resolved index, same
+        // shift split prompt, sent through the IWorldGuildBank facet.
+        const index = bagStackIndex(this.deps.world().inventory, s);
+        if (index < 0) break;
+        if (ev.shiftKey && bankDepositOpensPrompt(s)) {
+          this.showDepositQuantityPrompt(index, s, Math.max(1, Math.floor(s.count)), 'guild');
+        } else {
+          this.deps.world().guildBankDeposit(index);
+          this.deps.hideTooltip();
+          this.render();
+        }
+        break;
+      }
+      // The guild pipe's pre-empt denies, each voicing the exact line the sim
+      // would refuse with (its established sim_i18n keys), sending nothing.
+      case 'guildBankDepositBlockedQuest':
+        // The guild pipe's OWN quest line, not the personal bank's
+        // error.bankQuestItem: the sim voices error.guildBankQuestItem here, and
+        // a pre-empt that voiced a different sentence would silently diverge.
+        this.deps.showError(tSim('error.guildBankQuestItem'));
+        return;
+      case 'guildBankDepositBlockedSoulbound':
+        this.deps.showError(tSim('error.guildBankSoulbound'));
+        return;
+      case 'guildBankDepositBlockedNoTransfer':
+        this.deps.showError(tSim('error.guildBankNoTransfer'));
+        return;
       case 'petFeedBlocked':
         this.deps.showError(t('hud.pet.petEatsFoodOnly'));
         return;
@@ -810,15 +1412,15 @@ export class BagsWindow {
         this.deps.hideTooltip();
         this.render();
         break;
-      case 'openMountPicker':
-        this.deps.hideTooltip();
-        this.deps.openMountPicker(item.kind === 'mount' ? item.mount : '');
-        break;
-      case 'use':
-        this.deps.world().useItem(s.itemId);
+      case 'use': {
+        // Gathering tools (#2343) route through the interact-style handler
+        // (nearest matching node + autorun stop) when main.ts has wired it;
+        // everything else, and any unwired host, keeps the plain useItem.
+        if (!item || !this.deps.useGatherTool(item)) this.deps.world().useItem(s.itemId);
         this.render();
         this.deps.renderCharIfOpen();
         break;
+      }
     }
   }
 
@@ -827,13 +1429,17 @@ export class BagsWindow {
   private attachRowTooltip(row: HTMLElement, item: (typeof ITEMS)[string], s: InvSlot): void {
     this.deps.attachTooltip(row, () => {
       const mode = this.bagMode();
-      const key = bagTooltipHintKey(item, mode);
+      const key = bagTooltipHintKey(item, mode, s.instance);
       const extra = key ? `<div class="tt-sub">${esc(t(key))}</div>` : '';
       // Advertise the shift-click partial deposit on a splittable stack, the bank
       // window's withdrawPartialHint twin (tied to the deposit hint arm so a
       // blocked quest item never shows it).
+      // Both bank modes advertise the shift split on their deposit-hint arm
+      // (a blocked item never shows it): the guild target reuses the partial
+      // wording, only the primary hint key differs.
       const partial =
-        key === 'hudChrome.bank.depositHint' && bankDepositOpensPrompt(s)
+        (key === 'hudChrome.bank.depositHint' || key === 'hudChrome.bank.guildDepositHint') &&
+        bankDepositOpensPrompt(s)
           ? `<div class="tt-sub">${esc(t('hudChrome.bank.depositPartialHint'))}</div>`
           : '';
       // Advertise the two drag gestures that replaced right-click-destroy: a gear
@@ -853,9 +1459,44 @@ export class BagsWindow {
     });
   }
 
+  /** Plain progress inputs for bagQuestMarkKind (questReady). Null when the
+   *  stack is not a quest kind or the player does not hold the related quest. */
+  private questMarkProgress(item: ItemDef) {
+    if (item.kind !== 'quest' || !item.questId) return null;
+    // Optional chain: thin IWorld fakes in unit harnesses may omit questLog.
+    const log = this.deps.world().questLog?.get(item.questId);
+    if (!log) return null;
+    const quest = QUESTS[item.questId];
+    return bagQuestMarkProgressFromLog(
+      item.id,
+      {
+        counts: log.counts,
+        state: log.state,
+        resolvedCounts: log.resolvedCounts,
+      },
+      quest?.objectives.map((objective) => ({
+        type: objective.type,
+        itemId: 'itemId' in objective ? objective.itemId : undefined,
+        count: objective.count,
+      })),
+    );
+  }
+
+  private clearTrackerHighlight(): void {
+    this.trackerHighlight.clear();
+  }
+
+  /** Hide the shared tooltip and drop any bag-driven tracker highlight. */
+  private hideTooltipClearingTracker(): void {
+    this.clearTrackerHighlight();
+    this.deps.hideTooltip();
+  }
+
   // Refresh only the grid contents (used by live search) so the search input keeps
   // focus and caret position across keystrokes.
   private refreshGrid(): void {
+    // Grid rebuild tears down hovered cells without mouseleave.
+    this.clearTrackerHighlight();
     const grid = this.deps.root().querySelector('.bag-grid') as HTMLElement | null;
     if (!grid) return;
     const prevScrollTop = grid.scrollTop;
@@ -873,9 +1514,54 @@ export class BagsWindow {
       mailAttach: this.deps.isMailAttach(),
       marketSell: this.deps.isMarketSell(),
       vendorOpen: this.deps.vendorOpen(),
-      bankDeposit: this.deps.isBankOpen(),
+      // At most ONE of the two bank modes, and possibly NEITHER: each is armed
+      // only while its own grid is actually on screen to drop into. The guild
+      // pane's Log view arms neither, because a bag click while reading the
+      // history must not silently deposit the item that was clicked.
+      //
+      // bankOpen carries the fact the two deposit flags no longer can: that the
+      // bank cluster owns the bag slot at all. Without it, disarming both
+      // deposits reads downstream as "no window is open", which demotes the
+      // click to the plain use/equip default and re-arms the destroy prompt and
+      // the item action menu over a reading surface.
+      bankOpen: this.deps.isBankOpen(),
+      bankDeposit: this.deps.isPersonalBankTab(),
+      guildBankDeposit: this.deps.isGuildBankTab(),
       petFeed: this.deps.pendingPetFeed(),
     };
+  }
+
+  // Whether the action menu should open for this item. Offered ONLY in
+  // the plain-use default mode (never trade / mail / market / vendor / bank /
+  // pet-feed, whose own click owns the slot), mirroring bagDestroyAction's
+  // transactional-mode gate, and only when the item has an eligible action.
+  // The bank arm reads bankOpen for the same reason bagDestroyAction does: a
+  // bank view with no deposit target is still the bank owning the slot, and the
+  // menu's rows are the very use / equip / destroy actions this surface refuses.
+  private itemMenuAvailable(item: ItemDef, itemId: string): boolean {
+    const mode = this.bagMode();
+    const inDefaultMode =
+      !mode.tradeOpen &&
+      !mode.mailAttach &&
+      !mode.marketSell &&
+      !mode.vendorOpen &&
+      !mode.bankOpen &&
+      !mode.bankDeposit &&
+      !mode.guildBankDeposit &&
+      !mode.petFeed;
+    return inDefaultMode && bagItemHasContextActions(item, itemId);
+  }
+
+  // Open the action menu at the event's viewport point (falling back to the row
+  // box for a keyboard-activated click), passing the exact classic action for
+  // this slot as the menu's first row.
+  private openItemMenuFor(item: ItemDef, s: InvSlot, ev: MouseEvent): void {
+    this.deps.hideTooltip();
+    const rect = (ev.currentTarget as HTMLElement | null)?.getBoundingClientRect();
+    const x = ev.clientX || rect?.left || 0;
+    const y = ev.clientY || rect?.top || 0;
+    const index = bagStackIndex(this.deps.world().inventory, s);
+    this.deps.openItemActionMenu(item, s.itemId, index, x, y, () => this.runBagAction(item, s, ev));
   }
 
   private sellBagItem(slot: InvSlot, ev: MouseEvent): void {
@@ -883,103 +1569,30 @@ export class BagsWindow {
     if (ev.ctrlKey || ev.metaKey) {
       this.deps.world().sellItem(slot.itemId, count);
     } else if (ev.shiftKey && count > 1) {
-      this.showSellQuantityPrompt(slot.itemId, count);
+      // The prompt's cap is every copy of this item across the whole bag, not just
+      // the ONE slot that was clicked: a stackable item's per-slot count tops out at
+      // its stackSize (commonly 20), so a player holding more sits in other slots.
+      const heldTotal = Math.max(count, totalHeldCount(this.deps.world().inventory, slot.itemId));
+      this.showSellQuantityPrompt(slot.itemId, heldTotal);
     } else {
       this.deps.world().sellItem(slot.itemId);
     }
   }
 
-  // WCAG 2.2 AA: the ad-hoc bag prompts (discard / sell quantity) are modal
-  // dialogs but carried no role/name, no keyboard trap, and no focus return. This wires
-  // role=dialog + aria-modal + aria-labelledby (the prompt text), a self-contained Tab
-  // cycle among the prompt's controls (these prompts are appended to #prompt-stack,
-  // outside the bag window's reach, so they own their own trap), an Escape close, and
-  // focus return to the element that opened the prompt. Returns a close-and-return fn.
+  // WCAG 2.2 AA modal prompt wiring, the shared recipe (src/ui/prompt_dialog.ts):
+  // #bags is the inert root while a prompt is open, and if the bags window itself
+  // is force-closed out from under an open prompt, close() clears inert as a
+  // teardown backstop, so #bags is never left inert while hidden. This single
+  // chokepoint covers the discard, sell, and bank-deposit prompts.
   private installPromptDialog(
     prompt: HTMLElement,
     opener: HTMLElement | null,
     close: () => void,
-  ): { dismiss: () => void; dismissAndReturn: () => void } {
-    prompt.setAttribute('role', 'dialog');
-    prompt.setAttribute('aria-modal', 'true');
-    // Mark the bag grid behind the modal prompt inert while it is open, so a screen
-    // reader / Tab cannot reach the now-blocked inventory underneath. EVERY prompt
-    // teardown path (confirm/submit, cancel, Escape) routes through dismiss(), which
-    // clears inert before the prompt is removed; and if the bags window itself is
-    // force-closed out from under an open prompt, close() clears inert as a teardown
-    // backstop, so #bags is never left inert while hidden. The focus-returning variant
-    // clears inert BEFORE refocusing (a focus into a still-inert subtree is silently
-    // dropped, and the openers live inside #bags). This single chokepoint covers BOTH the
-    // discard and sell prompts.
-    const bagsRoot = this.deps.root();
-    bagsRoot.inert = true;
-    const titleEl = prompt.querySelector('.prompt-text') as HTMLElement | null;
-    if (titleEl) {
-      if (!titleEl.id) titleEl.id = `bags-prompt-title-${promptDialogSeq++}`;
-      prompt.setAttribute('aria-labelledby', titleEl.id);
-      // Name an unlabeled quantity field by the prompt's own question (the same titled
-      // text, e.g. "Destroy how many Linen Cloth?") so a number input is never anonymous
-      // (WCAG 1.3.1 / 4.1.2). The discard prompt's input had no name (the new bags axe
-      // case caught it); the sell prompt's input already carries a dedicated aria-label,
-      // so leave that one alone (aria-labelledby would otherwise shadow the better name).
-      const numInput = prompt.querySelector('.prompt-number');
-      if (numInput && !numInput.hasAttribute('aria-label')) {
-        numInput.setAttribute('aria-labelledby', titleEl.id);
-      }
-    }
-    // Clear inert THEN remove the prompt; the only teardown both the confirm and the
-    // cancel paths share, so routing every close through it guarantees inert never leaks.
-    const dismiss = (): void => {
-      bagsRoot.inert = false;
-      close();
-    };
-    const dismissAndReturn = (): void => {
-      dismiss();
-      opener?.focus();
-    };
-    prompt.addEventListener('keydown', (e) => {
-      const ke = e as KeyboardEvent;
-      // Escape: stopPropagation, not just preventDefault. The input layer's
-      // window-level keydown runs the global escape action (closeAll) regardless of
-      // defaultPrevented, and prompt BUTTONS are not tag-exempt like inputs, so
-      // without it one keypress dismisses the prompt AND closes the whole window.
-      if (ke.key === 'Escape') {
-        ke.preventDefault();
-        ke.stopPropagation();
-        dismissAndReturn();
-        return;
-      }
-      // Enter / Space: stopPropagation for the same reason, keeping the default so
-      // native activation (Enter/Space on the confirm and cancel buttons) survives.
-      // A submit handler on the quantity input runs at the target phase and removes
-      // the prompt DURING this keydown, so a window-level gate keyed on the prompt's
-      // presence runs too late: without the stop, the same press hits the global
-      // chat/jump bind and steals the WCAG 2.4.3 focus return. The event path is
-      // fixed at dispatch, so this listener still runs after the detach; only THEN
-      // cancel the default too, or the browser runs the key's activation against
-      // the freshly re-landed focus (Enter ghost-clicking [data-close] and closing
-      // the whole window).
-      if (ke.key === 'Enter' || ke.key === ' ' || ke.code === 'Space') {
-        ke.stopPropagation();
-        if (!prompt.isConnected) ke.preventDefault();
-        return;
-      }
-      if (ke.key !== 'Tab') return;
-      // Reuse the one canonical focusable set so a prompt that ever
-      // gains an [href] / [tabindex] control stays inside the trap.
-      const f = Array.from(prompt.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR));
-      if (f.length === 0) return;
-      const first = f[0];
-      const last = f[f.length - 1];
-      if (ke.shiftKey && document.activeElement === first) {
-        ke.preventDefault();
-        last.focus();
-      } else if (!ke.shiftKey && document.activeElement === last) {
-        ke.preventDefault();
-        first.focus();
-      }
+  ): PromptDialogHandle {
+    return installModalPromptDialog(prompt, opener, close, {
+      inertRoot: this.deps.root(),
+      idPrefix: 'bags-prompt-title',
     });
-    return { dismiss, dismissAndReturn };
   }
 
   private showDiscardItemPrompt(itemId: string, maxCount: number): void {
@@ -987,7 +1600,7 @@ export class BagsWindow {
       el.remove();
     });
     const opener = document.activeElement as HTMLElement | null;
-    const item = ITEMS[itemId];
+    const item = knownItemDef(ITEMS, itemId);
     const stack = document.getElementById('prompt-stack');
     if (!stack) return;
     const prompt = document.createElement('div');
@@ -1054,7 +1667,7 @@ export class BagsWindow {
       el.remove();
     });
     const opener = document.activeElement as HTMLElement | null;
-    const item = ITEMS[itemId];
+    const item = knownItemDef(ITEMS, itemId);
     const stack = document.getElementById('prompt-stack');
     if (!stack) return;
     const prompt = document.createElement('div');
@@ -1100,69 +1713,60 @@ export class BagsWindow {
   }
 
   // The partial-deposit prompt (shift-click a splittable stack while the bank is
-  // open), cloned from the QA-hardened bank withdraw prompt: index-based, and AT
-  // SUBMIT it re-resolves the live slot and refuses on an itemId mismatch (the bags
-  // can repaint under the open prompt) while clamping the count to the live stack.
-  // Reuses this window's installPromptDialog (role/aria-modal/aria-labelledby, the
-  // Tab cycle, Escape preventDefault+stopPropagation, the #bags inert set/clear, and
-  // focus return) and the shared prompt cancel label.
-  private showDepositQuantityPrompt(index: number, captured: InvSlot, maxCount: number): void {
-    dismissBagPrompts();
-    const opener = document.activeElement as HTMLElement | null;
-    const item = ITEMS[captured.itemId];
-    const stack = document.getElementById('prompt-stack');
-    if (!stack) return;
-    const prompt = document.createElement('div');
-    prompt.className = 'prompt panel bank-deposit-prompt';
+  // open). The shared builder (bank_quantity_prompt.ts) owns the chrome; this
+  // owns the bags closures: the stale-slot re-resolve (resolveDepositSubmit
+  // refuses on an itemId mismatch, else clamps to the live stack) and the send.
+  // `target` picks which facet command the submit sends: the personal pane's
+  // bankDeposit (default) or the Guild tab's guildBankDeposit; everything else
+  // is identical between the two.
+  private showDepositQuantityPrompt(
+    index: number,
+    captured: InvSlot,
+    maxCount: number,
+    target: 'bank' | 'guild' = 'bank',
+  ): void {
+    // knownItemDef, not a raw ITEMS index: the release's stale-client sweep
+    // made every bags item read tolerate an id this client does not know.
+    const item = knownItemDef(ITEMS, captured.itemId);
     const itemName = item ? itemDisplayName(item) : captured.itemId;
-    prompt.innerHTML = `<div class="prompt-text">${esc(t('hudChrome.bank.depositQuantityTitle', { item: itemName }))}</div>`;
-    const input = document.createElement('input');
-    input.className = 'prompt-number';
-    input.type = 'number';
-    input.setAttribute('aria-label', t('hudChrome.bank.depositQuantityInput'));
-    input.min = '1';
-    input.max = String(maxCount);
-    input.step = '1';
-    input.value = '1';
-    const confirm = document.createElement('button');
-    confirm.className = 'btn';
-    confirm.textContent = t('hudChrome.bank.depositQuantityConfirm');
-    const cancel = document.createElement('button');
-    cancel.className = 'btn';
-    cancel.textContent = t('itemUi.vendor.sellQuantityCancel');
-    const close = () => prompt.remove();
-    prompt.append(input, confirm, cancel);
-    const { dismiss, dismissAndReturn } = this.installPromptDialog(prompt, opener, close);
-    const submit = () => {
-      // Re-resolve the live slot at the captured index: depositing the WRONG item
-      // (the bags repainted under the prompt) is worse than dismissing. resolveDepositSubmit
-      // returns null to refuse on a mismatch, else the count clamped to the live stack.
-      const live = this.deps.world().inventory[index];
-      const count = resolveDepositSubmit(live, captured, Number(input.value) || 0, maxCount);
-      if (count === null) {
-        dismiss();
-        (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
-        return;
-      }
-      this.deps.world().bankDeposit(index, count);
-      dismiss();
-      this.deps.hideTooltip();
-      // render() rebuilds the grid, detaching the opener slot, so land focus on the
-      // always-present close button rather than dropping it to <body>. dismiss()
-      // cleared inert first, so this focus is not lost into a still-inert subtree.
-      this.render();
-      (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
-    };
-    confirm.addEventListener('click', submit);
-    cancel.addEventListener('click', dismissAndReturn);
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') submit();
-    });
-    stack.appendChild(prompt);
-    window.setTimeout(() => {
-      input.focus();
-      input.select();
-    }, 0);
+    showQuantityPrompt(
+      {
+        installPromptDialog: (prompt, opener, close) =>
+          this.installPromptDialog(prompt, opener, close),
+        dismissSiblings: dismissBagPrompts,
+      },
+      {
+        className: 'bank-deposit-prompt',
+        titleText: t('hudChrome.bank.depositQuantityTitle', { item: itemName }),
+        inputAriaText: t('hudChrome.bank.depositQuantityInput'),
+        confirmText: t('hudChrome.bank.depositQuantityConfirm'),
+        cancelText: t('itemUi.vendor.sellQuantityCancel'),
+        maxCount,
+        resolveCount: (requested) => {
+          // Re-resolve the live slot at the captured index: depositing the
+          // WRONG item (the bags repainted under the prompt) is worse than
+          // dismissing.
+          const live = this.deps.world().inventory[index];
+          return resolveDepositSubmit(live, captured, requested, maxCount);
+        },
+        send: (count) => {
+          if (target === 'guild') this.deps.world().guildBankDeposit(index, count);
+          else this.deps.world().bankDeposit(index, count);
+        },
+        afterClose: (sent) => {
+          if (sent) {
+            this.deps.hideTooltip();
+            // render() rebuilds the grid, detaching the opener slot; dismiss()
+            // cleared inert first, so the focus below is not lost into a
+            // still-inert subtree.
+            this.render();
+          }
+          // Land focus on the always-present close button rather than letting
+          // it drop to <body> (the opener slot is gone on both arms).
+          (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
+        },
+      },
+    );
   }
 
   // Write the dragged item onto the DataTransfer (reproduced from the exported

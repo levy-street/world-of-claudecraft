@@ -11,8 +11,12 @@
 // Sim (PlayerMeta.bags); Sim keeps thin same-named delegates.
 //
 // Capacity is enforced at the command boundaries (buy, loot, pick up, fish,
-// conjure, market collect, trade accept, quest turn-in, unequip) via
-// canAddItem/fitsAll pre-checks. Grant paths a player cannot re-try (winning a
+// conjure, market collect, trade accept, quest turn-in, unequip, and the
+// profession transforms: craft, salvage, disenchant, enchant apply, and the
+// unbind stack split, #2350) via canAddItem/fitsAll/countFit pre-checks; a
+// transform command models the post-consumption inventory on a scratch copy
+// (removeStacked/consumeOneScratch below) so consuming the inputs can free
+// the room the output needs. Grant paths a player cannot re-try (winning a
 // need/greed roll, master loot, delve end-of-run rewards, dev gives) skip the
 // check on purpose: an over-capacity inventory is tolerated (pre-bag saves may
 // load overflowing too) and simply blocks new pickups until space is freed.
@@ -22,9 +26,15 @@
 // Date.now (enforced by tests/architecture.test.ts). This module draws NO rng.
 
 import { ITEMS } from './data';
+import { canStackInstancePayloads, isMergeableInstancePayload } from './item_instance_merge';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import type { InvSlot, ItemDef } from './types';
+import {
+  cloneItemInstancePayload,
+  type InvSlot,
+  type ItemDef,
+  type ItemInstancePayload,
+} from './types';
 
 /** Slots in the always-present backpack every character owns. */
 export const BACKPACK_SLOTS = 16;
@@ -42,6 +52,24 @@ export function stackSizeOf(def: ItemDef | undefined): number {
   if (!def) return DEFAULT_STACK;
   if (def.stackSize && def.stackSize > 0) return Math.floor(def.stackSize);
   return UNSTACKED_KINDS.has(def.kind) ? 1 : DEFAULT_STACK;
+}
+
+/** The tamper ceiling for a PERSISTED slot's count: a counted instanced slot
+ *  loads capped at the stack cap identical-payload merges could legitimately
+ *  have built; a charge-bearing payload stays one-per-slot regardless (a
+ *  counted stack shares ONE payload object, so a hand-edited count would mint
+ *  shared-charge copies); an unknown item def stays dormant recoverable data,
+ *  uncapped like the plain arm (items are never destroyed by a load); plain
+ *  slots are uncapped. Consumed by bank.ts sanitizeBankState AND the
+ *  carried-inventory hydration in Sim.addPlayer so the rule cannot drift
+ *  between the two load arms. */
+export function instancedCountCap(
+  def: ItemDef | undefined,
+  instance: ItemInstancePayload | undefined,
+): number {
+  if (!instance) return Number.POSITIVE_INFINITY;
+  if (!isMergeableInstancePayload(instance)) return 1;
+  return def ? stackSizeOf(def) : Number.POSITIVE_INFINITY;
 }
 
 /** Extra slots a bag item grants when equipped (0 for a non-bag). */
@@ -63,24 +91,81 @@ export function usedBagSlots(inventory: readonly InvSlot[]): number {
 }
 
 /** How many of `count` copies of an item would fit: existing stacks absorb up
- *  to their stackSize, then each free slot holds one fresh stack. An instanced
- *  slot (#1165 per-instance payload) is never a merge target, so it offers no
- *  top-up room; it still occupies a slot in the `inventory.length` used count. */
+ *  to their stackSize, then each free slot holds one fresh stack. `instance`
+ *  is the payload of the copies being added (absent for a plain fungible
+ *  add). A slot offers top-up room only when its payload matches under
+ *  canStackInstancePayloads (identical-payload stacking): a plain
+ *  add never tops up an instanced slot (#1165) and an instanced add never
+ *  tops up a plain slot or a differently-instanced one; a non-matching slot
+ *  still occupies a slot in the `inventory.length` used count. */
 export function countFit(
   inventory: readonly InvSlot[],
   capacity: number,
   itemId: string,
   count: number,
+  instance?: ItemInstancePayload,
+  craftedRecipeId?: string,
 ): number {
   const def = ITEMS[itemId];
   const stack = stackSizeOf(def);
   let room = 0;
   for (const s of inventory) {
-    if (s.itemId === itemId && !s.instance && s.count < stack) room += stack - s.count;
+    if (
+      s.itemId === itemId &&
+      canStackInstancePayloads(s.instance, instance) &&
+      s.craftedRecipeId === craftedRecipeId &&
+      s.count < stack
+    ) {
+      room += stack - s.count;
+    }
   }
   const freeSlots = Math.max(0, capacity - inventory.length);
-  room += freeSlots * stack;
+  // A non-mergeable payload (charges) keeps one-per-slot semantics, so each
+  // fresh slot absorbs exactly one copy instead of a full stack.
+  const perFreshSlot = instance && !isMergeableInstancePayload(instance) ? 1 : stack;
+  room += freeSlots * perFreshSlot;
   return Math.min(count, room);
+}
+
+/** True when ALL `count` copies of an instanced grant fit (one by default):
+ *  room in a byte-equal mergeable stack (identical-payload stacking) plus free
+ *  slots. The corpse focus-harvest signed guards consume this (harvestNode's
+ *  signed batch reads countFit directly for the same model) so a slot-full bag
+ *  holding a same-payload stack with room keeps the
+ *  signature instead of downgrading to the plain fungible fallback (#2139:
+ *  every capacity pre-check must model the merge identically, or a guard
+ *  that disagrees with addStacked re-opens the overflow class). Counting the
+ *  WHOLE grant is what keeps that promise for a multi-unit signed yield
+ *  (#2473): a stack with room for one of three units must refuse, or the
+ *  remaining two push a fresh slot past capacity. The plain twin is
+ *  canAddItem, same all-or-nothing shape. A `count` of 0 answers true (nothing
+ *  is always grantable) and addItemInstance early-returns on it, so a caller
+ *  that can legitimately reach 0 owns that check itself; no shipped grant can
+ *  (a harvest quantity floors at 1). */
+export function canGrantItemInstance(
+  inventory: readonly InvSlot[],
+  capacity: number,
+  itemId: string,
+  instance: ItemInstancePayload,
+  count = 1,
+): boolean {
+  return countFit(inventory, capacity, itemId, count, instance) >= count;
+}
+
+/** How many of a `count`-unit instanced grant actually fit: the same
+ *  countFit room model canGrantItemInstance boolean-gates, surfaced as a
+ *  number. A signed-grant call site that owns a rolled quantity larger than
+ *  one (the corpse-harvest signed grant, mirroring the node-harvest signed
+ *  grant's own countFit call) uses this to size its addItemInstance call
+ *  instead of truncating an available multi-unit fit down to one. */
+export function fitForItemInstance(
+  inventory: readonly InvSlot[],
+  capacity: number,
+  itemId: string,
+  count: number,
+  instance: ItemInstancePayload,
+): number {
+  return countFit(inventory, capacity, itemId, count, instance);
 }
 
 /** True when all `count` copies fit. */
@@ -93,6 +178,27 @@ export function canAddItem(
   return countFit(inventory, capacity, itemId, count) >= count;
 }
 
+/** The ONE capacity check the exchange pipes share (market buy/cancel/collect,
+ *  mail claim, vendor buyback), payload-aware on both arms (#2139: the
+ *  pre-check must model the grant identically or the overflow class re-opens):
+ *  with `instance` absent this is canAddItem, with it canGrantItemInstance.
+ *  Also threads the plain-stack `craftedRecipeId` marker: a caller granting a
+ *  crafted plain stack must pre-check with the same marker `grantCopies`
+ *  grants with, or the fit check can see room in a marker-free stack that the
+ *  actual grant (keyed on the marker by addStacked) cannot merge into,
+ *  overfilling the recipient's bags past the modelled cap. Its grant twin is
+ *  item_instance_transfer.ts grantCopies. */
+export function canGrantCopies(
+  inventory: readonly InvSlot[],
+  capacity: number,
+  itemId: string,
+  count: number,
+  instance?: ItemInstancePayload,
+  craftedRecipeId?: string,
+): boolean {
+  return countFit(inventory, capacity, itemId, count, instance, craftedRecipeId) >= count;
+}
+
 /** True when EVERY add in the batch fits together (simulated cumulatively on a
  *  scratch copy, so three 1-slot items against one free slot correctly fail). */
 export function fitsAll(
@@ -102,39 +208,75 @@ export function fitsAll(
 ): boolean {
   const scratch = inventory.map((s) => ({ ...s }));
   for (const a of adds) {
-    if (countFit(scratch, capacity, a.itemId, a.count) < a.count) return false;
-    addStacked(scratch, a.itemId, a.count);
+    if (countFit(scratch, capacity, a.itemId, a.count, a.instance, a.craftedRecipeId) < a.count)
+      return false;
+    addStacked(scratch, a.itemId, a.count, a.instance, a.craftedRecipeId);
   }
   return true;
 }
 
 /** Stack-aware add: top up existing stacks to their stackSize, then append
- *  fresh stacks. Never merges into an instanced slot (#1165: signer/charges/
- *  rolled/boundTo copies keep their own slot). Applies NO capacity cap
- *  (capacity is a pre-check concern); callers on a gated path check
- *  canAddItem/fitsAll first. */
-export function addStacked(inventory: InvSlot[], itemId: string, count: number): void {
+ *  fresh stacks. `instance` is the payload the added copies carry (absent for
+ *  a plain fungible add). A stack is a top-up target only when its payload
+ *  matches under canStackInstancePayloads (identical-payload stacking;
+ *  before it, #1165 kept every signer/charges/rolled/boundTo copy in its
+ *  own slot): a plain add never merges into an instanced slot and an
+ *  instanced add never merges into a plain or differently-instanced one.
+ *  Applies NO capacity cap (capacity is a pre-check concern); callers on a
+ *  gated path check canAddItem/fitsAll first. */
+export function addStacked(
+  inventory: InvSlot[],
+  itemId: string,
+  count: number,
+  instance?: ItemInstancePayload,
+  craftedRecipeId?: string,
+): void {
   const def = ITEMS[itemId];
   const stack = stackSizeOf(def);
   let remaining = count;
   for (const s of inventory) {
     if (remaining <= 0) return;
-    if (s.itemId !== itemId || s.instance || s.count >= stack) continue;
+    if (
+      s.itemId !== itemId ||
+      !canStackInstancePayloads(s.instance, instance) ||
+      s.craftedRecipeId !== craftedRecipeId ||
+      s.count >= stack
+    )
+      continue;
     const take = Math.min(stack - s.count, remaining);
     s.count += take;
     remaining -= take;
   }
+  const mergeable = isMergeableInstancePayload(instance);
   while (remaining > 0) {
-    const take = Math.min(stack, remaining);
-    inventory.push({ itemId, count: take });
+    // A charge-bearing payload stays one-per-slot; every fresh instanced slot
+    // carries its own deep clone so two slots never alias one mutable payload.
+    const take = instance && !mergeable ? 1 : Math.min(stack, remaining);
+    const slot: InvSlot = instance
+      ? { itemId, count: take, instance: cloneItemInstancePayload(instance) }
+      : { itemId, count: take };
+    if (craftedRecipeId !== undefined) slot.craftedRecipeId = craftedRecipeId;
+    inventory.push(slot);
     remaining -= take;
   }
 }
 
+/** Units of `itemId` a scratch inventory holds, instanced slots included: the
+ *  read half of removeStacked below, for a capacity simulation that has to
+ *  decide HOW MUCH it can take from the scratch copy before taking it (the
+ *  grade-spanning craft consumption in professions/crafting.ts). Mirrors the
+ *  Sim hub's countItem, which sums the same slots. */
+export function countStacked(inventory: readonly InvSlot[], itemId: string): number {
+  let total = 0;
+  for (const s of inventory) if (s.itemId === itemId) total += s.count;
+  return total;
+}
+
 /** Stack-aware removal mirroring the Sim hub's removeItem walk (from the end,
  *  instanced slots included, exactly like removeItem), for capacity simulations
- *  on a scratch copy (e.g. "after handing in the collect items, does the quest
- *  reward fit?"). */
+ *  on a scratch copy whose live path removes with removeItem (the trade swap,
+ *  craft/enchant reagents). The quest turn-in gate instead models its
+ *  prefer-plain hand-in with consumeOneScratch below. */
 export function removeStacked(inventory: InvSlot[], itemId: string, count: number): void {
   let remaining = count;
   for (let i = inventory.length - 1; i >= 0 && remaining > 0; i--) {
@@ -145,6 +287,49 @@ export function removeStacked(inventory: InvSlot[], itemId: string, count: numbe
     remaining -= take;
     if (s.count <= 0) inventory.splice(i, 1);
   }
+}
+
+/** Scratch mirror of the sim's preferential single-copy removers, for
+ *  capacity simulations (#2350): removes ONE unit of `itemId` from a scratch
+ *  inventory, choosing the victim slot exactly like the live removers do: a
+ *  plain fungible slot first (highest index, removeFungibleItem's walk), then
+ *  an instanced slot `excludeInstance` does not match (highest index,
+ *  removeEnchantableItem's second pass), and only then an excluded instanced
+ *  slot (highest index: with no preferred copy left, the live paths fall back
+ *  to the plain removeItem walk, where only excluded slots remain). With no
+ *  `excludeInstance` it models items.ts removePreferFungible in its
+ *  predicate-less form, the only form its callers here use (salvage); the
+ *  trade path's `deprioritize` two-pass has its own dedicated mirror,
+ *  trade.ts fitsAfterSwap. With
+ *  professions/enchanting.ts isEnchantedInstance it models the
+ *  countEnchantableItem >= 1 ? removeEnchantableItem : removeItem split
+ *  (disenchant) and removeEnchantableItem alone (apply-enchant, whose
+ *  not_held gate already guarantees an unexcluded copy exists). Returns the
+ *  victim slot's payload (undefined for a plain victim or no victim at all)
+ *  so a transform command can model the grant it mints FROM the consumed
+ *  copy. A capacity pre-check must model the removal identically to the
+ *  remover it gates, or the guard re-opens the overflow class (#2139). */
+export function consumeOneScratch(
+  scratch: InvSlot[],
+  itemId: string,
+  excludeInstance?: (instance: ItemInstancePayload) => boolean,
+): ItemInstancePayload | undefined {
+  const passes: ((s: InvSlot) => boolean)[] = [
+    (s) => !s.instance,
+    (s) => !!s.instance && !excludeInstance?.(s.instance),
+    (s) => !!s.instance,
+  ];
+  for (const eligible of passes) {
+    for (let i = scratch.length - 1; i >= 0; i--) {
+      const s = scratch[i];
+      if (s.itemId !== itemId || !eligible(s)) continue;
+      const instance = s.instance;
+      s.count -= 1;
+      if (s.count <= 0) scratch.splice(i, 1);
+      return instance;
+    }
+  }
+  return undefined;
 }
 
 /** The standard full-bags rejection, shared by every capacity-gated command. */

@@ -6,7 +6,7 @@
 // with the right on/off state (the class lands on <body> because #nameplates and
 // the mobile controls are siblings of #ui, not descendants).
 
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { SceneOverlayModel } from '../src/ui/hud/scene/scene_overlay_view';
 import { SceneOverlayWindow } from '../src/ui/hud/scene/scene_overlay_window';
 import type { PainterHostWriters } from '../src/ui/painter_host';
@@ -47,6 +47,7 @@ function model(over: Partial<SceneOverlayModel> = {}): SceneOverlayModel {
     skipHintVisible: false,
     speakerKey: null,
     lineKey: null,
+    announcementId: 0,
     fadeOpacity: 0,
     cinematic: false,
     ...over,
@@ -104,5 +105,53 @@ describe('SceneOverlayWindow: cinematic-mode class toggle (C0 HUD hide)', () => 
     window.paint(model({ cinematic: true }));
     const toggles = cinematicToggle(calls);
     expect(toggles[0].args[0]).not.toBe(container);
+  });
+
+  it('exposes dialogue through a polite atomic live region', () => {
+    makeWindow();
+    const live = container.querySelector('.scene-subtitle-live');
+    expect(live?.classList.contains('visually-hidden')).toBe(true);
+    expect(live?.getAttribute('role')).toBe('status');
+    expect(live?.getAttribute('aria-live')).toBe('polite');
+    expect(live?.getAttribute('aria-atomic')).toBe('true');
+    expect(container.querySelector('.scene-subtitle')?.getAttribute('aria-hidden')).toBe('true');
+  });
+
+  it('announces each occurrence once and byte-marks repeated identical dialogue', () => {
+    const { window, calls } = makeWindow();
+    const line = model({
+      lineKey: 'hudChrome.scene.skipHint',
+      announcementId: 1,
+    });
+    window.paint(line);
+    window.paint(line);
+    window.paint({ ...line, announcementId: 2 });
+
+    const live = container.querySelector('.scene-subtitle-live');
+    const announcements = calls.filter((call) => call.m === 'setText' && call.args[0] === live);
+    expect(announcements).toHaveLength(2);
+    expect(announcements[0].args[1]).toBe('Skip scene (Esc)');
+    expect(announcements[1].args[1]).not.toBe(announcements[0].args[1]);
+    expect(String(announcements[1].args[1]).trim()).toBe('Skip scene (Esc)');
+  });
+
+  it('formats fade opacity only when the numeric opacity changes', () => {
+    const { window, calls } = makeWindow();
+    const toFixed = vi.spyOn(Number.prototype, 'toFixed');
+    try {
+      const idle = model();
+      window.paint(idle);
+      window.paint(idle);
+      window.paint(model({ fadeOpacity: 0.5 }));
+      expect(toFixed).toHaveBeenCalledTimes(2);
+    } finally {
+      toFixed.mockRestore();
+    }
+
+    const fade = container.querySelector('.scene-fade');
+    const writes = calls.filter(
+      (call) => call.m === 'setStyleProp' && call.args[0] === fade && call.args[1] === 'opacity',
+    );
+    expect(writes.map((call) => call.args[2])).toEqual(['0.000', '0.500']);
   });
 });

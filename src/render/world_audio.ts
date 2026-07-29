@@ -1,7 +1,7 @@
 // Pure world-to-audio routing. Static prop data determines footstep surfaces
 // and positional ambience anchors without adding presentation-only sim events.
 
-import { DUNGEON_X_THRESHOLD, getActiveWorldContent, PROPS } from '../sim/data';
+import { DUNGEON_X_THRESHOLD, getActiveWorldContent } from '../sim/data';
 import { dockSectionAt } from '../sim/dock_layout';
 import { harborSurfaceHeight } from '../sim/harbor_layout';
 import { isAtSowfield } from '../sim/vale_cup_layout';
@@ -26,7 +26,7 @@ export function footstepSurfaceAt(
 ): Surface {
   if (x > DUNGEON_X_THRESHOLD) return 'stone';
   if (isOnDockDeck(x, z)) return 'wood';
-  const waterLevel = waterLevelAt(x, z);
+  const waterLevel = waterLevelAt(x, z, seed);
   if (groundHeight(x, z, seed) < waterLevel && y <= waterLevel + 0.3) return 'water';
   const biome = zoneBiomeAt(x, z);
   if (biome === 'vale') return 'grass';
@@ -47,8 +47,9 @@ export function crowdAmbienceAt(
 
 export function buildWorldAmbientSources(seed: number): AmbientPointSource[] {
   const sources: AmbientPointSource[] = [];
-  for (let i = 0; i < PROPS.campfires.length; i++) {
-    const [x, z] = PROPS.campfires[i];
+  const props = getActiveWorldContent().props;
+  for (let i = 0; i < props.campfires.length; i++) {
+    const [x, z] = props.campfires[i];
     sources.push({
       id: `world:campfire:${x}:${z}`,
       kind: 'campfire',
@@ -57,8 +58,19 @@ export function buildWorldAmbientSources(seed: number): AmbientPointSource[] {
       z,
     });
   }
-  for (let i = 0; i < PROPS.stalls.length; i++) {
-    const stall = PROPS.stalls[i];
+  for (let i = 0; i < props.buildings.length; i++) {
+    const building = props.buildings[i];
+    if (building.id !== 'eastbrook_smithy') continue;
+    sources.push({
+      id: `world:forge:${building.x}:${building.z}`,
+      kind: 'forge',
+      x: building.x,
+      y: groundHeight(building.x, building.z, seed) + 1,
+      z: building.z,
+    });
+  }
+  for (let i = 0; i < props.stalls.length; i++) {
+    const stall = props.stalls[i];
     if (!stall.smithy) continue;
     sources.push({
       id: `world:forge:${stall.x}:${stall.z}`,

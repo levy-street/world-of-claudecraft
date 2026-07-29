@@ -1,4 +1,4 @@
-// The Guild trend letter (Professions 2.0 Phase 7): when an unattuned
+// The Guild trend letter (Professions 2.0): when an unattuned
 // character's craft skills first trend past the Guild's attention threshold
 // (trend.ts), the Crafting Guild sends them ONE Ravenpost letter naming Smith
 // Haldren and the attunement quest. One-shot per character via guildLetterSent (the

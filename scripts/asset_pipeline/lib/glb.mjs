@@ -400,6 +400,11 @@ export async function normalizeWeapon(
 
 /** Normalize a generated prop GLB: base at y=0, centered XZ, world-unit height,
  *  optional yaw (radians) so the front/opening faces +Z. */
+export function propNormalizeVariant({ height, rotateYDeg = 0, maxTex = 512 }) {
+  const clean = (value) => String(value).replace(/[^a-zA-Z0-9_-]/g, '_');
+  return `r${clean(rotateYDeg)}_h${clean(height)}_t${clean(maxTex)}`;
+}
+
 export async function normalizeProp(inPath, outPath, { height, rotateY = 0, maxTex } = {}) {
   if (!height || height <= 0) throw new Error('normalizeProp needs a world-unit --height');
   const doc = await openGlb(inPath);
@@ -696,7 +701,7 @@ export async function addHandslotBones(
     // Hand world pose on the TARGET rig (bind pose).
     const handM = hand.getWorldMatrix();
     const handQuat = mat4RotToQuat(handM);
-    const handP = worldPos(handM);
+    const _handP = worldPos(handM);
     // Hand world scale (uniform-ish): length of the first matrix column. Local
     // offsets under the hand are expressed in this scale.
     const handS = Math.hypot(handM[0], handM[1], handM[2]) || 1;

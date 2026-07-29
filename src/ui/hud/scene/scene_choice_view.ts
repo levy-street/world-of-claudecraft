@@ -37,7 +37,7 @@ export interface SceneChoiceModel {
 
 export interface SceneChoiceState {
   prompt: SceneChoicePrompt | null;
-  openedAt: number;
+  deadlineAt: number | null;
   readonly model: SceneChoiceModel;
 }
 
@@ -46,7 +46,7 @@ const NO_OPTIONS: readonly SceneChoiceOption[] = [];
 export function createSceneChoiceState(): SceneChoiceState {
   return {
     prompt: null,
-    openedAt: 0,
+    deadlineAt: null,
     model: {
       visible: false,
       choiceId: null,
@@ -67,13 +67,25 @@ export function choicePromptOpen(
   nowSec: number,
 ): void {
   s.prompt = prompt;
-  s.openedAt = nowSec;
+  s.deadlineAt = prompt.windowSeconds > 0 ? nowSec + prompt.windowSeconds : null;
+}
+
+export function choicePromptSync(
+  s: SceneChoiceState,
+  prompt: SceneChoicePrompt | null,
+  remainingSeconds: number | null,
+  nowSec: number,
+): void {
+  s.prompt = prompt;
+  s.deadlineAt =
+    prompt !== null && remainingSeconds !== null ? nowSec + Math.max(0, remainingSeconds) : null;
 }
 
 /** Resolve (sceneChoiceResult event). True when the live prompt closed. */
 export function choiceResolve(s: SceneChoiceState, choiceId: string): boolean {
   if (s.prompt === null || s.prompt.choiceId !== choiceId) return false;
   s.prompt = null;
+  s.deadlineAt = null;
   return true;
 }
 
@@ -93,8 +105,6 @@ export function sceneChoiceView(
   m.isLeader = prompt !== null && prompt.leaderPid === playerId;
   m.leaderPid = prompt?.leaderPid ?? -1;
   m.remainingSeconds =
-    prompt !== null && prompt.windowSeconds > 0
-      ? Math.max(0, Math.ceil(s.openedAt + prompt.windowSeconds - nowSec))
-      : null;
+    prompt !== null && s.deadlineAt !== null ? Math.max(0, Math.ceil(s.deadlineAt - nowSec)) : null;
   return m;
 }

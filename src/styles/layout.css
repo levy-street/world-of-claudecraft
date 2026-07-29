@@ -48,7 +48,8 @@
      and the dynamically created confirm/input dialog): their author lengths are
      never multiplied by the #ui zoom, so the clamps must not divide by it. */
   #mobile-extra-controls,
-  #confirm-dialog {
+  #confirm-dialog,
+  #profession-tutorial {
     --window-scale: 1;
   }
   /* Window header: sticks to the top of the window while the body scrolls under it.

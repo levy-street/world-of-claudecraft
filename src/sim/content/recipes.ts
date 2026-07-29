@@ -13,7 +13,7 @@
 // skill-gain scaling, and itemLevelBudget feeds the #1301 gold sink.
 //
 // Inputs are existing junk-material item ids (src/sim/content/items.ts):
-// bone_fragments, linen_scrap, spider_leg. Since Professions 2.0 Phase 4
+// bone_fragments, linen_scrap, spider_leg. Since Professions 2.0
 // nodes grant real materials (NODE_MATERIAL_TABLE in
 // src/sim/professions/gathering.ts) and these junk items drop only from
 // mobs/corpses; the recipes still consume them. Outputs reuse
@@ -33,7 +33,7 @@
 // (boundstone_helm, gravewyrm_gauntlets, elixir_of_the_bear) for the same
 // i18n reason as above.
 //
-// Acquisition (Professions 2.0 Phase 9, locked scope): ONLY the three
+// Acquisition (Professions 2.0, locked scope): ONLY the three
 // COMBO_RECIPES carry `acquisition: ['trainer']`, learned from the resident
 // master at their craft's station (professions/training.ts resolveTrain).
 // COMMON_RECIPES, TOOL_RECIPES, and CASTER_HUB_RECIPES deliberately keep NO
@@ -41,20 +41,36 @@
 // the empty-acquisition arm of crafting.ts isRecipeKnown. Existing characters
 // keep the combo recipes too, via the one-time grandfather union
 // (training.ts PRE_TRAINING_RECIPE_IDS / grandfatherKnownRecipes); every
-// recipe authored AFTER Phase 9 must carry a non-empty acquisition list (see
+// newly authored recipe must carry a non-empty acquisition list (see
 // the field doc in ../professions/types.ts).
 
 import type { ProfessionRecipeRecord } from '../professions/types';
 
+// Economy invariant: the reagent lists of the former
+// LEGACY_GOLD_POSITIVE_RECIPE_IDS members below were reworked so
+// input value exceeds output sellValue (the locked recipe_economy.test.ts
+// rule). INPUT reworks only: ids, results, resultCounts, skillReq, stations,
+// and acquisition are untouched. Every material on a rung-0 common is
+// obtainable by a fresh zone-1 character (starter mob drops, tier-1 nodes,
+// Eastbrook vendor staples); tanning_agent (zone-2 vendor) and glass_vial
+// (zone-3 vendor) are deliberately NOT used at rung 0. Four members (the
+// jerkin, vestments, druids hide, and warded leggings) could not clear the
+// invariant through inputs alone and closed through the paired arm
+// instead: an input rework plus an output sellValue re-priced
+// below it in items.ts. The frozen legacy list is EMPTY (see
+// tests/recipe_economy.test.ts).
 export const COMMON_RECIPES: ProfessionRecipeRecord[] = [
   {
     id: 'recipe_eastbrook_arming_sword',
     professionId: 'weaponcrafting',
     resultItemId: 'eastbrook_arming_sword',
     resultCount: 1,
+    // Fang-hilted arming sword: the first wolf_fang consumer (closing the
+    // zero-consumer harvest family). Input 156 vs output 140.
     reagents: [
-      { itemId: 'bone_fragments', count: 2 },
-      { itemId: 'linen_scrap', count: 1 },
+      { itemId: 'wolf_fang', count: 2 },
+      { itemId: 'bone_fragments', count: 4 },
+      { itemId: 'smithing_flux', count: 6 },
     ],
     skillReq: 0,
     itemLevelBudget: 10,
@@ -65,7 +81,11 @@ export const COMMON_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'armorcrafting',
     resultItemId: 'eastbrook_chain_vest',
     resultCount: 1,
-    reagents: [{ itemId: 'bone_fragments', count: 3 }],
+    // Chain needs links: copper smelted under flux. Input 196 vs output 180.
+    reagents: [
+      { itemId: 'copper_ore', count: 4 },
+      { itemId: 'smithing_flux', count: 9 },
+    ],
     skillReq: 0,
     itemLevelBudget: 10,
     level: 10,
@@ -75,7 +95,11 @@ export const COMMON_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'tailoring',
     resultItemId: 'eastbrook_wool_trousers',
     resultCount: 1,
-    reagents: [{ itemId: 'linen_scrap', count: 3 }],
+    // Harvested cloth volume plus vendor thread. Input 120 vs output 110.
+    reagents: [
+      { itemId: 'homespun_cloth', count: 3 },
+      { itemId: 'spool_of_thread', count: 9 },
+    ],
     skillReq: 0,
     itemLevelBudget: 8,
     level: 8,
@@ -85,9 +109,14 @@ export const COMMON_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'leatherworking',
     resultItemId: 'tanned_leather_jerkin',
     resultCount: 1,
+    // Economy invariant (paired arm): zone-1 leather palette (hide, sinew,
+    // thread; tanning_agent is
+    // zone-2 vendored and stays barred at the entry tier) plus the output
+    // sellValue re-priced below input in items.ts. Input 88 vs sell 80.
     reagents: [
+      { itemId: 'rough_hide', count: 4 },
       { itemId: 'spider_leg', count: 2 },
-      { itemId: 'bone_fragments', count: 1 },
+      { itemId: 'spool_of_thread', count: 5 },
     ],
     skillReq: 0,
     itemLevelBudget: 9,
@@ -108,9 +137,13 @@ export const COMMON_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'alchemy',
     resultItemId: 'minor_healing_potion',
     resultCount: 1,
+    // Economy invariant: sheenleaf (the zone-1 healing herb)
+    // joins the brew. glass_vial was rejected here: its only vendor is in
+    // zone 3 and this is the level-1 field alchemy entry. Input 15 vs output 8.
     reagents: [
       { itemId: 'linen_scrap', count: 1 },
       { itemId: 'spider_leg', count: 1 },
+      { itemId: 'silverleaf_herb', count: 2 },
     ],
     skillReq: 0,
     itemLevelBudget: 1,
@@ -118,15 +151,25 @@ export const COMMON_RECIPES: ProfessionRecipeRecord[] = [
   },
   // Caster-stat (int/spi) common-tier recipes: one per
   // tailoring/leatherworking/armorcrafting, alongside the armor-only pieces
-  // above. Reuses the same harvested reagents as the rest of COMMON_RECIPES.
+  // above. All three clear the economy invariant via the paired arm (zone-1
+  // thematic input rework plus an output sellValue re-priced below input in
+  // items.ts); the frozen legacy list is empty. See tests/recipe_economy.test.ts.
   {
     id: 'recipe_eastbrook_ritual_vestments',
     professionId: 'tailoring',
     resultItemId: 'eastbrook_ritual_vestments',
     resultCount: 1,
+    // Economy invariant (paired arm, see the jerkin note): cloth palette;
+    // also retires this piece as easy dust-mill fodder.
+    // The original linen 3 + spider_leg 1
+    // core is KEPT (the count-1 spider row is a load-bearing premise of the
+    // masterwork count-1 signed-reagent pins); cloth and thread add the
+    // volume. Input 85 vs sell 72.
     reagents: [
       { itemId: 'linen_scrap', count: 3 },
       { itemId: 'spider_leg', count: 1 },
+      { itemId: 'homespun_cloth', count: 3 },
+      { itemId: 'spool_of_thread', count: 5 },
     ],
     skillReq: 0,
     itemLevelBudget: 9,
@@ -137,9 +180,12 @@ export const COMMON_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'leatherworking',
     resultItemId: 'eastbrook_druids_hide',
     resultCount: 1,
+    // Economy invariant (paired arm, see the jerkin note).
+    // Input 93 vs sell 84.
     reagents: [
+      { itemId: 'rough_hide', count: 5 },
       { itemId: 'spider_leg', count: 2 },
-      { itemId: 'bone_fragments', count: 1 },
+      { itemId: 'spool_of_thread', count: 5 },
     ],
     skillReq: 0,
     itemLevelBudget: 9,
@@ -150,9 +196,12 @@ export const COMMON_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'armorcrafting',
     resultItemId: 'eastbrook_warded_leggings',
     resultCount: 1,
+    // Economy invariant (paired arm, see the jerkin note).
+    // Input 117 vs sell 105.
     reagents: [
       { itemId: 'bone_fragments', count: 3 },
-      { itemId: 'linen_scrap', count: 1 },
+      { itemId: 'copper_ore', count: 4 },
+      { itemId: 'smithing_flux', count: 4 },
     ],
     skillReq: 0,
     itemLevelBudget: 10,
@@ -171,12 +220,38 @@ export const COMMON_RECIPES: ProfessionRecipeRecord[] = [
 // ceiling), never as an admission gate: these are craftable on having the
 // reagents and standing at the hub station, same as any common recipe.
 //
-// stationType (Professions 2.0 Phase 8, formerly #1297's requiresHubStation):
+// stationType (Professions 2.0, formerly #1297's requiresHubStation):
 // every recipe below is station-bound at the toolworks (content/professions.ts
 // STATIONS, checked by ../professions/stations.ts). These are the natural
 // first station-bound recipes: real tier-4/5 gear already tier-gated well
 // past the common free floor, unlike COMMON_RECIPES/COMBO_RECIPES above
 // (both free-field-craftable, deliberately left ungated here).
+//
+// Every gathered reagent below is a FINE grade (D8,
+// professions/material_grades.ts), which is what turns this list from a
+// shopping list into a ladder: a fine material only drops for a player whose
+// tool is already strictly above it, and each recipe also consumes the tool
+// one rung down, so the rung below is the only route to the rung above. The
+// counts and the previous-tool reagent are unchanged; only the grade moved.
+//
+// Two rungs needed a decision rather than a swap, and both are recorded here
+// because the reagent lists alone do not show why they differ:
+//
+// - The tier-4 PICK could not simply take fine_thorium_ore. Osmium is the
+//   thornpeak (tier-3) yield, so its fine grade needs a tier-4 pick, which is
+//   this recipe's own output: a closed circuit with no entry. It is re-pointed
+//   onto fine_iron_ore, the mirefen (tier-2) yield, whose fine grade needs the
+//   tier-3 pick this recipe already consumes. That is exactly the shape the
+//   axe and sickle lines already had, so all three tier-4 recipes now read the
+//   same way instead of the pick being the odd one out.
+// - The tier-5 PICK has no node material at all: arcanite_bar is refined and
+//   vendor-only by locked ruling, and is consumed by nothing else, so
+//   re-pointing off it would strand both the bar and its vendor rows. It KEEPS
+//   the bar and GAINS fine_thorium_ore x2, matching the other two tier-5
+//   recipes (two units of the thornpeak fine grade plus the tier-4 tool) and
+//   giving fine_thorium_ore the consumer it would otherwise lack. It is the
+//   one rung that got more expensive rather than equivalent; that is the
+//   point, since it was the one rung still buyable off a counter.
 export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
   {
     id: 'recipe_thorium_mining_pick',
@@ -184,7 +259,7 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
     resultItemId: 'thorium_mining_pick',
     resultCount: 1,
     reagents: [
-      { itemId: 'thorium_ore', count: 4 },
+      { itemId: 'fine_iron_ore', count: 4 },
       { itemId: 'mithril_mining_pick', count: 1 },
     ],
     skillReq: 75,
@@ -199,6 +274,7 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
     resultCount: 1,
     reagents: [
       { itemId: 'arcanite_bar', count: 2 },
+      { itemId: 'fine_thorium_ore', count: 2 },
       { itemId: 'thorium_mining_pick', count: 1 },
     ],
     skillReq: 150,
@@ -212,7 +288,7 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
     resultItemId: 'ashwood_axe',
     resultCount: 1,
     reagents: [
-      { itemId: 'ashwood_log', count: 4 },
+      { itemId: 'fine_ashwood_log', count: 4 },
       { itemId: 'ironbark_axe', count: 1 },
     ],
     skillReq: 75,
@@ -226,7 +302,7 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
     resultItemId: 'elderwood_axe',
     resultCount: 1,
     reagents: [
-      { itemId: 'elderwood_log', count: 2 },
+      { itemId: 'fine_elderwood_log', count: 2 },
       { itemId: 'ashwood_axe', count: 1 },
     ],
     skillReq: 150,
@@ -240,7 +316,7 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
     resultItemId: 'goldleaf_sickle',
     resultCount: 1,
     reagents: [
-      { itemId: 'goldleaf_herb', count: 4 },
+      { itemId: 'fine_goldleaf_herb', count: 4 },
       { itemId: 'silverleaf_sickle', count: 1 },
     ],
     skillReq: 75,
@@ -254,7 +330,7 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
     resultItemId: 'sunpetal_sickle',
     resultCount: 1,
     reagents: [
-      { itemId: 'sunpetal_herb', count: 2 },
+      { itemId: 'fine_sunpetal_herb', count: 2 },
       { itemId: 'goldleaf_sickle', count: 1 },
     ],
     skillReq: 150,
@@ -264,19 +340,176 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
   },
 ];
 
+// The crafted fishing rods, tier 4 and tier 5 (D9).
+//
+// A SEPARATE LIST FROM TOOL_RECIPES, deliberately. TOOL_RECIPES carries one
+// invariant that is the whole reason it exists: every member consumes a FINE
+// gathered grade plus the tool one rung down, which is what makes that ladder
+// self-gating (the grade only drops for a player whose tool already outclasses
+// it). Fishing has no world nodes, so it has no fine grades, and folding these
+// two rows in would turn that invariant into "a fine grade OR a rare catch",
+// a disjunction the six land recipes could then quietly stop satisfying while
+// the sweep stayed green on the rods. A weaker shared claim is worth less than
+// two strong separate ones, so the rod ladder states its own
+// (tests/professions_rod_recipes.test.ts) and leaves TOOL_RECIPES alone.
+//
+// HOW FAR THE SELF-GATE ACTUALLY REACHES, stated plainly rather than implied.
+// Each rung consumes the rod below it, same as the land ladder. The rest
+// diverges:
+//
+// - The tier-4 rung is paced, not gated. Its reagent is the rare catch, whose
+//   weight is 1 / 3 / 6 by proficiency band (content/items.ts), so a capped
+//   angler farms it six times faster than a beginner. A beginner CAN still
+//   land one, which is the deliberate difference from a fine grade: the koi
+//   is also the low-level thrill and a deed target, and gating it behind
+//   fishing's 200 cap would have put the tier-4 rod behind the end of the
+//   climb rather than partway up it, which is not where the land tier-4 tools
+//   sit.
+// - The tier-5 rung IS hard-gated, and that is what the Slatefin Carp is
+//   doing in it. Carp is a Thornpeak-only catch, and Thornpeak water takes a
+//   tier-3 rod (professions/fishing_zones.ts), so the reagent cannot be
+//   fished at all without the rung this recipe's own input descends from.
+//
+// Neither rung joins the counterfactually-vendor-fed set in
+// tests/recipe_economy.test.ts, because the koi carries no buyValue and no
+// counter stocks it. That is a property of the reagent, not an exemption.
+//
+// Both carry `acquisition: ['trainer']`: the pre-training recipe list is a
+// frozen historical record and must not grow, so anything authored after that
+// switch is learned from a master. Tinker Gizzel at the Eastbrook toolworks
+// teaches them, without a content edit, because the trainer's list derives
+// from the crafts its station serves.
+//
+// SKILL REQUIREMENTS ARE BOTH INSIDE ENGINEERING'S CAP (125), unlike the
+// tier-5 land tools at 75/150. 150 resolves to tier 6 while the cap resolves
+// to tier 5, and a trainer only teaches a recipe whose tier the learner has
+// reached, so a trainer-taught recipe at 150 would be permanently unlearnable
+// rather than merely expensive. The land tools escape that only because they
+// predate training and are grandfathered known.
+export const ROD_RECIPES: ProfessionRecipeRecord[] = [
+  {
+    id: 'recipe_stormreel_fishing_rod',
+    professionId: 'engineering',
+    resultItemId: 'stormreel_fishing_rod',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'glimmerfin_koi', count: 4 },
+      { itemId: 'silverstream_fishing_rod', count: 1 },
+    ],
+    skillReq: 75,
+    itemLevelBudget: 20,
+    level: 20,
+    stationType: 'toolworks',
+    acquisition: ['trainer'],
+  },
+  {
+    id: 'recipe_tidewrought_fishing_rod',
+    professionId: 'engineering',
+    resultItemId: 'tidewrought_fishing_rod',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'glimmerfin_koi', count: 2 },
+      { itemId: 'raw_stonescale_carp', count: 8 },
+      { itemId: 'stormreel_fishing_rod', count: 1 },
+    ],
+    skillReq: 125,
+    itemLevelBudget: 30,
+    level: 20,
+    stationType: 'toolworks',
+    acquisition: ['trainer'],
+  },
+];
+
+// Tool-effect charms (the acquisition craft): the game's first enchanting
+// recipes, minting the item form of the two live TOOL_EFFECTS entries
+// (content/items.ts gatherers_cache / artisans_eye; the ids match). The slot
+// command consumes the item through resolveSlotToolEffect, so THESE recipes
+// are the only production path for a slotted effect.
+//
+// - `professionId: 'enchanting'` is identity, not listing convenience: the
+//   effects are Enchanter work (TOOL_EFFECTS craftId), so the craft gains
+//   ENCHANTING skill and the specialization recharge discount keys off the
+//   same craft. Enchanting has no station of its own, so the recipes bind to
+//   the TOOLWORKS (`stationType`), and the trainer route follows the binding
+//   (training.ts trainingStationTypeFor): the tool master teaches the tool
+//   upgrades.
+// - `acquisition: ['trainer']` per the authoring default (the pre-training
+//   grandfather list is frozen); skillReq 25 resolves to tier 1, so learning
+//   needs enchanting 25 (a real disenchant/enchant climb) and the tier-1
+//   training fee.
+// - REAGENTS ARE THE PRICE FLOOR, not flavor: re-slotting a fresh charm
+//   resets charges to full, so the mint MUST cost more than the most
+//   expensive generic recharge (a full epic-rung fill priced in shards) or
+//   re-crafting would bypass recharging outright. The whole arcane ladder is
+//   consumed (shards the bulk of the value), which also gives the shard its
+//   second sink beside the Greater enchants. The counts clear the bound at
+//   the DISCOUNTED price, not just the listed one: a specialized enchanter
+//   consumes floor(count x 0.8) of each reagent (crafting.ts
+//   requiredReagentCountFor), which is the arm that actually competes with a
+//   recharge, so the listed 383 copper is sized so the discounted 298 still
+//   sits above the 275 the worst generic recharge costs. The inequality is
+//   pinned BOTH ways in tests/professions_tool_effect_recharge.test.ts;
+//   retune both sides together.
+// - NO Springback (quickening_charm) recipe: the R9 slot policy refuses that
+//   effect everywhere, and no path may mint what another path refuses (same
+//   guard test derives this from the policy).
+export const TOOL_EFFECT_RECIPES: ProfessionRecipeRecord[] = [
+  {
+    id: 'recipe_gatherers_cache',
+    professionId: 'enchanting',
+    resultItemId: 'gatherers_cache',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'arcane_shard', count: 5 },
+      { itemId: 'arcane_essence', count: 4 },
+      { itemId: 'arcane_dust', count: 6 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 15,
+    level: 20,
+    stationType: 'toolworks',
+    acquisition: ['trainer'],
+  },
+  {
+    id: 'recipe_artisans_eye',
+    professionId: 'enchanting',
+    resultItemId: 'artisans_eye',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'arcane_shard', count: 5 },
+      { itemId: 'arcane_essence', count: 4 },
+      { itemId: 'arcane_dust', count: 6 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 15,
+    level: 20,
+    stationType: 'toolworks',
+    acquisition: ['trainer'],
+  },
+];
+
 // Station-tier caster-stat (int/spi) recipes (crafting content follow-up to
 // the COMMON_RECIPES caster pieces above): one per tailoring/leatherworking/
-// armorcrafting, at the same thorium tier as TOOL_RECIPES, each bound to its
+// armorcrafting, at the same osmium tier as TOOL_RECIPES, each bound to its
 // own craft's station type (loom/tannery/forge).
+// Economy invariant: all three caster-hub reagent lists are authored
+// gold-negative (input above output under the recipe_economy rule).
+// skillReq-75 recipes may consume rare-band materials; the plain volume-based
+// shapes were used (the resonant-consumer variant was deliberately not taken).
 export const CASTER_HUB_RECIPES: ProfessionRecipeRecord[] = [
   {
     id: 'recipe_wardweave_cowl',
     professionId: 'tailoring',
     resultItemId: 'wardweave_cowl',
     resultCount: 1,
+    // Silk volume warded with premium herbs (the ladder's sunweave/gildenweave
+    // idiom); the odd osmium padding is gone. Input 534 vs output 440.
     reagents: [
-      { itemId: 'thorium_ore', count: 3 },
-      { itemId: 'linen_scrap', count: 2 },
+      { itemId: 'sunpetal_herb', count: 2 },
+      { itemId: 'goldleaf_herb', count: 2 },
+      { itemId: 'pristine_silk', count: 2 },
+      { itemId: 'spider_silk', count: 4 },
+      { itemId: 'spool_of_thread', count: 2 },
     ],
     skillReq: 75,
     itemLevelBudget: 20,
@@ -288,9 +521,16 @@ export const CASTER_HUB_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'leatherworking',
     resultItemId: 'duskhide_wraps',
     resultCount: 1,
+    // Hide volume (pristine plus rough) tanned at the vats; the thorium
+    // studs carry the value. Nothing here is counter-bought since the
+    // delist: thorium is harvest-only (Thornpeak mining), the hides are mob
+    // drops, and tanning_agent is the zone-2 vendor staple. Input 461 vs
+    // output 420 (buyValue basis; delisted materials keep theirs).
     reagents: [
-      { itemId: 'thorium_ore', count: 3 },
-      { itemId: 'spider_leg', count: 2 },
+      { itemId: 'thorium_ore', count: 6 },
+      { itemId: 'pristine_hide', count: 3 },
+      { itemId: 'rough_hide', count: 2 },
+      { itemId: 'tanning_agent', count: 1 },
     ],
     skillReq: 75,
     itemLevelBudget: 20,
@@ -302,9 +542,15 @@ export const CASTER_HUB_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'armorcrafting',
     resultItemId: 'sootscale_mantle',
     resultCount: 1,
+    // Ore stays (mail theme) plus smithing_flux volume. Only the flux is
+    // Darva's counter staple; the thorium is harvest-only since the delist.
+    // Listed input 520 vs output 280 (buyValue basis):
+    // the output sits below even the cheapest specialized-plus-self-signed
+    // consumption (300, the discount-aware economy arm) so the all-vendor
+    // loop can never print copper.
     reagents: [
-      { itemId: 'thorium_ore', count: 4 },
-      { itemId: 'bone_fragments', count: 2 },
+      { itemId: 'thorium_ore', count: 7 },
+      { itemId: 'smithing_flux', count: 5 },
     ],
     skillReq: 75,
     itemLevelBudget: 20,
@@ -317,15 +563,24 @@ export const CASTER_HUB_RECIPES: ProfessionRecipeRecord[] = [
 // adjacent pair at the recipe's tier (comboRequirement.minTier), on top of the
 // normal reagent/skillReq gating above. See the module comment for why these
 // two pairs were chosen.
+// Economy invariant: all three combo reagent lists are authored
+// gold-negative. The two rare-output showcases may consume rare-band
+// materials (every reagent is vendor-stocked or harvestable in Eastbrook);
+// the resonant-secondary variant was deliberately not taken.
 export const COMBO_RECIPES: ProfessionRecipeRecord[] = [
   {
     id: 'recipe_ironbound_warplate_helm',
     professionId: 'armorcrafting',
     resultItemId: 'boundstone_helm',
     resultCount: 1,
+    // Warplate showcase: bar and ore under flux, crested with wolf fangs (the
+    // second wolf_fang home, closing the zero-consumer harvest family).
+    // Input 516 vs output 460.
     reagents: [
-      { itemId: 'bone_fragments', count: 4 },
-      { itemId: 'linen_scrap', count: 2 },
+      { itemId: 'arcanite_bar', count: 1 },
+      { itemId: 'thorium_ore', count: 5 },
+      { itemId: 'wolf_fang', count: 4 },
+      { itemId: 'smithing_flux', count: 2 },
     ],
     skillReq: 25,
     itemLevelBudget: 20,
@@ -338,9 +593,12 @@ export const COMBO_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'weaponcrafting',
     resultItemId: 'gravewyrm_gauntlets',
     resultCount: 1,
+    // Same combo family as the helm: osmium volume fluxed around an iron
+    // core. Input 424 vs output 390.
     reagents: [
-      { itemId: 'bone_fragments', count: 3 },
-      { itemId: 'linen_scrap', count: 3 },
+      { itemId: 'thorium_ore', count: 6 },
+      { itemId: 'iron_ore', count: 3 },
+      { itemId: 'smithing_flux', count: 2 },
     ],
     skillReq: 25,
     itemLevelBudget: 18,
@@ -353,9 +611,14 @@ export const COMBO_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'alchemy',
     resultItemId: 'elixir_of_the_bear',
     resultCount: 1,
+    // Venom glands deepen the gland sink; the vial is sold by
+    // alchemist_verane, the very master who teaches this recipe at the
+    // apothecary. Input 38 vs output 20.
     reagents: [
       { itemId: 'linen_scrap', count: 2 },
       { itemId: 'spider_leg', count: 2 },
+      { itemId: 'venom_gland', count: 2 },
+      { itemId: 'glass_vial', count: 1 },
     ],
     skillReq: 25,
     itemLevelBudget: 16,
@@ -365,14 +628,14 @@ export const COMBO_RECIPES: ProfessionRecipeRecord[] = [
   },
 ];
 
-// Phase 10 trained ladder set (Professions 2.0): the weaponcrafting,
+// Trained ladder set (Professions 2.0): the weaponcrafting,
 // armorcrafting, tailoring, leatherworking, cooking, and alchemy recipe
 // ladders, three rungs per craft at skillReq 0/25/50, all trainer-taught and
 // station-bound (forge for the weapon/armor crafts, loom for tailoring at
 // weaver_ottilie, tannery for leatherworking at tanner_hesk, kitchens for
 // cooking at cook_marlow, apothecary for alchemy at alchemist_verane). Outputs
 // are the new crafted weapon/armor/bag/food/potion/elixir ItemDefs in
-// content/profession_items.ts. Post-Phase-9 content, so every record carries a
+// content/profession_items.ts. Never-grandfathered content, so every record carries a
 // non-empty `acquisition` list (never grandfathered). The two scaffolding
 // fields are normalized to one cross-craft convention shared by all ladders
 // (skillReq 0 -> 10/10, skillReq 25 -> 16/15, skillReq 50 -> 20/20); the outputs'
@@ -417,7 +680,12 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'weaponcrafting',
     resultItemId: 'ironbark_boar_spear',
     resultCount: 1,
+    // Tusk-crested boar spear: the first curved_tusk consumer, closing the
+    // zero-consumer harvest family #2905 shipped the same way Phase 15 closed
+    // wolf_fang (the fang-hilted arming sword above). wild_boar itself drops
+    // the tusks, so the rung-0 recipe stays zone-1 legal. Input 50 vs output 36.
     reagents: [
+      { itemId: 'curved_tusk', count: 2 },
       { itemId: 'ironbark_log', count: 3 },
       { itemId: 'copper_ore', count: 2 },
       { itemId: 'smithing_flux', count: 1 },
@@ -954,7 +1222,15 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'leatherworking',
     resultItemId: 'mirewarden_treads',
     resultCount: 1,
+    // Claw-spiked treads: the first sharp_claw and pristine_claw consumers,
+    // closing the two remaining zero-consumer harvest families #2905 shipped
+    // (the wolf_fang precedent), with the specimen riding count-1 beside its
+    // base material like the serpent elixir's pristine_venom_gland. The mire
+    // prowlers this line is named for are claw carriers themselves. Input 125
+    // vs output 78.
     reagents: [
+      { itemId: 'pristine_claw', count: 1 },
+      { itemId: 'sharp_claw', count: 2 },
       { itemId: 'rough_hide', count: 4 },
       { itemId: 'spider_silk', count: 2 },
       { itemId: 'thorium_ore', count: 1 },
@@ -1264,6 +1540,8 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
 export const ALL_RECIPES: ProfessionRecipeRecord[] = [
   ...COMMON_RECIPES,
   ...TOOL_RECIPES,
+  ...ROD_RECIPES,
+  ...TOOL_EFFECT_RECIPES,
   ...CASTER_HUB_RECIPES,
   ...COMBO_RECIPES,
   ...LADDER_RECIPES,
@@ -1273,7 +1551,7 @@ export function recipeById(recipeId: string): ProfessionRecipeRecord | undefined
   return ALL_RECIPES.find((r) => r.id === recipeId);
 }
 
-// The hands-vs-stations field set (Professions 2.0 Phase 8): the recipe ids
+// The hands-vs-stations field set (Professions 2.0): the recipe ids
 // craftable anywhere with bare hands, exactly the nine common recipes today.
 // Everything outside this set either carries a stationType (station-bound)
 // or is a combo recipe (field-craftable but pair-gated); the set exists so
@@ -1283,7 +1561,10 @@ export const FIELD_RECIPES: ReadonlySet<string> = new Set(COMMON_RECIPES.map((r)
 // Reverse lookup (#1149, Battlefield Experience): the recipe whose crafting
 // produced a given result item id, so a tracked-event handler holding only an
 // item instance can resolve back to the craft (professionId) that made it.
-// First match wins: no two recipes in this table share a resultItemId today.
+// Searches ALL_RECIPES (common, tool, caster hub, combo, and ladder alike),
+// not just COMMON_RECIPES: a narrower search here silently broke attribution
+// for every recipe outside the common set. First match wins: no two recipes
+// in this table share a resultItemId today.
 export function recipeForResultItem(itemId: string): ProfessionRecipeRecord | undefined {
-  return COMMON_RECIPES.find((r) => r.resultItemId === itemId);
+  return ALL_RECIPES.find((r) => r.resultItemId === itemId);
 }

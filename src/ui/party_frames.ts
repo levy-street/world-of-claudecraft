@@ -1,9 +1,17 @@
 import { isPartyFrameRelevantAura } from '../sim/aura_classify';
 import type { PartyInfo, PartyMemberInfo } from '../world_api';
+import type { PartyPetInfo } from './pet_frame_view';
 
 export const PARTY_FRAME_RANGE_YD = 100;
 
-export type PartyFrameMember = PartyMemberInfo & { oor: boolean };
+/** A member row's data. `pet` is attached CLIENT-SIDE from the entity roster
+ *  (findPetsByOwner), not from the party wire: absent when the member has no pet,
+ *  when their pet is outside the client's interest scope, or when the Show Pets
+ *  display option is off. */
+export type PartyFrameMember = PartyMemberInfo & { oor: boolean; pet?: PartyPetInfo };
+
+/** Owner entity id -> that owner's pet. Built once per repaint by the caller. */
+export type PartyPetMap = ReadonlyMap<number, PartyPetInfo>;
 
 export type PartyFrameHealthTextMode = 0 | 1 | 2 | 3;
 export type PartyFrameSortMode = 0 | 1 | 2;
@@ -15,6 +23,7 @@ export interface PartyFrameDisplayConfig {
   showResource: boolean;
   showAbsorbs: boolean;
   showAuras: boolean;
+  showPets: boolean;
   healthText: PartyFrameHealthTextMode;
   sort: PartyFrameSortMode;
   presentation: PartyFrameStyleMode;
@@ -25,6 +34,7 @@ export const DEFAULT_PARTY_FRAME_DISPLAY: PartyFrameDisplayConfig = {
   showResource: true,
   showAbsorbs: true,
   showAuras: true,
+  showPets: true,
   healthText: 1,
   sort: 0,
   presentation: 0,
@@ -64,6 +74,7 @@ export function selectPartyFrameMembers(
   playerPos: { x: number; z: number },
   rangeYd = PARTY_FRAME_RANGE_YD,
   config: PartyFrameDisplayConfig = DEFAULT_PARTY_FRAME_DISPLAY,
+  pets?: PartyPetMap,
 ): PartyFrameMember[] {
   return info.members
     .map((member, index) => ({ member, index }))
@@ -81,11 +92,17 @@ export function selectPartyFrameMembers(
     })
     .map(({ member }) => member)
     .filter((m) => config.showSelf || m.pid !== playerId)
-    .map((m) => ({
-      ...m,
-      oor:
-        m.pid !== playerId && !m.dead && Math.hypot(m.x - playerPos.x, m.z - playerPos.z) > rangeYd,
-    }));
+    .map((m) => {
+      const pet = config.showPets ? pets?.get(m.pid) : undefined;
+      return {
+        ...m,
+        oor:
+          m.pid !== playerId &&
+          !m.dead &&
+          Math.hypot(m.x - playerPos.x, m.z - playerPos.z) > rangeYd,
+        ...(pet ? { pet } : {}),
+      };
+    });
 }
 
 /**
@@ -112,6 +129,7 @@ export function partyFrameSignature(
   playerPos: { x: number; z: number },
   rangeYd = PARTY_FRAME_RANGE_YD,
   config: PartyFrameDisplayConfig = DEFAULT_PARTY_FRAME_DISPLAY,
+  pets?: PartyPetMap,
 ): string {
   let sig = '';
   let myGroup: 1 | 2 = 1;
@@ -127,7 +145,20 @@ export function partyFrameSignature(
     if (m.auras) {
       for (const a of m.auras) sig += `${a.id},${a.kind},${a.neg ? 1 : 0},${a.remaining ?? ''};`;
     }
-    sig += `W${m.rewind ?? 0}:I${m.incomingHeal ?? 0}:A${m.hasAggro ?? 0}:C${m.connected ?? 1}|`;
+    // The pet sliver rides the SAME per-member fold. Without this the pet's health
+    // could move while every wire field stayed put, the signature would not budge,
+    // and updatePartyFrames would short-circuit before repainting: the sliver would
+    // simply freeze at whatever value it first painted.
+    //
+    // The NAME is folded for the same reason and is not decorative: it is the only
+    // thing the sliver's accessible label says besides the percent, and renamePet
+    // can change it with every other field identical. Everything paintPet reads
+    // (name, hp, maxHp, dead) has to be in here, or that read goes stale silently.
+    // Pet names are validated to letters, spaces, apostrophes and hyphens, so they
+    // cannot inject the delimiters this fold uses.
+    const pet = config.showPets ? pets?.get(m.pid) : undefined;
+    sig += `W${m.rewind ?? 0}:I${m.incomingHeal ?? 0}:A${m.hasAggro ?? 0}:C${m.connected ?? 1}`;
+    sig += pet ? `:P${pet.id},${pet.name},${pet.hp}/${pet.maxHp},${pet.dead ? 1 : 0}|` : '|';
   }
-  return `${sig}L${info.leader}:R${info.raid ? 1 : 0}:G${myGroup}:C${config.showSelf ? 1 : 0}${config.showResource ? 1 : 0}${config.showAbsorbs ? 1 : 0}${config.showAuras ? 1 : 0}${config.healthText}${config.sort}${config.presentation}`;
+  return `${sig}L${info.leader}:R${info.raid ? 1 : 0}:G${myGroup}:C${config.showSelf ? 1 : 0}${config.showResource ? 1 : 0}${config.showAbsorbs ? 1 : 0}${config.showAuras ? 1 : 0}${config.showPets ? 1 : 0}${config.healthText}${config.sort}${config.presentation}`;
 }

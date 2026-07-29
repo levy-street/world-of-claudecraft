@@ -1,5 +1,6 @@
 import type { PlayerEquipmentInstances } from '../sim/entity';
-import type { EquipSlot, InvSlot } from '../sim/types';
+import type { EquipSlot, InvSlot, ItemInstancePayload } from '../sim/types';
+import type { VendorBuyOptions } from '../sim/vendor_buy_stack';
 
 export interface IWorldInventory {
   inventory: InvSlot[];
@@ -29,13 +30,32 @@ export interface IWorldInventory {
   unequipBag(socket: number): void;
   useItem(itemId: string): void;
   discardItem(itemId: string, count?: number): void;
-  buyItem(npcId: number, itemId: string): void;
+  // The request rides an options bag (VendorBuyOptions, phase 21): `bulk`
+  // requests as many units as the buyer can currently afford in one purchase,
+  // capped at the item's bag stack size (VendorGoodsRow.bulkQuantity previews
+  // the count); `count` buys that many row units atomically, refuse-whole on
+  // any shortfall. The server re-derives and validates every quantity
+  // (vendor_buy_stack.ts), never trusting the client's math; the client sends
+  // at most one of the two fields. An empty/omitted bag buys the ordinary
+  // single unit (or the food/drink staple stack), byte-identical to today.
+  buyItem(npcId: number, itemId: string, opts?: VendorBuyOptions): void;
   sellItem(itemId: string, count?: number): void;
   // Sell every gray (poor-quality) item in the bags at once while a vendor is open.
   // Quest items and anything flagged noVendorSell are left untouched.
   sellAllJunk(): void;
-  buyBackItem(itemId: string): void;
-  salvageItem(itemId: string): void;
+  // `index` addresses the exact row in vendorBuyback the player clicked
+  // (VendorView.buyback[].index); rows can share an itemId with different
+  // instance payloads, so the index disambiguates which copy comes back.
+  // `instance` is that same row's payload as last seen by the client
+  // (VendorView.buyback[].instance): the server only honors the index when
+  // the row still carries this exact payload, so a stale index that now
+  // points at a different same-itemId row cannot redeem the wrong copy (#2398).
+  buyBackItem(
+    itemId: string,
+    index?: number,
+    instance?: ItemInstancePayload,
+    craftedRecipeId?: string,
+  ): void;
   upgradeRiftItem(itemId: string): void;
   enchantRiftItem(itemId: string, stat: string): void;
   socketRiftGem(itemId: string, gemId: string): void;

@@ -44,7 +44,11 @@ function baseEntity(id: number, pos: Vec3): Entity {
     onGround: true,
     jumping: false,
     fallStartY: pos.y,
+    swimStroke: 0,
+    swimDiving: false,
     fatigueTicks: 0,
+    breathUsedTicks: 0,
+    drownTicks: 0,
     hp: 1,
     maxHp: 1,
     resource: 0,
@@ -87,6 +91,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     blockValue: 0,
     castPushbackReduction: 0,
     knockbackResistance: 0,
+    ccDurationReduction: 0,
     moveSpeed: 7,
     hostile: false,
     targetId: null,
@@ -105,6 +110,23 @@ function baseEntity(id: number, pos: Vec3): Entity {
     castTotal: 0,
     castTargetId: null,
     castAim: null,
+    gatherCastNodeId: '',
+    gatherCastToolRarity: '',
+    gatherCastEffectConfirmed: false,
+    craftCastRecipeId: '',
+    craftCastCommission: false,
+    craftCastBatchRemaining: 0,
+    craftCastBatchTotal: 0,
+    enchantCastItemId: '',
+    enchantCastBagSlot: 0,
+    enchantCastEnchantId: '',
+    enchantCastEquipSlot: '',
+    enchantCastConfirmReplace: false,
+    enchantCastTargetPin: '',
+    toolRechargeCastProfessionId: '',
+    fishBiteAtTick: 0,
+    fishReelDeadlineTick: 0,
+    fishCastZoneId: '',
     channeling: false,
     channelTickTimer: 0,
     channelTickEvery: 0,
@@ -120,6 +142,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     overpowerUntil: -1,
     potionCooldownUntil: -1,
     potionCdRemaining: 0,
+    firebottleCdRemaining: 0,
     savedMana: 0,
     chargeTargetId: null,
     chargeTimeLeft: 0,
@@ -129,6 +152,8 @@ function baseEntity(id: number, pos: Vec3): Entity {
     eating: null,
     drinking: null,
     weaponStowed: false,
+    helmHidden: false,
+    afk: false,
     aiState: 'idle',
     tappedById: null,
     pulseTimer: 0,
@@ -136,6 +161,10 @@ function baseEntity(id: number, pos: Vec3): Entity {
     bigCastTimer: 0,
     deathZoneCastTimer: 0,
     deathZoneStrikeTimer: 0,
+    infernoTimer: 0,
+    infernoRemaining: 0,
+    infernoPulsesFired: 0,
+    infernoGatesFired: 0,
     yelledEngage: false,
     stoneskinTimer: 0,
     terrifyTimer: 0,
@@ -151,6 +180,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     warcryTimer: 0,
     firedSummons: 0,
     summonedIds: [],
+    summonedAdd: false,
     enraged: false,
     healedThisPull: false,
     threat: new Map(),
@@ -163,9 +193,14 @@ function baseEntity(id: number, pos: Vec3): Entity {
     petTauntTimer: 0,
     petPath: [],
     petPathCooldown: 0,
+    petOwnerHpBonus: 0,
     spawnPos: { ...pos },
     leashAnchor: null,
     evadeStall: 0,
+    chaseStall: 0,
+    evadeEpoch: 0,
+    combatExitHoldUntil: 0,
+    chainPullInbound: false,
     fleeTimer: 0,
     fleeReturnTimer: 0,
     hasFled: false,
@@ -338,6 +373,7 @@ export function recalcPlayerStats(
   let catForm = false;
   let moonkinForm = false;
   let scaleMul = 1; // Fiesta buff_scale: body-size multiplier (>1 also adds hp)
+  let flatAuraArmor = 0;
   // Percent raid buffs (Mark of the Wild / Arcane Intellect / Power Word: Fortitude /
   // Devotion Aura / Battle Shout / Blessing of Might). Accumulated as fractions here,
   // then folded multiplicatively at the relevant derivation step below.
@@ -353,7 +389,7 @@ export function recalcPlayerStats(
     // effectiveAttackPower; players bake it here, so without this arm the debuff
     // was a no-op versus enemy players (PvP).
     else if (a.kind === 'debuff_ap') bonusAp -= a.value;
-    else if (a.kind === 'buff_armor') s.armor += a.value;
+    else if (a.kind === 'buff_armor') flatAuraArmor += a.value;
     else if (a.kind === 'buff_int') s.int += a.value;
     else if (a.kind === 'buff_agi') s.agi += a.value;
     else if (a.kind === 'buff_spi') s.spi += a.value;
@@ -442,7 +478,10 @@ export function recalcPlayerStats(
   s.agi = Math.max(0, s.agi);
   s.armor += s.agi * 2;
   if (bearForm) {
-    s.armor = Math.round(s.armor * 1.9);
+    // 2.3x (2026-07 tank parity, was 1.9x): leather peaks ~1700-2100 armor
+    // vs the warrior's 2861, so the form multiplier fakes the missing plate
+    // tier, the Dire Bear logic.
+    s.armor = Math.round(s.armor * 2.3);
     bonusAp += 15 + Math.round(s.agi * 1.5);
   }
   if (catForm) {
@@ -456,13 +495,23 @@ export function recalcPlayerStats(
   // Strength) before the armor multiplier so armorPct amplifies it too.
   if (mods?.stats.armorFromStrPct) s.armor += Math.round(s.str * mods.stats.armorFromStrPct);
   if (mods?.stats.armorPct) s.armor = Math.round(s.armor * (1 + mods.stats.armorPct));
+  // Flat armor auras are authored as visible character-sheet deltas (Hallowed Wall
+  // is +150 armor), not extra base armor for forms or passive armor masteries to amplify.
+  if (flatAuraArmor) s.armor += flatAuraArmor;
   if (buffArmorPct) s.armor = Math.round(s.armor * (1 + buffArmorPct)); // Devotion Aura
   // Floor Spirit at 0 so a Spirit-siphoning debuff (negative buff_spi) can never
   // drive out-of-combat regen (updateRegen reads stats.spi) below zero.
   s.spi = Math.max(0, s.spi);
 
   e.stats = s;
-  const warfare = pvpFractionsFromRatings(bonusPvpOffenseRating, bonusPvpDefenseRating);
+  // Set-granted WARFARE ratings join the per-item totals BEFORE the single
+  // resolve below, so the cap clamps the combined value exactly once. Clamping
+  // the set contribution separately first would produce a different number and
+  // disagree with the character sheet, which reads these same two fields.
+  const warfare = pvpFractionsFromRatings(
+    bonusPvpOffenseRating + setEff.pvpOffenseRating,
+    bonusPvpDefenseRating + setEff.pvpDefenseRating,
+  );
   e.stats.pvpOffense = warfare.offense;
   e.stats.pvpDefense = warfare.defense;
   // An over-level mainhand is inert like any other gear: fall back to unarmed
@@ -497,7 +546,9 @@ export function recalcPlayerStats(
       meetsLevelRequirement(lvl, mainhand)) ||
       (offhand?.kind === 'weapon' && offhand.hand === 'twohand'));
   const activeShield =
-    cls === 'warrior' && isShieldItem(offhand) && meetsLevelRequirement(lvl, offhand);
+    (cls === 'warrior' || cls === 'paladin') &&
+    isShieldItem(offhand) &&
+    meetsLevelRequirement(lvl, offhand);
   e.blockChance = activeShield ? SHIELD_BLOCK_BASE : 0;
   e.blockValue = activeShield ? (offhand.blockValue ?? 0) : 0;
   // The equipped mainhand item id: drives the held weapon model on the client
@@ -518,7 +569,12 @@ export function recalcPlayerStats(
   // Resolve the active weapon-skin cosmetic against the (possibly changed)
   // mainhand: swapping to a different weapon type drops a non-matching skin and
   // re-shows the matching one automatically. Cosmetic only; never feeds stats.
-  e.weaponSkinId = resolveActiveWeaponSkin(cls, e.mainhandItemId, e.weaponSkinLoadout);
+  e.weaponSkinId = resolveActiveWeaponSkin(
+    cls,
+    e.mainhandItemId,
+    e.weaponSkinLoadout,
+    e.skinCatalog,
+  );
   // Render-only mirror of the full worn set, copied so a later mutation of the
   // owning PlayerMeta.equipment never aliases into the entity. Synced in the
   // identity wire (terse `eq`) for the inspect-another-player window.
@@ -599,6 +655,7 @@ export function recalcPlayerStats(
   e.critDmgHealBonus = mods?.global.critDmgHealPct ?? 0;
   e.castPushbackReduction = setEff.castPushbackReduction;
   e.knockbackResistance = setEff.knockbackResistance;
+  e.ccDurationReduction = setEff.ccDurationReduction;
   // Floored at 0: an off-balance debuff (negative buff_dodge) can drive dodge to nothing.
   e.dodgeChance = Math.max(0, 0.05 + s.agi * 0.0005 + bonusDodge);
 
@@ -719,10 +776,16 @@ export function createMob(id: number, template: MobTemplate, level: number, pos:
   // Telegraph the lethal zone casts the same way: one full interval before first fire.
   if (template.deathZoneCast) e.deathZoneCastTimer = template.deathZoneCast.every;
   if (template.deathZoneStrike) e.deathZoneStrikeTimer = template.deathZoneStrike.every;
+  if (template.infernoChannel) e.infernoTimer = template.infernoChannel.every;
   // Telegraph the first Rally the same way: one full interval after engage.
   if (template.rally) e.rallyTimer = template.rally.every;
   // Telegraph the first War Cadence the same way: one full interval after engage.
   if (template.warcry) e.warcryTimer = template.warcry.every;
+  // A template that takes its PASSIVE idle draws off the shared world stream
+  // (MobTemplate.offStreamIdle) carries the contract from birth, through EVERY spawn
+  // path: the camp loop, a brood egg hatching a whelp at runtime, a dev spawn. Draws
+  // no rng itself, so no spawn's draw position moves.
+  if (template.offStreamIdle) e.offStreamRng = true;
   return e;
 }
 

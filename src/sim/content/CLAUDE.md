@@ -15,7 +15,9 @@ Healer surface, plus `CLASSES`/`ABILITIES`). A few modules feed one sibling sim
 system directly instead of the `data.ts` spread: `mailboxes.ts`/`letters.ts`
 (mail, `src/sim/mail/post_office.ts`), `tunnels.ts` (`src/sim/voxel.ts`),
 `enchants.ts` (`src/sim/professions/enchanting.ts`), `dungeon_difficulty.ts`
-(`src/sim/instances/`). All shapes are typed in `../types.ts`: add a field
+(`src/sim/instances/`), `vendor_row_gates.ts` (the vendor buy path in
+`src/sim/items.ts` and, sharing the one resolver, the vendor window's pure view
+core). All shapes are typed in `../types.ts`: add a field
 there first if you need one.
 
 ## Where a new thing lands
@@ -50,7 +52,9 @@ there first if you need one.
 - **Professions data:** `professions.ts` (`CRAFT_RING`, `GATHERING_PROFESSIONS`,
   `TOOL_EFFECTS`, `PERK_THRESHOLDS`), `recipes.ts` (`COMMON_RECIPES`/`TOOL_RECIPES`/
   `CASTER_HUB_RECIPES`/`COMBO_RECIPES`, merged into `ALL_RECIPES`),
-  `gather_nodes.ts`, `enchants.ts`. Mechanics live in `src/sim/professions/`,
+  `gather_nodes.ts`, `enchants.ts`, `vendor_row_gates.ts` (per-item proficiency
+  requirements on NPC vendor rows, plus the one resolver both the authoritative
+  buy path and the vendor view call). Mechanics live in `src/sim/professions/`,
   never here.
 - **Events + world systems:** `augments.ts` (2v2 Fiesta) and `skins.ts` (cosmetic
   skin events), `vale_cup.ts`, `yumi.ts`, `item_sets.ts` (set bonuses),
@@ -77,6 +81,18 @@ cross-reference it; do not invent costs/levels/damage.
   highest `rank` whose `level <= playerLevel`; rank rows reuse the base id.
 
 ## How to add quest / mobs / camps / dungeon / item / gather node
+**Placement rule for every coordinate below.** An authored `pos` is a WORLD
+FIXTURE, not just data, so it inherits the screens `generateDecorations`
+(`src/sim/world.ts`) applies to procedurally seated props: a yard of freeboard
+over the water surface, walkable slope, no collider overlap, clear of a road, and
+outside a reserved venue footprint such as `SOWFIELD_EXCLUDE` (the boarball
+ground). Two guards own parts of that: `tests/placement_integrity.test.ts` walks
+the calm-pad roster for classic ground and road reachability, and
+`tests/gather_node_placement.test.ts` holds every gather-node coordinate to the
+full list. Neither covers a NEW fixture category by itself, so a new authored
+placement type needs its own coordinate arm in the same change. Skipping this has
+shipped twice: six herb patches on a lake floor, and a sheenleaf patch growing
+inside the Vale Cup pitch.
 - **Quest:** add to `ZONE{N}_QUESTS` (`giverNpcId`, `turnInNpcId` (or `turnInNpcIds`
   for multiple valid turn-ins), `text`, `objectives[]` of `{type:'kill',targetMobId}`,
   `{type:'collect',itemId}`, or `{type:'interact'}` with `targetObjectItemId` (ground
@@ -105,7 +121,13 @@ cross-reference it; do not invent costs/levels/damage.
   `NODE_HARVEST_TABLE` (`src/sim/professions/gathering.ts`); rendering in
   `src/render/gather_nodes.ts` (a new node TYPE also needs `NODE_ASSET_URL`,
   `gather_nodes_lookup.ts`, and the `GatherNodeType` union). Respawn is per
-  VIEWER. Tests: `tests/gather_nodes.test.ts`, `tests/gather_node_harvest.test.ts`.
+  VIEWER. The COORDINATE carries the placement rule above and then some:
+  `tests/gather_node_placement.test.ts` holds it to dry ground both under the
+  prop AND across its whole `INTERACT_RANGE` harvest reach (a gatherer never
+  wades to work a patch), plus slope, burial, hub reachability, zone containment,
+  spacing, named-mob clearance, and the Sowfield screen. Run it after moving any
+  `pos`. Tests: `tests/gather_nodes.test.ts`, `tests/gather_node_harvest.test.ts`,
+  `tests/gather_node_placement.test.ts`.
 
 ## i18n: English names/text here are the source, localized at the client
 This dir carries **no `t()`/i18n imports** (it's sim-side data) but its `name:`,

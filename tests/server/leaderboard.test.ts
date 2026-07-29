@@ -135,6 +135,7 @@ function fakeRuntime(overrides: Partial<LeaderboardRuntime> = {}): LeaderboardRu
     deedsSelfRank: async () => null,
     getArenaLeaderboard: async () => [],
     getAccountsCreatedCount: async () => 0,
+    getCharactersCreatedCount: async () => 0,
     getReleases: async () => [],
     githubRepo: 'levy-street/world-of-claudecraft',
     releasesMaxLimit: 20,
@@ -380,9 +381,18 @@ describe('readRealms (FakeCharactersDb)', () => {
 });
 
 describe('readProjectStats', () => {
-  it('reports accounts_created from the db, players_online from the arg, and the realm', async () => {
-    const out = await readProjectStats({ getAccountsCount: async () => 123 }, 7, REALM_NAME);
-    expect(out).toEqual({ accounts_created: 123, players_online: 7, realm: REALM_NAME });
+  it('reports accounts_created and characters_created from the db, players_online from the arg, and the realm', async () => {
+    const out = await readProjectStats(
+      { getAccountsCount: async () => 123, getCharactersCount: async () => 456 },
+      7,
+      REALM_NAME,
+    );
+    expect(out).toEqual({
+      accounts_created: 123,
+      characters_created: 456,
+      players_online: 7,
+      realm: REALM_NAME,
+    });
   });
 });
 
@@ -533,7 +543,7 @@ describe('readPublicSheet (FakeCharactersDb, resolved by name)', () => {
 // ---------------------------------------------------------------------------
 
 describe('status handler (name-list trim deviation)', () => {
-  it('returns counts only: { ok, realm, players_online, players_cap, steam } with NO names list', async () => {
+  it('returns counts and capability adverts with NO names list', async () => {
     configureLeaderboardRuntime(fakeRuntime({ playersOnline: () => 4, playersCap: () => 250 }));
     const ctx = fakeCtx({ method: 'GET', url: '/api/status' });
     await handlerFor('/api/status')(ctx);
@@ -546,8 +556,58 @@ describe('status handler (name-list trim deviation)', () => {
       // The configured realm cap, advertised so the client realm list can show Full.
       players_cap: 250,
       steam: { enabled: false },
+      epic: { enabled: false },
+      // The /dev GUI capability advert. False here because the suite runs without
+      // ALLOW_DEV_COMMANDS, which is also the production posture.
+      dev_commands: false,
+      profiler_invulnerability: false,
     });
     expect('names' in (body as object)).toBe(false);
+  });
+
+  // The advert must track the env, not a boot-time snapshot: the /api/perf gate
+  // beside it reads live per request, and a status body that lied either way would
+  // strand a tester (dark window on a dev realm) or tease one (lit window on a
+  // realm that refuses every command).
+  it('advertises dev_commands true only while ALLOW_DEV_COMMANDS=1, read live per request', async () => {
+    configureLeaderboardRuntime(fakeRuntime({ playersOnline: () => 1, playersCap: () => 10 }));
+    const previous = process.env.ALLOW_DEV_COMMANDS;
+    try {
+      process.env.ALLOW_DEV_COMMANDS = '1';
+      const on = fakeCtx({ method: 'GET', url: '/api/status' });
+      await handlerFor('/api/status')(on);
+      expect(
+        captured(on.res).body as {
+          dev_commands: boolean;
+          profiler_invulnerability: boolean;
+        },
+      ).toMatchObject({ dev_commands: true, profiler_invulnerability: true });
+
+      // Same process, no re-boot: flipping the env must flip the next answer.
+      process.env.ALLOW_DEV_COMMANDS = '0';
+      const off = fakeCtx({ method: 'GET', url: '/api/status' });
+      await handlerFor('/api/status')(off);
+      expect(
+        captured(off.res).body as {
+          dev_commands: boolean;
+          profiler_invulnerability: boolean;
+        },
+      ).toMatchObject({ dev_commands: false, profiler_invulnerability: false });
+
+      // Only the exact string '1' arms it, matching every other ALLOW_DEV_COMMANDS gate.
+      process.env.ALLOW_DEV_COMMANDS = 'true';
+      const truthy = fakeCtx({ method: 'GET', url: '/api/status' });
+      await handlerFor('/api/status')(truthy);
+      expect(
+        captured(truthy.res).body as {
+          dev_commands: boolean;
+          profiler_invulnerability: boolean;
+        },
+      ).toMatchObject({ dev_commands: false, profiler_invulnerability: false });
+    } finally {
+      if (previous === undefined) delete process.env.ALLOW_DEV_COMMANDS;
+      else process.env.ALLOW_DEV_COMMANDS = previous;
+    }
   });
 
   it('advertises players_cap 0 when the cap is disabled', async () => {
@@ -574,6 +634,22 @@ describe('status handler (name-list trim deviation)', () => {
     } finally {
       if (saved === undefined) delete process.env.STEAM_ENABLED;
       else process.env.STEAM_ENABLED = saved;
+    }
+  });
+
+  it('adverts epic.enabled true when EPIC_ENABLED=1 (the capability advert)', async () => {
+    const saved = process.env.EPIC_ENABLED;
+    process.env.EPIC_ENABLED = '1';
+    try {
+      configureLeaderboardRuntime(fakeRuntime({ playersOnline: () => 4 }));
+      const ctx = fakeCtx({ method: 'GET', url: '/api/status' });
+      await handlerFor('/api/status')(ctx);
+      const { status, body } = captured(ctx.res);
+      expect(status).toBe(200);
+      expect((body as { epic: { enabled: boolean } }).epic).toEqual({ enabled: true });
+    } finally {
+      if (saved === undefined) delete process.env.EPIC_ENABLED;
+      else process.env.EPIC_ENABLED = saved;
     }
   });
 });
@@ -797,15 +873,24 @@ describe('arena leaderboard handler (through the injected cache-fronted runtime)
 });
 
 describe('project-stats handler (through the injected cache-fronted runtime)', () => {
-  it('serves accounts_created from the runtime count, players_online live, and the realm', async () => {
+  it('serves characters_created from the runtime count, players_online live, and the realm', async () => {
     configureLeaderboardRuntime(
-      fakeRuntime({ playersOnline: () => 9, getAccountsCreatedCount: async () => 123 }),
+      fakeRuntime({
+        playersOnline: () => 9,
+        getAccountsCreatedCount: async () => 123,
+        getCharactersCreatedCount: async () => 456,
+      }),
     );
     const ctx = fakeCtx({ method: 'GET', url: '/api/project-stats' });
     await handlerFor('/api/project-stats')(ctx);
     const { status, body } = captured(ctx.res);
     expect(status).toBe(200);
-    expect(body).toEqual({ accounts_created: 123, players_online: 9, realm: REALM_NAME });
+    expect(body).toEqual({
+      accounts_created: 123,
+      characters_created: 456,
+      players_online: 9,
+      realm: REALM_NAME,
+    });
   });
 });
 

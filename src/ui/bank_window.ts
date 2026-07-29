@@ -30,7 +30,9 @@ import {
   parseBagFilter,
   serializeBagFilter,
 } from './bag_filter';
+import { bagInstanceGlyphKind } from './bag_instance_glyph_view';
 import { filterBankSlots } from './bank_filter';
+import { showQuantityPrompt } from './bank_quantity_prompt';
 import {
   type BankBonusModel,
   type BankBonusRowModel,
@@ -46,11 +48,30 @@ import {
 import { markDialogRoot } from './dialog_root';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
-import { FOCUSABLE_SELECTOR } from './focus_manager';
+import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
+import {
+  GUILD_PANEL_ID,
+  GUILD_TAB_ID,
+  type GuildBankPaneView,
+  GuildBankTab,
+} from './guild_bank_window';
 import { formatMoney, formatNumber, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
+import {
+  INSTANCE_GLYPH_ARIA_KEYS,
+  instanceGlyphMarkHtml,
+  UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS,
+} from './item_instance_glyph_mark';
+import { knownItemDef } from './known_item';
 import type { PainterHostPresentation } from './painter_host';
+import {
+  installPromptDialog as installModalPromptDialog,
+  type PromptDialogHandle,
+} from './prompt_dialog';
+import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
+import { tabStripHtml, tabStripModel } from './tab_strip_view';
 import { svgIcon } from './ui_icons';
+import { unknownItemIconHtml } from './unknown_item_icon';
 
 // The unranked quality fallback as a CSS custom property. The shared QUALITY_COLOR
 // map carries the real per-quality hex; this token covers an item with no quality
@@ -62,21 +83,26 @@ const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
 // MAIL_INFO_GRACE_MS semantics with a bank-named constant, same 3000 value).
 const BANK_INFO_GRACE_MS = 3_000;
 
-// Monotonic id source for the ad-hoc prompt dialogs' aria-labelledby target, so the
-// id never couples to class ordering (mirrors bags' promptDialogSeq).
-let promptDialogSeq = 0;
-
 // The confirm / quantity prompts mount into #prompt-stack (outside #bank-window). A
 // window-level close() removes any that are open so it never leaves an orphaned
 // aria-modal dialog floating over the closed window.
 const BANK_PROMPT_SELECTOR = '.bank-quantity-prompt, .bank-buy-prompt';
-function dismissBankPrompts(): void {
+// Exported so the guild pane (guild_bank_window.ts), which shares this window's
+// prompt classes and force-close teardown, can tear siblings down before
+// mounting its own prompts.
+export function dismissBankPrompts(): void {
   for (const p of document.querySelectorAll(BANK_PROMPT_SELECTOR)) p.remove();
 }
 
 // The bank's window-local filter preferences persist under their OWN key, distinct
 // from the bags' 'woc_bag_filter': the two windows share the state SHAPE (BagFilterState)
-// and the tolerant serialize/parse, but keep independent category/sort/search choices.
+// and the tolerant serialize/parse, but keep independent category/sort choices. The
+// SEARCH is per-visit only: close() resets the live value, persistFilter strips it
+// from every write, and construction never restores it (and eagerly scrubs a
+// non-empty stored query so storage never holds one even if the player never opens
+// the bank this session). A reopened bank always starts unfiltered (a stale query
+// silently hides slots). The bags window still keeps its search across sessions;
+// aligning the family is a named follow-up, not an accident of this module.
 const BANK_FILTER_KEY = 'woc_bank_filter';
 
 // How long the transient deposit-all summary stays on screen before it clears. The
@@ -95,6 +121,7 @@ const BANK_CATEGORY_LABEL_KEYS: Record<BagCategory, TranslationKey> = {
   armor: 'hudChrome.bags.filterArmor',
   consumable: 'hudChrome.bags.filterConsumable',
   material: 'hudChrome.bags.filterMaterial',
+  tool: 'hudChrome.bags.filterTool',
   quest: 'hudChrome.bags.filterQuest',
   mount: 'hudChrome.bags.filterMount',
 };
@@ -168,19 +195,56 @@ export interface BankWindowDeps extends PainterHostPresentation {
   onInventoryChanged(): void;
 }
 
+/** The two bank panes. The Guild tab exists only while guildBankInfo is
+ *  non-null (officer-plus at a banker, online with the book loaded). */
+export type BankTabId = 'personal' | 'guild';
+
 export class BankWindow {
   private opened = false;
   private lastSig = '';
   private openerFocus: HTMLElement | null = null;
   private openedAt = 0;
 
-  // Window-local filter state: category chips + sort + live search, persisted across
-  // sessions under BANK_FILTER_KEY. Pure logic lives in bank_filter.ts (reusing
-  // bag_filter.ts); this is the consumer. Tolerant parse: corrupt storage falls back
-  // to the default filter, never throwing.
+  // Which pane is showing. Guild is reachable only while the strip renders
+  // (guildBankInfo non-null); any render that finds it gone falls back to
+  // Personal, and close() resets it so a reopened bank never starts on a
+  // pane that may no longer exist.
+  private tab: BankTabId = 'personal';
+  // The pane the LAST paint drew, so the .bank-scroll offset is restored only
+  // within one pane (a tab switch starts at the top, never mid-list).
+  private lastRenderedTab: BankTabId = 'personal';
+  // ...and which GUILD sub-view it drew, for the same reason one level down:
+  // the contents grid and the log list both mount a .bank-scroll, so without
+  // this the grid's offset would be pasted onto the log the moment a player
+  // switched between them.
+  private lastRenderedGuildView: GuildBankPaneView = 'contents';
+  // The guild pane painter (guild_bank_view.ts core + guild_bank_window.ts),
+  // sharing this window's presentation bag and prompt-dialog chrome.
+  private readonly guildPane: GuildBankTab;
+
+  // Window-local filter state: category chips + sort persist across sessions under
+  // BANK_FILTER_KEY; the live search is per-visit and starts empty even when a
+  // reload while the bank sat open left a query in storage (close() never ran, see
+  // BANK_FILTER_KEY). A non-empty stored search is also rewritten out at boot so
+  // storage never holds a stranded query when the player never opens the bank.
+  // Pure logic lives in bank_filter.ts (reusing bag_filter.ts); this is the
+  // consumer. Tolerant parse: corrupt storage falls back to the default filter,
+  // never throwing.
   private filter: BagFilterState = (() => {
     try {
-      return parseBagFilter(localStorage.getItem(BANK_FILTER_KEY));
+      const parsed = parseBagFilter(localStorage.getItem(BANK_FILTER_KEY));
+      const next = { ...parsed, search: '' };
+      // Scrub a legacy or reload-stranded query at construction so storage never
+      // holds a search value even if the player never opens the bank this session.
+      // Category/sort stay; private-mode write failures are ignored like persistFilter.
+      if (parsed.search !== '') {
+        try {
+          localStorage.setItem(BANK_FILTER_KEY, serializeBagFilter(next));
+        } catch {
+          /* storage unavailable (private mode); live state is still search-free */
+        }
+      }
+      return next;
     } catch {
       return { ...DEFAULT_BAG_FILTER };
     }
@@ -201,10 +265,63 @@ export class BankWindow {
   private depositAllPending = false;
   private depositAllTimer: number | null = null;
 
-  constructor(private readonly deps: BankWindowDeps) {}
+  constructor(private readonly deps: BankWindowDeps) {
+    this.guildPane = new GuildBankTab({
+      root: () => this.deps.root(),
+      world: () => this.deps.world(),
+      itemIcon: (item) => this.deps.itemIcon(item),
+      moneyHtml: (copper) => this.deps.moneyHtml(copper),
+      itemTooltip: (item, instance) => this.deps.itemTooltip(item, instance),
+      attachTooltip: (el, html) => this.deps.attachTooltip(el, html),
+      hideTooltip: () => this.deps.hideTooltip(),
+      consumePeek: () => this.deps.consumePeek(),
+      onInventoryChanged: () => this.deps.onInventoryChanged(),
+      installPromptDialog: (prompt, opener, close) =>
+        this.installPromptDialog(prompt, opener, close),
+      dismissPrompts: () => dismissBankPrompts(),
+      requestRender: () => {
+        if (this.opened) this.render();
+      },
+    });
+  }
 
   get isOpen(): boolean {
     return this.opened;
+  }
+
+  /** True while the window is open on the PERSONAL pane: the bags companion
+   *  reads this (via Hud) to route a bag click to bankDeposit.
+   *
+   *  It is deliberately NOT "open and not on the guild CONTENTS view": the
+   *  guild pane's Log view is a reading surface, and while it shows, the
+   *  personal grid is off screen behind it exactly like the guild grid is. A
+   *  bag click there must arm NEITHER deposit, or reading the history silently
+   *  banks the item that was clicked, which is the same trap guildTabActive
+   *  documents below. */
+  get personalTabActive(): boolean {
+    return this.opened && this.tab === 'personal';
+  }
+
+  /** True while the window is open on the Guild pane: the bags companion
+   *  reads this (via Hud) to route a bag click to guildBankDeposit. Also
+   *  requires guildBankInfo to be live RIGHT NOW, so the one-frame window
+   *  between the mirror nulling (walk-away, guild loss) and the slow-band
+   *  repaint can never route a bag click at the guild facet. */
+  get guildTabActive(): boolean {
+    return (
+      this.opened &&
+      this.tab === 'guild' &&
+      // ONLY the contents view routes bag clicks. The log is a reading surface:
+      // a bag click while the player is reading the history must not silently
+      // deposit the item they clicked (the whole point of that routing is that
+      // the guild grid is on screen to drop into).
+      this.guildPane.activeView === 'contents' &&
+      // A READ-ONLY viewer's contents pane is a reading surface too (every
+      // member sees the bank, only officer-plus may deposit): their bag click
+      // must not arm the guild deposit, so it falls to the same speak-path the
+      // Log view uses (bankOpen stays true, both deposit modes stay off).
+      (this.deps.world().guildBankInfo?.canEdit ?? false)
+    );
   }
 
   // Re-interacting with the banker while already open must not re-run the open
@@ -235,10 +352,25 @@ export class BankWindow {
     // flashes a stale line, and no late timer fires render() on the hidden window.
     this.clearDepositStatus();
     this.clearDepositAllPending();
+    // The search is a per-visit filter: left set, the next open would start
+    // pre-narrowed to a stale query (slots hidden with no cue why). Reset the
+    // live value; the persist rewrite also scrubs any legacy pre-fix query out
+    // of storage (persistFilter never stores the search). Category/sort stay.
+    this.filter.search = '';
+    this.persistFilter();
     const el = this.deps.root();
     el.style.display = 'none';
     el.inert = false;
     this.opened = false;
+    // Walking away (or any close) empties the Guild tab state cleanly: the
+    // next open starts on Personal, never on a pane that may no longer exist.
+    this.tab = 'personal';
+    this.lastRenderedTab = 'personal';
+    // ...including the Guild pane's own sub-view: a reopened bank starts on the
+    // contents, so the log is never refetched by an open the player did not
+    // aim at it.
+    this.guildPane.resetView();
+    this.lastRenderedGuildView = 'contents';
     this.deps.hideTooltip();
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;
@@ -280,6 +412,12 @@ export class BankWindow {
       searchEl !== null && active === searchEl
         ? { start: searchEl.selectionStart, end: searchEl.selectionEnd }
         : null;
+    // The focused control's identity (data-focus-key), captured BEFORE the wipe:
+    // the guild refresh arm repaints on ANY officer's op, so an external echo
+    // must not yank a keyboard user off the tab, cell, or button they were on.
+    // Guild controls carry keys (guild_bank_window.ts + the tab annotation
+    // below); personal controls carry none and keep the close-button fallback.
+    const focusKey = hadFocus ? captureFocusKey(el) : null;
     if (document.querySelector(BANK_PROMPT_SELECTOR)) {
       dismissBankPrompts();
       el.inert = false;
@@ -290,17 +428,90 @@ export class BankWindow {
     // every rebuild, so capture its scroll offset and reapply it to the fresh one,
     // else a withdraw snaps the list back to the top (the bags idiom).
     const prevScrollTop = el.querySelector('.bank-scroll')?.scrollTop ?? 0;
-    const model = buildBankView(this.deps.world().bankInfo, (id) => ITEMS[id]);
+    const model = buildBankView(this.deps.world().bankInfo, (id) => knownItemDef(ITEMS, id));
+    // The Guild tab exists ONLY while guildBankInfo is non-null (any guild
+    // member at a banker, online, book loaded; a plain member's pane renders
+    // read-only). When it goes away mid-open (leave,
+    // kick, a reconcile window), the strip disappears and the pane falls back
+    // to Personal on this same paint; the whole-window walk-away close stays
+    // refreshIfChanged's grace-close on bankInfo.
+    const guildModel = this.guildPane.model();
+    const guildAvailable = guildModel.kind !== 'hidden'; // opened OR unopened pane
+    if (!guildAvailable) {
+      this.tab = 'personal';
+      // ...and drop the pane's OWN sub-view with it, the way close() does. The
+      // log view is the one that fetches: leaving it selected on a pane that no
+      // longer exists left a demoted client re-requesting a log the server
+      // refuses, once per TTL, forever.
+      this.guildPane.resetView();
+    }
     el.innerHTML =
       `<div class="panel-title"><span>${esc(t('hudChrome.bank.title'))} <span class="panel-subtitle">${esc(t('hudChrome.bank.subtitle'))}</span></span>` +
       `<button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.bank.close'))}">${svgIcon('close')}</button></div>`;
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
-    if (hadFocus && !searchFocus) (el.querySelector('[data-close]') as HTMLElement | null)?.focus();
+    if (guildAvailable) {
+      // The shared WAI-ARIA tab strip (tab_strip_view core + wireTabStrip),
+      // the social/talents idiom. The PERSONAL pane's sections still mount
+      // directly on the window root (wrapping them would disturb the flex
+      // column the bank CSS sizes), so the strip carries no blanket `panelId`;
+      // the GUILD pane does build a real role=tabpanel, because it holds a
+      // nested tab list of its own and a second peer tablist with no stated
+      // relationship is unintelligible to a screen reader. Its aria-controls is
+      // stamped below, once that panel exists.
+      el.insertAdjacentHTML(
+        'beforeend',
+        tabStripHtml(
+          tabStripModel({
+            ariaLabel: t('hudChrome.bank.tabsAria'),
+            stripClass: 'bank-tabs',
+            tabClass: 'bank-tab',
+            selectedClass: 'on',
+            tabs: [
+              { id: 'personal', label: t('hudChrome.bank.personalTab') },
+              // A stable id so the Guild pane's panel can point its
+              // aria-labelledby back at this tab.
+              { id: 'guild', label: t('hudChrome.bank.guildTab'), buttonId: GUILD_TAB_ID },
+            ],
+            selected: this.tab,
+          }),
+        ),
+      );
+      wireTabStrip(el, 'bank-tab', (id, focusFollow) => {
+        if (id !== 'personal' && id !== 'guild') return;
+        if (this.tab !== id) audio.click();
+        this.tab = id;
+        this.render();
+        if (focusFollow) focusActiveTab(this.deps.root(), 'bank-tab', 'on');
+      });
+      // Key the tab buttons so a repaint keeps focus on the tab the user was
+      // on (the shared strip carries data-tab; the key namespace is ours).
+      for (const tab of el.querySelectorAll<HTMLElement>('.bank-tab')) {
+        tab.dataset.focusKey = `tab:${tab.dataset.tab}`;
+      }
+    }
+    if (this.tab === 'guild') {
+      this.guildPane.renderInto(el, guildModel);
+      // Close the tab/panel relationship now that the panel exists: without it
+      // the pane's own Contents/Log strip reads to assistive tech as a second,
+      // unrelated top-level tab list that appeared out of nowhere.
+      const guildTab = el.querySelector<HTMLElement>(`#${GUILD_TAB_ID}`);
+      if (guildTab && el.querySelector(`#${GUILD_PANEL_ID}`)) {
+        guildTab.setAttribute('aria-controls', GUILD_PANEL_ID);
+      }
+      this.annotateGuildFocusKeys(el);
+      this.restoreScroll(el, prevScrollTop);
+      // The guild pane has no search box, so a searchFocus capture degrades
+      // through the key ladder to the close button, never to <body>.
+      if (hadFocus) this.restoreControlFocus(el, focusKey);
+      return;
+    }
     if (model.kind === 'away') {
       const away = document.createElement('div');
       away.className = 'bank-empty';
       away.textContent = t('hudChrome.bank.tooFar');
       el.appendChild(away);
+      this.lastRenderedTab = this.tab;
+      if (hadFocus) this.restoreControlFocus(el, focusKey);
       return;
     }
     const capacity = document.createElement('div');
@@ -333,7 +544,7 @@ export class BankWindow {
     const bonus = this.buildBonusSection(model.bonus);
     if (bonus) scroll.appendChild(bonus);
     el.appendChild(scroll);
-    scroll.scrollTop = prevScrollTop;
+    this.restoreScroll(el, prevScrollTop);
     el.appendChild(this.buildBuyRow(model.buy));
     if (searchFocus) {
       const fresh = el.querySelector('.bag-search') as HTMLInputElement | null;
@@ -345,7 +556,62 @@ export class BankWindow {
         // close button rather than dropping focus to <body>.
         (el.querySelector('[data-close]') as HTMLElement | null)?.focus();
       }
+    } else if (hadFocus) {
+      this.restoreControlFocus(el, focusKey);
     }
+  }
+
+  // Stamp the guild pane's controls with their focus keys AFTER renderInto
+  // returned: the shared data-focus-key namespace stays inside this module,
+  // the one that imports focus_restore (the single-reader guard in
+  // tests/focus_restore.test.ts), and the pane stays focus-agnostic. Cells are
+  // keyed by wire index: fillGrid appends model.slots in order (slotIndex ==
+  // array index) before the empty pad, so DOM order IS slot order; the pinned
+  // focus test drives a real repaint over a focused cell, so a reorder that
+  // broke this coupling goes red there.
+  private annotateGuildFocusKeys(el: HTMLElement): void {
+    // The Contents / Log sub-strip first: the log repaints on ANY officer's op
+    // (its cache busts and the response lands), so a keyboard user reading it
+    // must not be thrown off the strip by somebody else's deposit.
+    for (const tab of el.querySelectorAll<HTMLElement>('.gbank-view-tab')) {
+      tab.dataset.focusKey = `gbank:view:${tab.dataset.tab}`;
+    }
+    let slotIndex = 0;
+    for (const cell of el.querySelectorAll<HTMLElement>('.bank-grid .bank-item:not(.empty)')) {
+      cell.dataset.focusKey = `gbank:slot:${slotIndex++}`;
+    }
+    const [deposit, withdraw] = Array.from(el.querySelectorAll<HTMLElement>('.gbank-gold-btn'));
+    if (deposit) deposit.dataset.focusKey = 'gbank:deposit-gold';
+    if (withdraw) withdraw.dataset.focusKey = 'gbank:withdraw-gold';
+    const buy = el.querySelector<HTMLElement>('.bank-buy-btn');
+    if (buy) buy.dataset.focusKey = 'gbank:buy';
+  }
+
+  // Re-land focus after a full rebuild: the control the user was on (resolved
+  // by its data-focus-key in the fresh tree, skipped when it came back
+  // disabled), else the always-present close button. Never <body> (WCAG 2.4.3).
+  private restoreControlFocus(el: HTMLElement, focusKey: string | null): void {
+    restoreFirstEnabled([
+      focusKey
+        ? (el.querySelector(`[data-focus-key="${focusKey}"]`) as
+            | (HTMLElement & { disabled?: boolean })
+            | null)
+        : null,
+      el.querySelector('[data-close]') as HTMLElement | null,
+    ]);
+  }
+
+  // Reapply the captured .bank-scroll offset to the freshly built pane, but only
+  // within one pane (a tab switch starts at the top, never mid-list), and latch
+  // which pane this paint drew. Every render path that mounts a scroll region
+  // routes through here so the offset can never leak across panes.
+  private restoreScroll(el: HTMLElement, prevScrollTop: number): void {
+    const view = this.guildPane.activeView;
+    const samePane = this.lastRenderedTab === this.tab && this.lastRenderedGuildView === view;
+    const scroll = el.querySelector('.bank-scroll') as HTMLElement | null;
+    if (scroll) scroll.scrollTop = samePane ? prevScrollTop : 0;
+    this.lastRenderedTab = this.tab;
+    this.lastRenderedGuildView = view;
   }
 
   // Per-frame (slow divider): refresh the grid when the mirror changes; close when the
@@ -357,12 +623,52 @@ export class BankWindow {
       if (performance.now() - this.openedAt > BANK_INFO_GRACE_MS) this.close();
       return;
     }
+    // The guild half rides the same signature: a guild op echo, an expansion,
+    // the tab APPEARING or DISAPPEARING (guild loss, reconcile window), and a
+    // canEdit flip (promotion or demotion at the banker: the buttons, action
+    // rows, note, and bag-click routing all change with it) each repaint; null
+    // collapses the whole guild arm so the strip drops and
+    // the pane falls back to Personal in render(). Deliberately purse-free
+    // (the guild enablement reads snapshot state only, see guild_bank_view.ts)
+    // with ONE exception: while the bank is UNOPENED (purchasedSlots 0) and
+    // the viewer may edit, the
+    // open-the-bank row's shortfall marker reads the officer's own purse (rung
+    // 0 is purse-paid), so the purse joins the signature for that state only
+    // (a read-only member has no open row, so their pane stays purse-free).
+    // Nesting the guild arm under the bankInfo null-gate above is safe because
+    // guildBankInfoFor's gate is a strict SUPERSET of bankInfoFor's (same
+    // banker proximity, plus alive + guild membership + a loaded book):
+    // guildBank can never be non-null while bankInfo is null.
+    const g = this.deps.world().guildBankInfo;
     const sig = JSON.stringify([
       info.capacity,
       info.purchasedSlots,
       info.bonusSlots,
       info.nextExpansionCost,
       info.slots,
+      g && [
+        g.treasury,
+        g.capacity,
+        g.purchasedSlots,
+        g.nextExpansionPrice,
+        g.slots,
+        g.canEdit,
+        g.purchasedSlots === 0 && g.canEdit ? this.deps.world().copper : null,
+      ],
+      // The activity log's own repaint arm, and NULL unless the log view is
+      // actually open: the log is fetched on demand by reading it, so pulling
+      // it into the signature unconditionally would make every officer standing
+      // at a banker poll for a payload they are not looking at. When the view
+      // IS open this is what turns the response landing (loading -> ready, or a
+      // fresh row after another officer's op busted the server cache) into a
+      // repaint, with no timer of its own.
+      // ...and ONLY while the log view is on screen. `readAndRequestLog` reads
+      // the log, and reading it is what SENDS the request, so this arm is gated
+      // on the pane actually being visible rather than on the pane's remembered
+      // sub-view alone: a player who opened the log and went back to the
+      // Personal tab was otherwise re-requesting it every TTL for a pane nobody
+      // was looking at.
+      this.tab === 'guild' && g !== null ? this.guildPane.readAndRequestLog() : null,
     ]);
     if (sig === this.lastSig) return;
     this.lastSig = sig;
@@ -387,12 +693,14 @@ export class BankWindow {
       return;
     }
     // Apply the window-local filter/sort. slotIndex rides through, so a filtered or
-    // sorted cell still acts on its ORIGINAL bank slot; filterBankSlots drops unknown-id
-    // (dormant) slots exactly as the bags filter does.
+    // sorted cell still acts on its ORIGINAL bank slot; filterBankSlots keeps
+    // unknown-id slots visible in the everything view (bank contents are server
+    // truth, so a stale bundle can hold ids it predates, R34) and excludes them
+    // only from category chips and name searches, exactly as the bags filter does.
     const isDefault = bagFilterIsDefault(this.filter);
     const visible = filterBankSlots(
       slots,
-      (id) => ITEMS[id],
+      (id) => knownItemDef(ITEMS, id),
       this.filter,
       (id) => this.itemNameOf(id),
     );
@@ -405,19 +713,40 @@ export class BankWindow {
       return;
     }
     for (const slot of visible) {
-      const item = ITEMS[slot.itemId];
-      if (!item) continue;
+      const item = knownItemDef(ITEMS, slot.itemId);
       const cell = document.createElement('button');
       cell.type = 'button';
       cell.className = `bank-item q-${slot.qualityKey}`;
       const qColor = QUALITY_COLOR[slot.qualityKey] ?? QUALITY_DEFAULT_COLOR;
       cell.style.setProperty('--bank-slot-quality', qColor);
-      const itemName = itemDisplayName(item);
+      // Per-copy corner marks (masterwork seal, enchanted / signed / bound glyph,
+      // or the generic wedge): same shared helper bags use so a banked masterwork
+      // keeps its seal visible at a glance. Aria-hidden mark; the cell name
+      // carries the per-copy fact. Quest items cannot enter the bank, so no
+      // quest seal composes here.
+      const glyphKind = bagInstanceGlyphKind(slot.instance);
+      const instanceMark = instanceGlyphMarkHtml(glyphKind);
+      // Stale-client guard (R34): an id this bundle predates still holds a
+      // real, counted bank slot, so it renders (fallback icon, raw id as the
+      // label) instead of vanishing. The withdraw click stays live because the
+      // server resolves it by slotIndex, no def needed; only the def-derived
+      // tooltip body is replaced.
+      const countLabel = this.fmt(slot.count);
       cell.setAttribute(
         'aria-label',
-        t('itemUi.bags.itemAria', { item: itemName, count: this.fmt(slot.count) }),
+        item
+          ? t(glyphKind ? INSTANCE_GLYPH_ARIA_KEYS[glyphKind] : 'itemUi.bags.itemAria', {
+              item: itemDisplayName(item),
+              count: countLabel,
+            })
+          : t(
+              glyphKind
+                ? UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS[glyphKind]
+                : 'itemUi.bags.unknownItemAria',
+              { id: slot.itemId, count: countLabel },
+            ),
       );
-      cell.innerHTML = `${this.deps.itemIcon(item)}<span class="bank-count">${slot.showCount ? esc(t('itemUi.bags.stackCount', { count: this.fmt(slot.count) })) : ''}</span>`;
+      cell.innerHTML = `${item ? this.deps.itemIcon(item) : unknownItemIconHtml(slot.itemId)}${instanceMark}<span class="bank-count">${slot.showCount ? esc(t('itemUi.bags.stackCount', { count: countLabel })) : ''}</span>`;
       cell.addEventListener('click', (ev) => {
         // On touch, the click that ends a long-press peek inspects the slot (its
         // tooltip is already shown) instead of withdrawing: the release dismisses
@@ -432,7 +761,10 @@ export class BankWindow {
         const partial = slot.showCount
           ? `<div class="tt-sub">${esc(t('hudChrome.bank.withdrawPartialHint'))}</div>`
           : '';
-        return `${this.deps.itemTooltip(item, slot.instance)}<div class="tt-sub">${esc(t('hudChrome.bank.withdrawHint'))}</div>${partial}`;
+        const body = item
+          ? this.deps.itemTooltip(item, slot.instance)
+          : `<div class="tt-title">${esc(slot.itemId)}</div><div class="tt-sub">${esc(t('itemUi.bags.unknownItem'))}</div>`;
+        return `${body}<div class="tt-sub">${esc(t('hudChrome.bank.withdrawHint'))}</div>${partial}`;
       });
       grid.appendChild(cell);
     }
@@ -453,10 +785,10 @@ export class BankWindow {
   }
 
   // Localized display name, used for search matching AND the name-sort so both agree
-  // with the visible cell. An unknown id (already dropped by filterBankSlots) falls back
-  // to the raw id defensively.
+  // with the visible cell. An unknown id falls back to the raw id: that is the label
+  // its cell renders (the stale-client guard above), so sort and search stay agreed.
   private itemNameOf(itemId: string): string {
-    const item = ITEMS[itemId];
+    const item = knownItemDef(ITEMS, itemId);
     return item ? itemDisplayName(item) : itemId;
   }
 
@@ -469,7 +801,7 @@ export class BankWindow {
     if (!grid) return;
     const info = this.deps.world().bankInfo;
     if (!info) return; // walked away; refreshIfChanged owns the grace-close
-    const model = buildBankView(info, (id) => ITEMS[id]);
+    const model = buildBankView(info, (id) => knownItemDef(ITEMS, id));
     if (model.kind !== 'bank') return;
     // The offset lives on the .bank-scroll wrapper; emptying the grid momentarily
     // collapses the wrapper's scroll height (clamping scrollTop to 0), so capture
@@ -552,15 +884,31 @@ export class BankWindow {
     // Deposit all materials: one click banks every material stack that fully fits.
     // Disabled when the bags hold no material stack; a full bank is still actionable
     // (the click reports it), so it does not disable here.
+    //
+    // The clarification (junk moves too, not just tradeskill materials, and
+    // gathering tools never do) is exposed two ways so it reaches touch and keyboard users, not
+    // only a mouse-hover title: a `title` for desktop hover, PLUS a visually-hidden
+    // aria-describedby span the button always carries. A screen reader announces
+    // aria-describedby on both hover and keyboard focus, and reading it needs no
+    // pointer at all, so it also covers touch users who tap the button directly.
     const deposit = document.createElement('button');
     deposit.type = 'button';
     deposit.className = 'bank-deposit-all';
     deposit.textContent = t('hudChrome.bank.depositAll');
+    const depositTooltip = t('hudChrome.bank.depositAllTooltip');
+    deposit.title = depositTooltip;
+    deposit.setAttribute('aria-describedby', 'bank-deposit-all-desc');
     deposit.disabled =
       this.depositAllPending ||
-      !hasDepositableMaterials(this.deps.world().inventory, (id) => ITEMS[id]);
+      !hasDepositableMaterials(this.deps.world().inventory, (id) => knownItemDef(ITEMS, id));
     deposit.addEventListener('click', () => this.onDepositAll());
     tools.appendChild(deposit);
+
+    const depositDesc = document.createElement('span');
+    depositDesc.id = 'bank-deposit-all-desc';
+    depositDesc.className = 'visually-hidden';
+    depositDesc.textContent = depositTooltip;
+    tools.appendChild(depositDesc);
 
     bar.appendChild(tools);
     return bar;
@@ -568,7 +916,10 @@ export class BankWindow {
 
   private persistFilter(): void {
     try {
-      localStorage.setItem(BANK_FILTER_KEY, serializeBagFilter(this.filter));
+      // The search is stripped at the serialize boundary: it is per-visit state
+      // (close() resets it; construction never restores it), so no keystroke,
+      // chip, sort, or close write ever lands a query in storage.
+      localStorage.setItem(BANK_FILTER_KEY, serializeBagFilter({ ...this.filter, search: '' }));
     } catch {
       /* storage unavailable (private mode); the filter still works in-session */
     }
@@ -582,11 +933,8 @@ export class BankWindow {
     const world = this.deps.world();
     const info = world.bankInfo;
     if (!info) return; // walked away between render and click
-    const plan = planDepositAllMaterials(
-      world.inventory,
-      info.slots,
-      info.capacity,
-      (id) => ITEMS[id],
+    const plan = planDepositAllMaterials(world.inventory, info.slots, info.capacity, (id) =>
+      knownItemDef(ITEMS, id),
     );
     if (plan.sends.length === 0 && !plan.full) return; // nothing to do (button was disabled)
     for (const send of plan.sends) world.bankDeposit(send.slot, send.count);
@@ -794,146 +1142,67 @@ export class BankWindow {
     window.setTimeout(() => confirm.focus(), 0);
   }
 
+  // The shared quantity-prompt builder (bank_quantity_prompt.ts) owns the
+  // chrome; this owns the bank-specific closures: the stale-index guard and
+  // the withdraw send.
   private showWithdrawQuantityPrompt(slotIndex: number, maxCount: number): void {
-    dismissBankPrompts();
-    const opener = document.activeElement as HTMLElement | null;
     const slot = this.deps.world().bankInfo?.slots[slotIndex];
-    const item = slot ? ITEMS[slot.itemId] : undefined;
-    const stack = document.getElementById('prompt-stack');
-    if (!stack) return;
-    const prompt = document.createElement('div');
-    prompt.className = 'prompt panel bank-quantity-prompt';
-    const itemName = item ? itemDisplayName(item) : (slot?.itemId ?? '');
-    prompt.innerHTML = `<div class="prompt-text">${esc(t('hudChrome.bank.withdrawQuantityTitle', { item: itemName }))}</div>`;
-    const input = document.createElement('input');
-    input.className = 'prompt-number';
-    input.type = 'number';
-    input.setAttribute('aria-label', t('hudChrome.bank.withdrawQuantityInput'));
-    input.min = '1';
-    input.max = String(maxCount);
-    input.step = '1';
-    input.value = '1';
-    const confirm = document.createElement('button');
-    confirm.className = 'btn';
-    confirm.textContent = t('hudChrome.bank.withdrawQuantityConfirm');
-    const cancel = document.createElement('button');
-    cancel.className = 'btn';
-    cancel.textContent = t('itemUi.vendor.sellQuantityCancel');
-    const close = () => prompt.remove();
-    prompt.append(input, confirm, cancel);
-    const { dismiss, dismissAndReturn } = this.installPromptDialog(prompt, opener, close);
-    const submit = () => {
-      // The prompt captured slotIndex when it opened; the bank can repaint under it
-      // (a server correction, another op landing), shifting what sits at that
-      // index. Re-resolve the live slot and refuse on a mismatch: silently
-      // withdrawing the WRONG item is worse than dismissing the prompt. The count
-      // clamps to the live stack so a shrunken stack withdraws what is there.
-      const live = this.deps.world().bankInfo?.slots[slotIndex];
-      if (!live || !slot || live.itemId !== slot.itemId) {
-        dismiss();
-        (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
-        return;
-      }
-      const count = Math.max(
-        1,
-        Math.min(maxCount, live.count, Math.floor(Number(input.value) || 0)),
-      );
-      this.deps.world().bankWithdraw(slotIndex, count);
-      audio.click();
-      // The split just moved into the bags; repaint the companion (see the dep doc).
-      this.deps.onInventoryChanged();
-      dismiss();
-      // The grid rebuilds on the withdraw event, detaching the opener slot, so land on
-      // the always-present close button rather than dropping focus to <body>.
-      (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
-    };
-    confirm.addEventListener('click', submit);
-    cancel.addEventListener('click', dismissAndReturn);
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') submit();
-    });
-    stack.appendChild(prompt);
-    window.setTimeout(() => {
-      input.focus();
-      input.select();
-    }, 0);
+    if (!slot) return;
+    // knownItemDef, not a raw ITEMS index: the release's stale-client sweep
+    // made every bank item read tolerate an id this client does not know.
+    const item = knownItemDef(ITEMS, slot.itemId);
+    const itemName = item ? itemDisplayName(item) : slot.itemId;
+    showQuantityPrompt(
+      {
+        installPromptDialog: (prompt, opener, close) =>
+          this.installPromptDialog(prompt, opener, close),
+        dismissSiblings: dismissBankPrompts,
+      },
+      {
+        className: 'bank-quantity-prompt',
+        titleText: t('hudChrome.bank.withdrawQuantityTitle', { item: itemName }),
+        inputAriaText: t('hudChrome.bank.withdrawQuantityInput'),
+        confirmText: t('hudChrome.bank.withdrawQuantityConfirm'),
+        cancelText: t('itemUi.vendor.sellQuantityCancel'),
+        maxCount,
+        resolveCount: (requested) => {
+          // The prompt captured slotIndex when it opened; the bank can repaint
+          // under it (a server correction, another op landing), shifting what
+          // sits at that index. Re-resolve the live slot and refuse on a
+          // mismatch: silently withdrawing the WRONG item is worse than
+          // dismissing the prompt. The count clamps to the live stack so a
+          // shrunken stack withdraws what is there.
+          const live = this.deps.world().bankInfo?.slots[slotIndex];
+          if (!live || !slot || live.itemId !== slot.itemId) return null;
+          return Math.max(1, Math.min(maxCount, live.count, requested));
+        },
+        send: (count) => {
+          this.deps.world().bankWithdraw(slotIndex, count);
+          audio.click();
+          // The split just moved into the bags; repaint the companion (see the dep doc).
+          this.deps.onInventoryChanged();
+        },
+        afterClose: () => {
+          // The grid rebuilds on the withdraw event (and a stale refusal
+          // destroyed the opener slot either way), so land on the
+          // always-present close button rather than dropping focus to <body>.
+          (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
+        },
+      },
+    );
   }
 
-  // WCAG 2.2 AA modal prompt wiring (the bags installPromptDialog recipe): role=dialog
-  // + aria-modal + aria-labelledby (the prompt text), a self-contained Tab cycle among
-  // the prompt's controls (mounted in #prompt-stack, outside this window's reach, so
-  // they own their own trap), an Escape close, and focus return to the opener. EVERY
-  // teardown path routes through dismiss(), which clears the #bank-window inert this
-  // sets BEFORE the prompt is removed; close() clears it too as a force-close backstop,
-  // so the window is never left inert while hidden.
+  // WCAG 2.2 AA modal prompt wiring, the shared recipe (src/ui/prompt_dialog.ts):
+  // #bank-window is the inert root while a prompt is open; close() clears it too
+  // as a force-close backstop, so the window is never left inert while hidden.
   private installPromptDialog(
     prompt: HTMLElement,
     opener: HTMLElement | null,
     close: () => void,
-  ): { dismiss: () => void; dismissAndReturn: () => void } {
-    prompt.setAttribute('role', 'dialog');
-    prompt.setAttribute('aria-modal', 'true');
-    const bankRoot = this.deps.root();
-    bankRoot.inert = true;
-    const titleEl = prompt.querySelector('.prompt-text') as HTMLElement | null;
-    if (titleEl) {
-      if (!titleEl.id) titleEl.id = `bank-prompt-title-${promptDialogSeq++}`;
-      prompt.setAttribute('aria-labelledby', titleEl.id);
-      // Name an unlabeled quantity field by the prompt's own question when it lacks a
-      // dedicated aria-label (WCAG 1.3.1 / 4.1.2).
-      const numInput = prompt.querySelector('.prompt-number');
-      if (numInput && !numInput.hasAttribute('aria-label')) {
-        numInput.setAttribute('aria-labelledby', titleEl.id);
-      }
-    }
-    const dismiss = (): void => {
-      bankRoot.inert = false;
-      close();
-    };
-    const dismissAndReturn = (): void => {
-      dismiss();
-      opener?.focus();
-    };
-    prompt.addEventListener('keydown', (e) => {
-      const ke = e as KeyboardEvent;
-      // Escape: stopPropagation, not just preventDefault. The input layer's
-      // window-level keydown runs the global escape action (closeAll) regardless of
-      // defaultPrevented, and prompt BUTTONS are not tag-exempt like inputs, so
-      // without it one keypress dismisses the prompt AND closes the whole window.
-      if (ke.key === 'Escape') {
-        ke.preventDefault();
-        ke.stopPropagation();
-        dismissAndReturn();
-        return;
-      }
-      // Enter / Space: stopPropagation for the same reason, keeping the default so
-      // native activation (Enter/Space on the confirm and cancel buttons) survives.
-      // A submit handler on the quantity input runs at the target phase and removes
-      // the prompt DURING this keydown, so a window-level gate keyed on the prompt's
-      // presence runs too late: without the stop, the same press hits the global
-      // chat/jump bind and steals the WCAG 2.4.3 focus return. The event path is
-      // fixed at dispatch, so this listener still runs after the detach; only THEN
-      // cancel the default too, or the browser runs the key's activation against
-      // the freshly re-landed focus (Enter ghost-clicking [data-close] and closing
-      // the whole window).
-      if (ke.key === 'Enter' || ke.key === ' ' || ke.code === 'Space') {
-        ke.stopPropagation();
-        if (!prompt.isConnected) ke.preventDefault();
-        return;
-      }
-      if (ke.key !== 'Tab') return;
-      const f = Array.from(prompt.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR));
-      if (f.length === 0) return;
-      const first = f[0];
-      const last = f[f.length - 1];
-      if (ke.shiftKey && document.activeElement === first) {
-        ke.preventDefault();
-        last.focus();
-      } else if (!ke.shiftKey && document.activeElement === last) {
-        ke.preventDefault();
-        first.focus();
-      }
+  ): PromptDialogHandle {
+    return installModalPromptDialog(prompt, opener, close, {
+      inertRoot: this.deps.root(),
+      idPrefix: 'bank-prompt-title',
     });
-    return { dismiss, dismissAndReturn };
   }
 }

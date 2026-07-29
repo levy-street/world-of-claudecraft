@@ -198,6 +198,12 @@ const CALLBACK_KEYS = [
   'startAutoAttack',
   'revivePet',
   'completeFishing',
+  'completeGatherCast',
+  'completeCraftCast',
+  'completeDisenchantCast',
+  'completeApplyEnchantCast',
+  'completeSalvageCast',
+  'completeRechargeCast',
   'applyDemonHealTick',
   'awardCombo',
   'meleeSwing',
@@ -232,14 +238,24 @@ const CALLBACK_KEYS = [
   'queueQuestLetter',
   'mailHeroicMarks',
   'mailAuthoredLetter',
+  'mailboxHoldsItem',
+  // Commission order board change signal (professions/commission_order.ts
+  // writes it at every board mutation; the server's corder gate reads it).
+  'bumpCommissionOrderBoardRev',
   // Set proc firing.
   'applySetProcs',
+  // Book of Deeds lifetime-counter bump (deeds.ts owns the body).
+  'bumpDeedStat',
+  // Vale Cup <-> Arena queue exclusion (social/vale_cup.ts).
+  'vcupSeatedOrQueued',
   // The Vale Cup sport-move arms (social/vale_cup.ts).
   'vcupBallKick',
   'vcupBallPass',
   'vcupShoot',
   'vcupSportDash',
   'vcupSportShove',
+  // Thornhollow Fields battleground hooks (social/battleground.ts).
+  'bgOnPlayerDeath',
 ] as const;
 
 // A fully-spied fake host. `clock` is mutable so a test can prove the context reads
@@ -268,6 +284,8 @@ function makeFakeHost() {
       return entities;
     },
     players: new Map(),
+    masteryResetNoticeCounter: { pending: 0 },
+    stationPlacements: [],
     primaryId: -1,
     tradeInvites: new Map(),
     duelInvites: new Map(),
@@ -304,6 +322,11 @@ function makeFakeHost() {
     yumiCatDamaged: vi.fn(),
     cleanupYumiMatch: vi.fn(),
     nextArenaMatchId: 1,
+    bgQueue: [],
+    bgMatches: new Map(),
+    bgBusySlots: new Set(),
+    bgOutcomes: [],
+    nextBgMatchId: 1,
     delveRuns: [],
     delvePetStash: new Map(),
     utcDay: '',
@@ -317,7 +340,10 @@ function makeFakeHost() {
     nextLootRollId: 1,
     devCommands: false,
     marketListings: [],
+    commissionOrderBoard: [],
+    nextCommissionOrderId: 1,
     bankerIds: [],
+    guildBanks: new Map(),
     vcup: createVcState(),
     deedDirtyPids: new Set<number>(),
     deedDirtyKeys: new Map<number, Set<string>>(),
@@ -326,6 +352,7 @@ function makeFakeHost() {
     fiestaBotPids: [],
     mobScanCounters: createMobScanCounters(),
     bumpDeedStat: vi.fn(),
+    bumpCommissionOrderBoardRev: vi.fn(),
     markItemDiscovered: vi.fn(),
     markVisited: vi.fn(),
     markDeedsDirty: vi.fn(),
@@ -481,6 +508,9 @@ function makeFakeHost() {
     // delveDetectMult stubbed above (C1/M2/C3) - deduped here.
     partyMembersForKey: vi.fn(() => []),
     addItem: vi.fn(),
+    equipBag: vi.fn(),
+    equipItem: vi.fn(),
+    unequipItem: vi.fn(),
     addItemInstance: vi.fn(),
     // removeItem stubbed above (P1b inventory-hub helper) - deduped.
     spawnBossAdds: vi.fn(),
@@ -514,6 +544,12 @@ function makeFakeHost() {
     startAutoAttack: vi.fn(),
     revivePet: vi.fn(),
     completeFishing: vi.fn(),
+    completeGatherCast: vi.fn(),
+    completeCraftCast: vi.fn(),
+    completeDisenchantCast: vi.fn(),
+    completeApplyEnchantCast: vi.fn(),
+    completeSalvageCast: vi.fn(),
+    completeRechargeCast: vi.fn(),
     applyDemonHealTick: vi.fn(),
     awardCombo: vi.fn(),
     meleeSwing: vi.fn(() => false),
@@ -548,13 +584,21 @@ function makeFakeHost() {
     queueQuestLetter: vi.fn(),
     mailHeroicMarks: vi.fn(),
     mailAuthoredLetter: vi.fn(),
+    mailboxHoldsItem: vi.fn(() => false),
     applySetProcs: vi.fn(),
+    // Vale Cup <-> Arena queue exclusion.
+    vcupSeatedOrQueued: vi.fn(() => false),
     // The Vale Cup sport-move arms.
     vcupBallKick: vi.fn(),
     vcupBallPass: vi.fn(),
     vcupShoot: vi.fn(),
     vcupSportDash: vi.fn(),
     vcupSportShove: vi.fn(),
+    // Thornhollow Fields battleground hooks.
+    bgOnPlayerDeath: vi.fn(),
+    bgOnPlayerDamaged: vi.fn(),
+    bgOnPlayerHealed: vi.fn(),
+    bgCancelFlagAura: vi.fn(() => false),
   };
   return { host, rng, entities, clock };
 }
@@ -584,6 +628,14 @@ describe('createSimContext (isolated, fake host)', () => {
     expect(ctx.bankerIds).toBe(host.bankerIds);
     host.bankerIds.push(4242); // the Sim ctor pushes ids after the ctx is built
     expect(ctx.bankerIds).toEqual([4242]);
+  });
+
+  it('exposes guildBanks as a live shared view (the bankerIds idiom)', () => {
+    const { host } = makeFakeHost();
+    const ctx = createSimContext(host);
+    expect(ctx.guildBanks).toBe(host.guildBanks);
+    host.guildBanks.set(3, { treasury: 0, inventory: [], purchasedSlots: 0 });
+    expect(ctx.guildBanks.get(3)).toEqual({ treasury: 0, inventory: [], purchasedSlots: 0 });
   });
 
   it('passes every callback through to the host by identity (no rewrapping)', () => {

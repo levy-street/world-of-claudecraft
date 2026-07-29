@@ -23,15 +23,22 @@
 // touches the shared sim stream, so existing golden traces stay byte-identical.
 
 import { YUMI_TEMPLATE_ID } from '../content/yumi';
-import { MOBS, YUMI_MAZE_SLOT_COUNT, yumiMazeOrigin } from '../data';
+import { DUNGEON_X_THRESHOLD, MOBS, YUMI_MAZE_SLOT_COUNT, yumiMazeOrigin } from '../data';
 import { createMob } from '../entity';
+import { type MatchPetSnapshot, snapshotMatchPet } from '../pet/pet_match_return';
 import { Rng } from '../rng';
 import type { ArenaMatch, ArenaQueueUnit, ArenaReturnPools } from '../sim';
 import type { SimContext } from '../sim_context';
-import { DT, type Entity, TICK_RATE } from '../types';
+import { type DamageEventKind, DT, type Entity, TICK_RATE } from '../types';
 import { teleportPoints, YUMI_TELEPORT_MIN_SEP, yumiMazeLayout } from '../yumi_maze_layout';
 import * as arenaMod from './arena';
 import { fiestaDownEntity } from './fiesta';
+
+function yumiState(match: ArenaMatch): NonNullable<ArenaMatch['yumi']> {
+  const y = match.yumi;
+  if (!y) throw new Error(`Yumi match ${match.id} is missing state`);
+  return y;
+}
 
 export const YUMI_HP = 5000;
 export const YUMI_COUNTDOWN = 5; // pre-fight gate, like the ranked arena
@@ -99,7 +106,25 @@ export function pruneYumiQueue(ctx: SimContext, fmt: YumiFormat): void {
   const keep = (unit: ArenaQueueUnit) =>
     unit.pids.every((id) => {
       const e = ctx.entities.get(id);
-      return !!e && !e.dead && !ctx.arenaMatches.has(id);
+      // Drop the whole unit if any member walked into a dungeon/instance while
+      // queued: the bout would return them inside fully restored (issue #1600).
+      // Same x-band test the sibling 1v1/2v2/fiesta arena prune paths use.
+      // Also drop the unit if a member slipped into a Vale Cup match/queue
+      // after joining here (arenaQueueJoin blocks this at entry, and so does
+      // startValeCupPractice in the other direction; this mirrors the
+      // 1v1/2v2/fiesta prunes as defense in depth). A Thornhollow Fields member
+      // is likewise never seated into a yumi maze mid-match (the cross-queue
+      // hole behind the stale-arenaMatches release bug): the band's x already
+      // fails the threshold test, and the explicit membership check keeps the
+      // rule true even if a match ever seats a fighter outside the band.
+      return (
+        !!e &&
+        !e.dead &&
+        !ctx.arenaMatches.has(id) &&
+        !ctx.bgMatches.has(id) &&
+        e.pos.x <= DUNGEON_X_THRESHOLD &&
+        !ctx.vcupSeatedOrQueued(id)
+      );
     });
   if (fmt === 'yumi3') ctx.arenaQueueYumi3 = ctx.arenaQueueYumi3.filter(keep);
   else ctx.arenaQueueYumi5 = ctx.arenaQueueYumi5.filter(keep);
@@ -179,8 +204,12 @@ export function startYumiMatch(
   const metas = allPids.map((pid) => ctx.players.get(pid));
   if (slot === null || entities.some((e) => !e) || metas.some((m) => !m)) {
     const queue = yumiQueue(ctx, format);
-    const okA = teamA.every((pid) => ctx.entities.get(pid) && !ctx.arenaMatches.has(pid));
-    const okB = teamB.every((pid) => ctx.entities.get(pid) && !ctx.arenaMatches.has(pid));
+    const okA = teamA.every(
+      (pid) => ctx.entities.get(pid) && !ctx.arenaMatches.has(pid) && !ctx.bgMatches.has(pid),
+    );
+    const okB = teamB.every(
+      (pid) => ctx.entities.get(pid) && !ctx.arenaMatches.has(pid) && !ctx.bgMatches.has(pid),
+    );
     if (okB) queue.unshift({ pids: teamB, rating: arenaMod.arenaTeamRating(ctx, teamB, '2v2') });
     if (okA) queue.unshift({ pids: teamA, rating: arenaMod.arenaTeamRating(ctx, teamA, '2v2') });
     return;
@@ -188,10 +217,16 @@ export function startYumiMatch(
   ctx.yumiBusySlots.add(slot);
   const returns = new Map<number, { x: number; z: number; facing: number }>();
   const preMatchPools = new Map<number, ArenaReturnPools>();
+  // The maze runs the shared arena return path, so it snapshots the fighter's
+  // living pet the same way: a familiar hunt must not cost a hunter their beast.
+  const preMatchPets = new Map<number, MatchPetSnapshot>();
   for (let i = 0; i < allPids.length; i++) {
-    const e = entities[i]!;
+    const e = entities[i];
+    if (!e) throw new Error(`Yumi participant ${allPids[i]} is missing`);
     returns.set(allPids[i], { x: e.pos.x, z: e.pos.z, facing: e.facing });
     preMatchPools.set(allPids[i], arenaMod.snapshotArenaReturnPools(e));
+    const pet = snapshotMatchPet(ctx, allPids[i]);
+    if (pet) preMatchPets.set(allPids[i], pet);
   }
   const matchId = ctx.nextArenaMatchId++;
   const layout = yumiMazeLayout();
@@ -232,6 +267,7 @@ export function startYumiMatch(
     timer: YUMI_COUNTDOWN,
     returns,
     preMatchPools,
+    preMatchPets,
     ratingA: arenaMod.arenaTeamRating(ctx, teamA, '2v2'),
     ratingB: arenaMod.arenaTeamRating(ctx, teamB, '2v2'),
     defeated: new Set(),
@@ -258,7 +294,10 @@ export function startYumiMatch(
   ctx.yumiCatMatches.set(catB.id, match);
   arenaMod.placeTeamInArena(ctx, teamA, origin, layout.spawnA);
   arenaMod.placeTeamInArena(ctx, teamB, origin, layout.spawnB);
-  for (const e of entities) ctx.resetForArena(e!);
+  for (const e of entities) {
+    if (!e) throw new Error('Yumi participant entity is missing before arena reset');
+    ctx.resetForArena(e);
+  }
   arenaMod.emitArenaFound(ctx, match);
   for (const mPid of allPids) {
     ctx.emit({ type: 'arenaCountdown', seconds: YUMI_COUNTDOWN, pid: mPid });
@@ -311,7 +350,7 @@ export function pickYumiCells(
 }
 
 function teleportYumis(ctx: SimContext, match: ArenaMatch): void {
-  const y = match.yumi!;
+  const y = yumiState(match);
   const pts = teleportPoints(yumiMazeLayout());
   const origin = yumiMazeOrigin(match.slot);
   const picked = pickYumiCells(y.rng, pts, YUMI_TELEPORT_MIN_SEP);
@@ -345,7 +384,7 @@ function teleportYumis(ctx: SimContext, match: ArenaMatch): void {
 }
 
 export function updateYumiActive(ctx: SimContext, match: ArenaMatch): void {
-  const y = match.yumi!;
+  const y = yumiState(match);
   // A member whose entity vanished (disconnect) benches indefinitely; the
   // whole-team-missing forfeit stays in updateArena.
   for (const pid of ctx.arenaAllPids(match)) {
@@ -391,7 +430,7 @@ function killYumiCat(ctx: SimContext, match: ArenaMatch, cat: Entity, killer: En
   cat.hp = 0;
   cat.dead = true;
   ctx.emit({ type: 'death', entityId: cat.id, killerId: killer?.id ?? -1 });
-  const catTeam = match.yumi!.yumiA === cat.id ? 'A' : 'B';
+  const catTeam = yumiState(match).yumiA === cat.id ? 'A' : 'B';
   ctx.endArenaMatch(match, catTeam === 'A' ? 'B' : 'A', 'defeat');
 }
 
@@ -412,7 +451,7 @@ function bleedCat(ctx: SimContext, match: ArenaMatch, cat: Entity, dmg: number):
 }
 
 function pulseSuddenDeathBleed(ctx: SimContext, match: ArenaMatch): void {
-  const y = match.yumi!;
+  const y = yumiState(match);
   const dmg = Math.ceil(YUMI_HP * YUMI_SUDDEN_BLEED_PCT * suddenStep(match.timer));
   const catA = ctx.entities.get(y.yumiA);
   const catB = ctx.entities.get(y.yumiB);
@@ -459,11 +498,11 @@ export function yumiCatDamaged(
   crit: boolean,
   school: string,
   ability: string | null,
-  kind: 'hit' | 'miss' | 'dodge',
+  kind: DamageEventKind,
   attackAnimationStarted = false,
 ): void {
   if (match.state !== 'active' || cat.dead) return;
-  const y = match.yumi!;
+  const y = yumiState(match);
   let dmg = Math.round(amount * yumiTakenMult(match.timer));
   dmg = Math.min(dmg, cat.hp);
   const catTeam = y.yumiA === cat.id ? 'A' : 'B';
@@ -493,7 +532,7 @@ export function yumiPlayerDown(
   victim: Entity,
   killerPid: number | null,
 ): void {
-  const y = match.yumi!;
+  const y = yumiState(match);
   if (y.respawn.has(victim.id)) return;
   const killer = killerPid !== null ? (ctx.entities.get(killerPid) ?? null) : null;
   fiestaDownEntity(ctx, victim, killer);
@@ -508,7 +547,7 @@ export function yumiPlayerDown(
 }
 
 export function yumiRevive(ctx: SimContext, match: ArenaMatch, e: Entity): void {
-  const y = match.yumi!;
+  const y = yumiState(match);
   y.respawn.delete(e.id);
   const team = ctx.arenaTeamOf(match, e.id);
   if (!team) return;
@@ -532,7 +571,7 @@ export function yumiRevive(ctx: SimContext, match: ArenaMatch, e: Entity): void 
 }
 
 function emitYumiStatus(ctx: SimContext, match: ArenaMatch): void {
-  const y = match.yumi!;
+  const y = yumiState(match);
   const catA = ctx.entities.get(y.yumiA);
   const catB = ctx.entities.get(y.yumiB);
   const hpA = catA && !catA.dead ? catA.hp : 0;
@@ -566,7 +605,7 @@ function emitYumiStatus(ctx: SimContext, match: ArenaMatch): void {
 // arena wire for STRUCTURE while the live per-second numbers ride the
 // yumiStatus/yumiDown/yumiTeleport events.
 export function yumiMatchInfo(ctx: SimContext, match: ArenaMatch, pid: number, myTeam: 'A' | 'B') {
-  const y = match.yumi!;
+  const y = yumiState(match);
   const catView = (catId: number) => {
     const cat = ctx.entities.get(catId);
     const alive = !!cat && !cat.dead;
@@ -626,7 +665,7 @@ export function yumiMatchInfo(ctx: SimContext, match: ArenaMatch, pid: number, m
 
 // Torn down from returnFromArena: drop both cat entities and clear the index.
 export function cleanupYumiMatch(ctx: SimContext, match: ArenaMatch): void {
-  const y = match.yumi!;
+  const y = yumiState(match);
   ctx.yumiCatMatches.delete(y.yumiA);
   ctx.yumiCatMatches.delete(y.yumiB);
   if (ctx.entities.get(y.yumiA)) ctx.dropEntity(y.yumiA);

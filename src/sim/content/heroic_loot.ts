@@ -17,6 +17,7 @@
 // than a single token piece.
 
 import type { ItemDef, LootEntry } from '../types';
+import { FERAL } from './items';
 
 // Source level the heroic drop table reads as in the item-level index: the
 // dungeons are level-20 content and heroic is the tier above (+5), so the
@@ -47,9 +48,18 @@ const RAID_SECONDARY_RATING = 20; // 20 rating = 2.0%
 
 const HEAVY = ['warrior', 'paladin', 'shaman'] as ItemDef['requiredClass']; // plate/mail
 const HEAL_MAIL = ['paladin', 'shaman'] as ItemDef['requiredClass']; // int/spi mail wearers
+const HEAL_LEATHER = ['druid'] as ItemDef['requiredClass']; // int/spi leather wearers
 const AGILE = ['rogue', 'hunter'] as ItemDef['requiredClass'];
 const AGILE_WILD = ['rogue', 'hunter', 'druid'] as ItemDef['requiredClass'];
 const CASTER = ['mage', 'priest', 'warlock', 'druid'] as ItemDef['requiredClass'];
+const CASTER_WEAPON_CLASSES = [
+  'mage',
+  'priest',
+  'warlock',
+  'shaman',
+  'paladin',
+  'druid',
+] as ItemDef['requiredClass'];
 
 export const HEROIC_ITEMS: Record<string, ItemDef> = {
   // ================= Heroic Hollow Crypt: Morthen =================
@@ -222,7 +232,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     stats: { int: 13, spi: 9 },
     hitRating: FIVE_MAN_WEAPON_RATING,
     sellValue: 15000,
-    requiredClass: CASTER,
+    requiredClass: CASTER_WEAPON_CLASSES,
   },
   tidewoven_trousers: {
     id: 'tidewoven_trousers',
@@ -368,6 +378,156 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     sellValue: 9500,
     requiredClass: HEAL_MAIL,
   },
+  // ================= Heroic leather caster line (druid int/spi) =================
+  lunarward_cinch: {
+    id: 'lunarward_cinch',
+    name: 'Lunarward Cinch',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'waist',
+    quality: 'epic',
+    requiredLevel: 20,
+    // Item level 31 heroic-only drop: waist budget 15.
+    stats: { armor: 100, int: 9, spi: 6 },
+    hasteRating: ARMOR_RATING,
+    sellValue: 9500,
+    requiredClass: HEAL_LEATHER,
+  },
+  dreamroot_boots: {
+    id: 'dreamroot_boots',
+    name: 'Dreamroot Boots',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'feet',
+    quality: 'epic',
+    requiredLevel: 20,
+    // Item level 31 heroic-only drop: feet budget 14.
+    stats: { armor: 96, int: 8, spi: 6 },
+    critRating: ARMOR_RATING,
+    sellValue: 9500,
+    requiredClass: HEAL_LEATHER,
+  },
+  stormbark_mantle: {
+    id: 'stormbark_mantle',
+    name: 'Stormbark Mantle',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'shoulder',
+    quality: 'epic',
+    requiredLevel: 20,
+    // Item level 31 heroic-only drop: shoulder budget 16.
+    stats: { armor: 148, int: 9, spi: 5, sta: 2 },
+    critRating: ARMOR_RATING,
+    sellValue: 11000,
+    requiredClass: HEAL_LEATHER,
+  },
+  wildsoul_maul: {
+    id: 'wildsoul_maul',
+    name: 'Wildsoul Maul',
+    kind: 'weapon',
+    slot: 'mainhand',
+    hand: 'twohand',
+    quality: 'epic',
+    requiredLevel: 20,
+    // Item level 31 heroic-only feral two-hander: 2H dps on the weaponDpsBudget(31)
+    // x TWOHAND_DPS_MULT curve (~18.4 at speed 3.6), stat budget 29.
+    weapon: { min: 55, max: 78, speed: 3.6 },
+    stats: { str: 13, agi: 9, sta: 7 },
+    hitRating: FIVE_MAN_WEAPON_RATING,
+    sellValue: 15000,
+    requiredClass: FERAL,
+  },
+  // ================= Heroic Wildheart Basin: Zulgar =================
+  basin_stalkers_tunic: {
+    id: 'basin_stalkers_tunic',
+    name: "Basin Stalker's Tunic",
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'chest',
+    quality: 'epic',
+    requiredLevel: 20,
+    // Fills the agi-leather chest hole left by the retired scourgehide_carapace,
+    // which was AGILE_WILD: feral druids lost their only ilvl-31 agi-leather
+    // chest in that retirement too, so the replacement keeps their access.
+    stats: { armor: 172, agi: 13, sta: 9 },
+    hitRating: ARMOR_RATING,
+    sellValue: 14000,
+    requiredClass: AGILE_WILD,
+  },
+  verdant_heart_vestment: {
+    id: 'verdant_heart_vestment',
+    name: 'Verdant-Heart Vestment',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'chest',
+    quality: 'epic',
+    requiredLevel: 20,
+    // The first druid int-leather chest anywhere in the game.
+    stats: { armor: 172, int: 13, spi: 9 },
+    hasteRating: ARMOR_RATING,
+    sellValue: 14000,
+    requiredClass: HEAL_LEATHER,
+  },
+  sunbone_ritual_hauberk: {
+    id: 'sunbone_ritual_hauberk',
+    name: 'Sunbone Ritual Hauberk',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'chest',
+    quality: 'epic',
+    requiredLevel: 20,
+    // Fills the int-mail chest hole left by the retired soulforged_warplate.
+    stats: { armor: 335, int: 12, spi: 10 },
+    hasteRating: ARMOR_RATING,
+    sellValue: 14000,
+    requiredClass: HEAL_MAIL,
+  },
+  greatfang_of_the_basin: {
+    id: 'greatfang_of_the_basin',
+    name: 'Greatfang of the Basin',
+    kind: 'weapon',
+    slot: 'mainhand',
+    hand: 'twohand',
+    quality: 'epic',
+    requiredLevel: 20,
+    // The first five-man HEAVY two-hander: 2H dps on the weaponDpsBudget(31) x
+    // TWOHAND_DPS_MULT curve (~18.4 at speed 3.4), stat budget 29.
+    weapon: { min: 50, max: 75, speed: 3.4 },
+    stats: { str: 17, sta: 12 },
+    hitRating: FIVE_MAN_WEAPON_RATING,
+    sellValue: 15000,
+    requiredClass: HEAVY,
+  },
+  // Fills the CASTER helmet hole left by the retired soulrend_diadem (same
+  // armor 76 / budget 18, plus the one rating every live heroic piece carries).
+  sunbone_oracles_crown: {
+    id: 'sunbone_oracles_crown',
+    name: "Sunbone Oracle's Crown",
+    kind: 'armor',
+    armorType: 'cloth',
+    slot: 'helmet',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { armor: 76, int: 11, spi: 7 },
+    critRating: ARMOR_RATING,
+    sellValue: 12000,
+    requiredClass: CASTER,
+  },
+  // Fills the HEAVY legs hole left by the retired deathless_warguard_legmail
+  // (same armor 315 / budget 20, plus the rating).
+  bloodmane_war_legguards: {
+    id: 'bloodmane_war_legguards',
+    name: 'Bloodmane War-Legguards',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'legs',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { armor: 315, str: 11, sta: 9 },
+    hitRating: ARMOR_RATING,
+    sellValue: 12000,
+    requiredClass: HEAVY,
+  },
   // ================= Heroic Nythraxis, Scourge of Thornpeak (raid) =================
   scepter_of_the_deathless_court: {
     id: 'scepter_of_the_deathless_court',
@@ -482,55 +642,86 @@ export const RETIRED_HEROIC_ITEMS: Record<string, ItemDef> = {
 // heroic kill). loot_roll.ts rolls these only for a heroic-claimed instance.
 // Heroic mount drop rates per rarity tier. These are APPENDED after all gear
 // roll-group draws so the gear draw-order stays byte-identical to non-mount runs.
-// Green (common) mounts: 0.5% per heroic clear on their single boss.
+// Green (UNCOMMON) mounts: 0.5% per heroic clear on their single boss. The tier
+// name finally matches the item colour: these used to be quality 'common' (white),
+// which made "green mount" a misnomer for the whole life of the feature.
 const HEROIC_GREEN_MOUNT_CHANCE = 0.005;
 // Blue (rare) mounts: 0.1% per heroic clear everywhere (their paired five-man
 // boss and the Nythraxis heroic raid, which adds both blues so every
-// heroic-raider has a path to each). The generous 0.6% blue roll lives on A/S
-// rift clears only (rift/progression.ts), the maintainer-decided split.
+// heroic-raider has a path to each). A rifts pays the same 0.1%, so a rift is
+// never a cheaper route to a mount than the content it belongs to.
 const HEROIC_BLUE_MOUNT_CHANCE = 0.001;
 const HEROIC_RAID_BLUE_MOUNT_CHANCE = 0.001;
 
 export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
   morthen: [
-    { itemId: 'morthens_cryptforged_hauberk', chance: 0.34, rollGroup: 'morthen_heroic' },
-    { itemId: 'shadowpulse_handwraps', chance: 0.33, rollGroup: 'morthen_heroic' },
-    { itemId: 'bonechill_striders', chance: 0.33, rollGroup: 'morthen_heroic' },
+    { itemId: 'morthens_cryptforged_hauberk', chance: 0.25, rollGroup: 'morthen_heroic' },
+    { itemId: 'shadowpulse_handwraps', chance: 0.25, rollGroup: 'morthen_heroic' },
+    { itemId: 'bonechill_striders', chance: 0.25, rollGroup: 'morthen_heroic' },
+    { itemId: 'lunarward_cinch', chance: 0.25, rollGroup: 'morthen_heroic' },
     { itemId: 'cryptplate_helm', chance: 0.34, rollGroup: 'morthen_heroic2' },
     { itemId: 'shadowpulse_slippers', chance: 0.33, rollGroup: 'morthen_heroic2' },
     { itemId: 'bonechill_cord', chance: 0.33, rollGroup: 'morthen_heroic2' },
-    // Green mount: heroic-gated only; the normal table entry was retired.
-    { itemId: 'reins_grag_bear', chance: HEROIC_GREEN_MOUNT_CHANCE },
+    // Uncommon mount (0.5%): heroic-gated only, never on a normal table.
+    { itemId: 'reins_stormfeather_griffin', chance: HEROIC_GREEN_MOUNT_CHANCE },
   ],
   vael_the_mistcaller: [
     { itemId: 'mistcallers_fang', chance: 0.34, rollGroup: 'vael_heroic' },
     { itemId: 'tidebound_spaulders', chance: 0.33, rollGroup: 'vael_heroic' },
     { itemId: 'sash_of_the_sunken_court', chance: 0.33, rollGroup: 'vael_heroic' },
-    { itemId: 'mistforged_pauldrons', chance: 0.34, rollGroup: 'vael_heroic2' },
-    { itemId: 'tideguard_faceguard', chance: 0.33, rollGroup: 'vael_heroic2' },
-    { itemId: 'sunken_court_mantle', chance: 0.33, rollGroup: 'vael_heroic2' },
-    // Green mount: heroic-gated only; the normal table entry was retired.
-    { itemId: 'reins_stalkglider_snail', chance: HEROIC_GREEN_MOUNT_CHANCE },
+    { itemId: 'mistforged_pauldrons', chance: 0.25, rollGroup: 'vael_heroic2' },
+    { itemId: 'tideguard_faceguard', chance: 0.25, rollGroup: 'vael_heroic2' },
+    { itemId: 'sunken_court_mantle', chance: 0.25, rollGroup: 'vael_heroic2' },
+    { itemId: 'dreamroot_boots', chance: 0.25, rollGroup: 'vael_heroic2' },
+    // Uncommon mount (0.5%): heroic-gated only, never on a normal table.
+    { itemId: 'reins_shadowjump_toad', chance: HEROIC_GREEN_MOUNT_CHANCE },
   ],
   ysolei: [
-    { itemId: 'lunar_tide_greatstaff', chance: 0.34, rollGroup: 'ysolei_heroic' },
-    { itemId: 'tidewoven_trousers', chance: 0.33, rollGroup: 'ysolei_heroic' },
-    { itemId: 'choirmothers_casque', chance: 0.33, rollGroup: 'ysolei_heroic' },
+    { itemId: 'lunar_tide_greatstaff', chance: 0.25, rollGroup: 'ysolei_heroic' },
+    { itemId: 'tidewoven_trousers', chance: 0.25, rollGroup: 'ysolei_heroic' },
+    { itemId: 'choirmothers_casque', chance: 0.25, rollGroup: 'ysolei_heroic' },
+    { itemId: 'stormbark_mantle', chance: 0.25, rollGroup: 'ysolei_heroic' },
     { itemId: 'lunar_choir_leggings', chance: 0.34, rollGroup: 'ysolei_heroic2' },
     { itemId: 'choir_blessed_spaulders', chance: 0.33, rollGroup: 'ysolei_heroic2' },
     { itemId: 'tideworn_warboots', chance: 0.33, rollGroup: 'ysolei_heroic2' },
-    // Blue mount: heroic-gated only; the normal table entry was retired.
-    { itemId: 'reins_aether_hover_cycle', chance: HEROIC_BLUE_MOUNT_CHANCE },
+    // Rare mount (0.1%): heroic-gated only, never on a normal table.
+    { itemId: 'reins_grag_bear', chance: HEROIC_BLUE_MOUNT_CHANCE },
   ],
   korzul_the_gravewyrm: [
     { itemId: 'gravewyrm_cleaver', chance: 0.34, rollGroup: 'korzul_heroic' },
     { itemId: 'shroud_of_the_gravewyrm', chance: 0.33, rollGroup: 'korzul_heroic' },
     { itemId: 'sanctum_prowlers_grips', chance: 0.33, rollGroup: 'korzul_heroic' },
-    { itemId: 'gravewyrm_claws', chance: 0.34, rollGroup: 'korzul_heroic2' },
-    { itemId: 'gravescale_girdle', chance: 0.33, rollGroup: 'korzul_heroic2' },
-    { itemId: 'wyrmchoir_handwraps', chance: 0.33, rollGroup: 'korzul_heroic2' },
-    // Blue mount: heroic-gated only; the normal table entry was retired.
-    { itemId: 'reins_shadowjump_toad', chance: HEROIC_BLUE_MOUNT_CHANCE },
+    { itemId: 'gravewyrm_claws', chance: 0.25, rollGroup: 'korzul_heroic2' },
+    { itemId: 'gravescale_girdle', chance: 0.25, rollGroup: 'korzul_heroic2' },
+    { itemId: 'wyrmchoir_handwraps', chance: 0.25, rollGroup: 'korzul_heroic2' },
+    { itemId: 'wildsoul_maul', chance: 0.25, rollGroup: 'korzul_heroic2' },
+    // Rare mount (0.1%): heroic-gated only, never on a normal table.
+    { itemId: 'reins_stalkglider_snail', chance: HEROIC_BLUE_MOUNT_CHANCE },
+  ],
+  wildheart_high_priest: [
+    // Two groups of three DISTINCT items, the shape every other heroic
+    // five-man uses: per-item rates stay at the house 0.33-0.34 (the earlier
+    // dup-path version pushed the re-listed chests to 0.56-0.66 per kill,
+    // well above any other heroic item in the game).
+    { itemId: 'basin_stalkers_tunic', chance: 0.34, rollGroup: 'wildheart_heroic' },
+    { itemId: 'verdant_heart_vestment', chance: 0.33, rollGroup: 'wildheart_heroic' },
+    { itemId: 'sunbone_ritual_hauberk', chance: 0.33, rollGroup: 'wildheart_heroic' },
+    { itemId: 'greatfang_of_the_basin', chance: 0.34, rollGroup: 'wildheart_heroic2' },
+    { itemId: 'sunbone_oracles_crown', chance: 0.33, rollGroup: 'wildheart_heroic2' },
+    { itemId: 'bloodmane_war_legguards', chance: 0.33, rollGroup: 'wildheart_heroic2' },
+    // Rare mounts (0.1% each). The basin is the FIFTH heroic five-man and the
+    // catalog's two blues are already paired to Ysolei and Korzul, so rather
+    // than a fifth signature mount it carries equal-rate SECONDARY paths to
+    // both, exactly as the Nythraxis heroic raid does for all four five-man
+    // mounts. Per-MOUNT rate parity is the invariant that matters (0.1%
+    // wherever a blue drops), so the basin is never a cheaper route to either
+    // one. It does make the basin the only five-man offering two blues, so its
+    // aggregate blue rate is 0.2% per heroic clear against Ysolei's and
+    // Korzul's 0.1% (owner call, 2026-08-01). Epic mounts stay rift-S
+    // exclusive and never appear here. Appended AFTER the gear roll groups so
+    // the gear draw order stays byte-identical.
+    { itemId: 'reins_grag_bear', chance: HEROIC_BLUE_MOUNT_CHANCE },
+    { itemId: 'reins_stalkglider_snail', chance: HEROIC_BLUE_MOUNT_CHANCE },
   ],
   nythraxis_scourge_of_thornpeak: [
     // The heroic set pieces and legendaries come free from the heroic loot swap:
@@ -551,11 +742,11 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     // Blue mount secondary paths on the heroic raid (0.1% each, equal per-mount
     // to the five-man rate; both blues available so aggregate ~0.2%); the primary
     // path for each is its five-man heroic boss. Epic mounts are rift S-only.
-    { itemId: 'reins_aether_hover_cycle', chance: HEROIC_RAID_BLUE_MOUNT_CHANCE },
-    { itemId: 'reins_shadowjump_toad', chance: HEROIC_RAID_BLUE_MOUNT_CHANCE },
-    // Green mount secondary paths on the heroic raid (0.5% each), mirroring the
-    // five-man green paths (morthen + vael); every heroic raider has a path to each.
-    { itemId: 'reins_grag_bear', chance: HEROIC_GREEN_MOUNT_CHANCE },
-    { itemId: 'reins_stalkglider_snail', chance: HEROIC_GREEN_MOUNT_CHANCE },
+    { itemId: 'reins_grag_bear', chance: HEROIC_RAID_BLUE_MOUNT_CHANCE },
+    { itemId: 'reins_stalkglider_snail', chance: HEROIC_RAID_BLUE_MOUNT_CHANCE },
+    // Uncommon mount secondary paths on the heroic raid (0.5% each), mirroring the
+    // five-man uncommon paths; every heroic raider has a path to each.
+    { itemId: 'reins_stormfeather_griffin', chance: HEROIC_GREEN_MOUNT_CHANCE },
+    { itemId: 'reins_shadowjump_toad', chance: HEROIC_GREEN_MOUNT_CHANCE },
   ],
 };

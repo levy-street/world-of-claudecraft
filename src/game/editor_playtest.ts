@@ -10,6 +10,7 @@
 // malformed blob yields null and the normal start screen runs instead.
 
 import type { PlayerClass, WorldContent } from '../sim/types';
+import { WORLD_SEED } from '../sim/world_seed';
 
 export const EDITOR_PLAYTEST_KEY = 'woc_editor_playtest';
 
@@ -70,7 +71,7 @@ export function takeEditorPlaytestRequest(): EditorPlaytestRequest | null {
     const obj = JSON.parse(raw) as Record<string, unknown>;
     if (!obj || typeof obj !== 'object') return null;
     if (!looksLikeWorldContent(obj.content)) return null;
-    const seed = typeof obj.seed === 'number' && Number.isFinite(obj.seed) ? obj.seed : 20061;
+    const seed = typeof obj.seed === 'number' && Number.isFinite(obj.seed) ? obj.seed : WORLD_SEED;
     const pc =
       typeof obj.playerClass === 'string' && VALID_CLASSES.has(obj.playerClass)
         ? (obj.playerClass as PlayerClass)

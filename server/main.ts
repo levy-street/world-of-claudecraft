@@ -6,6 +6,7 @@ import * as http from 'node:http';
 import * as path from 'node:path';
 import { WebSocketServer } from 'ws';
 import { DEEDS } from '../src/sim/content/deeds';
+import { resolveActiveWeaponSkin } from '../src/sim/content/weapon_skin_rules';
 import {
   LEADERBOARD_MAX,
   LEADERBOARD_PAGE_SIZE,
@@ -16,11 +17,13 @@ import {
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import { virtualLevel } from '../src/sim/types';
-import type {
-  DeedsLeaderboardEntry,
-  DeedsLeaderboardSelf,
-  GuildLeaderboardEntry,
-  LeaderboardEntry,
+import { WORLD_SEED } from '../src/sim/world_seed';
+import {
+  type DeedsLeaderboardEntry,
+  type DeedsLeaderboardSelf,
+  type GuildLeaderboardEntry,
+  type LeaderboardEntry,
+  ONLINE_WORLD_AUTH_TYPE,
 } from '../src/world_api';
 import {
   configureAccountRuntime,
@@ -42,7 +45,12 @@ import {
   handleEmailUnsubscribe,
   verifyLoginTwoFactor,
 } from './account';
-import { configureAdminPlayersCap, configureAdminRuntime, handleAdminApi } from './admin';
+import {
+  configureAdminGuildBoardCacheBust,
+  configureAdminPlayersCap,
+  configureAdminRuntime,
+  handleAdminApi,
+} from './admin';
 import {
   currentSitePresenceUsers,
   distinctOnlineSampleRealms,
@@ -63,21 +71,28 @@ import {
 import { pruneApplePendingLogins } from './apple_auth_db';
 import {
   hashPassword,
+  MAX_PASSWORD_LENGTH,
+  MIN_PASSWORD_LENGTH,
   newToken,
   normalizeCharName,
   normalizeEmail,
   offensiveName,
-  validPassword,
   validUsernameShape,
   verifyPassword,
 } from './auth';
 import { configureAuthRuntime } from './auth_routes';
 import { computeBankBonus } from './bank_entitlements';
 import { bankLedgerIdle } from './bank_ledger';
+import { configureBattlegroundRuntime, readBgLeaderboard } from './battleground';
 import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from './bug_report_db';
 import { createCachedRead } from './cached_read';
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
-import { configureCharactersRuntime } from './characters';
+import {
+  buildCharacterList,
+  configureCharactersRuntime,
+  purgeDeletedCharacterWorldState,
+  rekeyReclaimedCharacterWorldState,
+} from './characters';
 import {
   claudiumPreAuthMutationRateLimited,
   configureClaudiumRuntime,
@@ -87,6 +102,7 @@ import {
 import { configureCommunityTestAccounts } from './community_test_accounts';
 import {
   bustDailyRewardBoardCache,
+  bustDailyRewardWinnersCache,
   dailyRewardEventsCutoffDay,
   handleDailyRewardApi,
   handleDailyRewardInternalApi,
@@ -96,8 +112,8 @@ import {
   type ArenaLeaderRow,
   accountAndScopeForToken,
   accountById,
-  accountForToken,
   acquireCharacterLease,
+  type BgLeaderRow,
   bankBonusFactsForAccount,
   type CharacterRow,
   characterCountsByRealm,
@@ -115,6 +131,7 @@ import {
   getAccountsCount,
   getCharacter,
   getCharacterById,
+  getCharactersCount,
   guildNameForCharacter,
   isAdminAccount,
   lifetimeXpRankForCharacter,
@@ -128,12 +145,16 @@ import {
   primarySlugForAccount,
   pruneChatLogsBatch,
   pruneClientPerfReportsBatch,
+  pruneEmailChangeRequestsBatch,
+  pruneEmailLogBatch,
+  prunePasswordResetRequestsBatch,
   reclaimDeactivatedName,
   referralCountForAccount,
   releaseAllCharacterLeases,
   releaseCharacterLease,
   renameCharacter,
   revokeCompanionToken,
+  runConcurrentIndexMigrations,
   saveToken,
   saveWorldState,
   scopeAllowsMutation,
@@ -141,6 +162,7 @@ import {
   setAccountEmail,
   type TokenScope,
   topArenaRatings,
+  topBgRatings,
   topGuilds,
   topLifetimeXp,
   touchLogin,
@@ -176,6 +198,7 @@ import {
 } from './discord';
 import { pruneDiscordOAuthStates, pruneDiscordPendingLogins } from './discord_db';
 import { emailAccountCreated } from './email';
+import { stopEpicMirror } from './epic/mirror';
 import { GameServer } from './game';
 import {
   handleGitHubCallback,
@@ -185,11 +208,13 @@ import {
 } from './github';
 import { configureGithubContributorsRuntime, topContributors } from './github_contributors';
 import { pruneGitHubOAuthStates } from './github_db';
+import { guildBankLogCacheStats } from './guild_bank_log';
 import { createAccessLogSink } from './http/access_log';
 import { setAttackSignalSink } from './http/attack_signals';
 import { registerBusinessMetrics } from './http/business_metrics';
 import { handleClientError } from './http/client_error';
 import { type Config, DEFAULT_DISPATCH, type DispatchMode, loadConfig } from './http/config';
+import { registerDiscordBotMetrics } from './http/discord_bot_metrics';
 import {
   type ApiDelegate,
   type ApiDispatcher,
@@ -249,6 +274,7 @@ import {
 import { createNativeAttestationChallenge } from './native_attestation';
 import { handleOAuth, seedOAuthClients } from './oauth';
 import { pruneExpiredOAuthGrants } from './oauth_db';
+import { registerParseMetrics } from './parse';
 import { handlePerfReport } from './perf_report';
 import {
   pruneAccountIpAssociationsBatch,
@@ -299,7 +325,7 @@ import {
 import { readStaticSfxSnapshot, type StaticSfxSnapshot } from './static_sfx';
 import { stopSteamMirror } from './steam/mirror';
 import { passesTurnstile } from './turnstile';
-import { pruneUnstuckReports, UNSTUCK_REPORT_RETENTION_DAYS } from './unstuck_db';
+import { pruneUnstuckReportsBatch } from './unstuck_db';
 import { stopUnstuckRecords, UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS } from './unstuck_records';
 import { MAX_ASSET_BYTES } from './user_assets';
 import {
@@ -422,9 +448,7 @@ const DAILY_PRUNE_INTERVAL_MS = 24 * 3600 * 1000;
 // lazily instead of at module load.
 let gameInstance: GameServer | null = null;
 function liveGame(): GameServer {
-  gameInstance ??= new GameServer({
-    communityTestRifts: activeConfig().communityTestRifts,
-  });
+  gameInstance ??= new GameServer();
   return gameInstance;
 }
 
@@ -433,7 +457,7 @@ function initialCharacterState(
   name: string,
   skin: number,
 ): import('../src/sim/sim').CharacterState {
-  const sim = new Sim({ seed: 20061, playerClass: cls, playerName: name });
+  const sim = new Sim({ seed: WORLD_SEED, playerClass: cls, playerName: name });
   sim.setPlayerSkin(sim.playerId, skin);
   const character = sim.serializeCharacter(sim.playerId);
   if (!character) throw new Error('failed to serialize initial character');
@@ -482,6 +506,10 @@ async function refreshLeaderboard(scope: 'realm' | 'global'): Promise<Leaderboar
     prestigeRank: r.prestigeRank,
     // a deed id (never display text); the client localizes via deed_i18n
     title: r.activeTitle,
+    // The guild tag shown beside the name. Omitted (not null) for an unguilded
+    // character, the `realm` treatment below, so an unguilded row is byte-unchanged
+    // on the wire.
+    ...(r.guild ? { guild: r.guild } : {}),
     ...(scope === 'global' ? { realm: r.realm } : {}),
   }));
   // Skip the install if a moderation bust landed mid-refresh (see boardEpoch).
@@ -620,6 +648,39 @@ async function getArenaLeaderboard(format: '1v1' | '2v2'): Promise<ArenaLeaderRo
   }
 }
 
+// Thornhollow Fields ladder cache. ONE entry (the battleground has a single format),
+// same compute-once / serve-from-memory shape as the arena ladder above. Wired
+// into bustBoardCaches below because the ladder is character-faced and
+// moderation-visible: a ban delists immediately in-process while cross-process
+// peers converge within one TTL, the same tradeoff the other boards make.
+// readBgLeaderboard (server/battleground.ts) is the INNER read, so
+// BG_LEADERBOARD_LIMIT stays the one place the ladder depth is set.
+let bgLeaderboardCache: { at: number; leaders: BgLeaderRow[] } | null = null;
+
+async function refreshBg(): Promise<BgLeaderRow[]> {
+  const epoch = boardEpoch;
+  const { leaders } = await readBgLeaderboard({ topBgRatings });
+  // Skip the install if a moderation bust landed mid-refresh (see boardEpoch).
+  if (boardEpoch === epoch) bgLeaderboardCache = { at: Date.now(), leaders };
+  return leaders;
+}
+
+// Single-flight keyed on boardEpoch exactly like the player/guild/arena
+// refreshes, so a moderation bust (which bumps boardEpoch) drops any in-flight
+// pre-ban refresh instead of handing a post-bust reader its pre-ban snapshot.
+const refreshBgShared = singleFlight(refreshBg, () => boardEpoch);
+
+async function getBgLeaderboard(): Promise<BgLeaderRow[]> {
+  const cached = bgLeaderboardCache;
+  if (cached && Date.now() - cached.at < LEADERBOARD_TTL_MS) return cached.leaders;
+  try {
+    return await refreshBgShared();
+  } catch (err) {
+    console.error('battleground leaderboard refresh failed:', err);
+    return cached?.leaders ?? [];
+  }
+}
+
 // Renown (deeds) board cache. Same compute-once/serve-from-memory shape as
 // the boards above, but ONE entry, not one per scope: the board is
 // account-level and accounts span realms, so it is GLOBAL-ONLY by design.
@@ -742,8 +803,21 @@ function bustBoardCaches(): void {
   guildLeaderboardCache.global = null;
   arenaLeaderboardCache['1v1'] = null;
   arenaLeaderboardCache['2v2'] = null;
+  bgLeaderboardCache = null;
   deedsBoardCache = null;
   bustDailyRewardBoardCache();
+  // Not a board: the Discord winner-announcement snapshot. The daily-reward ban
+  // and IP-ban writes fire this same hook, and they feed the
+  // daily_reward_excluded_accounts view that unannouncedWinnerDays filters its
+  // payouts through, so an exclusion is a content change a warm snapshot would
+  // hide. Without this a just-banned winner's username could still be announced
+  // publicly for up to the winners TTL (wallet pubkeys left the winner rows
+  // with the #2791 narrowing). Scope, honestly: the
+  // bust is per process (the snapshot lives on this process's service singleton),
+  // so it is immediate on the process that served the moderation write; a peer
+  // realm process's warm snapshot converges within one TTL, the same fleet story
+  // every board cache above already has.
+  bustDailyRewardWinnersCache();
 }
 setOnAccountModerated(bustBoardCaches);
 
@@ -787,33 +861,43 @@ async function getDeedsRarity(): Promise<import('../src/world_api').DeedsRarity>
   }
 }
 
-// Project-stats accounts-created counter cache. Unlike the player/guild/arena
-// boards, a COUNT(*) over accounts is moderation-INVARIANT (a ban or unban never
-// changes the row count, only eligibility), so it needs NO bust or epoch wiring,
-// the same call getDeedsRarity's cache makes above. It is a single-key read, so it
-// rides createCachedRead (server/cached_read.ts) directly rather than the per-scope
-// singleFlight the boards use. 60s TTL (the D11 exception): accounts-created is a
-// slow-moving marketing counter, not a moderation-sensitive ranked list, so a
-// minute of staleness is fine. Named to avoid colliding with db.ts's imported
-// getAccountsCount (mirrors getLeaderboard wrapping topLifetimeXp under a domain
-// name). readProjectStats (server/leaderboard.ts) is the INNER read; players_online
-// is a live per-request value the handler re-attaches, so the cache holds only the
-// count and the inner read gets a throwaway 0 for players_online that it discards.
+// Project-stats counters cache. Unlike the player/guild/arena boards, the
+// COUNT(*) reads over accounts and characters are moderation-INVARIANT (a ban or
+// unban never changes a row count, only eligibility), so they need NO bust or
+// epoch wiring, the same call getDeedsRarity's cache makes above. They are a
+// single-key read, so they ride createCachedRead (server/cached_read.ts) directly
+// rather than the per-scope singleFlight the boards use. 60s TTL (the D11
+// exception): both are slow-moving marketing counters, not moderation-sensitive
+// ranked lists, so a minute of staleness is fine. ONE cache holds the whole
+// readProjectStats body (server/leaderboard.ts, the INNER read), so a cold burst
+// costs one shared flight with exactly one getAccountsCount and one
+// getCharactersCount read between both getters; players_online is a live
+// per-request value the handler re-attaches, so the inner read gets a throwaway 0
+// for players_online that the getters discard.
 const PROJECT_STATS_TTL_MS = 60_000;
-const accountsCreatedCache = createCachedRead(
-  async () => (await readProjectStats({ getAccountsCount }, 0, REALM)).accounts_created,
+const projectStatsCache = createCachedRead(
+  () => readProjectStats({ getAccountsCount, getCharactersCount }, 0, REALM),
   { ttlMs: PROJECT_STATS_TTL_MS },
 );
 
 async function getAccountsCreatedCount(): Promise<number> {
   try {
-    return await accountsCreatedCache.read();
+    return (await projectStatsCache.read()).accounts_created;
   } catch (err) {
     // Only a never-warmed cache reaches here (createCachedRead stale-serves the
-    // last count on a later failure). Serve 0 rather than 500, the same
+    // last counts on a later failure). Serve 0 rather than 500, the same
     // degrade-not-throw contract getLeaderboard / getDeedsRarity already ship, so
     // /api/project-stats stays 200 when the db is unreachable.
     console.error('accounts-created count refresh failed:', err);
+    return 0;
+  }
+}
+
+async function getCharactersCreatedCount(): Promise<number> {
+  try {
+    return (await projectStatsCache.read()).characters_created;
+  } catch (err) {
+    console.error('characters-created count refresh failed:', err);
     return 0;
   }
 }
@@ -830,11 +914,14 @@ export const boardReadTestSeam = {
   getLeaderboard,
   getGuildLeaderboard,
   getArenaLeaderboard,
+  getBgLeaderboard,
   getAccountsCreatedCount,
+  getCharactersCreatedCount,
   refreshDeedsRarityShared,
   refreshLeaderboardShared,
   refreshGuildLeaderboardShared,
   refreshArenaShared,
+  refreshBgShared,
   bustBoardCaches,
   reset(): void {
     leaderboardCache.realm = null;
@@ -843,9 +930,10 @@ export const boardReadTestSeam = {
     guildLeaderboardCache.global = null;
     arenaLeaderboardCache['1v1'] = null;
     arenaLeaderboardCache['2v2'] = null;
+    bgLeaderboardCache = null;
     deedsBoardCache = null;
     deedsRarityCache = null;
-    accountsCreatedCache.bust();
+    projectStatsCache.bust();
   },
 };
 
@@ -936,49 +1024,29 @@ function toSheetRank(rank: { rank: number; total: number } | null): SheetRank | 
 
 // The character-list response shared by the full-session GET /api/characters and
 // the read-scoped GET /api/me/characters, so both stay byte-identical.
-function characterListPayload(chars: CharacterRow[]): {
-  realm: string;
-  characters: {
-    id: number;
-    name: string;
-    class: PlayerClass;
-    level: number;
-    skin: number;
-    online: boolean;
-    forceRename: boolean;
-    lastPlayed: string | null;
-    playtimeSeconds: number;
-    skinCatalog: 'class' | 'mech';
-    mainhandItemId: string | null;
-    offhandItemId: string | null;
-  }[];
-} {
-  return {
-    realm: REALM,
-    characters: chars.map((c) => ({
-      id: c.id,
-      name: c.name,
-      class: c.class,
-      level: c.level,
-      skin: c.state?.skin ?? 0,
-      online: [...liveGame().clients.values()].some((s) => s.characterId === c.id),
-      forceRename: c.force_rename,
-      lastPlayed: c.last_played ? new Date(c.last_played).toISOString() : null,
-      playtimeSeconds: Number(c.playtime_seconds ?? 0),
-      // Real appearance for the char-select 3D preview (the client renders the
-      // Combat Mech cosmetic body and both equipped hands, matching the world).
-      skinCatalog: c.state?.skinCatalog === 'mech' ? 'mech' : 'class',
-      mainhandItemId: c.state?.equipment?.mainhand ?? null,
-      offhandItemId: c.state?.equipment?.offhand ?? null,
-    })),
-  };
+function characterListPayload(
+  chars: CharacterRow[],
+  weaponSkinLoadout: Record<string, string>,
+): unknown {
+  // Delegates to the RouteDef arm's shared builder (review follow-up on the
+  // weaponSkinId addition): one implementation means the retained legacy arm
+  // and the new pipeline CANNOT diverge in payload shape, and the behavioral
+  // route tests in tests/server/characters.test.ts cover both by construction.
+  // Only the online scan stays legacy-owned (the same live-session scan main
+  // injects into the RouteDef runtime as isCharacterOnline).
+  return buildCharacterList(
+    chars,
+    (characterId) => [...liveGame().clients.values()].some((s) => s.characterId === characterId),
+    weaponSkinLoadout,
+  );
 }
 
 async function bearerAccount(req: http.IncomingMessage): Promise<number | null> {
   const auth = req.headers.authorization ?? '';
   const m = /^Bearer ([a-f0-9]{64})$/.exec(auth);
   if (!m) return null;
-  return accountForToken(m[1]);
+  const info = await accountAndScopeForToken(m[1]);
+  return info?.accountId ?? null;
 }
 
 // Account + token scope for the bearer (or null when unauthenticated). The scope
@@ -1308,10 +1376,15 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           error: 'username is not allowed',
           code: 'account.username_not_allowed',
         });
-      if (!validPassword(body.password))
+      if (typeof body.password !== 'string' || body.password.length < MIN_PASSWORD_LENGTH)
         return json(res, 400, {
-          error: 'password must be at least 6 chars',
+          error: `password must be at least ${MIN_PASSWORD_LENGTH} chars`,
           code: 'account.password_too_short',
+        });
+      if (body.password.length > MAX_PASSWORD_LENGTH)
+        return json(res, 400, {
+          error: `password must be at most ${MAX_PASSWORD_LENGTH} chars`,
+          code: 'account.password_too_long',
         });
       // Email is mandatory at signup: it is the recovery address that later proves
       // account ownership on a password reset, so we capture it up front.
@@ -1445,7 +1518,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       // via exchange, so create requires a full active session too
       // (bearerActiveAccount: read and companion tokens answer 403 'this token
       // is read-only'), where the pre-fix handler resolved the scope-blind
-      // accountForToken. Mirrored on
+      // identity-only token resolver. Mirrored on
       // the RouteDef twin (server/desktop_login_routes.ts); the
       // desktopLoginCreateFullScope known deviation records the change.
       const accountId = await bearerActiveAccount(req, res);
@@ -1464,13 +1537,27 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     if (req.method === 'GET' && url === '/api/me/characters') {
       const accountId = await bearerReadAccount(req, res);
       if (accountId === null) return;
-      return json(res, 200, characterListPayload(await listCharacters(accountId)));
+      return json(
+        res,
+        200,
+        characterListPayload(
+          await listCharacters(accountId),
+          (await loadAccountCosmetics(accountId)).weaponSkinLoadout,
+        ),
+      );
     }
     if (url === '/api/characters') {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
       if (req.method === 'GET') {
-        return json(res, 200, characterListPayload(await listCharacters(accountId)));
+        return json(
+          res,
+          200,
+          characterListPayload(
+            await listCharacters(accountId),
+            (await loadAccountCosmetics(accountId)).weaponSkinLoadout,
+          ),
+        );
       }
       if (req.method === 'POST') {
         const body = await readBody(req);
@@ -1533,8 +1620,22 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           // account, free it (the orphaned character is archived) and retry once;
           // otherwise it is genuinely taken. This is the self-service path that
           // replaces the hidden admin-only reactivate/force-rename recovery.
-          if (!(await reclaimDeactivatedName(name)))
+          const reclaimed = await reclaimDeactivatedName(name);
+          if (!reclaimed)
             return json(res, 409, { error: 'that name is taken', code: 'character.name_taken' });
+          // The SAME post-reclaim world-state rekey the migrated create arm
+          // runs, through the shared helper, so a legacy rollback keeps it.
+          await rekeyReclaimedCharacterWorldState(
+            {
+              rekeyMarketSeller: (id, oldName, newName) =>
+                liveGame().rekeyMarketSeller(id, oldName, newName),
+              saveMarket: () => liveGame().saveMarket(),
+              rekeyMailOwner: (id, oldName, newName) =>
+                liveGame().rekeyMailOwner(id, oldName, newName),
+              saveMail: () => liveGame().saveMail(),
+            },
+            reclaimed,
+          );
           try {
             const c = await create();
             if (!c)
@@ -1725,6 +1826,20 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         });
       }
       const ok = await deleteCharacter(accountId, characterId);
+      if (ok) {
+        // The SAME world-state purge the migrated deleteHandler runs (R43), through
+        // the one shared helper, so an API_DISPATCH=legacy rollback keeps it.
+        await purgeDeletedCharacterWorldState(
+          {
+            purgeMarketSeller: (id, name) => liveGame().purgeMarketSeller(id, name),
+            saveMarket: () => liveGame().saveMarket(),
+            purgeMailOwner: (id, name) => liveGame().purgeMailOwner(id, name),
+            saveMail: () => liveGame().saveMail(),
+          },
+          characterId,
+          character.name,
+        );
+      }
       return json(
         res,
         ok ? 200 : 404,
@@ -1842,22 +1957,28 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       // per-request read, so it is re-attached here rather than cached. Rate-limited
       // per IP like its migrated twin (same public-read budget, same 429 body).
       if (!publicReadRateLimited(req).allowed) return json(res, 429, { error: 'rate limited' });
+      const [accountsCreated, charactersCreated] = await Promise.all([
+        getAccountsCreatedCount(),
+        getCharactersCreatedCount(),
+      ]);
       return json(res, 200, {
-        accounts_created: await getAccountsCreatedCount(),
+        accounts_created: accountsCreated,
+        characters_created: charactersCreated,
         players_online: liveGame().clients.size,
         realm: REALM,
       });
     }
     if (req.method === 'GET' && url === '/api/status') {
       // steam.enabled is the capability advert clients read before rendering any
-      // Steam link UI. HARDCODED false on the legacy ladder: the Steam surface
-      // exists only as RouteDefs (server/steam/routes.ts), which the legacy arm
-      // never serves, so every /api/steam/* 404s here. Advertising the capability
-      // on an arm that then 404s it would strand a client into a dead link flow.
-      // Under the default 'new' dispatch the migrated statusHandler
-      // (server/leaderboard.ts) reads the real steamEnabled(), where the routes
-      // are live. This is a deliberate divergence from the new arm under
-      // STEAM_ENABLED=1 (pinned in tests/server/http/parity.test.ts).
+      // Steam / Epic link UI. HARDCODED false on the legacy ladder: those surfaces
+      // exist only as RouteDefs (server/steam/routes.ts, server/epic/routes.ts),
+      // which the legacy arm never serves, so every /api/steam/* and /api/epic/*
+      // 404s here. Advertising the capability on an arm that then 404s it would
+      // strand a client into a dead link flow. Under the default 'new' dispatch
+      // the migrated statusHandler (server/leaderboard.ts) reads the real
+      // steamEnabled() / epicEnabled(), where the routes are live. This is a
+      // deliberate divergence from the new arm under STEAM_ENABLED=1 or
+      // EPIC_ENABLED=1 (pinned in tests/server/http/parity.test.ts).
       return json(res, 200, {
         ok: true,
         realm: REALM,
@@ -1868,6 +1989,19 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         players_cap: canonicalPlayersCap(),
         names: [...liveGame().clients.values()].map((s) => s.name),
         steam: { enabled: false },
+        epic: { enabled: false },
+        // The /dev GUI capability advert. NOT hardcoded like steam.enabled above:
+        // the dev_* cheats ride the websocket dispatcher, which this arm serves
+        // exactly as the migrated one does, so advertising the real env here
+        // strands nobody. Dual-arm edit: the migrated statusHandler
+        // (server/leaderboard.ts) carries the same dev_commands field. Read live
+        // per request, mirroring the /api/perf gate just below.
+        dev_commands: process.env.ALLOW_DEV_COMMANDS === '1',
+        // Online-profiler capability handshake. Presence proves this server
+        // supports the idempotent invulnerability command; false tells the
+        // harness to stop before entry because the dev gate is off. Dual-arm
+        // edit: the migrated statusHandler carries the identical field.
+        profiler_invulnerability: process.env.ALLOW_DEV_COMMANDS === '1',
       });
     }
     // Dev-only world-loop perf profile (per-phase tick p95/max), for the load
@@ -2000,7 +2134,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const callerToken = bearerToken(req);
       if (!callerToken)
         return json(res, 401, { error: 'not authenticated', code: 'auth.required' });
-      return handleAccountChangePassword(req, res, accountId, callerToken);
+      return handleAccountChangePassword(req, res, accountId, callerToken, {
+        disconnectAccount: (id, reason) => liveGame().disconnectAccount(id, reason),
+      });
     }
     // Password reset is for users who are locked out, so both routes are
     // unauthenticated (rate-limited + web-login guarded above, and each handler is
@@ -2009,11 +2145,13 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       return handleAccountPasswordForgot(req, res);
     }
     if (req.method === 'POST' && url === '/api/account/password/reset') {
-      return handleAccountPasswordReset(req, res);
+      return handleAccountPasswordReset(req, res, {
+        disconnectAccount: (id, reason) => liveGame().disconnectAccount(id, reason),
+      });
     }
     if (req.method === 'POST' && url === '/api/account/logout') {
       const callerToken = bearerToken(req);
-      if (!callerToken || (await accountForToken(callerToken)) === null)
+      if (!callerToken || (await accountAndScopeForToken(callerToken)) === null)
         return json(res, 401, { error: 'not authenticated', code: 'auth.required' });
       return handleAccountLogout(res, callerToken);
     }
@@ -2170,6 +2308,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const mode = discordStartUrl.searchParams.get('mode') === 'link' ? 'link' : 'login';
       const native = discordStartUrl.searchParams.get('native') === '1';
       const nativeChallenge = discordStartUrl.searchParams.get('challenge') ?? undefined;
+      const desktop = mode === 'login' && discordStartUrl.searchParams.get('desktop') === '1';
       let accountId: number | null = null;
       if (mode === 'link') {
         accountId = await bearerActiveAccount(req, res);
@@ -2184,6 +2323,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         native,
         nativeChallenge,
         nativeAttestation: body.nativeAttestation,
+        desktop,
       });
     }
     if (req.method === 'GET' && url === '/api/auth/discord/callback') {
@@ -2410,6 +2550,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     if (req.method === 'DELETE' && assetIdMatch) {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
+      if (!assetUploadRateLimited(req, accountId).allowed) {
+        return json(res, 429, { error: 'rate_limited' });
+      }
       return assetDeleteCore(res, accountId, Number(assetIdMatch[1]));
     }
     json(res, 404, { error: 'unknown endpoint' });
@@ -2445,6 +2588,7 @@ configureLeaderboardRuntime({
   deedsSelfRank,
   getArenaLeaderboard,
   getAccountsCreatedCount,
+  getCharactersCreatedCount,
   getReleases,
   // A getter, not a value: configureLeaderboardRuntime runs at module load (before
   // startServer primes the config), but leaderboard.ts reads rt.githubRepo only at
@@ -2456,6 +2600,14 @@ configureLeaderboardRuntime({
   releasesMaxLimit: RELEASES_SIZE,
   publicOrigin,
   toSheetRank,
+});
+
+// Inject the main.ts runtime the Thornhollow Fields ladder handler
+// (server/battleground.ts) needs but cannot import without a cycle: the
+// cache-fronted ladder read. Done at module load, before any request,
+// mirroring configureLeaderboardRuntime above.
+configureBattlegroundRuntime({
+  getBgLeaderboard,
 });
 
 // Inject the main.ts runtime the deeds handlers (server/deeds.ts) need but
@@ -2494,9 +2646,11 @@ configureCharactersRuntime({
   rekeyMarketSeller: (characterId, oldName, newName) =>
     liveGame().rekeyMarketSeller(characterId, oldName, newName),
   saveMarket: () => liveGame().saveMarket(),
+  purgeMarketSeller: (characterId, name) => liveGame().purgeMarketSeller(characterId, name),
   rekeyMailOwner: (characterId, oldName, newName) =>
     liveGame().rekeyMailOwner(characterId, oldName, newName),
   saveMail: () => liveGame().saveMail(),
+  purgeMailOwner: (characterId, name) => liveGame().purgeMailOwner(characterId, name),
   initialCharacterState,
   publicOrigin,
 });
@@ -2836,6 +2990,7 @@ export async function startServer(): Promise<http.Server> {
   // (unlike AdminRuntime), so it rides its own seam, fed the SAME canonical source
   // /api/status uses, keeping the cap byte-identical across the status and overview reads.
   configureAdminPlayersCap(canonicalPlayersCap);
+  configureAdminGuildBoardCacheBust(bustBoardCaches);
   configureInternalRuntime(game);
   // Bot detector: replay this realm's saved config overrides onto the fresh
   // detector. Boot applies what it can; a stale entry (schema drift after a
@@ -2850,14 +3005,13 @@ export async function startServer(): Promise<http.Server> {
   }
   const orphans = await closeOrphanSessions();
   if (orphans > 0) console.log(`closed ${orphans} orphaned play session(s) from a previous run`);
-  const prunedUnstuckReports = await pruneUnstuckReports(pool);
-  if (prunedUnstuckReports > 0)
-    console.log(
-      `pruned ${prunedUnstuckReports} unstuck report row(s) older than ${UNSTUCK_REPORT_RETENTION_DAYS} days`,
-    );
   await pruneApplePendingLogins(pool);
   await game.loadMarket();
   await game.loadMail();
+  // Guild bank books boot-load BEFORE listen() below, so every non-oversized
+  // guild's book is live before any player can join (Guild Bank Phase 3: this
+  // releases the deliberately silent-inert Phase 2 wire).
+  await game.loadGuildBanks();
   await game.loadRifts();
   await game.loadChatFilter();
   await game.loadBlockedIps();
@@ -2866,9 +3020,6 @@ export async function startServer(): Promise<http.Server> {
     .then((count) => recordSitePresenceSample(count))
     .catch((err) => console.error('site presence sample failed:', err));
   setInterval(() => {
-    void pruneUnstuckReports(pool).catch((err) =>
-      console.error('unstuck report prune failed:', err),
-    );
     void pruneExpiredOAuthGrants(pool).catch((err) =>
       console.error('oauth grant prune failed:', err),
     );
@@ -2954,7 +3105,7 @@ export async function startServer(): Promise<http.Server> {
   const wss = new WebSocketServer({ noServer: true, maxPayload: WS_MAX_PAYLOAD_BYTES });
   const wsAuth = createWsAuth({
     game,
-    accountForToken,
+    accountAndScopeForToken,
     moderationStatusForAccount,
     getCharacter,
     chatMuteStatusForAccount,
@@ -2986,15 +3137,33 @@ export async function startServer(): Promise<http.Server> {
     simEntities: () => game.sim.entities.size,
     simTickHz: () => game.simTickHz(),
     tickPhaseMillis: () => game.tickPhaseMillis(),
+    // Coerced at the untyped boundary: @types/pg hand-declares these getters,
+    // so a pg upgrade that drops one type-checks clean and would otherwise
+    // fail the ENTIRE scrape at collect time (one bad collector rejects
+    // registry.metrics(), taking every gauge with it).
+    dbPool: () => ({
+      total: Number(pool.totalCount) || 0,
+      idle: Number(pool.idleCount) || 0,
+      waiting: Number(pool.waitingCount) || 0,
+    }),
     lastTickAt: () => game.lastTickAt(),
     loopStartedAt: () => game.loopStartedAt(),
+    // Read at scrape time and never constructs the cache: an idle process must
+    // not mint one as a side effect of being measured.
+    guildBankLogCache: () => guildBankLogCacheStats(),
   };
   setGameMetricsCounters(registerGameStateMetrics(httpMetrics.registry, gameStateSource));
+  registerParseMetrics(httpMetrics.registry, game.parseCapture.counters);
   // Hand the same live source to /livez, so a wedged loop answers 503 from outside
   // the process. Registered HERE rather than read from the route arm: the /livez arm
   // must never touch liveGame() (a health probe constructing a GameServer is the bug
   // tests/server/game_boot_order.test.ts pins against).
   registerLivenessSource(gameStateSource);
+
+  // The Discord bot's own rate-limit and breaker health, pushed in on the presence
+  // request and cached process-locally. No collector and no query: the gauges read
+  // that cache at scrape time and the counters ride the push itself.
+  registerDiscordBotMetrics(httpMetrics.registry);
 
   // Business gauges use isolated, staggered, timeout-protected engagement and
   // funnel snapshots every 15 minutes. Scrapes publish only cached data and never
@@ -3007,7 +3176,26 @@ export async function startServer(): Promise<http.Server> {
   server.listen(config.port, () => {
     console.log(`World of ClaudeCraft server listening on http://localhost:${config.port}`);
     console.log(`  REST: /api/register /api/login /api/characters /api/status`);
-    console.log(`  WS:   /ws, then first message {t:"auth",token,character}`);
+    console.log(`  WS:   /ws, then first message {t:"${ONLINE_WORLD_AUTH_TYPE}",token,character}`);
+  });
+
+  // The CONCURRENTLY index builds run AFTER listen, deliberately. They
+  // serialize across every realm process on the schema advisory lock, and a
+  // build on a genuinely large table (bank_ledger) is two heap scans plus a
+  // wait for every transaction that could see it: before listen, a rolling
+  // restart paid that stall on every realm at once and none of them served
+  // players meanwhile. A slow build should delay the index, not the realm.
+  //
+  // Not awaited, and a failure is LOUD but not fatal: every entry is idempotent
+  // and drops its own INVALID carcass, so the next boot retries, and a realm
+  // that is already serving players must not be killed by an index build. The
+  // readers that depend on these indexes carry their own statement bounds, so a
+  // window without one degrades a query rather than the process.
+  void runConcurrentIndexMigrations().catch((err) => {
+    console.error(
+      'concurrent index migrations failed; the realm is serving WITHOUT them and the next boot will retry:',
+      err,
+    );
   });
 
   // Off-peak batched retention. The sweep self-clocks once per UTC day behind a
@@ -3028,6 +3216,23 @@ export async function startServer(): Promise<http.Server> {
     saveLastSweepDay: async (day) => {
       await saveWorldState('retention_sweep:last_run', { day });
     },
+    // bank_ledger is deliberately ABSENT from this table list: it is kept
+    // FOREVER. It is the anti-dupe audit trail for both containers, and the
+    // guild container (Guild Bank Phase 3) makes that non-negotiable: guild
+    // conservation replays the WHOLE per-guild history (items in-vs-out across
+    // officers, the treasury balance), so pruning any prefix would turn every
+    // later legitimate withdraw into a false negative_net/negative_treasury
+    // finding and erase the evidence trail a real dupe investigation needs.
+    // Growth is accepted: one row per successful op, insert-only. It carries
+    // three append-only indexes (bank_ledger_character, bank_ledger_created,
+    // and bank_ledger_container_recent), and as of the in-game guild bank
+    // ACTIVITY LOG it has one player-triggerable hot read: the officer-visible
+    // per-guild history (server/guild_bank_log.ts), which is why that third
+    // index exists and is PARTIAL to `container = 'guild'`. Anyone re-deciding
+    // whether unbounded growth is still acceptable should weigh that read: it
+    // is bounded (LIMIT 50, a backward index scan) and cached per guild, so it
+    // does not scale with table size, but it is no longer true that nothing
+    // reads this table hot.
     tables: [
       { name: 'chat_logs', pruneBatch: (n) => pruneChatLogsBatch(config.chatLogRetentionDays, n) },
       {
@@ -3069,6 +3274,26 @@ export async function startServer(): Promise<http.Server> {
         name: 'account_ip_associations',
         pruneBatch: (n) =>
           pruneAccountIpAssociationsBatch(pool, config.accountIpAssociationRetentionDays, n),
+      },
+      {
+        // The unstuck telemetry table (v0.32.0). It shipped as a boot-blocking
+        // one-shot plus a bare interval, the exact shape the sweep exists to
+        // retire; it rides the shared budget and batch size like every sibling.
+        name: 'unstuck_reports',
+        pruneBatch: (n) => pruneUnstuckReportsBatch(pool, config.unstuckReportRetentionDays, n),
+      },
+      {
+        name: 'password_reset_requests',
+        pruneBatch: (n) =>
+          prunePasswordResetRequestsBatch(config.passwordResetRequestRetentionDays, n),
+      },
+      {
+        name: 'email_change_requests',
+        pruneBatch: (n) => pruneEmailChangeRequestsBatch(config.emailChangeRequestRetentionDays, n),
+      },
+      {
+        name: 'email_log',
+        pruneBatch: (n) => pruneEmailLogBatch(config.emailLogRetentionDays, n),
       },
     ],
     // The fold precondition makes sample pruning lossless; skip the whole group
@@ -3124,14 +3349,17 @@ export async function startServer(): Promise<http.Server> {
     // delays and drops queued telemetry before the shared pool closes.
     const unstuckReportsDrained = await stopUnstuckRecords(UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS);
     if (!unstuckReportsDrained) console.warn('unstuck report drain deadline reached');
-    // Stop and drain the Steam mirror's in-memory push FIFO too (right after the
-    // deeds records it observes): an unlock still queued here would be lost on
-    // pool.end(), and the next reconcile (on link or on login) is its only
-    // replay. stopSteamMirror flips the shutdown flag and races the drain tail
-    // against a 5s deadline, so a stuck upstream cannot hang the shutdown;
-    // failures are swallowed inside the worker, so this never throws. A no-op
-    // when the mirror is dark.
-    await stopSteamMirror(5000);
+    // Stop and drain each storefront mirror's in-memory push FIFO too (right
+    // after the deeds records they observe): an unlock still queued here would
+    // be lost on pool.end(), and the next reconcile (on link or on login) is
+    // its only replay. Each stop*Mirror flips its shutdown flag and races the
+    // drain tail against a 5s deadline, so a stuck upstream cannot hang the
+    // shutdown; failures are swallowed inside the worker, so this never
+    // throws. A no-op when that mirror is dark. Steam and Epic drain
+    // independently (D21) and CONCURRENTLY: the two stops share one 5s
+    // wall-clock budget, so a wedged Steam upstream cannot delay the Epic
+    // drain (or double the shutdown window) by serializing behind it.
+    await Promise.all([stopSteamMirror(5000), stopEpicMirror(5000)]);
     // Drop every character load lease this process holds so a clean restart can
     // reload its characters immediately instead of waiting out the lease TTL.
     // Runs before pool.end(); a failure here must not abort the shutdown, so log
@@ -3139,6 +3367,7 @@ export async function startServer(): Promise<http.Server> {
     await releaseAllCharacterLeases().catch((err) =>
       console.error('lease release-all failed:', err),
     );
+    await game.parseCapture.stop();
     await game.chatLog.stop();
     await pool.end();
     process.exit(0);

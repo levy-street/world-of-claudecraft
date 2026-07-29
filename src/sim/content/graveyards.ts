@@ -8,29 +8,29 @@
 // overworld healers are spawned from OVERWORLD_GRAVEYARDS in the Sim ctor and the
 // per-instance dungeon/raid healers in instances/dungeons.ts (claimInstance).
 
-import type { NpcDef } from '../types';
+import { EASTBROOK_LAYOUT } from '../eastbrook_layout';
+import { FENBRIDGE_LAYOUT } from '../fenbridge_layout';
+import type { GraveyardDef, NpcDef } from '../types';
 
-export interface GraveyardDef {
-  id: string;
-  // Internal label (zone-themed). Not player-visible: the angel's NAME is the only
-  // player-facing string, and it is the shared SPIRIT_HEALER name, localized once.
-  name: string;
-  // Overworld world position the released spirit appears at (a Spirit Healer hovers
-  // here). Dungeon/raid graveyards are NOT in this list: they live at the instance
-  // entry and are resolved per-instance in spirit.ts / instances/dungeons.ts.
-  x: number;
-  z: number;
-}
+export type { GraveyardDef } from '../types';
 
 // One graveyard per existing headstone cluster (the ZonePropsDef.graveyards anchors
 // across all three zones), so every visible graveyard on the map gets an angel and
 // no overworld death is ever far from one.
 export const OVERWORLD_GRAVEYARDS: GraveyardDef[] = [
   // Eastbrook Vale (zone 1)
-  { id: 'gy_eastbrook', name: 'Eastbrook Rest', x: -14, z: -14 },
+  {
+    id: 'gy_eastbrook',
+    name: 'Eastbrook Rest',
+    ...EASTBROOK_LAYOUT.services.graveyard.position,
+  },
   { id: 'gy_vale_chapel', name: 'Vale Chapel Yard', x: 4, z: -56 },
   // Mirefen Marsh (zone 2)
-  { id: 'gy_fenbridge', name: 'Fenbridge Barrow', x: -18, z: 286 },
+  {
+    id: FENBRIDGE_LAYOUT.services.graveyard.id,
+    name: FENBRIDGE_LAYOUT.services.graveyard.name,
+    ...FENBRIDGE_LAYOUT.services.graveyard.position,
+  },
   // Thornpeak Heights (zone 3)
   { id: 'gy_thornpeak', name: 'Thornpeak Cairns', x: 15, z: 645 },
   { id: 'gy_thornpeak_east', name: 'East Ridge Graves', x: 141, z: 712 },
@@ -42,10 +42,15 @@ export const OVERWORLD_GRAVEYARDS: GraveyardDef[] = [
   // strip graveyard across a sealed border.
   { id: 'gy_veiled_hollow', name: 'Eldergleam Rest', x: -60, z: 1004 },
   { id: 'gy_farshore', name: 'Gullhaven Rest', x: 836, z: 132 },
-  { id: 'gy_willowfen', name: 'Willowfen Barrow', x: -346, z: 338 },
+  // At the zone's own graveyard field (willowfen.ts): the old (-346, 338) spot
+  // sits inside Bridgemere's moat ring, below WATER_LEVEL, and the Pale Keeper
+  // spawned underwater there.
+  { id: 'gy_willowfen', name: 'Willowfen Barrow', x: -344, z: 306 },
   { id: 'gy_galecrest', name: 'Galecrest Rest', x: 404, z: 344 },
   { id: 'gy_palmreach', name: 'Palmreach Rest', x: -318, z: 802 },
-  { id: 'gy_evergarden', name: 'Evergarden Rest', x: 302, z: 792 },
+  // inside Hedgewick's churchyard, east of the chapel so the Pale Keeper
+  // hovers over the headstones clear of the chapel's collider
+  { id: 'gy_evergarden', name: 'Evergarden Rest', x: 309, z: 793 },
   { id: 'gy_nightbloom', name: 'Nightbloom Rest', x: -388, z: 1402 },
   { id: 'gy_wraithwood', name: 'Wraithwood Graves', x: 378, z: 1412 },
   { id: 'gy_frostveil', name: 'Frostveil Barrow', x: -34, z: 1576 },

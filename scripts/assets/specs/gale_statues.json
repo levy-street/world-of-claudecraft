@@ -1,0 +1,19 @@
+{
+  "comment": "The Galecrest's monument statues (maintainer-authored generated models): the ship monument for the Wickharbor dock district and the golden horse for the relocated stables. Dense source meshes route through build_foliage for weld+simplify, then the gentle bounded resimplify pass (the flower-bed fidelity recipe).",
+  "items": [
+    {
+      "src": "ship+monument+3d+model.glb",
+      "out": "models/props/ship_monument.glb",
+      "type": "static",
+      "maxTex": 1024,
+      "simplify": 0.001
+    },
+    {
+      "src": "golden+horse+statue+3d+model.glb",
+      "out": "models/props/golden_horse_statue.glb",
+      "type": "static",
+      "maxTex": 1024,
+      "simplify": 0.001
+    }
+  ]
+}

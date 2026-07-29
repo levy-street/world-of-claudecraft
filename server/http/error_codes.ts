@@ -190,9 +190,35 @@ export const ERROR_CODES = deepFreeze({
   'steam.account_taken': { params: [] },
   // The Steam Web API could not be reached or answered garbage (503).
   'steam.upstream': { params: [] },
+
+  // --- Epic link family codes (server/epic/). The whole surface is
+  // env-gated: with EPIC_ENABLED unset every route answers epic.disabled.
+  // Linking is cosmetic-mirror only; login with Epic does not exist. ---
+
+  // The Epic surface is not enabled on this server (feature-off 503).
+  'epic.disabled': { params: [] },
+  // The link proof failed shape or upstream verification (400).
+  'epic.invalid_token': { params: [] },
+  // The proof verified but the Epic account is blocked upstream (403).
+  'epic.banned': { params: [] },
+  // This account already has a linked Epic account (409).
+  'epic.already_linked': { params: [] },
+  // That Epic account is linked to a different account (409).
+  'epic.account_taken': { params: [] },
+  // The Epic / EOS upstream could not be reached or is not provisioned (503).
+  'epic.upstream': { params: [] },
   // wallet: the desktop browser handoff was malformed, expired, or mismatched.
   'wallet.handoff_invalid': { params: [] },
-  'welcome.invalid_input': { params: [] },
+  'ota_updates.invalid_input': { params: [] },
+  // seeker: native distribution, attestation, wallet, token, and entitlement failures.
+  'seeker.native_only': { params: [] },
+  'seeker.attestation_failed': { params: [] },
+  'seeker.solana_artifact_required': { params: [] },
+  'seeker.wallet_required': { params: [] },
+  'seeker.genesis_token_required': { params: [] },
+  'seeker.genesis_token_claimed': { params: [] },
+  'seeker.entitlement_required': { params: [] },
+  'seeker.current_ownership_required': { params: [] },
 } as const);
 
 /** A stable error code: one of the keys of ERROR_CODES. */

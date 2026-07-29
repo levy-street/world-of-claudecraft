@@ -1,16 +1,18 @@
-// Procedural adventure soundtrack: no audio files, pure WebAudio synthesis.
-// Eastbrook Vale keeps its original themes (town, vale, vale_legacy). Every
-// other cue is through-composed to modern JRPG dynamics: per-place leitmotifs
-// grown from the zone's look and lore, layered ostinati, extended harmony,
-// and multi-section forms (Mirefen's waterlogged requiem, Fenbridge's hearth
-// lilt, Thornpeak's cold anthem, Highwatch's watch march, eleven new-world
-// zone cues from the Farshore vigil to the Evergarden minuet, three dungeon
-// crawls, eight Rift environment crawls, and a battle theme that transposes
-// onto every zone key). Each theme is a composed multi-track loop scheduled
-// with a lookahead timer; zone changes crossfade.
+// The adventure soundtrack, in two halves. The composition half is unchanged:
+// every theme is still authored as note data (per-place leitmotifs, layered
+// ostinati, multi-section forms) played by the MusicSynth voices, and that
+// machinery keeps powering the music editor (music_editor.html) and the
+// offline render pipeline (scripts/render_music.mjs). The runtime half no
+// longer synthesizes: the shipped game streams the remastered mp3 renders of
+// those themes (public/audio/music/, see music_tracks.ts) through looping
+// media elements routed into one WebAudio graph, so zone changes crossfade
+// exactly as before while playback costs no synthesis CPU and no up-front
+// download. Each fight opens on one of the two battle themes at random.
 
 import type { BiomeId } from '../sim/types';
+import { resumeWhenAllowed } from './audio_unlock';
 import { MUSIC_OVERRIDES } from './music_overrides.generated';
+import { COMBAT_STREAM_URLS, pickCombatTrackIndex, ZONE_STREAM_URLS } from './music_tracks';
 
 export type MusicZone =
   | 'town_eastbrook'
@@ -3774,10 +3776,11 @@ function composeRiftTide(): Theme {
 // root, flat three, four), timpani on one, three, and the and-of-four pickup,
 // and bare horn fifths. Orchestral tension in the classic MMO mold: no drum
 // kit backbeat, no song melody; percussion, brass gestures, and string
-// agitato that sit under gameplay. All written from D so COMBAT_TRANSPOSE can
-// move the active cue onto each zone's tonal center. The alternates are
-// registered as extra themes purely so the render tool can audition them;
-// only the layer named 'combat' ever plays in game.
+// agitato that sit under gameplay. All written from D (the runtime used to
+// transpose the active cue onto each zone's tonal center; the streamed
+// remasters play as recorded). The alternates are registered as extra themes
+// purely so the render tool can audition them; in game, combat now streams
+// one of the two remastered battle tracks (see music_tracks.ts).
 // ---------------------------------------------------------------------------
 
 const COMBAT_CELL = [0, 0, 3, 0, 7, 0, 3, 5];
@@ -3931,67 +3934,19 @@ function composeCombat(): Theme {
 // ---------------------------------------------------------------------------
 
 const FADE_SECONDS = 2.2;
-const LOOKAHEAD = 0.6;
 const STORAGE_KEY = 'ev_music_on';
 
-// The combat cue is written from D3 exactly like the original; transpose it
-// onto each zone's tonal center so the crossfade never fights the theme
-// underneath (all shifts upward, matching the original table's register):
-//   town_eastbrook  0 -> D (Eastbrook is D major)
-//   town_fenbridge  5 -> G (Fenbridge is G major)
-//   town_highwatch  9 -> B (Highwatch is B minor)
-//   vale  7 -> A (vale is A dorian)
-//   vale_legacy  7 -> A (original vale is A dorian)
-//   marsh  2 -> E (marsh is E aeolian)
-//   peaks  0 -> D (peaks anthem is D major)
-//   vale_cup  0 -> D (the Sowfield match tune is D major)
-//   dungeon_hollow_crypt      0 -> D
-//   dungeon_sunken_bastion    2 -> E
-//   dungeon_gravewyrm_sanctum 9 -> B
-//   dusk        3 -> F  (Veiled Hollow rests on F lydian)
-//   ember       2 -> E  (Drakelands burns in E phrygian dominant)
-//   frost       5 -> G  (Frostveil shimmers in G lydian)
-//   amber       3 -> F  (Amberfall's harvest is F major)
-//   fen         2 -> E  (Willowfen lilts in E major)
-//   night       9 -> B  (Nightbloom dreams in B aeolian)
-//   haunt       4 -> F# (Wraithwood watches in F# minor)
-//   jungle      5 -> G  (Palmreach grooves in G mixolydian)
-//   garden      7 -> A  (Evergarden's minuet is A major)
-//   gale        0 -> D  (Galecrest drones on D mixolydian)
-//   farshore    7 -> A  (the Gullhaven vigil is A minor)
-//   rift_*      each crawl names its tonal center in its compose comment
-const COMBAT_TRANSPOSE: Record<MusicZone, number> = {
-  town_eastbrook: 0,
-  town_fenbridge: 5,
-  town_highwatch: 9,
-  vale: 7,
-  vale_legacy: 7,
-  marsh: 2,
-  peaks: 0,
-  dusk: 3,
-  ember: 2,
-  frost: 5,
-  amber: 3,
-  fen: 2,
-  night: 9,
-  haunt: 4,
-  jungle: 5,
-  garden: 7,
-  gale: 0,
-  farshore: 7,
-  vale_cup: 0,
-  dungeon_hollow_crypt: 0,
-  dungeon_sunken_bastion: 2,
-  dungeon_gravewyrm_sanctum: 9,
-  rift_frost: 2,
-  rift_ember: 0,
-  rift_venom: 4,
-  rift_bone: 5,
-  rift_brute: 2,
-  rift_void: 7,
-  rift_storm: 9,
-  rift_tide: 7,
-};
+// All remasters are mastered to one loudness (about -15 LUFS), so streamed
+// cues share a single level through the master gain; 0.5 matches the level
+// the Sowfield file tracks already play at.
+const STREAM_LEVEL = 0.5;
+// Pause a stream once it has been silent this long: the slowest fade time
+// constant in play (FADE_SECONDS / 3, about 0.73s) has decayed below 0.5%
+// (under -45 dB) by then, and a paused element stops decoding and
+// downloading. Playback later resumes from the same position, so re-entering
+// a zone picks its theme back up mid-phrase.
+const STREAM_PAUSE_AFTER_S = 4;
+const STREAM_KEEPER_MS = 500;
 
 export function buildMusicThemes(withOverrides = true): Record<string, Theme> {
   const composed: Record<string, Theme> = {
@@ -4816,18 +4771,29 @@ export class MusicSynth {
   }
 }
 
+// One streamed cue: a looping media element (progressive download, decoded on
+// demand) behind its own crossfade gain. el stays null until the cue is first
+// audible (and always in plain-Node tests, which have no Audio constructor);
+// targets still track for the logic either way.
+interface StreamTrack {
+  url: string;
+  el: HTMLAudioElement | null;
+  gain: GainNode;
+  target: number; // logical 0..1; the master gain applies the shared level
+  silentAt: number; // ctx.currentTime the cue went silent; -1 while audible
+}
+
 export class MusicDirector {
   private ctx: AudioContext | null = null;
-  private synth: MusicSynth | null = null;
   private master: GainNode | null = null;
-  private reverb: ConvolverNode | null = null;
-  private reverbSend: GainNode | null = null;
   private bossGain: GainNode | null = null;
   private bossBuffer: AudioBuffer | null = null;
   private bossSource: AudioBufferSourceNode | null = null;
   private bossElement: HTMLAudioElement | null = null;
   private bossLoading = false;
-  private layers: Record<string, Layer> = {};
+  private zoneStreams: Partial<Record<MusicZone, StreamTrack>> = {};
+  private combatStreams: StreamTrack[] = [];
+  private combatIdx = 0;
   private timer: number | undefined;
   // null until the first update() so the initial state always applies
   private zone: MusicZone | null = null;
@@ -4862,7 +4828,7 @@ export class MusicDirector {
     return this._enabled;
   }
 
-  // master gain target given the enabled flag and volume (base level 0.15).
+  // master gain target given the enabled flag and volume (base STREAM_LEVEL).
   // The dedicated Nythraxis track owns the mix while active.
   private masterTarget(): number {
     if (
@@ -4873,7 +4839,7 @@ export class MusicDirector {
       this.sowfieldTrack !== null
     )
       return 0;
-    return 0.15 * this._vol;
+    return STREAM_LEVEL * this._vol;
   }
 
   /** Scene music directive seam (SceneDirector): 'silence' hard-stops the whole
@@ -4909,19 +4875,25 @@ export class MusicDirector {
     this.applyBossPlayback();
     if (this.ctx && this.master)
       this.master.gain.setTargetAtTime(this.masterTarget(), this.ctx.currentTime, on ? 0.4 : 0.7);
+    // handing the mix back must revive paused streams now, not a tick later
+    if (!on) this.streamKeeper();
   }
 
   resetForDungeonEntry(dungeonId: string | null, zone?: MusicZone): void {
     if (!dungeonId) return;
-    // Real dungeons and delves resolve their layer from the instance id; a
+    // Real dungeons and delves resolve their cue from the instance id; a
     // procedural Rift floor has no DUNGEON_MUSIC row (its cue follows the
     // floor's RiftTheme), so the HUD passes the resolved zone explicitly.
-    const layerZone = zone ?? dungeonMusicZoneForDungeon(dungeonId);
-    const layer = this.layers[layerZone];
-    if (layer) {
-      layer.anchor = this.ctx?.currentTime ?? 0;
-      layer.nextIdx = -1;
-      layer.loopCount = 0;
+    const cueZone = zone ?? dungeonMusicZoneForDungeon(dungeonId);
+    // A fresh dungeon run starts its cue from the top (unlike overworld zones,
+    // which resume mid-track when you cross back in).
+    const el = this.zoneStreams[cueZone]?.el;
+    if (el) {
+      try {
+        el.currentTime = 0;
+      } catch {
+        /* browser may reject seeking before metadata */
+      }
     }
     if (this.bossElement) {
       try {
@@ -4941,7 +4913,7 @@ export class MusicDirector {
         : 0;
     this.bossGain.gain.setTargetAtTime(target, this.ctx.currentTime, target > 0 ? 0.25 : 0.12);
     if (target > 0) {
-      void this.ctx.resume?.();
+      resumeWhenAllowed(this.ctx);
       const element = this.ensureBossElement();
       if (element) {
         element.volume = target;
@@ -5028,6 +5000,8 @@ export class MusicDirector {
         track ? 0.4 : 0.7,
       );
     }
+    // walking away from the stadium must revive paused streams now
+    if (enteringOrLeaving && track === null) this.streamKeeper();
   }
 
   private ensureSowfieldElements(): void {
@@ -5055,7 +5029,7 @@ export class MusicDirector {
       this.sowfieldTrack !== null && this._enabled && !this._menuPaused && !this._sceneSilenced;
     const level = 0.5 * this._vol;
     if (active) {
-      void this.ctx.resume?.();
+      resumeWhenAllowed(this.ctx);
       this.ensureSowfieldElements();
       void this.sowfieldWaitingEl?.play().catch(() => {});
       void this.sowfieldMatchEl?.play().catch(() => {});
@@ -5086,6 +5060,8 @@ export class MusicDirector {
     }
     this.applyBossPlayback();
     this.applySowfield();
+    // leaving volume 0 must revive paused streams now, not a tick later
+    if (this.streamsAudible()) this.streamKeeper();
   }
 
   get volume(): number {
@@ -5100,7 +5076,6 @@ export class MusicDirector {
       return;
     }
     const ctx = this.ctx;
-    this.synth = new MusicSynth(ctx);
     this.master = ctx.createGain();
     this.master.gain.value = this.masterTarget();
     const compressor = ctx.createDynamicsCompressor();
@@ -5121,41 +5096,117 @@ export class MusicDirector {
     this.sowfieldMatchGain.gain.value = 0;
     this.sowfieldMatchGain.connect(compressor);
 
-    // generated hall impulse response
-    const seconds = 2.6;
-    const len = Math.floor(ctx.sampleRate * seconds);
-    const ir = ctx.createBuffer(2, len, ctx.sampleRate);
-    for (let ch = 0; ch < 2; ch++) {
-      const data = ir.getChannelData(ch);
-      for (let i = 0; i < len; i++) {
-        data[i] = (Math.random() * 2 - 1) * (1 - i / len) ** 2.4;
+    // Register both battle themes now (and warm their downloads whenever the
+    // mix is audible, see streamKeeper): a fight can start at any moment and
+    // its opening hit must not wait on a first-byte fetch. Zone streams are
+    // made lazily on first activation instead; a zone change always has the
+    // old theme's crossfade window to cover the new stream spinning up.
+    for (const url of COMBAT_STREAM_URLS) {
+      const stream = this.makeStream(url);
+      if (stream) this.combatStreams.push(stream);
+    }
+    this.timer = window.setInterval(() => this.streamKeeper(), STREAM_KEEPER_MS);
+    this.streamKeeper();
+  }
+
+  /** Build one streamed cue's bookkeeping and crossfade gain. The media
+   *  element itself is created on the first audible activation
+   *  (ensureElement), so a muted player never downloads anything. */
+  private makeStream(url: string): StreamTrack | null {
+    const ctx = this.ctx;
+    if (!ctx || !this.master) return null;
+    const gain = ctx.createGain();
+    gain.gain.value = 0;
+    gain.connect(this.master);
+    return { url, el: null, gain, target: 0, silentAt: 0 };
+  }
+
+  /** Create and wire the looping, progressively-downloaded media element. */
+  private ensureElement(stream: StreamTrack): void {
+    if (stream.el || !this.ctx || typeof Audio !== 'function') return;
+    const el = new Audio(stream.url);
+    el.loop = true;
+    el.preload = 'auto';
+    try {
+      this.ctx.createMediaElementSource(el).connect(stream.gain);
+    } catch {
+      // Without a graph route the element would play at full volume outside
+      // every gain, duck, and mute in the mix; silence is the safer failure.
+      el.muted = true;
+    }
+    stream.el = el;
+  }
+
+  private ensureZoneStream(zone: MusicZone): void {
+    if (this.zoneStreams[zone]) return;
+    const url = ZONE_STREAM_URLS[zone];
+    if (!url) return;
+    const stream = this.makeStream(url);
+    if (stream) this.zoneStreams[zone] = stream;
+  }
+
+  // Streams are audible only when nothing has the master ducked to zero: the
+  // toggle, the menu fade, the volume slider, and the dedicated boss and
+  // Sowfield file tracks (which own the mix while active). While inaudible,
+  // streams pause instead of decoding silence.
+  private streamsAudible(): boolean {
+    return (
+      this._enabled &&
+      !this._menuPaused &&
+      this._vol > 0 &&
+      !this.bossActive &&
+      this.sowfieldTrack === null
+    );
+  }
+
+  private setStreamTarget(stream: StreamTrack, target: number, fadeSeconds: number): void {
+    if (!this.ctx || stream.target === target) return;
+    stream.target = target;
+    stream.gain.gain.setTargetAtTime(target, this.ctx.currentTime, fadeSeconds);
+    if (target > 0) {
+      stream.silentAt = -1;
+      // While the mix is inaudible do not start the download; the keeper
+      // revives the stream the moment it is audible again.
+      if (!this.streamsAudible()) return;
+      resumeWhenAllowed(this.ctx);
+      this.ensureElement(stream);
+      if (stream.el) void stream.el.play().catch(() => {});
+    } else {
+      stream.silentAt = this.ctx.currentTime;
+    }
+  }
+
+  private *allStreams(): Iterable<StreamTrack> {
+    for (const stream of Object.values(this.zoneStreams)) yield stream;
+    yield* this.combatStreams;
+  }
+
+  // Runs every STREAM_KEEPER_MS (and directly on unmute, menu close, volume
+  // restore, and boss/Sowfield handback so revival is instant): pauses cues
+  // that finished fading out, so an inaudible stream costs no decoding or
+  // bandwidth, revives active cues that a refused autoplay, a tab restore,
+  // or a mute window left paused, and keeps the battle themes' downloads
+  // warm whenever the mix is audible.
+  private streamKeeper(): void {
+    const ctx = this.ctx;
+    if (!ctx) return;
+    const audibleBase = this.streamsAudible();
+    const now = ctx.currentTime;
+    if (audibleBase) for (const stream of this.combatStreams) this.ensureElement(stream);
+    for (const stream of this.allStreams()) {
+      if (audibleBase && stream.target > 0) {
+        stream.silentAt = -1;
+        this.ensureElement(stream);
+        if (stream.el?.paused) {
+          resumeWhenAllowed(ctx);
+          void stream.el.play().catch(() => {});
+        }
+      } else if (stream.silentAt < 0) {
+        stream.silentAt = now;
+      } else if (stream.el && !stream.el.paused && now - stream.silentAt > STREAM_PAUSE_AFTER_S) {
+        stream.el.pause();
       }
     }
-    this.reverb = ctx.createConvolver();
-    this.reverb.buffer = ir;
-    this.reverbSend = ctx.createGain();
-    this.reverbSend.gain.value = 0.55;
-    this.reverbSend.connect(this.reverb);
-    this.reverb.connect(this.master);
-
-    const themes = buildMusicThemes();
-    for (const [name, theme] of Object.entries(themes)) {
-      const gain = ctx.createGain();
-      gain.gain.value = 0;
-      gain.connect(this.master);
-      gain.connect(this.reverbSend);
-      this.layers[name] = {
-        theme,
-        gain,
-        target: 0,
-        anchor: 0,
-        nextIdx: -1,
-        loopCount: 0,
-        transpose: 0,
-        trim: THEME_TRIM[name] ?? 1,
-      };
-    }
-    this.timer = window.setInterval(() => this.tickScheduler(), 110);
   }
 
   setEnabled(on: boolean): void {
@@ -5170,6 +5221,8 @@ export class MusicDirector {
     }
     this.applyBossPlayback();
     this.applySowfield();
+    // re-enabling must revive paused streams now, not a keeper tick later
+    if (on) this.streamKeeper();
   }
 
   /** Fade out while the game menu is open; does not change the music toggle. */
@@ -5177,7 +5230,7 @@ export class MusicDirector {
     if (this._menuPaused) return;
     this._menuPaused = true;
     if (!this.ctx) return;
-    void this.ctx.resume();
+    resumeWhenAllowed(this.ctx);
     if (this.master) {
       this.master.gain.setTargetAtTime(0, this.ctx.currentTime, 0.2);
     }
@@ -5190,82 +5243,53 @@ export class MusicDirector {
     if (!this._menuPaused) return;
     this._menuPaused = false;
     if (!this.ctx) return;
-    void this.ctx.resume();
+    resumeWhenAllowed(this.ctx);
     if (this.master) {
       this.master.gain.setTargetAtTime(this.masterTarget(), this.ctx.currentTime, 0.35);
     }
     this.applyBossPlayback();
     this.applySowfield();
+    // closing the menu must revive paused streams now, not a keeper tick later
+    this.streamKeeper();
   }
 
   // called every frame by the HUD; cheap unless the state changed
   update(zone: MusicZone, inCombat: boolean): void {
     if (!this.ctx) return;
     if (zone === this.zone && inCombat === this.combat) return;
+    const combatStarting = inCombat && !this.combat;
     this.zone = zone;
     this.combat = inCombat;
-    const now = this.ctx.currentTime;
-    for (const [name, layer] of Object.entries(this.layers)) {
-      if (name === 'combat') continue;
-      // combat music replaces the zone theme rather than layering over it: the
-      // zone is silenced for the duration of combat and fades back in when it ends
-      const target = name === zone ? (inCombat ? 0 : 1) : 0;
-      if (layer.target !== target) {
-        layer.target = target;
-        // fade out faster than fade in so instance music doesn't bleed into the world
-        const fade = target > 0 ? FADE_SECONDS / 3 : 0.35;
-        layer.gain.gain.setTargetAtTime(target * layer.trim, now, fade);
-        if (target === 0) layer.nextIdx = -1;
-      }
+    // Combat music replaces the zone theme rather than layering over it: the
+    // zone is silenced for the duration of combat and fades back in when it
+    // ends. Fade out faster than fade in so instance music does not bleed
+    // into the world.
+    if (!inCombat) this.ensureZoneStream(zone);
+    for (const [name, stream] of Object.entries(this.zoneStreams) as [MusicZone, StreamTrack][]) {
+      const target = name === zone && !inCombat ? 1 : 0;
+      this.setStreamTarget(stream, target, target > 0 ? FADE_SECONDS / 3 : 0.35);
     }
-    const combatLayer = this.layers.combat;
-    // ostinato follows the zone's tonal center (see COMBAT_TRANSPOSE) — kept
-    // current on every zone crossing, not just when combat starts, so being
-    // chased across a border can't leave it in the previous zone's key
-    if (inCombat) combatLayer.transpose = COMBAT_TRANSPOSE[zone];
-    const combatTarget = inCombat ? 1 : 0;
-    if (combatLayer.target !== combatTarget) {
-      combatLayer.target = combatTarget;
-      combatLayer.gain.gain.setTargetAtTime(
-        combatTarget * combatLayer.trim,
-        now,
-        inCombat ? 0.35 : FADE_SECONDS / 3,
-      );
-    }
-  }
-
-  private tickScheduler(): void {
-    const ctx = this.ctx;
-    if (!ctx || !this._enabled) return;
-    const horizon = ctx.currentTime + LOOKAHEAD;
-    for (const layer of Object.values(this.layers)) {
-      // schedule only active layers — don't keep pumping long dungeon notes
-      // while a fading-out gain node is still above zero
-      if (layer.target <= 0.001) {
-        layer.nextIdx = -1;
-        continue;
-      }
-      const spb = 60 / layer.theme.bpm;
-      const loopBeats = layer.theme.bars * 4;
-      if (layer.nextIdx === -1) {
-        layer.anchor = ctx.currentTime + 0.15;
-        layer.nextIdx = 0;
-        layer.loopCount = 0;
-      }
-      for (let guard = 0; guard < 220; guard++) {
-        const evt = layer.theme.events[layer.nextIdx];
-        const when = layer.anchor + (layer.loopCount * loopBeats + evt.beat) * spb;
-        if (when > horizon) break;
-        if (when >= ctx.currentTime - 0.03) {
-          this.synth!.playNote(evt, when, spb, layer);
-        }
-        layer.nextIdx++;
-        if (layer.nextIdx >= layer.theme.events.length) {
-          layer.nextIdx = 0;
-          layer.loopCount++;
+    // Each fight opens on one of the battle themes, chosen at random per
+    // fight and restarted from the top so the opening hit lands; the pick
+    // then holds for the whole fight, even across a zone border mid-chase.
+    // A pull chained within the previous fight's fade-out (element not yet
+    // paused) continues from position instead: rewinding an audibly fading
+    // track would jump-cut, and rolling combat reads as one long fight.
+    if (combatStarting && this.combatStreams.length > 0) {
+      this.combatIdx = pickCombatTrackIndex(this.combatStreams.length, Math.random);
+      const el = this.combatStreams[this.combatIdx].el;
+      if (el?.paused) {
+        try {
+          el.currentTime = 0;
+        } catch {
+          /* browser may reject seeking before metadata */
         }
       }
     }
+    this.combatStreams.forEach((stream, idx) => {
+      const target = inCombat && idx === this.combatIdx ? 1 : 0;
+      this.setStreamTarget(stream, target, target > 0 ? 0.35 : FADE_SECONDS / 3);
+    });
   }
 }
 

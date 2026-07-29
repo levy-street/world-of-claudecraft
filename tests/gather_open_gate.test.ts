@@ -2,12 +2,16 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
-import { handlePickedEntity, shouldApproachPickedEntity } from '../src/game/interactions';
+import {
+  handlePickedEntity,
+  shouldApproachPickedEntity,
+  shouldDeferPickedCorpseToGatherNode,
+} from '../src/game/interactions';
 import { tryNearbyInteraction } from '../src/game/nearby_interaction';
 import { MOBS } from '../src/sim/data';
 import { type Entity, INTERACT_RANGE } from '../src/sim/types';
 
-// Phase 4 open-gate flip: the hcb wire mirror (PR 2087) made online corpse
+// The open-gate flip: the hcb wire mirror (PR 2087) made online corpse
 // harvest-claim state reliable, so the helper arms main.ts calls now run with
 // harvestStateReliable = TRUE by DEFAULT (no `online === null` override). A
 // harvest-only corpse (componentTags, no regular loot) therefore OPENS online
@@ -131,21 +135,106 @@ describe('shouldApproachPickedEntity default arm', () => {
   });
 });
 
+describe('direct corpse hits over gather nodes', () => {
+  it('defers a claimed harvest-only corpse so a node raycast can handle the click', () => {
+    const blockedCorpse = corpse({ harvestClaimedBy: 9 });
+    expect(shouldDeferPickedCorpseToGatherNode(blockedCorpse, 1)).toBe(true);
+
+    const openCorpse = corpse({});
+    expect(shouldDeferPickedCorpseToGatherNode(openCorpse, 1)).toBe(false);
+  });
+
+  it('defers an all-unmapped corpse with nothing to loot, claim or no claim (#2513)', () => {
+    // The click-path knock-on of the corpse-level harvest gate. fen_troll
+    // carried claw and tusk, neither mapped at the time, so it had no harvest
+    // half to open for; both are mapped now (this branch's own fix), so no
+    // shipped template is left in that shape. gills and horn are still
+    // waiting on theirs, so this retags a real, otherwise-untagged template
+    // (warlock_imp) for the duration of the case, restored in a finally. With
+    // no loot either, `canOpen` is false and a click on the corpse mesh should
+    // fall through to a gather node sitting under it rather than being swallowed.
+    // Pinned with the claim UNSPENT, which is the state that used to keep it
+    // open, so this is the predicate talking and not the pre-existing claim arm.
+    const template = MOBS.warlock_imp;
+    const priorTags = template.componentTags;
+    template.componentTags = ['gills', 'horn'];
+    try {
+      const troll = corpse({ templateId: 'warlock_imp', harvestClaimedBy: null, loot: null });
+      expect(shouldDeferPickedCorpseToGatherNode(troll, 1)).toBe(true);
+      // ...and click-to-walk no longer marches the player to it either: there is
+      // nothing to open on arrival. Same fixture, moved out of interact range.
+      const farTroll = corpse({
+        templateId: 'warlock_imp',
+        harvestClaimedBy: null,
+        loot: null,
+        pos: { x: 20, y: 0, z: 0 },
+      });
+      expect(shouldApproachPickedEntity(playerAt(0), farTroll, false)).toBe(false);
+      // It still owns the click while it holds loot the viewer can take, so
+      // suppressing the dead harvest does not cost the player the live coin.
+      const withCoin = corpse({
+        templateId: 'warlock_imp',
+        harvestClaimedBy: null,
+        loot: { copper: 50, items: [] },
+      });
+      expect(shouldDeferPickedCorpseToGatherNode(withCoin, 1)).toBe(false);
+    } finally {
+      template.componentTags = priorTags;
+    }
+    // The discriminator on real content: a MIXED template carrying an
+    // unmapped horn beside two mapped families keeps its harvest half, so an
+    // empty one still opens.
+    expect(MOBS.sethrael_palecoil.componentTags).toEqual(['hide', 'claw', 'horn']);
+    const palecoil = corpse({
+      templateId: 'sethrael_palecoil',
+      harvestClaimedBy: null,
+      loot: null,
+    });
+    expect(shouldDeferPickedCorpseToGatherNode(palecoil, 1)).toBe(false);
+  });
+
+  // The defer arm shares corpseLootAvailability with the open and approach arms,
+  // so it must share their party roster too: a party member's tap grants ME
+  // shared rights, and that corpse is mine to open, never deferred to a node
+  // sitting under it.
+  it('does not defer a party member claimed kill once the roster is passed', () => {
+    // Harvest already claimed, so the ONLY thing that can open this corpse is
+    // shared loot rights from the tapper being in my party.
+    const partyKill = corpse({
+      harvestClaimedBy: 9,
+      tappedById: 7,
+      loot: { copper: 120, items: [] },
+    } as Partial<Entity>);
+
+    // Solo (no roster): a stranger's kill, correctly deferred.
+    expect(shouldDeferPickedCorpseToGatherNode(partyKill, 1)).toBe(true);
+
+    // Same corpse, but pid 7 is my party member: mine to open, so no defer.
+    expect(shouldDeferPickedCorpseToGatherNode(partyKill, 1, true, [1, 7])).toBe(false);
+  });
+});
+
 describe('tryNearbyInteraction default arm', () => {
   function nearbyRig(e: Entity) {
     const lootCorpse = vi.fn(() => true as const);
+    const harvestCorpse = vi.fn();
+    const harvestNode = vi.fn(() => true as const);
     const world = {
       player: playerAt(0),
       playerId: 1,
       entities: new Map([[e.id, e]]),
+      questLog: new Map(),
+      targetEntity: () => {},
+      interact: () => {},
       lootCorpse,
+      harvestCorpse,
       delveInteract: () => false as const,
       enterDungeon: () => false as const,
       leaveDungeon: () => false as const,
       pickUpObject: () => false as const,
       resurrectAtSpiritHealer: () => false as const,
       nodeHarvestableByMe: () => true,
-      harvestNode: () => true as const,
+      harvestNode,
     } as unknown as Parameters<typeof tryNearbyInteraction>[0];
     const hud = {
       openMailbox: () => {},
@@ -155,24 +244,49 @@ describe('tryNearbyInteraction default arm', () => {
     } as unknown as Parameters<typeof tryNearbyInteraction>[1] & {
       showError: ReturnType<typeof vi.fn>;
     };
-    return { world, hud, lootCorpse };
+    return { world, hud, lootCorpse, harvestCorpse, harvestNode };
   }
 
   it('dispatches a lootable corpse without any harvest-state argument (the default arm)', () => {
     const withLoot = corpse({ loot: { copper: 5, items: [] } });
     const { world, hud, lootCorpse } = nearbyRig(withLoot);
-    expect(tryNearbyInteraction(world, hud, [], 'far', 'notReady', 'nothing')).toBe(true);
+    expect(
+      tryNearbyInteraction(world, hud, [], null, 'far', 'notReady', 'escortAway', 'nothing'),
+    ).toBe(true);
     expect(lootCorpse).toHaveBeenCalledWith(2);
   });
 
-  it('a harvest-only corpse does not capture the interact key (loot-first contract, unchanged by the flip)', () => {
-    // The nearby-interact corpse pick keys off hasLoot, not canOpen: harvest
-    // opens through the click path (handlePickedEntity above). Pinned so a
-    // future change to that contract is deliberate.
-    const { world, hud, lootCorpse } = nearbyRig(corpse({}));
-    expect(tryNearbyInteraction(world, hud, [], 'far', 'notReady', 'nothing')).toBe(false);
+  it('a harvest-only corpse now captures the interact key (unified press)', () => {
+    // The nearby-interact corpse pick keys off canOpen since the unified
+    // press: a harvest-only corpse is a target, and only its harvest half is
+    // dispatched (no loot command, so no denial toast on an empty table).
+    const { world, hud, lootCorpse, harvestCorpse } = nearbyRig(corpse({}));
+    expect(
+      tryNearbyInteraction(world, hud, [], null, 'far', 'notReady', 'escortAway', 'nothing'),
+    ).toBe(true);
+    expect(harvestCorpse).toHaveBeenCalledWith(2);
     expect(lootCorpse).not.toHaveBeenCalled();
-    expect(hud.showError).toHaveBeenCalledWith('nothing');
+    expect(hud.showError).not.toHaveBeenCalled();
+  });
+
+  it('lets an overlapped node win when the corpse has no loot or harvest for this player', () => {
+    const blockedCorpse = corpse({ loot: null, harvestClaimedBy: 9 });
+    const node = {
+      id: 'ore_under_corpse',
+      zoneId: 'zone',
+      type: 'ore',
+      pos: { x: 1, z: 0 },
+      level: 1,
+      tier: 1,
+    } as const;
+    const { world, hud, lootCorpse, harvestCorpse, harvestNode } = nearbyRig(blockedCorpse);
+
+    expect(
+      tryNearbyInteraction(world, hud, [node], null, 'far', 'notReady', 'escortAway', 'nothing'),
+    ).toBe(true);
+    expect(harvestCorpse).not.toHaveBeenCalled();
+    expect(lootCorpse).not.toHaveBeenCalled();
+    expect(harvestNode).toHaveBeenCalledWith('ore_under_corpse');
   });
 });
 

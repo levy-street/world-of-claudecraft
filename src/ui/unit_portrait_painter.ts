@@ -10,7 +10,12 @@
 // lives in unit_portrait.ts (and is unit-tested there).
 // ---------------------------------------------------------------------------
 
-import { playerPortraitDataUrl } from '../render/characters/portrait';
+import type { ModularLook } from '../render/characters/modular';
+import {
+  modularPortraitDataUrl,
+  playerPortraitDataUrl,
+  visualPortraitDataUrl,
+} from '../render/characters/portrait';
 import type { PlayerClass } from '../sim/types';
 import { iconCanvas } from './icons';
 import {
@@ -114,5 +119,35 @@ export class UnitPortraitPainter {
     const url = playerPortraitDataUrl(cls, skin);
     if (url) this.drawHeadshot(canvas, url);
     else this.drawCrest(canvas, `class_${cls}`);
+  }
+
+  /** Paint the Combat Mech cosmetic body in its worn chroma, what a mech
+   *  wearer actually looks like in the world. Falls back to the class portrait
+   *  (skin 0: `skin` is a CHROMA index here, not a class-atlas index) until
+   *  the lazily-loaded mech assets can render a portrait. */
+  drawMech(canvas: HTMLCanvasElement, chromaSkin: number, cls: PlayerClass): void {
+    const url = visualPortraitDataUrl('player_mech', chromaSkin);
+    if (url) this.drawHeadshot(canvas, url);
+    else this.drawClass(canvas, cls, 0);
+  }
+
+  /**
+   * Paint a headshot of a COMPOSED character, this player's own face, hair and
+   * colours, rather than the stock portrait for their class.
+   *
+   * Falls back through the class portrait and then the crest, because a look
+   * can be unpaintable for a frame or two: the modular GLB is streamed like any
+   * other, and a portrait asked for before it lands returns null.
+   */
+  drawModularPlayer(
+    canvas: HTMLCanvasElement,
+    visualKey: string,
+    look: ModularLook,
+    cls: PlayerClass,
+    skin: number,
+  ): void {
+    const url = modularPortraitDataUrl(visualKey, look);
+    if (url) this.drawHeadshot(canvas, url);
+    else this.drawClass(canvas, cls, skin);
   }
 }

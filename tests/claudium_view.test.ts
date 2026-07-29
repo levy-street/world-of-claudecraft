@@ -3,6 +3,7 @@ import {
   buildClaudiumView,
   type ClaudiumViewInput,
   claudiumBalanceAddress,
+  currentWocDiscountBps,
 } from '../src/ui/claudium_view';
 
 // The pure Claudium view core is DOM/i18n/net-free, so it drives directly here.
@@ -219,5 +220,37 @@ describe('claudiumBalanceAddress (which wallet funds the affordability reads)', 
 
   it('returns null with neither wallet, so the caller performs no balance read', () => {
     expect(claudiumBalanceAddress(null, null)).toBeNull();
+  });
+});
+
+describe('currentWocDiscountBps (service price aggregation)', () => {
+  it('selects the authoritative discount when every fetched $WOC price row agrees', () => {
+    expect(
+      currentWocDiscountBps([
+        { sku: 's1', wocDiscountBps: 5000 },
+        { sku: 's10', wocDiscountBps: 5000 },
+      ]),
+    ).toBe(5000);
+  });
+
+  it('fails closed when no fetched price row contains a valid discount', () => {
+    expect(currentWocDiscountBps([])).toBeNull();
+    expect(
+      currentWocDiscountBps([
+        { sku: 's1', wocDiscountBps: null },
+        { sku: 's10', wocDiscountBps: 5000 },
+      ]),
+    ).toBeNull();
+    expect(currentWocDiscountBps([{ sku: 's1', wocDiscountBps: -1 }])).toBeNull();
+    expect(currentWocDiscountBps([{ sku: 's10', wocDiscountBps: 9001 }])).toBeNull();
+  });
+
+  it('fails closed when fetched price rows span different policy revisions', () => {
+    expect(
+      currentWocDiscountBps([
+        { sku: 's1', wocDiscountBps: 2000 },
+        { sku: 's10', wocDiscountBps: 5000 },
+      ]),
+    ).toBeNull();
   });
 });

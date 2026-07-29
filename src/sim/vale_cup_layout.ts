@@ -58,8 +58,10 @@ export const GOAL_DEPTH = 2.5; // net pocket depth behind the goal line
 export const GOAL_Z_MIN = PITCH_CENTER.z - GOAL_HALF_W;
 export const GOAL_Z_MAX = PITCH_CENTER.z + GOAL_HALF_W;
 // Crossbar height (matches the rendered goal frame, vale_cup_stadium.ts goalPostH):
-// a ball crossing the line ABOVE this sails over and does not score, which is the
-// accuracy cost of an over-powered charged shot.
+// a ball crossing the line ABOVE this does not score, which is the accuracy cost
+// of an over-powered charged shot. The crossbar and the frame above it are SOLID,
+// so an over-the-bar shot banks back into play off the frame rather than escaping
+// through the open mouth (see reflectOffGoalFrame in vale_cup_ball.ts).
 export const GOAL_HEIGHT = 2.5;
 
 // Goal lines (the scoring planes): west goal belongs to team A, east to team B.
@@ -81,9 +83,11 @@ export interface VcWallSegment {
 }
 
 // Every board line the ball banks off, in world coordinates. The goal mouths
-// are open (no segment) so shots roll into the net pockets; the pockets' own
-// back/side walls stop the ball dead (the module treats pocket hits as goal
-// settle, not a bank).
+// are open BELOW the crossbar (no segment) so shots roll into the net pockets;
+// the pockets' own back/side walls stop the ball dead (the module treats pocket
+// hits as goal settle, not a bank). ABOVE the crossbar the goal frame is solid:
+// an over-the-bar shot banks back into play off it (reflectOffGoalFrame in
+// vale_cup_ball.ts), so a ballooned shot never escapes the arena.
 export const PITCH_WALLS: VcWallSegment[] = [
   // north board (inward normal points south, -z)
   { x1: PITCH.xMin, z1: PITCH.zMax, x2: PITCH.xMax, z2: PITCH.zMax, nx: 0, nz: -1 },
@@ -178,7 +182,7 @@ export function isAtSowfield(x: number, z: number): boolean {
  * Inside the full stadium footprint including the flatten's falloff apron. This
  * is the same rectangle that keeps procedural trees/rocks off the shell
  * (world.ts generateDecorations), reused to keep wild grass tufts, ground
- * plants, and ambient critters off the pitch and its immediate surrounds so the
+ * plants and other ambient dressing off the pitch and its immediate surrounds so the
  * Sowfield reads as a proper mown football ground.
  */
 export function isInSowfieldShell(x: number, z: number): boolean {
@@ -262,9 +266,8 @@ export function valeCupColliders(): Collider[] {
   const out: Collider[] = [];
   const midZ = (PITCH.zMin + PITCH.zMax) / 2;
   const midX = (PITCH.xMin + PITCH.xMax) / 2;
-  // The whole site sits on the flattened plateau, so the camera-occlusion tops
-  // are plain constants (no seed needed): low boards never pull the chase cam
-  // in (camGhost) but the renderer can still fade one crossing the eye line.
+  // The whole site sits on the flattened plateau, so the visual tops used by
+  // sight checks and renderer fades are plain constants (no seed needed).
   const boardTop = SOWFIELD_FLAT.height + BOARD_H;
   const postTop = SOWFIELD_FLAT.height + 2.4;
 
@@ -279,7 +282,6 @@ export function valeCupColliders(): Collider[] {
     hd: BOARD_T,
     rot: 0,
     cameraTopY: boardTop,
-    camGhost: true,
   });
   out.push({
     type: 'obb',
@@ -289,7 +291,6 @@ export function valeCupColliders(): Collider[] {
     hd: BOARD_T,
     rot: 0,
     cameraTopY: boardTop,
-    camGhost: true,
   });
   // south board, full length
   out.push({
@@ -300,7 +301,6 @@ export function valeCupColliders(): Collider[] {
     hd: BOARD_T,
     rot: 0,
     cameraTopY: boardTop,
-    camGhost: true,
   });
   // west + east boards flanking the goal mouths
   for (const [gx] of [[PITCH.xMin], [PITCH.xMax]] as const) {
@@ -314,7 +314,6 @@ export function valeCupColliders(): Collider[] {
       hd: southHd,
       rot: 0,
       cameraTopY: boardTop,
-      camGhost: true,
     });
     out.push({
       type: 'obb',
@@ -324,7 +323,6 @@ export function valeCupColliders(): Collider[] {
       hd: northHd,
       rot: 0,
       cameraTopY: boardTop,
-      camGhost: true,
     });
   }
   // goal posts (circles at the mouth corners) + net pockets (back/side walls)
@@ -337,7 +335,6 @@ export function valeCupColliders(): Collider[] {
       z: GOAL_Z_MIN,
       r: 0.35,
       cameraTopY: postTop,
-      camGhost: true,
     });
     out.push({
       type: 'circle',
@@ -345,7 +342,6 @@ export function valeCupColliders(): Collider[] {
       z: GOAL_Z_MAX,
       r: 0.35,
       cameraTopY: postTop,
-      camGhost: true,
     });
     // pocket back wall
     out.push({
@@ -356,7 +352,6 @@ export function valeCupColliders(): Collider[] {
       hd: GOAL_HALF_W + 0.6,
       rot: 0,
       cameraTopY: boardTop,
-      camGhost: true,
     });
     // pocket side rails
     for (const gz of [GOAL_Z_MIN, GOAL_Z_MAX]) {
@@ -368,7 +363,6 @@ export function valeCupColliders(): Collider[] {
         hd: BOARD_T * 0.6,
         rot: 0,
         cameraTopY: boardTop,
-        camGhost: true,
       });
     }
   }
@@ -391,7 +385,6 @@ export function valeCupColliders(): Collider[] {
       hd: 0.3,
       rot: 0,
       cameraTopY: backTop,
-      camGhost: true,
     });
   }
   // the Copper Pail plinth
@@ -401,7 +394,6 @@ export function valeCupColliders(): Collider[] {
     z: PLINTH_POS.z,
     r: 0.9,
     cameraTopY: SOWFIELD_FLAT.height + 1.8,
-    camGhost: true,
   });
   return out;
 }

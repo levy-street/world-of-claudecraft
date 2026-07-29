@@ -14,21 +14,27 @@ import {
   updateCasting,
 } from '../src/sim/combat/casting_lifecycle';
 import { handleDeath } from '../src/sim/combat/damage';
-import { BUILTIN_WORLD, MOBS } from '../src/sim/data';
+import { GATHER_NODES } from '../src/sim/content/gather_nodes';
+import { BUILTIN_WORLD, LAKE, MOBS } from '../src/sim/data';
 import { clearNythraxisWardChannelCast } from '../src/sim/encounters/nythraxis';
 import { createMob } from '../src/sim/entity';
+import { ACTIONS, applyAction } from '../src/sim/obs';
+import { startFishing } from '../src/sim/professions/fishing';
 import { advancePendingProjectiles } from '../src/sim/projectile_travel';
 import { Sim } from '../src/sim/sim';
 import { readyArenaFighter } from '../src/sim/social/arena';
 import { fiestaDownEntity } from '../src/sim/social/fiesta';
 import { releasePlayerSpirit, resurrectAtSpiritHealer } from '../src/sim/spirit';
-import type { Entity, PlayerClass, WorldContent } from '../src/sim/types';
+import type { Aura, Entity, PlayerClass, WorldContent } from '../src/sim/types';
 import {
   CAST_PUSHBACK_SEC,
   CAST_QUEUE_WINDOW_SEC,
   CHANNEL_PUSHBACK_FRACTION,
   FISHING_CAST_ID,
+  GATHER_CAST_ID,
 } from '../src/sim/types';
+import { terrainHeight } from '../src/sim/world';
+import { placePlayerInOpenField } from './helpers/open_field';
 
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
@@ -52,6 +58,7 @@ function makeSim(cls: PlayerClass, level: number): { sim: AnySim; p: AnyEntity; 
     world: CAST_TEST_WORLD,
   }) as AnySim;
   sim.setPlayerLevel(level);
+  placePlayerInOpenField(sim);
   const p = sim.player as AnyEntity;
   const meta = sim.players.get(p.id);
   p.resource = p.maxResource;
@@ -80,6 +87,24 @@ function drainCast(sim: AnySim, p: AnyEntity, meta: any): number {
   let n = 0;
   while (p.castingAbility && n++ < 1000) updateCasting(sim.ctx, p, meta);
   return n;
+}
+
+// A hostile mob that is currently ATTACKING the player (Entity.aggroTargetId),
+// but never selected as the player's target: the fixture auto-acquire-on-cast
+// (issue #2787) is meant to find. Never calls sim.targetEntity.
+function spawnAttacker(sim: AnySim, p: AnyEntity, dz: number, level = 1): AnyEntity {
+  const mob = createMob(sim.nextId++, MOBS.forest_wolf, level, {
+    x: p.pos.x,
+    y: p.pos.y,
+    z: p.pos.z + dz,
+  }) as AnyEntity;
+  mob.maxHp = 5000;
+  mob.hp = 5000;
+  mob.hostile = true;
+  mob.aiState = 'chase';
+  mob.aggroTargetId = p.id;
+  sim.addEntity(mob);
+  return mob;
 }
 
 describe('casting_lifecycle: timed cast start -> progress -> finish', () => {
@@ -125,6 +150,8 @@ describe('casting_lifecycle: timed cast start -> progress -> finish', () => {
     const { sim, p, meta } = makeSim('priest', 12);
     const ally = sim.entities.get(sim.addPlayer('warrior', 'Ally')) as AnyEntity;
     const bystander = sim.entities.get(sim.addPlayer('rogue', 'Bystander')) as AnyEntity;
+    placePlayerInOpenField(sim, ally.id, { x: 2 });
+    placePlayerInOpenField(sim, bystander.id, { x: 4 });
     ally.hp = Math.max(1, ally.maxHp - 500);
     bystander.hp = Math.max(1, bystander.maxHp - 500);
     const allyHp0 = ally.hp;
@@ -143,6 +170,161 @@ describe('casting_lifecycle: timed cast start -> progress -> finish', () => {
     expect(p.castTargetId).toBeNull();
     expect(ally.hp).toBeGreaterThan(allyHp0); // the heal landed on the locked target
     expect(bystander.hp).toBe(bystanderHp0); // the current target got nothing
+  });
+});
+
+describe('casting_lifecycle: Vanish escape stealth blocks a hostile cast (issue #2426)', () => {
+  function vanishAura(sourceId: number): Aura {
+    return {
+      id: 'vanish',
+      name: 'Smokestep',
+      kind: 'stealth',
+      remaining: 10,
+      duration: 10,
+      value: 0.5,
+      sourceId,
+      school: 'physical',
+    };
+  }
+
+  it('refuses to start a hostile cast against a target that just vanished', () => {
+    const { sim, p } = makeSim('mage', 12);
+    const target = spawnTarget(sim, p, 12, 6);
+    const hp0 = target.hp;
+    target.auras.push(vanishAura(target.id));
+    const errors: Array<Record<string, any>> = [];
+    const orig = (sim as any).emit.bind(sim);
+    (sim as any).emit = (e: Record<string, any>) => {
+      errors.push(e);
+      orig(e);
+    };
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.castingAbility).toBeNull(); // never started
+    expect(errors.some((e) => e.type === 'error' && e.text === 'You have no target.')).toBe(true);
+    expect(target.hp).toBe(hp0);
+  });
+
+  it('still starts the cast against a target that has an ordinary (non-escape) stealth aura', () => {
+    // Only Vanish's aura (id 'vanish') carries escape semantics (hasEscapeStealth,
+    // threat.ts); this pins that the new gate is scoped to that aura, not to every
+    // 'stealth'-kind buff.
+    const { sim, p } = makeSim('mage', 12);
+    const target = spawnTarget(sim, p, 12, 6);
+    target.auras.push({
+      id: 'some_other_stealth',
+      name: 'Test Cloak',
+      kind: 'stealth',
+      remaining: 10,
+      duration: 10,
+      value: 0.5,
+      sourceId: target.id,
+      school: 'physical',
+    });
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.castingAbility).toBe('fireball');
+  });
+});
+
+describe('casting_lifecycle: auto-acquire on cast with no target (issue #2787)', () => {
+  it('acquires the nearest ATTACKING mob over a closer idle one', () => {
+    const { sim, p } = makeSim('mage', 12);
+    const idleNear = spawnTarget(sim, p, 1, 4); // idle, closer, never attacking
+    idleNear.aiState = 'idle';
+    const attackerFar = spawnAttacker(sim, p, 12); // farther, but actually attacking
+    sim.targetEntity(null, p.id); // spawnTarget above selected idleNear; clear it
+    expect(p.targetId).toBeNull();
+
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.targetId).toBe(attackerFar.id);
+    expect(p.castingAbility).toBe('fireball'); // the cast actually started
+    expect(p.castTargetId).toBe(attackerFar.id);
+  });
+
+  it('among several attackers, picks the nearest one', () => {
+    const { sim, p } = makeSim('mage', 12);
+    const near = spawnAttacker(sim, p, 6);
+    const mid = spawnAttacker(sim, p, 14);
+    const far = spawnAttacker(sim, p, 22);
+    expect(p.targetId).toBeNull();
+
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.targetId).toBe(near.id);
+    void mid;
+    void far;
+  });
+
+  it('never overrides an existing target, even one nearer than the attacker', () => {
+    const { sim, p } = makeSim('mage', 12);
+    const selected = spawnTarget(sim, p, 1, 15); // explicitly targeted, farther away
+    const attacker = spawnAttacker(sim, p, 6); // closer, actively attacking, but not selected
+    expect(p.targetId).toBe(selected.id);
+
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.targetId).toBe(selected.id); // unchanged
+    expect(p.castTargetId).toBe(selected.id);
+    void attacker;
+  });
+
+  it('still errors "You have no target." when no mob is attacking the player', () => {
+    const { sim, p } = makeSim('mage', 12);
+    spawnTarget(sim, p); // an idle mob exists, but is never targeted here
+    sim.targetEntity(null, p.id);
+    const errors: Array<Record<string, any>> = [];
+    const orig = (sim as any).emit.bind(sim);
+    (sim as any).emit = (e: Record<string, any>) => {
+      errors.push(e);
+      orig(e);
+    };
+
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.targetId).toBeNull();
+    expect(p.castingAbility).toBeNull();
+    expect(errors.some((e) => e.type === 'error' && e.text === 'You have no target.')).toBe(true);
+  });
+
+  it('also auto-acquires for a dual-purpose (targetType "any") ability', () => {
+    const { sim, p } = makeSim('paladin', 12);
+    sim.setSpec('holy'); // Holy Shock is the Holy spec's signature ability
+    const attacker = spawnAttacker(sim, p, 8);
+    expect(p.targetId).toBeNull();
+
+    castAbility(sim.ctx, 'holy_shock', p.id);
+    expect(p.targetId).toBe(attacker.id);
+    expect(p.castingAbility).toBeNull(); // holy_shock is instant (castTime 0)
+  });
+
+  it('flows the auto-acquired target through a TIMED cast to completion (applyAbility)', () => {
+    const { sim, p, meta } = makeSim('mage', 12);
+    const attacker = spawnAttacker(sim, p, 10);
+    const hp0 = attacker.hp;
+    sim.rng.chance = () => true; // guarantee the hit lands
+
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.castTargetId).toBe(attacker.id);
+    drainCast(sim, p, meta);
+    expect(p.castingAbility).toBeNull();
+    for (let i = 0; i < 200 && sim.ctx.pendingProjectiles.length > 0; i++)
+      advancePendingProjectiles(sim.ctx);
+    expect(attacker.hp).toBeLessThan(hp0); // resolved against the auto-acquired mob
+  });
+
+  it('behaves identically through the headless RL action path (applyAction/ability_N)', () => {
+    // Offline/server path: a direct castAbility call.
+    const direct = makeSim('mage', 12);
+    const directAttacker = spawnAttacker(direct.sim, direct.p, 10);
+    castAbility(direct.sim.ctx, 'fireball', direct.p.id);
+
+    // Headless RL path: the exact same castAbilityBySlot call the RL env's
+    // applyAction dispatches for an 'ability_N' action (src/sim/obs.ts).
+    const headless = makeSim('mage', 12);
+    const headlessAttacker = spawnAttacker(headless.sim, headless.p, 10);
+    const slot = headless.meta.known.findIndex((k: any) => k.def.id === 'fireball');
+    expect(slot).toBeGreaterThanOrEqual(0);
+    applyAction(headless.sim, ACTIONS.indexOf(`ability_${slot + 1}` as (typeof ACTIONS)[number]));
+
+    expect(headless.p.targetId).toBe(headlessAttacker.id);
+    expect(headless.p.castingAbility).toBe(direct.p.castingAbility);
+    expect(direct.p.targetId).toBe(directAttacker.id);
   });
 });
 
@@ -389,13 +571,13 @@ describe('casting_lifecycle: spell queue (#1360)', () => {
     expect(p.queuedCastAim).toBeNull();
     // Flamestrike is a real 2s cast now (fire-spec redesign, instant only under Hot
     // Streak): once the queued cast fires it becomes the active cast, carrying the
-    // queued aim point through. Draining it lands the blast and arms its cooldown.
+    // queued aim point through. Draining it lands the blast without a cooldown.
     expect(p.castingAbility).toBe('flamestrike');
     // The queued aim point carried through (the cast resolves a y ground height).
     expect(p.castAim?.x).toBe(aim.x);
     expect(p.castAim?.z).toBe(aim.z);
     while (p.castingAbility) sim.tick();
-    expect(p.cooldowns.has('flamestrike')).toBe(true);
+    expect(p.cooldowns.has('flamestrike')).toBe(false);
   });
 
   it('holds a queued cast that would complete before the arming GCD clears, and fires it once the GCD does', () => {
@@ -515,6 +697,85 @@ describe('casting_lifecycle: force-stop clears drop the queued slot', () => {
     clearNythraxisWardChannelCast(p);
     expect(p.queuedCastAbility).toBeNull();
     expect(p.queuedCastAim).toBeNull();
+  });
+});
+
+describe('casting_lifecycle: session starts clear the queued slot', () => {
+  // The one load path that can survive into a gather/fishing session is the
+  // GCD-held slot from a spell completed just before it (fireQueuedCast holds
+  // the slot while the arming GCD runs). The session end paths never call
+  // fireQueuedCast, so without the start-clear the retry arm fires the stale
+  // press unprompted one idle tick after the session ends.
+  function armHeldQueuedPress(sim: AnySim, p: AnyEntity) {
+    p.spellHaste = 3;
+    castAbility(sim.ctx, 'flash_heal', p.id);
+    while (p.castRemaining > CAST_QUEUE_WINDOW_SEC) sim.tick();
+    castAbility(sim.ctx, 'flash_heal', p.id);
+    expect(p.queuedCastAbility).toBe('flash_heal');
+    while (p.castingAbility === 'flash_heal') sim.tick();
+    // Cast done, GCD still running: the press is held, not dropped.
+    expect(p.queuedCastAbility).toBe('flash_heal');
+    expect(p.gcdRemaining).toBeGreaterThan(0);
+  }
+
+  function teleportToLakeShore(sim: AnySim, p: AnyEntity) {
+    const pz = LAKE.z - LAKE.radius - 2;
+    p.pos.x = LAKE.x;
+    p.pos.z = pz;
+    p.pos.y = terrainHeight(LAKE.x, pz, sim.cfg.seed);
+    p.prevPos = { ...p.pos };
+    p.facing = Math.atan2(0, LAKE.z - pz);
+  }
+
+  it('startFishing drops a held queued press', () => {
+    const { sim, p, meta } = makeSim('priest', 40);
+    armHeldQueuedPress(sim, p);
+    teleportToLakeShore(sim, p);
+    sim.addItem('simple_fishing_pole', 1);
+    startFishing(sim.ctx, p, meta);
+    expect(p.castingAbility).toBe(FISHING_CAST_ID);
+    expect(p.queuedCastAbility).toBeNull();
+    expect(p.queuedCastAim).toBeNull();
+  });
+
+  it('harvestNode drops a held queued press', () => {
+    const { sim, p } = makeSim('priest', 40);
+    armHeldQueuedPress(sim, p);
+    const node = GATHER_NODES[0];
+    sim.addItem('copper_mining_pick', 1);
+    p.pos.x = node.pos.x;
+    p.pos.z = node.pos.z;
+    p.pos.y = terrainHeight(node.pos.x, node.pos.z, sim.cfg.seed);
+    p.prevPos = { ...p.pos };
+    expect(sim.harvestNode(node.id, undefined, p.id)).toBe(true);
+    expect(p.castingAbility).toBe(GATHER_CAST_ID);
+    expect(p.queuedCastAbility).toBeNull();
+    expect(p.queuedCastAim).toBeNull();
+  });
+
+  it('end to end: no spell fires unprompted after a fishing session ends', () => {
+    const { sim, p, meta } = makeSim('priest', 40);
+    armHeldQueuedPress(sim, p);
+    teleportToLakeShore(sim, p);
+    sim.addItem('simple_fishing_pole', 1);
+    startFishing(sim.ctx, p, meta);
+    expect(p.castingAbility).toBe(FISHING_CAST_ID);
+    // Drive the session to its natural got-away end off the hidden deadlines.
+    sim.tickCount = p.fishBiteAtTick;
+    updateCasting(sim.ctx, p, meta);
+    expect(p.fishReelDeadlineTick).toBeGreaterThan(0);
+    sim.tickCount = p.fishReelDeadlineTick + 1;
+    updateCasting(sim.ctx, p, meta);
+    expect(p.castingAbility).toBeNull();
+    // Let the GCD fully clear and idle ticks run: nothing may fire. Without
+    // the start-clear, the held flash_heal fires here unprompted the moment
+    // the GCD clears. Checked per tick (sim.tick flushes the event list, so
+    // an event scan after the loop would miss the misfire).
+    for (let i = 0; i < 30; i++) {
+      sim.tick();
+      expect(p.castingAbility, `unprompted cast on idle tick ${i}`).toBeNull();
+    }
+    expect(p.queuedCastAbility).toBeNull();
   });
 });
 

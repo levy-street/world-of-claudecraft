@@ -7,6 +7,102 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: '旗幟在手',
+    desc: '在荊谷原野奪取一面旗幟。',
+  },
+  pvp_bg_first_win: {
+    name: '荊谷凱旋',
+    desc: '贏得一場荊谷原野戰場。',
+  },
+  pvp_bg_wins_25: {
+    name: '荊谷原野守護者',
+    desc: '贏得25場荊谷原野戰場。',
+    title: '旗手',
+  },
+  pvp_bg_captures_100: {
+    name: '百面旗幟',
+    desc: '在荊谷原野生涯累計奪旗100次。',
+  },
+  dgn_rift: {
+    name: '裂隙行者',
+    desc: '擊敗裂隙的樓層首領，清除該裂隙。',
+  },
+  dgn_rift_s_rank: {
+    name: '裂隙至尊',
+    desc: '清除一個S級裂隙，裂隙傳送門所能生成的最高分級。',
+  },
+  pvp_honor_sergeant: {
+    name: '中士',
+    desc: '生涯累計獲得10,000點榮譽。花費榮譽不會讓你失去此階級。',
+    title: '中士',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: '騎士中尉',
+    desc: '生涯累計獲得40,000點榮譽，象徵你已歷經一季真正的戰爭。',
+    title: '騎士中尉',
+  },
+  pvp_honor_field_marshal: {
+    name: '元帥',
+    desc: '生涯累計獲得150,000點榮譽。在任何王國都極為罕見，而它本該如此。',
+    title: '元帥',
+  },
+  chr_drakemaw_broodlord: {
+    name: '碎巢者',
+    desc: '在龍喉巢主的卵群之間將牠擊殺，撐過牠的怒吼、順劈斬與烈焰。',
+  },
+  chr_maw_matriarch: {
+    name: '長空歸寂',
+    desc: '在龍喉上方的火山口棲地中，擊殺辛卓蕾絲，龍喉之母。',
+  },
+  chr_frostveil_gatherer: {
+    name: '梯田收穫',
+    desc: '在Frostveil採集一處礦脈、一片木料和一塊草藥地。',
+  },
+  chr_frostveil_first_cast: {
+    name: '山湖初冰',
+    desc: '在Frostveil水域釣上一條魚。',
+  },
+  chr_amberfall_gatherer: {
+    name: 'Amberfall的收穫',
+    desc: '在Amberfall採集一處礦脈、一片木料和一塊草藥地。',
+  },
+  chr_amberfall_first_cast: {
+    name: '大沼澤之獲',
+    desc: '在Amberfall水域釣上一條魚。',
+  },
+  chr_nightbloom_gatherer: {
+    name: '夢中收穫',
+    desc: '在Nightbloom採集一處礦脈、一片木料和一塊草藥地。',
+  },
+  chr_nightbloom_first_cast: {
+    name: '月井漣漪',
+    desc: '在Nightbloom水域釣上一條魚。',
+  },
+  chr_wraithwood_gatherer: {
+    name: '樹冠下的收穫',
+    desc: '在Wraithwood採集一處礦脈、一片木料和一塊草藥地。',
+  },
+  chr_wraithwood_first_cast: {
+    name: '鏡灣一投',
+    desc: '在Wraithwood水域釣上一條魚。',
+  },
+  chr_palmreach_gatherer: {
+    name: '棕櫚灘收穫',
+    desc: '在Palmreach採集一處礦脈、一片木料和一塊草藥地。',
+  },
+  chr_palmreach_first_cast: {
+    name: '藍寶石潟湖垂釣',
+    desc: '在Palmreach水域釣上一條魚。',
+  },
+  chr_evergarden_gatherer: {
+    name: '花壇饋贈',
+    desc: '在Evergarden採集一處礦脈、一片木料和一塊草藥地。',
+  },
+  chr_evergarden_first_cast: {
+    name: '花瓣池一投',
+    desc: '在Evergarden水域釣上一條魚。',
+  },
   pvp_card_duel_first_win: {
     name: '我的地盤我的規矩',
     desc: '在牌局大師處贏得一場紙牌對決。',
@@ -36,7 +132,10 @@ export const table: DeedLocaleTable = {
   prog_mining_100: { name: '血中礦脈', desc: '採礦熟練度達到100。' },
   prog_logging_100: { name: '心材伐手', desc: '伐木熟練度達到100。' },
   prog_herbalism_100: { name: '百草宗師', desc: '草藥學熟練度達到100。' },
-  prog_master_gatherer: { name: '採集大師', desc: '採礦、伐木與草藥學的熟練度皆達到100。' },
+  prog_master_gatherer: {
+    name: '採集大師',
+    desc: '採礦、伐木、草藥學與釣魚中，任意三項熟練度達到100。',
+  },
   prog_first_craft: { name: '親手打造', desc: '完成你的第一次成功製作。' },
   prog_craft_specialist: { name: '不傳之秘', desc: '任一工藝技能達到75，並解鎖其專精特長。' },
   prog_around_the_ring: { name: '環座巡禮', desc: '五種不同工藝的技能各達到25。' },
@@ -258,7 +357,10 @@ export const table: DeedLocaleTable = {
   col_true_colors: { name: '本色登場', desc: '穿上職業預設以外的任一外觀上場。' },
   col_all_slots: { name: '十一分體面', desc: '同時在全部十一個裝備欄位裝上物品。' },
   col_quartermaster_buyout: { name: '老主顧', desc: '發現軍需官維克斯所販售的全部十件貨品。' },
-  col_glimmerfin: { name: '一線微光', desc: '釣起一條微光鰭錦鯉。' },
+  col_glimmerfin: {
+    name: '一線微光',
+    desc: '釣起一條日輝錦鯉。',
+  },
   col_full_creel: { name: '滿簍而歸', desc: '發現溪谷、沼澤與高地水域的全部六種常見漁獲。' },
   col_junk_drawer: { name: '雜物抽屜', desc: '發現 10 種不同的粗糙品質物品。' },
   pvp_arena_first_match: { name: '靴中之沙', desc: '在灰燼競技場打一場積分賽，任一組別皆可。' },
@@ -336,7 +438,15 @@ export const table: DeedLocaleTable = {
   exp_peaks_wayfarer: { name: '高地遠行者', desc: '造訪荊峰高地全部十處具名地點。' },
   exp_world_traveler: { name: '行遍天下', desc: '贏得全部三個區域的遠行者功績。', title: '遠行者' },
   exp_something_shiny: { name: '閃亮的小東西', desc: '從地上撿起一件閃閃發亮的物品。' },
-  exp_first_ore: { name: '開鑿大地', desc: '採集你的第一處礦石採集點。' },
+  prog_guildsworn: {
+    name: '工藝誓者',
+    desc: '調諧至一對命途，並在其兩門行業中正式踏上匠途。',
+    title: '工藝誓者',
+  },
+  exp_first_ore: {
+    name: '一鎬見石',
+    desc: '採集你的第一處礦石採集點。',
+  },
   exp_first_timber: { name: '樹倒啦！', desc: '採集你的第一處木材採集點。' },
   exp_first_herb: { name: '綠手指', desc: '採集你的第一處草藥採集點。' },
   feat_era_cap: { name: '第一紀元之子', desc: '於第一紀元尚為當世紀元時達到 20 級。' },
@@ -379,4 +489,191 @@ export const table: DeedLocaleTable = {
     desc: '勇闖廢棄墓穴，從其守衛手中奪回墓穴鑰石的上下兩半與古老日記。',
   },
   chr_marsh_first_cast: { name: '蘆葦間有鰻', desc: '在泥沼濕地的水域釣起一條魚。' },
+  prog_masterwright: {
+    name: '傑作匠師',
+    desc: '完成你的第一件傑作，一件精絕到令整個區域都傳為美談的作品。',
+    title: '傑作匠師',
+  },
+  prog_fishing_100: {
+    name: '老釣手',
+    desc: '釣魚熟練度達到100。',
+  },
+  prog_master_angler: {
+    name: '釣藝宗師',
+    desc: '釣魚熟練度達到200，垂釣技藝的巔峰。',
+    title: '釣藝宗師',
+  },
+  prog_engineering_50: {
+    name: '齒輪與棘輪',
+    desc: '工程學技能達到50。',
+  },
+  prog_alchemy_50: {
+    name: '奇異煉藥',
+    desc: '鍊金術技能達到50。',
+  },
+  prog_cooking_50: {
+    name: '老道廚手',
+    desc: '烹飪技能達到50。',
+  },
+  prog_leatherworking_50: {
+    name: '鞣皮手藝',
+    desc: '製皮技能達到50。',
+  },
+  prog_tailoring_50: {
+    name: '一針見縫',
+    desc: '裁縫技能達到50。',
+  },
+  prog_enchanting_50: {
+    name: '秘法微光',
+    desc: '附魔技能達到50。',
+  },
+  prog_weaponcrafting_50: {
+    name: '鋒刃與淬火',
+    desc: '武器鍛造技能達到50。',
+  },
+  prog_armorcrafting_50: {
+    name: '鐵鎚與鋼板',
+    desc: '護甲鍛造技能達到50。',
+  },
+  prog_grandmaster_engineering: {
+    name: '工程學大宗師',
+    desc: '工程學技能達到125，此技藝的頂點。',
+    title: '工程學大宗師',
+  },
+  prog_grandmaster_alchemy: {
+    name: '鍊金術大宗師',
+    desc: '鍊金術技能達到125，此技藝的頂點。',
+    title: '鍊金術大宗師',
+  },
+  prog_grandmaster_cooking: {
+    name: '烹飪大宗師',
+    desc: '烹飪技能達到125，此技藝的頂點。',
+    title: '烹飪大宗師',
+  },
+  prog_grandmaster_leatherworking: {
+    name: '製皮大宗師',
+    desc: '製皮技能達到125，此技藝的頂點。',
+    title: '製皮大宗師',
+  },
+  prog_grandmaster_tailoring: {
+    name: '裁縫大宗師',
+    desc: '裁縫技能達到125，此技藝的頂點。',
+    title: '裁縫大宗師',
+  },
+  prog_grandmaster_enchanting: {
+    name: '附魔大宗師',
+    desc: '附魔技能達到125，此技藝的頂點。',
+    title: '附魔大宗師',
+  },
+  prog_grandmaster_weaponcrafting: {
+    name: '武器鍛造大宗師',
+    desc: '武器鍛造技能達到125，此技藝的頂點。',
+    title: '武器鍛造大宗師',
+  },
+  prog_grandmaster_armorcrafting: {
+    name: '護甲鍛造大宗師',
+    desc: '護甲鍛造技能達到125，此技藝的頂點。',
+    title: '護甲鍛造大宗師',
+  },
+  col_pristine_vein: {
+    name: '純淨礦脈',
+    desc: '鑿開一條純淨礦脈，讓整個區域都聽聞此事。',
+  },
+  col_ancient_heartwood: {
+    name: '遠古心木',
+    desc: '從一棵伐倒的大樹中取出一段遠古心木。',
+  },
+  col_moonlit_bloom: {
+    name: '月光之花',
+    desc: '在月光之花恰好綻放之際將其採下。',
+  },
+  col_perfect_specimen: {
+    name: '完美標本',
+    desc: '從獵獲的野獸身上取下一件完美標本，毫無割痕或瑕疵。',
+  },
+  soc_first_salvage: {
+    name: '物盡其用',
+    desc: '將一件裝備拆解還原為製作原料。',
+  },
+  soc_salvage_50: {
+    name: '廢料場行家',
+    desc: '將50件裝備拆解還原為製作原料。',
+  },
+  dgn_wildheart_basin: { name: '盆地反擊', desc: '在荒野之心盆地擊敗盆地之聲祖爾加。' },
+  dgn_wildheart_basin_heroic: {
+    name: '英雄：荒野之心盆地',
+    desc: '以英雄難度在荒野之心盆地擊敗盆地之聲祖爾加。',
+  },
+  chr_peaks_gatherer: {
+    name: '高地的收成',
+    desc: '在荊峰高地採集一處礦脈、一處林木與一叢草藥。',
+  },
+  chr_marsh_rares_ii: {
+    name: '暴食者，終得清算',
+    desc: '斬殺暴食者蛆顎，泥沼濕地第四個有名有姓的惡煞，首次清算時被漏記在冊。',
+  },
+  chr_peaks_rares_ii: {
+    name: '峭壁上新刻的名字',
+    desc: '斬殺老岩顎與碎片領主卡茲克斯，荊峰高地又兩個有名有姓的惡煞，首次清算時被漏記在冊。',
+  },
+  chr_gleamstag: {
+    name: '從不先出手的傳說',
+    desc: '斬殺微光雄鹿，一頭稀有而避世的精英，只有被逼入絕境才會出手。',
+  },
+  chr_hollow_rares: {
+    name: '鹿群不忘',
+    desc: '斬殺老髓殼與鹿群之首金輝角，帷幕幽谷的兩個遊蕩稀有首領。',
+  },
+  chr_willowfen_gatherer: {
+    name: '沼地的餽贈',
+    desc: '在柳澤沼地採集一處礦脈、一處林木與一叢草藥。',
+  },
+  chr_willowfen_first_cast: {
+    name: '睡蓮澤的漣漪',
+    desc: '在柳澤沼地的水域釣起一條魚。',
+  },
+  chr_galecrest_gatherer: {
+    name: '海岬上的收穫',
+    desc: '在疾風崖採集一處礦脈、一處林木與一叢草藥。',
+  },
+  chr_galecrest_first_cast: {
+    name: '鏡湖垂綸',
+    desc: '在疾風崖的水域釣起一條魚。',
+  },
+  chr_farshore_gatherer: {
+    name: '島上的補給',
+    desc: '在遠岸採集一處礦脈、一處林木與一叢草藥。',
+  },
+  chr_farshore_first_cast: {
+    name: '鷗鳥所知',
+    desc: '在遠岸的水域釣起一條魚。',
+  },
+  prog_engineering_rare: {
+    name: '精密工程',
+    desc: '在工程學中製作你的第一件稀有品質物品。',
+  },
+  prog_alchemy_rare: {
+    name: '稀世佳釀',
+    desc: '在鍊金術中製作你的第一件稀有品質物品。',
+  },
+  prog_cooking_rare: {
+    name: '令人難忘的佳餚',
+    desc: '在烹飪中製作你的第一件稀有品質物品。',
+  },
+  prog_leatherworking_rare: {
+    name: '精細鞣製',
+    desc: '在製皮中製作你的第一件稀有品質物品。',
+  },
+  prog_tailoring_rare: {
+    name: '大師的針腳',
+    desc: '在裁縫中製作你的第一件稀有品質物品。',
+  },
+  prog_weaponcrafting_rare: {
+    name: '淬鍊至光亮',
+    desc: '在武器鍛造中製作你的第一件稀有品質物品。',
+  },
+  prog_armorcrafting_rare: {
+    name: '鍛造至完美',
+    desc: '在護甲鍛造中製作你的第一件稀有品質物品。',
+  },
 };

@@ -1,12 +1,14 @@
 // Pure, host-agnostic celebration plan for crafting's earned moments
-// (Professions 2.0 Phase 6): the personal masterwork proc and craft tier-up
+// (Professions 2.0): the personal masterwork proc and craft tier-up
 // crossings. The buildDeedUnlockPlan shape (deeds_view.ts): the HUD arm stays
 // a thin consumer and the batching rules are unit-pinned here. DOM-free and
 // i18n-free so tests/craft_celebration_view.test.ts drives it directly.
 //
-// Cue discipline (Phase 4 grant-hub double-log trap): the grant hubs already
-// emit the loot line + cue and the craftResult arm already logs the crafted
-// toast, so this plan never re-logs a grant. It allows AT MOST ONE celebration
+// Cue discipline (grant-hub double-log trap): the craftResult arm already
+// logs the crafted line and plays the craft cue, and since #2430 that line is
+// the ONLY line for the craft grant (the grant hub's own "You receive:" line
+// and ding stand down for it), so this plan never re-logs a grant and never
+// re-cues one. It allows AT MOST ONE celebration
 // sound per drain, shared across masterwork and tier-up. `reducedMotion` gates
 // the MOTION flag only, never information: log lines, the banner text, and the
 // sound survive it untouched.

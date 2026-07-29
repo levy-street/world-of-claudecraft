@@ -7,6 +7,102 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: 'Cờ Trong Tay',
+    desc: 'Chiếm một lá cờ tại Cánh Đồng Trũng Gai.',
+  },
+  pvp_bg_first_win: {
+    name: 'Trũng Gai Vững Bền',
+    desc: 'Thắng một trận Cánh Đồng Trũng Gai.',
+  },
+  pvp_bg_wins_25: {
+    name: 'Người Trấn Giữ Trũng Gai',
+    desc: 'Thắng 25 trận Cánh Đồng Trũng Gai.',
+    title: 'Người Cầm Cờ',
+  },
+  pvp_bg_captures_100: {
+    name: 'Một Trăm Lá Cờ',
+    desc: 'Chiếm 100 lá cờ tại Cánh Đồng Trũng Gai trong suốt sự nghiệp của bạn.',
+  },
+  dgn_rift: {
+    name: 'Người Đi Xuyên Rạn Nứt',
+    desc: 'Dọn sạch một Rạn Nứt bằng cách đánh bại trùm của tầng đó.',
+  },
+  dgn_rift_s_rank: {
+    name: 'Quân Vương Rạn Nứt',
+    desc: 'Dọn sạch một Rạn Nứt hạng S, bậc khó nhất mà một cổng Rạn Nứt có thể sinh ra.',
+  },
+  pvp_honor_sergeant: {
+    name: 'Trung Sĩ',
+    desc: 'Kiếm được 10.000 danh dự trong suốt cuộc đời nhân vật. Tiêu nó đi không bao giờ khiến bạn mất cấp bậc.',
+    title: 'Trung Sĩ',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: 'Hiệp Sĩ Trung Úy',
+    desc: 'Kiếm được 40.000 danh dự trong suốt cuộc đời nhân vật, cả một mùa chiến tranh thực sự phía sau bạn.',
+    title: 'Hiệp Sĩ Trung Úy',
+  },
+  pvp_honor_field_marshal: {
+    name: 'Thống Chế',
+    desc: 'Kiếm được 150.000 danh dự trong suốt cuộc đời nhân vật. Hiếm có trên bất kỳ vương quốc nào, và nó nên như vậy.',
+    title: 'Thống Chế',
+  },
+  chr_drakemaw_broodlord: {
+    name: 'Kẻ Phá Vỡ Ổ Trứng',
+    desc: 'Hạ gục một Lãnh Chúa Bầy Drakemaw giữa bầy trứng của nó, vượt qua tiếng gầm, đòn chém bổ, và ngọn lửa.',
+  },
+  chr_maw_matriarch: {
+    name: 'Bầu Trời Lặng Yên',
+    desc: 'Hạ gục Cindraleth Mẫu Chúa Hàm trong tổ miệng núi lửa của nó, phía trên Drakemaw.',
+  },
+  chr_frostveil_gatherer: {
+    name: 'Thu hoach tren ruong bac thang',
+    desc: 'Thu hoach mot mach quang, mot vung go va mot luong thao moc o Frostveil.',
+  },
+  chr_frostveil_first_cast: {
+    name: 'Lop bang dau tren ho nho',
+    desc: 'Cau mot con ca trong vung nuoc Frostveil.',
+  },
+  chr_amberfall_gatherer: {
+    name: 'Vu thu hoach Amberfall',
+    desc: 'Thu hoach mot mach quang, mot vung go va mot luong thao moc o Amberfall.',
+  },
+  chr_amberfall_first_cast: {
+    name: 'Me ca tu dam lon',
+    desc: 'Cau mot con ca trong vung nuoc Amberfall.',
+  },
+  chr_nightbloom_gatherer: {
+    name: 'Vu thu hoach mong mo',
+    desc: 'Thu hoach mot mach quang, mot vung go va mot luong thao moc o Nightbloom.',
+  },
+  chr_nightbloom_first_cast: {
+    name: 'Gon song tren gieng trang',
+    desc: 'Cau mot con ca trong vung nuoc Nightbloom.',
+  },
+  chr_wraithwood_gatherer: {
+    name: 'Thu hoach duoi tan cay',
+    desc: 'Thu hoach mot mach quang, mot vung go va mot luong thao moc o Wraithwood.',
+  },
+  chr_wraithwood_first_cast: {
+    name: 'Lan cau trong vinh guong',
+    desc: 'Cau mot con ca trong vung nuoc Wraithwood.',
+  },
+  chr_palmreach_gatherer: {
+    name: 'Thu hoach tren bai co',
+    desc: 'Thu hoach mot mach quang, mot vung go va mot luong thao moc o Palmreach.',
+  },
+  chr_palmreach_first_cast: {
+    name: 'Tha cau o dam sapphire',
+    desc: 'Cau mot con ca trong vung nuoc Palmreach.',
+  },
+  chr_evergarden_gatherer: {
+    name: 'Loc cua vuon hoa',
+    desc: 'Thu hoach mot mach quang, mot vung go va mot luong thao moc o Evergarden.',
+  },
+  chr_evergarden_first_cast: {
+    name: 'Lan cau tren ao canh hoa',
+    desc: 'Cau mot con ca trong vung nuoc Evergarden.',
+  },
   pvp_card_duel_first_win: {
     name: 'Luật Của Ta',
     desc: 'Thắng một ván Đấu Bài tại Bậc Thầy Bài.',
@@ -79,7 +175,7 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: 'Bậc Thầy Đồng Cỏ', desc: 'Đạt 100 điểm thành thạo Thảo Dược Học.' },
   prog_master_gatherer: {
     name: 'Bậc Thầy Thu Thập',
-    desc: 'Đạt 100 điểm thành thạo trong Khai Khoáng, Đốn Gỗ, và Thảo Dược Học.',
+    desc: 'Đạt 100 điểm thành thạo trong bất kỳ ba trong số Khai Khoáng, Đốn Gỗ, Thảo Dược Học, và Câu Cá.',
   },
   prog_first_craft: {
     name: 'Làm Bằng Đôi Tay',
@@ -429,7 +525,10 @@ export const table: DeedLocaleTable = {
     name: 'Khách Quen Hạng Nhất',
     desc: 'Khám phá đủ cả mười món hàng của Quân Nhu Trưởng Vex.',
   },
-  col_glimmerfin: { name: 'Tia Hy Vọng Lấp Lánh', desc: 'Câu được một con Cá Koi Vây Lấp Lánh.' },
+  col_glimmerfin: {
+    name: 'Tia Hy Vọng Lấp Lánh',
+    desc: 'Câu được một Cá Koi Ánh Nắng.',
+  },
   col_full_creel: {
     name: 'Giỏ Cá Đầy Ắp',
     desc: 'Khám phá đủ sáu loại cá thường từ vùng nước của Thung Lũng, Đầm Lầy và Cao Nguyên.',
@@ -617,7 +716,10 @@ export const table: DeedLocaleTable = {
     name: 'Thứ Gì Đó Lấp Lánh',
     desc: 'Nhặt một vật thể lấp lánh trên mặt đất.',
   },
-  exp_first_ore: { name: 'Cuốc Vỡ Đất', desc: 'Thu hoạch mạch quặng đầu tiên của bạn.' },
+  exp_first_ore: {
+    name: 'Cuốc Chạm Đá',
+    desc: 'Thu hoạch mạch quặng đầu tiên của bạn.',
+  },
   exp_first_timber: { name: 'Cây Đổ Đấy!', desc: 'Thu hoạch cụm gỗ đầu tiên của bạn.' },
   exp_first_herb: { name: 'Mát Tay', desc: 'Thu hoạch bụi thảo dược đầu tiên của bạn.' },
   feat_era_cap: {
@@ -692,5 +794,200 @@ export const table: DeedLocaleTable = {
   chr_marsh_first_cast: {
     name: 'Lươn Trong Lau Sậy',
     desc: 'Câu một con cá từ vùng nước của Đầm Lầy Bùn Sâu.',
+  },
+  prog_guildsworn: {
+    name: 'Thề Nguyện Thủ Công',
+    desc: 'Gắn kết bản thân với một đôi kiểu mẫu và dấn thân vào các nghề của nó một cách thực sự.',
+    title: 'Thề Nguyện Thủ Công',
+  },
+  prog_masterwright: {
+    name: 'Thợ Đại Tài',
+    desc: 'Chế tạo kiệt tác đầu tiên của bạn, một tác phẩm tinh xảo đến mức cả khu vực đều nghe danh.',
+    title: 'Thợ Đại Tài',
+  },
+  prog_fishing_100: {
+    name: 'Lão Muối',
+    desc: 'Đạt 100 điểm thành thạo Câu Cá.',
+  },
+  prog_master_angler: {
+    name: 'Ngư Sư Thành Thạo',
+    desc: 'Đạt 200 điểm thành thạo Câu Cá, đỉnh cao tuyệt đối của nghệ thuật câu cá.',
+    title: 'Ngư Sư Thành Thạo',
+  },
+  prog_engineering_50: {
+    name: 'Bánh Răng và Lò Xo',
+    desc: 'Đạt 50 điểm kỹ năng Cơ Khí.',
+  },
+  prog_alchemy_50: {
+    name: 'Những Pha Chế Kỳ Lạ',
+    desc: 'Đạt 50 điểm kỹ năng Giả Kim.',
+  },
+  prog_cooking_50: {
+    name: 'Đầu Bếp Có Kinh Nghiệm',
+    desc: 'Đạt 50 điểm kỹ năng Nấu Ăn.',
+  },
+  prog_leatherworking_50: {
+    name: 'Nghề Thợ Thuộc Da',
+    desc: 'Đạt 50 điểm kỹ năng Thuộc Da.',
+  },
+  prog_tailoring_50: {
+    name: 'Đường May Đẹp',
+    desc: 'Đạt 50 điểm kỹ năng May Vá.',
+  },
+  prog_enchanting_50: {
+    name: 'Ánh Huyền Thuật Đầu Tiên',
+    desc: 'Đạt 50 điểm kỹ năng Pháp Khắc.',
+  },
+  prog_weaponcrafting_50: {
+    name: 'Lưỡi và Tôi Luyện',
+    desc: 'Đạt 50 điểm kỹ năng Rèn Vũ Khí.',
+  },
+  prog_armorcrafting_50: {
+    name: 'Búa và Giáp Tấm',
+    desc: 'Đạt 50 điểm kỹ năng Rèn Giáp.',
+  },
+  prog_grandmaster_engineering: {
+    name: 'Đại Sư Cơ Khí',
+    desc: 'Đạt 125 điểm kỹ năng Cơ Khí, đỉnh cao tuyệt đối của nghề.',
+    title: 'Đại Sư Cơ Khí',
+  },
+  prog_grandmaster_alchemy: {
+    name: 'Đại Sư Giả Kim',
+    desc: 'Đạt 125 điểm kỹ năng Giả Kim, đỉnh cao tuyệt đối của nghề.',
+    title: 'Đại Sư Giả Kim',
+  },
+  prog_grandmaster_cooking: {
+    name: 'Đại Sư Nấu Ăn',
+    desc: 'Đạt 125 điểm kỹ năng Nấu Ăn, đỉnh cao tuyệt đối của nghề.',
+    title: 'Đại Sư Nấu Ăn',
+  },
+  prog_grandmaster_leatherworking: {
+    name: 'Đại Sư Thuộc Da',
+    desc: 'Đạt 125 điểm kỹ năng Thuộc Da, đỉnh cao tuyệt đối của nghề.',
+    title: 'Đại Sư Thuộc Da',
+  },
+  prog_grandmaster_tailoring: {
+    name: 'Đại Sư May Vá',
+    desc: 'Đạt 125 điểm kỹ năng May Vá, đỉnh cao tuyệt đối của nghề.',
+    title: 'Đại Sư May Vá',
+  },
+  prog_grandmaster_enchanting: {
+    name: 'Đại Sư Pháp Khắc',
+    desc: 'Đạt 125 điểm kỹ năng Pháp Khắc, đỉnh cao tuyệt đối của nghề.',
+    title: 'Đại Sư Pháp Khắc',
+  },
+  prog_grandmaster_weaponcrafting: {
+    name: 'Đại Sư Rèn Vũ Khí',
+    desc: 'Đạt 125 điểm kỹ năng Rèn Vũ Khí, đỉnh cao tuyệt đối của nghề.',
+    title: 'Đại Sư Rèn Vũ Khí',
+  },
+  prog_grandmaster_armorcrafting: {
+    name: 'Đại Sư Rèn Giáp',
+    desc: 'Đạt 125 điểm kỹ năng Rèn Giáp, đỉnh cao tuyệt đối của nghề.',
+    title: 'Đại Sư Rèn Giáp',
+  },
+  col_pristine_vein: {
+    name: 'Mạch Quặng Nguyên Sơ',
+    desc: 'Phá vỡ một mạch quặng nguyên sơ và để cả khu vực nghe tin về điều đó.',
+  },
+  col_ancient_heartwood: {
+    name: 'Lõi Gỗ Cổ Đại',
+    desc: 'Khai thác một đoạn lõi gỗ cổ đại từ một bãi cây đã đổ xuống.',
+  },
+  col_moonlit_bloom: {
+    name: 'Hoa Nở Dưới Ánh Trăng',
+    desc: 'Thu hái một bông hoa nở dưới ánh trăng đúng vào khoảnh khắc nó bung cánh.',
+  },
+  col_perfect_specimen: {
+    name: 'Mẫu Vật Hoàn Hảo',
+    desc: 'Lấy ra một mẫu vật hoàn hảo từ xác thú vừa thu hoạch, không một vết xước hay tỳ vết.',
+  },
+  soc_first_salvage: {
+    name: 'Không Bỏ Phí Thứ Gì',
+    desc: 'Tháo dỡ một món trang bị thành nguyên liệu thô.',
+  },
+  soc_salvage_50: {
+    name: 'Bãi Phế Liệu',
+    desc: 'Tháo dỡ 50 món trang bị thành nguyên liệu thô.',
+  },
+  dgn_wildheart_basin: {
+    name: 'Lòng Chảo Phản Đòn',
+    desc: 'Đánh bại Zulgar, Tiếng Nói Của Vùng Trũng, trong Lòng Chảo Trái Tim Hoang Dã.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Anh Hùng: Lòng Chảo Trái Tim Hoang Dã',
+    desc: 'Đánh bại Zulgar, Tiếng Nói Của Vùng Trũng, trong Lòng Chảo Trái Tim Hoang Dã ở độ khó Anh Hùng.',
+  },
+  chr_peaks_gatherer: {
+    name: 'Mùa Gặt Chốn Non Cao',
+    desc: 'Thu hoạch một mạch quặng, một cụm gỗ và một khóm thảo dược tại Cao Nguyên Đỉnh Gai.',
+  },
+  chr_marsh_rares_ii: {
+    name: 'Kẻ Phàm Ăn, Được Ghi Sổ',
+    desc: 'Hạ Grubjaw Phàm Ăn, nỗi kinh hoàng hữu danh thứ tư của Đầm Lầy Bùn Sâu bị bỏ sót trong lần điểm danh đầu tiên.',
+  },
+  chr_peaks_rares_ii: {
+    name: 'Thêm Những Cái Tên Khắc Vào Vách Đá',
+    desc: 'Hạ Cragmaw Già và Lãnh Chúa Mảnh Vỡ Kazzix, thêm hai nỗi kinh hoàng hữu danh của Cao Nguyên Đỉnh Gai bị bỏ sót trong lần điểm danh đầu tiên.',
+  },
+  chr_gleamstag: {
+    name: 'Huyền Thoại Không Bao Giờ Ra Tay Trước',
+    desc: 'Hạ Hươu Lấp Lánh, một tinh anh hiếm gặp và nhút nhát, chỉ tấn công khi bị dồn vào đường cùng.',
+  },
+  chr_hollow_rares: {
+    name: 'Bầy Đàn Ghi Nhớ',
+    desc: 'Hạ Marrowshell Già và Aurelhorn, Kẻ Đầu Đàn, hai trùm hiếm lang thang của Thung Lũng Sương Phủ.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Lộc Trời Đầm Liễu',
+    desc: 'Thu hoạch một mạch quặng, một cụm gỗ và một khóm thảo dược tại Đầm Liễu.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Gợn Sóng Nơi Lilymoors',
+    desc: 'Câu một con cá từ vùng nước của Đầm Liễu.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Mùa Gặt Trên Mũi Đất',
+    desc: 'Thu hoạch một mạch quặng, một cụm gỗ và một khóm thảo dược tại Đỉnh Gió Lộng.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'Buông Câu Xuống Hồ Gương',
+    desc: 'Câu một con cá từ vùng nước của Đỉnh Gió Lộng.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Lương Thảo Hải Đảo',
+    desc: 'Thu hoạch một mạch quặng, một cụm gỗ và một khóm thảo dược tại Bờ Biển Xa Xôi.',
+  },
+  chr_farshore_first_cast: {
+    name: 'Điều Lũ Mòng Biển Biết',
+    desc: 'Câu một con cá từ vùng nước của Bờ Biển Xa Xôi.',
+  },
+  prog_engineering_rare: {
+    name: 'Cơ Khí Chính Xác',
+    desc: 'Chế tạo vật phẩm hiếm đầu tiên trong Cơ Khí.',
+  },
+  prog_alchemy_rare: {
+    name: 'Rượu Vang Quý Hiếm',
+    desc: 'Chế tạo vật phẩm hiếm đầu tiên trong Giả Kim.',
+  },
+  prog_cooking_rare: {
+    name: 'Món Ăn Đáng Nhớ',
+    desc: 'Chế tạo vật phẩm hiếm đầu tiên trong Nấu Ăn.',
+  },
+  prog_leatherworking_rare: {
+    name: 'Thuộc Da Tinh Xảo',
+    desc: 'Chế tạo vật phẩm hiếm đầu tiên trong Thuộc Da.',
+  },
+  prog_tailoring_rare: {
+    name: 'Đường Kim Bậc Thầy',
+    desc: 'Chế tạo vật phẩm hiếm đầu tiên trong May Vá.',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Tôi Luyện Đến Sáng Bóng',
+    desc: 'Chế tạo vật phẩm hiếm đầu tiên trong Rèn Vũ Khí.',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Mạ Đến Hoàn Hảo',
+    desc: 'Chế tạo vật phẩm hiếm đầu tiên trong Rèn Giáp.',
   },
 };

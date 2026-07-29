@@ -2,6 +2,7 @@
 // the meta fixpoint, Fiesta standardization safety, retro-on-join credit,
 // milestone unification, persistence round-trips, and determinism.
 import { describe, expect, it } from 'vitest';
+import { bagCapacity } from '../src/sim/bags';
 import { dealDamage } from '../src/sim/combat/damage';
 import { DEED_ORDER, DEEDS } from '../src/sim/content/deeds';
 import { emptyAllocation, type TalentAllocation } from '../src/sim/content/talents';
@@ -9,6 +10,7 @@ import { ITEMS, MOBS, QUESTS, ZONES } from '../src/sim/data';
 import {
   bumpDeedStat,
   checkDeedTrigger,
+  DEEDS_RECENT_CAP,
   evaluateDeedsFor,
   grantDeed,
   markItemDiscovered,
@@ -20,12 +22,15 @@ import {
   restoreDeedStats,
   updateDeeds,
 } from '../src/sim/deeds';
+import { createMob } from '../src/sim/entity';
+import { announceAttunement } from '../src/sim/professions/attunement_events';
 import { BATTLEFIELD_XP_TRICKLE } from '../src/sim/professions/battlefield_xp';
 import { queueGatheringGrant } from '../src/sim/professions/gathering';
 import { turnInQuestCore } from '../src/sim/quests/quest_commands';
 import { type ArenaMatch, type CharacterState, Sim } from '../src/sim/sim';
 import * as duelMod from '../src/sim/social/duel';
 import { type Entity, MAX_LEVEL, MILESTONES, type SimEvent } from '../src/sim/types';
+import { runSalvage } from './helpers/enchant_family_cast';
 
 function makeSim(seed = 42): Sim {
   return new Sim({ seed, playerClass: 'warrior', autoEquip: false });
@@ -471,6 +476,12 @@ describe('retro on join', () => {
       delveClears: { 'collapsed_reliquary:normal': 2 },
       craftSkills: { cooking: 3 },
       gatheringProficiency: { mining: 1 },
+      // A curve-era blob (Professions 2.0): without this flag the
+      // one-time mastery reset zeroes both skill maps at load, BEFORE the
+      // retro sweep runs, and the skill-proof inferences under test would
+      // (correctly) see nothing. The pre-curve arm is pinned in
+      // tests/professions_mastery_reset.test.ts.
+      masteryResetApplied: true,
     };
   }
 
@@ -612,7 +623,7 @@ describe('retro on join', () => {
   });
 
   it('a masterwork bag instance seeds at the item DEF quality on join (no bump inflation)', () => {
-    // Professions 2.0 Phase 2: a masterwork copy carries rolled.masterwork +
+    // Professions 2.0: a masterwork copy carries rolled.masterwork +
     // rolled.stats and NO rolled.quality, so the join seed reads the def
     // quality. eastbrook_ritual_vestments' def is uncommon: the gameplay bump
     // to rare is a stat-budget fact, never a discovery fact.
@@ -639,7 +650,7 @@ describe('retro on join', () => {
   });
 
   it('a legacy bag instance with rolled.quality rare still seeds the quality:rare mark on join', () => {
-    // Legacy crafted instances (pre-Phase 2) persist rolled.quality; their
+    // Legacy crafted instances (pre-masterwork) persist rolled.quality; their
     // exact old read is unchanged: the rolled quality beats the def.
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'LegacyVet', {
@@ -777,14 +788,66 @@ describe('retro on join', () => {
     });
     expect(sim.players.get(banked)!.deedsEarned.has('prog_well_rested')).toBe(true);
   });
+
+  it('Craftsworn retro arm: a non-empty attunedPairs history heals a stranded veteran, retro-flagged', () => {
+    // Attunement can be once-ever for a player who never switches, so a
+    // veteran attuned before the attunementsCompleted counter existed would be
+    // PERMANENTLY stranded without this arm: attunedPairs (written only by
+    // professions/archetype.ts downstream of a real quest-validated
+    // attunement, and KEPT by the 12c mastery reset) is the proof.
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'Attuned', {
+      state: {
+        ...veteranState(),
+        archetype: {
+          activeArchetype: 'armorcrafting',
+          pairedMajor: 'weaponcrafting',
+          hobbyCraft: 'tailoring',
+          attunedPairs: ['weaponcrafting+armorcrafting'],
+          switchCount: 0,
+          amendsProgress: 0,
+        },
+      } as CharacterState,
+    });
+    const meta = sim.players.get(pid)!;
+    expect(meta.deedsEarned.has('prog_guildsworn')).toBe(true);
+    // The heal is an inference over persisted state, never a counter write.
+    expect(meta.deedStats.counters.attunementsCompleted).toBe(0);
+    const ev = deedEvents(sim.tick()).find((e) => e.deedId === 'prog_guildsworn');
+    expect(ev?.retro).toBe(true);
+    expect(ev?.pid).toBe(pid);
+  });
+
+  it('Craftsworn retro arm negative: a veteran with an empty attunement history is never healed', () => {
+    // veteranState carries no archetype key at all (normalize fills the empty
+    // state) and the second player pins the explicit empty-history shape, so
+    // both the absent and the [] arm stay non-granting.
+    const sim = makeSim();
+    const bare = sim.addPlayer('warrior', 'NeverAttuned', { state: veteranState() });
+    expect(sim.players.get(bare)!.deedsEarned.has('prog_guildsworn')).toBe(false);
+    const explicit = sim.addPlayer('warrior', 'EmptyHistory', {
+      state: {
+        ...veteranState(),
+        archetype: {
+          activeArchetype: null,
+          pairedMajor: null,
+          hobbyCraft: null,
+          attunedPairs: [],
+          switchCount: 0,
+          amendsProgress: 0,
+        },
+      } as CharacterState,
+    });
+    expect(sim.players.get(explicit)!.deedsEarned.has('prog_guildsworn')).toBe(false);
+  });
 });
 
-// Professions 2.0 Phase 2: a live masterwork grant (sim.addItemInstance, the
+// Professions 2.0: a live masterwork grant (sim.addItemInstance, the
 // exact hub the craft path's masterwork arm calls) carries rolled.masterwork
 // and NO rolled.quality, so the discovery ledger reads the item DEF quality,
 // identical to a plain grant of the same item; the one-tier gameplay bump
 // never inflates the quality-first marks.
-describe('masterwork instance discovery (Professions 2.0 Phase 2)', () => {
+describe('masterwork instance discovery (Professions 2.0)', () => {
   it('a rare-DEF masterwork instance marks discovery exactly like a plain grant of the item', () => {
     // Rare DEF (boundstone_helm): the def quality itself lands quality:rare on
     // both paths, and the masterwork bump (rare to epic in stats) lands epic
@@ -1019,7 +1082,7 @@ describe('persistence', () => {
     meta.deedStats.itemsDiscovered.delete('wolf_fang');
     const wilkes = [...sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
     sim.entities.get(pid)!.pos = { x: wilkes.pos.x + 2, y: wilkes.pos.y, z: wilkes.pos.z };
-    sim.buyBackItem('wolf_fang', pid);
+    sim.buyBackItem('wolf_fang', undefined, undefined, pid);
     expect(sim.countItem('wolf_fang', pid)).toBe(1);
     expect(meta.deedStats.itemsDiscovered.has('wolf_fang')).toBe(true);
   });
@@ -1057,7 +1120,9 @@ describe('persistence', () => {
     const { meta } = primary(sim);
     for (let i = 0; i < 25; i++) sim.tick(); // let the 1 Hz proximity sweep run
     for (const mark of meta.deedStats.visited) {
-      expect(mark).toMatch(/^(poi|gather|fish|npc|slain|quality|fiesta|dungeon|witness):/);
+      expect(mark).toMatch(
+        /^(poi|gather|gather_event|fish|npc|slain|quality|fiesta|dungeon|witness):/,
+      );
     }
     // The spawn-square sweep marked the hub POI (bounded, authored input).
     expect(meta.deedStats.visited.has('poi:eastbrook_vale:eastbrook')).toBe(true);
@@ -1174,7 +1239,10 @@ describe('meter triggers (negative then positive per resolver)', () => {
           meta.townFocus = {};
         },
         at: () => {
-          meta.townFocus = { forge: 1 };
+          // A real component family: since #2511 no reachable path can put a
+          // key like 'forge' in an allocation, so a fixture using one would
+          // pin a shape the game cannot produce.
+          meta.townFocus = { hide: 1 };
         },
       },
       {
@@ -1294,6 +1362,58 @@ describe('meter triggers (negative then positive per resolver)', () => {
       expect(meta.deedsEarned.has('pvp_arena_first_match'), arm).toBe(true);
     }
   });
+
+  it('the battleground meters grant the first-win and first-capture deeds off PlayerMeta', () => {
+    // bgWins and bgCaptures are separate resolvers reading the persisted
+    // Thornhollow Fields standing: each arm gets a fresh Sim so a resolver that
+    // read the wrong field could not be masked by the other counter.
+    const winArm = makeSim();
+    const wm = primary(winArm).meta;
+    expect(wm.bgWins).toBe(0);
+    wm.bgWins = 1;
+    winArm.ctx.markDeedsDirty(wm.entityId);
+    winArm.tick();
+    expect(wm.deedsEarned.has('pvp_bg_first_win')).toBe(true);
+    // The capture deed must NOT ride along on a win.
+    expect(wm.deedsEarned.has('pvp_bg_first_capture')).toBe(false);
+
+    const capArm = makeSim();
+    const cm = primary(capArm).meta;
+    expect(cm.bgCaptures).toBe(0);
+    cm.bgCaptures = 1;
+    capArm.ctx.markDeedsDirty(cm.entityId);
+    capArm.tick();
+    expect(cm.deedsEarned.has('pvp_bg_first_capture')).toBe(true);
+    expect(cm.deedsEarned.has('pvp_bg_first_win')).toBe(false);
+  });
+
+  it('the battleground career deeds gate exactly at 25 wins and 100 captures', () => {
+    // Two-sided per threshold, fresh Sim per arm: the sticky grant means a
+    // single sim could never prove the below-threshold side after the fact.
+    const cases: { deedId: string; field: 'bgWins' | 'bgCaptures'; amount: number }[] = [
+      { deedId: 'pvp_bg_wins_25', field: 'bgWins', amount: 25 },
+      { deedId: 'pvp_bg_captures_100', field: 'bgCaptures', amount: 100 },
+    ];
+    for (const c of cases) {
+      // Pin the authored threshold so a content edit cannot silently drift the
+      // number this test claims to cover.
+      expect(DEEDS[c.deedId].trigger).toEqual({ kind: 'meter', meter: c.field, amount: c.amount });
+
+      const below = makeSim();
+      const bm = primary(below).meta;
+      bm[c.field] = c.amount - 1;
+      below.ctx.markDeedsDirty(bm.entityId);
+      below.tick();
+      expect(bm.deedsEarned.has(c.deedId), `${c.deedId} one short`).toBe(false);
+
+      const at = makeSim();
+      const am = primary(at).meta;
+      am[c.field] = c.amount;
+      at.ctx.markDeedsDirty(am.entityId);
+      at.tick();
+      expect(am.deedsEarned.has(c.deedId), `${c.deedId} at threshold`).toBe(true);
+    }
+  });
 });
 
 describe('flag triggers (one negative and one positive per predicate)', () => {
@@ -1385,12 +1505,24 @@ describe('fixpoint across the authored order', () => {
 
 describe('bounded sets on load', () => {
   it('restoreDeedStats drops marks outside the authored namespaces and unknown item ids', () => {
+    // gather_event is the load-drop regression pin: the marks always
+    // serialized fine but were dropped on load while the namespace was missing
+    // from VISITED_MARK_NAMESPACES, so a mid-hunt save silently lost rare-event
+    // deed progress. The mark must survive the round trip.
     const stats = restoreDeedStats({
       itemsDiscovered: ['glimmerfin_koi', 'not_a_real_item'],
-      visited: ['poi:eastbrook_vale:eastbrook', 'garbage', 'evil:namespace'],
+      visited: [
+        'poi:eastbrook_vale:eastbrook',
+        'gather_event:perfect_specimen',
+        'garbage',
+        'evil:namespace',
+      ],
     });
     expect([...stats.itemsDiscovered]).toEqual(['glimmerfin_koi']);
-    expect([...stats.visited]).toEqual(['poi:eastbrook_vale:eastbrook']);
+    expect([...stats.visited]).toEqual([
+      'poi:eastbrook_vale:eastbrook',
+      'gather_event:perfect_specimen',
+    ]);
   });
 });
 
@@ -1437,7 +1569,11 @@ describe('site wiring (real modules, not direct bumps)', () => {
     const clamped = victim.hp - 1;
     dealDamage(sim.ctx, attacker, victim, victim.hp + 500, true, 'physical', null, 'hit');
     expect(victim.hp).toBe(1);
-    expect(sim.ctx.duels.has(a)).toBe(false);
+    // The duel is over the instant the finisher lands, but the map entry
+    // itself lingers until updateDuels() purges it at tick-tail (see
+    // src/sim/social/duel.ts); duelFor() is the purge-order-independent way
+    // to observe "the duel has ended" from outside duel.ts.
+    expect(duelMod.duelFor(sim.ctx, a)).toBeNull();
     expect(metaA.deedStats.counters.damageDealt).toBe(10 + clamped);
     expect(metaA.deedStats.counters.crits).toBe(1);
   });
@@ -1577,6 +1713,40 @@ describe('site wiring (real modules, not direct bumps)', () => {
     sim.tick();
     for (const m of metas) expect(m.deedsEarned.has('soc_full_house')).toBe(true);
   });
+
+  it('a shared party kill through handleDeath credits kills to every eligible member, not just the tapper', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const puller = sim.addPlayer('warrior', 'Puller');
+    const healer = sim.addPlayer('priest', 'Healer');
+    sim.tick();
+    sim.partyInvite(healer, puller);
+    sim.partyAccept(healer);
+
+    const pE = sim.entities.get(puller)!;
+    const hE = sim.entities.get(healer)!;
+    const template = MOBS.forest_wolf;
+    const mob = createMob(9999, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    sim.entities.set(mob.id, mob);
+    for (const e of [pE, hE, mob]) {
+      e.pos = { x: 0, y: 0, z: 0 };
+      e.prevPos = { x: 0, y: 0, z: 0 };
+    }
+
+    const pullerMeta = sim.players.get(puller)!;
+    const healerMeta = sim.players.get(healer)!;
+    expect(pullerMeta.deedStats.counters.kills).toBe(0);
+    expect(healerMeta.deedStats.counters.kills).toBe(0);
+
+    // Only the puller taps and lands the killing blow; the healer stands in
+    // range the whole fight (earning the same shared XP/quest/loot credit as
+    // the tapper) but never attacks. A healer who never taps must still
+    // advance the same lifetime kills counter for a shared kill.
+    dealDamage(sim.ctx, pE, mob, mob.hp + 500, false, 'physical', null, 'hit');
+
+    expect(mob.dead).toBe(true);
+    expect(pullerMeta.deedStats.counters.kills).toBe(1);
+    expect(healerMeta.deedStats.counters.kills).toBe(1);
+  });
 });
 
 describe('active title selection (setActiveTitle)', () => {
@@ -1704,6 +1874,48 @@ describe('deedsRarity (offline facet arm)', () => {
   it('always resolves null: a sandbox has no population to aggregate', async () => {
     const sim = makeSim();
     await expect(sim.deedsRarity()).resolves.toBeNull();
+  });
+});
+
+describe('deedsRecent (offline facet arm)', () => {
+  it('pins the cap literal and its strip relation', () => {
+    // A literal, never a self-comparison: the three enforcement points (the
+    // Sim slice, the server LIMIT, the client clamp) all import this
+    // constant, so only a literal pin can catch it silently shrinking below
+    // the Book's 5-slot recent strip.
+    expect(DEEDS_RECENT_CAP).toBe(8);
+    expect(DEEDS_RECENT_CAP).toBeGreaterThanOrEqual(5);
+  });
+
+  it('the offline save round-trip preserves the grant order deedsRecent serves', async () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    // A deliberate non-catalog order, so the assertion can tell grant order
+    // from DEED_ORDER after the reload.
+    const granted = ['dgn_korzul_flawless', 'prog_first_steps', 'cmb_first_blood'];
+    for (const id of granted) grantDeed(sim.ctx, meta, id);
+    const state = sim.serializeCharacter(sim.playerId);
+    const sim2 = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    // JSON round-trip: exactly what the offline save does, and the step that
+    // would destroy the order if key order were not preserved.
+    sim2.addPlayer('warrior', 'Reload', { state: JSON.parse(JSON.stringify(state)) });
+    await expect(sim2.deedsRecent()).resolves.toEqual([...granted].reverse());
+  });
+
+  it('serves the live grant order newest first, capped at DEEDS_RECENT_CAP', async () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    // No unlocks yet: an empty list, never null (the Sim always has its own
+    // grant-order record; null is the fetch-failure arm online).
+    await expect(sim.deedsRecent()).resolves.toEqual([]);
+    // Grant two more than the cap in a KNOWN order that is not catalog order,
+    // so the assertion can tell grant order from DEED_ORDER.
+    const granted = [...DEED_ORDER.slice(0, DEEDS_RECENT_CAP + 1), 'dgn_korzul_flawless'];
+    for (const id of granted) grantDeed(sim.ctx, meta, id);
+    const recent = await sim.deedsRecent();
+    expect(recent).toEqual(granted.slice(-DEEDS_RECENT_CAP).reverse());
+    expect(recent).toHaveLength(DEEDS_RECENT_CAP);
+    expect(recent?.[0]).toBe('dgn_korzul_flawless');
   });
 });
 
@@ -1965,5 +2177,199 @@ describe('trade completion counts only non-empty trades (soc_first_trade)', () =
     expect(metaB.deedStats.counters.tradesCompleted).toBe(1);
     expect(metaA.deedsEarned.has('soc_first_trade')).toBe(true);
     expect(metaB.deedsEarned.has('soc_first_trade')).toBe(true);
+  });
+});
+
+// Professions 2.0: threshold-exact behavioral arms for the new deed
+// families, each driven through a live site (the real announce/command path,
+// or the live meta map plus the evaluator's own dirty sweep), with the
+// one-below negative beside every at-threshold grant.
+describe('profession deed families (threshold-exact, live sites)', () => {
+  it('Craftsworn: the real attunement announce site grants at the first bump, exactly once', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    sim.tick();
+    // Counter 0 is the one-below arm for a count:1 stat deed.
+    expect(meta.deedsEarned.has('prog_guildsworn')).toBe(false);
+    const renownBefore = meta.renown;
+    announceAttunement(sim.ctx, meta.entityId, 'weaponcrafting+armorcrafting');
+    expect(meta.deedStats.counters.attunementsCompleted).toBe(1);
+    const evs = sim.tick(); // the narrow stat mark grants at the tick tail
+    expect(meta.deedsEarned.has('prog_guildsworn')).toBe(true);
+    const ev = deedEvents(evs).find((e) => e.deedId === 'prog_guildsworn');
+    expect(ev?.pid).toBe(meta.entityId);
+    expect(ev?.retro).toBeUndefined(); // a live grant, never retro-flagged
+    expect(meta.renown).toBe(renownBefore + DEEDS.prog_guildsworn.renown);
+    // A later re-attunement (the switch-back path re-announces) counts but
+    // never re-grants.
+    announceAttunement(sim.ctx, meta.entityId, 'weaponcrafting+armorcrafting');
+    expect(meta.deedStats.counters.attunementsCompleted).toBe(2);
+    expect(deedEvents(sim.tick()).filter((e) => e.deedId === 'prog_guildsworn')).toHaveLength(0);
+    expect(meta.renown).toBe(renownBefore + DEEDS.prog_guildsworn.renown);
+  });
+
+  it('Masterwright: the masterworksCrafted counter grants at one, not zero', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    sim.ctx.bumpDeedStat(meta, 'masterworksCrafted', 0); // dropped: delta must be positive
+    sim.tick();
+    expect(meta.deedsEarned.has('prog_masterwright')).toBe(false);
+    sim.ctx.bumpDeedStat(meta, 'masterworksCrafted', 1);
+    sim.tick();
+    expect(meta.deedsEarned.has('prog_masterwright')).toBe(true);
+    expect(meta.deedStats.counters.masterworksCrafted).toBe(1);
+  });
+
+  it('salvage: the real command feeds the first-salvage deed; the 50 rung binds at exactly 50', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    sim.addItem('eastbrook_arming_sword', 1, meta.entityId);
+    runSalvage(sim, 'eastbrook_arming_sword', meta.entityId);
+    expect(meta.deedStats.counters.salvagesPerformed).toBe(1);
+    sim.tick();
+    expect(meta.deedsEarned.has('soc_first_salvage')).toBe(true);
+    expect(meta.deedsEarned.has('soc_salvage_50')).toBe(false);
+    // Climb the lifetime counter to one below the 50 rung: still no grant.
+    sim.ctx.bumpDeedStat(meta, 'salvagesPerformed', 48);
+    sim.tick();
+    expect(meta.deedStats.counters.salvagesPerformed).toBe(49);
+    expect(meta.deedsEarned.has('soc_salvage_50')).toBe(false);
+    sim.ctx.bumpDeedStat(meta, 'salvagesPerformed', 1);
+    sim.tick();
+    expect(meta.deedsEarned.has('soc_salvage_50')).toBe(true);
+  });
+
+  it('craft rare-tier rung: 49 does not grant, 50 does, and only the matching craft', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    meta.craftSkills.engineering = 49;
+    sim.ctx.markDeedsDirty(meta.entityId);
+    sim.tick();
+    expect(meta.deedsEarned.has('prog_engineering_50')).toBe(false);
+    meta.craftSkills.engineering = 50;
+    sim.ctx.markDeedsDirty(meta.entityId);
+    sim.tick();
+    expect(meta.deedsEarned.has('prog_engineering_50')).toBe(true);
+    // Craft fidelity: the engineering climb moves no other craft's rung, and
+    // never the same craft's cap deed.
+    expect(meta.deedsEarned.has('prog_alchemy_50')).toBe(false);
+    expect(meta.deedsEarned.has('prog_grandmaster_engineering')).toBe(false);
+  });
+
+  it('Grandmaster: 124 does not grant, 125 does, and the deed carries its title reward', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    meta.craftSkills.weaponcrafting = 124;
+    sim.ctx.markDeedsDirty(meta.entityId);
+    sim.tick();
+    expect(meta.deedsEarned.has('prog_weaponcrafting_50')).toBe(true); // 124 covers the 50 rung
+    expect(meta.deedsEarned.has('prog_grandmaster_weaponcrafting')).toBe(false);
+    meta.craftSkills.weaponcrafting = 125;
+    sim.ctx.markDeedsDirty(meta.entityId);
+    sim.tick();
+    expect(meta.deedsEarned.has('prog_grandmaster_weaponcrafting')).toBe(true);
+    // The earned title is selectable through the one validator both worlds use.
+    sim.setActiveTitle('prog_grandmaster_weaponcrafting', meta.entityId);
+    expect(meta.activeTitle).toBe('prog_grandmaster_weaponcrafting');
+  });
+
+  it('fishing ladder: 99/100 and 199/200 bind exactly, through the live grant drain', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    meta.gatheringProficiency.fishing = 99;
+    sim.ctx.markDeedsDirty(meta.entityId);
+    sim.tick();
+    expect(meta.deedsEarned.has('prog_fishing_100')).toBe(false);
+    // The +1 crossing rides the REAL queued-grant drain (drainGatheringGrants
+    // marks the deed sweep itself; no explicit dirty call here).
+    queueGatheringGrant(meta, 'fishing', 1);
+    sim.tick();
+    expect(meta.gatheringProficiency.fishing).toBe(100);
+    expect(meta.deedsEarned.has('prog_fishing_100')).toBe(true);
+    expect(meta.deedsEarned.has('prog_master_angler')).toBe(false);
+    // A fishing climb never credits another profession's milestone.
+    expect(meta.deedsEarned.has('prog_mining_100')).toBe(false);
+    meta.gatheringProficiency.fishing = 199;
+    sim.ctx.markDeedsDirty(meta.entityId);
+    sim.tick();
+    expect(meta.deedsEarned.has('prog_master_angler')).toBe(false);
+    queueGatheringGrant(meta, 'fishing', 1);
+    sim.tick();
+    expect(meta.gatheringProficiency.fishing).toBe(200); // fishing's cap
+    expect(meta.deedsEarned.has('prog_master_angler')).toBe(true);
+  });
+
+  it('rare-find marks: each flavor mark grants exactly its own deed, at renown 0', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    const flavors: [string, string][] = [
+      ['gather_event:pristine_vein', 'col_pristine_vein'],
+      ['gather_event:ancient_heartwood', 'col_ancient_heartwood'],
+      ['gather_event:moonlit_bloom', 'col_moonlit_bloom'],
+      ['gather_event:perfect_specimen', 'col_perfect_specimen'],
+    ];
+    const renownBefore = meta.renown;
+    for (const [mark, deedId] of flavors) {
+      const others = flavors.filter(([, d]) => d !== deedId).map(([, d]) => d);
+      const earnedOthersBefore = others.filter((d) => meta.deedsEarned.has(d));
+      sim.ctx.markVisited(meta, mark);
+      sim.tick();
+      expect(meta.deedsEarned.has(deedId), deedId).toBe(true);
+      // Cross-flavor fidelity: this mark granted ONLY its own deed.
+      const earnedOthersAfter = others.filter((d) => meta.deedsEarned.has(d));
+      expect(earnedOthersAfter).toEqual(earnedOthersBefore);
+    }
+    // Luck-based finds are renown 0 by doctrine: four grants, zero renown.
+    expect(meta.renown).toBe(renownBefore);
+  });
+
+  it('a bag-truncated specimen jackpot grants NO mark and no deed (the find got away)', () => {
+    // The interaction.ts hook fires on the LANDED addItemInstance arm only;
+    // with every bag slot full the signed jackpot cannot land, the harvest
+    // emits gatherDowngrade lost:'find', and col_perfect_specimen must not
+    // grant. Decisive against a mutant that marks before the capacity check.
+    const sim = makeSim();
+    const { meta, e: player } = primary(sim);
+    const pid = meta.entityId;
+    // Occupy every slot BUT keep stack room in a rough_hide stack: the plain
+    // grant then lands by top-up (the harvest pre-gate passes) while the
+    // SIGNED specimen needs a fresh slot and cannot (an instance never merges
+    // into a plain stack), which is exactly the truncation branch.
+    sim.addItem('rough_hide', 1, pid);
+    while (meta.inventory.length < bagCapacity(meta.bags)) sim.addItem('recruit_tunic', 1, pid);
+    const template = MOBS.forest_wolf;
+    const mob = createMob(987001, template, template.maxLevel, {
+      x: player.pos.x,
+      y: player.pos.y,
+      z: player.pos.z,
+    });
+    mob.dead = true;
+    mob.aiState = 'dead';
+    mob.corpseTimer = 9999;
+    mob.respawnTimer = 9999;
+    sim.entities.set(mob.id, mob);
+    let truncatedFindAt = -1;
+    for (let i = 0; i < 400 && truncatedFindAt < 0; i++) {
+      mob.harvestClaimedBy = null;
+      // Drain the top-up stack back to a single unit so the pre-gate keeps
+      // passing while every slot stays occupied.
+      const hideSlot = meta.inventory.find((s: { itemId: string }) => s.itemId === 'rough_hide');
+      if (hideSlot) hideSlot.count = 1;
+      sim.harvestCorpse(mob.id, ['hide'], pid);
+      const downgrade = sim
+        .drainEvents()
+        .some((e) => e.type === 'gatherDowngrade' && e.surface === 'corpse' && e.lost === 'find');
+      if (downgrade) truncatedFindAt = i;
+    }
+    // A specimen ROLLED and was truncated (the hunt found the downgrade), yet
+    // nothing landed: no signed instance, no mark, and after a tick no deed.
+    expect(truncatedFindAt).toBeGreaterThanOrEqual(0);
+    expect(meta.inventory.some((s: { itemId: string }) => s.itemId === 'pristine_hide')).toBe(
+      false,
+    );
+    expect(meta.deedStats.visited.has('gather_event:perfect_specimen')).toBe(false);
+    sim.tick();
+    expect(meta.deedsEarned.has('col_perfect_specimen')).toBe(false);
+    sim.entities.delete(mob.id);
   });
 });

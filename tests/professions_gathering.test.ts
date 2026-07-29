@@ -3,6 +3,9 @@ import { GATHERING_PROFESSIONS } from '../src/sim/content/professions';
 import {
   drainGatheringGrants,
   emptyGatheringProficiency,
+  foldPendingGatherGrants,
+  GATHER_GAIN_TIER_STEP,
+  gatherNodeGainMultiplier,
   normalizeGatheringProficiency,
   queueGatheringGrant,
 } from '../src/sim/professions/gathering';
@@ -45,12 +48,14 @@ describe('gathering profession proficiency (#1119)', () => {
     const pid = sim.playerId;
     sim.chat('/dev gather herbalism 4', pid);
     sim.tick();
+    // The enforced per-profession caps (mining/logging/herbalism 100,
+    // fishing 200) replace the old uniform 300.
     const expected = {
       skills: [
-        { professionId: 'mining', skill: 0, maxSkill: 300 },
-        { professionId: 'logging', skill: 0, maxSkill: 300 },
-        { professionId: 'herbalism', skill: 4, maxSkill: 300 },
-        { professionId: 'fishing', skill: 0, maxSkill: 300 },
+        { professionId: 'mining', skill: 0, maxSkill: 100 },
+        { professionId: 'logging', skill: 0, maxSkill: 100 },
+        { professionId: 'herbalism', skill: 4, maxSkill: 100 },
+        { professionId: 'fishing', skill: 0, maxSkill: 200 },
       ],
     };
     expect(sim.professionsState).toEqual(expected);
@@ -74,7 +79,7 @@ describe('gathering profession proficiency (#1119)', () => {
     expect(meta2.gatheringProficiency).toEqual({ mining: 7, logging: 0, herbalism: 2, fishing: 0 });
   });
 
-  it('a NONZERO fishing proficiency survives the save/load round trip (Phase 11)', () => {
+  it('a NONZERO fishing proficiency survives the save/load round trip', () => {
     // Every other persistence fixture in this file carries fishing:0, so a
     // regression dropping the fishing key from serializeCharacter (or a
     // hand-rolled normalize key list) would stay green without this pin.
@@ -105,8 +110,8 @@ describe('gathering profession proficiency (#1119)', () => {
     });
   });
 
-  it('ACCEPTED ROLLBACK CAVEAT (documented Phase 11 semantic): a pre-Phase-11 round trip re-zeroes fishing only', () => {
-    // A pre-Phase-11 loader normalizes the blob to the starter three keys, so
+  it('ACCEPTED ROLLBACK CAVEAT (documented semantic): a pre-fishing-support round trip re-zeroes fishing only', () => {
+    // A pre-fishing-support loader normalizes the blob to the starter three keys, so
     // a save written by that code path comes back WITHOUT the fishing key:
     // accrued fishing proficiency is deliberately lost on the downgrade round
     // trip (the mailWelcomed class; release-notes line at tag time) while the
@@ -180,7 +185,7 @@ describe('gathering profession proficiency (#1119)', () => {
       herbalism: 0,
       fishing: 0,
     });
-    // A nonzero fishing value passes through intact (Phase 11: every other
+    // A nonzero fishing value passes through intact (every other
     // fixture in this file feeds fishing 0, which a fishing-specific drop
     // would satisfy vacuously).
     expect(normalizeGatheringProficiency({ fishing: 57 })).toEqual({
@@ -250,6 +255,74 @@ describe('gathering profession proficiency (#1119)', () => {
     expect(meta.gatheringProficiency.mining).toBe(5);
   });
 
+  it('a save between the queueing tick and the draining tick folds the grant in', () => {
+    // The leave-time hazard: a harvest or reel-landed catch queues its grant
+    // for the NEXT tick's drain, and a leave-time save can run in between.
+    // The save folds the queue in (foldPendingGatherGrants); the live meta is
+    // untouched, so the tick-path drain doctrine holds unchanged.
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.chat('/dev gather mining 5', pid);
+    const meta = (sim as any).players.get(pid);
+    expect(meta.pendingGatherGrants.length).toBe(1); // still queued, undrained
+    const state = (sim as any).serializeCharacter(pid);
+    // BOTH persisted keys carry the folded value (the legacy dual-write too).
+    expect(state.gatheringProficiency.mining).toBe(5);
+    expect(state.professions.mining).toBe(5);
+    // The fold never mutated the live player: queue intact, counter unmoved.
+    expect(meta.pendingGatherGrants.length).toBe(1);
+    expect(meta.gatheringProficiency.mining).toBe(0);
+
+    // Loading that save resumes with the grant applied and nothing queued.
+    const sim2 = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const loadedPid = sim2.addPlayer('warrior', 'Kept', { state });
+    const meta2 = (sim2 as any).players.get(loadedPid);
+    expect(meta2.gatheringProficiency.mining).toBe(5);
+    expect(meta2.pendingGatherGrants).toEqual([]);
+
+    // No double-apply on the session that kept playing: the tick drains the
+    // same grant the earlier save already folded, and a later save agrees.
+    sim.tick();
+    expect(meta.gatheringProficiency.mining).toBe(5);
+    expect((sim as any).serializeCharacter(pid).gatheringProficiency.mining).toBe(5);
+  });
+
+  it('the save-time fold clamps at the content cap exactly like the tick drain', () => {
+    const meta: any = {
+      pendingGatherGrants: [],
+      gatheringProficiency: { ...emptyGatheringProficiency(), mining: 98 },
+    };
+    queueGatheringGrant(meta, 'mining', 5);
+    const folded = foldPendingGatherGrants(meta);
+    // The literal cap, not GATHERING_PROFESSIONS.mining.maxSkill: production
+    // reads that same constant, so a self-comparison would move with a cap
+    // edit instead of catching it.
+    expect(folded.mining).toBe(100); // 98 + 5 clamps to the mining content cap
+    expect(folded.logging).toBe(0); // untouched professions stay put
+    // Pure: the live record and queue are exactly as they were.
+    expect(meta.gatheringProficiency.mining).toBe(98);
+    expect(meta.pendingGatherGrants.length).toBe(1);
+  });
+
+  it('the fold applies every queued grant, not just the first', () => {
+    // A multi-grant queue is reachable (two /dev gather commands in one tick,
+    // or a harvest completion plus a /dev gather before the next drain), and
+    // the fold's contract covers ANY queue shape regardless, so its own loop
+    // needs a multi-grant arm: same profession accumulating into the clamp,
+    // plus a second profession that must not be dropped.
+    const meta: any = {
+      pendingGatherGrants: [],
+      gatheringProficiency: { ...emptyGatheringProficiency(), mining: 98 },
+    };
+    queueGatheringGrant(meta, 'mining', 1);
+    queueGatheringGrant(meta, 'logging', 2);
+    queueGatheringGrant(meta, 'mining', 1);
+    const folded = foldPendingGatherGrants(meta);
+    expect(folded.mining).toBe(100); // 98 + 1 + 1, exactly at the cap
+    expect(folded.logging).toBe(2);
+    expect(meta.pendingGatherGrants.length).toBe(3); // still pure
+  });
+
   it('the /dev gather cheat is gated by devCommands (never a bypass path)', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true }); // devCommands off
     const pid = sim.playerId;
@@ -257,6 +330,36 @@ describe('gathering profession proficiency (#1119)', () => {
     sim.tick();
     const meta = (sim as any).players.get(pid);
     expect(meta.gatheringProficiency).toEqual({ mining: 0, logging: 0, herbalism: 0, fishing: 0 });
+  });
+
+  it('node-tier-relative gain: gatherNodeGainMultiplier walks the mastery curve AT the band boundaries', () => {
+    // A node of tier T maps to gain tier T - 1, scored against
+    // floor(proficiency / GATHER_GAIN_TIER_STEP) through the shared four-state
+    // curve (wheel.ts). Pinned AT each boundary, not only past it.
+    // t1 (all pre-phase content, bare hands): full through 24, then down.
+    expect(gatherNodeGainMultiplier(0, 1)).toBe(1);
+    expect(gatherNodeGainMultiplier(24, 1)).toBe(1);
+    expect(gatherNodeGainMultiplier(25, 1)).toBe(0.5);
+    expect(gatherNodeGainMultiplier(49, 1)).toBe(0.5);
+    expect(gatherNodeGainMultiplier(50, 1)).toBe(0.25);
+    expect(gatherNodeGainMultiplier(74, 1)).toBe(0.25);
+    expect(gatherNodeGainMultiplier(75, 1)).toBe(0); // t1 nodes gray out at 75+
+    // t2: full through 49 (carries the band below 50).
+    expect(gatherNodeGainMultiplier(49, 2)).toBe(1);
+    expect(gatherNodeGainMultiplier(50, 2)).toBe(0.5);
+    expect(gatherNodeGainMultiplier(75, 2)).toBe(0.25);
+    // t3 (Thornpeak): full through 74, still reduced at 99: what finishes the
+    // climb to 100.
+    expect(gatherNodeGainMultiplier(74, 3)).toBe(1);
+    expect(gatherNodeGainMultiplier(75, 3)).toBe(0.5);
+    expect(gatherNodeGainMultiplier(99, 3)).toBe(0.5);
+    // Negative or degenerate inputs clamp instead of throwing.
+    expect(gatherNodeGainMultiplier(-5, 1)).toBe(1);
+    expect(gatherNodeGainMultiplier(0, 0)).toBe(1);
+  });
+
+  it('pins GATHER_GAIN_TIER_STEP at its literal value', () => {
+    expect(GATHER_GAIN_TIER_STEP).toBe(25);
   });
 
   it('rejects an unknown profession id without throwing or granting anything', () => {

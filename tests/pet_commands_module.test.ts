@@ -10,6 +10,7 @@ import {
   petAttack,
   petOf,
   petTaunt,
+  petTauntReadout,
   petWaterJet,
   renamePet,
   restorePet,
@@ -302,6 +303,64 @@ describe('pet_commands module (P1b)', () => {
     expect(freshVw.id).not.toBe(woundedId);
     expect(freshVw.hp).toBe(freshVw.maxHp);
     expect(sim.entities.has(woundedId)).toBe(false);
+  });
+
+  it('petTaunt is a permanent no-op for a ranged warlock pet, near or far (never gets stuck pending)', () => {
+    const sim = new Sim({ seed: 21, playerClass: 'warlock', noPlayer: true }) as AnySim;
+    const wpid = sim.addPlayer('warlock', 'Demonist') as number;
+    sim.setPlayerLevel(12, wpid);
+    const warlock = sim.entities.get(wpid) as AnyEntity;
+    summonPet(sim.ctx, warlock, 'emberkin');
+    const pet = petOf(sim.ctx, wpid) as AnyEntity;
+    expect(pet.templateId).toBe('emberkin');
+    const target = spawnWolf(sim, warlock);
+    warlock.targetId = target.id;
+
+    // Inside PET_TAUNT_RANGE: the old bug called ctx.applyTaunt(pet, target) directly,
+    // forcing mob aggro onto a squishy ranged caster pet that was never meant to tank.
+    pet.pos = { ...target.pos };
+    petTaunt(sim.ctx, wpid);
+    expect(target.forcedTargetId).not.toBe(pet.id);
+    expect(pet.petManualTauntPending).toBe(false);
+    expect(pet.petTauntTimer).toBe(0);
+
+    // Outside PET_TAUNT_RANGE (the pet's normal ranged standoff): the old bug latched
+    // petManualTauntPending = true, and pet_ai's consume condition also required
+    // !ranged, so a ranged pet could never clear it: a permanently-stuck no-op.
+    pet.pos = { x: target.pos.x + 24, y: target.pos.y, z: target.pos.z };
+    petTaunt(sim.ctx, wpid);
+    expect(pet.petManualTauntPending).toBe(false);
+    expect(target.forcedTargetId).not.toBe(pet.id);
+  });
+
+  it('setPetAutoTaunt cannot arm auto-taunt on a ranged warlock pet', () => {
+    const sim = new Sim({ seed: 22, playerClass: 'warlock', noPlayer: true }) as AnySim;
+    const wpid = sim.addPlayer('warlock', 'Demonist') as number;
+    const warlock = sim.entities.get(wpid) as AnyEntity;
+    summonPet(sim.ctx, warlock, 'spellhound');
+    const pet = petOf(sim.ctx, wpid) as AnyEntity;
+    expect(pet.templateId).toBe('spellhound');
+    setPetAutoTaunt(sim.ctx, true, wpid);
+    expect(pet.petAutoTaunt).toBe(false);
+    expect(petTauntReadout(sim.ctx, warlock)).toBe('This pet cannot taunt.');
+  });
+
+  it('petTaunt/setPetAutoTaunt/petTauntReadout stay no-op for the mage Water Elemental (regression)', () => {
+    const sim = new Sim({ seed: 23, playerClass: 'mage', noPlayer: true }) as AnySim;
+    const pid = sim.addPlayer('mage', 'Frostbite') as number;
+    const mage = sim.entities.get(pid) as AnyEntity;
+    summonPet(sim.ctx, mage, 'water_elemental');
+    const pet = petOf(sim.ctx, pid) as AnyEntity;
+    expect(pet.templateId).toBe('water_elemental');
+    setPetAutoTaunt(sim.ctx, true, pid);
+    expect(pet.petAutoTaunt).toBe(false);
+    expect(petTauntReadout(sim.ctx, mage)).toBe('This pet cannot taunt.');
+    const target = spawnWolf(sim, mage);
+    mage.targetId = target.id;
+    pet.pos = { ...target.pos };
+    petTaunt(sim.ctx, pid);
+    expect(target.forcedTargetId).not.toBe(pet.id);
+    expect(pet.petManualTauntPending).toBe(false);
   });
 
   it('is deterministic on seeded replay (same seed + same drive => identical state)', () => {

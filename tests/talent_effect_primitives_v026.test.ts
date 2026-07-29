@@ -125,6 +125,27 @@ describe('Talents V2 dispel and steal primitives', () => {
     expect(enemy.hp).toBe(Math.round(baseMaxHp * 0.5));
   });
 
+  it('starts Greater Invisibility damage reduction when Spellsteal ends the vanish', () => {
+    const sim = new Sim({ seed: 23, playerClass: 'mage', autoEquip: true });
+    const enemy = addHostile(sim);
+    sim.ctx.applyAura(enemy, {
+      ...aura(enemy, 'greater_invisibility', 'stealth', 1, 'arcane'),
+      value2: 0.9,
+      value3: 2,
+    });
+
+    runAbilityEffect(sim, enemy, 'spellsteal');
+
+    expect(enemy.stealthed).toBe(false);
+    expect(enemy.auras.some((entry) => entry.id === 'greater_invisibility')).toBe(false);
+    expect(enemy.auras.find((entry) => entry.id === 'greater_invisibility_dr')).toMatchObject({
+      kind: 'buff_dr',
+      value: 0.9,
+      remaining: 2,
+      duration: 2,
+    });
+  });
+
   it('lets Voidfeast devour the correctly directed magic aura and heal its caster', () => {
     const sim = new Sim({ seed: 3, playerClass: 'warlock', autoEquip: true });
     const enemy = addHostile(sim);

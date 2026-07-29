@@ -25,6 +25,8 @@ export interface ClaudiumSnapshot {
   available?: boolean;
   balance: number | null;
   skus: readonly ClaudiumSkuInput[];
+  /** Current service-computed $WOC discount, in basis points. */
+  wocDiscountBps?: number | null;
   nativeRails?: Partial<Record<'sol' | 'usdc' | 'woc', boolean>>;
   walletBalances?: {
     solLamports: string | null;
@@ -367,6 +369,18 @@ export class ClaudiumWindow {
     const solSel = this.selectedRail === 'sol' ? ' aria-pressed="true"' : ' aria-pressed="false"';
     const usdcSel = this.selectedRail === 'usdc' ? ' aria-pressed="true"' : ' aria-pressed="false"';
     const wocSel = this.selectedRail === 'woc' ? ' aria-pressed="true"' : ' aria-pressed="false"';
+    const wocDiscount =
+      Number.isInteger(view.wocDiscountBps) &&
+      (view.wocDiscountBps ?? -1) >= 0 &&
+      (view.wocDiscountBps ?? 10_000) <= 9000
+        ? `<span class="cl-rail-discount">${esc(
+            t('hudChrome.claudium.railWocDiscount', {
+              percent: formatNumber((view.wocDiscountBps ?? 0) / 100, {
+                maximumFractionDigits: 2,
+              }),
+            }),
+          )}</span>`
+        : '';
     const railPicker =
       `<div class="cl-rails" role="group" aria-label="${esc(t('hudChrome.claudium.railLabel'))}">` +
       `<button type="button" class="cl-rail" data-rail="stripe"${stripeSel} ${view.rails.stripe && !pending ? '' : 'disabled'}>` +
@@ -376,7 +390,7 @@ export class ClaudiumWindow {
       `<button type="button" class="cl-rail cl-rail-woc" data-rail="woc"${wocSel} ${view.rails.woc && !pending ? '' : 'disabled'}>` +
       this.railIconHtml('woc') +
       `<span>${esc(t('hudChrome.claudium.railWoc'))}</span>` +
-      `<span class="cl-rail-discount">${esc(t('hudChrome.claudium.railWocDiscount'))}</span>` +
+      wocDiscount +
       `</button>` +
       `<button type="button" class="cl-rail" data-rail="usdc"${usdcSel} ${view.rails.usdc && !pending ? '' : 'disabled'}>` +
       this.railIconHtml('usdc') +

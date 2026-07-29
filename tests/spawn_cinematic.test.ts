@@ -1,6 +1,8 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   type CameraPose,
+  decideSpawnCinematic,
   recordSkipTap,
   SKIP_TAP_COUNT,
   SKIP_TAP_WINDOW_SEC,
@@ -86,5 +88,86 @@ describe('skip tap burst', () => {
     for (let i = 0; i < SKIP_TAP_COUNT - 1; i++) recordSkipTap(taps, i * 0.1);
     // The next tap lands past the window: everything before it is pruned.
     expect(recordSkipTap(taps, SKIP_TAP_WINDOW_SEC + 1)).toBe(false);
+  });
+});
+
+describe('spawn cinematic entry policy', () => {
+  const eligible = {
+    requested: true,
+    seen: false,
+    playerLevel: 1,
+    reducedMotion: false,
+    native: false,
+    platform: 'web',
+    engine: 'chromium',
+    constrainedMemory: false,
+    graphicsPreset: 2,
+  } as const;
+
+  it('plays for an eligible first spawn on ordinary clients', () => {
+    expect(decideSpawnCinematic(eligible)).toEqual({ play: true, reason: 'eligible' });
+  });
+
+  it('suppresses the GPU-heavy pan on constrained native iOS WebKit at every non-Low preset', () => {
+    for (const graphicsPreset of [2, 3, 4, 5]) {
+      expect(
+        decideSpawnCinematic({
+          ...eligible,
+          native: true,
+          platform: 'ios',
+          engine: 'webkit',
+          constrainedMemory: true,
+          graphicsPreset,
+        }),
+      ).toEqual({ play: false, reason: 'constrained-ios-webkit' });
+    }
+  });
+
+  it('requires every native iOS WebKit risk predicate before suppressing the cinematic', () => {
+    const risky = {
+      ...eligible,
+      native: true,
+      platform: 'ios',
+      engine: 'webkit',
+      constrainedMemory: true,
+    };
+    for (const safe of [
+      { ...risky, graphicsPreset: 1 },
+      { ...risky, native: false },
+      { ...risky, platform: 'android' },
+      { ...risky, engine: 'chromium' },
+      { ...risky, constrainedMemory: false },
+    ]) {
+      expect(decideSpawnCinematic(safe)).toEqual({ play: true, reason: 'eligible' });
+    }
+  });
+
+  it('preserves the existing eligibility gates', () => {
+    expect(decideSpawnCinematic({ ...eligible, requested: false }).play).toBe(false);
+    expect(decideSpawnCinematic({ ...eligible, seen: true }).play).toBe(false);
+    expect(decideSpawnCinematic({ ...eligible, playerLevel: 2 }).play).toBe(false);
+    expect(decideSpawnCinematic({ ...eligible, reducedMotion: true }).play).toBe(false);
+  });
+
+  it('wires the live runtime signals into the policy before mutating intro state', () => {
+    const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
+    const policyAt = main.indexOf('const introPolicy = decideSpawnCinematic({');
+    const policyBranchAt = main.indexOf('if (introPolicy.play)', policyAt);
+    expect(policyAt).toBeGreaterThan(-1);
+    expect(policyBranchAt).toBeGreaterThan(policyAt);
+    for (const signal of [
+      'requested: playIntro',
+      'seen: introSeen',
+      'playerLevel: world.player.level',
+      "reducedMotion: settings.get('reduceMotion') || osReducedMotion",
+      'native: isNativeRuntime()',
+      'platform: mobilePlatform()',
+      'engine: startupBrowserEnv.engine',
+      'constrainedMemory: GFX.constrainedMemory',
+      "graphicsPreset: settings.get('graphicsPreset')",
+    ]) {
+      expect(main.slice(policyAt, policyBranchAt)).toContain(signal);
+    }
+    expect(main.slice(policyBranchAt)).toMatch(/if \(introPolicy\.play\) \{\s+intro = \{/);
   });
 });

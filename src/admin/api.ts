@@ -51,18 +51,34 @@ export interface AdminSession {
   permissions: string[];
 }
 
-export async function apiLogin(username: string, password: string): Promise<AdminSession> {
+export type AdminLoginResult = AdminSession | { twoFactorRequired: true };
+
+export async function apiLogin(
+  username: string,
+  password: string,
+  code = '',
+  recoveryCode = '',
+): Promise<AdminLoginResult> {
   const res = await fetch('/admin/api/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password }),
+    body: JSON.stringify({ username, password, code, recoveryCode }),
   });
-  const data = await parseEnvelope<{ token: string } & AdminSession>(res);
+  const data = await parseEnvelope<
+    ({ token: string } & AdminSession) | { twoFactorRequired: true }
+  >(res);
+  if ('twoFactorRequired' in data) {
+    return { twoFactorRequired: true };
+  }
   localStorage.setItem(TOKEN_KEY, data.token);
-  localStorage.setItem(NAME_KEY, data.username);
+  localStorage.setItem(NAME_KEY, data.username ?? '');
   // Tolerate a pre-permissions server during a deploy window: missing arrays
   // degrade to zero permissions (the no-access screen) instead of a crash.
-  return { username: data.username, roles: data.roles ?? [], permissions: data.permissions ?? [] };
+  return {
+    username: data.username ?? '',
+    roles: data.roles ?? [],
+    permissions: data.permissions ?? [],
+  };
 }
 
 // Boot-time hydration of the operator's identity: permissions are never

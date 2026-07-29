@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 import './_setup';
 import { fireEvent, render, screen } from '@testing-library/svelte';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -50,11 +50,12 @@ beforeEach(() => {
   auth.hydrateFailed = false;
   auth.loginError = '';
   auth.sessionMessage = '';
+  auth.twoFactorRequired = false;
 });
 
 describe('admin auth flow', () => {
   function loginForm(): HTMLFormElement {
-    const form = screen.getByText(t('auth.signIn')).closest('form');
+    const form = document.querySelector('#login-form');
     if (!(form instanceof HTMLFormElement)) {
       throw new Error('login form not found');
     }
@@ -86,18 +87,223 @@ describe('admin auth flow', () => {
     expect(await screen.findByText(t('auth.signOut'))).toBeInTheDocument();
     expect(screen.getByText('alice')).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 1, name: t('nav.reports') })).toBeInTheDocument();
-    expect(h.apiLogin).toHaveBeenCalledWith('alice', 'pw');
+    expect(h.apiLogin).toHaveBeenCalledWith('alice', 'pw', '', '');
+  });
+
+  it('requires an authenticator code before revealing admin chrome', async () => {
+    h.apiLogin.mockResolvedValueOnce({ twoFactorRequired: true });
+    render(App);
+    await fireEvent.input(screen.getByLabelText(t('auth.username')), {
+      target: { value: 'alice' },
+    });
+    await fireEvent.input(screen.getByLabelText(t('auth.password')), { target: { value: 'pw' } });
+    await fireEvent.submit(loginForm());
+
+    const codeInput = await screen.findByLabelText(t('auth.authenticatorCode'));
+    expect(codeInput).toHaveFocus();
+    expect(screen.queryByText(t('auth.signOut'))).not.toBeInTheDocument();
+    expect(h.apiLogin).toHaveBeenLastCalledWith('alice', 'pw', '', '');
+
+    h.apiLogin.mockImplementationOnce(async () => {
+      h.setToken('tok');
+      return {
+        username: 'alice',
+        roles: ['superadmin'],
+        permissions: ['analytics.read', 'accounts.read', 'moderation.read', 'moderation.act'],
+      };
+    });
+    await fireEvent.input(codeInput, { target: { value: '123456' } });
+    await fireEvent.submit(loginForm());
+
+    expect(await screen.findByText(t('auth.signOut'))).toBeInTheDocument();
+    expect(h.apiLogin).toHaveBeenLastCalledWith('alice', 'pw', '123456', '');
+  });
+
+  it('serializes login submissions while authentication is pending', async () => {
+    let resolveLogin!: (value: { twoFactorRequired: true }) => void;
+    h.apiLogin.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolveLogin = resolve;
+        }),
+    );
+    render(App);
+    await fireEvent.input(screen.getByLabelText(t('auth.username')), {
+      target: { value: 'alice' },
+    });
+    await fireEvent.input(screen.getByLabelText(t('auth.password')), {
+      target: { value: 'pw' },
+    });
+
+    const form = loginForm();
+    await Promise.all([fireEvent.submit(form), fireEvent.submit(form)]);
+
+    expect(h.apiLogin).toHaveBeenCalledTimes(1);
+    expect(form).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByRole('button', { name: t('auth.signIn') })).toBeDisabled();
+
+    resolveLogin({ twoFactorRequired: true });
+
+    expect(await screen.findByLabelText(t('auth.authenticatorCode'))).toHaveFocus();
+    expect(form).toHaveAttribute('aria-busy', 'false');
+  });
+
+  it('supports a recovery-code retry without leaving the challenge step', async () => {
+    h.apiLogin.mockResolvedValueOnce({ twoFactorRequired: true });
+    render(App);
+    await fireEvent.input(screen.getByLabelText(t('auth.username')), {
+      target: { value: 'alice' },
+    });
+    await fireEvent.input(screen.getByLabelText(t('auth.password')), { target: { value: 'pw' } });
+    await fireEvent.submit(loginForm());
+    await screen.findByLabelText(t('auth.authenticatorCode'));
+
+    await fireEvent.click(screen.getByText(t('auth.useRecoveryCode')));
+    const recoveryInput = screen.getByLabelText(t('auth.recoveryCode'));
+    expect(recoveryInput).toHaveFocus();
+    h.apiLogin.mockRejectedValueOnce(new ApiError(401, 'invalid authentication code'));
+    await fireEvent.input(recoveryInput, { target: { value: 'bad-code' } });
+    await fireEvent.submit(loginForm());
+
+    await vi.waitFor(() => expect(auth.loginError).toBe(t('error.invalidAuthenticationCode')));
+    expect(screen.getByLabelText(t('auth.recoveryCode'))).toBeInTheDocument();
+    expect(auth.twoFactorRequired).toBe(true);
+
+    h.apiLogin.mockImplementationOnce(async () => {
+      h.setToken('tok');
+      return {
+        username: 'alice',
+        roles: ['superadmin'],
+        permissions: ['analytics.read', 'accounts.read', 'moderation.read', 'moderation.act'],
+      };
+    });
+    await fireEvent.input(screen.getByLabelText(t('auth.recoveryCode')), {
+      target: { value: 'abcd-1234' },
+    });
+    await fireEvent.submit(loginForm());
+
+    expect(await screen.findByText(t('auth.signOut'))).toBeInTheDocument();
+    expect(h.apiLogin).toHaveBeenLastCalledWith('alice', 'pw', '', 'abcd-1234');
+  });
+
+  it('returns focus across factor-mode changes and Back', async () => {
+    h.apiLogin.mockResolvedValueOnce({ twoFactorRequired: true });
+    render(App);
+    await fireEvent.input(screen.getByLabelText(t('auth.username')), {
+      target: { value: 'alice' },
+    });
+    await fireEvent.input(screen.getByLabelText(t('auth.password')), {
+      target: { value: 'pw' },
+    });
+    await fireEvent.submit(loginForm());
+
+    expect(await screen.findByLabelText(t('auth.authenticatorCode'))).toHaveFocus();
+    await fireEvent.click(screen.getByRole('button', { name: t('auth.useRecoveryCode') }));
+    expect(screen.getByLabelText(t('auth.recoveryCode'))).toHaveFocus();
+    await fireEvent.click(screen.getByRole('button', { name: t('auth.useAuthenticatorCode') }));
+    expect(screen.getByLabelText(t('auth.authenticatorCode'))).toHaveFocus();
+
+    await fireEvent.click(screen.getByRole('button', { name: t('auth.back') }));
+
+    expect(screen.getByLabelText(t('auth.username'))).toHaveFocus();
   });
 
   it('shows a localized error and stays on login when credentials fail', async () => {
     h.apiLogin.mockRejectedValue(new ApiError(401, 'invalid credentials'));
     render(App);
     await fireEvent.input(screen.getByLabelText(t('auth.username')), { target: { value: 'bob' } });
-    await fireEvent.input(screen.getByLabelText(t('auth.password')), { target: { value: 'nope' } });
+    const passwordInput = screen.getByLabelText(t('auth.password'));
+    await fireEvent.input(passwordInput, { target: { value: 'nope' } });
+    passwordInput.focus();
+    await fireEvent.submit(loginForm());
+
+    await vi.waitFor(() => expect(auth.loginError).not.toBe(''));
+    expect(passwordInput).toHaveFocus();
+    expect(screen.queryByText(t('auth.signOut'))).not.toBeInTheDocument();
+  });
+
+  // Regression coverage for BUG #15: the admin login form previously had no way to
+  // submit a second factor at all, so a 2FA-enabled operator account had to be
+  // (server-side) waved through on password alone. Now the challenge reply reveals
+  // the code field and the second submit completes login with it.
+  it('reveals the 2FA code field after a challenge and completes login with the code', async () => {
+    expect(screen.queryByLabelText(t('auth.twoFactorLabel'))).not.toBeInTheDocument();
+    h.apiLogin.mockImplementationOnce(async () => ({ twoFactorRequired: true }));
+    h.apiLogin.mockImplementationOnce(
+      async (_username: string, _password: string, code: string, recoveryCode: string) => {
+        expect(code).toBe('123456');
+        expect(recoveryCode).toBe('');
+        h.setToken('tok');
+        return {
+          username: 'alice',
+          roles: ['superadmin'],
+          permissions: ['analytics.read', 'accounts.read', 'moderation.read', 'moderation.act'],
+        };
+      },
+    );
+    render(App);
+    await fireEvent.input(screen.getByLabelText(t('auth.username')), {
+      target: { value: 'alice' },
+    });
+    await fireEvent.input(screen.getByLabelText(t('auth.password')), { target: { value: 'pw' } });
+    await fireEvent.submit(loginForm());
+
+    const codeInput = await screen.findByLabelText(t('auth.twoFactorLabel'));
+    await fireEvent.input(codeInput, { target: { value: '123456' } });
+    await fireEvent.submit(loginForm());
+
+    expect(await screen.findByText(t('auth.signOut'))).toBeInTheDocument();
+    expect(h.apiLogin).toHaveBeenCalledTimes(2);
+    expect(h.apiLogin).toHaveBeenNthCalledWith(1, 'alice', 'pw', '', '');
+    expect(h.apiLogin).toHaveBeenNthCalledWith(2, 'alice', 'pw', '123456', '');
+  });
+
+  it('routes a non-6-digit entry in the 2FA field as a recovery code', async () => {
+    h.apiLogin.mockImplementationOnce(async () => ({ twoFactorRequired: true }));
+    h.apiLogin.mockImplementationOnce(async () => {
+      h.setToken('tok');
+      return { username: 'alice', roles: ['superadmin'], permissions: [] };
+    });
+    render(App);
+    await fireEvent.input(screen.getByLabelText(t('auth.username')), {
+      target: { value: 'alice' },
+    });
+    await fireEvent.input(screen.getByLabelText(t('auth.password')), { target: { value: 'pw' } });
+    await fireEvent.submit(loginForm());
+
+    // Real-shaped recovery code (generateRecoveryCodes, server/totp.ts): 16 hex
+    // chars grouped in fours with dashes, 19 characters total. A field that
+    // truncates this (regression: maxlength was 14) makes recovery-code login,
+    // the account's own lockout escape hatch, impossible.
+    const recoveryCode = '4f8a-3b1c-9d2e-71ab';
+    const codeInput = await screen.findByLabelText(t('auth.twoFactorLabel'));
+    expect(codeInput).not.toHaveAttribute('maxlength', '14');
+    await fireEvent.input(codeInput, { target: { value: recoveryCode } });
+    expect((codeInput as HTMLInputElement).value).toBe(recoveryCode);
+    await fireEvent.submit(loginForm());
+
+    expect(await screen.findByText(t('auth.signOut'))).toBeInTheDocument();
+    expect(h.apiLogin).toHaveBeenNthCalledWith(2, 'alice', 'pw', '', recoveryCode);
+  });
+
+  it('keeps the code field visible and shows an error when the 2FA code is wrong', async () => {
+    h.apiLogin.mockImplementationOnce(async () => ({ twoFactorRequired: true }));
+    h.apiLogin.mockRejectedValueOnce(new ApiError(401, 'invalid authentication code'));
+    render(App);
+    await fireEvent.input(screen.getByLabelText(t('auth.username')), {
+      target: { value: 'alice' },
+    });
+    await fireEvent.input(screen.getByLabelText(t('auth.password')), { target: { value: 'pw' } });
+    await fireEvent.submit(loginForm());
+
+    const codeInput = await screen.findByLabelText(t('auth.twoFactorLabel'));
+    await fireEvent.input(codeInput, { target: { value: '000000' } });
     await fireEvent.submit(loginForm());
 
     await vi.waitFor(() => expect(auth.loginError).not.toBe(''));
     expect(screen.queryByText(t('auth.signOut'))).not.toBeInTheDocument();
+    // The operator can retry the code without re-entering the password.
+    expect(screen.getByLabelText(t('auth.twoFactorLabel'))).toBeInTheDocument();
   });
 
   it('logout returns to the login screen with a session message', async () => {

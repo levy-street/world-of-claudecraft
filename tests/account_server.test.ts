@@ -70,6 +70,10 @@ const parse = (res: any) => ({
 // the right rows by inspecting the SQL, and records the writes it sees.
 let accountRow: any;
 let characters: any[];
+// Rows returned for the account-wide (every realm) character read the GDPR
+// export uses: distinct from `characters` (this process's realm only) so a
+// test can prove the export is not silently dropping the other-realm rows.
+let charactersAllRealms: any[];
 let charCount: number;
 let writes: { sql: string; params: any[] }[];
 // Pending email-change row the consume UPDATE returns (null = invalid/expired).
@@ -88,6 +92,9 @@ function routeQuery(sql: string, params: any[]) {
     return { rows: [{ unsubscribe_token: params[1] ?? 'unsub-token' }] };
   if (sql.includes('FROM accounts WHERE id')) return { rows: accountRow ? [accountRow] : [] };
   if (sql.includes('COUNT(*)')) return { rows: [{ count: charCount }] };
+  // Must be checked before the generic realm-scoped branch below: this is the
+  // account-wide (every realm) read, keyed by its distinguishing ORDER BY.
+  if (sql.includes('ORDER BY realm, id')) return { rows: charactersAllRealms };
   if (sql.includes('FROM characters WHERE account_id') || sql.includes('FROM characters c')) {
     return { rows: characters };
   }
@@ -113,6 +120,7 @@ beforeEach(async () => {
     marketing_opt_in: false,
   };
   characters = [{ id: 10 }, { id: 11 }];
+  charactersAllRealms = characters;
   charCount = 2;
   pendingChange = { account_id: 1, new_email: 'new@example.com' };
   emailBackfillRows = 1;
@@ -204,6 +212,7 @@ describe('handleAccountChangePassword', () => {
       res,
       1,
       'tokA',
+      noHooks,
     );
     expect(parse(res).status).toBe(401);
     expect(writes.some((w) => w.sql.includes('UPDATE accounts SET password_hash'))).toBe(false);
@@ -215,6 +224,7 @@ describe('handleAccountChangePassword', () => {
       res,
       1,
       'tokA',
+      noHooks,
     );
     expect(parse(res).status).toBe(400);
   });
@@ -225,6 +235,7 @@ describe('handleAccountChangePassword', () => {
       res,
       1,
       'tokA',
+      noHooks,
     );
     const { status, data } = parse(res);
     expect(status).toBe(400);
@@ -237,6 +248,7 @@ describe('handleAccountChangePassword', () => {
       res,
       1,
       'tokA',
+      noHooks,
     );
     expect(parse(res).status).toBe(200);
     expect(writes.some((w) => w.sql.includes('UPDATE accounts SET password_hash'))).toBe(true);
@@ -245,6 +257,42 @@ describe('handleAccountChangePassword', () => {
     // The "<> $2" (keep caller) variant, with the caller token as a param.
     expect(revoke!.sql).toContain('token <>');
     expect(revoke!.params).toContain('tokA');
+  });
+  // Token revocation alone does not close an already-open WS: an attacker who
+  // phished the password and is already in-world would otherwise keep playing
+  // on the victim's character after the victim locks them out. A successful
+  // change must also force-disconnect any live session for the account.
+  it('force-disconnects every live WS session for the account, unconditionally', async () => {
+    const disconnectAccount = vi.fn();
+    const res = makeRes();
+    await handleAccountChangePassword(
+      makeReq({ current: CORRECT_PW, next: 'brandnew1' }, '198.51.100.93'),
+      res,
+      1,
+      'tokA',
+      { disconnectAccount },
+    );
+    expect(parse(res).status).toBe(200);
+    // No exception token: a bearer token is a reusable wire credential, not a
+    // per-socket identity, so exempting a live session by token equality could
+    // just as easily spare an attacker's session sharing a stolen token as the
+    // legitimate caller's. disconnectAccount always kicks every live session for
+    // the account (a review finding on the original PR).
+    expect(disconnectAccount).toHaveBeenCalledWith(1, expect.any(String));
+    expect(disconnectAccount.mock.calls[0]).toHaveLength(2);
+  });
+  it('does not disconnect anyone when the change is rejected (wrong current password)', async () => {
+    const disconnectAccount = vi.fn();
+    const res = makeRes();
+    await handleAccountChangePassword(
+      makeReq({ current: 'wrong', next: 'brandnew1' }, '198.51.100.94'),
+      res,
+      1,
+      'tokA',
+      { disconnectAccount },
+    );
+    expect(parse(res).status).toBe(401);
+    expect(disconnectAccount).not.toHaveBeenCalled();
   });
 });
 
@@ -340,6 +388,7 @@ describe('account portal rate limiting (429)', () => {
         last,
         1,
         'tokA',
+        noHooks,
       );
     }
     expect(parse(last).status).toBe(429);
@@ -378,6 +427,7 @@ describe('account portal auth-failure accounting', () => {
       res,
       1,
       'tokA',
+      noHooks,
     );
     expect(parse(res).status).toBe(200);
   });
@@ -472,6 +522,23 @@ describe('handleAccountExport', () => {
     const bundle = JSON.parse(res.body);
     expect(bundle.account).toMatchObject({ id: 1, username: 'Aelwyn' });
     expect(Array.isArray(bundle.characters)).toBe(true);
+  });
+  it('includes characters from every realm the account holds, not just this process realm', async () => {
+    // This deployment runs multiple realm processes against one shared
+    // database (server/realm.ts); an account may hold characters on several of
+    // them. The export is an account-wide self-service surface (matching
+    // characterCountForAccount / handleAccountWhoami), so it must return every
+    // realm's characters, not only the realm serving this request.
+    charactersAllRealms = [
+      { id: 10, name: 'Aelwyn', class: 'warrior', level: 12, state: {}, realm: 'ashvale' },
+      { id: 55, name: 'Faelar', class: 'druid', level: 30, state: {}, realm: 'thornreach' },
+    ];
+    const res = makeRes();
+    await handleAccountExport(makeReq({}, '198.51.100.42'), res, 1);
+    const bundle = JSON.parse(res.body);
+    const realms = bundle.characters.map((c: any) => c.realm).sort();
+    expect(realms).toEqual(['ashvale', 'thornreach']);
+    expect(bundle.characters.map((c: any) => c.id).sort()).toEqual([10, 55]);
   });
   it('404s when the account is gone', async () => {
     accountRow = null;

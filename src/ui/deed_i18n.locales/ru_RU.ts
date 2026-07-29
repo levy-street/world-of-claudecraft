@@ -7,6 +7,102 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: 'Знамя в руках',
+    desc: 'Захватите флаг в Терновой Лощине.',
+  },
+  pvp_bg_first_win: {
+    name: 'Лощина устояла',
+    desc: 'Выиграйте бой в Терновой Лощине.',
+  },
+  pvp_bg_wins_25: {
+    name: 'Страж Лощины',
+    desc: 'Выиграйте 25 боёв в Терновой Лощине.',
+    title: 'Знаменосец',
+  },
+  pvp_bg_captures_100: {
+    name: 'Сто знамён',
+    desc: 'Захватите 100 флагов в Терновой Лощине за всю карьеру.',
+  },
+  dgn_rift: {
+    name: 'Скиталец Разломов',
+    desc: 'Пройдите Разлом, победив босса этажа.',
+  },
+  dgn_rift_s_rank: {
+    name: 'Повелитель Разломов',
+    desc: 'Пройдите Разлом ранга S, высшего уровня, который способен открыть портал Разлома.',
+  },
+  pvp_honor_sergeant: {
+    name: 'Сержант',
+    desc: 'Заработайте 10 000 чести за все время игры. Трата чести никогда не лишает вас звания.',
+    title: 'Сержант',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: 'Рыцарь-лейтенант',
+    desc: 'Заработайте 40 000 чести за все время игры: позади у вас целый сезон настоящей войны.',
+    title: 'Рыцарь-лейтенант',
+  },
+  pvp_honor_field_marshal: {
+    name: 'Фельдмаршал',
+    desc: 'Заработайте 150 000 чести за все время игры. Редкость в любом игровом мире, и так и должно быть.',
+    title: 'Фельдмаршал',
+  },
+  chr_drakemaw_broodlord: {
+    name: 'Разоритель кладки',
+    desc: 'Выводковый лорд Дрейкмо повержен среди своей кладки: рёв, секущий удар и огонь остались позади.',
+  },
+  chr_maw_matriarch: {
+    name: 'Небо смолкает',
+    desc: 'Синдралет, Матриарх Дрейкмо, повержена в своём кратерном гнездовье над Дрейкмо.',
+  },
+  chr_frostveil_gatherer: {
+    name: 'Urozhay na terrasakh',
+    desc: 'Soberi rudnuyu zhilu, lesnuyu porosl i gryadku trav vo Frostveil.',
+  },
+  chr_frostveil_first_cast: {
+    name: 'Pervyy led na gornom ozere',
+    desc: 'Poymay rybu v vodakh Frostveil.',
+  },
+  chr_amberfall_gatherer: {
+    name: 'Urozhay Amberfall',
+    desc: 'Soberi rudnuyu zhilu, lesnuyu porosl i gryadku trav v Amberfall.',
+  },
+  chr_amberfall_first_cast: {
+    name: 'Ulov iz velikoy topi',
+    desc: 'Poymay rybu v vodakh Amberfall.',
+  },
+  chr_nightbloom_gatherer: {
+    name: 'Snovidcheskiy urozhay',
+    desc: 'Soberi rudnuyu zhilu, lesnuyu porosl i gryadku trav v Nightbloom.',
+  },
+  chr_nightbloom_first_cast: {
+    name: 'Ryab na lunnom kolodtse',
+    desc: 'Poymay rybu v vodakh Nightbloom.',
+  },
+  chr_wraithwood_gatherer: {
+    name: 'Urozhay pod krovley lesa',
+    desc: 'Soberi rudnuyu zhilu, lesnuyu porosl i gryadku trav v Wraithwood.',
+  },
+  chr_wraithwood_first_cast: {
+    name: 'Zabros v zerkalnoy bukhte',
+    desc: 'Poymay rybu v vodakh Wraithwood.',
+  },
+  chr_palmreach_gatherer: {
+    name: 'Urozhay na palmovom beregu',
+    desc: 'Soberi rudnuyu zhilu, lesnuyu porosl i gryadku trav v Palmreach.',
+  },
+  chr_palmreach_first_cast: {
+    name: 'Zabros v sapfirovoy lagune',
+    desc: 'Poymay rybu v vodakh Palmreach.',
+  },
+  chr_evergarden_gatherer: {
+    name: 'Dary partera',
+    desc: 'Soberi rudnuyu zhilu, lesnuyu porosl i gryadku trav v Evergarden.',
+  },
+  chr_evergarden_first_cast: {
+    name: 'Zabros v prud s lepestkami',
+    desc: 'Poymay rybu v vodakh Evergarden.',
+  },
   pvp_card_duel_first_win: {
     name: 'Свои правила',
     desc: 'Победите в карточной дуэли у Карточного мастера.',
@@ -82,7 +178,7 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: 'Хозяин луга', desc: 'Доведите навык травничества до 100.' },
   prog_master_gatherer: {
     name: 'Мастер-собиратель',
-    desc: 'Доведите до 100 навыки горного дела, лесозаготовки и травничества.',
+    desc: 'Доведите навык до 100 в любых трёх из горного дела, лесозаготовки, травничества и рыбной ловли.',
   },
   prog_first_craft: { name: 'Ручная работа', desc: 'Успешно создайте своё первое изделие.' },
   prog_craft_specialist: {
@@ -435,7 +531,10 @@ export const table: DeedLocaleTable = {
     name: 'Почётный покупатель',
     desc: 'Найдите все десять предметов из запасов Интенданта Векса.',
   },
-  col_glimmerfin: { name: 'Проблеск надежды', desc: 'Поймайте карпа кои с мерцающими плавниками.' },
+  col_glimmerfin: {
+    name: 'Проблеск надежды',
+    desc: 'Поймайте кои солнечного блика.',
+  },
   col_full_creel: {
     name: 'Полный садок',
     desc: 'Найдите все шесть обычных уловов из вод Долины, Топи и Высот.',
@@ -608,7 +707,15 @@ export const table: DeedLocaleTable = {
     title: 'Странник',
   },
   exp_something_shiny: { name: 'Что-то блестящее', desc: 'Подберите с земли сверкающий предмет.' },
-  exp_first_ore: { name: 'Вгрызайся в землю', desc: 'Разработайте свою первую рудную жилу.' },
+  prog_guildsworn: {
+    name: 'Присягнувший ремеслу',
+    desc: 'Настройтесь на пару архетипа и всерьёз займитесь её ремёслами.',
+    title: 'Присягнувший ремеслу',
+  },
+  exp_first_ore: {
+    name: 'Кирка встречает камень',
+    desc: 'Разработайте свою первую рудную жилу.',
+  },
   exp_first_timber: { name: 'Поберегись!', desc: 'Соберите древесину со своей первой делянки.' },
   exp_first_herb: { name: 'Лёгкая рука', desc: 'Соберите травы со своих первых зарослей.' },
   feat_era_cap: {
@@ -678,4 +785,194 @@ export const table: DeedLocaleTable = {
     desc: 'Отважьтесь войти в Заброшенный склеп и добудьте у его стражей обе половины ключ-камня и древний дневник.',
   },
   chr_marsh_first_cast: { name: 'Угри в камышах', desc: 'Поймайте рыбу в водах Мирефенской топи.' },
+  prog_masterwright: {
+    name: 'Мастер-шедевральник',
+    desc: 'Создайте свой первый шедевр, настолько искусный, что весь регион узнает о нём.',
+    title: 'Мастер-шедевральник',
+  },
+  prog_fishing_100: {
+    name: 'Морской волк',
+    desc: 'Доведите мастерство рыбной ловли до 100.',
+  },
+  prog_master_angler: {
+    name: 'Мастер удочки',
+    desc: 'Доведите мастерство рыбной ловли до 200, до самой вершины искусства рыбака.',
+    title: 'Мастер удочки',
+  },
+  prog_engineering_50: {
+    name: 'Шестерни и пружины',
+    desc: 'Доведите навык инженерного дела до 50.',
+  },
+  prog_alchemy_50: {
+    name: 'Дивное варево',
+    desc: 'Доведите навык алхимии до 50.',
+  },
+  prog_cooking_50: {
+    name: 'Рука набита',
+    desc: 'Доведите навык кулинарии до 50.',
+  },
+  prog_leatherworking_50: {
+    name: 'Дело кожевника',
+    desc: 'Доведите навык кожевничества до 50.',
+  },
+  prog_tailoring_50: {
+    name: 'Стежок в стежок',
+    desc: 'Доведите навык портняжного дела до 50.',
+  },
+  prog_enchanting_50: {
+    name: 'Первый отблеск тайных сил',
+    desc: 'Доведите навык наложения чар до 50.',
+  },
+  prog_weaponcrafting_50: {
+    name: 'Заточка и закалка',
+    desc: 'Доведите навык оружейного дела до 50.',
+  },
+  prog_armorcrafting_50: {
+    name: 'Молот и пластина',
+    desc: 'Доведите навык бронного дела до 50.',
+  },
+  prog_grandmaster_engineering: {
+    name: 'Гранд-мастер инженерного дела',
+    desc: 'Доведите навык инженерного дела до 125, до самой вершины ремесла.',
+    title: 'Гранд-мастер инженерного дела',
+  },
+  prog_grandmaster_alchemy: {
+    name: 'Гранд-мастер алхимии',
+    desc: 'Доведите навык алхимии до 125, до самой вершины ремесла.',
+    title: 'Гранд-мастер алхимии',
+  },
+  prog_grandmaster_cooking: {
+    name: 'Гранд-мастер кулинарии',
+    desc: 'Доведите навык кулинарии до 125, до самой вершины ремесла.',
+    title: 'Гранд-мастер кулинарии',
+  },
+  prog_grandmaster_leatherworking: {
+    name: 'Гранд-мастер кожевничества',
+    desc: 'Доведите навык кожевничества до 125, до самой вершины ремесла.',
+    title: 'Гранд-мастер кожевничества',
+  },
+  prog_grandmaster_tailoring: {
+    name: 'Гранд-мастер портняжного дела',
+    desc: 'Доведите навык портняжного дела до 125, до самой вершины ремесла.',
+    title: 'Гранд-мастер портняжного дела',
+  },
+  prog_grandmaster_enchanting: {
+    name: 'Гранд-мастер наложения чар',
+    desc: 'Доведите навык наложения чар до 125, до самой вершины ремесла.',
+    title: 'Гранд-мастер наложения чар',
+  },
+  prog_grandmaster_weaponcrafting: {
+    name: 'Гранд-мастер оружейного дела',
+    desc: 'Доведите навык оружейного дела до 125, до самой вершины ремесла.',
+    title: 'Гранд-мастер оружейного дела',
+  },
+  prog_grandmaster_armorcrafting: {
+    name: 'Гранд-мастер бронного дела',
+    desc: 'Доведите навык бронного дела до 125, до самой вершины ремесла.',
+    title: 'Гранд-мастер бронного дела',
+  },
+  col_pristine_vein: {
+    name: 'Нетронутая жила',
+    desc: 'Вскройте нетронутую жилу и дайте всему региону узнать об этом.',
+  },
+  col_ancient_heartwood: {
+    name: 'Древняя сердцевина',
+    desc: 'Извлеките кусок древней сердцевины из поваленного ствола.',
+  },
+  col_moonlit_bloom: {
+    name: 'Лунный цветок',
+    desc: 'Соберите лунный цветок в самый миг его раскрытия.',
+  },
+  col_perfect_specimen: {
+    name: 'Безупречный трофей',
+    desc: 'Возьмите безупречный образец с разделанного зверя, без единого надреза или изъяна.',
+  },
+  soc_first_salvage: {
+    name: 'Ничего не пропадёт',
+    desc: 'Разберите снаряжение на сырые материалы.',
+  },
+  soc_salvage_50: {
+    name: 'Разборная мастерская',
+    desc: 'Разберите 50 единиц снаряжения на сырые материалы.',
+  },
+  dgn_wildheart_basin: {
+    name: 'Котловина даёт отпор',
+    desc: 'Одолейте Зулгара, Голос Котловины, в Котловине Дикого Сердца.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Героизм: Котловина Дикого Сердца',
+    desc: 'Одолейте Зулгара, Голос Котловины, в Котловине Дикого Сердца на героической сложности.',
+  },
+  chr_peaks_gatherer: {
+    name: 'Жатва высот',
+    desc: 'Добудьте руду из жилы, древесину с делянки и травы с поляны на Терновых высотах.',
+  },
+  chr_marsh_rares_ii: {
+    name: 'Обжора, взятый на счёт',
+    desc: 'Сразите Грабджо Обжору, четвёртого именного ужаса Мирефенской топи, не попавшего в первый счёт.',
+  },
+  chr_peaks_rares_ii: {
+    name: 'Новые имена, высеченные в скале',
+    desc: 'Сразите Старого Крагмо и Владыку осколков Каззикса, ещё двух именных ужасов Терновых высот, не попавших в первый счёт.',
+  },
+  chr_gleamstag: {
+    name: 'Легенда, что не бьёт первой',
+    desc: 'Сразите Мерцающего оленя, редкого и скрытного элитного зверя, который нападает, лишь когда его загонят в угол.',
+  },
+  chr_hollow_rares: {
+    name: 'Стадо помнит',
+    desc: 'Сразите Старого Мозгопанциря и Аурелхорна, Первого в стаде, двух бродячих редких боссов Сокрытой лощины.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Щедроты топей',
+    desc: 'Добудьте руду из жилы, древесину с делянки и травы с поляны в Ивовой Топи.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Рябь в Кувшинковых мхах',
+    desc: 'Поймайте рыбу в водах Ивовой Топи.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Жатва на мысу',
+    desc: 'Добудьте руду из жилы, древесину с делянки и травы с поляны в Гейлкресте.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'Леска в Зеркальном Озере',
+    desc: 'Поймайте рыбу в водах Гейлкреста.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Островные припасы',
+    desc: 'Добудьте руду из жилы, древесину с делянки и травы с поляны на Дальнем Берегу.',
+  },
+  chr_farshore_first_cast: {
+    name: 'Что знают чайки',
+    desc: 'Поймайте рыбу в водах Дальнего Берега.',
+  },
+  prog_engineering_rare: {
+    name: 'Точная инженерия',
+    desc: 'Впервые создайте предмет редкого качества по профессии «Инженерное дело».',
+  },
+  prog_alchemy_rare: {
+    name: 'Редкий урожай',
+    desc: 'Впервые создайте предмет редкого качества по профессии «Алхимия».',
+  },
+  prog_cooking_rare: {
+    name: 'Незабываемое блюдо',
+    desc: 'Впервые создайте предмет редкого качества по профессии «Кулинария».',
+  },
+  prog_leatherworking_rare: {
+    name: 'Тонкая выделка',
+    desc: 'Впервые создайте предмет редкого качества по профессии «Кожевничество».',
+  },
+  prog_tailoring_rare: {
+    name: 'Мастерский стежок',
+    desc: 'Впервые создайте предмет редкого качества по профессии «Портняжное дело».',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Закалено до блеска',
+    desc: 'Впервые создайте предмет редкого качества по профессии «Оружейное дело».',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Закован до совершенства',
+    desc: 'Впервые создайте предмет редкого качества по профессии «Бронное дело».',
+  },
 };

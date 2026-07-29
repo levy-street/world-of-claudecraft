@@ -30,7 +30,7 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
     },
   },
   'paladin/protection': {
-    stats: { str: 6, dodge: 0.02, armorPct: 0.29 },
+    stats: { str: 6, dodge: 0.02, armorPct: 0.29, staPct: 0.35 },
     global: { threatPct: 0.2 },
     abilities: {
       devotion_aura: { buffPct: 0.4 },
@@ -163,7 +163,7 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
     },
   },
   'druid/feral': {
-    stats: { armorPct: 0.23 },
+    stats: { armorPct: 0.23, staPct: 0.25 },
     global: { threatPct: 0.2 },
     abilities: {
       maul: { dmgPct: 0.35 },

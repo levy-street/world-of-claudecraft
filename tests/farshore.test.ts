@@ -7,7 +7,12 @@
 // the mainland side.
 
 import { describe, expect, it } from 'vitest';
-import { FARSHORE_PORTALS, FARSHORE_ROADS, FARSHORE_ZONE } from '../src/sim/content/farshore';
+import {
+  FARSHORE_CAMPS,
+  FARSHORE_PORTALS,
+  FARSHORE_ROADS,
+  FARSHORE_ZONE,
+} from '../src/sim/content/farshore';
 import { zoneAt } from '../src/sim/data';
 import {
   FARSHORE_BREACH,
@@ -16,10 +21,43 @@ import {
   valeLandness,
   WATER_LEVEL,
 } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
-const SEED = 1337; // matches the fixed client seed in src/main.ts
+// The SHIPPED world seed (src/sim/world_seed.ts, mandated for geometry
+// tests): this file long pinned 1337 under a comment claiming it matched
+// the fixed client seed, but every shipping host seeds WORLD_SEED, so the
+// dry-road and elevation pins were proving a world nobody plays.
+const SEED = WORLD_SEED;
 
 describe('Farshore zone registration', () => {
+  it('pins the established shared-stream budget and private expansion tail', () => {
+    expect(FARSHORE_CAMPS.map((camp) => camp.sharedRngCount)).toEqual([
+      2,
+      2,
+      1,
+      1,
+      4,
+      3,
+      2,
+      2,
+      undefined,
+    ]);
+    expect(
+      FARSHORE_CAMPS.reduce(
+        (sum, camp) => sum + (camp.sharedRngCount === undefined ? camp.count : camp.sharedRngCount),
+        0,
+      ),
+    ).toBe(18);
+    expect(
+      FARSHORE_CAMPS.reduce(
+        (sum, camp) =>
+          sum +
+          (camp.sharedRngCount === undefined ? 0 : Math.max(0, camp.count - camp.sharedRngCount)),
+        0,
+      ),
+    ).toBe(16);
+  });
+
   it('is a rectangle far offshore in the eastern sea', () => {
     expect(FARSHORE_ZONE.xMin).toBe(700);
     expect(FARSHORE_ZONE.xMax).toBe(1300);

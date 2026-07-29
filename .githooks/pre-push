@@ -49,6 +49,9 @@ if [ "$tools_ok" = 1 ]; then
 fi
 
 # 4) Copy rules over the push diff: no em dash, en dash, or emoji (locale overlays excluded).
+# The Russian doc mirrors are the one prose exception: Russian typography uses the
+# em dash correctly, so docs/i18n/*.ru_RU.md is excluded the same way the game's
+# locale overlays are. Every other locale mirror stays in scope.
 base=$(git merge-base HEAD '@{upstream}' 2>/dev/null \
   || git merge-base HEAD origin/main 2>/dev/null \
   || git rev-parse HEAD~1 2>/dev/null || true)
@@ -58,6 +61,7 @@ if [ -n "$base" ] && command -v perl >/dev/null 2>&1; then
     ':(exclude)src/ui/i18n.locales' \
     ':(exclude)src/ui/i18n.resolved.generated' \
     ':(exclude)src/admin/i18n.resolved.generated' \
+    ':(exclude)docs/i18n/*.ru_RU.md' \
     ':(exclude)*.lock' ':(exclude)package-lock.json' 2>/dev/null \
     | perl -CSD -ne '
         if (m{^\+\+\+\s+b/(.+)$}) { our $f = $1; $f =~ s/\s+$//; next; }

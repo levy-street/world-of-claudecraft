@@ -36,15 +36,15 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   charge: [9, 1],
   bear_charge: [9, 1],
   // "30% more threat": the stance threat multiplier inside threatModifier.
-  // Bear form's "armor +90%" is the recalcPlayerStats multiplier (1.9) in
-  // entity.ts, not the form effect's value.
+  // Bear form's "armor +130%" is the recalcPlayerStats multiplier (2.3, the
+  // 2026-07 tank-parity pass) in entity.ts, not the form effect's value.
   defensive_stance: [30],
   // Battle Stance's rage multiplier is applied by resourceGainMultiplier.
   battle_stance: [10],
   // Valor Roar's Protection-only damage reduction is applied when the party
   // maximum-health aura is created, rather than stored on its shared effect.
   rallying_cry: [5],
-  bear_form: [30, 90],
+  bear_form: [30, 130],
   // "compelled to attack you for 3 sec": the taunt compel window in threat.ts.
   taunt: [3],
   holy_taunt: [3],

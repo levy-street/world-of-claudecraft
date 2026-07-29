@@ -1,6 +1,24 @@
 import { describe, expect, it } from 'vitest';
-import { arenaOrigin, BUILTIN_WORLD, isArenaPos } from '../src/sim/data';
-import { DUNGEON_WALL_X } from '../src/sim/dungeon_layout';
+import { lineOfSightClear, resolveMovement } from '../src/sim/colliders';
+import {
+  ARENA_SLOT_COUNT,
+  ARENA_X_MIN,
+  arenaOrigin,
+  BUILTIN_WORLD,
+  dungeonAt,
+  instanceOrigin,
+  isArenaPos,
+} from '../src/sim/data';
+import {
+  ARENA_LAYOUT,
+  ARENA_SPAWNS_A_2v2,
+  ARENA_SPAWNS_B_2v2,
+  DUNGEON_WALL_HW,
+  DUNGEON_WALL_X,
+  layoutColliders,
+  NYTHRAXIS_LAYOUT,
+} from '../src/sim/dungeon_layout';
+import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
 import { eloDelta, Sim } from '../src/sim/sim';
 import type { PlayerClass, WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
@@ -197,6 +215,84 @@ describe('arena: a full bout', () => {
     sim.targetEntity(null, a);
     sim.targetNearestEnemy(a);
     expect(sim.entities.get(a)!.targetId).toBe(b);
+  });
+
+  it('keeps an opponent targeted during the countdown across the fight-start reset', () => {
+    const { sim, a, b } = queueDuo();
+    expect(sim.arenaMatchFor(a)!.state).toBe('countdown');
+    sim.targetEntity(b, a);
+    expect(sim.entities.get(a)!.targetId).toBe(b);
+
+    startBout(sim);
+
+    expect(sim.arenaMatchFor(a)!.state).toBe('active');
+    expect(sim.entities.get(a)!.targetId).toBe(b);
+    // only the selection persists: auto-attack still starts off at the gates
+    expect(sim.entities.get(a)!.autoAttack).toBe(false);
+  });
+
+  it('a self-target made during the countdown also survives the fight-start reset', () => {
+    const { sim, a } = queueDuo();
+    sim.targetEntity(a, a);
+    expect(sim.entities.get(a)!.targetId).toBe(a);
+
+    startBout(sim);
+
+    expect(sim.arenaMatchFor(a)!.state).toBe('active');
+    expect(sim.entities.get(a)!.targetId).toBe(a);
+  });
+
+  it('resets a target pointing outside the match to null at fight start', () => {
+    const { sim, a } = queueDuo();
+    const outsider = sim.addPlayer('rogue', 'Gimel');
+    expect(sim.arenaMatchFor(a)!.state).toBe('countdown');
+    sim.entities.get(a)!.targetId = outsider;
+
+    startBout(sim);
+
+    expect(sim.arenaMatchFor(a)!.state).toBe('active');
+    expect(sim.entities.get(a)!.targetId).toBe(null);
+  });
+
+  it('a fighter with no target during the countdown still starts the fight untargeted', () => {
+    const { sim, a } = queueDuo();
+    expect(sim.entities.get(a)!.targetId).toBe(null);
+
+    startBout(sim);
+
+    expect(sim.arenaMatchFor(a)!.state).toBe('active');
+    expect(sim.entities.get(a)!.targetId).toBe(null);
+  });
+
+  it('the match-creation reset still clears a target carried into the arena', () => {
+    const { sim, a } = queueDuo('warrior', 'mage', (sim, a, b) => {
+      sim.entities.get(a)!.targetId = b;
+    });
+    expect(sim.arenaMatchFor(a)!.state).toBe('countdown');
+    expect(sim.entities.get(a)!.targetId).toBe(null);
+  });
+
+  it('a 2v2 teammate target survives the fight-start reset', () => {
+    const sim = makeWorld();
+    const classes: PlayerClass[] = ['warrior', 'mage', 'rogue', 'priest'];
+    const names = ['Aleph', 'Bet', 'Gimel', 'Dalet'];
+    const pids = classes.map((cls, i) => sim.addPlayer(cls, names[i]));
+    pids.forEach((pid, i) => {
+      teleport(sim, pid, i * 3, -40);
+    });
+    for (const pid of pids) sim.arenaQueueJoin(pid, '2v2');
+    sim.tick(); // matchmake seats the four solos into one 2v2 match
+    const match = sim.arenaMatchFor(pids[0])!;
+    expect(match.format).toBe('2v2');
+    expect(match.state).toBe('countdown');
+    const [me, mate] = match.teamA;
+    sim.targetEntity(mate, me);
+    expect(sim.entities.get(me)!.targetId).toBe(mate);
+
+    startBout(sim);
+
+    expect(match.state).toBe('active');
+    expect(sim.entities.get(me)!.targetId).toBe(mate);
   });
 
   it('does not cancel auto-attack when retargeting an active arena opponent', () => {
@@ -702,6 +798,134 @@ describe('arena: class ability target filters', () => {
 });
 
 describe('arena: enclosing walls', () => {
+  it('classifies the complete arena footprint without claiming the neighboring raid', () => {
+    const o = arenaOrigin(0);
+    const xExtents = layoutColliders(ARENA_LAYOUT).flatMap((collider) => {
+      if (collider.type === 'circle') {
+        return [collider.x - collider.r, collider.x + collider.r];
+      }
+      const xRadius =
+        Math.abs(Math.cos(collider.rot)) * collider.hw +
+        Math.abs(Math.sin(collider.rot)) * collider.hd;
+      return [collider.x - xRadius, collider.x + xRadius];
+    });
+    const westOuterFace = o.x + Math.min(...xExtents);
+    const eastOuterFace = o.x + Math.max(...xExtents);
+    const westBandEdge = westOuterFace - 1;
+
+    expect(ARENA_X_MIN).toBe(westBandEdge);
+    expect(isArenaPos(westBandEdge)).toBe(true);
+    expect(isArenaPos(westOuterFace)).toBe(true);
+    expect(isArenaPos(eastOuterFace)).toBe(true);
+
+    const raidOrigin = instanceOrigin(5, 0);
+    const raidEastOuterFace =
+      raidOrigin.x + (NYTHRAXIS_LAYOUT.wallX ?? DUNGEON_WALL_X) + DUNGEON_WALL_HW;
+    expect(isArenaPos(raidEastOuterFace)).toBe(false);
+    expect(dungeonAt(raidEastOuterFace)?.id).toBe('nythraxis_boss_arena');
+  });
+
+  it('classifies every 2v2 combatant spawn as arena space', () => {
+    const o = arenaOrigin(0);
+    for (const spawn of [...ARENA_SPAWNS_A_2v2, ...ARENA_SPAWNS_B_2v2]) {
+      expect(isArenaPos(o.x + spawn.x)).toBe(true);
+    }
+  });
+
+  it('stops live player movement symmetrically at both side walls', () => {
+    const { sim, a, b } = queueDuo();
+    startBout(sim);
+    const match = sim.arenaMatchFor(a);
+    expect(match?.state).toBe('active');
+    const o = arenaOrigin(match?.slot ?? 0);
+    const startDistance = DUNGEON_WALL_X - 2;
+    teleport(sim, a, o.x - startDistance, o.z);
+    teleport(sim, b, o.x + startDistance, o.z);
+    sim.entities.get(a)!.facing = -Math.PI / 2;
+    sim.entities.get(b)!.facing = Math.PI / 2;
+    sim.meta(a)!.moveInput.forward = true;
+    sim.meta(b)!.moveInput.forward = true;
+
+    for (let i = 0; i < 20; i++) sim.tick();
+
+    const expectedStop = DUNGEON_WALL_X - DUNGEON_WALL_HW - PLAYER_BODY_RADIUS;
+    const westDistance = o.x - sim.entities.get(a)!.pos.x;
+    const eastDistance = sim.entities.get(b)!.pos.x - o.x;
+    expect(westDistance).toBeGreaterThan(startDistance);
+    expect(eastDistance).toBeGreaterThan(startDistance);
+    expect(westDistance).toBeCloseTo(expectedStop, 5);
+    expect(eastDistance).toBeCloseTo(expectedStop, 5);
+    expect(westDistance).toBeCloseTo(eastDistance, 5);
+  });
+
+  it.each(Array.from({ length: ARENA_SLOT_COUNT }, (_, slot) => slot))(
+    'sweeps high-speed movement against all four walls in slot %s',
+    (slot) => {
+      const sim = makeWorld();
+      const o = arenaOrigin(slot);
+      const xLimit = DUNGEON_WALL_X - DUNGEON_WALL_HW - PLAYER_BODY_RADIUS;
+      const zMinLimit = ARENA_LAYOUT.zMin + DUNGEON_WALL_HW + PLAYER_BODY_RADIUS;
+      const zMaxLimit = ARENA_LAYOUT.zMax - DUNGEON_WALL_HW - PLAYER_BODY_RADIUS;
+      // Sweep lanes are obstacle-free rows/columns of the SLOT'S map (even
+      // slots Coliseum, odd slots Drowned Court): the z row dodges each map's
+      // cover (screens/posts vs colonnades) and the x+19 column runs outside
+      // every pillar, stub, and reliquary, so each sweep exercises the WALL
+      // collider, not interior cover (pinned in tests/arena_layout.test.ts).
+      const rowZ = slot % 2 === 1 ? -2 : -6;
+      const cases = [
+        {
+          from: { x: o.x, z: o.z + rowZ },
+          to: { x: o.x - DUNGEON_WALL_X - 10, z: o.z + rowZ },
+          inside: (x: number, _z: number) => x >= o.x - xLimit - 1e-6,
+        },
+        {
+          from: { x: o.x, z: o.z + rowZ },
+          to: { x: o.x + DUNGEON_WALL_X + 10, z: o.z + rowZ },
+          inside: (x: number, _z: number) => x <= o.x + xLimit + 1e-6,
+        },
+        {
+          from: { x: o.x + 19, z: o.z + 2 },
+          to: { x: o.x + 19, z: o.z + ARENA_LAYOUT.zMin - 10 },
+          inside: (_x: number, z: number) => z >= o.z + zMinLimit - 1e-6,
+        },
+        {
+          from: { x: o.x + 19, z: o.z + 2 },
+          to: { x: o.x + 19, z: o.z + ARENA_LAYOUT.zMax + 10 },
+          inside: (_x: number, z: number) => z <= o.z + zMaxLimit + 1e-6,
+        },
+      ];
+
+      for (const testCase of cases) {
+        const result = resolveMovement(
+          sim.cfg.seed,
+          testCase.from.x,
+          testCase.from.z,
+          testCase.to.x,
+          testCase.to.z,
+          PLAYER_BODY_RADIUS,
+        );
+        expect(testCase.inside(result.x, result.z)).toBe(true);
+        expect(result).not.toEqual(testCase.to);
+      }
+    },
+  );
+
+  it('blocks line of sight through both side walls', () => {
+    const sim = makeWorld();
+    const o = arenaOrigin(0);
+    for (const side of [-1, 1]) {
+      const inside = {
+        x: o.x + side * (DUNGEON_WALL_X - 1.5),
+        z: o.z,
+      };
+      const outside = {
+        x: o.x + side * (DUNGEON_WALL_X + 1.5),
+        z: o.z,
+      };
+      expect(lineOfSightClear(sim.cfg.seed, inside, outside)).toBe(false);
+    }
+  });
+
   it('melee auto-attack cannot land through the arena side wall', () => {
     const { sim, a, b } = queueDuo();
     startBout(sim);
@@ -719,6 +943,31 @@ describe('arena: enclosing walls', () => {
     const startHp = target.hp;
     for (let i = 0; i < 20 * 3; i++) sim.tick();
     // stays toggled on (mirrors the ranged LOS gate) but never lands a swing
+    expect(target.hp).toBe(startHp);
+  });
+
+  it('melee auto-attack cannot land through an approach screen', () => {
+    // The screens are Coliseum cover: force the rotation's preferred parity
+    // even (before matchmaking runs) so the bout seats on a Coliseum slot.
+    const { sim, a, b } = queueDuo('warrior', 'mage', (world) => {
+      world.ctx.nextArenaMatchId = 2;
+    });
+    startBout(sim);
+    const target = sim.entities.get(b)!;
+    const slot = sim.arenaMatchFor(a)!.slot ?? 0;
+    expect(slot % 2).toBe(0);
+    const o = arenaOrigin(slot);
+    // fighters on opposite faces of the west spawn-A approach screen, within
+    // MELEE_RANGE of each other but with the screen's full height between.
+    const screen = ARENA_LAYOUT.stubs.find((s) => s.x === -5 && s.z === -10)!;
+    expect(screen).toBeTruthy();
+    teleport(sim, a, o.x + screen.x, o.z + screen.z - screen.hd - 1.2);
+    teleport(sim, b, o.x + screen.x, o.z + screen.z + screen.hd + 1.2);
+    face(sim, a, b);
+    sim.targetEntity(b, a);
+    sim.startAutoAttack(a);
+    const startHp = target.hp;
+    for (let i = 0; i < 20 * 3; i++) sim.tick();
     expect(target.hp).toBe(startHp);
   });
 });

@@ -27,7 +27,9 @@ import {
   moderationQueue,
   moderationReportsForAccount,
   muteAccountChat,
+  reactivateAccountAudited,
   recordInGameAction,
+  resetChatStrikesAudited,
   setDailyRewardsBan,
   setDailyRewardsIpBan,
   setOnAccountModerated,
@@ -284,8 +286,34 @@ describe('moderation report helpers', () => {
       'tone it down',
       new Date(expiresAt),
     ]);
-    expect(client.query.mock.calls[3][0]).toBe('COMMIT');
+    // Mirrors moderateAccount's ban/suspend arm: a chat mute is punitive, so it
+    // resolves whatever open report led to it in the same transaction.
+    expect(client.query.mock.calls[3][0]).toMatch(/UPDATE player_reports/);
+    expect(client.query.mock.calls[3][1]).toEqual([2, 1, 'tone it down']);
+    expect(client.query.mock.calls[4][0]).toBe('COMMIT');
+    expect(client.query.mock.calls).toHaveLength(5);
     expect(client.release).toHaveBeenCalledTimes(1);
+  });
+
+  it('resolves the reported account open reports when muting its chat', async () => {
+    const client = clientStub();
+    connect.mockResolvedValue(client as unknown as PoolClient);
+    const expiresAt = new Date(Date.now() + 3600_000).toISOString();
+
+    await muteAccountChat({
+      accountId: 2,
+      adminAccountId: 1,
+      reason: 'chat abuse',
+      expiresAt,
+    });
+
+    const reportUpdateCall = client.query.mock.calls.find((call) =>
+      /UPDATE player_reports/.test(String(call[0])),
+    );
+    if (!reportUpdateCall) throw new Error('player_reports update query not found');
+    expect(reportUpdateCall[0]).toMatch(/status = 'actioned'/);
+    expect(reportUpdateCall[0]).toMatch(/reported_account_id = \$1 AND status = 'open'/);
+    expect(reportUpdateCall[1]).toEqual([2, 1, 'chat abuse']);
   });
 
   it('lifts an active chat mute and writes a dedicated audit action', async () => {
@@ -329,6 +357,90 @@ describe('moderation report helpers', () => {
     expect(client.query.mock.calls[2][0]).toBe('ROLLBACK');
   });
 
+  it('rejects reactivation without a reason', async () => {
+    await expect(
+      reactivateAccountAudited({ accountId: 2, adminAccountId: 1, reason: '   ' }),
+    ).rejects.toThrow(/reason/);
+    expect(query).not.toHaveBeenCalled();
+    expect(connect).not.toHaveBeenCalled();
+  });
+
+  it('reactivates an account and writes an audit action in one transaction', async () => {
+    const client = clientStub();
+    connect.mockResolvedValue(client as unknown as PoolClient);
+
+    await reactivateAccountAudited({
+      accountId: 2,
+      adminAccountId: 1,
+      reason: 'appeal accepted',
+    });
+
+    expect(connect).toHaveBeenCalledTimes(1);
+    expect(client.query.mock.calls[0][0]).toBe('BEGIN');
+    expect(client.query.mock.calls[1][0]).toMatch(/deactivated_at = NULL/);
+    expect(client.query.mock.calls[1][1]).toEqual([2]);
+    expect(client.query.mock.calls[2][0]).toMatch(/account_moderation_actions/);
+    expect(client.query.mock.calls[2][1]).toEqual([2, 1, 'reactivate', 'appeal accepted', null]);
+    expect(client.query.mock.calls[3][0]).toBe('COMMIT');
+    expect(client.release).toHaveBeenCalledTimes(1);
+  });
+
+  it('rejects a chat-strikes reset without a reason', async () => {
+    await expect(
+      resetChatStrikesAudited({ accountId: 2, adminAccountId: 1, reason: '' }),
+    ).rejects.toThrow(/reason/);
+    expect(query).not.toHaveBeenCalled();
+    expect(connect).not.toHaveBeenCalled();
+  });
+
+  it('resets chat strikes and writes an audit action when the account exists', async () => {
+    const client = clientStub();
+    client.query
+      .mockResolvedValueOnce(queryResult([])) // BEGIN
+      .mockResolvedValueOnce(queryResult([], 1)) // UPDATE, one row
+      .mockResolvedValue(queryResult([]));
+    connect.mockResolvedValue(client as unknown as PoolClient);
+
+    const found = await resetChatStrikesAudited({
+      accountId: 2,
+      adminAccountId: 1,
+      reason: 'appeal accepted',
+    });
+
+    expect(found).toBe(true);
+    expect(client.query.mock.calls[1][0]).toMatch(/chat_strikes = 0/);
+    expect(client.query.mock.calls[1][1]).toEqual([2]);
+    expect(client.query.mock.calls[2][0]).toMatch(/account_moderation_actions/);
+    expect(client.query.mock.calls[2][1]).toEqual([
+      2,
+      1,
+      'chat_strikes_reset',
+      'appeal accepted',
+      null,
+    ]);
+    expect(client.query.mock.calls[3][0]).toBe('COMMIT');
+  });
+
+  it('skips the audit row and returns false for an unknown account', async () => {
+    const client = clientStub();
+    client.query
+      .mockResolvedValueOnce(queryResult([])) // BEGIN
+      .mockResolvedValueOnce(queryResult([], 0)) // UPDATE, no rows
+      .mockResolvedValue(queryResult([]));
+    connect.mockResolvedValue(client as unknown as PoolClient);
+
+    const found = await resetChatStrikesAudited({
+      accountId: 999,
+      adminAccountId: 1,
+      reason: 'appeal accepted',
+    });
+
+    expect(found).toBe(false);
+    const stmts = client.query.mock.calls.map((c) => String(c[0]));
+    expect(stmts.some((s) => s.includes('account_moderation_actions'))).toBe(false);
+    expect(stmts).toEqual(['BEGIN', expect.stringMatching(/chat_strikes = 0/), 'COMMIT']);
+  });
+
   it('requires a moderation reason for suspend and ban actions', async () => {
     await expect(
       moderateAccount({
@@ -358,8 +470,35 @@ describe('moderation report helpers', () => {
     expect(client.query.mock.calls[1][1]).toEqual([2, 'appeal accepted']);
     expect(client.query.mock.calls[2][0]).toMatch(/account_moderation_actions/);
     expect(client.query.mock.calls[2][1]).toEqual([2, 1, 'unban', 'appeal accepted', null]);
-    expect(client.query.mock.calls[4][0]).toBe('COMMIT');
+    // unban is a reversal action, symmetric to unsuspend: it must not touch
+    // player_reports, or a fresh, unreviewed report against an already-banned
+    // account gets silently closed the moment an unrelated appeal is granted.
+    expect(client.query.mock.calls.some((call) => /player_reports/.test(String(call[0])))).toBe(
+      false,
+    );
+    expect(client.query.mock.calls[3][0]).toBe('COMMIT');
+    expect(client.query.mock.calls).toHaveLength(4);
     expect(client.release).toHaveBeenCalledTimes(1);
+  });
+
+  it('leaves a pre-existing open report untouched when unbanning (parity with unsuspend)', async () => {
+    const client = clientStub();
+    connect.mockResolvedValue(client as unknown as PoolClient);
+
+    await moderateAccount({
+      accountId: 2,
+      adminAccountId: 1,
+      action: 'unban',
+      reason: 'unrelated appeal granted',
+    });
+
+    // moderateAccount never reads player_reports directly: the only way a report
+    // could be affected is the closing UPDATE, so proving that statement is never
+    // issued proves any pre-existing open report on this account is left as-is.
+    const reportUpdate = client.query.mock.calls.find((call) =>
+      /UPDATE player_reports/.test(String(call[0])),
+    );
+    expect(reportUpdate).toBeUndefined();
   });
 
   it('unsuspends an active suspension and writes a dedicated audit action', async () => {

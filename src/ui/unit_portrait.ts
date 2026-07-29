@@ -36,7 +36,12 @@ export function portraitBackingPx(cssSize: number, dpr: number): number {
   return Math.max(1, Math.round(cssSize * scale));
 }
 
-export interface DrawRect { dx: number; dy: number; dw: number; dh: number; }
+export interface DrawRect {
+  dx: number;
+  dy: number;
+  dw: number;
+  dh: number;
+}
 
 /** Centred draw rectangle for blitting a `size`x`size` image at `overscan`
  *  scale into a `size`x`size` canvas (negative offsets when overscan > 1). */

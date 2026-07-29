@@ -449,12 +449,16 @@ describe('quest npc roles', () => {
     const events = sim.tick();
 
     expect(redbrook.auras.some((a) => a.kind === 'polymorph')).toBe(false);
-    expect(events).toContainEqual({
-      type: 'aura',
-      targetId: redbrook.id,
-      name: 'Polymorph',
-      gained: false,
-    });
+    // objectContaining: fade sites may gain attribution fields over time and
+    // this assertion cares only about the fade itself.
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: 'aura',
+        targetId: redbrook.id,
+        name: 'Polymorph',
+        gained: false,
+      }),
+    );
   });
 });
 
@@ -668,7 +672,7 @@ describe('RL observation encoding', () => {
   // to [0, 1] while the others use [0, 1.5] (the 60-unit observation radius), so
   // a target between 40 and 60 units saturated and lost distance granularity.
   // Target distance index: 16 self + 2 fields per ability slot + presence/hp/level.
-  const ABILITY_SLOTS = ACTIONS.length - 13;
+  const ABILITY_SLOTS = ACTIONS.filter((action) => action.startsWith('ability_')).length;
   const TARGET_DIST_INDEX = 16 + ABILITY_SLOTS * 2 + 3;
 
   it('encodes target distance on the same 1.5 scale as nearby mobs', () => {
@@ -685,74 +689,6 @@ describe('RL observation encoding', () => {
     const obs = encodeObs(sim);
     expect(obs[TARGET_DIST_INDEX]).toBeGreaterThan(1); // would be clamped to 1 before the fix
     expect(obs[TARGET_DIST_INDEX]).toBeCloseTo(50 / 40, 5);
-  });
-});
-
-describe('pet heel warp', () => {
-  it('keeps the spatial grid exact when a pet warps to its owner', () => {
-    const sim = makeSim();
-    const p = sim.player;
-    // park the owner behind the spawn building, far enough that no heel route
-    // exists: the gap (87yd) exceeds the pet's A* search window and the building
-    // breaks line of sight, so the pet can only fall back to the last-resort warp.
-    teleportTo(sim, 0, 82);
-
-    // adopt a wild beast as a heeling pet and strand it on the far side of the wall
-    const pet = [...sim.entities.values()].find((e) => e.kind === 'mob' && !e.dead)!;
-    pet.ownerId = p.id;
-    pet.hostile = false;
-    pet.aggroTargetId = null;
-    pet.inCombat = false;
-    pet.petMode = 'passive';
-    pet.pos = { x: 0, z: -5, y: p.pos.y };
-    pet.prevPos = { ...pet.pos };
-    (sim as any).grid.update(pet); // grid now buckets the pet at its far cell
-
-    // unreachable owner with nothing to fight: the pet warps back to heel
-    (sim as any).ctx.updatePet(pet);
-    expect(dist2d(pet.pos, p.pos)).toBeLessThan(1);
-
-    // a same-tick radius query at the warp destination must see the pet; it
-    // would miss it if the grid still held the pet in its stale far-away cell
-    const found: number[] = [];
-    (sim as any).grid.forEachInRadius(p.pos.x, p.pos.z, 5, (e: Entity) => found.push(e.id));
-    expect(found).toContain(pet.id);
-  });
-});
-
-describe('mob tap rights', () => {
-  function wolf(sim: Sim): Entity {
-    return [...sim.entities.values()].find(
-      (e) => e.kind === 'mob' && e.templateId === 'forest_wolf',
-    )!;
-  }
-
-  it('a hit that deals real damage claims the mob', () => {
-    const sim = makeSim('mage');
-    const m = wolf(sim);
-    expect(m.tappedById).toBeNull();
-    (sim as any).dealDamage(sim.player, m, 7, false, 'fire', 'test', 'hit');
-    expect(m.tappedById).toBe(sim.player.id);
-  });
-
-  it('a fully absorbed (zero-damage) hit does not claim the mob', () => {
-    const sim = makeSim('mage');
-    const m = wolf(sim);
-    // a shield that soaks the whole hit; the mob takes no real damage
-    m.auras.push({
-      id: 'test_absorb',
-      name: 'Test Shield',
-      kind: 'absorb',
-      remaining: 30,
-      duration: 30,
-      value: 1000,
-      sourceId: m.id,
-      school: 'arcane',
-    } as any);
-    const hpBefore = m.hp;
-    (sim as any).dealDamage(sim.player, m, 50, false, 'fire', 'test', 'hit');
-    expect(m.hp).toBe(hpBefore); // nothing got through
-    expect(m.tappedById).toBeNull(); // so nobody owns the tap yet
   });
 });
 

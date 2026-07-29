@@ -25,6 +25,7 @@ class AuthState {
   // not clobber each other; both render in #login-error.
   loginError = $state<string>('');
   sessionMessage = $state<string>('');
+  twoFactorRequired = $state<boolean>(false);
 
   get authed(): boolean {
     return this.token !== null;
@@ -34,11 +35,16 @@ class AuthState {
     return hasPermission(this.permissions, permission);
   }
 
-  async login(username: string, password: string): Promise<void> {
+  async login(username: string, password: string, code = '', recoveryCode = ''): Promise<void> {
     this.loginError = '';
     this.sessionMessage = '';
     try {
-      const session = await apiLogin(username, password);
+      const session = await apiLogin(username, password, code, recoveryCode);
+      if ('twoFactorRequired' in session) {
+        this.twoFactorRequired = true;
+        return;
+      }
+      this.twoFactorRequired = false;
       this.name = session.username;
       this.roles = session.roles;
       this.permissions = session.permissions;
@@ -48,6 +54,11 @@ class AuthState {
       this.loginError =
         err instanceof ApiError ? localizeAdminError(err.message) : t('auth.loginFailed');
     }
+  }
+
+  cancelTwoFactor(): void {
+    this.twoFactorRequired = false;
+    this.loginError = '';
   }
 
   // Boot hydration for an already-stored token. Any failure other than an
@@ -78,6 +89,7 @@ class AuthState {
     this.permissions = [];
     this.permissionsLoaded = false;
     this.hydrateFailed = false;
+    this.twoFactorRequired = false;
     this.sessionMessage = message;
   }
 

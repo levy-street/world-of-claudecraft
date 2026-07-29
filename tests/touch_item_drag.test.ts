@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 //
 // The touch arm of the bags drag: hold to pick a stack up, drag it to a paperdoll
 // socket or out onto the world, release to drop. The gesture has to coexist with two
@@ -130,6 +130,25 @@ describe('bindTouchItemDrag', () => {
     h.el.dispatchEvent(pointer('pointerdown', 100, 100));
     vi.advanceTimersByTime(TOUCH_DRAG_HOLD_MS);
     h.el.dispatchEvent(pointer('pointercancel', 100, 100));
+    expect(h.drops).toEqual([]);
+    expect(h.state.get()).toBeNull();
+    expect(h.ended).toBe(1);
+  });
+
+  it('a mid-drag grid rebuild cannot strand the drag: the document release tears it down', () => {
+    // The fix-round review: the row's own listeners die with the row when
+    // the bags rebuild mid-drag (the 500ms refresh band on any inventory
+    // change), and the stranded body class kept the drag-window z-raise
+    // above every window for the rest of the session. The document-level
+    // safety cancels on release; it never drops a stale payload.
+    const h = harness();
+    h.el.dispatchEvent(pointer('pointerdown', 100, 100));
+    vi.advanceTimersByTime(TOUCH_DRAG_HOLD_MS);
+    expect(document.body.classList.contains('touch-item-dragging')).toBe(true);
+    h.el.remove();
+    document.dispatchEvent(pointer('pointerup', 200, 120));
+    expect(document.body.classList.contains('touch-item-dragging')).toBe(false);
+    expect(document.querySelector('.touch-drag-ghost')).toBeNull();
     expect(h.drops).toEqual([]);
     expect(h.state.get()).toBeNull();
     expect(h.ended).toBe(1);

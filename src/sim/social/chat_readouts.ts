@@ -24,9 +24,9 @@ import {
   abilitiesKnownAt,
   CLASSES,
   DUNGEON_LIST,
+  getActiveWorldContent,
   ITEMS,
   QUESTS,
-  ZONES,
   zoneAt,
 } from '../data';
 import { formatMoney } from '../format_money';
@@ -38,15 +38,20 @@ import { threatEntries } from '../threat';
 import {
   type ArenaFormat,
   type Aura,
-  type AuraKind,
+  CRAFT_CAST_ID,
+  DISENCHANT_CAST_ID,
   dist2d,
+  ENCHANT_CAST_ID,
   type Entity,
   type EquipSlot,
   FISHING_CAST_ID,
+  GATHER_CAST_ID,
   isFormAuraKind,
   MAX_LEVEL,
   MELEE_RANGE,
   questObjectiveRequired,
+  SALVAGE_CAST_ID,
+  TOOL_RECHARGE_CAST_ID,
   xpForLevel,
 } from '../types';
 import { UNSTUCK_COOLDOWN_ID } from '../unstuck_cooldown';
@@ -106,20 +111,24 @@ export function partyReadout(ctx: SimContext, pid: number): string {
 }
 // Self-only readout for "/zones": lists every overworld zone in travel order
 // (south -> north) with its level range, tagging the zone the player is in.
-// `currentX`/`currentZ` are the player's world position (zoneAt picks their zone).
-// ZONES is the ordered ZoneDef[] from ./data; each has .name and
-// .levelRange = [min, max].
+// `currentX`/`currentZ` are the player's world position (zoneAt picks their
+// zone). The zone list is the ACTIVE content's ordered ZoneDef[]; each has
+// .name and .levelRange = [min, max].
 export function zonesReadout(currentX: number, currentZ: number): string {
-  if (ZONES.length === 0) return 'No zones are defined.';
+  // The ACTIVE zone list, so the roster and the "you are here" tag (zoneAt
+  // walks the active zones too) resolve the same world on a custom map;
+  // byte-identical on shipped hosts.
+  const zones = getActiveWorldContent().zones;
+  if (zones.length === 0) return 'No zones are defined.';
   const here = zoneAt(currentX, currentZ);
   // travel order, not append order: south to north, then west to east
   // within a row (a column zone appends LAST for rng-stream stability)
-  const ordered = [...ZONES].sort((a, b) => a.zMin - b.zMin || (a.xMin ?? -180) - (b.xMin ?? -180));
+  const ordered = [...zones].sort((a, b) => a.zMin - b.zMin || (a.xMin ?? -180) - (b.xMin ?? -180));
   const parts = ordered.map((z) => {
     const line = `${z.name} (Lvl ${z.levelRange[0]}-${z.levelRange[1]})`;
     return z.id === here.id ? `${line} [you are here]` : line;
   });
-  return `Zones (${ZONES.length}): ${parts.join(', ')}.`;
+  return `Zones (${zones.length}): ${parts.join(', ')}.`;
 }
 // Self-only readout of a character's Ashen Coliseum standing. Reads only the
 // persisted PlayerMeta arena fields (no new state). Draws count as neither a
@@ -563,7 +572,30 @@ export function castingReadout(e: Entity): string {
   const remaining = e.castRemaining.toFixed(1);
   const total = e.castTotal.toFixed(1);
   if (e.castingAbility === FISHING_CAST_ID) {
-    return `You are fishing — ${remaining}s of ${total}s remaining.`;
+    // Honest with no bite leak: the fixed-cast countdown died
+    // with the bite minigame, and a countdown here would leak session
+    // timing, so the readout names the waiting state and nothing more.
+    return 'You are fishing. Waiting for a bite.';
+  }
+  if (e.castingAbility === GATHER_CAST_ID) {
+    // The gather cast is public state (castRemaining/castTotal broadcast),
+    // so an honest countdown is safe here, unlike the fishing arm above.
+    return `You are gathering: ${remaining}s of ${total}s remaining.`;
+  }
+  if (e.castingAbility === CRAFT_CAST_ID) {
+    return `You are crafting: ${remaining}s of ${total}s remaining.`;
+  }
+  if (e.castingAbility === DISENCHANT_CAST_ID) {
+    return `You are disenchanting: ${remaining}s of ${total}s remaining.`;
+  }
+  if (e.castingAbility === ENCHANT_CAST_ID) {
+    return `You are enchanting: ${remaining}s of ${total}s remaining.`;
+  }
+  if (e.castingAbility === SALVAGE_CAST_ID) {
+    return `You are salvaging: ${remaining}s of ${total}s remaining.`;
+  }
+  if (e.castingAbility === TOOL_RECHARGE_CAST_ID) {
+    return `You are recharging a tool effect: ${remaining}s of ${total}s remaining.`;
   }
   const name = ABILITIES[e.castingAbility]?.name ?? e.castingAbility;
   const verb = e.channeling ? 'Channeling' : 'Casting';

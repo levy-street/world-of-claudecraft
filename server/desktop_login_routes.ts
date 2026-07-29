@@ -18,7 +18,7 @@
 // - Scope fix (maintainer-resolved fork): create authenticates via
 //   the shared createActiveGuard (full active session; a read-scope
 //   companion/OAuth token answers 403 'this token is read-only'), where the
-//   original handler used the scope-blind accountForToken, letting a read token
+//   original handler used a scope-blind identity resolver, letting a read token
 //   escalate to the full session exchange mints. The legacy arm carries the
 //   mirror fix (bearerActiveAccount before issueDesktopLoginCode); the
 //   desktopLoginCreateFullScope known deviation records the contract change.

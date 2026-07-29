@@ -9,23 +9,36 @@ import { abilityImageUrl } from '../src/ui/icons';
 const AUTHORED_ICONS = {
   double_charge: {
     sourcePack: 'custom-user',
-    sourceFile: 'C:/Users/joseg/Desktop/Doble carga.png',
+    sourceFile: 'desktop/Doble carga.png',
     output: 'double_charge.webp',
     blob: '335e3c113f7bb729caec313b14b586d3c9ba0d30',
   },
   crushing_charge: {
     sourcePack: 'custom-user',
-    sourceFile: 'C:/Users/joseg/Desktop/el otro cargar.png',
+    sourceFile: 'desktop/el otro cargar.png',
     output: 'crushing_charge.webp',
     blob: '3f0f9c858635c054f59c950e8259833699f8b47c',
   },
   combat_mastery: {
     sourcePack: 'custom-user',
-    sourceFile: 'C:/Users/joseg/Desktop/Nuevo talento.png',
+    sourceFile: 'desktop/Nuevo talento.png',
     output: 'combat_mastery.webp',
     blob: '756978b7da595ec543be28cec98b03da79a60d9b',
   },
 } as const;
+
+const VALE_CUP_PAINTED_ABILITY_IDS = [
+  'sport_boot',
+  'sport_dive',
+  'sport_feint',
+  'sport_hoof',
+  'sport_kick',
+  'sport_pass',
+  'sport_punt',
+  'sport_second_wind',
+  'sport_shoot',
+  'sport_shoulder',
+] as const;
 
 const WINNING_SOURCE_BLOBS = {
   'public/ui/skills/warrior/anger_management.webp': 'a8af761b3afdbea5927a80acaa0e51b3e3f092ae',
@@ -105,5 +118,33 @@ describe('winning Warrior authored talent icons', () => {
       const path = resolve('public/ui/skills/warrior', expected.output);
       expect(gitBlobHash(path), expected.output).toBe(expected.blob);
     }
+  });
+
+  it('ships ten distinct borderless Vale Cup ability paintings with explicit ownership', () => {
+    const byId = new Map(mapping.abilities.map((entry) => [entry.abilityId, entry]));
+    const hashes = new Set<string>();
+    expect(VALE_CUP_PAINTED_ABILITY_IDS).toHaveLength(10);
+    for (const id of VALE_CUP_PAINTED_ABILITY_IDS) {
+      expect(abilityImageUrl(id), `${id} ability URL`).toBe(`/ui/skills/warrior/${id}.webp`);
+      const entry = byId.get(id) as
+        | {
+            sourcePack?: string;
+            source?: string;
+            owner?: string;
+            license?: string;
+          }
+        | undefined;
+      expect(entry?.sourcePack, `${id} generated source pack`).toBe(
+        'woc_openai_missing_painted_icons_2026_08_01',
+      );
+      expect(entry?.source, `${id} generator`).toBe('OpenAI built-in image generation');
+      expect(entry?.owner, `${id} owner`).toBe('World of ClaudeCraft');
+      expect(entry?.license, `${id} license`).toContain('project asset');
+      const bytes = readFileSync(resolve('public/ui/skills/warrior', `${id}.webp`));
+      const hash = createHash('sha256').update(bytes).digest('hex');
+      expect(hashes.has(hash), `${id} must not duplicate another Vale Cup motion`).toBe(false);
+      hashes.add(hash);
+    }
+    expect(hashes.size).toBe(10);
   });
 });

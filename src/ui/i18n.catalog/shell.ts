@@ -49,9 +49,13 @@ export const shellStrings = {
       reconnectingNow: 'Connection lost. Reconnecting now... (attempt {attempt}/{maxAttempts})',
       slowConnection: 'This is taking longer than usual. Check your internet connection.',
       connectionRejected: 'The server closed the connection.',
+      incompatibleWorldVersion:
+        'Game and server versions are incompatible. Reload or update, then try again.',
       realmFull: 'This world is full right now. Please try again in a few minutes.',
       tooManyConnections:
         'Too many connections to this world are coming from your network. Please close extra game windows or try again in a few minutes.',
+      messageRateExceeded:
+        'You were disconnected for sending actions too quickly. Please wait a moment and log back in.',
       tips: {
         classes:
           'Tip: each of the 9 classes plays differently. Try a few before committing to one.',
@@ -108,16 +112,24 @@ export const shellStrings = {
         crossSiteOrigin: 'Request blocked for security reasons.',
       },
     },
-    // Desktop (Electron) shell surfaces: the auto-update toast rendered by the
+    // Desktop (Electron) shell surfaces: the auto-update card rendered by the
     // renderer (src/ui/desktop_update_toast.ts) and the crash-dialog strings
     // the renderer pushes to the main process (src/game/desktop_shell_strings.ts,
     // mirrored by electron/shell_strings.cjs DEFAULT_SHELL_STRINGS in English).
     desktop: {
       update: {
-        downloading: 'Downloading update {version}...',
-        ready: 'Update {version} is ready. It installs when you quit, or restart now.',
+        // Classic desktop-client voice (Discord / VS Code / Steam style): short
+        // titles, calm bodies, primary action first on the ready card.
+        checkingTitle: 'Checking for updates...',
+        checkingBody: 'New versions download while you play.',
+        uptodateTitle: "You're up to date",
+        downloadingTitle: 'Downloading update {version}...',
+        downloadingBody: 'You can keep playing. It installs when you quit.',
+        readyTitle: 'Update {version} is ready',
+        readyBody: 'Restart to install now, or keep playing and it installs when you quit.',
         restart: 'Restart now',
         later: 'Later',
+        dismiss: 'Dismiss',
       },
       crash: {
         title: 'World of ClaudeCraft',
@@ -137,6 +149,21 @@ export const shellStrings = {
         'The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.',
       bodyWeb:
         'The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.',
+      dismiss: 'Dismiss',
+    },
+    // Performance nudge (src/ui/perf_nudge_toast.ts): the gpuNotice sibling
+    // shown once mid-session when the client perf-doctor finds a machine-local
+    // cause (packet 0 rulings R14-R16). The integrated-GPU copy is deliberately
+    // conditional: the adapter string cannot prove a discrete GPU exists, only
+    // that the session is not on one (ruling R15). The hardware-acceleration
+    // variants mirror the gpuNotice desktop/web split for the same reason.
+    perfNudge: {
+      integratedGpu:
+        'The game is running on the integrated (power-saving) GPU. If this computer also has a gaming GPU, set your browser to High performance under Settings > System > Display > Graphics on Windows, then restart the browser. The desktop app picks the gaming GPU automatically.',
+      hardwareAccelerationDesktop:
+        'The game is running without GPU acceleration, which makes it very slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.',
+      hardwareAccelerationWeb:
+        'The game is running without GPU acceleration, which makes it very slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.',
       dismiss: 'Dismiss',
     },
     realm: {
@@ -296,29 +323,6 @@ export const shellStrings = {
       heading: 'The world is temporarily unavailable.',
       body: 'We are restarting the game service and expect Claudemoon to return shortly. This page will keep checking automatically.',
       status: 'Back soon',
-    },
-    welcome: {
-      back: 'Welcome back, {name}',
-      level: 'Level {level}',
-      lastPlayed: 'Last played {when}',
-      continue: 'Enter World',
-      continueHint: 'Enter to continue, Esc to skip',
-      continueHintTouch: 'Tap to continue',
-      discord: {
-        title: 'The community lives on Discord',
-        sub: 'Patch previews, events, dev chat, and 2 bonus bank slots for linking.',
-        join: 'Join our Discord',
-      },
-      chest: {
-        ready: 'Daily chest ready',
-      },
-      armory: {
-        cta: 'Enter and browse the Armory',
-      },
-      news: {
-        new: 'New',
-        viewAll: 'View all updates on GitHub',
-      },
     },
   },
   es: {

@@ -12,6 +12,7 @@
 // This is a *_db-style module: SQL runs against an INJECTED client (type-only
 // usage of pg shapes), and it never imports db.ts, mirroring ratelimit_db.ts,
 // so db.ts can import the constants and the runner without a cycle.
+import { emptySaleLog, mergeSaleLogs, sanitizeSaleLog } from '../src/sim/market_sale_log';
 import type { MarketSave } from '../src/sim/sim';
 
 // FROZEN CONTRACT: every exported name and signature in this file is shared
@@ -187,10 +188,15 @@ export function mergeMarketSaves(existing: MarketSave, incoming: MarketSave): Ma
   // Collections merge by key: existing rows keep their order (copper summed and
   // items concatenated when the incoming partition shares a key), net-new
   // incoming keys append at the end.
+  // The pending sale ledger rides along with the copper it explains: this merge
+  // SUMS copper, so a clone that dropped `sales` would hand a seller gold with no
+  // rows accounting for it. Conditional + sanitized so a row that never carried a
+  // ledger (every pre-ledger blob) is still cloned byte-identical.
   const cloneCollection = (c: MarketCollectionSave): MarketCollectionSave => ({
     key: c.key,
     copper: c.copper,
     items: (c.items ?? []).map((s) => ({ ...s })),
+    ...(c.sales ? { sales: sanitizeSaleLog(c.sales) } : {}),
   });
   const collections: MarketCollectionSave[] = [];
   const byKey = new Map<string, MarketCollectionSave>();
@@ -204,6 +210,11 @@ export function mergeMarketSaves(existing: MarketSave, incoming: MarketSave): Ma
     if (found) {
       found.copper += numberOr0(c.copper);
       for (const s of c.items ?? []) found.items.push({ ...s });
+      if (c.sales) {
+        const into = found.sales ?? emptySaleLog();
+        mergeSaleLogs(into, sanitizeSaleLog(c.sales));
+        found.sales = into;
+      }
     } else {
       const clone = cloneCollection(c);
       collections.push(clone);

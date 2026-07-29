@@ -269,6 +269,51 @@ portal membrane is turquoise and animated. A warm limestone fallback handles pre
 `HEROIC_DUNGEON_TUNING.wildheart_basin` pins Heroic mobs to level 22, names
 `wildheart_high_priest` as final boss, and awards one Heroic Mark per eligible participant.
 
+### 8.1 Normal retune (follow-up)
+
+The dungeon shipped with a Heroic record but NO `NORMAL_DUNGEON_TUNING` record, so Normal mode ran
+the raw base templates. Measured on the shared reference warrior (level-20 prot, 2861 armor,
+Defensive Stance) its trash swung 26 to 32 and Zulgar 35, against normal Gravewyrm Sanctum's 103 to
+112 and 200 to 301: roughly 3.5x under on trash and 6 to 8x under on the boss, for the same endgame
+loot band. `NORMAL_DUNGEON_TUNING.wildheart_basin` ports the Sanctum calibration (doubled health,
+trash floored at 100 and the boss at 200), with two roster-forced departures:
+
+- a third band at 150 for `wildheart_beastmaster`, a rare ccImmune pack leader that spawns twice and
+  out-presses trash without being a second Zulgar;
+- `rangedDamageMultiplierByMob`, a new knob on `NormalDungeonTuning`. Half this roster (Stalker x6,
+  Hexcaller x4) is a `petSpell` caster, and a caster stands at spell range and casts instead of
+  swinging, so `damageMultiplierByMob` (which moves `dmgBase`/`dmgPerLevel`, i.e. melee) is inert
+  for it. Its nuke is rolled from the base table and multiplied by `petDamageMult`, which returns a
+  flat 1 for any mob with no owner, so no pre-existing knob could reach it. The new factor stamps
+  `Entity.rangedDamageMult`, applied at the fire site after the rng draw. Normal only: Heroic keeps
+  its shipped calibration untouched, and therefore still carries the same inert-caster gap.
+
+Floors, literals, live-spawn wiring, and the Heroic transform are pinned by
+`tests/wildheart_normal_tuning.test.ts`.
+
+### 8.2 Premature boss pull
+
+`DungeonDef.bossChainPull` (opt-in, live only here) makes aggroing Zulgar while any of the route is
+still alive send every living mob in the instance at the puller at once. The two open routes make
+running past every pack to the shrine trivial in a way a corridor dungeon prevents by geometry, so
+this restores the cost of skipping trash. The mechanic is self-gating: it pulls whatever is still
+alive, so a group that cleared the route finds nothing to pull and fights the boss alone. Pulled
+mobs anchor their leash on the puller rather than on where they stood, because the route is about
+180 yards end to end against a 70-yard dungeon leash and a self-anchored mob would evade home before
+reaching the shrine. Draws no rng, so the parity goldens are unaffected. Implementation in
+`src/sim/instances/boss_chain_pull.ts`, pinned by `tests/wildheart_boss_chain_pull.test.ts`.
+
+The puller-anchored leash alone was not enough, and shipping it alone left the mechanic working only
+near the shrine: a mob woken 170 yards away starts outside that same 70-yard sphere, so the leash
+prelude evaded it home on its first engaged tick and thirteen of the nineteen never took a step. A
+pulled mob now also carries a transit grace (`Entity.chainPullInbound`, `src/sim/mob/chain_pull_transit.ts`)
+that suspends the SOFT leash while it crosses and spends itself the moment the mob reaches the
+sphere, after which the ordinary leash governs from the pull point. The hard tether and the
+unreachable-target stall are untouched, so a mob pinned by geometry still evades on the normal
+clock. One deliberate consequence: a group that pulls and immediately runs is chased rather than
+leashed, since a mob kited away from the pull point never reaches the sphere that would spend its
+grace. That stays bounded by the instance, because the exit portal and a wipe both scrub the pull.
+
 Zulgar drops three new epic weapons: Wildheart Tuskblade, Hexwood Staff of the Basin, and
 Fangknife of Zulgar.
 

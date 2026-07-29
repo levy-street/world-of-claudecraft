@@ -12,6 +12,14 @@
 // The flavourful glyphs are from game-icons.net (CC BY 3.0 — Lorc & Delapouite;
 // see CREDITS.md). The plain geometrics (close, check, arrows, star, ellipsis,
 // bars, warning, envelope, note) are hand-authored to match their visual weight.
+//
+// One exception to "every glyph renders as this SVG": the names in CHROME_ART_IDS
+// (chrome_icon_art.ts) are PRIMARY DESTINATIONS, which DESIGN.md section 6 gives painted
+// art. `hydrateIcons` serves that art for their `[data-icon]` placeholders (the side rail,
+// the mobile bar, the More tray); their glyph below stays the source for every direct
+// `svgIcon()` call, where the icon sits inline beside text and must tint with currentColor.
+
+import { chromeIconUrl } from './chrome_icon_art';
 
 export type UiIconName =
   // game-icons.net
@@ -49,6 +57,7 @@ export type UiIconName =
   | 'next'
   | 'more'
   | 'meters'
+  | 'battleground'
   | 'whisper'
   | 'music'
   | 'talents'
@@ -65,12 +74,21 @@ export type UiIconName =
   | 'cards'
   | 'trash'
   | 'mount'
-  | 'crafting';
+  | 'crafting'
+  | 'professions'
+  | 'makers-mark'
+  | 'enchant-rune'
+  | 'bond-link'
+  | 'download'
+  | 'eye'
+  | 'eye-off';
 
 // Inner SVG markup per icon (one or more <path>). Default fill rule is nonzero
 // (correct for game-icons.net art incl. overlaps); the two hand-authored cut-out
 // glyphs set fill-rule="evenodd" locally.
 const ICONS: Record<UiIconName, string> = {
+  // hand-authored capture-the-flag banner on a pole (Thornhollow Fields battleground)
+  battleground: '<path d="M150 56h26v400h-26z"/><path d="M176 78h236l-52 66 52 66H176z"/>',
   // ── game-icons.net (CC BY 3.0) ───────────────────────────────────────────
   arena:
     '<path d="M19.75 14.438c59.538 112.29 142.51 202.35 232.28 292.718l3.626 3.75.063-.062c21.827 21.93 44.04 43.923 66.405 66.25-18.856 14.813-38.974 28.2-59.938 40.312l28.532 28.53 68.717-68.717c42.337 27.636 76.286 63.646 104.094 105.81l28.064-28.06c-42.47-27.493-79.74-60.206-106.03-103.876l68.936-68.938-28.53-28.53c-11.115 21.853-24.413 42.015-39.47 60.593-43.852-43.8-86.462-85.842-130.125-125.47-.224-.203-.432-.422-.656-.625C183.624 122.75 108.515 63.91 19.75 14.437zm471.875 0c-83.038 46.28-154.122 100.78-221.97 161.156l22.814 21.562 56.81-56.812 13.22 13.187-56.438 56.44 24.594 23.186c61.802-66.92 117.6-136.92 160.97-218.72zm-329.53 125.906l200.56 200.53c-4.36 4.443-8.84 8.793-13.405 13.032L148.875 153.53l13.22-13.186zm-76.69 113.28l-28.5 28.532 68.907 68.906c-26.29 43.673-63.53 76.414-106 103.907l28.063 28.06c27.807-42.164 61.758-78.174 104.094-105.81l68.718 68.717 28.53-28.53c-20.962-12.113-41.08-25.5-59.937-40.313 17.865-17.83 35.61-35.433 53.157-52.97l-24.843-25.655-55.47 55.467c-4.565-4.238-9.014-8.62-13.374-13.062l55.844-55.844-24.53-25.374c-18.28 17.856-36.602 36.06-55.158 54.594-15.068-18.587-28.38-38.758-39.5-60.625z"/>',
@@ -160,6 +178,16 @@ const ICONS: Record<UiIconName, string> = {
   // hand-authored swap: two opposing horizontal arrows (the mobile action-ring
   // page-cycle badge), matching the jump/autorun glyph weight
   swap: '<path d="M96 150 340 150 340 118 436 174 340 230 340 198 96 198ZM416 314 172 314 172 282 76 338 172 394 172 362 416 362Z"/>',
+  // hand-authored download: arrow into a base line (the desktop update card),
+  // matching the jump glyph weight
+  download:
+    '<path d="M236 72h40v196h84L256 372 156 268h80z"/><rect x="116" y="408" width="280" height="40" rx="14"/>',
+  // hand-authored eye (the paperdoll helmet-visibility toggle): almond outline
+  // cut open around a solid pupil (evenodd ring, like the vibrate case)
+  eye: '<path fill-rule="evenodd" d="M256 112c-104 0-193 62-236 144 43 82 132 144 236 144s193-62 236-144c-43-82-132-144-236-144zm0 240a96 96 0 1 1 0-192 96 96 0 0 1 0 192z"/><circle cx="256" cy="256" r="56"/>',
+  // the eye behind a diagonal slash bar (helm hidden state)
+  'eye-off':
+    '<path fill-rule="evenodd" d="M256 112c-104 0-193 62-236 144 43 82 132 144 236 144s193-62 236-144c-43-82-132-144-236-144zm0 240a96 96 0 1 1 0-192 96 96 0 0 1 0 192z"/><circle cx="256" cy="256" r="56"/><path d="M106 42 470 406l-40 40L66 82z" stroke="rgba(40,26,20,0.85)" stroke-width="26"/>',
   // phone handset flanked by vibration waves (hand-authored to match the bar glyphs)
   vibrate:
     '<path fill-rule="evenodd" d="M196 80h120a24 24 0 0 1 24 24v304a24 24 0 0 1-24 24H196a24 24 0 0 1-24-24V104a24 24 0 0 1 24-24zm4 40v272h112V120H200z"/><path d="M96 176v160h28V176zM388 176v160h28V176zM40 216v80h26v-80zM446 216v80h26v-80z"/>',
@@ -174,8 +202,8 @@ const ICONS: Record<UiIconName, string> = {
   // hand-authored open book (the Book of Deeds): two page leaves meeting at a
   // spine dip, each page hollowed so the glyph reads at micro-button size
   book: '<path fill-rule="evenodd" d="M256 118c-44-26-104-38-172-38v312c68 0 128 12 172 38 44-26 104-38 172-38V80c-68 0-128 12-172 38zM124 122c40 4 76 13 104 28v246c-30-13-66-21-104-24V122zm264 0v250c-38 3-74 11-104 24V150c28-15 64-24 104-28z"/>',
-  // hand-authored horseshoe (the Mounts window / mount keybind), opening up,
-  // matching the bar glyph weight
+  // hand-authored horseshoe for the mount keybind, opening up and matching the
+  // bar glyph weight
   mount:
     '<path d="M120 140 A176 176 0 1 0 392 140 L340 188 A104 104 0 1 1 172 188 Z"/><path d="M96 108h84v36H96zM332 108h84v36h-84z"/>',
   // hand-authored playing card (the Card Duel minigame): a solid card body
@@ -185,6 +213,27 @@ const ICONS: Record<UiIconName, string> = {
   // hand-authored anvil (the Crafting window): a horned top slab over a waisted
   // body and flared base, one solid silhouette so it reads at micro-button size
   crafting: '<path d="M60 102l90-11h300v85h-100l-30 92v97h68v54H124v-54h68v-97l-30-92h-12z"/>',
+  // hand-authored mortar and pestle (the Professions window): a bowl with a rim over a
+  // leaning pestle. Distinct from the `crafting` anvil, and distinct from `target`, whose
+  // crosshair this button used to borrow (the same glyph the mobile target-cycle uses).
+  professions:
+    '<path d="M104 268h304v36h-30l-22 92a44 44 0 0 1-43 34h-114a44 44 0 0 1-43-34l-22-92h-30z"/><path d="M318 104 246 236" stroke="currentColor" stroke-width="34" fill="none" stroke-linecap="round"/><circle cx="238" cy="250" r="30"/>',
+  // World of ClaudeCraft maker's mark: the exact project-owned calligraphic
+  // stroke used beside a crafted copy's provenance line. Unlike the filled
+  // chrome glyphs above, this mark is intentionally an open currentColor line.
+  'makers-mark':
+    '<path d="M82 390C126 341 151 273 157 204C162 156 213 139 249 168C284 196 274 247 236 262C204 274 177 253 178 220C204 276 258 326 323 340C364 349 397 329 426 296C393 365 315 400 231 382C171 369 122 363 82 390" fill="none" stroke="currentColor" stroke-width="46" stroke-linecap="round" stroke-linejoin="round"/>',
+  // hand-authored enchant rune (the bag grid's enchanted-copy corner glyph): a
+  // four-point arcane spark with a small orbiting mote, so it reads as "magic
+  // was worked on this" at the ~12px corner size and stays tellable apart from
+  // the maker's-mark stroke and the bond links beside it.
+  'enchant-rune':
+    '<path d="M256 40 300 190 450 234 300 278 256 428 212 278 62 234 212 190Z"/><path d="M404 60a34 34 0 1 0 0 68 34 34 0 0 0 0-68z"/>',
+  // hand-authored bond links (the bind-on-trade / bound corner glyph): two
+  // interlocked chain rings, the classic "this is bound to someone" read,
+  // hollowed with evenodd so the links stay legible at corner size.
+  'bond-link':
+    '<path fill-rule="evenodd" d="M186 148a108 108 0 1 0 0 216 108 108 0 0 0 0-216zm0 56a52 52 0 1 1 0 104 52 52 0 0 1 0-104zM326 148a108 108 0 1 0 0 216 108 108 0 0 0 0-216zm0 56a52 52 0 1 1 0 104 52 52 0 0 1 0-104z"/>',
 };
 
 export function hasUiIcon(name: string): name is UiIconName {
@@ -208,15 +257,33 @@ export function svgIcon(name: UiIconName, opts: SvgIconOpts = {}): string {
 }
 
 /**
- * Replace `[data-icon="name"]` placeholders in static markup (index.html) with
- * their SVG, once. Existing children (keybind labels, mobile captions) are kept;
- * the icon is prepended and marked decorative since the host element carries the
- * accessible name (title / aria-label).
+ * Painted-art `<img>` markup for a primary destination (DESIGN.md section 6). Decorative
+ * by construction: every host that carries art is a button or link with its own
+ * `aria-label`, so a second accessible name here would double-announce it.
+ * `draggable="false"` matters on a HUD control: a native image drag on a launcher starts a
+ * ghost-drag instead of a click.
+ */
+function chromeArtIcon(url: string): string {
+  return `<img class="ui-icon ui-icon-art" src="${url}" alt="" aria-hidden="true" draggable="false" decoding="async">`;
+}
+
+/**
+ * Replace `[data-icon="name"]` placeholders in static markup (index.html) with their icon,
+ * once. Existing children (keybind labels, mobile captions) are kept; the icon is prepended
+ * and marked decorative since the host element carries the accessible name (title /
+ * aria-label).
+ *
+ * A name with committed painted art (CHROME_ART_IDS) hydrates as that `<img>` instead of
+ * the inline SVG: these placeholders ARE the primary destinations (the side rail, the
+ * mobile bar, the More tray), which DESIGN.md section 6 gives painted art. The SVG stays
+ * the source everywhere else, including every direct `svgIcon()` call, so the small inline
+ * uses beside text keep tinting with `currentColor`.
  */
 export function hydrateIcons(root: ParentNode = document): void {
   root.querySelectorAll<HTMLElement>('[data-icon]').forEach((el) => {
     const name = el.dataset.icon;
     if (!name || !hasUiIcon(name) || el.querySelector(':scope > .ui-icon')) return;
-    el.insertAdjacentHTML('afterbegin', svgIcon(name));
+    const art = chromeIconUrl(name);
+    el.insertAdjacentHTML('afterbegin', art ? chromeArtIcon(art) : svgIcon(name));
   });
 }

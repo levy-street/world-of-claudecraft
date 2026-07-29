@@ -91,6 +91,21 @@ export class TimedNumberSampleRing {
     this.size = 0;
   }
 
+  /**
+   * The retained window as timestamped entries, oldest first. ALLOCATES, so it
+   * belongs off the per-frame path: the 1 Hz worst-window observer is the only
+   * caller. Per-frame readers want snapshotSince(), which keeps the values in
+   * one array and reports the span bounds instead.
+   */
+  entries(): { at: number; value: number }[] {
+    const out = new Array<{ at: number; value: number }>(this.size);
+    for (let offset = 0; offset < this.size; offset++) {
+      const index = (this.start + offset) % this.capacity;
+      out[offset] = { at: this.times[index], value: this.values[index] };
+    }
+    return out;
+  }
+
   snapshotSince(minAt: number): TimedSampleSnapshot {
     let first = 0;
     while (first < this.size) {

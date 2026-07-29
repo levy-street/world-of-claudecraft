@@ -59,6 +59,9 @@ describe('aggregateSetBonuses (pure resolver)', () => {
       hitRating: 0,
       castPushbackReduction: 0,
       knockbackResistance: 0,
+      pvpOffenseRating: 0,
+      pvpDefenseRating: 0,
+      ccDurationReduction: 0,
       procs: [],
     });
   });
@@ -139,8 +142,16 @@ describe('aggregateSetBonuses (pure resolver)', () => {
       const pieces = set.bonuses.map((b) => b.pieces);
       // every epic (raid/dungeon) family carries 2-, 3-, and 4-piece tiers (the
       // 4-piece is a proc); the leveling haste kits deliberately carry the
-      // single 3-piece tier.
-      const expected = pieces.length === 1 ? '3' : '2,3,4';
+      // single 3-piece tier. The four WARFARE families are 2/4/7: seven because
+      // at six the seventh armor slot had one right answer (abandon the chest,
+      // the priciest piece with the best PvE replacement) and measured strictly
+      // better than the intended build (4,200 honor and 0.89x against the full
+      // kit's 5,400 and 1.03x). tests/warfare_balance_harness.test.ts guards it.
+      const expected = set.id.startsWith('warfare_')
+        ? '2,4,7'
+        : pieces.length === 1
+          ? '3'
+          : '2,3,4';
       expect([pieces.join(','), set.id]).toEqual([expected, set.id]);
     }
   });
@@ -219,13 +230,13 @@ describe('recalcPlayerStats applies equipped set bonuses (real raid/dungeon gear
     expect(three.attackPower).toBe(three.stats.str * 2 + 40);
   });
 
-  it('Wyrmshadow (t1 agility): crit gains the flat 2% at 3pc on top of agi-derived crit', () => {
+  it('Wyrmshadow (t1 agility): crit gains 1% at 3pc on top of agi-derived crit', () => {
     const three = statsFor('rogue', 20, {
       chest: 'wyrmshadow_harness',
       feet: 'wyrmshadow_treads',
       legs: 'wyrmshadow_legguards',
     });
-    expect(three.critChance).toBeCloseTo(0.05 + three.stats.agi * 0.0005 + 0.02);
+    expect(three.critChance).toBeCloseTo(0.05 + three.stats.agi * 0.0005 + 0.01);
   });
 
   it('Crownforged (t2 strength, 4 pieces): the 4-set Hit bonus lands on the equipped hitRating', () => {

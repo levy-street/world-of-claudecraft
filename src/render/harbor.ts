@@ -33,10 +33,12 @@ import { type AnimState, type CharacterVisual, createCharacterVisual } from './c
 import { GFX, surfaceMat } from './gfx';
 import {
   type DeckStandInAttachPoint,
-  deckStandInAction,
   deckStandInParentTransform,
+  disposeDeckStandIn,
 } from './harbor_deck_stand_in_core';
-import { composeHarborShipAttachFrame, HarborShipPendingCueState } from './harbor_ship_attach_core';
+import { composeHarborShipAttachFrame } from './harbor_ship_attach_core';
+import { HarborShipCueRegistry } from './harbor_ship_cue_registry';
+import { createHarborShipUpdater } from './harbor_ship_update_core';
 import { type PropPathSample, type PropPathSegment, propPathPoseAt } from './prop_path_core';
 import { type PropAsset, propAsset } from './props';
 import { radialGlowTexture } from './textures';
@@ -405,10 +407,18 @@ const DECK_STAND_IN_IDLE_STATE: AnimState = {
   sitting: false,
 };
 
-const SHIPS = new Map<string, HarborShipHandle>();
 const PROP_PATH_SEGMENTS: Readonly<Record<string, PropPathSegment | undefined>> =
   LAST_BELL_PROP_PATH_SEGMENTS;
-const SHIP_CUE_STATE = new HarborShipPendingCueState(PROP_PATH_SEGMENTS);
+const SHIP_CUES = new HarborShipCueRegistry<PropPathSegment, HarborShipHandle>({
+  nowSec: () => performance.now() / 1000,
+  segmentForCue: (cue) => PROP_PATH_SEGMENTS[cue],
+  activate: (handle, segment, startSec) => {
+    handle.segment = segment;
+    handle.cueStartSec = startSec;
+    handle.group.matrixAutoUpdate = true;
+  },
+  reset: (handle) => resetShip(handle),
+});
 const CUE_POSE: PropPathSample = { x: 0, y: 0, z: 0, yaw: 0, done: false };
 const SHIP_ATTACH_FRAME: SceneAttachFrame = {
   position: { x: 0, y: 0, z: 0 },
@@ -425,7 +435,7 @@ export function harborShipAttachFrame(
   target: string,
   out: SceneAttachFrame = SHIP_ATTACH_FRAME,
 ): SceneAttachFrame | null {
-  const handle = SHIPS.get(target);
+  const handle = SHIP_CUES.get(target);
   if (!handle) return null;
   const pose =
     handle.cueStartSec !== null && handle.segment !== null
@@ -434,44 +444,23 @@ export function harborShipAttachFrame(
   return composeHarborShipAttachFrame(handle, pose, out);
 }
 
-/** Route a scene prop cue to a ship. Unknown targets are ignored and unknown
- *  cues park a known ship, so authored mistakes never crash the client. The
- *  ship's matrix auto-update is enabled ONLY while a cue is live, so harbors
- *  stay inside the freezeStaticMatrices contract the rest of the time. */
+/** Route a scene prop cue to a ship. Pre-build targets retain their cue and
+ *  unknown cues park a known ship, so load races and authored mistakes never
+ *  crash the client. The ship's matrix auto-update is enabled ONLY while a cue
+ *  is live, so harbors stay inside the freezeStaticMatrices contract otherwise. */
 export function cueHarborShip(target: string, cue: string): void {
-  const handle = SHIPS.get(target);
-  const resolved = SHIP_CUE_STATE.routeCue(
-    target,
-    cue,
-    performance.now() / 1000,
-    handle !== undefined,
-  );
-  if (!handle) return;
-  if (!resolved) {
-    resetShip(handle);
-    return;
-  }
-  // A voyage cut may swap between the two harbor instances of the same
-  // ferry. Retire the prior moving instance under that cut so only one
-  // local-player stand-in can survive into the next shot.
-  for (const [otherTarget, other] of SHIPS) {
-    if (otherTarget !== target && other.cueStartSec !== null) resetShip(other);
-  }
-  handle.segment = resolved.segment;
-  handle.cueStartSec = resolved.cueStartSec;
-  handle.group.matrixAutoUpdate = true;
+  SHIP_CUES.cue(target, cue);
 }
 
 /** Scene teardown: every ship back at its berth. */
 export function resetHarborShipCues(): void {
-  SHIP_CUE_STATE.clearPending();
-  for (const handle of SHIPS.values()) resetShip(handle);
+  SHIP_CUES.resetAll();
 }
 
 function resetShip(handle: HarborShipHandle): void {
   handle.cueStartSec = null;
   handle.segment = null;
-  syncDeckStandIn(handle, null);
+  disposeDeckStandIn(handle, (visual) => visual.dispose());
   handle.group.position.set(handle.baseX, handle.baseY, handle.baseZ);
   handle.group.rotation.y = handle.baseRot;
   // Back under the freeze: recompose the rest pose once (updateMatrix flags
@@ -480,43 +469,27 @@ function resetShip(handle: HarborShipHandle): void {
   handle.group.matrixAutoUpdate = false;
 }
 
-function syncDeckStandIn(handle: HarborShipHandle, player: Entity | null): void {
-  const cueLive = handle.cueStartSec !== null && handle.segment !== null;
-  const action = deckStandInAction(cueLive, handle.deckStandIn !== null, player?.kind === 'player');
-  if (action === 'build' && player?.kind === 'player') {
-    const visual = createCharacterVisual(player);
-    // A null build retries next frame with no cooldown. World entry preloads
-    // these assets, and the cue window is short, so this retry policy is accepted.
-    if (!visual) return;
-    const transform = deckStandInParentTransform(
-      HARBOR_SHIP_DECK_STAND_IN_ATTACH,
-      handle.shipScale,
-      player.scale,
-    );
-    visual.root.position.set(transform.x, transform.y, transform.z);
-    visual.root.rotation.y = transform.yaw;
-    visual.root.scale.setScalar(transform.scale);
-    visual.setWeaponSkin(player.weaponSkinId);
-    visual.update(0, DECK_STAND_IN_IDLE_STATE, true);
-    handle.group.add(visual.root);
-    handle.deckStandIn = visual;
-  } else if (action === 'dispose' && handle.deckStandIn) {
-    handle.deckStandIn.dispose();
-    handle.deckStandIn = null;
-  }
+function createDeckStandIn(handle: HarborShipHandle, player: Entity): CharacterVisual | null {
+  const visual = createCharacterVisual(player);
+  // A null build retries next frame with no cooldown. World entry preloads
+  // these assets, and the cue window is short, so this retry policy is accepted.
+  if (!visual) return null;
+  const transform = deckStandInParentTransform(
+    HARBOR_SHIP_DECK_STAND_IN_ATTACH,
+    handle.shipScale,
+    player.scale,
+  );
+  visual.root.position.set(transform.x, transform.y, transform.z);
+  visual.root.rotation.y = transform.yaw;
+  visual.root.scale.setScalar(transform.scale);
+  visual.setWeaponSkin(player.weaponSkinId);
+  visual.update(0, DECK_STAND_IN_IDLE_STATE, true);
+  handle.group.add(visual.root);
+  return visual;
 }
 
-/** Per-frame ship motion and deck visual lifecycle from the live cue state.
- * Returns true while a moving deck stand-in replaces the parked local rig. */
-export function updateHarborShips(localPlayer: Entity, dt: number): boolean {
-  let deckStandInActive = false;
-  for (const handle of SHIPS.values()) {
-    syncDeckStandIn(handle, localPlayer);
-    if (handle.deckStandIn) {
-      deckStandInActive = true;
-      handle.deckStandIn.update(dt, DECK_STAND_IN_IDLE_STATE, false);
-    }
-    if (handle.cueStartSec === null || handle.segment === null) continue;
+function updateHarborShipMotion(handle: HarborShipHandle): void {
+  if (handle.cueStartSec !== null && handle.segment !== null) {
     handle.group.matrixAutoUpdate = true;
     const pose = propPathPoseAt(
       handle.segment,
@@ -527,8 +500,21 @@ export function updateHarborShips(localPlayer: Entity, dt: number): boolean {
     handle.group.position.set(frame.position.x, frame.position.y, frame.position.z);
     handle.group.rotation.y = frame.yaw;
   }
-  return deckStandInActive;
 }
+
+/** Per-frame ship motion and deck visual lifecycle from the live cue state.
+ * True means the moving stand-in replaces the parked authoritative rig. The
+ * factory binds every callback once so this renderer hot path stays stable. */
+export const updateHarborShips = createHarborShipUpdater<Entity, CharacterVisual, HarborShipHandle>(
+  {
+    handles: () => SHIP_CUES.values(),
+    isRealLocalPlayer: (player) => player.kind === 'player',
+    createStandIn: createDeckStandIn,
+    updateStandIn: (visual, dt) => visual.update(dt, DECK_STAND_IN_IDLE_STATE, false),
+    disposeStandIn: (visual) => visual.dispose(),
+    updateMotion: updateHarborShipMotion,
+  },
+);
 
 // The moored ferry ship: the generated GLB (long axis x, base at the keel)
 // scaled so the hull matches the authored berth length, yawed to the berth
@@ -556,21 +542,14 @@ function buildShip(parent: THREE.Group, harbor: HarborDef): void {
     segment: null,
     deckStandIn: null,
   };
-  SHIPS.set(target, handle);
-  const pending = SHIP_CUE_STATE.consumePending(target);
-  if (!pending) return;
-  handle.segment = pending.segment;
-  handle.cueStartSec = pending.cueStartSec;
-  handle.group.matrixAutoUpdate = true;
+  SHIP_CUES.register(target, handle);
 }
 
 /** Build every authored harbor of the active world into one static group. */
 export function buildHarbors(seed: number): { group: THREE.Group } {
   const group = new THREE.Group();
   group.name = 'harbors';
-  SHIPS.clear();
-  // World rebuilds must discard cues recorded against the prior harbor handles.
-  SHIP_CUE_STATE.clearPending();
+  SHIP_CUES.clearHandles();
   const harbors = getActiveWorldContent().props.harbors ?? [];
   for (const harbor of harbors) {
     const g = new THREE.Group();

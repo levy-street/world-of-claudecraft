@@ -22,7 +22,6 @@ vi.mock('../server/db', () => ({
 }));
 
 import { GameServer } from '../server/game';
-import { ClientWorld } from '../src/net/online';
 import { type CharacterState, Sim } from '../src/sim/sim';
 import {
   canPrestige,
@@ -40,6 +39,7 @@ import {
 } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { formatXp, xpBarView } from '../src/ui/xp_bar';
+import { bareClient } from './helpers/bare_client';
 
 function makeSim(cls: 'warrior' | 'mage' | 'rogue' = 'warrior', seed = 42): Sim {
   return new Sim({ seed, playerClass: cls, autoEquip: true });
@@ -312,6 +312,34 @@ describe('prestige', () => {
     expect(sim.prestige()).toBe(false);
     expect(sim.prestigeRank).toBe(0);
   });
+
+  // Regression (issue #2137): the character sheet only repaints on a small
+  // explicit set of triggers, and prestige used to emit only a chat 'log' line,
+  // so an already-open sheet kept showing the stale rank. The rank rides every
+  // self snapshot, so the client always HAS the new value; what it lacked was a
+  // signal telling it when to repaint. This event is that signal (the 'honor'
+  // precedent), so a successful prestige must emit exactly one carrying the new
+  // rank, and a refused one must emit none.
+  it('emits a personal prestige event carrying the new rank (issue #2137)', () => {
+    const sim = makeSim('warrior');
+    sim.setPlayerLevel(MAX_LEVEL);
+    sim.grantXp(PRESTIGE_XP_PER_RANK);
+    sim.drainEvents();
+
+    expect(sim.prestige()).toBe(true);
+    const events = sim.drainEvents().filter((e) => e.type === 'prestige');
+    expect(events).toEqual([{ type: 'prestige', pid: sim.playerId, rank: 1 }]);
+    expect(sim.prestigeRank).toBe(1);
+  });
+
+  it('emits no prestige event when the gate refuses', () => {
+    const sim = makeSim('warrior');
+    sim.setPlayerLevel(10);
+    sim.drainEvents();
+
+    expect(sim.prestige()).toBe(false);
+    expect(sim.drainEvents().filter((e) => e.type === 'prestige')).toEqual([]);
+  });
 });
 
 describe('prestige anti-abuse gate (server-locked rank)', () => {
@@ -454,36 +482,6 @@ describe('xp-bar label states', () => {
 // Online path: the values flow through the snapshot to the ClientWorld, and
 // the client derives virtual level for display (server stays authoritative).
 // -------------------------------------------------------------------------
-
-function bareClient(pid: number): ClientWorld {
-  const c: any = Object.create(ClientWorld.prototype);
-  c.cfg = { seed: 20061, playerClass: 'warrior' };
-  c.entities = new Map();
-  c.missingSince = new Map(); // despawn-grace bookkeeping (set by the real field initializer)
-  c.playerId = pid;
-  c.moveInput = {};
-  c.inventory = [];
-  c.equipment = {};
-  c.copper = 0;
-  c.xp = 0;
-  c.lifetimeXp = 0;
-  c.prestigeRank = 0;
-  c.unlockedMilestones = [];
-  c.known = [];
-  c.questLog = new Map();
-  c.questsDone = new Set();
-  c.pendingQuestCommands = new Map();
-  c.partyInfo = null;
-  c.tradeInfo = null;
-  c.duelInfo = null;
-  c.lastSnapAt = 0;
-  c.snapInterval = 50;
-  c.pendingFacingDelta = 0;
-  c.connected = true;
-  c.eventQueue = [];
-  c.mouselookFacing = null;
-  return c;
-}
 
 describe('online ClientWorld path', () => {
   let server: GameServer;

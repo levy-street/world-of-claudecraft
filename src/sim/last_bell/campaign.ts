@@ -195,13 +195,15 @@ function offerFare(ctx: SimContext, fromMainland: boolean, pid: number): void {
 }
 
 // Interaction arm (interaction.ts): true when the target was a Last Bell
-// fixture and the interact was consumed. The ferry moorings are scenery
-// (non-lootable, never reach here); only the scenario door is a device.
+// fixture and the interact was consumed. Ferry moorings and the breach are
+// inert scenery; consuming their targeted interaction prevents a nearby NPC
+// from receiving the same key press. Only the scenario door is a device.
 export function tryLastBellInteract(ctx: SimContext, target: Entity, pid: number): boolean {
   if (target.templateId === 'lb_scenario_door' && target.scenarioId !== undefined) {
     startScenario(ctx, target.scenarioId, pid);
     return true;
   }
+  if (target.templateId === 'lb_ferry' || target.templateId === 'lb_breach_maw') return true;
   return false;
 }
 

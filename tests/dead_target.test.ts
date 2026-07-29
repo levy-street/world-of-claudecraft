@@ -5,6 +5,7 @@
 
 import { describe, expect, it, vi } from 'vitest';
 import { ClientWorld } from '../src/net/online';
+import { MOBS } from '../src/sim/data';
 import { deadTargetSelectable } from '../src/sim/dead_target';
 import type { SimContext } from '../src/sim/sim_context';
 import { Targeting } from '../src/sim/targeting';
@@ -63,6 +64,7 @@ describe('Targeting.targetEntity with a dead pet', () => {
       },
       stopFollow,
       isHostileTo: (_a: Entity, b: Entity) => b.kind === 'mob' && b.hostile === true,
+      partyOf: () => null,
     } as unknown as SimContext;
     return { ctx, entities };
   }
@@ -94,12 +96,110 @@ describe('Targeting.targetEntity with a dead pet', () => {
 
     expect(player.targetId).toBeNull();
   });
+
+  it('does not select a lootable corpse when the viewer has no loot or harvest rights', () => {
+    const { ctx, entities } = makeCtx();
+    const player = ent({ id: 1, kind: 'player', dead: false, hostile: false });
+    const corpse = ent({
+      id: 30,
+      kind: 'mob',
+      templateId: 'kobold_miner',
+      dead: true,
+      lootable: true,
+      tappedById: 2,
+      lootFfaTimer: 30,
+      loot: { copper: 0, items: [{ itemId: 'worn_sword', count: 1 }] },
+      harvestClaimedBy: 2,
+    });
+    entities.set(1, player);
+    entities.set(30, corpse);
+    const targeting = new Targeting(ctx);
+
+    targeting.targetEntity(30, 1);
+
+    expect(player.targetId).toBeNull();
+  });
+
+  it('stops selecting a stranger-tapped corpse whose every family is unmapped (#2513)', () => {
+    // The one derived behavior change #2513 has outside the harvest itself:
+    // Targeting gates a lootable corpse on corpseInteractionAvailability, whose
+    // `harvestable` term now reads mapped families. A corpse tapped by someone
+    // else and carrying only unmapped families is selectable purely because
+    // the harvest half said yes, and that harvest can no longer happen, so
+    // there is nothing left to select it for. The claim is deliberately
+    // UNSPENT here, which is what made it selectable before. fen_troll (claw,
+    // tusk) was the shipped fixture; both are mapped now (this branch's own
+    // fix), so this retags a real, otherwise-untagged template (warlock_imp)
+    // for the duration of the case, restored in a finally.
+    const template = MOBS.warlock_imp;
+    const priorTags = template.componentTags;
+    template.componentTags = ['gills', 'horn'];
+    const { ctx, entities } = makeCtx();
+    const player = ent({ id: 1, kind: 'player', dead: false, hostile: false });
+    // A FACTORY, not one spread object: sharing it would alias `loot` (and its
+    // slot array) across both corpses, so a future assertion that touched loot
+    // would silently be reading the other fixture.
+    const stranger = () => ({
+      kind: 'mob' as const,
+      dead: true,
+      lootable: true,
+      tappedById: 2,
+      lootFfaTimer: 30,
+      loot: { copper: 0, items: [{ itemId: 'worn_sword', count: 1 }] },
+      harvestClaimedBy: null,
+    });
+    const troll = ent({ id: 32, templateId: 'warlock_imp', ...stranger() });
+    // The discriminator on real content: sethrael_palecoil carries the
+    // unmapped `horn` beside two mapped families, so its harvest half still
+    // says yes and its corpse is still selectable.
+    const boar = ent({ id: 33, templateId: 'sethrael_palecoil', ...stranger() });
+    entities.set(1, player);
+    entities.set(32, troll);
+    entities.set(33, boar);
+    const targeting = new Targeting(ctx);
+
+    try {
+      targeting.targetEntity(32, 1);
+      expect(player.targetId).toBeNull();
+
+      targeting.targetEntity(33, 1);
+      expect(player.targetId).toBe(33);
+    } finally {
+      template.componentTags = priorTags;
+    }
+  });
+
+  it('selects a lootable corpse when the viewer owns the shared loot rights', () => {
+    const { ctx, entities } = makeCtx();
+    const player = ent({ id: 1, kind: 'player', dead: false, hostile: false });
+    const corpse = ent({
+      id: 31,
+      kind: 'mob',
+      templateId: 'kobold_miner',
+      dead: true,
+      lootable: true,
+      tappedById: 1,
+      lootFfaTimer: 30,
+      loot: { copper: 0, items: [{ itemId: 'worn_sword', count: 1 }] },
+      harvestClaimedBy: 2,
+    });
+    entities.set(1, player);
+    entities.set(31, corpse);
+    const targeting = new Targeting(ctx);
+
+    targeting.targetEntity(31, 1);
+
+    expect(player.targetId).toBe(31);
+  });
 });
 
 describe('ClientWorld.targetEntity with a dead player', () => {
   it('mirrors the dead-player selection optimistically before the server reply', () => {
     const viewer = ent({ id: 1, kind: 'player', dead: false, hostile: false });
     const fallen = ent({ id: 5, kind: 'player', dead: true, hostile: false });
+    // Kept bespoke on purpose (issue #2088): a hand-picked field subset plus a
+    // `cmd` spy. tests/helpers/bare_client.ts bareClient() is the default for
+    // a new suite that just needs a bare ClientWorld.
     const client = Object.create(ClientWorld.prototype) as {
       playerId: number;
       entities: Map<number, Entity>;

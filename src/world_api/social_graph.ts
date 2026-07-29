@@ -2,7 +2,7 @@
 // server/social.ts shapes; kept here so the HUD has no server-side imports.
 import type { PlayerFlair } from '../sim/account_flair';
 
-export type PresenceStatus = 'online' | 'combat' | 'dungeon' | 'dead';
+export type PresenceStatus = 'online' | 'combat' | 'dungeon' | 'dead' | 'afk';
 export type GuildRank = 'leader' | 'officer' | 'member';
 
 export interface FriendInfo {
@@ -27,6 +27,10 @@ export interface GuildMemberInfo extends FriendInfo {
   // ISO-8601 timestamp of this member's last world entry, or null if never
   // recorded. Rides the 'social' frame; drives the "last seen" roster readout.
   lastLogin: string | null;
+  // Epoch-ms timestamp of when this member joined the guild, or null when the
+  // server did not send one. Rides the 'social' frame; drives the roster tenure
+  // badges (New / Veteran).
+  joinedAt: number | null;
 }
 
 // One guild calendar event (the event calendar's guild lane). `day` is a UTC
@@ -45,6 +49,11 @@ export interface GuildInfo {
   id: number;
   name: string;
   rank: GuildRank;
+  // The guild billboard: a short officer-set message pinned atop the Guild tab
+  // ('' when unset), with the setter's display name for attribution. Rendered
+  // as plain escaped text only (player-controlled; never linkified).
+  motd: string;
+  motdSetBy: string;
   members: GuildMemberInfo[];
   events: GuildEventInfo[];
 }
@@ -106,6 +115,9 @@ export interface IWorldSocialGraph {
   // them via socialInfo.guild.events)
   guildEventCreate(day: string, hour: number | null, title: string, note: string): void;
   guildEventRemove(eventId: number): void;
+  // guild billboard: set (or clear, with '') the message pinned atop the Guild
+  // tab. Officers + the Guild Master only; the server enforces the rank gate.
+  guildSetMotd(text: string): void;
   // realm-scoped username typeahead for friend/ignore/guild search
   searchCharacters(query: string): Promise<CharacterSearchResult[]>;
   // public profile for any character on the realm, by name. Lets the player menu

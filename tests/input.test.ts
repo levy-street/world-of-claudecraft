@@ -1,7 +1,16 @@
+import { readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Input } from '../src/game/input';
 import { stopAutorunForInteraction } from '../src/game/interaction_autorun';
 import { Keybinds } from '../src/game/keybinds';
+
+// Pointer-lock tests keep explicit coordinates so the held-lock behavior stays
+// independent from the old edge-only path.
+const VIEWPORT_W = 1920;
+const VIEWPORT_H = 1080;
+const EDGE = { clientX: 6, clientY: 540 };
+const CENTER = { clientX: 960, clientY: 540 };
+const mainSource = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
 
 function installStorage(): void {
   const map = new Map<string, string>();
@@ -28,6 +37,9 @@ function makeInput(userAgent?: string) {
   const exitPointerLock = vi.fn();
   let gameActive = true;
   let mobileTouch = false;
+  // Input's optional "a menu owns the keyboard right now" gate; true unless a
+  // test flips it, so every existing expectation is unaffected.
+  let gameKeysAllowed = true;
   const canvas = {
     style: { cursor: '' },
     addEventListener: vi.fn((type: string, cb: (event: any) => void) => {
@@ -36,6 +48,8 @@ function makeInput(userAgent?: string) {
     requestPointerLock,
   };
   (globalThis as any).window = {
+    innerWidth: VIEWPORT_W,
+    innerHeight: VIEWPORT_H,
     addEventListener: vi.fn((type: string, cb: (event: any) => void) => {
       windowListeners.set(type, cb);
     }),
@@ -62,6 +76,7 @@ function makeInput(userAgent?: string) {
     onTargetFriendly: vi.fn(),
     onCycleFriendly: vi.fn(),
     onPet: vi.fn(),
+    onTargetPet: vi.fn(),
     onAbility: vi.fn(),
     onAbilityDown: vi.fn(),
     onAbilityUp: vi.fn(),
@@ -69,6 +84,7 @@ function makeInput(userAgent?: string) {
     onEmoteWheel: vi.fn(),
     onClickPick: vi.fn(),
     onAttackMove: vi.fn(),
+    canUseGameKeys: () => gameKeysAllowed,
   };
   const input = new Input(canvas as any, cb, new Keybinds());
   return {
@@ -83,6 +99,9 @@ function makeInput(userAgent?: string) {
     },
     setMobileTouch: (active: boolean) => {
       mobileTouch = active;
+    },
+    setGameKeysAllowed: (allowed: boolean) => {
+      gameKeysAllowed = allowed;
     },
   };
 }
@@ -136,6 +155,80 @@ describe('Input autorun', () => {
     expect(input.readMoveInput().forward).toBe(true);
     expect(input.setAutorun(false)).toBe(false);
     expect(input.readMoveInput().forward).toBe(false);
+  });
+
+  it('hard-locks scene movement and clears persistent travel latches', () => {
+    const { input, windowListeners } = makeInput();
+    const now = vi.spyOn(performance, 'now').mockReturnValue(1_000);
+    input.setAutorun(true);
+    input.setClickMoveTarget({ x: 8, z: 3 }, 0.5);
+    input.triggerTouchJump();
+    input.setControllerFacing(1.25);
+    windowListeners.get('keydown')?.({
+      code: 'Space',
+      repeat: false,
+      preventDefault: vi.fn(),
+    });
+    windowListeners.get('keyup')?.({ code: 'Space' });
+
+    input.setSceneInputLocked(true);
+
+    expect(input.autorun).toBe(false);
+    expect(input.clickMoveTarget).toBeNull();
+    expect(input.clickMoveGoal).toBeNull();
+    expect(input.readMoveInput()).toEqual({
+      forward: false,
+      back: false,
+      turnLeft: false,
+      turnRight: false,
+      strafeLeft: false,
+      strafeRight: false,
+      jump: false,
+    });
+    expect(input.controllerFacingOverride()).toBeNull();
+
+    expect(input.toggleAutorun()).toBe(false);
+    expect(input.setAutorun(true)).toBe(false);
+    input.setClickMoveTarget({ x: 12, z: 7 }, 0.5);
+    input.setTouchMove({ forward: true, back: false, strafeLeft: false, strafeRight: false });
+    input.setGamepadMove({ forward: true, back: false, strafeLeft: false, strafeRight: false });
+    input.setControllerMoveInput({ forward: true });
+    input.setControllerFacing(2.5);
+    input.triggerTouchJump();
+
+    input.setSceneInputLocked(false);
+
+    expect(input.autorun).toBe(false);
+    expect(input.clickMoveTarget).toBeNull();
+    expect(input.readMoveInput().forward).toBe(false);
+    expect(input.readMoveInput().jump).toBe(false);
+    expect(input.controllerFacingOverride()).toBeNull();
+
+    input.setSceneInputLocked(true);
+    input.triggerGamepadJump();
+    input.setSceneInputLocked(false);
+    expect(input.readMoveInput().jump).toBe(false);
+
+    input.setTouchMove({ forward: true, back: false, strafeLeft: false, strafeRight: false });
+    input.setControllerMoveInput({ strafeRight: true });
+    input.setControllerFacing(0.75);
+    input.triggerTouchJump();
+
+    expect(input.readMoveInput()).toEqual({
+      forward: false,
+      back: false,
+      turnLeft: false,
+      turnRight: false,
+      strafeLeft: false,
+      strafeRight: true,
+      jump: false,
+    });
+    expect(input.controllerFacingOverride()).toBe(0.75);
+
+    input.clearControllerMoveInput();
+    expect(input.readMoveInput().forward).toBe(true);
+    expect(input.readMoveInput().jump).toBe(true);
+    now.mockRestore();
   });
 
   it('a forward touch-move cancels autorun (classic tap-to-stop)', () => {
@@ -252,6 +345,39 @@ describe('Input autorun', () => {
     expect(input.readMoveInput().forward).toBe(true);
     expect(input.debugState().keys).toEqual([]);
   });
+
+  it('clears every movement source for an in-place client transition', () => {
+    const { input, windowListeners, cb } = makeInput();
+    input.setAutorun(true);
+    input.setTouchMove({ forward: false, back: true, strafeLeft: false, strafeRight: false });
+    input.setGamepadMove({ forward: false, back: false, strafeLeft: true, strafeRight: false });
+    input.setControllerMoveInput({ forward: true, jump: true });
+    input.setClickMoveTarget({ x: 4, z: 8 }, 0.5);
+    windowListeners.get('keydown')!({
+      code: 'Digit1',
+      repeat: false,
+      preventDefault: vi.fn(),
+    });
+
+    input.resetForClientTransition();
+
+    expect(input.autorun).toBe(false);
+    expect(input.clickMoveTarget).toBeNull();
+    expect(input.clickMoveGoal).toBeNull();
+    expect(input.controllerFacingOverride()).toBeNull();
+    expect(input.readMoveInput()).toEqual({
+      forward: false,
+      back: false,
+      turnLeft: false,
+      turnRight: false,
+      strafeLeft: false,
+      strafeRight: false,
+      jump: false,
+      dive: false,
+      surface: false,
+    });
+    expect(cb.onAbilityUp).toHaveBeenCalledWith(0);
+  });
 });
 
 describe('Input pet bar chords', () => {
@@ -345,6 +471,66 @@ describe('Input click-to-move marker pulses', () => {
 });
 
 describe('Input pointer lock', () => {
+  it('requests pointer lock for a camera drag that starts away from the viewport edge', () => {
+    // The Lock Cursor option means an active camera-look drag holds pointer lock
+    // for the whole drag, not only after the OS cursor has already approached a
+    // screen edge. This keeps the pointer from escaping the game surface before
+    // the player intentionally releases the drag.
+    const { canvas, input, canvasListeners, windowListeners } = makeInput();
+    const yaw = input.camYaw;
+
+    canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
+    windowListeners.get('mousemove')!({ movementX: 10, movementY: 5, ...CENTER });
+    windowListeners.get('mousemove')!({ movementX: 12, movementY: 0, ...CENTER });
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+
+    windowListeners.get('mousemove')!({ movementX: 20, movementY: 0, clientX: 980, clientY: 540 });
+
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+    expect(input.isCameraDragActive()).toBe(true);
+    expect(input.camYaw).toBeCloseTo(yaw - 20 * 0.0045);
+  });
+
+  it('engages the lock as soon as the drag starts, before the cursor reaches an edge', () => {
+    const { canvas, canvasListeners, windowListeners } = makeInput();
+
+    canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
+    windowListeners.get('mousemove')!({ movementX: 10, movementY: 5, ...CENTER });
+    windowListeners.get('mousemove')!({ movementX: 12, movementY: 0, ...CENTER });
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+
+    windowListeners.get('mousemove')!({ movementX: 40, movementY: 0, ...EDGE });
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+
+    windowListeners.get('mousemove')!({ movementX: 5, movementY: 0, clientX: 2, clientY: 540 });
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+  });
+
+  it('on Firefox, requests pointer lock synchronously even when the press starts away from the edge', () => {
+    const { canvas, canvasListeners } = makeInput(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0',
+    );
+
+    canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
+
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+  });
+
+  it('re-arms per drag while still locking every active drag', () => {
+    const { canvas, canvasListeners, windowListeners } = makeInput();
+
+    canvasListeners.get('mousedown')!({ button: 2, ...EDGE, preventDefault: vi.fn() });
+    windowListeners.get('mousemove')!({ movementX: 10, movementY: 5, ...EDGE });
+    windowListeners.get('mousemove')!({ movementX: 12, movementY: 0, ...EDGE });
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+    windowListeners.get('mouseup')!({ button: 2, ...EDGE, target: canvas });
+
+    canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
+    windowListeners.get('mousemove')!({ movementX: 10, movementY: 5, ...CENTER });
+    windowListeners.get('mousemove')!({ movementX: 12, movementY: 0, ...CENTER });
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(2);
+  });
+
   it('does not request pointer lock for a plain right click', () => {
     const { canvas, canvasListeners } = makeInput();
 
@@ -363,8 +549,7 @@ describe('Input pointer lock', () => {
     // drag, so the browser pointer-capture banner is never shown.
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
     now += 30;
@@ -378,7 +563,7 @@ describe('Input pointer lock', () => {
   it('requests pointer lock the instant a press becomes an active drag (before any rotation)', () => {
     const { canvas, canvasListeners, windowListeners } = makeInput();
 
-    canvasListeners.get('mousedown')!({ button: 2, clientX: 100, clientY: 100 });
+    canvasListeners.get('mousedown')!({ button: 2, ...EDGE });
     windowListeners.get('mousemove')!({ movementX: 10, movementY: 5 });
     expect(canvas.requestPointerLock).not.toHaveBeenCalled();
     // This move crosses the drag threshold: lock must engage on the SAME frame so
@@ -397,8 +582,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 0,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
     windowListeners.get('mousemove')!({ movementX: 10, movementY: 5 });
@@ -411,7 +595,7 @@ describe('Input pointer lock', () => {
     const { canvas, input, canvasListeners, windowListeners } = makeInput();
     input.setLockCursorOnRotate(false);
 
-    canvasListeners.get('mousedown')!({ button: 2, clientX: 100, clientY: 100 });
+    canvasListeners.get('mousedown')!({ button: 2, ...EDGE });
     windowListeners.get('mousemove')!({ movementX: 10, movementY: 5 });
     windowListeners.get('mousemove')!({ movementX: 4, movementY: 0 });
     windowListeners.get('mousemove')!({ movementX: 2, movementY: 0 });
@@ -424,7 +608,7 @@ describe('Input pointer lock', () => {
     (globalThis as any).document.fullscreenElement =
       (globalThis as any).document.documentElement ?? canvas;
 
-    canvasListeners.get('mousedown')!({ button: 2, clientX: 100, clientY: 100 });
+    canvasListeners.get('mousedown')!({ button: 2, ...EDGE });
     windowListeners.get('mousemove')!({ movementX: 19, movementY: 0 });
     windowListeners.get('mousemove')!({ movementX: 1, movementY: 0 });
 
@@ -441,8 +625,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
 
@@ -457,8 +640,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 0,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
 
@@ -475,8 +657,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 0,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
 
@@ -491,8 +672,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 0,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
 
@@ -507,8 +687,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
 
@@ -523,8 +702,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
 
@@ -547,8 +725,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
     expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
@@ -558,8 +735,7 @@ describe('Input pointer lock', () => {
     now += 200;
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
     expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
@@ -572,8 +748,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
 
@@ -592,13 +767,12 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
     expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
 
-    windowListeners.get('mouseup')!({ button: 2, clientX: 100, clientY: 100, target: canvas });
+    windowListeners.get('mouseup')!({ button: 2, ...EDGE, target: canvas });
     expect((globalThis as any).document.exitPointerLock).not.toHaveBeenCalled();
 
     (globalThis as any).document.pointerLockElement = canvas;
@@ -614,8 +788,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
 
@@ -649,6 +822,46 @@ describe('Input pointer lock', () => {
     expect(cb.onClickPick).toHaveBeenCalledWith(120, 160, 0);
   });
 
+  it('does not dispatch a canvas pick while gameplay input is blocked', () => {
+    const { canvas, cb, canvasListeners, windowListeners } = makeInput();
+    (cb as any).canUseGameKeys = vi.fn(() => false);
+
+    canvasListeners.get('mousedown')!({
+      button: 0,
+      clientX: 120,
+      clientY: 160,
+      preventDefault: vi.fn(),
+    });
+    windowListeners.get('mouseup')!({
+      button: 0,
+      clientX: 120,
+      clientY: 160,
+      target: canvas,
+    });
+
+    expect(cb.onClickPick).not.toHaveBeenCalled();
+  });
+
+  it('dispatches a canvas pick when the production gameplay gate explicitly allows it', () => {
+    const { canvas, cb, canvasListeners, windowListeners } = makeInput();
+    (cb as any).canUseGameKeys = vi.fn(() => true);
+
+    canvasListeners.get('mousedown')!({
+      button: 0,
+      clientX: 120,
+      clientY: 160,
+      preventDefault: vi.fn(),
+    });
+    windowListeners.get('mouseup')!({
+      button: 0,
+      clientX: 120,
+      clientY: 160,
+      target: canvas,
+    });
+
+    expect(cb.onClickPick).toHaveBeenCalledWith(120, 160, 0);
+  });
+
   it('starts camera drag by distance but discards the threshold-crossing movement', () => {
     const now = 1000;
     vi.spyOn(performance, 'now').mockImplementation(() => now);
@@ -657,8 +870,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
     windowListeners.get('mousemove')!({ movementX: 10, movementY: 5 });
@@ -674,24 +886,33 @@ describe('Input pointer lock', () => {
     expect(input.camYaw).toBeCloseTo(yaw - 2 * 0.0045);
   });
 
-  it('starts camera drag by hold duration even with small pointer movement', () => {
+  it('requests pointer lock before a duration-started right drag rotates', () => {
     let now = 1000;
     vi.spyOn(performance, 'now').mockImplementation(() => now);
-    const { input, canvasListeners, windowListeners } = makeInput();
+    const { canvas, input, canvasListeners, windowListeners } = makeInput();
     const yaw = input.camYaw;
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
     now += 150;
+    windowListeners.get('mousemove')!({ movementX: 0, movementY: 0 });
+    expect(canvas.requestPointerLock).not.toHaveBeenCalled();
+
     windowListeners.get('mousemove')!({ movementX: 1, movementY: 0 });
     expect(input.isCameraDragActive()).toBe(true);
     expect(input.camYaw).toBe(yaw);
+    expect(input.debugState()).toMatchObject({
+      rightDown: true,
+      cameraDragActive: true,
+      pointerLocked: false,
+    });
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
 
     windowListeners.get('mousemove')!({ movementX: 2, movementY: 0 });
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
     expect(input.camYaw).toBeCloseTo(yaw - 2 * 0.0045);
   });
 
@@ -727,8 +948,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
     now += 281;
@@ -753,8 +973,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
     windowListeners.get('mousemove')!({ movementX: 19, movementY: 0 });
@@ -899,6 +1118,45 @@ describe('Input Discord keybind', () => {
     windowListeners.get('keydown')!({ code: 'KeyU', repeat: false });
 
     expect(cb.onUiKey).not.toHaveBeenCalled();
+  });
+});
+
+describe('Input target buffs and debuffs keybind', () => {
+  it("dispatches onUiKey('targetAuras') for the default Shift+J chord", () => {
+    const { cb, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({ code: 'KeyJ', repeat: false, shiftKey: true });
+
+    expect(cb.onUiKey).toHaveBeenCalledWith('targetAuras');
+    expect(cb.onCycleFriendly).not.toHaveBeenCalled();
+  });
+
+  it('keeps bare J assigned to cycle friendly targets', () => {
+    const { cb, windowListeners } = makeInput();
+
+    windowListeners.get('keydown')!({ code: 'KeyJ', repeat: false });
+
+    expect(cb.onCycleFriendly).toHaveBeenCalledTimes(1);
+    expect(cb.onUiKey).not.toHaveBeenCalledWith('targetAuras');
+  });
+
+  it('routes both startGame input paths to the HUD toggle', () => {
+    const keyboardStart = mainSource.indexOf('onUiKey: (key) => {');
+    const keyboardRoute = mainSource.slice(
+      keyboardStart,
+      mainSource.indexOf('onEmoteWheel:', keyboardStart),
+    );
+    const gamepadStart = mainSource.indexOf('function dispatchGamepadAction(id: string): void {');
+    const gamepadRoute = mainSource.slice(
+      gamepadStart,
+      mainSource.indexOf('const gamepad =', gamepadStart),
+    );
+    const route = /case 'targetAuras':\s*hud\.toggleTargetAuras\(\);\s*break;/g;
+
+    expect(keyboardStart).toBeGreaterThanOrEqual(0);
+    expect(gamepadStart).toBeGreaterThanOrEqual(0);
+    expect(keyboardRoute.match(route)).toHaveLength(1);
+    expect(gamepadRoute.match(route)).toHaveLength(1);
   });
 });
 
@@ -1291,5 +1549,375 @@ describe('Input touch invert-look', () => {
     const rawYawDelta = 100 * 0.0045; // BASE_LOOK_SENS, mirrored here since it is not exported
 
     expect(dragYawDelta).toBeGreaterThan(rawYawDelta * 1.5);
+  });
+
+  it('honors the Touch Look Speed setting on the default one-finger swipe-drag path', () => {
+    const { input } = makeInput();
+    const baseYaw = input.camYaw;
+    input.applyTouchLookDelta(100, 0);
+    const defaultDelta = Math.abs(input.camYaw - baseYaw);
+
+    input.camYaw = baseYaw;
+    input.setTouchLookSpeed(2);
+    input.applyTouchLookDelta(100, 0);
+    const doubledDelta = Math.abs(input.camYaw - baseYaw);
+
+    expect(doubledDelta).toBeCloseTo(defaultDelta * 2);
+  });
+});
+
+describe('Input camera zoom (issue 1657)', () => {
+  it('zoomBy clamps camDist to [3,22] and reports each change to onCameraDistChange', () => {
+    const { input } = makeInput();
+    const changes: number[] = [];
+    input.onCameraDistChange = (d) => changes.push(d);
+    expect(input.camDist).toBe(12);
+    input.zoomBy(4); // 12 -> 16
+    input.zoomBy(-100); // clamps to the 3 min
+    input.zoomBy(100); // clamps to the 22 max
+    expect(input.camDist).toBe(22);
+    expect(changes).toEqual([16, 3, 22]);
+  });
+
+  it('does not fire onCameraDistChange when the clamp leaves camDist unchanged (no spurious persist)', () => {
+    const { input } = makeInput();
+    input.zoomBy(-100); // camDist -> 3 (min)
+    const changes: number[] = [];
+    input.onCameraDistChange = (d) => changes.push(d);
+    input.zoomBy(-5); // already at the min, no change
+    expect(input.camDist).toBe(3);
+    expect(changes).toEqual([]);
+  });
+});
+
+// Camera-steered swimming: the view IS the vertical stick. The band edges and
+// the resting pitch are load-bearing (a neutral camera must hold your depth),
+// and the steer inside the band is what turns the old on/off plunge into
+// something you can feather.
+describe('Input swim steer from the camera', () => {
+  it('holds depth at the resting camera pitch', () => {
+    const { input } = makeInput();
+    expect(input.camPitch).toBe(0.32);
+    const mi = input.readMoveInput();
+    expect(mi.dive).toBe(false);
+    expect(mi.surface).toBe(false);
+    expect(mi.swimSteer).toBe(0);
+  });
+
+  it('ramps the dive steer with how far past the threshold the STEERED view is aimed', () => {
+    // The bands read swimAimPitch (a steering look) and only act while a move
+    // key is held — pointing the camera at the lake bed while floating in
+    // place must not sink you (the WoW rule).
+    const { input, windowListeners } = makeInput();
+    windowListeners.get('keydown')!({ code: 'KeyW', repeat: false });
+    input.applyGamepadLook(0, 0.63 - input.camPitch); // steer just over the line
+    const shallow = input.readMoveInput();
+    input.applyGamepadLook(0, 1.3 - input.camPitch); // steer buried
+    const steep = input.readMoveInput();
+    expect(shallow.dive).toBe(true);
+    expect(steep.dive).toBe(true);
+    expect(shallow.swimSteer).toBeLessThan(0.2);
+    expect(steep.swimSteer).toBe(1);
+  });
+
+  it('ramps the surface steer the other way', () => {
+    const { input, windowListeners } = makeInput();
+    windowListeners.get('keydown')!({ code: 'KeyW', repeat: false });
+    input.applyGamepadLook(0, 0.04 - input.camPitch);
+    const shallow = input.readMoveInput();
+    input.applyGamepadLook(0, -0.4 - input.camPitch); // the clamp
+    const steep = input.readMoveInput();
+    expect(shallow.surface).toBe(true);
+    expect(steep.surface).toBe(true);
+    expect(shallow.swimSteer ?? 0).toBeLessThan(steep.swimSteer ?? 0);
+    expect(steep.swimSteer).toBe(1);
+  });
+
+  it('keeps the camera bands inert while no move key is held', () => {
+    const { input } = makeInput();
+    input.applyGamepadLook(0, 1.3 - input.camPitch); // steered hard down...
+    const mi = input.readMoveInput();
+    expect(mi.dive).toBe(false); // ...but floating in place: no sinking
+    expect(mi.surface).toBe(false);
+    expect(mi.swimSteer).toBe(0);
+  });
+
+  it('never steers off a pitch the steering looks did not write (left-drag orbit)', () => {
+    // A left-drag orbit moves camPitch without touching swimAimPitch: even
+    // with a move key held, sightseeing must not dive the swimmer.
+    const { input, windowListeners } = makeInput();
+    windowListeners.get('keydown')!({ code: 'KeyW', repeat: false });
+    input.camPitch = 1.3; // orbit-only pitch, no steering look involved
+    const mi = input.readMoveInput();
+    expect(mi.dive).toBe(false);
+    expect(mi.swimSteer).toBe(0);
+  });
+
+  it('quantises the steer, so a mouse twitch does not resend the input frame', () => {
+    const { input } = makeInput();
+    const seen = new Set<number | undefined>();
+    for (let i = 0; i <= 40; i++) {
+      input.camPitch = 0.62 + (i / 40) * (1.25 - 0.62);
+      seen.add(input.readMoveInput().swimSteer);
+    }
+    expect(seen.size).toBeLessThanOrEqual(7); // SWIM_STEER_STEPS + 1
+  });
+
+  it('latches the threshold, so a view resting on the line cannot chatter', () => {
+    const { input, windowListeners } = makeInput();
+    windowListeners.get('keydown')!({ code: 'KeyW', repeat: false });
+    input.applyGamepadLook(0, 0.63 - input.camPitch);
+    expect(input.readMoveInput().dive).toBe(true);
+    input.applyGamepadLook(0, 0.6 - input.camPitch); // inside the hysteresis
+    expect(input.readMoveInput().dive).toBe(true);
+    input.applyGamepadLook(0, 0.5 - input.camPitch); // clear of it
+    expect(input.readMoveInput().dive).toBe(false);
+  });
+
+  it('dives at full rate from the KEY, whatever the camera is doing', () => {
+    const { input, windowListeners } = makeInput();
+    input.camPitch = 0.32; // neutral: the camera is not steering
+    windowListeners.get('keydown')!({ code: 'ControlLeft', repeat: false });
+    const mi = input.readMoveInput();
+    expect(mi.dive).toBe(true);
+    expect(mi.swimSteer).toBe(1);
+  });
+});
+
+describe('Input captureNextKey cancellation (issue 1238)', () => {
+  it('captureNextKey(null) clears an armed capture so the next real keypress reaches gameplay', () => {
+    const { input, cb, windowListeners } = makeInput();
+    const captured: (string | null)[] = [];
+    input.captureNextKey((code) => captured.push(code));
+    // Abandon the capture without a keypress, the way Done/Reset does on the
+    // on-bar action-bar key-binding mode.
+    input.captureNextKey(null);
+
+    windowListeners.get('keydown')!({ code: 'Digit1', repeat: false, preventDefault: vi.fn() });
+
+    // The stale capture callback must never fire, and the keypress must fall
+    // through to normal ability dispatch (slot0's default key) instead of
+    // being swallowed.
+    expect(captured).toEqual([]);
+    expect(cb.onAbilityDown).toHaveBeenCalledWith(0);
+  });
+
+  it('a still-armed capture (no cancel) swallows the next keypress instead of dispatching it', () => {
+    const { input, cb, windowListeners } = makeInput();
+    const captured: (string | null)[] = [];
+    input.captureNextKey((code) => captured.push(code));
+
+    windowListeners.get('keydown')!({ code: 'Digit1', repeat: false, preventDefault: vi.fn() });
+
+    expect(captured).toEqual(['Digit1']);
+    expect(cb.onAbilityDown).not.toHaveBeenCalled();
+  });
+});
+
+describe('Input mouse-button bindings', () => {
+  // The thumb and middle buttons bind like keys (src/game/mouse_binds.ts):
+  // DOM button 1 is M3, 3 is M4, 4 is M5. Left (0) and right (2) stay reserved
+  // for the camera, click-to-move, and click-picking.
+  const mouseDown = (button: number, extra: Record<string, unknown> = {}) => ({
+    button,
+    preventDefault: vi.fn(),
+    ...extra,
+  });
+
+  it('captures a thumb button for the rebind UI, chord and all', () => {
+    const { input, windowListeners } = makeInput();
+    const captured: (string | null)[] = [];
+    input.captureNextKey((code) => captured.push(code));
+
+    windowListeners.get('mousedown')!(mouseDown(3, { shiftKey: true }));
+
+    expect(captured).toEqual(['Shift+Mouse4']);
+  });
+
+  it('leaves the capture armed when a reserved button is pressed', () => {
+    // The player has to be able to click Done, Cancel, or another row with the
+    // left button while a capture waits, so left/right never resolve it.
+    const { input, cb, windowListeners } = makeInput();
+    const captured: (string | null)[] = [];
+    input.captureNextKey((code) => captured.push(code));
+
+    windowListeners.get('mousedown')!(mouseDown(0));
+    windowListeners.get('mousedown')!(mouseDown(2));
+    expect(captured).toEqual([]);
+
+    // Still armed: the next bindable button resolves it, and never dispatches.
+    windowListeners.get('mousedown')!(mouseDown(4));
+    expect(captured).toEqual(['Mouse5']);
+    expect(cb.onAbilityDown).not.toHaveBeenCalled();
+  });
+
+  it('fires a slot bound to a thumb button on press and releases it on mouseup', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('slot3', 0, 'Mouse4')).toBe(true);
+    const { cb, windowListeners } = makeInput();
+
+    const down = mouseDown(3);
+    windowListeners.get('mousedown')!(down);
+    expect(cb.onAbilityDown).toHaveBeenLastCalledWith(3);
+    // The browser's back-navigation default is cancelled for a press the game used.
+    expect(down.preventDefault).toHaveBeenCalled();
+
+    windowListeners.get('mouseup')!({ button: 3, preventDefault: vi.fn() });
+    expect(cb.onAbilityUp).toHaveBeenLastCalledWith(3);
+  });
+
+  it('drives a held movement action from a mouse button and stops on release', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('forward', 0, 'Mouse5')).toBe(true);
+    const { input, windowListeners } = makeInput();
+
+    windowListeners.get('mousedown')!(mouseDown(4));
+    expect(input.readMoveInput().forward).toBe(true);
+
+    windowListeners.get('mouseup')!({ button: 4, preventDefault: vi.fn() });
+    expect(input.readMoveInput().forward).toBe(false);
+  });
+
+  it('dispatches an interface action bound to the middle button', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('bags', 0, 'Mouse3')).toBe(true);
+    const { cb, windowListeners } = makeInput();
+
+    windowListeners.get('mousedown')!(mouseDown(1));
+
+    expect(cb.onUiKey).toHaveBeenCalledWith('bags');
+  });
+
+  it('keeps a mouse chord distinct from the bare button', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('slot6', 0, 'Shift+Mouse4')).toBe(true);
+    const { cb, windowListeners } = makeInput();
+
+    windowListeners.get('mousedown')!(mouseDown(3));
+    expect(cb.onAbilityDown).not.toHaveBeenCalled();
+
+    windowListeners.get('mousedown')!(mouseDown(3, { shiftKey: true }));
+    expect(cb.onAbilityDown).toHaveBeenLastCalledWith(6);
+  });
+
+  it('leaves an unbound button alone, so browser back/forward still works', () => {
+    const { cb, windowListeners } = makeInput();
+    const down = mouseDown(3); // nothing binds M4 by default
+    const aux = { button: 3, preventDefault: vi.fn() };
+
+    windowListeners.get('mousedown')!(down);
+    windowListeners.get('auxclick')!(aux);
+
+    expect(cb.onAbilityDown).not.toHaveBeenCalled();
+    expect(down.preventDefault).not.toHaveBeenCalled();
+    expect(aux.preventDefault).not.toHaveBeenCalled();
+  });
+
+  it('cancels the auxclick that follows a press the game consumed', () => {
+    // Chromium and Gecko navigate on the thumb buttons; cancelling mousedown
+    // alone is not always enough, so the paired auxclick is cancelled too.
+    const kb = new Keybinds();
+    expect(kb.bind('slot3', 0, 'Mouse4')).toBe(true);
+    const { windowListeners } = makeInput();
+
+    windowListeners.get('mousedown')!(mouseDown(3));
+    const aux = { button: 3, preventDefault: vi.fn() };
+    windowListeners.get('auxclick')!(aux);
+    expect(aux.preventDefault).toHaveBeenCalled();
+
+    // One press, one cancelled auxclick: a later unrelated auxclick is untouched.
+    const second = { button: 3, preventDefault: vi.fn() };
+    windowListeners.get('auxclick')!(second);
+    expect(second.preventDefault).not.toHaveBeenCalled();
+  });
+
+  it('does not let a press whose auxclick never arrived suppress a later one', () => {
+    // Release outside the window means no auxclick for the consumed press. The
+    // next press of that button must clear the stale entry, or an unbound press
+    // later would silently eat the player's browser navigation.
+    const kb = new Keybinds();
+    expect(kb.bind('slot3', 0, 'Mouse4')).toBe(true);
+    const { windowListeners } = makeInput();
+
+    windowListeners.get('mousedown')!(mouseDown(3)); // consumed, auxclick lost
+
+    // A second press the game does NOT consume (a text field owns the keyboard).
+    (globalThis as any).document.activeElement = { tagName: 'INPUT' };
+    const ignored = mouseDown(3);
+    windowListeners.get('mousedown')!(ignored);
+    const aux = { button: 3, preventDefault: vi.fn() };
+    windowListeners.get('auxclick')!(aux);
+    (globalThis as any).document.activeElement = null;
+
+    expect(ignored.preventDefault).not.toHaveBeenCalled();
+    expect(aux.preventDefault).not.toHaveBeenCalled();
+  });
+
+  it('ignores a bound mouse button while a text field has focus', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('slot3', 0, 'Mouse4')).toBe(true);
+    const { cb, windowListeners } = makeInput();
+    (globalThis as any).document.activeElement = { tagName: 'TEXTAREA' };
+
+    windowListeners.get('mousedown')!(mouseDown(3));
+
+    expect(cb.onAbilityDown).not.toHaveBeenCalled();
+    (globalThis as any).document.activeElement = null;
+  });
+
+  it('ignores a bound mouse button while game keys are suppressed', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('slot3', 0, 'Mouse4')).toBe(true);
+    const { cb, windowListeners, setGameKeysAllowed } = makeInput();
+    setGameKeysAllowed(false); // a menu/modal owns input
+
+    windowListeners.get('mousedown')!(mouseDown(3));
+
+    expect(cb.onAbilityDown).not.toHaveBeenCalled();
+  });
+
+  it('issues an attack move from a mouse button, as the keyboard chord does', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('attackMove', 0, 'Mouse4')).toBe(true);
+    const { input, canvasListeners, cb, windowListeners } = makeInput();
+    input.setAttackMoveEnabled(true);
+    canvasListeners.get('mouseenter')!({}); // cursor over the world
+
+    windowListeners.get('mousedown')!(mouseDown(3));
+
+    expect(cb.onAttackMove).toHaveBeenCalled();
+    // Attack Move wins the press outright: no ability/held dispatch follows it.
+    expect(cb.onAbilityDown).not.toHaveBeenCalled();
+  });
+
+  it('never turns an extra button into a world click-pick', () => {
+    const now = 1000;
+    vi.spyOn(performance, 'now').mockImplementation(() => now);
+    const { canvas, cb, canvasListeners, windowListeners } = makeInput();
+
+    canvasListeners.get('mousedown')!(mouseDown(3, { clientX: 120, clientY: 160 }));
+    windowListeners.get('mouseup')!({ button: 3, clientX: 120, clientY: 160, target: canvas });
+
+    expect(cb.onClickPick).not.toHaveBeenCalled();
+  });
+
+  it('does not let a thumb-button press cancel a left click-pick in flight', () => {
+    // The extra button returns early from the canvas gesture handler, so it
+    // cannot clear the pending press the way a reserved-button press would.
+    let now = 1000;
+    vi.spyOn(performance, 'now').mockImplementation(() => now);
+    const kb = new Keybinds();
+    expect(kb.bind('slot3', 0, 'Mouse4')).toBe(true);
+    const { canvas, cb, canvasListeners, windowListeners } = makeInput();
+
+    canvasListeners.get('mousedown')!(mouseDown(0, { clientX: 120, clientY: 160 }));
+    now += 20;
+    windowListeners.get('mousedown')!(mouseDown(3)); // thumb press mid-click
+    windowListeners.get('mouseup')!({ button: 3 });
+    now += 20;
+    windowListeners.get('mouseup')!({ button: 0, clientX: 121, clientY: 161, target: canvas });
+
+    expect(cb.onAbilityDown).toHaveBeenLastCalledWith(3);
+    expect(cb.onClickPick).toHaveBeenCalledWith(120, 160, 0);
   });
 });

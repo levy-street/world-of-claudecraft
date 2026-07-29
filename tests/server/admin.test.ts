@@ -8,8 +8,8 @@
 // pins:
 //  - the FROZEN envelope contract (a success body, an error body, a data:{ ok:true }
 //    body) and that surface 'admin' + meta.envelope 'admin' select serializeAdmin;
-//  - the requireAdmin gate: db-free 401 on a missing bearer, 401 on a non-admin, and
-//    a valid admin reaches the handler (no read-only-scope 403, no moderation gate);
+//  - the requireAdmin gate: db-free 401 on a missing bearer, 401 on a read token or
+//    non-admin, and a valid full-scope admin reaches the handler;
 //  - the admin.login limiter: its own in-handler rateLimited (429), the 401 bad-cred
 //    and 403 no-admin-access shapes, all anonymous (no requireAdmin);
 //  - the operator :id loader: a valid id reaches the handler, a NaN id 422s;
@@ -34,21 +34,27 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   type AdminRuntime,
+  configureAdminGuildBoardCacheBust,
   configureAdminPlayersCap,
   configureAdminRuntime,
   resetAdminDbForTests,
+  resetAdminGuildBoardCacheBustForTests,
   resetAdminPlayersCapForTests,
   resetAdminRuntimeForTests,
   routes,
   setAdminDbForTests,
 } from '../../server/admin';
+import { resetAdminGuildListReadsForTests } from '../../server/admin_guilds_read';
+import { characterProfessionsSheet } from '../../server/character_professions';
 import { pool } from '../../server/db';
 import { compose } from '../../server/http/compose';
 import { withErrors } from '../../server/http/middleware/with_errors';
 import { apiRegistry } from '../../server/http/registry';
 import type { Method, Middleware } from '../../server/http/types';
 import {
+  authFailureCount,
   rateLimited,
+  resetAuthFailures,
   resetRateLimitClock,
   resetRateLimits,
   setRateLimitClock,
@@ -61,8 +67,12 @@ const BEARER = `Bearer ${'a'.repeat(64)}`;
 // The admin caller the gate resolves the bearer to; isAdminAccount(id) returns true
 // ONLY for this id, so a moderation target (a different id) reads as a non-admin.
 const ADMIN_ACCOUNT_ID = 7;
+const fullToken = (accountId = ADMIN_ACCOUNT_ID) => ({ accountId, scope: 'full' as const });
 // The admin-login per-minute ceiling (server/admin.ts ADMIN_LOGIN_MAX_PER_MINUTE).
 const ADMIN_LOGIN_MAX = 10;
+// The per-account failed-login ceiling within the window (server/ratelimit.ts
+// MAX_AUTH_FAILURES, which is not exported; mirrors tests/server/auth.login.test.ts).
+const MAX_AUTH_FAILURES = 10;
 // A frozen instant so a limiter drain sits inside one 60s window.
 const FIXED_NOW_MS = 1_700_000_000_000;
 
@@ -92,7 +102,7 @@ const allowedRateLimit = (): ReturnType<NonNullable<AdminDbBundle['rateLimited']
 // target reads as a normal account). Extra reads are layered per test.
 function authedAdminDb(overrides: DbOverrides = {}): void {
   setDb({
-    accountForToken: async () => ADMIN_ACCOUNT_ID,
+    accountAndScopeForToken: async () => fullToken(),
     adminRolesForAccount: async (id: number) =>
       id === ADMIN_ACCOUNT_ID ? { username: 'op', roles: ['superadmin'] } : null,
     isAdminAccount: async (id: number) => id === ADMIN_ACCOUNT_ID,
@@ -119,6 +129,7 @@ function installAdminRuntime(overrides: Partial<Record<keyof AdminRuntime, unkno
     isIpBlocked: vi.fn(() => false),
     liveSharedIps: vi.fn(() => []),
     liveAccountIds: vi.fn(() => new Set<number>()),
+    liveCharacterIds: vi.fn(() => new Set<number>()),
     disconnectAccount: vi.fn(),
     muteAccountChat: vi.fn(),
     liftChatMuteLive: vi.fn(),
@@ -127,6 +138,12 @@ function installAdminRuntime(overrides: Partial<Record<keyof AdminRuntime, unkno
     reloadBlockedIps: vi.fn(async () => {}),
     disconnectByIp: vi.fn(),
     applyAccountFlairLive: vi.fn(),
+    // The guild bank operator read defaults to "no loaded book" so a test that
+    // does not care about banks cannot accidentally assert against a fixture.
+    adminGuildBankState: vi.fn(() => null),
+    social: {
+      guildRenamed: vi.fn(),
+    },
     ...overrides,
   };
   configureAdminRuntime(rt as unknown as AdminRuntime);
@@ -209,15 +226,19 @@ async function runRoute(
 beforeEach(() => {
   setRateLimitClock(() => FIXED_NOW_MS);
   resetRateLimits();
+  resetAuthFailures();
   resetAdminDbForTests();
 });
 
 afterEach(() => {
   resetRateLimits();
+  resetAuthFailures();
   resetRateLimitClock();
   resetAdminDbForTests();
   resetAdminRuntimeForTests();
+  resetAdminGuildBoardCacheBustForTests();
   resetAdminPlayersCapForTests();
+  resetAdminGuildListReadsForTests();
   vi.clearAllMocks();
   vi.restoreAllMocks();
 });
@@ -254,12 +275,12 @@ describe('admin envelope contract (frozen)', () => {
   });
 
   it('a data:{ ok:true } body rides inside the same envelope', async () => {
-    authedAdminDb({ setAccountDeactivated: async () => {} });
+    authedAdminDb({ reactivateAccountAudited: async () => {} });
     installAdminRuntime();
     const r = await runRoute('POST', '/admin/api/moderation/accounts/:id/reactivate', {
       headers: { authorization: BEARER },
       params: { id: '5' },
-      body: {},
+      body: { reason: 'appeal accepted' },
     });
     expect(r.status).toBe(200);
     expect(r.body).toEqual({ success: true, data: { ok: true }, error: null });
@@ -279,19 +300,22 @@ describe('admin envelope contract (frozen)', () => {
 
 describe('requireAdmin gate', () => {
   it('401s a missing bearer DB-free with the legacy admin body', async () => {
-    const accountForToken = vi.fn(async () => ADMIN_ACCOUNT_ID);
+    const accountAndScopeForToken = vi.fn(async () => fullToken());
     const adminRolesForAccount = vi.fn(async () => ({ username: 'op', roles: ['superadmin'] }));
-    setDb({ accountForToken, adminRolesForAccount });
+    setDb({ accountAndScopeForToken, adminRolesForAccount });
     installAdminRuntime();
     const r = await runRoute('GET', '/admin/api/overview');
     expect(r.status).toBe(401);
     expect(r.body).toEqual({ success: false, data: null, error: 'admin authentication required' });
     // A missing bearer never reaches the token lookup.
-    expect(accountForToken).not.toHaveBeenCalled();
+    expect(accountAndScopeForToken).not.toHaveBeenCalled();
   });
 
   it('401s a valid bearer whose account is NOT staff (no roles)', async () => {
-    setDb({ accountForToken: async () => 42, adminRolesForAccount: async () => null });
+    setDb({
+      accountAndScopeForToken: async () => fullToken(42),
+      adminRolesForAccount: async () => null,
+    });
     installAdminRuntime();
     const r = await runRoute('GET', '/admin/api/overview', { headers: { authorization: BEARER } });
     expect(r.status).toBe(401);
@@ -300,13 +324,34 @@ describe('requireAdmin gate', () => {
 
   it('401s a bearer that resolves to no account', async () => {
     setDb({
-      accountForToken: async () => null,
+      accountAndScopeForToken: async () => null,
       adminRolesForAccount: async () => ({ username: 'op', roles: ['superadmin'] }),
     });
     installAdminRuntime();
     const r = await runRoute('GET', '/admin/api/overview', { headers: { authorization: BEARER } });
     expect(r.status).toBe(401);
     expect(r.body).toEqual({ success: false, data: null, error: 'admin authentication required' });
+  });
+
+  it('401s a staff read token before role resolution or the handler', async () => {
+    const adminRolesForAccount = vi.fn(async () => ({ username: 'op', roles: ['superadmin'] }));
+    setDb({
+      accountAndScopeForToken: async () => ({
+        accountId: ADMIN_ACCOUNT_ID,
+        scope: 'read' as const,
+      }),
+      adminRolesForAccount,
+    });
+    installAdminRuntime();
+
+    const r = await runRoute('GET', '/admin/api/overview', {
+      headers: { authorization: BEARER },
+    });
+
+    expect(r.status).toBe(401);
+    expect(r.body).toEqual({ success: false, data: null, error: 'admin authentication required' });
+    expect(r.reached).toBe(false);
+    expect(adminRolesForAccount).not.toHaveBeenCalled();
   });
 
   it('lets a valid admin through to the handler', async () => {
@@ -383,6 +428,112 @@ describe('POST /admin/api/login', () => {
     });
   });
 
+  // Regression coverage for the missing per-account brute-force lockout: unlike
+  // POST /api/login (server/auth_routes.ts), admin login had no authThrottled /
+  // recordAuthFailure / clearAuthFailures gate, so a distributed attacker who never
+  // repeats a source IP could guess a known admin username's password forever,
+  // capped only by ADMIN_LOGIN_MAX per IP (never per account).
+  describe('per-account failed-login throttle (distributed brute force)', () => {
+    it('429s the (MAX_AUTH_FAILURES + 1)th bad-password attempt against ONE account even though every attempt uses a DIFFERENT source IP', async () => {
+      const verifyPassword = vi.fn(async () => false);
+      setDb({
+        findAccount: async () => ({ id: 9, username: 'victim', password_hash: 'h' }) as never,
+        verifyPassword,
+      });
+      let last: Awaited<ReturnType<typeof runRoute>> | undefined;
+      for (let i = 0; i < MAX_AUTH_FAILURES + 1; i++) {
+        // A fresh, never-repeated source IP per attempt: the per-IP limiter (10/min,
+        // ADMIN_LOGIN_MAX) never sees more than one request from any of these, so if
+        // it were the only guard this loop would never 429.
+        last = await runRoute('POST', '/admin/api/login', {
+          body: { username: 'victim', password: 'wrong' },
+          headers: { 'x-forwarded-for': `203.0.113.${i + 1}` },
+        });
+      }
+      expect(last?.status).toBe(429);
+      expect(last?.body).toEqual({
+        success: false,
+        data: null,
+        error: 'too many failed attempts, wait a few minutes and try again',
+      });
+      // Locked out BEFORE any credential check on the final attempt: verifyPassword
+      // was reached exactly MAX_AUTH_FAILURES times (once per prior failure), never
+      // on the attempt that trips the lockout.
+      expect(verifyPassword).toHaveBeenCalledTimes(MAX_AUTH_FAILURES);
+    });
+
+    it('never locks out a DIFFERENT account sharing no username with the attacked one', async () => {
+      const verifyPassword = vi.fn(async () => false);
+      setDb({
+        findAccount: async () => ({ id: 9, username: 'victim', password_hash: 'h' }) as never,
+        verifyPassword,
+      });
+      for (let i = 0; i < MAX_AUTH_FAILURES; i++) {
+        await runRoute('POST', '/admin/api/login', {
+          body: { username: 'victim', password: 'wrong' },
+          headers: { 'x-forwarded-for': `203.0.113.${i + 1}` },
+        });
+      }
+      // 'bystander' has never failed a login, so it is unaffected by victim's lockout.
+      setDb({
+        findAccount: async () => ({ id: 10, username: 'bystander', password_hash: 'h2' }) as never,
+        verifyPassword: async () => true,
+        adminRolesForAccount: async () => ({ username: 'bystander', roles: ['viewer'] }),
+        touchLogin: async () => {},
+        newToken: () => 'tokBystander',
+        saveToken: async () => {},
+      });
+      const r = await runRoute('POST', '/admin/api/login', {
+        body: { username: 'bystander', password: 'right' },
+        headers: { 'x-forwarded-for': '198.51.100.1' },
+      });
+      expect(r.status).toBe(200);
+    });
+
+    it('a successful login clears the account throttle so a later lockout needs a fresh MAX_AUTH_FAILURES run', async () => {
+      const verifyPassword = vi.fn(async () => false);
+      setDb({
+        findAccount: async () => ({ id: 9, username: 'bob', password_hash: 'h' }) as never,
+        verifyPassword,
+      });
+      for (let i = 0; i < MAX_AUTH_FAILURES - 1; i++) {
+        await runRoute('POST', '/admin/api/login', {
+          body: { username: 'bob', password: 'wrong' },
+          headers: { 'x-forwarded-for': `203.0.113.${i + 1}` },
+        });
+      }
+      // One under the ceiling; a correct password now succeeds and forgives the typos.
+      setDb({
+        findAccount: async () => ({ id: 9, username: 'bob', password_hash: 'h' }) as never,
+        verifyPassword: async () => true,
+        adminRolesForAccount: async () => ({ username: 'bob', roles: ['viewer'] }),
+        touchLogin: async () => {},
+        newToken: () => 'tok456',
+        saveToken: async () => {},
+      });
+      const ok1 = await runRoute('POST', '/admin/api/login', {
+        body: { username: 'bob', password: 'correct' },
+        headers: { 'x-forwarded-for': '198.51.100.9' },
+      });
+      expect(ok1.status).toBe(200);
+
+      // Failures started fresh: MAX_AUTH_FAILURES - 1 more bad attempts still don't
+      // lock the account out.
+      setDb({
+        findAccount: async () => ({ id: 9, username: 'bob', password_hash: 'h' }) as never,
+        verifyPassword: async () => false,
+      });
+      let last: Awaited<ReturnType<typeof runRoute>> | undefined;
+      for (let i = 0; i < MAX_AUTH_FAILURES - 1; i++) {
+        last = await runRoute('POST', '/admin/api/login', {
+          body: { username: 'bob', password: 'wrong-again' },
+          headers: { 'x-forwarded-for': `192.0.2.${i + 1}` },
+        });
+      }
+      expect(last?.status).toBe(401);
+    });
+  });
+
   it('401s bad credentials db-free when the username is absent (anti-enumeration)', async () => {
     const findAccount = vi.fn(async () => null);
     setDb({ findAccount, rateLimited: allowedRateLimit });
@@ -408,6 +559,125 @@ describe('POST /admin/api/login', () => {
       success: false,
       data: null,
       error: 'this account does not have admin access',
+    });
+  });
+
+  it('challenges a 2FA-enabled staff account without issuing a token', async () => {
+    const verifyLoginTwoFactor = vi.fn(async () => true);
+    const clearAuthFailures = vi.fn();
+    const touchLogin = vi.fn(async () => {});
+    const saveToken = vi.fn(async () => {});
+    setDb({
+      rateLimited: allowedRateLimit,
+      findAccount: async () =>
+        ({
+          id: 9,
+          username: 'bob',
+          password_hash: 'h',
+          totp_enabled_at: '2026-07-01T00:00:00.000Z',
+        }) as never,
+      verifyPassword: async () => true,
+      verifyLoginTwoFactor,
+      adminRolesForAccount: async () => ({ username: 'bob', roles: ['viewer'] }),
+      clearAuthFailures,
+      touchLogin,
+      newToken: () => 'tok123',
+      saveToken,
+    });
+
+    const r = await runRoute('POST', '/admin/api/login', {
+      body: { username: 'bob', password: 'pw' },
+    });
+
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({
+      success: true,
+      data: { twoFactorRequired: true },
+      error: null,
+    });
+    expect(verifyLoginTwoFactor).not.toHaveBeenCalled();
+    expect(clearAuthFailures).not.toHaveBeenCalled();
+    expect(touchLogin).not.toHaveBeenCalled();
+    expect(saveToken).not.toHaveBeenCalled();
+  });
+
+  it('rejects an invalid second factor and records the failed attempt', async () => {
+    const verifyLoginTwoFactor = vi.fn(async () => false);
+    const recordAuthFailure = vi.fn();
+    const clearAuthFailures = vi.fn();
+    const saveToken = vi.fn(async () => {});
+    setDb({
+      rateLimited: allowedRateLimit,
+      findAccount: async () =>
+        ({
+          id: 9,
+          username: 'bob',
+          password_hash: 'h',
+          totp_enabled_at: '2026-07-01T00:00:00.000Z',
+        }) as never,
+      verifyPassword: async () => true,
+      verifyLoginTwoFactor,
+      adminRolesForAccount: async () => ({ username: 'bob', roles: ['viewer'] }),
+      recordAuthFailure,
+      clearAuthFailures,
+      saveToken,
+    });
+
+    const r = await runRoute('POST', '/admin/api/login', {
+      body: { username: 'bob', password: 'pw', code: '000000' },
+    });
+
+    expect(r.status).toBe(401);
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'invalid authentication code',
+    });
+    expect(verifyLoginTwoFactor).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 9 }),
+      '000000',
+      '',
+    );
+    expect(recordAuthFailure).toHaveBeenCalledWith('bob');
+    expect(clearAuthFailures).not.toHaveBeenCalled();
+    expect(saveToken).not.toHaveBeenCalled();
+  });
+
+  it('accepts a replay-safe recovery code before issuing a staff token', async () => {
+    const verifyLoginTwoFactor = vi.fn(async () => true);
+    const clearAuthFailures = vi.fn();
+    setDb({
+      rateLimited: allowedRateLimit,
+      findAccount: async () =>
+        ({
+          id: 9,
+          username: 'bob',
+          password_hash: 'h',
+          totp_enabled_at: '2026-07-01T00:00:00.000Z',
+        }) as never,
+      verifyPassword: async () => true,
+      verifyLoginTwoFactor,
+      adminRolesForAccount: async () => ({ username: 'bob', roles: ['viewer'] }),
+      clearAuthFailures,
+      touchLogin: async () => {},
+      newToken: () => 'tok123',
+      saveToken: async () => {},
+    });
+
+    const r = await runRoute('POST', '/admin/api/login', {
+      body: { username: 'bob', password: 'pw', recoveryCode: 'abcd-1234' },
+    });
+
+    expect(r.status).toBe(200);
+    expect(verifyLoginTwoFactor).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 9 }),
+      '',
+      'abcd-1234',
+    );
+    expect(clearAuthFailures).toHaveBeenCalledWith('bob');
+    expect(r.body).toMatchObject({
+      success: true,
+      data: { token: 'tok123', username: 'bob' },
     });
   });
 
@@ -438,6 +708,130 @@ describe('POST /admin/api/login', () => {
       error: null,
     });
   });
+
+  // Regression coverage for BUG #15: admin login checked only password + staff
+  // role and never the account's TOTP second factor (unlike POST /api/login,
+  // server/auth_routes.ts loginHandler), so an operator with 2FA enabled could
+  // sign into the highest-privilege surface in the app with a bare password.
+  describe('two-factor', () => {
+    it('returns twoFactorRequired without a token when 2FA is on and no code is supplied', async () => {
+      const saveToken = vi.fn(async () => {});
+      const verifyLoginTwoFactor = vi.fn(async () => true);
+      setDb({
+        rateLimited: allowedRateLimit,
+        findAccount: async () =>
+          ({
+            id: 9,
+            username: 'bob',
+            password_hash: 'h',
+            totp_enabled_at: '2020-01-01T00:00:00.000Z',
+          }) as never,
+        verifyPassword: async () => true,
+        adminRolesForAccount: async () => ({ username: 'bob', roles: ['viewer'] }),
+        verifyLoginTwoFactor,
+        saveToken,
+      });
+      const r = await runRoute('POST', '/admin/api/login', {
+        body: { username: 'bob', password: 'pw' },
+      });
+      expect(r.status).toBe(200);
+      expect(r.body).toEqual({ success: true, data: { twoFactorRequired: true }, error: null });
+      // No code + no recovery code: the verifier is never consulted and no token issues.
+      expect(verifyLoginTwoFactor).not.toHaveBeenCalled();
+      expect(saveToken).not.toHaveBeenCalled();
+    });
+
+    it('401s an invalid 2FA code and records a failure', async () => {
+      const verifyLoginTwoFactor = vi.fn(async () => false);
+      setDb({
+        rateLimited: allowedRateLimit,
+        findAccount: async () =>
+          ({
+            id: 9,
+            username: 'bob',
+            password_hash: 'h',
+            totp_enabled_at: '2020-01-01T00:00:00.000Z',
+          }) as never,
+        verifyPassword: async () => true,
+        adminRolesForAccount: async () => ({ username: 'bob', roles: ['viewer'] }),
+        verifyLoginTwoFactor,
+      });
+      const r = await runRoute('POST', '/admin/api/login', {
+        body: { username: 'bob', password: 'pw', code: '000000' },
+      });
+      expect(r.status).toBe(401);
+      expect(r.body).toEqual({
+        success: false,
+        data: null,
+        error: 'invalid authentication code',
+      });
+      expect(verifyLoginTwoFactor).toHaveBeenCalledTimes(1);
+      expect(authFailureCount()).toBe(1);
+    });
+
+    it('200s and issues a token for a good 2FA code', async () => {
+      setDb({
+        rateLimited: allowedRateLimit,
+        findAccount: async () =>
+          ({
+            id: 9,
+            username: 'bob',
+            password_hash: 'h',
+            totp_enabled_at: '2020-01-01T00:00:00.000Z',
+          }) as never,
+        verifyPassword: async () => true,
+        adminRolesForAccount: async () => ({ username: 'bob', roles: ['viewer'] }),
+        verifyLoginTwoFactor: async () => true,
+        touchLogin: async () => {},
+        newToken: () => 'tok789',
+        saveToken: async () => {},
+      });
+      const r = await runRoute('POST', '/admin/api/login', {
+        body: { username: 'bob', password: 'pw', code: '123456' },
+      });
+      expect(r.status).toBe(200);
+      expect(r.body).toEqual({
+        success: true,
+        data: {
+          token: 'tok789',
+          username: 'bob',
+          roles: ['viewer'],
+          permissions: ['analytics.read', 'accounts.read', 'support.read', 'moderation.read'],
+        },
+        error: null,
+      });
+    });
+
+    it('accepts a recovery code in place of a live TOTP code', async () => {
+      const verifyLoginTwoFactor = vi.fn(async () => true);
+      setDb({
+        rateLimited: allowedRateLimit,
+        findAccount: async () =>
+          ({
+            id: 9,
+            username: 'bob',
+            password_hash: 'h',
+            totp_enabled_at: '2020-01-01T00:00:00.000Z',
+          }) as never,
+        verifyPassword: async () => true,
+        adminRolesForAccount: async () => ({ username: 'bob', roles: ['viewer'] }),
+        verifyLoginTwoFactor,
+        touchLogin: async () => {},
+        newToken: () => 'tokRecovery',
+        saveToken: async () => {},
+      });
+      const r = await runRoute('POST', '/admin/api/login', {
+        body: { username: 'bob', password: 'pw', recoveryCode: 'ABCD-EFGH' },
+      });
+      expect(r.status).toBe(200);
+      expect((r.body as { data: { token: string } }).data.token).toBe('tokRecovery');
+      expect(verifyLoginTwoFactor).toHaveBeenCalledWith(
+        expect.objectContaining({ id: 9 }),
+        '',
+        'ABCD-EFGH',
+      );
+    });
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -446,12 +840,12 @@ describe('POST /admin/api/login', () => {
 
 describe('operator :id loader + enum :action', () => {
   it('reaches the handler with a valid numeric :id', async () => {
-    authedAdminDb({ setAccountDeactivated: async () => {} });
+    authedAdminDb({ reactivateAccountAudited: async () => {} });
     installAdminRuntime();
     const r = await runRoute('POST', '/admin/api/moderation/accounts/:id/reactivate', {
       headers: { authorization: BEARER },
       params: { id: '5' },
-      body: {},
+      body: { reason: 'appeal accepted' },
     });
     expect(r.status).toBe(200);
     expect(r.reached).toBe(true);
@@ -462,27 +856,27 @@ describe('operator :id loader + enum :action', () => {
     // permission and the central gate 404s it, byte-identical to the legacy arm's
     // fail-closed preamble. This supersedes the old adminIdParamDecode 422 for the
     // non-NUMERIC case; a numeric-but-invalid id (0, below) still reaches the decode.
-    const setAccountDeactivated = vi.fn(async () => {});
-    authedAdminDb({ setAccountDeactivated });
+    const reactivateAccountAudited = vi.fn(async () => {});
+    authedAdminDb({ reactivateAccountAudited });
     installAdminRuntime();
     const r = await runRoute('POST', '/admin/api/moderation/accounts/:id/reactivate', {
       headers: { authorization: BEARER },
       params: { id: 'abc' },
-      body: {},
+      body: { reason: 'appeal accepted' },
     });
     expect(r.status).toBe(404);
     expect(r.body).toEqual({ success: false, data: null, error: 'unknown admin endpoint' });
     expect(r.reached).toBe(false);
-    expect(setAccountDeactivated).not.toHaveBeenCalled();
+    expect(reactivateAccountAudited).not.toHaveBeenCalled();
   });
 
   it('422s a non-positive :id (0)', async () => {
-    authedAdminDb({ setAccountDeactivated: async () => {} });
+    authedAdminDb({ reactivateAccountAudited: async () => {} });
     installAdminRuntime();
     const r = await runRoute('POST', '/admin/api/moderation/accounts/:id/reactivate', {
       headers: { authorization: BEARER },
       params: { id: '0' },
-      body: {},
+      body: { reason: 'appeal accepted' },
     });
     expect(r.status).toBe(422);
     expect(r.body).toEqual({ success: false, data: null, error: 'validation.failed' });
@@ -491,7 +885,8 @@ describe('operator :id loader + enum :action', () => {
   for (const action of ['suspend', 'unsuspend', 'ban', 'unban'] as const) {
     it(`decodes the valid action "${action}" and reaches moderateAccount`, async () => {
       const moderateAccount = vi.fn(async () => {});
-      authedAdminDb({ moderateAccount, accountMailTarget: async () => null });
+      const revokeTokensExcept = vi.fn(async () => {});
+      authedAdminDb({ moderateAccount, accountMailTarget: async () => null, revokeTokensExcept });
       installAdminRuntime();
       const r = await runRoute('POST', '/admin/api/moderation/accounts/:id/:action', {
         headers: { authorization: BEARER },
@@ -503,6 +898,13 @@ describe('operator :id loader + enum :action', () => {
       expect(moderateAccount).toHaveBeenCalledWith(
         expect.objectContaining({ accountId: 5, adminAccountId: ADMIN_ACCOUNT_ID, action }),
       );
+      // suspend/ban sign the target out of every device (mirrors reset-password);
+      // unsuspend/unban are non-punitive reversals and must never touch tokens.
+      if (action === 'suspend' || action === 'ban') {
+        expect(revokeTokensExcept).toHaveBeenCalledWith(5, null);
+      } else {
+        expect(revokeTokensExcept).not.toHaveBeenCalled();
+      }
     });
   }
 
@@ -544,12 +946,41 @@ describe('page/limit pagination contract', () => {
       headers: { authorization: BEARER },
     });
     expect(r.status).toBe(200);
-    expect(listAccounts).toHaveBeenCalledWith('bob', 2, 10);
+    expect(listAccounts).toHaveBeenCalledWith('bob', 2, 10, 'id', 'desc');
     expect(r.body).toEqual({
       success: true,
       data: { rows: [{ id: 1 }], total: 1, page: 2, limit: 10, search: 'bob' },
       error: null,
     });
+  });
+
+  it('passes an allowlisted accounts sort/dir through and falls back on a bogus column', async () => {
+    const listAccounts = vi.fn(
+      async (_search: string, page: number, limit: number, _sort: string, _dir: string) => ({
+        rows: [],
+        total: 0,
+        page,
+        limit,
+      }),
+    );
+    authedAdminDb({ listAccounts });
+    installAdminRuntime();
+
+    const sorted = await runRoute('GET', '/admin/api/accounts', {
+      url: '/admin/api/accounts?sort=max_level&dir=asc',
+      headers: { authorization: BEARER },
+    });
+    expect(sorted.status).toBe(200);
+    expect(listAccounts).toHaveBeenCalledWith('', 1, 25, 'max_level', 'asc');
+
+    listAccounts.mockClear();
+    const bogus = await runRoute('GET', '/admin/api/accounts', {
+      url: '/admin/api/accounts?sort=not_a_real_column&dir=asc',
+      headers: { authorization: BEARER },
+    });
+    expect(bogus.status).toBe(200);
+    // An unrecognized sort column falls back to the safe id/desc default.
+    expect(listAccounts).toHaveBeenCalledWith('', 1, 25, 'id', 'desc');
   });
 
   it('clamps limit to MAX_PAGE_LIMIT (200) and floors page at 1', async () => {
@@ -563,7 +994,7 @@ describe('page/limit pagination contract', () => {
       url: '/admin/api/accounts?page=-5&limit=9999',
       headers: { authorization: BEARER },
     });
-    expect(listAccounts).toHaveBeenCalledWith('', 1, 200);
+    expect(listAccounts).toHaveBeenCalledWith('', 1, 200, 'id', 'desc');
   });
 
   it('is LENIENT: a non-numeric page/limit DEFAULTS (never 422)', async () => {
@@ -579,7 +1010,7 @@ describe('page/limit pagination contract', () => {
     });
     expect(r.status).toBe(200);
     // page defaults to 1, limit to DEFAULT_PAGE_LIMIT (25); NOT a validation 422.
-    expect(listAccounts).toHaveBeenCalledWith('', 1, 25);
+    expect(listAccounts).toHaveBeenCalledWith('', 1, 25, 'id', 'desc');
   });
 
   it('bug-reports uses page/limit and the { rows, total, page, limit } shape', async () => {
@@ -726,6 +1157,271 @@ describe('page/limit pagination contract', () => {
   });
 });
 
+describe('guild administration', () => {
+  it('denies guild reads and writes before their database functions when permissions are absent', async () => {
+    const listAdminGuilds = vi.fn();
+    const adminGuildDetail = vi.fn();
+    const listAdminGuildHistory = vi.fn();
+    const renameAdminGuild = vi.fn();
+    authedAdminDb({
+      adminRolesForAccount: async () => ({ username: 'op', roles: ['unknown-role'] }),
+      listAdminGuilds,
+      adminGuildDetail,
+      listAdminGuildHistory,
+      renameAdminGuild,
+    });
+    installAdminRuntime();
+
+    const read = await runRoute('GET', '/admin/api/guilds', {
+      headers: { authorization: BEARER },
+    });
+    expect(read.status).toBe(403);
+    expect(listAdminGuilds).not.toHaveBeenCalled();
+
+    const detail = await runRoute('GET', '/admin/api/guilds/:id', {
+      headers: { authorization: BEARER },
+      params: { id: '4' },
+    });
+    expect(detail.status).toBe(403);
+    expect(adminGuildDetail).not.toHaveBeenCalled();
+
+    const history = await runRoute('GET', '/admin/api/guilds/:id/history', {
+      headers: { authorization: BEARER },
+      params: { id: '4' },
+    });
+    expect(history.status).toBe(403);
+    expect(listAdminGuildHistory).not.toHaveBeenCalled();
+
+    // The guild bank read is a live-sim read rather than a db one, so its
+    // "never reached" proof is the runtime spy.
+    const rtDenied = installAdminRuntime();
+    const bank = await runRoute('GET', '/admin/api/guilds/:id/bank', {
+      headers: { authorization: BEARER },
+      params: { id: '4' },
+    });
+    expect(bank.status).toBe(403);
+    expect(rtDenied.adminGuildBankState).not.toHaveBeenCalled();
+
+    authedAdminDb({
+      adminRolesForAccount: async () => ({ username: 'op', roles: ['viewer'] }),
+      renameAdminGuild,
+    });
+    const write = await runRoute('POST', '/admin/api/guilds/:id/rename', {
+      headers: { authorization: BEARER },
+      params: { id: '4' },
+      body: { name: 'New Name', reason: 'reason' },
+    });
+    expect(write.status).toBe(403);
+    expect(renameAdminGuild).not.toHaveBeenCalled();
+  });
+
+  it('lists current-realm guilds through bounded page parameters', async () => {
+    const listAdminGuilds = vi.fn(
+      async (_search: string, page: number, limit: number, _sort: string, _dir: string) => ({
+        rows: [{ id: 4, name: 'Keepers' }],
+        total: 1,
+        page,
+        limit,
+      }),
+    );
+    authedAdminDb({ listAdminGuilds });
+    installAdminRuntime();
+
+    const response = await runRoute('GET', '/admin/api/guilds', {
+      url: '/admin/api/guilds?search=Keep&page=2&limit=10&sort=member_count&dir=asc',
+      headers: { authorization: BEARER },
+    });
+
+    expect(listAdminGuilds).toHaveBeenCalledWith('Keep', 2, 10, 'member_count', 'asc');
+    expect(response.body).toEqual({
+      success: true,
+      data: {
+        rows: [{ id: 4, name: 'Keepers' }],
+        total: 1,
+        page: 2,
+        limit: 10,
+      },
+      error: null,
+    });
+  });
+
+  it('returns 503 before a third distinct member-count read can occupy the pool', async () => {
+    const resolvers: Array<
+      (value: { rows: never[]; total: number; page: number; limit: number }) => void
+    > = [];
+    const listAdminGuilds = vi.fn(
+      async (_search: string, _page: number, _limit: number) =>
+        new Promise<{ rows: never[]; total: number; page: number; limit: number }>((resolve) => {
+          resolvers.push(resolve);
+        }),
+    );
+    authedAdminDb({ listAdminGuilds });
+    installAdminRuntime();
+
+    const first = runRoute('GET', '/admin/api/guilds', {
+      url: '/admin/api/guilds?sort=member_count&page=1',
+      headers: { authorization: BEARER },
+    });
+    const second = runRoute('GET', '/admin/api/guilds', {
+      url: '/admin/api/guilds?sort=member_count&page=2',
+      headers: { authorization: BEARER },
+    });
+    await vi.waitFor(() => expect(listAdminGuilds).toHaveBeenCalledTimes(2));
+
+    const rejected = await runRoute('GET', '/admin/api/guilds', {
+      url: '/admin/api/guilds?sort=member_count&page=3',
+      headers: { authorization: BEARER },
+    });
+    expect(rejected.status).toBe(503);
+    expect(rejected.body).toEqual({
+      success: false,
+      data: null,
+      error: 'guild list busy, try again',
+    });
+    expect(listAdminGuilds).toHaveBeenCalledTimes(2);
+
+    // The admission control exists for the aggregating sort, so the default
+    // name-sorted directory must still load while that class is saturated.
+    const directory = runRoute('GET', '/admin/api/guilds', {
+      url: '/admin/api/guilds?page=1',
+      headers: { authorization: BEARER },
+    });
+    await vi.waitFor(() => expect(listAdminGuilds).toHaveBeenCalledTimes(3));
+
+    resolvers.forEach((resolve, index) => {
+      resolve({ rows: [], total: 0, page: index + 1, limit: 25 });
+    });
+    const settled = await directory;
+    expect(settled.status).not.toBe(503);
+    await Promise.all([first, second]);
+  });
+
+  it('merges online character ids into the minimal guild roster', async () => {
+    authedAdminDb({
+      adminGuildDetail: async () => ({
+        guild: { id: 4, name: 'Keepers', realm: 'test', createdAt: 'now', memberCount: 2 },
+        members: [
+          { characterId: 8, characterName: 'Alice' },
+          { characterId: 9, characterName: 'Bob' },
+        ],
+      }),
+    });
+    installAdminRuntime({ liveCharacterIds: vi.fn(() => new Set([9])) });
+
+    const response = await runRoute('GET', '/admin/api/guilds/:id', {
+      headers: { authorization: BEARER },
+      params: { id: '4' },
+    });
+
+    expect(response.body).toEqual({
+      success: true,
+      data: {
+        guild: { id: 4, name: 'Keepers', realm: 'test', createdAt: 'now', memberCount: 2 },
+        members: [
+          { characterId: 8, characterName: 'Alice', online: false },
+          { characterId: 9, characterName: 'Bob', online: true },
+        ],
+      },
+      error: null,
+    });
+  });
+
+  it('returns the retained rename history independently from roster reads', async () => {
+    const listAdminGuildHistory = vi.fn(async () => [
+      { id: 1, oldName: 'Old Name', newName: 'Keepers' },
+    ]);
+    authedAdminDb({ listAdminGuildHistory });
+    installAdminRuntime();
+
+    const response = await runRoute('GET', '/admin/api/guilds/:id/history', {
+      headers: { authorization: BEARER },
+      params: { id: '4' },
+    });
+
+    expect(listAdminGuildHistory).toHaveBeenCalledWith(4);
+    expect(response.body).toEqual({
+      success: true,
+      data: { rows: [{ id: 1, oldName: 'Old Name', newName: 'Keepers' }] },
+      error: null,
+    });
+  });
+
+  it('pushes and invalidates only after the committed rename succeeds', async () => {
+    const renameAdminGuild = vi.fn(async () => ({
+      result: {
+        guildId: 4,
+        oldName: 'Old Name',
+        newName: 'Keepers',
+        memberCharacterIds: [8, 9],
+      },
+    }));
+    authedAdminDb({ renameAdminGuild });
+    const guildRenamed = vi.fn();
+    installAdminRuntime({ social: { guildRenamed } });
+    const bustCaches = vi.fn();
+    configureAdminGuildBoardCacheBust(bustCaches);
+
+    const response = await runRoute('POST', '/admin/api/guilds/:id/rename', {
+      headers: { authorization: BEARER },
+      params: { id: '4' },
+      body: { name: 'Keepers', reason: 'offensive name' },
+    });
+
+    expect(renameAdminGuild).toHaveBeenCalledWith(4, 'Keepers', 'offensive name', ADMIN_ACCOUNT_ID);
+    expect(guildRenamed).toHaveBeenCalledWith(4, 'Old Name', 'Keepers', [8, 9]);
+    expect(bustCaches).toHaveBeenCalledOnce();
+    expect(response.body).toEqual({
+      success: true,
+      data: { id: 4, name: 'Keepers' },
+      error: null,
+    });
+  });
+
+  it('does not emit a live event or invalidate caches when rename validation fails', async () => {
+    authedAdminDb({ renameAdminGuild: async () => ({ error: 'invalid_reason' }) });
+    const guildRenamed = vi.fn();
+    installAdminRuntime({ social: { guildRenamed } });
+    const bustCaches = vi.fn();
+    configureAdminGuildBoardCacheBust(bustCaches);
+
+    const response = await runRoute('POST', '/admin/api/guilds/:id/rename', {
+      headers: { authorization: BEARER },
+      params: { id: '4' },
+      body: { name: 'Keepers', reason: '' },
+    });
+
+    expect(response.status).toBe(400);
+    expect(guildRenamed).not.toHaveBeenCalled();
+    expect(bustCaches).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['invalid_name', 400, 'guild name must be 3-24 letters with single spaces'],
+    ['invalid_reason', 400, 'a moderation reason is required (500 chars max)'],
+    ['not_found', 404, 'guild not found'],
+    ['same_name', 400, 'guild name must change'],
+    ['name_taken', 409, 'guild name is already taken'],
+    ['member_limit_exceeded', 409, 'guild member limit exceeded'],
+  ] as const)('maps %s rename failures to the admin envelope', async (error, status, message) => {
+    authedAdminDb({ renameAdminGuild: async () => ({ error }) });
+    const guildRenamed = vi.fn();
+    installAdminRuntime({ social: { guildRenamed } });
+    const bustCaches = vi.fn();
+    configureAdminGuildBoardCacheBust(bustCaches);
+
+    const response = await runRoute('POST', '/admin/api/guilds/:id/rename', {
+      headers: { authorization: BEARER },
+      params: { id: '4' },
+      body: { name: 'New Name', reason: 'reason' },
+    });
+
+    expect(response.status).toBe(status);
+    expect(response.body).toEqual({ success: false, data: null, error: message });
+    expect(guildRenamed).not.toHaveBeenCalled();
+    expect(bustCaches).not.toHaveBeenCalled();
+  });
+});
+
 // ---------------------------------------------------------------------------
 // 6. Game-session side effects preserved.
 // ---------------------------------------------------------------------------
@@ -745,11 +1441,13 @@ describe('game.* side effects preserved', () => {
 
   it('a suspend disconnects the target account and fires the best-effort mail', async () => {
     const emailSecurityIncident = vi.fn();
+    const revokeTokensExcept = vi.fn(async () => {});
     authedAdminDb({
       moderateAccount: async () => {},
       accountMailTarget: async () =>
         ({ id: 5, username: 'x', email: 'x@y.z', locale: 'en', marketing_opt_in: false }) as never,
       emailSecurityIncident,
+      revokeTokensExcept,
     });
     const rt = installAdminRuntime();
     const r = await runRoute('POST', '/admin/api/moderation/accounts/:id/:action', {
@@ -758,6 +1456,7 @@ describe('game.* side effects preserved', () => {
       body: { reason: 'griefing' },
     });
     expect(r.status).toBe(200);
+    expect(revokeTokensExcept).toHaveBeenCalledWith(5, null);
     expect(rt.disconnectAccount).toHaveBeenCalledWith(5, 'This account is suspended.');
   });
 
@@ -884,12 +1583,12 @@ describe('game.* side effects preserved', () => {
   });
 
   it('reset-strikes pushes the live reset when a row was updated', async () => {
-    authedAdminDb({ resetChatStrikes: async () => true });
+    authedAdminDb({ resetChatStrikesAudited: async () => true });
     const rt = installAdminRuntime();
     const r = await runRoute('POST', '/admin/api/moderation/accounts/:id/reset-strikes', {
       headers: { authorization: BEARER },
       params: { id: '5' },
-      body: {},
+      body: { reason: 'appeal accepted' },
     });
     expect(r.status).toBe(200);
     expect(rt.resetChatStrikesLive).toHaveBeenCalledWith(5);
@@ -912,6 +1611,7 @@ describe('game.* side effects preserved', () => {
       accountMailTarget: async () => {
         throw new Error('mail db down');
       },
+      revokeTokensExcept: vi.fn(async () => {}),
     });
     const rt = installAdminRuntime();
     // The email is fired as a void .then().catch(), so the 200 is written synchronously
@@ -1292,6 +1992,40 @@ describe('migrated read handlers (QA gate parity coverage)', () => {
         page: 1,
         limit: 25,
         blocked: true,
+        blockable: true,
+      },
+      error: null,
+    });
+  });
+
+  it('ip-associations reads the stored unknown marker without treating it as blockable', async () => {
+    const associationsForIp = vi.fn(async (ip: string, page: number, limit: number) => ({
+      ip,
+      accounts: [{ accountId: 20 }],
+      total: 1,
+      page,
+      limit,
+    }));
+    authedAdminDb({ associationsForIp });
+    const rt = installAdminRuntime();
+
+    const r = await runRoute('GET', '/admin/api/ip-associations', {
+      url: '/admin/api/ip-associations?ip=unknown&page=1&limit=25',
+      headers: { authorization: BEARER },
+    });
+
+    expect(associationsForIp).toHaveBeenCalledWith('unknown', 1, 25);
+    expect(rt.isIpBlocked).not.toHaveBeenCalled();
+    expect(r.body).toEqual({
+      success: true,
+      data: {
+        ip: 'unknown',
+        accounts: [{ accountId: 20, online: false }],
+        total: 1,
+        page: 1,
+        limit: 25,
+        blocked: false,
+        blockable: false,
       },
       error: null,
     });
@@ -1483,6 +2217,43 @@ describe('migrated write handlers + side effects (QA gate parity coverage)', () 
     expect(rt.liftChatMuteLive).toHaveBeenCalledWith(5);
   });
 
+  it('reactivate forwards the reason and admin id to the audited reactivation', async () => {
+    const reactivateAccountAudited = vi.fn(async () => {});
+    authedAdminDb({ reactivateAccountAudited });
+    installAdminRuntime();
+    const r = await runRoute('POST', '/admin/api/moderation/accounts/:id/reactivate', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { reason: 'appeal accepted' },
+    });
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({ success: true, data: { ok: true }, error: null });
+    expect(reactivateAccountAudited).toHaveBeenCalledWith({
+      accountId: 5,
+      adminAccountId: ADMIN_ACCOUNT_ID,
+      reason: 'appeal accepted',
+    });
+  });
+
+  it('reset-strikes forwards the reason and admin id to the audited reset', async () => {
+    const resetChatStrikesAudited = vi.fn(async () => true);
+    authedAdminDb({ resetChatStrikesAudited });
+    const rt = installAdminRuntime();
+    const r = await runRoute('POST', '/admin/api/moderation/accounts/:id/reset-strikes', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { reason: 'appeal accepted' },
+    });
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({ success: true, data: { ok: true }, error: null });
+    expect(resetChatStrikesAudited).toHaveBeenCalledWith({
+      accountId: 5,
+      adminAccountId: ADMIN_ACCOUNT_ID,
+      reason: 'appeal accepted',
+    });
+    expect(rt.resetChatStrikesLive).toHaveBeenCalledWith(5);
+  });
+
   it('note appends the audit note from body.reason (the legacy field name)', async () => {
     const addAccountNote = vi.fn(async () => {});
     authedAdminDb({ addAccountNote });
@@ -1507,6 +2278,7 @@ describe('migrated write handlers + side effects (QA gate parity coverage)', () 
       moderateAccount: async () => {},
       accountMailTarget: async () => target,
       emailSecurityIncident,
+      revokeTokensExcept: vi.fn(async () => {}),
     });
     installAdminRuntime();
     const r = await runRoute('POST', '/admin/api/moderation/accounts/:id/:action', {
@@ -1528,6 +2300,7 @@ describe('migrated write handlers + side effects (QA gate parity coverage)', () 
       moderateAccount: async () => {},
       accountMailTarget: async () => target,
       emailSecurityIncident,
+      revokeTokensExcept: vi.fn(async () => {}),
     });
     installAdminRuntime();
     await runRoute('POST', '/admin/api/moderation/accounts/:id/:action', {
@@ -1608,12 +2381,12 @@ describe('migrated write handlers + side effects (QA gate parity coverage)', () 
   });
 
   it('404s a reset-strikes for an unknown account and skips the live push', async () => {
-    authedAdminDb({ resetChatStrikes: async () => false });
+    authedAdminDb({ resetChatStrikesAudited: async () => false });
     const rt = installAdminRuntime();
     const r = await runRoute('POST', '/admin/api/moderation/accounts/:id/reset-strikes', {
       headers: { authorization: BEARER },
       params: { id: '5' },
-      body: {},
+      body: { reason: 'appeal accepted' },
     });
     expect(r.status).toBe(404);
     expect(r.body).toEqual({ success: false, data: null, error: 'account not found' });
@@ -1631,6 +2404,49 @@ describe('migrated write handlers + side effects (QA gate parity coverage)', () 
     });
     expect(r.body).toEqual({ success: true, data: { ok: true }, error: null });
     expect(ignoreReport).toHaveBeenCalledWith(5, ADMIN_ACCOUNT_ID, 'duplicate');
+  });
+
+  it('a successful bug-report resolve resolves ok:true, passing status + the note from the body', async () => {
+    const resolveBugReport = vi.fn(async () => true);
+    authedAdminDb({ resolveBugReport });
+    installAdminRuntime();
+    const r = await runRoute('POST', '/admin/api/bug-reports/:id/resolve', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { note: 'fixed in 0.34.1' },
+    });
+    expect(r.body).toEqual({ success: true, data: { ok: true }, error: null });
+    expect(resolveBugReport).toHaveBeenCalledWith(
+      5,
+      ADMIN_ACCOUNT_ID,
+      'resolved',
+      'fixed in 0.34.1',
+    );
+  });
+
+  it('a successful bug-report dismiss resolves ok:true, passing status + the note from the body', async () => {
+    const resolveBugReport = vi.fn(async () => true);
+    authedAdminDb({ resolveBugReport });
+    installAdminRuntime();
+    const r = await runRoute('POST', '/admin/api/bug-reports/:id/dismiss', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: {},
+    });
+    expect(r.body).toEqual({ success: true, data: { ok: true }, error: null });
+    expect(resolveBugReport).toHaveBeenCalledWith(5, ADMIN_ACCOUNT_ID, 'dismissed', undefined);
+  });
+
+  it('404s a bug-report resolve for a report that is not open', async () => {
+    authedAdminDb({ resolveBugReport: async () => false });
+    installAdminRuntime();
+    const r = await runRoute('POST', '/admin/api/bug-reports/:id/resolve', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { note: 'already handled' },
+    });
+    expect(r.status).toBe(404);
+    expect(r.body).toEqual({ success: false, data: null, error: 'open bug report not found' });
   });
 });
 
@@ -2032,7 +2848,7 @@ describe('catch -> 400 err.message remap (legacy prose passthrough, per write ha
       label: 'reactivate',
       path: '/admin/api/moderation/accounts/:id/reactivate',
       params: { id: '5' },
-      fake: 'setAccountDeactivated',
+      fake: 'reactivateAccountAudited',
     },
     {
       label: 'chat-mute',
@@ -2058,6 +2874,12 @@ describe('catch -> 400 err.message remap (legacy prose passthrough, per write ha
       params: { id: '5' },
       fake: 'addAccountNote',
     },
+    {
+      label: 'reset-strikes',
+      path: '/admin/api/moderation/accounts/:id/reset-strikes',
+      params: { id: '5' },
+      fake: 'resetChatStrikesAudited',
+    },
     { label: 'blocked-ips add', path: '/admin/api/blocked-ips', fake: 'addBlockedIp' },
   ];
 
@@ -2072,7 +2894,7 @@ describe('catch -> 400 err.message remap (legacy prose passthrough, per write ha
       const r = await runRoute('POST', c.path, {
         headers: { authorization: BEARER },
         params: c.params,
-        body: {},
+        body: c.label === 'blocked-ips add' ? { ip: '9.9.9.9' } : {},
       });
       expect(r.status).toBe(400);
       expect(r.body).toEqual({ success: false, data: null, error: `${c.label} exploded` });
@@ -2081,7 +2903,7 @@ describe('catch -> 400 err.message remap (legacy prose passthrough, per write ha
 
   it('a NON-Error throw falls back to the per-route legacy prose (reactivation failed)', async () => {
     authedAdminDb({
-      setAccountDeactivated: async () => {
+      reactivateAccountAudited: async () => {
         // The legacy catch only reads .message off an Error; anything else gets the fallback.
         throw 'boom';
       },
@@ -2090,7 +2912,7 @@ describe('catch -> 400 err.message remap (legacy prose passthrough, per write ha
     const r = await runRoute('POST', '/admin/api/moderation/accounts/:id/reactivate', {
       headers: { authorization: BEARER },
       params: { id: '5' },
-      body: {},
+      body: { reason: 'appeal accepted' },
     });
     expect(r.status).toBe(400);
     expect(r.body).toEqual({ success: false, data: null, error: 'reactivation failed' });
@@ -2121,6 +2943,7 @@ describe('remaining legacy guard negatives (re-verification audit)', () => {
       moderateAccount: async () => {},
       accountMailTarget: async () => target,
       emailSecurityIncident,
+      revokeTokensExcept: vi.fn(async () => {}),
     });
     installAdminRuntime();
     await runRoute('POST', '/admin/api/moderation/accounts/:id/:action', {
@@ -2170,14 +2993,32 @@ describe('remaining legacy guard negatives (re-verification audit)', () => {
   });
 
   it('400s a blocked-ips add when addBlockedIp rejects the ip (falsy), no reload and no kick', async () => {
-    authedAdminDb({ addBlockedIp: async () => '' });
+    const addBlockedIp = vi.fn(async () => '');
+    authedAdminDb({ cleanIp: () => '9.9.9.9', addBlockedIp });
     const rt = installAdminRuntime();
     const r = await runRoute('POST', '/admin/api/blocked-ips', {
       headers: { authorization: BEARER },
-      body: { ip: 'not-an-ip' },
+      body: { ip: '9.9.9.9' },
     });
     expect(r.status).toBe(400);
     expect(r.body).toEqual({ success: false, data: null, error: 'a valid IP address is required' });
+    expect(addBlockedIp).toHaveBeenCalledWith(expect.objectContaining({ ip: '9.9.9.9' }));
+    expect(rt.reloadBlockedIps).not.toHaveBeenCalled();
+    expect(rt.disconnectByIp).not.toHaveBeenCalled();
+  });
+
+  it('400s a blocked-ips add for unknown before the write boundary', async () => {
+    const addBlockedIp = vi.fn(async () => 'unknown');
+    authedAdminDb({ addBlockedIp });
+    const rt = installAdminRuntime();
+
+    const r = await runRoute('POST', '/admin/api/blocked-ips', {
+      headers: { authorization: BEARER },
+      body: { ip: 'unknown' },
+    });
+
+    expect(r.status).toBe(400);
+    expect(addBlockedIp).not.toHaveBeenCalled();
     expect(rt.reloadBlockedIps).not.toHaveBeenCalled();
     expect(rt.disconnectByIp).not.toHaveBeenCalled();
   });
@@ -2282,7 +3123,7 @@ describe('reset-password RouteDef handler (accounts.password)', () => {
     // The actor holds accounts.password via the plain admin role, but the target
     // reads as staff (isAdminAccount true), so the reset is refused.
     setDb({
-      accountForToken: async () => ADMIN_ACCOUNT_ID,
+      accountAndScopeForToken: async () => fullToken(),
       adminRolesForAccount: async (id: number) =>
         id === ADMIN_ACCOUNT_ID ? { username: 'op', roles: ['admin'] } : null,
       isAdminAccount: async () => true,
@@ -2307,7 +3148,7 @@ describe('reset-password RouteDef handler (accounts.password)', () => {
   it('is denied 403 by the central gate for a moderator (accounts.password not held)', async () => {
     const deps = resetDeps();
     setDb({
-      accountForToken: async () => ADMIN_ACCOUNT_ID,
+      accountAndScopeForToken: async () => fullToken(),
       adminRolesForAccount: async () => ({ username: 'op', roles: ['moderator'] }),
       ...deps,
     });
@@ -2367,7 +3208,7 @@ describe('account flair (AI mark + streamer links)', () => {
     const setAccountAiFlag = vi.fn(async () => {});
     const setAccountStreamerFlair = vi.fn(async () => {});
     setDb({
-      accountForToken: async () => ADMIN_ACCOUNT_ID,
+      accountAndScopeForToken: async () => fullToken(),
       adminRolesForAccount: async () => ({ username: 'op', roles: ['viewer'] }),
       setAccountAiFlag,
       setAccountStreamerFlair,
@@ -2404,7 +3245,7 @@ describe('account flair (AI mark + streamer links)', () => {
     // The REAL setAccountAiFlag runs (not overridden), so the transaction and its
     // audit row are the ones production issues.
     setDb({
-      accountForToken: async () => ADMIN_ACCOUNT_ID,
+      accountAndScopeForToken: async () => fullToken(),
       adminRolesForAccount: async () => ({ username: 'op', roles: ['moderator'] }),
       loadAccountFlair,
     });
@@ -2433,7 +3274,7 @@ describe('account flair (AI mark + streamer links)', () => {
   it('audits an AI-mark write with no reason (non-punitive: a reason is optional)', async () => {
     const db = recordingPoolClient();
     setDb({
-      accountForToken: async () => ADMIN_ACCOUNT_ID,
+      accountAndScopeForToken: async () => fullToken(),
       adminRolesForAccount: async () => ({ username: 'op', roles: ['moderator'] }),
       loadAccountFlair: async () => LIVE_FLAIR,
     });
@@ -2511,7 +3352,7 @@ describe('account flair (AI mark + streamer links)', () => {
     const db = recordingPoolClient();
     const loadAccountFlair = vi.fn(async () => LIVE_FLAIR);
     setDb({
-      accountForToken: async () => ADMIN_ACCOUNT_ID,
+      accountAndScopeForToken: async () => fullToken(),
       adminRolesForAccount: async () => ({ username: 'op', roles: ['moderator'] }),
       loadAccountFlair,
     });
@@ -2541,7 +3382,7 @@ describe('account flair (AI mark + streamer links)', () => {
       links: { twitch: 'https://twitch.tv/someone', youtube: 'https://youtu.be/abc' },
     };
     setDb({
-      accountForToken: async () => ADMIN_ACCOUNT_ID,
+      accountAndScopeForToken: async () => fullToken(),
       adminRolesForAccount: async () => ({ username: 'op', roles: ['moderator'] }),
       loadAccountFlair: async () => live,
     });
@@ -2587,7 +3428,7 @@ describe('account flair (AI mark + streamer links)', () => {
     // The row after the flag is switched off: links intact, flag down.
     const flagOff: AccountFlair = { ai: false, streamer: false, links: storedLinks };
     setDb({
-      accountForToken: async () => ADMIN_ACCOUNT_ID,
+      accountAndScopeForToken: async () => fullToken(),
       adminRolesForAccount: async () => ({ username: 'op', roles: ['moderator'] }),
       loadAccountFlair: async () => flagOff,
     });
@@ -2625,7 +3466,7 @@ describe('account flair (AI mark + streamer links)', () => {
     const links = { twitch: 'https://twitch.tv/someone' };
     const already: AccountFlair = { ai: false, streamer: true, links };
     setDb({
-      accountForToken: async () => ADMIN_ACCOUNT_ID,
+      accountAndScopeForToken: async () => fullToken(),
       adminRolesForAccount: async () => ({ username: 'op', roles: ['moderator'] }),
       loadAccountFlair: async () => already,
     });
@@ -2655,7 +3496,7 @@ describe('account flair (AI mark + streamer links)', () => {
   it('leaves the stored links ALONE when the body omits the links key', async () => {
     const db = recordingPoolClient();
     setDb({
-      accountForToken: async () => ADMIN_ACCOUNT_ID,
+      accountAndScopeForToken: async () => fullToken(),
       adminRolesForAccount: async () => ({ username: 'op', roles: ['moderator'] }),
       loadAccountFlair: async () => ({ ai: false, streamer: false, links: {} }),
     });
@@ -2678,7 +3519,7 @@ describe('account flair (AI mark + streamer links)', () => {
   it('clears the links only on an EXPLICIT empty bag', async () => {
     const db = recordingPoolClient();
     setDb({
-      accountForToken: async () => ADMIN_ACCOUNT_ID,
+      accountAndScopeForToken: async () => fullToken(),
       adminRolesForAccount: async () => ({ username: 'op', roles: ['moderator'] }),
       loadAccountFlair: async () => ({ ai: false, streamer: true, links: {} }),
     });
@@ -2696,7 +3537,7 @@ describe('account flair (AI mark + streamer links)', () => {
 
   it('surfaces a db failure as a 400 without pushing anything live', async () => {
     setDb({
-      accountForToken: async () => ADMIN_ACCOUNT_ID,
+      accountAndScopeForToken: async () => fullToken(),
       adminRolesForAccount: async () => ({ username: 'op', roles: ['moderator'] }),
       setAccountAiFlag: async () => {
         throw new Error('boom');
@@ -2714,5 +3555,972 @@ describe('account flair (AI mark + streamer links)', () => {
     expect(r.status).toBe(400);
     expect(r.body).toEqual({ success: false, data: null, error: 'boom' });
     expect(rt.applyAccountFlairLive).not.toHaveBeenCalled();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The guild bank operator READ (GET /admin/api/guilds/:id/bank): the slot list
+// the escape hatch below is unusable without. Deliberately WIDER than the purge
+// (moderation.read, not the superadmin-only guildbank.purge), because reading
+// destroys nothing and "is this bank stuck?" is the question that decides
+// whether there is anything to escalate. The payload is guild-scoped property
+// only: what it must NOT carry is pinned here and in
+// tests/server/admin_guild_bank_view.test.ts.
+// ---------------------------------------------------------------------------
+
+describe('guild bank operator read', () => {
+  const STATE = {
+    treasury: 12_345,
+    capacity: 30,
+    purchasedSlots: 30,
+    usedSlots: 2,
+    dormantSlots: 1,
+    slots: [
+      { index: 0, itemId: 'wolf_fang', count: 3, dormant: false },
+      { index: 1, itemId: 'final_argument_greatblade', count: 1, dormant: true },
+    ],
+  };
+
+  it('answers the live book for the target guild', async () => {
+    const adminGuildBankState = vi.fn(() => STATE);
+    authedAdminDb({});
+    installAdminRuntime({ adminGuildBankState });
+
+    const r = await runRoute('GET', '/admin/api/guilds/:id/bank', {
+      headers: { authorization: BEARER },
+      params: { id: '913' },
+    });
+
+    expect(adminGuildBankState).toHaveBeenCalledWith(913);
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({
+      success: true,
+      data: { guildId: 913, ...STATE },
+      error: null,
+    });
+  });
+
+  it('carries nothing account-scoped: the response is item ids, counts, and flags', async () => {
+    // The operator boundary. The snapshot this read projects keeps the real
+    // per-copy payload (the purge's ledger evidence), so a regression that
+    // forwarded it would leak another character's bind identity to every
+    // moderation.read operator.
+    authedAdminDb({});
+    installAdminRuntime({ adminGuildBankState: vi.fn(() => STATE) });
+    const r = await runRoute('GET', '/admin/api/guilds/:id/bank', {
+      headers: { authorization: BEARER },
+      params: { id: '913' },
+    });
+    const data = (r.body as { data: Record<string, unknown> }).data;
+    expect(Object.keys(data).sort()).toEqual([
+      'capacity',
+      'dormantSlots',
+      'guildId',
+      'purchasedSlots',
+      'slots',
+      'treasury',
+      'usedSlots',
+    ]);
+    for (const slot of data.slots as Record<string, unknown>[]) {
+      expect(Object.keys(slot).sort()).toEqual(['count', 'dormant', 'index', 'itemId']);
+    }
+    expect(r.raw).not.toContain('instance');
+    expect(r.raw).not.toContain('boundTo');
+  });
+
+  it('404s a guild with no loaded book, reusing the purge line an operator already knows', async () => {
+    authedAdminDb({});
+    installAdminRuntime({ adminGuildBankState: vi.fn(() => null) });
+    const r = await runRoute('GET', '/admin/api/guilds/:id/bank', {
+      headers: { authorization: BEARER },
+      params: { id: '913' },
+    });
+    expect(r.status).toBe(404);
+    // Byte-identical to the purge's no_book body, so the dashboard's existing
+    // error.guildBankNotLoaded row localizes both without a second string.
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'that guild has no loaded bank',
+    });
+  });
+
+  it('is reachable by a moderator and a viewer, unlike the purge beside it', async () => {
+    // The deliberate widening, pinned: the roles that investigate a ticket can
+    // SEE a stuck bank. The same roles are denied the purge (pinned below).
+    for (const roles of [['moderator'], ['viewer'], ['admin']]) {
+      const adminGuildBankState = vi.fn(() => STATE);
+      authedAdminDb({ adminRolesForAccount: async () => ({ username: 'op', roles }) });
+      installAdminRuntime({ adminGuildBankState });
+      const r = await runRoute('GET', '/admin/api/guilds/:id/bank', {
+        headers: { authorization: BEARER },
+        params: { id: '913' },
+      });
+      expect(r.status, roles[0]).toBe(200);
+      expect(adminGuildBankState, roles[0]).toHaveBeenCalledWith(913);
+    }
+  });
+
+  it('denies a role holding no moderation.read before the live sim is read', async () => {
+    const adminGuildBankState = vi.fn(() => STATE);
+    authedAdminDb({ adminRolesForAccount: async () => ({ username: 'op', roles: [] }) });
+    installAdminRuntime({ adminGuildBankState });
+    const r = await runRoute('GET', '/admin/api/guilds/:id/bank', {
+      headers: { authorization: BEARER },
+      params: { id: '913' },
+    });
+    expect(r.status).toBe(403);
+    expect(adminGuildBankState).not.toHaveBeenCalled();
+  });
+
+  it('401s an unauthenticated caller before the sim is reached', async () => {
+    const adminGuildBankState = vi.fn(() => STATE);
+    installAdminRuntime({ adminGuildBankState });
+    const r = await runRoute('GET', '/admin/api/guilds/:id/bank', { params: { id: '913' } });
+    expect(r.status).toBe(401);
+    expect(adminGuildBankState).not.toHaveBeenCalled();
+  });
+
+  it('both dispatch arms run the SAME shared body (the dual-edit rule)', () => {
+    const source = readFileSync(join(process.cwd(), 'server/admin.ts'), 'utf8');
+    const calls = source.match(/guildBankStateOutcome\(/g) ?? [];
+    // one declaration + two call sites
+    expect(calls.length).toBe(3);
+    expect(source).toContain('const guildBankStateMatch =');
+    expect(source).toContain("path: '/admin/api/guilds/:id/bank',");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The guild bank dormant-slot escape hatch (POST /admin/api/guilds/:id/bank/
+// purge-slot). It destroys player property, so the authorization arm matters as
+// much as the happy path: it carries its OWN permission (guildbank.purge), not
+// moderation.act, and every refusal must reach the operator as its own body.
+// ---------------------------------------------------------------------------
+
+describe('guild bank dormant-slot purge', () => {
+  const OK_BODY = {
+    slot: 3,
+    itemId: 'wolf_fang',
+    reason: 'stuck rift-gear copy, guild disbanding',
+  };
+
+  it('purges the named slot, writes the audited row, and answers with what was removed', async () => {
+    const adminPurgeGuildBankSlot = vi.fn(async () => ({
+      ok: true as const,
+      removed: { itemId: 'wolf_fang', count: 2 },
+      carrierCharacterId: 11,
+    }));
+    const recordAdminGuildBankPurge = vi.fn(async () => {});
+    authedAdminDb({ recordAdminGuildBankPurge });
+    installAdminRuntime({ adminPurgeGuildBankSlot });
+
+    const r = await runRoute('POST', '/admin/api/guilds/:id/bank/purge-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '913' },
+      body: OK_BODY,
+    });
+
+    // The acting OPERATOR's account id is threaded to the game, not the carrier's.
+    expect(adminPurgeGuildBankSlot).toHaveBeenCalledWith(913, 3, 'wolf_fang', ADMIN_ACCOUNT_ID);
+    // ...and the audited moderation row carries who, why, and what.
+    expect(recordAdminGuildBankPurge).toHaveBeenCalledWith({
+      guildId: 913,
+      reason: OK_BODY.reason,
+      adminAccountId: ADMIN_ACCOUNT_ID,
+      itemId: 'wolf_fang',
+      count: 2,
+      slotIndex: 3,
+    });
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({
+      success: true,
+      data: { guildId: 913, slotIndex: 3, itemId: 'wolf_fang', count: 2, audited: true },
+      error: null,
+    });
+  });
+
+  it('reports audited:false (never a 500) when only the audit insert fails', async () => {
+    // The item is already gone; a failed audit row cannot un-remove it, so the
+    // operator is told the purge landed AND that the log row did not.
+    authedAdminDb({
+      recordAdminGuildBankPurge: vi.fn(async () => {
+        throw new Error('audit db down');
+      }),
+    });
+    installAdminRuntime({
+      adminPurgeGuildBankSlot: vi.fn(async () => ({
+        ok: true as const,
+        removed: { itemId: 'wolf_fang', count: 1 },
+        carrierCharacterId: 11,
+      })),
+    });
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const r = await runRoute('POST', '/admin/api/guilds/:id/bank/purge-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '913' },
+      body: OK_BODY,
+    });
+    errSpy.mockRestore();
+    expect(r.status).toBe(200);
+    expect((r.body as { data: { audited: boolean } }).data.audited).toBe(false);
+  });
+
+  it('denies every dashboard-grantable role BEFORE touching the live sim', async () => {
+    // guildbank.purge is superadmin-only: moderator reaches the guild rename,
+    // and even `admin` (otherwise everything) must NOT reach this.
+    for (const roles of [['moderator'], ['admin'], ['viewer']]) {
+      const adminPurgeGuildBankSlot = vi.fn();
+      const recordAdminGuildBankPurge = vi.fn();
+      authedAdminDb({
+        adminRolesForAccount: async () => ({ username: 'op', roles }),
+        recordAdminGuildBankPurge,
+      });
+      installAdminRuntime({ adminPurgeGuildBankSlot });
+
+      const r = await runRoute('POST', '/admin/api/guilds/:id/bank/purge-slot', {
+        headers: { authorization: BEARER },
+        params: { id: '913' },
+        body: OK_BODY,
+      });
+
+      expect(r.status, roles[0]).toBe(403);
+      expect(adminPurgeGuildBankSlot, roles[0]).not.toHaveBeenCalled();
+      expect(recordAdminGuildBankPurge, roles[0]).not.toHaveBeenCalled();
+    }
+  });
+
+  it('rejects a malformed slot, a missing itemId, and a missing reason, calling nothing', async () => {
+    const adminPurgeGuildBankSlot = vi.fn();
+    authedAdminDb({});
+    installAdminRuntime({ adminPurgeGuildBankSlot });
+
+    const cases: Array<[Record<string, unknown>, string]> = [
+      [{ ...OK_BODY, slot: undefined }, 'a slot index is required'],
+      [{ ...OK_BODY, slot: 'first' }, 'a slot index is required'],
+      [{ ...OK_BODY, slot: -1 }, 'a slot index is required'],
+      [{ ...OK_BODY, slot: 1.5 }, 'a slot index is required'],
+      [{ ...OK_BODY, itemId: undefined }, 'the item id in that slot is required'],
+      [{ ...OK_BODY, itemId: '   ' }, 'the item id in that slot is required'],
+      [{ ...OK_BODY, reason: undefined }, 'a moderation reason is required (500 chars max)'],
+      [{ ...OK_BODY, reason: '  ' }, 'a moderation reason is required (500 chars max)'],
+      [{ ...OK_BODY, reason: 'x'.repeat(501) }, 'a moderation reason is required (500 chars max)'],
+    ];
+    for (const [body, error] of cases) {
+      const r = await runRoute('POST', '/admin/api/guilds/:id/bank/purge-slot', {
+        headers: { authorization: BEARER },
+        params: { id: '913' },
+        body,
+      });
+      expect(r.status, JSON.stringify(body)).toBe(400);
+      expect(r.body, JSON.stringify(body)).toEqual({ success: false, data: null, error });
+    }
+    expect(adminPurgeGuildBankSlot).not.toHaveBeenCalled();
+  });
+
+  it('maps each refusal reason to its own status and operator body', async () => {
+    const cases = [
+      { reason: 'no_book', status: 404, error: 'that guild has no loaded bank' },
+      {
+        reason: 'no_carrier',
+        status: 409,
+        error: 'no member of that guild is online to persist the change',
+      },
+      { reason: 'not_dormant', status: 400, error: 'that slot is not a stuck item' },
+      {
+        reason: 'save_failed',
+        status: 503,
+        error: 'the change could not be saved and was rolled back',
+      },
+      {
+        // The guild-delete window: its OWN reason, and deliberately not the
+        // save_failed one. Nothing was attempted, so nothing was saved and
+        // nothing was rolled back, and 409 (a conflict with a delete already in
+        // flight) is not 503 (a transient the operator should retry into).
+        reason: 'delete_in_flight',
+        status: 409,
+        error: 'that guild is being deleted, so its bank is closed',
+      },
+    ] as const;
+    for (const c of cases) {
+      const recordAdminGuildBankPurge = vi.fn();
+      authedAdminDb({ recordAdminGuildBankPurge });
+      installAdminRuntime({
+        adminPurgeGuildBankSlot: vi.fn(async () => ({ ok: false as const, reason: c.reason })),
+      });
+      const r = await runRoute('POST', '/admin/api/guilds/:id/bank/purge-slot', {
+        headers: { authorization: BEARER },
+        params: { id: '913' },
+        body: OK_BODY,
+      });
+      expect(r.status, c.reason).toBe(c.status);
+      expect(r.body, c.reason).toEqual({ success: false, data: null, error: c.error });
+      // A refused purge never logs a moderation row.
+      expect(recordAdminGuildBankPurge, c.reason).not.toHaveBeenCalled();
+    }
+  });
+
+  it('fails CLOSED on an unrecognized refusal reason instead of faking success', async () => {
+    // A reason added to the game later must never fall through the switch into
+    // the success return (which would read `removed` off a refusal).
+    authedAdminDb({});
+    installAdminRuntime({
+      adminPurgeGuildBankSlot: vi.fn(async () => ({ ok: false, reason: 'future_reason' })),
+    });
+    const r = await runRoute('POST', '/admin/api/guilds/:id/bank/purge-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '913' },
+      body: OK_BODY,
+    });
+    expect(r.status).toBe(500);
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'the guild bank change was refused',
+    });
+  });
+
+  it('401s an unauthenticated caller before the sim is reached', async () => {
+    const adminPurgeGuildBankSlot = vi.fn();
+    installAdminRuntime({ adminPurgeGuildBankSlot });
+    const r = await runRoute('POST', '/admin/api/guilds/:id/bank/purge-slot', {
+      params: { id: '913' },
+      body: OK_BODY,
+    });
+    expect(r.status).toBe(401);
+    expect(adminPurgeGuildBankSlot).not.toHaveBeenCalled();
+  });
+
+  it('both dispatch arms run the SAME shared body (the dual-edit rule)', () => {
+    // The legacy ladder arm and the RouteDef handler must not drift, so pin
+    // that neither carries its own logic: both call the one shared helper.
+    const source = readFileSync(join(process.cwd(), 'server/admin.ts'), 'utf8');
+    const calls = source.match(/purgeGuildBankSlotOutcome\(/g) ?? [];
+    // one declaration + two call sites
+    expect(calls.length).toBe(3);
+    expect(source).toContain('const guildBankPurgeMatch =');
+    expect(source).toContain("path: '/admin/api/guilds/:id/bank/purge-slot'");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 12. R35 GM professions tooling: the inspector read + the two audited restores.
+// ---------------------------------------------------------------------------
+
+describe('R35 professions inspector (GET /admin/api/characters/:id/professions)', () => {
+  const BLOB_ROW = {
+    id: 5,
+    name: 'Aldric',
+    class: 'warrior',
+    level: 12,
+    accountId: 9,
+    username: 'aldric-owner',
+    state: {
+      gatheringProficiency: { mining: 42.5 },
+      craftSkills: { alchemy: 30 },
+      knownRecipes: ['recipe_a', 'recipe_b'],
+      toolEffectSlots: {
+        mining: {
+          effectId: 'gatherers_cache',
+          durability: 3,
+          maxDurability: 16,
+          craftedBy: 'Mira',
+          confirmMode: 'always',
+        },
+      },
+      // One live node id (enriched from content) and one retired id (null
+      // enrichment; the load-side filter would drop it in game).
+      nodeHarvestCooldowns: { ore_eastbrook_1: 120, retired_node_xyz: 30 },
+      archetype: { activeArchetype: 'alchemy', pairedMajor: 'engineering', hobbyCraft: null },
+      masteryResetApplied: true,
+      proficiencyDisplayHealApplied: true,
+      recipesGrandfathered: true,
+    },
+    updatedAt: '2026-07-30T12:00:00.000Z',
+  };
+
+  it('shapes the stored blob for an OFFLINE character (live false, save clock kept)', async () => {
+    const characterProfessionsRow = vi.fn(async () => BLOB_ROW);
+    authedAdminDb({ characterProfessionsRow });
+    installAdminRuntime({ adminCharacterState: vi.fn(() => null) });
+    const r = await runRoute('GET', '/admin/api/characters/:id/professions', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+    });
+    expect(r.status).toBe(200);
+    const sheet = (r.body as { data: Record<string, any> }).data;
+    expect(characterProfessionsRow).toHaveBeenCalledWith(5, true); // offline: fetch the blob
+    expect(sheet.name).toBe('Aldric');
+    expect(sheet.live).toBe(false);
+    expect(sheet.updatedAt).toBe('2026-07-30T12:00:00.000Z');
+    expect(sheet.preMigration).toBe(false); // the fixture carries all three one-shot flags
+    expect(sheet.gathering).toContainEqual({ professionId: 'mining', proficiency: 42.5 });
+    // Every gathering profession renders, absent ones as 0.
+    expect(sheet.gathering).toContainEqual({ professionId: 'fishing', proficiency: 0 });
+    expect(sheet.crafting).toContainEqual({ craftId: 'alchemy', skill: 30, tier: 1 });
+    expect(sheet.knownRecipes).toBe(2);
+    // The sheet runs the LOADER'S normalizeArchetypeState, so the stored
+    // null hobby renders as the default the next login resolves for the
+    // alchemy+engineering pair (enchanting; inscription has no content).
+    expect(sheet.archetype).toEqual({
+      activeArchetype: 'alchemy',
+      pairedMajor: 'engineering',
+      hobbyCraft: 'enchanting',
+    });
+    expect(sheet.slots).toEqual([
+      {
+        professionId: 'mining',
+        effectId: 'gatherers_cache',
+        durability: 3,
+        maxDurability: 16,
+        craftedBy: 'Mira',
+        confirmMode: 'always',
+      },
+    ]);
+    // Sorted longest-remaining first; the live node enriches, the retired one
+    // reads null zone/type.
+    expect(sheet.nodeTimers).toEqual([
+      {
+        nodeId: 'ore_eastbrook_1',
+        zoneId: 'eastbrook_vale',
+        nodeType: 'ore',
+        remainingSeconds: 120,
+      },
+      { nodeId: 'retired_node_xyz', zoneId: null, nodeType: null, remainingSeconds: 30 },
+    ]);
+    // The server-authored effect vocabulary the restore-slot select renders.
+    expect(sheet.toolEffectIds).toEqual(['gatherers_cache', 'artisans_eye', 'quickening_charm']);
+  });
+
+  it('overlays a LIVE serializeCharacter snapshot when the character is online here', async () => {
+    const characterProfessionsRow = vi.fn(async () => BLOB_ROW);
+    authedAdminDb({ characterProfessionsRow });
+    installAdminRuntime({
+      adminCharacterState: vi.fn(() => ({ gatheringProficiency: { mining: 43.5 } })),
+    });
+    const r = await runRoute('GET', '/admin/api/characters/:id/professions', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+    });
+    expect(r.status).toBe(200);
+    const sheet = (r.body as { data: Record<string, any> }).data;
+    expect(sheet.live).toBe(true);
+    expect(sheet.updatedAt).toBeNull(); // a live snapshot is "now"
+    expect(sheet.gathering).toContainEqual({ professionId: 'mining', proficiency: 43.5 });
+    // A live read discards the blob, so the query must not fetch it.
+    expect(characterProfessionsRow).toHaveBeenCalledWith(5, false);
+  });
+
+  it('falls back to the legacy pre-rename professions key (dual-key read)', async () => {
+    authedAdminDb({
+      characterProfessionsRow: vi.fn(async () => ({
+        ...BLOB_ROW,
+        state: { professions: { herbalism: 7 } },
+      })),
+    });
+    installAdminRuntime({ adminCharacterState: vi.fn(() => null) });
+    const r = await runRoute('GET', '/admin/api/characters/:id/professions', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+    });
+    const sheet = (r.body as { data: Record<string, any> }).data;
+    expect(sheet.gathering).toContainEqual({ professionId: 'herbalism', proficiency: 7 });
+  });
+
+  it('404s an unknown character with the standard envelope', async () => {
+    authedAdminDb({ characterProfessionsRow: vi.fn(async () => null) });
+    installAdminRuntime({ adminCharacterState: vi.fn(() => null) });
+    const r = await runRoute('GET', '/admin/api/characters/:id/professions', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+    });
+    expect(r.status).toBe(404);
+    expect(r.body).toEqual({ success: false, data: null, error: 'character not found' });
+  });
+});
+
+describe('R35 GM restores (restore-item / restore-slot)', () => {
+  it('restore-item audits FIRST, then mints on the live session', async () => {
+    const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
+    authedAdminDb({ recordProfessionsRestore });
+    const rt = installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreItem: vi.fn(() => 'ok'),
+    });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-item', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { itemId: 'copper_mining_pick', count: 2, reason: 'lost to issue 2514' },
+    });
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({ success: true, data: { ok: true }, error: null });
+    expect(recordProfessionsRestore).toHaveBeenCalledWith({
+      characterId: 5,
+      adminAccountId: ADMIN_ACCOUNT_ID,
+      action: 'restore_item',
+      detail: 'copper_mining_pick x2',
+      reason: 'lost to issue 2514',
+    });
+    expect(rt.adminRestoreItem).toHaveBeenCalledWith(5, 'copper_mining_pick', 2);
+    // A grant may never exist unaudited: the audit row precedes the mint.
+    const auditOrder = recordProfessionsRestore.mock.invocationCallOrder[0];
+    const mintOrder = (rt.adminRestoreItem as ReturnType<typeof vi.fn>).mock.invocationCallOrder[0];
+    expect(auditOrder).toBeLessThan(mintOrder);
+  });
+
+  it('restore-item refuses an offline character BEFORE any audit write', async () => {
+    const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
+    authedAdminDb({ recordProfessionsRestore });
+    const rt = installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => false),
+      adminRestoreItem: vi.fn(() => 'ok'),
+    });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-item', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { itemId: 'copper_mining_pick', count: 1, reason: 'lost' },
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'character is not online on this realm',
+    });
+    expect(recordProfessionsRestore).not.toHaveBeenCalled();
+    expect(rt.adminRestoreItem).not.toHaveBeenCalled();
+    expect(rt.adminCharacterOnline).toHaveBeenCalledWith(5);
+  });
+
+  it('restore-item refuses an unknown item and an out-of-range count pre-audit', async () => {
+    const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
+    authedAdminDb({ recordProfessionsRestore });
+    installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreItem: vi.fn(() => 'ok'),
+    });
+    const bad = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-item', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { itemId: 'not_a_real_item', count: 1, reason: 'lost' },
+    });
+    expect(bad.status).toBe(400);
+    expect(bad.body).toEqual({ success: false, data: null, error: 'unknown item id' });
+    const over = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-item', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { itemId: 'copper_mining_pick', count: 21, reason: 'lost' },
+    });
+    expect(over.status).toBe(400);
+    expect(over.body).toEqual({
+      success: false,
+      data: null,
+      error: 'count must be a whole number between 1 and 20',
+    });
+    expect(recordProfessionsRestore).not.toHaveBeenCalled();
+  });
+
+  it('restore-item surfaces a missing reason as the audited write refusal', async () => {
+    authedAdminDb({
+      recordProfessionsRestore: vi.fn(async () => {
+        throw new Error('moderation reason is required');
+      }),
+    });
+    const rt = installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreItem: vi.fn(() => 'ok'),
+    });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-item', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { itemId: 'copper_mining_pick', count: 1 },
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'moderation reason is required',
+    });
+    expect(rt.adminRestoreItem).not.toHaveBeenCalled(); // no unaudited grant
+  });
+
+  it('restore-slot audits then re-mints, with the profession/effect detail', async () => {
+    const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
+    authedAdminDb({ recordProfessionsRestore });
+    const rt = installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreToolEffectSlot: vi.fn(() => 'ok'),
+    });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { professionId: 'mining', effectId: 'gatherers_cache', reason: 'row vanished' },
+    });
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({ success: true, data: { ok: true }, error: null });
+    expect(recordProfessionsRestore).toHaveBeenCalledWith({
+      characterId: 5,
+      adminAccountId: ADMIN_ACCOUNT_ID,
+      action: 'restore_slot',
+      detail: 'mining/gatherers_cache',
+      reason: 'row vanished',
+    });
+    expect(rt.adminRestoreToolEffectSlot).toHaveBeenCalledWith(5, 'mining', 'gatherers_cache');
+  });
+
+  it('restore-slot maps the sim refusals to their own error prose', async () => {
+    authedAdminDb({ recordProfessionsRestore: vi.fn(async () => ({ accountId: 9 })) });
+    const rt = installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreToolEffectSlot: vi.fn(() => 'no_tool'),
+    });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { professionId: 'mining', effectId: 'gatherers_cache', reason: 'row vanished' },
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'the character owns no tool for that profession',
+    });
+    expect(rt.adminRestoreToolEffectSlot).toHaveBeenCalled();
+  });
+
+  it('restore-slot refuses a craft (non-gathering) profession id pre-audit', async () => {
+    const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
+    authedAdminDb({ recordProfessionsRestore });
+    installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreToolEffectSlot: vi.fn(() => 'ok'),
+    });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { professionId: 'cooking', effectId: 'gatherers_cache', reason: 'row vanished' },
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'unknown gathering profession id',
+    });
+    expect(recordProfessionsRestore).not.toHaveBeenCalled();
+  });
+});
+
+describe('R35 GM restores: refusal prose arms', () => {
+  it('restore-slot maps already_slotted and invalid_request to their own prose', async () => {
+    authedAdminDb({ recordProfessionsRestore: vi.fn(async () => ({ accountId: 9 })) });
+    const rt = installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreToolEffectSlot: vi.fn(() => 'already_slotted'),
+    });
+    const slotted = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { professionId: 'mining', effectId: 'gatherers_cache', reason: 'row vanished' },
+    });
+    expect(slotted.status).toBe(400);
+    expect(slotted.body).toEqual({
+      success: false,
+      data: null,
+      error: 'that profession already has a slotted effect',
+    });
+    (rt.adminRestoreToolEffectSlot as ReturnType<typeof vi.fn>).mockReturnValue('invalid_request');
+    const badPair = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { professionId: 'mining', effectId: 'gatherers_cache', reason: 'row vanished' },
+    });
+    expect(badPair.status).toBe(400);
+    expect(badPair.body).toEqual({
+      success: false,
+      data: null,
+      error: 'that effect cannot be slotted on that profession',
+    });
+  });
+
+  it('both restores surface the post-audit leave race as their own prose', async () => {
+    const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
+    authedAdminDb({ recordProfessionsRestore });
+    installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true), // online at the pre-check...
+      adminRestoreItem: vi.fn(() => 'offline'), // ...gone by the mint
+      adminRestoreToolEffectSlot: vi.fn(() => 'offline'),
+    });
+    const raceProse = 'character went offline before the restore landed';
+    const item = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-item', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { itemId: 'copper_mining_pick', count: 1, reason: 'lost' },
+    });
+    expect(item.status).toBe(400);
+    expect(item.body).toEqual({ success: false, data: null, error: raceProse });
+    const slot = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { professionId: 'mining', effectId: 'gatherers_cache', reason: 'lost' },
+    });
+    expect(slot.status).toBe(400);
+    expect(slot.body).toEqual({ success: false, data: null, error: raceProse });
+    // The race is the ONE place an audit row may outlive a failed grant, so
+    // the row must exist for the history to stay honest.
+    expect(recordProfessionsRestore).toHaveBeenCalledTimes(2);
+  });
+
+  it('restore-slot refuses an unknown effect id pre-audit', async () => {
+    const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
+    authedAdminDb({ recordProfessionsRestore });
+    installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreToolEffectSlot: vi.fn(() => 'ok'),
+    });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { professionId: 'mining', effectId: 'not_an_effect', reason: 'lost' },
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({ success: false, data: null, error: 'unknown tool effect id' });
+    expect(recordProfessionsRestore).not.toHaveBeenCalled();
+  });
+});
+
+describe('R35 professions inspector: fix-round edge pins', () => {
+  it('survives a NULL characters.state row (created but never entered)', async () => {
+    authedAdminDb({
+      characterProfessionsRow: vi.fn(async () => ({
+        id: 5,
+        name: 'Unborn',
+        class: 'warrior',
+        level: 1,
+        accountId: 9,
+        username: 'alice',
+        state: null,
+        updatedAt: '2026-07-30T12:00:00.000Z',
+      })),
+    });
+    installAdminRuntime({ adminCharacterState: vi.fn(() => null) });
+    const r = await runRoute('GET', '/admin/api/characters/:id/professions', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+    });
+    expect(r.status).toBe(200);
+    const sheet = (r.body as { data: Record<string, any> }).data;
+    expect(sheet.gathering).toContainEqual({ professionId: 'mining', proficiency: 0 });
+    expect(sheet.slots).toEqual([]);
+    expect(sheet.nodeTimers).toEqual([]);
+    expect(sheet.knownRecipes).toBe(0);
+    // Never-entered is emptyBlob, NOT pre-migration: first login takes the
+    // construction path the one-shot migrations never touch.
+    expect(sheet.preMigration).toBe(false);
+  });
+
+  it('marks a pre-migration blob and clamps a tampered node timer', async () => {
+    authedAdminDb({
+      characterProfessionsRow: vi.fn(async () => ({
+        id: 5,
+        name: 'Veteran',
+        class: 'warrior',
+        level: 12,
+        accountId: 9,
+        username: 'alice',
+        // A pre-curve blob: no one-shot flags, an over-cap node timer, and a
+        // fishing slot the loader drops plus a legacy confirm-mode row.
+        state: {
+          gatheringProficiency: { mining: 50 },
+          // 99999 pins the clamp; the negative and NaN rows pin the
+          // loader's positive() filter (garbage never renders).
+          nodeHarvestCooldowns: {
+            ore_eastbrook_1: 99999,
+            ore_eastbrook_2: -5,
+            ore_eastbrook_3: Number.NaN,
+          },
+          toolEffectSlots: {
+            fishing: {
+              effectId: 'gatherers_cache',
+              durability: 3,
+              maxDurability: 16,
+              confirmMode: 'always',
+            },
+            mining: { effectId: 'gatherers_cache', durability: 3, maxDurability: 16 },
+          },
+        },
+        updatedAt: '2026-07-30T12:00:00.000Z',
+      })),
+    });
+    installAdminRuntime({ adminCharacterState: vi.fn(() => null) });
+    const r = await runRoute('GET', '/admin/api/characters/:id/professions', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+    });
+    const sheet = (r.body as { data: Record<string, any> }).data;
+    // The one-shot load migrations have not run: the operator is warned.
+    expect(sheet.preMigration).toBe(true);
+    // The load-side clamp: never display a wait the game would not honor
+    // (ore respawn is 240s).
+    expect(sheet.nodeTimers).toEqual([
+      {
+        nodeId: 'ore_eastbrook_1',
+        zoneId: 'eastbrook_vale',
+        nodeType: 'ore',
+        remainingSeconds: 240,
+      },
+    ]);
+    // The loader's slot rules: the refused fishing row DROPS; the legacy
+    // row without a confirmMode reads 'always'.
+    expect(sheet.slots).toEqual([
+      {
+        professionId: 'mining',
+        effectId: 'gatherers_cache',
+        durability: 3,
+        maxDurability: 16,
+        craftedBy: null,
+        confirmMode: 'always',
+      },
+    ]);
+  });
+
+  it('a LIVE snapshot is never pre-migration even when its flags are absent', async () => {
+    authedAdminDb({
+      characterProfessionsRow: vi.fn(async () => ({
+        id: 5,
+        name: 'Live',
+        class: 'warrior',
+        level: 12,
+        accountId: 9,
+        username: 'alice',
+        state: null,
+        updatedAt: '2026-07-30T12:00:00.000Z',
+      })),
+    });
+    installAdminRuntime({
+      adminCharacterState: vi.fn(() => ({ gatheringProficiency: { mining: 1 } })),
+    });
+    const r = await runRoute('GET', '/admin/api/characters/:id/professions', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+    });
+    const sheet = (r.body as { data: Record<string, any> }).data;
+    expect(sheet.live).toBe(true);
+    expect(sheet.preMigration).toBe(false);
+  });
+});
+
+describe('characterProfessionsSheet: the per-field normalizer arms (pure)', () => {
+  const baseInput = (state: Record<string, unknown>) => ({
+    characterId: 5,
+    name: 'Aldric',
+    class: 'warrior',
+    level: 12,
+    accountId: 9,
+    username: 'alice',
+    state: state as never,
+    live: false,
+    updatedAt: null as string | null,
+    emptyBlob: false,
+  });
+  const ALL_FLAGS = {
+    masteryResetApplied: true,
+    proficiencyDisplayHealApplied: true,
+    recipesGrandfathered: true,
+  };
+
+  it('preMigration fires when ANY single one-shot flag is missing (per-dimension)', () => {
+    // The check ORs three independent flags; each case drops exactly one so
+    // a deleted conjunct in the source fails its own case.
+    for (const missing of [
+      'masteryResetApplied',
+      'proficiencyDisplayHealApplied',
+      'recipesGrandfathered',
+    ] as const) {
+      const flags: Record<string, boolean> = { ...ALL_FLAGS };
+      delete flags[missing];
+      const sheet = characterProfessionsSheet(baseInput(flags));
+      expect(sheet.preMigration, `missing ${missing} must warn`).toBe(true);
+    }
+    expect(characterProfessionsSheet(baseInput(ALL_FLAGS)).preMigration).toBe(false);
+  });
+
+  it('clamps out-of-range proficiencies and craft skills the way the login does', () => {
+    const sheet = characterProfessionsSheet(
+      baseInput({
+        ...ALL_FLAGS,
+        gatheringProficiency: { mining: 999, logging: -5 },
+        craftSkills: { alchemy: 99999 },
+      }),
+    );
+    // mining maxSkill is 100 (content); a tampered 999 renders as the value
+    // the next login resolves, and a negative floors at 0.
+    expect(sheet.gathering).toContainEqual({ professionId: 'mining', proficiency: 100 });
+    expect(sheet.gathering).toContainEqual({ professionId: 'logging', proficiency: 0 });
+    const alchemy = sheet.crafting.find((c) => c.craftId === 'alchemy');
+    expect(alchemy?.skill).toBeLessThanOrEqual(300);
+    expect(Number.isFinite(alchemy?.skill)).toBe(true);
+  });
+
+  it('drops a ZERO node timer (the > 0 boundary) and tie-breaks equal timers by node id', () => {
+    const sheet = characterProfessionsSheet(
+      baseInput({
+        ...ALL_FLAGS,
+        nodeHarvestCooldowns: { ore_eastbrook_1: 0, zz_retired: 30, aa_retired: 30 },
+      }),
+    );
+    // The literal 0 row is not "pending", it is the loader's drop boundary.
+    expect(sheet.nodeTimers.map((t) => t.nodeId)).toEqual(['aa_retired', 'zz_retired']);
+  });
+
+  it('counts knownRecipes through the loader Set (duplicates collapse)', () => {
+    const sheet = characterProfessionsSheet(
+      baseInput({ ...ALL_FLAGS, knownRecipes: ['recipe_a', 'recipe_a', 'recipe_a'] }),
+    );
+    expect(sheet.knownRecipes).toBe(1);
+  });
+
+  it('renders a corrupt non-iterable knownRecipes as 0 instead of a 500', () => {
+    // The loader THROWS on this blob (such a character cannot log in), which
+    // is exactly why the sheet must not: the inspector is the tool an
+    // operator opens to diagnose it. Guarded on iterability, not isArray,
+    // so a string still counts its characters the way the loader Set does.
+    expect(
+      characterProfessionsSheet(baseInput({ ...ALL_FLAGS, knownRecipes: 42 })).knownRecipes,
+    ).toBe(0);
+    expect(
+      characterProfessionsSheet(baseInput({ ...ALL_FLAGS, knownRecipes: {} })).knownRecipes,
+    ).toBe(0);
+    expect(
+      characterProfessionsSheet(baseInput({ ...ALL_FLAGS, knownRecipes: 'abc' })).knownRecipes,
+    ).toBe(3);
+  });
+
+  it('repairs an invalid archetype the way the login does (trio nulls together)', () => {
+    const sheet = characterProfessionsSheet(
+      baseInput({
+        ...ALL_FLAGS,
+        archetype: { activeArchetype: 'not_a_craft', pairedMajor: 'engineering', hobbyCraft: null },
+      }),
+    );
+    // normalizeArchetypeState refuses the invalid active craft, and without
+    // an active there is no pair and no hobby: the operator sees the reset
+    // the next login performs, not the raw stored trio.
+    expect(sheet.archetype).toEqual({ activeArchetype: null, pairedMajor: null, hobbyCraft: null });
+  });
+});
+
+describe('R35 restore-item: the defensive invalid_item arm', () => {
+  it('maps a runtime invalid_item to its own prose, never the offline race', async () => {
+    authedAdminDb({ recordProfessionsRestore: vi.fn(async () => ({ accountId: 9 })) });
+    installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreItem: vi.fn(() => 'invalid_item'),
+    });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-item', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { itemId: 'copper_mining_pick', count: 1, reason: 'lost' },
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({ success: false, data: null, error: 'unknown item id' });
   });
 });

@@ -1,6 +1,8 @@
-// A per-draw observer (parity harness only). When installed, it is called with
-// every value `next()` produces, in draw order. Pure bookkeeping: it MUST NOT
-// draw rng or branch simulation behavior.
+// A per-draw observer (tests only: the parity harness, plus any test pinning
+// what a code path costs in draws). When installed, it is called with every
+// value `next()` produces, in draw order. Every other method (`range`, `int`,
+// `chance`, `pick`) funnels through `next()`, so it sees those too. Pure
+// bookkeeping: it MUST NOT draw rng or branch simulation behavior.
 export type RngObserver = (value: number) => void;
 
 // Deterministic seeded RNG (mulberry32) — all sim randomness must flow through this.
@@ -13,8 +15,8 @@ export class Rng {
     this.s = seed >>> 0;
     if (this.s === 0) this.s = 0x9e3779b9;
   }
-  // Parity-harness seam: install (or clear, with null) a per-draw observer. Off
-  // by default; the observer never affects the returned value or the state `s`.
+  // Test seam: install (or clear, with null) a per-draw observer. Off by
+  // default; the observer never affects the returned value or the state `s`.
   setObserver(observer: RngObserver | null): void {
     this.observer = observer;
   }

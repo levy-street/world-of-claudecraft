@@ -13,7 +13,12 @@ import { describe, expect, it, vi } from 'vitest';
 import { VALE_CUP_BALL_TEMPLATE_ID } from '../src/sim/content/vale_cup';
 import { DUNGEON_X_THRESHOLD, MOBS } from '../src/sim/data';
 import type { Sim } from '../src/sim/sim';
-import { endCupMatch, VALE_CUP_BRAM_ID, VC_MATCH_DURATION } from '../src/sim/social/vale_cup';
+import {
+  endCupMatch,
+  VALE_CUP_BRAM_ID,
+  VC_MATCH_DURATION,
+  vcupRenameGuild,
+} from '../src/sim/social/vale_cup';
 import { GOAL_LINE_EAST_X, PITCH_CENTER } from '../src/sim/vale_cup_layout';
 import {
   addAt,
@@ -327,6 +332,130 @@ describe('Vale Cup: parallel private practice', () => {
   });
 });
 
+// Regression: the Ashen Coliseum arena and the Vale Cup boarball pitch used to
+// have no idea about each other, so a player mid rated Vale Cup match (or just
+// waiting in either queue) could be pulled straight into the other system.
+describe('Vale Cup <-> Arena: mutual queue exclusion', () => {
+  it('rejects an Arena queue join while seated in a live rated Vale Cup match', () => {
+    const sim = makeWorld();
+    const a = addAt(sim, 'warrior', 'Ada', 0, -40);
+    const b = addAt(sim, 'mage', 'Bo', 4, -40);
+    const match = startBout(sim, a, b);
+    sim.drainEvents();
+    sim.arenaQueueJoin(a);
+    expect(errorsOf(sim.drainEvents())).toContain('You are already in an arena match.');
+    expect(sim.arenaQueue1v1).not.toContain(a);
+    expect(sim.arenaMatches.has(a)).toBe(false);
+    // Untouched: still seated in the Vale Cup match, not benched or teleported.
+    expect(match.teamA.includes(a) || match.teamB.includes(a)).toBe(true);
+    expect(match.benched.has(a)).toBe(false);
+  });
+
+  it('rejects an Arena queue join while merely waiting in a Vale Cup bracket queue', () => {
+    const sim = makeWorld();
+    const a = addAt(sim, 'warrior', 'Ada', 0, -40);
+    sim.vcupQueueJoin(1, 'vale', 'allrounder', false, a); // alone: waits, not yet matched
+    expect(sim.vcup.queues[1].some((u) => u.pids.includes(a))).toBe(true);
+    sim.drainEvents();
+    sim.arenaQueueJoin(a);
+    expect(errorsOf(sim.drainEvents())).toContain('You are already in an arena match.');
+    expect(sim.arenaQueue1v1).not.toContain(a);
+  });
+
+  it('rejects a Vale Cup queue join while merely waiting in the Arena queue', () => {
+    const sim = makeWorld();
+    const a = addAt(sim, 'warrior', 'Ada', 0, -40);
+    sim.arenaQueueJoin(a); // alone: waits, not yet matched
+    expect(sim.arenaQueue1v1).toContain(a);
+    sim.drainEvents();
+    sim.vcupQueueJoin(1, 'vale', 'allrounder', false, a);
+    expect(errorsOf(sim.drainEvents())).toContain('You are already in an arena match.');
+    expect(sim.vcup.queues[1].some((u) => u.pids.includes(a))).toBe(false);
+  });
+
+  it('rejects an Arena 2v2 party queue when one member waits in a Vale Cup queue', () => {
+    const sim = makeWorld();
+    const leader = addAt(sim, 'warrior', 'Leader', 0, -40);
+    const member = addAt(sim, 'paladin', 'Member', 3, -40);
+    sim.vcupQueueJoin(1, 'vale', 'allrounder', false, member); // solo: waits
+    sim.partyInvite(member, leader);
+    sim.partyAccept(member);
+    sim.drainEvents();
+    sim.arenaQueueJoin(leader, '2v2');
+    expect(errorsOf(sim.drainEvents())).toContain('Member is already in an arena match.');
+    expect(sim.arenaQueue2v2.length).toBe(0);
+  });
+
+  it('defense in depth: the Arena 1v1 prune drops a queued player who is also Vale Cup seated', () => {
+    // matchmakeArena1v1 re-checks vcupSeatedOrQueued on every prune pass, the
+    // same defense-in-depth pattern it already applies to the dungeon-instance
+    // and dead checks (both already validated at join time too). Isolate that
+    // specific check here by seating `a` onto an UNRELATED live match's roster
+    // directly, without moving their entity, so the pre-existing "walked into
+    // an instance" x-threshold arm cannot be what drops them from the queue.
+    const sim = makeWorld();
+    const a = addAt(sim, 'warrior', 'Ada', 0, -40);
+    const c = addAt(sim, 'mage', 'Cee', 10, -40);
+    const d = addAt(sim, 'rogue', 'Dee', 14, -40);
+    sim.arenaQueueJoin(a);
+    expect(sim.arenaQueue1v1).toContain(a);
+    const match = startBout(sim, c, d); // an unrelated live rated Vale Cup match
+    expect(sim.arenaQueue1v1).toContain(a); // untouched by the unrelated match
+    match.teamA.push(a);
+    sim.tick(); // matchmakeArena1v1's prune re-checks vcupSeatedOrQueued
+    expect(sim.arenaQueue1v1).not.toContain(a);
+  });
+
+  // Review follow-up: startValeCupPractice is a THIRD entry point that seats a
+  // player straight into a Vale Cup instance, bypassing vcupQueueJoin. It only
+  // checked live arena matches, so an arena-QUEUED player could start practice
+  // and then be pulled into a bout from the queue they were still sitting in.
+  it('rejects starting a Vale Cup practice while waiting in the Arena queue', () => {
+    const sim = makeWorld();
+    const a = addAt(sim, 'warrior', 'Ada', 0, -40);
+    sim.arenaQueueJoin(a);
+    expect(sim.arenaQueue1v1).toContain(a);
+    sim.drainEvents();
+    sim.vcupPracticeStart(1, a);
+    expect(errorsOf(sim.drainEvents())).toContain('You are already in an arena match.');
+    expect(sim.vcupMatchOf(a)).toBeNull();
+    expect(sim.arenaQueue1v1).toContain(a); // the arena spot is kept, not dropped
+  });
+
+  it('rejects starting a Vale Cup practice while waiting in a Protect Yumi queue', () => {
+    const sim = makeWorld();
+    const a = addAt(sim, 'warrior', 'Ada', 0, -40);
+    sim.arenaQueueJoin(a, 'yumi3');
+    expect(sim.arenaQueueYumi3.some((u) => u.pids.includes(a))).toBe(true);
+    sim.drainEvents();
+    sim.vcupPracticeStart(1, a);
+    expect(errorsOf(sim.drainEvents())).toContain('You are already in an arena match.');
+    expect(sim.vcupMatchOf(a)).toBeNull();
+    expect(sim.arenaQueueYumi3.some((u) => u.pids.includes(a))).toBe(true);
+  });
+
+  it('defense in depth: the Protect Yumi prune drops a queued player who is also Vale Cup seated', () => {
+    // Mirrors the 1v1 prune test above for the yumi3/yumi5 arms: seat `a` onto
+    // an UNRELATED live match roster directly (no entity move), so only the
+    // vcupSeatedOrQueued arm of pruneYumiQueue can be what drops the unit.
+    const sim = makeWorld();
+    const a = addAt(sim, 'warrior', 'Ada', 0, -40);
+    const c = addAt(sim, 'mage', 'Cee', 10, -40);
+    const d = addAt(sim, 'rogue', 'Dee', 14, -40);
+    sim.arenaQueueJoin(a, 'yumi3');
+    const match = startBout(sim, c, d);
+    expect(sim.arenaQueueYumi3.some((u) => u.pids.includes(a))).toBe(true);
+    // Fill the rest of a yumi3 bout so matchmaking would otherwise seat `a`.
+    for (let i = 0; i < 5; i++) {
+      sim.arenaQueueJoin(addAt(sim, 'warrior', `P${i}`, 20 + i * 3, -40), 'yumi3');
+    }
+    match.teamA.push(a);
+    sim.tick();
+    expect(sim.arenaQueueYumi3.some((u) => u.pids.includes(a))).toBe(false);
+    expect(sim.arenaMatches.has(a)).toBe(false);
+  });
+});
+
 describe('Vale Cup: guild banners and the guild leaderboard', () => {
   // Force the live match to a decisive team-A win and tear it down.
   function decideForA(sim: Sim) {
@@ -373,6 +502,41 @@ describe('Vale Cup: guild banners and the guild leaderboard', () => {
     expect(board[0].name).toBe('Wheat Kings');
     // myGuild drives the "enter as guild" toggle.
     expect(sim.cupInfoFor(a)!.myGuild).toBe('Wheat Kings');
+  });
+
+  it('preserves queued and active banner identity across a moderation rename', () => {
+    const queuedSim = makeWorld();
+    const queuedPid = addAt(queuedSim, 'warrior', 'Queueing', 0, -40);
+    queuedSim.setPlayerGuild(queuedPid, 'Wheat Kings');
+    queuedSim.vcupQueueJoin(1, 'vale', 'allrounder', true, queuedPid);
+    const queued = queuedSim.vcup.queues[1][0];
+
+    vcupRenameGuild(queuedSim.ctx, queuedPid, 'Wheat Kings', 'Dawn Guard');
+
+    expect(queued.guilds[queuedPid]).toBe('Dawn Guard');
+    expect(queuedSim.entities.get(queuedPid)?.guild).toBe('Wheat Kings');
+
+    const matchSim = makeWorld();
+    const a = addAt(matchSim, 'warrior', 'Ada', 0, -40);
+    const b = addAt(matchSim, 'mage', 'Bo', 4, -40);
+    matchSim.setPlayerGuild(a, 'Wheat Kings');
+    matchSim.setPlayerGuild(b, 'Mire Herons');
+    matchSim.vcupQueueJoin(1, 'vale', 'allrounder', true, a);
+    matchSim.vcupQueueJoin(1, 'mirefen', 'allrounder', true, b);
+    matchSim.tick();
+    const match = matchSim.vcup.match!;
+
+    matchSim.renamePlayerGuild(a, 'Wrong Old Name', 'Ignored Name');
+    expect(match.guildEntry.get(a)).toBe('Wheat Kings');
+    expect(matchSim.entities.get(a)?.guild).toBe('Wheat Kings');
+
+    matchSim.renamePlayerGuild(a, 'Wheat Kings', 'Dawn Guard');
+
+    expect(match.guildEntry.get(a)).toBe('Dawn Guard');
+    expect(matchSim.entities.get(a)?.guild).toBe('Dawn Guard');
+    expect(matchSim.cupInfoFor(a)?.match?.teamA.find((p) => p.pid === a)?.guild).toBe('Dawn Guard');
+    decideForA(matchSim);
+    expect(matchSim.players.get(a)?.vcupGuildWins).toBe(1);
   });
 
   it('does not credit a guild when the player entered privately (banner off)', () => {

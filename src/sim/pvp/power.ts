@@ -4,8 +4,16 @@
 import type { Entity } from '../types';
 
 export const PVP_RATING_PER_PCT = 10;
-export const PVP_OFFENSE_CAP = 0.2;
-export const PVP_DEFENSE_CAP = 0.2;
+// A complete 11-slot WARFARE kit carries 182 of each rating and its seven-piece
+// set adds 120, so the two caps below are where a fully geared character lands
+// (302 rating clamps to 0.30). The maximum gear swing against an ungeared
+// opponent is therefore 1.3 / 0.7 = 1.86x, in duels and ranked arena as well as
+// battlegrounds, since isHostileTo is true in all three. Accepted deliberately:
+// see docs/design/warfare.md. PvpCaps below already takes the two independently,
+// so splitting them later (say 0.25 offense against 0.30 defense) is a constant
+// edit with no structural change.
+export const PVP_OFFENSE_CAP = 0.3;
+export const PVP_DEFENSE_CAP = 0.3;
 
 export interface PvpCaps {
   offense: number;

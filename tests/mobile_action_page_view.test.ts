@@ -4,6 +4,7 @@ import {
   MOBILE_ACTION_PAGE_COUNT,
   MOBILE_ACTION_SOURCE_SLOT_COUNT,
   MOBILE_ACTIONS_PER_PAGE,
+  mobileActionSourceSlotCount,
   mobileButtonHasSourceSlot,
   mobilePageCount,
   nextMobilePage,
@@ -25,6 +26,17 @@ describe('mobilePageCount', () => {
     expect(mobilePageCount(6)).toBe(2);
     expect(mobilePageCount(11)).toBe(3);
     expect(mobilePageCount(0)).toBe(1);
+  });
+
+  it('uses only enabled action-bar rows when deriving the mobile page count', () => {
+    expect(mobileActionSourceSlotCount({ secondary: false, third: false })).toBe(11);
+    expect(mobilePageCount(mobileActionSourceSlotCount({ secondary: false, third: false }))).toBe(
+      3,
+    );
+    expect(mobileActionSourceSlotCount({ secondary: true, third: false })).toBe(22);
+    expect(mobilePageCount(mobileActionSourceSlotCount({ secondary: true, third: false }))).toBe(5);
+    expect(mobileActionSourceSlotCount({ secondary: true, third: true })).toBe(33);
+    expect(mobilePageCount(mobileActionSourceSlotCount({ secondary: true, third: true }))).toBe(7);
   });
 });
 
@@ -134,5 +146,19 @@ describe('nextMobilePage', () => {
     expect(nextMobilePage(0, 3)).toBe(1);
     expect(nextMobilePage(1, 3)).toBe(2);
     expect(nextMobilePage(2, 3)).toBe(0);
+  });
+
+  it('wraps within the enabled-row page count after optional bars are disabled', () => {
+    const primaryOnlyCount = mobilePageCount(
+      mobileActionSourceSlotCount({ secondary: false, third: false }),
+    );
+    const secondaryCount = mobilePageCount(
+      mobileActionSourceSlotCount({ secondary: true, third: false }),
+    );
+
+    expect(nextMobilePage(2, primaryOnlyCount)).toBe(0);
+    expect(nextMobilePage(4, secondaryCount)).toBe(0);
+    expect(clampMobilePage(6, primaryOnlyCount)).toBe(2);
+    expect(clampMobilePage(6, secondaryCount)).toBe(4);
   });
 });

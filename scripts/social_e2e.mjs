@@ -1,6 +1,7 @@
 // Trade + duel over the real wire: two bots trade items/copper atomically,
 // then duel to first-blood (1hp), verifying winner/loser and no deaths.
 import WebSocket from 'ws';
+import { worldAuthMessage } from './lib/world_auth.mjs';
 
 const BASE = process.env.SERVER_URL ?? 'http://localhost:8787';
 const WS_BASE = BASE.replace(/^http/, 'ws');
@@ -72,7 +73,7 @@ class Bot {
       this.ws = new WebSocket(`${WS_BASE}/ws`);
       const to = setTimeout(() => reject(new Error('timeout')), 8000);
       this.ws.on('open', () => {
-        this.ws.send(JSON.stringify({ t: 'auth', token: reg.body.token, character: char.body.id }));
+        this.ws.send(JSON.stringify(worldAuthMessage(reg.body.token, char.body.id)));
       });
       this.ws.on('message', (data) => {
         const msg = JSON.parse(String(data));

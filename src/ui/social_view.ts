@@ -49,7 +49,7 @@ export interface FriendRow {
   cls: string;
   level: number;
   online: boolean;
-  /** Status dot kind: 'off' | 'online' | 'combat' | 'dungeon' | 'dead'. */
+  /** Status dot kind: 'off' | 'online' | 'combat' | 'dungeon' | 'dead' | 'afk'. */
   dot: string;
   status: string | undefined;
   zone: string | undefined;
@@ -101,6 +101,10 @@ export interface GuildRow {
    *  The painter formats it (relative/date) and localizes; the core just
    *  passes it through. */
   lastLogin: string | null;
+  /** Epoch-ms timestamp of when the member joined the guild, or null if
+   *  unknown. The painter derives the tenure badge from it (tenureTier);
+   *  the core just passes it through. */
+  joinedAt: number | null;
   /** The selected Book of Deeds title as a DEED ID (null untitled), as on
    *  FriendRow. */
   activeTitle: string | null;
@@ -123,7 +127,19 @@ export interface GuildRow {
 
 export interface GuildView {
   /** Null when the viewer has no guild (the tab shows the empty state). */
-  guild: { name: string; rank: string; memberCount: number; rows: GuildRow[] } | null;
+  guild: {
+    name: string;
+    rank: string;
+    memberCount: number;
+    /** The guild billboard message ('' when unset) and its setter's display
+     *  name ('' when unset). The painter escapes the text; never linkified. */
+    motd: string;
+    motdSetBy: string;
+    /** True iff the viewer may edit the billboard (rank leader or officer);
+     *  UX only, the server enforces the real gate. */
+    canEditMotd: boolean;
+    rows: GuildRow[];
+  } | null;
 }
 
 /** Guild-tab view: the header (name + viewer rank + count) and per-member rows
@@ -146,6 +162,7 @@ export function guildView(social: SocialInfo | null, myName: string): GuildView 
       status: m.status,
       zone: m.zone,
       lastLogin: m.lastLogin ?? null,
+      joinedAt: m.joinedAt ?? null,
       activeTitle: m.activeTitle ?? null,
       rank: m.rank,
       self,
@@ -156,7 +173,95 @@ export function guildView(social: SocialInfo | null, myName: string): GuildView 
       canKick,
     };
   });
-  return { guild: { name: guild.name, rank: me, memberCount: guild.members.length, rows } };
+  return {
+    guild: {
+      name: guild.name,
+      rank: me,
+      memberCount: guild.members.length,
+      motd: guild.motd ?? '',
+      motdSetBy: guild.motdSetBy ?? '',
+      canEditMotd: me === 'leader' || me === 'officer',
+      rows,
+    },
+  };
+}
+
+/** Membership under 7 days marks a member a "recruit". */
+export const TENURE_RECRUIT_MS = 7 * 24 * 60 * 60 * 1000;
+/** Membership of 30 days or more marks a member "veteran". */
+export const TENURE_VETERAN_MS = 30 * 24 * 60 * 60 * 1000;
+
+export type TenureTier = 'recruit' | 'veteran';
+
+/**
+ * Guild-roster tenure tier from the member's joinedAt (epoch ms) and the
+ * caller's clock: under 7 days is 'recruit', 30 days or more is 'veteran', in
+ * between (and unknown joinedAt) is no tier (guildDisplayedRole renders the
+ * plain member role then). A joinedAt in the future (clock skew) lands in the
+ * 'recruit' arm by construction. Returns a keyed tier, never display text: the
+ * painter localizes. Cosmetic-only by design: the tier is derived from the
+ * viewer's own clock and only styles the viewer's roster, so it must never
+ * gate a permission or any gameplay outcome; if tenure ever becomes
+ * gameplay-relevant, compute it server-side first.
+ */
+export function tenureTier(joinedAt: number | null, now: number): TenureTier | null {
+  if (joinedAt === null) return null;
+  const tenureMs = now - joinedAt;
+  if (tenureMs < TENURE_RECRUIT_MS) return 'recruit';
+  if (tenureMs >= TENURE_VETERAN_MS) return 'veteran';
+  return null;
+}
+
+/** The one keyed role label a guild-roster row displays: a rank for officers
+ *  and the leader, a tenure-derived role for everyone else. */
+export type GuildDisplayedRole = 'leader' | 'officer' | 'member' | 'recruit' | 'veteran';
+
+/**
+ * Resolve the ONE role chip a guild-roster row shows (one chip per row, by
+ * design): officers and the leader display their rank label exactly as
+ * before and never a tenure label; a regular member displays the tenure tier
+ * AS the role ('recruit' under 7 days, 'veteran' at 30 days or more) and the
+ * plain 'member' role in between or when joinedAt is unknown (a null tier).
+ * DISPLAY-ONLY: the underlying rank, every permission computation, and the
+ * roster sort are untouched; this only picks the chip's keyed label, which
+ * the painter localizes.
+ */
+export function guildDisplayedRole(rank: string, tier: TenureTier | null): GuildDisplayedRole {
+  if (rank === 'leader' || rank === 'officer') return rank;
+  return tier ?? 'member';
+}
+
+export type GuildRosterGroup = 'online' | 'offline';
+
+/** A guild-roster render item for the grouped view: either a group HEADER carrying
+ *  the group's member count, or a single MEMBER row. */
+export type GuildRosterItem =
+  | { kind: 'header'; group: GuildRosterGroup; count: number }
+  | { kind: 'member'; row: GuildRow };
+
+/**
+ * Group a guild roster online-first: an "online" header (+ count) over the online
+ * members, then an "offline" header (+ count) over the offline members. Preserves
+ * the source order within each group (guildView's secondary sort). Empty groups emit
+ * NO header (never an empty "Offline (0)"), so an all-online or all-offline roster
+ * renders exactly one group. `hideOffline` drops the offline header AND its rows
+ * entirely (the online header's count still reflects the real online membership, since
+ * the filter only suppresses the offline group's rendering). A DOM-free, i18n-free
+ * pure projection: the painter localizes each header and formats the count.
+ */
+export function guildRosterItems(rows: GuildRow[], hideOffline: boolean): GuildRosterItem[] {
+  const online = rows.filter((r) => r.online);
+  const offline = rows.filter((r) => !r.online);
+  const items: GuildRosterItem[] = [];
+  if (online.length > 0) {
+    items.push({ kind: 'header', group: 'online', count: online.length });
+    for (const row of online) items.push({ kind: 'member', row });
+  }
+  if (!hideOffline && offline.length > 0) {
+    items.push({ kind: 'header', group: 'offline', count: offline.length });
+    for (const row of offline) items.push({ kind: 'member', row });
+  }
+  return items;
 }
 
 export interface RaidMemberRow {

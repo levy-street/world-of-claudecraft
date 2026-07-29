@@ -1,6 +1,6 @@
 <div align="center">
 
-**English** · [Español](docs/i18n/CONTRIBUTING.es.md) · [Español (España)](docs/i18n/CONTRIBUTING.es_ES.md) · [Français](docs/i18n/CONTRIBUTING.fr_FR.md) · [Français (Canada)](docs/i18n/CONTRIBUTING.fr_CA.md) · [Italiano](docs/i18n/CONTRIBUTING.it_IT.md) · [Deutsch](docs/i18n/CONTRIBUTING.de_DE.md) · [简体中文](docs/i18n/CONTRIBUTING.zh_CN.md) · [繁體中文](docs/i18n/CONTRIBUTING.zh_TW.md) · [한국어](docs/i18n/CONTRIBUTING.ko_KR.md) · [日本語](docs/i18n/CONTRIBUTING.ja_JP.md) · [Português (Brasil)](docs/i18n/CONTRIBUTING.pt_BR.md) · [Русский](docs/i18n/CONTRIBUTING.ru_RU.md) · [Nederlands](docs/i18n/CONTRIBUTING.nl_NL.md) · [Polski](docs/i18n/CONTRIBUTING.pl_PL.md) · [Bahasa Indonesia](docs/i18n/CONTRIBUTING.id_ID.md) · [Türkçe](docs/i18n/CONTRIBUTING.tr_TR.md) · [Svenska](docs/i18n/CONTRIBUTING.sv_SE.md) · [Tiếng Việt](docs/i18n/CONTRIBUTING.vi_VN.md) · [Dansk](docs/i18n/CONTRIBUTING.da_DK.md)
+**English** · [Español](docs/i18n/CONTRIBUTING.es.md) · [Español (España)](docs/i18n/CONTRIBUTING.es_ES.md) · [Français](docs/i18n/CONTRIBUTING.fr_FR.md) · [Français (Canada)](docs/i18n/CONTRIBUTING.fr_CA.md) · [Italiano](docs/i18n/CONTRIBUTING.it_IT.md) · [Deutsch](docs/i18n/CONTRIBUTING.de_DE.md) · [简体中文](docs/i18n/CONTRIBUTING.zh_CN.md) · [繁體中文](docs/i18n/CONTRIBUTING.zh_TW.md) · [한국어](docs/i18n/CONTRIBUTING.ko_KR.md) · [日本語](docs/i18n/CONTRIBUTING.ja_JP.md) · [Português (Brasil)](docs/i18n/CONTRIBUTING.pt_BR.md) · [Русский](docs/i18n/CONTRIBUTING.ru_RU.md) · [Čeština](docs/i18n/CONTRIBUTING.cs_CZ.md) · [Nederlands](docs/i18n/CONTRIBUTING.nl_NL.md) · [Polski](docs/i18n/CONTRIBUTING.pl_PL.md) · [Bahasa Indonesia](docs/i18n/CONTRIBUTING.id_ID.md) · [Türkçe](docs/i18n/CONTRIBUTING.tr_TR.md) · [Svenska](docs/i18n/CONTRIBUTING.sv_SE.md) · [Tiếng Việt](docs/i18n/CONTRIBUTING.vi_VN.md) · [Dansk](docs/i18n/CONTRIBUTING.da_DK.md)
 
 </div>
 
@@ -37,41 +37,111 @@ There's a place for everyone here:
 
 ## Getting started
 
-You'll need [Node.js 22+](https://nodejs.org/) and npm. For the multiplayer server
-you'll also want [Docker](https://www.docker.com/) to run Postgres.
+You'll need [Node.js 26](https://nodejs.org/) and **pnpm 10.34.x** (exact pin in
+`package.json` `packageManager`, currently `pnpm@10.34.5`). Older Node majors
+are untested. For the multiplayer server you'll also want
+[Docker](https://www.docker.com/) to run Postgres.
+
+**Corepack is not required.** Install pnpm once with the npm that ships with
+Node. That path is the same on macOS, Linux, and Windows.
 
 ```bash
 # 1. Fork the repo on GitHub, then clone your fork
 git clone https://github.com/<your-username>/world-of-claudecraft.git
 cd world-of-claudecraft
 
-# 2. Install dependencies
-npm ci
+# 2. Install pnpm once (same command on macOS, Linux, Windows)
+#    Match the packageManager pin in package.json (today: 10.34.5).
+npm install -g pnpm@10.34.5
+pnpm --version   # should print 10.34.5 (or the pin in package.json)
 
-# 3. Run the offline client (no server or database needed)
-npm run dev          # open the URL it prints (usually http://localhost:5173)
+# 3. Install dependencies (uses the global content-addressable store)
+pnpm install --frozen-lockfile
+
+# 4. Point git at the repository hooks (once per clone)
+git config core.hooksPath .githooks
+
+# 5. Run the offline client (no server or database needed)
+pnpm run dev         # open the URL it prints (usually http://localhost:5173)
 ```
+
+`npm run <script>` still works after a pnpm install (Node ships npm), but
+**install and lockfile updates must go through pnpm**. Do not commit a
+`package-lock.json`; the single source of truth is `pnpm-lock.yaml`.
 
 That's enough to play the offline world and work on most things. To run the full
-online stack:
+online stack you need a database password in your environment first:
 
 ```bash
-npm run db:up        # start Postgres 16 in Docker (dev DB on port 5433)
-npm run server       # build and run the authoritative game server on :8787
-npm run dev          # in another terminal; the client proxies to the server
+cp .env.example .env
+# set POSTGRES_PASSWORD and point DATABASE_URL at the same password
+pnpm run db:up       # start Postgres 16 in Docker (dev DB on port 5433)
+pnpm run server      # build and run the authoritative game server on :8787
+pnpm run dev         # in another terminal; the client proxies to the server
 ```
+
+If you plan to run the full gate below, install the browser it drives once:
+`pnpm exec playwright install chromium`.
 
 The [README](README.md) has the full host, develop, and play guide, and the
 `CLAUDE.md` files throughout the repo document the conventions for each area.
 
+### Multi-worktree installs (agents and parallel branches)
+
+pnpm stores packages once under a shared content-addressable store. Defaults:
+
+| OS | Default store path |
+|---|---|
+| macOS | `~/Library/pnpm/store` |
+| Linux | `~/.local/share/pnpm/store` |
+| Windows | `%LOCALAPPDATA%\pnpm\store` |
+
+Each worktree only links into that store, so spinning a second (or twentieth)
+worktree is much cheaper than a full per-tree copy.
+
+```bash
+git worktree add ../wocc-my-task -b feature/my-task origin/release/v0.34.0
+cd ../wocc-my-task
+pnpm install --frozen-lockfile   # links from the shared store
+pnpm run gate:fast               # day-loop; full gate remains the merge bar
+```
+
+Override the store path if needed: `pnpm config set store-dir /path/to/store`
+(or `PNPM_STORE_DIR`). Keep the same `packageManager` pin across machines.
+
+### Cross-platform notes (macOS / Linux / Windows)
+
+The developer loop is the same on all three: Node 26, `npm install -g pnpm@…`
+matching `packageManager`, then `pnpm install --frozen-lockfile` and
+`pnpm run …`. CI uses `pnpm/action-setup` with the same pin (not Corepack).
+
+- **Layout.** This repo sets `node-linker=hoisted` in `.npmrc`, so
+  `node_modules` is a flat npm-like tree. That avoids Windows Developer Mode
+  symlink requirements that pure isolated pnpm layouts can hit.
+- **Windows shells.** Git Bash, PowerShell, and cmd all work. Gate scripts
+  already spawn `npm`/`npx`/`pnpm` via a shell on Windows so `.cmd` shims resolve.
+  Only if a script still fails to find a shim, set
+  `pnpm config set script-shell "C:\\Windows\\System32\\cmd.exe"` as a last resort.
+- **Windows Defender.** Can slow package installs; optional exclusion:
+  `Add-MpPreference -ExclusionPath $(pnpm store path)` (admin PowerShell).
+- **Corepack.** Optional only. Do not document it as required: many nvm / Node
+  installs omit it, and pnpm 10+ can self-align to `packageManager` once any
+  matching major is on PATH.
+
+**Native / optional platform packages.** Install scripts are allowlisted in
+`package.json` under `pnpm.onlyBuiltDependencies` (esbuild, sharp,
+ffmpeg-static, ffprobe-static, bufferutil, utf-8-validate, and a few others).
+If a scripts-skipped or incomplete install leaves binaries missing, reinstall
+with `pnpm install --frozen-lockfile` rather than hand-running install.js.
+
 ### TypeScript toolchain
 
-Type checking runs on TypeScript 7, the native compiler: `npx tsc --noEmit` works
-exactly as before and a full repo check now takes a few seconds instead of tens of
-seconds. The install is the official dual alias: the `typescript` package resolves
-the TypeScript 6 JS API (via the `@typescript/typescript6` wrapper) because
-`svelte-check` still consumes that API, while `@typescript/native` provides the
-`tsc` binary. Things to know:
+Type checking runs on TypeScript 7, the native compiler: `pnpm exec tsc --noEmit`
+(or `npx tsc --noEmit`) works exactly as before and a full repo check now takes
+a few seconds instead of tens of seconds. The install is the official dual
+alias: the `typescript` package resolves the TypeScript 6 JS API (via the
+`@typescript/typescript6` wrapper) because `svelte-check` still consumes that
+API, while `@typescript/native` provides the `tsc` binary. Things to know:
 
 - **Editors.** VS Code needs the "TypeScript 7" marketplace extension
   (`TypeScriptTeam.native-preview`) for native language service support until the
@@ -87,12 +157,15 @@ the TypeScript 6 JS API (via the `@typescript/typescript6` wrapper) because
   since more is not always faster. `--singleThreaded` disables all parallelism.
   Checking a single file ad hoc (`npx tsc somefile.ts`) errors when the directory
   has a `tsconfig.json`; pass `--ignoreConfig` for the old behavior.
-- **Lockfile.** Regenerate `package-lock.json` only with
-  `npx npm@10 install --package-lock-only`: the file uses npm-10 semantics, and
-  newer npm majors (including the npm 11 that CI's Node 26 bundles) silently drop
-  `svelte-check`'s nested optional-peer entries, which desyncs `npm ci` in CI.
-  Plain `npm ci` is safe under any npm major. After regenerating, confirm
-  `npm ci --dry-run` is in sync under both npm 10 and your workstation's npm.
+- **Lockfile.** The lockfile is `pnpm-lock.yaml` (pnpm 10 / lockfileVersion 9).
+  Update it only with `pnpm install` or `pnpm add` / `pnpm update` from this
+  repo root (never hand-edit). Commit `pnpm-lock.yaml` together with
+  `package.json` changes. CI installs with `pnpm install --frozen-lockfile`; a
+  stale lockfile fails closed. Do not introduce a second lockfile
+  (`package-lock.json` / yarn.lock): dual lockfiles diverge silently and are
+  forbidden. Peer dependency noise from optional wallet/solana trees is
+  tolerated via `.npmrc` (`strict-peer-dependencies=false`); do not loosen that
+  further without measuring.
 - **When to revisit.** Collapse the dual alias back to a single `typescript`
   dependency once BOTH hold: the TypeScript 7.1 stable JS API has shipped
   (TypeScript 7.0 ships no JS API at all; the replacement is tracked in
@@ -102,11 +175,41 @@ the TypeScript 6 JS API (via the `@typescript/typescript6` wrapper) because
   its in-progress TypeScript 7 loading (language-tools PR 3073) reads the
   `@typescript/native` alias this repo already uses, so no rename is needed.
 
+### Dependency vulnerabilities
+
+If your change touches `package.json` or `pnpm-lock.yaml`, the dependency audit
+workflow (`.github/workflows/audit.yml`) runs `pnpm audit` on it and fails on any
+finding. It also sweeps weekly on its own, so an advisory published against an
+unchanged tree does not turn an unrelated PR red.
+
+To resolve a finding, prefer a version-scoped `pnpm.overrides` entry pinning the
+fixed floor (`"undici@7": "^7.29.0"`) over bumping the direct dependency. Only
+when no fix exists, or the vulnerable path is provably unreachable here, add the
+advisory to `pnpm.auditConfig.ignoreGhsas`, with its justification recorded in
+`docs/security/dependency-audit-catalog.md`; the gate's test fails on an
+undocumented entry. That catalog holds the full model and the current exception
+register.
+
+One thing to budget for: `pnpm-lock.yaml` is a fingerprinted source input of the
+Eastbrook and Fenbridge asset pipelines, so any lockfile change also means
+re-minting their provenance seals (`scripts/assets/CLAUDE.md`). That is the bulk
+of the work in a dependency bump here, and the reason to batch them.
+
 ## Making your change
 
-1. **Create a branch** from the current `release/vX.Y.Z` branch: `feature/<short-slug>`
-   or `fix/<short-slug>`. Check the repository's active release branch instead of
-   assuming `main`.
+1. **Start from the latest release branch, and never from `main`.** Active work is
+   integrated on a `release/vX.Y.Z` branch; `main` trails it and is not the base for
+   contributions. Find the newest one and branch off it:
+
+   ```bash
+   git fetch origin
+   git branch -r --list 'origin/release/*' | sort -V | tail -1   # the newest release branch
+   git switch -c feature/<short-slug> origin/release/vX.Y.Z
+   ```
+
+   Always run that lookup rather than copying a version number out of this guide:
+   release branches turn over often, and the newest one moves with every release.
+   Branches are named `feature/<short-slug>` or `fix/<short-slug>`.
 2. **Make focused commits.** Smaller, self-contained changes are easier to review
    and merge than large ones.
 3. **Add or update tests** for any behavior you change in `src/sim/` or `server/`.
@@ -126,22 +229,76 @@ root [`CLAUDE.md`](CLAUDE.md), but the short version:
   `performance.now` in sim logic. The same seed always produces the same world.
 - **Gameplay math follows classic-era MMO formulas** (rage, hit tables, armor, XP
   curves). Please don't invent balance numbers. Cite the formula instead.
+- **New logic lands as its own small, tested module behind an existing seam**,
+  rather than being appended to one of the large coordinator files. Data the
+  renderer or HUD reads crosses the `IWorld` interface (`src/world_api/`) and is
+  implemented in both the offline and online worlds; a new simulation system goes
+  behind `SimContext`; a new REST endpoint is a route module you can scaffold with
+  `npm run new:endpoint`.
 - **Don't hand-edit generated files** such as `*.generated.ts`. Regenerate them
   through the build.
+- **House copy style: no em dashes, en dashes, or emojis** anywhere, in code,
+  comments, docs, commit messages, PR text, or player-facing copy. Use commas,
+  colons, parentheses, or "to" for ranges. A pre-push check scans your diff and
+  blocks the push on a hit.
 - **Never commit secrets** or a `.env` file, and never enable `ALLOW_DEV_COMMANDS`
   in a production path, since it unlocks cheats.
 
+### Code style
+
+Formatting is [Biome](https://biomejs.dev/), configured in `biome.json`: 2-space
+indent, 100-column lines, single quotes, trailing commas. Format only the files
+you touched (`npx @biomejs/biome check --write <your-file.ts>`) and check them
+with `npm run ci:changed`. CI gates changed files only, so please don't reformat
+the wider tree: a repo-wide run surfaces long-standing debt that is not yours to
+fix.
+
 ## Before you open a pull request
 
-Run the repository gate locally. It is the same contract CI enforces:
+Run the **full** repository gate locally. It is the same contract CI enforces and
+the only local command that counts as the pre-merge bar:
 
 ```bash
 npm run gate
 ```
 
-Use targeted tests and `npm run ci:changed` while iterating. `npm run gate` covers the
-generated-artifact freshness check, malware scan, formatting, full tests, strict
-typecheck, and client, server, and headless builds.
+While iterating (especially on mid/low-tier machines or in agent day-loops), you can
+use the fast path, which is **not** a substitute for the full gate:
+
+```bash
+npm run gate:fast
+```
+
+`gate:fast` runs malware, changed-file Biome, architecture + localization guards,
+incremental `check:ts`, and Vitest related to git changes. It skips the full suite,
+browser tests, SFX check, i18n freshness, and production builds. Details and worker
+tier presets (`GATE_WORKER_TIER`, `GATE_MAX_WORKERS`) are in
+[`docs/qa-gate.md`](docs/qa-gate.md) and
+[`docs/local-gate-perf/tier-workers.md`](docs/local-gate-perf/tier-workers.md).
+**Which command for low vs high tier, agent vs human, and OS status:**
+[`docs/local-gate-perf/platform-matrix.md`](docs/local-gate-perf/platform-matrix.md).
+
+Thinner Vitest helpers (also not merge bars): `npm run test:related -- <source.ts>`
+and `npm run test:changed` (optional git base after `--`). Prefer those or
+`gate:fast` while iterating; warm re-runs benefit from Vitest
+`experimental.fsModuleCache` (see `docs/local-gate-perf/`).
+
+The full gate also uses **Turborepo** for pure artifact steps (i18n gen, wiki
+content, SFX check, typecheck, env/server/client builds). On an unchanged tree a
+second `pnpm run gate` replays those from the local `.turbo/` cache; vitest,
+browser tests, malware, and changed-file Biome still always run. See
+[`docs/local-gate-perf/task-cache.md`](docs/local-gate-perf/task-cache.md).
+Clear the cache with `rm -rf .turbo` or force a task with
+`npx turbo run <task> --force`.
+
+You can also run a single suite (`npx vitest run tests/sim.test.ts`) and
+`npm run ci:changed` for formatting; `npm test` runs everything, and the suite map
+is in `tests/CLAUDE.md`. The full `npm run gate` covers generated-artifact
+freshness, the malware scan, formatting on changed files, the sound-effect
+conformance check, the whole test suite, a real-browser regression pass, the
+strict typecheck, and the client, server, and headless builds. The layered
+checks, from the pre-push floor up, are described in
+[`docs/qa-gate.md`](docs/qa-gate.md).
 
 Then test your change on both desktop and mobile, including a phone-sized viewport
 in portrait and landscape, if it touches anything players see. Touch targets
@@ -150,7 +307,10 @@ are documented in [`src/ui/CLAUDE.md`](src/ui/CLAUDE.md).
 
 ## Opening the pull request
 
-Push your branch and open a PR against the active release branch. The
+Push your branch and open a PR **targeting the same latest `release/vX.Y.Z` branch
+you started from. Never target `main`**, which is a release-time integration branch
+rather than the contribution base. GitHub will often preselect `main` for you, so
+change the base branch before you submit. The
 [pull request template](.github/PULL_REQUEST_TEMPLATE.md) will guide you through a
 short checklist. Please fill it in:
 
@@ -160,13 +320,20 @@ short checklist. Please fill it in:
 - Confirm `npm run gate` passes and new player-facing strings follow the English-first
   contributor policy below.
 
+On your PR, CI runs formatting and linting over your changed files, the full test
+suite across four parallel shards, a browser regression pass, and the typecheck plus
+the client, server, and headless builds. That matches what `npm run gate` runs
+locally, so a green gate is a good predictor of a green PR.
+
 A green CI run and a complete checklist are what we look for before merging. A
 maintainer may suggest changes. That's a normal, collaborative part of the
 process, not a rejection. We aim to be kind and constructive in review, and we ask
 the same of you.
 
-> Commit messages and PR titles must follow [Conventional Commits](https://www.conventionalcommits.org/)
-> with a scope (`feat(talents): ...`, `fix(net): ...`).
+> Commit messages and PR titles follow [Conventional Commits](https://www.conventionalcommits.org/)
+> with a scope (`feat(talents): ...`, `fix(net): ...`). Every commit also carries a
+> body: after a blank line, one to four plain sentences saying what changed and why,
+> wrapped near 72 columns. A title on its own is not enough.
 
 <a id="localization"></a>
 
@@ -190,6 +357,9 @@ translation key, while feature contributors normally add only the English source
   language-agnostic, must be re-localized at the client boundary in the same
   change. The guard test `npx vitest run tests/localization_fixes.test.ts`
   enforces this.
+- After adding or changing any string, run `npm run i18n:gen` and commit the
+  regenerated bundles in the same change. The gate and CI both diff the committed
+  artifacts against a fresh regeneration, so a stale bundle fails the build.
 
 So add your strings in English and open the PR; you do not need to translate them
 yourself. If you would like to help with translations, see the next section.
@@ -201,11 +371,18 @@ yourself. If you would like to help with translations, see the next section.
 Want to improve a language, or help bring the game to a new one? You don't need to
 write any game code to do it:
 
-1. Translations live in the per-language overlay files under
-   [`src/ui/i18n.locales/`](src/ui/i18n.locales/) (one per locale); the English keys
-   they mirror are defined in [`src/ui/i18n.catalog/`](src/ui/i18n.catalog/).
+1. Most player-facing translations live in the per-language overlay files under
+   [`src/ui/i18n.locales/`](src/ui/i18n.locales/) (one per locale), mirroring the
+   English keys in [`src/ui/i18n.catalog/`](src/ui/i18n.catalog/). Text emitted by
+   the simulation and the server is translated in `src/ui/sim_i18n.ts` and
+   `src/ui/server_i18n.ts`, talent copy in the `talent_i18n` modules, and the admin
+   dashboard has its own set under `src/admin/i18n.locales/`.
 2. Improve existing translations, or fill in any that read awkwardly.
-3. Run `npx tsc --noEmit` to confirm nothing is missing, then open a PR.
+3. Run `npm run i18n:gen`, commit the regenerated bundles alongside your overlay
+   edit, then run the localization suites
+   (`npx vitest run tests/i18n_completeness.test.ts tests/localization_coverage.test.ts`)
+   and open a PR. A type check alone will not tell you whether a key is missing,
+   since the overlays are intentionally sparse.
 
 To propose a brand-new locale, or to discuss tone and terminology, start a thread
 on [Discord](https://discord.com/invite/worldofclaudecraft) and we'll help you wire it up. Native
@@ -222,6 +399,9 @@ Please use the [issue templates](https://github.com/levy-street/world-of-claudec
   mobile).
 - **Feature request.** Describe the problem you're trying to solve, not just the
   solution. Context helps us design the right thing.
+- **Security vulnerabilities.** Please don't open a public issue. Report them
+  privately by following [SECURITY.md](SECURITY.md), and we'll work with you on a
+  fix and on disclosure.
 
 ## Getting help
 
@@ -234,6 +414,14 @@ new contributors are always welcome.
 By contributing code, you agree that your code contributions will be licensed
 under the project's [MIT License](LICENSE), the same license that covers the
 project.
+
+The MIT License means what it says: anyone may use, modify, and redistribute the
+code, commercially or not. Our
+[Terms of Service](https://worldofclaudecraft.com/terms) govern the hosted game
+we operate at worldofclaudecraft.com (accounts, conduct, virtual items) and do
+not restrict the rights the MIT License gives you or anyone else in this code.
+The "World of ClaudeCraft" and "Levy Street" names and branding are not covered
+by the MIT License.
 
 Original creative assets (sound recordings, music, art, and similar authored
 works) are the exception. If you contribute an original asset you created, you
@@ -248,8 +436,20 @@ may instead keep copyright and contribute it under a license of your choice
   and the in-game store.
 
 For assets listed in the CREDITS.md table, that recorded license controls over
-the project's default MIT license. Asset contributions without a CREDITS.md
-entry are MIT like everything else.
+the project's default MIT license.
+
+**Media assets with no CREDITS.md entry are not licensed under MIT.** The
+register is still being completed, so a missing entry means the terms are
+unrecorded, not that the asset is free to take. This is deliberate: it stops an
+unregistered contribution being given away by default. Code is the other way
+around, and anything not carved out in CREDITS.md is MIT.
+
+That is exactly why the register entry is not optional paperwork. If you
+contribute an asset without a CREDITS.md row, nobody downstream can use it and
+we have no record of what you granted us. Record the **Redistribution** column
+honestly too. It is what tells someone forking this project whether they may
+pass your asset on, and some rows are marked "No, permission required" precisely
+because they may not.
 
 ---
 

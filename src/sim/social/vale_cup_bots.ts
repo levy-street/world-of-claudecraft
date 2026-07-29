@@ -12,7 +12,7 @@
 // of sim state (pid parity picks the stagger slot, positions pick the play), so
 // a backfilled match on the live server perturbs no shared rng draw order.
 
-import { VC_NATION_IDS } from '../content/vale_cup';
+import { VC_ALLROUNDER_ONLY_MAX_BRACKET, VC_NATION_IDS } from '../content/vale_cup';
 import { DUNGEON_X_THRESHOLD } from '../data';
 import type { PlayerMeta, Sim } from '../sim';
 import {
@@ -34,6 +34,8 @@ import {
   VC_PRACTICE_SLOTS,
   vcPracticeOrigin,
 } from '../vale_cup_layout';
+import { isArenaQueued } from './arena';
+import { duelFor } from './duel';
 import * as valeCupMod from './vale_cup';
 import {
   VC_BACKFILL_WAIT,
@@ -67,7 +69,7 @@ const VC_BOT_NAMES = [
 // Bot kit assignment when filling a side, by seat index within the side:
 // seat 0 keeps goal (3v3 and up), the last seat sweeps, the middle strikes.
 function botRoleForSeat(seat: number, bracket: VcBracket): SportRole {
-  if (bracket <= 2) return 'allrounder';
+  if (bracket <= VC_ALLROUNDER_ONLY_MAX_BRACKET) return 'allrounder';
   if (seat === 0) return 'keeper';
   if (seat === bracket - 1) return 'sweeper';
   return 'striker';
@@ -119,7 +121,9 @@ function fillSideWithBots(sim: Sim, side: VcSide, bracket: VcBracket): void {
     const hasKeeper = side.pids.some((p) => side.roles[p] === 'keeper');
     const lastSeat = side.pids.length === bracket - 1;
     const role: SportRole =
-      bracket >= 3 && !hasKeeper && lastSeat ? 'keeper' : botRoleForSeat(seat, bracket);
+      bracket > VC_ALLROUNDER_ONLY_MAX_BRACKET && !hasKeeper && lastSeat
+        ? 'keeper'
+        : botRoleForSeat(seat, bracket);
     const bot = spawnCupBot(sim, role);
     side.pids.push(bot.pid);
     side.roles[bot.pid] = bot.role;
@@ -201,11 +205,19 @@ export function startValeCupPractice(sim: Sim, bracket: VcBracket, pid?: number)
     ctx.error(id, 'You are already in an arena match.');
     return;
   }
+  // Waiting in an arena queue counts too: this entry point seats the player
+  // directly, so without this guard a Protect Yumi / duel unit could still be
+  // matched around them and double-seat them across both systems. Symmetric
+  // with arenaQueueJoin's ctx.vcupSeatedOrQueued check in the other direction.
+  if (isArenaQueued(ctx, id)) {
+    ctx.error(id, 'You are already in an arena match.');
+    return;
+  }
   if (r.e.dead) {
     ctx.error(id, 'You cannot queue for the arena while dead.');
     return;
   }
-  if (ctx.duels.has(id)) {
+  if (duelFor(ctx, id) !== null) {
     ctx.error(id, 'You cannot queue while dueling.');
     return;
   }

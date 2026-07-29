@@ -54,21 +54,6 @@ function cellCoord(v: number, size: number): number | null {
 // their established high-water capacity.
 // ---------------------------------------------------------------------------
 const cluster: number[] = [];
-function sortIndicesByAnchorId(indices: number[], anchors: NameplateAnchor[]): void {
-  // Insertion sort is allocation-free and fast here: view-map order is stable
-  // between frames, while collision clusters normally contain only 2-3 plates.
-  for (let i = 1; i < indices.length; i++) {
-    const value = indices[i];
-    const id = anchors[value].id;
-    let j = i - 1;
-    while (j >= 0 && anchors[indices[j]].id > id) {
-      indices[j + 1] = indices[j];
-      j--;
-    }
-    indices[j + 1] = value;
-  }
-}
-
 const cellQueue: number[] = [];
 const occupiedSlots: number[] = [];
 const spatialOrder: number[] = [];
@@ -314,10 +299,10 @@ export function declutterNameplatesInPlace(
 
     if (cluster.length < 2) continue;
     // the whole pass stacks in ascending id order
-    sortIndicesByAnchorId(cluster, anchors);
+    cluster.sort((a, b) => anchors[a].id - anchors[b].id);
 
     let sum = 0;
-    for (let k = 0; k < cluster.length; k++) sum += anchors[cluster[k]].sy;
+    for (const j of cluster) sum += anchors[j].sy;
     const baseSy = sum / cluster.length;
     const mid = (cluster.length - 1) / 2;
     for (let k = 0; k < cluster.length; k++) {

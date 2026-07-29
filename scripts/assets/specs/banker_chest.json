@@ -1,0 +1,9 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/banker_chest/banker_chest.glb",
+      "out": "models/props/banker_chest.glb",
+      "type": "static"
+    }
+  ]
+}

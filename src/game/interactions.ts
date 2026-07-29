@@ -1,9 +1,17 @@
-import { dist2d, type Entity, INTERACT_RANGE } from '../sim/types';
+import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
+import {
+  dist2d,
+  EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS,
+  EASTBROOK_NOTICEBOARD_TEMPLATE_ID,
+  type Entity,
+  INTERACT_RANGE,
+} from '../sim/types';
 import { t } from '../ui/i18n';
 import { tSim } from '../ui/sim_i18n';
 import type { IWorld } from '../world_api';
-import { corpseLootAvailability } from './corpse_loot_availability';
+import { corpseLootAvailability, localPartyMemberIds } from './corpse_loot_availability';
 import type { HoverCursorKind } from './cursors';
+import { decideEscortPress, handleEscortPress, isEscorteeEntity } from './escort_interact';
 import type { InteractionOutcome } from './interaction_autorun';
 
 export interface PickInteractionWorld {
@@ -12,7 +20,14 @@ export interface PickInteractionWorld {
   entities: IWorld['entities'];
   duelInfo?: IWorld['duelInfo'];
   arenaInfo?: IWorld['arenaInfo'];
+  // Local party roster for the corpse rights check; optional so party-less
+  // fixtures stay valid.
+  partyInfo?: IWorld['partyInfo'];
+  // Required for the escort arm below (see escort_interact.ts): a right-click is
+  // the other half of an escort run's only client entry point.
+  questLog: IWorld['questLog'];
   targetEntity(id: number | null): void;
+  interact(): void;
   enterDungeon(dungeonId: string): InteractionOutcome;
   leaveDungeon(): InteractionOutcome;
   pickUpObject(id: number): InteractionOutcome;
@@ -35,8 +50,9 @@ export function isAttackHoverTarget(e: Entity | undefined): boolean {
 
 export function activePvpOpponentIds(
   world: Pick<PickInteractionWorld, 'player' | 'playerId' | 'duelInfo' | 'arenaInfo'>,
+  ids = new Set<number>(),
 ): Set<number> {
-  const ids = new Set<number>();
+  ids.clear();
   const selfId = world.playerId ?? world.player.id;
   if (world.duelInfo?.state === 'active' && world.duelInfo.otherPid !== selfId)
     ids.add(world.duelInfo.otherPid);
@@ -101,6 +117,9 @@ export function hoverCursorKind(
   if (!e) return 'default';
   if (isAttackableEntity(e, playerId, activePvpOpponentSet)) return 'attack';
   if (e.kind === 'npc') return 'friendly';
+  // An escortee is a quest NPC that happens to be mob-kind; hovering it must
+  // read as interactive, or the only cue that it can be talked to is gone.
+  if (isEscorteeEntity(e)) return 'friendly';
   if (e.kind === 'player' && e.id !== playerId) return 'friendly';
   void partyMemberIds;
   return 'default';
@@ -113,12 +132,20 @@ export function isActivePvpOpponent(world: PickInteractionWorld, e: Entity): boo
   );
 }
 
+/** Resolve the client-side range for a lootable object before dispatch or approach. */
+export function objectInteractionRange(entity: Pick<Entity, 'templateId'>): number {
+  return entity.templateId === EASTBROOK_NOTICEBOARD_TEMPLATE_ID
+    ? EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS
+    : INTERACT_RANGE;
+}
+
 /** Whether an otherwise incomplete entity click represents a useful movement intent. */
 export function shouldApproachPickedEntity(
   player: Entity,
   entity: Entity,
   didInteract: boolean,
   harvestStateReliable = true,
+  partyMemberIds: readonly number[] | null = null,
 ): boolean {
   if (didInteract || player.dead || entity.id === player.id) return false;
   const d = dist2d(player.pos, entity.pos);
@@ -127,12 +154,27 @@ export function shouldApproachPickedEntity(
       entity.kind === 'mob' &&
       entity.lootable &&
       d > INTERACT_RANGE + 1 &&
-      corpseLootAvailability(entity, player.id, harvestStateReliable).canOpen
+      corpseLootAvailability(entity, player.id, harvestStateReliable, partyMemberIds).canOpen
     );
   }
-  if (entity.kind === 'object') return d > INTERACT_RANGE;
+  if (entity.kind === 'object') return d > objectInteractionRange(entity);
   if (entity.kind === 'npc') return d > INTERACT_RANGE + 2;
   return true;
+}
+
+export function shouldDeferPickedCorpseToGatherNode(
+  entity: Entity | undefined,
+  playerId: number,
+  harvestStateReliable = true,
+  partyMemberIds: readonly number[] | null = null,
+): boolean {
+  return (
+    !!entity &&
+    entity.kind === 'mob' &&
+    entity.dead &&
+    entity.lootable &&
+    !corpseLootAvailability(entity, playerId, harvestStateReliable, partyMemberIds).canOpen
+  );
 }
 
 /** Route a picked entity and report only completed non-combat world interactions. */
@@ -148,6 +190,10 @@ export function handlePickedEntity(
   const e = world.entities.get(id);
   if (!e) return false;
 
+  // Quest-gated mobs (Broodmother eggs) are inert scenery to a player not on the
+  // gating quest: not targetable or interactable until they take the quest.
+  if (isQuestGatedEntityHidden(e, world.questLog)) return false;
+
   if (e.kind !== 'object') world.targetEntity(id);
 
   if (button === 2) {
@@ -159,7 +205,7 @@ export function handlePickedEntity(
         hud.showError(tSim('error.cantWhileDead'));
         return false;
       }
-      if (d > INTERACT_RANGE) {
+      if (d > objectInteractionRange(e)) {
         hud.showError(t('questUi.errors.tooFar'));
         return false;
       }
@@ -177,8 +223,12 @@ export function handlePickedEntity(
       }
       if (d <= INTERACT_RANGE + 1) {
         if (
-          !corpseLootAvailability(e, world.playerId ?? world.player.id, harvestStateReliable)
-            .canOpen
+          !corpseLootAvailability(
+            e,
+            world.playerId ?? world.player.id,
+            harvestStateReliable,
+            localPartyMemberIds(world.partyInfo),
+          ).canOpen
         )
           return false;
         hud.openLoot(id, screenX, screenY);
@@ -212,6 +262,21 @@ export function handlePickedEntity(
       }
       hud.showError(t('questUi.errors.tooFar'));
       return false;
+    } else if (isEscorteeEntity(e)) {
+      // Escortees are mob-kind (the escort driver walks them), so they fall
+      // past the npc arm above and would otherwise land in the attackable
+      // branch below, which refuses them for being non-hostile: a right-click
+      // that only ever targeted. The verdict core decides start vs away.
+      // Range first, like the npc branch above: the player clicked HER, so an
+      // out-of-range click earns the too-far line (and the caller's
+      // shouldApproachPickedEntity then walks them over).
+      if (d > INTERACT_RANGE + 2) {
+        hud.showError(t('questUi.errors.tooFar'));
+        return false;
+      }
+      const verdict = decideEscortPress(world.player.pos, world.entities, world.questLog);
+      if (verdict.kind === 'none') return false;
+      return handleEscortPress(world, hud, verdict, t('questUi.errors.escortAway'));
     } else if (
       isAttackableEntity(e, world.playerId ?? world.player.id, activePvpOpponentIds(world))
     ) {
@@ -231,7 +296,7 @@ export function handlePickedEntity(
         return false;
       }
       const d = dist2d(world.player.pos, e.pos);
-      if (d > INTERACT_RANGE) return false;
+      if (d > objectInteractionRange(e)) return false;
       if (e.templateId === 'dungeon_door' && e.dungeonId) return world.enterDungeon(e.dungeonId);
       if (e.templateId === 'dungeon_exit') return world.leaveDungeon();
       if (e.templateId === 'mailbox') {
@@ -247,8 +312,12 @@ export function handlePickedEntity(
       const d = dist2d(world.player.pos, e.pos);
       if (d <= INTERACT_RANGE + 1) {
         if (
-          !corpseLootAvailability(e, world.playerId ?? world.player.id, harvestStateReliable)
-            .canOpen
+          !corpseLootAvailability(
+            e,
+            world.playerId ?? world.player.id,
+            harvestStateReliable,
+            localPartyMemberIds(world.partyInfo),
+          ).canOpen
         )
           return false;
         hud.openLoot(id, screenX, screenY);

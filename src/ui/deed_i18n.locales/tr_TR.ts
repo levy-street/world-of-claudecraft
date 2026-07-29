@@ -7,6 +7,102 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: 'Elde Sancak',
+    desc: "Dikenvadi Ovası'nda bir sancak ele geçir.",
+  },
+  pvp_bg_first_win: {
+    name: 'Vadi Tutunuyor',
+    desc: 'Bir Dikenvadi Ovası savaşını kazan.',
+  },
+  pvp_bg_wins_25: {
+    name: 'Vadinin Muhafızı',
+    desc: '25 Dikenvadi Ovası savaşı kazan.',
+    title: 'Sancaktar',
+  },
+  pvp_bg_captures_100: {
+    name: 'Yüz Sancak',
+    desc: "Kariyerin boyunca Dikenvadi Ovası'nda 100 sancak ele geçir.",
+  },
+  dgn_rift: {
+    name: 'Yarık Gezgini',
+    desc: 'Kat şefini yenerek bir Yarığı temizle.',
+  },
+  dgn_rift_s_rank: {
+    name: 'Yarık Hükümdarı',
+    desc: 'Bir Yarık portalının oluşturabileceği en zor kademe olan S dereceli bir Yarığı temizle.',
+  },
+  pvp_honor_sergeant: {
+    name: 'Çavuş',
+    desc: 'Ömrün boyunca 10.000 onur kazan. Onu harcamak rütbeni asla kaybettirmez.',
+    title: 'Çavuş',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: 'Şövalye-Teğmen',
+    desc: 'Ömrün boyunca 40.000 onur kazan, arkanda gerçek bir savaş mevsimi bırak.',
+    title: 'Şövalye-Teğmen',
+  },
+  pvp_honor_field_marshal: {
+    name: 'Saha Mareşali',
+    desc: 'Ömrün boyunca 150.000 onur kazan. Herhangi bir diyarda nadirdir, ve öyle de olmalı.',
+    title: 'Saha Mareşali',
+  },
+  chr_drakemaw_broodlord: {
+    name: 'Kuluçka Kırıcı',
+    desc: "Bir Ejder Ağzı Yuva Lordu'nu, narasına, yarma darbesine ve ateşine rağmen, yumurtalarının ortasında öldür.",
+  },
+  chr_maw_matriarch: {
+    name: 'Gök Sessizleşiyor',
+    desc: "Ağız Anaerkili Cindraleth'i, Ejder Ağzı'nın üzerindeki krater tüneğinde öldür.",
+  },
+  chr_frostveil_gatherer: {
+    name: 'Teras Hasadi',
+    desc: 'Frostveil de bir cevher damari, bir odun alani ve bir ot yatagi hasat et.',
+  },
+  chr_frostveil_first_cast: {
+    name: 'Golcukte Ilk Buz',
+    desc: 'Frostveil sularindan bir balik yakala.',
+  },
+  chr_amberfall_gatherer: {
+    name: 'Amberfall Hasadi',
+    desc: 'Amberfall da bir cevher damari, bir odun alani ve bir ot yatagi hasat et.',
+  },
+  chr_amberfall_first_cast: {
+    name: 'Buyuk Batakliktan Bir Av',
+    desc: 'Amberfall sularindan bir balik yakala.',
+  },
+  chr_nightbloom_gatherer: {
+    name: 'Dusleyen Hasat',
+    desc: 'Nightbloom da bir cevher damari, bir odun alani ve bir ot yatagi hasat et.',
+  },
+  chr_nightbloom_first_cast: {
+    name: 'Ay Kuyusunda Bir Halka',
+    desc: 'Nightbloom sularindan bir balik yakala.',
+  },
+  chr_wraithwood_gatherer: {
+    name: 'Golge Altinda Hasat',
+    desc: 'Wraithwood da bir cevher damari, bir odun alani ve bir ot yatagi hasat et.',
+  },
+  chr_wraithwood_first_cast: {
+    name: 'Ayna Koyunda Bir Atis',
+    desc: 'Wraithwood sularindan bir balik yakala.',
+  },
+  chr_palmreach_gatherer: {
+    name: 'Palmiye Kiyisinda Hasat',
+    desc: 'Palmreach te bir cevher damari, bir odun alani ve bir ot yatagi hasat et.',
+  },
+  chr_palmreach_first_cast: {
+    name: 'Safir Lagune Atis',
+    desc: 'Palmreach sularindan bir balik yakala.',
+  },
+  chr_evergarden_gatherer: {
+    name: 'Parterin Bereketi',
+    desc: 'Evergarden da bir cevher damari, bir odun alani ve bir ot yatagi hasat et.',
+  },
+  chr_evergarden_first_cast: {
+    name: 'Yaprak Havuzunda Bir Atis',
+    desc: 'Evergarden sularindan bir balik yakala.',
+  },
   pvp_card_duel_first_win: {
     name: 'Ev Kuralları',
     desc: "Kart Ustası'nın yanında bir Kart Düellosu kazan.",
@@ -79,7 +175,7 @@ export const table: DeedLocaleTable = {
   },
   prog_master_gatherer: {
     name: 'Usta Toplayıcı',
-    desc: 'Madencilik, Odunculuk ve Şifalı Otçulukta 100 yetkinliğe ulaş.',
+    desc: "Madencilik, Odun Kesimi, Şifalı Otçuluk ve Balık Tutma'nın herhangi üçünde 100 yetkinliğe ulaş.",
   },
   prog_first_craft: { name: 'El Emeği Göz Nuru', desc: 'İlk başarılı üretimini tamamla.' },
   prog_craft_specialist: {
@@ -413,7 +509,10 @@ export const table: DeedLocaleTable = {
     name: 'Gedikli Müşteri',
     desc: "Kahramanca Levazımcısı'nın tezgâhındaki on parçanın tamamını keşfet.",
   },
-  col_glimmerfin: { name: 'Umut Pırıltısı', desc: 'Bir Pırıltıyüzgeç Koi tut.' },
+  col_glimmerfin: {
+    name: 'Umut Pırıltısı',
+    desc: 'Bir Günışıltısı Sazan tut.',
+  },
   col_full_creel: {
     name: 'Dolu Sepet',
     desc: "Vadi'nin, Bataklık'ın ve Tepeler'in sularındaki altı yaygın avın tümünü keşfet.",
@@ -571,7 +670,10 @@ export const table: DeedLocaleTable = {
     title: 'Seyyah',
   },
   exp_something_shiny: { name: 'Parlak Bir Şey', desc: 'Işıldayan bir nesneyi yerden al.' },
-  exp_first_ore: { name: 'Kazmayı Toprağa Vur', desc: 'İlk cevher kaynağını topla.' },
+  exp_first_ore: {
+    name: 'Kazma Taşa Değdi',
+    desc: 'İlk cevher kaynağını topla.',
+  },
   exp_first_timber: { name: 'Ağaç Devriliyor!', desc: 'İlk odun kaynağını topla.' },
   exp_first_herb: { name: 'Bereketli Eller', desc: 'İlk şifalı ot kaynağını topla.' },
   feat_era_cap: {
@@ -646,5 +748,200 @@ export const table: DeedLocaleTable = {
   chr_marsh_first_cast: {
     name: 'Sazlıktaki Yılanbalıkları',
     desc: "Mirefen Bataklığı'nın sularından bir balık tut.",
+  },
+  prog_guildsworn: {
+    name: 'Zanaat Yeminlisi',
+    desc: 'Bir arketip çiftine bağlan ve mesleklerini ciddiyetle üstlen.',
+    title: 'Zanaat Yeminlisi',
+  },
+  prog_masterwright: {
+    name: 'Şaheser Ustası',
+    desc: 'İlk şaheserini yap; o denli ince ki tüm bölge duyar bunu.',
+    title: 'Şaheser Ustası',
+  },
+  prog_fishing_100: {
+    name: 'Eski Denizci',
+    desc: 'Balık Tutmada 100 yetkinliğe ulaş.',
+  },
+  prog_master_angler: {
+    name: 'Usta Olta Ustası',
+    desc: 'Balık Tutmada 200 yetkinliğe ulaş; olta sanatının en zirvesi.',
+    title: 'Usta Olta Ustası',
+  },
+  prog_engineering_50: {
+    name: 'Dişliler ve Makaralar',
+    desc: 'Mühendislikte 50 beceriye ulaş.',
+  },
+  prog_alchemy_50: {
+    name: 'Tuhaf Karışımlar',
+    desc: 'Simyada 50 beceriye ulaş.',
+  },
+  prog_cooking_50: {
+    name: 'Deneyimli Şef',
+    desc: 'Yemek Pişirmede 50 beceriye ulaş.',
+  },
+  prog_leatherworking_50: {
+    name: 'Tabakçı Ticaret',
+    desc: 'Deri İşlemede 50 beceriye ulaş.',
+  },
+  prog_tailoring_50: {
+    name: 'İnce Dikiş',
+    desc: 'Terzilikte 50 beceriye ulaş.',
+  },
+  prog_enchanting_50: {
+    name: 'Arkanın Kıvılcımı',
+    desc: 'Büyülemede 50 beceriye ulaş.',
+  },
+  prog_weaponcrafting_50: {
+    name: 'Kenar ve Sunum',
+    desc: 'Silah Yapımında 50 beceriye ulaş.',
+  },
+  prog_armorcrafting_50: {
+    name: 'Çekiç ve Levha',
+    desc: 'Zırh Yapımında 50 beceriye ulaş.',
+  },
+  prog_grandmaster_engineering: {
+    name: 'Büyük Usta Mühendislik',
+    desc: 'Mühendislikte 125 beceriye ulaş; zanaatın en zirvesi.',
+    title: 'Büyük Usta Mühendislik',
+  },
+  prog_grandmaster_alchemy: {
+    name: 'Büyük Usta Simya',
+    desc: 'Simyada 125 beceriye ulaş; zanaatın en zirvesi.',
+    title: 'Büyük Usta Simya',
+  },
+  prog_grandmaster_cooking: {
+    name: 'Büyük Usta Aşçılık',
+    desc: 'Yemek Pişirmede 125 beceriye ulaş; zanaatın en zirvesi.',
+    title: 'Büyük Usta Aşçılık',
+  },
+  prog_grandmaster_leatherworking: {
+    name: 'Büyük Usta Deri İşleme',
+    desc: 'Deri İşlemede 125 beceriye ulaş; zanaatın en zirvesi.',
+    title: 'Büyük Usta Deri İşleme',
+  },
+  prog_grandmaster_tailoring: {
+    name: 'Büyük Usta Terzilik',
+    desc: 'Terzilikte 125 beceriye ulaş; zanaatın en zirvesi.',
+    title: 'Büyük Usta Terzilik',
+  },
+  prog_grandmaster_enchanting: {
+    name: 'Büyük Usta Büyüleme',
+    desc: 'Büyülemede 125 beceriye ulaş; zanaatın en zirvesi.',
+    title: 'Büyük Usta Büyüleme',
+  },
+  prog_grandmaster_weaponcrafting: {
+    name: 'Büyük Usta Silah Yapımı',
+    desc: 'Silah Yapımında 125 beceriye ulaş; zanaatın en zirvesi.',
+    title: 'Büyük Usta Silah Yapımı',
+  },
+  prog_grandmaster_armorcrafting: {
+    name: 'Büyük Usta Zırh Yapımı',
+    desc: 'Zırh Yapımında 125 beceriye ulaş; zanaatın en zirvesi.',
+    title: 'Büyük Usta Zırh Yapımı',
+  },
+  col_pristine_vein: {
+    name: 'Bozulmamış Damar',
+    desc: 'Bozulmamış bir damarı kır; duyulsun tüm bölgede.',
+  },
+  col_ancient_heartwood: {
+    name: 'Kadim Kalp Ağacı',
+    desc: 'Devrilmiş bir ağaçtan kadim bir kalp ağacı parçası çıkar.',
+  },
+  col_moonlit_bloom: {
+    name: 'Ay Işığı Çiçeği',
+    desc: 'Tam açtığı anda bir ay ışığı çiçeği topla.',
+  },
+  col_perfect_specimen: {
+    name: 'Mükemmel Numune',
+    desc: 'Hasat edilmiş bir yaratıktan tek çizik ya da leke olmaksızın mükemmel bir numune al.',
+  },
+  soc_first_salvage: {
+    name: 'İsrafı Önle',
+    desc: 'Bir teçhizat parçasını ham maddelere dönüştürmek için hurda işlemine sok.',
+  },
+  soc_salvage_50: {
+    name: 'Hurda Bahçesi',
+    desc: 'Elli teçhizat parçasını hurda işlemine sokarak ham maddelere dönüştür.',
+  },
+  dgn_wildheart_basin: {
+    name: 'Çukurun İntikamı',
+    desc: "Yaban Yürek Çukuru'nda Zulgar, Çukurun Sesi'ni alt et.",
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Kahramanca: Yaban Yürek Çukuru',
+    desc: "Yaban Yürek Çukuru'nda Zulgar, Çukurun Sesi'ni Kahramanca zorlukta alt et.",
+  },
+  chr_peaks_gatherer: {
+    name: 'Yükseklerin Hasadı',
+    desc: "Dikenzirve Tepeleri'nde bir cevher damarı, bir kesimlik ağaç ve bir şifalı ot öbeği topla.",
+  },
+  chr_marsh_rares_ii: {
+    name: 'Obur, Hesaba Katıldı',
+    desc: "Mirefen Bataklığı'nın ilk sayımda atlanan dördüncü namlı dehşeti Obur Grubjaw'ı öldür.",
+  },
+  chr_peaks_rares_ii: {
+    name: 'Kayaya Kazınan Yeni Adlar',
+    desc: "Dikenzirve Tepeleri'nin ilk sayımda atlanan iki namlı dehşetini daha öldür: Yaşlı Cragmaw ve Kıymıkbeyi Kazzix.",
+  },
+  chr_gleamstag: {
+    name: 'Önce Vurmayan Efsane',
+    desc: "Ancak köşeye sıkıştırılınca saldıran ender ve çekingen elit Parıltı Geyiği'ni öldür.",
+  },
+  chr_hollow_rares: {
+    name: 'Sürü Unutmaz',
+    desc: "Örtülü Vadi'nin iki gezgin ender patronunu öldür: Yaşlı Marrowshell ve Sürünün İlki Aurelhorn.",
+  },
+  chr_willowfen_gatherer: {
+    name: 'Söğütlük Bereketi',
+    desc: "Söğüt Bataklığı'nda bir cevher damarı, bir kesimlik ağaç ve bir şifalı ot öbeği topla.",
+  },
+  chr_willowfen_first_cast: {
+    name: "Zambak Bozkırları'nda Su Halkaları",
+    desc: "Söğüt Bataklığı'nın sularından bir balık tut.",
+  },
+  chr_galecrest_gatherer: {
+    name: 'Yamaç Başında Hasat',
+    desc: "Fırtına Sırtı'nda bir cevher damarı, bir kesimlik ağaç ve bir şifalı ot öbeği topla.",
+  },
+  chr_galecrest_first_cast: {
+    name: "Ayna Gölü'nde Bir Misina",
+    desc: "Fırtına Sırtı'nın sularından bir balık tut.",
+  },
+  chr_farshore_gatherer: {
+    name: 'Ada Erzağı',
+    desc: "Uzak Kıyı'da bir cevher damarı, bir kesimlik ağaç ve bir şifalı ot öbeği topla.",
+  },
+  chr_farshore_first_cast: {
+    name: 'Martıların Bildiği',
+    desc: "Uzak Kıyı'nın sularından bir balık tut.",
+  },
+  prog_engineering_rare: {
+    name: 'Hassas Mühendislik',
+    desc: 'Mühendislikte ilk ender eşyanı işle.',
+  },
+  prog_alchemy_rare: {
+    name: 'Ender Bir Yıllık',
+    desc: 'Simyada ilk ender eşyanı işle.',
+  },
+  prog_cooking_rare: {
+    name: 'Unutulmaz Bir Yemek',
+    desc: 'Yemek Pişirmede ilk ender eşyanı işle.',
+  },
+  prog_leatherworking_rare: {
+    name: 'İnce Tabaklama',
+    desc: 'Deri İşlemede ilk ender eşyanı işle.',
+  },
+  prog_tailoring_rare: {
+    name: 'Bir Usta Dikişi',
+    desc: 'Terzilikte ilk ender eşyanı işle.',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Parlayana Kadar Tavlandı',
+    desc: 'Silah Yapımında ilk ender eşyanı işle.',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Kusursuza Kaplandı',
+    desc: 'Zırh Yapımında ilk ender eşyanı işle.',
   },
 };

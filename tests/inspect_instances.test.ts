@@ -1,4 +1,4 @@
-// Inspect extension (Professions 2.0 Phase 6): equipped ItemInstancePayloads
+// Inspect extension (Professions 2.0): equipped ItemInstancePayloads
 // ride the IDENTITY lane (terse key `eqi`, next to `eq`) so the inspect window
 // shows another player's masterwork/enchant rolls. This suite is the liveness
 // half (the #2033 class: value, not shape): a REAL GameServer broadcast into a
@@ -29,8 +29,8 @@ vi.mock('../server/db', () => ({
 }));
 
 import { type ClientSession, GameServer } from '../server/game';
-import { ClientWorld } from '../src/net/online';
 import type { PlayerClass } from '../src/sim/types';
+import { bareClient } from './helpers/bare_client';
 
 const ITEM_ID = 'eastbrook_ritual_vestments';
 
@@ -70,56 +70,6 @@ function broadcast(server: GameServer): void {
 
 function cmd(server: GameServer, session: ClientSession, msg: Record<string, unknown>): void {
   server.handleMessage(session, JSON.stringify({ t: 'cmd', ...msg }));
-}
-
-// A ClientWorld without the WebSocket plumbing, to drive applySnapshot with the
-// REAL captured server snap (the tests/snapshots.test.ts bareClient idiom,
-// trimmed to the fields the ents decode path touches).
-function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWorld {
-  const c: any = Object.create(ClientWorld.prototype);
-  c.cfg = { seed: 20061, playerClass };
-  c.entities = new Map();
-  c.playerId = pid;
-  c.ownPlayerId = pid;
-  c.ownPlayerClass = playerClass;
-  c.spectating = null;
-  c.cupInfo = null;
-  c.sportRole = null;
-  c.moveInput = {};
-  c.inventory = [];
-  c.vendorBuyback = [];
-  c.equipment = {};
-  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
-  c.copper = 0;
-  c.honor = 0;
-  c.lifetimeHonor = 0;
-  c.xp = 0;
-  c.known = [];
-  c.questLog = new Map();
-  c.questsDone = new Set();
-  c.pendingQuestCommands = new Map();
-  c.partyInfo = null;
-  c.selectedDungeonDifficulty = 'normal';
-  c.tradeInfo = null;
-  c.duelInfo = null;
-  c.lastSnapAt = 0;
-  c.snapInterval = 50;
-  c.serverTickHz = null;
-  c.missingSince = new Map();
-  c.pendingFacingDelta = 0;
-  c.connected = true;
-  c.eventQueue = [];
-  c.mouselookFacing = null;
-  c.lastInputSentAt = 0;
-  c.lastInputSig = '';
-  c.inputSeq = 0;
-  c.pendingInputSeqSentAt = new Map();
-  c.ackedInputSeq = 0;
-  c.inputEchoSamples = [];
-  c.spectateFacingPending = false;
-  c.pendingSpectateFacing = null;
-  c.nodeCooldowns = new Map();
-  return c;
 }
 
 describe('eqi over a real server broadcast into applySnapshot (liveness, not shape)', () => {
@@ -240,20 +190,29 @@ describe('server authority over instance payloads', () => {
   });
 });
 
-// The last link of the inspect chain is hud.ts DOM glue no suite instantiates
-// (openInspect -> buildInspectSlotRow -> the widened itemTooltip), so the
-// threading is source-pinned: the eqi wire and mirror above are liveness-
-// tested, and these pins keep the rendered row actually consuming them.
+// The last link of the inspect chain is the inspect_window.ts painter DOM glue no
+// suite instantiates (openInspect -> buildSlotRow -> the widened itemTooltip), so
+// the threading is source-pinned: the eqi wire and mirror above are liveness-
+// tested, and these pins keep the rendered row actually consuming them. The
+// showcase redesign moved this glue out of hud.ts into the inspect_window painter
+// (a thin delegate remains in hud.ts), so the pins follow it there.
 import { readFileSync } from 'node:fs';
 
-describe('hud openInspect instance threading (source pins)', () => {
+describe('inspect_window painter instance threading (source pins)', () => {
+  const painter = readFileSync(new URL('../src/ui/inspect_window.ts', import.meta.url), 'utf8');
   const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
 
   it('threads the inspected entity payload per slot into both paperdoll columns', () => {
-    expect(hud).toContain('buildInspectSlotRow(cell, e.equippedInstances[cell.slot])');
+    expect(painter).toContain('this.buildSlotRow(cell, e.equippedInstances[cell.slot])');
   });
 
   it('the slot row forwards the instance into the tooltip builder', () => {
-    expect(hud).toContain('this.attachTooltip(row, () => this.itemTooltip(item, true, instance))');
+    expect(painter).toContain(
+      'this.deps.attachTooltip(row, () => this.deps.itemTooltip(item, instance))',
+    );
+  });
+
+  it('hud.ts openInspect is now a thin delegate to the painter', () => {
+    expect(hud).toContain('this.inspectWindow.openInspect(e, Date.now())');
   });
 });

@@ -61,7 +61,6 @@ function input(over: Partial<ArenaViewInput> = {}): ArenaViewInput {
     playerName: 'Me',
     party: null,
     allTime: {},
-    practiceAvailable: false,
     ...over,
   };
 }
@@ -107,18 +106,14 @@ describe('buildArenaView: bracket resolution + commit', () => {
   it('uses the selected bracket when idle and does not commit it', () => {
     const v = live(buildArenaView(input({ selectedBracket: '2v2' })));
     expect(v.bracket).toBe('2v2');
-    expect(v.commitBracket).toBe(false);
-    expect(v.canSwitchBracket).toBe(true);
   });
 
   it('forces + commits the match bracket regardless of selection', () => {
     const info = makeArenaInfo('sim', {
-      match: { format: 'fiesta', state: 'active', oppName: 'Foe' },
+      match: { format: 'fiesta', state: 'active', oppName: 'Foe', map: 'coliseum' },
     } as Partial<ArenaInfo>);
     const v = live(buildArenaView(input({ info, selectedBracket: '1v1' })));
     expect(v.bracket).toBe('fiesta');
-    expect(v.commitBracket).toBe(true);
-    expect(v.canSwitchBracket).toBe(false);
     expect(v.action).toEqual({ kind: 'in-match', oppName: 'Foe' });
   });
 
@@ -126,16 +121,7 @@ describe('buildArenaView: bracket resolution + commit', () => {
     const info = makeArenaInfo('sim', { queued: true, queueSize: 3, format: '2v2' });
     const v = live(buildArenaView(input({ info, selectedBracket: '1v1' })));
     expect(v.bracket).toBe('2v2');
-    expect(v.commitBracket).toBe(true);
-    expect(v.canSwitchBracket).toBe(false);
     expect(v.action).toEqual({ kind: 'queued', queueSize: 3 });
-    // Locked brackets are the inactive ones while queued.
-    expect(v.brackets.filter((b) => b.locked).map((b) => b.fmt)).toEqual([
-      '1v1',
-      'fiesta',
-      'yumi3',
-      'yumi5',
-    ]);
   });
 });
 
@@ -207,18 +193,6 @@ describe('buildArenaView: ladder + all-time rows', () => {
   it('omits the all-time section when the cache has no rows for the bracket', () => {
     expect(live(buildArenaView(input())).allTime).toBeNull();
   });
-
-  it('shows the practice affordance only on Fiesta when the hook is wired', () => {
-    expect(
-      live(buildArenaView(input({ selectedBracket: 'fiesta', practiceAvailable: true }))).practice,
-    ).toBe(true);
-    expect(
-      live(buildArenaView(input({ selectedBracket: 'fiesta', practiceAvailable: false }))).practice,
-    ).toBe(false);
-    expect(
-      live(buildArenaView(input({ selectedBracket: '1v1', practiceAvailable: true }))).practice,
-    ).toBe(false);
-  });
 });
 
 describe('buildArenaView: render-skip signature', () => {
@@ -230,5 +204,66 @@ describe('buildArenaView: render-skip signature', () => {
       buildArenaView(input({ info: makeArenaInfo('sim', { queued: true, queueSize: 1 }) })),
     ).sig;
     expect(changed).not.toBe(a);
+  });
+});
+
+describe('buildArenaView: match map fact (slot-parity arena maps)', () => {
+  const inMatch = (over: object) =>
+    makeArenaInfo('sim', {
+      match: {
+        format: '1v1',
+        state: 'active',
+        oppName: 'Foe',
+        map: 'coliseum',
+        ...over,
+      },
+    } as Partial<ArenaInfo>);
+
+  it('surfaces the bout map for arena-band brackets, by map id', () => {
+    expect(live(buildArenaView(input({ info: inMatch({}) }))).matchMap).toBe('coliseum');
+    expect(live(buildArenaView(input({ info: inMatch({ map: 'drowned_court' }) }))).matchMap).toBe(
+      'drowned_court',
+    );
+    expect(live(buildArenaView(input({ info: inMatch({ format: 'fiesta' }) }))).matchMap).toBe(
+      'coliseum',
+    );
+  });
+
+  it('shows the map from the countdown (queue pop) onward', () => {
+    expect(
+      live(buildArenaView(input({ info: inMatch({ state: 'countdown', map: 'drowned_court' }) })))
+        .matchMap,
+    ).toBe('drowned_court');
+  });
+
+  it('is null outside a match, for yumi brackets, and for a mapless mirror', () => {
+    expect(live(buildArenaView(input())).matchMap).toBeNull();
+    const yumiInfo = inMatch({ format: 'yumi3' });
+    (yumiInfo.ladders as Record<string, unknown>).yumi3 = [];
+    (yumiInfo.standings as Record<string, unknown>).yumi3 = { rating: 1500, wins: 0, losses: 0 };
+    expect(live(buildArenaView(input({ info: yumiInfo }))).matchMap).toBeNull();
+    // an older server's mirrored snapshot without the field stays hidden
+    expect(live(buildArenaView(input({ info: inMatch({ map: undefined }) }))).matchMap).toBeNull();
+  });
+
+  it('the render-skip signature moves when only the map changes', () => {
+    const a = live(buildArenaView(input({ info: inMatch({}) }))).sig;
+    const b = live(buildArenaView(input({ info: inMatch({ map: 'drowned_court' }) }))).sig;
+    expect(a).not.toBe(b);
+  });
+
+  it('reads identically from a ClientWorld-mirror-shaped snapshot', () => {
+    // map is precisely a mirrored field (server -> s.arena -> ClientWorld),
+    // so the client shape is the one that matters for the fact
+    const clientInfo = (over: object) =>
+      makeArenaInfo('client', {
+        match: { format: '1v1', state: 'active', oppName: 'Foe', map: 'coliseum', ...over },
+      } as Partial<ArenaInfo>);
+    expect(
+      live(buildArenaView(input({ info: clientInfo({ map: 'drowned_court' }) }))).matchMap,
+    ).toBe('drowned_court');
+    expect(
+      live(buildArenaView(input({ info: clientInfo({ map: undefined }) }))).matchMap,
+    ).toBeNull();
   });
 });

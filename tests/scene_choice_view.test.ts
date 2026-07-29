@@ -5,6 +5,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   choicePromptOpen,
+  choicePromptSync,
   choiceResolve,
   createSceneChoiceState,
   type SceneChoicePrompt,
@@ -62,6 +63,16 @@ describe('scene choice view', () => {
     const s = createSceneChoiceState();
     choicePromptOpen(s, { ...PROMPT, windowSeconds: 0 }, 100);
     expect(sceneChoiceView(s, 150, 42).remainingSeconds).toBeNull();
+  });
+
+  it('restores an authoritative remaining deadline, including finite zero', () => {
+    const s = createSceneChoiceState();
+    choicePromptSync(s, PROMPT, 4.2, 100);
+    expect(sceneChoiceView(s, 100, 42).remainingSeconds).toBe(5);
+    choicePromptSync(s, PROMPT, 0, 200);
+    expect(sceneChoiceView(s, 200, 42).remainingSeconds).toBe(0);
+    choicePromptSync(s, null, null, 201);
+    expect(sceneChoiceView(s, 201, 42).visible).toBe(false);
   });
 
   it('closes on the matching result and ignores a foreign one', () => {

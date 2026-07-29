@@ -86,11 +86,39 @@ describe('fiesta: scoring & respawn', () => {
     expect(victim.dead).toBe(true);
 
     // The victim should NOT be permanently eliminated — they revive on their timer.
+    // The respawn reset is a clean slate: a held selection does not survive it
+    // (only the countdown-end fight-start reset retains a valid target).
+    victim.targetId = killerPid;
     const downedFor = match.fiesta!.respawn.get(victimPid)!;
     for (let i = 0; i < Math.ceil(downedFor * 20) + 5; i++) sim.tick();
     expect(match.fiesta!.respawn.has(victimPid)).toBe(false);
     expect(sim.entities.get(victimPid)!.dead).toBe(false);
     expect(sim.entities.get(victimPid)!.hp).toBeGreaterThan(0);
+    expect(sim.entities.get(victimPid)!.targetId).toBe(null);
+  });
+
+  it('keeps a cross-team target selected during the countdown when the fiesta goes live', () => {
+    const sim = makeWorld();
+    const classes: PlayerClass[] = ['warrior', 'mage', 'rogue', 'priest'];
+    const pids = classes.map((c, i) => sim.addPlayer(c, `P${i}`));
+    pids.forEach((p, i) => {
+      teleport(sim, p, i * 4, -40);
+    });
+    pids.forEach((p) => {
+      sim.arenaQueueJoin(p, 'fiesta');
+    });
+    sim.tick(); // matchmake
+    const match = sim.arenaMatchFor(pids[0])!;
+    expect(match.state).toBe('countdown');
+    const me = match.teamA[0];
+    const opp = match.teamB[0];
+    sim.targetEntity(opp, me);
+    expect(sim.entities.get(me)!.targetId).toBe(opp);
+
+    for (let i = 0; i < 20 * 8 && match.state !== 'active'; i++) sim.tick();
+
+    expect(match.state).toBe('active');
+    expect(sim.entities.get(me)!.targetId).toBe(opp);
   });
 
   it('respawn timers grow with each death', () => {

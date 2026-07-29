@@ -59,8 +59,17 @@ function plan(
   viewHeight = 2,
   showNameplates = true,
   showOwnNameplate = false,
+  showPlayerNameplates = true,
 ) {
-  return nameplatePlanInto(newNameplatePlan(), e, p, viewHeight, showNameplates, showOwnNameplate);
+  return nameplatePlanInto(
+    newNameplatePlan(),
+    e,
+    p,
+    viewHeight,
+    showNameplates,
+    showOwnNameplate,
+    showPlayerNameplates,
+  );
 }
 
 describe('nameplate_view - visibility', () => {
@@ -163,6 +172,28 @@ describe('nameplate_view - visibility', () => {
     expect(plan(ent({ id: 3, kind: 'player' }), viewer(), 2, false).hidden).toBe(false);
     expect(plan(ent({ kind: 'npc' }), viewer(), 2, false).hidden).toBe(false);
   });
+
+  it('the player-nameplate toggle hides other players only, current target exempt', () => {
+    const other = ent({ id: 3, kind: 'player' });
+    // on (the default) keeps another player's plate visible
+    expect(plan(other, viewer(), 2, true, false, true).hidden).toBe(false);
+    // off hides it
+    expect(plan(other, viewer(), 2, true, false, false).hidden).toBe(true);
+    // ...but the CURRENT target stays readable
+    expect(plan(other, viewer({ targetId: 3 }), 2, true, false, false).hidden).toBe(false);
+    // mobs and npcs are unaffected by this toggle
+    expect(plan(ent({ kind: 'mob' }), viewer(), 2, true, false, false).hidden).toBe(false);
+    expect(plan(ent({ kind: 'npc' }), viewer(), 2, true, false, false).hidden).toBe(false);
+  });
+
+  it('the player-nameplate toggle never governs the self plate (showOwnNameplate does)', () => {
+    const me = ent({ id: PLAYER_ID, kind: 'player' });
+    // self stays visible via showOwnNameplate even with player plates off
+    expect(plan(me, viewer({ id: PLAYER_ID }), 2, true, true, false).hidden).toBe(false);
+    // and the self overhead-emote plate still shows with player plates off
+    const meEmote = ent({ id: PLAYER_ID, kind: 'player', overheadEmoteId: 'wave' });
+    expect(plan(meEmote, viewer({ id: PLAYER_ID }), 2, true, false, false).hidden).toBe(false);
+  });
 });
 
 describe('nameplate_view - urgent (content refreshes every pass)', () => {
@@ -234,15 +265,15 @@ describe('nameplate_view - allocation-light + determinism', () => {
   it('writes into the caller-owned plan and returns that same instance (no per-call alloc)', () => {
     const out = newNameplatePlan();
     const e = ent({ pos: { x: 0, y: 0, z: 5 } });
-    const returned = nameplatePlanInto(out, e, viewer(), 2, true, false);
+    const returned = nameplatePlanInto(out, e, viewer(), 2, true, false, true);
     expect(returned).toBe(out); // same reference, reused
   });
 
   it('same input gives the same plan (pure)', () => {
     const e = ent({ pos: { x: 0, y: 0, z: 5 }, aggroTargetId: PLAYER_ID });
     const p = viewer({ comboPoints: 2, targetId: e.id });
-    const a = nameplatePlanInto(newNameplatePlan(), e, p, 2, true, false);
-    const b = nameplatePlanInto(newNameplatePlan(), e, p, 2, true, false);
+    const a = nameplatePlanInto(newNameplatePlan(), e, p, 2, true, false, true);
+    const b = nameplatePlanInto(newNameplatePlan(), e, p, 2, true, false, true);
     expect(a).toEqual(b);
   });
 });
@@ -281,8 +312,8 @@ describe('nameplate_view - Sim-vs-ClientWorld parity', () => {
       // ClientWorld-mirror-shaped: ONLY the fields the core reads, sim-only absent.
       const mirE = ent({ ...eo });
       const mirP = viewer({ ...po });
-      const simPlan = nameplatePlanInto(newNameplatePlan(), simE, simP, 2, true, false);
-      const mirPlan = nameplatePlanInto(newNameplatePlan(), mirE, mirP, 2, true, false);
+      const simPlan = nameplatePlanInto(newNameplatePlan(), simE, simP, 2, true, false, true);
+      const mirPlan = nameplatePlanInto(newNameplatePlan(), mirE, mirP, 2, true, false, true);
       expect(simPlan).toEqual(mirPlan);
     });
   }

@@ -11,6 +11,12 @@ export interface DeckStandInParentTransform extends DeckStandInAttachPoint {
   scale: number;
 }
 
+export interface DeckStandInRuntimeHandle<TVisual> {
+  cueStartSec: number | null;
+  segment: unknown | null;
+  deckStandIn: TVisual | null;
+}
+
 /** Resolve the transient visual lifecycle from the cue and local-player identity. */
 export function deckStandInAction(
   cueLive: boolean,
@@ -38,4 +44,14 @@ export function deckStandInParentTransform(
     yaw: attachPoint.yaw,
     scale: playerScale * inverseShipScale,
   };
+}
+
+/** Dispose one handle's transient visual and clear its ownership. */
+export function disposeDeckStandIn<TVisual>(
+  handle: DeckStandInRuntimeHandle<TVisual>,
+  dispose: (visual: TVisual) => void,
+): void {
+  if (!handle.deckStandIn) return;
+  dispose(handle.deckStandIn);
+  handle.deckStandIn = null;
 }

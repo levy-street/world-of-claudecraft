@@ -133,6 +133,7 @@ export class DailyRewardsWindow {
   private storeItems: WocStoreItemInput[] = [];
   private armorySections: ArmorySection[] = [];
   private armoryInspect: ArmoryInspect | null = null;
+  private armoryGraphicsRestoreSkinId: string | null = null;
   private storeLoading = false;
   private storeReady = false;
   private storeError = false;
@@ -163,6 +164,22 @@ export class DailyRewardsWindow {
   async prewarmArmoryPreview(): Promise<void> {
     if (!this.storeEnabled()) return;
     await this.ensureArmoryInspect().prewarm(WEAPON_SKIN_LIST.map((skin) => skin.id));
+  }
+
+  /** Dispose the profile-bound Armory context; the next open rebuilds it lazily. */
+  resetArmoryPreviewForGraphicsRebuild(): void {
+    this.armoryGraphicsRestoreSkinId = this.armoryInspect?.openSkinId ?? null;
+    this.armoryInspect?.destroy();
+    this.armoryInspect = null;
+  }
+
+  /** Reopen an inspect overlay that was visible when its old profile context was reset. */
+  restoreArmoryPreviewAfterGraphicsRebuild(): void {
+    const skinId = this.armoryGraphicsRestoreSkinId;
+    this.armoryGraphicsRestoreSkinId = null;
+    if (!skinId || !this.isOpen) return;
+    const row = this.armoryRowById(skinId);
+    if (row) this.openArmoryInspect(row);
   }
 
   toggle(): void {
@@ -218,6 +235,12 @@ export class DailyRewardsWindow {
     let history: DailyRewardHistory = { payouts: [] };
     try {
       status = await this.deps.world().dailyRewards();
+      if (status.enabled === false) {
+        if (!this.isOpen || seq !== this.renderSeq) return;
+        this.deps.onStatus?.(status);
+        this.paint(buildDailyRewardsView({ kind: 'status', status, history }));
+        return;
+      }
       history = await this.deps.world().dailyRewardHistory();
     } catch (err) {
       const message = err instanceof Error ? err.message : 'daily rewards unavailable';
@@ -353,6 +376,7 @@ export class DailyRewardsWindow {
       cosmetics: world.accountCosmetics,
       cls: player.templateId,
       mainhandItemId: player.mainhandItemId,
+      skinCatalog: player.skinCatalog,
     });
   }
 
@@ -627,6 +651,10 @@ export class DailyRewardsWindow {
     }
     if (view.kind === 'error') {
       body.innerHTML = `<div class="dr-empty dr-error" role="alert">${esc(t('hudChrome.dailyRewards.error'))}</div>`;
+      return;
+    }
+    if (view.kind === 'disabled') {
+      body.innerHTML = `<div class="dr-empty" role="status">${esc(t('hudChrome.dailyRewards.disabled'))}</div>`;
       return;
     }
     body.innerHTML =

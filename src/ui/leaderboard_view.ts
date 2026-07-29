@@ -27,6 +27,10 @@ export interface LeaderboardViewer {
   name: string;
   level: number;
   lifetimeXp: number;
+  /** The viewer's own guild display name ('' or null when unguilded), for the
+   *  off-page "your standing" row. Read off the passive Entity.guild field the
+   *  host stamps, so it is always empty offline. */
+  guild: string | null;
   /** The viewer's own selected Book of Deeds title as a DEED ID (null untitled);
    *  the painter localizes it through deed_i18n.ts (the sticky-standing cell). */
   title: string | null;
@@ -46,6 +50,10 @@ export interface LeaderboardRow {
   /** The selected Book of Deeds title as a DEED ID (null untitled); the
    *  painter localizes through deed_i18n.ts (the Renown-tab cell treatment). */
   title: string | null;
+  /** The ranked player's guild name, null when unguilded; the painter renders it
+   *  beside the name in the `<Guild>` treatment (never localized: it is a
+   *  player-authored display name). */
+  guild: string | null;
   me: boolean;
 }
 
@@ -58,6 +66,9 @@ export interface LeaderboardStanding {
   /** The viewer's selected Book of Deeds title as a DEED ID (null untitled); the
    *  painter localizes through deed_i18n.ts (the row-cell treatment). */
   title: string | null;
+  /** The viewer's guild name, null when unguilded, so the sticky row carries the
+   *  same `<Guild>` tag a ranked row does. */
+  guild: string | null;
 }
 
 /** Prev/Next pager state. Null when the whole board fits on one page. */
@@ -118,6 +129,9 @@ export function buildLeaderboardView(input: LeaderboardInput): LeaderboardView {
     lifetimeXp: e.lifetimeXp,
     prestigeRank: e.prestigeRank,
     title: e.title ?? null,
+    // Normalized to null for the two "unguilded" wire shapes (absent, or the
+    // empty string the passive display field carries offline).
+    guild: e.guild ? e.guild : null,
     me: e.name === viewer.name,
   }));
   const onPage = rows.some((r) => r.me);
@@ -129,6 +143,7 @@ export function buildLeaderboardView(input: LeaderboardInput): LeaderboardView {
         virtualLevel: virtualLevel(viewer.lifetimeXp),
         lifetimeXp: viewer.lifetimeXp,
         title: viewer.title,
+        guild: viewer.guild ? viewer.guild : null,
       };
   const pager: LeaderboardPager | null =
     page.pageCount <= 1

@@ -12,6 +12,7 @@ const OPEN: CharBagsPairingState = {
   bagsShown: true,
   bankOpen: false,
   vendorOpen: false,
+  marketOpen: false,
 };
 
 describe('charBagsPaired', () => {
@@ -28,8 +29,9 @@ describe('charBagsPaired', () => {
     expect(charBagsPaired({ ...OPEN, bagsShown: false })).toBe(false);
   });
 
-  it('stands down for the bank and vendor clusters, which own the bags companion', () => {
+  it('stands down for the bank, vendor, and market clusters, which own the bags companion', () => {
     expect(charBagsPaired({ ...OPEN, bankOpen: true })).toBe(false);
     expect(charBagsPaired({ ...OPEN, vendorOpen: true })).toBe(false);
+    expect(charBagsPaired({ ...OPEN, marketOpen: true })).toBe(false);
   });
 });

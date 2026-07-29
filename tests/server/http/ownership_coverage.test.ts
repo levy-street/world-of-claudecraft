@@ -10,7 +10,7 @@
 // account-owned :id route in the registry actually MOUNTS an account-scoped owner
 // loader that DENIES a non-owned / absent id with a 404 (deny-by-default), before
 // the handler's success body is ever produced. It is the load-bearing BOLA
-// coverage test the packet leans on: a route that carried the marker but forgot to
+// coverage test: a route that carried the marker but forgot to
 // mount requireOwnedCharacter would ship a cross-account read hole that the
 // metadata check waves through; this sweep turns that into a red test.
 //
@@ -158,8 +158,10 @@ function installFakeRuntime(): void {
     takeOverCharacter: vi.fn(async () => 'not-online' as const),
     rekeyMarketSeller: vi.fn(() => false),
     saveMarket: vi.fn(async () => {}),
+    purgeMarketSeller: vi.fn(() => false),
     rekeyMailOwner: vi.fn(() => false),
     saveMail: vi.fn(async () => {}),
+    purgeMailOwner: vi.fn(() => false),
     // The fresh-character state is never serialized on the deny path; a bare object
     // is enough to satisfy the type for any handler that does run (negative control).
     initialCharacterState: vi.fn(
@@ -319,7 +321,10 @@ const ADMIN_VALIDATION_FAILED = { success: false, data: null, error: 'validation
 // so the gate's fail-closed staff check is the one that must refuse it.
 function installNonAdminDb(): void {
   setAdminDbForTests({
-    accountForToken: async () => NON_ADMIN_ACCOUNT_ID,
+    accountAndScopeForToken: async () => ({
+      accountId: NON_ADMIN_ACCOUNT_ID,
+      scope: 'full' as const,
+    }),
     adminRolesForAccount: async () => null,
   });
 }
@@ -329,9 +334,29 @@ function installNonAdminDb(): void {
 // operator identity.
 function installAdminDb(): void {
   setAdminDbForTests({
-    accountForToken: async () => CALLER_ACCOUNT_ID,
+    accountAndScopeForToken: async () => ({
+      accountId: CALLER_ACCOUNT_ID,
+      scope: 'full' as const,
+    }),
     adminRolesForAccount: async () => ({ username: 'op', roles: ['superadmin'] }),
   });
+}
+
+// Install a staff-owned read token. The token must be denied before the role
+// resolver is consulted, regardless of which protected admin route was matched.
+function installReadAdminDb() {
+  const adminRolesForAccount = vi.fn(async () => ({
+    username: 'op',
+    roles: ['superadmin'],
+  }));
+  setAdminDbForTests({
+    accountAndScopeForToken: async () => ({
+      accountId: CALLER_ACCOUNT_ID,
+      scope: 'read' as const,
+    }),
+    adminRolesForAccount,
+  });
+  return { adminRolesForAccount };
 }
 
 // Run a route's chain UNDER withErrors (surface 'admin'), so requireAdminTarget's
@@ -518,7 +543,7 @@ describe('admin auth-mounting sweep: every non-login admin route 401s an unauthe
   for (const route of authedAdminRoutes) {
     it(`refuses an unauthenticated ${route.method} ${route.path} with the legacy admin 401 before the handler`, async () => {
       // No authorization header at all: the gate must 401 db-free (bearerToken is
-      // null, so accountForToken is never consulted) and short-circuit the chain.
+      // null, so accountAndScopeForToken is never consulted) and short-circuit the chain.
       const ctx = fakeCtx({
         method: route.method,
         url: concretePath(route.path),
@@ -555,6 +580,37 @@ describe('admin auth-mounting sweep: every non-login admin route 401s an unauthe
   });
 });
 
+describe('admin scope sweep: every non-login admin route rejects a read token', () => {
+  beforeEach(() => {
+    configureAdminRuntime({} as AdminRuntime);
+  });
+
+  afterEach(() => {
+    resetAdminDbForTests();
+    resetAdminRuntimeForTests();
+    vi.restoreAllMocks();
+  });
+
+  for (const route of authedAdminRoutes) {
+    it(`refuses a read-scoped ${route.method} ${route.path} before roles or the handler`, async () => {
+      const { adminRolesForAccount } = installReadAdminDb();
+      const ctx = fakeCtx({
+        method: route.method,
+        url: concretePath(route.path),
+        headers: { authorization: `Bearer ${VALID_TOKEN}` },
+        params: { id: REQUESTED_ID, action: 'suspend' },
+      });
+
+      const { res, handler } = await runRouteWithErrors(route, ctx);
+
+      expect(res.statusCode).toBe(401);
+      expect(handler).not.toHaveBeenCalled();
+      expect(adminRolesForAccount).not.toHaveBeenCalled();
+      expect(JSON.parse(res.body)).toEqual(ADMIN_AUTH_REQUIRED);
+    });
+  }
+});
+
 // -------------------------------------------------------------------------
 // Internal secret-gate mounting sweep.
 //
@@ -573,8 +629,8 @@ describe('admin auth-mounting sweep: every non-login admin route 401s an unauthe
 // A negative control proves the sweep detects a route that forgot the gate.
 // -------------------------------------------------------------------------
 
-// Every registered internal-surface route (all 14 are secret-gated; there is no
-// anonymous internal route).
+// Every registered internal-surface route (every one is secret-gated; there is
+// no anonymous internal route).
 const internalSurfaceRoutes: RouteDef[] = apiRoutes.filter((route) => route.surface === 'internal');
 
 // The legacy fail() bodies the gates write (byte-parity with server/internal.ts
@@ -649,8 +705,11 @@ describe('internal secret-gate mounting sweep: every /internal route is gated', 
     vi.restoreAllMocks();
   });
 
-  it('selects the full 18-route internal surface (the handleInternalApi 12 + the 6 ops routes)', () => {
-    // The ops family includes four payout-service routes and two moderation mutations.
+  it('selects the full 18-route internal surface (handleInternalApi 9 + 7 ops + flex-batch + outbox)', () => {
+    // The ops family includes finalization, four payout-service routes, and two moderation mutations.
+    // flex-batch and outbox are registry-only (no legacy arm) but still ride the same Discord secret
+    // gate, so the sweep below generates their unset-env and wrong-secret cases like every other route.
+    // The retired relay/activity/winners GETs (#2791) are absent from the registry entirely.
     expect(internalSurfaceRoutes.length).toBe(18);
   });
 

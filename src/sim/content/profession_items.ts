@@ -1,4 +1,4 @@
-// Phase 10 profession materials: dedicated corpse-harvest components, their
+// Profession materials: dedicated corpse-harvest components, their
 // rare Pristine specimen counterparts, and the cheap master-stocked craft
 // reagents. Merged into ITEMS by data.ts (mergeItems), same pattern as
 // ZONE2_ITEMS.
@@ -49,6 +49,20 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 4,
   },
+  sharp_claw: {
+    id: 'sharp_claw',
+    name: 'Sharp Claw',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 5,
+  },
+  curved_tusk: {
+    id: 'curved_tusk',
+    name: 'Curved Tusk',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 5,
+  },
 
   // --- Pristine specimens (HARVEST_COMPONENT_SPECIMENS) --------------------
   // The signed jackpot a rare-or-better corpse-harvest rarity roll grants IN
@@ -75,6 +89,21 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     kind: 'junk',
     quality: 'rare',
     sellValue: 30,
+  },
+  // claw joins hide/silk/venomSac/meat with a specimen: fen_troll (claw, tusk)
+  // and old_greyjaw (hide, fang, claw) would otherwise carry TWO
+  // specimen-less families on one corpse (fang+claw, or claw+tusk), which
+  // breaks the capacity pre-gate's one-specimen-less-family-per-corpse
+  // premise (tests/corpse_harvest_sim.test.ts, "no corpse tags two
+  // specimen-less harvest families together"). tusk stays specimen-less,
+  // same as fang/cloth: it never shares a corpse with another specimen-less
+  // family once claw has its own.
+  pristine_claw: {
+    id: 'pristine_claw',
+    name: 'Pristine Claw',
+    kind: 'junk',
+    quality: 'rare',
+    sellValue: 25,
   },
   prime_cut: {
     id: 'prime_cut',
@@ -130,7 +159,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     buyValue: 12,
   },
 
-  // --- Phase 10 crafted weapon ladder (weaponcrafting) ---------------------
+  // --- Crafted weapon ladder (weaponcrafting) ------------------------------
   // Trainer-taught outputs of LADDER_RECIPES (content/recipes.ts), three rungs
   // at skillReq 0/25/50. Stats and values were budgeted against real weapon
   // comparables; never vendor-stocked (no buyValue), and every crafted output's
@@ -197,7 +226,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   },
   thorium_warblade: {
     id: 'thorium_warblade',
-    name: 'Thorium Warblade',
+    name: 'Osmium Warblade',
     kind: 'weapon',
     slot: 'mainhand',
     quality: 'rare',
@@ -207,7 +236,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   },
   arcanite_war_axe: {
     id: 'arcanite_war_axe',
-    name: 'Arcanite War Axe',
+    name: 'Glyphsteel War Axe',
     kind: 'weapon',
     slot: 'mainhand',
     quality: 'rare',
@@ -217,7 +246,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   },
   elderwood_battle_staff: {
     id: 'elderwood_battle_staff',
-    name: 'Elderwood Battle Staff',
+    name: 'Highpine Battle Staff',
     kind: 'weapon',
     slot: 'mainhand',
     quality: 'rare',
@@ -226,7 +255,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     sellValue: 285,
   },
 
-  // --- Phase 10 crafted armor ladder (armorcrafting) -----------------------
+  // --- Crafted armor ladder (armorcrafting) --------------------------------
   // Trainer-taught outputs of LADDER_RECIPES, three rungs at skillReq 0/25/50.
   // All mail. Armor and primary stats sit on the repo budget formula
   // (src/sim/item_budget.ts) per the ladder design notes; common-rung pieces
@@ -294,7 +323,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   },
   thoriumscale_greathelm: {
     id: 'thoriumscale_greathelm',
-    name: 'Thoriumscale Greathelm',
+    name: 'Osmiumscale Greathelm',
     kind: 'armor',
     armorType: 'mail',
     slot: 'helmet',
@@ -304,7 +333,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   },
   thoriumscale_cuirass: {
     id: 'thoriumscale_cuirass',
-    name: 'Thoriumscale Cuirass',
+    name: 'Osmiumscale Cuirass',
     kind: 'armor',
     armorType: 'mail',
     slot: 'chest',
@@ -314,7 +343,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   },
   thoriumscale_leggings: {
     id: 'thoriumscale_leggings',
-    name: 'Thoriumscale Leggings',
+    name: 'Osmiumscale Leggings',
     kind: 'armor',
     armorType: 'mail',
     slot: 'legs',
@@ -323,7 +352,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     sellValue: 350,
   },
 
-  // --- Phase 10 crafted cloth ladder (tailoring) ---------------------------
+  // --- Crafted cloth ladder (tailoring) ------------------------------------
   // Trainer-taught outputs of LADDER_RECIPES (content/recipes.ts), three rungs
   // at skillReq 0/25/50, loom-bound at weaver_ottilie. Caster cloth (int/spi)
   // plus one bag upgrade; common-rung pieces are armor-only (common quality
@@ -352,7 +381,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   },
   silverthread_slippers: {
     id: 'silverthread_slippers',
-    name: 'Silverthread Slippers',
+    name: 'Palethread Slippers',
     kind: 'armor',
     armorType: 'cloth',
     slot: 'feet',
@@ -362,7 +391,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   },
   goldweave_robe: {
     id: 'goldweave_robe',
-    name: 'Goldweave Robe',
+    name: 'Gildenweave Robe',
     kind: 'armor',
     armorType: 'cloth',
     slot: 'chest',
@@ -372,7 +401,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   },
   goldweave_leggings: {
     id: 'goldweave_leggings',
-    name: 'Goldweave Leggings',
+    name: 'Gildenweave Leggings',
     kind: 'armor',
     armorType: 'cloth',
     slot: 'legs',
@@ -419,7 +448,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     sellValue: 260,
   },
 
-  // --- Phase 10 crafted leather ladder (leatherworking) --------------------
+  // --- Crafted leather ladder (leatherworking) -----------------------------
   // Trainer-taught outputs of LADDER_RECIPES, three rungs at skillReq 0/25/50,
   // tannery-bound at tanner_hesk. Agi/sta melee leather, complementing the
   // existing int/spi leather pieces. Common-rung pieces are armor-only. Never
@@ -516,7 +545,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     sellValue: 78,
   },
 
-  // --- Phase 10 crafted cooking ladder (cooking) ---------------------------
+  // --- Crafted cooking ladder (cooking) ------------------------------------
   // Trainer-taught outputs of LADDER_RECIPES (content/recipes.ts), three rungs
   // at skillReq 0/25/50, kitchens-bound at cook_marlow. kind 'food' + foodHp
   // (an 18s sit heal); no new effect machinery. Every foodHp/sellValue reuses
@@ -596,19 +625,22 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     sellValue: 150,
   },
 
-  // --- Phase 10 crafted alchemy ladder (alchemy) ---------------------------
+  // --- Crafted alchemy ladder (alchemy) ------------------------------------
   // Trainer-taught outputs of LADDER_RECIPES (content/recipes.ts), three rungs
   // at skillReq 0/25/50, apothecary-bound at alchemist_verane. Potions reuse the
   // vendor potionHp/potionMana machinery (instant, in-combat, shared cooldown);
   // elixirs reuse the elixir_of_the_bear shape (a temporary buff_sta aura on
-  // use). Every consumable sits inside the existing ceilings: heal <= 280
-  // (healing_potion), mana <= 360 (mana_potion), elixir buff_sta <= 12 for <=
-  // 900s (elixir_of_the_bear). The three elixir aura display names are localized
-  // client-side through the sim_i18n aura matcher (AURA_NAME_KEY), the same path
-  // as 'Might of the Bear'. Never vendor-stocked (no buyValue).
+  // use). Every rung strictly EXCEEDS its vendor-tier equivalent in items.ts
+  // (minor/lesser/healing_potion, minor/lesser/mana_potion; #1608 retuned that
+  // ladder, so this one moved in lockstep to stay a strict upgrade): heal <= 335
+  // (healing_potion's 320 + headroom), mana <= 425 (mana_potion's 410 +
+  // headroom), elixir buff_sta <= 12 for <= 900s (elixir_of_the_bear). The three
+  // elixir aura display names are localized client-side through the sim_i18n
+  // aura matcher (AURA_NAME_KEY), the same path as 'Might of the Bear'. Never
+  // vendor-stocked (no buyValue).
   silverleaf_healing_draught: {
     id: 'silverleaf_healing_draught',
-    name: 'Silverleaf Healing Draught',
+    name: 'Sheenleaf Healing Draught',
     kind: 'potion',
     quality: 'common',
     potionHp: 120,
@@ -616,7 +648,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   },
   silverleaf_mana_draught: {
     id: 'silverleaf_mana_draught',
-    name: 'Silverleaf Mana Draught',
+    name: 'Sheenleaf Mana Draught',
     kind: 'potion',
     quality: 'common',
     potionMana: 160,
@@ -648,10 +680,10 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   },
   venomfire_elixir: {
     id: 'venomfire_elixir',
-    name: 'Venomfire Elixir',
+    name: 'Vipersear Elixir',
     kind: 'elixir',
     quality: 'uncommon',
-    elixir: { aura: 'Venomfire Vigor', kind: 'buff_sta', value: 9, duration: 900 },
+    elixir: { aura: 'Vipersear Vigor', kind: 'buff_sta', value: 9, duration: 900 },
     sellValue: 15,
   },
   sunpetal_healing_draught: {
@@ -659,7 +691,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     name: 'Sunpetal Healing Draught',
     kind: 'potion',
     quality: 'rare',
-    potionHp: 280,
+    potionHp: 335,
     sellValue: 32,
   },
   sunpetal_mana_draught: {
@@ -667,7 +699,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     name: 'Sunpetal Mana Draught',
     kind: 'potion',
     quality: 'rare',
-    potionMana: 360,
+    potionMana: 425,
     sellValue: 32,
   },
   elixir_of_the_serpent: {

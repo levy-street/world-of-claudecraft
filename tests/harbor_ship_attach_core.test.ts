@@ -193,9 +193,9 @@ describe('harbor ship attachment wiring', () => {
     expect(attachFrameSource).not.toContain('handle.group.rotation');
     expect(attachFrameSource).not.toContain('handle.group.matrixAutoUpdate');
 
-    const updateSource = functionSource('updateHarborShips');
-    expect(updateSource).toMatch(
-      /if \(handle\.cueStartSec === null \|\| handle\.segment === null\) continue;\n {4}handle\.group\.matrixAutoUpdate = true;/,
+    const updateSource = functionSource('updateHarborShipMotion');
+    expect(updateSource).toContain(
+      'if (handle.cueStartSec !== null && handle.segment !== null) {\n    handle.group.matrixAutoUpdate = true;',
     );
     expect(updateSource).toContain(
       'const frame = composeHarborShipAttachFrame(handle, pose, SHIP_UPDATE_FRAME);',
@@ -206,30 +206,17 @@ describe('harbor ship attachment wiring', () => {
     expect(updateSource).toContain('handle.group.rotation.y = frame.yaw;');
   });
 
-  it('routes live cues through the pending cue core', () => {
+  it('routes cues through the executable pending-cue registry', () => {
     const cueSource = functionSource('cueHarborShip');
-    expect(cueSource).toContain('SHIP_CUE_STATE.routeCue(');
-    expect(cueSource).toContain('handle !== undefined');
-    expect(cueSource).toContain('if (!handle) return;');
-    expect(cueSource).toMatch(/if \(!resolved\) \{\n {4}resetShip\(handle\);\n {4}return;\n {2}\}/);
-    expect(cueSource).toContain('handle.segment = resolved.segment;');
-    expect(cueSource).toContain('handle.cueStartSec = resolved.cueStartSec;');
+    expect(cueSource).toContain('SHIP_CUES.cue(target, cue);');
   });
 
-  it('applies the pending cue core result after ship registration', () => {
+  it('registers built ship handles with the executable pending-cue registry', () => {
     const buildSource = functionSource('buildShip');
-    expect(buildSource).toContain('SHIPS.set(target, handle);');
-    expect(buildSource).toContain('const pending = SHIP_CUE_STATE.consumePending(target);');
-    expect(buildSource).toContain('handle.segment = pending.segment;');
-    expect(buildSource).toContain('handle.cueStartSec = pending.cueStartSec;');
-    expect(buildSource).toContain('handle.group.matrixAutoUpdate = true;');
-    expect(buildSource).not.toContain('resetShip(handle)');
+    expect(buildSource).toContain('SHIP_CUES.register(target, handle);');
   });
 
-  it('clears pending cue state from both lifecycle reset paths', () => {
-    expect(functionSource('resetHarborShipCues')).toContain('SHIP_CUE_STATE.clearPending();');
-    expect(HARBOR_SOURCE).toContain(
-      'SHIPS.clear();\n  // World rebuilds must discard cues recorded against the prior harbor handles.\n  SHIP_CUE_STATE.clearPending();',
-    );
+  it('clears pending cues during scene reset', () => {
+    expect(functionSource('resetHarborShipCues')).toContain('SHIP_CUES.resetAll();');
   });
 });

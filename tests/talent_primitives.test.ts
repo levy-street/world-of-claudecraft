@@ -366,7 +366,20 @@ describe('talent primitive P3: empower next', () => {
     // so the free charge must not be consumed at cast start or the player would
     // pay full price anyway. Regression for the start-consume bug.
     const { sim, p } = makeSim('mage');
-    spawnTarget(sim, p);
+    // A STATIONARY target: a wandering wolf can stroll behind the market
+    // furniture during the cast plus flight, and this test is about the
+    // billing, not about town sight lines.
+    const dummy = createMob(sim.nextId++, MOBS.training_dummy, 20, {
+      x: p.pos.x,
+      y: p.pos.y,
+      z: p.pos.z + 4,
+    });
+    dummy.maxHp = 50000;
+    dummy.hp = 50000;
+    dummy.hostile = true;
+    sim.addEntity(dummy);
+    p.facing = Math.atan2(dummy.pos.x - p.pos.x, dummy.pos.z - p.pos.z);
+    sim.targetEntity(dummy.id, p.id);
     p.resource = 0;
     p.auras.push(aura('next_cast_free'));
 

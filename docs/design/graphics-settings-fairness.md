@@ -21,6 +21,16 @@ ACTIONABLE (must be identical across every tier; never tiered):
 - The target / boss cast bar. Interrupt timing depends on it.
 - Target HP at a usable granularity (execute thresholds, is-it-dead).
 - Enemy / aggro positions a player acts on.
+- The fishing bobber and its bite state. The reel window is a timed reaction; the bite
+  affordance must read identically on every preset (splash richness may vary, the state
+  may not).
+- The minimap and zone-map gather-node markers: spotting, the per-viewer ready/cooldown
+  state, and the lock strike (the non-hue lock cue), plus the node tooltip's respawn
+  countdown and fine-grade preview lines. Both surfaces (`minimap_markers` /
+  `minimap_painter` and `map_window_view` / `map_window_painter`) are pinned
+  profile-free by `tests/professions_graphics_fairness.test.ts`.
+- The node prop tier ladder in the 3D world (`nodeTierScale`): tier is actionable
+  information expressed as SIZE, static on every preset.
 
 COSMETIC (may be tiered down on lower presets):
 - Floating combat text volume and lifetime (the live-floater cap and how long each number
@@ -33,6 +43,22 @@ COSMETIC (may be tiered down on lower presets):
 - Buff-icon overflow when the bar is full. A buff is active whether or not its icon is on
   screen, so hiding a buff icon removes no actionable information.
 - Portrait and HP-bar redraw smoothness within human reaction tolerance (about 200 ms).
+- Weapon-skin VFX richness (`src/render/weapon_vfx_shed_core.ts`). The rarity rig on a
+  VFX-bearing weapon skin (glow, motes, aurora, shell, cast light) FADES on two inputs.
+  Neither reaches zero: what removes a rig is the character LOD swap, which replaces the whole
+  articulated rig with one baked mesh and is shared by the entire render path. The fade exists
+  so that removal is not a pop.
+  - VIEWER DISTANCE, measured against `CHARACTER_LOD_RANGE_SQ`, the articulated-rig range
+    BEFORE the crowd and per-tier factors scale it. Deliberately that fixed constant and not
+    the live band edge: the live edge reads a per-client, per-frame count of visible rigs, so
+    a fade keyed to it would pulse as unrelated players wander past a viewer's frustum and
+    would differ between two viewers standing in the same spot. Against the constant this arm
+    is identical for every player on every preset.
+  - The frame-budget governor's `vfx` bucket, the same lever the pooled particle cloud and the
+    ability VFX already answer to, floored at `WEAPON_VFX_GOVERNOR_FLOOR`. It is the one input
+    that differs between two players looking at the same wearer, and it can only dim.
+  What is faded is decoration ON a weapon. The wearer, their nameplate, their cast bar, their
+  auras, their position and the weapon model itself are untouched at every scale.
 
 The test for any new tier knob: if a knob hides or delays something a player READS AND REACTS
 TO, it is not allowed. If it only reduces visual richness or redraw smoothness, it is fine.
@@ -57,16 +83,20 @@ What each knob does, and why it is gameplay-neutral:
   instead of 10 Hz. Cosmetic: the minimap never draws enemy players (only PvE aggro mobs and
   allies), and the same aggro signal is full-rate in the 3D world and on nameplates.
 - Auras, `src/ui/auras_painter.ts`: on low, the visible-count cap is DEBUFF-PRIORITY. The
-  player buff bar (`createAurasView('all')`) interleaves buffs and debuffs in sim-application
-  order; the cap sheds BUFF overflow only (`if (!s.isDebuff && rendered >= cap) continue`), so
-  a debuff is never culled. Full tiers are byte-identical (cap is +Infinity). The aura strip
-  also coarsens its repaint cadence to about 4 Hz on low (at the human reaction floor and the
-  same rate the party frames run at on every tier).
+  player's own buff bar (`createAurasView('buffs')`) and debuff bar (`createAurasView('debuffs')`)
+  are two separate view instances; the cap sheds BUFF overflow only
+  (`if (!s.isDebuff && rendered >= cap) continue`), so a debuff is never culled. Full tiers are
+  byte-identical (cap is +Infinity). The player's OWN buff and debuff bars are never tier-gated:
+  they repaint every frame on every preset, because your own debuffs are the ACTIONABLE read
+  named above. The TARGET's (non-self) debuffs strip (`createAurasView('all')`, which
+  interleaves buffs and debuffs in sim-application order) is likewise never tier-gated: it can
+  carry a purgeable buff, an allied maintained buff, or a group-coordinated foreign debuff that a
+  player reacts to, so it repaints every frame on every preset just like the player's own bars.
 - Target frame, hud + `unit_frame_painter.ts`: on low, the target frame BODY (HP / level /
   portrait) refreshes at about 10 Hz; a target SWAP bypasses the throttle
-  (`nonSelfRepaintDue`), and the cast bar is painted OUTSIDE the throttle (full rate, so
-  interrupt timing is never degraded). Cosmetic: 100 ms is below the reaction loop and target
-  HP is a coarse read.
+  (`nonSelfRepaintDue`), and the cast bar and the debuffs strip are both painted OUTSIDE the
+  throttle (full rate, so interrupt timing and target aura reads are never degraded). Cosmetic:
+  100 ms is below the reaction loop and target HP is a coarse read.
 - Party frames: deliberately NOT tiered. Party-member HP is a healer's only actionable signal,
   so it stays on the 4 Hz mediumHud band for EVERY tier. (An earlier draft throttled it to
   2 Hz on low; the re-audit removed that. The perf win was illusory anyway, because
@@ -87,6 +117,30 @@ Commits on `feature/frontend-modernization-v016`: `8aba739d` (aura debuff-priori
 `ae619faf` (party full-rate + the `nonSelfRepaintDue` swap-bypass), `82721b18` (minimap token
 cache), `119b47fa` (FCT drop-kind uniformity test), `4915b6b7` (docs).
 
+### The world map's open-sea limit (2026-08-03)
+
+Not a graphics-preset shed, but the same question asked of a MAP read, and the answer landed
+somewhere worth recording: the map now marks the swim-fatigue limit LESS than it used to, on
+purpose.
+
+The zone map used to colour water with two palettes a stark distance apart, split by the sim's
+swim-fatigue predicate (`inHollowOpenSea`): safe water light, the lethal open sea near-navy.
+That predicate is a rectangle test, so the two met at a hard straight step through open water
+and the map read as a lighter box pasted on a flat sea. The sea is now one shallow-to-deep ramp
+that the limit's nearness walks (`src/ui/map_open_sea_edge_core.ts`, consumed by
+`map_terrain.ts`), and the boundary is not drawn at all.
+
+That is defensible because the map was never the load-bearing signal. `src/sim/fatigue.ts`
+raises an on-screen error toast the moment a swimmer crosses, repeats it every 4 seconds, logs
+it, and gives 8 seconds of grace before the first damage pulse: real time to turn around,
+delivered to a player who is looking at the world rather than at the map. A rule drawn across
+open water restated that worse, for the cost of a straight line through the sea.
+
+The rule this leaves behind: check WHERE a signal actually reaches the player before treating a
+cosmetic surface as though it carried the read. `tests/map_terrain.test.ts` pins the outcome in
+both directions, including that no pixel near the limit is drawn brighter than the water inside
+it, so the boundary cannot creep back in as decoration.
+
 ## Enforcing guards
 
 - `tests/auras_painter.test.ts`: a debuff past the buff cap still renders; an all-debuff bar
@@ -96,6 +150,11 @@ cache), `119b47fa` (FCT drop-kind uniformity test), `4915b6b7` (docs).
   governor; a source-scan pins that party frames are not tiered.
 - `tests/architecture.test.ts`: `ui_tier_knobs.ts` is a registered UI_PURE_CORE (no governor,
   DOM, or render import).
+- `tests/professions_graphics_fairness.test.ts`: the professions actionable set (the fishing
+  bobber pair, the minimap markers and painter, the node tooltip, the node prop ladder) is
+  scanned profile- and governor-free with comment-stripped sources, the tier ladder is
+  literal-pinned and proven applied on the built meshes, and the cosmetic set (LOW_FOG's
+  scenery shed, splash richness) is named beside it.
 - `scripts/perf_tour.mjs` per-tier run: `hudHotDomWrites` pinned across tiers (byte-equivalence)
   and the FCT cap engaging per tier.
 - `tests/snapshots.test.ts`: a real Sim aura to `wireEntity` to `ClientWorld` round trip pins that
@@ -108,6 +167,32 @@ cache), `119b47fa` (FCT drop-kind uniformity test), `4915b6b7` (docs).
   cap path for the sap).
 - `tests/auras_view.test.ts`: `isAuraDebuff` classifies a negative-value `buff_*` sap identically
   for the Sim aura and its `ClientWorld` mirror.
+- `tests/weapon_vfx_shed.test.ts`: the weapon-skin fade. Neither arm reaches zero and the
+  lever's floor is proven to stay clear of the multiplier at which a part would stop drawing,
+  so the fade can never be mistaken for a cull; the distance arm is anchored to the fixed
+  `CHARACTER_LOD_RANGE_SQ` rather than the live band edge, and the policy is scanned free of
+  any tier, preset or device-profile input and pinned to its two arguments; the applied fade is
+  proven to dim the rig light WITHOUT clearing its `visible` flag, because three counts visible
+  point lights into every lit material's program cache key and dropping one is the open-world
+  recompile freeze; and the far-LOD skip is pinned to require a baked stand-in mesh, since
+  `setFar` leaves the rig drawing when there is none.
+- `tests/drape_lod_core.test.ts`: the ground-VFX drape LOD reads viewer distance and the mark's
+  own geometry only (pinned to its two arguments), every sample it takes is one the exact drape
+  would also have taken, and the marks it is allowed to thin at all are bounded by a world-space
+  sample-spacing cap, so no mark's footprint, radius or position can move with it.
+- `tests/ability_vfx_stun_stars.test.ts`: the overhead stunned-star band (the "why can't I act"
+  tell, keyed off aura kind so every stun source reads) occupies the FIRST overlay slots, draws
+  identically at vfx quality 0, holds an alpha floor for the aura's whole life, and is bounded
+  by a band cap instead of a tier shed. The cap ranks bands in front of the camera ahead of
+  ones behind it, which is a fairness rule and not just polish: character self-culling is
+  enabled only on the tier that casts no sun shadow (`GFX.dynamicShadows` ->
+  `cullCharacters`), so on medium and above every stunned entity in interest range competes
+  for a slot, behind-camera ones included, while on low the offscreen non-actionable ones are
+  slept first. Ranking on raw camera distance would let a medium-tier player lose an on-screen
+  stun read that a low-tier player keeps. A band that still loses its slot is not dark: the
+  cast-moment sequence stands down only for bands that WON a slot, so a dropped one keeps
+  reading through the burst. Pinned skips: a dead body, a frustum-culled non-actionable rig,
+  and a cast-moment sequence for a band that is actually being drawn.
 
 ## Resolved: negative-value stat-sap auras now classify as debuffs in both worlds
 

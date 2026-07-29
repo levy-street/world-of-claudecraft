@@ -185,6 +185,120 @@ close to the reference (the skinmodel lane's redesigns are, by construction);
 review the clip previews for weight bleed on outlier silhouettes. Run `qa
 --job` after, like every lane.
 
+## Fit Studio (designer anchors for modular hair + piercings)
+```
+node scripts/asset_pipeline/pipeline.mjs fit [--port 5184] [--no-open]
+```
+A full studio app over the modular character. Server: `lib/fit_studio.mjs` (cached at start,
+restart after editing IT; walks the port forward if 5184 is taken and prints the real URL).
+Page: `fit_studio/`, plain ES modules read per request, so edits show on a reload:
+`index.html` + `style.css` (design system), `main.js` (shell/orchestration), `ui.js`
+(widgets: drag-scrub number fields, sliders, swatch grids, toasts, sections, prefs in
+localStorage), `history.js` (undo/redo), `viewport.js` (renderer/lights/camera),
+`character.js` (GLB, worn state, morphs, appearance), `anchors.js` (gizmo + save),
+`sculpt.js` (body brushes), `hairbrush.js` (shape brushes over the selected
+hair sculpt).
+
+Layout: library rail (search box; hair sculpts from `tmp/modular/hair_src/`, `E2_` jewellery
+sets from the GLB, body sculpt; green dot = anchored, amber = unsaved edits) · viewport
+(view pills 1 to 6/F, ghost/grid/wireframe/turntable/screenshot toggles, live TRS readout,
+double-click = orbit focus) · inspector tabs **Fit / Character / Scene** · top bar (G/R/S
+gizmo modes, X space, snap, uniform scale, undo/redo, Save `⌘S` with dirty state) · status
+bar (anchored counts, sculpt delta count, GLB tag, fps). `?` opens the shortcut sheet.
+
+**Fit tab**: numeric TRS fields (drag to scrub, click to type, ⇧ fine), arrow-key nudges
+(X/Y, ⌥=Z, ⇧ fine), copy/paste a placement between styles of the same kind, "Saved" reloads
+the saved anchor, Remove anchor returns the style to the solver. Sway segmented control
+(auto/on/off) per hair style; jewellery gets the material preset swatch grid + hue/light
+tint (twinned with `JEWEL_MATERIALS` in `tmp/modular/jewel.py` and the allowlist in
+`lib/fit_studio.mjs`, keep all three in sync). While a hair sculpt is selected its BUILT
+style is hidden outright (no translucent ghost, Troy, 2026-08-05); the ghost treatment
+remains for jewellery. The UNDERHAIR picker chooses the scalp pattern worn under the
+style, none, the buzz/crew clippers, solid washes (low/high line), widow's peak,
+receded temples, low/high fades, sparse, horseshoe, previewed live with the game's own
+decal and SAVED WITH THE ANCHOR (`underhair` in anchors.json; only non-buzz values are
+written). On every hair save/reset the server regenerates
+`src/render/characters/underhair.generated.ts`, the table `baseScalpDecal` reads at
+runtime, so the choice ships to the game with no rebuild. Pattern names are twinned in
+three places: `UNDERHAIR_STYLES` in modular.ts (the compiler holds stubble.ts's
+SCALP_CUTS/SCALP_SPECS Records complete against it), the `UNDERHAIR_NAMES` allowlist in
+lib/fit_studio.mjs, and `UNDERHAIR_OPTIONS` in fit_studio/anchors.js. Hairline shape
+fields on SCALP_CUTS: `peak` (widow's point down at centre), `temple` (negative lifts
+the line at ±35°, the M shape), `band` (bald crown above, the horseshoe), `taper`
+(fade width); `floor: 1` in SCALP_SPECS = a solid wash. **Everything is undoable** (`⌘Z`): gizmo drags, field scrubs,
+nudges, pastes, material picks, morph slider moves, sculpt strokes, undo re-selects the
+right style before restoring its matrix.
+
+**Sculpt shape** (Fit tab, hair only): grab + smooth brushes over the SELECTED sculpt,
+mirrored across the sculpt's own local x=0 midline (every sculpt in the set mirrors there
+measured in hairimp.py). "Edit shape" borrows the pointer from the gizmo and gives it
+back on Done; each stroke is one undo step, and unsaved shape edits survive switching
+styles. Save commits seat AND shape together: rows of `[restPos, delta]` in the sculpt's
+own local glTF axes go to `tmp/modular/hair_sculpt.json`, and `apply_hair_sculpt` in
+hairimp.py reshapes the imported sculpt right after `import_sculpt`, before is_blade,
+the seat, and the cut, so every downstream measurement sees the tweaked shape. Reset
+shape empties the style's entry and restores the raw sculpt.
+
+**Save writes `tmp/modular/anchors.json`, and that file IS the seat**: `hairimp.py` applies
+a saved hair anchor verbatim (cut/snap/clamp/close still run), `jewel.py` applies a saved
+jewellery matrix as a side-aware delta (right half verbatim, left half X-mirrored, midline
+blended, the browser previews exactly that with a live mirror; E2 geometry sits at its
+authored "rack" spot until placed, so identity = untouched). Matrices are stored in glTF
+Y-up axes exactly as the gizmo produced them; the Blender-side `C @ M @ C^-1` conjugation
+lives in `hairimp.anchor_matrix`, so never pre-convert. The first save of a server run
+snapshots the prior file to `anchors.json.bak`. Format unchanged, extra JSON keys would be
+ignored by the Python side, but don't add any without need.
+
+**Character tab** (the fit-in-context controls): gender, armor set + helm, underclothes,
+beard (`B2_*`), built hair (`H2_*`, context while placing earrings), face parts
+(ear/brow/eye/mouth variants + lash toggle; picking an ear style also drives the matching
+`ear_*` morph so piercings follow, the jewel.py morph gate), animation clip + speed + pause,
+during playback the fitted piece rides the head bone via a `follow` group
+(headWorld · headRest⁻¹), so authoring stays in REST space and stopping restores the rest
+pose exactly. Locomotion clips also drive HAIR SWAY: the game's own `HairSwayDriver`
+(bundled from `src/render/characters/hair_sway.ts`) runs the built styles' sway morphs
+from a synthetic gait (clip name → yd/s), and a twin of its spring feeds `swaySignal`,
+which bends the RAW sculpt being fitted per-vertex (`tickHairSway` in hairbrush.js):
+zero above character height 1.52, ramping to the tips (weight^1.8), gated to styles with
+enough hanging length (≥24 verts below 1.34, the game's own sway rule), with guard
+spheres (skull/face/torso) that forbid any vertex ending up deeper inside than it
+started, so sway never clips through the character. A rigid crown-pivot wobble shipped
+first and read as a tilting helmet (Troy, 2026-08-05), do not bring it back. The bend
+is display-only: it settles bit-exact when the clip stops, saves settle first so sway
+never bakes into shape rows, and brushing is blocked while a clip plays. Stopping hands
+the sway morphs back to the panel sliders. The character also wears the game's SCALP STUBBLE decal (`buildStubbleDecal`
+from stubble.ts, bundled; material `mod_stubble`, tinted by the hair wheel) under every
+fitted style, toggle in the Body section; the buzz density itself lives in
+`SCALP_SPECS` in stubble.ts. APPEARANCE = the game's HSL wheels (defaults from `DEFAULT_APPEARANCE` in
+`src/render/characters/modular.ts`), tinting materials BY NAME across the scene,
+`mod_skin`+`mod_skin_detail`, `mod_hair` (hair, brows, beards, and the sculpt preview all
+follow), `mod_eye`, `mod_lash`, so ghost clones recolour too. MORPHS: every pair the GLB
+carries as one −1..1 slider (face: ears/jaw/cheeks/chin/brow/nose/eyes/smirk; body:
+shoulders/chest/hips/hands/elbows/knees/feet), 0..1 expressions (`mouth_*`), and the
+`hair_sway_l/r/b` morphs for previewing sway extremes on a built style.
+
+**Scene tab**: lighting presets (Studio/Game/Soft/Rim, Game = no env + no tone mapping,
+the in-game look) with key intensity/angle/height, environment (PMREM RoomEnvironment,
+without it metal presets read black), rim, exposure; backdrop (dark/flat/light/chroma);
+ghost visibility + opacity; grid; wireframe; turntable; camera view buttons + reset.
+Camera, lighting, appearance, ghost prefs, and panel collapse states persist in
+localStorage (`fitstudio.prefs.v2`).
+
+**Body sculpt** (`B` key or the library item): grab (camera-plane drag), inflate (drag up =
+out, down = in, along stroke-start normals), smooth (relax toward neighbours, adjacency is
+built by welding split verts by position), radius/strength, Mirror X toggle (midline-safe
+blending), a brush ring cursor, and one undo step per stroke. Save diffs against the loaded
+rest positions and writes `tmp/modular/body_sculpt.json` rows of `[restPos, delta]` in glTF
+axes, which `bodysculpt.py` re-applies in the rebuild by POSITION match (survives exporter
+vertex reorder/splits; runs before `bodykeys.py` adds shape keys, since edits under a live
+key reach nothing).
+
+The page exposes `window.__fit`, the stable e2e surface (selectHair/selectJewel/
+enterSculpt/effectiveMatrix/setEffectiveMatrix/save/state/current/renderOnce, same names as
+v1) plus the live modules (`history`, `character`, `anchors`, `sculpt`, `viewport`) for
+deeper probes. Anchors survive rebuilds; Reset removes one and the solver takes that style
+back over.
+
 ## Asset library (viewer + inspector, static OR live 3D)
 ```
 node scripts/asset_pipeline/pipeline.mjs library [--full] [--category weapons,skins] [--open]

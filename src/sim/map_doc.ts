@@ -18,6 +18,7 @@ import type {
   ZoneDef,
 } from './types';
 import { BIOME_BY_ID } from './world';
+import { WORLD_SEED } from './world_seed';
 
 export const MAP_DOC_VERSION = 2;
 
@@ -132,7 +133,8 @@ export function serializeMapDoc(doc: MapDoc): string {
   return JSON.stringify(doc, null, 2);
 }
 
-const DEFAULT_SEED = 20061; // the game's fixed world seed (src/main.ts WORLD_SEED)
+// A map document authored without an explicit seed builds the shipped world.
+const DEFAULT_SEED = WORLD_SEED;
 
 function num(v: unknown, fallback: number): number {
   return typeof v === 'number' && Number.isFinite(v) ? v : fallback;

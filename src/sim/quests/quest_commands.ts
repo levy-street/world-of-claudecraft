@@ -23,10 +23,13 @@
 // render/ui/game/net/DOM/Three, no Math.random/Date.now), so it runs unchanged in
 // Node, the browser, and the headless RL env.
 
-import { bagCapacity, bagsFullError, countFit, removeStacked } from '../bags';
-import { QUESTS, questRewardItemId } from '../data';
+import { bagCapacity, bagsFullError, consumeOneScratch, countFit, countStacked } from '../bags';
+import { ITEMS, QUESTS, questRewardItemId } from '../data';
 import { formatMoney } from '../format_money';
+import { removePreferFungible } from '../items';
 import type { ArchetypeState } from '../professions/archetype';
+import { armCadence, cadenceBlockedKeys } from '../professions/cadence';
+import { planGradeRemoval } from '../professions/material_grades';
 import { questFallbackGrants } from '../quest_fallback';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -42,10 +45,12 @@ import {
 } from '../types';
 import {
   applyProfessionQuestEffect,
+  isIdentityTransitionQuest,
   professionQuestSelectionTargets,
   resolvedQuestObjectiveCounts,
   validateProfessionQuestSelection,
 } from './profession_quest_effects';
+import { playerHoldsQuestItem } from './quest_item_presence';
 
 // Pure quest-state computation, shared by the sim and the network client. Relocated
 // from sim.ts (W4) and re-exported from sim.ts so the ClientWorld import
@@ -56,6 +61,11 @@ export function computeQuestState(
   questsDone: Set<string>,
   playerLevel: number,
   professionState?: ArchetypeState,
+  // The set of quest ids currently inside their repeat-cadence window.
+  // Built per-tick-domain by the caller (the Sim from PlayerMeta.questCadence +
+  // ctx.tickCount, the online client from the server-computed cprof mirror), so
+  // this shared decision point never reasons about tick domains itself.
+  withinCadence?: ReadonlySet<string>,
 ): QuestState {
   const qp = questLog.get(questId);
   if (qp) return qp.state === 'ready' ? 'ready' : 'active';
@@ -72,18 +82,46 @@ export function computeQuestState(
   ) {
     return 'unavailable';
   }
+  // One pending identity transition at a time: while ANY identity-transition
+  // quest is active (attunePair or switchHobby, see isIdentityTransitionQuest),
+  // every OTHER identity-transition quest is unavailable. Two distinct stale-bank
+  // failures share this one gate, which is why its scope is both effect types
+  // rather than the attunePair-only scope it originally shipped with:
+  //   - resolvedCounts is stamped at accept and turn-in never re-resolves it, so
+  //     a banked second amends would complete at a stale cost after the first
+  //     return raised switchCount, dodging the 5 + 3 * switchCount escalation.
+  //   - the hobby quest banks its chosen craft on QuestProgress at accept, but a
+  //     pair transition rewrites both the candidate set and the hobby, so a bank
+  //     that straddles a transition either turns in against the wrong pair or
+  //     sticks unturnable-in on the revalidation below.
+  // The gate lives here so both hosts and the server accept path share it (the
+  // quest already in the log returned 'active' above, so it never gates itself).
+  if (isIdentityTransitionQuest(quest)) {
+    for (const activeId of questLog.keys()) {
+      if (isIdentityTransitionQuest(QUESTS[activeId])) return 'unavailable';
+    }
+  }
+  // A repeatable work order inside its cooldown window is unavailable until it
+  // lapses (the turn-in armed it; the window is server-authoritative and mirrors
+  // to the online client via cprof).
+  if (withinCadence?.has(questId)) return 'unavailable';
   return 'available';
 }
 
 export function questState(ctx: SimContext, questId: string, pid?: number): QuestState {
   const r = ctx.resolve(pid);
   if (!r) return 'unavailable';
+  const withinCadence =
+    r.meta.questCadence.size > 0
+      ? new Set(cadenceBlockedKeys(r.meta.questCadence, ctx.tickCount))
+      : undefined;
   return computeQuestState(
     questId,
     r.meta.questLog,
     r.meta.questsDone,
     r.e.level,
     r.meta.archetype,
+    withinCadence,
   );
 }
 
@@ -130,8 +168,15 @@ export function finalizeQuestAccept(
     state: 'active',
     ...(selection === undefined ? {} : { selection }),
     resolvedCounts: resolvedQuestObjectiveCounts(quest, meta),
+    // Stamp the objective-list revision so a later rework (a rev bump) resets
+    // only runs accepted under the OLD list (quest_progress_migration.ts).
+    ...(quest.rev === undefined ? {} : { rev: quest.rev }),
   });
-  for (const itemId of questFallbackGrants(quest, (id) => ctx.countItem(id, meta.entityId) > 0)) {
+  // The re-grant predicate spans every store the player can recover the item
+  // from alone (bags, bank, market escrow, mailbox), not just the bags: a
+  // bags-only read was the unbounded starter-tool mint (bank it, abandon,
+  // re-accept, repeat). See quest_item_presence.ts for the full reasoning.
+  for (const itemId of questFallbackGrants(quest, (id) => playerHoldsQuestItem(ctx, meta, id))) {
     ctx.addItem(itemId, 1, meta.entityId);
   }
   ctx.emit({ type: 'questAccepted', questId, pid: meta.entityId });
@@ -212,11 +257,57 @@ export function acceptLinkedQuest(
   if (sharer) ctx.notice(sharerPid, `${meta.name} accepted your shared quest.`);
 }
 
+// Strip a quest's OWN required items (the firebottle for q_deepfen_purge) from the
+// bag on turn-in and abandon, so a finished quest never leaves its tool behind.
+// Scoped HARD to items the quest itself owns (kind 'quest' with a matching questId):
+// requiredItems is the fallback-grant list (quest_fallback.ts) and its other users
+// are durable prerequisites the player keeps, the profession tools (the mining pick,
+// the gathering sickle) and cross-quest keys (the Crypt Keystone). Stripping those
+// would delete a tool the always-require-tool harvest gate still needs.
+function stripRequiredItems(ctx: SimContext, quest: QuestDef, meta: PlayerMeta): void {
+  for (const itemId of quest.requiredItems ?? []) {
+    const def = ITEMS[itemId];
+    if (!def || def.kind !== 'quest' || def.questId !== quest.id) continue;
+    const have = ctx.countItem(itemId, meta.entityId);
+    if (have > 0) ctx.removeItem(itemId, have, meta.entityId);
+  }
+}
+
+// Talking to the giver of an ACTIVE quest re-grants any required item the player
+// no longer holds anywhere they could recover it from themselves (a deleted
+// firebottle for q_deepfen_purge, say), so a lost prerequisite can never
+// permanently strand the quest. The accept path does the same grant
+// (finalizeQuestAccept); this is its in-progress twin, and it MUST use the same
+// playerHoldsQuestItem predicate: a bags-only read here would reopen the
+// unbounded starter-tool mint (bank the tool, talk to the giver, repeat) that
+// quest_item_presence.ts exists to close.
+export function regrantMissingQuestItems(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  npcTemplateId: string,
+): void {
+  for (const qp of meta.questLog.values()) {
+    if (qp.state !== 'active') continue;
+    const quest = QUESTS[qp.questId];
+    if (!quest || quest.giverNpcId !== npcTemplateId || !quest.requiredItems) continue;
+    for (const itemId of questFallbackGrants(quest, (id) => playerHoldsQuestItem(ctx, meta, id))) {
+      ctx.addItem(itemId, 1, meta.entityId);
+      ctx.emit({
+        type: 'log',
+        text: 'You recover a quest item you were missing.',
+        color: '#ff0',
+        pid: meta.entityId,
+      });
+    }
+  }
+}
+
 export function abandonQuest(ctx: SimContext, questId: string, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta } = r;
   if (!meta.questLog.has(questId)) return;
+  stripRequiredItems(ctx, QUESTS[questId], meta);
   meta.questLog.delete(questId);
   ctx.emit({
     type: 'log',
@@ -266,7 +357,21 @@ export function turnInQuest(ctx: SimContext, questId: string, pid?: number): voi
     for (const obj of quest.objectives) {
       if (obj.type === 'collect' && obj.itemId) {
         const index = quest.objectives.indexOf(obj);
-        removeStacked(scratch, obj.itemId, questObjectiveRequired(quest, qp, index));
+        // The same grade plan turnInQuestCore applies, against the scratch
+        // copy, so the room this gate frees is the room the hand-in frees.
+        // Per unit through consumeOneScratch (no exclusion), the scratch
+        // mirror of removePreferFungible's plain-first walk below: a gate
+        // that models the removal differently from the remover it gates
+        // re-opens the overflow class (#2139).
+        for (const take of planGradeRemoval(
+          obj.itemId,
+          questObjectiveRequired(quest, qp, index),
+          (id) => countStacked(scratch, id),
+        )) {
+          for (let unit = 0; unit < take.count; unit++) {
+            consumeOneScratch(scratch, take.itemId);
+          }
+        }
       }
     }
     if (countFit(scratch, bagCapacity(meta.bags), rewardItem, 1) < 1) {
@@ -295,9 +400,28 @@ export function turnInQuestCore(
   if (!applyProfessionQuestEffect(ctx, quest, qp, meta)) return false;
   for (const [index, obj] of quest.objectives.entries()) {
     if (obj.type === 'collect' && obj.itemId) {
-      ctx.removeItem(obj.itemId, questObjectiveRequired(quest, qp, index), meta.entityId);
+      // Base grade first, then the fine grade, so a player holding both hands
+      // over the plain ore and keeps the premium copies. Within each grade
+      // line, plain stacks are spent before instanced copies
+      // (removePreferFungible's own plain-first walk): a signed specimen
+      // survives any turn-in that plain copies can pay, and is consumed only
+      // when nothing plain remains. The trade and vendor arms additionally
+      // deprioritize the owner's self-signed CHARM copies; that charm-scoped
+      // rule is deliberately absent here because no shipped quest collects a
+      // charm (the grade-pool guard in tests/material_grades.test.ts keeps
+      // the collect vocabulary honest).
+      for (const take of planGradeRemoval(
+        obj.itemId,
+        questObjectiveRequired(quest, qp, index),
+        (id) => ctx.countItem(id, meta.entityId),
+      )) {
+        removePreferFungible(ctx, take.itemId, take.count, meta.entityId);
+      }
     }
   }
+  // Required items (tools, not rewards) leave with the finished quest, so a spent
+  // firebottle does not linger in the bag after "Back to the Shallows".
+  stripRequiredItems(ctx, quest, meta);
   qp.state = 'done';
   meta.questLog.delete(questId);
   const firstCompletion = !meta.questsDone.has(questId);
@@ -316,6 +440,12 @@ export function turnInQuestCore(
   const rewardItem = questRewardItemId(quest, meta.cls);
   if (rewardItem) ctx.addItem(rewardItem, 1, meta.entityId);
   ctx.grantXp(quest.xpReward, meta);
+  // Arm the repeat-cadence window (work orders): the quest stays
+  // unavailable (computeQuestState) until now + repeatCadenceTicks, server-
+  // authoritative and persisted per character with zero-default omission.
+  if (quest.repeatCadenceTicks && quest.repeatCadenceTicks > 0) {
+    armCadence(meta.questCadence, questId, ctx.tickCount, quest.repeatCadenceTicks);
+  }
   ctx.emit({ type: 'questDone', questId, pid: meta.entityId });
   ctx.emit({
     type: 'log',

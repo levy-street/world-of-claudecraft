@@ -87,6 +87,76 @@ describe('createCharacterVisual happy path (issue 2079)', () => {
   });
 });
 
+describe('CharacterVisual dispose() clears every cosmetic-overlay material cache', () => {
+  it('releases the ghost, soulRend, shadowform, moonkin, metamorph, and auraGlow clones', async () => {
+    vi.resetModules();
+    // Same minimally real GLTF stub as the happy-path build above: a
+    // MeshStandardMaterial (has both `color` and `emissive`, so every
+    // overlay's tint/glow write actually runs) plus every named clip.
+    const stubGltf = () => {
+      const scene = new THREE.Group();
+      const mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshStandardMaterial());
+      mesh.name = 'body';
+      scene.add(mesh);
+      const clip = (name: string) => new THREE.AnimationClip(name, 1, []);
+      return { scene, animations: ['Idle', 'Walk', 'Run', 'Attack', 'Hit', 'Death'].map(clip) };
+    };
+    vi.doMock('../src/render/assets/loader', () => ({
+      loadGltf: vi.fn(() => Promise.resolve(stubGltf())),
+      loadHdr: vi.fn(() => new Promise(() => undefined)),
+      loadTexture: vi.fn(() => new Promise(() => undefined)),
+      releaseGltf: vi.fn(),
+    }));
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const { preloadTrainingDummyAssets } = await import('../src/render/characters/assets');
+    await preloadTrainingDummyAssets();
+    const { createCharacterVisual } = await import('../src/render/characters/index');
+
+    const visual = createCharacterVisual(dummyEntity);
+    expect(visual).not.toBeNull();
+    if (!visual) return;
+
+    // Cycle each overlay on then off in turn: applyVisualMaterials() always
+    // recomputes from the ORIGINAL material against the flags live at that
+    // moment, so switching one off before the next turns on still lands one
+    // clone in each overlay's own cache, and no earlier cache is cleared by
+    // a later overlay taking priority.
+    visual.setGhost(true);
+    visual.setGhost(false);
+    visual.setSoulRend(true);
+    visual.setSoulRend(false);
+    visual.setShadowform(true);
+    visual.setShadowform(false);
+    visual.setMoonkin(true);
+    visual.setMoonkin(false);
+    visual.setMetamorph(true);
+    visual.setMetamorph(false);
+    visual.setAuraGlow(0xffffff, 0.5);
+    visual.setAuraGlow(0xffffff, 0);
+
+    const cacheNames = [
+      'ghostMaterials',
+      'soulRendMaterials',
+      'shadowformMaterials',
+      'moonkinMaterials',
+      'metamorphMaterials',
+      'auraGlowMaterials',
+    ] as const;
+    const caches = visual as unknown as Record<string, Map<unknown, unknown>>;
+    for (const name of cacheNames) {
+      expect(caches[name].size, `${name} should have cached a clone`).toBeGreaterThan(0);
+    }
+
+    visual.dispose();
+
+    for (const name of cacheNames) {
+      expect(caches[name].size, `${name} should be cleared on dispose`).toBe(0);
+    }
+
+    errSpy.mockRestore();
+  });
+});
+
 describe('logAssetMissOnce (issue 2079)', () => {
   it('logs a key the first time only, independently per key', async () => {
     vi.resetModules();
