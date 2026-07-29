@@ -154,6 +154,7 @@ describe('new admin error strings reverse-map', () => {
     'error.methodNotAllowed': 'method not allowed',
     'error.resetPasswordStaff': 'only a superadmin can reset a staff password',
     'error.resetPasswordFailed': 'password reset failed',
+    'error.invalidAuthenticationCode': 'invalid authentication code',
   };
 
   it('matches the en catalog and the server emit sites byte for byte', () => {

@@ -25,9 +25,6 @@ class AuthState {
   // not clobber each other; both render in #login-error.
   loginError = $state<string>('');
   sessionMessage = $state<string>('');
-  // Set once the server challenges a 2FA-enabled account (password accepted, no
-  // code yet supplied): the Login form reveals the code field and resubmits with
-  // it. Never itself grants access; the server re-verifies the code every time.
   twoFactorRequired = $state<boolean>(false);
 
   get authed(): boolean {
@@ -42,21 +39,26 @@ class AuthState {
     this.loginError = '';
     this.sessionMessage = '';
     try {
-      const result = await apiLogin(username, password, code, recoveryCode);
-      if ('twoFactorRequired' in result) {
+      const session = await apiLogin(username, password, code, recoveryCode);
+      if ('twoFactorRequired' in session) {
         this.twoFactorRequired = true;
         return;
       }
       this.twoFactorRequired = false;
-      this.name = result.username;
-      this.roles = result.roles;
-      this.permissions = result.permissions;
+      this.name = session.username;
+      this.roles = session.roles;
+      this.permissions = session.permissions;
       this.permissionsLoaded = true;
       this.token = getToken();
     } catch (err) {
       this.loginError =
         err instanceof ApiError ? localizeAdminError(err.message) : t('auth.loginFailed');
     }
+  }
+
+  cancelTwoFactor(): void {
+    this.twoFactorRequired = false;
+    this.loginError = '';
   }
 
   // Boot hydration for an already-stored token. Any failure other than an

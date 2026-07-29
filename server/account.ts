@@ -524,7 +524,7 @@ export async function handleAccount2faDisable(
   return json(res, 200, { ok: true });
 }
 
-// Login-time second-factor check, shared by the /api/login handler. Accepts a
+// Login-time second-factor check shared by ordinary and admin login. Accepts a
 // live TOTP code (replay-guarded: a code is good for at most one login inside its
 // 30s window) OR a single-use recovery code. Returns true on success. Never
 // throws: any unexpected state resolves to a denied second factor.

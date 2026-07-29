@@ -1,6 +1,5 @@
 import type * as http from 'node:http';
 import { verifyLoginTwoFactor } from './account';
-import { parseAdminAccountSort } from './admin_accounts_sort';
 import {
   accountDetail,
   associationsForIp,
@@ -166,12 +165,7 @@ const ADMIN_LOGIN_MAX_PER_MINUTE = 10;
 // bad-password response so it never reveals whether the account exists.
 const ADMIN_LOGIN_TOO_MANY_FAILED_ATTEMPTS =
   'too many failed attempts, wait a few minutes and try again';
-// Second factor, mirroring server/auth_routes.ts loginHandler exactly: an account
-// with TOTP enabled (account.totp_enabled_at) must supply a live code or a recovery
-// code before a token is minted. Without one, the response is a 200 CHALLENGE (never
-// a token), so the client shows the code step; with a wrong one it is a 401 that also
-// counts against the same per-account throttle as a bad password.
-const ADMIN_LOGIN_INVALID_TWO_FACTOR_CODE = 'invalid authentication code';
+const ADMIN_LOGIN_INVALID_TWO_FACTOR = 'invalid authentication code';
 const MAX_PAGE_LIMIT = 200;
 const DEFAULT_PAGE_LIMIT = 25;
 const ACTIVITY_WINDOW_DAYS = 30;
@@ -631,7 +625,7 @@ async function handleLogin(req: http.IncomingMessage, res: http.ServerResponse):
     }
     if (!(await verifyLoginTwoFactor(account, code, recoveryCode))) {
       recordAuthFailure(username);
-      return fail(res, 401, ADMIN_LOGIN_INVALID_TWO_FACTOR_CODE);
+      return fail(res, 401, ADMIN_LOGIN_INVALID_TWO_FACTOR);
     }
   }
   clearAuthFailures(username);
@@ -1853,6 +1847,7 @@ function makeRealAdminDb() {
     accountAndScopeForToken,
     accountMailTarget,
     findAccount,
+    verifyLoginTwoFactor,
     // Target-account staff check (the "admin accounts cannot be suspended / banned /
     // chat muted" guards); the CALLER gate resolves roles via adminRolesForAccount.
     isAdminAccount,
@@ -1978,7 +1973,7 @@ async function loginHandler(ctx: Ctx): Promise<void> {
     }
     if (!(await adminDb().verifyLoginTwoFactor(account, code, recoveryCode))) {
       adminDb().recordAuthFailure(username);
-      return fail(ctx.res, 401, ADMIN_LOGIN_INVALID_TWO_FACTOR_CODE);
+      return fail(ctx.res, 401, ADMIN_LOGIN_INVALID_TWO_FACTOR);
     }
   }
   adminDb().clearAuthFailures(username);

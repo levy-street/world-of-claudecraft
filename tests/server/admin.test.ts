@@ -562,6 +562,125 @@ describe('POST /admin/api/login', () => {
     });
   });
 
+  it('challenges a 2FA-enabled staff account without issuing a token', async () => {
+    const verifyLoginTwoFactor = vi.fn(async () => true);
+    const clearAuthFailures = vi.fn();
+    const touchLogin = vi.fn(async () => {});
+    const saveToken = vi.fn(async () => {});
+    setDb({
+      rateLimited: allowedRateLimit,
+      findAccount: async () =>
+        ({
+          id: 9,
+          username: 'bob',
+          password_hash: 'h',
+          totp_enabled_at: '2026-07-01T00:00:00.000Z',
+        }) as never,
+      verifyPassword: async () => true,
+      verifyLoginTwoFactor,
+      adminRolesForAccount: async () => ({ username: 'bob', roles: ['viewer'] }),
+      clearAuthFailures,
+      touchLogin,
+      newToken: () => 'tok123',
+      saveToken,
+    });
+
+    const r = await runRoute('POST', '/admin/api/login', {
+      body: { username: 'bob', password: 'pw' },
+    });
+
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({
+      success: true,
+      data: { twoFactorRequired: true },
+      error: null,
+    });
+    expect(verifyLoginTwoFactor).not.toHaveBeenCalled();
+    expect(clearAuthFailures).not.toHaveBeenCalled();
+    expect(touchLogin).not.toHaveBeenCalled();
+    expect(saveToken).not.toHaveBeenCalled();
+  });
+
+  it('rejects an invalid second factor and records the failed attempt', async () => {
+    const verifyLoginTwoFactor = vi.fn(async () => false);
+    const recordAuthFailure = vi.fn();
+    const clearAuthFailures = vi.fn();
+    const saveToken = vi.fn(async () => {});
+    setDb({
+      rateLimited: allowedRateLimit,
+      findAccount: async () =>
+        ({
+          id: 9,
+          username: 'bob',
+          password_hash: 'h',
+          totp_enabled_at: '2026-07-01T00:00:00.000Z',
+        }) as never,
+      verifyPassword: async () => true,
+      verifyLoginTwoFactor,
+      adminRolesForAccount: async () => ({ username: 'bob', roles: ['viewer'] }),
+      recordAuthFailure,
+      clearAuthFailures,
+      saveToken,
+    });
+
+    const r = await runRoute('POST', '/admin/api/login', {
+      body: { username: 'bob', password: 'pw', code: '000000' },
+    });
+
+    expect(r.status).toBe(401);
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'invalid authentication code',
+    });
+    expect(verifyLoginTwoFactor).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 9 }),
+      '000000',
+      '',
+    );
+    expect(recordAuthFailure).toHaveBeenCalledWith('bob');
+    expect(clearAuthFailures).not.toHaveBeenCalled();
+    expect(saveToken).not.toHaveBeenCalled();
+  });
+
+  it('accepts a replay-safe recovery code before issuing a staff token', async () => {
+    const verifyLoginTwoFactor = vi.fn(async () => true);
+    const clearAuthFailures = vi.fn();
+    setDb({
+      rateLimited: allowedRateLimit,
+      findAccount: async () =>
+        ({
+          id: 9,
+          username: 'bob',
+          password_hash: 'h',
+          totp_enabled_at: '2026-07-01T00:00:00.000Z',
+        }) as never,
+      verifyPassword: async () => true,
+      verifyLoginTwoFactor,
+      adminRolesForAccount: async () => ({ username: 'bob', roles: ['viewer'] }),
+      clearAuthFailures,
+      touchLogin: async () => {},
+      newToken: () => 'tok123',
+      saveToken: async () => {},
+    });
+
+    const r = await runRoute('POST', '/admin/api/login', {
+      body: { username: 'bob', password: 'pw', recoveryCode: 'abcd-1234' },
+    });
+
+    expect(r.status).toBe(200);
+    expect(verifyLoginTwoFactor).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 9 }),
+      '',
+      'abcd-1234',
+    );
+    expect(clearAuthFailures).toHaveBeenCalledWith('bob');
+    expect(r.body).toMatchObject({
+      success: true,
+      data: { token: 'tok123', username: 'bob' },
+    });
+  });
+
   it('200s a valid staff login with the token + username + roles + expanded permissions', async () => {
     setDb({
       rateLimited: allowedRateLimit,

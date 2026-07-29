@@ -143,6 +143,8 @@ import {
   isAdminAccount,
   pool,
   revokeTokensExcept,
+  saveToken,
+  touchLogin,
   updatePasswordHash,
 } from '../server/db';
 import { addBlockedIp, removeBlockedIp } from '../server/ip_block_db';
@@ -2348,6 +2350,98 @@ describe('admin api permissions', () => {
 });
 
 describe('admin login payload', () => {
+  it('challenges a 2FA-enabled staff account without issuing a token', async () => {
+    vi.mocked(findAccount).mockResolvedValue({
+      id: 3,
+      username: 'alice',
+      password_hash: 'hash',
+      totp_enabled_at: '2026-07-01T00:00:00.000Z',
+    } as never);
+    vi.mocked(verifyPassword).mockResolvedValueOnce(true);
+    vi.mocked(adminRolesForAccount).mockResolvedValue({ username: 'alice', roles: ['viewer'] });
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        url: '/admin/api/login',
+        body: { username: 'alice', password: 'pw' },
+      }),
+      res,
+      fakeGame,
+    );
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data).toEqual({ twoFactorRequired: true });
+    expect(verifyLoginTwoFactor).not.toHaveBeenCalled();
+    expect(touchLogin).not.toHaveBeenCalled();
+    expect(saveToken).not.toHaveBeenCalled();
+  });
+
+  it('rejects an invalid authenticator code without issuing a token', async () => {
+    vi.mocked(findAccount).mockResolvedValue({
+      id: 3,
+      username: 'alice',
+      password_hash: 'hash',
+      totp_enabled_at: '2026-07-01T00:00:00.000Z',
+    } as never);
+    vi.mocked(verifyPassword).mockResolvedValueOnce(true);
+    vi.mocked(verifyLoginTwoFactor).mockResolvedValueOnce(false);
+    vi.mocked(adminRolesForAccount).mockResolvedValue({ username: 'alice', roles: ['viewer'] });
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        url: '/admin/api/login',
+        body: { username: 'alice', password: 'pw', code: '000000' },
+      }),
+      res,
+      fakeGame,
+    );
+
+    expect(res.statusCode).toBe(401);
+    expect(res.body.error).toBe('invalid authentication code');
+    expect(verifyLoginTwoFactor).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 3 }),
+      '000000',
+      '',
+    );
+    expect(touchLogin).not.toHaveBeenCalled();
+    expect(saveToken).not.toHaveBeenCalled();
+  });
+
+  it('requires a valid recovery code before returning the staff token', async () => {
+    vi.mocked(findAccount).mockResolvedValue({
+      id: 3,
+      username: 'alice',
+      password_hash: 'hash',
+      totp_enabled_at: '2026-07-01T00:00:00.000Z',
+    } as never);
+    vi.mocked(verifyPassword).mockResolvedValueOnce(true);
+    vi.mocked(verifyLoginTwoFactor).mockResolvedValueOnce(true);
+    vi.mocked(adminRolesForAccount).mockResolvedValue({ username: 'alice', roles: ['viewer'] });
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        url: '/admin/api/login',
+        body: { username: 'alice', password: 'pw', recoveryCode: 'abcd-1234' },
+      }),
+      res,
+      fakeGame,
+    );
+
+    expect(res.statusCode).toBe(200);
+    expect(verifyLoginTwoFactor).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 3 }),
+      '',
+      'abcd-1234',
+    );
+    expect(res.body.data.token).toBe('b'.repeat(64));
+  });
+
   it('returns roles and expanded permissions for a staff account', async () => {
     vi.mocked(findAccount).mockResolvedValue({
       id: 3,

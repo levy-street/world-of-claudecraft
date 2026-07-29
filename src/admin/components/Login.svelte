@@ -12,36 +12,72 @@
   let username = $state('');
   let password = $state('');
   let code = $state('');
+  let recoveryCode = $state('');
+  let factorMode = $state<'totp' | 'recovery'>('totp');
 
   function submit(e: SubmitEvent): void {
     e.preventDefault();
-    const factor = auth.twoFactorRequired
-      ? classifyAdminAuthCode(code)
-      : { code: '', recoveryCode: '' };
-    void auth.login(username.trim(), password, factor.code, factor.recoveryCode);
+    void auth.login(
+      username.trim(),
+      password,
+      factorMode === 'totp' ? code.trim() : '',
+      factorMode === 'recovery' ? recoveryCode.trim() : '',
+    );
+  }
+
+  function switchFactorMode(mode: 'totp' | 'recovery'): void {
+    factorMode = mode;
+    code = '';
+    recoveryCode = '';
+    auth.loginError = '';
+  }
+
+  function back(): void {
+    code = '';
+    recoveryCode = '';
+    factorMode = 'totp';
+    auth.cancelTwoFactor();
   }
 </script>
 
 <div id="login" class="login">
   <form class="panel" id="login-form" onsubmit={submit}>
     <div class="panel-title">{t('app.title')}</div>
-    <label for="login-username">{t('auth.username')}</label>
-    <input id="login-username" autocomplete="username" required bind:value={username} />
-    <label for="login-password">{t('auth.password')}</label>
-    <input id="login-password" type="password" autocomplete="current-password" required bind:value={password} />
     {#if auth.twoFactorRequired}
-      <label for="login-2fa-code">{t('auth.twoFactorLabel')}</label>
-      <input
-        id="login-2fa-code"
-        inputmode="numeric"
-        autocomplete="one-time-code"
-        maxlength="19"
-        placeholder={t('auth.twoFactorPlaceholder')}
-        bind:value={code}
-      />
-      <p class="two-factor-hint">{t('auth.twoFactorHint')}</p>
+      <div>{t('auth.twoFactorPrompt')}</div>
+      {#if factorMode === 'totp'}
+        <label for="login-code">{t('auth.authenticatorCode')}</label>
+        <input
+          id="login-code"
+          inputmode="numeric"
+          autocomplete="one-time-code"
+          required
+          bind:value={code}
+        />
+        <button type="button" onclick={() => switchFactorMode('recovery')}>
+          {t('auth.useRecoveryCode')}
+        </button>
+      {:else}
+        <label for="login-recovery-code">{t('auth.recoveryCode')}</label>
+        <input
+          id="login-recovery-code"
+          autocomplete="one-time-code"
+          required
+          bind:value={recoveryCode}
+        />
+        <button type="button" onclick={() => switchFactorMode('totp')}>
+          {t('auth.useAuthenticatorCode')}
+        </button>
+      {/if}
+      <button type="submit">{t('auth.verify')}</button>
+      <button type="button" onclick={back}>{t('auth.back')}</button>
+    {:else}
+      <label for="login-username">{t('auth.username')}</label>
+      <input id="login-username" autocomplete="username" required bind:value={username} />
+      <label for="login-password">{t('auth.password')}</label>
+      <input id="login-password" type="password" autocomplete="current-password" required bind:value={password} />
+      <button type="submit">{t('auth.signIn')}</button>
     {/if}
-    <button type="submit">{t('auth.signIn')}</button>
     <div id="login-error">{auth.loginError || auth.sessionMessage}</div>
   </form>
 </div>
