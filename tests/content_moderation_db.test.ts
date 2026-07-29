@@ -10,6 +10,7 @@
 import type { PoolClient, QueryResult, QueryResultRow } from 'pg';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  CONTENT_MODERATION_SCHEMA,
   cleanContentModerationReason,
   recordContentModerationAction,
 } from '../server/content_moderation_db';
@@ -33,6 +34,14 @@ function clientStub() {
   const release = vi.fn();
   return { query: cquery, release };
 }
+
+describe('CONTENT_MODERATION_SCHEMA', () => {
+  it('indexes the owner foreign key used by account deletion', () => {
+    expect(CONTENT_MODERATION_SCHEMA).toContain(
+      'CREATE INDEX IF NOT EXISTS content_moderation_actions_owner ON content_moderation_actions(owner_account_id);',
+    );
+  });
+});
 
 describe('recordContentModerationAction', () => {
   it('inserts every field in the documented column order', async () => {
