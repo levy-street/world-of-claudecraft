@@ -64,7 +64,11 @@ import {
 } from './game/interactions';
 import { createIntroLogoOverlay } from './game/intro_logo_overlay';
 import { Keybinds } from './game/keybinds';
-import { newKeyboardTurnState, stepKeyboardTurnFacing } from './game/keyboard_turn_facing';
+import {
+  newKeyboardTurnState,
+  resetKeyboardTurnState,
+  stepKeyboardTurnFacing,
+} from './game/keyboard_turn_facing';
 import { applyMobileKeyboardViewport } from './game/keyboard_viewport_applier';
 import { shouldUseStaticBackdrop } from './game/landing_backdrop';
 import { createLandingThemeAudio } from './game/landing_theme';
@@ -87,6 +91,7 @@ import { createPerfMonitor } from './game/perf';
 import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
 import { SceneDirector } from './game/scene_director';
+import { SceneInputLockCoordinator } from './game/scene_input_lock';
 import { playSceneDirectiveSfx } from './game/scene_sfx';
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
 import {
@@ -1767,6 +1772,9 @@ async function startGame(
     },
   });
   mobileControls.start();
+  const sceneInputLock = new SceneInputLockCoordinator(sceneDirector, input, () =>
+    mobileControls.syncAutorun(false),
+  );
   const syncOverlayDiagnostics = (): void => {
     syncCharacterOpenDiagnostics();
     syncQuestDialogOpenDiagnostics();
@@ -3042,7 +3050,6 @@ async function startGame(
   let onlineInputEchoMs = 0;
   let playerWasDead = world.player.dead;
   let raceMovementWasLocked = world.mountRaceView()?.phase === 'countdown';
-  let sceneInputWasLocked = false;
   // Smoothed input-echo jitter (mean absolute deviation of RTT samples) for the
   // perf overlay's Jitter row.
   let onlineJitterMs = 0;
@@ -3465,16 +3472,25 @@ async function startGame(
     // enforces the same countdown lock, so online latency cannot move the
     // authoritative rider.
     const raceMovementLocked = world.mountRaceView()?.phase === 'countdown';
-    const sceneInputLocked = sceneDirector.inputLocked();
+    let sceneInputLocked = sceneInputLock.sync();
+    let drainedEvents: ReturnType<ClientWorld['drainEvents']> = [];
+    let selfAuthoritativeDiscontinuity = false;
+    if (online) {
+      // Scene events must land before this frame derives or flushes movement:
+      // a queued inputLock:on is authoritative for the whole outgoing frame.
+      drainedEvents = online.drainEvents();
+      sceneInputLocked = sceneInputLock.handleEvents(drainedEvents);
+      selfAuthoritativeDiscontinuity = hasAuthoritativeSelfPositionDiscontinuity(
+        drainedEvents,
+        online.playerId,
+      );
+    }
     if (raceMovementLocked && !raceMovementWasLocked) {
       input.clearClickMove();
       input.setAutorun(false);
       mobileControls.syncAutorun(false);
     }
     raceMovementWasLocked = raceMovementLocked;
-    if (sceneInputLocked && !sceneInputWasLocked) mobileControls.syncAutorun(false);
-    input.setSceneInputLocked(sceneInputLocked);
-    sceneInputWasLocked = sceneInputLocked;
     input.setSuspendMovement(
       !gameInputReady ||
         hud.isModalOpen() ||
@@ -3503,7 +3519,8 @@ async function startGame(
     });
     perf.markInputFrame(performance.now());
 
-    const mouselook = intro === null && input.isMouselookActive() && !movementFrozen();
+    const mouselook =
+      intro === null && !sceneInputLocked && input.isMouselookActive() && !movementFrozen();
     const controllerFacing = input.controllerFacingOverride();
     const renderFacing = renderFacingOverride();
     // On the frame the camera lets go of the player's heading (classic mouselook
@@ -3523,16 +3540,19 @@ async function startGame(
       input.camYaw,
     );
     prevCameraDrivenFacing = cameraDrivenFacing;
-    if (renderFacing !== null || controllerFacing !== null) {
+    if (sceneInputLocked) {
+      pendingReleaseFacing = null;
+    } else if (renderFacing !== null || controllerFacing !== null) {
       pendingReleaseFacing = null;
     } else if (edgeReleaseFacing !== null) {
       pendingReleaseFacing = edgeReleaseFacing;
     }
     // A ghost (dead && ghost) is not movement-frozen and keeps its facing; only a
     // corpse-bound dead player (dead && !ghost) loses it.
-    const movementFacing = !movementFrozen()
-      ? (renderFacing ?? controllerFacing ?? pendingReleaseFacing)
-      : null;
+    const movementFacing =
+      !sceneInputLocked && !movementFrozen()
+        ? (renderFacing ?? controllerFacing ?? pendingReleaseFacing)
+        : null;
 
     const visualFacingFor = (
       mi: ReturnType<typeof input.readMoveInput>,
@@ -3550,14 +3570,14 @@ async function startGame(
           offlineSim.player.facing,
         );
         Object.assign(offlineSim.moveInput, mi);
-        const stepFacing = movementFacing ?? facing;
+        const stepFacing = sceneDirector.inputLocked() ? null : (movementFacing ?? facing);
         if (stepFacing !== null) offlineSim.player.facing = stepFacing;
         offlineSim.updateFiestaBots(); // dev: steer Fiesta practice bots (no-op unless active)
         perf.markInputSent(performance.now());
         const events = perf.time('sim', () =>
           perf.trace('sim.tick', () => offlineSim.tick(), { mode: 'offline' }),
         );
-        sceneDirector.handleEvents(events);
+        sceneInputLocked = sceneInputLock.handleEvents(events);
         perf.time('events', () =>
           perf.trace('hud.handleEvents', () => hud.handleEvents(events), {
             mode: 'offline',
@@ -3637,20 +3657,23 @@ async function startGame(
     // stutter this feature has chased). The turn flags are zeroed on the wire
     // while the local heading owns the channel, or the server would integrate
     // the turn a second time on top of the streamed facing.
-    const kbFacing = stepKeyboardTurnFacing(kbTurn, {
-      turnLeft: resolved.mi.turnLeft,
-      turnRight: resolved.mi.turnRight,
-      turnAllowed: net.spectating === null && !movementFrozen() && !isStunned(pe),
-      sentFacing: foreignFacing,
-      serverFacing: interpServerFacing,
-      echoMs: onlineInputEchoMs,
-      frameDt,
-    });
+    if (sceneInputLocked) resetKeyboardTurnState(kbTurn);
+    const kbFacing = sceneInputLocked
+      ? null
+      : stepKeyboardTurnFacing(kbTurn, {
+          turnLeft: resolved.mi.turnLeft,
+          turnRight: resolved.mi.turnRight,
+          turnAllowed: net.spectating === null && !movementFrozen() && !isStunned(pe),
+          sentFacing: foreignFacing,
+          serverFacing: interpServerFacing,
+          echoMs: onlineInputEchoMs,
+          frameDt,
+        });
     // wireFacing, not kbFacing: only input-derived headings go on the wire.
     // Streaming the seam/glide corrections (which chase the mirror) would
     // close a feedback loop through the server that at high RTT never
     // converges (the observed self-spinning resonance under netem).
-    const netFacing = foreignFacing ?? kbTurn.wireFacing;
+    const netFacing = sceneInputLocked ? null : (foreignFacing ?? kbTurn.wireFacing);
     const onlineRenderFacing =
       visualFacingFor(resolved.mi, netFacing ?? kbFacing ?? interpServerFacing) ?? netFacing;
     Object.assign(net.moveInput, resolved.mi);
@@ -3676,12 +3699,6 @@ async function startGame(
       perf.markInputEcho(sample);
     }
     net.pendingFacingDelta = 0; // superseded by the interpolated follow below
-    const drainedEvents = net.drainEvents();
-    sceneDirector.handleEvents(drainedEvents);
-    const selfAuthoritativeDiscontinuity = hasAuthoritativeSelfPositionDiscontinuity(
-      drainedEvents,
-      net.playerId,
-    );
     perf.time('events', () =>
       perf.trace('hud.handleEvents', () => hud.handleEvents(drainedEvents), {
         mode: 'online',

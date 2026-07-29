@@ -509,6 +509,7 @@ export class Input {
     this.clearGamepadMove();
     this.clearControllerMoveInput();
     this.touchJumpUntil = 0;
+    this.keyJumpUntil = 0;
   }
 
   captureNextKey(cb: (code: string | null) => void): void {
@@ -562,6 +563,7 @@ export class Input {
   // helpers between sim ticks. Latch the tap briefly so those reads cannot eat
   // the jump before the grounded movement tick sees it.
   triggerTouchJump(): void {
+    if (this.sceneInputLocked) return;
     this.touchJumpUntil = Math.max(this.touchJumpUntil, performance.now() + TOUCH_JUMP_LATCH_MS);
   }
 
@@ -706,6 +708,7 @@ export class Input {
   }
 
   setControllerFacing(facing: unknown): void {
+    if (this.sceneInputLocked) return;
     this.controllerFacing = sanitizeMoveFacing(facing);
   }
 
@@ -777,7 +780,7 @@ export class Input {
   }
 
   controllerFacingOverride(): number | null {
-    return this.controllerFacing;
+    return this.sceneInputLocked ? null : this.controllerFacing;
   }
 
   private msSinceForcedUnlock(): number | null {
