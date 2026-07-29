@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { describe, expect, it, vi } from 'vitest';
+import { Hud } from '../src/ui/hud';
 import { ActionBarContextMenu } from '../src/ui/hud/action_bar/action_bar_context_menu';
 
 describe('ActionBarContextMenu', () => {
@@ -163,5 +164,37 @@ describe('ActionBarContextMenu', () => {
 
     expect(menu.openForKeyboardEvent(event, document.createElement('button'))).toBe(false);
     expect(event.preventDefault).not.toHaveBeenCalled();
+  });
+});
+
+describe('Hud shared context-menu keyboard binding', () => {
+  it.each(['Enter', ' '])('contains %j activation before it reaches game input', (key) => {
+    const element = document.createElement('div');
+    element.id = 'ctx-menu';
+    element.innerHTML = '<div class="ctx-item" data-act="toggle-lock">Lock Action Bars</div>';
+    document.body.appendChild(element);
+    const closeContextMenu = vi.fn();
+    const onActivate = vi.fn();
+    const gameInput = vi.fn();
+    const hud = Object.create(Hud.prototype) as unknown as {
+      closeContextMenu: () => void;
+      bindContextMenuActions: (handler: (action: string) => void) => void;
+    };
+    hud.closeContextMenu = closeContextMenu;
+    hud.bindContextMenuActions(onActivate);
+    document.addEventListener('keydown', gameInput);
+
+    try {
+      const event = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true });
+      element.querySelector<HTMLElement>('.ctx-item')?.dispatchEvent(event);
+
+      expect(event.defaultPrevented).toBe(true);
+      expect(closeContextMenu).toHaveBeenCalledOnce();
+      expect(onActivate).toHaveBeenCalledWith('toggle-lock');
+      expect(gameInput).not.toHaveBeenCalled();
+    } finally {
+      document.removeEventListener('keydown', gameInput);
+      element.remove();
+    }
   });
 });

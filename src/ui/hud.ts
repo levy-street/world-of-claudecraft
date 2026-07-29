@@ -14753,6 +14753,7 @@ export class Hud {
       item.addEventListener('keydown', (ev) => {
         if (ev.key !== 'Enter' && ev.key !== ' ') return;
         ev.preventDefault();
+        ev.stopPropagation();
         activate();
       });
     });
