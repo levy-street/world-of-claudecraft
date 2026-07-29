@@ -166,30 +166,6 @@ function doorPortalMaterial(entering: boolean, lowGfx: boolean): THREE.MeshBasic
   return material;
 }
 
-// The Orkadia war-camp gate reads distinct from every other dungeon door: a
-// toxic warpyre-green membrane carrying the same swirling energy texture the
-// ranked Rift gates use (so it visibly churns per frame), over a blackened orc
-// arch. Cached per lowGfx like doorPortalMaterial.
-function orkadiaDoorPortalMaterial(lowGfx: boolean): THREE.MeshBasicMaterial {
-  const key = `orkadia:${lowGfx}`;
-  const existing = portalMats.get(key);
-  if (existing) return existing;
-  const material = markSharedMaterial(
-    new THREE.MeshBasicMaterial({
-      color: 0x5aff3a, // acid warpyre green
-      map: riftPortalTexture() ?? undefined,
-      transparent: true,
-      opacity: 0.72,
-      side: THREE.DoubleSide,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    }),
-  );
-  if (!lowGfx) material.color.multiplyScalar(PORTAL_BOOST);
-  portalMats.set(key, material);
-  return material;
-}
-
 function wildheartDoorPortalMaterial(lowGfx: boolean): THREE.MeshBasicMaterial {
   const key = `wildheart:${lowGfx}`;
   const existing = portalMats.get(key);
@@ -208,25 +184,6 @@ function wildheartDoorPortalMaterial(lowGfx: boolean): THREE.MeshBasicMaterial {
   if (!lowGfx) material.color.multiplyScalar(PORTAL_BOOST);
   portalMats.set(key, material);
   return material;
-}
-
-// Blackened orc-iron grade for the Orkadia arch: a cloned, darkened copy of the
-// stone/GLB material so the shared door arch reads as scorched black rock. Never
-// mutates the shared source material (clone-then-tint, the marshMaterial trick).
-const ORKADIA_ARCH_TINT = 0x2a2620;
-function darkenOrkadiaArch(root: THREE.Object3D): void {
-  root.traverse((child) => {
-    if (child instanceof THREE.Mesh) {
-      const src = child.material;
-      const mats = Array.isArray(src) ? src : [src];
-      child.material = mats.map((m) => {
-        const c = (m as THREE.Material).clone() as THREE.MeshStandardMaterial;
-        if (c.color) c.color.multiply(new THREE.Color(ORKADIA_ARCH_TINT));
-        return c;
-      });
-      if (!Array.isArray(src)) child.material = (child.material as THREE.Material[])[0];
-    }
-  });
 }
 
 function warmWildheartArch(root: THREE.Object3D): void {
@@ -1006,7 +963,6 @@ export function buildDoorBody(
     return { body };
   }
 
-  const isOrkadia = dungeonId === 'orkadia';
   const isWildheart = dungeonId === 'wildheart_basin';
   const wildheartGate = isWildheart ? cloneWildheartGate() : null;
   if (wildheartGate) {
@@ -1019,14 +975,10 @@ export function buildDoorBody(
         child.receiveShadow = true;
       }
     });
-    if (isOrkadia) darkenOrkadiaArch(inst);
     if (isWildheart) warmWildheartArch(inst);
     body.add(inst);
   } else {
-    const stone = isOrkadia || isWildheart ? doorStoneMaterial().clone() : doorStoneMaterial();
-    if (isOrkadia && (stone as THREE.MeshStandardMaterial).color) {
-      (stone as THREE.MeshStandardMaterial).color.multiply(new THREE.Color(ORKADIA_ARCH_TINT));
-    }
+    const stone = isWildheart ? doorStoneMaterial().clone() : doorStoneMaterial();
     if (isWildheart && (stone as THREE.MeshStandardMaterial).color) {
       (stone as THREE.MeshStandardMaterial).color.setHex(0xb9a66d);
     }
@@ -1044,11 +996,9 @@ export function buildDoorBody(
       body.add(plinth);
     }
   }
-  const portalMat = isOrkadia
-    ? orkadiaDoorPortalMaterial(lowGfx)
-    : isWildheart
-      ? wildheartDoorPortalMaterial(lowGfx)
-      : doorPortalMaterial(entering, lowGfx);
+  const portalMat = isWildheart
+    ? wildheartDoorPortalMaterial(lowGfx)
+    : doorPortalMaterial(entering, lowGfx);
   const portal = new THREE.Mesh(doorPortalGeometry(), portalMat);
   portal.position.y = isWildheart && wildheartGate ? 4.4 : 2.15;
   portal.scale.set(
@@ -1057,11 +1007,7 @@ export function buildDoorBody(
     1,
   );
   body.add(portal);
-  if (isOrkadia) {
-    // The orc war-gate is monumental next to the other dungeon doors: same
-    // arch and membrane, scaled up (the walk trigger is sim-side, unchanged).
-    body.scale.setScalar(1.55);
-  } else if (isWildheart) {
+  if (isWildheart) {
     if (!wildheartGate) body.scale.setScalar(1.65);
   }
   return { body, portal };

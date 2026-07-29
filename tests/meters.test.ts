@@ -28,7 +28,12 @@ function fakeWorld(): IWorld {
   } as unknown as IWorld;
 }
 
-const dmg = (sourceId: number, targetId: number, amount: number): SimEvent =>
+const dmg = (
+  sourceId: number,
+  targetId: number,
+  amount: number,
+  ability: string | null = null,
+): SimEvent =>
   ({
     type: 'damage',
     sourceId,
@@ -36,11 +41,19 @@ const dmg = (sourceId: number, targetId: number, amount: number): SimEvent =>
     amount,
     crit: false,
     school: 'physical',
-    ability: null,
+    ability,
     kind: 'hit',
   }) as SimEvent;
-const heal = (sourceId: number, targetId: number, amount: number): SimEvent =>
-  ({ type: 'heal2', sourceId, targetId, amount, crit: false, ability: 'Heal' }) as SimEvent;
+// `ability` sits ahead of `cueOnly`: the per-ability breakdown reads it on most
+// calls, while the audio-only HoT cue is the single case that needs the flag.
+const heal = (
+  sourceId: number,
+  targetId: number,
+  amount: number,
+  ability = 'Heal',
+  cueOnly = false,
+): SimEvent =>
+  ({ type: 'heal2', sourceId, targetId, amount, crit: false, ability, cueOnly }) as SimEvent;
 
 describe('combat meters', () => {
   it('tallies party damage and healing into the current encounter and all-time', () => {
@@ -59,6 +72,33 @@ describe('combat meters', () => {
     // label follows the beefiest mob fought
     expect(m.current!.label).toBe('Gorrak');
     expect(m.current!.mainMobId).toBe(51);
+  });
+
+  it('ignores a cueOnly heal2 (the HoT-application sound cue): no encounter opens, no tally, no lastActivity bump', () => {
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    m.onEvent(heal(2, 1, 0, 'Heal', true), w, party, 1000);
+    expect(m.current).toBeNull();
+    expect(m.allTime.tallies.has(2)).toBe(false);
+    // a real event afterward opens the encounter fresh, proving the cue left no trace
+    m.onEvent(heal(2, 1, 30), w, party, 2000);
+    expect(m.current).not.toBeNull();
+    expect(m.current!.startedAt).toBe(2000);
+    expect(m.current!.tallies.get(2)!.heal).toBe(30);
+  });
+
+  it('a genuine amount:0 direct heal (no cueOnly flag) still keeps the encounter alive, just untallied', () => {
+    // Distinguishes the cueOnly flag from amount === 0 itself: a real heal
+    // that lands for 0 (full HP, fully absorbed) is still party activity,
+    // unlike the HoT-application cue above.
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    m.onEvent(heal(2, 1, 0), w, party, 1000);
+    expect(m.current).not.toBeNull();
+    expect(m.current!.startedAt).toBe(1000);
+    expect(m.allTime.tallies.has(2)).toBe(false); // 0-amount still untallied
   });
 
   it('ends the encounter after inactivity once no mob holds aggro, keeping history + all-time', () => {
@@ -123,7 +163,7 @@ describe('combat meters', () => {
     expect(m.current!.tallies.size).toBe(0);
   });
 
-  it('can tally controlled pet damage when the HUD includes the pet in the party set', () => {
+  it('folds controlled pet damage into its owner row instead of giving the pet its own', () => {
     const w = fakeWorld();
     const party = new Set([1, 2, 3]);
     (w.entities as Map<number, any>).set(3, {
@@ -134,10 +174,69 @@ describe('combat meters', () => {
       ownerId: 1,
     });
     const m = new MeterData(0);
-    m.onEvent(dmg(3, 50, 18), w, party, 1000);
-    expect(m.current).not.toBeNull();
-    expect(m.current!.tallies.get(3)!.name).toBe('Wolf Pet');
-    expect(m.current!.tallies.get(3)!.dmg).toBe(18);
+    m.onEvent(dmg(1, 50, 30, 'Aimed Shot'), w, party, 1000);
+    m.onEvent(dmg(3, 50, 18, 'Claw'), w, party, 1100);
+    // one row, the owner's, carrying both their own and their pet's damage
+    expect(m.current!.tallies.size).toBe(1);
+    expect(m.current!.tallies.has(3)).toBe(false);
+    const hunter = m.current!.tallies.get(1)!;
+    expect(hunter.name).toBe('Hero');
+    expect(hunter.dmg).toBe(48);
+    // the pet's damage is still attributable in the hover breakdown
+    const rows = [...hunter.dmgByAbility.values()];
+    expect(rows).toContainEqual({ ability: 'Aimed Shot', petName: null, amount: 30 });
+    expect(rows).toContainEqual({ ability: 'Claw', petName: 'Wolf Pet', amount: 18 });
+    // the folded pet damage counts toward the owner on the threat-tab fallback
+    expect(hunter.dmgByMob.get(50)).toBe(48);
+  });
+
+  it('breaks a member damage and healing down per ability, merging repeat casts', () => {
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    const m = new MeterData(0);
+    m.onEvent(dmg(1, 50, 10), w, party, 1000); // melee swing: ability null
+    m.onEvent(dmg(1, 50, 12), w, party, 1500);
+    m.onEvent(dmg(1, 50, 40, 'Mortal Strike'), w, party, 2000);
+    m.onEvent(heal(2, 1, 30, 'Flash Heal'), w, party, 2500);
+    m.onEvent(heal(2, 1, 20, 'Flash Heal'), w, party, 3000);
+    m.onEvent(heal(2, 1, 15, 'Renew'), w, party, 3500);
+    const warrior = m.current!.tallies.get(1)!;
+    expect([...warrior.dmgByAbility.values()]).toEqual([
+      { ability: null, petName: null, amount: 22 },
+      { ability: 'Mortal Strike', petName: null, amount: 40 },
+    ]);
+    expect(warrior.healByAbility.size).toBe(0);
+    const priest = m.current!.tallies.get(2)!;
+    expect([...priest.healByAbility.values()]).toEqual([
+      { ability: 'Flash Heal', petName: null, amount: 50 },
+      { ability: 'Renew', petName: null, amount: 15 },
+    ]);
+    // all-time accumulates the same split
+    expect([...m.allTime.tallies.get(2)!.healByAbility.values()]).toEqual([
+      { ability: 'Flash Heal', petName: null, amount: 50 },
+      { ability: 'Renew', petName: null, amount: 15 },
+    ]);
+  });
+
+  it('folds a pet heal into its owner row too', () => {
+    const w = fakeWorld();
+    const party = new Set([1, 2, 4]);
+    (w.entities as Map<number, any>).set(4, {
+      id: 4,
+      kind: 'mob',
+      name: 'Voidwalker',
+      templateId: 'voidwalker',
+      ownerId: 2,
+    });
+    const m = new MeterData(0);
+    m.onEvent(heal(4, 1, 25, 'Consume Shadows'), w, party, 1000);
+    expect(m.current!.tallies.has(4)).toBe(false);
+    const owner = m.current!.tallies.get(2)!;
+    expect(owner.name).toBe('Pal');
+    expect(owner.heal).toBe(25);
+    expect([...owner.healByAbility.values()]).toEqual([
+      { ability: 'Consume Shadows', petName: 'Voidwalker', amount: 25 },
+    ]);
   });
 
   it('merges a reconnecting party member into one row instead of duplicating them under their new pid', () => {
@@ -163,12 +262,12 @@ describe('combat meters', () => {
     expect(palRows[0].dmg).toBe(50);
   });
 
-  it('keeps two live same-named pets in separate rows instead of merging them by name', () => {
+  it('routes two live same-named pets to their own owners, never onto one shared row', () => {
     const w = fakeWorld();
     // two warlocks running the same demon template both have a pet named
     // "Imp" (createDemonPet sets pet.name = template.name), each with its
-    // own live pid. Both stay in the party set the whole time, so this must
-    // never look like a reconnect.
+    // own live pid. Folding by name alone would merge them; folding by ownerId
+    // keeps each imp's damage on the warlock that summoned it.
     (w.entities as Map<number, any>).set(10, {
       id: 10,
       kind: 'mob',
@@ -185,11 +284,35 @@ describe('combat meters', () => {
     });
     const party = new Set([1, 2, 10, 11]);
     const m = new MeterData(0);
-    m.onEvent(dmg(10, 50, 20), w, party, 1000);
-    m.onEvent(dmg(11, 50, 30), w, party, 1500);
-    m.onEvent(dmg(10, 50, 5), w, party, 2000);
+    m.onEvent(dmg(10, 50, 20, 'Firebolt'), w, party, 1000);
+    m.onEvent(dmg(11, 50, 30, 'Firebolt'), w, party, 1500);
+    m.onEvent(dmg(10, 50, 5, 'Firebolt'), w, party, 2000);
     expect(m.current!.tallies.size).toBe(2);
-    expect(m.current!.tallies.get(10)!.dmg).toBe(25);
-    expect(m.current!.tallies.get(11)!.dmg).toBe(30);
+    expect(m.current!.tallies.get(1)!.dmg).toBe(25);
+    expect(m.current!.tallies.get(2)!.dmg).toBe(30);
+    expect([...m.current!.tallies.get(1)!.dmgByAbility.values()]).toEqual([
+      { ability: 'Firebolt', petName: 'Imp', amount: 25 },
+    ]);
+  });
+
+  it('leaves an unowned mob and a pet whose owner is outside the party off the meter', () => {
+    const w = fakeWorld();
+    const party = new Set([1, 2]);
+    (w.entities as Map<number, any>).set(12, {
+      id: 12,
+      kind: 'mob',
+      name: 'Imp',
+      templateId: 'imp',
+      ownerId: 99, // a rival warlock's pet: neither it nor its owner is in the party
+    });
+    const m = new MeterData(0);
+    m.onEvent(dmg(12, 50, 40, 'Firebolt'), w, party, 1000);
+    // neither side of that hit is ours, so it does not even open an encounter
+    expect(m.current).toBeNull();
+    // and it must not fold onto pid 99 or onto anyone once the party IS fighting
+    m.onEvent(dmg(1, 50, 10), w, party, 1100);
+    m.onEvent(dmg(12, 50, 40, 'Firebolt'), w, party, 1200);
+    expect([...m.current!.tallies.keys()]).toEqual([1]);
+    expect(m.current!.tallies.get(1)!.dmg).toBe(10);
   });
 });

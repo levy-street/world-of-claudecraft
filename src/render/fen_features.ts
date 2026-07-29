@@ -1,12 +1,22 @@
-// The Willowfen's dressing, render-only: weeping willows trailing over the
-// pools, lily pads drifting on the still water, and flowering hedge tufts.
-// Same contract as the sibling realm modules: build once, update(time)
-// animates gently, no lights needed (the fen is bright).
+// The Willowfen's dressing, render-only: the maintainer's generated willow
+// trees trailing over the pools, water-lily rafts on the still water, river
+// reeds rooted along every shoreline, and clumped mushroom-and-log patches
+// out on the fen floor. All the modeled
+// pieces are GPU-instanced from five optimized GLBs (the flower-bed
+// fidelity recipe; scripts/assets/build_willowfen_props.mjs). Same contract
+// as the sibling realm modules: build once, update(time) animates gently.
 import * as THREE from 'three';
-import { WILLOWFEN_ZONE } from '../sim/content/willowfen';
+import { WILLOWFEN_PROPS, WILLOWFEN_ZONE } from '../sim/content/willowfen';
+import { fenWillowSpots } from '../sim/fen_willows';
 import { hash2 } from '../sim/rng';
-import { terrainHeight, WATER_LEVEL } from '../sim/world';
-import { GFX } from './gfx';
+import {
+  generateDecorationsInBounds,
+  roadDistance,
+  terrainHeight,
+  WATER_LEVEL,
+} from '../sim/world';
+import { loadGltf } from './assets/loader';
+import { registerPreload } from './assets/preload';
 
 export interface FenFeaturesView {
   group: THREE.Group;
@@ -15,65 +25,63 @@ export interface FenFeaturesView {
 
 const FEN_ZMIN = 180;
 const FEN_ZMAX = 700;
-const WILLOW_TINTS = [0x8fc47e, 0x7eb474, 0xa2d488];
-const BLOOM_TINTS = [0xf2a8c8, 0xf2e0a0, 0xd8b8f2, 0xffffff, 0xf2a88f];
 
-function mat(opts: {
-  color: number;
-  roughness?: number;
-  flatShading?: boolean;
-  transparent?: boolean;
-  opacity?: number;
-}): THREE.MeshStandardMaterial | THREE.MeshLambertMaterial {
-  return GFX.standardMaterials
-    ? new THREE.MeshStandardMaterial({
-        color: opts.color,
-        roughness: opts.roughness ?? 0.85,
-        flatShading: opts.flatShading ?? true,
-        transparent: opts.transparent ?? false,
-        opacity: opts.opacity ?? 1,
-      })
-    : new THREE.MeshLambertMaterial({
-        color: opts.color,
-        flatShading: opts.flatShading ?? true,
-        transparent: opts.transparent ?? false,
-        opacity: opts.opacity ?? 1,
-      });
+// the five Willowfen prop models (built by build_willowfen_props.mjs)
+const FEN_PROP_URLS = {
+  willow: '/models/props/willow_tree.glb',
+  lilies: '/models/props/fen_lilies.glb',
+  reeds: '/models/props/fen_reeds.glb',
+  mushrooms: '/models/props/fen_mushrooms.glb',
+  log: '/models/props/fen_log.glb',
+} as const;
+type FenPropKey = keyof typeof FEN_PROP_URLS;
+const propScenes: Partial<Record<FenPropKey, THREE.Group>> = {};
+for (const key of Object.keys(FEN_PROP_URLS) as FenPropKey[]) {
+  registerPreload(
+    loadGltf(FEN_PROP_URLS[key]).then((gltf) => {
+      propScenes[key] = gltf.scene;
+    }),
+  );
 }
 
-// A weeping willow: short trunk, a soft dome, and a skirt of hanging strand
-// cylinders drooping below the dome's rim (the strands are what sell it).
-function willowGeos(): { trunk: THREE.BufferGeometry; canopy: THREE.BufferGeometry } {
-  const trunk = new THREE.CylinderGeometry(0.22, 0.34, 2.6, 6);
-  trunk.translate(0, 1.3, 0);
-  const parts: THREE.BufferGeometry[] = [];
-  const dome = new THREE.SphereGeometry(2.4, 8, 6);
-  dome.scale(1, 0.72, 1);
-  dome.translate(0, 3.1, 0);
-  parts.push(dome.toNonIndexed());
-  for (let i = 0; i < 12; i++) {
-    const ang = (i / 12) * Math.PI * 2;
-    const rad = 2.05 + (i % 3) * 0.18;
-    const len = 2.4 + ((i * 7) % 5) * 0.28;
-    const strand = new THREE.CylinderGeometry(0.055, 0.03, len, 4);
-    strand.translate(Math.sin(ang) * rad, 3.0 - len / 2, Math.cos(ang) * rad);
-    parts.push(strand.toNonIndexed());
+export const fenFeaturesPreloadInternalsForTest = {
+  propUrls: Object.values(FEN_PROP_URLS),
+};
+
+interface Placement {
+  x: number;
+  y: number;
+  z: number;
+  s: number;
+  rot: number;
+  tint?: number;
+}
+
+// bake a loaded scene into (geometry, material) parts: world matrices
+// applied, the whole model re-based so xz is centered and min-y sits at 0
+function extractParts(scene: THREE.Group): { geo: THREE.BufferGeometry; mat: THREE.Material }[] {
+  scene.updateMatrixWorld(true);
+  const parts: { geo: THREE.BufferGeometry; mat: THREE.Material }[] = [];
+  scene.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (!mesh.isMesh) return;
+    const geo = mesh.geometry.clone();
+    geo.applyMatrix4(mesh.matrixWorld);
+    parts.push({ geo, mat: mesh.material as THREE.Material });
+  });
+  const box = new THREE.Box3();
+  for (const p of parts) {
+    p.geo.computeBoundingBox();
+    box.union(p.geo.boundingBox as THREE.Box3);
   }
-  // merge by hand (few parts, simple attributes)
-  let total = 0;
-  for (const g of parts) total += g.getAttribute('position').count;
-  const pos = new Float32Array(total * 3);
-  const norm = new Float32Array(total * 3);
-  let off = 0;
-  for (const g of parts) {
-    pos.set(g.getAttribute('position').array as Float32Array, off);
-    norm.set(g.getAttribute('normal').array as Float32Array, off);
-    off += g.getAttribute('position').count * 3;
+  const cx = (box.min.x + box.max.x) / 2;
+  const cz = (box.min.z + box.max.z) / 2;
+  for (const p of parts) {
+    p.geo.translate(-cx, -box.min.y, -cz);
+    p.geo.computeBoundingBox();
+    p.geo.computeBoundingSphere();
   }
-  const canopy = new THREE.BufferGeometry();
-  canopy.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  canopy.setAttribute('normal', new THREE.BufferAttribute(norm, 3));
-  return { trunk: trunk.toNonIndexed(), canopy };
+  return parts;
 }
 
 export function buildFenFeatures(seed: number): FenFeaturesView {
@@ -83,7 +91,7 @@ export function buildFenFeatures(seed: number): FenFeaturesView {
   const instance = (
     geo: THREE.BufferGeometry,
     material: THREE.Material,
-    spots: { x: number; z: number; y: number; s: number; rot: number; tint?: number }[],
+    spots: Placement[],
     tinted = false,
   ) => {
     if (spots.length === 0) return;
@@ -108,95 +116,166 @@ export function buildFenFeatures(seed: number): FenFeaturesView {
     group.add(mesh);
   };
 
-  // --- weeping willows: thickest at the pool shores, scattered elsewhere ---
-  {
-    const geos = willowGeos();
-    const spots: { x: number; z: number; y: number; s: number; rot: number; tint: number }[] = [];
-    for (const lake of WILLOWFEN_ZONE.lakes) {
-      const count = 3 + Math.floor(hash2(lake.x, lake.z, seed + 2101) * 3);
-      for (let k = 0; k < count; k++) {
-        const ang = hash2(k, lake.x + lake.z, seed + 2111) * Math.PI * 2;
-        const dist = lake.radius + 4 + hash2(lake.x, k, seed + 2121) * 6;
-        const x = lake.x + Math.sin(ang) * dist;
-        const z = lake.z + Math.cos(ang) * dist;
-        if (z < FEN_ZMIN + 8 || z > FEN_ZMAX - 8) continue;
-        const y = terrainHeight(x, z, seed);
-        if (y < WATER_LEVEL + 0.6) continue;
-        spots.push({
-          x,
-          z,
-          y,
-          s: 0.9 + hash2(k, lake.z, seed + 2131) * 0.9,
-          rot: hash2(lake.x + k, k, seed + 2141) * Math.PI * 2,
-          tint: WILLOW_TINTS[Math.floor(hash2(k, lake.x - k, seed + 2151) * WILLOW_TINTS.length)],
-        });
-      }
+  // instance every part of a loaded prop model at the given placements
+  const instanceProp = (key: FenPropKey, spots: Placement[]): void => {
+    const scene = propScenes[key];
+    if (!scene || spots.length === 0) return;
+    for (const part of extractParts(scene)) {
+      instance(part.geo, part.mat, spots);
     }
-    instance(geos.trunk, mat({ color: 0x7a6248 }), spots);
-    instance(geos.canopy, mat({ color: 0xffffff, roughness: 0.8 }), spots, true);
-  }
+  };
 
-  // --- lily pads: flat bright discs drifting on every pool ---
-  const pads: THREE.Mesh[] = [];
+  const hub = WILLOWFEN_ZONE.hub;
+
+  // --- placement obstacles: authored props and the terrain's own scattered
+  // rocks; nothing modeled may stand on any of them (only trees overlap) ---
+  const zp = WILLOWFEN_PROPS;
+  const zoneProps = {
+    campfires: zp.campfires ?? [],
+    buildings: zp.buildings ?? [],
+    decorProps: (zp.decorProps ?? []).map((d) => ({ x: d.x, z: d.z, r: d.r ?? 3 })),
+    stalls: zp.stalls ?? [],
+    wells: zp.wells ?? [],
+    crates: zp.crates ?? [],
+    fences: zp.fences ?? [],
+  };
+  const fenRocks = generateDecorationsInBounds(seed, {
+    minX: -540,
+    maxX: -180,
+    minZ: FEN_ZMIN,
+    maxZ: FEN_ZMAX,
+  }).filter((d) => d.kind === 'rock');
+  const segDist = (x: number, z: number, f: { x1: number; z1: number; x2: number; z2: number }) => {
+    const dx = f.x2 - f.x1;
+    const dz = f.z2 - f.z1;
+    const t = Math.max(
+      0,
+      Math.min(1, ((x - f.x1) * dx + (z - f.z1) * dz) / (dx * dx + dz * dz || 1)),
+    );
+    return Math.hypot(x - (f.x1 + dx * t), z - (f.z1 + dz * t));
+  };
+  const clearOfProps = (x: number, z: number, pad: number): boolean => {
+    for (const f of zoneProps.campfires) if (Math.hypot(x - f[0], z - f[1]) < 8 + pad) return false;
+    for (const b of zoneProps.buildings) if (Math.hypot(x - b.x, z - b.z) < 8 + pad) return false;
+    for (const d of zoneProps.decorProps)
+      if (Math.hypot(x - d.x, z - d.z) < d.r + 2 + pad) return false;
+    for (const st of zoneProps.stalls) if (Math.hypot(x - st.x, z - st.z) < 4 + pad) return false;
+    for (const w of zoneProps.wells) if (Math.hypot(x - w.x, z - w.z) < 3 + pad) return false;
+    for (const cr of zoneProps.crates)
+      if (Math.hypot(x - cr[0], z - cr[1]) < 2.5 + pad) return false;
+    for (const f of zoneProps.fences) if (segDist(x, z, f) < 2.2 + pad) return false;
+    return true;
+  };
+  const clearOfRocks = (x: number, z: number, pad: number): boolean => {
+    for (const r of fenRocks) if (Math.hypot(x - r.x, z - r.z) < 2.2 * r.scale + pad) return false;
+    return true;
+  };
+
+  // --- the willows: instanced at the shared sim placements (fenWillowSpots
+  // in sim/fen_willows.ts), so every trunk the renderer draws is exactly a
+  // trunk the sim's colliders block ---
+  instanceProp(
+    'willow',
+    fenWillowSpots(seed).map((w) => ({ x: w.x, y: w.y, z: w.z, s: w.s, rot: w.rot })),
+  );
+
+  // --- the water lilies: modeled lily rafts drifting on every pool ---
   {
-    const padGeo = new THREE.CircleGeometry(0.55, 7);
-    const padMat = mat({ color: 0x6aa858, roughness: 0.7, flatShading: false });
+    const spots: Placement[] = [];
     for (const lake of WILLOWFEN_ZONE.lakes) {
-      const count = 4 + Math.floor(hash2(lake.z, lake.x, seed + 2201) * 5);
+      const count = 2 + Math.floor(hash2(lake.z, lake.x, seed + 2201) * 3);
       for (let k = 0; k < count; k++) {
         const ang = hash2(k * 3, lake.x, seed + 2211) * Math.PI * 2;
-        const dist = Math.sqrt(hash2(lake.z, k * 5, seed + 2221)) * lake.radius * 0.8;
+        const dist = Math.sqrt(hash2(lake.z, k * 5, seed + 2221)) * lake.radius * 0.7;
         const x = lake.x + Math.sin(ang) * dist;
         const z = lake.z + Math.cos(ang) * dist;
-        if (terrainHeight(x, z, seed) > WATER_LEVEL - 0.4) continue;
-        const pad = new THREE.Mesh(padGeo, padMat);
-        pad.rotation.x = -Math.PI / 2;
-        pad.rotation.z = hash2(k, lake.x + 7, seed + 2231) * Math.PI * 2;
-        const s = 0.7 + hash2(lake.x, k + 11, seed + 2241) * 1;
-        pad.scale.setScalar(s);
-        pad.position.set(x, WATER_LEVEL + 0.08, z);
-        pad.userData.phase = hash2(x, z, seed + 2251) * Math.PI * 2;
-        pads.push(pad);
-        group.add(pad);
-      }
-    }
-  }
-
-  // --- flowering hedges: puffball bushes with bloom tints, near roadsides
-  // and shores across the whole band ---
-  {
-    const bloomGeo = new THREE.IcosahedronGeometry(0.8, 0);
-    bloomGeo.scale(1, 0.7, 1);
-    const geo = bloomGeo.toNonIndexed();
-    const spots: { x: number; z: number; y: number; s: number; rot: number; tint: number }[] = [];
-    for (let gx = -520; gx <= -200; gx += 11) {
-      for (let gz = FEN_ZMIN + 30; gz <= FEN_ZMAX - 60; gz += 11) {
-        const r = hash2(gx, gz, seed + 2301);
-        if (r > 0.42) continue;
-        const x = gx + (hash2(gx, gz, seed + 2311) - 0.5) * 10;
-        const z = gz + (hash2(gz, gx, seed + 2321) - 0.5) * 10;
-        const y = terrainHeight(x, z, seed);
-        if (y < WATER_LEVEL + 0.8) continue;
+        if (terrainHeight(x, z, seed) > WATER_LEVEL - 0.7) continue;
+        if (roadDistance(x, z) < 4) continue;
         spots.push({
           x,
           z,
-          y: y + 0.3,
-          s: 0.6 + hash2(gx + 1, gz, seed + 2331) * 1.1,
-          rot: hash2(gx, gz + 1, seed + 2341) * Math.PI * 2,
-          tint: BLOOM_TINTS[Math.floor(hash2(gx - 1, gz, seed + 2351) * BLOOM_TINTS.length)],
+          y: WATER_LEVEL + 0.03,
+          s: 3.5 + hash2(lake.x, k + 11, seed + 2241) * 2,
+          rot: hash2(k, lake.x + 7, seed + 2231) * Math.PI * 2,
         });
       }
     }
-    instance(geo, mat({ color: 0xffffff, roughness: 0.85 }), spots, true);
+    instanceProp('lilies', spots);
+  }
+
+  // --- the river reeds: rooted in the shallows along every shoreline ---
+  {
+    const spots: Placement[] = [];
+    for (const lake of WILLOWFEN_ZONE.lakes) {
+      const count = 4 + Math.floor(hash2(lake.x + 3, lake.z, seed + 2401) * 3);
+      for (let k = 0; k < count; k++) {
+        const ang = hash2(k * 7, lake.z, seed + 2411) * Math.PI * 2;
+        // walk outward until the shallows band at the waterline is found
+        let placed = false;
+        for (let dist = lake.radius * 0.9; dist < lake.radius * 1.7; dist += 0.6) {
+          const x = lake.x + Math.sin(ang) * dist;
+          const z = lake.z + Math.cos(ang) * dist;
+          const y = terrainHeight(x, z, seed);
+          if (y < WATER_LEVEL - 0.45 || y > WATER_LEVEL + 0.25) continue;
+          if (roadDistance(x, z) < 4) break;
+          spots.push({
+            x,
+            z,
+            y: y - 0.1,
+            s: 2.6 + hash2(lake.z, k + 5, seed + 2421) * 1.2,
+            rot: hash2(k, lake.x + 13, seed + 2431) * Math.PI * 2,
+          });
+          placed = true;
+          break;
+        }
+        if (!placed) continue;
+      }
+    }
+    instanceProp('reeds', spots);
+  }
+
+  // --- mushroom-and-log patches: clumped clusters out on the fen floor ---
+  {
+    const mushroomSpots: Placement[] = [];
+    const logSpots: Placement[] = [];
+    for (let gx = -520; gx <= -200; gx += 14) {
+      for (let gz = FEN_ZMIN + 30; gz <= FEN_ZMAX - 60; gz += 14) {
+        // a coarse patch gate: most cells stay empty, the rest clump
+        if (hash2(gx, gz, seed + 2501) > 0.16) continue;
+        const n = 2 + Math.floor(hash2(gz, gx, seed + 2511) * 2);
+        for (let k = 0; k <= n; k++) {
+          const x = gx + (hash2(gx + k, gz, seed + 2521) - 0.5) * 9;
+          const z = gz + (hash2(gx, gz + k, seed + 2531) - 0.5) * 9;
+          const y = terrainHeight(x, z, seed);
+          if (y < WATER_LEVEL + 0.8) continue;
+          if (roadDistance(x, z) < 4.5) continue;
+          if (Math.hypot(x - hub.x, z - hub.z) < 22) continue;
+          if (!clearOfProps(x, z, 0)) continue;
+          if (!clearOfRocks(x, z, 0.6)) continue;
+          // clusters never stand on one another: each keeps its own ground
+          if (mushroomSpots.some((sp) => Math.hypot(sp.x - x, sp.z - z) < 3.2)) continue;
+          if (logSpots.some((sp) => Math.hypot(sp.x - x, sp.z - z) < 3.2)) continue;
+          const spot: Placement = {
+            x,
+            z,
+            y: y - 0.08,
+            s: 2.4 + hash2(x, z, seed + 2541) * 1.4,
+            rot: hash2(z, x, seed + 2551) * Math.PI * 2,
+          };
+          // one log anchors some patches; the rest are mushroom clusters
+          if (k === 0 && hash2(gx, gz, seed + 2561) < 0.45) logSpots.push({ ...spot, s: 3 });
+          else mushroomSpots.push(spot);
+        }
+      }
+    }
+    instanceProp('mushrooms', mushroomSpots);
+    instanceProp('log', logSpots);
   }
 
   return {
     group,
-    update(time: number): void {
-      // lily pads bob almost imperceptibly
-      for (const pad of pads) {
-        pad.position.y = WATER_LEVEL + 0.08 + Math.sin(time * 0.8 + pad.userData.phase) * 0.03;
-      }
+    update(): void {
+      // everything modeled sits still; the fen's motion is the water's
     },
   };
 }

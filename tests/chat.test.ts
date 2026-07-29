@@ -1030,6 +1030,55 @@ describe('/afk and /dnd presence', () => {
     const out = logEvents(sim.tick());
     expect(out.some((m) => m.pid === a && /no longer marked as away/.test(m.text))).toBe(true);
   });
+
+  it('/afk sets the entity display flag; /dnd does not; toggling clears it', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.tick();
+    const e = sim.entities.get(a)!;
+
+    expect(e.afk).toBe(false);
+    sim.chat('/afk', a);
+    sim.tick();
+    expect(e.afk).toBe(true); // the wire/nameplate/presence display bit
+
+    sim.chat('/afk', a); // repeat toggles off
+    sim.tick();
+    expect(e.afk).toBe(false);
+
+    // Do Not Disturb is a private state: it never lights the public AFK tag.
+    sim.chat('/dnd raiding', a);
+    sim.tick();
+    expect(sim.meta(a)!.away?.mode).toBe('dnd');
+    expect(e.afk).toBe(false);
+  });
+
+  it('moving under your own input clears AFK (Do Not Disturb survives)', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.tick();
+    const e = sim.entities.get(a)!;
+
+    sim.chat('/afk', a);
+    sim.tick();
+    expect(e.afk).toBe(true);
+
+    sim.meta(a)!.moveInput.forward = true;
+    const moved = logEvents(sim.tick());
+    expect(e.afk).toBe(false);
+    expect(sim.meta(a)!.away).toBe(null);
+    expect(moved.some((m) => m.pid === a && /no longer Away From Keyboard/.test(m.text))).toBe(
+      true,
+    );
+
+    // Do Not Disturb is deliberate: movement leaves it in place.
+    sim.meta(a)!.moveInput.forward = false;
+    sim.chat('/dnd', a);
+    sim.tick();
+    sim.meta(a)!.moveInput.forward = true;
+    sim.tick();
+    expect(sim.meta(a)!.away?.mode).toBe('dnd');
+  });
 });
 
 // Direct unit tests for the extracted chat module (src/sim/social/chat.ts),
@@ -1205,10 +1254,10 @@ describe('chat module (direct, no Sim)', () => {
     expect(meta).toBeDefined();
     // Every catalog mount is owned (the reins item is in the bags)...
     expect(ownedMounts(meta as any)).toEqual([...MOUNT_KEYS]);
-    // ...and the level 1 rider was raised to the highest riding gate (20), so
-    // every granted mount is ridable immediately.
-    const maxGate = Math.max(...MOUNT_KEYS.map((k) => MOUNTS[k].level));
-    expect(sim.entities.get(pid)?.level).toBe(maxGate);
+    // ...and the level 1 rider was raised to 20, the stablemaster's buy gate and
+    // the only level that still matters in the mount flow (mounts themselves have
+    // no per-mount level gate).
+    expect(sim.entities.get(pid)?.level).toBe(20);
     expect(
       events.some((e: any) => e.type === 'log' && /^\[dev\] Granted 7 mount reins/.test(e.text)),
     ).toBe(true);
@@ -1235,7 +1284,7 @@ describe('chat module (direct, no Sim)', () => {
     const e = sim.entities.get(pid);
     // Level 20 (the riding-lesson gate), exactly 100g richer, standing in
     // Marla's yard beside her authored position.
-    expect(e?.level).toBe(MOUNTS.valorsteed.level);
+    expect(e?.level).toBe(20); // MOUNT_TRAIN_MIN_LEVEL
     expect(sim.meta(pid)?.copper).toBe(copperBefore + 100 * 10000);
     const marla = NPCS.stablemaster_marla;
     expect(Math.hypot((e?.pos.x ?? 0) - marla.pos.x, (e?.pos.z ?? 0) - marla.pos.z)).toBeLessThan(
@@ -1248,7 +1297,7 @@ describe('chat module (direct, no Sim)', () => {
     // never re-levels, and the [dev] line drops the level note.
     sim.chat('/dev mountquest', pid);
     const again = sim.drainEvents();
-    expect(sim.entities.get(pid)?.level).toBe(MOUNTS.valorsteed.level);
+    expect(sim.entities.get(pid)?.level).toBe(20);
     expect(sim.meta(pid)?.copper).toBe(copperBefore + 2 * 100 * 10000);
     expect(again.some((ev: any) => ev.type === 'log' && /^\[dev\] 100g added/.test(ev.text))).toBe(
       true,

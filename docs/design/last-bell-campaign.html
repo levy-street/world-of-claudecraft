@@ -1402,16 +1402,22 @@ const VIEWS = [
 ];
 
 function showView(id) {
-  document.querySelectorAll("section.view").forEach(s => s.classList.remove("active"));
+  document.querySelectorAll("section.view").forEach(s => {
+    s.classList.remove("active");
+  });
   $("#view-" + id).classList.add("active");
-  document.querySelectorAll("nav.tabs button").forEach(b => b.classList.toggle("active", b.dataset.view === id));
+  document.querySelectorAll("nav.tabs button").forEach(b => {
+    b.classList.toggle("active", b.dataset.view === id);
+  });
   window.scrollTo(0, 0);
 }
 
 function openQuest(qid) {
   showView("quests");
   renderQuestDetail(qid);
-  document.querySelectorAll(".quest-list button").forEach(b => b.classList.toggle("active", b.dataset.qid === qid));
+  document.querySelectorAll(".quest-list button").forEach(b => {
+    b.classList.toggle("active", b.dataset.qid === qid);
+  });
   location.hash = "quest:" + qid;
 }
 
@@ -1475,8 +1481,9 @@ function renderQuestList() {
     h += `<button data-qid="${q.id}"><span class="qcode">${esc(q.code)}</span> ${esc(q.title)}</button>`;
   }
   $("#quest-list").innerHTML = h;
-  document.querySelectorAll(".quest-list button").forEach(b =>
-    b.addEventListener("click", () => openQuest(b.dataset.qid)));
+  document.querySelectorAll(".quest-list button").forEach(b => {
+    b.addEventListener("click", () => openQuest(b.dataset.qid));
+  });
 }
 
 function renderMap() {
@@ -1488,13 +1495,15 @@ function renderMap() {
       <text x="${q.map.x}" y="${q.map.y + 3.5}" text-anchor="middle">${esc(q.code.replace("Q", ""))}</text>
       <title>${esc(q.code)}. ${esc(q.title)}</title>
     </g>`).join("");
-  g.querySelectorAll(".marker").forEach(m =>
-    m.addEventListener("click", () => openQuest(m.dataset.qid)));
+  g.querySelectorAll(".marker").forEach(m => {
+    m.addEventListener("click", () => openQuest(m.dataset.qid));
+  });
   $("#map-legend").innerHTML = markers.map(q =>
     `<span data-qid="${q.id}"><span class="qcode">${esc(q.code)}</span> ${esc(q.title)}</span>`).join("") +
     `<span data-qid="wf"><span class="qcode">EPI</span> Names Without Graves (Willowfen, off-island)</span>`;
-  document.querySelectorAll("#map-legend span[data-qid]").forEach(el =>
-    el.addEventListener("click", () => openQuest(el.dataset.qid)));
+  document.querySelectorAll("#map-legend span[data-qid]").forEach(el => {
+    el.addEventListener("click", () => openQuest(el.dataset.qid));
+  });
 }
 
 function linesFor(speaker) {
@@ -1539,8 +1548,9 @@ function openCastModal(c) {
   $("#modal-box").innerHTML = h;
   $("#modal").hidden = false;
   $("#modal-close").addEventListener("click", closeModal);
-  document.querySelectorAll(".modal-quest").forEach(a =>
-    a.addEventListener("click", (e) => { e.preventDefault(); closeModal(); openQuest(a.dataset.qid); }));
+  document.querySelectorAll(".modal-quest").forEach(a => {
+    a.addEventListener("click", (e) => { e.preventDefault(); closeModal(); openQuest(a.dataset.qid); });
+  });
 }
 
 function closeModal() { $("#modal").hidden = true; }
@@ -1568,9 +1578,10 @@ function renderCast() {
   $("#cast-squad").innerHTML = SQUAD.map((c, i) => castCard(c, "squad", i)).join("");
   $("#cast-npcs").innerHTML = NPCS.map((c, i) => castCard(c, "npcs", i)).join("");
   $("#cast-enemies").innerHTML = ENEMIES.map((c, i) => castCard(c, "enemies", i)).join("");
-  document.querySelectorAll("#view-cast .card.speaker").forEach(el =>
+  document.querySelectorAll("#view-cast .card.speaker").forEach(el => {
     el.addEventListener("click", () =>
-      openCastModal(CAST_GROUPS[el.dataset.group][Number(el.dataset.i)])));
+      openCastModal(CAST_GROUPS[el.dataset.group][Number(el.dataset.i)]));
+  });
 }
 
 function renderScenes() {
@@ -1603,8 +1614,9 @@ function renderScenes() {
   $("#scenes-table").innerHTML = `<thead><tr>
     <th>Quest</th><th>Beat</th><th>Type</th><th>Notes</th>
     </tr></thead><tbody>${rows}</tbody>`;
-  document.querySelectorAll(".scene-link").forEach(a =>
-    a.addEventListener("click", (e) => { e.preventDefault(); openQuest(a.dataset.qid); }));
+  document.querySelectorAll(".scene-link").forEach(a => {
+    a.addEventListener("click", (e) => { e.preventDefault(); openQuest(a.dataset.qid); });
+  });
 }
 
 function renderScript() {
@@ -1636,8 +1648,9 @@ function renderScript() {
   $("#script-summary").innerHTML =
     `<p><b>${lineCount} lines and ${choiceCount} choices across ${questCount} quests, all draft. ` +
     `${gapCount} known holes flagged below, plus the bark sheets.</b></p>`;
-  document.querySelectorAll(".script-link").forEach(a =>
-    a.addEventListener("click", (e) => { e.preventDefault(); openQuest(a.dataset.qid); }));
+  document.querySelectorAll(".script-link").forEach(a => {
+    a.addEventListener("click", (e) => { e.preventDefault(); openQuest(a.dataset.qid); });
+  });
 
   $("#bark-table").innerHTML = `<thead><tr>
     <th>Character</th><th>Lines to write</th><th>Status</th>
@@ -1651,8 +1664,9 @@ function renderScript() {
 
 $("#tabs").innerHTML = VIEWS.map(v =>
   `<button data-view="${v.id}">${esc(v.label)}</button>`).join("");
-document.querySelectorAll("nav.tabs button").forEach(b =>
-  b.addEventListener("click", () => { showView(b.dataset.view); location.hash = b.dataset.view; }));
+document.querySelectorAll("nav.tabs button").forEach(b => {
+  b.addEventListener("click", () => { showView(b.dataset.view); location.hash = b.dataset.view; });
+});
 
 renderQuestList();
 renderMap();

@@ -6,10 +6,19 @@
 // partial spans, pass resolution) against synthetic multi-column worlds.
 
 import { describe, expect, it } from 'vitest';
-import { STRIP_MAX_X, STRIP_MIN_X, worldXBoundsAt, ZONES } from '../src/sim/data';
+import {
+  STRIP_MAX_X,
+  STRIP_MIN_X,
+  WORLD_MAX_X,
+  WORLD_MIN_X,
+  worldXBoundsAt,
+  ZONES,
+} from '../src/sim/data';
 import type { ZoneDef } from '../src/sim/types';
 import {
   computeBorderEdges,
+  DECORATION_X_END,
+  DECORATION_X_START,
   inBorderLake,
   inHollowOpenSea,
   terrainHeight,
@@ -39,6 +48,13 @@ describe('the continent derives the right border set', () => {
     // no edges at all: the counts are the mainland grid's alone
     expect(edges.filter((e) => e.kind === 'h').length).toBe(10);
     expect(edges.filter((e) => e.kind === 'v').length).toBe(14);
+  });
+
+  it('enumerates decorations from the independent asymmetric x bounds', () => {
+    expect(DECORATION_X_START).toBe(WORLD_MIN_X + 14);
+    expect(DECORATION_X_END).toBe(WORLD_MAX_X - 14);
+    expect(DECORATION_X_START).toBe(-526);
+    expect(DECORATION_X_END).toBe(1286);
   });
 
   it('every crossing sits where the atlas says', () => {

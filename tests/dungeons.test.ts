@@ -109,20 +109,21 @@ function mobInInstance(sim: AnySim, inst: any, templateId: string): AnyEntity {
 // record, independently of mobTemplateForDungeonDifficulty, mirroring createMob's
 // formulas. Dropping any multiplier from the transform reddens these pins even
 // though forcing level 22 alone would already raise the per-level stats.
+// Per-mob health overrides (healthMultiplierByMob) take precedence over the
+// dungeon-wide healthMultiplier -- e.g. 2026-07-24 nerf: skeleton adds at 2.22x
+// their normal-mode pool (3,768 HP) via healthMultiplierByMob.nythraxis_skeleton_warrior.
 function expectedHeroicStats(template: MobTemplate, dungeonId: string) {
   const tuning = HEROIC_DUNGEON_TUNING[dungeonId];
   const levelUps = tuning.level - 1;
   const hpMult = template.elite ? 2.3 : 1;
   const dmgMult = template.elite ? 1.5 : 1;
+  const tuningDmg = tuning.damageMultiplierByMob?.[template.id] ?? tuning.damageMultiplier;
+  const tuningHp = tuning.healthMultiplierByMob?.[template.id] ?? tuning.healthMultiplier;
   const dmg =
-    (template.dmgBase * tuning.damageMultiplier +
-      template.dmgPerLevel * tuning.damageMultiplier * levelUps) *
-    dmgMult;
+    (template.dmgBase * tuningDmg + template.dmgPerLevel * tuningDmg * levelUps) * dmgMult;
   return {
     maxHp: Math.round(
-      (template.hpBase * tuning.healthMultiplier +
-        template.hpPerLevel * tuning.healthMultiplier * levelUps) *
-        hpMult,
+      (template.hpBase * tuningHp + template.hpPerLevel * tuningHp * levelUps) * hpMult,
     ),
     weaponMin: Math.round(dmg * 0.8),
     weaponMax: Math.round(dmg * 1.25),
@@ -897,21 +898,24 @@ describe('dungeons: heroic difficulty', () => {
     expect(heroicMorthen.weapon.min).toBeGreaterThan(normalMorthen.weapon.min);
     expect(normalMorthen.mechanicDamageMult).toBeUndefined();
     expect(normalMorthen.mechanicHealMult).toBeUndefined();
-    // Normal Morthen keeps his template speed and stays controllable.
+    // Normal Morthen keeps his template speed. He is still CC- and snare-immune,
+    // but through the TEMPLATE flags (bosses are immune on both difficulties,
+    // tests/dungeon_difficulty.test.ts): the heroic entity stamp stays heroic-only.
     expect(normalMorthen.moveSpeed).toBe(7);
+    expect(normalMorthen.ccImmune).toBeUndefined();
+    expect(normalMorthen.slowImmune).toBeUndefined();
     (normal as any).applyAura(normalMorthen, stunAura(normalPid));
     (normal as any).applyAura(normalMorthen, slowAura(normalPid));
-    expect(normalMorthen.auras.some((a: any) => a.id === 'test_stun')).toBe(true);
-    expect(normalMorthen.auras.some((a: any) => a.id === 'test_slow')).toBe(true);
+    expect(normalMorthen.auras.some((a: any) => a.id === 'test_stun')).toBe(false);
+    expect(normalMorthen.auras.some((a: any) => a.id === 'test_slow')).toBe(false);
   });
 
-  it('supports heroic mode across all six five-player dungeons', () => {
+  it('supports heroic mode across all five five-player dungeons', () => {
     const finalBosses = [
       ['hollow_crypt', 'morthen'],
       ['sunken_bastion', 'vael_the_mistcaller'],
       ['drowned_temple', 'ysolei'],
       ['gravewyrm_sanctum', 'korzul_the_gravewyrm'],
-      ['orkadia', 'orkadia_warlord'],
       ['wildheart_basin', 'wildheart_high_priest'],
     ] as const;
 
@@ -1316,17 +1320,20 @@ describe('dungeons: heroic boss drops', () => {
     expect(new Set(weaponIds).size).toBe(3);
     expect(weaponEntries.reduce((sum, e) => sum + e.chance, 0)).toBeCloseTo(1, 10);
     for (const id of weaponIds) expect(ITEMS[id]?.kind, id).toBe('weapon');
+    // The heroic raid carries the two RARE mounts and the two UNCOMMON ones. The
+    // hover-cycle is deliberately absent: it is epic now, and epic mounts are rift
+    // S-clear exclusive, so the raid must not be a back door to one.
     expect(mountEntries.map((e) => e.itemId).sort()).toEqual([
-      'reins_aether_hover_cycle',
       'reins_grag_bear',
       'reins_shadowjump_toad',
       'reins_stalkglider_snail',
+      'reins_stormfeather_griffin',
     ]);
-    // Blues at 0.1%, greens at 0.5% - check each individually.
+    // Rates follow rarity, derived rather than hand-listed: rare 0.1%, uncommon 0.5%.
     for (const e of mountEntries) {
-      const isBlue =
-        e.itemId === 'reins_aether_hover_cycle' || e.itemId === 'reins_shadowjump_toad';
-      expect(e.chance, `${e.itemId} chance`).toBe(isBlue ? 0.001 : 0.005);
+      const quality = ITEMS[e.itemId!]?.quality;
+      expect(quality, `${e.itemId} is a drop-tier mount`).not.toBe('epic');
+      expect(e.chance, `${e.itemId} (${quality}) chance`).toBe(quality === 'rare' ? 0.001 : 0.005);
     }
 
     const droppedWeapons = new Set<string>();
@@ -1921,20 +1928,24 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
       expect(add.templateId).toBe(NYTHRAXIS_ADD_ID);
       expect(add.level).toBe(22);
       expect(add.maxHp).toBe(addPins.maxHp);
+      // Encounter add waves ride the per-mob override (7.5x holds the Royal
+      // Guard at the heroic 500 floor), not the boss's dungeon-wide 8.75x.
       expect(add.mechanicDamageMult).toBe(
-        HEROIC_DUNGEON_TUNING.nythraxis_boss_arena.damageMultiplier,
+        HEROIC_DUNGEON_TUNING.nythraxis_boss_arena.damageMultiplierByMob?.[NYTHRAXIS_ADD_ID],
       );
     }
   });
 
-  it('a normal raid claim is untransformed; a heroic kill pays marks to every raider', () => {
+  it('a normal raid claim carries the normal retune; a heroic kill pays marks to every raider', () => {
     const normal = raidSetup('normal');
     const nBoss = mobInInstance(normal.sim, normal.inst, NYTHRAXIS_BOSS_ID);
-    expect(nBoss.maxHp).toBe(60000); // the untransformed raid boss (60k on normal)
-    expect(nBoss.mechanicDamageMult).toBeUndefined();
+    // Normal Nythraxis rides NORMAL_DUNGEON_TUNING (economy retune): doubled
+    // health (was 60000) and the 5x per-mob multiplier stamped for mechanics.
+    expect(nBoss.maxHp).toBe(120000);
+    expect(nBoss.mechanicDamageMult).toBe(5);
     spawnNythraxisAdds(normal.sim.ctx, nBoss);
     const nAdd = normal.sim.entities.get((nBoss.summonedIds as number[])[0]) as AnyEntity;
-    expect(nAdd.mechanicDamageMult).toBeUndefined();
+    expect(nAdd.mechanicDamageMult).toBe(5);
 
     const { sim, raiders, inst } = raidSetup('heroic');
     const boss = mobInInstance(sim, inst, NYTHRAXIS_BOSS_ID);
@@ -2319,6 +2330,25 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
 
     expect(sim.players.get(fallen)!.raidLockouts.has('nythraxis_boss_arena:heroic')).toBe(true);
     expect(sim.countItem(HEROIC_MARK_ITEM_ID, fallen)).toBe(0);
+  });
+
+  it('the empty-instance reaper never frees the arena while raiders stand in its wide outer floor', () => {
+    const { sim, raiders, inst } = raidSetup('normal');
+    const origin = instanceOriginOf(inst);
+    // NYTHRAXIS_LAYOUT (dungeon_layout.ts) authors tomb alcoves at local
+    // x = +/-210, legitimately inside the wide wallX:230/floorHalfX:228 raid
+    // room (and within instanceClaimContains's NYTHRAXIS_ROOM_RADIUS carve-out),
+    // but outside the generic 120yd box that instanceContains checks. Standing
+    // there is a real, in-fight position, not an edge case.
+    const tombX = origin.x + 210;
+    const tombZ = origin.z + 20;
+    raiders.forEach((pid) => {
+      teleport(sim, sim.entities.get(pid) as AnyEntity, tombX, tombZ);
+    });
+    inst.emptyFor = 100000; // even pre-loaded, an occupied check must reset it
+    updateInstances(sim.ctx);
+    expect(inst.partyKey).not.toBeNull();
+    expect(inst.emptyFor).toBe(0);
   });
 });
 

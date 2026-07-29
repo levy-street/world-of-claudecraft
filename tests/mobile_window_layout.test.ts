@@ -75,6 +75,16 @@ describe('mobile window layout CSS', () => {
     );
   });
 
+  it('scales the vendor window bottom clamp by --window-scale instead of a raw dvh', () => {
+    const start = mobileCss.indexOf('body.mobile-touch #vendor-window {\n    max-height:');
+    expect(start).toBeGreaterThan(0);
+    const block = mobileCss.slice(start, mobileCss.indexOf('}', start));
+    expect(block).toContain(
+      'max-height: calc(\n      var(--app-vh) /\n      var(--window-scale, 1) -\n      12px -\n      max(10px, env(safe-area-inset-bottom))\n    );',
+    );
+    expect(block).not.toContain('100dvh');
+  });
+
   it('places the Claudium wallet card beside the balance in mobile landscape', () => {
     expect(mobileCss).toContain(`@media (orientation: landscape) {
     body.mobile-touch #claudium-window .cl-body:has(> .cl-wallet-connect) {
@@ -94,19 +104,17 @@ describe('mobile window layout CSS', () => {
     }`);
   });
 
-  it('neutralizes the market controls flex-basis so column stacking never grows their height', () => {
-    // components.css gives .mkt-search/.mkt-filters/.mkt-filter a desktop flex-basis
-    // (200px/auto/140px) meant as a row WIDTH; once .mkt-controls/.mkt-filters flip to
-    // flex-direction: column that basis becomes a HEIGHT instead, ballooning the search
-    // box and clipping the filters and listing body out of the window (#2107 review).
+  it('reduces the shared market control grid to one column on mobile touch', () => {
+    // Search and filters share the desktop grid, so mobile changes the column definition
+    // directly. No nested flex basis may return and turn a control width into its height.
     expect(mobileCss).toMatch(
-      /body\.mobile-touch \.mkt-search \{[^}]*flex: 0 0 auto;[^}]*max-width: none;[^}]*min-height: 40px;/,
+      /body\.mobile-touch \.mkt-controls \{[^}]*grid-template-columns: 1fr;[^}]*align-items: stretch;/,
     );
     expect(mobileCss).toMatch(
-      /body\.mobile-touch \.mkt-filters \{[^}]*flex: 0 0 auto;[^}]*flex-direction: column;/,
+      /body\.mobile-touch \.mkt-search \{[^}]*max-width: none;[^}]*min-height: 40px;/,
     );
-    expect(mobileCss).toMatch(
-      /body\.mobile-touch \.mkt-filter \{[^}]*flex: 0 0 auto;[^}]*max-width: none;/,
-    );
+    expect(mobileCss).toMatch(/body\.mobile-touch \.mkt-filter \{[^}]*max-width: none;/);
+    expect(mobileCss).not.toMatch(/body\.mobile-touch \.mkt-(?:search|filter) \{[^}]*\bflex:/);
+    expect(mobileCss).not.toContain('body.mobile-touch .mkt-filters {');
   });
 });

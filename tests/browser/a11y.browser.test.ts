@@ -268,7 +268,7 @@ describe('axe: spellbook window', () => {
         // (IWorld always carries a player); level 1 keeps every row locked.
         world: () =>
           ({ cfg: { playerClass: 'warrior' }, known: [], player: { level: 1 } }) as never,
-        barAbilityIds: () => [],
+        barActions: () => [],
         hasFreeSlot: () => true,
         hasFormBars: () => false,
         captureFocus: () => null,
@@ -390,6 +390,8 @@ describe('axe: options menu', () => {
       (button) => button.textContent === t('hud.options.interface'),
     );
     interfaceButton?.click();
+    // The Interface panel is tabbed; both action-bar toggles live under Combat.
+    root.querySelector<HTMLButtonElement>('.opt-tab[data-tab="combat"]')?.click();
 
     expect(toggle('showThirdActionBar')?.disabled).toBe(true);
     const secondary = toggle('showSecondaryActionBar');
@@ -591,10 +593,13 @@ describe('axe: social window', () => {
 // ---------------------------------------------------------------------------
 
 describe('axe: character window', () => {
-  it('paperdoll and populated mount picker are clean and preserve keyboard focus', async () => {
+  it('the current paperdoll sheet is clean and its controls remain keyboard reachable', async () => {
+    // The mount picker used to live in this sheet and this test drove it. Reins are
+    // usable items now (bags / action bar -> useItem), so the sheet has no picker
+    // and no mount rows to focus; what is left to hold is the dialog naming and the
+    // preview's own name, which is what the axe pass below actually protects.
     const root = host('char-window');
     root.style.display = 'none';
-    let selectedMount = 'grag_bear';
     const win = new CharWindow(
       stubDeps({
         root: () => root,
@@ -604,11 +609,6 @@ describe('axe: character window', () => {
             player: { name: 'Aurelia', level: 12, skin: 0, mountKey: '' },
             equipment: {},
             professionsState: { skills: [] },
-            selectedMount: () => selectedMount,
-            ownedMounts: () => ['valorsteed', 'grag_bear', 'stalkglider_snail'],
-            selectMount: (key: string) => {
-              selectedMount = key;
-            },
           }) as never,
         statCellHtml: () => '',
         statTooltipHtml: () => '',
@@ -635,29 +635,23 @@ describe('axe: character window', () => {
     expect(root.getAttribute('aria-labelledby')).toBe('char-title');
     expect(root.querySelector('#char-title')).toBeTruthy();
     expect(root.querySelector('#char-model-preview')?.getAttribute('role')).toBe('img');
+    expect(root.querySelector('[data-mount-key]')).toBeNull();
     // The role=img preview HOST carries its OWN name, not a duplicate of the
     // title's level/class subtitle.
     const previewName = root.querySelector('#char-model-preview')?.getAttribute('aria-label');
     const titleSubtitle = root.querySelector('#char-title .panel-subtitle')?.textContent ?? '';
     expect(previewName).toBe(t('hudChrome.character.modelPreview'));
     expect(previewName).not.toBe(titleSubtitle);
-
-    const selected = root.querySelector<HTMLElement>('[data-mount-key="grag_bear"]');
-    const locked = root.querySelector<HTMLElement>('[data-mount-key="valorsteed"]');
-    const pickable = root.querySelector<HTMLElement>('[data-mount-key="stalkglider_snail"]');
-    expect(selected?.tagName).toBe('DIV');
-    expect(selected?.tabIndex).toBe(0);
-    expect(locked?.tagName).toBe('DIV');
-    expect(locked?.tabIndex).toBe(0);
-    locked?.focus();
-    expect(locked?.dataset.tooltipOpened).toBe('true');
-
-    pickable?.focus();
-    pickable?.click();
-    expect(selectedMount).toBe('stalkglider_snail');
-    const freshSelected = root.querySelector<HTMLElement>('[data-mount-key="stalkglider_snail"]');
-    expect(document.activeElement).toBe(freshSelected);
-    expect(freshSelected?.dataset.tooltipOpened).toBe('true');
+    const skin = root.querySelector<HTMLElement>('#char-skin-row button');
+    expect(skin?.tagName).toBe('BUTTON');
+    skin?.focus();
+    expect(document.activeElement).toBe(skin);
+    const share = root.querySelector<HTMLElement>('[data-act="share-card"]');
+    expect(share?.tagName).toBe('BUTTON');
+    expect(share?.textContent?.trim()).not.toBe('');
+    // The picker is GONE, not merely unpopulated: a stray mount row here would mean
+    // the sheet grew a second way to summon a mount beside the reins item.
+    expect(root.querySelector('.mount-picker')).toBeNull();
     await expectClean(root);
   });
 });
@@ -716,6 +710,16 @@ describe('axe: market window (Sim + ClientWorld shapes)', () => {
       expect(root.getAttribute('aria-label')).toBe(t('itemUi.market.title'));
       // The async-results live region is persistent + polite (the lazy-load a11y fix).
       expect(root.querySelector('.mkt-status')?.getAttribute('role')).toBe('status');
+      const groups = root.querySelectorAll<HTMLElement>('[role="group"]');
+      expect(groups).toHaveLength(1);
+      const filters = groups[0];
+      expect(filters.classList.contains('mkt-controls')).toBe(true);
+      expect(filters.getAttribute('aria-label')).toBe(t('itemUi.market.filters'));
+      expect(filters.querySelector('.mkt-search')).toBeTruthy();
+      for (const field of root.querySelectorAll('.mkt-filter')) {
+        expect(field.closest('[role="group"]')).toBe(filters);
+      }
+      expect(root.querySelector('.mkt-filters')?.hasAttribute('role')).toBe(false);
       await expectClean(root);
     });
   }

@@ -27,7 +27,13 @@
 import { adjacentCrafts, CRAFT_RING, oppositeCraft } from '../content/professions';
 import { COMBO_RECIPES } from '../content/recipes';
 import type { SimContext } from '../sim_context';
-import { type CraftSkills, tierCapability, tierForSkill, tierProgressMultiplier } from './wheel';
+import {
+  type CraftSkills,
+  skillInCraft,
+  tierCapability,
+  tierForSkill,
+  tierProgressMultiplier,
+} from './wheel';
 
 /** A character's active-archetype progression, persisted in CharacterState. */
 export interface ArchetypeState {
@@ -247,7 +253,7 @@ export function archetypeStateFor(ctx: SimContext, pid: number): ArchetypeState 
 }
 
 // Issue #1130 (re-scoped per the comment on the live issue, then pair-named
-// under the Professions 2.0 Phase 1 blueprint): a player's CURRENTLY-ACTIVE
+// under the Professions 2.0 blueprint): a player's CURRENTLY-ACTIVE
 // adjacent-pair attunement grants one named archetype title for that PAIR
 // (Smith for weaponcrafting+armorcrafting, Bombardier for engineering+alchemy,
 // and so on). There is no "Jack of All Trades" fallback under this model, since
@@ -361,8 +367,16 @@ export function archetypeCeilingFor(
  *  so a recipe tier above the player's RAW capability is the ordinary,
  *  doc-confirmed climb ("full at or above capability: this is how capability
  *  advances in the first place", wheel.ts). Below or at the ceiling, the
- *  ordinary curve (full at/above raw capability, reduced one tier under,
- *  zero two-plus under) applies off raw capability. */
+ *  ordinary four-state curve (full at/above raw capability, reduced one tier
+ *  under, minimal two under, zero three-plus under) applies off raw
+ *  capability. At the craft's enforced content cap (craftMaxSkillFor) the
+ *  multiplier is 0 outright: gainCraftSkill's clamp already made the applied
+ *  gain zero there, and folding that arm in here keeps the window label (and
+ *  the learning-coupled character-XP grant that scales by this curve) honest
+ *  at the cap. This matters because the four-state curve alone can never
+ *  reach gray for a skillReq-75-plus recipe (gray needs capability tier
+ *  recipeTier+3, i.e. skill past the 125 cap), so without the cap arm a
+ *  maxed craft would read a nonzero gain state forever. */
 export function craftSkillGainMultiplier(
   skills: CraftSkills,
   activeArchetype: string | null,
@@ -371,11 +385,41 @@ export function craftSkillGainMultiplier(
   hobbyCraft: string | null,
   skillReq: number,
 ): number {
+  // The cap is read off the ring record directly (not craftMaxSkillFor,
+  // which throws on an unknown id): this function was always total over
+  // arbitrary craft ids (the crafting window builds rows for any recipe
+  // def), and an unknown craft simply has no cap arm.
+  const cap = CRAFT_RING.find((c) => c.id === craftId)?.maxSkill;
+  if (cap !== undefined && skillInCraft(skills, craftId) >= cap) return 0;
   const ceilingTier = archetypeCeilingFor(activeArchetype, pairedMajor, craftId, hobbyCraft);
   const recipeTier = tierForSkill(skillReq);
   return recipeTier > ceilingTier
     ? 0
     : tierProgressMultiplier(tierCapability(skills, craftId), recipeTier);
+}
+
+/** The enchanting skill-gain multiplier (Professions 2.0):
+ *  quality-tiered input run through the same four-state curve as crafting,
+ *  but under the SOFT ceiling: above-ceiling input DEGRADES to the ceiling
+ *  tier (Math.min) instead of crafting's hard zero, so an epic disenchant
+ *  never grants zero merely for sitting above a pre-archetype ceiling, and
+ *  rarer input is always at least as good as commoner input (min is
+ *  monotone in `inputTier`, and tierProgressMultiplier is non-decreasing in
+ *  its recipe-tier argument). The hard-zero guard in
+ *  `craftSkillGainMultiplier` stays crafting-only: a recipe is a chosen
+ *  target, an input item is whatever the world dropped. */
+export function enchantingGainMultiplier(
+  skills: CraftSkills,
+  activeArchetype: string | null,
+  pairedMajor: string | null,
+  hobbyCraft: string | null,
+  inputTier: number,
+): number {
+  const ceilingTier = archetypeCeilingFor(activeArchetype, pairedMajor, 'enchanting', hobbyCraft);
+  return tierProgressMultiplier(
+    tierCapability(skills, 'enchanting'),
+    Math.min(inputTier, ceilingTier),
+  );
 }
 
 /** The actually-reachable tier ceiling for one craft: the lesser of the raw

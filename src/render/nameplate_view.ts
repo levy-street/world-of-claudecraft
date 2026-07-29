@@ -87,8 +87,11 @@ export function newNameplatePlan(): NameplatePlan {
  * `showNameplates` is the player's mob-nameplate toggle. `showOwnNameplate` is the
  * player's own-plate toggle (the setting defaults off): when on, the self plate is
  * no longer suppressed and it anchors at the normal lift like any other
- * player's. Pure: same inputs give the same plan, no DOM/Three/i18n, no
- * Math.random/Date.now/performance.now.
+ * player's. `showPlayerNameplates` is the other-players toggle (defaults on):
+ * when off, other players' plates hide, except the current target so a clicked
+ * player stays readable; the self plate stays governed by showOwnNameplate
+ * alone, and mob/object plates are unaffected. Pure: same inputs give the same
+ * plan, no DOM/Three/i18n, no Math.random/Date.now/performance.now.
  */
 export function nameplatePlanInto(
   out: NameplatePlan,
@@ -97,6 +100,7 @@ export function nameplatePlanInto(
   viewHeight: number,
   showNameplates: boolean,
   showOwnNameplate: boolean,
+  showPlayerNameplates: boolean,
 ): NameplatePlan {
   const dx = e.pos.x - player.pos.x;
   const dz = e.pos.z - player.pos.z;
@@ -131,7 +135,8 @@ export function nameplatePlanInto(
     (e.kind === 'object' && !isDoor && !delveInteractNear) ||
     (isDoor && e.dungeonId === UNLABELED_DOOR_DUNGEON_ID) ||
     e.templateId === UNLABELED_MOB_TEMPLATE_ID ||
-    (!showNameplates && e.kind === 'mob' && !e.dead);
+    (!showNameplates && e.kind === 'mob' && !e.dead) ||
+    (!showPlayerNameplates && e.kind === 'player' && !isSelf && e.id !== player.targetId);
   out.anchorYOffset =
     viewHeight * e.scale +
     (isSelf && hasOverheadEmote && !showOwnNameplate

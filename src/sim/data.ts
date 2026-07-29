@@ -27,6 +27,7 @@ import type {
 
 export type { FishingEntry } from './content/items';
 
+import { CASTLE_BLOCKERS } from './castle_layout';
 import {
   AMBERFALL_CAMPS,
   AMBERFALL_ITEMS,
@@ -67,6 +68,7 @@ import { DUNGEON_DEFS, DUNGEON_MOBS } from './content/dungeons';
 import {
   EVERGARDEN_CAMPS,
   EVERGARDEN_ITEMS,
+  EVERGARDEN_KNIGHT_CAMPS,
   EVERGARDEN_MOBS,
   EVERGARDEN_NPCS,
   EVERGARDEN_OBJECTS,
@@ -132,10 +134,12 @@ import { LAST_BELL_DUNGEON_DEFS } from './content/last_bell';
 import {
   LAST_BELL_CAMPAIGN_MOBS,
   LAST_BELL_CAMPAIGN_NPCS,
+  LAST_BELL_CAMPAIGN_QUEST_ORDER,
   LAST_BELL_CAMPAIGN_QUESTS,
 } from './content/last_bell_campaign';
 import { LAST_BELL_SQUAD_MOBS } from './content/last_bell_squad';
 import { MAGE_PET_MOBS } from './content/mage_pets';
+import { MAILBOXES } from './content/mailboxes';
 import {
   NIGHTBLOOM_CAMPS,
   NIGHTBLOOM_ITEMS,
@@ -150,7 +154,7 @@ import {
   NIGHTBLOOM_ROADS,
   NIGHTBLOOM_ZONE,
 } from './content/nightbloom';
-import { ORKADIA_DUNGEON_DEFS, ORKADIA_MOBS } from './content/orkadia';
+import { NOTICEBOARDS } from './content/noticeboards';
 import {
   PALMREACH_CAMPS,
   PALMREACH_ESCORTS,
@@ -165,6 +169,7 @@ import {
   PALMREACH_ROADS,
   PALMREACH_ZONE,
 } from './content/palmreach';
+import { STATIONS } from './content/professions';
 import {
   REALM_CAMPS,
   REALM_ITEMS,
@@ -269,7 +274,8 @@ import {
   ZONE3_ROADS,
   ZONE3_ZONE,
 } from './content/zone3';
-import { DUNGEON_WALL_HW } from './dungeon_layout';
+import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from './dungeon_layout';
+import { EASTBROOK_LAYOUT } from './eastbrook_layout';
 import { HARBOR_TERRAIN_EDITS } from './harbor_layout';
 import { JAIL_BLOCKERS, JAIL_TERRAIN_EDITS } from './jail';
 
@@ -306,7 +312,6 @@ function mergeItems(...parts: Record<string, ItemDef>[]): Record<string, ItemDef
 export type { ClassDef } from './content/classes';
 export { ABILITIES, abilitiesKnownAt, CLASSES } from './content/classes';
 export { GATHER_NODE_TYPES } from './content/gather_nodes';
-export { STATIONS } from './content/professions';
 // Re-export content shapes so existing `from './data'` imports keep working.
 export type {
   BiomeId,
@@ -321,6 +326,7 @@ export type {
   ZoneDef,
   ZonePropsDef,
 } from './types';
+export { STATIONS };
 
 // ---------------------------------------------------------------------------
 // Merged content tables
@@ -369,7 +375,6 @@ export const MOBS: Record<string, MobTemplate> = {
   ...YUMI_MOBS,
   ...REALM_MOBS,
   ...DRAKELANDS_MOBS,
-  ...ORKADIA_MOBS,
   ...WILDHEART_MOBS,
   ...FROSTVEIL_MOBS,
   ...AMBERFALL_MOBS,
@@ -462,6 +467,7 @@ export const QUEST_ORDER: string[] = [
   ...EVERGARDEN_QUEST_ORDER,
   ...GALECREST_QUEST_ORDER,
   ...FARSHORE_QUEST_ORDER,
+  ...LAST_BELL_CAMPAIGN_QUEST_ORDER,
 ];
 
 // The Book of Deeds catalog (content/deeds.ts) is deliberately NOT re-exported
@@ -504,6 +510,10 @@ export const CAMPS: CampDef[] = [
   ...WILLOWFEN_QUEST_CAMPS,
   ...NIGHTBLOOM_QUEST_CAMPS,
   ...GALECREST_QUEST_CAMPS,
+  // Dawnhold's knights arrived after every camp above shipped: they spread
+  // LAST so no earlier camp's world-gen rng draw moves (see the draw-order
+  // comment at the top of this array).
+  ...EVERGARDEN_KNIGHT_CAMPS,
 ];
 
 // Escort quest runs (src/sim/escort.ts): defs authored per realm, merged here
@@ -602,11 +612,14 @@ function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
     // ?? [] here would silently drop every harbor from the merged world
     harbors: sets.flatMap((s) => s.harbors ?? []),
     tents: sets.flatMap((s) => s.tents),
+    marshReeds: sets.flatMap((s) => s.marshReeds),
     crates: sets.flatMap((s) => s.crates),
     campfires: sets.flatMap((s) => s.campfires),
     mudHuts: sets.flatMap((s) => s.mudHuts),
     ruinRings: sets.flatMap((s) => s.ruinRings),
     fences: sets.flatMap((s) => s.fences),
+    benches: sets.flatMap((s) => s.benches ?? []),
+    walls: sets.flatMap((s) => s.walls ?? []),
     graveyards: sets.flatMap((s) => s.graveyards),
     // optional per-zone field, was being dropped here, so the delve entrance
     // marker (name slab + arch) never reached the renderer (props.ts)
@@ -687,7 +700,7 @@ export const WORLD_MAX_X = Math.max(...ZONES.map((zn) => zn.xMax ?? STRIP_MAX_X)
 export const WORLD_MIN_Z = Math.min(...ZONES.map((zn) => zn.zMin));
 export const WORLD_MAX_Z = Math.max(...ZONES.map((zn) => zn.zMax));
 
-export const PLAYER_START = { x: 2, z: -2 };
+export const PLAYER_START = { ...EASTBROOK_LAYOUT.services.playerStart.position };
 
 // ---------------------------------------------------------------------------
 // Active world content registry.
@@ -710,7 +723,15 @@ export const BUILTIN_WORLD: WorldContent = {
   roads: ROADS,
   props: PROPS,
   playerStart: PLAYER_START,
-  blockers: JAIL_BLOCKERS,
+  services: {
+    stations: STATIONS,
+    mailboxes: MAILBOXES,
+    noticeboards: NOTICEBOARDS,
+    graveyards: OVERWORLD_GRAVEYARDS,
+  },
+  // invisible collision walls: the moderation cage plus the Last Keep's
+  // sealed building slot (castle_layout.ts CASTLE_BLOCKERS)
+  blockers: [...JAIL_BLOCKERS, ...CASTLE_BLOCKERS],
   // The jail cage floor plus the harbor shore grading (harbor_layout.ts):
   // both are pure HeightStamp data applied through terrainHeight's edit layer.
   terrainEdits: [...JAIL_TERRAIN_EDITS, ...HARBOR_TERRAIN_EDITS],
@@ -871,25 +892,23 @@ export function instanceSlotForZ(z: number): number {
 export const DUNGEONS: Record<string, DungeonDef> = {
   ...DUNGEON_DEFS,
   ...TEMPLE_DUNGEON_DEFS,
-  ...ORKADIA_DUNGEON_DEFS,
   ...WILDHEART_DUNGEON_DEFS,
   ...LAST_BELL_DUNGEON_DEFS,
 };
 
 export const DUNGEON_LIST: DungeonDef[] = Object.values(DUNGEONS).sort((a, b) => a.index - b.index);
 
+// Indexed lookup: dungeonAt runs inside groundHeight's dungeon branch (per
+// entity per tick in a populated instance), so the per-call find() scan and
+// its closure are not welcome there.
+const DUNGEON_BY_INDEX: (DungeonDef | undefined)[] = [];
+for (const d of DUNGEON_LIST) DUNGEON_BY_INDEX[d.index] = d;
+
 export function dungeonByIndex(index: number): DungeonDef | null {
-  return DUNGEON_LIST.find((d) => d.index === index) ?? null;
+  return DUNGEON_BY_INDEX[index] ?? null;
 }
 
 // Which dungeon a far-off instance position belongs to, by x-band.
-// Dungeons occupy the instance x-band from the first slot up to (but not
-// including) the delve band. The Ashen Coliseum sits at a half-slot inside that
-// range (ARENA_X, between dungeon index 5 and 6), so its own tight band is
-// excluded explicitly. This lets the Orkadia slot (index 6, instance origin
-// ARENA_X + 300: past the arena footprint, west of the delve band) resolve as a
-// dungeon instead of being swallowed by the old `x >= ARENA_X_MIN` cutoff, which
-// left its interior unbuilt and its colliders unresolved (a pitch-black room).
 export function dungeonAt(x: number): DungeonDef | null {
   if (x >= DUNGEON_OVERFLOW_X_BASE - 300) {
     const index = DUNGEON_OVERFLOW_INDEX + Math.round((x - DUNGEON_OVERFLOW_X_BASE) / 600);
@@ -910,24 +929,22 @@ export function dungeonAt(x: number): DungeonDef | null {
 // ---------------------------------------------------------------------------
 
 export const ARENA_X = INSTANCE_X_BASE + 4200; // arena instances share this x; slots stack along z
-export const ARENA_X_MIN = ARENA_X; // x at/after this = an arena instance, not a dungeon
-// The arena band is a TIGHT column bracketing ARENA_X (all slots share this x;
-// the pit footprint is only ~±24u). It deliberately does NOT stretch to the
-// delve band: the gap east of the arena holds the Orkadia dungeon slot (index 6,
-// origin ARENA_X + 300), which must classify as a dungeon, not the arena. The
-// bound sits at the midpoint between the arena and the Orkadia slot so each
-// footprint stays comfortably on its own side.
+// Include the complete west wall plus one yard of routing headroom. Collision,
+// line of sight, camera sweeps, and dungeon lookup all select their instance
+// geometry through this boundary, so using the centreline would leave the
+// arena's entire west half attached to the neighboring dungeon band.
+export const ARENA_X_MIN = ARENA_X - (DUNGEON_WALL_X + DUNGEON_WALL_HW + 1);
 export const ARENA_X_MAX = ARENA_X + 150; // x at/after this = past the arena band
 export const ARENA_SLOT_COUNT = 4; // concurrent 1v1 matches the world can host
 const ARENA_Z0 = -1250;
-const ARENA_SLOT_SPACING = 120; // > the pit footprint (~44yd) so slots never overlap
+const ARENA_SLOT_SPACING = 120; // > the pit footprint (~52yd) so slots never overlap
 
 export function arenaOrigin(slot: number): { x: number; z: number } {
   return { x: ARENA_X, z: ARENA_Z0 + slot * ARENA_SLOT_SPACING };
 }
 
 export function isArenaPos(x: number): boolean {
-  return x >= ARENA_X_MIN && x < ARENA_X_MAX;
+  return x >= ARENA_X_MIN && x < DELVE_BAND_X_MIN;
 }
 
 // Nearest arena instance origin to a far-off position, matched by z-band (the
@@ -974,10 +991,10 @@ export const CRYPT_SPAWNS = DUNGEONS.hollow_crypt.spawns;
 
 // ---------------------------------------------------------------------------
 // Delves, private party instances past the arena x-band (see docs/prd/delves.md).
-// DELVE_X_MIN must stay above ARENA_X_MIN (4000) and ARENA_X (4200).
+// DELVE_X_MIN must stay above the full arena footprint around ARENA_X.
 // ---------------------------------------------------------------------------
 
-// 4800 sits clear of the v0.10.0 layout: dungeons end at ARENA_X_MIN (4000) and
+// 4800 sits clear of the v0.10.0 layout: the widest dungeon ends west of
 // the arena pit is centred at ARENA_X (4200, ~±22u footprint). The delve band's
 // west edge (DELVE_BAND_X_MIN = 4773) leaves a comfortable margin past the arena.
 export const DELVE_X_MIN = INSTANCE_X_BASE + 4800;

@@ -115,7 +115,7 @@ weekly seam, forge rules, or equipment-side instance payloads.
   (tunable; 1.10 compounds to about 2.6x heroic at key 10). Armor does
   not compound (the heroic armor multiplier stands).
 - The scaling record is a sibling of `HEROIC_DUNGEON_TUNING` in
-  `src/sim/content/dungeon_difficulty.ts`; `applyHeroicMobTuning` grows a
+  `src/sim/content/dungeon_difficulty.ts`; `applyDungeonMobTuning` (formerly applyHeroicMobTuning) grows a
   keystone-aware wrapper rather than a parallel path.
 - Affixes activate at thresholds: one at key 4, a second at key 7, a
   third at key 10. Declarative records in the delve-affix style

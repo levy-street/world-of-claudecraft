@@ -10,8 +10,11 @@
 // dialogue read to pick variant lines. No branching quest graphs exist.
 // All prompt/option/reply text is stable i18n keys (S3).
 
+import { MAX_SCENE_CHOICE_OPTIONS } from '../../scene_protocol';
 import type { SimContext } from '../sim_context';
-import type { Entity } from '../types';
+import type { Entity, SceneChoiceReconnectState } from '../types';
+
+export { MAX_SCENE_CHOICE_OPTIONS } from '../../scene_protocol';
 
 export interface SceneChoiceOptionDef {
   id: string;
@@ -47,6 +50,8 @@ export interface ActiveChoice {
   anchorX?: number;
   anchorZ?: number;
   onResolve?: (ctx: SimContext, optionId: string) => void;
+  /** Prompt interpolation values retained for reconnect convergence. */
+  values?: Record<string, string | number>;
 }
 
 /** A personal prompt resolves to its default once the player drifts this far
@@ -56,6 +61,9 @@ const PERSONAL_CHOICE_DRIFT = 10;
 const CHOICES: Record<string, SceneChoiceDef> = {};
 
 export function registerChoice(def: SceneChoiceDef): void {
+  if (def.options.length === 0 || def.options.length > MAX_SCENE_CHOICE_OPTIONS) {
+    throw new Error(`scene choice ${def.id} must define 1..${MAX_SCENE_CHOICE_OPTIONS} options`);
+  }
   CHOICES[def.id] = def;
 }
 
@@ -149,6 +157,7 @@ export function startChoiceForPlayer(
     anchorX: p.pos.x,
     anchorZ: p.pos.z,
     onResolve: opts?.onResolve,
+    values: opts?.values,
   });
   ctx.emit({
     type: 'sceneChoice',
@@ -162,6 +171,57 @@ export function startChoiceForPlayer(
     pid,
   });
   return true;
+}
+
+export function activeChoiceForPlayer(ctx: SimContext, pid: number): ActiveChoice | null {
+  let active: ActiveChoice | null = null;
+  for (const choice of ctx.activeChoices.values()) {
+    if (!participants(ctx, choice).some((participant) => participant.id === pid)) continue;
+    if (active === null || choice.startedAt >= active.startedAt) active = choice;
+  }
+  return active;
+}
+
+export function sceneChoiceReconnectStateFor(
+  ctx: SimContext,
+  pid: number,
+): SceneChoiceReconnectState | null {
+  const active = activeChoiceForPlayer(ctx, pid);
+  if (active === null) return null;
+  const def = CHOICES[active.choiceId];
+  if (!def) return null;
+  return {
+    choiceId: def.id,
+    promptKey: def.promptKey,
+    options: def.options.map(({ id, key }) => ({ id, key })),
+    defaultOptionId: def.defaultOptionId,
+    leaderPid: active.leaderPid,
+    values: active.values,
+    windowSeconds: def.windowSeconds,
+    remainingSeconds:
+      def.windowSeconds > 0 ? Math.max(0, def.windowSeconds - (ctx.time - active.startedAt)) : null,
+  };
+}
+
+export function answerActiveSceneChoiceByIndex(
+  ctx: SimContext,
+  optionIndex: number,
+  pid?: number,
+): boolean {
+  if (
+    !Number.isSafeInteger(optionIndex) ||
+    optionIndex < 0 ||
+    optionIndex >= MAX_SCENE_CHOICE_OPTIONS
+  )
+    return false;
+  const resolved = ctx.resolve(pid);
+  if (!resolved) return false;
+  const active = activeChoiceForPlayer(ctx, resolved.meta.entityId);
+  if (!active || active.leaderPid !== resolved.meta.entityId) return false;
+  const option = CHOICES[active.choiceId]?.options[optionIndex];
+  return option
+    ? answerSceneChoice(ctx, active.choiceId, option.id, resolved.meta.entityId)
+    : false;
 }
 
 function resolveChoice(ctx: SimContext, choice: ActiveChoice, optionId: string): void {
@@ -229,7 +289,7 @@ export function answerSceneChoice(
   }
   for (const choice of ctx.activeChoices.values()) {
     if (choice.audiencePid !== undefined || choice.choiceId !== choiceId) continue;
-    if (choice.leaderPid !== r.meta.entityId) return false;
+    if (choice.leaderPid !== r.meta.entityId) continue;
     resolveChoice(ctx, choice, optionId);
     return true;
   }

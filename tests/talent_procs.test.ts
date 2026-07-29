@@ -24,6 +24,26 @@ function fakePlayer(procs: ProcDef[]): { p: Entity; ctx: SimContext; events: str
     cooldowns: new Map<string, number>(),
     dead: false,
   } as unknown as Entity;
+  return withCtx(p, procs, events);
+}
+
+function fakeSubject(id: number, hostile: boolean): Entity {
+  return {
+    id,
+    kind: hostile ? 'mob' : 'player',
+    hostile,
+    hp: 300,
+    maxHp: 300,
+    auras: [] as Entity['auras'],
+    dead: false,
+  } as unknown as Entity;
+}
+
+function withCtx(
+  p: Entity,
+  procs: ProcDef[],
+  events: string[],
+): { p: Entity; ctx: SimContext; events: string[] } {
   const ctx = {
     players: new Map([[1, { cls: 'priest' }]]),
     playerMods: () => ({ procs }),
@@ -94,6 +114,95 @@ describe('talent proc engine', () => {
     tickProcState(p, 20.05); // age past the ICD
     onDamageTaken(ctx, p, 80);
     expect(events).toHaveLength(2);
+  });
+
+  it("absorb with target: 'self' wards the caster, never the live hostile cast target", () => {
+    // The Hellglass Ward shape: the triggering casts are hostile, so the cast
+    // target must NOT receive the ward. The negative assertion is the point.
+    const proc: ProcDef = {
+      id: 'test_hellglass',
+      name: 'Test Hellglass',
+      trigger: { on: 'castNth', n: 3, abilities: ['shadow_bolt'] },
+      responses: [
+        { kind: 'absorb', amount: 90, duration: 10, name: 'Test Hellglass', target: 'self' },
+      ],
+    };
+    const { p, ctx } = fakePlayer([proc]);
+    const enemy = fakeSubject(2, true);
+    for (let i = 0; i < 3; i++) onCastCompleted(ctx, p, 'shadow_bolt', enemy);
+    expect(p.auras.some((a) => a.id === 'test_hellglass' && a.kind === 'absorb')).toBe(true);
+    expect(enemy.auras).toHaveLength(0);
+  });
+
+  it("absorb with target: 'self' still lands on the caster when the 3rd cast kills", () => {
+    // Pins the onCastCompleted dead-target fallback: subject falls back to the
+    // player, and the self-targeted ward must land on the caster either way.
+    const proc: ProcDef = {
+      id: 'test_hellglass',
+      name: 'Test Hellglass',
+      trigger: { on: 'castNth', n: 3, abilities: ['shadow_bolt'] },
+      responses: [
+        { kind: 'absorb', amount: 90, duration: 10, name: 'Test Hellglass', target: 'self' },
+      ],
+    };
+    const { p, ctx } = fakePlayer([proc]);
+    const enemy = fakeSubject(2, true);
+    onCastCompleted(ctx, p, 'shadow_bolt', enemy);
+    onCastCompleted(ctx, p, 'shadow_bolt', enemy);
+    enemy.dead = true;
+    onCastCompleted(ctx, p, 'shadow_bolt', enemy);
+    expect(p.auras.some((a) => a.id === 'test_hellglass' && a.kind === 'absorb')).toBe(true);
+    expect(enemy.auras).toHaveLength(0);
+  });
+
+  it('absorb without a target field still shields the subject (the heal-target shape)', () => {
+    // Warding Refrain / Grove Covenant: a heal-triggered ward keeps landing on
+    // the friendly cast target, byte-identical to before the target field.
+    const proc: ProcDef = {
+      id: 'test_refrain',
+      name: 'Test Refrain',
+      trigger: { on: 'castNth', n: 1, abilities: ['lesser_heal'] },
+      responses: [{ kind: 'absorb', amount: 40, duration: 10, name: 'Test Refrain' }],
+    };
+    const { p, ctx } = fakePlayer([proc]);
+    const ally = fakeSubject(3, false);
+    onCastCompleted(ctx, p, 'lesser_heal', ally);
+    expect(ally.auras.some((a) => a.id === 'test_refrain' && a.kind === 'absorb')).toBe(true);
+    expect(p.auras).toHaveLength(0);
+  });
+
+  it("heal with target: 'self' heals the caster, not the subject", () => {
+    // No current talent uses this arm; it closes the same latent hazard for
+    // heal responses whose triggering casts are hostile.
+    const proc: ProcDef = {
+      id: 'test_leech',
+      name: 'Test Leech',
+      trigger: { on: 'castNth', n: 1, abilities: ['shadow_bolt'] },
+      responses: [{ kind: 'heal', amount: 25, target: 'self' }],
+    };
+    const { p, ctx } = fakePlayer([proc]);
+    p.hp = 100;
+    const enemy = fakeSubject(2, true);
+    enemy.hp = 100;
+    onCastCompleted(ctx, p, 'shadow_bolt', enemy);
+    expect(p.hp).toBe(125);
+    expect(enemy.hp).toBe(100);
+  });
+
+  it('heal without a target field still heals the subject', () => {
+    const proc: ProcDef = {
+      id: 'test_mend',
+      name: 'Test Mend',
+      trigger: { on: 'castNth', n: 1, abilities: ['lesser_heal'] },
+      responses: [{ kind: 'heal', amount: 25 }],
+    };
+    const { p, ctx } = fakePlayer([proc]);
+    p.hp = 100;
+    const ally = fakeSubject(3, false);
+    ally.hp = 100;
+    onCastCompleted(ctx, p, 'lesser_heal', ally);
+    expect(ally.hp).toBe(125);
+    expect(p.hp).toBe(100);
   });
 
   it('cooldownRefund shaves and clamps, reset clears', () => {

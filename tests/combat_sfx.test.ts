@@ -4,6 +4,7 @@ import type { Aura, Entity, SimEvent } from '../src/sim/types';
 import {
   auraApplyCue,
   castCueForAbility,
+  consumeHealCue,
   impactCueForDamage,
   MOB_VOICE_CUES,
   mobVoiceActionForDamage,
@@ -17,6 +18,12 @@ import {
   spellFxCue,
   weaponSwingCue,
 } from '../src/ui/combat_sfx';
+
+type HealEvent = Extract<SimEvent, { type: 'heal' }>;
+
+function heal(overrides: Partial<HealEvent> = {}): HealEvent {
+  return { type: 'heal', targetId: 1, amount: 0, ...overrides };
+}
 
 type DamageEvent = Extract<SimEvent, { type: 'damage' }>;
 
@@ -396,5 +403,28 @@ describe('combat SFX policy', () => {
     expect(playerSwingCueForDamage(damage({ kind: 'dodge' }), warrior)).toBe('melee_swing_blade');
     expect(playerSwingCueForDamage(damage({ school: 'fire' }), warrior)).toBeNull();
     expect(playerSwingCueForDamage(damage({ ability: 'Auto Shot' }), warrior)).toBeNull();
+  });
+
+  it('a potion always plays its cue, a mana-only quaff included (amount 0)', () => {
+    expect(consumeHealCue(heal({ source: 'potion', amount: 40 }))).toBe('player_drink_potion');
+    expect(consumeHealCue(heal({ source: 'potion', amount: 0 }))).toBe('player_drink_potion');
+  });
+
+  it('eat/drink only plays on the designated sfxTick, independent of amount', () => {
+    expect(consumeHealCue(heal({ source: 'food', amount: 10, sfxTick: true }))).toBe(
+      'player_eat_food',
+    );
+    expect(consumeHealCue(heal({ source: 'food', amount: 10, sfxTick: false }))).toBeNull();
+    expect(consumeHealCue(heal({ source: 'food', amount: 0, sfxTick: true }))).toBe(
+      'player_eat_food',
+    ); // full hp: still sounds on the sfx tick
+    expect(consumeHealCue(heal({ source: 'drink', amount: 10, sfxTick: true }))).toBe(
+      'player_drink_water',
+    );
+    expect(consumeHealCue(heal({ source: 'drink', amount: 10, sfxTick: false }))).toBeNull();
+  });
+
+  it('a heal with no source (leech, second wind, companion heals, ...) has no consume cue', () => {
+    expect(consumeHealCue(heal({ amount: 25 }))).toBeNull();
   });
 });

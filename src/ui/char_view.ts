@@ -28,15 +28,19 @@ export interface PaperdollView {
   right: PaperdollSlot[];
 }
 
-// Two columns flanking the model, like the classic character sheet: the left
-// column holds head/neck/shoulder/chest plus the weapon; the right column holds
-// the hands/waist/legs/feet quartet with the two ring slots at the bottom.
+// Two balanced 6/6 columns flanking the model, like the classic character sheet:
+// the left column holds head/neck/shoulder/chest plus both weapon hands (mainhand
+// then offhand); the right column holds the hands/waist/legs/feet quartet with the
+// two ring slots at the bottom. The 6/6 split (offhand under mainhand rather than
+// at the tail of the right column) keeps the two bands even on either side of the
+// fixed-width model stage; the inspect window inherits it via buildPaperdollView.
 export const PAPERDOLL_LEFT_SLOTS: readonly EquipSlot[] = [
   'helmet',
   'neck',
   'shoulder',
   'chest',
   'mainhand',
+  'offhand',
 ];
 export const PAPERDOLL_RIGHT_SLOTS: readonly EquipSlot[] = [
   'gloves',
@@ -45,7 +49,6 @@ export const PAPERDOLL_RIGHT_SLOTS: readonly EquipSlot[] = [
   'feet',
   'ring1',
   'ring2',
-  'offhand',
 ];
 
 /**

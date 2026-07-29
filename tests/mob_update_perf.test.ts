@@ -56,6 +56,41 @@ function buildPileup(): { sim: Sim; players: number[]; entities: number } {
 }
 
 describe('mob.update high-load regression budget', () => {
+  it('lets the headless host skip distant idle wilderness mobs without changing defaults', () => {
+    const throttled = new Sim({
+      seed: WORLD_SEED,
+      playerClass: 'warrior',
+      idleMobTickRadius: 25,
+    });
+    const defaultSim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
+
+    const distant = [...throttled.entities.values()].find(
+      (e) =>
+        e.kind === 'mob' &&
+        e.ownerId === null &&
+        e.aiState === 'idle' &&
+        Math.hypot(e.pos.x - throttled.player.pos.x, e.pos.z - throttled.player.pos.z) > 80,
+    );
+    expect(distant).toBeDefined();
+    if (distant?.kind !== 'mob') return;
+
+    const defaultTwin = [...defaultSim.entities.values()].find(
+      (e) =>
+        e.kind === 'mob' &&
+        e.templateId === distant.templateId &&
+        e.spawnPos.x === distant.spawnPos.x,
+    );
+    expect(defaultTwin?.kind).toBe('mob');
+
+    distant.wanderTimer = 10;
+    if (defaultTwin?.kind === 'mob') defaultTwin.wanderTimer = 10;
+    throttled.tick();
+    defaultSim.tick();
+
+    expect(distant.wanderTimer).toBe(10);
+    if (defaultTwin?.kind === 'mob') expect(defaultTwin.wanderTimer).toBeLessThan(10);
+  });
+
   it('bounds mob.update per-tick cost and tags every mob lap for zone attribution', () => {
     const { sim, entities } = buildPileup();
 

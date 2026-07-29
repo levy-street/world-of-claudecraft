@@ -26,11 +26,16 @@
 // cluster, so a DoT class can dot the nearest few mobs it can see, Tab through
 // them, then Tab once more to land back on the priority target, instead of
 // stepping out to an idle mob two screens away or one off to the side
-// (#tab-near-cluster). Keeping the gate on facing also means a warrior fleeing a
-// fight can turn toward a fresh mob, Tab it, and Charge away, rather than Tab
-// snapping back to the enemy chasing from behind. The fallback band is reached
-// only when the cluster is empty (e.g. the player has turned away from every
-// enemy), so Tab never leaves the player unable to target anything.
+// (#tab-near-cluster). An enemy actively engaged in melee with the player also
+// joins the cluster, even outside the facing cone, so an immediate attacker
+// cannot lose target priority to a distant idle mob. Keeping the wider off-screen
+// engaged band out of the cluster still means a warrior fleeing a fight can turn
+// toward a fresh mob, Tab it, and Charge away, rather than Tab snapping back to
+// the enemy chasing from behind. The fallback band is reached only when the
+// cluster is empty (e.g. the player has turned away from every enemy), so Tab
+// never leaves the player unable to target anything.
+
+import { MELEE_RANGE } from './types';
 
 export interface TabCandidate {
   id: number;
@@ -76,6 +81,8 @@ export const TAB_NEAR_RADIUS = 30;
 // TAB_NEAR_RADIUS. Used by Sim.enemyCandidates and surfaced by the debug overlay.
 export const TAB_QUERY_RADIUS = 40;
 
+export const TAB_ENGAGED_MELEE_RADIUS = MELEE_RANGE;
+
 function onScreen(c: TabCandidate, facing: number): boolean {
   // A target on top of the player has no meaningful direction; treat as visible.
   if (c.d <= 1e-6) return true;
@@ -89,8 +96,8 @@ function onScreen(c: TabCandidate, facing: number): boolean {
 
 // Lower tier = cycles first. 0: engaged and on screen, 1: on screen,
 // 2: engaged but off screen, 3: neither.
-function tier(engaged: boolean, vis: boolean): number {
-  if (engaged && vis) return 0;
+function tier(engaged: boolean, vis: boolean, meleeEngaged: boolean): number {
+  if (engaged && (vis || meleeEngaged)) return 0;
   if (vis) return 1;
   if (engaged) return 2;
   return 3;
@@ -116,15 +123,16 @@ export function orderTabTargets(
   const ranked = candidates
     .map((c) => {
       const vis = onScreen(c, facing);
+      const meleeEngaged = c.engaged && c.d <= TAB_ENGAGED_MELEE_RADIUS;
       return {
         id: c.id,
-        t: tier(c.engaged, vis),
+        t: tier(c.engaged, vis, meleeEngaged),
         d: c.d,
         // Visibility gates the cluster: an enemy must be on screen, and then
         // either engaged (distance relaxed) or within the near radius. Tab never
         // grabs an unseen mob off to the side or behind the player, even one in
         // combat with them.
-        near: vis && (c.engaged || c.d <= nearRadius),
+        near: (vis && (c.engaged || c.d <= nearRadius)) || meleeEngaged,
       };
     })
     .sort((a, b) => a.t - b.t || a.d - b.d || a.id - b.id);

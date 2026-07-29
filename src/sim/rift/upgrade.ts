@@ -2,7 +2,7 @@
 // shared by the authoritative sim and renderer, so upgraded content remains
 // deterministic without transmitting generated geometry.
 
-import { RIFT_MOBS } from '../content/rift/mobs';
+import { RIFT_MOBS, RIFT_TRASH_IDS } from '../content/rift/mobs';
 import { RIFT_MONSTER_BY_ID, riftMonsterCompatible } from '../content/rift/monster_index';
 import { RIFT_THEMES } from '../content/rift/themes';
 import { Rng } from '../rng';
@@ -231,7 +231,19 @@ export function applyRiftUpgrade(
   }
   const theme = RIFT_THEMES.find((candidate) => candidate.id === directive.themeId);
   if (!theme) return floor;
-  const trash = directive.monsterIds.filter((id) => !RIFT_MOBS[id]?.boss);
+  // Only SPAWN-LIST templates may be substituted into a spawn list. Excluding
+  // bosses is not enough: the shared summoned-add templates (rift_spawnling,
+  // rift_bonewalker) are non-boss AND appear in the bone/void/citadel theme
+  // rosters, so a manifest could seed them as trash. They are non-elite with
+  // roughly half a trash template's base weapon damage, so on the trash
+  // multiplier they land ~45% under the rank's trash floor
+  // (tests/rift_difficulty_floors.test.ts), and they carry no loot table at
+  // all, so a pack of them pays nothing. A manifest listing only adds leaves
+  // the generated templates in place, which is the safe fallback. Manifests can
+  // arrive from an optional server-side AI service, so this filter is a trust
+  // boundary, not just a tidy-up.
+  const spawnable = new Set<string>(RIFT_TRASH_IDS);
+  const trash = directive.monsterIds.filter((id) => spawnable.has(id));
   let trashIndex = 0;
   let spawns = floor.spawns.map((spawn) => {
     if (spawn.boss) {

@@ -33,8 +33,10 @@ export const MAIL_MAX_ATTACHMENTS = 3; // item stacks a letter can carry
 export const MAIL_DELIVERY_SECONDS = 45; // player mail: the raven's flight
 const MAIL_NPC_DELIVERY_SECONDS = 90; // authored letters default delay
 const MAIL_EXPIRY_SECONDS = 14 * 24 * 3600; // sim-seconds a read/plain letter lingers
+// Sim-seconds an unclaimed player parcel waits before it flies home to its
+// sender, and the returned letter's second window before the sweep deletes it.
+export const MAIL_ATTACHMENT_EXPIRY_SECONDS = 30 * 24 * 3600;
 const MAIL_MAX_PER_RECIPIENT = 100; // stored letters per mailbox (full = refuse new)
-const MAIL_WIRE_LIMIT = 50; // most letters shipped to one client at a time
 export const MAIL_SUBJECT_MAX = 64;
 export const MAIL_BODY_MAX = 600;
 
@@ -45,6 +47,13 @@ export interface MailMessage {
   recipientKey: string; // stable recipient identity (character id string); market sellerKey convention
   recipientName: string; // display name at send time (rekeyed on rename)
   senderName: string; // display name; player names splice verbatim, letter senders localize by letterId
+  // Stable sender identity (the market sellerKey convention), captured at send
+  // time for player mail only. A rename never changes this, unlike senderName,
+  // so returnToSender re-keys the flight home by THIS field: the sender's
+  // display name can drift after send (a rename between send and expiry), but
+  // their stable id never does. Absent on system/npc mail (never returned) and
+  // on any letter persisted before this field existed.
+  senderKey?: string;
   kind: MailKind;
   letterId?: string; // authored-letter id: the client localizes subject/body/sender through it
   subject: string;
@@ -52,8 +61,13 @@ export interface MailMessage {
   copper: number;
   items: InvSlot[];
   deliverAt: number; // sim.time seconds; in the recipient's box once time >= deliverAt
-  expiresAt: number; // sim.time seconds; Infinity while attachments remain
+  // sim.time seconds. Player parcels ride the attachment window; system and npc
+  // parcels hold Infinity while attachments remain (their expiry exemption).
+  expiresAt: number;
   read: boolean;
+  // The one return-to-sender cycle has run. The sweep's delete arm requires
+  // this flag, so attachments are never destroyed without a return flight.
+  returned?: boolean;
   // Runtime-only: the arrival event already fired (not serialized; on load a
   // delivered letter is marked announced so a restart never re-toasts it).
   announced: boolean;
@@ -68,6 +82,7 @@ export interface MailSave {
     recipientKey: string;
     recipientName: string;
     senderName: string;
+    senderKey?: string;
     kind: MailKind;
     letterId?: string;
     subject: string;
@@ -77,6 +92,7 @@ export interface MailSave {
     deliverIn: number; // seconds until delivery (0 = already delivered)
     secondsLeft: number; // seconds until expiry; -1 = never expires
     read: boolean;
+    returned?: boolean; // the return cycle has run; absent = false
   }[];
   nextMailId: number;
 }
@@ -128,6 +144,23 @@ export class PostOffice {
           });
         }
       }
+      // Attachment expiry, player mail ONLY: a system/npc parcel holds
+      // expiresAt = Infinity, so it can never trip this arm; the kind filter is
+      // the belt-and-braces behind that by-construction exemption. An unclaimed
+      // parcel first flies home; deletion with attachments aboard requires the
+      // returned flag, so no item is ever destroyed without the return cycle
+      // having run.
+      if (m.kind === 'player' && now >= m.expiresAt && (m.items.length > 0 || m.copper > 0)) {
+        if (m.returned) {
+          // The one sanctioned destruction: the return flight already happened.
+          if (!m.read && now >= m.deliverAt) this.indexDec(m.recipientKey);
+          this.undelivered.delete(m);
+          this.mail.splice(i, 1);
+        } else {
+          this.returnToSender(m, now);
+        }
+        continue;
+      }
       if (now >= m.expiresAt && m.items.length === 0 && m.copper <= 0) {
         // A delivered-and-unread letter that expires leaves the unread index.
         if (!m.read && now >= m.deliverAt) this.indexDec(m.recipientKey);
@@ -135,6 +168,38 @@ export class PostOffice {
         this.mail.splice(i, 1);
       }
     }
+  }
+
+  // Expiry return flight: the unclaimed parcel flies home IN PLACE, deliberately
+  // not as a send: MAIL_MAX_PER_RECIPIENT is a send-time gate, so a full sender
+  // box still holds the returned letter rather than destroying it. Re-keys the
+  // letter onto the sender's STABLE id (senderKey, the market sellerKey
+  // convention), never their display name: a sender who renames between send
+  // and expiry must still be reachable, so a name would silently orphan the
+  // parcel (or hand it to whoever later claims the vacated name). Falls back to
+  // senderName only for a letter persisted before senderKey existed. Also
+  // swaps the names so the letter honestly shows who it came back from, and
+  // carries the OLD recipientKey forward as the new senderKey: recipientKey is
+  // always stable-id by construction (booked that way, or by a prior return),
+  // so a letter that bounces back and forth stays stable-id-keyed on both ends.
+  private returnToSender(m: MailMessage, now: number): void {
+    // Move the delivered-and-unread contribution out of the old bucket
+    // (exactly what the index counts; the rekeyMailOwner shape).
+    if (!m.read && now >= m.deliverAt) this.indexDec(m.recipientKey);
+    const homeKey = m.senderKey ?? m.senderName;
+    const homeName = m.senderName;
+    m.senderKey = m.recipientKey;
+    m.senderName = m.recipientName;
+    m.recipientKey = homeKey;
+    m.recipientName = homeName;
+    m.returned = true;
+    m.read = false;
+    // A fresh flight: the normal delivery path lands and announces the return.
+    m.announced = false;
+    m.deliverAt = now + MAIL_DELIVERY_SECONDS;
+    // The second window: one more chance to claim, then the sweep deletes.
+    m.expiresAt = now + MAIL_ATTACHMENT_EXPIRY_SECONDS;
+    this.trackDelivery(m);
   }
 
   private nearMailbox(e: Entity): boolean {
@@ -356,6 +421,7 @@ export class PostOffice {
       recipientKey: recipient.key,
       recipientName: recipient.name,
       senderName: meta.name,
+      senderKey: this.mailKeyFor(meta),
       kind: 'player',
       subject: cleanSubject,
       body: cleanBody,
@@ -384,6 +450,7 @@ export class PostOffice {
       this.result(meta.entityId, 'letterGone');
       return;
     }
+    const hadAttachments = m.copper > 0 || m.items.length > 0;
     // Coin is never capacity-gated: it always lands in the purse.
     if (m.copper > 0) {
       meta.copper += m.copper;
@@ -414,8 +481,11 @@ export class PostOffice {
       this.ctx.error(meta.entityId, 'Your bags are full.');
       return;
     }
-    // Fully emptied: start the expiry clock if it never had one.
-    if (!Number.isFinite(m.expiresAt)) m.expiresAt = this.ctx.time + MAIL_EXPIRY_SECONDS;
+    // Fully emptied: the letter leaves its attachment clock (Infinity for
+    // system/npc mail, the attachment window for player parcels, either way a
+    // returned letter included) and starts the standard emptied-letter window.
+    // Only the take that empties it fires, so a repeat take never extends it.
+    if (hadAttachments) m.expiresAt = this.ctx.time + MAIL_EXPIRY_SECONDS;
   }
 
   mailDelete(mailId: number, pid?: number): void {
@@ -506,6 +576,7 @@ export class PostOffice {
     recipientKey: string;
     recipientName: string;
     senderName: string;
+    senderKey?: string;
     kind: MailKind;
     letterId?: string;
     subject: string;
@@ -515,11 +586,20 @@ export class PostOffice {
     delaySeconds: number;
   }): void {
     const hasAttachments = opts.copper > 0 || opts.items.length > 0;
+    // Player parcels ride the attachment window (one return cycle, then the
+    // sweep deletes). System and npc parcels get NO clock at all while loaded:
+    // that absence, plus the sweep's kind filter, IS their expiry exemption.
+    const expiresAt = hasAttachments
+      ? opts.kind === 'player'
+        ? this.ctx.time + MAIL_ATTACHMENT_EXPIRY_SECONDS
+        : Infinity
+      : this.ctx.time + MAIL_EXPIRY_SECONDS;
     const msg: MailMessage = {
       id: this.nextMailId++,
       recipientKey: opts.recipientKey,
       recipientName: opts.recipientName,
       senderName: opts.senderName,
+      senderKey: opts.senderKey,
       kind: opts.kind,
       letterId: opts.letterId,
       subject: opts.subject,
@@ -527,7 +607,7 @@ export class PostOffice {
       copper: opts.copper,
       items: opts.items,
       deliverAt: this.ctx.time + Math.max(0, opts.delaySeconds),
-      expiresAt: hasAttachments ? Infinity : this.ctx.time + MAIL_EXPIRY_SECONDS,
+      expiresAt,
       read: false,
       announced: false,
     };
@@ -543,9 +623,8 @@ export class PostOffice {
     // pillar, which also bounds the per-snapshot wire cost.
     if (!this.nearMailbox(e)) return null;
     const mine = this.deliveredFor(meta).sort((a, b) => b.deliverAt - a.deliverAt || b.id - a.id);
-    const wired = mine.slice(0, MAIL_WIRE_LIMIT);
     return {
-      messages: wired.map((m) => ({
+      messages: mine.map((m) => ({
         id: m.id,
         senderName: m.senderName,
         kind: m.kind,
@@ -598,6 +677,7 @@ export class PostOffice {
         recipientKey: m.recipientKey,
         recipientName: m.recipientName,
         senderName: m.senderName,
+        senderKey: m.senderKey,
         kind: m.kind,
         letterId: m.letterId,
         subject: m.subject,
@@ -607,6 +687,7 @@ export class PostOffice {
         deliverIn: Math.max(0, Math.round(m.deliverAt - now)),
         secondsLeft: Number.isFinite(m.expiresAt) ? Math.max(0, Math.round(m.expiresAt - now)) : -1,
         read: m.read,
+        returned: m.returned,
       })),
       nextMailId: this.nextMailId,
     };
@@ -635,6 +716,7 @@ export class PostOffice {
       const kind: MailKind = m.kind === 'player' || m.kind === 'npc' ? m.kind : 'system';
       const recipientName = String(m.recipientName ?? m.recipientKey);
       const senderName = String(m.senderName ?? '?');
+      const senderKey = typeof m.senderKey === 'string' ? m.senderKey : undefined;
       const subject = String(m.subject ?? '');
       const body = String(m.body ?? '');
       const retainedItems: InvSlot[] = [];
@@ -667,11 +749,23 @@ export class PostOffice {
         m.secondsLeft === -1 || !Number.isFinite(m.secondsLeft)
           ? Infinity
           : this.ctx.time + Math.max(0, m.secondsLeft);
+      // Deploy clock: a save written before the attachment window existed
+      // persisted player parcels with the never sentinel. Their window starts
+      // at this load, never retroactively. System/npc parcels keep Infinity.
+      const expiresAt =
+        returnedItems.length > 0 && retainedItems.length === 0 && copper <= 0
+          ? Math.min(persistedExpiresAt, this.ctx.time + MAIL_EXPIRY_SECONDS)
+          : kind === 'player' &&
+              (retainedItems.length > 0 || copper > 0) &&
+              !Number.isFinite(persistedExpiresAt)
+            ? this.ctx.time + MAIL_ATTACHMENT_EXPIRY_SECONDS
+            : persistedExpiresAt;
       this.mail.push({
         id: m.id,
         recipientKey: m.recipientKey,
         recipientName,
         senderName,
+        senderKey,
         kind,
         letterId: typeof m.letterId === 'string' ? m.letterId : undefined,
         subject,
@@ -679,11 +773,9 @@ export class PostOffice {
         copper,
         items: retainedItems,
         deliverAt: this.ctx.time + deliverIn,
-        expiresAt:
-          returnedItems.length > 0 && retainedItems.length === 0 && copper <= 0
-            ? Math.min(persistedExpiresAt, this.ctx.time + MAIL_EXPIRY_SECONDS)
-            : persistedExpiresAt,
+        expiresAt,
         read: m.read === true,
+        returned: m.returned === true,
         // Already-delivered letters never re-toast after a restart.
         announced: deliverIn <= 0,
       });

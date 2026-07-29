@@ -26,6 +26,7 @@ const MASTER_GAINS_DB = {
   ui_fiesta_augment: 3.02,
   ui_fiesta_down: 6.66,
   ui_fiesta_revive: 4.01,
+  ui_gather_cast: 0,
 };
 
 function tone(frequency, start, duration, gain, options = {}) {
@@ -131,6 +132,17 @@ export const UI_SFX_SPECS = [
   cue('ui_fiesta_revive', 0.55, 'Quick optimistic upward arcade revive pop.', [
     tone(523, 0, 0.16, 0.19, { wave: 'triangle', endFrequency: 784 }),
     tone(784, 0.08, 0.25, 0.17, { wave: 'triangle' }),
+  ]),
+  // Gathering-cast placeholder (Professions 2.0 Phase 12b, issue #2208):
+  // deterministic synth stand-in, the flat fallback for when no node type is
+  // known (see gatherCastByNodeType in src/game/audio.ts for the real,
+  // per-type recordings that otherwise take over). The fishing-rhythm
+  // placeholders that used to live here (ui_fish_cast/bite/reel) were
+  // retired once real recordings replaced them, same as the gather-strike/
+  // rare placeholders before them.
+  cue('ui_gather_cast', 0.5, 'Soft low woody wind-up thump as a gathering swing begins.', [
+    tone(180, 0, 0.22, 0.16, { wave: 'triangle', endFrequency: 130 }),
+    noise('brown', 0, 0.16, 0.08, { lowpass: 500 }),
   ]),
 ].map((spec) => ({ ...spec, masterGainDb: MASTER_GAINS_DB[spec.key] }));
 

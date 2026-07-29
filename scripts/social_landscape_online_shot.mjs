@@ -15,6 +15,7 @@ import puppeteer from 'puppeteer-core';
 import WebSocket from 'ws';
 import { BROWSER_PATH } from './browser_path.mjs';
 import { suppressGpuNotice } from './lib/gpu_notice_suppress.mjs';
+import { worldAuthMessage } from './lib/world_auth.mjs';
 
 const GAME_URL = process.env.GAME_URL ?? 'http://localhost:5190';
 const SERVER_URL = process.env.SERVER_URL ?? 'http://localhost:8790';
@@ -63,7 +64,7 @@ class AltBot {
       this.ws = new WebSocket(`${WS_BASE}/ws`);
       const to = setTimeout(() => reject(new Error('timeout')), 20000);
       this.ws.on('open', () => {
-        this.ws.send(JSON.stringify({ t: 'auth', token: reg.body.token, character: char.body.id }));
+        this.ws.send(JSON.stringify(worldAuthMessage(reg.body.token, char.body.id)));
       });
       this.ws.on('message', (data) => {
         const msg = JSON.parse(String(data));
@@ -221,17 +222,6 @@ async function loginAndEnter(page, username, charName, cls, mobile = false) {
       .catch(() => {});
     await page.evaluate(() => document.querySelector('#mobile-preflight-continue')?.click());
   }
-  // The post-login Welcome Screen (news/patch notes/Discord strip) gates startGame behind
-  // a Continue click, same #ws-continue id enterOfflineGame (scripts/enter_offline_game.mjs)
-  // dismisses offline; online shows it too and window.__game never appears until it clears.
-  await sleep(1000);
-  await page
-    .waitForSelector('#ws-continue:not([disabled])', { visible: true, timeout: 20000 })
-    .catch(() => {});
-  await page.evaluate(() => {
-    const btn = document.querySelector('#ws-continue');
-    if (btn && !btn.disabled) btn.click();
-  });
   await page.waitForFunction(() => window.__game?.world?.entities?.size >= 1, {
     timeout: 30000,
     polling: 500,

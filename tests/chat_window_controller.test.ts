@@ -3,6 +3,7 @@ import {
   type ChatContextMenuPort,
   ChatWindowController,
 } from '../src/ui/hud/chat/chat_window_controller';
+import { t } from '../src/ui/i18n';
 import { FakeDocument, type FakeElement } from './helpers/fake_dom';
 
 class MemoryStorage {
@@ -20,6 +21,17 @@ class MemoryStorage {
     this.values.set(key, value);
   }
 }
+
+// An item and a quest the client can name but the chat-link parser cannot
+// encode (its charset is [A-Za-z0-9_]+). No shipped content id looks like this;
+// the day one does, these are what keeps it from reaching chat as raw source.
+const ODD_ITEM_ID = 'qa-test.item';
+const ODD_QUEST_ID = 'q-odd.quest';
+
+const ITEM_NAMES: Record<string, string> = {
+  sword: 'Iron Sword',
+  [ODD_ITEM_ID]: 'Odd Relic',
+};
 
 interface Harness {
   controller: ChatWindowController;
@@ -68,10 +80,13 @@ function makeHarness(
     contextMenu,
     sendChat: (line) => sent.push(line),
     isMobileLayout: () => false,
-    itemDisplayName: (itemId) => (itemId === 'sword' ? 'Iron Sword' : null),
+    // ODD_ITEM_ID / ODD_QUEST_ID resolve like any other content record: they are
+    // in the tables and they have names. The ONLY thing wrong with them is the
+    // charset, which is exactly the case #2459 is about.
+    itemDisplayName: (itemId) => ITEM_NAMES[itemId] ?? null,
     questTitle: (questId) => (questId === 'q_wolves' ? 'Thin the Pack' : questId),
     selectedQuestId: () => selectedQuest,
-    hasQuest: (questId) => questId === 'q_wolves',
+    hasQuest: (questId) => questId === 'q_wolves' || questId === ODD_QUEST_ID,
     showError: (text) => errors.push(text),
   });
   return { controller, document, input, chatLog, combatLog, storage, sent, errors };
@@ -139,6 +154,65 @@ describe('ChatWindowController', () => {
     expect(selected.controller.maybeHandleQuestShareCommand('/share now')).toBe(true);
     expect(selected.sent).toEqual(['/p [[q:q_wolves]]']);
     expect(selected.controller.maybeHandleQuestShareCommand('/party hello')).toBe(false);
+  });
+
+  // #2459: three encode sites used to mint a token from an id the chat parser
+  // cannot match. Such a token is not dropped by parseChatSegments, it survives
+  // as a text segment, so the player and every recipient read the literal
+  // "[[i:...]]" source instead of a link.
+  it('drops a shift-click item link rather than drafting a token the parser will not match', () => {
+    const harness = makeHarness();
+    harness.controller.init();
+
+    harness.controller.insertItemLink(ODD_ITEM_ID);
+
+    // Nothing drafted at all: no label, and no pending mapping left behind that
+    // a later send could splice in. The label assertion has to come FIRST,
+    // because applyPendingLinks drains the queue on its first non-empty call, so
+    // a composeSend of unrelated text ahead of it would empty the very thing
+    // this is trying to observe.
+    expect(harness.input.value).toBe('');
+    expect(harness.controller.composeSend('[Odd Relic]')).not.toContain('[[i:');
+    expect(harness.controller.composeSend('look at this')).toBe('/say look at this');
+  });
+
+  it('still drafts the linkable stacks around a dropped one', () => {
+    // The guard must be per-link, not a latch that poisons the rest of the draft.
+    const harness = makeHarness();
+    harness.controller.init();
+
+    harness.controller.insertItemLink('sword');
+    harness.controller.insertItemLink(ODD_ITEM_ID);
+    harness.controller.insertItemLink('sword');
+
+    expect(harness.input.value).toBe('[Iron Sword] [Iron Sword]');
+    expect(harness.controller.composeSend(harness.input.value)).toBe(
+      '/say [[i:sword]] [[i:sword]]',
+    );
+  });
+
+  it('drops a questlog shift-click link on an unlinkable quest id', () => {
+    const harness = makeHarness();
+    harness.controller.init();
+
+    harness.controller.insertQuestLink(ODD_QUEST_ID);
+
+    expect(harness.input.value).toBe('');
+    expect(harness.controller.composeSend(`[${ODD_QUEST_ID}]`)).not.toContain('[[q:');
+  });
+
+  it('refuses /share for an unlinkable quest id and says why, rather than sending raw text', () => {
+    const harness = makeHarness({}, ODD_QUEST_ID);
+    harness.controller.init();
+
+    // The command is still consumed (it is a /share), but nothing goes out.
+    expect(harness.controller.maybeHandleQuestShareCommand('/share')).toBe(true);
+    expect(harness.sent).toEqual([]);
+    // Which string, spelled out: "can't be shared" is the truthful outcome, and
+    // the sibling "select a quest" copy would be a lie here (one IS selected and
+    // hasQuest already returned true for it).
+    expect(harness.errors).toEqual([t('hudChrome.questShare.notShareable')]);
+    expect(harness.errors[0]).not.toBe(t('hudChrome.questShare.noQuestSelected'));
   });
 
   it('composes plain text as a reply on a restored whisper tab', () => {

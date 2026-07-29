@@ -110,6 +110,7 @@ export const it_IT: Record<string, string> = {
   'stats.peakOnlineAllTime': 'picco online storico',
   'stats.accounts': 'account',
   'stats.characters': 'personaggi',
+  'stats.playersCap': 'limite giocatori',
   'stats.newAccounts24h': 'nuovi account 24h',
   'stats.returningAccounts24h': 'account di ritorno 24h',
   'stats.activeAccounts24h': 'account attivi 24h',

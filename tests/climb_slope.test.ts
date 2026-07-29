@@ -136,8 +136,18 @@ describe('unwalkable slope movement gates', () => {
   });
 
   it('cannot climb the rim wall by spamming jump into it', { timeout: 30000 }, () => {
+    // What "cannot climb" means is a HEIGHT, not an x. This used to assert
+    // pos.x > xCrest, which only holds while the rim is an unbroken rise all
+    // the way to the map edge; since d5af0bfda ("every land border is walkable,
+    // not just the pass roads") the margin past the crest is coast, and the
+    // land west of it descends into open sea. A walker that correctly SLIDES
+    // off the steep face and rounds the headland at sea level then passes the
+    // crest's x about 19yd BELOW it, having climbed nothing: the old proxy read
+    // that as a breach. Measure the climb itself instead, both ways it could
+    // happen (walking up the face, or laddering it with a ledge grab).
     const sim = makeSim();
     const { z, xStart, xCrest } = findWestRimApproach(SEED);
+    const hCrest = terrainHeight(xCrest, z, SEED);
     teleport(sim, xStart, z);
     const meta = sim.players.get(sim.player.id);
     if (!meta) throw new Error('missing player meta');
@@ -146,7 +156,8 @@ describe('unwalkable slope movement gates', () => {
     sim.player.facing = WEST;
     for (let i = 0; i < 20 * 60; i++) {
       sim.tick();
-      expect(sim.player.pos.x, `tick ${i}: crossed the rim crest`).toBeGreaterThan(xCrest);
+      expect(sim.player.pos.y, `tick ${i}: climbed to the rim crest height`).toBeLessThan(hCrest);
+      expect(sim.player.climb, `tick ${i}: laddered the rim with a ledge climb`).toBeFalsy();
     }
   });
 

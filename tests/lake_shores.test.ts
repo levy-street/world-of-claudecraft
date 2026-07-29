@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { BUILTIN_WORLD, CAMPS, setActiveWorldContent } from '../src/sim/data';
 import { moveSpeedMult, type PlayerMotionDeps, stepPlayerMotion } from '../src/sim/player_motion';
 import { Sim } from '../src/sim/sim';
-import type { MoveInput, WorldContent } from '../src/sim/types';
+import { emptyZoneProps, type MoveInput, type WorldContent } from '../src/sim/types';
 import { computeBorderEdges, terrainHeight, WATER_LEVEL } from '../src/sim/world';
 
 // Terrain-generation guarantees for declared water bodies (the generator-side
@@ -59,8 +59,16 @@ function kernelDeps(seed: number): PlayerMotionDeps {
 }
 
 // Drive the real movement kernel from the lake center outward; an escape is
-// standing on dry ground clear of the water. Pass-through collision: this
-// measures terrain, not props.
+// standing on dry ground clear of the water. This measures TERRAIN, not props,
+// which is why makeSim below strips the authored prop tables: the open-world
+// arm of stepPlayerMotion resolves through the physics kernel's own collider
+// broadphase (src/sim/physics/character.ts), not through PlayerMotionDeps
+// .resolveMove, so a pass-through dep can no longer make the measurement
+// prop-free. Stripping the props is the honest replacement, and it keeps the
+// end-to-end claim: the REAL kernel is still what walks out of every lake.
+// (The Hollow's falls basin is the case that forced this: its centrepiece prop
+// is a 4.6 yd disc sitting exactly on the lake anchor, so with props active the
+// actor starts every ray already inside a collider.)
 function blockedDirections(
   sim: Sim,
   seed: number,
@@ -101,13 +109,20 @@ function blockedDirections(
   return blocked;
 }
 
+function terrainOnlyWorld(world: WorldContent): WorldContent {
+  // Zones (and therefore lakes and the shore grading under test) stay exactly
+  // as authored; only the prop tables the collider grid reads are emptied.
+  return { ...world, props: emptyZoneProps() };
+}
+
 function makeSim(world: WorldContent, seed: number): Sim {
-  setActiveWorldContent(world);
+  const terrainOnly = terrainOnlyWorld(world);
+  setActiveWorldContent(terrainOnly);
   return new Sim({
     seed,
     playerClass: 'warrior',
     autoEquip: true,
-    world: { ...world, camps: [], npcs: {}, groundObjects: [] },
+    world: { ...terrainOnly, camps: [], npcs: {}, groundObjects: [] },
   });
 }
 

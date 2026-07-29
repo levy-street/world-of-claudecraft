@@ -5,8 +5,10 @@
 // cancel path, and the updateTradesAndInvites invite-expiry + drift sweep.
 
 import { describe, expect, it } from 'vitest';
+import { canStackInstancePayloads } from '../src/sim/item_instance_merge';
 import type { SimContext } from '../src/sim/sim_context';
 import * as tradeMod from '../src/sim/social/trade';
+import { cloneItemInstancePayload } from '../src/sim/types';
 
 function makeTradeCtx() {
   const players = new Map<number, any>();
@@ -221,16 +223,35 @@ describe('trade module (direct, no Sim)', () => {
         const inv = players.get(pid!).inventory;
         inv.push({ itemId, count });
       },
+      // Merge-aware like the real Sim.addItemInstance (identical-payload
+      // stacking): byte-equal mergeable payloads share a stack up
+      // to the default cap of 20; everything else takes its own slot.
       addItemInstance: (itemId: string, inst: any, pid?: number) => {
-        players.get(pid!).inventory.push({ itemId, count: 1, instance: inst });
+        const inv = players.get(pid!).inventory;
+        const target = inv.find(
+          (s: any) =>
+            s.itemId === itemId && s.count < 20 && canStackInstancePayloads(s.instance, inst),
+        );
+        if (target) target.count += 1;
+        else inv.push({ itemId, count: 1, instance: inst });
       },
+      // Per-unit payload returns like the real Sim.removeItem:
+      // one entry per unit consumed, cloned while the slot survives.
       removeItem: (itemId: string, count: number, pid?: number) => {
         const inv = players.get(pid!).inventory;
         const removed: any[] = [];
-        for (let i = inv.length - 1; i >= 0 && removed.length < count; i--) {
-          if (inv[i].itemId !== itemId || !inv[i].instance) continue;
-          removed.push(inv[i].instance);
-          inv.splice(i, 1);
+        let remaining = count;
+        for (let i = inv.length - 1; i >= 0 && remaining > 0; i--) {
+          const s = inv[i];
+          if (s.itemId !== itemId || !s.instance) continue;
+          const take = Math.min(s.count, remaining);
+          for (let u = 0; u < take; u++) {
+            const finalUnitOfSlot = take >= s.count && u === take - 1;
+            removed.push(finalUnitOfSlot ? s.instance : cloneItemInstancePayload(s.instance));
+          }
+          s.count -= take;
+          remaining -= take;
+          if (s.count <= 0) inv.splice(i, 1);
         }
         return removed;
       },
@@ -318,26 +339,28 @@ describe('trade module (direct, no Sim)', () => {
     expect(instanced?.instance).toEqual(instance);
   });
 
-  it('keeps full payloads (signer/charges/rolled/enchant/boundTo) for instances in both directions', () => {
-    // The phase acceptance criterion end to end: side A's offer mixes a plain
+  it('keeps full payloads (signer/charges/rolled/enchant) for instances in both directions', () => {
+    // The acceptance criterion end to end: side A's offer mixes a plain
     // copy with a fully-loaded instanced copy while side B offers a different
     // instanced item in the SAME trade, so tradeConfirm's second offer leg
     // (offerB, b to a) moves an instance too, and every payload field
-    // (signer, charges, rolled incl. the Phase 2 masterwork marker, the enchant
-    // marker, boundTo) must land intact on the right receiver's granted item.
+    // (signer, charges, rolled incl. the masterwork marker, the enchant
+    // marker) must land intact on the right receiver's granted item. boundTo is
+    // deliberately NOT set here: Professions 2.0 made boundTo the
+    // trade-lock marker, so a copy carrying it can no longer be offered at all
+    // (that behavior lives in professions_typed_reagents.test.ts's bind-on-trade
+    // suite); a freely tradeable instance never carries boundTo.
     const instA = {
       signer: 'Ayla',
       charges: { lifesteal: 2 },
       rolled: { stats: { atk: 3 }, masterwork: true },
       enchant: 'flame_weapon',
-      boundTo: 1,
     };
     const instB = {
       signer: 'Borin',
       charges: { warmth: 5 },
       rolled: { stats: { sta: 2 }, masterwork: true },
       enchant: 'hearth_ward',
-      boundTo: 2,
     };
     const { ctx, players } = makeInstancedTradeCtx(
       [
@@ -468,6 +491,111 @@ describe('trade module (direct, no Sim)', () => {
     expect(tradeMod.tradeFor(ctx, 1)).toBe(null);
     expect(players.get(1).inventory).toEqual(snap1);
     expect(players.get(2).inventory).toEqual(snap2);
+  });
+
+  it('trades partial counted stacks both directions with payload survival and conservation', () => {
+    // Side A offers 4 wolf_fang covered by 2 plain units plus 2 units of a
+    // count-3 signed stack; side B offers a count-2 signed bread stack. Every
+    // unit must land with its payload and the per-item unit totals conserve.
+    const { ctx, players, events } = makeInstancedTradeCtx(
+      [
+        { itemId: 'wolf_fang', count: 2 },
+        { itemId: 'wolf_fang', count: 3, instance: { signer: 'Ayla' } },
+      ],
+      [
+        { itemId: 'wolf_fang', count: 1, instance: { signer: 'Ayla' } },
+        { itemId: 'baked_bread', count: 2, instance: { signer: 'Borin' } },
+      ],
+    );
+
+    tradeMod.tradeRequest(ctx, 2, 1);
+    tradeMod.tradeAccept(ctx, 2);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 4 }], 0, 1);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'baked_bread', count: 2 }], 0, 2);
+    tradeMod.tradeConfirm(ctx, 1);
+    tradeMod.tradeConfirm(ctx, 2);
+    expect(events.some((e) => e.type === 'error')).toBe(false);
+
+    // A keeps one signed fang and receives the signed bread as ONE merged stack.
+    const invA = players.get(1).inventory;
+    expect(invA.find((s: any) => s.itemId === 'wolf_fang')).toEqual({
+      itemId: 'wolf_fang',
+      count: 1,
+      instance: { signer: 'Ayla' },
+    });
+    const breadA = invA.filter((s: any) => s.itemId === 'baked_bread');
+    expect(breadA).toHaveLength(1);
+    expect(breadA[0].count).toBe(2);
+    expect(breadA[0].instance).toEqual({ signer: 'Borin' });
+
+    // B receives 2 plain fangs plus 2 signed units merged into their own
+    // byte-equal signed stack (1 + 2 = 3); the bread left entirely.
+    const invB = players.get(2).inventory;
+    expect(invB.some((s: any) => s.itemId === 'baked_bread')).toBe(false);
+    const plainB = invB.find((s: any) => s.itemId === 'wolf_fang' && !s.instance);
+    const signedB = invB.filter((s: any) => s.itemId === 'wolf_fang' && s.instance);
+    expect(plainB?.count).toBe(2);
+    expect(signedB).toHaveLength(1);
+    expect(signedB[0].count).toBe(3);
+    expect(signedB[0].instance).toEqual({ signer: 'Ayla' });
+
+    // Unit conservation across both sides: 6 fangs and 2 breads, before and after.
+    const units = (itemId: string) =>
+      [...players.get(1).inventory, ...players.get(2).inventory]
+        .filter((s: any) => s.itemId === itemId)
+        .reduce((n: number, s: any) => n + s.count, 0);
+    expect(units('wolf_fang')).toBe(6);
+    expect(units('baked_bread')).toBe(2);
+  });
+
+  it('accepts a trade that fits only by merging into a byte-equal receiver stack', () => {
+    // The receiver is slot-full, but one slot is a byte-equal signed stack
+    // with room: the capacity gate must model the merge and accept
+    // (the older one-fresh-slot-per-instanced-unit model refused this).
+    const { ctx, players, events } = makeInstancedTradeCtx(
+      [{ itemId: 'wolf_fang', count: 1, instance: { signer: 'Ayla' } }],
+      [
+        { itemId: 'wolf_fang', count: 1, instance: { signer: 'Ayla' } },
+        ...Array.from({ length: 15 }, (_, i) => ({ itemId: `filler_${i}`, count: 1 })),
+      ],
+    );
+    expect(players.get(2).inventory).toHaveLength(16);
+
+    tradeMod.tradeRequest(ctx, 2, 1);
+    tradeMod.tradeAccept(ctx, 2);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 1 }], 0, 1);
+    tradeMod.tradeConfirm(ctx, 1);
+    tradeMod.tradeConfirm(ctx, 2);
+
+    expect(events.some((e) => e.type === 'error')).toBe(false);
+    expect(players.get(1).inventory).toHaveLength(0);
+    expect(players.get(2).inventory).toHaveLength(16);
+    const merged = players.get(2).inventory.find((s: any) => s.itemId === 'wolf_fang');
+    expect(merged.count).toBe(2);
+    expect(merged.instance).toEqual({ signer: 'Ayla' });
+  });
+
+  it('still refuses at full capacity when the byte-equal twin bears charges (never merged)', () => {
+    const charged = { signer: 'Ayla', charges: { zap: 1 } };
+    const { ctx, players, events } = makeInstancedTradeCtx(
+      [{ itemId: 'wolf_fang', count: 1, instance: { ...charged, charges: { zap: 1 } } }],
+      [
+        { itemId: 'wolf_fang', count: 1, instance: { ...charged, charges: { zap: 1 } } },
+        ...Array.from({ length: 15 }, (_, i) => ({ itemId: `filler_${i}`, count: 1 })),
+      ],
+    );
+
+    tradeMod.tradeRequest(ctx, 2, 1);
+    tradeMod.tradeAccept(ctx, 2);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 1 }], 0, 1);
+    tradeMod.tradeConfirm(ctx, 1);
+    tradeMod.tradeConfirm(ctx, 2);
+
+    expect(events.some((e) => e.type === 'error' && /not enough bag space/.test(e.text))).toBe(
+      true,
+    );
+    expect(players.get(1).inventory).toHaveLength(1);
+    expect(players.get(2).inventory).toHaveLength(16);
   });
 
   it('updateTradesAndInvites expires stale invites and cancels drifted trades', () => {

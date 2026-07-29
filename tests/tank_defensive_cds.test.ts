@@ -251,8 +251,22 @@ describe('Sacred Bulwark (paladin): divine cheat-death', () => {
       school: 'physical',
     });
     p.stealthed = true;
-    p.eating = { itemId: 'food', kind: 'food', hpPer2s: 10, manaPer2s: 0, remaining: 10 };
-    p.drinking = { itemId: 'drink', kind: 'drink', hpPer2s: 0, manaPer2s: 10, remaining: 10 };
+    p.eating = {
+      itemId: 'food',
+      kind: 'food',
+      hpPer2s: 10,
+      manaPer2s: 0,
+      remaining: 10,
+      ticksElapsed: 0,
+    };
+    p.drinking = {
+      itemId: 'drink',
+      kind: 'drink',
+      hpPer2s: 0,
+      manaPer2s: 10,
+      remaining: 10,
+      ticksElapsed: 0,
+    };
     p.sitting = true;
     p.castingAbility = 'holy_light';
     p.castRemaining = 1;

@@ -209,3 +209,93 @@ describe('account flair: the chat fan-out encoding', () => {
     expect(heard.flair).toBeUndefined();
   });
 });
+
+describe('staff role: the chat fan-out encoding (anti-impersonation tag)', () => {
+  // e.discordRole is written only by the bot's members-meta push; setting it
+  // directly here stands in for that push, exactly like the identity tests
+  // mutate entity fields the wire encodes.
+  function grantRole(server: GameServer, pid: number, role: string): void {
+    const e = server.sim.entities.get(pid);
+    if (!e) throw new Error('missing entity');
+    e.discordRole = role;
+  }
+
+  it('stamps the role on a chat line, even out of interest scope', () => {
+    const server = new GameServer();
+    const fa = fakeWs();
+    const fb = fakeWs();
+    const speaker = joinServer(server, fa, 1, 'Dev');
+    const listener = joinServer(server, fb, 2, 'Listener');
+    separate(server, speaker.pid, listener.pid);
+    grantRole(server, speaker.pid, 'coredevs');
+
+    cmd(server, speaker, '/general patch incoming');
+    route(server);
+
+    const heard = chatsOf(fb).find((ev) => ev.text === 'patch incoming');
+    expect(heard).toBeDefined();
+    expect(heard.flair).toEqual({ role: 'coredevs' });
+  });
+
+  it('composes the role WITH the account flair when both apply', () => {
+    const server = new GameServer();
+    const fa = fakeWs();
+    const fb = fakeWs();
+    const speaker = joinServer(server, fa, 1, 'DevStreamer');
+    const listener = joinServer(server, fb, 2, 'Listener');
+    colocate(server, speaker.pid, listener.pid);
+    server.applyAccountFlairLive(1, STREAMER);
+    grantRole(server, speaker.pid, 'mods');
+
+    cmd(server, speaker, 'both marks');
+    route(server);
+
+    const heard = chatsOf(fb).find((ev) => ev.text === 'both marks');
+    expect(heard.flair).toEqual({
+      ai: true,
+      links: { twitch: 'https://twitch.tv/someone' },
+      role: 'mods',
+    });
+  });
+
+  it('stops stamping the moment the role is revoked (live read, no stale cache)', () => {
+    const server = new GameServer();
+    const fa = fakeWs();
+    const fb = fakeWs();
+    const speaker = joinServer(server, fa, 1, 'ExMod');
+    const listener = joinServer(server, fb, 2, 'Listener');
+    colocate(server, speaker.pid, listener.pid);
+    grantRole(server, speaker.pid, 'mods');
+
+    cmd(server, speaker, 'tagged');
+    route(server);
+    expect(chatsOf(fb).find((ev) => ev.text === 'tagged').flair).toEqual({ role: 'mods' });
+
+    // The bot revokes (members-meta re-push with no role): the very next line is bare.
+    const e = server.sim.entities.get(speaker.pid);
+    if (e) e.discordRole = undefined;
+    cmd(server, speaker, 'untagged');
+    route(server);
+    expect(chatsOf(fb).find((ev) => ev.text === 'untagged').flair).toBeUndefined();
+  });
+
+  it('never stamps a COMMUNITY role: the chat tag is a staff-only authority signal', () => {
+    const server = new GameServer();
+    const fa = fakeWs();
+    const fb = fakeWs();
+    const speaker = joinServer(server, fa, 1, 'Fan');
+    const listener = joinServer(server, fb, 2, 'Listener');
+    colocate(server, speaker.pid, listener.pid);
+    // Every non-staff catalog role (nameplate-tagged, chat-untagged), one line each.
+    for (const role of ['artists', 'contentcreator', 'legend', 'shill']) {
+      grantRole(server, speaker.pid, role);
+      cmd(server, speaker, `hello from ${role}`);
+    }
+    route(server);
+    for (const role of ['artists', 'contentcreator', 'legend', 'shill']) {
+      const heard = chatsOf(fb).find((ev) => ev.text === `hello from ${role}`);
+      expect(heard, role).toBeDefined();
+      expect(heard.flair, role).toBeUndefined();
+    }
+  });
+});

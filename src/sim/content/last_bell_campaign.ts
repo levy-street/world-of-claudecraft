@@ -13,7 +13,7 @@
 import { GULLHAVEN_HARBOR, type HarborDef, MAINLAND_HARBOR } from '../harbor_layout';
 import { registerScenario } from '../scenarios/registry';
 import { registerChoice } from '../scenes/choices';
-import { registerScene, type SceneAttachShotDef, type SceneDollyShotDef } from '../scenes/scenes';
+import { registerScene, type SceneAttachShotDef, type SceneDollyShotDef } from '../scenes/registry';
 import type { MobTemplate, NpcDef, QuestDef } from '../types';
 import { LAST_BELL_VOYAGE_SEGMENT_IDS, LB_PROP_CUE_PARK } from './last_bell_cinematics';
 
@@ -68,7 +68,10 @@ export const LAST_BELL_CAMPAIGN_NPCS: Record<string, NpcDef> = {
     },
     facing: MAINLAND_HARBOR.gangplank.facing,
     color: 0x4a5a7a,
-    questIds: [],
+    // Q0 is accepted automatically on the first crossing, but the canonical
+    // giver link still belongs on Ewald for quest integrity, save repair, and
+    // any host that opens the normal quest surface before boarding.
+    questIds: ['q_lb_q0_ashore'],
     greeting:
       'The Farshore, is it? Nobody crosses for the fishing anymore, friend. Board when you are ready, and mind the bell when you land: the town listens to it the way you listen to weather.',
   },
@@ -140,6 +143,11 @@ export const LAST_BELL_CAMPAIGN_QUESTS: Record<string, QuestDef> = {
     minLevel: 3,
   },
 };
+
+// Explicit and append-only like every other content pack's quest order. Q0 is
+// appended after the established world quest vectors in data.ts so merging the
+// campaign does not renumber any pre-existing observation slots.
+export const LAST_BELL_CAMPAIGN_QUEST_ORDER = ['q_lb_q0_ashore'] as const;
 
 // ---------------------------------------------------------------------------
 // Choices

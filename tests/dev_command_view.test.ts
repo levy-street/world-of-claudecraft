@@ -36,6 +36,12 @@ describe('developer command view', () => {
     expect(filteredDevActions('spawns', 'selected', searchCopy).map((action) => action.id)).toEqual(
       ['killtarget', 'despawntarget'],
     );
-    expect(filteredDevActions('inventory', '')).toHaveLength(2);
+    // give, kit, gold. Named rather than counted so a future add says WHICH action
+    // appeared instead of just moving a number.
+    expect(filteredDevActions('inventory', '').map((action) => action.id)).toEqual([
+      'give',
+      'kit',
+      'gold',
+    ]);
   });
 });

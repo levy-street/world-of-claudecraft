@@ -1,4 +1,4 @@
-// Phase 8 station gate and mobile station over the live GameServer wire.
+// Station gate and mobile station over the live GameServer wire.
 // The offline suite (tests/professions_crafting_hub.test.ts) pins the
 // resolveCraft gate through the real Sim, but nothing there proves the ONLINE
 // path stays live: that the craft_item wire command's station denial produces
@@ -159,7 +159,7 @@ describe('station gate over the live GameServer wire (session routing)', () => {
     expect(results).toHaveLength(1);
     // toMatchObject, not toEqual: a success draws the masterwork proc roll,
     // whose outcome (masterwork flag plus a sibling masterwork event) is
-    // seed-dependent detail owned by the Phase 2 suites, not this liveness pin.
+    // seed-dependent detail owned by the masterwork suites, not this liveness pin.
     expect(results[0]).toMatchObject({
       type: 'craftResult',
       ok: true,

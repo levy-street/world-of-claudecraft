@@ -18,10 +18,10 @@
 // raw hex sits in this painter.
 
 import { audio } from '../game/audio';
-import type { MountKey } from '../sim/content/mounts';
 import { ITEMS } from '../sim/data';
 import type { EquipSlot } from '../sim/types';
 import type { IWorld } from '../world_api';
+import { STAT_PANELS } from './char_stats_view';
 import { buildPaperdollView, type PaperdollSlot } from './char_view';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName, itemDisplayName } from './entity_i18n';
@@ -31,10 +31,11 @@ import { buildGatheringProficiencyRows } from './gathering_view';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
 import type { ItemDragState } from './item_drag_state';
-import { mountPickerHtml, wireMountPicker } from './mount_picker';
-import { buildMountPickerView } from './mount_picker_view';
+import { wornTooltipInstance } from './item_instance_tooltip';
 import type { PainterHostPresentation } from './painter_host';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
+import { archetypeImageUrl, professionImageUrl } from './profession_art';
+import { qualityGlowShadow } from './quality_glow';
 import { tSim } from './sim_i18n';
 import type { StatId } from './stat_tooltip';
 import { svgIcon } from './ui_icons';
@@ -48,7 +49,7 @@ const SLOT_EMPTY_TEXT_COLOR = 'var(--color-slot-empty-text)';
 const SLOT_EMPTY_BORDER_COLOR = 'var(--color-slot-empty-border)';
 
 // The ten pair-archetype title keys (issue 1130, pair-named under Professions
-// 2.0 Phase 1), one per canonical pair id (see src/sim/professions/archetype.ts
+// 2.0), one per canonical pair id (see src/sim/professions/archetype.ts
 // ARCHETYPE_PAIR_TARGETS and getArchetypeTitle: the title identifier IS the
 // pair id). Every player-visible string is a t() key, so this is a literal
 // id-to-key table, never a built string.
@@ -106,29 +107,6 @@ export function hobbyCraftText(craftId: string | null): string {
   return craftNameText(craftId);
 }
 
-// The character-sheet stat cells, primaries down the left column and derived
-// stats down the right (the CSS grid wraps two per row). The HUD builds each cell
-// from the unit-tested stat_tooltip_view model, so the order is the only stat
-// concern this painter owns.
-const STAT_GRID: readonly StatId[] = [
-  'str',
-  'armor',
-  'agi',
-  'attackPower',
-  'sta',
-  'dps',
-  'int',
-  'critChance',
-  'spi',
-  'dodge',
-  'parry',
-  'spellPower',
-  'critRating',
-  'hasteRating',
-  'hitRating',
-  'warfare',
-];
-
 /**
  * Hud-supplied glue. Composes the shared PainterHostPresentation bag
  * (icon/tooltip) and adds the character-sheet surface: world reads, the localized
@@ -175,7 +153,7 @@ export interface CharWindowDeps extends PainterHostPresentation {
 // Maps each gathering profession id to its hud_chrome display-name key (issue
 // 1124). String-keyed like the sibling professions_window.ts GATHERING_NAME_KEYS
 // (and this file's CRAFT_NAME_KEYS): an id with no key here renders no row
-// (fishing landed with Professions 2.0 Phase 11).
+// (fishing landed with Professions 2.0).
 const GATHERING_PROFESSION_LABEL_KEY: Record<string, TranslationKey> = {
   mining: 'hudChrome.gathering.mining',
   logging: 'hudChrome.gathering.logging',
@@ -188,9 +166,6 @@ const SHARE_GLYPH =
 
 export class CharWindow {
   private openerFocus: HTMLElement | null = null;
-  // One-shot: the mount card to ring + scroll to on the next render (a bag
-  // click on a reins item lands here). Cleared after that render paints it.
-  private highlightMountKey = '';
 
   constructor(private readonly deps: CharWindowDeps) {}
 
@@ -222,27 +197,6 @@ export class CharWindow {
     if (this.isOpen) this.render();
   }
 
-  /** Open (or re-render) the sheet with one mount picker card highlighted and
-   *  scrolled into view: the bag click on a collected reins item routes here. */
-  openHighlightingMount(key: string): void {
-    this.highlightMountKey = key;
-    if (this.isOpen) this.render();
-    else this.toggle();
-    // Defer the scroll: at open time the sheet was rendered while still hidden
-    // and its late fragments (preview canvas mount, portrait hydration) have
-    // not landed, so a synchronous scrollIntoView sees a not-yet-overflowing
-    // box and no-ops. One rAF for the first laid-out frame, plus one late
-    // re-assert once the async fragments have settled the sheet's height.
-    const scroll = () => {
-      this.deps
-        .root()
-        .querySelector<HTMLElement>('.mp-highlight')
-        ?.scrollIntoView({ block: 'nearest' });
-    };
-    requestAnimationFrame(scroll);
-    window.setTimeout(scroll, 400);
-  }
-
   render(): void {
     const el = this.deps.root();
     const world = this.deps.world();
@@ -252,12 +206,16 @@ export class CharWindow {
     // WCAG 2.2 AA: name the focus-trapped root via the character title span.
     markDialogRoot(el, { labelledBy: 'char-title' });
     const archetypeTitle = archetypeTitleText(world.archetypeTitle);
+    const archetypeCrestUrl = archetypeImageUrl(world.archetypeTitle);
+    const archetypeCrest = archetypeCrestUrl
+      ? `<img class="char-archetype-title-crest" src="${esc(archetypeCrestUrl)}" alt="" draggable="false">`
+      : '';
     const hobbyCraft = hobbyCraftText(world.hobbyCraft);
     const hobbyRow =
       world.hobbyCraft !== null
         ? `<span class="panel-subtitle char-hobby-craft">${esc(t('hudChrome.archetypeTitle.hobbyLabel'))}: ${esc(hobbyCraft)}</span>`
         : '';
-    let html = `<div class="panel-title char-title-portrait">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md' })}<span class="char-title-text" id="char-title">${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level, className }))}</span><span class="panel-subtitle char-archetype-title">${esc(t('hudChrome.archetypeTitle.label'))}: ${esc(archetypeTitle)}</span>${hobbyRow}<span class="panel-subtitle char-honor-balance">${esc(t('hudChrome.warfare.balance', { amount: formatNumber(world.honor, { maximumFractionDigits: 0 }) }))}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
+    let html = `<div class="panel-title char-title-portrait">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md' })}<span class="char-title-text" id="char-title">${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level, className }))}</span><span class="panel-subtitle char-archetype-title">${archetypeCrest}${esc(t('hudChrome.archetypeTitle.label'))}: ${esc(archetypeTitle)}</span>${hobbyRow}<span class="panel-subtitle char-honor-balance">${esc(t('hudChrome.warfare.balance', { amount: formatNumber(world.honor, { maximumFractionDigits: 0 }) }))}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
     html += `<div class="paperdoll">
       <div class="equip-col" id="equip-col-left"></div>
       <div class="char-model-panel">
@@ -266,19 +224,21 @@ export class CharWindow {
       </div>
       <div class="equip-col equip-col-right" id="equip-col-right"></div>
     </div>`;
-    html += `<div class="char-stats">${STAT_GRID.map((stat) => this.deps.statCellHtml(stat)).join('')}</div>`;
+    // Stats as the showcase layout: five primary tiles, then the Offense and
+    // Defense panels. The partition + heading keys come from the char_stats_view
+    // pure core; each cell is the same unit-tested stat_tooltip_view cell (colon
+    // dropped, since flex layout separates label from value in tiles and panels).
+    html += `<div class="stat-panels">${STAT_PANELS.map((panel) => {
+      const cells = panel.stats.map((stat) => this.deps.statCellHtml(stat)).join('');
+      const title = panel.titleKey
+        ? `<div class="sp-title">${esc(t(panel.titleKey as TranslationKey))}</div>`
+        : '';
+      const cls = panel.kind === 'tiles' ? 'stat-panel attrs-tiles' : 'stat-panel';
+      return `<div class="${cls}">${title}${cells}</div>`;
+    }).join('')}</div>`;
     html += this.deps.talentSummaryHtml();
     html += this.deps.progressionHtml(p.level);
     html += this.gatheringHtml(world);
-    // The mount picker (mount_picker_view.ts core + mount_picker.ts section):
-    // the collection lives here now, in the sheet, not in a window of its own.
-    const mountView = buildMountPickerView(
-      p.level,
-      world.selectedMount(),
-      p.mountKey ?? '',
-      world.ownedMounts(),
-    );
-    html += mountPickerHtml(mountView, this.highlightMountKey);
     html += `<div class="pc-share-row"><button type="button" class="btn pc-share-btn" data-act="share-card">${SHARE_GLYPH}<span>${esc(t('playerCard.shareButton'))}</span></button></div>`;
     el.innerHTML = html;
     hydratePortraits(el);
@@ -293,42 +253,18 @@ export class CharWindow {
       audio.click();
       this.deps.openPlayerCard();
     });
-
     const view = buildPaperdollView(world.equipment, ITEMS);
     const leftCol = el.querySelector('#equip-col-left');
     const rightCol = el.querySelector('#equip-col-right');
     for (const cell of view.left) leftCol?.appendChild(this.buildSlotRow(cell));
     for (const cell of view.right) rightCol?.appendChild(this.buildSlotRow(cell));
 
-    for (const cell of el.querySelectorAll<HTMLElement>('.char-stats [data-stat]')) {
+    for (const cell of el.querySelectorAll<HTMLElement>('.stat-panels [data-stat]')) {
       const stat = cell.dataset.stat as StatId;
       // Resolve the tooltip lazily, on show, so the breakdown reflects the
       // player's current stats at the moment they hover, not at render time.
       this.deps.attachTooltip(cell, () => this.deps.statTooltipHtml(stat));
     }
-
-    const pickerRoot = el.querySelector<HTMLElement>('.mount-picker');
-    if (pickerRoot) {
-      wireMountPicker(pickerRoot, mountView, {
-        selectMount: (key) => {
-          world.selectMount(key as MountKey);
-          audio.click();
-          this.deps.hideTooltip();
-        },
-        rerender: (key, keyboardInitiated) => {
-          const scrollTop = el.scrollTop;
-          this.render();
-          el.scrollTop = scrollTop;
-          const selected = Array.from(el.querySelectorAll<HTMLElement>('[data-mount-key]')).find(
-            (card) => card.dataset.mountKey === key,
-          );
-          selected?.focus({ preventScroll: true });
-          if (!keyboardInitiated) this.deps.hideTooltip();
-        },
-        attachTooltip: (cardEl, htmlFn) => this.deps.attachTooltip(cardEl, htmlFn),
-      });
-    }
-    this.highlightMountKey = '';
 
     this.deps.renderPreview();
     this.deps.renderSkinPicker();
@@ -344,7 +280,11 @@ export class CharWindow {
       .map((r) => {
         const key = GATHERING_PROFESSION_LABEL_KEY[r.professionId];
         if (key === undefined) return '';
-        return `<span>${esc(t(key))}: <b>${formatNumber(r.value, { maximumFractionDigits: 0 })}</b></span>`;
+        const imageUrl = professionImageUrl(`gather_${r.professionId}`);
+        const icon = imageUrl
+          ? `<img class="char-gather-icon" src="${esc(imageUrl)}" alt="" draggable="false">`
+          : '';
+        return `<span class="char-gather-row">${icon}<span>${esc(t(key))}: <b>${formatNumber(r.displayValue, { maximumFractionDigits: 0 })}</b></span></span>`;
       })
       .join('');
     return `<div class="char-progression"><div class="cp-title">${esc(t('hudChrome.gathering.title'))}</div><div class="char-stats cp-stats">${items}</div></div>`;
@@ -371,11 +311,21 @@ export class CharWindow {
     row.innerHTML = `${icon}
         <div><div class="slot-name">${esc(this.deps.slotName(slot))}</div><div class="slot-item" style="color:${qColor}">${item ? esc(itemDisplayName(item)) : esc(t('itemUi.equipment.empty'))}</div></div>`;
     if (item) {
-      this.deps.attachTooltip(
-        row,
-        () =>
-          `${this.deps.itemTooltip(item, this.deps.world().equipmentInstances[slot])}<div class="tt-sub">${esc(t('hudChrome.paperdoll.unequipHint'))}</div>`,
-      );
+      // Soft glow in the item's quality color (derived, no getComputedStyle).
+      const iconEl = row.querySelector<HTMLImageElement>('.item-icon');
+      if (iconEl) iconEl.style.boxShadow = qualityGlowShadow(qColor);
+      this.deps.attachTooltip(row, () => {
+        // Own worn copy's per-copy lines (seal, enchanted marker, maker's mark):
+        // the self entity mirror carries equippedInstances in both worlds.
+        // Projected through wornTooltipInstance so the offline
+        // full payload renders exactly what the online eqi-trimmed mirror
+        // does: worn identity is signer/enchant/rolled, never the bond.
+        const world = this.deps.world();
+        const instance = wornTooltipInstance(
+          world.entities.get(world.playerId)?.equippedInstances?.[slot],
+        );
+        return `${this.deps.itemTooltip(item, instance)}<div class="tt-sub">${esc(t('hudChrome.paperdoll.unequipHint'))}</div>`;
+      });
       // Corner x: a styled glyph control (not an in-game icon), revealed on
       // hover/focus and always shown on touch where right-click is unavailable.
       const unequip = document.createElement('button');

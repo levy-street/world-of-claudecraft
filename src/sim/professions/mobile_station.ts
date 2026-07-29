@@ -1,6 +1,6 @@
-// Mobile crafting station (#1134, WIRED LIVE in Professions 2.0 Phase 8): a
+// Mobile crafting station (#1134, WIRED LIVE in Professions 2.0): a
 // specialized player can set up a temporary crafting station in the field.
-// Originally landed inert (no location gate existed to relax); the Phase 8
+// Originally landed inert (no location gate existed to relax); the
 // hands-vs-stations split gave it one: `resolveCraftForRecipe` (crafting.ts)
 // now accepts an ACTIVE own mobile station (isStationActive against the
 // current tick) in place of physical presence at a station, for recipes

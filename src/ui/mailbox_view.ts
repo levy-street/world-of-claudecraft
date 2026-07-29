@@ -103,6 +103,20 @@ export function clampParcelQty(current: number, delta: number, owned: number): n
   return Math.min(max, Math.max(1, Math.floor(current) + Math.floor(delta)));
 }
 
+/**
+ * Parse a TYPED parcel quantity (the chip's editable field) into the legal
+ * 1..owned range. Garbage, empty, or non-finite input restores `fallback` (the
+ * currently staged count) instead of NaN-poisoning the clamp: clampParcelQty
+ * alone returns NaN for NaN input because Math.max(1, NaN) is NaN. Purely a UX
+ * convenience: the sim re-validates every send authoritatively regardless
+ * (post_office floors counts, rejects < 1, and checks fungible stock).
+ */
+export function parseParcelQty(raw: string, owned: number, fallback: number): number {
+  const parsed = Number.parseInt(raw.trim(), 10);
+  const base = Number.isFinite(parsed) ? parsed : fallback;
+  return clampParcelQty(Number.isFinite(base) ? base : 1, 0, owned);
+}
+
 // The full price of sending: the attached coin plus the flat postage.
 export function mailSendCost(attachedCopper: number, postage: number): number {
   return Math.max(0, Math.floor(attachedCopper)) + postage;

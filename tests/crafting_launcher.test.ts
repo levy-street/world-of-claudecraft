@@ -79,7 +79,7 @@ describe('shared behavior across all screen sizes', () => {
   });
 
   it('registers the crafting glyph so hydrateIcons does not silently skip it', () => {
-    expect(uiIcons).toMatch(/\|\s*'crafting';/);
+    expect(uiIcons).toMatch(/\|\s*'crafting'(?:\s*\||;)/);
     expect(uiIcons).toMatch(/crafting:\n?\s*'<path /);
   });
 
@@ -309,5 +309,28 @@ describe('desktop launcher behavior (jsdom)', () => {
     // no-op for unknown names, so a missing registration would leave no svg.
     hydrateIcons(document.body);
     expect(btn.querySelector('.ui-icon')).not.toBeNull();
+  });
+});
+
+describe('side rail flyout stacking (col-b hover labels over col-a)', () => {
+  // The hover flyout is a ::before at z-index: -1 so it tucks 6px under its
+  // own button. In the shared #side-buttons stacking context that also painted
+  // it under EVERY rail button, so the leftward-growing labels of col-b (the
+  // column hugging the screen edge) were clipped by col-a's buttons (v0.29.0
+  // bug: hovering the Game Menu gear showed "Game M" cut off by the Crafting
+  // tankard). Col-b must form its own stacking context above col-a: the flyout
+  // then still paints under its own column's buttons but over the neighbor's.
+  it('keeps the flyout tucked under its own button (z-index -1)', () => {
+    const flyout = /\.micro-btn::before \{([^}]*)\}/.exec(hudCss)?.[1] ?? '';
+    expect(flyout).toMatch(/z-index:\s*-1;/);
+  });
+
+  it('lifts #side-buttons-col-b into a stacking context above col-a', () => {
+    const colB = /#side-buttons-col-b \{([^}]*)\}/.exec(hudCss)?.[1] ?? '';
+    expect(colB, 'a #side-buttons-col-b rule must exist in hud.css').not.toBe('');
+    expect(colB).toMatch(/position:\s*relative;/);
+    expect(colB).toMatch(/z-index:\s*1;/);
+    // col-a must not be lifted too, or the fix cancels itself out.
+    expect(/#side-buttons-col-a \{[^}]*z-index/.test(hudCss)).toBe(false);
   });
 });

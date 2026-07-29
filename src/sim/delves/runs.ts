@@ -49,6 +49,7 @@ import { isLitanyModuleId, litanyModuleGeometry } from '../delve_litany_layout';
 import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from '../dungeon_layout';
 import { createGroundObject, createMob, recalcPlayerStats } from '../entity';
 import { restorePetFromDelveStash, stowPetForDelve } from '../pet/pet_commands';
+import { delveExitDropZ } from '../prop_layout';
 import { aurasSurvivingDeath } from '../resurrection';
 import { Rng } from '../rng';
 import type { PlayerMeta } from '../sim';
@@ -427,7 +428,7 @@ export function leaveDelve(ctx: SimContext, pid?: number): void {
   if (run?.companion) ctx.despawnDelveCompanion(run);
   restorePetFromDelveStash(ctx, r.meta.entityId);
   const p = r.e;
-  p.pos = ctx.groundPos(delve.doorPos.x, delve.doorPos.z - 4);
+  p.pos = ctx.groundPos(delve.doorPos.x, delveExitDropZ(delve.doorPos.z, delve.id));
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
   p.targetId = null;
@@ -635,7 +636,7 @@ export function ejectToDelveDoor(
   if (!r) return;
   const p = r.e;
   p.dead = false;
-  const door = ctx.groundPos(delve.doorPos.x, delve.doorPos.z - 4);
+  const door = ctx.groundPos(delve.doorPos.x, delveExitDropZ(delve.doorPos.z, delve.id));
   p.pos = delveMemberSpawnPos(ctx, door, slotIndex);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
@@ -1076,10 +1077,19 @@ export function tickDelvePressurePlates(ctx: SimContext, run: DelveRun): void {
 export function tickDelveRaiseDeadChannel(ctx: SimContext, run: DelveRun): void {
   const channel = run.raiseDeadChannel;
   if (!channel) return;
+  const boss = ctx.entities.get(channel.bossId);
+  // The boss can enter 'evade' (leash break, or any other reset path) well before
+  // it finishes walking home to resetEvadingMob's arrival check. Drop the channel
+  // the moment that happens instead of letting it keep counting down in the
+  // background: a wipe/leash mid-channel must not still ambush the next pull with
+  // stale adds once the boss looks freshly reset.
+  if (!boss || boss.dead || boss.aiState === 'evade') {
+    run.raiseDeadChannel = null;
+    return;
+  }
   channel.remaining -= DT;
   if (channel.remaining > 0) return;
   run.raiseDeadChannel = null;
-  const boss = ctx.entities.get(channel.bossId);
   if (boss && !boss.dead) {
     ctx.spawnBossAdds(boss, channel.mobId, channel.count);
     // Raise Dead resolved uninterrupted (PRD §7.4 telegraph): mirror of the
@@ -1275,6 +1285,17 @@ export function startDelveRaiseDeadChannel(
     telegraph: true,
   });
   return true;
+}
+
+// Evade/wipe reset: an in-flight Raise Dead channel is DelveRun-level state
+// (not an Entity field), so the generic resetEvadingMob (mob/locomotion.ts)
+// cannot reach it directly. If the boss going home mid-channel is the one who
+// started it, drop it: mirrors the manual grave-interrupt cancel in
+// delveInteract below, so a stale channel never outlives the reset and spawns
+// unowned adds a few seconds after the pull was supposed to have ended.
+export function clearDelveRaiseDeadChannel(ctx: SimContext, boss: Entity): void {
+  const run = delveRunForMob(ctx, boss.id);
+  if (run?.raiseDeadChannel?.bossId === boss.id) run.raiseDeadChannel = null;
 }
 
 // ----- interact + reward delivery --------------------------------------------

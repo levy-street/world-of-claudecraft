@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   type KeyboardTurnArgs,
   newKeyboardTurnState,
+  resetKeyboardTurnState,
   stepKeyboardTurnFacing,
 } from '../src/game/keyboard_turn_facing';
 import { TURN_SPEED } from '../src/sim/types';
@@ -20,6 +21,24 @@ const args = (over: Partial<KeyboardTurnArgs> = {}): KeyboardTurnArgs => ({
 });
 
 describe('stepKeyboardTurnFacing', () => {
+  it('drops every pending local and wire heading when a scene lock takes ownership', () => {
+    const st = newKeyboardTurnState();
+    stepKeyboardTurnFacing(st, args({ turnLeft: true, serverFacing: 1 }));
+    st.releaseMs = 275;
+    st.suppressTurnFlags = true;
+    st.wasTurning = true;
+
+    resetKeyboardTurnState(st);
+
+    expect(st).toEqual({
+      facing: null,
+      releaseMs: 0,
+      wireFacing: null,
+      suppressTurnFlags: false,
+      wasTurning: false,
+    });
+  });
+
   it('integrates a right turn as a DECREASING facing at TURN_SPEED', () => {
     const st = newKeyboardTurnState();
     const f = stepKeyboardTurnFacing(st, args({ turnRight: true, serverFacing: 1.0 }));

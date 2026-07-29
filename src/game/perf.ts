@@ -1,6 +1,9 @@
+import type { NetPipelineSummary } from '../net/net_pipeline_stats';
 import { type AssetTimingSnapshot, assetTimingSnapshot } from '../render/assets/stats';
 import type { Renderer } from '../render/renderer';
+import { createHeapSawtooth, type HeapSawtoothSummary } from './heap_sawtooth';
 import { NumberSampleRing, TimedNumberSampleRing } from './sample_ring';
+import { createWorstWindow, type WorstWindowSummary } from './worst_window';
 
 export interface PerfSnapshot {
   seconds: number;
@@ -10,12 +13,22 @@ export interface PerfSnapshot {
   windows: {
     last10s: { seconds: number; frames: number; fps: number; frameMs: PerfSnapshot['frameMs'] };
     last30s: { seconds: number; frames: number; fps: number; frameMs: PerfSnapshot['frameMs'] };
+    // Worst 10 s window since the reporter last drained it (ruling R5):
+    // worst-per-report-interval, so a hitch storm survives the cumulative
+    // dilution and the frame ring's eviction. Null before the first 1 Hz tick.
+    worst10s: WorstWindowSummary | null;
   };
   mainMs: Record<string, { count: number; avg: number; p95: number; max: number }>;
   renderer: ReturnType<Renderer['perfStats']> | null;
   hud: { hotDomWrites: number; hotDomSkippedWrites: number; hotDomSkipRate: number } | null;
   assets: AssetTimingSnapshot;
   network: { connected: boolean; snapInterval: number; lastSnapAge: number; alpha: number } | null;
+  // Always-on aggregate counters (ruling R9), unlike the overlay-gated
+  // `network` block above: null offline, populated online even with the
+  // overlay disabled so every fleet perf report carries them.
+  netPipeline: NetPipelineSummary | null;
+  // Always-on 1 Hz heap sawtooth (ruling R10); null off Chromium.
+  heapSawtooth: HeapSawtoothSummary | null;
   input: {
     intents: number;
     lastKind: string;
@@ -351,6 +364,11 @@ export class PerfMonitor {
   private lastBucketMs: Record<TimedBucket, number> = { renderer: 0, hud: 0, events: 0, sim: 0 };
   private lastSnapshot: PerfSnapshot | null = null;
   private network: PerfSnapshot['network'] = null;
+  private netPipelineSource: { summary(): NetPipelineSummary } | null = null;
+  private heapSawtooth = createHeapSawtooth({
+    readUsedHeapBytes: () => this.memorySnapshot()?.usedJSHeapSize ?? null,
+  });
+  private worstWindow = createWorstWindow();
   private inputIntents = 0;
   private lastInputAt = 0;
   private lastInputKind = '';
@@ -440,7 +458,10 @@ export class PerfMonitor {
   }
 
   time<T>(bucket: TimedBucket, fn: () => T): T {
-    if (!this.enabled) return fn();
+    // Bucket recording is deliberately UNGATED (packet 0, finding 20): the
+    // four mainMs buckets ride in every fleet report, overlay on or off. The
+    // overlay mount, the markInput* chain, and the dev-trace spans (gated
+    // inside recordDevTraceSpan) stay behind their flags.
     const start = performance.now();
     try {
       return fn();
@@ -465,6 +486,38 @@ export class PerfMonitor {
   setNetwork(stats: PerfSnapshot['network']): void {
     if (!this.enabled) return;
     this.network = stats;
+  }
+
+  setNetPipelineSource(source: { summary(): NetPipelineSummary } | null): void {
+    // Deliberately NOT gated on this.enabled, unlike setNetwork above: the
+    // fleet story rides always-on aggregate counters (ruling R9); only the
+    // overlay and the dev-trace spans stay gated. Takes the stats SOURCE, not
+    // a built summary: summary() allocates, so snapshot() draws it lazily at
+    // its 1 Hz cadence instead of the caller paying it every animation frame.
+    this.netPipelineSource = source;
+  }
+
+  /**
+   * Reset the worst-10s interval. Only the reporter calls this, and only
+   * after a SUCCESSFUL send (ruling R5), so a failed post never loses the
+   * retained hitch storm; snapshot() itself stays a pure read.
+   */
+  drainWorstWindow(): void {
+    this.worstWindow.drain();
+  }
+
+  /**
+   * Feed an externally timed span into the dev trace on the 'external' span
+   * kind. Dev traces only: a no-op unless perfTrace is active (the internal
+   * recorder gates on traceEnabled), so it costs nothing in the fleet.
+   */
+  recordExternalSpan(
+    name: string,
+    startMs: number,
+    durationMs: number,
+    detail?: Record<string, unknown>,
+  ): void {
+    this.recordDevTraceSpan(name, startMs, durationMs, 'external', detail);
   }
 
   private recordDevTraceSpan(
@@ -687,13 +740,24 @@ export class PerfMonitor {
   }
 
   tick(now = performance.now()): void {
-    // Production telemetry reports on its own 75 s / 5 min cadence. Without a
-    // visible diagnostic overlay there is nothing to assemble every second:
-    // doing so sorted every history and copied renderer stats for no consumer.
-    if (!this.enabled) return;
     if (this.traceEnabled) this.recordDevTraceFrame(now);
     if (now - this.lastOverlayAt < 1000) return;
     this.lastOverlayAt = now;
+    // 1 Hz heap sample from the UNGATED tick path (ruling R10): the sawtooth
+    // rides in every fleet report, overlay on or off.
+    this.heapSawtooth.sample(now);
+    // 1 Hz worst-10s evaluation, also ungated (ruling R5): snapshot() stays a
+    // pure read of the retained window; only the reporter drains it.
+    this.worstWindow.observe(
+      this.frameWindow.entries().map((entry) => ({ at: entry.at, ms: entry.value })),
+      now,
+    );
+    // Production telemetry reports on its own 75 s / 5 min cadence. Without a
+    // visible diagnostic overlay there is nothing to ASSEMBLE every second:
+    // doing so sorted every history and copied renderer stats for no consumer.
+    // The two trackers above stay ungated: the fleet report reads them whether
+    // or not the overlay is up.
+    if (!this.enabled) return;
     this.lastSnapshot = this.snapshot(now);
     this.renderOverlay(this.lastSnapshot);
   }
@@ -728,12 +792,15 @@ export class PerfMonitor {
       windows: {
         last10s: windowSummary(10_000),
         last30s: windowSummary(30_000),
+        worst10s: this.worstWindow.current(),
       },
       mainMs: mainMs as PerfSnapshot['mainMs'],
       renderer: this.renderer?.perfStats() ?? null,
       hud: this.hud?.perfStats() ?? null,
       assets: assetTimingSnapshot(),
       network: this.network,
+      netPipeline: this.netPipelineSource?.summary() ?? null,
+      heapSawtooth: this.heapSawtooth.summary(),
       input: {
         intents: this.inputIntents,
         lastKind: this.lastInputKind,
@@ -804,6 +871,9 @@ export class PerfMonitor {
     this.frameWindow.clear();
     for (const samples of Object.values(this.buckets)) samples.clear();
     this.lastSnapshot = null;
+    this.netPipelineSource = null;
+    this.heapSawtooth.reset();
+    this.worstWindow.drain();
     this.inputIntents = 0;
     this.lastInputAt = 0;
     this.lastInputKind = '';

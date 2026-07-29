@@ -398,6 +398,47 @@ describe('coverage: each scenario fires its subsystem', () => {
     const signed = meta.inventory.filter(
       (s: any) => s.itemId === rare!.itemId && s.instance?.signer === meta.name,
     );
-    expect(signed.length).toBeGreaterThanOrEqual(rareGather!.qty);
+    // Identical-payload stacking: the same-signer units merge into
+    // signed stacks, so count UNITS and pin that the merge actually collapsed
+    // them into far fewer slots than units (stack cap 20).
+    const signedUnits = signed.reduce((n: number, s: any) => n + s.count, 0);
+    expect(signedUnits).toBeGreaterThanOrEqual(rareGather!.qty);
+    expect(signed.length).toBeLessThanOrEqual(Math.ceil(signedUnits / 20));
+  });
+
+  it('last_bell_tidemill: scenario, quest credit, doorway scene, and squad teardown all fire', () => {
+    const rec = run('last_bell_tidemill');
+    const sim = rec.sim as any;
+    const events = rec.allEvents as Ev[];
+    const claimId = rec.notes.claimId as number;
+    const stalkerId = rec.notes.stalkerId as number;
+
+    expect(rec.notes.started).toBe(true);
+    expect(rec.notes.squadSpawned).toBe(true);
+    expect(rec.notes.squadIds).toHaveLength(2);
+    expect(sim.entities.get(stalkerId)?.dead).toBe(true);
+    expect(sim.players.get(sim.playerId).questLog.get('q_lb_q0_ashore').counts[2]).toBe(1);
+    expect(sim.scenarioRuns.get(claimId)?.done).toBe(true);
+    expect(events.some((event) => event.type === 'scene' && event.op?.kind === 'start')).toBe(true);
+    expect(events.some((event) => event.type === 'scene' && event.op?.kind === 'end')).toBe(true);
+    expect(
+      [...sim.entities.values()].some((entity: any) =>
+        ['lb_actor_coalfast', 'lb_actor_tam'].includes(entity.templateId),
+      ),
+    ).toBe(false);
+  });
+
+  it('mount_reins: item use summons the exact owned mount, then dismounts without consuming it', () => {
+    const rec = run('mount_reins');
+    const sim = rec.sim as any;
+    const pid = sim.playerId as number;
+
+    expect(rec.notes.summonStarted).toBe(true);
+    expect(rec.notes.mountedKey).toBe('grag_bear');
+    expect(rec.notes.dismountedKey).toBe('');
+    expect(sim.player.mountKey).toBe('');
+    expect(sim.player.mountCastRemaining).toBe(0);
+    expect(sim.countItem('reins_grag_bear', pid)).toBe(1);
+    expect(sim.ownedMountsFor(pid)).toEqual(['grag_bear']);
   });
 });

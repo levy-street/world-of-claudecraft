@@ -11,12 +11,13 @@
 // not something this module enforces at runtime.
 
 import {
+  GATHERING_PROFESSION_IDS,
   type GatheringProfessionId,
   TOOL_EFFECTS,
   type ToolEffectId,
 } from '../content/professions';
 import type { Rng } from '../rng';
-import type { ItemDef, ItemUse } from '../types';
+import type { InvSlot, ItemDef, ItemUse } from '../types';
 import type { MaterialRarity } from './gathering';
 import { type CraftSkillState, rechargeDiscountMultiplier } from './wheel';
 
@@ -62,6 +63,80 @@ export function canGatherTier(playerToolTier: number, nodeTier: number): boolean
 // gating and monster-material gating can never fall out of sync.
 export function canHarvestMonsterMaterial(toolTier: number, materialTier: number): boolean {
   return toolTierCovers(toolTier, materialTier);
+}
+
+// Owned-best tool resolution (Professions 2.0). Bare hands resolve to
+// effective tool tier 1 for the surfaces that still allow them (corpse
+// harvesting, the fishing catch-band floor); NODE gathering does not (#2343,
+// below). `items` is passed as a parameter (never imported) so this module
+// stays a pure leaf.
+export const BARE_HANDS_TOOL_TIER = 1;
+
+// No matching-profession tool owned at all. Distinct from the bare-hands
+// floor: node gathering (#2343, the RuneScape rule) requires a REAL tool for
+// every node, so its gate needs to see "none" rather than the floored tier.
+export const NO_TOOL_OWNED = 0;
+
+// The best (highest) matching-profession gatherTool tier anywhere in the
+// player's bags, or NO_TOOL_OWNED when none is carried. Pure bag scan, no
+// equip slot: owning the tool is carrying it.
+export function bestOwnedGatherToolTierOrNone(
+  inventory: readonly InvSlot[],
+  professionId: GatheringProfessionId,
+  items: Readonly<Record<string, ItemDef>>,
+): number {
+  let best = NO_TOOL_OWNED;
+  for (const slot of inventory) {
+    const tier = gatherToolTier(items[slot.itemId], professionId);
+    if (tier !== undefined && tier > best) best = tier;
+  }
+  return best;
+}
+
+// The best matching-profession gatherTool tier, floored at
+// BARE_HANDS_TOOL_TIER. The bare-hands-tolerant surfaces (corpse harvesting,
+// fishing's band cap and bite/reel synergy) read this one.
+export function bestOwnedGatherToolTier(
+  inventory: readonly InvSlot[],
+  professionId: GatheringProfessionId,
+  items: Readonly<Record<string, ItemDef>>,
+): number {
+  return Math.max(
+    BARE_HANDS_TOOL_TIER,
+    bestOwnedGatherToolTierOrNone(inventory, professionId, items),
+  );
+}
+
+// True when the player carries ANY fishing implement: the simple pole
+// (use.type 'fishing') or a tiered fishing-profession gatherTool rod. The
+// startFishing implement gate (#2343: casting a line always needs tackle in
+// bags, the node-tool rule's fishing arm) reads this; pure bag scan.
+export function hasFishingImplement(
+  inventory: readonly InvSlot[],
+  items: Readonly<Record<string, ItemDef>>,
+): boolean {
+  return inventory.some((slot) => {
+    const use = items[slot.itemId]?.use;
+    return (
+      !!use &&
+      (use.type === 'fishing' || (use.type === 'gatherTool' && use.professionId === 'fishing'))
+    );
+  });
+}
+
+// The best owned gatherTool tier across EVERY gathering profession, floored at
+// BARE_HANDS_TOOL_TIER. This is the corpse-harvest gate's input: a monster
+// material has no single owning profession, so any gathering tool counts.
+export function bestOwnedAnyGatherToolTier(
+  inventory: readonly InvSlot[],
+  items: Readonly<Record<string, ItemDef>>,
+): number {
+  let best = BARE_HANDS_TOOL_TIER;
+  for (const professionId of GATHERING_PROFESSION_IDS) {
+    const tier = bestOwnedGatherToolTier(inventory, professionId, items);
+    if (tier > best) best = tier;
+  }
+  return best;
 }
 
 // Tool effect slotting (#1136). Durability is modeled as a standalone counter

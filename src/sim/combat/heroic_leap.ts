@@ -1,3 +1,4 @@
+import { resolvePosition, seatGroundedAt } from '../colliders';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../pathfind';
 import type { SimContext } from '../sim_context';
 import { type AbilityDef, DT, type Entity, type Vec3 } from '../types';
@@ -30,6 +31,7 @@ function wasExternallyRelocated(entity: Entity): boolean {
 }
 
 export function sweptLanding(ctx: SimContext, entity: Entity, aim: Vec3): Vec3 {
+  const fromFeetY = entity.pos.y;
   const fromX = entity.pos.x;
   const fromZ = entity.pos.z;
   const dx = aim.x - fromX;
@@ -61,7 +63,30 @@ export function sweptLanding(ctx: SimContext, entity: Entity, aim: Vec3): Vec3 {
       const moved = Math.hypot(resolved.x - safeX, resolved.z - safeZ);
       const diverted =
         Math.hypot(resolved.x - nextX, resolved.z - nextZ) > PLAYER_BODY_RADIUS * 0.25;
-      if (diverted || moved < step * 0.5) break;
+      if (diverted || moved < step * 0.5) {
+        // The grounded resolve treats every prop as a wall, but the flight
+        // arc rises FLIGHT_APEX above the takeoff line: anything with a
+        // movement top under that crest (a stall canopy, a crate stack) is
+        // flown OVER, not hit. Re-resolve the point at crest height; if it
+        // comes back clean the sweep continues across the prop and the seat
+        // below lands the body on its top. A genuine full-height blocker
+        // still diverts the crest resolve and ends the sweep at its face.
+        const crest = fromFeetY + FLIGHT_APEX;
+        const over = resolvePosition(
+          ctx.cfg.seed,
+          nextX,
+          nextZ,
+          PLAYER_BODY_RADIUS,
+          false,
+          undefined,
+          { y: crest, lift: 0 },
+        );
+        if (Math.hypot(over.x - nextX, over.z - nextZ) > PLAYER_BODY_RADIUS * 0.25) break;
+        safeX = nextX;
+        safeZ = nextZ;
+        previousGround = groundHeight(safeX, safeZ, ctx.cfg.seed);
+        continue;
+      }
 
       safeX = resolved.x;
       safeZ = resolved.z;
@@ -69,11 +94,19 @@ export function sweptLanding(ctx: SimContext, entity: Entity, aim: Vec3): Vec3 {
     }
   }
 
-  return {
-    x: safeX,
-    y: groundHeight(safeX, safeZ, ctx.cfg.seed),
-    z: safeZ,
-  };
+  // Support-aware seat: the sweep above passes over props under the arc's
+  // crest, so the end point may sit on a standable top (land ON it, at its
+  // sampled sloped height) or inside a passed-over footprint (nudge clear)
+  // instead of embedding at terrain. The crest is the honest feet height for
+  // the gate: the body descends from there onto whatever is below.
+  const seat = seatGroundedAt(
+    ctx.cfg.seed,
+    safeX,
+    safeZ,
+    PLAYER_BODY_RADIUS,
+    fromFeetY + FLIGHT_APEX,
+  );
+  return { x: seat.x, y: seat.y, z: seat.z };
 }
 
 /** Instant relocation through the same collision/terrain sweep as Heroic Leap. */

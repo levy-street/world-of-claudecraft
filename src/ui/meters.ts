@@ -9,12 +9,25 @@
 // threat — synced online as the top entries) and marks who the mob is
 // actually targeting (aggroTargetId). For finished encounters whose mob is
 // gone, it falls back to each member's damage on that mob.
+//
+// A controlled pet (hunter, warlock, mage) is NOT its own row: its output folds
+// into its owner's, the way a real damage meter reports a hunter. The pet's
+// name survives on the per-ability breakdown entries, so hovering the owner's
+// bar still shows exactly what the pet contributed.
 
 import { CLASSES } from '../sim/data';
 import type { SimEvent } from '../sim/types';
 import type { IWorld } from '../world_api';
+import { abilityDisplayNameFromSource } from './ability_display_name';
 import { tEntity } from './entity_i18n';
+import { esc } from './esc';
 import { formatNumber, type TranslationKey, t } from './i18n';
+import {
+  type BreakdownEntry,
+  type BreakdownRow,
+  breakdownKey,
+  buildMeterBreakdown,
+} from './meters_breakdown_view';
 
 const ENCOUNTER_END_SECONDS = 5;
 const HISTORY_CAP = 8;
@@ -27,6 +40,34 @@ export interface MemberTally {
   heal: number;
   /** damage per mob entity id (current/previous encounters only) */
   dmgByMob: Map<number, number>;
+  /** damage per ability (pet output keyed under the pet's name) */
+  dmgByAbility: Map<string, BreakdownEntry>;
+  /** healing per ability */
+  healByAbility: Map<string, BreakdownEntry>;
+}
+
+/** Who a combat event's damage/healing belongs to once pets fold into owners. */
+interface Attribution {
+  pid: number;
+  name: string;
+  cls: string | null;
+  /** display name of the acting pet, or null when the member acted directly */
+  petName: string | null;
+}
+
+function addBreakdown(
+  map: Map<string, BreakdownEntry>,
+  petName: string | null,
+  ability: string | null,
+  amount: number,
+): void {
+  const key = breakdownKey(petName, ability);
+  const entry = map.get(key);
+  if (entry) {
+    entry.amount += amount;
+    return;
+  }
+  map.set(key, { ability, petName, amount });
 }
 
 export interface Encounter {
@@ -92,14 +133,50 @@ export class MeterData {
         return existing;
       }
     }
-    t = { pid, name, cls, dmg: 0, heal: 0, dmgByMob: new Map() };
+    t = {
+      pid,
+      name,
+      cls,
+      dmg: 0,
+      heal: 0,
+      dmgByMob: new Map(),
+      dmgByAbility: new Map(),
+      healByAbility: new Map(),
+    };
     enc.tallies.set(pid, t);
     return t;
+  }
+
+  /**
+   * Resolve the row a combat event belongs to. A controlled pet reports its
+   * OWNER (folding hunter/warlock/mage pet output into the player's row) and
+   * keeps its own name for the breakdown; anything else reports itself.
+   */
+  private attribute(world: IWorld, sourceId: number, partyPids: Set<number>): Attribution {
+    const src = world.entities.get(sourceId);
+    const ownerId = src?.kind === 'mob' ? (src.ownerId ?? null) : null;
+    const owned = ownerId !== null && partyPids.has(ownerId);
+    const pid = owned && ownerId !== null ? ownerId : sourceId;
+    const petName = owned ? (src?.name ?? null) : null;
+    const member = world.partyInfo?.members.find((m) => m.pid === pid);
+    const entity = world.entities.get(pid);
+    return {
+      pid,
+      name: member?.name ?? entity?.name ?? `#${pid}`,
+      cls: member?.cls ?? (pid === world.player.id ? world.player.templateId : null),
+      petName,
+    };
   }
 
   /** party membership check is supplied by the caller (self + party pids) */
   onEvent(ev: SimEvent, world: IWorld, partyPids: Set<number>, now: number): void {
     if (ev.type !== 'damage' && ev.type !== 'heal2') return;
+    // The HoT-application sound cue (Sim.applyAura, cueOnly:true) is audio-only
+    // and must not open or keep alive an otherwise-idle encounter segment. Gated
+    // on the explicit flag, not amount === 0: a genuine direct heal (applyHeal)
+    // can also legitimately land at amount 0 (full HP, fully absorbed) and that
+    // real cast should still count as party activity.
+    if (ev.type === 'heal2' && ev.cueOnly) return;
     const sourceInParty = partyPids.has(ev.sourceId);
     const targetInParty = partyPids.has(ev.targetId);
     if (!sourceInParty && !targetInParty) return;
@@ -112,14 +189,11 @@ export class MeterData {
     if (ev.type === 'damage' && sourceInParty && ev.kind === 'hit' && ev.amount > 0) {
       const target = world.entities.get(ev.targetId);
       if (target && target.kind === 'mob') {
-        const src = world.entities.get(ev.sourceId);
-        const member = world.partyInfo?.members.find((m) => m.pid === ev.sourceId);
-        const name = member?.name ?? src?.name ?? `#${ev.sourceId}`;
-        const cls =
-          member?.cls ?? (ev.sourceId === world.player.id ? world.player.templateId : null);
+        const who = this.attribute(world, ev.sourceId, partyPids);
         for (const enc of [this.current, this.allTime]) {
-          const t = this.tally(enc, ev.sourceId, name, cls, partyPids);
+          const t = this.tally(enc, who.pid, who.name, who.cls, partyPids);
           t.dmg += ev.amount;
+          addBreakdown(t.dmgByAbility, who.petName, ev.ability, ev.amount);
           if (enc === this.current) {
             t.dmgByMob.set(ev.targetId, (t.dmgByMob.get(ev.targetId) ?? 0) + ev.amount);
           }
@@ -134,12 +208,11 @@ export class MeterData {
         }
       }
     } else if (ev.type === 'heal2' && sourceInParty && ev.amount > 0) {
-      const member = world.partyInfo?.members.find((m) => m.pid === ev.sourceId);
-      const src = world.entities.get(ev.sourceId);
-      const name = member?.name ?? src?.name ?? `#${ev.sourceId}`;
-      const cls = member?.cls ?? (ev.sourceId === world.player.id ? world.player.templateId : null);
+      const who = this.attribute(world, ev.sourceId, partyPids);
       for (const enc of [this.current, this.allTime]) {
-        this.tally(enc, ev.sourceId, name, cls, partyPids).heal += ev.amount;
+        const t = this.tally(enc, who.pid, who.name, who.cls, partyPids);
+        t.heal += ev.amount;
+        addBreakdown(t.healByAbility, who.petName, ev.ability, ev.amount);
       }
     }
   }
@@ -192,6 +265,40 @@ const TAB_SHORT_LABEL_KEY: Record<Tab, TranslationKey> = {
   threat: 'hud.meters.threat',
 };
 
+/** Hud's shared tooltip painter, injected so meters.ts never imports Hud. */
+export interface MetersDeps {
+  attachTooltip: (el: HTMLElement, html: () => string) => void;
+}
+
+/**
+ * One pooled bar. Rows are reused across renders (never rebuilt from
+ * innerHTML) so the tooltip can be attached ONCE per node: rebuilding the row
+ * under the cursor at the 4Hz render cadence would drop the hover and make the
+ * breakdown flicker. The tooltip closure reads `pid`/`name` LIVE off this
+ * record instead of capturing them.
+ */
+/** A live controlled pet, resolved from the world for the threat tab. */
+interface Pet {
+  pid: number;
+  name: string;
+}
+
+/** A member's threat column: their own hate plus every pet they own. */
+function threatOf(pid: number, threat: Map<number, number>, pets: Pet[] | undefined): number {
+  let total = threat.get(pid) ?? 0;
+  for (const pet of pets ?? []) total += threat.get(pet.pid) ?? 0;
+  return total;
+}
+
+interface MeterRowNodes {
+  el: HTMLElement;
+  fill: HTMLElement;
+  label: HTMLElement;
+  num: HTMLElement;
+  pid: number;
+  name: string;
+}
+
 export class Meters {
   private data: MeterData;
   private tab: Tab = 'dmg';
@@ -203,8 +310,12 @@ export class Meters {
   private titleEl: HTMLElement;
   private subEl: HTMLElement;
   private hintEl: HTMLElement;
+  private rowPool: MeterRowNodes[] = [];
 
-  constructor(private world: IWorld) {
+  constructor(
+    private world: IWorld,
+    private deps?: MetersDeps,
+  ) {
     this.data = new MeterData(performance.now());
     this.root = document.querySelector('#meters-window') as HTMLElement;
     this.rowsEl = this.root.querySelector('.mt-rows') as HTMLElement;
@@ -265,6 +376,22 @@ export class Meters {
     return pids;
   }
 
+  /**
+   * Live pets per owner, read from the world rather than the tallies: a pet can
+   * hold hate without ever landing a hit (a taunt, or a fresh summon), so the
+   * threat tab must see it even when it has no damage recorded.
+   */
+  private livePetsByOwner(): Map<number, Pet[]> {
+    const byOwner = new Map<number, Pet[]>();
+    for (const e of this.world.entities.values()) {
+      if (e.kind !== 'mob' || e.ownerId === null) continue;
+      const pets = byOwner.get(e.ownerId);
+      if (pets) pets.push({ pid: e.id, name: e.name });
+      else byOwner.set(e.ownerId, [{ pid: e.id, name: e.name }]);
+    }
+    return byOwner;
+  }
+
   onEvent(ev: SimEvent): void {
     this.data.onEvent(ev, this.world, this.partyPids(), performance.now());
   }
@@ -318,7 +445,8 @@ export class Meters {
       const showHint = this.viewIdx === 0 && this.tab !== 'threat';
       this.hintEl.textContent = showHint ? t('hudChrome.meters.autoShowHint') : '';
       this.hintEl.style.display = showHint ? 'block' : 'none';
-      this.rowsEl.innerHTML = '';
+      // Hide, never innerHTML='': the pooled rows own their attached tooltips.
+      for (const row of this.rowPool) row.el.style.display = 'none';
       return;
     }
     this.hintEl.textContent = '';
@@ -342,6 +470,10 @@ export class Meters {
         });
 
     const liveThreat = mob && !mob.dead && mob.threat.size > 0 ? mob.threat : null;
+    // Scanned ONCE per render, not once per row: the threat column and the
+    // aggro marker both need every member's pets, and re-walking the entity map
+    // per bar is the one part of this render that scales with the world.
+    const petsByOwner = isThreat ? this.livePetsByOwner() : null;
     const rows = [...enc.tallies.values()]
       .map((t) => ({
         t,
@@ -351,7 +483,7 @@ export class Meters {
             : this.tab === 'heal'
               ? t.heal
               : liveThreat
-                ? (liveThreat.get(t.pid) ?? 0)
+                ? threatOf(t.pid, liveThreat, petsByOwner?.get(t.pid))
                 : enc.mainMobId !== null
                   ? (t.dmgByMob.get(enc.mainMobId) ?? 0)
                   : 0,
@@ -360,27 +492,129 @@ export class Meters {
       .sort((a, b) => b.value - a.value);
 
     const top = rows[0]?.value ?? 1;
-    this.rowsEl.innerHTML = '';
-    for (const { t, value } of rows) {
-      const row = document.createElement('div');
-      row.className = 'mt-row';
-      const fill = document.createElement('div');
-      fill.className = 'mt-fill';
-      fill.style.width = `${Math.max(4, (value / top) * 100)}%`;
+    this.syncRowPool(rows.length);
+    rows.forEach(({ t, value }, i) => {
+      const row = this.rowPool[i];
+      row.pid = t.pid;
+      row.name = t.name;
+      row.el.style.display = 'block';
+      row.fill.style.width = `${Math.max(4, (value / top) * 100)}%`;
       const color = t.cls && (CLASSES as Record<string, { color: number }>)[t.cls]?.color;
-      fill.style.background = color ? `#${color.toString(16).padStart(6, '0')}cc` : '#888888cc';
-      const label = document.createElement('span');
-      label.className = 'mt-label';
-      const hasAggro = isThreat && aggroPid === t.pid;
-      label.textContent = t.name;
-      const num = document.createElement('span');
-      num.className = 'mt-num';
-      num.textContent = isThreat ? fmtNum(value) : fmtPerSecondRow(value, value / enc.duration);
-      if (hasAggro) row.classList.add('aggro');
-      row.append(fill, label, num);
-      this.rowsEl.appendChild(row);
+      row.fill.style.background = color ? `#${color.toString(16).padStart(6, '0')}cc` : '#888888cc';
+      row.label.textContent = t.name;
+      row.num.textContent = isThreat ? fmtNum(value) : fmtPerSecondRow(value, value / enc.duration);
+      // The mob's own target keeps the red outline; a pet holding aggro marks
+      // its owner's row, since the pet no longer has one of its own.
+      const hasAggro =
+        isThreat &&
+        aggroPid !== null &&
+        (aggroPid === t.pid || (petsByOwner?.get(t.pid)?.some((p) => p.pid === aggroPid) ?? false));
+      row.el.classList.toggle('aggro', hasAggro);
+    });
+    for (let i = rows.length; i < this.rowPool.length; i++) {
+      this.rowPool[i].el.style.display = 'none';
     }
   }
+
+  /** Grow the pooled bars to `count` rows, attaching each row's tooltip once. */
+  private syncRowPool(count: number): void {
+    while (this.rowPool.length < count) {
+      const el = document.createElement('div');
+      el.className = 'mt-row';
+      // Focusable so the breakdown is reachable by keyboard, not hover only
+      // (attachTooltip shows on focusin and on a mobile long-press).
+      el.tabIndex = 0;
+      const fill = document.createElement('div');
+      fill.className = 'mt-fill';
+      const label = document.createElement('span');
+      label.className = 'mt-label';
+      const num = document.createElement('span');
+      num.className = 'mt-num';
+      el.append(fill, label, num);
+      const row: MeterRowNodes = { el, fill, label, num, pid: -1, name: '' };
+      this.rowPool.push(row);
+      this.rowsEl.appendChild(el);
+      this.deps?.attachTooltip(el, () => this.breakdownHtml(row));
+    }
+  }
+
+  /**
+   * Hover panel for one bar: the member's per-ability damage/healing split (pet
+   * output labeled with the pet's name), or, on the threat tab, the split
+   * between the member and their pets. A finished encounter has no live hate
+   * table, so its threat number falls back to damage and the panel shows the
+   * damage breakdown that produced it.
+   */
+  private breakdownHtml(row: MeterRowNodes): string {
+    const { enc } = this.viewedEncounter();
+    const tally = enc?.tallies.get(row.pid);
+    const title = `<div class="tt-title">${esc(tally?.name ?? row.name)}</div>`;
+    if (!enc || !tally) return title;
+
+    const isThreat = this.tab === 'threat';
+    const mob = isThreat && enc.mainMobId !== null ? this.world.entities.get(enc.mainMobId) : null;
+    const liveThreat = mob && !mob.dead && mob.threat.size > 0 ? mob.threat : null;
+    const byContributor = isThreat && liveThreat !== null;
+
+    let entries: BreakdownEntry[];
+    if (byContributor && liveThreat) {
+      entries = [
+        { ability: null, petName: null, amount: liveThreat.get(tally.pid) ?? 0 },
+        ...(this.livePetsByOwner().get(tally.pid) ?? []).map((pet) => ({
+          ability: null,
+          petName: pet.name,
+          amount: liveThreat.get(pet.pid) ?? 0,
+        })),
+      ];
+    } else {
+      entries = [...(this.tab === 'heal' ? tally.healByAbility : tally.dmgByAbility).values()];
+    }
+
+    const model = buildMeterBreakdown(entries, enc.duration);
+    const summary = t('hudChrome.meters.breakdownSummary', {
+      tab: t(TAB_LABEL_KEY[isThreat && !byContributor ? 'dmg' : this.tab]),
+      value: isThreat ? fmtNum(model.total) : fmtPerSecondRow(model.total, model.perSecond),
+    });
+    const body = model.rows
+      .map((r) => this.breakdownRowHtml(r, tally.name, byContributor))
+      .join('');
+    return `${title}<div class="mt-tip-sub">${esc(summary)}</div><div class="mt-tip-rows">${body}</div>`;
+  }
+
+  private breakdownRowHtml(row: BreakdownRow, memberName: string, byContributor: boolean): string {
+    const label = breakdownRowLabel(row, memberName, byContributor);
+    const value = t('hudChrome.meters.breakdownRow', {
+      value: fmtNum(row.amount),
+      percent: t('hudChrome.meters.percent', {
+        value: formatNumber(Math.round(row.share * 100), {
+          maximumFractionDigits: 0,
+          useGrouping: false,
+        }),
+      }),
+    });
+    return (
+      `<div class="mt-tip-row">` +
+      `<span class="mt-tip-bar" style="width:${Math.max(2, row.fill * 100)}%"></span>` +
+      `<span class="mt-tip-name">${esc(label)}</span>` +
+      `<span class="mt-tip-val">${esc(value)}</span>` +
+      `</div>`
+    );
+  }
+}
+
+// Row label: the folded tail, a threat contributor (the member or one of their
+// pets), or an ability, prefixed with the pet's name when a pet cast it.
+function breakdownRowLabel(row: BreakdownRow, memberName: string, byContributor: boolean): string {
+  if (row.folded > 0) {
+    return t('hudChrome.meters.breakdownOther', {
+      count: formatNumber(row.folded, { maximumFractionDigits: 0, useGrouping: false }),
+    });
+  }
+  if (byContributor) return row.petName ?? memberName;
+  const ability = row.ability
+    ? abilityDisplayNameFromSource(row.ability)
+    : t('hudChrome.meters.melee');
+  return row.petName ? t('hudChrome.meters.petAbility', { pet: row.petName, ability }) : ability;
 }
 
 // Compact damage/heal/threat number. Digits route through formatNumber so the

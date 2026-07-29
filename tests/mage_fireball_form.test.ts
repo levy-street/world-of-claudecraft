@@ -1,18 +1,21 @@
 import { describe, expect, it } from 'vitest';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import { computeTalentModifiers, emptyAllocation } from '../src/sim/content/talents';
-import { ABILITIES, MOBS } from '../src/sim/data';
+import { ABILITIES, DUNGEONS, instanceOrigin, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { enterDungeon } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
-import type { Entity } from '../src/sim/types';
+import { type Entity, NYTHRAXIS_BOSS_ID } from '../src/sim/types';
 import { abilityBuffValue } from '../src/ui/ability_damage';
 import { hasExplicitAbilityIcon } from '../src/ui/icons';
+import { placePlayerInOpenField } from './helpers/open_field';
 
 const FORM_ID = 'fireball_form';
 
-function mageWithSpec(spec: 'fire' | 'frost' | 'arcane'): Sim {
-  const sim = new Sim({ seed: 73, playerClass: 'mage', autoEquip: true });
+function mageWithSpec(spec: 'fire' | 'frost' | 'arcane', devCommands = false): Sim {
+  const sim = new Sim({ seed: 73, playerClass: 'mage', autoEquip: true, devCommands });
   sim.setPlayerLevel(11);
+  placePlayerInOpenField(sim);
   expect(sim.setSpec(spec)).toBe(true);
   sim.tick();
   sim.player.resource = sim.player.maxResource;
@@ -66,6 +69,118 @@ describe('Mage Fireball Form', () => {
     expect(sim.player.auras.some((aura) => aura.kind === 'form_fireball')).toBe(true);
   });
 
+  it('cannot be activated while the Mage is in combat', () => {
+    const sim = mageWithSpec('fire');
+    const resourceBefore = sim.player.resource;
+    sim.player.inCombat = true;
+    sim.drainEvents();
+
+    sim.castAbility(FORM_ID);
+
+    expect(sim.player.castingAbility).toBeNull();
+    expect(sim.player.auras.some((aura) => aura.kind === 'form_fireball')).toBe(false);
+    expect(sim.player.resource).toBe(resourceBefore);
+    expect(sim.player.cooldowns.has(FORM_ID)).toBe(false);
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({ type: 'error', text: "You can't do that while in combat." }),
+    );
+  });
+
+  it.each([
+    ['a dungeon', 'hollow_crypt'],
+    ['a raid', 'nythraxis_crypt'],
+  ] as const)('cannot be activated inside %s instance', (_label, dungeonId) => {
+    const sim = mageWithSpec('fire');
+    const resourceBefore = sim.player.resource;
+    expect(sim.enterDungeon(dungeonId)).toBe(true);
+    expect(sim.instanceInfoAt(sim.player.pos)?.dungeonId).toBe(dungeonId);
+    sim.drainEvents();
+
+    sim.castAbility(FORM_ID);
+
+    expect(sim.player.castingAbility).toBeNull();
+    expect(sim.player.auras.some((aura) => aura.kind === 'form_fireball')).toBe(false);
+    expect(sim.player.resource).toBe(resourceBefore);
+    expect(sim.player.cooldowns.has(FORM_ID)).toBe(false);
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({ type: 'error', text: 'Leave the dungeon first.' }),
+    );
+  });
+
+  it('cancels its running cast when combat starts before the transformation completes', () => {
+    const sim = mageWithSpec('fire');
+    const resourceBefore = sim.player.resource;
+    sim.castAbility(FORM_ID);
+    expect(sim.player.castingAbility).toBe(FORM_ID);
+    sim.drainEvents();
+
+    sim.player.inCombat = true;
+    const events = sim.tick();
+
+    expect(sim.player.castingAbility).toBeNull();
+    expect(sim.player.auras.some((aura) => aura.kind === 'form_fireball')).toBe(false);
+    expect(sim.player.resource).toBe(resourceBefore);
+    expect(sim.player.cooldowns.has(FORM_ID)).toBe(false);
+    expect(events).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ type: 'castStop', entityId: sim.player.id, success: false }),
+        expect.objectContaining({ type: 'error', text: "You can't do that while in combat." }),
+      ]),
+    );
+  });
+
+  it.each([
+    ['a dungeon', 'hollow_crypt'],
+    ['a raid', 'nythraxis_crypt'],
+  ] as const)(
+    'cancels its running cast when the Mage enters %s before completion',
+    (_label, dungeonId) => {
+      const sim = mageWithSpec('fire');
+      const resourceBefore = sim.player.resource;
+      sim.castAbility(FORM_ID);
+      expect(sim.player.castingAbility).toBe(FORM_ID);
+      sim.drainEvents();
+
+      expect(sim.enterDungeon(dungeonId)).toBe(true);
+      const events = sim.tick();
+
+      expect(sim.player.castingAbility).toBeNull();
+      expect(sim.player.auras.some((aura) => aura.kind === 'form_fireball')).toBe(false);
+      expect(sim.player.resource).toBe(resourceBefore);
+      expect(sim.player.cooldowns.has(FORM_ID)).toBe(false);
+      expect(events).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ type: 'castStop', entityId: sim.player.id, success: false }),
+          expect.objectContaining({ type: 'error', text: 'Leave the dungeon first.' }),
+        ]),
+      );
+    },
+  );
+
+  it('cannot be activated in the wide wings after the Nythraxis boss despawns', () => {
+    const sim = mageWithSpec('fire', true);
+    expect(enterDungeon(sim.ctx, 'nythraxis_boss_arena', sim.player.id, true)).toBe(true);
+    const boss = [...sim.entities.values()].find(
+      (entity) => entity.templateId === NYTHRAXIS_BOSS_ID,
+    );
+    expect(boss).toBeDefined();
+    if (!boss) throw new Error('Nythraxis missing from the claimed raid');
+    sim.entities.delete(boss.id);
+    const origin = instanceOrigin(DUNGEONS.nythraxis_boss_arena.index, 0);
+    sim.player.pos = { ...sim.player.pos, x: origin.x + 130, z: origin.z + 96 };
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.drainEvents();
+
+    sim.castAbility(FORM_ID);
+
+    expect(sim.instanceInfoAt(sim.player.pos)?.dungeonId).toBe('nythraxis_boss_arena');
+    expect(sim.player.castingAbility).toBeNull();
+    expect(sim.player.auras.some((aura) => aura.kind === 'form_fireball')).toBe(false);
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({ type: 'error', text: 'Leave the dungeon first.' }),
+    );
+  });
+
   it('applies the canonical 40 percent movement bonus without dealing damage', () => {
     for (const spec of ['fire', 'frost', 'arcane'] as const) {
       const sim = mageWithSpec(spec);
@@ -85,6 +200,8 @@ describe('Mage Fireball Form', () => {
     const distanceOver = (transformed: boolean): number => {
       const sim = mageWithSpec('arcane');
       const player = sim.player;
+      // Measure the speed ratio on empty ground: the town square is furnished.
+      placePlayerInOpenField(sim);
       if (transformed) activate(sim);
       const meta = sim.meta(player.id);
       if (!meta) throw new Error('mage metadata missing');
@@ -131,6 +248,37 @@ describe('Mage Fireball Form', () => {
 
     sim.startAutoAttack();
     expect(player.autoAttack).toBe(false);
+  });
+
+  it('can still be toggled off after combat starts', () => {
+    const sim = mageWithSpec('arcane');
+    activate(sim);
+    sim.player.gcdRemaining = 0;
+    sim.player.inCombat = true;
+
+    sim.castAbility(FORM_ID);
+
+    expect(sim.player.auras.some((aura) => aura.kind === 'form_fireball')).toBe(false);
+  });
+
+  it.each([
+    ['a dungeon', 'hollow_crypt'],
+    ['a raid', 'nythraxis_crypt'],
+  ] as const)('can still be toggled off inside %s', (_label, dungeonId) => {
+    const sim = mageWithSpec('arcane');
+    activate(sim);
+    sim.player.gcdRemaining = 0;
+    expect(sim.enterDungeon(dungeonId)).toBe(true);
+    sim.drainEvents();
+
+    sim.castAbility(FORM_ID);
+
+    expect(sim.player.auras.some((aura) => aura.kind === 'form_fireball')).toBe(false);
+    expect(
+      sim
+        .drainEvents()
+        .some((event) => event.type === 'error' && event.text === 'Leave the dungeon first.'),
+    ).toBe(false);
   });
 
   it('toggles off through its running cooldown and restores normal control and speed', () => {

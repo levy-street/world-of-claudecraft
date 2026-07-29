@@ -39,6 +39,12 @@ export function renderHeroicVendorWindow(
   });
   el.appendChild(balance);
 
+  // Same landscape tile grid as the goods/buyback vendor (.vendor-goods-grid
+  // in components.css): the Heroic Quartermaster is the same kind of shop
+  // counter and shares #vendor-window's width, so its rows must flow into
+  // the grid rather than stay a single full-width column at that width.
+  const goodsGrid = document.createElement('div');
+  goodsGrid.className = 'vendor-goods-grid';
   for (const { itemId, item, marks, affordable } of view.rows) {
     const row = document.createElement('button');
     row.type = 'button';
@@ -54,8 +60,11 @@ export function renderHeroicVendorWindow(
       () =>
         `${deps.itemTooltip(item)}<div class="tt-sub">${esc(t('itemUi.tooltip.clickBuy'))}</div>`,
     );
-    el.appendChild(row);
+    goodsGrid.appendChild(row);
   }
+  // Guard mirrors vendor_window.ts's goods/buyback grids: skip appending an
+  // empty grid container rather than leaving a dead node in the DOM.
+  if (view.rows.length > 0) el.appendChild(goodsGrid);
 
   el.querySelector('[data-close]')?.addEventListener('click', () => deps.onClose());
   el.style.display = 'block';

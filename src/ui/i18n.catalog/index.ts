@@ -107,6 +107,14 @@ export const en = {
     filterLabel: 'Filter commands',
     filterPlaceholder: 'Search this category',
     noMatches: 'No matching commands.',
+    itemSearchPlaceholder: 'Search by name or id',
+    itemResultsAria: 'Matching items',
+    itemNoMatches: 'No items match.',
+    itemMore: 'Showing {shown} of {total}. Keep typing to narrow.',
+    itemChosen: 'Selected: {name}',
+    itemUnknown: 'No item has that id.',
+    itemHeroicTag: 'Heroic',
+    kitCurrentSpec: 'Current spec',
     serverRequirement: 'Server cheats still require ALLOW_DEV_COMMANDS=1.',
     invalidValues: 'Choose valid values before running this command.',
     sent: 'Sent: {command}',
@@ -125,6 +133,7 @@ export const en = {
       dungeon: 'Dungeon',
       difficulty: 'Difficulty',
       name: 'Name',
+      spec: 'Spec',
     },
     difficulty: { normal: 'Normal', heroic: 'Heroic' },
     actions: {
@@ -162,6 +171,10 @@ export const en = {
         description: 'Remove every mob spawned by this developer.',
       },
       give: { label: 'Give item', description: 'Add an item to the player inventory.' },
+      kit: {
+        label: 'Equip fresh-20 kit',
+        description: 'Wear the pre-Sanctum level-20 preset for a spec, bags first. Gear only.',
+      },
       gold: { label: 'Add gold', description: 'Add gold to the current purse.' },
       quest: { label: 'Complete quest', description: 'Complete a specific quest by id.' },
       quests: {
@@ -206,7 +219,7 @@ export const en = {
   // The Last Bell campaign text (scene lines, speakers, prompts): lb.* keys
   // emitted by the sim and rendered via t(key).
   lb: lastBellStrings,
-  // Rare gather events (Professions 2.0 Phase 4): the zone-broadcast lines
+  // Rare gather events (Professions 2.0): the zone-broadcast lines
   // rendered from the id-based gatherRareEvent SimEvent; {finder} is the
   // harvester's player name and splices verbatim.
   gatherEvent: {
@@ -268,6 +281,7 @@ export const en = {
   stats: {
     title: 'World Status',
     accountsCreated: 'Players',
+    charactersCreated: 'Characters Created',
     playersOnline: 'Players Online',
     realmName: 'World Name',
   },
@@ -302,6 +316,8 @@ export const en = {
     empty: 'No updates yet — check back soon.',
     prerelease: 'Pre-release',
     viewOnGithub: 'View on GitHub',
+    new: 'New',
+    viewAll: 'View all updates on GitHub',
   },
   download: {
     title: 'Download Desktop Launcher',
@@ -1188,6 +1204,7 @@ export const en = {
     },
     augment: {
       choose: 'Choose an Augment',
+      cardAria: '{name} ({category}) - {description}',
       aug_brutality: { name: 'Brutality', desc: 'Your physical strikes hit 15% harder.' },
       aug_spellfire: { name: 'Grimfire', desc: 'Your spells deal 15% more damage.' },
       aug_toughness: { name: 'Toughness', desc: 'Gain 12% maximum health.' },

@@ -50,7 +50,8 @@ function mountUp(sim: Sim, pid: number): void {
   sim.addItem('reins_valorsteed', 1, pid);
   // Summon in the north pasture so the summon lock never overlaps a ride.
   teleport(sim, pid, STABLE_PASTURE.xMin + 2, STABLE_PASTURE.zMin + 2);
-  sim.toggleMountFor(pid);
+  // Reins are usable items: summoning is a use, not a keybind toggle.
+  sim.useItem('reins_valorsteed', pid);
   const e = sim.entities.get(pid)!;
   for (let i = 0; i < 80 && e.mountKey === ''; i++) sim.tick();
   expect(e.mountKey).toBe('valorsteed');
@@ -121,7 +122,7 @@ describe('MOUNT_RACE_COURSE geometry contract', () => {
       expect(g.z).toBeLessThan(STABLE_PADDOCK.divider.z - 4);
     }
     expect(MOUNT_RACE_COURSE.jumps.length).toBe(7);
-    expect(MOUNT_RACE_COURSE.arch.x).toBe(114);
+    expect(MOUNT_RACE_COURSE.arch.x).toBe(390);
     expect(isOnMountRaceStartPlatform(MOUNT_RACE_START_PLATFORM)).toBe(true);
     expect(MOUNT_RACE_START_PLATFORM.x).toBeLessThan(MOUNT_RACE_COURSE.arch.x);
     expect(MOUNT_RACE_START_PLATFORM.size).toBe(8);
@@ -431,7 +432,7 @@ describe('losing a race', () => {
     expect(raceOf(sim, sim.playerId)).toBeNull();
     // Remount and start again: a brand-new race id.
     const e = sim.entities.get(sim.playerId)!;
-    sim.toggleMounted();
+    sim.useItem('reins_valorsteed');
     for (let i = 0; i < 80 && e.mountKey === ''; i++) sim.tick();
     const armed = startRace(sim, sim.playerId);
     expect(armed.some((ev) => ev.type === 'mountRaceStart')).toBe(true);

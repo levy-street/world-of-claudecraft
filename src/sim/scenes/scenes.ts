@@ -25,7 +25,13 @@
 
 import type { SimContext } from '../sim_context';
 import { setSquadDirective, squadActorEntity } from '../squad/squad';
-import type { Entity, SceneDollyLookAt, SceneRigPoint, SceneWireOp } from '../types';
+import type {
+  Entity,
+  SceneDollyLookAt,
+  SceneReconnectState,
+  SceneRigPoint,
+  SceneWireOp,
+} from '../types';
 import {
   clearScriptedPlayerWalks,
   fastForwardScriptedPlayerWalks,
@@ -33,80 +39,29 @@ import {
   resolvedPlayerWalkSpeed,
   startScriptedPlayerWalk,
 } from './player_walk';
+import {
+  registeredSceneIds,
+  registerScene,
+  type SceneAttachShotDef,
+  type SceneDef,
+  type SceneDollyLookAtDef,
+  type SceneDollyShotDef,
+  type SceneOpDef,
+  type SceneRigPointDef,
+  sceneById,
+} from './registry';
 
-// Authoring shapes: actor ids and instance-local coords; resolved to entity
-// ids and world coords at emit time.
-export interface SceneRigPointDef {
-  x: number;
-  z: number;
-  /** Yards above terrain at the resolved x/z coordinate. */
-  height: number;
-}
-
-export type SceneDollyLookAtDef =
-  | { kind: 'point'; point: SceneRigPointDef }
-  | { kind: 'spline'; points: readonly SceneRigPointDef[] }
-  | {
-      kind: 'subject';
-      actorId: string;
-      offset: SceneRigPoint;
-      fallback: SceneRigPointDef;
-    };
-
-export interface SceneDollyShotDef {
-  kind: 'dolly';
-  points: readonly SceneRigPointDef[];
-  lookAt: SceneDollyLookAtDef;
-  dur: number;
-}
-
-export interface SceneAttachShotDef {
-  kind: 'attach';
-  target: string;
-  /** Rest frame used until the client resolves the live target frame. */
-  fallbackFrame: { point: SceneRigPointDef; yaw: number };
-  /** Camera position in the target's local frame. */
-  offset: SceneRigPoint;
-  /** Exact look-at point in the target's local frame. */
-  lookAt: SceneRigPoint;
-}
-
-export type SceneOpDef = { at: number } & (
-  | { kind: 'line'; speaker: string; speakerActorId?: string; key: string; dur?: number }
-  | {
-      kind: 'camera';
-      shot:
-        | {
-            kind: 'focus';
-            actorId?: string;
-            x?: number;
-            z?: number;
-            dist?: number;
-            pitch?: number;
-            yaw?: number;
-            dur: number;
-          }
-        | SceneDollyShotDef
-        | SceneAttachShotDef
-        | { kind: 'release' };
-    }
-  | { kind: 'letterbox'; on: boolean }
-  | { kind: 'inputLock'; on: boolean }
-  | { kind: 'fade'; to: 'black' | 'clear'; dur: number }
-  | { kind: 'music'; directive: string }
-  | { kind: 'playerWalk'; to: { x: number; z: number }; speed?: number }
-  | { kind: 'actorMove'; actorId: string; x: number; z: number }
-  | { kind: 'actorFace'; actorId: string; facing: number }
-  | { kind: 'anim'; actorId: string; anim: string }
-  | { kind: 'prop'; target: string; cue: string }
-);
-
-export interface SceneDef {
-  id: string;
-  /** Total scene length in seconds; the end op emits when it elapses. */
-  duration: number;
-  ops: readonly SceneOpDef[];
-}
+export {
+  registeredSceneIds,
+  registerScene,
+  type SceneAttachShotDef,
+  type SceneDef,
+  type SceneDollyLookAtDef,
+  type SceneDollyShotDef,
+  type SceneOpDef,
+  type SceneRigPointDef,
+  sceneById,
+};
 
 export interface ScenePlayback {
   sceneId: string;
@@ -119,22 +74,6 @@ export interface ScenePlayback {
   /** Personal shared-world playback: the audience is exactly this player,
    * camera points are world coords, and actor ops are unavailable. */
   audiencePid?: number;
-}
-
-const SCENES: Record<string, SceneDef> = {};
-
-export function registerScene(def: SceneDef): void {
-  // Ops evaluate in time order whatever order the author listed them.
-  SCENES[def.id] = { ...def, ops: [...def.ops].sort((a, b) => a.at - b.at) };
-}
-
-export function sceneById(id: string): SceneDef | undefined {
-  return SCENES[id];
-}
-
-/** Sorted read-only snapshot of every scene registered in this host. */
-export function registeredSceneIds(): readonly string[] {
-  return Object.freeze(Object.keys(SCENES).sort());
 }
 
 export function sceneActiveFor(ctx: SimContext, claimId: number): boolean {
@@ -160,6 +99,37 @@ function participants(ctx: SimContext, playback: ScenePlayback): Entity[] {
   return out;
 }
 
+/** Persistent scene state for a reconnecting participant. One-shot camera,
+ * line, animation, fade, and prop history is deliberately not replayed. */
+export function sceneReconnectStateFor(ctx: SimContext, pid: number): SceneReconnectState | null {
+  let active: ScenePlayback | null = null;
+  for (const playback of ctx.scenePlaybacks.values()) {
+    if (!participants(ctx, playback).some((participant) => participant.id === pid)) continue;
+    if (active === null || playback.startedAt >= active.startedAt) active = playback;
+  }
+  if (active === null) return null;
+  const def = sceneById(active.sceneId);
+  if (!def) return null;
+  let inputLocked = false;
+  let letterbox = false;
+  let musicSilenced = false;
+  for (let index = 0; index < def.ops.length; index++) {
+    if (!active.emitted[index]) continue;
+    const op = def.ops[index];
+    if (op.kind === 'inputLock') inputLocked = op.on;
+    if (op.kind === 'letterbox') letterbox = op.on;
+    if (op.kind === 'music' && op.directive === 'silence') musicSilenced = true;
+    if (op.kind === 'music' && op.directive === 'resume') musicSilenced = false;
+  }
+  return {
+    sceneId: active.sceneId,
+    remainingSeconds: Math.max(0, def.duration - (ctx.time - active.startedAt)),
+    inputLocked,
+    letterbox,
+    musicSilenced,
+  };
+}
+
 function claimOrigin(ctx: SimContext, playback: ScenePlayback): { x: number; z: number } | null {
   if (playback.audiencePid !== undefined) return null; // world coords verbatim
   const inst = ctx.instances.find(
@@ -182,7 +152,7 @@ function resolveRigPoint(
 // claim, camera points are world coords, keyed by -pid so claim playbacks
 // (positive entity-id keys) never collide.
 export function playSceneForPlayer(ctx: SimContext, pid: number, sceneId: string): boolean {
-  const def = SCENES[sceneId];
+  const def = sceneById(sceneId);
   if (!def || !ctx.entities.has(pid)) return false;
   const key = -pid;
   if (ctx.scenePlaybacks.has(key)) return false;
@@ -201,7 +171,7 @@ export function playSceneForPlayer(ctx: SimContext, pid: number, sceneId: string
 }
 
 export function playScene(ctx: SimContext, claimId: number, sceneId: string): boolean {
-  const def = SCENES[sceneId];
+  const def = sceneById(sceneId);
   if (!def) return false;
   const inst = ctx.instances.find((i) => i.exitId === claimId && i.partyKey !== null);
   if (!inst) return false;
@@ -371,7 +341,7 @@ function resolveAndApply(
 }
 
 function finishScene(ctx: SimContext, playback: ScenePlayback, skipped: boolean): void {
-  const def = SCENES[playback.sceneId];
+  const def = sceneById(playback.sceneId);
   // Settle every already-emitted walk at its authored endpoint on both natural
   // completion and skip. A later un-emitted walk may still win in authoring
   // order through the skip-only applyOnly arm below.
@@ -409,12 +379,13 @@ export function requestSceneSkip(ctx: SimContext, pid?: number): boolean {
   return false;
 }
 
-// Per-tick driver, called from the Sim tick body after scenarios (a stage
-// that cues a scene arms it the same tick; ops start next tick). Zero work
-// while no scene is live.
+// Per-tick driver, called from the Sim tick body after scenarios. A stage
+// that cues a scene arms it and emits at:0 ops in the same tick; scripted
+// player movement starts next tick because the player phase already ran.
+// Zero work while no scene is live.
 export function updateScenes(ctx: SimContext): void {
   for (const playback of [...ctx.scenePlaybacks.values()]) {
-    const def = SCENES[playback.sceneId];
+    const def = sceneById(playback.sceneId);
     if (!def) {
       clearScriptedPlayerWalks(ctx, playback.claimId);
       ctx.scenePlaybacks.delete(playback.claimId);

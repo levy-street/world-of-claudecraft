@@ -36,8 +36,9 @@ fixing a red gate.
 ### Full local gate
 
 `npm run gate` mirrors the CI contract: generated i18n freshness, malware scanning,
-changed-file formatting, the SFX conformance check, the full test suite, typecheck, and
-env, server, and client builds. Release branches use the release i18n tier. It stops at
+changed-file formatting, the SFX conformance check, the full test suite, the browser
+regression suite (`npm run test:browser`, which drives Chromium through Playwright), the
+typecheck, and env, server, and client builds. Release branches use the release i18n tier. It stops at
 the first failure and bounds Vitest workers to avoid load flakes on shared machines. It
 resolves FFmpeg (`ffmpeg` and `ffprobe`) from the bundled `ffmpeg-static`/`ffprobe-static`
 npm packages, falling back to PATH, and refuses to run when neither source yields a

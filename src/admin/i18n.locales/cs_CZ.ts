@@ -579,6 +579,7 @@ export const cs_CZ: Record<string, string> = {
   'stats.peakOnlineToday': 'maximum online 24 h',
   'stats.returningAccounts24h': 'vracející se účty 24 h',
   'stats.serverRss': 'RSS serveru',
+  'stats.playersCap': 'limit hráčů',
   'stats.sessions24h': 'relace 24 h',
   'stats.siteUsersNow': 'uživatelé webu teď',
   'stats.uptime': 'doba běhu',

@@ -26,6 +26,17 @@ const REF_DISTANCE = 5; // world units at which a sound is at full volume
 const MAX_DISTANCE = 46; // hard cutoff: beyond this, sources are silent/skipped
 const MAX_DISTANCE_SQ = MAX_DISTANCE * MAX_DISTANCE;
 const POINT_AMBIENCE_GAIN = 0.18;
+// amb_forge's custom recording still reads quiet in-game even with the
+// catalog's keyTrimDb ceiling (scripts/sfx/sfx_gain_map.json) applied at its
+// full sanctioned +5dB, the maximum true-peak headroom under the shared
+// -6dBFS conform ceiling (the recording's own peak sits at -6.0 dBTP after
+// conform: a percussive hammer-strike signal has little room left under that
+// engine-wide floor). This mix target REPLACES POINT_AMBIENCE_GAIN for forge
+// only (campfire is unaffected), and stacks with the manifest's +5dB entry
+// gain in loop()'s mixedTarget: 0.625 (this) * 1.778 (the +5dB trim,
+// SFX_GAIN_LIMITS.amb_forge) = ~1.11, tuned by ear against the +5dB trim
+// alone (~0.32 effective, still too quiet).
+const FORGE_AMBIENCE_GAIN = 0.625;
 const FOOTSTEP_CUES: Partial<Record<string, string>> = {
   grass: 'foot_grass',
   dirt: 'foot_dirt',
@@ -755,7 +766,8 @@ class Sfx {
       return;
     }
     const key = source.kind === 'campfire' ? 'amb_campfire' : 'amb_forge';
-    this.loop(source.id, key, POINT_AMBIENCE_GAIN, source.x, source.y, source.z);
+    const gain = source.kind === 'forge' ? FORGE_AMBIENCE_GAIN : POINT_AMBIENCE_GAIN;
+    this.loop(source.id, key, gain, source.x, source.y, source.z);
   }
 
   /** Cross-fade the global ambience loops to match the player's surroundings.
@@ -806,10 +818,13 @@ class Sfx {
                         : 0;
     this.ambient('amb_wind_marsh', !inDungeon ? marshBed : 0);
     // the Frostveil shares the peaks' ridge wind, a touch stronger in the mist;
-    // desert/volcano (paint-only) borrow the peaks ridge bed too.
+    // desert/volcano (paint-only) borrow the peaks ridge bed too. 0.12 matches
+    // amb_wind_vale's mix target: peaks/vale/marsh are generated to the same
+    // -14ish LUFS target, and the old 0.18 was a player-reported "too loud"
+    // complaint at Thornpeak Heights traced to this constant alone.
     const peaksBed =
       biome === 'peaks' || biome === 'desert' || biome === 'volcano'
-        ? 0.18
+        ? 0.12
         : biome === 'frost'
           ? 0.2
           : biome === 'gale'

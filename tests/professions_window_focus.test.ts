@@ -15,7 +15,9 @@ import { ProfessionsWindow, type ProfessionsWindowDeps } from '../src/ui/profess
 // the painter only ever uses the returned string as an <img src>.
 vi.mock('../src/ui/icons', () => ({
   iconDataUrl: () => 'data:,',
-  professionIconUrl: () => 'data:,',
+  // Echo the requested id into the URL so painter tests catch a wrong or
+  // hardcoded profession/gathering resolver argument.
+  professionIconUrl: (id: string) => `/test-professions/${id}.webp`,
 }));
 
 interface WorldState {
@@ -109,6 +111,25 @@ describe('ProfessionsWindow: focus and scroll survive rebuilds', () => {
     expect(document.activeElement).toBe(el.querySelector('[data-close]'));
   });
 
+  it('re-opening while open re-renders in place without re-running the open bookkeeping', () => {
+    const captureFocus = vi.fn(() => null);
+    const closeOthers = vi.fn();
+    const { w, el } = makeWindow(baseState(), { captureFocus, closeOthers });
+    expect(captureFocus).toHaveBeenCalledTimes(1);
+    expect(closeOthers).toHaveBeenCalledTimes(1);
+
+    w.open();
+
+    // Still open and rendered, but the original opener-focus capture and the
+    // close-others sweep did not re-run: re-running would clobber the focus
+    // restore target with an element inside the window itself.
+    expect(w.isOpen).toBe(true);
+    expect(el.style.display).toBe('flex');
+    expect(el.querySelector('[data-close]')).not.toBeNull();
+    expect(captureFocus).toHaveBeenCalledTimes(1);
+    expect(closeOthers).toHaveBeenCalledTimes(1);
+  });
+
   it('rebuilds on a data change and restores focus to the fresh Close button', () => {
     const state = baseState();
     const { w, el } = makeWindow(state);
@@ -191,7 +212,7 @@ describe('ProfessionsWindow: mode and row gating', () => {
   });
 
   it('renders no gathering row for an unknown profession id', () => {
-    // Fishing joined GATHERING_NAME_KEYS with Professions 2.0 Phase 11, so
+    // Fishing joined GATHERING_NAME_KEYS with Professions 2.0, so
     // the unknown-id example is skinning (documented in gathering.ts as
     // deliberately NOT a gathering profession): an id with no
     // GATHERING_NAME_KEYS entry renders no row BY DESIGN, while the known
@@ -204,6 +225,9 @@ describe('ProfessionsWindow: mode and row gating', () => {
     const { el } = makeWindow(state);
     expect(el.querySelectorAll('.prof-gather-row')).toHaveLength(1);
     expect(el.querySelector('.prof-gathering')).not.toBeNull();
+    expect(
+      el.querySelector<HTMLImageElement>('.prof-gather-row .prof-craft-icon')?.getAttribute('src'),
+    ).toBe('/test-professions/gather_mining.webp');
   });
 
   it('omits the gathering section entirely when every injected id is unknown', () => {
@@ -241,6 +265,41 @@ describe('ProfessionsWindow: mode and row gating', () => {
     // The RingLayout math is unit-pinned in professions_view.test.ts; this
     // pins the painter's conditional SVG emission on top of it.
     const attuned = makeWindow(baseState());
+    const crest = attuned.el.querySelector<HTMLImageElement>('.prof-archetype-crest');
+    expect(crest?.getAttribute('src')).toBe('/ui/professions/archetype_smith.webp');
+    expect(crest?.getAttribute('alt')).toBe('');
+    expect(
+      [...attuned.el.querySelectorAll<HTMLImageElement>('.prof-ring-node img')].map((image) =>
+        image.getAttribute('src'),
+      ),
+    ).toEqual([
+      '/test-professions/prof_engineering.webp',
+      '/test-professions/prof_alchemy.webp',
+      '/test-professions/prof_cooking.webp',
+      '/test-professions/prof_leatherworking.webp',
+      '/test-professions/prof_tailoring.webp',
+      '/test-professions/prof_inscription.webp',
+      '/test-professions/prof_enchanting.webp',
+      '/test-professions/prof_jewelcrafting.webp',
+      '/test-professions/prof_weaponcrafting.webp',
+      '/test-professions/prof_armorcrafting.webp',
+    ]);
+    expect(
+      [...attuned.el.querySelectorAll<HTMLImageElement>('.prof-crafts .prof-craft-icon')].map(
+        (image) => image.getAttribute('src'),
+      ),
+    ).toEqual([
+      '/test-professions/prof_engineering.webp',
+      '/test-professions/prof_alchemy.webp',
+      '/test-professions/prof_cooking.webp',
+      '/test-professions/prof_leatherworking.webp',
+      '/test-professions/prof_tailoring.webp',
+      '/test-professions/prof_inscription.webp',
+      '/test-professions/prof_enchanting.webp',
+      '/test-professions/prof_jewelcrafting.webp',
+      '/test-professions/prof_weaponcrafting.webp',
+      '/test-professions/prof_armorcrafting.webp',
+    ]);
     expect(attuned.el.querySelectorAll('.prof-ring-node')).toHaveLength(10);
     expect(attuned.el.querySelector('.prof-ring-arc')).not.toBeNull();
     expect(attuned.el.querySelector('.prof-ring-chord')).not.toBeNull();
@@ -254,6 +313,7 @@ describe('ProfessionsWindow: mode and row gating', () => {
     expect(unattuned.el.querySelectorAll('.prof-ring-node')).toHaveLength(10);
     expect(unattuned.el.querySelector('.prof-ring-arc')).toBeNull();
     expect(unattuned.el.querySelector('.prof-ring-chord')).toBeNull();
+    expect(unattuned.el.querySelector('.prof-archetype-crest')).toBeNull();
   });
 
   it('restores the captured opener focus on close, and only once', () => {

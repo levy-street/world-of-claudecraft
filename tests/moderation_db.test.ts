@@ -27,7 +27,9 @@ import {
   moderationQueue,
   moderationReportsForAccount,
   muteAccountChat,
+  reactivateAccountAudited,
   recordInGameAction,
+  resetChatStrikesAudited,
   setDailyRewardsBan,
   setDailyRewardsIpBan,
   setOnAccountModerated,
@@ -327,6 +329,90 @@ describe('moderation report helpers', () => {
     ).rejects.toThrow(/not chat muted/);
 
     expect(client.query.mock.calls[2][0]).toBe('ROLLBACK');
+  });
+
+  it('rejects reactivation without a reason', async () => {
+    await expect(
+      reactivateAccountAudited({ accountId: 2, adminAccountId: 1, reason: '   ' }),
+    ).rejects.toThrow(/reason/);
+    expect(query).not.toHaveBeenCalled();
+    expect(connect).not.toHaveBeenCalled();
+  });
+
+  it('reactivates an account and writes an audit action in one transaction', async () => {
+    const client = clientStub();
+    connect.mockResolvedValue(client as unknown as PoolClient);
+
+    await reactivateAccountAudited({
+      accountId: 2,
+      adminAccountId: 1,
+      reason: 'appeal accepted',
+    });
+
+    expect(connect).toHaveBeenCalledTimes(1);
+    expect(client.query.mock.calls[0][0]).toBe('BEGIN');
+    expect(client.query.mock.calls[1][0]).toMatch(/deactivated_at = NULL/);
+    expect(client.query.mock.calls[1][1]).toEqual([2]);
+    expect(client.query.mock.calls[2][0]).toMatch(/account_moderation_actions/);
+    expect(client.query.mock.calls[2][1]).toEqual([2, 1, 'reactivate', 'appeal accepted', null]);
+    expect(client.query.mock.calls[3][0]).toBe('COMMIT');
+    expect(client.release).toHaveBeenCalledTimes(1);
+  });
+
+  it('rejects a chat-strikes reset without a reason', async () => {
+    await expect(
+      resetChatStrikesAudited({ accountId: 2, adminAccountId: 1, reason: '' }),
+    ).rejects.toThrow(/reason/);
+    expect(query).not.toHaveBeenCalled();
+    expect(connect).not.toHaveBeenCalled();
+  });
+
+  it('resets chat strikes and writes an audit action when the account exists', async () => {
+    const client = clientStub();
+    client.query
+      .mockResolvedValueOnce(queryResult([])) // BEGIN
+      .mockResolvedValueOnce(queryResult([], 1)) // UPDATE, one row
+      .mockResolvedValue(queryResult([]));
+    connect.mockResolvedValue(client as unknown as PoolClient);
+
+    const found = await resetChatStrikesAudited({
+      accountId: 2,
+      adminAccountId: 1,
+      reason: 'appeal accepted',
+    });
+
+    expect(found).toBe(true);
+    expect(client.query.mock.calls[1][0]).toMatch(/chat_strikes = 0/);
+    expect(client.query.mock.calls[1][1]).toEqual([2]);
+    expect(client.query.mock.calls[2][0]).toMatch(/account_moderation_actions/);
+    expect(client.query.mock.calls[2][1]).toEqual([
+      2,
+      1,
+      'chat_strikes_reset',
+      'appeal accepted',
+      null,
+    ]);
+    expect(client.query.mock.calls[3][0]).toBe('COMMIT');
+  });
+
+  it('skips the audit row and returns false for an unknown account', async () => {
+    const client = clientStub();
+    client.query
+      .mockResolvedValueOnce(queryResult([])) // BEGIN
+      .mockResolvedValueOnce(queryResult([], 0)) // UPDATE, no rows
+      .mockResolvedValue(queryResult([]));
+    connect.mockResolvedValue(client as unknown as PoolClient);
+
+    const found = await resetChatStrikesAudited({
+      accountId: 999,
+      adminAccountId: 1,
+      reason: 'appeal accepted',
+    });
+
+    expect(found).toBe(false);
+    const stmts = client.query.mock.calls.map((c) => String(c[0]));
+    expect(stmts.some((s) => s.includes('account_moderation_actions'))).toBe(false);
+    expect(stmts).toEqual(['BEGIN', expect.stringMatching(/chat_strikes = 0/), 'COMMIT']);
   });
 
   it('requires a moderation reason for suspend and ban actions', async () => {

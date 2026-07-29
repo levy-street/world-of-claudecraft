@@ -1,21 +1,23 @@
-// The Evergarden's dressing, render-only: marble statues down the Statuary
-// Walk and in the Fountain Court, the tiered fountain itself at the maze's
-// heart, clipped topiary forms scattered over the lawns (the hedge maze is
-// terrain, world.ts owns it), and the specimen elders at the greatTrees
-// spots (the same records the sim's trunk colliders use). Same contract as
-// the sibling realm modules: build once, update(time) animates gently.
+// The Evergarden's dressing, render-only: the four marble watchers in the
+// Fountain Court, the tiered fountain itself at the maze's heart, the Great
+// Maze's modeled hedge walls and arches (planned by garden_maze_core over
+// the wall grid world.ts owns, the same cells movement blocking reads), and
+// the specimen elders at the greatTrees spots (the same records the sim's
+// trunk colliders use). Same contract as the sibling realm modules: build
+// once, update(time) animates.
 import * as THREE from 'three';
-import { EVERGARDEN_PROPS, EVERGARDEN_ZONE } from '../sim/content/evergarden';
+import { EVERGARDEN_PROPS } from '../sim/content/evergarden';
 import { hash2 } from '../sim/rng';
-import {
-  gardenLandness,
-  inGardenMaze,
-  roadDistance,
-  terrainHeight,
-  WATER_LEVEL,
-} from '../sim/world';
+import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
+import {
+  MAZE_ARCH_SCALE,
+  MAZE_WALL_SCALE,
+  MAZE_Z1,
+  type MazePieceSpot,
+  planGardenMazePieces,
+} from './garden_maze_core';
 import { GFX } from './gfx';
 
 export interface GardenFeaturesView {
@@ -36,6 +38,32 @@ registerPreload(
     greatTreeScene = gltf.scene;
   }),
 );
+
+// The Great Maze's modeled hedge walls and entry arches (user-authored
+// models). The wall grid, cell geometry, and the movement-blocking bands
+// all live in sim/world.ts; this module only DRAWS that same data.
+const MAZE_WALL_URL = '/models/props/maze_hedge_wall.glb';
+const MAZE_ARCH_URL = '/models/props/maze_hedge_arch.glb';
+let mazeWallScene: THREE.Group | null = null;
+let mazeArchScene: THREE.Group | null = null;
+registerPreload(
+  loadGltf(MAZE_WALL_URL).then((gltf) => {
+    mazeWallScene = gltf.scene;
+  }),
+);
+registerPreload(
+  loadGltf(MAZE_ARCH_URL).then((gltf) => {
+    mazeArchScene = gltf.scene;
+  }),
+);
+
+// (The modeled flower beds render and collide as decorProps through the
+// props system now: PROP_ASSET_DEFS flowerBed* keys, placed by
+// content/evergarden with world.ts GARDEN_BED_PADS leveling their ground.)
+
+export const gardenFeaturesPreloadInternalsForTest = {
+  mazeAssetUrl: { wall: MAZE_WALL_URL, arch: MAZE_ARCH_URL },
+};
 
 function mat(color: number, rough = 0.85): THREE.MeshStandardMaterial | THREE.MeshLambertMaterial {
   return GFX.standardMaterials
@@ -80,30 +108,7 @@ function statueGeo(): THREE.BufferGeometry {
   return mergeGeos(parts);
 }
 
-// Three clipped topiary forms for the lawns: a ball on a stem, a tiered
-// triple-ball, and a garden cone. The living topiary (the mobs) are the
-// creature rigs; these are the ones still holding their shape.
-function topiaryGeos(): THREE.BufferGeometry[] {
-  const stem = (h: number): THREE.BufferGeometry => {
-    const g = new THREE.CylinderGeometry(0.09, 0.12, h, 5);
-    g.translate(0, h / 2, 0);
-    return g.toNonIndexed();
-  };
-  const ball = (r: number, y: number): THREE.BufferGeometry => {
-    const g = new THREE.SphereGeometry(r, 7, 6);
-    g.translate(0, y, 0);
-    return g.toNonIndexed();
-  };
-  const single = mergeGeos([stem(1.0), ball(0.85, 1.6)]);
-  const tiered = mergeGeos([stem(2.4), ball(0.75, 1.0), ball(0.55, 2.0), ball(0.38, 2.75)]);
-  const coneG = new THREE.ConeGeometry(0.85, 2.6, 7);
-  coneG.translate(0, 1.3 + 0.3, 0);
-  const cone = mergeGeos([stem(0.5), coneG.toNonIndexed()]);
-  return [single, tiered, cone];
-}
-
 const MARBLE = 0xcfcdc2;
-const TOPIARY_TINTS = [0x3f7e3c, 0x4a8a4e, 0x356e34];
 
 // The Fountain Court's centerpiece: a two-tier stone fountain with a still
 // water disc in each basin (the shimmer is the water shader's job elsewhere;
@@ -174,25 +179,11 @@ export function buildGardenFeatures(seed: number): GardenFeaturesView {
     group.add(mesh);
   };
 
-  // --- the Statuary Walk: paired statues flanking the road to the maze,
-  // plus four watchers inside the Fountain Court ---
+  // --- the four marble watchers inside the Fountain Court (the old paired
+  // walk statues came down: the white figures read as rubble pillars among
+  // the new hedge and flower borders) ---
   {
     const spots: { x: number; z: number; y: number; s: number; rot: number }[] = [];
-    for (let i = 0; i < 6; i++) {
-      const z = 840 + i * 17;
-      for (const x of [353, 367]) {
-        const y = terrainHeight(x, z, seed);
-        if (y < WATER_LEVEL + 0.5) continue;
-        spots.push({
-          x,
-          z,
-          y: y - 0.1,
-          s: 0.95 + hash2(x, z, seed + 6101) * 0.15,
-          // each faces the walk, weathered a few degrees off true
-          rot: (x < 360 ? 1 : -1) * (Math.PI / 2) + (hash2(z, x, seed + 6111) - 0.5) * 0.3,
-        });
-      }
-    }
     for (const [x, z] of [
       [350, 1008],
       [370, 1008],
@@ -217,39 +208,52 @@ export function buildGardenFeatures(seed: number): GardenFeaturesView {
     if (y > WATER_LEVEL) group.add(buildFountain(360, 1016.5, y - 0.1));
   }
 
-  // --- the topiary forms: a deterministic scatter over the open lawns,
-  // clear of the maze, the hamlet, the roads, and the water ---
+  // --- the Great Maze's modeled hedge walls and entry arches ---
+  // The plan comes from garden_maze_core (which reads the sim's wall grid),
+  // so the drawn hedges, the movement-blocking boxes, and the map painter
+  // all derive from the same cells. Instances split into north-south bands
+  // so the far half of the maze frustum-culls from inside it.
   {
-    const geos = topiaryGeos();
-    const spotSets: { x: number; z: number; y: number; s: number; rot: number; tint: number }[][] =
-      [[], [], []];
-    const hub = EVERGARDEN_ZONE.hub;
-    for (let gx = 184; gx <= 536; gx += 12) {
-      for (let gz = GARDEN_ZMIN + 14; gz <= GARDEN_ZMAX - 10; gz += 12) {
-        const r = hash2(gx, gz, seed + 6201);
-        if (r > 0.34) continue;
-        const x = gx + (hash2(gx, gz, seed + 6211) - 0.5) * 9;
-        const z = gz + (hash2(gz, gx, seed + 6221) - 0.5) * 9;
-        if (inGardenMaze(x, z)) continue;
-        if (Math.hypot(x - hub.x, z - hub.z) < hub.radius + 8) continue;
-        if (gardenLandness(x, z) < 0.22) continue;
-        if (roadDistance(x, z) < 8) continue;
-        const y = terrainHeight(x, z, seed);
-        if (y < WATER_LEVEL + 1.2 || y > 12) continue;
-        const kind = Math.floor(hash2(x, z, seed + 6231) * 3) % 3;
-        spotSets[kind].push({
-          x,
-          z,
-          y: y - 0.12,
-          s: 0.8 + hash2(z, x, seed + 6241) * 0.6,
-          rot: hash2(x + 3, z - 3, seed + 6251) * Math.PI * 2,
-          tint: TOPIARY_TINTS[Math.floor(hash2(x, z, seed + 6261) * 3) % 3],
-        });
-      }
-    }
-    const leafMat = mat(0xffffff, 0.85);
-    for (let k = 0; k < 3; k++) instance(geos[k], leafMat, spotSets[k], true);
+    const instanceModel = (scene: THREE.Group | null, spots: MazePieceSpot[], s: number) => {
+      if (!scene || spots.length === 0) return;
+      scene.updateMatrixWorld(true);
+      const bandOf = (sp: MazePieceSpot) => Math.min(3, Math.floor((MAZE_Z1 - sp.z) / 40));
+      const bands: MazePieceSpot[][] = [[], [], [], []];
+      for (const sp of spots) bands[bandOf(sp)].push(sp);
+      scene.traverse((obj) => {
+        const src = obj as THREE.Mesh;
+        if (!src.isMesh) return;
+        for (const band of bands) {
+          if (band.length === 0) continue;
+          const mesh = new THREE.InstancedMesh(src.geometry, src.material, band.length);
+          const m = new THREE.Matrix4();
+          const q = new THREE.Quaternion();
+          const up = new THREE.Vector3(0, 1, 0);
+          const v = new THREE.Vector3();
+          const sc = new THREE.Vector3(s, s, s);
+          band.forEach((sp, i) => {
+            // sunk a quarter yard so overlapped piece ends seat into the
+            // lawn together on the garden's gentle slopes
+            q.setFromAxisAngle(up, sp.rot);
+            v.set(sp.x, terrainHeight(sp.x, sp.z, seed) - 0.25, sp.z);
+            mesh.setMatrixAt(i, m.compose(v, q, sc).multiply(src.matrixWorld));
+          });
+          mesh.instanceMatrix.needsUpdate = true;
+          mesh.castShadow = true;
+          mesh.receiveShadow = true;
+          mesh.computeBoundingSphere();
+          group.add(mesh);
+        }
+      });
+    };
+    const plan = planGardenMazePieces();
+    instanceModel(mazeWallScene, plan.walls, MAZE_WALL_SCALE);
+    instanceModel(mazeArchScene, plan.arches, MAZE_ARCH_SCALE);
   }
+
+  // (The topiary forms retired entirely: even the clipped ball read as a
+  // lollipop tree beside the walks. The garden's greenery is now the hedge
+  // lines, the oaks, and the specimen elders below.)
 
   // --- the specimen elders: the twisted giant regrown clipped and green ---
   {

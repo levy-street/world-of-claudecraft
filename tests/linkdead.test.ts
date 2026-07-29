@@ -15,6 +15,8 @@ vi.mock('../server/db', () => ({
   markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   revokeAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  walletForAccount: vi.fn(async () => null),
+  loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
   // Character load leases: leave() releases and the autosave loop heartbeats, so
   // these must exist on the mock or those paths throw on the undefined export.
   acquireCharacterLease: vi.fn(async () => true),
@@ -34,6 +36,8 @@ import {
   RECONNECT_CONFLICT_ERROR,
   RECONNECT_TIMEOUT_ERROR,
 } from '../src/net/reconnect_policy';
+import { registerChoice, startChoiceForPlayer } from '../src/sim/scenes/choices';
+import { playSceneForPlayer, registerScene } from '../src/sim/scenes/scenes';
 
 function fakeWs() {
   const ws: any = {
@@ -206,9 +210,72 @@ describe('linkdead grace lifecycle', () => {
     const hello = ws2.send.mock.calls
       .map((c: any[]) => JSON.parse(c[0]))
       .find((m: any) => m.t === 'hello');
-    expect(hello).toMatchObject({ pid: session.pid, name: 'Comeback', cls: 'warrior' });
+    expect(hello).toMatchObject({
+      pid: session.pid,
+      name: 'Comeback',
+      cls: 'warrior',
+      sceneState: null,
+      sceneChoiceState: null,
+    });
     // one session, one character: no duplicates were created
     expect(server.clients.size).toBe(1);
+  });
+
+  it('sends active scene and choice convergence in the first resumed frame', () => {
+    registerScene({
+      id: 'sc_linkdead_active',
+      duration: 10,
+      ops: [
+        { at: 0, kind: 'inputLock', on: true },
+        { at: 0, kind: 'letterbox', on: true },
+        { at: 0, kind: 'music', directive: 'silence' },
+      ],
+    });
+    registerChoice({
+      id: 'ch_linkdead_active',
+      promptKey: 'lb.fare.promptOut',
+      flag: 'unused_personal_flag',
+      options: [
+        { id: 'pay', key: 'lb.fare.pay' },
+        { id: 'decline', key: 'lb.fare.decline' },
+      ],
+      windowSeconds: 8,
+      defaultOptionId: 'decline',
+    });
+
+    const server = new GameServer();
+    const ws = fakeWs();
+    const session = expectJoined(server.join(ws, 11, 101, 'Scenehold', 'warrior', null));
+    expect(playSceneForPlayer(server.sim.ctx, session.pid, 'sc_linkdead_active')).toBe(true);
+    expect(
+      startChoiceForPlayer(server.sim.ctx, session.pid, 'ch_linkdead_active', {
+        values: { price: 12 },
+      }),
+    ).toBe(true);
+    server.sim.tick();
+
+    dropSocket(server, session, ws);
+    for (let tick = 0; tick < 20; tick++) server.sim.tick();
+    const ws2 = fakeWs();
+    expectJoined(server.join(ws2, 11, 101, 'Scenehold', 'warrior', null));
+
+    const sent = ws2.send.mock.calls.map((call: any[]) => JSON.parse(call[0]));
+    expect(sent[0].t).toBe('hello');
+    expect(sent[0].sceneState).toMatchObject({
+      sceneId: 'sc_linkdead_active',
+      inputLocked: true,
+      letterbox: true,
+      musicSilenced: true,
+    });
+    expect(sent[0].sceneState.remainingSeconds).toBeGreaterThan(0);
+    expect(sent[0].sceneState.remainingSeconds).toBeLessThan(10);
+    expect(sent[0].sceneChoiceState).toMatchObject({
+      choiceId: 'ch_linkdead_active',
+      leaderPid: session.pid,
+      values: { price: 12 },
+    });
+    expect(sent[0].sceneChoiceState.remainingSeconds).toBeGreaterThan(0);
+    expect(sent[0].sceneChoiceState.remainingSeconds).toBeLessThan(8);
   });
 
   it('ignores a late close event from the pre-resume socket', () => {

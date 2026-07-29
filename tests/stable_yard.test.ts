@@ -33,13 +33,13 @@ function horses(sim: Sim): Entity[] {
 
 describe('STABLE_PADDOCK geometry contract', () => {
   it('documents the paddock and its divider', () => {
-    expect(PADDOCK.x1).toBe(54);
-    expect(PADDOCK.x2).toBe(150);
-    expect(PADDOCK.z1).toBe(646);
-    expect(PADDOCK.z2).toBe(706);
-    expect(PADDOCK.pasture).toEqual({ x1: 104 });
-    expect(PADDOCK.entrance).toEqual({ x1: 84, x2: 94 });
-    expect(DIVIDER).toEqual({ z: 688 });
+    expect(PADDOCK.x1).toBe(330);
+    expect(PADDOCK.x2).toBe(426);
+    expect(PADDOCK.z1).toBe(546);
+    expect(PADDOCK.z2).toBe(606);
+    expect(PADDOCK.pasture).toEqual({ x1: 380 });
+    expect(PADDOCK.entrance).toEqual({ x1: 360, x2: 370 });
+    expect(DIVIDER).toEqual({ z: 588 });
   });
 
   it('derives the pasture from the paddock (north of the divider, inset)', () => {
@@ -67,15 +67,15 @@ describe('STABLE_PADDOCK geometry contract', () => {
   it('places the barn cluster in the opened northwest notch', () => {
     expect(ZONE3_PROPS.buildings).toContainEqual({
       kind: 'inn',
-      x: 76,
-      z: 698,
+      x: 352,
+      z: 598,
       w: 10,
       d: 8,
       rot: 2.7,
     });
-    expect(ZONE3_PROPS.tents).toContainEqual({ x: 99, z: 712, rot: 2.2, scale: 1 });
-    expect(ZONE3_PROPS.stalls).toContainEqual({ x: 89, z: 703, rot: 1.2, r: 1.6 });
-    expect(ZONE3_PROPS.wells).toContainEqual({ x: 99, z: 703, r: 1.5 });
+    expect(ZONE3_PROPS.tents).toContainEqual({ x: 375, z: 612, rot: 2.2, scale: 1 });
+    expect(ZONE3_PROPS.stalls).toContainEqual({ x: 365, z: 603, rot: 1.2, r: 1.6 });
+    expect(ZONE3_PROPS.wells).toContainEqual({ x: 375, z: 603, r: 1.5 });
   });
 
   it('fully closes the horse pasture and leaves one entrance beside the barn', () => {
@@ -103,6 +103,8 @@ describe('ambient stable horses', () => {
     }
   });
 
+  // 90s budget: this drives a long real-world tick run (7 to 8s locally) and
+  // has hit the 30s default under CI core contention.
   it('stays non-hostile, idle, and in the north pasture over a long run, and wanders', () => {
     const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', autoEquip: true });
     const hs = horses(sim);
@@ -132,7 +134,7 @@ describe('ambient stable horses', () => {
     }
     // They actually amble (the wander drew rng and moved a horse off its spawn).
     expect(maxDisplacement).toBeGreaterThan(1);
-  }, 30000);
+  }, 90_000);
 
   it('cannot be targeted as an enemy, attacked, or damaged by a player', () => {
     const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', autoEquip: true });

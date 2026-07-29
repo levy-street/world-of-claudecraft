@@ -4,6 +4,7 @@
 // window, campaignFlags persistence round-trip, and the scenario choice
 // stage gating.
 import { beforeAll, describe, expect, it } from 'vitest';
+import { ACTIONS, applyAction, encodeObs } from '../src/sim/obs';
 import { registerScenario, scenarioRunFor, startScenario } from '../src/sim/scenarios/scenarios';
 import { answerSceneChoice, choiceActiveFor, registerChoice } from '../src/sim/scenes/choices';
 import { Sim } from '../src/sim/sim';
@@ -17,7 +18,12 @@ beforeAll(() => {
     promptKey: 'lb.q4.vote.prompt',
     flag: 'lastBellVote',
     options: [
-      { id: 'for', key: 'lb.q4.vote.for', replyKey: 'lb.q4.vote.for.reply' },
+      {
+        id: 'for',
+        key: 'lb.q4.vote.for',
+        replyKey: 'lb.q4.vote.for.reply',
+        replySpeaker: 'Edda',
+      },
       { id: 'against', key: 'lb.q4.vote.against', replyKey: 'lb.q4.vote.against.reply' },
     ],
     windowSeconds: 3,
@@ -71,6 +77,42 @@ describe('dialogue choices', () => {
     expect(scenarioRunFor(sim.ctx, claimIdOf(sim))?.stageIndex).toBe(1);
   });
 
+  it('exposes bounded indexed choices and their availability to headless agents', () => {
+    const sim = makeSim();
+    startScenario(sim.ctx, 'sc_test_vote');
+    collect(sim, 2);
+    const controls = encodeObs(sim).slice(-8);
+    expect(controls.slice(0, 3)).toEqual([0, 1, 1]);
+    expect(controls[3]).toBeGreaterThan(0);
+    expect(controls.slice(4)).toEqual([1, 1, 0, 0]);
+
+    applyAction(sim, ACTIONS.indexOf('scene_choice_4'));
+    expect(choiceActiveFor(sim.ctx, claimIdOf(sim))).toBe(true);
+    applyAction(sim, ACTIONS.indexOf('scene_choice_1'));
+    expect(choiceActiveFor(sim.ctx, claimIdOf(sim))).toBe(false);
+    expect(sim.ctx.players.get(sim.playerId)?.campaignFlags.get('lastBellVote')).toBe('for');
+    expect(encodeObs(sim).slice(-8)).toEqual([0, 0, 0, 0, 0, 0, 0, 0]);
+  });
+
+  it('reports authoritative active and resolved choice state for reconnect', () => {
+    const sim = makeSim();
+    startScenario(sim.ctx, 'sc_test_vote');
+    collect(sim, 2);
+    expect(sim.sceneChoiceReconnectStateFor(sim.playerId)).toMatchObject({
+      choiceId: 'ch_test_vote',
+      promptKey: 'lb.q4.vote.prompt',
+      leaderPid: sim.playerId,
+      windowSeconds: 3,
+      options: [
+        { id: 'for', key: 'lb.q4.vote.for' },
+        { id: 'against', key: 'lb.q4.vote.against' },
+      ],
+    });
+    expect(sim.sceneChoiceReconnectStateFor(sim.playerId)?.remainingSeconds).toBeGreaterThan(0);
+    answerSceneChoice(sim.ctx, 'ch_test_vote', 'for');
+    expect(sim.sceneChoiceReconnectStateFor(sim.playerId)).toBeNull();
+  });
+
   it('broadcasts the result with the reply key to every participant', () => {
     const sim = makeSim();
     startScenario(sim.ctx, 'sc_test_vote');
@@ -85,10 +127,16 @@ describe('dialogue choices', () => {
     collect(sim2, 2);
     answerSceneChoice(sim2.ctx, 'ch_test_vote', 'for');
     const drained = sim2.tick();
-    void drained;
     // Events emitted between ticks surface on the next tick's drain in the
-    // offline host; assert on the flag as ground truth plus the reply key on
-    // a fresh run captured across the answer.
+    // offline host.
+    expect(drained).toContainEqual({
+      type: 'sceneChoiceResult',
+      choiceId: 'ch_test_vote',
+      optionId: 'for',
+      replyKey: 'lb.q4.vote.for.reply',
+      replySpeaker: 'Edda',
+      pid: sim2.playerId,
+    });
     expect(sim2.ctx.players.get(sim2.playerId)?.campaignFlags.get('lastBellVote')).toBe('for');
   });
 
@@ -111,6 +159,54 @@ describe('dialogue choices', () => {
     // Both members carry the record.
     expect(sim.ctx.players.get(a)?.campaignFlags.get('lastBellVote')).toBe('against');
     expect(sim.ctx.players.get(b)?.campaignFlags.get('lastBellVote')).toBe('against');
+    const results = sim.tick().filter((event) => event.type === 'sceneChoiceResult');
+    expect(results).toEqual([
+      {
+        type: 'sceneChoiceResult',
+        choiceId: 'ch_test_vote',
+        optionId: 'against',
+        replyKey: 'lb.q4.vote.against.reply',
+        replySpeaker: undefined,
+        pid: a,
+      },
+      {
+        type: 'sceneChoiceResult',
+        choiceId: 'ch_test_vote',
+        optionId: 'against',
+        replyKey: 'lb.q4.vote.against.reply',
+        replySpeaker: undefined,
+        pid: b,
+      },
+    ]);
+  });
+
+  it('routes a shared choice id to the answering leader’s own story claim', () => {
+    const sim = makeSim();
+    const a = sim.playerId;
+    const b = sim.addPlayer('mage', 'Bet');
+    sim.ctx.players
+      .get(b)
+      ?.questLog.set(QUEST_ID, { questId: QUEST_ID, counts: [0], state: 'active' });
+
+    expect(startScenario(sim.ctx, 'sc_test_vote', a)).toBe(true);
+    expect(startScenario(sim.ctx, 'sc_test_vote', b)).toBe(true);
+    collect(sim, 2);
+
+    const claims = [...sim.ctx.activeChoices.values()].filter(
+      (choice) => choice.choiceId === 'ch_test_vote',
+    );
+    expect(claims.map((choice) => choice.leaderPid).sort((x, y) => x - y)).toEqual(
+      [a, b].sort((x, y) => x - y),
+    );
+
+    expect(answerSceneChoice(sim.ctx, 'ch_test_vote', 'against', b)).toBe(true);
+    expect(sim.ctx.players.get(b)?.campaignFlags.get('lastBellVote')).toBe('against');
+    expect(sim.ctx.players.get(a)?.campaignFlags.has('lastBellVote')).toBe(false);
+    expect([...sim.ctx.activeChoices.values()].map((choice) => choice.leaderPid)).toEqual([a]);
+
+    expect(answerSceneChoice(sim.ctx, 'ch_test_vote', 'for', a)).toBe(true);
+    expect(sim.ctx.players.get(a)?.campaignFlags.get('lastBellVote')).toBe('for');
+    expect(sim.ctx.activeChoices.size).toBe(0);
   });
 
   it('the window closes on the default so a scene never deadlocks', () => {

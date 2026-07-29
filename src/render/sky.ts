@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { COLUMN_ZONES, columnBlendAt, STRIP_ZONES } from '../sim/data';
 import type { BiomeId } from '../sim/types';
+import { SOWFIELD_CENTER } from '../sim/vale_cup_layout';
 import { loadHdr, loadTexture } from './assets/loader';
 import { GFX } from './gfx';
 import { skyTexture } from './textures';
@@ -37,7 +38,12 @@ const DOME_RADIUS = 560;
 // before the clamp: values below the 0.8 pivot deepen and cloud shading above
 // it spreads back out, recovering the texture detail the ACES highlight
 // shoulder otherwise flattens to a white wash. Raise it per biome by eye.
-const HDRI_TUNE: Record<BiomeId, { gain: number; clamp: number; contrast?: number }> = {
+// Two skies are keyed by PLACE rather than biome: the Farshore isle's own
+// day sky over the vale band, and the Vale Cup stadium's practice sky over
+// the Sowfield. They ride the same tables under widened keys.
+export type SkyKey = BiomeId | 'farshore' | 'vale_cup';
+
+const HDRI_TUNE: Record<SkyKey, { gain: number; clamp: number; contrast?: number }> = {
   // clamp reined in from 2.6 with the contrast pass, so the re-expanded cloud
   // tops do not just feed the bloom smear instead
   vale: { gain: 0.6, clamp: 2.0, contrast: 1.25 },
@@ -68,6 +74,9 @@ const HDRI_TUNE: Record<BiomeId, { gain: number; clamp: number; contrast?: numbe
   garden: { gain: 0.6, clamp: 2.6 },
   // the Galecrest's own storm-light sky (skies_in/galecrest.png)
   gale: { gain: 0.6, clamp: 2.6 },
+  // the Farshore's own day sky and the Vale Cup practice sky, graded bright
+  farshore: { gain: 0.6, clamp: 2.6 },
+  vale_cup: { gain: 0.6, clamp: 2.6 },
 };
 
 // Every zone biome carries its own project-generated sky (skies_in/ sources,
@@ -75,7 +84,7 @@ const HDRI_TUNE: Record<BiomeId, { gain: number; clamp: number; contrast?: numbe
 // paint-only biomes (beach/desert/volcano/cave) alias a shipped neighbour.
 // The realm skies have clean ocean horizons: no baked land, so no lift and
 // no tint hacks.
-const BIOME_HDRI_2K: Record<BiomeId, string> = {
+const BIOME_HDRI_2K: Record<SkyKey, string> = {
   vale: '/env/vale_day_2k.hdr',
   marsh: '/env/marsh_overcast_2k.hdr',
   peaks: '/env/peaks_dawn_2k.hdr',
@@ -93,9 +102,11 @@ const BIOME_HDRI_2K: Record<BiomeId, string> = {
   jungle: '/env/palmreach_day_2k.hdr',
   garden: '/env/evergarden_day_2k.hdr',
   gale: '/env/galecrest_day_2k.hdr',
+  farshore: '/env/farshore_day_2k.hdr',
+  vale_cup: '/env/vale_cup_2k.hdr',
 };
 
-const BIOME_HDRI_1K: Record<BiomeId, string> = {
+const BIOME_HDRI_1K: Record<SkyKey, string> = {
   vale: '/env/vale_day_1k.hdr',
   marsh: '/env/marsh_overcast_1k.hdr',
   peaks: '/env/peaks_dawn_1k.hdr',
@@ -113,6 +124,8 @@ const BIOME_HDRI_1K: Record<BiomeId, string> = {
   jungle: '/env/palmreach_day_1k.hdr',
   garden: '/env/evergarden_day_1k.hdr',
   gale: '/env/galecrest_day_1k.hdr',
+  farshore: '/env/farshore_day_1k.hdr',
+  vale_cup: '/env/vale_cup_1k.hdr',
 };
 
 function shouldUseLiteHdri(): boolean {
@@ -135,7 +148,7 @@ function shouldUseLiteHdri(): boolean {
 
 const BIOME_HDRI = shouldUseLiteHdri() ? BIOME_HDRI_1K : BIOME_HDRI_2K;
 
-const BIOME_BACKDROP_8K: Record<BiomeId, string> = {
+const BIOME_BACKDROP_8K: Record<SkyKey, string> = {
   vale: '/env/vale_backdrop.webp',
   marsh: '/env/marsh_backdrop.webp',
   peaks: '/env/peaks_backdrop.webp',
@@ -152,10 +165,12 @@ const BIOME_BACKDROP_8K: Record<BiomeId, string> = {
   haunt: '/env/marsh_backdrop.webp', // never shown: backdrop strength 0
   jungle: '/env/vale_backdrop.webp', // never shown: backdrop strength 0
   garden: '/env/vale_backdrop.webp', // never shown: backdrop strength 0
-  gale: '/env/vale_backdrop.webp', // never shown: backdrop strength 0
+  gale: '/env/vale_backdrop.webp', // never shown: backdrop strength 0,
+  farshore: '/env/vale_backdrop.webp',
+  vale_cup: '/env/vale_backdrop.webp',
 };
 
-const BIOME_BACKDROP_4K: Record<BiomeId, string> = {
+const BIOME_BACKDROP_4K: Record<SkyKey, string> = {
   vale: '/env/vale_backdrop_4k.webp',
   marsh: '/env/marsh_backdrop_4k.webp',
   peaks: '/env/peaks_backdrop_4k.webp',
@@ -173,9 +188,11 @@ const BIOME_BACKDROP_4K: Record<BiomeId, string> = {
   jungle: '/env/vale_backdrop_4k.webp',
   garden: '/env/vale_backdrop_4k.webp',
   gale: '/env/vale_backdrop_4k.webp',
+  farshore: '/env/vale_backdrop_4k.webp',
+  vale_cup: '/env/vale_backdrop_4k.webp',
 };
 
-const BACKDROP_Y_BIAS: Record<BiomeId, number> = {
+const BACKDROP_Y_BIAS: Record<SkyKey, number> = {
   vale: 0,
   marsh: 0,
   peaks: 0,
@@ -193,6 +210,8 @@ const BACKDROP_Y_BIAS: Record<BiomeId, number> = {
   jungle: 0,
   garden: 0,
   gale: 0,
+  farshore: 0,
+  vale_cup: 0,
 };
 
 // How strongly the painted horizon backdrop shows per biome. At 1 the painted
@@ -200,7 +219,7 @@ const BACKDROP_Y_BIAS: Record<BiomeId, number> = {
 // (0): the project HDRI skies are the one sky source everywhere, matching the
 // realms, whose border mountains are real geometry and whose open sea must
 // meet clear sky at the horizon, not a painted mountain ring.
-const BIOME_BACKDROP_STRENGTH: Record<BiomeId, number> = {
+const BIOME_BACKDROP_STRENGTH: Record<SkyKey, number> = {
   vale: 0,
   marsh: 0,
   peaks: 0,
@@ -221,13 +240,15 @@ const BIOME_BACKDROP_STRENGTH: Record<BiomeId, number> = {
   jungle: 0,
   garden: 0,
   gale: 0,
+  farshore: 0,
+  vale_cup: 0,
 };
 
 // Lift masks a horizon band PHOTOGRAPHED into an HDRI (the dawn sky's red
 // hills) by resampling low view angles from just above the ridge line. The
 // realm skies are generated with clean ocean horizons, so nothing lifts:
 // lift also smears bold clouds into vertical streaks near the ground.
-const BIOME_HORIZON_LIFT: Record<BiomeId, number> = {
+const BIOME_HORIZON_LIFT: Record<SkyKey, number> = {
   vale: 0,
   marsh: 0,
   peaks: 0,
@@ -245,6 +266,8 @@ const BIOME_HORIZON_LIFT: Record<BiomeId, number> = {
   jungle: 0,
   garden: 0,
   gale: 0,
+  farshore: 0,
+  vale_cup: 0,
 };
 
 interface NetworkInformationLike {
@@ -295,7 +318,7 @@ const BIOME_BACKDROP = shouldUseLiteBackdrop() ? BIOME_BACKDROP_4K : BIOME_BACKD
 // to rotate each map so its sun matches SUN_ANCHOR. Poly Haven values via
 // tmp/analyze_hdr.mjs; realm-sky values printed by the conversion pipeline
 // (the injected sun spot, identical at both tiers).
-const HDRI_SUN_U: Record<BiomeId, number> = {
+const HDRI_SUN_U: Record<SkyKey, number> = {
   vale: 0.595,
   marsh: 0.657,
   peaks: 0.631,
@@ -312,7 +335,9 @@ const HDRI_SUN_U: Record<BiomeId, number> = {
   haunt: 0.282, // the storm sky's dying sun on the horizon
   jungle: 0.497, // own sky (sunless source): rotation kept at the fen's value
   garden: 0.497, // own sky (sunless source): rotation kept at the fen's value
-  gale: 0.497, // own sky (sunless source): rotation kept at the fen's value
+  gale: 0.497, // own sky (sunless source): rotation kept at the fen's value,
+  farshore: 0.497, // own sky (sunless source): rotation kept at the fen's value
+  vale_cup: 0.497,
 };
 
 // Per-biome dome grade multiplied into the sky + backdrop sample (HDR, pre
@@ -320,7 +345,7 @@ const HDRI_SUN_U: Record<BiomeId, number> = {
 // now carries its own baked color (rose dusk, red storm, blue twilight,
 // sunset gold, day blue), so the heavy grades that faked those moods over
 // shared photographs are retired.
-const BIOME_TINT: Record<BiomeId, [number, number, number]> = {
+const BIOME_TINT: Record<SkyKey, [number, number, number]> = {
   vale: [1, 1, 1],
   marsh: [1, 1, 1],
   peaks: [1, 1, 1],
@@ -338,18 +363,20 @@ const BIOME_TINT: Record<BiomeId, [number, number, number]> = {
   jungle: [1, 1, 1],
   garden: [1, 1, 1],
   gale: [1, 1, 1],
+  farshore: [1, 1, 1],
+  vale_cup: [1, 1, 1],
 };
 
-const hdriStore: Partial<Record<BiomeId, THREE.DataTexture>> = {};
+const hdriStore: Partial<Record<SkyKey, THREE.DataTexture>> = {};
 // PMREM (IBL) prefilter source, always the 1k variant even on tiers whose dome
 // samples the 2k: the prefiltered env is blurred by the GGX chain anyway, and
 // a 2k source quadruples the CubeUV working-target size and blur cost, which
 // the zone streaming lane would otherwise pay inside live frames.
-const envHdriStore: Partial<Record<BiomeId, THREE.DataTexture>> = {};
-const backdropStore: Partial<Record<BiomeId, THREE.Texture>> = {};
-const skyAssetTasks = new Map<BiomeId, Promise<void>>();
+const envHdriStore: Partial<Record<SkyKey, THREE.DataTexture>> = {};
+const backdropStore: Partial<Record<SkyKey, THREE.Texture>> = {};
+const skyAssetTasks = new Map<SkyKey, Promise<void>>();
 
-export function ensureSkyBiomeAssets(biomes: readonly BiomeId[]): Promise<void> {
+export function ensureSkyBiomeAssets(biomes: readonly SkyKey[]): Promise<void> {
   if (!GFX.standardMaterials) return Promise.resolve();
   const tasks = [...new Set(biomes)].map((biome) => {
     const existing = skyAssetTasks.get(biome);
@@ -392,13 +419,11 @@ export function ensureSkyBiomeAssets(biomes: readonly BiomeId[]): Promise<void> 
   return Promise.all(tasks).then(() => undefined);
 }
 
-export function hasSkyHdriAssets(biomes: readonly BiomeId[] = ['vale', 'marsh', 'peaks']): boolean {
+export function hasSkyHdriAssets(biomes: readonly SkyKey[] = ['vale', 'marsh', 'peaks']): boolean {
   return biomes.every((biome) => Boolean(hdriStore[biome]));
 }
 
-export function hasBackdropAssets(
-  biomes: readonly BiomeId[] = ['vale', 'marsh', 'peaks'],
-): boolean {
+export function hasBackdropAssets(biomes: readonly SkyKey[] = ['vale', 'marsh', 'peaks']): boolean {
   return biomes.every((biome) => Boolean(backdropStore[biome]));
 }
 
@@ -414,18 +439,18 @@ export interface SkyView {
    *  seconds (for star twinkle). The sun/moon discs are sprites, not dome-drawn. */
   setStars(starAmt: number, time: number): void;
   /** Raw equirect HDR (unclamped) for PMREM IBL; null on the low tier. */
-  envTexture(biome: BiomeId): THREE.DataTexture | null;
+  envTexture(biome: SkyKey): THREE.DataTexture | null;
   /** Dome-sampled equirect (the visible sky), for prepare-lane GPU upload. */
-  domeTexture(biome: BiomeId): THREE.Texture | null;
+  domeTexture(biome: SkyKey): THREE.Texture | null;
   /** scene.environmentRotation.y that aligns the IBL sun with the dome's */
-  envRotationY(biome: BiomeId): number;
+  envRotationY(biome: SkyKey): number;
   /** biome cross-fade state at a given camera z (from -> to by t in [0,1]) */
   biomeAt(x: number, z: number): BiomeBlend;
 }
 
 export interface BiomeBlend {
-  from: BiomeId;
-  to: BiomeId;
+  from: SkyKey;
+  to: SkyKey;
   t: number;
 }
 
@@ -559,8 +584,8 @@ const SKY_FRAG = /* glsl */ `
 // as they always did; a column zone blends in sideways with the same window
 // shape, so its sky rises as you walk its border pass.
 function biomeBlendAt(x: number, z: number): BiomeBlend {
-  let from: BiomeId = STRIP_ZONES[0].biome;
-  let to: BiomeId = STRIP_ZONES[0].biome;
+  let from: SkyKey = STRIP_ZONES[0].biome;
+  let to: SkyKey = STRIP_ZONES[0].biome;
   let t = 0;
   for (let i = 0; i + 1 < STRIP_ZONES.length; i++) {
     const b = STRIP_ZONES[i].zMax;
@@ -589,10 +614,34 @@ function biomeBlendAt(x: number, z: number): BiomeBlend {
       t = ct;
     }
   }
+  // the two place-keyed skies override the biome pick: the Farshore isle's
+  // own day sky, and the Vale Cup practice sky over the Sowfield bowl
+  const ss = (a: number, b: number, v: number): number => {
+    const r = Math.max(0, Math.min(1, (v - a) / (b - a)));
+    return r * r * (3 - 2 * r);
+  };
+  const isleT = Math.min(
+    ss(172, 200, x),
+    1 - ss(532, 560, x),
+    ss(-182, -152, z),
+    1 - ss(152, 182, z),
+  );
+  if (isleT > 0) {
+    from = t > 0 ? to : from;
+    to = 'farshore';
+    t = isleT;
+  }
+  const dCup = Math.hypot(x - SOWFIELD_CENTER.x, z - SOWFIELD_CENTER.z);
+  const cupT = 1 - ss(70, 120, dCup);
+  if (cupT > 0) {
+    from = t > 0 ? to : from;
+    to = 'vale_cup';
+    t = cupT;
+  }
   return { from, to, t };
 }
 
-export function skyBiomesAt(x: number, z: number): readonly BiomeId[] {
+export function skyBiomesAt(x: number, z: number): readonly SkyKey[] {
   const blend = biomeBlendAt(x, z);
   return blend.from === blend.to ? [blend.from] : [blend.from, blend.to];
 }
@@ -602,7 +651,7 @@ export function ensureSkyAssetsAt(x: number, z: number): Promise<void> {
 }
 
 // u offset that moves a given HDRI's sun azimuth onto SUN_ANCHOR's azimuth
-function sunOffsetU(biome: BiomeId, sunDir: THREE.Vector3): number {
+function sunOffsetU(biome: SkyKey, sunDir: THREE.Vector3): number {
   const sunU = Math.atan2(sunDir.z, sunDir.x) / (2 * Math.PI) + 0.5;
   return HDRI_SUN_U[biome] - sunU;
 }
@@ -641,10 +690,10 @@ export function buildSky(
 
   const sun = sunDir.clone().normalize();
   const backdropsReady = hasBackdropAssets(startBiomes);
-  const tuneVec = (b: BiomeId): THREE.Vector3 =>
+  const tuneVec = (b: SkyKey): THREE.Vector3 =>
     new THREE.Vector3(HDRI_TUNE[b].gain, HDRI_TUNE[b].clamp, HDRI_TUNE[b].contrast ?? 1);
-  const tintVec = (b: BiomeId): THREE.Vector3 => new THREE.Vector3(...BIOME_TINT[b]);
-  const backdropTex = (b: BiomeId): THREE.Texture =>
+  const tintVec = (b: SkyKey): THREE.Vector3 => new THREE.Vector3(...BIOME_TINT[b]);
+  const backdropTex = (b: SkyKey): THREE.Texture =>
     (backdropsReady ? backdropStore[b] : hdriStore[b]) as THREE.Texture;
   const uniforms = {
     uSkyA: { value: hdriStore[start.from] as THREE.Texture },

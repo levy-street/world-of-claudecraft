@@ -93,3 +93,16 @@ describe('arena_window: offline skip-rebuild sentinel (collision-proof)', () => 
     expect(code).toContain('this.lastSig = ARENA_OFFLINE_SIG');
   });
 });
+
+describe('arena_window: map row (slot-parity arena maps)', () => {
+  it('renders the map row through the exhaustive key record, gated on matchMap', () => {
+    // the record keeps a future third map from silently rendering the wrong
+    // name (tsc reds on a missing member), and the row hides when the fact
+    // is null (no match, yumi bracket, or a mapless older-server mirror)
+    expect(src).toContain('ARENA_MAP_KEY[matchMap]');
+    expect(src).toContain("coliseum: 'hud.arena.map.coliseum'");
+    expect(src).toContain("drowned_court: 'hud.arena.map.drownedCourt'");
+    expect(src).toMatch(/const mapRow = matchMap\s*\?/);
+    expect(src).toContain("t('hud.arena.mapName', { name: t(ARENA_MAP_KEY[matchMap]) })");
+  });
+});

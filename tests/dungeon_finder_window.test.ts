@@ -20,6 +20,17 @@ describe('dungeon finder window painter (source contract)', () => {
     expect(src).toContain('data-df-clock');
   });
 
+  // The rebuild at `el.innerHTML = this.liveHtml(view)` replaces the whole window
+  // subtree, so the freshly parsed .df-rail starts at scrollTop 0. Selecting a row
+  // always takes that branch (the click flips this.pane and feeds selectedId into
+  // view.sig), which is why picking a dungeon near the bottom snapped the list back
+  // to the top. Capture-before / restore-after is the same idiom bank_window,
+  // spellbook_window and crafting_window already use for their own scrollers.
+  it('preserves the catalogue rail scroll offset across a rebuild', () => {
+    expect(src).toContain("el.querySelector('.df-rail')?.scrollTop ?? 0");
+    expect(src).toContain('rail.scrollTop = prevRailScrollTop');
+  });
+
   it('owns WCAG focus: dialog root marked once on open, focus captured and restored', () => {
     expect(src).toContain("markDialogRoot(root, { labelledBy: 'dfinder-title' })");
     expect(src).toContain('this.openerFocus = this.deps.captureFocus();');

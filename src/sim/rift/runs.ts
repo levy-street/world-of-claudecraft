@@ -31,9 +31,13 @@ import { addRiftClearGearLoot, addRiftProgressionLoot } from './progression';
 import { claimRiftFirstClear, markRiftEventActive } from './race';
 import {
   RIFT_RANK_MECHANIC_BUDGET,
-  riftHeroicTemplate,
+  type RiftSpawnRole,
   riftHeroicTuningFor,
   riftRankForBaseLevel,
+  riftRankTemplate,
+  riftRankTuningFor,
+  riftRoleDamageMultiplier,
+  riftRoleHealthMultiplier,
 } from './ranks';
 import { generateRiftFloor, isSetPieceRift, riftLiftAt } from './rift_gen';
 import { riftLockpickAbort, tickRiftLockpick } from './rift_lockpick';
@@ -264,28 +268,31 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
   inst.orbId = null;
   inst.orbActive = false;
 
-  // B-, A- and S-rank rifts are heroic scaled: a spawn-time stat transform plus the
-  // per-entity mechanic multipliers, mirroring instances/difficulty.ts. The rank
-  // derives from the descriptor's baseLevel, so every host regenerates it.
+  // Every rank is stat-scaled: a spawn-time stat transform plus the per-entity
+  // mechanic multipliers, mirroring instances/difficulty.ts. C takes the
+  // normal-dungeon table and B/A/S the heroic one; the rank derives from the
+  // descriptor's baseLevel, so every host regenerates it. Boss and trash take
+  // DIFFERENT multipliers (rift/ranks.ts), so each spawn resolves its role first.
   const rank = riftRankForBaseLevel(inst.baseLevel);
-  const heroic = riftHeroicTuningFor(inst.baseLevel);
+  const tuning = riftRankTuningFor(inst.baseLevel);
   for (const spawn of floor.spawns) {
     const template = MOBS[spawn.templateId];
     if (!template) continue;
+    const role: RiftSpawnRole = spawn.boss || spawn.miniboss ? 'boss' : 'trash';
     const mob = createMob(
       ctx.nextId++,
-      heroic ? riftHeroicTemplate(template, heroic) : template,
+      riftRankTemplate(template, tuning, role),
       spawn.level,
       ctx.groundPos(origin.x + spawn.x, origin.z + spawn.z),
     );
     if (spawn.name) mob.name = spawn.name;
-    if (heroic) {
-      // Mechanic damage/heal numbers are read from the base MOBS table at fire
-      // time, so the template transform cannot reach them; the per-entity
-      // multipliers apply AFTER each rng draw (draw order identical across ranks).
-      mob.mechanicDamageMult = heroic.damageMultiplier;
-      mob.mechanicHealMult = heroic.healthMultiplier;
-    }
+    // Mechanic damage/heal numbers are read from the base MOBS table at fire
+    // time, so the template transform cannot reach them; the per-entity
+    // multipliers apply AFTER each rng draw (draw order identical across ranks).
+    // Non-dodgeable mechanics still pass capRiftNonLethalMechanicDamage at the
+    // fire site, so scaling them can never produce a one-shot from full health.
+    mob.mechanicDamageMult = riftRoleDamageMultiplier(tuning, role);
+    mob.mechanicHealMult = riftRoleHealthMultiplier(tuning, role);
     // Rank-gated boss kits: how many entries of the template's rankMechanics
     // list are live on this spawn (C=1 .. S=4). Trash carries no budget.
     // Authored set-piece floors (the Infernal Citadel) are C-only hand-tuned
@@ -787,6 +794,7 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
           PLAYER_BODY_R,
           false,
           undefined,
+          undefined,
           ctx.riftCollisionToken,
         );
         const advanced = Math.hypot(dest.x - p.prevPos.x, dest.z - p.prevPos.z);
@@ -856,6 +864,7 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
         b.pos.z + (dirz / dd) * 1.4,
         1.0,
         false,
+        undefined,
         undefined,
         ctx.riftCollisionToken,
       );
@@ -1352,6 +1361,7 @@ function tickRiftRollers(
         p.pos.z + ROLLER_KB_FWD,
         PLAYER_BODY_R,
         false,
+        undefined,
         undefined,
         ctx.riftCollisionToken,
       );

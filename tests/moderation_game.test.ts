@@ -44,6 +44,8 @@ import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer } from '../server/game';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { isInJailCage, JAIL_GATE, JAIL_VISITOR_POS, jailGateTeleport } from '../src/sim/jail';
+import { registerChoice, startChoiceForPlayer } from '../src/sim/scenes/choices';
+import { playSceneForPlayer, registerScene } from '../src/sim/scenes/scenes';
 
 // Moderation acts on player sessions and the fixed jail cage; ambient camps,
 // world npcs and quest objects never take part, and every test here boots one
@@ -73,12 +75,22 @@ type FakeWs = {
 type TestFrame = {
   t?: string;
   name?: string | null;
+  pid?: number;
+  sceneState?: {
+    sceneId: string;
+    remainingSeconds: number;
+    inputLocked: boolean;
+    letterbox: boolean;
+    musicSilenced: boolean;
+  } | null;
+  sceneChoiceState?: unknown;
   list?: { text?: string }[];
   self?: {
     id: number;
     nm: string;
     ack: number;
     party: { members: { pid: number; x: number; z: number }[] };
+    tal?: { alloc: { spec: string | null; rows: Record<number, string> } };
   };
 };
 
@@ -655,7 +667,13 @@ describe('moderator spectate integration', () => {
     expect(moderatorEntity.pos.x).toBe(-10_000);
     expect(moderatorEntity.pos.z).toBe(-10_000);
     expect(moderatorEntity.gm).toBe(true);
-    expect(frames(moderatorWs)).toContainEqual({ t: 'spectate', name: 'Suspect' });
+    expect(frames(moderatorWs)).toContainEqual({
+      t: 'spectate',
+      name: 'Suspect',
+      pid: suspect.pid,
+      sceneState: null,
+      sceneChoiceState: null,
+    });
 
     moderatorWs.send.mockClear();
     internals(server).broadcastSnapshots();
@@ -709,28 +727,156 @@ describe('moderator spectate integration', () => {
     expect(moderator.spectating).toBeNull();
     expect(moderatorEntity.pos).toEqual(originalPos);
     expect(!!moderatorEntity.gm).toBe(originalGm);
-    expect(frames(moderatorWs)).toContainEqual({ t: 'spectate', name: null });
+    expect(frames(moderatorWs)).toContainEqual({
+      t: 'spectate',
+      name: null,
+      pid: moderator.pid,
+      sceneState: null,
+      sceneChoiceState: null,
+    });
   });
 
-  it('switches targets without moving the saved return point', () => {
+  it('converges represented scene and choice state on spectate enter and exit', () => {
+    registerScene({
+      id: 'scn_test_spectate_lock_convergence',
+      duration: 10,
+      ops: [{ at: 0, kind: 'inputLock', on: true }],
+    });
+    registerChoice({
+      id: 'ch_test_spectate_convergence',
+      promptKey: 'lb.test.spectate.prompt',
+      flag: 'test_spectate_choice',
+      options: [
+        { id: 'stay', key: 'lb.test.spectate.stay' },
+        { id: 'leave', key: 'lb.test.spectate.leave' },
+      ],
+      windowSeconds: 8,
+      defaultOptionId: 'leave',
+    });
     const server = new GameServer();
+    const moderatorWs = fakeWs();
     const moderator = joined(
-      server.join(fakeWs(), 1, 101, 'Watcher', 'mage', null, false, {
+      server.join(moderatorWs, 1, 101, 'Watcher', 'mage', null, false, {
         isAdmin: true,
         adminPermissions: MOD_PERMS,
       }),
     );
-    joined(server.join(fakeWs(), 2, 102, 'First', 'rogue', null));
+    const suspect = joined(server.join(fakeWs(), 2, 102, 'Suspect', 'rogue', null));
+    expect(
+      playSceneForPlayer(server.sim.ctx, suspect.pid, 'scn_test_spectate_lock_convergence'),
+    ).toBe(true);
+    expect(
+      startChoiceForPlayer(server.sim.ctx, suspect.pid, 'ch_test_spectate_convergence', {
+        values: { price: 12 },
+      }),
+    ).toBe(true);
+    server.sim.tick();
+    moderatorWs.send.mockClear();
+
+    command(server, moderator, '/spectate Suspect');
+
+    const entered = frames(moderatorWs).find((frame) => frame.t === 'spectate');
+    expect(entered).toMatchObject({
+      name: 'Suspect',
+      pid: suspect.pid,
+      sceneState: {
+        sceneId: 'scn_test_spectate_lock_convergence',
+        inputLocked: true,
+      },
+      sceneChoiceState: {
+        choiceId: 'ch_test_spectate_convergence',
+        promptKey: 'lb.test.spectate.prompt',
+        options: [
+          { id: 'stay', key: 'lb.test.spectate.stay' },
+          { id: 'leave', key: 'lb.test.spectate.leave' },
+        ],
+        defaultOptionId: 'leave',
+        leaderPid: suspect.pid,
+        values: { price: 12 },
+        windowSeconds: 8,
+      },
+    });
+
+    moderatorWs.send.mockClear();
+    command(server, moderator, '/unspectate');
+
+    expect(frames(moderatorWs)).toContainEqual({
+      t: 'spectate',
+      name: null,
+      pid: moderator.pid,
+      sceneState: null,
+      sceneChoiceState: null,
+    });
+  });
+
+  it('switches targets without moving the saved return point', () => {
+    registerScene({
+      id: 'scn_test_spectate_switch_first',
+      duration: 10,
+      ops: [{ at: 0, kind: 'inputLock', on: true }],
+    });
+    registerScene({
+      id: 'scn_test_spectate_switch_second',
+      duration: 10,
+      ops: [{ at: 0, kind: 'letterbox', on: true }],
+    });
+    for (const suffix of ['first', 'second']) {
+      registerChoice({
+        id: `ch_test_spectate_switch_${suffix}`,
+        promptKey: `lb.test.spectate.switch.${suffix}`,
+        flag: `test_spectate_switch_${suffix}`,
+        options: [{ id: 'continue', key: 'lb.test.spectate.continue' }],
+        windowSeconds: 8,
+        defaultOptionId: 'continue',
+      });
+    }
+    const server = new GameServer();
+    const moderatorWs = fakeWs();
+    const moderator = joined(
+      server.join(moderatorWs, 1, 101, 'Watcher', 'mage', null, false, {
+        isAdmin: true,
+        adminPermissions: MOD_PERMS,
+      }),
+    );
+    const first = joined(server.join(fakeWs(), 2, 102, 'First', 'rogue', null));
     const second = joined(server.join(fakeWs(), 3, 103, 'Second', 'warrior', null));
     const original = { ...entity(server, moderator.pid).pos };
+    expect(playSceneForPlayer(server.sim.ctx, first.pid, 'scn_test_spectate_switch_first')).toBe(
+      true,
+    );
+    expect(playSceneForPlayer(server.sim.ctx, second.pid, 'scn_test_spectate_switch_second')).toBe(
+      true,
+    );
+    expect(startChoiceForPlayer(server.sim.ctx, first.pid, 'ch_test_spectate_switch_first')).toBe(
+      true,
+    );
+    expect(startChoiceForPlayer(server.sim.ctx, second.pid, 'ch_test_spectate_switch_second')).toBe(
+      true,
+    );
+    server.sim.tick();
+    moderatorWs.send.mockClear();
 
     command(server, moderator, '/spectate First');
     if (!moderator.spectating) throw new Error('spectate did not start');
     const saved = { ...moderator.spectating.savedPos };
+    expect(frames(moderatorWs).find((frame) => frame.t === 'spectate')).toMatchObject({
+      name: 'First',
+      pid: first.pid,
+      sceneState: { sceneId: 'scn_test_spectate_switch_first', inputLocked: true },
+      sceneChoiceState: { choiceId: 'ch_test_spectate_switch_first' },
+    });
+    moderatorWs.send.mockClear();
+
     command(server, moderator, '/spectate Second');
 
     expect(moderator.spectating?.characterId).toBe(second.characterId);
     expect(moderator.spectating?.savedPos).toEqual(saved);
+    expect(frames(moderatorWs).find((frame) => frame.t === 'spectate')).toMatchObject({
+      name: 'Second',
+      pid: second.pid,
+      sceneState: { sceneId: 'scn_test_spectate_switch_second', inputLocked: false },
+      sceneChoiceState: { choiceId: 'ch_test_spectate_switch_second' },
+    });
     command(server, moderator, '/unspectate');
     expect(server.sim.entities.get(moderator.pid)?.pos).toEqual(original);
   });
@@ -752,7 +898,13 @@ describe('moderator spectate integration', () => {
     internals(server).broadcastSnapshots();
 
     expect(moderator.spectating).toBeNull();
-    expect(frames(moderatorWs)).toContainEqual({ t: 'spectate', name: null });
+    expect(frames(moderatorWs)).toContainEqual({
+      t: 'spectate',
+      name: null,
+      pid: moderator.pid,
+      sceneState: null,
+      sceneChoiceState: null,
+    });
     expect(eventTexts(moderatorWs)).toContain('Goneplayer is no longer online; spectate ended.');
 
     const regularWs = fakeWs();
@@ -802,5 +954,46 @@ describe('moderator spectate integration', () => {
 
     command(server, moderator, '/unspectate');
     expect(server.sim.petOf(moderator.pid, true)?.name).toBe('Tracker');
+  });
+
+  // Regression for the /spectate talent-reset bug: the heavy self block
+  // (tal/inv/equip/...) is gated on meta.wireRev vs session.lastWireRev, a
+  // comparison keyed to whichever entity's meta is currently being wired.
+  // Neither talent allocation bumps wireRev here (both start at the sim
+  // default, 0), so without forcing selfHeavyDirty on enter/exit, the
+  // moderator's own 'tal' field silently fails to resend after /unspectate
+  // and the client stays mirrored on the spectated target's talents.
+  it('resends the moderator own talents (not the spectated target) after /unspectate', () => {
+    const server = new GameServer();
+    const moderatorWs = fakeWs();
+    const moderator = joined(
+      server.join(moderatorWs, 1, 101, 'Watcher', 'mage', null, false, {
+        isAdmin: true,
+        adminPermissions: MOD_PERMS,
+      }),
+    );
+    const suspect = joined(server.join(fakeWs(), 2, 102, 'Suspect', 'mage', null));
+    const moderatorMeta = server.sim.meta(moderator.pid);
+    const suspectMeta = server.sim.meta(suspect.pid);
+    if (!moderatorMeta || !suspectMeta) throw new Error('meta missing');
+    moderatorMeta.talents = { spec: 'arcane', rows: { 5: 'arc_r5_arcane_focus' } };
+    suspectMeta.talents = { spec: 'fire', rows: { 5: 'fir_r5_imp_fireball' } };
+
+    // first snapshot as self establishes session.lastWireRev at the
+    // moderator's own (unbumped) wireRev.
+    internals(server).broadcastSnapshots();
+
+    command(server, moderator, '/spectate Suspect');
+    moderatorWs.send.mockClear();
+    internals(server).broadcastSnapshots();
+    const spectateSnap = frames(moderatorWs).find((frame) => frame.t === 'snap');
+    expect(spectateSnap?.self?.tal?.alloc).toEqual(suspectMeta.talents);
+
+    command(server, moderator, '/unspectate');
+    moderatorWs.send.mockClear();
+    internals(server).broadcastSnapshots();
+    const restoredSnap = frames(moderatorWs).find((frame) => frame.t === 'snap');
+    if (!restoredSnap?.self) throw new Error('restored snapshot missing');
+    expect(restoredSnap.self.tal?.alloc).toEqual(moderatorMeta.talents);
   });
 });

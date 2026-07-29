@@ -31,7 +31,7 @@ import type {
   MountSummonBarState,
 } from '../render/cast_bar';
 import { formatNumber, type TranslationKey, t } from './i18n';
-import { mountDisplayName } from './mount_picker';
+import { mountDisplayName } from './mount_labels';
 import type { PainterHostWriters } from './painter_host';
 
 // The channel class drives the draining (vs filling) fill color via CSS; a channel,

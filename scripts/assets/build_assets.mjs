@@ -10,7 +10,8 @@
 //   "addClipsFrom": ["tmp/.../Rig_Medium_X.glb"], // optional: merge clips from rig libs
 //   "attachMeshes": [{ "from": "weapon.glb",      // optional: bake a prop/weapon mesh
 //                      "bone": "handslot.r" }],    //   parented under a named bone
-//   "maxTex": 512                                  // optional: clamp texture dimension
+//   "maxTex": 512,                                 // optional: clamp texture dimension
+//   "keepExtras": true                             // optional: retain extras-bearing leaf nodes
 // } ] }
 //
 // Bulk mode: instead of `src`/`out`, an item may use `srcDir`/`outDir` to convert
@@ -57,6 +58,15 @@ function resolveSrc(src) {
   return path.isAbsolute(src) ? src : path.join(ROOT, src);
 }
 
+function resolveOutput(outputRoot, out) {
+  const absoluteRoot = path.resolve(outputRoot);
+  const outputPath = path.resolve(absoluteRoot, out);
+  if (outputPath === absoluteRoot || !outputPath.startsWith(`${absoluteRoot}${path.sep}`)) {
+    throw new Error(`output path escapes output root: ${out}`);
+  }
+  return outputPath;
+}
+
 // Expand any `srcDir`/`outDir` item into one item per .gltf/.glb in that folder,
 // so a single spec entry can bulk-convert a whole pack. Each out name is derived
 // from the source basename: lowercased, non-alphanumerics → `_`, and the
@@ -89,11 +99,99 @@ function expandItems(items) {
   return out;
 }
 
-async function processModel(io, item) {
+function dropMeshIslands(root, opts, outName) {
+  const minTris = opts.minTris ?? 150;
+  const maxDim = opts.maxDim ?? 1;
+  let dropped = 0;
+  for (const mesh of root.listMeshes()) {
+    for (const prim of mesh.listPrimitives()) {
+      const posAttr = prim.getAttribute('POSITION');
+      const indices = prim.getIndices();
+      if (!posAttr || !indices) continue;
+      const pos = posAttr.getArray();
+      const idx = indices.getArray();
+      const nVerts = pos.length / 3;
+      // canonicalize verts by quantized position so seam-split verts join
+      const canon = new Map();
+      const vertKey = new Int32Array(nVerts);
+      for (let v = 0; v < nVerts; v++) {
+        const k = `${Math.round(pos[v * 3] * 1e4)},${Math.round(pos[v * 3 + 1] * 1e4)},${Math.round(pos[v * 3 + 2] * 1e4)}`;
+        let id = canon.get(k);
+        if (id === undefined) {
+          id = canon.size;
+          canon.set(k, id);
+        }
+        vertKey[v] = id;
+      }
+      const parent = new Int32Array(canon.size);
+      for (let i = 0; i < parent.length; i++) parent[i] = i;
+      const find = (a) => {
+        let r = a;
+        while (parent[r] !== r) r = parent[r];
+        while (parent[a] !== r) {
+          const next = parent[a];
+          parent[a] = r;
+          a = next;
+        }
+        return r;
+      };
+      for (let t = 0; t < idx.length; t += 3) {
+        const a = find(vertKey[idx[t]]);
+        const b = find(vertKey[idx[t + 1]]);
+        const c = find(vertKey[idx[t + 2]]);
+        parent[a] = c;
+        parent[b] = c;
+      }
+      const comps = new Map();
+      for (let t = 0; t < idx.length; t += 3) {
+        const rootId = find(vertKey[idx[t]]);
+        let comp = comps.get(rootId);
+        if (!comp) {
+          comp = { tris: 0, min: [1e9, 1e9, 1e9], max: [-1e9, -1e9, -1e9] };
+          comps.set(rootId, comp);
+        }
+        comp.tris++;
+        for (const vi of [idx[t], idx[t + 1], idx[t + 2]]) {
+          for (let ax = 0; ax < 3; ax++) {
+            const v = pos[vi * 3 + ax];
+            if (v < comp.min[ax]) comp.min[ax] = v;
+            if (v > comp.max[ax]) comp.max[ax] = v;
+          }
+        }
+      }
+      const doomed = new Set();
+      for (const [rootId, comp] of comps) {
+        const dims = comp.max.map((m, i) => m - comp.min[i]);
+        if (comp.tris >= minTris && Math.max(...dims) <= maxDim) {
+          doomed.add(rootId);
+          dropped++;
+        }
+      }
+      if (!doomed.size) continue;
+      const kept = [];
+      for (let t = 0; t < idx.length; t += 3) {
+        if (doomed.has(find(vertKey[idx[t]]))) continue;
+        kept.push(idx[t], idx[t + 1], idx[t + 2]);
+      }
+      indices.setArray(nVerts > 65535 ? new Uint32Array(kept) : new Uint16Array(kept));
+    }
+  }
+  console.log(`  dropIslands: removed ${dropped} island(s) from ${outName}`);
+}
+
+async function processModel(io, item, outputRoot) {
   const srcPath = resolveSrc(item.src);
-  const outPath = path.join(PUBLIC_DIR, item.out);
+  const outPath = resolveOutput(outputRoot, item.out);
   const doc = await io.read(srcPath);
   const root = doc.getRoot();
+
+  // Drop baked-in decoration islands from a merged mesh (e.g. the KayKit
+  // stables building ships with yard horses welded into its one primitive).
+  // An "island" is a connected triangle component (shared vertex positions);
+  // { "minTris": N, "maxDim": D } drops every island with at least N
+  // triangles whose bounding box fits inside a D-sized cube: big-but-small
+  // organic clutter, never the building shell (many small welded islands).
+  if (item.dropIslands) dropMeshIslands(root, item.dropIslands, item.out);
 
   // Merge animation clips from separate library glbs. KayKit's v2 packs ship
   // animations in standalone Rig_Medium_*.glb files, each carrying a mannequin
@@ -185,7 +283,7 @@ async function processModel(io, item) {
     if (missing.length) console.warn(`  WARN ${item.out}: missing clips ${missing.join(', ')}`);
   }
 
-  const transforms = [resample(), prune(), dedup()];
+  const transforms = [resample(), prune({ keepExtras: item.keepExtras === true }), dedup()];
   if (item.maxTex) {
     transforms.push(
       textureCompress({
@@ -205,9 +303,9 @@ async function processModel(io, item) {
   console.log(`  ${item.out}  ${kb}KB${clips ? ` (${clips} clips)` : ''}`);
 }
 
-function processCopy(item) {
+function processCopy(item, outputRoot) {
   const srcPath = resolveSrc(item.src);
-  const outPath = path.join(PUBLIC_DIR, item.out);
+  const outPath = resolveOutput(outputRoot, item.out);
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
   fs.copyFileSync(srcPath, outPath);
   console.log(`  ${item.out}  ${(fs.statSync(outPath).size / 1024).toFixed(0)}KB (copy)`);
@@ -215,6 +313,19 @@ function processCopy(item) {
 
 async function main() {
   const args = process.argv.slice(2);
+  // `--output-root` is an explicit non-shipping destination for reproducible
+  // candidate builds. The default remains public/ for every existing caller.
+  let outputRoot = PUBLIC_DIR;
+  const oi = args.indexOf('--output-root');
+  if (oi >= 0) {
+    const requestedRoot = args[oi + 1];
+    if (!requestedRoot) {
+      console.error('usage: --output-root <directory>');
+      process.exit(1);
+    }
+    outputRoot = path.isAbsolute(requestedRoot) ? requestedRoot : path.resolve(ROOT, requestedRoot);
+    args.splice(oi, 2);
+  }
   // optional `--shard i/n`: process only every n-th expanded item, so several
   // converter processes can run in parallel over ONE spec. Filtering happens
   // after srcDir expansion over a stable sorted order, so shards are disjoint
@@ -232,7 +343,9 @@ async function main() {
   }
   const specs = args;
   if (!specs.length) {
-    console.error('usage: node scripts/assets/build_assets.mjs <spec.json> [...] [--shard i/n]');
+    console.error(
+      'usage: node scripts/assets/build_assets.mjs <spec.json> [...] [--output-root dir] [--shard i/n]',
+    );
     process.exit(1);
   }
   await MeshoptEncoder.ready;
@@ -254,8 +367,8 @@ async function main() {
     for (const raw of items) {
       const item = { ...defaults, ...raw };
       try {
-        if (item.type === 'copy') processCopy(item);
-        else await processModel(io, item);
+        if (item.type === 'copy') processCopy(item, outputRoot);
+        else await processModel(io, item, outputRoot);
       } catch (err) {
         failures++;
         console.error(`  FAIL ${item.src}: ${err instanceof Error ? err.message : err}`);

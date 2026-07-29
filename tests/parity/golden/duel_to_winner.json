@@ -8,13 +8,13 @@
     "updateDuels countdown -> active + duelStart",
     "endDuel on a PvP finishing blow (winner/loser + this.duels cleared)"
   ],
-  "draws": 529,
-  "drawDigest": "d090af58",
+  "draws": 542,
+  "drawDigest": "cb366de3",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 841,
+      "nextId": 843,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -28,9 +28,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 843,
-      "state": "233848da",
-      "events": "5f2979fd",
+      "nextId": 845,
+      "state": "9e8edea2",
+      "events": "b37f76ab",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -39,9 +39,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 843,
-      "state": "62bff415",
-      "events": "aa7ca6b2",
+      "nextId": 845,
+      "state": "506cfe61",
+      "events": "0e819d1e",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -50,23 +50,23 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 843,
-      "state": "faa12510",
-      "events": "c2a6182c",
+      "nextId": 845,
+      "state": "62bb24ac",
+      "events": "ebadb0cc",
       "rng": {
-        "draws": 139,
-        "digest": "90347766"
+        "draws": 144,
+        "digest": "f9648e2b"
       }
     },
     {
       "tick": 61,
       "time": 3.05,
-      "nextId": 843,
-      "state": "fc226b0b",
-      "events": "9f652fa1",
+      "nextId": 845,
+      "state": "0f0b7397",
+      "events": "c4a84589",
       "rng": {
-        "draws": 153,
-        "digest": "352b8dec"
+        "draws": 159,
+        "digest": "9846c78c"
       },
       "label": "duel-active",
       "players": [
@@ -103,7 +103,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 841,
+          "entityId": 843,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -121,7 +121,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -160,7 +159,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 842,
+          "entityId": 844,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -181,7 +180,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -200,7 +198,7 @@
               "name": "Battle Stance",
               "remaining": 3596.95,
               "school": "physical",
-              "sourceId": 841
+              "sourceId": 843
             }
           ],
           "blockChance": 0.05,
@@ -213,7 +211,7 @@
           "fallStartY": 2.242568,
           "fiveSecondRule": 102.05,
           "hp": 100,
-          "id": 841,
+          "id": 843,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -262,7 +260,7 @@
           "fallStartY": 2.139867,
           "fiveSecondRule": 102.05,
           "hp": 54,
-          "id": 842,
+          "id": 844,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -306,12 +304,12 @@
     {
       "tick": 61,
       "time": 3.05,
-      "nextId": 843,
-      "state": "7aeaa7da",
-      "events": "445fe043",
+      "nextId": 845,
+      "state": "9ba581d4",
+      "events": "5280a843",
       "rng": {
-        "draws": 153,
-        "digest": "352b8dec"
+        "draws": 159,
+        "digest": "9846c78c"
       },
       "label": "duel-ended",
       "players": [
@@ -351,7 +349,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 841,
+          "entityId": 843,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -369,7 +367,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -410,7 +407,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 842,
+          "entityId": 844,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -431,7 +428,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -450,7 +446,7 @@
               "name": "Battle Stance",
               "remaining": 3596.95,
               "school": "physical",
-              "sourceId": 841
+              "sourceId": 843
             }
           ],
           "blockChance": 0.05,
@@ -463,7 +459,7 @@
           "fallStartY": 2.242568,
           "fiveSecondRule": 102.05,
           "hp": 100,
-          "id": 841,
+          "id": 843,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -512,7 +508,7 @@
           "fallStartY": 2.139867,
           "fiveSecondRule": 102.05,
           "hp": 1,
-          "id": 842,
+          "id": 844,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -556,34 +552,34 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 843,
-      "state": "a33e09b1",
-      "events": "94540131",
+      "nextId": 845,
+      "state": "22b0f6c1",
+      "events": "fa3876ad",
       "rng": {
-        "draws": 306,
-        "digest": "8f34edb3"
+        "draws": 313,
+        "digest": "670d7529"
       }
     },
     {
       "tick": 100,
       "time": 5,
-      "nextId": 843,
-      "state": "5cdf65f6",
+      "nextId": 845,
+      "state": "1a627e5a",
       "events": "741638a5",
       "rng": {
-        "draws": 524,
-        "digest": "d2d530e4"
+        "draws": 535,
+        "digest": "6cd2e8ab"
       }
     },
     {
       "tick": 101,
       "time": 5.05,
-      "nextId": 843,
-      "state": "ae1ea9c7",
+      "nextId": 845,
+      "state": "d772329f",
       "events": "741638a5",
       "rng": {
-        "draws": 529,
-        "digest": "d090af58"
+        "draws": 542,
+        "digest": "cb366de3"
       },
       "label": "final",
       "players": [
@@ -629,7 +625,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 841,
+          "entityId": 843,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -648,7 +644,6 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "renown": 5,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -695,7 +690,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 842,
+          "entityId": 844,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -717,7 +712,6 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "renown": 5,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -736,7 +730,7 @@
               "name": "Battle Stance",
               "remaining": 3594.95,
               "school": "physical",
-              "sourceId": 841
+              "sourceId": 843
             }
           ],
           "blockChance": 0.05,
@@ -749,7 +743,7 @@
           "fallStartY": 2.242568,
           "fiveSecondRule": 104.05,
           "hp": 100,
-          "id": 841,
+          "id": 843,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -798,7 +792,7 @@
           "fallStartY": 2.139867,
           "fiveSecondRule": 104.05,
           "hp": 7,
-          "id": 842,
+          "id": 844,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

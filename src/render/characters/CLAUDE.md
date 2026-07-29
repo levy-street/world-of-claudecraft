@@ -21,11 +21,25 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   guess; see the P0 comment in `manifest.ts` and
   `tests/render_asset_preload.test.ts`). `prepareVisual(key)` memoizes
   normalize transform, resolved clips, click-capsule radius, and a baked
-  idle-pose geo (far-LOD/shadow proxy).
+  idle-pose geo (far-LOD/shadow proxy). `charactersReady()` is a narrower gate
+  than the site-wide `assetsReady()`: only this file's boot GLBs + skin atlases,
+  with its own retry loop (delayed, backed off between outer attempts) so a
+  transient failure anywhere else on the site can never permanently blank the
+  landing character-creation preview (`src/main.ts` awaits it there instead of
+  `assetsReady()`; see `tests/character_preview_boot.test.ts`).
 - `asset_miss_log.ts`: once-per-key dev logging for character-asset failures in
   per-frame render paths; `createCharacterVisual` returns null on such a
   failure so callers skip the view for the frame instead of stalling the
   renderer (`tests/character_visual_fail_soft.test.ts`).
+- `halo.ts`: the class halo (the priest's Light): `buildHalo(color, upOffset,
+  radius)`, driven by `VisualDef.halo` plus the optional
+  `haloUpOffset`/`haloRadius` placement overrides (defaults live here; the
+  priest overrides only the lift, for hat clearance). Texture, per-color
+  materials, and
+  per-radius geometries are shared never-disposed caches; radii must come from
+  static `VisualDef` values so the cache keys stay bounded. `visual.ts` parents
+  the mesh to the head bone and keeps it out of the shadow-caster sweeps
+  (`tests/character_halo.test.ts`).
 - `rig_merge.ts`: merges a KayKit rig's quantized body-part SkinnedMeshes into
   one draw per material (`assets.ts` `assembleModel` calls it). Read its
   header bind-pose proof before touching bone inverses.
@@ -74,12 +88,24 @@ live in `manifest.ts`), falling back to `mob_bandit`; NPCs to `NPC_KEYS`. Forms
   frame (swimming/sitting derived there, sim is unaware), calls `update(dt, s,
   animate)`, fires `playAttack()`/`playHit()` from sim events, and toggles live
   held items and effects. Don't drive visuals elsewhere.
-- **Crowd scaling:** the renderer consults `src/render/crowd_lod.ts` (pure,
-  unit-tested) for shadow/anim-cadence ranges as rig counts climb; the policy
-  is cosmetic-only and exempts anything a player reacts to.
+- **Crowd scaling / LOD bands:** the renderer consults `src/render/crowd_lod.ts`
+  (pure, unit-tested) for the shadow/anim-cadence ranges as rig counts climb,
+  and for where `setFar` swaps the rig for the baked idle-pose mesh. Between the
+  articulated band and that swap sits the animated far band: the rig keeps its
+  clips at a low cadence (the mixer integrates the skipped time via `pendingDt`,
+  so the clip plays at its real speed, just at fewer pose updates) instead of
+  freezing. The policy is cosmetic-only and exempts anything a player reacts to
+  from BOTH the cadence and the frozen mesh.
 - Death/revive are **edge-triggered locally** from `s.dead` (clamped one-shot);
   `flourish` plays on respawn. One-shots clamp on the last frame, see the
   T-pose-pop comment in `playOneShot`.
+- **Never leave the rig at zero weight.** A SkinnedMesh renders BIND pose (the
+  T-pose) whenever the mixer's scheduled actions sum below 1, and the base-state
+  fade only runs on an EDGE, so a partner-less `fadeIn` sticks for as long as a
+  held state (strafe/cast/walk) lasts. Start every clip through `beginAction`
+  (crossfade only when the outgoing action still drives the rig, else snap to
+  full weight); the per-frame `scanAnimRepair` watchdog (`anim_state.ts`) is the
+  backstop that re-drives the base pose after 3 starved frames.
 
 ## Adding things (module-first: where NEW work lands, and its test)
 - **New family/key:** a declarative `VisualDef` in `VISUALS` (existing `ClipMap`
@@ -92,7 +118,10 @@ live in `manifest.ts`), falling back to `mob_bandit`; NPCs to `NPC_KEYS`. Forms
   then have the renderer set the new flag. New pose LOGIC goes in the pure
   `anim_state.ts` half a Vitest imports directly, never inline in `visual.ts`.
 - **Tests:** `tests/visual_manifest.test.ts` pins the `VISUALS`/clip contract,
-  `tests/visual_anim_state.test.ts` the pose selection. Fix bugs test-first:
+  `tests/character_clipmaps.test.ts` gates every ClipMap name against the clips
+  actually in the shipped GLB (both graphics tiers), `tests/character_anim_state.test.ts`
+  the pure pose/watchdog math, `tests/character_tpose_repair.test.ts` the live
+  mixer weights across death, respawn and repeated swings. Fix bugs test-first:
   reproduce there (or in `tests/rig_merge.test.ts` for merge math), then the
   smallest change that turns it green.
 

@@ -113,6 +113,20 @@ function claimIdOf(sim: Sim): number {
 }
 
 describe('scene playback', () => {
+  it('reports persistent active state for reconnect and clears it after completion', () => {
+    const sim = makeSim();
+    startScenario(sim.ctx, 'sc_test_scene_stage');
+    collect(sim, 2);
+    expect(sim.sceneReconnectStateFor(sim.playerId)).toMatchObject({
+      sceneId: 'scn_test_doorway',
+      inputLocked: true,
+      letterbox: true,
+    });
+    expect(sim.sceneReconnectStateFor(sim.playerId)?.remainingSeconds).toBeGreaterThan(0);
+    collect(sim, 5 * 20);
+    expect(sim.sceneReconnectStateFor(sim.playerId)).toBeNull();
+  });
+
   it('emits ops in time order as personal events, keys only, then ends', () => {
     const sim = makeSim();
     expect(startScenario(sim.ctx, 'sc_test_scene_stage')).toBe(true);

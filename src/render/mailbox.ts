@@ -1,63 +1,188 @@
-// The Ravenpost pillar: the mailbox prop the renderer builds for
-// `kind:'object'` entities with templateId 'mailbox'. A small Tripo-generated
-// GLB (see public/models/props/CLAUDE.md), with the carved-plinth/timber-post
-// procedural build kept as a fallback for the brief window before the GLB
-// preload resolves. The votive glow under the letterbox is the per-viewer
-// "unread mail" beacon: the renderer toggles it from IWorld.mailUnread each
-// frame (exposed via group.userData.mailGlow).
-//
-// Deterministic (entityId drives the only variation, never Math.random);
-// materials go through surfaceMat() for dedup, matching delve_props.ts.
+// Ravenpost mailbox prop for ground-object entities with templateId 'mailbox'.
+// The stable GLB is a deterministic procedural Eastbrook asset. Every graphics
+// tier keeps the complete silhouette and service cues; Standard and Lambert
+// both bind the shared Eastbrook surface atlas over authored vertex colors.
 
 import * as THREE from 'three';
-import { loadGltf } from './assets/loader';
+import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
+import { loadGltf, releaseGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
+import {
+  eastbrookSurfaceAtlasMetadata,
+  eastbrookSurfaceAtlasTexture,
+  eastbrookSurfaceGeometry,
+  eastbrookSurfaceMaterial,
+  eastbrookTownSemanticForColor,
+} from './eastbrook_surface_atlas';
 import { GFX, surfaceMat } from './gfx';
+import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 
 const MAILBOX_ASSET_URL = '/models/props/mailbox_pillar.glb';
-let loadedMailboxGltf: THREE.Group | null = null;
+const MAILBOX_TARGET_HEIGHT = 2.9;
+const MAILBOX_UNREAD_SOCKET = 'Socket_UnreadGlow';
+let loadedMailboxGltf: GLTF | null = null;
+let preparedMailboxTemplate: THREE.Group | null = null;
+let fallbackMailboxTemplate: THREE.Group | null = null;
+let sharedGlowGeometry: THREE.SphereGeometry | null = null;
+let sharedGlowMaterial: THREE.Material | null = null;
 
 if (typeof window !== 'undefined') {
   registerPreload(
     loadGltf(MAILBOX_ASSET_URL).then((gltf) => {
-      loadedMailboxGltf = gltf.scene;
+      loadedMailboxGltf = gltf;
     }),
   );
 }
 
-/** Test-only window into the preload asset (mirrors props.ts). */
-export const mailboxPreloadInternalsForTest = { mailboxAssetUrl: MAILBOX_ASSET_URL };
-
-function stoneMat(color: number): THREE.Material {
-  return surfaceMat({
-    color,
-    roughness: 0.92,
-    metalness: 0,
-    flatShading: !GFX.standardMaterials,
-  });
+function materialTint(material: THREE.Material): THREE.Color {
+  return (
+    (material as THREE.Material & { color?: THREE.Color }).color?.clone() ??
+    new THREE.Color(1, 1, 1)
+  );
 }
 
-function woodMat(color: number): THREE.Material {
-  return surfaceMat({
-    color,
-    roughness: 0.8,
-    metalness: 0,
-    flatShading: !GFX.standardMaterials,
-  });
+function adaptedGeometry(
+  geometry: THREE.BufferGeometry,
+  material: THREE.Material,
+): THREE.BufferGeometry {
+  const color = geometry.getAttribute('color');
+  const tint = materialTint(material);
+  return eastbrookSurfaceGeometry(geometry, (index) =>
+    eastbrookTownSemanticForColor(
+      (color?.getX(index) ?? 1) * tint.r,
+      (color?.getY(index) ?? 1) * tint.g,
+      (color?.getZ(index) ?? 1) * tint.b,
+    ),
+  );
 }
 
-function brassMat(color: number): THREE.Material {
-  return surfaceMat({
-    color,
-    roughness: 0.45,
-    metalness: 0.75,
-    flatShading: !GFX.standardMaterials,
+export function buildMailboxFromSource(
+  source: THREE.Object3D,
+  atlas: THREE.Texture | undefined = eastbrookSurfaceAtlasTexture(),
+): THREE.Group {
+  // Loader-cache results are immutable. Clone the transform graph, clone and
+  // atlas-adapt each geometry, then mark the prepared resources as shared.
+  const instance = source.clone(true);
+  instance.name = 'ravenpostMailboxBody';
+  instance.traverse((child) => {
+    if (!(child instanceof THREE.Mesh)) return;
+    if (Array.isArray(child.material)) {
+      throw new Error('Ravenpost mailbox GLB must use one material per mesh');
+    }
+    child.geometry = markSharedGeometry(adaptedGeometry(child.geometry, child.material));
+    child.material = markSharedMaterial(eastbrookSurfaceMaterial(child.material, atlas));
+    child.castShadow = child.material.name === 'MailboxOpaque';
+    child.receiveShadow = true;
   });
+
+  const initialBounds = new THREE.Box3().setFromObject(instance);
+  const initialHeight = initialBounds.max.y - initialBounds.min.y;
+  if (initialHeight > 1e-4) instance.scale.multiplyScalar(MAILBOX_TARGET_HEIGHT / initialHeight);
+  const seatedBounds = new THREE.Box3().setFromObject(instance);
+  instance.position.y -= seatedBounds.min.y;
+
+  const group = new THREE.Group();
+  group.name = 'ravenpostMailboxTemplate';
+  group.add(instance);
+  group.userData.assetUrl = MAILBOX_ASSET_URL;
+  group.userData.source = 'procedural-glb';
+  group.userData.eastbrookSurfaceAtlas = eastbrookSurfaceAtlasMetadata(group, atlas);
+  return group;
+}
+
+function fallbackMaterial(
+  semanticColor: number,
+  options: { roughness: number; metalness: number },
+  atlas: THREE.Texture | undefined,
+): THREE.Material {
+  return markSharedMaterial(
+    surfaceMat({
+      color: semanticColor,
+      map: atlas,
+      roughness: options.roughness,
+      metalness: options.metalness,
+      flatShading: !GFX.standardMaterials,
+    }),
+  );
+}
+
+function fallbackMesh(
+  geometry: THREE.BufferGeometry,
+  semantic:
+    | 'darkStoneBlocks'
+    | 'lightStoneBlocks'
+    | 'verticalDarkTimber'
+    | 'horizontalWarmTimber'
+    | 'cobaltRoofShingles'
+    | 'warmGoldMetal'
+    | 'darkForgedMetal',
+  material: THREE.Material,
+): THREE.Mesh {
+  const mesh = new THREE.Mesh(
+    markSharedGeometry(eastbrookSurfaceGeometry(geometry, semantic)),
+    material,
+  );
+  mesh.castShadow = semantic !== 'warmGoldMetal' && semantic !== 'darkForgedMetal';
+  mesh.receiveShadow = true;
+  return mesh;
+}
+
+function buildFallbackMailbox(
+  atlas: THREE.Texture | undefined = eastbrookSurfaceAtlasTexture(),
+): THREE.Group {
+  const group = new THREE.Group();
+  group.name = 'ravenpostMailboxTemplate';
+  const stone = fallbackMaterial(0x777d80, { roughness: 0.92, metalness: 0 }, atlas);
+  const wood = fallbackMaterial(0x4c3829, { roughness: 0.84, metalness: 0.02 }, atlas);
+  const roof = fallbackMaterial(0x153b88, { roughness: 0.78, metalness: 0.02 }, atlas);
+  const metal = fallbackMaterial(0xa27320, { roughness: 0.42, metalness: 0.62 }, atlas);
+  const dark = fallbackMaterial(0x211813, { roughness: 0.88, metalness: 0.02 }, atlas);
+
+  const base = fallbackMesh(new THREE.BoxGeometry(0.72, 0.32, 0.56), 'lightStoneBlocks', stone);
+  base.position.y = 0.16;
+  group.add(base);
+  const post = fallbackMesh(new THREE.BoxGeometry(0.25, 1.05, 0.25), 'verticalDarkTimber', wood);
+  post.position.y = 0.84;
+  group.add(post);
+  const box = fallbackMesh(new THREE.BoxGeometry(1.34, 0.92, 0.72), 'horizontalWarmTimber', wood);
+  box.position.y = 1.63;
+  group.add(box);
+  const roofLeft = fallbackMesh(
+    new THREE.BoxGeometry(0.94, 0.12, 1.05),
+    'cobaltRoofShingles',
+    roof,
+  );
+  roofLeft.position.set(-0.36, 2.32, 0);
+  roofLeft.rotation.z = -0.58;
+  group.add(roofLeft);
+  const roofRight = roofLeft.clone();
+  roofRight.position.x = 0.36;
+  roofRight.rotation.z = 0.58;
+  group.add(roofRight);
+  const slotFrame = fallbackMesh(new THREE.BoxGeometry(0.72, 0.3, 0.08), 'warmGoldMetal', metal);
+  slotFrame.position.set(0, 1.84, 0.405);
+  group.add(slotFrame);
+  const slot = fallbackMesh(new THREE.BoxGeometry(0.53, 0.13, 0.1), 'darkForgedMetal', dark);
+  slot.position.set(0, 1.84, 0.455);
+  group.add(slot);
+  const socket = new THREE.Object3D();
+  socket.name = MAILBOX_UNREAD_SOCKET;
+  socket.position.set(0, 1.62, 0.478);
+  group.add(socket);
+
+  const bounds = new THREE.Box3().setFromObject(group);
+  const height = bounds.max.y - bounds.min.y;
+  if (height > 1e-4) group.scale.setScalar(MAILBOX_TARGET_HEIGHT / height);
+  group.position.y -= new THREE.Box3().setFromObject(group).min.y;
+  group.userData.assetUrl = MAILBOX_ASSET_URL;
+  group.userData.source = 'procedural-fallback';
+  group.userData.eastbrookSurfaceAtlas = eastbrookSurfaceAtlasMetadata(group, atlas);
+  return group;
 }
 
 function attachMailGlow(group: THREE.Group): THREE.Mesh {
-  const glow = new THREE.Mesh(
-    new THREE.SphereGeometry(0.09, 8, 6),
+  sharedGlowGeometry ??= markSharedGeometry(new THREE.SphereGeometry(0.09, 8, 6));
+  sharedGlowMaterial ??= markSharedMaterial(
     surfaceMat({
       color: 0xffd27a,
       roughness: 0.3,
@@ -67,101 +192,51 @@ function attachMailGlow(group: THREE.Group): THREE.Mesh {
       flatShading: !GFX.standardMaterials,
     }),
   );
-  glow.position.set(0, 1.56, 0.2);
+  const glow = new THREE.Mesh(sharedGlowGeometry, sharedGlowMaterial);
+  glow.name = 'ravenpostUnreadGlow';
   glow.visible = false;
-  group.add(glow);
+  const socket = group.getObjectByName(MAILBOX_UNREAD_SOCKET);
+  if (socket) socket.add(glow);
+  else {
+    glow.position.set(0, 1.62, 0.478);
+    group.add(glow);
+  }
+  // Renderer bobbing is parent-local. Preserve the authored socket origin (0
+  // when the GLB socket exists, the explicit fallback height otherwise) so
+  // sync never adds a second mailbox-height offset to a socket child.
+  glow.userData.mailGlowBaseLocalY = glow.position.y;
   group.userData.mailGlow = glow;
   return glow;
 }
 
-const MAILBOX_TARGET_H = 2.9;
-
-// Normalize the GLB to MAILBOX_TARGET_H (same Box3 trick as delve_props.ts'
-// buildStandaloneGlb) so the nameplate offset and the unread-mail glow anchor
-// hold regardless of the exported scale, instead of assuming the export is
-// already 2.9 units tall.
-export function buildMailboxPillar(entityId: number): { group: THREE.Group; height: number } {
-  if (loadedMailboxGltf) {
-    const group = new THREE.Group();
-    const inst = loadedMailboxGltf.clone(true);
-    inst.traverse((child) => {
-      if (child instanceof THREE.Mesh) child.castShadow = true;
-    });
-    const size = new THREE.Vector3();
-    new THREE.Box3().setFromObject(inst).getSize(size);
-    if (size.y > 1e-3) inst.scale.setScalar(MAILBOX_TARGET_H / size.y);
-    const seated = new THREE.Box3().setFromObject(inst);
-    inst.position.y -= seated.min.y;
-    group.add(inst);
-    attachMailGlow(group);
-    return { group, height: MAILBOX_TARGET_H };
+function preparedTemplate(): THREE.Group {
+  const atlas = eastbrookSurfaceAtlasTexture();
+  if (loadedMailboxGltf && !preparedMailboxTemplate) {
+    preparedMailboxTemplate = buildMailboxFromSource(loadedMailboxGltf.scene, atlas);
+    loadedMailboxGltf = null;
+    releaseGltf(MAILBOX_ASSET_URL);
   }
-  const group = new THREE.Group();
-  const stone = stoneMat(0x6f6a61);
-  const stoneDark = stoneMat(0x57534b);
-  const wood = woodMat(0x5b4226);
-  const brass = brassMat(0xc9973f);
-  const raven = surfaceMat({
-    color: 0x191b22,
-    roughness: 0.55,
-    metalness: 0.35,
-    flatShading: !GFX.standardMaterials,
-  });
-
-  // Stone plinth: two stacked octagonal slabs.
-  const plinth = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.66, 0.28, 8), stoneDark);
-  plinth.position.y = 0.14;
-  group.add(plinth);
-  const plinthTop = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.5, 0.22, 8), stone);
-  plinthTop.position.y = 0.39;
-  group.add(plinthTop);
-
-  // Timber post.
-  const post = new THREE.Mesh(new THREE.BoxGeometry(0.18, 1.35, 0.18), wood);
-  post.position.y = 1.15;
-  group.add(post);
-
-  // The letterbox: a brass-trimmed chest with a mail slot, facing the road.
-  const box = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.5, 0.5), wood);
-  box.position.y = 1.85;
-  group.add(box);
-  const trim = new THREE.Mesh(new THREE.BoxGeometry(0.76, 0.08, 0.54), brass);
-  trim.position.y = 2.06;
-  group.add(trim);
-  const slot = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.05, 0.03), brass);
-  slot.position.set(0, 1.9, 0.265);
-  group.add(slot);
-
-  // Peaked roof: a low pyramid keeping the letters dry.
-  const roof = new THREE.Mesh(new THREE.ConeGeometry(0.58, 0.34, 4), stoneDark);
-  roof.position.y = 2.28;
-  roof.rotation.y = Math.PI / 4;
-  group.add(roof);
-
-  // The Ravenpost raven, perched on the roof peak: body, head, beak, tail.
-  const ravenGroup = new THREE.Group();
-  const body = new THREE.Mesh(new THREE.SphereGeometry(0.13, 8, 6), raven);
-  body.scale.set(1, 0.85, 1.5);
-  ravenGroup.add(body);
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.075, 8, 6), raven);
-  head.position.set(0, 0.11, 0.14);
-  ravenGroup.add(head);
-  const beak = new THREE.Mesh(new THREE.ConeGeometry(0.03, 0.11, 6), brass);
-  beak.position.set(0, 0.1, 0.24);
-  beak.rotation.x = Math.PI / 2;
-  ravenGroup.add(beak);
-  const tail = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.03, 0.22), raven);
-  tail.position.set(0, 0.02, -0.22);
-  tail.rotation.x = -0.35;
-  ravenGroup.add(tail);
-  ravenGroup.position.y = 2.5;
-  // Each pillar's raven watches a slightly different direction (deterministic).
-  ravenGroup.rotation.y = (entityId % 5) * 0.9;
-  group.add(ravenGroup);
-
-  // The unread-mail votive: a warm ember tucked under the letterbox. Hidden by
-  // default; the renderer flips visibility from the viewer's mailUnread.
-  attachMailGlow(group);
-
-  return { group, height: 2.9 };
+  if (!preparedMailboxTemplate && !fallbackMailboxTemplate) {
+    fallbackMailboxTemplate = buildFallbackMailbox(atlas);
+  }
+  return preparedMailboxTemplate ?? fallbackMailboxTemplate ?? new THREE.Group();
 }
+
+export function buildMailboxPillar(_entityId: number): { group: THREE.Group; height: number } {
+  const atlas = eastbrookSurfaceAtlasTexture();
+  const group = preparedTemplate().clone(true);
+  group.name = 'ravenpostMailbox';
+  group.userData.assetUrl = MAILBOX_ASSET_URL;
+  group.userData.eastbrookSurfaceAtlas = eastbrookSurfaceAtlasMetadata(group, atlas);
+  attachMailGlow(group);
+  return { group, height: MAILBOX_TARGET_HEIGHT };
+}
+
+/** Test-only window into the stable preload and immutable preparation contract. */
+export const mailboxPreloadInternalsForTest = {
+  mailboxAssetUrl: MAILBOX_ASSET_URL,
+  targetHeight: MAILBOX_TARGET_HEIGHT,
+  unreadSocketName: MAILBOX_UNREAD_SOCKET,
+  buildMailboxFromSource,
+  buildFallbackMailbox,
+};

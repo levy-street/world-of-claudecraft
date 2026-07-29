@@ -13,15 +13,15 @@ import {
 // Gate for the committed WebP profession icons (mirror of tests/item_icons.test.ts). Art
 // under public/ui/professions/<id>.webp is the source of truth (WebP only, normalized by
 // scripts/convert_profession_icons_webp.mjs), served by professionIconUrl for the
-// professions window. The set legitimately ships EMPTY (every id has a procedural recipe),
-// so every guard here must hold with zero committed files. The guard is a bijection plus a
-// recipe-coverage check:
+// professions UI. The 14 profession/gathering row icons retain procedural recipes as a
+// deliberate fallback; the archetype crests and masterwork seal are raster-only. The guard is
+// a bijection plus a recipe-coverage check:
 //   A) every id in PROFESSION_IMAGE_IDS resolves to a committed, VALID .webp;
 //   B) only .webp art (+ mapping.json) is committed under public/ui/professions;
-//   C) every committed .webp is a WIRED id, and every wired id is a known manifest icon id;
-//   D) every manifest icon id has an explicit procedural recipe, so an unshipped image
+//   C) every committed .webp is a WIRED id, and every wired id is a known raster manifest id;
+//   D) every profession/gathering row id has an explicit procedural recipe, so an unshipped image
 //      renders a deliberate placeholder, never the generic unknown-icon fallback;
-//   E) every manifest icon id actually composes end to end (a valid data URL) when no
+//   E) every profession/gathering row id actually composes end to end (a valid data URL) when no
 //      image is committed for it;
 //   F) mapping.json provenance stays a bijection with the committed files at the declared
 //      128px square.
@@ -29,13 +29,27 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 const publicDir = path.join(repoRoot, 'public');
 const professionsDir = path.join(publicDir, 'ui/professions');
 
-// The full icon id set of docs/professions-2/asset-manifest.json wave one: the ten
+// The full icon id set of docs/design/professions-asset-manifest.json wave one: the ten
 // craft-wheel crafts plus the gathering skills. Derived from the sim content tables so a
 // renamed craft fails loudly here; gather_fishing now derives from the sim content like the
-// other gathering skills (fishing joined GATHERING_PROFESSION_IDS in Phase 11).
+// other gathering skills (fishing joined GATHERING_PROFESSION_IDS).
 const CRAFT_ICON_IDS = CRAFT_RING.map((c) => `prof_${c.id}`);
 const GATHER_ICON_IDS = GATHERING_PROFESSION_IDS.map((id) => `gather_${id}`);
-const ICON_IDS = [...CRAFT_ICON_IDS, ...GATHER_ICON_IDS];
+const RECIPE_ICON_IDS = [...CRAFT_ICON_IDS, ...GATHER_ICON_IDS];
+const ART_ICON_IDS = [
+  'archetype_apothecary',
+  'archetype_arcanist',
+  'archetype_bladewright',
+  'archetype_bombardier',
+  'archetype_cogsmith',
+  'archetype_gembinder',
+  'archetype_mageweaver',
+  'archetype_outfitter',
+  'archetype_smith',
+  'archetype_trapper',
+  ...RECIPE_ICON_IDS,
+  'masterwork_seal',
+];
 
 const isDotfile = (p: string): boolean => path.basename(p).startsWith('.');
 const isMapping = (p: string): boolean => path.basename(p) === 'mapping.json';
@@ -94,8 +108,17 @@ const webpFiles = (): string[] =>
   walk(professionsDir).filter((p) => path.extname(p).toLowerCase() === '.webp');
 
 type Mapping = {
+  license: string;
   iconSize: number;
-  entries: { id: string; name: string; source: string; license?: string }[];
+  entries: {
+    id: string;
+    name: string;
+    batch: string;
+    acceptedVersion: string;
+    source: string;
+    sourceSha256: string;
+    license: string;
+  }[];
 };
 const mapping = (): Mapping =>
   JSON.parse(readFileSync(path.join(professionsDir, 'mapping.json'), 'utf8')) as Mapping;
@@ -142,8 +165,8 @@ describe('profession webp icons', () => {
     vi.unstubAllGlobals();
   });
 
-  it('covers exactly the wave-one asset-manifest icon ids', () => {
-    expect([...ICON_IDS].sort()).toEqual([
+  it('covers exactly the profession and gathering ids that retain procedural recipes', () => {
+    expect([...RECIPE_ICON_IDS].sort()).toEqual([
       'gather_fishing',
       'gather_herbalism',
       'gather_logging',
@@ -161,12 +184,12 @@ describe('profession webp icons', () => {
     ]);
   });
 
-  it('stays in lockstep with the prof_/gather_ icon ids the asset manifest declares', () => {
-    // The pin above is a literal list; this guard reads the manifest itself so
-    // the two cannot drift apart silently. Deed crest ids are deed_prof_*, a
-    // different namespace, and stay out of this window's set by prefix.
+  it('stays in lockstep with every profession raster id the asset manifest declares', () => {
+    // The pins above are literal lists; this guard reads the manifest itself so the
+    // commissioned profession, gathering, archetype, and masterwork set cannot drift.
+    // Deed crest ids are deed_prof_*, a different namespace, and stay out by prefix.
     const manifest = JSON.parse(
-      readFileSync(path.join(repoRoot, 'docs/professions-2/asset-manifest.json'), 'utf8'),
+      readFileSync(path.join(repoRoot, 'docs/design/professions-asset-manifest.json'), 'utf8'),
     ) as unknown;
     const declared: string[] = [];
     const collect = (node: unknown): void => {
@@ -174,12 +197,16 @@ describe('profession webp icons', () => {
         for (const item of node) collect(item);
       } else if (node !== null && typeof node === 'object') {
         const rec = node as Record<string, unknown>;
-        if (typeof rec.id === 'string' && /^(prof|gather)_/.test(rec.id)) declared.push(rec.id);
+        if (
+          typeof rec.id === 'string' &&
+          (/^(prof|gather|archetype)_/.test(rec.id) || rec.id === 'masterwork_seal')
+        )
+          declared.push(rec.id);
         for (const value of Object.values(rec)) collect(value);
       }
     };
     collect(manifest);
-    expect([...declared].sort()).toEqual([...ICON_IDS].sort());
+    expect([...declared].sort()).toEqual([...ART_ICON_IDS].sort());
   });
 
   it('A) every image-backed profession id resolves to a committed, valid .webp', () => {
@@ -213,21 +240,21 @@ describe('profession webp icons', () => {
     }
     expect(orphans, 'remove dead-weight art or wire the id into PROFESSION_IMAGE_IDS').toEqual([]);
     expect(
-      [...PROFESSION_IMAGE_IDS].filter((id) => !ICON_IDS.includes(id)),
-      'PROFESSION_IMAGE_IDS covers manifest profession/gathering icon ids only',
+      [...PROFESSION_IMAGE_IDS].filter((id) => !ART_ICON_IDS.includes(id)),
+      'PROFESSION_IMAGE_IDS covers only raster ids declared by the professions manifest',
     ).toEqual([]);
   });
 
-  it('D) every manifest icon id has an explicit procedural recipe', () => {
+  it('D) every profession/gathering row id has an explicit procedural recipe', () => {
     expect(
-      ICON_IDS.filter((id) => !hasProfessionIconRecipe(id)),
+      RECIPE_ICON_IDS.filter((id) => !hasProfessionIconRecipe(id)),
       'an unshipped image must fall back to a deliberate recipe, never the unknown icon',
     ).toEqual([]);
   });
 
-  it('E) every manifest icon id composes to a valid data URL when its image is absent', () => {
+  it('E) every profession/gathering row id composes through its image or fallback recipe', () => {
     stubCanvasDocument();
-    for (const id of ICON_IDS) {
+    for (const id of RECIPE_ICON_IDS) {
       const url = professionIconUrl(id, 46);
       if (PROFESSION_IMAGE_IDS.has(id)) {
         expect(url, `${id} is art-backed and must serve its committed webp`).toBe(
@@ -239,6 +266,35 @@ describe('profession webp icons', () => {
     }
   });
 
+  it('E2) independently exercises every procedural fallback while production stays art-backed', () => {
+    stubCanvasDocument();
+    const productionIds = [...PROFESSION_IMAGE_IDS];
+    const mutableImageIds = PROFESSION_IMAGE_IDS as Set<string>;
+    for (const id of RECIPE_ICON_IDS) {
+      expect(PROFESSION_IMAGE_IDS.has(id), `${id} must begin art-backed in production`).toBe(true);
+      expect(professionImageUrl(id)).toBe(`/ui/professions/${id}.webp`);
+    }
+
+    // Simulate the row-art set omitted from a deployment without changing the canonical registry.
+    // This is the only way to drive these recipes now that every production row id has art.
+    try {
+      for (const id of RECIPE_ICON_IDS) mutableImageIds.delete(id);
+      for (const id of RECIPE_ICON_IDS) {
+        expect(professionImageUrl(id)).toBeNull();
+        expect(professionIconUrl(id, 47), `${id} must compose its explicit recipe`).toBe(
+          STUB_DATA_URL,
+        );
+      }
+    } finally {
+      // Restore both membership and iteration order so later exactness checks observe the real
+      // generated registry even when an assertion above fails.
+      mutableImageIds.clear();
+      for (const productionId of productionIds) mutableImageIds.add(productionId);
+    }
+
+    expect([...PROFESSION_IMAGE_IDS]).toEqual(productionIds);
+  });
+
   it('F) mapping.json provenance stays a bijection with the committed files at 128px', () => {
     const m = mapping();
     expect(
@@ -247,6 +303,9 @@ describe('profession webp icons', () => {
     ).toBe(128);
     const files = webpFiles().map((f) => path.basename(f, '.webp'));
     const listed = m.entries.map((e) => e.id);
+    expect(new Set(listed).size, 'mapping.json must not contain duplicate provenance ids').toBe(
+      listed.length,
+    );
     expect(
       files.filter((id) => !listed.includes(id)),
       'art without provenance: add its entry (source + license) to mapping.json',
@@ -255,6 +314,22 @@ describe('profession webp icons', () => {
       listed.filter((id) => !files.includes(id)),
       'mapping.json lists art that is not committed: drop the stale entry',
     ).toEqual([]);
+    expect(m.license).toContain('World of ClaudeCraft original art');
+    for (const entry of m.entries) {
+      expect(entry.name.trim(), `${entry.id} must retain a human-readable name`).not.toBe('');
+      expect(entry.batch, `${entry.id} batch`).toMatch(/^batch-\d+$/);
+      expect(entry.acceptedVersion, `${entry.id} accepted version`).toMatch(/^v\d+$/);
+      // Batch-relative like the items mapping's sourceFile: the masters are
+      // maintainer-held (not in the repo), and this file deploys verbatim to
+      // the live site, so it never publishes a local working path.
+      expect(entry.source, `${entry.id} source master`).toBe(
+        `${entry.batch}/masters/${entry.id}.png`,
+      );
+      expect(entry.sourceSha256, `${entry.id} source master SHA-256`).toMatch(/^[0-9a-f]{64}$/);
+      expect(entry.license, `${entry.id} license`).toBe(
+        'World of ClaudeCraft original art (project-owned, created for this game)',
+      );
+    }
     const wrong: string[] = [];
     for (const file of webpFiles()) {
       const { width, height } = webpSize(file);

@@ -31,6 +31,7 @@ export interface ClaudiumNativeSkuPriceInput {
   solAmountBase?: string | null;
   usdcAmountBase?: string | null;
   wocAmountBase?: string | null;
+  wocDiscountBps?: number | null;
 }
 
 /** The raw inputs, all sourced from the service via the SDK. */
@@ -38,6 +39,7 @@ export interface ClaudiumViewInput {
   /** Integer Claudium balance, or null when the service is off. */
   balance: number | null;
   skus: readonly ClaudiumSkuInput[];
+  wocDiscountBps?: number | null;
   nativeRails?: Partial<Record<'sol' | 'usdc' | 'woc', boolean>>;
   walletBalances?: ClaudiumWalletBalancesInput;
   nativePrices?: readonly ClaudiumNativeSkuPriceInput[];
@@ -76,6 +78,7 @@ export interface ClaudiumView {
   hasBalance: boolean;
   /** The integer balance to render, or null in the disabled state. */
   balance: number | null;
+  wocDiscountBps: number | null;
   walletBalances: ClaudiumWalletBalancesInput;
   buyRows: ClaudiumBuyRow[];
   rails: ClaudiumRailAvailability;
@@ -97,6 +100,27 @@ export function claudiumBalanceAddress(
   linkedWalletPubkey: string | null,
 ): string | null {
   return connectedAddress ?? linkedWalletPubkey;
+}
+
+/** Select the current service-owned $WOC discount when fetched SKU prices agree. */
+export function currentWocDiscountBps(
+  nativePrices: readonly ClaudiumNativeSkuPriceInput[],
+): number | null {
+  let current: number | null = null;
+  for (const row of nativePrices) {
+    const value = row.wocDiscountBps;
+    if (
+      !Number.isInteger(value) ||
+      value === null ||
+      value === undefined ||
+      value < 0 ||
+      value > 9000
+    )
+      return null;
+    if (current !== null && current !== value) return null;
+    current = value;
+  }
+  return current;
 }
 
 function affordable(balance: string | null | undefined, cost: string | null | undefined): boolean {
@@ -122,6 +146,7 @@ export function buildClaudiumView(input: ClaudiumViewInput): ClaudiumView {
       disabled: true,
       hasBalance: false,
       balance: null,
+      wocDiscountBps: null,
       walletBalances: { solLamports: null, usdcBaseUnits: null, wocBaseUnits: null },
       buyRows: [],
       rails: { stripe: false, sol: false, usdc: false, woc: false },
@@ -166,6 +191,7 @@ export function buildClaudiumView(input: ClaudiumViewInput): ClaudiumView {
     disabled: false,
     hasBalance: true,
     balance,
+    wocDiscountBps: input.wocDiscountBps ?? null,
     walletBalances,
     buyRows,
     rails: { stripe, sol, usdc, woc },

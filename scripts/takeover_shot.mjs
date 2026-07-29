@@ -11,6 +11,7 @@ import { mkdirSync } from 'node:fs';
 import { setTimeout as sleep } from 'node:timers/promises';
 import puppeteer from 'puppeteer-core';
 import WebSocket from 'ws';
+import { worldAuthMessage } from './lib/world_auth.mjs';
 
 const PORT = Number(process.env.WOC_SHOT_PORT ?? 8799);
 const BASE = `http://127.0.0.1:${PORT}`;
@@ -85,7 +86,7 @@ try {
   ws = new WebSocket(`${BASE.replace(/^http/, 'ws')}/ws`);
   await new Promise((resolve, reject) => {
     ws.on('open', () => {
-      ws.send(JSON.stringify({ t: 'auth', token, character: characterId }));
+      ws.send(JSON.stringify(worldAuthMessage(token, characterId)));
       resolve();
     });
     ws.on('error', reject);

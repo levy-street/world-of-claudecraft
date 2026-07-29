@@ -10,6 +10,7 @@
 // sample (renderer chunks, procgen, smooth/flatten sampling) reads through it.
 
 import { invalidateStaticColliders } from '../sim/colliders';
+import { clonePropsWithoutEastbrookLayout } from '../sim/custom_world_props';
 import { BUILTIN_WORLD, MOBS, PLAYER_START, setActiveWorldContent } from '../sim/data';
 import {
   clampBlockerSegment,
@@ -391,7 +392,7 @@ export class EditorApp {
       npcs: map.content.npcs as WorldContent['npcs'],
       groundObjects: map.content.objects as WorldContent['groundObjects'],
       roads: (map.content.roads ?? BUILTIN_WORLD.roads) as WorldContent['roads'],
-      props: BUILTIN_WORLD.props,
+      props: clonePropsWithoutEastbrookLayout(BUILTIN_WORLD.props),
       playerStart: map.playerStart ? { ...map.playerStart } : { ...PLAYER_START },
       terrainEdits: map.terrainEdits,
       placements: [],

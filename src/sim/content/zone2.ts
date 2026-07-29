@@ -3,6 +3,7 @@
 // trolls dig into barrow-mounds, and Vael the Fogbinder waits in the
 // Sunken Bastion.
 
+import { WORK_ORDER_CADENCE_TICKS } from '../professions/cadence';
 import type {
   CampDef,
   GroundObjectDef,
@@ -14,6 +15,7 @@ import type {
   ZoneDef,
   ZonePropsDef,
 } from '../types';
+import { FERAL } from './items';
 
 export const DEEPFEN_SHALLOWS_LAKE = { x: -110, z: 310, radius: 35 };
 
@@ -175,6 +177,7 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       { itemId: 'mirejaw_scale_vest', chance: 0.25 },
       { itemId: 'fen_reaver_glaive', chance: 0.25, rollGroup: 'mirejaw_chase' },
       { itemId: 'mirejaw_oracle_staff', chance: 0.25, rollGroup: 'mirejaw_chase' },
+      { itemId: 'mirebloom_treads', chance: 0.25 },
     ],
     scale: 1.05,
     color: 0x1abc9c,
@@ -252,6 +255,7 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       { copper: 38, chance: 1 },
       { itemId: 'widow_venom_sac', chance: 0.65, questId: 'q_widows' },
       { itemId: 'spider_leg', chance: 0.4 },
+      { itemId: 'fenbark_leggings', chance: 0.12 },
     ],
     scale: 1.0,
     color: 0x283747,
@@ -286,6 +290,7 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       { itemId: 'marshstrider_boots', chance: 0.4 },
       { itemId: 'broodmother_silk_robe', chance: 0.25 },
       { itemId: 'spider_leg', chance: 1 },
+      { itemId: 'fenwarden_sabatons', chance: 0.3 },
     ],
     scale: 1.4,
     color: 0x641e16,
@@ -339,6 +344,7 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       { itemId: 'chipped_tusk', chance: 0.4 },
       { itemId: 'bogiron_nugget', chance: 0.3 },
       { itemId: 'elixir_of_the_bear', chance: 0.07 },
+      { itemId: 'marshlight_hauberk', chance: 0.1 },
     ],
     scale: 1.15,
     color: 0x229954,
@@ -463,6 +469,7 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       { copper: 58, chance: 1 },
       { itemId: 'cult_cipher', chance: 0.4, questId: 'q_summoners' },
       { itemId: 'tallow_candle', chance: 0.3 },
+      { itemId: 'duskthorn_mantle', chance: 0.12 },
     ],
     scale: 1.0,
     color: 0x9b59b6,
@@ -553,6 +560,7 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       { copper: 600, chance: 1 },
       { itemId: 'tallow_candle', chance: 1 },
       { itemId: 'voss_sanctified_mace', chance: 0.25 },
+      { itemId: 'fenshadow_maul', chance: 0.25 },
     ],
     scale: 1.3,
     color: 0x512e5f,
@@ -656,6 +664,15 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
       'reedwoven_jerkin',
       'fenwalker_boots',
       'reedwoven_trousers',
+      // Gathering tools (#2343: every node harvest needs a matching tool, so
+      // each zone hub stocks the tiers its own nodes use; Mirefen has tier-1
+      // and tier-2 nodes). Tiered rods stay a Trader Wilkes exclusive.
+      'copper_mining_pick',
+      'iron_mining_pick',
+      'handaxe',
+      'felling_axe',
+      'gathering_sickle',
+      'bronze_sickle',
       'simple_fishing_pole',
     ],
     greeting:
@@ -709,7 +726,7 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
     questIds: [],
     greeting: 'Mind the damp on the pages, $N. The fen eats more books than readers ever will.',
   },
-  // Crafting-station master (Professions 2.0 Phase 8): stands beside the
+  // Crafting-station master (Professions 2.0): stands beside the
   // Fenbridge tannery (content/professions.ts STATIONS), on the northwest
   // edge of town with a guard-safe camp margin.
   tanner_hesk: {
@@ -719,8 +736,10 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
     pos: { x: -11, z: 315.5 },
     facing: 2.3,
     color: 0x8a5a2a,
-    questIds: [],
-    // Phase 9 station stocking: thorium_ore is the premium reagent the
+    // Professions 2.0: the Fenbridge tannery master runs the repeatable
+    // leatherworking work order.
+    questIds: ['q_prof_workorder_tannery'],
+    // Station stocking: thorium_ore is the premium reagent the
     // tannery station's own recipe (recipe_duskhide_wraps) consumes.
     vendorItems: [
       'travelers_knapsack',
@@ -1088,6 +1107,9 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
       warrior: 'deacons_cleaver',
       mage: 'staff_of_drowned_prayers',
       rogue: 'mistbinder_kris',
+      // Druid-specific override: the feral 2H ladder rung instead of the
+      // mage-archetype caster staff (questRewardItem checks the class first).
+      druid: 'fenshadow_maul',
     },
     requiresQuest: 'q_summoners',
   },
@@ -1158,6 +1180,28 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     minLevel: 12,
     suggestedPlayers: 5,
   },
+  // Repeatable craft work order (Professions 2.0): Tanner Hesk takes
+  // rough hides for coin on the shared cadence (WORK_ORDER_CADENCE_TICKS); the
+  // collect turn-in consumes them. copperReward is floor(0.5 * summed sell value
+  // of the requested hides); xpReward matches the make-amends repeatable band.
+  q_prof_workorder_tannery: {
+    id: 'q_prof_workorder_tannery',
+    name: 'Tannery Work Order',
+    giverNpcId: 'tanner_hesk',
+    turnInNpcId: 'tanner_hesk',
+    text: 'Vats are empty. Bring eight rough hides. Coin when you do.',
+    completionText: 'Good hides. Fair pay. Again when you have more.',
+    objectives: [
+      { type: 'collect', itemId: 'rough_hide', count: 8, label: 'Rough Hide delivered' },
+    ],
+    xpReward: 100,
+    // floor(0.5 * 8 * 5) = 20 (rough_hide sellValue 5).
+    copperReward: 20,
+    itemRewards: {},
+    repeatable: true,
+    shareable: false,
+    repeatCadenceTicks: WORK_ORDER_CADENCE_TICKS,
+  },
 };
 
 export const ZONE2_QUEST_ORDER = [
@@ -1184,6 +1228,7 @@ export const ZONE2_QUEST_ORDER = [
   'q_bastion_door',
   'q_olen',
   'q_mistcaller',
+  'q_prof_workorder_tannery',
 ];
 
 // ---------------------------------------------------------------------------
@@ -1282,6 +1327,14 @@ export const ZONE2_OBJECTS: GroundObjectDef[] = [
 const WAR: PlayerClass[] = ['warrior', 'paladin', 'shaman'];
 const MAG: PlayerClass[] = ['mage', 'priest', 'warlock', 'druid'];
 const ROG: PlayerClass[] = ['rogue', 'hunter'];
+const CASTER_WEAPON_CLASSES: PlayerClass[] = [
+  'mage',
+  'priest',
+  'warlock',
+  'shaman',
+  'paladin',
+  'druid',
+];
 
 export const ZONE2_ITEMS: Record<string, ItemDef> = {
   // --- quest items ---
@@ -1567,7 +1620,7 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 12, max: 20, speed: 3.0 },
     stats: { int: 5, spi: 2 },
     sellValue: 300,
-    requiredClass: MAG,
+    requiredClass: CASTER_WEAPON_CLASSES,
   },
   mistbinder_kris: {
     id: 'mistbinder_kris',
@@ -1598,7 +1651,7 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     name: 'Reins of the Moss-Shell Stalk-Glider',
     kind: 'mount',
     mount: 'stalkglider_snail',
-    quality: 'common',
+    quality: 'rare',
     soulbound: true,
     noDiscard: true,
     sellValue: 0,
@@ -1765,7 +1818,7 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 16, max: 27, speed: 3.0 },
     stats: { int: 6, spi: 3 },
     sellValue: 1400,
-    requiredClass: MAG,
+    requiredClass: CASTER_WEAPON_CLASSES,
   },
   // --- Sunken Bastion blues (rare) ---
   mistcallers_edge: {
@@ -1788,7 +1841,7 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 15, max: 26, speed: 3.0 },
     stats: { int: 6, spi: 3 },
     sellValue: 1200,
-    requiredClass: MAG,
+    requiredClass: CASTER_WEAPON_CLASSES,
   },
   riptide_dirk: {
     id: 'riptide_dirk',
@@ -2047,6 +2100,84 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     quality: 'poor',
     sellValue: 600,
   },
+  // --- Class/spec gap fill (uncommon/green leveling pieces) ---
+  // Budgeted via primaryStatBudget(item level, uncommon, slot); see
+  // src/sim/item_budget.ts. The leather int/spi pieces continue the druid
+  // caster line, the mail int/spi pieces the shaman/paladin caster line, and
+  // the druid-locked two-hander is the second rung of the feral weapon ladder
+  // (a bespoke druid-only lock: weaponArchetypeForItem returns null for it and
+  // canEquipItem falls through to the literal list, src/sim/equipment_rules.ts).
+  fenbark_leggings: {
+    id: 'fenbark_leggings',
+    name: 'Fenbark Leggings',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'legs',
+    quality: 'uncommon',
+    // Sableweb Widows (level 10) -> item level 11, legs budget 4.
+    stats: { armor: 48, int: 3, spi: 1 },
+    sellValue: 320,
+  },
+  mirebloom_treads: {
+    id: 'mirebloom_treads',
+    name: 'Mirebloom Treads',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'feet',
+    quality: 'uncommon',
+    // Mirejaw the Ravenous (level 10 rare elite) -> item level 11, feet budget 3.
+    stats: { armor: 28, int: 2, spi: 1 },
+    sellValue: 300,
+  },
+  fenwarden_sabatons: {
+    id: 'fenwarden_sabatons',
+    name: 'Fenwarden Sabatons',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'feet',
+    quality: 'uncommon',
+    // Mirefen Broodmother (level 10 boss) -> item level 11, feet budget 3.
+    stats: { armor: 42, int: 2, spi: 1 },
+    sellValue: 310,
+  },
+  marshlight_hauberk: {
+    id: 'marshlight_hauberk',
+    name: 'Marshlight Hauberk',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'chest',
+    quality: 'uncommon',
+    // Mirefen Trolls (level 12) -> item level 13, chest budget 5.
+    stats: { armor: 110, int: 3, spi: 2 },
+    sellValue: 380,
+  },
+  duskthorn_mantle: {
+    id: 'duskthorn_mantle',
+    name: 'Duskthorn Mantle',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'shoulder',
+    quality: 'uncommon',
+    // Gravecaller Menders (level 12) -> item level 13, shoulder budget 4.
+    stats: { armor: 34, int: 3, spi: 1 },
+    sellValue: 340,
+  },
+  fenshadow_maul: {
+    id: 'fenshadow_maul',
+    name: 'Fenshadow Maul',
+    kind: 'weapon',
+    slot: 'mainhand',
+    hand: 'twohand',
+    quality: 'uncommon',
+    // Deacon Voss (level 12 boss; also the q_deacon druid reward) -> item level
+    // 13: 2H stat budget round(primaryStatBudget(13, uncommon, mainhand) = 5 x
+    // TWOHAND_STAT_MULT) = 7, dps on the weaponDpsBudget(13) x TWOHAND_DPS_MULT
+    // curve (~12.19 at speed 3.4).
+    weapon: { min: 35, max: 48, speed: 3.4 },
+    stats: { str: 3, agi: 2, sta: 2 },
+    sellValue: 420,
+    requiredClass: FERAL,
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -2072,6 +2203,22 @@ export const ZONE2_PROPS: ZonePropsDef = {
     { x: -22, z: 486, rot: 1.2, scale: 1 },
     { x: -28, z: 494, rot: -0.7, scale: 1 },
     { x: -3, z: 505, rot: 2.9, scale: 1.3 },
+  ],
+  // Reed clumps ringing the Deepfen Shallows lake (DEEPFEN_SHALLOWS_LAKE, above).
+  // Reeds are waterline dressing, so every entry must sit on the shore: within
+  // ~1 yard of waterLevel() and inside the lake's own neighbourhood. A clump that
+  // drifts onto the dry bank reads as a bush stranded in a field
+  // (tests/marsh_reeds_placement.test.ts pins both).
+  marshReeds: [
+    [-82, 334],
+    [-85, 337],
+    [-97, 344],
+    [-112, 338],
+    [-74, 316],
+    [-77, 295],
+    [-96, 287],
+    [-110, 274],
+    [-123, 274],
   ],
   crates: [
     [14, 468],

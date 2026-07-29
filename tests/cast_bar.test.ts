@@ -65,6 +65,24 @@ describe('overhead cast bar', () => {
     expect(unknown.label).toBe('made_up_spell');
   });
 
+  it('renders fishing as a CONSTANT full waiting bar and the gather cast as a normal fill', () => {
+    // The fishing fill is pinned at 1 REGARDLESS of the broadcast decay: the
+    // bar must carry no session-progress information (the bite is the bobber
+    // plus the cue). castRemaining 7.5 of 15 would fill 0.5 on the generic
+    // path; fishing must stay 1.
+    const fish = castBarState(
+      caster({ castingAbility: 'fishing', castRemaining: 7.5, castTotal: 15 }),
+    );
+    expect(fish.fill).toBe(1);
+    // The gather cast rides the generic filling path (public state, honest
+    // bar): 1.25 of 2.5 remaining reads as half done.
+    const gather = castBarState(
+      caster({ castingAbility: 'gathering', castRemaining: 1.25, castTotal: 2.5 }),
+    );
+    expect(gather.fishing).toBe(false);
+    expect(gather.fill).toBe(0.5);
+  });
+
   it('carries custom raid mechanic cast ids for renderer localization', () => {
     const rage = castBarState(
       caster({
@@ -101,10 +119,24 @@ describe('overhead cast bar', () => {
 // the target's whole story, so eat/drink rides here, not on castBarState. The core
 // stays i18n-free, emitting only the `mode` discriminator the painter localizes.
 function food(remaining: number): Consuming {
-  return { itemId: 'roasted_boar', kind: 'food', hpPer2s: 40, manaPer2s: 0, remaining };
+  return {
+    itemId: 'roasted_boar',
+    kind: 'food',
+    hpPer2s: 40,
+    manaPer2s: 0,
+    remaining,
+    ticksElapsed: 0,
+  };
 }
 function drink(remaining: number): Consuming {
-  return { itemId: 'spring_water', kind: 'drink', hpPer2s: 0, manaPer2s: 30, remaining };
+  return {
+    itemId: 'spring_water',
+    kind: 'drink',
+    hpPer2s: 0,
+    manaPer2s: 30,
+    remaining,
+    ticksElapsed: 0,
+  };
 }
 
 describe('overhead eat/drink overlay', () => {
@@ -162,17 +194,17 @@ describe('overhead eat/drink overlay', () => {
 });
 
 // mountSummonBarState: the player-only mount summon channel bar. Hidden during a
-// dismount channel (mountCastKey === '') and when mountCastRemaining is 0 or
+// empty-key transition (mountCastKey === '') and when mountCastRemaining is 0 or
 // negative. Drains like a channel over MOUNT_SUMMON_SECONDS. The mountKey is the
 // stable discriminator; the painter resolves the localized mount name.
 describe('mount summon bar', () => {
-  it('is hidden when mountCastKey is empty (no summon or dismount channel)', () => {
+  it('is hidden when mountCastKey is empty (no keyed summon)', () => {
     const s = mountSummonBarState(0, '');
     expect(s.visible).toBe(false);
   });
 
-  it('is hidden when mountCastKey is empty even if time remains (dismount channel)', () => {
-    // A dismount channel has mountCastKey === '': the summon bar must NOT show.
+  it('is hidden when mountCastKey is empty even if a legacy transition remains', () => {
+    // A retired empty-key transition must never show the summon bar.
     const s = mountSummonBarState(0.5, '');
     expect(s.visible).toBe(false);
   });
@@ -268,6 +300,7 @@ describe('ClientWorld-vs-Sim parity', () => {
       hpPer2s: 0,
       manaPer2s: 0,
       remaining: 9,
+      ticksElapsed: 0,
     };
     const clientDrink: Consuming = {
       itemId: '',
@@ -275,6 +308,7 @@ describe('ClientWorld-vs-Sim parity', () => {
       hpPer2s: 0,
       manaPer2s: 0,
       remaining: 5,
+      ticksElapsed: 0,
     };
     const sim = consumeBarState(simEat, simDrink);
     const client = consumeBarState(clientEat, clientDrink);

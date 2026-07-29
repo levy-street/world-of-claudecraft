@@ -10,6 +10,7 @@ import {
   itemWeaponModelUrl,
   manifestUrls,
   mechHeldWeaponOverride,
+  offhandModelUrl,
   VISUALS,
   weaponSkinModelUrl,
   weaponSkinModelUrls,
@@ -75,24 +76,25 @@ describe('held weapon models', () => {
     expect(unmapped.map((item) => item.id)).toEqual([]);
   });
 
-  // The wraithfire_orb (and its generated heroic clone) is the ONE known held
-  // model gap: the shared art set has no orb model to map it to, so it needs new
-  // art, not a table row. Pinning the exact set makes the exception conscious: a
-  // future held_offhand item must either map to a model or extend this pin.
-  it('pins the wraithfire orb as the only held_offhand without a model', () => {
+  // The wraithfire_orb (and its generated heroic clone) plus the valefire_lantern
+  // are the known held model gaps: the shared art set has no orb or lantern model
+  // to map them to, so they need new art, not a table row. Pinning the exact set
+  // makes the exception conscious: a future held_offhand item must either map to
+  // a model or extend this pin.
+  it('pins the held_offhand items without a model (orb and lantern)', () => {
     const heldOffhands = Object.values(ITEMS).filter((item) => item.kind === 'held_offhand');
     const unmapped = heldOffhands
       .filter((item) => itemOffhandModelUrl(item.id) === null)
       .map((item) => item.id)
       .sort();
-    expect(unmapped).toEqual(['heroic_wraithfire_orb', 'wraithfire_orb']);
+    expect(unmapped).toEqual(['heroic_wraithfire_orb', 'valefire_lantern', 'wraithfire_orb']);
   });
 
   it('resolves actual offhands independently from the mainhand model', () => {
     expect(itemOffhandModelUrl('eastbrook_buckler')).toBe('models/weapons/shield_round.glb');
     expect(itemOffhandModelUrl('highwatch_wallshield')).toBe('models/weapons/shield_square.glb');
     expect(itemOffhandModelUrl('rusty_dagger')).toBe('models/weapons/dagger_a.glb');
-    expect(itemOffhandModelUrl('heroic_moggers_shiv')).toBe('models/weapons/dagger_c.glb');
+    expect(itemOffhandModelUrl('heroic_fang_of_korzul')).toBe('models/weapons/dagger_c.glb');
     expect(itemOffhandModelUrl('chest_armor_not_an_offhand')).toBeNull();
     expect(itemOffhandModelUrl(null)).toBeNull();
     expect(itemOffhandModelUrl(undefined)).toBeNull();
@@ -260,6 +262,40 @@ describe('weapon skin held models', () => {
     expect(weaponSkinModelUrl('not_a_skin')).toBeNull();
     expect(weaponSkinModelUrl(null)).toBeNull();
     expect(weaponSkinModelUrl(undefined)).toBeNull();
+  });
+
+  // The offhand slot mirrors the active skin ONLY onto a matching-type weapon;
+  // everything else keeps its own item model. This is the render half of
+  // the pure offhandMirrorsWeaponSkin rule (its full truth table is in
+  // tests/weapon_skins.test.ts).
+  it('offhandModelUrl mirrors the skin onto a matching-type offhand weapon', () => {
+    // Dagger skin + offhand dagger: the offhand renders the SKIN model.
+    expect(offhandModelUrl('rusty_dagger', 'frostbite_dagger')).toBe(
+      weaponSkinModelUrl('frostbite_dagger'),
+    );
+    expect(offhandModelUrl('heroic_fang_of_korzul', 'ashspark_dagger')).toBe(
+      weaponSkinModelUrl('ashspark_dagger'),
+    );
+    // Sword skin + offhand one-hand sword: also mirrors.
+    expect(offhandModelUrl('crossroads_saber', 'ice_fang_sword')).toBe(
+      weaponSkinModelUrl('ice_fang_sword'),
+    );
+  });
+
+  it('offhandModelUrl keeps the item model for a non-matching offhand', () => {
+    // Different-type weapon, shield, and held offhand all fall back to the item.
+    expect(offhandModelUrl('crossroads_saber', 'frostbite_dagger')).toBe(
+      itemOffhandModelUrl('crossroads_saber'),
+    );
+    expect(offhandModelUrl('eastbrook_buckler', 'frostbite_dagger')).toBe(
+      itemOffhandModelUrl('eastbrook_buckler'),
+    );
+    // No skin at all: unchanged item resolution (the common case).
+    expect(offhandModelUrl('rusty_dagger', null)).toBe(itemOffhandModelUrl('rusty_dagger'));
+    expect(offhandModelUrl('eastbrook_buckler', null)).toBe(
+      itemOffhandModelUrl('eastbrook_buckler'),
+    );
+    expect(offhandModelUrl(null, 'frostbite_dagger')).toBeNull();
   });
 
   it('ships 29 distinct skin model urls, all in the boot preload manifest', () => {

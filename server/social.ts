@@ -17,7 +17,7 @@ export type GuildRank = 'leader' | 'officer' | 'member';
 // `realm` is the world/shard the character lives on (stored per character so
 // it survives logout and is ready for future cross-realm play); `zone` and
 // `status` are only meaningful while the character is online.
-export type PresenceStatus = 'online' | 'combat' | 'dungeon' | 'dead';
+export type PresenceStatus = 'online' | 'combat' | 'dungeon' | 'dead' | 'afk';
 
 export interface Presence {
   zone: string;
@@ -77,6 +77,10 @@ export interface GuildView {
   id: number;
   name: string;
   rank: GuildRank;
+  // The guild billboard: a short officer-set message pinned atop the Guild tab
+  // ('' when unset), with the setter's display name for attribution.
+  motd: string;
+  motdSetBy: string;
   members: GuildMemberEntry[];
   events: GuildEventRow[];
 }
@@ -135,6 +139,9 @@ export interface SocialDb {
   ): Promise<
     (CharInfo & { rank: GuildRank; lastLogin: string | null; activeTitle: string | null })[]
   >;
+  // guild billboard (motd): the officer-set message + setter name on the guilds row
+  setGuildMotd(guildId: number, motd: string, setBy: string): Promise<void>;
+  guildMotd(guildId: number): Promise<{ motd: string; motdSetBy: string }>;
   // guild calendar events (the event calendar's guild lane)
   guildEvents(guildId: number, fromDay: string): Promise<GuildEventRow[]>;
   guildEventCount(guildId: number, fromDay: string): Promise<number>;
@@ -190,6 +197,15 @@ export interface SocialTransport {
   // true if `recipientId` has `senderCharacterId` on their BLOCK list, so
   // guild/officer chat can honour the same filter say/whisper already apply
   isBlocking(recipientId: number, senderCharacterId: number): boolean;
+  // true once `characterId`'s persisted block list has finished loading into
+  // the live session (or the character is offline, where there is nothing to
+  // load and no live presence to leak). While a just-joined character's block
+  // list is still loading, isBlocking() above answers false for them the same
+  // way an unset Set would, so a caller that skips this check can briefly
+  // disclose presence across a block the target already placed. Mirrors the
+  // canShowInWho fail-closed guard (server/game.ts) for the presence() /
+  // announcePresence() paths in this file.
+  blockListLoaded(characterId: number): boolean;
   // true if `recipientId` has `senderCharacterId` on their IGNORE list. Guild and
   // officer chat fan out through deliver() and never pass the routeEvents chat
   // filter, so they must consult the ignore list here, exactly as for blocks.
@@ -224,6 +240,8 @@ export type SocialEvent =
   // Structured guild-calendar outcome; the client renders the visible line
   // from the code (the sim's mailResult convention, so no server English here).
   | { type: 'calendarResult'; code: CalendarResultCode }
+  // Structured guild-billboard outcome, same convention as calendarResult.
+  | { type: 'motdResult'; code: MotdResultCode }
   // A guildmate's or followed friend's marquee deed unlock. Carries the deed
   // ID only, never English (the client composes the line from deed_i18n plus
   // its own chrome key, the calendarResult convention).
@@ -238,12 +256,18 @@ export type CalendarResultCode =
   | 'calendarFull'
   | 'eventGone';
 
+// Guild billboard command outcomes ('set' is the success; the rest refusals).
+export type MotdResultCode = 'set' | 'notInGuild' | 'notOfficer';
+
 const FRIEND_LIMIT = 50;
 const BLOCK_LIMIT = 50;
 const IGNORE_LIMIT = 50;
 const GUILD_MEMBER_LIMIT = 100;
 const GUILD_INVITE_TTL_MS = 60_000;
 const GUILD_MESSAGE_MAX = 200;
+// Guild billboard: the officer-set message pinned atop the Guild tab.
+// Server-clamped; '' clears the billboard.
+export const GUILD_MOTD_MAX = 240;
 // Guild calendar: caps + input bounds. Events are UTC-day keyed ('YYYY-MM-DD',
 // matching the sim's utcDay convention) and may be booked up to a year out.
 const GUILD_EVENT_LIMIT = 25; // upcoming events per guild
@@ -309,26 +333,30 @@ export class SocialService {
       this.db.listIgnores(charId),
       this.db.guildMembership(charId),
     ]);
+    const blockedByViewer = new Set(blocks.map((b) => b.id));
     let guild: GuildView | null = null;
     if (membership) {
       const fromDay = shiftDay(this.todayIso(), -GUILD_EVENT_KEEP_PAST_DAYS);
-      const [members, events] = await Promise.all([
+      const [members, events, motd] = await Promise.all([
         this.db.guildMembers(membership.guildId),
         this.db.guildEvents(membership.guildId, fromDay),
+        this.db.guildMotd(membership.guildId),
       ]);
       guild = {
         id: membership.guildId,
         name: membership.guildName,
         rank: membership.rank,
+        motd: motd.motd,
+        motdSetBy: motd.motdSetBy,
         members: members
-          .map((m) => ({ ...m, ...this.presence(m.id) }))
+          .map((m) => ({ ...m, ...this.presence(charId, m.id, blockedByViewer) }))
           .sort((a, b) => rankOrder(a.rank) - rankOrder(b.rank) || a.name.localeCompare(b.name)),
         events,
       };
     }
     return {
       friends: friends
-        .map((f) => ({ ...f, ...this.presence(f.id) }))
+        .map((f) => ({ ...f, ...this.presence(charId, f.id, blockedByViewer) }))
         .sort((a, b) => Number(b.online) - Number(a.online) || a.name.localeCompare(b.name)),
       blocks,
       ignores,
@@ -337,14 +365,31 @@ export class SocialService {
   }
 
   // Collapse a character's online presence into the fields a roster row needs.
-  private presence(charId: number): {
+  // A friend or guild edge can survive a block on either side (blockAdd only
+  // ever cleans the blocker's OWN outgoing friend edge, and never touches guild
+  // membership at all), so this hides live position and online status the same
+  // way canShowInWho already hides /who visibility: bidirectionally, and
+  // regardless of which side added the other or blocked the other.
+  private presence(
+    viewerCharId: number,
+    otherCharId: number,
+    viewerBlockedIds: Set<number>,
+  ): {
     online: boolean;
     zone?: string;
     status?: PresenceStatus;
     x?: number;
     z?: number;
   } {
-    const loc = this.tx.locationOf(charId);
+    if (
+      otherCharId !== viewerCharId &&
+      (viewerBlockedIds.has(otherCharId) ||
+        !this.tx.blockListLoaded(otherCharId) ||
+        this.tx.isBlocking(otherCharId, viewerCharId))
+    ) {
+      return { online: false };
+    }
+    const loc = this.tx.locationOf(otherCharId);
     return loc
       ? { online: true, zone: loc.zone, status: loc.status, x: loc.x, z: loc.z }
       : { online: false };
@@ -405,6 +450,21 @@ export class SocialService {
       this.err(actor.characterId, `${target.name} is already your friend.`);
       return;
     }
+    // A block is meant to be mutual (canShowInWho, broadcastDeedUnlock, and
+    // guildInvite all enforce it both ways): if the TARGET has blocked the
+    // actor, refuse the add too, or a blocked stalker could re-add the person
+    // who blocked them and keep live-tracking their position and online
+    // status through the one-directional friend list. The target may be
+    // offline, so this reads the DB rather than the live session set. This
+    // check runs AFTER the "already your friend" check above so re-running
+    // `/friend add` on an existing friend edge always answers the same way,
+    // even once the target blocks the actor: keeping the reply stable there
+    // avoids handing a blocker-detection oracle to an already-added friend.
+    const targetBlockedIds = await this.db.blockedIds(target.id);
+    if (targetBlockedIds.includes(actor.characterId)) {
+      this.err(actor.characterId, `You cannot add ${target.name} as a friend.`);
+      return;
+    }
     if (friends.length >= FRIEND_LIMIT) {
       this.err(actor.characterId, 'Your friends list is full.');
       return;
@@ -431,12 +491,31 @@ export class SocialService {
   }
 
   // Called by game.ts when a character logs in/out, so friends watching them
-  // see a come-online / go-offline notice (and refresh their panel).
+  // see a come-online / go-offline notice (and refresh their panel). Filtered
+  // bidirectionally by block, the same as broadcastDeedUnlock: a friend-of-me
+  // or guild edge on the OTHER side survives a block (blockAdd only cleans the
+  // blocker's own outgoing friend edge, never guild membership), so without
+  // this a blocked stalker (or someone the actor blocked) would keep hearing
+  // the actor's login/logout and getting their panel refreshed with the
+  // actor's live position.
   async announcePresence(actor: SocialActor, online: boolean): Promise<void> {
-    const watchers = await this.db.whoFriended(actor.characterId);
+    const [watchers, actorBlockedIds] = await Promise.all([
+      this.db.whoFriended(actor.characterId),
+      this.db.blockedIds(actor.characterId),
+    ]);
+    const actorBlocked = new Set(actorBlockedIds);
+    // Fail closed the same way presence() does: while otherId's own block
+    // list is still loading (a just-joined watcher or guildmate), we cannot
+    // yet tell whether they blocked the actor, so treat that as a block
+    // rather than deliver the notice or refresh their panel.
+    const blockedPair = (otherId: number): boolean =>
+      actorBlocked.has(otherId) ||
+      !this.tx.blockListLoaded(otherId) ||
+      this.tx.isBlocking(otherId, actor.characterId);
     const notified = new Set<number>();
     for (const watcherId of watchers) {
       if (!this.tx.isOnline(watcherId)) continue;
+      if (blockedPair(watcherId)) continue;
       this.tx.deliver(watcherId, [
         {
           type: 'log',
@@ -455,6 +534,7 @@ export class SocialService {
       const members = await this.db.guildMembers(membership.guildId);
       for (const m of members) {
         if (m.id === actor.characterId || notified.has(m.id) || !this.tx.isOnline(m.id)) continue;
+        if (blockedPair(m.id)) continue;
         this.push(m.id);
         notified.add(m.id);
       }
@@ -487,6 +567,9 @@ export class SocialService {
     this.info(actor.characterId, `${target.name} is now blocked.`);
     this.tx.onBlocksChanged(actor.characterId, await this.db.blockedIds(actor.characterId));
     this.push(actor.characterId);
+    // The target's own panel must lose the actor's presence too, or it stays
+    // frozen "online" on their side for the rest of the session (#2437).
+    this.push(target.id);
   }
 
   async blockRemove(actor: SocialActor, name: string): Promise<void> {
@@ -504,6 +587,7 @@ export class SocialService {
     this.info(actor.characterId, `${target.name} is no longer blocked.`);
     this.tx.onBlocksChanged(actor.characterId, await this.db.blockedIds(actor.characterId));
     this.push(actor.characterId);
+    this.push(target.id);
   }
 
   // "/blocklist": echo the blocked names back to the actor.
@@ -1033,6 +1117,40 @@ export class SocialService {
     }
     await this.db.createGuildEvent(membership.guildId, actor.characterId, day, hour, title, note);
     this.calendarResult(actor.characterId, 'created');
+    await this.pushGuild(membership.guildId);
+  }
+
+  // -------------------------------------------------------------------------
+  // Guild billboard (motd)
+  // -------------------------------------------------------------------------
+
+  private motdResult(charId: number, code: MotdResultCode): void {
+    this.tx.deliver(charId, [{ type: 'motdResult', code }]);
+  }
+
+  // Set (or clear, with '') the guild billboard. Officers + the Guild Master
+  // only; the text is server-clamped and the wire layer has already run the
+  // mute/rate/content gates (game.ts, the guild_event_create stack).
+  async guildSetMotd(actor: SocialActor, rawText: string): Promise<void> {
+    const membership = await this.db.guildMembership(actor.characterId);
+    if (!membership) {
+      this.motdResult(actor.characterId, 'notInGuild');
+      return;
+    }
+    if (membership.rank === 'member') {
+      this.motdResult(actor.characterId, 'notOfficer');
+      return;
+    }
+    let text = String(rawText ?? '')
+      .trim()
+      .slice(0, GUILD_MOTD_MAX);
+    // The clamp slices UTF-16 code units, so a boundary landing inside a
+    // surrogate pair (emoji-class codepoint) would store a lone surrogate that
+    // pg encodes as U+FFFD; drop the orphaned half instead.
+    const last = text.charCodeAt(text.length - 1);
+    if (last >= 0xd800 && last <= 0xdbff) text = text.slice(0, -1);
+    await this.db.setGuildMotd(membership.guildId, text, text === '' ? '' : actor.name);
+    this.motdResult(actor.characterId, 'set');
     await this.pushGuild(membership.guildId);
   }
 

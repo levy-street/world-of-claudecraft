@@ -183,7 +183,7 @@ describe('quest_credit: checkQuestReady (both arms)', () => {
   });
 });
 
-// Phase 1 (Professions 2.0): per-progress resolved counts. questObjectiveRequired
+// Professions 2.0: per-progress resolved counts. questObjectiveRequired
 // is the one read every credit/ready/turn-in/HUD site goes through, and the
 // credit loop must honor a snapshotted resolvedCounts override (the amends
 // escalation) over the static objective count.

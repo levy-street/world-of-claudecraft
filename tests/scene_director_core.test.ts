@@ -6,6 +6,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   applySceneOp,
+  applySceneSync,
   createSceneDirectorState,
   SCENE_RELEASE_SEC,
   type SceneDirectorState,
@@ -51,6 +52,26 @@ function stateWithShot(at: number): SceneDirectorState {
 }
 
 describe('scene lifecycle + input lock', () => {
+  it('hard-converges stale camera and input state from reconnect authority', () => {
+    const s = stateWithShot(0);
+    applySceneOp(s, { kind: 'inputLock', on: true }, 0);
+    scenePose(s, 0, LIVE, noEntities);
+    expect(sceneCameraActive(s)).toBe(true);
+    applySceneSync(s, {
+      sceneId: 'active',
+      remainingSeconds: 4,
+      inputLocked: false,
+      letterbox: true,
+      musicSilenced: false,
+    });
+    expect(s.sceneActive).toBe(true);
+    expect(s.inputLocked).toBe(false);
+    expect(sceneCameraActive(s)).toBe(false);
+    applySceneSync(s, null);
+    expect(s.sceneActive).toBe(false);
+    expect(s.inputLocked).toBe(false);
+  });
+
   it('start arms the scene and inputLock ops toggle the lock', () => {
     const s = createSceneDirectorState();
     expect(s.sceneActive).toBe(false);
@@ -82,6 +103,13 @@ describe('scene lifecycle + input lock', () => {
 });
 
 describe('focus shot easing', () => {
+  it('leaves the gameplay camera untouched when reduced motion is effective', () => {
+    const s = stateWithShot(0);
+    expect(scenePose(s, 1, LIVE, noEntities, undefined, true)).toBeNull();
+    expect(sceneCameraActive(s)).toBe(false);
+    expect(s.sceneActive).toBe(true);
+  });
+
   it('eases from the live pose at shot start to the shot pose over dur (easeInOutSine)', () => {
     const s = stateWithShot(100);
     // t=0: the first frame latches the live pose and returns it verbatim.

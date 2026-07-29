@@ -169,6 +169,7 @@ describe('rift sim: dev portal + entry', () => {
       0.6,
       false,
       undefined,
+      undefined,
       sim.riftCollisionToken,
     );
     expect(resolved.x).toBeLessThan(origin.x + 30);
@@ -182,7 +183,7 @@ describe('rift sim: dev portal + entry', () => {
     const instA = simA.riftInstances.find((i) => i.partyKey !== null)!;
     const origin = riftInstanceOrigin(instA.slot, instA.floorIndex);
     const probe = (token: number) =>
-      resolvePosition(SEED, origin.x + 40, origin.z + 20, 0.6, false, undefined, token);
+      resolvePosition(SEED, origin.x + 40, origin.z + 20, 0.6, false, undefined, undefined, token);
     const before = probe(simA.riftCollisionToken);
     // Sim B enters a DIFFERENT rift; Sim A's collision must not change at all,
     // and Sim B's token must not resolve against Sim A's region.
@@ -346,7 +347,7 @@ describe('rift sim: generator clearance matches runtime collision', () => {
         for (const spawn of floor.spawns) {
           const x = origin.x + spawn.x;
           const z = origin.z + spawn.z;
-          const res = resolvePosition(seed, x, z, 0.6, false, undefined, token);
+          const res = resolvePosition(seed, x, z, 0.6, false, undefined, undefined, token);
           const moved = Math.hypot(res.x - x, res.z - z);
           expect(
             moved,

@@ -3,6 +3,13 @@ import { Input } from '../src/game/input';
 import { stopAutorunForInteraction } from '../src/game/interaction_autorun';
 import { Keybinds } from '../src/game/keybinds';
 
+// Pointer-lock tests keep explicit coordinates so the held-lock behavior stays
+// independent from the old edge-only path.
+const VIEWPORT_W = 1920;
+const VIEWPORT_H = 1080;
+const EDGE = { clientX: 6, clientY: 540 };
+const CENTER = { clientX: 960, clientY: 540 };
+
 function installStorage(): void {
   const map = new Map<string, string>();
   (globalThis as any).localStorage = {
@@ -36,6 +43,8 @@ function makeInput(userAgent?: string) {
     requestPointerLock,
   };
   (globalThis as any).window = {
+    innerWidth: VIEWPORT_W,
+    innerHeight: VIEWPORT_H,
     addEventListener: vi.fn((type: string, cb: (event: any) => void) => {
       windowListeners.set(type, cb);
     }),
@@ -136,6 +145,80 @@ describe('Input autorun', () => {
     expect(input.readMoveInput().forward).toBe(true);
     expect(input.setAutorun(false)).toBe(false);
     expect(input.readMoveInput().forward).toBe(false);
+  });
+
+  it('hard-locks scene movement and clears persistent travel latches', () => {
+    const { input, windowListeners } = makeInput();
+    const now = vi.spyOn(performance, 'now').mockReturnValue(1_000);
+    input.setAutorun(true);
+    input.setClickMoveTarget({ x: 8, z: 3 }, 0.5);
+    input.triggerTouchJump();
+    input.setControllerFacing(1.25);
+    windowListeners.get('keydown')?.({
+      code: 'Space',
+      repeat: false,
+      preventDefault: vi.fn(),
+    });
+    windowListeners.get('keyup')?.({ code: 'Space' });
+
+    input.setSceneInputLocked(true);
+
+    expect(input.autorun).toBe(false);
+    expect(input.clickMoveTarget).toBeNull();
+    expect(input.clickMoveGoal).toBeNull();
+    expect(input.readMoveInput()).toEqual({
+      forward: false,
+      back: false,
+      turnLeft: false,
+      turnRight: false,
+      strafeLeft: false,
+      strafeRight: false,
+      jump: false,
+    });
+    expect(input.controllerFacingOverride()).toBeNull();
+
+    expect(input.toggleAutorun()).toBe(false);
+    expect(input.setAutorun(true)).toBe(false);
+    input.setClickMoveTarget({ x: 12, z: 7 }, 0.5);
+    input.setTouchMove({ forward: true, back: false, strafeLeft: false, strafeRight: false });
+    input.setGamepadMove({ forward: true, back: false, strafeLeft: false, strafeRight: false });
+    input.setControllerMoveInput({ forward: true });
+    input.setControllerFacing(2.5);
+    input.triggerTouchJump();
+
+    input.setSceneInputLocked(false);
+
+    expect(input.autorun).toBe(false);
+    expect(input.clickMoveTarget).toBeNull();
+    expect(input.readMoveInput().forward).toBe(false);
+    expect(input.readMoveInput().jump).toBe(false);
+    expect(input.controllerFacingOverride()).toBeNull();
+
+    input.setSceneInputLocked(true);
+    input.triggerGamepadJump();
+    input.setSceneInputLocked(false);
+    expect(input.readMoveInput().jump).toBe(false);
+
+    input.setTouchMove({ forward: true, back: false, strafeLeft: false, strafeRight: false });
+    input.setControllerMoveInput({ strafeRight: true });
+    input.setControllerFacing(0.75);
+    input.triggerTouchJump();
+
+    expect(input.readMoveInput()).toEqual({
+      forward: false,
+      back: false,
+      turnLeft: false,
+      turnRight: false,
+      strafeLeft: false,
+      strafeRight: true,
+      jump: false,
+    });
+    expect(input.controllerFacingOverride()).toBe(0.75);
+
+    input.clearControllerMoveInput();
+    expect(input.readMoveInput().forward).toBe(true);
+    expect(input.readMoveInput().jump).toBe(true);
+    now.mockRestore();
   });
 
   it('a forward touch-move cancels autorun (classic tap-to-stop)', () => {
@@ -345,6 +428,66 @@ describe('Input click-to-move marker pulses', () => {
 });
 
 describe('Input pointer lock', () => {
+  it('requests pointer lock for a camera drag that starts away from the viewport edge', () => {
+    // The Lock Cursor option means an active camera-look drag holds pointer lock
+    // for the whole drag, not only after the OS cursor has already approached a
+    // screen edge. This keeps the pointer from escaping the game surface before
+    // the player intentionally releases the drag.
+    const { canvas, input, canvasListeners, windowListeners } = makeInput();
+    const yaw = input.camYaw;
+
+    canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
+    windowListeners.get('mousemove')!({ movementX: 10, movementY: 5, ...CENTER });
+    windowListeners.get('mousemove')!({ movementX: 12, movementY: 0, ...CENTER });
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+
+    windowListeners.get('mousemove')!({ movementX: 20, movementY: 0, clientX: 980, clientY: 540 });
+
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+    expect(input.isCameraDragActive()).toBe(true);
+    expect(input.camYaw).toBeCloseTo(yaw - 20 * 0.0045);
+  });
+
+  it('engages the lock as soon as the drag starts, before the cursor reaches an edge', () => {
+    const { canvas, canvasListeners, windowListeners } = makeInput();
+
+    canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
+    windowListeners.get('mousemove')!({ movementX: 10, movementY: 5, ...CENTER });
+    windowListeners.get('mousemove')!({ movementX: 12, movementY: 0, ...CENTER });
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+
+    windowListeners.get('mousemove')!({ movementX: 40, movementY: 0, ...EDGE });
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+
+    windowListeners.get('mousemove')!({ movementX: 5, movementY: 0, clientX: 2, clientY: 540 });
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+  });
+
+  it('on Firefox, requests pointer lock synchronously even when the press starts away from the edge', () => {
+    const { canvas, canvasListeners } = makeInput(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0',
+    );
+
+    canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
+
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+  });
+
+  it('re-arms per drag while still locking every active drag', () => {
+    const { canvas, canvasListeners, windowListeners } = makeInput();
+
+    canvasListeners.get('mousedown')!({ button: 2, ...EDGE, preventDefault: vi.fn() });
+    windowListeners.get('mousemove')!({ movementX: 10, movementY: 5, ...EDGE });
+    windowListeners.get('mousemove')!({ movementX: 12, movementY: 0, ...EDGE });
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+    windowListeners.get('mouseup')!({ button: 2, ...EDGE, target: canvas });
+
+    canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
+    windowListeners.get('mousemove')!({ movementX: 10, movementY: 5, ...CENTER });
+    windowListeners.get('mousemove')!({ movementX: 12, movementY: 0, ...CENTER });
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(2);
+  });
+
   it('does not request pointer lock for a plain right click', () => {
     const { canvas, canvasListeners } = makeInput();
 
@@ -363,8 +506,7 @@ describe('Input pointer lock', () => {
     // drag, so the browser pointer-capture banner is never shown.
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
     now += 30;
@@ -378,7 +520,7 @@ describe('Input pointer lock', () => {
   it('requests pointer lock the instant a press becomes an active drag (before any rotation)', () => {
     const { canvas, canvasListeners, windowListeners } = makeInput();
 
-    canvasListeners.get('mousedown')!({ button: 2, clientX: 100, clientY: 100 });
+    canvasListeners.get('mousedown')!({ button: 2, ...EDGE });
     windowListeners.get('mousemove')!({ movementX: 10, movementY: 5 });
     expect(canvas.requestPointerLock).not.toHaveBeenCalled();
     // This move crosses the drag threshold: lock must engage on the SAME frame so
@@ -397,8 +539,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 0,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
     windowListeners.get('mousemove')!({ movementX: 10, movementY: 5 });
@@ -411,7 +552,7 @@ describe('Input pointer lock', () => {
     const { canvas, input, canvasListeners, windowListeners } = makeInput();
     input.setLockCursorOnRotate(false);
 
-    canvasListeners.get('mousedown')!({ button: 2, clientX: 100, clientY: 100 });
+    canvasListeners.get('mousedown')!({ button: 2, ...EDGE });
     windowListeners.get('mousemove')!({ movementX: 10, movementY: 5 });
     windowListeners.get('mousemove')!({ movementX: 4, movementY: 0 });
     windowListeners.get('mousemove')!({ movementX: 2, movementY: 0 });
@@ -424,7 +565,7 @@ describe('Input pointer lock', () => {
     (globalThis as any).document.fullscreenElement =
       (globalThis as any).document.documentElement ?? canvas;
 
-    canvasListeners.get('mousedown')!({ button: 2, clientX: 100, clientY: 100 });
+    canvasListeners.get('mousedown')!({ button: 2, ...EDGE });
     windowListeners.get('mousemove')!({ movementX: 19, movementY: 0 });
     windowListeners.get('mousemove')!({ movementX: 1, movementY: 0 });
 
@@ -441,8 +582,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
 
@@ -457,8 +597,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 0,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
 
@@ -475,8 +614,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 0,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
 
@@ -491,8 +629,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 0,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
 
@@ -507,8 +644,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
 
@@ -523,8 +659,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
 
@@ -547,8 +682,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
     expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
@@ -558,8 +692,7 @@ describe('Input pointer lock', () => {
     now += 200;
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
     expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
@@ -572,8 +705,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
 
@@ -592,13 +724,12 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
     expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
 
-    windowListeners.get('mouseup')!({ button: 2, clientX: 100, clientY: 100, target: canvas });
+    windowListeners.get('mouseup')!({ button: 2, ...EDGE, target: canvas });
     expect((globalThis as any).document.exitPointerLock).not.toHaveBeenCalled();
 
     (globalThis as any).document.pointerLockElement = canvas;
@@ -614,8 +745,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
 
@@ -649,6 +779,46 @@ describe('Input pointer lock', () => {
     expect(cb.onClickPick).toHaveBeenCalledWith(120, 160, 0);
   });
 
+  it('does not dispatch a canvas pick while gameplay input is blocked', () => {
+    const { canvas, cb, canvasListeners, windowListeners } = makeInput();
+    (cb as any).canUseGameKeys = vi.fn(() => false);
+
+    canvasListeners.get('mousedown')!({
+      button: 0,
+      clientX: 120,
+      clientY: 160,
+      preventDefault: vi.fn(),
+    });
+    windowListeners.get('mouseup')!({
+      button: 0,
+      clientX: 120,
+      clientY: 160,
+      target: canvas,
+    });
+
+    expect(cb.onClickPick).not.toHaveBeenCalled();
+  });
+
+  it('dispatches a canvas pick when the production gameplay gate explicitly allows it', () => {
+    const { canvas, cb, canvasListeners, windowListeners } = makeInput();
+    (cb as any).canUseGameKeys = vi.fn(() => true);
+
+    canvasListeners.get('mousedown')!({
+      button: 0,
+      clientX: 120,
+      clientY: 160,
+      preventDefault: vi.fn(),
+    });
+    windowListeners.get('mouseup')!({
+      button: 0,
+      clientX: 120,
+      clientY: 160,
+      target: canvas,
+    });
+
+    expect(cb.onClickPick).toHaveBeenCalledWith(120, 160, 0);
+  });
+
   it('starts camera drag by distance but discards the threshold-crossing movement', () => {
     const now = 1000;
     vi.spyOn(performance, 'now').mockImplementation(() => now);
@@ -657,8 +827,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
     windowListeners.get('mousemove')!({ movementX: 10, movementY: 5 });
@@ -674,24 +843,33 @@ describe('Input pointer lock', () => {
     expect(input.camYaw).toBeCloseTo(yaw - 2 * 0.0045);
   });
 
-  it('starts camera drag by hold duration even with small pointer movement', () => {
+  it('requests pointer lock before a duration-started right drag rotates', () => {
     let now = 1000;
     vi.spyOn(performance, 'now').mockImplementation(() => now);
-    const { input, canvasListeners, windowListeners } = makeInput();
+    const { canvas, input, canvasListeners, windowListeners } = makeInput();
     const yaw = input.camYaw;
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
     now += 150;
+    windowListeners.get('mousemove')!({ movementX: 0, movementY: 0 });
+    expect(canvas.requestPointerLock).not.toHaveBeenCalled();
+
     windowListeners.get('mousemove')!({ movementX: 1, movementY: 0 });
     expect(input.isCameraDragActive()).toBe(true);
     expect(input.camYaw).toBe(yaw);
+    expect(input.debugState()).toMatchObject({
+      rightDown: true,
+      cameraDragActive: true,
+      pointerLocked: false,
+    });
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
 
     windowListeners.get('mousemove')!({ movementX: 2, movementY: 0 });
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
     expect(input.camYaw).toBeCloseTo(yaw - 2 * 0.0045);
   });
 
@@ -727,8 +905,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
     now += 281;
@@ -753,8 +930,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
     windowListeners.get('mousemove')!({ movementX: 19, movementY: 0 });
@@ -1291,5 +1467,29 @@ describe('Input touch invert-look', () => {
     const rawYawDelta = 100 * 0.0045; // BASE_LOOK_SENS, mirrored here since it is not exported
 
     expect(dragYawDelta).toBeGreaterThan(rawYawDelta * 1.5);
+  });
+});
+
+describe('Input camera zoom (issue 1657)', () => {
+  it('zoomBy clamps camDist to [3,22] and reports each change to onCameraDistChange', () => {
+    const { input } = makeInput();
+    const changes: number[] = [];
+    input.onCameraDistChange = (d) => changes.push(d);
+    expect(input.camDist).toBe(12);
+    input.zoomBy(4); // 12 -> 16
+    input.zoomBy(-100); // clamps to the 3 min
+    input.zoomBy(100); // clamps to the 22 max
+    expect(input.camDist).toBe(22);
+    expect(changes).toEqual([16, 3, 22]);
+  });
+
+  it('does not fire onCameraDistChange when the clamp leaves camDist unchanged (no spurious persist)', () => {
+    const { input } = makeInput();
+    input.zoomBy(-100); // camDist -> 3 (min)
+    const changes: number[] = [];
+    input.onCameraDistChange = (d) => changes.push(d);
+    input.zoomBy(-5); // already at the min, no change
+    expect(input.camDist).toBe(3);
+    expect(changes).toEqual([]);
   });
 });

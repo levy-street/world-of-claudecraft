@@ -5,12 +5,40 @@ import { describe, expect, it } from 'vitest';
 import {
   createSceneOverlayState,
   overlayApplyOp,
+  overlayApplySync,
   overlayShowReply,
   SCENE_REPLY_SUBTITLE_SEC,
   sceneOverlayView,
 } from '../src/ui/hud/scene/scene_overlay_view';
 
 describe('scene overlay state', () => {
+  it('hard-converges letterbox state and clears stale transient presentation', () => {
+    const s = createSceneOverlayState();
+    overlayApplyOp(s, { kind: 'start', duration: 10 }, 0);
+    overlayApplyOp(s, { kind: 'line', speaker: 'a', speakerEntityId: null, key: 'k', dur: 8 }, 0);
+    overlayApplyOp(s, { kind: 'fade', to: 'black', dur: 1 }, 0);
+    overlayApplySync(s, {
+      sceneId: 'active',
+      remainingSeconds: 4,
+      inputLocked: true,
+      letterbox: true,
+      musicSilenced: true,
+    });
+    expect(sceneOverlayView(s, 1)).toMatchObject({
+      cinematic: true,
+      letterbox: true,
+      lineKey: null,
+      fadeOpacity: 0,
+    });
+    overlayApplySync(s, null);
+    expect(sceneOverlayView(s, 1)).toMatchObject({
+      cinematic: false,
+      letterbox: false,
+      lineKey: null,
+      fadeOpacity: 0,
+    });
+  });
+
   it('shows the skip hint for the whole scene and hides it after end', () => {
     const s = createSceneOverlayState();
     expect(sceneOverlayView(s, 0).skipHintVisible).toBe(false);
@@ -20,11 +48,18 @@ describe('scene overlay state', () => {
     expect(sceneOverlayView(s, 5).skipHintVisible).toBe(false);
   });
 
-  it('flags cinematic false before start, true through the scene, false after end (HUD hide)', () => {
+  it('keeps an unlocked active scene playable while the skip hint remains visible', () => {
     const s = createSceneOverlayState();
     expect(sceneOverlayView(s, 0).cinematic).toBe(false);
     overlayApplyOp(s, { kind: 'start', duration: 10 }, 0);
+    expect(sceneOverlayView(s, 1)).toMatchObject({
+      cinematic: false,
+      skipHintVisible: true,
+    });
+    overlayApplyOp(s, { kind: 'inputLock', on: true }, 1);
     expect(sceneOverlayView(s, 1).cinematic).toBe(true);
+    overlayApplyOp(s, { kind: 'inputLock', on: false }, 2);
+    expect(sceneOverlayView(s, 2).cinematic).toBe(false);
     overlayApplyOp(s, { kind: 'end' }, 5);
     expect(sceneOverlayView(s, 5).cinematic).toBe(false);
   });
@@ -34,6 +69,7 @@ describe('scene overlay state', () => {
     // must fall to false so the HUD is restored in one step, watched or skipped.
     const s = createSceneOverlayState();
     overlayApplyOp(s, { kind: 'start', duration: 10 }, 0);
+    overlayApplyOp(s, { kind: 'inputLock', on: true }, 0);
     overlayApplyOp(s, { kind: 'letterbox', on: true }, 0);
     overlayApplyOp(s, { kind: 'fade', to: 'black', dur: 5 }, 0);
     expect(sceneOverlayView(s, 1).cinematic).toBe(true);
@@ -111,9 +147,8 @@ describe('scene overlay state', () => {
     expect(m.skipHintVisible).toBe(false);
   });
 
-  it('ops the overlay does not own (camera/inputLock/music/anim) are ignored', () => {
+  it('presentation ops the overlay does not own (camera/music/anim) are ignored', () => {
     const s = createSceneOverlayState();
-    overlayApplyOp(s, { kind: 'inputLock', on: true }, 0);
     overlayApplyOp(s, { kind: 'music', directive: 'silence' }, 0);
     overlayApplyOp(s, { kind: 'camera', shot: { kind: 'release' } }, 0);
     overlayApplyOp(s, { kind: 'anim', entityId: 4, anim: 'wave' }, 0);
@@ -130,6 +165,28 @@ describe('scene overlay state', () => {
     expect(m.lineKey).toBe('lb.q0.reply');
     expect(m.speakerKey).toBe('lb.speaker.marsh');
     expect(sceneOverlayView(s, 100 + SCENE_REPLY_SUBTITLE_SEC).lineKey).toBeNull();
+  });
+
+  it('assigns distinct announcement ids to identical consecutive line and reply occurrences', () => {
+    const s = createSceneOverlayState();
+    const line = {
+      kind: 'line' as const,
+      speaker: 'lb.speaker.bell',
+      speakerEntityId: 3,
+      key: 'lb.q0.line1',
+      dur: 4,
+    };
+    overlayApplyOp(s, line, 0);
+    const firstLineId = sceneOverlayView(s, 0).announcementId;
+    overlayApplyOp(s, line, 1);
+    const secondLineId = sceneOverlayView(s, 1).announcementId;
+    expect(secondLineId).toBe(firstLineId + 1);
+
+    overlayShowReply(s, 'lb.q0.reply', 'lb.speaker.marsh', 2);
+    const firstReplyId = sceneOverlayView(s, 2).announcementId;
+    overlayShowReply(s, 'lb.q0.reply', 'lb.speaker.marsh', 3);
+    const secondReplyId = sceneOverlayView(s, 3).announcementId;
+    expect(secondReplyId).toBe(firstReplyId + 1);
   });
 
   it('returns the same reused model container across frames', () => {

@@ -5,6 +5,7 @@ import {
   ActionBarController,
 } from '../src/ui/hud/action_bar/action_bar_controller';
 import type { HotbarAction } from '../src/ui/hud/action_bar/hotbar';
+import type { ActionBarLayout } from '../src/world_api/action_bar';
 
 class MemoryStorage {
   readonly values = new Map<string, string>();
@@ -338,6 +339,25 @@ describe('ActionBarController form persistence', () => {
 
     expect(harness.controller.actions).toEqual(bar('prowl'));
   });
+
+  it('keeps a switched loadout layout until the target talent abilities arrive', () => {
+    const harness = makeHarness('mage', ['frostbolt', 'ice_lance'], bar('frostbolt', 'ice_lance'));
+    const fireLayout = bar();
+    fireLayout[5] = { type: 'ability', id: 'pyroblast' };
+    fireLayout[10] = { type: 'ability', id: 'fireball_form' };
+    const fireKnown = new Set(['fireball', 'pyroblast', 'fireball_form']);
+
+    harness.controller.replaceActionsForLoadout(fireLayout, fireKnown);
+    harness.controller.syncKnownAbilities();
+
+    expect(harness.controller.actions[5]).toEqual({ type: 'ability', id: 'pyroblast' });
+    expect(harness.controller.actions[10]).toEqual({ type: 'ability', id: 'fireball_form' });
+
+    harness.state.known = [...fireKnown];
+    harness.controller.syncKnownAbilities();
+
+    expect(harness.controller.actions).toEqual(fireLayout);
+  });
 });
 
 describe('ActionBarController attack slot', () => {
@@ -464,5 +484,94 @@ describe('ActionBarController: passives never occupy an action slot', () => {
 
     expect(controller.attackAction).toBeNull();
     expect(storage.getItem(key)).toBeNull();
+  });
+});
+
+describe('ActionBarController persistence seam', () => {
+  function persistHarness(): {
+    controller: ActionBarController;
+    storage: MemoryStorage;
+    persisted: ActionBarLayout[];
+  } {
+    const storage = new MemoryStorage();
+    const persisted: ActionBarLayout[] = [];
+    const controller = new ActionBarController({
+      storage,
+      playerClass: 'warrior',
+      playerName: 'ActionbarTester',
+      knownAbilityIds: () => ['heroic_strike', 'sunder_armor'],
+      hasAura: () => false,
+      isInSportMatch: () => false,
+      showAttackButton: () => true,
+      persistLayout: (layout) => persisted.push(layout),
+    });
+    return { controller, storage, persisted };
+  }
+
+  it('does NOT persist while loading during init (only user changes upload)', () => {
+    const { controller, persisted } = persistHarness();
+    controller.init();
+    expect(persisted).toEqual([]);
+  });
+
+  it('persists the full captured layout on a user-driven save after init', () => {
+    const { controller, persisted } = persistHarness();
+    controller.init();
+    controller.replaceActions(bar('heroic_strike'));
+    controller.saveActions();
+    expect(persisted).toHaveLength(1);
+    expect(persisted[0].forms.normal?.bar[0]).toEqual({ type: 'ability', id: 'heroic_strike' });
+  });
+
+  it('does NOT persist while re-seeding from storage in reload (server-wins restore)', () => {
+    const { controller, storage, persisted } = persistHarness();
+    controller.init();
+    persisted.length = 0;
+    // Simulate a server layout landing in the mirror, then a reload.
+    storage.setItem('woc_hotbar_warrior_ActionbarTester', JSON.stringify(bar('sunder_armor')));
+    controller.reload();
+    expect(persisted).toEqual([]);
+    expect(controller.actions[0]).toEqual({ type: 'ability', id: 'sunder_armor' });
+  });
+
+  it('keeps offline localStorage behavior byte-identical when no persistLayout is wired', () => {
+    const storage = new MemoryStorage();
+    const controller = new ActionBarController({
+      storage,
+      playerClass: 'warrior',
+      playerName: 'ActionbarTester',
+      knownAbilityIds: () => ['heroic_strike'],
+      hasAura: () => false,
+      isInSportMatch: () => false,
+      showAttackButton: () => true,
+      // no persistLayout: offline arm
+    });
+    controller.init();
+    controller.replaceActions(bar('heroic_strike'));
+    expect(() => controller.saveActions()).not.toThrow();
+    expect(JSON.parse(storage.getItem('woc_hotbar_warrior_ActionbarTester') ?? 'null')[0]).toEqual({
+      type: 'ability',
+      id: 'heroic_strike',
+    });
+  });
+});
+
+describe('isHotbarItemId: reusable item actions are placeable', () => {
+  it('admits mount reins and every gathering implement shape alongside consumables', () => {
+    const { controller } = makeHarness('warrior', [], []);
+    // Gathering tools (picks/axes/sickles) and the tiered rods are gatherTool
+    // items; the simple pole rides the pre-existing use.type 'fishing' arm.
+    expect(controller.isHotbarItemId('copper_mining_pick')).toBe(true);
+    expect(controller.isHotbarItemId('silverstream_fishing_rod')).toBe(true);
+    expect(controller.isHotbarItemId('simple_fishing_pole')).toBe(true);
+    expect(controller.isHotbarItemId('reins_grag_bear')).toBe(true);
+    expect(controller.isAssignableAction({ type: 'item', id: 'reins_grag_bear' })).toBe(true);
+    const withReins = bar();
+    withReins[0] = { type: 'item', id: 'reins_grag_bear' };
+    controller.replaceActions(withReins);
+    expect(controller.actionForSlot(1)).toEqual({ type: 'item', id: 'reins_grag_bear' });
+    // Regression companions: the consumable arms and the non-usable negative.
+    expect(controller.isHotbarItemId('lesser_healing_potion')).toBe(true);
+    expect(controller.isHotbarItemId('copper_ore')).toBe(false);
   });
 });

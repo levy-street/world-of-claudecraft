@@ -1,10 +1,22 @@
-import { CLASSES, ITEMS, QUEST_ORDER, QUESTS, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from './data';
+import { MAX_SCENE_CHOICE_OPTIONS } from '../scene_protocol';
+import { noticeboardDefByEntityId } from './content/noticeboards';
+import {
+  CLASSES,
+  ITEMS,
+  QUEST_ORDER,
+  QUESTS,
+  WORLD_MAX_X,
+  WORLD_MAX_Z,
+  WORLD_MIN_X,
+  WORLD_MIN_Z,
+} from './data';
 import type { Sim } from './sim';
 import {
   angleTo,
   dist2d,
   type Entity,
   GCD,
+  INTERACT_RANGE,
   MAX_LEVEL,
   normAngle,
   questObjectiveRequired,
@@ -38,6 +50,11 @@ export const ACTIONS = [
   'interact', // loot corpse / pick up object / talk to quest npc
   'stop', // stop moving + stop attacking
   'eat_drink', // consume best food (or water for mana classes) from bags
+  'scene_skip',
+  'scene_choice_1',
+  'scene_choice_2',
+  'scene_choice_3',
+  'scene_choice_4',
 ] as const;
 
 export const NUM_ACTIONS = ACTIONS.length;
@@ -107,11 +124,16 @@ export function applyAction(sim: Sim, action: number): void {
       }
       break;
     }
+    case 'scene_skip':
+      sim.sceneSkip();
+      break;
     case 'noop':
       break;
     default: {
       if (name.startsWith('ability_')) {
         sim.castAbilityBySlot(parseInt(name.slice(8), 10) - 1);
+      } else if (name.startsWith('scene_choice_')) {
+        sim.answerActiveSceneChoiceByIndex(parseInt(name.slice(13), 10) - 1);
       }
     }
   }
@@ -133,7 +155,7 @@ export function applyAction(sim: Sim, action: number): void {
 const NEARBY_MOBS = 5;
 
 export function obsSize(): number {
-  return 16 + ABILITY_SLOTS * 2 + 9 + NEARBY_MOBS * 6 + 5 + QUEST_ORDER.length * 2;
+  return 16 + ABILITY_SLOTS * 2 + 9 + NEARBY_MOBS * 6 + 5 + QUEST_ORDER.length * 2 + 8;
 }
 
 export function encodeObs(sim: Sim): number[] {
@@ -145,7 +167,9 @@ export function encodeObs(sim: Sim): number[] {
   obs.push(p.resource / Math.max(1, p.maxResource));
   obs.push(p.level / MAX_LEVEL);
   obs.push(p.level >= MAX_LEVEL ? 1 : sim.xp / xpForLevel(p.level));
-  obs.push(clamp(p.pos.x / WORLD_MAX_X, -1, 1));
+  obs.push(
+    clamp((p.pos.x - (WORLD_MIN_X + WORLD_MAX_X) / 2) / ((WORLD_MAX_X - WORLD_MIN_X) / 2), -1, 1),
+  );
   obs.push(
     clamp((p.pos.z - (WORLD_MIN_Z + WORLD_MAX_Z) / 2) / ((WORLD_MAX_Z - WORLD_MIN_Z) / 2), -1, 1),
   );
@@ -217,20 +241,46 @@ export function encodeObs(sim: Sim): number[] {
     }
   }
 
-  // --- nearest interactable (5): corpse, ground object, or quest npc ---
-  let best: { e: Entity; d: number; type: number } | null = null;
-  for (const e of sim.entities.values()) {
-    let type = 0;
-    if (e.kind === 'mob' && e.lootable) type = 0.33;
-    else if (e.kind === 'object' && e.lootable) type = 0.66;
-    else if (e.kind === 'npc') type = 1;
-    else continue;
-    const d = dist2d(p.pos, e.pos);
-    if (d < 60 && (!best || d < best.d)) best = { e, d, type };
-  }
+  // --- proximity interactable (5): corpse, ground object, or quest npc ---
+  // Match the no-target Sim.interact path: only advertise entities the interact
+  // action can select now, and preserve its corpse, object, then quest-NPC priority.
+  // Noticeboards own a narrower authored radius; ordinary objects keep the shared
+  // five-yard interaction range.
+  type Interactable = { e: Entity; d2: number; type: number };
+  let bestCorpse: Interactable | null = null;
+  let bestCorpseD2 = INTERACT_RANGE * INTERACT_RANGE;
+  let bestObject: Interactable | null = null;
+  let bestObjectD2 = INTERACT_RANGE * INTERACT_RANGE;
+  let bestQuestEntity: Interactable | null = null;
+  let bestQuestEntityD2 = INTERACT_RANGE * INTERACT_RANGE;
+  sim.grid.forEachInRadius(p.pos.x, p.pos.z, INTERACT_RANGE, (e, d2) => {
+    if (e.kind === 'mob' && e.lootable && d2 < bestCorpseD2) {
+      bestCorpse = { e, d2, type: 0.33 };
+      bestCorpseD2 = d2;
+    }
+    if (e.kind === 'object' && e.lootable && d2 < bestObjectD2) {
+      const noticeboardDef = noticeboardDefByEntityId(sim.noticeboardDefinitions, e.id);
+      if (!noticeboardDef || d2 <= noticeboardDef.interactionRadius ** 2) {
+        bestObject = { e, d2, type: 0.66 };
+        bestObjectD2 = d2;
+      }
+    }
+    const questEntity =
+      e.kind === 'npc' || (e.kind === 'mob' && !e.hostile && !e.dead && e.questIds.length > 0);
+    if (questEntity && d2 < bestQuestEntityD2) {
+      bestQuestEntity = { e, d2, type: 1 };
+      bestQuestEntityD2 = d2;
+    }
+  });
+  // Re-read through wider types: TypeScript cannot see the closure assignments above.
+  const best =
+    (bestCorpse as Interactable | null) ??
+    (bestObject as Interactable | null) ??
+    (bestQuestEntity as Interactable | null);
   if (best) {
+    const d = Math.sqrt(best.d2);
     const rel = normAngle(angleTo(p.pos, best.e.pos) - p.facing);
-    obs.push(1, clamp(best.d / 40, 0, 1.5), Math.sin(rel), Math.cos(rel), best.type);
+    obs.push(1, clamp(d / 40, 0, 1.5), Math.sin(rel), Math.cos(rel), best.type);
   } else {
     obs.push(0, 1.5, 0, 0, 0);
   }
@@ -253,6 +303,23 @@ export function encodeObs(sim: Sim): number[] {
     } else {
       obs.push(state === 'done' ? 1 : 0);
     }
+  }
+
+  // --- scene/choice controls (8, appended so every established slot stays stable) ---
+  const scene = sim.sceneReconnectStateFor(p.id);
+  const choice = sim.sceneChoiceReconnectStateFor(p.id);
+  obs.push(scene === null ? 0 : 1);
+  obs.push(choice === null ? 0 : 1);
+  obs.push(choice?.leaderPid === p.id ? 1 : 0);
+  obs.push(
+    choice === null
+      ? 0
+      : choice.remainingSeconds === null || choice.windowSeconds <= 0
+        ? 1
+        : clamp(choice.remainingSeconds / choice.windowSeconds, 0, 1),
+  );
+  for (let index = 0; index < MAX_SCENE_CHOICE_OPTIONS; index++) {
+    obs.push(choice !== null && index < choice.options.length ? 1 : 0);
   }
 
   return obs;

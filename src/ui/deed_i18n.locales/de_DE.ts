@@ -77,7 +77,7 @@ export const table: DeedLocaleTable = {
   },
   prog_master_gatherer: {
     name: 'Meistersammler',
-    desc: 'Erreiche eine Fertigkeit von 100 in Bergbau, Holzfällerei und Kräuterkunde.',
+    desc: 'Erreiche eine Fertigkeit von 100 in beliebigen drei von Bergbau, Holzfällen, Kräuterkunde und Angeln.',
   },
   prog_first_craft: {
     name: 'Handarbeit',
@@ -436,7 +436,10 @@ export const table: DeedLocaleTable = {
     name: 'Stammkunde',
     desc: 'Entdecke alle zehn Stücke aus dem Vorrat des Heroischen Quartiermeisters.',
   },
-  col_glimmerfin: { name: 'Ein Schimmer Hoffnung', desc: 'Fange einen Schimmerflossen-Koi.' },
+  col_glimmerfin: {
+    name: 'Ein Schimmer Hoffnung',
+    desc: 'Fange einen Sonnenschimmer-Koi.',
+  },
   col_full_creel: {
     name: 'Voller Fangkorb',
     desc: 'Entdecke alle sechs gewöhnlichen Fänge aus den Gewässern des Tals, des Moors und der Höhen.',
@@ -615,7 +618,10 @@ export const table: DeedLocaleTable = {
     name: 'Etwas Glitzerndes',
     desc: 'Hebe ein funkelndes Objekt vom Boden auf.',
   },
-  exp_first_ore: { name: 'Hau in den Fels', desc: 'Baue dein erstes Erzvorkommen ab.' },
+  exp_first_ore: {
+    name: 'Pickel trifft Stein',
+    desc: 'Baue dein erstes Erzvorkommen ab.',
+  },
   exp_first_timber: { name: 'Baum fällt!', desc: 'Ernte dein erstes Holzvorkommen.' },
   exp_first_herb: { name: 'Ein grüner Daumen', desc: 'Ernte dein erstes Kräutervorkommen.' },
   feat_era_cap: {
@@ -687,5 +693,120 @@ export const table: DeedLocaleTable = {
   chr_marsh_first_cast: {
     name: 'Aale im Schilf',
     desc: 'Fange einen Fisch aus den Gewässern des Mirefen-Moors.',
+  },
+  prog_guildsworn: {
+    name: 'Handwerksgeschworen',
+    desc: 'Stimme dich auf ein Archetyp-Paar ein und nimm seine Berufe ernsthaft auf.',
+    title: 'Handwerksgeschworen',
+  },
+  prog_masterwright: {
+    name: 'Meisterwerk-Macher',
+    desc: 'Fertige dein erstes Meisterwerk, ein Stück so fein, dass die ganze Zone davon erfährt.',
+    title: 'Meisterwerk-Macher',
+  },
+  prog_fishing_100: {
+    name: 'Alter Salzfisch',
+    desc: 'Erreiche eine Angelfertigkeit von 100.',
+  },
+  prog_master_angler: {
+    name: 'Meisterangler',
+    desc: 'Erreiche eine Angelfertigkeit von 200, den Gipfel der Anglerkunst.',
+    title: 'Meisterangler',
+  },
+  prog_engineering_50: {
+    name: 'Zahnräder und Schrauben',
+    desc: 'Erreiche eine Fertigkeit von 50 im Ingenieurswesen.',
+  },
+  prog_alchemy_50: {
+    name: 'Seltsame Gebräue',
+    desc: 'Erreiche eine Fertigkeit von 50 in der Alchemie.',
+  },
+  prog_cooking_50: {
+    name: 'Erfahrener Koch',
+    desc: 'Erreiche eine Fertigkeit von 50 im Kochen.',
+  },
+  prog_leatherworking_50: {
+    name: 'Gerbers Gewerbe',
+    desc: 'Erreiche eine Fertigkeit von 50 in der Lederverarbeitung.',
+  },
+  prog_tailoring_50: {
+    name: 'Eine feine Naht',
+    desc: 'Erreiche eine Fertigkeit von 50 in der Schneiderei.',
+  },
+  prog_enchanting_50: {
+    name: 'Ein Schimmer des Arkanen',
+    desc: 'Erreiche eine Fertigkeit von 50 in der Verzauberung.',
+  },
+  prog_weaponcrafting_50: {
+    name: 'Schärfe und Härte',
+    desc: 'Erreiche eine Fertigkeit von 50 in der Waffenherstellung.',
+  },
+  prog_armorcrafting_50: {
+    name: 'Hammer und Platte',
+    desc: 'Erreiche eine Fertigkeit von 50 in der Rüstungsherstellung.',
+  },
+  prog_grandmaster_engineering: {
+    name: 'Großmeister des Ingenieurswesens',
+    desc: 'Erreiche eine Fertigkeit von 125 im Ingenieurswesen, den Gipfel des Handwerks.',
+    title: 'Großmeister des Ingenieurswesens',
+  },
+  prog_grandmaster_alchemy: {
+    name: 'Großmeister der Alchemie',
+    desc: 'Erreiche eine Fertigkeit von 125 in der Alchemie, den Gipfel des Handwerks.',
+    title: 'Großmeister der Alchemie',
+  },
+  prog_grandmaster_cooking: {
+    name: 'Großmeister des Kochens',
+    desc: 'Erreiche eine Fertigkeit von 125 im Kochen, den Gipfel des Handwerks.',
+    title: 'Großmeister des Kochens',
+  },
+  prog_grandmaster_leatherworking: {
+    name: 'Großmeister der Lederverarbeitung',
+    desc: 'Erreiche eine Fertigkeit von 125 in der Lederverarbeitung, den Gipfel des Handwerks.',
+    title: 'Großmeister der Lederverarbeitung',
+  },
+  prog_grandmaster_tailoring: {
+    name: 'Großmeister der Schneiderei',
+    desc: 'Erreiche eine Fertigkeit von 125 in der Schneiderei, den Gipfel des Handwerks.',
+    title: 'Großmeister der Schneiderei',
+  },
+  prog_grandmaster_enchanting: {
+    name: 'Großmeister der Verzauberung',
+    desc: 'Erreiche eine Fertigkeit von 125 in der Verzauberung, den Gipfel des Handwerks.',
+    title: 'Großmeister der Verzauberung',
+  },
+  prog_grandmaster_weaponcrafting: {
+    name: 'Großmeister der Waffenherstellung',
+    desc: 'Erreiche eine Fertigkeit von 125 in der Waffenherstellung, den Gipfel des Handwerks.',
+    title: 'Großmeister der Waffenherstellung',
+  },
+  prog_grandmaster_armorcrafting: {
+    name: 'Großmeister der Rüstungsherstellung',
+    desc: 'Erreiche eine Fertigkeit von 125 in der Rüstungsherstellung, den Gipfel des Handwerks.',
+    title: 'Großmeister der Rüstungsherstellung',
+  },
+  col_pristine_vein: {
+    name: 'Makellose Ader',
+    desc: 'Breche eine makellose Ader auf und lass die ganze Zone davon erfahren.',
+  },
+  col_ancient_heartwood: {
+    name: 'Altes Herzholz',
+    desc: 'Gewinne ein Stück altes Herzholz aus einem gefällten Baumbestand.',
+  },
+  col_moonlit_bloom: {
+    name: 'Mondlichtblüte',
+    desc: 'Ernte eine Mondlichtblüte genau in dem Augenblick, da sie sich öffnet.',
+  },
+  col_perfect_specimen: {
+    name: 'Ein Makelloses Exemplar',
+    desc: 'Entnimm einem erlegten Tier ein makelloses Exemplar, ohne Kerbe und ohne Makel.',
+  },
+  soc_first_salvage: {
+    name: 'Kein Rest verschwendet',
+    desc: 'Zerlege ein Ausrüstungsstück zu Rohmaterialien.',
+  },
+  soc_salvage_50: {
+    name: 'Der Schrottplatz',
+    desc: 'Zerlege 50 Ausrüstungsstücke zu Rohmaterialien.',
   },
 };

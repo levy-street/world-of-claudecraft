@@ -1,6 +1,232 @@
 {
   "license": "World of ClaudeCraft original art (project-owned) unless an entry carries its own \"license\" field, which overrides this file-level default.",
   "iconSize": 128,
-  "note": "Profession and gathering skill icons (Professions 2.0). Ids follow docs/professions-2/asset-manifest.json (prof_<craftId>, gather_<skill>). WebP only; add art with `npm run assets:professions`, then wire each basename into PROFESSION_IMAGE_IDS (src/ui/icons.ts) and add its provenance entry here ({ \"id\", \"name\", \"source\", optional \"license\" }). The set ships empty: every id renders via its procedural recipe until painted art lands.",
-  "entries": []
+  "note": "Profession, gathering, archetype, and masterwork icons for Professions 2.0. Ids follow docs/design/professions-asset-manifest.json. WebP only; add art with `npm run assets:professions`, which regenerates PROFESSION_IMAGE_IDS, then add its exact provenance here.",
+  "entries": [
+    {
+      "id": "archetype_apothecary",
+      "name": "The Apothecary",
+      "batch": "batch-3",
+      "acceptedVersion": "v1",
+      "source": "batch-3/masters/archetype_apothecary.png",
+      "sourceSha256": "5ec39b3b0f616c182ae6f0a46bdc0e6432e7327e3c69f6646b247260b47f2d8c",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "id": "archetype_arcanist",
+      "name": "The Arcanist",
+      "batch": "batch-4",
+      "acceptedVersion": "v3",
+      "source": "batch-4/masters/archetype_arcanist.png",
+      "sourceSha256": "4cc18d9c6496ed93c7d4aaa44b63da0971d1c07b9419157fc379540bc243bab0",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "id": "archetype_bladewright",
+      "name": "The Bladewright",
+      "batch": "batch-4",
+      "acceptedVersion": "v2",
+      "source": "batch-4/masters/archetype_bladewright.png",
+      "sourceSha256": "1d250c09f55021bfd69f25554f2d2cde9f7d965b93547f9b271c85a78cb18928",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "id": "archetype_bombardier",
+      "name": "The Bombardier",
+      "batch": "batch-3",
+      "acceptedVersion": "v1",
+      "source": "batch-3/masters/archetype_bombardier.png",
+      "sourceSha256": "d3e8747da3dcac8c6baa3f657fd5d75d6c896e4f12be2c45f888839d2805772c",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "id": "archetype_cogsmith",
+      "name": "The Gearwright",
+      "batch": "batch-4",
+      "acceptedVersion": "v2",
+      "source": "batch-4/masters/archetype_cogsmith.png",
+      "sourceSha256": "1d3547b89f0e45029d89d909dd1c2c59c269f132e4405e33c643627e245d2dc1",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "id": "archetype_gembinder",
+      "name": "The Gembinder",
+      "batch": "batch-4",
+      "acceptedVersion": "v2",
+      "source": "batch-4/masters/archetype_gembinder.png",
+      "sourceSha256": "dc42b5a102fcec302ce270aeae37862bb4624cbde3e59ee91e7c50e558435b11",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "id": "archetype_mageweaver",
+      "name": "The Inkweaver",
+      "batch": "batch-4",
+      "acceptedVersion": "v3",
+      "source": "batch-4/masters/archetype_mageweaver.png",
+      "sourceSha256": "521918b1ed68d662eb7dd679b79a17ac66a50b992139bf23766f3f27e87e6785",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "id": "archetype_outfitter",
+      "name": "The Outfitter",
+      "batch": "batch-3",
+      "acceptedVersion": "v1",
+      "source": "batch-3/masters/archetype_outfitter.png",
+      "sourceSha256": "8f5565e962460015e368d14c1e73047eb49420a536f8ad77acc06ead9e86fd7e",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "id": "archetype_smith",
+      "name": "The Smith",
+      "batch": "batch-3",
+      "acceptedVersion": "v6",
+      "source": "batch-3/masters/archetype_smith.png",
+      "sourceSha256": "5a24b0d00505d06ed3574abefe2653e19d7f417d6ea7d5c09895083cb89fcb5d",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "id": "archetype_trapper",
+      "name": "The Trapper",
+      "batch": "batch-4",
+      "acceptedVersion": "v3",
+      "source": "batch-4/masters/archetype_trapper.png",
+      "sourceSha256": "4bff657d54d4709b962721c037f870e671770b9c4539dd8b3338d8192e3de1df",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "id": "gather_fishing",
+      "name": "Fishing",
+      "batch": "batch-2",
+      "acceptedVersion": "v12",
+      "source": "batch-2/masters/gather_fishing.png",
+      "sourceSha256": "19507920de33c82c8677b6cb217c78f4ab79c370aa0ff0eaf83d7e96ff31f51d",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "id": "gather_herbalism",
+      "name": "Herbalism",
+      "batch": "batch-2",
+      "acceptedVersion": "v11",
+      "source": "batch-2/masters/gather_herbalism.png",
+      "sourceSha256": "412cf2b82ca0e2b6c50e77d25a6e56d79497f9aca8959a12193dd61b90178be6",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "id": "gather_logging",
+      "name": "Logging",
+      "batch": "batch-2",
+      "acceptedVersion": "v41",
+      "source": "batch-2/masters/gather_logging.png",
+      "sourceSha256": "9a1cf7467168b73a54bb8e9c97df5a4258e3eb4f47d4ff416b874b442455ccd5",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "id": "gather_mining",
+      "name": "Mining",
+      "batch": "batch-2",
+      "acceptedVersion": "v20",
+      "source": "batch-2/masters/gather_mining.png",
+      "sourceSha256": "90c31f0b5d5a4fe61614a36a12784f9d67fd429dbc330d14f325d5093625b0e4",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "id": "masterwork_seal",
+      "name": "Masterwork seal",
+      "batch": "batch-5",
+      "acceptedVersion": "v2",
+      "source": "batch-5/masters/masterwork_seal.png",
+      "sourceSha256": "9840e1db9cfe32ac4e2e3ed0449860b179040ec52095628c961c286926b0e9b1",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "id": "prof_alchemy",
+      "name": "Alchemy",
+      "batch": "batch-1",
+      "acceptedVersion": "v23",
+      "source": "batch-1/masters/prof_alchemy.png",
+      "sourceSha256": "90c3129d3300c59a1d5ae23df90ebf5b4fa0704ef6a018f74d9b5d0dcf5f5b0f",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "id": "prof_armorcrafting",
+      "name": "Armorcrafting",
+      "batch": "batch-1",
+      "acceptedVersion": "v7",
+      "source": "batch-1/masters/prof_armorcrafting.png",
+      "sourceSha256": "0175057f4a323c38cd8237aa76006d3e93bba026f1a3d4189e554dec75753cb0",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "id": "prof_cooking",
+      "name": "Cooking",
+      "batch": "batch-1",
+      "acceptedVersion": "v16",
+      "source": "batch-1/masters/prof_cooking.png",
+      "sourceSha256": "2f0cdd98dc50335cee670af10698e64abec32d17c796f719dcbfc12b73c1367a",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "id": "prof_enchanting",
+      "name": "Enchanting",
+      "batch": "batch-1",
+      "acceptedVersion": "v7",
+      "source": "batch-1/masters/prof_enchanting.png",
+      "sourceSha256": "d0642d07e8c167efd3206f191f9bf4a37e17a64e4aaa6a9265c399d310da4627",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "id": "prof_engineering",
+      "name": "Engineering",
+      "batch": "batch-1",
+      "acceptedVersion": "v6",
+      "source": "batch-1/masters/prof_engineering.png",
+      "sourceSha256": "968113ffc990a049fa27d4791c362613b774922d6e060a3f8015cd8d6ececc30",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "id": "prof_inscription",
+      "name": "Inscription",
+      "batch": "batch-1",
+      "acceptedVersion": "v17",
+      "source": "batch-1/masters/prof_inscription.png",
+      "sourceSha256": "a61ebe1f93912ca756735076cb8db309c9cf95ed170b7afb5015541cb8847257",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "id": "prof_jewelcrafting",
+      "name": "Jewelcrafting",
+      "batch": "batch-1",
+      "acceptedVersion": "v7",
+      "source": "batch-1/masters/prof_jewelcrafting.png",
+      "sourceSha256": "7919dd252e18518c35e883a1c940364024ac575b5093acd4ab3136181a4a37c9",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "id": "prof_leatherworking",
+      "name": "Leatherworking",
+      "batch": "batch-1",
+      "acceptedVersion": "v2",
+      "source": "batch-1/masters/prof_leatherworking.png",
+      "sourceSha256": "a09822fdb678889d1c19212a5d1bd081cc891ba37aea7d2f4f05b8988c91ac78",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "id": "prof_tailoring",
+      "name": "Tailoring",
+      "batch": "batch-1",
+      "acceptedVersion": "v3",
+      "source": "batch-1/masters/prof_tailoring.png",
+      "sourceSha256": "2bd8973bfdd15835c12769c7d035e4cad2e2771727bb58f6f292fc1a28893b0f",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "id": "prof_weaponcrafting",
+      "name": "Weaponcrafting",
+      "batch": "batch-1",
+      "acceptedVersion": "v26",
+      "source": "batch-1/masters/prof_weaponcrafting.png",
+      "sourceSha256": "17d084cc1b270fb5a9cdf7ed20a22c30f976f6fafb671fa2327e5c8ef78656ad",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    }
+  ]
 }

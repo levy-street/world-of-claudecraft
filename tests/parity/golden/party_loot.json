@@ -8,12 +8,12 @@
     "multi-player party"
   ],
   "draws": 2,
-  "drawDigest": "32d9a29b",
+  "drawDigest": "eb8d71f4",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 841,
+      "nextId": 843,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -27,12 +27,12 @@
     {
       "tick": 3,
       "time": 0.15,
-      "nextId": 844,
-      "state": "8faeb5c1",
-      "events": "fa83459a",
+      "nextId": 846,
+      "state": "37f37bc3",
+      "events": "7bf7ba48",
       "rng": {
         "draws": 2,
-        "digest": "32d9a29b"
+        "digest": "eb8d71f4"
       },
       "label": "final",
       "players": [
@@ -74,7 +74,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 841,
+          "entityId": 843,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -97,7 +97,6 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "renown": 5,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -140,7 +139,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 842,
+          "entityId": 844,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -162,7 +161,6 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "renown": 5,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -181,7 +179,7 @@
               "name": "Battle Stance",
               "remaining": 3599.85,
               "school": "physical",
-              "sourceId": 841
+              "sourceId": 843
             }
           ],
           "blockChance": 0.05,
@@ -191,10 +189,10 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 0.860353,
+          "fallStartY": 0.954697,
           "fiveSecondRule": 99.15,
           "hp": 100,
-          "id": 841,
+          "id": 843,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -207,7 +205,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 20,
-            "y": 0.860353,
+            "y": 0.954697,
             "z": 20
           },
           "potionCooldownUntil": -1,
@@ -241,10 +239,10 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 0.639595,
+          "fallStartY": 0.774854,
           "fiveSecondRule": 99.15,
           "hp": 54,
-          "id": 842,
+          "id": 844,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -256,7 +254,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 21,
-            "y": 0.639595,
+            "y": 0.774854,
             "z": 20
           },
           "potionCooldownUntil": -1,
@@ -292,11 +290,11 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.031633,
+          "fallStartY": 1.076834,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 54,
-          "id": 843,
+          "id": 845,
           "kind": "mob",
           "level": 2,
           "lootFfaTimer": "Infinity",
@@ -308,20 +306,20 @@
           "petMode": "defensive",
           "pos": {
             "x": 20,
-            "y": 1.031633,
+            "y": 1.076834,
             "z": 22
           },
           "potionCooldownUntil": -1,
           "respawnTimer": -0.15,
           "spawnPos": {
             "x": 20,
-            "y": 1.031633,
+            "y": 1.076834,
             "z": 22
           },
           "stats": {
             "armor": 10
           },
-          "tappedById": 841,
+          "tappedById": 843,
           "templateId": "forest_wolf",
           "weapon": {
             "max": 6,

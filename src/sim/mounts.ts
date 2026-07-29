@@ -1,45 +1,39 @@
-// Rideable ground mounts: collection + selection + mount/dismount rules, a
-// sibling sim system behind the SimContext seam (module-first; sim.ts keeps
-// thin delegates).
+// Rideable ground mounts: collection + mount/dismount rules, a sibling sim
+// system behind the SimContext seam (module-first; sim.ts keeps thin delegates).
 //
 // Collection model: EVERY catalog mount is owned while its soulbound reins item
-// (ItemDef kind 'mount') sits in the player's bags or bank. The horse
-// (DEFAULT_MOUNT) is no longer free: it has its own reins item too, sold by the
+// (ItemDef kind 'mount') sits in the player's bags or bank. The horse is no
+// longer free: it has its own reins item too, sold by the
 // stablemaster, so a fresh player owns nothing until they buy or loot a mount.
-// PlayerMeta.selectedMount is the persisted stable pick (horse by default, and
-// may name an unowned mount, which is harmless: the toggle falls back to the
-// first owned mount). The live "riding X right now" state is Entity.mountKey
-// ('' dismounted), which the wire mirrors like `skin` so every host (renderer,
-// other clients, the online self extrapolator) reads the same field the
-// speed hook uses.
+// There is NO persisted "selected mount": reins are usable items, so you ride by
+// using the reins (summonMountItem, reached through items.ts useItem) and the
+// item you clicked IS the choice. The live "riding X right now" state is
+// Entity.mountKey ('' dismounted), which the wire mirrors like `skin` so every
+// host (renderer, other clients, the online self extrapolator) reads the same
+// field the speed hook uses.
 //
-// Summoning is not instant: mounting channels a short summon and dismounting a
-// quicker put-away (updateMountTransition, driven per tick and interruptible by
-// combat or water). Rules: selecting requires owning the mount and meeting its
-// level gate; starting a mount re-validates ownership, and is blocked while in
-// combat, dead, or a released spirit; dismounting is always allowed; death and
-// water force-dismount instantly. Every mount is a ground mount, no flying:
-// nothing here touches the vertical axis.
+// Summoning is not instant: mounting channels a short summon (updateMountTransition,
+// driven per tick and interruptible by combat or water). DISMOUNTING is instant
+// from every path, with no channel at all. Swapping straight from one mount to
+// another is instant too: there is nothing to put away. Rules: summoning requires
+// the riding skill FIRST, then ownership, and is blocked while in combat, dead, or
+// a released spirit; dismounting is never gated; death and water force-dismount
+// instantly. There is no per-mount level gate. Every mount is a ground mount, no
+// flying: nothing here touches the vertical axis.
 //
 // `src/sim`-pure and rng-free.
 
-import {
-  MOUNT_KEYS,
-  type MountKey,
-  mountDef,
-  normalizeSelectedMount,
-  TRAINING_MOUNT_KEY,
-} from './content/mounts';
+import { MOUNT_KEYS, type MountKey, mountDef, TRAINING_MOUNT_KEY } from './content/mounts';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { DT, type Entity, FORM_AURA_KINDS } from './types';
 
-// Summon/dismount channel durations (seconds). Mounting is a short cast the
-// player can interrupt by moving into combat or water; dismounting is quicker.
+// Summon channel duration (seconds). Mounting is a short cast the player can
+// interrupt by moving into combat or water. Dismounting has NO channel: it is
+// instant from every path (forceDismount), so there is no matching constant.
 export const MOUNT_SUMMON_SECONDS = 1.5;
-export const MOUNT_DISMOUNT_SECONDS = 0.8;
 
 // The reins itemId per catalog mount, derived once from the merged ITEMS table
 // (single source: the item record declares `mount`, nothing re-lists the map).
@@ -103,7 +97,7 @@ function trainingSummon(meta: PlayerMeta | undefined, key: string): boolean {
 }
 
 /** Force an instant dismount with no put-away channel: clears the live mount and
- *  any in-flight summon/dismount channel, then recomputes stats. Used by the riding
+ *  any in-flight mount transition, then recomputes stats. Used by the riding
  *  lesson to take the unowned training steed back the moment the lesson ends, and by
  *  the auto-attack loop and cast path to dismount on ability use. */
 export function forceDismount(ctx: SimContext, e: Entity): void {
@@ -130,40 +124,6 @@ export function forceTrainingMount(ctx: SimContext, e: Entity): boolean {
 
 const RIDING_UNTRAINED_MSG = 'You must learn to ride first. Find a riding trainer.';
 
-/** Pick the player's stable mount (persisted). Riding skill-, ownership-, and
- *  level-gated; swaps the live mount in place when already riding. Returns false
- *  on an unknown key or a failed gate (an error event carries the reason). */
-export function selectMount(ctx: SimContext, pid: number, key: string): boolean {
-  const meta = ctx.players.get(pid);
-  const e = ctx.entities.get(pid);
-  if (!meta || !e) return false;
-  const def = mountDef(key);
-  if (!def) return false;
-  if (!meta.ridingTrained) {
-    ctx.error(pid, RIDING_UNTRAINED_MSG);
-    return false;
-  }
-  if (!mountOwned(meta, def.key)) {
-    // The reins item is not in bags or bank. Reuses the registered useItem
-    // deny (sim_i18n error.noItem) instead of minting a new sim string.
-    ctx.error(pid, "You don't have that item.");
-    return false;
-  }
-  if (e.level < def.level) {
-    ctx.error(pid, `You must be level ${def.level} to ride that mount.`);
-    return false;
-  }
-  meta.selectedMount = def.key;
-  // Swap the ridden mount in place only OUT of combat: a mid-fight swap would
-  // bypass toggleMount's combat gate. In combat the pick still updates and applies
-  // on the next mount.
-  if (e.mountKey && e.mountKey !== def.key && !e.inCombat && !e.dead && !e.ghost) {
-    e.mountKey = def.key;
-    recalcFor(ctx, e, meta);
-  }
-  return true;
-}
-
 /** Strip all active form auras (FORM_AURA_KINDS) and ghost_wolf from the entity,
  *  emitting aura-removal events for each one removed. Called before a mount summon
  *  starts so the player is never simultaneously shapeshifted and mounting. Calls
@@ -184,23 +144,80 @@ function cancelFormsAndGhostWolf(ctx: SimContext, e: Entity): void {
   }
 }
 
-/** Toggle riding: start a summon channel when dismounted, or a dismount channel
- *  when riding. Returns true when a transition was started (or completed for
- *  dismount), false on a failed gate or an ignored mid-transition toggle. The
- *  live mount state does NOT flip here: updateMountTransition applies it when
- *  the channel finishes. Ownership is resolved here: the stable pick when owned,
- *  else the first owned mount in catalog order; with nothing owned there is
- *  nothing to ride. */
+/** Summon a SPECIFIC mount, the way a WoW reins item works: the player clicks the
+ *  item (bags or an action-bar slot) and rides that mount, with no "selected
+ *  mount" concept in between. Routed here from items.ts useItem.
+ *
+ *  Gate order matters and mirrors the old toggle path exactly:
+ *    1. riding skill  (the ONE gate that must never be bypassable: the item is in
+ *       your bags, so without this check owning reins would imply riding them)
+ *    2. ownership     (re-checked server-side even though the click proves it)
+ *    3. dead/ghost, then combat
+ *
+ *  Already riding something else: swap INSTANTLY, no dismount channel and no new
+ *  summon channel. Clicking the reins you are already riding dismounts. */
+export function summonMountItem(ctx: SimContext, pid: number, key: string): boolean {
+  const meta = ctx.players.get(pid);
+  const e = ctx.entities.get(pid);
+  if (!meta || !e) return false;
+  const def = mountDef(key);
+  if (!def) return false;
+  // Clicking the reins you are currently riding puts the mount away.
+  if (e.mountKey === def.key) {
+    forceDismount(ctx, e);
+    return true;
+  }
+  // A summon already in flight swallows the click, matching toggleMount.
+  if ((e.mountCastRemaining ?? 0) > 0) return false;
+  if (!meta.ridingTrained && !trainingSummon(meta, def.key)) {
+    ctx.error(pid, RIDING_UNTRAINED_MSG);
+    return false;
+  }
+  if (!mountOwned(meta, def.key) && !trainingSummon(meta, def.key)) {
+    // Reuses the registered useItem deny (sim_i18n error.noItem) rather than
+    // minting a new sim string.
+    ctx.error(pid, "You don't have that item.");
+    return false;
+  }
+  if (e.dead || e.ghost) return false;
+  if (e.inCombat) {
+    ctx.error(pid, "You can't do that while in combat.");
+    return false;
+  }
+  // Swapping between mounts is instant: the player is already mounted, so there
+  // is nothing to summon, only a model to change.
+  if (e.mountKey) {
+    e.mountKey = def.key;
+    e.mountCastRemaining = 0;
+    e.mountCastKey = '';
+    recalcFor(ctx, e, meta);
+    return true;
+  }
+  cancelFormsAndGhostWolf(ctx, e);
+  e.mountCastRemaining = MOUNT_SUMMON_SECONDS;
+  e.mountCastKey = def.key;
+  return true;
+}
+
+/** The Mount/Dismount keybind. It has exactly two jobs now that reins are items:
+ *  dismount INSTANTLY when riding (never gated, no channel), and summon the
+ *  LESSON steed while a riding lesson is in progress, which is the one mount a
+ *  player can ride without owning it and therefore the one with no reins to
+ *  click. Summoning a mount you own is not here: that is summonMountItem, driven
+ *  by useItem. An unmounted press outside a lesson deliberately does nothing, so
+ *  no implicit "selected mount" can grow back. Returns true when it dismounted or
+ *  started the lesson summon, false otherwise. */
 export function toggleMount(ctx: SimContext, pid: number): boolean {
   const meta = ctx.players.get(pid);
   const e = ctx.entities.get(pid);
   if (!meta || !e) return false;
-  // A toggle while a summon/dismount is already channeling is ignored.
+  // A toggle while a summon is already channeling is ignored.
   if ((e.mountCastRemaining ?? 0) > 0) return false;
   if (e.mountKey) {
-    // Start the dismount channel (never gated: dismounting is always allowed).
-    e.mountCastRemaining = MOUNT_DISMOUNT_SECONDS;
-    e.mountCastKey = '';
+    // Dismounting is instant and never gated. There is no put-away channel: a
+    // mount is a convenience, and making the player wait to get OFF one only ever
+    // cost them a reaction.
+    forceDismount(ctx, e);
     return true;
   }
   // Riding skill gate: the player must have purchased riding from Marla before
@@ -212,9 +229,9 @@ export function toggleMount(ctx: SimContext, pid: number): boolean {
   }
   // Riding-lesson tutorial: while a lesson is in progress the Mount/Dismount
   // toggle summons the training Valorsteed even though it is UNOWNED (teaching the
-  // Z keybind is the whole point). Runs the normal summon channel; it never touches
-  // the persisted pick and skips the ownership/level gates (begin already required
-  // level 20). Combat/water still cancel the channel via updateMountTransition.
+  // Z keybind is the whole point). Runs the normal summon channel and skips the
+  // ownership gate (begin already required level 20). Combat/water still cancel
+  // the channel via updateMountTransition.
   if (meta.mountTraining?.state === 'IN_PROGRESS') {
     if (e.dead || e.ghost) return false;
     if (e.inCombat) {
@@ -226,43 +243,18 @@ export function toggleMount(ctx: SimContext, pid: number): boolean {
     e.mountCastKey = TRAINING_MOUNT_KEY;
     return true;
   }
-  // Resolve which mount to summon: the stable pick if owned, else fall back to
-  // the first owned mount in catalog order (and adopt it as the new pick).
-  let key: MountKey | '' = '';
-  if (mountOwned(meta, meta.selectedMount)) {
-    key = normalizeSelectedMount(meta.selectedMount);
-  } else {
-    key = ownedMounts(meta)[0] ?? '';
-    if (key) meta.selectedMount = key;
-  }
-  if (!key) {
-    ctx.error(pid, "You don't have a mount yet.");
-    return false;
-  }
-  const def = mountDef(key);
-  if (!def) return false;
-  if (e.dead || e.ghost) return false;
-  if (e.level < def.level) {
-    ctx.error(pid, `You must be level ${def.level} to ride that mount.`);
-    return false;
-  }
-  if (e.inCombat) {
-    ctx.error(pid, "You can't do that while in combat.");
-    return false;
-  }
-  // Cancel all active form auras and ghost_wolf before the summon channel starts.
-  cancelFormsAndGhostWolf(ctx, e);
-  // Start the summon channel. mountKey stays '' until the channel completes.
-  e.mountCastRemaining = MOUNT_SUMMON_SECONDS;
-  e.mountCastKey = def.key;
-  return true;
+  // Summoning your OWN mount is not a keybind action any more: reins are items,
+  // so you ride by clicking the reins (bags or an action-bar slot), which routes
+  // to summonMountItem. There is deliberately no "selected mount" to fall back
+  // on, so an unmounted press outside a lesson does nothing.
+  return false;
 }
 
-/** Per-tick driver for the mount summon/dismount channel (called from the
+/** Per-tick driver for the mount summon channel (called from the
  *  coordinator's per-player loop). `swimming` is whether the entity is in
  *  fishable/deep water this tick. Water and death force an instant dismount;
  *  a summon channel cancels on entering combat or water; a finished channel
- *  applies the mount (re-validating ownership) or the dismount. */
+ *  applies the mount after re-validating ownership. */
 export function updateMountTransition(ctx: SimContext, e: Entity, swimming: boolean): void {
   const meta = ctx.players.get(e.id);
   // (a) Water force-dismounts instantly: no ground mount swims. Also clears any
@@ -274,10 +266,12 @@ export function updateMountTransition(ctx: SimContext, e: Entity, swimming: bool
     if (meta) recalcFor(ctx, e, meta);
     return;
   }
-  // (b) Advance an in-flight summon/dismount channel.
+  // (b) Advance an in-flight transition. Current code only creates keyed summon
+  // transitions; the empty-key completion arm preserves mixed-version entities
+  // created by the retired put-away channel during a rolling deployment.
   if ((e.mountCastRemaining ?? 0) > 0) {
-    // A summon (mountCastKey names a mount) cancels on entering combat or water,
-    // with no error toast. A dismount (mountCastKey === '') always proceeds.
+    // A keyed summon cancels on entering combat or water, with no error toast.
+    // A legacy empty-key transition always proceeds.
     if (e.mountCastKey !== '' && (e.inCombat || swimming)) {
       e.mountCastRemaining = 0;
       e.mountCastKey = '';

@@ -14,6 +14,7 @@
 //  - delve + lockpick:         delve_lockpick
 //  - loot roll:                solo_warrior (death->rollLoot), party_loot (need/greed)
 //  - loot distribution (L1):   l1_loot_distribution (fair-split remainder draw, need/greed/pass, personal/looter-takes-all)
+//  - master loot:              master_loot (assign direct/duplicate-pid/convert, tie-break draw)
 //
 // All drives are MOVE-safe: they only call public Sim methods + the documented
 // internal plumbing the existing tests use (createMob/addEntity, dealDamage,
@@ -31,6 +32,9 @@ import {
 } from '../../src/sim/data';
 import { createMob } from '../../src/sim/entity';
 import { solveLockActions } from '../../src/sim/lockpick';
+import { MOUNT_SUMMON_SECONDS } from '../../src/sim/mounts';
+import { gatherCastDurationSec } from '../../src/sim/professions/gathering';
+import { scenarioRunFor, startScenario } from '../../src/sim/scenarios/scenarios';
 import { Sim } from '../../src/sim/sim';
 import { addThreat } from '../../src/sim/threat';
 import {
@@ -48,12 +52,18 @@ import {
   xpForLevel,
 } from '../../src/sim/types';
 import { terrainHeight } from '../../src/sim/world';
+import { OPEN_FIELD } from '../helpers/open_field';
 import type { Recorder, Scenario } from './record';
 
 // ----- shared helpers ---------------------------------------------------------
 
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
+
+// Combat-only fixtures need a deterministic patch that does not overlap a town
+// landmark. This south-field anchor keeps their authored relative spacing while
+// decoupling the scenarios from Eastbrook's southeast civic lot.
+const EASTBROOK_PARITY_OPEN_FIELD = { x: 2, z: -21 } as const;
 
 // Move an entity to (x,z) on the terrain and keep the spatial grid consistent —
 // the same idiom every existing scenario test uses.
@@ -169,6 +179,7 @@ function soloMage(): Scenario {
       sim.setPlayerLevel(10);
       const p = sim.player as AnyEntity;
       beef(p);
+      teleport(sim, p, OPEN_FIELD.x, OPEN_FIELD.z);
       const mob = spawnMob(sim, 'forest_wolf', 5, p.pos.x, p.pos.y, p.pos.z + 18);
       beef(mob, 9000);
       rec.track(mob.id);
@@ -351,6 +362,7 @@ function mobSwingAffixes(): Scenario {
       const sim = rec.sim as AnySim;
       sim.setPlayerLevel(16);
       const p = sim.player as AnyEntity;
+      teleport(sim, p, EASTBROOK_PARITY_OPEN_FIELD.x, EASTBROOK_PARITY_OPEN_FIELD.z);
       // beef() does not stick on a player (applyAura -> recalcPlayerStats resets maxHp,
       // and several affixes ride negative buff_* drains); top the player up right before
       // each swing so it survives every draw, mirroring mob_locomotion's reviveTarget.
@@ -554,6 +566,7 @@ function petAi(): Scenario {
       const sim = rec.sim as AnySim;
       sim.setPlayerLevel(12);
       const p = sim.player as AnyEntity;
+      teleport(sim, p, OPEN_FIELD.x, OPEN_FIELD.z);
       beef(p);
 
       // Emberkin (petRanged demon): pre-targeted on a beefed wolf inside bolt range so
@@ -1504,6 +1517,143 @@ function l1LootDistribution(): Scenario {
       // b claims the personal slot and the returned-to-corpse openToAll item.
       sim.lootCorpse(mob.id, b);
       rec.snapshot('after-loot-b');
+      rec.tick(2);
+    },
+  };
+}
+
+// Master loot: a 4-member party on master loot over a corpse carrying three
+// copies of a threshold-meeting drop, driving the three assignment arms below
+// AND both places master loot reaches the shared rng stream (#2523: nothing
+// in this file used to touch assignMasterLoot / setPartyLootMaster at all, so a
+// reordered master-loot draw was invisible to the draw-order digest):
+//  - DIRECT GRANT: a single assigned target takes the item, drawing NOTHING;
+//  - DUPLICATE PID: a pid named twice collapses to that same single-target grant
+//    instead of converting into a one-player roll, the exact input class whose
+//    draw sequence #2505 (PR #2521) changed;
+//  - CONVERSION: a multi-target assignment reopens the roll as a need/greed
+//    contest over a strict SUBSET of the candidates (b/c/d, never the looter a),
+//    whose three submitLootRoll ctx.rng.int(1,100) draws TIE at the top, so
+//    resolveLootRoll's tie-break ctx.rng.int(0, tiedWinners.length - 1) -- the
+//    draw a master-loot resolution can reach and a plain need/greed roll usually
+//    does not -- lands in the log too.
+// The seed is load-bearing: 1091 makes those three rolls tie (b and c both roll
+// 97, d rolls 43), and a sweep of 1031 to 1230 found only two others that tie at
+// all (1165, 1170). Nothing is ticked before the resolution, so the tie hangs
+// only off the ctor + join draws, not off ambient world simulation; if a future
+// change to those moves the stream, the coverage test's draw-delta assertion
+// fails loudly and the seed must be re-swept (record the scenario for each
+// candidate seed and keep one whose resolution spends FOUR draws, three need
+// rolls plus the tie-break) rather than the tie assertion dropped. The payoff is
+// that the WHOLE scenario
+// draws exactly four times, all four of them master-loot draws, so its draw
+// digest is a near-pure instrument for this slice.
+// NOT driven here, and all zero-draw, so they would need a state-side pin rather
+// than a draw delta (tests/loot_master_sim.test.ts covers each directly): the
+// empty-target refusal that leaves the prompt open (#2526), the rejection of a
+// caller who is not the master looter, the departed-single-target convert, the
+// MASTER_LOOT_TIMEOUT convert in resolveLootRoll, removePlayerFromLootRolls's
+// master-looter convert, and setPartyLootMaster's non-leader error arm.
+function masterLoot(): Scenario {
+  return {
+    name: 'master_loot',
+    coverage: [
+      'setPartyLootMaster enable + threshold change',
+      'startMasterLootRoll (threshold met, masterLoot prompt to the looter only)',
+      'assignMasterLoot direct grant (single target, no rng draw)',
+      'assignMasterLoot duplicate pid dedupes to the direct grant (#2505)',
+      'convertMasterRollToNeedGreed over a candidate subset',
+      'resolveLootRoll tie-break rng.int over tied need rolls',
+    ],
+    // Seed re-hunted 1091 -> 1326 by the release/v0.32.0 base merge. This branch
+    // never touches master-loot logic (src/sim/loot/loot_roll.ts has no commits
+    // here); its extra content just moves the shared rng before the rolls, and at
+    // 1091 the need rolls stopped TYING. The tie is the whole point of the
+    // scenario's last coverage line (resolveLootRoll's tie-break rng.int), so the
+    // seed is re-hunted to keep two rollers level rather than re-recorded to
+    // whatever the new draw happens to be.
+    build: () => new Sim({ seed: 1326, playerClass: 'warrior', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const a = sim.addPlayer('warrior', 'Aaa');
+      const b = sim.addPlayer('mage', 'Bbb');
+      const c = sim.addPlayer('rogue', 'Ccc');
+      const d = sim.addPlayer('priest', 'Ddd');
+      sim.partyInvite(b, a);
+      sim.partyAccept(b);
+      sim.partyInvite(c, a);
+      sim.partyAccept(c);
+      sim.partyInvite(d, a);
+      sim.partyAccept(d);
+      teleport(sim, sim.entities.get(a)!, 20, 20);
+      teleport(sim, sim.entities.get(b)!, 21, 20);
+      teleport(sim, sim.entities.get(c)!, 22, 20);
+      teleport(sim, sim.entities.get(d)!, 23, 20);
+      // Leader-only switch, both message arms: enable (looter 0 = pinned to the
+      // leader, a) above the drop's quality, then lower the threshold onto it.
+      sim.setPartyLootMaster(true, 0, 'epic', a);
+      sim.setPartyLootMaster(true, 0, 'uncommon', a);
+      const mob = createMob(sim.nextId++, MOBS.forest_wolf, 2, {
+        x: 20,
+        y: terrainHeight(20, 22, sim.cfg.seed),
+        z: 22,
+      }) as AnyEntity;
+      mob.dead = true;
+      mob.lootable = true;
+      mob.tappedById = a;
+      mob.lootRecipientIds = [a, b, c, d];
+      // Three uncommon copies: one per assignment arm below. Master loot outranks
+      // need-greed in awardSharedLootItem, so each copy opens a curate-phase roll.
+      mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 3 }] };
+      sim.addEntity(mob);
+      rec.track(mob.id);
+      sim.lootCorpse(mob.id, a);
+      rec.snapshot('master-rolls-open');
+      const rollIds = [
+        ...new Set(
+          (rec.allEvents as { type: string; rollId?: number }[])
+            .filter((e) => e.type === 'masterLoot')
+            .map((e) => e.rollId as number),
+        ),
+      ];
+      rec.notes.rollIds = rollIds;
+      rec.notes.pids = { a, b, c, d };
+      // A candidate trying to vote on a roll still in its curate phase is refused
+      // by submitLootRoll's master-loot guard, and refused BEFORE the int(1,100)
+      // draw. This frame pins that the attempt costs zero draws, so hoisting that
+      // draw above the guard (the classic early-bail reorder) reddens the gate.
+      // BOTH choice kinds are tried: a 'need' would draw if the guard let it
+      // through (so the rng stream detects that), but a 'pass' never draws at any
+      // callsite, so nothing in the trace would notice a guard that admitted one.
+      // The recorded choice count below is what covers that second arm; it is read
+      // from pendingLootRolls, which the trace deliberately never samples.
+      if (rollIds[2] !== undefined) {
+        sim.submitLootRoll(rollIds[2], 'need', d);
+        sim.submitLootRoll(rollIds[2], 'pass', b);
+        const pending = (sim as any).pendingLootRolls as Map<
+          number,
+          { choices: Map<number, unknown> }
+        >;
+        rec.notes.refusedChoiceCount = pending.get(rollIds[2])?.choices.size ?? -1;
+      }
+      rec.snapshot('curate-phase-vote-refused');
+      // Arm 1: one target -> direct grant to b. No rng draw.
+      if (rollIds[0] !== undefined) sim.assignMasterLoot(rollIds[0], [b], a);
+      rec.snapshot('assigned-direct');
+      // Arm 2: c named twice -> deduped to the same direct grant. No rng draw.
+      if (rollIds[1] !== undefined) sim.assignMasterLoot(rollIds[1], [c, c], a);
+      rec.snapshot('assigned-duplicate-pid');
+      // Arm 3: three targets -> the roll converts to need/greed for that subset.
+      if (rollIds[2] !== undefined) sim.assignMasterLoot(rollIds[2], [b, c, d], a);
+      rec.snapshot('assigned-converted');
+      // The third submit fills the choice map and resolves: three int(1,100)
+      // draws, then the tie-break int(0,1) between b and c.
+      if (rollIds[2] !== undefined) {
+        sim.submitLootRoll(rollIds[2], 'need', b);
+        sim.submitLootRoll(rollIds[2], 'need', c);
+        sim.submitLootRoll(rollIds[2], 'need', d);
+      }
+      rec.snapshot('roll-resolved');
       rec.tick(2);
     },
   };
@@ -2925,19 +3075,30 @@ function nythraxisFullPull(): Scenario {
 
       // Tank in melee in front of the throne; four mages stacked tightly behind him
       // (within Soul Rend's 5yd stack range so a triple mark splits the damage three
-      // ways and nobody is one-shot).
+      // ways and nobody is one-shot; Soul Rend scales with maxHp, so the ROOM_HP
+      // pool below does not cover an unsplit mark, only the stack split does).
       floorTeleport(tank, boss.pos.x, boss.pos.z - 6, boss.pos.y);
       const dps = dpsPids.map((pid) => sim.entities.get(pid) as AnyEntity);
       dps.forEach((e, i) => {
         floorTeleport(e, boss.spawnPos.x + (i - 1.5), boss.spawnPos.z - 20, boss.pos.y);
       });
       const room = [tank, ...dps];
+      // The parity fixture pins draw order: deaths skip an entity's rng draws and
+      // derail the recorded stream, and the retuned normal boss one-shots the
+      // ungeared starter-kit fixture tank. Give the whole room a non-lethal hp
+      // pool so no single tick's damage can kill anyone. The pool is re-applied
+      // in topUp (not set once) because recalcPlayerStats reverts maxHp on any
+      // player aura expiry. Soul Rend and Deathless Rage scale with maxHp, so
+      // their relative behavior is unchanged.
+      const ROOM_HP = 50_000;
       const topUp = () => {
         for (const e of room) {
-          e.hp = e.maxHp;
+          e.maxHp = ROOM_HP;
+          e.hp = ROOM_HP;
           e.dead = false;
         }
       };
+      topUp(); // arm the hp pool before the first tick
       // Tick n times, restoring every room player to full after each tick so the
       // room is never empty at the next updateNythraxisEncounter wipe check.
       const step = (n: number) => {
@@ -2955,8 +3116,9 @@ function nythraxisFullPull(): Scenario {
       step(1); // init the encounter (intro yells)
       rec.snapshot('engage');
 
-      // ----- Phase 1: Gravebreaker (rng.range) + a forced Raise Fallen add wave -----
-      step(20 * 2); // ~2s: gravebreakerTimer (1.5) elapses -> rng.range draw + front cone
+      // ----- Phase 1: Gravebreaker (charged auto-attack) + a forced Raise Fallen add wave -----
+      (boss.nythraxis as any).gravebreakerTimer = DT; // arm the charge next tick...
+      step(20 * 2); // ...and release it on the next LANDED swing (front-cone splash)
       (boss.nythraxis as any).raiseFallenTimer = DT; // fire the add wave next tick
       step(1);
       const adds = [...sim.entities.values()].filter(
@@ -3114,13 +3276,21 @@ function c3AuraRunner(): Scenario {
       p.fiveSecondRule = 99;
       p.hp = Math.max(1, p.maxHp - 600);
       p.resource = Math.max(0, p.maxResource - 300);
-      p.eating = { itemId: 'parity_food', kind: 'food', hpPer2s: 90, manaPer2s: 0, remaining: 6 };
+      p.eating = {
+        itemId: 'parity_food',
+        kind: 'food',
+        hpPer2s: 90,
+        manaPer2s: 0,
+        remaining: 6,
+        ticksElapsed: 0,
+      };
       p.drinking = {
         itemId: 'parity_drink',
         kind: 'drink',
         hpPer2s: 0,
         manaPer2s: 50,
         remaining: 6,
+        ticksElapsed: 0,
       };
       p.auras.push(
         aura({
@@ -3864,12 +4034,28 @@ function marketRoundTrip(): Scenario {
 
       // 2) browse filter narrows to the wolf_fang listing, then clears.
       sim.marketSearch(
-        { search: 'wolf', itemType: 'all', subtype: 'all', rarity: 'all', page: 0 },
+        {
+          search: 'wolf',
+          itemType: 'all',
+          subtype: 'all',
+          armorClass: 'all',
+          primaryStat: 'all',
+          rarity: 'all',
+          page: 0,
+        },
         seller,
       );
       rec.snapshot('searched');
       sim.marketSearch(
-        { search: '', itemType: 'all', subtype: 'all', rarity: 'all', page: 0 },
+        {
+          search: '',
+          itemType: 'all',
+          subtype: 'all',
+          armorClass: 'all',
+          primaryStat: 'all',
+          rarity: 'all',
+          page: 0,
+        },
         seller,
       );
       rec.snapshot('search-cleared');
@@ -3970,6 +4156,12 @@ function inventoryVendor(): Scenario {
       sim.addItem('elixir_of_the_bear', 1, buyer);
       sim.useItem('elixir_of_the_bear', buyer);
       rec.snapshot('quaffed-elixir');
+      // A second same-stat elixir pins the per-kind exclusivity path (the
+      // shared elixir_buff_sta id replaces the Bear aura, last drunk wins,
+      // plus the fade event for the displaced different-name aura).
+      sim.addItem('elixir_of_the_serpent', 1, buyer);
+      sim.useItem('elixir_of_the_serpent', buyer);
+      rec.snapshot('quaffed-second-elixir');
 
       // 5) discard one of a gray stack.
       sim.addItem('wolf_fang', 3, buyer);
@@ -3986,7 +4178,7 @@ function inventoryVendor(): Scenario {
       rec.snapshot('sold-junk');
 
       // 8) buy one back (copper spend + addItemSilent + onInventoryChangedForQuests).
-      sim.buyBackItem('wolf_fang', buyer);
+      sim.buyBackItem('wolf_fang', undefined, undefined, buyer);
       rec.snapshot('bought-back');
     },
   };
@@ -4267,7 +4459,7 @@ function cardDuel(): Scenario {
   };
 }
 
-// Professions 2.0 craft path (Phase 2 masterwork model). The parity net had ZERO
+// Professions 2.0 craft path (the masterwork model). The parity net had ZERO
 // craft coverage (grep craft: no hits before this), so the whole craft
 // rng/draw-order/event contract was invisible to the goldens. This scenario pins
 // it permanently in one deterministic sequence with a snapshot after each craft:
@@ -4292,8 +4484,12 @@ function cardDuel(): Scenario {
 // masterwork chance and the proc fires inside the recorded run; only the found
 // literal is pinned here. Re-hunted after the new-realm quest pass shifted the
 // construction-time draw stream (quest camps + escort NPC spawns across the new
-// realms). Spare seeds 7 and 11 were also verified to fire the proc for this drive.
-function professionsCraft(seed = 1): Scenario {
+// realms), and again after the Eastbrook camp respacing thinned the zone-1 camp
+// counts (fewer camp mobs means fewer construction-time draws, which moves every
+// later draw). Re-hunted once more after the Last Bell campaign's stable
+// shared-construction quotas were reconciled with the live ambient roster;
+// seeds 10, 36, and 39 were verified to fire for this exact drive.
+function professionsCraft(seed = 10): Scenario {
   return {
     name: 'professions_craft',
     coverage: [
@@ -4312,20 +4508,24 @@ function professionsCraft(seed = 1): Scenario {
       const meta = sim.players.get(pid) as any;
       rec.notes.pid = pid;
 
-      // Phase 1: DENIAL. No materials held -> insufficient_materials; the denial
+      // Step 1: DENIAL. No materials held -> insufficient_materials; the denial
       // path returns before the proc draw, so it draws zero rng.
-      sim.craftItem('recipe_minor_healing_potion', pid);
+      sim.craftItem('recipe_minor_healing_potion', false, pid);
       rec.snapshot('craft-denied');
 
-      // Phase 2: plain deterministic craft. The single proc draw happens on the
+      // Step 2: plain deterministic craft. The single proc draw happens on the
       // success path, but a consumable (potion) def can never masterwork, so the
       // effect is gated off; the output is the def quality (common).
+      // Economy rework: the potion now also consumes
+      // silverleaf_herb x2 (addItem draws no rng, so the draw stream and its
+      // digest are unchanged; the golden state moves only via the new grants).
       sim.addItem('linen_scrap', 1, pid);
       sim.addItem('spider_leg', 1, pid);
-      sim.craftItem('recipe_minor_healing_potion', pid);
+      sim.addItem('silverleaf_herb', 2, pid);
+      sim.craftItem('recipe_minor_healing_potion', false, pid);
       rec.snapshot('craft-plain');
 
-      // Phase 3: masterwork PROC. Tailoring as the active archetype (a MAJOR craft,
+      // Step 3: masterwork PROC. Tailoring as the active archetype (a MAJOR craft,
       // unlimited empowerment ceiling) at skill 200 (tier 8, far above the recipe's
       // tier 0) plus the self-signed consumed reagent push the proc chance to the
       // capped 0.15; the equippable uncommon int/spi vestments pass the effect gate
@@ -4340,42 +4540,62 @@ function professionsCraft(seed = 1): Scenario {
       // qualifies), mirroring the crafting suite's proc test.
       sim.addItemInstance('linen_scrap', { signer: meta.name }, pid);
       sim.addItem('spider_leg', 1, pid);
-      sim.craftItem('recipe_eastbrook_ritual_vestments', pid);
+      // Economy rework: the vestments recipe gained cloth and
+      // thread volume (grants draw no rng; only golden state rows move).
+      sim.addItem('homespun_cloth', 3, pid);
+      sim.addItem('spool_of_thread', 5, pid);
+      sim.craftItem('recipe_eastbrook_ritual_vestments', false, pid);
       rec.snapshot('craft-masterwork');
 
-      // Phase 4: one more plain craft so the golden shows the draw stream continuing
+      // Step 4: one more plain craft so the golden shows the draw stream continuing
       // normally (one draw) after the proc.
       sim.addItem('linen_scrap', 1, pid);
       sim.addItem('spider_leg', 1, pid);
-      sim.craftItem('recipe_minor_healing_potion', pid);
+      sim.addItem('silverleaf_herb', 2, pid);
+      sim.craftItem('recipe_minor_healing_potion', false, pid);
       rec.snapshot('craft-plain-2');
     },
   };
 }
 
-// Gathering (Professions 2.0 Phase 4): the zone-material harvest path. Pins the
-// two-draw-per-harvest contract (draw #1 rollMaterialRarity, draw #2
-// rollGatherRareEvent) in the draw-order digest, the zero-draw cooldown denial,
-// the proficiency-0 fungible grant, the max-proficiency signed yield, and a
-// hunted rare-event hit (gatherRareEvent zone broadcast + x5 signed yield +
-// gatherResult qty/rareEvent payload) inside a fixed 100-harvest window.
+// Gathering (Professions 2.0, re-shaped for the gather
+// cast): the zone-material harvest path. harvestNode now STARTS a cast
+// (draw-free) and the draws, grant, and events land at completion on the
+// tick path, so every harvest ticks the cast out with the exact duration
+// from the shipped constants. Pins the completion-time two-draw contract
+// (draw #1 rollMaterialRarity, draw #2 rollGatherRareEvent) in the
+// draw-order digest, the zero-draw cooldown denial, the proficiency-0
+// fungible grant, the max-proficiency signed yield, and a hunted rare-event
+// hit (gatherRareEvent zone broadcast + x5 signed yield + gatherResult
+// qty/rareEvent payload) inside a fixed 100-harvest window. The cast loop
+// ticks ~5000 times, so frames ride the labelled snapshots plus a coarse
+// cadence (the heavy-scenario budget precedent).
 //
-// Seed HUNTED (bounded scan from seed 1 upward over this exact drive sequence,
-// not committed) so the herb window's rare-event draw hits inside the recorded
-// run with no bags-full denial; only the found literal is pinned here. Spare
-// compatible seeds 2, 4, 8, 9, and 13 also hit inside the same window.
+// Seed HUNTED (bounded scan from seed 1 upward over this exact drive
+// sequence, not committed) so the herb window's rare-event draw hits inside
+// the recorded run with all 102 casts resolving: no bags-full denial and no
+// cast-cancelling interference; only the found literal is pinned here.
 function professionsGather(seed = 1): Scenario {
+  // Worst-case gather cast: tier-1 node, tier-1 tool, band 0 (#2343: every
+  // harvest needs the matching tool; a tier-1 tool at a tier-1 node keeps
+  // the full base duration). Shorter casts (band reductions as proficiency
+  // accrues) still complete inside this fixed window; surplus ticks are
+  // plain world ticks.
+  const castTicks = Math.ceil(gatherCastDurationSec(1, 1, 0) / DT) + 1;
   return {
     name: 'professions_gather',
     coverage: [
       'class:warrior (gatherer)',
-      'granted harvest: exactly two rng draws (rarity roll then rare-event roll)',
-      'cooldown denial: zero rng draws',
+      'tier-1 tools in bags satisfy the #2343 always-require-tool gate',
+      'gather cast start: harvestNode begins the cast draw-free',
+      'granted harvest at cast completion: exactly two rng draws (rarity roll then rare-event roll)',
+      'cooldown denial: zero rng draws, no cast',
       'proficiency-0 grant: common rarity, fungible zone material (copper_ore)',
       'max-proficiency wood harvest: rarity ladder off the proficiency ceiling',
       'rare gather event: hunted hit in the herb window, gatherRareEvent fanout + x5 signed yield',
       'gatherResult qty/rareEvent payload fields',
     ],
+    sampleEvery: 500,
     build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: true }),
     drive(rec: Recorder) {
       const sim = rec.sim as AnySim;
@@ -4383,35 +4603,194 @@ function professionsGather(seed = 1): Scenario {
       const meta = sim.players.get(pid) as any;
       const p = sim.player as AnyEntity;
 
-      // Phase 1: proficiency-0 ore harvest (common, fungible grant) plus an
-      // immediate second attempt denied by the player's own cooldown, which
-      // must add ZERO draws to the digest.
+      // No mob interference: mob damage cancels a gather cast mid-drive, so
+      // the drive silences the world's mobs up front (deterministic,
+      // recorded state, the test-suite despawnMobs idiom).
+      for (const e of (sim.entities as Map<number, AnyEntity>).values()) {
+        if (e.kind !== 'mob') continue;
+        e.dead = true;
+        e.hp = 0;
+        e.aiState = 'dead';
+        e.respawnTimer = 9999;
+        e.corpseTimer = 9999;
+        e.inCombat = false;
+      }
+
+      // The three tier-1 tools (#2343: every node harvest needs its
+      // profession's tool in bags). addItem draws no rng, so the grant is
+      // digest-invisible beyond the sampled inventory contents.
+      sim.addItem('copper_mining_pick', 1, pid);
+      sim.addItem('handaxe', 1, pid);
+      sim.addItem('gathering_sickle', 1, pid);
+
+      // Step 1: proficiency-0 ore harvest (common, fungible grant, resolved
+      // at cast completion on the tick path) plus a post-completion second
+      // attempt denied by the player's own cooldown, which must add ZERO
+      // draws to the digest.
       teleport(sim, p, -70, -53); // ore_eastbrook_1
       sim.harvestNode('ore_eastbrook_1', pid);
+      rec.tick(castTicks); // the cast completes inside this window
       sim.harvestNode('ore_eastbrook_1', pid); // denied: own timer, no draw
       rec.snapshot('harvest-ore-common-and-denial');
       rec.tick(2);
 
-      // Phase 2: max-proficiency wood harvest: the rarity roll runs at the
+      // Step 2: max-proficiency wood harvest: the rarity roll runs at the
       // proficiency ceiling (zero common weight), so the rolled tier plus the
       // signed-or-fungible grant shape land in the state sample.
       meta.gatheringProficiency.logging = 100;
       teleport(sim, p, -62, 8); // wood_eastbrook_1
       sim.harvestNode('wood_eastbrook_1', pid);
+      rec.tick(castTicks);
       rec.snapshot('harvest-wood-max-proficiency');
       rec.tick(2);
 
-      // Phase 3: the rare-event window. Repeated herb harvests with the
+      // Step 3: the rare-event window. Repeated herb casts with the
       // per-player cooldown cleared advance the shared stream exactly two
-      // draws per harvest; the hunted seed hits the 1/90 rare event inside
-      // this fixed window (gatherRareEvent + the forced-signed x5 yield).
+      // draws per completed harvest. Two per-iteration resets keep the
+      // 100-cast window from ever hitting the bags-full deny at a cast
+      // start (which would skip a harvest and shift the stream): the
+      // proficiency reset pins the window at band 0 (the pre-gather-cast window ran
+      // at an undrained proficiency 0 anyway), and the retention filter
+      // sheds the accumulating common stacks while keeping the NEWEST eight
+      // signed instances, so a hunted hit's forced-signed x5 yield (all
+      // moonlit-bloom sheenleaf) survives into the final inventory sample
+      // even when the window hits more than once. The hunted seed's FIRST
+      // rare event lands inside this window (gatherRareEvent + x5 yield).
       teleport(sim, p, -86, 90); // herb_eastbrook_1
       for (let i = 0; i < 100; i++) {
+        meta.gatheringProficiency.herbalism = 0;
+        // The retention filter keeps the three tools (ahead of the gate,
+        // #2343) plus the newest eight signed instances, shedding the
+        // accumulating common stacks exactly as before.
+        const TOOL_IDS = ['copper_mining_pick', 'handaxe', 'gathering_sickle'];
+        meta.inventory = [
+          ...meta.inventory.filter((s: any) => TOOL_IDS.includes(s.itemId)),
+          ...meta.inventory.filter((s: any) => s.instance?.signer !== undefined).slice(-8),
+        ];
         delete meta.nodeHarvestReadyAt.herb_eastbrook_1;
         sim.harvestNode('herb_eastbrook_1', pid);
+        rec.tick(castTicks);
       }
       rec.snapshot('rare-event-window');
       rec.tick(2);
+    },
+  };
+}
+
+// Last Bell campaign seam: enter the shipped Tidemill story instance, arm its
+// rng-free stalker stage, kill through normal quest credit, then play the
+// doorway scene through authoritative completion. This pins the merged
+// scenario/scene/squad/event ordering and the shared draw stream together.
+function lastBellTidemill(): Scenario {
+  return {
+    name: 'last_bell_tidemill',
+    coverage: [
+      'Last Bell shipped scenario entry (sc_lb_q0_tidemill)',
+      'rng-free scenario spawn arming + tracked Tidemill Stalker',
+      'normal quest kill credit advances q_lb_q0_ashore',
+      'doorway scene start/ops/end + squad spawn/despawn',
+    ],
+    build: () =>
+      new Sim({
+        seed: 20_061,
+        playerClass: 'warrior',
+        playerName: 'Bell',
+        autoEquip: true,
+      }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      sim.setPlayerLevel(20);
+      const pid = sim.playerId as number;
+      const meta = sim.players.get(pid);
+      if (!meta) throw new Error('Last Bell parity player missing');
+      meta.questLog.set('q_lb_q0_ashore', {
+        questId: 'q_lb_q0_ashore',
+        counts: [1, 12, 0],
+        state: 'active',
+      });
+      rec.notes.started = startScenario(sim.ctx, 'sc_lb_q0_tidemill', pid);
+      const claim = sim.ctx.instances.find(
+        (instance: { dungeonId: string; partyKey: string | null }) =>
+          instance.dungeonId === 'lb_tidemill' && instance.partyKey !== null,
+      );
+      if (!claim || claim.exitId === null) throw new Error('Last Bell Tidemill claim missing');
+      rec.notes.claimId = claim.exitId;
+      rec.snapshot('entered-tidemill');
+
+      rec.tick(1);
+      const run = scenarioRunFor(sim.ctx, claim.exitId);
+      if (!run) throw new Error('Last Bell Tidemill run missing');
+      const stalkerId = run.stageSpawnIds[0];
+      if (stalkerId === undefined) throw new Error('Tidemill Stalker did not spawn');
+      rec.notes.stalkerId = stalkerId;
+      rec.track(stalkerId);
+      rec.snapshot('stalker-armed');
+
+      const stalker = sim.entities.get(stalkerId) as AnyEntity | undefined;
+      if (!stalker) throw new Error('Tidemill Stalker entity missing');
+      lethal(sim, sim.player, stalker);
+      rec.tick(2);
+      const squadIds = [...sim.entities.values()]
+        .filter((entity: AnyEntity) =>
+          ['lb_actor_coalfast', 'lb_actor_tam'].includes(entity.templateId),
+        )
+        .map((entity: AnyEntity) => entity.id)
+        .sort((a: number, b: number) => a - b);
+      if (squadIds.length !== 2) throw new Error('Last Bell doorway squad did not spawn');
+      rec.notes.squadSpawned = true;
+      rec.notes.squadIds = squadIds;
+      for (const actorId of squadIds) rec.track(actorId);
+      rec.snapshot('doorway-scene-armed');
+
+      // The shipped scene ends before 12 seconds; leave one second of runway
+      // for the scenario driver to observe completion and despawn the squad.
+      rec.tick(20 * 13);
+      rec.snapshot('tidemill-complete');
+    },
+  };
+}
+
+// Mount-reins integration seam: the collectible item is the summon command,
+// the per-tick transition applies its exact catalog mount, using the same reins
+// again dismounts instantly, and ownership remains because reins are reusable.
+function mountReins(): Scenario {
+  return {
+    name: 'mount_reins',
+    coverage: [
+      'riding-trained player owns literal reins_grag_bear',
+      'useItem(reins) starts the authoritative summon channel',
+      'tick completion applies Entity.mountKey=grag_bear',
+      'using active-mount reins dismounts instantly without consuming ownership',
+    ],
+    build: () =>
+      new Sim({
+        seed: 20_062,
+        playerClass: 'warrior',
+        playerName: 'Rider',
+        autoEquip: true,
+      }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      sim.setPlayerLevel(MAX_LEVEL);
+      const pid = sim.playerId as number;
+      const meta = sim.players.get(pid);
+      if (!meta) throw new Error('mount reins parity player missing');
+      meta.ridingTrained = true;
+      sim.addItem('reins_grag_bear', 1, pid);
+      rec.snapshot('reins-owned');
+
+      sim.useItem('reins_grag_bear', pid);
+      rec.notes.summonStarted =
+        sim.player.mountCastKey === 'grag_bear' && sim.player.mountCastRemaining > 0;
+      rec.snapshot('summon-started');
+
+      rec.tick(Math.ceil(MOUNT_SUMMON_SECONDS / DT) + 2);
+      rec.notes.mountedKey = sim.player.mountKey;
+      rec.snapshot('summon-complete');
+
+      sim.useItem('reins_grag_bear', pid);
+      rec.notes.dismountedKey = sim.player.mountKey;
+      rec.snapshot('reins-dismount');
     },
   };
 }
@@ -4440,6 +4819,7 @@ export const SCENARIOS: Scenario[] = [
   partyLoot(),
   partyRaid(),
   l1LootDistribution(),
+  masterLoot(),
   entityRoster(),
   delveDeath(),
   fiestaMidcastKill(),
@@ -4471,8 +4851,8 @@ export const SCENARIOS: Scenario[] = [
   g1bXpPrestige(),
   playerTrade(),
   chatSocial(),
-  // Seed re-hunted after the Farshore relocation world shift moved the
-  // ctor draw order (the old default seed's single proc draw stopped firing).
-  professionsCraft(11),
+  professionsCraft(),
   professionsGather(),
+  lastBellTidemill(),
+  mountReins(),
 ];

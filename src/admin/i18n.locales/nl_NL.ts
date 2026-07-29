@@ -107,6 +107,7 @@ export const nl_NL: Record<string, string> = {
   'stats.peakOnline': 'piek online',
   'stats.peakOnlineToday': 'piek online 24u',
   'stats.peakOnlineAllTime': 'piek online aller tijden',
+  'stats.playersCap': 'spelerskapaciteit',
   'stats.accounts': 'accounts',
   'stats.characters': 'personages',
   'stats.newAccounts24h': 'nieuwe accounts 24u',

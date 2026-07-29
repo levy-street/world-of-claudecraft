@@ -138,6 +138,10 @@ curl -fsS -X POST -H "x-woc-deploy-secret: <RESTART_COUNTDOWN_SECRET>" \
 sudo docker compose stop game
 #    On an older checkout whose compose file has no stop_grace_period, pass the
 #    window explicitly: sudo docker compose stop -t 60 game
+#    This normal stop followed by up -d --build replaces the process. It also
+#    terminates authenticated and linkdead sessions held in process memory, so an
+#    auth rollout needs no separate session cleanup. Do not leave an old game
+#    process serving alongside the rebuilt one.
 
 # 6. Rebuild and start. (`sudo docker compose build game` before step 4 shortens the
 #    outage: the image is then ready the moment the countdown ends.)
@@ -295,12 +299,6 @@ For off-box safety, sync the directory to S3 occasionally:
   the host `.env` into the game container. The key is a secret: it must never
   appear in logs or client code. Linking is a cosmetic mirror for deed
   achievements only; login with Steam does not exist.
-- **Season 1 Armory promo card (welcome screen)**: **off until configured**: the
-  welcome screen shows the Season 1 Armory store promo card only when
-  `ARMORY_PROMO_ENABLED=1` is set in the game server runtime env. The flag is
-  read by `server/welcome.ts` (behind a short in-process cache) and served to
-  signed-in clients via `GET /api/welcome/flags`; the client-side half of the
-  gate lives in `src/ui/store_promo_card.ts`.
 - **Claudium economy service**: `WOC_ECONOMY_SERVICE_URL` is resolved by the
   game server. Use `http://127.0.0.1:8798/v1/claudium/` only when both services
   run directly on the host. For the Compose game container with a host-run

@@ -119,7 +119,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'deep_wounds',
       'enrage_passive',
     ],
-    color: 0xc79c6e,
+    color: 0xd67a54,
   },
   mage: {
     id: 'mage',
@@ -207,7 +207,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'perfect_moment',
       'fireball_form',
     ],
-    color: 0x69ccf0,
+    color: 0x33c1f1,
   },
   rogue: {
     id: 'rogue',
@@ -247,7 +247,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'stealth',
       'kick',
     ],
-    color: 0xfff569,
+    color: 0xfcee58,
   },
   paladin: {
     id: 'paladin',
@@ -280,7 +280,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'rebuke',
       'sacred_bulwark',
     ],
-    color: 0xf58cba,
+    color: 0xf58ca0,
   },
   hunter: {
     id: 'hunter',
@@ -314,7 +314,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'volley',
       'counter_shot',
     ],
-    color: 0xabd473,
+    color: 0xa6d84f,
   },
   priest: {
     id: 'priest',
@@ -342,7 +342,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'mind_flay',
       'flash_heal',
     ],
-    color: 0xfffff0,
+    color: 0xc6d4f0,
   },
   shaman: {
     id: 'shaman',
@@ -370,7 +370,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'ghost_wolf',
       'earthquake',
     ],
-    color: 0x0070de,
+    color: 0x4e8aea,
   },
   warlock: {
     id: 'warlock',
@@ -407,7 +407,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'rain_of_fire',
       'spell_lock',
     ],
-    color: 0x9482c9,
+    color: 0xa785e6,
   },
   druid: {
     id: 'druid',
@@ -463,7 +463,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'skull_bash',
       'primal_reflexes',
     ],
-    color: 0xff7d0a,
+    color: 0xff8c1a,
   },
 };
 
@@ -1351,6 +1351,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'fire',
     requiresTarget: false,
+    requiresOutOfCombat: true,
+    requiresOutsideInstance: true,
     effects: [{ type: 'selfBuff', kind: 'form_fireball', value: 1.4, duration: 3600 }],
     description:
       'Transform into a blazing ember, increasing movement speed by $b%. You cannot attack or cast spells while transformed. Recast to return to your normal form.',
@@ -1802,7 +1804,16 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 5,
     cost: 40,
     castTime: 0,
-    cooldown: 8,
+    // Balance 2026-07-25 (live raid parses + class designer round): the full
+    // three-charge bank STAYS (dumping it inside Phoenix Trance for the free
+    // Pyrelance chain is the fire fantasy, designer call), but each charge
+    // recharges in 30s (was 8s, playtest 2026-07-13). The burst window keeps
+    // its whole payoff; the slow refill is what makes fire fall off after the
+    // window and come back for the next Trance (~110s), so FIGHT-LONG damage
+    // lands at parity: with the Ignite fold fix this measures 1.03x-1.17x the
+    // talented frost comparator at 60s/120s/300s (was 2.2x-2.9x live). Pinned
+    // by tests/fire_short_fight_tuning.test.ts.
+    cooldown: 30,
     range: 20,
     school: 'fire',
     requiresTarget: true,
@@ -1811,7 +1822,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // Owner rule (round five): fully off the GCD, like Phoenix Trance: castable
     // during one and it never arms one for the other abilities.
     offGcd: true,
-    // Owner playtest 2026-07-13: three stored charges (was two), back to back if banked.
+    // Owner playtest 2026-07-13: three stored charges, back to back if banked.
     maxCharges: 3,
     // Owner playtest round four: no bolt, the embers bite the moment you press.
     projectile: false,
@@ -1935,7 +1946,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // Owner rule 2026-07-11: a real cast, EXCEPT under Hot Streak, whose
     // next_cast_instant makes it instant and free (the spender machinery).
     castTime: 2,
-    cooldown: 12,
+    // Owner release rule 2026-07-19: cast time and the GCD pace it, no cooldown.
+    cooldown: 0,
     range: 30,
     school: 'fire',
     requiresTarget: false,
@@ -2837,7 +2849,16 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     spendsCombo: true,
-    effects: [{ type: 'dot', total: 96, duration: 16, interval: 2 }],
+    // 16 base + 16/combo point: totals 96 at 5 combo points, same max payoff as
+    // the old flat total, but now scales with combo points banked like every
+    // other finisher in this kit.
+    // Deliberate divergence from classic Rupture, which scales its DURATION
+    // with combo points (8 sec plus 2 sec per point) at a roughly flat per-tick
+    // value. This world's 1 to 20 level band compresses fight lengths, so a
+    // fixed 16 sec window with a combo-scaled tick reads better and keeps the
+    // bleed comparable to the other finishers here. Do not "fix" it back to
+    // duration scaling without retuning the whole rogue bleed budget.
+    effects: [{ type: 'dot', total: 16, duration: 16, interval: 2, perCombo: 16 }],
     description: 'Finishing move that wounds the target, causing it to bleed for $d over 16 sec.',
   },
   vanish: {
@@ -2948,7 +2969,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ranks: [
       { rank: 2, level: 8, cost: 50, effects: [{ type: 'heal', min: 76, max: 90 }] },
       { rank: 3, level: 14, cost: 70, effects: [{ type: 'heal', min: 122, max: 144 }] },
-      { rank: 4, level: 20, cost: 115, effects: [{ type: 'heal', min: 190, max: 222 }] },
+      { rank: 4, level: 20, cost: 117, effects: [{ type: 'heal', min: 275, max: 322 }] },
     ],
     description: 'Heals a friendly target for $d.',
   },
@@ -3097,6 +3118,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 62, max: 76 }],
+    ranks: [{ rank: 2, level: 20, cost: 46, effects: [{ type: 'heal', min: 90, max: 110 }] }],
     description: 'A quick, efficient flash of Light that heals a friendly target for $d.',
   },
   exorcism: {
@@ -3479,6 +3501,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ranks: [
       { rank: 2, level: 6, cost: 45, effects: [{ type: 'heal', min: 72, max: 86 }] },
       { rank: 3, level: 12, cost: 65, effects: [{ type: 'heal', min: 110, max: 132 }] },
+      { rank: 4, level: 20, cost: 85, effects: [{ type: 'heal', min: 160, max: 192 }] },
     ],
     description: 'Heals a friendly target for $d.',
   },
@@ -3541,6 +3564,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ranks: [
       { rank: 2, level: 12, cost: 70, effects: [{ type: 'absorb', amount: 90, duration: 30 }] },
       { rank: 3, level: 18, cost: 100, effects: [{ type: 'absorb', amount: 145, duration: 30 }] },
+      { rank: 4, level: 20, cost: 130, effects: [{ type: 'absorb', amount: 210, duration: 30 }] },
     ],
     description: 'Shields the target, absorbing $d damage for 30 sec.',
   },
@@ -3568,7 +3592,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         rank: 3,
         level: 20,
         cost: 75,
-        effects: [{ type: 'hot', total: 140, duration: 15, interval: 3 }],
+        effects: [{ type: 'hot', total: 205, duration: 15, interval: 3 }],
       },
     ],
     description: 'Heals the target for $d over 15 sec.',
@@ -3604,7 +3628,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 165, max: 195 }],
-    ranks: [{ rank: 2, level: 20, cost: 130, effects: [{ type: 'heal', min: 230, max: 270 }] }],
+    ranks: [{ rank: 2, level: 20, cost: 130, effects: [{ type: 'heal', min: 335, max: 390 }] }],
     description: 'A slow but powerful prayer that heals a friendly target for $d.',
   },
   mind_flay: {
@@ -3635,7 +3659,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'holy',
     requiresTarget: true,
     targetType: 'friendly',
-    effects: [{ type: 'heal', min: 120, max: 142 }],
+    effects: [{ type: 'heal', min: 174, max: 206 }],
     description: 'A fast prayer that heals a friendly target for $d.',
   },
 
@@ -3744,6 +3768,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 90,
         castTime: 2.5,
         effects: [{ type: 'heal', min: 138, max: 164 }],
+      },
+      {
+        rank: 5,
+        level: 20,
+        cost: 115,
+        castTime: 2.5,
+        effects: [{ type: 'heal', min: 200, max: 238 }],
       },
     ],
     description: 'Heals a friendly target for $d.',
@@ -4333,7 +4364,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ranks: [
       { rank: 2, level: 8, cost: 45, castTime: 3.0, effects: [{ type: 'heal', min: 68, max: 86 }] },
       { rank: 3, level: 14, cost: 75, effects: [{ type: 'heal', min: 115, max: 140 }] },
-      { rank: 4, level: 20, cost: 110, effects: [{ type: 'heal', min: 175, max: 208 }] },
+      { rank: 4, level: 20, cost: 110, effects: [{ type: 'heal', min: 254, max: 302 }] },
     ],
     description: 'Heals a friendly target for $d.',
   },
@@ -4422,7 +4453,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         rank: 4,
         level: 20,
         cost: 80,
-        effects: [{ type: 'hot', total: 116, duration: 12, interval: 3 }],
+        effects: [{ type: 'hot', total: 168, duration: 12, interval: 3 }],
       },
     ],
     description: 'Heals the target for $d over 12 sec.',
@@ -4494,7 +4525,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'form_bear', value: 0.65, duration: 3600 }],
     description:
-      'Shapeshift into a bear: armor +90%, greatly increased attack power, your attacks build rage and generate 30% more threat. Cast again to return to caster form.',
+      'Shapeshift into a bear: armor +130%, greatly increased attack power, your attacks build rage and generate 30% more threat. Cast again to return to caster form.',
   },
   bear_charge: {
     id: 'bear_charge',
@@ -4712,6 +4743,17 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'heal', min: 52, max: 62 },
       { type: 'hot', total: 49, duration: 21, interval: 3 },
     ],
+    ranks: [
+      {
+        rank: 2,
+        level: 20,
+        cost: 72,
+        effects: [
+          { type: 'heal', min: 75, max: 90 },
+          { type: 'hot', total: 71, duration: 21, interval: 3 },
+        ],
+      },
+    ],
     description: 'Heals a friendly target for $d and an additional amount over 21 sec.',
   },
   barkskin: {
@@ -4915,7 +4957,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     spendsCombo: true,
     requiresForm: 'cat',
-    effects: [{ type: 'dot', total: 60, duration: 12, interval: 2 }],
+    // 10 base + 10/combo point: totals 60 at 5 combo points, same max payoff as
+    // the old flat total, but now scales with combo points banked like every
+    // other finisher in this kit.
+    effects: [{ type: 'dot', total: 10, duration: 12, interval: 2, perCombo: 10 }],
     description:
       'Finishing move that causes $d Bleed damage over 12 sec. Consumes combo points. Wolf Form only.',
   },
@@ -5252,6 +5297,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: false,
     offGcd: true,
+    // The whole point of the break is escaping fear/stun, so the cast must be
+    // pressable while controlled (like Ice Block); the stun gate would
+    // otherwise make breakControl unreachable exactly when it matters.
+    usableWhileControlled: true,
     effects: [
       { type: 'breakControl' },
       // ONE aura for both halves (value = damage amp; the body scale is the
@@ -5260,7 +5309,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'selfBuff', kind: 'buff_avatar', value: 0.2, duration: 20 },
     ],
     description:
-      'Transform into a colossus for 20 sec, breaking all control on you and increasing your damage dealt by 20%.',
+      'Transform into a colossus for 20 sec, breaking enemy control effects on you (boss control is unaffected) and increasing your damage dealt by 20%.',
   },
   sanguine_aura: {
     id: 'sanguine_aura',
@@ -5332,6 +5381,17 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'heal', min: 40, max: 50 },
       { type: 'directDamage', min: 40, max: 50 },
     ],
+    ranks: [
+      {
+        rank: 2,
+        level: 20,
+        cost: 72,
+        effects: [
+          { type: 'heal', min: 58, max: 73 },
+          { type: 'directDamage', min: 40, max: 50 },
+        ],
+      },
+    ],
     description:
       'Shocks a friendly target with Holy energy to heal them, or an enemy for $d Holy damage. (Holy signature)',
   },
@@ -5349,6 +5409,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [
       { type: 'directDamage', min: 90, max: 110 },
       { type: 'chainDamage', min: 60, max: 75, jumps: 2, falloff: 1, radius: 10 },
+      { type: 'selfBuff', kind: 'buff_armor', value: 150, duration: 10 },
     ],
     description:
       'Hurls a radiant aegis at an enemy for 90 to 110 Holy damage, then bounces to 2 nearby enemies for 60 to 75 Holy damage each. (Protection signature)',
@@ -5443,7 +5504,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // same day: the Phoenix Trance window is meant to chain free Pyroblasts).
     effects: [{ type: 'selfBuff', kind: 'combustion', value: 0, duration: 10 }],
     description:
-      'Combust: for 10 sec your Fire spells always critically strike, including bolts already in flight. Off the global cooldown. These crits build Hot Streak like any other. (Fire signature)',
+      'Combust: for 10 sec your Fire spells always critically strike, including bolts already in flight. Off the global cooldown. These crits build Hot Streak like any other, and casting it finishes the Cinderfall charge currently recharging. (Fire signature)',
   },
   cone_of_cold: {
     id: 'cone_of_cold',
@@ -5558,6 +5619,17 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [
       { type: 'aoeHeal', min: 34, max: 42, radius: 10 },
       { type: 'aoeDamage', min: 24, max: 30, radius: 10 },
+    ],
+    ranks: [
+      {
+        rank: 2,
+        level: 20,
+        cost: 90,
+        effects: [
+          { type: 'aoeHeal', min: 49, max: 61, radius: 10 },
+          { type: 'aoeDamage', min: 24, max: 30, radius: 10 },
+        ],
+      },
     ],
     description:
       'Causes an explosion of Mending Light, healing nearby allies for $d and damaging nearby enemies. (Holy signature)',
@@ -6262,7 +6334,12 @@ function scaleEffect(
       // fraction again would double-apply the talent/global damage modifier.
       return eff.directPct
         ? { ...eff }
-        : { ...eff, total: Math.round(eff.total * dmgMult * dotMult + flat) };
+        : {
+            ...eff,
+            total: Math.round(eff.total * dmgMult * dotMult + flat),
+            perCombo:
+              eff.perCombo === undefined ? undefined : Math.round(eff.perCombo * dmgMult * dotMult),
+          };
     case 'aoeDamage':
     case 'aoeHeal':
       return {
@@ -6346,6 +6423,30 @@ function scaleEffect(
       return { ...eff, mana: Math.round(eff.mana * dmgMult + flat) };
     case 'gainResource':
       return { ...eff, amount: Math.round(eff.amount * dmgMult + flat) };
+    case 'groundAoE':
+      // Rune of Power's pulse is an ally damage-done buff, not a damage roll
+      // (its authored min/max are 0/0): leave it untouched so a flat talent
+      // mod can never turn a buff zone into a damage zone.
+      return eff.allyBuffPct
+        ? eff
+        : {
+            ...eff,
+            min: Math.round(eff.min * dmgMult + flat),
+            max: Math.round(eff.max * dmgMult + flat),
+          };
+    case 'repositionToAim':
+      // Heroic Leap's landing hit is a groundAoE-shaped rider on the
+      // reposition; scale it the same way a groundAoE pulse scales.
+      return eff.landingAoe
+        ? {
+            ...eff,
+            landingAoe: {
+              ...eff.landingAoe,
+              min: Math.round(eff.landingAoe.min * dmgMult + flat),
+              max: Math.round(eff.landingAoe.max * dmgMult + flat),
+            },
+          }
+        : eff;
     default:
       return eff;
   }
@@ -6356,7 +6457,12 @@ function scaleEffect(
 // mods stack on top and also tune cost / cast time / cooldown.
 function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
   const am = mods.abilities[entry.def.id];
-  const physical = entry.def.school === 'physical';
+  // The melee bucket also covers hunter's ranged-AP shots regardless of magic school:
+  // `scalesWith: 'ranged'` is exclusively set on hunter abilities (arcane_shot, serpent_sting,
+  // and wyvern_sting are non-physical), so this widening cannot reach any other class's
+  // melee/spell split. Without it, Marksmanship's Iron Aim ("ranged ability damage") silently
+  // never applied to Arcane Shot, the spec's arcane-school nuke.
+  const physical = entry.def.school === 'physical' || entry.def.scalesWith === 'ranged';
   const globalDmg = physical ? mods.global.meleeDmgPct : mods.global.spellDmgPct;
   const dmgMult = 1 + globalDmg + (am?.dmgPct ?? 0);
   const healMult = 1 + mods.global.healPct + (am?.dmgPct ?? 0);

@@ -133,8 +133,13 @@ describe('Number changes', () => {
   it('Scald lands instantly (no traveling bolt)', () => {
     expect(ABILITIES.scorch.projectile).toBe(false);
   });
-  it('Cinderfall stores three charges', () => {
+  it('Cinderfall stores three charges on a 30s recharge (balance 2026-07-25)', () => {
+    // The 2026-07-25 balance round (tests/fire_short_fight_tuning.test.ts,
+    // class designer sign-off) kept the 2026-07-13 three-charge bank (the
+    // Trance dump is the fire fantasy) and slowed each recharge 8s -> 30s so
+    // FIGHT-LONG damage, not the burst window, is what gets balanced.
     expect(ABILITIES.fire_blast.maxCharges).toBe(3);
+    expect(ABILITIES.fire_blast.cooldown).toBe(30);
   });
   it('Aetherwell restores 100 mana per tick', () => {
     const gain = ABILITIES.evocation.effects.find((e) => e.type === 'gainResource');

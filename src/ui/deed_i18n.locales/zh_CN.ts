@@ -36,7 +36,10 @@ export const table: DeedLocaleTable = {
   prog_mining_100: { name: '血脉藏矿', desc: '采矿熟练度达到100点。' },
   prog_logging_100: { name: '直取心木', desc: '伐木熟练度达到100点。' },
   prog_herbalism_100: { name: '草甸之主', desc: '草药学熟练度达到100点。' },
-  prog_master_gatherer: { name: '采集大师', desc: '采矿、伐木与草药学的熟练度均达到100点。' },
+  prog_master_gatherer: {
+    name: '采集大师',
+    desc: '在采矿、伐木、草药学、钓鱼中，任意三门的熟练度达到100点。',
+  },
   prog_first_craft: { name: '亲手所制', desc: '完成你的第一次成功制造。' },
   prog_craft_specialist: {
     name: '独门手艺',
@@ -255,7 +258,10 @@ export const table: DeedLocaleTable = {
   col_true_colors: { name: '真我本色', desc: '穿着你职业默认之外的任意外观登场。' },
   col_all_slots: { name: '十一分讲究', desc: '让全部十一个装备栏位同时都有装备。' },
   col_quartermaster_buyout: { name: '老主顾', desc: '发现军需官维克斯所售的全部十件货品。' },
-  col_glimmerfin: { name: '一线微光', desc: '钓起一条微光鳍锦鲤。' },
+  col_glimmerfin: {
+    name: '一线微光',
+    desc: '钓起一条日辉锦鲤。',
+  },
   col_full_creel: { name: '满载鱼篓', desc: '发现来自溪谷、湿地与高地水域的全部六种常见渔获。' },
   col_junk_drawer: { name: '杂物抽屉', desc: '发现 10 件不同的粗糙品质物品。' },
   pvp_arena_first_match: { name: '靴中黄沙', desc: '在灰烬竞技场打一场评级赛，任一组别皆可。' },
@@ -324,7 +330,15 @@ export const table: DeedLocaleTable = {
   exp_peaks_wayfarer: { name: '高地远行者', desc: '造访荆峰高地的全部10处具名之地。' },
   exp_world_traveler: { name: '周游世界', desc: '赢得全部三个区域的远行者功绩。', title: '远行者' },
   exp_something_shiny: { name: '闪光之物', desc: '从地上捡起一件闪闪发光的物品。' },
-  exp_first_ore: { name: '凿开大地', desc: '采集你的第一处矿石点。' },
+  prog_guildsworn: {
+    name: '誓艺者',
+    desc: '向一个原型组合完成调谐，正式踏上它所代表的两门技艺之路。',
+    title: '誓艺者',
+  },
+  exp_first_ore: {
+    name: '镐遇石鸣',
+    desc: '采集你的第一处矿石点。',
+  },
   exp_first_timber: { name: '顺山倒！', desc: '采集你的第一处木材点。' },
   exp_first_herb: { name: '绿手指', desc: '采集你的第一处草药点。' },
   feat_era_cap: { name: '第一纪元之子', desc: '在第一纪元仍为当前纪元时达到20级。' },
@@ -364,4 +378,114 @@ export const table: DeedLocaleTable = {
     desc: '闯入废弃墓穴，从其守卫者手中取回墓穴钥石的上下两半与古老日记。',
   },
   chr_marsh_first_cast: { name: '苇丛藏鳗', desc: '在泥沼湿地的水域钓起一条鱼。' },
+  prog_masterwright: {
+    name: '杰作锻师',
+    desc: '制作出你的第一件杰作，令整片区域都传颂这份匠心。',
+    title: '杰作锻师',
+  },
+  prog_fishing_100: {
+    name: '老渔翁',
+    desc: '钓鱼熟练度达到100点。',
+  },
+  prog_master_angler: {
+    name: '垂钓宗师',
+    desc: '钓鱼熟练度达到200点，攀至垂钓技艺的绝顶。',
+    title: '垂钓宗师',
+  },
+  prog_engineering_50: {
+    name: '齿轮与弹簧',
+    desc: '工程学技能达到50点。',
+  },
+  prog_alchemy_50: {
+    name: '奇药异酿',
+    desc: '炼金术技能达到50点。',
+  },
+  prog_cooking_50: {
+    name: '老练厨师',
+    desc: '烹饪技能达到50点。',
+  },
+  prog_leatherworking_50: {
+    name: '制皮人的手艺',
+    desc: '制皮技能达到50点。',
+  },
+  prog_tailoring_50: {
+    name: '一针一线',
+    desc: '裁缝技能达到50点。',
+  },
+  prog_enchanting_50: {
+    name: '奥术微光',
+    desc: '附魔技能达到50点。',
+  },
+  prog_weaponcrafting_50: {
+    name: '锋刃与淬炼',
+    desc: '武器锻造技能达到50点。',
+  },
+  prog_armorcrafting_50: {
+    name: '锤砧与钢板',
+    desc: '护甲锻造技能达到50点。',
+  },
+  prog_grandmaster_engineering: {
+    name: '工程学宗师',
+    desc: '工程学技能达到125点，登顶此门技艺的至高境界。',
+    title: '工程学宗师',
+  },
+  prog_grandmaster_alchemy: {
+    name: '炼金术宗师',
+    desc: '炼金术技能达到125点，登顶此门技艺的至高境界。',
+    title: '炼金术宗师',
+  },
+  prog_grandmaster_cooking: {
+    name: '烹饪宗师',
+    desc: '烹饪技能达到125点，登顶此门技艺的至高境界。',
+    title: '烹饪宗师',
+  },
+  prog_grandmaster_leatherworking: {
+    name: '制皮宗师',
+    desc: '制皮技能达到125点，登顶此门技艺的至高境界。',
+    title: '制皮宗师',
+  },
+  prog_grandmaster_tailoring: {
+    name: '裁缝宗师',
+    desc: '裁缝技能达到125点，登顶此门技艺的至高境界。',
+    title: '裁缝宗师',
+  },
+  prog_grandmaster_enchanting: {
+    name: '附魔宗师',
+    desc: '附魔技能达到125点，登顶此门技艺的至高境界。',
+    title: '附魔宗师',
+  },
+  prog_grandmaster_weaponcrafting: {
+    name: '武器锻造宗师',
+    desc: '武器锻造技能达到125点，登顶此门技艺的至高境界。',
+    title: '武器锻造宗师',
+  },
+  prog_grandmaster_armorcrafting: {
+    name: '护甲锻造宗师',
+    desc: '护甲锻造技能达到125点，登顶此门技艺的至高境界。',
+    title: '护甲锻造宗师',
+  },
+  col_pristine_vein: {
+    name: '纯净矿脉',
+    desc: '凿开一条纯净的矿脉，令整片区域都传扬这一发现。',
+  },
+  col_ancient_heartwood: {
+    name: '远古心木',
+    desc: '从倒下的古木中取出一段远古心木。',
+  },
+  col_moonlit_bloom: {
+    name: '月光之花',
+    desc: '在月光之花恰好绽放的瞬间将其采摘。',
+  },
+  col_perfect_specimen: {
+    name: '完美标本',
+    desc: '从猎获的野兽身上取下一份完美标本，不留半点割痕或瑕疵。',
+  },
+  soc_first_salvage: {
+    name: '物尽其用',
+    desc: '将一件装备拆解还原为原始材料。',
+  },
+  soc_salvage_50: {
+    name: '拆解行家',
+    desc: '将50件装备拆解还原为原始材料。',
+  },
 };

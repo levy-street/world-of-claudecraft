@@ -9,6 +9,7 @@ import { HEROIC_MARK_LETTER, QUEST_LETTERS, WELCOME_LETTER } from '../src/sim/co
 import { MAILBOXES } from '../src/sim/content/mailboxes';
 import { BUILTIN_WORLD } from '../src/sim/data';
 import {
+  MAIL_ATTACHMENT_EXPIRY_SECONDS,
   MAIL_DELIVERY_SECONDS,
   MAIL_MAX_ATTACHMENTS,
   MAIL_POSTAGE,
@@ -34,6 +35,14 @@ function moveToMailbox(sim: Sim, pid: number): void {
   const p = sim.entities.get(pid);
   if (!box || !p) throw new Error('missing mailbox or player');
   p.pos = { ...box.pos };
+  p.prevPos = { ...p.pos };
+  sim.rebucket(p);
+}
+
+function moveAwayFromMailboxes(sim: Sim, pid: number): void {
+  const p = sim.entities.get(pid);
+  if (!p) throw new Error('missing player');
+  p.pos = sim.groundPos(50, 0);
   p.prevPos = { ...p.pos };
   sim.rebucket(p);
 }
@@ -127,6 +136,29 @@ describe('sending a letter', () => {
     ).toBe(true);
   });
 
+  it('streams older delivered mail beyond the first fifty rows so it can be opened', () => {
+    const sim = makeWorld();
+    const alice = sim.addPlayer('warrior', 'Alice');
+    const bob = sim.addPlayer('mage', 'Bob');
+    const aliceMeta = sim.meta(alice);
+    if (!aliceMeta) throw new Error('no meta');
+    aliceMeta.copper = 100_000;
+    moveToMailbox(sim, alice);
+
+    for (let i = 0; i < 60; i++) {
+      sim.mailSend('Bob', `Letter ${i}`, `Body ${i}`, 0, [], alice);
+    }
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
+    moveToMailbox(sim, bob);
+
+    const info = sim.mailInfoFor(bob);
+    expect(info).not.toBeNull();
+    expect(info?.totalCount).toBe(61);
+    expect(info?.messages).toHaveLength(61);
+    expect(info?.messages.some((m) => m.subject === 'Letter 0')).toBe(true);
+    expect(info?.messages.some((m) => m.subject === 'Letter 59')).toBe(true);
+  });
+
   it('refuses what the post refuses', () => {
     const sim = makeWorld();
     const alice = sim.addPlayer('warrior', 'Alice');
@@ -141,7 +173,9 @@ describe('sending a letter', () => {
       return r && r.type === 'mailResult' ? r.code : null;
     };
 
-    // Away from any mailbox.
+    // The rebuilt Eastbrook mailbox is intentionally close to the fresh start,
+    // so move to an explicit non-service point for the proximity denial.
+    moveAwayFromMailboxes(sim, alice);
     sim.mailSend('Alice', 'x', 'y', 0, [], alice);
     expect(lastCode()).toBe('tooFar');
 
@@ -305,7 +339,7 @@ describe('taking attachments against bag capacity (finding 2)', () => {
     expect(empty?.items ?? []).toHaveLength(0);
   });
 
-  it('does not start the expiry clock while a partially-taken letter still holds parcels', () => {
+  it('does not start the emptied clock while a partially-taken letter still holds parcels', () => {
     const sim = makeWorld();
     const alice = sim.addPlayer('warrior', 'Alice');
     const bob = sim.addPlayer('mage', 'Bob');
@@ -315,6 +349,7 @@ describe('taking attachments against bag capacity (finding 2)', () => {
     aliceMeta.copper = 10_000;
     sim.addItem('roasted_boar', 2, alice);
     moveToMailbox(sim, alice);
+    const sentAt = sim.time;
     sim.mailSend('Bob', 'Held', 'Wait for room.', 0, [{ itemId: 'roasted_boar', count: 2 }], alice);
     tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
 
@@ -327,8 +362,9 @@ describe('taking attachments against bag capacity (finding 2)', () => {
     // biome-ignore lint/suspicious/noExplicitAny: reach into the book to inspect the raw expiry.
     const raw = (sim.postOffice as any).mail.find((m: { id: number }) => m.id === gift.id);
     expect(raw.items).toHaveLength(1);
-    // Attachments remain, so the expiry clock is still paused (Infinity).
-    expect(Number.isFinite(raw.expiresAt)).toBe(false);
+    // Attachments remain: the letter stays on its original attachment window,
+    // neither emptied-clock started nor window restarted by the partial take.
+    expect(raw.expiresAt).toBe(sentAt + MAIL_ATTACHMENT_EXPIRY_SECONDS);
   });
 });
 

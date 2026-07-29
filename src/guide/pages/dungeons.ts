@@ -16,7 +16,6 @@ const BODY: Record<string, TranslationKey> = {
   sunken_bastion: 'guide.dungeonsPage.bastionBody',
   drowned_temple: 'guide.dungeonsPage.templeBody',
   gravewyrm_sanctum: 'guide.dungeonsPage.sanctumBody',
-  orkadia: 'guide.dungeonsPage.orkadiaBody',
   wildheart_basin: 'guide.dungeonsPage.wildheartBody',
   raid: 'guide.dungeonsPage.raidBody',
 };

@@ -462,8 +462,12 @@ describe('bank_window: mobile pairing (hud.mobile.css)', () => {
     expect(mobileCss).toContain(
       `body.mobile-touch.bank-open #bank-window {\n    left: max(10px, env(safe-area-inset-left));\n    right: ${split};`,
     );
-    expect(mobileCss).toContain(
-      `body.mobile-touch.bank-open #bags {\n    left: ${split};\n    right: max(10px, env(safe-area-inset-right));`,
+    // The bags RIGHT half is shared with the market cluster (the market docks
+    // #bags the same way on touch, see market_window.test.ts). Pin against a
+    // whitespace-normalized view: biome re-wraps multi-selector lists, so a
+    // raw multi-line source pin here would rot on a reformat.
+    expect(mobileCss.replace(/\s+/g, ' ')).toContain(
+      `body.mobile-touch.bank-open #bags, body.mobile-touch.market-open #bags { left: ${split}; right: max(10px, env(safe-area-inset-right));`,
     );
   });
 
@@ -545,14 +549,14 @@ describe('bank_window: mobile pairing (hud.mobile.css)', () => {
   it('keeps the bank-cluster chips one scrollable row (no two-row wrap eating the grid)', () => {
     // At 360px-tall landscape phones a wrapped chip row squeezes the paired grid to a
     // sub-row sliver; the cluster-scoped rule keeps ONE horizontally scrollable row
-    // (bank chips docked AND undocked, bags chips only inside the bank cluster; the
-    // vendor cluster and standalone bags keep the family two-row wrap). Reverting
-    // flex-wrap to wrap, or dropping the scoped rule, reds this.
+    // (bank chips docked AND undocked, bags chips inside the bank and market
+    // clusters; the vendor cluster and standalone bags keep the family two-row
+    // wrap). Reverting flex-wrap to wrap, or dropping the scoped rule, reds this.
     expect(mobileCss).toMatch(
-      /body\.mobile-touch #bank-window \.bag-chips,\s*body\.mobile-touch\.bank-open #bags \.bag-chips \{[^}]*flex-wrap: nowrap;[^}]*overflow-x: auto;/,
+      /body\.mobile-touch #bank-window \.bag-chips,\s*body\.mobile-touch\.bank-open #bags \.bag-chips,\s*body\.mobile-touch\.market-open #bags \.bag-chips \{[^}]*flex-wrap: nowrap;[^}]*overflow-x: auto;/,
     );
     expect(mobileCss).toMatch(
-      /body\.mobile-touch #bank-window \.bag-chip,\s*body\.mobile-touch\.bank-open #bags \.bag-chip \{\s*flex: 0 0 auto;/,
+      /body\.mobile-touch #bank-window \.bag-chip,\s*body\.mobile-touch\.bank-open #bags \.bag-chip,\s*body\.mobile-touch\.market-open #bags \.bag-chip \{\s*flex: 0 0 auto;/,
     );
   });
 });

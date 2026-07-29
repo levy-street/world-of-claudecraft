@@ -8,13 +8,13 @@
     "multi-player PlayerMeta sampling",
     "classes:warrior,mage"
   ],
-  "draws": 972,
-  "drawDigest": "487a6f65",
+  "draws": 980,
+  "drawDigest": "37c898b7",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 841,
+      "nextId": 843,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -28,9 +28,9 @@
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 843,
-      "state": "c8453330",
-      "events": "5e4b101d",
+      "nextId": 845,
+      "state": "3e05a3e7",
+      "events": "025163d3",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -39,56 +39,56 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 843,
-      "state": "59a3e2af",
-      "events": "947dfa74",
+      "nextId": 845,
+      "state": "1c5b9858",
+      "events": "af1c4ea0",
       "rng": {
-        "draws": 72,
-        "digest": "d8a3e3bd"
+        "draws": 74,
+        "digest": "2374a3de"
       }
     },
     {
       "tick": 75,
       "time": 3.75,
-      "nextId": 843,
-      "state": "b7d0ebb7",
-      "events": "d827f01c",
+      "nextId": 845,
+      "state": "a943434c",
+      "events": "2852f390",
       "rng": {
-        "draws": 291,
-        "digest": "ca9e32bb"
+        "draws": 295,
+        "digest": "3fde616b"
       }
     },
     {
       "tick": 100,
       "time": 5,
-      "nextId": 843,
-      "state": "d5044bf4",
-      "events": "643f76ac",
+      "nextId": 845,
+      "state": "cd3844c3",
+      "events": "eab36b48",
       "rng": {
-        "draws": 537,
-        "digest": "70f0f32a"
+        "draws": 540,
+        "digest": "577b9f84"
       }
     },
     {
       "tick": 125,
       "time": 6.25,
-      "nextId": 843,
-      "state": "626d4bc3",
-      "events": "f81a5d45",
+      "nextId": 845,
+      "state": "4841190e",
+      "events": "e40e0da3",
       "rng": {
-        "draws": 788,
-        "digest": "272ec989"
+        "draws": 794,
+        "digest": "749f80ea"
       }
     },
     {
       "tick": 142,
       "time": 7.1,
-      "nextId": 843,
-      "state": "4a1f0310",
+      "nextId": 845,
+      "state": "987157d1",
       "events": "741638a5",
       "rng": {
-        "draws": 972,
-        "digest": "487a6f65"
+        "draws": 980,
+        "digest": "37c898b7"
       },
       "label": "final",
       "players": [
@@ -134,7 +134,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 841,
+          "entityId": 843,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -162,7 +162,6 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "renown": 15,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -212,7 +211,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 842,
+          "entityId": 844,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -234,7 +233,6 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "renown": 10,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -253,7 +251,7 @@
               "name": "Battle Stance",
               "remaining": 3597.95,
               "school": "physical",
-              "sourceId": 841
+              "sourceId": 843
             }
           ],
           "blockChance": 0.05,
@@ -265,7 +263,7 @@
           "dodgeChance": 0.06,
           "fiveSecondRule": 106.1,
           "hp": 100,
-          "id": 841,
+          "id": 843,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -278,7 +276,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 103600,
-            "z": -1264
+            "z": -1148
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -314,7 +312,7 @@
           "dodgeChance": 0.056,
           "facing": 3.141593,
           "fiveSecondRule": 106.1,
-          "id": 842,
+          "id": 844,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -326,7 +324,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 103600,
-            "z": -1232
+            "z": -1108
           },
           "potionCooldownUntil": -1,
           "resource": 195,

@@ -1,20 +1,26 @@
 import { describe, expect, it } from 'vitest';
 import {
   RIFT_EPIC_ITEM_IDS,
-  RIFT_LEGENDARY_ITEM_ID,
+  RIFT_LEGENDARY_ITEM_IDS,
   RIFT_RARE_ITEM_IDS,
 } from '../src/sim/content/rift/items';
 import { RIFT_BOSS_IDS, RIFT_TRASH_IDS } from '../src/sim/content/rift/mobs';
 import { BUILTIN_WORLD, ITEMS, MOBS, riftInstanceOrigin } from '../src/sim/data';
+import { riftHeroicClearPool, riftNormalClearPool } from '../src/sim/rift/loot_pools';
 import { RIFT_TIER_INFO } from '../src/sim/rift/portals';
 import {
   addRiftClearGearLoot,
+  RIFT_BLUE_MOUNT_CHANCE,
   RIFT_BLUE_MOUNT_REINS,
   RIFT_COIN_BONUS_A,
   RIFT_COIN_BONUS_B,
   RIFT_COIN_BONUS_C,
   RIFT_COIN_BONUS_S,
+  RIFT_EPIC_MOUNT_CHANCE,
   RIFT_EPIC_MOUNT_REINS,
+  RIFT_GREEN_MOUNT_CHANCE,
+  RIFT_GREEN_MOUNT_REINS,
+  RIFT_LEGENDARY_CHANCE_S,
 } from '../src/sim/rift/progression';
 import {
   capRiftNonLethalMechanicDamage,
@@ -23,9 +29,13 @@ import {
   RIFT_NONLETHAL_MECHANIC_CAP_PCT,
   RIFT_RANK_MECHANIC_BUDGET,
   RIFT_S_ZONE_TEMPO,
+  type RiftSpawnRole,
   riftFloorLevel,
   riftMechanicSuppressed,
   riftRankForBaseLevel,
+  riftRankTuningFor,
+  riftRoleDamageMultiplier,
+  riftRoleHealthMultiplier,
 } from '../src/sim/rift/ranks';
 import { generateRiftFloor, isSetPieceSeed, riftFloorCount } from '../src/sim/rift/rift_gen';
 import { Rng } from '../src/sim/rng';
@@ -188,42 +198,15 @@ describe('rift ranks: boss mechanic kits (content integrity)', () => {
   });
 });
 
-describe('rift ranks: A/S/B heroic spawn scaling', () => {
-  it('B/A/S trash takes the heroic stat transform + mechanic multipliers; C does not', () => {
-    // C is the only rank without the heroic transform.
-    for (const baseLevel of [20]) {
-      const sim = makeSim();
-      sim.enterRift(SEED, baseLevel, sim.player.id);
-      const inst = active(sim);
-      for (const id of inst.mobIds) {
-        const m = sim.entities.get(id)!;
-        expect(m.mechanicDamageMult, `C mob ${m.templateId}`).toBeUndefined();
-        expect(m.riftMechanicLimit, 'trash carries no mechanic budget').toBeUndefined();
-      }
-    }
-    // B-rank mobs DO carry the 1.5/1.35 heroic transform (new in B-rank tuning).
-    {
-      const sim = makeSim();
-      sim.enterRift(SEED, 22, sim.player.id);
-      const inst = active(sim);
-      const tuning = RIFT_HEROIC_TUNING.B!;
-      expect(inst.mobIds.length).toBeGreaterThan(0);
-      for (const id of inst.mobIds) {
-        const m = sim.entities.get(id)!;
-        const t = MOBS[m.templateId];
-        expect(m.mechanicDamageMult, `B mob ${m.templateId}`).toBe(tuning.damageMultiplier);
-        expect(m.mechanicHealMult).toBe(tuning.healthMultiplier);
-        expect(m.moveSpeed, 'anti-kite move-speed floor').toBeGreaterThanOrEqual(
-          RIFT_HEROIC_MIN_MOVE_SPEED,
-        );
-        const hm = tuning.healthMultiplier;
-        const expected = Math.round((t.hpBase * hm + t.hpPerLevel * hm * (m.level - 1)) * 2.3);
-        expect(m.maxHp, `B ${m.templateId} hp`).toBe(expected);
-      }
-    }
-    for (const baseLevel of [25, 28]) {
+describe('rift ranks: C/B/A/S spawn scaling', () => {
+  it('every rank takes a stat transform + mechanic multipliers, on its own table', () => {
+    // Since the 2026-07-26 recalibration C is scaled too, on the sibling
+    // RIFT_NORMAL_TUNING (the normal-dungeon rung), so no rank spawns raw
+    // templates any more. C keeps the template's own move speed: the anti-kite
+    // floor is a heroic-only property.
+    for (const baseLevel of [20, 22, 25, 28]) {
       const tier = riftRankForBaseLevel(baseLevel);
-      const tuning = RIFT_HEROIC_TUNING[tier]!;
+      const tuning = riftRankTuningFor(baseLevel);
       const sim = makeSim();
       sim.enterRift(SEED, baseLevel, sim.player.id);
       const inst = active(sim);
@@ -231,16 +214,39 @@ describe('rift ranks: A/S/B heroic spawn scaling', () => {
       for (const id of inst.mobIds) {
         const m = sim.entities.get(id)!;
         const t = MOBS[m.templateId];
-        expect(m.mechanicDamageMult, `${tier} mob ${m.templateId}`).toBe(tuning.damageMultiplier);
-        expect(m.mechanicHealMult).toBe(tuning.healthMultiplier);
-        expect(m.moveSpeed, 'anti-kite move-speed floor').toBeGreaterThanOrEqual(
-          RIFT_HEROIC_MIN_MOVE_SPEED,
+        // Floor 0 is never a boss floor, but a C set-piece seed fields the
+        // citadel miniboss there, which takes the BOSS pair.
+        const role: RiftSpawnRole = id === inst.bossId || id === inst.minibossId ? 'boss' : 'trash';
+        expect(m.mechanicDamageMult, `${tier} mob ${m.templateId}`).toBe(
+          riftRoleDamageMultiplier(tuning, role),
         );
+        expect(m.mechanicHealMult).toBe(riftRoleHealthMultiplier(tuning, role));
+        if (tier === 'C') {
+          expect(m.moveSpeed, 'C keeps the template speed').toBe(t.moveSpeed);
+        } else {
+          expect(m.moveSpeed, 'anti-kite move-speed floor').toBeGreaterThanOrEqual(
+            RIFT_HEROIC_MIN_MOVE_SPEED,
+          );
+        }
         // The spawn-time template transform reached the derived stats: maxHp is
         // the elite formula over the health-multiplied template line.
-        const hm = tuning.healthMultiplier;
-        const expected = Math.round((t.hpBase * hm + t.hpPerLevel * hm * (m.level - 1)) * 2.3);
+        const hm = riftRoleHealthMultiplier(tuning, role);
+        const eliteHp = t.elite ? 2.3 : 1;
+        const expected = Math.round((t.hpBase * hm + t.hpPerLevel * hm * (m.level - 1)) * eliteHp);
         expect(m.maxHp, `${tier} ${m.templateId} hp`).toBe(expected);
+      }
+    }
+    // Trash never carries a boss mechanic budget, at any rank.
+    for (const baseLevel of [20, 22, 25, 28]) {
+      const sim = makeSim();
+      sim.enterRift(SEED, baseLevel, sim.player.id);
+      const inst = active(sim);
+      for (const id of inst.mobIds) {
+        if (id === inst.bossId || id === inst.minibossId) continue;
+        expect(
+          sim.entities.get(id)!.riftMechanicLimit,
+          'trash carries no mechanic budget',
+        ).toBeUndefined();
       }
     }
   });
@@ -491,36 +497,18 @@ describe('rift ranks: lethal boss death zone (deathZoneCast / deathZoneStrike)',
     expect(new Set(anchors).size, 'zones land on distinct member positions').toBe(2);
   });
 
-  it('the heroic tuning table carries the approved literals', () => {
+  it('the heroic tuning table covers exactly B, A and S', () => {
     // The transform tests above assert WIRING against this table (field on the
-    // mob === field in the table), so the numbers themselves must be pinned
-    // here as literals or a silent retune of any multiplier passes every test.
-    expect(RIFT_HEROIC_TUNING).toEqual({
-      B: {
-        healthMultiplier: 1.5,
-        damageMultiplier: 1.35,
-        addDamageMultiplier: 1.12,
-        armorMultiplier: 1.12,
-      },
-      A: {
-        healthMultiplier: 1.9,
-        damageMultiplier: 1.6,
-        addDamageMultiplier: 1.25,
-        armorMultiplier: 1.25,
-      },
-      // heroic_s: S is a full difficulty tier above the B/A heroic ladder,
-      // double the old S hp and damage (playtest verdict 2026-07-21: a 5-man
-      // of capped players cleared S without pressure).
-      S: {
-        healthMultiplier: 5.0,
-        damageMultiplier: 4.0,
-        addDamageMultiplier: 3.0,
-        armorMultiplier: 1.4,
-      },
-    });
+    // mob === field in the table). The VALUES are pinned as literals, together
+    // with C's RIFT_NORMAL_TUNING and every floor they were solved against, in
+    // tests/rift_difficulty_floors.test.ts: that is the file that must go red
+    // when the dungeon ladder moves. Here we only pin the rank COVERAGE, which
+    // is what this file's wiring assertions depend on (C must stay absent, or
+    // the citadel and the C boulder gate change meaning silently).
+    expect(Object.keys(RIFT_HEROIC_TUNING).sort()).toEqual(['A', 'B', 'S']);
   });
 
-  it('B-rank boss adds take the softer 1.12 multiplier (venom summons in budget)', () => {
+  it('B-rank boss adds take the softer add multiplier (venom summons in budget)', () => {
     const seed = seedWithFinalBoss('rift_boss_venom');
     const b = enterAtBossFloor(seed, 22);
     const bBoss = b.entities.get(active(b).bossId!)!;
@@ -539,12 +527,16 @@ describe('rift ranks: lethal boss death zone (deathZoneCast / deathZoneStrike)',
     );
     tickAlive(b, 3);
     expect(bBoss.summonedIds.length, 'B summons (venom slot 1 fits budget 2)').toBeGreaterThan(0);
+    const addMult = RIFT_HEROIC_TUNING.B!.addDamageMultiplier;
     for (const addId of bBoss.summonedIds) {
       const add = b.entities.get(addId)!;
       expect(add.level, 'adds match the boss level').toBe(bBoss.level);
-      expect(add.mechanicDamageMult, 'softer add multiplier, literal').toBe(1.12);
+      expect(add.mechanicDamageMult, 'softer add multiplier, literal').toBe(10.3);
+      expect(addMult, 'and it is the table value').toBe(10.3);
+      // Strictly softer than the boss's own line: wave pressure, not extra bosses.
+      expect(addMult).toBeLessThan(RIFT_HEROIC_TUNING.B!.bossDamageMultiplier);
       const t = MOBS[add.templateId];
-      const swing = t.dmgBase * 1.12 + t.dmgPerLevel * 1.12 * (add.level - 1);
+      const swing = t.dmgBase * addMult + t.dmgPerLevel * addMult * (add.level - 1);
       expect(add.weapon.min, 'add swings at the softer multiplier').toBe(Math.round(swing * 0.8));
     }
   });
@@ -899,14 +891,21 @@ describe('rift ranks: clear-time epic and legendary payout', () => {
       expect(ITEMS[id], id).toBeDefined();
       expect(ITEMS[id].quality, id).toBe('epic');
     }
-    expect(ITEMS[RIFT_LEGENDARY_ITEM_ID]).toBeDefined();
-    expect(ITEMS[RIFT_LEGENDARY_ITEM_ID].quality).toBe('legendary');
+    for (const id of RIFT_LEGENDARY_ITEM_IDS) {
+      expect(ITEMS[id], id).toBeDefined();
+      expect(ITEMS[id].quality, id).toBe('legendary');
+    }
   });
 
-  it('C pays a guaranteed rare + coin, B guarantees an epic, A guarantees an epic, S guarantees plus rolls more', () => {
-    const epicIds = new Set<string>(RIFT_EPIC_ITEM_IDS);
-    const rareIds = new Set<string>(RIFT_RARE_ITEM_IDS);
-    const mountIds = new Set<string>([...RIFT_BLUE_MOUNT_REINS, ...RIFT_EPIC_MOUNT_REINS]);
+  it('C pays one normal-pool drop + coin, B/A guarantee one heroic epic, S guarantees plus rolls more', () => {
+    const epicIds = new Set<string>(riftHeroicClearPool());
+    const normalIds = new Set<string>(riftNormalClearPool());
+    const legendaryIds = new Set<string>(RIFT_LEGENDARY_ITEM_IDS);
+    const mountIds = new Set<string>([
+      ...RIFT_GREEN_MOUNT_REINS,
+      ...RIFT_BLUE_MOUNT_REINS,
+      ...RIFT_EPIC_MOUNT_REINS,
+    ]);
     // Returns only the gear (non-mount) items from a clear.
     const run = (baseLevel: number, rngSeed: number) => {
       const boss = { loot: { copper: 0, items: [] }, lootable: false } as unknown as Entity;
@@ -921,39 +920,117 @@ describe('rift ranks: clear-time epic and legendary payout', () => {
       return boss.loot!.copper;
     };
     for (let s = 1; s <= 40; s++) {
-      // C: guaranteed rare from RIFT_RARE_ITEM_IDS, never an epic.
+      // C: exactly one drop from the NORMAL five-man pool, never a heroic epic.
       const c = run(20, s);
-      expect(c.length, 'C pays exactly one rare').toBe(1);
-      expect(rareIds.has(c[0]!), 'C pays from the rare pool').toBe(true);
+      expect(c.length, 'C pays exactly one item').toBe(1);
+      expect(normalIds.has(c[0]!), 'C pays from the normal pool').toBe(true);
+      expect(epicIds.has(c[0]!), 'C never pays from the heroic pool').toBe(false);
       expect(runCopper(20, s), 'C pays the coin bonus').toBe(RIFT_COIN_BONUS_C);
       const a = run(25, s);
       expect(a.length, 'A guarantees exactly one epic').toBe(1);
-      expect(epicIds.has(a[0]!), 'A pays from the epic pool').toBe(true);
+      expect(epicIds.has(a[0]!), 'A pays from the heroic pool').toBe(true);
       // B: guaranteed 1 epic (RIFT_EPIC_CHANCE_B = 1.0).
       const b = run(22, s);
       expect(b.length, 'B guarantees exactly one epic').toBe(1);
-      expect(epicIds.has(b[0]!), 'B pays from the epic pool').toBe(true);
+      expect(epicIds.has(b[0]!), 'B pays from the heroic pool').toBe(true);
       const sDrops = run(28, s);
       expect(sDrops.length, 'S guarantees one epic').toBeGreaterThanOrEqual(1);
-      expect(sDrops.length).toBeLessThanOrEqual(3);
+      // Ceiling: guaranteed epic + second epic + one roll per legendary.
+      expect(sDrops.length).toBeLessThanOrEqual(2 + RIFT_LEGENDARY_ITEM_IDS.length);
       expect(epicIds.has(sDrops[0]!)).toBe(true);
       for (const id of sDrops) {
-        expect(epicIds.has(id!) || id === RIFT_LEGENDARY_ITEM_ID).toBe(true);
+        expect(epicIds.has(id!) || legendaryIds.has(id!)).toBe(true);
       }
     }
-    // S legendary is reachable but rare; B always pays exactly one epic.
-    let sLegendaries = 0;
-    for (let s = 1; s <= 300; s++) {
-      if (run(28, s).includes(RIFT_LEGENDARY_ITEM_ID)) sLegendaries++;
-    }
-    expect(sLegendaries).toBeGreaterThan(0);
-    expect(sLegendaries).toBeLessThan(60);
   });
 
-  it('an S-rank clear leaves an epic on the boss corpse; a C clear leaves a rare (not an epic)', () => {
+  it('the mount ladder: C none, B green only, A blue only, S epic only, each at its own rate', () => {
+    const run = (baseLevel: number, rngSeed: number): string[] => {
+      const boss = { loot: { copper: 0, items: [] }, lootable: false } as unknown as Entity;
+      const ctx = { rng: new Rng(rngSeed) } as unknown as SimContext;
+      addRiftClearGearLoot(ctx, boss, baseLevel);
+      return boss.loot!.items.map((i) => i.itemId!) as string[];
+    };
+    const SAMPLE = 20_000;
+    const tiers = [
+      { rank: 'C', baseLevel: 20, reins: [] as readonly string[], chance: 0 },
+      { rank: 'B', baseLevel: 22, reins: RIFT_GREEN_MOUNT_REINS, chance: RIFT_GREEN_MOUNT_CHANCE },
+      { rank: 'A', baseLevel: 25, reins: RIFT_BLUE_MOUNT_REINS, chance: RIFT_BLUE_MOUNT_CHANCE },
+      { rank: 'S', baseLevel: 28, reins: RIFT_EPIC_MOUNT_REINS, chance: RIFT_EPIC_MOUNT_CHANCE },
+    ];
+    const allReins = new Set<string>([
+      ...RIFT_GREEN_MOUNT_REINS,
+      ...RIFT_BLUE_MOUNT_REINS,
+      ...RIFT_EPIC_MOUNT_REINS,
+    ]);
+    for (const tier of tiers) {
+      const own = new Set<string>(tier.reins);
+      let hits = 0;
+      for (let s = 1; s <= SAMPLE; s++) {
+        for (const id of run(tier.baseLevel, s)) {
+          if (!allReins.has(id)) continue;
+          // A rank never sheds a tier it did not earn, in either direction.
+          expect(own.has(id), `${tier.rank} dropped ${id}, which is not its tier`).toBe(true);
+          hits++;
+        }
+      }
+      const expected = SAMPLE * tier.chance;
+      if (tier.chance === 0) {
+        expect(hits, `${tier.rank} rolls no mount at all`).toBe(0);
+        continue;
+      }
+      expect(
+        hits,
+        `${tier.rank} observed ${hits}/${SAMPLE}, expected about ${expected}`,
+      ).toBeGreaterThan(expected * 0.5);
+      expect(
+        hits,
+        `${tier.rank} observed ${hits}/${SAMPLE}, expected about ${expected}`,
+      ).toBeLessThan(expected * 1.7);
+    }
+  });
+
+  it('each rift legendary drops at its own declared 0.3% rate on S, and never below S', () => {
+    const mountIds = new Set<string>([
+      ...RIFT_GREEN_MOUNT_REINS,
+      ...RIFT_BLUE_MOUNT_REINS,
+      ...RIFT_EPIC_MOUNT_REINS,
+    ]);
+    const run = (baseLevel: number, rngSeed: number) => {
+      const boss = { loot: { copper: 0, items: [] }, lootable: false } as unknown as Entity;
+      const ctx = { rng: new Rng(rngSeed) } as unknown as SimContext;
+      addRiftClearGearLoot(ctx, boss, baseLevel);
+      return boss.loot!.items.map((i) => i.itemId).filter((id) => !mountIds.has(id!));
+    };
+    // A 0.3% rate needs a big sample to be measurable at all; 20 000 clears puts
+    // the expectation at 60 per legendary, tight enough to catch a 2x mistuning.
+    const SAMPLE = 20_000;
+    const hits = new Map<string, number>(RIFT_LEGENDARY_ITEM_IDS.map((id) => [id, 0]));
+    for (let s = 1; s <= SAMPLE; s++) {
+      for (const id of run(28, s)) if (hits.has(id!)) hits.set(id!, hits.get(id!)! + 1);
+    }
+    const expected = SAMPLE * RIFT_LEGENDARY_CHANCE_S; // 60
+    for (const id of RIFT_LEGENDARY_ITEM_IDS) {
+      const n = hits.get(id)!;
+      expect(n, `${id} observed ${n}/${SAMPLE}, expected about ${expected}`).toBeGreaterThan(
+        expected * 0.5,
+      );
+      expect(n, `${id} observed ${n}/${SAMPLE}, expected about ${expected}`).toBeLessThan(
+        expected * 1.7,
+      );
+    }
+    // C/B/A never shed a legendary, no matter how many clears.
+    for (const baseLevel of [20, 22, 25]) {
+      for (let s = 1; s <= 2000; s++) {
+        for (const id of run(baseLevel, s)) expect(RIFT_LEGENDARY_ITEM_IDS).not.toContain(id);
+      }
+    }
+  });
+
+  it('an S clear leaves a heroic epic on the corpse; a C clear leaves a normal-pool drop', () => {
     const seed = seedWithFinalBoss('rift_boss_ember');
-    const epicIds = new Set<string>(RIFT_EPIC_ITEM_IDS);
-    const rareIds = new Set<string>(RIFT_RARE_ITEM_IDS);
+    const epicIds = new Set<string>(riftHeroicClearPool());
+    const normalIds = new Set<string>(riftNormalClearPool());
 
     const s = enterAtBossFloor(seed, 28);
     const sBoss = s.entities.get(active(s).bossId!)!;
@@ -974,7 +1051,7 @@ describe('rift ranks: clear-time epic and legendary payout', () => {
     tickAlive(s, 25); // the 1 Hz sweep claims the clear and pays the gear
     const sItems = (sBoss.loot?.items ?? []).map((i) => i.itemId);
     expect(
-      sItems.some((id) => epicIds.has(id!) || id === RIFT_LEGENDARY_ITEM_ID),
+      sItems.some((id) => epicIds.has(id!) || RIFT_LEGENDARY_ITEM_IDS.includes(id as never)),
       `S corpse carries clear gear (got: ${sItems.join(',')})`,
     ).toBe(true);
 
@@ -996,12 +1073,12 @@ describe('rift ranks: clear-time epic and legendary payout', () => {
     tickAlive(c, 25);
     const cItems = (cBoss.loot?.items ?? []).map((i) => i.itemId);
     expect(
-      cItems.some((id) => epicIds.has(id!) || id === RIFT_LEGENDARY_ITEM_ID),
+      cItems.some((id) => epicIds.has(id!) || RIFT_LEGENDARY_ITEM_IDS.includes(id as never)),
       'C corpse never carries an epic or legendary',
     ).toBe(false);
     expect(
-      cItems.some((id) => rareIds.has(id!)),
-      'C corpse carries exactly one rare',
+      cItems.some((id) => normalIds.has(id!)),
+      `C corpse carries a normal-pool drop (got: ${cItems.join(',')})`,
     ).toBe(true);
   });
 

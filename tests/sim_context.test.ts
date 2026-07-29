@@ -198,6 +198,7 @@ const CALLBACK_KEYS = [
   'startAutoAttack',
   'revivePet',
   'completeFishing',
+  'completeGatherCast',
   'applyDemonHealTick',
   'awardCombo',
   'meleeSwing',
@@ -234,6 +235,8 @@ const CALLBACK_KEYS = [
   'mailAuthoredLetter',
   // Set proc firing.
   'applySetProcs',
+  // Vale Cup <-> Arena queue exclusion (social/vale_cup.ts).
+  'vcupSeatedOrQueued',
   // The Vale Cup sport-move arms (social/vale_cup.ts).
   'vcupBallKick',
   'vcupBallPass',
@@ -268,6 +271,7 @@ function makeFakeHost() {
       return entities;
     },
     players: new Map(),
+    stationPlacements: [],
     primaryId: -1,
     tradeInvites: new Map(),
     duelInvites: new Map(),
@@ -481,6 +485,9 @@ function makeFakeHost() {
     // delveDetectMult stubbed above (C1/M2/C3) - deduped here.
     partyMembersForKey: vi.fn(() => []),
     addItem: vi.fn(),
+    equipBag: vi.fn(),
+    equipItem: vi.fn(),
+    unequipItem: vi.fn(),
     addItemInstance: vi.fn(),
     // removeItem stubbed above (P1b inventory-hub helper) - deduped.
     spawnBossAdds: vi.fn(),
@@ -514,6 +521,7 @@ function makeFakeHost() {
     startAutoAttack: vi.fn(),
     revivePet: vi.fn(),
     completeFishing: vi.fn(),
+    completeGatherCast: vi.fn(),
     applyDemonHealTick: vi.fn(),
     awardCombo: vi.fn(),
     meleeSwing: vi.fn(() => false),
@@ -549,6 +557,8 @@ function makeFakeHost() {
     mailHeroicMarks: vi.fn(),
     mailAuthoredLetter: vi.fn(),
     applySetProcs: vi.fn(),
+    // Vale Cup <-> Arena queue exclusion.
+    vcupSeatedOrQueued: vi.fn(() => false),
     // The Vale Cup sport-move arms.
     vcupBallKick: vi.fn(),
     vcupBallPass: vi.fn(),

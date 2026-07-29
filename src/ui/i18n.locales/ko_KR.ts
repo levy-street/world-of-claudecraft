@@ -17,8 +17,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
   'hudChrome.nameplate.mobLevel': '{level}',
+  'hudChrome.nameplate.afkTag': '자리비움',
   'hudChrome.discord.roleTag.legend': '전설',
   'hudChrome.discord.roleTag.shill': '홍보대사',
+  'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',
+  'guide.profPages.fish.pctFmt': '{pct}%',
+  'questUi.dialog.profIntroHint': '{name}에게 "{quest}"을(를) 받으세요.',
   'entities.items.eastbrook_greatsword.name': '이스트브룩 대검',
   'entities.items.highwatch_greatsword.name': '하이워치 대검',
   'entities.items.highwatch_wallshield.name': '하이워치 벽방패',
@@ -388,6 +392,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.wtype.wand': '마법봉',
   'hudChrome.wocStore.wtype.bow': '활',
   'hudChrome.wocStore.wtype.crossbow': '석궁',
+  'hudChrome.wocStore.wtype.polearm': '장창',
   'hudChrome.wocStore.badge.flagship': '플래그십',
   'hudChrome.wocStore.badge.hero': '영웅',
   'hudChrome.wocStore.inspectAria': '{item} 살펴보기',
@@ -421,7 +426,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': '카드',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': '20% 할인',
+  'hudChrome.claudium.railWocDiscount': '{percent}% 할인',
   'hudChrome.claudium.solBalance': 'SOL: {amount}',
   'hudChrome.claudium.wocBalance': 'WOC: {amount}',
   'hudChrome.claudium.railWocUnavailable': '현재 WOC 가격을 이용할 수 없습니다.',
@@ -509,6 +514,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.close': '일일 보상 닫기',
   'hudChrome.dailyRewards.loading': '일일 보상 불러오는 중...',
   'hudChrome.dailyRewards.error': '일일 보상을 불러올 수 없습니다.',
+  'hudChrome.dailyRewards.disabled':
+    '일일 보상은 현재 비활성화되어 있습니다. 이 기능에 대한 업데이트는 Discord 채널에서 안내하겠습니다.',
   'hudChrome.dailyRewards.intro':
     '인증된 지갑에 충분한 WOC를 보유하여 일일 보상을 잠금 해제하세요. 하루 한 번의 스핀과 교체되는 과제로 포인트를 획득한 뒤, 일일 순위표를 올라 상금 풀의 일부를 차지하세요.',
   'hudChrome.dailyRewards.disclaimer':
@@ -568,7 +575,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.result':
     '준비 확인: {ready}명 준비 완료, {notReady}명 준비 안 됨, {noResponse}명 무응답.',
   'hudChrome.loot.chestTitle': '상자',
-  'hudChrome.loot.takeAllTooltip': '모두 가져가기: 이 전리품 창의 모든 돈과 아이템을 가져갑니다.',
+  'hudChrome.loot.takeLootButton': '전리품 가져가기',
+  'hudChrome.loot.takeLootTooltip':
+    '돈과 떨어진 아이템을 가져갑니다. 채집 기회는 소모되지 않습니다.',
+  'hudChrome.loot.unifiedPressHint':
+    '상호작용 키를 한 번 누르면 마을 집중에 따라 전리품 획득과 채집을 함께 수행합니다.',
   'hudChrome.itemTooltip.requiresLevel': '필요 레벨 {level}',
   'hudChrome.spellbook.addToBarAria': '{name}을(를) 행동 단축바에 추가',
   'hudChrome.spellbook.removeFromBarAria': '{name}을(를) 행동 단축바에서 제거',
@@ -680,6 +691,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.playerMenu.profileUnavailable': '{name} 님의 프로필을 찾을 수 없습니다.',
   'hudChrome.playerMenu.aiTag': '[AI]',
   'hudChrome.playerMenu.aiTagTitle': 'AI 운영 계정',
+  'hudChrome.discord.roleTagChatTitle': '인증된 서버 역할: {role}',
   'hudChrome.playerMenu.streamerBadgeTitle': '인증된 스트리머',
   'hudChrome.playerMenu.watchTwitch': 'Twitch에서 시청',
   'hudChrome.playerMenu.watchX': 'X에서 보기',
@@ -693,6 +705,19 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.nowBlocking': '{name} 님을 차단했습니다.',
   'hudChrome.social.blockedTab': '차단',
   'hudChrome.social.stopBlockingTitle': '{name} 님 차단 해제',
+  'hudChrome.social.onlineHeader': '온라인 ({n})',
+  'hudChrome.social.offlineHeader': '오프라인 ({n})',
+  'hudChrome.social.hideOffline': '오프라인 숨기기',
+  'hudChrome.social.hideOfflineTitle': '오프라인 길드원 숨기기',
+  'hudChrome.social.billboard.label': '길드 게시판',
+  'hudChrome.social.billboard.empty': '게시판에 아직 아무 내용도 없습니다.',
+  'hudChrome.social.billboard.setBy': '{name} 설정',
+  'hudChrome.social.billboard.save': '저장',
+  'hudChrome.social.billboard.placeholder': '길드에 전할 메시지를 작성하세요',
+  'hudChrome.social.billboard.inputLabel': '길드 게시판 메시지',
+  'hudChrome.social.billboard.result.set': '길드 게시판이 업데이트되었습니다.',
+  'hudChrome.social.billboard.result.notOfficer':
+    '게시판은 임원과 길드 마스터만 수정할 수 있습니다.',
   'hudChrome.party.promoteLeader': '파티장으로 지정',
   'hudChrome.party.inviteUsage': '누구를 초대하시겠습니까? 사용법: /invite <이름>.',
   'hudChrome.masterLoot.thresholdLabel': '품질 기준',
@@ -748,11 +773,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootSettings.masterOption': '분배 담당자: {name}',
   'hudChrome.corpseHarvest.title': '채집',
   'hudChrome.corpseHarvest.harvestButton': '채집',
-  'hudChrome.corpseHarvest.concentrateHint': '선택한 부위가 적을수록 부위당 등급이 더 높아집니다.',
   'hudChrome.corpseHarvest.alreadyHarvested': '이 시체는 이미 채집되었습니다.',
-  'hudChrome.corpseHarvest.harvestButtonTooltip':
-    '채집: 이 시체에서 전리품과 별개로 제작 재료(가죽, 송곳니, 실크 등)를 모읍니다. 누구나 채집할 수 있지만, 하나의 시체는 한 명의 플레이어만 채집할 수 있습니다.',
+  'hudChrome.corpseHarvest.nothingSelectedYields': '선택한 부위는 이 시체에서 채집할 수 없습니다.',
+  'hudChrome.corpseHarvest.harvestTooltip':
+    '선택한 부위를 채집합니다. 각 시체는 선착순으로 한 번만 채집할 수 있습니다. 전리품은 가져가지 않습니다.',
   'hudChrome.corpseHarvest.componentAria': '{component} 채집',
+  'hudChrome.corpseHarvest.componentNoYield': '아직 없음',
+  'hudChrome.corpseHarvest.componentAriaNoYield': '{component} 채집: {note}',
+  'hudChrome.corpseHarvest.yieldTierHint':
+    '채집에서 실제로 얻는 부위가 적을수록 각 부위의 등급이 더 높아집니다.',
   'hudChrome.corpseHarvest.components.hide': '가죽',
   'hudChrome.corpseHarvest.components.fang': '송곳니',
   'hudChrome.corpseHarvest.components.silk': '비단실',
@@ -761,9 +790,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.claw': '발톱',
   'hudChrome.corpseHarvest.components.horn': '뿔',
   'hudChrome.corpseHarvest.components.tusk': '엄니',
+  'hudChrome.corpseHarvest.components.cloth': '천',
   'hudChrome.townFocus.title': '마을 집중',
   'hudChrome.townFocus.hint':
     '집중 포인트는 각 재료의 기본 산출량에 보너스를 더합니다. 집중하지 않은 재료는 기본 산출량 그대로 유지됩니다.',
+  'hudChrome.townFocus.tierHint':
+    '재료 하나에 집중 {points}포인트를 투자할 때마다 채집 등급이 한 단계 오릅니다(최대 {steps}단계). {points}포인트 미만이라도 산출량은 늘어납니다.',
+  'hudChrome.townFocus.townOnlyHint': '집중은 마을 안에서만 변경할 수 있습니다.',
   'hudChrome.townFocus.budgetLabel': '남은 포인트: {remaining} / {budget}',
   'hudChrome.townFocus.saveButton': '집중 저장',
   'hudChrome.townFocus.notInTownHint': '집중을 설정하려면 마을에 있어야 합니다.',
@@ -803,6 +836,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.fiestaKill': '피에스타 처치',
   'hudChrome.warfare.reasons.fiestaComplete': '피에스타 완료',
   'hudChrome.warfare.reasons.fiestaWin': '피에스타 승리',
+  'hudChrome.charSheet.offense': '공격',
+  'hudChrome.charSheet.defense': '방어',
   'hudChrome.statInfo.fromYour': '당신의 {value} {stat}에서:',
   'hudChrome.statInfo.names.spellPower': '주문력',
   'hudChrome.statInfo.names.critRating': '치명타 등급',
@@ -969,6 +1004,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showWalletOnPlayerCard': '플레이어 카드에 지갑 표시',
   'hudChrome.options.showDevBadges': '개발자 배지 표시',
   'hudChrome.options.showOwnNameplate': '내 이름표 표시',
+  'hudChrome.options.showPlayerNameplates': '플레이어 이름표 표시',
   'hudChrome.playerCard.showWalletBadge': '지갑 배지 표시',
   'hudChrome.options.uiScale': 'UI 배율',
   'hudChrome.options.highContrastBackground': '고대비 배경',
@@ -1124,6 +1160,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'nav.donate': '후원',
   'stats.title': '월드 상태',
   'stats.accountsCreated': '플레이어',
+  'stats.charactersCreated': '생성된 캐릭터',
   'stats.playersOnline': '현재 접속자 수',
   'stats.realmName': '월드 이름',
   'footer.copyright': '2026 World of ClaudeCraft',
@@ -1453,9 +1490,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '연결이 끊어졌습니다. 지금 다시 연결하는 중...(시도 {attempt}/{maxAttempts})',
   'loading.slowConnection': '로딩이 평소보다 오래 걸리고 있습니다. 인터넷 연결을 확인하세요.',
   'loading.connectionRejected': '서버가 연결을 종료했습니다.',
+  'loading.incompatibleWorldVersion':
+    '게임과 서버 버전이 호환되지 않습니다. 새로고침하거나 업데이트한 후 다시 시도하세요.',
   'loading.realmFull': '이 월드는 현재 포화 상태입니다. 몇 분 후에 다시 시도해 주세요.',
   'loading.tooManyConnections':
     '사용 중인 네트워크에서 이 월드로 연결이 너무 많습니다. 추가 게임 창을 닫거나 몇 분 후에 다시 시도해 주세요.',
+  'loading.messageRateExceeded':
+    '행동을 너무 빠르게 전송하여 연결이 끊어졌습니다. 잠시 기다렸다가 다시 로그인해 주세요.',
   'errors.nothingInteract': '상호작용할 대상이 없습니다.',
   'errors.noEnemyNearby': '근처에 적이 없습니다.',
   'errors.characterNameRequired': '캐릭터 이름을 입력하세요.',
@@ -1849,6 +1890,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.combat.auraGain': '{name} 효과를 얻었습니다.',
   'hud.combat.auraFade': '{name} 효과가 사라졌습니다.',
   'hud.combat.auraAfflicted': '{target}이 {name} 효과에 걸렸습니다.',
+  'hud.combat.auraGainOther': '{target}이 {name} 효과를 얻었습니다.',
   'hud.system.playerDeath': '사망했습니다.',
   'hud.system.respawn': '다시 온전하고 편안한 상태가 되었습니다.',
   'hud.system.ignoringChat': '{name}의 채팅을 차단합니다.',
@@ -1948,6 +1990,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.logs.arenaJoin': '잿빛 원형경기장 대기열에 들어갔습니다. 훌륭한 상대를 기다리세요...',
   'hud.logs.arenaLeave': '잿빛 원형경기장 대기열에서 나왔습니다.',
   'hud.logs.arenaSands': '잿빛 원형경기장의 모래 위에 섰습니다.',
+  'hud.logs.arenaSandsDrowned': '수몰된 궁정의 물에 잠긴 돌바닥에 들어섰습니다.',
   'hud.logs.tradeRequestSent': '{name}님에게 거래를 요청했습니다.',
   'hud.logs.tradeOpened': '거래 창이 열렸습니다.',
   'hud.logs.tradeComplete': '거래 완료.',
@@ -1958,6 +2001,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.logs.soldItem': '{item}을(를) {money}에 팔았습니다.',
   'hud.logs.soldJunkOne': '잡동사니 아이템 {count}개를 {money}에 팔았습니다.',
   'hud.logs.soldJunkMany': '잡동사니 아이템 {count}개를 {money}에 팔았습니다.',
+  'hud.logs.keptBoundOne': '귀속된 아이템 {count}개는 팔지 않고 남겼습니다.',
+  'hud.logs.keptBoundMany': '귀속된 아이템 {count}개는 팔지 않고 남겼습니다.',
   'hud.logs.friendOnline': '{name}님이 접속했습니다.',
   'hud.logs.friendOffline': '{name}님이 접속을 종료했습니다.',
   'hud.markers.names.star': '별',
@@ -2044,6 +2089,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.social.status.combat': '전투 중',
   'hud.social.status.dungeon': '던전 안',
   'hud.social.status.dead': '죽음',
+  'hud.social.status.afk': '자리 비움',
   'hud.social.statusWithZone': '{status} - {zone}',
   'hud.social.ranks.leader': '길드장',
   'hud.social.ranks.officer': '장교',
@@ -2061,6 +2107,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.trade.accept': '거래 수락',
   'hud.trade.waiting': '대기 중...',
   'hud.trade.cancel': '취소',
+  'hud.arena.mapName': '맵: {name}',
+  'hud.arena.map.coliseum': '잿빛 원형경기장',
+  'hud.arena.map.drownedCourt': '수몰된 궁정',
   'hud.arena.title': '잿빛 원형경기장',
   'hud.arena.subtitle': '1대1 평점전',
   'hud.arena.close': '투기장 닫기',
@@ -2133,6 +2182,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.forms.bear': '곰',
   'abilityUi.forms.cat': '늑대',
   'abilityUi.cast.fishing': '낚시',
+  'abilityUi.cast.gathering': '채집',
   'abilityUi.cast.thunzharrStormcall': '폭풍의 부름',
   'abilityUi.cast.demonHeal': '악마 치유',
   'questUi.tracker.title': '퀘스트',
@@ -2246,7 +2296,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.ifYouEquip': '이것을 착용하면',
   'itemUi.tooltip.damageSpeed': '{min} - {max} 피해 속도 {speed}',
   'itemUi.tooltip.dps': '(초당 피해 {dps})',
-  'itemUi.tooltip.dagger': '단검',
   'itemUi.tooltip.armorStat': '방어도 {value}',
   'itemUi.tooltip.stat': '+{value} {stat}',
   'itemUi.tooltip.useFood':
@@ -2320,18 +2369,29 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.pageNextAria': '다음 시장 페이지',
   'itemUi.market.pageStatus': '{total}쪽 중 {current}쪽',
   'itemUi.market.filters': '시장 필터',
+  'itemUi.market.filterValueAria': '{label}: {value}',
   'itemUi.market.filterType': '유형',
   'itemUi.market.filterTypeAll': '모든 유형',
   'itemUi.market.filterTypeWeapon': '무기',
   'itemUi.market.filterTypeArmor': '방어구',
+  'itemUi.market.filterTypeBag': '가방',
   'itemUi.market.filterTypeConsumable': '소모품',
   'itemUi.market.filterTypeMaterial': '재료',
   'itemUi.market.filterTypeCosmetic': '외형',
   'itemUi.market.filterTypeOther': '기타',
   'itemUi.market.filterArmorType': '방어구 유형',
   'itemUi.market.filterArmorAll': '모든 방어구',
+  'itemUi.market.filterArmorSlot': '방어구 부위',
+  'itemUi.market.filterArmorClassAll': '모든 방어구 유형',
+  'itemUi.market.armorCloth': '천 방어구',
+  'itemUi.market.armorLeather': '가죽 방어구',
+  'itemUi.market.armorMail': '사슬 방어구',
+  'itemUi.market.filterPrimaryStat': '주 능력치',
+  'itemUi.market.filterPrimaryStatAll': '모든 주 능력치',
   'itemUi.market.filterWeaponType': '무기 유형',
   'itemUi.market.filterWeaponAll': '모든 무기',
+  'itemUi.market.filterBagSize': '가방 크기',
+  'itemUi.market.filterBagAll': '모든 가방',
   'itemUi.market.filterRarity': '희귀도',
   'itemUi.market.filterRarityAll': '모든 희귀도',
   'itemUi.market.weaponSword': '검',
@@ -2743,7 +2803,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.description': '대상을 최대 12초 동안 제자리에 묶습니다.',
   'entities.abilities.bear_form.name': '큰곰 변신',
   'entities.abilities.bear_form.description':
-    '곰으로 변신합니다. 방어도 +90%, 전투력이 크게 증가하고, 공격이 분노와 30% 더 많은 위협 수준을 생성합니다. 다시 시전하면 시전자 형태로 돌아갑니다.',
+    '곰으로 변신합니다. 방어도 +130%, 전투력이 크게 증가하고, 공격이 분노와 30% 더 많은 위협 수준을 생성합니다. 다시 시전하면 시전자 형태로 돌아갑니다.',
   'entities.abilities.maul.name': '뼈 분쇄',
   'entities.abilities.maul.description':
     '근접 피해를 {damage}만큼 증가시키고 많은 위협 수준을 생성하는 난폭한 공격입니다. 다음 무기 공격 시 발동됩니다. 큰곰 변신 전용.',
@@ -2983,7 +3043,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.eastbrook_warded_leggings.name': '이스트브룩 방호 각반',
   'entities.items.wardweave_cowl.name': '워드위브 두건',
   'entities.items.duskhide_wraps.name': '더스크하이드 손목보호대',
-  'entities.items.sootscale_mantle.name': '수트스케일 망토',
+  'entities.items.sootscale_mantle.name': '가마비늘 망토',
   'entities.items.gravecaller_blade.name': '무덤부름 넓은날검',
   'entities.items.widowfang_dirk.name': '과부송곳니 더크',
   'entities.items.gravecaller_staff.name': '공허의 지팡이',
@@ -3012,9 +3072,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.tallow_candle.name': '기름진 수지 덩어리',
   'entities.items.spider_leg.name': '꿈틀대는 거미 다리',
   'entities.items.bone_fragments.name': '뼈 조각',
-  'entities.items.arcane_dust.name': '비전 가루',
-  'entities.items.arcane_essence.name': '비전 정수',
-  'entities.items.arcane_shard.name': '비전 파편',
+  'entities.items.arcane_dust.name': '울림 가루',
+  'entities.items.arcane_essence.name': '울림 정수',
+  'entities.items.arcane_shard.name': '울림 파편',
   'entities.items.linen_scrap.name': '아마포 조각',
   'entities.items.fen_muster_order.name': '펜브리지 소집 명령서',
   'entities.items.mire_prowler_pelt.name': '수렁 배회자 가죽',
@@ -3116,7 +3176,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.icevein_dirk.name': '얼음맥 더크',
   'entities.items.highwatch_breastplate.name': '하이워치 흉갑',
   'entities.items.peakwool_robe.name': '봉우리양모 로브',
-  'entities.items.stalkerhide_jerkin.name': '추적자가죽 웃옷',
+  'entities.items.stalkerhide_jerkin.name': '잠행가죽 웃옷',
   'entities.items.cragwalker_boots.name': '바위걸음 장화',
   'entities.items.windguard_leggings.name': '바람수호 다리보호구',
   'entities.items.ogre_toe_ring.name': '오우거 발가락 반지',
@@ -3660,7 +3720,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_stalkers.completion':
     '산등성이의 그림자가 열둘 줄었습니다. 오늘 밤 순찰대가 숨 돌리겠습니다.',
   'entities.quests.q_stalkers.objectives.0.label': '산등성이 추적자 처치',
-  'entities.quests.q_stalker_pelts.title': '하이워치에 겨울이 온다',
+  'entities.quests.q_stalker_pelts.title': '하이워치의 첫서리',
   'entities.quests.q_stalker_pelts.text':
     '{playerName}이여, 이 산의 겨울은 문을 두드리지 않고 걷어찹니다. 추적자 가죽 8장이 성벽 망토를 덧댈 겁니다.',
   'entities.quests.q_stalker_pelts.completion':
@@ -3823,18 +3883,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_mogger.completion':
     '마침내 모거가 죽었습니다. 이스트브룩의 들판은 더 안전해졌고, 당신은 전할 만한 이야기를 하나 더 안고 계곡을 떠납니다.',
   'entities.quests.q_mogger.objectives.0.label': '모거 처치',
-  'entities.quests.q_archetype_acceptance.title': '스스로 택하는 기술',
-  'entities.quests.q_archetype_acceptance.text':
-    '기술은 지식이지만, {playerName}, 조율은 약속이라네. 서로 이웃한 두 기술을 주 전공으로 선택하고, 계곡에서 직접 캔 광석을 가져오게.',
-  'entities.quests.q_archetype_acceptance.completion':
-    '약속이 맺어졌네. 이제 이 두 기술이 자네의 주 전공이고, 그 맞은편의 지식은 취미가 되었네.',
-  'entities.quests.q_archetype_acceptance.objectives.0.label': '광맥 채굴',
-  'entities.quests.q_prof_make_amends.title': '속죄',
-  'entities.quests.q_prof_make_amends.text':
-    '이 조합은 전에 익힌 적이 있군, {playerName}. 돌아가는 것은 새로운 맹세가 아니지. 계곡 길을 안전하게 지키는 일을 돕고, 손이 예전에 알던 감각을 되찾게.',
-  'entities.quests.q_prof_make_amends.completion':
-    '옛 감각이 돌아왔네. 이전 조합이 다시 활성화되었어.',
-  'entities.quests.q_prof_make_amends.objectives.0.label': '숲늑대 처치',
   'entities.quests.q_prof_hobby_switch.title': '색다른 취미',
   'entities.quests.q_prof_hobby_switch.text':
     '주 전공에는 맹세가 필요하지만, 취미는 호기심이 어디로 향하는지만 묻지, {playerName}. 약초를 조금 채집하고 두 주 전공의 맞은편 기술 중 무엇을 익힐지 정하게.',
@@ -3912,7 +3960,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': '고룡교단 천막',
   'entities.zones.thornpeak_heights.pois.8.label': '망령 들판',
   'entities.zones.thornpeak_heights.pois.9.label': '무덤고룡 성소',
-  'entities.zones.thornpeak_heights.pois.10.label': '하이워치 마구간',
   'entities.zones.veiled_hollow.name': '장막의 골짜기',
   'entities.zones.veiled_hollow.welcome':
     '대기가 오래된 마법으로 웅웅거린다. 엘더글림의 큰 나무 아래에서 수호자 샐윈을 찾아가라.',
@@ -3937,8 +3984,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.drakelands.pois.1.label': '관문숲',
   'entities.zones.drakelands.pois.2.label': '잿빛 사구',
   'entities.zones.drakelands.pois.3.label': '트롤무트',
-  'entities.zones.drakelands.pois.4.label': '핏빛유리 벌판',
-  'entities.zones.drakelands.pois.5.label': '드레이크모 화산구',
+  'entities.zones.drakelands.pois.4.label': '마지막 요새',
+  'entities.zones.drakelands.pois.5.label': '핏빛유리 벌판',
+  'entities.zones.drakelands.pois.6.label': '드레이크모 화산구',
   'entities.zones.frostveil.name': '서리장막 봉우리',
   'entities.zones.frostveil.welcome':
     '눈이 모든 소리를 삼킨다. 춤추는 오로라 아래, 추위 그 자체가 깨어 있는 듯하다.',
@@ -4036,14 +4084,18 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '산울타리는 여전히 다듬어지고 있지만, 정원사를 본 사람은 백 년 동안 없었다. 미로를 조심하라. 미로도 너를 지켜보고 있다.',
   'entities.zones.evergarden.pois.0.label': '헤지윅',
   'entities.zones.evergarden.pois.1.label': '정원 문',
-  'entities.zones.evergarden.pois.2.label': '조각상 산책로',
-  'entities.zones.evergarden.pois.3.label': '들장미 수풀',
+  'entities.zones.evergarden.pois.2.label': '화단 산책로',
+  'entities.zones.evergarden.pois.3.label': '던홀드 성',
   'entities.zones.evergarden.pois.4.label': '꽃잎 연못',
   'entities.zones.evergarden.pois.5.label': '대미로',
   'entities.zones.evergarden.pois.6.label': '분수 안뜰',
+  'entities.zones.evergarden.pois.7.label': '오래된 풍차',
+  'entities.zones.evergarden.pois.8.label': '북쪽 감시초소',
+  'entities.zones.evergarden.pois.9.label': '수련 연못',
   'entities.mobs.topiary_stag.name': '토피어리 수사슴',
   'entities.mobs.topiary_wolf.name': '토피어리 늑대',
   'entities.mobs.hedge_gnome.name': '산울타리 노움',
+  'entities.mobs.hedge_knight.name': '던홀드 기사',
   'entities.mobs.the_topiary_bull.name': '토피어리 황소',
   'entities.zones.galecrest.name': '게일크레스트',
   'entities.zones.galecrest.welcome':
@@ -4055,6 +4107,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.galecrest.pois.4.label': '절단 절벽',
   'entities.zones.galecrest.pois.5.label': '난파선 벌판',
   'entities.zones.galecrest.pois.6.label': '거울 호수',
+  'entities.zones.galecrest.pois.7.label': '게일크레스트 마구간',
   'entities.npcs.warden_coalfast.name': '숯불 워든',
   'entities.npcs.warden_coalfast.title': '보루 지휘관',
   'entities.npcs.warden_coalfast.greeting':
@@ -4098,6 +4151,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gale_wisp.name': '돌풍 정령',
   'entities.mobs.shoal_scuttler.name': '여울 게',
   'entities.mobs.the_wreck_warden.name': '난파선 감시자',
+  'entities.mobs.downs_bandit.name': '구릉 도적',
+  'entities.mobs.wreck_thief.name': '난파선 도둑',
   'entities.mobs.glimmerwisp.name': '미광 위습',
   'entities.mobs.duskwisp.name': '황혼 위습',
   'entities.mobs.veiled_stag.name': '장막 수사슴',
@@ -4228,19 +4283,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.gravewyrm_sanctum.enterText':
     '공기가 차가워집니다. 아래에서 거대한 무언가가 숨 쉽니다...',
   'entities.dungeons.gravewyrm_sanctum.leaveText': '산바람 속으로 비틀거리며 돌아옵니다.',
-  'entities.mobs.orkadia_grunt.name': '피엄니 병졸',
-  'entities.mobs.orkadia_marauder.name': '무쇠가죽 약탈자',
-  'entities.mobs.orkadia_axethrower.name': '피엄니 도끼투척병',
-  'entities.mobs.orkadia_fel_shaman.name': '잿빛뼈 지옥 주술사',
-  'entities.mobs.orkadia_beast_handler.name': '무쇠가죽 전투야수 조련사',
-  'entities.mobs.orkadia_siege_brute.name': '오르카디아 공성 투사',
-  'entities.mobs.orkadia_banner_captain.name': '검은 깃발 대장',
-  'entities.mobs.orkadia_warlord.name': '전쟁군주 그로목 해골분쇄자',
-  'entities.dungeons.orkadia.name': '오르카디아',
-  'entities.dungeons.orkadia.enterText':
-    '전화가 녹색으로 타오른다. 오르카디아의 전쟁 야영지가 그대의 도래를 알아챘다.',
-  'entities.dungeons.orkadia.leaveText':
-    '베어 헤치고 나와 잿빛 드레이크랜드의 바람 속으로 돌아선다.',
   'entities.dungeons.drowned_temple.name': '익사한 신전',
   'entities.dungeons.drowned_temple.enterText':
     '당신은 달의 관문을 지나갑니다 — 공기가 차가운 물과 창백한 빛으로 변하고, 노랫소리가 당신의 머리 위로 닫혀 옵니다.',
@@ -4976,7 +5018,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.conjured_bread.name': '마력의 귀리빵',
   'entities.items.conjured_bread2.name': '마력의 검은 빵',
   'entities.items.conjured_bread3.name': '마력의 꿀과자',
-  'entities.items.glimmerfin_koi.name': '반짝이는 지느러미 코이',
+  'entities.items.glimmerfin_koi.name': '윤슬 코이',
+  'entities.items.ironreel_fishing_rod.name': '쇠릴 낚싯대',
+  'entities.items.silverstream_fishing_rod.name': '은빛 시내 낚싯대',
   'entities.items.raw_bog_eel.name': '날 늪지 뱀장어',
   'entities.items.raw_frostgill_trout.name': '날 서리아가미 송어',
   'entities.items.raw_marsh_pike.name': '날 늪지 강꼬치고기',
@@ -5020,23 +5064,23 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.monarch_crown_helm.name': '군주의 왕관',
   'entities.items.copper_mining_pick.name': '구리 채광 곡괭이',
   'entities.items.iron_mining_pick.name': '철 채광 곡괭이',
-  'entities.items.mithril_mining_pick.name': '미스릴 채광 곡괭이',
+  'entities.items.mithril_mining_pick.name': '천은 채광 곡괭이',
   'entities.items.handaxe.name': '손도끼',
   'entities.items.felling_axe.name': '벌목 도끼',
   'entities.items.ironbark_axe.name': '철피 도끼',
   'entities.items.gathering_sickle.name': '채집 낫',
   'entities.items.bronze_sickle.name': '청동 낫',
-  'entities.items.silverleaf_sickle.name': '은엽 낫',
-  'entities.items.thorium_mining_pick.name': '토륨 채광 곡괭이',
-  'entities.items.arcanite_mining_pick.name': '비전 채광 곡괭이',
+  'entities.items.silverleaf_sickle.name': '윤광잎 낫',
+  'entities.items.thorium_mining_pick.name': '오스뮴 채광 곡괭이',
+  'entities.items.arcanite_mining_pick.name': '문양강철 채광 곡괭이',
   'entities.items.ashwood_axe.name': '물푸레나무 도끼',
-  'entities.items.elderwood_axe.name': '고목 도끼',
+  'entities.items.elderwood_axe.name': '고산솔 도끼',
   'entities.items.goldleaf_sickle.name': '금엽 낫',
   'entities.items.sunpetal_sickle.name': '태양꽃잎 낫',
-  'entities.items.thorium_ore.name': '토륨 광석',
-  'entities.items.arcanite_bar.name': '비전 주괴',
+  'entities.items.thorium_ore.name': '오스뮴 광석',
+  'entities.items.arcanite_bar.name': '문양강철 주괴',
   'entities.items.ashwood_log.name': '잿빛나무 통나무',
-  'entities.items.elderwood_log.name': '고대 딱총나무 통나무',
+  'entities.items.elderwood_log.name': '고산솔 통나무',
   'entities.items.goldleaf_herb.name': '금빛잎 약초',
   'entities.items.sunpetal_herb.name': '태양꽃잎 약초',
   'hud.core.chatChannels.add': '채팅 채널 추가',
@@ -5189,6 +5233,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.chatTimestamps.format': '시각 표시 형식',
   'hudChrome.chatTimestamps.note':
     '새 채팅 줄마다 수신된 시각을 앞에 붙입니다(예: [14:32]). 이 옵션이 켜져 있는 동안 받은 메시지에만 적용됩니다.',
+  'hudChrome.interfaceTabs.general': '일반',
+  'hudChrome.interfaceTabs.frames': '프레임',
+  'hudChrome.interfaceTabs.chat': '채팅',
+  'hudChrome.interfaceTabs.combat': '전투',
   'hudChrome.chatTimestamps.show': '채팅 시각 표시',
   'hudChrome.chatWindow.move': '드래그하여 채팅 창 이동',
   'hudChrome.chatWindow.resize': '드래그하여 채팅 창 크기 조절',
@@ -5221,6 +5269,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.emotes.wave': '손인사',
   'hudChrome.emoteWheel.edit': '편집',
   'hudChrome.emoteWheel.label': '감정 표현',
+  'hudChrome.meters.breakdownOther': '기타 ({count})',
+  'hudChrome.meters.melee': '근접 공격',
   'hudChrome.meters.minutesSeconds': '{m}분 {s}초',
   'hudChrome.meters.perSecond': '{value}/초',
   'hudChrome.meters.perSecondRow': '{total} ({rate})',
@@ -6021,8 +6071,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetTitle': '인스턴스 초기화',
   'guide.dungeonsPage.sanctumBody':
     '가시봉우리의 어두운 심장부로, 교단의 오랜 작업이 끔찍한 정점에 다다르는 곳.',
-  'guide.dungeonsPage.orkadiaBody':
-    '드레이크랜드의 검은 화산암에 자리한 잔혹한 오크 전쟁 야영지로, 유독한 녹색 전화(戰火)가 활짝 열린 들판을 밝힌다. 피엄니 병졸과 무쇠가죽 약탈자를 베어 넘기고 해골 단상에 앉은 전쟁군주 그로목 해골분쇄자에게 이르라.',
   'guide.dungeonsPage.wildheartBody':
     '따뜻한 비에 젖은 정글 칼데라에서 두 개의 높은 사냥길이 비취빛 세노테를 감싼다. 야수 소굴과 선조의 폐허를 지나 의식 피라미드의 줄가르와 맞서라.',
   'guide.dungeonsPage.raidName': '최종 단계 공격대',
@@ -6744,7 +6792,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.junglePlaceNotes':
     '드리프트헤이븐은 해변에 불을 피워 둡니다. 덩굴 어귀는 강이 초록 장벽과 만나는 곳이고, 야자 백사장은 파도를 따라 희고 따뜻하게 이어집니다. 에메랄드 밀림과 덩굴폭포 숲은 내륙을 삼키고, 사파이어 석호는 맑고 깊게 빛나며, 가라앉은 신상은 물밑에서 지켜봅니다.',
   'guide.worldPage.gardenPlaceNotes':
-    '헤지윅은 정원 문 앞에서 기다립니다. 조각상 산책로는 말없는 동행을 지키고, 들장미 수풀은 화단을 벗어난 지 오래입니다. 꽃잎 연못은 일 년 내내 분홍빛으로 떠다니고, 대미로는 손님이 올 때마다 제 예법을 새로 고쳐 짜며, 분수 안뜰은 정원의 심장에서 여전히 맑게 흐릅니다.',
+    '헤지윅은 정원 문 앞에서 기다립니다. 화단 산책로는 잘 다듬어진 빛깔로 피어나고, 던홀드 성은 새 성벽 뒤에서 기사들을 조련합니다. 꽃잎 연못은 일 년 내내 분홍빛으로 떠다니고, 오래된 풍차는 제 둘레의 고리 화단 위에서 돌아갑니다. 대미로는 손님이 올 때마다 제 예법을 새로 고쳐 짜며, 그 아치는 잎사귀 여우들이 지킵니다. 북쪽 감시초소는 출구 길을 지키고, 수련 연못은 그 너머에 고요히 쉬며, 분수 안뜰은 정원의 심장에서 여전히 맑게 흐릅니다.',
   'guide.worldPage.valeGreeter': '레드브룩 원수, 이스트브룩',
   'guide.worldPage.valeGreeting': '칼을 가까이 두시오. 골짜기는 예전 같지 않으니.',
   'guide.worldPage.valePlaceNotes':
@@ -7299,6 +7347,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.empty': '알려진 제작법이 없습니다.',
   'hudChrome.crafting.resultAria': '{name} 제작',
   'hudChrome.crafting.craftedToast': '제작 완료:{name}',
+  'hudChrome.crafting.craftedToastQty': '제작 완료:{name} x{qty}',
   'hudChrome.crafting.insufficientMaterials': '재료가 부족합니다.',
   'hudChrome.crafting.unknownRecipe': '해당 제작법이 존재하지 않습니다.',
   'hudChrome.crafting.comboRequires': '조율 조건: {craftA} + {craftB}, 티어 {tier}.',
@@ -7393,6 +7442,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'gpuNotice.bodyWeb':
     '게임이 GPU 가속 없이 실행되고 있어 매우 느립니다. 브라우저 설정에서 하드웨어 가속을 켜고 그래픽 드라이버를 업데이트한 뒤 브라우저를 다시 시작하세요.',
   'gpuNotice.dismiss': '닫기',
+  'perfNudge.integratedGpu':
+    '게임이 내장(절전형) GPU에서 실행되고 있습니다. 이 컴퓨터에 게이밍 GPU도 있다면, Windows의 설정 > 시스템 > 디스플레이 > 그래픽에서 브라우저를 "고성능"으로 설정한 뒤 브라우저를 다시 시작하세요. 데스크톱 앱은 게이밍 GPU를 자동으로 선택합니다.',
+  'perfNudge.hardwareAccelerationDesktop':
+    '게임이 GPU 가속 없이 실행되고 있어 매우 느립니다. 그래픽 드라이버를 업데이트한 뒤 게임을 다시 시작하세요. Windows에서는 설정 > 시스템 > 디스플레이 > 그래픽에서 이 게임을 "고성능"으로 설정하세요.',
+  'perfNudge.hardwareAccelerationWeb':
+    '게임이 GPU 가속 없이 실행되고 있어 매우 느립니다. 브라우저 설정에서 하드웨어 가속을 켜고 그래픽 드라이버를 업데이트한 뒤 브라우저를 다시 시작하세요.',
+  'perfNudge.dismiss': '닫기',
   'editor.appTitle': '맵 편집기',
   'editor.docTitle': '맵 편집기 - World of ClaudeCraft',
   'editor.untitledMap': '제목 없는 맵',
@@ -7958,51 +8014,20 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.usd': '{amount} USD',
   'guide.professions.intro':
     '전투와 퀘스트를 넘어, 이 세계는 땅을 일구고 대장간에서 일하는 여러분에게도 보상을 준다. 원재료를 채집하고, 열 가지 제작 전문직에 걸쳐 이를 장비와 물품으로 바꾸며, 그 전문직들이 상징하는 열 가지 원형 중 하나로서 정체성을 다지는 것이다.',
-  'guide.professions.gatherTitle': '채집: 채광, 벌목, 약초학',
-  'guide.professions.gatherIntro':
-    "세 가지 채집 전문직을 통해 세계에서 직접 원재료를 얻을 수 있다. 채광은 광맥에서 광석과 돌을 캐고, 벌목은 나무숲에서 목재를 베어내며, 약초학은 야생에서 자라는 약초와 식물을 모은다. 각각 별도로 진행이 추적되므로, 하나를 익힌다고 해서 다른 하나의 진행이 늦어지지 않는다. 처음이라면? 이스트브룩의 오델 십장이 첫 채집을 안내하는 짧은 심부름 '누구에게나 맞는 생업'을 맡기고 있다.",
-  'guide.professions.gatherWhatTitle': '자원 노드',
-  'guide.professions.gatherWhatBody':
-    '광맥, 나무숲, 약초 군락은 골짜기와 습지 곳곳에 눈에 보이는 주인 없는 지형지물로 배치되어 있다. 다가가 상호작용하면 그 안에 있는 것을 채집할 수 있다. 한 번 채집한 노드는 여러분이 다시 채집하려면 회복할 시간이 필요하지만, 다른 플레이어를 막는 일은 결코 없다. 그동안 다른 플레이어가 같은 노드를 채집할 수 있다.',
-  'guide.professions.gatherProficiencyTitle': '숙련도',
-  'guide.professions.gatherProficiencyBody':
-    '채집에 성공할 때마다 해당 채집 전문직의 숙련도가 오르며, 캐릭터 정보 창이 각 전문직을 저마다 따로 기록한다. 더 많은 연습은 결코 진행을 해치지 않고, 오직 보탤 뿐이다.',
-  'guide.professions.gatherToolsTitle': '전문 도구',
-  'guide.professions.gatherToolsBody':
-    '상인들은 각 채집 전문직의 기본 도구를 판매하며, 더 좋은 도구는 제작할 수 있다. 오늘날 자원 노드를 캐는 데 도구가 반드시 필요하지는 않다. 도구는 앞으로 등장할 더 풍부한 노드를 위한 토대이며, 그곳에서는 상위 등급 곡괭이와 도끼, 낫이 그 관문이 될 것이다.',
   'guide.professions.harvestTitle': '사냥감 그 자체를 채집하기',
-  'guide.professions.harvestBody':
-    '채집은 노드에서 끝나지 않는다. 쓰러뜨린 짐승 일부는 시체에서 곧바로 부위를 채집할 수 있어, 가죽과 송곳니, 비단실, 그리고 더 낯선 것들이 평범한 전리품과 나란히 나온다. 처치 하나에 채집자는 한 명뿐이다: 먼저 채집한 사람이 전부 가져간다. 그리고 선택은 매번 당신 몫이다: 시체가 내주는 것을 전부 벗겨 내거나, 한 가지 부위에 집중해 더 좋은 등급으로 얻거나. 채집에는 전문직도 훈련도 필요 없어 어떤 캐릭터든 할 수 있으며, 유난히 좋은 부위에는 채집한 사람의 이름까지 새겨진다.',
+  'guide.professions.harvestBodyChoice':
+    '채집은 노드에서 끝나지 않는다. 쓰러뜨린 짐승 상당수는 시체에서 곧바로 한 번씩 채집할 수 있어, 가죽과 송곳니, 비단실, 고기가 평범한 전리품과 나란히 나온다. 시체 하나에 채집자는 선착순 한 명뿐이며, 한 번 누르면 전리품과 채집이 함께 열린다. 짐승이 쓸 만한 부위를 둘 이상 지녔다면 선택은 당신 몫이다. 그 시체가 내줄 수 있는 것을 전부 가져가거나, 더 적은 부위에 집중해 실제로 얻는 것을 눈에 띄게 더 좋은 등급으로 가져가거나.\n\n표본이 나오는 계열에서 희귀 이상 판정이 뜨면 평범한 산출물 위에 서명된 완벽한 표본(Pristine Hide, Pristine Silk, Pristine Venom Gland, Prime Cut)이 하나 더 주어지고, 업적의 서에 A Perfect Specimen이 기록된다. 채집에는 훈련이 필요 없어 어떤 캐릭터든 할 수 있으며, 가지고 있는 채집 도구는 어느 전문직의 것이든 최상급 재료 판정에 반영된다.',
   'guide.professions.focusTitle': '마을 집중',
   'guide.professions.focusBody':
     '모든 거점 마을은 찾아오는 채집자를 위해 마을 집중 게시판을 갖추고 있다. 마을에 선 채 미니맵 옆에서 이를 열고, 관심 있는 부위 종류에 약간의 집중 포인트를 겨누라. 집중한 부위는 이후의 모든 시체에서 한 등급 더 좋게, 조금 더 넉넉하게 나온다. 배분은 캐릭터가 어디를 떠돌든 따라다니며, 이후 마을에 들를 때마다 무료로 다시 짤 수 있다.',
-  'guide.professions.craftTitle': '열 가지 제작 전문직',
-  'guide.professions.craftIntro':
-    '열 가지 제작 전문직은 채집한 재료를 완성된 장비와 물품으로 바꾼다: 방어구 제작, 무기 제작, 보석 세공은 원재료를 착용 가능한 장비로 형태를 잡고, 연금술과 공학은 시행착오에 기반하며, 요리, 문양학, 마법부여는 각각 다른 전문직의 결과물에 손을 대고, 재봉과 가죽 세공은 정확한 도안을 따라 작업한다. 이들은 함께 하나의 원환을 이루며, 각 전문직은 두 이웃과 인접하고 다른 하나와 마주 본다.',
-  'guide.professions.craftRingTitle': '전문직의 원환',
-  'guide.professions.craftRingBody':
-    '열 가지 전문직은 고정된 원환 위에 배치되어 있으며, 그 원환 위의 위치가 중요하다: 원환에서 서로 인접한 전문직은 반대편에 있는 전문직보다 서로 더 많은 공통점을 가진다. 하나의 전문직에 전념하는 것은 고립된 기술 하나를 고르는 것이 아니라 관련된 전문직 가족에 합류하는 듯한 느낌을 주어야 한다.',
-  'guide.professions.craftRecipesTitle': '제작법과 재료',
-  'guide.professions.craftRecipesBody':
-    '각 제작법은 여러분이 채집하거나 구매하는 특정 재료를 필요로 한다. 가장 단순한 제작법은 일반 재료만으로 충분하며 처음부터 만들 수 있어, 전문직을 익히는 즉시 작업을 시작할 수 있다. 제작법 목록은 아직 채워지는 중이다. 몇몇 전문직은 첫 제작법을 기다리고 있으며, 전문직이 성장함에 따라 더 많은 제작법이 추가된다.',
   'guide.professions.craftMasteryTitle': '숙련도와 통달',
   'guide.professions.craftMasteryBody':
     '제작에 성공하면 해당 전문직의 숙련도가 오르며, 숙련도가 제작법을 잠가 두는 일은 결코 없다. 제작법을 알고 그 재료를 지녔다면 언제든 시도할 수 있다. 모든 제작법은 약속한 그대로의 결과물을 내놓지만, 손에 익은 솜씨는 이따금 걸작을 만들어 낸다. 같은 물건이되 마무리가 더 정교하고, 약간의 추가 힘이 깃들어 있다. 유일한 예외는 조합 제작법으로, 두 전문직을 잇는 원형에 조율하고 두 전문직 모두에서 검증된 실력을 갖춘 제작자에게만 열린다.',
-  'guide.professions.craftComboTitle': '조합 제작법',
-  'guide.professions.craftComboBody':
-    '단일 전문직 자체의 제작법 목록을 넘어, 이 원환은 인접한 두 전문직을 동시에 필요로 하는 조합 제작법도 지원하여, 고립된 하나의 전문직이 아니라 원환 위에서 인접한 전문직들에 투자한 캐릭터에게 보상을 준다. 제작자는 두 전문직을 모두 스스로 지녀야 하며, 파트너의 숙련도가 어느 한쪽을 대신할 수는 없다.',
-  'guide.professions.archetypeTitle': '열 가지 원형',
-  'guide.professions.archetypeIntro':
-    '열 가지 전문직은 각각 원형도 상징하며, 단순히 그 전문직에 종사하는 것을 넘어서는 더 넓은 정체성을 받아들일 수 있다. 당신의 현재 원형은 한 번에 하나뿐이며 목록이 아니다: 당신은 하나를 지니며, 원한다면 나중에 다른 것으로 바꿀 수 있다.',
   'guide.professions.archetypeChooseTitle': '원형 선택하기',
   'guide.professions.archetypeChooseBody':
     '원형을 선언하는 것은 하나의 이야기 장면이다: 그 정체성으로 당신을 공식적으로 받아들이는 퀘스트다. 선언하기 전에는 모든 전문직의 숙련도가 희귀 티어까지 오를 수 있다. 한 쌍을 받아들이면 그 두 전문직은 끝까지 열리고, 수레바퀴 반대편의 한 전문직은 취미로 곁에 남아 여전히 희귀 티어까지 쓸 수 있으며, 그 정체성을 지니는 동안 나머지 모든 전문직은 일반 티어에 머문다.',
-  'guide.professions.archetypeSwitchTitle': '마음을 바꾸기',
   'guide.professions.archetypeSwitchBody':
     '선언이 종신형이 되는 일도 없을 것이다. 계획은 새 원형을 받아들이기 전에 옛 전문직에 속죄하는 반복 가능한 절차이며, 바꿀 때마다 그 속죄는 조금씩 더 무거워져, 선택이 대가 없는 것이 아니라 늘 의미 있는 것으로 남는다. 선언 그 자체와 마찬가지로, 이 역시 아직 오는 중이다.',
-  'guide.professions.archetypeIdentityTitle': '당신의 원형이 의미하는 것',
-  'guide.professions.archetypeIdentityBody':
-    '당신의 현재 원형은 이 세계에서 당신의 캐릭터가 누구인지에 대한 선언이며, 다른 이들과 세계가 당신을 부르는 방식에 반영된다. 그에 따르는 구체적인 보상과 인정은 아직 다듬어지는 중이다. 시스템이 채워지는 대로 다시 확인해 보라.',
   'apiError.validation.failed': '일부 항목이 올바르지 않습니다. 양식을 확인하고 다시 시도하세요.',
   'apiError.json.malformed': '요청을 읽을 수 없습니다. 다시 시도해 주세요.',
   'apiError.body.too_large': '요청이 너무 큽니다. 데이터를 줄여 다시 시도하세요.',
@@ -8075,6 +8100,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.discord.swag_tier': '이 보상을 받으려면 더 높은 등급에 도달하세요.',
   'apiError.discord.swag_points': '포인트가 부족합니다.',
   'hudChrome.mailbox.title': '우편함',
+  'hudChrome.noticeboard.empty': '게시된 내용이 없는 것 같습니다.',
   'hudChrome.mailbox.subtitle': '레이븐포스트',
   'hudChrome.mailbox.close': '우편함 닫기',
   'hudChrome.mailbox.tabInbox': '받은 편지함',
@@ -8097,12 +8123,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.removeParcelAria': '편지에서 {item} 제거',
   'hudChrome.mailbox.parcelQtyDecreaseAria': '{item} 하나 적게 보내기',
   'hudChrome.mailbox.parcelQtyIncreaseAria': '{item} 하나 더 보내기',
+  'hudChrome.mailbox.parcelQtyAria': '보낼 {item} 수량',
   'hudChrome.mailbox.sendButton': '편지 보내기',
   'hudChrome.mailbox.postageNote': '우편 요금: {amount}. 까마귀가 약 {seconds}초 동안 날아갑니다.',
   'hudChrome.mailbox.arrivedBanner': '까마귀가 도착했습니다: {name}의 우편.',
   'hudChrome.mailbox.arrivedLog': '{name}에게서 새 우편이 도착했습니다.',
   'hudChrome.mailbox.indicatorAria': '읽지 않은 우편: {count}',
   'hudChrome.mailbox.indicatorTip': '읽지 않은 편지가 {count}통 있습니다. 우편함에서 확인하세요.',
+  'hudChrome.marketIndicator.aria': '세계 시장 판매 대금이나 아이템 수령 대기',
+  'hudChrome.marketIndicator.tip':
+    '판매 대금이나 반송된 아이템이 상인에게서 수령을 기다리고 있습니다.',
   'hudChrome.mailbox.clickAttach': '클릭하면 편지에 첨부됩니다.',
   'hudChrome.mailbox.cannotMail': '이 아이템은 우편으로 보낼 수 없습니다.',
   'hudChrome.mailbox.result.sent':
@@ -8120,6 +8150,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': '그 편지는 더 이상 우편함에 없습니다.',
   'hudChrome.mailbox.result.takeParcelsFirst': '편지를 버리기 전에 소포를 먼저 꺼내세요.',
   'worldContent.mailboxName': '우편함',
+  'worldContent.noticeboardName': '게시판',
   'entities.letters.ravenpost_welcome.sender': '레이븐포스트',
   'entities.letters.ravenpost_welcome.subject': '이제 까마귀가 당신을 위해 날아갑니다',
   'entities.letters.ravenpost_welcome.body':
@@ -8184,6 +8215,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '방어구 제작과 기계공학 솜씨에 관하여',
   'entities.letters.guild_trend_armorcrafting_engineering.body':
     '장인에게,\n\n방어구 제작과 기계공학에 힘쓰는 그대의 소문이 길드에 닿았습니다. 판금에 못을 박고 톱니를 맞추며 두 기술이 서로를 키워 주고 있다지요. 이웃한 두 기술을 함께 갈고닦는 손은 조율할 준비가 되었다는 증표입니다. 이스트브룩의 대장장이 할드렌을 찾아가십시오. 지금은 그가 장인들을 대신해 말합니다. 자신의 손으로 해낸 결과물로 솜씨를 증명하면, 그가 그 두 기술을 그대의 주 전공으로 조율해 줄 것입니다.\n\n경의를 담아,\n제작 길드',
+  'entities.letters.mastery_reset_notice.sender': '길드 회관',
+  'entities.letters.mastery_reset_notice.subject': '정직해진 장인의 길',
+  'entities.letters.mastery_reset_notice.body':
+    '길드 동료에게,\n\n길드가 숙련을 새로이 헤아리기로 했습니다. 모두가 처음부터 다시 오릅니다. 그대의 제작 기술과 채집 숙련도는 0으로 되돌아갔습니다.\n\n그 밖의 모든 것은 손대지 않은 채 그대의 것입니다. 제조법, 도구와 재료, 은행과 골드, 조율과 칭호, 업적과 명성, 퀘스트와 우편까지.\n\n이제 오르는 길에 눈속임은 없습니다. 값싼 일은 그대를 올려 주지 못합니다. 더 어려운 제조법, 더 풍부한 광맥, 더 깊은 물을 찾으십시오.\n\n경의를 담아,\n길드 회관',
   'hudChrome.calendar.title': '이벤트 달력',
   'hudChrome.calendar.close': '달력 닫기',
   'hudChrome.calendar.keybindLabel': '이벤트 달력',
@@ -8236,14 +8271,66 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.notReady': '이 자원 채집지는 아직 당신을 위해 재생성되지 않았습니다.',
   'hudChrome.gathering.gatherLine': '{name}을(를) 채집했습니다.',
   'hudChrome.gathering.gatherLineQty': '{name}을(를) {qty}개 채집했습니다.',
+  'hudChrome.gathering.harvestLine': '{name}을(를) 채취했습니다.',
+  'hudChrome.gathering.harvestLineQty': '{name}을(를) {qty}개 채취했습니다.',
+  'hudChrome.gathering.harvestSpecimenLine': '추가로 {name}을(를) 얻었습니다.',
   'hudChrome.gathering.catchLine': '{name}을(를) 낚아 올렸습니다',
+  'hudChrome.gathering.biteLine': '무언가 미끼를 물었습니다!',
+  'hudChrome.gathering.gotAwayLine': '놓쳐 버렸습니다.',
+  'hudChrome.gathering.nodeName.ore': '광맥',
+  'hudChrome.gathering.nodeName.wood': '벌목 나무',
+  'hudChrome.gathering.nodeName.herb': '약초 군락',
+  'hudChrome.gathering.tierRequired.mining': '{tier}티어 채광 곡괭이 필요',
+  'hudChrome.gathering.tierRequired.logging': '{tier}티어 벌목 도끼 필요',
+  'hudChrome.gathering.tierRequired.herbalism': '{tier}티어 약초 낫 필요',
+  'hudChrome.gathering.toolTierUnmet.mining':
+    '이 광맥을 캐려면 {tier}티어 채광 곡괭이가 필요합니다.',
+  'hudChrome.gathering.toolTierUnmet.logging':
+    '이 나무를 베려면 {tier}티어 벌목 도끼가 필요합니다.',
+  'hudChrome.gathering.toolTierUnmet.herbalism':
+    '이 군락을 채집하려면 {tier}티어 약초 낫이 필요합니다.',
+  'hudChrome.gathering.toolTierUnmetCorpse':
+    '최상급 재료를 회수하려면 {tier}티어 채집 도구가 필요합니다.',
+  'hudChrome.gathering.requiresTool.mining': '채광 곡괭이 필요',
+  'hudChrome.gathering.requiresTool.logging': '벌목 도끼 필요',
+  'hudChrome.gathering.requiresTool.herbalism': '약초 낫 필요',
+  'hudChrome.gathering.toolRequired.mining': '이 광맥을 캐려면 채광 곡괭이가 필요합니다.',
+  'hudChrome.gathering.toolRequired.logging': '이 나무를 베려면 벌목 도끼가 필요합니다.',
+  'hudChrome.gathering.toolRequired.herbalism': '이 군락을 채집하려면 약초 낫이 필요합니다.',
+  'hudChrome.gathering.toolRequired.fishing': '낚싯대가 있어야 낚싯줄을 드리울 수 있습니다.',
+  'hudChrome.gathering.noNodeNearby.mining': '손이 닿는 곳에 광맥이 없습니다.',
+  'hudChrome.gathering.noNodeNearby.logging': '손이 닿는 곳에 벌목 나무가 없습니다.',
+  'hudChrome.gathering.noNodeNearby.herbalism': '손이 닿는 곳에 약초 군락이 없습니다.',
+  'hudChrome.gathering.toolTooltip.kind.mining': '채광 도구 ({tier}티어)',
+  'hudChrome.gathering.toolTooltip.kind.logging': '벌목 도구 ({tier}티어)',
+  'hudChrome.gathering.toolTooltip.kind.herbalism': '약초 도구 ({tier}티어)',
+  'hudChrome.gathering.toolTooltip.kind.fishing': '낚싯대 ({tier}티어)',
+  'hudChrome.gathering.toolTooltip.unlocks.mining': '{tier}티어까지의 광맥을 캐는 데 필요합니다.',
+  'hudChrome.gathering.toolTooltip.unlocks.logging':
+    '{tier}티어까지의 벌목 나무를 베는 데 필요합니다.',
+  'hudChrome.gathering.toolTooltip.unlocks.herbalism':
+    '{tier}티어까지의 약초 군락을 채집하는 데 필요합니다.',
+  'hudChrome.gathering.toolTooltip.use.mining': '사용: 근처의 광맥을 캡니다.',
+  'hudChrome.gathering.toolTooltip.use.logging': '사용: 근처의 벌목 나무를 벱니다.',
+  'hudChrome.gathering.toolTooltip.use.herbalism': '사용: 근처의 약초 군락에서 채집합니다.',
+  'hudChrome.gathering.toolTooltip.speed': '{tier}티어 미만 채집지에서 더 빠르게 채집합니다.',
+  'hudChrome.gathering.toolTooltip.rodRequired': '낚시에 필요합니다.',
+  'hudChrome.gathering.toolTooltip.rodBite': '물고기가 최대 {seconds}초 더 빨리 입질합니다.',
+  'hudChrome.gathering.toolTooltip.rodReel': '릴 감기 시간이 {seconds}초 늘어납니다.',
+  'hudChrome.gathering.toolTooltip.rodBand':
+    '낚시 기술 {skill} 이상에서 더 풍성한 어획 목록이 해금됩니다.',
+  'hudChrome.gathering.downgradeMark':
+    '가방이 가득 찼습니다: 수확물이 채집자의 표식 없이 보관되었습니다.',
+  'hudChrome.gathering.downgradeFind': '가방이 가득 찼습니다: 최상급 수확물을 놓쳐 버렸습니다.',
+  'hudChrome.gathering.stateReady': '채집 가능',
+  'hudChrome.gathering.stateCooldown': '재생성 중',
   'gatherEvent.pristineVein': '{finder}님이 순수한 광맥을 발견했습니다!',
   'gatherEvent.ancientHeartwood': '{finder}님이 고대 심목을 베어냈습니다!',
   'gatherEvent.moonlitBloom': '{finder}님이 달빛 꽃을 발견했습니다!',
   'entities.items.copper_ore.name': '구리 광석',
   'entities.items.iron_ore.name': '철 광석',
   'entities.items.ironbark_log.name': '무쇠껍질나무 통나무',
-  'entities.items.silverleaf_herb.name': '은빛잎 약초',
+  'entities.items.silverleaf_herb.name': '윤광잎 약초',
   'hudChrome.archetypeTitle.label': '칭호',
   'hudChrome.archetypeTitle.none': '없음',
   'hudChrome.archetypeTitle.hobbyLabel': '취미',
@@ -8251,12 +8338,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.archetypePair.alchemy+cooking': '약제사',
   'hudChrome.archetypePair.cooking+leatherworking': '덫사냥꾼',
   'hudChrome.archetypePair.leatherworking+tailoring': '의복 장인',
-  'hudChrome.archetypePair.tailoring+inscription': '마법직조사',
+  'hudChrome.archetypePair.tailoring+inscription': '잉크직조사',
   'hudChrome.archetypePair.inscription+enchanting': '비전술사',
   'hudChrome.archetypePair.enchanting+jewelcrafting': '보석결속사',
   'hudChrome.archetypePair.jewelcrafting+weaponcrafting': '칼날장인',
   'hudChrome.archetypePair.weaponcrafting+armorcrafting': '대장장이',
-  'hudChrome.archetypePair.armorcrafting+engineering': '톱니장인',
+  'hudChrome.archetypePair.armorcrafting+engineering': '기어장인',
   'hudChrome.craftName.armorcrafting': '방어구 제작',
   'hudChrome.craftName.weaponcrafting': '무기 제작',
   'hudChrome.craftName.jewelcrafting': '보석세공',
@@ -8299,17 +8386,40 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '이 조합 제작법에 필요한 두 제작 기술의 숙련도에 도달하지 못했습니다.',
   'hudChrome.crafting.throttled': '너무 빨리 제작하고 있습니다. 잠시 후 다시 시도하세요.',
   'hudChrome.crafting.recipeNotLearned': '아직 그 제작법을 배우지 않았습니다.',
+  'hudChrome.crafting.noBagSpace': '가방에 제작한 아이템을 넣을 공간이 없습니다.',
+  // Professions 2.0 (M16 non-Latin fills).
+  'hudChrome.crafting.attunementReturnCost':
+    '이 조합을 떠나면 나중에 다시 돌아올 때 속죄 과제 {cost}개가 필요합니다.',
+  'hudChrome.crafting.learnMoreAtStation':
+    '{station}의 {master}이(가) 더 많은 {craft} 제작법을 가르쳐 줄 수 있습니다.',
+  'hudChrome.crafting.trendNudge':
+    '당신의 솜씨가 {archetype} 쪽으로 기울고 있습니다. 그 조율 임무는 {master}에게 있습니다.',
+  'hudChrome.crafting.trendNudgeNoMaster':
+    '당신의 솜씨가 {archetype} 쪽으로 기울고 있습니다. 그 길을 택하려면 공예 명인을 찾으세요.',
+  'hudChrome.crafting.attunedZoneLine': '{name}님이 {archetype}(으)로 조율했습니다!',
+  'hudChrome.crafting.attunedBanner': '조율 완료: {title}',
+  'hudChrome.crafting.tierTutorial.title': '첫 티어',
+  'hudChrome.crafting.tierTutorial.tierCap':
+    '기술은 숙련도 {skill}에서 첫 티어에 도달하며, 티어가 오를수록 만들 수 있는 것이 좋아집니다. 하지만 기술이 희귀 이상의 작품을 만들 수 있는 것은 그것이 당신의 두 주 전공 중 하나일 때뿐입니다.',
+  'hudChrome.crafting.tierTutorial.radar':
+    '당신의 전문 기술은 바퀴를 이룹니다. 인접한 한 쌍에 조율하면 그 두 기술은 상한 없는 주 전공이 되고, 바퀴 반대편의 한 기술은 희귀 상한의 취미가 되며, 나머지는 비활성 상태가 됩니다. 그 지식은 유지되지만 다시 택하기 전까지는 일반 상한이 적용됩니다.',
+  'hudChrome.crafting.tierTutorial.masters':
+    '마을의 공예 명인들이 조율 임무를 제공합니다. 준비가 되면 찾아가 당신의 조합을 선택하세요. 배운 것은 결코 사라지지 않습니다.',
+  'hudChrome.crafting.tierTutorial.dismiss': '알겠습니다',
   'hudChrome.crafting.skillReqLine': '{craft} {skill} 필요',
   'hudChrome.crafting.difficultyFull': '숙련도 전량 상승',
   'hudChrome.crafting.difficultyReduced': '숙련도 상승 감소',
+  'hudChrome.crafting.difficultyMinimal': '숙련도 소폭 상승',
   'hudChrome.crafting.difficultyNone': '숙련도 상승 없음',
   'hudChrome.crafting.stationBadge': '제작 거점',
   'hudChrome.crafting.masterworkToast': '걸작! {name}',
   'hudChrome.crafting.masterworkZoneLine': '{crafter}님이 걸작 {name}을(를) 제작했습니다!',
   'hudChrome.crafting.tierUpToast': '{craft} 티어 {tier} 달성!',
   'hudChrome.crafting.makersMark': '제작자: {name}',
+  'hudChrome.bags.itemAriaInstanced': '{item}, 수량 {count}, 제작자 표식이 있는 사본',
+  'hudChrome.bags.itemAriaMasterwork': '{item}, 수량 {count}, 걸작',
+  'hudChrome.crafting.gatheredBy': '채집자: {name}',
   'hudChrome.crafting.masterworkSeal': '걸작',
-  'hudChrome.crafting.enchantedLine': '마법부여됨',
   'hudChrome.crafting.stationRequired': '그것을 제작하려면 {station}에 있어야 합니다.',
   'hudChrome.crafting.stationOutOfRangeNamed': '{station}(으)로 이동하여 제작하세요.',
   'hudChrome.crafting.stationName.forge': '대장간',
@@ -8693,6 +8803,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.voidweave_mantle.name': '공허직조 어깨걸이',
   'entities.items.abysswrought_band.name': '심연세공 반지',
   'entities.items.heart_of_the_rift.name': '균열의 심장',
+  'entities.items.voidsong_dirk.name': '공허의 노래, 찢겨진 장막의 단검',
   'hudChrome.finder.title': '던전 찾기',
   'hudChrome.finder.close': '닫기',
   'hudChrome.finder.back': '뒤로',
@@ -8778,7 +8889,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.lunar_tide': '달의 파도(주기적 광역 피해)',
   'hudChrome.finder.mech.enrage': '체력이 낮으면 격노',
   'hudChrome.finder.mech.shuddering_stomp': '전율의 발구르기(광역 기절)',
-  'hudChrome.finder.mech.necrotic_shockwave': '괴사의 충격파(높은 광역 피해)',
+  'hudChrome.finder.mech.grave_inferno': '무덤의 지옥불(시전 화염 광역, 분산 유지)',
   'hudChrome.finder.mech.grave_cleaver': '무덤 절단(전방 휩쓸기)',
   'hudChrome.finder.mech.shadow_nova': '어둠의 회오리(광역 폭발)',
   'hudChrome.finder.mech.profane_mending': '모독의 치유(아군 치유)',
@@ -8880,22 +8991,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '팁: 특성 로드아웃을 여러 개 저장해 두면 포인트를 다시 쓰지 않고도 빌드를 바꿀 수 있습니다.',
   'loading.tips.pvp':
     '팁: 다른 플레이어에게 친선 결투를 신청하거나 잿빛 콜로세움 투기장에 참가해 빌드를 시험해보세요.',
-  // Rideable mounts: the Z keybind + the Mounts window (the stable).
+  // Rideable mounts: Z dismounts normally and summons the lesson steed during training.
   'hudChrome.keybinds.mount': '탑승 / 하차',
-  'hudChrome.mobile.mounts': '탈것',
-  'hudChrome.mounts.title': '탈것',
-  'hudChrome.mounts.close': '닫기',
-  'hudChrome.mounts.select': '선택',
-  'hudChrome.mounts.selected': '선택됨',
-  'hudChrome.mounts.riding': '탑승 중',
   'hudChrome.mounts.mount': '탑승',
-  'hudChrome.mounts.dismount': '내리기',
-  'hudChrome.mounts.requiresLevel': '{level}레벨 필요',
-  'hudChrome.mounts.pickFirst': '탈 탈것을 선택하세요.',
-  'hudChrome.mounts.keybindHint': '탑승 / 하차 키를 눌러 탑승합니다.',
-  'hudChrome.mounts.rarity_common': '일반',
-  'hudChrome.mounts.rarity_rare': '희귀',
-  'hudChrome.mounts.rarity_epic': '서사',
   'hudChrome.mounts.spec_speed': '+{pct}% 추가 기동력',
   'hudChrome.mounts.name_valorsteed': '발러스티드',
   'hudChrome.mounts.name_grag_bear': '골리앗 그라그곰',
@@ -8915,14 +9013,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '룬 발톱으로 땅을 누비는 위엄 있는 폭풍 그리핀입니다. 날개는 접혀 있습니다.',
   'hudChrome.mounts.desc_thunderstrut_gobbler':
     '깨어나는 봉우리에서 꼬리깃을 뇌운처럼 펼친 채 활보하며 내려오는, 폭풍이 낳은 거대한 칠면조입니다.',
-  'hudChrome.mounts.emptyTitle': '보유한 탈것 없음',
-  'hudChrome.mounts.emptyStableHint':
-    '20레벨을 달성한 뒤 하이워치 서쪽 마구간에서 마구간지기 마를라에게 승마를 배우세요.',
-  'hudChrome.mounts.emptyDropHint':
-    '더 희귀한 탈것은 영웅 던전 우두머리나 균열 완료를 통해 얻을 수 있습니다.',
-  'hudChrome.mounts.clickManage': '클릭하여 탈것 선택',
   'hudChrome.mountTraining.mountPrompt': '{key} 키를 눌러 훈련용 발러스티드에 탑승한다.',
-  'hudChrome.mountTraining.ownedMountPrompt': '{key} 키를 눌러 탑승하세요',
+  'hudChrome.mountTraining.buyReinsPrompt':
+    '이제 탈것을 탈 수 있습니다. 말라에게서 10골드에 발러스티드 고삐를 구매한 뒤 사용해 타세요.',
+  'hudChrome.mounts.useToRide': '사용하여 이 탈것을 소환합니다.',
   'hudChrome.mountTraining.ridePrompt':
     '빛나는 표식을 따라 출발선으로 간 뒤 레이스 시작을 누르세요.',
   'hudChrome.mountTraining.begin': '수업 시작',
@@ -8992,8 +9086,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.models.formTravel': '쾌속 형태',
   'guide.models.groupForms': '드루이드 변신',
   'guide.nav.sidebarLabel': '가이드 주제',
-  'guide.professions.craftHowBody':
-    '제작 창(기본 키 T)을 열면 여러분이 아는 모든 제작법과 각각에 필요한 재료, 그리고 지금 지닌 재료를 볼 수 있다. 재료가 갖춰져 있으면 클릭 한 번으로 제작된다. 일반적인 제작법은 세계 어디에서나 만들 수 있다. 다만 상위 도구와 희귀한 시전자 방어구를 비롯한 몇몇 고급 제작법은 하이워치의 제작 거점에 서 있어야 한다.',
   'guide.professions.craftHowTitle': '제작 창',
   'guide.search.typeAbility': '능력',
   'guide.search.typeDeed': '업적',
@@ -9025,6 +9117,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unstuck.completed': '도달할 수 있는 가장 가까운 안전한 위치로 이동했습니다.',
   'hudChrome.unstuck.completedAtGraveyard':
     '영혼이 가장 가까운 묘지로 돌아왔습니다. 영혼 치유사에게 말을 걸어 수호자의 대가를 받으세요.',
+  'hudChrome.unstuck.revivedAtGraveyard':
+    '가장 가까운 묘지로 옮겨져 부활했습니다. 수호자의 대가가 당신을 짓누릅니다.',
   'hudChrome.unstuck.cancelledMoved': '이동해서 갇힘 탈출이 취소되었습니다.',
   'hudChrome.unstuck.cancelledDamaged': '피해를 받아 갇힘 탈출이 취소되었습니다.',
   'hudChrome.unstuck.cancelledCombat': '전투에 진입해 갇힘 탈출이 취소되었습니다.',
@@ -9367,20 +9461,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.healthNone': '없음',
   'hudChrome.partyFrames.sortName': '이름',
   'hudChrome.partyFrames.sortRole': '역할',
-  'apiError.welcome.invalid_input': '입력이 올바르지 않습니다.',
-  'welcome.back': '다시 오신 것을 환영합니다, {name}',
-  'welcome.level': '레벨 {level}',
-  'welcome.lastPlayed': '마지막 플레이: {when}',
-  'welcome.continue': '월드 입장',
-  'welcome.continueHint': 'Enter로 계속, Esc로 건너뛰기',
-  'welcome.continueHintTouch': '탭하여 계속',
-  'welcome.discord.title': '커뮤니티는 Discord에서 활동합니다',
-  'welcome.discord.sub': '패치 미리보기, 이벤트, 개발자 채팅, 연동 시 보너스 은행 슬롯 2개.',
-  'welcome.discord.join': 'Discord에 참여하기',
-  'welcome.chest.ready': '일일 상자 준비 완료',
-  'welcome.armory.cta': '무기고 둘러보기',
-  'welcome.news.new': '신규',
-  'welcome.news.viewAll': 'GitHub에서 모든 업데이트 보기',
+  'news.new': '신규',
+  'news.viewAll': 'GitHub에서 모든 업데이트 보기',
   'hudChrome.auraEffect.battleStance': '전투 태세: 분노 생성 10% 증가',
   'hudChrome.auraEffect.berserkerStance': '광전사 태세: 치명타 확률 3% 증가, 피해 3% 증가',
   'hudChrome.auraEffect.crit': '치명타 확률이 {pct}% 증가합니다',
@@ -9399,6 +9481,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.combat.parried': '{target}이 당신의 {ability}을 무기로 막았습니다.',
   'hudChrome.options.mouseoverCast': '파티 창에서 마우스오버 시전',
   'hudChrome.options.showTargetOfTarget': '대상의 대상 표시',
+  'hudChrome.options.stickyTarget': '지면 클릭 시 대상 유지',
   'hudChrome.unitFrame.targetOfTargetLabel': '대상의 대상',
   'hudChrome.mobile.professions': '전문 기술',
   'hudChrome.professions.title': '전문 기술',
@@ -9420,7 +9503,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '다음 티어까지 숙련도 {points} 남음: 걸작 확률이 높아집니다',
   'hudChrome.professions.nextUnlockSpecialized':
     '전문화까지 숙련도 {points} 남음: 재료 소모가 줄어듭니다',
-  'hudChrome.professions.nextUnlockMax': '최대 숙련도입니다',
+  'hudChrome.professions.nextUnlockMastered': '지금은 통달했습니다',
   'hudChrome.professions.perkSpecializedLine': '{craft}: 전문화, 재료 소모 -{pct}%',
   'hudChrome.professions.perkSpecializedAt': '숙련도 {threshold}에서 전문화됩니다',
   'hudChrome.professions.switchCost': '다음 원형 전환에는 속죄 {cost}이 필요합니다',
@@ -9430,6 +9513,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.ctaHeader': '다음 단계',
   'hudChrome.professions.ctaRaise':
     '{craft}를 계속 올리세요. 다음 티어까지 숙련도 {points} 남았습니다.',
+  'hudChrome.professions.ctaRaiseSpecialized':
+    '{craft}를 계속 올리세요. 전문화까지 숙련도 {points} 남았습니다: 재료 소모가 줄어듭니다.',
   'hudChrome.professions.ctaStart': '아무 전문 기술로 제작하거나 채집하면 시작됩니다.',
   'hudChrome.professions.unattunedIdentity':
     '아직 원형에 조율되지 않았습니다. 기술을 올리고 조율을 완료하여 조합을 선택하세요.',
@@ -9618,8 +9703,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.training.stateKnown': '습득함',
   'hudChrome.training.stateTeachable': '습득 가능',
   'hudChrome.training.stateLocked': '잠김',
+  'hudChrome.training.statePending': '습득 중',
   'hudChrome.training.requirement': '{craft} {skill}에서 전수',
   'hudChrome.training.trainAria': '{fee}(으)로 {name} 습득',
+  'hudChrome.training.pendingAria': '{name} 습득 중',
   'hudChrome.training.dialogOption': '훈련',
   'hudChrome.training.dialogOptionAria': '{name}에게 훈련 받기',
   'hudChrome.training.learned': '제조법을 습득했습니다: {recipe}',
@@ -9648,23 +9735,23 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.ironedge_longsword.name': '무쇠날 대검',
   'entities.items.ironshod_maul.name': '무쇠 대형 망치',
   'entities.items.whetted_iron_dirk.name': '날카로운 무쇠 단검',
-  'entities.items.thorium_warblade.name': '토륨 전투검',
-  'entities.items.arcanite_war_axe.name': '비전 전투도끼',
-  'entities.items.elderwood_battle_staff.name': '고대 딱총나무 전투 지팡이',
+  'entities.items.thorium_warblade.name': '오스뮴 전투검',
+  'entities.items.arcanite_war_axe.name': '문양강철 전투도끼',
+  'entities.items.elderwood_battle_staff.name': '고산솔 전투 지팡이',
   'entities.items.riveted_copper_girdle.name': '리벳 구리 허리띠',
   'entities.items.coppermail_sabatons.name': '구리 사슬 사바톤',
   'entities.items.coppermail_gauntlets.name': '구리 사슬 건틀릿',
   'entities.items.ironlink_hauberk.name': '무쇠사슬 갑옷',
   'entities.items.ironlink_legguards.name': '무쇠사슬 다리보호구',
   'entities.items.ironlink_spaulders.name': '무쇠사슬 어깨보호구',
-  'entities.items.thoriumscale_greathelm.name': '토륨 비늘 대형 투구',
-  'entities.items.thoriumscale_cuirass.name': '토륨 비늘 흉갑',
-  'entities.items.thoriumscale_leggings.name': '토륨 비늘 각반',
+  'entities.items.thoriumscale_greathelm.name': '오스뮴 비늘 대형 투구',
+  'entities.items.thoriumscale_cuirass.name': '오스뮴 비늘 흉갑',
+  'entities.items.thoriumscale_leggings.name': '오스뮴 비늘 각반',
   'entities.items.homespun_hood.name': '손으로 짠 두건',
   'entities.items.homespun_mitts.name': '손으로 짠 벙어리장갑',
-  'entities.items.silverthread_slippers.name': '은실 슬리퍼',
-  'entities.items.goldweave_robe.name': '황금직조 로브',
-  'entities.items.goldweave_leggings.name': '황금직조 각반',
+  'entities.items.silverthread_slippers.name': '옅은실 슬리퍼',
+  'entities.items.goldweave_robe.name': '도금직조 로브',
+  'entities.items.goldweave_leggings.name': '도금직조 각반',
   'entities.items.silkspun_satchel.name': '실크 방적 가방',
   'entities.items.silkbinders_raiment.name': '실크결속의 의복',
   'entities.items.sunweave_mantle.name': '태양직조 망토',
@@ -9687,12 +9774,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.silvered_carp_supper.name': '은빛 잉어 만찬',
   'entities.items.anglers_feast_platter.name': '낚시꾼의 성찬 접시',
   'entities.items.marlows_grand_roast.name': '마를로의 대형 구이',
-  'entities.items.silverleaf_healing_draught.name': '은빛잎 치유 물약',
-  'entities.items.silverleaf_mana_draught.name': '은빛잎 마나 물약',
+  'entities.items.silverleaf_healing_draught.name': '윤광잎 치유 물약',
+  'entities.items.silverleaf_mana_draught.name': '윤광잎 마나 물약',
   'entities.items.elixir_of_the_boar.name': '멧돼지의 비약',
   'entities.items.goldleaf_healing_draught.name': '금빛잎 치유 물약',
   'entities.items.goldleaf_mana_draught.name': '금빛잎 마나 물약',
-  'entities.items.venomfire_elixir.name': '독화의 비약',
+  'entities.items.venomfire_elixir.name': '살무사 작열의 비약',
   'entities.items.sunpetal_healing_draught.name': '태양꽃잎 치유 물약',
   'entities.items.sunpetal_mana_draught.name': '태양꽃잎 마나 물약',
   'entities.items.elixir_of_the_serpent.name': '뱀의 비약',
@@ -9715,6 +9802,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '따뜻한 비가 오래된 돌 위에서 치익 소리를 냅니다. 야생심장 분지가 눈앞에 펼쳐집니다.',
   'entities.dungeons.wildheart_basin.leaveText':
     '돌송곳니 아래를 지나 팜리치의 햇살 속으로 돌아갑니다.',
+  'entities.dungeons.the_last_keep.name': '마지막 요새',
+  'entities.dungeons.the_last_keep.enterText': '마지막 요새의 차갑고 고요한 회랑에 발을 들입니다.',
+  'entities.items.last_keep_signet.name': '마지막 요새의 인장',
+  'entities.dungeons.the_last_keep.leaveText':
+    '요새의 문을 닫고 드레이크랜드의 바람 속으로 돌아갑니다.',
   'entities.items.wildheart_tuskblade.name': '야생심장 엄니대검',
   'entities.items.wildheart_hexwood_staff.name': '분지의 사술나무 지팡이',
   'entities.items.wildheart_fangknife.name': '줄가르의 송곳니칼',
@@ -9773,5 +9865,808 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.wreck_wardens_mantle.name': '난파선 감시자의 어깨덮개',
   'entities.items.wreckfield_flotsam_crate.name': '표류물 상자',
   'entities.items.wyrmwatch_warning_banner.name': '와이름 감시탑 경고 깃발',
+  'entities.items.mosshide_vest.name': '이끼가죽 조끼',
+  'entities.items.thornling_grips.name': '가시령 장갑',
+  'entities.items.acolyte_chain_grips.name': '수행자 사슬 장갑',
+  'entities.items.votive_chain_belt.name': '서원 사슬 허리띠',
+  'entities.items.briarroot_staff.name': '가시뿌리 지팡이',
+  'entities.items.valefire_lantern.name': '골짜기불 랜턴',
+  'entities.items.fenbark_leggings.name': '늪껍질 다리보호구',
+  'entities.items.mirebloom_treads.name': '수렁꽃 장화',
+  'entities.items.fenwarden_sabatons.name': '늪지기 철장화',
+  'entities.items.marshlight_hauberk.name': '습지빛 사슬갑옷',
+  'entities.items.duskthorn_mantle.name': '황혼가시 어깨망토',
+  'entities.items.fenshadow_maul.name': '늪그림자 철퇴',
+  'entities.items.wildgrove_cinch.name': '야생숲 허리띠',
+  'entities.items.cragward_pauldrons.name': '바위수비 어깨갑옷',
+  'entities.items.cragthorn_greatstaff.name': '바위가시 대지팡이',
+  'entities.items.moonbark_vestments.name': '달껍질 예복',
+  'entities.items.peaksong_helm.name': '봉우리노래 투구',
+  'entities.items.stormchant_gauntlets.name': '폭풍영창 건틀릿',
+  'entities.items.cragprowl_belt.name': '바위배회 허리띠',
+  'entities.items.stormroot_cowl.name': '폭풍뿌리 두건',
+  'entities.items.thunderward_legguards.name': '천둥수호 다리갑옷',
+  'entities.items.revenantstep_treads.name': '망령발걸음 장화',
+  'entities.items.shardfang_grips.name': '파편송곳니 장갑',
+  'entities.items.shardsong_mantle.name': '파편노래 어깨망토',
+  'entities.items.wyrmcult_spellgrips.name': '용교단 주문장갑',
+  'entities.items.thornpeak_wildwraps.name': '쏜피크 야생손싸개',
+  'entities.items.stormvotive_hauberk.name': '폭풍서원 사슬갑옷',
+  'entities.items.cryptbloom_shoulderguards.name': '무덤꽃 어깨보호구',
+  'entities.items.gravewyrm_thornmaul.name': '무덤용 가시철퇴',
+  'entities.items.vestments_of_the_waking_grove.name': '깨어나는 숲의 예복',
+  'entities.items.nightfangs_greatstaff.name': '밤송곳니의 대지팡이',
+  'entities.items.maul_of_the_scourged_wilds.name': '재앙 들판의 철퇴',
+  'entities.items.tidehymn_slippers.name': '물결찬가 슬리퍼',
+  'entities.items.pearlward_aegis.name': '진주수호 방패',
+  'entities.items.dreamroot_boots.name': '꿈뿌리 장화',
+  'entities.items.grovewardens_grips.name': '숲지기 장갑',
+  'entities.items.lunarward_cinch.name': '달수호 허리띠',
+  'entities.items.stormbark_mantle.name': '폭풍나무 껍질 망토',
+  'entities.items.verdant_walkers.name': '신록의 장화',
+  'entities.items.wildgrowth_leggings.name': '야생성장 다리보호구',
+  'entities.items.wildsoul_maul.name': '야생영혼 철퇴',
   'hudChrome.professions.skillValue': '{skill} / {max}',
+  'entities.items.resonant_thread.name': '공명의 실',
+  'entities.items.resonant_hide.name': '공명의 가죽',
+  'entities.items.resonant_links.name': '공명의 사슬',
+  'entities.items.resonant_steel.name': '공명의 강철',
+  'entities.items.resonant_timber.name': '공명의 목재',
+  'hud.errors.tradeBound': '그 아이템은 귀속되어 거래할 수 없습니다.',
+  'hudChrome.enchantName.enchant_weapon_might': '무기 마법부여 - 위력',
+  'hudChrome.enchantName.enchant_weapon_intellect': '무기 마법부여 - 주문력',
+  'hudChrome.enchantName.enchant_helmet_fortitude': '투구 마법부여 - 강건함',
+  'hudChrome.enchantName.enchant_neck_spirit': '목걸이 마법부여 - 정신력',
+  'hudChrome.enchantName.enchant_shoulder_agility': '어깨 마법부여 - 민첩성',
+  'hudChrome.enchantName.enchant_chest_stamina': '갑옷 마법부여 - 체력',
+  'hudChrome.enchantName.enchant_waist_stamina': '허리띠 마법부여 - 체력',
+  'hudChrome.enchantName.enchant_legs_stamina': '다리 마법부여 - 체력',
+  'hudChrome.enchantName.enchant_gloves_agility': '장갑 마법부여 - 민첩성',
+  'hudChrome.enchantName.enchant_gloves_intellect': '장갑 마법부여 - 주문력',
+  'hudChrome.enchantName.enchant_feet_agility': '신발 마법부여 - 민첩성',
+  'hudChrome.enchantName.enchant_ring_spirit': '반지 마법부여 - 정신력',
+  'hudChrome.enchantName.enchant_weapon_agility': '무기 마법부여 - 민첩성',
+  'hudChrome.enchantName.enchant_helmet_intellect': '투구 마법부여 - 지능',
+  'hudChrome.enchantName.enchant_helmet_armor': '투구 마법부여 - 강화',
+  'hudChrome.enchantName.enchant_neck_intellect': '목걸이 마법부여 - 지능',
+  'hudChrome.enchantName.enchant_neck_agility': '목걸이 마법부여 - 민첩성',
+  'hudChrome.enchantName.enchant_shoulder_strength': '어깨 마법부여 - 힘',
+  'hudChrome.enchantName.enchant_shoulder_intellect': '어깨 마법부여 - 지능',
+  'hudChrome.enchantName.enchant_chest_spirit': '갑옷 마법부여 - 정신력',
+  'hudChrome.enchantName.enchant_chest_armor': '갑옷 마법부여 - 강화',
+  'hudChrome.enchantName.enchant_waist_strength': '허리띠 마법부여 - 힘',
+  'hudChrome.enchantName.enchant_waist_agility': '허리띠 마법부여 - 민첩성',
+  'hudChrome.enchantName.enchant_legs_intellect': '다리 마법부여 - 지능',
+  'hudChrome.enchantName.enchant_gloves_strength': '장갑 마법부여 - 힘',
+  'hudChrome.enchantName.enchant_feet_strength': '신발 마법부여 - 힘',
+  'hudChrome.enchantName.enchant_feet_stamina': '신발 마법부여 - 체력',
+  'hudChrome.enchantName.enchant_ring_strength': '반지 마법부여 - 힘',
+  'hudChrome.enchantName.enchant_ring_agility': '반지 마법부여 - 민첩성',
+  'hudChrome.enchantName.enchant_ring_intellect': '반지 마법부여 - 지능',
+  'hudChrome.enchantName.enchant_weapon_greater_might': '무기 마법부여 - 상급 위력',
+  'hudChrome.enchantName.enchant_weapon_greater_spellpower': '무기 마법부여 - 상급 주문력',
+  'hudChrome.enchantName.enchant_helmet_greater_fortitude': '투구 마법부여 - 상급 강건함',
+  'hudChrome.enchantName.enchant_chest_greater_stamina': '갑옷 마법부여 - 상급 체력',
+  'hudChrome.enchantName.enchant_legs_greater_stamina': '다리 마법부여 - 상급 체력',
+  'hudChrome.enchantName.enchant_gloves_greater_agility': '장갑 마법부여 - 상급 민첩성',
+  'hudChrome.enchantName.enchant_weapon_runed_edge': '무기 마법부여 - 룬 칼날',
+  'hudChrome.enchantName.enchant_weapon_runed_focus': '무기 마법부여 - 룬 인장',
+  'hudChrome.enchantName.enchant_chest_runeweave': '갑옷 마법부여 - 룬 직조',
+  'hudChrome.enchantName.enchant_legs_runed_hide': '다리 마법부여 - 룬 가죽',
+  'hudChrome.enchantName.enchant_helmet_runed_links': '투구 마법부여 - 룬 사슬',
+  'hudChrome.itemMenu.equip': '장착',
+  'hudChrome.itemMenu.use': '사용',
+  'hudChrome.itemMenu.disenchant': '마력 추출',
+  'hudChrome.itemMenu.salvage': '분해',
+  'hudChrome.itemMenu.applyEnchant': '마법부여 적용',
+  'hudChrome.enchanting.disenchantedLine': '{item}의 마력을 추출했습니다.',
+  'hudChrome.enchanting.disenchantedYield':
+    '{item}의 마력을 추출하여 {material}(으)로 만들었습니다.',
+  'hudChrome.enchanting.disenchantedYieldQty':
+    '{item}의 마력을 추출하여 {material} {qty}개로 만들었습니다.',
+  'hudChrome.enchanting.disenchantedAlso': '추가로 {material}을(를) 얻었습니다.',
+  'hudChrome.enchanting.disenchantedAlsoQty': '추가로 {material}을(를) {qty}개 얻었습니다.',
+  'hudChrome.enchanting.salvagedLine': '{item}을(를) 분해했습니다.',
+  'hudChrome.enchanting.salvagedYield': '{item}을(를) 분해하여 {material}(으)로 만들었습니다.',
+  'hudChrome.enchanting.salvagedYieldQty':
+    '{item}을(를) 분해하여 {material} {qty}개로 만들었습니다.',
+  'hudChrome.enchanting.enchantAppliedLine': '{item}에 {enchant}을(를) 부여했습니다.',
+  'hudChrome.enchanting.notHeld': '해당 아이템을 가지고 있지 않습니다.',
+  'hudChrome.enchanting.notDisenchantable': '해당 아이템은 마력을 추출할 수 없습니다.',
+  'hudChrome.enchanting.notSalvageable': '해당 아이템은 분해할 수 없습니다.',
+  'hudChrome.enchanting.disenchantThrottled':
+    '너무 빠르게 마력을 추출하고 있습니다. 잠시 후 다시 시도하세요.',
+  'hudChrome.enchanting.salvageThrottled':
+    '너무 빠르게 분해하고 있습니다. 잠시 후 다시 시도하세요.',
+  'hudChrome.enchanting.enchantThrottled':
+    '너무 빠르게 마법부여하고 있습니다. 잠시 후 다시 시도하세요.',
+  'hudChrome.enchanting.enchantWrongSlot': '그 마법부여는 해당 아이템에 적용할 수 없습니다.',
+  'hudChrome.enchanting.enchantUnknown': '해당 마법부여가 존재하지 않습니다.',
+  'hudChrome.enchanting.enchantInsufficient': '해당 마법부여에 필요한 재료가 없습니다.',
+  'hudChrome.enchanting.disenchantNoSpace': '가방에 비전 재료를 넣을 공간이 없습니다.',
+  'hudChrome.enchanting.salvageNoSpace': '가방에 분해한 재료를 넣을 공간이 없습니다.',
+  'hudChrome.enchanting.enchantNoSpace': '가방에 마법부여한 아이템을 넣을 공간이 없습니다.',
+  'hudChrome.enchanting.disenchantConfirmTitle': '{item}의 마력을 추출하시겠습니까?',
+  'hudChrome.enchanting.disenchantConfirmBody':
+    '{item}을(를) 파괴하고 비전 재료를 얻습니다. 되돌릴 수 없습니다.',
+  'hudChrome.enchanting.disenchantConfirmBodySpecial':
+    '특별한 {item} 사본(서명됨, 걸작 또는 마법부여됨)을 파괴하고 비전 재료를 얻습니다. 되돌릴 수 없습니다.',
+  'hudChrome.enchanting.salvageConfirmTitle': '{item}을(를) 분해하시겠습니까?',
+  'hudChrome.enchanting.salvageConfirmBody':
+    '{item}을(를) 파괴하고 제작 재료를 얻습니다. 되돌릴 수 없습니다.',
+  'hudChrome.enchanting.salvageConfirmBodySpecial':
+    '특별한 {item} 사본(서명됨, 걸작 또는 마법부여됨)을 파괴하고 제작 재료를 얻습니다. 되돌릴 수 없습니다.',
+  'hudChrome.enchanting.pickerTitle': '마법부여 적용',
+  'hudChrome.enchanting.targetTitle': '마법부여할 아이템을 선택하세요',
+  'hudChrome.enchanting.noEnchants': '이 재료를 사용하는 마법부여가 없습니다.',
+  'hudChrome.enchanting.noTargets': '마법부여할 수 있는 아이템이 없습니다.',
+  // Professions 2.0 attunement quests + master tier letters (ko_KR M16 fills).
+  'entities.quests.q_prof_attune_smith.title': '대장장이의 약속',
+  'entities.quests.q_prof_attune_smith.text':
+    '강철은 흔들리는 손을 용서하지 않지. 그러니 무엇을 맹세하기 전에 분명히 일러 두겠다. 내 화로에 몸을 맡기면 무기 제작과 방어구 제작이 네 두 주 전공이 되고, 희귀 등급 작업 너머로 끌고 갈 수 있는 기술은 그 둘뿐이다. 수레바퀴 반대편의 기술은 취미로 곁에 남아 희귀 등급까지만 닿고 더는 못 간다. 나머지 생업이 불타 사라지는 것은 아니다, {playerName}. 그저 조용히 잠들어, 네가 다시 부를 때까지 잠든 채로 있을 뿐이다. 그리고 망치가 떨어지기 전에 알아 두어라. 이 짝을 버리고 다른 짝으로 옮겼다가 돌아오려면 정직한 노동으로 기어 돌아와야 한다. 처음 돌아올 땐 적 다섯을 쓰러뜨리고, 다음엔 여덟, 그다음엔 열하나, 벗어날수록 매번 더 무거워진다. 아직 여기 서 있느냐? 그렇다면 베일에서 네 손으로 직접 캐낸 광맥 셋을 가져오너라. 그러면 약속이 맺어진 것으로 하겠다.',
+  'entities.quests.q_prof_attune_smith.completion':
+    '좋은 광석이고, 그것을 다룰 좋은 손이로군. 이제 무기 제작과 방어구 제작은 네가 통달할 몫이다. 나머지는 스스로 얻어 내라.',
+  'entities.quests.q_prof_attune_smith.objectives.0.label': '광맥 채굴',
+  'entities.quests.q_prof_attune_outfitter.title': '의복 장인의 자',
+  'entities.quests.q_prof_attune_outfitter.text':
+    '자르기 전에 값을 재어라, 그것이 내 베틀의 첫 번째 규칙이다. 나를 택하면 가죽세공과 재봉이 네 두 주 전공이 되어 희귀 등급 작업 너머로 끌고 갈 수 있는 짝이 되고, 그 맞은편 기술은 취미로 곁에 남아 희귀 등급까지 닿은 뒤 그 자리에 머문다. 네가 잠시 내려놓는 생업은 풀려 흩어지는 것이 아니라, {playerName}, 그저 개켜 넣어 두는 것이니 다시 손에 잡을 때까지 잠들어 있을 뿐이다. 다만 분명히 새겨 두어라. 이 짝을 떠났다가 훗날 되찾고자 하면 돌아오는 길은 매번 더 길어지는 노동으로 치러야 한다. 처음엔 넷을 솎아 내고, 다음엔 여덟, 그다음엔 열하나, 언제나 조금씩 더. 마음을 정했다면 흑거미줄 잠복자 넷을 솎아 그 실을 베틀로 가져오너라. 좋은 실이 있어야 좋은 옷이 시작되는 법이니.',
+  'entities.quests.q_prof_attune_outfitter.completion':
+    '고른 실, 고른 손이로군. 이제 가죽세공과 재봉은 네 솜씨가 닿는 데까지 끌고 갈 수 있는 네 것이다. 두 번 재어라, 그러면 결코 너를 저버리지 않을 것이다.',
+  'entities.quests.q_prof_attune_outfitter.objectives.0.label': '흑거미줄 잠복자 처치',
+  'entities.quests.q_prof_attune_apothecary.title': '간직할 만한 요리법',
+  'entities.quests.q_prof_attune_apothecary.text':
+    '좋은 요리는 서로 어울리는 두 가지 맛이지, 좋은 기술도 마찬가지라네, {playerName}. 나와 함께 앉으면 연금술과 요리가 자네의 두 주 전공이 되어, 희귀 등급 작업 너머까지 뭉근히 끓일 수 있는 둘이 된다네. 수레바퀴 저편의 기술은 자네의 취미라, 희귀 등급까지 간을 맞추고 그 이상 불은 올리지 않지. 나머지 생업은 식료품 창고에 넣어 두는 셈이야. 잠들어 있을 뿐 상하지 않으니, 다시 꺼낼 때 언제든 그대로일세. 냄비가 아직 식어 있을 때 미리 일러 두지. 다른 짝으로 떠돌다 돌아오는 일은 점점 커지는 잡일이야. 처음엔 짐승 다섯을 처리하고, 다음엔 여덟, 그다음엔 열하나, 한 그릇 더할 때마다 무거워진다네. 그래도 군침이 도나? 그렇다면 야생 멧돼지 넷을 잡아 오게. 제대로 된 부엌은 좋은 고기에서 시작하는 법이니.',
+  'entities.quests.q_prof_attune_apothecary.completion':
+    '이거야말로 고기가 제대로 붙은 시작이로군. 이제 연금술과 요리는 자네가 원하는 만큼 높이 요리할 수 있는 자네 것일세. 배고플 때 또 오게.',
+  'entities.quests.q_prof_attune_apothecary.objectives.0.label': '야생 멧돼지 사냥',
+  'entities.quests.q_prof_attune_bombardier.title': '불안정한 계약',
+  'entities.quests.q_prof_attune_bombardier.text':
+    '오, 오, 좋은 거, 요란한 거 원하지, 응? 들어 봐, 들어 봐, 째깍거리는 건 아무것도 만지기 전에 말이야. 한마디만 하면 기계공학과 연금술이 네 두 주 전공이 되고, 희귀 등급 작업 너머로 밀어붙일 수 있는 건 딱 그 둘뿐이야(바로 거기서 재밌어지거든, 날 믿어). 반대편 기술은 취미로 주머니에 넣어 둬, 희귀 등급까지만, 더는 안 돼, 삐치지 말고. 네 다른 생업? 사라진 거 아니야, {playerName}, 그냥 낮잠 자는 거야, 잠들어 있는 거지, 언제든 깨우면 돼. 그런데(언제나 그런데가 있지, 도화선 붙잡아) 이 짝을 내팽개치고 나중에 뒤뚱뒤뚱 돌아오면 땀값이 쌓여. 처음엔 다섯을 쓰러뜨리고, 다음엔 여덟, 그다음엔 열하나, 더, 더, 겁먹고 발 뺄 때마다 매번. 할래? 할 거야? 그럼 가서 약초 군락 셋을 뜯어 와, 불안정한 놈들로, 어느 거냐고 묻지 마, 충분히 믿으면 다 조금씩 불안정하니까.',
+  'entities.quests.q_prof_attune_bombardier.completion':
+    '하. 시약이야, 진짜배기, 게다가 손가락도 다 붙어 있어, 좋아, 좋아. 기계공학과 연금술, 네 거야, 가서 후회할 만한 걸 하나 만들어 봐. 어서 가.',
+  'entities.quests.q_prof_attune_bombardier.objectives.0.label': '약초 군락 채집',
+  'entities.quests.q_prof_amends_smith.title': '다시 화로 앞으로',
+  'entities.quests.q_prof_amends_smith.text':
+    '그래, 다시 화로 앞으로 돌아왔군. 서운하지 않은 척은 않겠다, {playerName}. 하지만 나는 공정한 손이고, 일 또한 공정하다. 돌아오는 값은 알 테지. 노동이다, 그리고 벗어난 횟수만큼 매번 더 무거운. 북쪽 길을 물어뜯는 늑대들을 쓰러뜨려라. 그 팔놀림이 이 짝이 한때 네 팔에 무엇을 요구했는지 다시 일깨워 줄 것이다.',
+  'entities.quests.q_prof_amends_smith.completion':
+    '손에 다시 박자가 돌아왔군. 무기 제작과 방어구 제작이 다시 네 주 전공이다. 떠나는 것을 버릇 들이지 마라.',
+  'entities.quests.q_prof_amends_smith.objectives.0.label': '숲늑대 처치',
+  'entities.quests.q_prof_amends_outfitter.title': '다시 이은 실',
+  'entities.quests.q_prof_amends_outfitter.text':
+    '결국 다시 내 베틀 앞이로군. 원한은 없다, {playerName}. 다만 실은 자신을 놓아 버린 손을 기억하고, 그것을 다시 잡는 값은 매번 더 길게 재어진다. 서쪽 숲을 뒤덮은 흑거미줄 잠복자들을 솎아 내라. 그 노동이 좋은 실을 다시 만지기 전에 네 손을 가라앉혀 줄 것이다.',
+  'entities.quests.q_prof_amends_outfitter.completion':
+    '다시 흔들림이 없군. 가죽세공과 재봉이 주 전공으로 네 손에 돌아왔다. 이번에는 떠돌기 전에 두 번 재어라.',
+  'entities.quests.q_prof_amends_outfitter.objectives.0.label': '흑거미줄 잠복자 처치',
+  'entities.quests.q_prof_amends_apothecary.title': '다시 화덕 위로',
+  'entities.quests.q_prof_amends_apothecary.text':
+    '이런, 누가 다시 내 냄비 앞에 왔나 보게. 서운한 것 없네, {playerName}, 부엌에는 늘 자리가 있으니까. 다만 걸어 나갈 때마다 외상값이 길어지는 건 자네도 알 테지. 동쪽 초원의 야생 멧돼지를 솎아 오게. 정직한 땀이 첫 번째 재료이고, 그것이 자네 손에 이 일을 다시 일깨워 줄 걸세.',
+  'entities.quests.q_prof_amends_apothecary.completion':
+    '옛 맛이 다시 나는군. 연금술과 요리가 주 전공으로 자네 화덕 위에 돌아왔네. 이번엔 좀 오래 머물게.',
+  'entities.quests.q_prof_amends_apothecary.objectives.0.label': '야생 멧돼지 사냥',
+  'entities.quests.q_prof_amends_bombardier.title': '불어나는 장부',
+  'entities.quests.q_prof_amends_bombardier.text':
+    '돌아왔구나, 하, 다들 결국 돌아와, 요란한 건 끌어당기는 힘이 있거든, 응? 나야 삐치지 않아, {playerName}, 그런데 장부, 아 그 장부, 네가 빠져나갈 때마다 불어나, 돌아올 때마다 더, 그게 공평한 거지. 가서 굴착장의 깊은바위 채굴꾼들을 싹 치워 줘, 땀 먼저, 불꽃은 나중, 그게 방금 내가 만든 규칙이야.',
+  'entities.quests.q_prof_amends_bombardier.completion':
+    '바로 그거야, 손이 다시 근질거리지. 기계공학과 연금술, 다시 주 전공이야, 어서, 가서 한 방 터뜨려. 이번엔 좀 붙어 있어 봐, 응?',
+  'entities.quests.q_prof_amends_bombardier.objectives.0.label': '깊은바위 채굴꾼 소탕',
+  'entities.quests.q_prof_workorder_forge.title': '화로 작업 의뢰',
+  'entities.quests.q_prof_workorder_forge.text':
+    '화로는 늘 먹여 달라 보채지, {playerName}. 구리 광석 여덟 덩이를 가져오면 그 수고에 값을 치러 주겠다. 격식은 없다, 그저 광석과 동전뿐이다.',
+  'entities.quests.q_prof_workorder_forge.completion':
+    '좋은 무게에 찌꺼기도 없군. 여기 네 몫이다. 화로는 머지않아 또 배고파질 게다.',
+  'entities.quests.q_prof_workorder_forge.objectives.0.label': '구리 광석 납품',
+  'entities.quests.q_prof_workorder_kitchens.title': '주방 작업 의뢰',
+  'entities.quests.q_prof_workorder_kitchens.text':
+    '내 식료품 창고가 헐쑥해 보이는군, {playerName}. 그리고 헐쑥한 창고는 심술궂은 요리사를 만들지. 야생 고기 여덟 덩이를 가져다주면 자네 몫의 동전이 있네. 덤으로 변치 않는 내 고마움도 있고. 값어치는 덜하지만 맛은 더 좋다네.',
+  'entities.quests.q_prof_workorder_kitchens.completion':
+    '이제야 창고가 가득하군. 여기 자네 삯일세. 가방이 또 묵직해지면 다시 오게.',
+  'entities.quests.q_prof_workorder_kitchens.objectives.0.label': '야생 고기 납품',
+  'entities.quests.q_prof_workorder_loom.title': '베틀 작업 의뢰',
+  'entities.quests.q_prof_workorder_loom.text':
+    '베틀이 비었고, 노는 손은 대낮을 허비하지, {playerName}. 거미 비단 여섯 타래를 가져오면 동전 한 닢까지 헤아려 공정한 삯을 치러 주겠다.',
+  'entities.quests.q_prof_workorder_loom.completion':
+    '고운 실에, 고르게 자았군. 정확히 헤아린 네 동전이다. 베틀이 고마워하고, 나 또한 그렇다.',
+  'entities.quests.q_prof_workorder_loom.objectives.0.label': '거미 비단 납품',
+  'entities.quests.q_prof_workorder_toolworks.title': '공방 작업 의뢰',
+  'entities.quests.q_prof_workorder_toolworks.text':
+    '자루에 손잡이에 개머리판까지, 나무를 마치 한물간 물건처럼 써 대는데, 절대 안 그래, 나무는 영원하다고, {playerName}. 무쇠껍질나무 통나무 여덟 개를 끌고 오면 값을 쳐 주지, 동전, 진짜 동전, 인심 쓰는 게 아니라, 약속해, 대체로.',
+  'entities.quests.q_prof_workorder_toolworks.completion':
+    '완벽해, 완벽해, 결도 곧고 썩지도 않았어. 자, 네 동전, 봐, 나는 약속을 지키지(대체로). 나무에 발이 걸리거든 더 가져와.',
+  'entities.quests.q_prof_workorder_toolworks.objectives.0.label': '무쇠껍질나무 통나무 납품',
+  'entities.quests.q_prof_workorder_tannery.title': '무두질장 작업 의뢰',
+  'entities.quests.q_prof_workorder_tannery.text':
+    '통이 비었다. 거친 가죽 여덟 장을 가져와라. 가져오면 동전.',
+  'entities.quests.q_prof_workorder_tannery.completion':
+    '좋은 가죽이다. 삯은 공정하다. 더 생기면 또.',
+  'entities.quests.q_prof_workorder_tannery.objectives.0.label': '거친 가죽 납품',
+  'entities.quests.q_prof_workorder_apothecary.title': '약방 작업 의뢰',
+  'entities.quests.q_prof_workorder_apothecary.text':
+    '내 선반에는 금빛잎이 필요하고, 시장의 물건은 예상대로 불순물이 섞여 있다. 금빛잎 약초 여섯을 멍들지 않은 채로 가져오면 정확히 값을 치러 주겠다. 멍든 잎은 받지 않으니, 가방을 잘 간수해라.',
+  'entities.quests.q_prof_workorder_apothecary.completion':
+    '받을 만하군. 효능도 있고, 다룸새도 제대로다. 동전 단위까지 헤아린 네 삯이다. 우쭐하지는 마라, 그건 전혀 다른 시약의 일이니.',
+  'entities.quests.q_prof_workorder_apothecary.objectives.0.label': '금빛잎 약초 납품',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_1.subject': '눈여겨볼 불씨 하나',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_1.body':
+    '네 주 전공 하나가 이제 고급 등급 작업에 이르렀다는 소식이 내 화로에 닿았다. 긴 오르막에서 가장 낮은 디딤대이지만, 너는 그것을 부탁이 아니라 모루 앞에서 얻어 냈다. 불을 뜨겁게 지켜라.',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_2.subject':
+    '희귀 등급 작업, 스스로 얻은',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_2.body':
+    '네 주 전공 하나가 희귀 등급 작업에 이르렀다고 하더군. 그 디딤대에서 어설픈 손들은 떨어져 나가고 진짜 대장장이만 남는다. 너는 아직 서 있다. 좋다.',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_3.subject': '이제 쇠가 네게 응한다',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_3.body':
+    '네 주 전공 하나가 희귀 등급을 넘어 제법 묵직한 작업에 올라섰다. 쇠는 그런 손에 응하며, 더는 맞서지 않는다. 칭찬에 팔이 물러지게 두지 마라.',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_4.subject': '사다리 꼭대기 가까이',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_4.body':
+    '네 주 전공 하나가 통달 바로 한 디딤대 아래에 서 있다. 내가 아는 손 중 이 높이에 닿은 이는 드물고, 여기서 날을 지켜 낸 이는 더 드물다. 오르막을 끝까지 올라라.',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_5.subject': '마침내, 통달',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_5.body':
+    '네 주 전공 하나가 통달에 이르렀다. 손이 오를 수 있는 가장 높은 곳이다. 나는 칭찬을 헤프게 하지 않으니 이 말은 한 번만 하겠다. 화로가 너를 자랑스러워한다. 이제 가서 불에게 새로운 것을 가르쳐라.',
+  'entities.letters.prof_tier_leatherworking_tailoring_1.subject': '고른 첫 줄',
+  'entities.letters.prof_tier_leatherworking_tailoring_1.body':
+    '네 주 전공 하나가 고급 등급 작업에 이르렀다고 길드가 적어 두었다. 수많은 줄 가운데 첫 줄에 지나지 않으나, 고르고 반듯하다. 다음 줄도 그만큼 신중히 재어라.',
+  'entities.letters.prof_tier_leatherworking_tailoring_2.subject': '잘 재어 낸 희귀 등급 작업',
+  'entities.letters.prof_tier_leatherworking_tailoring_2.body':
+    '네 주 전공 하나가 희귀 등급 작업에 올랐다. 그 자리에서는 부주의한 손이 놓친 한 땀 한 땀을 다 드러내는데, 네 손은 그렇지 않았다. 나는 조용히 흡족하다.',
+  'entities.letters.prof_tier_leatherworking_tailoring_3.subject': '무늬가 또렷해진다',
+  'entities.letters.prof_tier_leatherworking_tailoring_3.body':
+    '네 주 전공 하나가 희귀 등급을 넘어 한층 정교한 작업에 들어섰다. 이 경지의 손에는 무늬가 또렷해지고, 더는 어림하지 않아도 된다. 계속 두 번씩 재어라.',
+  'entities.letters.prof_tier_leatherworking_tailoring_4.subject': '꼭대기에서 한 줄',
+  'entities.letters.prof_tier_leatherworking_tailoring_4.body':
+    '네 주 전공 하나가 통달에서 한 줄 모자란 자리에 앉아 있다. 마지막 줄은 언제나 고르게 지키기가 가장 어렵다. 지금 서두르지 마라.',
+  'entities.letters.prof_tier_leatherworking_tailoring_5.subject': '마지막 한 땀',
+  'entities.letters.prof_tier_leatherworking_tailoring_5.body':
+    '네 주 전공 하나가 통달에 이르렀다. 나는 무엇이든 그러하듯 네 솜씨를 두 번 재었고, 흔들림이 없었다. 마지막 한 땀을 이토록 깔끔하게 매듭짓는 손은 드물다. 나는 자랑스럽고, 그런 말을 가볍게 하지 않는다.',
+  'entities.letters.prof_tier_alchemy_cooking_1.subject': '앞날의 맛보기',
+  'entities.letters.prof_tier_alchemy_cooking_1.body':
+    '자네 주 전공 하나가 고급 등급 작업에 이르렀다는 소식이 내 주방까지 흘러왔네. 첫 맛일 뿐 그 이상은 아니지만, 기대할 만한 맛이야. 냄비를 계속 저어 두게.',
+  'entities.letters.prof_tier_alchemy_cooking_2.subject': '희귀 등급 작업, 눌어붙은 자리 하나 없이',
+  'entities.letters.prof_tier_alchemy_cooking_2.body':
+    '자네 주 전공 하나가 뭉근히 끓어 희귀 등급 작업까지 올랐다더군. 그 불에서 대부분의 요리사는 음식을 태워 먹는데, 자네는 그러지 않았어. 좀 앉게, 다만 오래는 말고.',
+  'entities.letters.prof_tier_alchemy_cooking_3.subject': '이제야 제대로 요리로군',
+  'entities.letters.prof_tier_alchemy_cooking_3.body':
+    '자네 주 전공 하나가 보글보글 희귀 등급을 넘어 진짜 깊은 맛에 들어섰네. 흔히들 말하듯, 이제야 제대로 요리로군. 대담하게 간을 맞추고 계속 맛을 보게.',
+  'entities.letters.prof_tier_alchemy_cooking_4.subject': '잔칫상에서 한 코스 모자란',
+  'entities.letters.prof_tier_alchemy_cooking_4.body':
+    '자네 주 전공 하나가 통달에서 딱 한 코스 모자라네. 마지막 한 코스는 언제나 가장 진하고, 또 넘치게 하기 가장 쉽지. 국자를 쥔 손을 흔들리지 말게.',
+  'entities.letters.prof_tier_alchemy_cooking_5.subject': '통달, 뜨겁게 차려 낸',
+  'entities.letters.prof_tier_alchemy_cooking_5.body':
+    '자네 주 전공 하나가 통달에 이르렀네. 온 식료품 창고에서 가장 높은 선반이지. 나야 누구든 먹이지만, 요리로 여기까지 올라오는 이는 드물어. 정말로, 자네가 자랑스럽네. 이제 가서 식탁 앞에서 눈물 쏟게 할 무언가를 만들어 보게.',
+  'entities.letters.prof_tier_engineering_alchemy_1.subject': '첫 불꽃이야, 하',
+  'entities.letters.prof_tier_engineering_alchemy_1.body':
+    '어이, 숫자가 그러는데 네 주 전공 하나가 방금 고급 등급 작업을 찍었대, 별거 아냐, 쬐끄맣지, 그래도 팡 터졌잖아, 응? 첫 불꽃이 늘 제일 귀엽지. 불꽃 더. 가.',
+  'entities.letters.prof_tier_engineering_alchemy_2.subject': '희귀, 오, 희귀',
+  'entities.letters.prof_tier_engineering_alchemy_2.body':
+    '네 주 전공 하나가 희귀 등급 작업까지 올랐다더라, 그리고 희귀부터가 제대로 위험해지기 시작하는 데야(좋은 쪽으로). 대부분은 재밌어지기 전에 그만두거든. 넌 아니야. 하.',
+  'entities.letters.prof_tier_engineering_alchemy_3.subject': '이제부터 요란해진다',
+  'entities.letters.prof_tier_engineering_alchemy_3.body':
+    '네 주 전공 하나가 희귀 등급을 뻥 뚫고 진지한 영역으로 넘어갔어, 오 여기서부터 요란해지는 거야. 지금 멈추지 마, 뭘 하든, 기세가 전부야, 도화선도 그렇고.',
+  'entities.letters.prof_tier_engineering_alchemy_4.subject': '꼭대기에서 한 디딤대, 딱 하나',
+  'entities.letters.prof_tier_engineering_alchemy_4.body':
+    '네 주 전공 하나가 통달 바로 한 디딤대 아래야, 하나, 딱 하나, 웅웅 울리는 거 느껴져? 마지막 한 걸음이 제일 큰 폭발이야. 눈 깜빡이지 마.',
+  'entities.letters.prof_tier_engineering_alchemy_5.subject': '통달이야, 콰광',
+  'entities.letters.prof_tier_engineering_alchemy_5.body':
+    '네 주 전공 하나가 통달을 찍었어, 바로 그 꼭대기, 콰광, 사다리 통째로, 끝. 나는 칭찬 같은 거 안 나눠 줘, 도화선을 나눠 주지, 그런데 여기, 둘 다 받아. 넌 눈부시고 살짝 무서워. 가서 산들이 조마조마하게 만들어.',
+  // Professions 2.0 master tier-letter senders (localized NPC names).
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_1.sender': '단조사 다르바',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_2.sender': '단조사 다르바',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_3.sender': '단조사 다르바',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_4.sender': '단조사 다르바',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_5.sender': '단조사 다르바',
+  'entities.letters.prof_tier_leatherworking_tailoring_1.sender': '직조공 오틸리에',
+  'entities.letters.prof_tier_leatherworking_tailoring_2.sender': '직조공 오틸리에',
+  'entities.letters.prof_tier_leatherworking_tailoring_3.sender': '직조공 오틸리에',
+  'entities.letters.prof_tier_leatherworking_tailoring_4.sender': '직조공 오틸리에',
+  'entities.letters.prof_tier_leatherworking_tailoring_5.sender': '직조공 오틸리에',
+  'entities.letters.prof_tier_alchemy_cooking_1.sender': '요리사 말로우',
+  'entities.letters.prof_tier_alchemy_cooking_2.sender': '요리사 말로우',
+  'entities.letters.prof_tier_alchemy_cooking_3.sender': '요리사 말로우',
+  'entities.letters.prof_tier_alchemy_cooking_4.sender': '요리사 말로우',
+  'entities.letters.prof_tier_alchemy_cooking_5.sender': '요리사 말로우',
+  'entities.letters.prof_tier_engineering_alchemy_1.sender': '땜장이 기즐',
+  'entities.letters.prof_tier_engineering_alchemy_2.sender': '땜장이 기즐',
+  'entities.letters.prof_tier_engineering_alchemy_3.sender': '땜장이 기즐',
+  'entities.letters.prof_tier_engineering_alchemy_4.sender': '땜장이 기즐',
+  'entities.letters.prof_tier_engineering_alchemy_5.sender': '땜장이 기즐',
+  // Commissions and the Maker's Bond (Professions 2.0).
+  'hudChrome.crafting.commissionToggle': '주문 제작품으로 제작',
+  'hudChrome.crafting.commissionToggleHint': '거래로 처음 받는 캐릭터에게 귀속됩니다.',
+  'hudChrome.crafting.commissionUnbound': '주문 제작품: 첫 수령인에게 귀속됩니다',
+  'hudChrome.crafting.commissionBound': '주문 제작품: 수령인에게 귀속되어 있습니다',
+  'hudChrome.unbind.title': '귀속 해제: {name}',
+  'hudChrome.unbind.close': '귀속 해제 닫기',
+  'hudChrome.unbind.intro': '장인은 수수료를 받고 주문 제작품의 귀속을 해제해 줍니다.',
+  'hudChrome.unbind.empty': '귀속된 주문 제작품이 없습니다.',
+  'hudChrome.unbind.rowSub': '귀속을 해제합니다. 다음 거래에서 다시 귀속됩니다.',
+  'hudChrome.unbind.unbindAria': '{fee}(으)로 {name} 귀속 해제',
+  'hudChrome.unbind.dialogOption': '귀속 해제',
+  'hudChrome.unbind.dialogOptionAria': '{name}에게 주문 제작품 귀속 해제 요청',
+  'hudChrome.unbind.confirmTitle': '주문 제작품 귀속 해제',
+  'hudChrome.unbind.confirmBody': '{fee}(으)로 {name}의 귀속을 해제하시겠습니까?',
+  'hudChrome.unbind.confirmOk': '귀속 해제',
+  'hudChrome.unbind.confirmCancel': '취소',
+  'hudChrome.unbind.unbound':
+    '{fee}(으)로 {name}의 귀속을 해제했습니다. 다음 거래에서 다시 귀속됩니다.',
+  'hudChrome.unbind.notEligible': '그 아이템은 귀속을 해제할 수 없습니다.',
+  'hudChrome.unbind.notBound': '그 아이템은 귀속되어 있지 않습니다.',
+  'hudChrome.unbind.cannotAfford': '귀속 해제 수수료를 지불할 수 없습니다.',
+  'hudChrome.unbind.outOfRange': '귀속을 해제하려면 작업대 옆에 있어야 합니다.',
+  'hudChrome.unbind.noSpace': '가방에 귀속 해제한 아이템을 넣을 공간이 없습니다.',
+  // Professions 2.0 wiki arm: the professions hub rewrite and the
+  // /wiki/professions detail pages (M16 non-Latin fills, added with the keys).
+  'guide.professions.ringHeading': '제작의 원환',
+  'guide.professions.ringBody':
+    '열 가지 제작 전문직이 하나의 원환에 놓여 저마다 기술을 따로 기록한다. 카드를 열면 전체 제조법 표와 수치를 볼 수 있다.',
+  'guide.professions.ringWaveNote':
+    '보석세공과 각인은 지금도 원환 위에 있지만 아직 제조법이 없다. 그 콘텐츠는 이후의 지역 확장과 함께 온다.',
+  'guide.professions.capFmt': '상한 {cap}',
+  'guide.professions.comingSoon': '제조법 없음',
+  'guide.professions.gatherHubHeading': '채집',
+  'guide.professions.gatherHubBody':
+    '네 가지 채집 전문직이 제작에 재료를 공급한다. 채광, 벌목, 약초학은 상한이 100이고 낚시는 200이다.',
+  'guide.professions.archetypesHeading': '열 가지 원형',
+  'guide.professions.archetypesBody':
+    '이웃한 두 전문직에 조율하면 짝 칭호를 얻는다. 두 전공은 최고 한계까지 오르고, 반대편 하나는 취미로 남아 희귀 단계까지 오르며, 나머지 전문직은 일반 단계에 머문다.',
+  'guide.professions.pairFmt': '{a}와 {b}',
+  'guide.professions.curveHeading': '숙달 곡선',
+  'guide.professions.curveBody':
+    '기술 {step}점마다 한 단계다. 자기 단계 이상의 제조법은 온전한 성장을 주고, 제조법이 아래로 멀어질수록 절반, 4분의 1로 줄다가 멈춘다.',
+  'guide.professions.provenanceHeading': '내력',
+  'guide.professions.provenanceBody':
+    '희귀 이상의 작품에는 제작자의 이름이 새겨지고, 걸작은 품질이 한 단계 오르며, 주문 제작품은 받는 이에게 귀속된다(제작자의 서약).',
+  'guide.professions.stationsHeading': '작업대와 장인',
+  'guide.professions.stationsBody':
+    '세 곳의 거점 마을에 여섯 개의 분류별 작업대가 있고, 상주 장인이 제조법을 가르치며 작업 주문을 낸다.',
+  'guide.professions.colStation': '작업대',
+  'guide.professions.colHub': '거점',
+  'guide.professions.colMaster': '장인',
+  'guide.professions.masterCellFmt': '{name}({title})',
+  'guide.profPages.back': '생산 전문직 개요로 돌아가기',
+  'guide.profPages.capLabel': '기술 상한',
+  'guide.profPages.stationLabel': '작업대',
+  'guide.profPages.stationNone': '작업대 불필요',
+  'guide.profPages.stationAnywhere': '어디서나',
+  'guide.profPages.mastersLabel': '장인',
+  'guide.profPages.masterFmt': '{name}({hub})',
+  'guide.profPages.specializationLabel': '전문화',
+  'guide.profPages.specializationFact': '기술 {at}: 재료 비용 {pct}% 할인',
+  'guide.profPages.matFmt': '{name} x{count}',
+  'guide.profPages.outputFmt': '{name} x{count}',
+  'guide.profPages.comboReq': '{a}와 {b} 필요',
+  'guide.profPages.sourceTrainerFee': '훈련사, {fee}',
+  'guide.profPages.sourceTrainerFree': '훈련사, 무료',
+  'guide.profPages.sourceKnown': '처음부터 습득',
+  'guide.profPages.colRecipe': '제조법',
+  'guide.profPages.colSkill': '기술',
+  'guide.profPages.colSource': '출처',
+  'guide.profPages.colStation': '작업대',
+  'guide.profPages.colMaterials': '재료',
+  'guide.profPages.colQuality': '품질',
+  'guide.profPages.colGain': '성장 감소 지점',
+  'guide.profPages.colMaterial': '재료',
+  'guide.profPages.colTool': '도구',
+  'guide.profPages.colTier': '티어',
+  'guide.profPages.colPrice': '가격',
+  'guide.profPages.colZone': '지역',
+  'guide.profPages.colNodes': '채집물 수',
+  'guide.profPages.colNodeTier': '채집물 티어',
+  'guide.profPages.colToolNeeded': '필요 도구',
+  'guide.profPages.craftIntro.weaponcrafting':
+    '무기 제작은 이스트브룩 대장간에서 도끼, 철퇴, 검, 지팡이를 벼리며, 구리 입문 무기부터 희귀한 오스뮴과 문양강철 작품까지 만든다.',
+  'guide.profPages.craftIntro.armorcrafting':
+    '방어구 제작은 이스트브룩 대장간에서 사슬 방어구를 벼리며, 리벳 구리 장비부터 희귀한 오스뮴비늘 중갑까지 만든다.',
+  'guide.profPages.craftIntro.tailoring':
+    '재봉은 이스트브룩 베틀에서 시전자용 천 방어구와 널찍한 가방을 짜며, 홈스펀 기본부터 도금직조 세트를 거쳐 희귀한 태양직물까지 만든다.',
+  'guide.profPages.craftIntro.leatherworking':
+    '가죽세공은 펜브리지 무두질 작업장에서 날렵한 가죽 장비를 무두질하며, 생가죽 기본부터 희귀한 늪지기 장비까지 만든다.',
+  'guide.profPages.craftIntro.cooking':
+    '요리는 이스트브룩 주방에서 생선과 사냥감과 약초를 앉아서 먹는 음식으로 만들며, 최고는 희귀한 연회 요리에 이른다.',
+  'guide.profPages.craftIntro.alchemy':
+    '연금술은 하이워치 약방에서 치유와 마나 물약, 그리고 체력 비약을 빚는다.',
+  'guide.profPages.craftIntro.engineering':
+    '기계공학은 이스트브룩 공작소에서 4티어와 5티어 채집 도구를 만들며, 각 도구는 한 단계 아래 도구를 재료로 소비한다.',
+  'guide.profPages.craftIntro.enchanting':
+    '마법부여는 쓸모없는 장비를 비전 재료로 분해하고, 그 재료를 영구적인 장비 마법부여에 쓴다. 작업대는 필요 없다.',
+  'guide.profPages.howHeading': '제작 방법',
+  'guide.profPages.howBody':
+    '재료를 갖추고 제작 창(기본 키 T)을 연다. 작업대 귀속 제조법은 해당 작업대 옆에서만, 야외 제조법은 어디서나 만들 수 있다.',
+  'guide.profPages.recipesHeading': '제조법',
+  'guide.profPages.recipesNote':
+    '모든 제조법의 정확한 기술과 재료 비용, 습득처, 그리고 성장이 줄기 시작하는 기술 수치.',
+  'guide.profPages.masteryHeading': '기술 성장',
+  'guide.profPages.masteryBody':
+    '기술 {step}점마다 한 단계다. 제조법이 내 단계 이상이면 온전한 성장, 한 단계 아래면 절반, 두 단계 아래면 4분의 1, 세 단계 이상 아래면 없음이며, 이 전문직의 상한은 {cap}이다.',
+  'guide.profPages.masterworkHeading': '걸작',
+  'guide.profPages.masterworkBody':
+    '제작에 성공할 때마다 {base}%의 걸작 확률이 있고, 제조법보다 한 단계 높을 때마다 {perTier}%, 서명된 재료 사용 시 {signed}%, 전문화 시 {spec}%가 더해지며, 상한은 {cap}%다.',
+  'guide.profPages.trainingHeading': '훈련',
+  'guide.profPages.trainingBody':
+    '이 전문직의 단계가 제조법의 단계에 이르면 장인이 가르쳐 준다. 0단계 제조법은 무료, 1단계는 {tier1}, 2단계는 {tier2}다.',
+  'guide.profPages.specializationHeading': '전문화',
+  'guide.profPages.specializationBody':
+    '기술이 {at}에 이르면 이 전문직에 전문화되어 제조법 재료 비용이 {pct}% 줄어든다.',
+  'guide.profPages.ench.disenchantHeading': '마력 추출',
+  'guide.profPages.ench.disenchantNote':
+    '마력 추출은 일반 품질 이상의 무기나 방어구를 하나 소모해 마법 재료로 분해한다. 마법이 부여되지 않은 물건을 먼저 소모하며, 마법이 부여된 물건만 남아 있으면 그중 하나를 마법 부여째 분해한다. 일반과 고급 품질은 울림 가루 한 줌으로 변하며, 희귀하거나 레벨이 높을수록 조금 더 나온다. 희귀 이상은 결과물의 형태가 달라져, 희귀 품질은 울림 정수 하나, 영웅이나 전설 품질은 울림 파편 하나가 나오고, 재료의 종류에 따른 보조 재료도 함께 나온다.',
+  'guide.profPages.ench.typedHeading': '계열 부산물',
+  'guide.profPages.ench.typedNote':
+    '희귀 이상의 장비는 계열별 거래 귀속 부산물도 내놓는다. 희귀 장비는 {rare}개, 영웅이나 전설은 {epicMin}에서 {epicMax}개다.',
+  'guide.profPages.ench.colSource': '추출 대상',
+  'guide.profPages.ench.meleeWeapons': '근접 무기',
+  'guide.profPages.ench.timberWeapons': '지팡이, 마법봉, 활, 석궁',
+  'guide.profPages.ench.enchantsHeading': '마법부여',
+  'guide.profPages.ench.enchantsNote':
+    '마법부여는 세 단계로 나뉜다. 기본 단계는 울림 가루(고급 끝 단에서는 울림 정수도 약간 필요)로 이루어지며, 보조 무기 슬롯을 제외한 무기와 모든 방어구 슬롯을 다룬다. 모든 능력치 축에 옵션이 있어 어느 빌드든 각 슬롯에 맞는 것을 찾을 수 있다. 상급 단계는 울림 파편 하나와 울림 정수가 필요하며, 파편의 유일한 쓰임새이기도 하다. 영향이 큰 슬롯에 더 강한 보너스를 준다.\n\n그 사이에 다섯 가지 룬 마법부여가 있다. 계열 부산물 하나씩을 소모해 막힌 길을 없앤다. Runed Edge(무기, 힘, Resonant Steel 소모), Runed Sigil(무기, 지능, Resonant Timber), Runed Weave(가슴, 정신, Resonant Thread), Runed Hide(다리, 민첩, Resonant Hide), Runed Links(투구, 체력, Resonant Links). 각각 울림 정수 두 개도 필요하다. 슬롯과 능력치에 기본과 상급이 모두 있는 경우 룬 보너스는 그 중간에 해당하지만, Runed Weave는 가슴 정신 마법부여 중 단독 최강이고 Runed Hide는 다리 민첩 마법부여 중 유일한 선택이다. 정확한 수치는 아래 표에 있다.',
+  'guide.profPages.ench.colEnchant': '마법부여',
+  'guide.profPages.ench.colSlot': '부위',
+  'guide.profPages.ench.colTier': '단계',
+  'guide.profPages.ench.colBonus': '보너스',
+  'guide.profPages.ench.tier.base': '기본',
+  'guide.profPages.ench.tier.runed': '룬',
+  'guide.profPages.ench.tier.greater': '상급',
+  'guide.profPages.ench.salvageHeading': '해체',
+  'guide.profPages.ench.salvageNote':
+    '누구나 무기나 방어구를 품질에 따라 일반 재료로 해체할 수 있다. 마법부여 기술은 필요 없다.',
+  'guide.profPages.ench.bonusFmt': '+{value} {stat}',
+  'guide.profPages.gatherIntro.mining':
+    '채광은 세상의 바위에서 광석을 곧바로 캐낸다. 이스트브룩 골짜기의 구리, 마이어펜 습지의 철, 쏜피크 고지의 오스뮴이 대장간 계열 전문직에 공급된다. 레벨 1부터 누구나 할 수 있고, 필요한 것은 가방 속 채광 곡괭이 하나뿐이다. 어느 거점 마을에서나 20동이면 산다. 자체 수치로 기록되며 상한은 100이다.',
+  'guide.profPages.gatherIntro.logging':
+    '벌목은 세 지역의 나무숲에서 목재를 베어 낸다. 이스트브룩 골짜기의 무쇠껍질나무, 마이어펜 습지의 물푸레나무, 쏜피크 고지의 고산소나무가 무기 자루와 지팡이, 그리고 기술자의 작업대에 들어가는 원자재다. 레벨 1부터 누구나 할 수 있고, 가방에 벌목 도끼(어느 거점 마을에서나 20동)만 있으면 된다. 자체 수치로 기록되며 상한은 100이다.',
+  'guide.profPages.gatherIntro.herbalism':
+    '약초학은 야생에서 자라는 것을 캔다. 이스트브룩 골짜기의 윤기잎, 마이어펜 습지의 금빛잎, 쏜피크 고지의 태양꽃잎, 연금술 계열 전문직의 조제를 이어 주는 잎과 줄기다. 레벨 1부터 누구나 할 수 있고, 가방에 약초 낫(어느 거점 마을에서나 20동)만 있으면 된다. 자체 수치로 기록되며 상한은 100이다.',
+  'guide.profPages.gatherIntro.fishing':
+    '낚시는 입질과 릴 감기의 흐름으로 모든 지역의 트인 물가에서 어획물을 낚으며, 상한은 200이다.',
+  'guide.profPages.rhythmHeading': '채집의 리듬',
+  'guide.profPages.rhythmBody':
+    '채집은 눈에 보이는 시전이다. 기본 {base}초에 최소 {floor}초까지, 도구가 채집물보다 한 티어 높을 때마다 {tool}초, 숙련도 구간마다 {band}초씩 짧아진다.',
+  'guide.profPages.gainBody':
+    '숙련도 {step}마다 한 성장 단계가 되어 채집물의 티어와 비교된다. 낮은 채집물의 성장은 점점 사라지고, 더 높은 티어의 채집물이 상한 {cap}까지 데려다 준다.',
+  'guide.profPages.nodesHeading': '지역별 채집물',
+  'guide.profPages.nodesNote':
+    '채집물의 위치, 티어, 필요한 도구, 산출물. 각 채집물은 내가 채집한 뒤 {respawn}초가 지나야 나에게 다시 생겨난다.',
+  'guide.profPages.toolsHeading': '도구',
+  'guide.profPages.toolsNote':
+    '모든 채집지에는 그 전문직의 도구가 가방에 있어야 하며, 1티어도 예외가 아니다. 곡괭이가 없으면 광석도 없고, 낚싯대가 없으면 물고기도 없다. 상인 사다리는 1티어부터 3티어까지를 다루며 모든 거점 마을에 재고가 있다. 도구는 가방에 들어 있기만 하면 되고, 장착 칸도 내구도도 없어서 한 번만 사면 된다. 조건을 가르는 것은 티어뿐이며, 도구의 희귀도 색은 겉모습일 뿐이다.\n\n상인 사다리 위에는 제작 도구 두 가지, 4티어와 5티어가 있다. 기술자가 도구 공방에서 만들며 어떤 NPC도 팔지 않는다. 현재 3티어를 넘는 채집지는 없으므로 지금 이들의 가치는 속도다. 최상급 도구는 낮은 등급 채집지에서 시전 시간을 최소치로 고정하며, 더 높은 티어의 땅이 열리면 그때의 입장권이 된다.',
+  'guide.profPages.toolCrafted': '제작({craft})',
+  'guide.profPages.toolVendor': '{name}({hub})',
+  'guide.profPages.toolUnavailable': '판매 없음',
+  'guide.profPages.priceNone': '판매 없음',
+  'guide.profPages.toolTierReq': '{tier}티어 도구',
+  'guide.profPages.bandsHeading': '숙련도 구간',
+  'guide.profPages.bandsBody':
+    '숙련도 구간은 채집 시전을 빠르게 하고, 낚시에서는 어획표까지 가른다.',
+  'guide.profPages.bandFmt': '구간 {band}: 숙련도 {at}부터',
+  'guide.profPages.rareHeading': '희귀한 발견',
+  'guide.profPages.rareBody':
+    '채집할 때마다 {oneIn}분의 1의 확률로 희귀한 발견이 나타난다. 수확이 {mult}배가 되고, 반드시 서명되며, 지역 전체에 알려진다.',
+  'guide.profPages.specimenBody':
+    '사체 채집에서는 서명된 완벽한 표본이 나오기도 한다. 사체 채집의 약 {pct}%가 희귀 이상을 굴린다.',
+  'guide.profPages.fish.biteHeading': '입질과 릴 감기',
+  'guide.profPages.fish.biteBody':
+    '던진 뒤 {min}에서 {max}초 사이에 입질이 온다(좋은 낚싯대는 기다림을 최대 {rod}초 줄인다). 릴 감기 시간은 {reel}초에 낚싯대 티어가 하나 오를 때마다 {reelRod}초가 더해지고, 한 번의 낚시는 최대 {cap}초다.',
+  'guide.profPages.fish.scheduleHeading': '숙련도 성장',
+  'guide.profPages.fish.scheduleNote':
+    '낚시 성장은 숙련도에 따른 고정 일정표를 따르며, {cutoff}부터는 잡동사니를 낚아도 아무것도 배우지 못한다.',
+  'guide.profPages.fish.colProficiency': '숙련도',
+  'guide.profPages.fish.colGain': '어획당 성장',
+  'guide.profPages.fish.belowFmt': '{below} 미만',
+  'guide.profPages.fish.tablesHeading': '어획표',
+  'guide.profPages.fish.tablesNote':
+    '구간마다 지역별 정확한 어획 확률. 모든 줄에서 {rare}가 희귀한 어획물이다.',
+  'guide.profPages.fish.bandHeading': '구간 {band}: 숙련도 {at} 이상, 낚싯대 {rod}티어',
+  'guide.profPages.fish.colCatch': '어획물',
+  'guide.profPages.fish.colOdds': '확률',
+  'guide.profPages.fish.emptyHook': '입질 없음',
+  'guide.profPages.econ.title': '제작 경제',
+  'guide.profPages.econ.intro': '생산 경제를 떠받치는 정확한 수수료, 소모처, 보수.',
+  'guide.profPages.econ.feesHeading': '수수료와 소모처',
+  'guide.profPages.econ.feesNote': '제작당 골드 소모부터 시장 수수료까지, 생산에 얽힌 모든 비용.',
+  'guide.profPages.econ.feeCraft': '제작비',
+  'guide.profPages.econ.feeCraftValue': '아이템 예산 1점당 {fee}',
+  'guide.profPages.econ.feeMarket': '시장 수수료',
+  'guide.profPages.econ.feeMarketValue': '성사된 판매의 {pct}%',
+  'guide.profPages.econ.feeDeposit': '등록 보증금',
+  'guide.profPages.econ.feeDepositValue': '없음',
+  'guide.profPages.econ.feeUnbind': '귀속 해제 수수료',
+  'guide.profPages.econ.feeUnbindValue': '고급 {uncommon}, 희귀 {rare}, 영웅 {epic}',
+  'guide.profPages.econ.trainingHeading': '훈련비',
+  'guide.profPages.econ.trainingNote':
+    '제조법 단계마다 정해진 요금 하나를, 장인이 가르칠 때 한 번만 낸다.',
+  'guide.profPages.econ.trainingTierFmt': '{tier}단계: {fee}',
+  'guide.profPages.econ.free': '무료',
+  'guide.profPages.econ.workOrdersHeading': '작업 주문',
+  'guide.profPages.econ.workOrdersNote':
+    '장인마다 자기 단골 재료 한 묶음을 상점가의 {pct}%에 사들이며, {minutes}분마다 되풀이할 수 있다.',
+  'guide.profPages.econ.colOrder': '작업 주문',
+  'guide.profPages.econ.colMaster': '장인',
+  'guide.profPages.econ.colAsks': '요구',
+  'guide.profPages.econ.colPays': '보수',
+  'guide.profPages.econ.commissionsHeading': '주문 제작과 제작자의 서약',
+  'guide.profPages.econ.commissionsBody':
+    '선택형 주문 제작에는 제작자의 서약이 걸린다. 완성품은 거래로 받는 이에게 귀속되고, 어느 작업대 장인이든 단계별 수수료로 풀어 줄 수 있다.',
+  'guide.profPages.econ.provenanceHeading': '서명된 작품',
+  'guide.profPages.econ.provenanceBody':
+    '희귀 이상의 제작품과 발견물에는 제작자의 서명이 남고, 서명이 완전히 같은 물건은 여전히 겹쳐 쌓인다.',
+  'guide.profPages.econ.throttleHeading': '행동 제한',
+  'guide.profPages.econ.throttleBody':
+    '제작, 마력 추출, 마법부여, 해체는 하나의 제한을 나눠 쓴다. {seconds}초당 최대 {actions}회다.',
+  'guide.profPages.econ.doctrineHeading': '플레이어끼리의 거래',
+  'guide.profPages.econ.doctrineBody':
+    '제작 장비의 힘은 언제나 공격대 하한 아래에 머물고, 위의 비용들은 물건을 상점 순환이 아니라 플레이어 간 거래로 밀어낸다.',
+  'guide.profPages.faq.title': '생산 전문직 FAQ',
+  'guide.profPages.faq.intro': '제작자들이 가장 자주 묻는 질문과 짧은 답.',
+  'guide.profPages.faq.q1': '전문직을 몇 개나 배울 수 있나요?',
+  'guide.profPages.faq.a1':
+    '모든 캐릭터가 여덟 가지 수련 가능한 제작 전문직과 네 가지 채집 전문직을 전부 올릴 수 있다. 하나만 골라야 하는 것은 원형 정체성뿐이다.',
+  'guide.profPages.faq.q2': '제조법은 어디서 배우나요?',
+  'guide.profPages.faq.a2':
+    '훈련사 사다리 제조법은 각 작업대의 상주 장인이 가르치고, 아홉 개의 공용 야외 제조법과 도구 제조법은 모두가 처음부터 안다.',
+  'guide.profPages.faq.q3': '채집에 도구가 필요한가요?',
+  'guide.profPages.faq.a3':
+    '1티어 채집물은 맨손이면 된다. 2티어나 3티어 채집물은 그 티어 이상의 맞는 도구가 필요하다.',
+  'guide.profPages.faq.q4': '왜 기술이 더 오르지 않나요?',
+  'guide.profPages.faq.a4':
+    '제조법이 아래로 멀어질수록 숙달 곡선이 성장을 절반, 4분의 1, 0으로 줄이고, 전문직마다 상한에서 멈춘다.',
+  'guide.profPages.faq.q5': '걸작이 무엇인가요?',
+  'guide.profPages.faq.a5':
+    '모든 제작에는 품질이 한 단계 높게 완성될 작은 확률(3%부터 상한 15%)이 있으며, 공격대 하한을 넘는 일은 없다.',
+  'guide.profPages.faq.q6': "'제작자:'는 무슨 뜻인가요?",
+  'guide.profPages.faq.a6':
+    '아홉 가지 공용 야외 제작법과 도구 제작법은 처음부터 누구나 알고 있다. 작업장에 묶인 세 가지 상급 제작법(가마비늘 망토, 워드위브 두건, 더스크하이드 손목보호대)도 마찬가지여서 스승은 필요 없지만 그 작업장은 있어야 한다. 나머지는 모두 세 거점 마을의 각 작업장에 있는 스승이 가르친다. 대부분은 이스트브룩에 있고, 무두장이는 펜브릿지의 무두질 작업장에, 연금술사는 하이워치의 약방에 있다.\n\n스승의 제작법은 숙련 0, 25, 50 단계로 나뉘며 일회성 비용으로 각각 무료, 은 25, 금 1에 배운다. 스승은 그 제작 기술에서 당신의 등급이 제작법 자체의 등급에 이르면 가르쳐 주고, 배우려면 스승의 작업장에 서 있어야 한다. 이동식 작업장은 인정되지 않는다.',
+  'guide.profPages.faq.q7': '제작자의 서약이 무엇인가요?',
+  'guide.profPages.faq.a7':
+    '주문 제작품은 거래로 받는 이에게 귀속되고, 어느 작업대 장인이든 단계별 수수료로 풀어 줄 수 있다.',
+  'guide.profPages.faq.q8': '원형을 바꿀 수 있나요?',
+  'guide.profPages.faq.a8':
+    '한 번도 지니지 않았던 짝은 새 조율 퀘스트 하나면 되고, 예전에 지녔던 짝으로 돌아가려면 대가가 점점 커지는 속죄 심부름을 마쳐야 한다.',
+  // Professions 2.0 wiki arm, final prose sections (M16 non-Latin
+  // fills for the NEW keys; item, NPC, and deed names stay English, the baked
+  // proper-noun precedent).
+  'guide.professions.whatHeading': '검 곁의 생업',
+  'guide.professions.whatBody':
+    '전문 기술은 이 세계의 생활이다. 네 가지 채집 기술이 땅에서 원료를 캐내고, 열 가지 제작 기술이 그것을 장비와 음식, 물약, 도구로 바꾼다. 모든 것이 맞물린다. 캐낸 광석은 검이 되고, 검은 마법부여를 받으며, 그 마법부여는 낡은 장비를 분해한 가루를 필요로 한다. 전문 기술 수 제한은 없다. 콘텐츠가 있는 여덟 제작 기술과 네 채집 기술을 모두 나란히 올릴 수 있고, 유일한 배타적 선택은 언젠가 맹세할 원형뿐이며, 일단 맹세하고 나면 그 뒤로 휴면에 든 제작 기술은 더 이상 오르지 않는다. 기술은 절대 내려가지 않고, 배운 것을 빼앗기지도 않는다.',
+  'guide.professions.deedsHeading': '여정을 새기는 업적',
+  'guide.professions.deedsBody':
+    '업적의 서가 모든 걸음에 함께한다. 첫 조율은 Craftsworn을, 첫 걸작은 Masterwright를 주며 둘 다 칭호로 착용할 수 있다. 여덟 제작 기술은 각각 기술 50에 이정표 업적을, 상한 125에 Grandmaster 칭호를 두고, 낚시는 숙련 100에 Old Salt를, 200에 Master Angler 칭호를 준다.\n\n첫 채집과 첫 제작, 야외의 희귀한 발견, 분해 회수의 조용한 페이지도 있다. 전부 장식일 뿐이다. 칭호와 명성만 있을 뿐, 업적은 결코 힘을 주지 않는다.',
+  'guide.professions.startHeading': '어디서 시작할까',
+  'guide.professions.startBody':
+    'Eastbrook에 막 도착했다면 Foreman Odell을 찾아 A Trade for Every Hand를 받자. 마을 남서쪽 Copper Dig 주변의 광맥을 알려 준다. 그 뒤로는 여행 중 지나치는 광맥과 나무, 약초를 전부 캐면 된다. 마을에서는 T 키로 제작 창을 열어 누구나 아는 기본 제조법을 만들고, 대장간과 주방, 베틀, 공작소의 장인들을 찾아 무엇을 가르치는지 보고, 작업 주문으로 꾸준한 동전을 벌자. 길드의 편지가 도착할 즈음이면 어느 짝이 내 집인지 이미 알게 된다.',
+  'guide.profPages.yieldsHeading': '채집의 수확물',
+  'guide.profPages.yieldsBody':
+    '채집마다 품질을 굴리는데, 그 확률은 숙련도가 전부다. 갓 시작한 채집가는 언제나 일반 등급을 얻지만, 숙련이 오를수록 무게가 높은 등급으로 옮겨 가며 절대 후퇴하지 않는다. 상한 100에서는 일반이 완전히 사라져 60% 고급, 30% 희귀, 8% 영웅, 2% 전설이 된다. 품질은 곧 수량이다. 일반 1개, 고급과 희귀 2개, 영웅 3개, 전설 4개. 희귀 이상은 서명이 새겨져(Gathered by) 도착하며, 상한에서는 열 번 중 네 번에 이름이 남는다.',
+  'guide.profPages.gatherDeedsHeading': '길 위의 업적',
+  'guide.profPages.gatherDeeds.mining':
+    '어느 채집이든 첫 채집은 Fruits of the Field를, 채광 100 상한은 Ore in the Blood를 새긴다. 채광, 벌목, 약초학, 낚시 중 셋이 100에 이르면 Master Gatherer(명성 25)를 얻고, 깨끗한 광맥을 쪼개면 전용 수집 표식도 남는다. 업적은 칭호와 명성뿐, 힘을 주지 않는다.',
+  'guide.profPages.gatherDeeds.logging':
+    '어느 채집이든 첫 채집은 Fruits of the Field를, 벌목 100 상한은 Heartwood Hewer를 새긴다. 네 채집 기술 중 셋이 100에 이르면 Master Gatherer(명성 25)를 얻고, 고대 심재를 쪼개면 전용 수집 표식도 남는다. 업적은 칭호와 명성뿐, 힘을 주지 않는다.',
+  'guide.profPages.gatherDeeds.herbalism':
+    '어느 채집이든 첫 채집은 Fruits of the Field를, 약초학 100 상한은 Master of the Meadow를 새긴다. 네 채집 기술 중 셋이 100에 이르면 Master Gatherer(명성 25)를 얻고, 달빛 개화를 꺾으면 전용 수집 표식도 남는다. 업적은 칭호와 명성뿐, 힘을 주지 않는다.',
+  'guide.profPages.gatherDeeds.fishing':
+    '숙련 100은 Old Salt를, 200은 Master Angler와 그 칭호를 새긴다. 낚시꾼 기예의 정점이다. 낚시도 Master Gatherer(세 기술 100)에 포함된다. 각 지역의 물에서 낚는 첫 물고기가 저마다의 페이지를 채우고, 윤슬 코이를 낚으면 Glimmer of Hope가 기록된다.',
+  'guide.profPages.fish.startHeading': '시작하기',
+  'guide.profPages.fish.startBody':
+    'Simple Fishing Pole은 Eastbrook의 Fisherman Brandt가 20동에 판다(마을 동쪽 끝에서 Mirror Lake를 노려보는 노련한 낚시꾼이다). Tinker Gizzel, Fenbridge의 Provisioner Hale, Highwatch의 Quartermaster Bree도 재고가 있다. 전방 약 24야드 안의 충분히 깊은 물을 바라보고 낚싯대를 쓰면 찌가 날아간다. 전투 중, 수영 중, 사망 중에는 던질 수 없다. 물가에서 던지는 것이 정석이고, 어느 지역의 낚시 가능한 물이든 좋다.',
+  'guide.profPages.fish.koiHeading': '윤슬 코이',
+  'guide.profPages.fish.koiBody':
+    '세상의 모든 물에는 같은 상품이 숨어 있다. 윤슬 코이, 상인에게 75동에 팔리는 고급 등급의 반짝이는 잉어로, 자부심의 값은 그 이상이다. 확률은 낚아 올릴 때마다 고정 3%(Thornpeak의 찬물에서는 4%)로 기술과 무관하니, 부두의 초심자도 Master Angler와 기회가 같다. 낚으면 업적의 서에 Glimmer of Hope(명성 0의 수집 표식)가 기록된다.',
+  'guide.profPages.econ.sellsHeading': '무엇이 팔리고, 왜 팔리나',
+  'guide.profPages.econ.sellsBody':
+    '가장 꾸준한 장사는 소모품이다. 쓰면 사라지고 다시 사기 때문이다. 물약, 요리, 마법부여는 모두 소모된다. 검을 한 번 산 전사도 치유 물약은 영원히 산다. 걸작은 프리미엄 시장이다. 주문 제작이 불가능하니 원하는 물건 하나에 진짜 웃돈이 붙고, 그 위의 서명은 걸어 다니는 광고다. 재료가 세 번째 기둥이다. 분해에서 나오는 비전 재료, 분해자에게서 마법부여사에게 곧장 흐르는 Resonant 부산물, 그리고 걸작 발동을 노리는 장인들이 웃돈을 주고 사는 서명된 채집 재료다.',
+  'guide.profPages.econ.marketHeading': '세계 시장과 수수료',
+  'guide.profPages.econ.marketBody':
+    '세계 시장은 Eastbrook의 Merchant와 Highwatch의 Auctioneer Voss가 지키는 서버 전체 거래소다. 등록은 무료다. 보증금이 없고 유찰된 물건은 그대로 돌아온다. 수수료는 성사될 때만 판매가의 5%를 뗀다. 중요한 한계 하나. 시장은 표식 없는 일반품만 다룬다. 서명, 걸작, 마법부여, 귀속된 사본은 등록되지 않으므로, 특별한 물건은 거래 창에서 얼굴을 맞대고 넘긴다. 값은 직접 매기자. 시장은 일반판 시세만 알려 줄 뿐이다.',
+  'guide.profPages.econ.collectorsHeading': '수집가, 전리품, 이야기의 값',
+  'guide.profPages.econ.collectorsBody':
+    '상인은 출처를 보지 못한다. 서명된 물건도 NPC에게는 일반품 값에 팔린다. 서명의 웃돈은 플레이어 사이에만 존재하고, 바로 그래서 흥미롭다. 이름난 채집가가 서명한 횡재 광석, Prime Cut 한 점, 은퇴한 장인의 이름이 새겨진 걸작 검. 값은 누군가의 기억이 정한다. 업적의 서도 같은 본능을 좇는다. Pristine Vein, Ancient Heartwood, Moonlit Bloom, A Perfect Specimen, Glimmer of Hope는 모두 그 순간이 당신에게 일어났음을 증명하기 위해서만 존재하는 명성 0의 수집 표식이다. 이것은 힘이 아니다. 출처는 능력치를 사지도, 싸움을 이기지도 않는다. 좋은 날들의 영수증일 뿐이다.',
+  'guide.profPages.craftProse.weaponcrafting.identityHeading': '모두가 사려는 칼날',
+  'guide.profPages.craftProse.weaponcrafting.identityBody':
+    '희귀 단만으로 세 가지 수요를 모두 채운다. 힘 근접용 Osmium Warblade, 민첩 전사용 Glyphsteel War Axe, 그리고 로브 차림을 위한 지능과 정신의 지팡이 Highpine Battle Staff. 제작의 고리에서는 방어구 제작과 보석세공 사이에 있다. 대장장이(무기 제작과 방어구 제작)는 Forgemistress Darva 앞에서 광맥 세 곳을 제 손으로 캐고 맹세할 수 있고, 보석세공과 이루는 Bladewright는 그 제조법이 미래 지역과 함께 올 때까지 맹세할 수 없다.',
+  'guide.profPages.craftProse.weaponcrafting.materialsHeading': '용광로가 삼키는 것',
+  'guide.profPages.craftProse.weaponcrafting.materialsBody':
+    '채광이 등뼈다. 구리 광석은 Eastbrook Vale, 철 광석은 Mirefen Marsh, 오스뮴은 Thornpeak Heights에서 난다. 벌목도 생각보다 중요하다. ironbark가 멧돼지 창 자루가 되고, ashwood가 망치를 받치며, 고산솔 통나무 하나가 지팡이가 된다. 나머지는 사냥과 상점에서 온다. 거친 가죽은 늑대와 멧돼지 사체에서 벗기고, 뼛조각은 일상 사냥에서 나오며, 사다리 제조법은 Smithing Flux(Darva에게 20동)를 태운다. 채광이 달리면 Darva가 오스뮴 광석을, Tinker Gizzel이 공작소에서 문양강철 주괴를 비싸게 판다.',
+  'guide.profPages.craftProse.weaponcrafting.ladderHeading': '한 단씩 오르는 사다리',
+  'guide.profPages.craftProse.weaponcrafting.ladderBody':
+    '야외 제조법 Eastbrook Arming Sword는 누구나 처음부터 알고 어디서든 만든다. 진짜 사다리는 대장간 전용 세 단 아홉 제조법이다. 구리 단은 기술 0에 무료, 철 단은 기술 25에 각 25은, 오스뮴 단은 기술 50에 각 1금. 당신의 단이 닿는 순간 Darva가 가르쳐 준다. 짝을 타는 제조법이 하나 더 있다. Gravewyrm Gauntlets. 무기 제작과 방어구 제작이 모두 25인 조율된 대장장이만 만들 수 있는 합작품으로, 작업대조차 필요 없다.',
+  'guide.profPages.craftProse.weaponcrafting.routeHeading': '걸작, 그리고 125까지의 길',
+  'guide.profPages.craftProse.weaponcrafting.routeBody':
+    '능력치가 있는 물건(철 단 이상)만 걸작이 될 수 있다. 능력치 없는 구리 단 일반품은 절대 발동하지 않는다. 철은 재료 1단계(+1%), 고산솔과 문양강철은 2단계(+2%)다. 경로는 구리 단으로 25, 철 단으로 50, 오스뮴 단으로 75. 이후 더 높은 제조법이 없어 오스뮴 단이 절반, 4분의 1로 줄어드니 상한 125까지 약 150회를 잡자. 분당 열 번의 공유 제한도 기억할 것. Darva의 작업 주문은 30분마다 구리 광석 8개를 사 준다. 업적의 서는 기술 50에 Edge and Temper를, 125에 Grandmaster Weaponcrafting을 새긴다.',
+  'guide.profPages.craftProse.armorcrafting.identityHeading': '최전선의 사슬 갑옷',
+  'guide.profPages.craftProse.armorcrafting.identityBody':
+    '사다리는 군인의 이력서 같다. 리벳 박은 구리 장비로 시작해, ironlink 단에서 처음 진짜 능력치가 붙고, 희귀 osmiumscale 투구, 흉갑, 다리 보호구는 장인이 두드릴 수 있는 가장 큰 방어도의 힘과 체력 장비다. 조용한 면도 있다. 야외 일반품 Eastbrook Warded Leggings와 기술 75의 가마비늘 망토(지능과 정신의 사슬 어깨)가 주문 계열 사슬 착용자를 고객으로 붙잡는다. 무기 제작과 기계공학 사이에 있으며, 대장장이 짝은 Darva 앞에서 맹세하고 기어장인은 아직 서약 퀘스트가 없다.',
+  'guide.profPages.craftProse.armorcrafting.materialsHeading': '자루째 드는 광석',
+  'guide.profPages.craftProse.armorcrafting.materialsBody':
+    '광석을 이보다 빨리 먹는 기술은 없다. ironlink hauberk 한 벌에 철 광석 다섯, osmiumscale 한 점마다 오스뮴 서너 개에 문양강철 주괴 하나. 진지한 갑옷 장인은 Mirefen Marsh와 Thornpeak Heights를 직접 캐거나 캐는 이에게 돈을 낸다. 구리는 첫 단 몫으로 Copper Dig 옆 광맥에서 나온다. 금속 둘레엔 부드러운 재료들, 거친 가죽과 뼛조각, 아마 조각이 있고 거의 모든 제조법에 Smithing Flux(대장간 20동) 한 병이 든다. 급하면 Darva가 오스뮴을 판다.',
+  'guide.profPages.craftProse.armorcrafting.ladderHeading': 'Darva의 용광로에서 배우기',
+  'guide.profPages.craftProse.armorcrafting.ladderBody':
+    '야외 일반품 두 벌(Eastbrook Chainmail Vest와 Warded Leggings)은 처음부터 어디서든 만든다. 수련 사다리는 Eastbrook 대장간의 세 단 아홉 제조법이다. 구리 단은 기술 0에 무료, ironlink 단은 기술 25에 각 25은, osmiumscale 단은 기술 50에 각 1금. 사다리 밖에 특례가 둘 있다. Boundstone Helm은 대장장이 합작 제조법(조율 필수, 두 기술 25, 작업대 불필요)이고, 가마비늘 망토는 스승이 필요 없어 모두가 알지만 기술 75에 대장간 전용, 이 기술의 3단 마무리다.',
+  'guide.profPages.craftProse.armorcrafting.routeHeading': '걸작, 그리고 125까지의 길',
+  'guide.profPages.craftProse.armorcrafting.routeBody':
+    'ironlink 단 이상은 모두 걸작을 굴린다. 방어도뿐인 구리 단 일반품은 발동하지 않는다. 철은 재료 1단계, 문양강철은 2단계. 경로는 정석 세 단, 구리로 25, ironlink로 50, osmiumscale로 75. 75 이후의 행운은 가마비늘 망토다. 3단 제조법이라 99까지 전속, 이후 절반이니 마지막 50점이 150회가 아니라 약 75회로 끝난다. 한 벌에 오스뮴 7개와 Smithing Flux 5개, Thornpeak과 대장간 계산대에서 미리 쟁여 두자. Darva의 주문은 30분마다 구리 광석 8개. 기술 50에 Hammer and Plate, 125에 Grandmaster Armorcrafting이 기다린다.',
+  'guide.profPages.craftProse.tailoring.identityHeading': '시전자의 천, 모두의 가방',
+  'guide.profPages.craftProse.tailoring.identityBody':
+    "사다리는 homespun 기본에서 도금직조 세트를 거쳐 희귀 단의 Silkbinder's Raiment와 sunweave로 오른다. 두 번째 장사는 만인의 것이다. Silkspun Satchel은 10칸 가방이고, 가방 자리를 마다할 직업도 레벨도 없다. 재봉은 가죽세공과 각인 사이에 있다. 살아 있는 짝은 의복 장인(가죽세공과 재봉)으로 Eastbrook 베틀 곁의 Weaver Ottilie 앞에서 webwood 거미 네 마리를 잡아 실을 바치고 맹세한다. 각인과 이루는 Inkweaver는 각인의 첫 제조법을 기다린다.",
+  'guide.profPages.craftProse.tailoring.materialsHeading': '실과 비단, 그리고 약초',
+  'guide.profPages.craftProse.tailoring.materialsBody':
+    "베틀은 사냥의 전리품과 들판의 소출로 돈다. 아마 조각과 홈스펀 천은 인간형에게서, 거미줄은 거미 사체에서 나오고, 희귀 단의 핵심 Silkbinder's Raiment는 Pristine Silk(사체 채집의 서명 표본)를 원한다. 약초학은 어느 장비 기술보다 재봉을 살찌운다. 윤광잎이 신발을 장식하고, goldleaf가 도금직조를 물들이며, sunpetal이 희귀 단 전체를 꿰맨다. Spool of Thread는 Ottilie에게 12동이고, 베틀은 금속을 전혀 요구하지 않으며 Wardweave Cowl 정점품조차 premium herbs, Pristine Silk, 거미줄, 실로 짜인다.",
+  'guide.profPages.craftProse.tailoring.ladderHeading': 'Ottilie의 베틀에서 배우기',
+  'guide.profPages.craftProse.tailoring.ladderBody':
+    '야외 일반품 두 벌(Eastbrook Wool Trousers와 Ritual Vestments)은 어디서든 만든다. 수련 사다리는 Eastbrook 우물 남쪽 베틀에서 돈다. homespun 단은 기술 0에 무료, 도금직조 단(Silkspun Satchel 포함)은 기술 25에 각 25은, 희귀 단은 기술 50에 각 1금. Wardweave Cowl은 스승이 필요 없다. 모두가 알지만 기술 75에 베틀 전용, 이 기술의 3단 마무리다. 어디서나 그렇듯 단이 닿으면 Ottilie가 바로 가르쳐 준다.',
+  'guide.profPages.craftProse.tailoring.routeHeading': '걸작, 그리고 125까지의 길',
+  'guide.profPages.craftProse.tailoring.routeBody':
+    '로브 속 Pristine Silk 하나로 서명 재료 보너스가 채워지고, goldleaf와 sunpetal은 각각 재료 1, 2단계로 세니 희귀 단이 발동 확률의 정점이다. 가방처럼 능력치 없는 물건은 절대 발동하지 않는다. 경로는 homespun으로 25, 도금직조로 50, 희귀 단으로 75. 75부터는 Wardweave Cowl(3단 제조법, 99까지 전속, 이후 절반)이 이어받아 마지막 50점이 약 75회, 한 번에 Pristine Silk 2개, 거미줄 4가닥, sunpetal과 goldleaf 약초 각 2, 실 2다. 가방은 말 그대로 모두에게 팔리고, Ottilie의 주문은 30분마다 거미줄 6가닥을 사 준다. 기술 50에 A Fine Seam, 125에 Grandmaster Tailoring이 기다린다.',
+  'guide.profPages.craftProse.leatherworking.identityHeading': '날랜 자들의 가죽',
+  'guide.profPages.craftProse.leatherworking.identityBody':
+    "사다리는 소박한 Fenbridge 생가죽 다리 보호구, 장화, 허리띠에서 고급 marshstalker 셋을 거쳐 장인이 잘라 낼 수 있는 최고의 가죽인 희귀 mirewarden 세트로 오른다. 시전자용 두 벌, 야외 일반품 Eastbrook Druid's Hide와 기술 75의 Duskhide Wraps가 진용을 채운다. 요리와 재봉 사이에 있으며, 살아 있는 짝은 Eastbrook의 Weaver Ottilie 앞에서 맹세하는 의복 장인이고, 요리와 이루는 Trapper는 아직 서약 퀘스트가 없다.",
+  'guide.profPages.craftProse.leatherworking.materialsHeading': '사냥이 곧 수확',
+  'guide.profPages.craftProse.leatherworking.materialsBody':
+    '가죽세공에서는 레벨링 경로와 보급선이 같은 길이다. 거친 가죽은 가죽 있는 사체, 특히 늑대와 멧돼지에서 직접 벗기고, 사체 하나는 선착순 한 사람만 쓸 수 있다. 희귀 이상 판정은 Pristine Hide도 주는데 Mirewarden Jerkin이 바로 그 서명 표본을 원하니 보이는 대로 모아 두자. 조연은 적다. 거미 다리와 거미줄, 인간형의 홈스펀 천, mirewarden 희귀 각 벌에 오스뮴 하나(Duskhide Wraps 정점품은 6개), 그리고 무두질 작업장 계산대의 Tanning Agent(16동). 캐기 싫다면 Tanner Hesk가 오스뮴도 판다.',
+  'guide.profPages.craftProse.leatherworking.ladderHeading': 'Fenbridge에서 수련하기',
+  'guide.profPages.craftProse.leatherworking.ladderBody':
+    "한 가지 다른 점. 무두질 작업장은 Mirefen Marsh 길목의 Fenbridge에 있어, Eastbrook 밖에서 수련하는 유일한 본격 기술이다. Tanner Hesk가 무두질 통 곁에서 가르친다. 생가죽 단은 기술 0에 무료, marshstalker 단은 기술 25부터 각 25은, mirewarden 단은 기술 50부터 각 1금. 두 제조법은 스승을 건너뛴다. 야외 일반품(Tanned Leather Jerkin과 Druid's Hide)은 처음부터 어디서든, Duskhide Wraps는 모두가 알지만 기술 75에 작업장 전용이다. 의복 장인의 서약 자체는 Eastbrook의 Ottilie 앞에서 한다. 늪에서 하는 것은 수련뿐이다.",
+  'guide.profPages.craftProse.leatherworking.routeHeading': '걸작, 그리고 125까지의 길',
+  'guide.profPages.craftProse.leatherworking.routeBody':
+    "marshstalker 단 이상은 모두 걸작을 굴리고, Mirewarden Jerkin의 Pristine Hide가 서명 재료 보너스를 자동으로 채운다. 오스뮴은 재료 1단계. 능력치 없는 생가죽 일반품은 발동하지 않는다. 자연스럽게 키우자. 1레벨부터 잡는 늑대와 멧돼지를 모두 벗기고, 생가죽 단은 선 자리에서 25까지, 퀘스트가 늪으로 이끌 때 겸사겸사 수련한다. marshstalker로 50, mirewarden으로 75, 그 뒤는 Duskhide Wraps(3단 제조법, 오스뮴 6개, Pristine Hide 3장, 거친 가죽 2장, Tanning Agent 1)가 99까지 전속, 이후 절반으로 마지막 50점을 약 75회에 데려간다. 75 특화의 이동 무두질 작업장은 이 기술에서 가장 빛난다. 모닥불 곁에서 가죽 자루가 장비로 변해 Fenbridge 왕복이 사라진다. Hesk의 주문은 30분마다 거친 가죽 8장. 기술 50에 Tanner's Trade, 상한에 Grandmaster Leatherworking이다.",
+  'guide.profPages.craftProse.cooking.identityHeading': '일행을 먹이는 솥',
+  'guide.profPages.craftProse.cooking.identityBody':
+    "요리를 먹으면 18초의 휴식 동안 회복한다. 전투 사이에는 가장 싼 치유다. 사다리는 회복 90의 Pan-Seared River Perch에서 현존 최대의 앉은 회복인 Marlow's Grand Roast(980)까지 이어진다. 연금술과 가죽세공 사이에 있으며, 살아 있는 짝은 약제사(연금술과 요리)로 Eastbrook 주방의 Cook Marlow 앞에서 멧돼지 네 마리를 사냥해 맹세한다. 가죽세공과 이루는 Trapper는 아직 서약 퀘스트가 없다.",
+  'guide.profPages.craftProse.cooking.materialsHeading': '낚싯대와 칼이 채우는 찬장',
+  'guide.profPages.craftProse.cooking.materialsBody':
+    '간판 재료는 낚시가 지역별로 댄다. Eastbrook Vale의 거울 송어와 강 농어, Mirefen Marsh의 늪 창꼬치와 진흙 장어, Thornpeak Heights의 서리아가미 송어와 판지느러미 잉어. 사다리의 각 단은 제 단의 물고기를 요리하니 낚는 요리사는 재료가 마르지 않는다. 푸줏간 쪽은 사체 채집에서 온다. 멧돼지 따위의 사냥 고기, 그리고 희귀 이상 판정에서 나오는 서명된 Prime Cut, 대구이의 주인공이다. 약초가 좋은 접시에 향을 더하고, ashwood 통나무 하나가 장어를 훈제하며, Cooking Salt는 Marlow의 가판에서 한 봉지 8동이다.',
+  'guide.profPages.craftProse.cooking.ladderHeading': '육포에서 대구이까지',
+  'guide.profPages.craftProse.cooking.ladderBody':
+    "Salted Jerky가 야외 제조법이다. 처음부터 알고, 거미 다리 하나면 어디서든 만드는 신출내기의 행군식. 수련 사다리는 광장 서쪽 Eastbrook 주방에서 돈다. 무료 단은 기술 0(농어, Hunter's Game Skewer, Herbed Marsh Pike), 중간 단은 기술 25에 각 25은(Ashwood Smoked Eel, Goldleaf Game Stew, Frostgill Chowder), 희귀 단은 기술 50에 각 1금(Silvered Carp Supper, Angler's Feast Platter, Marlow's Grand Roast). 묶음 요리는 재료를 늘린다. 훈제 장어와 스튜는 한 번에 두 접시, 연회 모둠은 세 접시다.",
+  'guide.profPages.craftProse.cooking.routeHeading': '걸작 아닌 특화, 그리고 125까지의 길',
+  'guide.profPages.craftProse.cooking.routeBody':
+    '요리는 걸작 이야기의 정직한 예외다. 접시에는 올릴 능력치가 없어 걸작이 절대 발동하지 않고, 좇을 이유도 없다. 이 기술의 정점은 75의 특화다. 모든 재료가 5분의 1씩 절약되고(묶음 요리에서 빠르게 불어난다), 이동식 야외 주방으로 던전 문 앞에서 연회를 차린다. 낚은 것을 요리하자. 두 기술이 서로를 먹인다. 육포와 무료 단으로 25, 중간 단으로 50, 희귀 단으로 75. 이후 더 높은 접시가 없어 희귀 요리가 절반과 4분의 1로 줄고, 상한까지 약 150회다. 갈이가 아니라 비축이라 생각하자. 길드는 모든 접시를 비운다. Marlow의 주문은 30분마다 사냥 고기 8점. 기술 50에 Seasoned Chef, 125에 Grandmaster Cooking 칭호다.',
+  'guide.profPages.craftProse.alchemy.identityHeading': '싸움을 이기는 병',
+  'guide.profPages.craftProse.alchemy.identityBody':
+    '이 기술은 Highwatch의 약방에서 이루어진다. 주인은 Alchemist Verane. 제조법 사다리를 가르치고, Glass Vial을 12동에 팔며, 작업 주문으로 약초 값을 치른다. 연금술은 시행착오 기술들 곁에 있어 한쪽은 기계공학, 다른 쪽은 요리다. 그래서 짝이 둘이다. 폭격수(기계공학과 연금술, Eastbrook의 Tinker Gizzel 앞에서)와 약제사(연금술과 요리, Cook Marlow 앞에서). 어느 쪽이든 조율하면 연금술이 주 전공이 되어 상한까지 열린다. 그 전까지는 여느 미서약 기술처럼 희귀 단계까지 일한다.',
+  'guide.profPages.craftProse.alchemy.materialsHeading': '약초, 독샘, 유리',
+  'guide.profPages.craftProse.alchemy.materialsBody':
+    '어느 물약이든 Glass Vial 하나에 단에 맞는 약초가 든다. 윤광잎은 Eastbrook Vale에, goldleaf는 Mirefen Marsh에, sunpetal은 Thornpeak Heights에 자란다. 한 지역에 한 약초, 병은 세계와 함께 오른다. 약초학이 타고난 짝 기술이지만 채집가나 시장에서 사도 무방하다. 깊은 지역의 상위 약초밭은 더 좋은 낫을 원하니 직접 꺾을 거라면 도구를 최신으로. 강장제 계열엔 사냥꾼의 재료가 더해진다. 독 있는 사체에서 채집하는 Venom Gland, 그리고 정점의 강장제가 원하는 Pristine Venom Gland(서명된 희귀 표본)다.',
+  'guide.profPages.craftProse.alchemy.ladderHeading': '제조법 사다리',
+  'guide.profPages.craftProse.alchemy.ladderBody':
+    'Minor Healing Potion은 모두가 처음부터 알고 어디서든 섞는다. 진짜 사다리는 Verane이 약방에서 가르치는 아홉 제조법, 단마다 셋이다. 기술 0 단은 무료, 25 단은 각 25은, 50 단은 각 1금. 각 단은 치유 물약, 마나 물약, 체력 강장제로, 일반 윤광잎 병(생명 120, 마나 160)에서 고급 goldleaf(200과 260), 희귀 sunpetal(280과 360)로 오른다. 강장제도 같이 오른다. Elixir of the Boar는 체력 6을 10분, Vipersear Elixir는 9를 15분, Elixir of the Serpent는 12를 15분에 한 번에 두 병. 옆길에 합작 하나, Elixir of the Bear. 연금 25에 Verane이 25은에 가르치고 어디서든 섞을 수 있지만, 두 기술 25의 조율된 폭격수만 만든다.',
+  'guide.profPages.craftProse.alchemy.routeHeading': '조제사의 125 길',
+  'guide.profPages.craftProse.alchemy.routeBody':
+    '물약은 절대 걸작이 되지 않는다. 그것은 능력치 있는 장비의 몫이다. 그래도 이름은 여행한다. 희귀 sunpetal 물약은 한 병씩 빚어져 서명되어 나오고, 두 병짜리 Elixir of the Serpent는 무명으로 남는다. 기술 75에 특화하면 모든 연금 제조법의 재료가 20% 절약된다. 약초학을 일찍 배워 레벨링하며 꺾자. 윤광잎은 골짜기에 널렸고, Verane의 작업대에 닿으면 무료 단이 어차피 꺾었을 약초로 깔끔하게 25까지 데려간다. 25 단은 열리는 즉시 배우고, 채집을 늪의 goldleaf로 옮기고, Verane의 주문(Goldleaf Herb 여섯에 45동, 30분마다)으로 잔돈을 회수하자. 50부터는 Thornpeak 약초로 sunpetal 물약과 Serpent를 빚는다. 100에서 125는 의도된 가는 물줄기이니 숫자 때문에 약초를 태우지 말고 팔리는 것을 빚자. 기술 50에 Strange Brews, 상한에 Grandmaster Alchemy다.',
+  'guide.profPages.craftProse.engineering.identityHeading': '공구장이의 독점',
+  'guide.profPages.craftProse.engineering.identityBody':
+    '이 기술은 Eastbrook 광장 남동쪽 모퉁이의 공작소에서 이루어진다. 주인은 Tinker Gizzel. 어느 공구 계열이든 1단계에서 3단계는 흔한 상점 물건이지만 4단계와 5단계는 기술자의 손에서만 나온다. 연금술과 방어구 제작 사이에 있고 짝은 폭격수(기계공학과 연금술)와 기어장인(아직 맹세 불가)다. 무엇보다 중요한 경고 하나. 기계공학의 두 제조법 단 모두 취미와 미서약자가 일하는 희귀 단계 천장보다 위에 있어, 기술 수치는 기계공학을 주 전공으로 지닌 자, 오늘은 곧 폭격수에게만 오른다. 공구는 누구나 만들 수 있다. 조율하지 않은 이는 만들어도 아무것도 배우지 못할 뿐이다.',
+  'guide.profPages.craftProse.engineering.materialsHeading': '재료와 이전 단계 공구',
+  'guide.profPages.craftProse.engineering.materialsBody':
+    '모든 공구 제조법은 한 단계 아래 공구와 상급 재료를 삼킨다. 오스뮴 광석 4개와 천은 채광 곡괭이가 오스뮴 채광 곡괭이가 되고, 문양강철 주괴 2개와 그 오스뮴 곡괭이가 문양강철 채광 곡괭이가 된다. 도끼와 낫 계열도 Ashwood와 고산솔 통나무, Goldleaf와 Sunpetal 약초로 같은 모양을 그린다. Gizzel이 공작소에 상급 재료 여섯을 모두 두지만, 광석과 통나무와 약초는 Mirefen Marsh와 Thornpeak Heights에서 캘 수 있고 이윤은 직접 캔 재고에 있다. 유일한 예외는 상점에만 있는 문양강철 주괴로, 문양강철급 공구마다 고정된 동전 바닥값을 깔아 준다.',
+  'guide.profPages.craftProse.engineering.ladderHeading': '공구 사다리',
+  'guide.profPages.craftProse.engineering.ladderBody':
+    '사다리 전체가 제조법 여섯뿐이다. 전부 공작소 전용에 자동 습득, 수련비는 영원히 없다. 기술 75에 4단계 곡괭이, 도끼, 낫, 기술 150에 5단계다. 150은 오타가 아니고 일부러 현 상한 125 위에 있다. 여기서 기술 요구치는 제작을 막지 않고 성장만 좌우하니, 재료와 4단계 전작이 손에 든 날 5단계 공구를 만들 수 있다. 완성품은 모두 희귀나 영웅 품질이고 출고부터 서명이 새겨져 있다. 기계공학은 합작 제조법의 반쪽도 맡는다. Elixir of the Bear, 두 기술 25의 조율된 폭격수가 빚는 물약이다.',
+  'guide.profPages.craftProse.engineering.routeHeading': '기술자의 125 길',
+  'guide.profPages.craftProse.engineering.routeBody':
+    '공구에는 전투 능력치가 없어 걸작이 절대 발동하지 않는다. 특화는 여전히 기술 75다. 재료 20% 절약에, 어떤 채집 여행이든 작업장으로 바꾸는 임시 야외 공작소가 더해진다. 성장은 거의 줄지 않는다. 기술 75 제조법은 100까지 전속에 이후 절반, 기술 150 제조법은 상한 125까지 내내 전속이니 진짜 제약은 재료와 돈이지 회색 제조법이 아니다. 먼저 짝을 정하자. Tinker Gizzel에게서 폭격수 조율을 받는다. 그다음 사다리를 먹인다. 채광, 벌목, 약초학을 직접 올리거나 채집가와 친해지고, 3단계 공구는 상점에서 사며, Gizzel의 주문(Ironbark Log 8개에 16동, 30분마다)은 용돈으로 삼자. 홍보 문구는 저절로 써진다. 교점보다 높은 공구 단계 하나마다 2.5초 채집 시전에서 0.4초를 깎는다(하한 1.5초). 기술 50에 Cogs and Sprockets, 125에 Grandmaster Engineering이다.',
+  'guide.profPages.craftProse.enchanting.identityHeading': '장비를 풀고, 힘을 되돌리다',
+  'guide.profPages.craftProse.enchanting.identityBody':
+    '작업대도, 스승도, 사야 할 제조법 목록도 없다. 모든 마법부여는 처음부터 알려져 있고, 분해는 누구나 첫날부터 할 수 있으며, 기술은 여느 기술처럼 125가 상한이다. 각인과 보석세공 사이에 있어 짝은 Arcanist와 Gembinder지만, 두 이웃 모두 제조법이 오기 전이라 아직 맹세할 수 없다. 그래서 오늘의 마법부여는 모두의 기술이다. 맹세 전엔 자유로이 희귀 단계까지 오르고, 폭격수나 약제사의 취미로도 자연스러운 선택이다. 마법부여사는 채집 세계도 떠받친다. 끼울 수 있는 세 가지 공구 효과가 모두 마법부여사의 작품이고, 원제작자는 제 작품의 재충전을 할인받으며 특화하면 더 깊어진다.',
+  'guide.profPages.craftProse.enchanting.levelingHeading': '마법부여 올리는 법',
+  'guide.profPages.craftProse.enchanting.levelingBody':
+    '기술을 움직이는 행동은 둘이다. 분해와 마법부여 시전. 성공마다 최대 1점이고, 일의 무게로 환산된다. 일반 분해와 가루만 드는 마법부여는 일반 일, 고급 분해와 정수 마법부여는 고급, 희귀 분해와 모든 Runed나 Greater 마법부여는 희귀, 영웅과 전설 분해는 그보다 높다. 익숙한 숙달 감쇠가 25점 단위로 걸려 일반 일은 기술 75에, 고급 일은 100에, 희귀 일은 정확히 상한 125에 회색이 된다. 마법부여만의 자비도 하나 있다. 천장을 넘는 입력은 0이 아니라 천장으로 내림되니, 맹세 전의 영웅 분해는 아무것도 못 배우는 대신 희귀로 계산된다. 마법부여가 다른 정체성 뒤에서 휴면하면 모든 것이 일반 일로 계산되어 오름세가 75에 멎고, 취미로 두면 희귀 일이 여전히 값을 하되 75 이후 느려질 뿐이다.',
+  'guide.profPages.craftProse.enchanting.marketHeading': '부여된 사본, 출처, 시장',
+  'guide.profPages.craftProse.enchanting.marketBody':
+    '마법부여는 재료를 소모하고 특정 사본 하나에 표시를 남긴다. 가방 속 사본에 쓰면 별개의 부여된 사본을 돌려받고, 이미 착용 중인 물건에 쓰면 벗었다 다시 입을 필요 없이 그 자리에서 부여된다. 어느 쪽이든 보너스가 영원히 그 물건을 따른다. 한 물건에 하나. 부여된 사본에 다른 마법부여를 쓰면 먼저 확인을 거친 뒤 옛 부여를 그대로 대체하며, 옛 부여는 재료 환불 없이 파괴된다. 판매와 폐기와 분해 모두 무표식 사본을 먼저 집으니 완성품이 실수로 갈리지 않는다. 똑같이 부여된 사본끼리는 겹쳐진다. 걸작과 마법부여는 친구다. 걸작은 온전히 부여 가능하고, 부여는 걸작 보너스와 서명을 건드리지 않고 얹힌다. 모든 것을 쌓은 서명된 걸작의 Greater 부여가 공예품의 정점이며, 그래도 설계상 공격대 전리품 아래에 있다. 세계 시장은 무표식 일반품만 다루므로 부여품과 서명품은 거래 창에서 직접 오간다. 시장에 올릴 수 있는 절반은 재료 쪽이다. 가루, 정수, 조각은 자유로이 등록되고, 등록은 무료, 수수료는 성사 시 5%뿐이다.',
+  'hudChrome.corpseHarvest.components.meat': '고기',
+  'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (마법부여)',
+  'hudChrome.materialHint.arcaneDust': '마법부여 재료. 일반과 고급 장비의 마력을 추출해 얻습니다.',
+  'hudChrome.materialHint.arcaneEssence': '마법부여 재료. 희귀 장비의 마력을 추출해 얻습니다.',
+  'hudChrome.materialHint.arcaneShard': '마법부여 재료. 영웅과 전설 장비의 마력을 추출해 얻습니다.',
+  'hudChrome.materialHint.resonantThread':
+    '마법부여 재료. 희귀 이상 천 방어구의 마력을 추출해 얻습니다.',
+  'hudChrome.materialHint.resonantHide':
+    '마법부여 재료. 희귀 이상 가죽 방어구의 마력을 추출해 얻습니다.',
+  'hudChrome.materialHint.resonantLinks':
+    '마법부여 재료. 희귀 이상 사슬 방어구의 마력을 추출해 얻습니다.',
+  'hudChrome.materialHint.resonantSteel':
+    '마법부여 재료. 희귀 이상 근접 무기의 마력을 추출해 얻습니다.',
+  'hudChrome.materialHint.resonantTimber':
+    '마법부여 재료. 희귀 이상 지팡이, 마법봉, 활, 석궁의 마력을 추출해 얻습니다.',
+  'hudChrome.enchanting.tier.base': '기본 마법부여',
+  'hudChrome.enchanting.tier.runed': '룬 마법부여',
+  'hudChrome.enchanting.tier.greater': '상급 마법부여',
+  'hudChrome.enchanting.yieldHeader': '예상 재료:',
+  'hudChrome.enchanting.yieldLineExact': '{item} {count}개',
+  'hudChrome.enchanting.yieldLineRange': '{item} {min}~{max}개',
+  'hudChrome.enchanting.alreadyEnchanted': '해당 아이템에는 이미 마법부여가 되어 있습니다.',
+  'hudChrome.enchanting.sameEnchant': '해당 아이템에는 이미 같은 마법부여가 되어 있습니다.',
+  'hudChrome.enchanting.replaceTag': '{enchant} 대체',
+  'hudChrome.enchanting.sameEnchantTag': '이미 적용됨',
+  'hudChrome.enchanting.plainTag': '마법부여 없음',
+  'hudChrome.enchanting.replaceConfirmTitle': '{item}의 마법부여를 대체하시겠습니까?',
+  'hudChrome.enchanting.replaceConfirmBody': '{item}의 {old}을(를) {new}(으)로 대체합니다.',
+  'hudChrome.enchanting.replaceConfirmNoRefund':
+    '기존 마법부여는 파괴되며 재료는 환불되지 않습니다. 되돌릴 수 없습니다.',
+  'hudChrome.enchanting.replaceConfirmKeeps': '유지: {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': '제작자 각인',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': '걸작 보너스',
+  'hudChrome.enchanting.replaceConfirmKeepsBond': '주문 제작품 귀속',
+  'hudChrome.enchanting.replaceConfirmCost': '비용: {cost}',
+  'hudChrome.enchanting.replaceConfirmCostItem': '{name} {count}개',
+  'hudChrome.enchanting.replaceConfirmAccept': '대체',
+  'hudChrome.bags.itemAriaEnchanted': '{item}, 수량 {count}, 마법부여된 사본',
+  'hudChrome.bags.itemAriaBound': '{item}, 수량 {count}, 귀속된 사본',
+  'hudChrome.itemTooltip.enchantedFallback': '마법부여됨',
+  'devCommand.actions.kit.description':
+    '특성에 맞는 성소 입장 전 20레벨 사전 설정 장비를 가방부터 착용합니다. 장비만 해당됩니다.',
+  'devCommand.actions.kit.label': '20레벨 초기 장비 세트 착용',
+  'devCommand.fields.spec': '전문화',
+  'devCommand.itemChosen': '선택됨: {name}',
+  'devCommand.itemHeroicTag': '영웅',
+  'devCommand.itemMore': '{total}개 중 {shown}개 표시 중입니다. 계속 입력해 범위를 좁히세요.',
+  'devCommand.itemNoMatches': '일치하는 아이템이 없습니다.',
+  'devCommand.itemResultsAria': '일치하는 아이템',
+  'devCommand.itemSearchPlaceholder': '이름 또는 ID로 검색',
+  'devCommand.itemUnknown': '해당 ID를 가진 아이템이 없습니다.',
+  'devCommand.kitCurrentSpec': '현재 전문화',
+  'hudChrome.enchanting.wornTag': '착용 중 ({slot})',
+  'hudChrome.continentMap.title': '세계 지도',
+  'hudChrome.continentMap.summary': '세계 지도. 지역을 선택하면 해당 지도가 열립니다.',
+  'hudChrome.continentMap.toWorld': '세계 지도',
+  'hudChrome.continentMap.toggleAria': '세계 지도와 지역 지도 전환',
+  'hudChrome.continentMap.levels': '레벨 {min}부터 {max}까지',
+  'entities.mobs.lb_actor_coalfast.name': '숯불 워든',
+  'entities.mobs.lb_actor_ollun.name': '균열감시자 올룬',
+  'entities.mobs.lb_actor_edda.name': '병참관 에다',
+  'entities.mobs.lb_actor_saul.name': '치료사 사울',
+  'entities.mobs.lb_actor_tam.name': '종지기 탐',
+  'entities.mobs.tidemill_stalker.name': '밀물방앗간 추적자',
+  'entities.npcs.ferryman_ewald.name': '뱃사공 에발트',
+  'entities.npcs.ferryman_ewald.title': '건너편 해안 나루',
+  'entities.npcs.ferryman_ewald.greeting':
+    '건너편 해안으로 가나? 이제 고기잡이 때문에 건너는 사람은 아무도 없어, 친구. 준비되면 배에 타게. 도착하면 종소리를 잘 들어. 그 마을 사람들은 자네가 날씨를 살피듯 종소리를 듣거든.',
+  'entities.npcs.ferrykeeper_odda.name': '나루지기 오다',
+  'entities.npcs.ferrykeeper_odda.title': '건너편 해안 나루',
+  'entities.npcs.ferrykeeper_odda.greeting':
+    '본토로 가나? 배는 자네가 탄 뒤에 떠나. 그전에는 안 가. 밧줄을 풀 때 종이 횟수를 세기 시작해도 돌아가 달라고 하지는 마. 세 번 울리는 종을 향해 노를 젓는 사람은 없으니까.',
+  'entities.npcs.sergeant_marsh.name': '마시 중사',
+  'entities.npcs.sergeant_marsh.title': '마을 민병대',
+  'entities.npcs.sergeant_marsh.greeting':
+    '훈련은 받았나? 그럼 오늘 밤의 방식을 알려 주지. 내 전열이 길을 지킨다. 균열이 우리가 쓰러뜨리지 못할 것을 토해 내면 내가 자네를 가리킬 거다. 방앗간은 자네 몫이다. 아무것도 따라 들어가게 하지 말고, 아무것도 우리를 지나 마을로 가게 하지 마라. 가.',
+  'entities.quests.q_lb_q0_ashore.title': '상륙',
+  'entities.quests.q_lb_q0_ashore.text':
+    '갈매기항은 밤낮으로 균열의 공격을 받고도 버티고 있다. 그들과 함께 설 생각이라면 마을이 피 흘리는 곳에서 시작하라. 항구 계단과 오래된 조각상을 지나 동쪽으로 가서 감시 초원의 민병대 전열로 향하라.',
+  'entities.quests.q_lb_q0_ashore.completion':
+    '방앗간의 괴물은 자네 혼자 쓰러뜨렸고, 들것에 관한 탐의 말도 과장이 아니더군. 정찰병은 부족하고 지켜야 할 들판은 넘친다. 오늘 밤 자네는 원래 자네 것이 아닌 땅을 지켰다. 그게 이 일의 전부다. 감시대에 온 걸 환영한다.',
+  'entities.quests.q_lb_q0_ashore.objectives.0.label': '감시 초원의 마시 중사에게 보고',
+  'entities.quests.q_lb_q0_ashore.objectives.1.label': '균열의 소생물 처치',
+  'entities.quests.q_lb_q0_ashore.objectives.2.label': '밀물방앗간 안의 무언가를 처치',
+  'entities.dungeons.lb_tidemill.name': '밀물방앗간',
+  'entities.dungeons.lb_tidemill.enterText':
+    '방앗간 문이 열린다. 안에서는 어둠이 귀를 기울이고 있다.',
+  'entities.dungeons.lb_tidemill.leaveText': '밀물방앗간을 나와 저녁 공기 속으로 들어선다.',
+  'entities.dungeons.lb_riftline.name': '해질녘 균열 방어선',
+  'entities.dungeons.lb_riftline.enterText':
+    '순찰대 뒤로 초원의 문이 닫힌다. 오늘 밤은 이 방어선의 것이다.',
+  'entities.dungeons.lb_riftline.leaveText': '균열 방어선을 새벽 경비대에 맡기고 떠난다.',
+  'entities.dungeons.lb_vault.name': '가라앉은 첫 번째 보루',
+  'entities.dungeons.lb_vault.enterText':
+    '밧줄이 어둠 속으로 풀려 내려간다. 아래에는 오래된 보루가 추락한 자리에 누워 있다.',
+  'entities.dungeons.lb_vault.leaveText': '절벽 밧줄을 타고 햇빛 속으로 올라온다.',
+  'entities.dungeons.lb_council.name': '보루 평의회',
+  'entities.dungeons.lb_council.enterText': '평의회실에는 의자가 여섯 개 있다. 하나는 비어 있다.',
+  'entities.dungeons.lb_council.leaveText': '보루 밖으로 나온다.',
+  'entities.dungeons.lb_landing.name': '밤의 상륙지',
+  'entities.dungeons.lb_landing.enterText':
+    '유도 불길이 해변을 따라 타오른다. 함대는 여울 너머에서 기다린다.',
+  'entities.dungeons.lb_landing.leaveText': '상륙 해변을 뒤로하고 떠난다.',
+  'entities.dungeons.lb_riftfields.name': '균열 들판 진입로',
+  'entities.dungeons.lb_riftfields.enterText':
+    '네 곳의 수호 지점이 균열을 둘러싼다. 의식은 이곳을 열두 세기 동안 봉인했다.',
+  'entities.dungeons.lb_riftfields.leaveText': '균열 들판에서 아래로 걸어 내려온다.',
+  'entities.dungeons.lb_breach.name': '균열 안쪽',
+  'entities.dungeons.lb_breach.enterText':
+    '빛이 잘못되어 있고 하늘은 더 나쁘다. 핵은 앞쪽의 탁 트인 땅에 있다.',
+  'entities.dungeons.lb_breach.leaveText': '경계를 넘어 평범한 밤공기 속으로 돌아온다.',
+  'entities.dungeons.lb_lastwatch.name': '마지막 경계',
+  'entities.dungeons.lb_lastwatch.enterText':
+    '보루는 깨끗하고 비어 있다. 누군가는 이 경계를 끝내야 한다.',
+  'entities.dungeons.lb_lastwatch.leaveText': '뒤에서 보루의 문을 닫는다.',
+  'entities.dungeons.lb_willowfen.name': '우는버들 늪',
+  'entities.dungeons.lb_willowfen.enterText': '버드나무는 움직이지 않는다. 물도 마찬가지다.',
+  'entities.dungeons.lb_willowfen.leaveText': '버드나무를 고요 속에 남겨 두고 떠난다.',
+  'hudChrome.enchanting.wornTagIndexed': '착용 중 ({slot} {index})',
 };

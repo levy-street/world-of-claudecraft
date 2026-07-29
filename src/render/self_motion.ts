@@ -25,7 +25,7 @@
 // facing_smooth.ts / locomotion.ts. tests/self_motion.test.ts drives it
 // against a real lagging Sim.
 
-import { resolveMovement } from '../sim/colliders';
+import { moverHeight, resolveMovement } from '../sim/colliders';
 import { moveSpeedMult, type PlayerMotionDeps, stepPlayerMotion } from '../sim/player_motion';
 import { DT, type Entity, type MoveInput, RUN_SPEED, type SimEvent } from '../sim/types';
 
@@ -191,8 +191,8 @@ export class SelfMotionPredictor {
     this.deps = {
       seed,
       moveSpeedMult: (e) => moveSpeedMult(e, 0),
-      resolveMove: (fromX, fromZ, nx, nz, r, _e, ignoreFences) =>
-        resolveMovement(seed, fromX, fromZ, nx, nz, r, ignoreFences),
+      resolveMove: (fromX, fromZ, nx, nz, r, e, ignoreFences) =>
+        resolveMovement(seed, fromX, fromZ, nx, nz, r, ignoreFences, undefined, moverHeight(e)),
       resolvedAbility: () => null,
       cancelCast: () => {},
       standUp: () => {},
@@ -326,10 +326,9 @@ export class SelfMotionPredictor {
     // Mount speed reads the entity mirror (player_motion.moveSpeedMult), so a
     // mid-session mount/dismount must reach the scratch actor the same frame.
     actor.mountKey = self.mountKey;
-    // The kernel roots movement while a mount summon channel is in flight
-    // (mountCastRemaining > 0 with a non-empty mountCastKey); borrow both so the
-    // online display roots in lockstep with the server. A dismount channel
-    // (mountCastKey === '') does not root movement and is move-cancelable.
+    // The kernel cancels a keyed summon on movement and preserves the retired
+    // empty-key transition as a rooted mixed-version compatibility state. Borrow
+    // both fields so online prediction makes the same decision as the server.
     actor.mountCastRemaining = self.mountCastRemaining;
     actor.mountCastKey = self.mountCastKey;
 

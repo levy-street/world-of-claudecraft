@@ -8,58 +8,6 @@ export interface HarborShipBasePose {
   readonly baseRot: number;
 }
 
-export interface PendingHarborShipCue {
-  readonly cue: string;
-  readonly startSec: number;
-}
-
-export interface ResolvedHarborShipCue<TSegment> {
-  readonly segment: TSegment;
-  readonly cueStartSec: number;
-}
-
-/** Resolve a recorded cue without replacing its original start time. */
-export function resolvePendingCue<TSegment>(
-  pending: PendingHarborShipCue | undefined,
-  segments: Readonly<Record<string, TSegment | undefined>>,
-): ResolvedHarborShipCue<TSegment> | null {
-  if (!pending) return null;
-  const segment = segments[pending.cue];
-  if (segment === undefined) return null;
-  return { segment, cueStartSec: pending.startSec };
-}
-
-/** Own deterministic pending cue state while the Three-side ship handle is absent. */
-export class HarborShipPendingCueState<TSegment> {
-  private readonly pending = new Map<string, PendingHarborShipCue>();
-
-  constructor(private readonly segments: Readonly<Record<string, TSegment | undefined>>) {}
-
-  routeCue(
-    target: string,
-    cue: string,
-    startSec: number,
-    handleAvailable: boolean,
-  ): ResolvedHarborShipCue<TSegment> | null {
-    if (!handleAvailable) {
-      this.pending.set(target, { cue, startSec });
-      return null;
-    }
-    this.pending.delete(target);
-    return resolvePendingCue({ cue, startSec }, this.segments);
-  }
-
-  consumePending(target: string): ResolvedHarborShipCue<TSegment> | null {
-    const pending = this.pending.get(target);
-    this.pending.delete(target);
-    return resolvePendingCue(pending, this.segments);
-  }
-
-  clearPending(): void {
-    this.pending.clear();
-  }
-}
-
 /** Compose a parked or live ship pose into its world attach frame. */
 export function composeHarborShipAttachFrame(
   base: HarborShipBasePose,

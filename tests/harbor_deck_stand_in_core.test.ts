@@ -1,8 +1,9 @@
 import { readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   deckStandInAction,
   deckStandInParentTransform,
+  disposeDeckStandIn,
 } from '../src/render/harbor_deck_stand_in_core';
 import { GULLHAVEN_HARBOR, MAINLAND_HARBOR } from '../src/sim/harbor_layout';
 import { WATER_LEVEL } from '../src/sim/world';
@@ -56,6 +57,18 @@ describe('harbor deck stand-in core', () => {
       expect(worldY).toBeCloseTo(deck.y);
     }
   });
+
+  it('can explicitly dispose a stand-in during scene reset', () => {
+    const visual = {};
+    const handle = { cueStartSec: 1, segment: {}, deckStandIn: visual as typeof visual | null };
+    const dispose = vi.fn();
+
+    disposeDeckStandIn(handle, dispose);
+    disposeDeckStandIn(handle, dispose);
+
+    expect(dispose).toHaveBeenCalledTimes(1);
+    expect(handle.deckStandIn).toBeNull();
+  });
 });
 
 describe('harbor deck stand-in render wiring', () => {
@@ -66,23 +79,21 @@ describe('harbor deck stand-in render wiring', () => {
     expect(HARBOR_SOURCE).toContain("from './characters';");
     expect(HARBOR_SOURCE).toContain('const visual = createCharacterVisual(player);');
     expect(HARBOR_SOURCE).not.toContain("from './characters/visual';");
-    expect(HARBOR_SOURCE).toContain(
-      'export function updateHarborShips(localPlayer: Entity, dt: number): boolean {',
-    );
+    expect(HARBOR_SOURCE).toContain('export const updateHarborShips = createHarborShipUpdater<');
+    expect(HARBOR_SOURCE).toContain('updateMotion: updateHarborShipMotion,');
     expect(RENDERER_SOURCE).toContain(
       'const harborDeckStandInActive = updateHarborShips(this.sim.player, dt);',
     );
     expect(RENDERER_SOURCE).toContain('v.group.visible = !harborDeckStandInActive;');
     expect(HARBOR_SOURCE).toContain(
-      'handle.deckStandIn.update(dt, DECK_STAND_IN_IDLE_STATE, false);',
+      'updateStandIn: (visual, dt) => visual.update(dt, DECK_STAND_IN_IDLE_STATE, false)',
     );
   });
 
   it('routes the existing ship reset through CharacterVisual disposal', () => {
     expect(HARBOR_SOURCE).toMatch(
-      /function resetShip\(handle: HarborShipHandle\): void \{[\s\S]{0,250}syncDeckStandIn\(handle, null\);/,
+      /function resetShip\(handle: HarborShipHandle\): void \{[\s\S]{0,250}disposeDeckStandIn\(handle,/,
     );
-    expect(HARBOR_SOURCE).toContain('handle.deckStandIn.dispose();');
-    expect(HARBOR_SOURCE).toContain('handle.deckStandIn = null;');
+    expect(HARBOR_SOURCE).toContain('(visual) => visual.dispose()');
   });
 });

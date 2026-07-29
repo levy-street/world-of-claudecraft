@@ -16,7 +16,7 @@
 // shared `ctx.rng` stream, drawn in the exact pre-move order.
 
 import { isDebuffAura, isDispellableAura } from '../aura_classify';
-import { ABILITIES, isDelvePos } from '../data';
+import { ABILITIES, isDelvePos, MOBS } from '../data';
 import { logCascadeCast, recordCascadeInitial } from '../dev/cascade_playtest';
 import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
@@ -33,14 +33,14 @@ import {
   hotTickBonus,
 } from '../spell_scaling';
 import { stunDrCategory } from '../stun_dr';
-import { addThreat } from '../threat';
+import { addThreat, dropThreat } from '../threat';
 import type { AbilityDef, Entity } from '../types';
 import {
   angleTo,
   armorReduction,
   DT,
   ENRAGE_DMG_DONE,
-  FISHING_CAST_ID,
+  isNonSpellCast,
   MELEE_ARC,
   MELEE_CLASSES,
   normAngle,
@@ -122,6 +122,49 @@ function preservesStealth(ability: AbilityDef): boolean {
     ability.id === 'sap' ||
     ability.id === 'shadowstep'
   );
+}
+
+function dropsCombatOnStealth(ability: AbilityDef): boolean {
+  return ability.id === 'vanish';
+}
+
+function dropSelfFromHostileFocus(ctx: SimContext, p: Entity): void {
+  p.combatTimer = 5;
+  p.inCombat = false;
+  p.autoAttack = false;
+  p.targetId = null;
+  p.queuedOnSwing = null;
+  delete p.queuedOnSwingFree;
+  delete p.queuedOnSwingCostMultiplier;
+
+  const pet = ctx.petOf(p.id);
+  const escapeIds = pet ? [p.id, pet.id] : [p.id];
+  if (pet) {
+    pet.combatTimer = 5;
+    pet.inCombat = false;
+    pet.aggroTargetId = null;
+    pet.targetId = null;
+  }
+
+  for (const entity of ctx.entities.values()) {
+    if (entity.kind !== 'mob' || entity.dead || !ctx.isHostileTo(p, entity)) continue;
+    let dropped = false;
+    for (const id of escapeIds) {
+      if (entity.threat.has(id) || entity.forcedTargetId === id) dropped = true;
+      dropThreat(entity, id);
+      if (entity.aggroTargetId === id) {
+        entity.aggroTargetId = null;
+        dropped = true;
+      }
+    }
+    if (!dropped) continue;
+    if (entity.ownerId !== null) {
+      if (entity.aggroTargetId === null) entity.inCombat = false;
+    } else if (entity.threat.size === 0 && entity.aggroTargetId === null) {
+      entity.aiState = 'evade';
+      entity.inCombat = false;
+    }
+  }
 }
 
 // Resolve the exclusiveGroup for an AURA id: either a plain ability id (a
@@ -863,7 +906,9 @@ export function runEffects(
         break;
       }
       case 'interrupt': {
-        if (!target || target.castingAbility === null || target.castingAbility === FISHING_CAST_ID)
+        // Non-spell casts (fishing/gather) are interrupt-immune. The Demon
+        // Heal channel is deliberately NOT folded in: it stays interruptible.
+        if (!target || target.castingAbility === null || isNonSpellCast(target.castingAbility))
           break;
         if (p.kind === 'player' && target.kind === 'player' && !ctx.isHostileTo(p, target)) break;
         // Resolve per-player when possible (rank/mods), but fall back to the
@@ -1136,8 +1181,14 @@ export function runEffects(
             e.type === 'aoeRoot',
         );
         if (eff.directPct !== undefined && lastDirectDamage <= 0) break;
+        // Combo-point finishers (rupture/rip, spendsCombo: true) add a perCombo
+        // term to the base total, mirroring finisherDamage/finisherHaste/
+        // finisherStun below: spentCombo is already 0 for any ability that
+        // doesn't spend combo, so this is a no-op for every other dot.
         const dotTotal =
-          eff.directPct === undefined ? eff.total : Math.round(lastDirectDamage * eff.directPct);
+          eff.directPct === undefined
+            ? eff.total + (eff.perCombo ?? 0) * spentCombo
+            : Math.round(lastDirectDamage * eff.directPct);
         const dotBase = Math.max(1, Math.round(dotTotal / (eff.duration / eff.interval)));
         // Physical bleeds (Rend, Rupture, Garrote, Rip) scale off melee Attack
         // Power here just like a spell DoT scales off Spell Power; `hybrid` still
@@ -2168,6 +2219,16 @@ export function runEffects(
               aura.kind === 'disarm' ||
               aura.kind === 'slow')
           ) {
+            // Product ruling (Avatar, the sole breakControl user): the break
+            // removes control from any source EXCEPT the caster itself and
+            // mobs whose template carries boss: true (final-boss templates).
+            // Encounter mobs without the flag are breakable; a source that
+            // cannot be resolved (despawned, since ctx.entities is the full
+            // authoritative roster here) defaults to breakable, the common
+            // case.
+            if (aura.sourceId === p.id) continue;
+            const source = ctx.entities.get(aura.sourceId);
+            if (source && MOBS[source.templateId]?.boss) continue;
             p.auras.splice(i, 1);
             ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
           }
@@ -2293,6 +2354,9 @@ export function runEffects(
           charges: eff.charges,
           icdMax: eff.internalCooldown,
         });
+        if (eff.kind === 'stealth' && dropsCombatOnStealth(ability)) {
+          dropSelfFromHostileFocus(ctx, p);
+        }
         recalcPlayerStats(
           p,
           meta.cls,

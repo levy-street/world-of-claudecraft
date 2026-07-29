@@ -1,4 +1,4 @@
-// Masterwork event mirror parity (Professions 2.0 Phase 2, the #2033 liveness
+// Masterwork event mirror parity (Professions 2.0, the #2033 liveness
 // class): the `masterwork` SimEvent must be a LIVE mirror on both hosts. The
 // offline Sim stashes PlayerMeta.lastMasterwork when a craft procs, and the
 // online ClientWorld rebuilds lastMasterwork from the event stream alone, so
@@ -9,13 +9,15 @@ import { ClientWorld } from '../src/net/online';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
 
-// Hunted proc seed, pinned: with a fresh warrior (tailoring 0, no archetype,
-// no self-signed reagent, not specialized) the first craft of
+// Hunted proc seed, pinned (re-recorded after the Eastbrook camp respacing
+// thinned the zone-1 camp counts and shifted the camp-driven world-gen draw
+// sequence): with a fresh warrior (tailoring 0, no archetype, no self-signed
+// reagent, not specialized) the first craft of
 // recipe_eastbrook_ritual_vestments draws under the 3 percent base masterwork
 // chance at this seed. Pre-verified against this exact grant order (3x
-// linen_scrap then 1x spider_leg, then the craft); seeds 68, 69, 70, and 125
+// linen_scrap then 1x spider_leg, then the craft); seeds 37, 45, 113, and 116
 // also land, kept on record here as spares.
-const PROC_SEED = 55;
+const PROC_SEED = 2;
 const RECIPE_ID = 'recipe_eastbrook_ritual_vestments';
 const ITEM_ID = 'eastbrook_ritual_vestments';
 
@@ -26,7 +28,9 @@ function craftMasterwork() {
   const pid = sim.playerId;
   for (let i = 0; i < 3; i++) sim.addItem('linen_scrap', 1, pid);
   sim.addItem('spider_leg', 1, pid);
-  sim.craftItem(RECIPE_ID, pid);
+  sim.addItem('homespun_cloth', 3, pid);
+  sim.addItem('spool_of_thread', 5, pid);
+  sim.craftItem(RECIPE_ID, false, pid);
   const events = sim.drainEvents().filter((ev) => ev.type === 'masterwork');
   return { sim, pid, events };
 }
@@ -51,7 +55,7 @@ function feed(client: ClientWorld, ev: unknown): void {
 }
 
 describe('offline Sim host', () => {
-  it('a procced craft emits the id-exact masterwork event and the getter reflects it (seed 55)', () => {
+  it('a procced craft emits the id-exact masterwork event and the getter reflects it (seed 2)', () => {
     const { sim, pid, events } = craftMasterwork();
     // Exactly one proc event, ids only, pid = crafter entity id on both keys.
     expect(events).toEqual([
@@ -97,7 +101,7 @@ describe('online ClientWorld host', () => {
   });
 
   it('the craftResult mirror carries the masterwork flag and rebuilds it per event', () => {
-    // applyCraftResultEvent (online.ts) must copy the Phase 2 `masterwork`
+    // applyCraftResultEvent (online.ts) must copy the `masterwork`
     // field into the lastCraftResult mirror: a dropped field here would leave
     // the online HUD unable to distinguish a proc, with every other test
     // (Sim-side only) still green.

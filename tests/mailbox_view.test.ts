@@ -11,6 +11,7 @@ import {
   mailIndicatorView,
   mailSendBlocked,
   mailSendCost,
+  parseParcelQty,
   recipientSuggestions,
   wrappedSuggestionIndex,
 } from '../src/ui/mailbox_view';
@@ -120,6 +121,29 @@ describe('buildMailboxView', () => {
     });
     expect(a).toEqual(b);
   });
+
+  it('keeps rows beyond the old first-page boundary reachable in the inbox model', () => {
+    const messages = Array.from({ length: 60 }, (_, i) => ({
+      id: i + 1,
+      senderName: 'Alice',
+      kind: 'player' as const,
+      subject: `Letter ${i + 1}`,
+      body: `Body ${i + 1}`,
+      copper: 0,
+      items: [],
+      read: true,
+    }));
+    const view = buildMailboxView({
+      info: { ...INFO, messages, totalCount: messages.length, unread: 0 },
+      tab: 'inbox',
+      openedId: 60,
+      attachments: [],
+    });
+    if (view.kind !== 'inbox') throw new Error('expected inbox');
+    expect(view.body.rows).toHaveLength(60);
+    expect(view.body.rows[59]?.subject).toBe('Letter 60');
+    expect(view.body.opened?.id).toBe(60);
+  });
 });
 
 describe('clampParcelQty (#1444 attach-a-quantity stepper)', () => {
@@ -200,5 +224,29 @@ describe('wrappedSuggestionIndex', () => {
 
   it('returns -1 for an empty list', () => {
     expect(wrappedSuggestionIndex(0, 1, 0)).toBe(-1);
+  });
+});
+
+describe('parseParcelQty: the typed quantity gate', () => {
+  it('clamps a typed value into 1..owned', () => {
+    expect(parseParcelQty('3', 5, 1)).toBe(3);
+    expect(parseParcelQty('999', 5, 1)).toBe(5);
+    expect(parseParcelQty('0', 5, 2)).toBe(1);
+    expect(parseParcelQty('-4', 5, 2)).toBe(1);
+  });
+
+  it('floors decimals and tolerates whitespace', () => {
+    expect(parseParcelQty(' 7.9 ', 10, 1)).toBe(7);
+  });
+
+  it('restores the fallback (clamped) for garbage or empty input', () => {
+    expect(parseParcelQty('', 5, 2)).toBe(2);
+    expect(parseParcelQty('abc', 5, 2)).toBe(2);
+    // a stale fallback above the owned ceiling still clamps down
+    expect(parseParcelQty('', 3, 9)).toBe(3);
+  });
+
+  it('never NaN-poisons: even NaN fallback resolves to a legal count', () => {
+    expect(parseParcelQty('abc', 5, Number.NaN)).toBe(1);
   });
 });

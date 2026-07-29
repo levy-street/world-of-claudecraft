@@ -86,6 +86,14 @@ export function newKeyboardTurnState(): KeyboardTurnState {
   };
 }
 
+export function resetKeyboardTurnState(state: KeyboardTurnState): void {
+  state.facing = null;
+  state.releaseMs = 0;
+  state.wireFacing = null;
+  state.suppressTurnFlags = false;
+  state.wasTurning = false;
+}
+
 function approachAngle(current: number, target: number, maxStep: number): number {
   const step = Math.max(0, maxStep);
   const d = wrapAngle(target - current);

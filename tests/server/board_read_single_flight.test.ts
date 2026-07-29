@@ -1,14 +1,16 @@
 // Board-read single-flight: the TTL-cached board reads (deed rarity, the
 // lifetime-XP leaderboard, the guild leaderboard, the arena ladder, and the
-// project-stats accounts-created count) each share ONE underlying db read across N
-// concurrent cold/expired callers, a rejected refresh is never cached (the next
-// call re-reads fresh), a refresh error stale-serves the last-good value, and a
-// moderation bust landing mid-flight evicts any in-flight pre-ban joiner (the
-// epoch-keyed leaderboard, arena, and deeds Renown board flights) instead of
-// handing it the pre-ban snapshot. The arena ladder is per FORMAT (each of
-// '1v1' / '2v2' its own slot and flight); the project-stats count is single-key and
-// moderation-INVARIANT, so it is NOT bust-wired and a cold-cache db error degrades
-// it to 0.
+// project-stats accounts/characters-created counts) each share ONE underlying db
+// read across N concurrent cold/expired callers, a rejected refresh is never
+// cached (the next call re-reads fresh), a refresh error stale-serves the
+// last-good value, and a moderation bust landing mid-flight evicts any in-flight
+// pre-ban joiner (the epoch-keyed leaderboard, arena, and deeds Renown board
+// flights) instead of handing it the pre-ban snapshot. The arena ladder is per
+// FORMAT (each of '1v1' / '2v2' its own slot and flight); the project-stats
+// counts share ONE single-key cache (both getters read one readProjectStats
+// flight, so a cold burst costs exactly one getAccountsCount and one
+// getCharactersCount read) and are moderation-INVARIANT, so the cache is NOT
+// bust-wired and a cold-cache db error degrades both counts to 0.
 //
 // These drive the REAL module-private getters through boardReadTestSeam (exported
 // by server/main.ts) with only the underlying db reads mocked, so every
@@ -44,6 +46,7 @@ const dbMocks = vi.hoisted(() => ({
   topGuilds: vi.fn(),
   topArenaRatings: vi.fn(),
   getAccountsCount: vi.fn(),
+  getCharactersCount: vi.fn(),
   deedRarityCounts: vi.fn(),
   deedsBoardRanked: vi.fn(),
   charactersForDeedsBoard: vi.fn(),
@@ -60,6 +63,7 @@ vi.mock('../../server/db', async (importOriginal) => ({
   topGuilds: dbMocks.topGuilds,
   topArenaRatings: dbMocks.topArenaRatings,
   getAccountsCount: dbMocks.getAccountsCount,
+  getCharactersCount: dbMocks.getCharactersCount,
   deedsBoardRanked: dbMocks.deedsBoardRanked,
   charactersForDeedsBoard: dbMocks.charactersForDeedsBoard,
 }));
@@ -174,6 +178,7 @@ beforeEach(() => {
   dbMocks.topGuilds.mockReset();
   dbMocks.topArenaRatings.mockReset();
   dbMocks.getAccountsCount.mockReset();
+  dbMocks.getCharactersCount.mockReset();
   dbMocks.deedRarityCounts.mockReset();
   dbMocks.deedsBoardRanked.mockReset();
   dbMocks.charactersForDeedsBoard.mockReset();
@@ -267,10 +272,37 @@ describe('concurrency: N cold callers share one underlying read', () => {
   });
 
   it('getAccountsCreatedCount: concurrent cold callers cost one getAccountsCount read', async () => {
+    // The shared project-stats flight reads the peer count too; prime it so the
+    // deferred below is the only pending read.
+    dbMocks.getCharactersCount.mockResolvedValue(7);
     const count = await sharesOneFlight(dbMocks.getAccountsCount, 4242, () =>
       seam.getAccountsCreatedCount(),
     );
     expect(count).toBe(4242);
+  });
+
+  it('getCharactersCreatedCount: concurrent cold callers cost one getCharactersCount read', async () => {
+    dbMocks.getAccountsCount.mockResolvedValue(7);
+    const count = await sharesOneFlight(dbMocks.getCharactersCount, 456, () =>
+      seam.getCharactersCreatedCount(),
+    );
+    expect(count).toBe(456);
+  });
+
+  it('both project-stats getters share ONE flight: one read per underlying count', async () => {
+    // The decisive pin against per-getter caches wrapping the same inner read:
+    // a cold burst across BOTH getters must cost exactly one getAccountsCount
+    // and one getCharactersCount call, not one pair per getter.
+    dbMocks.getAccountsCount.mockResolvedValue(123);
+    dbMocks.getCharactersCount.mockResolvedValue(456);
+    const [accounts, characters] = await Promise.all([
+      seam.getAccountsCreatedCount(),
+      seam.getCharactersCreatedCount(),
+    ]);
+    expect(accounts).toBe(123);
+    expect(characters).toBe(456);
+    expect(dbMocks.getAccountsCount).toHaveBeenCalledTimes(1);
+    expect(dbMocks.getCharactersCount).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -784,10 +816,17 @@ describe('the arena ladder is cached per format', () => {
 // (E3) COLD-CACHE DEGRADATION: the project-stats count is single-key and, before
 // its first success, a db error degrades to 0 rather than throwing (so the endpoint
 // stays 200 where an unguarded read 500'd).
-describe('the project-stats count degrades to 0 on a cold-cache db error', () => {
+describe('the project-stats counts degrade to 0 on a cold-cache db error', () => {
   it('a cold-cache getAccountsCount error serves 0, not a throw', async () => {
+    dbMocks.getCharactersCount.mockResolvedValueOnce(7);
     dbMocks.getAccountsCount.mockRejectedValueOnce(new Error('db down'));
     await expect(seam.getAccountsCreatedCount()).resolves.toBe(0);
+  });
+
+  it('a cold-cache getCharactersCount error serves 0, not a throw', async () => {
+    dbMocks.getAccountsCount.mockResolvedValueOnce(7);
+    dbMocks.getCharactersCount.mockRejectedValueOnce(new Error('db down'));
+    await expect(seam.getCharactersCreatedCount()).resolves.toBe(0);
   });
 });
 
