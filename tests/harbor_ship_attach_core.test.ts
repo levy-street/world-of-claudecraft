@@ -113,9 +113,9 @@ describe('harbor ship attachment wiring', () => {
     expect(attachFrameSource).not.toContain('handle.group.rotation');
     expect(attachFrameSource).not.toContain('handle.group.matrixAutoUpdate');
 
-    const updateSource = functionSource('updateHarborShips');
-    expect(updateSource).toMatch(
-      /if \(handle\.cueStartSec === null \|\| handle\.segment === null\) continue;\n {4}handle\.group\.matrixAutoUpdate = true;/,
+    const updateSource = functionSource('updateHarborShipMotion');
+    expect(updateSource).toContain(
+      'if (handle.cueStartSec !== null && handle.segment !== null) {\n    handle.group.matrixAutoUpdate = true;',
     );
     expect(updateSource).toContain(
       'const frame = composeHarborShipAttachFrame(handle, pose, SHIP_UPDATE_FRAME);',

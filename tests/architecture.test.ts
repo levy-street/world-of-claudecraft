@@ -285,6 +285,7 @@ const RENDER_PURE_CORES = [
   'src/render/cast_bar.ts',
   'src/render/harbor_deck_stand_in_core.ts',
   'src/render/harbor_ship_attach_core.ts',
+  'src/render/harbor_ship_update_core.ts',
   'src/render/prop_path_core.ts',
   'src/render/chunk_residency_core.ts',
   'src/render/draw_stats_core.ts',

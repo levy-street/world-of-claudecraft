@@ -35,10 +35,10 @@ import {
   type DeckStandInAttachPoint,
   deckStandInParentTransform,
   disposeDeckStandIn,
-  updateDeckStandIns,
 } from './harbor_deck_stand_in_core';
 import { composeHarborShipAttachFrame } from './harbor_ship_attach_core';
 import { HarborShipCueRegistry } from './harbor_ship_cue_registry';
+import { createHarborShipUpdater } from './harbor_ship_update_core';
 import { type PropPathSample, type PropPathSegment, propPathPoseAt } from './prop_path_core';
 import { type PropAsset, propAsset } from './props';
 import { radialGlowTexture } from './textures';
@@ -488,18 +488,8 @@ function createDeckStandIn(handle: HarborShipHandle, player: Entity): CharacterV
   return visual;
 }
 
-/** Per-frame ship motion and deck visual lifecycle from the live cue state.
- * Returns true while a moving deck stand-in replaces the parked local rig. */
-export function updateHarborShips(localPlayer: Entity, dt: number): boolean {
-  const deckStandInActive = updateDeckStandIns(
-    SHIP_CUES.values(),
-    localPlayer.kind === 'player',
-    (handle) => createDeckStandIn(handle, localPlayer),
-    (visual) => visual.update(dt, DECK_STAND_IN_IDLE_STATE, false),
-    (visual) => visual.dispose(),
-  );
-  for (const handle of SHIP_CUES.values()) {
-    if (handle.cueStartSec === null || handle.segment === null) continue;
+function updateHarborShipMotion(handle: HarborShipHandle): void {
+  if (handle.cueStartSec !== null && handle.segment !== null) {
     handle.group.matrixAutoUpdate = true;
     const pose = propPathPoseAt(
       handle.segment,
@@ -510,8 +500,21 @@ export function updateHarborShips(localPlayer: Entity, dt: number): boolean {
     handle.group.position.set(frame.position.x, frame.position.y, frame.position.z);
     handle.group.rotation.y = frame.yaw;
   }
-  return deckStandInActive;
 }
+
+/** Per-frame ship motion and deck visual lifecycle from the live cue state.
+ * True means the moving stand-in replaces the parked authoritative rig. The
+ * factory binds every callback once so this renderer hot path stays stable. */
+export const updateHarborShips = createHarborShipUpdater<Entity, CharacterVisual, HarborShipHandle>(
+  {
+    handles: () => SHIP_CUES.values(),
+    isRealLocalPlayer: (player) => player.kind === 'player',
+    createStandIn: createDeckStandIn,
+    updateStandIn: (visual, dt) => visual.update(dt, DECK_STAND_IN_IDLE_STATE, false),
+    disposeStandIn: (visual) => visual.dispose(),
+    updateMotion: updateHarborShipMotion,
+  },
+);
 
 // The moored ferry ship: the generated GLB (long axis x, base at the keel)
 // scaled so the hull matches the authored berth length, yawed to the berth
