@@ -2220,7 +2220,13 @@ export class GameServer {
     // comparison is keyed to whichever entity's meta is being wired, so
     // without this the target's heavy fields can silently fail to resend.
     moderator.selfHeavyDirty = true;
-    this.send(moderator, { t: 'spectate', name: target.name });
+    this.send(moderator, {
+      t: 'spectate',
+      name: target.name,
+      pid: target.pid,
+      sceneState: this.sim.sceneReconnectStateFor(target.pid),
+      sceneChoiceState: this.sim.sceneChoiceReconnectStateFor(target.pid),
+    });
     this.sendSystemNotice(moderator, `Now spectating ${target.name}.`);
   }
 
@@ -2259,7 +2265,13 @@ export class GameServer {
     // moderator's OWN talents/inventory/equip/etc. resend immediately
     // instead of staying stuck on the spectated target's last-sent values.
     moderator.selfHeavyDirty = true;
-    this.send(moderator, { t: 'spectate', name: null });
+    this.send(moderator, {
+      t: 'spectate',
+      name: null,
+      pid: moderator.pid,
+      sceneState: this.sim.sceneReconnectStateFor(moderator.pid),
+      sceneChoiceState: this.sim.sceneChoiceReconnectStateFor(moderator.pid),
+    });
     if (announce) this.sendSystemNotice(moderator, 'Stopped spectating.');
   }
 

@@ -1,6 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
-import { SceneInputLockCoordinator } from '../src/game/scene_input_lock';
+import {
+  newSceneFacingInputState,
+  resetSceneFacingInputState,
+  SceneInputLockCoordinator,
+} from '../src/game/scene_input_lock';
 import type { SimEvent } from '../src/sim/types';
 
 const LOCK_ON = {
@@ -12,7 +16,7 @@ const LOCK_OFF = {
   op: { kind: 'inputLock', on: false },
 } as SimEvent;
 
-function harness() {
+function harness(onLockEdge: () => void = vi.fn()) {
   let locked = false;
   const source = {
     handleEvents(events: SimEvent[]) {
@@ -30,7 +34,6 @@ function harness() {
       targetTransitions.push(on);
     },
   };
-  const onLockEdge = vi.fn();
   const coordinator = new SceneInputLockCoordinator(source, target, onLockEdge);
   return {
     coordinator,
@@ -96,6 +99,24 @@ describe('scene input lock frame coordination', () => {
     expect(onLockEdge).toHaveBeenCalledTimes(1);
   });
 
+  it('clears every facing latch on a receipt edge even when the batch finishes unlocked', () => {
+    const facing = newSceneFacingInputState();
+    facing.cameraDrivenFacing.active = true;
+    facing.pendingReleaseFacing = 1.25;
+    facing.keyboardTurn.facing = 0.75;
+    facing.keyboardTurn.releaseMs = 275;
+    facing.keyboardTurn.wireFacing = 0.75;
+    facing.keyboardTurn.suppressTurnFlags = true;
+    facing.keyboardTurn.wasTurning = true;
+    const { coordinator } = harness(() => resetSceneFacingInputState(facing));
+
+    coordinator.applyPending(true);
+    coordinator.applyPending(false);
+    coordinator.handleMirroredEvents([LOCK_ON, LOCK_OFF]);
+
+    expect(facing).toEqual(newSceneFacingInputState());
+  });
+
   it('wires both event paths before their next authoritative input boundary', () => {
     const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
     const offline = main.slice(main.indexOf('while (acc >= DT)'), main.indexOf('const pp ='));
@@ -118,9 +139,9 @@ describe('scene input lock frame coordination', () => {
     );
     expect(online.indexOf('resolveMove(')).toBeLessThan(online.indexOf('net.flushInput()'));
     expect(main).toContain('const mouselook =\n      intro === null && !sceneInputLocked');
-    expect(main).toContain('const netFacing = sceneInputLocked ? null');
+    expect(main).toMatch(/const netFacing = sceneInputLocked\s+\? null/);
     expect(main).toContain('sceneDirector.inputLocked() ? null');
-    expect(main).toContain('resetKeyboardTurnState(kbTurn)');
+    expect(main).toContain('resetSceneFacingInputState(sceneFacingInput)');
     expect(main).toContain('online.onSceneInputLockChanged = (locked) =>');
   });
 });

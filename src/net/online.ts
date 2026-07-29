@@ -2411,16 +2411,7 @@ export class ClientWorld implements IWorld {
       // The hello is ordered before any new tick event on this transport.
       // Object-or-null convergence prevents a dropped end/result event from
       // leaving the camera lock or choice focus trap stale forever.
-      const sceneSync = {
-        type: 'sceneSync',
-        state: helloSceneState(msg.sceneState),
-      } as SimEvent;
-      this.mirrorSceneInputLock(sceneSync);
-      this.eventQueue.push(sceneSync);
-      this.eventQueue.push({
-        type: 'sceneChoiceSync',
-        state: helloChoiceState(msg.sceneChoiceState),
-      });
+      this.queueSceneConvergence(msg.sceneState, msg.sceneChoiceState);
       if (wasReconnecting) {
         // fresh transport after an auto-reconnect: the server restarts input
         // acking at 0 and resends the world from an empty interest set, and
@@ -2477,7 +2468,13 @@ export class ClientWorld implements IWorld {
       this.pendingTargetEcho = null;
       this.pendingInputSeqSentAt.clear();
       this.inputEchoSamples = [];
-      if (typeof this.spectating !== 'string') {
+      if (typeof this.spectating === 'string' && Number.isSafeInteger(msg.pid) && msg.pid > 0) {
+        // Event routing switches anchors before the first spectated snapshot,
+        // so bind the represented pid from the transition frame itself. This
+        // keeps personal scene events in that pre-snapshot window correctly
+        // scoped on both target switches and initial entry.
+        this.playerId = msg.pid;
+      } else if (typeof this.spectating !== 'string') {
         this.playerId = this.ownPlayerId;
         this.cfg.playerClass = this.ownPlayerClass;
         // cmd() drops every non-chat command while spectating (see below), so
@@ -2487,6 +2484,10 @@ export class ClientWorld implements IWorld {
       }
       Object.assign(this.moveInput, emptyMoveInput());
       this.mouselookFacing = null;
+      // A spectate transition swaps the represented player without a hello.
+      // Converge both personal presentation streams at the same boundary so
+      // the prior identity cannot strand a scene lock or choice focus trap.
+      this.queueSceneConvergence(msg.sceneState, msg.sceneChoiceState);
       return;
     }
     if (msg.t === 'gbanklog') {
@@ -2641,6 +2642,19 @@ export class ClientWorld implements IWorld {
       this.mouselookFacing = null;
     }
     this.onSceneInputLockChanged?.(locked);
+  }
+
+  private queueSceneConvergence(sceneState: unknown, sceneChoiceState: unknown): void {
+    const sceneSync = {
+      type: 'sceneSync',
+      state: helloSceneState(sceneState),
+    } as SimEvent;
+    this.mirrorSceneInputLock(sceneSync);
+    this.eventQueue.push(sceneSync);
+    this.eventQueue.push({
+      type: 'sceneChoiceSync',
+      state: helloChoiceState(sceneChoiceState),
+    });
   }
 
   consumeSocialChanged(): boolean {

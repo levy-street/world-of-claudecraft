@@ -208,6 +208,26 @@ describe('Input autorun', () => {
     input.triggerGamepadJump();
     input.setSceneInputLocked(false);
     expect(input.readMoveInput().jump).toBe(false);
+
+    input.setTouchMove({ forward: true, back: false, strafeLeft: false, strafeRight: false });
+    input.setControllerMoveInput({ strafeRight: true });
+    input.setControllerFacing(0.75);
+    input.triggerTouchJump();
+
+    expect(input.readMoveInput()).toEqual({
+      forward: false,
+      back: false,
+      turnLeft: false,
+      turnRight: false,
+      strafeLeft: false,
+      strafeRight: true,
+      jump: false,
+    });
+    expect(input.controllerFacingOverride()).toBe(0.75);
+
+    input.clearControllerMoveInput();
+    expect(input.readMoveInput().forward).toBe(true);
+    expect(input.readMoveInput().jump).toBe(true);
     now.mockRestore();
   });
 

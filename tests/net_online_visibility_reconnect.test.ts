@@ -11,7 +11,7 @@
 // is OPEN-only and never exercises reconnect).
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ClientWorld } from '../src/net/online';
-import type { PlayerClass } from '../src/sim/types';
+import { emptyMoveInput, type PlayerClass } from '../src/sim/types';
 
 const PROBE_CLASS: PlayerClass = 'warrior';
 
@@ -518,7 +518,10 @@ describe('ClientWorld reconnect error-frame tolerance (auth timeout)', () => {
   it('queues bounded hello convergence before every later scene event', () => {
     withDomStubs(() => {
       const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
-      const w = world as unknown as WorldProbe;
+      const w = world as unknown as WorldProbe & { mouselookFacing: number | null };
+      const lockChanges = vi.fn();
+      world.onSceneInputLockChanged = lockChanges;
+      world.setMoveInput({ ...emptyMoveInput(), forward: true, jump: true }, 1.25);
       w.onMessage(
         JSON.stringify({
           t: 'hello',
@@ -546,6 +549,10 @@ describe('ClientWorld reconnect error-frame tolerance (auth timeout)', () => {
           },
         }),
       );
+      expect(world.sceneInputLockPending()).toBe(true);
+      expect(world.moveInput).toEqual(emptyMoveInput());
+      expect(w.mouselookFacing).toBeNull();
+      expect(lockChanges).toHaveBeenCalledExactlyOnceWith(true);
       w.onMessage(
         JSON.stringify({
           t: 'events',

@@ -36,7 +36,13 @@ import { createMob } from '../src/sim/entity';
 import { emptySaleLog } from '../src/sim/market_sale_log';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
 import { Sim } from '../src/sim/sim';
-import { type Aura, DT, type PlayerClass, type WorldContent } from '../src/sim/types';
+import {
+  type Aura,
+  DT,
+  emptyMoveInput,
+  type PlayerClass,
+  type WorldContent,
+} from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { absorbTotal } from '../src/ui/absorb_bar';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
@@ -88,6 +94,62 @@ function eventTexts(sent: any[]): string[] {
     .flatMap((msg) => (msg.t === 'events' ? msg.list : []))
     .filter((ev) => ev.type === 'log' || ev.type === 'error')
     .map((ev) => ev.text);
+}
+
+function broadcast(server: GameServer): void {
+  (server as any).broadcastSnapshots();
+}
+
+// A ClientWorld without the WebSocket plumbing, to drive applySnapshot directly.
+function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWorld {
+  const c: any = Object.create(ClientWorld.prototype);
+  c.cfg = { seed: 20061, playerClass };
+  c.entities = new Map();
+  c.playerId = pid;
+  c.ownPlayerId = pid;
+  c.ownPlayerClass = playerClass;
+  c.spectating = null;
+  c.cupInfo = null;
+  c.lastVcupRemainder = null;
+  c.lastVcupShared = null;
+  c.sportRole = null;
+  c.moveInput = {};
+  c.inventory = [];
+  c.vendorBuyback = [];
+  c.equipment = {};
+  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
+  c.copper = 0;
+  c.honor = 0;
+  c.lifetimeHonor = 0;
+  c.xp = 0;
+  c.known = [];
+  c.questLog = new Map();
+  c.questsDone = new Set();
+  c.pendingQuestCommands = new Map();
+  c.partyInfo = null;
+  c.selectedDungeonDifficulty = 'normal';
+  c.tradeInfo = null;
+  c.duelInfo = null;
+  c.lastSnapAt = 0;
+  c.snapInterval = 50;
+  c.serverTickHz = null;
+  c.missingSince = new Map();
+  c.pendingFacingDelta = 0;
+  c.connected = true;
+  c.eventQueue = [];
+  c.mouselookFacing = null;
+  c.sceneInputLockedBeforeDrain = false;
+  c.onSceneInputLockChanged = null;
+  c.lastInputSentAt = 0;
+  c.lastInputSig = '';
+  c.inputSeq = 0;
+  c.pendingInputSeqSentAt = new Map();
+  c.ackedInputSeq = 0;
+  c.inputEchoSamples = [];
+  c.spectateFacingPending = false;
+  c.pendingSpectateFacing = null;
+  c.nodeCooldowns = new Map();
+  return c;
 }
 
 function feedEventFrame(client: ClientWorld, frame: unknown): void {
@@ -260,8 +322,29 @@ describe('spectate client POV', () => {
         rtype: 'rage',
       },
     });
-    internals.onMessage(JSON.stringify({ t: 'spectate', name: 'Suspect' }));
+    const lockChanges = vi.fn();
+    client.onSceneInputLockChanged = lockChanges;
+    client.setMoveInput({ ...emptyMoveInput(), forward: true }, 1.25);
+    internals.onMessage(
+      JSON.stringify({
+        t: 'spectate',
+        name: 'Suspect',
+        pid: 2,
+        sceneState: {
+          sceneId: 'scn_test_spectated',
+          remainingSeconds: 4,
+          inputLocked: true,
+          letterbox: true,
+          musicSilenced: false,
+        },
+        sceneChoiceState: null,
+      }),
+    );
     expect(client.spectating).toBe('Suspect');
+    expect(client.playerId).toBe(2);
+    expect(client.sceneInputLockPending()).toBe(true);
+    expect(client.moveInput).toEqual(emptyMoveInput());
+    expect(lockChanges).toHaveBeenCalledExactlyOnceWith(true);
 
     const snapshot = (facing: number, dead: boolean) => ({
       t: 'snap',
@@ -298,12 +381,37 @@ describe('spectate client POV', () => {
     expect(client.consumeSpectateFacing()).toBe(-0.75);
     expect(client.consumeSpectateFacing()).toBeNull();
 
-    internals.onMessage(JSON.stringify({ t: 'spectate', name: null }));
+    internals.onMessage(
+      JSON.stringify({
+        t: 'spectate',
+        name: null,
+        pid: 1,
+        sceneState: null,
+        sceneChoiceState: null,
+      }),
+    );
     expect(client.spectating).toBeNull();
     expect(client.playerId).toBe(1);
     expect(client.player.name).toBe('Moderator');
     expect(client.cfg.playerClass).toBe('warrior');
     expect(client.consumeSpectateFacing()).toBeNull();
+    expect(client.sceneInputLockPending()).toBe(false);
+    expect(lockChanges.mock.calls).toEqual([[true], [false]]);
+    expect(client.drainEvents()).toEqual([
+      {
+        type: 'sceneSync',
+        state: {
+          sceneId: 'scn_test_spectated',
+          remainingSeconds: 4,
+          inputLocked: true,
+          letterbox: true,
+          musicSilenced: false,
+        },
+      },
+      { type: 'sceneChoiceSync', state: null },
+      { type: 'sceneSync', state: null },
+      { type: 'sceneChoiceSync', state: null },
+    ]);
   });
 });
 
