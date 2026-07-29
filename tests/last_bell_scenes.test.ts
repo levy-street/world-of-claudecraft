@@ -6,7 +6,12 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { assembleEventsFrame, serializeEventFragments } from '../server/event_frame';
 import { ClientWorld } from '../src/net/online';
-import { LAST_BELL_PROP_PATH_SEGMENTS } from '../src/sim/content/last_bell_cinematics';
+import {
+  LAST_BELL_CINEMATIC_SHIP_SPEED_CAP_YARDS_PER_SEC,
+  LAST_BELL_PROP_PATH_SEGMENTS,
+  LB_PROP_CUE_PARK,
+} from '../src/sim/content/last_bell_cinematics';
+import { GULLHAVEN_HARBOR, MAINLAND_HARBOR } from '../src/sim/harbor_layout';
 import { registerScenario, scenarioRunFor, startScenario } from '../src/sim/scenarios/scenarios';
 import { answerSceneChoice } from '../src/sim/scenes/choices';
 import {
@@ -280,7 +285,8 @@ describe('scene camera wire transport', () => {
 // cues the harbor ship prop and the bell, splices the Q0 arrival after the
 // held black on the first crossing, stays line-free on re-rides, and tears
 // down to consistent state on a skip at any point (the sim teleported the
-// rider before the scene started, so skip changes nothing authoritative).
+// rider onto the destination ship before the scene started, then the scene
+// walks the real player down the gangplank).
 // ---------------------------------------------------------------------------
 
 describe('the voyage cinematic', () => {
@@ -313,6 +319,7 @@ describe('the voyage cinematic', () => {
   }
 
   it('pins the C5 segment records and camera grammar in both directions', () => {
+    expect(LAST_BELL_CINEMATIC_SHIP_SPEED_CAP_YARDS_PER_SEC).toBe(12);
     expect({
       outCastOff: LAST_BELL_PROP_PATH_SEGMENTS.lb_voyage_out_cast_off,
       outOpenWater: LAST_BELL_PROP_PATH_SEGMENTS.lb_voyage_out_open_water,
@@ -328,14 +335,14 @@ describe('the voyage cinematic', () => {
         ease: 'easeOutQuad',
       },
       outOpenWater: {
-        start: { x: 124.665, y: 0, z: -5.913, yaw: -1.910796 },
-        end: { x: 242.374, y: 0, z: -3, yaw: -1.910796 },
+        start: { x: 159.519453, y: 0, z: -4.456482, yaw: -1.910796 },
+        end: { x: 207.519453, y: 0, z: -4.456482, yaw: -1.910796 },
         duration: 4.3,
         ease: 'linear',
       },
       outArrival: {
-        start: { x: -28, y: 0, z: 0, yaw: -0.05 },
-        end: { x: 0, y: 0, z: 0, yaw: 0 },
+        start: { x: -32, y: 0, z: 0, yaw: -2.822845 },
+        end: { x: 0, y: 0, z: 0, yaw: -2.822845 },
         duration: 4.3,
         ease: 'easeInOutSine',
       },
@@ -346,14 +353,14 @@ describe('the voyage cinematic', () => {
         ease: 'easeOutQuad',
       },
       backOpenWater: {
-        start: { x: 117.609, y: 0, z: -6.658, yaw: -0.371593 },
-        end: { x: 230.693, y: 0, z: -5.65, yaw: -0.371593 },
+        start: { x: 150.151155, y: 0, z: -6.154286, yaw: -0.371593 },
+        end: { x: 198.151155, y: 0, z: -6.154286, yaw: -0.371593 },
         duration: 4.3,
         ease: 'linear',
       },
       backArrival: {
-        start: { x: -28, y: 0, z: 0, yaw: 0.05 },
-        end: { x: 0, y: 0, z: 0, yaw: 0 },
+        start: { x: -32, y: 0, z: 0, yaw: 1.511606 },
+        end: { x: 0, y: 0, z: 0, yaw: 1.511606 },
         duration: 4.3,
         ease: 'easeInOutSine',
       },
@@ -399,35 +406,35 @@ describe('the voyage cinematic', () => {
     expect(attachSpecs(out)).toEqual([
       {
         target: 'harbor_ship_mainland',
-        offset: { x: -24, y: 17, z: 17 },
+        offset: { x: -20, y: 16, z: 22 },
         lookAt: { x: 6.6, y: 8.6, z: 0 },
       },
       {
         target: 'harbor_ship_mainland',
-        offset: { x: 6.6, y: 9.2, z: -11 },
+        offset: { x: 6.6, y: 18, z: -28 },
         lookAt: { x: 6.6, y: 8.6, z: 0 },
       },
       {
         target: 'harbor_ship_gullhaven',
-        offset: { x: 20, y: 11, z: 10 },
-        lookAt: { x: 6.6, y: 8.6, z: 0 },
+        offset: { x: 6.6, y: 20, z: -20 },
+        lookAt: { x: 24, y: 8.6, z: 0 },
       },
     ]);
     expect(attachSpecs(back)).toEqual([
       {
         target: 'harbor_ship_gullhaven',
-        offset: { x: -24, y: 17, z: -17 },
+        offset: { x: -20, y: 16, z: -22 },
         lookAt: { x: 6.6, y: 8.6, z: 0 },
       },
       {
         target: 'harbor_ship_gullhaven',
-        offset: { x: 6.6, y: 9.2, z: 11 },
+        offset: { x: 6.6, y: 18, z: 28 },
         lookAt: { x: 6.6, y: 8.6, z: 0 },
       },
       {
         target: 'harbor_ship_mainland',
-        offset: { x: 20, y: 11, z: 10 },
-        lookAt: { x: 6.6, y: 8.6, z: 0 },
+        offset: { x: 6.6, y: 20, z: 20 },
+        lookAt: { x: 24, y: 8.6, z: 0 },
       },
     ]);
 
@@ -437,12 +444,33 @@ describe('the voyage cinematic', () => {
       );
     expect(walks(out)).toHaveLength(1);
     expect(walks(out)[0]?.at).toBeCloseTo(13.2, 8);
-    expect(walks(out)[0]).toMatchObject({ to: { x: 784.5, z: 116 }, speed: 1.25 });
+    expect(walks(out)[0]).toMatchObject({
+      to: { x: GULLHAVEN_HARBOR.gangplank.x, z: GULLHAVEN_HARBOR.gangplank.z },
+      speed: 2.75,
+    });
     expect(walks(back)).toHaveLength(1);
     expect(walks(back)[0]?.at).toBeCloseTo(13.2, 8);
-    expect(walks(back)[0]).toMatchObject({ to: { x: 169.5, z: -48 }, speed: 1.5 });
+    expect(walks(back)[0]).toMatchObject({
+      to: { x: MAINLAND_HARBOR.gangplank.x, z: MAINLAND_HARBOR.gangplank.z },
+      speed: 2.75,
+    });
     expect(out.ops.some((op) => op.kind === 'line')).toBe(false);
     expect(back.ops.some((op) => op.kind === 'line')).toBe(false);
+
+    for (const scene of [out, back]) {
+      expect(
+        scene.ops.filter(
+          (op) => op.kind === 'fade' && op.to === 'black' && op.at > 8.5 && op.at < 12.8,
+        ),
+      ).toEqual([{ at: 12.4, kind: 'fade', to: 'black', dur: 0.4 }]);
+    }
+
+    const arrivalCutKinds = (scene: typeof out) =>
+      scene.ops
+        .filter((op) => Math.abs(op.at - 12.8) < 1e-8)
+        .map((op) => (op.kind === 'prop' ? `${op.kind}/${op.cue}` : op.kind));
+    expect(arrivalCutKinds(out)).toEqual(['fade', `prop/${LB_PROP_CUE_PARK}`, 'camera']);
+    expect(arrivalCutKinds(back)).toEqual(['fade', `prop/${LB_PROP_CUE_PARK}`, 'camera']);
 
     const q0Lines = q0.ops.flatMap((op) =>
       op.kind === 'line' ? [{ at: op.at, key: op.key, dur: op.dur }] : [],
@@ -498,6 +526,10 @@ describe('the voyage cinematic', () => {
         target: 'harbor_ship_gullhaven',
         cue: 'lb_voyage_out_arrival',
       },
+      {
+        target: 'harbor_ship_gullhaven',
+        cue: LB_PROP_CUE_PARK,
+      },
     ]);
     const directives = ops
       .filter((e): e is typeof e & { op: { kind: 'music'; directive: string } } => {
@@ -510,11 +542,21 @@ describe('the voyage cinematic', () => {
     const walk = ops.find((e) => e.op.kind === 'playerWalk');
     expect(walk?.op).toEqual({
       kind: 'playerWalk',
-      to: sim.groundPos(784.5, 116),
-      speed: 1.25,
+      to: sim.groundPos(GULLHAVEN_HARBOR.gangplank.x, GULLHAVEN_HARBOR.gangplank.z),
+      speed: 2.75,
     });
-    expect(sim.player.pos.x).toBeGreaterThan(782);
-    expect(sim.player.pos.x).toBeLessThan(784.5);
+    const gullhavenEnd = sim.groundPos(GULLHAVEN_HARBOR.gangplank.x, GULLHAVEN_HARBOR.gangplank.z);
+    const gullhavenRemaining = Math.hypot(
+      sim.player.pos.x - gullhavenEnd.x,
+      sim.player.pos.z - gullhavenEnd.z,
+    );
+    expect(gullhavenRemaining).toBeGreaterThan(0);
+    expect(gullhavenRemaining).toBeLessThan(
+      Math.hypot(
+        GULLHAVEN_HARBOR.deckArrival.x - gullhavenEnd.x,
+        GULLHAVEN_HARBOR.deckArrival.z - gullhavenEnd.z,
+      ),
+    );
     // The arrival half: its first line lands after the splice point.
     const line = ops.find((e) => e.op.kind === 'line');
     expect(line?.op.kind === 'line' ? line.op.key : '').toBe('lb.q0.scene.harbor');
@@ -526,7 +568,7 @@ describe('the voyage cinematic', () => {
     expect(lineKeys).toEqual(['lb.q0.scene.harbor', 'lb.q0.scene.plinth', 'lb.q0.scene.toll']);
     expect(tail.some((e) => e.op.kind === 'end')).toBe(true);
     expect(sim.ctx.scenePlaybacks.size).toBe(0);
-    expect(sim.player.pos).toEqual(sim.groundPos(784.5, 116));
+    expect(sim.player.pos).toEqual(gullhavenEnd);
   });
 
   it('a re-ride departure cues the ship on its own side and stays line-free', () => {
@@ -535,7 +577,9 @@ describe('the voyage cinematic', () => {
     board(sim, 238, -47.5, 'ch_lb_ferry_fare_out');
     // Let the outbound departure finish before riding back.
     collect(sim, 19 * 20);
-    expect(sim.player.pos).toEqual(sim.groundPos(784.5, 116));
+    expect(sim.player.pos).toEqual(
+      sim.groundPos(GULLHAVEN_HARBOR.gangplank.x, GULLHAVEN_HARBOR.gangplank.z),
+    );
     board(sim, 727, 131, 'ch_lb_ferry_fare_back');
     const ops = sceneOps(collect(sim, 10 * 20));
     expect(ops.length).toBeGreaterThan(0);
@@ -564,14 +608,24 @@ describe('the voyage cinematic', () => {
     const walk = arrivalOps.find((e) => e.op.kind === 'playerWalk');
     expect(walk?.op).toEqual({
       kind: 'playerWalk',
-      to: sim.groundPos(169.5, -48),
-      speed: 1.5,
+      to: sim.groundPos(MAINLAND_HARBOR.gangplank.x, MAINLAND_HARBOR.gangplank.z),
+      speed: 2.75,
     });
-    expect(sim.player.pos.x).toBeGreaterThan(169.5);
-    expect(sim.player.pos.x).toBeLessThan(173);
+    const mainlandEnd = sim.groundPos(MAINLAND_HARBOR.gangplank.x, MAINLAND_HARBOR.gangplank.z);
+    const mainlandRemaining = Math.hypot(
+      sim.player.pos.x - mainlandEnd.x,
+      sim.player.pos.z - mainlandEnd.z,
+    );
+    expect(mainlandRemaining).toBeGreaterThan(0);
+    expect(mainlandRemaining).toBeLessThan(
+      Math.hypot(
+        MAINLAND_HARBOR.deckArrival.x - mainlandEnd.x,
+        MAINLAND_HARBOR.deckArrival.z - mainlandEnd.z,
+      ),
+    );
     collect(sim, 5 * 20);
     expect(sim.ctx.scenePlaybacks.size).toBe(0);
-    expect(sim.player.pos).toEqual(sim.groundPos(169.5, -48));
+    expect(sim.player.pos).toEqual(mainlandEnd);
   });
 
   it('skipping the voyage tears down cleanly with the rider already ashore', () => {
@@ -583,9 +637,11 @@ describe('the voyage cinematic', () => {
     const ops = sceneOps(collect(sim, 2));
     expect(ops.some((e) => e.op.kind === 'end')).toBe(true);
     expect(sim.ctx.scenePlaybacks.size).toBe(0);
-    // The crossing happened at pay time: the skip leaves the rider ashore
-    // with the quest accepted, identical to a watched voyage.
-    expect(sim.player.pos).toEqual(sim.groundPos(784.5, 116));
+    // The crossing happened at pay time and skip settles the un-emitted walk
+    // at the pier-side end of the gangplank.
+    expect(sim.player.pos).toEqual(
+      sim.groundPos(GULLHAVEN_HARBOR.gangplank.x, GULLHAVEN_HARBOR.gangplank.z),
+    );
     expect(sim.questLog.get(Q0)?.state).toBe('active');
   });
 
@@ -598,6 +654,8 @@ describe('the voyage cinematic', () => {
     const ops = sceneOps(collect(sim, 2));
     expect(ops.some((e) => e.op.kind === 'end')).toBe(true);
     expect(sim.ctx.scenePlaybacks.size).toBe(0);
-    expect(sim.player.pos).toEqual(sim.groundPos(169.5, -48));
+    expect(sim.player.pos).toEqual(
+      sim.groundPos(MAINLAND_HARBOR.gangplank.x, MAINLAND_HARBOR.gangplank.z),
+    );
   });
 });

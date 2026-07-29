@@ -67,9 +67,12 @@ describe('harbor deck stand-in render wiring', () => {
     expect(HARBOR_SOURCE).toContain('const visual = createCharacterVisual(player);');
     expect(HARBOR_SOURCE).not.toContain("from './characters/visual';");
     expect(HARBOR_SOURCE).toContain(
-      'export function updateHarborShips(localPlayer: Entity, dt: number): void {',
+      'export function updateHarborShips(localPlayer: Entity, dt: number): boolean {',
     );
-    expect(RENDERER_SOURCE).toContain('updateHarborShips(this.sim.player, dt);');
+    expect(RENDERER_SOURCE).toContain(
+      'const harborDeckStandInActive = updateHarborShips(this.sim.player, dt);',
+    );
+    expect(RENDERER_SOURCE).toContain('v.group.visible = !harborDeckStandInActive;');
     expect(HARBOR_SOURCE).toContain(
       'handle.deckStandIn.update(dt, DECK_STAND_IN_IDLE_STATE, false);',
     );

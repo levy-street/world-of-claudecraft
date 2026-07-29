@@ -74,6 +74,49 @@ export interface HarborBerth {
   length: number;
 }
 
+export interface HarborShipLocalBounds {
+  x: number;
+  z: number;
+  hw: number;
+  hd: number;
+  bottomY: number;
+  topY: number;
+}
+
+// Measured from grand_ferry_ship.glb. The renderer scales the model by its
+// x-axis length, so these ratios keep audit volumes aligned at every berth.
+const HARBOR_SHIP_MODEL_LENGTH = 36.391693115234375;
+const HARBOR_SHIP_MODEL_HALF_WIDTH = 5.375957229050324;
+const HARBOR_SHIP_MODEL_BOTTOM_Y = -0.000251597952434679;
+const HARBOR_SHIP_MODEL_TOP_Y = 24.000251597952435;
+
+export function harborShipLocalBounds(berth: HarborBerth): HarborShipLocalBounds {
+  const scale = berth.length / HARBOR_SHIP_MODEL_LENGTH;
+  return {
+    x: 0,
+    z: 0,
+    hw: berth.length / 2,
+    hd: HARBOR_SHIP_MODEL_HALF_WIDTH * scale,
+    bottomY: HARBOR_SHIP_MODEL_BOTTOM_Y * scale,
+    topY: HARBOR_SHIP_MODEL_TOP_Y * scale,
+  };
+}
+
+export function harborShipLocalPointInside(
+  bounds: HarborShipLocalBounds,
+  point: { x: number; y: number; z: number },
+  horizontalMargin = 0,
+): boolean {
+  return (
+    point.x >= bounds.x - bounds.hw - horizontalMargin &&
+    point.x <= bounds.x + bounds.hw + horizontalMargin &&
+    point.z >= bounds.z - bounds.hd - horizontalMargin &&
+    point.z <= bounds.z + bounds.hd + horizontalMargin &&
+    point.y >= bounds.bottomY &&
+    point.y < bounds.topY
+  );
+}
+
 export interface HarborDef {
   id: 'mainland' | 'gullhaven';
   decks: readonly HarborDeck[];
@@ -97,8 +140,11 @@ export interface HarborDef {
   // Where boarding happens: ON the ship's main deck (walk the gangplank
   // aboard, then depart). The lb_ferry fixture spawns here.
   boarding: { x: number; z: number };
-  // Where the crossing puts you ashore: on the deck near the harbor's land
-  // end, clear of the gangplank.
+  // Where an arriving rider first appears on the parked ship deck. Voyage
+  // scenes walk the real player from here down the gangplank.
+  deckArrival: { x: number; z: number };
+  // A landward ground reference near the harbor's shore end. Cinematic
+  // arrival checks compare this with the berth to derive the open-water side.
   arrival: { x: number; z: number };
   // Enclosing xz bounds over every walkable rect, precomputed for the
   // groundHeight hot path (one cheap reject before the per-rect scan).
@@ -231,6 +277,7 @@ export const MAINLAND_HARBOR: HarborDef = withBounds({
   ],
   gangplank: { x: 230.4, z: -48, facing: Math.PI / 2 },
   boarding: { x: 239, z: -48 },
+  deckArrival: { x: 240.5, z: -50.6 },
   arrival: { x: 173, z: -48 },
 });
 
@@ -340,6 +387,7 @@ export const GULLHAVEN_HARBOR: HarborDef = withBounds({
   ],
   gangplank: { x: 727.5, z: 122, facing: 0 },
   boarding: { x: 727.5, z: 130 },
+  deckArrival: { x: 725.4, z: 132.5 },
   arrival: { x: 782, z: 116 },
 });
 

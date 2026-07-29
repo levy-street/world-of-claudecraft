@@ -1,33 +1,33 @@
 import type { SceneAttachFrame } from '../sim/types';
+import type { PropPathSample } from './prop_path_core';
 
-export interface HarborShipAttachHandle {
-  readonly group: {
-    readonly position: {
-      readonly x: number;
-      readonly y: number;
-      readonly z: number;
-    };
-    readonly rotation: {
-      readonly y: number;
-    };
-  };
+export interface HarborShipBasePose {
+  readonly baseX: number;
+  readonly baseY: number;
+  readonly baseZ: number;
+  readonly baseRot: number;
 }
 
-/** Read the current world frame from a harbor ship registry without mutating its group. */
-export function harborShipAttachFrameFrom(
-  handles: ReadonlyMap<string, HarborShipAttachHandle>,
-  target: string,
-  out?: SceneAttachFrame,
-): SceneAttachFrame | null {
-  const handle = handles.get(target);
-  if (!handle) return null;
-  const frame = out ?? {
-    position: { x: 0, y: 0, z: 0 },
-    yaw: 0,
-  };
-  frame.position.x = handle.group.position.x;
-  frame.position.y = handle.group.position.y;
-  frame.position.z = handle.group.position.z;
-  frame.yaw = handle.group.rotation.y;
-  return frame;
+/** Compose a parked or live ship pose into its world attach frame. */
+export function composeHarborShipAttachFrame(
+  base: HarborShipBasePose,
+  pose: PropPathSample | null,
+  out: SceneAttachFrame,
+): SceneAttachFrame {
+  if (pose === null) {
+    out.position.x = base.baseX;
+    out.position.y = base.baseY;
+    out.position.z = base.baseZ;
+    out.yaw = base.baseRot;
+    return out;
+  }
+
+  const yaw = base.baseRot + pose.yaw;
+  const cosYaw = Math.cos(yaw);
+  const sinYaw = Math.sin(yaw);
+  out.position.x = base.baseX + pose.x * cosYaw + pose.z * sinYaw;
+  out.position.y = base.baseY + pose.y;
+  out.position.z = base.baseZ - pose.x * sinYaw + pose.z * cosYaw;
+  out.yaw = yaw;
+  return out;
 }

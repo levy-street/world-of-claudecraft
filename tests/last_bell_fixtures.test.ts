@@ -130,13 +130,13 @@ describe('Last Bell campaign fixtures', () => {
     expect(meta.copper).toBe(15);
     expect(
       Math.hypot(
-        sim.player.pos.x - GULLHAVEN_HARBOR.arrival.x,
-        sim.player.pos.z - GULLHAVEN_HARBOR.arrival.z,
+        sim.player.pos.x - GULLHAVEN_HARBOR.deckArrival.x,
+        sim.player.pos.z - GULLHAVEN_HARBOR.deckArrival.z,
       ),
     ).toBeLessThan(3);
 
-    // The arrival deck is at the harbor's land end; walking back out along
-    // the pier to Odda is part of the flow, so step onto the ship first.
+    // The cinematic begins on the destination ship and walks the rider down
+    // the gangplank. Step back aboard to take the return fare immediately.
     teleport(sim, 727, 131);
     const odda = [...sim.entities.values()].find((e) => e.templateId === 'ferrykeeper_odda');
     expect(odda).toBeTruthy();
@@ -147,8 +147,8 @@ describe('Last Bell campaign fixtures', () => {
     expect(meta.copper).toBe(5);
     expect(
       Math.hypot(
-        sim.player.pos.x - MAINLAND_HARBOR.arrival.x,
-        sim.player.pos.z - MAINLAND_HARBOR.arrival.z,
+        sim.player.pos.x - MAINLAND_HARBOR.deckArrival.x,
+        sim.player.pos.z - MAINLAND_HARBOR.deckArrival.z,
       ),
     ).toBeLessThan(3);
   });

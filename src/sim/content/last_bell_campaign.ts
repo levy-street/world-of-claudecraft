@@ -15,7 +15,7 @@ import { registerScenario } from '../scenarios/registry';
 import { registerChoice } from '../scenes/choices';
 import { registerScene, type SceneAttachShotDef, type SceneDollyShotDef } from '../scenes/scenes';
 import type { MobTemplate, NpcDef, QuestDef } from '../types';
-import { LAST_BELL_VOYAGE_SEGMENT_IDS } from './last_bell_cinematics';
+import { LAST_BELL_VOYAGE_SEGMENT_IDS, LB_PROP_CUE_PARK } from './last_bell_cinematics';
 
 // ---------------------------------------------------------------------------
 // Mobs
@@ -195,7 +195,7 @@ const SEA_ARRIVAL_AT = 8.5;
 const PIER_AT = 12.8;
 const PIER_SHOT_SECONDS = 5;
 const Q0_STORY_SECONDS = 11;
-const RELEASE_SECONDS = 0.8;
+const RELEASE_SECONDS = 1;
 
 interface VoyageDirection {
   readonly departureHarbor: HarborDef;
@@ -210,6 +210,7 @@ interface VoyageDirection {
   readonly sternOffset: { x: number; y: number; z: number };
   readonly sideOffset: { x: number; y: number; z: number };
   readonly bowOffset: { x: number; y: number; z: number };
+  readonly arrivalLookAt: { x: number; y: number; z: number };
   readonly walkTo: { x: number; z: number };
   readonly walkSpeed: number;
   readonly pierShot: SceneDollyShotDef;
@@ -221,22 +222,27 @@ const OUTBOUND: VoyageDirection = {
   departureTarget: 'harbor_ship_mainland',
   arrivalTarget: 'harbor_ship_gullhaven',
   segmentIds: LAST_BELL_VOYAGE_SEGMENT_IDS.out,
-  sternOffset: { x: -24, y: 17, z: 17 },
-  sideOffset: { x: 6.6, y: 9.2, z: -11 },
-  bowOffset: { x: 20, y: 11, z: 10 },
-  walkTo: { x: 784.5, z: 116 },
-  walkSpeed: 1.25,
+  sternOffset: { x: -20, y: 16, z: 22 },
+  sideOffset: { x: 6.6, y: 18, z: -28 },
+  bowOffset: { x: 6.6, y: 20, z: -20 },
+  arrivalLookAt: { x: 24, y: 8.6, z: 0 },
+  walkTo: { x: GULLHAVEN_HARBOR.gangplank.x, z: GULLHAVEN_HARBOR.gangplank.z },
+  walkSpeed: 2.75,
   pierShot: {
     kind: 'dolly',
     points: [
-      { x: 778, z: 105, height: 15.36 },
-      { x: 780.594, z: 105.3, height: 11.318 },
+      { x: 738, z: 110.609175, height: 20.203309 },
+      { x: 727.5, z: 110.609175, height: 5.774799 },
     ],
     lookAt: {
       kind: 'spline',
       points: [
-        { x: GULLHAVEN_HARBOR.arrival.x, z: GULLHAVEN_HARBOR.arrival.z, height: 2 },
-        { x: 784.5, z: 116, height: 2 },
+        { x: 733, z: 126, height: 2 },
+        {
+          x: GULLHAVEN_HARBOR.gangplank.x,
+          z: GULLHAVEN_HARBOR.gangplank.z,
+          height: 2,
+        },
       ],
     },
     dur: PIER_SHOT_SECONDS,
@@ -249,22 +255,29 @@ const RETURN: VoyageDirection = {
   departureTarget: 'harbor_ship_gullhaven',
   arrivalTarget: 'harbor_ship_mainland',
   segmentIds: LAST_BELL_VOYAGE_SEGMENT_IDS.back,
-  sternOffset: { x: -24, y: 17, z: -17 },
-  sideOffset: { x: 6.6, y: 9.2, z: 11 },
-  bowOffset: { x: 20, y: 11, z: 10 },
-  walkTo: { x: 169.5, z: -48 },
-  walkSpeed: 1.5,
+  sternOffset: { x: -20, y: 16, z: -22 },
+  sideOffset: { x: 6.6, y: 18, z: 28 },
+  bowOffset: { x: 6.6, y: 20, z: 20 },
+  arrivalLookAt: { x: 24, y: 8.6, z: 0 },
+  walkTo: { x: MAINLAND_HARBOR.gangplank.x, z: MAINLAND_HARBOR.gangplank.z },
+  walkSpeed: 2.75,
   pierShot: {
     kind: 'dolly',
     points: [
-      { x: 175, z: -59, height: 6.6 },
-      { x: 173.406, z: -58.7, height: 6.422 },
+      { x: 230.4, z: -66, height: 16.448243 },
+      { x: 230.4, z: -62, height: 16.441451 },
+      { x: 230.4, z: -59.390825, height: 15.369799 },
     ],
     lookAt: {
       kind: 'spline',
       points: [
-        { x: MAINLAND_HARBOR.arrival.x, z: MAINLAND_HARBOR.arrival.z, height: 2 },
-        { x: 169.5, z: -48, height: 2 },
+        { x: 240.5, z: -50.6, height: 2 },
+        { x: 235, z: -49, height: 2 },
+        {
+          x: MAINLAND_HARBOR.gangplank.x,
+          z: MAINLAND_HARBOR.gangplank.z,
+          height: 2,
+        },
       ],
     },
     dur: PIER_SHOT_SECONDS,
@@ -275,6 +288,7 @@ function attachShot(
   target: string,
   harbor: HarborDef,
   offset: { x: number; y: number; z: number },
+  lookAt: { x: number; y: number; z: number } = { x: 6.6, y: 8.6, z: 0 },
 ): SceneAttachShotDef {
   return {
     kind: 'attach',
@@ -284,7 +298,7 @@ function attachShot(
       yaw: harbor.berth.rot,
     },
     offset,
-    lookAt: { x: 6.6, y: 8.6, z: 0 },
+    lookAt,
   };
 }
 
@@ -295,6 +309,7 @@ function arrivalPierOps(
 ): SceneOp[] {
   const ops: SceneOp[] = [
     { at, kind: 'fade', to: 'black', dur: 0 },
+    { at, kind: 'prop', target: direction.arrivalTarget, cue: LB_PROP_CUE_PARK },
     { at, kind: 'camera', shot: direction.pierShot },
     { at: at + 0.1, kind: 'fade', to: 'clear', dur: 0.6 },
     {
@@ -334,7 +349,7 @@ function departureCore(direction: VoyageDirection, includeHarborLine = false): S
     },
     { at: 1.2, kind: 'music', directive: 'lb_bell_toll_one' },
     { at: 1.8, kind: 'music', directive: 'lb_ship_castoff' },
-    { at: 3.8, kind: 'fade', to: 'black', dur: 0.4 },
+    { at: 3.75, kind: 'fade', to: 'black', dur: 0.4 },
     {
       at: OPEN_WATER_AT,
       kind: 'prop',
@@ -347,7 +362,7 @@ function departureCore(direction: VoyageDirection, includeHarborLine = false): S
       shot: attachShot(direction.departureTarget, direction.departureHarbor, direction.sideOffset),
     },
     { at: OPEN_WATER_AT + 0.15, kind: 'fade', to: 'clear', dur: 0.35 },
-    { at: 8.1, kind: 'fade', to: 'black', dur: 0.4 },
+    { at: 8.05, kind: 'fade', to: 'black', dur: 0.4 },
     {
       at: SEA_ARRIVAL_AT,
       kind: 'prop',
@@ -357,10 +372,15 @@ function departureCore(direction: VoyageDirection, includeHarborLine = false): S
     {
       at: SEA_ARRIVAL_AT,
       kind: 'camera',
-      shot: attachShot(direction.arrivalTarget, direction.arrivalHarbor, direction.bowOffset),
+      shot: attachShot(
+        direction.arrivalTarget,
+        direction.arrivalHarbor,
+        direction.bowOffset,
+        direction.arrivalLookAt,
+      ),
     },
     { at: SEA_ARRIVAL_AT + 0.15, kind: 'fade', to: 'clear', dur: 0.35 },
-    { at: 12.2, kind: 'fade', to: 'black', dur: 0.6 },
+    { at: PIER_AT - 0.4, kind: 'fade', to: 'black', dur: 0.4 },
     ...arrivalPierOps(direction, PIER_AT, includeHarborLine),
   ];
 }
@@ -379,17 +399,21 @@ const Q0_TOLL_SHOT: SceneDollyShotDef = {
   kind: 'dolly',
   points: [
     { x: 808, z: 113, height: 7.4 },
-    { x: 795, z: 114.5, height: 7.5 },
-    { x: 780, z: 116, height: 5.9 },
-    { x: 780.594, z: 105.3, height: 11.318 },
+    { x: 780, z: 115, height: 5.9 },
+    { x: 755, z: 116, height: 8 },
+    { x: 727.5, z: 110.609175, height: 5.774799 },
   ],
   lookAt: {
     kind: 'spline',
     points: [
       { x: 818, z: 120, height: 2 },
-      { x: 800, z: 116, height: 2 },
-      { x: 790, z: 116, height: 2 },
-      { x: 784.5, z: 116, height: 2 },
+      { x: 786, z: 122, height: 2 },
+      { x: 755, z: 122, height: 2 },
+      {
+        x: GULLHAVEN_HARBOR.gangplank.x,
+        z: GULLHAVEN_HARBOR.gangplank.z,
+        height: 2,
+      },
     ],
   },
   dur: 6.2,
@@ -417,6 +441,7 @@ function q0ArrivalBeats(at: number): SceneOp[] {
 
 function releaseTail(at: number): SceneOp[] {
   return [
+    { at: at - 0.4, kind: 'fade', to: 'black', dur: 0.4 },
     { at, kind: 'camera', shot: { kind: 'release' } },
     { at: at + RELEASE_SECONDS, kind: 'letterbox', on: false },
     { at: at + RELEASE_SECONDS, kind: 'inputLock', on: false },
@@ -429,7 +454,7 @@ const RERIDE_RELEASE_AT = PIER_AT + PIER_SHOT_SECONDS;
 
 registerScene({
   id: 'scn_lb_q0_ashore',
-  duration: PIER_SHOT_SECONDS + Q0_STORY_SECONDS + RELEASE_SECONDS + 0.2,
+  duration: PIER_SHOT_SECONDS + Q0_STORY_SECONDS + RELEASE_SECONDS,
   ops: [
     { at: 0, kind: 'letterbox', on: true },
     { at: 0, kind: 'inputLock', on: true },
@@ -441,19 +466,19 @@ registerScene({
 
 registerScene({
   id: 'scn_lb_ferry_depart_out',
-  duration: RERIDE_RELEASE_AT + RELEASE_SECONDS + 0.2,
+  duration: RERIDE_RELEASE_AT + RELEASE_SECONDS,
   ops: [...departureCore(OUTBOUND), ...releaseTail(RERIDE_RELEASE_AT)],
 });
 
 registerScene({
   id: 'scn_lb_ferry_depart_back',
-  duration: RERIDE_RELEASE_AT + RELEASE_SECONDS + 0.2,
+  duration: RERIDE_RELEASE_AT + RELEASE_SECONDS,
   ops: [...departureCore(RETURN), ...releaseTail(RERIDE_RELEASE_AT)],
 });
 
 registerScene({
   id: 'scn_lb_q0_voyage',
-  duration: Q0_RELEASE_AT + RELEASE_SECONDS + 0.2,
+  duration: Q0_RELEASE_AT + RELEASE_SECONDS,
   ops: [
     ...departureCore(OUTBOUND, true),
     ...q0ArrivalBeats(Q0_STORY_AT),

@@ -32,6 +32,8 @@ describe('Last Bell harbors', () => {
     expect(GULLHAVEN_HARBOR.gangplank).toEqual({ x: 727.5, z: 122, facing: 0 });
     expect(MAINLAND_HARBOR.boarding).toEqual({ x: 239, z: -48 });
     expect(GULLHAVEN_HARBOR.boarding).toEqual({ x: 727.5, z: 130 });
+    expect(MAINLAND_HARBOR.deckArrival).toEqual({ x: 240.5, z: -50.6 });
+    expect(GULLHAVEN_HARBOR.deckArrival).toEqual({ x: 725.4, z: 132.5 });
     expect(MAINLAND_HARBOR.arrival).toEqual({ x: 173, z: -48 });
     expect(GULLHAVEN_HARBOR.arrival).toEqual({ x: 782, z: 116 });
   });
@@ -168,15 +170,22 @@ describe('Last Bell harbors', () => {
     }
   });
 
-  it('stands the gangplank and the arrival point on the deck', () => {
+  it('stands every gangway walk endpoint on a walkable surface', () => {
     for (const harbor of HARBORS) {
       const gp = harbor.gangplank;
       const deck = harborDeckAt(harbor, gp.x, gp.z);
       expect(deck, `${harbor.id} gangplank must be on a deck`).toBeTruthy();
+      const deckArrival = harborDeckAt(harbor, harbor.deckArrival.x, harbor.deckArrival.z);
+      expect(deckArrival, `${harbor.id} deck arrival must be on the ship`).toBeTruthy();
+      expect(
+        harbor.shipDecks.some((candidate) => candidate === deckArrival),
+        `${harbor.id} deck arrival must use a ship deck`,
+      ).toBe(true);
       const arrivalDeck = harborDeckAt(harbor, harbor.arrival.x, harbor.arrival.z);
       expect(arrivalDeck, `${harbor.id} arrival must be on a deck`).toBeTruthy();
       for (const seed of SEEDS) {
         expect(groundHeight(gp.x, gp.z, seed)).toBe(deck?.y);
+        expect(groundHeight(harbor.deckArrival.x, harbor.deckArrival.z, seed)).toBe(deckArrival?.y);
         expect(groundHeight(harbor.arrival.x, harbor.arrival.z, seed)).toBe(arrivalDeck?.y);
       }
     }
