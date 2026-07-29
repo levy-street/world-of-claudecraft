@@ -916,6 +916,7 @@ export const ja_JP: EnTranslations = {
       "emoteWheel": "エモートホイール",
       "targetFriendly": "最も近い味方をターゲット",
       "targetFriendlyNext": "味方ターゲットを順に切り替え",
+      "wheelHeldUnsupported": "{key} は長押しが必要なアクションには割り当てられません。",
       "discord": "Discord",
       "valecup": "ヴェイルカップ",
       "sheathe": "武器を納刀/抜刀",

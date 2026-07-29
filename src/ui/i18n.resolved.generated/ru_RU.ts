@@ -916,6 +916,7 @@ export const ru_RU: EnTranslations = {
       "emoteWheel": "Колесо эмоций",
       "targetFriendly": "Ближайший союзник",
       "targetFriendlyNext": "Следующий союзник",
+      "wheelHeldUnsupported": "{key} нельзя назначить действию, которое нужно удерживать.",
       "discord": "Discord",
       "valecup": "Кубок Долины",
       "sheathe": "Убрать/обнажить оружие",

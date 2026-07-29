@@ -517,6 +517,7 @@ export function keyCapLabel(label: string): string {
 export class Keybinds {
   // actionId -> [primary, secondary] codes (either may be null)
   private map = new Map<string, (string | null)[]>();
+  private readonly changeListeners = new Set<() => void>();
   // localStorage key this profile reads/writes. A non-empty scope namespaces it
   // per character; an empty scope keeps the bare legacy/global key.
   private readonly storeKey: string;
@@ -637,6 +638,22 @@ export class Keybinds {
     return null;
   }
 
+  hasWheelBinding(): boolean {
+    for (const codes of this.map.values()) {
+      if (codes.some((code) => code !== null && isWheelBindingCode(code))) return true;
+    }
+    return false;
+  }
+
+  onBindingsChanged(listener: () => void): () => void {
+    this.changeListeners.add(listener);
+    return () => this.changeListeners.delete(listener);
+  }
+
+  private notifyBindingsChanged(): void {
+    for (const listener of this.changeListeners) listener();
+  }
+
   /** Non-null codes bound to an action (for held-key polling). */
   codesForAction(id: string): string[] {
     return (this.map.get(id) ?? []).filter((c): c is string => c !== null);
@@ -685,6 +702,7 @@ export class Keybinds {
     }
     codes[index] = value;
     this.save();
+    this.notifyBindingsChanged();
     return true;
   }
 
@@ -693,10 +711,12 @@ export class Keybinds {
     if (!codes || index < 0 || index >= SLOTS_PER_ACTION) return;
     codes[index] = null;
     this.save();
+    this.notifyBindingsChanged();
   }
 
   reset(): void {
     this.map = this.defaults();
     this.save();
+    this.notifyBindingsChanged();
   }
 }

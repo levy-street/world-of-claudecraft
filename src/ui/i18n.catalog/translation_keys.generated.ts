@@ -7081,6 +7081,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.keybinds.targetFriendly'
   | 'hudChrome.keybinds.targetFriendlyNext'
   | 'hudChrome.keybinds.valecup'
+  | 'hudChrome.keybinds.wheelHeldUnsupported'
   | 'hudChrome.landing.highContrast'
   | 'hudChrome.landing.highContrastAria'
   | 'hudChrome.leaderboard.close'

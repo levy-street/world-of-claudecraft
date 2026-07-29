@@ -916,6 +916,7 @@ export const zh_CN: EnTranslations = {
       "emoteWheel": "表情轮盘",
       "targetFriendly": "选中最近友方",
       "targetFriendlyNext": "切换友方目标",
+      "wheelHeldUnsupported": "{key} 无法绑定到需要按住的操作。",
       "discord": "Discord",
       "valecup": "溪谷杯",
       "sheathe": "收起/拔出武器",

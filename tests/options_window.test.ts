@@ -10,6 +10,15 @@ import { describe, expect, it } from 'vitest';
 const painter = readFileSync(new URL('../src/ui/options_window.ts', import.meta.url), 'utf8');
 const hudTs = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
 
+function methodSource(source: string, signature: string): string {
+  const start = source.indexOf(signature);
+  if (start < 0) throw new Error(`method not found: ${signature}`);
+  const rest = source.slice(start);
+  const end = rest.search(/\r?\n {2}}\r?\n/);
+  if (end < 0) throw new Error(`method end not found: ${signature}`);
+  return rest.slice(0, end);
+}
+
 describe('options_window: no magic values', () => {
   it('carries no literal color in TS (colors live in the extracted stylesheet)', () => {
     const hex = painter.match(/#[0-9a-fA-F]{3,8}\b/g) ?? [];
@@ -163,13 +172,10 @@ describe('options_window: interface tab split', () => {
     // body and assert none so much as mentions interfaceTab: only tab selection
     // touches it. This is the source-guard equivalent of a close-reopen round
     // trip (the live DOM round trip is the opt-in browser suite).
-    const methodBody = (sig: string) => {
-      const start = painter.indexOf(sig);
-      expect(start, `method not found: ${sig}`).toBeGreaterThan(-1);
-      return painter.slice(start, painter.indexOf('\n  }\n', start));
-    };
     for (const sig of ['toggle(): void {', 'close(): void {', 'private goBack(): void {']) {
-      expect(methodBody(sig), `${sig} must not touch interfaceTab`).not.toContain('interfaceTab');
+      expect(methodSource(painter, sig), `${sig} must not touch interfaceTab`).not.toContain(
+        'interfaceTab',
+      );
     }
   });
 });
@@ -276,14 +282,27 @@ describe('options_window: keybind rebind dispatch (cluster 5)', () => {
     expect(painter).toContain('this.deps.keybinds().bind(actionId, index, code)');
     expect(painter).toContain('this.deps.refreshKeybindLabels()');
   });
+
+  it('distinguishes held-action wheel rejection from reserved bindings', () => {
+    const capture = painter.slice(painter.indexOf('private beginCapture(actionId: string'));
+    const reservedStart = capture.indexOf('} else if (isReservedCode(code)) {');
+    const unsupportedStart = capture.indexOf('} else if (!actionAcceptsCode(actionId, code)) {');
+    expect(reservedStart).toBeGreaterThan(-1);
+    expect(unsupportedStart).toBeGreaterThan(reservedStart);
+    expect(capture.slice(reservedStart, unsupportedStart)).toContain(
+      "t('hud.options.keybindReserved'",
+    );
+    expect(capture.slice(unsupportedStart)).toContain(
+      "t('hudChrome.keybinds.wheelHeldUnsupported'",
+    );
+    expect(capture).toContain("if (this.isOpen && this.view === 'keybinds')");
+  });
 });
 
 describe('options_window: viewport resync on open (PR #1118)', () => {
   it('calls syncAppViewport() before the panel flips to display: block', () => {
     expect(painter).toContain("import { syncAppViewport } from '../game/app_viewport'");
-    const toggle = painter.slice(painter.indexOf('toggle(): void {'));
-    const toggleEnd = toggle.indexOf('\n  }\n');
-    const body = toggle.slice(0, toggleEnd);
+    const body = methodSource(painter, 'toggle(): void {');
     const syncIdx = body.indexOf('syncAppViewport()');
     const displayIdx = body.indexOf("root().style.display = 'block'");
     expect(syncIdx).toBeGreaterThan(-1);
@@ -301,7 +320,7 @@ describe('options_window: stays a cold window', () => {
     // mentioning hud.update() and gives a bogus slice); the per-frame body runs from
     // there to its 2-space-indented closing brace (nested blocks indent deeper).
     const update = hudTs.slice(hudTs.indexOf('\n  update(): void {'));
-    const nextMethodEnd = update.indexOf('\n  }\n');
+    const nextMethodEnd = update.search(/\r?\n {2}}\r?\n/);
     expect(update.slice(0, nextMethodEnd)).not.toContain('optionsWindow');
   });
 });
@@ -319,8 +338,7 @@ describe('options_window: title-bar back control', () => {
   const layoutCss = readFileSync(new URL('../src/styles/layout.css', import.meta.url), 'utf8');
 
   it('renders [data-back] on every panelTitle sub-view but not on the main menu', () => {
-    const title = painter.slice(painter.indexOf('private panelTitle(title: string): string {'));
-    const body = title.slice(0, title.indexOf('\n  }\n'));
+    const body = methodSource(painter, 'private panelTitle(title: string): string {');
     // the control exists only when the open view is not the root menu
     expect(body).toContain("this.view === 'main'");
     expect(body).toContain('data-back');
@@ -345,8 +363,7 @@ describe('options_window: title-bar back control', () => {
   });
 
   it('goBack returns to the root without closing, drops key capture, and moves focus', () => {
-    const goBack = painter.slice(painter.indexOf('private goBack(): void {'));
-    const body = goBack.slice(0, goBack.indexOf('\n  }\n'));
+    const body = methodSource(painter, 'private goBack(): void {');
     expect(body).toContain('audio.click();');
     expect(body).toContain("this.view = 'main';");
     expect(body).toContain('this.capturingKey = null;');
@@ -362,8 +379,7 @@ describe('options_window: title-bar back control', () => {
     // host plumbing: icon in, navigation out (routed to the shared goBack)
     expect(painter).toContain("backIconHtml: svgIcon('prev'),");
     expect(painter).toContain('onBack: () => this.goBack(),');
-    const title = perfPanel.slice(perfPanel.indexOf('private buildTitle(): HTMLElement {'));
-    const body = title.slice(0, title.indexOf('\n  }\n'));
+    const body = methodSource(perfPanel, 'private buildTitle(): HTMLElement {');
     expect(body).toContain("back.className = 'x-btn back-btn';");
     expect(body).toContain("back.addEventListener('click', () => this.host.onBack());");
     // NO data-back attribute: the central sweep would double-wire the first render
@@ -423,8 +439,7 @@ describe('options_window: settings shows the running version (#1541)', () => {
   });
 
   it('paints the version as a t() label in the main menu (renderMain)', () => {
-    const renderMain = painter.slice(painter.indexOf('private renderMain(): void {'));
-    const body = renderMain.slice(0, renderMain.indexOf('\n  }\n'));
+    const body = methodSource(painter, 'private renderMain(): void {');
     // The label is an i18n key with version+build passed as values (no concat).
     expect(body).toContain("t('hudChrome.options.version', { version, build })");
     // Rendered as the .opt-version secondary line appended after the button list.
@@ -443,10 +458,7 @@ describe('options_window: settings shows the running version (#1541)', () => {
 // settings.reset()) fails a test instead of shipping silently.
 describe('options_window: Reset to Defaults is scoped per sub-view (#2341)', () => {
   it('settingsViewFooter derives keys from its controls param and resets/re-applies only those', () => {
-    const footer = painter.slice(
-      painter.indexOf('settingsViewFooter(controls: OptionsControl[]): void {'),
-    );
-    const body = footer.slice(0, footer.indexOf('\n  }\n'));
+    const body = methodSource(painter, 'settingsViewFooter(controls: OptionsControl[]): void {');
     expect(body).toContain('const keys = optionsControlKeys(controls)');
     // the reset call is scoped, never the bare no-arg full reset
     expect(body).toContain('hooks?.settings.reset(keys)');
@@ -463,10 +475,7 @@ describe('options_window: Reset to Defaults is scoped per sub-view (#2341)', () 
   ])(
     '%s builds its own controls and passes that same list into settingsViewFooter',
     (method, builder) => {
-      const start = painter.indexOf(`private ${method}(): void {`);
-      expect(start).toBeGreaterThan(-1);
-      const rest = painter.slice(start);
-      const body = rest.slice(0, rest.indexOf('\n  }\n'));
+      const body = methodSource(painter, `private ${method}(): void {`);
       expect(body).toContain(builder);
       expect(body).toContain('this.settingsViewFooter(controls)');
     },

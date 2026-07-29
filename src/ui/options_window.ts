@@ -1673,11 +1673,16 @@ export class OptionsWindow {
           key: keyLabel(this.deps.keybinds().codeAt(actionId, index)),
         });
         this.deps.refreshKeybindLabels();
-      } else if (isReservedCode(code) || !actionAcceptsCode(actionId, code)) {
+      } else if (isReservedCode(code)) {
         this.keybindNote = t('hud.options.keybindReserved', { key: keyLabel(code) });
+      } else if (!actionAcceptsCode(actionId, code)) {
+        this.keybindNote = t('hudChrome.keybinds.wheelHeldUnsupported', {
+          key: keyLabel(code),
+        });
       }
-      // re-render only if the menu is still open (player may have closed it)
-      if (this.isOpen) this.renderKeybinds();
+      // A primary-button cancellation is delivered after the native click so
+      // Back/Close can run first. Do not repaint over a view that click left.
+      if (this.isOpen && this.view === 'keybinds') this.renderKeybinds();
     });
   }
 }
