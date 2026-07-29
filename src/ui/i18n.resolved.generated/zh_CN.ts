@@ -901,11 +901,11 @@ export const zh_CN: EnTranslations = {
       "minutesSeconds": "{m}分{s}秒",
       "seconds": "{s}秒",
       "autoShowHint": "一旦你的小队造成伤害或治疗，行数就会自动出现，此区段会在战斗结束几秒后关闭。",
-      "breakdownSummary": "{tab}: {value}",
-      "breakdownRow": "{value} ({percent})",
+      "breakdownSummary": "{选项卡}：{值} {tab} {value}",
+      "breakdownRow": "{值} ({百分比}) {value} {percent}",
       "breakdownOther": "其他（{count}）",
-      "percent": "{value}%",
-      "petAbility": "{pet}: {ability}",
+      "percent": "{值}% {value}",
+      "petAbility": "{宠物}：{能力} {pet} {ability}",
       "melee": "近战"
     },
     "petFeed": {
@@ -970,13 +970,13 @@ export const zh_CN: EnTranslations = {
     "mountRace": {
       "startButton": "开始比赛",
       "cancelButton": "取消比赛",
-      "go": "GO!",
+      "go": "出发！",
       "start": "出发！跳过每一道障碍，再骑回拱门冲线。",
       "toFinish": "骑回拱门冲线！",
       "finished": "完成！用时 {seconds} 秒！",
       "timeout": "比赛失败",
       "progress": "障碍 {n} / {total}",
-      "timeLeft": "{seconds}s"
+      "timeLeft": "{秒}秒 {seconds}"
     },
     "vcup": {
       "title": "溪谷杯",
@@ -2809,7 +2809,7 @@ export const zh_CN: EnTranslations = {
       "title": "世界地图",
       "summary": "世界地图。选择一个地区以打开其地图。",
       "toWorld": "世界地图",
-      "toZone": "Zone map",
+      "toZone": "区域地图",
       "toggleAria": "在世界地图和地区地图之间切换",
       "levels": "等级 {min} 到 {max}"
     }
@@ -5735,7 +5735,7 @@ export const zh_CN: EnTranslations = {
     },
     "augment": {
       "choose": "选择一项强化",
-      "cardAria": "{name} ({category}) - {description}",
+      "cardAria": "{名称}（{类别}）- {描述} {name} {category} {description}",
       "aug_brutality": {
         "name": "残暴",
         "desc": "你的物理打击造成的伤害提高15%。"
@@ -6106,8 +6106,8 @@ export const zh_CN: EnTranslations = {
       "secondsRemaining": "剩余 {seconds} 秒",
       "enteringZone": "进入 {zone}。",
       "welcomeZone": "欢迎来到 {zone}！",
-      "riftLabel": "{name}",
-      "riftLabelRanked": "{name} ({rank})",
+      "riftLabel": "{名称} {name}",
+      "riftLabelRanked": "{名称}（{排名}） {name} {rank}",
       "levelBanner": "{level} 级！",
       "levelLog": "你已达到 {level} 级！",
       "xpGain": "你获得 {amount} 点经验。",
@@ -6739,22 +6739,22 @@ export const zh_CN: EnTranslations = {
       "gathering": "采集",
       "demonHeal": "恶魔治疗",
       "thunzharrStormcall": "风暴召唤",
-      "rift_frost_execution": "Glacial Grave",
-      "rift_frost_strike": "Absolute Zero",
-      "rift_ember_execution": "Magma Well",
-      "rift_ember_strike": "Core Meltdown",
-      "rift_venom_execution": "Venom Pool",
-      "rift_venom_strike": "Broodmother's Mark",
-      "rift_necro_execution": "Soul Grave",
-      "rift_necro_strike": "Death Sentence",
-      "rift_brute_execution": "Earthshatter",
-      "rift_brute_strike": "Final Judgment",
-      "rift_arcane_execution": "Void Rift",
-      "rift_arcane_strike": "Arcane Annihilation",
-      "rift_storm_execution": "Lightning Rod",
-      "rift_storm_strike": "Stormcaller's Wrath",
-      "rift_tide_execution": "Abyssal Maw",
-      "rift_tide_strike": "Crushing Depth"
+      "rift_frost_execution": "冰川坟墓",
+      "rift_frost_strike": "绝对零",
+      "rift_ember_execution": "岩浆井",
+      "rift_ember_strike": "核心熔毁",
+      "rift_venom_execution": "毒液池",
+      "rift_venom_strike": "巢母印记",
+      "rift_necro_execution": "灵魂坟墓",
+      "rift_necro_strike": "死刑判决",
+      "rift_brute_execution": "碎地者",
+      "rift_brute_strike": "最终审判",
+      "rift_arcane_execution": "虚空裂缝",
+      "rift_arcane_strike": "奥术歼灭",
+      "rift_storm_execution": "避雷针",
+      "rift_storm_strike": "风暴召唤者之怒",
+      "rift_tide_execution": "深渊之口",
+      "rift_tide_strike": "破碎深度"
     }
   },
   "questUi": {

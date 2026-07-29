@@ -901,11 +901,11 @@ export const ru_RU: EnTranslations = {
       "minutesSeconds": "{m} мин {s} сек.",
       "seconds": "{s} сек.",
       "autoShowHint": "Строки появляются автоматически, как только ваша группа наносит урон или лечит, и этот раздел закрывается через несколько секунд после окончания боя.",
-      "breakdownSummary": "{tab}: {value}",
-      "breakdownRow": "{value} ({percent})",
+      "breakdownSummary": "{tab}: {значение} {value}",
+      "breakdownRow": "{значение} ({процент}) {value} {percent}",
       "breakdownOther": "Прочее ({count})",
-      "percent": "{value}%",
-      "petAbility": "{pet}: {ability}",
+      "percent": "{значение}% {value}",
+      "petAbility": "{питомец}: {способность} {pet} {ability}",
       "melee": "Ближний бой"
     },
     "petFeed": {
@@ -970,13 +970,13 @@ export const ru_RU: EnTranslations = {
     "mountRace": {
       "startButton": "Начать заезд",
       "cancelButton": "Отменить заезд",
-      "go": "GO!",
+      "go": "ВПЕРЕД!",
       "start": "Вперёд! Бери все препятствия и скачи назад через арку.",
       "toFinish": "Скачи назад через арку!",
       "finished": "Финиш за {seconds} с!",
       "timeout": "Заезд провален",
       "progress": "Барьеры {n} из {total}",
-      "timeLeft": "{seconds}s"
+      "timeLeft": "{секунды} с {seconds}"
     },
     "vcup": {
       "title": "Кубок Долины",
@@ -2809,7 +2809,7 @@ export const ru_RU: EnTranslations = {
       "title": "Карта мира",
       "summary": "Карта мира. Выберите зону, чтобы открыть её карту.",
       "toWorld": "Карта мира",
-      "toZone": "Zone map",
+      "toZone": "Карта зоны",
       "toggleAria": "Переключение между картой мира и картой региона",
       "levels": "Уровни {min} до {max}"
     }
@@ -5735,7 +5735,7 @@ export const ru_RU: EnTranslations = {
     },
     "augment": {
       "choose": "Выберите усиление",
-      "cardAria": "{name} ({category}) - {description}",
+      "cardAria": "{имя} ({категория}) – {описание} {name} {category} {description}",
       "aug_brutality": {
         "name": "Жестокость",
         "desc": "Твои физические удары бьют на 15% сильнее."
@@ -6106,8 +6106,8 @@ export const ru_RU: EnTranslations = {
       "secondsRemaining": "Осталось {seconds} сек.",
       "enteringZone": "Вход в {zone}.",
       "welcomeZone": "Добро пожаловать в {zone}!",
-      "riftLabel": "{name}",
-      "riftLabelRanked": "{name} ({rank})",
+      "riftLabel": "{имя} {name}",
+      "riftLabelRanked": "{имя} ({ранг}) {name} {rank}",
       "levelBanner": "Уровень {level}!",
       "levelLog": "Вы достигли уровня {level}!",
       "xpGain": "Вы получаете {amount} опыта.",
@@ -6739,22 +6739,22 @@ export const ru_RU: EnTranslations = {
       "gathering": "Сбор ресурсов",
       "demonHeal": "Исцеление демона",
       "thunzharrStormcall": "Зов бури",
-      "rift_frost_execution": "Glacial Grave",
-      "rift_frost_strike": "Absolute Zero",
-      "rift_ember_execution": "Magma Well",
-      "rift_ember_strike": "Core Meltdown",
-      "rift_venom_execution": "Venom Pool",
-      "rift_venom_strike": "Broodmother's Mark",
-      "rift_necro_execution": "Soul Grave",
-      "rift_necro_strike": "Death Sentence",
-      "rift_brute_execution": "Earthshatter",
-      "rift_brute_strike": "Final Judgment",
-      "rift_arcane_execution": "Void Rift",
-      "rift_arcane_strike": "Arcane Annihilation",
-      "rift_storm_execution": "Lightning Rod",
-      "rift_storm_strike": "Stormcaller's Wrath",
-      "rift_tide_execution": "Abyssal Maw",
-      "rift_tide_strike": "Crushing Depth"
+      "rift_frost_execution": "Ледниковая могила",
+      "rift_frost_strike": "Абсолютный ноль",
+      "rift_ember_execution": "Колодец магмы",
+      "rift_ember_strike": "Распад ядра",
+      "rift_venom_execution": "Бассейн яда",
+      "rift_venom_strike": "Знак Праматери",
+      "rift_necro_execution": "Могила души",
+      "rift_necro_strike": "Смертный приговор",
+      "rift_brute_execution": "Землетрясение",
+      "rift_brute_strike": "Окончательное решение",
+      "rift_arcane_execution": "Разлом Бездны",
+      "rift_arcane_strike": "Чародейское уничтожение",
+      "rift_storm_execution": "Громоотвод",
+      "rift_storm_strike": "Гнев Призывателя Бури",
+      "rift_tide_execution": "Бездонная пасть",
+      "rift_tide_strike": "Глубина дробления"
     }
   },
   "questUi": {

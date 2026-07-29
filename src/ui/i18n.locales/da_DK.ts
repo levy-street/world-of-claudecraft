@@ -9341,4 +9341,1419 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Skaberens mærke',
   'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Mesterværksbonus',
   'hudChrome.enchanting.replaceConfirmKeepsBond': 'Kommissionsbinding',
+  'abilityUi.cast.rift_arcane_execution': 'Oversat: Void Rift',
+  'abilityUi.cast.rift_arcane_strike': 'Utrolig udslettelse',
+  'abilityUi.cast.rift_brute_execution': 'Oversat: Earthshatter',
+  'abilityUi.cast.rift_brute_strike': 'Endelig dom',
+  'abilityUi.cast.rift_ember_execution': 'Oversat: Magma Well',
+  'abilityUi.cast.rift_ember_strike': 'Kernenedsmeltning',
+  'abilityUi.cast.rift_frost_execution': 'Oversat: Glacial Grave',
+  'abilityUi.cast.rift_frost_strike': 'Absolut nul',
+  'abilityUi.cast.rift_necro_execution': 'Sjælegrav',
+  'abilityUi.cast.rift_necro_strike': 'Dødsdom',
+  'abilityUi.cast.rift_storm_execution': 'Lynafleder',
+  'abilityUi.cast.rift_storm_strike': 'Stormkalderens vrede',
+  'abilityUi.cast.rift_tide_execution': 'Oversat: Abyssal Maw',
+  'abilityUi.cast.rift_tide_strike': 'Knusningsdybde',
+  'abilityUi.cast.rift_venom_execution': 'Giftpool',
+  'abilityUi.cast.rift_venom_strike': 'Brodermors mærke',
+  'hud.combat.floatingHealAbsorbed': 'Absorberet',
+  'hud.combat.healOtherAbsorbed': 'Din er fortæret af ilden på {target}. {ability}',
+  'hud.combat.healSelfAbsorbed': 'Din er fortæret af den fordærvelse over dig. {ability}',
+  'hud.core.riftLabel': '{name}',
+  'hud.core.riftLabelRanked': '() {name} {rank}',
+  'itemUi.kind.mount': 'Montering',
+  'entities.dungeons.the_last_keep.enterText':
+    'Du træder ind i de kolde, tavse haller i Last Keep.',
+  'entities.dungeons.the_last_keep.leaveText':
+    'Du trækker holdedøren lukket og træder tilbage i Drakelands-vinden.',
+  'entities.dungeons.the_last_keep.name': 'Oversat: The Last Keep',
+  'entities.dungeons.wildheart_basin.enterText':
+    'Varm regn hvæser på gamle sten. Wildheart Basin åbner foran dig.',
+  'entities.dungeons.wildheart_basin.leaveText':
+    'Du passerer tilbage under stenhugtænderne ind i Palmreach-solen.',
+  'entities.dungeons.wildheart_basin.name': 'Vildhjertebassinet',
+  'entities.items.abyssal_loop.name': 'Oversat: Abyssal Loop',
+  'entities.items.abysswrought_band.name': 'Oversat: Abysswrought Band',
+  'entities.items.amberfall_sap_bucket.name': 'Sap-Tap spand',
+  'entities.items.ashbone_war_brand.name': 'Ashbone War-Mærke',
+  'entities.items.aurora_mote.name': 'Oversat: Aurora Mote',
+  'entities.items.barrow_grave_offering.name': 'Spredt Gravoffer',
+  'entities.items.barrowshade_mantle.name': 'Oversat: Barrowshade Mantle',
+  'entities.items.bonelord_mantle.name': 'Oversat: Bonelord Mantle',
+  'entities.items.breakscarred_steel.name': 'Break-arred stål',
+  'entities.items.bridgemere_toll_chest.name': 'Nedsunket Toll-Chest',
+  'entities.items.broodmother_carapace.name': 'Brodermor Carapace',
+  'entities.items.canopy_silk_hank.name': 'Oversat: Canopy Silk Hank',
+  'entities.items.cinderwalk_treads.name': 'Oversat: Cinderwalk Treads',
+  'entities.items.eelskin_mudwaders.name': 'Oversat: Eelskin Mudwaders',
+  'entities.items.emberforge_gauntlets.name': 'Oversat: Emberforge Gauntlets',
+  'entities.items.emberforged_bulwark.name': 'Forgyldt bolværk',
+  'entities.items.emberwing_scale.name': 'Oversat: Emberwing Scale',
+  'entities.items.evergarden_bloom_clipping.name': 'Beskåret blomst',
+  'entities.items.evergarden_statue_rubbing.name': 'Statue gnidning',
+  'entities.items.farshore_salt_moss.name': 'Oversat: Farshore Salt Moss',
+  'entities.items.fenway_mooring_line.name': 'Klip fortøjningsline',
+  'entities.items.fountain_court_mantle.name': 'Mantel af Fountain Court',
+  'entities.items.frostmane_mantle.name': 'Frostmanens kappe',
+  'entities.items.galecrest_ram_wool.name': 'Fedtet vædderuld',
+  'entities.items.gallowmere_grave_candle.name': 'Grav-Lys',
+  'entities.items.gilded_sap_clot.name': 'Forgyldt saftklump',
+  'entities.items.gloamfield_nightbloom.name': 'Oversat: Nightbloom Blossom',
+  'entities.items.graskbreaker_girdle.name': 'Græsbælte',
+  'entities.items.gravebound_silk_wraps.name': 'Gravebound Silke Wraps',
+  'entities.items.gullhaven_watchbell.name': 'Oversat: Coastal Watchbell',
+  'entities.items.heart_of_the_rift.name': 'Riftens hjerte',
+  'entities.items.hearth_ember_cache.name': 'Oversat: Ember Cache',
+  'entities.items.hearthlined_treads.name': 'Slidbelægninger med ildsted',
+  'entities.items.hedgewick_shears.name': 'Stjålet Hedgewick-saks',
+  'entities.items.hedgewick_tool_cart.name': 'Spildt værktøjsvogn',
+  'entities.items.hoarfrost_edge.name': 'Rimfrostkant',
+  'entities.items.last_keep_signet.name': 'Signet af det sidste bevaring',
+  'entities.items.lilybed_mantle.name': 'Liljebedets kappe',
+  'entities.items.mantle_of_the_meredark.name': 'Meredarks kappe',
+  'entities.items.mantle_of_the_unbroken_shore.name': 'Mantel af den ubrudte kyst',
+  'entities.items.mantle_of_the_unhorsed.name': 'Oversat: Mantle of the Unhorsed',
+  'entities.items.mawscale_pauldrons.name': 'Oversat: Mawscale Pauldrons',
+  'entities.items.mere_ferry_lantern.name': 'Færgelanterne',
+  'entities.items.moonfleece_mitts.name': 'Moonfleece luffer',
+  'entities.items.moonfleece_tuft.name': 'Oversat: Moonfleece Tuft',
+  'entities.items.orchard_sapbinder_grips.name': 'Sapbinder-greb',
+  'entities.items.pactbound_vestments.name': 'Pagtbundne Vestments',
+  'entities.items.pearlwake_cargo_crate.name': 'Pearlwake lastkasse',
+  'entities.items.pitlords_cleaver.name': "Oversat: Pit Lord's Cleaver",
+  'entities.items.plump_fen_eel.name': 'Plump Fenål',
+  'entities.items.riding_training.name': 'Ridetræning',
+  'entities.items.rift_essence.name': 'Oversat: Rift Essence',
+  'entities.items.rift_gem_azure.name': 'Oversat: Azure Rift Gem',
+  'entities.items.rift_gem_crimson.name': 'Oversat: Crimson Rift Gem',
+  'entities.items.rift_gem_verdant.name': 'Grønne Rift Gem',
+  'entities.items.riftbound_band_of_guile.name': 'Oversat: Riftbound Band of Guile',
+  'entities.items.riftbound_band_of_insight.name': 'Oversat: Riftbound Band of Insight',
+  'entities.items.riftbound_band_of_might.name': 'Oversat: Riftbound Band of Might',
+  'entities.items.saltforged_grips.name': 'Saltsmedede greb',
+  'entities.items.saltwalker_sandals.name': 'Saltwalker-sandaler',
+  'entities.items.scorched_supply_crate.name': 'Forbrændt forsyningskasse',
+  'entities.items.shear_storm_lantern.name': 'Dysset Storm-Lanterne',
+  'entities.items.shearkeeper_gloves.name': 'Shearkeeper Handsker',
+  'entities.items.silkbound_remains.name': 'Silkeindbundne rester',
+  'entities.items.sprung_trap.name': 'Fjedret fenfælde',
+  'entities.items.stormscale_treads.name': 'Stormscale slidbaner',
+  'entities.items.stormsunder_hood.name': 'Oversat: Stormsunder Hood',
+  'entities.items.sunken_idol_mantle.name': 'Oversat: Mantle of the Sunken Idol',
+  'entities.items.sunken_offering_bowl.name': 'Genopfyldt Offerskål',
+  'entities.items.thick_winter_pelt.name': 'Tykt vinterpels',
+  'entities.items.vigil_star_chart.name': 'Oversat: Vigil Star Chart',
+  'entities.items.voidscar_handwraps.name': 'Voidscar håndomslag',
+  'entities.items.voidsong_dirk.name': 'Oversat: Voidsong, Dirk of the Sundered Veil',
+  'entities.items.voidweave_mantle.name': 'Oversat: Voidweave Mantle',
+  'entities.items.wickspun_treads.name': 'Oversat: Wickspun Treads',
+  'entities.items.widowsilk_skein.name': 'Enkesilkenøste',
+  'entities.items.wildheart_fangknife.name': 'Fangkniv fra Zulgar',
+  'entities.items.wildheart_hexwood_staff.name': 'Oversat: Hexwood Staff of the Basin',
+  'entities.items.wildheart_tuskblade.name': 'Oversat: Wildheart Tuskblade',
+  'entities.items.wisplight_globe.name': 'Oversat: Wisplight Globe',
+  'entities.items.wreck_wardens_mantle.name': 'Vragvagtens kappe',
+  'entities.items.wreckfield_flotsam_crate.name': 'Flotsam-kasse',
+  'entities.items.wyrmwatch_warning_banner.name': 'Wyrmwatch advarselsbanner',
+  'entities.mobs.ancient_guardian.name': 'Gammel vogter',
+  'entities.mobs.apprentice_wren.name': 'Lærling Wren',
+  'entities.mobs.ashbone_raider.name': 'Oversat: Ashbone Raider',
+  'entities.mobs.ashbone_warcaller.name': 'Oversat: Ashbone Warcaller',
+  'entities.mobs.aurelhorn.name': 'Aurelhorn, den første i flokken',
+  'entities.mobs.barrow_king.name': 'Barrow-kongen',
+  'entities.mobs.barrow_wight.name': 'Oversat: Barrow Wight',
+  'entities.mobs.bogtoad.name': 'Oversat: Bogtoad',
+  'entities.mobs.breach_wretch.name': 'Oversat: Breach Wretch',
+  'entities.mobs.canopy_weaver.name': 'Oversat: Canopy Weaver',
+  'entities.mobs.castaway_navigator.name': 'Oversat: Navigator Suli',
+  'entities.mobs.cindraleth_maw_matriarch.name': 'Oversat: Cindraleth the Maw Matriarch',
+  'entities.mobs.corrupted_sporeling.name': 'Korrupt Sporeling',
+  'entities.mobs.downs_bandit.name': 'Oversat: Downs Bandit',
+  'entities.mobs.drowned_deckhand.name': 'Druknet dæksmand',
+  'entities.mobs.drowsy_croaker.name': 'Den døsige kræker',
+  'entities.mobs.dune_troll.name': 'Klittrold',
+  'entities.mobs.duskwisp.name': 'Oversat: Duskwisp',
+  'entities.mobs.emberwing_drake.name': 'Oversat: Emberwing Drake',
+  'entities.mobs.fen_sprite.name': 'Oversat: Fen Sprite',
+  'entities.mobs.fisher_bram.name': 'Fisker Bram',
+  'entities.mobs.frostmane_yeti.name': 'Oversat: Frostmane Yeti',
+  'entities.mobs.gale_wisp.name': 'Oversat: Gale Wisp',
+  'entities.mobs.gilded_stag.name': 'Forgyldt kronhjort',
+  'entities.mobs.gleamstag.name': 'Gleamstag',
+  'entities.mobs.glimmerwisp.name': 'Oversat: Glimmerwisp',
+  'entities.mobs.gloam_fox.name': 'Oversat: Gloam Fox',
+  'entities.mobs.gloam_strider.name': 'Oversat: Gloam Strider',
+  'entities.mobs.gravedigger_mosley.name': 'Graver Mosley',
+  'entities.mobs.gravenbark_shambler.name': 'Oversat: Gravenbark Shambler',
+  'entities.mobs.harvest_sprite.name': 'Høst Sprite',
+  'entities.mobs.hedge_gnome.name': 'Oversat: Hedge Gnome',
+  'entities.mobs.hedge_knight.name': 'Oversat: Dawnhold Knight',
+  'entities.mobs.ice_wisp.name': 'Oversat: Ice Wisp',
+  'entities.mobs.idol_guardian.name': 'Idol Guardian',
+  'entities.mobs.lily_wisp.name': 'Oversat: Lily Wisp',
+  'entities.mobs.mere_lurker.name': 'Blot Lurker',
+  'entities.mobs.moonfleece_grazer.name': 'Oversat: Moonfleece Grazer',
+  'entities.mobs.moor_ram.name': 'Oversat: Moor Ram',
+  'entities.mobs.mushroom_pixie.name': 'Oversat: Gleamfolk Pixie',
+  'entities.mobs.nightkin_stargazer.name': 'Oversat: Nightkin Stargazer',
+  'entities.mobs.old_marrowshell.name': 'Gammel Marrowshell',
+  'entities.mobs.orchard_treant.name': 'Oversat: Orchard Treant',
+  'entities.mobs.pale_huntsman.name': 'Den blege jæger',
+  'entities.mobs.rift_boneclad.name': 'Benklædt kriger',
+  'entities.mobs.rift_bonewalker.name': 'Oversat: Risen Bonewalker',
+  'entities.mobs.rift_boss_arcane.name': 'Oversat: Archon Nyxaris',
+  'entities.mobs.rift_boss_brute.name': 'Krigsherre Grask',
+  'entities.mobs.rift_boss_ember.name': 'Emberforge Tyran',
+  'entities.mobs.rift_boss_frost.name': 'Rimfrostvagt',
+  'entities.mobs.rift_boss_necro.name': 'Oversat: Bonelord Xarreth',
+  'entities.mobs.rift_boss_pitlord.name': 'Azgorath, hulens herre',
+  'entities.mobs.rift_boss_ritualist.name': "Magus Vel'Kor den pagtbundne",
+  'entities.mobs.rift_boss_storm.name': 'Oversat: Tempest Vharok',
+  'entities.mobs.rift_boss_tide.name': 'Oversat: Abyssal Maw',
+  'entities.mobs.rift_boss_venom.name': 'Avlsmor Vysska',
+  'entities.mobs.rift_deep_lurker.name': 'Oversat: Deep Lurker',
+  'entities.mobs.rift_dread_stalker.name': 'Frygtede Stalker',
+  'entities.mobs.rift_ember_fiend.name': 'Ember Djævel',
+  'entities.mobs.rift_frost_revenant.name': 'Oversat: Frostbound Revenant',
+  'entities.mobs.rift_hellguard.name': 'Oversat: Hellguard',
+  'entities.mobs.rift_magma_brute.name': 'Oversat: Magma Brute',
+  'entities.mobs.rift_marrow_troll.name': 'Marvtrold',
+  'entities.mobs.rift_pact_acolyte.name': 'Pagt Acolyte',
+  'entities.mobs.rift_rime_elemental.name': 'Oversat: Rime Elemental',
+  'entities.mobs.rift_spawnling.name': 'Oversat: Rift Spawnling',
+  'entities.mobs.rift_stone_ogre.name': 'Sten Ogre',
+  'entities.mobs.rift_storm_caller.name': 'Stormkalder',
+  'entities.mobs.rift_stormscale.name': 'Oversat: Stormscale Drake',
+  'entities.mobs.rift_thornback.name': 'Oversat: Thornback Stalker',
+  'entities.mobs.rift_tide_thrall.name': 'Tidevandstræls',
+  'entities.mobs.rift_venom_weaver.name': 'Oversat: Venom Weaver',
+  'entities.mobs.rift_void_acolyte.name': 'Oversat: Voidscar Acolyte',
+  'entities.mobs.riftspawn.name': 'Oversat: Riftspawn',
+  'entities.mobs.rime_elemental.name': 'Oversat: Rime Elemental',
+  'entities.mobs.shoal_scuttler.name': 'Oversat: Shoal Scuttler',
+  'entities.mobs.snowdrift_wolf.name': 'Snedriveulv',
+  'entities.mobs.sporeling_gatherer.name': 'Sporeling Samler',
+  'entities.mobs.sundered_horror.name': 'Oversat: The Sundered Horror',
+  'entities.mobs.terrace_howler.name': 'Terrasse brøler',
+  'entities.mobs.the_meredark.name': 'Meredark',
+  'entities.mobs.the_topiary_bull.name': 'Topiary Bull',
+  'entities.mobs.the_wreck_warden.name': 'Vragvagten',
+  'entities.mobs.thicket_boar.name': 'Kratsvin',
+  'entities.mobs.tide_scuttler.name': 'Oversat: Tide Scuttler',
+  'entities.mobs.topiary_stag.name': 'Oversat: Topiary Stag',
+  'entities.mobs.topiary_wolf.name': 'Oversat: Topiary Wolf',
+  'entities.mobs.treant_elder.name': 'Treant Ældste',
+  'entities.mobs.veiled_doe.name': 'Tilsløret Doe',
+  'entities.mobs.veiled_stag.name': 'Tilsløret kronhjort',
+  'entities.mobs.void_stalker.name': 'Oversat: Void Stalker',
+  'entities.mobs.waking_warden.name': 'Den vågne vagtchef',
+  'entities.mobs.widowsilk_spinner.name': 'Oversat: Widowsilk Spinner',
+  'entities.mobs.wildheart_beastmaster.name': 'Oversat: Fanglord Beastmaster',
+  'entities.mobs.wildheart_hexcaller.name': 'Oversat: Sunbone Hexcaller',
+  'entities.mobs.wildheart_high_priest.name': 'Zulgar, Bassinets stemme',
+  'entities.mobs.wildheart_ravager.name': 'Oversat: Bloodmane Ravager',
+  'entities.mobs.wildheart_stalker.name': 'Oversat: Vineclaw Stalker',
+  'entities.mobs.willow_sprite.name': 'Oversat: Willow Sprite',
+  'entities.mobs.wood_wraith.name': 'Oversat: Wood Wraith',
+  'entities.mobs.wreck_thief.name': 'Oversat: Wreckfield Thief',
+  'entities.npcs.archivist_tullo.greeting':
+    'Monumenterne derude har ikke talt til nogen i en tid. Måske ventede de på friske ører.',
+  'entities.npcs.archivist_tullo.name': 'Arkivar Tullo',
+  'entities.npcs.archivist_tullo.title': 'Læser af Stones',
+  'entities.npcs.astronomer_cassian.greeting':
+    'Stil nu op. Himlen går aldrig op her, så den holder heller aldrig op med at tale.',
+  'entities.npcs.astronomer_cassian.name': 'Astronom Cassian',
+  'entities.npcs.astronomer_cassian.title': 'Overvåger ved vagten',
+  'entities.npcs.aurorist_veyla.greeting': 'Hys. Lysene taler i aften, og de gentager sig ikke.',
+  'entities.npcs.aurorist_veyla.name': 'Oversat: Aurorist Veyla',
+  'entities.npcs.aurorist_veyla.title': 'Læser af lysene',
+  'entities.npcs.bellkeeper_tam.greeting':
+    'Klokken er den eneste advarsel, pauserne giver os, {className}. En vejafgift for markerne, to for klipperne, tre, når det er tæt nok på, at løb ikke hjælper. Hold øje med det, og det kan holde dig hel.',
+  'entities.npcs.bellkeeper_tam.name': 'Klokkeren Tam',
+  'entities.npcs.bellkeeper_tam.title': 'Oversat: Watchbell Keeper',
+  'entities.npcs.bridgewright_alden.greeting':
+    'Hver planke i denne by er min at beholde, og fenerne tygger på dem alle.',
+  'entities.npcs.bridgewright_alden.name': 'Oversat: Bridgewright Alden',
+  'entities.npcs.bridgewright_alden.title': 'Mester af Fenway',
+  'entities.npcs.ferrymaster_caddow.greeting':
+    'Tågen er på Mere igen. Når lanternerne går ud på vandet, bliver kloge folk i land.',
+  'entities.npcs.ferrymaster_caddow.name': 'Færgemester Caddow',
+  'entities.npcs.ferrymaster_caddow.title': 'Keeper af Lantern Ferries',
+  'entities.npcs.fisher_nell.greeting':
+    'Den åbnede lige der, hvor nettene tørrer. Lige der, hvor jeg stod hver morgen i mit liv. Jeg går ikke længere ned til kysten. Jeg går ikke meget af nogen steder længere.',
+  'entities.npcs.fisher_nell.name': 'Skræmt Nell',
+  'entities.npcs.fisher_nell.title': 'Oversat: Gullhaven Fisher',
+  'entities.npcs.gardener_yew.greeting':
+    'Giv mig den bøs, ville du? Disse græsplæner går ikke selv, hvad end landsbyen synes.',
+  'entities.npcs.gardener_yew.name': 'Gartner Taks',
+  'entities.npcs.gardener_yew.title': 'Den sidste gartner',
+  'entities.npcs.gatecaptain_brannoc.greeting':
+    'Wyrmwatch holder porten. Har holdt det fyrre år. Det vil holde det i aften.',
+  'entities.npcs.gatecaptain_brannoc.name': 'Portkaptajn Brannoc',
+  'entities.npcs.gatecaptain_brannoc.title': 'Kommandør for Wyrmwatch',
+  'entities.npcs.gatewarden_pell.greeting':
+    'Pas på, hvordan du går på græsplænerne. Haven holder dem trimmet, og den kan godt lide dem ryddelige.',
+  'entities.npcs.gatewarden_pell.name': 'Portvært Pell',
+  'entities.npcs.gatewarden_pell.title': 'Haveportens vogter',
+  'entities.npcs.harbormaster_odile.greeting':
+    'Hver båd i denne bugt skylder det gamle fyrtårn sin køl. Tal hurtigt, tidevandet vil ikke vente.',
+  'entities.npcs.harbormaster_odile.name': 'Havnefoged Odile',
+  'entities.npcs.harbormaster_odile.title': 'Havnemester i Wickharbor',
+  'entities.npcs.head_gardener_amaranth.greeting':
+    'Tag ikke imod skyggerne under mine øjne. Nogen skal holde sig vågen, mens haven drømmer.',
+  'entities.npcs.head_gardener_amaranth.name': 'Overgartner Amaranth',
+  'entities.npcs.head_gardener_amaranth.title': 'Hovedgartner i Evergarden',
+  'entities.npcs.hearthkeeper_maeve.greeting':
+    'Kom ind fra kulden. Logebålet slukker aldrig, så længe jeg trækker vejret.',
+  'entities.npcs.hearthkeeper_maeve.name': 'Arnevogter Maeve',
+  'entities.npcs.hearthkeeper_maeve.title': 'Vogter af Hearth-Lodge',
+  'entities.npcs.hermit_okku.greeting':
+    'Stille nu. Tromlerne tæller alt, hvad der går under træerne, og de har allerede talt dig.',
+  'entities.npcs.hermit_okku.name': 'Oversat: Okku',
+  'entities.npcs.hermit_okku.title': 'Manden der gik ind',
+  'entities.npcs.huntsman_deral.greeting':
+    'Stille nu. Flokken kender hver eneste lyd denne dal giver, og det gør jeg også.',
+  'entities.npcs.huntsman_deral.name': 'Oversat: Huntsman Deral',
+  'entities.npcs.huntsman_deral.title': 'Vagtmester for Besætningerne',
+  'entities.npcs.keeper_bram.greeting':
+    'Ni og tredive år har denne lampe brændt på mit ur. Det bliver ikke mørkt på din.',
+  'entities.npcs.keeper_bram.name': 'Oversat: Keeper Bram',
+  'entities.npcs.keeper_bram.title': 'Vogter af det gamle fyrtårn',
+  'entities.npcs.keeper_saelwyn.greeting':
+    'Få af din slags har stået under disse grene, {className}. Gå blidt, og vær velkommen.',
+  'entities.npcs.keeper_saelwyn.name': 'Oversat: Keeper Saelwyn',
+  'entities.npcs.keeper_saelwyn.title': 'Oversat: Keeper of the Hollow',
+  'entities.npcs.lamplighter_sorrel.greeting':
+    'Pas på lamperne, ven. Forbi denne port giver solen op, og blomsterne tager over.',
+  'entities.npcs.lamplighter_sorrel.name': 'Lampetændersyre',
+  'entities.npcs.lamplighter_sorrel.title': 'Oversat: Keeper of the Nightgate',
+  'entities.npcs.lampman_cobb.greeting':
+    'Bliv i lampelyset, ven. Skoven tæller alle, der passerer porten.',
+  'entities.npcs.lampman_cobb.name': 'Oversat: Lampman Cobb',
+  'entities.npcs.lampman_cobb.title': 'Keeper af Crowgate Lanterne',
+  'entities.npcs.lira_dewsong.greeting':
+    'Velkommen til Moonrest, hvor blomsterne gør vores daggry for os.',
+  'entities.npcs.lira_dewsong.name': 'Oversat: Lira Dewsong',
+  'entities.npcs.lira_dewsong.title': 'Oversat: Night-Gardener of Moonrest',
+  'entities.npcs.loremother_bryn.greeting':
+    'Hvert lys i denne dal husker noget, {playerName}. Hjælp mig med at lytte.',
+  'entities.npcs.loremother_bryn.name': 'Loremoder Bryn',
+  'entities.npcs.loremother_bryn.title': 'Helligdommens stemme',
+  'entities.npcs.mender_saul.greeting':
+    'Jeg har sat flere knogler denne ene måned end i ti år med at reparere fiskefald. Pauserne efterlader ikke meget af det, de tager. Kom hel tilbage til mig, hvis du kan klare det.',
+  'entities.npcs.mender_saul.name': 'Oversat: Mender Saul',
+  'entities.npcs.mender_saul.title': 'Feltkirurg',
+  'entities.npcs.mother_sedge.greeting':
+    'Pilene fortalte mig, at du kom, før dine støvler forlod broen.',
+  'entities.npcs.mother_sedge.name': 'Mor Sedge',
+  'entities.npcs.mother_sedge.title': 'Fen-Heks af Pileweep',
+  'entities.npcs.netter_maris.greeting':
+    'Lugte det? Røget ål. Halvdelen af ​​denne by står på pæle, jeg købte med den.',
+  'entities.npcs.netter_maris.name': 'Oversat: Netter Maris',
+  'entities.npcs.netter_maris.title': 'Åle-Netter af Bridgemere',
+  'entities.npcs.orchardist_pomeline.greeting':
+    'Pas på, hvor du træder. Hver rod i disse rækker er ældre end byen, og de husker det.',
+  'entities.npcs.orchardist_pomeline.name': 'Oversat: Orchardist Pomeline',
+  'entities.npcs.orchardist_pomeline.title': 'Oversat: Keeper of the Gilded Rows',
+  'entities.npcs.pearlmother_isha.greeting':
+    'Havet giver, sandet holder, og junglen tager. Bliv på stranden, fremmed.',
+  'entities.npcs.pearlmother_isha.name': 'Perle-Moder Isha',
+  'entities.npcs.pearlmother_isha.title': 'Dykkernes ældste',
+  'entities.npcs.provisioner_fenna.greeting':
+    'Brød stadig varmt, vand stadig sødt. The Hollow giver, og det gør jeg også.',
+  'entities.npcs.provisioner_fenna.name': 'Forsørger Fenna',
+  'entities.npcs.provisioner_fenna.title': 'Oversat: Eldergleam Provisioner',
+  'entities.npcs.quartermaster_edda.greeting':
+    'Stål og salt, {className}, det er alt, jeg har tilbage at dele ud. Tag den og få pauserne til at fortryde, at de åbnede, hvor jeg kunne nå dem.',
+  'entities.npcs.quartermaster_edda.name': 'Kvartermester Edda',
+  'entities.npcs.quartermaster_edda.title': 'Oversat: Redoubt Armorer',
+  'entities.npcs.quartermaster_sela.greeting':
+    'Hver kasse i denne gård krydsede 40 miles af aske for at komme hertil. Behandl dem venligt.',
+  'entities.npcs.quartermaster_sela.name': 'Kvartermester Sela',
+  'entities.npcs.quartermaster_sela.title': 'Keeper af Garnison Stores',
+  'entities.npcs.reeve_ottoline.greeting':
+    'Velkommen til Lanternmere, hvor høsten aldrig slutter og heller ikke arbejdet.',
+  'entities.npcs.reeve_ottoline.name': 'Oversat: Reeve Ottoline',
+  'entities.npcs.reeve_ottoline.title': 'Reeve af Lanternmere',
+  'entities.npcs.riftwatch_ollun.greeting':
+    'Hver pause synger før den åbner, hvis man har øret til det. Jeg kan høre tre af dem røre på øen lige nu, og en af ​​dem er tæt på.',
+  'entities.npcs.riftwatch_ollun.name': 'Oversat: Riftwatch Ollun',
+  'entities.npcs.riftwatch_ollun.title': 'Oversat: Breach Scholar',
+  'entities.npcs.salvage_boss_ryna.greeting':
+    'En {className} med arbejdende arme, godt. Vraglinjen betaler godt, hvis krabberne giver dig fingre nok til at tælle det.',
+  'entities.npcs.salvage_boss_ryna.name': 'Bjærgning-Boss Ryna',
+  'entities.npcs.salvage_boss_ryna.title': 'Oversat: Mistress of the Wreck Line',
+  'entities.npcs.salvager_edda.greeting':
+    'Vragtræ, reb og døde mænds last. Havet betaler min løn, når vagten lader det.',
+  'entities.npcs.salvager_edda.name': 'Bjærgning Edda',
+  'entities.npcs.salvager_edda.title': 'Wreckfield Bjærgning',
+  'entities.npcs.scout_einna.greeting':
+    'Du gik gennem passet i live. God. Icemantle burde høre om det.',
+  'entities.npcs.scout_einna.name': 'Spejder Einna',
+  'entities.npcs.scout_einna.title': 'Snowline spejder',
+  'entities.npcs.scout_yerrin.greeting':
+    'Hold lavt. Lyden kommer mærkeligt af glasset, og lågen nedenunder har ører.',
+  'entities.npcs.scout_yerrin.name': 'Spejder Yerrin',
+  'entities.npcs.scout_yerrin.title': 'Oversat: Far-Dune Watcher',
+  'entities.npcs.sexton_marrow.greeting':
+    'Vi begraver dem dybt her, og vi ringer med klokkerne, så de husker at blive nede.',
+  'entities.npcs.sexton_marrow.name': 'Oversat: Sexton Marrow',
+  'entities.npcs.sexton_marrow.title': 'Sexton af Gallowmere',
+  'entities.npcs.strandwatcher_pell.greeting':
+    'Endelig ud af de sorte træer. Træk vejret, fremmede, solen holder denne side af passet.',
+  'entities.npcs.strandwatcher_pell.name': 'Oversat: Strandwatcher Pell',
+  'entities.npcs.strandwatcher_pell.title': 'Oversat: Watcher of the Tanglemouth',
+  'entities.npcs.trapper_brosk.greeting':
+    'Fen tog tre af mine linjer i denne uge. Fen tog aldrig en linje i tyve år.',
+  'entities.npcs.trapper_brosk.name': 'Oversat: Trapper Brosk',
+  'entities.npcs.trapper_brosk.title': 'Oversat: Shiverfen Trapper',
+  'entities.npcs.vicar_creel.greeting':
+    'Kapellet faldt for år tilbage. De døde under den lagde ikke mærke til det, og derfor blev jeg.',
+  'entities.npcs.vicar_creel.name': 'Vikar Creel',
+  'entities.npcs.vicar_creel.title': 'Sidste vikar for sørgestenen',
+  'entities.npcs.warden_coalfast.greeting':
+    'Pauserne er ligeglade med, at Gullhaven er lille, {className}. Vi holder denne kyst, ellers er der ingen kyst tilbage at holde. Bliv med os, og jeg vil ikke glemme det.',
+  'entities.npcs.warden_coalfast.name': 'Vagtmester Coalfast',
+  'entities.npcs.warden_coalfast.title': 'Oversat: Redoubt Commander',
+  'entities.npcs.warden_kaldra.greeting':
+    'Pas på bænkene, fremmed. Sneen holder, hvad der skal til.',
+  'entities.npcs.warden_kaldra.name': 'Vagtmester Kaldra',
+  'entities.npcs.warden_kaldra.title': 'Oversat: Warden of Icemantle',
+  'entities.npcs.wardsmith_orun.greeting':
+    'Disse smedjer blev afkølet for århundreder siden, {className}, men deres arbejde har stadig en kant.',
+  'entities.npcs.wardsmith_orun.name': 'Afdelingssmed Orun',
+  'entities.npcs.wardsmith_orun.title': 'Vogter af de gamle Smedjer',
+  'entities.npcs.watcher_maren.greeting':
+    'Pas på dit fodfæste forbi porten. Vinden heroppe tager hatten først og spørgsmål aldrig.',
+  'entities.npcs.watcher_maren.name': 'Oversat: Watcher Maren',
+  'entities.npcs.watcher_maren.title': 'Windway Watch',
+  'entities.npcs.waykeeper_pell.greeting':
+    'Ned ad trappen og ind i det bløde land. Husk, hvor du planter dine støvler.',
+  'entities.npcs.waykeeper_pell.name': 'Oversat: Waykeeper Pell',
+  'entities.npcs.waykeeper_pell.title': 'Vogter af Amberfen-trappen',
+  'entities.npcs.waywatcher_sorrel.greeting':
+    'Sne bag dig, guld foran. Få går Goldmelt to gange, så lad krydset tælle.',
+  'entities.npcs.waywatcher_sorrel.name': 'Oversat: Waywatcher Sorrel',
+  'entities.npcs.waywatcher_sorrel.title': 'Oversat: Watcher of the Goldmelt',
+  'entities.npcs.weaver_amelle.greeting':
+    'Føler du det? Moonfleece på væven. Varmere end nogen ild, du har siddet ved siden af.',
+  'entities.npcs.weaver_amelle.name': 'Væver Amelle',
+  'entities.npcs.weaver_amelle.title': 'Oversat: Moonfleece Weaver',
+  'entities.npcs.wickmother_sorrel.greeting':
+    'Kom ind, sæt dig, der er hjerteligt på bålet. Bare hold hånden på alt jern: nisserne er lette fingre for sent.',
+  'entities.npcs.wickmother_sorrel.name': 'Oversat: Wickmother Sorrel',
+  'entities.npcs.wickmother_sorrel.title': 'Keeper af Hedgewick Inn',
+  'entities.npcs.widow_tansy.greeting':
+    'A candle for every grave, and not one may go out. Ikke én, hører du mig?',
+  'entities.npcs.widow_tansy.name': 'Enke Tansy',
+  'entities.npcs.widow_tansy.title': 'Candlewright af Gallowmere',
+  'entities.quests.q_af_amber_from_the_herd.completion':
+    'Seks blodpropper, rene som hældt honning. Disse handsker er syet med den sidste batch, {playerName}: saftstivnede og varmere, end de ser ud.',
+  'entities.quests.q_af_amber_from_the_herd.objectives.0.label': 'Forgyldt saftklump',
+  'entities.quests.q_af_amber_from_the_herd.text':
+    'De forgyldte hjorte ligger nede under mine ældste træer, og saften drypper guld i deres frakker hele natten. Kæmmede koagler af det er det reneste rav i bjerget. Bring mig seks, {playerName}. Hjortene vil ikke takke dig, men de vil heller ikke savne det.',
+  'entities.quests.q_af_amber_from_the_herd.title': 'Rav fra flokken',
+  'entities.quests.q_af_foxes_in_the_lamplight.completion':
+    'Ti, og butikkerne gik urørt i aftes for første gang i denne sæson. Lampetænderne sender deres tak, {playerName}.',
+  'entities.quests.q_af_foxes_in_the_lamplight.objectives.0.label': 'Gloam Fox dræbt',
+  'entities.quests.q_af_foxes_in_the_lamplight.text':
+    'Gloam-rævene har lært, hvad lanternebutikkerne er værd, {playerName}. Hver skumringstid smider de hegnet og bærer den talg af, vi presser for færgelamperne. Bløde poter, blødere samvittighed. Slå ti af dem ned, og resten vil huske at frygte byen.',
+  'entities.quests.q_af_foxes_in_the_lamplight.title': 'Ræve i Lampelyset',
+  'entities.quests.q_af_goldmelt_road.completion':
+    'Stille på Goldmelt, og en rejsende med sne i håret for at bevise det. Sorrel holder sit ur for godt til at sende et tomt ord. Vær velkommen i Lanternmere, {playerName}. Lygterne brænder for dig.',
+  'entities.quests.q_af_goldmelt_road.objectives.0.label': 'Rapport til Reeve Ottoline',
+  'entities.quests.q_af_goldmelt_road.text':
+    'Du kom over Goldmelt, {playerName}, stadig sne på dine støvler. Jeg beholder denne helligdom, så Lanternmere ved, hvem der kommer ind fra kulden, og på det seneste har jeg haft lidt at berette. Tag guldvejen ned til byen, find Reeve Ottoline ved brønden, og fortæl hende, at passet er stille.',
+  'entities.quests.q_af_goldmelt_road.title': 'Guldvejen ned',
+  'entities.quests.q_af_lanterns_on_the_water.completion':
+    'Alle tre, og stadig brændende. Færgelanterner går ikke ud i vandet, {playerName}. Det er meningen med dem. Det, der bekymrer mig, er, hvad der har trukket dem løs.',
+  'entities.quests.q_af_lanterns_on_the_water.objectives.0.label': 'Færgelygten er kommet sig',
+  'entities.quests.q_af_lanterns_on_the_water.text':
+    'Hver færge på Mere har en hæklanterne, {playerName}, og tre af mine både kom tilbage ved daggry uden deres. Tågen tog dem, eller noget i tågen gjorde. De skyller op langs østkysten, når vinden vender. Gå langs kystvejen og tag mine lanterner med hjem.',
+  'entities.quests.q_af_lanterns_on_the_water.title': 'Lanterne på vandet',
+  'entities.quests.q_af_orchard_call.completion':
+    'Reeve tæller sine vogne, gør hun? Nå, hun kan tælle, at de mangler et stykke tid endnu. Se på mine rækker, {playerName}. Jeg har større problemer end en sen levering.',
+  'entities.quests.q_af_orchard_call.objectives.0.label': 'Oversat: Find Orchardist Pomeline',
+  'entities.quests.q_af_orchard_call.text':
+    'Orchardist Pomeline holder den forgyldte frugtplantage på vestvejen, og hendes saftvogne er tre dage forsinket. Hele byen kører på den ravsaft, {playerName}: lampeharpiks, sødemiddel, høstølet. Gå vestvejen og find ud af, hvad der holder hende.',
+  'entities.quests.q_af_orchard_call.title': 'En vogn til frugthaven',
+  'entities.quests.q_af_sprites_and_spigots.completion':
+    'Fire spande tilbage på krogene og rækkerne blev stille. Du har en tungere hånd med sprites end jeg har, {playerName}, og i dag er jeg glad for det.',
+  'entities.quests.q_af_sprites_and_spigots.objectives.0.label': 'Harvest Sprite kørt af',
+  'entities.quests.q_af_sprites_and_spigots.objectives.1.label': 'Sap-Tap Bucket gendannet',
+  'entities.quests.q_af_sprites_and_spigots.text':
+    'Harvest sprites, {playerName}. De lirker mine safthaner fra stammerne for sødmen indeni og kaster spandene i græsset. Kør otte af de små tyve væk og bring fire af mine spande tilbage, og vognene ruller igen.',
+  'entities.quests.q_af_sprites_and_spigots.title': 'Sprites og Spigots',
+  'entities.quests.q_af_the_meredark.completion':
+    'Tågen lettede fra Mere i morges, {playerName}, og hele byen så det. Færgerne vil køre natoverfarten igen, og hver lanterne på vandet vil brænde i dit navn. Tag dette: det blev udgravet fra den druknede mole, og ingen har bedre ret til at bære det.',
+  'entities.quests.q_af_the_meredark.objectives.0.label': 'Meredark dræbt',
+  'entities.quests.q_af_the_meredark.text':
+    'De gamle færgemænd har et navn, de kun siger i land: Meredark, den første lurer, gammel som søen og dobbelt så tålmodig. Den rejste sig en gang før, det år, hvor den druknede mole gik under, og den rejser sig nu. I skumringen soler den sig på moleruinen ud for sydkysten, {playerName}. Tag en ven, tag to, og afslut det, mens det stadig kan afsluttes.',
+  'entities.quests.q_af_the_meredark.title': 'Meredark',
+  'entities.quests.q_af_what_took_the_moorings.completion':
+    'Otte færre former i lavvandet, og overfarten kørte til tiden i dag for første gang i fjorten dage. Men dristige lurkere er drevne lurkere, {playerName}. Noget under Mere bevæger dem.',
+  'entities.quests.q_af_what_took_the_moorings.objectives.0.label': 'Blot Lurker dræbt',
+  'entities.quests.q_af_what_took_the_moorings.text':
+    'Nu vil jeg fortælle dig, hvad jeg ikke sagde foran byen. Fortøjningerne var ikke skredet, de blev bidt igennem. Blot lure, dristigere hver nat, trækker i rebene og rorene. Sæt otte af dem tilbage under vandet for altid, {playerName}, før en færgemand tager med dem.',
+  'entities.quests.q_af_what_took_the_moorings.title': 'Hvad tog fortøjningerne',
+  'entities.quests.q_calming_the_deep.completion':
+    'Du gjorde, hvad jeg ikke kunne holde ud. Samlerne synger endnu i sydringene; på grund af dig vil de blive ved med at synge.',
+  'entities.quests.q_calming_the_deep.objectives.0.label': 'Korrumperet Sporeling stedt til hvile',
+  'entities.quests.q_calming_the_deep.text':
+    'Sporelingerne i det skinnende dyb var blide folk, før tåren rørte ved deres ringe. Hvad korruptionen tager, giver den ikke tilbage. Giv de korrupte hvile, {playerName}: ti af dem, i den nordlige del af Dybet.',
+  'entities.quests.q_calming_the_deep.title': 'beroliger dybet',
+  'entities.quests.q_dk_ash_on_the_wind.completion':
+    'Ti færre vinger i klitterne, og mønstringsbålene brændte lavere i nat. Mine vagtposter sov, hvilket de ikke har gjort i en uge. Godt skåret, {playerName}.',
+  'entities.quests.q_dk_ash_on_the_wind.objectives.0.label': 'Ashbone Raider dræbt',
+  'entities.quests.q_dk_ash_on_the_wind.text':
+    'Kig mod syd fra palisaden, {playerName}. De bål i klitterne er ikke troldebål, de er askebensmønstringer, og hver aften er der flere. De døde kommer op af knoglemarkerne med sand stadig i tænderne. Fæld ti raiders ned, før de skærer en vej til min port.',
+  'entities.quests.q_dk_ash_on_the_wind.title': 'Ask på vinden',
+  'entities.quests.q_dk_banners_over_the_dunes.completion':
+    'Tre bannere, der knækker i den varme vind, lige hvor mit glas kan finde dem. Med fem krigskaldere stillet til tavshed, vil uanset hvad deres opkald besvares, komme langsommere. Du købte tid til os, {playerName}.',
+  'entities.quests.q_dk_banners_over_the_dunes.objectives.0.label': 'Ashbone Warcaller dræbt',
+  'entities.quests.q_dk_banners_over_the_dunes.objectives.1.label': 'Advarselsbanner plantet',
+  'entities.quests.q_dk_banners_over_the_dunes.text':
+    'Askebensmønstringen ved de gamle knoglemarksgrave, {playerName}, og mine patruljer kan ikke læse klitterne, som de læser en mur. Dræb fem af deres krigskaldere, dem der skriger de døde oprejst, og plant et advarselsbanner på hver mønstringsplads, så mine vagtposter kan markere det fra højdedraget.',
+  'entities.quests.q_dk_banners_over_the_dunes.title': 'Bannere over klitterne',
+  'entities.quests.q_dk_marrow_and_ash.completion':
+    'Seks mærker, og et mærke brændte ind i hver enkelt af dem. Dette er ingen raid-samling, {playerName}. Enhver vært i klitterne svarer til krigsporten under os, troldene kalder den Orkadia, og ingen fem soldater, jeg nogensinde har tjent sammen med, kunne bryde de trommer bag den dør. Måske fem kan lide dig.',
+  'entities.quests.q_dk_marrow_and_ash.objectives.0.label': 'Ashbone War-Mærke',
+  'entities.quests.q_dk_marrow_and_ash.text':
+    'Hver ashbone raider bærer et krigsmærke, {playerName}: en forbrændt opgørelse af værten, den marcherer under. Jeg har talt fire værter fra denne højderyg, men gæt er ikke intelligens. Bring mig seks mærker væk fra raiders og deres krigskaldere, og jeg vil give Brannoc formen på den krig, der kommer.',
+  'entities.quests.q_dk_marrow_and_ash.title': 'Marv og Ask',
+  'entities.quests.q_dk_matriarch_of_the_maw.completion':
+    'Himlen over Drakemaw har været tom i to dage, og nu går du gennem min port med en matriarks blod på dine støvler. Wyrmwatch har stået fyrre år på vagt for netop dette, {playerName}. Tag disse pauldrons, mawscale, lavet af vores egen smed. Bær dem, hvor drakes kan se.',
+  'entities.quests.q_dk_matriarch_of_the_maw.objectives.0.label':
+    'Cindraleth, Maw-matriarken, blev dræbt',
+  'entities.quests.q_dk_matriarch_of_the_maw.text':
+    'Vægten fortalte det sandt, {playerName}. Jeg klatrede op på randen ved daggry og så hende på kraterbunden: Cindraleth, matriarken, hver emberwing på denne himmel var udklækket under, guld som et kul ved at fange. Mens hun ruger, bliver drakes dristigere, og Wyrmwatch kan ikke bekæmpe både drager og askebenet. Slut hende i hendes krater, og bær så ordet til gatekaptajn Brannoc. Gå ikke alene.',
+  'entities.quests.q_dk_matriarch_of_the_maw.title': 'Matriark af Maw',
+  'entities.quests.q_dk_scales_of_the_maw.completion':
+    'Se på undersiden af ​​denne, {playerName}: svedet i en spiral, og kun én ting lægger sig i cirkler. Disse drakes er yngel-vagter. Noget i Drakemaw er en mor.',
+  'entities.quests.q_dk_scales_of_the_maw.objectives.0.label': 'Oversat: Emberwing Scale',
+  'entities.quests.q_dk_scales_of_the_maw.text':
+    'Når vinden slukker for Drakemaw, rider glødende drakes den over min lejr lavt nok til at tælle deres tænder, {playerName}. De rækker længere hver dag, og noget i det krater driver dem. Bring mig tre af deres vægte. Skæl husker varme, og jeg kan læse, hvor en drake har ligget ved forbrændingen.',
+  'entities.quests.q_dk_scales_of_the_maw.title': 'Maws skalaer',
+  'entities.quests.q_dk_scorched_stores.completion':
+    'Sviddet sort og hver lås holder stadig. Smeden får sine negle, fletcheren hendes snore, og du får de støvler, jeg sparede til den, der bragte mine kasser tilbage, {playerName}.',
+  'entities.quests.q_dk_scorched_stores.objectives.0.label': 'Forbrændt forsyningskasse genvundet',
+  'entities.quests.q_dk_scorched_stores.text':
+    'Den sidste vogn brændte, {playerName}, men kasser med jernbånd brænder ikke igennem. Fire af dem ligger stadig svedne langs klittervejen med en sæson af salt, søm og buestrenge indeni. Tag mine butikker med hjem, før troldene finder ud af, hvordan de skal åbne dem.',
+  'entities.quests.q_dk_scorched_stores.title': 'Forbrændte butikker',
+  'entities.quests.q_dk_trolls_on_the_road.completion':
+    'Otte, og mine chauffører er holdt op med at skrive afskedsbreve før hver løbetur. Garnisonen spiser på grund af dig, {playerName}.',
+  'entities.quests.q_dk_trolls_on_the_road.objectives.0.label': 'Klittrold dræbt',
+  'entities.quests.q_dk_trolls_on_the_road.text':
+    'Klittroldene har lært lyden af ​​en forsyningsvogn, {playerName}. De kørte på Cinder Dunes-vejen tre gange i denne måned, og den sidste chauffør kom ind med kun tøjlerne. Otte trolde af den vej og mine vogne ruller igen.',
+  'entities.quests.q_dk_trolls_on_the_road.title': 'Trolde på vejen',
+  'entities.quests.q_dk_watcher_at_the_wargate.completion':
+    'Har Brannoc sendt dig? Så nåede min sidste løber det aldrig. Hold din stemme nede, og sæt dig ned, {playerName}. Ser du den port nedenfor? Tæl krigsbannerne foran den, og du vil forstå, hvorfor jeg holdt op med at skrive tingene ned.',
+  'entities.quests.q_dk_watcher_at_the_wargate.objectives.0.label': 'Find spejder Yerrin',
+  'entities.quests.q_dk_watcher_at_the_wargate.text':
+    'Noget trækker askebenet mod øst, {playerName}, og jeg sendte mit bedste for at lære hvad. Spejder Yerrin har slået lejr en måned i de fjerne klitter forbi Trollmoot, i syne af en port, ingen har bygget i min levetid. Hendes rapporter stoppede for ti dage siden. Find hendes lejr og giv mig hendes øjne.',
+  'entities.quests.q_dk_watcher_at_the_wargate.title': 'Oversat: The Watcher at the Wargate',
+  'entities.quests.q_eg_bloom_clippings.completion':
+    'Se her: bladene krøller ind i sig selv, hver klipning er den samme. Haven er bange, {playerName}. I hundrede år har jeg aldrig kendt det bange.',
+  'entities.quests.q_eg_bloom_clippings.objectives.0.label': 'Beskåret blomst',
+  'entities.quests.q_eg_bloom_clippings.text':
+    'Vil du forstå denne have? Så læs det som jeg gør. Hjortene, der græsser plænerne, bliver de mest grønne: hvert blad på dem er en side. Bring mig seks friske udklip fra topiary-hjortene, {playerName}. De vil ikke takke dig for beskæringen, men de vil vokse igen. Alt her vokser igen.',
+  'entities.quests.q_eg_bloom_clippings.title': 'Udklip fra Living Green',
+  'entities.quests.q_eg_bull_of_the_court.completion':
+    'Jeg mærkede det her, da han gik fra hinanden. Hundrede års arbejde, og du gjorde ret i at afslutte det. Tag denne kappe: Jeg skar den for den, der viste sig stærkere end mit bedste. Banen er kun et springvand i aften, {playerName}, og haven er kun en have. Måske kan gartnermesteren og jeg begge sove.',
+  'entities.quests.q_eg_bull_of_the_court.objectives.0.label': 'Topiary Tyren ulavet',
+  'entities.quests.q_eg_bull_of_the_court.text':
+    'Nu sandheden, {playerName}. Tyren i hjertet af labyrinten var mit mesterværk: Jeg formede ham til at vogte Fountain Court, og det gjorde han i hundrede år. Men frygten i det grønne har nået ham, og han vogter ingenting nu, han jager. Labyrinten fodrer ham, hvem der vandrer i. Jeg er for gammel til at lave ham, og det må være uskabt, rod og gren. Tag en ven med, gå i labyrinten til banen, og hug min tyr ned.',
+  'entities.quests.q_eg_bull_of_the_court.title': 'Oversat: The Bull of the Fountain Court',
+  'entities.quests.q_eg_four_statues.completion':
+    'Fire gnidninger, fire søstre og ikke én af dem græd marmor. Haven har taget dit mål, {playerName}, og den fandt dig ikke lyst. Nu kan jeg sende dig, hvor problemerne virkelig bor.',
+  'entities.quests.q_eg_four_statues.objectives.0.label': 'Havestatue besøgt',
+  'entities.quests.q_eg_four_statues.text':
+    'Da haven var ung, rejste de første gartnere fire marmorsøstre for at se dens kvarterer: en over Rose Wilds, en på dammens gang øst for labyrinten, en på den vestlige græsplæne, hvor nisserne holder deres warren, og en på den sydlige græsplæne forbi hækkene. Labyrinten voksede op mellem dem, og de fleste ser aldrig alle fire. Gå i kvarteret, {playerName}, og tryk din håndflade mod hver søster. Når haven har set dig over fra alle fire sider, vil den åbne steder, den holder for fremmede.',
+  'entities.quests.q_eg_four_statues.title': 'De fire stille søstre',
+  'entities.quests.q_eg_gate_report.completion':
+    'Bevægede sig, gjorde de. Pell rapporterer, at hver uge og hver uge har han ret. Tilgiv mine øjne, {playerName}, jeg har ikke sovet en hel nat i årevis: nogen skal se haven holde øje med os. Velkommen til Hedgewick.',
+  'entities.quests.q_eg_gate_report.objectives.0.label': 'Rapport til overgartner Amaranth',
+  'entities.quests.q_eg_gate_report.text':
+    'Plænerne forbi denne port har trimmet sig selv i hundrede år, {playerName}, og på det seneste er de begyndt at trimme besøgende. Chefgartner Amaranth fører bøgerne i Hedgewick, oppe ad vejen forbi portens græsplæner. Fortæl hende, at en anden rejsende er kommet igennem, og fortæl hende, at hækkene ved porten flyttede i nat.',
+  'entities.quests.q_eg_gate_report.title': 'Ord gennem porten',
+  'entities.quests.q_eg_gnomes_in_the_green.completion':
+    'Tre vogne tilbage og pløkkene fulde igen. Lad de små djævle surmule i deres hække: Hedgewick arbejder også på disse græsplæner.',
+  'entities.quests.q_eg_gnomes_in_the_green.objectives.0.label': 'Hedge Gnome kørt af',
+  'entities.quests.q_eg_gnomes_in_the_green.objectives.1.label': 'Værktøjsvogn gendannet',
+  'entities.quests.q_eg_gnomes_in_the_green.text':
+    'Saksen var kun begyndelsen, {playerName}. I går aftes væltede nisserne vores redskabsvogne ud i det grønne, en ude ved deres warren vest for labyrinten, en ren på tværs af haven på damvandringen og spredte hundrede år med godt jern i græsset. Kør otte af de små djævle væk og slæb de spildte vogne hjem.',
+  'entities.quests.q_eg_gnomes_in_the_green.title': 'Oversat: The Groundskeepers Grudge',
+  'entities.quests.q_eg_hungry_shapes.completion':
+    'Ti dynger af afklip, hvor ti ulve stod. Det skulle føles som havearbejde, {playerName}. Hvorfor føles det som krig?',
+  'entities.quests.q_eg_hungry_shapes.objectives.0.label': 'Topiary Wolf dræbt',
+  'entities.quests.q_eg_hungry_shapes.text':
+    'Den, der former denne have, er blevet skødesløs eller grusom. Ulvefigurerne ude i Rose Wilds blev klippet til udstilling, men på det seneste jager de: grønne kæber, ingen maver og ingen grund til nogensinde at stoppe. Klip ti topiære ulve ned, {playerName}, og lad plænerne blive græsplæner igen for en stund.',
+  'entities.quests.q_eg_hungry_shapes.title': 'Beskæres til Sult',
+  'entities.quests.q_eg_stolen_shears.completion':
+    'Seks par, og mit eget blandt dem, ville jeg kende hakket i bladet hvor som helst. Her blev disse handsker strikket til beskæringsarbejde. Varme hænder gør en stabil saks.',
+  'entities.quests.q_eg_stolen_shears.objectives.0.label': 'Stjålet Hedgewick-saks',
+  'entities.quests.q_eg_stolen_shears.text':
+    'Hvert par sakse i Hedgewick er gået væk på fjorten dage, {playerName}: af pløkkene, ud af låste skure, et par ud af mit eget forklæde, mens jeg døsede. Det er hækkenisserne, de små havevogtere, der hader, at vi går på deres græsplæner. Få seks par tilbage, før hele landsbyen er nede på køkkenknive.',
+  'entities.quests.q_eg_stolen_shears.title': 'Den stjålne saks',
+  'entities.quests.q_eg_who_trims_the_hedges.completion':
+    'Så huset sendte endelig nogen. Hundrede år har jeg gået disse græsplæner, {playerName}, og haven, og jeg har en forståelse: Jeg trimmer det, der beder om at blive trimmet. Sidde. Hækkene kan spare dig en time.',
+  'entities.quests.q_eg_who_trims_the_hedges.objectives.0.label':
+    'Find gartneren ved Liljebassinet',
+  'entities.quests.q_eg_who_trims_the_hedges.text':
+    'Jeg har opbevaret hovedbøgerne i tredive år, {playerName}, og ikke sovet ordentligt i ti af dem, fordi beløbene ikke lukker. Græs vil gerne klippes og hække vil forme, og det er der heller ingen her, men alligevel står haven hver dag klippet. På det seneste sværger skovfolket, at de ser en gammel mand med en gravbør på græsplænerne langt mod syd, forbi labyrinten ved Liljebassinet. Find ham. Hvis han er ægte, kan jeg endelig sove. Hvis han ikke er det, vil jeg vel aldrig gøre det.',
+  'entities.quests.q_eg_who_trims_the_hedges.title': 'Hvem klipper hækkene',
+  'entities.quests.q_fs_bell_at_the_landing.completion':
+    'Vejbroen holder, og Tam har stadig vejret nok til at spøge med tre-tollen. God. Vi er en ø under belejring, {playerName}, og hvert par hænder, der krydser den sandbanke, er et par, pauserne skal igennem, før de når mit folk. Velkommen til Gullhaven.',
+  'entities.quests.q_fs_bell_at_the_landing.objectives.0.label': 'Rapport til Warden Coalfast',
+  'entities.quests.q_fs_bell_at_the_landing.text':
+    'Kom du over færgevandringen, {playerName}? Så er du den første i en uge, og vagten vil gerne kigge på dig. Gullhaven sidder op ad kystvejen, forbi tørrestativerne, ingen passer længere. Fortæl Warden Coalfast, at dæmningsvejen stadig står, og at Tam ikke har ringet en vejafgift i dag. Endnu.',
+  'entities.quests.q_fs_bell_at_the_landing.title': 'Klokken ved landingen',
+  'entities.quests.q_fs_bram_come_home.completion':
+    'Bram! Du bragte ham hel tilbage til mig, {playerName}. Vi græd begge, og ingen af ​​os skammer os. Uanset hvad pauserne tager fra denne ø, får de ikke min familie. Ikke længere.',
+  'entities.quests.q_fs_bram_come_home.objectives.0.label':
+    'Fisker Bram set sikkert hjem til Gullhaven',
+  'entities.quests.q_fs_bram_come_home.text':
+    'Min Bram tog båden ud den morgen, da garnbruddet åbnede sig, og havet kastede ham tilbage et sted forbi landingsstedet. Jeg hørte ham for tre nætter siden, {playerName}, kalde over vandet, og jeg var for bange til at gå. Jeg er stadig for bange. Behage. Hans båd ligger forlist på nordkysten. Tag ham hjem til mig.',
+  'entities.quests.q_fs_bram_come_home.title': 'Bram kom hjem',
+  'entities.quests.q_fs_hold_the_riftfields.completion':
+    'Ti færre, og felthænderne skændes allerede om, hvem der går først ud. Det holder ikke, pauserne hviler aldrig længe, ​​men en by, der spiser, er en by, der holder.',
+  'entities.quests.q_fs_hold_the_riftfields.objectives.0.label': 'Breach Wretch dræbt',
+  'entities.quests.q_fs_hold_the_riftfields.text':
+    'Øst for byen er kornrækkerne gået i stykker, og de stakler, der kom gennem Riftfields pausen, plukker dem nu rene. Mine folk kan ikke passe et felt, de ikke kan stå i, {playerName}. Nedlæg ti af de stakler og giv bønderne deres jord tilbage.',
+  'entities.quests.q_fs_hold_the_riftfields.title': 'Hold Riftfields',
+  'entities.quests.q_fs_moss_and_mending.completion':
+    'Mos i den ene hånd og en mere stille kystlinje i den anden. Du har genopfyldt hele min operation, {playerName}. Gør mig den venlighed ikke at blive min næste patient.',
+  'entities.quests.q_fs_moss_and_mending.objectives.0.label': 'Riftspawn dræbt',
+  'entities.quests.q_fs_moss_and_mending.objectives.1.label': 'Oversat: Farshore Salt Moss',
+  'entities.quests.q_fs_moss_and_mending.text':
+    'Saltmosen, der vokser langs tidevandslinjen, er den bedste sårpakning, jeg kender, og riftspawnen har gjort krav på hver strækning af kyst, den vokser på. De bærer totter af det, der hænger på deres huder, af alle ting. Ryd seks af dem fra den østlige del, {playerName}, og træk mig fire gode håndfulde mos fra det, de har trampet igennem.',
+  'entities.quests.q_fs_moss_and_mending.title': 'Moss og Mending',
+  'entities.quests.q_fs_song_before_the_break.completion':
+    'Har vagten sendt dig? God. Det betyder, at byen endelig er begyndt at lytte. Hold nu et øjeblik, {playerName}. Der, under vinden, hører du det? Klipperne synger, og jeg kan ikke lide melodien.',
+  'entities.quests.q_fs_song_before_the_break.objectives.0.label': 'Oversat: Find Riftwatch Ollun',
+  'entities.quests.q_fs_song_before_the_break.text':
+    'Der er en mand, der hører pauserne, før de åbner. Riftwatch Ollun: en lærd eller en galning, og på det seneste har jeg ikke råd til forskellen. Han holder sin vagt ved Watch Meadow, oppe ad vejen sydøst for byen. Find ham, {playerName}, og spørg ham, hvad øen er ved at gøre ved os næste gang.',
+  'entities.quests.q_fs_song_before_the_break.title': 'Sangen før pausen',
+  'entities.quests.q_fs_stalkers_off_the_light.completion':
+    'Otte nætters cirkulation, endte i én. Ildene brænder allerede mere stabilt, eller måske er det kun mine hænder. Uanset hvad er engen min igen, og jeg kan høre øen tænke.',
+  'entities.quests.q_fs_stalkers_off_the_light.objectives.0.label': 'Void Stalker dræbt',
+  'entities.quests.q_fs_stalkers_off_the_light.text':
+    'Stalkerne jager mørket mellem vagtbålene, og hver nat kredser de om min eng lidt tættere på. De er ikke tankeløse, {playerName}, de er tålmodige, og tålmodighed er den eneste ting, jeg ikke kan overleve. Dræb otte og skub mørket tilbage til klipperne, det kom igennem.',
+  'entities.quests.q_fs_stalkers_off_the_light.title': 'Forfølger lyset',
+  'entities.quests.q_fs_steel_for_the_redoubt.completion':
+    'Salt-udstenet og brud-arret, og det vil holde en kant alligevel. Her forede jeg selv disse greb. Stål til stål, {playerName}: det er den eneste handel, som Farshore driver i disse dage.',
+  'entities.quests.q_fs_steel_for_the_redoubt.objectives.0.label': 'Break-arred stål',
+  'entities.quests.q_fs_steel_for_the_redoubt.text':
+    'Hver klinge, jeg deler ud, er en, havet gav tilbage, eller en, jeg lod de døde, {playerName}. De elendige bærer skrot gennem brudene, hængslerne, krogene, knækket sværdstål, skafte-ting, men det hamrer rigtigt. Bring mig seks stykker af deres rensede stål og barrikadelinjen får tænderne tilbage.',
+  'entities.quests.q_fs_steel_for_the_redoubt.title': 'Stål til Redoubt',
+  'entities.quests.q_fs_the_great_break.completion':
+    'Ollun sendte bud i forvejen: sangen stoppede. Hele min by hørte stilheden, {playerName}, og halvdelen af ​​dem græd ved lyden af ​​ingenting. Bær denne kappe. Farshore glemmer ikke, hvem der holdt dens kyst.',
+  'entities.quests.q_fs_the_great_break.objectives.0.label': 'The Sundered Horror dræbt',
+  'entities.quests.q_fs_the_great_break.text':
+    'Hver sang denne ø synger ender på den samme lave tone, og den kommer fra Sundered Cliffs. Der kom noget gennem den store pause der, {playerName}, noget klipperne selv revnede op for at indrømme, og det vokser stadig. Hvis den går nordpå, vil ingen klokke betyde noget. Tag en ven, tag to, og slut det. Fortæl så Coalfast, at melodien har ændret sig.',
+  'entities.quests.q_fs_the_great_break.title': 'Den store pause',
+  'entities.quests.q_fs_the_three_bells.completion':
+    'Tre stemmer, tre svar, ført rent over vandet. Sov i Gullhaven i nat, {playerName}, og vid, at hvis en klokke vækker dig, vil den være ved min hånd og i god tid.',
+  'entities.quests.q_fs_the_three_bells.objectives.0.label': 'Uret ringede',
+  'entities.quests.q_fs_the_three_bells.text':
+    'Tre klokkeklokker står kysten ud over min egen: en på landingspunktet, en på sydstranden, en ude ved Riftfields-kysten. Hvis et reb er rådnet eller en klapper er båret af, får byen kendskab til en pause, når den allerede er på gaden. Gå langs kysten, {playerName}, og ring hver klokke én gang, så jeg ved, at den stadig har en stemme.',
+  'entities.quests.q_fs_the_three_bells.title': 'De tre klokker',
+  'entities.quests.q_fv_aurora_motes.completion':
+    'Seks splinter, stadig glødende. Se på dem, {playerName}: de pulserer i takt med hinanden. Lysene er ikke vejr. De er et signal.',
+  'entities.quests.q_fv_aurora_motes.objectives.0.label': 'Oversat: Aurora Mote',
+  'entities.quests.q_fv_aurora_motes.text':
+    'De spidser, der driver disse trin, bliver kastet af selve lysene, og hver bærer en splint af nordlys i sit hjerte. Jeg skal bruge seks for at læse, hvad himlen skriver, {playerName}. Knægtene kæmper ikke tilbage. Om det gør arbejdet lettere eller sværere er mellem dig og din samvittighed.',
+  'entities.quests.q_fv_aurora_motes.title': 'Aurora motes',
+  'entities.quests.q_fv_ember_caches.completion':
+    'Stadig varm, alle sammen. Du har købt hytten en hel vinter af barmhjertighed, {playerName}.',
+  'entities.quests.q_fv_ember_caches.objectives.0.label': 'Ember Cache gendannet',
+  'entities.quests.q_fv_ember_caches.text':
+    'En slæde af glødehuse væltede på tjærevejen i nat: jernkedler, der holder liv i en ild i en bank i en måned. Tre af dem ligger stadig i sneen, {playerName}, og lodgen kan ikke spare på det, de har. Bring ilden hjem.',
+  'entities.quests.q_fv_ember_caches.title': 'Gløder på Tarnvejen',
+  'entities.quests.q_fv_frostmane_tyrant.completion':
+    'Da vinden faldt i nat, hørte hele landsbyen stilheden, hvor Frostmanen plejede at være. The Reach skylder dig en gæld, det vil være år at betale, {playerName}. Bær dette, og hver dør i Icemantle er åben for dig.',
+  'entities.quests.q_fv_frostmane_tyrant.objectives.0.label': 'Frostmanen dræbt',
+  'entities.quests.q_fv_frostmane_tyrant.text':
+    'Hylerne var ikke på jagt, da de kom ned ad terrasserne. De var på flugt. En yeti har gjort krav på den høje grund, bjergfolkene kalder den Frostmanen, og selv flokkene vil ikke dele en skråning med den. Det skal slutte, {playerName}, før vinteren driver det ned til mine vægge. Tag en ven med. Medbring to.',
+  'entities.quests.q_fv_frostmane_tyrant.title': 'Frostmane-tyrannen',
+  'entities.quests.q_fv_howl_above.completion':
+    'Otte, og skumringskoret er tyndere for det. Men brølere forlader ikke toppene for ingenting. Noget deroppe rørte dem, og jeg frygter, at det har et navn.',
+  'entities.quests.q_fv_howl_above.objectives.0.label': 'Terrassebrøl dræbt',
+  'entities.quests.q_fv_howl_above.text':
+    'Du hører det i skumringen, {playerName}: et hyl fra Hylende Terrasser, der ikke er snedrive-pakkerne. Større struber. Terrassebrylerne er kommet ned fra toppene for første gang, siden min bedstemor holdt denne post, og det er dem, der har skubbet ulvene ind på min vej. Slå otte ned og skub dem tilbage.',
+  'entities.quests.q_fv_howl_above.title': 'Hylen på terrasserne',
+  'entities.quests.q_fv_lights_over_steps.completion':
+    'Kaldra har sendt dig? Så er hun endelig bekymret, og det har hun ret i. Sid, {playerName}. Se himlen med mig et stykke tid.',
+  'entities.quests.q_fv_lights_over_steps.objectives.0.label': 'Oversat: Find Aurorist Veyla',
+  'entities.quests.q_fv_lights_over_steps.text':
+    'Auroraen har brændt grønt hver nat i denne måned, og de gamle vil ikke gå under den. En kvinde ved måske hvorfor: Veyla, Auroristen. Hun slår lejr alene på Aurora-trappen, sydøst forbi tjernen. Find hendes lejr, {playerName}, og hør, hvad lysene har fortalt hende.',
+  'entities.quests.q_fv_lights_over_steps.title': 'Lys over trinene',
+  'entities.quests.q_fv_rime_unbound.completion':
+    'Natten føles allerede tyndere. Det, der vækker dem, er ikke gjort, men du har købt Steps nogle stille.',
+  'entities.quests.q_fv_rime_unbound.objectives.0.label': 'Rime Elemental dræbt',
+  'entities.quests.q_fv_rime_unbound.text':
+    'Når nordlyset brænder så stærkt, rejser kulden sig og går: rimeelementer, frost givet vilje. De samles, hvor lysene rører bænkene, og de vandrer tættere på min lejr hver nat. Bryd otte af dem fra hinanden, {playerName}, før en af ​​dem knækker mig.',
+  'entities.quests.q_fv_rime_unbound.title': 'Rime Ubundet',
+  'entities.quests.q_fv_seeing_wren_home.completion':
+    'Pigen er indenfor, pakket ind i halvdelen af ​​mine tæpper og taler stjernerne ud af himlen. Du gjorde en venlig ting i dag, {playerName}. The Reach ser ikke mange af dem.',
+  'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
+    'Lærling Wren set sikkert til Aurora-trappen',
+  'entities.quests.q_fv_seeing_wren_home.text':
+    'Min lærling Wren gik ud for at gå Goldmelt-linjen for to dage siden og kom aldrig tilbage. Jeg fandt hendes spor, hun er hulet op under vejmarkeringerne sydvest for Aurora-trappen, for bange for ulvene til at bevæge sig. Jeg kan ikke forlade fenet, {playerName}. Følg hende til Veylas lejr på trappen. Hun vil være i sikkerhed under lysene.',
+  'entities.quests.q_fv_seeing_wren_home.title': 'At se Wren Home',
+  'entities.quests.q_fv_silent_trapline.completion':
+    'Maeve har sendt dig? Ha. Elleve år og kvinden tror stadig, myren vil æde mig. Nå... i år har hun måske ret. Se hvad det har gjort ved mine linjer.',
+  'entities.quests.q_fv_silent_trapline.objectives.0.label': 'Oversat: Find Trapper Brosk',
+  'entities.quests.q_fv_silent_trapline.text':
+    'Gamle Brosk arbejder på Shiverfen-fælden vest herfor, og hver uge i elleve år har han sendt et bundt pelse op med træslæden. To uger nu, ingenting. Han er for stædig til at fryse og for forsigtig til at drukne, {playerName}, så noget andet er galt. Find hans lejr ved fenden og se ham trække vejret.',
+  'entities.quests.q_fv_silent_trapline.title': 'Den stille Trapline',
+  'entities.quests.q_fv_snowline_report.completion':
+    'Passet holder altså. Einna sidder den vejlejr gennem storme, der begraver vejmarkeringerne, og hun har aldrig en eneste gang sendt mig tomme nyheder. Velkommen til Icemantle, {playerName}.',
+  'entities.quests.q_fv_snowline_report.objectives.0.label': 'Indberetning til vagtchef Kaldra',
+  'entities.quests.q_fv_snowline_report.text':
+    'Hver eneste sjæl, der klatrer ud af Drakelands, passerer min ild, {playerName}, og færre klatrer hver uge. Vagtmester Kaldra holder Icemantle op ad nordvejen. Fortæl hende, at passet stadig er åbent, og fortæl hende, at en fremmed gik alene.',
+  'entities.quests.q_fv_snowline_report.title': 'Ord fra Snowline',
+  'entities.quests.q_fv_sprung_traps.completion':
+    'Fire gode fælder tilbage og sivene blev stille. Du fælder med en tungere hånd end jeg gør, {playerName}, men jeg kan ikke argumentere med resultaterne.',
+  'entities.quests.q_fv_sprung_traps.objectives.0.label': 'Fen Sprite kørt af',
+  'entities.quests.q_fv_sprung_traps.objectives.1.label': 'Fælden genvundet',
+  'entities.quests.q_fv_sprung_traps.text':
+    'Fen sprites, {playerName}. De små djævle springer mine fælder til sport og spreder jernet i sivene. Kør dem væk, otte skulle lære resten, og samle det, der er tilbage af mine fældeliner, mens du er derude.',
+  'entities.quests.q_fv_sprung_traps.title': 'Sprites i fælderne',
+  'entities.quests.q_fv_winter_pelts.completion':
+    'Pels som denne er det eneste argument, vinteren lytter til. Tag disse trin, de er foret med den sidste batch.',
+  'entities.quests.q_fv_winter_pelts.objectives.0.label': 'Tykt vinterpels',
+  'entities.quests.q_fv_winter_pelts.text':
+    'Brænde holder en krop i live, {playerName}, men uld bliver ikke så kold, kun ulvepels gør det. Seks tykke vinterskind af snedrivepakkerne, og jeg kan beklæde sengeruller for alle, som hytten er tilflugtssted for.',
+  'entities.quests.q_fv_winter_pelts.title': 'Skind til Logen',
+  'entities.quests.q_fv_wolves_at_the_door.completion':
+    'Ti færre skygger mellem her og tjernen. Skovhuggerne skændes allerede om, hvem der går først ud.',
+  'entities.quests.q_fv_wolves_at_the_door.objectives.0.label': 'Snedriveulv dræbt',
+  'entities.quests.q_fv_wolves_at_the_door.text':
+    'Snedrivepakkerne plejede at holde sig til de høje bænke. Nu krydser de tjærevejen i dagslys, og mine skovhuggere vil ikke forlade væggene. Tynd pakkerne, {playerName}, ti af dem, og vejen er en vej igen.',
+  'entities.quests.q_fv_wolves_at_the_door.title': 'Ulve ved døren',
+  'entities.quests.q_gc_dead_mens_cargo.completion':
+    'Seks besætninger mere stille og tre kasser høje og tørre. Du redder med en tungere hånd end jeg gør, {playerName}, men hovedbogen er ligeglad. Halvdelen af ​​dette er dit ved lov, og ved lov mener jeg, at jeg siger det.',
+  'entities.quests.q_gc_dead_mens_cargo.objectives.0.label': 'Druknet dæksmand lagt til hvile',
+  'entities.quests.q_gc_dead_mens_cargo.objectives.1.label': 'Flotsam Crate bjærget',
+  'entities.quests.q_gc_dead_mens_cargo.text':
+    'Bjærgningsloven er enkel, {playerName}: hvad havet giver stranden er mit. De druknede dæksmænd er uenige. De rejser sig fra deres skrog og trækker hver kasse, jeg stabler, tilbage under tidevandslinjen. Læg seks af dem ned for altid, og mens stranden er stille, slæb tre flotsamkasser ind, før tidevandet indgiver sit modkrav.',
+  'entities.quests.q_gc_dead_mens_cargo.title': 'Døde mænds last',
+  'entities.quests.q_gc_down_the_windway.completion':
+    'Over passet til fods, i dette vejr? Maren sender mig få nok navne, og færre går stadig ind for at svare for sig selv. Velkommen til Wickharbor, {playerName}. Luk krodøren bag dig.',
+  'entities.quests.q_gc_down_the_windway.objectives.0.label': 'Rapport til havnefoged Odile',
+  'entities.quests.q_gc_down_the_windway.text':
+    'Du klarede stigningen, {playerName}, så vinden har besluttet at beholde dig. Wickharbor ligger øst langs downs-vejen, gemt i læ af sin bugt. Havnefoged Odile tæller hver eneste sjæl, der kommer over passet, og hun vil gerne tælle dig. Fortæl hende, at Windway stadig er åben.',
+  'entities.quests.q_gc_down_the_windway.title': 'Ned ad Windway',
+  'entities.quests.q_gc_keeper_of_the_flame.completion':
+    'Odile sendte dig hele denne vej for at se, om vinden havde taget mig? Ha. Fortæl hende, at lampen brænder, og det gør jeg også. Men siden du har klatret, {playerName}, så bliv et øjeblik. The Beacon har arbejde, kun en fremmed synes egnet til at udføre.',
+  'entities.quests.q_gc_keeper_of_the_flame.objectives.0.label': 'Oversat: Find Keeper Bram',
+  'entities.quests.q_gc_keeper_of_the_flame.text':
+    'Gamle Bram holder Beacon på det høje hoved nordøst for byen, og han er ikke kommet ned til sine butikker i to uger. Lampen brænder stadig, så han lever, men en mand på hans alder alene på hovedet i denne vind, {playerName}. Bestig beacon-vejen og se ham stå.',
+  'entities.quests.q_gc_keeper_of_the_flame.title': 'Flammens vogter',
+  'entities.quests.q_gc_lanterns_on_the_shear.completion':
+    'Fire lyspunkter på klippevejen, lige hvor de hører hjemme. Heroppefra ser det ud til, at kysten har fået øjnene op igen. Du har evnerne til at være en keeper, {playerName}.',
+  'entities.quests.q_gc_lanterns_on_the_shear.objectives.0.label': 'Storm-lanterne relit',
+  'entities.quests.q_gc_lanterns_on_the_shear.text':
+    'Beacon er det store lys, {playerName}, men det er stormlanternerne, der går en natrejsende ned ad klippevejen over Shear. I aftes overdøvede stormen hver eneste af dem, og den vej i mørket er et langt fald med en kort afslutning. Tag min angriber og tænd igen de fire langs klippen.',
+  'entities.quests.q_gc_lanterns_on_the_shear.title': 'Lanterne på skæret',
+  'entities.quests.q_gc_scuttlers_in_the_pots.completion':
+    'Ti færre skaller på min vej, og gryderne kom op i morges. Pottemændene kalder dig et godt varsel, {playerName}. I Wickharbor er det så varmt som ros bliver.',
+  'entities.quests.q_gc_scuttlers_in_the_pots.objectives.0.label': 'Shoal Scuttler dræbt',
+  'entities.quests.q_gc_scuttlers_in_the_pots.text':
+    'Stimene har lært at klatre op ad klippevejen og slå vores krabbepotter op på stenene, {playerName}. Halvdelen af ​​fangsten er væk i denne uge, og en potman med en hånd vil han ikke bruge i en måned. Bryd ti af dem, og resten vil huske, hvorfor de holdt sig til stimerne.',
+  'entities.quests.q_gc_scuttlers_in_the_pots.title': 'Skudlere i gryderne',
+  'entities.quests.q_gc_the_far_shore.completion':
+    'Bram ser nu min kyst fra sit tårn, gør han? Den gamle mand har ret til at bekymre sig, {playerName}. De døde har gået deres egne vrag om natten, og på det seneste er de holdt op med at bekymre sig om, hvorvidt solen er fremme.',
+  'entities.quests.q_gc_the_far_shore.objectives.0.label': 'Find Bjærgning Edda',
+  'entities.quests.q_gc_the_far_shore.text':
+    'Fra dette lamperum kan jeg se hele kysten, {playerName}, og det, jeg ser i nord, kan jeg ikke lide. Grønt lys går på vragmarkerne ved lavvande, skrog for skrog. En kvinde arbejder alene på den kyst: Edda, bjærgningen. Følg klippevejen nordpå forbi Shear, indtil vragene begynder, og se, at hun stadig trækker vejret.',
+  'entities.quests.q_gc_the_far_shore.title': 'Oversat: The Far Shore',
+  'entities.quests.q_gc_the_wreck_warden.completion':
+    'Stranden blev stille i det øjeblik, den faldt, {playerName}. Første stilhed, jeg har hørt på denne kyst i ti år, hvor jeg har arbejdet med den. Besætningerne er bare knogler nu, hvilende knogler. Tag kappen af ​​toppen af ​​skatten, den ville altid passe bedre til en levende ryg.',
+  'entities.quests.q_gc_the_wreck_warden.objectives.0.label': 'Vragvagten fældet',
+  'entities.quests.q_gc_the_wreck_warden.text':
+    'Nu ved du hvorfor deckhands rejser sig, {playerName}. Noget bærer brækpladen fra det første vrag, der nogensinde gik i stykker på denne kyst, og det beskytter hvert skrog på stranden som en kirkegård, det var hyret til at holde. Den rummer en skat, jeg har eftertragtet i ti år, og en besætning, jeg hellere vil se hvile. Afslut Wreck Warden. Tag en ven med, de døde holder godt øje.',
+  'entities.quests.q_gc_the_wreck_warden.title': 'Vragvagten',
+  'entities.quests.q_gc_wind_against_the_wick.completion':
+    'Lampen gik ikke så meget som tagrende i aftes, første gang i en måned. Vinden hader os stadig, {playerName}, men den er vendt tilbage til at hade os retfærdigt.',
+  'entities.quests.q_gc_wind_against_the_wick.objectives.0.label': 'Gale Wisp spredt',
+  'entities.quests.q_gc_wind_against_the_wick.text':
+    'Kulingen er den ondskabsfulde vind, {playerName}. De samles på de høje nedgange ved Mirror Tarn, og hver flamme, de finder, snuser de, en lanterne, et ildsted, en dag denne lampe. 39 år har jeg holdt fyret tændt, og jeg vil ikke miste det for at klare det med nag. Spred otte af dem.',
+  'entities.quests.q_gc_wind_against_the_wick.title': 'Vind mod vægen',
+  'entities.quests.q_gc_wool_off_the_downs.completion':
+    'Fleece som dette er grunden til, at væddere står derude fede og selvtilfredse i vejr, der dræber mænd. Spinnerne vil være ved det ved lampelys. Tag disse trin, {playerName}, de er foret fra den sidste klipning.',
+  'entities.quests.q_gc_wool_off_the_downs.objectives.0.label': 'Fedtet vædderuld',
+  'entities.quests.q_gc_wool_off_the_downs.text':
+    'Mine bådbesætninger ror ind i en storm, der skærer gennem olieskind som papir, {playerName}. Kun én ting vender denne vind: den fedtede uld fra hedevæddere, spundet tykt på Wickharbor-måden. Besætningerne græsser Howling Downs vest for byen. Seks gode uld og hver besætningsrækker varme denne sæson.',
+  'entities.quests.q_gc_wool_off_the_downs.title': 'Uld af Downs',
+  'entities.quests.q_gleaming_antlers.completion':
+    'Se hvordan de holder lyset! Ingen flamme, ingen røg, kun gløden. The Hollow giver.',
+  'entities.quests.q_gleaming_antlers.objectives.0.label': 'Glimrende gevir',
+  'entities.quests.q_gleaming_antlers.text':
+    'De tilslørede hjorte kaster lys, hvor de græsser, og deres støbte gevirer holder det i årevis. Fem af dem, fra flokkene i den åbne lysning i hjertet af dalen, og mine lanterner brænder vinteren igennem uden olie. Hjortene behøver ikke at tage skade, men de skiller sig ikke let af med dem.',
+  'entities.quests.q_gleaming_antlers.title': 'Glimrende gevirer',
+  'entities.quests.q_grove_menace.completion':
+    'Natmarkedet kan åbne igen. Du har en kunde for livet, eller i det mindste en rabat.',
+  'entities.quests.q_grove_menace.objectives.0.label': 'Duskwisp spredt',
+  'entities.quests.q_grove_menace.text':
+    'Duskwisps er begyndt at drive ind blandt mine boder efter mørkets frembrud, {playerName}, og deres kulde ødelægger alt, hvad de rører ved. Tynd dem ud for mig: ti af dem, hvor end sløret er revet.',
+  'entities.quests.q_grove_menace.title': 'Trussel i Glade',
+  'entities.quests.q_hollow_first_of_the_herd.completion':
+    'Så den første falder til den sidste. Flokken er allerede roligere, mærker du det? Du gjorde hulen en venlighed i dag, selvom den ikke ligner en.',
+  'entities.quests.q_hollow_first_of_the_herd.objectives.0.label': 'Aurelhorn givet fred',
+  'entities.quests.q_hollow_first_of_the_herd.text':
+    'Det andet navn er sværere at sige. Aurelhorn førte disse flokke, da min bedstemor holdt denne udkig, og hvad der end vågnede i Hulen vækkede ham forkert. Han tramper det, han engang bevogtede, og flokken vil ikke overleve hans vanvid. Han strejfer på engene nær de gamle retsveje. Afslut ham med barmhjertighed, {playerName}, og tag en ven med til at dele vægten af ​​det.',
+  'entities.quests.q_hollow_first_of_the_herd.title': 'Først af flokken',
+  'entities.quests.q_hollow_old_marrowshell.completion':
+    'Det lavvandede er bare vand igen. Jeg har set den skal knække bedre jægere end mig, {playerName}. Ikke dig.',
+  'entities.quests.q_hollow_old_marrowshell.objectives.0.label': 'Gammel Marrowshell dræbt',
+  'entities.quests.q_hollow_old_marrowshell.text':
+    'Det første navn er Old Marrowshell, en krabbe på størrelse med en vogn, der har jaget de østlige lavvande siden før Eldergleam havde en låge. Den vandrer, {playerName}, så du bliver nødt til at gå langs kystlinjen, indtil du krydser dens spor. Gå ikke alene, og stol ikke på dens stilhed.',
+  'entities.quests.q_hollow_old_marrowshell.title': 'Oversat: The Old Shell of the Shallows',
+  'entities.quests.q_hollow_the_huntsman.completion':
+    'Fenna har sendt dig? God. Så stoler hun på dig, og jeg har to navne, der skal streges over.',
+  'entities.quests.q_hollow_the_huntsman.objectives.0.label': 'Oversat: Find Huntsman Deral',
+  'entities.quests.q_hollow_the_huntsman.text':
+    'Du ligner en, der kan klare mere end tæsk, {playerName}. Jæger Deral holder udkig blandt hjortens enge øst herfor, og han har spurgt efter dygtige hænder i ugevis. Uanset hvad han sporer derude, vil han ikke sige det højt i landsbyen.',
+  'entities.quests.q_hollow_the_huntsman.title': 'Besætningernes Vagt',
+  'entities.quests.q_monument_tour.completion':
+    'En udsigt, en domstol og et glemt hjørne... og alle tre vers af beseglingssangen, sammen for første gang siden den blev sunget. Du har gjort en gammel læser meget glad.',
+  'entities.quests.q_monument_tour.objectives.0.label': 'Overlook-monumentet læst',
+  'entities.quests.q_monument_tour.objectives.1.label': 'Hofmonumentet læst',
+  'entities.quests.q_monument_tour.objectives.2.label': 'Det glemte monument læst',
+  'entities.quests.q_monument_tour.text':
+    'Tre monumenter står stadig fra før forseglingen: et ved Duskfall Overlook, et i Sunken Court og et tabt i det fjerne nordøst, hvor ingen går. Læs dem for mig, {playerName}. Mine knæ gav ud for to århundreder af trapper siden.',
+  'entities.quests.q_monument_tour.title': 'Hvad stenene husker',
+  'entities.quests.q_nb_charts_of_the_stones.completion':
+    'Der er ingen tvivl tilbage. Hvert leje har sneget sig hen mod den søvnløse grav, som om selve himlen læner sig over den høj for at se. De gamle konger blev begravet under ens stjerner af en grund, {playerName}.',
+  'entities.quests.q_nb_charts_of_the_stones.objectives.0.label': 'Stjernediagram læst',
+  'entities.quests.q_nb_charts_of_the_stones.text':
+    'Vågestenene er ældre end Moonrest, ældre end natkindet, der passer dem, og deres ansigter er skåret med stjernekort, jeg har brugt mit liv på at lære at læse. Himlen har flyttet sig, {playerName}, og jeg skal vide hvor langt. Læs diagrammerne på tre af stenene og giv mig deres pejling.',
+  'entities.quests.q_nb_charts_of_the_stones.title': 'Charts in the Stones',
+  'entities.quests.q_nb_eyes_on_the_vigil.completion':
+    'Har Lira sendt dig? Så mærker haverne det også. Sid ved glasset et øjeblik, {playerName}. Stjernerne har været urolige i en måned, og hvert kort, jeg tegner, hælder mod nord mod graven.',
+  'entities.quests.q_nb_eyes_on_the_vigil.objectives.0.label':
+    'Find astronomen Cassian ved den stående vagt',
+  'entities.quests.q_nb_eyes_on_the_vigil.text':
+    'Noget gør striderne modige og flokkene urolige, {playerName}, og jeg kan ikke læse det i blomsterne. Cassian kan læse det på himlen. Han holder sin observationslejr ved Standing Vigil øst herfor, hvor natskindet driver mellem stenene. Find ham, og spørg, hvad stjernerne siger.',
+  'entities.quests.q_nb_eyes_on_the_vigil.title': 'Øjne på Vigilen',
+  'entities.quests.q_nb_night_gardens.completion':
+    'Stadig glødende, hvert kronblad. Helligdommen vil lugte af nat i en uge, og Moonrest sover lettere for det.',
+  'entities.quests.q_nb_night_gardens.objectives.0.label': 'Nightbloom Blossom samlet sig',
+  'entities.quests.q_nb_night_gardens.text':
+    'Natblomstringen åbner sig kun under denne himmel, og Gloamfield har de ældste senge i riget. Jeg skal bruge fire friske blomster til helligdomsguirlanderne, {playerName}. Skær dem forsigtigt: en seng husker en hård hånd i en sæson.',
+  'entities.quests.q_nb_night_gardens.title': 'Nattehaverne',
+  'entities.quests.q_nb_restless_mounds.completion':
+    'Gravguld, stadig koldt fra jorden. Vægtene rejser sig ikke af sig selv, {playerName}: noget under den store høj kalder dem frem, og jeg frygter, at søkortene allerede har fortalt os, hvad de hedder.',
+  'entities.quests.q_nb_restless_mounds.objectives.0.label': 'Barrow Wight dræbt',
+  'entities.quests.q_nb_restless_mounds.objectives.1.label': 'Gravoffer genvundet',
+  'entities.quests.q_nb_restless_mounds.text':
+    'Kortene var en advarsel, og gravemarken beviser det: højene åbner sig nedefra. Wights går på gravrækkerne iført de gamle hædersbevisninger, og de tilbud, der fik dem til at sove, ligger spredt i græsset. Læg otte af dem ned, {playerName}, og saml fire af ofrene tilbage til mig.',
+  'entities.quests.q_nb_restless_mounds.title': 'De urolige høje',
+  'entities.quests.q_nb_road_of_lanterns.completion':
+    'Lamperne brænder stadig, og vejen fører stadig fremmede til os. Sorrel har holdt den port længere, end nogen i Moonrest husker. Velkommen, {playerName}, til riget, der aldrig gryer.',
+  'entities.quests.q_nb_road_of_lanterns.objectives.0.label': 'Find Lira Dewsong i Moonrest',
+  'entities.quests.q_nb_road_of_lanterns.text':
+    'Heroppe følger solen aldrig efter, {playerName}, kun lamperne jeg holder tændt langs stigningen. Månehvilen ligger nordpå, hvor blomsterlyset samles. Find Lira Dewsong blandt hendes haver, og fortæl hende, at Nightgate-lamperne stadig brænder.',
+  'entities.quests.q_nb_road_of_lanterns.title': 'Lanternes Vej',
+  'entities.quests.q_nb_striders_in_the_dark.completion':
+    'Ti skridtere færre, og besætningerne græsser allerede lettere. Haverne holder deres egne timer, men i aften holder de dem i fred.',
+  'entities.quests.q_nb_striders_in_the_dark.objectives.0.label': 'Gloam Strider dræbt',
+  'entities.quests.q_nb_striders_in_the_dark.text':
+    'Gloam-striderne var altid tålmodige jægere, {playerName}, men for sent smutter de lige ind i blomsterbedene og tager månefleece-lam under vores lanterner. Slå ti af dem ned og giv nedturene deres stilhed tilbage.',
+  'entities.quests.q_nb_striders_in_the_dark.title': 'Stridere i mørket',
+  'entities.quests.q_nb_the_barrow_king.completion':
+    'Stjernerne har slået sig op for første gang i en sæson, {playerName}. Højene er lukkede, natskindet er gået stille ved deres sten, og kongen sover nedenunder igen. Bær denne kappe: Moonrest klippede den til den, som natten endelig stolede på.',
+  'entities.quests.q_nb_the_barrow_king.objectives.0.label': 'Barrow-kongen hvilede',
+  'entities.quests.q_nb_the_barrow_king.text':
+    'Hver pejling, hver rastløs stjerne, hver åbnede høj peger på én ting: Barrow-kongen vågner under den store høj, og dette rige har ingen daggry til at holde ham tilbage. Han skal hviles, før han husker sin krone, {playerName}. Gå ikke alene: tag en ven med, og hold blomsterlyset i ryggen.',
+  'entities.quests.q_nb_the_barrow_king.title': 'Barrow-kongen vågner',
+  'entities.quests.q_nb_wool_by_moonlight.completion':
+    'Sølv som stjernelys og dobbelt så blød. Her, {playerName}: luffer fra den sidste batch, foret som kun månefleece-linjer.',
+  'entities.quests.q_nb_wool_by_moonlight.objectives.0.label': 'Oversat: Moonfleece Tuft',
+  'entities.quests.q_nb_wool_by_moonlight.text':
+    'Intet varmer som moonfleece, {playerName}, og intet spinder så fint. Græsserne bærer deres sølvuld løs i totter, mens de driver dunene. Bring mig seks gode totter fra flokkene, og jeg vil væve dig noget, der er værd at gå.',
+  'entities.quests.q_nb_wool_by_moonlight.title': 'Uld fra Moonlight',
+  'entities.quests.q_pr_boars_in_the_gardens.completion':
+    'Stativerne står og haverne kan genplantes. Ornerne valgte ikke at komme på sandet, {playerName}. Husk det: noget bevægede dem.',
+  'entities.quests.q_pr_boars_in_the_gardens.objectives.0.label': 'Krattesvin drevet af',
+  'entities.quests.q_pr_boars_in_the_gardens.text':
+    'Uanset hvad der rører sig i det dybe grønne, skubber det krattsvinene ud på vores strand. De har rodet haveterrasserne op to gange i denne uge, og de skal have tørrestativerne næste gang. Ti orner, {playerName}, og skub resten tilbage under træerne.',
+  'entities.quests.q_pr_boars_in_the_gardens.title': 'Orner i Haverne',
+  'entities.quests.q_pr_canopy_silk.completion':
+    'God, stærk silke. Mine klokker vil synge et stykke tid endnu, og intet går disse stier om natten uden at jeg ved det, {playerName}. På det seneste er der ofte gået noget.',
+  'entities.quests.q_pr_canopy_silk.objectives.0.label': 'Oversat: Canopy Silk Hank',
+  'entities.quests.q_pr_canopy_silk.text':
+    'Slå op, {playerName}. Hver baldakin herfra til idolet er svømmehud som et fiskenet, og væverne bliver dristigere for hver sæson. Jeg snor deres egen silke hen over stierne, tripline klokker, så junglen ikke kan snige sig op på mig. Seks gode hanks fra baldakinvæverne vil dæmpe mine linjer.',
+  'entities.quests.q_pr_canopy_silk.title': 'Silke fra baldakinen',
+  'entities.quests.q_pr_down_to_drifthaven.completion':
+    'Pell sendte dig? Så gik du hele Tanglemouth-vejen alene, og det er reference nok for mig. Velkommen til Drifthaven, {playerName}. Grib et reb, vi er korthåndede.',
+  'entities.quests.q_pr_down_to_drifthaven.objectives.0.label': 'Rapport til Bjærgning-Boss Ryna',
+  'entities.quests.q_pr_down_to_drifthaven.text':
+    'Ud af de sorte træer og ind i solen, {playerName}. Følg kystvejen nordpå, og du vil ramme Drifthaven, inden tidevandet vender. Spørg efter Bjærgning-Boss Ryna, hun har arbejde til ethvert par hænder siden stormen, og fortæl hende, at Tanglemouth-vejen stadig er åben.',
+  'entities.quests.q_pr_down_to_drifthaven.title': 'Ned til Drifthaven',
+  'entities.quests.q_pr_idol_guardian.completion':
+    'Du fældede en ting, som junglen selv ikke ville røre ved. Se der, bag idolet: Guardian vogtede aldrig kolonnerne, {playerName}, den vogtede trinene under dem. Trommerne er blevet stille i aften. Uanset hvad der sover under Wildheart Basin, kender du nu dit navn.',
+  'entities.quests.q_pr_idol_guardian.objectives.0.label': 'Idol Guardian gik i stykker',
+  'entities.quests.q_pr_idol_guardian.text':
+    'Idolet er ældre end øen, {playerName}. Ældre end trommerne, ældre end navnet Palmreach. Dens vogter har stået i den druknede ring siden før palmerne voksede, og nu vågner den og går på søjlerne om natten. Uanset hvad tilbuddene fodrer, er Guardian dens dørafdeling. Tag en ven med og bryd den.',
+  'entities.quests.q_pr_idol_guardian.title': 'Idol Guardian',
+  'entities.quests.q_pr_scuttler_cull.completion':
+    'Ti færre kløer i brændingen. Mine hold er allerede ved at vade ud igen, og ikke én af dem sagde tak, så jeg vil: tak, {playerName}.',
+  'entities.quests.q_pr_scuttler_cull.objectives.0.label': 'Tide Scuttler knækkede',
+  'entities.quests.q_pr_scuttler_cull.text':
+    'Hvert vrag på denne kyst trækker tidevandsflyverne, og Pearlwake har trukket halvdelen af ​​revet. Mine bjærgningshold vil ikke arbejde en line med de kløer i lavvandet. Knæk ti af dem, {playerName}, og vraglinjen er vores igen.',
+  'entities.quests.q_pr_scuttler_cull.title': 'Oversat: Shellbacked Thieves',
+  'entities.quests.q_pr_the_lost_navigator.completion':
+    'Suli er ved bålet og sværger stadig på, at hun kunne have svømmet den. Du bragte den eneste kortlæser på denne kyst tilbage, {playerName}. Disse er fra hendes søkiste med hendes velsignelse.',
+  'entities.quests.q_pr_the_lost_navigator.objectives.0.label':
+    'Navigatør Suli set sikkert til Drifthaven',
+  'entities.quests.q_pr_the_lost_navigator.text':
+    'Vi trak hver hånd væk fra Pearlwake undtagen én: Navigator Suli, som svømmede til den fjerne strand og aldrig gik ind. En dykker så hende inde i bovvraget forbi Palmstranden, i live og for brugt til at køre handsken alene. Gå med hende hjem ad kystvejen, {playerName}. Krabberne vil ikke lide det, og junglen kan lide det mindre.',
+  'entities.quests.q_pr_the_lost_navigator.title': 'Oversat: The Lost Navigator',
+  'entities.quests.q_pr_the_man_who_went_in.completion':
+    'Har Isha sendt dig? Perlemoderen har ikke talt mit navn i årevis. Sid uden for vinstokkenes rækkevidde, {playerName}, og jeg vil fortælle dig, hvad jeg ved: trommerne er ikke faren. De er advarslen.',
+  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': 'Find Okku ved Vinefall',
+  'entities.quests.q_pr_the_man_who_went_in.text':
+    'Dykkerne vil ikke træde forbi trægrænsen, {playerName}, og det vil jeg ikke bede dem om. Du har hørt trommerne nu: det gør alle, inden den anden nat. En mand på denne ø gik nogen sinde mod den lyd og kom tilbage. Okku. Han slår lejr under de store banyans ved Vinefall, dybt oppe af Tangle-vejen. Find ham, og spørg ham, hvad den grønne gemmer på.',
+  'entities.quests.q_pr_the_man_who_went_in.title': 'Manden der gik ind',
+  'entities.quests.q_pr_what_the_drums_guard.completion':
+    'Mos, perleskall og orneblod, pakket af fingre. Noget i den ruin holder stadig sine ritualer, {playerName}, og Guardian holder alt andet ude. Det er på tide, at vi taler tydeligt om det.',
+  'entities.quests.q_pr_what_the_drums_guard.objectives.0.label': 'Canopy Weaver skåret ned',
+  'entities.quests.q_pr_what_the_drums_guard.objectives.1.label': 'Genopfyldt Offerskål samlet',
+  'entities.quests.q_pr_what_the_drums_guard.text':
+    'Jeg har gået så nær ved det sunkne afgud, som en levende mand tør, og jeg så to ting: Væverne har forhænget afgudsvejen i spind, og de gamle offerskåle langs den er blevet fyldt igen. Frisk, {playerName}. Klip otte vævere af vejen og giv mig tre af de tilbud. Jeg ville vide, hvilken hånd der stadig fodrer en død gud.',
+  'entities.quests.q_pr_what_the_drums_guard.title': 'Hvad Drums Guard',
+  'entities.quests.q_pr_wreck_line_cargo.completion':
+    'Saltplettet men sunde, alle tre. Dykkerne spiser denne måned på grund af dig, {playerName}.',
+  'entities.quests.q_pr_wreck_line_cargo.objectives.0.label': 'Pearlwake Cargo er kommet sig',
+  'entities.quests.q_pr_wreck_line_cargo.text':
+    'Stormen for tre nætter tilbage drev Pearlwake ud på revet, og hendes last er strøet ud i hele vraglinjen mellem her og Palmstranden. Tre kasser med handelsvarer ligger stadig i brændingen, {playerName}. Bring dem ind før tidevandet, eller krabberne, gør krav på det, der er tilbage.',
+  'entities.quests.q_pr_wreck_line_cargo.title': 'Vraglinjen',
+  'entities.quests.q_seal_restored.completion':
+    'Jeg mærkede det tæt herfra, blidt som skumringen. The Hollow husker sine venner, {playerName}. Uanset hvor langt du rejser, vil der altid være et lys for dig under det store træ.',
+  'entities.quests.q_seal_restored.objectives.0.label': 'Seglet sat tilbage i seglstenen',
+  'entities.quests.q_seal_restored.text':
+    "Tag Warden's Segl til seglstenen i hjertet af retten og sæt den tilbage, hvor den blev slået løs. Så kan hulen begynde at hele, og du, {playerName}, vil have gjort, hvad ingen af ​​din slags har gjort før.",
+  'entities.quests.q_seal_restored.title': 'Seglet restaureret',
+  'entities.quests.q_shards_of_starfall.completion':
+    'Se på striberne! Efterår. Hulen blev forseglet i efteråret. To hundrede års skænderi, afgjort af seks små sten.',
+  'entities.quests.q_shards_of_starfall.objectives.0.label': 'Oversat: Starfall Shard',
+  'entities.quests.q_shards_of_starfall.text':
+    'Når skumringsvisperne passerer over krystalmarkerne, klæber fliser af gammelt stjernelys sig til dem som grater. Seks skår, {playerName}, og jeg kan datere forseglingen til netop den sæson, den blev sunget.',
+  'entities.quests.q_shards_of_starfall.title': 'Skår af Stjernefald',
+  'entities.quests.q_spore_hearts.completion':
+    'Der. Renset og stille. Hver af dem viser det samme mærke: skyggen flyder FRA Sunken Court. Fortæl Saelwyn.',
+  'entities.quests.q_spore_hearts.objectives.0.label': 'Sporehjerte',
+  'entities.quests.q_spore_hearts.text':
+    'Når en sporeling falder til mørket, bliver dens hjerte ved med at slå med lånt skygge. Fire af disse hjerter, renset ved helligdommen, kan lære os, hvordan korruptionen breder sig. Det er grumt arbejde, {playerName}, men det er reparationsarbejde.',
+  'entities.quests.q_spore_hearts.title': 'Ringens hjerter',
+  'entities.quests.q_spore_tide.completion':
+    'Ringene i nord synger igen i aften. Stille, men syngende.',
+  'entities.quests.q_spore_tide.objectives.0.label': 'Korrumperet Sporeling stedt til hvile',
+  'entities.quests.q_spore_tide.text':
+    'Salven holder Grove, men korruptionen presser hårdere på Dybet med hver skumring. Yderligere tolv af de korrupte skal lægges til hvile, før samlerne kan genvinde deres nordringe, {playerName}.',
+  'entities.quests.q_spore_tide.title': 'Mod Spore Tidevandet',
+  'entities.quests.q_sunken_court.completion':
+    'Otte værger, stillet. Jeg kan huske, da de blev opdraget, {playerName}. Se ikke så overrasket ud; Hollow holder sine brugere i lang tid.',
+  'entities.quests.q_sunken_court.objectives.0.label': 'Ancient Guardian stilles',
+  'entities.quests.q_sunken_court.text':
+    'Bryn læste hjerterne sandt: tåren løber gennem det gamle hof i øst, og dets vogtere er vågnet forkert. De blev bygget for at beskytte sælen; nu vil de knuse enhver, der nærmer sig det. Ryd otte af dem fra ruinerne.',
+  'entities.quests.q_sunken_court.title': 'Den sunkne domstol',
+  'entities.quests.q_treant_accord.completion':
+    'Tykke og sunde, alle fire. Salven vil tage en uge at brygge og hundrede år at færdiggøre sit arbejde. Træer måler venlighed forskelligt.',
+  'entities.quests.q_treant_accord.objectives.0.label': 'Ældste Bark',
+  'entities.quests.q_treant_accord.text':
+    'De ældste i Grove smider deres ydre bark, mens korruptionen gnaver i deres rødder. Fire længder af det, og jeg kan brygge en salve til hele Grove. De vil ikke takke dig, mens du lirker det løs, {playerName}, men de vil stå et århundrede længere for det.',
+  'entities.quests.q_treant_accord.title': 'Treant-aftalen',
+  'entities.quests.q_veil_thinned.completion':
+    'Kolde, hver eneste af dem. The Hollow har måske en sæson, før tåren bliver en rift. Vi har arbejde at gøre, du og jeg.',
+  'entities.quests.q_veil_thinned.objectives.0.label': 'Oversat: Duskwisp Essence',
+  'entities.quests.q_veil_thinned.text':
+    'Så hulen åbnede sig for dig. Så er forseglingen svagere, end jeg frygtede, {playerName}. Hvor sløret river, bliver tisserne mørke og kolde. Bring mig otte essenser fra duskwisps, og jeg vil læse, hvor dybt såret løber.',
+  'entities.quests.q_veil_thinned.title': 'Det fortyndede slør',
+  'entities.quests.q_waking_warden.completion':
+    'Klokken af ​​dens stemme er tavs. Jeg mærkede det herfra, som en vægt løftet af hele dalen.',
+  'entities.quests.q_waking_warden.objectives.0.label': 'The Waking Warden besejrede',
+  'entities.quests.q_waking_warden.text':
+    'Retten er stille, men dens herre er ikke. Vagten, der holder sælen, er vågnet forvredet, og mens den står, kan sælen ikke repareres. Det vil ikke falde let; tag en ven med, hvis du kan finde en, {playerName}. Medbring to, hvis du kan finde to.',
+  'entities.quests.q_waking_warden.title': 'Den vågne vagtchef',
+  'entities.quests.q_wardens_echoes.completion':
+    'Ekkoet bliver svagere for hver gang. Snart vil retten ikke rumme andet end vind og vedbend, som en ruin skal.',
+  'entities.quests.q_wardens_echoes.objectives.0.label': 'Ancient Guardian stilles',
+  'entities.quests.q_wardens_echoes.text':
+    'Selv med deres herre tavs, gentager rettens vogtere sin sidste kommando som et ekko, der ikke vil falme. Indtil forseglingen er sat tilbage, vil de blive ved med at vågne, {playerName}. Stadig ti mere af dem, så murerne kan nå seglstenen.',
+  'entities.quests.q_wardens_echoes.title': 'Ekkoer af Warden',
+  'entities.quests.q_wf_across_the_fenway.completion':
+    'Pell holder ilden brændende gennem hver tåge fenen kan indånde mod hende. Hvis hun siger, at trinene er åbne, er de åbne. Velkommen til Bridgemere, {playerName}. Pas på dit skridt på mine planker, og vi kommer godt ud af det.',
+  'entities.quests.q_wf_across_the_fenway.objectives.0.label': 'Rapport til Bridgewright Alden',
+  'entities.quests.q_wf_across_the_fenway.text':
+    'Et blidt land, Willowfen, men blidt er ikke det samme som sikkert, {playerName}. Følg vejen nordpå til Fenway-dæmningen og kryds ind i Bridgemere. Fortæl Bridgewright Alden, at trapperne er åbne, og lejrbålet er tændt.',
+  'entities.quests.q_wf_across_the_fenway.title': 'På tværs af Fenway',
+  'entities.quests.q_wf_croakers_hush.completion':
+    'Hør her, {playerName}. Intet. Den første sande stilhed over dette fen i tredive år, og halvdelen af ​​byen vil ikke sove i nat på grund af dets mærkelighed. Pilene siger tak på deres måde. Bær dette, vævet af hans eget liljebed, og fenet vil kende dig som en ven, hvor end vandet når.',
+  'entities.quests.q_wf_croakers_hush.objectives.0.label': 'Den døsige Croaker dræbt',
+  'entities.quests.q_wf_croakers_hush.text':
+    'Nu kender du snorerens navn, {playerName}: den døsige kræker, den gamle tudsekonge ude på de døsige lejligheder. Hvert år bliver hans kvækkelse tungere, og hvert år glemmer flere moser at vågne. Charms vil holde dine øjne åbne, men hans bulk er en anden sag: tag en ven med, og bekæmp ikke ham i vandet. Sæt den gamle konge i en roligere søvn.',
+  'entities.quests.q_wf_croakers_hush.title': 'Croakerens tys',
+  'entities.quests.q_wf_eels_for_the_smokehouse.completion':
+    'Seks gode ål, knap forslået. Røgeriet vil lugte af penge om morgenen. Her var disse waders mine, da jeg var hurtigere: åleskind gør det våde som intet andet.',
+  'entities.quests.q_wf_eels_for_the_smokehouse.objectives.0.label': 'Plump Fenål',
+  'entities.quests.q_wf_eels_for_the_smokehouse.text':
+    'Mosepadderne æder ikke bare mine reb, {playerName}, de æder min fangst: de sluger ålene hele, lige ud af fælderne. Skær seks fyldige fri af de grådige ting, før kødet fordærves, og røgeribålene forbliver tændte.',
+  'entities.quests.q_wf_eels_for_the_smokehouse.title': 'Ål til Røghuset',
+  'entities.quests.q_wf_mind_the_moorings.completion':
+    'Se på det: rene bid, alle sammen, men der er reb nok tilbage til at splejse. Du har sparet mig for en måneds mønt og netterne for en måneds brokken, {playerName}.',
+  'entities.quests.q_wf_mind_the_moorings.objectives.0.label': 'Cut Mooring Line genoprettet',
+  'entities.quests.q_wf_mind_the_moorings.text':
+    'Godt reb er kært herude, {playerName}: hver linje, tudserne bider igennem, er en uge med ålepenge væk. De afskårne ender ligger stadig langs voldgraven, hvor bådene gled dem. Gå på strandpromenaden og bring mig fire linjer tilbage, så kan jeg splejse dem så godt som nye.',
+  'entities.quests.q_wf_mind_the_moorings.title': 'Pas på Moorings',
+  'entities.quests.q_wf_rope_chewers.completion':
+    'Ti færre sæt tænder i min voldgrav. Skiffsene sad på deres fortøjninger hele natten for første gang i en måned, {playerName}. Du har tak fra hver netter i byen.',
+  'entities.quests.q_wf_rope_chewers.objectives.0.label': 'Bogtoad dræbt',
+  'entities.quests.q_wf_rope_chewers.text':
+    'Bogtoads, {playerName}. De trækker op af voldgraven om natten og tygger gennem mine fortøjningsreb, som om de var rørstængler. Tre skiffer drev i sidste uge, og en af ​​dem havde mit gode spil ombord. Tynd dem ud, ti af de fede ting, og bådene bliver, hvor vi binder dem.',
+  'entities.quests.q_wf_rope_chewers.title': 'Reb-tyggere',
+  'entities.quests.q_wf_toll_and_tangle.completion':
+    'Tre kister, og mønten er stadig tør indeni. Spritterne vil surmule i underlivet i en uge, {playerName}, og byen skylder dig sit vinterbrød.',
+  'entities.quests.q_wf_toll_and_tangle.objectives.0.label': 'Willow Sprite kørt af',
+  'entities.quests.q_wf_toll_and_tangle.objectives.1.label': 'Toll-Chest kom sig',
+  'entities.quests.q_wf_toll_and_tangle.text':
+    'Pilespritterne synes, det er et fint spil at skære en færge løs, {playerName}, og i sidste uge gik afgiften over på østbanen med en sæson med broafgift ombord. Kisterne gik ned i lavvandet, og sprites danser på strandpromenaden, som om de ejer dem. Kør af otte og slæb tre betalingskister op, og Bridgemere spiser denne vinter.',
+  'entities.quests.q_wf_toll_and_tangle.title': 'Toll og Tangle',
+  'entities.quests.q_wf_wisplight_charms.completion':
+    'Seks glober, stadig varme af drømme. Giv mig indtil månen står op, og jeg vil få vævet charme til dig og den, der er modig nok til at stå ved siden af ​​dig.',
+  'entities.quests.q_wf_wisplight_charms.objectives.0.label': 'Oversat: Wisplight Globe',
+  'entities.quests.q_wf_wisplight_charms.text':
+    'Trådene over bassinerne er fen, der drømmer højt, {playerName}, og deres lys er det eneste, der holder imod Croakerens stilhed. Jeg væver den ind i pile-amuler: en om din hals, og snorken kan ikke trække dine øjenlåg ned. Bring mig seks visplight glober. Trådene vil ikke kæmpe mod dig for dem, hvilket gør det til en venlighed eller et tyveri, afhængigt af hvordan du bærer det.',
+  'entities.quests.q_wf_wisplight_charms.title': 'Oversat: Wisplight Charms',
+  'entities.quests.q_wf_witch_of_willowweep.completion':
+    'Alden sendte dig hele vejen for at spørge om snorken? Så lytter bridgefolket endelig. Sæt dig ud af fugten, {playerName}. Den lyd har et navn og en hals, og jeg har ventet på, at nogen, der er tåbe nok, vil hjælpe mig med at stille den.',
+  'entities.quests.q_wf_witch_of_willowweep.objectives.0.label': 'Oversat: Find Mother Sedge',
+  'entities.quests.q_wf_witch_of_willowweep.text':
+    'Du har hørt det nu, {playerName}: snorken. Langsomt og tungt, ud forbi de døsige lejligheder, som selve fenet, der vender om i søvne. tudserne, spritterne, tudserne, der brændte ved middagstid: det hele startede, da lyden gjorde det. En sjæl ved måske, hvad det er. Mother Sedge holder en lejr ved Willowweep, vest omkring voldgraven og ned ad den fjerne kyst. Find hende, og spørg hende, hvad der sover midt på mit fen.',
+  'entities.quests.q_wf_witch_of_willowweep.title': 'Heksen fra Pileweep',
+  'entities.quests.q_wisp_lights.completion':
+    'Blød som de første stjerner. Stil dem her ved alteret; helligdommen klarer resten.',
+  'entities.quests.q_wisp_lights.objectives.0.label': 'Oversat: Wisp Mote',
+  'entities.quests.q_wisp_lights.text':
+    'Glimmervisperne bærer splinter af det gamle stjernelys, der faldt her, da Hulen blev forseglet. Seks splinter, og helligdomslamperne vil brænde i et år. Tag kun fra dem, der falmer; hulen giver nok uden grådighed.',
+  'entities.quests.q_wisp_lights.title': 'Shallows lys',
+  'entities.quests.q_ww_bells_of_gallowmere.completion':
+    'Cobb sendte dig hele vejen op, gjorde han? God mand. Han har holdt de portlygter tændt i tredive år, og skoven er aldrig en eneste gang kommet forbi ham. Velkommen til Gallowmere, {playerName}. Pas på klokkerne.',
+  'entities.quests.q_ww_bells_of_gallowmere.objectives.0.label': 'Rapporter til Sexton Marrow',
+  'entities.quests.q_ww_bells_of_gallowmere.text':
+    'Har du hørt det, {playerName}? Det er Gallowmere, op ad nordvejen, der ringer sine døde i søvn. Sexton Marrow holder tællingen af ​​enhver sjæl under baldakinen, levende og begravet. Gå hen og bliv talt, før skoven selv tæller dig.',
+  'entities.quests.q_ww_bells_of_gallowmere.title': 'Klokkerne i Gallowmere',
+  'entities.quests.q_ww_candles_at_the_bounds.completion':
+    'Alle fire brænder? Træk derefter vejret, {playerName}. Du hørte det ikke, men det gjorde hele landsbyen: klokkerne ringede lettere i det øjeblik, den sidste væge fangede.',
+  'entities.quests.q_ww_candles_at_the_bounds.objectives.0.label': 'Gentændt gravlys',
+  'entities.quests.q_ww_candles_at_the_bounds.text':
+    'Fire grænsesten ringer Gallowmere, {playerName}, en på hver vej ud, og et gravlys brænder på hver sten. Mens de brænder, bliver de begravede begravet. Finregnen har druknet dem, alle fire, og jeg er for gammel til at gå alene. Tag min taper og tænd dem igen, hurtigt.',
+  'entities.quests.q_ww_candles_at_the_bounds.title': 'Stearinlys ved Grænsen',
+  'entities.quests.q_ww_horn_of_the_huntsman.completion':
+    'Hornet stoppede i mellemtonen. Hver klokke i Gallowmere ringede en gang af sig selv, og så blev skoven mere stille, end jeg har hørt det i tredive år. Du har udført den rite, jeg ikke kunne, {playerName}. Bær dette, og gå under baldakinen uden frygt.',
+  'entities.quests.q_ww_horn_of_the_huntsman.objectives.0.label': 'Den blege jæger løsnet hesten',
+  'entities.quests.q_ww_horn_of_the_huntsman.text':
+    'Du har hørt hornet nu, {playerName}, tyndt og langt væk, lyden hele skoven holder vejret for. Den blege jæger rider på sin lysning nord herfra, og hver grav han passerer bliver mere lavvandet. Han var en mand engang, og han blev begravet forkert, og jeg er færdig med at lade som om, at bøn vil gøre det. Tag en ven, tag to, og tag ham af hesten.',
+  'entities.quests.q_ww_horn_of_the_huntsman.title': 'Jægerens Horn',
+  'entities.quests.q_ww_silk_in_the_eaves.completion':
+    'Ti færre vævere i tagskægget. Lampetænderne vil gå deres runder i aften uden at kigge op, og det er mere værd her, end du ved.',
+  'entities.quests.q_ww_silk_in_the_eaves.objectives.0.label': 'Enkesilkespinder dræbt',
+  'entities.quests.q_ww_silk_in_the_eaves.text':
+    'Kig op, når du går vestvejen, {playerName}, og du vil se dem: indhyllede former i baldakinen, der svajer, hvor ingen vind når. Enkesilkespinderne har sneget sig ud af Krattet og spændt deres spisekammer over mine lanterner. Dræb ti, og vejen er igen en vej.',
+  'entities.quests.q_ww_silk_in_the_eaves.title': 'Silke i tagskægget',
+  'entities.quests.q_ww_the_last_vicar.completion':
+    'Marrow bekymringer efter mig? Det er nyt. Fortæl ham, at Mournstone står på en måde, og det gør jeg også. Bliv et stykke tid, {playerName}. Tjernen har hvisket, og jeg vil helst ikke lytte alene.',
+  'entities.quests.q_ww_the_last_vicar.objectives.0.label': 'Oversat: Find Vicar Creel',
+  'entities.quests.q_ww_the_last_vicar.text':
+    'Syd herfor støber Mournstone-kapellet sig af sin sorte tjære, og en mand passer det stadig: Vicar Creel, som ikke ville gå, når taget faldt. Han kender de gamle ritualer bedre end mine klokker gør, {playerName}, og han har ikke sendt besked i en måned. Gå på kapelvejen og se ham trække vejret.',
+  'entities.quests.q_ww_the_last_vicar.title': 'Den sidste præst',
+  'entities.quests.q_ww_walking_mosley_home.completion':
+    'Han kom gennem porten på egne ben og svor, at han ikke vil grave noget dybere end et majroebed fra nu af. Han er tilbage i gården på søndag, det er de altid. Tak, {playerName}. Gallowmere beholder sine folk, det er hele vores lov.',
+  'entities.quests.q_ww_walking_mosley_home.objectives.0.label':
+    'Graver Mosley gik sikkert tilbage til Gallowmere',
+  'entities.quests.q_ww_walking_mosley_home.text':
+    'Min graver Mosley tog kapelvejen for tre dage siden for at åbne en grund i den gamle gård, og graven kom ned oven på ham. Han kløede sig ud, fjolset er i live, men han er sammenkrøbet ved kapelgravene og vil ikke bevæge sig efter spinnere på vejen. Følg ham hjem, {playerName}. Jeg kan ikke ringe med klokkerne for en levende mand.',
+  'entities.quests.q_ww_walking_mosley_home.title': 'Vandrende Mosley Hjem',
+  'entities.quests.q_ww_what_the_bark_holds.completion':
+    'Tre sjæle tilbage under ærlig jord før natten falder på. Shamblerne vil vokse ud igen, det gør bark altid, men i aften hænger lysningen tom, og det er nok.',
+  'entities.quests.q_ww_what_the_bark_holds.objectives.0.label': 'Gravenbark Shambler fældet',
+  'entities.quests.q_ww_what_the_bark_holds.objectives.1.label': 'Silkebundne rester skåret ned',
+  'entities.quests.q_ww_what_the_bark_holds.text':
+    'I Den hængende Glade øst for Gallowmere hænger spinderne deres silkeindpakkede døde fra grenene, og gravbark-smellerne står vagt under som tålmodige pallebærere. Det er vores folk deroppe, {playerName}. Bryd fem shamblere, skær tre af de indpakkede døde ned og bring dem hjem til jorden.',
+  'entities.quests.q_ww_what_the_bark_holds.title': 'Hvad barken rummer',
+  'entities.quests.q_ww_widows_skeins.completion':
+    'Seks nøgler, bløde som en holdt vejret. De døde vil ligge lettere i dette. Tag disse wraps, jeg syede dem fra det sidste parti, og træet har aldrig bidt igennem dem.',
+  'entities.quests.q_ww_widows_skeins.objectives.0.label': 'Enkesilkenøste',
+  'entities.quests.q_ww_widows_skeins.text':
+    'Spinderne tager vores døde til deres spisekammer, {playerName}, så jeg tager deres silke til vores ligklæder. Det brænder rent, og det rummer en velsignelse bedre end linned nogensinde har gjort. Bring mig seks nøster af enkesilke, og den næste sjæl, vi begraver, går ned indpakket og bevogtet.',
+  'entities.quests.q_ww_widows_skeins.title': 'Enkens nøster',
+  'entities.quests.q_ww_wraiths_of_the_tarn.completion':
+    'Otte vagter lagde endelig ned. Jeg vil ikke kalde det en nåde i dagslys, men mellem os, {playerName}, var det en.',
+  'entities.quests.q_ww_wraiths_of_the_tarn.objectives.0.label': 'Træ Wraith dræbt',
+  'entities.quests.q_ww_wraiths_of_the_tarn.text':
+    'Trækranserne var kapelvogterne engang, {playerName}, dyrket af træer plantet over de ærede døde. Siden tjærnen blev sort, har de glemt deres kontor, og nu driver de gennem min kirkegård og trækker i jorden. Del otte af dem fra hinanden, før de afslutter det, de har startet.',
+  'entities.quests.q_ww_wraiths_of_the_tarn.title': 'Oversat: Wraiths of the Tarn',
+  'entities.zones.amberfall.name': 'Ravfaldet',
+  'entities.zones.amberfall.pois.0.label': 'Oversat: Lanternmere',
+  'entities.zones.amberfall.pois.1.label': 'Guldsmelten',
+  'entities.zones.amberfall.pois.2.label': 'Den forgyldte frugthave',
+  'entities.zones.amberfall.pois.3.label': 'Oversat: Harvest Hollow',
+  'entities.zones.amberfall.pois.4.label': 'Den Store Mere',
+  'entities.zones.amberfall.pois.5.label': 'Oversat: Cindermaple Rise',
+  'entities.zones.amberfall.pois.6.label': 'Den skæve monolit',
+  'entities.zones.amberfall.welcome':
+    'Hvert blad her brænder guld og rødt, men ingen falder nogensinde. Lanternmeres lanterner er tændt for dig.',
+  'entities.zones.drakelands.name': 'Drakelandslandene',
+  'entities.zones.drakelands.pois.0.label': 'Oversat: Wyrmwatch',
+  'entities.zones.drakelands.pois.1.label': 'Oversat: The Gatewood',
+  'entities.zones.drakelands.pois.2.label': 'Oversat: Cinder Dunes',
+  'entities.zones.drakelands.pois.3.label': 'Oversat: Trollmoot',
+  'entities.zones.drakelands.pois.4.label': 'Oversat: The Last Keep',
+  'entities.zones.drakelands.pois.5.label': 'Blodglasmarker',
+  'entities.zones.drakelands.pois.6.label': 'Oversat: Drakemaw Caldera',
+  'entities.zones.drakelands.welcome':
+    'Varm vind ruller af affaldet forude. Drager kører over Drakemaw, og troldebrande brænder i klitterne.',
+  'entities.zones.eastbrook_vale.pois.11.label': 'Farshore Causeway',
+  'entities.zones.evergarden.name': 'Evergarden',
+  'entities.zones.evergarden.pois.0.label': 'Oversat: Hedgewick',
+  'entities.zones.evergarden.pois.1.label': 'Haveporten',
+  'entities.zones.evergarden.pois.2.label': 'Parterre-vandringen',
+  'entities.zones.evergarden.pois.3.label': 'Oversat: Dawnhold Castle',
+  'entities.zones.evergarden.pois.4.label': 'Kronbladsdammen',
+  'entities.zones.evergarden.pois.5.label': 'Den store labyrint',
+  'entities.zones.evergarden.pois.6.label': 'Fountain Court',
+  'entities.zones.evergarden.pois.7.label': 'Den Gamle Mølle',
+  'entities.zones.evergarden.pois.8.label': 'Nordvagten',
+  'entities.zones.evergarden.pois.9.label': 'Liljebassinet',
+  'entities.zones.evergarden.welcome':
+    'Nogen klipper stadig hækkene, selvom der ikke er set nogen gartner i hundrede år. Pas på labyrinten: det tænker dig tilbage.',
+  'entities.zones.farshore_isle.name': 'Oversat: The Farshore',
+  'entities.zones.farshore_isle.pois.0.label': 'Oversat: Gullhaven',
+  'entities.zones.farshore_isle.pois.1.label': 'Landingen',
+  'entities.zones.farshore_isle.pois.2.label': 'Oversat: The Watch Meadow',
+  'entities.zones.farshore_isle.pois.3.label': 'Oversat: The Sundered Cliffs',
+  'entities.zones.farshore_isle.pois.4.label': 'Riftfields',
+  'entities.zones.farshore_isle.welcome':
+    'Kryds over sandbanken, og Gullhavens klokke finder dig, før byen gør det. Pauserne rives op uden varsel, og skansen holder kysten mod det, der strømmer igennem. De har ventet længe på en som dig.',
+  'entities.zones.frostveil.name': 'Oversat: The Frostveil Reach',
+  'entities.zones.frostveil.pois.0.label': 'Oversat: Icemantle',
+  'entities.zones.frostveil.pois.1.label': 'Snelinjen',
+  'entities.zones.frostveil.pois.2.label': 'Gletsjer Tarn',
+  'entities.zones.frostveil.pois.3.label': 'Aurora-trinene',
+  'entities.zones.frostveil.pois.4.label': 'Shiverfen',
+  'entities.zones.frostveil.pois.5.label': 'De hylende terrasser',
+  'entities.zones.frostveil.welcome':
+    'Sne sluger enhver lyd. Under de dansende lys føles kulden i sig selv vågen.',
+  'entities.zones.galecrest.name': 'Galecrest',
+  'entities.zones.galecrest.pois.0.label': 'Oversat: Wickharbor',
+  'entities.zones.galecrest.pois.1.label': 'Vindvejen',
+  'entities.zones.galecrest.pois.2.label': 'Oversat: The Howling Downs',
+  'entities.zones.galecrest.pois.3.label': 'Det gamle fyrtårn',
+  'entities.zones.galecrest.pois.4.label': 'Skæret',
+  'entities.zones.galecrest.pois.5.label': 'Wreckfields',
+  'entities.zones.galecrest.pois.6.label': 'Spejlet Tarn',
+  'entities.zones.galecrest.pois.7.label': 'Galecrest-staldene',
+  'entities.zones.galecrest.welcome':
+    'Vinden er aldrig stoppet her, og den gamle fyr er aldrig gået ud. Wickharbor beder kun om, at du lukker krodøren bag dig.',
+  'entities.zones.nightbloom.name': 'Natblomstringen',
+  'entities.zones.nightbloom.pois.0.label': 'Månehvile',
+  'entities.zones.nightbloom.pois.1.label': 'Natteporten',
+  'entities.zones.nightbloom.pois.2.label': 'Månebrønden',
+  'entities.zones.nightbloom.pois.3.label': 'Oversat: Gloamfield',
+  'entities.zones.nightbloom.pois.4.label': 'Den stående Våge',
+  'entities.zones.nightbloom.pois.5.label': 'Den søvnløse Barrow',
+  'entities.zones.nightbloom.welcome':
+    'Forbi Nightgate drømmer luften selv. Følg blomsterlyset til Moonrest, og pas på den sovende verden, der hænger på himlen.',
+  'entities.zones.palmreach.name': 'Oversat: The Palmreach',
+  'entities.zones.palmreach.pois.0.label': 'Oversat: Drifthaven',
+  'entities.zones.palmreach.pois.1.label': 'Tanglemouth',
+  'entities.zones.palmreach.pois.2.label': 'Palmestranden',
+  'entities.zones.palmreach.pois.3.label': 'Oversat: The Emerald Tangle',
+  'entities.zones.palmreach.pois.4.label': 'Vinfaldet',
+  'entities.zones.palmreach.pois.5.label': 'Safirlagunen',
+  'entities.zones.palmreach.pois.6.label': 'Det sunkne idol',
+  'entities.zones.palmreach.welcome':
+    'Varmt sand, højlydte fugle og en jungle, der æder horisonten. Drifthaven holder et bål tændt på stranden for dig.',
+  'entities.zones.veiled_hollow.name': 'Den Tilslørede Hule',
+  'entities.zones.veiled_hollow.pois.0.label': 'Ældreglimt',
+  'entities.zones.veiled_hollow.pois.1.label': 'Oversat: Duskfall Cave',
+  'entities.zones.veiled_hollow.pois.2.label': 'Oversat: Duskfall Overlook',
+  'entities.zones.veiled_hollow.pois.3.label': 'Ældste Grove',
+  'entities.zones.veiled_hollow.pois.4.label': 'Stjernefaldsbassinet',
+  'entities.zones.veiled_hollow.pois.5.label': 'Den sunkne domstol',
+  'entities.zones.veiled_hollow.pois.6.label': 'Krystallinske grunde',
+  'entities.zones.veiled_hollow.pois.7.label': 'Det skinnende dyb',
+  'entities.zones.veiled_hollow.welcome':
+    'Luften brummer af gammel magi. Søg vogter Saelwyn under det store træ i Eldergleam.',
+  'entities.zones.willowfen.name': 'Willowfen',
+  'entities.zones.willowfen.pois.0.label': 'Oversat: Bridgemere',
+  'entities.zones.willowfen.pois.1.label': 'Amberfen-trappen',
+  'entities.zones.willowfen.pois.2.label': 'Lilymoorerne',
+  'entities.zones.willowfen.pois.3.label': 'Oversat: Bogshine Pools',
+  'entities.zones.willowfen.pois.4.label': 'Pilegræs',
+  'entities.zones.willowfen.pois.5.label': 'De døsige lejligheder',
+  'entities.zones.willowfen.welcome':
+    'Myren brummer af guldsmede og bier. Kryds broen ind i Bridgemere og hvil fødderne et stykke tid.',
+  'entities.zones.wraithwood.name': 'Wraithwood',
+  'entities.zones.wraithwood.pois.0.label': 'Oversat: Gallowmere',
+  'entities.zones.wraithwood.pois.1.label': 'Crowgate',
+  'entities.zones.wraithwood.pois.2.label': 'Enkens kratt',
+  'entities.zones.wraithwood.pois.3.label': 'Den Hængende Glade',
+  'entities.zones.wraithwood.pois.4.label': 'Mournstone Kapellet',
+  'entities.zones.wraithwood.pois.5.label': 'Jægerens rydning',
+  'entities.zones.wraithwood.welcome':
+    'Baldakinen lukker sig over vejen som et låg. Hold dig til Gallowmeres lanterner, og svar ikke, hvis skoven kalder dit navn.',
+  'fiesta.augment.cardAria': '{name} ({category}) - {description}',
+  'guide.dungeonsPage.wildheartBody':
+    'En regnvåd junglecaldera, hvor to hævede jagtstier kredser om en jadecenote. Kryds dyrehuler og forfædres ruiner, og bestig derefter den rituelle pyramide for at møde Zulgar.',
+  'guide.family.demon.desc':
+    'Angribere fra hinsides sprækkerne, alle ild og trods. Hvor man står, er et brud aldrig langt.',
+  'guide.family.demon.name': 'Dæmoner',
+  'guide.family.kobold.desc':
+    'Skitrende ådselædere og sprites af lysning og levende hegn, mere gener end trussel, indtil de samler sig i antal.',
+  'guide.family.kobold.name': 'Oversat: Scamps',
+  'guide.family.murloc.desc':
+    'Kvækkende fiskefolk ved søbredden og tidevandsbassinet, hurtig til at sværme alt, der vader for tæt på.',
+  'guide.family.murloc.name': 'Croakfinns',
+  'guide.home.world.amberBlurb':
+    'Bag de vestlige klipper et efterår, der aldrig ender, og lanterner på en gylden blot.',
+  'guide.home.world.amberName': 'Ravfaldet',
+  'guide.home.world.duskBlurb':
+    'Et rige forseglet under bjergene, hvis hvisken om en vej ind er sande.',
+  'guide.home.world.duskName': 'Den Tilslørede Hule',
+  'guide.home.world.emberBlurb':
+    'På tværs af Pale Causeway viger det grønne vej for slagg, og noget gammelt styrer affaldet.',
+  'guide.home.world.emberName': 'Drakelandslandene',
+  'guide.home.world.fenBlurb':
+    'Forbi efterårskronen, en lys gren af ​​piletræer og stille vand og en by bag en voldgrav.',
+  'guide.home.world.fenName': 'Willowfen',
+  'guide.home.world.frostBlurb':
+    'En snebundet højde ud over hvert kort, kun skimtet i de dansende lys.',
+  'guide.home.world.frostName': 'Oversat: The Frostveil Reach',
+  'guide.worldPage.amberBlurb':
+    'Et evigt efterår af guld og røde blade, der aldrig falder, samlet sig omkring den lanterneoplyste by Lanternmere.',
+  'guide.worldPage.amberGreeter': 'Lanternemageren, Lanternmere',
+  'guide.worldPage.amberGreeting':
+    'Hvert blad her brænder guld og rødt, men ingen falder nogensinde. Lygterne tændes for dig; pas på Goldmelt på vej op.',
+  'guide.worldPage.amberPlaceNotes':
+    'Lanternmere gløder i hjertet af høsten. Guldsmelten er den ravglatte pas ind; Den forgyldte frugthave og Harvest Hollow holder de sødeste plukker og de dristigeste tyve; den store blotte spejler de brændende blade; Cindermaple Rise står højest og rødest; og den skæve monolitt husker noget ældre end efteråret.',
+  'guide.worldPage.duskBlurb':
+    'En dal med permanent skumring under det store træ i Eldergleam, hvor krystalruiner gløder og luften brummer af gammel magi.',
+  'guide.worldPage.duskGreeter': 'Oversat: Keeper Saelwyn, Eldergleam',
+  'guide.worldPage.duskGreeting':
+    'Få af din slags har stået under disse grene. Gå blidt, og vær velkommen.',
+  'guide.worldPage.duskPlaceNotes':
+    'Eldergleam samler sig under det store træ. Duskfall Cave og dens udsigt er vejen ind og det første syn af dalen; Ældste Grove og Starfall Basin holder det stille syd; Sunken Court rummer tilgroede ruiner i øst; og de skinnende dybe og krystallinske grunde lyser tværs over nord.',
+  'guide.worldPage.emberBlurb':
+    'Stormoplyste affald af aske og blodglas, hvor drakes hjul over calderaen og troldebrande brænder blandt klitterne, set fra portbyen Wyrmwatch.',
+  'guide.worldPage.emberGreeter': 'Portvagten, Wyrmwatch',
+  'guide.worldPage.emberGreeting':
+    'Varm vind af affaldet, drager over Drakemaw og troldebrande i klitterne. Drik før du går derud.',
+  'guide.worldPage.emberPlaceNotes':
+    'Wyrmwatch holder porten. Gatewood er den sidste green før affaldet; Cinder Dunes driver med aske og endnu værre; Troldemooten er hvor klittrolde samler deres ild; Bloodglass Fields glitrer med barberknive; og Drakemaw calderaen er den rygende krone i drakes cirkel.',
+  'guide.worldPage.fenBlurb':
+    'Et lyst, brummende vådområde af liljer og langsomt vand, krydset på gamle promenader fra brobyen Bridgemere.',
+  'guide.worldPage.fenGreeter': 'Brovogteren, Bridgemere',
+  'guide.worldPage.fenGreeting':
+    'Myren brummer af guldsmede og bier. Kryds broen, hvil fødderne et stykke tid, og bliv på brædderne forbi bassinerne.',
+  'guide.worldPage.fenPlaceNotes':
+    'Bridgemere sidder på det langsomme vand. Amberfen-trappen kommer ned fra høstlandet; Lilymoors- og Bogshine-bassinerne glitrer med tusser og guldsmede; Willowweep sporer sine grene ind i det blotte; og de døsige lejligheder er så blide, som dette land bliver.',
+  'guide.worldPage.frostBlurb':
+    'En tys af sne og mørke fyrretræer under nordlyset, hvor selve kulden føles vågen, og Icemantle holder sine bål brændende.',
+  'guide.worldPage.frostGreeter': 'Arnevogteren, Icemantle',
+  'guide.worldPage.frostGreeting':
+    'Sne sluger enhver lyd ud forbi muren. Hvis lysene begynder at danse, hold din stemme nede og din ild tændt.',
+  'guide.worldPage.frostPlaceNotes':
+    'Icemantle holder den sidste varme ildsted. Snelinjen markerer, hvor driverne tager over; Glacier Tarn er sort, stille vand under isen; Aurora-trappen klatrer under de dansende lys; Shiverfen er en frossen mose, der aldrig helt sover; og Hyleterrasserne tjener deres navn hver aften.',
+  'guide.worldPage.galeBlurb':
+    'Havklipper og hylende nedture, hvor vinden aldrig hviler, Old Beacon går aldrig ud, og Wickharbor lukker sine døre tæt.',
+  'guide.worldPage.galeGreeter': 'Beacon-keeperen, Wickharbor',
+  'guide.worldPage.galeGreeting':
+    'Vinden er aldrig stoppet her, og den gamle fyr er aldrig gået ud. Luk krodøren bag dig.',
+  'guide.worldPage.galePlaceNotes':
+    'Wickharbor læner sig ind i vinden. The Windway er klippevejen i; Howling Downs ruller træløse under kulingen; det Gamle Fyr er brændt så længe nogen kan sige; skæret falder helt ned til vandet; vragmarkerne holder kysten ærlig; og Mirror Tarn er den eneste ting, der stadig er i hele riget.',
+  'guide.worldPage.gardenBlurb':
+    'En hæk-labyrint haverige, der stadig er trimmet af ingen gartner, nogen har set, gik ind forbi Hedgewick og dens springvandsbaner.',
+  'guide.worldPage.gardenGreeter': 'Portvagten, Hedgewick',
+  'guide.worldPage.gardenGreeting':
+    'Nogen klipper stadig hækkene, selvom der ikke er set nogen gartner i hundrede år. Pas på labyrinten: det tænker dig tilbage.',
+  'guide.worldPage.gardenPlaceNotes':
+    'Hedgewick venter ved haveporten. Parterre Walk blomstrer i klippede farver; Dawnhold Castle borer sine riddere bag nye mure; kronbladsdammen driver lyserød året rundt; den Gamle Mølle omsætter sine egne ringbede; den store labyrint omarrangerer sine manerer for hver gæst, dens buer iagttaget af løvrige ræve; Nordvagten holder udkørselsvejen; liljebassinet hviler ud over det hele; og Springvandet løber stadig klart i havens hjerte.',
+  'guide.worldPage.hauntBlurb':
+    'En hjemsøgt skov under kæmpe baldakiner, hvor Gallowmeres lanterner er det eneste ærlige lys på vejen.',
+  'guide.worldPage.hauntGreeter': 'Lampetænderen, Gallowmere',
+  'guide.worldPage.hauntGreeting':
+    'Hold dig til lanternerne, rejsende. Og hvis skoven kalder dit navn fra vejen, skal du ikke svare på det.',
+  'guide.worldPage.hauntPlaceNotes':
+    'Gallowmere klemmer sig inde i sine lanterner. Crowgate er skovens dystre hoveddør; Enkekrat er spundet tykt med spind; Hængegladen og Sørgestenskapellet holder skovens ældste sorger; og Jægerrydningen hører til hvad der stadig jager der.',
+  'guide.worldPage.jungleBlurb':
+    'Et tropisk virvar af palmer, hvidt sand og højlydte fugle, hvor strandbyen Drifthaven holder et bål tændt på stranden.',
+  'guide.worldPage.jungleGreeter': 'Havnefogeden, Drifthaven',
+  'guide.worldPage.jungleGreeting':
+    'Varmt sand, højlydte fugle og en jungle, der æder horisonten. Vi holder et bål tændt på stranden; prøv at vende tilbage til det.',
+  'guide.worldPage.junglePlaceNotes':
+    'Drifthaven holder ilden på stranden. Tanglemouth er der, hvor floden møder den grønne mur; Palmstranden løber hvid og varm langs brændingen; Smaragdvirret og Vinfaldet sluger det indre; Safirlagunen lyser klart og dybt; og Sunken Idol ser fra under vandet.',
+  'guide.worldPage.nightBlurb':
+    'Et rige med stjerneklar midnat, hvor blomster oplyser stierne, og Moonrest holder en stille vagt under en drømmende himmel.',
+  'guide.worldPage.nightGreeter': 'Vagtmesteren, Moonrest',
+  'guide.worldPage.nightGreeting':
+    'Forbi Nightgate drømmer luften selv. Følg blomsterlyset, og pas på den sovende verden, der hænger på himlen.',
+  'guide.worldPage.nightPlaceNotes':
+    'Moonrest holder vågen. Natporten er vejen ind i midnatslandet; Moonwell rummer stjernelys, du kan stå ved siden af; Gloamfield blomstrer i mørket; Standing Vigil ser uden nogensinde at bevæge sig; og Sleepless Barrow er det eneste sted her, der aldrig drømmer.',
+  'hudChrome.continentMap.levels': 'Niveauer {min} til {max}',
+  'hudChrome.continentMap.summary': 'Verdenskort. Vælg en zone for at åbne dens kort.',
+  'hudChrome.continentMap.title': 'Verdenskort',
+  'hudChrome.continentMap.toWorld': 'Verdenskort',
+  'hudChrome.continentMap.toZone': 'Zone kort',
+  'hudChrome.continentMap.toggleAria': 'Skift mellem verdenskortet og zonekortet',
+  'hudChrome.itemTooltip.riftSockets': 'Rift ædelstene {used}/{total}',
+  'hudChrome.itemTooltip.riftTier': '{tier}-rang Rift element',
+  'hudChrome.itemTooltip.riftUpgrade': 'Rift-opgradering {level}/{max}',
+  'hudChrome.keybinds.mount': 'Monter / Afmonter',
+  'hudChrome.meters.breakdownOther': 'Andet ({count})',
+  'hudChrome.meters.breakdownRow': '{value} ({percent})',
+  'hudChrome.meters.breakdownSummary': '{tab}: {værdi} {value}',
+  'hudChrome.meters.melee': 'Nærkamp',
+  'hudChrome.meters.percent': '{værdi}% {value}',
+  'hudChrome.meters.petAbility': '{kæledyr}: {pet} {ability}',
+  'hudChrome.mobile.mounts': 'Beslag',
+  'hudChrome.mountRace.cancelButton': 'Aflys løb',
+  'hudChrome.mountRace.finished': 'Færdig om {seconds}s!',
+  'hudChrome.mountRace.go': 'GÅ!',
+  'hudChrome.mountRace.progress': 'Porte {n} af {total}',
+  'hudChrome.mountRace.start': 'Gå! Ryd hvert hop, og kør derefter tilbage gennem buen.',
+  'hudChrome.mountRace.startButton': 'Start løb',
+  'hudChrome.mountRace.timeLeft': 'Oversat: {seconds}s',
+  'hudChrome.mountRace.timeout': 'Race mislykkedes',
+  'hudChrome.mountRace.toFinish': 'Kør tilbage gennem buen!',
+  'hudChrome.mountTraining.begin': 'Begynd lektion',
+  'hudChrome.mountTraining.mountPrompt': 'Tryk på for at montere træningen Valorsteed. {key}',
+  'hudChrome.mountTraining.ownedMountPrompt': 'Dine tøjler er i dine tasker. Brug dem til at ride.',
+  'hudChrome.mountTraining.returnToMarla':
+    'Vend tilbage til Marla ved stalden for at købe dine Valorsteed-tøjler for 10g.',
+  'hudChrome.mountTraining.ridePrompt':
+    'Følg den lysende markør til startlinjen, og tryk derefter på Start Race.',
+  'hudChrome.mountTraining.success': 'Du har tæmmet Valorsteed.',
+  'hudChrome.mounts.clickManage': 'Klik for at vælge din montering',
+  'hudChrome.mounts.close': 'Tæt',
+  'hudChrome.mounts.desc_aether_hover_cycle':
+    'En kraftfuld magitech-cykel designet til hurtig, lavtsvævende kampgennemløb.',
+  'hudChrome.mounts.desc_grag_bear': 'En hårdfør, sikker bjørn, der giver øget rejsehastighed.',
+  'hudChrome.mounts.desc_shadowjump_toad':
+    'En massiv, fodsikker kæmpetudse, trænet i lynhurtige skyggegrænser, der dækker ethvert terræn.',
+  'hudChrome.mounts.desc_stalkglider_snail':
+    'En solid, langsomt brændende snegl, der giver øget rejsehastighed.',
+  'hudChrome.mounts.desc_stormfeather_griffin':
+    'En kongelig stormgriffin, der forfølger jorden på runeskoede kløer med foldede vinger.',
+  'hudChrome.mounts.desc_thunderstrut_gobbler':
+    'En kolossal stormudklækket gobbler, der stritter ned fra Waking Peak, med halen viftet som et tordenhoved.',
+  'hudChrome.mounts.desc_valorsteed': 'En hårdfør, sikker hest, der giver øget kørehastighed.',
+  'hudChrome.mounts.dismount': 'Afmontere',
+  'hudChrome.mounts.emptyDropHint':
+    'Sjældnere mounts falder fra heroiske dungeon-bosser og Rift-afslutninger.',
+  'hudChrome.mounts.emptyStableHint':
+    'Nå niveau 20 og tag ridetimer med Stablemaster Marla i Highwatch Stables, vest for Highwatch.',
+  'hudChrome.mounts.emptyTitle': 'Ingen beslag indsamlet',
+  'hudChrome.mounts.mount': 'Montering',
+  'hudChrome.mounts.name_aether_hover_cycle': 'Oversat: Aether-Jouster Hover-Cycle',
+  'hudChrome.mounts.name_grag_bear': 'Oversat: Goliath Grag-Bear',
+  'hudChrome.mounts.name_shadowjump_toad': 'Oversat: Kama-Kage the Shadow-Jump Toad',
+  'hudChrome.mounts.name_stalkglider_snail': 'Moss-Shell Stilk-Svævefly',
+  'hudChrome.mounts.name_stormfeather_griffin': 'Oversat: Sky-Reach Stormfeather',
+  'hudChrome.mounts.name_thunderstrut_gobbler': 'Oversat: Thunderstrut the Grand Gobbler',
+  'hudChrome.mounts.name_valorsteed': 'Oversat: Valorsteed',
+  'hudChrome.mounts.rarity_common': 'Fælles',
+  'hudChrome.mounts.rarity_epic': 'Episk',
+  'hudChrome.mounts.rarity_rare': 'Sjælden',
+  'hudChrome.mounts.riding': 'Ridning',
+  'hudChrome.mounts.select': 'Vælge',
+  'hudChrome.mounts.selected': 'Valgt',
+  'hudChrome.mounts.spec_speed': '+{pct}% ekstra mobilitet',
+  'hudChrome.mounts.title': 'Beslag',
+  'hudChrome.mounts.useToRide': 'Brug til at tilkalde denne montering.',
+  'hudChrome.unstuck.alreadyActive': 'Unstuck tæller allerede ned.',
+  'hudChrome.unstuck.alreadySafe': 'Du er allerede i en sikker, tilgængelig position.',
+  'hudChrome.unstuck.busy': 'Afslut din nuværende handling, før du bruger Unstuck.',
+  'hudChrome.unstuck.cancelledBusy': 'Unstuck annulleret, fordi du startede en anden handling.',
+  'hudChrome.unstuck.cancelledCombat': 'Unstuck annulleret, fordi du gik ind i kamp.',
+  'hudChrome.unstuck.cancelledDamaged': 'Unstuck annulleret, fordi du tog skade.',
+  'hudChrome.unstuck.cancelledDisconnected': 'Afbrudt annulleret, fordi du afbrød forbindelsen.',
+  'hudChrome.unstuck.cancelledMoved': 'Afbrudt annulleret, fordi du flyttede.',
+  'hudChrome.unstuck.cancelledState': 'Afbrudt annulleret, fordi din tilstand er ændret.',
+  'hudChrome.unstuck.combat': 'Du kan ikke bruge Unstuck under kamp.',
+  'hudChrome.unstuck.completed': 'Flyttet til det nærmeste sikre sted.',
+  'hudChrome.unstuck.completedAtGraveyard':
+    "Din ånd er vendt tilbage til den nærmeste kirkegård. Tal med Pale Keeper for at acceptere The Keeper's Toll.",
+  'hudChrome.unstuck.controlled': 'Du kan ikke bruge Unstuck, mens bevægelsen er nedsat.',
+  'hudChrome.unstuck.cooldown': 'Unstuck vil være klar om {seconds} sekunder.',
+  'hudChrome.unstuck.countdown': 'Ikke sat fast: {seconds}',
+  'hudChrome.unstuck.dead': 'Du kan ikke bruge Unstuck, mens du er død eller i åndelig form.',
+  'hudChrome.unstuck.help':
+    'Gendannelse: /unstuck starter en stationær nedtælling for at flytte dig til et sikkert sted i nærheden.',
+  'hudChrome.unstuck.helpAtGraveyard':
+    "Recovery: /unstuck starter en stationær nedtælling og sender derefter din ånd til den nærmeste kirkegård. At vende tilbage gennem Pale Keeper kræver The Keeper's Toll.",
+  'hudChrome.unstuck.menuButton': 'Løsnede',
+  'hudChrome.unstuck.noSafePosition':
+    'Der blev ikke fundet noget sikkert sted i nærheden. Du blev ikke rørt.',
+  'hudChrome.unstuck.revivedAtGraveyard':
+    "Du er blevet returneret til den nærmeste kirkegård og genoplivet. Keeper's Toll tynger dig.",
+  'hudChrome.unstuck.standStill': 'Stå stille på fast grund, før du bruger Unstuck.',
+  'hudChrome.unstuck.standStillAnywhere': 'Stå stille, før du bruger Unstuck.',
+  'hudChrome.unstuck.started':
+    'Løsnede om {seconds} sekunder. Hvis du flytter, kæmper, tager skade eller starter en anden handling, annulleres den.',
+  'hudChrome.unstuck.unavailable': 'Unstuck er ikke tilgængelig i din nuværende tilstand.',
+  'sim.rift.allUnstable': 'Alle rifter er ustabile lige nu. Prøv snart igen.',
+  'sim.rift.alreadyCleared': 'Denne rift er allerede blevet ryddet af {names}.',
+  'sim.rift.deadEntry': 'Du kan ikke komme ind i en sprække, mens du er død.',
+  'sim.rift.deadEntryCombat':
+    'Dit parti er stadig i kamp. De døde kan komme ind igen, når kampene stopper.',
+  'sim.rift.descendFloor': 'Du går dybere ned i. {name}',
+  'sim.rift.detonateAbsoluteZero': 'Absolut nul bryder ud!',
+  'sim.rift.detonateAbyssalMaw': 'Abyssal Maw lukker!',
+  'sim.rift.detonateArcaneAnnihilation': 'Arkan tilintetgørelse bryder ud!',
+  'sim.rift.detonateBloodRite': 'Blodriten falder!',
+  'sim.rift.detonateBroodmothersMark': "Broodmother's Mark detonerer!",
+  'sim.rift.detonateCoreMeltdown': 'Core Meltdown detonerer!',
+  'sim.rift.detonateCrushingDepth': 'Knusningsdybde knuser!',
+  'sim.rift.detonateDeathSentence': 'Dødsdommen falder!',
+  'sim.rift.detonateEarthshatter': 'Earthshatter detonerer!',
+  'sim.rift.detonateFinalJudgment': 'Den endelige dom lander!',
+  'sim.rift.detonateGlacialGrave': 'Glacial Grave detonerer!',
+  'sim.rift.detonateHellfireBrand': 'Hellfire Brand detonerer!',
+  'sim.rift.detonateLightningRod': 'Lynet slår ned!',
+  'sim.rift.detonateMagmaWell': 'Magma Brønd bryder ud!',
+  'sim.rift.detonatePactSeal': 'Pact Seal detonerer!',
+  'sim.rift.detonatePitSentence': 'Pit Sentence detonerer!',
+  'sim.rift.detonateSoulGrave': 'Soul Grave detonerer!',
+  'sim.rift.detonateStormcallersWrath': "Stormcaller's Wrath bryder ud!",
+  'sim.rift.detonateVenomPool': 'Venom Pool bryder ud!',
+  'sim.rift.detonateVoidRift': 'Void Rift detonerer!',
+  'sim.rift.enterFloor': 'Du træder gennem kløften ind i. {name}',
+  'sim.rift.exitOpens': 'Sprækken gyser. En vej hjem river sig bag de faldne.',
+  'sim.rift.forgeEnchanted': 'Rift-fortryllelse fuldført for {name}.',
+  'sim.rift.forgeSocketed': 'Rift perle fatning til {name}.',
+  'sim.rift.forgeUpgraded': 'Rift-opgradering fuldført for {name}.',
+  'sim.rift.gateOpen': 'Porten kværner op.',
+  'sim.rift.iceGoalLit': 'Frostsiglen flammer. Vejen rører på sig.',
+  'sim.rift.levelGate': 'Kun eventyrere på niveau {level} eller højere kan deltage i denne rift.',
+  'sim.rift.orbOpensGate': 'Blood Orb blusser. Templets porte åbner sig.',
+  'sim.rift.orbSealed': 'Kuglen er forseglet ved ritualet nedenfor.',
+  'sim.rift.orbWakes': 'Pentagrammets flamme løber ud. Noget vågner på alteret.',
+  'sim.rift.portalCollapses': '{tier}-rangkløften i {zone} kollapser.',
+  'sim.rift.portalOpens': 'En rift med {tier}-rang river sig i {zone}!',
+  'sim.rift.portalSealed': '{tier}-rangkløften i {zone} er blevet forseglet.',
+  'sim.rift.pylonLit': 'En runepylon blusser til liv ({lit}/{total}).',
+  'sim.rift.raceLost': 'Riften er allerede blevet ryddet af {names}. Dit løb slutter.',
+  'sim.rift.raceLostBanner': 'Rift allerede ryddet',
+  'sim.rift.raceWinBanner': 'Rift Race vundet - {seconds}s',
+  'sim.rift.raceWorldWin': '{names} vandt Rift-løbet med {tier}-rang på {seconds}s!',
+  'sim.rift.seqProgress': 'Runerne svarer på skift (/{total}). {step}',
+  'sim.rift.seqReset': 'Runerne bliver mørke. Begynd igen.',
+  'sim.rift.socketsShut': 'Stikkontakterne kværner lukket. Vejen rører på sig.',
+  'sim.rift.stepBack': 'Du træder tilbage gennem kløften.',
+  'sim.rift.wayDownOpens': 'Vejen ned river sig.',
 };
