@@ -71,9 +71,17 @@ describe('SceneChoiceWindow retained controls', () => {
 
   it('relocalizes option text without replacing or unfocusing the active button', () => {
     const { window } = makeWindow();
-    const current = model();
+    const current = model({
+      promptKey: 'hudChrome.finder.chooseActivities',
+      values: null,
+      options: [
+        { id: 'pay', key: 'hudChrome.finder.accept' },
+        { id: 'decline', key: 'hudChrome.finder.decline' },
+      ],
+    });
     window.update(current, 'Leader');
     const buttons = [...window.root.querySelectorAll<HTMLButtonElement>('.scene-choice-option')];
+    expect(buttons.map((button) => button.textContent)).toEqual(['Accept', 'Decline']);
     buttons[1].focus();
 
     setLanguage('es');
@@ -83,6 +91,7 @@ describe('SceneChoiceWindow retained controls', () => {
     const repainted = [...window.root.querySelectorAll<HTMLButtonElement>('.scene-choice-option')];
     expect(repainted[0]).toBe(buttons[0]);
     expect(repainted[1]).toBe(buttons[1]);
+    expect(repainted.map((button) => button.textContent)).toEqual(['Aceptar', 'Rechazar']);
     expect(document.activeElement).toBe(buttons[1]);
   });
 
