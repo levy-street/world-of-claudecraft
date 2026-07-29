@@ -438,7 +438,7 @@ describe('Eastbrook polish capture contract', () => {
       // and harbor integration. Those paths are inactive in the accepted
       // Eastbrook captures, so the evidence still depicts this tree. No
       // recapture.
-      fingerprint: '2e47b27090287f17335d9d07957fdd0c152fd860e646f3be78d13e352872f95a',
+      fingerprint: '21b2cd59eeccd29c54897e2b78ac9f2d27389ded281a281c85f931efa7a80b36',
       components: {
         captureContract: {
           id: 'polish-v2',

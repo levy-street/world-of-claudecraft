@@ -1533,14 +1533,14 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(acceptedFiles).toHaveLength(4);
     // Second-order seal, recomputed LAST in the re-mint recipe: it hashes the
     // performance evidence files, which carry the composite polish provenance.
-    // The mount integration changed comments in src/render/renderer.ts, a
+    // The campaign voyage integration changed src/render/renderer.ts, a
     // fingerprinted input, so the two after-evidence files re-mint one digest
     // pair each (renderer sha256 plus the composite fingerprint) and this seal
-    // follows. Runtime code and every measured value (frame timings, draw stats,
-    // triangle and scenario numbers) remain byte-identical, so no capture was
-    // retaken.
+    // follows. The harbor-only path is inactive in Eastbrook and every measured
+    // value (frame timings, draw stats, triangle and scenario numbers) remains
+    // byte-identical, so no capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      '08cd947eb217008c0fe08c57500adbd878bfc208f4d4f0e680e7415c4597d807',
+      'ee4687518a52b0a22582069529c57ba3e75e59e89435f4ec54cd8bdefbfd0f24',
     );
   });
 
