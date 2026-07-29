@@ -916,6 +916,7 @@ export const tr_TR: EnTranslations = {
       "emoteWheel": "İfade Çarkı",
       "targetFriendly": "En Yakın Dostu Hedefle",
       "targetFriendlyNext": "Dost Hedefler Arasında Geç",
+      "wheelHeldUnsupported": "{key} cannot be bound to actions that must be held.",
       "discord": "Discord",
       "valecup": "Vadi Kupası",
       "sheathe": "Silahı Kın'a Tak / Çıkar",

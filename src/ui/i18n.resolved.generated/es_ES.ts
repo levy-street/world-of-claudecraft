@@ -916,6 +916,7 @@ export const es_ES: EnTranslations = {
       "emoteWheel": "Rueda de gestos",
       "targetFriendly": "Objetivo amistoso más cercano",
       "targetFriendlyNext": "Objetivo amistoso siguiente",
+      "wheelHeldUnsupported": "{key} cannot be bound to actions that must be held.",
       "discord": "Discord",
       "valecup": "Copa del Valle",
       "sheathe": "Envainar/Desenvainar arma",

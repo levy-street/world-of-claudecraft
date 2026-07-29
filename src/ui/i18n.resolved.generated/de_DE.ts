@@ -916,6 +916,7 @@ export const de_DE: EnTranslations = {
       "emoteWheel": "Emote-Rad",
       "targetFriendly": "Nächsten Verbündeten anvisieren",
       "targetFriendlyNext": "Freundliches Ziel wechseln",
+      "wheelHeldUnsupported": "{key} cannot be bound to actions that must be held.",
       "discord": "Discord",
       "valecup": "Talpokal",
       "sheathe": "Waffe einstecken/ziehen",

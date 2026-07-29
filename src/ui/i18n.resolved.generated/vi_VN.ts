@@ -916,6 +916,7 @@ export const vi_VN: EnTranslations = {
       "emoteWheel": "Vòng Biểu Cảm",
       "targetFriendly": "Chọn Đồng Minh Gần Nhất",
       "targetFriendlyNext": "Luân Phiên Mục Tiêu Đồng Minh",
+      "wheelHeldUnsupported": "{key} cannot be bound to actions that must be held.",
       "discord": "Discord",
       "valecup": "Cúp Thung Lũng",
       "sheathe": "Tra/Rút Vũ Khí",

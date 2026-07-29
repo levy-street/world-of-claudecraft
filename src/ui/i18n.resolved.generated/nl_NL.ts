@@ -916,6 +916,7 @@ export const nl_NL: EnTranslations = {
       "emoteWheel": "Emotewiel",
       "targetFriendly": "Dichtstbijzijnde Bondgenoot Aanwijzen",
       "targetFriendlyNext": "Door Bondgenoten Bladeren",
+      "wheelHeldUnsupported": "{key} cannot be bound to actions that must be held.",
       "discord": "Discord",
       "valecup": "Dalbeker",
       "sheathe": "Wapen Schede In/Uit",

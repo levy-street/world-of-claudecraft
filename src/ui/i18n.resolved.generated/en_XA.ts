@@ -916,6 +916,7 @@ export const en_XA: EnTranslations = {
       "emoteWheel": "[Éɱóţé Ŵĥééļ]",
       "targetFriendly": "[Ţáŕĝéţ Ñéáŕéšţ Ƒŕíéñðļý]",
       "targetFriendlyNext": "[Çýçļé Ƒŕíéñðļý Ţáŕĝéţ]",
+      "wheelHeldUnsupported": "[{key} çáññóţ ƀé ƀóúñð ţó áçţíóñš ţĥáţ ɱúšţ ƀé ĥéļð.]",
       "discord": "[Ðíšçóŕð]",
       "valecup": "[Ʋáļé Çúþ]",
       "sheathe": "[Šĥéáţĥé/Úñšĥéáţĥé Ŵéáþóñ]",

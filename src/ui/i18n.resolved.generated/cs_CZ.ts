@@ -916,6 +916,7 @@ export const cs_CZ: EnTranslations = {
       "emoteWheel": "Kruh emotů",
       "targetFriendly": "Zacílit nejbližšího spojence",
       "targetFriendlyNext": "Procházet spojenecké cíle",
+      "wheelHeldUnsupported": "{key} cannot be bound to actions that must be held.",
       "discord": "Discord",
       "valecup": "Pohár údolí",
       "sheathe": "Zasunout/Vytasit zbraň",

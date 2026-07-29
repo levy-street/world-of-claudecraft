@@ -9,6 +9,7 @@ import type { MoveInput } from '../sim/types';
 import { detectBrowserEngine } from './browser_env';
 import { cursorForHover, type HoverCursorKind } from './cursors';
 import { comboCode, isModifierCode, type Keybinds, makeCombo } from './keybinds';
+import { mouseButtonBindingCode, wheelBindingCode } from './pointer_bindings';
 import {
   inForcedPointerLockCooldown,
   pointerLockNeedsSyncGesture,
@@ -192,9 +193,16 @@ export class Input {
   private downX = 0;
   private downY = 0;
   private downAt = 0;
-  // one-shot key capture for the rebind UI: the next keydown is delivered here
-  // (Escape cancels with null) instead of being dispatched as an action
+  // One-shot input capture for the rebind UI. Escape cancels with null; other
+  // keys, mouse buttons, and wheel directions are delivered as binding codes.
   private captureCb: ((code: string | null) => void) | null = null;
+  private captureGeneration = 0;
+  private captureWheelListening = false;
+  private boundWheelListening = false;
+  private readonly captureWheelListener = (e: WheelEvent): void => this.captureWheel(e);
+  private readonly boundWheelListener = (e: WheelEvent): void => this.onBoundWheel(e);
+  private boundMouseButtons = new Set<number>();
+  private suppressCapturedMouseButton: number | null = null;
   private controllerMoveInput: MoveInput | null = null;
   private controllerFacing: number | null = null;
   private emoteWheelHeldCodes = new Set<string>();
@@ -313,8 +321,20 @@ export class Input {
     });
     document.addEventListener('contextmenu', (e) => this.onContextMenu(e));
     document.addEventListener('selectstart', (e) => this.onSelectStart(e));
+    window.addEventListener('mousedown', (e) => this.onWindowMouseDown(e), true);
     canvas.addEventListener('mousedown', (e) => this.onMouseDown(e));
-    window.addEventListener('mouseup', (e) => this.onMouseUp(e));
+    window.addEventListener(
+      'mouseup',
+      (e) => {
+        if (this.captureMouseButton(e)) return;
+        this.onMouseUp(e);
+      },
+      true,
+    );
+
+    window.addEventListener('click', (e) => this.suppressCapturedMouseClick(e), true);
+    window.addEventListener('auxclick', (e) => this.suppressCapturedMouseClick(e), true);
+    window.addEventListener('contextmenu', (e) => this.suppressCapturedMouseClick(e), true);
     window.addEventListener('mousemove', (e) => this.onMouseMove(e));
     canvas.addEventListener(
       'wheel',
@@ -334,6 +354,8 @@ export class Input {
       this.hoverActive = false;
       this.setHoverCursor('default');
     });
+    this.keybinds.onBindingsChanged(() => this.syncBoundWheelListener());
+    this.syncBoundWheelListener();
     this.updateCursor();
   }
 
@@ -497,7 +519,106 @@ export class Input {
   }
 
   captureNextKey(cb: (code: string | null) => void): void {
+    this.captureGeneration++;
     this.captureCb = cb;
+    this.syncBoundWheelListener();
+    this.setCaptureWheelListening(true);
+  }
+
+  private finishInputCapture(code: string | null): void {
+    const cb = this.captureCb;
+    if (!cb) return;
+    this.captureCb = null;
+    this.setCaptureWheelListening(false);
+    this.syncBoundWheelListener();
+    cb(code);
+  }
+
+  private deferInputCaptureCancellation(): void {
+    const cb = this.captureCb;
+    if (!cb) return;
+    const generation = this.captureGeneration;
+    this.captureCb = null;
+    this.setCaptureWheelListening(false);
+    this.syncBoundWheelListener();
+    setTimeout(() => {
+      // The native click must reach Back/Close before their DOM is rerendered.
+      // If that click starts another capture, its newer generation wins.
+      if (this.captureGeneration === generation) cb(null);
+    }, 0);
+  }
+
+  private setCaptureWheelListening(on: boolean): void {
+    if (this.captureWheelListening === on) return;
+    this.captureWheelListening = on;
+    if (on) {
+      window.addEventListener('wheel', this.captureWheelListener, {
+        capture: true,
+        passive: false,
+      });
+    } else {
+      window.removeEventListener('wheel', this.captureWheelListener, true);
+    }
+  }
+
+  private syncBoundWheelListener(): void {
+    const on = !this.captureCb && this.keybinds.hasWheelBinding();
+    if (this.boundWheelListening === on) return;
+    this.boundWheelListening = on;
+    if (on) {
+      window.addEventListener('wheel', this.boundWheelListener, {
+        capture: true,
+        passive: false,
+      });
+    } else {
+      window.removeEventListener('wheel', this.boundWheelListener, true);
+    }
+  }
+
+  private capturePointerInput(code: string, e: MouseEvent | WheelEvent): boolean {
+    if (!this.captureCb) return false;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    this.finishInputCapture(
+      makeCombo(code, {
+        ctrl: e.ctrlKey,
+        alt: e.altKey,
+        shift: e.shiftKey,
+        meta: e.metaKey,
+      }),
+    );
+    return true;
+  }
+
+  private captureMouseButton(e: MouseEvent): boolean {
+    if (!this.captureCb) return false;
+    // Primary click is how players naturally back out of the capture UI. Treat
+    // it as cancellation and leave the click untouched so Back and Close work.
+    if (e.button === 0) {
+      this.deferInputCaptureCancellation();
+      return true;
+    }
+    const code = mouseButtonBindingCode(e.button);
+    if (!code || !this.capturePointerInput(code, e)) return false;
+    this.suppressCapturedMouseButton = e.button;
+    setTimeout(() => {
+      if (this.suppressCapturedMouseButton === e.button) {
+        this.suppressCapturedMouseButton = null;
+      }
+    }, 0);
+    return true;
+  }
+
+  private captureWheel(e: WheelEvent): void {
+    const code = wheelBindingCode(e.deltaY);
+    if (code) this.capturePointerInput(code, e);
+  }
+
+  private suppressCapturedMouseClick(e: MouseEvent): void {
+    if (this.suppressCapturedMouseButton !== e.button) return;
+    this.suppressCapturedMouseButton = null;
+    e.preventDefault();
+    e.stopImmediatePropagation();
   }
 
   setCameraSpeed(mult: number): void {
@@ -758,6 +879,7 @@ export class Input {
 
   private releaseCapture(reason: string): void {
     const hadInput = this.keys.size > 0 || this.leftDown || this.rightDown;
+    if (reason !== 'pointerlock' && this.captureCb) this.finishInputCapture(null);
     // Always drop the mouse-drag state so a button can't stick "held".
     this.leftDown = false;
     this.rightDown = false;
@@ -769,7 +891,10 @@ export class Input {
     // -lock exit is different: the window still has focus and keyup will fire
     // normally, so clearing keys here would cancel a walk the instant a camera
     // drag ends (every right/left-drag exits pointer lock on release).
-    if (reason !== 'pointerlock') this.keys.clear();
+    if (reason !== 'pointerlock') {
+      this.keys.clear();
+      this.boundMouseButtons.clear();
+    }
     if (reason !== 'pointerlock' && this.emoteWheelHeldCodes.size > 0) {
       this.emoteWheelHeldCodes.clear();
       this.cb.onEmoteWheel(false);
@@ -837,15 +962,18 @@ export class Input {
       // player can hold Shift/Ctrl/Alt and THEN press the real key to bind the
       // whole chord (e.g. Shift+1); the chord is captured on that final key.
       if (e.code === 'Escape') {
-        const cb = this.captureCb;
-        this.captureCb = null;
-        cb(null);
+        this.finishInputCapture(null);
         return;
       }
       if (isModifierCode(e.code)) return;
-      const cb = this.captureCb;
-      this.captureCb = null;
-      cb(makeCombo(e.code, { ctrl: e.ctrlKey, alt: e.altKey, shift: e.shiftKey, meta: e.metaKey }));
+      this.finishInputCapture(
+        makeCombo(e.code, {
+          ctrl: e.ctrlKey,
+          alt: e.altKey,
+          shift: e.shiftKey,
+          meta: e.metaKey,
+        }),
+      );
       return;
     }
     const tag = (document.activeElement?.tagName ?? '').toLowerCase();
@@ -923,14 +1051,18 @@ export class Input {
   }
 
   private onKeyUp(e: KeyboardEvent): void {
-    if (this.keys.delete(e.code)) this.noteIntent('move');
-    if (this.emoteWheelHeldCodes.delete(e.code) && this.emoteWheelHeldCodes.size === 0) {
+    this.releaseBindingCode(e.code, e);
+  }
+
+  private releaseBindingCode(code: string, e?: { preventDefault?: () => void }): void {
+    if (this.keys.delete(code)) this.noteIntent('move');
+    if (this.emoteWheelHeldCodes.delete(code) && this.emoteWheelHeldCodes.size === 0) {
       this.cb.onEmoteWheel(false);
-      e.preventDefault();
+      e?.preventDefault?.();
     }
-    const slot = this.heldSlotCodes.get(e.code);
+    const slot = this.heldSlotCodes.get(code);
     if (slot !== undefined) {
-      this.heldSlotCodes.delete(e.code);
+      this.heldSlotCodes.delete(code);
       this.cb.onAbilityUp(slot);
     }
   }
@@ -1047,6 +1179,89 @@ export class Input {
     }
   }
 
+  private pressPointerBinding(
+    code: string,
+    combo: string,
+    holdable: boolean,
+    e: MouseEvent | WheelEvent,
+  ): boolean {
+    const tag = (document.activeElement?.tagName ?? '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea') return false;
+    if (this.cb.canUseGameKeys && !this.cb.canUseGameKeys()) return false;
+
+    if (
+      this.attackMoveEnabled &&
+      this.hoverActive &&
+      this.keybinds.codesForAction('attackMove').includes(combo)
+    ) {
+      e.preventDefault();
+      this.cb.onAttackMove?.(this.hoverX, this.hoverY);
+      return true;
+    }
+
+    let handled = false;
+    const held = this.keybinds.heldActionForCode(code);
+    if (held === 'emoteWheel') {
+      this.emoteWheelHeldCodes.add(code);
+      this.cb.onEmoteWheel(true);
+      handled = true;
+    } else if (held !== null) {
+      this.keys.add(code);
+      if (held === 'forward' || held === 'back') this.autorun = false;
+      // Wheel directions are rejected for held actions, so a jump here always
+      // has a matching mouse-button release.
+      if (held === 'jump')
+        this.keyJumpUntil = Math.max(this.keyJumpUntil, performance.now() + KEY_JUMP_LATCH_MS);
+      this.noteMovementIntent();
+      handled = true;
+    }
+
+    const edge = this.keybinds.edgeActionForCombo(combo);
+    if (edge !== null) {
+      if (edge.startsWith('slot')) {
+        const slot = Number(edge.slice(4));
+        this.cb.onAbilityDown(slot);
+        if (holdable) {
+          this.heldSlotCodes.set(code, slot);
+        } else {
+          this.cb.onAbilityUp(slot);
+        }
+      } else {
+        this.dispatchEdge(edge);
+      }
+      handled = true;
+    }
+
+    if (handled) e.preventDefault();
+    return handled;
+  }
+
+  private onWindowMouseDown(e: MouseEvent): void {
+    const code = mouseButtonBindingCode(e.button);
+    if (!code) return;
+    const combo = makeCombo(code, {
+      ctrl: e.ctrlKey,
+      alt: e.altKey,
+      shift: e.shiftKey,
+      meta: e.metaKey,
+    });
+    if (!this.pressPointerBinding(code, combo, true, e)) return;
+    this.boundMouseButtons.add(e.button);
+    e.stopPropagation();
+  }
+
+  private onBoundWheel(e: WheelEvent): void {
+    const code = wheelBindingCode(e.deltaY);
+    if (!code) return;
+    const combo = makeCombo(code, {
+      ctrl: e.ctrlKey,
+      alt: e.altKey,
+      shift: e.shiftKey,
+      meta: e.metaKey,
+    });
+    if (this.pressPointerBinding(code, combo, false, e)) e.stopPropagation();
+  }
+
   private onMouseDown(e: MouseEvent): void {
     if (e.button === 0) this.leftDown = true;
     if (e.button === 2) this.rightDown = true;
@@ -1089,6 +1304,13 @@ export class Input {
   }
 
   private onMouseUp(e: MouseEvent): void {
+    const code = mouseButtonBindingCode(e.button);
+    if (code && this.boundMouseButtons.has(e.button)) {
+      this.releaseBindingCode(code, e);
+      if (e.type !== 'pointerup') this.boundMouseButtons.delete(e.button);
+      e.preventDefault();
+      return;
+    }
     if (e.button === 0) this.leftDown = false;
     if (e.button === 2) this.rightDown = false;
     if (e.button === 0 || e.button === 2) this.noteIntent(e.button === 2 ? 'look' : 'move');

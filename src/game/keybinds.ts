@@ -12,6 +12,7 @@
 // game menu, so it stays out of the registry and is refused by bind().
 
 import { repairStoredBindings } from './keybinds_repair';
+import { isWheelBindingCode, pointerBindingLabel } from './pointer_bindings';
 
 export type BindKind = 'held' | 'edge';
 
@@ -420,8 +421,16 @@ export function isReservedCode(combo: string): boolean {
   return comboCode(combo) === 'Escape'; // the game-menu key is never rebindable
 }
 
+export function actionAcceptsCode(id: string, combo: string): boolean {
+  const kind = actionKind(id);
+  if (kind === null) return false;
+  return kind === 'edge' || !isWheelBindingCode(combo);
+}
+
 // short on-screen label for a single e.code (the keycap glyph)
 function codeLabel(code: string): string {
+  const pointer = pointerBindingLabel(code);
+  if (pointer) return pointer;
   if (/^Digit\d$/.test(code)) return code.slice(5);
   if (/^Key[A-Z]$/.test(code)) return code.slice(3);
   if (/^F\d{1,2}$/.test(code)) return code;
@@ -499,12 +508,16 @@ export function keyCapLabel(label: string): string {
     .replace(/shift\+/g, 's-')
     .replace(/ctrl\+/g, 'c-')
     .replace(/alt\+/g, 'a-')
-    .replace(/meta\+/g, 'm-');
+    .replace(/meta\+/g, 'm-')
+    .replace(/mouse (\d+)/g, 'm$1')
+    .replace(/wheel up/g, 'wu')
+    .replace(/wheel down/g, 'wd');
 }
 
 export class Keybinds {
   // actionId -> [primary, secondary] codes (either may be null)
   private map = new Map<string, (string | null)[]>();
+  private readonly changeListeners = new Set<() => void>();
   // localStorage key this profile reads/writes. A non-empty scope namespaces it
   // per character; an empty scope keeps the bare legacy/global key.
   private readonly storeKey: string;
@@ -554,7 +567,7 @@ export class Keybinds {
       const shared = actionAllowsShared(a.id);
       for (let i = 0; i < SLOTS_PER_ACTION; i++) {
         const v = entry[i];
-        if (typeof v !== 'string' || isReservedCode(v)) continue;
+        if (typeof v !== 'string' || isReservedCode(v) || !actionAcceptsCode(a.id, v)) continue;
         // Shared actions keep their code even if another action already claimed
         // it, and never claim it themselves, so the overlap survives a round-trip.
         if (!shared && claimed.has(v)) continue;
@@ -625,6 +638,22 @@ export class Keybinds {
     return null;
   }
 
+  hasWheelBinding(): boolean {
+    for (const codes of this.map.values()) {
+      if (codes.some((code) => code !== null && isWheelBindingCode(code))) return true;
+    }
+    return false;
+  }
+
+  onBindingsChanged(listener: () => void): () => void {
+    this.changeListeners.add(listener);
+    return () => this.changeListeners.delete(listener);
+  }
+
+  private notifyBindingsChanged(): void {
+    for (const listener of this.changeListeners) listener();
+  }
+
   /** Non-null codes bound to an action (for held-key polling). */
   codesForAction(id: string): string[] {
     return (this.map.get(id) ?? []).filter((c): c is string => c !== null);
@@ -651,7 +680,8 @@ export class Keybinds {
    */
   bind(id: string, index: number, combo: string): boolean {
     const codes = this.map.get(id);
-    if (!codes || index < 0 || index >= SLOTS_PER_ACTION) return false;
+    if (!codes || index < 0 || index >= SLOTS_PER_ACTION || !actionAcceptsCode(id, combo))
+      return false;
     // Held (movement) actions are polled per-frame against the physical e.code
     // and deliberately ignore modifiers (so e.g. Shift+W still walks). Store
     // them bare so the poll keeps matching; only edge actions keep the full
@@ -672,6 +702,7 @@ export class Keybinds {
     }
     codes[index] = value;
     this.save();
+    this.notifyBindingsChanged();
     return true;
   }
 
@@ -680,10 +711,12 @@ export class Keybinds {
     if (!codes || index < 0 || index >= SLOTS_PER_ACTION) return;
     codes[index] = null;
     this.save();
+    this.notifyBindingsChanged();
   }
 
   reset(): void {
     this.map = this.defaults();
     this.save();
+    this.notifyBindingsChanged();
   }
 }

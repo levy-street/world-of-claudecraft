@@ -1342,6 +1342,69 @@ export const TARGETS = [
     },
   },
   {
+    key: 'pointer-keybinds',
+    label: 'Key bindings: real mouse-wheel assignment',
+    when: ['game/input.ts', 'game/keybinds.ts', 'game/pointer_bindings.ts'],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+        const hud = window.__game?.hud;
+        if (!hud) return;
+        const win = document.querySelector('#options-menu');
+        if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
+        hud.toggleOptionsMenu();
+        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
+        buttons[0]?.click();
+      });
+      if (!(await pollForSize(page, '#options-menu .kb-cols'))) {
+        throw new Error('key bindings panel did not open');
+      }
+
+      const target = await page.evaluate(() => {
+        const columns = Array.from(document.querySelectorAll('#options-menu .kb-col'));
+        const actionBar = columns[columns.length - 1];
+        const button = actionBar?.querySelector('.kb-row .kb-key');
+        if (!button) return null;
+        button.scrollIntoView({ block: 'center' });
+        button.click();
+        const r = button.getBoundingClientRect();
+        return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
+      });
+      if (!target) throw new Error('first action-bar binding control was not found');
+
+      await page.mouse.move(target.x, target.y);
+      await wait(150);
+      // This is real browser wheel input. The capture path must consume it,
+      // persist Wheel Down, and repaint both the keycap and confirmation note.
+      await page.mouse.wheel({ deltaY: 120 });
+      await wait(350);
+
+      const state = await page.evaluate(() => {
+        const columns = Array.from(document.querySelectorAll('#options-menu .kb-col'));
+        const actionBar = columns[columns.length - 1];
+        const button = actionBar?.querySelector('.kb-row .kb-key');
+        const notes = Array.from(document.querySelectorAll('#options-menu .kb-note'));
+        const note = notes[notes.length - 1];
+        if (!button) return null;
+        button.scrollIntoView({ block: 'center' });
+        return {
+          keycap: button.textContent.trim(),
+          note: note?.textContent?.trim() ?? '',
+        };
+      });
+      const captured =
+        state?.keycap === 'Wheel Down' && state.note.includes('Wheel Down');
+      const unsupportedBefore =
+        state?.keycap === '...' && state.note.includes('Press a key');
+      if (!captured && !unsupportedBefore) {
+        throw new Error(`unexpected wheel-capture state: ${JSON.stringify(state)}`);
+      }
+      return { clip: '#options-menu' };
+    },
+  },
+  {
     key: 'interface-options-tabs',
     label: 'Interface options panel (four-tab split)',
     when: ['ui/options_window', 'ui/options_view'],

@@ -916,6 +916,7 @@ export const ko_KR: EnTranslations = {
       "emoteWheel": "감정 표현 휠",
       "targetFriendly": "가장 가까운 아군 대상 지정",
       "targetFriendlyNext": "아군 대상 순환",
+      "wheelHeldUnsupported": "{key}은(는) 길게 눌러야 하는 동작에 지정할 수 없습니다.",
       "discord": "Discord",
       "valecup": "베일 컵",
       "sheathe": "무기 넣기/빼기",

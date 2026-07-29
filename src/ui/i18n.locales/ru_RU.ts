@@ -564,6 +564,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.reason.bannedUntil':
     'Запрет на участие в ежедневных наградах действует еще {remaining}. Доступ вернется {until}. Причина: {reason}',
   'hudChrome.keybinds.discord': 'Discord',
+  'hudChrome.keybinds.wheelHeldUnsupported': '{key} нельзя назначить действию, которое нужно удерживать.',
   'hudChrome.spectate.banner': 'Наблюдение за {name}',
   'hudChrome.readyCheck.prompt': '{name} начал проверку готовности. Вы готовы?',
   'hudChrome.readyCheck.ready': 'Готов',

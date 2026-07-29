@@ -916,6 +916,7 @@ export const da_DK: EnTranslations = {
       "emoteWheel": "Følelseshjul",
       "targetFriendly": "Sigt mod nærmeste allierede",
       "targetFriendlyNext": "Skift allieret mål",
+      "wheelHeldUnsupported": "{key} cannot be bound to actions that must be held.",
       "discord": "Discord",
       "valecup": "Dalpokalen",
       "sheathe": "Gem/fremvis våben",

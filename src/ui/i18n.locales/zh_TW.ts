@@ -553,6 +553,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.reason.bannedUntil':
     '您還將被禁止參加每日獎勵 {remaining}。恢復時間：{until}。原因：{reason}',
   'hudChrome.keybinds.discord': 'Discord',
+  'hudChrome.keybinds.wheelHeldUnsupported': '{key} 無法綁定到需要按住的操作。',
   'hudChrome.spectate.banner': '正在觀察 {name}',
   'hudChrome.readyCheck.prompt': '{name} 發起了準備確認。你準備好了嗎？',
   'hudChrome.readyCheck.ready': '準備就緒',

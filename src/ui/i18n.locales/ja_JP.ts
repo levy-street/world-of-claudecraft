@@ -567,6 +567,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dailyRewards.reason.bannedUntil':
     'デイリー報酬への参加はあと{remaining}禁止されています。解除日時: {until}。理由: {reason}',
   'hudChrome.keybinds.discord': 'Discord',
+  'hudChrome.keybinds.wheelHeldUnsupported':
+    '{key} は長押しが必要なアクションには割り当てられません。',
   'hudChrome.spectate.banner': '{name}を観戦中',
   'hudChrome.readyCheck.prompt': '{name} が準備確認を開始しました。準備はいいですか？',
   'hudChrome.readyCheck.ready': '準備完了',

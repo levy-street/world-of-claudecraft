@@ -23,6 +23,7 @@ import { syncAppViewport } from '../game/app_viewport';
 import { audio } from '../game/audio';
 import { GAMEPAD_NONE, gamepadButtonLabel } from '../game/gamepad_map';
 import {
+  actionAcceptsCode,
   BIND_ACTIONS,
   BIND_CATEGORIES,
   isReservedCode,
@@ -1674,9 +1675,14 @@ export class OptionsWindow {
         this.deps.refreshKeybindLabels();
       } else if (isReservedCode(code)) {
         this.keybindNote = t('hud.options.keybindReserved', { key: keyLabel(code) });
+      } else if (!actionAcceptsCode(actionId, code)) {
+        this.keybindNote = t('hudChrome.keybinds.wheelHeldUnsupported', {
+          key: keyLabel(code),
+        });
       }
-      // re-render only if the menu is still open (player may have closed it)
-      if (this.isOpen) this.renderKeybinds();
+      // A primary-button cancellation is delivered after the native click so
+      // Back/Close can run first. Do not repaint over a view that click left.
+      if (this.isOpen && this.view === 'keybinds') this.renderKeybinds();
     });
   }
 }
