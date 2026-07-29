@@ -809,4 +809,12 @@ export const table: DeedLocaleTable = {
     name: 'Der Schrottplatz',
     desc: 'Zerlege 50 Ausrüstungsstücke zu Rohmaterialien.',
   },
+  dgn_wildheart_basin: {
+    name: 'Das Becken beißt zurück',
+    desc: 'Besiege Zulgar, die Stimme des Beckens, im Wildheart-Becken.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Heroisch: Das Wildheart Basin',
+    desc: 'Besiege Zulgar, die Stimme des Beckens, im Wildheart-Becken auf dem Schwierigkeitsgrad „Heroisch“.',
+  },
 };

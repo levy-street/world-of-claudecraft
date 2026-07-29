@@ -814,4 +814,12 @@ export const table: DeedLocaleTable = {
     name: 'O Ferro-Velho',
     desc: 'Recupere 50 pecas de equipamento transformando-as em materiais brutos.',
   },
+  dgn_wildheart_basin: {
+    name: 'A bacia morde de volta',
+    desc: 'Derrote Zulgar, Voz da Bacia na Bacia do Coração Selvagem.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Heroico: A Bacia do Coração Selvagem',
+    desc: 'Derrotar Zulgar, Voz da Bacia, na Bacia do Coração Selvagem, no modo Heroico.',
+  },
 };

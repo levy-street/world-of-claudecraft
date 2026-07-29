@@ -503,4 +503,12 @@ export const table: DeedLocaleTable = {
     name: '廢料場行家',
     desc: '將50件裝備拆解還原為製作原料。',
   },
+  dgn_wildheart_basin: {
+    name: '盆地反噬',
+    desc: '擊敗野心盆地的盆地之聲祖爾加。',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: '英雄：野心盆地',
+    desc: '在野心盆地擊敗盆地之聲祖爾加（英雄難度）。',
+  },
 };

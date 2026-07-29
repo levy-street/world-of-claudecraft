@@ -780,4 +780,12 @@ export const table: DeedLocaleTable = {
     name: 'Burza vrakovišť',
     desc: 'Rozeber 50 kusů výstroje zpět na základní materiály.',
   },
+  dgn_wildheart_basin: {
+    name: 'Povodí kousne zpět',
+    desc: 'Porazte Zulgara, Voice of the Basin in the Wildheart Basin.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Preklad: Heroic: The Wildheart Basin',
+    desc: 'Porazte Zulgara, Voice of the Basin v Wildheart Basin na obtížnost Heroic.',
+  },
 };

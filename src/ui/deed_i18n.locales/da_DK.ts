@@ -744,4 +744,12 @@ export const table: DeedLocaleTable = {
     name: 'Ophuggerens Plads',
     desc: 'Bjærg 50 stykker udstyr tilbage til råmaterialer.',
   },
+  dgn_wildheart_basin: {
+    name: 'Bassinet bider tilbage',
+    desc: 'Besejr Zulgar, Voice of the Basin i Wildheart Basin.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Oversat: Heroic: The Wildheart Basin',
+    desc: 'Besejr Zulgar, Voice of the Basin i Wildheart Basin på heroisk sværhedsgrad.',
+  },
 };

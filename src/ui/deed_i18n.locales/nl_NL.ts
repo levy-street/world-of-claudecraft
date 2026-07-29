@@ -817,4 +817,12 @@ export const table: DeedLocaleTable = {
     name: 'Het Slopersveld',
     desc: 'Salvage 50 stuks uitrusting terug tot ruwe grondstoffen.',
   },
+  dgn_wildheart_basin: {
+    name: 'Het bekken bijt terug',
+    desc: 'Versla Zulgar, Stem van het Basin in het Wildheart Basin.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Heldhaftig: het Wildheart Basin',
+    desc: 'Versla Zulgar, Voice of the Basin in het Wildheart Basin op Heroic-moeilijkheidsgraad.',
+  },
 };

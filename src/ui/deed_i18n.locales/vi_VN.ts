@@ -814,4 +814,12 @@ export const table: DeedLocaleTable = {
     name: 'Bãi Phế Liệu',
     desc: 'Tháo dỡ 50 món trang bị thành nguyên liệu thô.',
   },
+  dgn_wildheart_basin: {
+    name: 'Lưu vực cắn lại',
+    desc: 'Đánh bại Zulgar, Voice of the Basin ở Wildheart Basin.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Anh hùng: Lưu vực Wildheart',
+    desc: 'Đánh bại Zulgar, Voice of the Basin ở Wildheart Basin ở độ khó Heroic.',
+  },
 };

@@ -488,4 +488,12 @@ export const table: DeedLocaleTable = {
     name: '拆解行家',
     desc: '将50件装备拆解还原为原始材料。',
   },
+  dgn_wildheart_basin: {
+    name: '盆地反噬',
+    desc: '击败野心盆地的盆地之声祖尔加。',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: '英雄：野心盆地',
+    desc: '在野心盆地击败盆地之声祖尔加（英雄难度）。',
+  },
 };

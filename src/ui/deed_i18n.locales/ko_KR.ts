@@ -728,4 +728,12 @@ export const table: DeedLocaleTable = {
     name: '해체의 마당',
     desc: '장비 50점을 분해하여 원재료로 되돌리십시오.',
   },
+  dgn_wildheart_basin: {
+    name: '분지가 다시 물었습니다.',
+    desc: '야생심장 분지에서 분지의 목소리 줄가르를 처치하세요.',
+  },
+  dgn_wildheart_basin_heroic: {
+    name: '영웅: 야생심장 분지',
+    desc: '야생심장 분지에서 분지의 목소리 줄가르를 영웅 난이도로 처치하세요.',
+  },
 };

@@ -768,4 +768,12 @@ export const table: DeedLocaleTable = {
     name: 'Hurda Bahçesi',
     desc: 'Elli teçhizat parçasını hurda işlemine sokarak ham maddelere dönüştür.',
   },
+  dgn_wildheart_basin: {
+    name: 'Havza Geri Dönüyor',
+    desc: "Wildheart Havzasında Havzanın Sesi Zulgar'ı yen.",
+  },
+  dgn_wildheart_basin_heroic: {
+    name: 'Heroic: Wildheart Havzası',
+    desc: "Heroic zorlukta Wildheart Basin'de, Havzanın Sesi Zulgar'ı yen.",
+  },
 };
