@@ -1,5 +1,5 @@
 // The Undermount raid's in-world entrance: wing 1 has the single overworld door
-// (the Thornpeak fissure); wings 2 to 4 are reached through internal sealed doors.
+// (the Thornpeak fissure); wings 2 and 3 are reached through internal sealed doors.
 // This proves the raid is actually enterable in the world (walk into the door),
 // not just via a direct enterDungeon call.
 
@@ -23,10 +23,10 @@ function overworldDoor(sim: AnySim, dungeonId: string): AnyEntity | undefined {
 }
 
 describe('Undermount surface entrance', () => {
-  it('spawns exactly one overworld door: wing 1, not wings 2 to 4', () => {
+  it('spawns exactly one overworld door: wing 1, not wings 2 and 3', () => {
     const sim = makeSim();
     expect(overworldDoor(sim, 'undermount_wing1'), 'wing 1 door').toBeDefined();
-    for (const id of ['undermount_wing2', 'undermount_wing3', 'undermount_wing4']) {
+    for (const id of ['undermount_wing2', 'undermount_wing3']) {
       expect(overworldDoor(sim, id), `${id} has no overworld door`).toBeUndefined();
     }
   });

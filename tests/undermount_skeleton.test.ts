@@ -23,9 +23,16 @@ import {
 } from '../src/sim/encounters/undermount';
 
 describe('Undermount wing chain metadata (pure)', () => {
-  it('has four wings in descent order with unique orders 1..4', () => {
-    expect(UNDERMOUNT_WINGS).toHaveLength(4);
-    expect(UNDERMOUNT_WINGS.map((w) => w.order)).toEqual([1, 2, 3, 4]);
+  it('has three wings in descent order with unique orders 1..3', () => {
+    expect(UNDERMOUNT_WINGS).toHaveLength(3);
+    expect(UNDERMOUNT_WINGS.map((w) => w.order)).toEqual([1, 2, 3]);
+  });
+
+  it('assigns the pass-6 bosses: the duo, then Odrenn, then Volzharr (no Forge-Heart)', () => {
+    expect(UNDERMOUNT_WINGS[0].bossMobIds).toEqual(['vosh_the_glazier', 'saan_the_stoker']);
+    expect(UNDERMOUNT_WINGS[1].bossMobIds).toEqual(['odrenn_the_temperer']);
+    expect(UNDERMOUNT_WINGS[2].bossMobIds).toEqual(['volzharr_buried_furnace']);
+    expect(MOBS.the_forge_heart, 'the cut Forge-Heart wing leaves no mob behind').toBeUndefined();
   });
 
   it('chains each wing to the previous one (wing 1 requires nothing)', () => {
@@ -46,7 +53,7 @@ describe('Undermount dungeon x-band', () => {
     expect(dungeonAt(instanceOrigin(10, 0).x)?.id).toBe('undermount_wing1');
     expect(dungeonAt(instanceOrigin(11, 0).x)?.id).toBe('undermount_wing2');
     expect(dungeonAt(instanceOrigin(12, 0).x)?.id).toBe('undermount_wing3');
-    expect(dungeonAt(instanceOrigin(13, 0).x)?.id).toBe('undermount_wing4');
+    expect(dungeonAt(instanceOrigin(13, 0).x), 'no fourth wing band').toBeNull();
     expect(dungeonAt(arenaOrigin(0).x)).toBeNull();
     expect(dungeonAt(delveOrigin(0, 0).x)).toBeNull();
     expect(dungeonAt(yumiMazeOrigin(0).x)).toBeNull();
@@ -73,8 +80,6 @@ describe('undermountWingSealed (pure seal predicate)', () => {
     expect(undermountWingSealed(cleared, 'undermount_wing3')).toBe(true);
     cleared.add('undermount_wing2');
     expect(undermountWingSealed(cleared, 'undermount_wing3')).toBe(false);
-    cleared.add('undermount_wing3');
-    expect(undermountWingSealed(cleared, 'undermount_wing4')).toBe(false);
   });
 
   it('never seals a non-Undermount dungeon', () => {
