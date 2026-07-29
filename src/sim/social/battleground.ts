@@ -47,11 +47,10 @@ const BG_COUNTDOWN = 8; // form-up gate at the keeps before the flags go live
 export const BG_CAPS_TO_WIN = 5; // first team to this many captures wins.
 // ^ Tuning knob number one post-launch: fall back to 3 if live cap pace runs
 // slower than the modeled 2-3 minutes per capture on even teams.
-// 17 min cap; resolves on score, ties draw. Scaled with the field: Thornhollow's
-// stands are 334yd apart against the old field's 236, so a capture costs about
-// 1.4x the running, and the old 12 minutes would have let the clock, rather
-// than the fifth capture, decide most matches.
-export const BG_MAX_DURATION = 1020;
+// 12 min cap; resolves on score, ties draw. Scaled with the field: the stands
+// are 236yd apart, so five captures on even teams model out inside the cap and
+// the fifth capture, rather than the clock, decides most matches.
+export const BG_MAX_DURATION = 720;
 export const BG_END_HOLD = 15; // post-match hold: the frozen result screen
 export const BG_WAVE_PERIOD = 10; // one respawn wave per team every 10s
 export const BG_WAVE_OFFSET = 5; // the two team clocks run staggered half-cycles
@@ -61,19 +60,16 @@ export const BG_WAVE_OFFSET = 5; // the two team clocks run staggered half-cycle
 // BG_CARRIER_VULN_PER_STACK more damage taken, uncapped. Stacks clear the
 // moment the flag leaves the carrier (capture, drop, or return). Anti-turtle:
 // a hidden carrier gets softer the longer the hold.
-// The delay is tuned to the field's real scale: Thornhollow's stands are 334yd
-// apart, about 48s of clean running each way, so the anti-turtle clock starts
-// biting after roughly two full runs, as it did on the smaller field.
-export const BG_CARRIER_VULN_DELAY = 105;
+// The delay is tuned to the field's real scale: the stands are 236yd apart,
+// about 34s of clean running each way, so the anti-turtle clock starts biting
+// after roughly two full flag-to-flag runs.
+export const BG_CARRIER_VULN_DELAY = 75;
 export const BG_CARRIER_VULN_INTERVAL = 15;
 export const BG_CARRIER_VULN_PER_STACK = 0.1;
 const BG_FLAG_RETURN_TIME = 20; // a dropped flag auto-returns home after this
-// Reach for the flag action. Matched to the capture radius because the
-// Thornhollow flag stands on an authored stone plinth roughly 5yd across: a
-// runner stands AGAINST the plinth (its edge plus a body radius is over 3yd
-// from the flag), so a tighter reach would make the flag untouchable without
-// jumping onto the stand.
-export const BG_PICKUP_RADIUS = 4;
+// Reach for the flag action. The stand is paved ground, not a plinth: a runner
+// walks right up to the pole, so the reach stays tight.
+export const BG_PICKUP_RADIUS = 2.5;
 const BG_CAPTURE_RADIUS = 4; // carry the enemy flag this close to your stand
 const BG_RUNE_RADIUS = 2.5; // step this close to a speed rune to claim it
 const BG_RUNE_COOLDOWN = 30; // a claimed rune recharges over this (owner: 22 felt too fast)

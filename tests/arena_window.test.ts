@@ -24,8 +24,10 @@ describe('arena_window: WCAG chrome (focusable controls + focus-return)', () => 
     // openTab is the Ravenrift deep entry (hud.toggleBattleground rides it).
     expect(code).toContain('openTab(tab: PvpTabId)');
     // The two live signatures carry the tab and the strip's lock state, so a
-    // tab switch or a lock change can never be skipped by a colliding sig.
-    expect(code).toContain('const sig = `ravenrift|');
+    // tab switch or a lock change can never be skipped by a colliding sig. They
+    // are also named apart, because both arms guard the same `lastSig` field
+    // with the same shape and the drive registry pins one of them by name.
+    expect(code).toContain('const ravenriftSig = `ravenrift|');
     expect(code).toContain('const sig = `${tab}|');
   });
 

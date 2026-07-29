@@ -37,6 +37,19 @@ export const BG_TEXTURE_DIR = 'textures/battleground';
 export const BG_FIELD_HALF_X = TH_HALF_X;
 export const BG_FIELD_HALF_Z = TH_HALF_Z;
 
+/**
+ * How far the out-of-play SLOPE DRESSING reaches beyond the field rect.
+ *
+ * The hollow's wooded lip is authored outside the walls, on detached anchors
+ * that climb away from the ramparts, so what shows over a rampart top is forest
+ * rather than the edge of the world. None of it collides and none of it is
+ * reachable (the enceinte stands between it and the field), which is why the
+ * COLLIDER set is pinned to the field rect while the placement set is pinned
+ * here: art may frame the hollow, but nothing that blocks may leave it.
+ */
+export const BG_DRESSING_HALF_X = 106;
+export const BG_DRESSING_HALF_Z = 196;
+
 /** Lift for flat ground decoration (rune discs, decals) so it never z-fights
  *  the terrain it lies on. */
 export const BG_FLOOR_Y = 0.06;

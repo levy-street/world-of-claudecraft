@@ -239,9 +239,12 @@ export class ArenaWindow {
       return;
     }
     this.fetchBgLeaderboard();
-    const sig = `ravenrift|${strip.tabs.map((tab) => (tab.locked ? 1 : 0)).join('')}|${view.sig}`;
-    if (sig === this.lastSig) return;
-    this.lastSig = sig;
+    // Named apart from the arena arm's own signature on purpose: the two tab arms
+    // guard the same `lastSig` field with the same shape, and a pin that cannot
+    // tell them apart cannot prove either one still exists.
+    const ravenriftSig = `ravenrift|${strip.tabs.map((tab) => (tab.locked ? 1 : 0)).join('')}|${view.sig}`;
+    if (ravenriftSig === this.lastSig) return;
+    this.lastSig = ravenriftSig;
     el.innerHTML = this.bgTitleHtml() + this.stripHtml(strip) + this.bgBodyHtml(view);
     this.wireChrome(el);
     el.querySelector('[data-act="queue"]')?.addEventListener('click', () => {

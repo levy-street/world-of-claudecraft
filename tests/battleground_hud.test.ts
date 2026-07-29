@@ -338,16 +338,21 @@ describe('battleground map view (pure core)', () => {
     }
   });
 
-  it('spans the authored Thornhollow rect, and every mapped anchor falls inside it', () => {
+  it('spans the authored field rect, and every mapped anchor falls inside it', () => {
     const model = buildBgMapModel(worldSlice(0, []));
-    // The 240x452yd field, not the old code-defined 100x280 one.
+    // Ravenrift's own 100x280yd footprint: the map a player learns the field
+    // by is the same shape the field has always been.
     expect([model.halfX, model.halfZ]).toEqual([BG_HALF_X, BG_HALF_Z]);
-    expect(model.halfX * 2).toBe(240);
-    expect(model.halfZ * 2).toBe(452);
-    const inside = (x: number, z: number, pad = 0): boolean =>
-      Math.abs(x) + pad <= model.halfX && Math.abs(z) + pad <= model.halfZ;
+    expect(model.halfX * 2).toBe(100);
+    expect(model.halfZ * 2).toBe(280);
+    // Padded PER AXIS: a plot's own half-extents, not their sum, which would
+    // bound a 18x12yd yard by 15yd in both directions and reject a legal one.
+    const inside = (x: number, z: number, padX = 0, padZ = 0): boolean =>
+      Math.abs(x) + padX <= model.halfX && Math.abs(z) + padZ <= model.halfZ;
     for (const base of BG_BASES) expect(inside(base.flag.x, base.flag.z)).toBe(true);
-    for (const plot of BG_GRAVEYARDS) expect(inside(plot.x, plot.z, plot.hw + plot.hd)).toBe(true);
+    for (const plot of BG_GRAVEYARDS) {
+      expect(inside(plot.x, plot.z, plot.hw, plot.hd), `graveyard ${plot.x},${plot.z}`).toBe(true);
+    }
     for (const pad of [...BG_SPEED_RUNES, ...BG_POWER_RUNES]) {
       expect(inside(pad.x, pad.z)).toBe(true);
     }
@@ -356,14 +361,16 @@ describe('battleground map view (pure core)', () => {
   it('draws a wall plan that reaches both keeps, stays inside the rect, and is rotated', () => {
     const model = buildBgMapModel(worldSlice(0, []));
     const walls = bgFieldPlanWalls();
-    // The authored keeps alone are hundreds of boxes; a plan that collapsed to
-    // a handful means the projection dropped the real colliders.
+    // The authored ramparts and keeps alone are hundreds of boxes; a plan that
+    // collapsed to a handful means the projection dropped the real colliders.
     expect(walls.length).toBeGreaterThan(100);
-    // The perimeter blockers are centred ON the map edge and run its full
-    // length, so their own depth legitimately straddles it; everything else
-    // must sit inside the rect. Use the box's TRUE rotated extent, not the
-    // hw+hd bound, which is hopelessly loose for a long wall laid along an axis.
-    const EDGE_SLACK = 1.5;
+    // Two kinds of box legitimately straddle the map edge: the perimeter
+    // blockers, which are centred ON it and run its full length, and the mural
+    // drums, which project from the rampart line the way a real tower does
+    // (the widest is the corner drum, 3.33yd of radius past its centre). Use
+    // the box's TRUE rotated extent, not the hw+hd bound, which is hopelessly
+    // loose for a long wall laid along an axis.
+    const EDGE_SLACK = 3.5;
     for (const w of walls) {
       const c = Math.abs(Math.cos(w.rot));
       const s = Math.abs(Math.sin(w.rot));
@@ -375,14 +382,15 @@ describe('battleground map view (pure core)', () => {
       expect(Math.abs(w.x)).toBeLessThanOrEqual(model.halfX);
       expect(Math.abs(w.z)).toBeLessThanOrEqual(model.halfZ);
     }
-    // Both keeps are walled: the keep rects start at |z| 130 and each carries
-    // real boxes past that line, which is what the plan must show at the two
-    // ends of the map.
-    const keepLineZ = 130;
-    expect(walls.some((w) => w.z <= -keepLineZ)).toBe(true);
-    expect(walls.some((w) => w.z >= keepLineZ)).toBe(true);
-    // Thornhollow's walls are placed structures, not axis-aligned segments: a
-    // painter that filled plain rects and ignored `rot` would draw a lie.
+    // Both keeps are walled, and it is the KEEP that has to show, not the
+    // rampart behind it: only the keep enclosure has boxes this far down the
+    // field AND inside the keep's own width.
+    const inKeep = (w: (typeof walls)[number], sign: number) =>
+      Math.sign(w.z) === sign && Math.abs(w.z) >= 108 && Math.abs(w.x) <= 20;
+    expect(walls.some((w) => inKeep(w, -1))).toBe(true);
+    expect(walls.some((w) => inKeep(w, 1))).toBe(true);
+    // The walls are placed structures, not axis-aligned segments: a painter
+    // that filled plain rects and ignored `rot` would draw a lie.
     expect(walls.some((w) => Math.abs(Math.sin(w.rot * 2)) > 1e-3)).toBe(true);
   });
 });

@@ -1,5 +1,6 @@
 // Compile the Thornhollow battleground map (data/battleground/thornhollow.map.json,
-// authored in the standalone WoC map editor) into the generated field module the
+// a standard WoC map-editor document, built from the Ravenrift combat plan by
+// scripts/assets/build_battleground_map.mjs) into the generated field module the
 // game consumes: src/sim/thornhollow_field.generated.ts.
 //
 // The map document carries four kinds of thing, and the compiler routes each to
@@ -682,12 +683,17 @@ const heightB64 = Buffer.from(quant).toString('base64');
 // ---------------------------------------------------------------------------
 
 const probes = [];
+// Scatter INSIDE the rect: the runtime grid clamps to it, so a probe sampled
+// outside would compare a clamped read against an unclamped chain evaluation
+// and fail for a reason that has nothing to do with the two ports agreeing.
+const PROBE_HALF_X = HALF_X - 2;
+const PROBE_HALF_Z = HALF_Z - 2;
 for (let i = 0; i < 40; i++) {
-  // Deterministic scatter over the play rect (no rng: hash the index).
+  // Deterministic scatter over the rect (no rng: hash the index).
   const hx = Math.sin(i * 127.1) * 43758.5453;
   const hz = Math.sin(i * 311.7) * 12543.8567;
-  const x = round((hx - Math.floor(hx) - 0.5) * 2 * 118);
-  const z = round((hz - Math.floor(hz) - 0.5) * 2 * 224);
+  const x = round((hx - Math.floor(hx) - 0.5) * 2 * PROBE_HALF_X);
+  const z = round((hz - Math.floor(hz) - 0.5) * 2 * PROBE_HALF_Z);
   probes.push({ x, z, h: round(heightAt(x, z)) });
 }
 for (const b of bases)

@@ -28,6 +28,11 @@ For reference-image reconstruction and procedural GLB authoring, read the living
 - **`build_foliage.mjs`** is a superset for `foliage.json`: adds `weld + simplify`
   (target `ratio`), strips constant-white `COLOR_0`, and hue-rotates leaf textures
   via `recolor` rules. Use this only for foliage.
+- **`build_battleground_map.mjs`** (+ `battleground/`, own CLAUDE.md) builds the Ravenrift
+  field's map document from the combat plan plus the Thornhollow art kit, and
+  `compile_thornhollow.mjs` compiles that document into `src/sim/thornhollow_field.generated.ts`.
+  Both are deterministic and both committed artifacts are freshness-gated by
+  `tests/battleground_band.test.ts`: re-run BOTH after any edit under `battleground/`.
 - **Per-asset procedural exporters** (`banker_chest/`, `eastbrook_town/`,
   `eastbrook_grand_armoury/`, `eastbrook_mailbox/`, `eastbrook_noticeboard/`) author GLBs
   from reference images: deterministic `model.js` factory, browser `export_entry.js`,

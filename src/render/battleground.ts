@@ -92,38 +92,57 @@ export interface BattlegroundView {
 }
 
 /** Grass tufts: unlit cross-billboards tinted by the placement's own hue/lum,
- *  merged into one mesh. Cheap ground cover that softens the ravine floor. */
+ *  merged into one mesh. Cheap ground cover that softens the ravine floor.
+ *
+ *  Each blade is a tapered cross of two quads, DARK at the root and full colour
+ *  at the tip. The gradient is what makes a tuft read as grass rather than as a
+ *  flat card lying on the ground: an unlit quad at one tone has no contact
+ *  shadow of its own, so it floats no matter how small it is drawn. Blade size
+ *  and lean vary per blade from the same positional hash the offsets use, so
+ *  the field is identical on every host. */
 function buildGrass(): THREE.Mesh | null {
   const patches = bgGrassPatches();
   if (patches.length === 0) return null;
-  const bladeW = 0.55;
-  const bladeH = 0.42;
-  const perPatch = 4;
+  const perPatch = 5;
+  const spread = 1.7;
   const verts: number[] = [];
   const colors: number[] = [];
   const idx: number[] = [];
-  const color = new THREE.Color();
+  const tip = new THREE.Color();
+  const root = new THREE.Color();
   for (const p of patches) {
     // Deterministic spread inside the patch: the placement's own coordinates
     // seed the offsets, so the field looks identical on every host.
     for (let i = 0; i < perPatch; i++) {
       const a = Math.sin((p.x * 12.9898 + p.z * 78.233 + i * 37.719) * 43758.5453);
       const b = Math.sin((p.x * 93.9898 + p.z * 27.345 + i * 11.135) * 24634.6345);
-      const ox = (a - Math.floor(a) - 0.5) * 1.6;
-      const oz = (b - Math.floor(b) - 0.5) * 1.6;
-      const yaw = (a - Math.floor(a)) * Math.PI;
+      const ra = a - Math.floor(a);
+      const rb = b - Math.floor(b);
+      const ox = (ra - 0.5) * spread;
+      const oz = (rb - 0.5) * spread;
+      const yaw = ra * Math.PI;
+      const bladeH = 0.22 + rb * 0.3;
+      const bladeW = 0.1 + ra * 0.11;
+      const lean = (rb - 0.5) * 0.2;
+      const hue = (((p.hue ?? 95) + (ra - 0.5) * 14) % 360) / 360;
+      // Deliberately DARKER than the ground it grows out of. These quads are
+      // unlit and the post chain blooms, so a tuft mixed at the ground's own
+      // brightness comes back paler than the ground and reads as litter; a dark
+      // tuft over bright meadow reads as grass.
+      const lum = Math.max(0.05, Math.min(0.4, 0.08 + (p.lum ?? 0) * 0.28));
+      tip.setHSL(hue, 0.5, lum);
+      root.setHSL(hue, 0.58, lum * 0.45);
       const base = verts.length / 3;
-      color.setHSL(
-        ((p.hue ?? 95) % 360) / 360,
-        0.42,
-        Math.max(0.12, Math.min(0.6, 0.3 + (p.lum ?? 0) * 0.3)),
-      );
       for (const turn of [yaw, yaw + Math.PI / 2]) {
         const dx = (Math.cos(turn) * bladeW) / 2;
         const dz = (Math.sin(turn) * bladeW) / 2;
         const x = p.x + ox;
         const z = p.z + oz;
         const y = p.seatY;
+        // Root pair at full width, tip pair narrowed and leaned over: a taper,
+        // not a rectangle.
+        const tx = x + Math.cos(yaw) * lean;
+        const tz = z + Math.sin(yaw) * lean;
         verts.push(
           x - dx,
           y,
@@ -131,14 +150,15 @@ function buildGrass(): THREE.Mesh | null {
           x + dx,
           y,
           z + dz,
-          x + dx,
+          tx + dx * 0.35,
           y + bladeH,
-          z + dz,
-          x - dx,
+          tz + dz * 0.35,
+          tx - dx * 0.35,
           y + bladeH,
-          z - dz,
+          tz - dz * 0.35,
         );
-        for (let k = 0; k < 4; k++) colors.push(color.r, color.g, color.b);
+        colors.push(root.r, root.g, root.b, root.r, root.g, root.b);
+        colors.push(tip.r, tip.g, tip.b, tip.r, tip.g, tip.b);
       }
       for (let q = 0; q < 2; q++) {
         const o = base + q * 4;

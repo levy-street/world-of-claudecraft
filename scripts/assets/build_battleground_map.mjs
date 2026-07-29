@@ -1,0 +1,258 @@
+// Build the Ravenrift battleground map document
+// (data/battleground/thornhollow.map.json) from the combat plan plus the
+// Thornhollow art kit.
+//
+// The field is Ravenrift's original, combat-tuned layout, dressed at
+// Thornhollow: same 100x280 footprint, same three chambers, same two crossings
+// per curtain, same keeps, cover, rune pads and graveyards, now built out of the
+// authored map's catalogue architecture, photographed ground textures, sculpted
+// relief and light.
+//
+// The map document is a normal map-editor document, so it can still be opened
+// and hand-edited in the editor; it is BUILT rather than hand-placed because it
+// carries a couple of thousand placements and a half-million painted cells that
+// have to stay point-symmetric to the yard. The pipeline is:
+//
+//   node scripts/assets/build_battleground_map.mjs      -> data/battleground/thornhollow.map.json
+//   node scripts/assets/compile_thornhollow.mjs         -> src/sim/thornhollow_field.generated.ts
+//
+// Both steps are deterministic (same inputs, byte-identical output) and both are
+// freshness-gated by tests/battleground_band.test.ts. Commit both results.
+
+import { readFileSync, writeFileSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { buildDressing } from './battleground/dressing.mjs';
+import {
+  BASES,
+  GRAVEYARDS,
+  HALF_X,
+  HALF_Z,
+  LOCATIONS,
+  POWER_RUNES,
+  SPEED_RUNES,
+} from './battleground/field_plan.mjs';
+import {
+  buildPaint,
+  GRASS_GROUND,
+  makePaintSampler,
+  SOFT_GROUND,
+} from './battleground/ground_paint.mjs';
+import { makeHeightAt } from './battleground/stamp_chain.mjs';
+import { terrainStamps } from './battleground/terrain.mjs';
+
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
+const ASSETS_PATH = join(ROOT, 'data', 'battleground', 'thornhollow_assets.json');
+const OUT_PATH = process.argv[2]
+  ? resolve(process.cwd(), process.argv[2])
+  : join(ROOT, 'data', 'battleground', 'thornhollow.map.json');
+
+const assetData = JSON.parse(readFileSync(ASSETS_PATH, 'utf8'));
+
+// Authoring timestamps are FIXED, not wall-clock: the builder has to be
+// byte-deterministic so the freshness gate can diff a rebuild against the
+// committed document.
+const AUTHORED_AT = 1785175003886;
+const REVISED_AT = 1785902400000;
+
+const stamps = terrainStamps();
+const heightAt = makeHeightAt(stamps);
+
+// ---------------------------------------------------------------------------
+// Game-mode anchors: the tagged placements the field compiler turns into the
+// record the mode reasons about. Tagged placements never render and never
+// collide; the mode draws its own flags, runes and banners as entities.
+// ---------------------------------------------------------------------------
+
+const TEAM = [
+  {
+    name: 'Crimson',
+    flagAsset: 'dungeon/banner_triple_red',
+    bannerAsset: 'dungeon/banner_shield_red',
+  },
+  {
+    name: 'Azure',
+    flagAsset: 'dungeon/banner_triple_blue',
+    bannerAsset: 'dungeon/banner_shield_blue',
+  },
+];
+
+const anchors = [];
+for (const base of BASES) {
+  const t = TEAM[base.team];
+  anchors.push({
+    assetId: t.flagAsset,
+    x: base.flag.x,
+    z: base.flag.z,
+    rotY: base.team === 0 ? 0 : Math.PI,
+    scale: 2.1,
+    collide: false,
+    y: 2.5,
+    name: `${t.name} flag`,
+    regionRole: `flag${base.team}`,
+  });
+  anchors.push({
+    assetId: t.bannerAsset,
+    x: base.banner.x,
+    z: base.banner.z,
+    rotY: base.team === 0 ? 0 : Math.PI,
+    scale: 1.7,
+    collide: false,
+    y: 0.4,
+    name: `${t.name} spawn banner`,
+    regionRole: `banner${base.team}`,
+  });
+  // Author order IS spawn order: the compiler sorts by name, so the numbers
+  // here are the ring order the mode assigns fighters to.
+  base.spawns.forEach((s, i) => {
+    anchors.push({
+      assetId: 'collider/sphere',
+      x: s.x,
+      z: s.z,
+      rotY: 0,
+      scale: 1,
+      collide: false,
+      sizeX: 2,
+      sizeY: 2,
+      sizeZ: 2,
+      name: `${t.name} spawn ${i + 1}`,
+      regionRole: `spawn${base.team}`,
+    });
+  });
+  const plot = GRAVEYARDS[base.team];
+  anchors.push({
+    assetId: 'collider/box',
+    x: plot.x,
+    z: plot.z,
+    rotY: 0,
+    scale: 1,
+    collide: false,
+    sizeX: plot.hw * 2,
+    sizeY: 4,
+    sizeZ: plot.hd * 2,
+    name: `${t.name} graveyard`,
+    regionRole: `graveyard${base.team}`,
+  });
+}
+for (const [role, pads, label] of [
+  ['speedRune', SPEED_RUNES, 'Sprint rune'],
+  ['powerRune', POWER_RUNES, 'Power rune'],
+]) {
+  for (const pad of pads) {
+    anchors.push({
+      assetId: 'collider/box',
+      x: pad.x,
+      z: pad.z,
+      rotY: 0,
+      scale: 1,
+      collide: false,
+      sizeX: 3,
+      sizeY: 0.4,
+      sizeZ: 3,
+      name: label,
+      regionRole: role,
+    });
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Assemble
+// ---------------------------------------------------------------------------
+
+// The ground is painted FIRST, so the scatter can read it: a grass tuft only
+// grows out of painted grass, a fern only sits on soft ground.
+const biomePaint = buildPaint();
+const swatchAt = makePaintSampler(biomePaint);
+const { placements, lights, decals } = buildDressing({
+  assetData,
+  heightAt,
+  grassGround: (x, z) => GRASS_GROUND.has(swatchAt(x, z)),
+  softGround: (x, z) => SOFT_GROUND.has(swatchAt(x, z)),
+});
+
+// Perimeter blockers: a belt-and-braces seal around the rect, independent of
+// the rampart art, so no seam between two wall modules can ever leak a body out
+// of the field.
+const blockers = [];
+for (const [x1, z1, x2, z2] of [
+  [-HALF_X, -HALF_Z, HALF_X, -HALF_Z],
+  [HALF_X, -HALF_Z, HALF_X, 0],
+  [HALF_X, 0, HALF_X, HALF_Z],
+  [HALF_X, HALF_Z, -HALF_X, HALF_Z],
+  [-HALF_X, HALF_Z, -HALF_X, 0],
+  [-HALF_X, 0, -HALF_X, -HALF_Z],
+]) {
+  blockers.push({ x1, z1, x2, z2 });
+}
+
+const map = {
+  version: 2,
+  meta: {
+    id: 'thornhollow_v3',
+    name: 'Thornhollow',
+    description:
+      'Ravenrift at Thornhollow: a walled hollow in the old growth under Thornpeak. ' +
+      'Crimson and Azure hold a keep at either end of the ravine floor, two curtain ' +
+      'walls carve the field into three chambers, and the Ruin Courtyard between them ' +
+      'settles what the flags cannot.',
+    createdAt: AUTHORED_AT,
+    updatedAt: REVISED_AT,
+    seed: 20061,
+    parentId: '',
+  },
+  content: {
+    zones: [
+      {
+        id: 'blank_world',
+        name: 'Thornhollow',
+        zMin: -HALF_Z,
+        zMax: HALF_Z,
+        levelRange: [1, 1],
+        biome: 'vale',
+        hub: { x: 0, z: 0, radius: 8, name: '' },
+        graveyard: { x: 0, z: 0 },
+        lakes: [],
+        pois: [],
+        welcome: '',
+      },
+    ],
+    camps: [],
+    npcs: {},
+    objects: [],
+    roads: [],
+  },
+  terrainEdits: stamps,
+  placements: [...anchors, ...placements],
+  biomePaint,
+  blockers,
+  waterLevel: -40,
+  worldHalfX: HALF_X,
+  playerStart: { x: 0, z: -113 },
+  propsMode: 'empty',
+  decorationsMode: 'empty',
+  presentationMode: 'blank',
+  skybox: 'builtin:vale_day',
+  locations: LOCATIONS,
+  lights,
+  terrainStyle: { slopeRock: false, snowCaps: false, rimMountains: false, shoreSand: false },
+  assetViewDistance: 400,
+  weather: { clouds: { coverage: 0.32, height: 78 } },
+  lighting: {
+    sunIntensity: 2.5,
+    sunColor: 16773330,
+    hemiIntensity: 0.75,
+    skyColor: 10469608,
+    envScale: 1.05,
+    sunAzimuthDeg: 118,
+    sunElevationDeg: 46,
+  },
+  decals,
+};
+
+writeFileSync(OUT_PATH, JSON.stringify(map));
+const kinds = new Set(placements.map((p) => p.assetId));
+console.log(
+  `wrote ${OUT_PATH}: ${stamps.length} stamps, ${anchors.length} anchors, ` +
+    `${placements.length} placements over ${kinds.size} assets, ${lights.length} lights, ` +
+    `${decals.length} decals, paint ${biomePaint.cols}x${biomePaint.rows}`,
+);

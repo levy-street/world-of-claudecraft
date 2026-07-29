@@ -262,8 +262,8 @@ describe('immersive-scale interest: the whole match stays tracked', () => {
     // radius. Pin the radius itself AND compute the check from the exported
     // constants, so lowering the server radius fails here instead of silently
     // shrinking the guarantee under a still-green hardcoded number.
-    expect(BG_MATCH_INTEREST_RADIUS).toBe(420);
-    // Players fight inside the walkable hollow, not the dressed outer rect:
+    expect(BG_MATCH_INTEREST_RADIUS).toBe(300);
+    // Players fight inside the ramparts, not on the dressed slope beyond them:
     // that diagonal is what has to fit, and it does with real headroom.
     const playDiagonal = Math.hypot(2 * BG_PLAY_HALF_X, 2 * BG_PLAY_HALF_Z);
     expect(playDiagonal).toBeLessThan(BG_MATCH_INTEREST_RADIUS);

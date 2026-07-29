@@ -21,6 +21,8 @@ import { describe, expect, it } from 'vitest';
 import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
 import { battlegroundPreloadAssetPaths } from '../src/render/battleground';
 import {
+  BG_DRESSING_HALF_X,
+  BG_DRESSING_HALF_Z,
   BG_FIELD_HALF_X,
   BG_FIELD_HALF_Z,
   BG_GRASS_ASSET,
@@ -204,11 +206,15 @@ describe('Thornhollow art manifest: every group loads a model that exists', () =
         expect(Number.isFinite(p.seatY), `${g.assetId} seat`).toBe(true);
         expect(Number.isFinite(p.rotY), `${g.assetId} rotation`).toBe(true);
         expect(p.scale, `${g.assetId} scale`).toBeGreaterThan(0);
-        expect(Math.abs(p.x), `${g.assetId} inside the rect`).toBeLessThanOrEqual(
-          BG_FIELD_HALF_X + 8,
+        // Art may reach past the ramparts (the wooded slope that frames the
+        // hollow is authored out there), but only as far as the declared
+        // dressing bound. Nothing that BLOCKS may leave the field rect at all,
+        // which the collider pin in tests/battleground_band.test.ts holds.
+        expect(Math.abs(p.x), `${g.assetId} inside the dressing bound`).toBeLessThanOrEqual(
+          BG_DRESSING_HALF_X,
         );
-        expect(Math.abs(p.z), `${g.assetId} inside the rect`).toBeLessThanOrEqual(
-          BG_FIELD_HALF_Z + 8,
+        expect(Math.abs(p.z), `${g.assetId} inside the dressing bound`).toBeLessThanOrEqual(
+          BG_DRESSING_HALF_Z,
         );
       }
     }
@@ -288,6 +294,32 @@ describe('Thornhollow dressing: authored lights and decals', () => {
     // visible advantage, so the two halves each carry lights.
     expect(lights.some((l) => l.z < 0)).toBe(true);
     expect(lights.some((l) => l.z > 0)).toBe(true);
+  });
+
+  it('authors no more lights than the top tier will actually draw', () => {
+    // The field builder trims to this number ON PURPOSE. The Three layer sorts
+    // by intensity*range and slices to the tier budget, so an authored light
+    // past it is cost that never reaches a frame AND, worse, a light whose twin
+    // on the other half might survive the slice while it does not.
+    const src = readFileSync(`${ROOT}src/render/battleground.ts`, 'utf8');
+    const budgets = [...src.matchAll(/^\s+(low|medium|high|ultra):\s*(\d+),/gm)].map((m) =>
+      Number(m[2]),
+    );
+    expect(budgets.length, 'the tier budget table moved').toBe(4);
+    expect(bgFieldLights().length).toBeLessThanOrEqual(Math.max(...budgets));
+  });
+
+  it('mirrors every light through the field centre, colour included where it is neutral', () => {
+    // Cosmetic, but the fairness story is the same as the plan's: one half lit
+    // and the other dim is an advantage a player can see. Team-coloured pairs
+    // (the keep braziers and flag shrines) are exempt from the colour half.
+    const lights = bgFieldLights();
+    for (const l of lights) {
+      const twin = lights.find((q) => Math.hypot(q.x + l.x, q.z + l.z) < 1e-6);
+      expect(twin, `light (${l.x}, ${l.z}) has no mirrored twin`).toBeTruthy();
+      expect(twin?.intensity).toBe(l.intensity);
+      expect(twin?.range).toBe(l.range);
+    }
   });
 
   it('every decal texture exists under the decals folder the builder loads', () => {

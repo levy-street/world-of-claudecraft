@@ -1058,9 +1058,9 @@ describe('Ravenrift: runes, hostility, and the match clock', () => {
   it('pins the whole live tune as literals (re-pin deliberately when retuning)', () => {
     // The behavior suites use these constants symbolically, so THIS block is
     // what actually fails on a silent retune: every tuned number ships pinned.
-    expect(BG_CARRIER_VULN_DELAY).toBe(105); // ~two 334yd Thornhollow flag runs
+    expect(BG_CARRIER_VULN_DELAY).toBe(75); // ~two 236yd flag runs
     expect(BG_CARRIER_VULN_INTERVAL).toBe(15);
-    expect(BG_MAX_DURATION).toBe(1020); // 17 minute cap, scaled with the field
+    expect(BG_MAX_DURATION).toBe(720); // 12 minute cap, scaled with the field
     expect(BG_WAVE_PERIOD).toBe(10);
     expect(BG_WAVE_OFFSET).toBe(5);
     expect(BG_POWER_RUNE_VALUE).toBeCloseTo(0.15, 10);

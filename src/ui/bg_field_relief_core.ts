@@ -6,12 +6,17 @@
 // per-pixel work is unit-testable in Node and the two surfaces cannot drift.
 //
 // Heights come from `bgFieldHeightLocal`, the ONE surface the sim, the server
-// and the renderer all sample, so a shaded ridge on the map is a ridge a
-// fighter really has to climb. The colours are a hypsometric ramp over the
-// authored field (the sunken Fightpit, the ravine floor the flag run crosses,
-// the two flank ridge decks, the keep plateaus, then the wooded slope that is
-// out of play) plus a west-to-east hillshade, which is what actually makes the
-// pit rim and the ridge shoulders read at map scale.
+// and the renderer all sample, so a shaded rise on the map is a rise a fighter
+// really walks. The colours are a hypsometric ramp over the authored field (the
+// sunken Ruin Courtyard, the ravine floor the flag run crosses, the chamber
+// swells, then the two keep terraces) plus a west-to-east hillshade.
+//
+// The field's relief is DELIBERATELY shallow, because the layout under it is
+// combat-tuned on flat ground: about five yards from the bottom of the
+// courtyard bowl to the top of a keep terrace. So the ramp is packed into that
+// band and the hillshade gain runs hot, several times the overworld's: at map
+// scale the terrace fronts and the bowl rim are the two shapes that have to
+// read, and each is a couple of yards of rise spread over a dozen.
 //
 // The ramp is a hardcoded terrain palette, exactly as map_terrain.ts hardcodes
 // the overworld biome colours: it is sampled terrain, not HUD chrome, and a
@@ -23,28 +28,22 @@ import { bgFieldHeightLocal } from '../sim/battleground_field';
 /** One hypsometric stop: [field height in yards, r, g, b]. */
 type ReliefStop = readonly [number, number, number, number];
 
-// Ascending by height. The play surface sits between about -9 (the Fightpit
-// floor) and 11 (the keep decks); everything above the treeline is the wooded
-// ravine wall the hollow is cut into, which reads dark and cold on purpose so
-// the walkable hollow separates from it at a glance.
+// Ascending by height. The play surface sits between about -2.4 (the bottom of
+// the Ruin Courtyard bowl) and 2.4 (the keep terraces).
 const RELIEF_RAMP: readonly ReliefStop[] = [
-  [-9, 100, 92, 74], // Fightpit floor, the deepest ground on the field
-  [-3, 150, 139, 113], // the pit's shoulders
-  [0, 186, 174, 146], // ravine floor: the flag run
-  [6, 201, 190, 162], // Whistlerock / Sablepine ridge decks
-  [12, 206, 196, 172], // the two keep plateaus
-  [16, 128, 132, 108], // treeline: the hollow's lip, deliberately abrupt
-  [30, 70, 78, 64], // the wooded ravine wall, out of play
+  [-2.5, 138, 128, 104], // the bottom of the courtyard bowl, the deepest ground
+  [-1.2, 165, 154, 128], // the bowl's shoulders
+  [0, 186, 174, 146], // the ravine floor: the flag run
+  [1.2, 197, 187, 160], // the chamber swells
+  [2, 208, 199, 175], // the two keep terraces
+  [2.8, 216, 208, 187], // the crest behind each keep
 ];
 
 // Hillshade from the west-to-east slope, reusing the already-sampled
 // left-neighbour height so relief costs no extra height samples (the
-// map_terrain.ts technique). The gain runs hotter than the overworld's because
-// the field is sampled at map scale over gentler ground: the pit rim, the ridge
-// shoulders and the keep ramps are the shapes that have to read, and they are a
-// couple of yards each. Clamped so a cliff cannot blow out to white or crush to
-// black.
-const SHADE_GAIN = 0.4;
+// map_terrain.ts technique). Clamped so a slope cannot blow out to white or
+// crush to black.
+const SHADE_GAIN = 2.2;
 const SHADE_MIN = 0.58;
 const SHADE_MAX = 1.36;
 const OPAQUE = 255;
