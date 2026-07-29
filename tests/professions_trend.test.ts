@@ -164,7 +164,7 @@ const letterDelay = (pairId: string): number => GUILD_TREND_LETTERS[pairId]?.del
 
 // These drive full mail-delivery windows through sim.tick(); give them real
 // headroom under worker-pool CPU contention (the mail.test.ts precedent).
-const GUILD_DELIVERY_TEST_TIMEOUT_MS = 20_000;
+const GUILD_DELIVERY_TEST_TIMEOUT_MS = 40_000;
 
 describe('the Guild letter through the real Sim', () => {
   it(

@@ -261,12 +261,12 @@ describe('isHarvestableCorpse', () => {
     // The complement is asserted too, so an always-false predicate could not
     // pass the row above by making the sweep vacuous.
     const included = Object.entries(MOBS).filter(([, m]) => isHarvestableCorpse(m.componentTags));
-    expect(included).toHaveLength(17);
-    // ...and the untagged templates are counted rather than assumed: 101 of them
+    expect(included).toHaveLength(21);
+    // ...and the untagged templates are counted rather than assumed: 199 of them
     // ship, all excluded before this change and all excluded after it, which is
     // the path fen_troll now joins instead of getting one of its own.
     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
-    expect(untagged).toHaveLength(101);
+    expect(untagged).toHaveLength(199);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read
@@ -471,8 +471,11 @@ describe('yieldingFocusComponents and harvestConcentrationBonus (#2514)', () => 
       }
     }
     // The sweep must actually have exercised the raising arm, or a formula
-    // that changed nothing would pass both bounds above.
-    expect(raised).toBe(30);
+    // that changed nothing would pass both bounds above. A CORPUS CENSUS like
+    // the mixed-template count in tests/mob_component_tags: v0.32.0 authored 30
+    // against the release bestiary, and this branch's extra corpses raise two
+    // more picks. The two bounds inside the loop are the real assertions.
+    expect(raised).toBe(32);
   });
 
   it('is self-healing: giving claw an item returns every number to the pre-#2514 world', () => {

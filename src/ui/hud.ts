@@ -17,11 +17,13 @@ import {
 } from '../game/ui_tier_knobs';
 import { voice, voiceDistanceGain } from '../game/voice';
 import type { ClaudiumStoreItem } from '../net/economy_sdk';
-import { castBarState, consumeBarState } from '../render/cast_bar';
+import { castBarState, consumeBarState, mountSummonBarState } from '../render/cast_bar';
 import { CharacterPreview, type PreviewFramingName } from '../render/characters';
 import { preloadMechAssets } from '../render/characters/assets';
-import { mechHeldWeaponOverride } from '../render/characters/manifest';
-import { onPortraitsReady } from '../render/characters/portrait';
+import { mechHeldWeaponOverride, skinCount } from '../render/characters/manifest';
+import { onPortraitsReady, playerPortraitDataUrl } from '../render/characters/portrait';
+import { currentDayNightPhase } from '../render/day_night_clock';
+import { globalDayness, skyTintForDayness } from '../render/day_night_core';
 import { isFriendlyPet, mobTooltipConColor } from '../render/reaction';
 import type { Renderer } from '../render/renderer';
 import {
@@ -33,7 +35,9 @@ import { warriorParryChance } from '../sim/combat/warrior_hit_table';
 import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
 import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
+import { isOnMountRaceStartPlatform, MOUNTS } from '../sim/content/mounts';
 import { recipeById } from '../sim/content/recipes';
+import { MECH_CHROMAS } from '../sim/content/skins';
 import { FIRST_TALENT_LEVEL, type TalentAllocation, talentsFor } from '../sim/content/talents';
 import { resolveActiveWeaponSkin } from '../sim/content/weapon_skin_rules';
 import type { ZoneDef } from '../sim/data';
@@ -85,6 +89,7 @@ import type {
 } from '../sim/types';
 import {
   type AbilityEffect,
+  ALL_CLASSES,
   type AuraKind,
   CONSUME_DURATION,
   canPrestige,
@@ -100,6 +105,7 @@ import {
   questObjectiveRequired,
   type SimEvent,
   SUNDER_ARMOR_PCT_PER_STACK,
+  TICK_RATE,
   virtualLevel,
   xpUntilNextPrestige,
 } from '../sim/types';
@@ -172,6 +178,8 @@ import {
   spellFxCue,
 } from './combat_sfx';
 import { type CardinalId, compassView } from './compass';
+import { ContinentMapPainter } from './continent_map_painter';
+import { type ContinentZoneRegion, continentZoneAt } from './continent_map_view';
 import { formatMinimapCoords } from './coords';
 import {
   buildCraftCelebrationPlan,
@@ -346,6 +354,7 @@ import { LootRollController } from './hud/loot/loot_roll_controller';
 import { lootSettingsView } from './hud/loot/loot_settings_view';
 import { renderLootSettingsWindow } from './hud/loot/loot_settings_window';
 import { LootWindowController } from './hud/loot/loot_window_controller';
+import { CARD_POSES } from './hud/player_card/player_card';
 import { PlayerCardController } from './hud/player_card/player_card_controller';
 import { QuestDialogController } from './hud/quest/quest_dialog_controller';
 import { parseChatSegments } from './hud/quest/quest_link';
@@ -395,11 +404,20 @@ import { lowHealthVignette } from './low_health';
 import { lowResourceView } from './low_resource';
 import { mailIndicatorView } from './mailbox_view';
 import { MailboxWindow } from './mailbox_window';
+import { onMapArtReady } from './map_art';
+import { bakedMapBgEligible, loadBakedMapBg } from './map_bg';
 import { bindMapPinchZoom, finishMapTap, mapTapReleaseFromPointer } from './map_pinch_zoom';
 import { MAP_TAP_MOVE_TOLERANCE_PX, nextMapZoom } from './map_pinch_zoom_core';
-import { type MapRegion, mapCanvasHeight, paintTerrainRows } from './map_terrain';
+import {
+  type MapRegion,
+  mapCanvasHeight,
+  mapZoneRegion,
+  type PaintRowCarry,
+  paintTerrainRows,
+} from './map_terrain';
 import { MapWindowPainter } from './map_window_painter';
 import {
+  MAP_OPEN_ZOOM,
   type MapNpcMarker,
   type MapQuestAreaMarker,
   mapWindowMode,
@@ -431,6 +449,9 @@ import {
 import { type MobTooltipI18n, type MobTooltipModel, mobTooltipHtml } from './mob_tooltip_view';
 import { isMobileFullscreenWindowOpen } from './mobile_fullscreen_window_core';
 import { MobileMoreDialogController } from './mobile_more_dialog';
+import { MOUNT_DESC_KEYS, mountSpecLines } from './mount_labels';
+import { MountRaceControls } from './mount_race_controls';
+import { MountRaceStrip } from './mount_race_strip';
 import { MovableFrame } from './movable_frame';
 import { OptionsWindow } from './options_window';
 import { makeWriterFacet, type PainterHostPresentation } from './painter_host';
@@ -523,6 +544,7 @@ import { type UnitFrameDescriptor, unitFrameView } from './unit_frame';
 import { UnitFramePainter } from './unit_frame_painter';
 import { crestIdForEntity } from './unit_portrait';
 import { UnitPortraitPainter } from './unit_portrait_painter';
+import { unstuckFeedback } from './unstuck_feedback';
 import { ValeCupBetting } from './vale_cup_betting';
 import { buildVcupBettingView } from './vale_cup_betting_view';
 import { ValeCupBriefing } from './vale_cup_briefing';
@@ -659,8 +681,9 @@ export interface BugReportHooks {
   // is false when the server dropped the screenshot), rejects with a server error
   // message the hud maps via localizeBugReportError.
   submit(payload: BugReportPayload): Promise<{ screenshotStored: boolean }>;
-  // Grab a JPEG data URL of the current frame, or null if capture failed/unavailable.
-  capture(): string | null;
+  // Grab a JPEG data URL of the current frame asynchronously, or null if capture
+  // failed/unavailable. Encoding must not block the options window's main thread.
+  capture(): Promise<string | null>;
   // Auto-collected context (build, userAgent, viewport, zone, level/class, camera).
   collectMeta(): unknown;
 }
@@ -750,6 +773,27 @@ const MOB_TOOLTIP_VIEW_DEPS: MobTooltipI18n = {
   t: (key, params) => t(key as TranslationKey, params),
   fmt: (value, opts) => formatNumber(value, opts),
 };
+// Rift boss one-shot mechanic cast IDs: keyed by their authored mechanic name.
+// These appear in the target cast bar when the boss winds up a lethal zone.
+// The lookup prevents falling back to the raw castId string on the HUD.
+const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
+  'abilityUi.cast.rift_frost_execution': true,
+  'abilityUi.cast.rift_frost_strike': true,
+  'abilityUi.cast.rift_ember_execution': true,
+  'abilityUi.cast.rift_ember_strike': true,
+  'abilityUi.cast.rift_venom_execution': true,
+  'abilityUi.cast.rift_venom_strike': true,
+  'abilityUi.cast.rift_necro_execution': true,
+  'abilityUi.cast.rift_necro_strike': true,
+  'abilityUi.cast.rift_brute_execution': true,
+  'abilityUi.cast.rift_brute_strike': true,
+  'abilityUi.cast.rift_arcane_execution': true,
+  'abilityUi.cast.rift_arcane_strike': true,
+  'abilityUi.cast.rift_storm_execution': true,
+  'abilityUi.cast.rift_storm_strike': true,
+  'abilityUi.cast.rift_tide_execution': true,
+  'abilityUi.cast.rift_tide_strike': true,
+};
 const PLAYER_TOOLTIP_VIEW_DEPS: PlayerTooltipI18n = {
   t: (key, params) => t(key as TranslationKey, params),
   fmt: (value, opts) => formatNumber(value, opts),
@@ -759,6 +803,8 @@ const castDisplayName = (id: string): string => {
   if (id === GATHER_CAST_ID) return t('abilityUi.cast.gathering');
   if (id === 'demon_heal') return t('abilityUi.cast.demonHeal');
   if (id === 'thunzharr_stormcall') return t('abilityUi.cast.thunzharrStormcall');
+  const riftKey = `abilityUi.cast.${id}` as TranslationKey;
+  if (riftKey in RIFT_CAST_DISPLAY_KEYS) return t(riftKey);
   const ability = ABILITIES[id];
   return ability ? abilityDisplayName(ability) : id;
 };
@@ -853,6 +899,7 @@ const ITEM_KIND_LABEL_KEYS: Record<ItemDef['kind'], TranslationKey> = {
   potion: 'itemUi.kind.potion',
   elixir: 'itemUi.kind.elixir',
   bag: 'itemUi.kind.bag',
+  mount: 'itemUi.kind.mount',
 };
 // Classic class colors (CLASSES[cls].color is a 0xRRGGBB number) as a CSS
 // string, used to color-code party members on the minimap and in the frames.
@@ -871,8 +918,6 @@ const DEFAULT_EMOTE_WHEEL: OverheadEmoteId[] = [
   'cry',
 ];
 
-// yards past a zone boundary before the crossing banner/welcome commits
-const ZONE_BANNER_DEADBAND = 5;
 // The OFFLINE ignore store. Online, the ignore list is server-persisted and
 // arrives on the `social` frame, so this set is not consulted at all (see the
 // chat event filter): keeping a second, name-keyed local list live online is
@@ -1134,6 +1179,8 @@ export class Hud {
   private errorTimer: number | undefined;
   private lastMirroredErrorText: string | undefined;
   private bannerTimer: number | undefined;
+  private mountRaceInstructionTimer: number | undefined;
+  private bannerSource: 'unstuck' | null = null;
   private pfLevelEl = $('#pf-level');
   private pfHpEl = $('#pf-hp');
   private pfHpTextEl = $('#pf-hp-text');
@@ -1247,6 +1294,8 @@ export class Hud {
   private minimapCtx: CanvasRenderingContext2D;
   private minimapBg: HTMLCanvasElement;
   private clockEl: HTMLElement | null = null;
+  private dayNightCtx: CanvasRenderingContext2D | null = null;
+  private lastDayNightDrawAt = 0; // the dial redraws ~1Hz; the 12h cycle barely moves
   private raidLockoutEl: HTMLElement | null = null;
   private raidLockoutLocked = false;
   private clock24 = false; // 24-hour vs 12-hour AM/PM display
@@ -1281,7 +1330,17 @@ export class Hud {
     H: number;
     row: number;
     region: MapRegion;
+    carry: PaintRowCarry;
   } | null = null;
+  // Zones waiting for their background prewarm behind the single in-flight
+  // job: fed by zone streaming (every zone the renderer prepares also gets its
+  // map background rendered ahead of the first open). The committed-zone
+  // prewarm (prewarmMapBg on a crossing) preempts; the preempted zone returns
+  // to the front of this queue.
+  private mapPrewarmQueue: string[] = [];
+  // Blank-paper placeholders handed to an open map while a baked plate is
+  // still decoding; dropped the moment the real background commits.
+  private mapBgPending = new Map<string, HTMLCanvasElement>();
   private mapPrewarmHandle = 0;
   // Which scheduler produced mapPrewarmHandle. requestIdleCallback and setTimeout
   // hand out ids from separate pools, so the handle must be cancelled with the
@@ -1294,6 +1353,23 @@ export class Hud {
   private readonly lootRolls: LootRollController;
   private openVendorNpcId: number | null = null;
   private openHeroicVendorNpcId: number | null = null;
+  // The show-jumping race: a slim, non-interactive bottom strip painted from the
+  // authoritative world.mountRaceView() (never a cached copy). hud.ts keeps only
+  // the event routing, the start/finish banners, and show/hide.
+  private readonly mountRaceStrip = new MountRaceStrip({
+    getState: () => this.sim.mountRaceView(),
+  });
+  // The Start/Cancel Race button above the player frame + 3..2..1..GO countdown.
+  // Start appears on the shared glowing square; active-quest riders may start
+  // dismounted because the authoritative command lends the training horse.
+  private readonly mountRaceControls = new MountRaceControls({
+    getState: () => this.sim.mountRaceView(),
+    canStart: () =>
+      isOnMountRaceStartPlatform(this.sim.player.pos) &&
+      (this.sim.questState('q_riding_lessons') === 'active' || !!this.sim.player.mountKey),
+    startRace: () => this.sim.mountRaceStart(),
+    cancelRace: () => this.sim.mountRaceCancel(),
+  });
   private openTrainNpcId: number | null = null;
   // Learn flights + confirmed-grant overlay for the train window (issue
   // #2342): begin on click (the double-submit guard), resolve on the
@@ -1404,6 +1480,7 @@ export class Hud {
   private lastNythraxisCombatEventAt = 0;
   private lastResting = false;
   private lastZoneId = '';
+  private mapZoneId = '';
   private mapZoom = 1; // world-map zoom: 1 = whole zone, up to MAP_MAX_ZOOM
   private mapCenter: { x: number; z: number } | null = null; // pan target; null = follow player
   // Dungeon Finder "Show on Map": a highlighted entrance + the zone band to
@@ -1425,6 +1502,13 @@ export class Hud {
   // The quest-giver glyphs of the last overworld map paint, for the hover
   // tooltip's hit-test (quest names + level requirements). Empty in delve mode.
   private mapNpcMarkers: MapNpcMarker[] = [];
+  // World-map level: the per-zone detail map, or the WoW-style continent overview
+  // reached by right-click / the level-toggle button. Reset to 'zone' on open.
+  private mapLevel: 'zone' | 'continent' = 'zone';
+  // The zone id under the cursor on the continent overview (drives the highlight
+  // + hover tooltip), and the last paint's clickable zone regions for hit-testing.
+  private mapHoverZone: string | null = null;
+  private continentRegions: ContinentZoneRegion[] = [];
   private windowDragController: WindowDragController | null = null;
   private readonly chatGeometry: ChatGeometryController;
   private readonly chatWindow: ChatWindowController;
@@ -1790,12 +1874,47 @@ export class Hud {
     });
     const mm = $('#minimap') as unknown as HTMLCanvasElement;
     this.minimapCtx = require2dContext(mm);
-    this.minimapBg = this.renderTerrainCanvas(140, {
+    // The whole-world minimap strip: on the shipped world it is a baked plate
+    // (public/map_bg/world_strip.webp) blitted in as soon as it decodes, so
+    // boot skips ~50k pixels of synchronous terrain painting; other worlds
+    // keep the procedural render.
+    const worldStripRegion = {
       minX: WORLD_MIN_X,
       maxX: WORLD_MAX_X,
       minZ: WORLD_MIN_Z,
       maxZ: WORLD_MAX_Z,
-    });
+    };
+    if (bakedMapBgEligible(this.sim.cfg.seed, 'world_strip')) {
+      const stripCanvas = document.createElement('canvas');
+      stripCanvas.width = 140;
+      stripCanvas.height = mapCanvasHeight(140, worldStripRegion);
+      const stripCtx = require2dContext(stripCanvas);
+      stripCtx.fillStyle = '#163058'; // the painter's deep-sea tone until the plate lands
+      stripCtx.fillRect(0, 0, stripCanvas.width, stripCanvas.height);
+      this.minimapBg = stripCanvas;
+      loadBakedMapBg(
+        'world_strip',
+        (img) =>
+          require2dContext(stripCanvas).drawImage(img, 0, 0, stripCanvas.width, stripCanvas.height),
+        () => {
+          this.minimapBg = this.renderTerrainCanvas(140, worldStripRegion);
+        },
+      );
+    } else {
+      this.minimapBg = this.renderTerrainCanvas(140, worldStripRegion);
+    }
+    // hand-painted plates land in the world strip too, each over its own band
+    {
+      const stripH = this.minimapBg.height;
+      const spanZ = WORLD_MAX_Z - WORLD_MIN_Z;
+      for (const zn of ZONES) {
+        onMapArtReady(zn.id, (img) => {
+          const top = ((WORLD_MAX_Z - zn.zMax) / spanZ) * stripH;
+          const rows = ((zn.zMax - zn.zMin) / spanZ) * stripH;
+          require2dContext(this.minimapBg).drawImage(img, 0, top, this.minimapBg.width, rows);
+        });
+      }
+    }
     mm.style.cursor = 'var(--cursor-point)';
     mm.title = t('controls.worldMap');
     mm.addEventListener('click', () => this.toggleMap());
@@ -1880,6 +1999,10 @@ export class Hud {
     // UI-only concern, so `new Date()` here is fine (the sim-only time ban
     // doesn't apply — cf. meters.ts using performance.now()).
     this.clockEl = $('#minimap-clock');
+    // day/night dial on the minimap rim: a decorative canvas showing the 12h
+    // world cycle. Same UI-only wall-clock allowance as the clock above.
+    const dayNightCanvas = document.getElementById('minimap-daynight') as HTMLCanvasElement | null;
+    this.dayNightCtx = dayNightCanvas?.getContext('2d') ?? null;
     // raid-lockout badge on the minimap rim: a lock icon whose hover/tap panel
     // lists the player's raid lockouts (the unlock countdown). Always visible;
     // it lights up (.locked) while any raid is on cooldown. attachTooltip handles
@@ -2078,6 +2201,7 @@ export class Hud {
       'wheel',
       (ev) => {
         ev.preventDefault();
+        if (this.mapLevel !== 'zone') return; // no per-zone zoom on the overview
         this.zoomMap((ev as WheelEvent).deltaY < 0 ? 1.2 : 1 / 1.2);
       },
       { passive: false },
@@ -2156,6 +2280,7 @@ export class Hud {
       return true;
     };
     mapCanvas.addEventListener('pointermove', (ev) => {
+      if (this.mapLevel !== 'zone') return; // continent hover is handled below
       if (ev.pointerType !== 'mouse' || this.mapDrag) {
         hideMapAreaTip();
         return;
@@ -2190,6 +2315,63 @@ export class Hud {
     };
     mapCanvas.addEventListener('pointerup', endMapTap);
     mapCanvas.addEventListener('pointercancel', endMapTap);
+
+    // Continent overview interactions. These are separate from the per-zone
+    // pan/zoom/tooltip handlers above, which early-return at the continent level.
+    // Right-click (or the level-toggle button) zooms out to the overview; a mouse
+    // hover highlights the zone under the cursor and shows its name + level band;
+    // a left-click / tap on a region opens that zone's detail map.
+    const canvasPoint = (clientX: number, clientY: number): { cx: number; cy: number } => {
+      const rect = mapCanvas.getBoundingClientRect();
+      return {
+        cx: ((clientX - rect.left) * mapCanvas.width) / rect.width,
+        cy: ((clientY - rect.top) * mapCanvas.height) / rect.height,
+      };
+    };
+    let continentTipShown = false;
+    const hideContinentTip = (): void => {
+      if (!continentTipShown) return;
+      continentTipShown = false;
+      this.hideTooltip();
+    };
+    mapCanvas.addEventListener('contextmenu', (ev) => {
+      ev.preventDefault(); // suppress the browser menu; right-click changes level
+      this.toggleMapLevel();
+    });
+    mapCanvas.addEventListener('click', (ev) => {
+      if (this.mapLevel !== 'continent') return;
+      const { cx, cy } = canvasPoint(ev.clientX, ev.clientY);
+      const zoneId = continentZoneAt(this.continentRegions, cx, cy);
+      if (zoneId) {
+        hideContinentTip();
+        this.openZoneFromContinent(zoneId);
+      }
+    });
+    mapCanvas.addEventListener('pointermove', (ev) => {
+      if (this.mapLevel !== 'continent' || ev.pointerType !== 'mouse') return;
+      const { cx, cy } = canvasPoint(ev.clientX, ev.clientY);
+      const zoneId = continentZoneAt(this.continentRegions, cx, cy);
+      if (zoneId !== this.mapHoverZone) {
+        this.mapHoverZone = zoneId; // repaint the highlight (+ cursor via updateMapWindow)
+        this.updateMapWindow();
+      }
+      if (zoneId) {
+        this.paintTooltipAt(this.continentZoneTooltipHtml(zoneId), ev.clientX, ev.clientY);
+        continentTipShown = true;
+      } else {
+        hideContinentTip();
+      }
+    });
+    mapCanvas.addEventListener('pointerleave', (ev) => {
+      if (ev.pointerType !== 'mouse') return;
+      hideContinentTip();
+      if (this.mapLevel === 'continent' && this.mapHoverZone !== null) {
+        this.mapHoverZone = null;
+        this.updateMapWindow();
+      }
+    });
+    $('#map-level-toggle').addEventListener('click', () => this.toggleMapLevel());
+
     $('#mm-bag').addEventListener('click', () => this.toggleBags());
     $('#mm-crafting').addEventListener('click', () => this.toggleCrafting());
     // Drop an equipped piece dragged out of the paperdoll onto the bags window.
@@ -2250,7 +2432,7 @@ export class Hud {
       music.setEnabled(!music.enabled);
       styleMusicBtn();
     });
-    const startZone = zoneAt(sim.player.pos.z);
+    const startZone = zoneAt(sim.player.pos.x, sim.player.pos.z);
     const startZoneName = zoneDisplayName(startZone.id);
     this.lastZoneId = startZone.id;
     this.prewarmMapBg(startZone.id); // render the spawn-zone map bg during idle, not on first open
@@ -3497,8 +3679,12 @@ export class Hud {
     moveZone: () => document.querySelector('#mobile-move-zone'),
   });
   // Overworld world-map painter (the delve branch stays with delvePainter). Owns
-  // the cached whole-world decorations; redraws from the mediumHud band while open.
+  // the cached current-zone decorations; redraws from the mediumHud band while open.
   private readonly mapPainter = new MapWindowPainter();
+  // Continent overview painter (the world map's "zoom out to the whole world"
+  // level). Loads the painted world_overview plate once; redraws from the
+  // mediumHud band like the per-zone map.
+  private readonly continentPainter = new ContinentMapPainter();
   // The aura strips are the keyed-pool aura painter, two instances of the
   // auras_view core + AurasPainter: the player buff bar (#buff-bar, mode
   // 'all') and the target strip (#tf-debuffs, mode 'all' too: a target's buffs AND
@@ -3591,8 +3777,12 @@ export class Hud {
   // Overworld minimap canvas painter (the delve branch stays with delvePainter). Owns
   // the marker core; redraws from the fastHud (~10Hz) band. classCss colors the party
   // discs/arrows; zoneDisplayName localizes the '#zone-label' it writes via setText.
-  private readonly minimapPainter = new MinimapPainter(this.writerFacet, classCss, (zoneId) =>
-    zoneDisplayName(zoneId),
+  private readonly minimapPainter = new MinimapPainter(
+    this.writerFacet,
+    classCss,
+    (zoneId) => zoneDisplayName(zoneId),
+    (name, rank) =>
+      rank ? t('hud.core.riftLabelRanked', { name, rank }) : t('hud.core.riftLabel', { name }),
   );
   private readonly presentationBag: PainterHostPresentation = {
     itemIcon: (item) => this.itemIcon(item),
@@ -4772,6 +4962,23 @@ export class Hud {
       }
     }
     html += instanceBonusStatLines(instance);
+    if (instance?.rift) {
+      html += `<div class="tt-sub">${esc(
+        t('hudChrome.itemTooltip.riftTier', { tier: instance.rift.tier }),
+      )}</div>`;
+      html += `<div class="tt-sub">${esc(
+        t('hudChrome.itemTooltip.riftUpgrade', {
+          level: itemNumber(instance.rift.upgradeLevel),
+          max: itemNumber(instance.rift.maxUpgradeLevel),
+        }),
+      )}</div>`;
+      html += `<div class="tt-sub">${esc(
+        t('hudChrome.itemTooltip.riftSockets', {
+          used: itemNumber(instance.rift.gems.length),
+          total: itemNumber(instance.rift.gemSlots),
+        }),
+      )}</div>`;
+    }
     const warfareRating = Math.min(item.pvpOffenseRating ?? 0, item.pvpDefenseRating ?? 0);
     if (warfareRating > 0) {
       html += `<div class="tt-green">${esc(
@@ -4814,6 +5021,22 @@ export class Hud {
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.questItem'))}</div>`;
     if (item.kind === 'bag' && item.bagSlots)
       html += `<div class="tt-stat">${esc(t('itemUi.tooltip.bagSlots', { slots: itemNumber(item.bagSlots) }))}</div>`;
+    // Collectible mount reins: the mount's flavor + specialty numbers + its
+    // ride-level gate (red below the gate, like gear's requires-level line).
+    if (item.kind === 'mount') {
+      const mountDef = MOUNTS[item.mount];
+      if (mountDef) {
+        const descKey = MOUNT_DESC_KEYS[mountDef.key];
+        if (descKey) html += `<div class="tt-desc">${esc(t(descKey))}</div>`;
+        for (const line of mountSpecLines({
+          speedPct: Math.round(mountDef.moveSpeedPct * 100),
+        }))
+          html += `<div class="tt-green">${esc(line)}</div>`;
+        // No per-mount level gate any more: the only requirement is the riding
+        // skill, so the tooltip says how to ride instead of quoting a level.
+        html += `<div class="tt-sub">${esc(t('hudChrome.mounts.useToRide'))}</div>`;
+      }
+    }
     const requiredClasses = requiredClassesForTooltip(item);
     if (requiredClasses) {
       html += `<div class="tt-sub">${esc(t('itemUi.tooltip.classes', { classes: requiredClasses.map(classDisplayName).join(', ') }))}</div>`;
@@ -5042,6 +5265,10 @@ export class Hud {
       title: t('hudChrome.wocStore.armoryTitle'),
       cta: t('hudChrome.wocStore.title'),
     });
+    // The mount-race strip and controls gate on race id / phase / countdown
+    // number, none of which move with the locale (tests/language_fanout_registry).
+    this.mountRaceStrip.relocalize();
+    this.mountRaceControls.relocalize();
     this.refreshKeybindLabels();
     this.updateQuestTracker();
     // NOT updateDelveTracker(): the tracker's own signature is ids + numbers, so
@@ -7176,6 +7403,8 @@ export class Hud {
 
     this.questDialog.updateVoice();
     this.meters.update();
+    this.mountRaceStrip.repaintIfChanged();
+    this.mountRaceControls.update();
     this.lockpickController.repaintIfChanged();
     this.tutorial.update(sim, this.renderer, this.keybinds);
     this.lootRolls.update(now);
@@ -7485,10 +7714,13 @@ export class Hud {
     }
 
     // cast bar: the player instance localizes the cast id (castDisplayName), layers
-    // the player-only eat/drink overlay (consumeBarState), and clears on hide.
+    // the mount summon channel (mountSummonBarState) and the player-only eat/drink
+    // overlay (consumeBarState), and clears on hide. Priority: spell cast > mount
+    // summon > eat/drink (you cannot cast while mounting, but the painter guards it).
     this.playerCastBarPainter.paint({
       cast: castBarState(p),
       castRemaining: p.castRemaining,
+      mountSummon: mountSummonBarState(p.mountCastRemaining, p.mountCastKey),
       consume: consumeBarState(p.eating, p.drinking),
     });
 
@@ -7647,35 +7879,30 @@ export class Hud {
     }
 
     const inDungeon = p.pos.x > DUNGEON_X_THRESHOLD;
-    const currentZone = zoneAt(p.pos.z);
+    const currentZone = zoneAt(p.pos.x, p.pos.z);
     if (mediumHud) {
       // zone transitions: banner + welcome hint when crossing into a new band.
-      // A ~5yd dead-band past the boundary stops a player straddling the border
-      // from re-triggering the banner/log (and the map canvas regen) every step.
       if (!inDungeon && currentZone.id !== this.lastZoneId) {
-        const lastZone = ZONES.find((z) => z.id === this.lastZoneId);
-        const pastDeadBand =
-          !lastZone ||
-          p.pos.z < lastZone.zMin - ZONE_BANNER_DEADBAND ||
-          p.pos.z >= lastZone.zMax + ZONE_BANNER_DEADBAND;
-        if (pastDeadBand) {
-          if (this.lastZoneId !== '') {
-            const currentZoneName = zoneDisplayName(currentZone.id);
-            this.showBanner(currentZoneName);
-            this.log(t('hud.core.enteringZone', { zone: currentZoneName }), '#ffd100');
-            this.logZoneWelcome(currentZone);
-            // Zone-entry vista: a slow up-and-out camera sweep over the new
-            // zone alongside the banner. Display-only, cancelled by any
-            // camera input, skipped in combat/while dead and under reduced
-            // motion (the renderer gates the latter). Online mirrors never
-            // set p.inCombat, so the recent-personal-combat-event window (the
-            // same signal the combat music rides) carries that gate there.
-            const recentCombat = performance.now() - this.lastCombatEventAt < 6000;
-            if (!p.dead && !p.inCombat && !recentCombat) this.renderer.vistaPan();
-          }
-          this.lastZoneId = currentZone.id;
-          this.prewarmMapBg(currentZone.id); // get the new zone's map bg ready before the player opens it
+        // commit the moment zoneAt flips: the old 1D z deadband never fired
+        // on an east-west crossing (the grid's column borders share the z
+        // band), so the banner and map lagged the border by a whole realm.
+        // Re-crossing costs only a banner re-emit; the map bg is cached.
+        if (this.lastZoneId !== '') {
+          const currentZoneName = zoneDisplayName(currentZone.id);
+          this.showBanner(currentZoneName);
+          this.log(t('hud.core.enteringZone', { zone: currentZoneName }), '#ffd100');
+          this.logZoneWelcome(currentZone);
+          // Zone-entry vista: a slow up-and-out camera sweep over the new
+          // zone alongside the banner. Display-only, cancelled by any
+          // camera input, skipped in combat/while dead and under reduced
+          // motion (the renderer gates the latter). Online mirrors never
+          // set p.inCombat, so the recent-personal-combat-event window (the
+          // same signal the combat music rides) carries that gate there.
+          const recentCombat = performance.now() - this.lastCombatEventAt < 6000;
+          if (!p.dead && !p.inCombat && !recentCombat) this.renderer.vistaPan();
         }
+        this.lastZoneId = currentZone.id;
+        this.prewarmMapBg(currentZone.id); // get the new zone's map bg ready before the player opens it
       }
 
       // subzone text: a smaller banner when you step into a named landmark
@@ -7701,6 +7928,7 @@ export class Hud {
         inDungeon,
         entities: sim.entities.values(),
         cupInfo: sim.cupInfo,
+        riftFloor: sim.riftFloor,
       });
       const inCombat = musicState.inCombat;
       const { atSowfield } = musicState;
@@ -7800,6 +8028,7 @@ export class Hud {
         this.updateMinimap();
       }
       this.updateClock();
+      this.updateDayNightDial();
       this.updateMinimapCoords();
       this.updateCompass();
     }
@@ -8071,6 +8300,80 @@ export class Hud {
     this.lockpickController.close(restoreFocus);
   }
 
+  // ---------------------------------------------------------------------------
+  // "Riding Lessons": the glowing square's Start Race action opens the lesson,
+  // lends the training Valorsteed, and arms the countdown in one deliberate step.
+  // The mountTrainSession/End events retain the quest guidance and completion UI.
+  // ---------------------------------------------------------------------------
+
+  private mountKey(): string {
+    // The live Mount/Dismount binding label (a physical keycap, shown verbatim).
+    // A player may deliberately clear both slots, so never invent a default that
+    // could trigger a different action (Z sheathes the weapon on this release).
+    return this.keybinds.primaryLabel('mount') || t('hud.options.unbound');
+  }
+
+  // A mountTrainSession event announces a fresh attempt or a phase change: at
+  // 'mount' toast the Mount/Dismount hint; at 'ride' (climbed aboard) point the
+  // rider at the start line.
+  private onMountTrainSession(phase: 'mount' | 'ride'): void {
+    if (phase === 'ride') {
+      this.showBanner(t('hudChrome.mountTraining.ridePrompt'));
+    } else {
+      this.showBanner(t('hudChrome.mountTraining.mountPrompt', { key: this.mountKey() }));
+    }
+  }
+
+  private endMountTraining(outcome: 'success' | 'abandoned'): void {
+    // Abandoning is the player's own doing (the sim posts its own notice where one
+    // helps), so it gets no banner; success gets a banner + log line.
+    if (outcome === 'success') {
+      const summary = t('hudChrome.mountTraining.success');
+      this.showBanner(summary, true, undefined, t('hudChrome.mountTraining.returnToMarla'), 6000);
+      this.log(summary, '#7fdc4f');
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Show-jumping race: the always-open paddock course (src/sim/mount_race.ts).
+  // The bottom control sends the explicit start/cancel commands; mountRace*
+  // events show the bottom strip + a go banner, repaint cleared jumps, and
+  // announce the outcome. Player text renders through hudChrome.mountRace.*.
+  // ---------------------------------------------------------------------------
+
+  private openMountRace(): void {
+    $('#mount-race-strip').style.display = 'flex';
+    this.mountRaceStrip.show();
+    // The large GO flash occupies the center first. Wait until it clears before
+    // showing the course instruction in the upper banner slot.
+    clearTimeout(this.mountRaceInstructionTimer);
+    this.mountRaceInstructionTimer = window.setTimeout(() => {
+      if (this.sim.mountRaceView()?.phase === 'racing') {
+        this.showBanner(t('hudChrome.mountRace.start'));
+      }
+    }, 900);
+  }
+
+  private endMountRace(outcome: 'finished' | 'timeout' | 'abandoned', timeTicks: number): void {
+    clearTimeout(this.mountRaceInstructionTimer);
+    // Abandoning is the player's own dismount/exit, so it gets no banner; a
+    // finish or a timeout gets a banner + log line.
+    if (outcome === 'finished') {
+      const seconds = formatNumber(timeTicks / TICK_RATE, { maximumFractionDigits: 1 });
+      const summary = t('hudChrome.mountRace.finished', { seconds });
+      this.showBanner(summary);
+      this.log(summary, '#7fdc4f');
+    } else if (outcome === 'timeout') {
+      const summary = t('hudChrome.mountRace.timeout');
+      this.showBanner(summary);
+      this.log(summary, '#ff7a6a');
+      audio.error();
+    }
+    $('#mount-race-strip').style.display = 'none';
+    this.mountRaceStrip.hide();
+    this.mountRaceControls.hide();
+  }
+
   // Drowned Reliquary Rite: the difficulty popup opens when a player interacts
   // with the risen reliquary (delveRiteChoosePrompt) and closes once the chosen
   // sequence starts playing (the first delveRitePulse) or on dismiss.
@@ -8104,33 +8407,139 @@ export class Hud {
     return c;
   }
 
-  // The full-zone band used by the world map (and prewarm), keyed only on z.
+  // The full-zone band used by the world map (and prewarm): the shared
+  // map_terrain helper, so the HUD, the build-time plate bake, and the
+  // freshness guard can never disagree about a plate's bounds.
   private mapZoneRegion(zone: ZoneDef): MapRegion {
-    return { minX: WORLD_MIN_X, maxX: WORLD_MAX_X, minZ: zone.zMin, maxZ: zone.zMax };
+    return mapZoneRegion(zone);
   }
 
   // The cached terrain background for a zone, rendering it synchronously only if
   // a prewarm hasn't already produced it. The synchronous path is the fallback
   // for "opened the map the instant we entered a zone"; normally the idle
   // prewarm has it ready and this is a Map hit.
+  // Composite a hand-painted plate (public/map_art/<zoneId>.*) over a zone's
+  // procedural background canvas once it loads; the caches hold the canvas by
+  // reference, so the next blit picks the art up without invalidation.
+  private compositeMapArt(zoneId: string, canvas: HTMLCanvasElement): void {
+    onMapArtReady(zoneId, (img) => {
+      const ctx = require2dContext(canvas);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    });
+  }
+
   private mapZoneBg(zone: ZoneDef): HTMLCanvasElement {
     const cached = this.mapBgCache.get(zone.id);
     if (cached) return cached;
-    const bg = this.renderTerrainCanvas(MAP_BG_RES, this.mapZoneRegion(zone));
-    this.mapBgCache.set(zone.id, bg);
-    // a redundant in-flight prewarm for this same zone can be dropped now
-    if (this.mapPrewarm?.zoneId === zone.id) this.cancelMapPrewarm();
-    return bg;
+    // Cache miss with the map ALREADY open: never render synchronously (a
+    // full zone background is seconds of terrain sampling over the grid
+    // world). Prioritize this zone's plate (the baked image on the shipped
+    // world, else the sliced procedural prewarm) and hand back an interim
+    // canvas: the open map redraws on the medium HUD cadence, so the plate
+    // appears the moment the image decodes, or fills in top-down as the
+    // sliced prewarm publishes rows.
+    if (this.mapPrewarm?.zoneId !== zone.id) this.prewarmMapBg(zone.id);
+    const rechecked = this.mapBgCache.get(zone.id);
+    if (rechecked) return rechecked; // an already-decoded baked plate commits synchronously
+    if (this.mapPrewarm?.zoneId === zone.id) return this.mapPrewarm.canvas;
+    // A baked plate is still decoding: show blank map paper for a frame or two.
+    let placeholder = this.mapBgPending.get(zone.id);
+    if (!placeholder) {
+      const region = mapZoneRegion(zone);
+      placeholder = document.createElement('canvas');
+      placeholder.width = MAP_BG_RES;
+      placeholder.height = mapCanvasHeight(MAP_BG_RES, region);
+      const ctx = require2dContext(placeholder);
+      ctx.fillStyle = '#3c3a30';
+      ctx.fillRect(0, 0, placeholder.width, placeholder.height);
+      this.mapBgPending.set(zone.id, placeholder);
+    }
+    return placeholder;
   }
 
-  // Kick off (or no-op) an idle, time-sliced render of a zone's map background
-  // so opening the map never pays the ~200ms terrain cost on the click. Called
-  // when the committed zone changes and once at startup for the spawn zone.
+  /**
+   * Enqueue a zone's map background for the idle prewarm lane. Wired by
+   * main.ts to the renderer's zone streaming, so every zone that becomes
+   * resident also gets its map background rendered ahead of the first open
+   * (opening the map must never pay the ~200ms terrain render on the click).
+   * One job runs at a time; the committed-zone prewarm preempts the lane and
+   * the preempted zone resumes from the queue.
+   */
+  queueMapBgPrewarm(zoneId: string): void {
+    if (this.mapBgCache.has(zoneId)) return;
+    if (this.mapPrewarm?.zoneId === zoneId) return;
+    if (this.mapPrewarmQueue.includes(zoneId)) return;
+    if (this.mapPrewarm) {
+      this.mapPrewarmQueue.push(zoneId);
+      return;
+    }
+    this.prewarmMapBg(zoneId);
+  }
+
+  private startNextMapPrewarm(): void {
+    while (!this.mapPrewarm) {
+      const next = this.mapPrewarmQueue.shift();
+      if (next === undefined) return;
+      if (this.mapBgCache.has(next)) continue;
+      this.prewarmMapBg(next);
+      return;
+    }
+  }
+
+  // Commit a ready background (baked plate or finished prewarm) to the cache
+  // and let the map-art overlay land on it.
+  private commitMapBg(zoneId: string, canvas: HTMLCanvasElement): void {
+    this.mapBgCache.set(zoneId, canvas);
+    this.mapBgPending.delete(zoneId);
+    this.compositeMapArt(zoneId, canvas);
+  }
+
+  // Ready a zone's map background so opening the map never pays terrain
+  // rendering on the click. On the shipped world this only DECODES the baked
+  // plate (public/map_bg, see scripts/build_map_backgrounds.mjs); custom
+  // seeds, edited worlds, and missing plates fall back to the idle-sliced
+  // procedural painter. Called when the committed zone changes, once at
+  // startup for the spawn zone, and for every zone the streaming lane
+  // prepares (queueMapBgPrewarm).
   private prewarmMapBg(zoneId: string): void {
     if (this.mapBgCache.has(zoneId)) return;
     if (this.mapPrewarm?.zoneId === zoneId) return; // already prewarming it
     const zone = ZONES.find((z) => z.id === zoneId);
     if (!zone) return;
+    if (bakedMapBgEligible(this.sim.cfg.seed, zoneId)) {
+      loadBakedMapBg(
+        zoneId,
+        (img) => {
+          if (this.mapBgCache.has(zoneId)) return;
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+          require2dContext(canvas).drawImage(img, 0, 0);
+          this.commitMapBg(zoneId, canvas);
+          // a redundant procedural job or queue entry for this zone can stop
+          if (this.mapPrewarm?.zoneId === zoneId) {
+            this.cancelMapPrewarm();
+            this.startNextMapPrewarm();
+          }
+        },
+        () => this.prewarmMapBgProcedural(zone),
+      );
+      return;
+    }
+    this.prewarmMapBgProcedural(zone);
+  }
+
+  // The runtime fallback painter: an idle, time-sliced render of the zone's
+  // background through the single prewarm lane.
+  private prewarmMapBgProcedural(zone: ZoneDef): void {
+    const zoneId = zone.id;
+    if (this.mapBgCache.has(zoneId)) return;
+    if (this.mapPrewarm?.zoneId === zoneId) return; // already prewarming it
+    // Preempt any in-flight prewarm (the committed zone is the most urgent
+    // open), but keep the preempted zone: it resumes from the queue front.
+    if (this.mapPrewarm && !this.mapPrewarmQueue.includes(this.mapPrewarm.zoneId)) {
+      this.mapPrewarmQueue.unshift(this.mapPrewarm.zoneId);
+    }
     this.cancelMapPrewarm(); // drop any prewarm for a now-stale zone
     const region = this.mapZoneRegion(zone);
     const W = MAP_BG_RES;
@@ -8139,6 +8548,11 @@ export class Hud {
     c.width = W;
     c.height = H;
     const ctx = require2dContext(c);
+    // A neutral parchment underlay: a cache-miss open blits this canvas while
+    // it fills top-down (see mapZoneBg), so the unpainted remainder reads as
+    // blank map paper rather than black.
+    ctx.fillStyle = '#3c3a30';
+    ctx.fillRect(0, 0, W, H);
     this.mapPrewarm = {
       zoneId,
       canvas: c,
@@ -8148,6 +8562,7 @@ export class Hud {
       H,
       row: 0,
       region,
+      carry: { prevRow: null },
     };
     this.scheduleMapPrewarm();
   }
@@ -8188,29 +8603,41 @@ export class Hud {
     }
   }
 
-  // Paint a budgeted slice of the in-flight prewarm, then reschedule until the
-  // zone is fully rendered. Whole rows per slice keeps it byte-identical to a
-  // one-shot render (the only per-row state, hillshade, resets each row).
-  // With an idle deadline we paint as many slices as fit; without one (the
-  // setTimeout fallback) we paint a single slice and let the reschedule pace it,
-  // so the no-requestIdleCallback path stays sliced instead of rendering the
-  // whole canvas in one ~200ms hitch.
+  // Paint a TIME-budgeted slice of the in-flight prewarm, then reschedule
+  // until the zone is fully rendered. Whole rows per step keep it
+  // byte-identical to a one-shot render; the carry threads the previous row's
+  // heights between pumps so one-row steps never pay a chunk-start recompute.
+  // Rows are expensive (~5ms each at MAP_BG_RES over the grid world), so the
+  // budget is wall time, never a fixed row count: a pump stops after
+  // MAP_PREWARM_SLICE_MS or when the idle deadline runs dry. Each pump also
+  // publishes its rows to the canvas, so a cache-miss open (mapZoneBg) shows
+  // the map filling in top-down instead of freezing on a full render.
   private pumpMapPrewarm = (deadline?: { timeRemaining(): number }): void => {
     const job = this.mapPrewarm;
     if (!job) return;
     const seed = this.sim.cfg.seed;
-    const ROWS_PER_SLICE = 16; // ~6ms at MAP_BG_RES; one frame fits several
+    const MAP_PREWARM_SLICE_MS = 6;
+    const start = performance.now();
+    const firstRow = job.row;
     do {
-      const end = Math.min(job.H, job.row + ROWS_PER_SLICE);
-      paintTerrainRows(job.img.data, job.W, job.H, job.region, seed, job.row, end);
+      const end = Math.min(job.H, job.row + 1);
+      paintTerrainRows(job.img.data, job.W, job.H, job.region, seed, job.row, end, job.carry);
       job.row = end;
-    } while (job.row < job.H && deadline !== undefined && deadline.timeRemaining() > 3);
+    } while (
+      job.row < job.H &&
+      performance.now() - start < MAP_PREWARM_SLICE_MS &&
+      (deadline === undefined || deadline.timeRemaining() > 3)
+    );
+    if (job.row > firstRow) {
+      job.ctx.putImageData(job.img, 0, 0, 0, firstRow, job.W, job.row - firstRow);
+    }
     if (job.row >= job.H) {
       job.ctx.putImageData(job.img, 0, 0);
-      this.mapBgCache.set(job.zoneId, job.canvas);
+      this.commitMapBg(job.zoneId, job.canvas);
       this.mapPrewarm = null;
       this.mapPrewarmHandle = 0;
       this.mapPrewarmVia = null;
+      this.startNextMapPrewarm(); // drain the streamed-zone backlog
       return;
     }
     this.scheduleMapPrewarm();
@@ -8226,6 +8653,98 @@ export class Hud {
       this.lastClockText = text;
       this.clockEl.textContent = text;
     }
+  }
+
+  /** Force the minimap day/night dial to redraw on the next tick (the /daynight
+   *  dev command calls this so an override shows without the ~1s throttle wait). */
+  refreshDayNightDial(): void {
+    this.lastDayNightDrawAt = 0;
+  }
+
+  // Draw the minimap day/night dial: a ring painted with the 12h world sky cycle
+  // (deep navy night, warm dawn/dusk glow, bright day blue), a "now" marker that
+  // sweeps it once per cycle, and a centre sun or moon. Purely visual (the canvas
+  // is aria-hidden) and reads the shared UTC-anchored cycle, so a glance shows the
+  // current time of day and how far the marker sits from the coming day or night.
+  private updateDayNightDial(): void {
+    const ctx = this.dayNightCtx;
+    if (!ctx) return;
+    const now = Date.now();
+    if (now - this.lastDayNightDrawAt < 1000) return; // the 12h cycle crawls; ~1Hz is ample
+    this.lastDayNightDrawAt = now;
+
+    const S = 60; // backing resolution (CSS shows it at 30px, so 2x for crispness)
+    const cx = S / 2;
+    const cy = S / 2;
+    const rMid = 23; // ring centreline radius
+    const ringW = 8;
+    const rInner = rMid - ringW / 2 - 2; // centre disc radius
+    // noon (brightest) sits at the top, midnight at the bottom; the marker sweeps
+    // clockwise once per 12h. angle = pi/2 + phase*2pi (canvas y is down).
+    const angleForPhase = (p: number): number => Math.PI / 2 + p * Math.PI * 2;
+    const rgb = (c: readonly [number, number, number]): string =>
+      `rgb(${Math.round(c[0] * 255)}, ${Math.round(c[1] * 255)}, ${Math.round(c[2] * 255)})`;
+
+    ctx.clearRect(0, 0, S, S);
+
+    // the ring: sample the cycle in segments, each an arc of its sky color. The
+    // small angular overlap hides seams between the butt-capped arc segments.
+    const SEG = 60;
+    ctx.lineWidth = ringW;
+    ctx.lineCap = 'butt';
+    for (let i = 0; i < SEG; i++) {
+      const p0 = i / SEG;
+      const p1 = (i + 1) / SEG;
+      ctx.strokeStyle = rgb(skyTintForDayness(globalDayness((p0 + p1) / 2)));
+      ctx.beginPath();
+      ctx.arc(cx, cy, rMid, angleForPhase(p0), angleForPhase(p1) + 0.02);
+      ctx.stroke();
+    }
+
+    const phaseNow = currentDayNightPhase();
+    const daynessNow = globalDayness(phaseNow);
+    const skyNow = skyTintForDayness(daynessNow);
+
+    // centre disc tinted to the current sky, with a sun by day or a moon by night
+    ctx.fillStyle = rgb(skyNow);
+    ctx.beginPath();
+    ctx.arc(cx, cy, rInner, 0, Math.PI * 2);
+    ctx.fill();
+    if (daynessNow >= 0.5) {
+      ctx.fillStyle = '#ffd45a';
+      ctx.beginPath();
+      ctx.arc(cx, cy, 5.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#ffd45a';
+      ctx.lineWidth = 1.4;
+      for (let i = 0; i < 8; i++) {
+        const a = (i / 8) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(a) * 8, cy + Math.sin(a) * 8);
+        ctx.lineTo(cx + Math.cos(a) * 10.5, cy + Math.sin(a) * 10.5);
+        ctx.stroke();
+      }
+    } else {
+      // crescent: a pale disc minus an offset disc repainted in the sky color
+      ctx.fillStyle = '#e2e8f6';
+      ctx.beginPath();
+      ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = rgb(skyNow);
+      ctx.beginPath();
+      ctx.arc(cx + 3, cy - 2.2, 6, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // the "now" marker: a bright pip riding the ring at the current phase
+    const am = angleForPhase(phaseNow);
+    ctx.beginPath();
+    ctx.arc(cx + Math.cos(am) * rMid, cy + Math.sin(am) * rMid, 3.6, 0, Math.PI * 2);
+    ctx.fillStyle = '#fff';
+    ctx.fill();
+    ctx.lineWidth = 1.4;
+    ctx.strokeStyle = '#000';
+    ctx.stroke();
   }
 
   // Classic-style coordinate readout pinned under the minimap. Reads only the
@@ -8358,13 +8877,22 @@ export class Hud {
     }
     // The overworld minimap: a pure marker core (minimap_markers) + the thin canvas
     // painter. It owns the cached terrain blit + the marker draws and writes
-    // '#zone-label' through the write-elision facet.
+    // '#zone-label' through the write-elision facet. It blits the current zone's
+    // high-res map background sharp over the coarse whole-world fallback, so the
+    // player's surroundings are crisp instead of a handful of upscaled pixels.
+    // The zone bg is only PEEKED from the cache (never rendered here: a 10Hz
+    // sync terrain render would hitch); the idle prewarm normally has it ready,
+    // and the coarse fallback covers the gap until then.
+    const p = this.sim.player;
+    const zone = ZONES.find((z) => z.id === this.lastZoneId) ?? zoneAt(p.pos.x, p.pos.z);
+    const cachedZoneBg = this.mapBgCache.get(zone.id);
     this.minimapPainter.paintOverworld(
       ctx,
       this.sim,
       $('#zone-label'),
       this.minimapBg,
       this.minimapZoom,
+      cachedZoneBg ? { canvas: cachedZoneBg, region: this.mapZoneRegion(zone) } : null,
     );
   }
 
@@ -8461,13 +8989,45 @@ export class Hud {
       return;
     }
     this.closeOtherWindows('#map-window');
-    this.mapZoom = 1; // always open at the full-zone view, following the player
+    this.mapZoom = MAP_OPEN_ZOOM; // open on the complete current zone
     this.mapCenter = null;
     this.mapPing = null;
     this.mapZoneOverride = null;
+    this.mapLevel = 'zone'; // always open on the per-zone detail map
+    this.mapHoverZone = null;
     el.style.display = 'block';
     this.updateMapWindow();
     this.syncAnyWindowOpenState();
+  }
+
+  // Toggle the world map between the per-zone detail level and the continent
+  // overview (WoW-style right-click zoom out / the level-toggle button). Not
+  // available in a delve, whose map is the schematic branch.
+  private toggleMapLevel(): void {
+    if (mapWindowMode(this.sim) === 'delve') return;
+    this.setMapLevel(this.mapLevel === 'continent' ? 'zone' : 'continent');
+  }
+
+  private setMapLevel(level: 'zone' | 'continent'): void {
+    if (this.mapLevel === level) return;
+    this.mapLevel = level;
+    this.mapHoverZone = null;
+    this.mapDrag = null;
+    this.hideTooltip();
+    if ($('#map-window').style.display === 'block') this.updateMapWindow();
+  }
+
+  // Open a specific zone's detail map from the continent overview (a left-click on
+  // its region). Reuses the Show-on-Map override; never teleports the player.
+  private openZoneFromContinent(zoneId: string): void {
+    this.mapZoneOverride = zoneId;
+    this.mapZoom = MAP_OPEN_ZOOM;
+    this.mapCenter = null;
+    this.mapPing = null;
+    this.mapHoverZone = null;
+    this.hideTooltip();
+    this.mapLevel = 'zone';
+    this.updateMapWindow();
   }
 
   // Dungeon Finder "Show on Map": open the world map on the entrance's zone
@@ -8476,7 +9036,7 @@ export class Hud {
   showFinderOnMap(x: number, z: number): void {
     const el = $('#map-window');
     if (el.style.display !== 'block') this.toggleMap();
-    this.mapZoneOverride = zoneAt(z).id;
+    this.mapZoneOverride = zoneAt(x, z).id;
     this.mapPing = { x, z };
     this.mapZoom = Math.max(this.mapZoom, 2);
     this.mapCenter = { x, z };
@@ -8508,11 +9068,18 @@ export class Hud {
     const p = this.sim.player;
     const summaryEl = $('#map-summary');
 
-    if (mapWindowMode(this.sim) === 'delve') {
+    const inDelve = mapWindowMode(this.sim) === 'delve';
+    // The continent overview only applies to the overworld; a delve forces the
+    // schematic branch and hides the level toggle. The per-zone +/- zoom controls
+    // are meaningless on the continent overview, so hide them there.
+    this.setDisplay($('#map-level-toggle'), inDelve ? 'none' : 'block');
+    this.setDisplay($('#map-zoom'), this.mapLevel === 'continent' && !inDelve ? 'none' : 'flex');
+    if (inDelve) {
       // The delve painter owns the full world-map schematic render (the area
       // title is drawn on-canvas, since the world map has no DOM zone label).
       this.mapQuestAreas = [];
       this.mapNpcMarkers = [];
+      this.continentRegions = [];
       this.delvePainter.paintWorldMapDelve(ctx, this.sim, S);
       const run = this.sim.delveRun;
       const area = run ? delveDisplayName(run.delveId) : '';
@@ -8520,18 +9087,56 @@ export class Hud {
       return;
     }
 
+    // Update the level-toggle button's visible text (its accessible name) to the
+    // action it performs from the current level. The generic aria/title is static.
+    this.setText(
+      $('#map-level-toggle'),
+      t(
+        this.mapLevel === 'continent'
+          ? 'hudChrome.continentMap.toZone'
+          : 'hudChrome.continentMap.toWorld',
+      ),
+    );
+
+    if (this.mapLevel === 'continent') {
+      // The continent overview: a painted world plate with clickable zone regions.
+      this.mapQuestAreas = [];
+      this.mapNpcMarkers = [];
+      this.mapView = null; // panning/zoom belong to the per-zone level only
+      const result = this.continentPainter.paintContinent(ctx, this.sim, {
+        canvasSize: S,
+        hoveredZoneId: this.mapHoverZone,
+      });
+      this.continentRegions = result.regions;
+      canvas.style.cursor = this.mapHoverZone ? 'pointer' : 'default';
+      this.setText(summaryEl, t('hudChrome.continentMap.summary'));
+      return;
+    }
+    this.continentRegions = [];
+
     // inside an instance, show the zone the dungeon's door is in (dungeonAt owns
     // the instance x-band layout); outdoors, follow the committed zone so
     // border-straddling can't thrash the cached terrain regen.
     const dungeon = dungeonAt(p.pos.x);
     const zone: ZoneDef = this.mapZoneOverride
-      ? (ZONES.find((z) => z.id === this.mapZoneOverride) ?? zoneAt(p.pos.z))
+      ? (ZONES.find((z) => z.id === this.mapZoneOverride) ?? zoneAt(p.pos.x, p.pos.z))
       : dungeon
-        ? zoneAt(dungeon.doorPos.z)
-        : (ZONES.find((z) => z.id === this.lastZoneId) ?? zoneAt(p.pos.z));
+        ? zoneAt(dungeon.doorPos.x, dungeon.doorPos.z)
+        : (ZONES.find((z) => z.id === this.lastZoneId) ?? zoneAt(p.pos.x, p.pos.z));
+    // Crossing a zone while the map is open starts that zone at its full frame;
+    // a pan target from the previous zone must never leak into the new one.
+    if (this.mapZoneId !== zone.id) {
+      this.mapZoneId = zone.id;
+      this.mapZoom = MAP_OPEN_ZOOM;
+      this.mapCenter = null;
+    }
+    const zoneBg = {
+      canvas: this.mapZoneBg(zone),
+      region: this.mapZoneRegion(zone),
+    };
     const result = this.mapPainter.paintOverworld(ctx, this.sim, {
       zone,
-      bg: this.mapZoneBg(zone), // cached per zone; prewarmed during idle
+      zoneBg,
       canvasSize: S,
       zoom: this.mapZoom,
       center: this.mapCenter,
@@ -8542,6 +9147,22 @@ export class Hud {
     this.mapNpcMarkers = result.npcs;
     if (!this.mapDrag) canvas.style.cursor = result.cursor;
     this.setText(summaryEl, t('hud.core.mapSummary', { zone: zoneDisplayName(zone.id) }));
+  }
+
+  // Tooltip body for a hovered zone region on the continent overview: the zone's
+  // localized name plus its suggested level band (from the region's levelRange).
+  private continentZoneTooltipHtml(zoneId: string): string {
+    const region = this.continentRegions.find((r) => r.zoneId === zoneId);
+    let html = `<div class="tt-title">${esc(zoneDisplayName(zoneId))}</div>`;
+    if (region) {
+      html += `<div class="tt-quest-req">${esc(
+        t('hudChrome.continentMap.levels', {
+          min: this.questNumber(region.levelMin),
+          max: this.questNumber(region.levelMax),
+        }),
+      )}</div>`;
+    }
+    return html;
   }
 
   // Tooltip body for a hovered quest-giver glyph on the world map: each quest
@@ -8765,6 +9386,18 @@ export class Hud {
         const cue = spellFxCue(ev);
         const anchor = cue ? sim.entities.get(cue.anchorId) : null;
         if (cue && anchor) this.combat(cue.key, anchor.pos.x, anchor.pos.y, anchor.pos.z, 1.0);
+        return;
+      }
+      case 'spellfxAt': {
+        // Ground-anchored bursts (ground-target detonations, the citadel's Blood
+        // Orb flare, the portcullis release nova) were silent: give novas the
+        // shared burst layered with a school-flavored impact, so the orb's fire
+        // flare reads differently from the gate's holy release. The listener is
+        // on the same floor, so the player's own y is the right height anchor.
+        if (ev.fx !== 'nova') return;
+        const y = sim.player.pos.y;
+        this.combat('spell_nova', ev.x, y, ev.z, 0.6, { cooldown: 0.08 });
+        this.combat(`impact_${ev.school}`, ev.x, y, ev.z, 0.5, { rate: 0.8, cooldown: 0.08 });
         return;
       }
       case 'heal':
@@ -9768,6 +10401,15 @@ export class Hud {
         }
         case 'questDone':
           sfx.playUi('quest_complete');
+          if (ev.questId === 'q_riding_lessons') {
+            this.showBanner(
+              t('hudChrome.mountTraining.ownedMountPrompt'),
+              true,
+              undefined,
+              undefined,
+              6000,
+            );
+          }
           this.questDialog.refresh();
           break;
         case 'chat': {
@@ -10496,6 +11138,28 @@ export class Hud {
           sfx.playUi('lockpick_bonus');
           break;
         }
+        case 'mountTrainSession':
+          this.onMountTrainSession(ev.phase);
+          break;
+        case 'mountTrainEnd':
+          this.endMountTraining(ev.outcome);
+          break;
+        case 'mountRaceCountdown':
+          // The 3..2..1 countdown paints from the per-frame view; nudge it now so
+          // it appears the instant the race arms. Clear any lingering lesson
+          // instruction immediately so the two center-screen messages cannot overlap.
+          this.hideBannerImmediately();
+          this.mountRaceControls.update();
+          break;
+        case 'mountRaceStart':
+          this.openMountRace();
+          break;
+        case 'mountRaceJump':
+          this.mountRaceStrip.repaintIfChanged();
+          break;
+        case 'mountRaceEnd':
+          this.endMountRace(ev.outcome, ev.timeTicks);
+          break;
         case 'delveRiteChoosePrompt':
           this.openRitePanel();
           break;
@@ -10512,6 +11176,22 @@ export class Hud {
         case 'delveFailed':
           this.showBanner(t('delveUi.run.failed'));
           break;
+        case 'riftRaceResult':
+          if (ev.outcome === 'won') {
+            this.showBanner(
+              t('sim.rift.raceWinBanner', {
+                seconds: formatNumber(ev.clearTime, { maximumFractionDigits: 1 }),
+              }),
+            );
+            audio.duelEnd();
+          } else {
+            this.showBanner(t('sim.rift.raceLostBanner'));
+            audio.death();
+          }
+          break;
+        case 'riftRaceWorld':
+        case 'riftForgeResult':
+          break; // their localized log line carries the non-modal detail
         case 'companionBark': {
           // Acolyte Tessa's voice line: overhead bubble over her (when on-screen),
           // plus an attributed combat-log line so it is never missed off-screen.
@@ -10588,6 +11268,28 @@ export class Hud {
         case 'respawn':
           this.log(t('hud.system.respawn'), '#7fdc4f');
           break;
+        case 'unstuck': {
+          const feedback = unstuckFeedback(ev);
+          const text = t(feedback.key, feedback.values);
+          if (feedback.clearBanner) this.clearUnstuckBanner();
+          if (feedback.kind === 'error') {
+            this.showError(text);
+            break;
+          }
+          if (feedback.banner) {
+            const bannerText = t(feedback.bannerKey ?? feedback.key, feedback.values);
+            this.showBanner(
+              bannerText,
+              true,
+              undefined,
+              undefined,
+              2600,
+              feedback.kind === 'progress' ? 'unstuck' : null,
+            );
+          }
+          if (feedback.log) this.log(text, feedback.kind === 'success' ? '#7fdc4f' : '#ffd100');
+          break;
+        }
         case 'castStart':
           // cast-loop SFX is spatial now (see playEventSfx); the profession
           // casts (Professions 2.0) add a personal cue at cast start,
@@ -11099,6 +11801,8 @@ export class Hud {
       'You mutter to yourself. Nobody hears it.': 'hud.errors.whisperSelf',
       'You are not in a party.': 'hud.errors.notInParty',
       'You must be in a party to start a ready check.': 'hudChrome.readyCheck.notInPartyError',
+      "Recovery: /unstuck starts a stationary countdown, then sends your spirit to the nearest graveyard. Returning through the Pale Keeper requires The Keeper's Toll.":
+        'hudChrome.unstuck.helpAtGraveyard',
       'A ready check is already in progress.': 'hudChrome.readyCheck.inProgressError',
       'Only the party leader can change the loot method.': 'hudChrome.masterLoot.leaderOnly',
       'Only the party leader may invite.': 'hud.errors.partyLeaderInvite',
@@ -11534,28 +12238,67 @@ export class Hud {
     }
   }
 
-  showBanner(text: string, motion = true, decorativeIconUrl?: string): void {
-    const copy = document.createElement('span');
-    copy.className = 'banner-copy';
-    copy.textContent = text;
-    if (decorativeIconUrl) {
-      this.bannerEl.replaceChildren(
-        decorativeArtImg(document, 'banner-art', decorativeIconUrl),
-        copy,
-      );
+  private clearUnstuckBanner(): void {
+    if (this.bannerSource !== 'unstuck') return;
+    clearTimeout(this.bannerTimer);
+    this.bannerTimer = undefined;
+    this.bannerSource = null;
+    this.bannerEl.replaceChildren();
+    this.bannerEl.classList.remove('has-subtext');
+    this.bannerEl.style.opacity = '0';
+  }
+
+  showBanner(
+    text: string,
+    motion = true,
+    decorativeIconUrl?: string,
+    subtext?: string,
+    durationMs = 2600,
+    source: 'unstuck' | null = null,
+  ): void {
+    this.bannerEl.style.removeProperty('display');
+    this.bannerEl.classList.toggle('has-subtext', !!subtext);
+    if (subtext) {
+      const title = document.createElement('span');
+      title.className = 'banner-title';
+      title.textContent = text;
+      const detail = document.createElement('span');
+      detail.className = 'banner-subtext';
+      detail.textContent = subtext;
+      this.bannerEl.replaceChildren(title, detail);
     } else {
-      this.bannerEl.replaceChildren(copy);
+      const copy = document.createElement('span');
+      copy.className = 'banner-copy';
+      copy.textContent = text;
+      if (decorativeIconUrl) {
+        this.bannerEl.replaceChildren(
+          decorativeArtImg(document, 'banner-art', decorativeIconUrl),
+          copy,
+        );
+      } else {
+        this.bannerEl.replaceChildren(copy);
+      }
     }
-    this.bannerEl.classList.toggle('banner-with-art', Boolean(decorativeIconUrl));
+    this.bannerEl.classList.toggle('banner-with-art', Boolean(decorativeIconUrl) && !subtext);
     // Reduced-motion celebrations (craft plan.motion) show and hide the
     // banner without the fade transition: identical text and duration, no
     // animation. Motion-trimming only; information always survives.
     this.bannerEl.classList.toggle('banner-no-motion', !motion);
     this.bannerEl.style.opacity = '1';
+    this.bannerSource = source;
     clearTimeout(this.bannerTimer);
     this.bannerTimer = window.setTimeout(() => {
       this.bannerEl.style.opacity = '0';
-    }, 2600);
+      this.bannerSource = null;
+    }, durationMs);
+  }
+
+  private hideBannerImmediately(): void {
+    clearTimeout(this.bannerTimer);
+    this.bannerTimer = undefined;
+    this.bannerSource = null;
+    this.bannerEl.style.opacity = '0';
+    this.bannerEl.style.display = 'none';
   }
 
   showSubzone(text: string): void {
@@ -11923,7 +12666,7 @@ export class Hud {
 
   private isInTown(): boolean {
     const pos = this.sim.player.pos;
-    return isInTownZone(pos, zoneAt(pos.z));
+    return isInTownZone(pos, zoneAt(pos.x, pos.z));
   }
 
   toggleTownFocus(): void {
@@ -12414,6 +13157,54 @@ export class Hud {
 
   private renderCharIfOpen(): void {
     this.charWindow.renderIfOpen();
+  }
+
+  /** Build and GPU-warm the shared paperdoll preview before the loading screen
+   *  fades. The character painter remains hidden; its ResizeObserver keeps the
+   *  preview loop dormant until a real preview host becomes visible. */
+  async prewarmCharacterPreview(): Promise<void> {
+    if (!this.charPreview) this.charWindow.render();
+    const cls = this.sim.cfg.playerClass;
+    const skins = Array.from({ length: skinCount(`player_${cls}`) }, (_, index) => index);
+    await this.charPreview?.prewarm(skins);
+    await this.charPreview?.prewarmCloseupPoses(CARD_POSES);
+    // Character chips use a separate offscreen renderer/cache from the live
+    // turntable. Generate the same bounded class set under loading too. Both
+    // framings are distinct cache entries: lists use headshots while Inspect
+    // uses a full-body portrait, so warming only the former still leaves a
+    // synchronous WebGL readback + PNG encode on the first inspected player.
+    for (const portraitClass of ALL_CLASSES) {
+      const portraitSkins = Array.from(
+        { length: skinCount(`player_${portraitClass}`) },
+        (_, index) => index,
+      );
+      for (const skin of portraitSkins) {
+        for (const framing of ['headshot', 'body'] as const) {
+          playerPortraitDataUrl(portraitClass, skin, framing);
+          // PNG serialization is a bounded few milliseconds per portrait.
+          // Yield between captures so the loading UI stays responsive instead
+          // of combining the complete class catalog into one long task.
+          await new Promise<void>((resolve) => window.setTimeout(resolve, 0));
+        }
+      }
+    }
+  }
+
+  /** Compile the online Armory's persistent WebGL context and all Season 1
+   *  skin variants while the world loading screen is still opaque. */
+  async prewarmArmoryPreview(): Promise<void> {
+    if (!this.claudiumHooks) return;
+    await this.dailyRewardsWindow.prewarmArmoryPreview();
+  }
+
+  /** Populate the small synchronous Canvas caches used by contextual HUD
+   *  surfaces while the loading screen still covers the world. Raid markers
+   *  are otherwise encoded one-by-one the first time a party member opens the
+   *  target marker menu. */
+  prewarmStaticUiAssets(): void {
+    for (let marker = 0; marker < RAID_MARKER_LABEL_KEYS.length; marker++) {
+      raidMarkerDataUrl(marker);
+    }
   }
 
   private refreshOpenProfessionSurfacesIfChanged(): void {

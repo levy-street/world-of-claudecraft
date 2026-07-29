@@ -1,6 +1,8 @@
+import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { sfx } from '../src/game/sfx';
 import { SFX_CLIPS, type SfxEntry } from '../src/game/sfx_manifest.generated';
+import { MOUNT_KEYS } from '../src/sim/content/mounts';
 
 // The footstep "jingling" bug: foot clips are ~0.48s but steps fire every ~0.22s
 // at a run, so flat retriggers overlap two pitch-jittered copies of one sample and
@@ -109,6 +111,9 @@ beforeEach(() => {
   // Inject decoded buffers directly (skip async fetch/decode in preload).
   const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
   buffers.set('foot_grass', { duration: 0.48 });
+  for (const [index, mountKey] of MOUNT_KEYS.entries()) {
+    buffers.set(`mount_run_${mountKey}`, { duration: 0.5 + index / 100 });
+  }
   buffers.set('foot_wood', WOOD_BUFFER);
 });
 
@@ -231,6 +236,71 @@ describe('isBuffered/preload', () => {
     const loading = (sfx as unknown as { loading: Map<string, unknown> }).loading;
     expect(loading.has(key)).toBe(false);
     expect(loading.has(`${key}:1`)).toBe(false);
+  });
+});
+
+describe('mount running audio', () => {
+  it('ships one generated manifest entry for every catalog mount', () => {
+    for (const mountKey of MOUNT_KEYS) {
+      const entry = SFX_CLIPS[`mount_run_${mountKey}`];
+      expect(entry).toMatchObject({
+        loop: false,
+        spatial: true,
+      });
+      expect(entry.url).toMatch(
+        new RegExp(`^/audio/sfx/mount_run_${mountKey}\\.mp3\\?v=[0-9a-f]{12}$`),
+      );
+    }
+  });
+
+  it('ships one non-empty MP3 asset for every catalog mount and no orphan mount clips', () => {
+    const directory = new URL('../public/audio/sfx/', import.meta.url);
+    const expected = MOUNT_KEYS.map((mountKey) => `mount_run_${mountKey}.mp3`).sort();
+    const actual = readdirSync(directory)
+      .filter((file) => file.startsWith('mount_run_') && file.endsWith('.mp3'))
+      .sort();
+
+    expect(actual).toEqual(expected);
+    for (const file of expected) {
+      const url = new URL(file, directory);
+      expect(statSync(url).size).toBeGreaterThan(5_000);
+      const header = readFileSync(url).subarray(0, 3).toString('ascii');
+      expect(header).toBe('ID3');
+    }
+  });
+
+  it('plays a distinct custom clip for every catalog mount', () => {
+    const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
+    const played = new Set<unknown>();
+
+    for (const mountKey of MOUNT_KEYS) {
+      nowT += 0.5;
+      sfx.mountRun(0, 0, 0, mountKey, true);
+      const src = sources.at(-1)!;
+      expect(src.buffer).toBe(buffers.get(`mount_run_${mountKey}`));
+      played.add(src.buffer);
+    }
+
+    expect(played.size).toBe(MOUNT_KEYS.length);
+  });
+
+  it('plays independently of the optional on-foot footstep toggle', () => {
+    sfx.setFootstepsEnabled(false);
+    sfx.mountRun(0, 0, 0, 'valorsteed', true);
+    expect(sources.at(-1)!.started).toBe(true);
+  });
+
+  it('truncates each stride before the next mounted running beat', () => {
+    sfx.mountRun(0, 0, 0, 'valorsteed', true);
+    const src = sources.at(-1)!;
+    expect(src.stopAt).not.toBeNull();
+    expect(src.stopAt! - nowT).toBeLessThan(0.5);
+  });
+
+  it('ignores unknown mount keys', () => {
+    const before = sources.length;
+    sfx.mountRun(0, 0, 0, 'unknown_mount', true);
+    expect(sources.length).toBe(before);
   });
 });
 

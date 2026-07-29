@@ -672,6 +672,18 @@ export const TEMPLE_ITEMS: Record<string, ItemDef> = {
     sellValue: 2400,
     requiredClass: WAR,
   },
+  // Collectible mount (Ysolei, Avatar of the Drowned Moon). Soulbound; owning
+  // the ignition key item is owning the mount (src/sim/mounts.ts mountOwned).
+  reins_aether_hover_cycle: {
+    id: 'reins_aether_hover_cycle',
+    name: 'Ignition Key: Aether-Jouster Hover-Cycle',
+    kind: 'mount',
+    mount: 'aether_hover_cycle',
+    quality: 'epic',
+    soulbound: true,
+    noDiscard: true,
+    sellValue: 0,
+  },
   moonshroud_robe: {
     id: 'moonshroud_robe',
     name: 'Moonwrack Robe',

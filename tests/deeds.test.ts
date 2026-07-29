@@ -703,33 +703,50 @@ describe('retro on join', () => {
     expect(sim2.players.get(pid2)!.deedsEarned.has('exp_something_shiny')).toBe(false);
   });
 
-  it('Giantslayer heals exactly where no mob can sit five levels up', () => {
-    // The heroic pin (level 22) is the highest creditable spawn in the game,
-    // so level 18 is the first permanently stranded level and 17 the last
-    // one where the live kill site can still fire.
+  it('Giantslayer auto-heals for capped players now that S-rank is flat 23 (deed stranded)', () => {
+    // MAX_CREDITABLE_MOB_LEVEL was lowered from 25 to 23 when S-rank was
+    // re-tuned to a flat level 23 (no ramp to 25). A capped player (level 20)
+    // can never be hit by a mob five levels up (20+5=25>23), so the deed is
+    // permanently stranded and retroFallbackGrants auto-heals it at join time.
+    // Giantslayer is no longer earnable inside S-rank rifts (maintainer-accepted).
     const sim = makeSim();
     const capped = sim.addPlayer('warrior', 'Capped', {
       state: { ...veteranState(), level: 20 },
     });
+    // Auto-heal fires at join for the capped player (level 20+5=25 > 23).
     expect(sim.players.get(capped)!.deedsEarned.has('cmb_giantslayer')).toBe(true);
-    const edge = sim.addPlayer('warrior', 'Edge', { state: { ...veteranState(), level: 18 } });
-    expect(sim.players.get(edge)!.deedsEarned.has('cmb_giantslayer')).toBe(true);
-    const leveler = sim.addPlayer('warrior', 'Leveler', {
+    // A level-17 player (17+5=22 <= 23) is still below the threshold: not yet stranded.
+    const notStranded = sim.addPlayer('warrior', 'NotStranded', {
       state: { ...veteranState(), level: 17 },
     });
-    expect(sim.players.get(leveler)!.deedsEarned.has('cmb_giantslayer')).toBe(false);
-    // The heal is a retro grant: flagged on the event, delivered to the
-    // healed player only.
-    const evs = deedEvents(sim.tick());
-    const ev = evs.find((e) => e.deedId === 'cmb_giantslayer' && e.pid === capped);
-    expect(ev?.retro).toBe(true);
+    expect(sim.players.get(notStranded)!.deedsEarned.has('cmb_giantslayer')).toBe(false);
+    // A level-18 player (18+5=23, not strictly greater) is also not stranded yet.
+    const edge = sim.addPlayer('warrior', 'Edge', { state: { ...veteranState(), level: 18 } });
+    expect(sim.players.get(edge)!.deedsEarned.has('cmb_giantslayer')).toBe(false);
+    // The live kill site still grants on a killing blow five levels up (for sub-cap players).
+    const edgeEntity = sim.entities.get(edge)!;
+    const wolf = [...sim.entities.values()].find((e) => e.kind === 'mob' && !e.dead)!;
+    wolf.level = edgeEntity.level + 5;
+    (sim as unknown as { dealDamage: Function }).dealDamage(
+      edgeEntity,
+      wolf,
+      wolf.hp + 10,
+      false,
+      'physical',
+      'test',
+      'hit',
+      true,
+    );
+    expect(sim.players.get(edge)!.deedsEarned.has('cmb_giantslayer')).toBe(true);
   });
 
   it('the heals unlock feat_book_complete in the same join for an otherwise complete book', () => {
-    // The motivating payoff: when the three healed deeds were the last holes
-    // in a veteran's book, the meta pass that runs right after the fallback
-    // arms must complete the feat on the SAME login, not one login later.
-    const healed = ['exp_something_shiny', 'cmb_giantslayer', 'prog_well_rested'];
+    // The motivating payoff: when the healed deeds were the last holes in a
+    // veteran's book, the meta pass that runs right after the fallback arms
+    // must complete the feat on the SAME login, not one login later.
+    // (cmb_giantslayer left the healed set when the S-rank rift ceiling made
+    // it earnable at the cap, so this veteran already carries it.)
+    const healed = ['exp_something_shiny', 'prog_well_rested'];
     const bookIds = (DEEDS.feat_book_complete.trigger as { deedIds: string[] }).deedIds;
     const deeds: Record<string, string> = {};
     for (const id of bookIds) {

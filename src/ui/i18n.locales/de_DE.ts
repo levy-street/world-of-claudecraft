@@ -3715,6 +3715,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.tool': 'Werkzeug',
   'itemUi.kind.potion': 'Trank',
   'itemUi.kind.elixir': 'Elixier',
+  'itemUi.kind.mount': 'Reittier',
   'itemUi.stats.armor': 'Rüstung',
   'itemUi.stats.str': 'Stärke',
   'itemUi.stats.agi': 'Beweglichkeit',
@@ -4790,6 +4791,16 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.the_merchant.greeting':
     'Willkommen auf dem Weltmarkt, {className}. Kaufe von Abenteurern aus dem ganzen Reich oder biete deine eigenen Waren an.',
   'entities.npcs.marshal_redbrook.name': 'Marschall Redbrook',
+  'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
+  'entities.npcs.stablemaster_marla.title': 'Stallmeisterin',
+  'entities.npcs.stablemaster_marla.greeting':
+    'Jeder Reiter kommt auf zwei Beinen herein, {className}. Die Zügel gebe ich erst, wenn Ihr den Valorross reiten könnt, ohne im Dreck zu landen, und Highwatch hat keine Heiler für gebrochene Knochen übrig.',
+  'entities.quests.q_riding_lessons.title': 'Reitstunden',
+  'entities.quests.q_riding_lessons.text':
+    'Jeder Reiter kommt auf zwei Beinen herein, {playerName}, genau wie ich Euch am Tag unserer ersten Begegnung sagte. Zahlt die Gebühr, und wenn ich das Wort gebe, ruft das Übungs-Valorross zu Euch und steigt auf. Dann reitet den Parcours: folgt der Markierung zum Startbogen, nehmt jeden Sprung sauber und überquert die Linie erneut, ehe die Sanduhr leerläuft. Schafft Ihr das, gehört Euch der Sattel. Verlasst Ihr die Koppel, fangen wir von vorn an.',
+  'entities.quests.q_riding_lessons.completion':
+    'So, ja. In einer einzigen sauberen Bewegung hinauf und oben ruhig gesessen. Der Valorross gehört Euch, {playerName}: Sattel, Zügel und der Stand eines Reiters, der sich den Sitz verdient hat, statt ihn zu kaufen.',
+  'entities.quests.q_riding_lessons.objectives.0.label': 'Bezähmt den Valorross',
   'entities.npcs.marshal_redbrook.title': 'Stadtmarschall',
   'entities.npcs.marshal_redbrook.greeting':
     'Halte deine Klinge nah, {className}. Das Tal ist nicht mehr, was es war.',
@@ -5811,6 +5822,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_waistguard.name': 'Gürtelschutz des Sturmrufers',
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, der Erwachende Gipfel',
   'entities.mobs.thunzharr_stormling.name': 'Geweckter Sturmling',
+  'entities.mobs.stable_horse.name': 'Stallpferd',
   'hudChrome.worldBoss.spawn': '{name} erhebt sich über den Thornpeak-Höhen!',
   'entities.items.stormcallers_spaulders.name': 'Galecall-Schulterplatten',
   'entities.items.bonewrought_greatsword.name': 'Bonewrought-Großschwert',
@@ -5891,6 +5903,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterArmor': 'Rüstung',
   'hudChrome.bags.filterConsumable': 'Verbrauchbares',
   'hudChrome.bags.filterMaterial': 'Materialien',
+  'hudChrome.bags.filterMount': 'Reittiere',
   'hudChrome.bags.filterQuest': 'Quest',
   'hudChrome.bags.sortAria': 'Taschengegenstände sortieren',
   'hudChrome.bags.sortRecent': 'Neueste',
@@ -7031,6 +7044,26 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.reliquary_gloves_rog.name': 'Knochenwächter-Griffe',
   'entities.items.deacon_reliquary_helm.name': 'Reliquiarhelm des Diakons',
   'entities.items.varric_shadow_cowl.name': 'Varrics Schattenkapuze',
+  'entities.items.duskwisp_essence.name': 'Dämmerirrlicht-Essenz',
+  'entities.items.spore_heart.name': 'Sporenherz',
+  'entities.items.gleaming_antler.name': 'Schimmerndes Geweih',
+  'entities.items.wisp_mote.name': 'Irrlichtstaub',
+  'entities.items.starfall_shard.name': 'Sternenfall-Splitter',
+  'entities.items.elder_bark.name': 'Ältestenrinde',
+  'entities.items.hollow_sealstone.name': 'Der Siegelstein der Senke',
+  'entities.items.monument_overlook.name': 'Verwitterte Gedenksäule',
+  'entities.items.monument_court.name': 'Versunkene Gedenksäule',
+  'entities.items.monument_north.name': 'Vergessene Gedenksäule',
+  'entities.items.guardian_core.name': 'Wächterkern',
+  'entities.items.wardens_seal.name': 'Das Siegel des Wächters',
+  'entities.items.gleamstag_charm.name': 'Glanzhirsch-Talisman',
+  'entities.items.veilsteel_blade.name': 'Schleierstahlklinge',
+  'entities.items.duskfang_dirk.name': 'Dämmerfang-Dolch',
+  'entities.items.gleamwood_stave.name': 'Glanzholzstab',
+  'entities.items.wardens_oathband.name': 'Schwurband des Wächters',
+  'entities.items.wardplate_cuirass.name': 'Wachtplatten-Kürass',
+  'entities.items.nightweave_tunic.name': 'Nachtgewebe-Wams',
+  'entities.items.veilcloth_robe.name': 'Schleiertuch-Robe',
   'entities.mobs.acolyte_tessa.name': 'Akolythin Tessa',
   'entities.mobs.deacon_varric.name': 'Diakon Varric',
   'entities.mobs.reliquary_bonewalker.name': 'Erweckter Knochengänger',
@@ -8059,6 +8092,13 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.steam.title': 'Steam',
   'hudChrome.steam.unlink': 'Steam-Verknüpfung lösen',
   'entities.items.chunk_of_ore.name': 'Erzbrocken',
+  'entities.items.reins_grag_bear.name': 'Zügel des Goliath-Gragbären',
+  'entities.items.reins_valorsteed.name': 'Zügel des Valorross',
+  'entities.items.reins_stalkglider_snail.name': 'Zügel des Moosschalen-Stielgleiters',
+  'entities.items.reins_aether_hover_cycle.name': 'Zündschlüssel: Ätherlanzen-Schwebrad',
+  'entities.items.reins_shadowjump_toad.name': 'Zügel von Kama-Kage der Schattensprungkröte',
+  'entities.items.reins_stormfeather_griffin.name': 'Zügel des Himmelsgreifs Sturmfeder',
+  'entities.items.reins_thunderstrut_gobbler.name': 'Zügel von Donnerstolz, dem Großen Puter',
   'entities.quests.q_prof_intro.title': 'Ein Handwerk für jede Hand',
   'hudChrome.auth.appleChoiceExpired':
     'Diese Apple-Anmeldung ist abgelaufen. Melde dich bitte erneut mit Apple an.',
@@ -8104,6 +8144,47 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Tipp: Fordere einen anderen Spieler zu einem freundschaftlichen Duell heraus oder reihe dich für die Arena des Aschenen Kolosseums ein, um deinen Build zu testen.',
   'loading.tips.talents':
     'Tipp: Du kannst deine Talente jederzeit außerhalb des Kampfes zurücksetzen, eine frühe Wahl ist also nie eine Falle.',
+  // Rideable mounts: the Z keybind + the Mounts window (the stable).
+  'hudChrome.keybinds.mount': 'Aufsitzen / Absitzen',
+  'hudChrome.mobile.mounts': 'Reittiere',
+  'hudChrome.mounts.title': 'Reittiere',
+  'hudChrome.mounts.close': 'Schließen',
+  'hudChrome.mounts.select': 'Auswählen',
+  'hudChrome.mounts.selected': 'Ausgewählt',
+  'hudChrome.mounts.riding': 'Im Sattel',
+  'hudChrome.mounts.mount': 'Aufsitzen',
+  'hudChrome.mounts.dismount': 'Absitzen',
+  'hudChrome.mounts.rarity_common': 'Verbreitet',
+  'hudChrome.mounts.rarity_rare': 'Selten',
+  'hudChrome.mounts.rarity_epic': 'Episch',
+  'hudChrome.mounts.spec_speed': '+{pct}% zusätzliche Mobilität',
+  'hudChrome.mounts.name_valorsteed': 'Valorross',
+  'hudChrome.mounts.name_grag_bear': 'Goliath-Gragbär',
+  'hudChrome.mounts.name_stalkglider_snail': 'Moosschalen-Stielgleiter',
+  'hudChrome.mounts.name_aether_hover_cycle': 'Ätherlanzen-Schwebrad',
+  'hudChrome.mounts.name_shadowjump_toad': 'Kama-Kage die Schattensprungkröte',
+  'hudChrome.mounts.name_stormfeather_griffin': 'Himmelsgreif Sturmfeder',
+  'hudChrome.mounts.name_thunderstrut_gobbler': 'Donnerstolz der Große Puter',
+  'hudChrome.mounts.desc_valorsteed':
+    'Ein robustes, trittsicheres Ross, das die Reisegeschwindigkeit erhöht.',
+  'hudChrome.mounts.desc_grag_bear':
+    'Ein robuster, trittsicherer Bär, der die Reisegeschwindigkeit erhöht.',
+  'hudChrome.mounts.desc_stalkglider_snail':
+    'Eine herzhafte, ausdauernde Schnecke, die die Reisegeschwindigkeit erhöht.',
+  'hudChrome.mounts.desc_aether_hover_cycle':
+    'Ein mächtiges Magitech-Rad für schnelles, bodennah schwebendes Kampfmanövrieren.',
+  'hudChrome.mounts.desc_shadowjump_toad':
+    'Eine massige, trittsichere Riesenkröte, geschult in blitzschnellen Schattensprüngen über jedes Gelände.',
+  'hudChrome.mounts.desc_stormfeather_griffin':
+    'Ein königlicher Sturmgreif, der mit runenbeschlagenen Klauen und angelegten Schwingen über den Boden pirscht.',
+  'hudChrome.mounts.desc_thunderstrut_gobbler':
+    'Ein kolossaler sturmgeborener Puter, der vom Erwachenden Gipfel herabstolziert, den Schwanz gefächert wie eine Gewitterfront.',
+  'hudChrome.mounts.emptyTitle': 'Keine Reittiere gesammelt',
+  'hudChrome.mounts.emptyStableHint':
+    'Erreicht Stufe 20 und nehmt bei Stallmeisterin Marla in den Ställen westlich von Highwatch Reitstunden.',
+  'hudChrome.mounts.emptyDropHint':
+    'Seltenere Reittiere lassen Dungeon- und Schlachtzugsbosse fallen.',
+  'hudChrome.mounts.clickManage': 'Anklicken, um Euer Reittier zu wählen',
   'guide.bestiary.flavor.sethrael_palecoil':
     'Eine knochenbleiche Schlange, die über den tiefen Grund des Glimmermere gleitet, stiller Wächter des Wassers, das sie für sich beansprucht hat. Schwimmer, die den See mit ihr teilen, tauchen selten wieder auf.',
   'guide.combat.metersBody':

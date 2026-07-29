@@ -8,7 +8,22 @@ import {
 } from '../src/sim/professions/gathering';
 import type { GatherNodeType } from '../src/sim/types';
 
-const ZONES = ['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights'] as const;
+const ZONES = [
+  'eastbrook_vale',
+  'mirefen_marsh',
+  'thornpeak_heights',
+  'veiled_hollow',
+  'drakelands',
+  'frostveil',
+  'amberfall',
+  'willowfen',
+  'nightbloom',
+  'wraithwood',
+  'galecrest',
+  'palmreach',
+  'evergarden',
+  'farshore_isle',
+] as const;
 const RARITIES: MaterialRarity[] = ['common', 'uncommon', 'rare', 'epic', 'legendary'];
 
 // The shared contract's zone x type matrix, spelled out literally so a table
@@ -18,16 +33,49 @@ const EXPECTED_MATRIX: Record<GatherNodeType, Record<(typeof ZONES)[number], str
     eastbrook_vale: 'copper_ore',
     mirefen_marsh: 'iron_ore',
     thornpeak_heights: 'thorium_ore',
+    veiled_hollow: 'thorium_ore',
+    drakelands: 'thorium_ore',
+    frostveil: 'thorium_ore',
+    amberfall: 'thorium_ore',
+    willowfen: 'thorium_ore',
+    nightbloom: 'thorium_ore',
+    wraithwood: 'thorium_ore',
+    galecrest: 'thorium_ore',
+    palmreach: 'thorium_ore',
+    evergarden: 'thorium_ore',
+    farshore_isle: 'iron_ore',
   },
   wood: {
     eastbrook_vale: 'ironbark_log',
     mirefen_marsh: 'ashwood_log',
     thornpeak_heights: 'elderwood_log',
+    veiled_hollow: 'elderwood_log',
+    drakelands: 'elderwood_log',
+    frostveil: 'elderwood_log',
+    amberfall: 'elderwood_log',
+    willowfen: 'elderwood_log',
+    nightbloom: 'elderwood_log',
+    wraithwood: 'elderwood_log',
+    galecrest: 'elderwood_log',
+    palmreach: 'elderwood_log',
+    evergarden: 'elderwood_log',
+    farshore_isle: 'ashwood_log',
   },
   herb: {
     eastbrook_vale: 'silverleaf_herb',
     mirefen_marsh: 'goldleaf_herb',
     thornpeak_heights: 'sunpetal_herb',
+    veiled_hollow: 'sunpetal_herb',
+    drakelands: 'sunpetal_herb',
+    frostveil: 'sunpetal_herb',
+    amberfall: 'sunpetal_herb',
+    willowfen: 'sunpetal_herb',
+    nightbloom: 'sunpetal_herb',
+    wraithwood: 'sunpetal_herb',
+    galecrest: 'sunpetal_herb',
+    palmreach: 'sunpetal_herb',
+    evergarden: 'sunpetal_herb',
+    farshore_isle: 'goldleaf_herb',
   },
 };
 

@@ -97,7 +97,11 @@ describe('G5: damage-scaled fear break', () => {
   });
 
   it('Harrow applies a chance-scaled fear', () => {
-    const sim = new Sim({ seed: 7, playerClass: 'warlock', autoEquip: true });
+    // Seed hunted (post-merge camp order) so the level-14-vs-20 Harrow cast
+    // is not resisted: the fear must actually land for the aura assertions.
+    // Re-hunted (1 -> 3) after the Eastbrook camp respacing thinned the zone-1
+    // camp counts. Spares on record: 4, 7.
+    const sim = new Sim({ seed: 3, playerClass: 'warlock', autoEquip: true });
     sim.setPlayerLevel(14);
     const mob = addTarget(sim, 3);
     sim.player.resource = sim.player.maxResource;

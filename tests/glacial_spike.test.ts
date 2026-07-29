@@ -122,7 +122,15 @@ describe('Glacial Spike content def', () => {
 
 describe('Icicles build-up', () => {
   it('a Rimelance impact banks one Icicle, capped at ICICLE_MAX', () => {
-    const { sim, p } = makeSim();
+    // Seed hunted (post-merge camp order) so the first 10 Rimelance casts all
+    // LAND (a resisted bolt never impacts, so it banks nothing); the loop only
+    // needs 7, the extra landed casts are margin. Under seed 90210 the merged
+    // stream resists cast 5. Re-hunted from seed 11 after the Eastbrook camp
+    // respacing merged in: world-gen draws 5 rng values per camp mob, so
+    // thinning the zone-1 camps shifted every seed's stream and seed 11 now
+    // resists cast 3. Seed 12 lands all 10 again, so the loop below is
+    // unchanged.
+    const { sim, p } = makeSim({ seed: 12 });
     spawnTarget(sim, p);
     expect(frostIcicleCharges(p.auras)).toBe(0);
     for (let n = 1; n <= ICICLE_MAX + 2; n++) {

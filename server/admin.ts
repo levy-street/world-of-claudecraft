@@ -100,12 +100,23 @@ import {
 } from './moderation_db';
 import { providerUsageSnapshot } from './provider_usage';
 import { authThrottled, clearAuthFailures, rateLimited, recordAuthFailure } from './ratelimit';
+import { REALM } from './realm';
 import {
   adminRolesForAccount,
   listStaff,
   roleChangeHistory,
   setAccountAdminRoles,
 } from './staff_db';
+import {
+  type UnstuckHotspotRow as DbUnstuckHotspotRow,
+  type UnstuckReportPage as DbUnstuckReportPage,
+  type UnstuckReportRow as DbUnstuckReportRow,
+  listUnstuckHotspots as listUnstuckHotspotsDb,
+  listUnstuckReports as listUnstuckReportsDb,
+  UNSTUCK_HOTSPOT_MAX_LIMIT,
+  UNSTUCK_REPORT_MAX_DAYS,
+  UNSTUCK_REPORT_MAX_LIMIT,
+} from './unstuck_db';
 import { PgUserAssetsDb } from './user_assets_db';
 
 // Admin API: everything under /admin/api/*. Auth is an exact full-scope bearer
@@ -129,6 +140,8 @@ const MAX_PAGE_LIMIT = 200;
 const DEFAULT_PAGE_LIMIT = 25;
 const ACTIVITY_WINDOW_DAYS = 30;
 const ANTIBOT_CONFIG_NOTE_MAX = 500;
+const UNSTUCK_DEFAULT_DAYS = 30;
+const UNSTUCK_DEFAULT_LIMIT = 50;
 
 const IP_BLOCK_KICK_MESSAGE = 'Connection to the server was lost.';
 
@@ -150,6 +163,103 @@ async function dailyRewardEventDay(value: string | null): Promise<string | null>
   return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value
     ? value
     : null;
+}
+
+function boundedPositiveParam(raw: string | null, fallback: number, max: number): number {
+  const value = Number(raw ?? fallback);
+  return Number.isFinite(value) ? Math.min(max, Math.max(1, Math.floor(value))) : fallback;
+}
+
+function unstuckQuery(params: URLSearchParams): {
+  days: number;
+  limit: number;
+  beforeId?: number;
+} {
+  const days = boundedPositiveParam(
+    params.get('days'),
+    UNSTUCK_DEFAULT_DAYS,
+    UNSTUCK_REPORT_MAX_DAYS,
+  );
+  const limit = boundedPositiveParam(
+    params.get('limit'),
+    UNSTUCK_DEFAULT_LIMIT,
+    UNSTUCK_REPORT_MAX_LIMIT,
+  );
+  const rawBeforeId = Number(params.get('beforeId'));
+  return {
+    days,
+    limit,
+    ...(Number.isSafeInteger(rawBeforeId) && rawBeforeId > 0 ? { beforeId: rawBeforeId } : {}),
+  };
+}
+
+function adminUnstuckReport(row: DbUnstuckReportRow): unknown {
+  const destination =
+    row.destinationRawX === null ||
+    row.destinationRawY === null ||
+    row.destinationRawZ === null ||
+    row.destinationLocalX === null ||
+    row.destinationLocalZ === null
+      ? null
+      : {
+          x: row.destinationRawX,
+          y: row.destinationRawY,
+          z: row.destinationRawZ,
+          localX: row.destinationLocalX,
+          localY: row.destinationLocalY,
+          localZ: row.destinationLocalZ,
+        };
+  return {
+    id: row.id,
+    characterId: row.characterId,
+    characterName: row.characterName,
+    area: {
+      kind: row.areaKind,
+      id: row.areaId,
+      instanceId: row.instanceId,
+      slot: row.instanceSlot,
+    },
+    origin: {
+      x: row.originRawX,
+      y: row.originRawY,
+      z: row.originRawZ,
+      localX: row.originLocalX,
+      localY: row.originLocalY,
+      localZ: row.originLocalZ,
+    },
+    destination,
+    outcome: row.outcome,
+    reason: row.reason,
+    invokedAt: row.invokedAt,
+    resolvedAt: row.resolvedAt,
+  };
+}
+
+function adminUnstuckHotspot(row: DbUnstuckHotspotRow): unknown {
+  return {
+    area: { kind: row.areaKind, id: row.areaId, instanceId: null, slot: null },
+    bucket: { x: row.bucketLocalX, y: row.bucketLocalY, z: row.bucketLocalZ },
+    count: row.reportCount,
+    completed: row.completedCount,
+    cancelled: row.cancelledCount,
+    failed: row.failedCount,
+    lastUsedAt: row.lastResolvedAt,
+  };
+}
+
+function adminUnstuckPayload(
+  page: DbUnstuckReportPage,
+  hotspots: DbUnstuckHotspotRow[],
+  query: { days: number; limit: number },
+): unknown {
+  return {
+    reports: page.rows.map(adminUnstuckReport),
+    hotspots: hotspots.map(adminUnstuckHotspot),
+    days: query.days,
+    limit: query.limit,
+    hasMore: page.hasMore,
+    nextBeforeId: page.nextBeforeId,
+  };
 }
 
 /**
@@ -1010,6 +1120,20 @@ export async function handleAdminApi(
       const { rows, total } = await listBugReports(limit, (page - 1) * limit);
       return ok(res, { rows, total, page, limit });
     }
+    if (path === '/admin/api/unstuck-reports') {
+      const query = unstuckQuery(url.searchParams);
+      const [page, hotspots] = await Promise.all([
+        listUnstuckReportsDb(pool, { realm: REALM, ...query }),
+        query.beforeId === undefined
+          ? listUnstuckHotspotsDb(pool, {
+              realm: REALM,
+              days: query.days,
+              limit: UNSTUCK_HOTSPOT_MAX_LIMIT,
+            })
+          : Promise.resolve<DbUnstuckHotspotRow[]>([]),
+      ]);
+      return ok(res, adminUnstuckPayload(page, hotspots, query));
+    }
     const bugScreenshotMatch = /^\/admin\/api\/bug-reports\/(\d+)\/screenshot$/.exec(path);
     if (bugScreenshotMatch) {
       // The list query omits the (potentially large) screenshot; fetch it per report.
@@ -1259,6 +1383,10 @@ function makeRealAdminDb() {
     sessionsByDay,
     listBugReports,
     getBugReportScreenshot,
+    listUnstuckReports: (options: Parameters<typeof listUnstuckReportsDb>[1]) =>
+      listUnstuckReportsDb(pool, options),
+    listUnstuckHotspots: (options: Parameters<typeof listUnstuckHotspotsDb>[1]) =>
+      listUnstuckHotspotsDb(pool, options),
     listFilterWords,
     addFilterWord,
     removeFilterWord,
@@ -2120,6 +2248,22 @@ async function bugReportsHandler(ctx: Ctx): Promise<void> {
   ok(ctx.res, { rows, total, page, limit });
 }
 
+/** GET /admin/api/unstuck-reports: bounded reports plus content-local hotspots. */
+async function unstuckReportsHandler(ctx: Ctx): Promise<void> {
+  const query = unstuckQuery(ctx.url.searchParams);
+  const [page, hotspots] = await Promise.all([
+    adminDb().listUnstuckReports({ realm: REALM, ...query }),
+    query.beforeId === undefined
+      ? adminDb().listUnstuckHotspots({
+          realm: REALM,
+          days: query.days,
+          limit: UNSTUCK_HOTSPOT_MAX_LIMIT,
+        })
+      : Promise.resolve<DbUnstuckHotspotRow[]>([]),
+  ]);
+  ok(ctx.res, adminUnstuckPayload(page, hotspots, query));
+}
+
 /** GET /admin/api/bug-reports/:id/screenshot: one report's screenshot on demand. */
 async function bugScreenshotHandler(ctx: Ctx): Promise<void> {
   ok(ctx.res, { screenshot: await adminDb().getBugReportScreenshot(adminTargetId(ctx)) });
@@ -2601,6 +2745,14 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin],
     meta: ADMIN_META,
     handler: bugReportsHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/unstuck-reports',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: unstuckReportsHandler,
   },
   {
     method: 'GET',

@@ -134,12 +134,24 @@ function findStrideableStone(): { x: number; z: number; scale: number } | undefi
 }
 
 function findSteepFace(): { x: number; z: number } | undefined {
-  for (let z = -60; z <= 200; z += 7) {
+  // SKIP unusable columns rather than abandoning the row: the western margin
+  // now carries inlets and shore props between the start of the sweep and the
+  // face, and a `break` on the first of them walked the whole search off the
+  // only qualifying face in the world. The sweep also runs the full z span, so
+  // one retuned margin cannot empty it; `expect(found).toBeDefined()` in each
+  // case below is the anti-vacuity pin that fails loudly if it ever does.
+  for (let z = -200; z <= 200; z += 7) {
     for (let x = -130; x >= -184; x -= 0.25) {
-      if (terrainHeight(x, z, SEED) < WATER_LEVEL + 0.5) break;
-      if (isBlocked(SEED, x, z, 0.6)) break;
+      if (terrainHeight(x, z, SEED) < WATER_LEVEL + 0.5) continue;
+      if (isBlocked(SEED, x, z, 0.6)) continue;
       const rise = terrainHeight(x - 0.5, z, SEED) - terrainHeight(x, z, SEED);
-      if (rise > MAX_STEP_HEIGHT * 2) return { x, z };
+      // The face has to be BOTH unwalkable by the climb rule over this probe
+      // run AND taller than the step reach, so neither the slope gate nor
+      // step-up can swallow it. Stated as those two rules rather than the old
+      // `MAX_STEP_HEIGHT * 2` proxy: that number was comfortably inside the
+      // terrain of the day, and the retuned western margin now tops out just
+      // under it, which emptied the sweep rather than failing anything.
+      if (rise > MAX_STEP_HEIGHT && rise / 0.5 > PLAYER_MAX_CLIMB_SLOPE) return { x, z };
     }
   }
   return undefined;

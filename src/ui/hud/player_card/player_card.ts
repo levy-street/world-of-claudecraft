@@ -47,8 +47,9 @@ export interface PlayerCardData {
   level: number;
   /** Realm name, or '' in offline play (then a generic subtitle is used). */
   realm: string;
-  /** PNG data URL of the character close-up (transparent background). */
-  characterImage: string;
+  /** Character close-up with a transparent background. Live captures stay as
+   *  an unencoded canvas; data URLs remain supported for fixtures/callers. */
+  characterImage: string | HTMLCanvasElement;
   /** STR / AGI / STA / INT / SPI / Armor. */
   primaryStats: PlayerCardStat[];
   /** Attack power, DPS, crit, dodge, etc. */
@@ -77,7 +78,7 @@ export interface PlayerCardData {
 
 export const CARD_W = 1200;
 export const CARD_H = 630;
-const SCALE = 2; // render at 2× for crisp text, then the canvas is 2400×1260
+const SCALE = 1; // native Open Graph size; already denser than the 680px preview
 
 const COL = {
   bgTop: '#1d1409',
@@ -179,8 +180,8 @@ function fillTextClamped(
     return;
   }
   let s = text;
-  while (s.length > 1 && ctx.measureText(s + '…').width > maxW) s = s.slice(0, -1);
-  ctx.fillText(s + '…', x, y);
+  while (s.length > 1 && ctx.measureText(`${s}…`).width > maxW) s = s.slice(0, -1);
+  ctx.fillText(`${s}…`, x, y);
 }
 
 const TITLE_FONT = 'Cinzel, Georgia, serif';
@@ -228,7 +229,7 @@ function formatTopPercent(pct: number): string {
 }
 
 /**
- * Composite the player card and return the canvas (2400×1260). The caller can
+ * Composite the player card and return the canvas (1200x630). The caller can
  * scale it for preview or export it to a PNG blob. Fonts are awaited so the
  * brand typefaces are used rather than a fallback.
  */
@@ -247,7 +248,9 @@ export async function renderPlayerCardCanvas(data: PlayerCardData): Promise<HTML
   const pctTier = percentileTierForPercent(data.topPercent);
   const devTier = devTierByIndex(data.devTier ?? 0);
   const [charImg, badgeImg, logoImg, pctBadgeImg, devBadgeImg] = await Promise.all([
-    loadImage(data.characterImage),
+    typeof data.characterImage === 'string'
+      ? loadImage(data.characterImage)
+      : Promise.resolve(data.characterImage),
     tier ? loadImage(holderTierBadgeDataUrl(tier, 256)) : Promise.resolve(null),
     loadImage(LOGO_URL).catch(() => null), // best-effort brand mark
     pctTier
@@ -261,7 +264,8 @@ export async function renderPlayerCardCanvas(data: PlayerCardData): Promise<HTML
   const canvas = document.createElement('canvas');
   canvas.width = CARD_W * SCALE;
   canvas.height = CARD_H * SCALE;
-  const ctx = canvas.getContext('2d')!;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('player-card: could not create canvas context');
   ctx.scale(SCALE, SCALE);
   ctx.textBaseline = 'alphabetic';
 
@@ -300,7 +304,10 @@ function drawBackdrop(ctx: CanvasRenderingContext2D, accent: string): void {
   ctx.fillRect(0, 0, CARD_W, CARD_H);
 }
 
-function drawCharacter(ctx: CanvasRenderingContext2D, img: HTMLImageElement): void {
+function drawCharacter(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement | HTMLCanvasElement,
+): void {
   // Fit the portrait into the left third, anchored to the bottom so feet sit on
   // the frame. The capture is transparent, so it composites over the backdrop.
   const boxX = 24;

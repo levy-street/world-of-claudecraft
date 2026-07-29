@@ -3685,6 +3685,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.tool': 'Strumento',
   'itemUi.kind.potion': 'Pozione',
   'itemUi.kind.elixir': 'Elisir',
+  'itemUi.kind.mount': 'Cavalcatura',
   'itemUi.stats.armor': 'Armatura',
   'itemUi.stats.str': 'Forza',
   'itemUi.stats.agi': 'Agilità',
@@ -4759,6 +4760,16 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.the_merchant.greeting':
     'Benvenuto al Mercato Mondiale, {className}. Compra dagli avventurieri del reame o vendi le tue merci.',
   'entities.npcs.marshal_redbrook.name': 'Maresciallo Redbrook',
+  'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
+  'entities.npcs.stablemaster_marla.title': 'Stalliera capo',
+  'entities.npcs.stablemaster_marla.greeting':
+    'Ogni cavaliere arriva sulle proprie gambe, {className}. Non ti darò le redini finché non saprai restare in sella al Destriero del Valore senza baciare il fango, e a Highwatch non abbondano i guaritori per le ossa rotte.',
+  'entities.quests.q_riding_lessons.title': 'Lezioni di equitazione',
+  'entities.quests.q_riding_lessons.text':
+    'Ogni cavaliere arriva sulle proprie gambe, {playerName}, proprio come ti dissi il giorno in cui ci siamo conosciuti. Paga la quota e, quando te lo dico, chiama a te il Destriero del Valore da addestramento e sali in sella. Poi affronta il percorso: segui il segnale fino all’arco di partenza, supera pulito ogni ostacolo e taglia di nuovo il traguardo prima che la sabbia si esaurisca. Riuscirci, e la sella è tua. Esci dal recinto e si ricomincia.',
+  'entities.quests.q_riding_lessons.completion':
+    'Ecco, così. Su con un solo movimento pulito e ben saldo in sella. Il Destriero del Valore è tuo, {playerName}: sella, redini, e la reputazione di un cavaliere che si è guadagnato la sella invece di comprarla.',
+  'entities.quests.q_riding_lessons.objectives.0.label': 'Doma il Destriero del Valore',
   'entities.npcs.marshal_redbrook.title': 'Maresciallo cittadino',
   'entities.npcs.marshal_redbrook.greeting':
     'Tieni la lama vicina, {className}. La Valle non è più quella di una volta.',
@@ -5840,6 +5851,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_waistguard.name': 'Guardacintura del Chiamatempeste',
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, il Picco Risvegliato',
   'entities.mobs.thunzharr_stormling.name': 'Elementale di tempesta ridestato',
+  'entities.mobs.stable_horse.name': 'Cavallo da stalla',
   'hudChrome.worldBoss.spawn': '{name} si erge sulle Alture di Thornpeak!',
   'entities.items.stormcallers_spaulders.name': 'Spallacci Galecall',
   'entities.items.bonewrought_greatsword.name': 'Spadone Bonewrought',
@@ -5919,6 +5931,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterArmor': 'Armatura',
   'hudChrome.bags.filterConsumable': 'Consumabili',
   'hudChrome.bags.filterMaterial': 'Materiali',
+  'hudChrome.bags.filterMount': 'Cavalcature',
   'hudChrome.bags.filterQuest': 'Missione',
   'hudChrome.bags.sortAria': 'Ordina gli oggetti della borsa',
   'hudChrome.bags.sortRecent': 'Recenti',
@@ -7054,6 +7067,26 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.reliquary_gloves_rog.name': 'Manopole del guardiano delle ossa',
   'entities.items.deacon_reliquary_helm.name': 'Elmo del reliquiario del diacono',
   'entities.items.varric_shadow_cowl.name': "Cappuccio d'ombra di Varric",
+  'entities.items.duskwisp_essence.name': 'Essenza di fuoco fatuo del crepuscolo',
+  'entities.items.spore_heart.name': 'Cuore di spora',
+  'entities.items.gleaming_antler.name': 'Palco luccicante',
+  'entities.items.wisp_mote.name': 'Granello di fuoco fatuo',
+  'entities.items.starfall_shard.name': 'Scheggia di stella caduta',
+  'entities.items.elder_bark.name': "Corteccia dell'anziano",
+  'entities.items.hollow_sealstone.name': 'La Pietra del Sigillo della Conca',
+  'entities.items.monument_overlook.name': 'Monumento consunto',
+  'entities.items.monument_court.name': 'Monumento sommerso',
+  'entities.items.monument_north.name': 'Monumento dimenticato',
+  'entities.items.guardian_core.name': 'Nucleo di guardiano',
+  'entities.items.wardens_seal.name': 'Il Sigillo del Custode',
+  'entities.items.gleamstag_charm.name': 'Ciondolo del Cervo Lucente',
+  'entities.items.veilsteel_blade.name': "Lama d'acciaio velato",
+  'entities.items.duskfang_dirk.name': 'Daga zanna del crepuscolo',
+  'entities.items.gleamwood_stave.name': 'Bastone di legno lucente',
+  'entities.items.wardens_oathband.name': 'Fascia del giuramento del Custode',
+  'entities.items.wardplate_cuirass.name': 'Corazza di piastre di guardia',
+  'entities.items.nightweave_tunic.name': 'Tunica di tessuto notturno',
+  'entities.items.veilcloth_robe.name': 'Veste di tela velata',
   'entities.mobs.acolyte_tessa.name': 'Accolita Tessa',
   'entities.mobs.deacon_varric.name': 'Diacono Varric',
   'entities.mobs.reliquary_bonewalker.name': 'Camminaossa Risorto',
@@ -8123,6 +8156,14 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'loading.tips.talents':
     'Suggerimento: puoi azzerare i talenti ogni volta che sei fuori combattimento, quindi una scelta iniziale non è mai definitiva.',
   'entities.items.chunk_of_ore.name': 'Pezzo di Minerale',
+  'entities.items.reins_grag_bear.name': 'Redini dell’Orso Grag Golia',
+  'entities.items.reins_valorsteed.name': 'Redini del Destriero del Valore',
+  'entities.items.reins_stalkglider_snail.name': 'Redini dell’Aliante dal Guscio Muschioso',
+  'entities.items.reins_aether_hover_cycle.name':
+    'Chiave di accensione: Aerociclo del Giostratore d’Etere',
+  'entities.items.reins_shadowjump_toad.name': 'Redini di Kama-Kage, il Rospo Saltombra',
+  'entities.items.reins_stormfeather_griffin.name': 'Redini del Piumatempesta Toccacielo',
+  'entities.items.reins_thunderstrut_gobbler.name': 'Redini di Passotuono, il Gran Tacchino',
   'entities.quests.q_prof_intro.title': 'Un mestiere per ogni mano',
   'hudChrome.auth.appleChoiceExpired':
     'Questo accesso con Apple è scaduto. Accedi di nuovo con Apple.',
@@ -8151,6 +8192,47 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.notInPartyError':
     'Devi essere in un gruppo per avviare un controllo di prontezza.',
   'hudChrome.readyCheck.inProgressError': 'È già in corso un controllo di prontezza.',
+  // Rideable mounts: the Z keybind + the Mounts window (the stable).
+  'hudChrome.keybinds.mount': 'Monta / Smonta',
+  'hudChrome.mobile.mounts': 'Cavalcature',
+  'hudChrome.mounts.title': 'Cavalcature',
+  'hudChrome.mounts.close': 'Chiudi',
+  'hudChrome.mounts.select': 'Scegli',
+  'hudChrome.mounts.selected': 'Scelta',
+  'hudChrome.mounts.riding': 'In sella',
+  'hudChrome.mounts.mount': 'Monta',
+  'hudChrome.mounts.dismount': 'Smonta',
+  'hudChrome.mounts.rarity_common': 'Comune',
+  'hudChrome.mounts.rarity_rare': 'Rara',
+  'hudChrome.mounts.rarity_epic': 'Epica',
+  'hudChrome.mounts.spec_speed': '+{pct}% di mobilità extra',
+  'hudChrome.mounts.name_valorsteed': 'Destriero del Valore',
+  'hudChrome.mounts.name_grag_bear': 'Orso Grag Golia',
+  'hudChrome.mounts.name_stalkglider_snail': 'Aliante dal Guscio Muschioso',
+  'hudChrome.mounts.name_aether_hover_cycle': 'Aerociclo del Giostratore d’Etere',
+  'hudChrome.mounts.name_shadowjump_toad': 'Kama-Kage, il Rospo Saltombra',
+  'hudChrome.mounts.name_stormfeather_griffin': 'Piumatempesta Toccacielo',
+  'hudChrome.mounts.name_thunderstrut_gobbler': 'Passotuono, il Gran Tacchino',
+  'hudChrome.mounts.desc_valorsteed':
+    'Un destriero robusto e dal passo sicuro che aumenta la velocità di viaggio.',
+  'hudChrome.mounts.desc_grag_bear':
+    'Un orso robusto e dal passo sicuro che aumenta la velocità di viaggio.',
+  'hudChrome.mounts.desc_stalkglider_snail':
+    'Una lumaca tenace e a combustione lenta che aumenta la velocità di viaggio.',
+  'hudChrome.mounts.desc_aether_hover_cycle':
+    'Una potente moto magitech pensata per spostamenti da combattimento rapidi e radenti.',
+  'hudChrome.mounts.desc_shadowjump_toad':
+    'Un rospo gigante, massiccio e dal passo sicuro, addestrato a balzi d’ombra fulminei su ogni terreno.',
+  'hudChrome.mounts.desc_stormfeather_griffin':
+    'Un grifone della tempesta regale che incede al suolo su artigli runici, ali ripiegate.',
+  'hudChrome.mounts.desc_thunderstrut_gobbler':
+    'Un tacchino colossale nato dalla tempesta che scende impettito dal Picco Risvegliato, con la coda spiegata come un fronte di tempesta.',
+  'hudChrome.mounts.emptyTitle': 'Nessuna cavalcatura ottenuta',
+  'hudChrome.mounts.emptyStableHint':
+    'Raggiungi il livello 20 e prendi lezioni di equitazione dalla Stalliera capo Marla alle stalle a ovest di Highwatch.',
+  'hudChrome.mounts.emptyDropHint':
+    'Le cavalcature più rare sono bottino dei boss di spedizione e incursione.',
+  'hudChrome.mounts.clickManage': 'Clicca per scegliere la tua cavalcatura',
   'guide.bestiary.flavor.sethrael_palecoil':
     "Un serpente pallido come l'osso che scivola lungo la piattaforma profonda del Glimmermere, guardiano silenzioso delle acque che ha reclamato. Chi nuota nel lago in sua compagnia di rado torna a galla.",
   'guide.combat.metersBody':

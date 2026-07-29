@@ -199,6 +199,7 @@ const UI_PURE_CORES = [
   'src/ui/quality_glow.ts',
   'src/ui/map_pinch_zoom_core.ts',
   'src/ui/map_window_view.ts',
+  'src/ui/continent_map_view.ts',
   'src/ui/map_quest_list_view.ts',
   'src/ui/arena_window_view.ts',
   'src/ui/dungeon_finder_view.ts',
@@ -248,6 +249,7 @@ const UI_PURE_CORES = [
   'src/ui/perf_nudge_view.ts',
   'src/ui/hud/loot/corpse_harvest_view.ts',
   'src/ui/town_focus_view.ts',
+  'src/ui/mount_race_view.ts',
   'src/ui/pet_action_icons.ts',
   'src/ui/loading_slow_hint_core.ts',
   'src/ui/reconnect_status_core.ts',
@@ -265,12 +267,16 @@ const UI_PURE_CORES = [
 // terrain_region_core (editor partial-rebuild chunk/texel selection math) and
 // water_core (the shore-depth sample shared by build + editor setLevel) follow
 // the same contract for the map editor's realtime terrain/water edits.
+// day_night_core is the clock-to-grade math of the world day/night cycle
+// (Date.now stays in the renderer that calls it), so a Vitest can drive any
+// moment of the cycle.
 const RENDER_PURE_CORES = [
   'src/render/arena_water_band_core.ts',
   'src/render/camera_boom_core.ts',
   'src/render/camera_director_core.ts',
   'src/render/camera_feel_core.ts',
   'src/render/cast_bar.ts',
+  'src/render/chunk_residency_core.ts',
   'src/render/draw_stats_core.ts',
   'src/render/fishing_bobber_core.ts',
   'src/render/foliage_core.ts',
@@ -282,10 +288,20 @@ const RENDER_PURE_CORES = [
   'src/render/eastbrook_town_visibility_core.ts',
   'src/render/nameplate_view.ts',
   'src/render/net_interp_core.ts',
-  'src/render/prewarm_policy.ts',
+  'src/render/race_line_core.ts',
+  'src/render/sea_mist_core.ts',
   'src/render/terrain_region_core.ts',
   'src/render/water_core.ts',
+  'src/render/water_flora_core.ts',
+  'src/render/day_night_core.ts',
+  'src/render/authored_walls_core.ts',
+  'src/render/garden_maze_core.ts',
+  'src/render/garden_parterre_core.ts',
+  'src/render/foliage_lod.ts',
+  'src/render/prewarm_pass.ts',
+  'src/render/prewarm_policy.ts',
   'src/render/warrior_cast_fx_core.ts',
+  'src/render/zone_feature_visibility_core.ts',
   'src/render/characters/weapon_attack_style_core.ts',
 ].map((rel) => join(repoRoot, rel));
 
@@ -298,6 +314,8 @@ const RENDER_PURE_CORES = [
 // updating this list) fails the cross-check instead of silently escaping the
 // reverse-completeness guard.
 const BARE_NAMED = [
+  'src/render/foliage_lod.ts',
+  'src/render/prewarm_pass.ts',
   'src/render/prewarm_policy.ts',
   'src/ui/mob_idle_sfx.ts',
   'src/ui/gather_tool_tooltip.ts',
@@ -1034,6 +1052,7 @@ const UI_DOM_MODULES = [
   'src/ui/charselect_news.ts',
   'src/ui/chat_command_menu.ts',
   'src/ui/claudium_window.ts',
+  'src/ui/continent_art.ts',
   'src/ui/crafting_window.ts',
   'src/ui/daily_rewards_window.ts',
   'src/ui/deeds_window.ts',
@@ -1070,16 +1089,21 @@ const UI_DOM_MODULES = [
   'src/ui/hud/vendor/vendor_window.ts',
   'src/ui/i18n.ts',
   'src/ui/icon_prewarm.ts',
+  'src/ui/icon_prewarm_worker.ts',
   'src/ui/icons.ts',
   'src/ui/inspect_window.ts',
   'src/ui/item_drop_hit_test.ts',
   'src/ui/loading_slow_hint.ts',
   'src/ui/loading_tips.ts',
   'src/ui/mailbox_window.ts',
+  'src/ui/map_art.ts',
+  'src/ui/map_bg.ts',
   'src/ui/market_window.ts',
   'src/ui/meters.ts',
   'src/ui/minimap_gilded_ornament.ts',
   'src/ui/mobile_wallet_launcher.ts',
+  'src/ui/mount_race_controls.ts',
+  'src/ui/mount_race_strip.ts',
   'src/ui/movable_frame.ts',
   'src/ui/native_update_prompt.ts',
   'src/ui/options_window.ts',

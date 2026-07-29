@@ -5,7 +5,7 @@ vi.mock('../src/render/characters/assets', () => ({
   preloadMechAssets: vi.fn(() => Promise.resolve()),
 }));
 
-import { MECH_CHROMAS } from '../src/sim/content/skins';
+import { MECH_CHROMAS, SKIN_COUNTS } from '../src/sim/content/skins';
 import { type CharSkinPainterHost, paintCharSkinPicker } from '../src/ui/char_skin_window';
 
 function makeHost(overrides?: {
@@ -94,8 +94,7 @@ describe('char_skin_window: paintCharSkinPicker (extracted from hud.ts)', () => 
     paintCharSkinPicker(host);
     const row = document.getElementById('char-skin-row') as HTMLElement;
     const swatches = row.querySelectorAll<HTMLButtonElement>('.skin-swatch');
-    // mage has 4 class skins (src/sim/content/skins.ts SKIN_COUNTS.mage).
-    expect(swatches).toHaveLength(4);
+    expect(swatches).toHaveLength(SKIN_COUNTS.mage);
     expect(swatches[1].classList.contains('sel')).toBe(true);
     expect(swatches[0].classList.contains('sel')).toBe(false);
   });
@@ -116,8 +115,7 @@ describe('char_skin_window: paintCharSkinPicker (extracted from hud.ts)', () => 
     const host = makeHost({ skinCatalog: 'mech', skin: 0, mechChromaIds: [chromaId] });
     paintCharSkinPicker(host);
     const row = document.getElementById('char-skin-row') as HTMLElement;
-    // 4 class swatches + at least 1 mech swatch.
-    expect(row.querySelectorAll('.skin-swatch').length).toBeGreaterThan(4);
+    expect(row.querySelectorAll('.skin-swatch').length).toBeGreaterThan(SKIN_COUNTS.mage);
     const unequip = row.querySelector<HTMLButtonElement>('.skin-unequip-btn');
     expect(unequip).not.toBeNull();
     unequip?.click();
@@ -138,7 +136,7 @@ describe('char_skin_window: paintCharSkinPicker (extracted from hud.ts)', () => 
     const host = makeHost({ skinCatalog: 'class', skin: 0, mechChromaIds: [chromaId] });
     paintCharSkinPicker(host);
     const row = document.getElementById('char-skin-row') as HTMLElement;
-    const mechSwatch = row.querySelectorAll<HTMLButtonElement>('.skin-swatch')[4];
+    const mechSwatch = row.querySelectorAll<HTMLButtonElement>('.skin-swatch')[SKIN_COUNTS.mage];
     mechSwatch.click();
     expect(host.changeSkinCalls).toEqual([[0, 'mech']]);
     expect(mechSwatch.classList.contains('sel')).toBe(true);

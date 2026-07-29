@@ -96,11 +96,13 @@ interface TextInk {
  *  actually rasterizes: a 16-character ally name 126x43px (21KB of backing
  *  store), a POI label 162x45 (29KB), a portal name 138x44 (24KB), the zone title
  *  154x49 (30KB), a quest-giver glyph 34x48 (6KB), a badge digit 12x20 (1KB). So
- *  the ordinary couple of dozen is around half a megabyte, the 263-label
- *  pathological mix is 3.7MB, and 320 sprites all of them ally names, which
- *  nothing can actually ask for, would be 6.6MB: the same class as a handful of
- *  cached zone terrain canvases. */
-export const TEXT_SPRITE_LIMIT = 320;
+ *  the ordinary couple of dozen is around half a megabyte, the 370-label
+ *  pathological mix is 5.2MB, and 384 sprites all of them ally names, which
+ *  nothing can actually ask for, would be 8.1MB: the same class as a handful of
+ *  cached zone terrain canvases. (370 is the worst case the realm grid brought:
+ *  more zones means more POI labels and more overworld doors, and the quest
+ *  tables grew with them. tests/text_sprite_cache.ts derives it from content.) */
+export const TEXT_SPRITE_LIMIT = 384;
 
 // Slack around the measured ink on every side, so glyph antialiasing is never
 // clipped. The outline's own reach is added on top (see SPRITE_MITER_LIMIT).

@@ -1,6 +1,7 @@
 // Core shared types for the simulation. The sim layer has zero DOM/rendering deps.
 
 import type { ChatSenderFlair, StreamerLinks } from './account_flair';
+import type { MountKey } from './content/mounts';
 import type { GatheringProfessionId } from './content/professions';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { HarvestYield } from './professions/harvest_yields';
@@ -657,7 +658,8 @@ type ItemKind =
   | 'tool'
   | 'potion'
   | 'elixir'
-  | 'bag';
+  | 'bag'
+  | 'mount';
 
 interface BaseItemDef {
   id: string;
@@ -696,6 +698,11 @@ interface BaseItemDef {
   // reward tokens can opt into permanent storage. Enforced in social/trade.ts,
   // mail/post_office.ts, market.ts, and items.ts.
   soulbound?: boolean;
+  // Vendor service entry: buying this "item" teaches the riding skill instead of
+  // adding anything to the bags (items.ts buyItem delegates to learnRiding, which
+  // owns every gate: already trained, level, the 80g fee). Only the stablemaster
+  // stocks it.
+  teachesRiding?: boolean;
   /** Shown when interacting with a ground quest object before the quest is active. */
   pickupDeny?: string;
   /** Shown when the quest is active but the collect count is already met. */
@@ -884,8 +891,20 @@ export interface HeldOffhandItemDef extends BaseItemDef {
 }
 
 export interface OtherItemDef extends BaseItemDef {
-  kind: Exclude<ItemKind, 'armor' | 'weapon' | 'held_offhand'>;
+  kind: Exclude<ItemKind, 'armor' | 'weapon' | 'held_offhand' | 'mount'>;
   armorType?: never;
+}
+
+// A collectible mount item. Owning the item IS owning the mount: while it sits
+// in the player's bags or bank, the catalog mount it names is selectable and
+// ridable (src/sim/mounts.ts mountOwned). Always soulbound, so ownership can
+// never transfer. Every catalog mount has one, the horse included: five are
+// sub-1% boss drops, the horse's reins comes from the stablemaster.
+export interface MountItemDef extends BaseItemDef {
+  kind: 'mount';
+  mount: MountKey;
+  armorType?: never;
+  weapon?: never;
 }
 
 export type ItemDef =
@@ -893,7 +912,8 @@ export type ItemDef =
   | WeaponItemDef
   | JewelryItemDef
   | HeldOffhandItemDef
-  | OtherItemDef;
+  | OtherItemDef
+  | MountItemDef;
 
 // Per-instance item payload (#1165). Additive and OPTIONAL: most items stay plain
 // {itemId, count} with no instance payload (fungible, market-listable). A slot
@@ -934,6 +954,45 @@ export interface ItemInstancePayload {
    *  boundTo, nothing item-specific. Additive and JSONB-safe: an absent flag is
    *  an ordinary freely-tradeable instance. */
   bindOnTrade?: boolean;
+  /** Long-term Rift gear progression. `rolled.stats` is the authoritative
+   * aggregate bonus consumed by recalcPlayerStats; this record explains how it
+   * was earned and lets forge operations rebuild it deterministically. */
+  rift?: {
+    sourceEventId: string;
+    tier: RiftTier;
+    power: number;
+    upgradeLevel: number;
+    maxUpgradeLevel: number;
+    baseStats: Record<string, number>;
+    enchant?: { stat: string; value: number };
+    gemSlots: number;
+    gems: string[];
+  };
+}
+
+// A shallow `{ ...instance }` aliases the mutable `charges`/`rolled.stats`/`rift`
+// maps between a live payload and a serialized/loaded copy: decrementing a charge
+// on one would silently mutate the other. Deep-clones at every save/load boundary
+// instead. Shared by cloneInvSlot below and the equipped-instance map (an
+// enchanted piece's payload, src/sim/professions/enchanting.ts, or a Rift gear
+// piece's, src/sim/rift/progression.ts), so all copy through the exact same rules.
+export function cloneItemInstancePayload(src: ItemInstancePayload): ItemInstancePayload {
+  const instance: ItemInstancePayload = { ...src };
+  if (src.charges) instance.charges = { ...src.charges };
+  if (src.rolled)
+    instance.rolled = {
+      ...src.rolled,
+      ...(src.rolled.stats && { stats: { ...src.rolled.stats } }),
+    };
+  if (src.rift) {
+    instance.rift = {
+      ...src.rift,
+      baseStats: { ...src.rift.baseStats },
+      ...(src.rift.enchant && { enchant: { ...src.rift.enchant } }),
+      gems: [...src.rift.gems],
+    };
+  }
+  return instance;
 }
 
 export interface InvSlot {
@@ -953,25 +1012,9 @@ export interface InvSlot {
   slot?: number;
 }
 
-// A shallow `{ ...instance }` aliases the mutable `charges`/`rolled.stats` maps
-// between a live payload and a serialized/loaded copy: decrementing a charge on
-// one would silently mutate the other. Deep-clones at every save/load boundary
-// instead. Shared by cloneInvSlot below and the equipped-instance map (an
-// enchanted piece's payload, src/sim/professions/enchanting.ts), so both copy
-// through the exact same rules.
-export function cloneItemInstancePayload(src: ItemInstancePayload): ItemInstancePayload {
-  const instance: ItemInstancePayload = { ...src };
-  if (src.charges) instance.charges = { ...src.charges };
-  if (src.rolled)
-    instance.rolled = {
-      ...src.rolled,
-      ...(src.rolled.stats && { stats: { ...src.rolled.stats } }),
-    };
-  return instance;
-}
-
 // A shallow `{ ...slot }` aliases `instance` between the live slot and a
-// serialized/loaded copy; see cloneItemInstancePayload above for why that is
+// serialized/loaded copy; see cloneItemInstancePayload above (shared with the
+// equipped-instance map, src/sim/professions/enchanting.ts) for why that is
 // unsafe and what this clones instead.
 export function cloneInvSlot<T extends InvSlot>(slot: T): T {
   if (!slot.instance) return { ...slot };
@@ -1096,6 +1139,8 @@ export type MobFamily =
   | 'elemental'
   | 'dragonkin'
   | 'demon'
+  | 'kobold'
+  | 'murloc'
   | 'reptile';
 export type PetMode = 'passive' | 'defensive' | 'aggressive';
 export type PetRole = 'melee_tank' | 'ranged_dps';
@@ -1162,6 +1207,12 @@ export interface MobTemplate {
   // combat and heals to full a few seconds after the last hit. Guarded in
   // enterCombat (sim.ts) and updateMob (mob/locomotion.ts).
   dummy?: boolean;
+  // Purely-ambient decoration (the Highwatch stable horses): never hostile,
+  // never aggros/fights, un-attackable and un-tameable, but wanders a bounded
+  // patch. Spawned RNG-free (like the dummy) so it never perturbs the shared
+  // seed stream, and driven by the ambient arm (mob/ambient.ts) whose wander
+  // draws a private Rng sub-stream, not ctx.rng. See src/sim/mob/ambient.ts.
+  ambient?: boolean;
   // Boss mechanic: periodic AoE pulse around the mob while in combat.
   aoePulse?: {
     min: number;
@@ -1209,6 +1260,36 @@ export interface MobTemplate {
     school?: string;
     yell?: string;
   };
+  // Boss mechanic: lethal telegraphed zone (A-rank). The boss hardcasts for
+  // `castTime` seconds (a visible cast bar, same as bigCast), placing a ground
+  // zone at a targeted player's position the instant casting begins. Any player
+  // still inside `radius` when the cast completes takes flat p.hp + p.maxHp
+  // (guaranteed kill, no mechanicDamageMult). `yell` fires at cast start;
+  // `detonateText` fires in a log line at detonation. Zone state lives on
+  // RiftInstance.bossDeathZones and ticks down; only rift boss floors emit these.
+  deathZoneCast?: {
+    castId: string;
+    name: string;
+    castTime: number;
+    every: number;
+    radius: number;
+    school?: string;
+    yell?: string;
+    detonateText: string;
+  };
+  // Boss mechanic: lethal telegraphed zone (S-rank), identical driver to
+  // deathZoneCast but with distinct castId/name/flavor (wider radius, slower
+  // cast) so rank S bosses run two distinct lethal patterns simultaneously.
+  deathZoneStrike?: {
+    castId: string;
+    name: string;
+    castTime: number;
+    every: number;
+    radius: number;
+    school?: string;
+    yell?: string;
+    detonateText: string;
+  };
   // Boss bark lines, broadcast as 'yell'-channel chat to every player within
   // YELL_RANGE (mirroring the Nythraxis encounter yells; sim-emitted English by
   // the variable-routed-chat precedent, see the S3 note in
@@ -1217,6 +1298,15 @@ export interface MobTemplate {
   yells?: { engage?: string; summon?: string; enrage?: string };
   // Boss mechanic: spawn adds when hp first drops below each threshold (descending fractions).
   summonAdds?: { mobId: string; count: number; atHpPct: number[] };
+  // Rift rank gating: the boss's headline mechanics in unlock order. A rift boss
+  // spawned at rank C runs only the first entry, B the first two, A three, S all
+  // four (src/sim/rift/ranks.ts riftMechanicSuppressed, consulted at each fire
+  // site). Absent (every non-rift template) or on an entity with no
+  // riftMechanicLimit, nothing is suppressed. Keys name MobTemplate mechanic
+  // fields driven by the timed/threshold runners (aoePulse, aoeSlow, bigCast,
+  // stoneskin, stomp, terrify, summonAdds, desperateHeal, deathZoneCast,
+  // deathZoneStrike); on-hit affixes stay ungated flavor.
+  rankMechanics?: readonly string[];
   // Boss mechanic: damage multiplier (and optional swing-speed haste) once hp
   // drops below the threshold. hasteMult > 1 makes the enraged mob swing faster.
   enrage?: { belowHpPct: number; dmgMult: number; hasteMult?: number };
@@ -2447,7 +2537,7 @@ export interface DungeonDef {
   exitOffset: { x: number; z: number }; // exit portal (instance-local)
   spawns: DungeonSpawn[];
   objects?: DungeonObjectSpawn[];
-  interior: 'crypt' | 'sanctum' | 'temple' | 'nythraxis'; // renderer + collider interior builder key
+  interior: 'crypt' | 'sanctum' | 'temple' | 'nythraxis' | 'wildheart' | 'lastkeep'; // renderer + collider interior builder key
   /**
    * What dresses this dungeon's wall-side obstacle slots (matches the render
    * variant): coffins get one standable lid, cargo splits into the crate
@@ -2461,12 +2551,50 @@ export interface DungeonDef {
   leaveText: string;
 }
 
-export type BiomeId = 'vale' | 'marsh' | 'peaks' | 'beach' | 'desert' | 'volcano' | 'cave';
+export type BiomeId =
+  | 'vale'
+  | 'marsh'
+  | 'peaks'
+  | 'beach'
+  | 'desert'
+  | 'volcano'
+  | 'cave'
+  | 'dusk'
+  | 'ember'
+  | 'frost'
+  | 'amber'
+  | 'fen'
+  | 'night'
+  | 'haunt'
+  | 'jungle'
+  | 'garden'
+  | 'gale';
 
 export interface ZoneDef {
   id: string;
   name: string;
+  /** Natural Rift portals may only select zones explicitly opted in. */
+  riftPortalEligible?: boolean;
+  /** Relative C/B/A/S weights for portals in this zone. Missing/zero ranks are
+   * never selected. Kept on content data so adding/reordering zones cannot
+   * silently change endgame difficulty. */
+  riftTierWeights?: Partial<Record<RiftTier, number>>;
   zMin: number;
+  /**
+   * Optional east-west extent (a world GRID column). Omitted = the original
+   * full-width strip [-WORLD_SIZE/2, WORLD_SIZE/2]. Zones are rectangles;
+   * zoneAt(x, z) picks by rect, so side-by-side columns can share a z band
+   * and meet at a real walkable border, exactly like the north passes.
+   */
+  xMin?: number;
+  xMax?: number;
+  /**
+   * Road passes through a COLUMN border (a shared vertical edge with the
+   * neighbor east or west), the sideways twin of southPassX: the z where
+   * the border ridge opens. Only read when such an edge exists.
+   */
+  eastPassZ?: number;
+  westPassZ?: number;
   zMax: number;
   levelRange: [number, number];
   biome: BiomeId;
@@ -2480,10 +2608,49 @@ export interface ZoneDef {
   pois: { x: number; z: number; label: string; id?: string }[];
   welcome: string; // chat-log hint shown on first entry
   welcomeQuestId?: string; // only show the hint while this quest is available
+  // The zone's southern border ridge has NO road pass and is raised past the
+  // climbable slope: the zone is reachable only by portal (see world.ts).
+  sealedSouthBorder?: boolean;
+  // Where the road pass through the zone's SOUTHERN border ridge sits (x).
+  // Defaults to 0 (the original zones' central road); the Drakelands set it
+  // to the Pale Causeway's head so the Wyrmgate opens where the road arrives.
+  southPassX?: number;
+}
+
+// One end of a paired overworld portal. Walking within the pair's trigger
+// radius of this side teleports the player to the OTHER side's landing;
+// `landing` is where a traveler coming out of this side arrives, placed
+// outside this side's own trigger radius so arrivals never bounce back.
+export interface PortalSide {
+  x: number;
+  z: number;
+  landing: { x: number; z: number; facing: number };
+}
+
+// A two-way positional portal between overworld locations (the Veiled Hollow
+// cave). Purely data: src/sim/portals.ts checks these in the tick, in every
+// host, with no entities and no rng.
+export interface PortalDef {
+  id: string;
+  a: PortalSide;
+  b: PortalSide;
+  radius: number;
+  enterText: string; // flavor line for a -> b
+  leaveText: string; // flavor line for b -> a
 }
 
 export interface BuildingDef {
-  kind: 'house' | 'inn' | 'chapel';
+  // hollow* kinds are the Veiled Hollow town set: KayKit medieval buildings
+  // recolored to the dusk palette (render/props.ts maps kind -> asset)
+  kind:
+    | 'house'
+    | 'inn'
+    | 'chapel'
+    | 'hollowHouse'
+    | 'hollowInn'
+    | 'hollowChapel'
+    | 'hollowSmith'
+    | 'hollowMarket';
   /** Stable authored placement identity for focused landmark renderers. */
   id?: string;
   /** Runtime asset URL. Absent keeps the legacy procedural prop path. */
@@ -2564,6 +2731,9 @@ export interface ZonePropsDef {
   campfires: [number, number][];
   mudHuts: [number, number][];
   ruinRings: { x: number; z: number; ringR: number; columns: number }[];
+  // kind 'stone': the low scalloped KayKit stone wall (garden/path walls);
+  // kind 'palisade': the spiked KayKit log wall (raider camps); both keep
+  // the wood rail's run geometry and the same jumpable OBB
   fences: {
     id?: string;
     assetId?: string;
@@ -2573,6 +2743,7 @@ export interface ZonePropsDef {
     z2: number;
     width?: number;
     height?: number;
+    kind?: 'stone' | 'palisade';
   }[];
   /** Small authored solid OBB props, currently civic benches. */
   benches?: StaticObbPropDef[];
@@ -2582,6 +2753,38 @@ export interface ZonePropsDef {
   // delveId resolves to the delve's localized name at render time (the carved
   // entrance sign), so the marker carries no hardcoded English label.
   delveMarkers?: { x: number; z: number; delveId: string }[];
+  // The show-jumping race fixtures (the Highwatch stables): the start/finish
+  // arch and one jump per course gate, placed from content/mounts
+  // MOUNT_RACE_COURSE so the props can never drift from the course. colliders.ts
+  // gives each jump a matching fence-like OBB: grounded riders stop at the rail,
+  // while a deliberate airborne jump clears it. `dir` is the riding heading.
+  raceCourse?: {
+    arch: { x: number; z: number; dir: number };
+    jumps: { x: number; z: number; dir: number; kind: 'vertical' | 'oxer' }[];
+  };
+  // Hand-placed giant trees (the Eldergleam centerpiece): solid trunk
+  // colliders here, rendered by render/realm_flora.ts from the same record.
+  greatTrees?: { x: number; z: number; r: number }[];
+  // Hand-placed one-off GLB props (the generated storybook set). `key` names a
+  // PROP_ASSET_DEFS entry (render/props.ts); the GLB is authored at world scale
+  // with its front on +z, so `rot` alone orients it. r > 0 adds a circle
+  // collider of that radius (keep it matched to the model's measured footprint,
+  // or to the trunk for canopy trees); r 0/absent is walk-through dressing.
+  // h is the visual height, used only for the camera-ghost top. scale is a
+  // uniform visual multiplier over the authored world-scale model; when set,
+  // keep r and h matched to the SCALED footprint by hand.
+  decorProps?: {
+    key: string;
+    x: number;
+    z: number;
+    rot?: number;
+    r?: number;
+    h?: number;
+    scale?: number;
+    /** ride the water surface instead of the seabed (moored ships/boats);
+     * sunk this many yd below the waterline (the hull's draft) */
+    float?: number;
+  }[];
 }
 
 export function emptyZoneProps(): ZonePropsDef {
@@ -2621,7 +2824,73 @@ export type QuestObjective =
   | (QuestObjectiveBase & { type: 'gather' } & (
         | { nodeType: GatherNodeType; itemId?: string }
         | { nodeType?: undefined; itemId: string }
-      ));
+      ))
+  // Escort: completed by the escort run in src/sim/escort.ts when the walked
+  // NPC reaches its final waypoint with this player in credit range. count is
+  // always 1; the run starts by interacting with the idle escortee while this
+  // quest is active.
+  | (QuestObjectiveBase & { type: 'escort'; escortId: string });
+
+// ---------------------------------------------------------------------------
+// Escort runs (src/sim/escort.ts): a quest NPC that walks an authored waypoint
+// path while scripted ambushes attack it. Defs are data-as-code in the realm
+// content modules, merged into ESCORTS by data.ts.
+// ---------------------------------------------------------------------------
+
+export interface EscortAmbushDef {
+  // Fires when the escortee ARRIVES at this waypoint index (0-based).
+  atWaypoint: number;
+  mobId: string;
+  count: number;
+  // Spawn scatter ring around the escortee (world yards).
+  radius?: number;
+}
+
+export interface EscortDef {
+  id: string;
+  // MobTemplate of the escortee: a non-hostile mob with moveSpeed 0 (the run
+  // drives all movement) and aggroRadius 0. Players cannot attack it; mobs
+  // damage it through seeded ambush threat; players may heal it while live.
+  npcMobId: string;
+  // The quest carrying this escort's { type: 'escort' } objective. Interacting
+  // with the idle escortee while this quest is active starts the run.
+  questId: string;
+  start: { x: number; z: number };
+  waypoints: { x: number; z: number }[];
+  moveSpeed: number;
+  ambushes: EscortAmbushDef[];
+  // Players with the quest active within this range of the escortee at the
+  // final waypoint receive objective credit.
+  creditRadius: number;
+  // Idle escortee respawn delay (seconds) after a success or a failure.
+  respawnSeconds: number;
+  // Player-visible flavor barked by the escortee as 'yell'-channel chat
+  // (emitMobYell), riding the MobTemplate.yells variable-routed-chat precedent
+  // (see the S3 note about boss yells in tests/localization_fixes.test.ts).
+  startText: string;
+  successText: string;
+  failText: string;
+}
+
+// Live per-def escort state (src/sim/escort.ts; the backing map stays on Sim).
+// Exactly one of three phases: idle (npcId set, run null), live (npcId set,
+// run set), or respawning (npcId null, respawnAt in the future).
+export interface EscortRunState {
+  escortId: string;
+  npcId: number | null;
+  respawnAt: number;
+  run: {
+    waypointIndex: number;
+    startedAt: number;
+    ambushIds: number[];
+    fired: boolean[];
+    // Stuck-advance bookkeeping: a walker pinned against a collider for a few
+    // seconds counts its current waypoint as reached (escort.ts).
+    lastX: number;
+    lastZ: number;
+    stuckTicks: number;
+  } | null;
+}
 
 export interface QuestDef {
   id: string;
@@ -2636,6 +2905,10 @@ export interface QuestDef {
   copperReward: number;
   itemRewards: Partial<Record<PlayerClass, string>>;
   requiresQuest?: string; // prerequisite quest id (must be turned in)
+  // Acceptance requires the purchased riding skill (PlayerMeta.ridingTrained).
+  // Enforced in finalizeQuestAccept so every accept path (npc, linked share,
+  // dev completer) shares the gate.
+  requiresRidingTrained?: boolean;
   requiredItems?: string[]; // quest items obtained earlier (e.g. a prerequisite reward) that this
   // quest needs; re-granted on accept if the player no longer has them, to avoid a progression block
   minLevel?: number;
@@ -2866,6 +3139,7 @@ export interface Entity extends ClientMirroredEntityFields {
   // Lets a jump clear fences for the whole arc, independent of slope.
   jumping: boolean;
   fallStartY: number;
+  fatigueTicks: number; // ticks spent past the open-sea fatigue line (sim/fatigue.ts)
   hp: number;
   maxHp: number;
   resource: number;
@@ -3039,6 +3313,8 @@ export interface Entity extends ClientMirroredEntityFields {
   pulseTimer: number; // boss aoe pulse countdown
   stompTimer: number; // boss War Stomp stun-pulse countdown
   bigCastTimer: number; // boss telegraphed-hardcast (bigCast) cadence countdown
+  deathZoneCastTimer: number; // lethal zone cast (deathZoneCast) cadence countdown
+  deathZoneStrikeTimer: number; // lethal zone cast (deathZoneStrike) cadence countdown
   infernoTimer: number; // infernoChannel cadence countdown
   infernoRemaining: number; // seconds left in a live inferno channel (0 = not channeling)
   infernoPulsesFired: number; // pulses already fired this channel
@@ -3096,6 +3372,9 @@ export interface Entity extends ClientMirroredEntityFields {
   /** GM character: invulnerable (dealDamage no-ops). Server-set from the
    *  characters.is_gm column; never user-settable. */
   gm?: boolean;
+  /** Dev "smite" mode: this player's damage one-shots any mob it hits. Toggled by
+   *  the dev command /dev smite (gated by ALLOW_DEV_COMMANDS); never set otherwise. */
+  oneShot?: boolean;
   // [dev] /dev god cheat state, kept OFF the production gm flag so it never touches a
   // real game master (who could otherwise deal 100x or have their invuln toggled).
   devGod?: boolean;
@@ -3140,6 +3419,49 @@ export interface Entity extends ClientMirroredEntityFields {
   // object (ground interactable)
   objectItemId: string | null;
   dungeonId: string | null; // set on dungeon door/exit portals
+  // Procedural Rift portal: set on an overworld 'rift_portal' object so walking
+  // into it opens a freshly generated rift from this descriptor (see rift/runs.ts).
+  riftSeed?: number;
+  riftBaseLevel?: number;
+  // Stable identity of the shared natural Rift event. Two groups entering the
+  // same portal receive separate instances tied to this one race record.
+  // Absent on legacy/dev portals that are not global events.
+  riftEventId?: string;
+  // Rank of a world-spawned rift portal (rift/portals.ts); drives the rank badge
+  // both hosts render above the portal and the Heroic Mark payout on sealing.
+  // Absent on dev-spawned portals.
+  riftTier?: RiftTier;
+  // Sim time of the last "level too low" rift denial shown to this player, so
+  // standing inside the portal trigger radius does not spam the toast per tick.
+  riftDeniedAt?: number;
+  // Sim time of the last "pool full" / "event already cleared" denial shown to
+  // this player on walk-in, so a 20 Hz trigger does not spam the error toast.
+  riftPoolFullAt?: number;
+  // Sim time of the last "the orb is sealed" nudge shown to this player at a
+  // dormant Blood Orb (authored citadel), throttled the same way.
+  riftOrbNoticeAt?: number;
+  // Sim time of the last lockpickOffer emitted to this player from a
+  // rift_locked_chest click, so repeated F-key presses don't spam the UI.
+  riftLockpickOfferAt?: number;
+  // Walk-in portal grace after leaving a rift: until this sim time the player
+  // does not auto-enter portals, so being returned near the entry portal can
+  // never bounce them straight back in (clicking the portal still works).
+  riftReentryGraceUntil?: number;
+  // Locked glide heading while ice-sliding on a rift frost sheet (unit vector);
+  // both 0/undefined means not sliding. The slide advances a fixed step along this
+  // each tick, ignoring steering input, until a wall or the sheet edge stops it.
+  riftSlideDirX?: number;
+  riftSlideDirZ?: number;
+  // True while the ice slide is carrying the player: the renderer holds a frozen
+  // braced pose (no run cycle) so they read as gliding, not sprinting. Wired (`sld`).
+  riftSliding?: boolean;
+  // Cooldown gate (sim time) between rolling-boulder knockbacks, so a single pass
+  // shoves + chips once rather than every tick of overlap.
+  riftRollerUntil?: number;
+  // Rift boss rank budget: how many entries of the template's `rankMechanics`
+  // list are live on THIS spawn (C=1, B=2, A=3, S=4; rift/ranks.ts). Undefined
+  // (every non-rift mob, and rift trash) suppresses nothing.
+  riftMechanicLimit?: number;
   // misc
   dead: boolean;
   // Ghost/spirit state for the WoW-style death -> corpse-run -> resurrect loop.
@@ -3159,6 +3481,25 @@ export interface Entity extends ClientMirroredEntityFields {
   color: number;
   skinCatalog: SkinCatalog; // player appearance catalog: class texture set or cosmetic body.
   skin: number; // player appearance: index into SKINS[visualKey]; 0 = default. synced in identity fields.
+  // Active rideable ground mount ('' = dismounted; players only). Unlike the
+  // render-only cosmetics below, the sim READS this: player_motion.moveSpeedMult
+  // (speed), auto_attack.meleeSwing (melee block), and recalcPlayerStats (crit)
+  // key off it, so it syncs in identity fields (terse `mnt`) like `skin` and the
+  // online self-extrapolator predicts mounted speed in lockstep. The persisted
+  // selection lives on PlayerMeta.selectedMount (src/sim/content/mounts.ts).
+  mountKey: string;
+  // Mount summon/dismount transition (players only; 0 = idle). Seconds left in the
+  // call-the-mount summon or the dismount, driven per tick by updateMountTransition
+  // (src/sim/mounts.ts). The sim READS it: player_motion.stepPlayerMotion roots the
+  // player (no walk/strafe/jump) while it is > 0, so it must sync on the wire like
+  // mountKey (terse `mcr`) for the online self-extrapolator to root in lockstep and
+  // for other clients to time the summon FX. handleDeath clears it.
+  mountCastRemaining: number;
+  // The catalog key being summoned during a mount transition ('' while dismounting or
+  // idle). Render-only (the summon-FX / call-pose the client draws); the sim never
+  // reads it. Syncs on the wire (terse `mck`) alongside mountCastRemaining, and
+  // handleDeath clears it.
+  mountCastKey: string;
   // Equipped mainhand item id (players only; null otherwise). Render-only: the
   // client maps it to a held weapon model. Recomputed in recalcPlayerStats and
   // synced in identity fields (terse `mh`). The sim never reads it for gameplay.
@@ -3320,6 +3661,128 @@ export interface ReadyCheck {
   responses: Map<number, 'ready' | 'notready' | 'pending'>; // pid -> answer
 }
 
+// A player's active riding-lesson attempt (src/sim/mounts_training.ts), kept on
+// PlayerMeta.mountTraining. Session-only: never persisted/serialized (unlike the
+// one-time mountTrainingFeePaid flag also on PlayerMeta), so a save/load never
+// resumes a half-finished lesson. The lesson is the Mount/Dismount keybind
+// tutorial: begin at Marla, then climb onto the training Valorsteed with that
+// key, which succeeds the lesson and credits the quest objective. No rng, so
+// installing this system perturbs no draw order.
+export interface MountTrainingSession {
+  sessionId: string;
+  ownerId: number;
+  /** Marla's position captured at begin (she is stationary), so the per-tick
+   *  stray check never rescans the entity map for her. */
+  anchor: { x: number; z: number };
+  state: 'IN_PROGRESS' | 'SUCCESS' | 'ABANDONED';
+  /** Lesson phase while IN_PROGRESS: 'mount' before the player has climbed onto
+   *  the training steed, 'ride' once mounted (ride the course to the start line
+   *  and finish a race to pass). Mounting no longer completes the lesson; a race
+   *  finished while the lesson is live is what credits the quest. */
+  phase: 'mount' | 'ride';
+}
+
+// A player's own active show-jumping race (src/sim/mount_race.ts), kept on
+// PlayerMeta.mountRace. Session-only: never persisted/serialized, so a
+// save/load never resumes a half-run race. Strictly per-player by design (the
+// online-concurrency requirement): no field references any other player or any
+// shared course state. The lap starts on the 'mount_race_start' command at the
+// arch, counts down, then runs a timed lap in which the seven jumps may be
+// cleared in ANY order (a bit per jump), finishing on the next arch crossing once
+// all bits are set. No rng.
+export interface MountRaceSession {
+  raceId: string;
+  ownerId: number;
+  /** 'countdown' from the start command until GO (gates inert), then 'racing'. */
+  phase: 'countdown' | 'racing';
+  /** The tick the countdown ends and the timed lap begins (the 3..2..1..GO
+   *  boundary); the elapsed time and the deadline both measure from here. */
+  goTick: number;
+  /** The tick the timed lap times out (goTick + budget); only checked while racing. */
+  deadlineTick: number;
+  /** Bitmask of cleared jumps (bit i = MOUNT_RACE_COURSE.jumps[i]); the lap
+   *  finishes when every bit is set and the rider re-crosses the arch. jumpsTotal
+   *  is <= 31, so a number bitmask suffices. */
+  clearedMask: number;
+}
+
+// Structured, player-safe recovery telemetry. The sim captures both raw world
+// coordinates and content-local coordinates at invocation time so operators can
+// group repeated problem spots across separate instance slots. Stable codes only:
+// player-facing prose is assembled by the client i18n catalog.
+export type UnstuckAreaKind = 'overworld' | 'dungeon' | 'delve' | 'rift';
+
+export interface UnstuckArea {
+  kind: UnstuckAreaKind;
+  id: string;
+  instanceId?: string;
+  slot?: number;
+}
+
+export interface UnstuckPosition extends Vec3 {
+  localX: number;
+  localZ: number;
+}
+
+export type UnstuckBlockedReason =
+  | 'already_active'
+  | 'already_safe'
+  | 'cooldown'
+  | 'dead'
+  | 'ghost'
+  | 'jailed'
+  | 'combat'
+  | 'controlled'
+  | 'falling'
+  | 'moving'
+  | 'busy'
+  | 'spectating'
+  | 'competitive'
+  | 'trading'
+  | 'invalid_area';
+
+export type UnstuckCancelReason =
+  | 'moved'
+  | 'damaged'
+  | 'combat'
+  | 'busy'
+  | 'state_changed'
+  | 'disconnected';
+
+export type UnstuckEvent =
+  | { type: 'unstuck'; phase: 'started'; seconds: number }
+  | { type: 'unstuck'; phase: 'countdown'; seconds: number }
+  | { type: 'unstuck'; phase: 'blocked'; reason: UnstuckBlockedReason; seconds?: number }
+  | {
+      type: 'unstuck';
+      phase: 'cancelled';
+      reason: UnstuckCancelReason;
+      area: UnstuckArea;
+      origin: UnstuckPosition;
+      duration: number;
+    }
+  | {
+      type: 'unstuck';
+      phase: 'failed';
+      reason: 'no_safe_position';
+      area: UnstuckArea;
+      origin: UnstuckPosition;
+      duration: number;
+    }
+  | {
+      type: 'unstuck';
+      phase: 'completed';
+      // 'nearest_graveyard': a living player died and rose as a ghost there.
+      // 'revived_at_graveyard': an already dead or released player was pulled to
+      // the graveyard and resurrected under The Keeper's Toll instead.
+      reason: 'nearest_safe_position' | 'nearest_graveyard' | 'revived_at_graveyard';
+      area: UnstuckArea;
+      origin: UnstuckPosition;
+      destination: UnstuckPosition;
+      duration: number;
+      distance: number;
+    };
+
 // A player resurrection that has been offered but not yet accepted. The Sim owns
 // one authoritative offer per dead target. The cast-time destination is retained
 // only as a fallback if the caster no longer exists when the target accepts.
@@ -3447,6 +3910,7 @@ export type SimEvent = { pid?: number } & (
   | { type: 'comboPoint'; points: number }
   | { type: 'playerDeath' }
   | { type: 'respawn' }
+  | UnstuckEvent
   // itemId names the single item for buy/sell/buyback; it is omitted for the
   // bulk "sell all junk" sweep, which the client treats as a plain refresh signal.
   | { type: 'vendor'; action: 'buy' | 'sell' | 'buyback'; itemId?: string }
@@ -3685,6 +4149,12 @@ export type SimEvent = { pid?: number } & (
       amount: number;
       crit: boolean;
       ability: string;
+      // Healing a heal-absorb shield (necrotic blight) devoured before it could
+      // land, omitted when nothing was absorbed. Load-bearing for the client:
+      // `amount: 0` alone is ambiguous between "target was already at full
+      // health" and "a blight ate the whole heal", and those need opposite
+      // feedback. See src/ui/heal_landing_feedback_core.ts.
+      absorbed?: number;
       // Set only by a HoT's periodic tick (auras.ts), never a direct cast or the
       // one-shot application emit below: the client uses this to silence the
       // repeated per-tick sound (see hud.ts), since a HoT fires this every couple
@@ -4010,6 +4480,117 @@ export type SimEvent = { pid?: number } & (
       recipeId: string;
       zoneId: string;
     }
+  // Riding lesson (src/sim/mounts_training.ts). Both personal (pid-scoped).
+  // mountTrainSession announces a fresh attempt or a phase change: `phase` is
+  // 'mount' at begin (the client toasts the Mount/Dismount hint) and re-emitted
+  // as 'ride' once the player climbs on (toast: follow the marker to the start
+  // line). mountTrainEnd reports the terminal outcome.
+  | {
+      type: 'mountTrainSession';
+      sessionId: string;
+      phase: 'mount' | 'ride';
+      pid: number;
+    }
+  | {
+      type: 'mountTrainEnd';
+      sessionId: string;
+      outcome: 'success' | 'abandoned';
+      pid: number;
+    }
+  // Show-jumping race (src/sim/mount_race.ts). ALL personal (pid-scoped): each
+  // rider only ever hears about their own race, so concurrent racers never
+  // interfere. mountRaceCountdown fires on the start command with the pre-GO
+  // budget (the client shows 3..2..1..GO); mountRaceStart fires at GO and arms
+  // the lap timer; mountRaceJump reports one jump cleared any-order (`jump` is the
+  // gate index just marked, `cleared` the running count, `mask` the full bitset);
+  // mountRaceEnd reports the terminal outcome with the elapsed ticks from GO
+  // (meaningful on 'finished'). Gate positions are NOT on the wire: the client
+  // derives them from the shared MOUNT_RACE_COURSE content.
+  | {
+      type: 'mountRaceCountdown';
+      raceId: string;
+      countdownTicks: number;
+      pid: number;
+    }
+  | {
+      type: 'mountRaceStart';
+      raceId: string;
+      timeLimitTicks: number;
+      jumpsTotal: number;
+      pid: number;
+    }
+  | {
+      type: 'mountRaceJump';
+      raceId: string;
+      jump: number;
+      cleared: number;
+      mask: number;
+      jumpsTotal: number;
+      pid: number;
+    }
+  | {
+      type: 'mountRaceEnd';
+      raceId: string;
+      outcome: 'finished' | 'timeout' | 'abandoned';
+      timeTicks: number;
+      pid: number;
+    }
+  // Procedural Rift state, pushed to the entering player so the client can
+  // regenerate the current floor's geometry + visual style from the descriptor
+  // (the same pure generator the server ran). `active:false` clears it on leave.
+  // Text-free structured fields (like skinEvent/craftResult): the client renders
+  // its own localized floor label from name/themeName.
+  | {
+      type: 'riftState';
+      pid: number;
+      active: boolean;
+      eventId: string | null;
+      instanceId: number;
+      seed: number;
+      baseLevel: number;
+      floorIndex: number;
+      floorCount: number;
+      origin: { x: number; z: number };
+      contentId: string;
+      contentHash: string;
+      upgrade: import('./rift/types').RiftUpgradeManifest | null;
+      name: string;
+      themeName: string;
+      tier: RiftTier | null;
+    }
+  | {
+      type: 'riftRaceResult';
+      pid: number;
+      eventId: string;
+      outcome: 'won' | 'lost';
+      tier: RiftTier;
+      winnerNames: string[];
+      clearTime: number;
+    }
+  | {
+      type: 'riftRaceWorld';
+      eventId: string;
+      tier: RiftTier;
+      winnerNames: string[];
+      clearTime: number;
+    }
+  | {
+      type: 'riftForgeResult';
+      pid: number;
+      ok: boolean;
+      action: 'upgrade' | 'enchant' | 'socket';
+      itemId: string;
+      reason?:
+        | 'not_found'
+        | 'not_rift_gear'
+        | 'max_upgrade'
+        | 'insufficient_essence'
+        | 'invalid_stat'
+        | 'invalid_gem'
+        | 'sockets_full';
+      upgradeLevel?: number;
+      essenceSpent?: number;
+    }
   // Gather-node harvest outcome (#1729): a successful resource harvest emits
   // this so the client can play a gathering audio cue for the acting player.
   // Personal (carries pid), delivered only to the harvester. Emitted only on a
@@ -4150,6 +4731,21 @@ export type SimEvent = { pid?: number } & (
       zoneId: string;
       nodeType: GatherNodeType;
       itemId: string;
+    }
+  // Rift boss lethal death zone placed (deathZoneCast / deathZoneStrike mechanic).
+  // Emitted at zone-placement time so online clients can mirror the countdown
+  // locally without a snapshot field. Interest-scoped by x/z world position like
+  // spellfxAt, so only instance players (who are inside the instance area) receive
+  // it. `durationSecs` equals the cast-time fuse the sim uses internally. The
+  // client counts the zone down locally starting from `durationSecs` and removes
+  // it when remaining reaches zero. Late joiners missing an in-flight zone are an
+  // accepted edge (the fuse is at most a few seconds).
+  | {
+      type: 'riftDeathZoneSpawn';
+      x: number;
+      z: number;
+      radius: number;
+      durationSecs: number;
     }
   // Trend nudge (Professions 2.0): a soft, at-most-once-per-window
   // reminder that an unattuned crafter's skills are leaning toward an adjacent
@@ -4420,6 +5016,13 @@ export interface SimConfig {
   // Offline worlds and parity traces keep the default (first rise after one
   // interval), so this never fires inside a short deterministic scenario.
   worldBossAtBoot?: boolean;
+  // Live worlds (server + offline client): enable the natural ranked rift portal
+  // scheduler (rift/portals.ts). Default OFF so deterministic tests, parity
+  // traces, and the RL env keep a portal-free world unless they opt in.
+  riftPortals?: boolean;
+  // Public test realms may opt into a denser natural-portal policy and a larger
+  // instance pool. Default OFF so all existing hosts retain their current policy.
+  communityRifts?: boolean;
   // Host-computed next raid-reset instant for a given lockout "now" (epoch ms). The
   // authoritative server uses its realm-local 3 AM daily reset; offline/headless omit
   // this and fall back to a flat 24h day. Keeps the time zone out of the sim core.
@@ -4498,6 +5101,19 @@ export const XP_TABLE = [
   400, 900, 1400, 2100, 2800, 3600, 4500, 5400, 6500, 7600, 8800, 10100, 11400, 12900, 14400, 16000,
   17700, 19400, 21300, 23200,
 ];
+// Procedural Rift rank ladder (C lowest, S highest); tuning per rank lives in
+// rift/portals.ts (RIFT_TIER_INFO). Declared here so Entity can carry it.
+export type RiftTier = 'C' | 'B' | 'A' | 'S';
+
+// Rank badge colours, shared by the sim tuning table and the renderer's
+// floating rank badge (single source so the two can never drift).
+export const RIFT_TIER_COLORS: Record<RiftTier, number> = {
+  C: 0x3fbf5f,
+  B: 0x3f7fff,
+  A: 0xb04fff,
+  S: 0xffb020,
+};
+
 export const MAX_LEVEL = 20;
 
 // Shared sim constants relocated here (C1) so both sim.ts and the extracted damage

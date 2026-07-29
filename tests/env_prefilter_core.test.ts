@@ -26,13 +26,17 @@ describe('resolveEnvironmentPrefilterPlan', () => {
 
   it('drives the renderer without a deferred PMREM timer', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
-    expect(source).toContain('resolveEnvironmentPrefilterPlan(GFX.constrainedMemory, initial)');
+    expect(source).toContain(
+      'resolveEnvironmentPrefilterPlan(GFX.constrainedMemory, initialBiome)',
+    );
     expect(source).toContain(
       'const entryBiomes: BiomeId[] = envPlan.immediate;\n      if (GFX.constrainedMemory)',
     );
-    expect(source).toContain(
-      'for (const b of entryBiomes) {\n        const eq = this.skyView.envTexture(b);\n        if (eq) this.envRTs.set(b, pmrem.fromEquirectangular(eq));\n      }',
-    );
+    // Entry prefilters route through the shared ensureEnvironmentBiome cache
+    // (the streaming lanes reuse it), whose constrained-memory guard refuses
+    // any PMREM beyond the entry-built one for the whole session.
+    expect(source).toContain('for (const b of entryBiomes) this.ensureEnvironmentBiome(b);');
+    expect(source).toContain('if (GFX.constrainedMemory && this.envRTs.size > 0) return null;');
     expect(source.match(/fromEquirectangular\(/g)).toHaveLength(1);
     expect(source).not.toContain('DEFERRED_ENV_PREFILTER');
     expect(source).not.toContain('deferred env prefilter:');

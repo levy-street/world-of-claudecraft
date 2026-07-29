@@ -1,9 +1,19 @@
 import { describe, expect, it } from 'vitest';
 import { isBlocked, moverHeight, resolveMovement } from '../src/sim/colliders';
+import { BUILTIN_WORLD } from '../src/sim/data';
+import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { moveSpeedMult, type PlayerMotionDeps, stepPlayerMotion } from '../src/sim/player_motion';
 import { Sim } from '../src/sim/sim';
-import type { Entity, MoveInput } from '../src/sim/types';
-import { terrainHeight, terrainSteepness, terrainSteepnessAt, WATER_LEVEL } from '../src/sim/world';
+import type { Entity, MoveInput, WorldContent } from '../src/sim/types';
+import {
+  groundHeight,
+  terrainHeight,
+  terrainSteepness,
+  terrainSteepnessAt,
+  terrainWallStandoff,
+  WATER_LEVEL,
+} from '../src/sim/world';
+import { wallFootFixture } from './helpers/wall_foot';
 
 // The parity gate for the movement-kernel extraction (MV1) and the foundation
 // of the online self extrapolator: stepPlayerMotion driven with CLIENT-shaped
@@ -14,8 +24,23 @@ import { terrainHeight, terrainSteepness, terrainSteepnessAt, WATER_LEVEL } from
 const SEED = 42;
 const CLIMB_LIMIT = 1.5;
 
+// Every assertion here compares the live player pose against the kernel mirror
+// (terrain, colliders, water); ambient camps/npcs/ground objects never appear in
+// an assertion, so strip them (dot_final_tick pattern) to keep each tick cheap.
+const MOTION_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+
 function makeSim(): Sim {
-  const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true });
+  const sim = new Sim({
+    seed: SEED,
+    playerClass: 'warrior',
+    autoEquip: true,
+    world: MOTION_TEST_WORLD,
+  });
   sim.setPlayerLevel(60); // mobs along the routes must not decide these tests
   return sim;
 }
@@ -195,8 +220,16 @@ describe('player motion kernel parity with the live Sim', () => {
 
   it('routes terrain wall standoff through the collision sweep', () => {
     const standoffSeed = 20061;
-    const sim = new Sim({ seed: standoffSeed, playerClass: 'warrior', autoEquip: true });
-    const start = { x: -150, z: 546.75 };
+    const sim = new Sim({
+      seed: standoffSeed,
+      playerClass: 'warrior',
+      autoEquip: true,
+      world: MOTION_TEST_WORLD,
+    });
+    // A pinned wall foot validated against the generated heightfield (the strip
+    // world's old western-rim literal is open ground in the 2D atlas-grid world).
+    const foot = wallFootFixture(standoffSeed, PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE);
+    const start = { x: foot.x, z: foot.z };
     teleport(sim, start.x, start.z);
     expect(terrainSteepnessAt(start.x, start.z, standoffSeed)).toBeLessThan(1.0);
 
@@ -253,5 +286,87 @@ describe('player motion kernel parity with the live Sim', () => {
       return JSON.stringify(out);
     };
     expect(trace()).toBe(trace());
+  });
+});
+
+// The wall-standoff ACCEPTANCE GATE inside stepPlayerMotion (distinct from the
+// terrainWallStandoff iteration itself, covered by
+// tests/terrain_wall_standoff.test.ts): committing a push once it strictly
+// improves on the player's current steepness, not only once it fully clears
+// the climb limit. Pinned at a concave pocket (production seed 20061, 2D
+// atlas-grid world) where a single standoff resolves the player to steepness
+// ~1.56, well over the ~1.5 climb limit, but a strict improvement over the
+// ~10.14 the player started at. The OLD gate (accept only if standSteep <=
+// climb limit) would have discarded this push outright, leaving the player
+// wedged; the NEW gate (accept if standSteep <= climb limit OR standSteep <=
+// current steepness) commits it.
+describe('stepPlayerMotion wall-standoff acceptance gate', () => {
+  const GATE_SEED = 20061; // the fixed production seed (src/main.ts, server/game.ts)
+  const GATE_R = PLAYER_BODY_RADIUS;
+  const GATE_SLOPE = PLAYER_MAX_CLIMB_SLOPE;
+  const PIN = { x: -620, z: -172 };
+
+  it('commits a standoff push that strictly improves steepness but stays above the climb limit', () => {
+    const steepStart = terrainSteepnessAt(PIN.x, PIN.z, GATE_SEED);
+    const standoff = terrainWallStandoff(PIN.x, PIN.z, GATE_SEED, GATE_R, GATE_SLOPE);
+    const steepStand = terrainSteepnessAt(standoff.x, standoff.z, GATE_SEED);
+    // Pin the scenario itself: still above the climb limit (so the OLD gate,
+    // which only ever accepted full clearance, would reject this push), but a
+    // strict improvement over the starting steepness (so the NEW gate accepts).
+    expect(steepStand).toBeGreaterThan(GATE_SLOPE);
+    expect(steepStand).toBeLessThan(steepStart);
+
+    // Drive the real gate via stepPlayerMotion. The player's own position is
+    // steep enough here to also trigger the downhill-slide movement earlier in
+    // the same tick (a separate code path from the standoff gate under test).
+    // That slide no longer routes through this dep: the open-world horizontal
+    // step resolves inside the physics kernel (src/sim/physics/character.ts),
+    // and PlayerMotionDeps.resolveMove now serves the instanced path and the
+    // standoff pass only. So there is nothing left to stub out by call order,
+    // and the assertions below measure the standoff FROM the slid position
+    // rather than from the pin.
+    const deps: PlayerMotionDeps = {
+      seed: GATE_SEED,
+      moveSpeedMult: (e) => moveSpeedMult(e, 0),
+      resolveMove: (fromX, fromZ, nx, nz, r, _e, ignoreFences) =>
+        resolveMovement(GATE_SEED, fromX, fromZ, nx, nz, r, ignoreFences),
+      resolvedAbility: () => null,
+      cancelCast: () => {},
+      standUp: () => {},
+      dealDamage: () => {},
+    };
+    const p = {
+      pos: { x: PIN.x, z: PIN.z, y: groundHeight(PIN.x, PIN.z, GATE_SEED) },
+      prevPos: { x: PIN.x, z: PIN.z, y: groundHeight(PIN.x, PIN.z, GATE_SEED) },
+      facing: 0,
+      onGround: true,
+      jumping: false,
+      vx: 0,
+      vz: 0,
+      vy: 0,
+      fallStartY: groundHeight(PIN.x, PIN.z, GATE_SEED),
+      auras: [],
+      sitting: false,
+      maxHp: 100,
+    } as unknown as Entity;
+
+    stepPlayerMotion(deps, p, mi());
+
+    // The gate committed. Stated as three claims rather than one coordinate
+    // equality: the tick's downhill slide runs inside the physics kernel now
+    // and is allowed to move the body a little before the standoff pass sees
+    // it, so an exact-point pin would be measuring the slide, not the gate.
+    //
+    // The pin sits a full yard from the standoff point and the body radius is
+    // half that, so "within a body radius of the standoff" still fails outright
+    // if the push is discarded and the body is left wedged at the pin.
+    expect(p.pos.x === PIN.x && p.pos.z === PIN.z).toBe(false);
+    expect(Math.hypot(p.pos.x - standoff.x, p.pos.z - standoff.z)).toBeLessThan(GATE_R);
+    // ...and the push really improved things, which is the acceptance rule
+    // under test: the OLD gate would have rejected this one for still being
+    // over the climb limit.
+    const steepEnd = terrainSteepnessAt(p.pos.x, p.pos.z, GATE_SEED);
+    expect(steepEnd).toBeLessThan(steepStart);
+    expect(steepEnd).toBeGreaterThan(GATE_SLOPE);
   });
 });

@@ -13,6 +13,7 @@ import type {
   DelveCompanionInfo,
   DelveRunInfo,
   LockpickView,
+  MountRaceView,
   PlayerProfessionsView,
 } from '../world_api';
 import * as bagsMod from './bags';
@@ -27,8 +28,10 @@ import {
 } from './bags';
 import * as bankMod from './bank';
 import { type BankState, clampBonusSlots, sanitizeBankState } from './bank';
+import { campSpawnOffset } from './camp_scatter';
 import { advanceClimb, tryStartClimb } from './climb';
 import {
+  allocRiftCollisionToken,
   lineOfSightClear,
   moverHeight,
   resolveMovement,
@@ -103,6 +106,8 @@ import { ensureWarriorStance } from './combat/warrior_stances';
 // moved to social/fiesta.ts with that logic; sim.ts keeps only the type used by
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
+import { MAILBOXES } from './content/mailboxes';
+import { DEFAULT_MOUNT, type MountKey } from './content/mounts';
 import type { GatheringProfessionId } from './content/professions';
 import { PTR_DEV_VENDOR_DEF } from './content/ptr_dev_vendor';
 import { FURY_ENTITY_ID, FURY_NPC_ID } from './content/pvp_honor';
@@ -149,6 +154,7 @@ import {
   abilitiesKnownAt,
   arenaOrigin,
   CLASSES,
+  COMMUNITY_RIFT_SLOT_COUNT,
   DELVE_COMPANIONS,
   DELVE_LIST,
   DELVE_SLOT_COUNT,
@@ -162,8 +168,13 @@ import {
   ITEMS,
   isArenaPos,
   isDelvePos,
+  isRiftPos,
   MOBS,
+  migrateLegacyInstancePos,
+  NPCS,
   QUESTS,
+  RIFT_SLOT_COUNT,
+  riftInstanceOrigin,
   SPIRIT_HEALER_NPC_ID,
   zoneAt,
 } from './data';
@@ -194,6 +205,7 @@ import {
   createNpc,
   createPlayer,
   type PlayerEquipment,
+  type PlayerEquipmentInstances,
   pctValue,
   recalcPlayerStats,
 } from './entity';
@@ -209,6 +221,8 @@ import {
   tickGroundAoEs,
 } from './entity_roster';
 import { canEquipItem, resolveEquipSlot } from './equipment_rules';
+import * as escortMod from './escort';
+import { initEscorts as initEscortsImpl, updateEscorts as updateEscortsImpl } from './escort';
 import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
 import * as interaction from './interaction';
@@ -268,6 +282,25 @@ import {
 } from './mob/targeting';
 import { emitMobYell } from './mob/yells';
 import type { MobCombatProfile } from './mob_combat';
+import {
+  cancelMountRace as cancelMountRaceImpl,
+  mountRaceViewFor as mountRaceViewForImpl,
+  startMountRace as startMountRaceImpl,
+  tickMountRace as tickMountRaceImpl,
+} from './mount_race';
+import {
+  forceDismount as forceDismountImpl,
+  ownedMounts as ownedMountsImpl,
+  toggleMount as toggleMountImpl,
+  updateMountTransition,
+} from './mounts';
+import {
+  abandonMountTraining as abandonMountTrainingImpl,
+  learnRiding as learnRidingImpl,
+  mountTrainAbort as mountTrainAbortImpl,
+  mountTrainBegin as mountTrainBeginImpl,
+  tickMountTraining as tickMountTrainingImpl,
+} from './mounts_training';
 import {
   findPlayerPath,
   PLAYER_BODY_RADIUS,
@@ -365,6 +398,7 @@ import { prestige as prestigeImpl, updateRested } from './progression/xp';
 import { advancePendingProjectiles, type PendingProjectile } from './projectile_travel';
 import * as honorMod from './pvp';
 import { sanitizeRemovedZone1Content } from './removed_zone1_content';
+import { rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
 import { Rng } from './rng';
 import { persistedResource } from './serialize_resource';
 import { createSimContext, type SimContext, type SimContextHost } from './sim_context';
@@ -384,6 +418,7 @@ import {
   CURRENT_CHARACTER_CONTENT_REVISION,
   migrateCharacterTalentsV2,
 } from './talent_save_migration';
+import * as unstuckMod from './unstuck';
 import {
   rollWorldBossLoot as rollWorldBossLootImpl,
   scaleWorldBossHp,
@@ -398,6 +433,7 @@ export type { MailSave } from './mail/post_office';
 // stays valid now that the type lives in market.ts.
 export type { MarketSave } from './market';
 
+import { updateSwimFatigue } from './fatigue';
 import {
   applyDungeonMobTuning,
   mobLevelForDungeonDifficulty,
@@ -420,6 +456,7 @@ import {
   updateInstances as updateInstancesImpl,
 } from './instances/dungeons';
 import { buyHeroicVendorItem as buyHeroicVendorItemImpl } from './instances/heroic_vendor';
+import { updatePortalTriggers } from './portals';
 import * as questCommands from './quests/quest_commands';
 import {
   checkQuestReady,
@@ -428,6 +465,40 @@ import {
   onNodeGatheredForQuests,
   onRecipeCraftedForQuests,
 } from './quests/quest_credit';
+import {
+  type NaturalRiftPortal,
+  RIFT_PORTAL_FIRST_AT,
+  updateRiftPortals as updateRiftPortalsImpl,
+} from './rift/portals';
+import {
+  enchantRiftItem as enchantRiftItemImpl,
+  type RiftForgeResult,
+  sanitizeRiftGearInstance,
+  socketRiftGem as socketRiftGemImpl,
+  upgradeRiftItem as upgradeRiftItemImpl,
+} from './rift/progression';
+import { riftMechanicSuppressed, riftRankTemplate, riftRankTuningFor } from './rift/ranks';
+import { generateRiftFloor } from './rift/rift_gen';
+import {
+  riftLockpickAbort as riftLockpickAbortImpl,
+  riftLockpickAction as riftLockpickActionImpl,
+  riftLockpickEngage as riftLockpickEngageImpl,
+  riftLockpickViewFor as riftLockpickViewForImpl,
+} from './rift/rift_lockpick';
+import {
+  advanceRiftRollers as advanceRiftRollersImpl,
+  enterRift as enterRiftImpl,
+  leaveRift as leaveRiftImpl,
+  liftRiftEntities as liftRiftEntitiesImpl,
+  riftInstanceAtPos,
+  riftOpenTreasure as riftOpenTreasureImpl,
+  riftPlayerLift as riftPlayerLiftImpl,
+  tickRiftBossDeathZones as tickRiftBossDeathZonesImpl,
+  tickRiftLockpicks as tickRiftLockpicksImpl,
+  updateRiftInstances as updateRiftInstancesImpl,
+  updateRiftTriggers as updateRiftTriggersImpl,
+} from './rift/runs';
+import type { RiftEvent, RiftInstance } from './rift/types';
 
 // computeQuestState (the pure quest-state fn) moved to quests/quest_commands.ts (W4);
 // re-export it here so ClientWorld's `import { computeQuestState } from '../sim/sim'`
@@ -509,8 +580,10 @@ import {
   type DungeonDifficulty,
   dist2d,
   type Entity,
+  EQUIP_SLOTS,
   type EquipSlot,
   type ErrorReason,
+  type EscortRunState,
   emptyMoveInput,
   FAERIE_FIRE_ARMOR_PCT,
   GCD,
@@ -531,6 +604,8 @@ import {
   type MasterLootThreshold,
   MELEE_RANGE,
   type MobFamily,
+  type MountRaceSession,
+  type MountTrainingSession,
   type MoveInput,
   type NoticeboardDef,
   type OverheadEmoteId,
@@ -566,6 +641,7 @@ import {
 } from './types';
 import * as weaponStowMod from './weapon_stow';
 import {
+  crossesGardenHedge,
   groundHeight,
   nearSteepWalls,
   terrainSteepnessAt,
@@ -979,6 +1055,30 @@ export interface PlayerMeta {
   pendingSkinRank: SkinRank | null;
   pendingSkinCatalog: SkinCatalog | null;
   pendingSkinItemId: string | null;
+  // The active riding-lesson attempt, or null. Session state, never persisted:
+  // src/sim/mounts_training.ts owns the rules; this is the same
+  // optional-plus-null shape as other transient session fields below (e.g.
+  // `away`), initialized to null in createPlayer.
+  mountTraining?: MountTrainingSession | null;
+  // The player's own active show-jumping race, or null. Session state, never
+  // persisted: src/sim/mount_race.ts owns the rules. Strictly per-player, so
+  // simultaneous racers never share or contend on anything.
+  mountRace?: MountRaceSession | null;
+  // One-time riding-lesson fee (100g), charged when the first lesson race starts
+  // (or through the legacy mount_train_begin command). Optional so absent === false (pre-feature saves and a
+  // fresh character stay byte-equal): never explicitly set to false, only ever
+  // flipped true, mirroring the ridingTrained-omitted-while-false convention in
+  // serializeCharacter below.
+  mountTrainingFeePaid?: boolean;
+  // Riding skill purchased from Marla (80g). Optional and absent until bought,
+  // so pre-feature saves load cleanly as un-trained. Grandfathered: any save
+  // that had mountTrainingFeePaid=true gets ridingTrained=true on load.
+  ridingTrained?: boolean;
+  // PBE boost kit version already applied to this character (server/
+  // pbe_boost.ts, PBE_BOOST_ACCOUNTS=1 only). Optional and absent outside the
+  // PBE so live saves round-trip byte-equal; the world-join top-up re-kits
+  // any character whose stamp is below the current BOOST_KIT_VERSION.
+  pbeBoostKit?: number;
   moveInput: MoveInput;
   // Monotonic counter bumped when a bulky, rarely-changing wire field (the
   // inventory, and the collection-quest progress derived from it) mutates, so a
@@ -1002,9 +1102,10 @@ export interface PlayerMeta {
   copper: number;
   equipment: PlayerEquipment;
   // Per-slot ItemInstancePayload for whichever equipped piece carries one (an
-  // enchanted item's rolled.stats, see src/sim/professions/enchanting.ts).
-  // Sparse: a slot with a plain (unenchanted) piece has no entry.
-  equipmentInstance: Partial<Record<EquipSlot, ItemInstancePayload>>;
+  // enchanted item's rolled.stats, see src/sim/professions/enchanting.ts, or a
+  // rift-forged upgrade's payload, see src/sim/rift/progression.ts). Sparse: a
+  // slot with a plain piece has no entry.
+  equipmentInstance: PlayerEquipmentInstances;
   xp: number;
   // Post-cap progression (Max-Level XP Overflow). `lifetimeXp` is the monotonic
   // 64-bit-safe total of all XP ever earned — it keeps growing at the cap and is
@@ -1080,6 +1181,9 @@ export interface PlayerMeta {
   // aggressive pet auto-pull (see PET_OWNER_IDLE_TICKS) so an idle owner's pet
   // cannot farm the area alone.
   lastActiveTick: number;
+  // Runtime-only local recovery attempt. The owning system lives in unstuck.ts;
+  // only its anti-relog cooldown is persisted through Entity.cooldowns.
+  pendingUnstuck: unstuckMod.PendingUnstuck | null;
   // Ashen Coliseum standings. Legacy arenaRating/Wins/Losses are the 1v1
   // bracket; 2v2 is fully independent and persisted alongside them.
   arenaRating: number;
@@ -1304,9 +1408,11 @@ export interface CharacterState {
   facing: number;
   equipment: PlayerEquipment;
   // Per-slot ItemInstancePayload for whichever equipped piece carries one (an
-  // enchanted item's rolled.stats, see src/sim/professions/enchanting.ts).
-  // Optional so pre-Enchanting saves load cleanly (defaults to no enchants).
+  // enchanted item's rolled.stats or a rift-forged upgrade's payload).
+  // Optional so pre-Enchanting saves load cleanly (defaults to no instances).
   equipmentInstance?: Partial<Record<EquipSlot, ItemInstancePayload>>;
+  /** Legacy plural key written by this branch's earlier rift-gear saves. */
+  equipmentInstances?: Partial<Record<EquipSlot, ItemInstancePayload>>;
   inventory: InvSlot[];
   // Equipped bag sockets. Optional so pre-bag saves load cleanly (defaults to
   // 4 empty sockets; an over-capacity legacy inventory is tolerated).
@@ -1377,6 +1483,20 @@ export interface CharacterState {
   pendingSkinRank?: SkinRank | null;
   pendingSkinCatalog?: SkinCatalog | null;
   pendingSkinItemId?: string | null;
+  // LEGACY. The old "selected mount" pick, written by builds before reins became
+  // usable items. Still declared so an existing save deserializes without a type
+  // error, but nothing reads it and nothing writes it any more: the field simply
+  // ages out of saves as characters are re-saved. Do NOT reintroduce a reader.
+  selectedMount?: string;
+  // One-time riding-lesson training fee (100g), charged when the first lesson
+  // race starts (or through legacy mount_train_begin). Optional and absent until
+  // paid, so pre-mount-training saves (and every save before the fee is ever
+  // charged) stay byte-equal.
+  mountTrainingFeePaid?: boolean;
+  // Riding skill purchased from Marla (80g). Optional and absent until bought.
+  ridingTrained?: boolean;
+  // PBE boost kit version applied (server/pbe_boost.ts); absent outside PBE.
+  pbeBoostKit?: number;
   delveMarks?: number;
   delveClears?: Record<string, number>;
   companionUpgrades?: Record<string, number>;
@@ -1609,6 +1729,22 @@ export class Sim {
   // dungeon instances
   instances: InstanceSlot[] = [];
   dungeonResetLocks = new Map<string, { availableAt: number; claimId: number }>();
+  // procedural rift instances (separate slot pool + coordinate band from dungeons)
+  riftInstances: RiftInstance[] = [];
+  // Shared natural-world events. Group instances point here by eventId and race
+  // for one authoritative first-clear claim.
+  riftEvents: RiftEvent[] = [];
+  nextRiftInstanceId = 1;
+  // rift-portal registry (built lazily by updateRiftTriggers, appended on rift_portal spawn)
+  private riftPortalIds: number[] | null = null;
+  // Open world-spawned ranked rift portals + the spawn ordinal (rift/portals.ts
+  // scheduler; both live SimContext views).
+  naturalRiftPortals: NaturalRiftPortal[] = [];
+  riftPortalSpawnCount = 0;
+  riftPortalNextAt = RIFT_PORTAL_FIRST_AT;
+  // Escort quest runs (src/sim/escort.ts), keyed by EscortDef id. Live
+  // SimContext view; the module owns every mutation.
+  escortRuns = new Map<string, EscortRunState>();
   // delve instances (separate slot pool from dungeons)
   delveRuns: DelveRun[] = [];
   private delvePetStash = new Map<number, PetState>();
@@ -1698,6 +1834,11 @@ export class Sim {
   private worldBossNextAt: number[] = WORLD_BOSSES.map((b) => b.intervalSeconds);
   private worldBossEntityIds: (number | null)[] = WORLD_BOSSES.map(() => null);
 
+  // Per-world key for the rift collision registry in colliders.ts. Allocated per
+  // Sim INSTANCE (not per seed): two same-seed Sims in one process must never
+  // read or overwrite each other's active rift regions.
+  readonly riftCollisionToken = allocRiftCollisionToken();
+
   constructor(cfg: SimConfig) {
     this.devCommands = cfg.devCommands ?? false;
     this.cfg = {
@@ -1708,6 +1849,8 @@ export class Sim {
       playerName: cfg.playerName ?? 'Adventurer',
       devCommands: this.devCommands,
       worldBossAtBoot: cfg.worldBossAtBoot ?? false,
+      riftPortals: cfg.riftPortals ?? false,
+      communityRifts: cfg.communityRifts ?? false,
       lockoutNowMs: cfg.lockoutNowMs ?? (() => Math.floor(this.time * 1000)),
       raidResetMs: cfg.raidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_RAID_LOCKOUT_MS),
       valeCupShowcase: cfg.valeCupShowcase ?? false,
@@ -1800,10 +1943,12 @@ export class Sim {
       // still spawns on dry land even though combat movement can enter water.
       const minHeight = this.mobCanSpawnInWater(template) ? waterLevel() - 0.5 : waterLevel() + 0.4;
       for (let i = 0; i < camp.count; i++) {
-        if (template.dummy) {
-          // A practice dummy is a fixed, deterministic prop (no scatter, fixed level,
-          // never wanders): spawn it WITHOUT drawing any RNG so adding one never
-          // perturbs the world's seed-stable spawns and rolls.
+        if (template.dummy || template.ambient) {
+          // A practice dummy or an ambient decoration (the stable horses) is a
+          // fixed, deterministic prop (no scatter, fixed level): spawn it WITHOUT
+          // drawing any RNG so adding one never perturbs the world's seed-stable
+          // spawns and rolls. (The horses do wander, but off a PRIVATE Rng
+          // sub-stream in mob/ambient.ts, never the shared ctx.rng.)
           const safe = this.findSafePos(camp.center.x, camp.center.z, minHeight);
           const mob = createMob(
             this.nextId++,
@@ -1816,17 +1961,20 @@ export class Sim {
           this.addEntity(mob);
           continue;
         }
-        const ang = this.rng.range(0, Math.PI * 2);
-        const r = Math.sqrt(this.rng.next()) * camp.radius;
+        // Spread the camp's mobs with even nearest-neighbor spacing (a sunflower
+        // spiral) instead of independent uniform sampling, which let mobs stack.
+        // The two draws below feed campSpawnOffset as jitter and are consumed in the
+        // SAME order/count as the old angle/radius rolls, so the global rng stream
+        // position is unchanged: only spawn positions move (see camp_scatter.ts).
+        const jitterAngle = this.rng.range(0, Math.PI * 2);
+        const jitterFrac = this.rng.next();
+        const off = campSpawnOffset(i, camp.count, camp.radius, jitterAngle, jitterFrac);
         // Keep camp mobs out of every dungeon door's clear ring so approaching or
         // zoning out of a dungeon never lands the player in a pack's aggro radius.
         // Pure geometry on the already-rolled point: it draws no rng, so the spawn
         // loop's own draw order is untouched (mob positions do shift, which moves
         // their later idle-wander draws, but that is downstream in the drive phase).
-        const cleared = projectOutsideDungeonDoors(
-          camp.center.x + Math.sin(ang) * r,
-          camp.center.z + Math.cos(ang) * r,
-        );
+        const cleared = projectOutsideDungeonDoors(camp.center.x + off.x, camp.center.z + off.z);
         // findSafePos's inward spiral can walk a shore-side ring-edge point back
         // toward land, i.e. back INTO the ring; re-project the safe point so the
         // "never inside a door ring" guarantee holds for every seed, not just the
@@ -1988,6 +2136,60 @@ export class Sim {
       }
     }
 
+    // Procedural rift instance pool (empty until a portal is entered). Public
+    // test realms opt into a larger pool without changing the normal host cap.
+    const riftSlotCount = this.cfg.communityRifts ? COMMUNITY_RIFT_SLOT_COUNT : RIFT_SLOT_COUNT;
+    for (let i = 0; i < riftSlotCount; i++) {
+      this.riftInstances.push({
+        slot: i,
+        instanceId: 0,
+        eventId: null,
+        partyKey: null,
+        memberIds: new Set(),
+        startedAt: 0,
+        finishedAt: null,
+        outcome: 'abandoned',
+        upgrade: null,
+        seed: 0,
+        baseLevel: 1,
+        floorIndex: 0,
+        floorCount: 0,
+        mobIds: [],
+        objectIds: [],
+        bossId: null,
+        bossDiedAtTick: null,
+        exitId: null,
+        descentAt: null,
+        descentId: null,
+        descentOpen: false,
+        pylonIds: [],
+        litPylons: new Set(),
+        pylonTotal: 0,
+        puzzleSolved: false,
+        boulderIds: [],
+        boulderPads: [],
+        seqRuneIds: [],
+        seqStep: 0,
+        beaconId: null,
+        rollerIds: [],
+        cacheId: null,
+        lockpick: null,
+        gateId: null,
+        switchId: null,
+        gateOpen: true,
+        minibossId: null,
+        orbId: null,
+        orbActive: false,
+        returnPos: { x: 0, z: 0 },
+        emptyFor: 0,
+        tier: null,
+        portalId: null,
+        rewarded: false,
+        seqResetAt: -Infinity,
+        bossDeathZones: [],
+      });
+    }
+
     // Noticeboard collision reads the active WorldContent registry, so spawn
     // must use that same authority even when cfg.world differs. This prevents
     // a cfg-only board entity without its active static collider, or the reverse.
@@ -2016,6 +2218,11 @@ export class Sim {
     if (!cfg.noPlayer) {
       this.addPlayer(this.cfg.playerClass, this.cfg.playerName, { autoEquip: this.cfg.autoEquip });
     }
+
+    // Escort quest NPCs (src/sim/escort.ts). Last on purpose: the spawns draw
+    // no rng and only consume trailing entity ids, so every id and rng draw
+    // above stays byte-identical to a world without escorts.
+    initEscortsImpl(this.ctx);
   }
 
   private spawnHealerPracticeDummy(): void {
@@ -2173,13 +2380,26 @@ export class Sim {
     // branch's `?? DUNGEON_LIST[0]` fallback would otherwise swallow a delve
     // position and eject the player to a dungeon door instead of the board door
     // (FR-1.6). The two bands are disjoint, so `else if` keeps dungeon handling intact.
+    // Saves from before the instance plane moved east (see data.ts). This
+    // resolves a legacy instance position all the way to its door, so it IS an
+    // instance exit and takes the same exemption the two branches below do:
+    // the collision migration must not walk it off a door the content author
+    // placed, exactly as it does not walk a current-band exit off one.
+    let legacyInstanceExit = false;
+    if (savedPos) {
+      const migrated = migrateLegacyInstancePos(savedPos);
+      if (migrated) {
+        savedPos = migrated;
+        legacyInstanceExit = true;
+      }
+    }
     if (savedPos && isDelvePos(savedPos.x)) {
       const delve = delveAt(savedPos.x) ?? DELVE_LIST[0];
       savedPos = { x: delve.doorPos.x, z: delve.doorPos.z - 4 };
     } else if (savedPos && savedPos.x > DUNGEON_X_THRESHOLD) {
       const dungeon = dungeonAt(savedPos.x) ?? DUNGEON_LIST[0];
       savedPos = { x: dungeon.doorPos.x, z: dungeon.doorPos.z - 4 };
-    } else if (savedPos) {
+    } else if (savedPos && !legacyInstanceExit) {
       // Authored towns can grow across release boundaries. A living character
       // saved on what used to be open overworld ground must not resume trapped
       // inside a newly added solid prop. Preserve valid shoreline and swimming
@@ -2252,6 +2472,7 @@ export class Sim {
       joinedAt: this.time,
       totalPlayedSeconds: Math.max(0, savedState?.totalPlayedSeconds ?? 0),
       lastActiveTick: this.tickCount,
+      pendingUnstuck: null,
       arenaRating: savedArena1v1.rating,
       arenaWins: savedArena1v1.wins,
       arenaLosses: savedArena1v1.losses,
@@ -2278,6 +2499,8 @@ export class Sim {
       activeLoadout: -1,
       raidLockouts: new Map(),
       away: null,
+      mountTraining: null,
+      mountRace: null,
       marketFilter: '',
       craftSkills: emptyCraftSkills(),
       knownRecipes: new Set(),
@@ -2353,12 +2576,20 @@ export class Sim {
         for (const id of s.unlockedMilestones) meta.unlockedMilestones.add(id);
       meta.copper = s.copper;
       meta.equipment = { ...s.equipment };
-      meta.equipmentInstance = Object.fromEntries(
-        Object.entries(s.equipmentInstance ?? {}).map(([slot, inst]) => [
-          slot,
-          cloneItemInstancePayload(inst),
-        ]),
-      );
+      meta.equipmentInstance = {};
+      for (const [slot, instance] of Object.entries(
+        s.equipmentInstance ?? s.equipmentInstances ?? {},
+      )) {
+        if (!(EQUIP_SLOTS as readonly string[]).includes(slot) || !instance) continue;
+        const itemId = meta.equipment[slot as EquipSlot];
+        if (!itemId) continue;
+        // A rift payload is validated against the worn item (anti-tamper); any
+        // other instance (an enchant) deep-clones through the shared rules.
+        const clean = instance.rift
+          ? sanitizeRiftGearInstance(itemId, instance, player.id)
+          : cloneItemInstancePayload(instance);
+        if (clean) meta.equipmentInstance[slot as EquipSlot] = clean;
+      }
       // The shared tamper ceiling (bags.ts instancedCountCap, same rule as the
       // bank arm below): a counted instanced slot loads capped at what
       // identical-payload merges could legitimately have built, and a
@@ -2369,6 +2600,12 @@ export class Sim {
         slot.count = Math.min(slot.count, instancedCountCap(ITEMS[slot.itemId], slot.instance));
         return slot;
       });
+      for (const slot of meta.inventory) {
+        if (!slot.instance?.rift) continue;
+        const clean = sanitizeRiftGearInstance(slot.itemId, slot.instance, player.id);
+        if (clean) slot.instance = clean;
+        else delete slot.instance;
+      }
       if (s.bags === undefined) {
         // PRE-BAG save: the character earned this space under the infinite
         // inventory, so grant + equip bags that cover it (lowest quality tier
@@ -2463,6 +2700,22 @@ export class Sim {
         healDisplayRoundedProficiency(meta.gatheringProficiency);
       }
       meta.mailWelcomed = s.mailWelcomed === true;
+      // Never explicitly set false: absent stays absent so a pre-feature save
+      // (or one where the fee was never charged) round-trips byte-equal.
+      if (s.mountTrainingFeePaid === true) meta.mountTrainingFeePaid = true;
+      // Grandfather: players who already paid the old 100g fee are riding-trained.
+      if (s.ridingTrained === true || s.mountTrainingFeePaid === true) meta.ridingTrained = true;
+      if (typeof s.pbeBoostKit === 'number') meta.pbeBoostKit = s.pbeBoostKit;
+      // Grandfather: players who had q_riding_lessons active in a mid-quest save
+      // (state='active' or 'ready') but never received ridingTrained=true are
+      // riding-trained because accepting the quest proves they already paid
+      // the old lesson fee. Also covers done: questsDone.has('q_riding_lessons').
+      if (
+        !meta.ridingTrained &&
+        (meta.questLog.has('q_riding_lessons') || meta.questsDone.has('q_riding_lessons'))
+      ) {
+        meta.ridingTrained = true;
+      }
       meta.guildLetterSent = s.guildLetterSent === true;
       // Work-order cooldowns: clamp every stored availableAt to
       // tickCount + WORK_ORDER_CADENCE_TICKS so a tick-counter reset (fresh
@@ -2570,7 +2823,7 @@ export class Sim {
       this.time,
       restoredAbilityCharges,
       legacyChargeCaps,
-      (id) => ABILITIES[id] !== undefined,
+      (id) => id === unstuckMod.UNSTUCK_COOLDOWN_ID || ABILITIES[id] !== undefined,
     );
     if (Object.keys(restoredAbilityCharges).length > 0) {
       player.abilityCharges = restoredAbilityCharges;
@@ -2855,6 +3108,11 @@ export class Sim {
   removePlayer(pid: number): void {
     const meta = this.players.get(pid);
     if (!meta) return;
+    // Offline/headless removals have no GameServer lifecycle hook. End an
+    // accepted recovery explicitly so every accepted attempt has one terminal
+    // event; the online server calls the same delegate earlier so it can attach
+    // durable account/character identity before removing the session.
+    this.cancelUnstuckForDisconnect(pid);
     // If the leaver owns a live lockpick session, abandon it (preserves
     // attemptAvailable so a remaining party member can still pick the chest).
     // Must run before party removal / dropEntity, since delveRunForPlayer
@@ -2862,6 +3120,9 @@ export class Sim {
     const leavingRun = this.delveRunForPlayer(pid);
     if (leavingRun?.lockpick && leavingRun.lockpick.ownerId === pid)
       this.ctx.abandonLockpick(leavingRun);
+    // A leaving player's riding-lesson session is likewise abandoned (never
+    // silently left IN_PROGRESS); the one-time fee stays paid either way.
+    if (meta.mountTraining?.state === 'IN_PROGRESS') this.ctx.abandonMountTraining(meta);
     this.preparePlayerLeave(pid);
     despawnMobsForDev(this.ctx, pid, 'spawned');
     // leave social systems cleanly. removeFromParty lives on the PartyMachine now
@@ -3129,6 +3390,12 @@ export class Sim {
       pendingSkinRank: meta.pendingSkinRank,
       pendingSkinCatalog: meta.pendingSkinCatalog,
       pendingSkinItemId: meta.pendingSkinItemId,
+      // Absent until the fee is actually charged (back-compat + parity-stable saves).
+      ...(meta.mountTrainingFeePaid ? { mountTrainingFeePaid: true } : {}),
+      // Absent until riding skill is purchased (back-compat).
+      ...(meta.ridingTrained ? { ridingTrained: true } : {}),
+      // Absent outside the PBE (back-compat; server/pbe_boost.ts).
+      ...(meta.pbeBoostKit !== undefined ? { pbeBoostKit: meta.pbeBoostKit } : {}),
       craftSkills: { ...meta.craftSkills },
       knownRecipes: [...meta.knownRecipes],
       recipesGrandfathered: meta.recipesGrandfathered,
@@ -3207,6 +3474,93 @@ export class Sim {
 
   changeSkin(skin: number, catalog: SkinCatalog = 'class'): void {
     this.setPlayerSkin(this.primaryId, skin, catalog);
+  }
+
+  /** Per-pid mount toggle (the server command path); the IWorld members below
+   *  ride primaryId. Rules live in src/sim/mounts.ts. Summoning a specific mount
+   *  is not here: it is an item use (useItem -> summonMountItem). */
+  toggleMountFor(pid: number): boolean {
+    return toggleMountImpl(this.ctx, pid);
+  }
+
+  /** The owned subset of the catalog for a player (the server wire path). */
+  ownedMountsFor(pid: number): MountKey[] {
+    const meta = this.players.get(pid);
+    return meta ? ownedMountsImpl(meta) : [DEFAULT_MOUNT];
+  }
+
+  // --- IWorldMounts ---
+  ownedMounts(): readonly MountKey[] {
+    return this.ownedMountsFor(this.primaryId);
+  }
+  ridingTrained(): boolean {
+    return this.players.get(this.primaryId)?.ridingTrained === true;
+  }
+  toggleMounted(): void {
+    this.toggleMountFor(this.primaryId);
+  }
+
+  /** Purchase the riding skill from Marla (80g). Server path; IWorld member rides
+   *  primaryId. Rules live in src/sim/mounts_training.ts. */
+  learnRidingFor(npcId: number, pid: number): void {
+    learnRidingImpl(this.ctx, npcId, pid);
+  }
+
+  // --- IWorldMounts: learn riding ---
+  learnRiding(npcId: number): void {
+    this.learnRidingFor(npcId, this.primaryId);
+  }
+
+  /** Per-pid riding-lesson command surface (the server path); the IWorld member
+   *  below rides primaryId. Rules live in src/sim/mounts_training.ts.
+   *  mountTrainAbortFor stays server-reachable (the append-only wire token
+   *  mount_train_abort) even though no HUD surface sends it anymore. */
+  mountTrainBeginFor(pid: number): void {
+    mountTrainBeginImpl(this.ctx, pid);
+  }
+  mountTrainAbortFor(pid: number): void {
+    mountTrainAbortImpl(this.ctx, pid);
+  }
+
+  // --- IWorldMounts: the riding lesson ---
+  mountTrainBegin(): void {
+    this.mountTrainBeginFor(this.primaryId);
+  }
+
+  /** Per-pid show-jumping race start (the server wire path); the IWorld member
+   *  below rides primaryId. Rules live in src/sim/mount_race.ts. */
+  mountRaceStartFor(pid: number): void {
+    startMountRaceImpl(this.ctx, pid);
+  }
+
+  mountRaceCancelFor(pid: number): void {
+    cancelMountRaceImpl(this.ctx, pid);
+  }
+
+  /** Read-only projection of a player's own active show-jumping race
+   *  (src/sim/mount_race.ts); null when not racing. */
+  mountRaceViewFor(pid?: number): MountRaceView | null {
+    return mountRaceViewForImpl(this.ctx, pid);
+  }
+
+  /** Whether a player has a live riding lesson in progress. Retained for online
+   *  parity and legacy consumers; offline rides primaryId below. */
+  mountLessonActiveFor(pid: number): boolean {
+    return this.players.get(pid)?.mountTraining?.state === 'IN_PROGRESS';
+  }
+
+  // --- IWorldMounts: the show-jumping race (offline rides primaryId) ---
+  mountRaceStart(): void {
+    this.mountRaceStartFor(this.primaryId);
+  }
+  mountRaceCancel(): void {
+    this.mountRaceCancelFor(this.primaryId);
+  }
+  mountLessonActive(): boolean {
+    return this.mountLessonActiveFor(this.primaryId);
+  }
+  mountRaceView(): MountRaceView | null {
+    return this.mountRaceViewFor(this.primaryId);
   }
 
   /** Replace a player's whole weapon-skin loadout (host seed: the server pushes
@@ -3456,6 +3810,9 @@ export class Sim {
   get equipment(): PlayerEquipment {
     return this.primary.equipment;
   }
+  get equipmentInstances(): PlayerEquipmentInstances {
+    return this.primary.equipmentInstance;
+  }
   get copper(): number {
     return this.primary.copper;
   }
@@ -3670,7 +4027,16 @@ export class Sim {
     const seed = this.cfg.seed;
     const ok = (px: number, pz: number): boolean => {
       if (groundHeight(px, pz, seed) < minHeight) return false;
-      const res = resolvePosition(seed, px, pz, bodyRadius);
+      const res = resolvePosition(
+        seed,
+        px,
+        pz,
+        bodyRadius,
+        false,
+        undefined,
+        undefined,
+        this.riftCollisionToken,
+      );
       return Math.abs(res.x - px) < 1e-4 && Math.abs(res.z - pz) < 1e-4;
     };
     if (ok(x, z)) return { x, z };
@@ -3714,6 +4080,9 @@ export class Sim {
     const host: SimContextHost = {
       get rng() {
         return sim.rng;
+      },
+      get riftCollisionToken() {
+        return sim.riftCollisionToken;
       },
       get time() {
         return sim.time;
@@ -3778,6 +4147,39 @@ export class Sim {
       get instances() {
         return sim.instances;
       },
+      get riftInstances() {
+        return sim.riftInstances;
+      },
+      get riftEvents() {
+        return sim.riftEvents;
+      },
+      get nextRiftInstanceId() {
+        return sim.nextRiftInstanceId;
+      },
+      set nextRiftInstanceId(v) {
+        sim.nextRiftInstanceId = v;
+      },
+      get naturalRiftPortals() {
+        return sim.naturalRiftPortals;
+      },
+      get riftPortalSpawnCount() {
+        return sim.riftPortalSpawnCount;
+      },
+      set riftPortalSpawnCount(v: number) {
+        sim.riftPortalSpawnCount = v;
+      },
+      get riftPortalNextAt() {
+        return sim.riftPortalNextAt;
+      },
+      set riftPortalNextAt(v: number) {
+        sim.riftPortalNextAt = v;
+      },
+      get riftPortalIds() {
+        return sim.riftPortalIds;
+      },
+      set riftPortalIds(v) {
+        sim.riftPortalIds = v;
+      },
       get dungeonResetLocks() {
         return sim.dungeonResetLocks;
       },
@@ -3841,6 +4243,9 @@ export class Sim {
       },
       get yumiCatMatches() {
         return sim.yumiCatMatches;
+      },
+      get escortRuns() {
+        return sim.escortRuns;
       },
       get nextArenaMatchId() {
         return sim.nextArenaMatchId;
@@ -4075,6 +4480,9 @@ export class Sim {
       instanceClaimIdAt: sim.instanceClaimIdAt.bind(sim),
       enterDungeon: sim.enterDungeon.bind(sim),
       leaveDungeon: sim.leaveDungeon.bind(sim),
+      enterRift: sim.enterRift.bind(sim),
+      leaveRift: sim.leaveRift.bind(sim),
+      riftOpenTreasure: sim.riftOpenTreasure.bind(sim),
       resetDungeonInstances: sim.resetDungeonInstances.bind(sim),
       inheritDungeonResetLocks: sim.inheritDungeonResetLocks.bind(sim),
       dungeonDifficulty: sim.dungeonDifficulty.bind(sim),
@@ -4124,6 +4532,7 @@ export class Sim {
       swingIntervalMult: sim.swingIntervalMult.bind(sim),
       mobCanSwim: sim.mobCanSwim.bind(sim),
       resolveMovePoint: sim.resolveMovePoint.bind(sim),
+      resolvePlayerMove: sim.resolveMove.bind(sim),
       resolveMove: sim.resolveMove.bind(sim),
       // P1a pet AI lives in src/sim/pet/pet_ai.ts; locomotion.updateMob reaches it
       // through this seam binding (late-bound arrow so sim.ctx resolves at call time).
@@ -4204,6 +4613,9 @@ export class Sim {
       maybeCompanionBark: (run, pid, barkId) => sim.maybeCompanionBark(run, pid, barkId),
       abandonLockpick: (run) => lockpickMod.abandonLockpick(sim.ctx, run),
       tickLockpickTimeout: (run) => lockpickMod.tickLockpickTimeout(sim.ctx, run),
+      tickMountTraining: (meta) => tickMountTrainingImpl(sim.ctx, meta),
+      tickMountRace: (meta) => tickMountRaceImpl(sim.ctx, meta),
+      abandonMountTraining: (meta) => abandonMountTrainingImpl(sim.ctx, meta),
       delveRunForMob: (mobId) => sim.delveRunForMob(mobId),
       onDelveBossDefeated: (run) => sim.onDelveBossDefeated(run),
       delveDetectMult: (player) => sim.delveDetectMult(player),
@@ -4223,6 +4635,7 @@ export class Sim {
       tameError: sim.tameError.bind(sim),
       standUp: sim.standUp.bind(sim),
       breakGhostWolf: sim.breakGhostWolf.bind(sim),
+      forceDismount: sim.forceDismountPlayer.bind(sim),
       startAutoAttack: sim.startAutoAttack.bind(sim),
       revivePet: sim.revivePet.bind(sim),
       completeFishing: (p, meta) => fishing.completeFishing(sim.ctx, p, meta),
@@ -4574,6 +4987,9 @@ export class Sim {
         this.updatePlayerMovement(p, meta);
         lap?.('p.move');
         this.updateDoorTriggers(p);
+        this.updateRiftTriggers(p);
+        updatePortalTriggers(this.ctx, p);
+        updateSwimFatigue(this.ctx, p);
         lap?.('p.doors');
         this.updateCasting(p, meta);
         lap?.('p.casting');
@@ -4594,6 +5010,11 @@ export class Sim {
           // Proficiency just became visible; the gathering predicates re-check.
           deedsMod.markDeedsDirty(this.ctx, p.id);
         }
+        // Mount summon/dismount transition: decrement the timer, cancel a summon
+        // on combat/swim, complete a mount/dismount, and force-dismount a mounted
+        // swimmer. Live players only (a dead player is already force-dismounted by
+        // handleDeath). Draws no rng, so the tick-phase draw order is unchanged.
+        updateMountTransition(this.ctx, p, this.isSwimming(p));
         lap?.('p.regen');
       } else if (p.ghost) {
         // A released spirit only runs (boosted speed via moveSpeedMult); it does not
@@ -4602,8 +5023,17 @@ export class Sim {
         // death model), or resurrect at its corpse / an overworld Spirit Healer.
         this.updatePlayerMovement(p, meta);
         this.updateDoorTriggers(p);
+        this.updateRiftTriggers(p);
         lap?.('p.move');
       }
+      // Riding-lesson driver: server-authoritative; tracks the training-steed
+      // phase and ends a dead/ghost player's IN_PROGRESS lesson, so death never
+      // strands the session. Finishing the race credits success. Draws no rng,
+      // so the tick-phase draw order is unchanged.
+      this.ctx.tickMountTraining(meta);
+      // Show-jumping race driver: per-player, server-authoritative, rng-free
+      // (runs after movement so prevPos -> pos is this tick's ridden segment).
+      this.ctx.tickMountRace(meta);
       updateTimers(p);
       updateComboExpiry(this.ctx, p);
       updateAuras(this.ctx, p);
@@ -4674,7 +5104,19 @@ export class Sim {
     lap?.('trades');
     this.updateLootRolls();
     lap?.('lootRolls');
+    // Recovery resolves after this tick's movement/combat and before instance
+    // lift/trigger passes. It draws no rng and its swept candidate search cannot
+    // change phase ordering for players without an active attempt.
+    unstuckMod.updateUnstuck(this.ctx);
     this.updateInstances();
+    this.updateRiftInstances();
+    advanceRiftRollersImpl(this.ctx); // 20 Hz: smooth rolling-boulder motion
+    liftRiftEntitiesImpl(this.ctx); // stand rift mobs/objects on the raised tier
+    tickRiftLockpicksImpl(this.ctx); // per-tick rift-cache lockpick step clock
+    tickRiftBossDeathZonesImpl(this.ctx); // lethal boss zone fuses + detonation
+    if (this.cfg.riftPortals) updateRiftPortalsImpl(this.ctx);
+    // Escort runs walk their NPC + watch ambush waves (rng-free; src/sim/escort.ts).
+    updateEscortsImpl(this.ctx);
     lap?.('instances');
     this.updateDelveRuns();
     lap?.('delves');
@@ -4955,7 +5397,15 @@ export class Sim {
   }
 
   private findChargePath(p: Entity, target: Entity): Vec3[] {
-    return findPlayerPath(this.cfg.seed, p.pos, target.pos, 64).map((w) => ({
+    return findPlayerPath(
+      this.cfg.seed,
+      p.pos,
+      target.pos,
+      64,
+      false,
+      false,
+      this.riftCollisionToken,
+    ).map((w) => ({
       x: w.x,
       y: 0,
       z: w.z,
@@ -4988,14 +5438,20 @@ export class Sim {
     const step = Math.min(RUN_SPEED * CHARGE_SPEED_MULT * DT, Math.max(0.01, dist2d(p.pos, wp)));
     const nx = p.pos.x + Math.sin(p.facing) * step;
     const nz = p.pos.z + Math.cos(p.facing) * step;
-    // deep water and cliffs end the charge early rather than dragging the player in
-    const h0 = groundHeight(p.pos.x, p.pos.z, this.cfg.seed);
+    // deep water and cliffs end the charge early rather than dragging the
+    // player in; slopes use the ridden surface (ride_height.ts) plus the shore
+    // step-out, matching the movement kernel and the clamp findChargePath
+    // already plans with, so a wading-depth ford never ends a charge.
     const h1 = groundHeight(nx, nz, this.cfg.seed);
     if (h1 < waterLevelAt(nx, nz) - SWIM_DEPTH) return done(false);
+    const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz);
+    const r0 = Math.max(groundHeight(p.pos.x, p.pos.z, this.cfg.seed), wls);
+    const r1 = Math.max(h1, wls);
     if (
-      h1 > h0 &&
-      ((h1 - h0) / step > MAX_CLIMB_SLOPE ||
-        terrainSteepnessAt(nx, nz, this.cfg.seed) > MAX_CLIMB_SLOPE)
+      r1 > r0 &&
+      ((r1 - r0) / step > MAX_CLIMB_SLOPE ||
+        (h1 >= wls && rideSteepnessAt(nx, nz, this.cfg.seed) > MAX_CLIMB_SLOPE)) &&
+      !shoreStepOut(p.pos.x, p.pos.z, nx, nz, this.cfg.seed, MAX_CLIMB_SLOPE)
     ) {
       return done(false);
     }
@@ -5057,14 +5513,20 @@ export class Sim {
     const step = Math.min(speed * DT, d - FOLLOW_STOP_DIST);
     const nx = p.pos.x + Math.sin(p.facing) * step;
     const nz = p.pos.z + Math.cos(p.facing) * step;
-    const h0 = groundHeight(p.pos.x, p.pos.z, this.cfg.seed);
     const h1 = groundHeight(nx, nz, this.cfg.seed);
     if (h1 < waterLevelAt(nx, nz) - SWIM_DEPTH) return true; // don't trail into deep water
+    // ridden-surface slopes plus the shore step-out (ride_height.ts), matching
+    // the movement kernel: a follower crosses the same fords and climbs the
+    // same low banks its leader just walked.
+    const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz);
+    const r0 = Math.max(groundHeight(p.pos.x, p.pos.z, this.cfg.seed), wls);
+    const r1 = Math.max(h1, wls);
     if (
-      h1 > h0 &&
+      r1 > r0 &&
       step > 1e-5 &&
-      ((h1 - h0) / step > MAX_CLIMB_SLOPE ||
-        terrainSteepnessAt(nx, nz, this.cfg.seed) > MAX_CLIMB_SLOPE)
+      ((r1 - r0) / step > MAX_CLIMB_SLOPE ||
+        (h1 >= wls && rideSteepnessAt(nx, nz, this.cfg.seed) > MAX_CLIMB_SLOPE)) &&
+      !shoreStepOut(p.pos.x, p.pos.z, nx, nz, this.cfg.seed, MAX_CLIMB_SLOPE)
     ) {
       return true; // wall/cliff
     }
@@ -5079,6 +5541,12 @@ export class Sim {
   }
 
   private updatePlayerMovement(p: Entity, meta: PlayerMeta): void {
+    // Verticality: strip last tick's rift raised-tier lift so the movement kernel
+    // (and the charge/follow/fear paths) integrate jumps + gravity against the true
+    // flat rift floor; updateRiftTriggers re-applies it after the step. Zero outside
+    // a rift or on a single-level floor, so non-rift movement is byte-identical.
+    const preLift = riftPlayerLiftImpl(this.ctx, p);
+    if (preLift !== 0) p.pos.y -= preLift;
     // Any locomotion key counts as a deliberate action for the anti-AFK pet gate.
     const mv = meta.moveInput;
     if (
@@ -5095,6 +5563,9 @@ export class Sim {
       // no-op unless the player is currently AFK. Do Not Disturb survives.
       clearAfkOnMove(this.ctx, meta, p);
     }
+    // The race countdown is a real start lock, not just a client animation.
+    // Hold every forced/manual locomotion mode until the authoritative GO tick.
+    if (meta.mountRace?.phase === 'countdown') return;
     if (advanceHeroicLeap(this.ctx, p)) return;
     // A ledge climb owns movement while it runs, and an airborne body that
     // gets its hands on a reachable ledge starts one. Sits after the leap arc
@@ -5259,7 +5730,14 @@ export class Sim {
       this.delveRunForMob(target.id) ??
       this.delveRunForPlayer(source.id) ??
       this.delveRunForPlayer(target.id);
-    return lineOfSightClear(this.cfg.seed, source.pos, target.pos, 0.05, run?.modules);
+    return lineOfSightClear(
+      this.cfg.seed,
+      source.pos,
+      target.pos,
+      0.05,
+      run?.modules,
+      this.riftCollisionToken,
+    );
   }
 
   private lineOfSightBlocked(source: Entity, target: Entity, ability: AbilityDef): boolean {
@@ -5534,13 +6012,18 @@ export class Sim {
       const adv = Math.min(STEP, distance - moved);
       const nx = cx + ux * adv,
         nz = cz + uz * adv;
-      const h0 = groundHeight(cx, cz, this.cfg.seed);
       const h1 = groundHeight(nx, nz, this.cfg.seed);
       if (h1 < waterLevelAt(nx, nz) - SWIM_DEPTH) break; // would land in deep water
+      // ridden-surface slopes (ride_height.ts): a submerged bed bump does not
+      // stop a shove crossing shallow water. No shore step-out here: a forced
+      // displacement conservatively stops at a bank face.
+      const wls = stepWaterLevel(cx, cz, nx, nz);
+      const r0 = Math.max(groundHeight(cx, cz, this.cfg.seed), wls);
+      const r1 = Math.max(h1, wls);
       if (
-        h1 > h0 &&
-        ((h1 - h0) / adv > MAX_CLIMB_SLOPE ||
-          terrainSteepnessAt(nx, nz, this.cfg.seed) > MAX_CLIMB_SLOPE)
+        r1 > r0 &&
+        ((r1 - r0) / adv > MAX_CLIMB_SLOPE ||
+          (h1 >= wls && rideSteepnessAt(nx, nz, this.cfg.seed) > MAX_CLIMB_SLOPE))
       ) {
         break; // would slam into a cliff
       }
@@ -5639,6 +6122,10 @@ export class Sim {
     const name = e.auras[idx].name;
     e.auras.splice(idx, 1);
     this.emit({ type: 'aura', targetId: e.id, name, gained: false });
+  }
+
+  private forceDismountPlayer(e: Entity): void {
+    forceDismountImpl(this.ctx, e);
   }
 
   // Taunt/Growl, classic semantics: never misses, lifts the caster's threat to
@@ -5848,8 +6335,8 @@ export class Sim {
     alreadyFinal = false,
     abilityId: string | null = null,
     aoe = false,
-  ): void {
-    dealDamageImpl(
+  ): number {
+    return dealDamageImpl(
       this.ctx,
       source,
       target,
@@ -6366,6 +6853,11 @@ export class Sim {
         if (ride(nx, nz, groundHeight(nx, nz, this.cfg.seed)) > h0) continue;
       }
       const r = this.resolveMovePoint(nx, nz, BODY_RADIUS, e);
+      // The Great Maze's hedge walls are hard for mobs too (the maze patrol
+      // knights pace their dead ends instead of drifting through a hedge);
+      // crossesGardenHedge fast-rejects outside the maze, so the open-world
+      // fan pays two comparisons.
+      if (crossesGardenHedge(e.pos.x, e.pos.z, r.x, r.z)) continue;
       const progress = d - Math.hypot(r.x - dest.x, r.z - dest.z);
       if (progress > bestProgress) {
         bestProgress = progress;
@@ -6411,7 +6903,10 @@ export class Sim {
     )
       return;
     const hpFrac = mob.hp / Math.max(1, mob.maxHp);
-    if (tmpl.summonAdds) {
+    // Rank-gated rift boss kits: a mechanic listed in the template's
+    // rankMechanics past the spawn's budget never fires (rift/ranks.ts).
+    // Inert for every non-rift mob (no riftMechanicLimit on the entity).
+    if (tmpl.summonAdds && !riftMechanicSuppressed(mob, 'summonAdds')) {
       const thresholds = tmpl.summonAdds.atHpPct;
       while (mob.firedSummons < thresholds.length && hpFrac <= thresholds[mob.firedSummons]) {
         mob.firedSummons++;
@@ -6452,7 +6947,12 @@ export class Sim {
         fx: 'nova',
       });
     }
-    if (tmpl.desperateHeal && !mob.healedThisPull && hpFrac <= tmpl.desperateHeal.belowHpPct) {
+    if (
+      tmpl.desperateHeal &&
+      !riftMechanicSuppressed(mob, 'desperateHeal') &&
+      !mob.healedThisPull &&
+      hpFrac <= tmpl.desperateHeal.belowHpPct
+    ) {
       mob.healedThisPull = true;
       const heal = Math.min(mob.maxHp - mob.hp, Math.round(mob.maxHp * tmpl.desperateHeal.healPct));
       if (heal > 0) {
@@ -6749,23 +7249,45 @@ export class Sim {
     // 1yd cluster spread only enough to not stack on one point); ordinary summoners keep
     // the wider 3.5yd ring beside the boss.
     const spawnRadius = MOBS[boss.templateId]?.worldBoss ? 1 : 3.5;
+    // A rift boss's adds always match the dungeon: spawn at the BOSS's own
+    // level (the floor level, ~20s), never a roll of the template band, and at
+    // EVERY rank take the rift add tuning (rift/ranks.ts). The rank derives
+    // from the instance descriptor, so all hosts agree.
+    const riftInst = isRiftPos(boss.pos.x) ? riftInstanceAtPos(this.ctx, boss.pos) : null;
+    const riftTuning = riftInst ? riftRankTuningFor(riftInst.baseLevel) : null;
     for (let k = 0; k < count; k++) {
       const ang = (k / count) * Math.PI * 2 + 0.7;
       const pos = this.groundPos(
         boss.pos.x + Math.sin(ang) * spawnRadius,
         boss.pos.z + Math.cos(ang) * spawnRadius,
       );
+      // The band roll stays even when a rift overrides the level below, so the
+      // rng draw count and order never depend on where the boss stands.
       const rolledLevel = this.rng.int(template.minLevel, template.maxLevel);
       const difficulty = inst?.difficulty ?? 'normal';
-      const addTemplate = mobTemplateForDungeonDifficulty(
+      let addTemplate = mobTemplateForDungeonDifficulty(
         template,
         inst?.dungeonId ?? '',
         difficulty,
-        { summonedAdd: true },
+        {
+          summonedAdd: true,
+        },
       );
-      const level = mobLevelForDungeonDifficulty(inst?.dungeonId ?? '', difficulty, rolledLevel);
+      let level = mobLevelForDungeonDifficulty(inst?.dungeonId ?? '', difficulty, rolledLevel);
+      if (riftInst && riftTuning) {
+        level = boss.level;
+        // The add wave lands on top of the boss's own output, so BOTH its
+        // auto-attack (via the template transform) and its mechanics (via
+        // mechanicDamageMult below) take the softer addDamageMultiplier, while
+        // its pool rides the trash health line: wave pressure, not extra bosses.
+        addTemplate = riftRankTemplate(template, riftTuning, 'add');
+      }
       const add = createMob(this.nextId++, addTemplate, level, pos);
       applyDungeonMobTuning(add, inst?.dungeonId ?? '', difficulty, { summonedAdd: true });
+      if (riftTuning) {
+        add.mechanicDamageMult = riftTuning.addDamageMultiplier;
+        add.mechanicHealMult = riftTuning.healthMultiplier;
+      }
       // The add is anchored where it ERUPTED (createMob already set spawnPos to the
       // spawn point beside the boss): a boss kited far from HIS original spawn must
       // not hatch adds that are instantly past their own leash and evade home without
@@ -7392,6 +7914,18 @@ export class Sim {
     return this.players.get(pid)?.lastSalvageResult ?? null;
   }
 
+  upgradeRiftItem(itemId: string, pid?: number): RiftForgeResult {
+    return upgradeRiftItemImpl(this.ctx, itemId, pid);
+  }
+
+  enchantRiftItem(itemId: string, stat: string, pid?: number): RiftForgeResult {
+    return enchantRiftItemImpl(this.ctx, itemId, stat, pid);
+  }
+
+  socketRiftGem(itemId: string, gemId: string, pid?: number): RiftForgeResult {
+    return socketRiftGemImpl(this.ctx, itemId, gemId, pid);
+  }
+
   // Enchanting profession commands (IWorldProfessions): same thin-
   // delegate/stash-result/emit shape as salvageItem/craftItem above.
   disenchantItem(
@@ -7530,7 +8064,7 @@ export class Sim {
     const r = this.resolve(pid);
     if (!r) return;
     const { meta, e: p } = r;
-    const zone = zoneAt(p.pos.z);
+    const zone = zoneAt(p.pos.x, p.pos.z);
     const inTown = professionsFocus.isInTownZone(p.pos, zone);
     const result = professionsFocus.setTownFocus(meta.townFocus, allocation, inTown);
     if (!result.ok) {
@@ -7716,6 +8250,19 @@ export class Sim {
     return chatMod.chat(this.ctx, text, pid);
   }
 
+  // Local recovery lives in unstuck.ts. Both the slash command and the direct
+  // Settings wire action enter through the same authoritative system.
+  unstuck(pid?: number): boolean {
+    return unstuckMod.requestUnstuck(this.ctx, pid);
+  }
+
+  cancelUnstuckForDisconnect(
+    pid: number,
+    emitEvent = true,
+  ): unstuckMod.CancelledUnstuckEvent | null {
+    return unstuckMod.cancelPendingUnstuckForDisconnect(this.ctx, pid, emitEvent);
+  }
+
   // PUBLIC (IWorld + server) overhead-emote entry; body moved to social/chat.ts (G2).
   playEmote(emoteId: OverheadEmoteId, pid?: number): void {
     chatMod.playEmote(this.ctx, emoteId, pid);
@@ -7804,7 +8351,16 @@ export class Sim {
     // A Protect Yumi cat is heal/shield-targetable only by its own team.
     if (target.kind === 'mob' && yumiMod.isYumiCat(target))
       return yumiMod.yumiCatFriendlyTo(this.ctx, caster, target);
+    // The dev-gated healer practice dummy is friendly to everyone (no controller
+    // check: it exists so a solo healer has something to heal).
     if (target.kind === 'mob' && target.friendlyPracticeTarget) return true;
+    // An escortee with a live run is heal/shield-targetable by any player or
+    // player-owned pet (pvpController resolves a pet to its owner; escort.ts
+    // owns the predicate). Players can never attack it because isHostileTo
+    // resolves an ownerless mob to its hostile flag, false here.
+    if (target.kind === 'mob' && escortMod.isActiveEscortee(this.ctx, target)) {
+      return this.pvpController(caster) !== null;
+    }
     if (target.kind === 'mob' && target.ownerId !== null) {
       const owner = this.entities.get(target.ownerId);
       return !!owner && owner.kind === 'player' && !this.isHostileTo(caster, owner);
@@ -8874,6 +9430,33 @@ export class Sim {
     inheritDungeonResetLocksImpl(this.ctx, pid);
   }
 
+  // Procedural rift delegates (dev command + interaction click + tick drivers).
+  enterRift(
+    seed: number,
+    baseLevel: number,
+    pid?: number,
+    returnPos?: { x: number; z: number },
+    portal?: Entity,
+  ): void {
+    enterRiftImpl(this.ctx, seed, baseLevel, pid, returnPos, portal);
+  }
+
+  leaveRift(pid?: number): void {
+    leaveRiftImpl(this.ctx, pid);
+  }
+
+  riftOpenTreasure(objectId: number, pid?: number): void {
+    riftOpenTreasureImpl(this.ctx, objectId, pid);
+  }
+
+  private updateRiftTriggers(p: Entity): void {
+    updateRiftTriggersImpl(this.ctx, p);
+  }
+
+  private updateRiftInstances(): void {
+    updateRiftInstancesImpl(this.ctx);
+  }
+
   dungeonDifficulty(pid?: number): DungeonDifficulty {
     const r = this.resolve(pid);
     if (!r) return 'normal';
@@ -9146,6 +9729,7 @@ export class Sim {
       ignoreFences,
       run?.modules,
       mover,
+      this.riftCollisionToken,
     );
     if (!run) return res;
     const clamped = this.clampDelveModuleBounds(run, res.x, res.z, r);
@@ -9156,7 +9740,16 @@ export class Sim {
   private resolveMovePoint(nx: number, nz: number, r: number, e: Entity): { x: number; z: number } {
     const run = isDelvePos(nx) || isDelvePos(e.pos.x) ? this.delveRunForEntity(e) : undefined;
     const mover = e.kind === 'player' ? moverHeight(e) : undefined;
-    const res = resolvePosition(this.cfg.seed, nx, nz, r, false, run?.modules, mover);
+    const res = resolvePosition(
+      this.cfg.seed,
+      nx,
+      nz,
+      r,
+      false,
+      run?.modules,
+      mover,
+      this.riftCollisionToken,
+    );
     if (!run) return res;
     const clamped = this.clampDelveModuleBounds(run, res.x, res.z, r);
     return this.clampDelveDoors(run, clamped.x, clamped.z, r);
@@ -9431,17 +10024,40 @@ export class Sim {
   // never serialized, only visibleCells() inside the fog window is emitted.
   // -------------------------------------------------------------------------
 
+  /** The rift instance the acting player is standing in, or null. Lockpick ops
+   * route to the rift-cache driver when in a rift, else the delve controller (a
+   * player is never in both), so the shared engine/HUD/commands serve both. */
+  private riftInstForPid(pid?: number) {
+    const r = this.ctx.resolve(pid);
+    return r ? riftInstanceAtPos(this.ctx, r.e.pos) : null;
+  }
+
   /** Start a lockpicking attempt: commit an ante (1/2/3 lives = loot tier). */
   lockpickEngage(objectId: number, ante: Ante, pid?: number): void {
+    const inst = this.riftInstForPid(pid);
+    if (inst) {
+      riftLockpickEngageImpl(this.ctx, inst, objectId, ante, pid);
+      return;
+    }
     lockpickMod.lockpickEngage(this.ctx, objectId, ante, pid);
   }
 
   /** Submit one pick action on the player's active attempt (server-authoritative). */
   lockpickAction(action: PickAction, pid?: number, sessionId?: string): void {
+    const inst = this.riftInstForPid(pid);
+    if (inst) {
+      riftLockpickActionImpl(this.ctx, inst, action, pid, sessionId);
+      return;
+    }
     lockpickMod.lockpickAction(this.ctx, action, pid, sessionId);
   }
 
   lockpickAbort(pid?: number, sessionId?: string): void {
+    const inst = this.riftInstForPid(pid);
+    if (inst) {
+      riftLockpickAbortImpl(this.ctx, inst, pid, sessionId);
+      return;
+    }
     lockpickMod.lockpickAbort(this.ctx, pid, sessionId);
   }
 
@@ -9457,6 +10073,8 @@ export class Sim {
 
   /** Read-only projection of the active lockpick attempt for IWorld (offline). */
   lockpickViewFor(pid?: number): LockpickView | null {
+    const inst = this.riftInstForPid(pid);
+    if (inst) return riftLockpickViewForImpl(this.ctx, inst, pid);
     return lockpickMod.lockpickViewFor(this.ctx, pid);
   }
 
@@ -9510,6 +10128,57 @@ export class Sim {
 
   delveDailyWire(pid: number): { date: string; firstClearXp: string[]; markClears: number } {
     return runsMod.delveDailyWire(this.ctx, pid);
+  }
+
+  // The primary player's active procedural Rift floor (offline IWorld read). The
+  // renderer regenerates geometry/style from this descriptor; null outside a rift.
+  get riftFloor(): import('../world_api/dungeons').RiftFloorView | null {
+    // The renderer reads this per frame (camera clamp, per-entity ground
+    // reference): cache the derived view per tick instead of reallocating it
+    // and re-searching riftEvents on every read.
+    if (this.riftFloorViewTick === this.tickCount) return this.riftFloorView;
+    this.riftFloorViewTick = this.tickCount;
+    this.riftFloorView = this.buildRiftFloorView();
+    return this.riftFloorView;
+  }
+
+  private riftFloorViewTick = -1;
+  private riftFloorView: import('../world_api/dungeons').RiftFloorView | null = null;
+
+  private buildRiftFloorView(): import('../world_api/dungeons').RiftFloorView | null {
+    const p = this.entities.get(this.primaryId);
+    if (!p) return null;
+    const inst = riftInstanceAtPos(this.ctx, p.pos);
+    if (!inst || inst.partyKey === null) return null;
+    const floor = generateRiftFloor(inst.seed, inst.baseLevel, inst.floorIndex, inst.upgrade);
+    const event =
+      inst.eventId === null
+        ? null
+        : (this.riftEvents.find((candidate) => candidate.eventId === inst.eventId) ?? null);
+    const contentId = event?.contentId ?? `procedural-v1:${inst.seed}:${inst.baseLevel}`;
+    return {
+      eventId: inst.eventId,
+      instanceId: inst.instanceId,
+      seed: inst.seed,
+      baseLevel: inst.baseLevel,
+      floorIndex: inst.floorIndex,
+      floorCount: inst.floorCount,
+      origin: riftInstanceOrigin(inst.slot, inst.floorIndex),
+      contentId,
+      contentHash: event?.contentHash ?? contentId,
+      upgrade: inst.upgrade,
+      name: floor.name,
+      themeName: floor.themeName,
+      tier: inst.tier,
+    };
+  }
+
+  riftBossDeathZones(): import('../world_api/dungeons').RiftBossDeathZoneView[] {
+    const p = this.entities.get(this.primaryId);
+    if (!p) return [];
+    const inst = riftInstanceAtPos(this.ctx, p.pos);
+    if (!inst || inst.partyKey === null) return [];
+    return inst.bossDeathZones;
   }
 
   get delveRun(): DelveRunInfo | null {

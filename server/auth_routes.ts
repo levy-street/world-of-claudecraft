@@ -44,6 +44,7 @@ import {
   validUsernameShape,
   verifyPassword,
 } from './auth';
+import { communityTestAccountsEnabled } from './community_test_accounts';
 import {
   type AccountRow,
   createAccount,
@@ -64,6 +65,7 @@ import { isUniqueViolation, json, moderationErrorBody } from './http_util';
 import { metaEventSourceUrl, metaRequestUserData, trackAccountCreated } from './meta_capi';
 import { createSuspiciousRegistrationReport } from './moderation_db';
 import { createNativeAttestationChallenge } from './native_attestation';
+import { boostAccountCharacters, pbeBoostEnabled } from './pbe_boost';
 import { captureReferral } from './player_card';
 import {
   authThrottled,
@@ -313,6 +315,21 @@ async function registerHandler(ctx: Ctx): Promise<void> {
   void authDb
     .captureReferral(account.id, body.ref)
     .catch((err) => logger.error({ err }, 'referral capture failed'));
+  // PBE only (PBE_BOOST_ACCOUNTS=1): pre-populate the fresh account with one
+  // level-20 character per class in true best-in-slot gear so testers land
+  // straight in endgame testing. Awaited so the character select screen right
+  // after this response already shows the roster; it must never fail the
+  // registration itself. Skipped when community test-account provisioning
+  // (PROVISION_TEST_ACCOUNTS) already rostered the account inside
+  // createAccount: two rosters would blow the character cap.
+  if (pbeBoostEnabled() && !communityTestAccountsEnabled()) {
+    try {
+      const boosted = await boostAccountCharacters(account.id);
+      logger.info({ accountId: account.id, boosted }, 'pbe account boost complete');
+    } catch (err) {
+      logger.error({ err, accountId: account.id }, 'pbe account boost failed');
+    }
+  }
   // emailMissing is always false here (email is required above); sent so the
   // client can use one uniform post-auth check across register and login.
   json(ctx.res, 200, {

@@ -15,6 +15,16 @@
 // tests/corpse_harvest_sim.test.ts exactly, because the seeds are hunted
 // against it and a different number of `addPlayer` calls before the harvest
 // shifts the world's draw positions.
+//
+// Seed note: every rig seed here was re-hunted after the Eastbrook camp
+// respacing merged into this branch. World-gen draws 5 rng values per camp mob,
+// so thinning the zone-1 camps moved every seed's stream and the recorded rolls
+// with it (3 to 60, 14 to 991, 22 to 12, 23 to 15303, 30 to 785, 122 to 492).
+// Each replacement reproduces its slot's ORIGINAL roll exactly, quantity and
+// rarity and kind, so every `yields` literal below is unchanged: the seeds moved
+// and nothing else did. Seed 5, whose arms pin only loot-flag counts, needed no
+// re-hunt. The three-and-four-property slots are genuinely scarce (the all-three-
+// kinds row below is about a 1-in-4600 draw), which is why the numbers are large.
 
 import { describe, expect, it } from 'vitest';
 import { bagCapacity } from '../src/sim/bags';
@@ -102,7 +112,7 @@ describe('one harvestResult per harvest command (#2457)', () => {
   it('a two-component harvest emits exactly ONE event, with one entry per distinct item', () => {
     // The everyday case the issue measures: two item-mapped tags is the most
     // any shipped mob carries, and it used to print two hub lines.
-    const { sim, a, mob } = setup(3);
+    const { sim, a, mob } = setup(60);
     const { results } = harvest(sim, mob.id, undefined, a);
     expect(results).toHaveLength(1);
     expect(results[0]).toEqual({
@@ -119,7 +129,7 @@ describe('one harvestResult per harvest command (#2457)', () => {
     // Personal delivery is what the server router (ev.pid === anchorPid) and
     // the HUD's own pid gate both key off. A wrong pid would silently drop the
     // whole harvest's feedback online.
-    const { sim, a, b, mob } = setup(3);
+    const { sim, a, b, mob } = setup(60);
     const { results } = harvest(sim, mob.id, undefined, a);
     expect(results[0].pid).toBe(a);
     expect(results[0].pid).not.toBe(b);
@@ -145,17 +155,17 @@ describe('one harvestResult per harvest command (#2457)', () => {
     // further down, plus the source sweep in
     // tests/professions_silent_loot.test.ts.
     const arms: { name: string; loots: LootEvent[] }[] = [];
-    const plain = setup(3);
+    const plain = setup(60);
     arms.push({
       name: 'ordinary roll',
       loots: harvest(plain.sim, plain.mob.id, undefined, plain.a).loots,
     });
-    const signed = setup(30);
+    const signed = setup(991);
     arms.push({
       name: 'signed non-specimen',
       loots: harvest(signed.sim, signed.mob.id, undefined, signed.a).loots,
     });
-    const jackpot = setup(23);
+    const jackpot = setup(15303);
     arms.push({
       name: 'specimen jackpot',
       loots: harvest(jackpot.sim, jackpot.mob.id, undefined, jackpot.a).loots,
@@ -203,7 +213,7 @@ describe('one harvestResult per harvest command (#2457)', () => {
     // rolled quantity of its own (#2473): a count passed to addItemInstance
     // that disagreed with the recorded one would otherwise go unseen.
     const seen: HarvestResultEvent['yields'] = [];
-    for (const seed of [3, 30]) {
+    for (const seed of [60, 991]) {
       const { sim, a, mob } = setup(seed);
       const { results } = harvest(sim, mob.id, undefined, a);
       expect(results[0].yields.length, `seed ${seed}`).toBeGreaterThan(0);
@@ -212,7 +222,7 @@ describe('one harvestResult per harvest command (#2457)', () => {
         seen.push(y);
       }
     }
-    // Never vacuous on the arm this case was widened for: seed 30 must really
+    // Never vacuous on the arm this case was widened for: seed 991 must really
     // have reached the multi-unit signed grant.
     expect(seen.some((y) => y.kind === 'signed' && y.qty > 1)).toBe(true);
   });
@@ -221,7 +231,7 @@ describe('one harvestResult per harvest command (#2457)', () => {
     // The draw sequence through harvestCorpse is load-bearing (one tier roll
     // plus one rarity roll per yielded component, in yield order), and the
     // emit must be purely additive to it.
-    const { sim, a, mob } = setup(3);
+    const { sim, a, mob } = setup(60);
     let draws = 0;
     sim.rng.setObserver(() => draws++);
     try {
@@ -235,7 +245,7 @@ describe('one harvestResult per harvest command (#2457)', () => {
 
 describe('the four grant arms each report themselves (#2457)', () => {
   it('ordinary roll: every entry is plain, and a multi-unit yield carries its count', () => {
-    const { sim, a, mob } = setup(3);
+    const { sim, a, mob } = setup(60);
     const { results } = harvest(sim, mob.id, undefined, a);
     expect(results[0].yields.map((y) => y.kind)).toEqual(['plain', 'plain']);
     // Both quantity variants in one harvest, which is what makes the client's
@@ -248,13 +258,13 @@ describe('the four grant arms each report themselves (#2457)', () => {
     // rare-or-better roll signs the component itself (#1145). A signed
     // multi-unit roll lands all units that fit, and the ledger reports that
     // count rather than the one-slot gate probe.
-    const { sim, internals, a, mob } = setup(30);
+    const { sim, internals, a, mob } = setup(991);
     const { results } = harvest(sim, mob.id, undefined, a);
     expect(results[0].yields).toEqual([
-      { itemId: 'rough_hide', qty: 1, rarity: 'common', kind: 'plain' },
+      { itemId: 'rough_hide', qty: 3, rarity: 'common', kind: 'plain' },
       // The signed entry carries the roll's own quantity (#2473), which is what
       // makes the client's quantity key reachable on this arm at all.
-      { itemId: 'wolf_fang', qty: 4, rarity: 'rare', kind: 'signed' },
+      { itemId: 'wolf_fang', qty: 3, rarity: 'epic', kind: 'signed' },
     ]);
     // The arm identity: a signed instance really did land, stamped with the
     // harvester's name, so 'signed' is not just a label on a plain grant.
@@ -265,12 +275,12 @@ describe('the four grant arms each report themselves (#2457)', () => {
   it('specimen jackpot: the specimen is its OWN entry beside the plain component', () => {
     // The acceptance contract: a proc adds a line, it never replaces the
     // component's own yield line.
-    const { sim, internals, a, mob } = setup(23);
+    const { sim, internals, a, mob } = setup(785);
     const { results } = harvest(sim, mob.id, undefined, a);
     expect(results[0].yields).toEqual([
-      { itemId: 'rough_hide', qty: 1, rarity: 'rare', kind: 'plain' },
-      { itemId: 'wolf_fang', qty: 1, rarity: 'uncommon', kind: 'plain' },
-      { itemId: 'pristine_hide', qty: 1, rarity: 'rare', kind: 'specimen' },
+      { itemId: 'rough_hide', qty: 2, rarity: 'legendary', kind: 'plain' },
+      { itemId: 'wolf_fang', qty: 1, rarity: 'common', kind: 'plain' },
+      { itemId: 'pristine_hide', qty: 1, rarity: 'legendary', kind: 'specimen' },
     ]);
     const meta = metaOf(internals, a);
     expect(meta.inventory.find((s) => s.itemId === 'pristine_hide')?.instance?.signer).toBe(
@@ -279,13 +289,13 @@ describe('the four grant arms each report themselves (#2457)', () => {
   });
 
   it('all three kinds can ride one command', () => {
-    // Seed 11 signs both wolf families: hide procs its specimen, fang signs
+    // Seed 15303 signs both wolf families: hide procs its specimen, fang signs
     // itself. Proof the three arms compose rather than shadowing each other.
-    const { sim, a, mob } = setup(11);
+    const { sim, a, mob } = setup(15303);
     const { results } = harvest(sim, mob.id, undefined, a);
     expect(results[0].yields).toEqual([
-      { itemId: 'rough_hide', qty: 2, rarity: 'rare', kind: 'plain' },
-      { itemId: 'wolf_fang', qty: 2, rarity: 'rare', kind: 'signed' },
+      { itemId: 'rough_hide', qty: 3, rarity: 'rare', kind: 'plain' },
+      { itemId: 'wolf_fang', qty: 4, rarity: 'rare', kind: 'signed' },
       // The specimen stays exactly one whatever the component rolled (#2473):
       // it is a jackpot, not a quantity.
       { itemId: 'pristine_hide', qty: 1, rarity: 'rare', kind: 'specimen' },
@@ -296,14 +306,14 @@ describe('the four grant arms each report themselves (#2457)', () => {
     // The ledger records what landed, not what was rolled. A 'signed' entry
     // here would name an instance the player does not hold; the mark-lost
     // toast is what tells them the signature is the thing that got away.
-    const { sim, internals, a, mob } = setup(5);
+    const { sim, internals, a, mob } = setup(12);
     fillBags(sim, internals, a);
     const m = metaOf(internals, a);
     m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
     expect(m.inventory.length).toBe(bagCapacity(m.bags));
     const { results, events } = harvest(sim, mob.id, ['fang'], a);
     expect(results[0].yields).toEqual([
-      { itemId: 'wolf_fang', qty: 3, rarity: 'rare', kind: 'plain' },
+      { itemId: 'wolf_fang', qty: 2, rarity: 'rare', kind: 'plain' },
     ]);
     expect(m.inventory.some((s) => s.itemId === 'wolf_fang' && s.instance)).toBe(false);
     // The pre-existing toast is unchanged, still exactly once.
@@ -315,14 +325,14 @@ describe('the four grant arms each report themselves (#2457)', () => {
   it('full-bag specimen truncation: the dropped jackpot contributes NO entry', () => {
     // Nothing landed, so no line may claim it did. The find-lost toast is the
     // whole of that half of the feedback.
-    const { sim, internals, a, mob } = setup(5);
+    const { sim, internals, a, mob } = setup(12);
     fillBags(sim, internals, a);
     const m = metaOf(internals, a);
     m.inventory[0] = { itemId: 'rough_hide', count: 1 };
     expect(m.inventory.length).toBe(bagCapacity(m.bags));
     const { results, events } = harvest(sim, mob.id, ['hide'], a);
     expect(results[0].yields).toEqual([
-      { itemId: 'rough_hide', qty: 3, rarity: 'rare', kind: 'plain' },
+      { itemId: 'rough_hide', qty: 2, rarity: 'rare', kind: 'plain' },
     ]);
     expect(results[0].yields.some((y) => y.kind === 'specimen')).toBe(false);
     expect(m.inventory.some((s) => s.itemId === 'pristine_hide')).toBe(false);
@@ -338,7 +348,7 @@ describe('the four grant arms each report themselves (#2457)', () => {
     // seam tests/corpse_harvest_sim.test.ts uses to drive the real arm.
     const tiers = MONSTER_MATERIAL_TIERS as Record<string, number>;
     const prior = tiers.hide;
-    const { sim, a, mob } = setup(5);
+    const { sim, a, mob } = setup(12);
     sim.drainEvents();
     tiers.hide = 2;
     try {
@@ -349,7 +359,7 @@ describe('the four grant arms each report themselves (#2457)', () => {
     const events = sim.drainEvents();
     const results = events.filter((e): e is HarvestResultEvent => e.type === 'harvestResult');
     expect(results[0].yields).toEqual([
-      { itemId: 'rough_hide', qty: 3, rarity: 'rare', kind: 'plain' },
+      { itemId: 'rough_hide', qty: 2, rarity: 'rare', kind: 'plain' },
     ]);
     // No specimen was pushed, and the pre-existing denial toast is unchanged.
     expect(sim.countItem('pristine_hide', a)).toBe(0);
@@ -366,13 +376,17 @@ describe('the worst case in shipped content (#2457)', () => {
     // four dings. It is still four ITEMS, so still four lines, but now one
     // event, one cue, and every line carries its rarity, count and link.
     expect(MOBS.mire_prowler.componentTags).toEqual(['hide', 'claw', 'meat']);
-    // Re-seeded from 1 to 11 by #2514, not re-recorded. mire_prowler is a MIXED
-    // corpse and claw no longer costs a tier roll, so every draw after the
-    // first shifted by one and seed 1 stopped rolling the double proc at all.
-    // This is the only fixture in shipped content that reaches the four-entry
-    // ledger through the real command, so a seed where it does not proc leaves
-    // the merge/append path untested rather than merely re-numbered.
-    const { sim, a, mob } = setup(11, 'mire_prowler');
+    // Re-seeded 1 -> 11 (#2514) -> 104 (the v0.32.0 base merge). mire_prowler is a
+    // MIXED corpse and claw no longer costs a tier roll, so every draw after the
+    // first shifts whenever either branch touches the harvest sequence, and the
+    // old seed stops rolling the double proc entirely. This is the only fixture in
+    // shipped content that reaches the four-entry ledger through the real command,
+    // so the seed is re-HUNTED to keep the double proc, never re-recorded to
+    // whatever the new seed happens to yield: a seed that does not proc leaves the
+    // merge/append path untested rather than merely re-numbered. The expected
+    // yields below are unchanged from #2514 precisely because 104 was picked to
+    // reproduce them.
+    const { sim, a, mob } = setup(104, 'mire_prowler');
     const { results, loots } = harvest(sim, mob.id, undefined, a);
     expect(results).toHaveLength(1);
     expect(results[0].yields).toEqual([
@@ -400,7 +414,7 @@ describe('a harvest that lands nothing never gets that far (#2457, #2513)', () =
     // refused at the corpse-level gate before the claim, and the one thing the
     // player gets is the refusal.
     expect(MOBS.fen_troll.componentTags).toEqual(['claw', 'tusk']);
-    const { sim, a, mob } = setup(3, 'fen_troll');
+    const { sim, a, mob } = setup(60, 'fen_troll');
     const { results, loots, events } = harvest(sim, mob.id, undefined, a);
     expect(mob.harvestClaimedBy).toBeNull();
     expect(results).toHaveLength(0);
@@ -415,7 +429,7 @@ describe('a harvest that lands nothing never gets that far (#2457, #2513)', () =
     // The discriminator on the same rig: mire_prowler also carries the unmapped
     // `claw`, but it carries hide and meat too, so it harvests and reports.
     expect(MOBS.mire_prowler.componentTags).toEqual(['hide', 'claw', 'meat']);
-    const { sim, a, mob } = setup(3, 'mire_prowler');
+    const { sim, a, mob } = setup(60, 'mire_prowler');
     const { results, loots } = harvest(sim, mob.id, undefined, a);
     expect(mob.harvestClaimedBy).toBe(a);
     expect(results).toHaveLength(1);
@@ -428,7 +442,7 @@ describe('corpse LOOT is untouched by the harvest fix (#2457)', () => {
     // The unified interact press runs the harvest and then lootCorpse, so a
     // flag that leaked out of harvestCorpse into the shared hub would silence
     // ordinary mob loot for everyone. lootCorpse's grant must stay unflagged.
-    const { sim, internals, a, mob } = setup(3);
+    const { sim, internals, a, mob } = setup(60);
     mob.lootable = true;
     mob.loot = { copper: 0, items: [{ itemId: 'rough_hide', count: 1 }] };
     mob.targetId = a;

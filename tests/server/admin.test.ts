@@ -747,6 +747,128 @@ describe('page/limit pagination contract', () => {
       error: null,
     });
   });
+
+  it('unstuck-reports returns bounded cursor rows and content-local hotspots', async () => {
+    const listUnstuckReports = vi.fn(async () => ({
+      rows: [
+        {
+          id: 9,
+          realm: 'test',
+          accountId: 4,
+          characterId: 5,
+          characterName: 'Aleph',
+          areaKind: 'rift',
+          areaId: 'seed:42:floor:1',
+          instanceId: '7',
+          instanceSlot: 2,
+          originRawX: 100,
+          originRawY: 3,
+          originRawZ: 200,
+          originLocalX: 4,
+          originLocalY: 3,
+          originLocalZ: 8,
+          destinationRawX: 101,
+          destinationRawY: 3,
+          destinationRawZ: 200,
+          destinationLocalX: 5,
+          destinationLocalY: 3,
+          destinationLocalZ: 8,
+          outcome: 'completed',
+          reason: 'nearest_safe_position',
+          invokedAt: '2026-01-01T00:00:00.000Z',
+          resolvedAt: '2026-01-01T00:00:10.000Z',
+          createdAt: '2026-01-01T00:00:10.000Z',
+        },
+      ],
+      hasMore: true,
+      nextBeforeId: 9,
+    }));
+    const listUnstuckHotspots = vi.fn(async () => [
+      {
+        areaKind: 'rift',
+        areaId: 'seed:42:floor:1',
+        instanceId: null,
+        bucketLocalX: 0,
+        bucketLocalY: 0,
+        bucketLocalZ: 5,
+        reportCount: 3,
+        completedCount: 1,
+        cancelledCount: 1,
+        failedCount: 1,
+        firstInvokedAt: '2026-01-01T00:00:00.000Z',
+        lastResolvedAt: '2026-01-02T00:00:00.000Z',
+      },
+    ]);
+    authedAdminDb({ listUnstuckReports, listUnstuckHotspots });
+    installAdminRuntime();
+
+    const r = await runRoute('GET', '/admin/api/unstuck-reports', {
+      url: '/admin/api/unstuck-reports?days=999&limit=999',
+      headers: { authorization: BEARER },
+    });
+
+    expect(listUnstuckReports).toHaveBeenCalledWith(
+      expect.objectContaining({ days: 90, limit: 200 }),
+    );
+    expect(listUnstuckHotspots).toHaveBeenCalledWith(
+      expect.objectContaining({ days: 90, limit: 50 }),
+    );
+    expect(r.body).toMatchObject({
+      success: true,
+      data: {
+        reports: [
+          {
+            id: 9,
+            characterName: 'Aleph',
+            area: { kind: 'rift', id: 'seed:42:floor:1', instanceId: '7', slot: 2 },
+            origin: { x: 100, y: 3, z: 200, localX: 4, localY: 3, localZ: 8 },
+            destination: { x: 101, y: 3, z: 200, localX: 5, localY: 3, localZ: 8 },
+            outcome: 'completed',
+          },
+        ],
+        hotspots: [
+          {
+            bucket: { x: 0, y: 0, z: 5 },
+            count: 3,
+            completed: 1,
+            cancelled: 1,
+            failed: 1,
+          },
+        ],
+        days: 90,
+        limit: 200,
+        hasMore: true,
+        nextBeforeId: 9,
+      },
+      error: null,
+    });
+  });
+
+  it('unstuck-reports skips the hotspot aggregate on cursor pages', async () => {
+    const listUnstuckReports = vi.fn(async () => ({
+      rows: [],
+      hasMore: false,
+      nextBeforeId: null,
+    }));
+    const listUnstuckHotspots = vi.fn(async () => []);
+    authedAdminDb({ listUnstuckReports, listUnstuckHotspots });
+    installAdminRuntime();
+
+    const r = await runRoute('GET', '/admin/api/unstuck-reports', {
+      url: '/admin/api/unstuck-reports?days=14&limit=25&beforeId=9',
+      headers: { authorization: BEARER },
+    });
+
+    expect(listUnstuckReports).toHaveBeenCalledWith(
+      expect.objectContaining({ days: 14, limit: 25, beforeId: 9 }),
+    );
+    expect(listUnstuckHotspots).not.toHaveBeenCalled();
+    expect(r.body).toMatchObject({
+      success: true,
+      data: { reports: [], hotspots: [], hasMore: false, nextBeforeId: null },
+      error: null,
+    });
+  });
 });
 
 // ---------------------------------------------------------------------------

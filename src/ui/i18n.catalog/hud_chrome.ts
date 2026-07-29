@@ -38,6 +38,40 @@ export const hudChromeStrings = {
     healerConfirmAccept: 'Revive Me',
     healerConfirmCancel: 'Cancel',
   },
+  // Countdown-to-graveyard recovery. Stable event phases/reasons come from the
+  // authoritative sim; new semantics use new keys so stale safe-spot translations
+  // cannot be shown while locale fills catch up.
+  unstuck: {
+    menuButton: 'Unstuck',
+    help: 'Recovery: /unstuck starts a stationary countdown to move you to a nearby reachable safe spot.',
+    helpAtGraveyard:
+      "Recovery: /unstuck starts a stationary countdown, then sends your spirit to the nearest graveyard. Returning through the Pale Keeper requires The Keeper's Toll.",
+    started:
+      'Unstuck in {seconds} seconds. Moving, fighting, taking damage, or starting another action cancels it.',
+    countdown: 'Unstuck: {seconds}',
+    completed: 'Moved to the nearest reachable safe spot.',
+    completedAtGraveyard:
+      "Your spirit has returned to the nearest graveyard. Speak to the Pale Keeper to accept The Keeper's Toll.",
+    revivedAtGraveyard:
+      "You have been returned to the nearest graveyard and revived. The Keeper's Toll weighs on you.",
+    cancelledMoved: 'Unstuck cancelled because you moved.',
+    cancelledDamaged: 'Unstuck cancelled because you took damage.',
+    cancelledCombat: 'Unstuck cancelled because you entered combat.',
+    cancelledBusy: 'Unstuck cancelled because you started another action.',
+    cancelledState: 'Unstuck cancelled because your state changed.',
+    cancelledDisconnected: 'Unstuck cancelled because you disconnected.',
+    noSafePosition: 'No reachable safe spot was found nearby. You were not moved.',
+    alreadyActive: 'Unstuck is already counting down.',
+    alreadySafe: 'You are already in a safe, reachable position.',
+    cooldown: 'Unstuck will be ready in {seconds} seconds.',
+    dead: 'You cannot use Unstuck while dead or in spirit form.',
+    combat: 'You cannot use Unstuck during combat.',
+    controlled: 'You cannot use Unstuck while movement is impaired.',
+    standStill: 'Stand still on solid ground before using Unstuck.',
+    standStillAnywhere: 'Stand still before using Unstuck.',
+    busy: 'Finish your current action before using Unstuck.',
+    unavailable: 'Unstuck is unavailable in your current state.',
+  },
   // Floating combat text self-notes (proc consume labels, absorb readout).
   fct: {
     absorbed: 'Absorbed {amount}',
@@ -413,6 +447,7 @@ export const hudChromeStrings = {
     leaderboard: 'Ranks',
     dailyRewards: 'Store',
     deeds: 'Deeds',
+    mounts: 'Mounts',
     professions: 'Professions',
     nameplates: 'Names',
     haptics: 'Haptics',
@@ -644,6 +679,89 @@ export const hudChromeStrings = {
     petTaunt: 'Pet: Taunt',
     petDefensive: 'Pet: Defensive',
     petAggressive: 'Pet: Aggressive',
+    // Rideable mounts: the Z toggle (opens the stable while nothing is picked).
+    mount: 'Mount / Dismount',
+  },
+  // The character sheet's mount picker (mount_picker.ts; the old Mounts window
+  // is retired, its keys stay per the retired-but-translated chrome precedent).
+  // Names and descriptions come from the reference cards
+  // (src/sim/content/mounts.ts carries the canonical English names for the sim
+  // side); clickManage is the bag tooltip hint on a collected reins item.
+  mounts: {
+    title: 'Mounts',
+    close: 'Close',
+    select: 'Select',
+    selected: 'Selected',
+    riding: 'Riding',
+    mount: 'Mount',
+    dismount: 'Dismount',
+    // Reins are usable items: the bag tooltip tells the player to use them. There
+    // is no per-mount level gate and no picker, so the old requiresLevel /
+    // pickFirst / keybindHint lines went with them.
+    useToRide: 'Use to summon this mount.',
+    // The empty state, shown when the player owns no mount yet: a heading plus
+    // how to earn a first one (the stablemaster's riding lessons) and the rarer
+    // boss-drop mounts.
+    emptyTitle: 'No mounts collected',
+    emptyStableHint:
+      'Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.',
+    emptyDropHint: 'Rarer mounts drop from heroic dungeon bosses and Rift completions.',
+    clickManage: 'Click to choose your mount',
+    rarity_common: 'Common',
+    rarity_rare: 'Rare',
+    rarity_epic: 'Epic',
+    spec_speed: '+{pct}% extra mobility',
+    name_valorsteed: 'Valorsteed',
+    name_grag_bear: 'Goliath Grag-Bear',
+    name_stalkglider_snail: 'Moss-Shell Stalk-Glider',
+    name_aether_hover_cycle: 'Aether-Jouster Hover-Cycle',
+    name_shadowjump_toad: 'Kama-Kage the Shadow-Jump Toad',
+    name_stormfeather_griffin: 'Sky-Reach Stormfeather',
+    name_thunderstrut_gobbler: 'Thunderstrut the Grand Gobbler',
+    desc_valorsteed: 'A hardy, sure-footed steed that provides enhanced travel speed.',
+    desc_grag_bear: 'A hardy, sure-footed bear that provides enhanced travel speed.',
+    desc_stalkglider_snail: 'A hearty, slow-burning snail that provides enhanced travel speed.',
+    desc_aether_hover_cycle:
+      'A powerful magitech bike designed for swift, low-hovering combat traversal.',
+    desc_shadowjump_toad:
+      'A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.',
+    desc_stormfeather_griffin:
+      'A regal storm griffin that stalks the ground on rune-shod talons, wings furled.',
+    desc_thunderstrut_gobbler:
+      'A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead.',
+  },
+  // The riding lesson at the Highwatch stables (q_riding_lessons): Stablemaster
+  // Marla lends the player a training Valorsteed for the paddock race. Finishing
+  // the course succeeds the lesson. Sim-side gameplay lives in
+  // src/sim/mounts_training.ts. mountPrompt is retained for the legacy command;
+  // the current flow starts on the glowing race platform.
+  mountTraining: {
+    mountPrompt: 'Press {key} to mount the training Valorsteed.',
+    // Shown once the riding lesson is turned in and the reward reins land in the
+    // bags. It must teach the ITEM, not a keybind: summoning your own mount is a
+    // bag / action-bar click now.
+    ownedMountPrompt: 'Your reins are in your bags. Use them to ride.',
+    ridePrompt: 'Follow the glowing marker to the start line, then press Start Race.',
+    begin: 'Begin Lesson',
+    success: 'You have tamed the Valorsteed.',
+    returnToMarla: 'Return to Marla at the stables to buy your Valorsteed reins for 10g.',
+  },
+  // The show-jumping race in the stables paddock (src/sim/mount_race.ts): ride to
+  // the glowing platform and press Start Race, watch the countdown, then clear
+  // every jump (in any order) and ride back through the arch in time. countdown/
+  // go are the center-screen count; startButton is the button; start/finished/
+  // timeout are the banners; timeLeft is the bottom strip's only text.
+  // {seconds} is a formatNumber-rendered count.
+  mountRace: {
+    startButton: 'Start Race',
+    cancelButton: 'Cancel Race',
+    go: 'GO!',
+    start: 'Go! Clear every jump, then ride back through the arch.',
+    toFinish: 'Ride back through the arch!',
+    finished: 'Finished in {seconds}s!',
+    timeout: 'Race Failed',
+    progress: 'Gates {n} of {total}',
+    timeLeft: '{seconds}s',
   },
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md): the queue window,
   // the persistent indicator button, the in-match score strip, and the event
@@ -1598,6 +1716,7 @@ export const hudChromeStrings = {
     filterConsumable: 'Consumables',
     filterMaterial: 'Materials',
     filterQuest: 'Quest',
+    filterMount: 'Mounts',
     sortAria: 'Sort bag items',
     sortRecent: 'Recent',
     sortQuality: 'Quality',
@@ -1893,6 +2012,9 @@ export const hudChromeStrings = {
   // through formatNumber.
   itemTooltip: {
     requiresLevel: 'Requires Level {level}',
+    riftTier: '{tier}-rank Rift item',
+    riftUpgrade: 'Rift upgrade {level}/{max}',
+    riftSockets: 'Rift gems {used}/{total}',
     // The enchant-attributed sibling of itemUi.tooltip.stat, rendered on the
     // share of a per-copy bonus stat that an applied enchant granted
     // (item_instance_tooltip.ts instanceBonusStatLines). It replaced the old
@@ -3200,5 +3322,19 @@ export const hudChromeStrings = {
     // placement around the name live HERE so a locale owns both. Non-wordy
     // after placeholder strip, so no forced non-Latin fills.
     titledName: '{name} [{title}]',
+  },
+  // World map continent overview (right-click the map, or the level-toggle
+  // button, to zoom out to the whole world; click a region to open its zone map).
+  continentMap: {
+    title: 'World Map',
+    // aria-live summary announced when the overview opens.
+    summary: 'World map. Choose a zone to open its map.',
+    // Level-toggle button visible text per level (the accessible name too). The
+    // static aria/title is generic so it never needs a per-level setAttribute.
+    toWorld: 'World map',
+    toZone: 'Zone map',
+    toggleAria: 'Switch between the world map and the zone map',
+    // Hover tooltip over a zone region: its name plus the suggested level band.
+    levels: 'Levels {min} to {max}',
   },
 };

@@ -13,6 +13,7 @@ export const BAG_CATEGORIES = [
   'consumable',
   'material',
   'quest',
+  'mount',
 ] as const;
 export const BAG_SORTS = ['recent', 'quality', 'name'] as const;
 
@@ -69,6 +70,8 @@ export function matchesCategory(item: ItemDef, category: BagCategory): boolean {
       return item.kind === 'junk' || item.kind === 'tool';
     case 'quest':
       return item.kind === 'quest';
+    case 'mount':
+      return item.kind === 'mount';
   }
 }
 

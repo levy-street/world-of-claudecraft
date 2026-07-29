@@ -1118,6 +1118,9 @@ describe('POST /api/auth/discord/login/new', () => {
       status: 409,
       data: { error: 'already_linked', code: 'discord.already_linked' },
     });
+    expect(
+      dbMock.query.mock.calls.some((call) => String(call[0]).includes('DELETE FROM accounts')),
+    ).toBe(true);
   });
 
   it('provisions a password-less account, links it, and returns a session', async () => {

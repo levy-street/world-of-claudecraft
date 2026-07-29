@@ -47,7 +47,9 @@ describe('mob disarm ("Disarming Smash")', () => {
     p.hp = 100000;
     const mob = spawnCrusher(sim, p);
     MOBS['ogre_crusher'].disarm!.chance = 1; // deterministic for the test
-    swing(sim, mob, p);
+    // the swing itself can miss on the hit table (rng-stream dependent):
+    // keep swinging until one lands (chance 1 disarms on any landed hit)
+    for (let i = 0; i < 12 && !p.auras.some((a) => a.kind === 'disarm'); i++) swing(sim, mob, p);
     MOBS['ogre_crusher'].disarm!.chance = 0.25;
     const aura = p.auras.find((a) => a.kind === 'disarm');
     expect(aura).toBeTruthy();
@@ -89,10 +91,13 @@ describe('mob disarm ("Disarming Smash")', () => {
     (sim as any).updatePlayerAutoAttack(p, meta);
     expect(dummy.hp).toBe(before); // no swing while disarmed
 
-    // Weapon recovered: the same ready swing now lands.
+    // Weapon recovered: the same ready swing now lands (retry past hit-table
+    // misses, which are rng-stream dependent).
     p.auras = p.auras.filter((a) => a.kind !== 'disarm');
-    p.swingTimer = 0;
-    (sim as any).updatePlayerAutoAttack(p, meta);
+    for (let i = 0; i < 12 && dummy.hp >= before; i++) {
+      p.swingTimer = 0;
+      (sim as any).updatePlayerAutoAttack(p, meta);
+    }
     expect(dummy.hp).toBeLessThan(before);
   });
 

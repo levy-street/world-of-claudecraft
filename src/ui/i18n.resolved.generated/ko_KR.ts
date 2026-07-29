@@ -336,6 +336,33 @@ export const ko_KR: EnTranslations = {
       "healerConfirmAccept": "부활",
       "healerConfirmCancel": "취소"
     },
+    "unstuck": {
+      "menuButton": "갇힘 탈출",
+      "help": "탈출: /unstuck은 제자리에서 카운트다운을 시작한 뒤 주변의 도달 가능한 안전한 위치로 이동합니다.",
+      "helpAtGraveyard": "탈출: /unstuck은 제자리에서 카운트다운을 시작하고, 완료되면 영혼을 가장 가까운 묘지로 보냅니다. 되살아나려면 영혼 치유사에게서 수호자의 대가를 받아야 합니다.",
+      "started": "{seconds}초 후 탈출합니다. 이동, 전투, 피해를 받거나 다른 행동을 시작하면 취소됩니다.",
+      "countdown": "갇힘 탈출: {seconds}",
+      "completed": "도달할 수 있는 가장 가까운 안전한 위치로 이동했습니다.",
+      "completedAtGraveyard": "영혼이 가장 가까운 묘지로 돌아왔습니다. 영혼 치유사에게 말을 걸어 수호자의 대가를 받으세요.",
+      "revivedAtGraveyard": "가장 가까운 묘지로 옮겨져 부활했습니다. 수호자의 대가가 당신을 짓누릅니다.",
+      "cancelledMoved": "이동해서 갇힘 탈출이 취소되었습니다.",
+      "cancelledDamaged": "피해를 받아 갇힘 탈출이 취소되었습니다.",
+      "cancelledCombat": "전투에 진입해 갇힘 탈출이 취소되었습니다.",
+      "cancelledBusy": "다른 행동을 시작해 갇힘 탈출이 취소되었습니다.",
+      "cancelledState": "상태가 바뀌어 갇힘 탈출이 취소되었습니다.",
+      "cancelledDisconnected": "연결이 끊겨서 갇힘 탈출이 취소되었습니다.",
+      "noSafePosition": "주변에 도달할 수 있는 안전한 위치가 없습니다. 이동하지 않았습니다.",
+      "alreadyActive": "갇힘 탈출 카운트다운이 이미 진행 중입니다.",
+      "alreadySafe": "이미 안전하고 접근 가능한 위치에 있습니다.",
+      "cooldown": "{seconds}초 후 갇힘 탈출을 다시 사용할 수 있습니다.",
+      "dead": "죽었거나 영혼 상태일 때는 갇힘 탈출을 사용할 수 없습니다.",
+      "combat": "전투 중에는 갇힘 탈출을 사용할 수 없습니다.",
+      "controlled": "이동이 제한된 동안에는 갇힘 탈출을 사용할 수 없습니다.",
+      "standStill": "단단한 지면에 멈춰 선 뒤 갇힘 탈출을 사용하세요.",
+      "standStillAnywhere": "제자리에 멈춘 뒤 갇힘 탈출을 사용하세요.",
+      "busy": "현재 행동을 끝낸 뒤 갇힘 탈출을 사용하세요.",
+      "unavailable": "현재 상태에서는 갇힘 탈출을 사용할 수 없습니다."
+    },
     "fct": {
       "absorbed": "{amount} 흡수",
       "cheap": "비용 감소!"
@@ -775,6 +802,7 @@ export const ko_KR: EnTranslations = {
       "leaderboard": "순위",
       "dailyRewards": "상점",
       "deeds": "업적",
+      "mounts": "탈것",
       "professions": "전문 기술",
       "nameplates": "이름표",
       "haptics": "진동",
@@ -896,7 +924,59 @@ export const ko_KR: EnTranslations = {
       "petStop": "펫: 정지",
       "petTaunt": "펫: 도발",
       "petDefensive": "펫: 방어",
-      "petAggressive": "펫: 공격적"
+      "petAggressive": "펫: 공격적",
+      "mount": "탑승 / 하차"
+    },
+    "mounts": {
+      "title": "탈것",
+      "close": "닫기",
+      "select": "선택",
+      "selected": "선택됨",
+      "riding": "탑승 중",
+      "mount": "탑승",
+      "dismount": "내리기",
+      "useToRide": "사용하여 이 탈것을 소환합니다.",
+      "emptyTitle": "보유한 탈것 없음",
+      "emptyStableHint": "20레벨을 달성한 뒤 하이워치 서쪽 마구간에서 마구간지기 마를라에게 승마를 배우세요.",
+      "emptyDropHint": "더 희귀한 탈것은 영웅 던전 우두머리나 균열 완료를 통해 얻을 수 있습니다.",
+      "clickManage": "클릭하여 탈것 선택",
+      "rarity_common": "일반",
+      "rarity_rare": "희귀",
+      "rarity_epic": "서사",
+      "spec_speed": "+{pct}% 추가 기동력",
+      "name_valorsteed": "발러스티드",
+      "name_grag_bear": "골리앗 그라그곰",
+      "name_stalkglider_snail": "이끼껍질 활공달팽이",
+      "name_aether_hover_cycle": "에테르 기사 호버사이클",
+      "name_shadowjump_toad": "그림자 도약 두꺼비 카마카게",
+      "name_stormfeather_griffin": "하늘닿이 폭풍깃",
+      "name_thunderstrut_gobbler": "천둥활보 대왕 칠면조",
+      "desc_valorsteed": "여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.",
+      "desc_grag_bear": "여행 속도를 높여 주는 튼튼하고 발이 안정된 곰입니다.",
+      "desc_stalkglider_snail": "여행 속도를 높여 주는 끈질기고 느긋한 달팽이입니다.",
+      "desc_aether_hover_cycle": "낮게 떠서 빠르게 전장을 가로지르도록 설계된 강력한 마도 바이크입니다.",
+      "desc_shadowjump_toad": "어떤 지형이든 번개 같은 그림자 도약으로 누비도록 훈련된 거대한 두꺼비입니다.",
+      "desc_stormfeather_griffin": "룬 발톱으로 땅을 누비는 위엄 있는 폭풍 그리핀입니다. 날개는 접혀 있습니다.",
+      "desc_thunderstrut_gobbler": "깨어나는 봉우리에서 꼬리깃을 뇌운처럼 펼친 채 활보하며 내려오는, 폭풍이 낳은 거대한 칠면조입니다."
+    },
+    "mountTraining": {
+      "mountPrompt": "{key} 키를 눌러 훈련용 발러스티드에 탑승한다.",
+      "ownedMountPrompt": "고삐가 가방에 있습니다. 사용하면 탈 수 있습니다.",
+      "ridePrompt": "빛나는 표식을 따라 출발선으로 간 뒤 레이스 시작을 누르세요.",
+      "begin": "수업 시작",
+      "success": "발러스티드를 길들였다.",
+      "returnToMarla": "마구간의 마를라에게 돌아가 발러스티드 고삐를 10골드에 구매하세요."
+    },
+    "mountRace": {
+      "startButton": "레이스 시작",
+      "cancelButton": "경기 취소",
+      "go": "GO!",
+      "start": "출발! 모든 장애물을 뛰어넘고 아치로 돌아가 통과하라.",
+      "toFinish": "아치로 돌아가 통과하라!",
+      "finished": "{seconds}초 만에 완주!",
+      "timeout": "레이스 실패",
+      "progress": "장애물 {n} / {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "베일 컵",
@@ -1566,6 +1646,7 @@ export const ko_KR: EnTranslations = {
       "filterConsumable": "소모품",
       "filterMaterial": "재료",
       "filterQuest": "퀘스트",
+      "filterMount": "탈것",
       "sortAria": "가방 아이템 정렬",
       "sortRecent": "최근",
       "sortQuality": "품질",
@@ -1783,6 +1864,9 @@ export const ko_KR: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "필요 레벨 {level}",
+      "riftTier": "{tier} 등급 균열 아이템",
+      "riftUpgrade": "균열 강화 {level}/{max}",
+      "riftSockets": "균열 보석 {used}/{total}",
       "statEnchanted": "+{value} {stat} (마법부여)",
       "enchantedFallback": "마법부여됨"
     },
@@ -2720,6 +2804,14 @@ export const ko_KR: EnTranslations = {
       "lbEmpty": "아직 순위에 오른 연대기 작가가 없습니다.",
       "broadcastsLabel": "업적 달성을 길드와 친구에게 공유",
       "titledName": "{name} [{title}]"
+    },
+    "continentMap": {
+      "title": "세계 지도",
+      "summary": "세계 지도. 지역을 선택하면 해당 지도가 열립니다.",
+      "toWorld": "세계 지도",
+      "toZone": "Zone map",
+      "toggleAria": "세계 지도와 지역 지도 전환",
+      "levels": "레벨 {min}부터 {max}까지"
     }
   },
   "gatherEvent": {
@@ -2948,7 +3040,17 @@ export const ko_KR: EnTranslations = {
         "marshName": "진흙늪 습지",
         "marshBlurb": "가라앉은 늪지와 조수에 닳은 폐허, 진흙지느러미를 비롯한 더한 것들의 보금자리.",
         "peaksName": "가시봉우리 고원",
-        "peaksBlurb": "왕국에서 가장 차가운 위험을 향해 솟아오른, 바람에 깎인 능선."
+        "peaksBlurb": "왕국에서 가장 차가운 위험을 향해 솟아오른, 바람에 깎인 능선.",
+        "duskName": "장막의 골짜기",
+        "duskBlurb": "산맥 아래 봉인된 세계. 들어가는 길이 있다는 소문이 사실이라면.",
+        "emberName": "드레이크랜드",
+        "emberBlurb": "창백한 둑길을 건너면 초록은 재에 자리를 내주고, 오래된 존재가 황무지를 다스린다.",
+        "frostName": "서리장막 봉우리",
+        "frostBlurb": "어떤 지도에도 없는 눈 덮인 고지. 춤추는 오로라 속에서만 언뜻 보인다.",
+        "amberName": "호박빛 가을터",
+        "amberBlurb": "서쪽 절벽 너머에는 끝나지 않는 가을이 있고, 금빛 호수 위에 등불이 떠 있다.",
+        "fenName": "버들늪",
+        "fenBlurb": "가을의 왕관 너머, 버드나무와 고요한 물의 밝은 늪과 해자 뒤의 마을이 있다."
       },
       "group": {
         "heading": "어려운 구간은 함께",
@@ -3417,6 +3519,18 @@ export const ko_KR: EnTranslations = {
       "reptile": {
         "name": "파충류",
         "desc": "쉭쉭거리는 소리와 날카로운 물어뜯기를 지닌 냉혈 사냥꾼들로, 온혈 야수들과는 뚜렷이 다릅니다."
+      },
+      "murloc": {
+        "name": "개굴지느러미족",
+        "desc": "호숫가와 조수 웅덩이에 사는 개골거리는 물고기 인간들로, 물가에 너무 가까이 들어오는 것은 무엇이든 재빨리 떼 지어 덮칩니다."
+      },
+      "kobold": {
+        "name": "장난꾸러기 정령",
+        "desc": "숲속 공터와 산울타리를 종종거리며 뒤지는 약탈꾼과 요정들로, 수가 모이기 전까지는 위협이라기보다 골칫거리에 가깝습니다."
+      },
+      "demon": {
+        "name": "악마",
+        "desc": "균열 너머에서 온 침략자들로, 온통 불길과 악의뿐입니다. 악마 하나가 서 있는 곳이라면, 균열이 결코 멀지 않습니다."
       }
     },
     "worldPage": {
@@ -3430,15 +3544,55 @@ export const ko_KR: EnTranslations = {
       "valeBlurb": "새내기 영웅들이 동개울 마을 주변에서 늑대와 산적을 상대로 실력을 갈고닦는 푸른 시작의 골짜기.",
       "marshBlurb": "안개와 폐허에 잠긴 땅. 진흙지느러미가 얕은 물가에 떼지어 모이고 물밑에서는 더 오래된 무언가가 꿈틀거리며, 펜브리지 다리 마을에서 이를 지켜봅니다.",
       "peaksBlurb": "왕국에서 가장 차갑고 높은 위험을 향해 솟아오른, 바람에 깎인 능선과 오래된 광산 터. 높은감시 전초기지가 이곳을 지킵니다.",
+      "duskBlurb": "수정 폐허가 빛나고 대기가 오래된 마법으로 웅웅거리는, 엘더글림의 큰 나무 아래 영원한 황혼에 잠긴 골짜기.",
+      "emberBlurb": "드레이크가 화산구 위를 맴돌고 모래 언덕 사이에 트롤의 모닥불이 타오르는, 재와 핏빛유리로 뒤덮인 뇌우 치는 황무지. 관문 마을 와이름 감시탑이 이곳을 지켜봅니다.",
+      "frostBlurb": "오로라 아래 눈과 검은 소나무가 이루는 고요. 추위 그 자체가 깨어 있는 듯한 이곳에서 아이스맨틀은 불씨를 꺼뜨리지 않습니다.",
+      "amberBlurb": "등불 켜진 마을 랜턴미어를 중심으로 모여든, 금빛과 붉은 잎이 결코 지지 않는 영원한 가을.",
+      "fenBlurb": "다리 마을 브리지미어에서 오래된 널판 잔교를 따라 건너는, 수련과 느린 물이 웅웅거리는 밝은 습지.",
+      "nightBlurb": "꽃들이 길을 밝히는 별 가득한 한밤의 세계. 문레스트가 꿈꾸는 하늘 아래 조용히 불침번을 섭니다.",
+      "hauntBlurb": "거대한 나무우듬지 아래 유령 들린 숲. 길 위에서는 갈로미어의 등불만이 유일하게 정직한 빛입니다.",
+      "galeBlurb": "바람이 한시도 쉬지 않는 바다 절벽과 울부짖는 구릉. 올드 비컨은 결코 꺼지지 않고, 윅하버는 문을 굳게 걸어 잠급니다.",
+      "jungleBlurb": "야자수와 백사장, 요란한 새들이 뒤엉킨 열대의 밀림. 해변 마을 드리프트헤이븐이 물가에 불을 피워 둡니다.",
+      "gardenBlurb": "아무도 본 적 없는 정원사가 여전히 다듬고 있는 산울타리 미로의 정원 세계. 헤지윅과 그 분수 안뜰을 지나 들어섭니다.",
       "valeGreeting": "칼을 가까이 두시오. 골짜기는 예전 같지 않으니.",
       "valeGreeter": "레드브룩 원수, 이스트브룩",
       "marshGreeting": "문에서 멈추시오. 저 갈대밭 너머에서는, 습지가 우리 대신 죽이는 일을 하니까.",
       "marshGreeter": "감시관 펜윅, 펜브리지",
       "peaksGreeting": "이 성벽이 이백 년을 버텨 왔소. 내가 지키는 한 무너지지 않겠지만, 신음하고 있긴 하지.",
       "peaksGreeter": "대장 테살리, 하이워치",
+      "duskGreeting": "그대의 동족이 이 가지 아래 선 일은 드물다. 조심스레 걸으라, 그리고 환영받으라.",
+      "duskGreeter": "수호자 샐윈, 엘더글림",
+      "emberGreeting": "황무지에서 뜨거운 바람이 불고, 드레이크모 위엔 용들이, 모래 언덕엔 트롤의 모닥불이 있소. 저기로 나가기 전에 물부터 마셔 두시오.",
+      "emberGreeter": "성문 감시관, 와이름 감시탑",
+      "frostGreeting": "성벽 너머에서는 눈이 모든 소리를 삼킨다오. 빛이 춤추기 시작하거든, 목소리를 낮추고 불씨를 꺼뜨리지 마시오.",
+      "frostGreeter": "화로지기, 아이스맨틀",
+      "amberGreeting": "이곳의 잎은 모두 금빛과 붉은빛으로 타오르지만 결코 지지 않는다오. 등불은 그대를 위해 켜 두었으니, 올라가는 길에 금빛눈녹이 고개를 조심하시오.",
+      "amberGreeter": "등불장인, 랜턴미어",
+      "fenGreeting": "늪에는 잠자리와 벌의 날갯소리가 가득하다오. 다리를 건너 잠시 발을 쉬어 가시오. 웅덩이를 지날 때는 널판 위를 벗어나지 말고.",
+      "fenGreeter": "다리지기, 브리지미어",
+      "nightGreeting": "밤의 문 너머에서는 공기마저 꿈을 꾼다오. 꽃빛을 따라가되, 하늘에 걸린 잠든 세계를 조심하시오.",
+      "nightGreeter": "불침번 감시관, 문레스트",
+      "hauntGreeting": "등불 곁을 떠나지 마시오, 여행자여. 그리고 길 밖에서 숲이 그대의 이름을 부르거든, 절대 대답하지 마시오.",
+      "hauntGreeter": "등불지기, 갈로미어",
+      "galeGreeting": "이곳의 바람은 단 한 번도 멎은 적이 없고, 올드 비컨은 단 한 번도 꺼진 적이 없다오. 여관 문은 들어온 뒤에 꼭 닫으시오.",
+      "galeGreeter": "봉화지기, 윅하버",
+      "jungleGreeting": "따뜻한 모래, 요란한 새들, 그리고 지평선을 삼키는 정글이라오. 해변에 불을 피워 두었으니, 부디 그 불가로 돌아오시오.",
+      "jungleGreeter": "항구의 여주인, 드리프트헤이븐",
+      "gardenGreeting": "정원사를 본 사람이 백 년째 없는데도, 누군가는 여전히 산울타리를 다듬고 있다오. 미로를 조심하시오. 미로도 그대를 눈여겨보고 있으니.",
+      "gardenGreeter": "문지기, 헤지윅",
       "valePlaceNotes": "이스트브룩은 여러분의 첫 본거지입니다. 늑대길과 멧돼지 초원은 무난한 사냥터이고, 거울호수는 낚시하기 좋은 물이지만 얕은 물가에는 진흙지느러미가 우글거립니다. 흑거미줄과 구리 광산에는 거미와 광석에 굶주린 굴착꾼이 숨어 있고, 도적 야영지와 무너진 예배당은 한층 거친 일거리를 품습니다. 성물실 언덕은 왕국 최초의 탐굴인 무너진 성물실로 내려가는 길이고, 브라이트우드 숲은 북쪽의 고요하고 햇살 드는 숲입니다. 그리고 소우필드는 담장을 두른 이스트브룩의 보어볼 경기장으로, 수확 휴전 아래 베일 컵이 열리는 곳입니다.",
       "marshPlaceNotes": "펜브리지는 유일하게 마른 길을 지킵니다. 배회자 갈대밭과 딥펜 얕은 물에는 습지 짐승과 진흙지느러미가 들끓고, 과부거미 덤불은 거미줄로 빽빽이 얽혀 있습니다. 가라앉은 예배당과 트롤 봉분은 한층 오래된 위험을 품고 있으며, 봉분 바로 북쪽에서는 습지의 탐굴인 익사한 연도가 열립니다. 무덤부름 야영지는 교단이 자리를 틀고 박힌 곳이고, 가라앉은 요새는 습지의 인스턴스 심장부입니다.",
       "peaksPlaceNotes": "하이워치가 성벽을 지킵니다. 추적자 능선과 깊은바위 굴은 능선 들고양이와 굴착꾼의 차지이고, 오우거 산기슭과 드로그마르의 전쟁 야영지는 고용된 흉포한 자들의 것입니다. 스톰크래그는 정령들로 들끓고 그 아래에서 글리머미어가 빛나는데, 그 물가에는 익사한 신전으로 내려가는 창백한 빛의 문이 자리합니다. 고룡교단 천막과 망령의 들판이 교단의 높은 거점을 에워싸고, 그 정점에 무덤고룡 성소가 있습니다.",
+      "duskPlaceNotes": "엘더글림은 큰 나무 아래 모여 있다. 황혼 동굴과 그 전망대는 들어가는 길이자 골짜기를 처음 내려다보는 곳이다. 고대나무 숲과 별내림 분지는 고요한 남쪽을 지키고, 가라앉은 궁정은 동쪽에 수풀 우거진 폐허를 품으며, 빛나는 심처와 수정 여울은 북쪽에서 은은히 빛난다.",
+      "emberPlaceNotes": "와이름 감시탑이 관문을 지킵니다. 관문숲은 황무지 앞의 마지막 푸른 땅이고, 잿빛 사구에는 재와 그보다 고약한 것들이 떠다닙니다. 트롤무트는 모래언덕 트롤들이 모닥불을 피우고 모이는 곳이며, 핏빛유리 벌판은 면도날 같은 파편으로 반짝이고, 드레이크모 화산구는 드레이크들이 맴도는 연기 오르는 왕관입니다.",
+      "frostPlaceNotes": "아이스맨틀은 마지막 따뜻한 화롯불을 지킵니다. 설선 고개부터는 눈더미가 땅을 차지하고, 빙하 호수는 얼음 아래 검고 고요한 물입니다. 오로라 계단은 춤추는 빛 아래로 오르고, 떨림늪은 결코 완전히 잠들지 않는 얼어붙은 수렁이며, 울부짖는 단구는 밤마다 제 이름값을 합니다.",
+      "amberPlaceNotes": "랜턴미어는 수확의 한가운데서 빛납니다. 금빛눈녹이 고개는 호박빛으로 미끄러운 들어오는 길이고, 금빛 과수원과 수확 골짜기에는 가장 달콤한 수확물과 가장 대담한 도둑들이 있습니다. 큰 호수는 불타는 잎을 비추고, 잿단풍 언덕은 가장 높고 가장 붉게 서 있으며, 기운 비석은 가을보다 오래된 무언가를 기억합니다.",
+      "fenPlaceNotes": "브리지미어는 느린 물 위에 걸터앉아 있습니다. 호박늪 돌계단은 수확의 땅에서 내려오는 길이고, 수련 습지와 늪빛 웅덩이는 위습과 잠자리로 반짝입니다. 수양버들 만은 가지를 호수에 드리우고, 나른한 여울은 이 땅에서 가장 온순한 곳입니다.",
+      "nightPlaceNotes": "문레스트는 불침번을 섭니다. 밤의 문은 한밤의 나라로 들어가는 길이고, 달우물은 곁에 설 수 있는 별빛을 담고 있습니다. 어스름 꽃벌판은 어둠 속에서 피어나고, 불침번 선돌은 한 발짝도 움직이지 않은 채 지켜보며, 잠들지 않는 봉분은 이곳에서 유일하게 꿈꾸지 않는 자리입니다.",
+      "hauntPlaceNotes": "갈로미어는 제 등불 안에 웅크리고 있습니다. 까마귀 문은 이 숲의 음산한 정문이고, 과부의 덤불은 거미줄로 빽빽이 얽혀 있습니다. 교수대 공터와 애도석 예배당은 숲의 가장 오래된 슬픔을 간직하며, 사냥꾼의 공터는 아직도 그곳에서 사냥하는 무언가의 차지입니다.",
+      "galePlaceNotes": "윅하버는 바람에 몸을 기울인 채 서 있습니다. 바람길은 절벽을 따라 들어오는 길이고, 울부짖는 구릉은 강풍 아래 나무 한 그루 없이 굽이칩니다. 올드 비컨은 누구도 기억하지 못할 만큼 오래 타올랐고, 절단 절벽은 물까지 곧장 떨어지며, 난파선 벌판은 이 해안을 정직하게 만듭니다. 그리고 거울 호수는 이 지역 전체에서 유일하게 고요한 것입니다.",
+      "junglePlaceNotes": "드리프트헤이븐은 해변에 불을 피워 둡니다. 덩굴 어귀는 강이 초록 장벽과 만나는 곳이고, 야자 백사장은 파도를 따라 희고 따뜻하게 이어집니다. 에메랄드 밀림과 덩굴폭포 숲은 내륙을 삼키고, 사파이어 석호는 맑고 깊게 빛나며, 가라앉은 신상은 물밑에서 지켜봅니다.",
+      "gardenPlaceNotes": "헤지윅은 정원 문 앞에서 기다립니다. 화단 산책로는 잘 다듬어진 빛깔로 피어나고, 던홀드 성은 새 성벽 뒤에서 기사들을 조련합니다. 꽃잎 연못은 일 년 내내 분홍빛으로 떠다니고, 오래된 풍차는 제 둘레의 고리 화단 위에서 돌아갑니다. 대미로는 손님이 올 때마다 제 예법을 새로 고쳐 짜며, 그 아치는 잎사귀 여우들이 지킵니다. 북쪽 감시초소는 출구 길을 지키고, 수련 연못은 그 너머에 고요히 쉬며, 분수 안뜰은 정원의 심장에서 여전히 맑게 흐릅니다.",
       "gladeTitle": "고요한 한구석: 브라이트우드 숲",
       "gladeBody": "계곡의 모든 이야기가 죽은 자들에 관한 것은 아닙니다. 북쪽에는 브라이트우드 숲이라 불리는 햇살 드는 숲이 있어, 가지 아래로 어른거리는 빛과 조용한 길과 함께 더 부드러운 고유한 리듬을 지킵니다. 당신이 따라가는 흔적에 대한 차분한 대비이며, 길이 잠시 여유를 줄 때 둘러볼 만한 곳입니다.",
       "worldBossTitle": "봉우리가 깨어날 때: 월드 보스",
@@ -3512,6 +3666,7 @@ export const ko_KR: EnTranslations = {
       "bastionBody": "습지에 삼켜진 침수된 요새로, 물에 빠진 수호자들과 차오르는 밀물 그 자체가 지키고 있습니다.",
       "templeBody": "습지 길에서 벗어난 곳에 가라앉은 신전으로, 호기심 많고 만반의 준비를 갖춘 이들을 위한 샛길입니다.",
       "sanctumBody": "가시봉우리의 어두운 심장부로, 교단의 오랜 작업이 끔찍한 정점에 다다르는 곳.",
+      "wildheartBody": "따뜻한 비에 젖은 정글 칼데라에서 두 개의 높은 사냥길이 비취빛 세노테를 감싼다. 야수 소굴과 선조의 폐허를 지나 의식 피라미드의 줄가르와 맞서라.",
       "raidName": "최종 단계 공격대",
       "raidBody": "봉인된 왕실 문 너머에는 10인 시련이 기다립니다. 여러 단계로 이어지는 전투와, 공격대 전원이 함께 꺼뜨려야 하는 불사의 힘입니다. 입장할 자격을 스스로 얻은 뒤, 친구 아홉을 데려오세요.",
       "heroicTitle": "영웅 난이도",
@@ -5046,6 +5201,57 @@ export const ko_KR: EnTranslations = {
     "chat": "채팅창 열기"
   },
   "sim": {
+    "rift": {
+      "allUnstable": "모든 균열이 지금은 불안정합니다. 잠시 후 다시 시도하세요.",
+      "enterFloor": "균열을 통과해 {name}에 들어섰습니다.",
+      "descendFloor": "{name}의 더 깊은 곳으로 내려갑니다.",
+      "stepBack": "균열을 통해 원래 자리로 돌아왔습니다.",
+      "pylonLit": "룬 첨탑이 빛을 발합니다 ({lit}/{total}).",
+      "wayDownOpens": "아래로 향하는 길이 찢겨 열립니다.",
+      "exitOpens": "균열이 요동칩니다. 쓰러진 적 너머로 귀환의 길이 열립니다.",
+      "portalOpens": "{zone}에 {tier}등급 균열이 찢어져 열렸습니다!",
+      "portalSealed": "{zone}의 {tier}등급 균열이 봉인되었습니다.",
+      "portalCollapses": "{zone}의 {tier}등급 균열이 무너졌습니다.",
+      "levelGate": "레벨 {level} 이상의 모험가만 이 균열에 들어갈 수 있습니다.",
+      "deadEntry": "죽은 상태로는 균열에 들어갈 수 없습니다.",
+      "deadEntryCombat": "파티가 아직 전투 중입니다. 전투가 끝나면 죽은 자도 다시 들어갈 수 있습니다.",
+      "iceGoalLit": "서리 문양이 타오릅니다. 길이 꿈틀거립니다.",
+      "socketsShut": "받침대가 갈리며 닫힙니다. 길이 꿈틀거립니다.",
+      "seqProgress": "룬이 차례로 응답합니다 ({step}/{total}).",
+      "seqReset": "룬이 모두 어두워집니다. 처음부터 다시 시작하세요.",
+      "gateOpen": "문이 삐걱거리며 열립니다.",
+      "orbSealed": "구슬은 아래의 의식에 봉인되어 있습니다.",
+      "orbWakes": "펜타그램의 불꽃이 꺼집니다. 제단에서 무언가가 깨어납니다.",
+      "orbOpensGate": "피의 구슬이 타오릅니다. 신전의 문이 삐걱거리며 열립니다.",
+      "alreadyCleared": "이 균열은 이미 {names} 님이 정복했습니다.",
+      "raceLost": "이 균열은 이미 {names} 님이 정복했습니다. 도전이 종료됩니다.",
+      "raceWorldWin": "{names} 님이 {seconds}초 만에 {tier} 등급 균열 경주에서 승리했습니다!",
+      "raceWinBanner": "균열 경주 승리 — {seconds}초",
+      "raceLostBanner": "이미 정복된 균열",
+      "forgeUpgraded": "{name}의 균열 강화가 완료되었습니다.",
+      "forgeEnchanted": "{name}의 균열 마법부여가 완료되었습니다.",
+      "forgeSocketed": "{name}에 균열 보석을 장착했습니다.",
+      "detonateGlacialGrave": "빙하의 무덤이 폭발합니다!",
+      "detonateAbsoluteZero": "절대 영도가 폭발합니다!",
+      "detonateMagmaWell": "마그마 우물이 분출합니다!",
+      "detonateCoreMeltdown": "핵심 용해가 폭발합니다!",
+      "detonateVenomPool": "독액 웅덩이가 분출합니다!",
+      "detonateBroodmothersMark": "여왕 거미의 낙인이 폭발합니다!",
+      "detonateSoulGrave": "영혼의 무덤이 폭발합니다!",
+      "detonateDeathSentence": "사망 선고가 내려집니다!",
+      "detonateEarthshatter": "대지 분쇄가 폭발합니다!",
+      "detonateFinalJudgment": "최후의 심판이 내립니다!",
+      "detonateVoidRift": "공허 균열이 폭발합니다!",
+      "detonateArcaneAnnihilation": "비전 소멸이 폭발합니다!",
+      "detonateLightningRod": "피뢰침이 번개를 내리칩니다!",
+      "detonateStormcallersWrath": "폭풍 소환사의 분노가 폭발합니다!",
+      "detonateAbyssalMaw": "심연의 아가리가 닫힙니다!",
+      "detonateCrushingDepth": "분쇄의 심연이 짓누릅니다!",
+      "detonatePactSeal": "서약 봉인이 폭발합니다!",
+      "detonateBloodRite": "피의 의식이 내려집니다!",
+      "detonatePitSentence": "구렁텅이 판결이 폭발합니다!",
+      "detonateHellfireBrand": "지옥불 낙인이 폭발합니다!"
+    },
     "delve": {
       "cannotEnterNow": "지금은 탐굴에 진입할 수 없습니다.",
       "leaveDungeonFirst": "먼저 던전에서 나가세요.",
@@ -5900,6 +6106,8 @@ export const ko_KR: EnTranslations = {
       "secondsRemaining": "{seconds}초 남음",
       "enteringZone": "{zone}에 진입합니다.",
       "welcomeZone": "{zone}에 오신 것을 환영합니다!",
+      "riftLabel": "{name}",
+      "riftLabelRanked": "{name} ({rank})",
       "levelBanner": "{level} 레벨!",
       "levelLog": "{level} 레벨이 되었습니다!",
       "xpGain": "경험치 {amount}을 획득했습니다.",
@@ -6153,6 +6361,7 @@ export const ko_KR: EnTranslations = {
       "floatingParry": "무기 막기",
       "floatingResist": "저항",
       "floatingHealFull": "가득 참",
+      "floatingHealAbsorbed": "흡수됨",
       "cannotMove": "이동 불가!",
       "attack": "공격",
       "damageDone": "{ability}이 {target}에게 {amount}의 피해를 입혔습니다.",
@@ -6169,6 +6378,8 @@ export const ko_KR: EnTranslations = {
       "healOtherCrit": "{ability}이 {target}을 치명타 치유로 {amount}만큼 회복했습니다.",
       "healSelfFull": "{ability}이 적중했지만 이미 생명력이 가득합니다.",
       "healOtherFull": "{ability}이 {target}에게 적중했지만 대상은 이미 생명력이 가득합니다.",
+      "healSelfAbsorbed": "당신의 {ability}이(가) 당신에게 걸린 부패에 삼켜졌습니다.",
+      "healOtherAbsorbed": "당신의 {ability}이(가) {target}에게 걸린 부패에 삼켜졌습니다.",
       "death": "{name} 사망.",
       "auraGain": "{name} 효과를 얻었습니다.",
       "auraFade": "{name} 효과가 사라졌습니다.",
@@ -6527,7 +6738,23 @@ export const ko_KR: EnTranslations = {
       "fishing": "낚시",
       "gathering": "채집",
       "demonHeal": "악마 치유",
-      "thunzharrStormcall": "폭풍의 부름"
+      "thunzharrStormcall": "폭풍의 부름",
+      "rift_frost_execution": "Glacial Grave",
+      "rift_frost_strike": "Absolute Zero",
+      "rift_ember_execution": "Magma Well",
+      "rift_ember_strike": "Core Meltdown",
+      "rift_venom_execution": "Venom Pool",
+      "rift_venom_strike": "Broodmother's Mark",
+      "rift_necro_execution": "Soul Grave",
+      "rift_necro_strike": "Death Sentence",
+      "rift_brute_execution": "Earthshatter",
+      "rift_brute_strike": "Final Judgment",
+      "rift_arcane_execution": "Void Rift",
+      "rift_arcane_strike": "Arcane Annihilation",
+      "rift_storm_execution": "Lightning Rod",
+      "rift_storm_strike": "Stormcaller's Wrath",
+      "rift_tide_execution": "Abyssal Maw",
+      "rift_tide_strike": "Crushing Depth"
     }
   },
   "questUi": {
@@ -6644,7 +6871,8 @@ export const ko_KR: EnTranslations = {
       "tool": "도구",
       "potion": "물약",
       "elixir": "비약",
-      "bag": "가방"
+      "bag": "가방",
+      "mount": "탈것"
     },
     "stats": {
       "armor": "방어도",
@@ -9188,6 +9416,312 @@ export const ko_KR: EnTranslations = {
       "resonant_timber": {
         "name": "공명의 목재"
       },
+      "duskwisp_essence": {
+        "name": "황혼 위습의 정수"
+      },
+      "spore_heart": {
+        "name": "포자 심장"
+      },
+      "gleaming_antler": {
+        "name": "빛나는 가지뿔"
+      },
+      "wisp_mote": {
+        "name": "별빛 티끌"
+      },
+      "starfall_shard": {
+        "name": "별내림 파편"
+      },
+      "elder_bark": {
+        "name": "원로의 나무껍질"
+      },
+      "hollow_sealstone": {
+        "name": "골짜기 봉인석"
+      },
+      "monument_overlook": {
+        "name": "풍화된 비석"
+      },
+      "monument_court": {
+        "name": "가라앉은 비석"
+      },
+      "monument_north": {
+        "name": "잊힌 비석"
+      },
+      "guardian_core": {
+        "name": "수호자의 핵"
+      },
+      "wardens_seal": {
+        "name": "감시자의 인장"
+      },
+      "gleamstag_charm": {
+        "name": "빛사슴 부적"
+      },
+      "veilsteel_blade": {
+        "name": "장막강철 검"
+      },
+      "duskfang_dirk": {
+        "name": "황혼송곳니 단검"
+      },
+      "gleamwood_stave": {
+        "name": "빛나무 지팡이"
+      },
+      "wardens_oathband": {
+        "name": "감시자의 서약 장갑"
+      },
+      "wardplate_cuirass": {
+        "name": "수호 판금 흉갑"
+      },
+      "nightweave_tunic": {
+        "name": "밤엮음 튜닉"
+      },
+      "veilcloth_robe": {
+        "name": "장막천 로브"
+      },
+      "rift_essence": {
+        "name": "균열 정수"
+      },
+      "rift_gem_crimson": {
+        "name": "진홍빛 균열 보석"
+      },
+      "rift_gem_azure": {
+        "name": "푸른빛 균열 보석"
+      },
+      "rift_gem_verdant": {
+        "name": "초록빛 균열 보석"
+      },
+      "riftbound_band_of_might": {
+        "name": "힘의 균열결속 반지"
+      },
+      "riftbound_band_of_insight": {
+        "name": "통찰의 균열결속 반지"
+      },
+      "riftbound_band_of_guile": {
+        "name": "기민함의 균열결속 반지"
+      },
+      "hoarfrost_edge": {
+        "name": "서리서린 칼날"
+      },
+      "emberforge_gauntlets": {
+        "name": "잉걸불 화로 건틀릿"
+      },
+      "broodmother_carapace": {
+        "name": "무리어미 갑각"
+      },
+      "bonelord_mantle": {
+        "name": "뼈군주 어깨걸이"
+      },
+      "graskbreaker_girdle": {
+        "name": "그라스크 분쇄 허리띠"
+      },
+      "voidscar_handwraps": {
+        "name": "공허상흔 손싸개"
+      },
+      "stormscale_treads": {
+        "name": "폭풍비늘 장화"
+      },
+      "abyssal_loop": {
+        "name": "심연의 고리"
+      },
+      "pactbound_vestments": {
+        "name": "서약의 예복"
+      },
+      "pitlords_cleaver": {
+        "name": "구덩이 군주의 도끼"
+      },
+      "emberforged_bulwark": {
+        "name": "잉걸불 벼림 흉갑"
+      },
+      "stormsunder_hood": {
+        "name": "폭풍쪼개기 두건"
+      },
+      "voidweave_mantle": {
+        "name": "공허직조 어깨걸이"
+      },
+      "abysswrought_band": {
+        "name": "심연세공 반지"
+      },
+      "heart_of_the_rift": {
+        "name": "균열의 심장"
+      },
+      "voidsong_dirk": {
+        "name": "공허의 노래, 찢겨진 장막의 단검"
+      },
+      "wildheart_tuskblade": {
+        "name": "야생심장 엄니대검"
+      },
+      "wildheart_hexwood_staff": {
+        "name": "분지의 사술나무 지팡이"
+      },
+      "wildheart_fangknife": {
+        "name": "줄가르의 송곳니칼"
+      },
+      "thick_winter_pelt": {
+        "name": "두꺼운 겨울 모피"
+      },
+      "aurora_mote": {
+        "name": "오로라 티끌"
+      },
+      "hearth_ember_cache": {
+        "name": "불씨 단지"
+      },
+      "sprung_trap": {
+        "name": "튕겨진 늪 덫"
+      },
+      "hearthlined_treads": {
+        "name": "화롯가 안감 장화"
+      },
+      "frostmane_mantle": {
+        "name": "서리갈기 어깨덮개"
+      },
+      "ashbone_war_brand": {
+        "name": "잿빛뼈 전쟁낙인"
+      },
+      "emberwing_scale": {
+        "name": "잿불날개 비늘"
+      },
+      "scorched_supply_crate": {
+        "name": "그을린 보급 상자"
+      },
+      "wyrmwatch_warning_banner": {
+        "name": "와이름 감시탑 경고 깃발"
+      },
+      "cinderwalk_treads": {
+        "name": "잿길 장화"
+      },
+      "mawscale_pauldrons": {
+        "name": "화산구 비늘 어깨보호구"
+      },
+      "gilded_sap_clot": {
+        "name": "금빛 수액 덩이"
+      },
+      "amberfall_sap_bucket": {
+        "name": "수액 꼭지 양동이"
+      },
+      "mere_ferry_lantern": {
+        "name": "나룻배 등불"
+      },
+      "orchard_sapbinder_grips": {
+        "name": "수액먹인 장갑"
+      },
+      "mantle_of_the_meredark": {
+        "name": "호수어둠의 어깨덮개"
+      },
+      "plump_fen_eel": {
+        "name": "통통한 늪 뱀장어"
+      },
+      "wisplight_globe": {
+        "name": "위습빛 구슬"
+      },
+      "fenway_mooring_line": {
+        "name": "잘린 계류 밧줄"
+      },
+      "bridgemere_toll_chest": {
+        "name": "가라앉은 통행세 궤짝"
+      },
+      "eelskin_mudwaders": {
+        "name": "뱀장어가죽 진창장화"
+      },
+      "lilybed_mantle": {
+        "name": "수련밭 어깨덮개"
+      },
+      "moonfleece_tuft": {
+        "name": "달양털 뭉치"
+      },
+      "gloamfield_nightbloom": {
+        "name": "밤꽃 송이"
+      },
+      "vigil_star_chart": {
+        "name": "불침번 성도"
+      },
+      "barrow_grave_offering": {
+        "name": "흩어진 무덤 공물"
+      },
+      "moonfleece_mitts": {
+        "name": "달양털 벙어리장갑"
+      },
+      "barrowshade_mantle": {
+        "name": "봉분그늘 어깨덮개"
+      },
+      "widowsilk_skein": {
+        "name": "과부비단 실타래"
+      },
+      "gallowmere_grave_candle": {
+        "name": "무덤 초"
+      },
+      "silkbound_remains": {
+        "name": "비단에 감긴 유해"
+      },
+      "gravebound_silk_wraps": {
+        "name": "무덤비단 손목보호대"
+      },
+      "mantle_of_the_unhorsed": {
+        "name": "말에서 끌어내린 자의 어깨덮개"
+      },
+      "pearlwake_cargo_crate": {
+        "name": "펄웨이크호 화물 상자"
+      },
+      "canopy_silk_hank": {
+        "name": "수관 비단 타래"
+      },
+      "sunken_offering_bowl": {
+        "name": "다시 채워진 공양 그릇"
+      },
+      "saltwalker_sandals": {
+        "name": "소금길 샌들"
+      },
+      "sunken_idol_mantle": {
+        "name": "가라앉은 신상의 어깨덮개"
+      },
+      "hedgewick_shears": {
+        "name": "도둑맞은 헤지윅 전정가위"
+      },
+      "evergarden_bloom_clipping": {
+        "name": "다듬은 꽃가지"
+      },
+      "hedgewick_tool_cart": {
+        "name": "엎어진 연장 수레"
+      },
+      "evergarden_statue_rubbing": {
+        "name": "조각상 탁본"
+      },
+      "shearkeeper_gloves": {
+        "name": "가위지기 장갑"
+      },
+      "fountain_court_mantle": {
+        "name": "분수 안뜰의 어깨덮개"
+      },
+      "galecrest_ram_wool": {
+        "name": "기름진 숫양 양털"
+      },
+      "shear_storm_lantern": {
+        "name": "꺼진 폭풍 등불"
+      },
+      "wreckfield_flotsam_crate": {
+        "name": "표류물 상자"
+      },
+      "wickspun_treads": {
+        "name": "윅하버 털실 장화"
+      },
+      "wreck_wardens_mantle": {
+        "name": "난파선 감시자의 어깨덮개"
+      },
+      "breakscarred_steel": {
+        "name": "균열 흉터 강철"
+      },
+      "farshore_salt_moss": {
+        "name": "먼바다 소금이끼"
+      },
+      "gullhaven_watchbell": {
+        "name": "해안 경종"
+      },
+      "saltforged_grips": {
+        "name": "소금벼림 장갑"
+      },
+      "mantle_of_the_unbroken_shore": {
+        "name": "부서지지 않은 해안의 어깨덮개"
+      },
+      "last_keep_signet": {
+        "name": "마지막 요새의 인장"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },
@@ -9919,6 +10453,30 @@ export const ko_KR: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "폭풍소환사의 허리보호구"
+      },
+      "riding_training": {
+        "name": "탑승 훈련"
+      },
+      "reins_valorsteed": {
+        "name": "발러스티드의 고삐"
+      },
+      "reins_grag_bear": {
+        "name": "골리앗 그라그곰의 고삐"
+      },
+      "reins_stalkglider_snail": {
+        "name": "이끼껍질 활공달팽이의 고삐"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "시동 열쇠: 에테르 기사 호버사이클"
+      },
+      "reins_shadowjump_toad": {
+        "name": "그림자 도약 두꺼비 카마카게의 고삐"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "하늘닿이 폭풍깃의 고삐"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "천둥활보 대왕 칠면조의 고삐"
       }
     },
     "mobs": {
@@ -10168,6 +10726,312 @@ export const ko_KR: EnTranslations = {
       "thunzharr_stormling": {
         "name": "깨어난 폭풍 정령"
       },
+      "stable_horse": {
+        "name": "마구간 말"
+      },
+      "rift_spawnling": {
+        "name": "균열의 산물"
+      },
+      "rift_bonewalker": {
+        "name": "되살아난 뼈걷는자"
+      },
+      "rift_frost_revenant": {
+        "name": "서리에 묶인 망령"
+      },
+      "rift_rime_elemental": {
+        "name": "상고대 정령"
+      },
+      "rift_ember_fiend": {
+        "name": "잉걸불 마귀"
+      },
+      "rift_magma_brute": {
+        "name": "용암 야수"
+      },
+      "rift_venom_weaver": {
+        "name": "독액 직조자"
+      },
+      "rift_thornback": {
+        "name": "가시등 추적자"
+      },
+      "rift_boneclad": {
+        "name": "뼈갑옷 전사"
+      },
+      "rift_marrow_troll": {
+        "name": "골수 트롤"
+      },
+      "rift_void_acolyte": {
+        "name": "공허상흔 시종"
+      },
+      "rift_dread_stalker": {
+        "name": "공포의 추적자"
+      },
+      "rift_storm_caller": {
+        "name": "폭풍 소환사"
+      },
+      "rift_stormscale": {
+        "name": "폭풍비늘 드레이크"
+      },
+      "rift_tide_thrall": {
+        "name": "조수의 노예"
+      },
+      "rift_deep_lurker": {
+        "name": "심연의 잠복자"
+      },
+      "rift_stone_ogre": {
+        "name": "돌 오우거"
+      },
+      "rift_boss_frost": {
+        "name": "서리 파수꾼"
+      },
+      "rift_boss_ember": {
+        "name": "잉걸불 대장간의 폭군"
+      },
+      "rift_boss_venom": {
+        "name": "어미 비스카"
+      },
+      "rift_boss_necro": {
+        "name": "뼈군주 자레스"
+      },
+      "rift_boss_brute": {
+        "name": "군주 그라스크"
+      },
+      "rift_boss_arcane": {
+        "name": "집정관 닉사리스"
+      },
+      "rift_boss_storm": {
+        "name": "폭풍 바로크"
+      },
+      "rift_boss_tide": {
+        "name": "심연의 아가리"
+      },
+      "glimmerwisp": {
+        "name": "미광 위습"
+      },
+      "duskwisp": {
+        "name": "황혼 위습"
+      },
+      "veiled_stag": {
+        "name": "장막 수사슴"
+      },
+      "veiled_doe": {
+        "name": "장막 암사슴"
+      },
+      "gleamstag": {
+        "name": "빛나는 수사슴"
+      },
+      "sporeling_gatherer": {
+        "name": "포자꾼 채집꾼"
+      },
+      "corrupted_sporeling": {
+        "name": "타락한 포자꾼"
+      },
+      "mushroom_pixie": {
+        "name": "글림포크 픽시"
+      },
+      "treant_elder": {
+        "name": "나무정령 원로"
+      },
+      "ancient_guardian": {
+        "name": "고대 수호자"
+      },
+      "waking_warden": {
+        "name": "깨어난 감시자"
+      },
+      "old_marrowshell": {
+        "name": "늙은 골수껍질"
+      },
+      "aurelhorn": {
+        "name": "아우렐혼, 무리의 첫째"
+      },
+      "snowdrift_wolf": {
+        "name": "눈더미 늑대"
+      },
+      "ice_wisp": {
+        "name": "얼음 위습"
+      },
+      "rime_elemental": {
+        "name": "서리 정령"
+      },
+      "fen_sprite": {
+        "name": "늪 요정"
+      },
+      "frostmane_yeti": {
+        "name": "서리갈기 예티"
+      },
+      "terrace_howler": {
+        "name": "단구 울음꾼"
+      },
+      "apprentice_wren": {
+        "name": "견습생 렌"
+      },
+      "emberwing_drake": {
+        "name": "잿불날개 드레이크"
+      },
+      "ashbone_raider": {
+        "name": "잿빛뼈 약탈자"
+      },
+      "ashbone_warcaller": {
+        "name": "잿빛뼈 전쟁소집꾼"
+      },
+      "dune_troll": {
+        "name": "모래언덕 트롤"
+      },
+      "cindraleth_maw_matriarch": {
+        "name": "화산구의 어미 신드랄레스"
+      },
+      "gilded_stag": {
+        "name": "금빛 수사슴"
+      },
+      "gloam_fox": {
+        "name": "어스름여우"
+      },
+      "orchard_treant": {
+        "name": "과수원 나무정령"
+      },
+      "the_meredark": {
+        "name": "호수어둠"
+      },
+      "harvest_sprite": {
+        "name": "수확 요정"
+      },
+      "mere_lurker": {
+        "name": "호수 잠복자"
+      },
+      "bogtoad": {
+        "name": "늪두꺼비"
+      },
+      "drowsy_croaker": {
+        "name": "졸음 개구리왕"
+      },
+      "lily_wisp": {
+        "name": "수련 위습"
+      },
+      "willow_sprite": {
+        "name": "버들 요정"
+      },
+      "moonfleece_grazer": {
+        "name": "달양털 짐승"
+      },
+      "gloam_strider": {
+        "name": "어스름 질주자"
+      },
+      "nightkin_stargazer": {
+        "name": "밤일족 별지기"
+      },
+      "barrow_king": {
+        "name": "봉분의 왕"
+      },
+      "barrow_wight": {
+        "name": "봉분 망자"
+      },
+      "widowsilk_spinner": {
+        "name": "과부비단 거미"
+      },
+      "wood_wraith": {
+        "name": "숲 망령"
+      },
+      "gravenbark_shambler": {
+        "name": "무덤껍질 괴목"
+      },
+      "pale_huntsman": {
+        "name": "창백한 사냥꾼"
+      },
+      "gravedigger_mosley": {
+        "name": "무덤파기꾼 모슬리"
+      },
+      "tide_scuttler": {
+        "name": "조수 게"
+      },
+      "thicket_boar": {
+        "name": "덤불 멧돼지"
+      },
+      "canopy_weaver": {
+        "name": "수관 거미"
+      },
+      "idol_guardian": {
+        "name": "신상 수호자"
+      },
+      "castaway_navigator": {
+        "name": "항해사 술리"
+      },
+      "topiary_stag": {
+        "name": "토피어리 수사슴"
+      },
+      "topiary_wolf": {
+        "name": "토피어리 늑대"
+      },
+      "hedge_gnome": {
+        "name": "산울타리 노움"
+      },
+      "hedge_knight": {
+        "name": "던홀드 기사"
+      },
+      "the_topiary_bull": {
+        "name": "토피어리 황소"
+      },
+      "moor_ram": {
+        "name": "황무지 숫양"
+      },
+      "gale_wisp": {
+        "name": "돌풍 정령"
+      },
+      "shoal_scuttler": {
+        "name": "여울 게"
+      },
+      "downs_bandit": {
+        "name": "구릉 도적"
+      },
+      "wreck_thief": {
+        "name": "난파선 도둑"
+      },
+      "the_wreck_warden": {
+        "name": "난파선 감시자"
+      },
+      "drowned_deckhand": {
+        "name": "익사한 갑판원"
+      },
+      "riftspawn": {
+        "name": "균열의 산물"
+      },
+      "breach_wretch": {
+        "name": "균열의 비루한 것"
+      },
+      "void_stalker": {
+        "name": "공허 추적자"
+      },
+      "sundered_horror": {
+        "name": "찢겨진 공포"
+      },
+      "fisher_bram": {
+        "name": "어부 브람"
+      },
+      "rift_hellguard": {
+        "name": "지옥 수호병"
+      },
+      "rift_pact_acolyte": {
+        "name": "계약의 수련사제"
+      },
+      "rift_boss_ritualist": {
+        "name": "서약에 묶인 마구스 벨코르"
+      },
+      "rift_boss_pitlord": {
+        "name": "구렁의 군주 아즈고라스"
+      },
+      "wildheart_stalker": {
+        "name": "덩굴발톱 추적자"
+      },
+      "wildheart_ravager": {
+        "name": "피갈기 약탈자"
+      },
+      "wildheart_hexcaller": {
+        "name": "태양뼈 사술사"
+      },
+      "wildheart_beastmaster": {
+        "name": "송곳니 군주 야수조련사"
+      },
+      "wildheart_high_priest": {
+        "name": "분지의 목소리 줄가르"
+      },
       "ironvein_foreman": {
         "name": "철맥 감독관"
       },
@@ -10321,6 +11185,11 @@ export const ko_KR: EnTranslations = {
         "title": "광산 감독관",
         "greeting": "갱도 전체가 저 흙범벅이 된 해충들로 들끓고 있습니다!"
       },
+      "stablemaster_marla": {
+        "name": "마를라 히첸",
+        "title": "마구간지기",
+        "greeting": "기수는 누구나 두 발로 걸어 들어오지, {className}. 발러스티드 위에서 진흙에 처박히지 않고 버틸 수 있을 때까지는 고삐를 내주지 않아. 하이워치엔 부러진 뼈를 봐줄 치료사도 넉넉지 않으니까."
+      },
       "warden_fenwick": {
         "name": "감시관 펜윅",
         "title": "펜브리지 감시관",
@@ -10450,6 +11319,246 @@ export const ko_KR: EnTranslations = {
         "name": "연대기 기록관 젠지",
         "title": "쏜피크 고지 연대기",
         "greeting": "산은 아무것도 잊지 않네, {playerName}. 나도 마찬가지지. 자네가 이룬 일을 보여 주게."
+      },
+      "keeper_saelwyn": {
+        "name": "수호자 샐윈",
+        "title": "골짜기의 수호자",
+        "greeting": "그대의 동족이 이 가지 아래 선 일은 드물다, {className}. 조심스레 걸으라, 그리고 환영받으라."
+      },
+      "loremother_bryn": {
+        "name": "로어마더 브린",
+        "title": "성소의 목소리",
+        "greeting": "이 골짜기의 빛은 저마다 무언가를 기억하고 있다네, {playerName}. 함께 귀 기울여 주게."
+      },
+      "provisioner_fenna": {
+        "name": "보급상 펜나",
+        "title": "엘더글림 보급상",
+        "greeting": "빵은 아직 따끈하고 물은 여전히 달아요. 골짜기가 베풀고, 저도 베풀지요."
+      },
+      "wardsmith_orun": {
+        "name": "수호기술자 오룬",
+        "title": "옛 대장간의 관리인",
+        "greeting": "이 화로들은 수백 년 전에 식었지만, {className}, 여기서 벼려진 날은 아직도 서슬이 퍼렇다네."
+      },
+      "archivist_tullo": {
+        "name": "기록관 툴로",
+        "title": "돌을 읽는 자",
+        "greeting": "바깥의 비석들은 한 시대가 지나도록 누구에게도 말을 걸지 않았지. 새 귀를 기다렸는지도 모르네."
+      },
+      "huntsman_deral": {
+        "name": "사냥꾼 데랄",
+        "title": "무리의 수호자",
+        "greeting": "조용히 하게. 무리는 이 골짜기가 내는 소리를 전부 알고 있고, 나도 그렇다네."
+      },
+      "warden_kaldra": {
+        "name": "워든 칼드라",
+        "title": "아이스맨틀의 워든",
+        "greeting": "단구 자락을 조심하게, 낯선 이여. 눈은 가져간 것을 돌려주지 않으니."
+      },
+      "hearthkeeper_maeve": {
+        "name": "화롯지기 메이브",
+        "title": "화로 산장의 지기",
+        "greeting": "추운 데 있지 말고 들어와요. 내가 숨 쉬는 한 산장의 불은 꺼지지 않아요."
+      },
+      "scout_einna": {
+        "name": "정찰병 에인나",
+        "title": "설선 정찰병",
+        "greeting": "고개를 살아서 걸어 넘었군. 좋아. 아이스맨틀이 이 소식을 들어야 하네."
+      },
+      "aurorist_veyla": {
+        "name": "오로라술사 베일라",
+        "title": "빛을 읽는 자",
+        "greeting": "쉿. 오늘 밤은 빛이 말을 하고 있네. 저들은 같은 말을 두 번 하지 않아."
+      },
+      "trapper_brosk": {
+        "name": "덫사냥꾼 브로스크",
+        "title": "떨림늪 덫사냥꾼",
+        "greeting": "이번 주에 늪이 내 덫줄 셋을 가져갔네. 이십 년 동안 단 하나도 가져간 적 없던 늪이 말이야."
+      },
+      "gatecaptain_brannoc": {
+        "name": "관문대장 브란녹",
+        "title": "와이름 감시탑의 지휘관",
+        "greeting": "와이름 감시탑은 관문을 지킨다. 마흔 해를 지켜 왔고, 오늘 밤도 지킬 것이다."
+      },
+      "quartermaster_sela": {
+        "name": "병참관 셀라",
+        "title": "주둔지 보급품 관리인",
+        "greeting": "이 마당의 상자는 하나같이 재의 땅 사십 마일을 건너 여기 닿았다네. 곱게 다뤄 주게."
+      },
+      "scout_yerrin": {
+        "name": "정찰병 예린",
+        "title": "먼 사구의 감시자",
+        "greeting": "몸을 낮추게. 핏빛유리 벌판에서는 소리가 이상하게 퍼지고, 저 아래 관문에는 귀가 달려 있으니."
+      },
+      "reeve_ottoline": {
+        "name": "촌장 오톨린",
+        "title": "랜턴미어의 촌장",
+        "greeting": "랜턴미어에 잘 오셨어요. 수확이 끝나지 않는 곳이니, 일도 끝나지 않지요."
+      },
+      "waywatcher_sorrel": {
+        "name": "길목 감시자 소렐",
+        "title": "금빛눈녹이 감시자",
+        "greeting": "등 뒤엔 눈, 눈앞엔 금빛이라. 금빛눈녹이를 두 번 걷는 이는 드무니, 이 한 번을 값지게 건너게."
+      },
+      "ferrymaster_caddow": {
+        "name": "나루지기 캐도우",
+        "title": "등불 나룻배지기",
+        "greeting": "큰 호수에 또 안개가 꼈군. 물 위의 등불이 꺼지면, 지혜로운 사람은 뭍에 머문다네."
+      },
+      "orchardist_pomeline": {
+        "name": "과수원지기 포멜린",
+        "title": "금빛 과수원의 지기",
+        "greeting": "발밑을 조심하게. 이 나무줄의 뿌리는 하나같이 마을보다 오래됐고, 다 기억하고 있으니."
+      },
+      "waykeeper_pell": {
+        "name": "길지기 펠",
+        "title": "호박늪 돌계단의 지기",
+        "greeting": "돌계단을 내려가면 무른 땅일세. 장화 디딜 자리를 잘 보게."
+      },
+      "bridgewright_alden": {
+        "name": "다리장인 알든",
+        "title": "늪둑길의 주인",
+        "greeting": "이 마을의 널판은 죄다 내가 건사하는 것인데, 늪은 그 하나하나를 갉아 대지."
+      },
+      "netter_maris": {
+        "name": "그물꾼 마리스",
+        "title": "브리지미어의 뱀장어 그물꾼",
+        "greeting": "이 냄새 맡았어요? 훈제 뱀장어예요. 이 마을 절반이 그걸로 벌어 세운 말뚝 위에 서 있죠."
+      },
+      "mother_sedge": {
+        "name": "세지 어멈",
+        "title": "수양버들 만의 늪마녀",
+        "greeting": "자네 장화가 다리를 벗어나기도 전에, 버드나무들이 자네가 온다고 일러 주었다네."
+      },
+      "lamplighter_sorrel": {
+        "name": "점등꾼 소렐",
+        "title": "밤의 문지기",
+        "greeting": "등불을 잘 보고 가요, 친구. 이 문을 지나면 해는 손을 놓고, 꽃들이 그 일을 넘겨받으니까요."
+      },
+      "lira_dewsong": {
+        "name": "리라 듀송",
+        "title": "문레스트의 밤 정원사",
+        "greeting": "문레스트에 잘 오셨어요. 여기서는 꽃이 우리 대신 동을 틔워 준답니다."
+      },
+      "weaver_amelle": {
+        "name": "직조공 아멜",
+        "title": "달양털 직조공",
+        "greeting": "느껴져요? 베틀에 걸린 달양털이에요. 당신이 쬐어 본 어떤 불보다도 따뜻하답니다."
+      },
+      "astronomer_cassian": {
+        "name": "천문학자 카시안",
+        "title": "불침번 선돌의 관측자",
+        "greeting": "쉿. 이곳 하늘은 동이 트지 않으니, 말을 멈추는 법도 없다네."
+      },
+      "lampman_cobb": {
+        "name": "등불꾼 콥",
+        "title": "까마귀 문 등불지기",
+        "greeting": "등불빛 안에 머물게, 친구. 숲은 문을 지나는 모두를 헤아리니까."
+      },
+      "sexton_marrow": {
+        "name": "교회지기 매로우",
+        "title": "갈로미어의 교회지기",
+        "greeting": "여기서는 깊이 묻는다네. 그리고 종을 울리지. 묻힌 자들이 그대로 있어야 한다는 걸 기억하도록."
+      },
+      "widow_tansy": {
+        "name": "과부 탠지",
+        "title": "갈로미어의 초장인",
+        "greeting": "무덤마다 초 하나, 그리고 단 하나도 꺼져서는 안 돼요. 단 하나도요, 알아들었어요?"
+      },
+      "vicar_creel": {
+        "name": "사제 크릴",
+        "title": "애도석의 마지막 사제",
+        "greeting": "예배당은 여러 해 전에 무너졌네. 그 아래 망자들은 알아채지 못했고, 그래서 나는 남았지."
+      },
+      "strandwatcher_pell": {
+        "name": "백사장 감시자 펠",
+        "title": "덩굴 어귀의 감시자",
+        "greeting": "드디어 검은 나무들을 벗어났군. 숨을 돌리게, 낯선 이여. 고개 이쪽은 해가 지키고 있으니."
+      },
+      "salvage_boss_ryna": {
+        "name": "인양대장 리나",
+        "title": "난파선 지대의 주인",
+        "greeting": "팔이 성한 {className}이라, 좋군. 난파선 지대는 삯이 후하다네. 게들이 그걸 셀 손가락만 남겨 준다면 말이지."
+      },
+      "pearlmother_isha": {
+        "name": "진주어멈 이샤",
+        "title": "잠수부들의 원로",
+        "greeting": "바다는 내주고, 모래는 간직하고, 밀림은 앗아 가지. 백사장에 머물게, 낯선 이여."
+      },
+      "hermit_okku": {
+        "name": "오쿠",
+        "title": "안으로 들어갔던 자",
+        "greeting": "조용히. 북소리는 나무 아래를 걷는 모든 것을 헤아리는데, 자네는 이미 헤아려졌다네."
+      },
+      "gatewarden_pell": {
+        "name": "문지기 펠",
+        "title": "정원 문의 지기",
+        "greeting": "잔디밭에서는 걸음을 조심하게. 정원이 직접 다듬는 곳이라, 말끔한 걸 좋아하거든."
+      },
+      "head_gardener_amaranth": {
+        "name": "수석 정원사 아마란스",
+        "title": "상록 정원의 수석 정원사",
+        "greeting": "눈 밑 그늘은 신경 쓰지 말아요. 정원이 꿈꾸는 동안 누군가는 깨어 있어야 하니까요."
+      },
+      "wickmother_sorrel": {
+        "name": "여관어멈 소렐",
+        "title": "헤지윅 여관의 주인",
+        "greeting": "들어와 앉아요. 불에 과실주가 데워지고 있어요. 다만 쇠붙이는 손에서 놓지 말아요. 요즘 노움들 손버릇이 나쁘거든요."
+      },
+      "gardener_yew": {
+        "name": "정원사 유",
+        "title": "마지막 정원사",
+        "greeting": "그 손수레 좀 건네주겠나? 마을이야 어찌 생각하든, 이 잔디밭은 누가 걸어 주지 않으면 안 되거든."
+      },
+      "watcher_maren": {
+        "name": "감시관 마렌",
+        "title": "바람길의 감시자",
+        "greeting": "문을 지나면 발밑을 조심하게. 이 위의 바람은 모자부터 채 가고, 묻는 법은 없으니."
+      },
+      "harbormaster_odile": {
+        "name": "항만장 오딜",
+        "title": "윅하버의 항만장",
+        "greeting": "이 후미의 배는 죄다 올드 비컨에 제 용골을 빚졌지. 빨리 말하게, 조수는 기다려 주지 않으니."
+      },
+      "keeper_bram": {
+        "name": "등불지기 브람",
+        "title": "올드 비컨의 등불지기",
+        "greeting": "이 등불은 내 당번으로 서른아홉 해를 탔네. 자네 당번에 꺼지는 일은 없을 걸세."
+      },
+      "salvager_edda": {
+        "name": "인양꾼 에다",
+        "title": "난파선 벌판의 인양꾼",
+        "greeting": "난파선 목재에 밧줄에 죽은 자들의 화물까지. 내 삯은 바다가 치르지. 그 감시자가 허락할 때나 말이지만."
+      },
+      "warden_coalfast": {
+        "name": "숯불 워든",
+        "title": "보루 지휘관",
+        "greeting": "균열은 걸헤이븐이 작은 마을이라는 걸 신경 쓰지 않는다네, {className}. 우리가 이 해안을 지키거나, 아니면 지킬 해안조차 남지 않을 걸세. 우리 곁에 서 주게. 그러면 나는 그 은혜를 잊지 않겠네."
+      },
+      "riftwatch_ollun": {
+        "name": "균열감시자 올룬",
+        "title": "균열 학자",
+        "greeting": "모든 균열은 열리기 전에 노래하지, 귀를 기울일 줄만 안다면 말일세. 지금 이 섬에서 셋이 꿈틀대는 소리가 들리는데, 그중 하나는 아주 가깝다네."
+      },
+      "quartermaster_edda": {
+        "name": "병참관 에다",
+        "title": "보루 무기담당",
+        "greeting": "강철과 소금뿐이야, {className}. 내가 나눠 줄 수 있는 건 이제 그게 전부라네. 이걸 받아서, 균열들이 내 손 닿는 곳에서 열린 걸 후회하게 만들어 주게."
+      },
+      "mender_saul": {
+        "name": "치료사 사울",
+        "title": "야전 군의관",
+        "greeting": "지난 한 달 동안 맞춘 뼈가, 십 년간 고깃배 사고를 치료하며 맞춘 것보다 많다네. 균열은 앗아간 것을 온전히 남겨 두지 않지. 할 수 있거든, 성한 몸으로 돌아와 주게."
+      },
+      "bellkeeper_tam": {
+        "name": "종지기 탐",
+        "title": "경종지기",
+        "greeting": "이 종이야말로 균열이 우리에게 주는 유일한 경고라오, {className}. 한 번 울리면 들판, 두 번이면 절벽, 세 번 울리면 이미 코앞이라 달아나도 소용없을 만큼 가까이 온 것이오. 늘 귀를 기울이시오, 그리하면 종이 그대를 온전히 지켜 줄지도 모르니."
+      },
+      "fisher_nell": {
+        "name": "겁먹은 넬",
+        "title": "걸헤이븐 어부",
+        "greeting": "그물을 말리던 바로 그 자리에서 열렸어요. 바로 거기, 제가 평생 매일 아침 서 있던 그 자리에서요. 이제 저는 해안으로 내려가지 않아요. 이제는 어디로도 잘 가지 않는답니다."
       },
       "forgemistress_darva": {
         "name": "단조사 다르바",
@@ -11420,6 +12529,192 @@ export const ko_KR: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "승마 수업",
+        "text": "기수는 누구나 두 발로 걸어 들어오지, {playerName}, 우리가 처음 만난 날 말했던 그대로다. 수업료를 내고, 내가 신호를 주면 훈련용 발러스티드를 불러 안장에 올라타라. 그런 다음 코스를 달려라. 표식을 따라 출발 아치로 가서, 모든 장애물을 깔끔하게 뛰어넘고, 모래가 다 떨어지기 전에 결승선을 다시 넘어라. 그걸 해내면 그 안장은 네 것이다. 마당 밖으로 벗어나면 처음부터 다시다.",
+        "completion": "그래, 됐다. 한 번에 매끄럽게 올라타서 흔들림 없이 앉았구나. 발러스티드는 이제 네 것이다, {playerName}: 안장도 고삐도, 그리고 값을 치른 게 아니라 스스로 얻어낸 기수의 자리도.",
+        "objectives": {
+          "0": {
+            "label": "발러스티드 길들이기"
+          }
+        }
+      },
+      "q_veil_thinned": {
+        "title": "얇아진 장막",
+        "text": "동굴이 그대에게 열렸군. 그렇다면 봉인은 내 걱정보다 약해져 있다는 뜻이야, {playerName}. 장막이 찢긴 곳에서 위습들은 어둡고 차갑게 변한다네. 황혼 위습의 정수 여덟 개를 가져오면 상처가 얼마나 깊은지 읽어 보겠네.",
+        "completion": "하나같이 차갑군. 찢긴 자리가 균열이 되기까지 골짜기에 남은 시간은 한 계절 남짓일 게야. 그대와 내가 할 일이 생겼네.",
+        "objectives": {
+          "0": {
+            "label": "황혼 위습의 정수"
+          }
+        }
+      },
+      "q_gleaming_antlers": {
+        "title": "빛나는 가지뿔",
+        "text": "장막 수사슴은 풀을 뜯는 자리마다 빛을 흘리고, 떨어진 가지뿔은 그 빛을 몇 해나 간직하지요. 별내림 분지의 무리에게서 다섯 개만 구해 오면 제 등불은 기름 없이 겨울을 나요. 사슴을 해칠 필요는 없지만, 순순히 내주지도 않을 거예요.",
+        "completion": "빛을 이렇게나 담고 있다니! 불꽃도 연기도 없이, 오직 빛뿐. 골짜기는 베푸는군요.",
+        "objectives": {
+          "0": {
+            "label": "빛나는 가지뿔"
+          }
+        }
+      },
+      "q_wisp_lights": {
+        "title": "여울의 불빛",
+        "text": "미광 위습들은 골짜기가 봉인되던 날 떨어진 옛 별빛의 티끌을 지니고 다니지. 여섯 톨이면 성소의 등불이 일 년을 버틴다네. 스러져 가는 것들에게서만 취하게. 골짜기는 욕심부리지 않아도 넉넉히 베푸니.",
+        "completion": "첫 별들처럼 은은하군. 제단 곁에 두게. 나머지는 성소가 알아서 할 걸세.",
+        "objectives": {
+          "0": {
+            "label": "별빛 티끌"
+          }
+        }
+      },
+      "q_calming_the_deep": {
+        "title": "깊은 숲 달래기",
+        "text": "빛나는 심처의 포자꾼들은 찢긴 자리가 그들의 고리에 닿기 전까진 온순한 이들이었다네. 타락이 앗아간 것은 돌아오지 않아. 타락한 이들에게 안식을 주게, {playerName}. 심처 북쪽에서 열이라네.",
+        "completion": "내가 차마 못 할 일을 해 주었군. 남쪽 고리의 채집꾼들은 아직 노래하고 있네. 그대 덕에 계속 노래할 걸세.",
+        "objectives": {
+          "0": {
+            "label": "타락한 포자꾼에게 안식을 주었다"
+          }
+        }
+      },
+      "q_spore_hearts": {
+        "title": "고리의 심장",
+        "text": "어둠에 떨어진 포자꾼의 심장은 빌려 온 그림자로 계속 뛴다네. 그 심장 넷을 성소에서 정화하면 타락이 어떻게 번지는지 배울 수 있을 게야. 궂은일이지만, {playerName}, 고치는 일이기도 하지.",
+        "completion": "되었네. 정화되어 고요해졌어. 하나같이 같은 표식이 보이는군. 그림자는 가라앉은 궁정에서 흘러나오고 있네. 샐윈에게 전하게.",
+        "objectives": {
+          "0": {
+            "label": "포자 심장"
+          }
+        }
+      },
+      "q_monument_tour": {
+        "title": "돌이 기억하는 것",
+        "text": "봉인 이전의 비석이 아직 셋 서 있네. 하나는 황혼 전망대, 하나는 가라앉은 궁정, 하나는 아무도 걷지 않는 북동쪽 끝에 잊혀 있지. 대신 읽어 주게, {playerName}. 내 무릎은 이백 년 전에 계단을 포기했다네.",
+        "completion": "전망대, 궁정, 잊힌 구석이라… 봉인가의 세 절이 불린 그날 이후 처음으로 한자리에 모였군. 늙은 독서가를 참으로 기쁘게 해 주었네.",
+        "objectives": {
+          "0": {
+            "label": "전망대 비석을 읽었다"
+          },
+          "1": {
+            "label": "궁정 비석을 읽었다"
+          },
+          "2": {
+            "label": "잊힌 비석을 읽었다"
+          }
+        }
+      },
+      "q_grove_menace": {
+        "title": "숲의 골칫거리",
+        "text": "해가 지면 황혼 위습들이 제 좌판 사이로 흘러들어요, {playerName}. 그 냉기는 닿는 족족 상하게 하죠. 좀 솎아 주세요. 장막이 찢긴 곳이라면 어디든, 열 마리요.",
+        "completion": "이제 밤장을 다시 열 수 있겠어요. 평생 단골이 생긴 셈 치세요. 적어도 할인은 해 드릴게요.",
+        "objectives": {
+          "0": {
+            "label": "황혼 위습을 흩어 놓았다"
+          }
+        }
+      },
+      "q_shards_of_starfall": {
+        "title": "별내림의 파편",
+        "text": "황혼 위습이 수정 들판 위를 지나면 옛 별빛 조각이 가시처럼 들러붙지. 파편 여섯이면, {playerName}, 봉인이 불린 계절까지 짚어낼 수 있다네.",
+        "completion": "이 결을 보게! 가을일세. 골짜기는 가을에 봉인되었어. 이백 년 묵은 논쟁이 작은 돌 여섯으로 끝났군.",
+        "objectives": {
+          "0": {
+            "label": "별내림 파편"
+          }
+        }
+      },
+      "q_treant_accord": {
+        "title": "나무정령과의 언약",
+        "text": "숲의 원로들은 타락이 뿌리를 갉을수록 겉껍질을 벗어 던진다네. 네 장이면 숲 전체에 바를 연고를 달일 수 있어. 껍질을 떼는 동안 고맙단 말은 못 듣겠지만, {playerName}, 그 덕에 그들은 한 세기를 더 서 있을 걸세.",
+        "completion": "넷 다 두껍고 성하군. 연고는 달이는 데 일주일, 다 듣는 데 백 년이 걸리지. 나무는 친절을 재는 잣대가 다르다네.",
+        "objectives": {
+          "0": {
+            "label": "원로의 나무껍질"
+          }
+        }
+      },
+      "q_spore_tide": {
+        "title": "포자의 물결에 맞서",
+        "text": "연고가 숲은 지키고 있지만, 타락은 황혼마다 심처를 더 세게 밀어붙인다네. 채집꾼들이 북쪽 고리를 되찾으려면 타락한 이들 열둘에게 더 안식을 주어야 해, {playerName}.",
+        "completion": "오늘 밤 북쪽 고리가 다시 노래하고 있네. 나직하게, 그러나 분명하게.",
+        "objectives": {
+          "0": {
+            "label": "타락한 포자꾼에게 안식을 주었다"
+          }
+        }
+      },
+      "q_sunken_court": {
+        "title": "가라앉은 궁정",
+        "text": "브린이 옳게 읽었네. 찢긴 자리는 동쪽의 옛 궁정을 관통하고, 그곳의 수호자들은 잘못 깨어났어. 봉인을 지키라고 세운 것들이 이제는 다가서는 자를 짓뭉개려 든다네. 폐허에서 여덟을 쓰러뜨리게.",
+        "completion": "수호자 여덟이 잠잠해졌군. 나는 저들이 세워지던 때를 기억한다네, {playerName}. 놀랄 것 없어. 골짜기는 제 수호자들을 오래 살게 하지.",
+        "objectives": {
+          "0": {
+            "label": "고대 수호자를 잠재웠다"
+          }
+        }
+      },
+      "q_wardens_echoes": {
+        "title": "감시자의 메아리",
+        "text": "주인이 침묵했는데도 궁정의 수호자들은 사그라들지 않는 메아리처럼 마지막 명령을 되풀이하고 있네. 봉인이 제자리로 돌아갈 때까지 저들은 계속 깨어날 걸세, {playerName}. 석공들이 봉인석에 닿도록 열을 더 잠재워 주게.",
+        "completion": "메아리는 되풀이될수록 옅어지는군. 머잖아 궁정에는 바람과 담쟁이만 남을 걸세. 폐허란 본래 그래야 하는 법이지.",
+        "objectives": {
+          "0": {
+            "label": "고대 수호자를 잠재웠다"
+          }
+        }
+      },
+      "q_waking_warden": {
+        "title": "깨어난 감시자",
+        "text": "궁정은 조용해졌지만 그 주인은 아니라네. 봉인을 지키던 감시자가 뒤틀린 채 깨어났고, 저것이 서 있는 한 봉인은 기울 수 없어. 쉽게 쓰러지지 않을 걸세. 친구를 하나 구할 수 있다면 데려가게, {playerName}. 둘을 구할 수 있다면 둘을 데려가게.",
+        "completion": "그 종소리 같던 목소리가 침묵했네. 여기서도 느꼈다네. 골짜기 전체에서 무거운 짐이 내려앉는 듯했지.",
+        "objectives": {
+          "0": {
+            "label": "깨어난 감시자를 물리쳤다"
+          }
+        }
+      },
+      "q_seal_restored": {
+        "title": "봉인의 복원",
+        "text": "감시자의 인장을 궁정 한가운데의 봉인석으로 가져가, 떨어져 나온 자리에 도로 끼우게. 그러면 골짜기는 아물기 시작할 것이고, 그대는, {playerName}, 그대의 동족 누구도 해내지 못한 일을 이루는 걸세.",
+        "completion": "여기서도 닫히는 것이 느껴졌네. 황혼처럼 부드럽게. 골짜기는 벗을 기억한다네, {playerName}. 아무리 멀리 떠나도 큰 나무 아래에는 언제나 그대를 위한 불빛이 있을 걸세.",
+        "objectives": {
+          "0": {
+            "label": "봉인을 봉인석에 되돌려 놓았다"
+          }
+        }
+      },
+      "q_hollow_the_huntsman": {
+        "title": "무리의 수호자",
+        "text": "위습보다 더한 것도 감당할 사람으로 보이는군, {playerName}. 사냥꾼 데랄이 여기서 동쪽 사슴 풀밭에 망루를 두고 있는데, 몇 주째 쓸 만한 일손을 수소문하고 있다네. 그가 저 밖에서 무엇을 뒤쫓고 있는지는 몰라도, 마을 안에서는 입 밖에 내려 하질 않아.",
+        "completion": "펜나가 보냈다고? 좋아. 그녀가 자네를 믿는다는 뜻이니. 내게는 지워야 할 이름이 둘 있네.",
+        "objectives": {
+          "0": {
+            "label": "사냥꾼 데랄을 찾아라"
+          }
+        }
+      },
+      "q_hollow_old_marrowshell": {
+        "title": "얕은 물의 늙은 껍질",
+        "text": "첫 번째 이름은 늙은 골수껍질이네. 엘더글림에 문이 서기도 전부터 동쪽 얕은 물을 사냥해 온, 수레만 한 게지. 떠돌아다니는 놈이니, {playerName}, 물가를 따라 걸으며 그 자취를 가로지를 때까지 찾아야 할 걸세. 혼자 가지 말게. 그리고 그 고요함을 믿지 말게.",
+        "completion": "얕은 물이 다시 그저 물이 되었군. 그 껍질이 나보다 나은 사냥꾼들을 꺾는 걸 지켜봐 왔네, {playerName}. 자네는 아니었어.",
+        "objectives": {
+          "0": {
+            "label": "늙은 골수껍질 처치"
+          }
+        }
+      },
+      "q_hollow_first_of_the_herd": {
+        "title": "무리의 첫째",
+        "text": "두 번째 이름은 입에 올리기가 더 어렵네. 아우렐혼은 내 할머니가 이 망루를 지키던 시절부터 이 무리를 이끌었는데, 골짜기에서 깨어난 그 무언가가 그를 잘못 깨워 놓았어. 한때 지키던 것들을 이제는 짓밟고 다니니, 무리는 그의 광기를 견뎌 내지 못할 걸세. 옛 궁정 길 근처 풀밭을 떠돌고 있네. 자비로 그를 끝내 주게, {playerName}. 그리고 그 무게를 나눌 동료를 데려가게.",
+        "completion": "첫째가 마지막 온 이의 손에 스러졌군. 무리가 벌써 차분해졌어. 느껴지는가? 오늘 자네는 골짜기에 고운 일을 해 주었네. 비록 그렇게 보이지 않을지라도.",
+        "objectives": {
+          "0": {
+            "label": "아우렐혼에게 평안을 주었다"
+          }
+        }
+      },
       "q_prof_hobby_switch": {
         "title": "색다른 취미",
         "text": "주 전공에는 맹세가 필요하지만, 취미는 호기심이 어디로 향하는지만 묻지, {playerName}. 약초를 조금 채집하고 두 주 전공의 맞은편 기술 중 무엇을 익힐지 정하게.",
@@ -11427,6 +12722,916 @@ export const ko_KR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "약초 군락 채집"
+          }
+        }
+      },
+      "q_fv_snowline_report": {
+        "title": "설선에서 온 전갈",
+        "text": "드레이크랜드에서 기어 올라오는 사람은 하나같이 내 모닥불을 지나가는데, {playerName}, 그 수가 매주 줄고 있네. 워든 칼드라가 북쪽 길 위 아이스맨틀을 지키고 있어. 고개가 아직 열려 있다고 전하게. 그리고 낯선 이가 그 길을 혼자 걸어왔다는 것도.",
+        "completion": "고개가 버티고 있다는 말이군. 에인나는 길표지가 파묻히는 폭설 속에서도 그 길목 야영지를 지키는 사람이야. 지금껏 단 한 번도 한가한 소식을 보낸 적이 없지. 아이스맨틀에 잘 왔네, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "워든 칼드라에게 보고"
+          }
+        }
+      },
+      "q_fv_wolves_at_the_door": {
+        "title": "문 앞의 늑대들",
+        "text": "눈더미 무리는 원래 높은 단구 자락을 벗어나지 않았네. 그런데 이제는 대낮에 빙하 호수 길을 가로지르니, 내 나무꾼들이 성벽 밖으로 나가려 하질 않아. 무리를 솎아 주게, {playerName}. 열 마리면, 길이 다시 길이 되네.",
+        "completion": "여기서 호수까지 그림자가 열이나 줄었군. 나무꾼들은 벌써 누가 먼저 나갈지 다투고 있다네.",
+        "objectives": {
+          "0": {
+            "label": "눈더미 늑대 처치"
+          }
+        }
+      },
+      "q_fv_winter_pelts": {
+        "title": "산장을 위한 모피",
+        "text": "장작은 목숨을 잇게 해 주지만, {playerName}, 양털로는 이 추위를 막지 못해요. 늑대 모피만이 막아 주지요. 눈더미 무리에게서 두꺼운 겨울 모피 여섯 장을 얻어 오면, 산장이 거두는 모든 이의 침낭에 안감을 대 줄 수 있어요.",
+        "completion": "이런 모피야말로 겨울이 귀 기울이는 유일한 반박이지요. 이 장화를 받아요. 지난번 모피로 안감을 댄 거예요.",
+        "objectives": {
+          "0": {
+            "label": "두꺼운 겨울 모피"
+          }
+        }
+      },
+      "q_fv_ember_caches": {
+        "title": "호수 길 위의 불씨",
+        "text": "어젯밤 빙하 호수 길에서 불씨 단지를 실은 썰매가 뒤집혔어요. 갈무리한 불을 한 달은 살려 두는 쇠 단지들이지요. 그중 셋이 아직 눈 속에 뒹굴고 있어요, {playerName}. 산장은 그 안의 불을 잃을 형편이 못 돼요. 불을 집으로 데려와 주세요.",
+        "completion": "하나같이 아직 따뜻하네요. 당신이 산장에 겨울 한 철의 자비를 사 주셨어요, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "불씨 단지 회수"
+          }
+        }
+      },
+      "q_fv_lights_over_steps": {
+        "title": "계단 위의 빛",
+        "text": "이번 달 들어 오로라가 밤마다 초록으로 타올라서, 노인들은 그 아래로 걸어 다니려 하질 않네. 이유를 알 만한 사람은 하나뿐이야. 베일라, 오로라를 읽는 자. 호수 지나 남동쪽 오로라 계단에 혼자 야영하고 있지. 그녀의 야영지를 찾아가서, {playerName}, 빛이 그녀에게 무엇을 말해 주었는지 들어 보게.",
+        "completion": "칼드라가 보냈다고? 그럼 그녀도 드디어 걱정이 든 게로군. 그럴 만도 하지. 앉게, {playerName}. 나와 함께 잠시 하늘을 지켜보세.",
+        "objectives": {
+          "0": {
+            "label": "오로라술사 베일라를 찾아라"
+          }
+        }
+      },
+      "q_fv_silent_trapline": {
+        "title": "침묵하는 덫줄",
+        "text": "브로스크 영감은 여기서 서쪽 떨림늪의 덫줄을 돌보는데, 십일 년 동안 매주 장작 썰매 편에 모피 꾸러미를 올려 보냈네. 그런데 두 주째 감감무소식이야. 얼어 죽기엔 너무 고집이 세고 빠져 죽기엔 너무 신중한 사람이니, {playerName}, 뭔가 다른 일이 생긴 걸세. 늪가의 야영지를 찾아 그가 숨 쉬고 있는지 보고 오게.",
+        "completion": "메이브가 보냈다고? 하. 십일 년이 지났는데도 그 여자는 아직 늪이 날 잡아먹을 줄 아는군. 하기야... 올해는 그 말이 맞을지도 모르지. 늪이 내 덫줄에 무슨 짓을 했는지 보게.",
+        "objectives": {
+          "0": {
+            "label": "덫사냥꾼 브로스크를 찾아라"
+          }
+        }
+      },
+      "q_fv_aurora_motes": {
+        "title": "오로라의 티끌",
+        "text": "이 계단을 떠도는 위습들은 저 빛이 스스로 떨어뜨린 것이라, 저마다 심장에 오로라 티끌을 하나씩 품고 있네. 하늘이 무엇을 적고 있는지 읽으려면 여섯 톨이 필요하네, {playerName}. 위습들은 맞서 싸우지 않아. 그것이 이 일을 쉽게 만드는지 무겁게 만드는지는, 자네와 자네 양심 사이의 문제겠지.",
+        "completion": "여섯 톨, 아직 빛나는군. 보게, {playerName}. 서로 박자를 맞춰 고동치고 있어. 저 빛은 날씨가 아니야. 신호라네.",
+        "objectives": {
+          "0": {
+            "label": "오로라 티끌"
+          }
+        }
+      },
+      "q_fv_rime_unbound": {
+        "title": "풀려난 서리",
+        "text": "오로라가 이토록 밝게 타면, 추위가 일어나 걷는다네. 서리 정령, 의지를 얻은 서리지. 빛이 단구 자락에 닿는 곳마다 모여들고, 밤마다 내 야영지로 점점 가까이 다가오고 있네. 여덟을 부수어 주게, {playerName}. 그중 하나가 나를 부수기 전에.",
+        "completion": "벌써 밤공기가 한결 얇아진 느낌이군. 저들을 깨우는 것이 무엇이든 아직 끝나지 않았지만, 자네가 계단에 얼마간의 고요를 사 주었네.",
+        "objectives": {
+          "0": {
+            "label": "서리 정령 처치"
+          }
+        }
+      },
+      "q_fv_sprung_traps": {
+        "title": "덫 속의 요정들",
+        "text": "늪 요정들이라네, {playerName}. 그 작은 악동들이 재미 삼아 내 덫을 튕겨 버리고 쇠붙이를 갈대밭에 흩어 놓지. 쫓아내 주게. 여덟이면 나머지도 알아들을 게야. 그리고 나간 김에 내 덫줄에서 남은 것들을 주워 모아 주게.",
+        "completion": "멀쩡한 덫 넷이 돌아오고 갈대밭도 조용해졌군. 자네는 나보다 덫 놓는 손이 묵직하네, {playerName}. 하지만 결과를 두고 따질 수야 없지.",
+        "objectives": {
+          "0": {
+            "label": "늪 요정을 쫓아냈다"
+          },
+          "1": {
+            "label": "덫 회수"
+          }
+        }
+      },
+      "q_fv_howl_above": {
+        "title": "단구 위의 울음",
+        "text": "해 질 녘이면 들릴 걸세, {playerName}. 울부짖는 단구에서 내려오는, 눈더미 무리의 것이 아닌 울음소리 말이야. 더 큰 목청이지. 단구 울음꾼들이 내 할머니가 이 자리를 지키던 시절 이후 처음으로 봉우리에서 내려왔고, 늑대들을 내 길로 밀어낸 것도 바로 그놈들일세. 여덟을 솎아 내고 도로 밀어 올리게.",
+        "completion": "여덟이라, 저녁의 울음 합창이 그만큼 성겨졌군. 하지만 울음꾼은 까닭 없이 봉우리를 버리지 않아. 저 위의 무언가가 놈들을 움직인 게고, 그 무언가에게 이름이 있을까 두렵네.",
+        "objectives": {
+          "0": {
+            "label": "단구 울음꾼 처치"
+          }
+        }
+      },
+      "q_fv_seeing_wren_home": {
+        "title": "렌을 바래다주는 길",
+        "text": "내 견습생 렌이 이틀 전에 금빛눈녹이 길을 살피러 나갔다가 돌아오지 않았네. 발자국은 찾았어. 오로라 계단 남서쪽 길표지 아래 웅크리고 있는데, 늑대가 무서워 꼼짝을 못 하고 있지. 나는 늪을 비울 수가 없네, {playerName}. 그 아이를 계단 위 베일라의 야영지까지 데려다주게. 빛 아래라면 안전할 걸세.",
+        "completion": "그 아이는 안에 있네. 내 담요를 절반이나 두르고서 하늘의 별을 다 헤아릴 기세로 떠들고 있지. 오늘 자네는 고운 일을 했어, {playerName}. 서리장막 봉우리에서는 좀처럼 보기 힘든 일이라네.",
+        "objectives": {
+          "0": {
+            "label": "견습생 렌을 오로라 계단까지 무사히 배웅했다"
+          }
+        }
+      },
+      "q_fv_frostmane_tyrant": {
+        "title": "서리갈기 폭군",
+        "text": "울음꾼들이 단구를 내려온 건 사냥 때문이 아니었네. 도망치고 있었던 게야. 예티 한 마리가 고지대를 차지했지. 산사람들은 그것을 서리갈기라 부르는데, 늑대 무리조차 그것과는 비탈 하나를 나누려 들지 않아. 끝내야 하네, {playerName}. 겨울이 그것을 내 성벽까지 몰아 내리기 전에. 동료를 데려가게. 둘이면 더 좋고.",
+        "completion": "어젯밤 바람이 잦아들자, 서리갈기가 있던 자리의 침묵을 온 마을이 들었다네. 서리장막 봉우리는 자네에게 몇 해를 갚아도 모자랄 빚을 졌어, {playerName}. 이것을 걸치게. 그러면 아이스맨틀의 모든 문이 자네에게 열려 있을 걸세.",
+        "objectives": {
+          "0": {
+            "label": "서리갈기 처치"
+          }
+        }
+      },
+      "q_dk_ash_on_the_wind": {
+        "title": "바람에 실린 재",
+        "text": "방책 남쪽을 내다보게, {playerName}. 사구의 저 불들은 트롤의 취사 모닥불이 아니라 잿빛뼈의 소집 화톳불이고, 밤마다 늘어나고 있네. 죽은 자들이 이빨에 모래를 문 채 뼈벌판에서 기어 올라오지. 놈들이 내 관문까지 길을 내기 전에 약탈자 열을 베어 넘기게.",
+        "completion": "사구의 칼날이 열 자루 줄었고, 어젯밤 소집 화톳불이 한층 낮게 탔다네. 내 보초들이 일주일 만에 처음으로 눈을 붙였어. 잘 베었네, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "잿빛뼈 약탈자 처치"
+          }
+        }
+      },
+      "q_dk_trolls_on_the_road": {
+        "title": "길 위의 트롤",
+        "text": "모래언덕 트롤들이 보급 마차 소리를 배워 버렸다네, {playerName}. 이번 달에만 잿빛 사구 길을 세 번 덮쳤고, 마지막 마부는 고삐만 든 채 걸어 들어왔어. 그 길에서 트롤 여덟을 치우면 내 마차가 다시 구른다네.",
+        "completion": "여덟이라, 이제 내 마부들은 길을 나설 때마다 유서를 쓰지 않게 됐다네. 주둔지가 굶지 않는 건 자네 덕일세, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "모래언덕 트롤 처치"
+          }
+        }
+      },
+      "q_dk_scorched_stores": {
+        "title": "그을린 보급품",
+        "text": "마지막 마차는 불탔지만, {playerName}, 쇠테를 두른 상자는 속까지 타지 않는다네. 그중 넷이 아직 사구 길가에 그을린 채 뒹굴고 있어. 안에는 한 철 치 소금과 못과 활시위가 들어 있지. 트롤들이 여는 법을 알아내기 전에 내 보급품을 집으로 가져와 주게.",
+        "completion": "새까맣게 그을렸는데 걸쇠는 하나도 안 풀렸군. 대장장이는 못을 받고, 화살장이는 시위를 받고, 자네는 내 상자를 찾아오는 사람에게 주려고 아껴 둔 이 장화를 받게, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "그을린 보급 상자 회수"
+          }
+        }
+      },
+      "q_dk_banners_over_the_dunes": {
+        "title": "사구 위의 깃발",
+        "text": "잿빛뼈는 옛 뼈벌판 무덤가에서 소집한다네, {playerName}. 그런데 내 순찰대는 성벽을 읽듯 사구를 읽지는 못해. 죽은 자들을 비명으로 일으켜 세우는 전쟁소집꾼 다섯을 처치하고, 소집터마다 경고 깃발을 꽂아 내 보초들이 산등성이에서 표시를 알아볼 수 있게 해 주게.",
+        "completion": "뜨거운 바람에 깃발 셋이 펄럭이는군. 내 망원경이 딱 찾을 자리에 말이야. 전쟁소집꾼 다섯이 입을 다물었으니, 그 부름에 응하는 것들도 더디 오겠지. 자네가 우리에게 시간을 벌어 주었네, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "잿빛뼈 전쟁소집꾼 처치"
+          },
+          "1": {
+            "label": "경고 깃발을 꽂았다"
+          }
+        }
+      },
+      "q_dk_watcher_at_the_wargate": {
+        "title": "전쟁관문의 감시자",
+        "text": "무언가가 잿빛뼈를 동쪽으로 끌어당기고 있네, {playerName}. 그래서 그게 무엇인지 알아내라고 최고의 정찰병을 보냈지. 정찰병 예린은 트롤무트 너머 먼 사구에서 한 달째 야영하며, 내 평생 누구도 지은 적 없는 관문을 감시하고 있었네. 열흘 전부터 보고가 끊겼어. 그녀의 야영지를 찾아, 그녀가 본 것을 내게 가져오게.",
+        "completion": "브란녹이 보냈다고? 그럼 내 마지막 전령은 끝내 닿지 못했군. 목소리를 낮추고 앉게, {playerName}. 저 아래 관문이 보이나? 그 앞의 전쟁 깃발을 세어 보게. 그러면 내가 왜 기록을 남기기를 그만뒀는지 알게 될 걸세.",
+        "objectives": {
+          "0": {
+            "label": "정찰병 예린을 찾아라"
+          }
+        }
+      },
+      "q_dk_marrow_and_ash": {
+        "title": "골수와 재",
+        "text": "잿빛뼈 약탈자는 하나같이 전쟁낙인을 지니고 다닌다네, {playerName}. 저마다 어느 군단 아래서 행군하는지 그을려 새긴 표식이지. 이 산등성이에서 네 개 군단까지는 세어 봤지만, 짐작은 정보가 아니야. 약탈자와 전쟁소집꾼에게서 낙인 여섯을 가져오면, 브란녹에게 다가오는 전쟁의 윤곽을 그려 줄 수 있네.",
+        "completion": "낙인 여섯, 그리고 여섯 모두에 같은 표식 하나가 새겨져 있군. 이건 약탈 소집이 아닐세, {playerName}. 사구의 모든 군단이 우리 발밑의 전쟁관문을 따르고 있어. 트롤들은 그곳을 오르카디아라 부르지. 내가 모셨던 어떤 병사 다섯도 저 문 뒤에서 울리는 북소리를 꺾지 못했을 걸세. 하지만 자네 같은 다섯이라면, 혹시 모르지.",
+        "objectives": {
+          "0": {
+            "label": "잿빛뼈 전쟁낙인"
+          }
+        }
+      },
+      "q_dk_scales_of_the_maw": {
+        "title": "화산구의 비늘",
+        "text": "드레이크모에서 바람이 돌아 불면, 잿불날개 드레이크들이 이빨을 셀 수 있을 만큼 낮게 내 야영지 위를 스치고 지나간다네, {playerName}. 놈들의 행동반경이 날마다 넓어지는데, 저 분화구의 무언가가 놈들을 몰아대고 있어. 비늘 세 장을 가져다주게. 비늘은 열기를 기억하니, 그을린 자국을 보면 드레이크가 어디에 둥지를 틀었는지 읽어 낼 수 있네.",
+        "completion": "이놈 뒷면을 보게, {playerName}. 나선으로 그을려 있어. 원을 그리며 둥지를 트는 건 단 하나뿐이지. 이 드레이크들은 알을 지키는 호위대야. 드레이크모 안의 무언가가 어미라는 뜻일세.",
+        "objectives": {
+          "0": {
+            "label": "잿불날개 비늘"
+          }
+        }
+      },
+      "q_dk_matriarch_of_the_maw": {
+        "title": "화산구의 어미",
+        "text": "비늘이 진실을 말해 주었네, {playerName}. 새벽에 화산구 테두리에 올라 분화구 바닥의 그것을 보았어. 신드랄레스, 이 하늘의 모든 잿불날개가 그 아래서 부화한 어미라네. 막 불붙으려는 숯처럼 금빛으로 달아올라 있었지. 그것이 알을 품는 동안 드레이크들은 점점 대담해지는데, 와이름 감시탑은 용과 잿빛뼈를 동시에 상대할 수 없네. 분화구에서 그것을 끝장내고, 관문대장 브란녹에게 소식을 전하게. 혼자 가지는 말게.",
+        "completion": "드레이크모의 하늘이 이틀째 비어 있는데, 지금 자네가 어미의 피를 장화에 묻힌 채 내 관문을 걸어 들어오는군. 와이름 감시탑은 바로 이 순간을 위해 마흔 해를 지켜 왔다네, {playerName}. 이 어깨보호구를 받게. 화산구 비늘로, 우리 대장장이가 직접 두들긴 것이야. 드레이크들이 볼 수 있는 곳에 걸치고 다니게.",
+        "objectives": {
+          "0": {
+            "label": "화산구의 어미 신드랄레스 처치"
+          }
+        }
+      },
+      "q_af_goldmelt_road": {
+        "title": "금빛 길을 따라 내려가다",
+        "text": "금빛눈녹이 고개를 넘어왔군, {playerName}. 장화에 아직 눈이 묻어 있어. 나는 랜턴미어가 추운 땅에서 누가 걸어 들어오는지 알 수 있도록 이 성소를 지키고 있는데, 요즘은 전할 소식이 통 없었지. 금빛 길을 따라 마을로 내려가서, 우물가의 촌장 오톨린을 찾아 고개가 조용하다고 전해 주게.",
+        "completion": "금빛눈녹이가 조용하다라, 그리고 머리에 눈을 얹은 여행자가 그 증거로군요. 소렐은 한가한 소식을 보낼 만큼 허투루 망을 보는 사람이 아니에요. 랜턴미어에 잘 오셨어요, {playerName}. 등불은 당신을 위해 타고 있답니다.",
+        "objectives": {
+          "0": {
+            "label": "촌장 오톨린에게 보고"
+          }
+        }
+      },
+      "q_af_foxes_in_the_lamplight": {
+        "title": "등불 속의 여우들",
+        "text": "어스름여우들이 등불 창고의 값어치를 알아 버렸어요, {playerName}. 해 질 녘마다 울타리를 빠져나와 나룻배 등불용으로 짜 둔 수지를 물어 가지요. 발끝은 가볍고 양심은 더 가벼운 것들이에요. 열 마리를 솎아 내면 나머지는 마을을 두려워하던 기억을 되찾을 거예요.",
+        "completion": "열 마리라니, 그리고 이 계절 들어 처음으로 어젯밤 창고가 무사했어요. 점등꾼들이 고맙다는 인사를 전해 달래요, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "어스름여우 처치"
+          }
+        }
+      },
+      "q_af_lanterns_on_the_water": {
+        "title": "물 위의 등불",
+        "text": "큰 호수를 오가는 나룻배는 모두 고물에 등불을 다네, {playerName}. 그런데 내 배 세 척이 새벽에 등불 없이 돌아왔어. 안개가 가져갔거나, 안개 속의 무언가가 가져갔겠지. 바람이 돌면 동쪽 물가로 밀려온다네. 물가 길을 걸으며 내 등불들을 찾아와 주게.",
+        "completion": "셋 다 아직 타고 있군. 나룻배 등불은 물속에서도 꺼지지 않아, {playerName}. 그러라고 만든 물건이니까. 내가 걱정하는 건 무엇이 그걸 뜯어 갔느냐 하는 거라네.",
+        "objectives": {
+          "0": {
+            "label": "나룻배 등불 회수"
+          }
+        }
+      },
+      "q_af_orchard_call": {
+        "title": "과수원으로 보내는 수레",
+        "text": "과수원지기 포멜린이 서쪽 길의 금빛 과수원을 돌보는데, 수액 수레가 사흘째 오지 않고 있어요. 온 마을이 그 호박 수액으로 돌아가요, {playerName}. 등불 수지도, 단맛도, 수확제 맥주도요. 서쪽 길을 걸어가 무엇이 그녀를 붙잡고 있는지 알아봐 주세요.",
+        "completion": "촌장이 수레를 세고 있다고? 그럼 조금 더 빠진 채로 세라지. 내 나무들을 보게, {playerName}. 나한테는 늦은 배달보다 큰 걱정거리가 있다네.",
+        "objectives": {
+          "0": {
+            "label": "과수원지기 포멜린을 찾아라"
+          }
+        }
+      },
+      "q_af_amber_from_the_herd": {
+        "title": "무리에게서 얻는 호박",
+        "text": "금빛 수사슴들은 내 가장 오래된 나무 아래에서 잠자리를 트고, 수액은 밤새 금빛으로 녹아 그 털가죽에 스며들지. 빗어 낸 수액 덩이는 이 숲에서 가장 순수한 호박이라네. 여섯 덩이를 가져다주게, {playerName}. 사슴들이 고마워하지는 않겠지만, 아쉬워하지도 않을 걸세.",
+        "completion": "여섯 덩이, 갓 따른 꿀처럼 맑군. 이 장갑은 지난번 수액으로 기운 것이라네, {playerName}. 수액이 배어 뻣뻣하지만, 보기보다 따뜻하지.",
+        "objectives": {
+          "0": {
+            "label": "금빛 수액 덩이"
+          }
+        }
+      },
+      "q_af_what_took_the_moorings": {
+        "title": "밧줄을 가져간 것",
+        "text": "이제 마을 사람들 앞에서 하지 않은 이야기를 해 주지. 계류 밧줄은 풀린 게 아니라 물어뜯긴 거라네. 호수 잠복자들이야. 밤마다 대담해져서 밧줄이며 키를 물고 늘어지지. 뱃사공이 딸려 들어가기 전에, {playerName}, 여덟 마리를 영영 물밑으로 돌려보내 주게.",
+        "completion": "얕은 물의 그림자가 여덟이나 줄었고, 보름 만에 처음으로 오늘 도강이 제시간에 다녔다네. 하지만 대담해진 잠복자는 내몰린 잠복자야, {playerName}. 큰 호수 밑의 무언가가 그들을 몰아내고 있어.",
+        "objectives": {
+          "0": {
+            "label": "호수 잠복자 처치"
+          }
+        }
+      },
+      "q_af_sprites_and_spigots": {
+        "title": "요정과 수액 꼭지",
+        "text": "수확 요정들이라네, {playerName}. 그 안의 단맛을 노리고 나무둥치에서 수액 꼭지를 뜯어낸 다음, 양동이는 풀숲에 내던져 버리지. 그 좀도둑 여덟을 쫓아내고 내 양동이 넷을 되찾아 주면, 수레가 다시 구른다네.",
+        "completion": "양동이 넷이 다시 고리에 걸리고 나무줄도 조용해졌군. 자네는 나보다 요정을 다루는 손이 묵직해, {playerName}. 오늘만큼은 그게 고맙네.",
+        "objectives": {
+          "0": {
+            "label": "수확 요정을 쫓아냈다"
+          },
+          "1": {
+            "label": "수액 꼭지 양동이 회수"
+          }
+        }
+      },
+      "q_af_the_meredark": {
+        "title": "호수어둠",
+        "text": "늙은 뱃사공들에게는 뭍에서만 입에 올리는 이름이 있다네. 호수어둠, 첫 번째 잠복자, 호수만큼 늙고 그 두 배로 끈질긴 놈이지. 물에 잠긴 선착장이 가라앉던 해에 한 번 떠올랐고, 지금 다시 떠오르고 있어. 해 질 녘이면 남쪽 물가 앞 선착장 폐허에 몸을 말리러 올라온다네, {playerName}. 동료를 하나, 아니 둘 데려가서, 아직 끝낼 수 있을 때 끝내 주게.",
+        "completion": "오늘 아침 큰 호수에서 안개가 걷혔다네, {playerName}. 온 마을이 그걸 봤지. 나룻배는 다시 밤 도강을 시작할 테고, 물 위의 모든 등불이 자네의 이름으로 타오를 걸세. 이걸 받게. 물에 잠긴 선착장에서 건져 올린 것인데, 자네보다 이걸 걸칠 자격이 있는 사람은 없으니.",
+        "objectives": {
+          "0": {
+            "label": "호수어둠 처치"
+          }
+        }
+      },
+      "q_wf_across_the_fenway": {
+        "title": "늪둑길을 건너",
+        "text": "버들늪은 온화한 고장이지만, 온화한 것과 안전한 것은 다르다네, {playerName}. 길을 따라 북쪽으로 가서 늪둑길을 건너 브리지미어로 들어가게. 다리장인 알든에게 돌계단 길이 열려 있고 길목 야영지의 불이 밝혀져 있다고 전해 주게.",
+        "completion": "펠은 늪이 내뿜는 안개란 안개를 다 뚫고 그 불을 지키는 사람이지. 그녀가 돌계단이 열렸다면 열린 걸세. 브리지미어에 잘 왔네, {playerName}. 내 널판 위에서 발밑만 조심하면 우리는 잘 지낼 거야.",
+        "objectives": {
+          "0": {
+            "label": "다리장인 알든에게 보고"
+          }
+        }
+      },
+      "q_wf_rope_chewers": {
+        "title": "밧줄 갉는 것들",
+        "text": "늪두꺼비들일세, {playerName}. 밤이면 해자에서 기어 올라와 내 계류 밧줄을 갈대 줄기 씹듯 물어 끊지. 지난주에만 거룻배 세 척이 떠내려갔는데, 그중 한 척에는 내 아끼는 도르래가 실려 있었네. 솎아 주게. 그 살진 것들 열 마리면, 배가 묶어 둔 자리에 그대로 있게 되네.",
+        "completion": "내 해자의 이빨이 열 벌 줄었군. 한 달 만에 처음으로 거룻배들이 밤새 제자리를 지켰네, {playerName}. 이 마을 그물꾼 전부의 감사를 받게.",
+        "objectives": {
+          "0": {
+            "label": "늪두꺼비 처치"
+          }
+        }
+      },
+      "q_wf_eels_for_the_smokehouse": {
+        "title": "훈제장으로 갈 뱀장어",
+        "text": "늪두꺼비들이 내 밧줄만 먹는 게 아니에요, {playerName}. 내 어획까지 먹어 치워요. 통발에서 뱀장어를 통째로 꿀꺽 삼켜 버린다니까요. 고기가 상하기 전에 그 욕심 사나운 것들 배 속에서 통통한 놈 여섯 마리를 꺼내 와요. 그래야 훈제장 불이 꺼지지 않죠.",
+        "completion": "좋은 뱀장어 여섯, 흠집 하나 없네요. 아침이면 훈제장에서 돈 냄새가 날 거예요. 자, 이 장화는 내가 더 날랬을 적에 신던 거예요. 뱀장어 가죽만큼 물기를 막아 주는 건 없죠.",
+        "objectives": {
+          "0": {
+            "label": "통통한 늪 뱀장어"
+          }
+        }
+      },
+      "q_wf_mind_the_moorings": {
+        "title": "밧줄 단속",
+        "text": "이 바닥에서 좋은 밧줄은 귀하다네, {playerName}. 두꺼비가 물어 끊는 줄 하나가 일주일 치 뱀장어 벌이야. 잘린 끄트머리들이 아직 해자 물가를 따라, 배가 흘러간 자리에 널려 있네. 널판길을 걸으며 밧줄 넷을 찾아와 주게. 그러면 새것처럼 이어 붙일 수 있어.",
+        "completion": "보게, 죄다 깨끗하게 물어 끊었는데도 이을 밧줄은 넉넉히 남았군. 자네 덕에 한 달 치 돈과 그물꾼들의 한 달 치 불평을 아꼈네, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "잘린 계류 밧줄 회수"
+          }
+        }
+      },
+      "q_wf_witch_of_willowweep": {
+        "title": "수양버들 만의 마녀",
+        "text": "지금쯤 들었을 걸세, {playerName}. 그 코 고는 소리 말이야. 나른한 여울 너머에서, 늪 자체가 잠결에 몸을 뒤집는 것처럼 느리고 무겁게 울리지. 두꺼비도, 요정도, 한낮에 타오르는 위습도, 전부 그 소리가 시작되면서 함께 시작됐네. 그게 무엇인지 알 만한 사람은 하나뿐이야. 세지 어멈이 수양버들 만에 야영지를 두고 있네. 해자를 서쪽으로 돌아 먼 물가로 내려가면 나오지. 그녀를 찾아서, 내 늪 한가운데에 무엇이 잠들어 있는지 물어보게.",
+        "completion": "알든이 그 코골이를 물어보라고 예까지 보냈다고? 다리 사람들이 드디어 귀를 기울이는군. 축축한 데서 나와 앉게, {playerName}. 그 소리에는 이름이 있고, 목구멍이 있지. 그리고 나는 그것을 잠재우는 걸 도울 만큼 어리석은 이를 기다려 왔다네.",
+        "objectives": {
+          "0": {
+            "label": "세지 어멈을 찾아라"
+          }
+        }
+      },
+      "q_wf_toll_and_tangle": {
+        "title": "통행세와 덤불",
+        "text": "버들 요정들은 나룻배를 끊어 놓는 게 신나는 놀이인 줄 안다네, {playerName}. 지난주에는 동쪽 물길에서 통행세 거룻배가 뒤집혔는데, 한 철 치 다리 통행세가 실려 있었지. 궤짝들은 얕은 물에 가라앉았고, 요정들은 저희 것인 양 널판길 위에서 춤을 추고 있어. 여덟을 쫓아내고 통행세 궤짝 셋을 건져 올리게. 그러면 브리지미어가 이번 겨울을 난다네.",
+        "completion": "궤짝 셋, 안의 동전도 아직 말라 있군. 요정들은 일주일은 버들가지 속에서 골을 부리겠지만, {playerName}, 마을은 자네에게 겨울 빵을 빚졌네.",
+        "objectives": {
+          "0": {
+            "label": "버들 요정을 쫓아냈다"
+          },
+          "1": {
+            "label": "통행세 궤짝 회수"
+          }
+        }
+      },
+      "q_wf_wisplight_charms": {
+        "title": "위습빛 부적",
+        "text": "웅덩이 위의 위습들은 늪이 소리 내어 꾸는 꿈이라네, {playerName}. 그리고 그 빛만이 개구리왕의 잠기운을 버텨 내지. 나는 그것을 버들가지 부적으로 엮는다네. 하나 목에 걸면 그 코골이도 자네 눈꺼풀을 끌어내리지 못해. 위습빛 구슬 여섯을 가져다주게. 위습들은 맞서 싸우지 않을 테니, 이 일이 선행인지 도둑질인지는 자네가 어떻게 짊어지느냐에 달렸네.",
+        "completion": "구슬 여섯, 아직 꿈결로 따뜻하군. 달 뜰 때까지만 기다리게. 자네와, 자네 곁에 설 만큼 용감한 이의 몫까지 부적을 엮어 두겠네.",
+        "objectives": {
+          "0": {
+            "label": "위습빛 구슬"
+          }
+        }
+      },
+      "q_wf_croakers_hush": {
+        "title": "개구리왕의 잠",
+        "text": "이제 그 코 고는 소리의 이름을 알았군, {playerName}. 졸음 개구리왕, 나른한 여울에 사는 늙은 두꺼비 왕이라네. 해마다 그 울음은 무거워지고, 해마다 이 늪은 조금씩 더 깨어나는 법을 잊어 가지. 부적이 눈꺼풀은 지켜 주겠지만, 그 덩치는 다른 문제야. 동료를 데려가게. 그리고 물속에서는 싸우지 말게. 늙은 왕을 더 고요한 잠에 들여 주게.",
+        "completion": "들어 보게, {playerName}. 아무것도 없어. 삼십 년 만에 이 늪에 내린 첫 참된 침묵이라, 마을 절반은 그 낯섦에 오늘 밤 잠들지 못할 걸세. 버드나무들이 저희 방식으로 고맙다 말하고 있네. 이걸 걸치게. 그 왕의 수련밭에서 엮은 것이니, 물이 닿는 곳이라면 어디서든 늪이 자네를 벗으로 알아볼 걸세.",
+        "objectives": {
+          "0": {
+            "label": "졸음 개구리왕 처치"
+          }
+        }
+      },
+      "q_nb_road_of_lanterns": {
+        "title": "등불의 길",
+        "text": "이 위로는 해가 따라오지 않아요, {playerName}. 오르막을 따라 내가 밝혀 둔 등불만이 있을 뿐이죠. 문레스트는 꽃빛이 모여드는 북쪽에 있어요. 리라 듀송을 그녀의 정원에서 찾아, 밤의 문 등불이 아직 타고 있다고 전해 주세요.",
+        "completion": "등불이 아직 타고, 길이 아직 낯선 이를 우리에게 데려다주는군요. 소렐은 문레스트의 그 누구가 기억하는 것보다 오래 그 문을 지켜 왔어요. 어서 와요, {playerName}. 동이 트지 않는 땅에 오신 것을 환영해요.",
+        "objectives": {
+          "0": {
+            "label": "문레스트에서 리라 듀송을 찾아라"
+          }
+        }
+      },
+      "q_nb_striders_in_the_dark": {
+        "title": "어둠 속의 질주자들",
+        "text": "어스름 질주자들은 본래 참을성 있는 사냥꾼이었어요, {playerName}. 그런데 요즘은 꽃밭까지 슬며시 들어와, 우리 등불 아래에서 달양털 새끼 양을 물어 가요. 열 마리를 솎아 내고 구릉에 고요를 돌려주세요.",
+        "completion": "질주자 열이 줄었고, 무리는 벌써 한결 편히 풀을 뜯네요. 정원은 저만의 시간을 지키며 살지만, 오늘 밤은 그 시간을 평화로이 지키겠어요.",
+        "objectives": {
+          "0": {
+            "label": "어스름 질주자 처치"
+          }
+        }
+      },
+      "q_nb_wool_by_moonlight": {
+        "title": "달빛 아래의 양털",
+        "text": "달양털만큼 따뜻한 것도, 그만큼 곱게 자아지는 것도 없어요, {playerName}. 짐승들이 구릉을 거닐면서 은빛 털을 뭉치째 흘리고 다니죠. 무리에게서 좋은 뭉치 여섯을 얻어다 주면, 걸어온 보람이 있는 것을 짜 드릴게요.",
+        "completion": "별빛처럼 은빛이고 그 두 배로 부드럽네요. 자, {playerName}. 지난번 털로 만든 벙어리장갑이에요. 달양털만이 댈 수 있는 안감을 댔죠.",
+        "objectives": {
+          "0": {
+            "label": "달양털 뭉치"
+          }
+        }
+      },
+      "q_nb_night_gardens": {
+        "title": "밤의 정원",
+        "text": "밤꽃은 오직 이 하늘 아래에서만 피는데, 어스름 꽃벌판에는 이 땅에서 가장 오래된 꽃밭이 있어요. 성소의 꽃줄을 엮으려면 싱싱한 꽃송이 넷이 필요해요, {playerName}. 부드럽게 잘라 주세요. 꽃밭은 거친 손을 한 계절 내내 기억하니까요.",
+        "completion": "꽃잎마다 아직 빛이 돌고 있네요. 성소에서 일주일은 밤 내음이 날 테고, 문레스트는 그 덕에 더 편히 잠들 거예요.",
+        "objectives": {
+          "0": {
+            "label": "밤꽃 송이 채집"
+          }
+        }
+      },
+      "q_nb_eyes_on_the_vigil": {
+        "title": "선돌을 지켜보는 눈",
+        "text": "무언가가 질주자들을 대담하게, 무리를 불안하게 만들고 있어요, {playerName}. 그런데 그것은 꽃으로는 읽을 수가 없네요. 카시안이라면 하늘에서 읽어 낼 수 있어요. 그는 밤일족이 돌 사이를 떠도는 동쪽 불침번 선돌 곁에 관측 야영지를 두고 있죠. 그를 찾아가서, 별들이 무어라 말하는지 물어봐 주세요.",
+        "completion": "리라가 보냈다고? 그럼 정원들도 느끼고 있다는 뜻이군. 잠시 관측경 곁에 앉게, {playerName}. 별들이 한 달째 뒤척이고 있는데, 내가 그리는 성도마다 북쪽 봉분을 향해 기울고 있다네.",
+        "objectives": {
+          "0": {
+            "label": "불침번 선돌에서 천문학자 카시안을 찾아라"
+          }
+        }
+      },
+      "q_nb_charts_of_the_stones": {
+        "title": "돌에 새겨진 성도",
+        "text": "불침번 선돌은 문레스트보다, 그 돌을 돌보는 밤일족보다도 오래되었네. 그 돌 표면에는 성도가 새겨져 있는데, 나는 그것을 읽는 법을 배우는 데 평생을 들였지. 하늘이 움직였네, {playerName}. 얼마나 멀리 움직였는지 알아야겠어. 선돌 셋의 성도를 읽고 그 방위를 내게 가져다주게.",
+        "completion": "의심의 여지가 없군. 방위 하나하나가 모두 잠들지 않는 봉분 쪽으로 기울었네. 마치 하늘이 그 무덤 위로 몸을 숙여 들여다보는 것처럼 말이야. 옛 왕들이 정렬된 별 아래 묻힌 데는 이유가 있었네, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "성도를 읽었다"
+          }
+        }
+      },
+      "q_nb_restless_mounds": {
+        "title": "잠 못 드는 봉분들",
+        "text": "성도는 경고였고, 봉분 벌판이 그것을 증명하네. 봉분이 안쪽에서부터 열리고 있어. 망자들이 옛 예장을 걸친 채 무덤 줄 사이를 거닐고, 그들을 잠재우던 공물은 풀밭에 흩어져 있네. 여덟을 눕혀 주게, {playerName}. 그리고 공물 넷을 거두어 내게 가져오게.",
+        "completion": "무덤의 금붙이, 아직 흙의 한기가 남아 있군. 망자들은 스스로 일어나는 게 아니야, {playerName}. 큰 봉분 아래의 무언가가 그들을 불러내고 있네. 그리고 그 이름은 성도가 이미 말해 주었을까 두렵군.",
+        "objectives": {
+          "0": {
+            "label": "봉분 망자 처치"
+          },
+          "1": {
+            "label": "무덤 공물 회수"
+          }
+        }
+      },
+      "q_nb_the_barrow_king": {
+        "title": "봉분의 왕이 깨어난다",
+        "text": "모든 방위가, 뒤척이는 모든 별이, 열린 모든 봉분이 한 가지를 가리키네. 봉분의 왕이 큰 봉분 아래에서 깨어나고 있는데, 이 땅에는 그를 막아 줄 새벽이 없어. 그가 제 왕관을 기억해 내기 전에 다시 잠재워야 하네, {playerName}. 혼자 가지 말게. 동료를 데려가고, 꽃빛을 등 뒤에 두게.",
+        "completion": "별들이 한 계절 만에 처음으로 자리를 잡았네, {playerName}. 봉분은 닫혔고, 밤일족은 저희 돌 곁에서 고요해졌고, 왕은 다시 아래에서 잠드네. 이 어깨덮개를 걸치게. 문레스트가, 밤이 마침내 믿게 된 이를 위해 지은 것이라네.",
+        "objectives": {
+          "0": {
+            "label": "봉분의 왕을 안식에 들였다"
+          }
+        }
+      },
+      "q_ww_bells_of_gallowmere": {
+        "title": "갈로미어의 종소리",
+        "text": "저 종소리가 들리나, {playerName}? 북쪽 길 위 갈로미어가 제 망자들을 재우려 울리는 소리라네. 교회지기 매로우가 나무우듬지 아래 모든 영혼을 헤아리지. 산 자든 묻힌 자든 말이야. 가서 헤아림을 받게. 숲이 자네를 제멋대로 헤아리기 전에.",
+        "completion": "콥이 자네를 성한 몸으로 올려 보냈군? 좋은 사람이지. 삼십 년을 그 문 등불을 밝혀 왔는데, 숲은 단 한 번도 그를 지나치지 못했다네. 갈로미어에 잘 왔네, {playerName}. 종소리를 조심하게.",
+        "objectives": {
+          "0": {
+            "label": "교회지기 매로우에게 보고"
+          }
+        }
+      },
+      "q_ww_silk_in_the_eaves": {
+        "title": "처마 밑의 비단",
+        "text": "서쪽 길을 걸을 때 위를 올려다보게, {playerName}. 보일 걸세. 바람도 닿지 않는 우듬지에서 흔들리는, 둘둘 감긴 형체들 말이야. 과부비단 거미들이 덤불에서 기어 나와 내 등불 위에 저희 곳간을 매달아 놓았네. 열을 죽이게. 그러면 길이 다시 길이 되네.",
+        "completion": "처마의 거미가 열이나 줄었군. 오늘 밤 점등꾼들은 위를 올려다보지 않고 순찰을 돌 걸세. 그게 여기서 얼마나 값진 일인지 자네는 모를 거야.",
+        "objectives": {
+          "0": {
+            "label": "과부비단 거미 처치"
+          }
+        }
+      },
+      "q_ww_widows_skeins": {
+        "title": "과부의 실타래",
+        "text": "거미들이 우리 망자를 저희 곳간으로 가져가니, {playerName}, 나는 그들의 비단을 우리 수의로 가져온다네. 깨끗하게 타고, 아마포보다 축복을 잘 머금지. 과부비단 여섯 타래를 가져다주게. 그러면 다음에 묻는 영혼은 감싸이고 지켜진 채로 내려간다네.",
+        "completion": "여섯 타래, 참았던 숨결처럼 보드랍군. 망자들이 이 안에서 더 편히 눕겠어. 이 손목보호대를 받게. 지난번 비단으로 지은 것인데, 숲이 단 한 번도 물어뜯지 못했다네.",
+        "objectives": {
+          "0": {
+            "label": "과부비단 실타래"
+          }
+        }
+      },
+      "q_ww_candles_at_the_bounds": {
+        "title": "경계의 초",
+        "text": "갈로미어를 두르고 경계석 넷이 서 있네, {playerName}. 바깥으로 난 길마다 하나씩, 그리고 돌마다 무덤 초가 타고 있지. 그 초가 타는 동안은 묻힌 자들이 묻힌 채로 있는다네. 그런데 가랑비가 넷을 모조리 꺼 버렸는데, 나는 혼자 경계를 돌기엔 너무 늙었어. 내 심지불을 가져가서 다시 밝혀 주게. 서둘러야 하네.",
+        "completion": "넷 다 타고 있다고? 그럼 한숨 돌리게, {playerName}. 자네는 못 들었겠지만 온 마을이 들었다네. 마지막 심지에 불이 붙는 순간, 종소리가 한결 편안해졌어.",
+        "objectives": {
+          "0": {
+            "label": "무덤 초를 다시 밝혔다"
+          }
+        }
+      },
+      "q_ww_the_last_vicar": {
+        "title": "마지막 사제",
+        "text": "여기서 남쪽으로 애도석 예배당이 검은 호수 곁에서 삭아 가는데, 아직 한 사람이 그곳을 돌보고 있네. 사제 크릴. 지붕이 무너져 내릴 때도 떠나지 않은 사람이지. 그는 옛 의식을 내 종보다 잘 아는데, {playerName}, 한 달째 소식이 없네. 예배당 길을 걸어가 그가 숨 쉬고 있는지 보고 오게.",
+        "completion": "매로우가 내 걱정을 한다고? 그거 새롭군. 애도석은 그런대로 서 있고 나도 그렇다고 전해 주게. 잠시 머물게, {playerName}. 호수가 속삭이고 있는데, 혼자 듣고 싶지는 않으니.",
+        "objectives": {
+          "0": {
+            "label": "사제 크릴을 찾아라"
+          }
+        }
+      },
+      "q_ww_wraiths_of_the_tarn": {
+        "title": "호수의 망령들",
+        "text": "숲 망령들은 한때 예배당의 수호자였네, {playerName}. 명예로운 망자 위에 심은 나무에서 자라났지. 호수가 검게 변한 뒤로 저희 소임을 잊었고, 이제는 내 묘지를 떠돌며 흙을 잡아 뜯는다네. 여덟을 부수어 주게. 그들이 시작한 일을 끝마치기 전에.",
+        "completion": "수호자 여덟이 마침내 몸을 눕혔군. 한낮에는 이것을 자비라 부르지 않겠네만, 우리끼리 말이지만, {playerName}, 자비였다네.",
+        "objectives": {
+          "0": {
+            "label": "숲 망령 처치"
+          }
+        }
+      },
+      "q_ww_what_the_bark_holds": {
+        "title": "나무껍질이 품은 것",
+        "text": "갈로미어 동쪽 매달린 공터에서는 거미들이 비단에 감은 망자를 가지에 매달아 두고, 그 아래에는 무덤껍질 괴목들이 참을성 있는 관잡이처럼 서서 지킨다네. 저 위에 매달린 건 우리 사람들일세, {playerName}. 괴목 다섯을 부수고, 감긴 망자 셋을 끌어 내려, 흙으로 돌려보내 주게.",
+        "completion": "해 지기 전에 세 영혼이 바른 땅 밑으로 돌아갔네. 괴목이야 다시 자라겠지. 나무껍질은 늘 그러니까. 하지만 오늘 밤 그 공터는 비어 있고, 그거면 충분하네.",
+        "objectives": {
+          "0": {
+            "label": "무덤껍질 괴목 처치"
+          },
+          "1": {
+            "label": "비단에 감긴 유해를 내렸다"
+          }
+        }
+      },
+      "q_ww_walking_mosley_home": {
+        "title": "모슬리를 집까지",
+        "text": "내 무덤파기꾼 모슬리가 사흘 전에 옛 묘역에 자리 하나를 파러 예배당 길을 나섰는데, 파던 구덩이가 그 위로 무너져 내렸다네. 제 손으로 기어 나왔으니 그 바보는 살아 있네만, 예배당 무덤가에 웅크린 채 길 위의 거미들이 무서워 꼼짝을 않고 있어. 집까지 데려와 주게, {playerName}. 산 사람을 위해 종을 울릴 수는 없지 않은가.",
+        "completion": "제 두 발로 문을 걸어 들어왔네. 앞으로는 순무밭보다 깊은 건 안 파겠다고 맹세하면서 말이야. 일요일이면 다시 묘역에 나가 있을 걸세. 늘 그러니까. 고맙네, {playerName}. 갈로미어는 제 사람을 지킨다네. 그게 우리 법의 전부일세.",
+        "objectives": {
+          "0": {
+            "label": "무덤파기꾼 모슬리를 갈로미어까지 무사히 배웅했다"
+          }
+        }
+      },
+      "q_ww_horn_of_the_huntsman": {
+        "title": "사냥꾼의 뿔피리",
+        "text": "지금쯤 그 뿔피리 소리를 들었겠지, {playerName}. 가늘고 아득한, 온 숲이 숨을 죽이는 그 소리 말일세. 창백한 사냥꾼이 여기서 북쪽의 제 공터를 말 타고 도는데, 그가 지나는 무덤마다 조금씩 얕아진다네. 그도 한때는 사람이었고, 잘못 묻혔지. 나는 이제 기도로 될 일인 척하기를 그만두었네. 동료를 하나, 아니 둘 데려가서, 그를 말에서 끌어내리게.",
+        "completion": "뿔피리가 음 한가운데서 멎었네. 갈로미어의 종이란 종이 저 혼자 한 번씩 울리더니, 숲이 삼십 년 만에 처음 듣는 고요에 잠겼어. 자네는 내가 못 한 의식을 해낸 걸세, {playerName}. 이걸 걸치고, 나무우듬지 아래를 두려움 없이 걷게.",
+        "objectives": {
+          "0": {
+            "label": "창백한 사냥꾼을 말에서 끌어내렸다"
+          }
+        }
+      },
+      "q_pr_down_to_drifthaven": {
+        "title": "드리프트헤이븐으로",
+        "text": "검은 나무들을 빠져나와 햇빛 속으로 왔군, {playerName}. 물가 길을 따라 북쪽으로 가면 조수가 돌기 전에 드리프트헤이븐에 닿을 걸세. 인양대장 리나를 찾게. 폭풍 이후로 일손이라면 쌍수 들고 반기는 사람이야. 그리고 덩굴 어귀 길이 아직 열려 있다고 전해 주게.",
+        "completion": "펠이 보냈다고? 그럼 덩굴 어귀 길을 처음부터 끝까지 혼자 걸어왔다는 건데, 그거면 내게는 추천장으로 충분하네. 드리프트헤이븐에 잘 왔네, {playerName}. 밧줄부터 잡게. 일손이 모자라니까.",
+        "objectives": {
+          "0": {
+            "label": "인양대장 리나에게 보고"
+          }
+        }
+      },
+      "q_pr_wreck_line_cargo": {
+        "title": "난파선 지대",
+        "text": "사흘 전 밤 폭풍이 펄웨이크호를 암초에 처박았고, 화물은 여기서 야자 백사장까지 난파선 지대를 따라 온통 흩어졌네. 교역품 상자 셋이 아직 파도에 뒹굴고 있어, {playerName}. 남은 것마저 조수가, 아니면 게들이 챙겨 가기 전에 거둬들이게.",
+        "completion": "소금물이 배긴 했지만 셋 다 멀쩡하군. 이번 달 잠수부들이 밥을 먹는 건 자네 덕일세, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "펄웨이크호 화물 회수"
+          }
+        }
+      },
+      "q_pr_scuttler_cull": {
+        "title": "등딱지 도둑들",
+        "text": "이 해안의 난파선마다 조수 게가 꼬이는데, 펄웨이크호는 암초의 절반을 끌어모았네. 저 집게발들이 얕은 물에 있는 한 내 인양꾼들은 줄을 잡으려 들지 않아. 열 마리를 부수게, {playerName}. 그러면 난파선 지대는 다시 우리 것일세.",
+        "completion": "파도 속의 집게발이 열이나 줄었군. 내 일꾼들은 벌써 물로 되돌아 걸어 들어가고 있는데, 고맙다는 말은 아무도 안 하더군. 그러니 내가 하지. 고맙네, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "조수 게 처치"
+          }
+        }
+      },
+      "q_pr_boars_in_the_gardens": {
+        "title": "텃밭의 멧돼지들",
+        "text": "깊은 초록에서 무엇이 꿈틀대는지 몰라도, 그것이 덤불 멧돼지들을 우리 백사장으로 밀어내고 있네. 이번 주에만 텃밭 단을 두 번이나 파헤쳤고, 다음은 건조대 차례일 게야. 열 마리일세, {playerName}. 그리고 나머지는 나무 밑으로 도로 밀어 넣게.",
+        "completion": "건조대는 무사하고 텃밭은 다시 심으면 되네. 멧돼지들이 제 발로 모래에 나온 게 아니야, {playerName}. 그걸 기억하게. 무언가가 놈들을 움직인 걸세.",
+        "objectives": {
+          "0": {
+            "label": "덤불 멧돼지를 쫓아냈다"
+          }
+        }
+      },
+      "q_pr_the_man_who_went_in": {
+        "title": "안으로 들어갔던 자",
+        "text": "잠수부들은 나무 그늘 너머로는 발을 들이지 않을 테고, 나도 그들에게 그것을 청하지 않겠네, {playerName}. 지금쯤 북소리는 들었겠지. 둘째 밤이면 누구나 듣게 되니까. 이 섬에서 그 소리를 향해 걸어 들어갔다가 돌아온 사람은 단 하나뿐이야. 오쿠. 그는 덩굴 길 깊숙이, 덩굴폭포 숲의 큰 반얀나무 아래 야영하고 있네. 그를 찾아가서, 초록이 무엇을 숨기고 있는지 물어보게.",
+        "completion": "이샤가 보냈다고? 진주어멈이 내 이름을 입에 올리지 않은 지 여러 해인데. 덩굴 손이 닿지 않는 곳에 앉게, {playerName}. 내가 아는 것을 말해 주지. 북소리는 위험이 아니야. 경고라네.",
+        "objectives": {
+          "0": {
+            "label": "덩굴폭포 숲에서 오쿠를 찾아라"
+          }
+        }
+      },
+      "q_pr_canopy_silk": {
+        "title": "수관의 비단",
+        "text": "위를 보게, {playerName}. 여기서 신상까지 나무우듬지란 우듬지는 죄다 고기잡이 그물처럼 거미줄이 쳐져 있는데, 거미들은 철마다 대담해지고 있네. 나는 놈들의 비단을 길 위에 걸어 두지. 방울 단 걸림줄이야. 밀림이 내게 소리 없이 다가들지 못하도록 말일세. 수관 거미에게서 좋은 비단 타래 여섯이면 내 줄을 다시 맬 수 있네.",
+        "completion": "좋군, 질긴 비단이야. 내 방울들은 당분간 더 노래할 테고, 밤에 이 길을 걷는 것치고 내가 모르는 것은 없을 걸세, {playerName}. 요즘 들어, 무언가가 자주 걷고 있다네.",
+        "objectives": {
+          "0": {
+            "label": "수관 비단 타래"
+          }
+        }
+      },
+      "q_pr_the_lost_navigator": {
+        "title": "길 잃은 항해사",
+        "text": "펄웨이크호에서 선원을 전부 건져 냈는데 하나가 빠졌네. 항해사 술리. 먼 백사장을 향해 헤엄쳤는데 끝내 걸어 들어오지 못했지. 잠수부 하나가 야자 백사장 너머 뱃머리 잔해에 웅크린 그녀를 발견했네. 살아 있지만, 혼자 그 길을 뚫고 오기엔 너무 지쳐 있어. 물가 길을 따라 집까지 데려와 주게, {playerName}. 게들이 싫어할 테고, 밀림은 더 싫어할 걸세.",
+        "completion": "술리는 불가에 있네. 아직도 헤엄쳐 올 수 있었다고 우기면서 말이야. 이 해안의 유일한 해도 읽는 이를 자네가 데려온 걸세, {playerName}. 이건 그녀의 뱃궤에서 나온 것이니, 그녀의 축복과 함께 받게.",
+        "objectives": {
+          "0": {
+            "label": "항해사 술리를 드리프트헤이븐까지 무사히 배웅했다"
+          }
+        }
+      },
+      "q_pr_what_the_drums_guard": {
+        "title": "북소리가 지키는 것",
+        "text": "산 사람이 감히 다가갈 수 있는 데까지 가라앉은 신상 곁을 걸어 봤는데, 두 가지를 보았네. 거미들이 신상 길을 거미줄 장막으로 덮었다는 것, 그리고 그 길가의 옛 공양 그릇들이 다시 채워져 있다는 것. 그것도 갓 채워졌더군, {playerName}. 길에서 거미 여덟을 베어 내고 그 공물 셋을 가져다주게. 어떤 손이 아직도 죽은 신을 먹이는지 알아야겠네.",
+        "completion": "이끼, 진주 껍데기, 멧돼지 피. 손가락으로 눌러 담았군. 그 폐허의 무언가가 아직 제 의식을 지키고 있네, {playerName}. 그리고 수호자는 그 밖의 모든 것을 막아서고 있지. 이제 이 이야기를 터놓고 할 때가 되었네.",
+        "objectives": {
+          "0": {
+            "label": "수관 거미 처치"
+          },
+          "1": {
+            "label": "다시 채워진 공양 그릇 획득"
+          }
+        }
+      },
+      "q_pr_idol_guardian": {
+        "title": "신상의 수호자",
+        "text": "그 신상은 섬보다 오래되었네, {playerName}. 북소리보다, 야자 해안이라는 이름보다도 오래되었지. 그 수호자는 야자수가 자라기도 전부터 물에 잠긴 그 원형 터에 서 있었는데, 이제 깨어나 밤마다 기둥 사이를 걷는다네. 그 공물이 무엇을 먹이든, 수호자는 그것의 문지기야. 동료를 데려가서, 부수게.",
+        "completion": "밀림조차 건드리려 하지 않던 것을 자네가 쓰러뜨렸군. 저길 보게, 신상 뒤편을. 수호자가 지키던 건 기둥이 아니었어, {playerName}. 그 아래의 계단이었네. 오늘 밤은 북소리가 멎었군. 야생심장 분지 밑에서 잠든 그것이 무엇이든, 이제 자네의 이름을 알고 있네.",
+        "objectives": {
+          "0": {
+            "label": "신상 수호자 처치"
+          }
+        }
+      },
+      "q_eg_gate_report": {
+        "title": "문 너머로 전하는 말",
+        "text": "이 문 너머의 잔디밭은 백 년 동안 스스로를 다듬어 왔네, {playerName}. 그런데 요즘 들어 방문객까지 다듬기 시작했어. 수석 정원사 아마란스가 헤지윅에서 장부를 맡고 있네. 문 앞 잔디밭을 지나 길을 오르면 나오지. 여행자가 또 하나 들어왔다고 전하고, 어젯밤 문가의 산울타리가 움직였다는 것도 전해 주게.",
+        "completion": "움직였다고. 펠은 매주 그 보고를 올리고, 매주 그의 말이 맞아요. 눈 밑이 이런 건 이해해 줘요, {playerName}. 몇 년째 밤을 제대로 자 본 적이 없거든요. 누군가는 정원이 우리를 지켜보는 걸 지켜봐야 하니까요. 헤지윅에 잘 왔어요.",
+        "objectives": {
+          "0": {
+            "label": "수석 정원사 아마란스에게 보고"
+          }
+        }
+      },
+      "q_eg_hungry_shapes": {
+        "title": "굶주림으로 다듬어지다",
+        "text": "이 정원을 빚는 자가 손이 무뎌졌거나, 아니면 잔인해졌네. 들장미 수풀의 늑대 형상들은 보라고 다듬어 놓은 것인데, 요즘은 사냥을 하지. 초록 아가리에, 배 속은 없고, 그러니 멈출 이유도 영영 없는 것들이야. 토피어리 늑대 열을 베어 넘기게, {playerName}. 그리고 잠시나마 잔디밭이 다시 잔디밭이 되게 해 주게.",
+        "completion": "늑대 열 마리가 서 있던 자리에 가지 더미가 열 무더기라. 원예 일처럼 느껴져야 마땅한데, {playerName}. 어째서 전쟁처럼 느껴지는 걸까?",
+        "objectives": {
+          "0": {
+            "label": "토피어리 늑대 처치"
+          }
+        }
+      },
+      "q_eg_stolen_shears": {
+        "title": "도둑맞은 전정가위",
+        "text": "보름 사이에 헤지윅의 전정가위란 가위가 죄다 걸어 나가 버렸어요, {playerName}. 걸이에서, 잠근 헛간에서, 한 자루는 내가 조는 사이 앞치마에서까지요. 산울타리 노움들 짓이에요. 우리가 저희 잔디밭을 밟는 걸 싫어하는 그 작은 정원지기들 말이에요. 온 마을이 부엌칼로 버티는 신세가 되기 전에 여섯 자루만 되찾아 줘요.",
+        "completion": "여섯 자루, 그리고 그중엔 내 것도 있네요. 날의 이 빠진 자리는 어디서든 알아보죠. 자, 이 장갑은 가지치기용으로 뜬 거예요. 손이 따뜻해야 가위질이 흔들리지 않는답니다.",
+        "objectives": {
+          "0": {
+            "label": "도둑맞은 헤지윅 전정가위"
+          }
+        }
+      },
+      "q_eg_who_trims_the_hedges": {
+        "title": "산울타리는 누가 다듬는가",
+        "text": "장부를 맡은 지 삼십 년인데, {playerName}, 그중 십 년은 제대로 잠을 못 잤어요. 셈이 맞질 않으니까요. 풀은 깎아야 자라고 산울타리는 다듬어야 모양이 나는데, 여기서 그 일을 하는 사람은 아무도 없어요. 그런데도 새벽마다 정원은 말끔히 다듬어져 있죠. 요즘 숲사람들이 남쪽 끝 잔디밭에서, 미로 지나 수련 못 옆에서 손수레를 끄는 노인을 봤다고 맹세해요. 그를 찾아 줘요. 그가 실재한다면 나는 드디어 잘 수 있어요. 아니라면, 아마 영영 못 자겠죠.",
+        "completion": "저택에서 드디어 사람을 보냈군. 백 년을 이 잔디밭을 걸었네, {playerName}. 정원과 나 사이엔 약조가 있지. 나는 다듬어 달라 청하는 것만 다듬는다네. 앉게. 산울타리도 자네에게 한 시간쯤은 내줄 수 있으니.",
+        "objectives": {
+          "0": {
+            "label": "수련 못 옆의 정원사를 찾아라"
+          }
+        }
+      },
+      "q_eg_gnomes_in_the_green": {
+        "title": "정원지기의 앙심",
+        "text": "가위는 시작에 불과했어요, {playerName}. 어젯밤에는 노움들이 우리 연장 수레를 초록 속에 엎어 버렸어요. 하나는 미로 서쪽 저희 굴 근처에, 하나는 정원 반대편 연못 산책로에요. 백 년 묵은 좋은 쇠붙이가 풀밭에 흩어졌지요. 그 작은 악동 여덟을 쫓아내고, 엎어진 수레를 끌고 돌아와 줘요.",
+        "completion": "수레 셋이 돌아오고 걸이도 다시 찼네요. 그 작은 악동들은 저희 산울타리에서 실컷 골이나 부리라죠. 헤지윅도 이 잔디밭에서 일하며 사는걸요.",
+        "objectives": {
+          "0": {
+            "label": "산울타리 노움을 쫓아냈다"
+          },
+          "1": {
+            "label": "연장 수레 회수"
+          }
+        }
+      },
+      "q_eg_bloom_clippings": {
+        "title": "살아 있는 초록의 가지",
+        "text": "이 정원을 이해하고 싶은가? 그러면 나처럼 정원을 읽어야 하네. 잔디밭에서 풀을 뜯는 수사슴들은 가장 참된 초록으로 자라나지. 그 몸의 잎 하나하나가 책의 한 쪽이라네. 토피어리 수사슴에게서 싱싱한 가지 여섯을 잘라 오게, {playerName}. 가지치기를 고마워하지는 않겠지만, 다시 자랄 걸세. 여기서는 모든 것이 다시 자라니까.",
+        "completion": "이걸 보게. 잎이 안으로 말려들고 있어. 잘라 온 가지가 하나같이 그래. 정원이 겁을 먹은 거라네, {playerName}. 백 년을 지켜봤지만 이 정원이 겁내는 건 단 한 번도 본 적이 없네.",
+        "objectives": {
+          "0": {
+            "label": "다듬은 꽃가지"
+          }
+        }
+      },
+      "q_eg_four_statues": {
+        "title": "네 명의 조용한 자매",
+        "text": "정원이 어리던 시절, 첫 정원사들은 사방을 지켜보라고 대리석 자매 넷을 세웠네. 하나는 들장미 수풀 위에, 하나는 미로 동쪽 연못 산책로에, 하나는 노움들이 굴을 튼 서쪽 잔디밭에, 하나는 산울타리 너머 남쪽 잔디밭에 말일세. 미로가 그 사이로 자라 올라, 넷을 모두 본 사람은 드물지. 정원의 사방을 걸으며, {playerName}, 자매마다 손바닥을 대어 보게. 정원이 네 방향에서 자네를 살펴보고 나면, 낯선 이에게 감춰 둔 곳들을 열어 줄 걸세.",
+        "completion": "탁본 넷, 자매 넷, 그리고 대리석 눈물을 흘린 자매는 하나도 없군. 정원이 자네를 가늠해 보았고, {playerName}, 부족하다 여기지 않았네. 이제 진짜 골칫거리가 사는 곳으로 자네를 보낼 수 있겠어.",
+        "objectives": {
+          "0": {
+            "label": "정원 조각상을 찾아갔다"
+          }
+        }
+      },
+      "q_eg_bull_of_the_court": {
+        "title": "분수 안뜰의 황소",
+        "text": "이제 진실을 말해 주지, {playerName}. 미로 한가운데의 황소는 내 필생의 역작이었네. 분수 안뜰을 지키라고 빚었고, 백 년 동안 지켰지. 하지만 초록에 번진 공포가 그놈에게까지 닿았고, 이제 그놈은 아무것도 지키지 않아. 사냥을 하지. 미로는 길 잃은 자를 그놈에게 먹이로 넘긴다네. 나는 그놈을 되돌려 놓기엔 너무 늙었고, 이 일은 뿌리와 가지째 되돌려 놓아야만 하네. 동료를 데리고 미로를 지나 안뜰로 가서, 내 황소를 베어 주게.",
+        "completion": "그놈이 흩어질 때, 여기 이 가슴으로 느꼈다네. 백 년의 공력이었지만, 자네가 끝낸 것이 옳았어. 이 어깨덮개를 받게. 내 최고작보다 강한 자가 나타나면 주려고 재단해 둔 것이라네. 오늘 밤 안뜰은 그저 분수일 뿐이고, {playerName}, 정원은 그저 정원일 뿐이야. 이제야 수석 정원사도 나도 잠들 수 있겠지.",
+        "objectives": {
+          "0": {
+            "label": "토피어리 황소를 되돌려 놓았다"
+          }
+        }
+      },
+      "q_fs_bell_at_the_landing": {
+        "title": "선착장의 종",
+        "text": "모래톱 둑길을 건너왔소, {playerName}? 그렇다면 일주일 만에 처음 온 사람이니, 워든이 그대를 직접 살펴보고 싶어 할 것이오. 걸헤이븐은 물가 길을 올라가면 나오오. 이제 아무도 돌보지 않는 건조대를 지나서 말이오. 숯불 워든에게 둑길이 아직 버티고 있다고 전하시오. 그리고 탐이 오늘은 아직 종을 세 번 울리지 않았다고. 아직은 말이오.",
+        "completion": "둑길이 버티고 있고, 탐은 아직 세 번 종을 두고 농담할 기운이 남아 있군. 좋아. 우리는 포위당한 섬일세, {playerName}. 저 모래톱을 건너오는 손 한 쌍 한 쌍이, 균열이 내 사람들에게 닿기 전에 뚫고 지나야 할 손일세. 걸헤이븐에 온 것을 환영하네.",
+        "objectives": {
+          "0": {
+            "label": "숯불 워든에게 보고"
+          }
+        }
+      },
+      "q_fs_hold_the_riftfields": {
+        "title": "균열의 들판을 사수하라",
+        "text": "마을 동쪽 곡식 이랑이 엉망이 됐는데, 균열의 들판에서 넘어온 비루한 것들이 이제 그걸 쪼아 먹고 있네. 설 수조차 없는 밭을 내 사람들이 어찌 돌보겠나, {playerName}. 그 비루한 것 열을 솎아 내고 농부들에게 땅을 돌려주게.",
+        "completion": "열이 줄었고, 일꾼들은 벌써 누가 먼저 밭에 나갈지 다투고 있네. 오래가진 않겠지. 균열은 오래 쉬는 법이 없으니. 하지만 먹는 마을은 버티는 마을일세.",
+        "objectives": {
+          "0": {
+            "label": "균열의 비루한 것 처치"
+          }
+        }
+      },
+      "q_fs_steel_for_the_redoubt": {
+        "title": "보루를 위한 강철",
+        "text": "내가 나눠 주는 칼은 죄다 바다가 돌려준 것이거나 죽은 이에게서 벗겨 낸 것이라네, {playerName}. 저 비루한 것들은 균열 너머에서 고철을 물고 나오지. 경첩, 갈고리, 부러진 칼조각 같은 까치 둥지 잡동사니지만, 두들기면 제법 참한 쇠가 돼. 놈들이 주워 모은 강철 여섯 점을 가져다주면, 방책 전선이 다시 이빨을 갖추게 되네.",
+        "completion": "소금에 삭고 균열에 흉이 졌지만, 그래도 날은 설 쇠로군. 자, 이 장갑은 내가 직접 안감을 댄 것이야. 강철에는 강철일세, {playerName}. 요즘 먼바다 해안이 굴리는 장사라곤 그것뿐이라네.",
+        "objectives": {
+          "0": {
+            "label": "균열 흉터 강철"
+          }
+        }
+      },
+      "q_fs_the_three_bells": {
+        "title": "세 개의 종",
+        "text": "내 종 말고도 해안에는 경종이 셋 서 있소. 하나는 선착장 곶에, 하나는 남쪽 모래밭에, 하나는 균열의 들판 물가에 말이오. 밧줄이 삭았거나 종추를 누가 물어 갔다면, 마을은 균열이 이미 거리에 들어선 뒤에야 그것을 알게 되오. 해안을 걸으며, {playerName}, 종마다 한 번씩 울려 주시오. 아직 목소리가 남아 있는지 내가 알 수 있도록.",
+        "completion": "세 목소리, 세 대답이 물 너머로 또렷이 실려 왔소. 오늘 밤은 걸헤이븐에서 자시오, {playerName}. 종소리가 그대를 깨운다면 그건 내 손으로 울린 것이고, 늦지 않게 울린 것임을 알고 자면 되오.",
+        "objectives": {
+          "0": {
+            "label": "경종을 울렸다"
+          }
+        }
+      },
+      "q_fs_song_before_the_break": {
+        "title": "균열 앞의 노래",
+        "text": "균열이 열리기 전에 그 소리를 듣는 사람이 있네. 균열감시자 올룬. 학자거나 미치광이인데, 요즘 나는 그 차이를 따질 여유가 없어. 그는 마을 남동쪽 길 위 감시 초원에서 불침번을 서고 있네. 그를 찾아가게, {playerName}. 그리고 이 섬이 다음에 우리에게 무슨 짓을 하려는지 물어보게.",
+        "completion": "워든이 보냈다고? 좋군. 마을이 드디어 귀를 기울이기 시작했다는 뜻이니. 이제 잠시 가만히 있어 보게, {playerName}. 저기, 바람 밑에서, 들리는가? 절벽이 노래하고 있어. 그리고 나는 저 곡조가 마음에 들지 않네.",
+        "objectives": {
+          "0": {
+            "label": "균열감시자 올룬을 찾아라"
+          }
+        }
+      },
+      "q_fs_moss_and_mending": {
+        "title": "이끼와 치료",
+        "text": "물가를 따라 자라는 소금이끼는 내가 아는 최고의 상처 짜임재인데, 그 이끼가 자라는 물가란 물가는 균열의 산물들이 죄다 차지해 버렸다네. 별일이지, 놈들 가죽에 이끼 뭉치가 걸려 있기까지 해. 동쪽 물가에서 여섯을 치우고, {playerName}, 놈들이 짓밟고 다닌 자리에서 좋은 이끼 네 줌을 뜯어다 주게.",
+        "completion": "한 손에는 이끼, 다른 손에는 조용해진 물가라. 내 치료소를 통째로 다시 채워 주었군, {playerName}. 부디 내 다음 환자가 되지는 말아 주게.",
+        "objectives": {
+          "0": {
+            "label": "균열의 산물 처치"
+          },
+          "1": {
+            "label": "먼바다 소금이끼"
+          }
+        }
+      },
+      "q_fs_bram_come_home": {
+        "title": "브람아 돌아오렴",
+        "text": "그물 균열이 열리던 아침에 우리 브람이 배를 몰고 나갔는데, 바다가 그이를 선착장 곶 너머 어딘가로 내던졌어요. 사흘 전 밤에 그이가 물 너머로 부르는 소리를 들었어요, {playerName}. 그런데도 나는 무서워서 가지 못했어요. 지금도 무서워요. 부탁이에요. 그이의 배가 북쪽 물가에 부서져 있어요. 그이를 집까지 데려다주세요.",
+        "completion": "브람! 그이를 성한 몸으로 데려다주셨군요, {playerName}. 우리 둘 다 울었지만 부끄럽지 않아요. 균열이 이 섬에서 다음에 무엇을 앗아 가든, 내 가족만은 안 돼요. 이제 다시는요.",
+        "objectives": {
+          "0": {
+            "label": "어부 브람을 걸헤이븐까지 무사히 배웅했다"
+          }
+        }
+      },
+      "q_fs_stalkers_off_the_light": {
+        "title": "불빛 밖의 추적자들",
+        "text": "추적자들은 화톳불 사이의 어둠을 사냥하는데, 밤마다 내 초원을 조금씩 좁혀 오고 있네. 놈들은 무지성이 아니야, {playerName}. 끈기가 있지. 그리고 끈기야말로 내가 못 당해 내는 단 한 가지라네. 여덟을 죽여서 어둠을 놈들이 넘어온 절벽까지 밀어내 주게.",
+        "completion": "여덟 밤을 맴돌던 것이 하룻밤에 끝났군. 벌써 화톳불이 한결 고르게 타는 것 같네. 아니면 내 손이 떨리길 그만둔 것뿐인지도. 어느 쪽이든 초원은 다시 내 것이고, 이제 섬이 생각하는 소리가 들리네.",
+        "objectives": {
+          "0": {
+            "label": "공허 추적자 처치"
+          }
+        }
+      },
+      "q_fs_the_great_break": {
+        "title": "대균열",
+        "text": "이 섬이 부르는 노래는 하나같이 같은 낮은 음으로 끝나는데, 그 음은 찢겨진 절벽에서 흘러나온다네. 그곳의 대균열로 무언가가 넘어왔어, {playerName}. 절벽이 스스로 쪼개져 들인 무언가가. 그리고 그것은 아직도 자라고 있네. 그것이 북쪽으로 걸음을 떼면 어떤 종도 소용없을 걸세. 동료를 하나, 아니 둘 데려가서 끝장내게. 그런 다음 숯불 워든에게 곡조가 바뀌었다고 전하게.",
+        "completion": "올룬이 먼저 소식을 보냈네. 노래가 멎었다고. 온 마을이 그 고요를 들었고, {playerName}, 그 절반이 아무 소리도 없다는 사실에 울음을 터뜨렸다네. 이 어깨덮개를 걸치게. 먼바다 해안은 제 물가를 지켜 낸 이를 잊지 않아.",
+        "objectives": {
+          "0": {
+            "label": "찢겨진 공포 처치"
+          }
+        }
+      },
+      "q_gc_down_the_windway": {
+        "title": "바람길을 내려가다",
+        "text": "그 비탈을 올라 냈으니, {playerName}, 바람이 자네를 거두기로 한 모양이군. 윅하버는 구릉 길을 따라 동쪽, 후미의 바람그늘에 웅크리고 있네. 항만장 오딜은 고개를 넘어오는 사람을 하나하나 세는데, 자네도 세고 싶어 할 걸세. 그녀에게 바람길이 아직 열려 있다고 전하게.",
+        "completion": "이 날씨에 고개를 걸어서 넘어왔다고? 마렌이 보내오는 이름은 얼마 없는데, 제 발로 걸어와 해명하는 이는 더 드물지. 윅하버에 잘 왔네, {playerName}. 여관 문은 꼭 닫고 다니게.",
+        "objectives": {
+          "0": {
+            "label": "항만장 오딜에게 보고"
+          }
+        }
+      },
+      "q_gc_wool_off_the_downs": {
+        "title": "구릉의 양털",
+        "text": "내 뱃사람들은 기름먹인 옷을 종잇장처럼 뚫는 돌풍 속으로 노를 저어 나간다네, {playerName}. 이 바람을 막는 건 단 하나, 황무지 숫양의 기름진 양털을 윅하버 방식으로 두껍게 자아낸 것뿐이야. 무리는 마을 서쪽 울부짖는 구릉에서 풀을 뜯지. 좋은 양털 여섯 뭉치면 이번 철 모든 선원이 따뜻하게 노를 젓는다네.",
+        "completion": "이런 양털이 있으니 숫양들이 사람 잡는 날씨에도 살지고 의기양양하게 서 있는 게지. 실잣는 이들은 등불 켜고 밤새 일할 걸세. 이 장화를 받게, {playerName}. 지난번 깎은 털로 안감을 댄 것이라네.",
+        "objectives": {
+          "0": {
+            "label": "기름진 숫양 양털"
+          }
+        }
+      },
+      "q_gc_scuttlers_in_the_pots": {
+        "title": "통발 속의 게들",
+        "text": "여울 게들이 벼랑길을 기어올라 우리 게 통발을 돌에 쳐서 깨는 법을 배웠다네, {playerName}. 이번 주에만 어획량 절반이 사라졌고, 통발지기 하나는 한 달은 못 쓸 손이 되었지. 열 마리를 부수면 나머지는 저희가 왜 여울에 붙어 살았는지 기억해 낼 걸세.",
+        "completion": "내 길의 등딱지가 열이나 줄었고, 오늘 아침 통발은 가득 차서 올라왔네. 통발지기들은 자네를 길조라 부르고 있어, {playerName}. 윅하버에서는 그게 칭찬의 최고치라네.",
+        "objectives": {
+          "0": {
+            "label": "여울 게 처치"
+          }
+        }
+      },
+      "q_gc_keeper_of_the_flame": {
+        "title": "불꽃을 지키는 자",
+        "text": "브람 영감이 마을 북동쪽 높은 곶에서 올드 비컨을 지키는데, 두 주째 보급품을 가지러 내려오지 않고 있네. 등불이 아직 타고 있으니 살아는 있겠지. 하지만 그 나이의 노인이 이 바람 속에 저 곶 위에 혼자라니, {playerName}. 봉화 길을 올라 그가 서 있는 걸 보고 오게.",
+        "completion": "바람이 날 데려갔는지 보라고 오딜이 자네를 예까지 보냈다고? 하. 등불도 타고 나도 탄다고 전하게. 하지만 기왕 올라왔으니, {playerName}, 잠시 머물게. 올드 비컨에는 낯선 이만이 감당할 성싶은 일이 있다네.",
+        "objectives": {
+          "0": {
+            "label": "등불지기 브람을 찾아라"
+          }
+        }
+      },
+      "q_gc_lanterns_on_the_shear": {
+        "title": "절단 절벽의 등불",
+        "text": "올드 비컨이 큰 불이라면, {playerName}, 밤길 나그네를 절단 절벽 위 벼랑길로 무사히 데려다주는 건 폭풍 등불들이라네. 어젯밤 돌풍이 그걸 하나도 남김없이 꺼 버렸어. 어둠 속의 그 길은 낙하는 길고 끝은 짧지. 내 부시를 가져가서 벼랑을 따라 넷을 다시 밝혀 주게.",
+        "completion": "벼랑길에 불빛 네 점, 제자리에 딱 맞게 돌아왔군. 여기서 내려다보면 해안이 다시 눈을 뜬 것 같네. 자네에게는 등불지기의 자질이 있어, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "폭풍 등불을 다시 밝혔다"
+          }
+        }
+      },
+      "q_gc_wind_against_the_wick": {
+        "title": "심지를 노리는 바람",
+        "text": "돌풍 정령은 심술이 난 바람이라네, {playerName}. 거울 호수 옆 높은 구릉에 모여들어서는, 눈에 띄는 불꽃마다 꺼 버리지. 등불 하나, 화롯불 하나, 그리고 언젠가는 이 등불까지. 삼십구 년을 이 올드 비컨의 불을 지켜 왔는데, 앙심 품은 날씨 따위에 잃을 수는 없네. 여덟을 흩어 버리게.",
+        "completion": "어젯밤엔 등불이 흔들리는 시늉조차 안 했네. 한 달 만에 처음이야. 바람은 여전히 우리를 미워하지만, {playerName}, 이제는 공정하게 미워하게 됐군.",
+        "objectives": {
+          "0": {
+            "label": "돌풍 정령을 흩어 놓았다"
+          }
+        }
+      },
+      "q_gc_the_far_shore": {
+        "title": "먼 물가",
+        "text": "이 등화실에서는 해안 전체가 보이는데, {playerName}, 북쪽에서 보이는 것이 영 마음에 들지 않네. 썰물 때마다 초록 불빛이 난파선 벌판을 선체에서 선체로 걸어 다니고 있어. 그 물가를 혼자 일구는 여인이 하나 있네. 에다, 인양꾼이지. 벼랑길을 따라 절단 절벽을 지나 북쪽으로, 난파선이 시작되는 곳까지 가서 그녀가 아직 숨 쉬고 있는지 확인해 주게.",
+        "completion": "브람이 이제 제 탑에서 내 물가까지 지켜봐 준다고? 그 영감 걱정이 맞아, {playerName}. 죽은 자들이 밤마다 저희 난파선을 거닐고 있는데, 요즘은 해가 떠 있는지조차 아랑곳하지 않게 됐다네.",
+        "objectives": {
+          "0": {
+            "label": "인양꾼 에다를 찾아라"
+          }
+        }
+      },
+      "q_gc_dead_mens_cargo": {
+        "title": "죽은 자들의 화물",
+        "text": "인양법은 간단하다네, {playerName}. 바다가 물가에 내주는 것은 내 것이야. 그런데 익사한 갑판원들의 생각은 다르지. 제 선체에서 일어나서는, 내가 쌓아 올린 상자를 죄다 물때 아래로 도로 끌고 들어간다네. 여섯을 영영 눕혀 주게. 그리고 물가가 조용한 틈에, 조수가 반소를 제기하기 전에 표류물 상자 셋을 끌어올려 주고.",
+        "completion": "선원 여섯이 조용해지고 상자 셋이 뭍에 올랐군. 자네는 나보다 인양하는 손이 묵직해, {playerName}. 하지만 장부는 그런 걸 따지지 않지. 이 중 절반은 법에 따라 자네 몫일세. 그리고 그 법이란 내가 그렇다면 그런 거라네.",
+        "objectives": {
+          "0": {
+            "label": "익사한 갑판원 안식시킴"
+          },
+          "1": {
+            "label": "표류물 상자 인양"
+          }
+        }
+      },
+      "q_gc_the_wreck_warden": {
+        "title": "난파선 감시자",
+        "text": "이제 갑판원들이 왜 일어나는지 알겠지, {playerName}. 이 물가에서 최초로 부서진 난파선의 따개비 낀 판금을 무언가가 걸치고서는, 지키라고 고용된 묘지처럼 이 백사장의 선체란 선체를 죄다 감시하고 있다네. 그것은 내가 십 년을 탐내 온 보물 더미와, 이제는 쉬는 꼴을 보고 싶은 선원들을 붙들고 있어. 난파선 감시자를 끝장내게. 동료를 데려가게. 죽은 자들은 불침번을 잘 서니까.",
+        "completion": "그것이 쓰러지는 순간 백사장이 침묵했다네, {playerName}. 이 물가에서 십 년을 일하며 처음 듣는 침묵이었지. 선원들은 이제 그저 뼈일 뿐이야. 쉬고 있는 뼈지. 보물 더미 맨 위의 어깨덮개를 가져가게. 어차피 산 사람의 등에 더 잘 맞을 물건이었으니.",
+        "objectives": {
+          "0": {
+            "label": "난파선 감시자 처치"
           }
         }
       },
@@ -11531,6 +13736,9 @@ export const ko_KR: EnTranslations = {
           },
           "10": {
             "label": "소우필드"
+          },
+          "11": {
+            "label": "먼바다 해안 모래톱 둑길"
           }
         }
       },
@@ -11599,6 +13807,300 @@ export const ko_KR: EnTranslations = {
             "label": "무덤고룡 성소"
           }
         }
+      },
+      "veiled_hollow": {
+        "name": "장막의 골짜기",
+        "welcome": "대기가 오래된 마법으로 웅웅거린다. 엘더글림의 큰 나무 아래에서 수호자 샐윈을 찾아가라.",
+        "pois": {
+          "0": {
+            "label": "엘더글림"
+          },
+          "1": {
+            "label": "황혼 동굴"
+          },
+          "2": {
+            "label": "황혼 전망대"
+          },
+          "3": {
+            "label": "고대나무 숲"
+          },
+          "4": {
+            "label": "별내림 분지"
+          },
+          "5": {
+            "label": "가라앉은 궁정"
+          },
+          "6": {
+            "label": "수정 여울"
+          },
+          "7": {
+            "label": "빛나는 심처"
+          }
+        }
+      },
+      "drakelands": {
+        "name": "드레이크랜드",
+        "welcome": "뜨거운 바람이 황무지에서 불어온다. 용들이 드레이크모 위를 맴돌고, 모래 언덕에는 트롤의 모닥불이 타오른다.",
+        "pois": {
+          "0": {
+            "label": "와이름 감시탑"
+          },
+          "1": {
+            "label": "관문숲"
+          },
+          "2": {
+            "label": "잿빛 사구"
+          },
+          "3": {
+            "label": "트롤무트"
+          },
+          "4": {
+            "label": "마지막 요새"
+          },
+          "5": {
+            "label": "핏빛유리 벌판"
+          },
+          "6": {
+            "label": "드레이크모 화산구"
+          }
+        }
+      },
+      "frostveil": {
+        "name": "서리장막 봉우리",
+        "welcome": "눈이 모든 소리를 삼킨다. 춤추는 오로라 아래, 추위 그 자체가 깨어 있는 듯하다.",
+        "pois": {
+          "0": {
+            "label": "아이스맨틀"
+          },
+          "1": {
+            "label": "설선 고개"
+          },
+          "2": {
+            "label": "빙하 호수"
+          },
+          "3": {
+            "label": "오로라 계단"
+          },
+          "4": {
+            "label": "떨림늪"
+          },
+          "5": {
+            "label": "울부짖는 단구"
+          }
+        }
+      },
+      "amberfall": {
+        "name": "호박빛 가을터",
+        "welcome": "이곳의 잎은 모두 금빛과 붉은빛으로 타오르지만 결코 지지 않는다. 랜턴미어의 등불이 너를 위해 켜져 있다.",
+        "pois": {
+          "0": {
+            "label": "랜턴미어"
+          },
+          "1": {
+            "label": "금빛눈녹이 고개"
+          },
+          "2": {
+            "label": "금빛 과수원"
+          },
+          "3": {
+            "label": "수확 골짜기"
+          },
+          "4": {
+            "label": "큰 호수"
+          },
+          "5": {
+            "label": "잿단풍 언덕"
+          },
+          "6": {
+            "label": "기운 비석"
+          }
+        }
+      },
+      "willowfen": {
+        "name": "버들늪",
+        "welcome": "늪에는 잠자리와 벌의 날갯소리가 가득하다. 다리를 건너 브리지미어에 들어가 잠시 쉬어 가라.",
+        "pois": {
+          "0": {
+            "label": "브리지미어"
+          },
+          "1": {
+            "label": "호박늪 돌계단"
+          },
+          "2": {
+            "label": "수련 습지"
+          },
+          "3": {
+            "label": "늪빛 웅덩이"
+          },
+          "4": {
+            "label": "수양버들 만"
+          },
+          "5": {
+            "label": "나른한 여울"
+          }
+        }
+      },
+      "nightbloom": {
+        "name": "밤꽃 평원",
+        "welcome": "밤의 문 너머에서는 공기마저 꿈을 꾼다. 꽃빛을 따라 문레스트로 가라. 하늘에 걸린 잠든 세계도 놓치지 말고.",
+        "pois": {
+          "0": {
+            "label": "문레스트"
+          },
+          "1": {
+            "label": "밤의 문"
+          },
+          "2": {
+            "label": "달우물"
+          },
+          "3": {
+            "label": "어스름 꽃벌판"
+          },
+          "4": {
+            "label": "불침번 선돌"
+          },
+          "5": {
+            "label": "잠들지 않는 봉분"
+          }
+        }
+      },
+      "wraithwood": {
+        "name": "망령숲",
+        "welcome": "나무우듬지가 관 뚜껑처럼 길 위로 닫힌다. 갈로미어의 등불 곁을 떠나지 마라. 숲이 네 이름을 불러도 절대 대답하지 마라.",
+        "pois": {
+          "0": {
+            "label": "갈로미어"
+          },
+          "1": {
+            "label": "까마귀 문"
+          },
+          "2": {
+            "label": "과부의 덤불"
+          },
+          "3": {
+            "label": "교수대 공터"
+          },
+          "4": {
+            "label": "애도석 예배당"
+          },
+          "5": {
+            "label": "사냥꾼의 공터"
+          }
+        }
+      },
+      "palmreach": {
+        "name": "야자 해안",
+        "welcome": "따뜻한 모래, 요란한 새소리, 지평선을 삼키는 정글. 드리프트헤이븐이 해변에 불을 피워 두고 너를 기다린다.",
+        "pois": {
+          "0": {
+            "label": "드리프트헤이븐"
+          },
+          "1": {
+            "label": "덩굴 어귀"
+          },
+          "2": {
+            "label": "야자 백사장"
+          },
+          "3": {
+            "label": "에메랄드 밀림"
+          },
+          "4": {
+            "label": "덩굴폭포 숲"
+          },
+          "5": {
+            "label": "사파이어 석호"
+          },
+          "6": {
+            "label": "가라앉은 신상"
+          }
+        }
+      },
+      "evergarden": {
+        "name": "상록 정원",
+        "welcome": "산울타리는 여전히 다듬어지고 있지만, 정원사를 본 사람은 백 년 동안 없었다. 미로를 조심하라. 미로도 너를 지켜보고 있다.",
+        "pois": {
+          "0": {
+            "label": "헤지윅"
+          },
+          "1": {
+            "label": "정원 문"
+          },
+          "2": {
+            "label": "화단 산책로"
+          },
+          "3": {
+            "label": "던홀드 성"
+          },
+          "4": {
+            "label": "꽃잎 연못"
+          },
+          "5": {
+            "label": "대미로"
+          },
+          "6": {
+            "label": "분수 안뜰"
+          },
+          "7": {
+            "label": "오래된 풍차"
+          },
+          "8": {
+            "label": "북쪽 감시초소"
+          },
+          "9": {
+            "label": "수련 연못"
+          }
+        }
+      },
+      "galecrest": {
+        "name": "게일크레스트",
+        "welcome": "이곳의 바람은 단 한 번도 멈춘 적이 없고, 올드 비컨의 불도 단 한 번도 꺼진 적이 없다. 윅하버의 부탁은 하나뿐이다. 여관 문을 꼭 닫아 달라는 것.",
+        "pois": {
+          "0": {
+            "label": "윅하버"
+          },
+          "1": {
+            "label": "바람길"
+          },
+          "2": {
+            "label": "울부짖는 구릉"
+          },
+          "3": {
+            "label": "올드 비컨"
+          },
+          "4": {
+            "label": "절단 절벽"
+          },
+          "5": {
+            "label": "난파선 벌판"
+          },
+          "6": {
+            "label": "거울 호수"
+          },
+          "7": {
+            "label": "게일크레스트 마구간"
+          }
+        }
+      },
+      "farshore_isle": {
+        "name": "먼바다 해안",
+        "welcome": "모래톱을 건너면, 마을보다 먼저 걸헤이븐의 종소리가 그대를 맞이할 것이오. 균열은 아무 예고도 없이 찢어지듯 열리고, 이 보루는 그 틈으로 쏟아지는 무엇이든 맞서며 제 해안을 지켜 왔소. 그대 같은 이를 오래도록 기다려 왔다오.",
+        "pois": {
+          "0": {
+            "label": "걸헤이븐"
+          },
+          "1": {
+            "label": "선착장"
+          },
+          "2": {
+            "label": "감시 초원"
+          },
+          "3": {
+            "label": "찢겨진 절벽"
+          },
+          "4": {
+            "label": "균열의 들판"
+          }
+        }
       }
     },
     "dungeons": {
@@ -11626,6 +14128,16 @@ export const ko_KR: EnTranslations = {
         "name": "니트락시스 공격대 투기장",
         "enterText": "봉인된 왕실 문을 지나갑니다.",
         "leaveText": "쏜피크의 차가운 공기 속으로 돌아옵니다."
+      },
+      "wildheart_basin": {
+        "name": "야생심장 분지",
+        "enterText": "따뜻한 비가 오래된 돌 위에서 치익 소리를 냅니다. 야생심장 분지가 눈앞에 펼쳐집니다.",
+        "leaveText": "돌송곳니 아래를 지나 팜리치의 햇살 속으로 돌아갑니다."
+      },
+      "the_last_keep": {
+        "name": "마지막 요새",
+        "enterText": "마지막 요새의 차갑고 고요한 회랑에 발을 들입니다.",
+        "leaveText": "요새의 문을 닫고 드레이크랜드의 바람 속으로 돌아갑니다."
       },
       "drowned_temple": {
         "name": "익사한 신전",

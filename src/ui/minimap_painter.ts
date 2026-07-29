@@ -178,6 +178,18 @@ const MINIMAP_COLOR_TOKENS = {
 export type MinimapColors = Record<keyof typeof MINIMAP_COLOR_TOKENS, string>;
 
 /**
+ * The current zone's cached high-res map background (the 480px per-zone canvas
+ * the world map already renders), plus the world rect it covers. Blitting this
+ * sharp over the coarse whole-world fallback gives the minimap ~10x the source
+ * resolution around the player instead of upscaling ~12 pixels of the 140px
+ * world image. Null when the zone's bg has not been prewarmed yet.
+ */
+export type MinimapZoneBg = {
+  canvas: HTMLCanvasElement;
+  region: { minX: number; maxX: number; minZ: number; maxZ: number };
+};
+
+/**
  * Owns painting the overworld minimap onto the #minimap canvas. One instance is built
  * by Hud with the write-elision facet (for the '#zone-label' text), the class-color
  * resolver (for party discs/arrows), and the zone-name localizer.
@@ -205,6 +217,7 @@ export class MinimapPainter {
     private readonly writers: PainterHostWriters,
     private readonly classColor: (cls: string) => string,
     private readonly localizeZone: (zoneId: string) => string,
+    private readonly localizeRift: (name: string, rank: string | null) => string,
   ) {}
 
   /** Resolve the minimap color tokens in one getComputedStyle pass (a 2D
@@ -236,12 +249,18 @@ export class MinimapPainter {
     zoneLabelEl: HTMLElement,
     bg: HTMLCanvasElement,
     zoom: number,
+    zoneBg: MinimapZoneBg | null = null,
   ): void {
     const S = MINIMAP_SIZE;
     const pxPerYard = MINIMAP_BASE_SCALE * zoom;
     const model = this.markers.build(world, S, pxPerYard);
     // The one DOM write this Canvas painter routes through the write-elision facet.
-    this.writers.setText(zoneLabelEl, this.localizeZone(model.zoneId));
+    // In a rift, show the generated floor name + rank instead of the overworld zone.
+    if (model.rift) {
+      this.writers.setText(zoneLabelEl, this.localizeRift(model.rift.name, model.rift.rank));
+    } else {
+      this.writers.setText(zoneLabelEl, this.localizeZone(model.zoneId));
+    }
     const colors = this.resolveColors();
     const p = world.player;
 
@@ -250,14 +269,30 @@ export class MinimapPainter {
     ctx.beginPath();
     ctx.arc(S / 2, S / 2, S / 2 - CLIP_INSET, 0, FULL_CIRCLE);
     ctx.clip();
-    ctx.imageSmoothingEnabled = false;
+    // Smooth sampling: the coarse fallback reads as a soft wash (not hard
+    // blocks), and the sharp zone overlay upscales cleanly.
+    ctx.imageSmoothingEnabled = true;
 
-    // Blit the matching sub-rect of the cached terrain background (Hud-owned, +X-left).
+    // Coarse fallback: the sub-rect of the whole-world background under the
+    // player (Hud-owned, +X-left). Covers the border case where the player's
+    // view spills into a neighbouring zone the overlay does not.
     const bgPxPerYard = bg.width / (WORLD_MAX_X - WORLD_MIN_X);
     const sw = S / (pxPerYard / bgPxPerYard);
     const sx = (WORLD_MAX_X - p.pos.x) * bgPxPerYard - sw / 2;
     const sy = (WORLD_MAX_Z - p.pos.z) * bgPxPerYard - sw / 2;
     ctx.drawImage(bg, sx, sy, sw, sw, 0, 0, S, S);
+
+    // Sharp overlay: the current zone's own high-res background, placed by its
+    // world rect so the player sits at centre. +X is map-left, +Z is map-down.
+    if (zoneBg) {
+      const r = zoneBg.region;
+      const half = S / 2;
+      const destX = half - (r.maxX - p.pos.x) * pxPerYard;
+      const destY = half - (r.maxZ - p.pos.z) * pxPerYard;
+      const destW = (r.maxX - r.minX) * pxPerYard;
+      const destH = (r.maxZ - r.minZ) * pxPerYard;
+      ctx.drawImage(zoneBg.canvas, destX, destY, destW, destH);
+    }
 
     this.drawMarkers(ctx, model.markers, colors);
     ctx.restore();

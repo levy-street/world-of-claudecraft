@@ -1,0 +1,77 @@
+{
+  "comment": "The Evergarden's garden ironwork: wrought-iron fence runs, pillars, a gate, and the stone garden arch from KayKit Halloween Bits (CC0). Sourced from the user's local KayKit collection; world-scale already (fence 4yd runs, arch 4.2yd span).",
+  "items": [
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Halloween Bits 1.0/Assets/gltf/fence.gltf",
+      "out": "models/props/garden_iron_fence.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Halloween Bits 1.0/Assets/gltf/fence_pillar.gltf",
+      "out": "models/props/garden_iron_pillar.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Halloween Bits 1.0/Assets/gltf/fence_gate.gltf",
+      "out": "models/props/garden_iron_gate.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Halloween Bits 1.0/Assets/gltf/arch.gltf",
+      "out": "models/props/garden_arch.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/green/building_watchtower_green.gltf",
+      "out": "models/biome/hex_watchtower.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/green/building_tower_cannon_green.gltf",
+      "out": "models/biome/hex_tower_cannon.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/green/building_barracks_green.gltf",
+      "out": "models/biome/hex_barracks.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/decoration/props/cannonball_pallet.gltf",
+      "out": "models/biome/hex_cannonballs.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/decoration/props/resource_lumber.gltf",
+      "out": "models/biome/hex_lumber.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/decoration/props/weaponrack.gltf",
+      "out": "models/biome/hex_weaponrack.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/decoration/props/flag_green.gltf",
+      "out": "models/biome/hex_flag.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/decoration/props/wheelbarrow.gltf",
+      "out": "models/biome/hex_wheelbarrow.glb",
+      "type": "static",
+      "maxTex": 512
+    }
+  ]
+}

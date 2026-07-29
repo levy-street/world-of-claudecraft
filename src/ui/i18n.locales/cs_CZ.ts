@@ -3514,6 +3514,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterConsumable': 'Spotřební',
   'hudChrome.bags.filterGroupAria': 'Filtrovat batohy podle kategorie',
   'hudChrome.bags.filterMaterial': 'Materiály',
+  'hudChrome.bags.filterMount': 'Jezdecká zvířata',
   'hudChrome.bags.filterQuest': 'Úkolové',
   'hudChrome.bags.filterWeapon': 'Zbraně',
   'hudChrome.bags.noMatch': 'Tvým filtrům neodpovídají žádné předměty.',
@@ -5861,6 +5862,16 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.marshal_redbrook.greeting':
     'Měj čepel po ruce, {className}. Údolí už není, co bývalo.',
   'entities.npcs.marshal_redbrook.name': 'Maršál Redbrook',
+  'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
+  'entities.npcs.stablemaster_marla.title': 'Správkyně stájí',
+  'entities.npcs.stablemaster_marla.greeting':
+    'Každý jezdec sem přijde po svých, {className}. Otěže nedostaneš, dokud neusedneš na Valorsteeda, aniž bys skončil v blátě, a Highwatch nemá ranhojiče nazbyt pro zlomené kosti.',
+  'entities.quests.q_riding_lessons.title': 'Jezdecké lekce',
+  'entities.quests.q_riding_lessons.text':
+    'Každý jezdec sem přijde po svých, {playerName}, přesně jak jsem ti řekla v den, kdy jsme se poznali. Zaplať poplatek, a až dám pokyn, přivolej cvičného Valorsteeda a vylez do sedla. Pak projeď parkur: sleduj značku ke startovnímu oblouku, vezmi každý skok čistě a znovu projeď cílem, než se přesýpací hodiny vyprázdní. Dokážeš to, a sedlo je tvoje. Zatouláš se z ohrady a začínáme znovu.',
+  'entities.quests.q_riding_lessons.completion':
+    'Tak. Nahoru jedním plynulým pohybem a v sedle pevně jako skála. Valorsteed je tvůj, {playerName}: sedlo, otěže i postavení jezdce, který si to místo v sedle vydřel, a nekoupil.',
+  'entities.quests.q_riding_lessons.objectives.0.label': 'Zkroť Valorsteeda',
   'entities.npcs.marshal_redbrook.title': 'Městský maršál',
   'entities.npcs.provisioner_hale.greeting':
     'Suché boty, suchý chléb, suchý prach: ve Fenbridge máš v dobrý den dvě ze tří.',
@@ -5995,6 +6006,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sump_troll_devourer.name': 'Trollí požírač z jímky',
   'entities.mobs.thornpeak_ogre.name': 'Thornpeakský zlobr',
   'entities.mobs.thunzharr_stormling.name': 'Probuzený bouřník',
+  'entities.mobs.stable_horse.name': 'Stájový kůň',
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, probouzející se štít',
   'entities.mobs.tidebound_acolyte.name': 'Přílivem spoutaný akolyta',
   'entities.mobs.tolling_bell.name': 'Zvonící zvon',
@@ -7982,6 +7994,13 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.steam.noTicket': 'Steam nevydal propojovací tiket. Spusť Steam a zkus to znovu.',
   'hudChrome.steam.title': 'Steam',
   'hudChrome.steam.unlink': 'Odpojit Steam',
+  'entities.items.reins_grag_bear.name': 'Otěže Goliáše Grag-medvěda',
+  'entities.items.reins_valorsteed.name': 'Otěže Valorsteeda',
+  'entities.items.reins_stalkglider_snail.name': 'Otěže mechokrunýřového plachtíka',
+  'entities.items.reins_aether_hover_cycle.name': 'Startovací klíč: Éterové vznášecí kolo',
+  'entities.items.reins_shadowjump_toad.name': 'Otěže Kama-Kageho, ropuchy stínového skoku',
+  'entities.items.reins_stormfeather_griffin.name': 'Otěže Bouřopera Nebedosahujícího',
+  'entities.items.reins_thunderstrut_gobbler.name': 'Otěže Hromokroka, velkého krocana',
   'hudChrome.auth.appleChoiceExpired':
     'Platnost tohoto přihlášení přes Apple vypršela. Přihlas se přes Apple znovu.',
   'hudChrome.auth.appleChoiceIntro': 'Vytvoř nový účet, nebo propoj Apple s účtem, který už máš.',

@@ -8,7 +8,14 @@ import { resolvePosition } from '../src/sim/colliders';
 import { HEROIC_DUNGEON_TUNING, HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { HEROIC_MARK_LETTER } from '../src/sim/content/letters';
-import { DUNGEON_X_THRESHOLD, DUNGEONS, ITEMS, instanceOrigin, MOBS } from '../src/sim/data';
+import {
+  BUILTIN_WORLD,
+  DUNGEON_X_THRESHOLD,
+  DUNGEONS,
+  ITEMS,
+  instanceOrigin,
+  MOBS,
+} from '../src/sim/data';
 import { spawnNythraxisAdds } from '../src/sim/encounters/nythraxis';
 import {
   awardHeroicMarks,
@@ -29,13 +36,30 @@ import {
   NYTHRAXIS_ADD_ID,
   NYTHRAXIS_BOSS_ID,
   PARTY_XP_RANGE,
+  type WorldContent,
 } from '../src/sim/types';
 
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
 
+// Dungeon doors, instance slots, and instance mobs all spawn from DUNGEON_LIST
+// (data), not from WorldContent, and no assertion here reads ambient overworld
+// content, so strip camps/npcs/ground objects to keep each Sim and tick cheap
+// (the dot_final_tick subsystem-world pattern).
+const DUNGEON_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+
 function makeSim(seed = 99): AnySim {
-  return new Sim({ seed, playerClass: 'warrior', noPlayer: true }) as AnySim;
+  return new Sim({
+    seed,
+    playerClass: 'warrior',
+    noPlayer: true,
+    world: DUNGEON_TEST_WORLD,
+  }) as AnySim;
 }
 
 function teleport(sim: AnySim, e: AnyEntity, x: number, z: number): void {
@@ -886,12 +910,13 @@ describe('dungeons: heroic difficulty', () => {
     expect(normalMorthen.auras.some((a: any) => a.id === 'test_slow')).toBe(false);
   });
 
-  it('supports heroic mode across the four five-player dungeons only', () => {
+  it('supports heroic mode across all five five-player dungeons', () => {
     const finalBosses = [
       ['hollow_crypt', 'morthen'],
       ['sunken_bastion', 'vael_the_mistcaller'],
       ['drowned_temple', 'ysolei'],
       ['gravewyrm_sanctum', 'korzul_the_gravewyrm'],
+      ['wildheart_basin', 'wildheart_high_priest'],
     ] as const;
 
     for (const [dungeonId, bossId] of finalBosses) {
@@ -1284,12 +1309,32 @@ describe('dungeons: heroic boss drops', () => {
     // set-piece and legendary drops auto-upgrade to their raid-tier heroic
     // variants in a heroic claim (loot/loot_roll.ts + heroic_variants.ts).
     const heroicTable = HEROIC_BOSS_LOOT.nythraxis_scourge_of_thornpeak;
-    const weaponIds = heroicTable.flatMap((e) => (e.itemId ? [e.itemId] : []));
-    const groups = new Set(heroicTable.map((e) => e.rollGroup));
+    // The table now also carries the two blue mount reins as independent
+    // sub-1% draws (the mount drop matrix); the weapon contract applies to the
+    // roll-grouped entries only.
+    const weaponEntries = heroicTable.filter((e) => e.rollGroup !== undefined);
+    const mountEntries = heroicTable.filter((e) => e.rollGroup === undefined);
+    const weaponIds = weaponEntries.flatMap((e) => (e.itemId ? [e.itemId] : []));
+    const groups = new Set(weaponEntries.map((e) => e.rollGroup));
     expect(groups.size).toBe(1);
     expect(new Set(weaponIds).size).toBe(3);
-    expect(heroicTable.reduce((sum, e) => sum + e.chance, 0)).toBeCloseTo(1, 10);
+    expect(weaponEntries.reduce((sum, e) => sum + e.chance, 0)).toBeCloseTo(1, 10);
     for (const id of weaponIds) expect(ITEMS[id]?.kind, id).toBe('weapon');
+    // The heroic raid carries the two RARE mounts and the two UNCOMMON ones. The
+    // hover-cycle is deliberately absent: it is epic now, and epic mounts are rift
+    // S-clear exclusive, so the raid must not be a back door to one.
+    expect(mountEntries.map((e) => e.itemId).sort()).toEqual([
+      'reins_grag_bear',
+      'reins_shadowjump_toad',
+      'reins_stalkglider_snail',
+      'reins_stormfeather_griffin',
+    ]);
+    // Rates follow rarity, derived rather than hand-listed: rare 0.1%, uncommon 0.5%.
+    for (const e of mountEntries) {
+      const quality = ITEMS[e.itemId!]?.quality;
+      expect(quality, `${e.itemId} is a drop-tier mount`).not.toBe('epic');
+      expect(e.chance, `${e.itemId} (${quality}) chance`).toBe(quality === 'rare' ? 0.001 : 0.005);
+    }
 
     const droppedWeapons = new Set<string>();
     const droppedVariants = new Set<string>();
@@ -1384,6 +1429,7 @@ describe('dungeons: heroic daily lockouts', () => {
       noPlayer: true,
       lockoutNowMs: () => now,
       raidResetMs: () => now + 24 * 3600 * 1000,
+      world: DUNGEON_TEST_WORLD,
     }) as AnySim;
     sim.utcDay = '2026-07-12';
     const pid = sim.addPlayer('warrior', 'Raider');

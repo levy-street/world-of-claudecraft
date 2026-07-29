@@ -15,9 +15,9 @@ import { type CapturedResponse, normalizeResponse, stableStringify } from './nor
 
 /**
  * A request dispatcher: writes the response to `res` and ends it. May be sync or
- * async; the driver awaits its return, then reads the captured response. A later
- * phase supplies a real dispatcher whose Promise resolves when the response ends;
- * the self-tests here use trivial fakes that write+end synchronously.
+ * async; the driver awaits its return and the response's end signal before it
+ * reads the captured response. Fire-and-forget route ladders therefore do not
+ * need scheduler-polling wrappers.
  */
 export type Dispatch = (
   req: http.IncomingMessage,
@@ -31,6 +31,7 @@ export async function captureResponse(
 ): Promise<CapturedResponse> {
   const res = new FakeRes();
   await dispatch(req, res as unknown as http.ServerResponse);
+  await res.waitForEnd();
   return { status: res.statusCode, headers: res.headers, body: res.body };
 }
 

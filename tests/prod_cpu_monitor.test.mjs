@@ -72,16 +72,12 @@ describe('production CPU monitor parsing', () => {
     expect(parseCpuSamples(' 95.01%\n199.8%\n96%\n')).toEqual([95.01, 199.8, 96]);
   });
 
-  it.each([
-    '',
-    '--',
-    'NaN%',
-    '-1%',
-    '95',
-    '95%\ninvalid%',
-  ])('rejects malformed CPU output %j', (raw) => {
-    expect(() => parseCpuSamples(raw)).toThrow();
-  });
+  it.each(['', '--', 'NaN%', '-1%', '95', '95%\ninvalid%'])(
+    'rejects malformed CPU output %j',
+    (raw) => {
+      expect(() => parseCpuSamples(raw)).toThrow();
+    },
+  );
 
   it('uses a strict threshold and a two-of-three confirmation by default', () => {
     expect(shouldTriggerProfile([95, 95, 95], 95, 2)).toBe(false);
@@ -121,6 +117,12 @@ describe('production CPU monitor configuration', () => {
     const dockerfile = await readFile(new URL('../Dockerfile', import.meta.url), 'utf8');
     expect(dockerfile).toContain('/app/scripts/prod_cpu_game_helper.mjs /app/ops/');
     expect(dockerfile).toContain('/app/scripts/prod_cpu_profile_client.mjs /app/ops/');
+  });
+
+  it('keeps the immutable helpers in the Docker build context', async () => {
+    const dockerignore = await readFile(new URL('../.dockerignore', import.meta.url), 'utf8');
+    expect(dockerignore).toContain('!scripts/prod_cpu_game_helper.mjs');
+    expect(dockerignore).toContain('!scripts/prod_cpu_profile_client.mjs');
   });
 
   it('pins the inspector client to the discovered game PID and requests shutdown', () => {

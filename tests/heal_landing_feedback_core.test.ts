@@ -65,6 +65,37 @@ describe('heal landing feedback', () => {
     expect(healLandingLogKey(ev, true)).toBe(null);
   });
 
+  it('reads a fully absorbed heal as absorbed, never as "already at full health"', () => {
+    // The two ways amount reaches 0 need OPPOSITE messages. consumeHealAbsorb
+    // (src/sim/combat/heal.ts) can zero a heal on a target nowhere near full: a
+    // mob with a healAbsorb template brands the victim with a necrotic blight, so
+    // a priest healing a blighted ally at 30 percent HP gets amount 0 back. Telling
+    // that healer they are "already at full health" is exactly backwards.
+    const absorbed = heal2({ amount: 0, absorbed: 240 });
+
+    expect(shouldShowHealLanding(absorbed)).toBe(true);
+    expect(shouldFloatHealLanding(absorbed)).toBe(true);
+    expect(healLandingFloatTextKey(absorbed)).toBe('hud.combat.floatingHealAbsorbed');
+    expect(healLandingLogKey(absorbed, true)).toBe('hud.combat.healSelfAbsorbed');
+    expect(healLandingLogKey(absorbed, false)).toBe('hud.combat.healOtherAbsorbed');
+
+    // The genuine full-health case is untouched: no absorb on the event.
+    const full = heal2({ amount: 0 });
+    expect(healLandingFloatTextKey(full)).toBe('hud.combat.floatingHealFull');
+    expect(healLandingLogKey(full, true)).toBe('hud.combat.healSelfFull');
+    expect(healLandingLogKey(full, false)).toBe('hud.combat.healOtherFull');
+  });
+
+  it('a PARTIALLY absorbed heal still reads as a normal heal, not an absorb', () => {
+    // absorbed > 0 alone must not hijack the message: the shield ate some but the
+    // target still gained HP, which is an ordinary heal from the healer's side.
+    const partial = heal2({ amount: 130, absorbed: 70 });
+
+    expect(healLandingFloatTextKey(partial)).toBe(null);
+    expect(healLandingLogKey(partial, true)).toBe('hud.combat.healSelf');
+    expect(healLandingLogKey(partial, false)).toBe('hud.combat.healOther');
+  });
+
   it('keeps online-delivered zero-effective direct heals visible to the HUD feedback path', () => {
     const [ev] = onlineDrain([heal2({ sourceId: 7, targetId: 7, amount: 0 })]) as Heal2Event[];
 

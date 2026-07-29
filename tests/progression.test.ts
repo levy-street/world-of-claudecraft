@@ -174,9 +174,33 @@ describe('content referential integrity', () => {
     expect(problems).toEqual([]);
   });
 
-  it('zones tile the world strip and content sits inside its zone band', () => {
-    for (let i = 0; i + 1 < ZONES.length; i++) {
-      expect(ZONES[i].zMax).toBe(ZONES[i + 1].zMin);
+  it('zones tile the grid and content sits inside its zone band', () => {
+    // the strip column tiles south to north exactly as it always did
+    const strip = ZONES.filter((zn) => (zn.xMin ?? -180) <= -180 && (zn.xMax ?? 180) >= 180);
+    for (let i = 0; i + 1 < strip.length; i++) {
+      expect(strip[i].zMax).toBe(strip[i + 1].zMin);
+    }
+    // the columns stack beside the strip: bands may straddle strip rows
+    // (the realms kept their sizes when the grid landed), so the invariants
+    // are: no two zone rects overlap, and every column shares some z with
+    // the strip (an unreachable island would be a bug)
+    const x0 = (zn: (typeof ZONES)[number]) => zn.xMin ?? -180;
+    const x1 = (zn: (typeof ZONES)[number]) => zn.xMax ?? 180;
+    for (const a of ZONES) {
+      for (const b of ZONES) {
+        if (a.id >= b.id) continue;
+        const overlap = x0(a) < x1(b) && x1(a) > x0(b) && a.zMin < b.zMax && a.zMax > b.zMin;
+        expect(overlap, `${a.id} and ${b.id} rects must not overlap`).toBe(false);
+      }
+    }
+    const stripMin = strip[0].zMin;
+    const stripMax = strip[strip.length - 1].zMax;
+    for (const zn of ZONES) {
+      if (x0(zn) <= -180 && x1(zn) >= 180) continue;
+      expect(
+        zn.zMin < stripMax && zn.zMax > stripMin,
+        `${zn.id} band overlaps the strip somewhere`,
+      ).toBe(true);
     }
     const problems: string[] = [];
     const inWorld = (x: number, z: number) =>

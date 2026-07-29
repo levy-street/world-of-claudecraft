@@ -119,10 +119,6 @@ describe('withSecurityHeaders (unit)', () => {
 // below returns before touching it (verified db-free by reading each handler).
 process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_phase21_security';
 
-// routeHttpRequest is synchronous fire-and-forget (void apiEntry(req, res)), so a
-// dispatch must poll res.writableEnded before the captured headers are readable.
-const MAX_POLL_TICKS = 5000;
-
 // The security headers whose parity across the two dispatch modes is asserted.
 // Cache-Control is deliberately excluded (handlers set it, so it is not a
 // wrapper-owned invariant on a non-oauth path).
@@ -157,7 +153,7 @@ afterAll(() => {
   else process.env.NODE_ENV = savedNodeEnv;
 });
 
-/** Drive the real routeHttpRequest under `mode` and poll until the response ends. */
+/** Drive the real routeHttpRequest under `mode` and await its end signal. */
 async function driveRoute(
   mode: 'legacy' | 'new',
   opts: { method?: string; url: string; headers?: Record<string, string> },
@@ -166,11 +162,7 @@ async function driveRoute(
   const req = makeReq(opts);
   const res = new FakeRes();
   main.routeHttpRequest(req, res as unknown as http.ServerResponse);
-  let ticks = 0;
-  while (!res.writableEnded) {
-    if (ticks++ > MAX_POLL_TICKS) throw new Error('response never ended');
-    await new Promise((r) => setImmediate(r));
-  }
+  await res.waitForEnd();
   return res;
 }
 

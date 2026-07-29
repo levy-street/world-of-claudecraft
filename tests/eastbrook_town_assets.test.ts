@@ -21,7 +21,7 @@ const REPO_ROOT = path.join(__dirname, '..');
 const PROPS_ROOT = path.join(REPO_ROOT, 'public/models/props');
 const EVIDENCE_ROOT = path.join(REPO_ROOT, 'docs/screenshots/eastbrook-vale-rebuild/assets');
 const MATERIALS_ROOT = path.join(REPO_ROOT, 'docs/screenshots/eastbrook-vale-rebuild/materials');
-const SOURCE_FINGERPRINT = '928d47dde04c667cafc33cf6c68f9c41cfb08059586f271c912abb64619f4e2b';
+const SOURCE_FINGERPRINT = '961489892c5cfee2667ea67b1e8ae2a524adb8885a8d74f6dbf797d5254e574e';
 const SURFACE_ATLAS_SOURCE_SHA256 =
   'abec3036f8887e9c94972dab52aea664f18a74696db6b6d24cc48a4cfbe22b7d';
 const SURFACE_ATLAS_SHIPPING_SHA256 =
@@ -72,7 +72,7 @@ const ASSETS: readonly AssetContract[] = [
     rootName: 'EastbrookBank',
     dimensions: [7, 7.8, 5.5],
     bytes: 40_000,
-    sha256: 'fc8edc0a02a7da88e3197d58cd24ff523565963445635f85cc1f1797007a7a55',
+    sha256: 'df7e798570a835984d9c88f048656e23d4401c0fdd4e20b250cbb7fe339faf17',
     triangles: 2324,
     primitiveTriangles: [2128, 196],
     triangleCeiling: 6000,
@@ -90,7 +90,7 @@ const ASSETS: readonly AssetContract[] = [
     rootName: 'EastbrookSmithy',
     dimensions: [7, 7.5, 5.5],
     bytes: 40_352,
-    sha256: '1c63b08d2bb2fb622d4abf8b4081a4ac686aea8c0d24cf92d1e55373f4eca9ed',
+    sha256: '9de3e08591997e0b352dd48c1a4ba35bff33794c51fddd7f014c366a2ed55be5',
     triangles: 2410,
     primitiveTriangles: [2282, 128],
     triangleCeiling: 6000,
@@ -108,7 +108,7 @@ const ASSETS: readonly AssetContract[] = [
     rootName: 'EastbrookInn',
     dimensions: [7.5, 8.5, 6],
     bytes: 67_768,
-    sha256: 'e323abb76b21047df4395b137d79d7a510ea847ac8bb50ceabda602586b8377c',
+    sha256: 'a9c3f4434299e16b6103374a5ed4b12a7ca8fbada7f6c7c3ab9283b9f8588ef4',
     triangles: 4348,
     primitiveTriangles: [4004, 344],
     triangleCeiling: 6000,
@@ -126,7 +126,7 @@ const ASSETS: readonly AssetContract[] = [
     rootName: 'EastbrookChapel',
     dimensions: [5.5, 7, 6],
     bytes: 66_132,
-    sha256: '86d69cc8135e69ec8d6a958c5c519ed107a0306be4f05c9fcdd34d826a87034e',
+    sha256: '096cb9c6b8ef48af087857846eb40d9050c56f1156731f1095e342d98f1e8882',
     triangles: 4120,
     primitiveTriangles: [3800, 320],
     triangleCeiling: 6000,
@@ -144,7 +144,7 @@ const ASSETS: readonly AssetContract[] = [
     rootName: 'EastbrookWeavingWorkshop',
     dimensions: [5.5, 5.8, 4.5],
     bytes: 40_392,
-    sha256: '0a7281365264d45a656e1cb39b984c2cadba4934ae67b3f7be1da2911c047a6e',
+    sha256: 'c270c601dec11750a806a5e667ddff24d99afca906111a821318d3fd6ae7b12f',
     triangles: 2412,
     primitiveTriangles: [2272, 140],
     triangleCeiling: 6000,
@@ -162,7 +162,7 @@ const ASSETS: readonly AssetContract[] = [
     rootName: 'EastbrookToolworks',
     dimensions: [5.5, 5.8, 4.5],
     bytes: 39_920,
-    sha256: '09da0bfcc671b86926f87893beea9b76cb075b48e90f6eada3d71e32ea6ce09b',
+    sha256: 'f7df21a0d65e9f059b67c1e0ee8ea7332b7db0cf83030cec91b19f27c736aadf',
     triangles: 2320,
     primitiveTriangles: [2180, 140],
     triangleCeiling: 6000,
@@ -180,7 +180,7 @@ const ASSETS: readonly AssetContract[] = [
     rootName: 'EastbrookCivicWellBeacon',
     dimensions: [3.2, 3.1, 3.2],
     bytes: 13_216,
-    sha256: '186ba5afba895111a5e55a355c52397ba0829e381846d6f5460af3027cb78d42',
+    sha256: 'e067f10d50f653634bf13c83ca0cf2e2411096c6ef4f7d35a61586af47e88dff',
     triangles: 464,
     primitiveTriangles: [456, 8],
     triangleCeiling: 3000,
@@ -198,7 +198,7 @@ const ASSETS: readonly AssetContract[] = [
     rootName: 'EastbrookMarketStall',
     dimensions: [2.8, 2.7, 2.2],
     bytes: 27_072,
-    sha256: '0f216a0d083a65a1d61d893d38bbdd830d649ae5a3817b72b3c7745d85491f3d',
+    sha256: '649747530b44dde778499a27136cad1864ee6e39a8a4dd7e393dae9730825a51',
     triangles: 1314,
     primitiveTriangles: [1294, 20],
     triangleCeiling: 3000,
@@ -216,7 +216,7 @@ const ASSETS: readonly AssetContract[] = [
     rootName: 'EastbrookWallWing',
     dimensions: [6.5, 2.7, 0.65],
     bytes: 8352,
-    sha256: '5b23dfd6f5b57bdace499855189a27c855a0c4acc54c628277b253402d322c0e',
+    sha256: '7cd4379846fe71e047c27278b199084b343da18bc0a56a6eb48aa03b7ab225ea',
     triangles: 206,
     primitiveTriangles: [196, 10],
     triangleCeiling: 206,

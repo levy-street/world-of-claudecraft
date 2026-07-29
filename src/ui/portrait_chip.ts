@@ -31,6 +31,11 @@ export interface PortraitChipOpts {
    *  normal 3/4 figure framing where the chip is shown large, e.g. the
    *  Inspect window, so it does not read as an over-zoomed helmet crop. */
   framing?: PortraitFraming;
+  /** Omit the potentially large data URL from generated HTML and let
+   *  hydratePortraits assign it after the subtree is mounted. Useful for dense
+   *  repeated grids where embedding one cached portrait dozens of times would
+   *  create multi-megabyte innerHTML strings. Assets must already be ready. */
+  deferSource?: boolean;
 }
 
 /** Class crest data URL — the placeholder before the 3D portrait is ready and
@@ -42,18 +47,27 @@ function crestUrl(cls: PlayerClass): string {
 /** Build a portrait-chip HTML string. Call {@link hydratePortraits} on the
  *  container afterwards (or rely on the global ready hook to upgrade it). */
 export function portraitChipHtml(opts: PortraitChipOpts): string {
-  const { cls, skin = 0, name, variant = 'sm', badge = true, framing = 'headshot' } = opts;
-  const portrait = playerPortraitDataUrl(cls, skin, framing);
-  const src = portrait ?? crestUrl(cls);
-  const pending = portrait ? '' : ' data-portrait-pending="1"';
-  const fallbackCls = portrait ? '' : ' is-fallback';
+  const {
+    cls,
+    skin = 0,
+    name,
+    variant = 'sm',
+    badge = true,
+    framing = 'headshot',
+    deferSource = false,
+  } = opts;
+  const portrait = deferSource ? null : playerPortraitDataUrl(cls, skin, framing);
+  const src = deferSource ? null : (portrait ?? crestUrl(cls));
+  const source = src ? ` src="${src}"` : '';
+  const pending = portrait && !deferSource ? '' : ' data-portrait-pending="1"';
+  const fallbackCls = portrait && !deferSource ? '' : ' is-fallback';
   const alt = esc(t('character.portraitAlt', { name }));
   const badgeHtml = badge
     ? `<img class="portrait-badge" src="${crestUrl(cls)}" alt="" aria-hidden="true" draggable="false">`
     : '';
   return (
     `<span class="portrait-chip portrait-${variant}${fallbackCls}" data-class="${cls}" data-cls="${cls}" data-skin="${skin}" data-framing="${framing}"${pending}>` +
-    `<span class="portrait-ring"><img class="portrait-img" src="${src}" alt="${alt}" draggable="false"></span>` +
+    `<span class="portrait-ring"><img class="portrait-img"${source} alt="${alt}" loading="lazy" decoding="async" draggable="false"></span>` +
     badgeHtml +
     `</span>`
   );
@@ -71,7 +85,11 @@ export function hydratePortraits(root: ParentNode = document): void {
     const url = playerPortraitDataUrl(cls, skin, framing);
     if (!url) return;
     const img = chip.querySelector<HTMLImageElement>('.portrait-img');
-    if (img) img.src = url;
+    if (img) {
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.src = url;
+    }
     chip.classList.remove('is-fallback');
     chip.removeAttribute('data-portrait-pending');
   });

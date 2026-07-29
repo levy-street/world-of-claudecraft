@@ -11,9 +11,17 @@ import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
 import type { ActionBarLayout } from '../src/world_api/action_bar';
 import { APPLE_AUTH_SCHEMA } from './apple_auth_db';
+import { validCharName } from './auth';
 import type { BankBonusFacts } from './bank_entitlements';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import type { ChatLogRow } from './chat_log';
+import {
+  buildCommunityTestCharacters,
+  communityTestAccountsEnabled,
+  GENERATED_NAME_ATTEMPTS,
+  generatedTestCharacterName,
+  prepareCommunityTestCharacters,
+} from './community_test_accounts';
 import { CONCURRENT_INDEX_MIGRATIONS } from './concurrent_indexes';
 import { CONTENT_MODERATION_SCHEMA } from './content_moderation_db';
 import type { RankedDeedsAccount } from './deeds_board';
@@ -41,6 +49,7 @@ import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';
 import { REALM } from './realm';
 import { chooseArchiveName } from './reclaim_name';
 import { SOCIAL_SCHEMA } from './social_db';
+import { UNSTUCK_SCHEMA } from './unstuck_db';
 import { USER_ASSETS_SCHEMA } from './user_assets_db';
 
 // The realm-market key helpers and the backfill marker key live in
@@ -1051,6 +1060,9 @@ export async function ensureSchema(): Promise<void> {
     await client.query('SET LOCAL statement_timeout = 0');
     await client.query('SELECT pg_advisory_xact_lock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
     await client.query(SCHEMA);
+    // Local-recovery reports reference accounts/characters, so their additive
+    // schema runs after the core tables under the same boot advisory lock.
+    await client.query(UNSTUCK_SCHEMA);
     // Compact player analytics facts depend on accounts, characters, and
     // play_sessions from the core schema. The tables start empty and collect
     // lifecycle facts prospectively, so boot never runs a production backfill.
@@ -1458,19 +1470,67 @@ export async function createAccount(
   // (register / portal) signup so nothing changes for them.
   opts: { passwordSet?: boolean } = {},
 ): Promise<AccountRow> {
-  const res = await pool.query(
-    `INSERT INTO accounts (username, password_hash, created_ip, created_user_agent, password_set)
+  const values = [
+    username,
+    passwordHash,
+    cleanMetadataText(meta.ip, 128),
+    cleanMetadataText(meta.userAgent, 512),
+    opts.passwordSet ?? true,
+  ];
+  const insertAccount = `INSERT INTO accounts (username, password_hash, created_ip, created_user_agent, password_set)
      VALUES ($1, $2, $3, $4, $5)
-     RETURNING id, username, password_hash`,
-    [
-      username,
-      passwordHash,
-      cleanMetadataText(meta.ip, 128),
-      cleanMetadataText(meta.userAgent, 512),
-      opts.passwordSet ?? true,
-    ],
-  );
-  return res.rows[0];
+     RETURNING id, username, password_hash`;
+  if (!communityTestAccountsEnabled()) {
+    const res = await pool.query(insertAccount, values);
+    return res.rows[0];
+  }
+
+  // Sim construction and canonical equipment serialization are CPU work, so
+  // warm the immutable templates before opening a database transaction.
+  prepareCommunityTestCharacters();
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const res = await client.query(insertAccount, values);
+    const account = res.rows[0] as AccountRow | undefined;
+    if (!account) throw new Error('account insert returned no row');
+
+    for (const character of buildCommunityTestCharacters(account.id)) {
+      let inserted = false;
+      for (let attempt = 0; attempt < GENERATED_NAME_ATTEMPTS; attempt++) {
+        const name = generatedTestCharacterName(account.id, character.cls, attempt);
+        if (!validCharName(name)) continue;
+        const characterResult = await client.query(
+          `INSERT INTO characters (account_id, name, class, realm, level, state)
+           VALUES ($1, $2, $3, $4, $5, $6)
+           ON CONFLICT DO NOTHING
+           RETURNING id`,
+          [
+            account.id,
+            name,
+            character.cls,
+            REALM,
+            character.state.level,
+            JSON.stringify(character.state),
+          ],
+        );
+        if ((characterResult.rowCount ?? 0) > 0) {
+          inserted = true;
+          break;
+        }
+      }
+      if (!inserted) {
+        throw new Error(`failed to reserve a community test name for ${character.cls}`);
+      }
+    }
+    await client.query('COMMIT');
+    return account;
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 
 export async function findAccount(username: string): Promise<AccountRow | null> {
@@ -3538,6 +3598,20 @@ export async function loadMailState(): Promise<MailSave | null> {
 
 export async function saveMailState(save: MailSave): Promise<void> {
   await saveWorldState(mailStateKey(REALM), save);
+}
+
+// Shared Rift event history/scheduler, realm-scoped. Runtime group instances are
+// intentionally absent from this blob (see sim/rift/persistence.ts).
+export function riftStateKey(realm: string): string {
+  return `rifts:${realm}`;
+}
+
+export async function loadRiftState(): Promise<unknown | null> {
+  return loadWorldState<unknown>(riftStateKey(REALM));
+}
+
+export async function saveRiftState(save: unknown): Promise<void> {
+  await saveWorldState(riftStateKey(REALM), save);
 }
 
 // ---------------------------------------------------------------------------

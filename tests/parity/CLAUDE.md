@@ -67,8 +67,14 @@ pets, affixes, ground AoE), arena/duel/fiesta, delves + lockpick, dungeons/raids
 quests, loot rolls, market, bank, trade, chat/social, talents, xp/prestige, casting,
 and mob lifecycle. Every playable class appears in some scenario; enumerate with
 `grep -o "playerClass: '[a-z]*'\|addPlayer('[a-z]*'" tests/parity/scenarios.ts | sort -u`.
-`coverage.test.ts` asserts each scenario's subsystem actually FIRES (not merely named
-in a comment). Read those two files, never a hand-written list, before adding a scenario.
+The coverage shards (`coverage_a..c.test.ts`) assert each scenario's subsystem actually
+FIRES (not merely named in a comment). Read those files, never a hand-written list,
+before adding a scenario.
+
+Layout note: the gate is SHARDED for wall-time (`parity_a..g.test.ts` +
+`coverage_a..c.test.ts`, contiguous scenario slices over the shared runner in
+`run_scenarios.ts`); `npx vitest run tests/parity` and `UPDATE_PARITY=1` work
+unchanged, and a shard minting run touches only its own slice's goldens.
 
 ## Known boundaries (what is NOT pinned, read before extracting these)
 

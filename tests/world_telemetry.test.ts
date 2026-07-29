@@ -3,7 +3,9 @@ import { telemetryZoneId } from '../src/game/world_telemetry';
 import {
   ARENA_X_MIN,
   DUNGEON_X_THRESHOLD,
+  DUNGEONS,
   delveOrigin,
+  instanceOrigin,
   YUMI_BAND_X_MAX,
   YUMI_BAND_X_MIN,
 } from '../src/sim/data';
@@ -19,7 +21,10 @@ describe('telemetry zone id', () => {
   });
 
   it('reports a bounded dungeon-scoped id inside a dungeon band', () => {
-    expect(telemetryZoneId(900, 0)).toBe('dungeon:hollow_crypt');
+    // Derived from the band helper, never a literal x: the atlas-grid world
+    // moved every instance band far east of the old single-strip coordinates.
+    const crypt = instanceOrigin(DUNGEONS.hollow_crypt.index, 0);
+    expect(telemetryZoneId(crypt.x, crypt.z)).toBe('dungeon:hollow_crypt');
   });
 
   it('reports a bounded delve-scoped id inside a delve band', () => {
@@ -36,7 +41,10 @@ describe('telemetry zone id', () => {
   it('keeps the defensive fallbacks bounded for unmapped instance coordinates', () => {
     // A delve-band slot with no delve record behind it (only indexes 0-1 have
     // content today) still emits a bounded label, never a raw coordinate.
-    expect(telemetryZoneId(7900, 0)).toBe('delve:unknown');
+    // Between the last authored delve slot and the band ceiling: inside the
+    // delve band by position, with no delve record behind it.
+    const pastLastDelve = delveOrigin(1, 0).x + 300;
+    expect(telemetryZoneId(pastLastDelve, 0)).toBe('delve:unknown');
     // Past every mapped band (beyond the yumi maze ceiling) folds to the
     // generic instance label.
     expect(telemetryZoneId(YUMI_BAND_X_MAX + 10, 0)).toBe('instance');

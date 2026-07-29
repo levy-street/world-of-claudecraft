@@ -120,26 +120,26 @@ export function dealDamage(
   // Arcane damage converts to healing at a reduced rate. Defaults false, so
   // every single-target caller is unchanged and byte-identical.
   aoe = false,
-): void {
-  if (target.dead) return;
+): number {
+  if (target.dead) return 0;
   if (
     source?.kind === 'mob' &&
     source.ownerId !== null &&
     target.kind === 'player' &&
     !canDetectStealthedTarget(source, target, PET_STEALTH_DETECTION_RADIUS)
   )
-    return;
-  if (target.gm || target.devGod) return; // GMs and /dev god are invulnerable (every damage path funnels here)
+    return 0;
+  if (target.gm || target.devGod) return 0; // GMs and /dev god are invulnerable (every damage path funnels here)
   // Ice Block (Cold Coffin): while encased in stasis the mage is FULLY immune to
   // damage (owner 2026-07-13), so nothing gets through until it is cancelled or
   // expires. Every damage path funnels here, so this covers melee, spells, and DoTs.
-  if (target.auras.some((a) => a.kind === 'stasis')) return;
+  if (target.auras.some((a) => a.kind === 'stasis')) return 0;
   // A wild mob that broke leash is in 'evade': it has dropped its hate table
   // and walks home without fighting back, healing to full only on arrival.
   // Classic mechanics make it immune while it retreats, so it can't be chipped
   // down or killed outright for a risk-free kill. Owned pets use pet AI, not
   // wild-mob leash recovery, and must not inherit this immunity from stale state.
-  if (target.kind === 'mob' && target.aiState === 'evade' && target.ownerId === null) return;
+  if (target.kind === 'mob' && target.aiState === 'evade' && target.ownerId === null) return 0;
   amount = Math.max(0, amount);
   const attackAnimation = attackAnimationStarted ? { attackAnimationStarted: true as const } : {};
 
@@ -150,10 +150,16 @@ export function dealDamage(
 
   // [dev] A god-mode player (/dev god) hits for 100x so a solo tester can chew
   // through raid bosses to inspect drops without one-shotting them past their phase
-  // transitions. Gated on devCommands so it can NEVER apply in production (where gm
+  // transitions. Gated on devCommands so it can never apply in production (where gm
   // marks real, non-fighting game masters). Draws no rng.
   if (source?.devGod && source.kind === 'player' && ctx.devCommands)
     amount = Math.round(amount * 100);
+  // Dev "smite" mode: a flagged player's hit one-shots any mob (overrides the
+  // rolled amount before mitigation, so armor/absorb can't save the target). Only
+  // the player's own damage, only vs mobs; never touches players/NPCs/PvP.
+  if (source?.oneShot && source.kind === 'player' && target.kind === 'mob' && ctx.devCommands) {
+    amount = target.maxHp * 1000 + 1_000_000;
+  }
 
   // Master Armorer is a live equipment condition, not a stat baked at talent
   // recompute time. It applies to every school while the Arms warrior's current
@@ -503,7 +509,7 @@ export function dealDamage(
       // return skips the shared deed site and the session RewardCounters).
       if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
       ctx.endDuel(duel, sourcePlayer.id);
-      return;
+      return amount;
     }
   }
 
@@ -550,7 +556,7 @@ export function dealDamage(
       // Book of Deeds: the clamped terminal hit counts (zero rng).
       if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
       ctx.fiestaTakedown(match, sourcePlayer.id, target);
-      return;
+      return amount;
     }
   }
 
@@ -580,7 +586,7 @@ export function dealDamage(
       // Book of Deeds: the clamped terminal hit counts (zero rng).
       if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
       ctx.yumiPlayerDown(match, target, sourcePlayer.id);
-      return;
+      return amount;
     }
   }
 
@@ -595,7 +601,7 @@ export function dealDamage(
     sourcePlayer &&
     ctx.isArenaCrossTeam(match, sourcePlayer.id, target.id)
   ) {
-    if (match.defeated.has(target.id)) return;
+    if (match.defeated.has(target.id)) return 0;
     if (target.hp - amount <= 0) {
       amount = Math.max(0, target.hp);
       target.hp = 0;
@@ -619,7 +625,7 @@ export function dealDamage(
       if (loserTeam && ctx.isArenaTeamWiped(match, loserTeam)) {
         ctx.endArenaMatch(match, loserTeam === 'A' ? 'B' : 'A', 'defeat');
       }
-      return;
+      return amount;
     }
   }
 
@@ -674,7 +680,7 @@ export function dealDamage(
         kind,
         attackAnimationStarted,
       );
-      return;
+      return amount;
     }
   }
 
@@ -926,6 +932,7 @@ export function dealDamage(
       handleDeath(ctx, target, source);
     }
   }
+  return amount;
 }
 
 // Reactive beast "Frenzy": when a mob with the frenzyOnHit trait is struck by a
@@ -1062,6 +1069,15 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     stripTemporalEchoes(ctx, e.id);
     const meta = ctx.players.get(e.id);
     if (meta) meta.counters.deaths++;
+    // Death force-dismounts (the mount bolts); the persisted selection stays,
+    // so remounting after the corpse run is one keypress. Stats recalc on the
+    // next mount toggle / resurrect recalc, and a dead player draws no swings,
+    // so the stale crit mirror is inert. Draws no rng. Any in-flight summon or
+    // dismount transition is cancelled too, so a mid-cast death does not leave a
+    // rooted, half-summoned player.
+    e.mountKey = '';
+    e.mountCastRemaining = 0;
+    e.mountCastKey = '';
     // The Book of Deeds death hook (lifetime deaths counter, the Keeper's Toll
     // delight, perfection-window taints, the world-boss survival record) already
     // ran above, before the hate tables were cleared.

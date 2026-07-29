@@ -40,7 +40,7 @@ const page = await browser.newPage();
 await page.setViewport({ width: 900, height: 900, deviceScaleFactor: 1 });
 const pageErrors = [];
 page.on('pageerror', (e) => pageErrors.push(String(e)));
-await page.goto(BASE + '/', { waitUntil: 'networkidle2', timeout: 45000 });
+await page.goto(`${BASE}/`, { waitUntil: 'networkidle2', timeout: 45000 });
 
 const results = await page
   .evaluate(async (CLASSES) => {
@@ -58,37 +58,32 @@ const results = await page
     const preview = new CharacterPreview(container, canvas);
 
     const raf = () => new Promise((r) => requestAnimationFrame(() => r()));
-    const measure = (dataUrl) =>
-      new Promise((resolve) => {
-        const img = new Image();
-        img.onload = () => {
-          const W = 540,
-            H = 720;
-          const c = document.createElement('canvas');
-          c.width = W;
-          c.height = H;
-          const ctx = c.getContext('2d');
-          ctx.drawImage(img, 0, 0, W, H);
-          const d = ctx.getImageData(0, 0, W, H).data;
-          let top = -1,
-            bottom = -1,
-            left = W,
-            right = -1,
-            count = 0;
-          for (let y = 0; y < H; y++)
-            for (let x = 0; x < W; x++) {
-              if (d[(y * W + x) * 4 + 3] > 16) {
-                if (top < 0) top = y;
-                bottom = y;
-                if (x < left) left = x;
-                if (x > right) right = x;
-                count++;
-              }
-            }
-          resolve({ top, bottom, left, right, count, W, H });
-        };
-        img.src = dataUrl;
-      });
+    const measure = (image) => {
+      const W = 540,
+        H = 720;
+      const c = document.createElement('canvas');
+      c.width = W;
+      c.height = H;
+      const ctx = c.getContext('2d');
+      ctx.drawImage(image, 0, 0, W, H);
+      const d = ctx.getImageData(0, 0, W, H).data;
+      let top = -1,
+        bottom = -1,
+        left = W,
+        right = -1,
+        count = 0;
+      for (let y = 0; y < H; y++)
+        for (let x = 0; x < W; x++) {
+          if (d[(y * W + x) * 4 + 3] > 16) {
+            if (top < 0) top = y;
+            bottom = y;
+            if (x < left) left = x;
+            if (x > right) right = x;
+            count++;
+          }
+        }
+      return { top, bottom, left, right, count, W, H };
+    };
 
     const out = [];
     for (const cls of CLASSES) {
@@ -97,8 +92,11 @@ const results = await page
       await raf();
       await raf();
       for (const pose of CARD_POSES) {
-        const url = preview.captureCloseup({ poseClips: pose.clips, poseFraction: pose.fraction });
-        out.push({ cls, pose: pose.id, ...(await measure(url)) });
+        const image = await preview.captureCloseup({
+          poseClips: pose.clips,
+          poseFraction: pose.fraction,
+        });
+        out.push({ cls, pose: pose.id, ...measure(image) });
       }
     }
     return out;

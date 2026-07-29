@@ -488,6 +488,20 @@
      re-tuned per layout tier (see the tiers section); --btn-scale
      (actionButtonScale) and --touch-opacity (touchOpacity) are reused
      directly, not forked. */
+  /* The race timer and pre-GO button sit higher on touch so they clear the
+     mobile controls at the bottom of the screen. */
+  body.mobile-touch #mount-race-strip,
+  body.mobile-touch #race-start-btn {
+    bottom: max(34vh, calc(220px + env(safe-area-inset-bottom)));
+  }
+  body.mobile-touch #mount-race-strip {
+    max-width: calc(100vw - 24px);
+    padding: 8px 14px;
+    font-size: 16px;
+  }
+  body.mobile-touch #mount-race-strip .mr-timer {
+    width: 110px;
+  }
   body.mobile-touch #mobile-action-ring {
     /* Chrome-scale folded into every ring size var (the arc offsets below are
        expressed in these vars, so the whole cluster shrinks proportionally and keeps
@@ -2504,7 +2518,9 @@
     }
     body.mobile-touch .armory-card {
       width: 100%;
-      max-width: 116px;
+      /* 112px keeps the square art + copy fully inside a 390px landscape
+         store viewport (the previous 116px card overran it by 3.625px). */
+      max-width: 112px;
       justify-self: center;
     }
     body.mobile-touch .armory-card-copy {
@@ -4351,6 +4367,12 @@
      40x40 floor (desktop is 32x32). box-sizing keeps the 2px border inside the box. */
   body.mobile-touch .map-zoom-btn {
     min-width: 40px;
+    min-height: 40px;
+    box-sizing: border-box;
+  }
+  /* the continent level toggle is the touch way to reach the world overview
+     (no right-click on touch); raise it to the 40x40 floor. */
+  body.mobile-touch #map-level-toggle {
     min-height: 40px;
     box-sizing: border-box;
   }

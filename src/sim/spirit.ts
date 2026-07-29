@@ -18,10 +18,15 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now.
 
 import {
+  DELVES,
   dungeonAt,
   isDelvePos,
+  isRiftPos,
   OVERWORLD_GRAVEYARDS,
   PLAYER_START,
+  RIFT_REGION_HALF_X,
+  RIFT_REGION_HALF_Z,
+  riftInstanceOrigin,
   SPIRIT_HEALER,
   SPIRIT_HEALER_NPC_ID,
 } from './data';
@@ -87,13 +92,35 @@ export function nearestOverworldGraveyard(
 // no Spirit Healer stands inside an instance. Outdoors it is the nearest overworld
 // graveyard to where the body fell.
 function ghostGraveyard(
+  ctx: SimContext,
   p: Entity,
-  graveyards: readonly { x: number; z: number }[],
-  fallback: { x: number; z: number },
+  graveyards: readonly { x: number; z: number }[] = OVERWORLD_GRAVEYARDS,
+  fallback: { x: number; z: number } = PLAYER_START,
 ): { x: number; z: number } {
   const dungeon = dungeonAt(p.pos.x);
   if (dungeon) {
     return nearestOverworldGraveyard(dungeon.doorPos.x, dungeon.doorPos.z, graveyards, fallback);
+  }
+  const delve = ctx.delveRunForPlayer(p.id);
+  if (delve && isDelvePos(p.pos.x)) {
+    const door = DELVES[delve.delveId]?.doorPos;
+    if (door) return nearestOverworldGraveyard(door.x, door.z, graveyards, fallback);
+  }
+  // A rift death returns the spirit to the overworld graveyard nearest where the
+  // player STEPPED THROUGH the portal (the instance's returnPos), not the far-off
+  // rift band (which would resolve to whatever zone happens to be nearest in raw
+  // world space). Scanned off ctx.riftInstances to avoid a rift/runs import cycle.
+  if (isRiftPos(p.pos.x)) {
+    for (const inst of ctx.riftInstances) {
+      if (inst.partyKey === null) continue;
+      const o = riftInstanceOrigin(inst.slot, inst.floorIndex);
+      if (
+        Math.abs(p.pos.x - o.x) <= RIFT_REGION_HALF_X &&
+        Math.abs(p.pos.z - o.z) <= RIFT_REGION_HALF_Z
+      ) {
+        return nearestOverworldGraveyard(inst.returnPos.x, inst.returnPos.z, graveyards, fallback);
+      }
+    }
   }
   return nearestOverworldGraveyard(p.pos.x, p.pos.z, graveyards, fallback);
 }
@@ -118,11 +145,51 @@ export function releasePlayerSpirit(
     releaseSpiritInDelve(ctx, meta.entityId);
     return;
   }
-  // Mark where the body lies, then send the spirit to the graveyard.
-  p.corpsePos = { x: p.pos.x, y: p.pos.y, z: p.pos.z };
-  p.corpseInstanceId = ctx.instanceClaimIdAt(p.pos);
+  releaseAtNearestGraveyard(ctx, meta, p, true, graveyards, fallback);
+}
+
+/**
+ * Finish Unstuck through the ordinary graveyard/Pale Keeper loop. Unlike a
+ * normal death, the abandoned body cannot be used for a penalty-free corpse
+ * resurrection: the player must accept The Keeper's Toll at the graveyard.
+ */
+export function releasePlayerSpiritForUnstuck(ctx: SimContext, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r?.e.dead || r.e.ghost) return;
+  releaseAtNearestGraveyard(ctx, r.meta, r.e, false);
+}
+
+/**
+ * Finish Unstuck for a player who was ALREADY dead when they invoked it. The
+ * graveyard/Pale Keeper loop has nothing left to offer a body that cannot reach
+ * its corpse or an angel, so pull them to the graveyard and resurrect them there
+ * on exactly the Spirit Healer's terms: RES_HEALER_HP_FRACTION of their pools
+ * plus The Keeper's Toll. Unstuck only saves them the walk, never the toll, so it
+ * can never be the cheap way out of a death.
+ */
+export function reviveAtGraveyardForUnstuck(ctx: SimContext, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r?.e.dead) return;
+  const { meta, e: p } = r;
+  // Resolve the graveyard before the revive moves the body out of its instance band.
+  const gy = ghostGraveyard(ctx, p);
+  reviveAt(ctx, meta, p, { x: gy.x, y: p.pos.y, z: gy.z }, RES_HEALER_HP_FRACTION, true);
+  ctx.emit({ type: 'respawn', pid: meta.entityId });
+}
+
+function releaseAtNearestGraveyard(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  p: Entity,
+  leaveCorpse: boolean,
+  graveyards: readonly { x: number; z: number }[] = OVERWORLD_GRAVEYARDS,
+  fallback: { x: number; z: number } = PLAYER_START,
+): void {
+  // Resolve the graveyard before moving the entity out of its instance band.
+  const gy = ghostGraveyard(ctx, p, graveyards, fallback);
+  p.corpsePos = leaveCorpse ? { x: p.pos.x, y: p.pos.y, z: p.pos.z } : null;
+  p.corpseInstanceId = leaveCorpse ? ctx.instanceClaimIdAt(p.pos) : null;
   p.ghost = true; // p.dead stays true
-  const gy = ghostGraveyard(p, graveyards, fallback);
   p.pos = ctx.groundPos(gy.x, gy.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
@@ -190,6 +257,9 @@ export function resurrectOnInstanceReentry(
   p: Entity,
   pos: Vec3,
 ): void {
+  // Unstuck deliberately abandons its corpse so the Pale Keeper toll cannot be
+  // bypassed by walking the ghost through an unrelated instance entrance.
+  if (!p.corpsePos || p.corpseInstanceId === null) return;
   reviveAt(ctx, meta, p, pos, RES_HP_FRACTION, false);
   ctx.emit({ type: 'respawn', pid: meta.entityId });
 }

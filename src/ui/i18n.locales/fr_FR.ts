@@ -4129,6 +4129,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.tool': 'Outil',
   'itemUi.kind.potion': 'Potion',
   'itemUi.kind.elixir': 'Élixir',
+  'itemUi.kind.mount': 'Monture',
   'itemUi.stats.armor': 'Armure',
   'itemUi.stats.str': 'Force',
   'itemUi.stats.agi': 'Agilité',
@@ -5205,6 +5206,16 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.the_merchant.greeting':
     'Bienvenue au Marché mondial, {className}. Achetez aux aventuriers du royaume ou proposez vos propres marchandises.',
   'entities.npcs.marshal_redbrook.name': 'Maréchal Redbrook',
+  'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
+  'entities.npcs.stablemaster_marla.title': 'Maîtresse d’écurie',
+  'entities.npcs.stablemaster_marla.greeting':
+    'Tout cavalier arrive sur ses deux jambes, {className}. Je ne te donnerai les rênes que lorsque tu sauras tenir en selle sur le Destrier de Bravoure sans mordre la boue, et Highwatch n’a pas de guérisseurs de trop pour les os brisés.',
+  'entities.quests.q_riding_lessons.title': 'Leçons d’équitation',
+  'entities.quests.q_riding_lessons.text':
+    'Tout cavalier arrive sur ses deux jambes, {playerName}, comme je te l’ai dit le jour de notre rencontre. Paie les frais, et quand j’en donne l’ordre, appelle à toi le Destrier de Bravoure d’entraînement et mets-toi en selle. Puis fais le parcours : suis le repère jusqu’à l’arche de départ, franchis chaque obstacle proprement et repasse la ligne avant que le sable ne s’écoule. Réussis, et la selle est à toi. Sors de l’enclos et l’on recommence.',
+  'entities.quests.q_riding_lessons.completion':
+    'Voilà. En selle d’un seul mouvement, et bien stable une fois là-haut. Le Destrier de Bravoure est à toi, {playerName} : selle, rênes, et le rang d’un cavalier qui a gagné sa place au lieu de l’acheter.',
+  'entities.quests.q_riding_lessons.objectives.0.label': 'Dompter le Destrier de Bravoure',
   'entities.npcs.marshal_redbrook.title': 'Maréchal de la ville',
   'entities.npcs.marshal_redbrook.greeting':
     "Gardez votre lame près de vous, {className}. Le Val n'est plus ce qu'il était.",
@@ -6304,6 +6315,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_waistguard.name': "Protège-taille d'Appel-tempête",
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, le Pic Éveillé',
   'entities.mobs.thunzharr_stormling.name': 'Élémentaire de tempête éveillé',
+  'entities.mobs.stable_horse.name': "Cheval d'écurie",
   'hudChrome.worldBoss.spawn': '{name} se dresse sur les Hauteurs de Thornpeak !',
   'entities.items.stormcallers_spaulders.name': 'Spallières de Galecall',
   'entities.items.bonewrought_greatsword.name': 'Espadon Bonewrought',
@@ -6381,6 +6393,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterArmor': 'Armure',
   'hudChrome.bags.filterConsumable': 'Consommables',
   'hudChrome.bags.filterMaterial': 'Matériaux',
+  'hudChrome.bags.filterMount': 'Montures',
   'hudChrome.bags.filterQuest': 'Quête',
   'hudChrome.bags.sortAria': 'Trier les objets du sac',
   'hudChrome.bags.sortRecent': 'Récents',
@@ -7520,6 +7533,26 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.reliquary_gloves_rog.name': 'Gantelets du gardien des os',
   'entities.items.deacon_reliquary_helm.name': 'Heaume du reliquaire du diacre',
   'entities.items.varric_shadow_cowl.name': "Cagoule d'ombre de Varric",
+  'entities.items.duskwisp_essence.name': 'Essence de feu follet du crépuscule',
+  'entities.items.spore_heart.name': 'Coeur de spore',
+  'entities.items.gleaming_antler.name': 'Bois de cerf luisant',
+  'entities.items.wisp_mote.name': 'Poussière de feu follet',
+  'entities.items.starfall_shard.name': "Éclat d'étoile tombée",
+  'entities.items.elder_bark.name': "Écorce d'ancien",
+  'entities.items.hollow_sealstone.name': 'La Pierre du Sceau de la Combe',
+  'entities.items.monument_overlook.name': 'Monument usé',
+  'entities.items.monument_court.name': 'Monument englouti',
+  'entities.items.monument_north.name': 'Monument oublié',
+  'entities.items.guardian_core.name': 'Coeur de gardien',
+  'entities.items.wardens_seal.name': 'Le Sceau du Veilleur',
+  'entities.items.gleamstag_charm.name': 'Charme du Cerf-Luisant',
+  'entities.items.veilsteel_blade.name': "Lame d'acier voilé",
+  'entities.items.duskfang_dirk.name': 'Dague croc-du-crépuscule',
+  'entities.items.gleamwood_stave.name': 'Bâton de bois luisant',
+  'entities.items.wardens_oathband.name': 'Anneau de serment du Veilleur',
+  'entities.items.wardplate_cuirass.name': 'Cuirasse de plaques de garde',
+  'entities.items.nightweave_tunic.name': 'Tunique de tisse-nuit',
+  'entities.items.veilcloth_robe.name': 'Robe de toile voilée',
   'entities.mobs.acolyte_tessa.name': 'Acolyte Tessa',
   'entities.mobs.deacon_varric.name': 'Diacre Varric',
   'entities.mobs.reliquary_bonewalker.name': 'Marche-os relevé',
@@ -8570,6 +8603,13 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'loading.tips.talents':
     'Conseil : vous pouvez réinitialiser vos talents dès que vous êtes hors combat, un premier choix ne vous enferme donc jamais.',
   'entities.items.chunk_of_ore.name': 'Morceau de minerai',
+  'entities.items.reins_grag_bear.name': 'Rênes de l’Ours-Grag Goliath',
+  'entities.items.reins_valorsteed.name': 'Rênes du Destrier de Bravoure',
+  'entities.items.reins_stalkglider_snail.name': 'Rênes du Glisseur à Coquille Moussue',
+  'entities.items.reins_aether_hover_cycle.name': 'Clé de contact : Aérocycle du Jouteur d’Éther',
+  'entities.items.reins_shadowjump_toad.name': 'Rênes de Kama-Kage, le Crapaud Saute-Ombre',
+  'entities.items.reins_stormfeather_griffin.name': 'Rênes du Plume-d’Orage Toise-Ciel',
+  'entities.items.reins_thunderstrut_gobbler.name': 'Rênes de Pavane-Tonnerre, le Grand Dindon',
   'entities.quests.q_prof_intro.title': 'Un métier pour chaque main',
   'hudChrome.auth.appleChoiceExpired':
     'Cette connexion avec Apple a expiré. Veuillez vous reconnecter avec Apple.',
@@ -8599,6 +8639,47 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.notInPartyError':
     'Vous devez être dans un groupe pour lancer une vérification de disponibilité.',
   'hudChrome.readyCheck.inProgressError': 'Une vérification de disponibilité est déjà en cours.',
+  // Rideable mounts: the Z keybind + the Mounts window (the stable).
+  'hudChrome.keybinds.mount': 'Monter / Descendre',
+  'hudChrome.mobile.mounts': 'Montures',
+  'hudChrome.mounts.title': 'Montures',
+  'hudChrome.mounts.close': 'Fermer',
+  'hudChrome.mounts.select': 'Choisir',
+  'hudChrome.mounts.selected': 'Choisie',
+  'hudChrome.mounts.riding': 'En selle',
+  'hudChrome.mounts.mount': 'Monter',
+  'hudChrome.mounts.dismount': 'Descendre',
+  'hudChrome.mounts.rarity_common': 'Commune',
+  'hudChrome.mounts.rarity_rare': 'Rare',
+  'hudChrome.mounts.rarity_epic': 'Épique',
+  'hudChrome.mounts.spec_speed': '+{pct}% de mobilité supplémentaire',
+  'hudChrome.mounts.name_valorsteed': 'Destrier de Bravoure',
+  'hudChrome.mounts.name_grag_bear': 'Ours-Grag Goliath',
+  'hudChrome.mounts.name_stalkglider_snail': 'Glisseur à Coquille Moussue',
+  'hudChrome.mounts.name_aether_hover_cycle': 'Aérocycle du Jouteur d’Éther',
+  'hudChrome.mounts.name_shadowjump_toad': 'Kama-Kage, le Crapaud Saute-Ombre',
+  'hudChrome.mounts.name_stormfeather_griffin': 'Plume-d’Orage Toise-Ciel',
+  'hudChrome.mounts.name_thunderstrut_gobbler': 'Pavane-Tonnerre, le Grand Dindon',
+  'hudChrome.mounts.desc_valorsteed':
+    'Un destrier robuste au pied sûr qui accroît la vitesse de déplacement.',
+  'hudChrome.mounts.desc_grag_bear':
+    'Un ours robuste au pied sûr qui accroît la vitesse de déplacement.',
+  'hudChrome.mounts.desc_stalkglider_snail':
+    'Un escargot vaillant à combustion lente qui accroît la vitesse de déplacement.',
+  'hudChrome.mounts.desc_aether_hover_cycle':
+    'Une puissante moto magitech conçue pour des déplacements de combat rapides en vol rasant.',
+  'hudChrome.mounts.desc_shadowjump_toad':
+    'Un crapaud géant, massif et au pied sûr, dressé aux bonds d’ombre fulgurants sur tout terrain.',
+  'hudChrome.mounts.desc_stormfeather_griffin':
+    'Un griffon d’orage majestueux qui arpente le sol sur des serres runiques, ailes repliées.',
+  'hudChrome.mounts.desc_thunderstrut_gobbler':
+    'Un dindon colossal né de l’orage qui descend du Pic Éveillé en se pavanant, la queue déployée comme un front d’orage.',
+  'hudChrome.mounts.emptyTitle': 'Aucune monture collectée',
+  'hudChrome.mounts.emptyStableHint':
+    'Atteignez le niveau 20 et prenez des leçons d’équitation auprès de la Maîtresse d’écurie Marla aux écuries à l’ouest de Highwatch.',
+  'hudChrome.mounts.emptyDropHint':
+    'Les montures plus rares sont lâchées par les boss de donjon et de raid.',
+  'hudChrome.mounts.clickManage': 'Cliquez pour choisir votre monture',
   'guide.bestiary.flavor.sethrael_palecoil':
     "Un serpent d'une pâleur d'os qui glisse dans les profondeurs du Glimmermere, gardien silencieux de l'eau qu'il a faite sienne. Les nageurs qui partagent le lac avec lui refont rarement surface.",
   'guide.combat.metersBody':

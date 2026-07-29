@@ -34,6 +34,7 @@ import {
   interactObjectForQuests,
   tryStartNythraxisWardChannel,
 } from './encounters/nythraxis';
+import { tryStartEscort } from './escort';
 import { isInRaidInstance } from './instances/dungeons';
 import { hasSharedLootRights as computeSharedLootRights, lootHasGoneFfa } from './loot/loot_ffa';
 import {
@@ -61,8 +62,17 @@ import {
 import { type HarvestYield, recordHarvestYield } from './professions/harvest_yields';
 import { bestOwnedAnyGatherToolTier, canHarvestMonsterMaterial } from './professions/tools';
 import type { SimContext } from './sim_context';
-import { dist2d, type Entity, INTERACT_RANGE, type InvSlot, OBJECT_RESPAWN } from './types';
+import {
+  cloneItemInstancePayload,
+  dist2d,
+  type Entity,
+  INTERACT_RANGE,
+  type InvSlot,
+  OBJECT_RESPAWN,
+} from './types';
 import { markWorldBossLooted } from './world_boss';
+
+const LOCKPICK_OFFER_COOLDOWN = 4; // seconds between repeated rift_locked_chest offer emits per player
 
 // Shared corpse loot-rights snapshot for both the manual `lootCorpse` and the passive
 // walk-by `autoLootForParty`. The caller passes `ffaUnlocked` so the two paths can
@@ -135,7 +145,11 @@ export function lootCorpse(
     if (!lootSlotVisibleTo(s, meta.entityId)) continue;
     if (s.openToAll) {
       while (s.count > 0 && ctx.canAddItem(s.itemId, 1, meta.entityId)) {
-        ctx.addItem(s.itemId, 1, meta.entityId);
+        if (s.instance) {
+          ctx.addItemInstance(s.itemId, cloneItemInstancePayload(s.instance), meta.entityId);
+        } else {
+          ctx.addItem(s.itemId, 1, meta.entityId);
+        }
         s.count--;
         didLoot = true;
       }
@@ -147,15 +161,27 @@ export function lootCorpse(
         bagsFull = true;
         continue;
       }
-      ctx.addItem(s.itemId, 1, meta.entityId);
+      if (s.instance) {
+        ctx.addItemInstance(s.itemId, cloneItemInstancePayload(s.instance), meta.entityId);
+      } else {
+        ctx.addItem(s.itemId, 1, meta.entityId);
+      }
       s.personalFor = s.personalFor.filter((id) => id !== meta.entityId);
       tookPersonal = true;
       didLoot = true;
       continue;
     }
     if (!rights.shared) continue;
-    while (s.count > 0 && awardSharedLootItem(ctx, s.itemId, mob, meta)) {
-      s.count--;
+    while (s.count > 0) {
+      if (s.instance) {
+        if (!ctx.canAddItem(s.itemId, 1, meta.entityId)) break;
+        ctx.addItemInstance(s.itemId, cloneItemInstancePayload(s.instance), meta.entityId);
+        s.count--;
+      } else if (awardSharedLootItem(ctx, s.itemId, mob, meta)) {
+        s.count--;
+      } else {
+        break;
+      }
       didLoot = true;
     }
     if (s.count > 0) bagsFull = true;
@@ -814,6 +840,27 @@ export function interact(
           ctx.leaveDungeon(p.id);
           return;
         }
+        if (target.templateId === 'rift_portal' && target.riftSeed !== undefined) {
+          ctx.enterRift(target.riftSeed, target.riftBaseLevel ?? p.level, p.id, undefined, target);
+          return;
+        }
+        if (target.templateId === 'rift_exit') {
+          ctx.leaveRift(p.id);
+          return;
+        }
+        if (target.templateId === 'rift_locked_chest') {
+          // Offer the ante selector; the pick itself runs via lockpick_engage.
+          // Rate-limited per player so repeated F-key spam does not re-open the UI.
+          if (ctx.time >= (p.riftLockpickOfferAt ?? -Infinity) + LOCKPICK_OFFER_COOLDOWN) {
+            p.riftLockpickOfferAt = ctx.time;
+            ctx.emit({ type: 'lockpickOffer', objectId: target.id, bountiful: false, pid: p.id });
+          }
+          return;
+        }
+        if (target.templateId === 'rift_treasure') {
+          ctx.riftOpenTreasure(target.id, p.id);
+          return;
+        }
         if (target.templateId === 'mailbox') {
           ctx.emit({ type: 'mailbox', pid: p.id });
           return;
@@ -834,6 +881,9 @@ export function interact(
       }
     }
   }
+  // Escort start: standing near an idle escortee whose quest this player has
+  // active begins the walk (escort.ts picks the nearest eligible one).
+  if (tryStartEscort(ctx, p, r.meta)) return;
   let bestCorpse: Entity | null = null;
   let bestCorpseD2 = INTERACT_RANGE * INTERACT_RANGE;
   let bestObj: Entity | null = null;
@@ -884,6 +934,25 @@ export function interact(
     }
     if (obj.templateId === 'dungeon_exit') {
       ctx.leaveDungeon(p.id);
+      return;
+    }
+    if (obj.templateId === 'rift_portal' && obj.riftSeed !== undefined) {
+      ctx.enterRift(obj.riftSeed, obj.riftBaseLevel ?? p.level, p.id, undefined, obj);
+      return;
+    }
+    if (obj.templateId === 'rift_exit') {
+      ctx.leaveRift(p.id);
+      return;
+    }
+    if (obj.templateId === 'rift_locked_chest') {
+      if (ctx.time >= (p.riftLockpickOfferAt ?? -Infinity) + LOCKPICK_OFFER_COOLDOWN) {
+        p.riftLockpickOfferAt = ctx.time;
+        ctx.emit({ type: 'lockpickOffer', objectId: obj.id, bountiful: false, pid: p.id });
+      }
+      return;
+    }
+    if (obj.templateId === 'rift_treasure') {
+      ctx.riftOpenTreasure(obj.id, p.id);
       return;
     }
     if (obj.templateId === 'mailbox') {

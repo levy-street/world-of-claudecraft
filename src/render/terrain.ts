@@ -1,14 +1,40 @@
 import * as THREE from 'three';
-import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z, ZONES } from '../sim/data';
+import {
+  COLUMN_ZONES,
+  columnBlendAt,
+  STRIP_MAX_X,
+  STRIP_MIN_X,
+  STRIP_ZONES,
+  WORLD_MAX_X,
+  WORLD_MAX_Z,
+  WORLD_MIN_Z,
+  ZONES,
+} from '../sim/data';
 import { fbm2 } from '../sim/rng';
-import type { BiomeId } from '../sim/types';
-import { biomeAt, roadDistance, terrainHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
+import type { BiomeId, ZoneDef } from '../sim/types';
+import { roadDistance, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import { loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
+import { type ChunkGrid, type GroundPendingAt, orderCellsForEntry } from './chunk_residency_core';
 import { GFX } from './gfx';
-import { runIdleQueue } from './idle_queue';
+import { idleSlot } from './idle_queue';
 import { impactCraterTerrainBlend } from './impact_terrain';
-import { chunkIntersectsRegion, normalTexelBounds } from './terrain_region_core';
+import {
+  beginChunkGeometry,
+  type ChunkGeometryArrays,
+  type ChunkGeometryBuildState,
+  fillChunkIndexRow,
+  fillChunkVertexRow,
+} from './terrain_chunk_build';
+import { terrainChunkPool } from './terrain_chunk_pool';
+import { meshTerrainHeight } from './terrain_mesh_height';
+import {
+  chunkIntersectsRegion,
+  normalTexelBounds,
+  owningRectIndex,
+  type TexelBounds,
+  type WorldRect,
+} from './terrain_region_core';
 import { groundDetailTexture, groundSplatMaps, macroNoiseTexture } from './textures';
 
 // Chunked terrain across the whole 360x1080 zone strip.
@@ -28,12 +54,13 @@ import { groundDetailTexture, groundSplatMaps, macroNoiseTexture } from './textu
 // - High tier: MeshStandardMaterial + splat shading (grass/dirt/rock/sand
 //   weights precomputed per vertex from slope/height/roadDistance into a vec4
 //   attribute) over the biome vertex-color tint, plus a world-space macro
-//   normal map baked from terrainHeight.
+//   normal map baked from the mesh height view (terrain_mesh_height.ts).
 // - Low tier: the legacy vertex-color Lambert look, still chunked for culling.
 
 const CHUNK_SIZE = 60;
-const SKIRT_DROP = 0.3;
-const SLOPE_EPS = 1.5; // matches the legacy color pass so tints don't shift
+// An 'idle'-paced zone build waits for a browser idle slot between batches;
+// this timeout forces one batch through anyway under sustained frame load.
+const IDLE_BUILD_TIMEOUT_MS = 200;
 
 // ---------------------------------------------------------------------------
 // Real PBR splat layers (ambientCG 1K, shipped under public/textures/terrain).
@@ -116,361 +143,31 @@ const LOD_BANDS = {
 const WALL_LOD_RIDGE_HALF = 30;
 const WALL_LOD_RIM_MARGIN = 40;
 
-// terrain normal map resolution (~0.56u per texel over 360x1080)
-const NORMAL_TEX_W = 640;
-const NORMAL_TEX_H = 1920;
+// Macro relief only needs to carry broad slopes: vertex normals and the four
+// tiled material normals own close detail. The atlas spans the whole expanded
+// world but is baked sparsely by zone, so keep it compact enough that entering
+// a new region never turns tens of thousands of height samples into a
+// second boot. At the current bounds this is roughly 3yd/texel.
+const NORMAL_TEX_W = 320;
+const NORMAL_TEX_H = 960;
 const NORMAL_TEX_STRENGTH = 1.35;
 
 // Ground colors per biome; boundaries blend across the same window as the
 // heightfield's shape blend. This is the tint layer the splat albedo
 // multiplies into (splat textures are authored near mid-gray).
-const BIOME_PALETTE: Record<
-  BiomeId,
-  { grass: number; grassDark: number; grassYellow: number; dirt: number; sand: number }
-> = {
-  vale: {
-    grass: 0x548545,
-    grassDark: 0x3e6635,
-    grassYellow: 0x768c44,
-    dirt: 0x8a6f47,
-    sand: 0xc2b283,
-  },
-  // Darker, murkier and more desaturated than the vale so the swamp reads as
-  // gloomy lowland rather than "vale but slightly duller". Pushed further
-  // toward drab olive/brown than a first pass so it reads at a glance.
-  marsh: {
-    grass: 0x3f4d28,
-    grassDark: 0x2c3a1e,
-    grassYellow: 0x505c34,
-    dirt: 0x4f4028,
-    sand: 0x655741,
-  },
-  // Cooler and greyer than the vale/marsh's warm greens, pushing toward sage
-  // and stone since altitude thins out the lush growth. Pushed further blue-
-  // grey than a first pass so peaks are unmistakably a different biome.
-  peaks: {
-    grass: 0x7a8878,
-    grassDark: 0x5c6862,
-    grassYellow: 0x9aa192,
-    dirt: 0x8a7d6a,
-    sand: 0xbdb49c,
-  },
-  // Paint-only biomes (editor brush): flat palettes, no zone-band blend.
-  // Coastal green-blue, brighter sand than the desert's.
-  beach: {
-    grass: 0x9ab86a,
-    grassDark: 0x7d9a5a,
-    grassYellow: 0xb8c278,
-    dirt: 0xc2a575,
-    sand: 0xf0e4bc,
-  },
-  // Warmer and browner than the beach, less green. Pushed further orange
-  // than a first pass to separate it clearly from the beach at a glance.
-  desert: {
-    grass: 0xcbaa5e,
-    grassDark: 0xa88d48,
-    grassYellow: 0xe0c070,
-    dirt: 0xc08f4a,
-    sand: 0xecc890,
-  },
-  // Dark, red-tinted ash rather than the cave's neutral grey. Pushed darker
-  // still so it reads as scorched ground, not just "dirty".
-  volcano: {
-    grass: 0x3c2c28,
-    grassDark: 0x281c18,
-    grassYellow: 0x503830,
-    dirt: 0x2c2018,
-    sand: 0x4c342c,
-  },
-  // Neutral blue-grey stone, distinct from volcano's warm ash. Pushed cooler
-  // and darker so it reads as underground rock, not daylight dirt.
-  cave: {
-    grass: 0x585e66,
-    grassDark: 0x3e444c,
-    grassYellow: 0x6a7078,
-    dirt: 0x484e56,
-    sand: 0x767c86,
-  },
-};
-
-// rock starts creeping in at lower slopes in the peaks, later in the marsh
-const ROCK_SLOPE_START: Record<BiomeId, number> = {
-  vale: 0.55,
-  marsh: 0.62,
-  peaks: 0.45,
-  beach: 0.7,
-  desert: 0.55,
-  volcano: 0.35,
-  cave: 0.4,
-};
-
-const clamp01 = (v: number): number => Math.max(0, Math.min(1, v));
-
-interface VertexSample {
-  height: number;
-  slope: number;
-  normal: [number, number, number];
-  color: [number, number, number];
-  splat: [number, number, number, number]; // grass, dirt, rock, sand
-  extra: [number, number, number, number]; // mud, snow, impact scorch, impact ash
+function finishChunkGeometry(state: ChunkGeometryArrays): THREE.BufferGeometry {
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(state.positions, 3));
+  geo.setAttribute('normal', new THREE.BufferAttribute(state.normals, 3));
+  geo.setAttribute('color', new THREE.BufferAttribute(state.colors, 3));
+  geo.setAttribute('uv', new THREE.BufferAttribute(state.uvs, 2));
+  if (state.splats) geo.setAttribute('aSplat', new THREE.BufferAttribute(state.splats, 4));
+  if (state.extras) geo.setAttribute('aExtra', new THREE.BufferAttribute(state.extras, 4));
+  geo.setIndex(new THREE.BufferAttribute(state.indices, 1));
+  geo.computeBoundingBox();
+  geo.computeBoundingSphere();
+  return geo;
 }
-
-// Shared scratch colors for the palette blend (hot loop, avoid allocation).
-const cTmp = new THREE.Color();
-const grassC = new THREE.Color(),
-  grassDarkC = new THREE.Color(),
-  grassYellowC = new THREE.Color();
-const dirtC = new THREE.Color(),
-  sandC = new THREE.Color();
-const dirtDarkC = new THREE.Color(0x73592f);
-const rockC = new THREE.Color(0x7a7a72);
-const wetRockC = new THREE.Color(0x3f4442); // dark wet-rock shoreline (peaks/volcano/cave)
-const impactAshC = new THREE.Color(0x18110d);
-const impactScorchC = new THREE.Color(0x2a160c);
-const hazyPeakC = new THREE.Color(0xa8bdd4); // world-rim mountains, atmospheric
-const snowCapC = new THREE.Color(0xedf3fa);
-const lowSunC = new THREE.Color(0xe7d9a5);
-const lowShadeC = new THREE.Color(0x60745b);
-const zonePalettes = ZONES.map((zn) => {
-  const p = BIOME_PALETTE[zn.biome];
-  return {
-    grass: new THREE.Color(p.grass),
-    grassDark: new THREE.Color(p.grassDark),
-    grassYellow: new THREE.Color(p.grassYellow),
-    dirt: new THREE.Color(p.dirt),
-    sand: new THREE.Color(p.sand),
-  };
-});
-
-// Per-biome palettes for painted cells (a flat lookup, no z-blend).
-const biomePalettes: Record<BiomeId, (typeof zonePalettes)[number]> = {
-  vale: makeBiomePalette('vale'),
-  marsh: makeBiomePalette('marsh'),
-  peaks: makeBiomePalette('peaks'),
-  beach: makeBiomePalette('beach'),
-  desert: makeBiomePalette('desert'),
-  volcano: makeBiomePalette('volcano'),
-  cave: makeBiomePalette('cave'),
-};
-function makeBiomePalette(b: BiomeId): (typeof zonePalettes)[number] {
-  const p = BIOME_PALETTE[b];
-  return {
-    grass: new THREE.Color(p.grass),
-    grassDark: new THREE.Color(p.grassDark),
-    grassYellow: new THREE.Color(p.grassYellow),
-    dirt: new THREE.Color(p.dirt),
-    sand: new THREE.Color(p.sand),
-  };
-}
-
-// Palette at a point. A painted cell (biome differs from its zone band) uses that
-// biome's flat palette; otherwise the smooth zone-band blend. With no paint layer
-// `biome === zoneBiomeAt(z)` always, so this is the original z-blend exactly.
-function paletteAt(_x: number, z: number, biome: BiomeId): void {
-  if (biome !== zoneBiomeAt(z)) {
-    const p = biomePalettes[biome];
-    grassC.copy(p.grass);
-    grassDarkC.copy(p.grassDark);
-    grassYellowC.copy(p.grassYellow);
-    dirtC.copy(p.dirt);
-    sandC.copy(p.sand);
-    return;
-  }
-  grassC.copy(zonePalettes[0].grass);
-  grassDarkC.copy(zonePalettes[0].grassDark);
-  grassYellowC.copy(zonePalettes[0].grassYellow);
-  dirtC.copy(zonePalettes[0].dirt);
-  sandC.copy(zonePalettes[0].sand);
-  for (let i = 0; i + 1 < ZONES.length; i++) {
-    const b = ZONES[i].zMax;
-    const t = clamp01((z - (b - 30)) / 65);
-    const tt = t * t * (3 - 2 * t);
-    if (tt <= 0) break;
-    grassC.lerp(zonePalettes[i + 1].grass, tt);
-    grassDarkC.lerp(zonePalettes[i + 1].grassDark, tt);
-    grassYellowC.lerp(zonePalettes[i + 1].grassYellow, tt);
-    dirtC.lerp(zonePalettes[i + 1].dirt, tt);
-    sandC.lerp(zonePalettes[i + 1].sand, tt);
-  }
-}
-
-// How "marsh" a given z is — mirrors the palette/heightfield blend windows so
-// the mud texture fades in exactly where the marsh palette does.
-function marshWeightAt(z: number): number {
-  let w = ZONES[0].biome === 'marsh' ? 1 : 0;
-  for (let i = 0; i + 1 < ZONES.length; i++) {
-    const b = ZONES[i].zMax;
-    const t = clamp01((z - (b - 30)) / 65);
-    const tt = t * t * (3 - 2 * t);
-    if (tt <= 0) break;
-    w += ((ZONES[i + 1].biome === 'marsh' ? 1 : 0) - w) * tt;
-  }
-  return w;
-}
-
-// blend the splat weight vector toward a single layer
-function lerpSplat(w: [number, number, number, number], layer: 0 | 1 | 2 | 3, t: number): void {
-  if (t <= 0) return;
-  w[0] -= w[0] * t;
-  w[1] -= w[1] * t;
-  w[2] -= w[2] * t;
-  w[3] -= w[3] * t;
-  w[layer] += t;
-}
-
-// One terrain sample: height, analytic normal, legacy tint color and splat
-// weights. Both tiers use the color; only the splat tier consumes weights.
-function sampleVertex(x: number, z: number, seed: number): VertexSample {
-  const h = terrainHeight(x, z, seed);
-  const hx = terrainHeight(x + SLOPE_EPS, z, seed) - terrainHeight(x - SLOPE_EPS, z, seed);
-  const hz = terrainHeight(x, z + SLOPE_EPS, seed) - terrainHeight(x, z - SLOPE_EPS, seed);
-  const slope = Math.sqrt(hx * hx + hz * hz) / (2 * SLOPE_EPS);
-  const invLen = 1 / Math.hypot(hx / (2 * SLOPE_EPS), 1, hz / (2 * SLOPE_EPS));
-  const normal: [number, number, number] = [
-    -(hx / (2 * SLOPE_EPS)) * invLen,
-    invLen,
-    -(hz / (2 * SLOPE_EPS)) * invLen,
-  ];
-
-  const biome = biomeAt(x, z);
-  paletteAt(x, z, biome);
-  const w: [number, number, number, number] = [1, 0, 0, 0];
-  // A painted cell re-bases the splat mix on its biome's dominant ground layer;
-  // without this the splat tier keeps the grass texture everywhere and the
-  // biome override only reads as the gentle vertex tint (invisible in practice).
-  // Shore/road/slope/snow blends below still layer on top, matching zone bands.
-  const painted = biome !== zoneBiomeAt(z);
-  if (painted) {
-    if (biome === 'marsh' || biome === 'cave') lerpSplat(w, 1, 0.8);
-    else if (biome === 'peaks' || biome === 'volcano') lerpSplat(w, 2, 0.75);
-    else if (biome === 'beach' || biome === 'desert') lerpSplat(w, 3, 0.9);
-  }
-  const impact = impactCraterTerrainBlend(x, z);
-
-  // base grass with patchy variation: a coarse fbm layer for dry/lush
-  // patches plus a fine one for grain, replacing the old pure-sine tint
-  // (sine repeats on a visible grid at a distance; noise reads as natural
-  // ground cover instead).
-  const v = fbm2(x * 0.045, z * 0.045, seed + 53, 3);
-  cTmp.copy(grassC).lerp(grassDarkC, v);
-  const v2 = fbm2(x * 0.16, z * 0.16, seed + 59, 2);
-  cTmp.lerp(grassYellowC, v2 * 0.35);
-  // the marsh reads muddier: patches of wet dirt across the lowland
-  if (biome === 'marsh') lerpSplat(w, 1, 0.3 * v2 * clamp01((4 - h) / 6));
-  // shoreline blend, biome-specific: marsh has no sandy beach (wet mud
-  // instead), rocky/ashen biomes get a darker wet-rock tint, everywhere else
-  // keeps the classic sandy bank. Color and splat weight share one feathered
-  // falloff so the shore blends out instead of cutting a razor-hard edge.
-  // waterLevelAt(x, z) (not the flat const) so the beach only tracks water inside
-  // a declared lake's footprint; a dry sunken feature elsewhere gets no shore tint.
-  const wl = waterLevelAt(x, z);
-  const shore = clamp01((wl + 1.6 - h) / 1.6);
-  if (biome === 'marsh') {
-    cTmp.lerp(dirtDarkC, shore);
-    lerpSplat(w, 1, shore);
-  } else if (biome === 'peaks' || biome === 'volcano' || biome === 'cave') {
-    cTmp.lerp(wetRockC, shore);
-    lerpSplat(w, 2, shore);
-  } else {
-    cTmp.lerp(sandC, shore);
-    lerpSplat(w, 3, shore);
-  }
-  // packed dirt at each hub settlement (same feather as the splat weight —
-  // a constant lerp stamped a clean-edged brown disc on the grass)
-  for (const zn of ZONES) {
-    const dHub = Math.hypot(x - zn.hub.x, z - zn.hub.z);
-    if (dHub < 14) {
-      const hubT = clamp01((14 - dHub) / 3);
-      cTmp.lerp(dirtDarkC, 0.7 * hubT);
-      lerpSplat(w, 1, 0.75 * hubT);
-      break;
-    }
-  }
-  const rd = roadDistance(x, z);
-  if (rd < 2.0) {
-    cTmp.lerp(dirtC, 0.85);
-    lerpSplat(w, 1, 0.85);
-  } else if (rd < 3.4) {
-    const t = 0.85 * (1 - (rd - 2.0) / 1.4);
-    cTmp.lerp(dirtC, t);
-    lerpSplat(w, 1, t);
-  }
-  // Break up the rock/snow blend so cliffs read as striated stone and snow
-  // reads as patchy drifts instead of a single flat tone / a clean cutoff.
-  const rockStreak = fbm2(x * 0.09, z * 0.09, seed + 41, 3);
-  const snowPatch = fbm2(x * 0.06, z * 0.06, seed + 47, 3);
-  const rockStart = ROCK_SLOPE_START[biome];
-  if (slope > rockStart) {
-    const t = Math.min(1, (slope - rockStart) * 2);
-    cTmp.lerp(rockC, t);
-    cTmp.lerp(dirtDarkC, t * (rockStreak - 0.5) * 0.35);
-    lerpSplat(w, 2, t);
-  }
-  // high ground (ridges, peaks) goes rocky then snowy. The snow ramp is wide
-  // (26u, over four terrace bands) with a strong patch-noise term: the terraced
-  // heightfield steps 6u at a time, and a ramp comparable to the step paints
-  // alternate treads fully white / fully bare, which reads as a repetitive
-  // checkerboard from a distance.
-  let snow = 0;
-  if (h > 22) {
-    const rockT = clamp01((h - 22) / 10) * (0.6 + rockStreak * 0.25);
-    cTmp.lerp(rockC, rockT);
-    snow = clamp01((h - 28 + (snowPatch - 0.5) * 14) / 26) * 0.85;
-    cTmp.lerp(snowCapC, snow);
-    lerpSplat(w, 2, clamp01((h - 22) / 10) * 0.8);
-  }
-  if (impact.scorch > 0) {
-    cTmp.lerp(impactScorchC, 0.88 * impact.scorch);
-    cTmp.lerp(impactAshC, 0.58 * impact.ash);
-    lerpSplat(w, 1, impact.dirt);
-    lerpSplat(w, 2, impact.rock);
-  }
-  // the rim wall reads as distant sunlit peaks, not a black cliff. The haze
-  // kicks in well before the wall itself (edge starts negative deep inland)
-  // so from a zone's centre the rim reads as atmospheric haze rather than a
-  // crisp silhouette, reinforcing the reduced BIOME_FOG draw distance.
-  const edge = Math.max(
-    Math.abs(x) - (WORLD_MAX_X - 70),
-    WORLD_MIN_Z + 70 - z,
-    z - (WORLD_MAX_Z - 70),
-  );
-  const rim = clamp01(edge / 64);
-  if (rim > 0) {
-    cTmp.lerp(hazyPeakC, rim * 0.95);
-    // same wide, noise-broken ramp as the interior snow above: a pure
-    // height threshold snowed every terrace tread above the line uniformly,
-    // turning the rim's 2D terrace lattice into a white/grey checkerboard
-    const rimSnow = clamp01((h - 21 + (snowPatch - 0.5) * 12) / 26) * rim * 0.8;
-    cTmp.lerp(snowCapC, rimSnow);
-    snow = Math.max(snow, rimSnow);
-    lerpSplat(w, 2, rim * 0.85);
-  }
-  // mud rides the dirt layer wherever the marsh palette is active; a painted
-  // cell overrides the z-band weight (painted marsh is fully wet, any other
-  // painted biome suppresses band mud that would bleed into it)
-  const mud = painted ? (biome === 'marsh' ? 1 : 0) : marshWeightAt(z);
-  if (GFX.lowPlus && !GFX.terrainSplat) {
-    const ridge = clamp01((slope - 0.22) * 1.6);
-    const lowland = clamp01((wl + 7 - h) / 12);
-    const upland = clamp01((h - 8) / 22);
-    cTmp.lerp(lowShadeC, 0.07 * ridge + 0.05 * lowland * mud);
-    cTmp.lerp(lowSunC, 0.035 * (1 - shore) + 0.045 * upland);
-    cTmp.multiplyScalar(0.98 + upland * 0.04 - ridge * 0.025);
-  }
-  return {
-    height: h,
-    slope,
-    normal,
-    color: [cTmp.r, cTmp.g, cTmp.b],
-    splat: w,
-    extra: [mud, snow, impact.scorch, impact.ash],
-  };
-}
-
-// ---------------------------------------------------------------------------
-// Chunk geometry: interior (nx+1)x(nz+1) grid wrapped in a skirt ring whose
-// vertices sit on the chunk border but 0.3u lower, hiding LOD cracks.
-// ---------------------------------------------------------------------------
 
 function buildChunkGeometry(
   x0: number,
@@ -480,128 +177,53 @@ function buildChunkGeometry(
   seed: number,
   withSplat: boolean,
   skirtSpan: number,
+  lowShade: boolean,
 ): THREE.BufferGeometry {
-  const nx = Math.max(4, Math.round(size / spacing));
-  const nz = nx;
-  const stepX = size / nx;
-  const stepZ = size / nz;
-  const gw = nx + 3; // grid width including the skirt ring
-  const gh = nz + 3;
-  const count = gw * gh;
+  const state = beginChunkGeometry(x0, z0, size, spacing, seed, withSplat, skirtSpan, lowShade);
+  for (let row = 0; row < state.gh; row++) fillChunkVertexRow(state, row);
+  for (let row = 0; row < state.gh - 1; row++) fillChunkIndexRow(state, row);
+  return finishChunkGeometry(state);
+}
 
-  const positions = new Float32Array(count * 3);
-  const normals = new Float32Array(count * 3);
-  const colors = new Float32Array(count * 3);
-  const uvs = new Float32Array(count * 2);
-  const splats = withSplat ? new Float32Array(count * 4) : null;
-  const extras = withSplat ? new Float32Array(count * 4) : null;
+const IDLE_GEOMETRY_SLICE_MS = 6;
 
-  const worldDepth = WORLD_MAX_Z - WORLD_MIN_Z;
-  const sampleCache = new Map<number, VertexSample>();
-  for (let gj = 0; gj < gh; gj++) {
-    for (let gi = 0; gi < gw; gi++) {
-      const i = gi - 1,
-        j = gj - 1; // interior indices; -1 / n+1 are skirt
-      const ci = Math.max(0, Math.min(nx, i));
-      const cj = Math.max(0, Math.min(nz, j));
-      const isSkirt = i !== ci || j !== cj;
-      const x = x0 + ci * stepX;
-      const z = z0 + cj * stepZ;
-      // skirt verts share the border sample — cache by clamped grid index
-      const cacheKey = cj * gw + ci;
-      let s = sampleCache.get(cacheKey);
-      if (!s) {
-        s = sampleVertex(x, z, seed);
-        sampleCache.set(cacheKey, s);
-      }
-      const vi = gj * gw + gi;
-      positions[vi * 3] = x;
-      // Slope-aware drop: a T-junction hole under a coarse neighbor's chord is
-      // bounded by the local gradient times that neighbor's vertex spacing, so
-      // a flat cliff-side skirt must deepen with the slope or the hole shows
-      // sky (skirtSpan is the coarsest spacing any neighbor can have).
-      positions[vi * 3 + 1] = s.height - (isSkirt ? SKIRT_DROP + s.slope * skirtSpan : 0);
-      positions[vi * 3 + 2] = z;
-      normals[vi * 3] = s.normal[0];
-      normals[vi * 3 + 1] = s.normal[1];
-      normals[vi * 3 + 2] = s.normal[2];
-      colors[vi * 3] = s.color[0];
-      colors[vi * 3 + 1] = s.color[1];
-      colors[vi * 3 + 2] = s.color[2];
-      uvs[vi * 2] = (x + WORLD_MAX_X) / (WORLD_MAX_X * 2);
-      uvs[vi * 2 + 1] = (z - WORLD_MIN_Z) / worldDepth;
-      if (splats) {
-        splats[vi * 4] = s.splat[0];
-        splats[vi * 4 + 1] = s.splat[1];
-        splats[vi * 4 + 2] = s.splat[2];
-        splats[vi * 4 + 3] = s.splat[3];
-      }
-      if (extras) {
-        extras[vi * 4] = s.extra[0];
-        extras[vi * 4 + 1] = s.extra[1];
-        extras[vi * 4 + 2] = s.extra[2];
-        extras[vi * 4 + 3] = s.extra[3];
-      }
+async function buildChunkGeometryIdle(
+  x0: number,
+  z0: number,
+  size: number,
+  spacing: number,
+  seed: number,
+  withSplat: boolean,
+  skirtSpan: number,
+  lowShade: boolean,
+  yieldSlice: () => Promise<void>,
+  cancelled: () => boolean,
+): Promise<THREE.BufferGeometry | null> {
+  const state = beginChunkGeometry(x0, z0, size, spacing, seed, withSplat, skirtSpan, lowShade);
+  const drainRows = async (rows: number, fill: (row: number) => void): Promise<boolean> => {
+    let row = 0;
+    while (row < rows) {
+      await yieldSlice();
+      if (cancelled()) return false;
+      const started = performance.now();
+      do fill(row++);
+      while (row < rows && performance.now() - started < IDLE_GEOMETRY_SLICE_MS);
     }
-  }
-
-  const quadsX = gw - 1,
-    quadsZ = gh - 1;
-  const indices = new Uint32Array(quadsX * quadsZ * 6);
-  let k = 0;
-  for (let gj = 0; gj < quadsZ; gj++) {
-    for (let gi = 0; gi < quadsX; gi++) {
-      const a = gj * gw + gi;
-      const b = a + 1;
-      const c = a + gw;
-      const d = c + 1;
-      // Split each quad along the diagonal whose endpoints are closest in
-      // height, so the fold line follows a ridge/terrace edge instead of
-      // cutting across it (a fixed diagonal saws terraced cliffs into
-      // alternating shards). Both windings keep the +y face up.
-      const ha = positions[a * 3 + 1];
-      const hb = positions[b * 3 + 1];
-      const hc = positions[c * 3 + 1];
-      const hd = positions[d * 3 + 1];
-      if (Math.abs(hb - hc) <= Math.abs(ha - hd)) {
-        indices[k++] = a;
-        indices[k++] = c;
-        indices[k++] = b;
-        indices[k++] = b;
-        indices[k++] = c;
-        indices[k++] = d;
-      } else {
-        indices[k++] = a;
-        indices[k++] = c;
-        indices[k++] = d;
-        indices[k++] = a;
-        indices[k++] = d;
-        indices[k++] = b;
-      }
-    }
-  }
-
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  geo.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
-  geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-  geo.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
-  if (splats) geo.setAttribute('aSplat', new THREE.BufferAttribute(splats, 4));
-  if (extras) geo.setAttribute('aExtra', new THREE.BufferAttribute(extras, 4));
-  geo.setIndex(new THREE.BufferAttribute(indices, 1));
-  geo.computeBoundingBox();
-  geo.computeBoundingSphere();
-  return geo;
+    return true;
+  };
+  if (!(await drainRows(state.gh, (row) => fillChunkVertexRow(state, row)))) return null;
+  if (!(await drainRows(state.gh - 1, (row) => fillChunkIndexRow(state, row)))) return null;
+  return finishChunkGeometry(state);
 }
 
 // ---------------------------------------------------------------------------
-// Macro relief: a DataTexture normal map baked from terrainHeight in
+// Macro relief: a DataTexture normal map baked from the mesh height view in
 // strip-planar UV space — cliffs and ridges get per-pixel light response far
 // beyond the vertex density.
 // ---------------------------------------------------------------------------
 
 // Bake the normal texels [i0..i1] x [j0..j1] (inclusive) into `data`, sampling
-// the CURRENT terrainHeight. The full build and the editor's partial rebake
+// the CURRENT mesh height. The full build and the editor's partial rebake
 // share this one path so a partial rebake is byte-identical to a full one:
 // heights are sampled one texel beyond the baked rect (clamped at the texture
 // border, exactly like the full bake's clamped derivative stencil).
@@ -629,7 +251,7 @@ function bakeNormalRegion(
   for (let j = hj0; j <= hj1; j++) {
     const z = WORLD_MIN_Z + (j + 0.5) * stepZ;
     for (let i = hi0; i <= hi1; i++) {
-      heights[(j - hj0) * hw + (i - hi0)] = terrainHeight(
+      heights[(j - hj0) * hw + (i - hi0)] = meshTerrainHeight(
         -WORLD_MAX_X + (i + 0.5) * stepX,
         z,
         seed,
@@ -657,9 +279,16 @@ function bakeNormalRegion(
   }
 }
 
-function terrainNormalTexture(seed: number): THREE.DataTexture {
+function terrainNormalTexture(): THREE.DataTexture {
   const data = new Uint8Array(NORMAL_TEX_W * NORMAL_TEX_H * 4);
-  bakeNormalRegion(data, seed, 0, NORMAL_TEX_W - 1, 0, NORMAL_TEX_H - 1);
+  // Zone texels are baked on demand. Unloaded areas remain a flat normal and
+  // have no geometry, so they cannot be sampled on screen.
+  for (let i = 0; i < data.length; i += 4) {
+    data[i] = 128;
+    data[i + 1] = 128;
+    data[i + 2] = 255;
+    data[i + 3] = 255;
+  }
   const tex = new THREE.DataTexture(data, NORMAL_TEX_W, NORMAL_TEX_H, THREE.RGBAFormat);
   tex.colorSpace = THREE.NoColorSpace;
   tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
@@ -913,8 +542,36 @@ function buildLambertMaterial(brush: BrushUniforms): THREE.MeshLambertMaterial {
 // Entry point
 // ---------------------------------------------------------------------------
 
+export interface EnsureZoneOptions {
+  /** Build the cells nearest this point first (e.g. the entry position).
+   *  Falls back to buildTerrain's priorityPoint when omitted. */
+  priority?: { x: number; z: number };
+  /** 'fast' (default): the caller is gating on the result (boot, a teleport
+   *  behind the loading screen), so yield only between small batches.
+   *  'idle': a background prepare; every batch waits for a browser idle slot
+   *  (requestIdleCallback with a forced-progress timeout) so the build never
+   *  steals time an interactive frame needs. */
+  pace?: 'fast' | 'idle';
+}
+
 export interface TerrainView {
   group: THREE.Group;
+  /** Materialize one overworld zone. Repeated calls share the cached task. */
+  ensureZone(
+    zone: ZoneDef,
+    onProgress?: (done: number, total: number) => void,
+    opts?: EnsureZoneOptions,
+  ): Promise<void>;
+  isZoneLoaded(zoneId: string): boolean;
+  /**
+   * The chunk lattice this view builds on, plus whether a given cell still owes
+   * geometry. The outdoor fog clamp reads ground residency through this narrow
+   * accessor (never through the renderer's zone-level `preparedZones`), so it
+   * stops at the nearest UNBUILT CHUNK rather than the nearest unprepared zone
+   * rectangle, and so retiring zone residency later is one implementation swap.
+   * The returned object is stable across calls: it is read every frame.
+   */
+  groundResidency(): { grid: ChunkGrid; isPending: GroundPendingAt };
   /** hides chunks that sit entirely past the fog far plane */
   update(camX: number, camZ: number, fogFar: number): void;
   /**
@@ -927,7 +584,7 @@ export interface TerrainView {
   rebuildRegion(minX: number, minZ: number, maxX: number, maxZ: number): void;
   /**
    * Editor-only: rebake the region's texels of the macro normal DataTexture
-   * from the current terrainHeight and flag it for re-upload. Byte-identical
+   * from the current mesh height and flag it for re-upload. Byte-identical
    * to a full bake over those texels. Call at stroke end, never per drag
    * sample. No-op on the Lambert tier (it has no normal map).
    */
@@ -941,29 +598,20 @@ export interface TerrainView {
   /** Editor-only: hide the brush ring. */
   clearBrush(): void;
   /**
-   * Resolves once every streamed-in far chunk (see buildTerrain) has been
-   * added to `group`. Only the near ring around the world's zone hubs is
-   * built synchronously; everything else streams in across idle slots so
-   * first paint isn't gated on the whole map's geometry. Most callers don't
-   * need this - `chunks` is a live array shared with update()/rebuildRegion(),
-   * so those already see streamed chunks as they arrive. Use this only when a
-   * caller needs the FULL map built before doing something else (e.g. a
-   * screenshot tour), and call cancelStreaming() before discarding this view.
+   * Stops any in-flight ensureZone build from adding further chunks. Call
+   * before discarding this view (see renderer rebuildTerrain), or the
+   * abandoned zone builds keep running on a setTimeout chain.
    */
-  streamingDone: Promise<void>;
-  /** Stops any in-flight far-chunk streaming. Call before discarding this view (see rebuildTerrain). */
   cancelStreaming(): void;
 }
 
-// Chunks farther than the near ring stream in this many at a time per idle
-// slot, forced forward even under sustained load by the timeout.
-const STREAM_BATCH_SIZE = 4;
-const STREAM_TIMEOUT_MS = 200;
-
 export function buildTerrain(seed: number, priorityPoint?: { x: number; z: number }): TerrainView {
   const lowGfx = !GFX.terrainSplat || !hasTerrainSplatAssets();
+  // Resolved here, not inside the generator: gfx.ts reads document/navigator, so
+  // a worker running the same generator would resolve a different tier.
+  const lowShade = GFX.lowPlus && !GFX.terrainSplat;
   const brush = makeBrushUniforms();
-  const normalTex = lowGfx ? null : terrainNormalTexture(seed);
+  const normalTex = lowGfx ? null : terrainNormalTexture();
   const mat = normalTex ? buildSplatMaterial(normalTex, brush) : buildLambertMaterial(brush);
   const bands = lowGfx ? LOD_BANDS.low : LOD_BANDS.high;
   const group = new THREE.Group();
@@ -971,6 +619,21 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
   const worldDepth = WORLD_MAX_Z - WORLD_MIN_Z;
   const chunksX = Math.ceil((WORLD_MAX_X * 2) / CHUNK_SIZE);
   const chunksZ = Math.ceil(worldDepth / CHUNK_SIZE);
+  const grid: ChunkGrid = {
+    size: CHUNK_SIZE,
+    countX: chunksX,
+    countZ: chunksZ,
+    originX: -WORLD_MAX_X,
+    originZ: WORLD_MIN_Z,
+  };
+  // 1 = this cell is owed terrain geometry and has not attached it yet, which
+  // is the only state that may clamp the outdoor fog. Ownership is TOTAL
+  // since the gap-cell fill (cellOwnerId assigns every cell its containing
+  // zone, else the nearest rectangle), so ALL 792 cells seed pending and each
+  // one is genuinely buildable by its owner: pending-until-attach is the
+  // correct state everywhere, and the old carve-out for unowned cells (the
+  // rects do not tile; 96 cells used to be permanently unbuildable) is gone.
+  const groundPending = new Uint8Array(chunksX * chunksZ);
   // x/z/half feed the per-frame fog cull; x0/z0/size/spacing are the exact
   // buildChunkGeometry inputs, kept so an editor rebuild re-runs the same build.
   const chunks: {
@@ -1004,12 +667,38 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     return false;
   };
 
+  // The zone rectangles do NOT tile the world box. Three kinds of cell fall
+  // outside every one of them: the whole quadrant west of Eastbrook Vale (no
+  // realm sits at x < -180 for z -180..180), the centre column north of
+  // Frostveil, and the grid's last row, which overhangs WORLD_MAX_Z and so
+  // carries the northern 20yd of the Drakelands rim. Those cells still hold
+  // ground a player reaches on foot: the tongue of land running south out of
+  // the Willowfen border around (-195, 161) sits 1.6yd ABOVE the waterline.
+  // Leaving them unowned meant no zone's build ever meshed them, so that
+  // ground rendered as a hole you could see (and fall) through.
+  const zoneRects: WorldRect[] = ZONES.map((zone) => ({
+    minX: zone.xMin ?? STRIP_MIN_X,
+    maxX: zone.xMax ?? STRIP_MAX_X,
+    minZ: zone.zMin,
+    maxZ: zone.zMax,
+  }));
+  const insideAnyZone = (x: number, z: number): boolean =>
+    zoneRects.some((r) => x >= r.minX && x < r.maxX && z >= r.minZ && z < r.maxZ);
+
   const bandIndexAt = (cx: number, cz: number): number => {
     const x0 = -WORLD_MAX_X + cx * CHUNK_SIZE;
     const z0 = WORLD_MIN_Z + cz * CHUNK_SIZE;
-    if (wallChunkAt(x0, z0, CHUNK_SIZE)) return 0;
     const centerX = x0 + CHUNK_SIZE / 2;
     const centerZ = z0 + CHUNK_SIZE / 2;
+    // Cells outside every realm (see zoneRects) are open sea floor and the
+    // outer face of the rim: no quest, camp, or road ever lands there, and the
+    // sim drowns a player who swims out. They take the coarsest band whatever
+    // wallChunkAt says, so the gap fill costs a handful of merged super-chunks
+    // instead of a dense grid over water nobody stands on. Checked BEFORE the
+    // wall promotion, which would otherwise hand the empty south-west quadrant
+    // the 1.2u spacing meant for the terraced inter-zone walls.
+    if (!insideAnyZone(centerX, centerZ)) return bands.length - 1;
+    if (wallChunkAt(x0, z0, CHUNK_SIZE)) return 0;
     let hubDist = Infinity;
     for (const zn of ZONES) {
       hubDist = Math.min(hubDist, Math.hypot(centerX - zn.hub.x, centerZ - zn.hub.z));
@@ -1023,8 +712,13 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
   // neighbor's chord (and vice versa)
   const skirtSpan = bands[bands.length - 1].spacing;
 
-  const addChunk = (x0: number, z0: number, size: number, spacing: number): void => {
-    const geo = buildChunkGeometry(x0, z0, size, spacing, seed, !lowGfx, skirtSpan);
+  const attachChunk = (
+    geo: THREE.BufferGeometry,
+    x0: number,
+    z0: number,
+    size: number,
+    spacing: number,
+  ): void => {
     const mesh = new THREE.Mesh(geo, mat);
     mesh.receiveShadow = true;
     group.add(mesh);
@@ -1037,6 +731,22 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     // for the rest of the session.
     mesh.updateMatrixWorld(true);
     mesh.matrixAutoUpdate = false;
+    // Ground residency flips HERE, where the mesh actually joins the scene, and
+    // never at the point the cell is claimed for building: `built` below is set
+    // BEFORE the (idle-paced, possibly multi-second) geometry build is awaited,
+    // so keying the fog off it would open the view over ground that has not
+    // arrived. A far-band super-chunk covers a 2x2 block, hence the span.
+    const span = Math.max(1, Math.round(size / CHUNK_SIZE));
+    const cx0 = Math.round((x0 + WORLD_MAX_X) / CHUNK_SIZE);
+    const cz0 = Math.round((z0 - WORLD_MIN_Z) / CHUNK_SIZE);
+    for (let dz = 0; dz < span; dz++) {
+      for (let dx = 0; dx < span; dx++) {
+        const cx = cx0 + dx;
+        const cz = cz0 + dz;
+        if (cx < 0 || cx >= chunksX || cz < 0 || cz >= chunksZ) continue;
+        groundPending[cz * chunksX + cx] = 0;
+      }
+    }
     chunks.push({
       mesh,
       x: x0 + size / 2,
@@ -1048,106 +758,263 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
       spacing,
     });
   };
-
-  // Collect every chunk to build as a job first, instead of building inline,
-  // so the near ring (around the zone hubs, i.e. where a fresh character
-  // actually stands) can build synchronously while the rest streams in
-  // across idle slots below. bandIndexAt returns 0 only for the densest,
-  // closest-to-a-hub band, which is what we treat as "near".
-  interface ChunkJob {
-    x0: number;
-    z0: number;
-    size: number;
-    spacing: number;
-    near: boolean;
-  }
-  const jobs: ChunkJob[] = [];
+  const addChunk = (x0: number, z0: number, size: number, spacing: number): void => {
+    attachChunk(
+      buildChunkGeometry(x0, z0, size, spacing, seed, !lowGfx, skirtSpan, lowShade),
+      x0,
+      z0,
+      size,
+      spacing,
+    );
+  };
+  // One pool per view, torn down with it. Null wherever module workers are
+  // unavailable (Vitest under Node, an old WebView, a blocked CSP), in which
+  // case every build below takes the main-thread path exactly as before.
+  let pool: ReturnType<typeof terrainChunkPool> | null | undefined;
+  const chunkPool = (): ReturnType<typeof terrainChunkPool> => {
+    if (pool === undefined) pool = terrainChunkPool();
+    return pool;
+  };
+  // A background chunk built OFF-THREAD. Generation is pure arithmetic, so the
+  // only reason the idle path yields constantly is to protect frames; with no
+  // frame to protect it runs flat out. Returns false only when the caller
+  // should fall back, never on cancellation, which the caller checks itself.
+  const addChunkInWorker = async (
+    x0: number,
+    z0: number,
+    size: number,
+    spacing: number,
+  ): Promise<boolean> => {
+    const active = chunkPool();
+    if (!active) return false;
+    const arrays = await active.build({
+      x0,
+      z0,
+      size,
+      spacing,
+      seed,
+      withSplat: !lowGfx,
+      skirtSpan,
+      lowShade,
+    });
+    if (!arrays) return false;
+    if (cancelled) return true; // discarded view: drop the result, do not attach
+    attachChunk(finishChunkGeometry(arrays), x0, z0, size, spacing);
+    return true;
+  };
+  const addChunkIdle = async (
+    x0: number,
+    z0: number,
+    size: number,
+    spacing: number,
+    yieldSlice: () => Promise<void>,
+  ): Promise<boolean> => {
+    if (await addChunkInWorker(x0, z0, size, spacing)) return !cancelled;
+    const geo = await buildChunkGeometryIdle(
+      x0,
+      z0,
+      size,
+      spacing,
+      seed,
+      !lowGfx,
+      skirtSpan,
+      lowShade,
+      yieldSlice,
+      () => cancelled,
+    );
+    if (!geo) return false;
+    attachChunk(geo, x0, z0, size, spacing);
+    return true;
+  };
 
   // far-LOD cells merge 2x2 into super-chunks: the far field is where draw
   // count hurts and culling granularity matters least
   const farBand = bands.length - 1;
   const built = new Set<number>();
-  for (let cz = 0; cz < chunksZ; cz++) {
-    for (let cx = 0; cx < chunksX; cx++) {
-      if (built.has(cz * chunksX + cx)) continue;
-      const superOk =
-        cx % 2 === 0 &&
-        cz % 2 === 0 &&
-        cx + 1 < chunksX &&
-        cz + 1 < chunksZ &&
-        bandIndexAt(cx, cz) === farBand &&
-        bandIndexAt(cx + 1, cz) === farBand &&
-        bandIndexAt(cx, cz + 1) === farBand &&
-        bandIndexAt(cx + 1, cz + 1) === farBand;
-      if (superOk) {
-        for (const [dx, dz] of [
-          [0, 0],
-          [1, 0],
-          [0, 1],
-          [1, 1],
-        ]) {
-          built.add((cz + dz) * chunksX + (cx + dx));
-        }
-        // a merged super-chunk only forms from four far-band cells, so it's
-        // never near
-        jobs.push({
-          x0: -WORLD_MAX_X + cx * CHUNK_SIZE,
-          z0: WORLD_MIN_Z + cz * CHUNK_SIZE,
-          size: CHUNK_SIZE * 2,
-          spacing: bands[farBand].spacing,
-          near: false,
-        });
-      } else {
-        built.add(cz * chunksX + cx);
-        const bandIdx = bandIndexAt(cx, cz);
-        jobs.push({
-          x0: -WORLD_MAX_X + cx * CHUNK_SIZE,
-          z0: WORLD_MIN_Z + cz * CHUNK_SIZE,
-          size: CHUNK_SIZE,
-          spacing: bands[bandIdx].spacing,
-          near: bandIdx === 0,
-        });
+  const loadedZones = new Set<string>();
+  const pendingZones = new Map<string, Promise<void>>();
+  // Set by cancelStreaming(): every in-flight ensureZone loop bails at its next
+  // yield point without marking its zone loaded, so a discarded view (see
+  // renderer rebuildTerrain) stops adding chunks instead of building on a
+  // setTimeout chain for the rest of the session.
+  let cancelled = false;
+  // Every cell of the grid gets exactly one owner: the zone containing it,
+  // else (the gap cells described at zoneRects) the nearest zone rectangle.
+  // See owningRectIndex for why nearest-rect and not zoneAt's z-band clamp.
+  const cellOwnerId = (cx: number, cz: number): string => {
+    const x = -WORLD_MAX_X + (cx + 0.5) * CHUNK_SIZE;
+    const z = WORLD_MIN_Z + (cz + 0.5) * CHUNK_SIZE;
+    return ZONES[owningRectIndex(x, z, zoneRects)].id;
+  };
+  groundPending.fill(1);
+  const residency = {
+    grid,
+    isPending: (cx: number, cz: number): boolean => groundPending[cz * chunksX + cx] === 1,
+  };
+  const zoneCells = (zone: ZoneDef): [number, number][] => {
+    const out: [number, number][] = [];
+    for (let cz = 0; cz < chunksZ; cz++) {
+      for (let cx = 0; cx < chunksX; cx++) {
+        if (cellOwnerId(cx, cz) === zone.id) out.push([cx, cz]);
       }
     }
-  }
-
-  for (const job of jobs) {
-    if (job.near) addChunk(job.x0, job.z0, job.size, job.spacing);
-  }
-  const farJobs = jobs.filter((job) => !job.near);
-  // A returning character can log out anywhere, not just at a zone hub, so
-  // the near ring alone can leave them standing on not-yet-streamed terrain.
-  // Ordering the far queue by distance to the actual entry point (falling
-  // back to world center when none is given) guarantees the chunk directly
-  // underfoot streams in first rather than landing wherever row-major order
-  // happens to reach it.
-  if (priorityPoint) {
-    const centerX = (job: (typeof farJobs)[number]): number => job.x0 + job.size / 2;
-    const centerZ = (job: (typeof farJobs)[number]): number => job.z0 + job.size / 2;
-    farJobs.sort(
-      (a, b) =>
-        Math.hypot(centerX(a) - priorityPoint.x, centerZ(a) - priorityPoint.z) -
-        Math.hypot(centerX(b) - priorityPoint.x, centerZ(b) - priorityPoint.z),
+    return out;
+  };
+  const yieldBuild = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 0));
+  // Background ('idle') builds advance one batch per idle slot instead: the
+  // timeout still forces progress under sustained load, so a later gating
+  // caller awaiting the same shared task is never starved indefinitely.
+  const yieldIdle = (): Promise<void> => idleSlot(IDLE_BUILD_TIMEOUT_MS);
+  const normalTexelsOver = (minX: number, minZ: number, maxX: number, maxZ: number) =>
+    normalTexelBounds(
+      minX,
+      minZ,
+      maxX,
+      maxZ,
+      -WORLD_MAX_X,
+      WORLD_MIN_Z,
+      WORLD_MAX_X * 2,
+      WORLD_MAX_Z - WORLD_MIN_Z,
+      NORMAL_TEX_W,
+      NORMAL_TEX_H,
+      1,
     );
-  }
-  let cancelled = false;
-  const streamingDone = runIdleQueue(
-    farJobs,
-    (job) => {
-      addChunk(job.x0, job.z0, job.size, job.spacing);
-    },
-    {
-      batchSize: STREAM_BATCH_SIZE,
-      timeoutMs: STREAM_TIMEOUT_MS,
-      cancelled: () => cancelled,
-    },
-  );
-
+  // The macro normal texels this zone's build must bake: its own rectangle,
+  // plus one region per owned cell lying outside it (the gap cells above).
+  // An unbaked texel stays flat, so without the extra regions the macro relief
+  // would stop dead at the realm border. Region-per-cell rather than one
+  // bounding box over rect + cells: the gap west of Eastbrook Vale is as wide
+  // as the realm itself, and a bbox would re-bake that whole empty quadrant.
+  const normalRegionsFor = (zone: ZoneDef, cells: readonly [number, number][]): TexelBounds[] => {
+    const minX = zone.xMin ?? STRIP_MIN_X;
+    const maxX = zone.xMax ?? STRIP_MAX_X;
+    const regions: TexelBounds[] = [];
+    const zoneBounds = normalTexelsOver(minX, zone.zMin, maxX, zone.zMax);
+    if (zoneBounds) regions.push(zoneBounds);
+    for (const [cx, cz] of cells) {
+      const x0 = -WORLD_MAX_X + cx * CHUNK_SIZE;
+      const z0 = WORLD_MIN_Z + cz * CHUNK_SIZE;
+      const inside =
+        x0 >= minX && x0 + CHUNK_SIZE <= maxX && z0 >= zone.zMin && z0 + CHUNK_SIZE <= zone.zMax;
+      if (inside) continue; // already covered by zoneBounds
+      const cellBounds = normalTexelsOver(x0, z0, x0 + CHUNK_SIZE, z0 + CHUNK_SIZE);
+      if (cellBounds) regions.push(cellBounds);
+    }
+    return regions;
+  };
+  const ensureZone = (
+    zone: ZoneDef,
+    onProgress?: (done: number, total: number) => void,
+    opts?: EnsureZoneOptions,
+  ): Promise<void> => {
+    if (loadedZones.has(zone.id)) {
+      onProgress?.(1, 1);
+      return Promise.resolve();
+    }
+    const pending = pendingZones.get(zone.id);
+    if (pending) return pending;
+    const idlePace = opts?.pace === 'idle';
+    const yieldSlice = idlePace ? yieldIdle : yieldBuild;
+    // Gating builds race in batches of four. Idle geometry has its own
+    // row/time-sliced builder, preserving one mesh per cell without a blocking
+    // 60 yd build or the old four-mesh subdivision workaround.
+    const cellsPerSlice = 4;
+    const task = (async () => {
+      // Build order is the "which chunk next" seam, and it lives in the pure
+      // core so a later globally nearest-first queue replaces one function
+      // instead of the zone lane around it.
+      const cells = orderCellsForEntry(
+        zoneCells(zone),
+        grid,
+        opts?.priority ?? priorityPoint,
+        CHUNK_SIZE * 3,
+      );
+      const normalRegions = normalTex ? normalRegionsFor(zone, cells) : [];
+      const rowsPerSlice = 12;
+      const normalSlices = normalRegions.reduce(
+        (slices, region) => slices + Math.ceil((region.j1 - region.j0 + 1) / rowsPerSlice),
+        0,
+      );
+      const total = Math.max(1, normalSlices + cells.length);
+      let done = 0;
+      if (normalTex && normalRegions.length > 0) {
+        for (const region of normalRegions) {
+          for (let j = region.j0; j <= region.j1; j += rowsPerSlice) {
+            if (cancelled) return;
+            bakeNormalRegion(
+              normalTex.image.data as Uint8Array,
+              seed,
+              region.i0,
+              region.i1,
+              j,
+              Math.min(region.j1, j + rowsPerSlice - 1),
+            );
+            onProgress?.(++done, total);
+            await yieldSlice();
+          }
+        }
+        normalTex.needsUpdate = true;
+      }
+      for (const [cx, cz] of cells) {
+        if (cancelled) return;
+        const cell = cz * chunksX + cx;
+        if (!built.has(cell)) {
+          const superCells = [
+            [cx, cz],
+            [cx + 1, cz],
+            [cx, cz + 1],
+            [cx + 1, cz + 1],
+          ] as const;
+          const superOk =
+            cx % 2 === 0 &&
+            cz % 2 === 0 &&
+            cx + 1 < chunksX &&
+            cz + 1 < chunksZ &&
+            superCells.every(
+              ([sx, sz]) =>
+                cellOwnerId(sx, sz) === zone.id &&
+                !built.has(sz * chunksX + sx) &&
+                bandIndexAt(sx, sz) === farBand,
+            );
+          if (superOk) {
+            for (const [sx, sz] of superCells) built.add(sz * chunksX + sx);
+            const x0 = -WORLD_MAX_X + cx * CHUNK_SIZE;
+            const z0 = WORLD_MIN_Z + cz * CHUNK_SIZE;
+            if (idlePace) {
+              if (!(await addChunkIdle(x0, z0, CHUNK_SIZE * 2, bands[farBand].spacing, yieldSlice)))
+                return;
+            } else {
+              addChunk(x0, z0, CHUNK_SIZE * 2, bands[farBand].spacing);
+            }
+          } else {
+            built.add(cell);
+            const x0 = -WORLD_MAX_X + cx * CHUNK_SIZE;
+            const z0 = WORLD_MIN_Z + cz * CHUNK_SIZE;
+            const spacing = bands[bandIndexAt(cx, cz)].spacing;
+            if (idlePace) {
+              if (!(await addChunkIdle(x0, z0, CHUNK_SIZE, spacing, yieldSlice))) return;
+            } else {
+              addChunk(x0, z0, CHUNK_SIZE, spacing);
+            }
+          }
+        }
+        onProgress?.(++done, total);
+        if (!idlePace && done % cellsPerSlice === 0) await yieldSlice();
+      }
+      loadedZones.add(zone.id);
+      onProgress?.(total, total);
+    })().finally(() => pendingZones.delete(zone.id));
+    pendingZones.set(zone.id, task);
+    return task;
+  };
   return {
     group,
-    streamingDone,
+    ensureZone,
+    isZoneLoaded: (zoneId: string) => loadedZones.has(zoneId),
+    groundResidency: () => residency,
     cancelStreaming(): void {
       cancelled = true;
+      pool?.dispose();
     },
     update(camX: number, camZ: number, fogFar: number): void {
       // fully-fogged chunks are pure overdraw; drop them before the frustum
@@ -1172,6 +1039,7 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
           seed,
           !lowGfx,
           skirtSpan,
+          lowShade,
         );
         chunk.mesh.geometry.dispose();
         chunk.mesh.geometry = geo; // bounding box/sphere already computed by the build

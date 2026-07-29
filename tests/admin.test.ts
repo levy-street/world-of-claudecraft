@@ -121,6 +121,7 @@ import {
   accountMailTarget,
   findAccount,
   isAdminAccount,
+  pool,
   revokeTokensExcept,
   updatePasswordHash,
 } from '../server/db';
@@ -605,6 +606,123 @@ describe('admin api auth', () => {
 
     expect(listCharacters).toHaveBeenCalledWith('Merlin', 'name', 'asc', 3, 50);
     expect(res.statusCode).toBe(200);
+  });
+
+  it('serves unstuck reports through the production admin dispatcher', async () => {
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
+    vi.mocked(isAdminAccount).mockResolvedValue(true);
+    vi.mocked(pool.query)
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            id: '9',
+            realm: 'main',
+            account_id: 4,
+            character_id: 5,
+            character_name: 'Aleph',
+            area_kind: 'dungeon',
+            area_id: 'hollow_crypt',
+            instance_id: null,
+            instance_slot: 2,
+            origin_raw_x: 100,
+            origin_raw_y: 3,
+            origin_raw_z: 200,
+            origin_local_x: 4,
+            origin_local_y: 3,
+            origin_local_z: 8,
+            destination_raw_x: null,
+            destination_raw_y: null,
+            destination_raw_z: null,
+            destination_local_x: null,
+            destination_local_y: null,
+            destination_local_z: null,
+            outcome: 'cancelled',
+            reason: 'moved',
+            invoked_at: '2026-07-14T00:00:00.000Z',
+            resolved_at: '2026-07-14T00:00:03.000Z',
+            created_at: '2026-07-14T00:00:03.000Z',
+          },
+        ],
+      } as never)
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            area_kind: 'dungeon',
+            area_id: 'hollow_crypt',
+            bucket_local_x: 0,
+            bucket_local_y: 0,
+            bucket_local_z: 5,
+            report_count: 3,
+            completed_count: 1,
+            cancelled_count: 2,
+            failed_count: 0,
+            first_invoked_at: '2026-07-13T00:00:00.000Z',
+            last_resolved_at: '2026-07-14T00:00:03.000Z',
+          },
+        ],
+      } as never);
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({
+        token: VALID_TOKEN,
+        url: '/admin/api/unstuck-reports?days=14&limit=25',
+      }),
+      res,
+      fakeGame,
+    );
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data).toMatchObject({
+      days: 14,
+      limit: 25,
+      reports: [
+        {
+          id: 9,
+          characterName: 'Aleph',
+          origin: { x: 100, y: 3, z: 200, localX: 4, localY: 3, localZ: 8 },
+          destination: null,
+          outcome: 'cancelled',
+          reason: 'moved',
+        },
+      ],
+      hotspots: [
+        {
+          bucket: { x: 0, y: 0, z: 5 },
+          count: 3,
+          completed: 1,
+          cancelled: 2,
+          failed: 0,
+        },
+      ],
+    });
+  });
+
+  it('skips the unstuck hotspot aggregate on legacy cursor pages', async () => {
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
+    vi.mocked(isAdminAccount).mockResolvedValue(true);
+    vi.mocked(pool.query).mockResolvedValueOnce({ rows: [], rowCount: 0 } as never);
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({
+        token: VALID_TOKEN,
+        url: '/admin/api/unstuck-reports?days=14&limit=25&beforeId=9',
+      }),
+      res,
+      fakeGame,
+    );
+
+    expect(pool.query).toHaveBeenCalledTimes(1);
+    expect(String(vi.mocked(pool.query).mock.calls[0][0])).toContain('FROM unstuck_reports r');
+    expect(String(vi.mocked(pool.query).mock.calls[0][0])).not.toContain('WITH bucketed AS');
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data).toMatchObject({
+      reports: [],
+      hotspots: [],
+      hasMore: false,
+      nextBeforeId: null,
+    });
   });
 
   it('serves shared IPs with their current block state', async () => {

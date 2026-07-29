@@ -179,6 +179,7 @@ const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   leaderboard: 'game.leaderboard.title',
   calendar: 'hudChrome.calendar.keybindLabel',
   crafting: 'hudChrome.crafting.title',
+  mount: 'hudChrome.keybinds.mount',
   deeds: 'hudChrome.deeds.title',
   professions: 'hudChrome.professions.title',
 };
@@ -193,7 +194,7 @@ const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
 export interface OptionsWindowDeps {
   /** The #options-menu root (Hud owns the id; the painter stays instance-parameterized). */
   root(): HTMLElement;
-  /** The live world (offline Sim or online ClientWorld mirror); read only for the bug-report info. */
+  /** The live world (offline Sim or online ClientWorld mirror); reads bug-report info and dispatches recovery. */
   world(): IWorld;
   /** The options seam main.ts wires after Input exists (null until attached). */
   options(): OptionsHooks | null;
@@ -478,6 +479,9 @@ export class OptionsWindow {
           this.render();
         } else if (a.kind === 'logout') {
           this.deps.options()?.logout();
+        } else if (a.kind === 'unstuck') {
+          this.deps.world().unstuck();
+          this.close();
         } else {
           this.close();
         }
@@ -1233,10 +1237,6 @@ export class OptionsWindow {
       infoRow(t('hudChrome.bugReport.position'), coords);
     body.appendChild(infoEl);
 
-    // Capture once when the form opens so the screenshot reflects what the player
-    // saw, not a later frame. null when capture is unavailable/failed.
-    const shot = hooks.capture();
-
     const descLabel = document.createElement('label');
     descLabel.className = 'bug-label';
     descLabel.setAttribute('for', 'bug-desc');
@@ -1249,8 +1249,26 @@ export class OptionsWindow {
     desc.setAttribute('aria-describedby', 'bug-error');
     body.append(descLabel, desc);
 
-    let includeShot = shot !== null;
-    if (shot) {
+    // Start the framebuffer copy in an idle slot after the form itself can paint.
+    // Renderer.captureScreenshot copies the live WebGL frame synchronously inside
+    // that slot, then JPEG-encodes asynchronously. The promise is also the submit
+    // gate, so a very fast submit cannot silently omit a capture still in flight.
+    let includeShot = true;
+    const shotHost = document.createElement('div');
+    shotHost.hidden = true;
+    body.appendChild(shotHost);
+    const capturePromise = new Promise<string | null>((resolve) => {
+      const capture = (): void => {
+        void hooks.capture().then(resolve, () => resolve(null));
+      };
+      const idleWindow = window as typeof window & {
+        requestIdleCallback?: (callback: () => void, options?: { timeout?: number }) => number;
+      };
+      if (idleWindow.requestIdleCallback) idleWindow.requestIdleCallback(capture, { timeout: 500 });
+      else window.setTimeout(capture, 0);
+    }).then((shot) => {
+      includeShot = shot !== null;
+      if (!shot || !shotHost.isConnected) return shot;
       const shotWrap = document.createElement('div');
       shotWrap.className = 'bug-shot';
       const img = document.createElement('img');
@@ -1280,8 +1298,10 @@ export class OptionsWindow {
       name.textContent = t('hudChrome.bugReport.includeScreenshot');
       toggleRow.append(name, toggle);
       shotWrap.append(toggleRow, img);
-      body.appendChild(shotWrap);
-    }
+      shotHost.hidden = false;
+      shotHost.replaceChildren(shotWrap);
+      return shot;
+    });
 
     const error = document.createElement('div');
     error.className = 'report-error';
@@ -1313,24 +1333,29 @@ export class OptionsWindow {
       }
       submit.disabled = true;
       error.textContent = '';
-      const sentShot = includeShot && shot !== null;
-      hooks
-        .submit({ description, screenshot: includeShot ? shot : null, meta: hooks.collectMeta() })
-        .then(({ screenshotStored }) => {
-          // Be honest when the server dropped a screenshot the player asked to send.
-          const droppedShot = sentShot && !screenshotStored;
-          this.deps.log(
-            t(
-              droppedShot ? 'hudChrome.bugReport.submittedNoShot' : 'hudChrome.bugReport.submitted',
-            ),
-          );
-          this.view = 'main';
-          this.render();
-        })
-        .catch((err: unknown) => {
-          submit.disabled = false;
-          error.textContent = this.localizeBugReportError(err);
-        });
+      void capturePromise.then((shot) => {
+        if (!body.isConnected) return;
+        const sentShot = includeShot && shot !== null;
+        hooks
+          .submit({ description, screenshot: includeShot ? shot : null, meta: hooks.collectMeta() })
+          .then(({ screenshotStored }) => {
+            // Be honest when the server dropped a screenshot the player asked to send.
+            const droppedShot = sentShot && !screenshotStored;
+            this.deps.log(
+              t(
+                droppedShot
+                  ? 'hudChrome.bugReport.submittedNoShot'
+                  : 'hudChrome.bugReport.submitted',
+              ),
+            );
+            this.view = 'main';
+            this.render();
+          })
+          .catch((err: unknown) => {
+            submit.disabled = false;
+            error.textContent = this.localizeBugReportError(err);
+          });
+      });
     });
 
     this.deps

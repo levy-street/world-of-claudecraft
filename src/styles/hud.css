@@ -2904,6 +2904,24 @@
     color: #fff;
     border-color: #c9a86a;
   }
+  /* day/night dial: a small satellite disc on the top-right rim of the minimap
+     (mirrors the #raid-lockout button placement), showing the 12h world cycle.
+     Purely informational, so it ignores pointer input. */
+  #minimap-daynight {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    z-index: 3;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: #14141d;
+    box-shadow:
+      0 1px 3px #000a,
+      inset 0 0 6px #0007;
+    pointer-events: none;
+  }
   #minimap-coords {
     margin-top: 4px;
     display: inline-block;
@@ -4491,9 +4509,14 @@
     left: 50%;
     top: 28%;
     transform: translateX(-50%);
+    width: max-content;
+    max-width: calc(100vw - 48px);
+    box-sizing: border-box;
     color: var(--gold);
     font-size: 38px;
     font-weight: bold;
+    line-height: 1.15;
+    text-align: center;
     text-shadow:
       0 0 18px #00000088,
       2px 2px 6px #000;
@@ -4502,7 +4525,21 @@
     pointer-events: none;
     font-family: var(--title-font);
     letter-spacing: 1px;
-    white-space: nowrap;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  #banner.has-subtext {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  #banner .banner-subtext {
+    margin-top: 6px;
+    color: var(--color-text-light);
+    font-family: var(--font-serif);
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0;
   }
   #banner.banner-with-art {
     display: flex;

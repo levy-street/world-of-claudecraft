@@ -40,6 +40,7 @@ export class FakeRes {
   private _writableEnded = false;
   private _capturedBody: string | null = null;
   private _capturedHeaders: Record<string, HeaderValue> | null = null;
+  private readonly _endWaiters = new Set<() => void>();
 
   /** true once writeHead, write, or end has committed the headers. */
   get headersSent(): boolean {
@@ -120,7 +121,29 @@ export class FakeRes {
     this._writableEnded = true;
     this._capturedBody = this._bodyChunks.join('');
     this._capturedHeaders = this.snapshotHeaders();
+    for (const resolve of this._endWaiters) resolve();
+    this._endWaiters.clear();
     return this;
+  }
+
+  /**
+   * Wait for end() without spinning on scheduler turns. The deadline is elapsed
+   * time, so a busy worker cannot fail merely because it ran many setImmediate
+   * callbacks while real async I/O was still within budget.
+   */
+  async waitForEnd(timeoutMs = 5_000): Promise<void> {
+    if (this._writableEnded) return;
+    await new Promise<void>((resolve, reject) => {
+      const onEnd = () => {
+        clearTimeout(timeout);
+        resolve();
+      };
+      const timeout = setTimeout(() => {
+        this._endWaiters.delete(onEnd);
+        reject(new Error(`FakeRes response did not end within ${timeoutMs}ms`));
+      }, timeoutMs);
+      this._endWaiters.add(onEnd);
+    });
   }
 
   private snapshotHeaders(): Record<string, HeaderValue> {

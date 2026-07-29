@@ -30,6 +30,7 @@ import {
 } from '../sim';
 import type { SimContext } from '../sim_context';
 import { dist2d, type Entity, type OverheadEmoteId, type PlayerClass, YELL_RANGE } from '../types';
+import { requestUnstuck } from '../unstuck';
 import { setAwayState } from './away';
 import * as readouts from './chat_readouts';
 
@@ -107,6 +108,15 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
   if (!r) return null;
   const raw = text.trim().slice(0, MAX_CHAT_MESSAGE_LEN);
   if (!raw) return null;
+
+  // Local geometry recovery is a direct system command, not chat. Match it
+  // before the token bucket or presence handling so offline and online hosts
+  // neither throttle it nor clear AFK/DND state as a side effect.
+  if (/^\/unstuck\s*$/i.test(raw)) {
+    requestUnstuck(ctx, r.meta.entityId);
+    return null;
+  }
+
   if (!chatAllowed(ctx, r.meta.entityId)) {
     ctx.error(r.meta.entityId, 'You are sending messages too quickly.');
     return null;
@@ -481,7 +491,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
 
   // Self-only readouts: emit a private system line and never become chat.
   if (/^\/(?:where|loc|zone)(?:\s|$)/i.test(raw)) {
-    const zone = zoneAt(r.e.pos.z);
+    const zone = zoneAt(r.e.pos.x, r.e.pos.z);
     const [lo, hi] = zone.levelRange;
     ctx.error(
       r.meta.entityId,
@@ -545,7 +555,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return null;
   }
   if (/^\/(?:zones|zonelist|worldmap)(?:\s|$)/i.test(raw)) {
-    ctx.error(r.meta.entityId, readouts.zonesReadout(r.e.pos.z));
+    ctx.error(r.meta.entityId, readouts.zonesReadout(r.e.pos.x, r.e.pos.z));
     return null;
   }
   if (/^\/(?:nearby|near|around)(?:\s|$)/i.test(raw)) {
@@ -1042,6 +1052,7 @@ export function helpLines(): string[] {
     'Chat channels: /s say, /y yell, /general, /p party, /world, /lfg.',
     'Whisper a player with /w <name> <message>, reply with /r.',
     'Other commands: /join <world|lfg>, /roll, /invite <name>, /inspect <name>, /follow <name>, /unfollow, /assist <name>, /ready, /afk, /dnd, /who.',
+    "Recovery: /unstuck starts a stationary countdown, then sends your spirit to the nearest graveyard. Returning through the Pale Keeper requires The Keeper's Toll.",
     'Hide a player: /ignore <name> hides their public chat only. /block <name> also stops their whispers, invites and mail. Also /unignore, /unblock, /ignorelist, /blocklist.',
     'Character readouts: /played, /playtime, /xp, /gold, /stats, /bags, /gear, /abilities, /buffs, /cooldowns, /quest, /completed.',
     'World readouts: /where, /zones, /nearby, /pois, /graveyard, /dungeons, /arena, /session, /listings, /buyback.',

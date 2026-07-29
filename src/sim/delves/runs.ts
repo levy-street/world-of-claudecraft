@@ -1149,6 +1149,34 @@ function standingOnLitanyDryGround(moduleId: string, localX: number, localZ: num
   return false;
 }
 
+/** The active static Blackwater tier at a world point, or null on dry ground. */
+export function delveBlackwaterTierAt(
+  run: DelveRun,
+  pos: Pick<Vec3, 'x' | 'z'>,
+): 'shallow' | 'deep' | null {
+  const moduleId = run.modules[run.moduleIndex];
+  const zones = DELVE_MODULES[moduleId]?.hazards;
+  if (!moduleId || !zones || zones.length === 0) return null;
+  const ox = run.origin.x;
+  const oz = run.origin.z + delveModuleZOffset(run);
+  const localX = pos.x - ox;
+  const localZ = pos.z - oz;
+  if (standingOnLitanyDryGround(moduleId, localX, localZ)) return null;
+
+  let worstTier: 'shallow' | 'deep' | null = null;
+  for (const zone of zones) {
+    const dx = localX - zone.x;
+    const dz = localZ - zone.z;
+    const rx = zone.rx ?? zone.r;
+    const rz = zone.rz ?? zone.r;
+    if ((dx * dx) / (rx * rx) + (dz * dz) / (rz * rz) > 1) continue;
+    const tier = zone.tier ?? 'deep';
+    if (tier === 'deep') return 'deep';
+    worstTier = 'shallow';
+  }
+  return worstTier;
+}
+
 export function tickDelveBlackwater(ctx: SimContext, run: DelveRun): void {
   const mod = DELVE_MODULES[run.modules[run.moduleIndex]];
   const zones = mod?.hazards;
@@ -1165,35 +1193,12 @@ export function tickDelveBlackwater(ctx: SimContext, run: DelveRun): void {
       ? DELVE_BLACKWATER_PCT_HEROIC
       : DELVE_BLACKWATER_PCT_NORMAL;
   if (highWater) basePct *= 1.35;
-  const ox = run.origin.x;
-  const oz = run.origin.z + delveModuleZOffset(run);
   for (const pid of ctx.partyMembersForKey(run.partyKey)) {
     const p = ctx.entities.get(pid);
     if (!p || p.dead) continue;
     // Airborne players dodge water damage.
     if (p.jumping) continue;
-    // Standing on an island or the dais is dry ground, regardless of which
-    // hazard zone's radius it geometrically falls inside.
-    if (standingOnLitanyDryGround(run.modules[run.moduleIndex], p.pos.x - ox, p.pos.z - oz)) {
-      continue;
-    }
-    // Find the worst-tier zone the player is standing in.
-    let worstTier: 'shallow' | 'deep' | null = null;
-    for (const z of zones) {
-      const dx = p.pos.x - (ox + z.x);
-      const dz = p.pos.z - (oz + z.z);
-      // An authored ellipse (rx/rz, e.g. the apse moat) checks per-axis; a plain
-      // zone (rx/rz unset) falls back to the circular r/r check.
-      const rx = z.rx ?? z.r;
-      const rz = z.rz ?? z.r;
-      if ((dx * dx) / (rx * rx) + (dz * dz) / (rz * rz) > 1) continue;
-      const zt = z.tier ?? 'deep';
-      if (zt === 'deep') {
-        worstTier = 'deep';
-        break; // deep is worst; no need to check further
-      }
-      if (worstTier === null) worstTier = 'shallow';
-    }
+    const worstTier = delveBlackwaterTierAt(run, p.pos);
     if (worstTier === null) continue;
     const tierMult = worstTier === 'deep' ? 2.0 : 0.35;
     const dmg = Math.max(1, Math.round(p.maxHp * basePct * tierMult));

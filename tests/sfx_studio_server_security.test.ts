@@ -150,6 +150,9 @@ describe.sequential('SFX Studio server security', () => {
     try {
       rmSync(sourceLink, { force: true });
       rmSync(executableSource, { force: true });
+      // escapedSourceDir is normally the symlink planted in beforeAll, but a
+      // denied traversal probe can leave a real directory in its place;
+      // recursive rm removes either (rm never follows a symlink).
       rmSync(escapedSourceDir, { recursive: true, force: true });
       rmSync(externalSourceDir, { recursive: true, force: true });
       rmSync(externalExportDir, { recursive: true, force: true });

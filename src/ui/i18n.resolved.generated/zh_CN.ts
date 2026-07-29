@@ -336,6 +336,33 @@ export const zh_CN: EnTranslations = {
       "healerConfirmAccept": "复活",
       "healerConfirmCancel": "取消"
     },
+    "unstuck": {
+      "menuButton": "脱困",
+      "help": "脱困：/unstuck 会启动原地倒计时，随后将你移动到附近可到达的安全位置。",
+      "helpAtGraveyard": "脱困：/unstuck 会启动原地倒计时，结束后将你的灵魂送往最近的墓地。你必须向灵魂医者接受守护者的代价才能复活。",
+      "started": "将在 {seconds} 秒后脱困。移动、战斗、受到伤害或开始其他动作都会取消。",
+      "countdown": "脱困：{seconds}",
+      "completed": "已移动到最近且可到达的安全位置。",
+      "completedAtGraveyard": "你的灵魂已返回最近的墓地。与灵魂医者交谈并接受守护者的代价。",
+      "revivedAtGraveyard": "你已被送回最近的墓地并复活。守护者的代价正压在你身上。",
+      "cancelledMoved": "你进行了移动，脱困已取消。",
+      "cancelledDamaged": "你受到了伤害，脱困已取消。",
+      "cancelledCombat": "你进入了战斗，脱困已取消。",
+      "cancelledBusy": "你开始了其他动作，脱困已取消。",
+      "cancelledState": "你的状态发生变化，脱困已取消。",
+      "cancelledDisconnected": "由于连接断开，脱困已取消。",
+      "noSafePosition": "附近没有可到达的安全位置。你没有被移动。",
+      "alreadyActive": "脱困倒计时已在进行。",
+      "alreadySafe": "你已经处于安全且可到达的位置。",
+      "cooldown": "脱困将在 {seconds} 秒后可用。",
+      "dead": "死亡或灵魂状态下无法使用脱困。",
+      "combat": "战斗中无法使用脱困。",
+      "controlled": "移动受限时无法使用脱困。",
+      "standStill": "请在坚实地面上站稳后再使用脱困。",
+      "standStillAnywhere": "请先停下再使用脱困。",
+      "busy": "请先完成当前动作再使用脱困。",
+      "unavailable": "当前状态下无法使用脱困。"
+    },
     "fct": {
       "absorbed": "吸收 {amount}",
       "cheap": "费用降低!"
@@ -775,6 +802,7 @@ export const zh_CN: EnTranslations = {
       "leaderboard": "排行榜",
       "dailyRewards": "商店",
       "deeds": "功绩",
+      "mounts": "坐骑",
       "professions": "专业",
       "nameplates": "姓名板",
       "haptics": "震动反馈",
@@ -896,7 +924,59 @@ export const zh_CN: EnTranslations = {
       "petStop": "宠物：停止",
       "petTaunt": "宠物：嘲讽",
       "petDefensive": "宠物：防御",
-      "petAggressive": "宠物：攻击性"
+      "petAggressive": "宠物：攻击性",
+      "mount": "骑乘 / 下骑"
+    },
+    "mounts": {
+      "title": "坐骑",
+      "close": "关闭",
+      "select": "选择",
+      "selected": "已选择",
+      "riding": "骑乘中",
+      "mount": "骑乘",
+      "dismount": "下骑",
+      "useToRide": "使用以召唤该坐骑。",
+      "emptyTitle": "尚未收集坐骑",
+      "emptyStableHint": "升到20级，前往高望以西的马厩，向马厩总管玛拉学习骑术。",
+      "emptyDropHint": "较稀有的坐骑由英雄地下城首领掉落或完成裂隙获得。",
+      "clickManage": "点击选择坐骑",
+      "rarity_common": "普通",
+      "rarity_rare": "稀有",
+      "rarity_epic": "史诗",
+      "spec_speed": "+{pct}%额外移动力",
+      "name_valorsteed": "英勇战马",
+      "name_grag_bear": "歌利亚格拉格巨熊",
+      "name_stalkglider_snail": "苔壳滑行蜗牛",
+      "name_aether_hover_cycle": "以太骑士悬浮机车",
+      "name_shadowjump_toad": "影跃蟾蜍卡玛影",
+      "name_stormfeather_griffin": "凌天风暴之羽",
+      "name_thunderstrut_gobbler": "雷霆阔步大火鸡",
+      "desc_valorsteed": "一匹坚韧稳健的骏马，可提升旅行速度。",
+      "desc_grag_bear": "一头坚韧稳健的巨熊，可提升旅行速度。",
+      "desc_stalkglider_snail": "一只坚毅耐久的蜗牛，可提升旅行速度。",
+      "desc_aether_hover_cycle": "一辆强大的魔导机车，专为快速贴地悬浮的战斗穿行而设计。",
+      "desc_shadowjump_toad": "一只体型庞大、步伐稳健的巨蟾，受训于闪电般的暗影跳跃，可跨越任何地形。",
+      "desc_stormfeather_griffin": "一头威严的风暴狮鹫，收拢双翼，以符文利爪行走于大地。",
+      "desc_thunderstrut_gobbler": "一只风暴所生的庞然大火鸡，从觉醒之峰昂首阔步而下，尾羽如雷云般展开。"
+    },
+    "mountTraining": {
+      "mountPrompt": "按 {key} 键骑上训练用英勇战马。",
+      "ownedMountPrompt": "你的缰绳已在背包中，使用它即可骑乘。",
+      "ridePrompt": "跟随发光的标记前往起点线，然后点击开始比赛。",
+      "begin": "开始课程",
+      "success": "你已经驯服了英勇战马。",
+      "returnToMarla": "返回马厩找玛拉，花10金购买英勇战马的缰绳。"
+    },
+    "mountRace": {
+      "startButton": "开始比赛",
+      "cancelButton": "取消比赛",
+      "go": "GO!",
+      "start": "出发！跳过每一道障碍，再骑回拱门冲线。",
+      "toFinish": "骑回拱门冲线！",
+      "finished": "完成！用时 {seconds} 秒！",
+      "timeout": "比赛失败",
+      "progress": "障碍 {n} / {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "溪谷杯",
@@ -1566,6 +1646,7 @@ export const zh_CN: EnTranslations = {
       "filterConsumable": "消耗品",
       "filterMaterial": "材料",
       "filterQuest": "任务",
+      "filterMount": "坐骑",
       "sortAria": "排序背包物品",
       "sortRecent": "最近",
       "sortQuality": "品质",
@@ -1783,6 +1864,9 @@ export const zh_CN: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "需要等级 {level}",
+      "riftTier": "{tier}级裂隙物品",
+      "riftUpgrade": "裂隙强化 {level}/{max}",
+      "riftSockets": "裂隙宝石 {used}/{total}",
       "statEnchanted": "+{value} {stat}（附魔）",
       "enchantedFallback": "已附魔"
     },
@@ -2720,6 +2804,14 @@ export const zh_CN: EnTranslations = {
       "lbEmpty": "暂无上榜的编年史家。",
       "broadcastsLabel": "与公会和好友分享功绩达成",
       "titledName": "{name}【{title}】"
+    },
+    "continentMap": {
+      "title": "世界地图",
+      "summary": "世界地图。选择一个地区以打开其地图。",
+      "toWorld": "世界地图",
+      "toZone": "Zone map",
+      "toggleAria": "在世界地图和地区地图之间切换",
+      "levels": "等级 {min} 到 {max}"
     }
   },
   "gatherEvent": {
@@ -2948,7 +3040,17 @@ export const zh_CN: EnTranslations = {
         "marshName": "泥沼湿地",
         "marshBlurb": "沉没的沼泽与遭潮水侵蚀的废墟，泥鳍与更可怕之物的栖身之所。",
         "peaksName": "荆棘峰高地",
-        "peaksBlurb": "狂风侵蚀的山脊,向上攀升,直抵这片国度最寒冷的险境。"
+        "peaksBlurb": "狂风侵蚀的山脊,向上攀升,直抵这片国度最寒冷的险境。",
+        "duskName": "帷幕幽谷",
+        "duskBlurb": "群山之下封存的国度，如果关于入口的低语属实。",
+        "emberName": "龙裔荒原",
+        "emberBlurb": "越过苍白堤道，绿意让位于灰烬，古老的存在统治着荒漠。",
+        "frostName": "霜幕之境",
+        "frostBlurb": "一处任何地图都未曾标出的雪封高地，只在舞动的极光中若隐若现。",
+        "amberName": "琥珀秋境",
+        "amberBlurb": "西边峭壁之后，是一场永不落幕的秋天，金色湖面上灯火点点。",
+        "fenName": "柳泽沼地",
+        "fenBlurb": "越过秋色之冠，是一片垂柳与静水的明亮沼泽，还有一座护城河环绕的小镇。"
       },
       "group": {
         "heading": "组队迎接硬仗",
@@ -3417,6 +3519,18 @@ export const zh_CN: EnTranslations = {
       "reptile": {
         "name": "爬行类",
         "desc": "冷血的猎手，带着独有的嘶声与撕咬，与温血的野兽截然不同。"
+      },
+      "murloc": {
+        "name": "蛙鳍族",
+        "desc": "湖岸与潮池间呱呱叫的鱼人族群，谁涉水靠得太近，它们便会一拥而上。"
+      },
+      "kobold": {
+        "name": "林间小妖",
+        "desc": "在林间空地与树篱下窜来窜去的拾荒者和小妖精，单个不过讨人嫌，聚成一群才成祸患。"
+      },
+      "demon": {
+        "name": "恶魔",
+        "desc": "来自裂隙彼端的入侵者，浑身是火焰与怨毒。只要有一只现身，裂口就绝不会远。"
       }
     },
     "worldPage": {
@@ -3430,15 +3544,55 @@ export const zh_CN: EnTranslations = {
       "valeBlurb": "青翠的起始山谷，新英雄在东溪镇周边的野狼与盗匪身上磨砺技艺。",
       "marshBlurb": "一片被洪水淹没、迷雾与废墟交织的国度。泥鳍涌入浅滩，水下有更古老之物蠢蠢欲动，由桥镇芬桥镇守望着。",
       "peaksBlurb": "风蚀的山脊与古老的矿坑向上攀升，通往这片王国中最寒冷、最高处的危险之地，由高守哨站镇守。",
+      "duskBlurb": "一座笼罩在永恒暮色中的山谷，坐落于古辉巨树之下，水晶废墟泛着微光，空气中回荡着古老的魔力。",
+      "emberBlurb": "一片被风暴照亮、遍布灰烬与血玻璃的荒漠，巨龙在火山口上空盘旋，巨魔的篝火在沙丘间燃烧，由门镇望龙哨守望着。",
+      "frostBlurb": "极光之下，白雪与黑松一片静谧，寒冷本身仿佛苏醒了，唯有冰幔镇的炉火长燃不熄。",
+      "amberBlurb": "一场永恒的秋天，金红的叶子从不飘落，环绕着灯火通明的灯湖镇。",
+      "fenBlurb": "一片明亮而嗡鸣不息的湿地，睡莲漂浮在缓缓的水面上，从桥镇桥湖镇踏上古旧的木栈道即可穿行其间。",
+      "nightBlurb": "一片星光璀璨的午夜国度，花朵照亮小径，月栖镇在梦境般的夜空下静静守望。",
+      "hauntBlurb": "一片被巨大树冠笼罩的闹鬼森林，路上唯一可信的光亮，便是绞湖镇的灯笼。",
+      "galeBlurb": "海崖与呼啸的丘陵，这里的风从不停歇，老灯塔的火从未熄灭，烛港的家家户户都把门关得严严实实。",
+      "jungleBlurb": "棕榈、白沙与喧闹鸟鸣交织的热带丛林，海滨小镇漂流港在沙滩上燃着一堆长明的篝火。",
+      "gardenBlurb": "一座树篱迷宫般的花园国度，至今仍被修剪得整整齐齐，却无人见过园丁；经由篱苑镇及其喷泉庭院方可进入。",
       "valeGreeting": "把你的刀剑带在身边。谷地已不复往日。",
       "valeGreeter": "雷德布鲁克元帅，东溪",
       "marshGreeting": "守在门口。过了那片芦苇，泥沼会替我们动手杀人。",
       "marshGreeter": "守望者芬威克，芬桥",
       "peaksGreeting": "这堵墙已守了两百年。在我当值时它绝不会破，但它在呻吟。",
       "peaksGreeter": "塞萨莉队长，高守哨站",
+      "duskGreeting": "你的同族鲜少踏足这片树荫。轻声慢行，欢迎你的到来。",
+      "duskGreeter": "守护者塞尔文，古辉镇",
+      "emberGreeting": "荒漠吹来灼热的风，巨龙盘旋在龙喉火山上空，巨魔的篝火在沙丘间燃烧。出发之前，先喝口水吧。",
+      "emberGreeter": "守关人，望龙哨",
+      "frostGreeting": "出了墙外，白雪吞没一切声响。若天上的光开始舞动，就压低嗓音，别让火堆熄灭。",
+      "frostGreeter": "守炉人，冰幔镇",
+      "amberGreeting": "这里每一片叶子都燃烧着金红，却从不飘落。灯笼已为你点亮；上山路过融金隘口时可要当心。",
+      "amberGreeter": "灯匠，灯湖镇",
+      "fenGreeting": "沼泽里蜻蜓与蜜蜂嗡嗡作响。跨过桥来歇歇脚，过了水池就别离开木栈道。",
+      "fenGreeter": "守桥人，桥湖镇",
+      "nightGreeting": "越过夜门，连空气都在做梦。沿着花光前行，别忘了留意悬在天上沉睡的世界。",
+      "nightGreeter": "守夜人，月栖镇",
+      "hauntGreeting": "跟紧灯笼走，旅人。若林中有声音在路外喊你的名字，千万别回应。",
+      "hauntGreeter": "点灯人，绞湖镇",
+      "galeGreeting": "这里的风从未停过一刻，老灯塔的火也从未熄过一次。进来后记得随手关上旅店的门。",
+      "galeGreeter": "守塔人，烛港",
+      "jungleGreeting": "温暖的沙滩，喧闹的鸟鸣，还有吞没地平线的丛林。我们在海滩上留着一堆篝火；可要记得回到火边来。",
+      "jungleGreeter": "港务长，漂流港",
+      "gardenGreeting": "树篱仍有人在修剪，可百年来无人见过园丁。当心迷宫：它也在留意你。",
+      "gardenGreeter": "守门人，篱苑镇",
       "valePlaceNotes": "东溪镇是你的第一个大本营。狼奔谷与野猪草甸是温和的狩猎场；镜湖是供垂钓的好水域，只是浅滩处泥鳍鱼成群；墨网林与铜矿坑藏着蜘蛛和贪婪掘矿的家伙；一处强盗营地与陷落礼拜堂里有更棘手的活儿；圣物库山丘向下通往坍塌的圣物库，这是王国的第一座探秘；明木林地是北方一片宁静、阳光普照的林地；而母猪场则是东溪镇有围墙的野猪球场，溪谷杯就在丰收休战的庇护下在那里开赛。",
       "marshPlaceNotes": "芬桥守着唯一一条干燥的道路。潜行者芦苇荡与深沼浅滩里满是沼泽野兽和泥鳍；寡妇密林被蛛网织得密不透风；溺亡礼拜堂与巨魔土丘藏着更古老的危险，而这片湿地自己的探秘，溺亡连祷，就在土丘以北不远处开放；唤墓者营地是邪教的盘踞之处，沉没堡垒则是这片湿地的副本核心。",
       "peaksPlaceNotes": "高守哨站扼守着城墙。潜猎者山脊与深岩洞穴属于山脊猫和穴居者；食人魔丘陵与卓格玛的战营属于受雇的莽夫；风暴岩中元素噼啪作响，其下方泛着微光的便是微光湖，这座山中小湖的湖畔守着一道通往溺亡神殿的苍白之光之门；蜿龙教帐篷与亡魂之野环绕着邪教的制高点，墓龙圣所则居于其巅。",
+      "duskPlaceNotes": "古辉镇聚居在巨树之下。暮落洞穴与其瞭望台是入口，也是初见山谷的地方；古木林地与星落盆地守着宁静的南方；沉没王庭在东面藏着草木蔓生的废墟；辉光深处与水晶浅滩则在北方闪着微光。",
+      "emberPlaceNotes": "望龙哨扼守着大门。门林是荒漠前最后一片绿意；烬沙丘随风飘着灰烬，还有更糟的东西；巨魔集会是沙丘巨魔燃起篝火聚集之处；血玻璃原野闪烁着锋利的碎片；而龙喉火山口则是群龙盘旋其上的冒烟王冠。",
+      "frostPlaceNotes": "冰幔镇守着最后一座温暖的炉火。雪线隘口标记着积雪接管一切的地方；冰川湖是冰层之下漆黑而静止的水；极光台阶在舞动的光芒下向上攀升；颤栗沼泽是一片从未真正沉睡的冰封泥沼；而呼啸台地每到夜里都名副其实。",
+      "amberPlaceNotes": "灯湖镇在丰收之地的中心闪着光。融金隘口是那条覆着琥珀的进山之路；鎏金果园与丰收谷藏着最甜的果实和最大胆的窃贼；大湖倒映着燃烧的秋叶；烬枫坡上的枫树最高也最红；而斜碑还记得比秋天更古老的事。",
+      "fenPlaceNotes": "桥湖镇横跨在缓缓的水面上。琥珀沼石阶从丰收之乡蜿蜒而下；睡莲泽与泽光池间闪烁着鬼火与蜻蜓；垂柳湾的柳枝垂入湖中；而沉眠浅滩已是这片土地最温柔的去处。",
+      "nightPlaceNotes": "月栖镇守着长夜的警戒。夜门是通往午夜国度的入口；月井盛着可以伫立其旁的星光；暮光花田在黑暗中绽放；守望石阵一动不动地凝视着；而不眠古冢是这里唯一从不做梦的地方。",
+      "hauntPlaceNotes": "绞湖镇蜷缩在自己的灯笼之间。鸦门是这片森林阴森的正门；寡妇棘丛被蛛网织得密不透风；吊影林地与哀石礼拜堂承载着森林最古老的悲恸；而猎手林隙属于至今仍在那里狩猎的东西。",
+      "galePlaceNotes": "烛港迎风而立。风道是进来的悬崖之路；啸风丘陵在狂风下光秃起伏；老灯塔燃烧的岁月已无人能说清；断崖直落入海；沉船滩让人不敢小看这段海岸；而镜湖是整个国度里唯一静止的东西。",
+      "junglePlaceNotes": "漂流港在海滩上燃着篝火。缠木隘口是大河汇入绿墙之处；棕榈长滩沿着浪缘铺展，洁白而温暖；翠绿丛林与垂藤林吞没了内陆；蓝宝石潟湖清澈而幽深地发着光；而沉没神像则在水下静静注视。",
+      "gardenPlaceNotes": "篱苑镇候在花园之门前。花坛步道绽放着修剪齐整的色彩；晨曦堡在新筑的城墙后操练骑士；花瓣池终年漂着粉色的花瓣；老磨坊在自己的环形花坛上转动；大迷宫会为每一位客人重新排布自己的礼数，拱门有绿叶狐狸守望；北望哨守着出口之路；睡莲池在这一切之外静卧；而喷泉庭院仍在花园中心流淌着清泉。",
       "gladeTitle": "宁静一隅：明木林地",
       "gladeBody": "the Vale 里的故事并不全都关于亡者。北方有一片阳光照耀的林地，名为 Brightwood Glade，自有它更为温和的节奏：尽是安静的小径，以及枝叶下斑驳的光影。它是你所追寻的踪迹之外一段柔和的对照，若道路给你余裕闲逛，很值得去看一看。",
       "worldBossTitle": "当山峰苏醒：世界首领",
@@ -3512,6 +3666,7 @@ export const zh_CN: EnTranslations = {
       "bastionBody": "一座沉入沼泽、被淹没守军和不断上涨的潮水所占据的失落要塞。",
       "templeBody": "沼泽小路旁一座沉没的圣殿，是为好奇者与有备而来者准备的岔路。",
       "sanctumBody": "棘峰的黑暗核心，邪教漫长的图谋在此达到可怖的顶点。",
+      "wildheartBody": "一座被暖雨浸透的丛林火山口，两条高起的猎径环绕着碧色深潭。穿过兽巢与先祖遗迹，在仪式金字塔上迎战祖尔加。",
       "raidName": "终局团队副本",
       "raidBody": "在一扇封印的皇家大门之后，等待着一场十人试炼：一场多阶段的战斗，以及一股不死之力，需要整支团队齐心协力将其镇压。先赢得入场资格，再带上九位好友。",
       "heroicTitle": "英雄模式",
@@ -5046,6 +5201,57 @@ export const zh_CN: EnTranslations = {
     "chat": "打开聊天框"
   },
   "sim": {
+    "rift": {
+      "allUnstable": "所有裂隙目前都不稳定。请稍后再试。",
+      "enterFloor": "你穿过裂隙，进入了{name}。",
+      "descendFloor": "你深入{name}的更深处。",
+      "stepBack": "你退回裂隙，返回原地。",
+      "pylonLit": "一座符文尖塔亮起（{lit}/{total}）。",
+      "wayDownOpens": "通往下层的裂口被撕开了。",
+      "exitOpens": "裂隙震颤。一条归途在倒下的敌人身后撕裂开来。",
+      "portalOpens": "一道{tier}级裂隙在{zone}撕裂而开！",
+      "portalSealed": "{zone}的{tier}级裂隙已被封印。",
+      "portalCollapses": "{zone}的{tier}级裂隙坍塌了。",
+      "levelGate": "只有等级达到{level}级或以上的冒险者才能进入这道裂隙。",
+      "deadEntry": "死亡状态下无法进入裂隙。",
+      "deadEntryCombat": "你的队伍仍在战斗中。战斗结束后，死者方可重新进入。",
+      "iceGoalLit": "霜之印记熊熊燃起。去路随之震动。",
+      "socketsShut": "凹槽隆隆合拢。去路随之震动。",
+      "seqProgress": "符文依次回应（{step}/{total}）。",
+      "seqReset": "符文尽数熄灭。从头再来。",
+      "gateOpen": "闸门轰隆隆地开启了。",
+      "orbSealed": "宝珠被下方的仪式封印着。",
+      "orbWakes": "五芒星阵的火焰熄灭了。祭坛上有什么苏醒了。",
+      "orbOpensGate": "血色宝珠骤然爆发。神殿之门轰然开启。",
+      "alreadyCleared": "该裂隙已被 {names} 清除。",
+      "raceLost": "该裂隙已被 {names} 清除。你的挑战结束了。",
+      "raceWorldWin": "{names} 用时 {seconds} 秒赢得了 {tier} 级裂隙竞速！",
+      "raceWinBanner": "裂隙竞速胜利 — {seconds} 秒",
+      "raceLostBanner": "裂隙已被清除",
+      "forgeUpgraded": "{name} 的裂隙强化已完成。",
+      "forgeEnchanted": "{name} 的裂隙附魔已完成。",
+      "forgeSocketed": "已为 {name} 镶嵌裂隙宝石。",
+      "detonateGlacialGrave": "冰川之墓引爆！",
+      "detonateAbsoluteZero": "绝对零度爆发！",
+      "detonateMagmaWell": "岩浆泉喷涌！",
+      "detonateCoreMeltdown": "核心熔毁引爆！",
+      "detonateVenomPool": "毒液池喷发！",
+      "detonateBroodmothersMark": "蜘蛛母后之印引爆！",
+      "detonateSoulGrave": "灵魂之墓引爆！",
+      "detonateDeathSentence": "死亡判决降临！",
+      "detonateEarthshatter": "碎地之力引爆！",
+      "detonateFinalJudgment": "终极审判落下！",
+      "detonateVoidRift": "虚空裂隙引爆！",
+      "detonateArcaneAnnihilation": "奥术湮灭爆发！",
+      "detonateLightningRod": "避雷针雷击！",
+      "detonateStormcallersWrath": "风暴召唤者之怒爆发！",
+      "detonateAbyssalMaw": "深渊之口合拢！",
+      "detonateCrushingDepth": "粉碎深渊碾压！",
+      "detonatePactSeal": "契约封印引爆！",
+      "detonateBloodRite": "血液仪式降临！",
+      "detonatePitSentence": "深坑判决引爆！",
+      "detonateHellfireBrand": "地狱烙印引爆！"
+    },
     "delve": {
       "cannotEnterNow": "你现在无法进入探秘。",
       "leaveDungeonFirst": "请先离开地下城。",
@@ -5900,6 +6106,8 @@ export const zh_CN: EnTranslations = {
       "secondsRemaining": "剩余 {seconds} 秒",
       "enteringZone": "进入 {zone}。",
       "welcomeZone": "欢迎来到 {zone}！",
+      "riftLabel": "{name}",
+      "riftLabelRanked": "{name} ({rank})",
       "levelBanner": "{level} 级！",
       "levelLog": "你已达到 {level} 级！",
       "xpGain": "你获得 {amount} 点经验。",
@@ -6153,6 +6361,7 @@ export const zh_CN: EnTranslations = {
       "floatingParry": "招架",
       "floatingResist": "抵抗",
       "floatingHealFull": "已满",
+      "floatingHealAbsorbed": "被吸收",
       "cannotMove": "无法移动！",
       "attack": "攻击",
       "damageDone": "你的{ability}击中{target}，造成 {amount} 点伤害。",
@@ -6169,6 +6378,8 @@ export const zh_CN: EnTranslations = {
       "healOtherCrit": "你的{ability}对{target}造成暴击治疗，恢复 {amount} 点生命。",
       "healSelfFull": "你的{ability}生效了，但你的生命值已满。",
       "healOtherFull": "你的{ability}在{target}身上生效了，但目标的生命值已满。",
+      "healSelfAbsorbed": "你的{ability}被你身上的枯萎吞噬了。",
+      "healOtherAbsorbed": "你的{ability}被{target}身上的枯萎吞噬了。",
       "death": "{name}死亡。",
       "auraGain": "你获得了 {name}。",
       "auraFade": "{name}从你身上消失。",
@@ -6527,7 +6738,23 @@ export const zh_CN: EnTranslations = {
       "fishing": "钓鱼",
       "gathering": "采集",
       "demonHeal": "恶魔治疗",
-      "thunzharrStormcall": "风暴召唤"
+      "thunzharrStormcall": "风暴召唤",
+      "rift_frost_execution": "Glacial Grave",
+      "rift_frost_strike": "Absolute Zero",
+      "rift_ember_execution": "Magma Well",
+      "rift_ember_strike": "Core Meltdown",
+      "rift_venom_execution": "Venom Pool",
+      "rift_venom_strike": "Broodmother's Mark",
+      "rift_necro_execution": "Soul Grave",
+      "rift_necro_strike": "Death Sentence",
+      "rift_brute_execution": "Earthshatter",
+      "rift_brute_strike": "Final Judgment",
+      "rift_arcane_execution": "Void Rift",
+      "rift_arcane_strike": "Arcane Annihilation",
+      "rift_storm_execution": "Lightning Rod",
+      "rift_storm_strike": "Stormcaller's Wrath",
+      "rift_tide_execution": "Abyssal Maw",
+      "rift_tide_strike": "Crushing Depth"
     }
   },
   "questUi": {
@@ -6644,7 +6871,8 @@ export const zh_CN: EnTranslations = {
       "tool": "工具",
       "potion": "药水",
       "elixir": "药剂",
-      "bag": "背包"
+      "bag": "背包",
+      "mount": "坐骑"
     },
     "stats": {
       "armor": "护甲",
@@ -9188,6 +9416,312 @@ export const zh_CN: EnTranslations = {
       "resonant_timber": {
         "name": "共鸣木材"
       },
+      "duskwisp_essence": {
+        "name": "暮光灵精华"
+      },
+      "spore_heart": {
+        "name": "孢子之心"
+      },
+      "gleaming_antler": {
+        "name": "辉光鹿角"
+      },
+      "wisp_mote": {
+        "name": "光尘"
+      },
+      "starfall_shard": {
+        "name": "星落碎片"
+      },
+      "elder_bark": {
+        "name": "长者树皮"
+      },
+      "hollow_sealstone": {
+        "name": "幽谷封印石"
+      },
+      "monument_overlook": {
+        "name": "风蚀石碑"
+      },
+      "monument_court": {
+        "name": "沉没石碑"
+      },
+      "monument_north": {
+        "name": "遗忘石碑"
+      },
+      "guardian_core": {
+        "name": "守卫核心"
+      },
+      "wardens_seal": {
+        "name": "守望者之印"
+      },
+      "gleamstag_charm": {
+        "name": "辉鹿护符"
+      },
+      "veilsteel_blade": {
+        "name": "帷钢之刃"
+      },
+      "duskfang_dirk": {
+        "name": "暮牙短剑"
+      },
+      "gleamwood_stave": {
+        "name": "辉木长杖"
+      },
+      "wardens_oathband": {
+        "name": "守望者誓言护手"
+      },
+      "wardplate_cuirass": {
+        "name": "守卫板甲胸铠"
+      },
+      "nightweave_tunic": {
+        "name": "夜织皮甲"
+      },
+      "veilcloth_robe": {
+        "name": "帷纱长袍"
+      },
+      "rift_essence": {
+        "name": "裂隙精华"
+      },
+      "rift_gem_crimson": {
+        "name": "猩红裂隙宝石"
+      },
+      "rift_gem_azure": {
+        "name": "蔚蓝裂隙宝石"
+      },
+      "rift_gem_verdant": {
+        "name": "翠绿裂隙宝石"
+      },
+      "riftbound_band_of_might": {
+        "name": "力量裂隙之戒"
+      },
+      "riftbound_band_of_insight": {
+        "name": "洞察裂隙之戒"
+      },
+      "riftbound_band_of_guile": {
+        "name": "诡诈裂隙之戒"
+      },
+      "hoarfrost_edge": {
+        "name": "白霜之锋"
+      },
+      "emberforge_gauntlets": {
+        "name": "烬炉护手"
+      },
+      "broodmother_carapace": {
+        "name": "育母甲壳"
+      },
+      "bonelord_mantle": {
+        "name": "骸骨领主衬肩"
+      },
+      "graskbreaker_girdle": {
+        "name": "格拉斯克碎击腰带"
+      },
+      "voidscar_handwraps": {
+        "name": "虚痕裹手"
+      },
+      "stormscale_treads": {
+        "name": "风暴鳞之靴"
+      },
+      "abyssal_loop": {
+        "name": "深渊之环"
+      },
+      "pactbound_vestments": {
+        "name": "缚约法袍"
+      },
+      "pitlords_cleaver": {
+        "name": "深渊领主的劈斧"
+      },
+      "emberforged_bulwark": {
+        "name": "烬铸壁垒胸甲"
+      },
+      "stormsunder_hood": {
+        "name": "裂风兜帽"
+      },
+      "voidweave_mantle": {
+        "name": "虚织衬肩"
+      },
+      "abysswrought_band": {
+        "name": "渊铸指环"
+      },
+      "heart_of_the_rift": {
+        "name": "裂隙之心"
+      },
+      "voidsong_dirk": {
+        "name": "虚空之歌，裂帷短匕"
+      },
+      "wildheart_tuskblade": {
+        "name": "荒野之心獠牙巨刃"
+      },
+      "wildheart_hexwood_staff": {
+        "name": "盆地巫木法杖"
+      },
+      "wildheart_fangknife": {
+        "name": "祖尔加的獠牙匕首"
+      },
+      "thick_winter_pelt": {
+        "name": "厚实的冬季毛皮"
+      },
+      "aurora_mote": {
+        "name": "极光微尘"
+      },
+      "hearth_ember_cache": {
+        "name": "火种罐"
+      },
+      "sprung_trap": {
+        "name": "被触发的沼泽捕兽夹"
+      },
+      "hearthlined_treads": {
+        "name": "炉火衬里行靴"
+      },
+      "frostmane_mantle": {
+        "name": "霜鬃披风"
+      },
+      "ashbone_war_brand": {
+        "name": "灰骨战印"
+      },
+      "emberwing_scale": {
+        "name": "烬翼龙鳞"
+      },
+      "scorched_supply_crate": {
+        "name": "烧焦的补给箱"
+      },
+      "wyrmwatch_warning_banner": {
+        "name": "望龙哨警示旗"
+      },
+      "cinderwalk_treads": {
+        "name": "烬径行靴"
+      },
+      "mawscale_pauldrons": {
+        "name": "龙喉鳞护肩"
+      },
+      "gilded_sap_clot": {
+        "name": "鎏金树脂凝块"
+      },
+      "amberfall_sap_bucket": {
+        "name": "采脂桶"
+      },
+      "mere_ferry_lantern": {
+        "name": "渡船提灯"
+      },
+      "orchard_sapbinder_grips": {
+        "name": "缚脂护手"
+      },
+      "mantle_of_the_meredark": {
+        "name": "湖渊暗影披风"
+      },
+      "plump_fen_eel": {
+        "name": "肥美的沼泽鳗鱼"
+      },
+      "wisplight_globe": {
+        "name": "泽光球"
+      },
+      "fenway_mooring_line": {
+        "name": "断掉的系船索"
+      },
+      "bridgemere_toll_chest": {
+        "name": "沉水桥税箱"
+      },
+      "eelskin_mudwaders": {
+        "name": "鳗皮涉泥靴"
+      },
+      "lilybed_mantle": {
+        "name": "莲床披风"
+      },
+      "moonfleece_tuft": {
+        "name": "月绒毛团"
+      },
+      "gloamfield_nightbloom": {
+        "name": "夜绽花"
+      },
+      "vigil_star_chart": {
+        "name": "守望石阵星图"
+      },
+      "barrow_grave_offering": {
+        "name": "散落的墓前祭品"
+      },
+      "moonfleece_mitts": {
+        "name": "月绒连指手套"
+      },
+      "barrowshade_mantle": {
+        "name": "冢影披风"
+      },
+      "widowsilk_skein": {
+        "name": "寡妇丝线束"
+      },
+      "gallowmere_grave_candle": {
+        "name": "墓烛"
+      },
+      "silkbound_remains": {
+        "name": "缚丝遗骸"
+      },
+      "gravebound_silk_wraps": {
+        "name": "缚墓丝裹"
+      },
+      "mantle_of_the_unhorsed": {
+        "name": "落马者披风"
+      },
+      "pearlwake_cargo_crate": {
+        "name": "珠浪号货箱"
+      },
+      "canopy_silk_hank": {
+        "name": "树冠丝束"
+      },
+      "sunken_offering_bowl": {
+        "name": "重新盛满的祭碗"
+      },
+      "saltwalker_sandals": {
+        "name": "踏盐凉鞋"
+      },
+      "sunken_idol_mantle": {
+        "name": "沉没神像披风"
+      },
+      "hedgewick_shears": {
+        "name": "失窃的篱苑修枝剪"
+      },
+      "evergarden_bloom_clipping": {
+        "name": "修剪下的花枝"
+      },
+      "hedgewick_tool_cart": {
+        "name": "翻倒的工具车"
+      },
+      "evergarden_statue_rubbing": {
+        "name": "雕像拓片"
+      },
+      "shearkeeper_gloves": {
+        "name": "持剪人手套"
+      },
+      "fountain_court_mantle": {
+        "name": "喷泉庭院披风"
+      },
+      "galecrest_ram_wool": {
+        "name": "含脂羊毛"
+      },
+      "shear_storm_lantern": {
+        "name": "熄灭的风暴提灯"
+      },
+      "wreckfield_flotsam_crate": {
+        "name": "漂流货箱"
+      },
+      "wickspun_treads": {
+        "name": "烛纺行靴"
+      },
+      "wreck_wardens_mantle": {
+        "name": "沉船守卫披风"
+      },
+      "breakscarred_steel": {
+        "name": "裂隙创痕钢"
+      },
+      "farshore_salt_moss": {
+        "name": "远岸盐苔"
+      },
+      "gullhaven_watchbell": {
+        "name": "海岸警钟"
+      },
+      "saltforged_grips": {
+        "name": "盐锻护手"
+      },
+      "mantle_of_the_unbroken_shore": {
+        "name": "不破之岸披风"
+      },
+      "last_keep_signet": {
+        "name": "最后的堡垒印戒"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
@@ -9919,6 +10453,30 @@ export const zh_CN: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "唤雷者腰甲"
+      },
+      "riding_training": {
+        "name": "骑术训练"
+      },
+      "reins_valorsteed": {
+        "name": "英勇战马的缰绳"
+      },
+      "reins_grag_bear": {
+        "name": "歌利亚格拉格巨熊的缰绳"
+      },
+      "reins_stalkglider_snail": {
+        "name": "苔壳滑行蜗牛的缰绳"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "点火钥匙：以太骑士悬浮机车"
+      },
+      "reins_shadowjump_toad": {
+        "name": "影跃蟾蜍卡玛影的缰绳"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "凌天风暴之羽的缰绳"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "雷霆阔步大火鸡的缰绳"
       }
     },
     "mobs": {
@@ -10168,6 +10726,312 @@ export const zh_CN: EnTranslations = {
       "thunzharr_stormling": {
         "name": "被惊醒的风暴元素"
       },
+      "stable_horse": {
+        "name": "厩马"
+      },
+      "rift_spawnling": {
+        "name": "裂隙孽生体"
+      },
+      "rift_bonewalker": {
+        "name": "复生骨行者"
+      },
+      "rift_frost_revenant": {
+        "name": "霜缚亡魂"
+      },
+      "rift_rime_elemental": {
+        "name": "白霜元素"
+      },
+      "rift_ember_fiend": {
+        "name": "余烬恶鬼"
+      },
+      "rift_magma_brute": {
+        "name": "熔岩蛮兽"
+      },
+      "rift_venom_weaver": {
+        "name": "毒液织网者"
+      },
+      "rift_thornback": {
+        "name": "荆棘潜袭者"
+      },
+      "rift_boneclad": {
+        "name": "骨甲战士"
+      },
+      "rift_marrow_troll": {
+        "name": "骨髓巨魔"
+      },
+      "rift_void_acolyte": {
+        "name": "虚空侍僧"
+      },
+      "rift_dread_stalker": {
+        "name": "恐惧潜猎者"
+      },
+      "rift_storm_caller": {
+        "name": "唤风者"
+      },
+      "rift_stormscale": {
+        "name": "风暴鳞龙"
+      },
+      "rift_tide_thrall": {
+        "name": "潮汐奴仆"
+      },
+      "rift_deep_lurker": {
+        "name": "深渊潜伏者"
+      },
+      "rift_stone_ogre": {
+        "name": "石食人魔"
+      },
+      "rift_boss_frost": {
+        "name": "白霜守望者"
+      },
+      "rift_boss_ember": {
+        "name": "余烬熔炉暴君"
+      },
+      "rift_boss_venom": {
+        "name": "育母维斯卡"
+      },
+      "rift_boss_necro": {
+        "name": "骨领主萨瑞斯"
+      },
+      "rift_boss_brute": {
+        "name": "督军格拉斯克"
+      },
+      "rift_boss_arcane": {
+        "name": "执政官尼克萨里斯"
+      },
+      "rift_boss_storm": {
+        "name": "风暴威洛克"
+      },
+      "rift_boss_tide": {
+        "name": "深渊之喉"
+      },
+      "glimmerwisp": {
+        "name": "微光灵"
+      },
+      "duskwisp": {
+        "name": "暮光灵"
+      },
+      "veiled_stag": {
+        "name": "帷纱雄鹿"
+      },
+      "veiled_doe": {
+        "name": "帷纱雌鹿"
+      },
+      "gleamstag": {
+        "name": "辉光雄鹿"
+      },
+      "sporeling_gatherer": {
+        "name": "孢子人采集者"
+      },
+      "corrupted_sporeling": {
+        "name": "堕落的孢子人"
+      },
+      "mushroom_pixie": {
+        "name": "辉光族小精灵"
+      },
+      "treant_elder": {
+        "name": "树人长者"
+      },
+      "ancient_guardian": {
+        "name": "上古守卫"
+      },
+      "waking_warden": {
+        "name": "苏醒的守望者"
+      },
+      "old_marrowshell": {
+        "name": "老甲髓"
+      },
+      "aurelhorn": {
+        "name": "金角，鹿群之首"
+      },
+      "snowdrift_wolf": {
+        "name": "雪堆狼"
+      },
+      "ice_wisp": {
+        "name": "寒冰微光"
+      },
+      "rime_elemental": {
+        "name": "霜凝元素"
+      },
+      "fen_sprite": {
+        "name": "沼泽小妖"
+      },
+      "frostmane_yeti": {
+        "name": "霜鬃雪人"
+      },
+      "terrace_howler": {
+        "name": "台地嚎兽"
+      },
+      "apprentice_wren": {
+        "name": "学徒雯恩"
+      },
+      "emberwing_drake": {
+        "name": "烬翼幼龙"
+      },
+      "ashbone_raider": {
+        "name": "灰骨掠夺者"
+      },
+      "ashbone_warcaller": {
+        "name": "灰骨战吼者"
+      },
+      "dune_troll": {
+        "name": "沙丘巨魔"
+      },
+      "cindraleth_maw_matriarch": {
+        "name": "辛德拉蕾丝，龙喉之母"
+      },
+      "gilded_stag": {
+        "name": "鎏金雄鹿"
+      },
+      "gloam_fox": {
+        "name": "暮光狐"
+      },
+      "orchard_treant": {
+        "name": "果园树人"
+      },
+      "the_meredark": {
+        "name": "湖渊暗影"
+      },
+      "harvest_sprite": {
+        "name": "丰收小妖"
+      },
+      "mere_lurker": {
+        "name": "湖泽潜伏者"
+      },
+      "bogtoad": {
+        "name": "沼蟾"
+      },
+      "drowsy_croaker": {
+        "name": "瞌睡蛙王"
+      },
+      "lily_wisp": {
+        "name": "睡莲微光"
+      },
+      "willow_sprite": {
+        "name": "柳树小妖"
+      },
+      "moonfleece_grazer": {
+        "name": "月绒兽"
+      },
+      "gloam_strider": {
+        "name": "幽暝疾行者"
+      },
+      "nightkin_stargazer": {
+        "name": "夜裔观星者"
+      },
+      "barrow_king": {
+        "name": "古冢之王"
+      },
+      "barrow_wight": {
+        "name": "古冢尸妖"
+      },
+      "widowsilk_spinner": {
+        "name": "寡妇丝纺蛛"
+      },
+      "wood_wraith": {
+        "name": "林中怨灵"
+      },
+      "gravenbark_shambler": {
+        "name": "墓皮树怪"
+      },
+      "pale_huntsman": {
+        "name": "苍白猎手"
+      },
+      "gravedigger_mosley": {
+        "name": "掘墓人莫斯利"
+      },
+      "tide_scuttler": {
+        "name": "潮汐蟹"
+      },
+      "thicket_boar": {
+        "name": "灌丛野猪"
+      },
+      "canopy_weaver": {
+        "name": "树冠织网蛛"
+      },
+      "idol_guardian": {
+        "name": "神像守卫"
+      },
+      "castaway_navigator": {
+        "name": "领航员苏莉"
+      },
+      "topiary_stag": {
+        "name": "绿雕雄鹿"
+      },
+      "topiary_wolf": {
+        "name": "绿雕之狼"
+      },
+      "hedge_gnome": {
+        "name": "树篱地精"
+      },
+      "hedge_knight": {
+        "name": "晨曦堡骑士"
+      },
+      "the_topiary_bull": {
+        "name": "绿雕公牛"
+      },
+      "moor_ram": {
+        "name": "荒原羊"
+      },
+      "gale_wisp": {
+        "name": "疾风精"
+      },
+      "shoal_scuttler": {
+        "name": "浅滩蟹"
+      },
+      "downs_bandit": {
+        "name": "丘陵强盗"
+      },
+      "wreck_thief": {
+        "name": "沉船窃贼"
+      },
+      "the_wreck_warden": {
+        "name": "沉船守卫"
+      },
+      "drowned_deckhand": {
+        "name": "溺亡水手"
+      },
+      "riftspawn": {
+        "name": "裂生怪"
+      },
+      "breach_wretch": {
+        "name": "裂口恶徒"
+      },
+      "void_stalker": {
+        "name": "虚空潜行者"
+      },
+      "sundered_horror": {
+        "name": "碎裂恐魔"
+      },
+      "fisher_bram": {
+        "name": "渔民布拉姆"
+      },
+      "rift_hellguard": {
+        "name": "地狱卫士"
+      },
+      "rift_pact_acolyte": {
+        "name": "契约侍僧"
+      },
+      "rift_boss_ritualist": {
+        "name": "契约缚身者维尔科尔法师"
+      },
+      "rift_boss_pitlord": {
+        "name": "深渊之主阿兹戈拉斯"
+      },
+      "wildheart_stalker": {
+        "name": "藤爪潜猎者"
+      },
+      "wildheart_ravager": {
+        "name": "血鬃掠夺者"
+      },
+      "wildheart_hexcaller": {
+        "name": "日骨巫咒师"
+      },
+      "wildheart_beastmaster": {
+        "name": "獠牙领主驯兽师"
+      },
+      "wildheart_high_priest": {
+        "name": "盆地之声祖尔加"
+      },
       "ironvein_foreman": {
         "name": "铁脉工头"
       },
@@ -10321,6 +11185,11 @@ export const zh_CN: EnTranslations = {
         "title": "矿井工头",
         "greeting": "整条矿道都爬满了那些沾满泥污的害虫！"
       },
+      "stablemaster_marla": {
+        "name": "玛拉·希琴",
+        "title": "马厩总管",
+        "greeting": "每个骑手都是两条腿走进来的，{className}。你能骑稳英勇战马、不摔进泥里之前，我是不会把缰绳交给你的，高望这儿可没有多余的医者去治断骨。"
+      },
       "warden_fenwick": {
         "name": "芬威克守望者",
         "title": "芬桥守望者",
@@ -10450,6 +11319,246 @@ export const zh_CN: EnTranslations = {
         "name": "编年史者赞茜",
         "title": "荆峰高地编年史",
         "greeting": "高山什么都不会忘记，{playerName}，我也一样。让我看看你都做过什么吧。"
+      },
+      "keeper_saelwyn": {
+        "name": "守护者塞尔文",
+        "title": "幽谷守护者",
+        "greeting": "你的同族鲜少踏足这片树荫，{className}。轻声慢行，欢迎你的到来。"
+      },
+      "loremother_bryn": {
+        "name": "传识之母布琳",
+        "title": "圣祠之声",
+        "greeting": "这山谷里的每一盏光都铭记着什么，{playerName}。帮我听听它们的低语。"
+      },
+      "provisioner_fenna": {
+        "name": "补给员芬娜",
+        "title": "古辉镇补给员",
+        "greeting": "面包还热着，泉水依然甘甜。幽谷有所馈赠，我也一样。"
+      },
+      "wardsmith_orun": {
+        "name": "结界铁匠欧伦",
+        "title": "古炉看守",
+        "greeting": "这些熔炉几百年前就冷了，{className}，但它们锻出的兵刃至今锋利。"
+      },
+      "archivist_tullo": {
+        "name": "档案员图洛",
+        "title": "读石者",
+        "greeting": "外面那些石碑已经许久不曾对人开口。也许它们正等着新的耳朵。"
+      },
+      "huntsman_deral": {
+        "name": "猎人德拉尔",
+        "title": "鹿群守望者",
+        "greeting": "别出声。鹿群熟悉这山谷里的每一种声响，我也一样。"
+      },
+      "warden_kaldra": {
+        "name": "守望者卡尔德拉",
+        "title": "冰幔镇守望者",
+        "greeting": "当心那些雪台，陌生人。雪拿走的东西，从不归还。"
+      },
+      "hearthkeeper_maeve": {
+        "name": "炉火看守梅芙",
+        "title": "炉舍看守",
+        "greeting": "快进来避避寒。只要我还有一口气，炉舍的火就不会熄。"
+      },
+      "scout_einna": {
+        "name": "斥候艾娜",
+        "title": "雪线斥候",
+        "greeting": "你活着走过了隘口。很好。这消息该让冰幔镇知道。"
+      },
+      "aurorist_veyla": {
+        "name": "极光师薇拉",
+        "title": "读光者",
+        "greeting": "安静。今晚极光正在开口，而它们从不重复自己说过的话。"
+      },
+      "trapper_brosk": {
+        "name": "捕兽人布罗斯克",
+        "title": "颤栗沼泽捕兽人",
+        "greeting": "这星期沼泽吞了我三条陷阱线。二十年来它一条都没吞过。"
+      },
+      "gatecaptain_brannoc": {
+        "name": "门队长布兰诺克",
+        "title": "望龙哨指挥官",
+        "greeting": "望龙哨守着这道门。守了四十年。今夜也一样守得住。"
+      },
+      "quartermaster_sela": {
+        "name": "军需官塞拉",
+        "title": "驻军仓库看守",
+        "greeting": "这院子里的每只箱子都是跨过四十里灰烬才到这儿的。对它们好一点。"
+      },
+      "scout_yerrin": {
+        "name": "斥候耶琳",
+        "title": "远丘瞭望者",
+        "greeting": "压低身子。声音在血玻璃上传得很怪，而下面那道门长着耳朵。"
+      },
+      "reeve_ottoline": {
+        "name": "镇务官奥托琳",
+        "title": "灯湖镇镇务官",
+        "greeting": "欢迎来到灯湖镇，这里的丰收永不结束，活计也一样。"
+      },
+      "waywatcher_sorrel": {
+        "name": "望道者索雷尔",
+        "title": "融金隘口守望者",
+        "greeting": "身后是雪，前方是金。走融金隘口第二遍的人不多，所以这一趟要走得值。"
+      },
+      "ferrymaster_caddow": {
+        "name": "渡船长卡多",
+        "title": "灯火渡船看守",
+        "greeting": "大湖又起雾了。水面上的灯笼一灭，聪明人就该待在岸上。"
+      },
+      "orchardist_pomeline": {
+        "name": "果园主帕梅琳",
+        "title": "鎏金果园看守",
+        "greeting": "脚下留神。这些果树的每一条根都比镇子古老，而且它们记性很好。"
+      },
+      "waykeeper_pell": {
+        "name": "道口看守佩尔",
+        "title": "琥珀沼石阶看守",
+        "greeting": "沿石阶而下就是那片松软的水乡。落脚的地方可要看仔细。"
+      },
+      "bridgewright_alden": {
+        "name": "桥匠奥尔登",
+        "title": "沼道之主",
+        "greeting": "镇上每一块木板都归我照管，而沼泽正啃着它们每一块。"
+      },
+      "netter_maris": {
+        "name": "网夫马里斯",
+        "title": "桥湖镇捕鳗人",
+        "greeting": "闻到了吗？熏鳗鱼。这镇子有一半的木桩都是我拿它换来的。"
+      },
+      "mother_sedge": {
+        "name": "莎草婆婆",
+        "title": "柳泣泽的沼泽女巫",
+        "greeting": "你的靴子还没离开桥面，柳树就已告诉我你要来了。"
+      },
+      "lamplighter_sorrel": {
+        "name": "点灯人索雷尔",
+        "title": "夜门看守",
+        "greeting": "留意这些灯，朋友。过了这道门，太阳就放弃了，接班的是花。"
+      },
+      "lira_dewsong": {
+        "name": "莉拉·露歌",
+        "title": "月栖镇夜园丁",
+        "greeting": "欢迎来到月栖镇，在这里，替我们迎来黎明的是花。"
+      },
+      "weaver_amelle": {
+        "name": "织工艾梅尔",
+        "title": "月绒织工",
+        "greeting": "摸摸看？织机上的月绒。比你烤过的任何炉火都暖。"
+      },
+      "astronomer_cassian": {
+        "name": "天文学者卡西安",
+        "title": "守望石阵观测者",
+        "greeting": "轻声些。这里的天空从无黎明，所以它也从不停止诉说。"
+      },
+      "lampman_cobb": {
+        "name": "灯夫科布",
+        "title": "鸦门灯火看守",
+        "greeting": "待在灯光里，朋友。这片林子数着每一个过门的人。"
+      },
+      "sexton_marrow": {
+        "name": "司墓人马罗",
+        "title": "绞湖镇司墓人",
+        "greeting": "在这里我们把死者埋得很深，还要敲响钟声，好让他们记得安分躺着。"
+      },
+      "widow_tansy": {
+        "name": "遗孀坦茜",
+        "title": "绞湖镇制烛人",
+        "greeting": "每座坟一支蜡烛，一支也不许熄。一支也不许，你听清了吗？"
+      },
+      "vicar_creel": {
+        "name": "牧师克里尔",
+        "title": "哀石礼拜堂最后的牧师",
+        "greeting": "礼拜堂多年前就塌了。堂下的亡者浑然不觉，于是我留了下来。"
+      },
+      "strandwatcher_pell": {
+        "name": "滩岸守望者佩尔",
+        "title": "缠木隘口守望者",
+        "greeting": "总算走出那片黑树林了。喘口气吧，陌生人，隘口这一侧还归太阳管。"
+      },
+      "salvage_boss_ryna": {
+        "name": "打捞头目莱娜",
+        "title": "沉船线女主人",
+        "greeting": "一位胳膊还能使唤的{className}，好。沉船线上的报酬不薄，前提是螃蟹给你留下够数钱的手指。"
+      },
+      "pearlmother_isha": {
+        "name": "珍珠之母伊莎",
+        "title": "采珠人长老",
+        "greeting": "海会给予，沙会保存，丛林只会夺取。待在沙滩上吧，陌生人。"
+      },
+      "hermit_okku": {
+        "name": "奥库",
+        "title": "走进丛林的人",
+        "greeting": "安静。鼓声数着树下走过的一切，而它们已经数到了你。"
+      },
+      "gatewarden_pell": {
+        "name": "门卫佩尔",
+        "title": "花园之门看守",
+        "greeting": "在草坪上走路当心些。花园亲自修剪它们，也喜欢它们整整齐齐。"
+      },
+      "head_gardener_amaranth": {
+        "name": "园丁长阿玛兰丝",
+        "title": "常青园园丁长",
+        "greeting": "别在意我眼下的阴影。花园做梦的时候，总得有人醒着。"
+      },
+      "wickmother_sorrel": {
+        "name": "烛芯大娘索雷尔",
+        "title": "篱苑旅店老板娘",
+        "greeting": "进来坐吧，火上温着甜酒。只是铁器都看牢些：那帮地精最近手脚不太干净。"
+      },
+      "gardener_yew": {
+        "name": "园丁尤伊",
+        "title": "最后的园丁",
+        "greeting": "把那辆手推车递给我，好吗？不管小镇怎么想，这些草坪总得有人走上一遍。"
+      },
+      "watcher_maren": {
+        "name": "瞭望者玛伦",
+        "title": "风道岗哨",
+        "greeting": "过了门就看稳脚下。这上头的风先抢帽子，从不问话。"
+      },
+      "harbormaster_odile": {
+        "name": "港务长奥黛尔",
+        "title": "烛港港务长",
+        "greeting": "这湾里每一条船的龙骨都欠着老灯塔的情。有话快说，潮水可不等人。"
+      },
+      "keeper_bram": {
+        "name": "守灯人布拉姆",
+        "title": "老灯塔守灯人",
+        "greeting": "这盏灯在我手上烧了三十九年。它不会在你来的这天熄灭。"
+      },
+      "salvager_edda": {
+        "name": "打捞者艾妲",
+        "title": "沉船滩打捞者",
+        "greeting": "沉船木、缆绳，还有死人的货。大海付我工钱，只要沉船守卫肯放行。"
+      },
+      "warden_coalfast": {
+        "name": "守望者·煤耐",
+        "title": "堡垒指挥官",
+        "greeting": "裂隙才不管鸥港有多小，{className}。我们守住这片海岸，否则就再没有海岸可守。与我们并肩而战，我不会忘记你的付出。"
+      },
+      "riftwatch_ollun": {
+        "name": "裂察·奥伦",
+        "title": "裂隙学者",
+        "greeting": "每道裂隙开启之前都会歌唱，只要你有听它的耳朵。此刻我能听见岛上三道裂隙正在骚动，其中一道就在近处。"
+      },
+      "quartermaster_edda": {
+        "name": "军需官·艾达",
+        "title": "堡垒军械师",
+        "greeting": "钢铁与海盐，{className}，这就是我还能发给你的全部了。拿上它，让那些裂隙后悔在我够得着的地方裂开。"
+      },
+      "mender_saul": {
+        "name": "疗愈者·索尔",
+        "title": "战地外科医",
+        "greeting": "这一个月里我接的骨头，比过去十年医治渔民跌伤加起来还多。裂隙夺走的东西，很少留下什么。若你办得到，就囫囵着回来见我。"
+      },
+      "bellkeeper_tam": {
+        "name": "守钟人·塔姆",
+        "title": "警钟守",
+        "greeting": "这口钟，是裂隙留给我们的唯一预警，{className}。一声,是田野;两声,是断崖;三声,便是它已近得逃也无用。留心听着,它或许能保你全身。"
+      },
+      "fisher_nell": {
+        "name": "受惊的奈尔",
+        "title": "鸥港渔民",
+        "greeting": "它就在晾网的地方裂开了。就在那儿，我这辈子每天清晨都站着的地方。我再也不下到海岸去了。如今我哪儿都不太去了。"
       },
       "forgemistress_darva": {
         "name": "达尔瓦锻造师",
@@ -11420,6 +12529,192 @@ export const zh_CN: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "骑术课",
+        "text": "每个骑手都是两条腿走进来的，{playerName}，就像我们初次见面那天我说的那样。交上学费，等我发话，就把训练用的英勇战马唤到身边，翻身上鞍。然后跑完赛道：跟着标记到起点拱门，把每一道障碍都跳得干净利落，在沙子漏尽之前再次冲过终点线。做到了，这鞍子就是你的。要是跑出围场，我们就从头再来。",
+        "completion": "好了，就是这样。一个利落的动作上了鞍，坐得稳稳当当。英勇战马现在是你的了，{playerName}：马鞍、缰绳，还有靠本事挣来而不是买来的骑手身份。",
+        "objectives": {
+          "0": {
+            "label": "驯服英勇战马"
+          }
+        }
+      },
+      "q_veil_thinned": {
+        "title": "稀薄的帷幕",
+        "text": "洞穴竟为你敞开了。那么封印比我担心的还要脆弱，{playerName}。帷幕撕裂之处，光灵会变得阴冷黑暗。给我带来八份暮光灵的精华，我便能读出这道伤口有多深。",
+        "completion": "每一份都是冰冷的。幽谷也许只剩一个季节，裂缝就会变成裂谷。你我有得忙了。",
+        "objectives": {
+          "0": {
+            "label": "暮光灵精华"
+          }
+        }
+      },
+      "q_gleaming_antlers": {
+        "title": "辉光鹿角",
+        "text": "帷纱雄鹿在吃草的地方洒下微光，它们蜕下的鹿角能把光留住许多年。从星落盆地的鹿群那里取来五支，我的灯笼整个冬天都不用点油。不必伤害雄鹿，但它们也不会轻易相让。",
+        "completion": "看它们把光留得多好！没有火焰，没有烟，只有光。幽谷自有馈赠。",
+        "objectives": {
+          "0": {
+            "label": "辉光鹿角"
+          }
+        }
+      },
+      "q_wisp_lights": {
+        "title": "浅滩之光",
+        "text": "微光灵身上带着幽谷封印之时落下的古老星光。六粒光尘，圣祠的灯便能燃上一年。只取那些将熄的，幽谷的馈赠足够，无需贪求。",
+        "completion": "柔和得像最初的星辰。放在祭坛边吧，圣祠会完成剩下的事。",
+        "objectives": {
+          "0": {
+            "label": "光尘"
+          }
+        }
+      },
+      "q_calming_the_deep": {
+        "title": "安抚幽深",
+        "text": "辉光深处的孢子人本是温和的族群，直到裂缝触到了他们的蘑菇环。被侵蚀夺走的，再也不会归还。让堕落者安息吧，{playerName}：深处北面，十个。",
+        "completion": "你做了我不忍做的事。南边的采集者还在歌唱；因为你，他们能一直唱下去。",
+        "objectives": {
+          "0": {
+            "label": "堕落的孢子人：已安息"
+          }
+        }
+      },
+      "q_spore_hearts": {
+        "title": "蘑菇环之心",
+        "text": "孢子人堕入黑暗后，心脏仍靠借来的阴影跳动。四颗这样的心，在圣祠净化后，能让我们弄清侵蚀如何蔓延。这活计残酷，{playerName}，却是修补之工。",
+        "completion": "好了。净化了，也安静了。每一颗都指向同一处：阴影来自沉没王庭。去告诉塞尔文。",
+        "objectives": {
+          "0": {
+            "label": "孢子之心"
+          }
+        }
+      },
+      "q_monument_tour": {
+        "title": "石碑的记忆",
+        "text": "封印之前的石碑还立着三座：一座在暮落瞭望台，一座在沉没王庭，还有一座失落在无人行走的东北角。替我读一读它们，{playerName}。我的膝盖两百年前就爬不动台阶了。",
+        "completion": "瞭望台、王庭、被遗忘的角落……封印之歌的三段歌词，自吟唱之日起第一次重聚。你让一个老读者非常快乐。",
+        "objectives": {
+          "0": {
+            "label": "已读瞭望台石碑"
+          },
+          "1": {
+            "label": "已读王庭石碑"
+          },
+          "2": {
+            "label": "已读遗忘石碑"
+          }
+        }
+      },
+      "q_grove_menace": {
+        "title": "林间之患",
+        "text": "入夜后暮光灵开始在我的摊位间游荡，{playerName}，它们的寒气碰什么坏什么。替我清一清：十只，哪里帷幕破了就去哪里。",
+        "completion": "夜市又能开张了。你有一位终身顾客，至少也有个折扣。",
+        "objectives": {
+          "0": {
+            "label": "已驱散暮光灵"
+          }
+        }
+      },
+      "q_shards_of_starfall": {
+        "title": "星落碎片",
+        "text": "暮光灵飘过水晶原野时，古老星光的碎屑会像芒刺般附在它们身上。六枚碎片，{playerName}，我就能把封印的年代精确到吟唱的那个季节。",
+        "completion": "看这些纹理！秋天。幽谷是在秋天被封印的。两百年的争论，被六块小石头了结。",
+        "objectives": {
+          "0": {
+            "label": "星落碎片"
+          }
+        }
+      },
+      "q_treant_accord": {
+        "title": "树人之约",
+        "text": "树荫长者们的根被侵蚀啃噬，外层树皮纷纷剥落。四段树皮，我就能为整片林地熬制药膏。你去撬树皮时它们不会道谢，{playerName}，但它们会因此多站立一个世纪。",
+        "completion": "四段都厚实完好。药膏要熬一个星期，药效要过一百年才算完。树木衡量善意的方式不一样。",
+        "objectives": {
+          "0": {
+            "label": "长者树皮"
+          }
+        }
+      },
+      "q_spore_tide": {
+        "title": "抵御孢子之潮",
+        "text": "药膏守住了林地，但每到黄昏，侵蚀就把深处逼得更紧。还要让十二个堕落者安息，采集者们才能夺回北面的蘑菇环，{playerName}。",
+        "completion": "今夜北面的蘑菇环又在歌唱了。轻轻地，但在歌唱。",
+        "objectives": {
+          "0": {
+            "label": "堕落的孢子人：已安息"
+          }
+        }
+      },
+      "q_sunken_court": {
+        "title": "沉没王庭",
+        "text": "布琳读得没错：裂缝贯穿东边的古老王庭，而它的守卫醒得不对了。它们本是为守护封印而造；如今却会碾碎任何靠近的人。清除废墟中的八座。",
+        "completion": "八座守卫，归于沉寂。我还记得它们被立起来的时候，{playerName}。别这么惊讶；幽谷让它的守护者活得很久。",
+        "objectives": {
+          "0": {
+            "label": "上古守卫：已沉寂"
+          }
+        }
+      },
+      "q_wardens_echoes": {
+        "title": "守望者的回响",
+        "text": "主人虽已沉默，王庭的守卫仍在重复它最后的命令，像一道不肯消散的回声。封印一日不归位，它们就会不断苏醒，{playerName}。再平息十座，石匠们才能抵达封印石。",
+        "completion": "回声一次比一次微弱。很快王庭就只剩下风和常春藤，废墟本该如此。",
+        "objectives": {
+          "0": {
+            "label": "上古守卫：已沉寂"
+          }
+        }
+      },
+      "q_waking_warden": {
+        "title": "苏醒的守望者",
+        "text": "王庭安静了，它的主人却没有。持守封印的守望者在扭曲中苏醒，它不倒下，封印就无法修复。这一战不会轻松；能找到一个朋友就带上一个，{playerName}。能找到两个就带上两个。",
+        "completion": "它钟鸣般的嗓音沉寂了。我在这里都感觉到了，像有重担从整座山谷卸下。",
+        "objectives": {
+          "0": {
+            "label": "已击败苏醒的守望者"
+          }
+        }
+      },
+      "q_seal_restored": {
+        "title": "封印重铸",
+        "text": "带上守望者之印，去王庭中心的封印石那里，把它放回被击落的位置。那时幽谷便能开始愈合，而你，{playerName}，将完成你的同族从未做到的事。",
+        "completion": "我在这里感觉到它合拢了，温柔如暮色。幽谷会记得它的朋友，{playerName}。无论你走多远，大树下总会为你留一盏灯。",
+        "objectives": {
+          "0": {
+            "label": "封印已放回封印石"
+          }
+        }
+      },
+      "q_hollow_the_huntsman": {
+        "title": "鹿群守望者",
+        "text": "你看着可不像只能对付光灵的人，{playerName}。猎人德拉尔在东边的雄鹿草甸间守着他的瞭望哨，这几周他一直在打听有没有能干的帮手。不管他在那边追踪的是什么，他都不肯在村子里说出口。",
+        "completion": "芬娜派你来的？好。那就是说她信得过你，而我这里有两个需要划掉的名字。",
+        "objectives": {
+          "0": {
+            "label": "找到猎人德拉尔"
+          }
+        }
+      },
+      "q_hollow_old_marrowshell": {
+        "title": "浅滩老甲",
+        "text": "第一个名字是老甲髓，一只货车大小的螃蟹，早在古辉镇还没有大门的年月，它就在东边的浅滩里捕猎了。它四处游走，{playerName}，所以你得沿着岸线走，直到撞上它的行迹。不要独自前往，也不要相信它的静止。",
+        "completion": "浅滩又只是一片水了。我亲眼见过那只甲壳磕碎比我更好的猎手，{playerName}。但没能磕碎你。",
+        "objectives": {
+          "0": {
+            "label": "已击杀老甲髓"
+          }
+        }
+      },
+      "q_hollow_first_of_the_herd": {
+        "title": "鹿群之首",
+        "text": "第二个名字更难说出口。我祖母守这座瞭望哨的年月，金角就已统领着这些鹿群，而幽谷中苏醒的那个东西，把他唤醒错了。他践踏着自己曾经守护的一切，鹿群熬不过他的疯狂。他在旧王庭道路附近的草甸上游荡。仁慈地终结他吧，{playerName}，再带上一个朋友，分担这份重量。",
+        "completion": "于是鹿群之首倒在了最后。鹿群已经安定了些，你感觉到了吗？你今天为幽谷做了一件善事，哪怕它看上去不像。",
+        "objectives": {
+          "0": {
+            "label": "已让金角安息"
+          }
+        }
+      },
       "q_prof_hobby_switch": {
         "title": "别样消遣",
         "text": "主修技艺需要誓言。爱好只问你的好奇心将去往何处，{playerName}。采集一些草药，然后决定要钻研哪一门与主修技艺相对的手艺。",
@@ -11427,6 +12722,916 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "采集草药丛"
+          }
+        }
+      },
+      "q_fv_snowline_report": {
+        "title": "雪线来讯",
+        "text": "每一个从龙裔荒原爬上来的人都会经过我的火堆，{playerName}，而一周比一周人少。守望者卡尔德拉守着北路上头的冰幔镇。告诉她隘口还开着，再告诉她，有个陌生人独自走完了它。",
+        "completion": "这么说，隘口还守得住。艾娜守着那处驿营，熬过一场场埋掉路标的风雪，从没给我送来过一句废话。欢迎来到冰幔镇，{playerName}。",
+        "objectives": {
+          "0": {
+            "label": "向守望者卡尔德拉报到"
+          }
+        }
+      },
+      "q_fv_wolves_at_the_door": {
+        "title": "门前之狼",
+        "text": "雪堆狼群从前只在高处的雪台活动。如今它们大白天就横穿冰川湖路，我的樵夫们不肯出墙了。削减狼群吧，{playerName}，十头，路就又是路了。",
+        "completion": "从这里到冰川湖之间少了十条影子。樵夫们已经在争谁第一个出门了。",
+        "objectives": {
+          "0": {
+            "label": "已击杀雪堆狼"
+          }
+        }
+      },
+      "q_fv_winter_pelts": {
+        "title": "炉舍的毛皮",
+        "text": "柴火能吊住一条命，{playerName}，可这样的冷，羊毛挡不住，只有狼皮挡得住。从雪堆狼群身上取六张厚实的冬季毛皮来，我就能给炉舍收留的每个人都衬一床铺盖。",
+        "completion": "这样的毛皮，是冬天唯一听得进的道理。收下这双行靴吧，里子就是用上一批衬的。",
+        "objectives": {
+          "0": {
+            "label": "厚实的冬季毛皮"
+          }
+        }
+      },
+      "q_fv_ember_caches": {
+        "title": "湖路上的火种",
+        "text": "昨夜一架运火种罐的雪橇在冰川湖路上翻了：那是些铁罐，封好的火种能在里头活上一个月。还有三只躺在雪里，{playerName}，罐里的东西炉舍一点也损失不起。把火带回家。",
+        "completion": "每一只都还温着。你为炉舍换来了整整一冬的仁慈，{playerName}。",
+        "objectives": {
+          "0": {
+            "label": "已寻回火种罐"
+          }
+        }
+      },
+      "q_fv_lights_over_steps": {
+        "title": "台阶上的极光",
+        "text": "这个月，极光夜夜烧成绿色，老人们都不肯从它底下走了。有一个女人也许知道缘由：薇拉，那位极光师。她独自在极光台阶上扎营，过了冰川湖再往东南。找到她的营地，{playerName}，听听极光都对她说了什么。",
+        "completion": "卡尔德拉派你来的？那她总算是担心了，而她担心得对。坐吧，{playerName}。陪我看一会儿天。",
+        "objectives": {
+          "0": {
+            "label": "找到极光师薇拉"
+          }
+        }
+      },
+      "q_fv_silent_trapline": {
+        "title": "沉默的陷阱线",
+        "text": "老布罗斯克在西边经营着颤栗沼泽的陷阱线，十一年来，每周都有一捆毛皮跟着运柴雪橇送上来。可这两周，什么也没有。他犟得冻不死，仔细得淹不着，{playerName}，所以出岔子的是别的事。去沼泽找到他的营地，亲眼看看他还喘着气。",
+        "completion": "梅芙派你来的？哈。十一年了，那女人还当沼泽会吃了我。唔……今年她也许还真说对了。看看它把我的陷阱线糟蹋成什么样了。",
+        "objectives": {
+          "0": {
+            "label": "找到捕兽人布罗斯克"
+          }
+        }
+      },
+      "q_fv_aurora_motes": {
+        "title": "极光微尘",
+        "text": "这片台阶上漂浮的光灵是极光亲自洒落的，每一只心里都揣着一粒极光的微尘。我需要六粒，才能读出天空正在书写的东西，{playerName}。光灵不会还手。这让活计更轻松还是更沉重，就看你和你的良心怎么商量了。",
+        "completion": "六粒微尘，还亮着。看看它们，{playerName}：它们的明灭彼此同步。极光不是天象。是信号。",
+        "objectives": {
+          "0": {
+            "label": "极光微尘"
+          }
+        }
+      },
+      "q_fv_rime_unbound": {
+        "title": "脱缚之霜",
+        "text": "极光烧得这么亮的时候，寒冷就会站起来行走：霜凝元素，被赋予了意志的霜。它们聚在极光触到雪台的地方，一夜比一夜游荡得离我的营地更近。拆散八个吧，{playerName}，别等哪一个先拆散我。",
+        "completion": "夜色已经显得稀薄了些。唤醒它们的东西还没有罢手，但你为台阶换来了一阵安宁。",
+        "objectives": {
+          "0": {
+            "label": "已击杀霜凝元素"
+          }
+        }
+      },
+      "q_fv_sprung_traps": {
+        "title": "陷阱里的小妖",
+        "text": "是沼泽小妖，{playerName}。这帮小恶棍拿触发我的陷阱当消遣，还把铁夹子撒进芦苇丛。赶走它们，八个就够给其余的上一课，出门在外时顺手把我陷阱线剩下的家当也收拢回来。",
+        "completion": "四只好夹子回来了，芦苇丛也安静了。你下手比我这个捕兽人还重，{playerName}，可结果摆在这儿，我没什么好争的。",
+        "objectives": {
+          "0": {
+            "label": "已赶走沼泽小妖"
+          },
+          "1": {
+            "label": "已寻回捕兽夹"
+          }
+        }
+      },
+      "q_fv_howl_above": {
+        "title": "台地上的嚎叫",
+        "text": "黄昏时你也听见了吧，{playerName}：呼啸台地上传来的嚎叫，不是雪堆狼群的声音。喉咙更大。台地嚎兽下了峰顶，这是自我祖母执掌这个哨位以来的头一遭，把狼群挤上我这条路的正是它们。除掉八头，把它们赶回去。",
+        "completion": "八头，黄昏的合唱也单薄了几分。可嚎兽不会平白无故离开峰顶。上头有什么东西挪动了它们，而我担心那东西有名有姓。",
+        "objectives": {
+          "0": {
+            "label": "已击杀台地嚎兽"
+          }
+        }
+      },
+      "q_fv_seeing_wren_home": {
+        "title": "送雯恩回家",
+        "text": "我的学徒雯恩两天前出门去巡融金线，就再没回来。我找到了她的足迹，她正躲在极光台阶西南边的路标底下，怕狼怕得不敢挪窝。我离不开这片沼泽，{playerName}。送她去台阶上薇拉的营地吧。在极光底下她会安全的。",
+        "completion": "姑娘已经在帐里了，裹着我一半的毯子，叽叽喳喳快把星星都聊下来了。你今天做了件善事，{playerName}。这样的事，霜幕之境可不多见。",
+        "objectives": {
+          "0": {
+            "label": "已护送学徒雯恩平安抵达极光台阶"
+          }
+        }
+      },
+      "q_fv_frostmane_tyrant": {
+        "title": "霜鬃暴君",
+        "text": "嚎兽们下台地时并不是在狩猎。它们是在逃。一头雪人占下了高地，山民管它叫霜鬃，连狼群都不肯和它同处一面山坡。必须了结它，{playerName}，赶在寒冬把它逼下我的城墙之前。带上一个朋友。带上两个。",
+        "completion": "昨夜风一停，全村人都听见了霜鬃从前盘踞之处的那片寂静。霜幕之境欠你一笔要还上好些年的债，{playerName}。披上这个，冰幔镇的每一扇门都为你敞开。",
+        "objectives": {
+          "0": {
+            "label": "已击杀霜鬃"
+          }
+        }
+      },
+      "q_dk_ash_on_the_wind": {
+        "title": "风中之烬",
+        "text": "到栅墙上朝南看看，{playerName}。沙丘里那些火光不是巨魔的炊火，是灰骨大军的集结火，而且一夜多过一夜。死者从白骨之地里爬出来，牙缝里还嵌着沙。砍倒十个掠夺者，别让他们先砍出一条通向我大门的路。",
+        "completion": "沙丘里少了十把刀，昨夜的集结火也黯了几分。我的哨兵们睡上了觉，这可是一周来的头一回。砍得漂亮，{playerName}。",
+        "objectives": {
+          "0": {
+            "label": "已击杀灰骨掠夺者"
+          }
+        }
+      },
+      "q_dk_trolls_on_the_road": {
+        "title": "路上的巨魔",
+        "text": "沙丘巨魔已经听熟了补给马车的声响，{playerName}。这个月它们在烬沙丘的路上抢了三回，最后那位车夫走回来时手里只剩缰绳。从那条路上除掉八头巨魔，我的车队就能重新上路。",
+        "completion": "八头，我的车夫们出车前也不再先写诀别信了。驻军能吃上饭，全靠你，{playerName}。",
+        "objectives": {
+          "0": {
+            "label": "已击杀沙丘巨魔"
+          }
+        }
+      },
+      "q_dk_scorched_stores": {
+        "title": "烧焦的补给",
+        "text": "上一辆马车烧了，{playerName}，可包铁的箱子烧不穿。四只箱子还焦黑地躺在沙丘路边，里头装着一季的盐、钉子和弓弦。趁巨魔还没琢磨出怎么开箱，把我的补给运回家。",
+        "completion": "焦得漆黑，锁扣却一只没坏。铁匠有了钉子，制箭师有了弓弦，而你得到这双靴子，本就是留给把箱子带回来的人的，{playerName}。",
+        "objectives": {
+          "0": {
+            "label": "已寻回烧焦的补给箱"
+          }
+        }
+      },
+      "q_dk_banners_over_the_dunes": {
+        "title": "沙丘上的旗帜",
+        "text": "灰骨大军在白骨旧冢集结，{playerName}，而我的巡逻队读沙丘不像读城墙那样在行。杀掉五个战吼者，就是那些把死者吼得站起来的家伙，再在每处集结地插上一面警示旗，好让我的哨兵能从山脊上认出它们。",
+        "completion": "三面旗在热风里猎猎作响，正插在我的望远镜找得到的地方。五个战吼者闭了嘴，无论什么会应他们的召唤，来得都会慢一些。你为我们争到了时间，{playerName}。",
+        "objectives": {
+          "0": {
+            "label": "已击杀灰骨战吼者"
+          },
+          "1": {
+            "label": "已插上警示旗"
+          }
+        }
+      },
+      "q_dk_watcher_at_the_wargate": {
+        "title": "战门前的瞭望者",
+        "text": "有什么正把灰骨大军往东牵引，{playerName}，我派了手下最好的人去查。斥候耶琳在巨魔集会以外的远沙丘里扎营一个月了，营地正望着一道我此生从未见人修起的门。她的回报十天前断了。找到她的营地，把她看到的带回来给我。",
+        "completion": "布兰诺克派你来的？那就是说我最后一个传令兵没能回去。压低声音坐下吧，{playerName}。看见下面那道门了？数数门前的战旗，你就明白我为什么不再写报告了。",
+        "objectives": {
+          "0": {
+            "label": "找到斥候耶琳"
+          }
+        }
+      },
+      "q_dk_marrow_and_ash": {
+        "title": "骨髓与灰烬",
+        "text": "每个灰骨掠夺者都带着一枚战印，{playerName}：一块灼痕烙出的计数牌，记着它所属的军团。从这道山脊上我数出了四个军团，可猜测算不得情报。从掠夺者和战吼者身上取六枚战印来，我就能让布兰诺克看清这场将至之战的轮廓。",
+        "completion": "六枚战印，每一枚上都烙着同一个记号。这不是打劫的集结，{playerName}。沙丘里的每个军团都听命于我们下方那道战门，巨魔管它叫奥卡迪亚，而我共事过的士兵里，凑不出五个能撼动门后那阵战鼓的。也许五个像你这样的人可以。",
+        "objectives": {
+          "0": {
+            "label": "灰骨战印"
+          }
+        }
+      },
+      "q_dk_scales_of_the_maw": {
+        "title": "龙喉之鳞",
+        "text": "每当风从龙喉吹下来，烬翼幼龙就会乘着风掠过我的营地，低得能数清它们的牙，{playerName}。它们一天比一天飞得远，而火山口里有什么东西在驱使它们。给我带三片它们的鳞来。鳞片记得热度，凭灼痕我就能读出一头幼龙栖息过的地方。",
+        "completion": "看看这片的背面，{playerName}：灼痕呈螺旋状，而只有一种东西会绕着圈筑巢。这些幼龙是护巢的。龙喉里的那个东西，是一位母亲。",
+        "objectives": {
+          "0": {
+            "label": "烬翼龙鳞"
+          }
+        }
+      },
+      "q_dk_matriarch_of_the_maw": {
+        "title": "龙喉之母",
+        "text": "鳞片没有说谎，{playerName}。拂晓时我爬上火山口边缘，看见她就伏在火山口底：辛德拉蕾丝，这片天空中每一头烬翼幼龙都是在她的羽翼下孵出的，通体金黄，像一块将燃未燃的炭。只要她还在孵巢，幼龙就会越来越大胆，而望龙哨没法同时对付巨龙和灰骨大军。在她的火山口里终结她，然后把消息带给门队长布兰诺克。不要独自前往。",
+        "completion": "龙喉上空已经空了两天，而此刻你踏进我的大门，靴上还沾着龙母的血。望龙哨四十年的守望，等的正是这一天，{playerName}。收下这对护肩吧，龙喉之鳞所制，出自我们自己的铁匠之手。戴上它，走到幼龙看得见的地方去。",
+        "objectives": {
+          "0": {
+            "label": "已击杀龙喉之母辛德拉蕾丝"
+          }
+        }
+      },
+      "q_af_goldmelt_road": {
+        "title": "下山的金路",
+        "text": "你翻过了融金隘口，{playerName}，靴子上还沾着雪。我守着这座小神龛，好让灯湖镇知道都有谁从寒地走进来，而近来我几乎无事可报。沿着金色大道下山进镇，到水井边找镇务官奥托琳，告诉她隘口一切平静。",
+        "completion": "融金隘口平静无事，还有一位发间带雪的旅人可以作证。索雷尔的岗从不虚报。欢迎来到灯湖镇，{playerName}。这里的灯笼为你而亮。",
+        "objectives": {
+          "0": {
+            "label": "向镇务官奥托琳报到"
+          }
+        }
+      },
+      "q_af_foxes_in_the_lamplight": {
+        "title": "灯火中的狐狸",
+        "text": "暮光狐已经摸清了灯料仓库的价值，{playerName}。每到黄昏，它们就溜过栅栏，叼走我们为渡船灯压制的油脂。爪子轻，良心更轻。除掉十只，其余的就会重新记起要怕这座镇子。",
+        "completion": "十只，而昨夜的仓库这一季头一次分毫未失。点灯人们托我向你道谢，{playerName}。",
+        "objectives": {
+          "0": {
+            "label": "已击杀暮光狐"
+          }
+        }
+      },
+      "q_af_lanterns_on_the_water": {
+        "title": "水上的灯火",
+        "text": "大湖上的每条渡船都挂着一盏船尾灯，{playerName}，而今天拂晓，我有三条船回来时灯不见了。是雾拿走了它们，或者是雾里的什么东西。风向一转，它们就会被冲上东岸。沿着湖岸路走一遭，把我的灯带回家。",
+        "completion": "三盏俱全，而且还亮着。渡船灯在水里也不会熄，{playerName}。它们生来如此。让我担心的，是究竟什么把它们扯了下来。",
+        "objectives": {
+          "0": {
+            "label": "已寻回渡船提灯"
+          }
+        }
+      },
+      "q_af_orchard_call": {
+        "title": "果园的货车",
+        "text": "果园主帕梅琳照看着西路上的鎏金果园，她的树脂货车已经迟了三天。全镇都靠那种琥珀树脂过活，{playerName}：灯用树脂、甜料，还有丰收麦酒。沿西路走一趟，看看是什么绊住了她。",
+        "completion": "镇务官在数她的货车，是吗？那就让她再多数几天空缺吧。看看我的果林，{playerName}。比起迟到的货，我有更大的麻烦。",
+        "objectives": {
+          "0": {
+            "label": "找到果园主帕梅琳"
+          }
+        }
+      },
+      "q_af_amber_from_the_herd": {
+        "title": "鹿群身上的琥珀",
+        "text": "鎏金雄鹿总在我最老的果树下过夜，树脂整晚滴落，把金色淌进它们的皮毛。梳下来的凝块是整片林地最纯的琥珀。给我带六块来，{playerName}。雄鹿不会谢你，但也不会心疼这点东西。",
+        "completion": "六块凝块，干净得像刚倒出的蜂蜜。这双护手就是用上一批缝的，{playerName}：树脂浸硬，比看上去暖和得多。",
+        "objectives": {
+          "0": {
+            "label": "鎏金树脂凝块"
+          }
+        }
+      },
+      "q_af_what_took_the_moorings": {
+        "title": "是什么咬断了缆绳",
+        "text": "现在我要告诉你我没在镇上人面前说的话。那些缆绳不是松脱的，是被咬断的。湖泽潜伏者一晚比一晚大胆，拖拽着缆绳和船舵。让八只永远沉回水底吧，{playerName}，别等哪个船夫跟着一起沉下去。",
+        "completion": "浅水里少了八条影子，今天的渡船两周来头一次准点。可潜伏者变得大胆，是因为有东西在驱赶它们，{playerName}。大湖底下有什么正在搅动。",
+        "objectives": {
+          "0": {
+            "label": "已击杀湖泽潜伏者"
+          }
+        }
+      },
+      "q_af_sprites_and_spigots": {
+        "title": "小妖与采脂桶",
+        "text": "是丰收小妖，{playerName}。它们为了里头的甜汁把采脂嘴从树干上撬下来，还把桶子扔进草丛。赶走八个小贼，找回我的四只桶，货车就能重新上路。",
+        "completion": "四只桶重新挂回了钩子，果林也安静了。你对付小妖的手比我重得多，{playerName}，而今天我为此庆幸。",
+        "objectives": {
+          "0": {
+            "label": "已赶走丰收小妖"
+          },
+          "1": {
+            "label": "已找回采脂桶"
+          }
+        }
+      },
+      "q_af_the_meredark": {
+        "title": "湖渊暗影",
+        "text": "老船夫们有一个只敢在岸上说的名字：湖渊暗影，第一头潜伏者，和湖一样古老，耐心还要多上一倍。它从前浮起过一次，就在沉没栈桥没入水中的那一年，而如今它又在上浮。黄昏时分，它会趴在南岸外的栈桥残骸上晒着余晖，{playerName}。带上一个朋友，带上两个，趁它还能被终结时终结它。",
+        "completion": "今天清晨，大湖上的雾散了，{playerName}，全镇的人都看见了。夜渡将会重开，水面上的每一盏灯都将为你的名字而亮。收下这个：它是从沉没栈桥打捞上来的，没有人比你更有资格披上它。",
+        "objectives": {
+          "0": {
+            "label": "已击杀湖渊暗影"
+          }
+        }
+      },
+      "q_wf_across_the_fenway": {
+        "title": "跨过沼道",
+        "text": "柳泽沼地是片温柔的水乡，可温柔不等于安全，{playerName}。沿路向北走到沼道堤道，过桥进入桥湖镇。告诉桥匠奥尔登，石阶还开着，驿营的火也点着了。",
+        "completion": "不管沼泽朝她呼出怎样的浓雾，佩尔都能让那堆火一直烧着。她说石阶开着，那就是开着。欢迎来到桥湖镇，{playerName}。在我的木板上走路当心些，咱们就能处得来。",
+        "objectives": {
+          "0": {
+            "label": "向桥匠奥尔登报到"
+          }
+        }
+      },
+      "q_wf_rope_chewers": {
+        "title": "咬绳的家伙",
+        "text": "是沼蟾，{playerName}。它们夜里从护城河里爬上来，把我的系船索当芦苇秆一样嚼断。上周漂走了三条小艇，其中一条还载着我那台好绞盘。削减它们的数目吧，十只肥家伙，船就能老老实实待在我们系它的地方。",
+        "completion": "护城河里少了十副牙口。小艇整夜安安稳稳地泊着，一个月来头一回，{playerName}。全镇的网夫都承你的情。",
+        "objectives": {
+          "0": {
+            "label": "已击杀沼蟾"
+          }
+        }
+      },
+      "q_wf_eels_for_the_smokehouse": {
+        "title": "熏房的鳗鱼",
+        "text": "沼蟾吃的不只是我的绳子，{playerName}，还有我的渔获：它们把鳗鱼整条吞下去，直接从笼子里抢。趁鱼肉还没坏，从那些贪吃鬼肚里剖出六条肥鳗来，熏房的火就能一直烧着。",
+        "completion": "六条好鳗，几乎没伤着。到明早，熏房就该是一股钱味儿了。给，这双涉水靴是我腿脚还利索时穿的：论挡水，什么也比不过鳗皮。",
+        "objectives": {
+          "0": {
+            "label": "肥美的沼泽鳗鱼"
+          }
+        }
+      },
+      "q_wf_mind_the_moorings": {
+        "title": "看好缆绳",
+        "text": "在这地方好绳子金贵得很，{playerName}：蟾蜍咬断一根，就是一周的鳗钱打了水漂。断掉的绳头还散在护城河岸边，就在船脱缆的地方。沿着栈道走一圈，给我捡回四根，我就能把它们接得跟新的一样。",
+        "completion": "瞧瞧：每一根都是齐齐整整的咬口，好在剩下的绳子还够拼接。你省了我一个月的铜钱，也省了网夫们一个月的牢骚，{playerName}。",
+        "objectives": {
+          "0": {
+            "label": "已寻回断掉的系船索"
+          }
+        }
+      },
+      "q_wf_witch_of_willowweep": {
+        "title": "柳泣泽的女巫",
+        "text": "你如今该听见了，{playerName}：那阵鼾声。缓慢而沉重，从沉眠浅滩外传来，像沼泽本身在睡梦里翻了个身。蟾蜍、小妖、正午还亮着的泽光：一切都是从那声音响起时开始的。有一个人也许知道那是什么。莎草婆婆在柳泣泽有个营地，绕护城河向西，再沿远岸走到头。找到她，问问我这片沼泽的正中央睡着什么。",
+        "completion": "奥尔登让你跑这么远，就为问那阵鼾声？那桥镇的人总算肯听了。坐到干燥些的地方来，{playerName}。那声音有名字，也有喉咙，而我一直在等一个够傻的人来帮我让它安静。",
+        "objectives": {
+          "0": {
+            "label": "找到莎草婆婆"
+          }
+        }
+      },
+      "q_wf_toll_and_tangle": {
+        "title": "桥税与纠缠",
+        "text": "柳树小妖觉得割断渡船缆绳是个有趣的游戏，{playerName}，上周收税的小艇就在东航道上翻了，载着一整季的桥税。钱箱沉进了浅水，小妖们在栈道上手舞足蹈，好像那是它们的地盘。赶走八只，捞起三只桥税箱，桥湖镇今年冬天就有饭吃。",
+        "completion": "三只箱子，里头的钱还干干的。小妖们要在柳条丛里赌上一周的气了，{playerName}，而这座镇子欠你一个冬天的面包。",
+        "objectives": {
+          "0": {
+            "label": "已赶走柳树小妖"
+          },
+          "1": {
+            "label": "已寻回桥税箱"
+          }
+        }
+      },
+      "q_wf_wisplight_charms": {
+        "title": "泽光护符",
+        "text": "池塘上的光灵是沼泽在大声做梦，{playerName}，而它们的光是唯一扛得住蛙王催眠的东西。我把它编进柳条护符：一只挂上脖子，那阵鼾声就再拖不下你的眼皮。给我带六只泽光球来。光灵不会为此和你相争，所以这算善举还是偷窃，全看你怎么拿。",
+        "completion": "六只光球，还带着梦的余温。给我到月升的工夫，我就把护符编好，给你，也给每一个敢站在你身边的人。",
+        "objectives": {
+          "0": {
+            "label": "泽光球"
+          }
+        }
+      },
+      "q_wf_croakers_hush": {
+        "title": "蛙王的静默",
+        "text": "现在你知道打鼾者的名字了，{playerName}：瞌睡蛙王，沉眠浅滩上的老蟾之王。他的鼾鸣一年比一年沉，沼泽里忘记醒来的东西也一年比一年多。护符能让你睁着眼，可他那身块头是另一回事：带上一个朋友，别在水里跟他缠斗。送这位老王进一场更安静的长眠吧。",
+        "completion": "听，{playerName}。什么也没有。三十年来这片沼泽上第一场真正的寂静，今夜镇上有一半人反倒要因为这份陌生睡不着了。柳树们在用它们的方式道谢。披上这个吧，用他自己的莲床编成，从此凡是水到之处，沼泽都认你这个朋友。",
+        "objectives": {
+          "0": {
+            "label": "已击杀瞌睡蛙王"
+          }
+        }
+      },
+      "q_nb_road_of_lanterns": {
+        "title": "灯笼之路",
+        "text": "太阳从不跟着人爬到这上头来，{playerName}，一路相随的只有我沿坡点亮的灯。月栖镇在北边，花光汇聚的地方。去花园里找到莉拉·露歌，告诉她夜门的灯还亮着。",
+        "completion": "灯还亮着，路也还在把陌生人送到我们这里。索雷尔守那道门的年头，比月栖镇任何人记得的都久。欢迎你，{playerName}，来到这片永无黎明的国度。",
+        "objectives": {
+          "0": {
+            "label": "在月栖镇找到莉拉·露歌"
+          }
+        }
+      },
+      "q_nb_striders_in_the_dark": {
+        "title": "暗中的疾行者",
+        "text": "幽暝疾行者向来是耐心的猎手，{playerName}，可近来它们径直溜进花床，在我们的灯笼底下叼走月绒羔羊。除掉十只，把安宁还给丘野。",
+        "completion": "少了十只疾行者，兽群吃草已经安心多了。花园自有它的作息，但今夜，它过得太平。",
+        "objectives": {
+          "0": {
+            "label": "已击杀幽暝疾行者"
+          }
+        }
+      },
+      "q_nb_wool_by_moonlight": {
+        "title": "月光下的绒毛",
+        "text": "没有什么比月绒更暖，{playerName}，也没有什么纺得比它更细。月绒兽在丘野间游荡时，银色的绒毛会一团团松松地挂在身上。从兽群那儿给我带六团好绒毛来，我就给你织一件值得你跑这一趟的东西。",
+        "completion": "像星光一样银亮，还要柔软一倍。给，{playerName}：上一批绒毛做的连指手套，那种衬里只有月绒衬得出来。",
+        "objectives": {
+          "0": {
+            "label": "月绒毛团"
+          }
+        }
+      },
+      "q_nb_night_gardens": {
+        "title": "夜之花园",
+        "text": "夜绽花只在这片天空下开放，而暮光花田里有全境最古老的花床。我需要四朵新鲜的花来做圣祠的花环，{playerName}。剪的时候轻一些：一床花能把一双粗鲁的手记上一整季。",
+        "completion": "每一片花瓣都还亮着。圣祠会有一整周都带着夜的香气，月栖镇也能睡得更安稳了。",
+        "objectives": {
+          "0": {
+            "label": "已采集夜绽花"
+          }
+        }
+      },
+      "q_nb_eyes_on_the_vigil": {
+        "title": "望向石阵的眼睛",
+        "text": "有什么东西让疾行者变得大胆、兽群惶惶不安，{playerName}，而我从花里读不出缘由。卡西安能从天上读出来。他的观星营地就在东边的守望石阵旁，夜裔在石间飘荡的地方。找到他，问问星星都在说些什么。",
+        "completion": "莉拉派你来的？那就是说花园也感觉到了。到望远镜边坐一会儿吧，{playerName}。星星已经躁动一个月了，我画的每一张星图都朝北偏向古冢。",
+        "objectives": {
+          "0": {
+            "label": "在守望石阵找到天文学者卡西安"
+          }
+        }
+      },
+      "q_nb_charts_of_the_stones": {
+        "title": "石上星图",
+        "text": "石阵的立石比月栖镇古老，比照看它们的夜裔更古老，石面上刻着我用一生学着解读的星图。天空移位了，{playerName}，我必须知道移了多远。读取三座立石上的星图，把方位带回来给我。",
+        "completion": "再没有疑问了。每一个方位都朝不眠古冢挪去，仿佛天空亲自俯身盯着那座坟丘。古时的王要葬在群星连线之下，是有缘由的，{playerName}。",
+        "objectives": {
+          "0": {
+            "label": "已读取星图"
+          }
+        }
+      },
+      "q_nb_restless_mounds": {
+        "title": "不安的坟丘",
+        "text": "星图是一次警告，古冢原野证实了它：坟丘正从底下被打开。尸妖披挂着旧日的荣饰在墓行间走动，而那些让他们安眠的祭品散落在草丛里。放倒八只，{playerName}，再把四份祭品收回来给我。",
+        "completion": "陪葬的金器，还带着泥土的凉气。尸妖不是自己爬起来的，{playerName}：大坟丘底下有什么在唤他们出来，而我担心星图早已把它的名字告诉了我们。",
+        "objectives": {
+          "0": {
+            "label": "已击杀古冢尸妖"
+          },
+          "1": {
+            "label": "已寻回墓前祭品"
+          }
+        }
+      },
+      "q_nb_the_barrow_king": {
+        "title": "古冢之王苏醒",
+        "text": "每一个方位、每一颗躁动的星、每一座开启的坟丘都指向同一件事：古冢之王正在大坟丘之下苏醒，而这片国度没有黎明可以拦他。必须赶在他想起自己的王冠之前送他安息，{playerName}。不要独自前往：带上一个朋友，让花光始终照在你背后。",
+        "completion": "星星安定了下来，一季以来头一回，{playerName}。坟丘闭合了，夜裔在他们的立石旁归于静止，王也重新沉睡于地下。披上这件披风吧：月栖镇裁下它，就是留给夜晚最终信任的那个人。",
+        "objectives": {
+          "0": {
+            "label": "已让古冢之王安息"
+          }
+        }
+      },
+      "q_ww_bells_of_gallowmere": {
+        "title": "绞湖镇的钟声",
+        "text": "听见那阵钟鸣了吗，{playerName}？那是绞湖镇，在北路上头，正用钟声哄它的亡者入睡。司墓人马罗数点着树冠之下的每一个人，活着的和入土的都算。去让他数上你一笔吧，免得这片林子亲自来数你。",
+        "completion": "科布把你囫囵个儿地送上了路，是吗？好人。那些门灯他点了三十年，这片林子从没能越过他一步。欢迎来到绞湖镇，{playerName}。留心钟声。",
+        "objectives": {
+          "0": {
+            "label": "向司墓人马罗报到"
+          }
+        }
+      },
+      "q_ww_silk_in_the_eaves": {
+        "title": "檐下之丝",
+        "text": "走西路的时候抬头看看，{playerName}，你会看见它们：树冠里一具具裹起来的形体，在没有风的地方摇晃。寡妇丝纺蛛已经爬出棘丛，把它们的储食窖挂在了我的灯笼上方。杀掉十只，路就又是路了。",
+        "completion": "檐下少了十只纺蛛。今夜点灯人巡街时再不用抬头看了，这在这地方的分量，比你知道的重得多。",
+        "objectives": {
+          "0": {
+            "label": "已击杀寡妇丝纺蛛"
+          }
+        }
+      },
+      "q_ww_widows_skeins": {
+        "title": "寡妇的丝线",
+        "text": "纺蛛把我们的亡者收进储食窖，{playerName}，那我就取它们的丝来做我们的裹尸布。这丝烧得干净，又比亚麻更能留住祝福。给我带六束寡妇丝来，下一个下葬的人就能裹得妥帖、护得周全地入土。",
+        "completion": "六束丝，软得像一口屏住的气。亡者裹着它会躺得安稳些。收下这副裹手吧，是我用上一批缝的，这片林子从没能咬穿过它们。",
+        "objectives": {
+          "0": {
+            "label": "寡妇丝线束"
+          }
+        }
+      },
+      "q_ww_candles_at_the_bounds": {
+        "title": "界石上的蜡烛",
+        "text": "四块界石环着绞湖镇，{playerName}，每条出镇的路上一块，每块石上都燃着一支墓烛。烛火不灭，入土者就不出土。这场细雨把它们浇熄了，四支全灭了，而我太老了，独自走不完这一圈界石。拿上我的引烛，快去把它们重新点亮。",
+        "completion": "四支都燃起来了？那就松口气吧，{playerName}。你没听见，可全村人都听见了：最后一根烛芯着起来的那一刻，钟声都敲得轻快了。",
+        "objectives": {
+          "0": {
+            "label": "已重新点燃墓烛"
+          }
+        }
+      },
+      "q_ww_the_last_vicar": {
+        "title": "最后的牧师",
+        "text": "从这里往南，哀石礼拜堂在它那片黑水潭边一点点朽坏，只剩一个人还在照看它：牧师克里尔，当年屋顶塌下来他也不肯走。论古老的仪轨，他比我的钟还熟，{playerName}，可他已经一个月没捎来只言片语了。走一趟礼拜堂的路，亲眼看看他还喘着气。",
+        "completion": "马罗居然惦记起我来了？倒是新鲜。告诉他，哀石礼拜堂还立着，勉强算立着，我也一样。留一会儿吧，{playerName}。水潭最近总在低语，我不想独自听着。",
+        "objectives": {
+          "0": {
+            "label": "找到牧师克里尔"
+          }
+        }
+      },
+      "q_ww_wraiths_of_the_tarn": {
+        "title": "水潭怨灵",
+        "text": "林中怨灵从前是礼拜堂的守卫，{playerName}，由栽在贤者墓上的树木生成。自从水潭变黑，它们就忘了自己的职守，如今在我的墓园里飘荡，扒抓着泥土。趁它们还没做完已经开始的事，拆散八只。",
+        "completion": "八位守卫终于躺下了。在白天我不会管这叫仁慈，可私下里说，{playerName}，这就是仁慈。",
+        "objectives": {
+          "0": {
+            "label": "已击杀林中怨灵"
+          }
+        }
+      },
+      "q_ww_what_the_bark_holds": {
+        "title": "树皮所守之物",
+        "text": "在绞湖镇以东的吊影林地，纺蛛把裹满蛛丝的死者悬在枝头，墓皮树怪像一队耐心的抬棺人一样在底下守着。挂在上头的是我们的人啊，{playerName}。击碎五只树怪，割下三具裹尸，带他们回家入土。",
+        "completion": "天黑之前，三个魂灵回到了干净的土里。树怪还会再长出来，树皮向来如此，可今夜林地上空空荡荡，这就够了。",
+        "objectives": {
+          "0": {
+            "label": "已击倒墓皮树怪"
+          },
+          "1": {
+            "label": "已割下缚丝遗骸"
+          }
+        }
+      },
+      "q_ww_walking_mosley_home": {
+        "title": "送莫斯利回家",
+        "text": "我的掘墓人莫斯利三天前走礼拜堂的路，去旧墓园开一块墓穴，结果坑塌下来把他埋了。他自己刨了出来，这傻子命还在，可他缩在礼拜堂的坟堆边不敢动，路上全是纺蛛。送他回家吧，{playerName}。我总不能为一个活人敲丧钟。",
+        "completion": "他靠自己两条腿走进了大门，赌咒说从今往后挖得最深的就是萝卜地。不出周日他就会回墓园上工，他们向来如此。谢谢你，{playerName}。绞湖镇护住自己的人，这就是我们全部的律法。",
+        "objectives": {
+          "0": {
+            "label": "已护送掘墓人莫斯利平安回到绞湖镇"
+          }
+        }
+      },
+      "q_ww_horn_of_the_huntsman": {
+        "title": "猎手的号角",
+        "text": "号角声你如今该听过了，{playerName}，细弱而遥远，整片林子都为那声音屏住呼吸。苍白猎手在这里以北他的林隙中驰骋，他每经过一座坟，坟就变浅一分。他曾经是个人，却被下葬错了，而我已经不想再假装祷告能管用。带上一个朋友，带上两个，把他挑落马下。",
+        "completion": "号角声在半个音上断了。绞湖镇的每一口钟都自己响了一声，随后这片林子安静下来，三十年来我从没听过它这样安静。你完成了我做不到的仪式，{playerName}。披上这个，从此在树冠下行走，无所畏惧。",
+        "objectives": {
+          "0": {
+            "label": "已将苍白猎手挑落马下"
+          }
+        }
+      },
+      "q_pr_down_to_drifthaven": {
+        "title": "去往漂流港",
+        "text": "走出黑树林，走进太阳里，{playerName}。沿着岸边路向北，赶在潮水转向之前你就能到漂流港。去找打捞头目莱娜，风暴过后她那儿多的是活计，谁的手都用得上，再告诉她缠木隘口的路还通着。",
+        "completion": "佩尔派你来的？那你就是独自走完了整条缠木隘口的路，这份履历对我来说够用了。欢迎来到漂流港，{playerName}。抄起根缆绳吧，我们正缺人手。",
+        "objectives": {
+          "0": {
+            "label": "向打捞头目莱娜报到"
+          }
+        }
+      },
+      "q_pr_wreck_line_cargo": {
+        "title": "沉船线",
+        "text": "三夜前的风暴把珠浪号推上了礁石，她的货物撒满了从这里到棕榈长滩之间整条沉船线。还有三箱货物躺在浪花里，{playerName}。抢在潮水，或是螃蟹，认领剩下的东西之前，把它们运回来。",
+        "completion": "三箱俱全，沾了盐渍但完好无损。这个月采珠人有饭吃，全靠你，{playerName}。",
+        "objectives": {
+          "0": {
+            "label": "已寻回珠浪号货物"
+          }
+        }
+      },
+      "q_pr_scuttler_cull": {
+        "title": "披壳的窃贼",
+        "text": "这条海岸上每一艘沉船都会招来潮汐蟹，而珠浪号招来了半个礁盘。浅水里满是那些钳子，我的打捞队没法下水作业。敲开十只，{playerName}，沉船线就又是我们的了。",
+        "completion": "浪花里少了十副钳子。我的人已经重新蹚水下去了，没一个说声谢谢，那就由我来说：谢谢你，{playerName}。",
+        "objectives": {
+          "0": {
+            "label": "已敲碎潮汐蟹"
+          }
+        }
+      },
+      "q_pr_boars_in_the_gardens": {
+        "title": "菜园里的野猪",
+        "text": "不管深绿之中骚动的是什么，它正把灌丛野猪挤到我们的沙滩上来。这一周它们已经两次拱翻了梯田菜园，下一个遭殃的就是晒架。十头野猪，{playerName}，把其余的赶回树下去。",
+        "completion": "晒架保住了，菜园也还能重新栽种。野猪不是自己选了走上沙滩的，{playerName}。记住这一点：是有什么东西挪动了它们。",
+        "objectives": {
+          "0": {
+            "label": "已赶走灌丛野猪"
+          }
+        }
+      },
+      "q_pr_the_man_who_went_in": {
+        "title": "走进丛林的人",
+        "text": "采珠人不肯踏过林线一步，{playerName}，我也不会开这个口。鼓声你如今该听过了：到第二夜，人人都会听见。这座岛上只有一个人朝那声音走过去，还走了回来。奥库。他在垂藤林的大榕树下扎营，得沿缠木路走进深处。找到他，问问绿荫里藏着什么。",
+        "completion": "伊莎派你来的？珍珠之母已经多年没提过我的名字了。坐到藤蔓够不着的地方来，{playerName}，我把知道的都告诉你：鼓声不是危险。鼓声是警告。",
+        "objectives": {
+          "0": {
+            "label": "在垂藤林找到奥库"
+          }
+        }
+      },
+      "q_pr_canopy_silk": {
+        "title": "树冠之丝",
+        "text": "抬头看，{playerName}。从这里到神像，每一片树冠都结着渔网似的蛛网，织网蛛一季比一季大胆。我把它们自己的丝拉在小径上，系成绊线铃，好叫丛林没法悄悄摸到我跟前。从树冠织网蛛身上取六束好丝，我的线就能重新拉起来。",
+        "completion": "好丝，结实。我的铃铛还能再唱上一阵子，夜里走这些小径的东西，没有一个能瞒过我，{playerName}。而最近，有什么东西走得很勤。",
+        "objectives": {
+          "0": {
+            "label": "树冠丝束"
+          }
+        }
+      },
+      "q_pr_the_lost_navigator": {
+        "title": "失踪的领航员",
+        "text": "珠浪号上的人手我们都捞回来了，只差一个：领航员苏莉，她朝远处的沙滩游去，却始终没有走进港来。有个采珠人瞧见她躲在棕榈长滩过去的船头残骸里，人还活着，只是精疲力竭，独自闯不过那条险路。沿着岸边路送她回家吧，{playerName}。螃蟹不会乐意，丛林更不乐意。",
+        "completion": "苏莉已经坐在火边了，还在赌咒说她本可以游回来。你带回了这条海岸上唯一识海图的人，{playerName}。这些是从她的船箱里取的，带着她的祝福。",
+        "objectives": {
+          "0": {
+            "label": "已护送领航员苏莉平安抵达漂流港"
+          }
+        }
+      },
+      "q_pr_what_the_drums_guard": {
+        "title": "鼓声守护之物",
+        "text": "我曾走到活人敢靠近沉没神像的极限，看见了两件事：织网蛛用蛛网把神像之路挂成了帷幔，而路边那些古老的祭碗又被盛满了。是新盛的，{playerName}。清掉路上的八只织网蛛，再给我带三份祭品回来。我要知道，究竟是谁的手还在供奉一位死去的神。",
+        "completion": "苔藓、珠贝，还有野猪血，是用手指一点点按进去的。那片废墟里还有什么在奉行它的仪式，{playerName}，而守卫把其余一切都挡在外面。是时候把话说开了。",
+        "objectives": {
+          "0": {
+            "label": "已斩落树冠织网蛛"
+          },
+          "1": {
+            "label": "已收集重新盛满的祭碗"
+          }
+        }
+      },
+      "q_pr_idol_guardian": {
+        "title": "神像守卫",
+        "text": "神像比这座岛更古老，{playerName}。比鼓声古老，比棕榈湾这个名字更古老。早在棕榈还没长出来的年月，它的守卫就立在那圈沉水的石环里，而如今它醒了，夜里在石柱间走动。无论祭品供养的是什么，守卫就是它的门卫。带上一个朋友，打碎它。",
+        "completion": "你击倒了一件连丛林自己都不敢碰的东西。看那边，神像背后：守卫守的从来不是石柱，{playerName}，它守的是石柱之下的台阶。今夜鼓声沉寂了。沉睡在荒野之心盆地之下的那个东西，如今已经知道了你的名字。",
+        "objectives": {
+          "0": {
+            "label": "已击碎神像守卫"
+          }
+        }
+      },
+      "q_eg_gate_report": {
+        "title": "门内传讯",
+        "text": "这道门后的草坪已经自己修剪了一百年，{playerName}，而最近它们开始修剪访客了。园丁长阿玛兰丝在篱苑镇管着记录，就在门前草坪再往前的路上。告诉她又有一位旅人进了园子，还有，门边的树篱昨夜挪动了。",
+        "completion": "挪动了，是吗。佩尔每周都这么报，而每周他都没报错。请原谅我这双眼睛，{playerName}，我已经多年没睡过一个整觉了：花园在盯着我们，总得有人盯着花园。欢迎来到篱苑镇。",
+        "objectives": {
+          "0": {
+            "label": "向园丁长阿玛兰丝报到"
+          }
+        }
+      },
+      "q_eg_hungry_shapes": {
+        "title": "修剪成的饥饿",
+        "text": "修剪这座花园的那位，要么是粗心了，要么是变得残忍了。野蔷薇丛里那些狼形绿雕本是剪来观赏的，近来却开始狩猎：绿色的颚，没有肚腹，也就永远没有停下的理由。砍倒十头绿雕之狼，{playerName}，让草坪再当一阵子草坪。",
+        "completion": "十头狼站过的地方，如今是十堆碎枝。这本该像是园艺活，{playerName}。为什么却像是打仗？",
+        "objectives": {
+          "0": {
+            "label": "已击杀绿雕之狼"
+          }
+        }
+      },
+      "q_eg_stolen_shears": {
+        "title": "失窃的修枝剪",
+        "text": "两周之内，篱苑镇的每一把修枝剪都不翼而飞了，{playerName}：挂钩上的、锁着的棚屋里的，还有一把是趁我打盹时从我围裙里摸走的。是树篱地精干的，那些小园丁最恨我们踩他们的草坪。找回六把来，别让全镇沦落到只能用菜刀干活。",
+        "completion": "六把，我自己那把也在里头，刀刃上那道缺口我到哪儿都认得。来，这双手套是专为修剪活计织的。手暖了，剪子才稳。",
+        "objectives": {
+          "0": {
+            "label": "失窃的篱苑修枝剪"
+          }
+        }
+      },
+      "q_eg_who_trims_the_hedges": {
+        "title": "谁在修剪树篱",
+        "text": "我管了三十年账本，{playerName}，其中十年不曾睡好，因为账目怎么也对不上。草要割，树篱要剪，这里没有一个人做这些活，可每天拂晓花园都是修剪整齐的。最近林中人赌咒说，在遥远的南草坪上见过一个推着手推车的老人，就在迷宫之外的睡莲池边。找到他。若他是真的，我总算能睡了。若不是，我想我这辈子都睡不成了。",
+        "completion": "这么说，镇上总算派人来了。我在这些草坪上走了一百年，{playerName}，花园和我之间有个默契：什么求剪，我就剪什么。坐吧。树篱匀得出你一个钟头。",
+        "objectives": {
+          "0": {
+            "label": "在睡莲池边找到那位园丁"
+          }
+        }
+      },
+      "q_eg_gnomes_in_the_green": {
+        "title": "小园丁的怨气",
+        "text": "修枝剪只是个开头，{playerName}。昨夜地精把我们的工具车掀进了绿丛，一辆翻在迷宫西边他们的地洞旁，另一辆远在花园另一头的花瓣池步道上，把上百年的好铁器撒了一草地。赶走八个小恶棍，把翻倒的车拖回家。",
+        "completion": "三辆车回来了，挂钩上也重新挂满了。让那帮小恶棍在树篱里赌气去吧：这片草坪，篱苑镇同样有份打理。",
+        "objectives": {
+          "0": {
+            "label": "已赶走树篱地精"
+          },
+          "1": {
+            "label": "已寻回工具车"
+          }
+        }
+      },
+      "q_eg_bloom_clippings": {
+        "title": "活绿剪枝",
+        "text": "你想弄懂这座花园？那就用我的法子来读它。草坪上吃草的那些绿雕雄鹿长着最纯正的绿：它们身上每一片叶子都是一页书。从绿雕雄鹿身上给我剪六段新鲜的枝叶来，{playerName}。它们不会为这次修剪谢你，但它们会重新长好。这里的一切都会重新长好。",
+        "completion": "看这里：叶子全都向内蜷着，每一段剪枝都一样。花园在害怕，{playerName}。一百年来，我从没见过它害怕。",
+        "objectives": {
+          "0": {
+            "label": "修剪下的花枝"
+          }
+        }
+      },
+      "q_eg_four_statues": {
+        "title": "四位静默姐妹",
+        "text": "花园年轻的时候，最早的园丁们立起四位大理石姐妹，看护园子的四方：一位立在野蔷薇丛上方，一位在迷宫以东的花瓣池步道，一位在地精筑洞的西草坪，还有一位在树篱之外的南草坪。迷宫在她们之间长了起来，大多数人一辈子也见不全四位。走遍四方吧，{playerName}，把手掌贴上每一位姐妹。等花园从四面把你打量过一遍，它就会向你敞开那些不给陌生人看的地方。",
+        "completion": "四张拓片，四位姐妹，没有一位落下大理石的泪。花园已经掂量过你了，{playerName}，而它没有嫌弃你。现在我可以把你派往麻烦真正盘踞的地方了。",
+        "objectives": {
+          "0": {
+            "label": "已造访花园雕像"
+          }
+        }
+      },
+      "q_eg_bull_of_the_court": {
+        "title": "喷泉庭院的公牛",
+        "text": "现在说实话吧，{playerName}。迷宫深处那头公牛是我的得意之作：我把他剪成喷泉庭院的守卫，他也守了一百年。可绿意里的恐惧已经蔓延到他身上，如今他什么也不守了，他在狩猎。谁误入迷宫，迷宫就把谁喂给他。我太老了，拆解不动他了，而这必须是连根带枝的拆解。带上一个朋友，穿过迷宫走到庭院，砍倒我的公牛。",
+        "completion": "他散架的那一刻，我在这里感觉到了。一百年的心血，而你终结它是对的。收下这件披风：我裁下它，就是留给证明自己胜过我最好作品的人。今夜的庭院只是一座喷泉，{playerName}，花园也只是一座花园。也许现在，园丁长和我都能睡上一觉了。",
+        "objectives": {
+          "0": {
+            "label": "已拆解绿雕公牛"
+          }
+        }
+      },
+      "q_fs_bell_at_the_landing": {
+        "title": "登岸口的钟",
+        "text": "你是从沙洲堤道过来的，{playerName}？那你是这一周里的头一个，守望者肯定想亲眼瞧瞧你。鸥港就在岸边路再往上，过了那排如今没人打理的晒网架。告诉守望者煤耐，堤道还立着，塔姆今天也还没敲过三响。暂时还没有。",
+        "completion": "堤道还撑得住，塔姆也还有力气拿三响打趣。很好。我们是一座被围攻的岛，{playerName}，每一双跨过沙洲的手，都是裂隙要伤到我的人之前必须先闯过的一道关。欢迎来到鸥港。",
+        "objectives": {
+          "0": {
+            "label": "向守望者煤耐报到"
+          }
+        }
+      },
+      "q_fs_hold_the_riftfields": {
+        "title": "守住裂野",
+        "text": "镇子以东的麦田已经荒败，从裂野的裂隙钻出来的恶徒正把田里洗劫一空。人连站都站不进去的田，叫人怎么耕种，{playerName}。除掉十个恶徒，把土地还给农人。",
+        "completion": "少了十个，雇工们已经在争谁第一个下田了。这撑不了多久，裂隙从不会安分太久，但吃得上饭的镇子，就是守得住的镇子。",
+        "objectives": {
+          "0": {
+            "label": "已击杀裂口恶徒"
+          }
+        }
+      },
+      "q_fs_steel_for_the_redoubt": {
+        "title": "堡垒之钢",
+        "text": "我发下去的每一把刀，不是海还回来的，就是我从死人身上撬下来的，{playerName}。恶徒们把碎铁从裂隙里带过来，铰链、挂钩、断掉的剑钢，尽是些喜鹊叼来的破烂，可锤打出来却是好钢。给我带六块他们搜刮的钢铁来，路障防线就能重新长出牙齿。",
+        "completion": "盐蚀斑斑，裂痕累累，可开刃照样锋利。来，这副护手是我亲手衬的里。以钢换钢，{playerName}：如今的远岸，只做这一门买卖。",
+        "objectives": {
+          "0": {
+            "label": "裂隙创痕钢"
+          }
+        }
+      },
+      "q_fs_the_three_bells": {
+        "title": "三口警钟",
+        "text": "除了我这一口，海岸上还立着三口警钟：一口在登岸口的岬角，一口在南边的沙滩，一口在裂野的岸边。若是绳子朽了，或是钟舌被人拿走了，等镇子知道裂隙开了，它已经进了街巷。沿海岸走一遭吧，{playerName}，每口钟敲一响，好让我知道它们还有嗓子。",
+        "completion": "三副嗓子，三声回应，清清楚楚地传过了水面。今夜就睡在鸥港吧，{playerName}，放心，若有钟声吵醒你，那一定是我亲手敲的，而且敲得及时。",
+        "objectives": {
+          "0": {
+            "label": "已敲响警钟"
+          }
+        }
+      },
+      "q_fs_song_before_the_break": {
+        "title": "裂开前的歌",
+        "text": "有个人能在裂隙开启之前听见它们。裂察奥伦：一位学者，或是一个疯子，而近来我已经付不起分辨的代价了。他在守望草甸守着他的哨位，就在镇子东南的路上。找到他，{playerName}，问问他这座岛接下来又要对我们做什么。",
+        "completion": "守望者派你来的？好。这说明镇子总算肯听了。现在静一静，{playerName}。那儿，在风声底下，听见了吗？峭壁在唱歌，而我不喜欢这个调子。",
+        "objectives": {
+          "0": {
+            "label": "找到裂察奥伦"
+          }
+        }
+      },
+      "q_fs_moss_and_mending": {
+        "title": "苔藓与疗伤",
+        "text": "潮线边生长的盐苔是我所知最好的敷伤药，可裂生怪占了它生长的每一段海岸。说来也怪，它们的皮上就挂着一撮撮刮下来的盐苔。把东边滩涂上的六只清掉，{playerName}，再从它们踩烂的苔地里给我采四把好苔来。",
+        "completion": "一手是盐苔，一手是安静下来的海岸线。你把我整间手术房都补齐了，{playerName}。行行好，别成了我的下一个病人。",
+        "objectives": {
+          "0": {
+            "label": "已击杀裂生怪"
+          },
+          "1": {
+            "label": "远岸盐苔"
+          }
+        }
+      },
+      "q_fs_bram_come_home": {
+        "title": "布拉姆回家",
+        "text": "晾网场的裂隙开启那天早晨，我的布拉姆出海了，海把他抛回了登岸口岬角外的什么地方。三夜之前我听见了他，{playerName}，隔着水面呼喊，而我吓得不敢去。现在也还是不敢。求求你。他的船就搁浅在北岸。把他领回家，交到我手上。",
+        "completion": "布拉姆！你把他完完整整地带回来了，{playerName}。我们俩都哭了，谁也不觉得丢人。往后裂隙不管再从这座岛夺走什么，都别想夺走我的家人。再也不会了。",
+        "objectives": {
+          "0": {
+            "label": "已护送渔民布拉姆平安回到鸥港"
+          }
+        }
+      },
+      "q_fs_stalkers_off_the_light": {
+        "title": "驱离灯火的潜行者",
+        "text": "潜行者在哨火之间的黑暗里狩猎，每一夜都把包围我草甸的圈子收得更紧一些。它们并非没有心智，{playerName}，它们有的是耐心，而耐心恰恰是我唯一耗不过的东西。杀掉八只，把黑暗推回它钻出来的峭壁去。",
+        "completion": "八夜的围困，一夜了结。火光已经烧得稳了些，也可能只是我的手稳了。不管怎样，草甸又是我的了，我又能听见这座岛思考了。",
+        "objectives": {
+          "0": {
+            "label": "已击杀虚空潜行者"
+          }
+        }
+      },
+      "q_fs_the_great_break": {
+        "title": "大裂隙",
+        "text": "这座岛唱的每一支歌，都终结在同一个低音上，而那个音来自碎裂断崖。有什么东西从那里的大裂隙里过来了，{playerName}，是峭壁亲自裂开身子放进来的东西，而它还在生长。一旦它向北走，什么钟声都救不了了。带上一个朋友，带上两个，终结它。然后告诉煤耐，曲调变了。",
+        "completion": "奥伦先送来了消息：歌声停了。全镇的人都听见了那份安静，{playerName}，有一半人听着那一无所有的声音落了泪。披上这件披风吧。远岸不会忘记是谁守住了它的海岸。",
+        "objectives": {
+          "0": {
+            "label": "已击杀碎裂恐魔"
+          }
+        }
+      },
+      "q_gc_down_the_windway": {
+        "title": "沿风道而下",
+        "text": "你爬上来了，{playerName}，看来风决定留下你了。烛港在丘陵路的东头，藏在小湾的背风处。港务长奥黛尔清点每一个翻过隘口的人，她也会想把你点上一笔。告诉她风道还开着。",
+        "completion": "这种天气，靠两条腿翻隘口？玛伦送来的名字本就不多，能亲自走进来交代自己来历的更少。欢迎来到烛港，{playerName}。进旅店记得随手关门。",
+        "objectives": {
+          "0": {
+            "label": "向港务长奥黛尔报到"
+          }
+        }
+      },
+      "q_gc_wool_off_the_downs": {
+        "title": "丘陵上的羊毛",
+        "text": "我的船员们划进的狂风，能把油布像纸一样割穿，{playerName}。能挡住这风的只有一样东西：荒原羊身上的含脂羊毛，按烛港的老法子纺得厚厚的。羊群就在镇子西边的啸风丘陵吃草。六张好羊毛，这一季每条船的人都能划得暖暖和和。",
+        "completion": "正是这样的毛，让那些羊在能要人命的天气里站得又肥又得意。纺工们今晚就会点灯开工。收下这双行靴，{playerName}，里子是上一次剪毛时衬的。",
+        "objectives": {
+          "0": {
+            "label": "含脂羊毛"
+          }
+        }
+      },
+      "q_gc_scuttlers_in_the_pots": {
+        "title": "蟹笼里的贼",
+        "text": "浅滩蟹学会了爬上崖路，把我们的蟹笼在石头上磕开，{playerName}。这一周半数的渔获没了，还有个笼夫的一只手一个月都使不上劲了。敲碎十只，其余的就会想起它们当初为什么只待在浅滩。",
+        "completion": "我的路上少了十只壳，今早的蟹笼也满满当当地提了上来。笼夫们都说你是个好兆头，{playerName}。在烛港，这已经是最热乎的夸奖了。",
+        "objectives": {
+          "0": {
+            "label": "已击杀浅滩蟹"
+          }
+        }
+      },
+      "q_gc_keeper_of_the_flame": {
+        "title": "守焰之人",
+        "text": "老布拉姆守着镇子东北高岬上的灯塔，已经两周没下来取补给了。灯还亮着，人就还活着，可他那把年纪，独自一人待在那样的风口岬角上，{playerName}。爬一趟灯塔路，亲眼看看他还站着。",
+        "completion": "奥黛尔让你跑这么远，就为看看风把我卷走了没有？哈。告诉她，灯还烧着，我也还烧着。不过既然你爬都爬上来了，{playerName}，就留一会儿。灯塔这儿有桩活，似乎只有外乡人做得来。",
+        "objectives": {
+          "0": {
+            "label": "找到守灯人布拉姆"
+          }
+        }
+      },
+      "q_gc_lanterns_on_the_shear": {
+        "title": "断崖上的提灯",
+        "text": "灯塔是大光，{playerName}，可真正领着夜行人走下断崖上方崖路的，是那些风暴提灯。昨夜狂风把它们一盏不剩全吹灭了，而摸黑走那条路，就是一段很长的坠落加一个很短的结局。拿上我的打火器，把崖边那四盏重新点亮。",
+        "completion": "崖路上四点灯火，正在它们该在的地方。从这上头望下去，像是海岸重新睁开了眼睛。你有当守灯人的料，{playerName}。",
+        "objectives": {
+          "0": {
+            "label": "已重新点亮风暴提灯"
+          }
+        }
+      },
+      "q_gc_wind_against_the_wick": {
+        "title": "逆芯之风",
+        "text": "疾风精就是起了歹意的风，{playerName}。它们聚在镜湖旁的高丘上，见火就掐：掐提灯，掐炉膛，早晚要掐到这盏塔灯头上。我让灯塔亮了三十九年，绝不能把它输给一场记仇的天气。驱散八只。",
+        "completion": "昨夜塔灯连晃都没晃一下，一个月来头一回。风还是恨我们，{playerName}，但它总算恨得讲规矩了。",
+        "objectives": {
+          "0": {
+            "label": "已驱散疾风精"
+          }
+        }
+      },
+      "q_gc_the_far_shore": {
+        "title": "远处的海岸",
+        "text": "从这间灯室能望尽整条海岸，{playerName}，而北边的景象我不喜欢。退潮时有绿光在沉船滩上游走，一条船壳挨着一条船壳。那片岸上只有一个女人独自讨生活：打捞者艾妲。沿崖路向北过了断崖，一直走到沉船出现的地方，去确认她还有气。",
+        "completion": "布拉姆如今在他的塔上盯着我这片岸了，是吗？老头担心得没错，{playerName}。死人夜里会在自己的沉船上走动，而最近，他们已经不在乎太阳升没升起了。",
+        "objectives": {
+          "0": {
+            "label": "找到打捞者艾妲"
+          }
+        }
+      },
+      "q_gc_dead_mens_cargo": {
+        "title": "死人的货",
+        "text": "打捞法很简单，{playerName}：海送上滩的，就是我的。溺亡水手们不同意。他们从船壳里爬起来，把我码好的每只箱子又拖回潮线以下。让六个彻底安息，趁滩上清静，再抢在潮水提出反诉之前拖回三只漂流货箱。",
+        "completion": "六个水手安静了，三只箱子也高高地晾干了。你打捞的手比我重，{playerName}，可账本不管这些。按法律这一半归你，而所谓法律，就是我说了算。",
+        "objectives": {
+          "0": {
+            "label": "已安息溺亡水手"
+          },
+          "1": {
+            "label": "已打捞漂流货箱"
+          }
+        }
+      },
+      "q_gc_the_wreck_warden": {
+        "title": "沉船守卫",
+        "text": "现在你明白水手们为什么会爬起来了，{playerName}。有个东西披着这片岸上第一艘失事船的藤壶甲板，像看守一座受雇照管的墓园一样，看守着滩上的每一具船壳。它守着一批我垂涎了十年的财货，还有一群我更愿看到安息的船员。终结沉船守卫。带上朋友，死人站岗站得很牢。",
+        "completion": "它倒下的那一刻，海滩静了，{playerName}。我在这片岸上讨了十年生活，头一次听见这样的寂静。船员们如今只是白骨了，安息的白骨。把财货堆顶上那件披风拿走吧，它反正更合活人的背。",
+        "objectives": {
+          "0": {
+            "label": "已击倒沉船守卫"
           }
         }
       },
@@ -11531,6 +13736,9 @@ export const zh_CN: EnTranslations = {
           },
           "10": {
             "label": "母猪场"
+          },
+          "11": {
+            "label": "远岸沙洲堤道"
           }
         }
       },
@@ -11599,6 +13807,300 @@ export const zh_CN: EnTranslations = {
             "label": "墓龙圣所"
           }
         }
+      },
+      "veiled_hollow": {
+        "name": "帷幕幽谷",
+        "welcome": "空气中回荡着古老魔法的低鸣。到古辉镇的巨树下寻找守护者塞尔文吧。",
+        "pois": {
+          "0": {
+            "label": "古辉镇"
+          },
+          "1": {
+            "label": "暮落洞穴"
+          },
+          "2": {
+            "label": "暮落瞭望台"
+          },
+          "3": {
+            "label": "古木林地"
+          },
+          "4": {
+            "label": "星落盆地"
+          },
+          "5": {
+            "label": "沉没王庭"
+          },
+          "6": {
+            "label": "水晶浅滩"
+          },
+          "7": {
+            "label": "辉光深处"
+          }
+        }
+      },
+      "drakelands": {
+        "name": "龙裔荒原",
+        "welcome": "灼热的风从前方的荒漠滚滚而来。巨龙在龙喉火山上空盘旋，巨魔的篝火在沙丘间燃烧。",
+        "pois": {
+          "0": {
+            "label": "望龙哨"
+          },
+          "1": {
+            "label": "门林"
+          },
+          "2": {
+            "label": "烬沙丘"
+          },
+          "3": {
+            "label": "巨魔集会"
+          },
+          "4": {
+            "label": "最后的堡垒"
+          },
+          "5": {
+            "label": "血玻璃原野"
+          },
+          "6": {
+            "label": "龙喉火山口"
+          }
+        }
+      },
+      "frostveil": {
+        "name": "霜幕之境",
+        "welcome": "白雪吞没了一切声响。在舞动的极光之下，寒冷本身仿佛苏醒了。",
+        "pois": {
+          "0": {
+            "label": "冰幔镇"
+          },
+          "1": {
+            "label": "雪线隘口"
+          },
+          "2": {
+            "label": "冰川湖"
+          },
+          "3": {
+            "label": "极光台阶"
+          },
+          "4": {
+            "label": "颤栗沼泽"
+          },
+          "5": {
+            "label": "呼啸台地"
+          }
+        }
+      },
+      "amberfall": {
+        "name": "琥珀秋境",
+        "welcome": "这里每一片叶子都燃烧着金红，却从不飘落。灯湖镇的灯笼已为你点亮。",
+        "pois": {
+          "0": {
+            "label": "灯湖镇"
+          },
+          "1": {
+            "label": "融金隘口"
+          },
+          "2": {
+            "label": "鎏金果园"
+          },
+          "3": {
+            "label": "丰收谷"
+          },
+          "4": {
+            "label": "大湖"
+          },
+          "5": {
+            "label": "烬枫坡"
+          },
+          "6": {
+            "label": "斜碑"
+          }
+        }
+      },
+      "willowfen": {
+        "name": "柳泽沼地",
+        "welcome": "沼泽里蜻蜓与蜜蜂嗡嗡作响。跨过桥进入桥湖镇，歇歇脚吧。",
+        "pois": {
+          "0": {
+            "label": "桥湖镇"
+          },
+          "1": {
+            "label": "琥珀沼石阶"
+          },
+          "2": {
+            "label": "睡莲泽"
+          },
+          "3": {
+            "label": "泽光池"
+          },
+          "4": {
+            "label": "垂柳湾"
+          },
+          "5": {
+            "label": "沉眠浅滩"
+          }
+        }
+      },
+      "nightbloom": {
+        "name": "夜绽花野",
+        "welcome": "越过夜门，连空气都在做梦。沿着花光走向月栖镇，别忘了看看悬在天上沉睡的世界。",
+        "pois": {
+          "0": {
+            "label": "月栖镇"
+          },
+          "1": {
+            "label": "夜门"
+          },
+          "2": {
+            "label": "月井"
+          },
+          "3": {
+            "label": "暮光花田"
+          },
+          "4": {
+            "label": "守望石阵"
+          },
+          "5": {
+            "label": "不眠古冢"
+          }
+        }
+      },
+      "wraithwood": {
+        "name": "怨灵林",
+        "welcome": "树冠像棺盖一样在路上合拢。跟紧绞湖镇的灯火，若林中有声音喊你的名字，千万别回应。",
+        "pois": {
+          "0": {
+            "label": "绞湖镇"
+          },
+          "1": {
+            "label": "鸦门"
+          },
+          "2": {
+            "label": "寡妇棘丛"
+          },
+          "3": {
+            "label": "吊影林地"
+          },
+          "4": {
+            "label": "哀石礼拜堂"
+          },
+          "5": {
+            "label": "猎手林隙"
+          }
+        }
+      },
+      "palmreach": {
+        "name": "棕榈湾",
+        "welcome": "温暖的沙滩，喧闹的鸟鸣，还有吞没地平线的丛林。漂流港在海滩上为你留着一堆篝火。",
+        "pois": {
+          "0": {
+            "label": "漂流港"
+          },
+          "1": {
+            "label": "缠木隘口"
+          },
+          "2": {
+            "label": "棕榈长滩"
+          },
+          "3": {
+            "label": "翠绿丛林"
+          },
+          "4": {
+            "label": "垂藤林"
+          },
+          "5": {
+            "label": "蓝宝石潟湖"
+          },
+          "6": {
+            "label": "沉没神像"
+          }
+        }
+      },
+      "evergarden": {
+        "name": "常青园",
+        "welcome": "树篱仍有人在修剪，可百年来无人见过园丁。当心迷宫：它也在留意你。",
+        "pois": {
+          "0": {
+            "label": "篱苑镇"
+          },
+          "1": {
+            "label": "花园之门"
+          },
+          "2": {
+            "label": "花坛步道"
+          },
+          "3": {
+            "label": "晨曦堡"
+          },
+          "4": {
+            "label": "花瓣池"
+          },
+          "5": {
+            "label": "大迷宫"
+          },
+          "6": {
+            "label": "喷泉庭院"
+          },
+          "7": {
+            "label": "老磨坊"
+          },
+          "8": {
+            "label": "北望哨"
+          },
+          "9": {
+            "label": "睡莲池"
+          }
+        }
+      },
+      "galecrest": {
+        "name": "疾风崖",
+        "welcome": "这里的风从未停过，老灯塔的火也从未熄过。烛港只求你随手关上旅店的门。",
+        "pois": {
+          "0": {
+            "label": "烛港"
+          },
+          "1": {
+            "label": "风道"
+          },
+          "2": {
+            "label": "啸风丘陵"
+          },
+          "3": {
+            "label": "老灯塔"
+          },
+          "4": {
+            "label": "断崖"
+          },
+          "5": {
+            "label": "沉船滩"
+          },
+          "6": {
+            "label": "镜湖"
+          },
+          "7": {
+            "label": "疾风崖马厩"
+          }
+        }
+      },
+      "farshore_isle": {
+        "name": "远岸",
+        "welcome": "越过沙洲，鸥港的警钟会先于这座镇子寻到你。裂隙毫无预兆地撕裂开来，而这座堡垒守着自己的海岸，抵挡从中涌出的一切。他们已经等待像你这样的人很久了。",
+        "pois": {
+          "0": {
+            "label": "鸥港"
+          },
+          "1": {
+            "label": "登岸口"
+          },
+          "2": {
+            "label": "守望草甸"
+          },
+          "3": {
+            "label": "碎裂断崖"
+          },
+          "4": {
+            "label": "裂野"
+          }
+        }
       }
     },
     "dungeons": {
@@ -11626,6 +14128,16 @@ export const zh_CN: EnTranslations = {
         "name": "尼思拉克西斯团队竞技场",
         "enterText": "你穿过封印的王室之门。",
         "leaveText": "你回到荆峰的寒冷空气中。"
+      },
+      "wildheart_basin": {
+        "name": "荒野之心盆地",
+        "enterText": "温热的雨水在古老石面上嘶嘶作响。荒野之心盆地在你眼前展开。",
+        "leaveText": "你从石牙之下穿回棕榈之境的阳光中。"
+      },
+      "the_last_keep": {
+        "name": "最后的堡垒",
+        "enterText": "你踏入最后的堡垒那冰冷而寂静的大厅。",
+        "leaveText": "你带上堡门，重新走进龙裔荒原的寒风中。"
       },
       "drowned_temple": {
         "name": "溺亡神殿",

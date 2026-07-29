@@ -292,6 +292,23 @@ function buildEncounters(activity: FinderActivity): FinderEncounterViewModel[] {
   return out;
 }
 
+/** All procedural item icons the catalogue can paint, derived through the same
+ *  encounter/heroic-loot path as the visible detail model. Main uses this as a
+ *  loading-screen priority list so selecting any activity never serializes a
+ *  cold 96px icon on the UI thread. */
+export function finderLootItemIds(): string[] {
+  const ids = new Set<string>();
+  for (const activity of FINDER_ACTIVITIES) {
+    for (const encounter of buildEncounters(activity)) {
+      for (const group of [...encounter.groups, ...encounter.heroicGroups]) {
+        for (const item of group.items) ids.add(item.itemId);
+      }
+      for (const item of encounter.singles) ids.add(item.itemId);
+    }
+  }
+  return [...ids];
+}
+
 function buildDetail(
   activity: FinderActivity,
   level: number,
@@ -311,7 +328,7 @@ function buildDetail(
     size: activity.size,
     composition: activity.composition ? { ...activity.composition } : null,
     autoQueue: activity.autoQueue,
-    entrance: { x: door.x, z: door.z, zoneId: zoneAt(door.z).id },
+    entrance: { x: door.x, z: door.z, zoneId: zoneAt(door.x, door.z).id },
     lockout: activity.lockout,
     lockedMinutes: lockoutMinutesFor(activity, lockouts),
     attunementQuestId: activity.attunementQuestId ?? null,

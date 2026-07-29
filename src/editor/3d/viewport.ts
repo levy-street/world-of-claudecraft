@@ -607,6 +607,9 @@ export class Editor3DViewport {
     this.raf = 0;
     if (this.renderer) {
       try {
+        // Stop terrain streaming FIRST: it owns a pool of module workers that
+        // nothing else tears down when the whole renderer is discarded.
+        this.renderer.cancelTerrainStreaming();
         this.renderer.editorCam = null;
         this.renderer.webgl.setAnimationLoop(null);
         this.renderer.webgl.dispose();

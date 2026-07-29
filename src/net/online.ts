@@ -10,6 +10,7 @@ import {
 } from '../sim/account_flair';
 import { bagCapacity } from '../sim/bags';
 import { signChallenge } from '../sim/client_challenge';
+import { MOUNT_RACE_COURSE, type MountKey, normalizeMountKey } from '../sim/content/mounts';
 import { mechChromaItemId, mechChromaSkinIndex } from '../sim/content/skins';
 import {
   computeTalentModifiers,
@@ -64,9 +65,11 @@ import {
   type PlayerClass,
   type QuestProgress,
   type QuestState,
+  type RiftTier,
   type RiteIntensity,
   type SimEvent,
   type SportRole,
+  TICK_RATE,
   type VcBracket,
   type VcNationId,
   type WeaponSkinType,
@@ -105,6 +108,7 @@ import {
   type LockpickView,
   type MailInfo,
   type MarketInfo,
+  type MountRaceView,
   ONLINE_WORLD_AUTH_TYPE,
   ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
   type OverheadEmoteId,
@@ -113,6 +117,7 @@ import {
   type PresenceStatus,
   type RaidLockout,
   type RecipeDef,
+  type RiftFloorView,
   type SocialInfo,
   type TradeInfo,
   type VcSharedCupInfo,
@@ -1136,6 +1141,7 @@ function blankEntity(id: number): Entity {
     onGround: true,
     jumping: false,
     fallStartY: 0,
+    fatigueTicks: 0,
     hp: 1,
     maxHp: 1,
     resource: 0,
@@ -1229,6 +1235,8 @@ function blankEntity(id: number): Entity {
     pulseTimer: 0,
     stompTimer: 0,
     bigCastTimer: 0,
+    deathZoneCastTimer: 0,
+    deathZoneStrikeTimer: 0,
     infernoTimer: 0,
     infernoRemaining: 0,
     infernoPulsesFired: 0,
@@ -1282,6 +1290,9 @@ function blankEntity(id: number): Entity {
     color: 0xffffff,
     skinCatalog: 'class',
     skin: 0,
+    mountKey: '',
+    mountCastRemaining: 0,
+    mountCastKey: '',
     mainhandItemId: null,
     offhandItemId: null,
     weaponSkinLoadout: {},
@@ -1313,6 +1324,7 @@ export class ClientWorld implements IWorld {
   bags: (string | null)[] = [null, null, null, null];
   vendorBuyback: InvSlot[] = [];
   equipment: Partial<Record<EquipSlot, string>> = {};
+  equipmentInstances: import('../sim/entity').PlayerEquipmentInstances = {};
   copper = 0;
   // --- IWorldCosmetics: account cosmetics (completed-quest + mech-chroma ids),
   // mirrored from snapshot self. ---
@@ -1415,9 +1427,45 @@ export class ClientWorld implements IWorld {
   // applyLockpickEvent. delveClears is a NON-IWorld mirror behind delveShopOffers. ---
   delveRun: DelveRunInfo | null = null;
   companionState: DelveCompanionInfo | null = null;
+  // Active procedural Rift floor, rebuilt from the riftState event (no snapshot
+  // field). The renderer regenerates geometry/style from this descriptor.
+  riftFloor: RiftFloorView | null = null;
+  // Active lethal boss death zones, mirrored from riftDeathZoneSpawn events.
+  // Each entry stores the zone geometry and the wall-clock expiry (ms, performance.now
+  // scale). riftBossDeathZones() converts these to RiftBossDeathZoneView on demand.
+  // Cleared on riftState(active:false) so stale zones from a previous run never
+  // bleed into a new floor. Late joiners missing an in-flight zone are accepted.
+  private activeBossDeathZones: Array<{
+    x: number;
+    z: number;
+    radius: number;
+    expiresAtMs: number;
+  }> = [];
+  // The online client never registers rift collision regions (the server owns
+  // collision); 0 keeps rift camera occlusion a no-op here.
+  readonly riftCollisionToken = 0;
   // Lockpicking: rebuilt from the lockpick* events (there is no snapshot field).
   // Holds only the fog-windowed cells the server discloses.
   lockpickState: LockpickView | null = null;
+  // Show-jumping race: updated immediately from mountRace* events and reconciled
+  // from the authoritative self snapshot after reconnects. Internal shape carries
+  // wall-clock anchors (performance.now scale, render-interpolation timing only):
+  // goDeadlineMs for the 3..2..1 countdown and deadlineMs for the timed lap, so
+  // mountRaceView() can count both down; the server stays authoritative (its end
+  // event clears the mirror). clearedMask/cleared mirror the any-order jump progress.
+  private mountRaceMirror: {
+    raceId: string;
+    phase: 'countdown' | 'racing';
+    clearedMask: number;
+    cleared: number;
+    jumpsTotal: number;
+    goDeadlineMs: number;
+    deadlineMs: number;
+    timeLimitTicks: number;
+  } | null = null;
+  // Riding lesson liveness, mirrored from mountTrain* events and reconciled from
+  // the authoritative self snapshot for legacy mountLessonActive() consumers.
+  private mountLessonActiveMirror = false;
   delveMarks = 0;
   companionUpgrades: Record<string, number> = {};
   // Flat per-craft skill tracking (#1126). NOT yet mirrored over the wire: this
@@ -1804,7 +1852,7 @@ export class ClientWorld implements IWorld {
 
   setMoveInput(input: unknown, facing?: unknown): void {
     Object.assign(this.moveInput, sanitizeMoveInput(input));
-    if (arguments.length > 1) this.setMouselookFacing(facing);
+    if (facing !== undefined) this.setMouselookFacing(facing);
   }
 
   setMouselookFacing(facing: unknown): void {
@@ -2084,12 +2132,17 @@ export class ClientWorld implements IWorld {
     if (msg.t === 'events') {
       for (const ev of msg.list) {
         this.applyLockpickEvent(ev as SimEvent);
+        this.applyMountRaceEvent(ev as SimEvent);
+        this.applyMountTrainEvent(ev as SimEvent);
         this.applyCraftResultEvent(ev as SimEvent);
+        this.applyRiftStateEvent(ev as SimEvent);
+        this.applyRiftDeathZoneSpawnEvent(ev as SimEvent);
         this.applyMasterworkEvent(ev as SimEvent);
         this.applyDisenchantResultEvent(ev as SimEvent);
         this.applyEnchantResultEvent(ev as SimEvent);
         this.applySalvageResultEvent(ev as SimEvent);
         this.applyChatFlairEvent(ev as SimEvent);
+        this.applyUnstuckEvent(ev as SimEvent);
         this.applyPrestigeEvent(ev as SimEvent);
         this.eventQueue.push(ev as SimEvent);
       }
@@ -2398,6 +2451,7 @@ export class ClientWorld implements IWorld {
         e.name = w.nm;
         e.level = w.lv;
         e.skin = w.sk ?? 0;
+        e.mountKey = w.mnt ?? ''; // active rideable mount ('' dismounted); feeds speed + render
         e.mainhandItemId = w.mh ?? null; // equipped mainhand → held weapon model (render-only)
         e.offhandItemId = w.oh ?? null; // equipped offhand → held weapon model (render-only)
         e.weaponSkinId = w.wsk ?? null; // active weapon-skin cosmetic (render-only)
@@ -2438,6 +2492,7 @@ export class ClientWorld implements IWorld {
         e.scale = w.sc ?? 1;
         e.color = w.c ?? 0xffffff;
         e.dungeonId = w.dgn ?? null;
+        e.riftTier = typeof w.rt === 'string' ? (w.rt as RiftTier) : undefined; // rift rank badge
         e.objectItemId = w.obj ?? null;
         e.guild = w.gd ?? '';
         e.title = w.title ?? null; // Book of Deeds active title (a deed id)
@@ -2532,7 +2587,13 @@ export class ClientWorld implements IWorld {
       e.castRemaining = w.castRem ?? 0;
       e.castTotal = w.castTot ?? 0;
       e.channeling = !!w.chan;
+      // Mount summon/dismount transition (volatile): absent decodes to idle. Feeds
+      // the summon FX / call pose and (for the local player) the self-extrapolator's
+      // movement root, which reads mountCastRemaining.
+      e.mountCastRemaining = w.mcr ?? 0;
+      e.mountCastKey = w.mck ?? '';
       e.sitting = !!w.sit;
+      e.riftSliding = !!w.sld;
       e.climbing = !!w.cl;
       // Quantized 1..99 progress through the pull (see server snapshot);
       // undefined when not climbing so the visual falls back to its own clock.
@@ -2887,6 +2948,7 @@ export class ClientWorld implements IWorld {
         this.invChanged = true;
       }
       if (s.equip !== undefined) this.equipment = s.equip;
+      if (s.einst !== undefined) this.equipmentInstances = s.einst;
       // IWorldCosmetics facet (W7) self-decode: cosmetics is delta-guarded (a
       // missing field keeps the prior mirror); normalizeAccountCosmetics rebuilds it.
       if (s.cosmetics !== undefined) {
@@ -2897,6 +2959,38 @@ export class ClientWorld implements IWorld {
         this.questLog = new Map((s.qlog as QuestProgress[]).map((q) => [q.questId, q]));
       if (s.qdone !== undefined) this.questsDone = new Set(s.qdone);
       if (s.lockouts !== undefined) this.selfLockouts = s.lockouts as Record<string, number>;
+      // IWorldMounts self-decode: mntOwn is delta-guarded (omitted keeps the prior
+      // mirror). The owned collection is mirrored VERBATIM (no horse prepend): the
+      // horse is no longer auto-owned, so an empty owned list is legal and the
+      // server is the sole authority on what is collected. There is no `mntSel`
+      // any more; a legacy server still sending it is simply ignored.
+      if (Array.isArray(s.mntOwn)) {
+        this.selfOwnedMounts = (s.mntOwn as unknown[])
+          .map((k) => normalizeMountKey(typeof k === 'string' ? k : ''))
+          .filter((k): k is MountKey => k !== '');
+      }
+      if (s.mntRtd !== undefined) this.selfRidingTrained = s.mntRtd === true;
+      if (s.mntLesson !== undefined) this.mountLessonActiveMirror = s.mntLesson === true;
+      if (s.mntRace !== undefined) {
+        const view = s.mntRace as MountRaceView | null;
+        if (!view) {
+          this.mountRaceMirror = null;
+        } else {
+          const goTicksLeft = Math.max(0, Number(view.goTicksLeft) || 0);
+          const ticksLeft = Math.max(0, Number(view.ticksLeft) || 0);
+          const timeLimitTicks = Math.max(0, Number(view.timeLimitTicks) || 0);
+          this.mountRaceMirror = {
+            raceId: String(view.raceId),
+            phase: view.phase === 'racing' ? 'racing' : 'countdown',
+            clearedMask: Math.max(0, Number(view.clearedMask) || 0),
+            cleared: Math.max(0, Number(view.cleared) || 0),
+            jumpsTotal: Math.max(0, Number(view.jumpsTotal) || 0),
+            goDeadlineMs: now + (goTicksLeft / TICK_RATE) * 1000,
+            deadlineMs: now + (ticksLeft / TICK_RATE) * 1000,
+            timeLimitTicks,
+          };
+        }
+      }
       if (s.ddiff === 'normal' || s.ddiff === 'heroic') this.selectedDungeonDifficulty = s.ddiff;
       if (s.qlog !== undefined || s.qdone !== undefined) this.pendingQuestCommands?.clear();
       // IWorldTalents facet (W7) self-decode: tal is delta-guarded (omitted keeps
@@ -3219,6 +3313,9 @@ export class ClientWorld implements IWorld {
   stopAutoAttack(): void {
     this.cmd({ cmd: 'stopattack' });
   }
+  unstuck(): void {
+    this.cmd({ cmd: 'unstuck' });
+  }
   releaseSpirit(): void {
     this.cmd({ cmd: 'release' });
   }
@@ -3385,6 +3482,15 @@ export class ClientWorld implements IWorld {
   unequipItem(slot: EquipSlot): void {
     this.cmd({ cmd: 'unequip_item', slot });
   }
+  upgradeRiftItem(itemId: string): void {
+    this.cmd({ cmd: 'rift_upgrade_item', item: itemId });
+  }
+  enchantRiftItem(itemId: string, stat: string): void {
+    this.cmd({ cmd: 'rift_enchant_item', item: itemId, stat });
+  }
+  socketRiftGem(itemId: string, gemId: string): void {
+    this.cmd({ cmd: 'rift_socket_gem', item: itemId, gem: gemId });
+  }
   get bagCapacity(): number {
     return bagCapacity(this.bags);
   }
@@ -3500,6 +3606,114 @@ export class ClientWorld implements IWorld {
   claimEventSkin(skin: number): void {
     const idx = Math.max(0, Math.floor(skin));
     this.cmd({ cmd: 'claim_event_skin', skin: idx });
+  }
+  // --- IWorldMounts: collection + dismount. Summoning a specific mount is an
+  // item use, not a mount command, so nothing here sends one. The toggle stays
+  // authoritative because the server's combat gate can refuse it, and the active
+  // identity mirror (mnt) lands on the next snapshot either way. ---
+  ownedMounts(): readonly MountKey[] {
+    return this.selfOwnedMounts;
+  }
+  ridingTrained(): boolean {
+    return this.selfRidingTrained;
+  }
+  toggleMounted(): void {
+    this.cmd({ cmd: 'mount_toggle' });
+  }
+  // --- riding skill purchase: server-authoritative; on success the snapshot
+  // delta (mntRtd=true) confirms the skill was granted. ---
+  learnRiding(npcId: number): void {
+    this.cmd({ cmd: 'learn_riding', npc: npcId });
+  }
+  // --- riding lesson: fully server-authoritative, no optimistic local nudge;
+  // feedback rides the mountTrain* events straight to the HUD (drainEvents), no
+  // mirrored state. ---
+  mountTrainBegin(): void {
+    this.cmd({ cmd: 'mount_train_begin' });
+  }
+  // --- show-jumping race: start/cancel commands (platform and eligibility are
+  // re-validated server-side); events update the read immediately and the self
+  // snapshot reconciles it after reconnects. Both count down against wall-clock
+  // anchors while the server remains authoritative. ---
+  mountRaceStart(): void {
+    this.cmd({ cmd: 'mount_race_start' });
+  }
+  mountRaceCancel(): void {
+    this.cmd({ cmd: 'mount_race_cancel' });
+  }
+  mountLessonActive(): boolean {
+    return this.mountLessonActiveMirror;
+  }
+  mountRaceView(): MountRaceView | null {
+    const s = this.mountRaceMirror;
+    if (!s) return null;
+    const now = performance.now();
+    const goMs = Math.max(0, s.goDeadlineMs - now);
+    const remMs = Math.max(0, s.deadlineMs - now);
+    return {
+      raceId: s.raceId,
+      phase: s.phase,
+      clearedMask: s.clearedMask,
+      cleared: s.cleared,
+      jumpsTotal: s.jumpsTotal,
+      goTicksLeft: s.phase === 'countdown' ? Math.round((goMs / 1000) * TICK_RATE) : 0,
+      ticksLeft: s.phase === 'racing' ? Math.round((remMs / 1000) * TICK_RATE) : s.timeLimitTicks,
+      timeLimitTicks: s.timeLimitTicks,
+    };
+  }
+  // Mirror the authoritative race lifecycle into mountRaceMirror. Gate positions
+  // never ride the wire (the racing line derives from the shared
+  // MOUNT_RACE_COURSE content); the events still flow to the HUD (drainEvents)
+  // for the countdown/banners.
+  private applyMountRaceEvent(ev: SimEvent): void {
+    if (ev.type === 'mountRaceCountdown') {
+      this.mountRaceMirror = {
+        raceId: ev.raceId,
+        phase: 'countdown',
+        clearedMask: 0,
+        cleared: 0,
+        jumpsTotal: MOUNT_RACE_COURSE.jumps.length,
+        goDeadlineMs: performance.now() + (ev.countdownTicks / TICK_RATE) * 1000,
+        deadlineMs: 0,
+        timeLimitTicks: 0,
+      };
+    } else if (ev.type === 'mountRaceStart') {
+      const s = this.mountRaceMirror;
+      const deadlineMs = performance.now() + (ev.timeLimitTicks / TICK_RATE) * 1000;
+      if (s && s.raceId === ev.raceId) {
+        s.phase = 'racing';
+        s.jumpsTotal = ev.jumpsTotal;
+        s.timeLimitTicks = ev.timeLimitTicks;
+        s.deadlineMs = deadlineMs;
+      } else {
+        // A start without a preceding countdown mirror (late join / dropped
+        // event): build the racing mirror straight from the start event.
+        this.mountRaceMirror = {
+          raceId: ev.raceId,
+          phase: 'racing',
+          clearedMask: 0,
+          cleared: 0,
+          jumpsTotal: ev.jumpsTotal,
+          goDeadlineMs: 0,
+          deadlineMs,
+          timeLimitTicks: ev.timeLimitTicks,
+        };
+      }
+    } else if (ev.type === 'mountRaceJump') {
+      const s = this.mountRaceMirror;
+      if (s && s.raceId === ev.raceId) {
+        s.clearedMask = ev.mask;
+        s.cleared = ev.cleared;
+        s.jumpsTotal = ev.jumpsTotal;
+      }
+    } else if (ev.type === 'mountRaceEnd') {
+      if (this.mountRaceMirror?.raceId === ev.raceId) this.mountRaceMirror = null;
+    }
+  }
+  // Mirror riding-lesson liveness for legacy mountLessonActive() consumers.
+  private applyMountTrainEvent(ev: SimEvent): void {
+    if (ev.type === 'mountTrainSession') this.mountLessonActiveMirror = true;
+    else if (ev.type === 'mountTrainEnd') this.mountLessonActiveMirror = false;
   }
   toggleWeaponStow(): void {
     // Optimistic local nudge (like changeSkin/playEmote) so the sheathe pose and
@@ -4087,9 +4301,28 @@ export class ClientWorld implements IWorld {
   buyHeroicVendorItem(itemId: string): void {
     this.cmd({ cmd: 'heroic_buy', itemId });
   }
+  // Live lethal death zones on the current rift boss floor. Mirrored from
+  // riftDeathZoneSpawn events emitted at zone-placement time; the client counts
+  // each zone down locally and drops it when remaining falls to zero.
+  riftBossDeathZones(): import('../world_api/dungeons').RiftBossDeathZoneView[] {
+    const now = performance.now();
+    const out: import('../world_api/dungeons').RiftBossDeathZoneView[] = [];
+    for (const z of this.activeBossDeathZones) {
+      const remaining = (z.expiresAtMs - now) / 1000;
+      if (remaining > 0) out.push({ x: z.x, z: z.z, radius: z.radius, remaining });
+    }
+    return out;
+  }
   // Raid lockouts mirrored from snapshot self as {dungeonId: expiryEpochMs}; the
   // remaining time is derived locally so the countdown ticks down without traffic.
   private selfLockouts: Record<string, number> = {};
+  // The owned collection, mirrored from `s.mntOwn`. Starts empty: nothing is owned
+  // until the server says so (the horse is no longer auto-granted), so an empty list
+  // is the correct pre-snapshot state.
+  private selfOwnedMounts: MountKey[] = [];
+  // Riding skill, mirrored from the snapshot `s.mntRtd`. False until the server
+  // confirms the player purchased it from Marla.
+  private selfRidingTrained = false;
   raidLockouts(): RaidLockout[] {
     const now = Date.now();
     const src = this.selfLockouts ?? {};
@@ -4136,6 +4369,43 @@ export class ClientWorld implements IWorld {
   }
   // Mirror the authoritative craftResult event into lastCraftResult (#1127).
   // The event still flows to the HUD (drainEvents) for a toast/log line.
+  private applyRiftStateEvent(ev: SimEvent): void {
+    if (ev.type !== 'riftState') return;
+    this.riftFloor = ev.active
+      ? {
+          eventId: ev.eventId,
+          instanceId: ev.instanceId,
+          seed: ev.seed,
+          baseLevel: ev.baseLevel,
+          floorIndex: ev.floorIndex,
+          floorCount: ev.floorCount,
+          origin: ev.origin,
+          contentId: ev.contentId,
+          contentHash: ev.contentHash,
+          upgrade: ev.upgrade,
+          name: ev.name,
+          themeName: ev.themeName,
+          tier: ev.tier,
+        }
+      : null;
+    // Clear death zones on rift exit / floor change so stale rings from a
+    // previous run never bleed into a new floor.
+    if (!ev.active) this.activeBossDeathZones = [];
+  }
+
+  // Mirror a spawned lethal boss death zone so riftBossDeathZones() returns
+  // the live ring for the renderer. The zone counts down via wall-clock; no
+  // tick dependency needed. Expired entries are lazily dropped by the reader.
+  private applyRiftDeathZoneSpawnEvent(ev: SimEvent): void {
+    if (ev.type !== 'riftDeathZoneSpawn') return;
+    this.activeBossDeathZones.push({
+      x: ev.x,
+      z: ev.z,
+      radius: ev.radius,
+      expiresAtMs: performance.now() + ev.durationSecs * 1000,
+    });
+  }
+
   private applyCraftResultEvent(ev: SimEvent): void {
     if (ev.type !== 'craftResult') return;
     this.lastCraftResult = {
@@ -4148,6 +4418,24 @@ export class ClientWorld implements IWorld {
       reason: ev.reason,
     };
   }
+  // A successful recovery is intentionally shorter than the normal large-delta
+  // snapshot snap threshold. Mirror its authoritative event immediately so an
+  // eight-yard correction never spends a frame interpolating back into the wall.
+  private applyUnstuckEvent(ev: SimEvent): void {
+    if (ev.type !== 'unstuck' || ev.phase !== 'completed') return;
+    const p = this.entities.get(ev.pid ?? this.playerId);
+    if (!p) return;
+    p.pos = {
+      x: ev.destination.x,
+      y: ev.destination.y,
+      z: ev.destination.z,
+    };
+    p.prevPos = { ...p.pos };
+    p.vx = 0;
+    p.vy = 0;
+    p.vz = 0;
+  }
+
   // Mirror the authoritative masterwork event into lastMasterwork
   // (Professions 2.0), modeled exactly on applyCraftResultEvent
   // above. The event still flows to the HUD (drainEvents) for a future

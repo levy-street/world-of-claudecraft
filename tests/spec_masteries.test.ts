@@ -208,13 +208,17 @@ describe('spec masteries', () => {
 
   it('applies petDmgPct at BOTH the melee and ranged pet damage sites, not only the helper', () => {
     // Drive the actual damage sites (a regression that drops `dmg *= petDamageMult` at
-    // either would still pass a helper-only assertion). Same seed + fixed rolls + an
+    // either would still pass a helper-only assertion). A fixed attack-site RNG + an
     // identical dummy (armor cancels in the ratio) isolate the multiplier: BM's Packbond (petDmgPct 0.35)
     // must deal exactly 1.35x what a no-pet-mastery spec's identical pet deals.
     const setup = (spec: string) => {
       const sim = new Sim({ seed: 11, playerClass: 'hunter', autoEquip: true });
       sim.setPlayerLevel(20);
       sim.setSpec(spec);
+      // World construction consumes the shared RNG, so pin subsequent combat rolls:
+      // adding unrelated world content must not move this multiplier test across an
+      // integer-rounding boundary.
+      (sim as unknown as { rng: { next: () => number } }).rng.next = () => 0.5;
       const pet = createMob(9101, MOBS.forest_wolf, 20, sim.player.pos);
       pet.ownerId = sim.player.id;
       pet.weapon = { ...pet.weapon, min: 100, max: 100 };

@@ -244,8 +244,8 @@ describe('corpseHarvestView: a selection that forfeits every yield (#2509)', () 
     // The sweep has to actually VISIT both disabled arms. A content retag that
     // left no mixed template would otherwise pass it all-false with the mirror
     // never exercised at all.
-    expect(disabledSeen).toBe(15);
-    expect(byPickGate).toBe(11);
+    expect(disabledSeen).toBe(16);
+    expect(byPickGate).toBe(12);
     expect(byCorpseGate).toBe(4);
   });
 });

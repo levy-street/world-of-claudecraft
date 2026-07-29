@@ -11,12 +11,15 @@ import { GFX } from '../gfx';
 import { createWeaponVfx, WEAPON_VFX, type WeaponVfxHandle } from '../weapon_vfx';
 import { weaponVfxTuningFor } from '../weapon_vfx_tuning';
 import {
+  type AnimActionWeight,
   type AnimState,
   advanceSwimBlend,
   type BaseState,
   desiredBaseState,
+  drivesPose,
   locomotionTimeScale,
   pickProxyHeight,
+  scanAnimRepair,
 } from './anim_state';
 import {
   applyMaterials,
@@ -187,6 +190,16 @@ const MOONKIN_TINT = new THREE.Color(0x9d6bff);
 // dark enough that the body still shades and the flames read against it.
 const METAMORPH_TINT = new THREE.Color(0x4f2170);
 
+/** The live mixer facts the pure watchdog decides on (see anim_state.ts). */
+function readActionWeight(a: THREE.AnimationAction, into?: AnimActionWeight): AnimActionWeight {
+  const scheduled = a.isScheduled();
+  const effectiveWeight = a.getEffectiveWeight();
+  if (!into) return { scheduled, effectiveWeight };
+  into.scheduled = scheduled;
+  into.effectiveWeight = effectiveWeight;
+  return into;
+}
+
 // shared invisible click capsule — raycaster ignores `visible`, render doesn't
 let clickGeoSingleton: THREE.CylinderGeometry | null = null;
 function clickGeo(): THREE.CylinderGeometry {
@@ -277,6 +290,11 @@ export class CharacterVisual {
   private currentIsOneShot = false;
   private currentOneShotIsEmote = false;
   private deadLock = false;
+  /** consecutive frames with no action driving the pose (the T-pose watchdog) */
+  private starvedFrames = 0;
+  /** Per-frame scratch view of every action's mixer weight, refilled in place:
+   *  a fresh array per rig per frame would be real GC churn at raid rig counts. */
+  private readonly weightScan: AnimActionWeight[] = [];
   private wasDead = false;
   private initialized = false;
   private attackIdx = 0;
@@ -470,6 +488,15 @@ export class CharacterVisual {
         if (this.baseState === 'spin') this.current.timeScale = SPIN_ATTACK_TIMESCALE;
       }
     }
+
+    // Zero-weight watchdog. The fades above only run on a base-state EDGE, so
+    // any transient that leaves NO action driving the rig keeps it in bind pose
+    // (the T-pose) for as long as the state is held, and strafe/cast/walk are
+    // all held states. Re-drive the base pose instead of waiting for the next
+    // edge. Debounced, so a legitimate crossfade can never trip it.
+    const scan = scanAnimRepair(this.starvedFrames, this.readActionWeights(), this.deadLock);
+    this.starvedFrames = scan.starvedFrames;
+    if (scan.repair) this.repairPose();
 
     if (s.spinning && !s.dead) {
       this.spinAngle = (this.spinAngle + dt * SPIN_RATE) % (Math.PI * 2);
@@ -800,6 +827,19 @@ export class CharacterVisual {
     const clip = firstLoadedEmoteClip(spec, (name) => this.action(name));
     if (!clip) return;
     this.playOneShot(clip, spec?.timeScale ?? 1, repeatsOverride ?? spec?.repeats ?? 1, id);
+  }
+
+  /** The summon gesture: the rider throws an arm up as a mount is called. A thin
+   *  wrapper over the Spellcast_Raise one-shot, time-scaled so the single raise
+   *  roughly fills the transition window (clamped so a very short or long window
+   *  still reads as a deliberate pose). No-ops on rigs without the clip. */
+  playCallPose(durationSeconds: number): void {
+    if (this.deadLock) return;
+    const a = this.action('Spellcast_Raise');
+    if (!a) return;
+    const window = Math.max(0.2, durationSeconds);
+    const timeScale = Math.min(2, Math.max(0.5, a.getClip().duration / window));
+    this.playOneShot('Spellcast_Raise', timeScale);
   }
 
   // -------------------------------------------------------------------------
@@ -1397,7 +1437,35 @@ export class CharacterVisual {
   // -------------------------------------------------------------------------
 
   private desiredBase(s: AnimState): BaseState {
-    return desiredBaseState(s, !!this.def.clips.walkBack);
+    // Whether the LOADED rig has the clip, not whether the ClipMap names one:
+    // every player ClipMap names walkBack, but baseAction() silently falls back
+    // to walk when the GLB lacks it, and the machine would then hold a state
+    // nothing is playing.
+    return desiredBaseState(s, !!this.action(this.def.clips.walkBack));
+  }
+
+  /** Refill the weight scratch from the live mixer (see `weightScan`). */
+  private readActionWeights(): AnimActionWeight[] {
+    const scan = this.weightScan;
+    let i = 0;
+    for (const a of this.actions.values()) {
+      const slot = scan[i];
+      if (slot) readActionWeight(a, slot);
+      else scan.push(readActionWeight(a));
+      i++;
+    }
+    return scan;
+  }
+
+  /** Nothing is driving the rig (see `needsAnimRepair`): drop the stale handle
+   *  so fadeTo cannot early-return on it, release the one-shot latch a missed
+   *  `finished` may have left set, and re-drive the base state. beginAction
+   *  snaps rather than fades, since there is no live pose to blend from. */
+  private repairPose(): void {
+    this.currentIsOneShot = false;
+    this.currentOneShotIsEmote = false;
+    this.current = null;
+    this.fadeTo(this.baseAction(), FADE, false);
   }
 
   private effectMaterial<T extends THREE.Material | THREE.Material[]>(material: T): T {
@@ -1550,11 +1618,32 @@ export class CharacterVisual {
     next.setLoop(oneShot || this.isOnce(next) ? THREE.LoopOnce : THREE.LoopRepeat, Infinity);
     next.clampWhenFinished = true;
     next.timeScale = 1;
-    if (prev && prev !== next) prev.fadeOut(fade);
-    next.fadeIn(fade).play();
+    this.beginAction(next, prev, fade);
     this.current = next;
     this.currentIsOneShot = oneShot;
     this.currentOneShotIsEmote = false;
+  }
+
+  /**
+   * Start `next`, crossfading out of `prev` while it still drives the rig.
+   * With no outgoing partner (nothing active, the same clip re-triggered, or a
+   * `current` that was stopped out from under us) a fadeIn would ramp the ONLY
+   * contributing action up from zero, and the mixer blends that whole deficit
+   * toward BIND pose: a T-pose for the length of the fade. Snap to full weight
+   * in that case, since there is no live pose to blend from anyway.
+   */
+  private beginAction(
+    next: THREE.AnimationAction,
+    prev: THREE.AnimationAction | null,
+    fade: number,
+  ): void {
+    if (prev && prev !== next && drivesPose(readActionWeight(prev))) {
+      prev.fadeOut(fade);
+      next.fadeIn(fade).play();
+      return;
+    }
+    next.setEffectiveWeight(1);
+    next.play();
   }
 
   /** sit-down transitions play once, then hand off to the sit-idle loop */
@@ -1571,7 +1660,10 @@ export class CharacterVisual {
     const a = this.action(name);
     if (!a) return;
     const prev = this.current;
-    if (prev === a) a.stop();
+    // reset (not stop) restarts the clip in place: stopping the clip that is
+    // ALREADY driving the rig, then fading it back in from zero with no
+    // outgoing partner, T-poses the rig for the whole fade on every same-clip
+    // re-trigger (a repeated swing, a re-fired emote, the sheathe gesture).
     a.reset();
     const repeatCount = Math.max(1, Math.floor(repeats));
     a.setLoop(repeatCount === 1 ? THREE.LoopOnce : THREE.LoopRepeat, repeatCount);
@@ -1580,8 +1672,7 @@ export class CharacterVisual {
     // whole 0.18s hand-off fade (a visible T-pose pop after every swing)
     a.clampWhenFinished = true;
     a.timeScale = timeScale;
-    if (prev && prev !== a) prev.fadeOut(ONESHOT_FADE);
-    a.fadeIn(ONESHOT_FADE).play();
+    this.beginAction(a, prev, ONESHOT_FADE);
     this.current = a;
     this.currentIsOneShot = true;
     this.currentOneShotIsEmote = emoteId !== null;
@@ -1612,7 +1703,18 @@ export class CharacterVisual {
     // runs on every enterDeath path including the created-already-dead snapshot.
     this.clickProxy.scale.y = pickProxyHeight(this.height, this.clickRadius, true);
     const death = this.action(this.def.clips.death);
-    if (!death) return;
+    if (!death) {
+      // No death clip: the corpse holds whatever pose was driving it. dead-lock
+      // freezes the zero-weight watchdog, so leave the machine on something
+      // real, or the rig sits in bind pose until it revives (and revive() would
+      // inherit a stale `current` it can neither fade out of nor blend from).
+      if (!drivesPose(this.current ? readActionWeight(this.current) : null)) {
+        this.baseState = 'idle';
+        this.current = null;
+        this.fadeTo(this.baseAction(), ONESHOT_FADE, false);
+      }
+      return;
+    }
     const prev = this.current;
     death.reset();
     death.setLoop(THREE.LoopOnce, 1);
@@ -1627,27 +1729,32 @@ export class CharacterVisual {
       this.mixer.update(0);
       return;
     }
-    if (prev && prev !== death) prev.fadeOut(ONESHOT_FADE);
-    death.fadeIn(ONESHOT_FADE).play();
+    this.beginAction(death, prev, ONESHOT_FADE);
     this.current = death;
   }
 
   private revive(): void {
     this.deadLock = false;
     this.baseState = 'idle';
+    // Release the one-shot latch: a `finished` that never arrived (the rig was
+    // throttled, or the clip was cut) would otherwise leave every later base
+    // change committing its state while silently skipping its fade.
+    this.currentIsOneShot = false;
     this.currentOneShotIsEmote = false;
     // Restore the upright pick capsule (the corpse-flatten from enterDeath).
     this.clickProxy.scale.y = pickProxyHeight(this.height, this.clickRadius, false);
+    // The clamped death pose stays the OUTGOING partner of the fade below (a
+    // paused action still fades out). Stopping it first, or clearing `current`,
+    // left the incoming clip ramping up from zero with nothing else driving the
+    // rig: bind pose (the T-pose) for the whole fade, on every single respawn.
     const death = this.action(this.def.clips.death);
-    if (death) death.stop();
-    const flourish = this.action(this.def.clips.flourish);
-    if (flourish) {
-      // skeletons claw back out of the ground; bosses taunt
-      this.current = null;
-      this.playOneShot(this.def.clips.flourish!, 1);
-    } else {
-      this.fadeTo(this.action(this.def.clips.idle), 0.2, false);
+    if (death && death !== this.current) death.stop();
+    const flourishClip = this.def.clips.flourish;
+    if (flourishClip && this.action(flourishClip)) {
+      this.playOneShot(flourishClip, 1); // skeletons claw out of the ground; bosses taunt
+      return;
     }
+    this.fadeTo(this.action(this.def.clips.idle), 0.2, false);
   }
 }
 

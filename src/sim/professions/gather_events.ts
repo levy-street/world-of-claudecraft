@@ -56,7 +56,7 @@ export function emitToZonePlayers(
     // zoneAt is overworld-only: instance space (dungeons, arenas, delves) lives
     // in far-off x bands whose z can overlap a zone strip, so instanced players
     // are excluded from zone broadcasts.
-    if (e.pos.x > DUNGEON_X_THRESHOLD || zoneAt(e.pos.z).id !== zoneId) continue;
+    if (e.pos.x > DUNGEON_X_THRESHOLD || zoneAt(e.pos.x, e.pos.z).id !== zoneId) continue;
     ctx.emit(build(meta.entityId));
   }
 }
@@ -98,7 +98,7 @@ export function announceMasterworkZone(
 ): void {
   const crafterE = ctx.entities.get(crafterPid);
   if (!crafterE || crafterE.pos.x > DUNGEON_X_THRESHOLD) return;
-  const zoneId = zoneAt(crafterE.pos.z).id;
+  const zoneId = zoneAt(crafterE.pos.x, crafterE.pos.z).id;
   emitToZonePlayers(ctx, zoneId, (recipientPid) => ({
     type: 'masterworkZone',
     pid: recipientPid,

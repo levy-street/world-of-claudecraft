@@ -400,5 +400,13 @@ export default defineConfig({
       'tests/browser/**',
       '**/*.browser.test.ts',
     ],
+    // The world grew from 3 zones to 11 and Sim construction/tick cost with
+    // it: the long tick-loop tests written against the 3-zone world brush
+    // vitest's 5s default under full-suite parallel load and flip flakily by
+    // scheduling luck. Seed sweeps use subsystem-sized world fixtures instead of
+    // repeatedly constructing unrelated ambient content, so 20s remains honest
+    // headroom for the current world size; deliberately long walkers keep their
+    // own explicit budgets.
+    testTimeout: 20000,
   },
 });

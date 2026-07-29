@@ -20,10 +20,34 @@ export const ZONE_STREAM_URLS: Record<MusicZone, string | null> = {
   vale_legacy: '/audio/music/vale.mp3',
   marsh: '/audio/music/marsh.mp3',
   peaks: '/audio/music/peaks.mp3',
+  // STAND-INS (same precedent as vale_legacy): Veiled Hollow, Drakelands, and
+  // Wraithwood do not have supplied remasters yet, so they stream the nearest
+  // existing render instead of falling silent. Replace these three URLs when
+  // their dedicated public/audio/music/<zone>.mp3 files land.
+  dusk: '/audio/music/marsh.mp3',
+  ember: '/audio/music/peaks.mp3',
+  frost: '/audio/music/frost.mp3',
+  amber: '/audio/music/amber.mp3',
+  fen: '/audio/music/fen.mp3',
+  night: '/audio/music/night.mp3',
+  haunt: '/audio/music/marsh.mp3',
+  jungle: '/audio/music/jungle.mp3',
+  garden: '/audio/music/garden.mp3',
+  gale: '/audio/music/gale.mp3',
+  farshore: '/audio/music/farshore.mp3',
   vale_cup: null,
   dungeon_hollow_crypt: '/audio/music/dungeon_hollow_crypt.mp3',
   dungeon_sunken_bastion: '/audio/music/dungeon_sunken_bastion.mp3',
   dungeon_gravewyrm_sanctum: '/audio/music/dungeon_gravewyrm_sanctum.mp3',
+  // Rift crawl stand-ins borrow the nearest-mood dungeon crawl render.
+  rift_frost: '/audio/music/dungeon_gravewyrm_sanctum.mp3',
+  rift_ember: '/audio/music/dungeon_hollow_crypt.mp3',
+  rift_venom: '/audio/music/dungeon_sunken_bastion.mp3',
+  rift_bone: '/audio/music/dungeon_gravewyrm_sanctum.mp3',
+  rift_brute: '/audio/music/dungeon_hollow_crypt.mp3',
+  rift_void: '/audio/music/dungeon_gravewyrm_sanctum.mp3',
+  rift_storm: '/audio/music/dungeon_hollow_crypt.mp3',
+  rift_tide: '/audio/music/dungeon_sunken_bastion.mp3',
 };
 
 /** The remastered battle themes; each fight opens on one chosen at random. */

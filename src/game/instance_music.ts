@@ -1,6 +1,11 @@
 import { delveAt, dungeonAt, isDelvePos, type ZoneDef } from '../sim/data';
 import { isAtSowfield } from '../sim/vale_cup_layout';
-import { type MusicZone, musicZoneForLocation, shouldResetMusicForDungeonEntry } from './music';
+import {
+  type MusicZone,
+  musicZoneForLocation,
+  riftMusicZoneForTheme,
+  shouldResetMusicForDungeonEntry,
+} from './music';
 
 export interface InstanceMusicEntity {
   kind: string;
@@ -19,6 +24,14 @@ export interface InstanceMusicCupInfo {
   spectate: InstanceMusicMatch | null;
 }
 
+// The slice of RiftFloorView the soundtrack needs: the floor's environment
+// archetype plus enough identity to key per-floor phrasing resets.
+export interface InstanceMusicRiftFloor {
+  instanceId: number;
+  floorIndex: number;
+  themeName: string;
+}
+
 export interface InstanceMusicInput {
   now: number;
   lastCombatEventAt: number;
@@ -29,6 +42,11 @@ export interface InstanceMusicInput {
   inDungeon: boolean;
   entities: Iterable<InstanceMusicEntity>;
   cupInfo: InstanceMusicCupInfo | null;
+  // The active procedural Rift floor (null outside a rift). A rift floor scores
+  // by its RiftTheme, not the dungeon fallback, and each floor counts as its own
+  // instance entry so the crawl cue re-phrases from the top even when two floors
+  // roll the same theme.
+  riftFloor: InstanceMusicRiftFloor | null;
 }
 
 export interface InstanceMusicDecision {
@@ -42,7 +60,9 @@ export interface InstanceMusicDecision {
 }
 
 export interface InstanceMusicPort {
-  resetForDungeonEntry(dungeonId: string | null): void;
+  // A procedural Rift floor has no DUNGEON_MUSIC row (its cue follows the
+  // floor's RiftTheme), so the resolved zone rides along explicitly.
+  resetForDungeonEntry(dungeonId: string | null, zone?: MusicZone): void;
   update(zone: MusicZone, inCombat: boolean): void;
   setBossCombat(active: boolean): void;
   setSowfieldTrack(track: 'match' | 'waiting' | null): void;
@@ -77,16 +97,23 @@ export function instanceMusicDecision(input: InstanceMusicInput): InstanceMusicD
     ? (delveAt(input.playerPos.x)?.id ?? FALLBACK_DELVE_ID)
     : (dungeon?.id ?? null);
   const atSowfield = !input.inDungeon && isAtSowfield(input.playerPos.x, input.playerPos.z);
+  const riftFloor = input.riftFloor;
   const zone = atSowfield
     ? 'vale_cup'
-    : musicZoneForLocation(
-        input.zone.id,
-        input.zone.biome,
-        inHub,
-        input.inDungeon || inRaidArena,
-        instanceId,
-      );
-  const musicInstanceId = input.inDungeon || inRaidArena ? instanceId : null;
+    : riftFloor
+      ? riftMusicZoneForTheme(riftFloor.themeName)
+      : musicZoneForLocation(
+          input.zone.id,
+          input.zone.biome,
+          inHub,
+          input.inDungeon || inRaidArena,
+          instanceId,
+        );
+  const musicInstanceId = riftFloor
+    ? `rift:${riftFloor.instanceId}:${riftFloor.floorIndex}`
+    : input.inDungeon || inRaidArena
+      ? instanceId
+      : null;
 
   const cupMatchView = input.cupInfo?.match ?? input.cupInfo?.spectate ?? null;
   const cupKickedOff =
@@ -115,7 +142,7 @@ export class InstanceMusicController {
   update(input: InstanceMusicInput): InstanceMusicDecision {
     const decision = instanceMusicDecision(input);
     if (shouldResetMusicForDungeonEntry(this.lastInstanceId, decision.instanceId)) {
-      this.music.resetForDungeonEntry(decision.instanceId);
+      this.music.resetForDungeonEntry(decision.instanceId, decision.zone);
     }
     this.lastInstanceId = decision.instanceId;
     this.music.update(decision.zone, decision.musicCombat);

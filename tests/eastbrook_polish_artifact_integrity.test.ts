@@ -1408,11 +1408,15 @@ describe('Eastbrook polish performance and contact evidence', () => {
       fingerprint.update('\0');
     }
     expect(acceptedFiles).toHaveLength(4);
-    // Deliberately re-pinned for the 0.31.0 version sync: package-lock.json is
-    // in every Eastbrook source inventory, so the release version bump moved
-    // the composite provenance these records carry. No capture was retaken.
+    // Second-order seal, recomputed LAST in the re-mint recipe: it hashes the
+    // performance evidence files, which carry the composite polish provenance.
+    // The chunk-streaming base merge moved src/render/renderer.ts, a
+    // fingerprinted input, so the two after-evidence files re-mint one digest
+    // pair each (renderer sha256 plus the composite fingerprint) and this seal
+    // follows. Every measured value (frame timings, draw stats, triangle and
+    // scenario numbers) is byte-identical, and no capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      'efa3499a134315a5a17ee82b87297aa5c72c9b7a9a0b4a111157c78357f37f66',
+      '930468dbefb98b791d7b66cc4d047a48d21f9927a6cf7dd41f44ffa176dfe546',
     );
   });
 

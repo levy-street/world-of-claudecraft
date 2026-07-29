@@ -3,6 +3,7 @@ import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { buildingCameraHeight } from '../sim/building_layout';
 import { mineMoundFootprint, STALL_HALF_D, STALL_HALF_W } from '../sim/colliders';
+import { MOUNT_RACE_JUMP_FIXTURES } from '../sim/content/mounts';
 import { BUILTIN_WORLD, getActiveWorldContent, WORLD_MIN_Z } from '../sim/data';
 import {
   DOCK_SECTION_LOCAL_Z,
@@ -21,7 +22,8 @@ import {
   propPlacementRoll,
 } from '../sim/prop_layout';
 import { hash2 } from '../sim/rng';
-import { terrainHeight, waterLevel } from '../sim/world';
+import type { BuildingDef } from '../sim/types';
+import { terrainHeight, WATER_LEVEL, waterLevel } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { buildEastbrookGrandArmouryView } from './eastbrook_grand_armoury';
@@ -53,6 +55,7 @@ import { GFX, sharedUniforms, surfaceMat } from './gfx';
 export interface PropsResult {
   group: THREE.Group;
   flames: THREE.Mesh[]; // animated campfire flames
+  windmillFans: THREE.Object3D[]; // live sail pivots the renderer spins
   fireLights: THREE.PointLight[];
   /**
    * Hides merged/instanced prop bands that sit entirely past the fog far plane,
@@ -88,10 +91,23 @@ interface PropAssetDef {
   strip?: RegExp;
 }
 
-const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
+// exported for render/castle_features.ts, which instances the kcas castle
+// set through the same registry (one preload gate, one manifest surface)
+export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   house1: { url: '/models/props/house_1.glb', kit: 'village' },
   house2: { url: '/models/props/house_2.glb', kit: 'village', yaw: -Math.PI / 2 },
   house3: { url: '/models/props/house_3.glb', kit: 'village' },
+  // Veiled Hollow town: KayKit Medieval Hexagon Pack buildings (CC0) with the
+  // blue-colorway palette texture shifted to the Hollow's dusk violet (baked
+  // into the *_hollow.glb files by tmp/make_kmed_hollow.mjs). Placed via the
+  // BuildingDef kinds hollowHouse / hollowInn / hollowChapel / hollowSmith /
+  // hollowMarket.
+  kmedHomeA: { url: '/models/props/kmed_home_A_hollow.glb', kit: 'kmed' },
+  kmedHomeB: { url: '/models/props/kmed_home_B_hollow.glb', kit: 'kmed' },
+  kmedTavern: { url: '/models/props/kmed_tavern_hollow.glb', kit: 'kmed' },
+  kmedChurch: { url: '/models/props/kmed_church_hollow.glb', kit: 'kmed' },
+  kmedBlacksmith: { url: '/models/props/kmed_blacksmith_hollow.glb', kit: 'kmed' },
+  kmedMarket: { url: '/models/props/kmed_market_hollow.glb', kit: 'kmed' },
   blacksmith: { url: '/models/props/blacksmith.glb', kit: 'village' },
   inn: { url: '/models/props/inn.glb', kit: 'village' },
   bellTower: { url: '/models/props/bell_tower.glb', kit: 'village' },
@@ -133,6 +149,199 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   // No yaw here: the geometry is CACHED and shared by every delve marker, so a
   // per-delve flip is applied to the placed group in buildProps, never baked.
   delveEntrance2: { url: '/models/dungeon/delve_entrance_2.glb', kit: 'dungeon' },
+  // Show-jumping race fixtures (Highwatch stables paddock): the start/finish
+  // arch and the two jump styles, placed from props.raceCourse (which mirrors
+  // the MOUNT_RACE_COURSE content). Tripo-generated CC-authored set; their long
+  // axis (the crossbar / arch face) is local +z.
+  courseArch: { url: '/models/props/course_arch.glb', kit: 'stable' },
+  jumpVertical: { url: '/models/props/jump_vertical.glb', kit: 'stable' },
+  jumpOxer: { url: '/models/props/jump_oxer.glb', kit: 'stable' },
+  // Veiled Hollow hand-placed decor, all user-made models: the Tripo pixie
+  // house (pipeline-normalized: world scale, front on +z) and the flora
+  // GLBs realm_flora.ts also scatters (near unit size, so decor entries set
+  // an explicit scale; propAsset re-bases min-y to 0 at extraction).
+  // Consumed via ZonePropsDef.decorProps.
+  pixieMushroomHouse: { url: '/models/props/pixie_mushroom_house.glb', kit: 'hollow' },
+  crystalAmethystCluster: { url: '/models/props/crystal_amethyst_cluster.glb', kit: 'hollow' },
+  crystalMoundCave: { url: '/models/props/crystal_mound_cave.glb', kit: 'hollow' },
+  starHeartCrystal: { url: '/models/props/star_heart_crystal.glb', kit: 'hollow' },
+  kkWall: { url: '/models/dungeon/wall.glb', kit: 'dungeon' },
+  kkWallCracked: { url: '/models/dungeon/wall_cracked.glb', kit: 'dungeon' },
+  kkPillar: { url: '/models/dungeon/pillar.glb', kit: 'dungeon' },
+  // The Evergarden's built garden: KayKit Medieval Hexagon Pack buildings in
+  // their green colorway (shipped by scripts/assets/specs/biome_packs.json,
+  // authored at hex-tile scale so decorProps entries carry a scale) plus the
+  // wrought-iron garden fence/arch set from KayKit Halloween Bits (world
+  // scale; specs/garden_town.json). All placed via EVERGARDEN_PROPS.decorProps.
+  hexWindmill: { url: '/models/biome/hex_windmill.glb', kit: 'khex' },
+  hexCastle: { url: '/models/biome/hex_castle.glb', kit: 'khex' },
+  hexTower: { url: '/models/biome/hex_tower.glb', kit: 'khex' },
+  hexWall: { url: '/models/biome/hex_wall.glb', kit: 'khex' },
+  hexChurch: { url: '/models/biome/hex_church.glb', kit: 'khex' },
+  hexTavern: { url: '/models/biome/hex_tavern.glb', kit: 'khex' },
+  hexBlacksmith: { url: '/models/biome/hex_blacksmith.glb', kit: 'khex' },
+  hexHomeA: { url: '/models/biome/hex_home_a.glb', kit: 'khex' },
+  hexHomeB: { url: '/models/biome/hex_home_b.glb', kit: 'khex' },
+  hexMarket: { url: '/models/biome/hex_market.glb', kit: 'khex' },
+  hexWatchtower: { url: '/models/biome/hex_watchtower.glb', kit: 'khex' },
+  hexCannonTower: { url: '/models/biome/hex_tower_cannon.glb', kit: 'khex' },
+  hexBarracks: { url: '/models/biome/hex_barracks.glb', kit: 'khex' },
+  hexCannonballs: { url: '/models/biome/hex_cannonballs.glb', kit: 'khex' },
+  hexLumber: { url: '/models/biome/hex_lumber.glb', kit: 'khex' },
+  hexWeaponRack: { url: '/models/biome/hex_weaponrack.glb', kit: 'khex' },
+  hexFlag: { url: '/models/biome/hex_flag.glb', kit: 'khex' },
+  hexWheelbarrow: { url: '/models/biome/hex_wheelbarrow.glb', kit: 'khex' },
+  // the Wickharbor city set (blue colorway) plus the harbor line: ships,
+  // docks, and the stackable tower drums the Old Beacon rebuilds from
+  hexbHomeA: { url: '/models/biome/hexb_home_a.glb', kit: 'khex' },
+  hexbHomeB: { url: '/models/biome/hexb_home_b.glb', kit: 'khex' },
+  hexbTavern: { url: '/models/biome/hexb_tavern.glb', kit: 'khex' },
+  hexbTownhall: { url: '/models/biome/hexb_townhall.glb', kit: 'khex' },
+  hexbWorkshop: { url: '/models/biome/hexb_workshop.glb', kit: 'khex' },
+  hexbMarket: { url: '/models/biome/hexb_market.glb', kit: 'khex' },
+  hexbShipyard: { url: '/models/biome/hexb_shipyard.glb', kit: 'khex' },
+  hexbStables: { url: '/models/biome/hexb_stables.glb', kit: 'khex' },
+  hexbTowerBase: { url: '/models/biome/hexb_tower_base.glb', kit: 'khex' },
+  hexbTowerA: { url: '/models/biome/hexb_tower_a.glb', kit: 'khex' },
+  hexrTowerA: { url: '/models/biome/hexr_tower_a.glb', kit: 'khex' },
+  hexbTowerB: { url: '/models/biome/hexb_tower_b.glb', kit: 'khex' },
+  hexShipBlue: { url: '/models/biome/hex_ship_blue.glb', kit: 'khex' },
+  hexShipRed: { url: '/models/biome/hex_ship_red.glb', kit: 'khex' },
+  hexShipGreen: { url: '/models/biome/hex_ship_green.glb', kit: 'khex' },
+  hexBoat: { url: '/models/biome/hex_boat.glb', kit: 'khex' },
+  hexBoatrack: { url: '/models/biome/hex_boatrack.glb', kit: 'khex' },
+  hexAnchor: { url: '/models/biome/hex_anchor.glb', kit: 'khex' },
+  hexSack: { url: '/models/biome/hex_sack.glb', kit: 'khex' },
+  hexCrateBig: { url: '/models/biome/hex_crate_big.glb', kit: 'khex' },
+  hexCrateOpen: { url: '/models/biome/hex_crate_open.glb', kit: 'khex' },
+  hexHaybale: { url: '/models/biome/hex_haybale.glb', kit: 'khex' },
+  hexTrough: { url: '/models/biome/hex_trough.glb', kit: 'khex' },
+  // the low scalloped stone wall (fences with kind 'stone'; length runs
+  // along local +z in the authored piece)
+  hexFenceStone: { url: '/models/biome/hexn_fence_stone.glb', kit: 'khex' },
+  // the raider encampment set: spiked log wall (fences with kind
+  // 'palisade'; length along local +x), red hide tents, and camp dressing
+  hexnPalisade: { url: '/models/biome/hexn_palisade.glb', kit: 'khex' },
+  hexrTent: { url: '/models/biome/hexr_tent.glb', kit: 'khex' },
+  hexrWatchtower: { url: '/models/biome/hexr_watchtower.glb', kit: 'khex' },
+  hexBarrel: { url: '/models/biome/hex_barrel.glb', kit: 'khex' },
+  hexTarget: { url: '/models/biome/hex_target.glb', kit: 'khex' },
+  hexFlagRed: { url: '/models/biome/hex_flag_red.glb', kit: 'khex' },
+  hexCannon: { url: '/models/biome/hex_cannon.glb', kit: 'khex' },
+  hexbWindmill: { url: '/models/biome/hexb_windmill.glb', kit: 'khex' },
+  // the Galecrest monuments (maintainer-authored generated models): the
+  // ship memorial on the Wickharbor dock plaza, the golden horse for the
+  // stable yard
+  shipMonument: { url: '/models/props/ship_monument.glb', kit: 'kgale' },
+  goldenHorseStatue: { url: '/models/props/golden_horse_statue.glb', kit: 'kgale' },
+  // a placeable oak (the foliage kit's biggest crown) for authored shade
+  // spots like the Garden Gate lawns; decor entries set scale, r is trunk
+  oakTree: { url: '/models/foliage/oak_4.glb', kit: 'kfol' },
+  gardenIronFence: { url: '/models/props/garden_iron_fence.glb', kit: 'kiron' },
+  gardenIronPillar: { url: '/models/props/garden_iron_pillar.glb', kit: 'kiron' },
+  gardenIronGate: { url: '/models/props/garden_iron_gate.glb', kit: 'kiron' },
+  gardenArch: { url: '/models/props/garden_arch.glb', kit: 'kiron' },
+  // the user-authored leafy fox: a clipped-topiary statue crowning the
+  // Evergarden's grandest flower beds (sibling models to the maze hedges)
+  leafyFoxStatue: { url: '/models/props/leafy_fox_statue.glb', kit: 'kiron' },
+  // the Evergarden's modeled flower beds (same maintainer-authored set);
+  // their own kit so material dedupe never crosses into the iron props
+  flowerBedSquareA: { url: '/models/props/flower_bed_square_a.glb', kit: 'kbeds' },
+  flowerBedSquareB: { url: '/models/props/flower_bed_square_b.glb', kit: 'kbeds' },
+  flowerBedRound: { url: '/models/props/flower_bed_round.glb', kit: 'kbeds' },
+  stagShrine: { url: '/models/props/stag_shrine.glb', kit: 'hollow' },
+  mushroomGiantPurple: { url: '/models/props/mushroom_giant_purple.glb', kit: 'hollow' },
+  mushroomGlowCluster: { url: '/models/props/mushroom_glow_cluster.glb', kit: 'hollow' },
+  flowerGlow: { url: '/models/props/flower_glow.glb', kit: 'hollow' },
+  shrubFlowering: { url: '/models/props/shrub_flowering.glb', kit: 'hollow' },
+  // The Drakelands castle structure set: KayKit Dungeon Remastered (CC0) pieces
+  // at walkable scale (shipped by scripts/assets/specs/drakelands_castle.json):
+  // curtain walls, gates, stairs, battlement barriers, floors, red banners,
+  // torches, rubble, and keep furnishings for the great hall.
+  kcasWall: { url: '/models/biome/kcas_wall.glb', kit: 'kcas' },
+  kcasWallHalf: { url: '/models/biome/kcas_wall_half.glb', kit: 'kcas' },
+  kcasWallCorner: { url: '/models/biome/kcas_wall_corner.glb', kit: 'kcas' },
+  kcasWallGated: { url: '/models/biome/kcas_wall_gated.glb', kit: 'kcas' },
+  kcasWallDoorway: { url: '/models/biome/kcas_wall_doorway.glb', kit: 'kcas' },
+  kcasWallBroken: { url: '/models/biome/kcas_wall_broken.glb', kit: 'kcas' },
+  kcasWallCracked: { url: '/models/biome/kcas_wall_cracked.glb', kit: 'kcas' },
+  kcasWallWindow: { url: '/models/biome/kcas_wall_window.glb', kit: 'kcas' },
+  kcasWallPillar: { url: '/models/biome/kcas_wall_pillar.glb', kit: 'kcas' },
+  kcasStairsWide: { url: '/models/biome/kcas_stairs_wide.glb', kit: 'kcas' },
+  kcasStairsWalled: { url: '/models/biome/kcas_stairs_walled.glb', kit: 'kcas' },
+  kcasBarrier: { url: '/models/biome/kcas_barrier.glb', kit: 'kcas' },
+  kcasBarrierHalf: { url: '/models/biome/kcas_barrier_half.glb', kit: 'kcas' },
+  kcasBarrierCorner: { url: '/models/biome/kcas_barrier_corner.glb', kit: 'kcas' },
+  kcasColumn: { url: '/models/biome/kcas_column.glb', kit: 'kcas' },
+  kcasPillar: { url: '/models/biome/kcas_pillar.glb', kit: 'kcas' },
+  kcasFloorLarge: { url: '/models/biome/kcas_floor_large.glb', kit: 'kcas' },
+  kcasFloorWeeds: { url: '/models/biome/kcas_floor_weeds.glb', kit: 'kcas' },
+  kcasFoundation: { url: '/models/biome/kcas_foundation.glb', kit: 'kcas' },
+  kcasBannerRedA: { url: '/models/biome/kcas_banner_red_a.glb', kit: 'kcas' },
+  kcasBannerRedShield: { url: '/models/biome/kcas_banner_red_shield.glb', kit: 'kcas' },
+  kcasBannerRedTriple: { url: '/models/biome/kcas_banner_red_triple.glb', kit: 'kcas' },
+  kcasTorch: { url: '/models/biome/kcas_torch.glb', kit: 'kcas' },
+  kcasTorchMounted: { url: '/models/biome/kcas_torch_mounted.glb', kit: 'kcas' },
+  kcasRubbleLarge: { url: '/models/biome/kcas_rubble_large.glb', kit: 'kcas' },
+  kcasRubbleHalf: { url: '/models/biome/kcas_rubble_half.glb', kit: 'kcas' },
+  kcasRocks: { url: '/models/biome/kcas_rocks.glb', kit: 'kcas' },
+  kcasChestGold: { url: '/models/biome/kcas_chest_gold.glb', kit: 'kcas' },
+  kcasTableLong: { url: '/models/biome/kcas_table_long.glb', kit: 'kcas' },
+  kcasBench: { url: '/models/biome/kcas_bench.glb', kit: 'kcas' },
+  kcasBookcase: { url: '/models/biome/kcas_bookcase.glb', kit: 'kcas' },
+  kcasKeg: { url: '/models/biome/kcas_keg.glb', kit: 'kcas' },
+  kcasBarrel: { url: '/models/biome/kcas_barrel.glb', kit: 'kcas' },
+  // The Last Keep's lived-in interior furniture (KayKit Dungeon Remastered
+  // tavern set, already committed under public/models/dungeon): beds for the
+  // residence wing, seating and clothed tables for the dining rooms, shelves,
+  // buffet counters, candelabra, stores, and the chapel shrine. Instanced by
+  // src/render/lastkeep_dressing.ts through this same registry (one preload
+  // gate, one manifest surface).
+  kcasBedRoyal: { url: '/models/dungeon/bed_decorated.glb', kit: 'kcas' },
+  kcasBedDouble: { url: '/models/dungeon/bed_b_double.glb', kit: 'kcas' },
+  kcasBedSingle: { url: '/models/dungeon/bed_b_single.glb', kit: 'kcas' },
+  kcasBedBunk: { url: '/models/dungeon/bed_a_stacked.glb', kit: 'kcas' },
+  kcasBedCot: { url: '/models/dungeon/bed_a_single.glb', kit: 'kcas' },
+  kcasBedroll: { url: '/models/dungeon/bed_floor.glb', kit: 'kcas' },
+  kcasChair: { url: '/models/dungeon/chair.glb', kit: 'kcas' },
+  kcasStool: { url: '/models/dungeon/stool.glb', kit: 'kcas' },
+  kcasTableRoundSmall: { url: '/models/dungeon/table_round_small.glb', kit: 'kcas' },
+  kcasTableRoundMedium: { url: '/models/dungeon/table_round_medium.glb', kit: 'kcas' },
+  // NOTE: the laid feast table (table_long_tablecloth_decorated_a) is already
+  // registered above as kcasTableLong (/models/biome/kcas_table_long.glb), so
+  // only the PLAIN clothed table is a new entry.
+  kcasTableCloth: { url: '/models/dungeon/table_long_tablecloth.glb', kit: 'kcas' },
+  kcasShelfLarge: { url: '/models/dungeon/shelf_large.glb', kit: 'kcas' },
+  kcasShelfSmall: { url: '/models/dungeon/shelf_small.glb', kit: 'kcas' },
+  kcasShelfBooks: { url: '/models/dungeon/shelf_small_books.glb', kit: 'kcas' },
+  kcasShelfCandles: { url: '/models/dungeon/shelf_small_candles.glb', kit: 'kcas' },
+  kcasBarA: { url: '/models/dungeon/bar_straight_a.glb', kit: 'kcas' },
+  kcasBarB: { url: '/models/dungeon/bar_straight_b.glb', kit: 'kcas' },
+  kcasBarC: { url: '/models/dungeon/bar_straight_c.glb', kit: 'kcas' },
+  kcasBartopMedium: { url: '/models/dungeon/bartop_a_medium.glb', kit: 'kcas' },
+  kcasCandleTriple: { url: '/models/dungeon/candle_triple.glb', kit: 'kcas' },
+  kcasCrateLarge: { url: '/models/dungeon/crate_large.glb', kit: 'kcas' },
+  kcasCrateSmall: { url: '/models/dungeon/crate_small.glb', kit: 'kcas' },
+  kcasCratesStacked: { url: '/models/dungeon/crates_stacked.glb', kit: 'kcas' },
+  kcasSwordShield: { url: '/models/dungeon/sword_shield.glb', kit: 'kcas' },
+  kcasShrine: { url: '/models/dungeon/shrine_candles.glb', kit: 'kcas' },
+  // The Drakelands castle bailey: KayKit Medieval Hexagon Pack buildings in the
+  // red colorway (same drakelands_castle.json spec; hex-tile scale, so decor
+  // entries carry scale like the other hex buildings).
+  hexrCastle: { url: '/models/biome/hexr_castle.glb', kit: 'khex' },
+  hexrTownhall: { url: '/models/biome/hexr_townhall.glb', kit: 'khex' },
+  hexrBarracks: { url: '/models/biome/hexr_barracks.glb', kit: 'khex' },
+  hexrChurch: { url: '/models/biome/hexr_church.glb', kit: 'khex' },
+  hexrTavern: { url: '/models/biome/hexr_tavern.glb', kit: 'khex' },
+  hexrStables: { url: '/models/biome/hexr_stables.glb', kit: 'khex' },
+  hexrHomeA: { url: '/models/biome/hexr_home_a.glb', kit: 'khex' },
+  hexrHomeB: { url: '/models/biome/hexr_home_b.glb', kit: 'khex' },
+  hexrMarket: { url: '/models/biome/hexr_market.glb', kit: 'khex' },
+  hexrBlacksmith: { url: '/models/biome/hexr_blacksmith.glb', kit: 'khex' },
+  hexrWindmill: { url: '/models/biome/hexr_windmill.glb', kit: 'khex' },
+  hexrArcheryrange: { url: '/models/biome/hexr_archeryrange.glb', kit: 'khex' },
+  hexrTowerCatapult: { url: '/models/biome/hexr_tower_catapult.glb', kit: 'khex' },
+  hexrTowerBase2: { url: '/models/biome/hexr_tower_base.glb', kit: 'khex' },
 };
 
 type PropKey = keyof typeof PROP_ASSET_DEFS;
@@ -170,6 +379,8 @@ const LOW_TIER_PROP_KEYS: readonly PropKey[] = [
   'dockPlatform',
   'rowboat',
   'graveRound',
+  'hexFenceStone',
+  'hexnPalisade',
   'graveCross',
   'graveBevel',
   'graveDecor',
@@ -178,6 +389,12 @@ const LOW_TIER_PROP_KEYS: readonly PropKey[] = [
   'crateWooden',
   'barrel',
   'delveEntrance2', // delve entrance portal, a landmark, so keep it on low gfx too
+  // The race fixtures are GAMEPLAY landmarks (players ride a timed course
+  // against them), so every tier renders them: hiding one on low gfx would
+  // break the gameplay-neutral graphics invariant.
+  'courseArch',
+  'jumpVertical',
+  'jumpOxer',
 ];
 
 /**
@@ -222,6 +439,9 @@ export const propPreloadInternalsForTest = {
   allPropKeys: ALL_PROP_KEYS,
   lowTierPropKeys: LOW_TIER_PROP_KEYS,
   preloadPropKeys,
+  propAssetUrl: Object.fromEntries(
+    Object.entries(PROP_ASSET_DEFS).map(([key, def]) => [key, def.url]),
+  ) as Record<string, string>,
 };
 
 // Per-material look overrides, keyed `${kit}:${name}` (falls back to name).
@@ -263,6 +483,8 @@ const MAT_OVERRIDES: Record<
 interface AssetPart {
   geo: THREE.BufferGeometry;
   mat: THREE.Material;
+  /** source mesh name (picks out animated parts like the windmill fan) */
+  name: string;
 }
 interface PropAsset {
   parts: AssetPart[];
@@ -304,28 +526,39 @@ function convertMaterial(
       ? new THREE.Color(ov.color)
       : (s.color?.clone() ?? new THREE.Color(0xffffff));
   const map = s.map ?? null;
+  // Tripo-generated 'hollow' kit: one baked painterly albedo per model, glow
+  // painted in, smooth normals. Two nudges make them sit beside the
+  // hand-authored kits: flat shading (faceted low-poly light response) and a
+  // soft albedo re-emit (the realm_flora mushroom trick) so painted windows,
+  // lanterns, and crystals actually shine under the permanent dusk.
+  const hollow = kit === 'hollow';
+  const hollowEmissive = hollow && map;
   let mat: THREE.Material;
   if (GFX.standardMaterials) {
     mat = new THREE.MeshStandardMaterial({
       color,
       map,
       vertexColors: hasVertexColors,
+      flatShading: hollow,
       normalMap: s.normalMap ?? null,
       roughnessMap: s.roughnessMap ?? null,
       metalnessMap: s.metalnessMap ?? null,
       aoMap: s.aoMap ?? null,
-      roughness: ov?.roughness ?? (s.isMeshStandardMaterial ? s.roughness : 0.9),
+      roughness: ov?.roughness ?? (hollow ? 0.85 : s.isMeshStandardMaterial ? s.roughness : 0.9),
       metalness: ov?.metalness ?? (s.isMeshStandardMaterial ? Math.min(s.metalness, 0.85) : 0),
-      emissive: new THREE.Color(ov?.emissive ?? 0x000000),
-      emissiveIntensity: ov?.emissiveIntensity ?? 1,
+      emissive: new THREE.Color(hollowEmissive ? 0xffffff : (ov?.emissive ?? 0x000000)),
+      emissiveMap: hollowEmissive ? map : null,
+      emissiveIntensity: hollowEmissive ? 0.3 : (ov?.emissiveIntensity ?? 1),
     });
   } else {
     mat = new THREE.MeshLambertMaterial({
       color,
       map,
       vertexColors: hasVertexColors,
-      emissive: new THREE.Color(ov?.emissive ?? 0x000000),
-      emissiveIntensity: (ov?.emissiveIntensity ?? 1) * 0.6,
+      flatShading: hollow,
+      emissive: new THREE.Color(hollowEmissive ? 0xffffff : (ov?.emissive ?? 0x000000)),
+      emissiveMap: hollowEmissive ? map : null,
+      emissiveIntensity: hollowEmissive ? 0.2 : (ov?.emissiveIntensity ?? 1) * 0.6,
     });
   }
   mat.name = `${kit}:${s.name}`;
@@ -372,7 +605,7 @@ function propAsset(key: PropKey): PropAsset {
     geo.applyMatrix4(mesh.matrixWorld);
     if (yawM) geo.applyMatrix4(yawM);
     if (!geo.getAttribute('normal')) geo.computeVertexNormals();
-    parts.push({ geo, mat: convertMaterial(srcMat, def.kit, !!col) });
+    parts.push({ geo, mat: convertMaterial(srcMat, def.kit, !!col), name: mesh.name });
   });
   if (!parts.length) throw new Error(`prop asset has no meshes: ${key}`);
   // normalize origin: xz-center at 0, base at y=0
@@ -712,6 +945,7 @@ function buildDelveEmbers(
 export function buildProps(seed: number, delveLabel?: (delveId: string) => string): PropsResult {
   const group = new THREE.Group();
   const flames: THREE.Mesh[] = [];
+  const windmillFans: THREE.Object3D[] = [];
   const fireLights: THREE.PointLight[] = [];
   const activeContent = getActiveWorldContent();
   const builtInWorld = activeContent === BUILTIN_WORLD;
@@ -827,11 +1061,26 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
 
   // ---- buildings: village houses / inn / composed chapel ------------------
   const housePool: PropKey[] = ['house1', 'house2', 'blacksmith'];
+  const hollowPool: PropKey[] = ['kmedHomeA', 'kmedHomeB'];
   const houseHeight: Record<string, number> = {
     house1: 8.0,
     house2: 7.6,
     blacksmith: 6.6,
     inn: 7.6,
+    kmedHomeA: 8.0,
+    kmedHomeB: 8.8,
+    kmedTavern: 8.5,
+    kmedChurch: 10.5,
+    kmedBlacksmith: 6.2,
+    kmedMarket: 5.2,
+  };
+  // single-asset (non-pool) building kinds
+  const kindAsset: Partial<Record<BuildingDef['kind'], PropKey>> = {
+    inn: 'inn',
+    hollowInn: 'kmedTavern',
+    hollowChapel: 'kmedChurch',
+    hollowSmith: 'kmedBlacksmith',
+    hollowMarket: 'kmedMarket',
   };
 
   for (const b of activeContent.props.buildings) {
@@ -915,8 +1164,9 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       );
       continue;
     }
+    const pool = b.kind === 'hollowHouse' ? hollowPool : housePool;
     const asset: PropKey =
-      b.kind === 'inn' ? 'inn' : housePool[Math.floor(keyRand(key, 3) * 0.999 * housePool.length)];
+      kindAsset[b.kind] ?? pool[Math.floor(keyRand(key, 3) * 0.999 * pool.length)];
     const a = propAsset(asset);
     const g = new THREE.Group();
     addParts(g, asset, { scale: [b.w / a.size.x, houseHeight[asset] / a.size.y, b.d / a.size.z] });
@@ -924,6 +1174,50 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     g.rotation.y = b.rot;
     group.add(shadowed(g));
     registerHideable(g, obbFootprint(b.x, b.z, b.w / 2, b.d / 2, b.rot, roofY));
+  }
+
+  // ---- hand-placed GLB decor (the generated storybook set) -----------------
+  // World-scale, front-on-+z models: place at scale 1, orient with rot alone.
+  // r > 0 entries mirror the circle collider in colliders.ts and camera-ghost;
+  // r 0 dressing stays always-visible (small silhouettes, nothing to hide).
+  for (const d of getActiveWorldContent().props.decorProps ?? []) {
+    if (!(d.key in PROP_ASSET_DEFS)) {
+      console.warn(`decorProps: unknown prop key "${d.key}" skipped`);
+      continue;
+    }
+    const g = new THREE.Group();
+    const holder = addParts(g, d.key as PropKey, { scale: d.scale ?? 1 });
+    // the windmill's sail cross is a distinct authored mesh: reparent it onto
+    // a pivot at its axle so the renderer can spin it (kept out of the static
+    // merge, the campfire-flame idiom)
+    if (d.key === 'hexWindmill' || d.key === 'hexbWindmill') {
+      const a = propAsset(d.key);
+      const fanIdx = a.parts.findIndex((part) => /fan/i.test(part.name));
+      if (fanIdx >= 0) {
+        const fanMesh = holder.children[fanIdx] as THREE.Mesh;
+        const axle = (a.parts[fanIdx].geo.boundingBox as THREE.Box3).getCenter(new THREE.Vector3());
+        const pivot = new THREE.Group();
+        pivot.position.copy(axle);
+        fanMesh.position.set(-axle.x, -axle.y, -axle.z);
+        holder.remove(fanMesh);
+        pivot.add(fanMesh);
+        holder.add(pivot);
+        keepFromMerge.add(fanMesh);
+        windmillFans.push(pivot);
+      }
+    }
+    // floating decor (moored ships) rides the waterline at its draft depth
+    // instead of standing on the seabed
+    const baseY =
+      d.float !== undefined
+        ? Math.max(ground(d.x, d.z), WATER_LEVEL - d.float)
+        : ground(d.x, d.z) - 0.05;
+    g.position.set(d.x, baseY, d.z);
+    g.rotation.y = d.rot ?? 0;
+    group.add(shadowed(g));
+    if (d.r) {
+      registerHideable(g, circleFootprint(d.x, d.z, d.r, baseY + (d.h ?? 4)));
+    }
   }
 
   // ---- market stalls (smith/armorer stalls get anvil + weapon stand) ------
@@ -998,13 +1292,26 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   }
 
   // ---- town fences: village fence module repeated along the run ------------
+  // (kind 'stone': the low scalloped KayKit wall, its authored length along
+  // local +z; kind 'palisade': the spiked KayKit log wall, length along
+  // local +x like the wood rail)
+  const STONE_WALL_SCALE = 4.2;
+  const STONE_MODULE_LEN = 1.155 * STONE_WALL_SCALE;
+  const PALISADE_MODULE_LEN = 2.0; // authored length before scaling
+  const PALISADE_SEG = 6.4; // target module length in the world
   for (const f of activeContent.props.fences) {
     if (builtInWorld && isEastbrookRebuildFence(f)) continue;
     const len = Math.hypot(f.x2 - f.x1, f.z2 - f.z1);
-    const n = Math.max(1, Math.round(len / 2.35));
+    const stone = f.kind === 'stone';
+    const palisade = f.kind === 'palisade';
+    const n = Math.max(
+      1,
+      Math.round(len / (stone ? STONE_MODULE_LEN : palisade ? PALISADE_SEG : 2.35)),
+    );
     const dirx = (f.x2 - f.x1) / len,
       dirz = (f.z2 - f.z1) / len;
-    const yaw = Math.atan2(-dirz, dirx); // module length runs along local +x
+    // module length runs along local +x (wood, palisade) or local +z (stone)
+    const yaw = stone ? Math.atan2(dirx, dirz) : Math.atan2(-dirz, dirx);
     for (let i = 0; i < n; i++) {
       const x0 = f.x1 + (f.x2 - f.x1) * (i / n),
         z0 = f.z1 + (f.z2 - f.z1) * (i / n);
@@ -1015,6 +1322,31 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       const pitch = Math.atan2(g1 - g0, len / n);
       const mx = (x0 + x1) / 2,
         mz = (z0 + z1) / 2;
+      if (stone) {
+        // stretch the module to close the run exactly; sink a touch so the
+        // base course follows sloped ground without floating
+        const segScale = (len / n / STONE_MODULE_LEN) * STONE_WALL_SCALE;
+        addInstance(
+          'hexFenceStone',
+          mx,
+          (g0 + g1) / 2 - 0.12,
+          mz,
+          new THREE.Euler(-pitch, yaw, 0, 'YXZ'),
+          [STONE_WALL_SCALE, STONE_WALL_SCALE, segScale],
+        );
+        continue;
+      }
+      if (palisade) {
+        addInstance(
+          'hexnPalisade',
+          mx,
+          (g0 + g1) / 2 - 0.15,
+          mz,
+          new THREE.Euler(0, yaw, pitch, 'YZX'),
+          [len / n / PALISADE_MODULE_LEN, 3.2, 1.8],
+        );
+        continue;
+      }
       const sy = 2.9 + (propRand(mx, mz, 1) - 0.5) * 0.5;
       addInstance('fence', mx, (g0 + g1) / 2 - 0.05, mz, new THREE.Euler(0, yaw, pitch, 'YZX'), [
         3.0,
@@ -1055,8 +1387,12 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     flames.push(flame);
     noShadow.add(flame);
     const light = new THREE.PointLight(0xff8830, 12, 16, 2);
-    light.position.y = 1.2;
-    g.add(light);
+    // Root-level, world-positioned: the light must NOT live inside the hideable
+    // campfire group. A parent visibility toggle (fog cull / camera ghost) would
+    // change numPointLights and recompile every lit material mid-travel (the
+    // open-world shader-compile freeze). The fireLights budget owns its shine.
+    light.position.set(x, y + 1.2, z);
+    group.add(light);
     fireLights.push(light);
     g.position.set(x, y, z);
     group.add(shadowed(g));
@@ -1349,12 +1685,22 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
         scale: [0.78, 0.52, zScale],
       });
     }
-    const hut = propAsset('house3');
-    addParts(g, 'house3', {
-      x: d.hutLocal.x,
-      z: d.hutLocal.z,
-      scale: [(d.hutLocal.hw * 2) / hut.size.x, 2.6 / hut.size.y, (d.hutLocal.hd * 2) / hut.size.z],
-    });
+    // hw/hd 0 means this dock carries no stone hut (e.g. the Farshore Landing).
+    // Skip it entirely: a zero-scale mesh has a degenerate (non-invertible)
+    // transform, which reads as NaN normals and flickers as a black square.
+    const hasHut = d.hutLocal.hw > 0 && d.hutLocal.hd > 0;
+    if (hasHut) {
+      const hut = propAsset('house3');
+      addParts(g, 'house3', {
+        x: d.hutLocal.x,
+        z: d.hutLocal.z,
+        scale: [
+          (d.hutLocal.hw * 2) / hut.size.x,
+          2.6 / hut.size.y,
+          (d.hutLocal.hd * 2) / hut.size.z,
+        ],
+      });
+    }
     if (!lowProps) {
       // Loose dressing from the shared DOCK_DRESSING layout (all collidable
       // now, so they sit OFF the pinned-crossable plank walkway, on the
@@ -1397,14 +1743,16 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     g.rotation.y = d.rot;
     group.add(shadowed(g));
     // stone hut OBB — same offset/extents/rotation as the collider
-    const hc = Math.cos(d.rot),
-      hs = Math.sin(d.rot);
-    const hx = d.x + d.hutLocal.x * hc + d.hutLocal.z * hs;
-    const hz = d.z - d.hutLocal.x * hs + d.hutLocal.z * hc;
-    registerHideable(
-      g,
-      obbFootprint(hx, hz, d.hutLocal.hw, d.hutLocal.hd, d.rot, ground(hx, hz) + 2.9),
-    );
+    if (hasHut) {
+      const hc = Math.cos(d.rot),
+        hs = Math.sin(d.rot);
+      const hx = d.x + d.hutLocal.x * hc + d.hutLocal.z * hs;
+      const hz = d.z - d.hutLocal.x * hs + d.hutLocal.z * hc;
+      registerHideable(
+        g,
+        obbFootprint(hx, hz, d.hutLocal.hw, d.hutLocal.hd, d.rot, ground(hx, hz) + 2.9),
+      );
+    }
   }
 
   // ---- delve entrance: Meshy portal-door + animated void + carved name lintel -
@@ -1641,6 +1989,62 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     group.add(face);
   }
 
+  // ---- show-jumping race fixtures (Highwatch Stables) -----------------------
+  // The start/finish arch and the jumps, permanent landmarks placed from
+  // props.raceCourse (zone content mirroring MOUNT_RACE_COURSE), so the visible
+  // course can never drift from the gates the race system detects. Rendered on
+  // EVERY tier (riders race against these; no tier may hide them). colliders.ts
+  // builds matching fence-like OBBs from the same raceCourse and fixture-size
+  // data, so grounded riders stop and deliberate jumps clear. Merged static.
+  const raceCourse = getActiveWorldContent().props.raceCourse;
+  if (raceCourse) {
+    // The models' long axis (crossbar / arch face) is local +z; yawing by
+    // dir + PI/2 turns it perpendicular to the riding heading, so every gate is
+    // ridden face-on. The gates are deliberately BIG (a proper arena): wide jumps
+    // whose bar sits a touch higher now that mounts jump higher. Each jump carries
+    // a height cap on the WHOLE model; the jumpable rail reads a bit below that, so
+    // capping the vertical model at ~1.7 and the oxer at ~1.85 lands the main bar
+    // below each model's top. A mounted hop apexes near ~1.76yd (JUMP_VELOCITY * MOUNT_JUMP_MULT
+    // over GRAVITY in sim/player_motion), clearing even the standard tops, so the
+    // ~7.5-8yd span fills the gate while every jump still reads as hoppable. The
+    // arch is an imposing ~10.5yd start/finish gate at natural proportions.
+    const fixtures: {
+      x: number;
+      z: number;
+      dir: number;
+      key: PropKey;
+      width: number;
+      maxHeight?: number;
+    }[] = [
+      { ...raceCourse.arch, key: 'courseArch', width: 10.5 },
+      ...raceCourse.jumps.map((j) => {
+        const fixture = MOUNT_RACE_JUMP_FIXTURES[j.kind];
+        return {
+          x: j.x,
+          z: j.z,
+          dir: j.dir,
+          key: (j.kind === 'oxer' ? 'jumpOxer' : 'jumpVertical') as PropKey,
+          width: fixture.width,
+          maxHeight: fixture.maxHeight,
+        };
+      }),
+    ];
+    for (const f of fixtures) {
+      const a = propAsset(f.key);
+      // Uniform scale to the target width (long axis is +z), then clamp the
+      // height: for a model taller than maxHeight this lowers only the vertical
+      // axis (never a stretch, min() keeps it a cap). Sunk 0.08yd like the delve
+      // rubble so a wide base never floats on the paddock's gentle slopes.
+      const s = f.width / a.size.z;
+      const sy = f.maxHeight != null ? Math.min(s, f.maxHeight / a.size.y) : s;
+      const g = new THREE.Group();
+      addParts(g, f.key, { scale: [s, sy, s] });
+      g.position.set(f.x, ground(f.x, f.z) - 0.08, f.z);
+      g.rotation.y = f.dir + Math.PI / 2;
+      group.add(shadowed(g));
+    }
+  }
+
   // ---- flush instanced batches ---------------------------------------------
   const cullables: PropCullable[] = [];
   for (const batch of instanceBatches.values()) {
@@ -1672,6 +2076,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   return {
     group,
     flames,
+    windmillFans,
     fireLights,
     update(
       camX: number,
@@ -1682,13 +2087,17 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       eyeZ: number,
       fogFar: number,
     ): void {
-      for (const c of cullables) {
-        c.obj.visible = cullableVisible(c, camX, camZ, fogFar);
+      const fogFarSq = fogFar * fogFar;
+      for (let i = 0; i < cullables.length; i++) {
+        const c = cullables[i];
+        c.obj.visible = cullableVisible(c, camX, camZ, fogFar, fogFarSq);
       }
-      for (const h of hideables) {
+      for (let i = 0; i < hideables.length; i++) {
+        const h = hideables[i];
         const dx = camX - h.x,
           dz = camZ - h.z;
-        if (Math.hypot(dx, dz) - h.cull >= fogFar) {
+        const reach = fogFar + h.cull;
+        if (dx * dx + dz * dz >= reach * reach) {
           h.group.visible = false; // fully fogged: drop it (shadow is out of range too)
           continue;
         }
@@ -1703,7 +2112,8 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
         h.group.visible = true;
         if (hide !== h.hidden) {
           h.hidden = hide;
-          for (const m of h.mats) {
+          for (let j = 0; j < h.mats.length; j++) {
+            const m = h.mats[j];
             m.mat.colorWrite = !hide;
             m.mat.depthWrite = hide ? false : m.depthWrite;
           }
@@ -1914,12 +2324,21 @@ function cullableBounds(
   };
 }
 
-function cullableVisible(c: PropCullable, camX: number, camZ: number, fogFar: number): boolean {
+function cullableVisible(
+  c: PropCullable,
+  camX: number,
+  camZ: number,
+  fogFar: number,
+  fogFarSq: number,
+): boolean {
   const dx = camX < c.minX ? c.minX - camX : camX > c.maxX ? camX - c.maxX : 0;
   const dz = camZ < c.minZ ? c.minZ - camZ : camZ > c.maxZ ? camZ - c.maxZ : 0;
-  if (Math.hypot(dx, dz) < fogFar) return true;
+  if (dx * dx + dz * dz < fogFarSq) return true;
   if (c.hasBox) return false;
-  return Math.hypot(c.cx - camX, c.cz - camZ) - c.r < fogFar;
+  const centerDx = c.cx - camX;
+  const centerDz = c.cz - camZ;
+  const reach = fogFar + c.r;
+  return centerDx * centerDx + centerDz * centerDz < reach * reach;
 }
 
 // Bake every static prop mesh into world space and merge per

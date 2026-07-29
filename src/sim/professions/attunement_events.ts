@@ -39,7 +39,7 @@ export function announceAttunement(ctx: SimContext, pid: number, pairId: string)
   ctx.bumpDeedStat(meta, 'attunementsCompleted', 1);
   const celebrantE = ctx.entities.get(pid);
   if (!celebrantE || celebrantE.pos.x > DUNGEON_X_THRESHOLD) return;
-  const zoneId = zoneAt(celebrantE.pos.z).id;
+  const zoneId = zoneAt(celebrantE.pos.x, celebrantE.pos.z).id;
   emitToZonePlayers(ctx, zoneId, (recipientPid) => ({
     type: 'attunedZone',
     pid: recipientPid,

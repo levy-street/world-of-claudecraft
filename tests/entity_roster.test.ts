@@ -55,6 +55,12 @@ function makeCtx() {
   const clearEntityMarker = vi.fn();
   const pulseGroundAoE = vi.fn();
   const host: SimContextHost = {
+    riftCollisionToken: 1,
+    naturalRiftPortals: [],
+    riftEvents: [],
+    nextRiftInstanceId: 1,
+    riftPortalNextAt: 120,
+    riftPortalSpawnCount: 0,
     get rng() {
       return rng;
     },
@@ -97,6 +103,8 @@ function makeCtx() {
       return dungeonDoorIds;
     },
     instances: [],
+    riftInstances: [],
+    riftPortalIds: null,
     dungeonResetLocks: new Map(),
     get arenaMatches() {
       return arenaMatches;
@@ -117,6 +125,7 @@ function makeCtx() {
     arenaQueueYumi5: [],
     yumiBusySlots: new Set(),
     yumiCatMatches: new Map(),
+    escortRuns: new Map(),
     matchmakeYumi: vi.fn(),
     updateYumiActive: vi.fn(),
     yumiPlayerDown: vi.fn(),
@@ -207,6 +216,9 @@ function makeCtx() {
     instanceClaimIdAt: vi.fn(() => null),
     enterDungeon: vi.fn(),
     leaveDungeon: vi.fn(),
+    enterRift: vi.fn(),
+    leaveRift: vi.fn(),
+    riftOpenTreasure: vi.fn(),
     resetDungeonInstances: vi.fn(),
     inheritDungeonResetLocks: vi.fn(),
     dungeonDifficulty: vi.fn(() => 'normal' as const),
@@ -271,6 +283,7 @@ function makeCtx() {
     swingIntervalMult: vi.fn(() => 1),
     mobCanSwim: vi.fn(() => false),
     resolveMovePoint: vi.fn(() => ({ x: 0, z: 0 })),
+    resolvePlayerMove: vi.fn(() => ({ x: 0, z: 0 })),
     resolveMove: vi.fn(() => ({ x: 0, z: 0 })),
     updatePet: vi.fn(),
     isDelveCompanionMob: vi.fn(() => false),
@@ -310,6 +323,9 @@ function makeCtx() {
     abandonLockpick: vi.fn(),
     tickLockpickTimeout: vi.fn(),
     startDelveRaiseDeadChannel: vi.fn(() => false),
+    tickMountTraining: vi.fn(),
+    tickMountRace: vi.fn(),
+    abandonMountTraining: vi.fn(),
     resolvedAbility: vi.fn(() => null),
     playerGcdFor: vi.fn(() => 1.5),
     isFriendlyTo: vi.fn(() => false),
@@ -321,6 +337,7 @@ function makeCtx() {
     tameError: vi.fn(() => null),
     standUp: vi.fn(),
     breakGhostWolf: vi.fn(),
+    forceDismount: vi.fn(),
     startAutoAttack: vi.fn(),
     revivePet: vi.fn(),
     completeFishing: vi.fn(),

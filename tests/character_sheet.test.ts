@@ -74,7 +74,7 @@ describe('characterSheet: shared fields', () => {
     expect(sheet.level).toBe(20);
     expect(sheet.virtualLevel).toBe(virtualLevel(50_000));
     expect(sheet.prestigeRank).toBe(1);
-    expect(sheet.zone).toBe(zoneAt(0).name);
+    expect(sheet.zone).toBe(zoneAt(0, 0).name);
     expect(sheet.guild).toBe('Echoes of Claude');
     expect(sheet.rank).toEqual({ scope: 'realm', rank: 27, total: 4012 });
     expect(sheet.avatarUrl).toBe('https://worldofclaudecraft.com/avatar/shaman/0.png');
@@ -154,7 +154,7 @@ describe('characterSheet: public variant leaks nothing sensitive', () => {
     expect(sheet.pos).toBeUndefined();
     // but keeps the safe public subset
     expect(sheet.name).toBe('Thrallish');
-    expect(sheet.zone).toBe(zoneAt(0).name);
+    expect(sheet.zone).toBe(zoneAt(0, 0).name);
     expect(sheet.virtualLevel).toBe(virtualLevel(50_000));
     expect(sheet.guild).toBe('Echoes of Claude');
   });

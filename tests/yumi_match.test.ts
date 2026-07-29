@@ -3,7 +3,7 @@
 // death (guaranteed winner, unranked), win + cleanup, and determinism.
 
 import { describe, expect, it } from 'vitest';
-import { DUNGEON_X_THRESHOLD, yumiMazeOrigin } from '../src/sim/data';
+import { BUILTIN_WORLD, DUNGEON_X_THRESHOLD, yumiMazeOrigin } from '../src/sim/data';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
 import { isArenaQueued, updateArena } from '../src/sim/social/arena';
@@ -16,12 +16,22 @@ import {
   YUMI_SUDDEN_AT,
   YUMI_TELEPORT_EVERY,
 } from '../src/sim/social/yumi';
-import type { Entity, SimEvent } from '../src/sim/types';
+import type { Entity, SimEvent, WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 import { teleportPoints, YUMI_TELEPORT_MIN_SEP, yumiMazeLayout } from '../src/sim/yumi_maze_layout';
 
+// Yumi assertions exercise queued players, the maze slots, and the cats the
+// match itself spawns. Spawning every ambient realm mob only makes each tick
+// scan unrelated overworld AI (the fiesta/arena subsystem-world precedent).
+const YUMI_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+
 function makeWorld(seed = 42) {
-  return new Sim({ seed, playerClass: 'warrior', noPlayer: true });
+  return new Sim({ seed, playerClass: 'warrior', noPlayer: true, world: YUMI_TEST_WORLD });
 }
 
 function teleport(sim: Sim, pid: number, x: number, z: number) {

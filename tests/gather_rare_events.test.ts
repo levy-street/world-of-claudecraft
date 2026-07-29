@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { bagCapacity } from '../src/sim/bags';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
-import { zoneAt } from '../src/sim/data';
+import { DUNGEON_X_THRESHOLD, zoneAt } from '../src/sim/data';
 import {
   announceGatherRareEvent,
+  emitToZonePlayers,
   GATHER_RARE_EVENT_CHANCE,
   GATHER_RARE_EVENT_YIELD_MULT,
   gatherRareEventFlavor,
@@ -202,8 +203,24 @@ describe('announceGatherRareEvent: soft zone fanout + dormant deed mark', () => 
   }
 
   it('sanity: the fanout z positions used below sit in the intended zones', () => {
-    expect(zoneAt(0).id).toBe('eastbrook_vale');
-    expect(zoneAt(340).id).toBe('mirefen_marsh');
+    expect(zoneAt(0, 0).id).toBe('eastbrook_vale');
+    expect(zoneAt(0, 340).id).toBe('mirefen_marsh');
+    expect(zoneAt(400, 340).id).toBe('galecrest');
+  });
+
+  it('routes same-row players by both atlas coordinates', () => {
+    const { ctx, emitted, addPlayer } = fakeCtx();
+    addPlayer(1, 'GalecrestOne', 340, 400);
+    addPlayer(2, 'GalecrestTwo', 340, 420);
+    addPlayer(3, 'Mirefen', 340, 0);
+
+    emitToZonePlayers(ctx, 'galecrest', (pid) => ({
+      type: 'log',
+      pid,
+      text: `recipient:${pid}`,
+    }));
+
+    expect(emitted.map((event) => event.pid)).toEqual([1, 2]);
   });
 
   it('emits one pid-scoped copy per in-zone player (finder included), none out of zone', () => {
@@ -213,7 +230,7 @@ describe('announceGatherRareEvent: soft zone fanout + dormant deed mark', () => 
     addPlayer(3, 'FarAway', 340); // mirefen_marsh: must not receive
     // Instance space: z overlaps the zone strip but x sits past
     // DUNGEON_X_THRESHOLD (600), so a dungeon/arena/delve runner is excluded.
-    addPlayer(4, 'Delver', 0, 900);
+    addPlayer(4, 'Delver', 0, DUNGEON_X_THRESHOLD + 100);
 
     announceGatherRareEvent(ctx, finder, node, 'pristine_vein', 'copper_ore');
 

@@ -3560,6 +3560,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.tool': 'Herramienta',
   'itemUi.kind.potion': 'Poción',
   'itemUi.kind.elixir': 'Elixir',
+  'itemUi.kind.mount': 'Montura',
   'itemUi.stats.armor': 'Armadura',
   'itemUi.stats.str': 'Fuerza',
   'itemUi.stats.agi': 'Agilidad',
@@ -4634,6 +4635,16 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.the_merchant.greeting':
     'Bienvenido al Mercado Mundial, {className}. Compra a aventureros de cada rincón del reino o vende tus propias mercancías.',
   'entities.npcs.marshal_redbrook.name': 'Mariscal Redbrook',
+  'entities.npcs.stablemaster_marla.name': 'Marla Hitchen',
+  'entities.npcs.stablemaster_marla.title': 'Caballeriza mayor',
+  'entities.npcs.stablemaster_marla.greeting':
+    'Cada jinete llega a pie, {className}. No te daré las riendas hasta que puedas montar al Corcel del Valor sin besar el barro, y en Highwatch no sobran sanadores para huesos rotos.',
+  'entities.quests.q_riding_lessons.title': 'Lecciones de equitación',
+  'entities.quests.q_riding_lessons.text':
+    'Cada jinete llega a pie, {playerName}, tal como te dije el día que nos conocimos. Paga la cuota y, cuando te dé la orden, llama al Corcel del Valor de entrenamiento y sube a la silla. Luego haz el recorrido: sigue la señal hasta el arco de salida, salta limpio cada obstáculo y cruza la línea de nuevo antes de que se acabe la arena. Hazlo y la silla es tuya. Si te sales del corral, empezamos de nuevo.',
+  'entities.quests.q_riding_lessons.completion':
+    'Así, muy bien. Arriba de un solo impulso y bien firme en la silla. El Corcel del Valor es tuyo, {playerName}: silla, riendas y la reputación de un jinete que se ganó el asiento en vez de comprarlo.',
+  'entities.quests.q_riding_lessons.objectives.0.label': 'Doma al Corcel del Valor',
   'entities.npcs.marshal_redbrook.title': 'Mariscal de la ciudad',
   'entities.npcs.marshal_redbrook.greeting':
     'Ten la hoja cerca, {className}. El Valle ya no es lo que era.',
@@ -5720,6 +5731,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_waistguard.name': 'Guardacintura del Invocatormentas',
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, el Pico Despierto',
   'entities.mobs.thunzharr_stormling.name': 'Elemental de tormenta despierto',
+  'entities.mobs.stable_horse.name': 'Caballo de establo',
   'hudChrome.worldBoss.spawn': '¡{name} se alza sobre las Alturas de Thornpeak!',
   'entities.items.stormcallers_spaulders.name': 'Bufas de Galecall',
   'entities.items.bonewrought_greatsword.name': 'Espadón Bonewrought',
@@ -5795,6 +5807,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterArmor': 'Armadura',
   'hudChrome.bags.filterConsumable': 'Consumibles',
   'hudChrome.bags.filterMaterial': 'Materiales',
+  'hudChrome.bags.filterMount': 'Monturas',
   'hudChrome.bags.filterQuest': 'Misión',
   'hudChrome.bags.sortAria': 'Ordenar objetos de la bolsa',
   'hudChrome.bags.sortRecent': 'Recientes',
@@ -6929,6 +6942,26 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.reliquary_gloves_rog.name': 'Manoplas del Guardián de Huesos',
   'entities.items.deacon_reliquary_helm.name': 'Yelmo del Relicario del Diácono',
   'entities.items.varric_shadow_cowl.name': 'Capucha sombría de Varric',
+  'entities.items.duskwisp_essence.name': 'Esencia de fuego crepuscular',
+  'entities.items.spore_heart.name': 'Corazón de espora',
+  'entities.items.gleaming_antler.name': 'Asta reluciente',
+  'entities.items.wisp_mote.name': 'Mota de fuego fatuo',
+  'entities.items.starfall_shard.name': 'Esquirla de estrella caída',
+  'entities.items.elder_bark.name': 'Corteza de anciano',
+  'entities.items.hollow_sealstone.name': 'La Piedra del Sello de la Hondonada',
+  'entities.items.monument_overlook.name': 'Monumento desgastado',
+  'entities.items.monument_court.name': 'Monumento hundido',
+  'entities.items.monument_north.name': 'Monumento olvidado',
+  'entities.items.guardian_core.name': 'Núcleo de guardián',
+  'entities.items.wardens_seal.name': 'El Sello del Vigilante',
+  'entities.items.gleamstag_charm.name': 'Talismán del Ciervo Radiante',
+  'entities.items.veilsteel_blade.name': 'Hoja de acero velado',
+  'entities.items.duskfang_dirk.name': 'Daga colmillo crepuscular',
+  'entities.items.gleamwood_stave.name': 'Bastón de madera radiante',
+  'entities.items.wardens_oathband.name': 'Banda de juramento del Vigilante',
+  'entities.items.wardplate_cuirass.name': 'Coraza de placas guardianas',
+  'entities.items.nightweave_tunic.name': 'Túnica de tejido nocturno',
+  'entities.items.veilcloth_robe.name': 'Toga de tela velada',
   'entities.mobs.acolyte_tessa.name': 'Acólita Tessa',
   'entities.mobs.deacon_varric.name': 'Diácono Varric',
   'entities.mobs.reliquary_bonewalker.name': 'Andahuesos alzado',
@@ -7988,6 +8021,14 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'loading.tips.talents':
     'Consejo: puedes restablecer tus talentos cuando estés fuera de combate, así que una elección temprana nunca es definitiva.',
   'entities.items.chunk_of_ore.name': 'Trozo de mineral',
+  'entities.items.reins_grag_bear.name': 'Riendas del Oso Grag Goliat',
+  'entities.items.reins_valorsteed.name': 'Riendas del Corcel del Valor',
+  'entities.items.reins_stalkglider_snail.name': 'Riendas del Deslizador de Caparazón Musgoso',
+  'entities.items.reins_aether_hover_cycle.name':
+    'Llave de encendido: Aerocicleta Justadora del Éter',
+  'entities.items.reins_shadowjump_toad.name': 'Riendas de Kama-Kage, el Sapo Saltasombras',
+  'entities.items.reins_stormfeather_griffin.name': 'Riendas del Plumatormenta Alcanzacielos',
+  'entities.items.reins_thunderstrut_gobbler.name': 'Riendas de Pavoneatruenos, el Gran Pavo',
   'entities.quests.q_prof_intro.title': 'Un oficio para cada mano',
   'hudChrome.auth.appleChoiceExpired':
     'Ese inicio de sesión con Apple ha caducado. Vuelve a iniciar sesión con Apple.',
@@ -8016,6 +8057,47 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.notInPartyError':
     'Debes estar en un grupo para iniciar una comprobación de disponibilidad.',
   'hudChrome.readyCheck.inProgressError': 'Ya hay una comprobación de disponibilidad en curso.',
+  // Rideable mounts: the Z keybind + the Mounts window (the stable).
+  'hudChrome.keybinds.mount': 'Montar / Desmontar',
+  'hudChrome.mobile.mounts': 'Monturas',
+  'hudChrome.mounts.title': 'Monturas',
+  'hudChrome.mounts.close': 'Cerrar',
+  'hudChrome.mounts.select': 'Elegir',
+  'hudChrome.mounts.selected': 'Elegida',
+  'hudChrome.mounts.riding': 'Montada',
+  'hudChrome.mounts.mount': 'Montar',
+  'hudChrome.mounts.dismount': 'Desmontar',
+  'hudChrome.mounts.rarity_common': 'Común',
+  'hudChrome.mounts.rarity_rare': 'Rara',
+  'hudChrome.mounts.rarity_epic': 'Épica',
+  'hudChrome.mounts.spec_speed': '+{pct}% de movilidad adicional',
+  'hudChrome.mounts.name_valorsteed': 'Corcel del Valor',
+  'hudChrome.mounts.name_grag_bear': 'Oso Grag Goliat',
+  'hudChrome.mounts.name_stalkglider_snail': 'Deslizador de Caparazón Musgoso',
+  'hudChrome.mounts.name_aether_hover_cycle': 'Aerocicleta Justadora del Éter',
+  'hudChrome.mounts.name_shadowjump_toad': 'Kama-Kage, el Sapo Saltasombras',
+  'hudChrome.mounts.name_stormfeather_griffin': 'Plumatormenta Alcanzacielos',
+  'hudChrome.mounts.name_thunderstrut_gobbler': 'Pavoneatruenos, el Gran Pavo',
+  'hudChrome.mounts.desc_valorsteed':
+    'Un corcel resistente y de paso firme que aumenta la velocidad de viaje.',
+  'hudChrome.mounts.desc_grag_bear':
+    'Un oso resistente y de paso firme que aumenta la velocidad de viaje.',
+  'hudChrome.mounts.desc_stalkglider_snail':
+    'Un caracol recio y de combustión lenta que aumenta la velocidad de viaje.',
+  'hudChrome.mounts.desc_aether_hover_cycle':
+    'Una potente moto magitecnológica diseñada para desplazamientos de combate veloces a baja altura.',
+  'hudChrome.mounts.desc_shadowjump_toad':
+    'Un sapo gigante, macizo y de paso firme, adiestrado en saltos sombríos relámpago que cubren cualquier terreno.',
+  'hudChrome.mounts.desc_stormfeather_griffin':
+    'Un grifo de tormenta majestuoso que acecha por tierra sobre garras rúnicas, con las alas plegadas.',
+  'hudChrome.mounts.desc_thunderstrut_gobbler':
+    'Un pavo colosal nacido de la tormenta que baja pavoneándose del Pico Despierto, con la cola desplegada como un frente de tormenta.',
+  'hudChrome.mounts.emptyTitle': 'Ninguna montura obtenida',
+  'hudChrome.mounts.emptyStableHint':
+    'Alcanza el nivel 20 y toma clases de monta con la Caballeriza mayor Marla en los establos al oeste de Highwatch.',
+  'hudChrome.mounts.emptyDropHint':
+    'Las monturas más raras las sueltan los jefes de mazmorras y bandas.',
+  'hudChrome.mounts.clickManage': 'Haz clic para elegir tu montura',
   'guide.bestiary.flavor.sethrael_palecoil':
     'Una serpiente pálida como el hueso que se desliza por la profunda plataforma del Glimmermere, guardiana silenciosa de las aguas que ha reclamado. Los nadadores que comparten el lago con ella rara vez vuelven a la superficie.',
   'guide.combat.metersBody':

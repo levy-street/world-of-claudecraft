@@ -187,7 +187,11 @@ function itemMatchesType(item: ItemDef, filter: MarketItemTypeFilter): boolean {
   if (filter === 'material')
     return !isCosmeticItem(item) && (item.kind === 'junk' || item.kind === 'tool');
   if (filter === 'cosmetic') return isCosmeticItem(item);
-  if (filter === 'other') return item.kind === 'quest';
+  // The catch-all for catalog kinds with no browse category of their own. Mount
+  // reins join quest items here: both are soulbound oddments a player can hold
+  // but never list, so neither earns a filter chip, and neither may be left
+  // reachable through 'All' alone (tests/market_filters.test.ts).
+  if (filter === 'other') return item.kind === 'quest' || item.kind === 'mount';
   // Exhaustive on purpose: a future MARKET_ITEM_TYPE_FILTERS entry with no arm above
   // reddens tsc here instead of silently inheriting the 'other' predicate, which is
   // how `bag` browsed as nothing at all for its whole life before this arm existed.

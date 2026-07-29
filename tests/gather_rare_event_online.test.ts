@@ -84,7 +84,7 @@ function liveSetup() {
   const node = GATHER_NODES.find((n) => n.id === NODE_ID);
   if (!node) throw new Error(`missing node ${NODE_ID}`);
   moveTo(internals, sa.pid, node.pos.x, node.pos.z);
-  moveTo(internals, sb.pid, 300, 0);
+  moveTo(internals, sb.pid, 150, 0);
   moveTo(internals, sc.pid, 0, 340);
   // #2343: every node harvest needs the matching-profession tool in bags
   // (addItem draws no rng; its loot event drains with the settle tick below).

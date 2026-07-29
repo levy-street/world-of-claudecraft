@@ -12,6 +12,7 @@ vi.mock('pg', () => ({
   },
 }));
 
+import { configureCommunityTestAccounts } from '../server/community_test_accounts';
 import {
   backfillAccountEmailIfEmpty,
   bankBonusFactsForAccount,
@@ -33,8 +34,98 @@ import {
 import { REALM } from '../server/realm';
 
 beforeEach(() => {
+  configureCommunityTestAccounts(false);
   dbMock.query.mockReset();
   dbMock.connect.mockReset();
+});
+
+describe('community test account transaction', () => {
+  it('atomically inserts the account and all nine level-20 character states when enabled', async () => {
+    configureCommunityTestAccounts(true);
+    const client = clientStub();
+    dbMock.connect.mockResolvedValue(client as any);
+    client.query.mockImplementation(async (sql: string, params?: unknown[]) => {
+      if (/INSERT INTO accounts/i.test(sql)) {
+        return { rows: [{ id: 42, username: 'tester', password_hash: 'hash' }], rowCount: 1 };
+      }
+      if (/INSERT INTO characters/i.test(sql)) {
+        return { rows: [{ id: 100, name: params?.[1] }], rowCount: 1 };
+      }
+      return { rows: [], rowCount: 0 };
+    });
+
+    await expect(
+      createAccount('tester', 'hash', { ip: '203.0.113.4' }, { passwordSet: false }),
+    ).resolves.toMatchObject({ id: 42, username: 'tester' });
+
+    const calls = client.query.mock.calls;
+    expect(calls[0][0]).toBe('BEGIN');
+    expect(calls.at(-1)?.[0]).toBe('COMMIT');
+    expect(client.release).toHaveBeenCalledTimes(1);
+    expect(dbMock.query).not.toHaveBeenCalled();
+    const accountInsert = calls.find((call) => /INSERT INTO accounts/i.test(call[0]));
+    expect(accountInsert?.[1]?.[4]).toBe(false);
+    const characterInserts = calls.filter((call) => /INSERT INTO characters/i.test(call[0]));
+    expect(characterInserts).toHaveLength(9);
+    expect(new Set(characterInserts.map((call) => call[1]?.[1]))).toHaveLength(9);
+    for (const [, params] of characterInserts) {
+      expect(params?.[0]).toBe(42);
+      expect(params?.[3]).toBe(REALM);
+      expect(params?.[4]).toBe(20);
+      expect(JSON.parse(String(params?.[5])).level).toBe(20);
+    }
+  });
+
+  it('retries a generated name collision without aborting the transaction', async () => {
+    configureCommunityTestAccounts(true);
+    const client = clientStub();
+    dbMock.connect.mockResolvedValue(client as any);
+    let characterInsert = 0;
+    client.query.mockImplementation(async (sql: string, params?: unknown[]) => {
+      if (/INSERT INTO accounts/i.test(sql)) {
+        return { rows: [{ id: 42, username: 'tester', password_hash: 'hash' }], rowCount: 1 };
+      }
+      if (/INSERT INTO characters/i.test(sql)) {
+        characterInsert++;
+        if (characterInsert === 1) return { rows: [], rowCount: 0 };
+        return { rows: [{ id: 100, name: params?.[1] }], rowCount: 1 };
+      }
+      return { rows: [], rowCount: 0 };
+    });
+
+    await createAccount('tester', 'hash');
+
+    const characterInserts = client.query.mock.calls.filter((call) =>
+      /INSERT INTO characters/i.test(call[0]),
+    );
+    expect(characterInserts).toHaveLength(10);
+    expect(characterInserts[0][1]?.[2]).toBe('warrior');
+    expect(characterInserts[1][1]?.[2]).toBe('warrior');
+    expect(characterInserts[1][1]?.[1]).not.toBe(characterInserts[0][1]?.[1]);
+    expect(client.query.mock.calls.at(-1)?.[0]).toBe('COMMIT');
+  });
+
+  it('rolls back the account and every character when any character insert fails', async () => {
+    configureCommunityTestAccounts(true);
+    const client = clientStub();
+    dbMock.connect.mockResolvedValue(client as any);
+    let characterInsert = 0;
+    client.query.mockImplementation(async (sql: string) => {
+      if (/INSERT INTO accounts/i.test(sql)) {
+        return { rows: [{ id: 42, username: 'tester', password_hash: 'hash' }], rowCount: 1 };
+      }
+      if (/INSERT INTO characters/i.test(sql) && ++characterInsert === 4) {
+        throw new Error('character write failed');
+      }
+      return { rows: [{ id: 100 }], rowCount: 1 };
+    });
+
+    await expect(createAccount('tester', 'hash')).rejects.toThrow('character write failed');
+
+    expect(client.query.mock.calls.map((call) => call[0])).toContain('ROLLBACK');
+    expect(client.query.mock.calls.map((call) => call[0])).not.toContain('COMMIT');
+    expect(client.release).toHaveBeenCalledTimes(1);
+  });
 });
 
 function clientStub() {

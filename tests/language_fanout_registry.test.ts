@@ -124,6 +124,8 @@ const FANOUT_ARMS: readonly string[] = [
   'this.lockpickController.relocalize|',
   'this.tutorial.relocalize|',
   'this.mobileActionRingPainter.relocalize|',
+  'this.mountRaceStrip.relocalize|',
+  'this.mountRaceControls.relocalize|',
 ];
 
 const observedArms = scan.sites.map((s) => `${s.call}|${s.conditions.join(' && ')}`);
@@ -180,6 +182,18 @@ interface AnsweredSurface extends GatedModule {
 }
 
 const ANSWERED: readonly AnsweredSurface[] = [
+  {
+    file: 'mount_race_controls.ts',
+    memos: ['lastButtonVisible', 'lastCountdownMode', 'lastCountdownNumber'],
+    answer: 'this.mountRaceControls.relocalize',
+    why: 'a visibility flag, the countdown mode and the countdown NUMBER, so the Start/Cancel label and the GO text never move with the locale',
+  },
+  {
+    file: 'mount_race_strip.ts',
+    memos: ['lastRaceId', 'lastPhase', 'lastSecond'],
+    answer: 'this.mountRaceStrip.relocalize',
+    why: 'the race id, the phase and the whole second remaining, so the time-left line never moves with the locale',
+  },
   {
     file: 'arena_window.ts',
     memos: ['lastSig'],

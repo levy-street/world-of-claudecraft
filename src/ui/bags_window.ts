@@ -120,6 +120,7 @@ const BAG_CATEGORY_LABEL_KEYS: Record<BagCategory, TranslationKey> = {
   consumable: 'hudChrome.bags.filterConsumable',
   material: 'hudChrome.bags.filterMaterial',
   quest: 'hudChrome.bags.filterQuest',
+  mount: 'hudChrome.bags.filterMount',
 };
 const BAG_SORT_LABEL_KEYS: Record<BagSort, TranslationKey> = {
   recent: 'hudChrome.bags.sortRecent',
@@ -187,6 +188,8 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   stageMailParcel(itemId: string): void;
   /** Shift-click: insert a readable item link into the chat input. */
   insertItemChatLink(itemId: string): void;
+  /** Open the character sheet's mount picker highlighting this mount (a click
+   *  on a collected kind:'mount' reins item). */
   showError(text: string): void;
   setPendingPetFeed(active: boolean): void;
   resetPetBarSig(): void;
@@ -948,7 +951,6 @@ export class BagsWindow {
         // Gathering tools (#2343) route through the interact-style handler
         // (nearest matching node + autorun stop) when main.ts has wired it;
         // everything else, and any unwired host, keeps the plain useItem.
-        const item = ITEMS[s.itemId];
         if (!item || !this.deps.useGatherTool(item)) this.deps.world().useItem(s.itemId);
         this.render();
         this.deps.renderCharIfOpen();

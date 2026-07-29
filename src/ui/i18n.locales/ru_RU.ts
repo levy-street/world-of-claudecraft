@@ -1924,6 +1924,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.combat.healOther': 'Ваше {ability} исцеляет {target} на {amount}.',
   'hud.combat.healOtherCrit': 'Ваше {ability} критически исцеляет {target} на {amount}.',
   'hud.combat.healSelfFull': 'Ваше {ability} срабатывает, но у вас уже полное здоровье.',
+  'hud.combat.floatingHealAbsorbed': 'Поглощено',
+  'hud.combat.healSelfAbsorbed': 'Ваше «{ability}» поглощено порчей на вас.',
+  'hud.combat.healOtherAbsorbed': 'Ваше «{ability}» поглощено порчей на цели {target}.',
   'hud.combat.healOtherFull':
     'Ваше {ability} срабатывает на {target}, но у цели уже полное здоровье.',
   'hud.combat.death': '{name} умирает.',
@@ -2324,6 +2327,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.tool': 'Инструмент',
   'itemUi.kind.potion': 'Зелье',
   'itemUi.kind.elixir': 'Эликсир',
+  'itemUi.kind.mount': 'Транспорт',
   'itemUi.stats.armor': 'Броня',
   'itemUi.stats.str': 'Сила',
   'itemUi.stats.agi': 'Ловкость',
@@ -3405,6 +3409,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.the_merchant.greeting':
     'Добро пожаловать на Мировой рынок, {className}. Покупайте у искателей приключений всего королевства или выставляйте свои товары.',
   'entities.npcs.marshal_redbrook.name': 'Маршал Редбрук',
+  'entities.npcs.stablemaster_marla.name': 'Марла Хитчен',
+  'entities.npcs.stablemaster_marla.title': 'Старшая конюшая',
+  'entities.npcs.stablemaster_marla.greeting':
+    'Каждый всадник приходит на своих двоих, {className}. Поводья я отдам не раньше, чем ты научишься держаться на Доблестном скакуне, не целуя грязь, а лекарей на все сломанные кости в Хайвотче не напасёшься.',
+  'entities.quests.q_riding_lessons.title': 'Уроки верховой езды',
+  'entities.quests.q_riding_lessons.text':
+    'Каждый всадник приходит на своих двоих, {playerName}, как я и сказала в день нашей встречи. Заплати за обучение, и когда я подам знак, подзови учебного Доблестного скакуна и заберись в седло. Потом пройди маршрут: следуй за меткой к стартовой арке, бери каждое препятствие чисто и снова пересеки черту, пока не высыпался песок. Справишься — седло твоё. Выйдешь за пределы загона — начнём заново.',
+  'entities.quests.q_riding_lessons.completion':
+    'Вот так, хорошо. Взлетел в седло одним движением и сидишь уверенно. Доблестный скакун теперь твой, {playerName}: седло, поводья и репутация всадника, который заслужил место в седле, а не купил его.',
+  'entities.quests.q_riding_lessons.objectives.0.label': 'Приручить Доблестного скакуна',
   'entities.npcs.marshal_redbrook.title': 'Городской маршал',
   'entities.npcs.marshal_redbrook.greeting':
     'Держите клинок рядом, {className}. Долина уже не та, что прежде.',
@@ -3998,6 +4012,316 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.pois.7.label': 'Шатры Культа Вирма',
   'entities.zones.thornpeak_heights.pois.8.label': 'Поля ревенантов',
   'entities.zones.thornpeak_heights.pois.9.label': 'Святилище Могильного Вирма',
+  'entities.zones.veiled_hollow.name': 'Сокрытая лощина',
+  'entities.zones.veiled_hollow.welcome':
+    'Воздух гудит от древней магии. Найдите хранительницу Сэльвин под великим древом Элдерглима.',
+  'entities.zones.veiled_hollow.pois.0.label': 'Элдерглим',
+  'entities.zones.veiled_hollow.pois.1.label': 'Сумеречная пещера',
+  'entities.zones.veiled_hollow.pois.2.label': 'Сумеречная смотровая площадка',
+  'entities.zones.veiled_hollow.pois.3.label': 'Древняя роща',
+  'entities.zones.veiled_hollow.pois.4.label': 'Котловина Звездопада',
+  'entities.zones.veiled_hollow.pois.5.label': 'Затонувший двор',
+  'entities.zones.veiled_hollow.pois.6.label': 'Хрустальные отмели',
+  'entities.zones.veiled_hollow.pois.7.label': 'Мерцающая глубь',
+  'guide.home.world.emberName': 'Земли Драконов',
+  'guide.home.world.emberBlurb':
+    'За Бледной дамбой зелень уступает пеплу, и пустошами правит нечто древнее.',
+  'guide.home.world.frostName': 'Морозный Предел',
+  'guide.home.world.frostBlurb':
+    'Заснеженная высь, которой нет ни на одной карте. Её видно лишь в танцующем сиянии.',
+  'entities.zones.drakelands.name': 'Земли Драконов',
+  'entities.zones.drakelands.welcome':
+    'Горячий ветер несётся с пустошей. Драконы кружат над Дрейкмо, а в дюнах горят костры троллей.',
+  'entities.zones.drakelands.pois.0.label': 'Змеиный дозор',
+  'entities.zones.drakelands.pois.1.label': 'Привратный лес',
+  'entities.zones.drakelands.pois.2.label': 'Пепельные дюны',
+  'entities.zones.drakelands.pois.3.label': 'Тролльмут',
+  'entities.zones.drakelands.pois.4.label': 'Последний оплот',
+  'entities.zones.drakelands.pois.5.label': 'Кровостеклянные поля',
+  'entities.zones.drakelands.pois.6.label': 'Кальдера Дрейкмо',
+  'entities.zones.frostveil.name': 'Морозный Предел',
+  'entities.zones.frostveil.welcome':
+    'Снег глотает каждый звук. Под танцующим сиянием сам холод кажется живым.',
+  'entities.zones.frostveil.pois.0.label': 'Ледяная Мантия',
+  'entities.zones.frostveil.pois.1.label': 'Снеговая Тропа',
+  'entities.zones.frostveil.pois.2.label': 'Ледниковое озеро',
+  'entities.zones.frostveil.pois.3.label': 'Ступени Сияния',
+  'entities.zones.frostveil.pois.4.label': 'Дрожащая топь',
+  'entities.zones.frostveil.pois.5.label': 'Воющие террасы',
+  'entities.zones.amberfall.name': 'Янтарная Падь',
+  'entities.zones.amberfall.welcome':
+    'Каждый лист здесь горит золотом и багрянцем, но ни один не падает. Фонари Лантанмира зажжены для тебя.',
+  'entities.zones.amberfall.pois.0.label': 'Лантанмир',
+  'entities.zones.amberfall.pois.1.label': 'Золотая Проталина',
+  'entities.zones.amberfall.pois.2.label': 'Золочёный сад',
+  'entities.zones.amberfall.pois.3.label': 'Жатвенная лощина',
+  'entities.zones.amberfall.pois.4.label': 'Великое озеро',
+  'entities.zones.amberfall.pois.5.label': 'Клёновый взгорок',
+  'entities.zones.amberfall.pois.6.label': 'Кренящийся монолит',
+  'entities.zones.willowfen.name': 'Ивовая Топь',
+  'entities.zones.willowfen.welcome':
+    'Над топью гудят стрекозы и пчёлы. Перейди мост в Бриджмир и дай ногам отдых.',
+  'entities.zones.willowfen.pois.0.label': 'Бриджмир',
+  'entities.zones.willowfen.pois.1.label': 'Янтарные Ступени',
+  'entities.zones.willowfen.pois.2.label': 'Кувшинковые мхи',
+  'entities.zones.willowfen.pois.3.label': 'Светлые бочаги',
+  'entities.zones.willowfen.pois.4.label': 'Плакучая заводь',
+  'entities.zones.willowfen.pois.5.label': 'Дремотные отмели',
+  'guide.home.world.fenName': 'Ивовая Топь',
+  'guide.home.world.fenBlurb':
+    'За осенней короной лежит светлая топь ив и тихой воды, и городок за рвом.',
+  'guide.home.world.amberName': 'Янтарная Падь',
+  'guide.home.world.amberBlurb':
+    'За западными утёсами длится вечная осень, и на золотом озере горят фонари.',
+  'entities.mobs.snowdrift_wolf.name': 'Сугробный волк',
+  'entities.mobs.ice_wisp.name': 'Ледяной огонёк',
+  'entities.mobs.rime_elemental.name': 'Инеевый элементаль',
+  'entities.mobs.fen_sprite.name': 'Топяной дух',
+  'entities.mobs.frostmane_yeti.name': 'Морозогривый йети',
+  'entities.mobs.emberwing_drake.name': 'Углекрылый дрейк',
+  'entities.mobs.ashbone_raider.name': 'Пеплокостный налётчик',
+  'entities.mobs.ashbone_warcaller.name': 'Пеплокостный горлопан',
+  'entities.mobs.dune_troll.name': 'Дюнный тролль',
+  'entities.mobs.gilded_stag.name': 'Золочёный олень',
+  'entities.mobs.gloam_fox.name': 'Сумеречный лис',
+  'entities.mobs.orchard_treant.name': 'Садовый древень',
+  'entities.mobs.harvest_sprite.name': 'Жатвенный дух',
+  'entities.mobs.mere_lurker.name': 'Озёрный скрытень',
+  'entities.mobs.bogtoad.name': 'Топяная жаба',
+  'entities.mobs.drowsy_croaker.name': 'Дремотный Квакун',
+  'entities.mobs.lily_wisp.name': 'Кувшинковый огонёк',
+  'entities.mobs.willow_sprite.name': 'Ивовый дух',
+  'entities.zones.nightbloom.name': 'Ночецветье',
+  'entities.zones.nightbloom.welcome':
+    'За Ночными Вратами грезит сам воздух. Иди по цветочному свету к Лунному Приюту и не пропусти спящий мир, что висит в небе.',
+  'entities.zones.nightbloom.pois.0.label': 'Лунный Приют',
+  'entities.zones.nightbloom.pois.1.label': 'Ночные Врата',
+  'entities.zones.nightbloom.pois.2.label': 'Лунный Колодец',
+  'entities.zones.nightbloom.pois.3.label': 'Сумеречное Поле',
+  'entities.zones.nightbloom.pois.4.label': 'Стоячий Дозор',
+  'entities.zones.nightbloom.pois.5.label': 'Курган Неспящего',
+  'entities.mobs.moonfleece_grazer.name': 'Лунорунный зверь',
+  'entities.mobs.gloam_strider.name': 'Сумеречный бегун',
+  'entities.mobs.nightkin_stargazer.name': 'Ночерождённый звездочёт',
+  'entities.mobs.barrow_king.name': 'Курганный Король',
+  'entities.zones.wraithwood.name': 'Призрачная Чаща',
+  'entities.zones.wraithwood.welcome':
+    'Кроны смыкаются над дорогой, как крышка гроба. Держись фонарей Гэллоумира, и если лес позовёт тебя по имени, не отвечай.',
+  'entities.zones.wraithwood.pois.0.label': 'Гэллоумир',
+  'entities.zones.wraithwood.pois.1.label': 'Вороньи Врата',
+  'entities.zones.wraithwood.pois.2.label': 'Вдовья Чаща',
+  'entities.zones.wraithwood.pois.3.label': 'Висельная Поляна',
+  'entities.zones.wraithwood.pois.4.label': 'Часовня Скорбного Камня',
+  'entities.zones.wraithwood.pois.5.label': 'Поляна Ловчего',
+  'entities.mobs.widowsilk_spinner.name': 'Вдовий шелкопряд',
+  'entities.mobs.wood_wraith.name': 'Лесной призрак',
+  'entities.mobs.gravenbark_shambler.name': 'Гробокорый шатун',
+  'entities.mobs.pale_huntsman.name': 'Бледный Ловчий',
+  'entities.zones.palmreach.name': 'Пальмовый Берег',
+  'entities.zones.palmreach.welcome':
+    'Тёплый песок, громкие птицы и джунгли, пожирающие горизонт. Дрифтхейвен держит для тебя костёр на берегу.',
+  'entities.zones.palmreach.pois.0.label': 'Дрифтхейвен',
+  'entities.zones.palmreach.pois.1.label': 'Заросшее Устье',
+  'entities.zones.palmreach.pois.2.label': 'Пальмовая Коса',
+  'entities.zones.palmreach.pois.3.label': 'Изумрудная Чаща',
+  'entities.zones.palmreach.pois.4.label': 'Лианопад',
+  'entities.zones.palmreach.pois.5.label': 'Сапфировая Лагуна',
+  'entities.zones.palmreach.pois.6.label': 'Затонувший Идол',
+  'entities.mobs.tide_scuttler.name': 'Приливный краб',
+  'entities.mobs.thicket_boar.name': 'Чащобный вепрь',
+  'entities.mobs.canopy_weaver.name': 'Кроновый ткач',
+  'entities.mobs.idol_guardian.name': 'Страж идола',
+  'entities.zones.evergarden.name': 'Вечный Сад',
+  'entities.zones.evergarden.welcome':
+    'Кто-то до сих пор подстригает живые изгороди, хотя садовника не видели уже сто лет. Берегись лабиринта: он тоже следит за тобой.',
+  'entities.zones.evergarden.pois.0.label': 'Хеджвик',
+  'entities.zones.evergarden.pois.1.label': 'Садовые Врата',
+  'entities.zones.evergarden.pois.2.label': 'Аллея Цветников',
+  'entities.zones.evergarden.pois.3.label': 'Замок Донхолд',
+  'entities.zones.evergarden.pois.4.label': 'Лепестковый Пруд',
+  'entities.zones.evergarden.pois.5.label': 'Великий Лабиринт',
+  'entities.zones.evergarden.pois.6.label': 'Фонтанный Двор',
+  'entities.zones.evergarden.pois.7.label': 'Старая Мельница',
+  'entities.zones.evergarden.pois.8.label': 'Северный Дозор',
+  'entities.zones.evergarden.pois.9.label': 'Лилейная Заводь',
+  'entities.mobs.topiary_stag.name': 'Фигурный олень',
+  'entities.mobs.topiary_wolf.name': 'Фигурный волк',
+  'entities.mobs.hedge_gnome.name': 'Гном живой изгороди',
+  'entities.mobs.hedge_knight.name': 'Рыцарь Донхолда',
+  'entities.mobs.the_topiary_bull.name': 'Фигурный бык',
+  'entities.zones.galecrest.name': 'Гейлкрест',
+  'entities.zones.galecrest.welcome':
+    'Ветер здесь не стихал ни разу, и Старый Маяк ни разу не гас. Викхарбор просит лишь об одном: закрывайте за собой дверь таверны.',
+  'entities.zones.galecrest.pois.0.label': 'Викхарбор',
+  'entities.zones.galecrest.pois.1.label': 'Ветровой Проход',
+  'entities.zones.galecrest.pois.2.label': 'Воющие Холмы',
+  'entities.zones.galecrest.pois.3.label': 'Старый Маяк',
+  'entities.zones.galecrest.pois.4.label': 'Отвесный Срез',
+  'entities.zones.galecrest.pois.5.label': 'Поля Кораблекрушений',
+  'entities.zones.galecrest.pois.6.label': 'Зеркальное Озеро',
+  'entities.zones.galecrest.pois.7.label': 'Конюшни Гейлкреста',
+  'entities.npcs.warden_coalfast.name': 'Смотритель Хладоуголь',
+  'entities.npcs.warden_coalfast.title': 'Комендант редута',
+  'entities.npcs.warden_coalfast.greeting':
+    'Прорывам нет дела до того, что Чаячья Гавань мала, {className}. Мы удержим этот берег — или удерживать будет уже нечего. Встань с нами, и я этого не забуду.',
+  'entities.npcs.riftwatch_ollun.name': 'Стражеразлома Оллун',
+  'entities.npcs.riftwatch_ollun.title': 'Учёный по прорывам',
+  'entities.npcs.riftwatch_ollun.greeting':
+    'Каждый прорыв поёт, прежде чем раскрыться, — если есть слух для этого. Прямо сейчас я слышу, как трое из них ворочаются на острове, и один совсем близко.',
+  'entities.npcs.quartermaster_edda.name': 'Интендант Эдда',
+  'entities.npcs.quartermaster_edda.title': 'Оружейница редута',
+  'entities.npcs.quartermaster_edda.greeting':
+    'Сталь да соль, {className}, — вот и всё, что мне осталось раздавать. Бери и заставь прорывы пожалеть, что они раскрылись там, куда я смогла дотянуться.',
+  'entities.npcs.mender_saul.name': 'Врачеватель Саул',
+  'entities.npcs.mender_saul.title': 'Полевой хирург',
+  'entities.npcs.mender_saul.greeting':
+    'За один этот месяц я вправил больше костей, чем за десять лет лечения рыбацких увечий. Прорывы мало что оставляют от того, что забирают. Возвращайся ко мне целым, если сумеешь.',
+  'entities.npcs.bellkeeper_tam.name': 'Звонарь Там',
+  'entities.npcs.bellkeeper_tam.title': 'Смотритель сигнального колокола',
+  'entities.npcs.bellkeeper_tam.greeting':
+    'Колокол — единственное предупреждение, что даёт нам прорыв, {className}. Один удар — за поля, два — за утёсы, три — когда он уже так близко, что бежать без толку. Держи ухо востро, и он, глядишь, сбережёт тебя целым.',
+  'entities.npcs.fisher_nell.name': 'Испуганная Нелл',
+  'entities.npcs.fisher_nell.title': 'Рыбачка Чаячьей Гавани',
+  'entities.npcs.fisher_nell.greeting':
+    'Он раскрылся прямо там, где сушат сети. Прямо там, где я стояла каждое утро всей своей жизни. Я больше не спускаюсь к берегу. Я вообще почти никуда больше не хожу.',
+  'entities.mobs.riftspawn.name': 'Порождение разлома',
+  'entities.mobs.breach_wretch.name': 'Отродье прорыва',
+  'entities.mobs.void_stalker.name': 'Охотник Пустоты',
+  'entities.mobs.sundered_horror.name': 'Расколотый Ужас',
+  'entities.zones.farshore_isle.name': 'Дальний Берег',
+  'entities.zones.farshore_isle.welcome':
+    'Пройди по песчаной косе, и колокол Чаячьей Гавани отыщет тебя раньше, чем сам город. Прорыв разверзается без предупреждения, и редут держит свой берег против всего, что через него хлещет. Они уже давно ждут кого-то вроде тебя.',
+  'entities.zones.farshore_isle.pois.0.label': 'Чаячья Гавань',
+  'entities.zones.farshore_isle.pois.1.label': 'Пристань',
+  'entities.zones.farshore_isle.pois.2.label': 'Дозорный Луг',
+  'entities.zones.farshore_isle.pois.3.label': 'Расколотые Утёсы',
+  'entities.zones.farshore_isle.pois.4.label': 'Поля Разломов',
+  'entities.zones.eastbrook_vale.pois.11.label': 'Коса Дальнего Берега',
+  'entities.mobs.moor_ram.name': 'Вересковый баран',
+  'entities.mobs.gale_wisp.name': 'Штормовой дух',
+  'entities.mobs.shoal_scuttler.name': 'Отмельный краб',
+  'entities.mobs.the_wreck_warden.name': 'Страж Кораблекрушений',
+  'entities.mobs.downs_bandit.name': 'Бандит с холмов',
+  'entities.mobs.wreck_thief.name': 'Расхититель кораблекрушений',
+  'entities.mobs.glimmerwisp.name': 'Мерцающий огонёк',
+  'entities.mobs.duskwisp.name': 'Сумеречный огонёк',
+  'entities.mobs.veiled_stag.name': 'Скрытый олень',
+  'entities.mobs.veiled_doe.name': 'Скрытая олениха',
+  'entities.mobs.gleamstag.name': 'Сияющий олень',
+  'entities.mobs.mushroom_pixie.name': 'Пикси сияющего народца',
+  'entities.mobs.sporeling_gatherer.name': 'Спорёныш-собиратель',
+  'entities.mobs.corrupted_sporeling.name': 'Осквернённый спорёныш',
+  'entities.mobs.treant_elder.name': 'Древень-старейшина',
+  'entities.mobs.ancient_guardian.name': 'Древний страж',
+  'entities.mobs.waking_warden.name': 'Пробудившийся Смотритель',
+  'entities.mobs.old_marrowshell.name': 'Старый Костнопанцирь',
+  'entities.mobs.aurelhorn.name': 'Аурелхорн, Первый в стаде',
+  'entities.npcs.keeper_saelwyn.name': 'Хранительница Сэльвин',
+  'entities.npcs.keeper_saelwyn.title': 'Хранительница Лощины',
+  'entities.npcs.keeper_saelwyn.greeting':
+    'Немногие из вашего рода стояли под этими ветвями, {className}. Ступайте мягко, и добро пожаловать.',
+  'entities.npcs.loremother_bryn.name': 'Мать преданий Брин',
+  'entities.npcs.loremother_bryn.title': 'Голос святилища',
+  'entities.npcs.loremother_bryn.greeting':
+    'Каждый огонёк в этой долине что-то помнит, {playerName}. Помоги мне вслушаться.',
+  'entities.npcs.provisioner_fenna.name': 'Снабженец Фенна',
+  'entities.npcs.provisioner_fenna.title': 'Снабженец Элдерглима',
+  'entities.npcs.provisioner_fenna.greeting':
+    'Хлеб ещё тёплый, вода всё так же сладка. Лощина даёт, и я даю.',
+  'entities.npcs.wardsmith_orun.name': 'Кузнец-оберегов Орун',
+  'entities.npcs.wardsmith_orun.title': 'Хранитель старых горнов',
+  'entities.npcs.wardsmith_orun.greeting':
+    'Эти горны остыли столетия назад, {className}, но их работа до сих пор держит остроту.',
+  'entities.npcs.archivist_tullo.name': 'Архивариус Тулло',
+  'entities.npcs.archivist_tullo.title': 'Чтец камней',
+  'entities.npcs.archivist_tullo.greeting':
+    'Тамошние монументы давно никому не говорили ни слова. Быть может, они ждали свежие уши.',
+  'entities.quests.q_veil_thinned.title': 'Истончившаяся завеса',
+  'entities.quests.q_veil_thinned.text':
+    'Значит, пещера открылась тебе. Тогда печать слабее, чем я боялась, {playerName}. Там, где рвётся завеса, огоньки становятся тёмными и холодными. Принеси мне восемь сущностей сумеречных огоньков, и я прочту, как глубока рана.',
+  'entities.quests.q_veil_thinned.completion':
+    'Холодные, все до единой. У Лощины, пожалуй, есть одно время года, прежде чем разрыв станет разломом. Нам с тобой предстоит работа.',
+  'entities.quests.q_veil_thinned.objectives.0.label': 'Сущность сумеречного огонька',
+  'entities.quests.q_gleaming_antlers.title': 'Сияющие рога',
+  'entities.quests.q_gleaming_antlers.text':
+    'Скрытые олени роняют свет там, где пасутся, а сброшенные рога хранят его годами. Пять рогов от стад у Котловины Звездопада, и мои фонари прогорят всю зиму без масла. Оленей можно не трогать, но задаром они рога не отдадут.',
+  'entities.quests.q_gleaming_antlers.completion':
+    'Только посмотри, как они держат свет! Ни пламени, ни дыма, лишь сияние. Лощина даёт.',
+  'entities.quests.q_gleaming_antlers.objectives.0.label': 'Сияющий рог',
+  'entities.quests.q_wisp_lights.title': 'Огни отмелей',
+  'entities.quests.q_wisp_lights.text':
+    'Мерцающие огоньки несут пылинки старого звёздного света, упавшего сюда при запечатывании Лощины. Шесть пылинок, и лампады святилища прогорят год. Бери лишь у тех, что угасают: Лощина даёт довольно и без жадности.',
+  'entities.quests.q_wisp_lights.completion':
+    'Мягкие, как первые звёзды. Положи их у алтаря; святилище довершит остальное.',
+  'entities.quests.q_wisp_lights.objectives.0.label': 'Звёздная пылинка',
+  'entities.quests.q_calming_the_deep.title': 'Утишить чащу',
+  'entities.quests.q_calming_the_deep.text':
+    'Спорёныши Мерцающей глуби были кротким народом, пока разрыв не коснулся их колец. Что порча забрала, того не вернёт. Даруй осквернённым покой, {playerName}: десятерым, на севере глуби.',
+  'entities.quests.q_calming_the_deep.completion':
+    'Ты сделал то, чего я не могла вынести. Собиратели в южных кольцах всё ещё поют; благодаря тебе они будут петь и дальше.',
+  'entities.quests.q_calming_the_deep.objectives.0.label': 'Осквернённый спорёныш упокоен',
+  'entities.quests.q_spore_hearts.title': 'Сердца кольца',
+  'entities.quests.q_spore_hearts.text':
+    'Когда спорёныш падает во тьму, его сердце продолжает биться заёмной тенью. Четыре таких сердца, очищенных в святилище, покажут нам, как расползается порча. Мрачная работа, {playerName}, но это работа исцеления.',
+  'entities.quests.q_spore_hearts.completion':
+    'Вот так. Очищены и тихи. На каждом одна и та же метка: тень течёт из Затонувшего двора. Скажи Сэльвин.',
+  'entities.quests.q_spore_hearts.objectives.0.label': 'Споровое сердце',
+  'entities.quests.q_monument_tour.title': 'Что помнят камни',
+  'entities.quests.q_monument_tour.text':
+    'Со времён до запечатывания стоят три монумента: один на Сумеречной смотровой площадке, один в Затонувшем дворе, а один потерян на северо-востоке, где никто не ходит. Прочти их за меня, {playerName}. Мои колени сдались лестницам два столетия назад.',
+  'entities.quests.q_monument_tour.completion':
+    'Смотровая площадка, двор и забытый угол... все три строфы песни запечатывания вместе, впервые с тех пор, как её спели. Ты осчастливил старого чтеца.',
+  'entities.quests.q_monument_tour.objectives.0.label': 'Прочитан монумент на смотровой площадке',
+  'entities.quests.q_monument_tour.objectives.1.label': 'Прочитан монумент во дворе',
+  'entities.quests.q_monument_tour.objectives.2.label': 'Прочитан забытый монумент',
+  'entities.quests.q_grove_menace.title': 'Напасть на поляне',
+  'entities.quests.q_grove_menace.text':
+    'После заката сумеречные огоньки повадились плыть между моими прилавками, {playerName}, а их стужа портит всё, чего коснётся. Проредите их для меня: десяток, где бы ни рвалась завеса.',
+  'entities.quests.q_grove_menace.completion':
+    'Ночной рынок снова может открыться. Считай, у тебя пожизненный покупатель. Ну или хотя бы скидка.',
+  'entities.quests.q_grove_menace.objectives.0.label': 'Сумеречный огонёк развеян',
+  'entities.quests.q_shards_of_starfall.title': 'Осколки звездопада',
+  'entities.quests.q_shards_of_starfall.text':
+    'Когда сумеречные огоньки проплывают над хрустальными полями, к ним, как репьи, липнут осколки старого звёздного света. Шесть осколков, {playerName}, и я датирую запечатывание до самого времени года, когда его спели.',
+  'entities.quests.q_shards_of_starfall.completion':
+    'Взгляни на прожилки! Осень. Лощину запечатали осенью. Двести лет споров решили шесть камешков.',
+  'entities.quests.q_shards_of_starfall.objectives.0.label': 'Осколок звездопада',
+  'entities.quests.q_treant_accord.title': 'Уговор с древнями',
+  'entities.quests.q_treant_accord.text':
+    'Старейшины Рощи сбрасывают внешнюю кору, пока порча грызёт их корни. Четыре пласта, и я сварю бальзам на всю Рощу. Пока будешь отдирать кору, спасибо не скажут, {playerName}, зато простоят на столетие дольше.',
+  'entities.quests.q_treant_accord.completion':
+    'Все четыре толстые и крепкие. Бальзам варится неделю, а действует сто лет. Деревья меряют доброту иначе.',
+  'entities.quests.q_treant_accord.objectives.0.label': 'Кора старейшины',
+  'entities.quests.q_spore_tide.title': 'Против споровой волны',
+  'entities.quests.q_spore_tide.text':
+    'Бальзам держит Рощу, но порча с каждыми сумерками сильнее давит на глубь. Ещё двенадцать осквернённых должны обрести покой, прежде чем собиратели вернут свои северные кольца, {playerName}.',
+  'entities.quests.q_spore_tide.completion':
+    'Северные кольца этой ночью снова поют. Тихо, но поют.',
+  'entities.quests.q_spore_tide.objectives.0.label': 'Осквернённый спорёныш упокоен',
+  'entities.quests.q_sunken_court.title': 'Затонувший двор',
+  'entities.quests.q_sunken_court.text':
+    'Брин прочла сердца верно: разрыв идёт через старый двор на востоке, и его стражи пробудились неправильно. Их строили защищать печать; теперь они сокрушат всякого, кто приблизится. Убери восьмерых из руин.',
+  'entities.quests.q_sunken_court.completion':
+    'Восемь стражей утихли. Я помню, как их поднимали, {playerName}. Не удивляйся: Лощина долго хранит своих хранителей.',
+  'entities.quests.q_sunken_court.objectives.0.label': 'Древний страж утихомирен',
+  'entities.quests.q_wardens_echoes.title': 'Отголоски Смотрителя',
+  'entities.quests.q_wardens_echoes.text':
+    'Хозяин умолк, но стражи двора повторяют его последний приказ, как эхо, что не желает стихать. Пока печать не вернётся на место, они будут просыпаться снова и снова, {playerName}. Утихомирь ещё десятерых, чтобы каменщики добрались до печатного камня.',
+  'entities.quests.q_wardens_echoes.completion':
+    'Эхо с каждым разом всё слабее. Скоро во дворе останутся лишь ветер и плющ, как и положено руинам.',
+  'entities.quests.q_wardens_echoes.objectives.0.label': 'Древний страж утихомирен',
+  'entities.quests.q_waking_warden.title': 'Пробудившийся Смотритель',
+  'entities.quests.q_waking_warden.text':
+    'Двор затих, но его хозяин нет. Смотритель, держащий печать, пробудился искажённым, и пока он стоит, печать не срастить. Легко он не падёт; возьми друга, если найдёшь одного, {playerName}. Возьми двоих, если найдёшь двоих.',
+  'entities.quests.q_waking_warden.completion':
+    'Колокол его голоса умолк. Я почувствовала это отсюда, будто с целой долины сняли тяжесть.',
+  'entities.quests.q_waking_warden.objectives.0.label': 'Пробудившийся Смотритель повержен',
+  'entities.quests.q_seal_restored.title': 'Печать восстановлена',
+  'entities.quests.q_seal_restored.text':
+    'Отнеси печать Смотрителя к печатному камню в сердце двора и вложи её туда, откуда её выбили. Тогда Лощина начнёт исцеляться, а ты, {playerName}, совершишь то, чего никто из вашего рода не совершал.',
+  'entities.quests.q_seal_restored.completion':
+    'Я почувствовала, как она сомкнулась, мягко, как сумерки. Лощина помнит своих друзей, {playerName}. Как бы далеко ты ни странствовал, под великим древом для тебя всегда будет гореть огонёк.',
+  'entities.quests.q_seal_restored.objectives.0.label': 'Печать возвращена в печатный камень',
   'entities.dungeons.hollow_crypt.name': 'Пустая крипта',
   'entities.dungeons.hollow_crypt.enterText': 'Вы спускаетесь в Пустую крипту...',
   'entities.dungeons.hollow_crypt.leaveText': 'Вы выбираетесь обратно к дневному свету.',
@@ -4148,6 +4472,575 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_nythraxis_scourges_end.completion':
     'Теперь корона наконец молчит. Торнпик все еще будет хранить своих мертвых, но ни один король под горой больше не призовет их на войну. Вы завершили то, что Олдрен, Малрик и Восс смогли лишь сдержать.',
   'entities.quests.q_nythraxis_scourges_end.objectives.0.label': 'Нитраксис побежден',
+  'entities.quests.q_af_goldmelt_road.title': 'Золотая дорога вниз',
+  'entities.quests.q_af_goldmelt_road.text':
+    'Ты перешёл Золотую Проталину, {playerName}, — на сапогах ещё снег. Я держу это святилище, чтобы Лантанмир знал, кто приходит с холода, а докладывать в последнее время было нечего. Спустись по золотой дороге в город, найди старосту Оттолину у колодца и передай ей, что на перевале тихо.',
+  'entities.quests.q_af_goldmelt_road.completion':
+    'На Золотой Проталине тихо — и вот путник со снегом в волосах тому порукой. Соррел несёт дозор слишком исправно, чтобы слать пустые вести. Добро пожаловать в Лантанмир, {playerName}. Фонари горят для тебя.',
+  'entities.quests.q_af_goldmelt_road.objectives.0.label': 'Доложите старосте Оттолине',
+  'entities.quests.q_af_foxes_in_the_lamplight.title': 'Лисы в свете фонарей',
+  'entities.quests.q_af_foxes_in_the_lamplight.text':
+    'Сумеречные лисы поняли, чего стоят фонарные припасы, {playerName}. Каждый вечер они проскальзывают за ограду и таскают сало, что мы топим для паромных ламп. Мягкие лапы — и совесть ещё мягче. Истреби десяток, и остальные вспомнят, что города надо бояться.',
+  'entities.quests.q_af_foxes_in_the_lamplight.completion':
+    'Десять — и этой ночью припасы впервые за сезон остались нетронуты. Фонарщики шлют тебе благодарность, {playerName}.',
+  'entities.quests.q_af_foxes_in_the_lamplight.objectives.0.label': 'Сумеречный лис убит',
+  'entities.quests.q_af_orchard_call.title': 'Повозка для сада',
+  'entities.quests.q_af_orchard_call.text':
+    'Садовница Помелина держит Золочёный сад у западной дороги, и её повозки с живицей запаздывают уже на три дня. Весь город живёт этой янтарной живицей, {playerName}: смола для ламп, подсластка, жатвенный эль. Пройди по западной дороге и выясни, что её задержало.',
+  'entities.quests.q_af_orchard_call.completion':
+    'Староста считает свои повозки, вот как? Что ж, пусть ещё немного посчитает их пропавшими. Взгляни на мои ряды, {playerName}. У меня беды посерьёзнее запоздалой поставки.',
+  'entities.quests.q_af_orchard_call.objectives.0.label': 'Найдите садовницу Помелину',
+  'entities.quests.q_af_sprites_and_spigots.title': 'Духи и краники',
+  'entities.quests.q_af_sprites_and_spigots.text':
+    'Жатвенные духи, {playerName}. Они выковыривают мои краники из стволов ради сладости внутри, а вёдра швыряют в траву. Прогони восьмерых маленьких воришек и верни четыре моих ведёрка — и повозки снова покатятся.',
+  'entities.quests.q_af_sprites_and_spigots.completion':
+    'Четыре ведёрка снова на крюках, и в рядах стало тихо. Рука у тебя с духами тяжелее моей, {playerName}, и сегодня я этому рада.',
+  'entities.quests.q_af_sprites_and_spigots.objectives.0.label': 'Жатвенный дух прогнан',
+  'entities.quests.q_af_sprites_and_spigots.objectives.1.label': 'Ведёрко для живицы возвращено',
+  'entities.quests.q_af_amber_from_the_herd.title': 'Янтарь со стада',
+  'entities.quests.q_af_amber_from_the_herd.text':
+    'Золочёные олени ложатся на ночлег под моими старейшими деревьями, и живица всю ночь капает золотом им в шерсть. Вычесанные сгустки — чистейший янтарь во всей округе. Принеси мне шесть, {playerName}. Олени спасибо не скажут, но и убыли не заметят.',
+  'entities.quests.q_af_amber_from_the_herd.completion':
+    'Шесть сгустков, чистых, как литой мёд. Эти рукавицы прошиты прошлой партией, {playerName}: живица держит их жёсткими, а греют они лучше, чем кажется.',
+  'entities.quests.q_af_amber_from_the_herd.objectives.0.label': 'Сгусток золочёной живицы',
+  'entities.quests.q_af_lanterns_on_the_water.title': 'Фонари на воде',
+  'entities.quests.q_af_lanterns_on_the_water.text':
+    'Каждый паром на Великом озере несёт кормовой фонарь, {playerName}, а три мои лодки вернулись на рассвете без них. Их забрал туман — или что-то в тумане. Когда ветер меняется, их выносит на восточный берег. Пройди по прибрежной дороге и верни мои фонари домой.',
+  'entities.quests.q_af_lanterns_on_the_water.completion':
+    'Все три — и всё ещё горят. Паромные фонари не гаснут в воде, {playerName}. На то они и сделаны. Меня тревожит другое: что их сорвало.',
+  'entities.quests.q_af_lanterns_on_the_water.objectives.0.label': 'Паромный фонарь возвращён',
+  'entities.quests.q_af_what_took_the_moorings.title': 'Что забрало швартовы',
+  'entities.quests.q_af_what_took_the_moorings.text':
+    'А теперь я скажу то, чего не сказал при всём городе. Швартовы не соскользнули — их перекусили. Озёрные скрытни, что наглеют с каждой ночью, тянут за канаты и рули. Отправь восьмерых обратно под воду навсегда, {playerName}, пока следом не ушёл кто-нибудь из паромщиков.',
+  'entities.quests.q_af_what_took_the_moorings.completion':
+    'На восемь теней в отмелях меньше, и сегодня переправа впервые за две недели прошла по расписанию. Но наглый скрытень — это гонимый скрытень, {playerName}. Что-то под гладью озера гонит их наверх.',
+  'entities.quests.q_af_what_took_the_moorings.objectives.0.label': 'Озёрный скрытень убит',
+  'entities.quests.q_af_the_meredark.title': 'Озёрный Мрак',
+  'entities.quests.q_af_the_meredark.text':
+    'У старых паромщиков есть имя, которое произносят только на берегу: Озёрный Мрак — первый из скрытней, старый, как само озеро, и вдвое терпеливее. Однажды он уже поднимался — в тот год, когда ушла под воду затонувшая пристань, — и теперь поднимается снова. В сумерках он греется на руинах пристани у южного берега, {playerName}. Возьми друга, а лучше двух, и покончи с ним, пока с ним ещё можно покончить.',
+  'entities.quests.q_af_the_meredark.completion':
+    'Этим утром туман сошёл с Великого озера, {playerName}, и весь город это видел. Паромы снова пойдут ночным рейсом, и каждый фонарь на воде будет гореть в твою честь. Возьми: её подняли со дна у затонувшей пристани, и ни у кого нет больше прав её носить.',
+  'entities.quests.q_af_the_meredark.objectives.0.label': 'Озёрный Мрак убит',
+  'entities.quests.q_dk_ash_on_the_wind.title': 'Пепел на ветру',
+  'entities.quests.q_dk_ash_on_the_wind.text':
+    'Взгляни на юг с частокола, {playerName}. Огни в дюнах — это не костры троллей, это пеплокостные сборы, и с каждой ночью их всё больше. Мёртвые встают из костяных полей с песком на зубах. Сруби десять налётчиков, пока они не прорубили дорогу к моим воротам.',
+  'entities.quests.q_dk_ash_on_the_wind.completion':
+    'В дюнах на десять клинков меньше, и этой ночью огни сборов горели тусклее. Мои часовые выспались — впервые за неделю. Чистая работа, {playerName}.',
+  'entities.quests.q_dk_ash_on_the_wind.objectives.0.label': 'Пеплокостный налётчик убит',
+  'entities.quests.q_dk_trolls_on_the_road.title': 'Тролли на дороге',
+  'entities.quests.q_dk_trolls_on_the_road.text':
+    'Дюнные тролли выучили, как звучит обозная повозка, {playerName}. За этот месяц они трижды нападали на дороге Пепельных дюн, и последний возница пришёл пешком, неся одни лишь поводья. Убери восемь троллей с той дороги — и мои повозки снова покатятся.',
+  'entities.quests.q_dk_trolls_on_the_road.completion':
+    'Восемь — и мои возницы перестали писать прощальные письма перед каждым рейсом. Гарнизон ест благодаря тебе, {playerName}.',
+  'entities.quests.q_dk_trolls_on_the_road.objectives.0.label': 'Дюнный тролль убит',
+  'entities.quests.q_dk_scorched_stores.title': 'Обгоревшие припасы',
+  'entities.quests.q_dk_scorched_stores.text':
+    'Последний обоз сгорел, {playerName}, но окованные железом ящики насквозь не прогорают. Четыре из них так и лежат, обугленные, вдоль дороги через дюны, а внутри — соль, гвозди и тетивы на целый сезон. Верни мои припасы домой, пока тролли не додумались, как их открыть.',
+  'entities.quests.q_dk_scorched_stores.completion':
+    'Обгорели дочерна, а все запоры держат. Кузнец получит свои гвозди, лучница — тетивы, а ты — сапоги, что я приберегала для того, кто вернёт мои ящики, {playerName}.',
+  'entities.quests.q_dk_scorched_stores.objectives.0.label':
+    'Обгоревший ящик с припасами возвращён',
+  'entities.quests.q_dk_banners_over_the_dunes.title': 'Знамёна над дюнами',
+  'entities.quests.q_dk_banners_over_the_dunes.text':
+    'Пеплокостные собираются у старых могил костяных полей, {playerName}, а мои дозоры читают дюны хуже, чем стену. Убей пятерых их горлопанов — тех, что криком поднимают мёртвых, — и водрузи на каждом месте сбора предупредительное знамя, чтобы часовые могли отметить его с гребня.',
+  'entities.quests.q_dk_banners_over_the_dunes.completion':
+    'Три знамени хлопают на горячем ветру — ровно там, где их найдёт моя подзорная труба. Пять горлопанов умолкли, и то, что отзывается на их зов, придёт медленнее. Ты выиграл нам время, {playerName}.',
+  'entities.quests.q_dk_banners_over_the_dunes.objectives.0.label': 'Пеплокостный горлопан убит',
+  'entities.quests.q_dk_banners_over_the_dunes.objectives.1.label':
+    'Предупредительное знамя водружено',
+  'entities.quests.q_dk_watcher_at_the_wargate.title': 'Дозорная у Врат войны',
+  'entities.quests.q_dk_watcher_at_the_wargate.text':
+    'Что-то тянет пеплокостных на восток, {playerName}, и я послал лучшую из моих разведчиц узнать, что именно. Разведчица Йеррин уже месяц стоит лагерем в дальних дюнах за Тролльмутом, в виду врат, которых на моём веку никто не строил. Десять дней назад её донесения оборвались. Найди её лагерь и добудь мне её глаза.',
+  'entities.quests.q_dk_watcher_at_the_wargate.completion':
+    'Тебя прислал Браннок? Значит, мой последний гонец так и не дошёл. Говори тише и сядь, {playerName}. Видишь врата внизу? Сосчитай боевые знамёна перед ними — и поймёшь, почему я перестала вести записи.',
+  'entities.quests.q_dk_watcher_at_the_wargate.objectives.0.label': 'Найдите разведчицу Йеррин',
+  'entities.quests.q_dk_marrow_and_ash.title': 'Кость и пепел',
+  'entities.quests.q_dk_marrow_and_ash.text':
+    'Каждый пеплокостный налётчик носит боевое клеймо, {playerName}: обожжённую метку войска, под которым он идёт. С этого гребня я насчитала четыре войска, но догадки — не разведданные. Принеси мне шесть клейм с налётчиков и их горлопанов, и я покажу Бранноку очертания грядущей войны.',
+  'entities.quests.q_dk_marrow_and_ash.completion':
+    'Шесть клейм — и на каждом выжжен один и тот же знак. Это не сбор для набега, {playerName}. Каждое войско в дюнах подчиняется вратам войны под нами — тролли зовут их Оркадией, — и никакая пятёрка солдат из тех, с кем я служила, не сломила бы то, что грохочет за той дверью. Разве что пятёрка таких, как ты.',
+  'entities.quests.q_dk_marrow_and_ash.objectives.0.label': 'Пеплокостное боевое клеймо',
+  'entities.quests.q_dk_scales_of_the_maw.title': 'Чешуя Дрейкмо',
+  'entities.quests.q_dk_scales_of_the_maw.text':
+    'Когда ветер задувает со стороны Дрейкмо, углекрылые дрейки проносятся над моим лагерем так низко, что можно пересчитать им зубы, {playerName}. С каждым днём они залетают всё дальше, и что-то в том кратере их гонит. Принеси мне три их чешуйки. Чешуя помнит жар, и по ожогу я прочту, где дрейк устроил гнездовье.',
+  'entities.quests.q_dk_scales_of_the_maw.completion':
+    'Взгляни на испод этой, {playerName}: опалён по спирали, а кругами гнездится только одно. Эти дрейки — стражи выводка. В Дрейкмо кто-то стал матерью.',
+  'entities.quests.q_dk_scales_of_the_maw.objectives.0.label': 'Чешуйка углекрылого дрейка',
+  'entities.quests.q_dk_matriarch_of_the_maw.title': 'Матриарх Дрейкмо',
+  'entities.quests.q_dk_matriarch_of_the_maw.text':
+    'Чешуя не солгала, {playerName}. На рассвете я поднялась на кромку и увидела её на дне кратера: Синдралет, матриарх, под которой вылупился каждый углекрылый в этом небе, золотая, как уголь за миг до вспышки. Пока она сидит на кладке, дрейки наглеют, а Змеиный дозор не может воевать разом и с драконами, и с пеплокостными. Покончи с ней в её кратере, а затем отнеси весть капитану врат Бранноку. Не ходи в одиночку.',
+  'entities.quests.q_dk_matriarch_of_the_maw.completion':
+    'Небо над Дрейкмо пустует уже два дня — и вот ты входишь в мои ворота с кровью матриарха на сапогах. Сорок лет Змеиный дозор стоял на страже именно ради этого, {playerName}. Возьми эти наплечники из чешуи Дрейкмо, работы нашего же кузнеца. Носи их там, где их увидят дрейки.',
+  'entities.quests.q_dk_matriarch_of_the_maw.objectives.0.label':
+    'Синдралет, Матриарх Дрейкмо, убита',
+  'entities.quests.q_eg_gate_report.title': 'Весть за врата',
+  'entities.quests.q_eg_gate_report.text':
+    'Газоны за этими вратами стригут сами себя уже сотню лет, {playerName}, а в последнее время принялись подстригать и гостей. Старшая садовница Амарант ведёт учёт в Хеджвике, вверх по дороге за привратными лужайками. Скажи ей, что прошёл ещё один путник, и скажи, что изгороди у врат этой ночью шевелились.',
+  'entities.quests.q_eg_gate_report.completion':
+    'Шевелились, значит. Пелл докладывает это каждую неделю — и каждую неделю он прав. Прости мои глаза, {playerName}, я годами не сплю целую ночь: кто-то же должен следить за тем, как сад следит за нами. Добро пожаловать в Хеджвик.',
+  'entities.quests.q_eg_gate_report.objectives.0.label': 'Доложите старшей садовнице Амарант',
+  'entities.quests.q_eg_hungry_shapes.title': 'Пострижены в голод',
+  'entities.quests.q_eg_hungry_shapes.text':
+    'Тот, кто стрижёт этот сад, стал небрежен — или жесток. Волчьи фигуры в Диких Розах были выстрижены для красоты, но с недавних пор они охотятся: зелёные пасти, никаких животов — и ни единой причины останавливаться. Сруби десять фигурных волков, {playerName}, и пусть газоны хоть ненадолго снова побудут газонами.',
+  'entities.quests.q_eg_hungry_shapes.completion':
+    'Десять куч обрезков там, где стояли десять волков. Это должно было быть похоже на садоводство, {playerName}. Почему же это похоже на войну?',
+  'entities.quests.q_eg_hungry_shapes.objectives.0.label': 'Фигурный волк убит',
+  'entities.quests.q_eg_stolen_shears.title': 'Украденные ножницы',
+  'entities.quests.q_eg_stolen_shears.text':
+    'За две недели из Хеджвика ушли все садовые ножницы до единых, {playerName}: с крючков, из запертых сараев, а одна пара — прямо из моего фартука, пока я дремала. Это гномы живой изгороди, маленькие садовники, которым ненавистно, что мы топчем их газоны. Верни шесть пар, пока вся деревня не осталась с одними кухонными ножами.',
+  'entities.quests.q_eg_stolen_shears.completion':
+    'Шесть пар, и среди них мои собственные — эту зазубрину на лезвии я узнаю где угодно. Вот, держи: эти перчатки вязали для работы с секатором. Тёплые руки — твёрдые ножницы.',
+  'entities.quests.q_eg_stolen_shears.objectives.0.label': 'Украденные хеджвикские ножницы',
+  'entities.quests.q_eg_gnomes_in_the_green.title': 'Обида садовых гномов',
+  'entities.quests.q_eg_gnomes_in_the_green.text':
+    'Ножницы были только началом, {playerName}. Этой ночью гномы опрокинули в зелень наши тележки с инструментами — одну у их лабиринтовой норы к западу, другую через весь сад, на дорожке у пруда, — и рассыпали по траве сотню лет доброго железа. Прогони восьмерых маленьких злыдней и притащи опрокинутые тележки домой.',
+  'entities.quests.q_eg_gnomes_in_the_green.completion':
+    'Три тележки на месте, и крючки снова полны. Пусть чертенята дуются в своих изгородях: Хеджвик тоже работает на этих газонах.',
+  'entities.quests.q_eg_gnomes_in_the_green.objectives.0.label': 'Гном живой изгороди прогнан',
+  'entities.quests.q_eg_gnomes_in_the_green.objectives.1.label':
+    'Тележка с инструментами возвращена',
+  'entities.quests.q_eg_who_trims_the_hedges.title': 'Кто стрижёт изгороди',
+  'entities.quests.q_eg_who_trims_the_hedges.text':
+    'Я веду учётные книги тридцать лет, {playerName}, и десять из них толком не сплю, потому что счета не сходятся. Трава просит стрижки, изгороди просят формы, и никто здесь не делает ни того ни другого — а сад каждое утро стоит подстриженный. С недавних пор лесной люд божится, что видит старика с тачкой на дальних южных лужайках, за лабиринтом, у Кувшинковой чаши. Найди его. Если он существует, я наконец усну. А если нет — видно, не усну уже никогда.',
+  'entities.quests.q_eg_who_trims_the_hedges.completion':
+    'Стало быть, дом наконец кого-то прислал. Сто лет я хожу по этим газонам, {playerName}, и у нас с садом уговор: я стригу то, что просит стрижки. Присядь. Изгороди уступят тебе час.',
+  'entities.quests.q_eg_who_trims_the_hedges.objectives.0.label':
+    'Найдите садовника у Кувшинковой чаши',
+  'entities.quests.q_eg_bloom_clippings.title': 'Черенки живой зелени',
+  'entities.quests.q_eg_bloom_clippings.text':
+    'Хочешь понять этот сад? Тогда читай его, как читаю я. Олени, что пасутся на газонах, растят самую верную зелень: каждый их лист — страница. Принеси мне шесть свежих побегов с фигурных оленей, {playerName}. За обрезку они спасибо не скажут, но отрастут заново. Здесь всё отрастает заново.',
+  'entities.quests.q_eg_bloom_clippings.completion':
+    'Взгляни сюда: листья сворачиваются внутрь, на каждом побеге одно и то же. Сад боится, {playerName}. За сто лет я ни разу не видел его испуганным.',
+  'entities.quests.q_eg_bloom_clippings.objectives.0.label': 'Свежесрезанный побег',
+  'entities.quests.q_eg_four_statues.title': 'Четыре тихие сестры',
+  'entities.quests.q_eg_four_statues.text':
+    'Когда сад был юн, первые садовники поставили четырёх мраморных сестёр стеречь его четверти: одну над Дикими Розами, одну на прудовой дорожке к востоку от лабиринта, одну на западной лужайке, где гномы держат нору, и одну на южной, за изгородями. Лабиринт вырос между ними, и мало кто видел всех четырёх. Обойди четверти, {playerName}, и приложи ладонь к каждой сестре. Когда сад осмотрит тебя со всех четырёх сторон, он откроет места, что прячет от чужих.',
+  'entities.quests.q_eg_four_statues.completion':
+    'Четыре оттиска, четыре сестры — и ни одна не заплакала мрамором. Сад снял с тебя мерку, {playerName}, и не нашёл изъяна. Теперь я могу послать тебя туда, где живёт настоящая беда.',
+  'entities.quests.q_eg_four_statues.objectives.0.label': 'Садовая статуя осмотрена',
+  'entities.quests.q_eg_bull_of_the_court.title': 'Бык Фонтанного Двора',
+  'entities.quests.q_eg_bull_of_the_court.text':
+    'А теперь правда, {playerName}. Бык в сердце лабиринта был моим лучшим творением: я выстриг его стеречь Фонтанный Двор, и сто лет он его стерёг. Но страх, что бродит в зелени, добрался и до него, и теперь он не стережёт — он охотится. Лабиринт скармливает ему всякого, кто забредёт внутрь. Я слишком стар, чтобы развоплотить его, а нужно именно развоплощение — под корень и под ветвь. Возьми друга, пройди лабиринт до двора и сруби моего быка.',
+  'entities.quests.q_eg_bull_of_the_court.completion':
+    'Я почувствовал — вот здесь, — когда он распался. Сто лет труда, и ты был прав, что положил им конец. Возьми эту мантию: я скроил её для того, кто окажется сильнее лучшего из моих творений. Сегодня двор — просто фонтан, {playerName}, а сад — просто сад. Быть может, теперь мы со старшей садовницей оба выспимся.',
+  'entities.quests.q_eg_bull_of_the_court.objectives.0.label': 'Фигурный бык развоплощён',
+  'entities.quests.q_fs_bell_at_the_landing.title': 'Колокол у Пристани',
+  'entities.quests.q_fs_bell_at_the_landing.text':
+    'Ты пришёл по Паромной косе, {playerName}? Значит, ты первый за неделю, и Смотритель захочет на тебя взглянуть. Чаячья Гавань выше по прибрежной дороге, за сушильными рамами, за которыми больше никто не смотрит. Скажи Смотрителю Хладоуглю, что коса ещё цела и что Там сегодня не бил тройной набат. Пока.',
+  'entities.quests.q_fs_bell_at_the_landing.completion':
+    'Коса держится, а у Тама ещё хватает дыхания шутить про тройной набат. Хорошо. Мы — остров в осаде, {playerName}, и каждая пара рук, что переходит эту отмель, — ещё одна пара, через которую прорывам придётся пробиться, прежде чем они доберутся до моих людей. Добро пожаловать в Чаячью Гавань.',
+  'entities.quests.q_fs_bell_at_the_landing.objectives.0.label': 'Доложите Смотрителю Хладоуглю',
+  'entities.quests.q_fs_hold_the_riftfields.title': 'Удержать Поля Разломов',
+  'entities.quests.q_fs_hold_the_riftfields.text':
+    'К востоку от города хлебные ряды пришли в запустение, и отродья, пролезшие через прорыв на Полях Разломов, теперь обирают их дочиста. Мои люди не могут возделывать поле, на котором не могут стоять, {playerName}. Истреби десять отродий и верни земледельцам их землю.',
+  'entities.quests.q_fs_hold_the_riftfields.completion':
+    'На десять меньше — и батраки уже спорят, кто первым выйдет в поле. Это ненадолго, прорывы не отдыхают подолгу, но город, который ест, — это город, который держится.',
+  'entities.quests.q_fs_hold_the_riftfields.objectives.0.label': 'Отродье прорыва убито',
+  'entities.quests.q_fs_steel_for_the_redoubt.title': 'Сталь для редута',
+  'entities.quests.q_fs_steel_for_the_redoubt.text':
+    'Каждый клинок, что я выдаю, — из тех, что вернуло море, или из тех, что я сняла с мёртвых, {playerName}. Отродья тащат через прорывы лом: петли, крючья, обломки мечей — сорочья добыча, но перековывается она на славу. Принеси мне шесть кусков их награбленной стали, и у линии заграждений снова будут зубы.',
+  'entities.quests.q_fs_steel_for_the_redoubt.completion':
+    'Изъедена солью, в шрамах прорыва — а кромку всё равно держит. Вот, эти рукавицы я подбивала сама. Сталь за сталь, {playerName}: другой торговли на Дальнем Береге нынче не водится.',
+  'entities.quests.q_fs_steel_for_the_redoubt.objectives.0.label': 'Сталь со шрамами прорыва',
+  'entities.quests.q_fs_the_three_bells.title': 'Три колокола',
+  'entities.quests.q_fs_the_three_bells.text':
+    'Кроме моего, на побережье стоят три сторожевых колокола: один на мысу у Пристани, один на южной полосе, один у берега Полей Разломов. Если верёвка сгнила или язык унесли, город узнает о прорыве, когда тот уже будет на улицах. Обойди берег, {playerName}, и ударь в каждый колокол по разу, чтобы я знал, что голос при нём.',
+  'entities.quests.q_fs_the_three_bells.completion':
+    'Три голоса, три ответа, чисто донесённых над водой. Спи этой ночью в Чаячьей Гавани, {playerName}, и знай: если тебя разбудит колокол, то от моей руки — и вовремя.',
+  'entities.quests.q_fs_the_three_bells.objectives.0.label': 'Сторожевой колокол прозвонил',
+  'entities.quests.q_fs_song_before_the_break.title': 'Песнь перед прорывом',
+  'entities.quests.q_fs_song_before_the_break.text':
+    'Есть человек, который слышит прорывы раньше, чем они раскрываются. Стражеразлома Оллун: учёный — или безумец, а мне в последнее время эта разница не по карману. Он несёт свою вахту на Дозорном Лугу, вверх по дороге к юго-востоку от города. Найди его, {playerName}, и спроси, что остров собирается сделать с нами дальше.',
+  'entities.quests.q_fs_song_before_the_break.completion':
+    'Тебя прислал Смотритель? Хорошо. Значит, город наконец начал слушать. А теперь замри на мгновение, {playerName}. Вот, под ветром — слышишь? Утёсы поют, и напев мне не нравится.',
+  'entities.quests.q_fs_song_before_the_break.objectives.0.label': 'Найдите Стражеразлома Оллуна',
+  'entities.quests.q_fs_moss_and_mending.title': 'Мох и врачевание',
+  'entities.quests.q_fs_moss_and_mending.text':
+    'Солёный мох, что растёт вдоль линии прилива, — лучшая повязка на рану из всех, что я знаю, а порождения разлома заняли каждую полосу берега, где он растёт. Они, представь себе, таскают его клочья, зацепившиеся за шкуры. Расчисть от них восточные отмели — шестерых хватит, {playerName}, — и набери мне четыре добрых горсти мха там, где они его истоптали.',
+  'entities.quests.q_fs_moss_and_mending.completion':
+    'В одной руке мох, в другой — притихший берег. Ты пополнил всю мою лечебницу, {playerName}. Сделай милость: не становись моим следующим пациентом.',
+  'entities.quests.q_fs_moss_and_mending.objectives.0.label': 'Порождение разлома убито',
+  'entities.quests.q_fs_moss_and_mending.objectives.1.label': 'Солёный мох Дальнего Берега',
+  'entities.quests.q_fs_bram_come_home.title': 'Вернись домой, Брам',
+  'entities.quests.q_fs_bram_come_home.text':
+    'Мой Брам вывел лодку в то самое утро, когда раскрылся прорыв у сетей, и море выбросило его где-то за мысом у Пристани. Три ночи назад я слышала его, {playerName}, — он звал через воду, а я побоялась пойти. Я и сейчас боюсь. Прошу тебя. Его лодка лежит разбитой на северном берегу. Доведи его до дома, ко мне.',
+  'entities.quests.q_fs_bram_come_home.completion':
+    'Брам! Ты вернул мне его целым, {playerName}. Мы оба плакали, и никому из нас не стыдно. Что бы прорывы ни забрали у этого острова дальше, моей семьи им не видать. Больше никогда.',
+  'entities.quests.q_fs_bram_come_home.objectives.0.label':
+    'Рыбак Брам благополучно доведён до Чаячьей Гавани',
+  'entities.quests.q_fs_stalkers_off_the_light.title': 'Охотники прочь от света',
+  'entities.quests.q_fs_stalkers_off_the_light.text':
+    'Охотники рыщут во тьме между сторожевыми кострами, и с каждой ночью их круг вокруг моего луга всё теснее. Они не безмозглы, {playerName}, они терпеливы, а терпение — единственное, что мне не пересидеть. Убей восьмерых и оттесни тьму назад, к утёсам, из которых она пришла.',
+  'entities.quests.q_fs_stalkers_off_the_light.completion':
+    'Восемь ночей кружения окончились за одну. Костры уже горят ровнее — или это только мои руки. Так или иначе, луг снова мой, и я слышу, как остров думает.',
+  'entities.quests.q_fs_stalkers_off_the_light.objectives.0.label': 'Охотник Пустоты убит',
+  'entities.quests.q_fs_the_great_break.title': 'Великий прорыв',
+  'entities.quests.q_fs_the_great_break.text':
+    'Каждая песня этого острова кончается одной и той же низкой нотой, и идёт она с Расколотых Утёсов. Что-то прошло там через великий прорыв, {playerName}, — что-то, ради чего утёсы сами треснули, чтобы впустить его, — и оно всё ещё растёт. Если оно двинется на север, никакой колокол уже не поможет. Возьми друга, а лучше двух, и покончи с ним. Потом скажи Хладоуглю, что мелодия переменилась.',
+  'entities.quests.q_fs_the_great_break.completion':
+    'Оллун прислал весть вперёд тебя: пение смолкло. Весь мой город услышал эту тишину, {playerName}, и половина заплакала от звука полного ничего. Носи эту мантию. Дальний Берег не забывает тех, кто удержал его берег.',
+  'entities.quests.q_fs_the_great_break.objectives.0.label': 'Расколотый Ужас убит',
+  'entities.quests.q_fv_snowline_report.title': 'Весть со Снеговой Тропы',
+  'entities.quests.q_fv_snowline_report.text':
+    'Каждая душа, что выбирается из Земель Драконов, проходит мимо моего костра, {playerName}, и с каждой неделей таких всё меньше. Смотрительница Калдра держит Ледяную Мантию выше по северной дороге. Скажи ей, что перевал ещё открыт, и скажи, что его в одиночку прошёл чужак.',
+  'entities.quests.q_fv_snowline_report.completion':
+    'Значит, перевал держится. Эйнна высиживает в том путевом лагере бури, что хоронят дорожные вехи, и ни разу не прислала мне пустой вести. Добро пожаловать в Ледяную Мантию, {playerName}.',
+  'entities.quests.q_fv_snowline_report.objectives.0.label': 'Доложите Смотрительнице Калдре',
+  'entities.quests.q_fv_wolves_at_the_door.title': 'Волки у порога',
+  'entities.quests.q_fv_wolves_at_the_door.text':
+    'Сугробные стаи прежде держались верхних уступов. Теперь они переходят озёрную дорогу средь бела дня, и мои дровосеки не выходят за стены. Прореди стаи, {playerName}, десятерых хватит, — и дорога снова станет дорогой.',
+  'entities.quests.q_fv_wolves_at_the_door.completion':
+    'На десять теней меньше между нами и Ледниковым озером. Дровосеки уже спорят, кто выйдет первым.',
+  'entities.quests.q_fv_wolves_at_the_door.objectives.0.label': 'Сугробный волк убит',
+  'entities.quests.q_fv_winter_pelts.title': 'Шкуры для дома',
+  'entities.quests.q_fv_winter_pelts.text':
+    'Дрова держат тело живым, {playerName}, но этот холод не остановить шерстью — только волчьим мехом. Шесть плотных зимних шкур с сугробных стай, и я подобью постели всем, кого приютил Очажный дом.',
+  'entities.quests.q_fv_winter_pelts.completion':
+    'Такой мех — единственный довод, к которому прислушивается зима. Возьми эти боты, они подбиты последней партией.',
+  'entities.quests.q_fv_winter_pelts.objectives.0.label': 'Плотная зимняя шкура',
+  'entities.quests.q_fv_ember_caches.title': 'Угли на озёрной дороге',
+  'entities.quests.q_fv_ember_caches.text':
+    'Этой ночью на озёрной дороге перевернулись сани с запасами углей: железные котелки, что месяц хранят прикрытый жар живым. Три из них так и лежат в снегу, {playerName}, а дому не пережить потери того, что в них тлеет. Верни огонь домой.',
+  'entities.quests.q_fv_ember_caches.completion':
+    'Всё ещё тёплые, все до единого. Ты купил этому дому целую зиму милосердия, {playerName}.',
+  'entities.quests.q_fv_ember_caches.objectives.0.label': 'Запас углей возвращён',
+  'entities.quests.q_fv_lights_over_steps.title': 'Огни над Ступенями',
+  'entities.quests.q_fv_lights_over_steps.text':
+    'Весь этот месяц сияние каждую ночь горит зелёным, и старики не хотят ходить под ним. Одна женщина может знать почему: Вейла, чтица сияния. Она стоит одна на Ступенях Сияния, к юго-востоку за озером. Найди её лагерь, {playerName}, и услышь, что рассказали ей огни.',
+  'entities.quests.q_fv_lights_over_steps.completion':
+    'Тебя прислала Калдра? Значит, она наконец встревожилась — и не зря. Сядь, {playerName}. Посмотри со мной на небо.',
+  'entities.quests.q_fv_lights_over_steps.objectives.0.label': 'Найдите чтицу сияния Вейлу',
+  'entities.quests.q_fv_aurora_motes.title': 'Пылинки сияния',
+  'entities.quests.q_fv_aurora_motes.text':
+    'Огоньки, что плывут над этими ступенями, роняет само сияние, и каждый несёт в сердце его пылинку. Мне нужно шесть, чтобы прочесть, что пишет небо, {playerName}. Огоньки не сопротивляются. Легче от этого работа или тяжелее — решать тебе и твоей совести.',
+  'entities.quests.q_fv_aurora_motes.completion':
+    'Шесть пылинок, и все ещё светятся. Взгляни на них, {playerName}: они пульсируют в лад друг с другом. Сияние — не погода. Сияние — это сигнал.',
+  'entities.quests.q_fv_aurora_motes.objectives.0.label': 'Пылинка сияния',
+  'entities.quests.q_fv_rime_unbound.title': 'Иней на воле',
+  'entities.quests.q_fv_rime_unbound.text':
+    'Когда сияние горит так ярко, холод встаёт и идёт: инеевые элементали, мороз, обретший волю. Они собираются там, где огни касаются уступов, и каждую ночь подбираются всё ближе к моему лагерю. Разбей восьмерых, {playerName}, пока один из них не разбил меня.',
+  'entities.quests.q_fv_rime_unbound.completion':
+    'Ночь уже стала тоньше. То, что их будит, ещё не закончило, но ты выторговал Ступеням немного тишины.',
+  'entities.quests.q_fv_rime_unbound.objectives.0.label': 'Инеевый элементаль убит',
+  'entities.quests.q_fv_silent_trapline.title': 'Умолкшая ловчая линия',
+  'entities.quests.q_fv_silent_trapline.text':
+    'Старый Броск держит ловчие линии Дрожащей топи к западу отсюда, и каждую неделю все одиннадцать лет он отправлял с дровяными санями связку мехов. Уже две недели — ничего. Он слишком упрям, чтобы замёрзнуть, и слишком осторожен, чтобы утонуть, {playerName}, — стало быть, стряслось что-то иное. Найди его лагерь у топи и убедись, что он дышит.',
+  'entities.quests.q_fv_silent_trapline.completion':
+    'Тебя прислала Мейв? Ха. Одиннадцать лет — а она всё думает, что топь меня съест. Что ж... в этом году она может оказаться права. Посмотри, что стало с моими линиями.',
+  'entities.quests.q_fv_silent_trapline.objectives.0.label': 'Найдите зверолова Броска',
+  'entities.quests.q_fv_sprung_traps.title': 'Духи в капканах',
+  'entities.quests.q_fv_sprung_traps.text':
+    'Топяные духи, {playerName}. Чертенята забавы ради захлопывают мои капканы и раскидывают железо по камышам. Прогони их — восьмерых хватит, чтобы наука дошла до остальных, — и собери, что осталось от моих ловчих линий, раз уж будешь там.',
+  'entities.quests.q_fv_sprung_traps.completion':
+    'Четыре добрых капкана на месте, и в камышах стало тихо. Ставишь ты их тяжелее моего, {playerName}, но с итогом не поспоришь.',
+  'entities.quests.q_fv_sprung_traps.objectives.0.label': 'Топяной дух прогнан',
+  'entities.quests.q_fv_sprung_traps.objectives.1.label': 'Капкан возвращён',
+  'entities.quests.q_fv_seeing_wren_home.title': 'Проводить Рен домой',
+  'entities.quests.q_fv_seeing_wren_home.text':
+    'Моя ученица Рен два дня назад ушла обходить линию у Золотой Проталины и не вернулась. Я нашёл её следы: она забилась под дорожные вехи к юго-западу от Ступеней Сияния и от страха перед волками не может сдвинуться с места. Мне нельзя оставить топь, {playerName}. Доведи её до лагеря Вейлы на Ступенях. Под огнями она будет в безопасности.',
+  'entities.quests.q_fv_seeing_wren_home.completion':
+    'Девочка внутри, закутана в половину моих одеял и болтает так, что звёзды с неба сыплются. Ты сделал сегодня доброе дело, {playerName}. Предел таких видит немного.',
+  'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
+    'Ученица Рен благополучно доведена до Ступеней Сияния',
+  'entities.quests.q_fv_howl_above.title': 'Вой на террасах',
+  'entities.quests.q_fv_howl_above.text':
+    'Ты слышишь его в сумерках, {playerName}: вой с Воющих террас, и это не сугробные стаи. Глотки крупнее. Террасные ревуны спустились с вершин впервые с тех пор, как этот пост держала моя бабка, и это они согнали волков на мою дорогу. Истреби восьмерых и оттесни их назад.',
+  'entities.quests.q_fv_howl_above.completion':
+    'Восемь — и сумеречный хор стал жиже. Но ревуны не покидают вершин просто так. Что-то их согнало, и я боюсь, что у этого есть имя.',
+  'entities.quests.q_fv_howl_above.objectives.0.label': 'Террасный ревун убит',
+  'entities.quests.q_fv_frostmane_tyrant.title': 'Тиран Морозная Грива',
+  'entities.quests.q_fv_frostmane_tyrant.text':
+    'Ревуны не охотились, когда спускались по террасам. Они бежали. Высоты забрал себе йети — горный люд зовёт его Морозной Гривой, — и даже стаи не делят с ним склона. С этим надо покончить, {playerName}, пока зима не согнала его к моим стенам. Возьми друга. А лучше двух.',
+  'entities.quests.q_fv_frostmane_tyrant.completion':
+    'Когда этой ночью стих ветер, вся деревня услышала тишину там, где раньше была Морозная Грива. Предел в долгу перед тобой, и платить его будут годами, {playerName}. Носи это — и каждая дверь в Ледяной Мантии открыта для тебя.',
+  'entities.quests.q_fv_frostmane_tyrant.objectives.0.label': 'Морозная Грива убита',
+  'entities.quests.q_gc_down_the_windway.title': 'Вниз по Ветровому Проходу',
+  'entities.quests.q_gc_down_the_windway.text':
+    'Ты одолел подъём, {playerName}, — значит, ветер решил тебя оставить. Викхарбор лежит к востоку по дороге через холмы, укрытый в затишье своей бухты. Начальница гавани Одиль считает каждую душу, что переваливает через проход, и захочет сосчитать тебя. Скажи ей, что Ветровой Проход ещё открыт.',
+  'entities.quests.q_gc_down_the_windway.completion':
+    'Через перевал пешком, в такую погоду? Марен присылает мне немного имён, и ещё меньше их приходит отвечать за себя самим. Добро пожаловать в Викхарбор, {playerName}. Закрой за собой дверь таверны.',
+  'entities.quests.q_gc_down_the_windway.objectives.0.label': 'Доложите начальнице гавани Одиль',
+  'entities.quests.q_gc_wool_off_the_downs.title': 'Шерсть с холмов',
+  'entities.quests.q_gc_wool_off_the_downs.text':
+    'Мои лодочные команды гребут в шторм, что режет сквозь промасленную кожу, как сквозь бумагу, {playerName}. Этот ветер держит лишь одно: жирная шерсть вересковых баранов, спрядённая потолще, по-викхарборски. Стада пасутся на Воющих Холмах к западу от города. Шесть добрых рун — и каждая команда этот сезон гребёт в тепле.',
+  'entities.quests.q_gc_wool_off_the_downs.completion':
+    'Вот из-за такого руна бараны и стоят там, сытые и самодовольные, в погоду, что убивает людей. Пряхи засядут за работу при лампах. Возьми эти боты, {playerName}, они подбиты с последней стрижки.',
+  'entities.quests.q_gc_wool_off_the_downs.objectives.0.label': 'Жирная баранья шерсть',
+  'entities.quests.q_gc_scuttlers_in_the_pots.title': 'Крабы в ловушках',
+  'entities.quests.q_gc_scuttlers_in_the_pots.text':
+    'Отмельные крабы научились взбираться по прибрежной дороге и раскалывать наши крабьи ловушки о камни, {playerName}. За неделю — половина улова, и один ловец с рукой, которой он месяц не сможет пользоваться. Разбей десятерых, и остальные вспомнят, почему держались отмелей.',
+  'entities.quests.q_gc_scuttlers_in_the_pots.completion':
+    'На десять панцирей меньше на моей дороге, и этим утром ловушки поднялись полными. Ловцы зовут тебя добрым знаком, {playerName}. В Викхарборе теплее похвалы не бывает.',
+  'entities.quests.q_gc_scuttlers_in_the_pots.objectives.0.label': 'Отмельный краб убит',
+  'entities.quests.q_gc_keeper_of_the_flame.title': 'Хранитель огня',
+  'entities.quests.q_gc_keeper_of_the_flame.text':
+    'Старый Брам держит Маяк на высоком мысу к северо-востоку от города, и вот уже две недели он не спускается за припасами. Лампа горит — значит, он жив, но человек его лет, один на том мысу, на таком ветру, {playerName}... Поднимись по маячной дороге и убедись, что он на ногах.',
+  'entities.quests.q_gc_keeper_of_the_flame.completion':
+    'Одиль послала тебя в такую даль проверить, не унесло ли меня ветром? Ха. Передай ей: лампа горит, и я горю. Но раз уж ты одолел подъём, {playerName}, задержись. У Маяка есть работа, к которой годен, похоже, только чужак.',
+  'entities.quests.q_gc_keeper_of_the_flame.objectives.0.label': 'Найдите смотрителя Брама',
+  'entities.quests.q_gc_lanterns_on_the_shear.title': 'Фонари над Срезом',
+  'entities.quests.q_gc_lanterns_on_the_shear.text':
+    'Маяк — великий свет, {playerName}, но ночного путника по дороге над Отвесным Срезом ведут штормовые фонари. Этой ночью шторм задул их все до единого, а та дорога в темноте — это долгое падение с коротким концом. Возьми моё огниво и снова зажги четыре фонаря вдоль обрыва.',
+  'entities.quests.q_gc_lanterns_on_the_shear.completion':
+    'Четыре точки света на дороге над обрывом, ровно там, где им положено. Отсюда, сверху, кажется, будто побережье снова открыло глаза. Из тебя вышел бы смотритель, {playerName}.',
+  'entities.quests.q_gc_lanterns_on_the_shear.objectives.0.label': 'Штормовой фонарь зажжён вновь',
+  'entities.quests.q_gc_wind_against_the_wick.title': 'Ветер против фитиля',
+  'entities.quests.q_gc_wind_against_the_wick.text':
+    'Штормовые духи — это ветер, обернувшийся злобой, {playerName}. Они собираются на верхних холмах у Зеркального Озера, и всякое пламя, что найдут, гасят: фонарь, очаг, а однажды — и эту лампу. Тридцать девять лет я держу Маяк зажжённым и не отдам его погоде, затаившей обиду. Развей восьмерых.',
+  'entities.quests.q_gc_wind_against_the_wick.completion':
+    'Этой ночью лампа ни разу даже не дрогнула — впервые за месяц. Ветер всё ещё ненавидит нас, {playerName}, но ненавидит снова честно.',
+  'entities.quests.q_gc_wind_against_the_wick.objectives.0.label': 'Штормовой дух развеян',
+  'entities.quests.q_gc_the_far_shore.title': 'Дальний берег',
+  'entities.quests.q_gc_the_far_shore.text':
+    'Из этой ламповой комнаты мне видно всё побережье, {playerName}, и то, что я вижу на севере, мне не по душе. Зелёные огни бродят по Полям Кораблекрушений в отлив, от остова к остову. На том берегу работает одна-единственная женщина: Эдда, добытчица. Иди по дороге над обрывом на север, мимо Среза, пока не начнутся остовы, и убедись, что она ещё дышит.',
+  'entities.quests.q_gc_the_far_shore.completion':
+    'Брам теперь караулит мой берег со своей башни, вот как? Старик прав, что тревожится, {playerName}. Мертвецы стали по ночам обходить собственные крушения, а с недавних пор им всё равно, взошло ли солнце.',
+  'entities.quests.q_gc_the_far_shore.objectives.0.label': 'Найдите добытчицу Эдду',
+  'entities.quests.q_gc_dead_mens_cargo.title': 'Груз мертвецов',
+  'entities.quests.q_gc_dead_mens_cargo.text':
+    'Закон добычи прост, {playerName}: что море отдало берегу, то моё. Утонувшие матросы не согласны. Они поднимаются из своих остовов и утаскивают каждый сложенный мною ящик обратно за линию прилива. Упокой шестерых насовсем, а пока на берегу тихо, вытащи три прибитых морем ящика, прежде чем прилив подаст встречный иск.',
+  'entities.quests.q_gc_dead_mens_cargo.completion':
+    'Шесть команд стали тише, и три ящика в сухости. Добываешь ты тяжелее моего, {playerName}, но учётной книге всё равно. Половина твоя по закону, а закон здесь — это я.',
+  'entities.quests.q_gc_dead_mens_cargo.objectives.0.label': 'Утонувший матрос упокоен',
+  'entities.quests.q_gc_dead_mens_cargo.objectives.1.label': 'Прибитый морем ящик добыт',
+  'entities.quests.q_gc_the_wreck_warden.title': 'Страж Кораблекрушений',
+  'entities.quests.q_gc_the_wreck_warden.text':
+    'Теперь ты знаешь, почему матросы встают, {playerName}. Нечто носит обросшие ракушками латы первого корабля, разбившегося об этот берег, и сторожит каждый остов на отмели, как кладбище, которое ему поручили. Оно хранит клад, о котором я мечтаю десять лет, и команду, которой я желала бы покоя. Покончи со Стражем Кораблекрушений. Возьми друга — мёртвые несут дозор исправно.',
+  'entities.quests.q_gc_the_wreck_warden.completion':
+    'Берег умолк в тот самый миг, когда он пал, {playerName}. Первая тишина на этом берегу за десять лет моей работы. Команды теперь просто кости — упокоенные кости. Возьми мантию с верхушки клада: живой спине она всегда была впору больше.',
+  'entities.quests.q_gc_the_wreck_warden.objectives.0.label': 'Страж Кораблекрушений повержен',
+  'entities.quests.q_hollow_the_huntsman.title': 'Смотритель стад',
+  'entities.quests.q_hollow_the_huntsman.text':
+    'Ты, похоже, из тех, кому по плечу не только огоньки, {playerName}. Охотник Дерал держит дозор среди оленьих лугов к востоку отсюда и уже которую неделю спрашивает про умелые руки. Что бы он там ни выслеживал, вслух в деревне он этого не скажет.',
+  'entities.quests.q_hollow_the_huntsman.completion':
+    'Тебя прислала Фенна? Хорошо. Значит, она тебе доверяет, а у меня есть два имени, которые надо вычеркнуть.',
+  'entities.quests.q_hollow_the_huntsman.objectives.0.label': 'Найдите охотника Дерала',
+  'entities.quests.q_hollow_old_marrowshell.title': 'Старый панцирь отмелей',
+  'entities.quests.q_hollow_old_marrowshell.text':
+    'Первое имя — Старый Костнопанцирь, краб размером с повозку, что охотится в восточных отмелях с тех пор, когда у Элдерглима ещё не было ворот. Он бродит, {playerName}, так что придётся идти вдоль берега, пока не пересечёшь его след. Не ходи в одиночку и не верь его неподвижности.',
+  'entities.quests.q_hollow_old_marrowshell.completion':
+    'Отмели снова стали просто водой. Я видел, как этот панцирь ломал охотников получше меня, {playerName}. Но не тебя.',
+  'entities.quests.q_hollow_old_marrowshell.objectives.0.label': 'Старый Костнопанцирь убит',
+  'entities.quests.q_hollow_first_of_the_herd.title': 'Первый в стаде',
+  'entities.quests.q_hollow_first_of_the_herd.text':
+    'Второе имя выговорить труднее. Аурелхорн водил эти стада, когда этот дозор держала моя бабка, и то, что проснулось в Лощине, разбудило его неправильно. Он топчет то, что прежде оберегал, и стаду не пережить его безумия. Он бродит по лугам у старых дворовых дорог. Оборви его муку милосердно, {playerName}, и возьми друга, чтобы разделить эту ношу.',
+  'entities.quests.q_hollow_first_of_the_herd.completion':
+    'Вот и пал Первый — от руки последнего. Стадо уже спокойнее, чувствуешь? Сегодня ты оказал Лощине милость, даже если она на милость не похожа.',
+  'entities.quests.q_hollow_first_of_the_herd.objectives.0.label': 'Аурелхорн обрёл покой',
+  'entities.quests.q_nb_road_of_lanterns.title': 'Дорога фонарей',
+  'entities.quests.q_nb_road_of_lanterns.text':
+    'Сюда, наверх, солнце не идёт следом, {playerName}, — только лампы, что я держу зажжёнными вдоль подъёма. Лунный Приют лежит к северу, там, где собирается цветочный свет. Найди Лиру Песнь Росы среди её садов и скажи ей, что лампы Ночных Врат ещё горят.',
+  'entities.quests.q_nb_road_of_lanterns.completion':
+    'Лампы горят, и дорога всё ещё приводит к нам странников. Соррел держит те врата дольше, чем помнит кто-либо в Лунном Приюте. Добро пожаловать, {playerName}, в край, где не бывает рассвета.',
+  'entities.quests.q_nb_road_of_lanterns.objectives.0.label':
+    'Найдите Лиру Песнь Росы в Лунном Приюте',
+  'entities.quests.q_nb_striders_in_the_dark.title': 'Бегуны во тьме',
+  'entities.quests.q_nb_striders_in_the_dark.text':
+    'Сумеречные бегуны всегда были терпеливыми охотниками, {playerName}, но в последнее время они проскальзывают прямо в цветочные гряды и уносят лунорунных ягнят под самыми нашими фонарями. Истреби десятерых и верни холмам их тишину.',
+  'entities.quests.q_nb_striders_in_the_dark.completion':
+    'На десять бегунов меньше, и стада уже пасутся спокойнее. Сады живут по собственным часам, но этой ночью они живут по ним в мире.',
+  'entities.quests.q_nb_striders_in_the_dark.objectives.0.label': 'Сумеречный бегун убит',
+  'entities.quests.q_nb_wool_by_moonlight.title': 'Шерсть при лунном свете',
+  'entities.quests.q_nb_wool_by_moonlight.text':
+    'Ничто не греет так, как лунное руно, {playerName}, и ничто не прядётся так тонко. Лунорунные звери, бредя по холмам, роняют своё серебро клоками. Принеси мне шесть добрых клоков со стад, и я сотку тебе то, ради чего стоило ходить.',
+  'entities.quests.q_nb_wool_by_moonlight.completion':
+    'Серебристое, как звёздный свет, и вдвое мягче. Вот, {playerName}: рукавицы из последней партии, подбитые так, как подбивает только лунное руно.',
+  'entities.quests.q_nb_wool_by_moonlight.objectives.0.label': 'Клок лунного руна',
+  'entities.quests.q_nb_night_gardens.title': 'Ночные сады',
+  'entities.quests.q_nb_night_gardens.text':
+    'Ночецвет раскрывается только под этим небом, а Сумеречное Поле хранит старейшие гряды во всём краю. Мне нужно четыре свежих цветка для гирлянд святилища, {playerName}. Срезай бережно: гряда помнит грубую руку целый сезон.',
+  'entities.quests.q_nb_night_gardens.completion':
+    'Всё ещё светятся, каждый лепесток. Святилище неделю будет пахнуть ночью, и Лунному Приюту от этого спится легче.',
+  'entities.quests.q_nb_night_gardens.objectives.0.label': 'Цветок ночецвета собран',
+  'entities.quests.q_nb_eyes_on_the_vigil.title': 'Глаза на Дозоре',
+  'entities.quests.q_nb_eyes_on_the_vigil.text':
+    'Что-то сделало бегунов дерзкими, а стада — беспокойными, {playerName}, и по цветам мне этого не прочесть. Кассиан прочтёт по небу. Его обсерваторный лагерь стоит у Стоячего Дозора к востоку отсюда, там, где среди камней бродят ночерождённые. Найди его и спроси, что говорят звёзды.',
+  'entities.quests.q_nb_eyes_on_the_vigil.completion':
+    'Тебя прислала Лира? Значит, и сады это чувствуют. Посиди у трубы, {playerName}. Звёзды не находят покоя уже месяц, и каждая карта, что я черчу, клонится на север, к кургану.',
+  'entities.quests.q_nb_eyes_on_the_vigil.objectives.0.label':
+    'Найдите астронома Кассиана у Стоячего Дозора',
+  'entities.quests.q_nb_charts_of_the_stones.title': 'Карты в камнях',
+  'entities.quests.q_nb_charts_of_the_stones.text':
+    'Камни Дозора старше Лунного Приюта, старше ночерождённых, что за ними ухаживают, и на их гранях высечены звёздные карты, которые я учился читать всю жизнь. Небо сдвинулось, {playerName}, и я должен знать, насколько. Прочти карты на трёх камнях и принеси мне их пеленги.',
+  'entities.quests.q_nb_charts_of_the_stones.completion':
+    'Сомнений не осталось. Каждый пеленг сполз к Кургану Неспящего, будто само небо склонилось над этим холмом, чтобы смотреть. Старых королей не зря хоронили под выверенными звёздами, {playerName}.',
+  'entities.quests.q_nb_charts_of_the_stones.objectives.0.label': 'Звёздная карта прочитана',
+  'entities.quests.q_nb_restless_mounds.title': 'Беспокойные курганы',
+  'entities.quests.q_nb_restless_mounds.text':
+    'Карты были предупреждением, и курганное поле его подтверждает: могильники открываются изнутри. Умертвия ходят между могильных рядов в старых почестях, а подношения, что хранили их сон, раскиданы по траве. Упокой восьмерых, {playerName}, и собери мне обратно четыре подношения.',
+  'entities.quests.q_nb_restless_mounds.completion':
+    'Могильное золото, ещё холодное от земли. Умертвия встают не сами по себе, {playerName}: что-то под великим курганом выкликает их наружу, и боюсь, карты уже назвали нам его имя.',
+  'entities.quests.q_nb_restless_mounds.objectives.0.label': 'Курганное умертвие убито',
+  'entities.quests.q_nb_restless_mounds.objectives.1.label': 'Могильное подношение возвращено',
+  'entities.quests.q_nb_the_barrow_king.title': 'Курганный Король пробуждается',
+  'entities.quests.q_nb_the_barrow_king.text':
+    'Каждый пеленг, каждая беспокойная звезда, каждый вскрытый могильник указывают на одно: под великим курганом просыпается Курганный Король, а у этого края нет рассвета, чтобы его сдержать. Его нужно вернуть в сон, прежде чем он вспомнит свою корону, {playerName}. Не ходи в одиночку: возьми друга, и пусть цветочный свет будет у тебя за спиной.',
+  'entities.quests.q_nb_the_barrow_king.completion':
+    'Звёзды улеглись впервые за сезон, {playerName}. Могильники закрыты, ночерождённые замерли у своих камней, и король снова спит внизу. Носи эту мантию: Лунный Приют скроил её для того, кому ночь наконец доверилась.',
+  'entities.quests.q_nb_the_barrow_king.objectives.0.label': 'Курганный Король упокоен',
+  'entities.quests.q_pr_down_to_drifthaven.title': 'Вниз, в Дрифтхейвен',
+  'entities.quests.q_pr_down_to_drifthaven.text':
+    'Из чёрных деревьев — на солнце, {playerName}. Иди по прибрежной дороге на север, и выйдешь к Дрифтхейвену раньше, чем сменится прилив. Спроси начальницу добытчиков Рину — после шторма у неё найдётся работа для любой пары рук — и скажи ей, что дорога Заросшего Устья ещё открыта.',
+  'entities.quests.q_pr_down_to_drifthaven.completion':
+    'Тебя прислал Пелл? Значит, ты в одиночку прошёл всю дорогу Заросшего Устья, и лучшей рекомендации мне не нужно. Добро пожаловать в Дрифтхейвен, {playerName}. Хватай канат — у нас не хватает рук.',
+  'entities.quests.q_pr_down_to_drifthaven.objectives.0.label':
+    'Доложите начальнице добытчиков Рине',
+  'entities.quests.q_pr_wreck_line_cargo.title': 'Полоса крушений',
+  'entities.quests.q_pr_wreck_line_cargo.text':
+    'Шторм три ночи назад выбросил «Жемчужный След» на риф, и его груз раскидало по всей полосе крушений отсюда до Пальмовой Косы. Три ящика с товаром так и лежат в прибое, {playerName}. Втащи их на берег, пока прилив — или крабы — не забрали то, что осталось.',
+  'entities.quests.q_pr_wreck_line_cargo.completion':
+    'В солёных разводах, но целёхоньки, все три. Ныряльщицы этот месяц едят благодаря тебе, {playerName}.',
+  'entities.quests.q_pr_wreck_line_cargo.objectives.0.label': 'Груз «Жемчужного Следа» возвращён',
+  'entities.quests.q_pr_scuttler_cull.title': 'Воры в панцирях',
+  'entities.quests.q_pr_scuttler_cull.text':
+    'Каждое крушение на этом берегу манит приливных крабов, а «Жемчужный След» приманил полрифа. Мои добытчики не станут работать на линии, пока в отмелях щёлкают эти клешни. Расколи десятерых, {playerName}, и полоса крушений снова наша.',
+  'entities.quests.q_pr_scuttler_cull.completion':
+    'На десять клешней меньше в прибое. Мои команды уже бредут обратно в воду, и ни одна не сказала спасибо, так что скажу я: спасибо, {playerName}.',
+  'entities.quests.q_pr_scuttler_cull.objectives.0.label': 'Приливный краб расколот',
+  'entities.quests.q_pr_the_lost_navigator.title': 'Пропавший штурман',
+  'entities.quests.q_pr_the_lost_navigator.text':
+    'Мы сняли с «Жемчужного Следа» всех, кроме одной: штурман Сули поплыла к дальней полосе и так и не дошла. Ныряльщица видела её в носовых обломках за Пальмовой Косой — жива, но слишком измотана, чтобы пройти этот строй в одиночку. Доведи её домой по прибрежной дороге, {playerName}. Крабам это не понравится, а джунглям — и того меньше.',
+  'entities.quests.q_pr_the_lost_navigator.completion':
+    'Сули у костра и всё ещё божится, что доплыла бы сама. Ты вернул единственного чтеца карт на этом берегу, {playerName}. Это из её морского сундука, с её благословения.',
+  'entities.quests.q_pr_the_lost_navigator.objectives.0.label':
+    'Штурман Сули благополучно доведена до Дрифтхейвена',
+  'entities.quests.q_pr_boars_in_the_gardens.title': 'Вепри в огородах',
+  'entities.quests.q_pr_boars_in_the_gardens.text':
+    'Что бы ни ворочалось в глубокой зелени, оно выталкивает чащобных вепрей на нашу полосу. Дважды за неделю они перерыли огородные террасы, а следом возьмутся за сушильные рамы. Десять вепрей, {playerName}, — и оттесни остальных обратно под деревья.',
+  'entities.quests.q_pr_boars_in_the_gardens.completion':
+    'Рамы стоят, а огороды можно засадить заново. Вепри не сами решили выйти на песок, {playerName}. Помни это: что-то их погнало.',
+  'entities.quests.q_pr_boars_in_the_gardens.objectives.0.label': 'Чащобный вепрь прогнан',
+  'entities.quests.q_pr_the_man_who_went_in.title': 'Тот, кто вошёл в чащу',
+  'entities.quests.q_pr_the_man_who_went_in.text':
+    'Ныряльщицы не ступят за кромку деревьев, {playerName}, и я не стану их просить. Барабаны ты уже слышал: их слышат все — ко второй ночи. Лишь один человек на этом острове пошёл на этот звук и вернулся. Окку. Он живёт под великими баньянами у Лианопада, в глубине дороги через Заросли. Найди его и спроси, что прячет зелень.',
+  'entities.quests.q_pr_the_man_who_went_in.completion':
+    'Тебя прислала Иша? Мать-Жемчужница годами не произносила моего имени. Сядь подальше от лиан, {playerName}, и я расскажу, что знаю: барабаны — не опасность. Барабаны — предупреждение.',
+  'entities.quests.q_pr_the_man_who_went_in.objectives.0.label': 'Найдите Окку у Лианопада',
+  'entities.quests.q_pr_canopy_silk.title': 'Шёлк из крон',
+  'entities.quests.q_pr_canopy_silk.text':
+    'Подними голову, {playerName}. Все кроны отсюда до идола затянуты паутиной, как рыбацкой сетью, и ткачи наглеют с каждым сезоном. Я натягиваю их же шёлк поперёк троп — колокольчики на растяжках, — чтобы джунгли не подкрались ко мне. Шесть добрых мотков с кроновых ткачей — и мои линии натянуты заново.',
+  'entities.quests.q_pr_canopy_silk.completion':
+    'Хороший, крепкий шёлк. Мои колокольчики ещё попоют, и ничто не пройдёт этими тропами ночью без моего ведома, {playerName}. А в последнее время что-то ходит часто.',
+  'entities.quests.q_pr_canopy_silk.objectives.0.label': 'Моток кронового шёлка',
+  'entities.quests.q_pr_what_the_drums_guard.title': 'Что стерегут барабаны',
+  'entities.quests.q_pr_what_the_drums_guard.text':
+    'Я подходил к Затонувшему Идолу так близко, как смеет живой, и увидел две вещи: ткачи занавесили дорогу к идолу паутиной, а старые жертвенные чаши вдоль неё снова наполнены. Свежим, {playerName}. Сруби восьмерых ткачей с дороги и принеси мне три подношения. Я хочу знать, чья рука всё ещё кормит мёртвого бога.',
+  'entities.quests.q_pr_what_the_drums_guard.completion':
+    'Мох, жемчужница и кабанья кровь, умятые пальцами. Что-то в тех руинах всё ещё блюдёт свои обряды, {playerName}, а Страж не подпускает всех остальных. Пора поговорить об этом начистоту.',
+  'entities.quests.q_pr_what_the_drums_guard.objectives.0.label': 'Кроновый ткач срублен',
+  'entities.quests.q_pr_what_the_drums_guard.objectives.1.label':
+    'Наполненная жертвенная чаша собрана',
+  'entities.quests.q_pr_idol_guardian.title': 'Страж идола',
+  'entities.quests.q_pr_idol_guardian.text':
+    'Идол старше острова, {playerName}. Старше барабанов, старше самого имени Пальмового Берега. Его Страж стоял в том затопленном кольце ещё до того, как выросли пальмы, а теперь он проснулся и ночами ходит меж колонн. Что бы ни кормили подношения, Страж — его привратник. Возьми друга и сломай его.',
+  'entities.quests.q_pr_idol_guardian.completion':
+    'Ты свалил то, чего сами джунгли не смели коснуться. Взгляни туда, за идола: Страж никогда не стерёг колонны, {playerName}, он стерёг ступени под ними. Барабаны этой ночью умолкли. То, что спит под Котловиной Дикого Сердца, теперь знает твоё имя.',
+  'entities.quests.q_pr_idol_guardian.objectives.0.label': 'Страж идола сломлен',
+  'entities.quests.q_wf_across_the_fenway.title': 'Через Топяную гать',
+  'entities.quests.q_wf_across_the_fenway.text':
+    'Мягкий край эта Ивовая Топь, но мягкий — не значит безопасный, {playerName}. Иди по дороге на север к Топяной гати и переходи в Бриджмир. Скажи мостовщику Олдену, что Ступени открыты и что костёр путевого лагеря горит.',
+  'entities.quests.q_wf_across_the_fenway.completion':
+    'Пелл держит тот костёр сквозь любой туман, каким топь на неё дышит. Если она говорит, что Ступени открыты, — они открыты. Добро пожаловать в Бриджмир, {playerName}. Смотри под ноги на моих досках, и мы поладим.',
+  'entities.quests.q_wf_across_the_fenway.objectives.0.label': 'Доложите мостовщику Олдену',
+  'entities.quests.q_wf_rope_chewers.title': 'Грызуны канатов',
+  'entities.quests.q_wf_rope_chewers.text':
+    'Топяные жабы, {playerName}. По ночам они выбираются из рва и перегрызают мои швартовы, будто камышовые стебли. На той неделе три ялика унесло, и на одном была моя добрая лебёдка. Прореди их — десяток жирных тварей, — и лодки будут стоять там, где мы их привязали.',
+  'entities.quests.q_wf_rope_chewers.completion':
+    'На десять пастей меньше в моём рву. Ялики впервые за месяц простояли на швартовых всю ночь, {playerName}. Тебе благодарен каждый сетевик в городе.',
+  'entities.quests.q_wf_rope_chewers.objectives.0.label': 'Топяная жаба убита',
+  'entities.quests.q_wf_mind_the_moorings.title': 'Береги швартовы',
+  'entities.quests.q_wf_mind_the_moorings.text':
+    'Добрый канат здесь дорог, {playerName}: каждый перегрызенный жабами конец — неделя угриных денег на ветер. Обрезки так и лежат вдоль берега рва, где лодки их обронили. Пройди по мосткам и принеси мне четыре конца, и я срощу их как новые.',
+  'entities.quests.q_wf_mind_the_moorings.completion':
+    'Гляди-ка: срезы чистые, все до единого, а каната осталось довольно, чтобы срастить. Ты сберёг мне месяц монет, а сетевикам — месяц ворчания, {playerName}.',
+  'entities.quests.q_wf_mind_the_moorings.objectives.0.label': 'Перекушенный швартов возвращён',
+  'entities.quests.q_wf_eels_for_the_smokehouse.title': 'Угри для коптильни',
+  'entities.quests.q_wf_eels_for_the_smokehouse.text':
+    'Топяные жабы жрут не только мои канаты, {playerName}, — они жрут мой улов: заглатывают угрей целиком прямо из ловушек. Вырежи шесть жирных из брюха этих обжор, пока мясо не испортилось, и огни коптильни не погаснут.',
+  'entities.quests.q_wf_eels_for_the_smokehouse.completion':
+    'Шесть добрых угрей, почти не помятых. К утру коптильня будет пахнуть деньгами. Вот, держи: эти сапоги были моими, пока я был проворнее, — кожа угря держит сырость, как ничто другое.',
+  'entities.quests.q_wf_eels_for_the_smokehouse.objectives.0.label': 'Жирный топяной угорь',
+  'entities.quests.q_wf_toll_and_tangle.title': 'Пошлина и путаница',
+  'entities.quests.q_wf_toll_and_tangle.text':
+    'Ивовые духи считают отличной забавой перерезать паром, {playerName}, а на той неделе на восточном ходу перевернулся пошлинный ялик с мостовым сбором за целый сезон. Сундуки ушли на дно в отмелях, а духи пляшут на мостках, будто они здесь хозяева. Прогони восьмерых и подними три сундука с пошлиной — и Бриджмир этой зимой ест.',
+  'entities.quests.q_wf_toll_and_tangle.completion':
+    'Три сундука, и монета внутри суха. Духи будут неделю дуться в ивняке, {playerName}, а город обязан тебе своим зимним хлебом.',
+  'entities.quests.q_wf_toll_and_tangle.objectives.0.label': 'Ивовый дух прогнан',
+  'entities.quests.q_wf_toll_and_tangle.objectives.1.label': 'Сундук с пошлиной возвращён',
+  'entities.quests.q_wf_witch_of_willowweep.title': 'Ведьма Плакучей заводи',
+  'entities.quests.q_wf_witch_of_willowweep.text':
+    'Ты уже слышал его, {playerName}: храп. Медленный и тяжёлый, где-то за Дремотными отмелями, будто сама топь ворочается во сне. Жабы, духи, огоньки, горящие в полдень, — всё началось вместе с этим звуком. Одна душа может знать, что это. Матушка Осока живёт у Плакучей заводи — вокруг рва на запад и вниз по дальнему берегу. Найди её и спроси, что спит посреди моей топи.',
+  'entities.quests.q_wf_witch_of_willowweep.completion':
+    'Олден послал тебя в такую даль спросить про храп? Значит, мостовой люд наконец прислушался. Сядь, спрячься от сырости, {playerName}. У этого звука есть имя, и есть глотка, и я давно жду кого-нибудь достаточно безрассудного, чтобы помочь мне её утихомирить.',
+  'entities.quests.q_wf_witch_of_willowweep.objectives.0.label': 'Найдите Матушку Осоку',
+  'entities.quests.q_wf_wisplight_charms.title': 'Обереги света огоньков',
+  'entities.quests.q_wf_wisplight_charms.text':
+    'Огоньки над бочагами — это топь, грезящая вслух, {playerName}, и только их свет держится против дрёмы Квакуна. Я вплетаю его в ивовые обереги: один на шею — и храп не утянет твои веки вниз. Принеси мне шесть шаров света огоньков. Огоньки не станут за них драться, так что выйдет это добротой или воровством — смотря как понесёшь.',
+  'entities.quests.q_wf_wisplight_charms.completion':
+    'Шесть шаров, ещё тёплых от грёз. Дай мне срок до восхода луны, и обереги будут сплетены — для тебя и для всякого, кому хватит храбрости встать с тобой рядом.',
+  'entities.quests.q_wf_wisplight_charms.objectives.0.label': 'Шар света огоньков',
+  'entities.quests.q_wf_croakers_hush.title': 'Тишина Квакуна',
+  'entities.quests.q_wf_croakers_hush.text':
+    'Теперь ты знаешь имя храпуна, {playerName}: Дремотный Квакун, старый жабий король с Дремотных отмелей. С каждым годом его кваканье тяжелеет, и с каждым годом всё больше топи забывает проснуться. Обереги удержат твои глаза открытыми, но его туша — дело другое: возьми друга и не бейся с ним в воде. Уложи старого короля в сон потише.',
+  'entities.quests.q_wf_croakers_hush.completion':
+    'Слушай, {playerName}. Ничего. Первая настоящая тишина над этой топью за тридцать лет, и полгорода сегодня не уснёт от её непривычности. Ивы благодарят тебя — по-своему. Носи это, сплетено из его собственного кувшинкового ложа, — и топь признает в тебе друга всюду, куда дотягивается вода.',
+  'entities.quests.q_wf_croakers_hush.objectives.0.label': 'Дремотный Квакун убит',
+  'entities.quests.q_ww_bells_of_gallowmere.title': 'Колокола Гэллоумира',
+  'entities.quests.q_ww_bells_of_gallowmere.text':
+    'Слышишь звон, {playerName}? Это Гэллоумир, вверх по северной дороге, убаюкивает своих мёртвых. Пономарь Марроу ведёт счёт каждой душе под этими кронами — и живой, и погребённой. Иди и будь сосчитан, пока лес не сосчитал тебя сам.',
+  'entities.quests.q_ww_bells_of_gallowmere.completion':
+    'Кобб отправил тебя по дороге целым, вот как? Хороший человек. Тридцать лет он держит те привратные фонари зажжёнными, и лес ни разу его не обошёл. Добро пожаловать в Гэллоумир, {playerName}. Слушайся колоколов.',
+  'entities.quests.q_ww_bells_of_gallowmere.objectives.0.label': 'Доложите пономарю Марроу',
+  'entities.quests.q_ww_silk_in_the_eaves.title': 'Шёлк под кронами',
+  'entities.quests.q_ww_silk_in_the_eaves.text':
+    'Подними глаза, когда пойдёшь западной дорогой, {playerName}, и увидишь их: спелёнутые силуэты в кронах, качающиеся там, куда не достаёт ветер. Вдовьи шелкопряды выползли из Чащи и развесили свои кладовые над моими фонарями. Убей десятерых — и дорога снова станет дорогой.',
+  'entities.quests.q_ww_silk_in_the_eaves.completion':
+    'На десять шелкопрядов меньше под кронами. Этой ночью фонарщики пройдут свой обход, не поднимая глаз, а это здесь стоит больше, чем ты думаешь.',
+  'entities.quests.q_ww_silk_in_the_eaves.objectives.0.label': 'Вдовий шелкопряд убит',
+  'entities.quests.q_ww_widows_skeins.title': 'Вдовьи мотки',
+  'entities.quests.q_ww_widows_skeins.text':
+    'Шелкопряды забирают наших мёртвых в свои кладовые, {playerName}, — а я забираю их шёлк на наши саваны. Он горит чисто и держит благословение лучше, чем любое полотно. Принеси мне шесть мотков вдовьего шёлка, и следующая душа, которую мы похороним, ляжет в землю спелёнутой и обережённой.',
+  'entities.quests.q_ww_widows_skeins.completion':
+    'Шесть мотков, мягких, как задержанное дыхание. Мёртвым в таком лежится легче. Возьми эти обмотки — я сшила их из последней партии, и лес ещё ни разу не прокусил их насквозь.',
+  'entities.quests.q_ww_widows_skeins.objectives.0.label': 'Моток вдовьего шёлка',
+  'entities.quests.q_ww_candles_at_the_bounds.title': 'Свечи на рубежах',
+  'entities.quests.q_ww_candles_at_the_bounds.text':
+    'Гэллоумир окружают четыре пограничных камня, {playerName}, по одному на каждой дороге из города, и на каждом камне горит могильная свеча. Пока они горят, погребённые остаются погребёнными. Морось затопила их — все четыре, а я слишком стара, чтобы обходить рубежи одна. Возьми мою лучину и зажги их снова, скорее.',
+  'entities.quests.q_ww_candles_at_the_bounds.completion':
+    'Все четыре горят? Тогда выдохни, {playerName}. Ты этого не слышал, но слышала вся деревня: колокола зазвонили легче в тот самый миг, когда занялся последний фитиль.',
+  'entities.quests.q_ww_candles_at_the_bounds.objectives.0.label': 'Могильная свеча зажжена вновь',
+  'entities.quests.q_ww_the_last_vicar.title': 'Последний викарий',
+  'entities.quests.q_ww_the_last_vicar.text':
+    'К югу отсюда у чёрного озерца ветшает Часовня Скорбного Камня, и один человек всё ещё смотрит за ней: викарий Крил, который не ушёл, даже когда обвалилась крыша. Старые обряды он знает лучше, чем мои колокола, {playerName}, а вестей от него нет уже месяц. Пройди по дороге к часовне и убедись, что он дышит.',
+  'entities.quests.q_ww_the_last_vicar.completion':
+    'Марроу обо мне тревожится? Это что-то новое. Передай ему: Скорбный Камень стоит — в известном смысле, — и я тоже. Побудь здесь, {playerName}. Озерцо шепчет, и мне не хотелось бы слушать его в одиночестве.',
+  'entities.quests.q_ww_the_last_vicar.objectives.0.label': 'Найдите викария Крила',
+  'entities.quests.q_ww_wraiths_of_the_tarn.title': 'Призраки озерца',
+  'entities.quests.q_ww_wraiths_of_the_tarn.text':
+    'Лесные призраки когда-то были стражами часовни, {playerName}, — они выросли из деревьев, посаженных над почётными мёртвыми. С тех пор как озерцо почернело, они забыли своё служение и теперь бродят по моему кладбищу, дёргая землю. Разбей восьмерых, пока они не довершили начатое.',
+  'entities.quests.q_ww_wraiths_of_the_tarn.completion':
+    'Восемь стражей наконец улеглись. При свете дня я не назову это милостью, но между нами, {playerName}, — это была она.',
+  'entities.quests.q_ww_wraiths_of_the_tarn.objectives.0.label': 'Лесной призрак убит',
+  'entities.quests.q_ww_what_the_bark_holds.title': 'Что держит кора',
+  'entities.quests.q_ww_what_the_bark_holds.text':
+    'На Висельной Поляне к востоку от Гэллоумира шелкопряды развешивают по ветвям своих спелёнутых шёлком мертвецов, а гробокорые шатуны стоят на страже внизу, как терпеливые носильщики гроба. Там, наверху, наши люди, {playerName}. Свали пятерых шатунов, срежь троих спелёнутых мёртвых и верни их домой, в землю.',
+  'entities.quests.q_ww_what_the_bark_holds.completion':
+    'Три души вернулись под честную землю до наступления ночи. Шатуны отрастут — кора всегда отрастает, — но этой ночью поляна висит пустой, и этого довольно.',
+  'entities.quests.q_ww_what_the_bark_holds.objectives.0.label': 'Гробокорый шатун повержен',
+  'entities.quests.q_ww_what_the_bark_holds.objectives.1.label': 'Опутанные шёлком останки срезаны',
+  'entities.quests.q_ww_walking_mosley_home.title': 'Проводить Мозли домой',
+  'entities.quests.q_ww_walking_mosley_home.text':
+    'Мой могильщик Мозли три дня назад ушёл по дороге к часовне копать могилу на старом дворе, и раскоп обрушился прямо на него. Он выбрался, дурень жив, но сидит, сжавшись, у часовенных могил и не двинется с места из-за шелкопрядов на дороге. Доведи его до дома, {playerName}. Я не могу звонить в колокола по живому человеку.',
+  'entities.quests.q_ww_walking_mosley_home.completion':
+    'Он вошёл в ворота на своих двоих, божась, что отныне не выкопает ничего глубже грядки под репу. К воскресенью вернётся на двор — они всегда возвращаются. Спасибо, {playerName}. Гэллоумир бережёт своих — вот и весь наш закон.',
+  'entities.quests.q_ww_walking_mosley_home.objectives.0.label':
+    'Могильщик Мозли благополучно доведён до Гэллоумира',
+  'entities.quests.q_ww_horn_of_the_huntsman.title': 'Рог Ловчего',
+  'entities.quests.q_ww_horn_of_the_huntsman.text':
+    'Ты уже слышал рог, {playerName}: тонкий, далёкий — звук, на котором весь лес задерживает дыхание. Бледный Ловчий объезжает свою поляну к северу отсюда, и каждая могила, мимо которой он проезжает, становится мельче. Когда-то он был человеком, и похоронили его неправильно, а я устал делать вид, что молитва с этим справится. Возьми друга, а лучше двух, и выбей его из седла.',
+  'entities.quests.q_ww_horn_of_the_huntsman.completion':
+    'Рог оборвался на полуноте. Каждый колокол в Гэллоумире ударил по разу, сам по себе, а потом лес затих так, как не затихал на моей памяти тридцать лет. Ты совершил обряд, который был мне не по силам, {playerName}. Носи это — и ходи под кронами без страха.',
+  'entities.quests.q_ww_horn_of_the_huntsman.objectives.0.label': 'Бледный Ловчий выбит из седла',
   'hud.errors.silenced': 'Вы лишены дара речи!',
   'hud.pet.noPetFood': 'У вас нет пищи, чтобы покормить питомца.',
   'hud.pet.petEatsFoodOnly': 'Ваш питомец ест только пищу.',
@@ -4578,6 +5471,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_waistguard.name': 'Поясная защита призывателя бурь',
   'entities.mobs.thunzharr_waking_peak.name': 'Тунзарр, Пробуждающийся пик',
   'entities.mobs.thunzharr_stormling.name': 'Пробуждённый элементаль бури',
+  'entities.mobs.stable_horse.name': 'Конюшенная лошадь',
   'hudChrome.worldBoss.spawn': '{name} поднимается над Терновыми высотами!',
   'entities.items.stormcallers_spaulders.name': 'Наплечники Зова Бури',
   'entities.items.bonewrought_greatsword.name': 'Костокованый двуручный меч',
@@ -4707,6 +5601,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.filterArmor': 'Броня',
   'hudChrome.bags.filterConsumable': 'Расходники',
   'hudChrome.bags.filterMaterial': 'Материалы',
+  'hudChrome.bags.filterMount': 'Транспорт',
   'hudChrome.bags.filterQuest': 'Задания',
   'hudChrome.bags.sortAria': 'Сортировать предметы в сумках',
   'hudChrome.bags.sortRecent': 'Недавние',
@@ -4862,6 +5757,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.home.world.peaksName': 'Тернопиковые высоты',
   'guide.home.world.peaksBlurb':
     'Выскобленные ветром хребты, что уходят ввысь к самым холодным опасностям королевства.',
+  'guide.home.world.duskName': 'Сокрытая лощина',
+  'guide.home.world.duskBlurb': 'Мир, запечатанный под горами, если шёпот о пути внутрь не лжёт.',
   'guide.home.group.heading': 'Объединяйтесь для сложных испытаний',
   'guide.home.group.sub': 'Мир можно пройти в одиночку, но лучшая добыча ждёт за хорошей группой.',
   'guide.home.group.dungeonsTitle': 'Подземелья',
@@ -5257,6 +6154,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetTitle': 'Сброс инстансов',
   'guide.dungeonsPage.sanctumBody':
     'Темное сердце Терновых высот, где долгий труд культа достигает своего ужасающего пика.',
+  'guide.dungeonsPage.wildheartBody':
+    'Залитая тёплым дождём лесная кальдера, где две высокие охотничьи тропы огибают нефритовый сенот. Пройдите через звериные логова и руины предков, затем поднимитесь на ритуальную пирамиду к Зулгару.',
   'guide.dungeonsPage.raidName': 'Финальный рейд',
   'guide.dungeonsPage.raidBody':
     'За запечатанной королевской дверью ждёт испытание для десяти игроков: многофазная битва и не знающая смерти сила, которую весь рейд должен пресечь сообща. Заслужите право войти, а затем приведите девятерых друзей.',
@@ -5931,6 +6830,85 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Две сотни лет держится эта стена. На моём посту она не падёт, но стонет.',
   'guide.worldPage.peaksPlaceNotes':
     'Хайвотч держит стену. Хребет Преследователя и Глубокоскальные норы принадлежат горным котам и землекопам; Огрские предгорья и Военный лагерь Дрогмара, наёмным громилам; Бурехребет трещит от элементалей, а под ним сияет Глиммермир, горное озеро, чей берег хранит врата бледного света, ведущие вниз, в Утонувший храм; Шатры Культа Вирма и Поля ревенантов кольцом окружают высоты культа, а на самом их пике, Святилище Могильного Вирма.',
+  'guide.worldPage.duskGreeting':
+    'Немногие из вашего рода стояли под этими ветвями. Ступайте мягко, и добро пожаловать.',
+  'guide.worldPage.duskGreeter': 'Хранительница Сэльвин, Элдерглим',
+  'guide.worldPage.duskPlaceNotes':
+    'Элдерглим собрался под великим древом. Сумеречная пещера и её смотровая площадка служат входом и первым видом на долину; Древняя роща и Котловина Звездопада хранят тихий юг; Затонувший двор скрывает заросшие руины на востоке; а Мерцающая глубь и Хрустальные отмели светятся на севере.',
+  'guide.family.murloc.name': 'Квакопёры',
+  'guide.family.murloc.desc':
+    'Квакающий рыбий народец озёрных берегов и приливных луж, что мигом накидывается стаей на всякого, кто зайдёт в воду слишком близко.',
+  'guide.family.kobold.name': 'Проныры',
+  'guide.family.kobold.desc':
+    'Суетливые мусорщики и духи полян и живых изгородей, скорее докука, чем угроза, пока их не наберётся много.',
+  'guide.family.demon.name': 'Демоны',
+  'guide.family.demon.desc':
+    'Захватчики из-за разломов, сплошь огонь и злоба. Где стоит один из них, там и прорыв недалеко.',
+  'guide.worldPage.duskBlurb':
+    'Долина вечных сумерек под великим древом Элдерглима, где светятся хрустальные руины, а воздух гудит от древней магии.',
+  'guide.worldPage.emberBlurb':
+    'Озарённые грозами пустоши пепла и кровостекла, где дрейки кружат над кальдерой, а в дюнах горят костры троллей; за всем этим следит привратный город Змеиный дозор.',
+  'guide.worldPage.frostBlurb':
+    'Тишина снега и тёмных сосен под танцующим сиянием, где сам холод кажется живым, а Ледяная Мантия не даёт погаснуть своим очагам.',
+  'guide.worldPage.amberBlurb':
+    'Вечная осень золотых и багряных листьев, что никогда не опадают, собравшаяся вокруг освещённого фонарями городка Лантанмир.',
+  'guide.worldPage.fenBlurb':
+    'Светлая, гудящая жизнью топь кувшинок и тихой воды, которую пересекают старые мостки от города-моста Бриджмир.',
+  'guide.worldPage.nightBlurb':
+    'Край звёздной полуночи, где тропы освещают цветы, а Лунный Приют несёт тихий дозор под грезящим небом.',
+  'guide.worldPage.hauntBlurb':
+    'Населённый призраками лес под исполинскими кронами, где фонари Гэллоумира, единственный честный свет на дороге.',
+  'guide.worldPage.galeBlurb':
+    'Морские утёсы и воющие холмы, где ветер не знает покоя, Старый Маяк никогда не гаснет, а Викхарбор крепко запирает свои двери.',
+  'guide.worldPage.jungleBlurb':
+    'Тропическое сплетение пальм, белого песка и громких птиц, где пляжный городок Дрифтхейвен держит костёр на берегу.',
+  'guide.worldPage.gardenBlurb':
+    'Садовый край живых лабиринтов, который до сих пор подстригает садовник, которого никто не видел; путь внутрь лежит мимо Хеджвика и его фонтанных дворов.',
+  'guide.worldPage.emberGreeting':
+    'Горячий ветер с пустошей, драконы над Дрейкмо и костры троллей в дюнах. Выпей воды, прежде чем выходить туда.',
+  'guide.worldPage.emberGreeter': 'Страж ворот, Змеиный дозор',
+  'guide.worldPage.frostGreeting':
+    'За стеной снег глотает каждый звук. Если огни в небе пустятся в пляс, говори тише и не давай своему костру погаснуть.',
+  'guide.worldPage.frostGreeter': 'Хранитель очага, Ледяная Мантия',
+  'guide.worldPage.amberGreeting':
+    'Каждый лист здесь горит золотом и багрянцем, но ни один не падает. Фонари зажжены для тебя; будь осторожен на Золотой Проталине по пути наверх.',
+  'guide.worldPage.amberGreeter': 'Фонарных дел мастер, Лантанмир',
+  'guide.worldPage.fenGreeting':
+    'Над топью гудят стрекозы и пчёлы. Перейди мост, дай ногам отдых и не сходи с мостков за бочагами.',
+  'guide.worldPage.fenGreeter': 'Смотритель моста, Бриджмир',
+  'guide.worldPage.nightGreeting':
+    'За Ночными Вратами грезит сам воздух. Иди по цветочному свету и не пропусти спящий мир, что висит в небе.',
+  'guide.worldPage.nightGreeter': 'Страж дозора, Лунный Приют',
+  'guide.worldPage.hauntGreeting':
+    'Держись фонарей, путник. И если лес позовёт тебя по имени откуда-то с обочины, не отвечай.',
+  'guide.worldPage.hauntGreeter': 'Фонарщик, Гэллоумир',
+  'guide.worldPage.galeGreeting':
+    'Ветер здесь не стихал ни разу, и Старый Маяк ни разу не гас. Закрой за собой дверь таверны.',
+  'guide.worldPage.galeGreeter': 'Смотритель маяка, Викхарбор',
+  'guide.worldPage.jungleGreeting':
+    'Тёплый песок, громкие птицы и джунгли, пожирающие горизонт. Мы держим костёр на берегу; постарайся к нему вернуться.',
+  'guide.worldPage.jungleGreeter': 'Хозяйка гавани, Дрифтхейвен',
+  'guide.worldPage.gardenGreeting':
+    'Кто-то до сих пор подстригает живые изгороди, хотя садовника не видели уже сто лет. Берегись лабиринта: он тоже следит за тобой.',
+  'guide.worldPage.gardenGreeter': 'Привратник, Хеджвик',
+  'guide.worldPage.emberPlaceNotes':
+    'Змеиный дозор держит ворота. Привратный лес, это последняя зелень перед пустошью; по Пепельным дюнам несёт пепел и кое-что похуже; в Тролльмуте дюнные тролли собираются у своих костров; Кровостеклянные поля блестят острыми, как бритва, осколками; а Кальдера Дрейкмо, это дымящаяся корона, над которой кружат дрейки.',
+  'guide.worldPage.frostPlaceNotes':
+    'Ледяная Мантия хранит последний тёплый очаг. Снеговая Тропа отмечает, где начинаются сугробы; Ледниковое озеро, это чёрная, недвижная вода подо льдом; Ступени Сияния поднимаются под танцующими огнями; Дрожащая топь, это промёрзшая трясина, что никогда не спит до конца; а Воющие террасы каждую ночь оправдывают своё имя.',
+  'guide.worldPage.amberPlaceNotes':
+    'Лантанмир светится в самом сердце жатвы. Золотая Проталина, это скользкий от янтаря перевал на входе; Золочёный сад и Жатвенная лощина хранят самые сладкие плоды и самых дерзких воров; Великое озеро отражает горящую листву; Клёновый взгорок стоит выше и краснее всех; а Кренящийся монолит помнит нечто старше самой осени.',
+  'guide.worldPage.fenPlaceNotes':
+    'Бриджмир сидит верхом на тихой воде. Янтарные Ступени спускаются из края жатвы; Кувшинковые мхи и Светлые бочаги блестят огоньками и стрекозами; Плакучая заводь опускает свои ветви в озеро; а Дремотные отмели, это самое ласковое место во всём этом краю.',
+  'guide.worldPage.nightPlaceNotes':
+    'Лунный Приют несёт дозор. Ночные Врата, это путь в полуночный край; Лунный Колодец хранит звёздный свет, рядом с которым можно постоять; Сумеречное Поле цветёт в темноте; Стоячий Дозор наблюдает, не шевелясь; а Курган Неспящего, единственное место здесь, которому не снятся сны.',
+  'guide.worldPage.hauntPlaceNotes':
+    'Гэллоумир жмётся к своим фонарям. Вороньи Врата, это мрачная парадная дверь леса; Вдовья Чаща густо оплетена паутиной; Висельная Поляна и Часовня Скорбного Камня хранят самые старые скорби этого леса; а Поляна Ловчего принадлежит тому, что до сих пор там охотится.',
+  'guide.worldPage.galePlaceNotes':
+    'Викхарбор стоит, накренившись против ветра. Ветровой Проход, это дорога по утёсам на входе; Воющие Холмы катятся под бурей без единого дерева; Старый Маяк горит столько, сколько кто-либо может припомнить; Отвесный Срез обрывается прямо к воде; Поля Кораблекрушений держат побережье в строгости; а Зеркальное Озеро, единственная неподвижная вещь во всём этом краю.',
+  'guide.worldPage.junglePlaceNotes':
+    'Дрифтхейвен держит костёр на берегу. Заросшее Устье, это место, где река встречает зелёную стену; Пальмовая Коса тянется белой тёплой полосой вдоль прибоя; Изумрудная Чаща и Лианопад поглощают всё, что дальше от берега; Сапфировая Лагуна светится, прозрачная и глубокая; а Затонувший Идол наблюдает из-под воды.',
+  'guide.worldPage.gardenPlaceNotes':
+    'Хеджвик ждёт у Садовых Врат. Аллея Цветников цветёт подстриженными красками; Замок Донхолд муштрует рыцарей за новыми стенами; Лепестковый Пруд круглый год розовеет от лепестков; Старая Мельница вертится над собственными кольцевыми клумбами; Великий Лабиринт меняет свои манеры под каждого гостя, а за его арками следят лиственные лисы; Северный Дозор стережёт дорогу от выхода; Лилейная Заводь покоится за всем этим; а Фонтанный Двор всё так же бежит чистой водой в самом сердце сада.',
   'guide.worldPage.valeGreeter': 'Маршал Редбрук, Истврук',
   'guide.worldPage.valeGreeting': 'Держите клинок наготове. Долина уже не та, что прежде.',
   'guide.worldPage.valePlaceNotes':
@@ -5952,6 +6930,26 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.reliquary_gloves_rog.name': 'Рукавицы Костяного стража',
   'entities.items.deacon_reliquary_helm.name': 'Шлем реликвария дьякона',
   'entities.items.varric_shadow_cowl.name': 'Теневой капюшон Варрика',
+  'entities.items.duskwisp_essence.name': 'Сущность сумеречного огонька',
+  'entities.items.spore_heart.name': 'Споровое сердце',
+  'entities.items.gleaming_antler.name': 'Сияющий рог',
+  'entities.items.wisp_mote.name': 'Звёздная пылинка',
+  'entities.items.starfall_shard.name': 'Осколок звездопада',
+  'entities.items.elder_bark.name': 'Кора старейшины',
+  'entities.items.hollow_sealstone.name': 'Печатный камень Лощины',
+  'entities.items.monument_overlook.name': 'Выветренный монумент',
+  'entities.items.monument_court.name': 'Затонувший монумент',
+  'entities.items.monument_north.name': 'Забытый монумент',
+  'entities.items.guardian_core.name': 'Ядро стража',
+  'entities.items.wardens_seal.name': 'Печать Смотрителя',
+  'entities.items.gleamstag_charm.name': 'Оберег Сияющего оленя',
+  'entities.items.veilsteel_blade.name': 'Клинок скрытой стали',
+  'entities.items.duskfang_dirk.name': 'Кинжал сумеречного клыка',
+  'entities.items.gleamwood_stave.name': 'Посох сияющего дерева',
+  'entities.items.wardens_oathband.name': 'Наручи клятвы Смотрителя',
+  'entities.items.wardplate_cuirass.name': 'Кираса стражевых пластин',
+  'entities.items.nightweave_tunic.name': 'Куртка ночного плетения',
+  'entities.items.veilcloth_robe.name': 'Одеяние скрытой ткани',
   'entities.mobs.acolyte_tessa.name': 'Послушница Тесса',
   'entities.mobs.deacon_varric.name': 'Дьякон Варрик',
   'entities.mobs.reliquary_bonewalker.name': 'Поднятый костеход',
@@ -6995,6 +7993,29 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'sim.delve.baptistryWave': 'Что-то шевелится в чёрной воде крестильни.',
   'sim.delve.nhaliaCantorShield': 'Канторы, держите ноту!',
   'sim.delve.nhaliaBlackwaterMark': '{name} метит {player} Чёрной Водой!',
+  'sim.rift.allUnstable': 'Все разломы сейчас нестабильны. Попробуйте позже.',
+  'sim.rift.descendFloor': 'Вы спускаетесь глубже в {name}.',
+  'sim.rift.enterFloor': 'Вы проходите сквозь разлом и попадаете в {name}.',
+  'sim.rift.exitOpens': 'Разлом содрогается. Позади павших разверзается путь домой.',
+  'sim.rift.deadEntry': 'Мертвым нельзя войти в разлом.',
+  'sim.rift.deadEntryCombat':
+    'Ваша группа все еще в бою. Мертвые смогут вернуться, когда бой закончится.',
+  'sim.rift.iceGoalLit': 'Морозная печать вспыхивает. Путь пробуждается.',
+  'sim.rift.levelGate':
+    'Войти в этот разлом могут лишь искатели приключений уровня {level} и выше.',
+  'sim.rift.portalCollapses': 'Разлом ранга {tier} в {zone} обрушился.',
+  'sim.rift.portalOpens': 'В {zone} разверзся разлом ранга {tier}!',
+  'sim.rift.portalSealed': 'Разлом ранга {tier} в {zone} запечатан.',
+  'sim.rift.pylonLit': 'Рунный пилон вспыхивает ({lit}/{total}).',
+  'sim.rift.seqProgress': 'Руны отвечают по очереди ({step}/{total}).',
+  'sim.rift.seqReset': 'Руны гаснут. Начните заново.',
+  'sim.rift.socketsShut': 'Гнёзда с грохотом смыкаются. Путь пробуждается.',
+  'sim.rift.gateOpen': 'Врата с грохотом отворяются.',
+  'sim.rift.orbSealed': 'Сфера запечатана ритуалом внизу.',
+  'sim.rift.orbWakes': 'Пламя пентаграммы гаснет. Нечто пробуждается на алтаре.',
+  'sim.rift.orbOpensGate': 'Кровавая сфера вспыхивает. Врата храма с грохотом отворяются.',
+  'sim.rift.stepBack': 'Вы возвращаетесь назад сквозь разлом.',
+  'sim.rift.wayDownOpens': 'Путь вниз разверзается.',
   'delveRiteUi.title': 'Обряд Утонувшего Реликвария',
   'delveRiteUi.blurb':
     'Святилища загорятся по порядку. Повторите последовательность, активируя каждое святилище по очереди. Неверное касание проваливает попытку и повторяет последовательность, безупречная попытка приносит богатейшую добычу, а исчерпание попыток открывает реликварий с самой скудной добычей. Выберите, как обряд испытает вас.',
@@ -7080,6 +8101,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.litany_helm.name': 'Капюшон Утопшего Реликвария',
   'entities.items.sister_nhalia_choir_plate.name': 'Хоровая Кованая Броня Сестры Нхалии',
   'entities.items.drowned_choir_fang.name': 'Клык Утопшего Хора',
+  'entities.items.reins_grag_bear.name': 'Поводья Голиафа Граг-медведя',
+  'entities.items.riding_training.name': 'Обучение верховой езде',
+  'entities.items.reins_valorsteed.name': 'Поводья Доблестного скакуна',
+  'entities.items.reins_stalkglider_snail.name': 'Поводья мохопанцирного скользня',
+  'entities.items.reins_aether_hover_cycle.name':
+    'Ключ зажигания: эфирный ховерцикл турнирного бойца',
+  'entities.items.reins_shadowjump_toad.name': 'Поводья Кама-Кагэ, жабы теневых прыжков',
+  'entities.items.reins_stormfeather_griffin.name': 'Поводья Штормокрыла Поднебесного',
+  'entities.items.reins_thunderstrut_gobbler.name': 'Поводья Громоступа, великого индюка',
   'entities.mobs.drowned_cantor.name': 'Утопший Кантор',
   'entities.mobs.reedbound_acolyte.name': 'Тростниковый Послушник',
   'entities.mobs.deepfen_spearjaw.name': 'Глубокотрясинный Копьечелюст',
@@ -7091,6 +8121,35 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.sister_nhalia_drowned_canticle.name': 'Сестра Нхалия, Утонувшая Песнь',
   'entities.mobs.edda_reedhand.name': 'Эдда Тростниковая Рука',
   'entities.mobs.tolling_bell.name': 'Звонящий Колокол',
+  'entities.mobs.rift_spawnling.name': 'Отпрыск Разлома',
+  'entities.mobs.rift_bonewalker.name': 'Восставший Костоход',
+  'entities.mobs.rift_frost_revenant.name': 'Скованный Морозом Возвращенец',
+  'entities.mobs.rift_rime_elemental.name': 'Изморозевый Элементаль',
+  'entities.mobs.rift_ember_fiend.name': 'Тлеющий Изверг',
+  'entities.mobs.rift_magma_brute.name': 'Магмовый Громила',
+  'entities.mobs.rift_venom_weaver.name': 'Ядовитый Ткач',
+  'entities.mobs.rift_thornback.name': 'Терноспинный Охотник',
+  'entities.mobs.rift_boneclad.name': 'Костяной Воин',
+  'entities.mobs.rift_marrow_troll.name': 'Костномозговой Тролль',
+  'entities.mobs.rift_void_acolyte.name': 'Аколит Пустотного Шрама',
+  'entities.mobs.rift_dread_stalker.name': 'Жуткий Преследователь',
+  'entities.mobs.rift_storm_caller.name': 'Призыватель Бури',
+  'entities.mobs.rift_stormscale.name': 'Грозочешуйчатый Дрейк',
+  'entities.mobs.rift_tide_thrall.name': 'Приливный Раб',
+  'entities.mobs.rift_deep_lurker.name': 'Глубинный Обитатель',
+  'entities.mobs.rift_stone_ogre.name': 'Каменный Огр',
+  'entities.mobs.rift_boss_frost.name': 'Инеевый Страж',
+  'entities.mobs.rift_boss_ember.name': 'Тиран Пепельной Кузни',
+  'entities.mobs.rift_hellguard.name': 'Адский страж',
+  'entities.mobs.rift_pact_acolyte.name': 'Послушник договора',
+  'entities.mobs.rift_boss_ritualist.name': "Магус Вель'Кор Связанный Договором",
+  'entities.mobs.rift_boss_pitlord.name': 'Азгорат, Владыка Бездны',
+  'entities.mobs.rift_boss_venom.name': 'Прародительница Висска',
+  'entities.mobs.rift_boss_necro.name': 'Костяной Владыка Ксаррет',
+  'entities.mobs.rift_boss_brute.name': 'Полководец Граск',
+  'entities.mobs.rift_boss_arcane.name': 'Архонт Никсарис',
+  'entities.mobs.rift_boss_storm.name': 'Буревой Вхарок',
+  'entities.mobs.rift_boss_tide.name': 'Бездонная Пасть',
   'entities.mobs.vale_cup_ball.name': 'Кабаний мяч',
   'entities.npcs.brother_halven_marsh.name': 'Брат Хальвен',
   'entities.npcs.brother_halven_marsh.title': 'Хранитель Реликвария',
@@ -7860,6 +8919,60 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Пригласите друга: когда он достигнет 10 уровня, вы оба получите по 2 ячейки, до 5 друзей.',
   'hudChrome.bank.bonusSectionAria': 'Бонусные ячейки банка и способы их получить',
   'entities.mobs.yumi_cat.name': 'Юми',
+  'hudChrome.itemTooltip.riftTier': 'Предмет разлома ранга {tier}',
+  'hudChrome.itemTooltip.riftUpgrade': 'Улучшение разлома {level}/{max}',
+  'hudChrome.itemTooltip.riftSockets': 'Самоцветы разлома {used}/{total}',
+  'sim.rift.alreadyCleared': 'Этот разлом уже закрыла группа {names}.',
+  'sim.rift.raceLost': 'Этот разлом уже закрыла группа {names}. Ваш поход завершён.',
+  'sim.rift.raceWorldWin': '{names} победили в гонке разлома ранга {tier} за {seconds} с!',
+  'sim.rift.raceWinBanner': 'Победа в гонке разлома — {seconds} с',
+  'sim.rift.raceLostBanner': 'Разлом уже закрыт',
+  'sim.rift.forgeUpgraded': 'Улучшение разлома завершено для {name}.',
+  'sim.rift.forgeEnchanted': 'Зачарование разлома завершено для {name}.',
+  'sim.rift.forgeSocketed': 'Самоцвет разлома вставлен в {name}.',
+  'sim.rift.detonateGlacialGrave': 'Ледяная могила взрывается!',
+  'sim.rift.detonateAbsoluteZero': 'Абсолютный ноль вырывается!',
+  'sim.rift.detonateMagmaWell': 'Магматический колодец вырывается!',
+  'sim.rift.detonateCoreMeltdown': 'Расплавление ядра взрывается!',
+  'sim.rift.detonateVenomPool': 'Ядовитая лужа вырывается!',
+  'sim.rift.detonateBroodmothersMark': 'Метка паучьей матки взрывается!',
+  'sim.rift.detonateSoulGrave': 'Могила душ взрывается!',
+  'sim.rift.detonateDeathSentence': 'Смертный приговор падает!',
+  'sim.rift.detonateEarthshatter': 'Разрушитель земли взрывается!',
+  'sim.rift.detonateFinalJudgment': 'Окончательный приговор обрушивается!',
+  'sim.rift.detonateVoidRift': 'Разлом пустоты взрывается!',
+  'sim.rift.detonateArcaneAnnihilation': 'Тайное уничтожение вырывается!',
+  'sim.rift.detonateLightningRod': 'Громоотвод разит молнией!',
+  'sim.rift.detonateStormcallersWrath': 'Гнев призывателя бурь вырывается!',
+  'sim.rift.detonateAbyssalMaw': 'Пасть бездны сжимается!',
+  'sim.rift.detonateCrushingDepth': 'Сокрушающая глубина давит!',
+  'sim.rift.detonatePactSeal': 'Печать пакта взрывается!',
+  'sim.rift.detonateBloodRite': 'Кровавый обряд падает!',
+  'sim.rift.detonatePitSentence': 'Приговор ямы взрывается!',
+  'sim.rift.detonateHellfireBrand': 'Адское клеймо взрывается!',
+  'entities.items.rift_essence.name': 'Эссенция разлома',
+  'entities.items.rift_gem_crimson.name': 'Багровый самоцвет разлома',
+  'entities.items.rift_gem_azure.name': 'Лазурный самоцвет разлома',
+  'entities.items.rift_gem_verdant.name': 'Зелёный самоцвет разлома',
+  'entities.items.riftbound_band_of_might.name': 'Кольцо разлома могущества',
+  'entities.items.riftbound_band_of_insight.name': 'Кольцо разлома прозрения',
+  'entities.items.riftbound_band_of_guile.name': 'Кольцо разлома хитрости',
+  'entities.items.hoarfrost_edge.name': 'Инеистый клинок',
+  'entities.items.emberforge_gauntlets.name': 'Рукавицы Пепельной кузни',
+  'entities.items.broodmother_carapace.name': 'Панцирь матки выводка',
+  'entities.items.bonelord_mantle.name': 'Наплечье костяного владыки',
+  'entities.items.graskbreaker_girdle.name': 'Пояс сокрушителя Граска',
+  'entities.items.voidscar_handwraps.name': 'Обмотки Пустотного шрама',
+  'entities.items.stormscale_treads.name': 'Ботинки грозовой чешуи',
+  'entities.items.abyssal_loop.name': 'Кольцо бездны',
+  'entities.items.pactbound_vestments.name': 'Облачение пакта',
+  'entities.items.pitlords_cleaver.name': 'Тесак повелителя преисподней',
+  'entities.items.emberforged_bulwark.name': 'Пепелокованый бастион',
+  'entities.items.stormsunder_hood.name': 'Клобук грозолома',
+  'entities.items.voidweave_mantle.name': 'Наплечье пустотного плетения',
+  'entities.items.abysswrought_band.name': 'Кольцо бездновой ковки',
+  'entities.items.heart_of_the_rift.name': 'Сердце разлома',
+  'entities.items.voidsong_dirk.name': 'Песнь Пустоты, кинжал расколотой завесы',
   'hudChrome.finder.title': 'Поиск подземелий',
   'hudChrome.finder.close': 'Закрыть',
   'hudChrome.finder.back': 'Назад',
@@ -8051,6 +9164,64 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Совет: сохраните несколько наборов талантов, чтобы менять билды, не тратя очки заново.',
   'loading.tips.pvp':
     'Совет: вызовите другого игрока на дружескую дуэль или встаньте в очередь на арену Пепельного Колизея, чтобы испытать свой билд.',
+  // Rideable mounts: the Z keybind + the Mounts window (the stable).
+  'hudChrome.keybinds.mount': 'Сесть / Спешиться',
+  'hudChrome.mobile.mounts': 'Транспорт',
+  'hudChrome.mounts.title': 'Транспорт',
+  'hudChrome.mounts.close': 'Закрыть',
+  'hudChrome.mounts.select': 'Выбрать',
+  'hudChrome.mounts.selected': 'Выбран',
+  'hudChrome.mounts.riding': 'Верхом',
+  'hudChrome.mounts.mount': 'Сесть',
+  'hudChrome.mounts.dismount': 'Спешиться',
+  'hudChrome.mounts.rarity_common': 'Обычный',
+  'hudChrome.mounts.rarity_rare': 'Редкий',
+  'hudChrome.mounts.rarity_epic': 'Эпический',
+  'hudChrome.mounts.spec_speed': '+{pct}% к скорости передвижения',
+  'hudChrome.mounts.name_valorsteed': 'Доблестный скакун',
+  'hudChrome.mounts.name_grag_bear': 'Голиаф Граг-медведь',
+  'hudChrome.mounts.name_stalkglider_snail': 'Мохопанцирный скользень',
+  'hudChrome.mounts.name_aether_hover_cycle': 'Эфирный ховерцикл турнирного бойца',
+  'hudChrome.mounts.name_shadowjump_toad': 'Кама-Кагэ, жаба теневых прыжков',
+  'hudChrome.mounts.name_stormfeather_griffin': 'Штормокрыл Поднебесный',
+  'hudChrome.mounts.name_thunderstrut_gobbler': 'Громоступ, великий индюк',
+  'hudChrome.mounts.desc_valorsteed':
+    'Выносливый и твердо стоящий на ногах скакун, повышающий скорость передвижения.',
+  'hudChrome.mounts.desc_grag_bear':
+    'Выносливый и твердо стоящий на лапах медведь, повышающий скорость передвижения.',
+  'hudChrome.mounts.desc_stalkglider_snail':
+    'Стойкая неторопливая улитка, повышающая скорость передвижения.',
+  'hudChrome.mounts.desc_aether_hover_cycle':
+    'Мощный магитех-байк для быстрых боевых рейдов на бреющем ходу.',
+  'hudChrome.mounts.desc_shadowjump_toad':
+    'Огромная устойчивая жаба, обученная молниеносным теневым прыжкам по любой местности.',
+  'hudChrome.mounts.desc_stormfeather_griffin':
+    'Величавый штормовой грифон, ступающий по земле на рунных когтях со сложенными крыльями.',
+  'hudChrome.mounts.desc_thunderstrut_gobbler':
+    'Исполинский индюк, рожденный бурей: он важно спускается с Пробуждающегося пика, распустив хвост, словно грозовой фронт.',
+  'hudChrome.mounts.emptyTitle': 'Скакунов пока нет',
+  'hudChrome.mounts.emptyStableHint':
+    'Достигните 20 уровня и возьмите урок верховой езды у старшей конюшей Марлы в конюшнях к западу от Хайвотча.',
+  'hudChrome.mounts.emptyDropHint':
+    'Более редких скакунов выбивают боссы героических подземелий или получают за прохождение Разломов.',
+  'hudChrome.mounts.clickManage': 'Нажмите, чтобы выбрать транспорт',
+  'hudChrome.mountTraining.mountPrompt':
+    'Нажми {key}, чтобы оседлать учебного Доблестного скакуна.',
+  'hudChrome.mountTraining.ownedMountPrompt': 'Поводья лежат в сумке. Используйте их, чтобы сесть верхом.',
+  'hudChrome.mounts.useToRide': 'Используйте, чтобы призвать это ездовое животное.',
+  'hudChrome.mountTraining.ridePrompt':
+    'Следуй за светящейся меткой к линии старта и нажми «Начать заезд».',
+  'hudChrome.mountTraining.begin': 'Начать урок',
+  'hudChrome.mountTraining.success': 'Ты приручил Доблестного скакуна.',
+  'hudChrome.mountTraining.returnToMarla':
+    'Вернись к Марле в конюшни, чтобы купить поводья Доблестного скакуна за 10 золотых.',
+  'hudChrome.mountRace.cancelButton': 'Отменить заезд',
+  'hudChrome.mountRace.startButton': 'Начать заезд',
+  'hudChrome.mountRace.start': 'Вперёд! Бери все препятствия и скачи назад через арку.',
+  'hudChrome.mountRace.toFinish': 'Скачи назад через арку!',
+  'hudChrome.mountRace.finished': 'Финиш за {seconds} с!',
+  'hudChrome.mountRace.timeout': 'Заезд провален',
+  'hudChrome.mountRace.progress': 'Барьеры {n} из {total}',
   // Baseline class interrupts.
   'entities.abilities.pummel.name': 'Челюстолом',
   'entities.abilities.pummel.description':
@@ -8126,6 +9297,38 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.social.slashBody':
     'Несколько повседневных команд стоит запомнить: /w Имя отправляет шёпот, а /r отвечает на последний полученный, /invite приглашает кого-то в вашу группу, /follow пристраивает вас следом за другом, /roll бросает кости на виду у группы, /who показывает, кто в сети, а /afk отмечает вас отошедшим. Введите /help в игре, чтобы увидеть полный список.',
   'guide.social.slashHeading': 'Удобные команды с косой чертой',
+  // Unstuck recovery (M16 non-Latin fills).
+  'hudChrome.unstuck.menuButton': 'Выбраться',
+  'hudChrome.unstuck.help':
+    'Спасение: /unstuck запускает неподвижный отсчёт, после которого вы окажетесь в ближайшем доступном безопасном месте.',
+  'hudChrome.unstuck.helpAtGraveyard':
+    'Спасение: /unstuck запускает неподвижный отсчёт, после которого ваш дух отправится на ближайшее кладбище. Чтобы вернуться к жизни, примите Подать Хранителя у Целителя душ.',
+  'hudChrome.unstuck.started':
+    'Перемещение из ловушки через {seconds} сек. Движение, бой, получение урона или другое действие отменят его.',
+  'hudChrome.unstuck.countdown': 'Выбраться: {seconds}',
+  'hudChrome.unstuck.completed': 'Вы перемещены в ближайшее доступное безопасное место.',
+  'hudChrome.unstuck.completedAtGraveyard':
+    'Ваш дух вернулся на ближайшее кладбище. Поговорите с Целителем душ и примите Подать Хранителя.',
+  'hudChrome.unstuck.revivedAtGraveyard':
+    'Вас вернули на ближайшее кладбище и воскресили. Подать Хранителя тяготит вас.',
+  'hudChrome.unstuck.cancelledMoved': 'Перемещение отменено, потому что вы сдвинулись с места.',
+  'hudChrome.unstuck.cancelledDamaged': 'Перемещение отменено, потому что вы получили урон.',
+  'hudChrome.unstuck.cancelledCombat': 'Перемещение отменено, потому что вы вступили в бой.',
+  'hudChrome.unstuck.cancelledBusy': 'Перемещение отменено, потому что вы начали другое действие.',
+  'hudChrome.unstuck.cancelledState': 'Перемещение отменено из-за изменения вашего состояния.',
+  'hudChrome.unstuck.cancelledDisconnected': 'Перемещение отменено из-за отключения.',
+  'hudChrome.unstuck.noSafePosition':
+    'Поблизости нет доступного безопасного места. Вы остались на месте.',
+  'hudChrome.unstuck.alreadyActive': 'Отсчёт перемещения уже идёт.',
+  'hudChrome.unstuck.alreadySafe': 'Вы уже находитесь в безопасном доступном месте.',
+  'hudChrome.unstuck.cooldown': 'Перемещение будет доступно через {seconds} сек.',
+  'hudChrome.unstuck.dead': 'Нельзя выбраться, пока вы мертвы или находитесь в облике духа.',
+  'hudChrome.unstuck.combat': 'Нельзя выбраться во время боя.',
+  'hudChrome.unstuck.controlled': 'Нельзя выбраться, пока ваше движение ограничено.',
+  'hudChrome.unstuck.standStill': 'Остановитесь на твёрдой земле, прежде чем выбираться.',
+  'hudChrome.unstuck.standStillAnywhere': 'Остановитесь, прежде чем выбираться.',
+  'hudChrome.unstuck.busy': 'Завершите текущее действие, прежде чем выбираться.',
+  'hudChrome.unstuck.unavailable': 'В текущем состоянии выбраться нельзя.',
   'guide.abilityHook.revenge':
     'Поражает противников перед вами и может не требовать затрат после уклонения или парирования.',
   'guide.abilityHook.hamstring': 'Ограничивает передвижение противника, не позволяя ему сбежать.',
@@ -8531,6 +9734,153 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.alchemist_verane.title': 'Хозяин аптекарской',
   'entities.npcs.alchemist_verane.greeting':
     'Отмерь дважды, лей один раз, {className}. В аптекарской не прощают пролитых реактивов.',
+  'entities.npcs.astronomer_cassian.greeting':
+    'Тише. Здесь небо не знает рассвета — потому оно и не умолкает ни на миг.',
+  'entities.npcs.astronomer_cassian.name': 'Астроном Кассиан',
+  'entities.npcs.astronomer_cassian.title': 'Наблюдатель Стоячего Дозора',
+  'entities.npcs.aurorist_veyla.greeting':
+    'Тише. Этой ночью сияние говорит, а оно не повторяет дважды.',
+  'entities.npcs.aurorist_veyla.name': 'Чтица сияния Вейла',
+  'entities.npcs.aurorist_veyla.title': 'Читающая небесные огни',
+  'entities.npcs.bridgewright_alden.greeting':
+    'Каждая доска в этом городе на моём попечении — а топь грызёт их все.',
+  'entities.npcs.bridgewright_alden.name': 'Мостовщик Олден',
+  'entities.npcs.bridgewright_alden.title': 'Мастер Топяной гати',
+  'entities.npcs.ferrymaster_caddow.greeting':
+    'На Великое озеро снова лёг туман. Когда фонари на воде гаснут, разумный люд остаётся на берегу.',
+  'entities.npcs.ferrymaster_caddow.name': 'Паромщик Каддоу',
+  'entities.npcs.ferrymaster_caddow.title': 'Хранитель фонарных паромов',
+  'entities.npcs.gardener_yew.greeting':
+    'Подай-ка мне ту тачку, будь добр. Газоны сами себя не обходят, что бы там ни думали в деревне.',
+  'entities.npcs.gardener_yew.name': 'Садовник Тис',
+  'entities.npcs.gardener_yew.title': 'Последний садовник',
+  'entities.npcs.gatecaptain_brannoc.greeting':
+    'Змеиный дозор держит врата. Держит сорок лет. Удержит и этой ночью.',
+  'entities.npcs.gatecaptain_brannoc.name': 'Капитан врат Браннок',
+  'entities.npcs.gatecaptain_brannoc.title': 'Командир Змеиного дозора',
+  'entities.npcs.gatewarden_pell.greeting':
+    'Поосторожнее на газонах. Сад сам их подстригает, и он любит порядок.',
+  'entities.npcs.gatewarden_pell.name': 'Привратник Пелл',
+  'entities.npcs.gatewarden_pell.title': 'Хранитель Садовых Врат',
+  'entities.npcs.harbormaster_odile.greeting':
+    'Каждая лодка в этой бухте обязана килем Старому Маяку. Говори быстрее — прилив ждать не станет.',
+  'entities.npcs.harbormaster_odile.name': 'Начальница гавани Одиль',
+  'entities.npcs.harbormaster_odile.title': 'Начальница гавани Викхарбора',
+  'entities.npcs.head_gardener_amaranth.greeting':
+    'Не обращай внимания на тени у меня под глазами. Кто-то должен бодрствовать, пока сад видит сны.',
+  'entities.npcs.head_gardener_amaranth.name': 'Старшая садовница Амарант',
+  'entities.npcs.head_gardener_amaranth.title': 'Старшая садовница Вечного Сада',
+  'entities.npcs.hearthkeeper_maeve.greeting':
+    'Заходи с мороза. Огонь в этом доме не гаснет, пока я дышу.',
+  'entities.npcs.hearthkeeper_maeve.name': 'Хранительница очага Мейв',
+  'entities.npcs.hearthkeeper_maeve.title': 'Хозяйка Очажного дома',
+  'entities.npcs.hermit_okku.greeting':
+    'Тихо. Барабаны считают всех, кто ходит под деревьями, — и тебя они уже сосчитали.',
+  'entities.npcs.hermit_okku.name': 'Окку',
+  'entities.npcs.hermit_okku.title': 'Тот, кто вошёл в чащу',
+  'entities.npcs.huntsman_deral.greeting': 'Тише. Стадо знает каждый звук этой долины — и я тоже.',
+  'entities.npcs.huntsman_deral.name': 'Охотник Дерал',
+  'entities.npcs.huntsman_deral.title': 'Смотритель стад',
+  'entities.npcs.keeper_bram.greeting':
+    'Тридцать девять лет эта лампа горит на моей вахте. На твоей она не погаснет.',
+  'entities.npcs.keeper_bram.name': 'Смотритель Брам',
+  'entities.npcs.keeper_bram.title': 'Смотритель Старого Маяка',
+  'entities.npcs.lamplighter_sorrel.greeting':
+    'Держись фонарей, друг. За этими вратами солнце сдаётся, и его сменяют цветы.',
+  'entities.npcs.lamplighter_sorrel.name': 'Фонарщик Соррел',
+  'entities.npcs.lamplighter_sorrel.title': 'Хранитель Ночных Врат',
+  'entities.npcs.lampman_cobb.greeting':
+    'Не выходи из света фонарей, друг. Лес считает каждого, кто минует врата.',
+  'entities.npcs.lampman_cobb.name': 'Фонарщик Кобб',
+  'entities.npcs.lampman_cobb.title': 'Хранитель фонарей Вороньих Врат',
+  'entities.npcs.lira_dewsong.greeting':
+    'Добро пожаловать в Лунный Приют, где рассвет за нас встречают цветы.',
+  'entities.npcs.lira_dewsong.name': 'Лира Песнь Росы',
+  'entities.npcs.lira_dewsong.title': 'Ночная садовница Лунного Приюта',
+  'entities.npcs.mother_sedge.greeting':
+    'Ивы сказали мне, что ты идёшь, прежде чем твои сапоги сошли с моста.',
+  'entities.npcs.mother_sedge.name': 'Матушка Осока',
+  'entities.npcs.mother_sedge.title': 'Топяная ведьма Плакучей заводи',
+  'entities.npcs.netter_maris.greeting':
+    'Чуешь? Копчёный угорь. Полгорода стоит на сваях, купленных на него.',
+  'entities.npcs.netter_maris.name': 'Ловец угрей Марис',
+  'entities.npcs.netter_maris.title': 'Ловец угрей из Бриджмира',
+  'entities.npcs.orchardist_pomeline.greeting':
+    'Смотри, куда ступаешь. Каждый корень в этих рядах старше города — и они всё помнят.',
+  'entities.npcs.orchardist_pomeline.name': 'Садовница Помелина',
+  'entities.npcs.orchardist_pomeline.title': 'Хранительница золочёных рядов',
+  'entities.npcs.pearlmother_isha.greeting':
+    'Море даёт, песок хранит, а джунгли забирают. Держись берега, странник.',
+  'entities.npcs.pearlmother_isha.name': 'Мать-Жемчужница Иша',
+  'entities.npcs.pearlmother_isha.title': 'Старейшина ныряльщиц',
+  'entities.npcs.quartermaster_sela.greeting':
+    'Каждый ящик на этом дворе прошёл сорок миль пепла, чтобы попасть сюда. Обращайся с ними бережно.',
+  'entities.npcs.quartermaster_sela.name': 'Интендант Села',
+  'entities.npcs.quartermaster_sela.title': 'Хранительница гарнизонных складов',
+  'entities.npcs.reeve_ottoline.greeting':
+    'Добро пожаловать в Лантанмир, где не кончается жатва — а с нею и работа.',
+  'entities.npcs.reeve_ottoline.name': 'Староста Оттолина',
+  'entities.npcs.reeve_ottoline.title': 'Староста Лантанмира',
+  'entities.npcs.salvage_boss_ryna.greeting':
+    'Смотри-ка, {className} с крепкими руками — хорошо. Полоса крушений платит щедро, если крабы оставят тебе достаточно пальцев, чтобы пересчитать выручку.',
+  'entities.npcs.salvage_boss_ryna.name': 'Начальница добытчиков Рина',
+  'entities.npcs.salvage_boss_ryna.title': 'Хозяйка полосы крушений',
+  'entities.npcs.salvager_edda.greeting':
+    'Корабельный лес, канаты да груз мертвецов. Море платит мне жалованье — когда Страж позволяет.',
+  'entities.npcs.salvager_edda.name': 'Добытчица Эдда',
+  'entities.npcs.salvager_edda.title': 'Добытчица Полей Кораблекрушений',
+  'entities.npcs.scout_einna.greeting':
+    'Перевал остался позади, и ты в живых. Хорошо. Ледяная Мантия должна об этом узнать.',
+  'entities.npcs.scout_einna.name': 'Разведчица Эйнна',
+  'entities.npcs.scout_einna.title': 'Разведчица Снеговой Тропы',
+  'entities.npcs.scout_yerrin.greeting':
+    'Пригнись. Звук странно отражается от стекла, а у врат внизу есть уши.',
+  'entities.npcs.scout_yerrin.name': 'Разведчица Йеррин',
+  'entities.npcs.scout_yerrin.title': 'Дозорная дальних дюн',
+  'entities.npcs.sexton_marrow.greeting':
+    'Здесь мы хороним глубоко и звоним в колокола, чтобы мёртвые не забывали лежать смирно.',
+  'entities.npcs.sexton_marrow.name': 'Пономарь Марроу',
+  'entities.npcs.sexton_marrow.title': 'Пономарь Гэллоумира',
+  'entities.npcs.strandwatcher_pell.greeting':
+    'Наконец-то из чёрных деревьев. Дыши, странник: по эту сторону прохода правит солнце.',
+  'entities.npcs.strandwatcher_pell.name': 'Береговой дозорный Пелл',
+  'entities.npcs.strandwatcher_pell.title': 'Дозорный Заросшего Устья',
+  'entities.npcs.trapper_brosk.greeting':
+    'За эту неделю топь забрала у меня три ловчие линии. За двадцать лет она не тронула ни одной.',
+  'entities.npcs.trapper_brosk.name': 'Зверолов Броск',
+  'entities.npcs.trapper_brosk.title': 'Зверолов Дрожащей топи',
+  'entities.npcs.vicar_creel.greeting':
+    'Часовня рухнула много лет назад. Мёртвые под ней этого не заметили — потому я и остался.',
+  'entities.npcs.vicar_creel.name': 'Викарий Крил',
+  'entities.npcs.vicar_creel.title': 'Последний викарий Скорбного Камня',
+  'entities.npcs.warden_kaldra.greeting':
+    'Осторожнее на уступах, странник. Снег не отдаёт того, что забрал.',
+  'entities.npcs.warden_kaldra.name': 'Смотрительница Калдра',
+  'entities.npcs.warden_kaldra.title': 'Смотрительница Ледяной Мантии',
+  'entities.npcs.watcher_maren.greeting':
+    'Смотри под ноги за воротами. Здешний ветер сперва забирает шляпы, а вопросов не задаёт вовсе.',
+  'entities.npcs.watcher_maren.name': 'Дозорный Марен',
+  'entities.npcs.watcher_maren.title': 'Дозор Ветрового Прохода',
+  'entities.npcs.waykeeper_pell.greeting':
+    'Вниз по Ступеням — и в мягкий край. Гляди, куда ставишь сапоги.',
+  'entities.npcs.waykeeper_pell.name': 'Смотрительница пути Пелл',
+  'entities.npcs.waykeeper_pell.title': 'Хранительница Янтарных Ступеней',
+  'entities.npcs.waywatcher_sorrel.greeting':
+    'Позади снег, впереди золото. Мало кто проходит Золотую Проталину дважды — так пусть переход будет не зря.',
+  'entities.npcs.waywatcher_sorrel.name': 'Дозорная Соррел',
+  'entities.npcs.waywatcher_sorrel.title': 'Дозорная Золотой Проталины',
+  'entities.npcs.weaver_amelle.greeting':
+    'Чувствуешь? Лунное руно на станке. Теплее любого огня, у которого ты грелся.',
+  'entities.npcs.weaver_amelle.name': 'Ткачиха Амелла',
+  'entities.npcs.weaver_amelle.title': 'Ткачиха лунного руна',
+  'entities.npcs.wickmother_sorrel.greeting':
+    'Заходи, садись, на огне греется наливка. Только придерживай всё железное: гномы в последнее время на руку нечисты.',
+  'entities.npcs.wickmother_sorrel.name': 'Матушка Соррел',
+  'entities.npcs.wickmother_sorrel.title': 'Хозяйка трактира Хеджвика',
+  'entities.npcs.widow_tansy.greeting':
+    'По свече на каждую могилу, и ни одна не должна погаснуть. Ни одна, слышишь?',
+  'entities.npcs.widow_tansy.name': 'Вдова Пижма',
+  'entities.npcs.widow_tansy.title': 'Свечница Гэллоумира',
   'hudChrome.training.title': 'Обучение: {name}',
   'hudChrome.training.close': 'Закрыть обучение',
   'hudChrome.training.empty': 'Этому мастеру нечему вас научить.',
@@ -8618,6 +9968,87 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.sunpetal_healing_draught.name': 'Целебный настой солнцелепеста',
   'entities.items.sunpetal_mana_draught.name': 'Настой маны солнцелепеста',
   'entities.items.elixir_of_the_serpent.name': 'Эликсир змея',
+  'entities.mobs.wildheart_stalker.name': 'Лазутчик Лозокогтя',
+  'entities.mobs.wildheart_ravager.name': 'Разоритель Кровавой Гривы',
+  'entities.mobs.wildheart_hexcaller.name': 'Заклинатель Солнечной Кости',
+  'entities.mobs.wildheart_beastmaster.name': 'Повелитель клыков',
+  'entities.mobs.wildheart_high_priest.name': 'Зулгар, Голос Котловины',
+  'entities.mobs.apprentice_wren.name': 'Ученица Рен',
+  'entities.mobs.barrow_wight.name': 'Курганное умертвие',
+  'entities.mobs.castaway_navigator.name': 'Штурман Сули',
+  'entities.mobs.cindraleth_maw_matriarch.name': 'Синдралет, Матриарх Дрейкмо',
+  'entities.mobs.drowned_deckhand.name': 'Утонувший матрос',
+  'entities.mobs.fisher_bram.name': 'Рыбак Брам',
+  'entities.mobs.gravedigger_mosley.name': 'Могильщик Мозли',
+  'entities.mobs.terrace_howler.name': 'Террасный ревун',
+  'entities.mobs.the_meredark.name': 'Озёрный Мрак',
+  'entities.dungeons.wildheart_basin.name': 'Котловина Дикого Сердца',
+  'entities.dungeons.wildheart_basin.enterText':
+    'Тёплый дождь шипит на древнем камне. Перед вами открывается Котловина Дикого Сердца.',
+  'entities.dungeons.wildheart_basin.leaveText':
+    'Вы проходите под каменными клыками и возвращаетесь к солнцу Палмрича.',
+  'entities.dungeons.the_last_keep.name': 'Последний оплот',
+  'entities.dungeons.the_last_keep.enterText': 'Вы входите в холодные безмолвные залы Последнего оплота.',
+  'entities.items.last_keep_signet.name': 'Печатка Последнего оплота',
+  'entities.dungeons.the_last_keep.leaveText': 'Вы затворяете дверь оплота и возвращаетесь под ветер Земель Драконов.',
+  'entities.items.wildheart_tuskblade.name': 'Клыкастый клинок Дикого Сердца',
+  'entities.items.wildheart_hexwood_staff.name': 'Посох колдовского дерева из Котловины',
+  'entities.items.wildheart_fangknife.name': 'Клыковый нож Зулгара',
+  'entities.items.amberfall_sap_bucket.name': 'Ведёрко для живицы',
+  'entities.items.ashbone_war_brand.name': 'Пеплокостное боевое клеймо',
+  'entities.items.aurora_mote.name': 'Пылинка сияния',
+  'entities.items.barrow_grave_offering.name': 'Разбросанное могильное подношение',
+  'entities.items.barrowshade_mantle.name': 'Мантия курганной тени',
+  'entities.items.breakscarred_steel.name': 'Сталь со шрамами прорыва',
+  'entities.items.bridgemere_toll_chest.name': 'Затонувший сундук с пошлиной',
+  'entities.items.canopy_silk_hank.name': 'Моток кронового шёлка',
+  'entities.items.cinderwalk_treads.name': 'Боты пеплохода',
+  'entities.items.eelskin_mudwaders.name': 'Болотные сапоги из кожи угря',
+  'entities.items.emberwing_scale.name': 'Чешуйка углекрылого дрейка',
+  'entities.items.evergarden_bloom_clipping.name': 'Свежесрезанный побег',
+  'entities.items.evergarden_statue_rubbing.name': 'Оттиск со статуи',
+  'entities.items.farshore_salt_moss.name': 'Солёный мох Дальнего Берега',
+  'entities.items.fenway_mooring_line.name': 'Перекушенный швартов',
+  'entities.items.fountain_court_mantle.name': 'Мантия Фонтанного Двора',
+  'entities.items.frostmane_mantle.name': 'Мантия Морозной Гривы',
+  'entities.items.galecrest_ram_wool.name': 'Жирная баранья шерсть',
+  'entities.items.gallowmere_grave_candle.name': 'Могильная свеча',
+  'entities.items.gilded_sap_clot.name': 'Сгусток золочёной живицы',
+  'entities.items.gloamfield_nightbloom.name': 'Цветок ночецвета',
+  'entities.items.gravebound_silk_wraps.name': 'Погребальные шёлковые обмотки',
+  'entities.items.gullhaven_watchbell.name': 'Береговой сторожевой колокол',
+  'entities.items.hearth_ember_cache.name': 'Запас углей',
+  'entities.items.hearthlined_treads.name': 'Прогретые у очага боты',
+  'entities.items.hedgewick_shears.name': 'Украденные хеджвикские ножницы',
+  'entities.items.hedgewick_tool_cart.name': 'Опрокинутая тележка с инструментами',
+  'entities.items.lilybed_mantle.name': 'Мантия кувшинкового ложа',
+  'entities.items.mantle_of_the_meredark.name': 'Мантия Озёрного Мрака',
+  'entities.items.mantle_of_the_unbroken_shore.name': 'Мантия несломленного берега',
+  'entities.items.mantle_of_the_unhorsed.name': 'Мантия спешенного всадника',
+  'entities.items.mawscale_pauldrons.name': 'Наплечники из чешуи Дрейкмо',
+  'entities.items.mere_ferry_lantern.name': 'Паромный фонарь',
+  'entities.items.moonfleece_mitts.name': 'Рукавицы из лунного руна',
+  'entities.items.moonfleece_tuft.name': 'Клок лунного руна',
+  'entities.items.orchard_sapbinder_grips.name': 'Рукавицы смоловяза',
+  'entities.items.pearlwake_cargo_crate.name': 'Ящик с грузом «Жемчужного Следа»',
+  'entities.items.plump_fen_eel.name': 'Жирный топяной угорь',
+  'entities.items.saltforged_grips.name': 'Рукавицы солёной ковки',
+  'entities.items.saltwalker_sandals.name': 'Сандалии солеброда',
+  'entities.items.scorched_supply_crate.name': 'Обгоревший ящик с припасами',
+  'entities.items.shear_storm_lantern.name': 'Погасший штормовой фонарь',
+  'entities.items.shearkeeper_gloves.name': 'Перчатки хранителя ножниц',
+  'entities.items.silkbound_remains.name': 'Опутанные шёлком останки',
+  'entities.items.sprung_trap.name': 'Захлопнувшийся топяной капкан',
+  'entities.items.sunken_idol_mantle.name': 'Мантия Затонувшего Идола',
+  'entities.items.sunken_offering_bowl.name': 'Вновь наполненная жертвенная чаша',
+  'entities.items.thick_winter_pelt.name': 'Плотная зимняя шкура',
+  'entities.items.vigil_star_chart.name': 'Звёздная карта Стоячего Дозора',
+  'entities.items.wickspun_treads.name': 'Боты викхарборской пряжи',
+  'entities.items.widowsilk_skein.name': 'Моток вдовьего шёлка',
+  'entities.items.wisplight_globe.name': 'Шар света огоньков',
+  'entities.items.wreck_wardens_mantle.name': 'Мантия Стража Кораблекрушений',
+  'entities.items.wreckfield_flotsam_crate.name': 'Прибитый морем ящик',
+  'entities.items.wyrmwatch_warning_banner.name': 'Предупредительное знамя Змеиного дозора',
   'entities.items.mosshide_vest.name': 'Жилет из мшистой кожи',
   'entities.items.thornling_grips.name': 'Перчатки Колючки',
   'entities.items.acolyte_chain_grips.name': 'Кольчужные перчатки послушника',
@@ -9366,5 +10797,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'devCommand.itemUnknown': 'Нет предмета с таким идентификатором.',
   'devCommand.kitCurrentSpec': 'Текущая специализация',
   'hudChrome.enchanting.wornTag': 'Надето ({slot})',
+  'hudChrome.continentMap.title': 'Карта мира',
+  'hudChrome.continentMap.summary': 'Карта мира. Выберите зону, чтобы открыть её карту.',
+  'hudChrome.continentMap.toWorld': 'Карта мира',
+  'hudChrome.continentMap.toggleAria': 'Переключение между картой мира и картой региона',
+  'hudChrome.continentMap.levels': 'Уровни {min} до {max}',
   'hudChrome.enchanting.wornTagIndexed': 'Надето ({slot} {index})',
 };
