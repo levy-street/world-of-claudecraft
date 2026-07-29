@@ -552,15 +552,11 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
     driverAllow: {},
   },
   { file: 'bank_window.ts', reflowAllow: { '.scrollTop': 4 }, driverAllow: {} },
-  // The mount roster: the same scroll pair every other window uses (read before a
-  // rerender, write it back after), plus ONE rAF that scrolls the selected card
-  // into view on the first laid-out frame. A single frame callback that never
-  // re-arms is not a driver; the late re-assert beside it is a setTimeout.
-  {
-    file: 'char_window.ts',
-    reflowAllow: { '.scrollTop': 2 },
-    driverAllow: { requestAnimationFrame: 1 },
-  },
+  // The scroll pair and the rAF both belonged to the mount picker's
+  // scroll-the-selected-card-into-view path, which went away when reins became
+  // usable items and the picker was deleted. The sheet now reads nothing and
+  // arms nothing.
+  { file: 'char_window.ts', reflowAllow: {}, driverAllow: {} },
   {
     file: 'crafting_window.ts',
     reflowAllow: { '.scrollTop': 2, '.scrollLeft': 2 },

@@ -248,7 +248,6 @@ const UI_PURE_CORES = [
   'src/ui/perf_nudge_view.ts',
   'src/ui/hud/loot/corpse_harvest_view.ts',
   'src/ui/town_focus_view.ts',
-  'src/ui/mount_picker_view.ts',
   'src/ui/mount_race_view.ts',
   'src/ui/pet_action_icons.ts',
   'src/ui/loading_slow_hint_core.ts',

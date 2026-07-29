@@ -100,7 +100,6 @@ function harness(startCopper = 1000, inventory: InvSlot[] = SWORD): Harness {
     markEquipDropTargets: noop,
     dropOnEquipSlot: noop,
     openItemActionMenu: noop,
-    openMountPicker: noop,
   };
   return {
     window: new BagsWindow(deps),

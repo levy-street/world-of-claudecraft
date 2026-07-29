@@ -213,18 +213,21 @@ export const RIFT_COIN_BONUS_S = 50_000; // 50 000c; +5 000c static boss coin = 
 // Each rank rolls its OWN tier only: a rank does not inherit the tiers below it,
 // so the ladder climbs in rarity rather than accumulating chances.
 
-/** Green (common) mount reins, on B clears. Excludes reins_valorsteed, which is
- *  the stablemaster's purchase and has never been a drop. */
-export const RIFT_GREEN_MOUNT_REINS = ['reins_grag_bear', 'reins_stalkglider_snail'] as const;
+/** Uncommon ("green") mount reins, on B clears. Excludes reins_valorsteed, which
+ *  is the stablemaster's purchase and has never been a drop. */
+export const RIFT_GREEN_MOUNT_REINS = [
+  'reins_stormfeather_griffin',
+  'reins_shadowjump_toad',
+] as const;
 export const RIFT_GREEN_MOUNT_CHANCE = 0.005; // 0.5%, the heroic five-man green rate
 
-/** Blue (rare) mount reins, on A clears. */
-export const RIFT_BLUE_MOUNT_REINS = ['reins_aether_hover_cycle', 'reins_shadowjump_toad'] as const;
+/** Rare ("blue") mount reins, on A clears. */
+export const RIFT_BLUE_MOUNT_REINS = ['reins_grag_bear', 'reins_stalkglider_snail'] as const;
 export const RIFT_BLUE_MOUNT_CHANCE = 0.001; // 0.1%, the heroic five-man blue rate
 
 /** Epic mount reins, on S clears only. Rifts are their sole source. */
 export const RIFT_EPIC_MOUNT_REINS = [
-  'reins_stormfeather_griffin',
+  'reins_aether_hover_cycle',
   'reins_thunderstrut_gobbler',
 ] as const;
 export const RIFT_EPIC_MOUNT_CHANCE = 0.003; // 0.3% per S clear

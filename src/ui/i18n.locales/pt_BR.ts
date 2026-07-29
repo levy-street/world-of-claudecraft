@@ -8034,9 +8034,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.riding': 'Montado',
   'hudChrome.mounts.mount': 'Montar',
   'hudChrome.mounts.dismount': 'Desmontar',
-  'hudChrome.mounts.requiresLevel': 'Requer nível {level}',
-  'hudChrome.mounts.pickFirst': 'Escolha uma montaria para montar.',
-  'hudChrome.mounts.keybindHint': 'Pressione a tecla Montar / Desmontar para montar.',
   'hudChrome.mounts.rarity_common': 'Comum',
   'hudChrome.mounts.rarity_rare': 'Rara',
   'hudChrome.mounts.rarity_epic': 'Épica',
@@ -8066,7 +8063,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.emptyStableHint':
     'Alcance o nível 20 e faça aulas de montaria com a Cavalariça-mor Marla nos estábulos a oeste de Highwatch.',
   'hudChrome.mounts.emptyDropHint': 'Montarias mais raras caem de chefes de masmorra e raide.',
-  'hudChrome.mounts.clickManage': 'Clique para escolher sua montaria',
+  'hudChrome.mounts.useToRide': 'Use para invocar esta montaria.',
   'guide.bestiary.flavor.sethrael_palecoil':
     'Uma serpente pálida como osso que desliza pelo fundo profundo do Glimmermere, guardiã silenciosa das águas que reivindicou para si. Nadadores que dividem o lago com ela raramente voltam à superfície.',
   'guide.combat.metersBody':

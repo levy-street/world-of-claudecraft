@@ -1,5 +1,5 @@
 import { DEV_KIT_ROLES, devKitRole } from './content/dev_kit_roles';
-import { MOUNT_KEYS, MOUNTS, TRAINING_MOUNT_KEY } from './content/mounts';
+import { MOUNT_KEYS } from './content/mounts';
 import { GATHERING_PROFESSIONS } from './content/professions';
 import { DUNGEONS, ITEMS, MOBS, NPCS, ZONES } from './data';
 import { applyDevKit } from './dev_kit';
@@ -7,6 +7,7 @@ import { createGroundObject, createMob } from './entity';
 import { enterDungeon } from './instances/dungeons';
 import { isStoryDungeonId } from './instances/story_instances';
 import { mountItemId, mountOwned } from './mounts';
+import { MOUNT_TRAIN_MIN_LEVEL } from './mounts_training';
 import { isGatheringProfessionId, queueGatheringGrant } from './professions/gathering';
 import { placeMobileStationForPlayer } from './professions/mobile_station';
 import { completeAllQuestsForDev } from './quests/dev_quest_commands';
@@ -240,7 +241,9 @@ export function handleDevChat(
     const meta = ctx.players.get(pid);
     const entity = ctx.entities.get(pid);
     if (meta && entity) {
-      const maxGate = Math.max(...MOUNT_KEYS.map((key) => MOUNTS[key].level));
+      // Mounts have no per-mount level gate any more; the only level that still
+      // matters anywhere in the mount flow is the stablemaster's level-20 buy gate.
+      const maxGate = 20;
       const leveled = entity.level < maxGate;
       if (leveled) ctx.setPlayerLevel(maxGate, pid);
       meta.ridingTrained = true;
@@ -252,11 +255,11 @@ export function handleDevChat(
         ctx.addItem(itemId, 1, pid);
         granted += 1;
       }
-      const levelNote = leveled ? `, level raised to ${maxGate} for the riding gates` : '';
+      const levelNote = leveled ? `, level raised to ${maxGate} for the riding gate` : '';
       emitDevLog(
         ctx,
         pid,
-        `[dev] Granted ${granted} mount reins (${MOUNT_KEYS.length} owned)${levelNote}. Press Z to summon a mount.`,
+        `[dev] Granted ${granted} mount reins (${MOUNT_KEYS.length} owned)${levelNote}. Use a reins item from your bags to ride.`,
       );
     }
     return null;
@@ -267,7 +270,7 @@ export function handleDevChat(
     const entity = ctx.entities.get(pid);
     const marla = NPCS.stablemaster_marla;
     if (meta && entity && marla) {
-      const gate = MOUNTS[TRAINING_MOUNT_KEY].level;
+      const gate = MOUNT_TRAIN_MIN_LEVEL;
       const leveled = entity.level < gate;
       if (leveled) ctx.setPlayerLevel(gate, pid);
       meta.copper += 100 * 10000;

@@ -31,11 +31,12 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // place_mobile_station, train_recipe, the three enchanting actions
 // (disenchant_item, apply_enchant, salvage_item), unbind_item (the
 // Maker's Bond unbind service), and the Rift + mounts surface (rift and
-// forge commands, learn_riding, mount selection).
+// forge commands, learn_riding, reins use).
 // The Last Bell scene_skip and scene_choice commands add two sends and two
-// dispatch arms on top of that upstream surface.
-const EXPECTED_SEND_COUNT = 176;
-const EXPECTED_DISPATCH_COUNT = 187;
+// dispatch arms on top of that upstream surface; mount_select has left the wire
+// now that reins are usable items.
+const EXPECTED_SEND_COUNT = 175;
+const EXPECTED_DISPATCH_COUNT = 186;
 const EXPECTED_DISPATCH_ONLY_COUNT = 11;
 
 // The chat sub-channel routing switch (server/game.ts `switch

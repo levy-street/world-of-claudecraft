@@ -28,7 +28,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 846,
-      "state": "b9d574f3",
+      "state": "37f37bc3",
       "events": "7bf7ba48",
       "rng": {
         "draws": 2,
@@ -97,7 +97,6 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "renown": 5,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -162,7 +161,6 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "renown": 5,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },

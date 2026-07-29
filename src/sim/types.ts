@@ -3494,21 +3494,19 @@ export interface Entity extends ClientMirroredEntityFields {
   skinCatalog: SkinCatalog; // player appearance catalog: class texture set or cosmetic body.
   skin: number; // player appearance: index into SKINS[visualKey]; 0 = default. synced in identity fields.
   // Active rideable ground mount ('' = dismounted; players only). Unlike the
-  // render-only cosmetics below, the sim READS this: player_motion.moveSpeedMult
-  // (speed), auto_attack.meleeSwing (melee block), and recalcPlayerStats (crit)
-  // key off it, so it syncs in identity fields (terse `mnt`) like `skin` and the
-  // online self-extrapolator predicts mounted speed in lockstep. The persisted
-  // selection lives on PlayerMeta.selectedMount (src/sim/content/mounts.ts).
+  // render-only cosmetics below, player_motion.moveSpeedMult reads this for the
+  // mount's speed bonus, so it syncs in identity fields (terse `mnt`) and the
+  // online self-extrapolator predicts mounted speed in lockstep.
   mountKey: string;
-  // Mount summon/dismount transition (players only; 0 = idle). Seconds left in the
-  // call-the-mount summon or the dismount, driven per tick by updateMountTransition
+  // Mount summon transition (players only; 0 = idle). Seconds left in the
+  // call-the-mount summon, driven per tick by updateMountTransition
   // (src/sim/mounts.ts). The sim READS it: player_motion.stepPlayerMotion roots the
   // player (no walk/strafe/jump) while it is > 0, so it must sync on the wire like
   // mountKey (terse `mcr`) for the online self-extrapolator to root in lockstep and
   // for other clients to time the summon FX. handleDeath clears it.
   mountCastRemaining: number;
-  // The catalog key being summoned during a mount transition ('' while dismounting or
-  // idle). Render-only (the summon-FX / call-pose the client draws); the sim never
+  // The catalog key being summoned during a mount transition ('' while idle).
+  // Render-only (the summon-FX / call-pose the client draws); the sim never
   // reads it. Syncs on the wire (terse `mck`) alongside mountCastRemaining, and
   // handleDeath clears it.
   mountCastKey: string;

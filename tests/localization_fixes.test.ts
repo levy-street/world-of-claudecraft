@@ -1085,8 +1085,8 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // Riding lesson: the mount_train_begin guard refusals and the driver's
     // notices (level/range/quest/in-progress/success/left-yard literals).
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mounts_training.ts'), 'utf8'),
-    // Mounts: the toggleMount/selectMount guard refusals and the ridingTrained
-    // error (RIDING_UNTRAINED_MSG) that the riding-skill gate emits.
+    // Mounts: the lesson toggle and usable-reins guard refusals, including the
+    // ridingTrained error (RIDING_UNTRAINED_MSG).
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mounts.ts'), 'utf8'),
     // Heroic anti-kite mob charge: the "unleashes" announce line (the mechanic
     // name doubles as the mob_charge_stun debuff, localized via AURA_NAME_KEY's

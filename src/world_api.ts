@@ -441,7 +441,6 @@ export const COMMAND_NAMES = [
   'vcup_ready',
   'vcup_bet',
   'vcup_practice',
-  'mount_select',
   'mount_toggle',
   'mount_train_begin',
   'mount_train_answer',
@@ -755,11 +754,11 @@ export const COMMAND_FACETS = {
   vcup_ready: 'IWorldValeCup',
   vcup_bet: 'IWorldValeCup',
   vcup_practice: 'IWorldValeCup',
-  // IWorldMounts: pick + mount/dismount (snake_case wire strings, by design).
-  // selectedMount is a self-snapshot read (terse `mnt`, no send, untagged).
+  // IWorldMounts: summon/dismount (snake_case wire strings, by design).
+  // The active mount is a self-snapshot read (terse `mnt`, no send, untagged);
+  // summoning one is an item use (use_item), not a mount command.
   // mount_train_begin is the legacy riding-lesson entry point; its feedback
   // rides the mountTrain* events (no snapshot field).
-  mount_select: 'IWorldMounts',
   mount_toggle: 'IWorldMounts',
   mount_train_begin: 'IWorldMounts',
   // mount_race_start begins a show-jumping race from the glowing platform;

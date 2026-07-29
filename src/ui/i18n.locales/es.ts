@@ -8057,9 +8057,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.riding': 'Montada',
   'hudChrome.mounts.mount': 'Montar',
   'hudChrome.mounts.dismount': 'Desmontar',
-  'hudChrome.mounts.requiresLevel': 'Requiere nivel {level}',
-  'hudChrome.mounts.pickFirst': 'Elige una montura para montar.',
-  'hudChrome.mounts.keybindHint': 'Pulsa la tecla Montar / Desmontar para montar.',
   'hudChrome.mounts.rarity_common': 'Común',
   'hudChrome.mounts.rarity_rare': 'Rara',
   'hudChrome.mounts.rarity_epic': 'Épica',
@@ -8090,7 +8087,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Alcanza el nivel 20 y toma clases de monta con la Caballeriza mayor Marla en los establos al oeste de Highwatch.',
   'hudChrome.mounts.emptyDropHint':
     'Las monturas más raras las sueltan los jefes de mazmorras y bandas.',
-  'hudChrome.mounts.clickManage': 'Haz clic para elegir tu montura',
+  'hudChrome.mounts.useToRide': 'Úsalo para invocar esta montura.',
   'guide.bestiary.flavor.sethrael_palecoil':
     'Una serpiente pálida como el hueso que se desliza por la profunda plataforma del Glimmermere, guardiana silenciosa de las aguas que ha reclamado. Los nadadores que comparten el lago con ella rara vez vuelven a la superficie.',
   'guide.combat.metersBody':

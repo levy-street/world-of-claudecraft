@@ -586,7 +586,6 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'change_skin',
   'unequip_mech_chroma',
   'claim_event_skin',
-  'mount_select',
   'mount_toggle',
   'change_weapon_skin',
   'prestige',
@@ -945,9 +944,8 @@ function identityFields(e: Entity): Record<string, unknown> {
   const out: Record<string, unknown> = { k: e.kind, tid: e.templateId, nm: e.name, lv: e.level };
   if (e.skinCatalog === 'mech') out.cat = 'mech';
   if (e.skin) out.sk = e.skin;
-  // Active rideable mount ('' omitted). This identity field is intentionally
-  // distinct from the self-only persisted pick (`mntSel`): using `mnt` for both
-  // made the appended self delta overwrite the live riding state in JSON.
+  // Active rideable mount ('' omitted). Reins use drives this live state; there
+  // is no separate persisted mount selection.
   if (e.mountKey) out.mnt = e.mountKey;
   if (e.mainhandItemId) out.mh = e.mainhandItemId; // equipped mainhand → held weapon model (render-only)
   if (e.offhandItemId) out.oh = e.offhandItemId; // equipped offhand → held weapon model (render-only)
@@ -4591,11 +4589,8 @@ export class GameServer {
       case 'unequip_mech_chroma':
         if (typeof msg.chroma === 'string') this.unequipAccountMechChroma(session, msg.chroma);
         break;
-      // Rideable mounts: the Sim re-validates everything (catalog key, level
-      // gate, combat gate); the entity mirror + self `mnt` field carry the result.
-      case 'mount_select':
-        if (typeof msg.mount === 'string') sim.selectMountFor(pid, msg.mount);
-        break;
+      // Rideable mounts: the lesson-only toggle is server-authoritative; ordinary
+      // mounts are summoned through the equally authoritative use-item command.
       case 'mount_toggle':
         sim.toggleMountFor(pid);
         break;
@@ -6237,19 +6232,13 @@ export class GameServer {
     // shape used by the `/dev gather` chat cheat and existing consumers. Wire
     // key `gprof`; see TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts.
     maybe('gprof', this.sim.gatheringProficiencyFor(anchorSession.pid));
-    // The persisted mount pick (IWorldMounts.selectedMount; always a valid
-    // catalog key, the horse by default). Kept per-tick like the other small
-    // scalars: one short string, negligible diff. Wire key `mntSel`; `mnt`
-    // remains the separate active-mount identity field. See
-    // TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts.
-    maybe('mntSel', meta.selectedMount);
-    // The owned mount collection (IWorldMounts.ownedMounts): the horse plus
-    // every mount whose reins item sits in bags or bank. A handful of short
+    // The owned mount collection (IWorldMounts.ownedMounts): every mount whose
+    // reins item sits in bags or bank. A handful of short
     // strings whose serialized form only changes on a loot/bank move, so the
     // per-tick diff is negligible. Wire key `mntOwn`.
     maybe('mntOwn', this.sim.ownedMountsFor(anchorSession.pid));
     // Riding skill: persisted, so the client knows whether to show the riding
-    // trainer UI without waiting on a mount/select command to fail. Wire key
+    // trainer UI without waiting on a reins-use command to fail. Wire key
     // `mntRtd`; delta-guarded, only changes once (false to true, never back).
     maybe('mntRtd', meta.ridingTrained === true ? true : null);
     // Session-only lesson and race state must still reconcile after linkdead:

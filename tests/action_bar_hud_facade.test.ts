@@ -84,4 +84,26 @@ describe('Hud action-bar facade', () => {
     expect(hud.mobileHotbarDrag).toBeNull();
     expect(clearTimeout).toHaveBeenCalledWith(99);
   });
+
+  it('activates assigned reins through the shared item slot path', () => {
+    const useItem = vi.fn();
+    const flashActionSlot = vi.fn();
+    vi.stubGlobal('document', {
+      querySelector: () => ({ style: { display: 'none' } }),
+    });
+    const hud = Object.create(Hud.prototype) as any;
+    hud.isGroundAimActive = () => false;
+    hud.attackSlotIsAttack = () => false;
+    hud.actionForSlot = () => ({ type: 'item', id: 'reins_grag_bear' });
+    hud.isHotbarItemId = (id: string) => id === 'reins_grag_bear';
+    hud.tryGatherToolUse = () => false;
+    hud.sim = { tradeInfo: null, useItem };
+    hud.flashActionSlot = flashActionSlot;
+
+    hud.castSlot(1);
+
+    expect(useItem).toHaveBeenCalledTimes(1);
+    expect(useItem).toHaveBeenCalledWith('reins_grag_bear');
+    expect(flashActionSlot).toHaveBeenCalledWith(1);
+  });
 });

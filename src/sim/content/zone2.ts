@@ -1651,7 +1651,7 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     name: 'Reins of the Moss-Shell Stalk-Glider',
     kind: 'mount',
     mount: 'stalkglider_snail',
-    quality: 'common',
+    quality: 'rare',
     soulbound: true,
     noDiscard: true,
     sellValue: 0,

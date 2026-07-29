@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 844,
-      "state": "d385ebf1",
+      "state": "52e6c214",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -71,7 +71,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -144,7 +143,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 854,
-      "state": "accd34d2",
+      "state": "f0f9cc09",
       "events": "ca83effe",
       "rng": {
         "draws": 5,
@@ -155,7 +154,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 854,
-      "state": "0a421537",
+      "state": "d5ad99da",
       "events": "d7a0b421",
       "rng": {
         "draws": 5,
@@ -166,7 +165,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 854,
-      "state": "151582c5",
+      "state": "62e2cd78",
       "events": "97c64a25",
       "rng": {
         "draws": 8,
@@ -177,7 +176,7 @@
       "tick": 38,
       "time": 1.9,
       "nextId": 856,
-      "state": "86df7da0",
+      "state": "9bf13b17",
       "events": "c011fbc0",
       "rng": {
         "draws": 11,
@@ -279,7 +278,6 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "renown": 55,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -487,7 +485,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 856,
-      "state": "b404981e",
+      "state": "595ea37d",
       "events": "741638a5",
       "rng": {
         "draws": 11,
@@ -498,7 +496,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 856,
-      "state": "b404981e",
+      "state": "595ea37d",
       "events": "741638a5",
       "rng": {
         "draws": 11,
@@ -600,7 +598,6 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "renown": 55,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },

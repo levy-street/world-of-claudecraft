@@ -69,12 +69,13 @@ describe('show-jumping race UI wiring', () => {
     expect(hudCss).toContain('#banner .banner-subtext');
   });
 
-  it('shows the live mount key after the riding lesson quest is turned in', () => {
-    expect(hudTs).toContain("ev.questId === 'q_riding_lessons'");
-    expect(hudTs).toContain("t('hudChrome.mountTraining.ownedMountPrompt'");
-    expect(hudTs).toContain('key: this.mountKey()');
-    expect(hudTs).toContain("this.keybinds.primaryLabel('mount') || t('hud.options.unbound')");
-    expect(hudTs).not.toContain("this.keybinds.primaryLabel('mount') || 'Z'");
+  it('directs a completed riding student to buy reins instead of claiming they were rewarded', () => {
+    const questDone =
+      hudTs.match(/case 'questDone':([\s\S]*?)case 'chat':/)?.[1] ?? 'missing questDone branch';
+    expect(questDone).toContain("ev.questId === 'q_riding_lessons'");
+    expect(questDone).toContain("t('hudChrome.mountTraining.buyReinsPrompt')");
+    expect(questDone).not.toContain('ownedMountPrompt');
+    expect(questDone).not.toContain('key: this.mountKey()');
   });
 
   it('wraps long race banners within the viewport', () => {

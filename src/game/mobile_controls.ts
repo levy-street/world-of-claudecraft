@@ -146,8 +146,8 @@ export interface MobileControlCallbacks {
   onDailyRewards(): void;
   /** Open the Book of Deeds window, folded into the More tray on mobile. */
   onDeeds(): void;
-  /** Mount / dismount the picked mount directly, in the More tray (the pick
-   *  itself changes in the character sheet's mount picker). */
+  /** Dismount the active mount, or summon the lesson steed during training.
+   *  Ordinary mounts are summoned by using their reins item. */
   onMountToggle(): void;
   /** Open the Professions window, folded into the More tray on mobile. */
   onProfessions(): void;

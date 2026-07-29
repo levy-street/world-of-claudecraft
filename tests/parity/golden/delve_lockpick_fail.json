@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 844,
-      "state": "d385ebf1",
+      "state": "52e6c214",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -71,7 +71,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -144,7 +143,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 854,
-      "state": "04c221be",
+      "state": "4f4d265b",
       "events": "effd5056",
       "rng": {
         "draws": 3,
@@ -155,7 +154,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 854,
-      "state": "0384d454",
+      "state": "dcc1cd01",
       "events": "d7a0b421",
       "rng": {
         "draws": 3,
@@ -166,7 +165,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 854,
-      "state": "6dbd86c6",
+      "state": "f1099873",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -177,7 +176,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 854,
-      "state": "651d7288",
+      "state": "6f137955",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -188,7 +187,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 854,
-      "state": "df02b01e",
+      "state": "1759597b",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -199,7 +198,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 854,
-      "state": "e277dcc4",
+      "state": "17e643f1",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -210,7 +209,7 @@
       "tick": 69,
       "time": 3.45,
       "nextId": 855,
-      "state": "9f5dd080",
+      "state": "7d456afd",
       "events": "87de5f2a",
       "rng": {
         "draws": 3,
@@ -292,7 +291,6 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "renown": 25,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -403,7 +401,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 855,
-      "state": "54705e9a",
+      "state": "f93c0607",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -414,7 +412,7 @@
       "tick": 71,
       "time": 3.55,
       "nextId": 855,
-      "state": "ff8673d8",
+      "state": "d7f816e5",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -496,7 +494,6 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "renown": 25,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },

@@ -74,7 +74,6 @@ function windowFor(inventory: InvSlot[]): HTMLElement {
     markEquipDropTargets: noop,
     dropOnEquipSlot: noop,
     openItemActionMenu: noop,
-    openMountPicker: noop,
   };
   new BagsWindow(deps).render();
   return root;

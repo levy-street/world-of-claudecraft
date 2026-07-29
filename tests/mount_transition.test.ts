@@ -16,12 +16,7 @@ vi.mock('../server/db', () => ({
 
 import { wireEntity } from '../server/game';
 import { isBlocked, resolveMovement } from '../src/sim/colliders';
-import {
-  MOUNT_DISMOUNT_SECONDS,
-  MOUNT_SUMMON_SECONDS,
-  selectMount,
-  toggleMount,
-} from '../src/sim/mounts';
+import { MOUNT_SUMMON_SECONDS, summonMountItem, toggleMount } from '../src/sim/mounts';
 import { PLAYER_SWIM_DEPTH } from '../src/sim/pathfind';
 import {
   isSwimming,
@@ -58,7 +53,6 @@ function joinRider(sim: Sim, opts: { level?: number; x?: number; z?: number } = 
   const meta = sim.players.get(pid);
   if (meta) meta.ridingTrained = true;
   sim.addItem('reins_grag_bear', 1, pid);
-  selectMount(sim.ctx, pid, 'grag_bear');
   return pid;
 }
 
@@ -159,7 +153,7 @@ describe('mount summon/dismount transition', () => {
     const pid = joinRider(sim);
     const e = sim.entities.get(pid)!;
 
-    expect(toggleMount(sim.ctx, pid)).toBe(true);
+    expect(summonMountItem(sim.ctx, pid, 'grag_bear')).toBe(true);
     // The channel starts; the live mount is NOT flipped yet.
     expect(e.mountKey).toBe('');
     expect(e.mountCastRemaining).toBeCloseTo(MOUNT_SUMMON_SECONDS, 5);
@@ -185,7 +179,7 @@ describe('mount summon/dismount transition', () => {
     const e = sim.entities.get(pid)!;
     const meta = sim.meta(pid)!;
 
-    toggleMount(sim.ctx, pid);
+    summonMountItem(sim.ctx, pid, 'grag_bear');
     expect(e.mountCastRemaining).toBeGreaterThan(0); // channel started
     expect(e.mountCastKey).toBe('grag_bear');
 
@@ -202,9 +196,9 @@ describe('mount summon/dismount transition', () => {
     const pid = joinRider(sim);
     const e = sim.entities.get(pid)!;
 
-    expect(toggleMount(sim.ctx, pid)).toBe(true);
+    expect(summonMountItem(sim.ctx, pid, 'grag_bear')).toBe(true);
     const rem = e.mountCastRemaining;
-    expect(toggleMount(sim.ctx, pid)).toBe(false);
+    expect(summonMountItem(sim.ctx, pid, 'grag_bear')).toBe(false);
     expect(e.mountCastRemaining).toBe(rem); // channel untouched
     expect(e.mountCastKey).toBe('grag_bear');
     expect(e.mountKey).toBe('');
@@ -215,7 +209,7 @@ describe('mount summon/dismount transition', () => {
     const pid = joinRider(sim);
     const e = sim.entities.get(pid)!;
 
-    toggleMount(sim.ctx, pid);
+    summonMountItem(sim.ctx, pid, 'grag_bear');
     sim.tick(); // one tick of channel progress
     expect(e.mountCastRemaining).toBeGreaterThan(0);
 
@@ -236,7 +230,7 @@ describe('mount summon/dismount transition', () => {
     const pid = joinRider(sim);
     const e = sim.entities.get(pid)!;
 
-    toggleMount(sim.ctx, pid);
+    summonMountItem(sim.ctx, pid, 'grag_bear');
     sim.tick();
     expect(e.mountCastRemaining).toBeGreaterThan(0);
 
@@ -246,33 +240,28 @@ describe('mount summon/dismount transition', () => {
     expect(e.mountKey).toBe('');
   });
 
-  it('holds the mount through the dismount channel, rooted, then clears it', () => {
+  it('dismounts INSTANTLY with no channel, and never roots the player', () => {
     const sim = makeSim();
     const pid = joinRider(sim);
     const e = sim.entities.get(pid)!;
     const meta = sim.meta(pid)!;
     e.mountKey = 'grag_bear'; // start already mounted (skip the summon)
 
-    expect(toggleMount(sim.ctx, pid)).toBe(true); // start the dismount channel
-    expect(e.mountCastRemaining).toBeCloseTo(MOUNT_DISMOUNT_SECONDS, 5);
-    expect(e.mountCastKey).toBe(''); // a dismount carries no summon key
+    expect(toggleMount(sim.ctx, pid)).toBe(true);
+    // No channel at all: off the mount on the same call, not after N ticks.
+    expect(e.mountKey).toBe('');
+    expect(e.mountCastRemaining).toBe(0);
+    expect(e.mountCastKey).toBe('');
 
-    // mid-dismount: the mount is still ridden AND the player is rooted
+    // The old put-away channel rooted the player for its duration. Nothing roots
+    // them now, so movement input applies on the very next tick.
     meta.moveInput.forward = true;
     const start = { x: e.pos.x, z: e.pos.z };
     sim.tick();
-    expect(e.mountKey).toBe('grag_bear');
-    expect(e.pos.x).toBeCloseTo(start.x, 6);
-    expect(e.pos.z).toBeCloseTo(start.z, 6);
-
-    let ticks = 1;
-    while (e.mountCastRemaining > 0 && ticks < 200) {
-      sim.tick();
-      ticks++;
-    }
-    expect(e.mountKey).toBe(''); // now dismounted
-    expect(e.mountCastRemaining).toBe(0);
-    expect(ticks).toBe(channelTicks(MOUNT_DISMOUNT_SECONDS));
+    expect(
+      Math.hypot(e.pos.x - start.x, e.pos.z - start.z),
+      'a just-dismounted player moves immediately',
+    ).toBeGreaterThan(0);
   });
 
   it('force-dismounts a mounted player teleported into deep water', () => {
@@ -363,7 +352,7 @@ describe('mount transition on the entity wire', () => {
     expect(idle).not.toHaveProperty('mck');
 
     // mid-summon: both ride (mcr rounded to 2dp, mck names the summoned mount)
-    toggleMount(sim.ctx, pid);
+    summonMountItem(sim.ctx, pid, 'grag_bear');
     sim.tick();
     const summoning = wireEntity(e);
     expect(typeof summoning.mcr).toBe('number');
@@ -371,17 +360,19 @@ describe('mount transition on the entity wire', () => {
     expect(summoning.mck).toBe('grag_bear');
   });
 
-  it('carries mcr but omits mck during a dismount', () => {
+  it('a dismount puts NO channel on the wire (it is instant)', () => {
     const sim = makeSim();
     const pid = joinRider(sim);
     const e = sim.entities.get(pid)!;
     e.mountKey = 'grag_bear';
 
-    toggleMount(sim.ctx, pid); // start the dismount channel
-    const dismounting = wireEntity(e);
-    expect(typeof dismounting.mcr).toBe('number');
-    expect(dismounting.mcr as number).toBeGreaterThan(0);
-    expect(dismounting).not.toHaveProperty('mck'); // '' is omitted
+    toggleMount(sim.ctx, pid);
+    const dismounted = wireEntity(e);
+    // Both channel fields are omitted, and so is mnt: there is nothing to mirror
+    // because the dismount already completed.
+    expect(dismounted).not.toHaveProperty('mcr');
+    expect(dismounted).not.toHaveProperty('mck');
+    expect(dismounted).not.toHaveProperty('mnt');
   });
 });
 

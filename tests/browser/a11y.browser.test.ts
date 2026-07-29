@@ -593,10 +593,9 @@ describe('axe: social window', () => {
 // ---------------------------------------------------------------------------
 
 describe('axe: character window', () => {
-  it('paperdoll and populated mount picker are clean and preserve keyboard focus', async () => {
+  it('the current paperdoll sheet is clean and its controls remain keyboard reachable', async () => {
     const root = host('char-window');
     root.style.display = 'none';
-    let selectedMount = 'grag_bear';
     const win = new CharWindow(
       stubDeps({
         root: () => root,
@@ -606,11 +605,6 @@ describe('axe: character window', () => {
             player: { name: 'Aurelia', level: 12, skin: 0, mountKey: '' },
             equipment: {},
             professionsState: { skills: [] },
-            selectedMount: () => selectedMount,
-            ownedMounts: () => ['valorsteed', 'grag_bear', 'stalkglider_snail'],
-            selectMount: (key: string) => {
-              selectedMount = key;
-            },
           }) as never,
         statCellHtml: () => '',
         statTooltipHtml: () => '',
@@ -644,22 +638,13 @@ describe('axe: character window', () => {
     expect(previewName).toBe(t('hudChrome.character.modelPreview'));
     expect(previewName).not.toBe(titleSubtitle);
 
-    const selected = root.querySelector<HTMLElement>('[data-mount-key="grag_bear"]');
-    const locked = root.querySelector<HTMLElement>('[data-mount-key="valorsteed"]');
-    const pickable = root.querySelector<HTMLElement>('[data-mount-key="stalkglider_snail"]');
-    expect(selected?.tagName).toBe('DIV');
-    expect(selected?.tabIndex).toBe(0);
-    expect(locked?.tagName).toBe('DIV');
-    expect(locked?.tabIndex).toBe(0);
-    locked?.focus();
-    expect(locked?.dataset.tooltipOpened).toBe('true');
-
-    pickable?.focus();
-    pickable?.click();
-    expect(selectedMount).toBe('stalkglider_snail');
-    const freshSelected = root.querySelector<HTMLElement>('[data-mount-key="stalkglider_snail"]');
-    expect(document.activeElement).toBe(freshSelected);
-    expect(freshSelected?.dataset.tooltipOpened).toBe('true');
+    const skin = root.querySelector<HTMLElement>('#char-skin-row button');
+    expect(skin?.tagName).toBe('BUTTON');
+    skin?.focus();
+    expect(document.activeElement).toBe(skin);
+    const share = root.querySelector<HTMLElement>('[data-act="share-card"]');
+    expect(share?.tagName).toBe('BUTTON');
+    expect(share?.textContent?.trim()).not.toBe('');
     await expectClean(root);
   });
 });

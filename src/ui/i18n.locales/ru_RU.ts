@@ -9160,9 +9160,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.riding': 'Верхом',
   'hudChrome.mounts.mount': 'Сесть',
   'hudChrome.mounts.dismount': 'Спешиться',
-  'hudChrome.mounts.requiresLevel': 'Требуется {level} уровень',
-  'hudChrome.mounts.pickFirst': 'Выберите транспорт для езды.',
-  'hudChrome.mounts.keybindHint': 'Нажмите клавишу «Сесть / Спешиться», чтобы поехать.',
   'hudChrome.mounts.rarity_common': 'Обычный',
   'hudChrome.mounts.rarity_rare': 'Редкий',
   'hudChrome.mounts.rarity_epic': 'Эпический',
@@ -9193,10 +9190,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Достигните 20 уровня и возьмите урок верховой езды у старшей конюшей Марлы в конюшнях к западу от Хайвотча.',
   'hudChrome.mounts.emptyDropHint':
     'Более редких скакунов выбивают боссы героических подземелий или получают за прохождение Разломов.',
-  'hudChrome.mounts.clickManage': 'Нажмите, чтобы выбрать транспорт',
   'hudChrome.mountTraining.mountPrompt':
     'Нажми {key}, чтобы оседлать учебного Доблестного скакуна.',
-  'hudChrome.mountTraining.ownedMountPrompt': 'Нажми {key}, чтобы оседлать скакуна',
+  'hudChrome.mountTraining.buyReinsPrompt':
+    'Верховая езда изучена. Купите у Марлы поводья Доблестного скакуна за 10 золотых и используйте их, чтобы сесть верхом.',
+  'hudChrome.mounts.useToRide': 'Используйте, чтобы призвать это ездовое животное.',
   'hudChrome.mountTraining.ridePrompt':
     'Следуй за светящейся меткой к линии старта и нажми «Начать заезд».',
   'hudChrome.mountTraining.begin': 'Начать урок',

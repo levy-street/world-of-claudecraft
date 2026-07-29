@@ -679,7 +679,7 @@ export const TEMPLE_ITEMS: Record<string, ItemDef> = {
     name: 'Ignition Key: Aether-Jouster Hover-Cycle',
     kind: 'mount',
     mount: 'aether_hover_cycle',
-    quality: 'rare',
+    quality: 'epic',
     soulbound: true,
     noDiscard: true,
     sellValue: 0,

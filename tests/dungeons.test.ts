@@ -1320,17 +1320,20 @@ describe('dungeons: heroic boss drops', () => {
     expect(new Set(weaponIds).size).toBe(3);
     expect(weaponEntries.reduce((sum, e) => sum + e.chance, 0)).toBeCloseTo(1, 10);
     for (const id of weaponIds) expect(ITEMS[id]?.kind, id).toBe('weapon');
+    // The heroic raid carries the two RARE mounts and the two UNCOMMON ones. The
+    // hover-cycle is deliberately absent: it is epic now, and epic mounts are rift
+    // S-clear exclusive, so the raid must not be a back door to one.
     expect(mountEntries.map((e) => e.itemId).sort()).toEqual([
-      'reins_aether_hover_cycle',
       'reins_grag_bear',
       'reins_shadowjump_toad',
       'reins_stalkglider_snail',
+      'reins_stormfeather_griffin',
     ]);
-    // Blues at 0.1%, greens at 0.5% - check each individually.
+    // Rates follow rarity, derived rather than hand-listed: rare 0.1%, uncommon 0.5%.
     for (const e of mountEntries) {
-      const isBlue =
-        e.itemId === 'reins_aether_hover_cycle' || e.itemId === 'reins_shadowjump_toad';
-      expect(e.chance, `${e.itemId} chance`).toBe(isBlue ? 0.001 : 0.005);
+      const quality = ITEMS[e.itemId!]?.quality;
+      expect(quality, `${e.itemId} is a drop-tier mount`).not.toBe('epic');
+      expect(e.chance, `${e.itemId} (${quality}) chance`).toBe(quality === 'rare' ? 0.001 : 0.005);
     }
 
     const droppedWeapons = new Set<string>();

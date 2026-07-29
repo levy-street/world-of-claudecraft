@@ -32,7 +32,7 @@ import { formatMoney } from './format_money';
 import { moveStackToCell } from './inventory_order';
 import { canStackInstancePayloads, itemInstancePayloadsEqual } from './item_instance_merge';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
-import { mountOwned } from './mounts';
+import { mountOwned, summonMountItem } from './mounts';
 import { learnRiding } from './mounts_training';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
 import { useGatherToolItem } from './professions/gathering';
@@ -621,6 +621,12 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     equipItem(ctx, itemId, meta.entityId);
   } else if (def.kind === 'bag') {
     equipBagCmd(ctx, itemId, undefined, meta.entityId);
+  } else if (def.kind === 'mount') {
+    // Reins work like any other usable item: clicking them (bags or an action-bar
+    // slot) summons THAT mount. summonMountItem owns every gate, riding skill
+    // first. Reins are never consumed: mountOwned() derives ownership from holding
+    // the item, so removing it here would delete the mount.
+    summonMountItem(ctx, meta.entityId, def.mount);
   }
 }
 

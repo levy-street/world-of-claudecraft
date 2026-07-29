@@ -3148,9 +3148,9 @@ describe('online mount command and race-event transport', () => {
     actorMeta.ridingTrained = true;
     otherMeta.ridingTrained = true;
 
-    // Drive the real ClientWorld command adapter. The select payload is the
-    // fragile arm: both the command token and the `mount` field must arrive
-    // unchanged at the server dispatch.
+    // Drive the real ClientWorld command adapter. Every remaining mount command
+    // is payload-free now that mount_select is gone, so the fragile part is the
+    // command TOKEN arriving unchanged at the server dispatch.
     const outbox: string[] = [];
     const commandClient = bareClient(actor.pid);
     (commandClient as any).connected = true;
@@ -3158,25 +3158,22 @@ describe('online mount command and race-event transport', () => {
     (commandClient as any).entities.set(actor.pid, { level: 20 });
     const owned: MountKey[] = ['grag_bear'];
     (commandClient as any).selfOwnedMounts = owned;
-    commandClient.selectMount('grag_bear');
     commandClient.toggleMounted();
     commandClient.mountRaceStart();
     commandClient.mountRaceCancel();
     expect(outbox.map((payload) => JSON.parse(payload))).toEqual([
-      { t: 'cmd', cmd: 'mount_select', mount: 'grag_bear' },
       { t: 'cmd', cmd: 'mount_toggle' },
       { t: 'cmd', cmd: 'mount_race_start' },
       { t: 'cmd', cmd: 'mount_race_cancel' },
     ]);
 
+    // The toggle no longer summons: reins are items, so an unmounted toggle is a
+    // no-op and neither player starts a summon channel from it.
     server.handleMessage(actor, outbox[0]);
-    expect(actorMeta.selectedMount).toBe('grag_bear');
-    expect(otherMeta.selectedMount).toBe('valorsteed');
-    server.handleMessage(actor, outbox[1]);
-    expect(actorEntity.mountCastKey).toBe('grag_bear');
+    expect(actorEntity.mountCastKey).toBe('');
     expect(otherEntity.mountCastKey).toBe('');
 
-    // Put the actor at the course on the selected mount, then start through the
+    // Put the actor at the course already mounted, then start through the
     // client-built frame. The bystander must never gain a session or receive
     // the actor's personal race events.
     actorEntity.mountCastRemaining = 0;
@@ -3188,7 +3185,8 @@ describe('online mount command and race-event transport', () => {
     actorEntity.pos.z = MOUNT_RACE_START_PLATFORM.z;
     actorEntity.pos.y = terrainHeight(actorEntity.pos.x, actorEntity.pos.z, sim.cfg.seed);
     actorEntity.prevPos = { ...actorEntity.pos };
-    server.handleMessage(actor, outbox[2]);
+    // outbox[1] is mount_race_start (mount_select no longer occupies index 0).
+    server.handleMessage(actor, outbox[1]);
     expect(actorMeta.mountRace?.phase).toBe('countdown');
     expect(otherMeta.mountRace ?? null).toBeNull();
 
@@ -3217,7 +3215,7 @@ describe('online mount command and race-event transport', () => {
     expect(actorMeta.mountRace?.phase).toBe('racing');
     expect(mirror.mountRaceView()).toMatchObject({ phase: 'racing', cleared: 0 });
 
-    server.handleMessage(actor, outbox[3]);
+    server.handleMessage(actor, outbox[2]); // mount_race_cancel
     routeTick();
     feedNewActorFrames();
     expect(actorMeta.mountRace ?? null).toBeNull();
@@ -3300,7 +3298,6 @@ const ALL_DELTA_KEYS = [
   'mntOwn',
   'mntRace',
   'mntRtd',
-  'mntSel',
   'mst',
   'ncd',
   'party',
@@ -3372,7 +3369,6 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   mntOwn: 'ownedMounts',
   mntRace: 'mountRaceView',
   mntRtd: 'ridingTrained',
-  mntSel: 'selectedMount',
   mres: 'maxResource',
   mst: 'activeMobileStationCraft',
   party: 'partyInfo',
@@ -3508,7 +3504,6 @@ function dirtyEveryDeltaField(): {
   meta.nodeHarvestReadyAt[GATHER_NODES[0].id] = sim.time + 30;
   meta.delveDaily = { date: '2099-01-01', firstClearXp: new Set(['x']), markClears: 4 };
   meta.talents = { spec: 'arms', rows: {} };
-  meta.selectedMount = 'grag_bear';
   meta.ridingTrained = true; // dirties mntRtd (the purchased riding skill)
   meta.mountTraining = {
     sessionId: 'mt_wire_fixture',
@@ -3786,8 +3781,6 @@ describe('full self-state snapshot delta fixture', () => {
     // mnt is active identity only: a persisted pick must not make a dismounted
     // online player render or move as mounted.
     expect(client.player.mountKey).toBe('');
-    // mntSel -> selfSelectedMount (private), via the selectedMount() accessor
-    expect(client.selectedMount()).toBe('grag_bear');
     // mntOwn -> selfOwnedMounts (private), via the ownedMounts() accessor. The
     // horse is no longer auto-owned, so the collection is exactly what the reins
     // item in the seeded inventory grants (server ownedMountsFor -> wire -> mirror).
@@ -3936,12 +3929,13 @@ describe('full self-state snapshot delta fixture', () => {
     broadcast(server);
     const snapshot = lastSnap(fc.sent);
     expect(snapshot.self.mnt).toBe('valorsteed');
-    expect(snapshot.self.mntSel).toBe('grag_bear');
+    // There is no persisted pick any more: mntSel left the wire when reins became
+    // usable items, so the active mount is the only mount field on the snapshot.
+    expect(snapshot.self).not.toHaveProperty('mntSel');
 
     const client = bareClient(leader.pid);
     (client as any).applySnapshot(snapshot);
     expect(client.player.mountKey).toBe('valorsteed');
-    expect(client.selectedMount()).toBe('grag_bear');
   });
 
   it('flips mst to null when the mobile station expires (server-side tick-domain check)', () => {
@@ -4061,8 +4055,8 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 
 describe('delta-key contract pins (anti-drift)', () => {
   it('ALL_DELTA_KEYS contains exactly 62 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(62);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(62);
+    expect(ALL_DELTA_KEYS).toHaveLength(61);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(61);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -4084,7 +4078,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The v0.31 base-merge union: the release's 56 (incl. the market-collect
     // key mktU) plus the Rift + mounts and worn-instance keys (einst, mntRtd
     // and the rift snapshot fragments).
-    expect(scraped.size).toBe(62);
+    expect(scraped.size).toBe(61);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -4109,7 +4103,6 @@ describe('delta-key contract pins (anti-drift)', () => {
       mntLesson: 'mountLessonActive',
       mntRace: 'mountRaceView',
       mntRtd: 'ridingTrained',
-      mntSel: 'selectedMount',
     };
     for (const [terse, iworld] of Object.entries(required)) {
       expect(TERSE_TO_IWORLD[terse], `rename ${terse} -> ${iworld} drifted`).toBe(iworld);

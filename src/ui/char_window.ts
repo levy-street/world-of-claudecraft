@@ -18,7 +18,6 @@
 // raw hex sits in this painter.
 
 import { audio } from '../game/audio';
-import type { MountKey } from '../sim/content/mounts';
 import { ITEMS } from '../sim/data';
 import type { EquipSlot } from '../sim/types';
 import type { IWorld } from '../world_api';
@@ -33,8 +32,6 @@ import { formatNumber, type TranslationKey, t } from './i18n';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
 import type { ItemDragState } from './item_drag_state';
 import { wornTooltipInstance } from './item_instance_tooltip';
-import { mountPickerHtml, wireMountPicker } from './mount_picker';
-import { buildMountPickerView } from './mount_picker_view';
 import type { PainterHostPresentation } from './painter_host';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import { archetypeImageUrl, professionImageUrl } from './profession_art';
@@ -169,9 +166,6 @@ const SHARE_GLYPH =
 
 export class CharWindow {
   private openerFocus: HTMLElement | null = null;
-  // One-shot: the mount card to ring + scroll to on the next render (a bag
-  // click on a reins item lands here). Cleared after that render paints it.
-  private highlightMountKey = '';
 
   constructor(private readonly deps: CharWindowDeps) {}
 
@@ -201,27 +195,6 @@ export class CharWindow {
 
   renderIfOpen(): void {
     if (this.isOpen) this.render();
-  }
-
-  /** Open (or re-render) the sheet with one mount picker card highlighted and
-   *  scrolled into view: the bag click on a collected reins item routes here. */
-  openHighlightingMount(key: string): void {
-    this.highlightMountKey = key;
-    if (this.isOpen) this.render();
-    else this.toggle();
-    // Defer the scroll: at open time the sheet was rendered while still hidden
-    // and its late fragments (preview canvas mount, portrait hydration) have
-    // not landed, so a synchronous scrollIntoView sees a not-yet-overflowing
-    // box and no-ops. One rAF for the first laid-out frame, plus one late
-    // re-assert once the async fragments have settled the sheet's height.
-    const scroll = () => {
-      this.deps
-        .root()
-        .querySelector<HTMLElement>('.mp-highlight')
-        ?.scrollIntoView({ block: 'nearest' });
-    };
-    requestAnimationFrame(scroll);
-    window.setTimeout(scroll, 400);
   }
 
   render(): void {
@@ -266,15 +239,6 @@ export class CharWindow {
     html += this.deps.talentSummaryHtml();
     html += this.deps.progressionHtml(p.level);
     html += this.gatheringHtml(world);
-    // The mount picker (mount_picker_view.ts core + mount_picker.ts section):
-    // the collection lives here now, in the sheet, not in a window of its own.
-    const mountView = buildMountPickerView(
-      p.level,
-      world.selectedMount(),
-      p.mountKey ?? '',
-      world.ownedMounts(),
-    );
-    html += mountPickerHtml(mountView, this.highlightMountKey);
     html += `<div class="pc-share-row"><button type="button" class="btn pc-share-btn" data-act="share-card">${SHARE_GLYPH}<span>${esc(t('playerCard.shareButton'))}</span></button></div>`;
     el.innerHTML = html;
     hydratePortraits(el);
@@ -301,29 +265,6 @@ export class CharWindow {
       // player's current stats at the moment they hover, not at render time.
       this.deps.attachTooltip(cell, () => this.deps.statTooltipHtml(stat));
     }
-
-    const pickerRoot = el.querySelector<HTMLElement>('.mount-picker');
-    if (pickerRoot) {
-      wireMountPicker(pickerRoot, mountView, {
-        selectMount: (key) => {
-          world.selectMount(key as MountKey);
-          audio.click();
-          this.deps.hideTooltip();
-        },
-        rerender: (key, keyboardInitiated) => {
-          const scrollTop = el.scrollTop;
-          this.render();
-          el.scrollTop = scrollTop;
-          const selected = Array.from(el.querySelectorAll<HTMLElement>('[data-mount-key]')).find(
-            (card) => card.dataset.mountKey === key,
-          );
-          selected?.focus({ preventScroll: true });
-          if (!keyboardInitiated) this.deps.hideTooltip();
-        },
-        attachTooltip: (cardEl, htmlFn) => this.deps.attachTooltip(cardEl, htmlFn),
-      });
-    }
-    this.highlightMountKey = '';
 
     this.deps.renderPreview();
     this.deps.renderSkinPicker();

@@ -8191,9 +8191,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.riding': 'In sella',
   'hudChrome.mounts.mount': 'Monta',
   'hudChrome.mounts.dismount': 'Smonta',
-  'hudChrome.mounts.requiresLevel': 'Richiede livello {level}',
-  'hudChrome.mounts.pickFirst': 'Scegli una cavalcatura da cavalcare.',
-  'hudChrome.mounts.keybindHint': 'Premi il tasto Monta / Smonta per cavalcare.',
   'hudChrome.mounts.rarity_common': 'Comune',
   'hudChrome.mounts.rarity_rare': 'Rara',
   'hudChrome.mounts.rarity_epic': 'Epica',
@@ -8224,7 +8221,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Raggiungi il livello 20 e prendi lezioni di equitazione dalla Stalliera capo Marla alle stalle a ovest di Highwatch.',
   'hudChrome.mounts.emptyDropHint':
     'Le cavalcature più rare sono bottino dei boss di spedizione e incursione.',
-  'hudChrome.mounts.clickManage': 'Clicca per scegliere la tua cavalcatura',
+  'hudChrome.mounts.useToRide': 'Usa per evocare questa cavalcatura.',
   'guide.bestiary.flavor.sethrael_palecoil':
     "Un serpente pallido come l'osso che scivola lungo la piattaforma profonda del Glimmermere, guardiano silenzioso delle acque che ha reclamato. Chi nuota nel lago in sua compagnia di rado torna a galla.",
   'guide.combat.metersBody':

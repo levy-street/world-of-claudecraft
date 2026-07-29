@@ -31,7 +31,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 847,
-      "state": "ebf966c6",
+      "state": "826a7e3a",
       "events": "a9993ed2",
       "rng": {
         "draws": 0,
@@ -42,7 +42,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 847,
-      "state": "0c569f0f",
+      "state": "04d12a6b",
       "events": "a251f2f9",
       "rng": {
         "draws": 68,
@@ -53,7 +53,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 847,
-      "state": "2d1d8481",
+      "state": "8206a18d",
       "events": "2b57d341",
       "rng": {
         "draws": 285,
@@ -64,7 +64,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 847,
-      "state": "e332a20e",
+      "state": "abe9c562",
       "events": "623e5ee1",
       "rng": {
         "draws": 538,
@@ -75,7 +75,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 847,
-      "state": "5ced22cf",
+      "state": "84a7e25f",
       "events": "93b56656",
       "rng": {
         "draws": 550,
@@ -140,7 +140,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {
               "5": "war_row_double_charge",
@@ -210,7 +209,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {
               "5": "mag_r5_ice_floes",
@@ -278,7 +276,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {
               "5": "rog_r5_relentless_strikes",
@@ -348,7 +345,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {
               "5": "hun_r5_improved_serpent_sting",
@@ -591,7 +587,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 847,
-      "state": "88818823",
+      "state": "2a87dd83",
       "events": "47b2f082",
       "rng": {
         "draws": 550,
@@ -656,7 +652,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {
               "5": "war_row_double_charge",
@@ -726,7 +721,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {
               "5": "mag_r5_ice_floes",
@@ -794,7 +788,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {
               "5": "rog_r5_relentless_strikes",
@@ -864,7 +857,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {
               "5": "hun_r5_improved_serpent_sting",
@@ -1105,7 +1097,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 847,
-      "state": "3a05f878",
+      "state": "4d320060",
       "events": "0c83776b",
       "rng": {
         "draws": 550,
@@ -1173,7 +1165,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {
               "5": "war_row_double_charge",
@@ -1243,7 +1234,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {
               "5": "mag_r5_ice_floes",
@@ -1312,7 +1302,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {
               "5": "rog_r5_relentless_strikes",
@@ -1382,7 +1371,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {
               "5": "hun_r5_improved_serpent_sting",
@@ -1623,7 +1611,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 847,
-      "state": "9fef0572",
+      "state": "9226887a",
       "events": "741638a5",
       "rng": {
         "draws": 797,
@@ -1634,7 +1622,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 847,
-      "state": "33c3982d",
+      "state": "26894b3d",
       "events": "741638a5",
       "rng": {
         "draws": 986,
@@ -1702,7 +1690,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {
               "5": "war_row_double_charge",
@@ -1772,7 +1759,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {
               "5": "mag_r5_ice_floes",
@@ -1841,7 +1827,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {
               "5": "rog_r5_relentless_strikes",
@@ -1911,7 +1896,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {
               "5": "hun_r5_improved_serpent_sting",

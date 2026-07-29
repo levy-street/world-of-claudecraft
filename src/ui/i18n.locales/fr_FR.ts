@@ -8638,9 +8638,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.riding': 'En selle',
   'hudChrome.mounts.mount': 'Monter',
   'hudChrome.mounts.dismount': 'Descendre',
-  'hudChrome.mounts.requiresLevel': 'Niveau {level} requis',
-  'hudChrome.mounts.pickFirst': 'Choisissez une monture à chevaucher.',
-  'hudChrome.mounts.keybindHint': 'Appuyez sur la touche Monter / Descendre pour chevaucher.',
   'hudChrome.mounts.rarity_common': 'Commune',
   'hudChrome.mounts.rarity_rare': 'Rare',
   'hudChrome.mounts.rarity_epic': 'Épique',
@@ -8671,7 +8668,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Atteignez le niveau 20 et prenez des leçons d’équitation auprès de la Maîtresse d’écurie Marla aux écuries à l’ouest de Highwatch.',
   'hudChrome.mounts.emptyDropHint':
     'Les montures plus rares sont lâchées par les boss de donjon et de raid.',
-  'hudChrome.mounts.clickManage': 'Cliquez pour choisir votre monture',
+  'hudChrome.mounts.useToRide': 'Utilisez pour invoquer cette monture.',
   'guide.bestiary.flavor.sethrael_palecoil':
     "Un serpent d'une pâleur d'os qui glisse dans les profondeurs du Glimmermere, gardien silencieux de l'eau qu'il a faite sienne. Les nageurs qui partagent le lac avec lui refont rarement surface.",
   'guide.combat.metersBody':

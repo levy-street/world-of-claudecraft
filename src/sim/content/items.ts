@@ -384,7 +384,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: 'Reins of the Goliath Grag-Bear',
     kind: 'mount',
     mount: 'grag_bear',
-    quality: 'common',
+    quality: 'rare',
     soulbound: true,
     noDiscard: true,
     sellValue: 0,

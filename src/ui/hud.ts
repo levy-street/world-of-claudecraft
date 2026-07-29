@@ -442,7 +442,7 @@ import {
 import { type MobTooltipI18n, type MobTooltipModel, mobTooltipHtml } from './mob_tooltip_view';
 import { isMobileFullscreenWindowOpen } from './mobile_fullscreen_window_core';
 import { MobileMoreDialogController } from './mobile_more_dialog';
-import { MOUNT_DESC_KEYS, mountSpecLines } from './mount_picker';
+import { MOUNT_DESC_KEYS, mountSpecLines } from './mount_labels';
 import { MountRaceControls } from './mount_race_controls';
 import { MountRaceStrip } from './mount_race_strip';
 import { MovableFrame } from './movable_frame';
@@ -3892,7 +3892,6 @@ export class Hud {
     stageMarketSell: (itemId) => this.marketWindow.stageSell(itemId),
     stageMailParcel: (itemId) => this.mailboxWindow.stageParcel(itemId),
     insertItemChatLink: (itemId) => this.insertItemChatLink(itemId),
-    openMountPicker: (mountKey) => this.openCharacterWithMount(mountKey),
     showError: (text) => this.showError(text),
     setPendingPetFeed: (active) => {
       this.pendingPetFeed = active;
@@ -5032,8 +5031,7 @@ export class Hud {
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.questItem'))}</div>`;
     if (item.kind === 'bag' && item.bagSlots)
       html += `<div class="tt-stat">${esc(t('itemUi.tooltip.bagSlots', { slots: itemNumber(item.bagSlots) }))}</div>`;
-    // Collectible mount reins: the mount's flavor + specialty numbers + its
-    // ride-level gate (red below the gate, like gear's requires-level line).
+    // Collectible mount reins: the mount's flavor, speed, and item-use hint.
     if (item.kind === 'mount') {
       const mountDef = MOUNTS[item.mount];
       if (mountDef) {
@@ -5043,8 +5041,9 @@ export class Hud {
           speedPct: Math.round(mountDef.moveSpeedPct * 100),
         }))
           html += `<div class="tt-green">${esc(line)}</div>`;
-        const meets = this.sim.player.level >= mountDef.level;
-        html += `<div class="${meets ? 'tt-sub' : 'tt-red'}">${esc(t('hudChrome.mounts.requiresLevel', { level: mountDef.level }))}</div>`;
+        // No per-mount level gate any more: the only requirement is the riding
+        // skill, so the tooltip says how to ride instead of quoting a level.
+        html += `<div class="tt-sub">${esc(t('hudChrome.mounts.useToRide'))}</div>`;
       }
     }
     const requiredClasses = requiredClassesForTooltip(item);
@@ -10401,7 +10400,7 @@ export class Hud {
           sfx.playUi('quest_complete');
           if (ev.questId === 'q_riding_lessons') {
             this.showBanner(
-              t('hudChrome.mountTraining.ownedMountPrompt', { key: this.mountKey() }),
+              t('hudChrome.mountTraining.buyReinsPrompt'),
               true,
               undefined,
               undefined,
@@ -13185,12 +13184,6 @@ export class Hud {
       marketOpen: this.marketWindow.isOpen,
     });
     document.body.classList.toggle('char-bags-paired', paired);
-  }
-
-  /** Open the character sheet with one mount picker card highlighted (the bag
-   *  click on a collected reins item routes here). */
-  openCharacterWithMount(key: string): void {
-    this.charWindow.openHighlightingMount(key);
   }
 
   private renderCharPreview(): void {

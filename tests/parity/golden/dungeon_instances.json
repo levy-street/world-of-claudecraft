@@ -31,7 +31,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 859,
-      "state": "6291921b",
+      "state": "1721d4eb",
       "events": "e6899ed6",
       "rng": {
         "draws": 39,
@@ -95,7 +95,6 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "renown": 5,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -160,7 +159,6 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "renown": 5,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -905,7 +903,7 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 859,
-      "state": "849965bf",
+      "state": "068a462f",
       "events": "6e1ca117",
       "rng": {
         "draws": 42,
@@ -981,7 +979,6 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "renown": 15,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -1046,7 +1043,6 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "renown": 5,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -1782,7 +1778,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 859,
-      "state": "e0bf93e8",
+      "state": "fc8fed36",
       "events": "17a7defb",
       "rng": {
         "draws": 42,
@@ -1793,7 +1789,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 859,
-      "state": "2852c531",
+      "state": "0f179d07",
       "events": "741638a5",
       "rng": {
         "draws": 42,
@@ -1804,7 +1800,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 859,
-      "state": "748e1ce3",
+      "state": "47efabe9",
       "events": "741638a5",
       "rng": {
         "draws": 42,
@@ -1815,7 +1811,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 859,
-      "state": "807aa733",
+      "state": "d82e13f9",
       "events": "5b11cae4",
       "rng": {
         "draws": 42,
@@ -1826,7 +1822,7 @@
       "tick": 24,
       "time": 1.2,
       "nextId": 859,
-      "state": "793288cb",
+      "state": "10ad10b1",
       "events": "741638a5",
       "rng": {
         "draws": 42,
@@ -1902,7 +1898,6 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "renown": 15,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -1979,7 +1974,6 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "renown": 15,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -2095,7 +2089,7 @@
       "tick": 24,
       "time": 1.2,
       "nextId": 859,
-      "state": "793288cb",
+      "state": "10ad10b1",
       "events": "741638a5",
       "rng": {
         "draws": 42,
@@ -2171,7 +2165,6 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "renown": 15,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -2248,7 +2241,6 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "renown": 15,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },

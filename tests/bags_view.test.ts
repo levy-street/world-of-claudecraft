@@ -38,6 +38,13 @@ const ITEMS: Record<string, ItemDef> = {
   questItem: { kind: 'quest', name: 'Relic', quality: 'epic' } as ItemDef,
   bound: { kind: 'armor', name: 'Bound Plate', quality: 'uncommon', noMarketList: true } as ItemDef,
   rod: { kind: 'tool', name: 'Fishing Rod', use: { type: 'fishing' } } as ItemDef,
+  reins: {
+    id: 'reins_grag_bear',
+    kind: 'mount',
+    mount: 'grag_bear',
+    name: 'Reins of the Goliath Grag-Bear',
+    quality: 'rare',
+  } as ItemDef,
   soulbound: { kind: 'quest', name: 'Soulbound Key', quality: 'epic', noDiscard: true } as ItemDef,
   mark: {
     kind: 'tool',
@@ -288,6 +295,9 @@ describe('bagTooltipHintKey', () => {
     expect(bagTooltipHintKey(ITEMS.bread, NO_MODE)).toBe('itemUi.tooltip.clickConsume');
     expect(bagTooltipHintKey(ITEMS.potion, NO_MODE)).toBe('itemUi.tooltip.clickUseInstant');
     expect(bagTooltipHintKey(ITEMS.rod, NO_MODE)).toBe('itemUi.tooltip.clickUse');
+    // The base reins tooltip already carries the use-to-summon line; bags must
+    // not append a duplicate action hint.
+    expect(bagTooltipHintKey(ITEMS.reins, NO_MODE)).toBe('');
     expect(bagTooltipHintKey({ kind: 'junk' }, NO_MODE)).toBe('');
   });
 });

@@ -556,14 +556,20 @@ describe('ActionBarController persistence seam', () => {
   });
 });
 
-describe('isHotbarItemId: gathering implements are placeable (#2343)', () => {
-  it('admits every gathering implement shape alongside the consumable kinds', () => {
+describe('isHotbarItemId: reusable item actions are placeable', () => {
+  it('admits mount reins and every gathering implement shape alongside consumables', () => {
     const { controller } = makeHarness('warrior', [], []);
     // Gathering tools (picks/axes/sickles) and the tiered rods are gatherTool
     // items; the simple pole rides the pre-existing use.type 'fishing' arm.
     expect(controller.isHotbarItemId('copper_mining_pick')).toBe(true);
     expect(controller.isHotbarItemId('silverstream_fishing_rod')).toBe(true);
     expect(controller.isHotbarItemId('simple_fishing_pole')).toBe(true);
+    expect(controller.isHotbarItemId('reins_grag_bear')).toBe(true);
+    expect(controller.isAssignableAction({ type: 'item', id: 'reins_grag_bear' })).toBe(true);
+    const withReins = bar();
+    withReins[0] = { type: 'item', id: 'reins_grag_bear' };
+    controller.replaceActions(withReins);
+    expect(controller.actionForSlot(1)).toEqual({ type: 'item', id: 'reins_grag_bear' });
     // Regression companions: the consumable arms and the non-usable negative.
     expect(controller.isHotbarItemId('lesser_healing_potion')).toBe(true);
     expect(controller.isHotbarItemId('copper_ore')).toBe(false);

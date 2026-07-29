@@ -70,7 +70,9 @@ function beginLesson(sim: Sim): void {
 }
 
 /** Summon the training Valorsteed and run the channel to completion; the lesson
- * advances to the 'ride' phase (it no longer completes here). */
+ * advances to the 'ride' phase (it no longer completes here). The lesson steed is
+ * UNOWNED, so there is no reins item to click: this is the one path where the
+ * Mount/Dismount keybind still summons. */
 function mountSteed(sim: Sim): void {
   sim.toggleMounted();
   const meta = metaOf(sim);
@@ -172,7 +174,7 @@ describe('riding lesson, begin gates', () => {
     const sim = makeSim();
     setupAtMarla(sim);
     sim.addItem('reins_valorsteed', 1, sim.playerId);
-    sim.toggleMounted();
+    sim.useItem('reins_valorsteed');
     for (let i = 0; i < 80 && sim.player.mountKey === ''; i++) sim.tick();
     expect(sim.player.mountKey).toBe('valorsteed');
     standAtMarla(sim);
@@ -497,15 +499,12 @@ describe('new-player path: buy riding at Marla, then complete the lesson', () =>
     expect(meta.copper).toBe(0);
     expect(meta.inventory.some((s) => s.itemId === 'reins_valorsteed')).toBe(true);
 
-    // selectMount and toggleMount of the valorsteed work now that reins are owned.
-    sim.selectMount('valorsteed');
-    expect(meta.selectedMount).toBe('valorsteed');
-
-    // Verify toggleMount summons the valorsteed (channel runs, mountKey set).
-    // Abort the active lesson first so the toggle is not blocked by it.
+    // Reins are usable items now: USING the reward reins summons the horse, with
+    // no select step and no keybind. Abort the lesson first so the training-steed
+    // branch cannot be what mounts us.
     sim.mountTrainAbortFor(sim.playerId);
     sim.tick();
-    sim.toggleMounted();
+    sim.useItem('reins_valorsteed');
     for (let i = 0; i < 80 && sim.player.mountKey === ''; i++) sim.tick();
     expect(sim.player.mountKey).toBe('valorsteed');
   }, 20000);

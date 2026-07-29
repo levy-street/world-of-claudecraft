@@ -681,11 +681,10 @@ export const hudChromeStrings = {
     // Rideable mounts: the Z toggle (opens the stable while nothing is picked).
     mount: 'Mount / Dismount',
   },
-  // The character sheet's mount picker (mount_picker.ts; the old Mounts window
-  // is retired, its keys stay per the retired-but-translated chrome precedent).
-  // Names and descriptions come from the reference cards
+  // Rideable mount labels and shared reins affordances. Names and descriptions
+  // come from the reference cards
   // (src/sim/content/mounts.ts carries the canonical English names for the sim
-  // side); clickManage is the bag tooltip hint on a collected reins item.
+  // side); useToRide is shared by every reins tooltip surface.
   mounts: {
     title: 'Mounts',
     close: 'Close',
@@ -694,9 +693,10 @@ export const hudChromeStrings = {
     riding: 'Riding',
     mount: 'Mount',
     dismount: 'Dismount',
-    requiresLevel: 'Requires level {level}',
-    pickFirst: 'Pick a mount to ride.',
-    keybindHint: 'Press the Mount / Dismount key to ride.',
+    // Reins are usable items: the bag tooltip tells the player to use them. There
+    // is no per-mount level gate and no picker, so the old requiresLevel /
+    // pickFirst / keybindHint lines went with them.
+    useToRide: 'Use to summon this mount.',
     // The empty state, shown when the player owns no mount yet: a heading plus
     // how to earn a first one (the stablemaster's riding lessons) and the rarer
     // boss-drop mounts.
@@ -704,7 +704,6 @@ export const hudChromeStrings = {
     emptyStableHint:
       'Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.',
     emptyDropHint: 'Rarer mounts drop from heroic dungeon bosses and Rift completions.',
-    clickManage: 'Click to choose your mount',
     rarity_common: 'Common',
     rarity_rare: 'Rare',
     rarity_epic: 'Epic',
@@ -735,7 +734,10 @@ export const hudChromeStrings = {
   // the current flow starts on the glowing race platform.
   mountTraining: {
     mountPrompt: 'Press {key} to mount the training Valorsteed.',
-    ownedMountPrompt: 'Press {key} to mount',
+    // Shown once the riding lesson is turned in. The quest teaches riding but
+    // awards no reins; Marla sells the Valorsteed item separately.
+    buyReinsPrompt:
+      'Riding learned. Buy Valorsteed reins from Marla for 10 gold, then use them to ride.',
     ridePrompt: 'Follow the glowing marker to the start line, then press Start Race.',
     begin: 'Begin Lesson',
     success: 'You have tamed the Valorsteed.',

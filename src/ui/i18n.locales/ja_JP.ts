@@ -9011,9 +9011,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.riding': '騎乗中',
   'hudChrome.mounts.mount': '騎乗',
   'hudChrome.mounts.dismount': '降りる',
-  'hudChrome.mounts.requiresLevel': 'レベル{level}が必要',
-  'hudChrome.mounts.pickFirst': '騎乗するマウントを選んでください。',
-  'hudChrome.mounts.keybindHint': '騎乗 / 降車キーで騎乗します。',
   'hudChrome.mounts.rarity_common': 'コモン',
   'hudChrome.mounts.rarity_rare': 'レア',
   'hudChrome.mounts.rarity_epic': 'エピック',
@@ -9041,9 +9038,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'レベル20に到達し、ハイウォッチ西の厩舎で厩舎長マーラの乗馬レッスンを受けましょう。',
   'hudChrome.mounts.emptyDropHint':
     'より希少なマウントはヒロイックダンジョンのボスからドロップするか、リフトの完了で入手できます。',
-  'hudChrome.mounts.clickManage': 'クリックしてマウントを選択',
   'hudChrome.mountTraining.mountPrompt': '{key} キーを押して訓練用ヴァロースティードに騎乗する。',
-  'hudChrome.mountTraining.ownedMountPrompt': '{key} キーを押して騎乗する',
+  'hudChrome.mountTraining.buyReinsPrompt':
+    '騎乗を習得しました。マーラから10ゴールドでヴァロースティードの手綱を購入し、使用して騎乗しましょう。',
+  'hudChrome.mounts.useToRide': '使用してこの騎乗生物を呼び出します。',
   'hudChrome.mountTraining.ridePrompt':
     '光る目印をたどってスタートラインへ向かい、「レース開始」を押そう。',
   'hudChrome.mountTraining.begin': 'レッスン開始',

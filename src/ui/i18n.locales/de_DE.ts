@@ -8142,9 +8142,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.riding': 'Im Sattel',
   'hudChrome.mounts.mount': 'Aufsitzen',
   'hudChrome.mounts.dismount': 'Absitzen',
-  'hudChrome.mounts.requiresLevel': 'Benötigt Stufe {level}',
-  'hudChrome.mounts.pickFirst': 'Wählt ein Reittier zum Reiten.',
-  'hudChrome.mounts.keybindHint': 'Drückt die Aufsitzen-/Absitzen-Taste, um zu reiten.',
   'hudChrome.mounts.rarity_common': 'Verbreitet',
   'hudChrome.mounts.rarity_rare': 'Selten',
   'hudChrome.mounts.rarity_epic': 'Episch',
@@ -8175,7 +8172,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Erreicht Stufe 20 und nehmt bei Stallmeisterin Marla in den Ställen westlich von Highwatch Reitstunden.',
   'hudChrome.mounts.emptyDropHint':
     'Seltenere Reittiere lassen Dungeon- und Schlachtzugsbosse fallen.',
-  'hudChrome.mounts.clickManage': 'Anklicken, um Euer Reittier zu wählen',
+  'hudChrome.mounts.useToRide': 'Benutzen, um dieses Reittier zu beschwören.',
   'guide.bestiary.flavor.sethrael_palecoil':
     'Eine knochenbleiche Schlange, die über den tiefen Grund des Glimmermere gleitet, stiller Wächter des Wassers, das sie für sich beansprucht hat. Schwimmer, die den See mit ihr teilen, tauchen selten wieder auf.',
   'guide.combat.metersBody':

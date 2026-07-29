@@ -19,7 +19,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 844,
-      "state": "89b1a79d",
+      "state": "b9cf54c0",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -74,7 +74,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -151,7 +150,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 844,
-      "state": "2713a20c",
+      "state": "fc6b8f4b",
       "events": "da29771b",
       "rng": {
         "draws": 0,
@@ -210,7 +209,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -287,7 +285,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 844,
-      "state": "14e878ae",
+      "state": "5fdd9dbd",
       "events": "ee1fc8c7",
       "rng": {
         "draws": 1,
@@ -366,7 +364,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -444,7 +441,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 844,
-      "state": "9a8e8ff2",
+      "state": "06d3dea1",
       "events": "2a1ee7b6",
       "rng": {
         "draws": 2,
@@ -565,7 +562,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -643,7 +639,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 844,
-      "state": "e6c782de",
+      "state": "3c4e02ed",
       "events": "ee1fc8c7",
       "rng": {
         "draws": 3,
@@ -762,7 +758,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -840,7 +835,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 844,
-      "state": "e6c782de",
+      "state": "3c4e02ed",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -959,7 +954,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },

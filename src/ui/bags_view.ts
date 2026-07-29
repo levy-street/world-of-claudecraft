@@ -68,7 +68,6 @@ export type BagAction =
   | 'petFeedBlocked'
   | 'discardQuest'
   | 'equipBag'
-  | 'openMountPicker'
   | 'use';
 
 /** The tooltip hint sub-line i18n key for a bag item (or '' for no hint). */
@@ -82,7 +81,6 @@ export type BagTooltipHintKey =
   | 'hudChrome.bank.depositHint'
   | 'hudChrome.bank.cannotDeposit'
   | 'itemUi.tooltip.clickDestroy'
-  | 'hudChrome.mounts.clickManage'
   | 'itemUi.tooltip.clickEquip'
   | 'itemUi.tooltip.clickConsume'
   | 'itemUi.tooltip.clickUseInstant'
@@ -115,9 +113,9 @@ export function bagItemAction(item: BagItemInfo, mode: BagMode): BagAction {
   if (mode.petFeed) return item.kind === 'food' ? 'petFeed' : 'petFeedBlocked';
   if (item.kind === 'quest') return 'discardQuest';
   if (item.kind === 'bag') return 'equipBag';
-  // A collected reins item: the click opens the character sheet's mount picker
-  // on this mount (the pick itself happens there, and riding is the Z key).
-  if (item.kind === 'mount') return 'openMountPicker';
+  // A collected reins item falls through to 'use' like any other usable item:
+  // clicking it summons that mount (sim useItem -> summonMountItem). There is no
+  // picker to open any more.
   return 'use';
 }
 
@@ -218,7 +216,8 @@ export function bagDestroyAction(item: BagItemInfo, mode: BagMode): BagDestroyAc
 }
 
 /** The tooltip hint sub-line for a bag item, matching the original tooltip's
- *  mode-then-kind branch. Returns '' when no hint applies (e.g. a material). */
+ *  mode-then-kind branch. Returns '' when no extra hint applies (e.g. a
+ *  material, or mount reins whose base item tooltip already owns the use hint). */
 export function bagTooltipHintKey(item: BagItemInfo, mode: BagMode): BagTooltipHintKey {
   if (item.soulbound && (mode.tradeOpen || mode.mailAttach || mode.marketSell || mode.vendorOpen))
     return 'hudChrome.itemSoulbound';
@@ -238,7 +237,7 @@ export function bagTooltipHintKey(item: BagItemInfo, mode: BagMode): BagTooltipH
   if (mode.bankDeposit)
     return item.kind === 'quest' ? 'hudChrome.bank.cannotDeposit' : 'hudChrome.bank.depositHint';
   if (item.kind === 'quest') return 'itemUi.tooltip.clickDestroy';
-  if (item.kind === 'mount') return 'hudChrome.mounts.clickManage';
+  if (item.kind === 'mount') return '';
   if (
     item.kind === 'weapon' ||
     item.kind === 'armor' ||

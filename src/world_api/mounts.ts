@@ -1,24 +1,22 @@
 import type { MountKey } from '../sim/content/mounts';
 
-// Rideable ground mounts: the collection + selection surface behind the
-// character sheet's mount picker and the mount keybind. The catalog itself is
-// sim content (src/sim/content/mounts.ts); the live "riding X" state rides the
-// entity mirror (Entity.mountKey, synced in identity fields like skin), so the
-// reads here are the persisted pick and the owned subset. Both commands
-// re-validate server-side (ownership, level gate, combat gate) in
-// src/sim/mounts.ts.
+// Rideable ground mounts. Reins are ITEMS: you ride by using the reins (bags or
+// an action-bar slot), which routes through useItem -> summonMountItem. There is
+// deliberately no "selected mount" and no picker. The catalog itself is sim
+// content (src/sim/content/mounts.ts); the live "riding X" state rides the entity
+// mirror (Entity.mountKey, synced in identity fields like skin), so the only read
+// here is the owned subset. Everything re-validates server-side (riding skill,
+// ownership, combat gate) in src/sim/mounts.ts.
 export interface IWorldMounts {
-  /** The persisted stable pick (always a valid key; the horse by default). */
-  selectedMount(): MountKey;
   /** The owned subset of the catalog, in catalog order: any mount whose
    *  reins item sits in bags or bank (soulbound). A fresh player owns nothing. */
   ownedMounts(): readonly MountKey[];
   /** Whether the player has purchased the riding skill from Marla (80g).
-   *  Required before selecting or summoning any mount. */
+   *  Required before summoning any mount. */
   ridingTrained(): boolean;
-  /** Pick an owned mount (level-gated; swaps in place while riding). */
-  selectMount(key: MountKey): void;
-  /** Mount the selected mount, or dismount while riding. */
+  /** Dismount if riding (instant, never gated). Does nothing when unmounted:
+   *  summoning a specific mount is an item use, not a keybind. The one exception
+   *  is an in-progress riding lesson, which lends the unowned training steed. */
   toggleMounted(): void;
   /** Purchase the riding skill from Marla the stables trainer for 80 gold (800000
    *  copper). One-time: once ridingTrained is true it never reverts. Requires the
