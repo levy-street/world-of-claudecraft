@@ -3616,6 +3616,7 @@ async function startGame(
   let onlineInputEchoMs = 0;
   let playerWasDead = world.player.dead;
   let raceMovementWasLocked = world.mountRaceView()?.phase === 'countdown';
+  let sceneInputWasLocked = false;
   // Smoothed input-echo jitter (mean absolute deviation of RTT samples) for the
   // perf overlay's Jitter row.
   let onlineJitterMs = 0;
@@ -4115,12 +4116,16 @@ async function startGame(
     // enforces the same countdown lock, so online latency cannot move the
     // authoritative rider.
     const raceMovementLocked = world.mountRaceView()?.phase === 'countdown';
+    const sceneInputLocked = sceneDirector.inputLocked();
     if (raceMovementLocked && !raceMovementWasLocked) {
       input.clearClickMove();
       input.setAutorun(false);
       mobileControls.syncAutorun(false);
     }
     raceMovementWasLocked = raceMovementLocked;
+    if (sceneInputLocked && !sceneInputWasLocked) mobileControls.syncAutorun(false);
+    input.setSceneInputLocked(sceneInputLocked);
+    sceneInputWasLocked = sceneInputLocked;
     input.setSuspendMovement(
       !gameInputReady ||
         hud.isModalOpen() ||
@@ -4129,7 +4134,7 @@ async function startGame(
         // Last Bell scene input lock: presentation-side movement freeze, the
         // same mechanism the intro cinematic uses (server combat authority is
         // untouched either way).
-        sceneDirector.inputLocked() ||
+        sceneInputLocked ||
         raceMovementLocked,
     );
     const playerDead = world.player.dead;

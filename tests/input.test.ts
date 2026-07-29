@@ -157,6 +157,40 @@ describe('Input autorun', () => {
     expect(input.readMoveInput().forward).toBe(false);
   });
 
+  it('hard-locks scene movement and clears persistent travel latches', () => {
+    const { input } = makeInput();
+    input.setAutorun(true);
+    input.setClickMoveTarget({ x: 8, z: 3 }, 0.5);
+
+    input.setSceneInputLocked(true);
+
+    expect(input.autorun).toBe(false);
+    expect(input.clickMoveTarget).toBeNull();
+    expect(input.clickMoveGoal).toBeNull();
+    expect(input.readMoveInput()).toEqual({
+      forward: false,
+      back: false,
+      turnLeft: false,
+      turnRight: false,
+      strafeLeft: false,
+      strafeRight: false,
+      jump: false,
+    });
+
+    expect(input.toggleAutorun()).toBe(false);
+    expect(input.setAutorun(true)).toBe(false);
+    input.setClickMoveTarget({ x: 12, z: 7 }, 0.5);
+    input.setTouchMove({ forward: true, back: false, strafeLeft: false, strafeRight: false });
+    input.setGamepadMove({ forward: true, back: false, strafeLeft: false, strafeRight: false });
+    input.setControllerMoveInput({ forward: true });
+
+    input.setSceneInputLocked(false);
+
+    expect(input.autorun).toBe(false);
+    expect(input.clickMoveTarget).toBeNull();
+    expect(input.readMoveInput().forward).toBe(false);
+  });
+
   it('a forward touch-move cancels autorun (classic tap-to-stop)', () => {
     const { input } = makeInput();
     input.toggleAutorun();
@@ -746,6 +780,26 @@ describe('Input pointer lock', () => {
     now += 40;
     windowListeners.get('mouseup')!({ button: 0, clientX: 132, clientY: 163, target: canvas });
     expect(cb.onClickPick).toHaveBeenCalledWith(120, 160, 0);
+  });
+
+  it('does not dispatch a canvas pick while gameplay input is blocked', () => {
+    const { canvas, cb, canvasListeners, windowListeners } = makeInput();
+    (cb as any).canUseGameKeys = vi.fn(() => false);
+
+    canvasListeners.get('mousedown')!({
+      button: 0,
+      clientX: 120,
+      clientY: 160,
+      preventDefault: vi.fn(),
+    });
+    windowListeners.get('mouseup')!({
+      button: 0,
+      clientX: 120,
+      clientY: 160,
+      target: canvas,
+    });
+
+    expect(cb.onClickPick).not.toHaveBeenCalled();
   });
 
   it('starts camera drag by distance but discards the threshold-crossing movement', () => {

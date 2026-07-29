@@ -183,6 +183,9 @@ export class Input {
   onCameraDistChange?: (dist: number) => void;
   autorun = false;
   suspendMovement = false;
+  // Story cinematics are a hard input lock, unlike ordinary menu suspension:
+  // they must stop persistent travel latches instead of preserving autorun.
+  private sceneInputLocked = false;
   // click-to-move (#95): a world destination the player clicked; the frame loop
   // walks toward it until arrival or until the player takes manual control.
   // null when inactive. clickMoveTarget is the current waypoint; clickMoveGoal
@@ -566,45 +569,19 @@ export class Input {
     if (hadHeldInput) this.noteIntent('move');
   }
 
-  /**
-   * Reset every transient gameplay-input source before an in-place client
-   * transition. Unlike an ordinary modal suspension, this also drops autorun,
-   * click-to-move, controller/touch/gamepad state, and latched jumps so no old
-   * intent can resume when the transition curtain comes down.
-   */
-  resetForClientTransition(): void {
-    const emoteWheelWasOpen = this.emoteWheelHeldCodes.size > 0;
-    this.keys.clear();
-    this.keyJumpUntil = 0;
-    this.touchJumpUntil = 0;
-    this.autorun = false;
+  setSceneInputLocked(on: boolean): void {
+    if (this.sceneInputLocked === on) return;
+    this.sceneInputLocked = on;
+    if (!on) return;
     this.clearClickMove();
-    this.touchMove = { forward: false, back: false, strafeLeft: false, strafeRight: false };
-    this.gamepadMove = { forward: false, back: false, strafeLeft: false, strafeRight: false };
-    this.touchLookActive = false;
-    this.touchLookVector = { x: 0, y: 0 };
-    this.gamepadLookActive = false;
-    this.controllerMoveInput = null;
-    this.controllerFacing = null;
-    this.leftDown = false;
-    this.rightDown = false;
-    this.cameraDragActive = false;
-    this.downButton = -1;
-    this.pointerLockRequestedForDrag = false;
-    this.releaseHeldSlots();
-    this.emoteWheelHeldCodes.clear();
-    if (emoteWheelWasOpen) this.cb.onEmoteWheel(false);
-    if (document.pointerLockElement === this.canvas) document.exitPointerLock?.();
-    this.suspendMovement = true;
-    this.updateCursor();
-    this.noteIntent('move');
+    this.setAutorun(false);
+    this.clearTouchMove();
+    this.clearGamepadMove();
+    this.clearControllerMoveInput();
+    this.touchJumpUntil = 0;
   }
 
-  // Passing null clears an armed capture without invoking a callback, so a
-  // caller that abandons a pending capture (Done / Reset confirm) does not
-  // leave a stale one-shot handler in place to swallow the player's next
-  // real keypress.
-  captureNextKey(cb: ((code: string | null) => void) | null): void {
+  captureNextKey(cb: (code: string | null) => void): void {
     this.captureCb = cb;
   }
 
@@ -623,6 +600,10 @@ export class Input {
   }
 
   setTouchMove(move: TouchMoveInput): void {
+    if (this.sceneInputLocked) {
+      this.clearTouchMove();
+      return;
+    }
     const changed =
       move.forward !== this.touchMove.forward ||
       move.back !== this.touchMove.back ||
@@ -663,6 +644,7 @@ export class Input {
   // Touch-reachable autorun toggle (the keyboard path is the 'autorun' edge action).
   // Returns the new state so the on-screen button can reflect it.
   toggleAutorun(): boolean {
+    if (this.sceneInputLocked) return false;
     this.autorun = !this.autorun;
     this.noteMovementIntent();
     return this.autorun;
@@ -671,6 +653,7 @@ export class Input {
   // Idempotent autorun latch for analog inputs that have a one-way "engage"
   // gesture, such as the mobile move joystick's top band.
   setAutorun(on: boolean): boolean {
+    if (this.sceneInputLocked && on) return false;
     if (this.autorun !== on) this.noteMovementIntent();
     this.autorun = on;
     return this.autorun;
@@ -711,6 +694,10 @@ export class Input {
   // The gamepad shares the touch joystick's movement path: its left-stick flags
   // are OR'd into readMoveInput(). Set/cleared each poll by GamepadManager.
   setGamepadMove(move: TouchMoveInput): void {
+    if (this.sceneInputLocked) {
+      this.clearGamepadMove();
+      return;
+    }
     const changed =
       move.forward !== this.gamepadMove.forward ||
       move.back !== this.gamepadMove.back ||
@@ -738,6 +725,7 @@ export class Input {
   // Latch a gamepad jump-button tap the same way touch jumps latch, so reads
   // between sim ticks don't swallow it before the grounded tick sees it.
   triggerGamepadJump(): void {
+    if (this.sceneInputLocked) return;
     this.touchJumpUntil = Math.max(this.touchJumpUntil, performance.now() + TOUCH_JUMP_LATCH_MS);
   }
 
@@ -792,6 +780,7 @@ export class Input {
   }
 
   setControllerMoveInput(input: unknown, facing?: unknown): void {
+    if (this.sceneInputLocked) return;
     this.controllerMoveInput = sanitizeMoveInput(input);
     if (facing !== undefined) this.controllerFacing = sanitizeMoveFacing(facing);
   }
@@ -812,6 +801,7 @@ export class Input {
     path: { x: number; z: number }[] = [target],
     attack = false,
   ): void {
+    if (this.sceneInputLocked) return;
     this.applyClickMovePath(target, path);
     this.clickMoveStop = stopDistance;
     this.clickMoveEntityId = entityId;
@@ -1083,8 +1073,7 @@ export class Input {
     }
     switch (action) {
       case 'autorun':
-        this.autorun = !this.autorun;
-        this.noteMovementIntent();
+        this.toggleAutorun();
         return;
       case 'target':
         this.cb.onTab();
@@ -1348,7 +1337,9 @@ export class Input {
     ) {
       document.exitPointerLock();
     }
-    if (pick) this.cb.onClickPick(pick.x, pick.y, pick.button);
+    if (pick && (!this.cb.canUseGameKeys || this.cb.canUseGameKeys())) {
+      this.cb.onClickPick(pick.x, pick.y, pick.button);
+    }
     if (!this.leftDown && !this.rightDown) this.cameraDragActive = false;
     this.downButton = -1;
     this.pointerLockRequestedForDrag = false;
@@ -1480,6 +1471,17 @@ export class Input {
   }
 
   readMoveInput(): MoveInput {
+    if (this.sceneInputLocked) {
+      return {
+        forward: false,
+        back: false,
+        turnLeft: false,
+        turnRight: false,
+        strafeLeft: false,
+        strafeRight: false,
+        jump: false,
+      };
+    }
     if (this.suspendMovement) {
       // A game menu / modal is open (or chat is focused). Suppress held keys and
       // pointer/touch/gamepad movement so menu keystrokes never leak into the
