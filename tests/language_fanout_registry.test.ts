@@ -597,7 +597,12 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
     ).toBe(6);
   });
 
-  it('gives every relocalize() in src/ui a caller in the fan-out', () => {
+  it('gives every relocalize() in src/ui a caller in the fan-out', {
+    // This contract reads the full UI source inventory and can exceed Vitest's
+    // 20-second default when four gate workers contend for disk and CPU. Keep
+    // the complete sweep, matcher floors, and caller assertions unchanged.
+    timeout: 60_000,
+  }, () => {
     // The bug that started #2529: card_duel_window.ts already HAD a correct
     // relocalize() and nothing in the repo ever called it. A relocalize with no
     // caller is dead code that reads like a working feature.
