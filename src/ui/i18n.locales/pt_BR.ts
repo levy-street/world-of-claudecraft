@@ -9990,7 +9990,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Seis marcas e uma marca gravada em cada uma delas. Esta não é uma reunião de raid, {playerName}. Cada exército nas dunas responde ao portal de guerra abaixo de nós, os trolls o chamam de Orkadia, e nenhum dos cinco soldados com quem servi poderia quebrar os tambores atrás daquela porta. Talvez cinco como você.',
   'entities.quests.q_dk_marrow_and_ash.objectives.0.label': 'Marca de Guerra Ashbone',
   'entities.quests.q_dk_marrow_and_ash.text':
-    'Todo invasor de ossos de cinza carrega uma marca de guerra, {playerName}: um registro queimado do exército sob o qual ele marcha. Contei quatro hostes desta cordilheira, mas suposições não são inteligência. Traga-me seis marcas dos invasores e de seus invocadores de guerra, e eu darei a Brannoc a forma da guerra que está por vir.',
+    'Cada invasor de ossos de cinza carrega uma marca de guerra, {playerName}: um registro queimado do exército sob o qual ele marcha. Contei quatro hostes desta cordilheira, mas suposições não são inteligência. Traga-me seis marcas dos invasores e de seus invocadores de guerra, e eu darei a Brannoc a forma da guerra que está por vir.',
   'entities.quests.q_dk_marrow_and_ash.title': 'Medula e Cinzas',
   'entities.quests.q_dk_matriarch_of_the_maw.completion':
     'O céu sobre Drakemaw está vazio há dois dias, e agora você atravessa meu portão com o sangue de uma matriarca em suas botas. Wyrmwatch esteve quarenta anos vigiando exatamente isso, {playerName}. Pegue estas ombreiras, escama de boca, trabalhadas pelo nosso próprio ferreiro. Use-os onde os dracos possam ver.',

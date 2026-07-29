@@ -12903,7 +12903,7 @@ export const pt_BR: EnTranslations = {
       },
       "q_dk_marrow_and_ash": {
         "title": "Medula e Cinzas",
-        "text": "Todo invasor de ossos de cinza carrega uma marca de guerra, {playerName}: um registro queimado do exército sob o qual ele marcha. Contei quatro hostes desta cordilheira, mas suposições não são inteligência. Traga-me seis marcas dos invasores e de seus invocadores de guerra, e eu darei a Brannoc a forma da guerra que está por vir.",
+        "text": "Cada invasor de ossos de cinza carrega uma marca de guerra, {playerName}: um registro queimado do exército sob o qual ele marcha. Contei quatro hostes desta cordilheira, mas suposições não são inteligência. Traga-me seis marcas dos invasores e de seus invocadores de guerra, e eu darei a Brannoc a forma da guerra que está por vir.",
         "completion": "Seis marcas e uma marca gravada em cada uma delas. Esta não é uma reunião de raid, {playerName}. Cada exército nas dunas responde ao portal de guerra abaixo de nós, os trolls o chamam de Orkadia, e nenhum dos cinco soldados com quem servi poderia quebrar os tambores atrás daquela porta. Talvez cinco como você.",
         "objectives": {
           "0": {
