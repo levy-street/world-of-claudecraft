@@ -9562,6 +9562,9 @@ export const zh_CN: EnTranslations = {
       "heart_of_the_rift": {
         "name": "裂隙之心"
       },
+      "voidsong_dirk": {
+        "name": "虚空之歌，裂帷短匕"
+      },
       "wildheart_tuskblade": {
         "name": "荒野之心獠牙巨刃"
       },

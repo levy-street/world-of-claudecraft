@@ -2314,6 +2314,7 @@ export type TranslationKeyFlat =
   | 'entities.items.vestments_of_the_waking_grove.name'
   | 'entities.items.vigil_star_chart.name'
   | 'entities.items.voidscar_handwraps.name'
+  | 'entities.items.voidsong_dirk.name'
   | 'entities.items.voidweave_mantle.name'
   | 'entities.items.voss_sanctified_mace.name'
   | 'entities.items.votive_chain_belt.name'

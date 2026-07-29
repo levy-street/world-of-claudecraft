@@ -66,6 +66,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   drowned_choir_fang: 'dagger_c', // fangs share dagger_c (fang_of_korzul)
   mistcallers_fang: 'adv_dagger', // EPIC: Heroic Vael dagger
   wildheart_fangknife: 'adv_dagger',
+  voidsong_dirk: 'adv_dagger', // LEGENDARY: the S-rift caster dirk
 
   // ---- staves (staff_a..d + adv_staff + adv_druid_staff) ----------------------
   gnarled_staff: 'staff_a',

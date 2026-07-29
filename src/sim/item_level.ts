@@ -30,7 +30,7 @@ import { FURY_STOCK, WARFARE_SOURCE_LEVEL } from './content/pvp_honor';
 import {
   RIFT_EPIC_ITEM_IDS,
   RIFT_GEAR_ITEM_IDS,
-  RIFT_LEGENDARY_ITEM_ID,
+  RIFT_LEGENDARY_ITEM_IDS,
   RIFT_RARE_ITEM_IDS,
 } from './content/rift/items';
 import { ALL_RECIPES, DUNGEONS, ITEMS, MOBS, QUESTS } from './data';
@@ -79,18 +79,33 @@ export const RAID_MIN_PLAYERS = 10;
 // are level-20 content); see buildSourceIndex.
 export const HEROIC_VENDOR_SOURCE_LEVEL = 20;
 
-// The source level the rift clear-time gear (epics + legendary) reads as. The
-// rift mobs themselves are source level 23 (their maxLevel after the rank retune
-// capped spawns at 23; mob-loot block below picks this up), so the rare
-// world-drops land at ilvl 26 (23 + rare bonus 3) automatically. The
-// clear-time epics and legendary sit above the static drops and are registered
-// at HEROIC_LOOT_SOURCE_LEVEL (25) just like the five-man heroic table, giving
-// them ilvl 31 (25 + epic 6) and ilvl 35 (25 + legendary 10). The riftbound
+// The source level the rift-only clear-time gear (the four rift-signature epics
+// plus the two legendaries) reads as. The B/A/S clear pool ALSO pays the heroic
+// five-man epics, which register themselves off HEROIC_BOSS_LOOT below at this
+// same level, so a rift never re-prices them (bump() is highest-level-wins and
+// equal levels are a no-op). The rift mobs themselves are source level 23 (their
+// maxLevel after the rank retune capped spawns at 23; the mob-loot block below
+// picks this up), so the rare world-drops land at ilvl 26 (23 + rare bonus 3)
+// automatically. The clear-time epics sit above the static drops and register at
+// HEROIC_LOOT_SOURCE_LEVEL (25) just like the five-man heroic table, giving them
+// ilvl 31 (25 + epic 6); the legendaries register one tier higher again, at
+// RIFT_LEGENDARY_LOOT_SOURCE_LEVEL (27), for ilvl 37. The C rank pays from the
+// level-20 NORMAL five-man pool, whose members keep their own source 20
+// (ilvl 23 rares / 26 epics); see rift/loot_pools.ts. The riftbound
 // rings (A/S personal gear, source level 20) and gems/essence (tools, no slot)
 // are excluded from item-level registration: rings derive their level from the
 // personal first-clear event (not a static loot source), and tools have no slot
 // so isItemLevelEligible returns false already.
 export const RIFT_CLEAR_LOOT_SOURCE_LEVEL = HEROIC_LOOT_SOURCE_LEVEL; // 25
+
+// The two S-rank legendary chase items sit a tier ABOVE the clear-time epics, at
+// the raid loot source level, so they land at item level 37 (27 + legendary 10).
+// This is a deliberate exception to "a rift never mints above its own tier": the
+// maintainer's call is that the S legendaries ARE top-of-game gear, gated behind
+// a 0.3% roll on the hardest rank of content whose portals spawn a handful of
+// times a day server-wide. They are NOT flagged as raid drops (itemFromRaid stays
+// false); only the source level is shared.
+export const RIFT_LEGENDARY_LOOT_SOURCE_LEVEL = NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL; // 27
 
 // itemScore weights: how many armor points and how much weapon DPS count as one
 // primary-stat point, so a single comparable number can span gear types.
@@ -210,14 +225,15 @@ function buildSourceIndex(): Map<string, ItemSource> {
       : HEROIC_VARIANT_SOURCE_LEVEL;
     bump(item.id, src, false);
   }
-  // Rift clear-time epics and legendary: gated behind B+/A/S final-boss kills
-  // (addRiftClearGearLoot), they never appear on static mob loot tables, so the
-  // mob-loot block above never registers them. Register at RIFT_CLEAR_LOOT_SOURCE_LEVEL
-  // (25) so they land at item level 31 (epics) and 35 (legendary), one tier above
-  // the rift world-drop rares (ilvl 26, auto-registered via the mob-loot block above
-  // since rift mobs are maxLevel 23). Not a raid source.
+  // Rift-only clear-time epics and legendaries: gated behind B+/A/S final-boss
+  // kills (addRiftClearGearLoot), they never appear on static mob loot tables, so
+  // the mob-loot block above never registers them. The epics register at
+  // RIFT_CLEAR_LOOT_SOURCE_LEVEL (25) for item level 31; the legendaries at
+  // RIFT_LEGENDARY_LOOT_SOURCE_LEVEL (27) for item level 37. Both sit above the
+  // rift world-drop rares (ilvl 26, auto-registered via the mob-loot block above
+  // since rift mobs are maxLevel 23). Neither is a raid source.
   for (const id of RIFT_EPIC_ITEM_IDS) bump(id, RIFT_CLEAR_LOOT_SOURCE_LEVEL, false);
-  bump(RIFT_LEGENDARY_ITEM_ID, RIFT_CLEAR_LOOT_SOURCE_LEVEL, false);
+  for (const id of RIFT_LEGENDARY_ITEM_IDS) bump(id, RIFT_LEGENDARY_LOOT_SOURCE_LEVEL, false);
   // Rift rare world-drops: already picked up by the mob-loot block (rift mobs are
   // maxLevel 23) but listed here explicitly so the intent is clear. The bump() call
   // is a no-op when the mob block already registered a higher-or-equal level.

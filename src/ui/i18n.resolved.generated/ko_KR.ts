@@ -9562,6 +9562,9 @@ export const ko_KR: EnTranslations = {
       "heart_of_the_rift": {
         "name": "균열의 심장"
       },
+      "voidsong_dirk": {
+        "name": "공허의 노래, 찢겨진 장막의 단검"
+      },
       "wildheart_tuskblade": {
         "name": "야생심장 엄니대검"
       },

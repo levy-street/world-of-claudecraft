@@ -9562,6 +9562,9 @@ export const ru_RU: EnTranslations = {
       "heart_of_the_rift": {
         "name": "Сердце разлома"
       },
+      "voidsong_dirk": {
+        "name": "Песнь Пустоты, кинжал расколотой завесы"
+      },
       "wildheart_tuskblade": {
         "name": "Клыкастый клинок Дикого Сердца"
       },

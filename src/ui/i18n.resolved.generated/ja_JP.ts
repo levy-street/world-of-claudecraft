@@ -9562,6 +9562,9 @@ export const ja_JP: EnTranslations = {
       "heart_of_the_rift": {
         "name": "リフトの心臓"
       },
+      "voidsong_dirk": {
+        "name": "ヴォイドソング、裂かれし帳の短剣"
+      },
       "wildheart_tuskblade": {
         "name": "ワイルドハートの牙大剣"
       },

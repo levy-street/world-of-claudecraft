@@ -8415,6 +8415,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.voidweave_mantle.name': '虚织衬肩',
   'entities.items.abysswrought_band.name': '渊铸指环',
   'entities.items.heart_of_the_rift.name': '裂隙之心',
+  'entities.items.voidsong_dirk.name': '虚空之歌，裂帷短匕',
   'hudChrome.finder.title': '地下城查找器',
   'hudChrome.finder.close': '关闭',
   'hudChrome.finder.back': '返回',

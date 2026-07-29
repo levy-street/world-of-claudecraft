@@ -3,17 +3,16 @@
 // shell; all per-copy progression lives in ItemInstancePayload.
 
 import {
-  RIFT_EPIC_ITEM_IDS,
   RIFT_ESSENCE_ITEM_ID,
   RIFT_GEM_IDS,
-  RIFT_LEGENDARY_ITEM_ID,
-  RIFT_RARE_ITEM_IDS,
+  RIFT_LEGENDARY_ITEM_IDS,
   type RiftGemId,
 } from '../content/rift/items';
 import { ITEMS } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity, ItemInstancePayload, PlayerClass, RiftTier } from '../types';
+import { riftHeroicClearPool, riftNormalClearPool } from './loot_pools';
 import { riftRankForBaseLevel } from './ranks';
 
 export const RIFT_ENCHANT_STATS = [
@@ -172,15 +171,20 @@ export function createRiftGearInstance(
 }
 
 // Clear-time epic/legendary odds per rank. Economy rationale: these land ONLY
-// on a completed final-boss kill (never a static loot table), so a C farm can
-// never mint epics (it gets a guaranteed rare instead), and the cadence is
-// bound by the ranked portal spawns. B now guarantees one epic, matching the
-// heroic five-man floor for a rank that carries the same heroic stat transform.
-// A guarantees one epic; S guarantees one with a real shot at a second, plus
-// the game's one legendary chase roll.
+// on a completed final-boss kill (never a static loot table), and the cadence is
+// bound by the ranked portal spawns (one every 2-4 h server-wide, 3 open at most),
+// which is a HARDER gate than the per-player heroic lockout. C pays from the
+// normal five-man pool; B guarantees one epic from the heroic five-man pool,
+// matching the heroic floor for a rank that carries the same heroic stat transform.
+// A guarantees one epic; S guarantees one with a real shot at a second, plus an
+// independent chase roll for each of the two rift legendaries.
 const RIFT_EPIC_CHANCE_B = 1.0; // guaranteed: B carries heroic stat transform
 const RIFT_SECOND_EPIC_CHANCE_S = 0.35;
-const RIFT_LEGENDARY_CHANCE_S = 0.04;
+// 0.3% per S clear PER legendary, deliberately the same rate as the epic mount
+// below rather than the 4% it shipped at. S clears carry no lockout on this roll,
+// so 4% made a legendary a matter of a few evenings; at 0.3% each is a chase item
+// on the same cadence as the rarest mount.
+export const RIFT_LEGENDARY_CHANCE_S = 0.003;
 
 // Clear-time coin bonuses by rank (added on top of the static boss coin, which
 // stays rank-invariant). C mirrors the normal-dungeon economy; B tastes a small
@@ -195,14 +199,30 @@ export const RIFT_COIN_BONUS_B = 10_000; // 10 000c (10 silver)
 export const RIFT_COIN_BONUS_A = 35_000; // 35 000c (35 silver), matches Korzul Heroic
 export const RIFT_COIN_BONUS_S = 50_000; // 50 000c; +5 000c static boss coin = 55 000c total
 
-// Blue (rare) mount reins that roll on A or S clears. A 0.6% independent roll
-// picks one of these two at random; they are appended AFTER all gear draws so
-// the gear draw-order stays byte-identical to pre-mount builds.
-export const RIFT_BLUE_MOUNT_REINS = ['reins_aether_hover_cycle', 'reins_shadowjump_toad'] as const;
-export const RIFT_BLUE_MOUNT_CHANCE = 0.006; // 0.6% per A/S clear
+// The mount ladder: one rarity tier per rank, each at the rate that tier already
+// earns elsewhere in the game, so a rift is never a cheaper route to a mount than
+// the content the mount belongs to.
+//
+//   C  none          normal-mode tables shed no mounts at all (the greens were
+//                    deliberately moved to heroic-only, see heroic_loot.ts), so
+//                    the normal-tier rank matches that and rolls nothing.
+//   B  green  0.5%   exactly HEROIC_GREEN_MOUNT_CHANCE, the five-man heroic rate.
+//   A  blue   0.1%   exactly HEROIC_BLUE_MOUNT_CHANCE, the five-man heroic rate.
+//   S  epic   0.3%   the top tier, and the only source of these two reins.
+//
+// Each rank rolls its OWN tier only: a rank does not inherit the tiers below it,
+// so the ladder climbs in rarity rather than accumulating chances.
 
-// Epic mount reins that roll on S clears only. 0.3% independent roll picks one
-// of the two at random; appended after the blue mount draw.
+/** Green (common) mount reins, on B clears. Excludes reins_valorsteed, which is
+ *  the stablemaster's purchase and has never been a drop. */
+export const RIFT_GREEN_MOUNT_REINS = ['reins_grag_bear', 'reins_stalkglider_snail'] as const;
+export const RIFT_GREEN_MOUNT_CHANCE = 0.005; // 0.5%, the heroic five-man green rate
+
+/** Blue (rare) mount reins, on A clears. */
+export const RIFT_BLUE_MOUNT_REINS = ['reins_aether_hover_cycle', 'reins_shadowjump_toad'] as const;
+export const RIFT_BLUE_MOUNT_CHANCE = 0.001; // 0.1%, the heroic five-man blue rate
+
+/** Epic mount reins, on S clears only. Rifts are their sole source. */
 export const RIFT_EPIC_MOUNT_REINS = [
   'reins_stormfeather_griffin',
   'reins_thunderstrut_gobbler',
@@ -215,13 +235,15 @@ export const RIFT_EPIC_MOUNT_CHANCE = 0.003; // 0.3% per S clear
  * the rank derived from the descriptor baseLevel.
  *
  * Draw order (APPEND-ONLY; inserting before any existing draw breaks parity):
- *   0. C: guaranteed rare from RIFT_RARE_ITEM_IDS pool (rng.int pick)
- *   1. B: guaranteed epic gear (RIFT_EPIC_CHANCE_B = 1.0, preserves rng draw)
- *   2. A/S: guaranteed first epic gear (rng.int pick)
- *   3. S: optional second epic gear (RIFT_SECOND_EPIC_CHANCE_S)
- *   4. S: optional legendary gear (RIFT_LEGENDARY_CHANCE_S)
- *   5. A/S: optional blue mount (RIFT_BLUE_MOUNT_CHANCE + rng.int pick)
- *   6. S: optional epic mount (RIFT_EPIC_MOUNT_CHANCE + rng.int pick)
+ *   0. C: guaranteed drop from riftNormalClearPool() (rng.int pick)
+ *   1. B: guaranteed epic from riftHeroicClearPool() (RIFT_EPIC_CHANCE_B = 1.0,
+ *         the chance() call is kept so the draw survives)
+ *   2. A/S: guaranteed first heroic epic (rng.int pick)
+ *   3. S: optional second heroic epic (RIFT_SECOND_EPIC_CHANCE_S)
+ *   4. S: one independent legendary roll PER id in RIFT_LEGENDARY_ITEM_IDS,
+ *         in array order (RIFT_LEGENDARY_CHANCE_S each)
+ *   5. B/A/S: exactly one mount roll, for the rank's own tier only
+ *         (green/blue/epic chance + rng.int pick)
  *
  * B/A/S draws are unaffected by the new C draw (C returns after draw 0).
  */
@@ -229,17 +251,18 @@ export function addRiftClearGearLoot(ctx: SimContext, boss: Entity, baseLevel: n
   const rank = riftRankForBaseLevel(baseLevel);
   const loot = boss.loot ?? { copper: 0, items: [] };
 
-  // --- Draw 0: C-rank guaranteed rare + coin (normal-tier payout; exits here) ---
+  // --- Draw 0: C-rank guaranteed normal-dungeon drop + coin (exits here) ---
   if (rank === 'C') {
-    const rare = RIFT_RARE_ITEM_IDS[ctx.rng.int(0, RIFT_RARE_ITEM_IDS.length - 1)];
-    loot.items.push({ itemId: rare, count: 1 });
+    const pool = riftNormalClearPool();
+    loot.items.push({ itemId: pool[ctx.rng.int(0, pool.length - 1)], count: 1 });
     loot.copper = (loot.copper ?? 0) + RIFT_COIN_BONUS_C;
     boss.loot = loot;
     boss.lootable = true;
     return;
   }
 
-  const epic = (): string => RIFT_EPIC_ITEM_IDS[ctx.rng.int(0, RIFT_EPIC_ITEM_IDS.length - 1)];
+  const heroicPool = riftHeroicClearPool();
+  const epic = (): string => heroicPool[ctx.rng.int(0, heroicPool.length - 1)];
 
   // --- Draws 1-4: clear-time gear (existing order preserved for parity) ---
   if (rank === 'B') {
@@ -250,22 +273,30 @@ export function addRiftClearGearLoot(ctx: SimContext, boss: Entity, baseLevel: n
       if (ctx.rng.chance(RIFT_SECOND_EPIC_CHANCE_S)) {
         loot.items.push({ itemId: epic(), count: 1 });
       }
-      if (ctx.rng.chance(RIFT_LEGENDARY_CHANCE_S)) {
-        loot.items.push({ itemId: RIFT_LEGENDARY_ITEM_ID, count: 1 });
+      // One INDEPENDENT roll per legendary, not a pick from a pool: an S clear
+      // that beats both rolls sheds both, which is the point of a chase tier.
+      for (const legendaryId of RIFT_LEGENDARY_ITEM_IDS) {
+        if (ctx.rng.chance(RIFT_LEGENDARY_CHANCE_S)) {
+          loot.items.push({ itemId: legendaryId, count: 1 });
+        }
       }
     }
   }
 
-  // --- Draw 5: blue mount on A or S clears (APPENDED after all gear draws) ---
-  if ((rank === 'A' || rank === 'S') && ctx.rng.chance(RIFT_BLUE_MOUNT_CHANCE)) {
-    const reins = RIFT_BLUE_MOUNT_REINS[ctx.rng.int(0, RIFT_BLUE_MOUNT_REINS.length - 1)];
-    loot.items.push({ itemId: reins, count: 1 });
-  }
-
-  // --- Draw 6: epic mount on S clears only (APPENDED after blue mount draw) ---
-  if (rank === 'S' && ctx.rng.chance(RIFT_EPIC_MOUNT_CHANCE)) {
-    const reins = RIFT_EPIC_MOUNT_REINS[ctx.rng.int(0, RIFT_EPIC_MOUNT_REINS.length - 1)];
-    loot.items.push({ itemId: reins, count: 1 });
+  // --- Draw 5: the mount ladder, one tier per rank (see the constants above) ---
+  // Ranks do not inherit each other's tiers, so exactly one mount roll happens
+  // per clear (none at C), and it is always for the tier that rank earns.
+  const mount =
+    rank === 'B'
+      ? { reins: RIFT_GREEN_MOUNT_REINS, chance: RIFT_GREEN_MOUNT_CHANCE }
+      : rank === 'A'
+        ? { reins: RIFT_BLUE_MOUNT_REINS, chance: RIFT_BLUE_MOUNT_CHANCE }
+        : { reins: RIFT_EPIC_MOUNT_REINS, chance: RIFT_EPIC_MOUNT_CHANCE };
+  if (ctx.rng.chance(mount.chance)) {
+    loot.items.push({
+      itemId: mount.reins[ctx.rng.int(0, mount.reins.length - 1)],
+      count: 1,
+    });
   }
 
   // --- Rank coin bonus (no rng; purely additive to the static boss coin) ---

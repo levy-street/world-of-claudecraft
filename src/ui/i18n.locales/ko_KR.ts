@@ -8798,6 +8798,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.voidweave_mantle.name': '공허직조 어깨걸이',
   'entities.items.abysswrought_band.name': '심연세공 반지',
   'entities.items.heart_of_the_rift.name': '균열의 심장',
+  'entities.items.voidsong_dirk.name': '공허의 노래, 찢겨진 장막의 단검',
   'hudChrome.finder.title': '던전 찾기',
   'hudChrome.finder.close': '닫기',
   'hudChrome.finder.back': '뒤로',

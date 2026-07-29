@@ -43,6 +43,8 @@ import {
   RIFT_BLUE_MOUNT_REINS,
   RIFT_EPIC_MOUNT_CHANCE,
   RIFT_EPIC_MOUNT_REINS,
+  RIFT_GREEN_MOUNT_CHANCE,
+  RIFT_GREEN_MOUNT_REINS,
 } from '../src/sim/rift/progression';
 import { Sim } from '../src/sim/sim';
 import { DT, FORM_AURA_KINDS, type MountItemDef, type SimEvent } from '../src/sim/types';
@@ -157,7 +159,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
   });
 
   it('pins each reins item to its acquisition path (all heroic-gated or rift-clear-only)', () => {
-    // Green mounts (0.5%) and blue mounts (0.6%) are now heroic-gated appends in
+    // Green mounts (0.5%) and blue mounts (0.1%) are now heroic-gated appends in
     // HEROIC_BOSS_LOOT, never on normal mob loot tables. Epic mounts are rift
     // S-clear-only (rift/progression.ts), not on any static table.
 
@@ -230,10 +232,17 @@ describe('mount reins items (the collection: owning the item is owning the mount
       expect(RIFT_EPIC_MOUNT_CHANCE).toBe(0.003);
     }
 
-    // Blue mounts also in the rift blue mount reins list (A/S clear path).
+    // Green mounts also in the rift green mount reins list (B clear path), at
+    // exactly the five-man heroic rate so a B rift is never the cheaper route.
+    expect(RIFT_GREEN_MOUNT_REINS).toContain('reins_grag_bear');
+    expect(RIFT_GREEN_MOUNT_REINS).toContain('reins_stalkglider_snail');
+    expect(RIFT_GREEN_MOUNT_CHANCE).toBe(0.005);
+
+    // Blue mounts also in the rift blue mount reins list (A clear path), at
+    // exactly the five-man heroic rate for the same reason.
     expect(RIFT_BLUE_MOUNT_REINS).toContain('reins_aether_hover_cycle');
     expect(RIFT_BLUE_MOUNT_REINS).toContain('reins_shadowjump_toad');
-    expect(RIFT_BLUE_MOUNT_CHANCE).toBe(0.006);
+    expect(RIFT_BLUE_MOUNT_CHANCE).toBe(0.001);
   });
 
   it('ownership: a fresh player owns nothing; a mount only while its reins is held', () => {

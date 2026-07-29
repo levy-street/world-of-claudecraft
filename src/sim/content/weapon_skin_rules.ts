@@ -72,6 +72,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   first_blood_razor: 'dagger',
   duskfang_dirk: 'dagger',
   wildheart_fangknife: 'dagger',
+  voidsong_dirk: 'dagger',
   // Maces
   training_mace: 'mace',
   copper_flanged_mace: 'mace',

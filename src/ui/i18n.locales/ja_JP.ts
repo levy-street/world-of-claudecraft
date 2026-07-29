@@ -8811,6 +8811,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.voidweave_mantle.name': '虚無織りのマント',
   'entities.items.abysswrought_band.name': '深淵細工の指輪',
   'entities.items.heart_of_the_rift.name': 'リフトの心臓',
+  'entities.items.voidsong_dirk.name': 'ヴォイドソング、裂かれし帳の短剣',
   'hudChrome.finder.title': 'ダンジョンファインダー',
   'hudChrome.finder.close': '閉じる',
   'hudChrome.finder.back': '戻る',

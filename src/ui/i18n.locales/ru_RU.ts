@@ -8958,6 +8958,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.voidweave_mantle.name': 'Наплечье пустотного плетения',
   'entities.items.abysswrought_band.name': 'Кольцо бездновой ковки',
   'entities.items.heart_of_the_rift.name': 'Сердце разлома',
+  'entities.items.voidsong_dirk.name': 'Песнь Пустоты, кинжал расколотой завесы',
   'hudChrome.finder.title': 'Поиск подземелий',
   'hudChrome.finder.close': 'Закрыть',
   'hudChrome.finder.back': 'Назад',
