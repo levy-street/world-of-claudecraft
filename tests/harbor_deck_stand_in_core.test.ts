@@ -1,8 +1,11 @@
 import { readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
+  type DeckStandInRuntimeHandle,
   deckStandInAction,
   deckStandInParentTransform,
+  disposeDeckStandIn,
+  updateDeckStandIns,
 } from '../src/render/harbor_deck_stand_in_core';
 import { GULLHAVEN_HARBOR, MAINLAND_HARBOR } from '../src/sim/harbor_layout';
 import { WATER_LEVEL } from '../src/sim/world';
@@ -56,6 +59,87 @@ describe('harbor deck stand-in core', () => {
       expect(worldY).toBeCloseTo(deck.y);
     }
   });
+
+  it('creates one visual across repeated live ticks and reports the rig replacement', () => {
+    const visual = { updates: 0, disposals: 0 };
+    const handle = { cueStartSec: 1, segment: {}, deckStandIn: null as typeof visual | null };
+    const create = vi.fn(() => visual);
+    const update = vi.fn((value: typeof visual) => value.updates++);
+    const dispose = vi.fn((value: typeof visual) => value.disposals++);
+
+    expect(updateDeckStandIns([handle], true, create, update, dispose)).toBe(true);
+    expect(updateDeckStandIns([handle], true, create, update, dispose)).toBe(true);
+
+    expect(create).toHaveBeenCalledTimes(1);
+    expect(update).toHaveBeenCalledTimes(2);
+    expect(handle.deckStandIn).toBe(visual);
+  });
+
+  it('keeps the authoritative rig visible after a failed build and retries next tick', () => {
+    const visual = { updates: 0 };
+    const handle = { cueStartSec: 1, segment: {}, deckStandIn: null as typeof visual | null };
+    const create = vi
+      .fn<() => typeof visual | null>()
+      .mockReturnValueOnce(null)
+      .mockReturnValue(visual);
+
+    expect(updateDeckStandIns([handle], true, create, vi.fn(), vi.fn())).toBe(false);
+    expect(updateDeckStandIns([handle], true, create, vi.fn(), vi.fn())).toBe(true);
+    expect(create).toHaveBeenCalledTimes(2);
+  });
+
+  it('disposes once on park and restores the authoritative rig', () => {
+    const visual = {};
+    const handle: DeckStandInRuntimeHandle<typeof visual> = {
+      cueStartSec: 1,
+      segment: {},
+      deckStandIn: visual,
+    };
+    const dispose = vi.fn();
+    handle.cueStartSec = null;
+    handle.segment = null;
+
+    expect(updateDeckStandIns([handle], true, vi.fn(), vi.fn(), dispose)).toBe(false);
+    expect(updateDeckStandIns([handle], true, vi.fn(), vi.fn(), dispose)).toBe(false);
+
+    expect(dispose).toHaveBeenCalledTimes(1);
+    expect(handle.deckStandIn).toBeNull();
+  });
+
+  it('leaves exactly one stand-in active when a voyage cut switches ships', () => {
+    const firstVisual = { id: 'first' };
+    const first = {
+      cueStartSec: null,
+      segment: null,
+      deckStandIn: firstVisual as typeof firstVisual | null,
+    };
+    const second = {
+      cueStartSec: 5,
+      segment: {},
+      deckStandIn: null as typeof firstVisual | null,
+    };
+    const dispose = vi.fn();
+
+    expect(
+      updateDeckStandIns([first, second], true, () => ({ id: 'second' }), vi.fn(), dispose),
+    ).toBe(true);
+
+    expect(dispose).toHaveBeenCalledWith(firstVisual);
+    expect(first.deckStandIn).toBeNull();
+    expect(second.deckStandIn).toEqual({ id: 'second' });
+  });
+
+  it('can explicitly dispose a stand-in during scene reset', () => {
+    const visual = {};
+    const handle = { cueStartSec: 1, segment: {}, deckStandIn: visual as typeof visual | null };
+    const dispose = vi.fn();
+
+    disposeDeckStandIn(handle, dispose);
+    disposeDeckStandIn(handle, dispose);
+
+    expect(dispose).toHaveBeenCalledTimes(1);
+    expect(handle.deckStandIn).toBeNull();
+  });
 });
 
 describe('harbor deck stand-in render wiring', () => {
@@ -69,20 +153,20 @@ describe('harbor deck stand-in render wiring', () => {
     expect(HARBOR_SOURCE).toContain(
       'export function updateHarborShips(localPlayer: Entity, dt: number): boolean {',
     );
+    expect(HARBOR_SOURCE).toContain('const deckStandInActive = updateDeckStandIns(');
     expect(RENDERER_SOURCE).toContain(
       'const harborDeckStandInActive = updateHarborShips(this.sim.player, dt);',
     );
     expect(RENDERER_SOURCE).toContain('v.group.visible = !harborDeckStandInActive;');
     expect(HARBOR_SOURCE).toContain(
-      'handle.deckStandIn.update(dt, DECK_STAND_IN_IDLE_STATE, false);',
+      '(visual) => visual.update(dt, DECK_STAND_IN_IDLE_STATE, false)',
     );
   });
 
   it('routes the existing ship reset through CharacterVisual disposal', () => {
     expect(HARBOR_SOURCE).toMatch(
-      /function resetShip\(handle: HarborShipHandle\): void \{[\s\S]{0,250}syncDeckStandIn\(handle, null\);/,
+      /function resetShip\(handle: HarborShipHandle\): void \{[\s\S]{0,250}disposeDeckStandIn\(handle,/,
     );
-    expect(HARBOR_SOURCE).toContain('handle.deckStandIn.dispose();');
-    expect(HARBOR_SOURCE).toContain('handle.deckStandIn = null;');
+    expect(HARBOR_SOURCE).toContain('(visual) => visual.dispose()');
   });
 });
