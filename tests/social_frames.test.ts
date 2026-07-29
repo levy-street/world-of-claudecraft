@@ -469,4 +469,56 @@ describe('socialpos carries the live active title (Book of Deeds)', () => {
     (server as any).broadcastSocialPositions();
     expect(lastSocialPos(watcherFc.sent)).not.toBeNull();
   });
+
+  it('fails closed while either side of a periodic position push has an unloaded block list', () => {
+    const server = new GameServer();
+    const watcherFc = fakeWs();
+    const watcher = joinServer(server, watcherFc, 1, 'Watcher');
+    const trackedFc = fakeWs();
+    const tracked = joinServer(server, trackedFc, 2, 'Tracked');
+    watcher.socialTrackedIds = [tracked.characterId];
+
+    watcher.blockListLoaded = false;
+    (server as any).broadcastSocialPositions();
+    expect(lastSocialPos(watcherFc.sent)).toBeNull();
+
+    watcher.blockListLoaded = true;
+    tracked.blockListLoaded = false;
+    (server as any).broadcastSocialPositions();
+    expect(lastSocialPos(watcherFc.sent)).toBeNull();
+  });
+
+  it('heals an unloaded block list from a successful social snapshot before exposing presence', async () => {
+    const server = new GameServer();
+    const watcherFc = fakeWs();
+    const watcher = joinServer(server, watcherFc, 1, 'Watcher');
+    const trackedFc = fakeWs();
+    const tracked = joinServer(server, trackedFc, 2, 'Tracked');
+    watcher.blockListLoaded = false;
+    watcher.blockedIds = new Set();
+
+    vi.spyOn((server as any).social, 'snapshot').mockResolvedValue({
+      friends: [],
+      blocks: [{ id: tracked.characterId, name: tracked.name }],
+      ignores: [],
+      guild: null,
+    });
+    await (server as any).sendSocialSnapshot(watcher.characterId);
+
+    expect(watcher.blockListLoaded).toBe(true);
+    expect(watcher.blockedIds).toEqual(new Set([tracked.characterId]));
+  });
+
+  it('treats an authoritative block mutation as a loaded block list', () => {
+    const server = new GameServer();
+    const watcherFc = fakeWs();
+    const watcher = joinServer(server, watcherFc, 1, 'Watcher');
+    watcher.blockListLoaded = false;
+    watcher.blockedIds = new Set();
+
+    (server as any).socialTransport().onBlocksChanged(watcher.characterId, [7, 9]);
+
+    expect(watcher.blockListLoaded).toBe(true);
+    expect(watcher.blockedIds).toEqual(new Set([7, 9]));
+  });
 });

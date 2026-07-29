@@ -2490,7 +2490,7 @@ export class GameServer {
       },
       onBlocksChanged: (id, ids) => {
         const s = this.sessionByCharacterId(id);
-        if (s) s.blockedIds = new Set(ids);
+        if (s) this.setLoadedBlockIds(s, ids);
       },
       onGuildFounded: (id) => {
         // The one server-produced deed stat (DeedStatKey doc, src/sim/types.ts):
@@ -2629,6 +2629,11 @@ export class GameServer {
     };
   }
 
+  private setLoadedBlockIds(session: ClientSession, ids: Iterable<number>): void {
+    session.blockedIds = new Set(ids);
+    session.blockListLoaded = true;
+  }
+
   private async sendSocialSnapshot(charId: number, firstJoin = false): Promise<void> {
     const session = this.sessionByCharacterId(charId);
     if (!session) return;
@@ -2639,6 +2644,16 @@ export class GameServer {
       // not overwrite them below.
       const seqBefore = session.guildStampSeq;
       const snap = await this.social.snapshot(charId);
+      // The full snapshot reads the same authoritative block relation as the
+      // dedicated startup query. If that first query failed, use this
+      // successful read to leave fail-closed mode without overwriting a newer
+      // live block mutation that already marked the session loaded.
+      if (!session.blockListLoaded) {
+        this.setLoadedBlockIds(
+          session,
+          snap.blocks.map((block) => block.id),
+        );
+      }
       this.send(session, { t: 'social', ...snap });
       // Stamp the guild name onto the player's world entity so it rides the
       // identity wire and shows under their nameplate for everyone nearby,
@@ -3954,8 +3969,10 @@ export class GameServer {
   // let friends + guildmates know they've come online.
   private async initSocial(session: ClientSession, firstJoin = false): Promise<void> {
     try {
-      session.blockedIds = new Set(await this.socialDb.blockedIds(session.characterId));
-      session.blockListLoaded = true;
+      const blockedIds = await this.socialDb.blockedIds(session.characterId);
+      // A live block mutation may resolve while this startup read is in
+      // flight. Do not replace that newer authoritative state on completion.
+      if (!session.blockListLoaded) this.setLoadedBlockIds(session, blockedIds);
     } catch (err) {
       console.error('failed to load block list:', err);
     }
@@ -10042,10 +10059,10 @@ export class GameServer {
   }
 
   private canShowInWho(viewer: ClientSession, candidate: ClientSession): boolean {
-    // Fail closed while the candidate's block list is still loading: showing
-    // them in /who before we know their blocks could leak presence to
-    // someone they've blocked.
-    if (!candidate.blockListLoaded) return false;
+    // Fail closed while either block list is still loading: until both sides
+    // are authoritative, presence could leak across an existing block in
+    // either direction.
+    if (!viewer.blockListLoaded || !candidate.blockListLoaded) return false;
     if (viewer.blockedIds.has(candidate.characterId)) return false;
     if (
       candidate.characterId !== viewer.characterId &&
