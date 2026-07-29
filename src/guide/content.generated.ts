@@ -8760,7 +8760,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
   "player_warrior": {
     "url": "models/chars/players/warrior_v02.glb",
     "idle": "Idle",
-    "height": 2.6,
+    "height": 3.12,
     "attach": [
       {
         "url": "models/weapons/sword_1handed.glb",
@@ -8775,7 +8775,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
   "player_paladin": {
     "url": "models/chars/players/paladin_v02.glb",
     "idle": "Idle",
-    "height": 2.6,
+    "height": 3.12,
     "attach": [
       {
         "url": "models/weapons/axe_1handed.glb",
@@ -8790,18 +8790,18 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
   "player_hunter": {
     "url": "models/chars/players/hunter_male_v02.glb",
     "idle": "Idle",
-    "height": 2.6,
+    "height": 3.12,
     "attach": [
       {
         "url": "models/weapons/crossbow_1handed.glb",
-        "bone": "handslot.r"
+        "bone": "handslot.l"
       }
     ]
   },
   "player_rogue": {
     "url": "models/chars/players/rogue_male_v02.glb",
     "idle": "Idle",
-    "height": 2.6,
+    "height": 3.12,
     "attach": [
       {
         "url": "models/weapons/dagger.glb",
@@ -8816,7 +8816,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
   "player_priest": {
     "url": "models/chars/players/priest_male_v02.glb",
     "idle": "Idle",
-    "height": 2.6,
+    "height": 3.12,
     "attach": [
       {
         "url": "models/weapons/staff.glb",
@@ -8827,7 +8827,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
   "player_shaman": {
     "url": "models/chars/players/shaman_male_v02.glb",
     "idle": "Idle",
-    "height": 2.6,
+    "height": 3.12,
     "attach": [
       {
         "url": "models/weapons/axe_1handed.glb",
@@ -8842,7 +8842,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
   "player_mage": {
     "url": "models/chars/players/mage_male_v02.glb",
     "idle": "Idle",
-    "height": 2.6,
+    "height": 3.12,
     "attach": [
       {
         "url": "models/weapons/staff.glb",
@@ -8853,7 +8853,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
   "player_warlock": {
     "url": "models/chars/players/warlock_male_v02.glb",
     "idle": "Idle",
-    "height": 2.6,
+    "height": 3.12,
     "attach": [
       {
         "url": "models/weapons/wand.glb",
@@ -8869,7 +8869,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
   "player_druid": {
     "url": "models/chars/players/druid_male_v02.glb",
     "idle": "Idle",
-    "height": 2.6,
+    "height": 3.12,
     "attach": [
       {
         "url": "models/weapons/staff.glb",
