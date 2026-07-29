@@ -21,6 +21,7 @@
 
 import { arenaOrigin, DELVES, instanceOrigin, MOBS, PROPS, QUESTS } from '../../src/sim/data';
 import { createMob } from '../../src/sim/entity';
+import { enterDungeon } from '../../src/sim/instances/dungeons';
 import { solveLockActions } from '../../src/sim/lockpick';
 import { Sim } from '../../src/sim/sim';
 import { addThreat } from '../../src/sim/threat';
@@ -4057,4 +4058,55 @@ export const SCENARIOS: Scenario[] = [
   g1bXpPrestige(),
   playerTrade(),
   chatSocial(),
+  undermountOdrenn(),
 ];
+
+function undermountOdrenn(): Scenario {
+  return {
+    name: 'undermount_odrenn',
+    coverage: [
+      'encounters/odrenn.ts full script: geography marks + hysteresis flip across the centerline',
+      'mixed-mark Tempering Clash burn (two players astride the line inside burn range)',
+      'Cinder Arc: the one ctx.rng seed draw + deterministic nearest-neighbor chain walk',
+      'Tempering stacking haste self-buff cadence; locomotion dispatch by templateId',
+    ],
+    build: () => new Sim({ seed: 1031, playerClass: 'warrior', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const a = sim.addPlayer('warrior', 'Hotside');
+      const b = sim.addPlayer('mage', 'Coldside');
+      for (const pid of [a, b]) {
+        const meta = sim.ctx.resolve(pid)?.meta;
+        meta?.undermountCleared?.add('undermount_wing1');
+      }
+      enterDungeon(sim.ctx, 'undermount_wing2', a);
+      const inst = (sim.instances as any[]).find((i) => i.dungeonId === 'undermount_wing2');
+      const boss = inst.mobIds
+        .map((id: number) => sim.entities.get(id))
+        .find((e: AnyEntity | undefined) => e?.templateId === 'odrenn_the_temperer') as AnyEntity;
+      const pa = sim.entities.get(a) as AnyEntity;
+      const pb = sim.entities.get(b) as AnyEntity;
+      beef(pa, 900000);
+      beef(pb, 900000);
+      // A mixed pair astride the centerline, inside burn range of each other.
+      teleport(sim, pa, boss.spawnPos.x + 4, boss.spawnPos.z - 8);
+      teleport(sim, pb, boss.spawnPos.x - 4, boss.spawnPos.z - 8);
+      sim.dealDamage(pa, boss, 25, false, 'physical', null, 'hit', true);
+      rec.track(boss.id);
+      rec.tick(30); // marks assigned, burn ticking
+      rec.snapshot('odrenn-marks-burn');
+      // Hysteresis flip: Hotside crosses clearly past the band.
+      teleport(sim, pa, boss.spawnPos.x - 6, boss.spawnPos.z - 8);
+      rec.tick(10);
+      rec.snapshot('odrenn-flip');
+      // Force the arc and a Tempering stack inside the recording window.
+      const st = (boss as AnyEntity).odrenn;
+      if (st) {
+        st.arcTimer = 0.05;
+        st.enrageTimer = 0.1;
+      }
+      rec.tick(20);
+      rec.snapshot('odrenn-arc-temper');
+    },
+  };
+}
