@@ -74,7 +74,6 @@ export function buildDressing({ assetData, heightAt, grassGround, softGround }) 
   const halfWall = ext('dungeon/barrier_half');
   const broken = ext('dungeon/wall_broken');
   const tower = ext('city/wall_tower');
-  const plinth = ext('medieval_village_v2/buildings/CastleBase_03');
   const railPiece = ext('dungeon/fence_broken');
 
   const courseH = wall.top * WALL_SCALE; // 5.75yd per wall course
@@ -274,101 +273,16 @@ export function buildDressing({ assetData, heightAt, grassGround, softGround }) 
     });
   }
 
-  // The great hall: a raised stone plinth in the dead-end pocket behind each
-  // keep, with stairs off both flanks. The keep's back wall stands between it
-  // and the flag, so it is silhouette and landmark, never fight space.
-  {
-    const hallZ = -HALF_Z + 7;
-    const seat = floorUnder(0, hallZ, 14, 5);
-    const cols = 9;
-    const rows = 2;
-    const pitchX = 28 / cols;
-    const pitchZ = 4.2;
-    for (let i = 0; i < cols; i++) {
-      for (let j = 0; j < rows; j++) {
-        const sx = pitchX / (plinth.width * 1.3);
-        const sz = pitchZ / (plinth.depth * 1.3);
-        both(
-          seated(
-            'medieval_village_v2/buildings/CastleBase_03',
-            -14 + (i + 0.5) * pitchX,
-            hallZ - (pitchZ * (rows - 1)) / 2 + j * pitchZ,
-            0,
-            {
-              scale: 1.3,
-              collide: true,
-              collisionMode: 'baked',
-              scaleX: r4(sx),
-              scaleZ: r4(sz),
-              detached: true,
-              groundY: r4(seat),
-              name: 'Hall plinth',
-            },
-            plinth,
-            1.3 * sx,
-            1.3 * sz,
-          ),
-        );
-      }
-    }
-    for (const sx of [-1, 1]) {
-      both({
-        assetId: 'medieval_village_v2/buildings/CastleStairs_03',
-        x: r4(sx * 17.5),
-        z: r4(hallZ),
-        rotY: yaw(sx < 0 ? HALF_PI : -HALF_PI),
-        scale: 2.6,
-        collide: true,
-        collisionMode: 'baked',
-        detached: true,
-        groundY: r4(seat),
-        name: 'Hall stair',
-      });
-      both({
-        assetId: 'medieval_village_v2/buildings/Stairs_01',
-        x: r4(sx * 9),
-        z: r4(hallZ + 5.4),
-        rotY: yaw(sx < 0 ? 0 : Math.PI),
-        scale: 1.7,
-        collide: true,
-        collisionMode: 'baked',
-        detached: true,
-        groundY: r4(seat),
-        name: 'Hall step',
-      });
-    }
-    for (let i = 0; i < 7; i++) {
-      both({
-        assetId: 'dungeon/floor_wood_large',
-        x: r4(-12 + i * 4),
-        z: r4(hallZ),
-        rotY: 0,
-        scale: 2.25,
-        collide: false,
-        y: 1.56,
-        detached: true,
-        groundY: r4(seat),
-        name: 'Hall boards',
-      });
-    }
-    for (const sx of [-1, 1]) {
-      bothTeamArt(
-        {
-          assetId: 'dungeon/banner_shield_red',
-          x: r4(sx * 4.5),
-          z: r4(hallZ - 2.6),
-          rotY: 0,
-          scale: 2,
-          collide: false,
-          y: 1.6,
-          detached: true,
-          groundY: r4(seat),
-          name: 'Hall banner',
-        },
-        'dungeon/banner_shield_blue',
-      );
-    }
-  }
+  // The pocket behind each keep is left as OPEN GROUND on purpose. It carried a
+  // raised stone plinth with stair runs off both flanks; playtesting killed it
+  // on both counts. The plinth read as a platform and was not one (its top sits
+  // a step and a half up, so a body bounces off the face instead of walking on),
+  // and the stairs read as a route and were not one either: a stair GLB's baked
+  // collision is a ramp deck the movement kernel only honours from the tread it
+  // starts on, which is not how a player reads a staircase. Nothing that looks
+  // walkable and is not belongs on a competitive field, so the whole structure
+  // is gone rather than half-fixed. The keep's own banners and braziers carry
+  // the ceremony now.
 
   // --- the curtains, their gates and the gatehouses --------------------------
   for (const seg of CURTAIN_WALLS) {
@@ -401,8 +315,9 @@ export function buildDressing({ assetData, heightAt, grassGround, softGround }) 
     bothLights({ x: r4(gate.x), y: 6.5, z: r4(gate.z), color: FLAME, intensity: 26, range: 26 });
   }
 
-  // Gatehouse timber posts and a lantern: the room reads as a built crossing.
-  // Decoration only (`collide: false`), so both offset doors keep their full
+  // Gatehouse timber posts and a lantern. They COLLIDE: a post you can see and
+  // walk through is the thing playtesting called out. They sit inside the room's
+  // corners and hard against its east wall, so both offset doors keep their full
   // width and the ambush corners stay exactly where the plan put them.
   for (const room of GATEHOUSE_ROOMS) {
     if (room.z > 0) continue;
@@ -415,7 +330,8 @@ export function buildDressing({ assetData, heightAt, grassGround, softGround }) 
           z: r4(room.z + sz * (room.hd - 1.4)),
           rotY: yaw(hashYaw(room.x + sx, room.z + sz)),
           scale: 3.4,
-          collide: false,
+          collide: true,
+          collisionMode: 'baked',
           detached: true,
           groundY: r4(seat - 0.2),
           name: 'Gatehouse post',
@@ -424,11 +340,12 @@ export function buildDressing({ assetData, heightAt, grassGround, softGround }) 
     }
     both({
       assetId: 'dungeon/lantern_standing',
-      x: r4(room.x + 4.2),
+      x: r4(room.x + 5.6),
       z: r4(room.z),
       rotY: 0,
-      scale: 1.7,
-      collide: false,
+      scale: 1.5,
+      collide: true,
+      collisionMode: 'baked',
       name: 'Gatehouse lantern',
     });
     bothLights({ x: r4(room.x), y: 4, z: r4(room.z), color: FLAME, intensity: 24, range: 24 });
@@ -557,8 +474,9 @@ export function buildDressing({ assetData, heightAt, grassGround, softGround }) 
       name: 'Heart ruin core',
       hidden: true,
     });
-    // Columns thrown down out of the shell: LYING, and pure art, so the ring of
-    // ground a runner rounds the heart on stays exactly as wide as the plan.
+    // Columns thrown down out of the shell: LYING, and solid. Prone they top out
+    // around a yard, so a runner strides over one rather than being walled by
+    // it, and the ring of ground around the heart keeps its width.
     const ruinRng = stream(17);
     for (let i = 0; i < 6; i++) {
       const a = (i / 6) * TAU;
@@ -570,7 +488,8 @@ export function buildDressing({ assetData, heightAt, grassGround, softGround }) 
         rotY: yaw(a + HALF_PI),
         rotZ: r4(HALF_PI),
         scale: r4(ruinRng.range(1.6, 2.3)),
-        collide: false,
+        collide: true,
+        collisionMode: 'baked',
         name: 'Fallen column',
       });
     }
@@ -586,7 +505,8 @@ export function buildDressing({ assetData, heightAt, grassGround, softGround }) 
         z: bz,
         rotY: 0,
         scale: 1.7,
-        collide: false,
+        collide: true,
+        collisionMode: 'baked',
         name: 'Ruin brazier',
       });
       lights.push({ x: bx, y: 3, z: bz, color: 0xffb04a, intensity: 30, range: 30 });
@@ -614,7 +534,8 @@ export function buildDressing({ assetData, heightAt, grassGround, softGround }) 
         z: r4(pad.z + Math.sin(a) * 3.7),
         rotY: yaw(a),
         scale: 1.5,
-        collide: false,
+        collide: true,
+        collisionMode: 'baked',
         name: 'Rune lantern',
       });
     }
@@ -659,7 +580,8 @@ export function buildDressing({ assetData, heightAt, grassGround, softGround }) 
       z: r4(c.z + Math.sin(hashYaw(c.z, c.x)) * 1.5),
       rotY: yaw(hashYaw(c.z * 3, c.x)),
       scale: 0.85,
-      collide: false,
+      collide: true,
+      collisionMode: 'baked',
       name: 'Field stores',
     });
   });
@@ -703,7 +625,8 @@ export function buildDressing({ assetData, heightAt, grassGround, softGround }) 
           z: r4(pile.z + Math.sin(a) * radius * rng.range(0.4, 1)),
           rotY: yaw(a + HALF_PI),
           scale: r4(rng.range(0.8, 1.4)),
-          collide: false,
+          collide: true,
+          collisionMode: 'baked',
           name: 'Debris',
         });
       }
@@ -712,43 +635,46 @@ export function buildDressing({ assetData, heightAt, grassGround, softGround }) 
   }
 
   // --- the graveyards -------------------------------------------------------
+  // THREE headstones per plot, and their placement is the point. A released
+  // spirit rises on a fixed five-spot grid (spirit.ts bgGraveyardSpot: x +-3,
+  // z -3/0/+3 off the plot centre) and leaves by the 4yd gap the plan opens at
+  // the KEEP-SIDE corner. Playtesting found the old twelve-stone yard was a
+  // maze: every stone stands taller than the eye line, so a spirit could not
+  // even see the way out, let alone walk to it. The three that remain are
+  // pushed into the far (east) strip, so the whole half of the plot the gap is
+  // on stays open ground, and they are cut down to headstone size rather than
+  // the monoliths they were. Anything added here has to keep that half clear.
   const STONES = [
-    'dungeon/gravestone',
-    'dungeon/grave_a',
-    'dungeon/gravemarker_b',
-    'props/gravestone_cross',
+    ['dungeon/gravestone', 39.5, -134.5],
+    ['props/gravestone_cross', 40.8, -130.5],
+    ['dungeon/grave_a', 39, -126.5],
   ];
   for (const plot of GRAVEYARDS) {
     if (plot.z > 0) continue;
     const rng = stream(311);
-    for (let row = 0; row < 3; row++) {
-      for (let col = 0; col < 4; col++) {
-        both({
-          assetId: rng.pick(STONES),
-          x: r4(plot.x - 6 + col * 4 + rng.range(-0.5, 0.5)),
-          z: r4(plot.z - 3.6 + row * 3.6 + rng.range(-0.4, 0.4)),
-          rotY: yaw(rng.range(-0.25, 0.25)),
-          scale: r4(rng.range(1.35, 1.75)),
-          collide: true,
-          collisionMode: 'baked',
-          name: 'Grave',
-        });
-      }
-    }
-    for (const [lx, lz] of [
-      [-7.5, -4.5],
-      [7.5, 4.5],
-    ]) {
+    for (const [assetId, gx, gz] of STONES) {
       both({
-        assetId: 'dungeon/lantern_standing',
-        x: r4(plot.x + lx),
-        z: r4(plot.z + lz),
-        rotY: 0,
-        scale: 1.8,
-        collide: false,
-        name: 'Grave lantern',
+        assetId,
+        x: r4(gx),
+        z: r4(gz),
+        rotY: yaw(rng.range(-0.25, 0.25)),
+        scale: r4(rng.range(1.05, 1.3)),
+        collide: true,
+        collisionMode: 'baked',
+        name: 'Grave',
       });
     }
+    // One lantern, in the corner furthest from both the rise spots and the gap.
+    both({
+      assetId: 'dungeon/lantern_standing',
+      x: r4(plot.x - 7.5),
+      z: r4(plot.z - 4.5),
+      rotY: 0,
+      scale: 1.5,
+      collide: true,
+      collisionMode: 'baked',
+      name: 'Grave lantern',
+    });
     bothLights({ x: r4(plot.x), y: 3, z: r4(plot.z), color: GRAVE_GLOW, intensity: 20, range: 24 });
   }
   // Rails: broken fence art over an invisible rail volume, so a plot blocks
@@ -831,7 +757,8 @@ export function buildDressing({ assetData, heightAt, grassGround, softGround }) 
       z: -126.6,
       rotY: 0,
       scale: 2.4,
-      collide: false,
+      collide: true,
+      collisionMode: 'baked',
       y: 0.5,
       detached: true,
       groundY: r4(courtSeat),
@@ -863,7 +790,8 @@ export function buildDressing({ assetData, heightAt, grassGround, softGround }) 
       z: -122,
       rotY: 0,
       scale: 1.5,
-      collide: false,
+      collide: true,
+      collisionMode: 'baked',
       name: 'Court brazier',
     });
   }
@@ -884,8 +812,8 @@ export function buildDressing({ assetData, heightAt, grassGround, softGround }) 
     for (const [assetId, dx, dz, scale, collide] of [
       ['biome/camp_tent', -6, -4, 2.6, true],
       ['biome/camp_tent', 5, -6, 2.4, true],
-      ['biome/camp_bedroll', -6, 1, 1.5, false],
-      ['biome/camp_fire_pit', 0, -1, 1.6, false],
+      ['biome/camp_bedroll', -6, 1, 1.5, true],
+      ['biome/camp_fire_pit', 0, -1, 1.6, true],
       ['props/cart', 8, 3, 1.6, true],
       ['dungeon/haybale', -9, 4, 1.4, true],
       ['dungeon/wagon', 3, 6, 1.7, true],
@@ -914,25 +842,27 @@ export function buildDressing({ assetData, heightAt, grassGround, softGround }) 
     // Real-world widths, solved back through each piece's own extents: the kit
     // normalizes every model to about 2.2yd, so a skull placed at "scale" reads
     // boulder-sized unless the size it should actually be is stated here.
-    const LITTER = [
-      ['dungeon/skull', 0.5],
-      ['dungeon/bone_c', 0.95],
-      ['dungeon/sword_shield_broken', 1.25],
-    ];
+    // Litter is scaled by its TOP, not its width: everything on this list has to
+    // finish under the physics step height so a body walks straight over it.
+    // Sized by width instead, a broken sword-and-shield comes out nearly two
+    // yards tall, which is a sight blocker dropped at random in the courtyard.
+    const LITTER = ['dungeon/skull', 'dungeon/bone_c', 'dungeon/sword_shield_broken'];
+    const LITTER_TOP = 0.72; // under MAX_STEP_HEIGHT (0.9), with room to spare
     for (let i = 0; i < 34; i++) {
       const a = rng.range(0, TAU);
       const rad = rng.range(11, 40);
       const x = Math.cos(a) * rad;
       const z = Math.sin(a) * rad;
-      const [assetId, width] = rng.pick(LITTER);
+      const assetId = rng.pick(LITTER);
       if (z > 0.5) continue;
       both({
         assetId,
         x: r4(x),
         z: r4(z),
         rotY: yaw(rng.range(0, TAU)),
-        scale: r4((width * rng.range(0.8, 1.2)) / ext(assetId).width),
-        collide: false,
+        scale: r4((LITTER_TOP * rng.range(0.55, 1)) / ext(assetId).top),
+        collide: true,
+        collisionMode: 'baked',
         name: 'Aftermath',
       });
     }
@@ -976,22 +906,28 @@ export function buildDressing({ assetData, heightAt, grassGround, softGround }) 
         name: 'Undergrowth',
       });
     }
-    // Twisted trees rooted along the ramparts, clear of every route.
+    // Twisted trees rooted along the ramparts. They COLLIDE, because a
+    // fifteen-yard tree a body walks through is the single most jarring thing
+    // on a field, and they are pushed hard against the wall (|x| 47) so the
+    // trunk projects from the rampart instead of standing in the flank lane.
+    // Only species with BAKED collision are eligible: an unbaked one would fall
+    // back to a guessed circle, and this field blocks with measured bodies only.
     for (const [x, z] of [
-      [-45, -18],
-      [45, -44],
-      [-46, -78],
-      [46, -92],
-      [-20, -134],
-      [24, -136],
+      [-47, -18],
+      [47, -44],
+      [-47, -78],
+      [47, -92],
+      [-20, -136],
+      [20, -138],
     ]) {
       both({
-        assetId: rng.pick(['foliage/twisted_1', 'foliage/twisted_3', 'foliage/dead_1']),
+        assetId: rng.pick(['foliage/twisted_1', 'foliage/twisted_3']),
         x,
         z,
         rotY: yaw(rng.range(0, TAU)),
-        scale: r4(rng.range(1.5, 2.2)),
-        collide: false,
+        scale: r4(rng.range(1.4, 1.9)),
+        collide: true,
+        collisionMode: 'baked',
         name: 'Hollow tree',
       });
     }

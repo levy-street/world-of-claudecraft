@@ -38,6 +38,7 @@ import {
   makePaintSampler,
   SOFT_GROUND,
 } from './battleground/ground_paint.mjs';
+import { pieceExtents } from './battleground/kit.mjs';
 import { makeHeightAt } from './battleground/stamp_chain.mjs';
 import { terrainStamps } from './battleground/terrain.mjs';
 
@@ -170,6 +171,90 @@ const { placements, lights, decals } = buildDressing({
   softGround: (x, z) => SOFT_GROUND.has(swatchAt(x, z)),
 });
 
+// ---------------------------------------------------------------------------
+// Collision audit: what you can see, you can touch
+// ---------------------------------------------------------------------------
+//
+// Playtesting found a whole class of props that render as solid objects and
+// have no collision at all: posts, lanterns, fallen columns, braziers, and worst
+// of all fifteen-yard trees a body walks straight through. Individually each one
+// is a one-line oversight; together they make the field feel fake.
+//
+// So it is not a one-off fix. Every placement is measured against its own baked
+// collision body, and one that reads SOLID has to collide or be named here with
+// a reason. The build FAILS otherwise, which means the mistake cannot be made
+// again quietly.
+//
+// A body is "solid" when it is at least this wide in BOTH horizontal axes and
+// stands at least this tall. Below the height floor a piece is ground litter
+// (the physics step carries a body over anything under 0.9yd anyway); below the
+// span floor it is a rail, a banner edge or a flat slab.
+const SOLID_MIN_SPAN = 0.35;
+const SOLID_MIN_TOP = 0.5;
+
+/** The only placements allowed to render solid and not collide, each with the
+ *  reason it is honest rather than an oversight. */
+const NON_COLLIDING_BY_DESIGN = new Map([
+  [
+    'Wall torch',
+    'mounted above head height on a wall that already blocks; its own body is never reachable',
+  ],
+  ['Grave rail', 'art laid over an explicit invisible rail volume, which is what actually blocks'],
+  [
+    'Hollow slope',
+    'the wooded lip OUTSIDE the ramparts: out of play, unreachable, and pure silhouette',
+  ],
+  ['Undergrowth', 'ferns and bushes, which the open world does not collide either'],
+]);
+
+const solidProblems = [];
+const guessedBodies = [];
+const unmeasured = new Set();
+let solidChecked = 0;
+for (const p of placements) {
+  if (p.assetId.startsWith('collider/') || p.assetId === 'grass/patch' || p.hidden) continue;
+  let body;
+  try {
+    body = pieceExtents(assetData, p.assetId);
+  } catch {
+    unmeasured.add(p.assetId);
+    // A COLLIDING piece with no baked body falls back to a guessed circle whose
+    // radius is a per-family factor times its scale. This field blocks with
+    // MEASURED bodies only, so that fallback is a defect here, not a feature.
+    if (p.collide)
+      guessedBodies.push(`${p.assetId} "${p.name ?? '(unnamed)'}" at (${p.x}, ${p.z})`);
+    continue;
+  }
+  const s = p.scale > 0 ? p.scale : 1;
+  const spanX = body.width * s * (p.scaleX ?? 1);
+  const spanZ = body.depth * s * (p.scaleZ ?? 1);
+  const top = body.top * s * (p.scaleY ?? 1);
+  if (Math.min(spanX, spanZ) < SOLID_MIN_SPAN || top < SOLID_MIN_TOP) continue;
+  solidChecked++;
+  if (p.collide) continue;
+  if (NON_COLLIDING_BY_DESIGN.has(p.name)) continue;
+  solidProblems.push(
+    `${p.assetId} "${p.name ?? '(unnamed)'}" at (${p.x}, ${p.z}): renders ` +
+      `${spanX.toFixed(2)}x${spanZ.toFixed(2)}yd and ${top.toFixed(2)}yd tall with no collision`,
+  );
+}
+if (guessedBodies.length > 0) {
+  throw new Error(
+    `${guessedBodies.length} colliding placement(s) have no baked collision body, so they would\n` +
+      'block with a guessed circle instead of their own measured shape. Use a species that is\n' +
+      'in data/battleground/thornhollow_assets.json, or stop it colliding:\n  ' +
+      guessedBodies.join('\n  '),
+  );
+}
+if (solidProblems.length > 0) {
+  throw new Error(
+    `${solidProblems.length} placement(s) render solid but do not collide. Give each one\n` +
+      "`collide: true, collisionMode: 'baked'`, or add its name to NON_COLLIDING_BY_DESIGN\n" +
+      'with the reason it is honest:\n  ' +
+      solidProblems.join('\n  '),
+  );
+}
+
 // Perimeter blockers: a belt-and-braces seal around the rect, independent of
 // the rampart art, so no seam between two wall modules can ever leak a body out
 // of the field.
@@ -255,4 +340,10 @@ console.log(
   `wrote ${OUT_PATH}: ${stamps.length} stamps, ${anchors.length} anchors, ` +
     `${placements.length} placements over ${kinds.size} assets, ${lights.length} lights, ` +
     `${decals.length} decals, paint ${biomePaint.cols}x${biomePaint.rows}`,
+);
+console.log(
+  `  collision audit: ${solidChecked} solid-reading placements, all colliding or named` +
+    (unmeasured.size > 0
+      ? `; no baked body to measure for ${[...unmeasured].sort().join(', ')}`
+      : ''),
 );

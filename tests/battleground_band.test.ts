@@ -67,6 +67,7 @@ import { Sim } from '../src/sim/sim';
 import { BG_PICKUP_RADIUS } from '../src/sim/social/battleground';
 import { bgGraveyardSpot } from '../src/sim/spirit';
 import {
+  TH_COLLIDERS,
   TH_HEIGHT_PROBES,
   TH_LOCATIONS,
   TH_PLACEMENTS,
@@ -75,6 +76,8 @@ import { groundHeight } from '../src/sim/world';
 
 const SEED = 42;
 const ORIGIN = battlegroundOrigin(0);
+/** The vendored per-asset collision table the compiler bakes bodies from. */
+const ASSETS_PATH = 'data/battleground/thornhollow_assets.json';
 
 const locationRect = (name: string) => {
   const rect = TH_LOCATIONS.find((l) => l.name === name);
@@ -814,9 +817,37 @@ describe('Thornhollow collision honesty: what blocks, blocks; what opens, opens'
     expect(battlegroundColliders().filter((c) => c.moveTopY !== undefined)).toHaveLength(
       decks.length,
     );
-    // Some of them are real RAMPS (the keep hall stairs, the drum arcades): a
-    // field that lost its slope decks would still pass the count above.
-    expect(decks.filter((c) => c.topSlope !== undefined).length).toBeGreaterThan(4);
+  });
+
+  it('authors no walkable stairs, and nothing that reads like one', () => {
+    // From playtesting. A stair GLB's baked collision is a ramp deck the
+    // movement kernel only honours from the tread a body already stands on, so
+    // a staircase invites a climb and then refuses it. Every stair came off the
+    // field rather than being half-fixed, and these two pins are what stop one
+    // creeping back: no collider claims a sloped top...
+    expect(battlegroundColliders().filter((c) => c.topSlope !== undefined)).toHaveLength(0);
+    // ...and no stair MODEL is placed either, which is the cause rather than
+    // the symptom (a stair with its collision stripped still invites the climb).
+    expect(TH_PLACEMENTS.filter((p) => /stair/i.test(p.assetId)).map((p) => p.assetId)).toEqual([]);
+  });
+
+  it('leaves the pocket behind each keep as open ground, not a false platform', () => {
+    // Also from playtesting: a raised stone plinth stood back there and read as
+    // a platform without being walkable. The pocket runs from the keep's back
+    // wall (|z| 128) to the rampart (140), inside the keep's own width.
+    for (const sign of [-1, 1]) {
+      const pocket = battlegroundColliders().filter(
+        (c) =>
+          Math.sign(c.z) === sign &&
+          Math.abs(c.z) > 129 &&
+          Math.abs(c.z) < 139.5 &&
+          Math.abs(c.x) < 16,
+      );
+      expect(
+        pocket.filter((c) => c.standable),
+        `something standable stands in the pocket behind keep ${sign}`,
+      ).toHaveLength(0);
+    }
   });
 
   it('every collider is a box, seated inside the field rect', () => {
@@ -834,6 +865,105 @@ describe('Thornhollow collision honesty: what blocks, blocks; what opens, opens'
     const before = first.x;
     first.x += 100;
     expect(battlegroundColliders()[0].x).toBe(before);
+  });
+
+  it('a spirit walks out of its graveyard: the plot is a yard, not a maze', () => {
+    // From playtesting. A released spirit rises on a FIXED five-spot grid
+    // (spirit.ts bgGraveyardSpot) and leaves by the one gap the plan opens in
+    // the rails. The yard used to carry twelve headstones, every one of them
+    // taller than the eye line, so a spirit could not even see the way out.
+    // Both halves of the fix are pinned: how much stands in there, and that the
+    // walk out is actually clear from every spot a spirit can rise on.
+    for (const [i, plot] of BG_GRAVEYARDS.entries()) {
+      const inside = battlegroundColliders().filter(
+        (c) => Math.abs(c.x - plot.x) <= plot.hw && Math.abs(c.z - plot.z) <= plot.hd,
+      );
+      // The four rail volumes bound the plot and are the plan's, not clutter;
+      // everything else standing in there is a headstone or a lantern.
+      expect(inside.length, `graveyard ${i} clutter`).toBeLessThanOrEqual(10);
+      const m = i === 0 ? 1 : -1;
+      const gapX = plot.x - 6 * m;
+      const gapZ = plot.z + 6 * m;
+      const mouth = { x: gapX, z: plot.z + (plot.hd - 1.5) * m };
+      for (let idx = 0; idx < 5; idx++) {
+        const spot = {
+          x: plot.x + ((idx % 2) * 6 - 3) * m,
+          z: plot.z + (Math.floor(idx / 2) - 1) * 3 * m,
+        };
+        // A spirit must RISE somewhere it can stand, unshoved.
+        const settled = resolvePosition(SEED, ORIGIN.x + spot.x, ORIGIN.z + spot.z, BODY_RADIUS);
+        expect(
+          Math.hypot(settled.x - (ORIGIN.x + spot.x), settled.z - (ORIGIN.z + spot.z)),
+          `graveyard ${i} rise spot ${idx} is inside something`,
+        ).toBeLessThan(0.05);
+        // ...and then walk the two legs a player actually walks: across to the
+        // gap mouth, then straight out through it.
+        for (const [a, b] of [
+          [spot, mouth],
+          [mouth, { x: gapX, z: gapZ + 2 * m }],
+        ]) {
+          for (let k = 0; k <= 40; k++) {
+            const t = k / 40;
+            const x = a.x + (b.x - a.x) * t;
+            const z = a.z + (b.z - a.z) * t;
+            expect(
+              isBlocked(SEED, ORIGIN.x + x, ORIGIN.z + z, BODY_RADIUS),
+              `graveyard ${i} spot ${idx}: blocked walking out at (${x.toFixed(1)}, ${z.toFixed(1)})`,
+            ).toBe(false);
+          }
+        }
+      }
+    }
+  });
+
+  it('everything that renders solid also blocks: no walk-through props', () => {
+    // The playtest finding this exists for: posts, lanterns, fallen columns,
+    // braziers and fifteen-yard trees that rendered as objects and had no
+    // collision at all. The map builder audits this at BUILD time; this is the
+    // same claim checked against the COMPILED field, which is what the game
+    // actually loads, so a compiler change cannot quietly drop the bodies.
+    const assets = JSON.parse(
+      readFileSync(join(fileURLToPath(new URL('..', import.meta.url)), ASSETS_PATH), 'utf8'),
+    ) as Record<
+      string,
+      { boxes?: { x: number; y: number; z: number; hx: number; hy: number; hz: number }[] }
+    >;
+    const NON_COLLIDING_BY_DESIGN = new Set(['dungeon/torch_mounted', 'dungeon/fence_broken']);
+    let checked = 0;
+    for (const p of TH_PLACEMENTS) {
+      // Out-of-play slope dressing is unreachable by construction.
+      if (Math.abs(p.x) > BG_HALF_X || Math.abs(p.z) > BG_HALF_Z) continue;
+      if (NON_COLLIDING_BY_DESIGN.has(p.assetId)) continue;
+      const boxes = assets[p.assetId]?.boxes;
+      if (!boxes || boxes.length === 0) continue;
+      let spanX = 0;
+      let spanZ = 0;
+      let top = 0;
+      for (const b of boxes) {
+        spanX = Math.max(spanX, Math.abs(b.x) + b.hx);
+        spanZ = Math.max(spanZ, Math.abs(b.z) + b.hz);
+        top = Math.max(top, b.y + b.hy);
+      }
+      const s = p.scale > 0 ? p.scale : 1;
+      if (
+        Math.min(spanX * s * (p.scaleX ?? 1), spanZ * s * (p.scaleZ ?? 1)) < 0.2 ||
+        top * s * (p.scaleY ?? 1) < 0.5
+      ) {
+        continue;
+      }
+      checked++;
+      const reach = Math.max(spanX, spanZ) * s * Math.max(p.scaleX ?? 1, p.scaleZ ?? 1) + 1.5;
+      const hit = TH_COLLIDERS.some(
+        (c) => Math.abs(c.x - p.x) <= reach && Math.abs(c.z - p.z) <= reach,
+      );
+      expect(hit, `${p.assetId} at (${p.x}, ${p.z}) renders solid but nothing blocks there`).toBe(
+        true,
+      );
+    }
+    // Vacuity floor, kept near the real count (712) rather than far under it:
+    // a floor with room to spare is what lets a whole family drop out of the
+    // sweep unnoticed.
+    expect(checked).toBeGreaterThan(650);
   });
 
   it('the art the map placed stays inside the declared dressing bound', () => {
