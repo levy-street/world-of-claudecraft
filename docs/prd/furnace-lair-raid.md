@@ -27,6 +27,15 @@ wing 2, chests in wing 3, the two missing slots. Naming rule: nothing borrowed f
 WoW spells, bosses, or items (ip_scrub). Open-source game, no secrets: prestige comes
 from difficulty and visible cosmetics, never hidden knowledge.
 
+The Ember Vein (the forward hook, costs nothing here): Volzharr's fire is a VEIN,
+not a point: the same deep heat that surfaces as the Drakelands' Drakemaw belt and
+cinder desert to the north. Killing him half-formed does not end the fire; it
+recedes north along the vein. This raid quietly explains why the Drakelands burns,
+and the cult's beast-quartermaster who fled north with the kennels when the raid
+came (Maerin finds his torn-out ledger page, below) is the planted villain of a
+future Drakelands five-man. One lore line and one paragraph; no shared state, no
+dependency in either direction.
+
 ## Release structure
 
 - Three `DUNGEON_DEFS` entries (`undermount_wing1` .. `undermount_wing3`), each one
@@ -51,7 +60,9 @@ Maerin is a scholar who follows the raid down; her arc is the audience realizing
 front is a front. After each boss she enters, yells 2 to 3 lines over the corpse, and
 channels the next sealed door. Her beats:
 - After wing 1, puzzled: "This craftsmanship... a whole guild's work, for a cult of
-  arsonists? Something down here is worth hiding behind all this."
+  arsonists? Something down here is worth hiding behind all this." Then, at the
+  keepers' ledger (the Ember Vein plant, one line): "Beast provisions, wages,
+  kennel feed... and the signature page torn out. Someone left in a hurry. North."
 - In the abandoned quench hall between wings, suspicious: the runes are a cooling
   system. "They are not making anything. They are keeping something ASLEEP until
   they are ready."
@@ -125,11 +136,16 @@ tempers RAIDERS. Where you stand relative to your own raid is the whole fight.
 - Story beat: killing Odrenn RUSHES the ritual: the vessel he was tempering shatters
   early (his death line says so), which is why wing 3's god is half-formed.
 
-## Wing 3, The Waking: Volzharr (verb: survive the geography)
+## Wing 3, The Waking: Volzharr (verb: survive the geography, on the move)
 
-Boss: level 26, `boss: true`, `elite: true`, `ccImmune: true`, one continuous phase.
-The kernel is the whole fight: permanent vents and geysers, line-of-sight Eruption,
-Forgeheat, one scheduler; vent saturation is the enrage pressure. Arena: a circular
+Boss: level 26, `boss: true`, `elite: true`, `ccImmune: true`, one continuous phase,
+and he WALKS: `moveSpeed 5.5` (tuning, below the player run of 7), slow and
+unstoppable, always advancing on his threat target. Nobody tanks Volzharr in a
+corner; the tank ROUTES him along whatever corridors the vents have not eaten yet,
+and the shrinking floor turns the kite path into a live problem that gets harder
+all fight. The kernel is the whole fight: permanent vents and geysers, the ember
+march (below), line-of-sight Eruption, Forgeheat, one scheduler; vent saturation
+plus Emberfeed stacks are the twin enrage pressures. Arena: a circular
 magma chamber ~70 yd across, a raised vent-free rock rim (not a safe spot: Molten
 Ejecta hits it), and 5 to 7 STATIC stalagmite pillar colliders that cast survivable
 Eruption shadows (`lineOfSightClear`), stop template-knockback punts, and anchor the
@@ -142,8 +158,9 @@ lands shortly before an Eruption telegraph so the raid learns to pre-position), 
 Fury (`enrage`, belowHpPct 0.15, dmgMult 1.4, hasteMult 1.25, tuning), `yells` (3 to
 4 short seismic lines), ordinary template `knockback`. Dormant Cinderlings: 8 to 10
 half-sunk magma elementals, low HP, `aggroRadius` 3 to 4, deterministic-rng positions
-weighted near future vent corridors; proximity IS the wake mechanic, the emerge sold
-by the render layer. No `summonAdds`.
+weighted near future vent corridors; proximity wakes one early (the guilt mechanic),
+the emerge sold by the render layer. No `summonAdds`: every add that will ever exist
+is on the floor at pull, visible, countable, and part of the routing problem.
 
 Scripted systems (`encounters/volzharr.ts`), the kernel only:
 1. **Vent Fissures + geysers.** Every ~25 s (tuning) a permanent Vent Fissure opens
@@ -168,7 +185,20 @@ Scripted systems (`encounters/volzharr.ts`), the kernel only:
    TAKEN (opener: +4% damage, +4% haste, +20% fire taken per stack, cap 5, decays a
    few seconds after leaving; tuning). Composes from existing aura effects; no new
    primitive. The nameable skill decision: "are you greeding vents?"
-4. **One scheduler, one rule.** Control effects never overlap a cover window:
+4. **The Embers Come Home (the empower march, maintainer design 2026-07-29).**
+   Every ~30 s (tuning) the module wakes one dormant Cinderling (proximity can wake
+   one early). A woken Cinderling never attacks players: it turns and SHAMBLES
+   toward Volzharr at ~3 speed (tuning), slow and visible, immune to vents (it is
+   magma). If it reaches him (~3 yd) he CONSUMES it: one permanent Emberfeed stack,
+   +4% damage and +3% haste (tuning), uncapped: the half-formed god rebuilding
+   himself from his own embers. Cinderlings are low-HP and killable anywhere along
+   the walk; killing one denies the stack. The raid's DPS priority becomes
+   intercepting shamblers along their walk lines while the tank routes Volzharr
+   AWAY from the next wake, and Emberfeed is the fight's aging clock: a clean raid
+   eats 1 to 2 stacks, a sloppy one drowns. Module-owned walk target and consume
+   check, zero engine work (the module already drives per-tick logic; the walk is
+   the module steering an entity it owns).
+5. **One scheduler, one rule.** Control effects never overlap a cover window:
    Tremor is suppressed while an Eruption telegraph is live (it re-fires after), and
    a suppressed effect RE-ANCHORS its next fire from when it actually fired, so
    drift permanently de-syncs harmonic cadence locks. A stunned player facing a
@@ -178,8 +208,8 @@ Reserve list (not built; promotion is a later Levy call):
 - The Floor Breathes: at Final Fury every open vent geysers on a shared 8 s pulse;
   the execute becomes burn, launch wave, reposition, burn. Reuses the geyser system
   wholesale. Playtest-gated: only if the execute is flat without it.
-- Waking Fury: a permanent +5% fire-damage stack every 30 s, a second clock
-  alongside floor space, squeezing Forgeheat greed as the fight ages.
+(Waking Fury is DELETED from the reserve, not parked: Emberfeed now owns the
+aging-clock job, and one aging clock is the spartan budget.)
 Furnace Slam (needs a `SimContext` knockback exposure) and Vent Surge (needs a
 ground-AoE fuse field) are CUT outright, not reserved: they require engine fields
 and this raid ships zero engine work.
@@ -209,10 +239,12 @@ Nythraxis (Nythraxis normal is 60,000 effective: `hpBase: 60000 / 2.3` times the
 elite 2.3x at spawn, `dungeons.ts` + `entity.ts`; review-corrected, the earlier
 51,239 anchor existed nowhere in the tree). The same pre-compensation idiom:
 `hpBase: 69000 / 2.3`, `hpPerLevel: 0`.
-Melee `dmgBase 58`, `dmgPerLevel 11.4`, `attackSpeed 2.6`. Target 4 to 6 minutes at
-ilvl 29; vent saturation makes ~8 minutes a practical wipe. Forgeheat uptime is in
-the HP budget: a no-vent raid should feel undertuned on the enrage, a full-greed
-raid comfortably ahead of it.
+Melee `dmgBase 58`, `dmgPerLevel 11.4`, `attackSpeed 2.6`, `moveSpeed 5.5`. Target
+4 to 6 minutes at ilvl 29; vent saturation makes ~8 minutes a practical wipe, and
+the Emberfeed curve is tuned so 1 to 2 consumed embers is par, 4 is a threat check,
+6 or more is the wipe (tuning). Forgeheat uptime is in the HP budget: a no-vent
+raid should feel undertuned on the enrage, a full-greed raid comfortably ahead of
+it.
 
 ## Loot (Gravewyrm Sanctum structure)
 
