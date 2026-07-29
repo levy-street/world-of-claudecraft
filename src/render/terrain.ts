@@ -149,9 +149,50 @@ const WALL_LOD_RIM_MARGIN = 40;
 // world but is baked sparsely by zone, so keep it compact enough that entering
 // a new region never turns tens of thousands of height samples into a
 // second boot. At the current bounds this is roughly 3yd/texel.
-const NORMAL_TEX_W = 320;
-const NORMAL_TEX_H = 960;
-const NORMAL_TEX_STRENGTH = 1.35;
+export const TERRAIN_NORMAL_TEXTURE_WIDTH = 320;
+export const TERRAIN_NORMAL_TEXTURE_HEIGHT = 960;
+export const TERRAIN_NORMAL_TEXTURE_STRENGTH = 1.35;
+const NORMAL_TEX_W = TERRAIN_NORMAL_TEXTURE_WIDTH;
+const NORMAL_TEX_H = TERRAIN_NORMAL_TEXTURE_HEIGHT;
+const NORMAL_TEX_STRENGTH = TERRAIN_NORMAL_TEXTURE_STRENGTH;
+
+/** Production world-to-texel region selection used by high-tier zone builds.
+ * Exported so the asymmetric Farshore mapping is pinned without constructing
+ * the full Three.js terrain graph. */
+export function terrainNormalRegionsFor(
+  zone: ZoneDef,
+  cells: readonly [number, number][],
+): TexelBounds[] {
+  const normalTexelsOver = (minX: number, minZ: number, maxX: number, maxZ: number) =>
+    normalTexelBounds(
+      minX,
+      minZ,
+      maxX,
+      maxZ,
+      WORLD_MIN_X,
+      WORLD_MIN_Z,
+      WORLD_MAX_X - WORLD_MIN_X,
+      WORLD_MAX_Z - WORLD_MIN_Z,
+      NORMAL_TEX_W,
+      NORMAL_TEX_H,
+      1,
+    );
+  const minX = zone.xMin ?? STRIP_MIN_X;
+  const maxX = zone.xMax ?? STRIP_MAX_X;
+  const regions: TexelBounds[] = [];
+  const zoneBounds = normalTexelsOver(minX, zone.zMin, maxX, zone.zMax);
+  if (zoneBounds) regions.push(zoneBounds);
+  for (const [cx, cz] of cells) {
+    const x0 = WORLD_MIN_X + cx * CHUNK_SIZE;
+    const z0 = WORLD_MIN_Z + cz * CHUNK_SIZE;
+    const inside =
+      x0 >= minX && x0 + CHUNK_SIZE <= maxX && z0 >= zone.zMin && z0 + CHUNK_SIZE <= zone.zMax;
+    if (inside) continue;
+    const cellBounds = normalTexelsOver(x0, z0, x0 + CHUNK_SIZE, z0 + CHUNK_SIZE);
+    if (cellBounds) regions.push(cellBounds);
+  }
+  return regions;
+}
 
 // Ground colors per biome; boundaries blend across the same window as the
 // heightfield's shape blend. This is the tint layer the splat albedo
@@ -228,7 +269,7 @@ async function buildChunkGeometryIdle(
 // share this one path so a partial rebake is byte-identical to a full one:
 // heights are sampled one texel beyond the baked rect (clamped at the texture
 // border, exactly like the full bake's clamped derivative stencil).
-function bakeNormalRegion(
+export function bakeTerrainNormalRegion(
   data: Uint8Array,
   seed: number,
   i0: number,
@@ -867,43 +908,12 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
   // timeout still forces progress under sustained load, so a later gating
   // caller awaiting the same shared task is never starved indefinitely.
   const yieldIdle = (): Promise<void> => idleSlot(IDLE_BUILD_TIMEOUT_MS);
-  const normalTexelsOver = (minX: number, minZ: number, maxX: number, maxZ: number) =>
-    normalTexelBounds(
-      minX,
-      minZ,
-      maxX,
-      maxZ,
-      WORLD_MIN_X,
-      WORLD_MIN_Z,
-      worldWidth,
-      WORLD_MAX_Z - WORLD_MIN_Z,
-      NORMAL_TEX_W,
-      NORMAL_TEX_H,
-      1,
-    );
   // The macro normal texels this zone's build must bake: its own rectangle,
   // plus one region per owned cell lying outside it (the gap cells above).
   // An unbaked texel stays flat, so without the extra regions the macro relief
   // would stop dead at the realm border. Region-per-cell rather than one
   // bounding box over rect + cells: the gap west of Eastbrook Vale is as wide
   // as the realm itself, and a bbox would re-bake that whole empty quadrant.
-  const normalRegionsFor = (zone: ZoneDef, cells: readonly [number, number][]): TexelBounds[] => {
-    const minX = zone.xMin ?? STRIP_MIN_X;
-    const maxX = zone.xMax ?? STRIP_MAX_X;
-    const regions: TexelBounds[] = [];
-    const zoneBounds = normalTexelsOver(minX, zone.zMin, maxX, zone.zMax);
-    if (zoneBounds) regions.push(zoneBounds);
-    for (const [cx, cz] of cells) {
-      const x0 = WORLD_MIN_X + cx * CHUNK_SIZE;
-      const z0 = WORLD_MIN_Z + cz * CHUNK_SIZE;
-      const inside =
-        x0 >= minX && x0 + CHUNK_SIZE <= maxX && z0 >= zone.zMin && z0 + CHUNK_SIZE <= zone.zMax;
-      if (inside) continue; // already covered by zoneBounds
-      const cellBounds = normalTexelsOver(x0, z0, x0 + CHUNK_SIZE, z0 + CHUNK_SIZE);
-      if (cellBounds) regions.push(cellBounds);
-    }
-    return regions;
-  };
   const ensureZone = (
     zone: ZoneDef,
     onProgress?: (done: number, total: number) => void,
@@ -931,7 +941,7 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
         opts?.priority ?? priorityPoint,
         CHUNK_SIZE * 3,
       );
-      const normalRegions = normalTex ? normalRegionsFor(zone, cells) : [];
+      const normalRegions = normalTex ? terrainNormalRegionsFor(zone, cells) : [];
       const rowsPerSlice = 12;
       const normalSlices = normalRegions.reduce(
         (slices, region) => slices + Math.ceil((region.j1 - region.j0 + 1) / rowsPerSlice),
@@ -943,7 +953,7 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
         for (const region of normalRegions) {
           for (let j = region.j0; j <= region.j1; j += rowsPerSlice) {
             if (cancelled) return;
-            bakeNormalRegion(
+            bakeTerrainNormalRegion(
               normalTex.image.data as Uint8Array,
               seed,
               region.i0,
@@ -1065,7 +1075,7 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
         1,
       );
       if (!bounds) return;
-      bakeNormalRegion(
+      bakeTerrainNormalRegion(
         normalTex.image.data as Uint8Array,
         seed,
         bounds.i0,

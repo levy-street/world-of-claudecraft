@@ -1,4 +1,4 @@
-export const ONLINE_WORLD_AUTH_TYPE: 'auth-world-3';
+export const ONLINE_WORLD_AUTH_TYPE: 'auth-world-4';
 
 export interface WorldAuthMessage {
   readonly t: typeof ONLINE_WORLD_AUTH_TYPE;

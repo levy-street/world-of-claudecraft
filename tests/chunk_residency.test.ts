@@ -326,7 +326,7 @@ describe('partially built neighbours (the reported walls)', () => {
         if (owner === 'mirefen_marsh') return cz < lowestBuiltRow;
         return true;
       };
-    const thresholds = [mirefenRows[mirefenRows.length - 1] + 1, ...mirefenRows.toReversed()];
+    const thresholds = [mirefenRows[mirefenRows.length - 1] + 1, ...[...mirefenRows].reverse()];
     const opened = thresholds.map((row) =>
       fogFarForBuiltGround(GRID, builtThrough(row), camera.x, camera.z, MAX_OUTDOOR_FOG_FAR),
     );

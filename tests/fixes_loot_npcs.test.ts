@@ -668,7 +668,7 @@ describe('RL observation encoding', () => {
   // to [0, 1] while the others use [0, 1.5] (the 60-unit observation radius), so
   // a target between 40 and 60 units saturated and lost distance granularity.
   // Target distance index: 16 self + 2 fields per ability slot + presence/hp/level.
-  const ABILITY_SLOTS = ACTIONS.length - 13;
+  const ABILITY_SLOTS = ACTIONS.filter((action) => action.startsWith('ability_')).length;
   const TARGET_DIST_INDEX = 16 + ABILITY_SLOTS * 2 + 3;
 
   it('encodes target distance on the same 1.5 scale as nearby mobs', () => {

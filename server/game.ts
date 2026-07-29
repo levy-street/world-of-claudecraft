@@ -3010,6 +3010,8 @@ export class GameServer {
       // Epoch ms of an active chat mute, or null. Lets the client show status
       // at login; sending is still gated server-side regardless.
       chatMutedUntil: session.chatMutedUntil ?? null,
+      sceneState: this.sim.sceneReconnectStateFor(pid),
+      sceneChoiceState: this.sim.sceneChoiceReconnectStateFor(pid),
     });
     // Only the entering player sees their own world-entry notice; we don't
     // broadcast it to everyone (and likewise don't broadcast departures below).
@@ -3093,6 +3095,8 @@ export class GameServer {
       realm: REALM,
       softWords: this.chatFilter.softWords(),
       chatMutedUntil: session.chatMutedUntil ?? null,
+      sceneState: this.sim.sceneReconnectStateFor(session.pid),
+      sceneChoiceState: this.sim.sceneChoiceReconnectStateFor(session.pid),
     });
     // No self "entered the world" notice here: on a seamless reconnect the
     // player never saw themselves leave (and friends never got a presence

@@ -5330,6 +5330,7 @@ export class Hud {
     this.vcupBriefing.relocalize();
     this.vcupCharge.relocalize();
     this.questDialog.relocalize();
+    this.sceneController.relocalize();
   }
 
   // Prefers the live resolved entry when the player already knows it (rank +
@@ -9816,6 +9817,8 @@ export class Hud {
         case 'scene':
         case 'sceneChoice':
         case 'sceneChoiceResult':
+        case 'sceneSync':
+        case 'sceneChoiceSync':
           this.sceneController.onEvent(ev);
           break;
         case 'learnAbility':

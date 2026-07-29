@@ -1672,6 +1672,10 @@ async function startGame(
   // Last Bell scene director (camera shots, input lock, music directives,
   // prop cues). Presentation only: skips and choice answers go back through
   // IWorld.
+  const sceneReducedMotionMedia =
+    typeof window.matchMedia === 'function'
+      ? window.matchMedia('(prefers-reduced-motion: reduce)')
+      : null;
   const sceneDirector = new SceneDirector({
     world: () => world,
     nowSec: () => performance.now() / 1000,
@@ -1680,6 +1684,8 @@ async function startGame(
     propCue: (target, cue) => cueHarborShip(target, cue),
     propReset: () => resetHarborShipCues(),
     attachmentFrame: (target, out) => harborShipAttachFrame(target, out),
+    reducedMotion: () =>
+      settings.get('reduceMotion') || (sceneReducedMotionMedia?.matches ?? false),
   });
   perf.setInputDebugProvider(() => ({
     ...input.debugState(),
@@ -3867,15 +3873,23 @@ async function startGame(
   // focus re-reads the entity's live mirrored position via IWorld every frame
   // (inside sceneDirector.cameraPose); the focus point rides to the renderer
   // on sceneCameraFocus, re-anchoring the chase camera off the player.
+  const sceneLivePose = {
+    yaw: input.camYaw,
+    pitch: input.camPitch,
+    dist: input.camDist,
+    playerX: world.player.pos.x,
+    playerY: world.player.pos.y,
+    playerZ: world.player.pos.z,
+  };
+  const sceneFocus = { x: 0, y: 0, z: 0 };
   const sceneCameraTick = (): void => {
-    const pose = sceneDirector.cameraPose({
-      yaw: input.camYaw,
-      pitch: input.camPitch,
-      dist: input.camDist,
-      playerX: world.player.pos.x,
-      playerY: world.player.pos.y,
-      playerZ: world.player.pos.z,
-    });
+    sceneLivePose.yaw = input.camYaw;
+    sceneLivePose.pitch = input.camPitch;
+    sceneLivePose.dist = input.camDist;
+    sceneLivePose.playerX = world.player.pos.x;
+    sceneLivePose.playerY = world.player.pos.y;
+    sceneLivePose.playerZ = world.player.pos.z;
+    const pose = sceneDirector.cameraPose(sceneLivePose);
     if (!pose) {
       renderer.sceneCameraFocus = null;
       return;
@@ -3883,16 +3897,17 @@ async function startGame(
     input.camYaw = pose.yaw;
     input.camPitch = pose.pitch;
     input.camDist = pose.dist;
-    renderer.sceneCameraFocus = { x: pose.focusX, y: pose.focusY, z: pose.focusZ };
+    sceneFocus.x = pose.focusX;
+    sceneFocus.y = pose.focusY;
+    sceneFocus.z = pose.focusZ;
+    renderer.sceneCameraFocus = sceneFocus;
   };
   // "Reduce motion" is the EFFECTIVE flag (the OS prefers-reduced-motion query OR the
   // in-game switch, the ui_effects_profile model): the intro is exactly the kind of
   // sweeping camera glide that contract exists for, and checking only the in-game
   // switch left OS-level reduce-motion players watching it (it also hid #ui from
   // them, silently dropping any focus() into the HUD while it ran).
-  const osReducedMotion =
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const osReducedMotion = sceneReducedMotionMedia?.matches ?? false;
   const introPolicy = decideSpawnCinematic({
     requested: playIntro,
     seen: introSeen,

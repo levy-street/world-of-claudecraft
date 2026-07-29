@@ -7,7 +7,7 @@
 // the clicked option through `deps`.
 
 import type { TranslationKey } from '../../i18n';
-import { formatNumber, t } from '../../i18n';
+import { formatNumber, getLanguage, t } from '../../i18n';
 import type { PainterHostWriters } from '../../painter_host';
 import type { SceneChoiceModel } from './scene_choice_view';
 
@@ -30,6 +30,14 @@ export class SceneChoiceWindow {
   /** The choiceId the cold render was built for; a change re-renders. */
   private renderedChoiceId: string | null = null;
   private renderedIsLeader = false;
+  private renderedLanguage = '';
+  private renderedPromptKey: string | null = null;
+  private renderedOptions: readonly SceneChoiceModel['options'][number][] | null = null;
+  private renderedValues: Record<string, string | number> | null = null;
+  private renderedLeaderName = '';
+  private timerLanguage = '';
+  private timerSeconds: number | null = null;
+  private timerText = '';
 
   constructor(private readonly deps: SceneChoiceWindowDeps) {
     const doc = deps.document;
@@ -58,17 +66,41 @@ export class SceneChoiceWindow {
       this.renderedChoiceId = null;
       return;
     }
-    if (this.renderedChoiceId !== model.choiceId || this.renderedIsLeader !== model.isLeader) {
+    const language = getLanguage();
+    if (
+      this.renderedChoiceId !== model.choiceId ||
+      this.renderedIsLeader !== model.isLeader ||
+      this.renderedLanguage !== language ||
+      this.renderedPromptKey !== model.promptKey ||
+      this.renderedOptions !== model.options ||
+      this.renderedValues !== model.values ||
+      this.renderedLeaderName !== leaderName
+    ) {
       this.renderedChoiceId = model.choiceId;
       this.renderedIsLeader = model.isLeader;
+      this.renderedLanguage = language;
+      this.renderedPromptKey = model.promptKey;
+      this.renderedOptions = model.options;
+      this.renderedValues = model.values;
+      this.renderedLeaderName = leaderName;
       this.renderPrompt(model, leaderName);
     }
-    w.setText(
-      this.timerEl,
-      model.remainingSeconds !== null
-        ? t('hudChrome.scene.timer', { seconds: formatNumber(model.remainingSeconds, NUM0) })
-        : '',
-    );
+    if (this.timerLanguage !== language || this.timerSeconds !== model.remainingSeconds) {
+      this.timerLanguage = language;
+      this.timerSeconds = model.remainingSeconds;
+      this.timerText =
+        model.remainingSeconds !== null
+          ? t('hudChrome.scene.timer', { seconds: formatNumber(model.remainingSeconds, NUM0) })
+          : '';
+    }
+    w.setText(this.timerEl, this.timerText);
+  }
+
+  /** Invalidate the cold localized body after a live locale switch. */
+  relocalize(): void {
+    this.renderedChoiceId = null;
+    this.renderedLanguage = '';
+    this.timerLanguage = '';
   }
 
   private renderPrompt(model: SceneChoiceModel, leaderName: string): void {

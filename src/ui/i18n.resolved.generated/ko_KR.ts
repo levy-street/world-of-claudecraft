@@ -11026,22 +11026,22 @@ export const ko_KR: EnTranslations = {
         "name": "어부 브람"
       },
       "lb_actor_coalfast": {
-        "name": "Warden Coalfast"
+        "name": "숯불 워든"
       },
       "lb_actor_ollun": {
-        "name": "Riftwatch Ollun"
+        "name": "균열감시자 올룬"
       },
       "lb_actor_edda": {
-        "name": "Quartermaster Edda"
+        "name": "병참관 에다"
       },
       "lb_actor_saul": {
-        "name": "Mender Saul"
+        "name": "치료사 사울"
       },
       "lb_actor_tam": {
-        "name": "Bellkeeper Tam"
+        "name": "종지기 탐"
       },
       "tidemill_stalker": {
-        "name": "The Tidemill Stalker"
+        "name": "밀물방앗간 추적자"
       },
       "rift_hellguard": {
         "name": "지옥 수호병"
@@ -11599,19 +11599,19 @@ export const ko_KR: EnTranslations = {
         "greeting": "그물을 말리던 바로 그 자리에서 열렸어요. 바로 거기, 제가 평생 매일 아침 서 있던 그 자리에서요. 이제 저는 해안으로 내려가지 않아요. 이제는 어디로도 잘 가지 않는답니다."
       },
       "ferryman_ewald": {
-        "name": "Ferryman Ewald",
-        "title": "The Farshore Crossing",
-        "greeting": "The Farshore, is it? Nobody crosses for the fishing anymore, friend. Board when you are ready, and mind the bell when you land: the town listens to it the way you listen to weather."
+        "name": "뱃사공 에발트",
+        "title": "건너편 해안 나루",
+        "greeting": "건너편 해안으로 가나? 이제 고기잡이 때문에 건너는 사람은 아무도 없어, 친구. 준비되면 배에 타게. 도착하면 종소리를 잘 들어. 그 마을 사람들은 자네가 날씨를 살피듯 종소리를 듣거든."
       },
       "ferrykeeper_odda": {
-        "name": "Ferrykeeper Odda",
-        "title": "The Farshore Crossing",
-        "greeting": "Mainland-bound? The ship goes when you are aboard, not before. And if you hear the bell start counting while we cast off, do not ask me to turn her around: nobody rows toward a three-toll."
+        "name": "나루지기 오다",
+        "title": "건너편 해안 나루",
+        "greeting": "본토로 가나? 배는 자네가 탄 뒤에 떠나. 그전에는 안 가. 밧줄을 풀 때 종이 횟수를 세기 시작해도 돌아가 달라고 하지는 마. 세 번 울리는 종을 향해 노를 젓는 사람은 없으니까."
       },
       "sergeant_marsh": {
-        "name": "Sergeant Marsh",
-        "title": "Town Militia",
-        "greeting": "Trained? Then here is how tonight works. My line holds the road. If the rift coughs up something we cannot put down, I point at you. The mill is yours: nothing follows you in, nothing gets past us to town. Go."
+        "name": "마시 중사",
+        "title": "마을 민병대",
+        "greeting": "훈련은 받았나? 그럼 오늘 밤의 방식을 알려 주지. 내 전열이 길을 지킨다. 균열이 우리가 쓰러뜨리지 못할 것을 토해 내면 내가 자네를 가리킬 거다. 방앗간은 자네 몫이다. 아무것도 따라 들어가게 하지 말고, 아무것도 우리를 지나 마을로 가게 하지 마라. 가."
       },
       "forgemistress_darva": {
         "name": "단조사 다르바",
@@ -13596,18 +13596,18 @@ export const ko_KR: EnTranslations = {
         }
       },
       "q_lb_q0_ashore": {
-        "title": "Ashore",
-        "text": "Gullhaven takes the breaks day and night and holds anyway. If you mean to stand with them, start where the town bleeds: the militia line at the Watch Meadow, east past the harbor steps and the old statue.",
-        "completion": "The mill kill was yours alone, and Tam does not exaggerate about stretchers. I am short a scout and long on fields. You held ground tonight that was not yours to hold, and that is the whole job. Welcome to the watch.",
+        "title": "상륙",
+        "text": "갈매기항은 밤낮으로 균열의 공격을 받고도 버티고 있다. 그들과 함께 설 생각이라면 마을이 피 흘리는 곳에서 시작하라. 항구 계단과 오래된 조각상을 지나 동쪽으로 가서 감시 초원의 민병대 전열로 향하라.",
+        "completion": "방앗간의 괴물은 자네 혼자 쓰러뜨렸고, 들것에 관한 탐의 말도 과장이 아니더군. 정찰병은 부족하고 지켜야 할 들판은 넘친다. 오늘 밤 자네는 원래 자네 것이 아닌 땅을 지켰다. 그게 이 일의 전부다. 감시대에 온 걸 환영한다.",
         "objectives": {
           "0": {
-            "label": "Report to Sergeant Marsh at the Watch Meadow"
+            "label": "감시 초원의 마시 중사에게 보고"
           },
           "1": {
-            "label": "Riftspawn slain"
+            "label": "균열의 소생물 처치"
           },
           "2": {
-            "label": "Put down whatever is in the Tidemill"
+            "label": "밀물방앗간 안의 무언가를 처치"
           }
         }
       },
@@ -14215,49 +14215,49 @@ export const ko_KR: EnTranslations = {
         "leaveText": "요새의 문을 닫고 드레이크랜드의 바람 속으로 돌아갑니다."
       },
       "lb_tidemill": {
-        "name": "The Tidemill",
-        "enterText": "The mill door gives. Inside, the dark is listening.",
-        "leaveText": "You step out of the Tidemill into the evening air."
+        "name": "밀물방앗간",
+        "enterText": "방앗간 문이 열린다. 안에서는 어둠이 귀를 기울이고 있다.",
+        "leaveText": "밀물방앗간을 나와 저녁 공기 속으로 들어선다."
       },
       "lb_riftline": {
-        "name": "The Rift-Line at Dusk",
-        "enterText": "The meadow gate closes behind the patrol. The night belongs to the line.",
-        "leaveText": "You leave the rift-line to the dawn watch."
+        "name": "해질녘 균열 방어선",
+        "enterText": "순찰대 뒤로 초원의 문이 닫힌다. 오늘 밤은 이 방어선의 것이다.",
+        "leaveText": "균열 방어선을 새벽 경비대에 맡기고 떠난다."
       },
       "lb_vault": {
-        "name": "The Drowned First Redoubt",
-        "enterText": "The rope pays out into the dark. Below, the old redoubt lies where it fell.",
-        "leaveText": "You come up the cliff rope into daylight."
+        "name": "가라앉은 첫 번째 보루",
+        "enterText": "밧줄이 어둠 속으로 풀려 내려간다. 아래에는 오래된 보루가 추락한 자리에 누워 있다.",
+        "leaveText": "절벽 밧줄을 타고 햇빛 속으로 올라온다."
       },
       "lb_council": {
-        "name": "The Redoubt Council",
-        "enterText": "The council room holds six chairs. One is empty.",
-        "leaveText": "You step out of the redoubt."
+        "name": "보루 평의회",
+        "enterText": "평의회실에는 의자가 여섯 개 있다. 하나는 비어 있다.",
+        "leaveText": "보루 밖으로 나온다."
       },
       "lb_landing": {
-        "name": "The Landing at Night",
-        "enterText": "The guide fires burn down the beach. The fleet waits beyond the shoals.",
-        "leaveText": "You leave the Landing beach behind."
+        "name": "밤의 상륙지",
+        "enterText": "유도 불길이 해변을 따라 타오른다. 함대는 여울 너머에서 기다린다.",
+        "leaveText": "상륙 해변을 뒤로하고 떠난다."
       },
       "lb_riftfields": {
-        "name": "The Riftfields Approach",
-        "enterText": "Four ward sites ring the breach. The rite has closed it for twelve centuries.",
-        "leaveText": "You walk back down out of the Riftfields."
+        "name": "균열 들판 진입로",
+        "enterText": "네 곳의 수호 지점이 균열을 둘러싼다. 의식은 이곳을 열두 세기 동안 봉인했다.",
+        "leaveText": "균열 들판에서 아래로 걸어 내려온다."
       },
       "lb_breach": {
-        "name": "Inside the Breach",
-        "enterText": "The light is wrong and the sky is worse. The heart sits in open ground ahead.",
-        "leaveText": "You cross the threshold into ordinary night air."
+        "name": "균열 안쪽",
+        "enterText": "빛이 잘못되어 있고 하늘은 더 나쁘다. 핵은 앞쪽의 탁 트인 땅에 있다.",
+        "leaveText": "경계를 넘어 평범한 밤공기 속으로 돌아온다."
       },
       "lb_lastwatch": {
-        "name": "The Last Watch",
-        "enterText": "The redoubt is clean and empty. Someone has to close the watch.",
-        "leaveText": "You close the redoubt door behind you."
+        "name": "마지막 경계",
+        "enterText": "보루는 깨끗하고 비어 있다. 누군가는 이 경계를 끝내야 한다.",
+        "leaveText": "뒤에서 보루의 문을 닫는다."
       },
       "lb_willowfen": {
-        "name": "Willowweep",
-        "enterText": "The willow does not move. The water does not either.",
-        "leaveText": "You leave the willow to its quiet."
+        "name": "우는버들 늪",
+        "enterText": "버드나무는 움직이지 않는다. 물도 마찬가지다.",
+        "leaveText": "버드나무를 고요 속에 남겨 두고 떠난다."
       },
       "drowned_temple": {
         "name": "익사한 신전",

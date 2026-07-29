@@ -40,6 +40,12 @@ beforeAll(() => {
       },
     ],
   });
+  registerScenario({
+    id: 'sc_test_missing_scene',
+    dungeonId: 'lb_riftline',
+    questId: QUEST_ID,
+    stages: [{ id: 'broken', objective: { kind: 'scene' }, sceneId: 'missing_scene' }],
+  });
 });
 
 function makeSim(): Sim {
@@ -99,6 +105,22 @@ describe('scenario gating and lifecycle', () => {
     // The stage directive landed on Coalfast.
     // (Draw-free arming: spawns are even rings at fixed levels.)
     expect(draws).toBe(0);
+  });
+
+  it('does not arm or auto-complete a scene stage when playback cannot start', () => {
+    const sim = makeSim();
+    expect(startScenario(sim.ctx, 'sc_test_missing_scene')).toBe(true);
+    const claim = sim.ctx.instances.find(
+      (instance) => instance.dungeonId === 'lb_riftline' && instance.partyKey !== null,
+    );
+    const scenario =
+      claim?.exitId !== null && claim !== undefined
+        ? scenarioRunFor(sim.ctx, claim.exitId ?? -1)
+        : undefined;
+    sim.tick();
+    expect(scenario?.stageArmed).toBe(false);
+    expect(scenario?.stageIndex).toBe(0);
+    expect(scenario?.done).toBe(false);
   });
 
   it('advances killSpawned -> quest -> reach -> survive to completion', () => {

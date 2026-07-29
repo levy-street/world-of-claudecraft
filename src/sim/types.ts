@@ -3885,6 +3885,28 @@ export type SceneWireOp =
   // key plus the segment id in cue; the end op resets all active segments.
   | { kind: 'prop'; target: string; cue: string };
 
+/** Authoritative persistent scene state sent in a reconnect hello. Historical
+ * one-shot presentation ops are intentionally not replayed. */
+export interface SceneReconnectState {
+  sceneId: string;
+  remainingSeconds: number;
+  inputLocked: boolean;
+  letterbox: boolean;
+  musicSilenced: boolean;
+}
+
+/** Authoritative active prompt sent in a reconnect hello. */
+export interface SceneChoiceReconnectState {
+  choiceId: string;
+  promptKey: string;
+  options: { id: string; key: string }[];
+  defaultOptionId: string;
+  leaderPid: number;
+  values?: Record<string, string | number>;
+  windowSeconds: number;
+  remainingSeconds: number | null;
+}
+
 export type SimEvent = { pid?: number } & (
   | {
       type: 'damage';
@@ -3957,6 +3979,10 @@ export type SimEvent = { pid?: number } & (
       replyKey?: string;
       replySpeaker?: string;
     }
+  // Client-only convergence events synthesized from the ordered hello frame.
+  // Explicit null means the authority confirms no state is active.
+  | { type: 'sceneSync'; state: SceneReconnectState | null }
+  | { type: 'sceneChoiceSync'; state: SceneChoiceReconnectState | null }
   | { type: 'learnAbility'; abilityId: string; rank: number }
   // The hub grant event. Two independent stand-down flags, both set only from
   // Sim.addItem/addItemInstance's opts param (the one place either gets set):

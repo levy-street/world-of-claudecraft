@@ -11026,22 +11026,22 @@ export const ru_RU: EnTranslations = {
         "name": "Рыбак Брам"
       },
       "lb_actor_coalfast": {
-        "name": "Warden Coalfast"
+        "name": "Смотритель Хладоуголь"
       },
       "lb_actor_ollun": {
-        "name": "Riftwatch Ollun"
+        "name": "Стражеразлома Оллун"
       },
       "lb_actor_edda": {
-        "name": "Quartermaster Edda"
+        "name": "Интендант Эдда"
       },
       "lb_actor_saul": {
-        "name": "Mender Saul"
+        "name": "Врачеватель Саул"
       },
       "lb_actor_tam": {
-        "name": "Bellkeeper Tam"
+        "name": "Звонарь Там"
       },
       "tidemill_stalker": {
-        "name": "The Tidemill Stalker"
+        "name": "Ловчий Приливной Мельницы"
       },
       "rift_hellguard": {
         "name": "Адский страж"
@@ -11599,19 +11599,19 @@ export const ru_RU: EnTranslations = {
         "greeting": "Он раскрылся прямо там, где сушат сети. Прямо там, где я стояла каждое утро всей своей жизни. Я больше не спускаюсь к берегу. Я вообще почти никуда больше не хожу."
       },
       "ferryman_ewald": {
-        "name": "Ferryman Ewald",
-        "title": "The Farshore Crossing",
-        "greeting": "The Farshore, is it? Nobody crosses for the fishing anymore, friend. Board when you are ready, and mind the bell when you land: the town listens to it the way you listen to weather."
+        "name": "Паромщик Эвальд",
+        "title": "Переправа на Дальний Берег",
+        "greeting": "На Дальний Берег, значит? Ради рыбалки туда давно уже никто не ездит, друг. Поднимайся на борт, когда будешь готов, и прислушайся к колоколу после высадки: жители города слушают его так же, как ты следишь за погодой."
       },
       "ferrykeeper_odda": {
-        "name": "Ferrykeeper Odda",
-        "title": "The Farshore Crossing",
-        "greeting": "Mainland-bound? The ship goes when you are aboard, not before. And if you hear the bell start counting while we cast off, do not ask me to turn her around: nobody rows toward a three-toll."
+        "name": "Смотрительница парома Одда",
+        "title": "Переправа на Дальний Берег",
+        "greeting": "На материк? Корабль отправится, когда ты будешь на борту, не раньше. И если колокол начнёт отсчёт, пока мы отдаём швартовы, не проси меня повернуть назад: никто не гребёт навстречу третьему удару."
       },
       "sergeant_marsh": {
-        "name": "Sergeant Marsh",
-        "title": "Town Militia",
-        "greeting": "Trained? Then here is how tonight works. My line holds the road. If the rift coughs up something we cannot put down, I point at you. The mill is yours: nothing follows you in, nothing gets past us to town. Go."
+        "name": "Сержант Марш",
+        "title": "Городское ополчение",
+        "greeting": "Обучен? Тогда вот как всё будет сегодня ночью. Моя шеренга держит дорогу. Если прорыв выплюнет нечто, с чем нам не совладать, я укажу на тебя. Мельница твоя: ничто не войдёт туда следом за тобой и ничто не пройдёт мимо нас к городу. Ступай."
       },
       "forgemistress_darva": {
         "name": "Мастерица кузни Дарва",
@@ -13596,18 +13596,18 @@ export const ru_RU: EnTranslations = {
         }
       },
       "q_lb_q0_ashore": {
-        "title": "Ashore",
-        "text": "Gullhaven takes the breaks day and night and holds anyway. If you mean to stand with them, start where the town bleeds: the militia line at the Watch Meadow, east past the harbor steps and the old statue.",
-        "completion": "The mill kill was yours alone, and Tam does not exaggerate about stretchers. I am short a scout and long on fields. You held ground tonight that was not yours to hold, and that is the whole job. Welcome to the watch.",
+        "title": "На берегу",
+        "text": "Чаячья Гавань терпит прорывы днём и ночью, но всё ещё держится. Если хочешь встать рядом с её защитниками, начни там, где город истекает кровью: на линии ополчения у Дозорного Луга, к востоку от портовых ступеней и старой статуи.",
+        "completion": "Тварь на мельнице ты убил в одиночку, и Там не преувеличивал насчёт носилок. Разведчиков у меня не хватает, зато полей в избытке. Сегодня ты удержал землю, которую не обязан был защищать, и в этом вся наша служба. Добро пожаловать в дозор.",
         "objectives": {
           "0": {
-            "label": "Report to Sergeant Marsh at the Watch Meadow"
+            "label": "Доложить сержанту Маршу у Дозорного Луга"
           },
           "1": {
-            "label": "Riftspawn slain"
+            "label": "Убить порождений разлома"
           },
           "2": {
-            "label": "Put down whatever is in the Tidemill"
+            "label": "Уничтожить то, что скрывается в Приливной Мельнице"
           }
         }
       },
@@ -14215,49 +14215,49 @@ export const ru_RU: EnTranslations = {
         "leaveText": "Вы затворяете дверь оплота и возвращаетесь под ветер Земель Драконов."
       },
       "lb_tidemill": {
-        "name": "The Tidemill",
-        "enterText": "The mill door gives. Inside, the dark is listening.",
-        "leaveText": "You step out of the Tidemill into the evening air."
+        "name": "Приливная Мельница",
+        "enterText": "Дверь мельницы поддаётся. Внутри тьма прислушивается.",
+        "leaveText": "Ты выходишь из Приливной Мельницы в вечерний воздух."
       },
       "lb_riftline": {
-        "name": "The Rift-Line at Dusk",
-        "enterText": "The meadow gate closes behind the patrol. The night belongs to the line.",
-        "leaveText": "You leave the rift-line to the dawn watch."
+        "name": "Линия прорыва в сумерках",
+        "enterText": "Ворота луга закрываются за патрулём. Эта ночь принадлежит линии обороны.",
+        "leaveText": "Ты оставляешь линию прорыва рассветному дозору."
       },
       "lb_vault": {
-        "name": "The Drowned First Redoubt",
-        "enterText": "The rope pays out into the dark. Below, the old redoubt lies where it fell.",
-        "leaveText": "You come up the cliff rope into daylight."
+        "name": "Затонувший Первый редут",
+        "enterText": "Верёвка уходит во тьму. Внизу старый редут лежит там, куда рухнул.",
+        "leaveText": "Ты поднимаешься по утёсной верёвке обратно к дневному свету."
       },
       "lb_council": {
-        "name": "The Redoubt Council",
-        "enterText": "The council room holds six chairs. One is empty.",
-        "leaveText": "You step out of the redoubt."
+        "name": "Совет редута",
+        "enterText": "В зале совета стоят шесть кресел. Одно пустует.",
+        "leaveText": "Ты выходишь из редута."
       },
       "lb_landing": {
-        "name": "The Landing at Night",
-        "enterText": "The guide fires burn down the beach. The fleet waits beyond the shoals.",
-        "leaveText": "You leave the Landing beach behind."
+        "name": "Ночной плацдарм",
+        "enterText": "Сигнальные костры догорают вдоль пляжа. Флот ждёт за отмелями.",
+        "leaveText": "Ты оставляешь берег плацдарма позади."
       },
       "lb_riftfields": {
-        "name": "The Riftfields Approach",
-        "enterText": "Four ward sites ring the breach. The rite has closed it for twelve centuries.",
-        "leaveText": "You walk back down out of the Riftfields."
+        "name": "Подступы к Полям Разломов",
+        "enterText": "Четыре места оберегов окружают прорыв. Обряд держал его закрытым двенадцать веков.",
+        "leaveText": "Ты спускаешься обратно с Полей Разломов."
       },
       "lb_breach": {
-        "name": "Inside the Breach",
-        "enterText": "The light is wrong and the sky is worse. The heart sits in open ground ahead.",
-        "leaveText": "You cross the threshold into ordinary night air."
+        "name": "Внутри Прорыва",
+        "enterText": "Свет неправильный, а небо ещё хуже. Сердце лежит впереди на открытом месте.",
+        "leaveText": "Ты переступаешь порог и возвращаешься в обычный ночной воздух."
       },
       "lb_lastwatch": {
-        "name": "The Last Watch",
-        "enterText": "The redoubt is clean and empty. Someone has to close the watch.",
-        "leaveText": "You close the redoubt door behind you."
+        "name": "Последний дозор",
+        "enterText": "Редут чист и пуст. Кто-то должен завершить этот дозор.",
+        "leaveText": "Ты закрываешь за собой дверь редута."
       },
       "lb_willowfen": {
-        "name": "Willowweep",
-        "enterText": "The willow does not move. The water does not either.",
-        "leaveText": "You leave the willow to its quiet."
+        "name": "Ивовый Плач",
+        "enterText": "Ива не шевелится. Вода тоже.",
+        "leaveText": "Ты оставляешь иву в её тишине."
       },
       "drowned_temple": {
         "name": "Утонувший храм",

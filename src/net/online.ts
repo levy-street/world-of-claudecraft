@@ -2,6 +2,7 @@
 
 import { apiUrl, DESKTOP_API_ORIGIN, NATIVE_API_ORIGIN } from '../client_origin';
 import { normalizeOrigin, runtimeWebSocketUrl } from '../runtime';
+import { MAX_SCENE_CHOICE_OPTIONS } from '../scene_protocol';
 import {
   hasStreamerLink,
   normalizeStreamerLinks,
@@ -73,6 +74,8 @@ import {
   type QuestState,
   type RiftTier,
   type RiteIntensity,
+  type SceneChoiceReconnectState,
+  type SceneReconnectState,
   type SimEvent,
   type SportRole,
   TICK_RATE,
@@ -130,6 +133,106 @@ import {
   type VcSharedCupInfo,
   type VcViewerReadout,
 } from '../world_api';
+
+function helloSceneState(value: unknown): SceneReconnectState | null {
+  if (value === null || typeof value !== 'object') return null;
+  const state = value as Record<string, unknown>;
+  if (
+    typeof state.sceneId !== 'string' ||
+    state.sceneId.length > 128 ||
+    typeof state.remainingSeconds !== 'number' ||
+    !Number.isFinite(state.remainingSeconds) ||
+    state.remainingSeconds < 0 ||
+    typeof state.inputLocked !== 'boolean' ||
+    typeof state.letterbox !== 'boolean' ||
+    typeof state.musicSilenced !== 'boolean'
+  ) {
+    return null;
+  }
+  return {
+    sceneId: state.sceneId,
+    remainingSeconds: state.remainingSeconds,
+    inputLocked: state.inputLocked,
+    letterbox: state.letterbox,
+    musicSilenced: state.musicSilenced,
+  };
+}
+
+function helloChoiceState(value: unknown): SceneChoiceReconnectState | null {
+  if (value === null || typeof value !== 'object') return null;
+  const state = value as Record<string, unknown>;
+  if (
+    typeof state.choiceId !== 'string' ||
+    state.choiceId.length > 128 ||
+    typeof state.promptKey !== 'string' ||
+    state.promptKey.length > 256 ||
+    !Array.isArray(state.options) ||
+    state.options.length === 0 ||
+    state.options.length > MAX_SCENE_CHOICE_OPTIONS ||
+    typeof state.defaultOptionId !== 'string' ||
+    !Number.isSafeInteger(state.leaderPid) ||
+    (state.leaderPid as number) <= 0 ||
+    typeof state.windowSeconds !== 'number' ||
+    !Number.isFinite(state.windowSeconds) ||
+    state.windowSeconds < 0 ||
+    !(
+      state.remainingSeconds === null ||
+      (typeof state.remainingSeconds === 'number' &&
+        Number.isFinite(state.remainingSeconds) &&
+        state.remainingSeconds >= 0)
+    )
+  ) {
+    return null;
+  }
+  const options: { id: string; key: string }[] = [];
+  for (const option of state.options) {
+    if (
+      option === null ||
+      typeof option !== 'object' ||
+      typeof option.id !== 'string' ||
+      option.id.length > 64 ||
+      typeof option.key !== 'string' ||
+      option.key.length > 256
+    ) {
+      return null;
+    }
+    options.push({ id: option.id, key: option.key });
+  }
+  if (!options.some((option) => option.id === state.defaultOptionId)) return null;
+  if (
+    (state.windowSeconds === 0 && state.remainingSeconds !== null) ||
+    (state.windowSeconds > 0 && state.remainingSeconds === null)
+  ) {
+    return null;
+  }
+  let values: Record<string, string | number> | undefined;
+  if (state.values !== null && typeof state.values === 'object' && !Array.isArray(state.values)) {
+    values = {};
+    let valueCount = 0;
+    for (const [key, item] of Object.entries(state.values as Record<string, unknown>)) {
+      if (valueCount >= 16) break;
+      if (key.length > 64) continue;
+      if (typeof item === 'string' && item.length <= 256) {
+        values[key] = item;
+        valueCount++;
+      } else if (typeof item === 'number' && Number.isFinite(item)) {
+        values[key] = item;
+        valueCount++;
+      }
+    }
+  }
+  return {
+    choiceId: state.choiceId,
+    promptKey: state.promptKey,
+    options,
+    defaultOptionId: state.defaultOptionId,
+    leaderPid: state.leaderPid as number,
+    values,
+    windowSeconds: state.windowSeconds,
+    remainingSeconds: state.remainingSeconds as number | null,
+  };
+}
+
 import {
   type ActionBarLayout,
   type ActionBarLayoutRestore,
@@ -2029,6 +2132,7 @@ export class ClientWorld implements IWorld {
       return;
     }
     if (msg.t === 'hello') {
+      const wasReconnecting = this.reconnectAttempts > 0;
       this.playerId = msg.pid;
       this.ownPlayerId = msg.pid;
       this.cfg.seed = msg.seed;
@@ -2039,7 +2143,15 @@ export class ClientWorld implements IWorld {
         );
         this.profanityDirty = true;
       }
-      if (this.reconnectAttempts > 0) {
+      // The hello is ordered before any new tick event on this transport.
+      // Object-or-null convergence prevents a dropped end/result event from
+      // leaving the camera lock or choice focus trap stale forever.
+      this.eventQueue.push({ type: 'sceneSync', state: helloSceneState(msg.sceneState) });
+      this.eventQueue.push({
+        type: 'sceneChoiceSync',
+        state: helloChoiceState(msg.sceneChoiceState),
+      });
+      if (wasReconnecting) {
         // fresh transport after an auto-reconnect: the server restarts input
         // acking at 0 and resends the world from an empty interest set, and
         // any stale mirrored entities fall out via the snapshot prune

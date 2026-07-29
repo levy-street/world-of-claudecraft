@@ -405,4 +405,26 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(signedUnits).toBeGreaterThanOrEqual(rareGather!.qty);
     expect(signed.length).toBeLessThanOrEqual(Math.ceil(signedUnits / 20));
   });
+
+  it('last_bell_tidemill: scenario, quest credit, doorway scene, and squad teardown all fire', () => {
+    const rec = run('last_bell_tidemill');
+    const sim = rec.sim as any;
+    const events = rec.allEvents as Ev[];
+    const claimId = rec.notes.claimId as number;
+    const stalkerId = rec.notes.stalkerId as number;
+
+    expect(rec.notes.started).toBe(true);
+    expect(rec.notes.squadSpawned).toBe(true);
+    expect(rec.notes.squadIds).toHaveLength(2);
+    expect(sim.entities.get(stalkerId)?.dead).toBe(true);
+    expect(sim.players.get(sim.playerId).questLog.get('q_lb_q0_ashore').counts[2]).toBe(1);
+    expect(sim.scenarioRuns.get(claimId)?.done).toBe(true);
+    expect(events.some((event) => event.type === 'scene' && event.op?.kind === 'start')).toBe(true);
+    expect(events.some((event) => event.type === 'scene' && event.op?.kind === 'end')).toBe(true);
+    expect(
+      [...sim.entities.values()].some((entity: any) =>
+        ['lb_actor_coalfast', 'lb_actor_tam'].includes(entity.templateId),
+      ),
+    ).toBe(false);
+  });
 });

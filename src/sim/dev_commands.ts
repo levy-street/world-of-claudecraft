@@ -5,7 +5,7 @@ import { DUNGEONS, ITEMS, MOBS, NPCS, ZONES } from './data';
 import { applyDevKit } from './dev_kit';
 import { createGroundObject, createMob } from './entity';
 import { enterDungeon } from './instances/dungeons';
-import { enterStoryInstance, isStoryDungeonId } from './instances/story_instances';
+import { isStoryDungeonId } from './instances/story_instances';
 import { mountItemId, mountOwned } from './mounts';
 import { isGatheringProfessionId, queueGatheringGrant } from './professions/gathering';
 import { placeMobileStationForPlayer } from './professions/mobile_station';
@@ -463,7 +463,7 @@ export function handleDevChat(
       ctx.error(pid, `[dev] Unknown story instance '${storyId}'.`);
       return null;
     }
-    enterStoryInstance(ctx, storyId, pid);
+    ctx.enterStoryInstance(storyId, pid);
     emitDevLog(ctx, pid, `[dev] Entering story instance ${storyId}.`);
     return null;
   }

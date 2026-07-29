@@ -28,7 +28,7 @@
 import { DUNGEONS, MOBS, QUESTS } from '../data';
 import { createGroundObject, createMob } from '../entity';
 import { instanceOriginOf } from '../instances/dungeons';
-import { enterStoryInstance, storyInstanceKeyFor } from '../instances/story_instances';
+import { storyInstanceKeyFor } from '../instances/story_instances';
 import { startChoice } from '../scenes/choices';
 import type { InstanceSlot } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -152,10 +152,10 @@ export function startScenario(ctx: SimContext, scenarioId: string, pid?: number)
       ? ctx.scenarioRuns.get(existing.exitId ?? -1)
       : undefined;
   if (!existingRun && qp?.state !== 'active') {
-    ctx.error(r.meta.entityId, 'You are not ready for this.');
+    ctx.error(r.meta.entityId, 'That quest is not available.');
     return false;
   }
-  if (!enterStoryInstance(ctx, def.dungeonId, r.meta.entityId)) return false;
+  if (!ctx.enterStoryInstance(def.dungeonId, r.meta.entityId)) return false;
   const claim = claimFor(ctx, def.dungeonId, r.meta.entityId);
   if (!claim || claim.exitId === null) return false;
   if (ctx.scenarioRuns.has(claim.exitId)) return true; // rejoin the live run
@@ -246,6 +246,10 @@ function armStage(ctx: SimContext, def: ScenarioDef, run: ScenarioRun): void {
   const stage = def.stages[run.stageIndex];
   const origin = runOrigin(ctx, run);
   if (!stage || !origin) return;
+  // Cue blocking presentation before mutating stage state. A missing scene or
+  // occupied claim must not turn a `scene` objective into an instant success.
+  if (stage.sceneId && !ctx.playScene(run.claimId, stage.sceneId)) return;
+  if (stage.choiceId && !startChoice(ctx, run.claimId, stage.choiceId)) return;
   run.stageArmed = true;
   run.stageStartedAt = ctx.time;
   run.timedFired = (stage.timedSpawns ?? []).map(() => false);
@@ -283,8 +287,6 @@ function armStage(ctx: SimContext, def: ScenarioDef, run: ScenarioRun): void {
         : { ...d.directive, x: origin.x + d.directive.x, z: origin.z + d.directive.z };
     setSquadDirective(ctx, run.claimId, d.actorId, directive);
   }
-  if (stage.sceneId) ctx.playScene(run.claimId, stage.sceneId);
-  if (stage.choiceId) startChoice(ctx, run.claimId, stage.choiceId);
 }
 
 function clearStageEntities(ctx: SimContext, run: ScenarioRun): void {

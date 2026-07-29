@@ -9,6 +9,7 @@ import type { SimEvent } from '../sim/types';
 import type { IWorld } from '../world_api';
 import {
   applySceneOp,
+  applySceneSync,
   createSceneDirectorState,
   type SceneLivePose,
   type ScenePose,
@@ -32,17 +33,33 @@ export interface SceneDirectorDeps {
   propReset?: () => void;
   /** Live world frame of a scene attachment target, when its renderer owns one. */
   attachmentFrame?: SceneAttachmentResolver;
+  /** Effective OS-or-game reduced-motion preference, sampled live. */
+  reducedMotion: () => boolean;
 }
 
 export class SceneDirector {
   private readonly state = createSceneDirectorState();
+  private readonly resolveEntity: (id: number) => { x: number; y: number; z: number } | null;
 
-  constructor(private readonly deps: SceneDirectorDeps) {}
+  constructor(private readonly deps: SceneDirectorDeps) {
+    // Stable resolver: cameraPose is a frame path, so do not allocate a closure
+    // for every pose evaluation.
+    this.resolveEntity = (id) => {
+      const e = this.deps.world().entities.get(id);
+      return e ? e.pos : null;
+    };
+  }
 
   /** Feed a tick's drained events; non-scene events are ignored. */
   handleEvents(events: SimEvent[]): void {
     const world = this.deps.world();
     for (const ev of events) {
+      if (ev.type === 'sceneSync') {
+        applySceneSync(this.state, ev.state);
+        this.deps.musicSilence(ev.state?.musicSilenced ?? false);
+        this.deps.propReset?.();
+        continue;
+      }
       if (ev.type !== 'scene') continue;
       // Offline hands the WHOLE tick batch over, so another local player's
       // personal events must be dropped here (same gate as hud.handleEvents).
@@ -88,11 +105,9 @@ export class SceneDirector {
       this.state,
       this.deps.nowSec(),
       live,
-      (id) => {
-        const e = this.deps.world().entities.get(id);
-        return e ? e.pos : null;
-      },
+      this.resolveEntity,
       this.deps.attachmentFrame,
+      this.deps.reducedMotion(),
     );
   }
 

@@ -29,6 +29,7 @@ import {
 import * as bankMod from './bank';
 import { type BankState, clampBonusSlots, sanitizeBankState } from './bank';
 import { campSpawnOffset } from './camp_scatter';
+import { createCampSpawnRngSelector } from './camp_spawn_rng';
 import { advanceClimb, tryStartClimb } from './climb';
 import {
   allocRiftCollisionToken,
@@ -400,7 +401,7 @@ import { advancePendingProjectiles, type PendingProjectile } from './projectile_
 import * as honorMod from './pvp';
 import { sanitizeRemovedZone1Content } from './removed_zone1_content';
 import { rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
-import { hash2, Rng } from './rng';
+import { Rng } from './rng';
 import type { ScenarioRun } from './scenarios/scenarios';
 import * as scenarioMod from './scenarios/scenarios';
 import type { ActiveChoice } from './scenes/choices';
@@ -1978,19 +1979,7 @@ export class Sim {
       // position-derived stream so content growth cannot re-roll later camps
       // or immediate post-construction interactions. Creating the stream draws
       // nothing from the shared rng.
-      const sharedRngCount = camp.sharedRngCount;
-      const privateSpawnRng =
-        sharedRngCount === undefined
-          ? null
-          : new Rng(
-              Math.floor(
-                hash2(
-                  Math.round(camp.center.x * 10),
-                  Math.round(camp.center.z * 10),
-                  this.cfg.seed,
-                ) * 0x1_0000_0000,
-              ),
-            );
+      const rngForSpawn = createCampSpawnRngSelector(this.rng, this.cfg.seed, camp);
       // Aquatic/flagged swimmers may wade in the shallows; everyone else
       // still spawns on dry land even though combat movement can enter water.
       const minHeight = this.mobCanSpawnInWater(template) ? waterLevel() - 0.5 : waterLevel() + 0.4;
@@ -2013,10 +2002,7 @@ export class Sim {
           this.addEntity(mob);
           continue;
         }
-        const spawnRng =
-          privateSpawnRng !== null && sharedRngCount !== undefined && i >= sharedRngCount
-            ? privateSpawnRng
-            : this.rng;
+        const spawnRng = rngForSpawn(i);
         // Spread the camp's mobs with even nearest-neighbor spacing (a sunflower
         // spiral) instead of independent uniform sampling, which let mobs stack.
         // The two draws below feed campSpawnOffset as jitter and are consumed in the
@@ -9527,8 +9513,16 @@ export class Sim {
     return enterStoryInstanceImpl(this.ctx, dungeonId, pid);
   }
 
-  playScene(claimId: number, sceneId: string): void {
-    scenesMod.playScene(this.ctx, claimId, sceneId);
+  playScene(claimId: number, sceneId: string): boolean {
+    return scenesMod.playScene(this.ctx, claimId, sceneId);
+  }
+
+  sceneReconnectStateFor(pid: number) {
+    return scenesMod.sceneReconnectStateFor(this.ctx, pid);
+  }
+
+  sceneChoiceReconnectStateFor(pid: number) {
+    return choicesMod.sceneChoiceReconnectStateFor(this.ctx, pid);
   }
 
   requestSceneSkip(pid?: number): boolean {
@@ -9544,6 +9538,10 @@ export class Sim {
 
   answerSceneChoice(choiceId: string, optionId: string, pid?: number): boolean {
     return choicesMod.answerSceneChoice(this.ctx, choiceId, optionId, pid);
+  }
+
+  answerActiveSceneChoiceByIndex(optionIndex: number, pid?: number): boolean {
+    return choicesMod.answerActiveSceneChoiceByIndex(this.ctx, optionIndex, pid);
   }
 
   resetDungeonInstances(pid?: number): void {

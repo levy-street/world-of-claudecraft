@@ -38,9 +38,10 @@ foundation reaches the sampled lot minimum and the adaptive skirt is absent, so 
 geometry or draw. Supported alternate seeds and localized custom-terrain edits retain the
 same entrance grade while a solid skirt extends to the deterministic footprint minimum;
 seed `4717`, for example, requires a `0.9766606569`-yard extension. Camera collision derives
-its roof height from the same terrain envelope. Online admission uses layout epoch `3` and
-the strict `auth-world-3` discriminator so clients and servers with different footprint data
-fail before credentials or world admission.
+its roof height from the same terrain envelope. The armoury release advanced online
+admission to layout epoch `3` / `auth-world-3`; later compatibility epochs retain the same
+strict rejection so clients and servers with different authoritative state fail before
+credentials or world admission.
 
 ## Visual and production contract
 

@@ -32,6 +32,7 @@ import {
 import { createMob } from '../../src/sim/entity';
 import { solveLockActions } from '../../src/sim/lockpick';
 import { gatherCastDurationSec } from '../../src/sim/professions/gathering';
+import { scenarioRunFor, startScenario } from '../../src/sim/scenarios/scenarios';
 import { Sim } from '../../src/sim/sim';
 import { addThreat } from '../../src/sim/threat';
 import {
@@ -4537,6 +4538,79 @@ function professionsGather(seed = 1): Scenario {
   };
 }
 
+// Last Bell campaign seam: enter the shipped Tidemill story instance, arm its
+// rng-free stalker stage, kill through normal quest credit, then play the
+// doorway scene through authoritative completion. This pins the merged
+// scenario/scene/squad/event ordering and the shared draw stream together.
+function lastBellTidemill(): Scenario {
+  return {
+    name: 'last_bell_tidemill',
+    coverage: [
+      'Last Bell shipped scenario entry (sc_lb_q0_tidemill)',
+      'rng-free scenario spawn arming + tracked Tidemill Stalker',
+      'normal quest kill credit advances q_lb_q0_ashore',
+      'doorway scene start/ops/end + squad spawn/despawn',
+    ],
+    build: () =>
+      new Sim({
+        seed: 20_061,
+        playerClass: 'warrior',
+        playerName: 'Bell',
+        autoEquip: true,
+      }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      sim.setPlayerLevel(20);
+      const pid = sim.playerId as number;
+      const meta = sim.players.get(pid);
+      if (!meta) throw new Error('Last Bell parity player missing');
+      meta.questLog.set('q_lb_q0_ashore', {
+        questId: 'q_lb_q0_ashore',
+        counts: [1, 12, 0],
+        state: 'active',
+      });
+      rec.notes.started = startScenario(sim.ctx, 'sc_lb_q0_tidemill', pid);
+      const claim = sim.ctx.instances.find(
+        (instance: { dungeonId: string; partyKey: string | null }) =>
+          instance.dungeonId === 'lb_tidemill' && instance.partyKey !== null,
+      );
+      if (!claim || claim.exitId === null) throw new Error('Last Bell Tidemill claim missing');
+      rec.notes.claimId = claim.exitId;
+      rec.snapshot('entered-tidemill');
+
+      rec.tick(1);
+      const run = scenarioRunFor(sim.ctx, claim.exitId);
+      if (!run) throw new Error('Last Bell Tidemill run missing');
+      const stalkerId = run.stageSpawnIds[0];
+      if (stalkerId === undefined) throw new Error('Tidemill Stalker did not spawn');
+      rec.notes.stalkerId = stalkerId;
+      rec.track(stalkerId);
+      rec.snapshot('stalker-armed');
+
+      const stalker = sim.entities.get(stalkerId) as AnyEntity | undefined;
+      if (!stalker) throw new Error('Tidemill Stalker entity missing');
+      lethal(sim, sim.player, stalker);
+      rec.tick(2);
+      const squadIds = [...sim.entities.values()]
+        .filter((entity: AnyEntity) =>
+          ['lb_actor_coalfast', 'lb_actor_tam'].includes(entity.templateId),
+        )
+        .map((entity: AnyEntity) => entity.id)
+        .sort((a: number, b: number) => a - b);
+      if (squadIds.length !== 2) throw new Error('Last Bell doorway squad did not spawn');
+      rec.notes.squadSpawned = true;
+      rec.notes.squadIds = squadIds;
+      for (const actorId of squadIds) rec.track(actorId);
+      rec.snapshot('doorway-scene-armed');
+
+      // The shipped scene ends before 12 seconds; leave one second of runway
+      // for the scenario driver to observe completion and despawn the squad.
+      rec.tick(20 * 13);
+      rec.snapshot('tidemill-complete');
+    },
+  };
+}
+
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
   soloMage(),
@@ -4594,4 +4668,5 @@ export const SCENARIOS: Scenario[] = [
   chatSocial(),
   professionsCraft(),
   professionsGather(),
+  lastBellTidemill(),
 ];

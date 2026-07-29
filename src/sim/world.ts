@@ -4216,8 +4216,8 @@ export function isCliffFace(x: number, z: number, seed: number): boolean {
 }
 
 const DECORATION_STEP = 10;
-const DECORATION_X_START = -(WORLD_MAX_X - 14);
-const DECORATION_X_END = WORLD_MAX_X - 14;
+export const DECORATION_X_START = WORLD_MIN_X + 14;
+export const DECORATION_X_END = WORLD_MAX_X - 14;
 const DECORATION_Z_START = WORLD_MIN_Z + 14;
 const DECORATION_Z_END = WORLD_MAX_Z - 14;
 const DECORATION_JITTER = DECORATION_STEP / 2;

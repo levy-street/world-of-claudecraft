@@ -5709,7 +5709,7 @@
     position: fixed;
     left: 0;
     right: 0;
-    height: 12vh;
+    height: calc(var(--app-vh) * 0.12);
     background: #000;
     transform: scaleY(0);
     transition: transform 0.6s ease;
@@ -5747,9 +5747,9 @@
   .scene-subtitle {
     position: fixed;
     left: 50%;
-    bottom: calc(12vh + 18px);
+    bottom: calc(var(--app-vh) * 0.12 + 18px + env(safe-area-inset-bottom));
     transform: translateX(-50%);
-    width: min(720px, 86vw);
+    width: min(720px, calc(var(--app-vw) * 0.86));
     text-align: center;
     z-index: 39;
     pointer-events: none;
@@ -5770,12 +5770,12 @@
   }
   .scene-skip {
     position: fixed;
-    top: 14px;
-    right: 14px;
+    top: calc(14px + env(safe-area-inset-top));
+    right: calc(14px + env(safe-area-inset-right));
     z-index: 39;
     min-height: 40px;
     padding: 8px 14px;
-    background: rgba(10, 10, 16, 0.78);
+    background: color-mix(in srgb, var(--panel-base) 78%, transparent);
     border: 1px solid var(--color-border-default);
     border-radius: 6px;
     color: var(--color-text-muted);
@@ -5794,7 +5794,7 @@
      centers along the top edge instead of stacking under it. */
   @media (pointer: coarse) {
     .scene-skip {
-      top: 10px;
+      top: calc(10px + env(safe-area-inset-top));
       right: auto;
       left: 50%;
       transform: translateX(-50%);
@@ -5803,13 +5803,16 @@
   .scene-choice {
     position: fixed;
     left: 50%;
-    bottom: calc(12vh + 72px);
+    bottom: calc(var(--app-vh) * 0.12 + 72px + env(safe-area-inset-bottom));
     transform: translateX(-50%);
     width: 100%;
-    max-width: min(480px, calc(100vw - 24px));
+    max-width: min(
+      480px,
+      calc(var(--app-vw) - 24px - env(safe-area-inset-left) - env(safe-area-inset-right))
+    );
     z-index: 39;
     padding: 14px 16px;
-    background: rgba(10, 10, 16, 0.92);
+    background: color-mix(in srgb, var(--panel-base) 92%, transparent);
     border: 1px solid var(--color-border-default);
     border-radius: 8px;
     box-shadow: 0 6px 24px #000a;
@@ -5828,7 +5831,7 @@
   .scene-choice-option {
     min-height: 40px;
     padding: 8px 12px;
-    background: rgba(24, 22, 14, 0.9);
+    background: color-mix(in srgb, var(--panel-base) 90%, var(--color-gold) 10%);
     border: 1px solid var(--color-border-default);
     border-radius: 6px;
     color: var(--color-text-light);
@@ -5838,7 +5841,7 @@
   }
   .scene-choice-option:hover {
     border-color: var(--color-border-focus);
-    background: rgba(40, 34, 18, 0.95);
+    background: color-mix(in srgb, var(--panel-base) 82%, var(--color-gold) 18%);
   }
   .scene-choice-option:focus-visible {
     outline: 2px solid var(--color-border-focus);

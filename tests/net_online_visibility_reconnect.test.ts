@@ -512,7 +512,151 @@ describe('ClientWorld reconnect error-frame tolerance (auth timeout)', () => {
     timeoutRejections: number;
     conflictRejections: number;
     sessionEnded: boolean;
+    reconnectAttempts: number;
   };
+
+  it('queues bounded hello convergence before every later scene event', () => {
+    withDomStubs(() => {
+      const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
+      const w = world as unknown as WorldProbe;
+      w.onMessage(
+        JSON.stringify({
+          t: 'hello',
+          pid: 1,
+          seed: 42,
+          sceneState: {
+            sceneId: 'scn_lb_q0_voyage',
+            remainingSeconds: 4.5,
+            inputLocked: true,
+            letterbox: true,
+            musicSilenced: false,
+          },
+          sceneChoiceState: {
+            choiceId: 'ch_lb_ferry_fare_out',
+            promptKey: 'lb.fare.promptOut',
+            options: [
+              { id: 'pay', key: 'lb.fare.pay' },
+              { id: 'decline', key: 'lb.fare.decline' },
+            ],
+            defaultOptionId: 'decline',
+            leaderPid: 1,
+            values: { price: 12 },
+            windowSeconds: 10,
+            remainingSeconds: 3,
+          },
+        }),
+      );
+      w.onMessage(
+        JSON.stringify({
+          t: 'events',
+          list: [{ type: 'sceneChoiceResult', choiceId: 'ch_lb_ferry_fare_out', optionId: 'pay' }],
+        }),
+      );
+
+      expect(world.drainEvents()).toEqual([
+        {
+          type: 'sceneSync',
+          state: {
+            sceneId: 'scn_lb_q0_voyage',
+            remainingSeconds: 4.5,
+            inputLocked: true,
+            letterbox: true,
+            musicSilenced: false,
+          },
+        },
+        {
+          type: 'sceneChoiceSync',
+          state: {
+            choiceId: 'ch_lb_ferry_fare_out',
+            promptKey: 'lb.fare.promptOut',
+            options: [
+              { id: 'pay', key: 'lb.fare.pay' },
+              { id: 'decline', key: 'lb.fare.decline' },
+            ],
+            defaultOptionId: 'decline',
+            leaderPid: 1,
+            values: { price: 12 },
+            windowSeconds: 10,
+            remainingSeconds: 3,
+          },
+        },
+        { type: 'sceneChoiceResult', choiceId: 'ch_lb_ferry_fare_out', optionId: 'pay' },
+      ]);
+      world.close();
+    });
+  });
+
+  it('treats absent or malformed reconnect state as authoritative null', () => {
+    withDomStubs(() => {
+      const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
+      const w = world as unknown as WorldProbe;
+      w.reconnectAttempts = 1;
+      w.onMessage(
+        JSON.stringify({
+          t: 'hello',
+          pid: 1,
+          seed: 42,
+          sceneState: { sceneId: 'bad', remainingSeconds: -1 },
+          sceneChoiceState: {
+            choiceId: 'bad',
+            promptKey: 'bad',
+            options: new Array(5).fill({ id: 'x', key: 'x' }),
+            defaultOptionId: 'x',
+            leaderPid: 1,
+            windowSeconds: 1,
+            remainingSeconds: 1,
+          },
+        }),
+      );
+      expect(world.drainEvents()).toEqual([
+        { type: 'sceneSync', state: null },
+        { type: 'sceneChoiceSync', state: null },
+      ]);
+      world.close();
+    });
+  });
+
+  it('rejects internally inconsistent reconnect prompts before they can trap focus', () => {
+    withDomStubs(() => {
+      const valid = {
+        choiceId: 'ch_lb_ferry_fare_out',
+        promptKey: 'lb.fare.promptOut',
+        options: [
+          { id: 'pay', key: 'lb.fare.pay' },
+          { id: 'decline', key: 'lb.fare.decline' },
+        ],
+        defaultOptionId: 'decline',
+        leaderPid: 1,
+        windowSeconds: 10,
+        remainingSeconds: 3,
+      };
+      const invalidStates = [
+        { ...valid, options: [] },
+        { ...valid, defaultOptionId: 'missing' },
+        { ...valid, leaderPid: 0 },
+        { ...valid, remainingSeconds: null },
+        { ...valid, windowSeconds: 0, remainingSeconds: 1 },
+      ];
+      const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
+      const w = world as unknown as WorldProbe;
+      for (const sceneChoiceState of invalidStates) {
+        w.onMessage(
+          JSON.stringify({
+            t: 'hello',
+            pid: 1,
+            seed: 42,
+            sceneState: null,
+            sceneChoiceState,
+          }),
+        );
+        expect(world.drainEvents()).toEqual([
+          { type: 'sceneSync', state: null },
+          { type: 'sceneChoiceSync', state: null },
+        ]);
+      }
+      world.close();
+    });
+  });
 
   it('tolerates the auth-timeout rejection mid-reconnect on its own counter and resets it on hello', () => {
     withDomStubs((doc, harness) => {
@@ -565,7 +709,7 @@ describe('ClientWorld reconnect error-frame tolerance (auth timeout)', () => {
     });
   });
 
-  it('fails closed when an auth-world-3 client reaches an auth-world-2 server', () => {
+  it('fails closed when an auth-world-4 client reaches an auth-world-3 server', () => {
     withDomStubs((_doc, harness) => {
       const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
       const w = world as unknown as WorldProbe;
@@ -579,13 +723,13 @@ describe('ClientWorld reconnect error-frame tolerance (auth timeout)', () => {
       expect(socket.sent).toHaveLength(1);
       expect(JSON.parse(socket.sent[0])).toEqual(
         expect.objectContaining({
-          t: 'auth-world-3',
+          t: 'auth-world-4',
           token: 't',
           character: 1,
         }),
       );
 
-      // An auth-world-2 server rejects this unknown future epoch before admission.
+      // An auth-world-3 server rejects this unknown future epoch before admission.
       w.onMessage(
         JSON.stringify({
           t: 'error',

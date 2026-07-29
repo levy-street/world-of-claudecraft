@@ -11026,22 +11026,22 @@ export const ja_JP: EnTranslations = {
         "name": "漁師ブラム"
       },
       "lb_actor_coalfast": {
-        "name": "Warden Coalfast"
+        "name": "守将コールファスト"
       },
       "lb_actor_ollun": {
-        "name": "Riftwatch Ollun"
+        "name": "裂け目監視のオルン"
       },
       "lb_actor_edda": {
-        "name": "Quartermaster Edda"
+        "name": "補給将校エッダ"
       },
       "lb_actor_saul": {
-        "name": "Mender Saul"
+        "name": "癒し手サウル"
       },
       "lb_actor_tam": {
-        "name": "Bellkeeper Tam"
+        "name": "鐘守タム"
       },
       "tidemill_stalker": {
-        "name": "The Tidemill Stalker"
+        "name": "潮挽き水車場の追跡者"
       },
       "rift_hellguard": {
         "name": "ヘルガード"
@@ -11599,19 +11599,19 @@ export const ja_JP: EnTranslations = {
         "greeting": "網を干す、まさにあの場所で開いたんだ。あそこだよ、私が生まれてからずっと毎朝立っていた場所さ。もう岸へは下りない。もう、どこへもろくに行かなくなっちまった。"
       },
       "ferryman_ewald": {
-        "name": "Ferryman Ewald",
-        "title": "The Farshore Crossing",
-        "greeting": "The Farshore, is it? Nobody crosses for the fishing anymore, friend. Board when you are ready, and mind the bell when you land: the town listens to it the way you listen to weather."
+        "name": "渡し守エーヴァルト",
+        "title": "対岸への渡し",
+        "greeting": "対岸へ行くのか？ もう漁のために渡る者はいないよ、旅人。支度ができたら乗りな。着いたら鐘に気をつけろ。あの町の者は、天気を読むように鐘の音を聞く。"
       },
       "ferrykeeper_odda": {
-        "name": "Ferrykeeper Odda",
-        "title": "The Farshore Crossing",
-        "greeting": "Mainland-bound? The ship goes when you are aboard, not before. And if you hear the bell start counting while we cast off, do not ask me to turn her around: nobody rows toward a three-toll."
+        "name": "船守オッダ",
+        "title": "対岸への渡し",
+        "greeting": "本土行きかい？ 船はあんたが乗ってから出す。それより前には出さない。綱を解く最中に鐘が数え始めても、引き返せとは言わないでおくれ。三つ鐘へ向かって漕ぐ者はいないんだ。"
       },
       "sergeant_marsh": {
-        "name": "Sergeant Marsh",
-        "title": "Town Militia",
-        "greeting": "Trained? Then here is how tonight works. My line holds the road. If the rift coughs up something we cannot put down, I point at you. The mill is yours: nothing follows you in, nothing gets past us to town. Go."
+        "name": "マーシュ軍曹",
+        "title": "町の民兵",
+        "greeting": "訓練は受けたな？ なら今夜の段取りを教える。私の隊が街道を守る。裂け目がこちらで倒せないものを吐き出したら、私がお前に示す。水車場は任せた。何も連れて入るな。何一つ、我々を抜けて町へ行かせるな。行け。"
       },
       "forgemistress_darva": {
         "name": "鍛冶長ダルヴァ",
@@ -13596,18 +13596,18 @@ export const ja_JP: EnTranslations = {
         }
       },
       "q_lb_q0_ashore": {
-        "title": "Ashore",
-        "text": "Gullhaven takes the breaks day and night and holds anyway. If you mean to stand with them, start where the town bleeds: the militia line at the Watch Meadow, east past the harbor steps and the old statue.",
-        "completion": "The mill kill was yours alone, and Tam does not exaggerate about stretchers. I am short a scout and long on fields. You held ground tonight that was not yours to hold, and that is the whole job. Welcome to the watch.",
+        "title": "上陸",
+        "text": "ガルヘイヴンは昼も夜も裂け目の襲撃を受け、それでも持ちこたえている。彼らと並んで立つつもりなら、町が血を流している場所から始めよう。港の階段と古い像を越えて東へ進み、見張り草地の民兵線へ向かえ。",
+        "completion": "水車場の獲物はお前一人で仕留めたそうだ。担架の話も、タムの誇張ではない。斥候は足りず、守る畑ばかりが余っている。今夜、お前は本来お前のものではない土地を守った。それがこの仕事のすべてだ。見張り隊へようこそ。",
         "objectives": {
           "0": {
-            "label": "Report to Sergeant Marsh at the Watch Meadow"
+            "label": "見張り草地のマーシュ軍曹に報告する"
           },
           "1": {
-            "label": "Riftspawn slain"
+            "label": "裂け目の落とし子を倒す"
           },
           "2": {
-            "label": "Put down whatever is in the Tidemill"
+            "label": "潮挽き水車場にいる何かを始末する"
           }
         }
       },
@@ -14215,49 +14215,49 @@ export const ja_JP: EnTranslations = {
         "leaveText": "砦の扉を閉め、ドレイクランドの風の中へ戻った。"
       },
       "lb_tidemill": {
-        "name": "The Tidemill",
-        "enterText": "The mill door gives. Inside, the dark is listening.",
-        "leaveText": "You step out of the Tidemill into the evening air."
+        "name": "潮挽き水車場",
+        "enterText": "水車場の扉が開く。中では、闇が耳を澄ませている。",
+        "leaveText": "潮挽き水車場を出て、夕暮れの空気へ戻る。"
       },
       "lb_riftline": {
-        "name": "The Rift-Line at Dusk",
-        "enterText": "The meadow gate closes behind the patrol. The night belongs to the line.",
-        "leaveText": "You leave the rift-line to the dawn watch."
+        "name": "黄昏の裂け目防衛線",
+        "enterText": "草地の門が巡回隊の背後で閉じる。今夜はこの防衛線のものだ。",
+        "leaveText": "裂け目防衛線を夜明けの見張りに任せる。"
       },
       "lb_vault": {
-        "name": "The Drowned First Redoubt",
-        "enterText": "The rope pays out into the dark. Below, the old redoubt lies where it fell.",
-        "leaveText": "You come up the cliff rope into daylight."
+        "name": "水没した第一要塞",
+        "enterText": "縄が闇へと繰り出される。眼下には、古い要塞が落ちた場所に横たわっている。",
+        "leaveText": "崖の縄を登り、日の光の中へ戻る。"
       },
       "lb_council": {
-        "name": "The Redoubt Council",
-        "enterText": "The council room holds six chairs. One is empty.",
-        "leaveText": "You step out of the redoubt."
+        "name": "要塞評議会",
+        "enterText": "評議室には椅子が六脚ある。一脚だけ空いている。",
+        "leaveText": "要塞の外へ出る。"
       },
       "lb_landing": {
-        "name": "The Landing at Night",
-        "enterText": "The guide fires burn down the beach. The fleet waits beyond the shoals.",
-        "leaveText": "You leave the Landing beach behind."
+        "name": "夜の上陸地",
+        "enterText": "導き火が浜辺を焼く。船団は浅瀬の向こうで待っている。",
+        "leaveText": "上陸浜を後にする。"
       },
       "lb_riftfields": {
-        "name": "The Riftfields Approach",
-        "enterText": "Four ward sites ring the breach. The rite has closed it for twelve centuries.",
-        "leaveText": "You walk back down out of the Riftfields."
+        "name": "裂け野への道",
+        "enterText": "四つの結界跡が裂け目を囲んでいる。儀式は十二世紀もの間、ここを閉ざしていた。",
+        "leaveText": "裂け野を下って戻る。"
       },
       "lb_breach": {
-        "name": "Inside the Breach",
-        "enterText": "The light is wrong and the sky is worse. The heart sits in open ground ahead.",
-        "leaveText": "You cross the threshold into ordinary night air."
+        "name": "裂け目の内側",
+        "enterText": "光がおかしい。空はさらにひどい。核は前方の開けた地にある。",
+        "leaveText": "境を越え、いつもの夜気へ戻る。"
       },
       "lb_lastwatch": {
-        "name": "The Last Watch",
-        "enterText": "The redoubt is clean and empty. Someone has to close the watch.",
-        "leaveText": "You close the redoubt door behind you."
+        "name": "最後の見張り",
+        "enterText": "要塞は清潔で、空っぽだ。誰かが見張りを終わらせなければならない。",
+        "leaveText": "背後で要塞の扉を閉じる。"
       },
       "lb_willowfen": {
-        "name": "Willowweep",
-        "enterText": "The willow does not move. The water does not either.",
-        "leaveText": "You leave the willow to its quiet."
+        "name": "泣き柳沼",
+        "enterText": "柳は動かない。水もまた動かない。",
+        "leaveText": "柳を静寂の中に残して立ち去る。"
       },
       "drowned_temple": {
         "name": "溺れし神殿",

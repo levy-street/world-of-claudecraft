@@ -138,6 +138,9 @@ describe('content referential integrity', () => {
   it('QUEST_ORDER covers every quest exactly once', () => {
     expect([...QUEST_ORDER].sort()).toEqual(Object.keys(QUESTS).sort());
     expect(new Set(QUEST_ORDER).size).toBe(QUEST_ORDER.length);
+    // Observation slots are append-only: Last Bell may grow only at the tail,
+    // never by renumbering any established quest feature.
+    expect(QUEST_ORDER.at(-1)).toBe('q_lb_q0_ashore');
   });
 
   it('all loot tables, vendor stock, camps and dungeon spawns resolve', () => {

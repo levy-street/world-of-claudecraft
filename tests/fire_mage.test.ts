@@ -248,6 +248,10 @@ describe('Hot Streak', () => {
     addDummy(sim);
     sim.castAbility('combustion');
     expect(p.auras.some((a) => a.kind === 'combustion')).toBe(true);
+    // This case pins the crit override, not the independent spell-resist
+    // table. Combustion recalculates stats, so ensure the test cast lands
+    // after applying it; a seeded full resist must not make this vacuous.
+    p.hitBonus = 1;
     gcdReset(p);
     sim.castAbility('fireball'); // guaranteed crit under Combustion
     const events = collect(sim, 4);

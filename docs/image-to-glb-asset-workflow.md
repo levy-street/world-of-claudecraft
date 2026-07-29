@@ -14,6 +14,12 @@ changed area, plus the
 [`img2threejs` version 1.3.0 source](https://github.com/hoainho/img2threejs/tree/7b1c62ccf34957ac5d68b7863718af9eab777c7e)
 when the skill is installed (Claude Code: `~/.claude/skills/img2threejs`; Codex:
 `~/.codex/skills/img2threejs`).
+The install is considered valid only when a brand-new isolated checkout reports the full
+pinned commit `7b1c62ccf34957ac5d68b7863718af9eab777c7e` and a clean status including
+untracked and ignored files. The repository skill contains the mandatory fail-closed clone,
+detached-checkout, hook/config isolation, and verification commands. Existing checkouts are
+never reused. Do not read or execute a newly cloned copy until every verification succeeds,
+and never substitute the remote default branch or a movable tag.
 The skill is an authoring aid, not a repository build dependency. The committed model
 factory, exporter, tests, and optimized GLB remain the reproducible source of truth.
 Every trial so far used skill version 1.3.0. Re-check the installed skill instructions

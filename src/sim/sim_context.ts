@@ -328,9 +328,9 @@ export interface SimContextCallbacks {
   // dev command reach it through the seam; leaving reuses leaveDungeon.
   enterStoryInstance(dungeonId: string, pid?: number): boolean;
   // Last Bell scene playback (src/sim/scenes/): the scenario sequencer cues
-  // a scene script for a claim's audience. Bound to a no-op until the scene
-  // system lands; owned by scenes once it does.
-  playScene(claimId: number, sceneId: string): void;
+  // a scene script for a claim's audience. False means the requested scene
+  // could not start, so a scene objective must remain unarmed.
+  playScene(claimId: number, sceneId: string): boolean;
   // Procedural Rift entry/exit (dev command + interaction click path). The per-tick
   // drivers (updateRiftTriggers/updateRiftInstances) are called directly from tick();
   // these two are on the seam so foreign callers reach them through ctx.

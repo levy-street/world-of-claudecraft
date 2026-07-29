@@ -25,7 +25,13 @@
 
 import type { SimContext } from '../sim_context';
 import { setSquadDirective, squadActorEntity } from '../squad/squad';
-import type { Entity, SceneDollyLookAt, SceneRigPoint, SceneWireOp } from '../types';
+import type {
+  Entity,
+  SceneDollyLookAt,
+  SceneReconnectState,
+  SceneRigPoint,
+  SceneWireOp,
+} from '../types';
 import {
   clearScriptedPlayerWalks,
   fastForwardScriptedPlayerWalks,
@@ -158,6 +164,37 @@ function participants(ctx: SimContext, playback: ScenePlayback): Entity[] {
     if (Math.abs(p.pos.x - origin.x) < 120 && Math.abs(p.pos.z - origin.z) < 250) out.push(p);
   }
   return out;
+}
+
+/** Persistent scene state for a reconnecting participant. One-shot camera,
+ * line, animation, fade, and prop history is deliberately not replayed. */
+export function sceneReconnectStateFor(ctx: SimContext, pid: number): SceneReconnectState | null {
+  let active: ScenePlayback | null = null;
+  for (const playback of ctx.scenePlaybacks.values()) {
+    if (!participants(ctx, playback).some((participant) => participant.id === pid)) continue;
+    if (active === null || playback.startedAt >= active.startedAt) active = playback;
+  }
+  if (active === null) return null;
+  const def = SCENES[active.sceneId];
+  if (!def) return null;
+  let inputLocked = false;
+  let letterbox = false;
+  let musicSilenced = false;
+  for (let index = 0; index < def.ops.length; index++) {
+    if (!active.emitted[index]) continue;
+    const op = def.ops[index];
+    if (op.kind === 'inputLock') inputLocked = op.on;
+    if (op.kind === 'letterbox') letterbox = op.on;
+    if (op.kind === 'music' && op.directive === 'silence') musicSilenced = true;
+    if (op.kind === 'music' && op.directive === 'resume') musicSilenced = false;
+  }
+  return {
+    sceneId: active.sceneId,
+    remainingSeconds: Math.max(0, def.duration - (ctx.time - active.startedAt)),
+    inputLocked,
+    letterbox,
+    musicSilenced,
+  };
 }
 
 function claimOrigin(ctx: SimContext, playback: ScenePlayback): { x: number; z: number } | null {

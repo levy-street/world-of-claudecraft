@@ -11026,22 +11026,22 @@ export const zh_TW: EnTranslations = {
         "name": "漁夫布蘭姆"
       },
       "lb_actor_coalfast": {
-        "name": "Warden Coalfast"
+        "name": "守望者 煤堅"
       },
       "lb_actor_ollun": {
-        "name": "Riftwatch Ollun"
+        "name": "裂隙守望 歐倫"
       },
       "lb_actor_edda": {
-        "name": "Quartermaster Edda"
+        "name": "軍需官 艾妲"
       },
       "lb_actor_saul": {
-        "name": "Mender Saul"
+        "name": "療者 索爾"
       },
       "lb_actor_tam": {
-        "name": "Bellkeeper Tam"
+        "name": "守鐘人 塔姆"
       },
       "tidemill_stalker": {
-        "name": "The Tidemill Stalker"
+        "name": "潮汐磨坊潛獵者"
       },
       "rift_hellguard": {
         "name": "地獄衛士"
@@ -11599,19 +11599,19 @@ export const zh_TW: EnTranslations = {
         "greeting": "它就開在曬網的地方。就在那裡，就在我這輩子每天清晨站立的地方。我再也不下海岸了。如今哪兒我都幾乎不再去了。"
       },
       "ferryman_ewald": {
-        "name": "Ferryman Ewald",
-        "title": "The Farshore Crossing",
-        "greeting": "The Farshore, is it? Nobody crosses for the fishing anymore, friend. Board when you are ready, and mind the bell when you land: the town listens to it the way you listen to weather."
+        "name": "渡船夫 艾瓦德",
+        "title": "遠岸航線",
+        "greeting": "要去遠岸，是嗎？如今已經沒人為了捕魚渡海了，朋友。準備好就上船；抵岸後留心鐘聲，鎮上的人聽鐘，就像你聽風辨天氣一樣。"
       },
       "ferrykeeper_odda": {
-        "name": "Ferrykeeper Odda",
-        "title": "The Farshore Crossing",
-        "greeting": "Mainland-bound? The ship goes when you are aboard, not before. And if you hear the bell start counting while we cast off, do not ask me to turn her around: nobody rows toward a three-toll."
+        "name": "渡船守 歐妲",
+        "title": "遠岸航線",
+        "greeting": "要回大陸？你上船，我們才啟航，絕不會提前。如果解纜時鐘聲開始計數，別求我掉頭：沒人會朝三響鐘划去。"
       },
       "sergeant_marsh": {
-        "name": "Sergeant Marsh",
-        "title": "Town Militia",
-        "greeting": "Trained? Then here is how tonight works. My line holds the road. If the rift coughs up something we cannot put down, I point at you. The mill is yours: nothing follows you in, nothing gets past us to town. Go."
+        "name": "馬許中士",
+        "title": "城鎮民兵",
+        "greeting": "受過訓練？那就聽好今晚的規矩。我的防線守住道路。裂隙要是吐出我們解決不了的東西，我就指給你。磨坊歸你：什麼都不許跟你進去，也什麼都不許越過我們進鎮。去吧。"
       },
       "forgemistress_darva": {
         "name": "達爾瓦鍛造師",
@@ -13596,18 +13596,18 @@ export const zh_TW: EnTranslations = {
         }
       },
       "q_lb_q0_ashore": {
-        "title": "Ashore",
-        "text": "Gullhaven takes the breaks day and night and holds anyway. If you mean to stand with them, start where the town bleeds: the militia line at the Watch Meadow, east past the harbor steps and the old statue.",
-        "completion": "The mill kill was yours alone, and Tam does not exaggerate about stretchers. I am short a scout and long on fields. You held ground tonight that was not yours to hold, and that is the whole job. Welcome to the watch.",
+        "title": "上岸",
+        "text": "鷗港日夜承受裂隙侵襲，卻依然堅守。若你真想與他們並肩，就從城鎮流血之處開始：穿過港口臺階和老雕像，向東去守望草甸的民兵防線。",
+        "completion": "磨坊裡的怪物是你獨自殺掉的，塔姆對擔架的事也沒有誇大。我缺一個斥候，卻有守不完的田野。今晚你守住了本不屬於你的陣地，而這就是這份差事的全部。歡迎加入守望。",
         "objectives": {
           "0": {
-            "label": "Report to Sergeant Marsh at the Watch Meadow"
+            "label": "向守望草甸的馬許中士報到"
           },
           "1": {
-            "label": "Riftspawn slain"
+            "label": "消滅裂隙孽生體"
           },
           "2": {
-            "label": "Put down whatever is in the Tidemill"
+            "label": "解決潮汐磨坊裡的東西"
           }
         }
       },
@@ -14215,49 +14215,49 @@ export const zh_TW: EnTranslations = {
         "leaveText": "你帶上堡門，重新走進龍裔荒原的寒風中。"
       },
       "lb_tidemill": {
-        "name": "The Tidemill",
-        "enterText": "The mill door gives. Inside, the dark is listening.",
-        "leaveText": "You step out of the Tidemill into the evening air."
+        "name": "潮汐磨坊",
+        "enterText": "磨坊的門讓開了。裡面，黑暗正在聆聽。",
+        "leaveText": "你走出潮汐磨坊，回到傍晚的空氣中。"
       },
       "lb_riftline": {
-        "name": "The Rift-Line at Dusk",
-        "enterText": "The meadow gate closes behind the patrol. The night belongs to the line.",
-        "leaveText": "You leave the rift-line to the dawn watch."
+        "name": "暮色裂隙防線",
+        "enterText": "草甸大門在巡邏隊身後關閉。今夜屬於這道防線。",
+        "leaveText": "你把裂隙防線留給黎明守衛。"
       },
       "lb_vault": {
-        "name": "The Drowned First Redoubt",
-        "enterText": "The rope pays out into the dark. Below, the old redoubt lies where it fell.",
-        "leaveText": "You come up the cliff rope into daylight."
+        "name": "沉沒的第一堡壘",
+        "enterText": "繩索向黑暗中放下。下方，舊堡壘躺在它墜落之處。",
+        "leaveText": "你沿懸崖繩索爬回日光之下。"
       },
       "lb_council": {
-        "name": "The Redoubt Council",
-        "enterText": "The council room holds six chairs. One is empty.",
-        "leaveText": "You step out of the redoubt."
+        "name": "堡壘議會",
+        "enterText": "議事廳裡擺著六把椅子。其中一把空著。",
+        "leaveText": "你走出堡壘。"
       },
       "lb_landing": {
-        "name": "The Landing at Night",
-        "enterText": "The guide fires burn down the beach. The fleet waits beyond the shoals.",
-        "leaveText": "You leave the Landing beach behind."
+        "name": "夜間登陸場",
+        "enterText": "引航火沿海灘漸次燃燒。艦隊在淺灘之外等待。",
+        "leaveText": "你把登陸海灘留在身後。"
       },
       "lb_riftfields": {
-        "name": "The Riftfields Approach",
-        "enterText": "Four ward sites ring the breach. The rite has closed it for twelve centuries.",
-        "leaveText": "You walk back down out of the Riftfields."
+        "name": "裂隙原進路",
+        "enterText": "四處結界地點環繞著裂口。這場儀式曾將它封閉十二個世紀。",
+        "leaveText": "你從裂隙原向山下走去。"
       },
       "lb_breach": {
-        "name": "Inside the Breach",
-        "enterText": "The light is wrong and the sky is worse. The heart sits in open ground ahead.",
-        "leaveText": "You cross the threshold into ordinary night air."
+        "name": "裂隙之內",
+        "enterText": "光線不對，天空更糟。那顆核心就在前方的開闊地上。",
+        "leaveText": "你跨過門檻，回到尋常的夜空之下。"
       },
       "lb_lastwatch": {
-        "name": "The Last Watch",
-        "enterText": "The redoubt is clean and empty. Someone has to close the watch.",
-        "leaveText": "You close the redoubt door behind you."
+        "name": "最後守望",
+        "enterText": "堡壘乾淨而空蕩。總得有人結束這場守望。",
+        "leaveText": "你在身後關上堡壘大門。"
       },
       "lb_willowfen": {
-        "name": "Willowweep",
-        "enterText": "The willow does not move. The water does not either.",
-        "leaveText": "You leave the willow to its quiet."
+        "name": "泣柳澤",
+        "enterText": "柳樹紋絲不動。水面也是。",
+        "leaveText": "你離開柳樹，任它繼續沉寂。"
       },
       "drowned_temple": {
         "name": "溺亡神殿",
