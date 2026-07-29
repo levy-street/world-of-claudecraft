@@ -1,4 +1,5 @@
 import type * as http from 'node:http';
+import { verifyLoginTwoFactor } from './account';
 import {
   accountDetail,
   associationsForIp,
@@ -136,6 +137,7 @@ const ADMIN_LOGIN_MAX_PER_MINUTE = 10;
 // bad-password response so it never reveals whether the account exists.
 const ADMIN_LOGIN_TOO_MANY_FAILED_ATTEMPTS =
   'too many failed attempts, wait a few minutes and try again';
+const ADMIN_LOGIN_INVALID_TWO_FACTOR = 'invalid authentication code';
 const MAX_PAGE_LIMIT = 200;
 const DEFAULT_PAGE_LIMIT = 25;
 const ACTIVITY_WINDOW_DAYS = 30;
@@ -426,6 +428,17 @@ async function handleLogin(req: http.IncomingMessage, res: http.ServerResponse):
   const staff = await adminRolesForAccount(account.id);
   if (staff === null) {
     return fail(res, 403, 'this account does not have admin access');
+  }
+  if (account.totp_enabled_at) {
+    const code = typeof body.code === 'string' ? body.code : '';
+    const recoveryCode = typeof body.recoveryCode === 'string' ? body.recoveryCode : '';
+    if (!code && !recoveryCode) {
+      return ok(res, { twoFactorRequired: true });
+    }
+    if (!(await verifyLoginTwoFactor(account, code, recoveryCode))) {
+      recordAuthFailure(username);
+      return fail(res, 401, ADMIN_LOGIN_INVALID_TWO_FACTOR);
+    }
   }
   clearAuthFailures(username);
   await touchLogin(account.id);
@@ -1410,6 +1423,7 @@ function makeRealAdminDb() {
     accountAndScopeForToken,
     accountMailTarget,
     findAccount,
+    verifyLoginTwoFactor,
     // Target-account staff check (the "admin accounts cannot be suspended / banned /
     // chat muted" guards); the CALLER gate resolves roles via adminRolesForAccount.
     isAdminAccount,
@@ -1520,6 +1534,17 @@ async function loginHandler(ctx: Ctx): Promise<void> {
   const staff = await adminDb().adminRolesForAccount(account.id);
   if (staff === null) {
     return fail(ctx.res, 403, 'this account does not have admin access');
+  }
+  if (account.totp_enabled_at) {
+    const code = typeof body.code === 'string' ? body.code : '';
+    const recoveryCode = typeof body.recoveryCode === 'string' ? body.recoveryCode : '';
+    if (!code && !recoveryCode) {
+      return ok(ctx.res, { twoFactorRequired: true });
+    }
+    if (!(await adminDb().verifyLoginTwoFactor(account, code, recoveryCode))) {
+      adminDb().recordAuthFailure(username);
+      return fail(ctx.res, 401, ADMIN_LOGIN_INVALID_TWO_FACTOR);
+    }
   }
   adminDb().clearAuthFailures(username);
   await adminDb().touchLogin(account.id);
