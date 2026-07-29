@@ -340,15 +340,9 @@ describe('constrained entry view creation ramp', () => {
     );
     const budgetMethod = renderer.slice(budgetMethodStart, budgetMethodEnd);
     const budgetAt = budgetMethod.indexOf('const base = constrainedEntryViewCreateBudget(');
-    const zeroGuardAt = budgetMethod.indexOf(
-      'if (base === 0) return { maxViews: 0, maxStartWorkMs: 0 };',
-    );
+    const zeroGuardAt = budgetMethod.indexOf('if (base === 0) return 0;');
     const backoffAt = budgetMethod.indexOf('if (this.viewCreateBackoff > 0)');
     const createAt = renderer.indexOf('this.createCandidateViews(', budgetMethodEnd);
-    const deadlineAt = renderer.indexOf(
-      'performance.now() + createBudget.maxStartWorkMs',
-      createAt,
-    );
     const elapsedIncrementAt = renderer.indexOf(
       'this.runtimeEntryElapsedMs += Math.min(250, Math.max(0, dt * 1000))',
     );
@@ -358,7 +352,6 @@ describe('constrained entry view creation ramp', () => {
     expect(zeroGuardAt).toBeGreaterThan(budgetAt);
     expect(backoffAt).toBeGreaterThan(zeroGuardAt);
     expect(createAt).toBeGreaterThan(budgetMethodEnd);
-    expect(deadlineAt).toBeGreaterThan(createAt);
     expect(elapsedIncrementAt).toBeGreaterThan(createAt);
   });
 

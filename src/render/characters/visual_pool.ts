@@ -18,7 +18,7 @@ export class CharacterVisualPool<T> {
     readonly capacity: number,
     private readonly hooks: VisualPoolHooks<T>,
   ) {
-    if (!Number.isInteger(capacity) || capacity < 0) {
+    if ((!Number.isInteger(capacity) && capacity !== Number.POSITIVE_INFINITY) || capacity < 0) {
       throw new RangeError('visual pool capacity must be a non-negative integer');
     }
   }
@@ -27,7 +27,7 @@ export class CharacterVisualPool<T> {
     const bucket = this.available.get(key);
     const pooled = bucket?.pop();
     if (!pooled) return null;
-    if (bucket!.length === 0) this.available.delete(key);
+    if (bucket?.length === 0) this.available.delete(key);
     this.availableCount--;
     this.hooks.reset(pooled.value);
     return pooled.value;
@@ -65,7 +65,8 @@ export class CharacterVisualPool<T> {
       }
     }
     if (!oldest) return;
-    const bucket = this.available.get(oldest.key)!;
+    const bucket = this.available.get(oldest.key);
+    if (!bucket) return;
     const index = bucket.indexOf(oldest);
     bucket.splice(index, 1);
     if (bucket.length === 0) this.available.delete(oldest.key);

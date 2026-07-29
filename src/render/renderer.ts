@@ -40,18 +40,6 @@ import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
-import {
-  articulatedRigLimit,
-  type CharacterRenderMode,
-  createRigBudgetScratch,
-  planArticulatedRigs,
-  type RigBudgetCandidate,
-  type RigBudgetDecision,
-  requiresLocalCharacterVisual,
-  resolveRigBudgetRenderMode,
-  shouldHidePendingLocalCharacterVisual,
-  writeRigBudgetCandidate,
-} from './articulated_rig_budget_core';
 import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
 import type { RenderBackendSelection } from './backend/types';
 import { attachBankerChestToNpcView } from './banker_chest';
@@ -94,12 +82,8 @@ import {
   mechAssetsReady,
   preloadMechAssets,
   preloadTrainingDummyAssets,
-  prepareVisual,
-  tintedFarMaterials,
   trainingDummyAssetsReady,
 } from './characters/assets';
-import { createCharacterClickProxy, syncCharacterClickProxy } from './characters/click_proxy';
-import { CharacterCrowdBatch } from './characters/crowd_batch';
 import { skinCount, visualKeyFor } from './characters/manifest';
 import {
   playerRangedAttackAlreadyStarted,
@@ -110,7 +94,12 @@ import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { CompileBatch } from './compile_batch';
 import { trackWebGLContext } from './context_release';
-import { animCadenceFrames, characterLodBands, showsStaticFarMesh } from './crowd_lod';
+import {
+  animatesEveryFrame,
+  animCadenceFrames,
+  characterLodBands,
+  showsStaticFarMesh,
+} from './crowd_lod';
 import { shouldPlayDeedFirework } from './deed_fx_gate';
 import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable, syncDelveInteractableVisibility } from './delve_props';
@@ -180,7 +169,6 @@ import { facingAlpha, remoteEntityAlpha } from './net_interp_core';
 import { buildEastbrookNoticeboard } from './noticeboard';
 import { resolveDirectPickEntityId } from './pick_resolution';
 import { PlacedAssetsView } from './placed_assets';
-import { planPlayerRigResidency } from './player_rig_residency_core';
 import {
   applyPointLightBudget,
   type RankedPointLight,
@@ -239,7 +227,6 @@ import { ValeCupPracticeSky } from './vale_cup_practice_sky';
 import { buildValeCupStadium, type ValeCupStadiumView } from './vale_cup_stadium';
 import { buildValeCupTeamRings, type ValeCupTeamRingsView } from './vale_cup_team_ring';
 import { SCHOOL_COLORS, Vfx } from './vfx';
-import { type ViewCreateBudget, viewCreateBudget } from './view_create_budget_core';
 import { ViewCreateRetryGate } from './view_create_retry';
 import { type WarriorCastVisualPlan, warriorCastVisualPlan } from './warrior_cast_fx_core';
 import { RecklessSkullPainter } from './warrior_cast_fx_painter';
@@ -673,11 +660,7 @@ export interface EntityView {
   /** rigged glTF visual for characters; null for object views (doors/crates) */
   visual: CharacterVisual | null;
   visualKey: string | null;
-  visualColor: number;
   visualPoolKey: string | null;
-  crowdVariantKey: string | null;
-  /** Fresh promoted rig is compiling while the shell stays batched/clickable. */
-  rigCompilePending: boolean;
   sheepVisual: CharacterVisual | null; // polymorph form, built lazily
   bearVisual: CharacterVisual | null; // druid bear form, built lazily
   catVisual: CharacterVisual | null; // druid cat form, built lazily
@@ -694,8 +677,6 @@ export interface EntityView {
   weaponStowed: boolean; // last-rendered sheathe state (Z key), diffed for live stow toggles
   /** unscaled height — nameplate/vfx anchor reads height * e.scale */
   height: number;
-  /** unscaled stable-shell hit radius; independent of full rig residency */
-  clickRadius: number;
   /** last-applied entity scale (group.scale); diffed each frame for live size buffs */
   liveScale: number;
   /** what removeView pulls back out of clickTargets */
@@ -1189,24 +1170,6 @@ export class Renderer {
   private frameIdx = 0;
   // Visible non-self character rigs last frame, feeding the crowd-adaptive LOD.
   private lastVisibleRigCount = 0;
-  private readonly crowdBatch = new CharacterCrowdBatch();
-  private readonly crowdVariantKeys = new Set<string>();
-  private readonly crowdBatchCounts = new Map<string, number>();
-  private readonly crowdMatrix = new THREE.Matrix4();
-  private readonly crowdScale = new THREE.Vector3();
-  private readonly crowdRigCandidates: RigBudgetCandidate[] = [];
-  private readonly crowdRigCandidatePool: RigBudgetCandidate[] = [];
-  private readonly crowdRigDecisions: RigBudgetDecision[] = [];
-  private readonly crowdPlayerRigDecisions: RigBudgetDecision[] = [];
-  private readonly crowdActionableIds = new Set<number>();
-  private readonly crowdLocalVisualIds = new Set<number>();
-  private readonly crowdRigScratch = createRigBudgetScratch();
-  private readonly crowdRenderModes = new Map<number, CharacterRenderMode>();
-  private readonly playerRigResidentIds = new Set<number>();
-  private readonly playerRigReleaseIds: number[] = [];
-  private readonly playerRigAcquireIds: number[] = [];
-  private crowdArticulatedCount = 0;
-  private crowdLocalFarCount = 0;
   // KHR_parallel_shader_compile present: lets us link new programs off-thread and
   // gate a freshly-streamed view's draw on readiness instead of stalling the frame.
   private asyncCompileSupported = false;
@@ -1482,8 +1445,6 @@ export class Renderer {
         return 44;
       },
     });
-    setRenderCategory(this.crowdBatch.group, 'character-crowd');
-    this.scene.add(this.crowdBatch.group);
 
     this.scene.fog = new THREE.Fog(
       LOW_GFX ? 0xb6cddd : 0xa6c6e0,
@@ -2214,12 +2175,6 @@ export class Renderer {
     programs: number;
     views: number;
     pooledVisuals: number;
-    crowd?: {
-      articulated: number;
-      localFar: number;
-      batched: number;
-      variants: number;
-    };
     foliage: FoliagePerfStats;
     glVendor: string;
     glRenderer: string;
@@ -2282,12 +2237,6 @@ export class Renderer {
       programs: info.programs?.length ?? 0,
       views: this.views.size,
       pooledVisuals: this.visualPool.size,
-      crowd: {
-        articulated: this.crowdArticulatedCount,
-        localFar: this.crowdLocalFarCount,
-        batched: this.crowdBatch.instanceCount,
-        variants: this.crowdBatch.variantCount,
-      },
       foliage: this.foliage.perfStats(),
       glVendor: this.glVendor,
       glRenderer: this.glRenderer,
@@ -2545,36 +2494,25 @@ export class Renderer {
     this.applyRenderBudgetState(state);
   }
 
-  private runtimeViewCreateBudget(dt: number): ViewCreateBudget {
+  private runtimeViewCreateBudget(dt: number): number {
     const normalBase = this.lowGfx ? VIEW_CREATE_BUDGET_LOW : VIEW_CREATE_BUDGET_HIGH;
     const base = constrainedEntryViewCreateBudget(
       GFX.constrainedMemory,
       this.runtimeEntryElapsedMs,
       normalBase,
     );
-    if (base === 0) return { maxViews: 0, maxStartWorkMs: 0 };
-    const planned = viewCreateBudget({
-      dtSeconds: dt,
-      constrained: GFX.constrainedMemory,
-      budgetPressure: this.lastBudgetPressure,
-      entryElapsedMs: this.runtimeEntryElapsedMs,
-    });
-    if (!Number.isFinite(dt) || dt <= 0) {
-      return { ...planned, maxViews: Math.min(base, planned.maxViews) };
-    }
+    if (base === 0) return 0;
+    if (!Number.isFinite(dt) || dt <= 0) return base;
     const frameMs = Math.min(250, dt * 1000);
     if (frameMs >= VIEW_CREATE_HITCH_FRAME_MS) this.viewCreateBackoff = VIEW_CREATE_BACKOFF_SECONDS;
     if (this.viewCreateBackoff > 0) {
       this.viewCreateBackoff = Math.max(0, this.viewCreateBackoff - dt);
-      return { maxViews: 1, maxStartWorkMs: Math.min(1, planned.maxStartWorkMs) };
+      return 1;
     }
     if (frameMs >= VIEW_CREATE_SLOW_FRAME_MS || this.frameMsEma >= GFX.budget.dropFrameMs) {
-      return {
-        maxViews: Math.min(planned.maxViews, Math.max(1, Math.ceil(base / 2))),
-        maxStartWorkMs: planned.maxStartWorkMs,
-      };
+      return Math.max(1, Math.ceil(base / 2));
     }
-    return { ...planned, maxViews: Math.min(base, planned.maxViews) };
+    return base;
   }
 
   private viewCandidatePriority(e: Entity, p: Entity, d2: number): number {
@@ -2638,164 +2576,6 @@ export class Renderer {
     }
   }
 
-  private refreshPlayerShellAppearance(e: Entity, view: EntityView): void {
-    const nextKey = visualKeyFor(e);
-    if (nextKey === view.visualKey && e.color === view.visualColor) return;
-    if (nextKey === 'player_mech' && !mechAssetsReady()) {
-      void preloadMechAssets()
-        .then(() => this.viewCreateRetry.markSucceeded(e.id, `base:${nextKey}`))
-        .catch((error) =>
-          logAssetMissOnce('preload:player_mech', 'Failed to preload live mech cosmetic:', error),
-        );
-      return;
-    }
-    try {
-      const prepared = prepareVisual(nextKey);
-      if (view.visual) this.releasePlayerRig(e.id);
-      view.visualKey = nextKey;
-      view.visualColor = e.color;
-      view.visualPoolKey = this.visualPoolKeyFor(e);
-      view.height = prepared.def.height;
-      view.clickRadius = prepared.clickRadius;
-      view.crowdVariantKey = null;
-      syncCharacterClickProxy(
-        view.clickTarget as THREE.Mesh,
-        view.height,
-        view.clickRadius,
-        e.dead,
-      );
-    } catch (error) {
-      logAssetMissOnce(`player-shell:${nextKey}`, 'Failed to refresh player shell:', error);
-    }
-  }
-
-  private planCrowdCharacterModes(player: Entity): void {
-    this.crowdActionableIds.clear();
-    this.crowdLocalVisualIds.clear();
-
-    let candidateCount = 0;
-    for (const [id, view] of this.views) {
-      const e = this.sim.entities.get(id);
-      if (!e) continue;
-      const slot = this.renderWorld.slotFor(id);
-      if (slot < 0) continue;
-      let candidate = this.crowdRigCandidatePool[candidateCount];
-      if (!candidate) {
-        candidate = { id: 0, distanceSq: 0, priority: 0, actionable: false };
-        this.crowdRigCandidatePool.push(candidate);
-      }
-      const combatTargetId = e.aggroTargetId ?? e.targetId;
-      const combatTarget =
-        e.inCombat && combatTargetId !== null ? this.sim.entities.get(combatTargetId) : undefined;
-      if (
-        !writeRigBudgetCandidate(
-          candidate,
-          e,
-          this.renderWorld.distanceSq[slot],
-          ENTITY_LOD_RANGE_SQ,
-          player.id,
-          player.targetId,
-          combatTarget?.ownerId ?? null,
-          view.visual !== null,
-          e.templateId !== 'spirit_healer' || player.ghost,
-        )
-      ) {
-        continue;
-      }
-      if (candidate.actionable) this.crowdActionableIds.add(id);
-      if (e.kind === 'player') this.refreshPlayerShellAppearance(e, view);
-      this.crowdRigCandidates[candidateCount++] = candidate;
-    }
-    this.crowdRigCandidates.length = candidateCount;
-    const localFarLimit =
-      GFX.tier === 'low' ? 2 : GFX.tier === 'medium' ? 4 : GFX.tier === 'high' ? 6 : 8;
-    planArticulatedRigs(
-      this.crowdRigCandidates,
-      articulatedRigLimit(GFX.tier, GFX.constrainedMemory, this.lastBudgetPressure),
-      localFarLimit,
-      this.crowdRigDecisions,
-      this.crowdRigScratch,
-    );
-    this.crowdRenderModes.clear();
-    this.crowdPlayerRigDecisions.length = 0;
-    this.crowdArticulatedCount = 0;
-    this.crowdLocalFarCount = 0;
-    for (const decision of this.crowdRigDecisions) {
-      const e = this.sim.entities.get(decision.id);
-      if (!e) continue;
-      const view = this.views.get(decision.id);
-      if (
-        e.kind === 'player' &&
-        (decision.mode === 'batchedFar' ||
-          view?.visual === null ||
-          view?.rigCompilePending === true) &&
-        requiresLocalCharacterVisual(e)
-      ) {
-        this.crowdLocalVisualIds.add(decision.id);
-      }
-      // Convert planner overflow into the mode this entity can actually draw:
-      // only players have an instanced batch, while status-heavy players must
-      // retain a local static far mesh so forms/corpses never become idle shells.
-      const effectiveMode = resolveRigBudgetRenderMode(
-        e.kind,
-        decision.mode,
-        true,
-        this.crowdLocalVisualIds.has(decision.id),
-      );
-      if (!effectiveMode) continue;
-      decision.mode = effectiveMode;
-      this.crowdRenderModes.set(decision.id, decision.mode);
-      if (e.kind === 'player') this.crowdPlayerRigDecisions.push(decision);
-      if (decision.mode === 'rig') this.crowdArticulatedCount++;
-      else if (decision.mode === 'localFar') this.crowdLocalFarCount++;
-    }
-  }
-
-  private crowdVariantFor(e: Entity, view: EntityView): string | null {
-    if (view.crowdVariantKey !== null) return view.crowdVariantKey;
-    const visualKey = view.visualKey ?? visualKeyFor(e);
-    const key = `${visualKey}:${e.color >>> 0}`;
-    if (this.crowdVariantKeys.has(key)) {
-      view.crowdVariantKey = key;
-      return key;
-    }
-    try {
-      const prepared = prepareVisual(visualKey);
-      if (!prepared.idleGeo) return null;
-      const materials = tintedFarMaterials(prepared.def, e.color, prepared.idleSrcMats);
-      this.crowdBatch.registerVariant(key, {
-        geometry: prepared.idleGeo,
-        material: materials,
-        capacity: 64,
-        ownsMaterial: true,
-      });
-      this.crowdVariantKeys.add(key);
-      view.crowdVariantKey = key;
-      this.compileBatch.request(this.crowdBatch.group);
-      return key;
-    } catch {
-      return null;
-    }
-  }
-
-  private reserveCrowdBatchCapacity(): void {
-    this.crowdBatchCounts.clear();
-    for (const [id, view] of this.views) {
-      const e = this.sim.entities.get(id);
-      if (e?.kind !== 'player') continue;
-      const mode = this.crowdRenderModes.get(id);
-      if (mode !== 'batchedFar' && view.visual !== null && !view.rigCompilePending) {
-        continue;
-      }
-      const variant = this.crowdVariantFor(e, view);
-      if (!variant) continue;
-      this.crowdBatchCounts.set(variant, (this.crowdBatchCounts.get(variant) ?? 0) + 1);
-    }
-    for (const [variant, count] of this.crowdBatchCounts) {
-      this.crowdBatch.reserve(variant, count);
-    }
-  }
-
   private setCharacterMainPassCulled(
     view: EntityView,
     culled: boolean,
@@ -2816,177 +2596,6 @@ export class Renderer {
 
   private restoreCharacterMainPass(view: EntityView): void {
     this.characterMainPassCullStates.get(view)?.restore();
-  }
-
-  private syncBatchedCrowdView(
-    e: Entity,
-    v: EntityView,
-    player: Entity,
-    alpha: number,
-    now: number,
-  ): boolean {
-    if (e.kind !== 'player') return false;
-    this.restoreCharacterMainPass(v);
-    const dx = e.pos.x - player.pos.x;
-    const dz = e.pos.z - player.pos.z;
-    const d2 = dx * dx + dz * dz;
-    const showCutoff = v.group.visible
-      ? this.entityViewDestroyRangeSq
-      : this.entityViewCreateRangeSq;
-    if (d2 > showCutoff) {
-      v.group.visible = false;
-      return true;
-    }
-    const ea = remoteEntityAlpha(now, e.netUpdatedAt, e.netInterval, alpha);
-    const x = e.prevPos.x + (e.pos.x - e.prevPos.x) * ea;
-    const y = e.prevPos.y + (e.pos.y - e.prevPos.y) * ea;
-    const z = e.prevPos.z + (e.pos.z - e.prevPos.z) * ea;
-    const facing = e.prevFacing + shortestAngle(e.prevFacing, e.facing) * facingAlpha(ea);
-    const variant = this.crowdVariantFor(e, v);
-    this.cullSphere.center.set(x, y + v.height * 0.5 * e.scale, z);
-    this.cullSphere.radius = (v.height * 0.7 + 1.5) * e.scale;
-    const inMainFrustum = this.cullFrustum.intersectsSphere(this.cullSphere);
-    if (variant && inMainFrustum) {
-      this.crowdMatrix.makeRotationY(facing);
-      this.crowdScale.setScalar(e.scale);
-      this.crowdMatrix.scale(this.crowdScale);
-      this.crowdMatrix.setPosition(x, y, z);
-      // reserveCrowdBatchCapacity makes this total in normal operation. An
-      // unexpected miss sheds only the cosmetic instance for this frame; it
-      // must never fall through and construct/retain a full rig.
-      this.crowdBatch.addMatrix(variant, this.crowdMatrix.elements);
-    }
-
-    v.group.visible = true;
-    v.group.position.set(x, y, z);
-    v.group.rotation.y = facing;
-    v.group.scale.setScalar(e.scale);
-    syncCharacterClickProxy(v.clickTarget as THREE.Mesh, v.height, v.clickRadius, e.dead);
-    if (v.visual) v.visual.root.visible = false;
-    if (v.sheepVisual) v.sheepVisual.root.visible = false;
-    if (v.bearVisual) v.bearVisual.root.visible = false;
-    if (v.catVisual) v.catVisual.root.visible = false;
-    if (v.travelVisual) v.travelVisual.root.visible = false;
-    v.visual?.setShadow(false);
-    v.visual?.setProxyShadow(false);
-    v.isFar = true;
-    return true;
-  }
-
-  private reconcilePlayerRigResidency(): void {
-    planPlayerRigResidency(
-      this.crowdPlayerRigDecisions,
-      this.playerRigResidentIds,
-      this.playerRigReleaseIds,
-      this.playerRigAcquireIds,
-    );
-    // Demote first: the selected replacement can hit the finite LRU instead of
-    // constructing another rig, and resident ordinary rigs never exceed plan.
-    for (const id of this.playerRigReleaseIds) this.releasePlayerRig(id);
-    for (const id of this.playerRigAcquireIds) this.acquirePlayerRig(id);
-  }
-
-  private disposePlayerRigDependents(view: EntityView): void {
-    view.sheepVisual?.dispose();
-    view.bearVisual?.dispose();
-    view.catVisual?.dispose();
-    view.travelVisual?.dispose();
-    view.fireballTravelVisual?.dispose();
-    view.iceBlockVisual?.dispose();
-    view.temporalHourglassVisual?.dispose();
-    view.frostNovaRootVisual?.dispose();
-    view.mageBarrierVisual?.dispose();
-    view.sheepVisual = null;
-    view.bearVisual = null;
-    view.catVisual = null;
-    view.travelVisual = null;
-    view.fireballTravelVisual = null;
-    view.iceBlockVisual = null;
-    view.temporalHourglassVisual = null;
-    view.frostNovaRootVisual = null;
-    view.mageBarrierVisual = null;
-    view.recklessOn = false;
-  }
-
-  private releasePlayerRig(id: number): void {
-    const view = this.views.get(id);
-    if (!view?.visual) {
-      this.playerRigResidentIds.delete(id);
-      return;
-    }
-    const visual = view.visual;
-    const entity = this.sim.entities.get(id);
-    view.group.remove(visual.root);
-    view.visual = null;
-    view.rigCompilePending = false;
-    this.playerRigResidentIds.delete(id);
-    this.disposePlayerRigDependents(view);
-    this.reconcileViewLights(view);
-    const poolKey = view.visualPoolKey ?? (entity ? this.visualPoolKeyFor(entity) : null);
-    if (poolKey) this.storePooledVisual(poolKey, visual);
-    else visual.dispose();
-  }
-
-  private acquirePlayerRig(id: number): void {
-    const view = this.views.get(id);
-    const entity = this.sim.entities.get(id);
-    if (!view || entity?.kind !== 'player' || view.visual) return;
-    const poolKey = this.visualPoolKeyFor(entity);
-    if (!poolKey) return;
-    let visual = this.takePooledVisual(poolKey);
-    const pooled = visual !== null;
-    if (!visual) visual = this.createCharacterVisualWithRetry(entity, 'player-residency');
-    if (!visual) return;
-
-    // A pooled rig can come from another player with the same constructor
-    // identity. Apply every mutable appearance field before exposing it.
-    visual.setSkin(entity.skin);
-    visual.setWeapon(entity.mainhandItemId);
-    visual.setOffhand(entity.offhandItemId);
-    visual.setWeaponSkin(entity.weaponSkinId);
-    visual.setWeaponStowed(entity.weaponStowed);
-    visual.setShadow(view.shadowOn);
-    visual.setFar(false);
-    visual.root.visible = true;
-    view.group.add(visual.root);
-
-    view.visual = visual;
-    view.visualKey = visualKeyFor(entity);
-    view.visualColor = entity.color;
-    view.visualPoolKey = poolKey;
-    view.height = visual.height;
-    view.skin = entity.skin;
-    view.mainhandItemId = entity.mainhandItemId;
-    view.offhandItemId = entity.offhandItemId;
-    view.weaponSkinId = entity.weaponSkinId;
-    view.weaponStowed = entity.weaponStowed;
-    view.rigCompilePending = false;
-    this.playerRigResidentIds.add(id);
-    this.reconcileViewLights(view);
-
-    if (!pooled && id !== this.sim.player.id) {
-      this.gatePlayerRigOnCompile(view, visual);
-    }
-  }
-
-  private gatePlayerRigOnCompile(view: EntityView, visual: CharacterVisual): void {
-    if (!this.asyncCompileSupported) return;
-    view.rigCompilePending = true;
-    visual.root.visible = false;
-    const compileReady = this.compileBatch.request(visual.root);
-    let settled = false;
-    const clear = (): void => {
-      if (settled) return;
-      settled = true;
-      if (view.visual === visual) view.rigCompilePending = false;
-    };
-    const guard = setTimeout(clear, VIEW_COMPILE_GATE_MAX_MS);
-    try {
-      compileReady.then(clear, clear).finally(() => clearTimeout(guard));
-    } catch {
-      clearTimeout(guard);
-      clear();
-    }
   }
 
   private createdViewType(e: Entity): string {
@@ -3212,10 +2821,6 @@ export class Renderer {
   }
 
   private visualPoolKeyFor(e: Entity): string | null {
-    if (e.kind === 'player') {
-      // Mech uses the wearer's class-specific held-item layout, hence templateId.
-      return `player:${visualKeyFor(e)}:${e.templateId}:${e.color >>> 0}`;
-    }
     if (e.kind === 'mob') return `mob:${e.templateId}:${e.color}:${e.scale}`;
     // NPCs are skinned characters too: pool them like mobs so their Skeleton (and its
     // bone-matrix DataTexture) survives interest churn instead of being disposed and
@@ -4693,10 +4298,8 @@ export class Renderer {
     const group = new THREE.Group();
     setRenderCategory(group, `entity:${e.kind}`);
     let visual: CharacterVisual | null = null;
-    let characterVisualKey: string | null = null;
     let body: THREE.Group | null = null; // object views build meshes into this
     let height = 1.2;
-    let clickRadius = 0.4;
     let sparkle: THREE.Sprite | undefined;
     let objectMesh: THREE.Object3D | undefined;
     let visualPoolKey: string | null = null;
@@ -4799,7 +4402,6 @@ export class Renderer {
       objectMesh = body;
     } else {
       const visualKey = visualKeyFor(e);
-      characterVisualKey = visualKey;
       // The in-flight cooldown stops the deferring entity from burning a
       // budget slot every frame, and clearing it when the fetch RESOLVES
       // keeps pop-in at the next frame after readiness (only a rejected
@@ -4827,34 +4429,19 @@ export class Renderer {
         return;
       }
       visualPoolKey = this.visualPoolKeyFor(e);
-      if (e.kind === 'player') {
-        // Remote players begin as a lightweight shell (group + stable pick
-        // proxy + nameplate). The residency pass below constructs only selected
-        // articulated/local-far rigs.
-        try {
-          const prepared = prepareVisual(visualKey);
-          height = prepared.def.height;
-          clickRadius = prepared.clickRadius;
-        } catch (error) {
-          logAssetMissOnce(`player-shell:${visualKey}`, 'Failed to create player shell:', error);
-          this.viewCreateRetry.markFailed(e.id, 'view', performance.now());
-          return;
-        }
+      visual = visualPoolKey ? this.takePooledVisual(visualPoolKey) : null;
+      if (!visual) {
+        // Pool misses build the complete production visual. Only mob and NPC
+        // visuals carry pool keys, matching the release-base retention policy.
+        visual = this.createCharacterVisualWithRetry(e, 'view');
+        if (!visual) return;
       } else {
-        visual = visualPoolKey ? this.takePooledVisual(visualPoolKey) : null;
-        if (!visual) {
-          // Pool MISS: build a fresh visual but KEEP its pool key so removeView
-          // returns it to the finite global LRU instead of churning skeletons.
-          visual = this.createCharacterVisualWithRetry(e, 'view');
-          if (!visual) return;
-        } else {
-          this.viewCreateRetry.markSucceeded(e.id, 'view');
-        }
-        // entity scale is applied to the whole group below, so it can update live
-        // and also scale lazily-built form visuals for free.
-        group.add(visual.root);
-        height = visual.height;
+        this.viewCreateRetry.markSucceeded(e.id, 'view');
       }
+      // Entity scale is applied to the whole group below, so it can update live
+      // and also scale lazily-built form visuals for free.
+      group.add(visual.root);
+      height = visual.height;
     }
 
     const bankerChest = attachBankerChestToNpcView(
@@ -4865,13 +4452,7 @@ export class Renderer {
     );
 
     let clickTarget: THREE.Object3D;
-    if (e.kind === 'player') {
-      // Shell-owned and never swapped during rig promotion/demotion.
-      const proxy = createCharacterClickProxy(height, clickRadius, e.dead);
-      proxy.userData.entityId = e.id;
-      group.add(proxy);
-      clickTarget = proxy;
-    } else if (visual) {
+    if (visual) {
       // raycasting skinned meshes is expensive — pick against the invisible
       // capsule proxy instead (three's raycaster ignores `visible`)
       if (!isQuestVision) visual.clickProxy.userData.entityId = e.id;
@@ -4998,7 +4579,7 @@ export class Renderer {
     // Object views gate their own casters. Character shadows live in visual,
     // while separately composed accessories use this same distance gate.
     const objectCasters: THREE.Object3D[] = [];
-    if (!visual && e.kind !== 'player') collectCasters(group, objectCasters);
+    if (!visual) collectCasters(group, objectCasters);
     else if (bankerChest) collectCasters(bankerChest, objectCasters);
     // Register any point lights this view owns (e.g. the quest-object glow) into the
     // constant point-light budget so numPointLights never changes as it streams in.
@@ -5015,11 +4596,8 @@ export class Renderer {
     this.views.set(e.id, {
       group,
       visual,
-      visualKey: characterVisualKey,
-      visualColor: e.color,
+      visualKey: visual ? visualKeyFor(e) : null,
       visualPoolKey,
-      crowdVariantKey: null,
-      rigCompilePending: false,
       sheepVisual: null,
       bearVisual: null,
       catVisual: null,
@@ -5030,7 +4608,6 @@ export class Renderer {
       frostNovaRootVisual: null,
       mageBarrierVisual: null,
       height,
-      clickRadius,
       clickTarget,
       nameplate: np,
       nameEl,
@@ -5082,10 +4659,8 @@ export class Renderer {
       skin: e.skin,
       mainhandItemId: e.mainhandItemId,
       offhandItemId: e.offhandItemId,
-      // A player shell already caches the desired appearance; promotion applies
-      // it explicitly. Built non-player rigs retain the legacy first-frame diff.
-      weaponSkinId: e.kind === 'player' ? e.weaponSkinId : null,
-      weaponStowed: e.kind === 'player' ? e.weaponStowed : false,
+      weaponSkinId: null,
+      weaponStowed: false,
       liveScale: e.scale,
       loco: newLocoTrack(),
       stepAccum: 0,
@@ -5114,7 +4689,7 @@ export class Renderer {
     // class is already prewarmed, and the self render path does not re-evaluate
     // the compilePending flag (only the non-self loop does), so gating it would
     // strand the player invisible. Other entities un-hide via that loop.
-    if (view && e.kind !== 'player' && e.id !== this.sim.player.id) {
+    if (view && e.id !== this.sim.player.id) {
       view.compileReady = this.gateViewOnCompile(view, group);
     }
   }
@@ -5167,7 +4742,6 @@ export class Renderer {
   }
 
   private updateBaseVisual(e: Entity, v: EntityView): void {
-    if (e.kind === 'player') return; // refreshed before residency planning
     if (!v.visual) return;
     const nextKey = visualKeyFor(e);
     if (nextKey === v.visualKey) return;
@@ -5592,7 +5166,6 @@ export class Renderer {
     const v = this.views.get(id);
     if (!v) return;
     this.restoreCharacterMainPass(v);
-    this.playerRigResidentIds.delete(id);
     this.renderWorld.markViewAttached(id, false);
     this.scene.remove(v.group);
     this.lightOwnerGroups.delete(v.group);
@@ -5792,12 +5365,7 @@ export class Renderer {
     // rig/nameplate DOM for the whole sim on the first rendered frame.
     createdViews += this.createRequiredViews(p, createdViewTypes);
     this.collectRuntimeViewCandidates(p, false);
-    const createBudget = this.runtimeViewCreateBudget(dt);
-    createdViews += this.createCandidateViews(
-      createBudget.maxViews,
-      createdViewTypes,
-      performance.now() + createBudget.maxStartWorkMs,
-    );
+    createdViews += this.createCandidateViews(this.runtimeViewCreateBudget(dt), createdViewTypes);
     this.compileBatch.flush(this.compileRuntimeViewBatch, this.handleCompileBatchError);
     for (let i = 0; i < renderWorldFrame.removalCount; i++) {
       const id = this.renderWorld.removalIds[i];
@@ -5812,10 +5380,6 @@ export class Renderer {
       this.removeView(id);
       removedViews++;
     }
-    this.planCrowdCharacterModes(p);
-    this.reconcilePlayerRigResidency();
-    this.crowdBatch.beginFrame();
-    this.reserveCrowdBatchCapacity();
 
     // frame parity for distance-tiered mixer throttling
     this.frameIdx = (this.frameIdx + 1) & 0xffff;
@@ -5846,26 +5410,6 @@ export class Renderer {
     for (const [id, v] of this.views) {
       const e = sim.entities.get(id);
       if (!e) continue;
-      const plannedCharacterMode = resolveRigBudgetRenderMode(
-        e.kind,
-        this.crowdRenderModes.get(id),
-        v.visual !== null && !v.rigCompilePending,
-        this.crowdLocalVisualIds.has(id),
-      );
-      if (plannedCharacterMode === 'batchedFar' && this.syncBatchedCrowdView(e, v, p, alpha, now)) {
-        continue;
-      }
-      if (
-        shouldHidePendingLocalCharacterVisual(
-          e.kind,
-          v.rigCompilePending,
-          this.crowdLocalVisualIds.has(id),
-        )
-      ) {
-        v.group.visible = false;
-        continue;
-      }
-      if (v.visual) v.visual.root.visible = true;
       // form swaps (polymorph sheep, druid forms) — computed up front because
       // the shadow gates below must not run the base rig's proxy under a form.
       // One pass over the aura list instead of six .some() scans per entity per
@@ -5928,7 +5472,19 @@ export class Renderer {
       // the current target, pet combat, a cast windup telegraph) rather than
       // mere cosmetic smoothness: such an entity is exempt from BOTH the cadence
       // throttle and the crowd-pulled frozen-mesh swap below.
-      const actionablePose = this.crowdActionableIds.has(id);
+      const combatTargetId = e.aggroTargetId ?? e.targetId;
+      const combatTarget =
+        e.inCombat && combatTargetId !== null ? sim.entities.get(combatTargetId) : undefined;
+      const actionablePose = animatesEveryFrame(
+        id,
+        p.id,
+        p.targetId,
+        e.castingAbility,
+        e.inCombat,
+        e.ownerId,
+        combatTargetId,
+        combatTarget?.ownerId ?? null,
+      );
       if (isSelf) {
         v.group.visible = true;
         v.isFar = false;
@@ -5964,12 +5520,9 @@ export class Renderer {
         const wantShadow = d2 < shadowRangeSq;
         const inProxyBand = d2 < ENTITY_PROXY_SHADOW_RANGE_SQ;
         if (v.visual) {
-          if (plannedCharacterMode === undefined || plannedCharacterMode === 'rig') {
-            visibleRigCount++; // crowd-density signal for next frame's adaptive LOD
-          }
+          visibleRigCount++; // crowd-density signal for next frame's adaptive LOD
           v.visual.setShadow(wantShadow);
-          v.isFar =
-            plannedCharacterMode === 'localFar' || showsStaticFarMesh(d2, lodBands, actionablePose);
+          v.isFar = showsStaticFarMesh(d2, lodBands, actionablePose);
           // past the articulated gate the static-pose proxy carries the
           // shadow; an active form's own rig keeps casting instead
           v.visual.setProxyShadow(
@@ -6090,9 +5643,6 @@ export class Renderer {
         // bespoke ball motion (roll + contact shadow + dust); no rig to animate
         this.updateValeCupBall(e, v, dt);
         continue;
-      }
-      if (e.kind === 'player') {
-        syncCharacterClickProxy(v.clickTarget as THREE.Mesh, v.height, v.clickRadius, e.dead);
       }
       if (!v.visual) continue;
       let characterGraphChanged = false;
@@ -6255,10 +5805,6 @@ export class Renderer {
       v.visual.root.visible = active === v.visual && !fireballForm;
       // distant rigs swap to the single-draw baked idle-pose mesh
       v.visual.setFar(v.isFar && active === v.visual && !fireballForm);
-      v.sheepVisual?.setFar(v.isFar && active === v.sheepVisual);
-      v.bearVisual?.setFar(v.isFar && active === v.bearVisual);
-      v.catVisual?.setFar(v.isFar && active === v.catVisual);
-      v.travelVisual?.setFar(v.isFar && active === v.travelVisual);
 
       // animation state machine inputs, derived from render-space motion with
       // hysteresis so a one-frame speed dip can't reset the walk clip.
@@ -6685,7 +6231,6 @@ export class Renderer {
         if (!charOnScreen) v.group.visible = false;
       }
     }
-    this.crowdBatch.endFrame();
     this.compileBatch.flush(this.compileRuntimeViewBatch, this.handleCompileBatchError);
     this.lastVisibleRigCount = visibleRigCount;
 

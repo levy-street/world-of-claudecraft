@@ -751,17 +751,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     maxPointLights: nativeIosMemoryProfile ? 2 : constrainedMemory ? 3 : 6,
     constrainedMemory,
     nativeIosMemoryProfile,
-    maxPooledCharacterVisuals: nativeIosMemoryProfile
-      ? 6
-      : constrainedMemory
-        ? 12
-        : tier === 'low'
-          ? 16
-          : tier === 'medium'
-            ? 24
-            : tier === 'high'
-              ? 36
-              : 48,
+    maxPooledCharacterVisuals: nativeIosMemoryProfile ? 6 : Number.POSITIVE_INFINITY,
     // Extra articulated rigs are skinning + draw-call cost, so the phone-class
     // memory profiles and the low tier (which includes software GL) opt out and
     // keep the straight-to-frozen far LOD.

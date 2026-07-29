@@ -330,7 +330,7 @@ describe('graphics tier resolution', () => {
     expect(mobileWeb.standardMaterials).toBe(true);
     expect(nativeAndroid.nativeIosMemoryProfile).toBe(false);
     expect(nativeAndroid.standardMaterials).toBe(true);
-    expect(nativeAndroid.maxPooledCharacterVisuals).toBe(12);
+    expect(nativeAndroid.maxPooledCharacterVisuals).toBe(Number.POSITIVE_INFINITY);
   });
 
   it('never raises the native iOS light bound from an Advanced low-effects override', () => {

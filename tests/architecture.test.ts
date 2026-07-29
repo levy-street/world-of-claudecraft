@@ -264,7 +264,6 @@ const UI_PURE_CORES = [
 // water_core (the shore-depth sample shared by build + editor setLevel) follow
 // the same contract for the map editor's realtime terrain/water edits.
 const RENDER_PURE_CORES = [
-  'src/render/articulated_rig_budget_core.ts',
   'src/render/arena_water_band_core.ts',
   'src/render/backend/backend_select_core.ts',
   'src/render/camera_boom_core.ts',
@@ -283,7 +282,6 @@ const RENDER_PURE_CORES = [
   'src/render/nameplate_view.ts',
   'src/render/nameplate_budget_core.ts',
   'src/render/net_interp_core.ts',
-  'src/render/player_rig_residency_core.ts',
   'src/render/prewarm_policy.ts',
   'src/render/renderer_phase_samples_core.ts',
   'src/render/runtime/render_world_core.ts',
@@ -291,8 +289,6 @@ const RENDER_PURE_CORES = [
   'src/render/terrain_region_core.ts',
   'src/render/water_core.ts',
   'src/render/warrior_cast_fx_core.ts',
-  'src/render/view_create_budget_core.ts',
-  'src/render/characters/crowd_batch_core.ts',
   'src/render/characters/weapon_attack_style_core.ts',
 ].map((rel) => join(repoRoot, rel));
 

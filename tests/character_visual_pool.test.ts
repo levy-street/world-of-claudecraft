@@ -25,4 +25,17 @@ describe('CharacterVisualPool', () => {
     expect(pool.size).toBe(2);
     expect(dispose).toHaveBeenCalledWith({ id: 1 });
   });
+
+  it('retains all released visuals for the production desktop policy', () => {
+    const dispose = vi.fn();
+    const pool = new CharacterVisualPool<{ id: number }>(Number.POSITIVE_INFINITY, {
+      reset: vi.fn(),
+      dispose,
+    });
+    for (let id = 0; id < 80; id++) {
+      pool.release(`player:${id}`, { id });
+    }
+    expect(pool.size).toBe(80);
+    expect(dispose).not.toHaveBeenCalled();
+  });
 });
