@@ -20,13 +20,15 @@ render as the shared villager body tinted with their signature colour. For those
 the load-bearing grounding is the tint, the title, the zone, and above all the
 character's own written dialogue: read the quest text before writing a voice.
 
-One voice serves one character, not one content record. NPCs who recur across
-zones under suffixed ids (Brother Aldric, Scout Maren, Brother Halven) map back
-to a single designed voice through `VOICE_ALIAS` in
-`scripts/voices/npc_voice_prompts.mjs`. Where a first name repeats across zones
-(the three Sorrels, the three Pells, the two Eddas, the two Marens, the two
-Sauls) those are deliberately DIFFERENT people and each gets its own voice; the
-entries below say so explicitly and describe how the pair must differ.
+One voice normally serves one character, not one content record. NPCs who recur
+across zones under suffixed ids (Brother Aldric, Scout Maren, Brother Halven) map
+back to a single designed voice through `VOICE_ALIAS` in
+`scripts/voices/npc_voice_prompts.mjs`. That table also records the few deliberate
+ensemble-cast exceptions where a minor campaign character reuses a compatible
+established voice. Where a first name repeats across zones (the three Sorrels,
+the three Pells, the two Eddas, the two Marens, the two Sauls) those are
+deliberately DIFFERENT people and each gets its own voice; the entries below say
+so explicitly and describe how the pair must differ.
 
 Escortees are voiced too. Escort-quest barks
 (`EscortDef.startText`/`successText`/`failText`) ride the same yell channel as
@@ -793,6 +795,33 @@ lower, slower and more tired.
 ---
 
 ## The Farshore (Gullhaven)
+
+### Ferryman Ewald: *The Farshore Crossing*
+**Visual:** villager, harbor blue (#4a5a7a), mainland gangplank.
+
+Low, weather-worn and deliberate, with the practical superstition of someone who
+has crossed dangerous water too often to mock its warnings. Ewald deliberately
+reuses Ferrymaster Caddow's established voice.
+
+**Voice test:** *"Board when you are ready, and mind the bell when you land: the town listens to it the way you listen to weather."*
+
+### Ferrykeeper Odda: *The Farshore Crossing*
+**Visual:** villager, harbor blue (#4a5a7a), Gullhaven gangplank.
+
+Brisk, salt-worn contralto, decisive and tide-conscious, treating a three-toll
+warning as seamanship rather than folklore. Odda deliberately reuses
+Harbormaster Odile's established voice.
+
+**Voice test:** *"If you hear the bell start counting while we cast off, do not ask me to turn her around."*
+
+### Sergeant Marsh: *Town Militia*
+**Visual:** villager, field brown (#6a5a3a), Watch Meadow line.
+
+Clipped, grave military baritone, operational and unsentimental, giving a proven
+fighter exactly the information needed and no comfort. Marsh deliberately reuses
+Marshal Redbrook's established voice.
+
+**Voice test:** *"My line holds the road. If the rift coughs up something we cannot put down, I point at you."*
 
 ### Bellkeeper Tam: *Watchbell Keeper*
 **Visual:** villager, sea green (#4a7b6b).

@@ -2,8 +2,9 @@
 // for ElevenLabs voice design. One entry per DISTINCT voice. Brother Aldric,
 // Scout Maren and Brother Halven each get a single voice even though they recur
 // across zones under suffixed NPC ids (brother_aldric_fen, scout_maren_highwatch,
-// brother_halven_marsh, …); gen_npc_lines.mjs maps those recurring ids back to
-// the base voice via VOICE_ALIAS.
+// brother_halven_marsh, …). A few deliberately ensemble-cast campaign NPCs also
+// reuse a compatible established voice. gen_npc_lines.mjs maps both cases through
+// VOICE_ALIAS.
 //
 // Each `voiceDescription` is the voice-direction paragraph from npc_voices.md;
 // `sampleText` is that NPC's "Voice test" sentence. npcId uses the canonical
@@ -1038,22 +1039,19 @@ export const VOICE_PROMPTS = [
   },
 ];
 
-// Recurring NPC records → the base voice that speaks for them. gen_npc_lines.mjs
-// consults this so every Aldric/Maren/Halven zone variant reuses one designed voice.
+// Content NPC id → the established voice that speaks for it. Most rows collapse
+// recurring records for the same character; the Last Bell rows deliberately reuse
+// compatible ensemble voices so the campaign does not depend on an unreviewed,
+// externally generated voice.
 export const VOICE_ALIAS = {
   brother_aldric_fen: 'brother_aldric',
   brother_aldric_highwatch: 'brother_aldric',
   brother_aldric_raid: 'brother_aldric',
   scout_maren_highwatch: 'scout_maren',
   brother_halven_marsh: 'brother_halven',
-  // Warmarshal Draven Kole, the Highwatch Master of the Warfare Stores, sells the
-  // identical WARFARE stock FURY sells in Eastbrook and speaks in the same
-  // parade-ground register, so he borrows FURY's designed voice for now. This is
-  // the one alias here that is a ROLE match rather than the same character
-  // recurring under a suffixed id (docs/design/npc_voices.md): promote him to his
-  // own VOICE_PROMPTS entry, with the rank and the cold Highwatch authority the
-  // greeting carries, once an ElevenLabs key is available to design and render it.
-  warmarshal_draven_kole: 'fury',
+  ferryman_ewald: 'ferrymaster_caddow',
+  ferrykeeper_odda: 'harbormaster_odile',
+  sergeant_marsh: 'marshal_redbrook',
 };
 
 /** Resolve any NPC content id to the id of the voice that should speak for it. */

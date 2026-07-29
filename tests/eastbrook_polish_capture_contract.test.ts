@@ -431,7 +431,14 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      fingerprint: PINNED_POLISH_COMPOSITE_FINGERPRINT,
+      // Deliberately re-pinned for the campaign/base integration: the seal
+      // fingerprints src/render/renderer.ts, so it re-mints whenever the
+      // renderer coordinator moves. Exactly one component leaf moves here,
+      // runtimeRender.renderer.sha256, folding in the campaign scene-camera
+      // and harbor integration. Those paths are inactive in the accepted
+      // Eastbrook captures, so the evidence still depicts this tree. No
+      // recapture.
+      fingerprint: '2e47b27090287f17335d9d07957fdd0c152fd860e646f3be78d13e352872f95a',
       components: {
         captureContract: {
           id: 'polish-v2',

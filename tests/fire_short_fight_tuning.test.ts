@@ -394,7 +394,12 @@ describe('talented burst window (Monte Carlo 2026-07-24, designer round 2026-07-
     expect(mean).toBeLessThanOrEqual(frostMean * BURST_SANITY_CEILING);
   });
 
-  it('the talented build still out-bursts the naked spec (over-nerf guard)', () => {
+  it('the talented build still out-bursts the naked spec (over-nerf guard)', {
+    // Ten synchronous Monte Carlo fights can exceed the suite-wide 20-second
+    // default when four simulation workers share the CPU. Preserve the exact
+    // paired seeds and acceptance margin while allowing the gate to finish.
+    timeout: 60000,
+  }, () => {
     // PAIRED comparison: the naked comparator runs the SAME seed ladder as the
     // talented sample, mean against mean. It used to be a 5-seed talented mean
     // against ONE naked run on the default seed, which is a population claim

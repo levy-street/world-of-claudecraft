@@ -1533,35 +1533,15 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(acceptedFiles).toHaveLength(4);
     // Second-order seal, recomputed LAST in the re-mint recipe: it hashes the
     // performance evidence files, which carry the composite polish provenance.
-    // It therefore follows the first-order composite, so this merge moves it for
-    // the same reason: every rendererIntegration move on both sides stacks in
-    // that composite (from the release, PR #2720's fence-removal layout
-    // evidence, the live graphics rebuild #2799, the Bear Form rig swap #2842,
-    // the far-field impostors, fog-free vista and horizon pass #2793, the
-    // Blizzard timed ground loop #2861, and the brood shout/flourish wiring;
-    // from this branch, the worldObjectBurning fire-burst cue), recomputed last
-    // by remint_polish_provenance.mjs. The release retook the polish captures, so
-    // every measured value (frame timings, draw stats, triangle and scenario
-    // numbers) is adopted verbatim from the base tip; no parent's literal
-    // matched the merged tree, and no capture was retaken here.
-    // Re-pinned for the integrated v0.35 renderer on AAA-enhancements and
-    // recomputed by remint_polish_provenance.mjs.
-    // Re-pinned for the PR #2982 merge: the first-order composite follows the
-    // release-side weapon-skin renderer changes and the PR-side ability VFX
-    // warm-up changes, then this second-order performance seal follows the
-    // swept evidence bytes. No capture was retaken.
-    // Re-pinned for the PR #2983 revert: the swept evidence follows the
-    // reverted renderer while preserving PR #2982's prewarm-policy leaf.
-    // Re-pinned for the PR #2983 re-land: the swept evidence follows the
-    // re-landed renderer, itself on top of the release's bow-aim edit.
-    // Re-pinned for the VFX per-frame cost work: the first-order composite
-    // follows the renderer's anchor seam, weapon-skin fade and census tag,
-    // then this second-order seal follows the swept evidence bytes. No capture
-    // was retaken.
-    expect(
-      fingerprint.digest('hex'),
-      `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('751280aa6d8c9c0ce6b8324245f44e53aba31b6c4bdc19fecf27458592aa1743');
+    // The mount integration changed comments in src/render/renderer.ts, a
+    // fingerprinted input, so the two after-evidence files re-mint one digest
+    // pair each (renderer sha256 plus the composite fingerprint) and this seal
+    // follows. Runtime code and every measured value (frame timings, draw stats,
+    // triangle and scenario numbers) remain byte-identical, so no capture was
+    // retaken.
+    expect(fingerprint.digest('hex')).toBe(
+      '08cd947eb217008c0fe08c57500adbd878bfc208f4d4f0e680e7415c4597d807',
+    );
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
