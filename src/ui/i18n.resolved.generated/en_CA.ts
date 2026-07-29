@@ -2925,6 +2925,9 @@ export const en_CA: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "That wallet authorization expired or could not be verified. Try again."
+    },
+    "ota_updates": {
+      "invalid_input": "Invalid input."
     }
   },
   "guide": {

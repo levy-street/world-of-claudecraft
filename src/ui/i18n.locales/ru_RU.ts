@@ -8216,6 +8216,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.body.too_large': 'Запрос слишком большой. Повторите попытку с меньшим объёмом данных.',
   'apiError.body.unsupported_media_type': 'Неподдерживаемый формат запроса.',
   'apiError.deeds.invalid_input': 'Недопустимые данные.',
+  'apiError.ota_updates.invalid_input': 'Недопустимые данные.',
   'apiError.steam.disabled': 'Привязка Steam сейчас недоступна.',
   'apiError.wallet.handoff_invalid':
     'Срок действия авторизации кошелька истек или ее не удалось проверить. Повторите попытку.',

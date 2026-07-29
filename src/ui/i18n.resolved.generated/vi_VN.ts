@@ -2925,6 +2925,9 @@ export const vi_VN: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "Quyền ủy quyền ví đó đã hết hạn hoặc không thể xác minh. Hãy thử lại."
+    },
+    "ota_updates": {
+      "invalid_input": "Invalid input."
     }
   },
   "guide": {

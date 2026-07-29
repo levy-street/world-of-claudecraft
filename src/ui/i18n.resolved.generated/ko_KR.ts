@@ -2925,6 +2925,9 @@ export const ko_KR: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "지갑 인증이 만료되었거나 확인할 수 없습니다. 다시 시도해 주세요."
+    },
+    "ota_updates": {
+      "invalid_input": "입력이 올바르지 않습니다."
     }
   },
   "guide": {

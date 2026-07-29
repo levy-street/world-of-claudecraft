@@ -2925,6 +2925,9 @@ export const zh_TW: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "錢包授權已過期或無法驗證。請再試一次。"
+    },
+    "ota_updates": {
+      "invalid_input": "輸入無效。"
     }
   },
   "guide": {

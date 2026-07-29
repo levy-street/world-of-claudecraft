@@ -8088,6 +8088,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.body.too_large': 'リクエストが大きすぎます。データを減らしてもう一度お試しください。',
   'apiError.body.unsupported_media_type': 'サポートされていないリクエスト形式です。',
   'apiError.deeds.invalid_input': '入力が無効です。',
+  'apiError.ota_updates.invalid_input': '入力が無効です。',
   'apiError.steam.disabled': 'Steam連携は現在利用できません。',
   'apiError.wallet.handoff_invalid':
     'ウォレット認証の有効期限が切れたか、確認できませんでした。もう一度お試しください。',

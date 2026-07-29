@@ -7725,6 +7725,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'apiError.body.too_large': '該請求過大。請減少資料後再試一次。',
   'apiError.body.unsupported_media_type': '不支援的請求格式。',
   'apiError.deeds.invalid_input': '輸入無效。',
+  'apiError.ota_updates.invalid_input': '輸入無效。',
   'apiError.steam.disabled': 'Steam 連結目前無法使用。',
   'apiError.wallet.handoff_invalid': '錢包授權已過期或無法驗證。請再試一次。',
   'apiError.steam.invalid_ticket': 'Steam 無法驗證此連結請求。請在桌面應用程式中重試。',

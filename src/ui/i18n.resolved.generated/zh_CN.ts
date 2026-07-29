@@ -2925,6 +2925,9 @@ export const zh_CN: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "钱包授权已过期或无法验证。请重试。"
+    },
+    "ota_updates": {
+      "invalid_input": "输入无效。"
     }
   },
   "guide": {

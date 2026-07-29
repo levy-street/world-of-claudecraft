@@ -8071,6 +8071,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.body.too_large': '요청이 너무 큽니다. 데이터를 줄여 다시 시도하세요.',
   'apiError.body.unsupported_media_type': '지원되지 않는 요청 형식입니다.',
   'apiError.deeds.invalid_input': '입력이 올바르지 않습니다.',
+  'apiError.ota_updates.invalid_input': '입력이 올바르지 않습니다.',
   'apiError.steam.disabled': '현재 Steam 연동을 사용할 수 없습니다.',
   'apiError.wallet.handoff_invalid':
     '지갑 인증이 만료되었거나 확인할 수 없습니다. 다시 시도해 주세요.',

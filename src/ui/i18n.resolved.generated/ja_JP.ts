@@ -2925,6 +2925,9 @@ export const ja_JP: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "ウォレット認証の有効期限が切れたか、確認できませんでした。もう一度お試しください。"
+    },
+    "ota_updates": {
+      "invalid_input": "入力が無効です。"
     }
   },
   "guide": {

@@ -2925,6 +2925,9 @@ export const sv_SE: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "Den plånboksbehörigheten har gått ut eller kunde inte verifieras. Försök igen."
+    },
+    "ota_updates": {
+      "invalid_input": "Invalid input."
     }
   },
   "guide": {

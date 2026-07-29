@@ -2925,6 +2925,9 @@ export const pl_PL: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "Autoryzacja portfela wygasła lub nie mogła zostać zweryfikowana. Spróbuj ponownie."
+    },
+    "ota_updates": {
+      "invalid_input": "Invalid input."
     }
   },
   "guide": {

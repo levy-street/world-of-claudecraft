@@ -2925,6 +2925,9 @@ export const nl_NL: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "Die portemonnee-autorisatie is verlopen of kon niet worden geverifieerd. Probeer het opnieuw."
+    },
+    "ota_updates": {
+      "invalid_input": "Invalid input."
     }
   },
   "guide": {

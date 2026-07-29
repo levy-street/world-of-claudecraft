@@ -2925,6 +2925,9 @@ export const it_IT: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "L'autorizzazione del portafoglio è scaduta o non ha potuto essere verificata. Riprova."
+    },
+    "ota_updates": {
+      "invalid_input": "Invalid input."
     }
   },
   "guide": {

@@ -137,6 +137,7 @@ export type TranslationKeyFlat =
   | 'apiError.moderation.suspended'
   | 'apiError.moderation.suspended_until'
   | 'apiError.origin.cross_site'
+  | 'apiError.ota_updates.invalid_input'
   | 'apiError.rate_limit.exceeded'
   | 'apiError.steam.account_taken'
   | 'apiError.steam.already_linked'

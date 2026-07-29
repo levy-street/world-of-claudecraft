@@ -2925,6 +2925,9 @@ export const de_DE: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "Diese Wallet-Autorisierung ist abgelaufen oder konnte nicht verifiziert werden. Bitte versuche es erneut."
+    },
+    "ota_updates": {
+      "invalid_input": "Invalid input."
     }
   },
   "guide": {

@@ -2925,6 +2925,9 @@ export const en_XA: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "[Ţĥáţ ŵáļļéţ áúţĥóŕížáţíóñ éẋþíŕéð óŕ çóúļð ñóţ ƀé ʋéŕíƒíéð. Ţŕý áĝáíñ.]"
+    },
+    "ota_updates": {
+      "invalid_input": "[Íñʋáļíð íñþúţ.]"
     }
   },
   "guide": {

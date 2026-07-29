@@ -2925,6 +2925,9 @@ export const ru_RU: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "Срок действия авторизации кошелька истек или ее не удалось проверить. Повторите попытку."
+    },
+    "ota_updates": {
+      "invalid_input": "Недопустимые данные."
     }
   },
   "guide": {

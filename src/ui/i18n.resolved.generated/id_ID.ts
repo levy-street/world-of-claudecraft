@@ -2925,6 +2925,9 @@ export const id_ID: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "Otorisasi dompet itu telah kedaluwarsa atau tidak dapat diverifikasi. Coba lagi."
+    },
+    "ota_updates": {
+      "invalid_input": "Invalid input."
     }
   },
   "guide": {

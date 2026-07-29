@@ -2925,6 +2925,9 @@ export const cs_CZ: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "Toto oprávnění peněženky vypršelo nebo je neověřitelné. Zkus to znovu."
+    },
+    "ota_updates": {
+      "invalid_input": "Invalid input."
     }
   },
   "guide": {

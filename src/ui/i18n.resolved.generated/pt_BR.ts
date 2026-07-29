@@ -2925,6 +2925,9 @@ export const pt_BR: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "Essa autorização de carteira expirou ou não pôde ser verificada. Tente novamente."
+    },
+    "ota_updates": {
+      "invalid_input": "Invalid input."
     }
   },
   "guide": {
