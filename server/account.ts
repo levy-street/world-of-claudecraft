@@ -93,8 +93,12 @@ const PASSWORD_RESET_TTL_HOURS = 1;
 export interface AccountGameHooks {
   /** True when any of the account's characters is currently in a live session. */
   anyCharacterOnline(characterIds: number[]): boolean;
-  /** Close any established socket for the account right after deactivation. */
-  disconnectAccount(accountId: number, reason: string): void;
+  /**
+   * Close any established socket for the account. Pass exceptToken (the
+   * caller's own bearer token) to spare the session that just made the
+   * request; omit it to kick every live session unconditionally.
+   */
+  disconnectAccount(accountId: number, reason: string, exceptToken?: string): void;
 }
 
 // The narrower hook a credential-change handler needs: just the live-WS
@@ -137,8 +141,11 @@ export async function handleAccountWhoami(
 // callerToken is resolved by main.ts; it must never be null here (validated up
 // the stack) so the revoke below can never accidentally nuke this session. Token
 // revocation alone does not close an already-open WS (an attacker who is
-// already in-world stays connected), so we also force-disconnect any live
-// session for the account, mirroring handleAccountDeactivate below.
+// already in-world stays connected), so we also force-disconnect any OTHER live
+// session for the account, mirroring handleAccountDeactivate below but passing
+// callerToken as the exception so the caller's own live session (if any, e.g.
+// changing password from the in-game HUD account panel) is spared exactly like
+// its token is.
 export async function handleAccountChangePassword(
   req: http.IncomingMessage,
   res: http.ServerResponse,
@@ -175,7 +182,7 @@ export async function handleAccountChangePassword(
   }
   await updatePasswordHash(accountId, await hashPassword(next));
   await revokeTokensExcept(accountId, callerToken);
-  hooks.disconnectAccount(accountId, CREDENTIAL_CHANGE_KICK_MESSAGE);
+  hooks.disconnectAccount(accountId, CREDENTIAL_CHANGE_KICK_MESSAGE, callerToken);
   // Best-effort security notice; never blocks the password change on mail state.
   emailPasswordChanged(acct);
   return json(res, 200, { ok: true });

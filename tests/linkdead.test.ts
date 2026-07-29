@@ -240,6 +240,33 @@ describe('linkdead grace lifecycle', () => {
     expect(server.clients.size).toBe(0);
   });
 
+  it('exempts the caller session from an account-wide kick via exceptToken, but kicks a second session', async () => {
+    const server = new GameServer();
+    const wsSelf = fakeWs();
+    const wsOther = fakeWs();
+    // Both sessions join as GM (isGm=true): MAX_ACTIVE_SESSIONS_PER_ACCOUNT caps an
+    // account at one LIVE session, and GMs are the one exemption, which is the
+    // simplest way to get two simultaneous live sessions for one account in this test.
+    const selfSession = expectJoined(
+      server.join(wsSelf, 11, 101, 'Caller', 'warrior', null, true, { authToken: 'tokA' }),
+    );
+    const otherSession = expectJoined(
+      server.join(wsOther, 11, 102, 'Other', 'warrior', null, true, { authToken: 'tokB' }),
+    );
+
+    server.disconnectAccount(11, 'credential change', 'tokA');
+    await vi.waitFor(() => {
+      expect(otherSession.left).toBe(true);
+    });
+
+    // The exempted session (its own password-change request) survives.
+    expect(selfSession.left).toBe(false);
+    expect(server.clients.has(selfSession.pid)).toBe(true);
+    // Every other live session for the account is still kicked.
+    expect(otherSession.left).toBe(true);
+    expect(server.clients.has(otherSession.pid)).toBe(false);
+  });
+
   it('fully logs the character out when the grace window expires', async () => {
     closePlaySession.mockClear();
     const server = new GameServer();

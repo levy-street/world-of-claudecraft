@@ -639,6 +639,10 @@ const ADMIN_LOCATION_POI_RADIUS = 32;
 export interface ClientSession {
   ws: WebSocket;
   accountId: number;
+  // The bearer token this session authenticated (or last resumed) with. Lets a
+  // credential-change kick exempt the caller's own live session (disconnectAccount's
+  // exceptToken) instead of force-closing the socket that just made the request.
+  authToken: string;
   accountCosmetics: AccountCosmetics;
   // Operator-set account flair (AI mark + streamer links), loaded at join and kept
   // current by applyAccountFlairLive. Held on the SESSION, not just the entity,
@@ -2724,6 +2728,10 @@ export class GameServer {
         // passed through from the join handler's DB read. Untrusted at rest, so
         // it is re-validated here before it reaches the client.
         hotbarLayout?: ActionBarLayout | null;
+        // The bearer token this handshake authenticated with (ws_auth.ts). Stashed
+        // on the session so disconnectAccount can exempt this exact session from an
+        // account-wide kick (see ClientSession.authToken).
+        authToken?: string;
       } = {},
   ): ClientSession | { error: string } {
     // Anti-bot: cap simultaneous online characters per account. Accounts can
@@ -2791,6 +2799,7 @@ export class GameServer {
     const session: ClientSession = {
       ws,
       accountId,
+      authToken: meta.authToken ?? '',
       accountCosmetics,
       // Loaded right below by refreshAccountFlair; an account with no flair (every
       // ordinary player) keeps these empty values and never touches the wire.
@@ -2973,6 +2982,10 @@ export class GameServer {
     session.linkdead = false;
     session.graceUntil = 0;
     session.awaitingPong = false;
+    // A resume authenticates with a fresh bearer token; keep authToken current so a
+    // later credential-change exemption matches the token this socket is actually
+    // holding, not a stale one from the original join.
+    if (meta.authToken !== undefined) session.authToken = meta.authToken;
     const sessionIp = meta.ip ?? '';
     if (sessionIp !== session.ip) {
       this.releaseIpSession(session.ip);
@@ -3740,9 +3753,15 @@ export class GameServer {
     return state ? state.level : null;
   }
 
-  disconnectAccount(accountId: number, reason: string): void {
+  // Force-close every live session for the account, except one: pass exceptToken
+  // (the caller's own bearer token) to spare the session that just made the
+  // request (self-service password change) while still kicking every other live
+  // session for the account. Omit it (moderation, deactivation, password reset)
+  // to kick unconditionally.
+  disconnectAccount(accountId: number, reason: string, exceptToken?: string): void {
     for (const session of [...this.clients.values()]) {
       if (session.accountId !== accountId) continue;
+      if (exceptToken !== undefined && session.authToken === exceptToken) continue;
       void this.kickSession(session, reason, 'moderation action');
     }
   }

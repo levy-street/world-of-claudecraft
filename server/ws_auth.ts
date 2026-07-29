@@ -311,6 +311,10 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       reason: chatMute.reason,
       chatStrikes: status.chatStrikes,
       accountCosmetics,
+      // Stashed so a self-service password change can exempt this exact live
+      // session from the account-wide kick (GameServer.disconnectAccount's
+      // exceptToken); see ClientSession.authToken.
+      authToken: token,
       isAdmin,
       adminPermissions,
       clientSeed,
