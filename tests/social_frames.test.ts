@@ -39,6 +39,17 @@ function fakeWs(): FakeClient {
   return { sent, ws: { readyState: 1, send: (payload: string) => sent.push(JSON.parse(payload)) } };
 }
 
+function deferred<T>(): {
+  promise: Promise<T>;
+  resolve: (value: T) => void;
+} {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((done) => {
+    resolve = done;
+  });
+  return { promise, resolve };
+}
+
 function lastSnap(sent: any[]): any {
   for (let i = sent.length - 1; i >= 0; i--) {
     if (sent[i].t === 'snap') return sent[i];
@@ -517,6 +528,58 @@ describe('socialpos carries the live active title (Book of Deeds)', () => {
     watcher.blockedIds = new Set();
 
     (server as any).socialTransport().onBlocksChanged(watcher.characterId, [7, 9]);
+
+    expect(watcher.blockListLoaded).toBe(true);
+    expect(watcher.blockedIds).toEqual(new Set([7, 9]));
+  });
+
+  it('does not let an older startup block read overwrite a live mutation', async () => {
+    const server = new GameServer();
+    const watcher = joinServer(server, fakeWs(), 1, 'Watcher');
+    watcher.blockListLoaded = false;
+    watcher.blockedIds = new Set();
+    const startupRead = deferred<number[]>();
+    vi.spyOn((server as any).socialDb, 'blockedIds').mockReturnValueOnce(startupRead.promise);
+    vi.spyOn((server as any).socialDb, 'ignoredIds').mockResolvedValueOnce([]);
+    vi.spyOn((server as any).social, 'snapshot').mockResolvedValueOnce({
+      friends: [],
+      blocks: [],
+      ignores: [],
+      guild: null,
+    });
+    vi.spyOn((server as any).social, 'announcePresence').mockResolvedValueOnce(undefined);
+
+    const initializing = (server as any).initSocial(watcher);
+    (server as any).socialTransport().onBlocksChanged(watcher.characterId, [7, 9]);
+    startupRead.resolve([3]);
+    await initializing;
+
+    expect(watcher.blockListLoaded).toBe(true);
+    expect(watcher.blockedIds).toEqual(new Set([7, 9]));
+  });
+
+  it('does not let an older social snapshot overwrite a live block mutation', async () => {
+    const server = new GameServer();
+    const watcher = joinServer(server, fakeWs(), 1, 'Watcher');
+    watcher.blockListLoaded = false;
+    watcher.blockedIds = new Set();
+    const snapshotRead = deferred<{
+      friends: never[];
+      blocks: { id: number; name: string }[];
+      ignores: never[];
+      guild: null;
+    }>();
+    vi.spyOn((server as any).social, 'snapshot').mockReturnValueOnce(snapshotRead.promise);
+
+    const sending = (server as any).sendSocialSnapshot(watcher.characterId);
+    (server as any).socialTransport().onBlocksChanged(watcher.characterId, [7, 9]);
+    snapshotRead.resolve({
+      friends: [],
+      blocks: [{ id: 3, name: 'Old block' }],
+      ignores: [],
+      guild: null,
+    });
+    await sending;
 
     expect(watcher.blockListLoaded).toBe(true);
     expect(watcher.blockedIds).toEqual(new Set([7, 9]));
