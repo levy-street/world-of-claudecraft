@@ -33,10 +33,10 @@
     "da_DK"
   ],
   "counts": {
-    "keys": 6549,
-    "rows": 137529,
-    "translated": 136856,
-    "pending": 480,
+    "keys": 6545,
+    "rows": 137445,
+    "translated": 136832,
+    "pending": 420,
     "blocked": 193,
     "blockedSource": 93
   },
@@ -128531,252 +128531,6 @@
     },
     "main:entities.dungeons.undermount_wing2.enterText": {
       "scope": "main",
-      "enHash": "59fe191dbfc0d76a",
-      "placeholders": [],
-      "locales": {
-        "es": {
-          "state": "pending"
-        },
-        "es_ES": {
-          "state": "pending"
-        },
-        "fr_FR": {
-          "state": "pending"
-        },
-        "fr_CA": {
-          "state": "pending"
-        },
-        "en_CA": {
-          "state": "translated",
-          "srcHash": "59fe191dbfc0d76a",
-          "by": "human"
-        },
-        "it_IT": {
-          "state": "pending"
-        },
-        "de_DE": {
-          "state": "pending"
-        },
-        "zh_CN": {
-          "state": "translated",
-          "srcHash": "59fe191dbfc0d76a",
-          "by": "human"
-        },
-        "zh_TW": {
-          "state": "translated",
-          "srcHash": "59fe191dbfc0d76a",
-          "by": "human"
-        },
-        "ko_KR": {
-          "state": "translated",
-          "srcHash": "59fe191dbfc0d76a",
-          "by": "human"
-        },
-        "ja_JP": {
-          "state": "translated",
-          "srcHash": "59fe191dbfc0d76a",
-          "by": "human"
-        },
-        "pt_BR": {
-          "state": "pending"
-        },
-        "ru_RU": {
-          "state": "translated",
-          "srcHash": "59fe191dbfc0d76a",
-          "by": "human"
-        },
-        "cs_CZ": {
-          "state": "pending"
-        },
-        "nl_NL": {
-          "state": "pending"
-        },
-        "pl_PL": {
-          "state": "pending"
-        },
-        "id_ID": {
-          "state": "pending"
-        },
-        "tr_TR": {
-          "state": "pending"
-        },
-        "sv_SE": {
-          "state": "pending"
-        },
-        "vi_VN": {
-          "state": "pending"
-        },
-        "da_DK": {
-          "state": "pending"
-        }
-      }
-    },
-    "main:entities.dungeons.undermount_wing2.leaveText": {
-      "scope": "main",
-      "enHash": "8e6d8d9223cd919a",
-      "placeholders": [],
-      "locales": {
-        "es": {
-          "state": "pending"
-        },
-        "es_ES": {
-          "state": "pending"
-        },
-        "fr_FR": {
-          "state": "pending"
-        },
-        "fr_CA": {
-          "state": "pending"
-        },
-        "en_CA": {
-          "state": "translated",
-          "srcHash": "8e6d8d9223cd919a",
-          "by": "human"
-        },
-        "it_IT": {
-          "state": "pending"
-        },
-        "de_DE": {
-          "state": "pending"
-        },
-        "zh_CN": {
-          "state": "translated",
-          "srcHash": "8e6d8d9223cd919a",
-          "by": "human"
-        },
-        "zh_TW": {
-          "state": "translated",
-          "srcHash": "8e6d8d9223cd919a",
-          "by": "human"
-        },
-        "ko_KR": {
-          "state": "translated",
-          "srcHash": "8e6d8d9223cd919a",
-          "by": "human"
-        },
-        "ja_JP": {
-          "state": "translated",
-          "srcHash": "8e6d8d9223cd919a",
-          "by": "human"
-        },
-        "pt_BR": {
-          "state": "pending"
-        },
-        "ru_RU": {
-          "state": "translated",
-          "srcHash": "8e6d8d9223cd919a",
-          "by": "human"
-        },
-        "cs_CZ": {
-          "state": "pending"
-        },
-        "nl_NL": {
-          "state": "pending"
-        },
-        "pl_PL": {
-          "state": "pending"
-        },
-        "id_ID": {
-          "state": "pending"
-        },
-        "tr_TR": {
-          "state": "pending"
-        },
-        "sv_SE": {
-          "state": "pending"
-        },
-        "vi_VN": {
-          "state": "pending"
-        },
-        "da_DK": {
-          "state": "pending"
-        }
-      }
-    },
-    "main:entities.dungeons.undermount_wing2.name": {
-      "scope": "main",
-      "enHash": "51a05f5a724ee6cb",
-      "placeholders": [],
-      "locales": {
-        "es": {
-          "state": "pending"
-        },
-        "es_ES": {
-          "state": "pending"
-        },
-        "fr_FR": {
-          "state": "pending"
-        },
-        "fr_CA": {
-          "state": "pending"
-        },
-        "en_CA": {
-          "state": "translated",
-          "srcHash": "51a05f5a724ee6cb",
-          "by": "human"
-        },
-        "it_IT": {
-          "state": "pending"
-        },
-        "de_DE": {
-          "state": "pending"
-        },
-        "zh_CN": {
-          "state": "translated",
-          "srcHash": "51a05f5a724ee6cb",
-          "by": "human"
-        },
-        "zh_TW": {
-          "state": "translated",
-          "srcHash": "51a05f5a724ee6cb",
-          "by": "human"
-        },
-        "ko_KR": {
-          "state": "translated",
-          "srcHash": "51a05f5a724ee6cb",
-          "by": "human"
-        },
-        "ja_JP": {
-          "state": "translated",
-          "srcHash": "51a05f5a724ee6cb",
-          "by": "human"
-        },
-        "pt_BR": {
-          "state": "pending"
-        },
-        "ru_RU": {
-          "state": "translated",
-          "srcHash": "51a05f5a724ee6cb",
-          "by": "human"
-        },
-        "cs_CZ": {
-          "state": "pending"
-        },
-        "nl_NL": {
-          "state": "pending"
-        },
-        "pl_PL": {
-          "state": "pending"
-        },
-        "id_ID": {
-          "state": "pending"
-        },
-        "tr_TR": {
-          "state": "pending"
-        },
-        "sv_SE": {
-          "state": "pending"
-        },
-        "vi_VN": {
-          "state": "pending"
-        },
-        "da_DK": {
-          "state": "pending"
-        }
-      }
-    },
-    "main:entities.dungeons.undermount_wing3.enterText": {
-      "scope": "main",
       "enHash": "9ce050e1abb1f413",
       "placeholders": [],
       "locales": {
@@ -128857,7 +128611,7 @@
         }
       }
     },
-    "main:entities.dungeons.undermount_wing3.leaveText": {
+    "main:entities.dungeons.undermount_wing2.leaveText": {
       "scope": "main",
       "enHash": "8263be8874e54d22",
       "placeholders": [],
@@ -128939,7 +128693,7 @@
         }
       }
     },
-    "main:entities.dungeons.undermount_wing3.name": {
+    "main:entities.dungeons.undermount_wing2.name": {
       "scope": "main",
       "enHash": "338951226409b531",
       "placeholders": [],
@@ -129021,7 +128775,7 @@
         }
       }
     },
-    "main:entities.dungeons.undermount_wing4.enterText": {
+    "main:entities.dungeons.undermount_wing3.enterText": {
       "scope": "main",
       "enHash": "a383fa0b00db61fb",
       "placeholders": [],
@@ -129103,7 +128857,7 @@
         }
       }
     },
-    "main:entities.dungeons.undermount_wing4.leaveText": {
+    "main:entities.dungeons.undermount_wing3.leaveText": {
       "scope": "main",
       "enHash": "56d38d03b0f0caf5",
       "placeholders": [],
@@ -129185,7 +128939,7 @@
         }
       }
     },
-    "main:entities.dungeons.undermount_wing4.name": {
+    "main:entities.dungeons.undermount_wing3.name": {
       "scope": "main",
       "enHash": "972d166294887eb5",
       "placeholders": [],
@@ -193156,88 +192910,6 @@
           "state": "translated",
           "srcHash": "33c5dbd88687c544",
           "by": "human"
-        }
-      }
-    },
-    "main:entities.mobs.the_forge_heart.name": {
-      "scope": "main",
-      "enHash": "9d2842ba8afe41c7",
-      "placeholders": [],
-      "locales": {
-        "es": {
-          "state": "pending"
-        },
-        "es_ES": {
-          "state": "pending"
-        },
-        "fr_FR": {
-          "state": "pending"
-        },
-        "fr_CA": {
-          "state": "pending"
-        },
-        "en_CA": {
-          "state": "translated",
-          "srcHash": "9d2842ba8afe41c7",
-          "by": "human"
-        },
-        "it_IT": {
-          "state": "pending"
-        },
-        "de_DE": {
-          "state": "pending"
-        },
-        "zh_CN": {
-          "state": "translated",
-          "srcHash": "9d2842ba8afe41c7",
-          "by": "human"
-        },
-        "zh_TW": {
-          "state": "translated",
-          "srcHash": "9d2842ba8afe41c7",
-          "by": "human"
-        },
-        "ko_KR": {
-          "state": "translated",
-          "srcHash": "9d2842ba8afe41c7",
-          "by": "human"
-        },
-        "ja_JP": {
-          "state": "translated",
-          "srcHash": "9d2842ba8afe41c7",
-          "by": "human"
-        },
-        "pt_BR": {
-          "state": "pending"
-        },
-        "ru_RU": {
-          "state": "translated",
-          "srcHash": "9d2842ba8afe41c7",
-          "by": "human"
-        },
-        "cs_CZ": {
-          "state": "pending"
-        },
-        "nl_NL": {
-          "state": "pending"
-        },
-        "pl_PL": {
-          "state": "pending"
-        },
-        "id_ID": {
-          "state": "pending"
-        },
-        "tr_TR": {
-          "state": "pending"
-        },
-        "sv_SE": {
-          "state": "pending"
-        },
-        "vi_VN": {
-          "state": "pending"
-        },
-        "da_DK": {
-          "state": "pending"
         }
       }
     },

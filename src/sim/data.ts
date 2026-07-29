@@ -410,8 +410,9 @@ export function dungeonAt(x: number): DungeonDef | null {
 
 // ---------------------------------------------------------------------------
 // The Ashen Coliseum — 1v1 ranked arena. Its match instances live in their own
-// far-off flat-ground x-band, well past the dungeon bands. The highest dungeon
-// index is 13 at x 8700, and its east room edge reaches x 8928. Like dungeons,
+// far-off flat-ground x-band, well past the dungeon bands. The band split was
+// sized for dungeon indices through 13 (x 8700, east room edge x 8928); the
+// highest occupied index today is 12 (undermount_wing3). Like dungeons,
 // positions past DUNGEON_X_THRESHOLD use flat ground (world.groundHeight) and
 // instance-local collision (sim/colliders.ts);
 // the band split below keeps arena positions from being read as a dungeon.

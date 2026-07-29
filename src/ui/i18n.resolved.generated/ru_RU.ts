@@ -7170,9 +7170,6 @@ export const ru_RU: EnTranslations = {
       "saan_the_stoker": {
         "name": "Саан Кочегар"
       },
-      "the_forge_heart": {
-        "name": "Сердце Горна"
-      },
       "odrenn_the_temperer": {
         "name": "Одренн Закальщик"
       },
@@ -8544,16 +8541,11 @@ export const ru_RU: EnTranslations = {
         "leaveText": "Вы выбираетесь назад со спуска в Подгорье."
       },
       "undermount_wing2": {
-        "name": "Подгорье: Закалка",
-        "enterText": "Пар клубится из затопленных горнов впереди.",
-        "leaveText": "Вы оставляете залы закалки позади."
-      },
-      "undermount_wing3": {
         "name": "Подгорье: Отпуск",
         "enterText": "Удары молотов гремят в хранилище отпуска.",
         "leaveText": "Вы отступаете из звенящих горновых путей."
       },
-      "undermount_wing4": {
+      "undermount_wing3": {
         "name": "Подгорье: Пробуждение",
         "enterText": "Погребенная печь шевелится в глубине.",
         "leaveText": "Вы отходите от пробуждающегося жара."

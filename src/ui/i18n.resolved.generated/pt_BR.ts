@@ -7170,9 +7170,6 @@ export const pt_BR: EnTranslations = {
       "saan_the_stoker": {
         "name": "Saan the Stoker"
       },
-      "the_forge_heart": {
-        "name": "The Forge-Heart"
-      },
       "odrenn_the_temperer": {
         "name": "Odrenn the Temperer"
       },
@@ -8544,16 +8541,11 @@ export const pt_BR: EnTranslations = {
         "leaveText": "You climb back from the Undermount descent."
       },
       "undermount_wing2": {
-        "name": "Undermount: The Quenching",
-        "enterText": "Steam curls from the flooded forges ahead.",
-        "leaveText": "You leave the quenching halls behind."
-      },
-      "undermount_wing3": {
         "name": "Undermount: The Tempering",
         "enterText": "Hammerfalls echo through the tempering vault.",
         "leaveText": "You retreat from the ringing forgeways."
       },
-      "undermount_wing4": {
+      "undermount_wing3": {
         "name": "Undermount: The Waking",
         "enterText": "The buried furnace stirs in the deep.",
         "leaveText": "You withdraw from the waking heat."

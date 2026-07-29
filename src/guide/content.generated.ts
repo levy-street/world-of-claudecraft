@@ -1346,13 +1346,6 @@ export const GUIDE_DUNGEONS: GuideDungeon[] = [
     "id": "raid",
     "isRaid": true,
     "suggestedPlayers": 10,
-    "min": 24,
-    "max": 24
-  },
-  {
-    "id": "raid",
-    "isRaid": true,
-    "suggestedPlayers": 10,
     "min": 26,
     "max": 26
   }

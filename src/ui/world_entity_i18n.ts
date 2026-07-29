@@ -78,7 +78,6 @@ const MOB_IDS = [
   'nythraxis_scourge_of_thornpeak',
   'vosh_the_glazier',
   'saan_the_stoker',
-  'the_forge_heart',
   'odrenn_the_temperer',
   'volzharr_buried_furnace',
   // Collapsed Reliquary delve mobs
@@ -232,7 +231,6 @@ const DUNGEON_IDS = [
   'undermount_wing1',
   'undermount_wing2',
   'undermount_wing3',
-  'undermount_wing4',
 ] as const;
 const DELVE_IDS = ['collapsed_reliquary', 'drowned_litany'] as const;
 // Ravenpost authored letters (src/sim/content/letters.ts): the welcome letter

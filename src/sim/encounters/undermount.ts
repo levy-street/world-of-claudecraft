@@ -1,5 +1,8 @@
-// The Undermount Descent: the four-wing raid under Thornpeak Heights (finale:
-// Volzharr, the Buried Furnace). This module owns the wing-chain metadata and
+// The Undermount Descent: the three-wing raid under Thornpeak Heights (pass 6
+// of docs/prd/furnace-lair-raid.md; finale: Volzharr, the Buried Furnace).
+// Wing 1 is the Kiln-Keepers duo, wing 2 Odrenn the Temperer, wing 3 Volzharr;
+// the Forge-Heart (Quenching) wing was cut in the pass-6 review.
+// This module owns the wing-chain metadata and
 // the pure seal predicate: each wing's door stays sealed until the prior wing's
 // boss has been cleared (permanent raid progress, NOT the daily lockout, so a
 // farm raid never re-clears wing 1 to reach wing 2). Per-wing encounter drivers
@@ -40,7 +43,7 @@ export interface UndermountWing {
 
 // Descent order. dungeonIds and bossMobIds are the stable content contract the
 // DUNGEON_DEFS + MobTemplate records must match. Wing 1 is the Kiln-Keepers duo
-// (Vosh + Saan); wings 2 to 4 are still single stub bosses pending their kits.
+// (Vosh + Saan); wings 2 and 3 are still single stub bosses pending their kits.
 export const UNDERMOUNT_WINGS: readonly UndermountWing[] = [
   {
     dungeonId: 'undermount_wing1',
@@ -51,20 +54,14 @@ export const UNDERMOUNT_WINGS: readonly UndermountWing[] = [
   {
     dungeonId: 'undermount_wing2',
     order: 2,
-    bossMobIds: ['the_forge_heart'],
+    bossMobIds: ['odrenn_the_temperer'],
     requires: 'undermount_wing1',
   },
   {
     dungeonId: 'undermount_wing3',
     order: 3,
-    bossMobIds: ['odrenn_the_temperer'],
-    requires: 'undermount_wing2',
-  },
-  {
-    dungeonId: 'undermount_wing4',
-    order: 4,
     bossMobIds: ['volzharr_buried_furnace'],
-    requires: 'undermount_wing3',
+    requires: 'undermount_wing2',
   },
 ] as const;
 

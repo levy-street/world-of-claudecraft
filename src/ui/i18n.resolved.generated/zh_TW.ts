@@ -7170,9 +7170,6 @@ export const zh_TW: EnTranslations = {
       "saan_the_stoker": {
         "name": "司爐薩安"
       },
-      "the_forge_heart": {
-        "name": "鍛爐之心"
-      },
       "odrenn_the_temperer": {
         "name": "回火者奧德倫"
       },
@@ -8544,16 +8541,11 @@ export const zh_TW: EnTranslations = {
         "leaveText": "你從地底山的下行路爬回。"
       },
       "undermount_wing2": {
-        "name": "地底山: 淬火",
-        "enterText": "蒸汽從前方被水淹沒的鍛爐中捲起。",
-        "leaveText": "你把淬火大廳拋在身後。"
-      },
-      "undermount_wing3": {
         "name": "地底山: 回火",
         "enterText": "錘擊聲在回火寶庫中迴盪。",
         "leaveText": "你從鳴響的爐道撤退。"
       },
-      "undermount_wing4": {
+      "undermount_wing3": {
         "name": "地底山: 甦醒",
         "enterText": "被埋的熔爐在深處躁動。",
         "leaveText": "你從甦醒的熱浪中撤離。"

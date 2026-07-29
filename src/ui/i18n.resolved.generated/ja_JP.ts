@@ -7170,9 +7170,6 @@ export const ja_JP: EnTranslations = {
       "saan_the_stoker": {
         "name": "火焚きサーン"
       },
-      "the_forge_heart": {
-        "name": "鍛炉の心臓"
-      },
       "odrenn_the_temperer": {
         "name": "焼き戻し師オドレン"
       },
@@ -8544,16 +8541,11 @@ export const ja_JP: EnTranslations = {
         "leaveText": "あなたはアンダーマウントの降下路から登り戻る。"
       },
       "undermount_wing2": {
-        "name": "アンダーマウント: 焼き入れ",
-        "enterText": "前方の水没した炉から蒸気が渦を巻く。",
-        "leaveText": "あなたは焼き入れの広間を後にする。"
-      },
-      "undermount_wing3": {
         "name": "アンダーマウント: 焼き戻し",
         "enterText": "槌音が焼き戻しの宝物庫に響き渡る。",
         "leaveText": "あなたは鳴り響く炉道から退く。"
       },
-      "undermount_wing4": {
+      "undermount_wing3": {
         "name": "アンダーマウント: 目覚め",
         "enterText": "埋もれた炉が深みで身じろぎする。",
         "leaveText": "あなたは目覚めつつある熱から退く。"

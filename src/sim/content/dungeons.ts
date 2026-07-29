@@ -583,29 +583,6 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     scale: 1.65,
     color: 0xd86d32,
   },
-  the_forge_heart: {
-    id: 'the_forge_heart',
-    name: 'The Forge-Heart',
-    minLevel: 24,
-    maxLevel: 24,
-    family: 'elemental',
-    elite: true,
-    boss: true,
-    // Wing 2, single boss. 42k effective (2.3x elite factor). Mechanics not yet
-    // authored: this is a raid-scale stat block so the encounter is not trivial
-    // while the wing-2 fight script is still to come.
-    hpBase: 42000 / 2.3,
-    hpPerLevel: 0,
-    dmgBase: 50,
-    dmgPerLevel: 10.4,
-    attackSpeed: 2.6,
-    armorPerLevel: 34,
-    moveSpeed: 7,
-    aggroRadius: 18,
-    loot: [],
-    scale: 1.8,
-    color: 0xd87a32,
-  },
   odrenn_the_temperer: {
     id: 'odrenn_the_temperer',
     name: 'Odrenn the Temperer',
@@ -614,8 +591,8 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     family: 'humanoid',
     elite: true,
     boss: true,
-    // Wing 3, single boss. 48k effective (2.3x elite factor). Mechanics not yet
-    // authored: raid-scale stat block placeholder ahead of the wing-3 script.
+    // Wing 2, single boss. 48k effective (2.3x elite factor). Mechanics not yet
+    // authored: raid-scale stat block placeholder ahead of the wing-2 script.
     hpBase: 48000 / 2.3,
     hpPerLevel: 0,
     dmgBase: 52,
@@ -636,16 +613,17 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     family: 'elemental',
     elite: true,
     boss: true,
-    // Wing 4, the raid capstone (level 26, drops ilvl 35). 68k effective (2.3x
-    // elite factor), pitched just above the 60k Nythraxis finale since this is a
-    // higher-level tier. Mechanics not yet authored: raid-scale stat placeholder.
-    hpBase: 68000 / 2.3,
+    // Wing 3, the raid capstone (level 26, drops ilvl 35). 69k effective (2.3x
+    // elite factor), the review-corrected 1.15x anchor over the 60k Nythraxis
+    // finale since this is a higher-level tier. Mechanics not yet authored:
+    // raid-scale stat placeholder.
+    hpBase: 69000 / 2.3,
     hpPerLevel: 0,
     dmgBase: 58,
     dmgPerLevel: 12.2,
     attackSpeed: 2.6,
     armorPerLevel: 34,
-    moveSpeed: 7,
+    moveSpeed: 5.5, // the kite: below player run 7, pass-6 movement finale
     aggroRadius: 18,
     loot: [],
     scale: 1.8,
@@ -725,11 +703,9 @@ const UNDERMOUNT_WING1_SPAWN_LIST: DungeonSpawn[] = [
   { mobId: 'saan_the_stoker', x: 6, z: 40 },
 ];
 
-const UNDERMOUNT_WING2_SPAWN_LIST: DungeonSpawn[] = [{ mobId: 'the_forge_heart', x: 0, z: 40 }];
+const UNDERMOUNT_WING2_SPAWN_LIST: DungeonSpawn[] = [{ mobId: 'odrenn_the_temperer', x: 0, z: 40 }];
 
-const UNDERMOUNT_WING3_SPAWN_LIST: DungeonSpawn[] = [{ mobId: 'odrenn_the_temperer', x: 0, z: 40 }];
-
-const UNDERMOUNT_WING4_SPAWN_LIST: DungeonSpawn[] = [
+const UNDERMOUNT_WING3_SPAWN_LIST: DungeonSpawn[] = [
   { mobId: 'volzharr_buried_furnace', x: 0, z: 40 },
 ];
 
@@ -837,7 +813,7 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     name: 'Undermount: The Descent',
     index: 10,
     // Wing 1 has the raid's only overworld entrance: the Undermount fissure in
-    // the Wyrmcult territory of Thornpeak. Wings 2 to 4 stay internal (reached
+    // the Wyrmcult territory of Thornpeak. Wings 2 and 3 stay internal (reached
     // through each wing's sealed door), so this is the single walk-in point.
     doorPos: { x: -174, z: 610 },
     entry: { x: 0, z: 4 },
@@ -860,7 +836,7 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
   },
   undermount_wing2: {
     id: 'undermount_wing2',
-    name: 'Undermount: The Quenching',
+    name: 'Undermount: The Tempering',
     index: 11,
     overworldDoor: false,
     doorPos: { x: -168, z: 620 },
@@ -870,7 +846,7 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     objects: [
       {
         itemId: '',
-        name: 'Quenching Door',
+        name: 'Tempering Door',
         x: 0,
         z: 110,
         templateId: 'dungeon_door',
@@ -879,42 +855,18 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     ],
     interior: 'undermount',
     suggestedPlayers: 10,
-    enterText: 'Steam curls from the flooded forges ahead.',
-    leaveText: 'You leave the quenching halls behind.',
+    enterText: 'Hammerfalls echo through the tempering vault.',
+    leaveText: 'You retreat from the ringing forgeways.',
   },
   undermount_wing3: {
     id: 'undermount_wing3',
-    name: 'Undermount: The Tempering',
+    name: 'Undermount: The Waking',
     index: 12,
     overworldDoor: false,
     doorPos: { x: -162, z: 630 },
     entry: { x: 0, z: 4 },
     exitOffset: { x: 0, z: -6 },
     spawns: UNDERMOUNT_WING3_SPAWN_LIST,
-    objects: [
-      {
-        itemId: '',
-        name: 'Tempering Door',
-        x: 0,
-        z: 110,
-        templateId: 'dungeon_door',
-        dungeonId: 'undermount_wing4',
-      },
-    ],
-    interior: 'undermount',
-    suggestedPlayers: 10,
-    enterText: 'Hammerfalls echo through the tempering vault.',
-    leaveText: 'You retreat from the ringing forgeways.',
-  },
-  undermount_wing4: {
-    id: 'undermount_wing4',
-    name: 'Undermount: The Waking',
-    index: 13,
-    overworldDoor: false,
-    doorPos: { x: -156, z: 640 },
-    entry: { x: 0, z: 4 },
-    exitOffset: { x: 0, z: -6 },
-    spawns: UNDERMOUNT_WING4_SPAWN_LIST,
     interior: 'undermount',
     suggestedPlayers: 10,
     enterText: 'The buried furnace stirs in the deep.',

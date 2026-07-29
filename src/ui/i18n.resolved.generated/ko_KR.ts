@@ -7170,9 +7170,6 @@ export const ko_KR: EnTranslations = {
       "saan_the_stoker": {
         "name": "화부 사안"
       },
-      "the_forge_heart": {
-        "name": "대장간 심장"
-      },
       "odrenn_the_temperer": {
         "name": "뜨임장이 오드렌"
       },
@@ -8544,16 +8541,11 @@ export const ko_KR: EnTranslations = {
         "leaveText": "당신은 언더마운트의 하강로에서 기어올라옵니다."
       },
       "undermount_wing2": {
-        "name": "언더마운트: 담금질",
-        "enterText": "앞쪽의 물에 잠긴 용광로에서 증기가 피어오릅니다.",
-        "leaveText": "당신은 담금질 전당을 뒤로합니다."
-      },
-      "undermount_wing3": {
         "name": "언더마운트: 뜨임",
         "enterText": "망치질 소리가 뜨임 금고에 울려 퍼집니다.",
         "leaveText": "당신은 울리는 화로길에서 물러납니다."
       },
-      "undermount_wing4": {
+      "undermount_wing3": {
         "name": "언더마운트: 깨어남",
         "enterText": "묻힌 용광로가 깊은 곳에서 꿈틀거립니다.",
         "leaveText": "당신은 깨어나는 열기에서 물러납니다."

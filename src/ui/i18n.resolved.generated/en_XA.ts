@@ -7170,9 +7170,6 @@ export const en_XA: EnTranslations = {
       "saan_the_stoker": {
         "name": "[Šááñ ţĥé Šţóķéŕ]"
       },
-      "the_forge_heart": {
-        "name": "[Ţĥé Ƒóŕĝé-Ĥéáŕţ]"
-      },
       "odrenn_the_temperer": {
         "name": "[Óðŕéññ ţĥé Ţéɱþéŕéŕ]"
       },
@@ -8544,16 +8541,11 @@ export const en_XA: EnTranslations = {
         "leaveText": "[Ýóú çļíɱƀ ƀáçķ ƒŕóɱ ţĥé Úñðéŕɱóúñţ ðéšçéñţ.]"
       },
       "undermount_wing2": {
-        "name": "[Úñðéŕɱóúñţ: Ţĥé Ɋúéñçĥíñĝ]",
-        "enterText": "[Šţéáɱ çúŕļš ƒŕóɱ ţĥé ƒļóóðéð ƒóŕĝéš áĥéáð.]",
-        "leaveText": "[Ýóú ļéáʋé ţĥé ɋúéñçĥíñĝ ĥáļļš ƀéĥíñð.]"
-      },
-      "undermount_wing3": {
         "name": "[Úñðéŕɱóúñţ: Ţĥé Ţéɱþéŕíñĝ]",
         "enterText": "[Ĥáɱɱéŕƒáļļš éçĥó ţĥŕóúĝĥ ţĥé ţéɱþéŕíñĝ ʋáúļţ.]",
         "leaveText": "[Ýóú ŕéţŕéáţ ƒŕóɱ ţĥé ŕíñĝíñĝ ƒóŕĝéŵáýš.]"
       },
-      "undermount_wing4": {
+      "undermount_wing3": {
         "name": "[Úñðéŕɱóúñţ: Ţĥé Ŵáķíñĝ]",
         "enterText": "[Ţĥé ƀúŕíéð ƒúŕñáçé šţíŕš íñ ţĥé ðééþ.]",
         "leaveText": "[Ýóú ŵíţĥðŕáŵ ƒŕóɱ ţĥé ŵáķíñĝ ĥéáţ.]"

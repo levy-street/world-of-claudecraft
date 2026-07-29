@@ -43,7 +43,6 @@ const RAID_ALLOWED_DUNGEON_IDS = new Set([
   'undermount_wing1',
   'undermount_wing2',
   'undermount_wing3',
-  'undermount_wing4',
 ]);
 const RAID_REQUIRED_DUNGEON_IDS = new Set(['nythraxis_boss_arena']);
 
