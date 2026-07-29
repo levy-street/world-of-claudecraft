@@ -23,6 +23,7 @@ import {
   prepareCommunityTestCharacters,
 } from './community_test_accounts';
 import { CONCURRENT_INDEX_MIGRATIONS } from './concurrent_indexes';
+import { CONTENT_MODERATION_SCHEMA } from './content_moderation_db';
 import type { RankedDeedsAccount } from './deeds_board';
 import { DISCORD_SCHEMA } from './discord_db';
 import { GITHUB_SCHEMA } from './github_db';
@@ -1112,6 +1113,10 @@ export async function ensureSchema(): Promise<void> {
     // unconditionally (idempotent), like the other schema modules.
     await client.query(MAPS_SCHEMA);
     await client.query(USER_ASSETS_SCHEMA);
+    // Audit trail for the map/asset moderation actions above (unpublish,
+    // block, unblock). FK-references accounts(id), so it runs after SCHEMA.
+    // Applied unconditionally (idempotent), like the other schema modules.
+    await client.query(CONTENT_MODERATION_SCHEMA);
     // Seed the chat-filter word lists + config on first boot only (idempotent).
     // Runs under the same advisory lock so concurrent realm boots don't race.
     await seedChatFilterDefaults(client);
@@ -2082,16 +2087,20 @@ export async function consumeRecoveryCode(accountId: number, codeHash: string): 
 }
 
 // GDPR-style data export bundle: the account's own profile plus every character
-// it owns on this realm, as plain JSON. Excludes secrets (password hash, tokens).
-// Also carries the folded retention rollups (lifetime playtime totals and the
-// account-to-IP association ledger): they are stored personal data, so a data
-// export must include them even after the raw sessions folded away.
+// it owns across every realm this deployment runs (account-wide, like
+// characterCountForAccount: the account portal is an account-wide self-service
+// surface, and a process-per-realm deployment can host the same account's
+// characters on several realm processes sharing this database), as plain JSON.
+// Excludes secrets (password hash, tokens). Also carries the folded retention
+// rollups (lifetime playtime totals and the account-to-IP association ledger):
+// they are stored personal data, so a data export must include them even after
+// the raw sessions folded away.
 export async function exportAccountData(
   accountId: number,
 ): Promise<Record<string, unknown> | null> {
   const acct = await accountById(accountId);
   if (!acct) return null;
-  const characters = await listCharacters(accountId);
+  const characters = await listCharactersAllRealms(accountId);
   const twoFactorEnabled = await accountTwoFactorEnabled(accountId);
   const playtimeTotals = await pool.query(
     `SELECT character_id, playtime_seconds, sessions, last_played
@@ -2124,6 +2133,7 @@ export async function exportAccountData(
       class: c.class,
       level: c.level,
       state: c.state,
+      realm: c.realm,
     })),
     playtimeTotals: playtimeTotals.rows,
     ipAssociations: ipAssociations.rows,
@@ -2599,6 +2609,26 @@ export async function listCharacters(accountId: number): Promise<CharacterRow[]>
       WHERE c.account_id = $1 AND c.realm = $2
       ORDER BY c.id`,
     [accountId, REALM],
+  );
+  return res.rows;
+}
+
+// Account-wide character list across every realm this deployment runs, used by
+// the GDPR export (exportAccountData below): the export is an account-wide
+// self-service surface, same as characterCountForAccount, so it must not stop
+// at this process's realm the way listCharacters above deliberately does.
+// Selects the realm column so the export can label which realm each character
+// belongs to. One query, no per-realm loop: `characters` is already indexed
+// on account_id (characters_account), so this stays a single indexed read.
+export async function listCharactersAllRealms(
+  accountId: number,
+): Promise<(CharacterRow & { realm: string })[]> {
+  const res = await pool.query(
+    `SELECT id, account_id, name, class, level, state, is_gm, force_rename, realm
+       FROM characters
+      WHERE account_id = $1
+      ORDER BY realm, id`,
+    [accountId],
   );
   return res.rows;
 }

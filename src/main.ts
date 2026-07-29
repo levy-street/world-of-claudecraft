@@ -5870,7 +5870,16 @@ function renderClassDetails(
             eff.type === 'imbue',
         );
         if (secondaryEffect) {
-          if (secondaryEffect.type === 'dot' || secondaryEffect.type === 'hot') {
+          if (secondaryEffect.type === 'dot' && secondaryEffect.perCombo !== undefined) {
+            // A combo-point bleed finisher (rupture, rip): `total` alone is the
+            // damage at zero combo points, a state the caster can never reach.
+            // Render base plus per-combo-point, the same composition the
+            // finisherDamage arm above and abilityEffectText in the HUD use.
+            dmgText = t('abilityUi.tooltip.finisherDamage', {
+              base: formatClassDetailNumber(secondaryEffect.total),
+              perCombo: formatClassDetailNumber(secondaryEffect.perCombo),
+            });
+          } else if (secondaryEffect.type === 'dot' || secondaryEffect.type === 'hot') {
             dmgText = formatClassDetailNumber(secondaryEffect.total);
           } else if (secondaryEffect.type === 'absorb') {
             dmgText = formatClassDetailNumber(secondaryEffect.amount);

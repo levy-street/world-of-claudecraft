@@ -198,6 +198,14 @@ export class MarketWindow {
     ]);
     if (sig === this.lastSig) return;
     this.lastSig = sig;
+    // The listings changed (a filter/search narrowed the result set, a listing sold, a
+    // page arrived), so renderContent() below is about to tear down and rebuild the
+    // `.mkt-row` nodes. A row detached this way fires no mouseleave, so a tooltip left
+    // open on a row that no longer matches the query would otherwise linger forever,
+    // still describing an item the list no longer shows (issue 2456). render()'s full rebuild
+    // already hides it for the tab/filter-click path; this is the same guard for the
+    // signature-driven refresh path (typing in search, an async listings update).
+    this.deps.hideTooltip();
     const collectTab = this.deps.root().querySelector('[data-tab="collect"]');
     if (collectTab) {
       const n = marketCollectBadgeCount(info);
@@ -229,15 +237,15 @@ export class MarketWindow {
     };
     const tab = (id: MarketTab) =>
       `<button type="button" class="mkt-tab${this.tab === id ? ' sel' : ''}" data-tab="${id}" aria-pressed="${this.tab === id ? 'true' : 'false'}">${esc(tabLabel(id))}</button>`;
-    // The search box and the type/subtype/rarity dropdowns are both filter controls for
-    // the Browse tab, so they render side by side in one `.mkt-controls` row: the search
-    // box lives here (rather than being created inside #market-body by renderBrowse) so it
-    // can sit in the same flex row as the filter menus. It is only rebuilt when render()
+    // The search box and the type/subtype/rarity dropdowns are all filter controls for
+    // the Browse tab, so `.mkt-controls` owns their shared accessible group and responsive
+    // grid. The search box lives here (rather than being created inside #market-body by
+    // renderBrowse) so it can align with every filter menu. It is only rebuilt when render()
     // rebuilds the whole window (tab switch, filter pick), never on every keystroke:
     // renderBrowse's own reuse-and-sync logic (below) is what preserves focus while typing.
     const controlsHtml =
       this.tab === 'browse'
-        ? `<div class="mkt-controls">` +
+        ? `<div class="mkt-controls" role="group" aria-label="${esc(t('itemUi.market.filters'))}">` +
           `<input type="search" class="mkt-search" placeholder="${esc(t('itemUi.market.searchPlaceholder'))}" aria-label="${esc(t('itemUi.market.searchAria'))}" value="${esc(this.searchQuery)}">` +
           this.renderMarketFilters() +
           `</div>`
@@ -831,7 +839,7 @@ export class MarketWindow {
     // Bound to a const so the null check below narrows inside the option-label closure.
     const subtypeKind = menus.subtypeKind;
     return (
-      `<div class="mkt-filters" role="group" aria-label="${esc(t('itemUi.market.filters'))}">` +
+      `<div class="mkt-filters">` +
       this.renderMarketFilterMenu(
         'itemType',
         t('itemUi.market.filterType'),

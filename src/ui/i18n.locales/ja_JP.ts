@@ -774,13 +774,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootSettings.masterOption': '分配担当：{name}',
   'hudChrome.corpseHarvest.title': '採取',
   'hudChrome.corpseHarvest.harvestButton': '採取',
-  'hudChrome.corpseHarvest.concentrateHint': '選ぶ部位が少ないほど、各部位の品質が高くなります。',
   'hudChrome.corpseHarvest.alreadyHarvested': 'この死体はすでに採取されています。',
   'hudChrome.corpseHarvest.nothingSelectedYields':
     '選んだ部位はどれも、この死体から採取できません。',
   'hudChrome.corpseHarvest.harvestTooltip':
     'チェックした部位を採取します。各死体は早い者勝ちで一度だけ採取できます。戦利品は取りません。',
   'hudChrome.corpseHarvest.componentAria': '{component}を採取',
+  'hudChrome.corpseHarvest.componentNoYield': 'まだ産出なし',
+  'hudChrome.corpseHarvest.componentAriaNoYield': '{component}を採取：{note}',
+  'hudChrome.corpseHarvest.yieldTierHint':
+    '一度の採取で実際に取れる部位が少ないほど、各部位の採取ティアが高くなります。',
   'hudChrome.corpseHarvest.components.hide': '毛皮',
   'hudChrome.corpseHarvest.components.fang': '牙',
   'hudChrome.corpseHarvest.components.silk': '絹糸',
@@ -5285,6 +5288,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.emotes.wave': '手を振る',
   'hudChrome.emoteWheel.edit': '編集',
   'hudChrome.emoteWheel.label': 'エモート',
+  'hudChrome.meters.breakdownOther': 'その他（{count}）',
+  'hudChrome.meters.melee': '近接攻撃',
   'hudChrome.meters.minutesSeconds': '{m}分{s}秒',
   'hudChrome.meters.perSecond': '{value}/秒',
   'hudChrome.meters.perSecondRow': '{total}（{rate}）',
@@ -8027,8 +8032,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.professions.intro':
     '戦闘やクエストだけでなく、この世界は大地を耕し鍛冶場に立つあなたにも報いてくれます。原材料を採集し、十の製作職を通じてそれを装備や品物へと変え、それらの職が体現する十のアーキタイプのひとつとして自らのアイデンティティを築いていきます。',
   'guide.professions.harvestTitle': '狩りそのものを採取する',
-  'guide.professions.harvestBody':
-    '採集はノードで終わらない。倒した獣の中には、通常の戦利品と並んで、死体から直接素材を採取できるものがいる：毛皮、牙、絹糸、さらに奇妙なものまで。一体の獲物につき採り手は一人：最初に採取した者がすべてを手にする。そして選択は毎回あなたのものだ：死体が差し出すすべてを剥ぎ取るか、ひとつの素材に集中してより上のグレードを受け取るか。採取はどのキャラクターにもでき、職も訓練も要らない。とりわけ見事な素材には、採取した者の名まで刻まれる。',
+  'guide.professions.harvestBodyChoice':
+    '採集はノードで終わらない。倒した獣の多くは、通常の戦利品と並んで、死体から直接素材を採取できる：毛皮、牙、絹糸、そして肉。各死体は早い者勝ちで一度だけ採取でき、ひと押しで戦利品と採取の両方が開く。加工できる素材をふたつ以上持つ獣なら、選択はあなたのものだ：その獣が差し出せるすべてを取るか、より少ない素材に集中して、実際に取る分だけはっきりと上のグレードで受け取るか。\n\n標本を宿す系統の獣でレア以上の採取を引き当てると、通常の産出に加えて署名入りの完璧な標本（極上の獣皮、極上の蜘蛛の糸、極上の毒腺、極上の肉のいずれか）も手に入り、功績の書に「申し分なき標本」が刻まれる。採取はどのキャラクターにもでき、訓練も要らない。手持ちの採集道具はどの職のものであれ、このレア以上の判定を後押しする。',
   'guide.professions.focusTitle': '町のフォーカス',
   'guide.professions.focusBody':
     'どの拠点の町にも、訪れる採り手のための「町のフォーカス」パネルがある。町の中に立ってミニマップの脇から開き、わずかなフォーカスポイントの持ち分を、気にかける素材の種類へ振り分けよう。フォーカスした素材は、以後どの死体からもワングレード上質に、そして少し多めに採れる。割り振りはどこを歩いてもキャラクターに付いてまわり、後で町を訪れれば、無料で何度でも組み直せる。',
@@ -10668,4 +10673,5 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.lb_willowfen.name': '泣き柳沼',
   'entities.dungeons.lb_willowfen.enterText': '柳は動かない。水もまた動かない。',
   'entities.dungeons.lb_willowfen.leaveText': '柳を静寂の中に残して立ち去る。',
+  'hudChrome.enchanting.wornTagIndexed': '装備中 ({slot}{index})',
 };

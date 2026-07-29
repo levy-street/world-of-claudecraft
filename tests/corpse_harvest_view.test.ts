@@ -22,9 +22,13 @@ describe('corpseHarvestView: rows and the concentrate flag', () => {
   it('renders one row per tag, in order, with the checked state from the selection', () => {
     const view = corpseHarvestView(['hide', 'fang', 'claw'], pick('fang'));
     expect(view.rows).toEqual([
-      { tag: 'hide', checked: false },
-      { tag: 'fang', checked: true },
-      { tag: 'claw', checked: false },
+      { tag: 'hide', checked: false, yieldsItem: true },
+      { tag: 'fang', checked: true, yieldsItem: true },
+      // #2514: the row is still OFFERED (the corpse really does carry claw) and
+      // still checkable, and it carries the flag the painter marks it by. Rows
+      // are not filtered: filtering would hide a component the corpse has, and
+      // would put the #2509 refusal out of reach of the shipped picker.
+      { tag: 'claw', checked: false, yieldsItem: false },
     ]);
     expect(view.concentrated).toBe(true);
     expect(view.harvestDisabled).toBe(false);
@@ -45,10 +49,57 @@ describe('corpseHarvestView: rows and the concentrate flag', () => {
     expect(corpseHarvestView([], pick()).harvestDisabled).toBe(true);
   });
 
-  it('reports concentrated only for a strict subset', () => {
+  it('reports concentrated only for a strict subset, on an ALL-MAPPED corpse', () => {
     expect(corpseHarvestView(['hide', 'fang'], pick()).concentrated).toBe(false);
     expect(corpseHarvestView(['hide', 'fang'], pick('hide')).concentrated).toBe(true);
     expect(corpseHarvestView(['hide', 'fang'], pick('hide', 'fang')).concentrated).toBe(false);
+  });
+
+  it('measures concentration against the WIDEST pick the corpse offers, not the box count (#2514)', () => {
+    // The fixture above cannot see this: on an all-mapped corpse "strict subset
+    // of the boxes" and "beats the widest available pick" are the same set, so
+    // it stayed green through the redefinition while proving nothing about it.
+    // The murloc shape is the discriminator. gills extracts nothing, so hide
+    // alone IS the widest pick there is here: a box count would call checking
+    // both a spread and checking one a concentrate, and the sim pays the same
+    // bonus 1 for both.
+    const murloc = ['gills', 'hide'];
+    expect(corpseHarvestView(murloc, pick()).concentrated).toBe(false);
+    expect(corpseHarvestView(murloc, pick('hide')).concentrated).toBe(false);
+    expect(corpseHarvestView(murloc, pick('gills', 'hide')).concentrated).toBe(false);
+    // On the 3-tag mixed shape the choice is real again, and the unmapped box
+    // is transparent to it: hide beside claw concentrates exactly as hide alone
+    // does, and naming both mapped families does not.
+    const greyjaw = ['hide', 'fang', 'claw'];
+    expect(corpseHarvestView(greyjaw, pick()).concentrated).toBe(false);
+    expect(corpseHarvestView(greyjaw, pick('hide')).concentrated).toBe(true);
+    expect(corpseHarvestView(greyjaw, pick('hide', 'claw')).concentrated).toBe(true);
+    expect(corpseHarvestView(greyjaw, pick('hide', 'fang')).concentrated).toBe(false);
+    expect(corpseHarvestView(greyjaw, pick('hide', 'fang', 'claw')).concentrated).toBe(false);
+    // A pick the sim refuses is never "concentrated", though its raw bonus is
+    // the whole tag count: the field describes the harvest the button would
+    // run, and that button is dead.
+    expect(corpseHarvestView(greyjaw, pick('claw')).harvestDisabled).toBe(true);
+    expect(corpseHarvestView(greyjaw, pick('claw')).concentrated).toBe(false);
+    // Same for a corpse no pick can harvest (fen_troll).
+    expect(corpseHarvestView(['claw', 'tusk'], pick()).concentrated).toBe(false);
+  });
+
+  it('marks the rows with no item behind them, and only those (#2514)', () => {
+    const rows = (tags: string[]) =>
+      Object.fromEntries(corpseHarvestView(tags, pick()).rows.map((r) => [r.tag, r.yieldsItem]));
+    expect(rows(['hide', 'fang', 'claw'])).toEqual({ hide: true, fang: true, claw: false });
+    expect(rows(['gills', 'hide'])).toEqual({ gills: false, hide: true });
+    expect(rows(['claw', 'tusk'])).toEqual({ claw: false, tusk: false });
+    // Reads the real yield table, both directions, so it cannot be measuring
+    // the table against itself: every mapped family marks true and every
+    // carried-but-unmapped one marks false.
+    for (const mapped of ['cloth', 'fang', 'hide', 'meat', 'silk', 'venomSac']) {
+      expect(rows([mapped])[mapped], mapped).toBe(true);
+    }
+    for (const unmapped of ['claw', 'gills', 'horn', 'tusk']) {
+      expect(rows([unmapped])[unmapped], unmapped).toBe(false);
+    }
   });
 });
 

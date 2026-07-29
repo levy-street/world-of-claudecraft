@@ -88,4 +88,16 @@ export class MobileActionRingPainter {
       );
     }
   }
+
+  /** Re-localize after an in-game language switch (the Hud's woc:languagechange
+   *  fan-out). Both writes at the end of paint() are keyed on the page/count
+   *  pair, which is two integers, so a switch alone never moves them and the ring
+   *  would keep the old locale's "Page X of Y" and toggle name. Dropping the
+   *  latch makes the NEXT paint rewrite both, the same in-place shape the party
+   *  rows use; there is nothing to repaint from here, since the page and count
+   *  arrive per call rather than being retained. */
+  relocalize(): void {
+    this.lastPage = -1;
+    this.lastPageCount = -1;
+  }
 }

@@ -904,7 +904,13 @@ export const en_CA: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m}m {s}s",
       "seconds": "{s}s",
-      "autoShowHint": "Rows appear automatically once your party deals damage or healing, and this segment closes a few seconds after combat ends."
+      "autoShowHint": "Rows appear automatically once your party deals damage or healing, and this segment closes a few seconds after combat ends.",
+      "breakdownSummary": "{tab}: {value}",
+      "breakdownRow": "{value} ({percent})",
+      "breakdownOther": "Other ({count})",
+      "percent": "{value}%",
+      "petAbility": "{pet}: {ability}",
+      "melee": "Melee"
     },
     "petFeed": {
       "disabledFullHp": "Pet is at full health",
@@ -1534,10 +1540,12 @@ export const en_CA: EnTranslations = {
       "title": "Harvest",
       "harvestButton": "Harvest",
       "harvestTooltip": "Gathers the checked components. Each corpse can be harvested once, first come. Does not take the loot.",
-      "concentrateHint": "Fewer chosen components yield a higher tier each.",
+      "yieldTierHint": "The fewer components a harvest takes, the higher the tier of each.",
       "nothingSelectedYields": "Nothing you selected can be harvested from this corpse.",
       "alreadyHarvested": "This corpse has already been harvested.",
       "componentAria": "Harvest {component}",
+      "componentNoYield": "nothing yet",
+      "componentAriaNoYield": "Harvest {component}: {note}",
       "components": {
         "hide": "Hide",
         "fang": "Fang",
@@ -2552,6 +2560,7 @@ export const en_CA: EnTranslations = {
       "noEnchants": "No enchant uses this reagent.",
       "noTargets": "No eligible item to enchant.",
       "wornTag": "Worn ({slot})",
+      "wornTagIndexed": "Worn ({slot} {index})",
       "tier": {
         "base": "Base Enchants",
         "runed": "Runed Enchants",
@@ -3921,7 +3930,7 @@ export const en_CA: EnTranslations = {
     "professions": {
       "intro": "Beyond combat and quests, the world rewards you for working the land and the forge: gathering raw materials, turning them into gear and goods across ten crafting trades, and settling into an identity as one of the ten archetypes those trades represent.",
       "harvestTitle": "Harvesting the hunt itself",
-      "harvestBody": "Gathering does not stop at nodes. Many slain beasts can be harvested once each, first come first served, for hides, fangs, silk, and meat, straight from the corpse alongside its ordinary loot; one press opens both. The choice is yours each time, too: strip everything the corpse offers, or concentrate on fewer components and take a measurably finer grade of what you do take.\n\nA rare or better harvest roll on a specimen-bearing family also grants a signed perfect specimen (a Pristine Hide, Pristine Silk, Pristine Venom Gland, or Prime Cut) on top of the ordinary yield, and records A Perfect Specimen in your Book of Deeds. Any character can harvest, no training required, and any gathering tool you own counts toward the premium arm, whichever trade it belongs to.",
+      "harvestBodyChoice": "Gathering does not stop at nodes. Many slain beasts can be harvested once each, first come first served, for hides, fangs, silk, and meat, straight from the corpse alongside its ordinary loot; one press opens both. Where a beast carries more than one workable component, the choice is yours: take everything it can give, or concentrate on fewer components and take a measurably finer grade of what you do take.\n\nA rare or better harvest roll on a specimen-bearing family also grants a signed perfect specimen (a Pristine Hide, Pristine Silk, Pristine Venom Gland, or Prime Cut) on top of the ordinary yield, and records A Perfect Specimen in your Book of Deeds. Any character can harvest, no training required, and any gathering tool you own counts toward the premium arm, whichever trade it belongs to.",
       "focusTitle": "Town Focus",
       "focusBody": "Every hub town keeps a Town Focus panel for visiting harvesters: stand in town, open it from beside the minimap, and spread a budget of 10 focus points across the component types you care about. Every 5 points on a component raises its harvest grade one step (two steps at most), and each point adds 10 percent to its yield; unfocused components are never made worse. Your allocation follows your character everywhere and can be reworked, free, on any later visit to town.",
       "craftHowTitle": "The crafting window",
@@ -5746,6 +5755,7 @@ export const en_CA: EnTranslations = {
     },
     "augment": {
       "choose": "Choose an Augment",
+      "cardAria": "{name} ({category}) - {description}",
       "aug_brutality": {
         "name": "Brutality",
         "desc": "Your physical strikes hit 15% harder."

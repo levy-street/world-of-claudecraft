@@ -7,8 +7,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_weapon_runed_focus': 'Silah Büyüsü - Runlu Odak',
   'hudChrome.professions.ctaRaiseSpecialized':
     "{craft}'yi yükseltmeye devam edin: {points} puan daha Uzmanlaşmış kademesine, malzeme maliyetleri düşer.",
-  'guide.professions.harvestBody':
-    'Toplama düğümlerde durmaz. Öldürülen pek çok canavardan birer kez hasat yapılabilir, ilk gelen alır; cesedin olağan ganimetiyle birlikte doğrudan cesetten post, diş, ipek ve et elde edilir; tek bir basışla her ikisi de açılır. Her seferinde seçim sizindir: cesedin sunduğu her şeyi alın ya da daha az bileşene odaklanın ve aldığınız şeyin ölçülebilir biçimde daha kaliteli bir derecesini kazanın.\n\nOrnek taşıyan bir ailede nadir veya daha iyi hasat turunda ayrıca imzalı mükemmel bir örnek (Bozulmamış Post, Bozulmamış İpek, Bozulmamış Zehir Bezi veya Birinci Kalite Et) olağan verimin üstüne gelir ve Yiğitlikler Kitabına Mükemmel Örnek kaydedilir. Her karakter hasat yapabilir, eğitim gerekmez; sahip olduğunuz herhangi bir toplama aleti hangi zanaata ait olursa olsun premium kolu sayılır.',
+  'guide.professions.harvestBodyChoice':
+    'Toplama düğümlerde durmaz. Öldürülen pek çok canavardan birer kez hasat yapılabilir, ilk gelen alır; cesedin olağan ganimetiyle birlikte doğrudan cesetten post, diş, ipek ve et elde edilir; tek bir basışla her ikisi de açılır. Bir canavar birden fazla işlenebilir bileşen taşıyorsa seçim sizindir: verebileceği her şeyi alın ya da daha az bileşene odaklanın ve aldığınız şeyin ölçülebilir biçimde daha kaliteli bir derecesini kazanın.\n\nOrnek taşıyan bir ailede nadir veya daha iyi hasat turunda ayrıca imzalı mükemmel bir örnek (Bozulmamış Post, Bozulmamış İpek, Bozulmamış Zehir Bezi veya Birinci Kalite Et) olağan verimin üstüne gelir ve Yiğitlikler Kitabına Mükemmel Örnek kaydedilir. Her karakter hasat yapabilir, eğitim gerekmez; sahip olduğunuz herhangi bir toplama aleti hangi zanaata ait olursa olsun premium kolu sayılır.',
   'guide.professions.craftMasteryTitle': 'Ustalık ne kadar sürer',
   'guide.professions.craftMasteryBody':
     'Dürüst beklentiler: bir zanaatın 125 tavanına tırmanmak en az 125 başarılı zanaat gerektirir, çünkü tam kazanımlı her zanaat sizi tam bir puan ilerletir; pratikte ise tarifler eğitmen kademeleri arasında solduğundan biraz daha fazla. Zanaat eylemi hızlıdır; onu beslemek asıl yolculuktur; bu yüzden her zanaat için birkaç toparlama ve zanaat akşamı ayırın.\n\nToplama meslekleri, yolculuk ederken hasat ederseniz normal bir seviye atlamada 100 tavanına ulaşır; ancak son gerilim kuzeyin yüksek kademeli düğümlerini ister. Balık Tutma ise tasarım gereği uzun yoldur: kendi kazanım programına göre 200 ustalık üç binden fazla yakalamadır. Usta Olta Ustası, hafta sonları değil, sessiz akşamların mevsimi boyunca kazanılan bir unvandır.',
@@ -2055,6 +2055,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.alreadyHarvested': 'Bu leş zaten toplandı.',
   'hudChrome.corpseHarvest.nothingSelectedYields': 'Bu leşten seçtiklerinin hiçbiri toplanamaz.',
   'hudChrome.corpseHarvest.componentAria': '{component} topla',
+  'hudChrome.corpseHarvest.componentNoYield': 'henüz verim yok',
+  'hudChrome.corpseHarvest.componentAriaNoYield': '{component} topla: {note}',
+  'hudChrome.corpseHarvest.yieldTierHint':
+    'Bir toplama ne kadar az bileşen alırsa, her birinin kademesi o kadar yüksek olur.',
   'hudChrome.corpseHarvest.components.claw': 'Pençe',
   'hudChrome.corpseHarvest.components.fang': 'Diş',
   'hudChrome.corpseHarvest.components.gills': 'Solungaç',
@@ -2063,8 +2067,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.silk': 'İpek',
   'hudChrome.corpseHarvest.components.tusk': 'Azı Dişi',
   'hudChrome.corpseHarvest.components.venomSac': 'Zehir Kesesi',
-  'hudChrome.corpseHarvest.concentrateHint':
-    'Ne kadar az parça seçersen, her biri o kadar yüksek kademede olur.',
   'hudChrome.corpseHarvest.harvestButton': 'Topla',
   'hudChrome.corpseHarvest.harvestTooltip':
     'İşaretlenmiş bileşenleri toplar. Her leş yalnızca bir kez toplanabilir, ilk gelen alır. Yağmayı almaz.',
@@ -3493,7 +3495,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.vaels_mist_staff.name': "Vael'in Sis Asası",
   'entities.items.vale_carving_knife.name': 'Vadi Oyma Bıçağı',
   'entities.items.valeborn_spellblade.name': 'Vadidoğumlu Büyü Kılıcı',
-  'entities.items.valespun_robe.name': 'Vadidokuma Cübbesi',
+  'entities.items.valespun_robe.name': 'Vadieğirme Cübbesi',
   'entities.items.vanguard_azure_armor_plate.name': 'Öncü Birlik Gök Mavisi',
   'entities.items.vanguard_chrome_armor_plate.name': 'Öncü Birlik Krom',
   'entities.items.varric_shadow_cowl.name': "Varric'in Gölge Başlığı",
@@ -9293,6 +9295,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.tier.greater': 'Daha İyi Büyüler',
   'hudChrome.enchanting.tier.runed': 'Runlu Büyüler',
   'hudChrome.enchanting.wornTag': 'Kuşanılı ({slot})',
+  'hudChrome.enchanting.wornTagIndexed': 'Kuşanılı ({slot} {index})',
   'hudChrome.enchanting.yieldHeader': 'Beklenen malzemeler:',
   'hudChrome.enchanting.yieldLineExact': '{count} {item}',
   'hudChrome.enchanting.yieldLineRange': '{min} ile {max} arası {item}',

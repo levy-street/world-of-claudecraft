@@ -132,6 +132,7 @@ export const IWORLD_MEMBERS = [
   { name: 'submitLootRoll', kind: 'method' },
   { name: 'activeLootRolls', kind: 'method' }, // read-returning (2/6)
   { name: 'lootRollGroupStatus', kind: 'method' }, // read-returning
+  { name: 'activeMasterLootRolls', kind: 'method' }, // read-returning
   { name: 'pickUpObject', kind: 'method' },
   { name: 'townFocus', kind: 'data' },
   { name: 'setTownFocus', kind: 'method' },
@@ -494,10 +495,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // activeMobileStationCraft), the commissions unbindItem command, and the
     // Rift + mounts surface. The action-bar pair and Last Bell's two scene
     // methods are included in the merged facet union; making reins usable items
-    // removed selectedMount + selectMount from the prior surface.
-    expect(IWORLD_MEMBERS.length).toBe(275);
+    // removed selectedMount + selectMount from the prior surface. The v0.32.0
+    // integration adds activeMasterLootRolls.
+    expect(IWORLD_MEMBERS.length).toBe(276);
     expect(DATA_MEMBERS.length).toBe(72);
-    expect(METHOD_MEMBERS.length).toBe(203);
+    expect(METHOD_MEMBERS.length).toBe(204);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -517,6 +519,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'activeFrostRings',
       'activeLoadout',
       'activeLootRolls',
+      'activeMasterLootRolls',
       'activeMobileStationCraft',
       'activeTemporalHourglasses',
       'activeTitle',
@@ -871,6 +874,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'acceptQuest',
       'accountFlair',
       'activeLootRolls',
+      'activeMasterLootRolls',
       'answerSceneChoice',
       'applyEnchant',
       'applyTalents',
@@ -1185,6 +1189,7 @@ const FACET_LOOT = [
   'submitLootRoll',
   'activeLootRolls',
   'lootRollGroupStatus',
+  'activeMasterLootRolls',
 ] as const satisfies readonly (keyof IWorldLoot)[];
 type _ExhaustLoot = AssertNever<Exclude<keyof IWorldLoot, (typeof FACET_LOOT)[number]>>;
 
@@ -1612,8 +1617,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(275);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(275);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(276);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(276);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

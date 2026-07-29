@@ -7,8 +7,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_weapon_runed_focus': 'Okouzlení zbraně - Runová pečeť',
   'hudChrome.professions.ctaRaiseSpecialized':
     'Pokračuj ve zvyšování {craft}: do specializace zbývá {points} bodů a náklady na materiál klesnou.',
-  'guide.professions.harvestBody':
-    'Sklizeň se nezastaví u nalezišť. Z mnoha poražených bestií lze jednou sklízet každou, kdo první, ten bere, za kůže, kly, hedvábí a maso přímo z těla vedle běžné kořisti; jedno stisknutí otevře oboje. Volba je pokaždé i tvoje: strip vše, co tělo nabízí, nebo se soustřeď na méně složek a vezmi prokazatelně lepší jakost toho, co bereš.\n\nVzácný nebo lepší hod na sklizeň z rodiny nesoucí exempláře také přinese podepsaný dokonalý exemplář (Prvotřídní kůži, Prvotřídní hedvábí, Prvotřídní jedový vak nebo Prvotřídní kus) navíc k běžnému výnosu a do Knihy skutků zapíše Dokonalý exemplář. Sklízet může každá postava bez jakéhokoli výcviku a jakýkoli sběratelský nástroj, který vlastníš, se počítá k prémiové složce, bez ohledu na to, ke které profesi patří.',
+  'guide.professions.harvestBodyChoice':
+    'Sklizeň se nezastaví u nalezišť. Z mnoha poražených bestií lze jednou sklízet každou, kdo první, ten bere, za kůže, kly, hedvábí a maso přímo z těla vedle běžné kořisti; jedno stisknutí otevře oboje. Pokud bestie nese více než jednu zpracovatelnou složku, volba je na tobě: vezmi si vše, co může dát, nebo se soustřeď na méně složek a vezmi prokazatelně lepší jakost toho, co bereš.\n\nVzácný nebo lepší hod na sklizeň z rodiny nesoucí exempláře také přinese podepsaný dokonalý exemplář (Prvotřídní kůži, Prvotřídní hedvábí, Prvotřídní jedový vak nebo Prvotřídní kus) navíc k běžnému výnosu a do Knihy skutků zapíše Dokonalý exemplář. Sklízet může každá postava bez jakéhokoli výcviku a jakýkoli sběratelský nástroj, který vlastníš, se počítá k prémiové složce, bez ohledu na to, ke které profesi patří.',
   'guide.professions.craftMasteryTitle': 'Jak dlouho trvá mistrovství',
   'guide.professions.craftMasteryBody':
     'Upřímná očekávání: cesta na strop řemesla 125 vyžaduje alespoň 125 úspěšných výrob, protože každá výroba s plným ziskem posune dovednost přesně o jeden bod, a v praxi o něco více, jak recepty blednou mezi příčely trenéra. Samotná výroba je rychlá; zásobovat ji je ta skutečná cesta, takže si na každé řemeslo vyhraď několik soustředěných večerů věnovaných sběru a výrobě.\n\nSběratelské profese dosáhnou svého stropu 100 v průběhu normálního levelování, pokud sklízíš za pochodu, třebaže poslední úsek chce uzly vyšší úrovně dalekého severu. Rybaření je záměrně dlouhá cesta: dle svého vlastního plánu zisků je 200 mistrů rybolovu více než tři tisíce záběrů. Mistr rybář je titul vydobytý za sezónu klidných večerů, ne za víkend.',
@@ -4102,6 +4102,10 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.nothingSelectedYields':
     'Z této mrtvoly nelze sklidit nic z vybraných komponent.',
   'hudChrome.corpseHarvest.componentAria': 'Sklidit {component}',
+  'hudChrome.corpseHarvest.componentNoYield': 'zatím nic',
+  'hudChrome.corpseHarvest.componentAriaNoYield': 'Sklidit {component}: {note}',
+  'hudChrome.corpseHarvest.yieldTierHint':
+    'Čím méně komponent sklizeň skutečně odebere, tím vyšší úroveň sklizně má každá z nich.',
   'hudChrome.corpseHarvest.components.claw': 'Dráp',
   'hudChrome.corpseHarvest.components.fang': 'Tesák',
   'hudChrome.corpseHarvest.components.gills': 'Žábry',
@@ -4110,7 +4114,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.silk': 'Hedvábí',
   'hudChrome.corpseHarvest.components.tusk': 'Kly',
   'hudChrome.corpseHarvest.components.venomSac': 'Jedový váček',
-  'hudChrome.corpseHarvest.concentrateHint': 'Méně vybraných komponent dá každé vyšší stupeň.',
   'hudChrome.corpseHarvest.harvestButton': 'Sklidit',
   'hudChrome.corpseHarvest.harvestTooltip':
     'Sbírá zaškrtnuté součásti. Každou mrtvolu lze sklidit pouze jednou, kdo dřív přijde. Nepobírá kořist.',
@@ -5551,7 +5554,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.vaels_mist_staff.name': 'Vaelova mlžná hůl',
   'entities.items.vale_carving_knife.name': 'Řezbářský nůž z údolí',
   'entities.items.valeborn_spellblade.name': 'Kouzelná čepel zrozená v údolí',
-  'entities.items.valespun_robe.name': 'Údolně tkané roucho',
+  'entities.items.valespun_robe.name': 'Údolně předené roucho',
   'entities.items.vanguard_azure_armor_plate.name': 'Předvojová azurová',
   'entities.items.vanguard_chrome_armor_plate.name': 'Předvojová chromová',
   'entities.items.varric_shadow_cowl.name': 'Varricova stínová kápě',
@@ -9195,6 +9198,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.tier.greater': 'Velké okouzlení',
   'hudChrome.enchanting.tier.runed': 'Runové okouzlení',
   'hudChrome.enchanting.wornTag': 'Vybaveno ({slot})',
+  'hudChrome.enchanting.wornTagIndexed': 'Vybaveno ({slot} {index})',
   'hudChrome.enchanting.yieldHeader': 'Očekávané materiály:',
   'hudChrome.enchanting.yieldLineExact': '{count} {item}',
   'hudChrome.enchanting.yieldLineRange': '{min} až {max} {item}',

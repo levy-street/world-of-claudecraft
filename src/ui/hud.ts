@@ -79,7 +79,6 @@ import type {
   HonorReason,
   InvSlot,
   ItemInstancePayload,
-  ItemSlot,
   MailResultCode,
   MotdResultCode,
   PetMode,
@@ -130,6 +129,7 @@ import {
   abilitySecondaryEffect,
   abilityTemporalHourglassValues,
 } from './ability_damage';
+import { abilityDisplayName, abilityDisplayNameFromSource } from './ability_display_name';
 import { ArenaWindow } from './arena_window';
 import { auraDisplayNameFromSource } from './aura_display_name';
 import { type AuraEffectInput, auraEffectDescriptor } from './aura_effect';
@@ -390,6 +390,7 @@ import {
   itemStatName,
 } from './item_instance_tooltip';
 import { itemSetMemberCounts, itemSetTooltipModel } from './item_set_tooltip_view';
+import { itemSlotLabel as itemSlotName } from './item_slot_labels';
 import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
 import { isCombatFlavorLog } from './log_event_route';
@@ -495,7 +496,7 @@ import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view'
 import { restView } from './rest_indicator';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
-import { localizeSimAuraName, localizeSimText } from './sim_i18n';
+import { localizeSimText } from './sim_i18n';
 import { SocialWindow } from './social_window';
 import { SpellbookWindow } from './spellbook_window';
 import { stanceBarView, WARRIOR_STANCE_GROUP } from './stance_bar_view';
@@ -529,6 +530,7 @@ import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap, CLICK_SUPPRESS_MS, TAP_SLOP_PX } from './touch_tap';
 import { buildTownFocusView, stepTownFocus, townFocusRenderSig } from './town_focus_view';
 import { renderTownFocusWindow } from './town_focus_window';
+import { tradeOfferCeiling } from './trade_view';
 import { TutorialOverlay } from './tutorial';
 import { svgIcon } from './ui_icons';
 import { getUiScale } from './ui_scale';
@@ -871,23 +873,6 @@ const PET_MODE_DESC_KEYS: Record<PetMode, TranslationKey> = {
   aggressive: 'hud.pet.aggressiveDesc',
 };
 type ItemQuality = NonNullable<ItemDef['quality']>;
-const ITEM_SLOT_LABEL_KEYS: Record<ItemSlot, TranslationKey> = {
-  mainhand: 'itemUi.slots.mainhand',
-  offhand: 'itemUi.slots.offhand',
-  helmet: 'itemUi.slots.helmet',
-  neck: 'itemUi.slots.neck',
-  shoulder: 'itemUi.slots.shoulder',
-  chest: 'itemUi.slots.chest',
-  waist: 'itemUi.slots.waist',
-  legs: 'itemUi.slots.legs',
-  gloves: 'itemUi.slots.gloves',
-  feet: 'itemUi.slots.feet',
-  // The three ring forms share one player-facing label ("Finger"): items
-  // declare 'ring', the paperdoll cells are the concrete ring1/ring2 keys.
-  ring: 'itemUi.slots.ring',
-  ring1: 'itemUi.slots.ring',
-  ring2: 'itemUi.slots.ring',
-};
 const ITEM_QUALITY_LABEL_KEYS: Record<ItemQuality, TranslationKey> = {
   poor: 'itemUi.quality.poor',
   common: 'itemUi.quality.common',
@@ -1602,7 +1587,9 @@ export class Hud {
     private readonly features: HudFeatures = { dailyRewardsEnabled: true },
   ) {
     this.localIgnoredNames = this.loadLocalIgnoredNames();
-    this.meters = new Meters(sim);
+    this.meters = new Meters(sim, {
+      attachTooltip: (element, html) => this.attachTooltip(element, html),
+    });
     this.actionBarController = new ActionBarController({
       storage: localStorage,
       playerClass: this.sim.cfg.playerClass,
@@ -2949,6 +2936,16 @@ export class Hud {
         break;
       case 'delve-board':
         this.closeDelveBoard();
+        break;
+      case 'lockpick-panel':
+        // Withdraw from a live lock, else dismiss the ante selector. The reachability
+        // story and why this is not a bare hide live on LockpickController.requestClose
+        // (#2517); do not restate them here, the two copies drifted once already.
+        // The hide is this arm's own, the trade-window precedent above: the withdrawal
+        // does not close the panel, so nothing else would retire a tooltip left standing
+        // over another surface until the server answers.
+        this.lockpickController.requestClose();
+        this.hideTooltip();
         break;
       case 'loot-settings-window':
         this.closeLootSettings();
@@ -4378,13 +4375,13 @@ export class Hud {
         playerSpellHasteFrac(this.sim.player),
       ),
     abilityTooltip: (known) => this.abilityTooltip(known),
-    barAbilityIds: () =>
-      this.hotbarActions.flatMap((a) => (a && a.type === 'ability' ? [a.id] : [])),
-    // Index 0 = barSlot 1 (hotbarActions' own index = barSlot-1 convention), used
-    // to derive each row's mobile action-ring page (Phase 4). Non-ability slots
-    // (empty or an item) map to null, never mistaken for an ability id.
-    abilityIdByBarSlot: () =>
-      this.hotbarActions.map((a) => (a && a.type === 'ability' ? a.id : null)),
+    // The bar's LIVE slot array (index 0 = barSlot 1, hotbarActions' own index =
+    // barSlot-1 convention), handed over as-is. It used to be two DERIVED id lists
+    // (a flatMap for the on-bar ids, a map for the per-slot ids the mobile action-
+    // ring page label reads), and the spellbook's per-frame refresh called the
+    // first one every frame the window was open, allocating 34 arrays each time.
+    // The window derives both views itself now, at render time (#2519).
+    barActions: () => this.hotbarActions,
     hasFreeSlot: () => this.actionBarController.hasFreeSlot(),
     attackOnBar: () => this.attackSlotIsAttack(),
     // Routes through the Interface showAttackButton setting, the same state the
@@ -5274,9 +5271,16 @@ export class Hud {
       title: t('hudChrome.wocStore.armoryTitle'),
       cta: t('hudChrome.wocStore.title'),
     });
+    // The mount-race strip and controls gate on race id / phase / countdown
+    // number, none of which move with the locale (tests/language_fanout_registry).
+    this.mountRaceStrip.relocalize();
+    this.mountRaceControls.relocalize();
     this.refreshKeybindLabels();
     this.updateQuestTracker();
-    this.updateDelveTracker();
+    // NOT updateDelveTracker(): the tracker's own signature is ids + numbers, so
+    // a plain update() early-returns here and re-emits nothing. relocalize()
+    // clears it for exactly one rebuild (#2529).
+    this.delveTracker.relocalize();
     // The keyed-pool party rows reuse their DOM, so a rebuild never re-runs t() on
     // their badge tooltips / leave label; re-localize them in place on a switch.
     this.partyFramesPainter.relocalize();
@@ -5330,6 +5334,20 @@ export class Hud {
     this.vcupCharge.relocalize();
     this.questDialog.relocalize();
     this.sceneController.relocalize();
+    // Same text-independent-sig contract, one surface at a time (#2529). Every
+    // one of these was rebuilding only when its own data moved, so an open one
+    // kept the previous locale until the player happened to change something.
+    // Each relocalize() is self-gated on its own window being open.
+    this.calendarWindow.relocalize();
+    this.mailboxWindow.relocalize();
+    this.socialWindow.relocalize();
+    this.cardDuelWindow.relocalize();
+    this.spellbookWindow.relocalize();
+    this.lockpickController.relocalize();
+    this.tutorial.relocalize(this.sim, this.keybinds);
+    // The ring latches its page indicator on the page/count pair; dropping the
+    // latch relabels it on the next paint (mobile layouts only build the ring).
+    this.mobileActionRingPainter?.relocalize();
   }
 
   // Prefers the live resolved entry when the player already knows it (rank +
@@ -8259,9 +8277,10 @@ export class Hud {
 
   private endLockpick(
     outcome: 'success' | 'fail' | 'abandoned',
-    tier?: 'premium' | 'medium' | 'low',
+    tier: 'premium' | 'medium' | 'low' | undefined,
+    sessionId: string,
   ): void {
-    this.lockpickController.end(outcome, tier);
+    this.lockpickController.end(outcome, tier, sessionId);
   }
 
   private openDelveLoot(chestId: number, items: { itemId: string; count: number }[]): void {
@@ -10652,6 +10671,15 @@ export class Hud {
           );
           break;
         case 'resurrectionOffer':
+          // An offer completing against a player who is no longer dead (they
+          // released, respawned, or accepted another healer's rez while this
+          // cast was in flight, all ordinary in online group play) is
+          // unanswerable: the sim keeps offers only for dead players. Showing
+          // it anyway painted the centred prompt for exactly one frame before
+          // the per-frame `!p.dead` closer below removed it, a split-second
+          // dark-panel flash. The guard reads the same mirror the closer does,
+          // so the two can never disagree.
+          if (!sim.player.dead) break;
           // Same "someone is asking you to respond to a prompt" vocabulary as
           // party/guild invite; questAccept() was retired, see invitePrompt().
           audio.invitePrompt();
@@ -11109,7 +11137,7 @@ export class Hud {
           break;
         }
         case 'lockpickEnd':
-          this.endLockpick(ev.outcome, ev.lootTier);
+          this.endLockpick(ev.outcome, ev.lootTier, ev.sessionId);
           if (ev.outcome === 'success') sfx.playUi('lockpick_end');
           break;
         case 'lockpickBonus': {
@@ -12637,6 +12665,18 @@ export class Hud {
    *  the in-town flag, the budget and a row per component). */
   private lastTownFocusSig = '';
 
+  // Standalone trapping window (#2525): the train / unbind shape, one
+  // windowFocus bridge plus one opener field. The panel was outside the shared
+  // focus system entirely: absent from every windowFocus(rootSel) call site and
+  // not one of the two documented opt-outs (#bags and #bank-window, which pair
+  // with a second window and must stay Tab-passable), so it had no Tab trap and
+  // no return-to-opener. It is not the last one out (vendor, crafting, trade,
+  // map and report still are); it is the one that became REACHABLE, because
+  // #2500 stopped the panel rebuilding itself twice a second and focus started
+  // surviving long enough for the missing hand-back to matter.
+  private readonly townFocusWindowFocus = this.windowFocus('#town-focus-window');
+  private townFocusOpenerFocus: HTMLElement | null = null;
+
   private isInTown(): boolean {
     const pos = this.sim.player.pos;
     return isInTownZone(pos, zoneAt(pos.x, pos.z));
@@ -12651,6 +12691,16 @@ export class Hud {
     this.closeOtherWindows('#town-focus-window');
     this.townFocusDraft = { ...this.sim.townFocus };
     this.renderTownFocus();
+    // AFTER the first paint, the train / unbind ordering: captureFocus records
+    // the opener (the minimap button) and installs the trap over a root that is
+    // by then populated and displayed. The one case where AFTER would be worse
+    // than BEFORE is unreachable: if the paint could leave focus INSIDE the
+    // panel, captureFocus would record an in-window opener and the bridge's
+    // in-window arm would then decline to release the trap on close. It cannot,
+    // because the root is display:none until this paint, so a browser has
+    // already blurred its stale children to <body>, and activeFocusable()
+    // rejects <body>.
+    this.townFocusOpenerFocus = this.townFocusWindowFocus.captureFocus();
   }
 
   private renderTownFocus(): void {
@@ -12701,10 +12751,39 @@ export class Hud {
     this.renderTownFocus();
   }
 
+  /** The ONE close path: the X and Save go through onClose/onSave, Escape and
+   *  the gamepad go through closeAll -> closeManagedWindow's `town-focus-window`
+   *  case, and the toggle re-press comes straight here. So releasing the trap and
+   *  handing focus back once, here, covers every one of them.
+   *
+   *  Deliberately NOT guarded on `townFocusOpen` the way closeTrain/closeUnbind
+   *  guard on their npc id: those hold open state in a field, this panel reads
+   *  it off the DOM, every caller is already guarded, and a redundant call is a
+   *  no-op (the opener is nulled below, and releasing a released trap does
+   *  nothing). A guard would also make the "a later close cannot re-steal focus"
+   *  test pass for the wrong reason.
+   *
+   *  KNOWN EDGE, NOT fixed here, and the obvious local fix is a trap. The panel
+   *  is deliberately readable out of town while the slow band hides
+   *  #mm-town-focus out of town, so a player can open it in town, walk out, and
+   *  close with the opener no longer rendered. FocusManager then refuses the
+   *  hand-back (no client rects: moving focus somewhere invisible is a WCAG
+   *  2.4.11 failure), focus is left standing, and the browser drops it to <body>
+   *  with the panel. That is the pre-#2525 outcome, never worse, and the trap is
+   *  released either way.
+   *  Do NOT "fix" it by keeping the button visible while townFocusOpen: the
+   *  hand-back lands, then the next slow tick (<=500ms later) hides the button
+   *  again now that the panel is closed, and focus drops anyway. A flicker
+   *  instead of a loss. The real fix is a fallback destination, which
+   *  makeWindowFocus passes for NO window (closeTrain / closeUnbind hand back to
+   *  a gossip button that is already gone), so it belongs to the bridge and the
+   *  whole family, not to this one caller. */
   closeTownFocus(): void {
     $('#town-focus-window').style.display = 'none';
     this.townFocusDraft = null;
     this.hideTooltip();
+    this.townFocusWindowFocus.restoreFocus(this.townFocusOpenerFocus);
+    this.townFocusOpenerFocus = null;
   }
 
   get townFocusOpen(): boolean {
@@ -14880,7 +14959,7 @@ export class Hud {
   addItemToTrade(itemId: string): void {
     if (!this.tradeOpen || this.stagedTrade.items.length >= 6) return;
     const existing = this.stagedTrade.items.find((s) => s.itemId === itemId);
-    const have = this.sim.inventory.find((s) => s.itemId === itemId)?.count ?? 0;
+    const have = tradeOfferCeiling(this.sim.inventory, itemId);
     if (existing) {
       if (existing.count < have) existing.count++;
     } else {
@@ -15147,10 +15226,6 @@ function describeAbilitySummary(
   return parts.join(' · ');
 }
 
-function abilityDisplayName(def: AbilityDef): string {
-  return tEntity({ kind: 'ability', id: def.id, field: 'name' });
-}
-
 // Fills every description placeholder from the RESOLVED ability: {damage} ($d)
 // the primary hit, {overTime} ($o) a hybrid's dot/hot total, {buff} ($b) the
 // first buff's value, {duration} ($t) the first timed effect's duration. All are
@@ -15273,14 +15348,6 @@ function delveDisplayName(delveId: string): string {
   return tEntity({ kind: 'delve', id: delveId, field: 'name' });
 }
 
-function abilityDisplayNameFromSource(name: string): string {
-  const ability = Object.values(ABILITIES).find((candidate) => candidate.name === name);
-  if (ability) return abilityDisplayName(ability);
-  // Boss/mob mechanic names (War Stomp, etc.) surface as a damage-log ability label but
-  // are not in ABILITIES; route them through the shared sim aura/mechanic localizer.
-  return localizeSimAuraName(name) ?? name;
-}
-
 function combatAbilityName(name: string | null): string {
   return name ? abilityDisplayNameFromSource(name) : t('hud.combat.attack');
 }
@@ -15289,9 +15356,9 @@ function resourceDisplayName(resourceType: ResourceType | null): string {
   return t(RESOURCE_LABEL_KEYS[resourceType ?? 'mana']);
 }
 
-function itemSlotName(slot: ItemSlot): string {
-  return t(ITEM_SLOT_LABEL_KEYS[slot]);
-}
+// itemSlotName moved to ./item_slot_labels as itemSlotLabel (imported above under
+// its old name here), so the pure view cores can read the same shared-label facts
+// the HUD does (#2466).
 
 function itemQualityLabel(quality: ItemDef['quality']): string {
   return t(ITEM_QUALITY_LABEL_KEYS[quality ?? 'common']);
@@ -15446,6 +15513,14 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
   if (!secondary) return '';
   switch (secondary.type) {
     case 'dot':
+      if (secondary.perCombo !== undefined) {
+        return (
+          t('abilityUi.tooltip.finisherDamage', {
+            base: formatAbilityNumber(secondary.total),
+            perCombo: formatAbilityNumber(secondary.perCombo),
+          }) + suffix(secondary)
+        );
+      }
       return formatAbilityNumber(secondary.total) + suffix(secondary);
     case 'hot':
       return formatAbilityNumber(secondary.total) + suffix(secondary);
@@ -15467,6 +15542,14 @@ function abilityOverTimeText(res: ResolvedAbility, scaling?: AbilityScaling): st
   const b = scaling ? abilityDamageBonus(res, eff, scaling) : 0;
   const bonus =
     b > 0 ? ` ${t('hudChrome.abilityScaling.bonus', { value: formatAbilityNumber(b) })}` : '';
+  if (eff.type === 'dot' && eff.perCombo !== undefined) {
+    return (
+      t('abilityUi.tooltip.finisherDamage', {
+        base: formatAbilityNumber(eff.total),
+        perCombo: formatAbilityNumber(eff.perCombo),
+      }) + bonus
+    );
+  }
   return formatAbilityNumber(eff.total) + bonus;
 }
 

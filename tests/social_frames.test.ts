@@ -436,4 +436,33 @@ describe('socialpos carries the live active title (Book of Deeds)', () => {
     // the key is always present so a clear propagates as an explicit null
     expect(row2.title).toBeNull();
   });
+
+  it('drops a tracked id from the periodic position push once either side has blocked the other', () => {
+    // A stale friend/guild edge (never cleaned by blockAdd on the OTHER side) can
+    // leave a tracked id in session.socialTrackedIds long after a block; the
+    // per-tick position push must still refuse to leak live x/z across it, the
+    // same way /who already refuses to list a mutually-blocked pair.
+    const server = new GameServer();
+    const watcherFc = fakeWs();
+    const watcher = joinServer(server, watcherFc, 1, 'Watcher');
+    const trackedFc = fakeWs();
+    const tracked = joinServer(server, trackedFc, 2, 'Tracked');
+    watcher.socialTrackedIds = [tracked.characterId];
+
+    // Direction 1: the tracked player blocked the watcher.
+    tracked.blockedIds = new Set([watcher.characterId]);
+    (server as any).broadcastSocialPositions();
+    expect(lastSocialPos(watcherFc.sent)).toBeNull();
+
+    // Direction 2: the watcher blocked the tracked player instead.
+    tracked.blockedIds = new Set();
+    watcher.blockedIds = new Set([tracked.characterId]);
+    (server as any).broadcastSocialPositions();
+    expect(lastSocialPos(watcherFc.sent)).toBeNull();
+
+    // Sanity: with no block either way, the position push goes through.
+    watcher.blockedIds = new Set();
+    (server as any).broadcastSocialPositions();
+    expect(lastSocialPos(watcherFc.sent)).not.toBeNull();
+  });
 });

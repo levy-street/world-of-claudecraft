@@ -70,11 +70,17 @@ describe('ChatFilter', () => {
     expect(apiPost).toHaveBeenCalledWith('/admin/api/chat-filter/words/1/delete', {});
   });
 
-  it('resets strikes for a moderated account', async () => {
+  it('asks for a reason before resetting strikes for a moderated account', async () => {
     render(ChatFilter);
     await screen.findByText('troll');
     await fireEvent.click(screen.getByText(t('chatMod.resetStrikes')));
-    expect(apiPost).toHaveBeenCalledWith('/admin/api/moderation/accounts/9/reset-strikes', {});
+    const reason = screen.getByPlaceholderText(t('detail.notePlaceholder'));
+    await fireEvent.input(reason, { target: { value: 'appeal accepted' } });
+    await fireEvent.click(screen.getByText(t('dialog.confirm')));
+
+    expect(apiPost).toHaveBeenCalledWith('/admin/api/moderation/accounts/9/reset-strikes', {
+      reason: 'appeal accepted',
+    });
   });
 
   it('asks for a reason before lifting a chat mute', async () => {

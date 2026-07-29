@@ -555,4 +555,58 @@ describe('Hud.buildMobileActionRing wiring (source scan)', () => {
       "(iconKey) => (iconKey === ATTACK_ICON_KEY ? '' : this.actionBarIconBg(iconKey)),",
     );
   });
+
+  // #2529: the page/count latch is two integers, so a language switch alone
+  // cannot move it and the elision above would hold the previous locale's
+  // "Page X of Y" and toggle name for as long as the player stayed on the page.
+  it('re-issues the elided indicator writes in the new locale after relocalize()', () => {
+    const { calls, writers } = recordingFacet();
+    const els = [0, 1, 2, 3, 4, 5].map((i) => slotElements(`ring${i}`));
+    const indicator = { tag: 'indicator' } as unknown as HTMLElement;
+    const toggle = { tag: 'toggle' } as unknown as HTMLElement;
+    let locale = 'en';
+    const painter = new MobileActionRingPainter(
+      writers,
+      {
+        bar: { container: { tag: 'c' } as unknown as HTMLElement, slots: els },
+        pageToggle: toggle,
+        pageIndicator: indicator,
+      },
+      (key) => `URL(${key})`,
+      (key, values) => `${locale}:${key}${values ? `|${JSON.stringify(values)}` : ''}`,
+    );
+    const pageBox = { page: 0 };
+    const view = createActionBarView({ slots: ringDescriptor(pageBox, new Map()) }, fakeDeps());
+    const indicatorWrites = (): unknown[] =>
+      calls.filter((c) => c.m === 'setText' && c.args[0] === indicator).map((c) => c.args[1]);
+    const toggleWrites = (): unknown[] =>
+      calls.filter((c) => c.m === 'setAttr' && c.args[0] === toggle).map((c) => c.args[2]);
+
+    painter.paint(view.tick(idleWorld()), 0, 2);
+    expect(indicatorWrites()).toEqual([
+      'en:hudChrome.mobile.actionPageIndicator|{"page":1,"count":2}',
+    ]);
+    expect(toggleWrites()).toEqual(['en:hudChrome.mobile.actionPageToggle']);
+
+    // The switch itself moves nothing the latch can see: this paint must elide.
+    locale = 'es';
+    painter.paint(view.tick(idleWorld()), 0, 2);
+    expect(indicatorWrites(), 'the unchanged-page paint stopped eliding').toHaveLength(1);
+
+    painter.relocalize();
+    painter.paint(view.tick(idleWorld()), 0, 2);
+    expect(indicatorWrites()).toEqual([
+      'en:hudChrome.mobile.actionPageIndicator|{"page":1,"count":2}',
+      'es:hudChrome.mobile.actionPageIndicator|{"page":1,"count":2}',
+    ]);
+    expect(toggleWrites()).toEqual([
+      'en:hudChrome.mobile.actionPageToggle',
+      'es:hudChrome.mobile.actionPageToggle',
+    ]);
+
+    // The latch is retaken by that paint, so the ring goes straight back to
+    // eliding rather than rewriting both nodes on every subsequent frame.
+    painter.paint(view.tick(idleWorld()), 0, 2);
+    expect(indicatorWrites(), 'relocalize() left the page latch cleared').toHaveLength(2);
+  });
 });

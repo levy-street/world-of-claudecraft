@@ -54,6 +54,7 @@ import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/per
 import { populateCommunityRiftPortals } from '../src/sim/rift/portals';
 import type { PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
+import { RAID_MAX } from '../src/sim/social/party';
 import type { VcMatch } from '../src/sim/social/vale_cup';
 import {
   parseTalentAllocation,
@@ -1932,6 +1933,13 @@ export class GameServer {
         const s = this.sessionByCharacterId(recipientId);
         return s ? s.blockedIds.has(senderCharacterId) : false;
       },
+      // Offline characters have nothing loaded and no live presence to leak,
+      // so they report loaded (true); an online session reports its own
+      // blockListLoaded flag, set once initSocial's DB read resolves.
+      blockListLoaded: (characterId) => {
+        const s = this.sessionByCharacterId(characterId);
+        return s ? s.blockListLoaded : true;
+      },
       onIgnoresChanged: (id, ids) => {
         const s = this.sessionByCharacterId(id);
         if (s) s.ignoredIds = new Set(ids);
@@ -1986,6 +1994,12 @@ export class GameServer {
       for (const id of ids) {
         const other = this.sessionByCharacterId(id);
         if (!other) continue; // offline — snapshots own the online/offline flip
+        // A friend/guild edge on the OTHER side survives a block (blockAdd only
+        // cleans the blocker's own outgoing friend edge, never guild
+        // membership), so this tracked id can stay in socialTrackedIds long
+        // after a block either way. Refuse to leak live position across it,
+        // the same bidirectional rule canShowInWho already applies to /who.
+        if (!this.canShowInWho(session, other)) continue;
         const loc = this.presenceOf(other);
         if (loc.x === undefined || loc.z === undefined) continue;
         // The live Book of Deeds title (sim meta, no DB read); the `social`
@@ -4823,6 +4837,17 @@ export class GameServer {
           typeof msg.rollId === 'number' &&
           Array.isArray(msg.pids) &&
           msg.pids.length > 0 &&
+          // A curate-phase roll's candidates are the tapping group's loot-eligible
+          // members, so a full raid roster is the most an honest client can check
+          // (#2524). Over cap the frame is rejected outright, the way the other
+          // capped cases here reject theirs, rather than truncated to a selection
+          // the master looter never made. Tested BEFORE the element scan so the
+          // per-element work is bounded too; the Sim re-validates every pid.
+          // Never tighten this below the honest ceiling: the reject path is
+          // silent, so a cap a real roster can exceed would not fail visibly, it
+          // would livelock the looter against the #2526 regrace (the row clears,
+          // returns after the grace, and re-sending is dropped again).
+          msg.pids.length <= RAID_MAX &&
           msg.pids.every((p: unknown) => typeof p === 'number')
         )
           sim.assignMasterLoot(msg.rollId, msg.pids, pid);
@@ -6196,6 +6221,14 @@ export class GameServer {
     // so every party member's roll frame shows the live vote strip and stays up
     // after they answer. Per-tick for the same reason as lroll.
     maybe('lrollg', this.sim.lootRollGroupStatus(anchorSession.pid));
+    // curate-phase master-loot assignments this player is the MASTER LOOTER of,
+    // so a refused assignment (the sim leaves the roll open) or a missed
+    // masterLoot event can restore the prompt inside the 300s window instead of
+    // stranding the looter (#2526). Empty for every non-looter, so after the first
+    // snapshot of a session (which carries `"mloot":[]`, as every registered key
+    // does while lastSent is empty) the key delta-elides away for them. Per-tick
+    // like lroll, and like lroll it costs one pendingLootRolls scan per session.
+    maybe('mloot', this.sim.activeMasterLootRolls(anchorSession.pid));
     maybe('drun', this.sim.delveRunWire(anchorSession.pid));
     maybe('dcompanion', this.sim.delveCompanionWire(anchorSession.pid));
     maybe('dmarks', this.sim.delveMarksFor(anchorSession.pid));
@@ -7308,6 +7341,9 @@ export class GameServer {
   }
 
   private canShowInWho(viewer: ClientSession, candidate: ClientSession): boolean {
+    // Fail closed while the candidate's block list is still loading: showing
+    // them in /who before we know their blocks could leak presence to
+    // someone they've blocked.
     if (!candidate.blockListLoaded) return false;
     if (viewer.blockedIds.has(candidate.characterId)) return false;
     if (

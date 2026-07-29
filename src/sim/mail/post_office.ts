@@ -47,6 +47,13 @@ export interface MailMessage {
   recipientKey: string; // stable recipient identity (character id string); market sellerKey convention
   recipientName: string; // display name at send time (rekeyed on rename)
   senderName: string; // display name; player names splice verbatim, letter senders localize by letterId
+  // Stable sender identity (the market sellerKey convention), captured at send
+  // time for player mail only. A rename never changes this, unlike senderName,
+  // so returnToSender re-keys the flight home by THIS field: the sender's
+  // display name can drift after send (a rename between send and expiry), but
+  // their stable id never does. Absent on system/npc mail (never returned) and
+  // on any letter persisted before this field existed.
+  senderKey?: string;
   kind: MailKind;
   letterId?: string; // authored-letter id: the client localizes subject/body/sender through it
   subject: string;
@@ -75,6 +82,7 @@ export interface MailSave {
     recipientKey: string;
     recipientName: string;
     senderName: string;
+    senderKey?: string;
     kind: MailKind;
     letterId?: string;
     subject: string;
@@ -165,17 +173,25 @@ export class PostOffice {
   // Expiry return flight: the unclaimed parcel flies home IN PLACE, deliberately
   // not as a send: MAIL_MAX_PER_RECIPIENT is a send-time gate, so a full sender
   // box still holds the returned letter rather than destroying it. Re-keys the
-  // letter onto the sender's name bucket (the loadMail soulbound-return
-  // precedent; the key folds onto the stable character id via rekeyMailOwner)
-  // and swaps the names so the letter honestly shows who it came back from.
+  // letter onto the sender's STABLE id (senderKey, the market sellerKey
+  // convention), never their display name: a sender who renames between send
+  // and expiry must still be reachable, so a name would silently orphan the
+  // parcel (or hand it to whoever later claims the vacated name). Falls back to
+  // senderName only for a letter persisted before senderKey existed. Also
+  // swaps the names so the letter honestly shows who it came back from, and
+  // carries the OLD recipientKey forward as the new senderKey: recipientKey is
+  // always stable-id by construction (booked that way, or by a prior return),
+  // so a letter that bounces back and forth stays stable-id-keyed on both ends.
   private returnToSender(m: MailMessage, now: number): void {
     // Move the delivered-and-unread contribution out of the old bucket
     // (exactly what the index counts; the rekeyMailOwner shape).
     if (!m.read && now >= m.deliverAt) this.indexDec(m.recipientKey);
-    const home = m.senderName;
+    const homeKey = m.senderKey ?? m.senderName;
+    const homeName = m.senderName;
+    m.senderKey = m.recipientKey;
     m.senderName = m.recipientName;
-    m.recipientKey = home;
-    m.recipientName = home;
+    m.recipientKey = homeKey;
+    m.recipientName = homeName;
     m.returned = true;
     m.read = false;
     // A fresh flight: the normal delivery path lands and announces the return.
@@ -405,6 +421,7 @@ export class PostOffice {
       recipientKey: recipient.key,
       recipientName: recipient.name,
       senderName: meta.name,
+      senderKey: this.mailKeyFor(meta),
       kind: 'player',
       subject: cleanSubject,
       body: cleanBody,
@@ -559,6 +576,7 @@ export class PostOffice {
     recipientKey: string;
     recipientName: string;
     senderName: string;
+    senderKey?: string;
     kind: MailKind;
     letterId?: string;
     subject: string;
@@ -581,6 +599,7 @@ export class PostOffice {
       recipientKey: opts.recipientKey,
       recipientName: opts.recipientName,
       senderName: opts.senderName,
+      senderKey: opts.senderKey,
       kind: opts.kind,
       letterId: opts.letterId,
       subject: opts.subject,
@@ -658,6 +677,7 @@ export class PostOffice {
         recipientKey: m.recipientKey,
         recipientName: m.recipientName,
         senderName: m.senderName,
+        senderKey: m.senderKey,
         kind: m.kind,
         letterId: m.letterId,
         subject: m.subject,
@@ -696,6 +716,7 @@ export class PostOffice {
       const kind: MailKind = m.kind === 'player' || m.kind === 'npc' ? m.kind : 'system';
       const recipientName = String(m.recipientName ?? m.recipientKey);
       const senderName = String(m.senderName ?? '?');
+      const senderKey = typeof m.senderKey === 'string' ? m.senderKey : undefined;
       const subject = String(m.subject ?? '');
       const body = String(m.body ?? '');
       const retainedItems: InvSlot[] = [];
@@ -744,6 +765,7 @@ export class PostOffice {
         recipientKey: m.recipientKey,
         recipientName,
         senderName,
+        senderKey,
         kind,
         letterId: typeof m.letterId === 'string' ? m.letterId : undefined,
         subject,

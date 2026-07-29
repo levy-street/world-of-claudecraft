@@ -7,8 +7,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_weapon_runed_focus': 'Wapen betoveren - Geruned Teken',
   'hudChrome.professions.ctaRaiseSpecialized':
     'Blijf {craft} verhogen: nog {points} punten tot Gespecialiseerd, en materiaalkosten dalen.',
-  'guide.professions.harvestBody':
-    'Verzamelen stopt niet bij bronpunten. Veel gevelde beesten kunnen eenmalig worden geoogst, wie het eerst komt wie het eerst maalt, voor huid, tanden, zijde en vlees, rechtstreeks van het karkas naast de gewone buit; een druk opent beide. De keuze is ook elke keer aan jou: strip alles wat het karkas biedt, of concentreer je op minder componenten en neem een meetbaar betere kwaliteit van wat je wel neemt.\n\nEen zeldzame of betere oogstrol op een specimenfamilie geeft ook een gesigneerd perfect exemplaar (een Ongeschonden Huid, Ongeschonden Zijde, Ongeschonden Gifklier of Stuk Ossenhaas) bovenop de gewone opbrengst, en registreert Een Perfect Exemplaar in je Boek der Daden. Elk personage kan oogsten, geen training vereist, en elk gereedschap dat je bezit telt mee voor de premiumerkenning, tot welk beroep het ook behoort.',
+  'guide.professions.harvestBodyChoice':
+    'Verzamelen stopt niet bij bronpunten. Veel gevelde beesten kunnen eenmalig worden geoogst, wie het eerst komt wie het eerst maalt, voor huid, tanden, zijde en vlees, rechtstreeks van het karkas naast de gewone buit; een druk opent beide. Waar een beest meer dan één bruikbare component draagt, is de keuze aan jou: neem alles wat het te bieden heeft, of concentreer je op minder componenten en neem een meetbaar betere kwaliteit van wat je wel neemt.\n\nEen zeldzame of betere oogstrol op een specimenfamilie geeft ook een gesigneerd perfect exemplaar (een Ongeschonden Huid, Ongeschonden Zijde, Ongeschonden Gifklier of Stuk Ossenhaas) bovenop de gewone opbrengst, en registreert Een Perfect Exemplaar in je Boek der Daden. Elk personage kan oogsten, geen training vereist, en elk gereedschap dat je bezit telt mee voor de premiumerkenning, tot welk beroep het ook behoort.',
   'guide.professions.craftMasteryTitle': 'Hoe lang meesterschap duurt',
   'guide.professions.craftMasteryBody':
     'Eerlijke verwachtingen: de klim naar de grens van 125 in een ambacht vereist minimaal 125 geslaagde vervaardigingen, want elke volledige winst verplaatst je precies een punt, en in de praktijk iets meer naarmate recepten vervagen tussen de treden van de trainer. Het vervaardigen zelf gaat snel; het voeden ervan is de echte reis, dus reken op een paar toegewijde avonden verzamelen en maken per ambacht.\n\nDe verzamelberoepen bereiken hun grens van 100 gedurende een normale levelreis als je oogst tijdens het reizen, al wil het laatste stuk de hogetier-bronnen van het verre noorden. Vissen is de lange weg by design: op grond van zijn eigen winstschema zijn 200 punten meer dan drieduizend vangsten. Meesterhengelaar is een titel die je verdient in een seizoen van stille avonden, niet over een weekend.',
@@ -7659,12 +7659,14 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.title': 'Verzamelen',
   'hudChrome.corpseHarvest.title': 'Oogsten',
   'hudChrome.corpseHarvest.harvestButton': 'Oogsten',
-  'hudChrome.corpseHarvest.concentrateHint':
-    'Hoe minder delen je kiest, hoe hoger de kwaliteit van elk deel.',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Dit kadaver is al geoogst.',
   'hudChrome.corpseHarvest.nothingSelectedYields':
     'Van dit kadaver valt niets uit je selectie te oogsten.',
   'hudChrome.corpseHarvest.componentAria': 'Oogst {component}',
+  'hudChrome.corpseHarvest.componentNoYield': 'nog niets',
+  'hudChrome.corpseHarvest.componentAriaNoYield': 'Oogst {component}: {note}',
+  'hudChrome.corpseHarvest.yieldTierHint':
+    'Hoe minder delen een oogst daadwerkelijk oplevert, hoe hoger het oogstniveau van elk deel.',
   'hudChrome.corpseHarvest.components.hide': 'Huid',
   'hudChrome.corpseHarvest.components.fang': 'Tand',
   'hudChrome.corpseHarvest.components.silk': 'Zijde',
@@ -9398,6 +9400,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.tier.greater': 'Grotere betoveringen',
   'hudChrome.enchanting.tier.runed': 'Gerunede betoveringen',
   'hudChrome.enchanting.wornTag': 'Gedragen ({slot})',
+  'hudChrome.enchanting.wornTagIndexed': 'Gedragen ({slot} {index})',
   'hudChrome.enchanting.yieldHeader': 'Verwachte materialen:',
   'hudChrome.enchanting.yieldLineExact': '{count} {item}',
   'hudChrome.enchanting.yieldLineRange': '{min} tot {max} {item}',

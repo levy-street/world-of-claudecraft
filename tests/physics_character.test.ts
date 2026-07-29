@@ -24,6 +24,7 @@ import {
   physicsStats,
   resetPhysicsStats,
 } from '../src/sim/physics';
+import { LEDGE_GRAB_MIN } from '../src/sim/physics/ledge';
 import { GRAVITY, JUMP_VELOCITY } from '../src/sim/player_motion';
 import { Sim } from '../src/sim/sim';
 import type { WorldContent } from '../src/sim/types';
@@ -327,6 +328,49 @@ describe('step up: walking over low obstacles', () => {
     const g = groundHeight(stone.x, stone.z, SEED);
     moveCharacter(params({ grounded: false }), stone.x, g, stone.z - 2, 0, 4, out);
     expect(out.stepped).toBe(0);
+  });
+
+  it('pins the airborne allowance to the grounded stride band', () => {
+    // One number, three consumers: the horizontal gates (blocksAt here,
+    // passesOver in colliders.ts) and the vertical support query in
+    // player_motion.ts all read MANTLE_REACH. Holding it equal to the stride
+    // band means leaving the ground never costs a body a top it could have
+    // strided over, and holding it equal to LEDGE_GRAB_MIN leaves no band
+    // between "vault over it" and "grab it" for a top to be a wall in.
+    expect(MANTLE_REACH).toBe(MAX_STEP_HEIGHT);
+    expect(LEDGE_GRAB_MIN).toBe(MAX_STEP_HEIGHT);
+  });
+
+  it('admits exactly the airborne tops the landing pass can seat', () => {
+    // The pass-over gate and the landing snap must agree on every top. A top
+    // the horizontal solver waves through but floorHeightAt refuses is a top
+    // the body tunnels INTO: it lands on the terrain inside the prop and gets
+    // ejected sideways the next grounded tick. So both arms are asserted, on
+    // both sides of the allowance, at a realistic per-tick displacement.
+    const cz = SPOT.z + 2;
+    setActiveWorldContent(world({ crates: [[SPOT.x, cz]] }));
+    const g = groundHeight(SPOT.x, cz, SEED);
+    const top = g + campCrateShape(SPOT.x, cz, 0).top;
+    // Feet just INSIDE the allowance: crosses, and lands on the crate top.
+    const inBand = top - MANTLE_REACH + 0.02;
+    let px = SPOT.x;
+    let pz = SPOT.z;
+    for (let i = 0; i < 20 && pz < cz; i++) {
+      moveCharacter(params({ grounded: false }), px, inBand, pz, 0, 0.35, out);
+      expect(out.blocked).toBe(false);
+      px = out.x;
+      pz = out.z;
+    }
+    expect(pz).toBeGreaterThanOrEqual(cz);
+    expect(floorHeightAt(SEED, px, pz, R, inBand + MANTLE_REACH)).toBeCloseTo(top, 6);
+    // Feet just OUTSIDE it: still a wall, and the landing pass agrees by
+    // refusing the same top. This is the negative arm the allowance needs:
+    // raising the horizontal gate alone would turn this into a tunnel.
+    const below = top - MANTLE_REACH - 0.05;
+    moveCharacter(params({ grounded: false }), SPOT.x, below, SPOT.z, 0, 4, out);
+    expect(out.blocked).toBe(true);
+    expect(out.z).toBeLessThan(cz);
+    expect(floorHeightAt(SEED, SPOT.x, cz, R, below + MANTLE_REACH)).toBeLessThan(top);
   });
 
   it('never steps onto something taller than the step height', () => {

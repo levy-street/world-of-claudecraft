@@ -190,7 +190,11 @@ function supportFromCandidates(x: number, z: number, r: number, maxY: number): n
  * `MANTLE_REACH` allowance `colliders.ts` grants the legacy sweep): a jump
  * that falls just short of a crate rim still carries over it, and the vertical
  * pass then seats the body on top. Grounded bodies get no lift; they climb
- * only through step-up, which has its own, stricter gate.
+ * only through step-up, which has its own, stricter gate. `MANTLE_REACH` is
+ * pinned to the same height as the grounded stride band (`MAX_STEP_HEIGHT`),
+ * so leaving the ground never costs a body a top it could have strided over,
+ * and the ONE constant keeps this gate and the vertical support query
+ * (`floorHeightAt` in `player_motion.ts`) admitting exactly the same tops.
  *
  * Sloped tops are sampled at the body's own position: a body standing on a
  * canopy's fabric is ON the surface there, and must not be treated as inside

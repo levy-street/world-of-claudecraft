@@ -587,9 +587,9 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     guard: {
       kind: 'module',
       module: 'spellbook_window.ts',
-      proof: 'if (SpellbookWindow.knownSig(this.deps.world().known) !== this.lastKnownSig) {',
+      proof: 'if (this.knownChanged(this.deps.world().known)) {',
     },
-    why: 'the ONLY window on the per-frame band; the sig gates the rebuild, the fall-through hotbar-control refresh runs every frame',
+    why: 'the ONLY window on the per-frame band, and since #2519 BOTH of its halves are gated: the guard proved below (knownChanged, an in-place walk of the resolved-ability numbers, no signature string built per frame) gates the rebuild, and the fall-through hotbar-control refresh takes its own change check (takeControlChange) over the three bar inputs its toggles render, so an unchanged frame makes no lookup, no allocation and no DOM write',
   },
   {
     call: 'this.actionBarPainter.paint',
@@ -1409,7 +1409,10 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         'mount_race_strip.ts: if (view.raceId !== this.lastRaceId || view.phase !== this.lastPhase || second !== this.lastSecond) {',
         'professions_window.ts: if (sig === this.lastSig) return;',
         'social_window.ts: if (struct !== this.lastStruct) {',
-        'spellbook_window.ts: if (SpellbookWindow.knownSig(this.deps.world().known) !== this.lastKnownSig) {',
+        // #2519 replaced the joined signature string this used to build every frame with
+        // an in-place comparison against the retained numbers; same guard, same place, no
+        // per-frame allocation.
+        'spellbook_window.ts: if (this.knownChanged(this.deps.world().known)) {',
         'vale_cup_betting.ts: if (view.sig !== this.lastSig) {',
         'vale_cup_briefing.ts: if (view.sig !== this.lastSig) {',
         'vale_cup_window.ts: if (view.sig === this.lastSig) return;',

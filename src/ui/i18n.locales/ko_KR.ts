@@ -773,12 +773,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootSettings.masterOption': '분배 담당자: {name}',
   'hudChrome.corpseHarvest.title': '채집',
   'hudChrome.corpseHarvest.harvestButton': '채집',
-  'hudChrome.corpseHarvest.concentrateHint': '선택한 부위가 적을수록 부위당 등급이 더 높아집니다.',
   'hudChrome.corpseHarvest.alreadyHarvested': '이 시체는 이미 채집되었습니다.',
   'hudChrome.corpseHarvest.nothingSelectedYields': '선택한 부위는 이 시체에서 채집할 수 없습니다.',
   'hudChrome.corpseHarvest.harvestTooltip':
     '선택한 부위를 채집합니다. 각 시체는 선착순으로 한 번만 채집할 수 있습니다. 전리품은 가져가지 않습니다.',
   'hudChrome.corpseHarvest.componentAria': '{component} 채집',
+  'hudChrome.corpseHarvest.componentNoYield': '아직 없음',
+  'hudChrome.corpseHarvest.componentAriaNoYield': '{component} 채집: {note}',
+  'hudChrome.corpseHarvest.yieldTierHint':
+    '채집에서 실제로 얻는 부위가 적을수록 각 부위의 등급이 더 높아집니다.',
   'hudChrome.corpseHarvest.components.hide': '가죽',
   'hudChrome.corpseHarvest.components.fang': '송곳니',
   'hudChrome.corpseHarvest.components.silk': '비단실',
@@ -5266,6 +5269,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.emotes.wave': '손인사',
   'hudChrome.emoteWheel.edit': '편집',
   'hudChrome.emoteWheel.label': '감정 표현',
+  'hudChrome.meters.breakdownOther': '기타 ({count})',
+  'hudChrome.meters.melee': '근접 공격',
   'hudChrome.meters.minutesSeconds': '{m}분 {s}초',
   'hudChrome.meters.perSecond': '{value}/초',
   'hudChrome.meters.perSecondRow': '{total} ({rate})',
@@ -8010,8 +8015,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.professions.intro':
     '전투와 퀘스트를 넘어, 이 세계는 땅을 일구고 대장간에서 일하는 여러분에게도 보상을 준다. 원재료를 채집하고, 열 가지 제작 전문직에 걸쳐 이를 장비와 물품으로 바꾸며, 그 전문직들이 상징하는 열 가지 원형 중 하나로서 정체성을 다지는 것이다.',
   'guide.professions.harvestTitle': '사냥감 그 자체를 채집하기',
-  'guide.professions.harvestBody':
-    '채집은 노드에서 끝나지 않는다. 쓰러뜨린 짐승 일부는 시체에서 곧바로 부위를 채집할 수 있어, 가죽과 송곳니, 비단실, 그리고 더 낯선 것들이 평범한 전리품과 나란히 나온다. 처치 하나에 채집자는 한 명뿐이다: 먼저 채집한 사람이 전부 가져간다. 그리고 선택은 매번 당신 몫이다: 시체가 내주는 것을 전부 벗겨 내거나, 한 가지 부위에 집중해 더 좋은 등급으로 얻거나. 채집에는 전문직도 훈련도 필요 없어 어떤 캐릭터든 할 수 있으며, 유난히 좋은 부위에는 채집한 사람의 이름까지 새겨진다.',
+  'guide.professions.harvestBodyChoice':
+    '채집은 노드에서 끝나지 않는다. 쓰러뜨린 짐승 상당수는 시체에서 곧바로 한 번씩 채집할 수 있어, 가죽과 송곳니, 비단실, 고기가 평범한 전리품과 나란히 나온다. 시체 하나에 채집자는 선착순 한 명뿐이며, 한 번 누르면 전리품과 채집이 함께 열린다. 짐승이 쓸 만한 부위를 둘 이상 지녔다면 선택은 당신 몫이다. 그 시체가 내줄 수 있는 것을 전부 가져가거나, 더 적은 부위에 집중해 실제로 얻는 것을 눈에 띄게 더 좋은 등급으로 가져가거나.\n\n표본이 나오는 계열에서 희귀 이상 판정이 뜨면 평범한 산출물 위에 서명된 완벽한 표본(Pristine Hide, Pristine Silk, Pristine Venom Gland, Prime Cut)이 하나 더 주어지고, 업적의 서에 A Perfect Specimen이 기록된다. 채집에는 훈련이 필요 없어 어떤 캐릭터든 할 수 있으며, 가지고 있는 채집 도구는 어느 전문직의 것이든 최상급 재료 판정에 반영된다.',
   'guide.professions.focusTitle': '마을 집중',
   'guide.professions.focusBody':
     '모든 거점 마을은 찾아오는 채집자를 위해 마을 집중 게시판을 갖추고 있다. 마을에 선 채 미니맵 옆에서 이를 열고, 관심 있는 부위 종류에 약간의 집중 포인트를 겨누라. 집중한 부위는 이후의 모든 시체에서 한 등급 더 좋게, 조금 더 넉넉하게 나온다. 배분은 캐릭터가 어디를 떠돌든 따라다니며, 이후 마을에 들를 때마다 무료로 다시 짤 수 있다.',
@@ -10663,4 +10668,5 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.lb_willowfen.name': '우는버들 늪',
   'entities.dungeons.lb_willowfen.enterText': '버드나무는 움직이지 않는다. 물도 마찬가지다.',
   'entities.dungeons.lb_willowfen.leaveText': '버드나무를 고요 속에 남겨 두고 떠난다.',
+  'hudChrome.enchanting.wornTagIndexed': '착용 중 ({slot} {index})',
 };

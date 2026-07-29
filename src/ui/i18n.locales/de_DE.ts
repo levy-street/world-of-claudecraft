@@ -18,8 +18,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_weapon_runed_focus': 'Waffe verzaubern - Runenfokus',
   'hudChrome.professions.ctaRaiseSpecialized':
     'Erhöhe weiter {craft}: noch {points} Punkte bis zur Spezialisierung, und Materialkosten sinken.',
-  'guide.professions.harvestBody':
-    'Das Sammeln hört nicht bei Knoten auf. Viele erlegte Tiere können jeweils einmal geerntet werden, nach dem Prinzip Erster kommt, Erster mahlt, für Häute, Fangzähne, Seide und Fleisch, direkt von der Leiche neben der gewöhnlichen Beute; ein Tastendruck öffnet beides. Die Wahl liegt auch jedes Mal bei dir: Streife alles ab, was die Leiche bietet, oder konzentriere dich auf weniger Komponenten und nimm eine messbar feinere Güte dessen mit, was du nimmst.\n\nEin seltener oder besserer Erntewurf bei einer exemplartragenden Familie gewährt zudem ein signiertes makelloses Exemplar (eine Makellose Haut, Makellose Seide, eine Unberührte Giftdrüse oder ein Erstklassiges Filet) zusätzlich zum gewöhnlichen Ertrag und vermerkt Ein makelloses Exemplar in deinem Buch der Taten. Jeder Charakter kann ernten, ohne Ausbildung, und jedes Sammelwerkzeug, das du besitzt, zählt für den Gütegewinn, gleichgültig, zu welchem Beruf es gehört.',
+  'guide.professions.harvestBodyChoice':
+    'Das Sammeln hört nicht bei Knoten auf. Viele erlegte Tiere können jeweils einmal geerntet werden, nach dem Prinzip Erster kommt, Erster mahlt, für Häute, Fangzähne, Seide und Fleisch, direkt von der Leiche neben der gewöhnlichen Beute; ein Tastendruck öffnet beides. Trägt ein Tier mehr als eine verwertbare Komponente, so liegt die Wahl bei dir: Nimm alles mit, was es hergeben kann, oder konzentriere dich auf weniger Komponenten und nimm eine messbar feinere Güte dessen mit, was du nimmst.\n\nEin seltener oder besserer Erntewurf bei einer exemplartragenden Familie gewährt zudem ein signiertes makelloses Exemplar (eine Makellose Haut, Makellose Seide, eine Unberührte Giftdrüse oder ein Erstklassiges Filet) zusätzlich zum gewöhnlichen Ertrag und vermerkt Ein makelloses Exemplar in deinem Buch der Taten. Jeder Charakter kann ernten, ohne Ausbildung, und jedes Sammelwerkzeug, das du besitzt, zählt für den Gütegewinn, gleichgültig, zu welchem Beruf es gehört.',
   'guide.professions.craftMasteryTitle': 'Wie lange Meisterschaft dauert',
   'guide.professions.craftMasteryBody':
     'Ehrliche Erwartungen: Der Aufstieg zur Obergrenze von 125 eines Handwerks umfasst mindestens 125 erfolgreiche Herstellungen, da jede vollwirksame Herstellung genau einen Punkt einbringt, und in der Praxis etwas mehr, da Rezepte zwischen den Lehrmeister-Sprossen verblassen. Das Handwerken selbst geht schnell; es zu versorgen ist die eigentliche Reise, also plane ein paar gewidmete Abende zum Sammeln und Handwerken pro Beruf.\n\nDie Sammelberufe erreichen ihre Obergrenze von 100 auf dem normalen Levelweg, wenn du beim Reisen erntest, wobei die letzte Strecke die höherstufigen Knoten des hohen Nordens verlangt. Angeln ist von Natur aus der lange Weg: Nach seinem eigenen Zuwachsplan erfordert Fertigkeit 200 mehr als dreitausend Fänge. Meisterangler ist ein Titel, den man in einer Saison ruhiger Abende verdient, nicht an einem Wochenende.',
@@ -5708,6 +5708,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.nothingSelectedYields':
     'An diesem Kadaver gibt es nichts aus deiner Auswahl zu verwerten.',
   'hudChrome.corpseHarvest.componentAria': '{component} verwerten',
+  'hudChrome.corpseHarvest.componentNoYield': 'noch nichts',
+  'hudChrome.corpseHarvest.componentAriaNoYield': '{component} verwerten: {note}',
+  'hudChrome.corpseHarvest.yieldTierHint':
+    'Je weniger Teile eine Verwertung tatsächlich entnimmt, desto höher ist die Sammelstufe jedes einzelnen Teils.',
   'hudChrome.corpseHarvest.components.claw': 'Klaue',
   'hudChrome.corpseHarvest.components.fang': 'Fangzahn',
   'hudChrome.corpseHarvest.components.gills': 'Kiemen',
@@ -5716,8 +5720,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.silk': 'Seide',
   'hudChrome.corpseHarvest.components.tusk': 'Stoßzahn',
   'hudChrome.corpseHarvest.components.venomSac': 'Giftsack',
-  'hudChrome.corpseHarvest.concentrateHint':
-    'Je weniger Teile du wählst, desto höher ist die Qualitätsstufe jedes einzelnen Teils.',
   'hudChrome.corpseHarvest.harvestButton': 'Verwerten',
   'hudChrome.corpseHarvest.title': 'Verwerten',
   'hudChrome.emoteEditor.done': 'Fertig',
@@ -9507,6 +9509,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.tier.greater': 'Große Verzauberungen',
   'hudChrome.enchanting.tier.runed': 'Runen-Verzauberungen',
   'hudChrome.enchanting.wornTag': 'Angelegt ({slot})',
+  'hudChrome.enchanting.wornTagIndexed': 'Angelegt ({slot} {index})',
   'hudChrome.enchanting.yieldHeader': 'Erwartete Materialien:',
   'hudChrome.enchanting.yieldLineExact': '{count} {item}',
   'hudChrome.enchanting.yieldLineRange': '{min} bis {max} {item}',

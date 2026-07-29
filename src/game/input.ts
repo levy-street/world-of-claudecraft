@@ -233,6 +233,12 @@ export class Input {
   private touchJumpUntil = 0;
   private keyJumpUntil = 0;
   private touchLookActive = false;
+  // True while the gamepad's right stick is deflected past its deadzone, set
+  // each poll by GamepadManager (mirrors touchLookActive for the touch camera
+  // joystick). Folded into isMouselookActive() so looking around with the
+  // right stick turns the character the same way the touch joystick and
+  // mouselook do, instead of only ever orbiting the free camera.
+  private gamepadLookActive = false;
   private touchLookVector = { x: 0, y: 0 };
   // multiplier on the touch look (camera joystick) rate; setTouchLookSpeed
   // drives it from the settings menu. Mouselook uses lookSensitivity instead.
@@ -629,6 +635,14 @@ export class Input {
     this.noteIntent('look');
   }
 
+  // Set each poll by GamepadManager from stickToLook's `active` flag: true
+  // while the right stick is deflected past its deadzone. See
+  // isMouselookActive, which folds this in the same way touchLookActive is.
+  setGamepadLookActive(active: boolean): void {
+    if (active !== this.gamepadLookActive) this.noteIntent('look');
+    this.gamepadLookActive = active;
+  }
+
   updateTouchLook(dt: number): void {
     if (!this.touchLookActive) return;
     this.camYaw -= this.touchLookVector.x * TOUCH_LOOK_YAW_RATE * this.touchLookSpeed * dt;
@@ -653,8 +667,10 @@ export class Input {
   }
 
   isMouselookActive(): boolean {
-    if (this.mouseCameraEnabled) return this.touchLookActive;
-    return (this.rightDown && this.cameraDragActive) || this.touchLookActive;
+    if (this.mouseCameraEnabled) return this.touchLookActive || this.gamepadLookActive;
+    return (
+      (this.rightDown && this.cameraDragActive) || this.touchLookActive || this.gamepadLookActive
+    );
   }
 
   setControllerMoveInput(input: unknown, facing?: unknown): void {

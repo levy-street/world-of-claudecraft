@@ -989,3 +989,75 @@ describe('masterwork proc (Professions 2.0)', () => {
     expect(sim.lastMasterwork).toBeNull();
   });
 });
+
+// Regression: the #1149 signing rule was gated on `recipe.resultCount === 1`,
+// so a rare-quality output with resultCount > 1 fell through to the plain
+// fungible grant and was never signed at all. Two shipped recipes hit this:
+// recipe_anglers_feast_platter (resultCount 3) and recipe_elixir_of_the_serpent
+// (resultCount 2), both resolving to a rare-def item. Every granted copy of a
+// signable-rarity output must carry the crafter's signature, matching the
+// masterwork/commission precedent that a multi-copy grant arms every copy
+// (they merge into one byte-equal stack since every copy carries the SAME
+// {signer} payload).
+describe('rare-quality signing composes with multi-copy outputs (#1149 regression)', () => {
+  it('signs every copy of a rare-quality resultCount>1 recipe (anglers_feast_platter)', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = (sim as any).players.get(pid);
+    const recipe = recipeById('recipe_anglers_feast_platter');
+    if (!recipe) throw new Error('expected recipe_anglers_feast_platter to exist');
+    expect(recipe.resultCount).toBe(3);
+    meta.knownRecipes.add(recipe.id);
+    placeAtStationFor(sim, pid, recipe.id);
+    grantItem(sim, 'raw_frostgill_trout', 2, pid);
+    grantItem(sim, 'raw_bog_eel', 2, pid);
+    grantItem(sim, 'sunpetal_herb', 1, pid);
+    grantItem(sim, 'cooking_salt', 2, pid);
+
+    const result = resolveCraft((sim as any).ctx, pid, recipe.id);
+
+    expect(result.ok).toBe(true);
+    expect(result.count).toBe(3);
+    expect(result.quality).toBe('rare');
+    const slots = meta.inventory.filter((s: any) => s.itemId === 'anglers_feast_platter');
+    const totalGranted = slots.reduce((sum: number, s: any) => sum + s.count, 0);
+    expect(totalGranted).toBe(3);
+    // All 3 copies carry the SAME {signer} payload, so the single
+    // addItemInstance call must merge them into ONE byte-equal stack. Pinning
+    // the stack count (not just "at least one") is what fails a regression to
+    // a per-copy grant loop, which would fragment the output into 3 slots.
+    expect(slots.length).toBe(1);
+    for (const slot of slots) {
+      expect(slot.instance?.signer).toBe(meta.name);
+    }
+  });
+
+  it('signs every copy of a rare-quality resultCount>1 recipe (elixir_of_the_serpent)', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = (sim as any).players.get(pid);
+    const recipe = recipeById('recipe_elixir_of_the_serpent');
+    if (!recipe) throw new Error('expected recipe_elixir_of_the_serpent to exist');
+    expect(recipe.resultCount).toBe(2);
+    meta.knownRecipes.add(recipe.id);
+    placeAtStationFor(sim, pid, recipe.id);
+    grantItem(sim, 'pristine_venom_gland', 1, pid);
+    grantItem(sim, 'venom_gland', 2, pid);
+    grantItem(sim, 'sunpetal_herb', 1, pid);
+    grantItem(sim, 'glass_vial', 1, pid);
+
+    const result = resolveCraft((sim as any).ctx, pid, recipe.id);
+
+    expect(result.ok).toBe(true);
+    expect(result.count).toBe(2);
+    expect(result.quality).toBe('rare');
+    const slots = meta.inventory.filter((s: any) => s.itemId === 'elixir_of_the_serpent');
+    const totalGranted = slots.reduce((sum: number, s: any) => sum + s.count, 0);
+    expect(totalGranted).toBe(2);
+    // Same single-stack merge pin as the platter case above.
+    expect(slots.length).toBe(1);
+    for (const slot of slots) {
+      expect(slot.instance?.signer).toBe(meta.name);
+    }
+  });
+});

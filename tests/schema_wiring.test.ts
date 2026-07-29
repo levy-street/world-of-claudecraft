@@ -307,6 +307,16 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(sansReconcile).not.toMatch(/ADD COLUMN (?!IF NOT EXISTS)/i);
   });
 
+  it('applies the content-moderation audit schema (map unpublish, asset block/unblock)', async () => {
+    // Regression guard for the same "defined but never wired" failure mode as
+    // DISCORD_SCHEMA above: content_moderation_actions backs the admin
+    // dashboard's map/asset moderation audit trail (server/content_moderation_db.ts).
+    await ensureSchema();
+    const applied = h.calls.join('\n');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS content_moderation_actions');
+    expect(applied).toContain('CREATE INDEX IF NOT EXISTS content_moderation_actions_resource');
+  });
+
   it('applies the tier-2 rate-limit schema under the advisory lock', async () => {
     // The multi-realm tier-2 backstop depends on the rate_limits table being
     // created at boot (RATELIMIT_SCHEMA in server/ratelimit_db.ts). Pin that it is

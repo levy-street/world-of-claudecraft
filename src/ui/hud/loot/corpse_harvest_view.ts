@@ -9,17 +9,47 @@
 // core only builds the row list + the harvest-button label state, it never
 // rolls or picks a tier itself.
 
-import { forfeitsEveryMappedYield, isHarvestableCorpse } from '../../../sim/professions/gathering';
+import {
+  forfeitsEveryMappedYield,
+  harvestConcentrationBonus,
+  harvestFamilyYieldsItem,
+  isHarvestableCorpse,
+} from '../../../sim/professions/gathering';
 
 export interface CorpseHarvestRow {
   readonly tag: string;
   readonly checked: boolean;
+  /**
+   * #2514: does this family have a harvest item behind it? False for the four
+   * carried-but-unmapped families (claw, tusk, gills, horn), whose rows are
+   * still offered (the corpse really does carry them) but can extract nothing.
+   * Checking one is now a no-op rather than a tier's worth of penalty, and the
+   * painter marks the row so the box is not a silent one.
+   */
+  readonly yieldsItem: boolean;
 }
 
 export interface CorpseHarvestViewModel {
   readonly rows: CorpseHarvestRow[];
   readonly harvestDisabled: boolean;
-  readonly concentrated: boolean; // true when the current selection is a strict subset of all tags
+  /**
+   * True when THIS selection concentrates: it earns a higher tier than the
+   * widest pick available on this corpse would. Measured against that widest
+   * pick (the sim's bonus for an empty selection), not against zero, because
+   * after #2514 the widest pick on a mixed corpse already carries a bonus: part
+   * of the corpse's breadth is a family with no item behind it, which is
+   * unreachable content rather than a choice the player declined. So on the
+   * three `gills, hide` murlocs nothing is ever concentrated (checking hide is
+   * the widest pick there is), and on old_greyjaw `['hide']` is while
+   * `['hide','fang']` is not.
+   *
+   * Read off the sim's own bonus, never a checkbox count. A count would call
+   * `['gills','hide']` a full cover and `['hide','claw']` a concentrate, and
+   * the sim disagrees with both. On an all-mapped corpse the two definitions
+   * coincide exactly, which is why the pre-#2514 count survived: it was right
+   * about the eight templates it was ever tested on.
+   */
+  readonly concentrated: boolean;
   /** #2509: the checked set forfeits every yield this corpse could have given. */
   readonly forfeitsEveryYield: boolean;
   /**
@@ -75,29 +105,45 @@ export interface CorpseHarvestViewModel {
  * as prose. `harvestDisabled` still folds the term in, so a painter that ignores
  * the new field cannot submit.
  *
- * Rows are deliberately NOT filtered to the mapped families: filtering would
- * change what "check every box" submits, and so would move the concentration
- * bonus (`taggedComponents.length - effectiveChosen.length`) on nine shipped mobs.
+ * Rows are still NOT filtered to the mapped families, and after #2514 that is a
+ * choice with nothing left to pay for it. Filtering would hide a component the
+ * corpse genuinely carries, and it would put the #2509 refusal above out of
+ * reach of the shipped picker, leaving the reason line as dead UI for the one
+ * client that can no longer produce the state it explains. The sim now ignores
+ * an unmapped entry outright (yieldingFocusComponents), so the row costs the
+ * player nothing; it carries `yieldsItem: false` instead, and the painter marks
+ * it. Offered, marked, and free is the honest shape: "this beast has claws, we
+ * cannot do anything with them yet".
  */
 export function corpseHarvestView(
   componentTags: readonly string[],
   selected: ReadonlySet<string>,
 ): CorpseHarvestViewModel {
   const tags = [...new Set(componentTags)];
-  const rows = tags.map((tag) => ({ tag, checked: selected.has(tag) }));
+  const rows = tags.map((tag) => ({
+    tag,
+    checked: selected.has(tag),
+    yieldsItem: harvestFamilyYieldsItem(tag),
+  }));
   const checked = rows.filter((r) => r.checked);
-  // The sim's own predicate, imported rather than restated: the command
-  // boundary refuses exactly this, and a mirror written twice is a mirror that
-  // drifts the first time effectiveFocusComponents' spread rule moves.
-  const forfeitsEveryYield = forfeitsEveryMappedYield(
-    tags,
-    checked.map((r) => r.tag),
-  );
+  const chosen = checked.map((r) => r.tag);
+  // The sim's own predicates, imported rather than restated: the command
+  // boundary refuses exactly this and rolls exactly that bonus, and a mirror
+  // written twice is a mirror that drifts the first time
+  // effectiveFocusComponents' spread rule moves.
+  const forfeitsEveryYield = forfeitsEveryMappedYield(tags, chosen);
   const corpseHarvestable = isHarvestableCorpse(tags);
+  const harvestDisabled = !corpseHarvestable || forfeitsEveryYield;
   return {
     rows,
-    harvestDisabled: !corpseHarvestable || forfeitsEveryYield,
-    concentrated: checked.length > 0 && checked.length < tags.length,
+    harvestDisabled,
+    // Gated on the button, because the field describes the harvest this button
+    // would RUN: a pick that forfeits everything scores the whole tag count
+    // (nothing is extracted, so all of it is forfeited breadth), which would
+    // read as maximally concentrated for a harvest that cannot happen.
+    concentrated:
+      !harvestDisabled &&
+      harvestConcentrationBonus(tags, chosen) > harvestConcentrationBonus(tags, []),
     forfeitsEveryYield,
     corpseHarvestable,
   };

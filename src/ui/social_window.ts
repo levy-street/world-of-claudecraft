@@ -27,6 +27,7 @@ import { deedTitleText } from './deed_i18n';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName } from './entity_i18n';
 import { esc } from './esc';
+import { captureFormDraft, restoreFormDraft } from './form_draft';
 import { loadGuildHideOffline, saveGuildHideOffline } from './guild_hide_offline';
 import { formatDateTime, formatNumber, t, tPlural } from './i18n';
 import { localizeZone } from './server_i18n';
@@ -196,6 +197,39 @@ export class SocialWindow {
         this.refreshList();
       }
     }
+  }
+
+  /**
+   * Re-localize after an in-game language switch (the Hud's woc:languagechange
+   * fan-out). Self-gated on isOpen so the fan-out can call it unconditionally.
+   *
+   * A full render() is what this needs and refreshList() is not a substitute:
+   * the panel title, the five tab labels and the footer's placeholders and
+   * button labels are all emitted by render(), which refreshList never reaches
+   * (it swaps `.soc-body` only). Three things have to survive that rebuild:
+   *   - the half-typed name in the tab's typeahead, emitted with no value;
+   *   - the guild billboard draft. refreshList protects it by reading the live
+   *     input, but render() destroys `.soc-body` BEFORE calling refreshList, so
+   *     by then there is nothing left to read. Capture happens first here.
+   *   - `this.suggest`, which render() strands: it destroys the `.soc-suggest`
+   *     listbox and leaves the field populated, so ArrowDown/Enter would act on
+   *     items no longer on screen. The pending search is dropped with the DOM
+   *     that showed it.
+   *
+   * Both signatures are RE-LATCHED rather than cleared: render() does not touch
+   * them, and clearing would buy a second full rebuild on the next slow tick
+   * that would wipe the draft this just restored.
+   */
+  relocalize(): void {
+    if (!this.isOpen) return;
+    const el = this.deps.root();
+    const draft = captureFormDraft(el);
+    window.clearTimeout(this.suggestTimer);
+    this.suggest = { field: '', items: [], index: -1 };
+    this.render();
+    restoreFormDraft(el, draft);
+    this.lastStruct = this.structSig();
+    this.lastContent = this.contentSig();
   }
 
   private structSig(): string {

@@ -2331,6 +2331,25 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
     expect(sim.players.get(fallen)!.raidLockouts.has('nythraxis_boss_arena:heroic')).toBe(true);
     expect(sim.countItem(HEROIC_MARK_ITEM_ID, fallen)).toBe(0);
   });
+
+  it('the empty-instance reaper never frees the arena while raiders stand in its wide outer floor', () => {
+    const { sim, raiders, inst } = raidSetup('normal');
+    const origin = instanceOriginOf(inst);
+    // NYTHRAXIS_LAYOUT (dungeon_layout.ts) authors tomb alcoves at local
+    // x = +/-210, legitimately inside the wide wallX:230/floorHalfX:228 raid
+    // room (and within instanceClaimContains's NYTHRAXIS_ROOM_RADIUS carve-out),
+    // but outside the generic 120yd box that instanceContains checks. Standing
+    // there is a real, in-fight position, not an edge case.
+    const tombX = origin.x + 210;
+    const tombZ = origin.z + 20;
+    raiders.forEach((pid) => {
+      teleport(sim, sim.entities.get(pid) as AnyEntity, tombX, tombZ);
+    });
+    inst.emptyFor = 100000; // even pre-loaded, an occupied check must reset it
+    updateInstances(sim.ctx);
+    expect(inst.partyKey).not.toBeNull();
+    expect(inst.emptyFor).toBe(0);
+  });
 });
 
 describe('dungeons: ghost corpse-run re-entry', () => {

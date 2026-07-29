@@ -748,12 +748,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootSettings.masterOption': '分配者：{name}',
   'hudChrome.corpseHarvest.title': '采集',
   'hudChrome.corpseHarvest.harvestButton': '采集',
-  'hudChrome.corpseHarvest.concentrateHint': '选择的部位越少，每个部位的品质越高。',
   'hudChrome.corpseHarvest.alreadyHarvested': '这具尸体已经被采集过了。',
   'hudChrome.corpseHarvest.nothingSelectedYields': '你选择的部位都无法从这具尸体上采集。',
   'hudChrome.corpseHarvest.harvestTooltip':
     '采集勾选的部位。每具尸体只能被采集一次，先到先得。不会拾取战利品。',
   'hudChrome.corpseHarvest.componentAria': '采集{component}',
+  'hudChrome.corpseHarvest.componentNoYield': '暂无产出',
+  'hudChrome.corpseHarvest.componentAriaNoYield': '采集{component}：{note}',
+  'hudChrome.corpseHarvest.yieldTierHint': '一次采集实际取得的部位越少，每个部位的品阶越高。',
   'hudChrome.corpseHarvest.components.hide': '兽皮',
   'hudChrome.corpseHarvest.components.fang': '尖牙',
   'hudChrome.corpseHarvest.components.silk': '丝线',
@@ -5096,6 +5098,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.emotes.wave': '挥手',
   'hudChrome.emoteWheel.edit': '编辑',
   'hudChrome.emoteWheel.label': '表情',
+  'hudChrome.meters.breakdownOther': '其他（{count}）',
+  'hudChrome.meters.melee': '近战',
   'hudChrome.meters.minutesSeconds': '{m}分{s}秒',
   'hudChrome.meters.perSecond': '{value}/秒',
   'hudChrome.meters.perSecondRow': '{total}（{rate}）',
@@ -7666,8 +7670,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.professions.intro':
     '除了战斗和任务之外，这个世界还会奖励你耕耘土地与执掌熔炉：采集原材料，通过十种制作行业将其打造成装备与货物，并在这些行业所代表的十种命途之一中确立自己的身份。',
   'guide.professions.harvestTitle': '收获狩猎本身',
-  'guide.professions.harvestBody':
-    '采集并不止步于资源节点。有些被击杀的野兽也可以从尸体上采集出材料：兽皮、尖牙、丝线，以及更稀奇的东西，与它的普通战利品一并直接取自尸体。每具尸体只容一位收获者：谁先采集，就归谁所有。每次如何取舍也由你决定：把尸体能给的全部取走，或专注于单一一种材料，换取它更精细的品级。任何角色都可以采集，无需行业也无需训练，而一件格外精良的材料上，甚至会带着采集者的名字。',
+  'guide.professions.harvestBodyChoice':
+    '采集并不止步于资源节点。许多被击杀的野兽都可以被采集一次，先到先得：兽皮、尖牙、丝线与兽肉，与它的普通战利品一并直接取自尸体，一次按键就会同时打开两者。当一头野兽身上不止一种可用材料时，如何取舍便由你决定：把它能给的全部取走，或专注于更少的材料，换取你所取之物明显更精细的品级。\n\n在能产出标本的族群身上掷出精良或更高的采集品质时，除普通产出之外还会额外获得一件署名的完美标本（一块Pristine Hide、一块Pristine Silk、一枚Pristine Venom Gland或一份Prime Cut），并在你的功绩之书中记下A Perfect Specimen。任何角色都可以采集，无需训练；而你拥有的任何采集工具，无论属于哪一门行业，都会计入最上等材料的判定。',
   'guide.professions.focusTitle': '城镇专注',
   'guide.professions.focusBody':
     '每座主城都为过路的采集者备有一块城镇专注面板：站在城镇里，从小地图旁打开它，把一小笔专注点数投向你在意的那些材料种类。此后每具尸体上产出的受专注材料都会精细一个品级、也略微丰厚一些；你的分配会跟随你的角色走遍各地，而且日后任何一次回到城镇，都可以免费重新调整。',
@@ -10186,4 +10190,5 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.lb_willowfen.name': '泣柳泽',
   'entities.dungeons.lb_willowfen.enterText': '柳树纹丝不动。水面也是。',
   'entities.dungeons.lb_willowfen.leaveText': '你离开柳树，任它继续沉寂。',
+  'hudChrome.enchanting.wornTagIndexed': '已装备（{slot}{index}）',
 };

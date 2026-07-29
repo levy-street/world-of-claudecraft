@@ -1,21 +1,25 @@
-// Rideable ground mounts: reins ownership + summon/dismount rules, a
-// sibling sim system behind the SimContext seam (module-first; sim.ts keeps
-// thin delegates).
+// Rideable ground mounts: collection + mount/dismount rules, a sibling sim
+// system behind the SimContext seam (module-first; sim.ts keeps thin delegates).
 //
 // Collection model: EVERY catalog mount is owned while its soulbound reins item
 // (ItemDef kind 'mount') sits in the player's bags or bank. The horse is no
 // longer free: it has its own reins item too, sold by the
 // stablemaster, so a fresh player owns nothing until they buy or loot a mount.
-// Using a reins item names the exact mount to summon; there is no persisted
-// selection. The live "riding X right now" state is Entity.mountKey
-// ('' dismounted), mirrored on the wire so every host reads the same field as
-// the movement-speed hook.
+// There is NO persisted "selected mount": reins are usable items, so you ride by
+// using the reins (summonMountItem, reached through items.ts useItem) and the
+// item you clicked IS the choice. The live "riding X right now" state is
+// Entity.mountKey ('' dismounted), which the wire mirrors like `skin` so every
+// host (renderer, other clients, the online self extrapolator) reads the same
+// field the speed hook uses.
 //
-// Summoning channels briefly through updateMountTransition and is interruptible
-// by combat or water. Reins use re-validates riding skill and ownership, and is
-// blocked while in combat, dead, or a released spirit. Dismounting is instant
-// and always allowed; death and water also force-dismount. Every mount is a
-// ground mount, no flying: nothing here touches the vertical axis.
+// Summoning is not instant: mounting channels a short summon (updateMountTransition,
+// driven per tick and interruptible by combat or water). DISMOUNTING is instant
+// from every path, with no channel at all. Swapping straight from one mount to
+// another is instant too: there is nothing to put away. Rules: summoning requires
+// the riding skill FIRST, then ownership, and is blocked while in combat, dead, or
+// a released spirit; dismounting is never gated; death and water force-dismount
+// instantly. There is no per-mount level gate. Every mount is a ground mount, no
+// flying: nothing here touches the vertical axis.
 //
 // `src/sim`-pure and rng-free.
 
@@ -195,6 +199,14 @@ export function summonMountItem(ctx: SimContext, pid: number, key: string): bool
   return true;
 }
 
+/** The Mount/Dismount keybind. It has exactly two jobs now that reins are items:
+ *  dismount INSTANTLY when riding (never gated, no channel), and summon the
+ *  LESSON steed while a riding lesson is in progress, which is the one mount a
+ *  player can ride without owning it and therefore the one with no reins to
+ *  click. Summoning a mount you own is not here: that is summonMountItem, driven
+ *  by useItem. An unmounted press outside a lesson deliberately does nothing, so
+ *  no implicit "selected mount" can grow back. Returns true when it dismounted or
+ *  started the lesson summon, false otherwise. */
 export function toggleMount(ctx: SimContext, pid: number): boolean {
   const meta = ctx.players.get(pid);
   const e = ctx.entities.get(pid);

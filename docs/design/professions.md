@@ -72,6 +72,19 @@ plain yields before any signed instance, specimens last, with rarity draws
 staying in the first loop in yield order (`harvestCorpse`,
 `src/sim/interaction.ts`; the draw order is pinned by the corpse suites' own
 draw-count cases, not by the parity goldens, which drive no corpse harvest).
+The per-corpse focus picker's concentration bonus counts the families the
+harvest could not EXTRACT, not the ones the player named: a component family
+`HARVEST_COMPONENT_ITEMS` does not map (`claw`, `tusk`, `gills`, `horn`) is
+never extracted, so it is always forfeited breadth, costs no rng draw, and
+never dilutes the bonus (`harvestConcentrationBonus` and
+`yieldingFocusComponents`, `src/sim/professions/gathering.ts`, which own the
+ruling in prose). The denominator stays the corpse's advertised tag count, so
+an unmapped tag is worth a tier to whoever concentrates, which is what it has
+been since #1142; the shape guard that keeps a corpse from out-paying its own
+tag list lives in `tests/mob_component_tags.test.ts`. Consequence worth
+knowing: on a corpse that mixes mapped and unmapped families the unshifted
+bonus-0 spread is unreachable, and on one carrying a single mapped family
+every legal pick collapses to the same outcome.
 The premium arm
 gates on `MONSTER_MATERIAL_TIERS` (every wave-one family is tier 1, so the
 gate is live but never fires yet). One interact press loots AND harvests an
