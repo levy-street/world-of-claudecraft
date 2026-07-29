@@ -11,6 +11,18 @@ export function signedRectDistance(point, rect) {
   return Math.hypot(Math.max(0, dx), Math.max(0, dz));
 }
 
+export function worldToLocal(frame, point) {
+  const dx = point.x - frame.position.x;
+  const dz = point.z - frame.position.z;
+  const cos = Math.cos(frame.yaw);
+  const sin = Math.sin(frame.yaw);
+  return {
+    x: dx * cos - dz * sin,
+    y: point.y - frame.position.y,
+    z: dx * sin + dz * cos,
+  };
+}
+
 export function measureSegment(sampleWorld, duration, sampleRateHz) {
   if (duration <= 0) {
     const start = sampleWorld(-1);

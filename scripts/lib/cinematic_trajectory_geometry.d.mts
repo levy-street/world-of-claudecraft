@@ -14,6 +14,11 @@ export interface TrajectoryRect extends FlatPoint {
   readonly hd: number;
 }
 
+export interface TrajectoryFrame {
+  readonly position: TrajectoryPoint;
+  readonly yaw: number;
+}
+
 export interface SegmentMetrics {
   readonly start: TrajectoryPoint;
   readonly end: TrajectoryPoint;
@@ -30,6 +35,8 @@ export interface ArrivalApproachMetrics {
 export function pointDistance(a: TrajectoryPoint, b: TrajectoryPoint): number;
 
 export function signedRectDistance(point: FlatPoint, rect: TrajectoryRect): number;
+
+export function worldToLocal(frame: TrajectoryFrame, point: TrajectoryPoint): TrajectoryPoint;
 
 export function measureSegment(
   sampleWorld: (elapsed: number) => TrajectoryPoint,

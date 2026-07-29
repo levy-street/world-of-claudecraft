@@ -3,6 +3,7 @@ import {
   measureSegment,
   pointDistance,
   signedRectDistance,
+  worldToLocal,
 } from './cinematic_trajectory_geometry.mjs';
 
 export const SAMPLE_RATE_HZ = 20;
@@ -51,18 +52,6 @@ function shipFrameAt(runtime, scene, harbor, time) {
     ? runtime.propPathPoseAt(active.segment, time - active.startedAt)
     : { x: 0, y: 0, z: 0, yaw: 0, done: true };
   return shipFrameForPose(runtime, harbor, pose);
-}
-
-function worldToLocal(frame, point) {
-  const dx = point.x - frame.position.x;
-  const dz = point.z - frame.position.z;
-  const cos = Math.cos(frame.yaw);
-  const sin = Math.sin(frame.yaw);
-  return {
-    x: dx * cos - dz * sin,
-    y: point.y - frame.position.y,
-    z: dx * sin + dz * cos,
-  };
 }
 
 function shipDeckLocalCenter(runtime, harbor) {

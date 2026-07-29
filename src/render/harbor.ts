@@ -36,7 +36,7 @@ import {
   deckStandInAction,
   deckStandInParentTransform,
 } from './harbor_deck_stand_in_core';
-import { composeHarborShipAttachFrame } from './harbor_ship_attach_core';
+import { composeHarborShipAttachFrame, HarborShipPendingCueState } from './harbor_ship_attach_core';
 import { type PropPathSample, type PropPathSegment, propPathPoseAt } from './prop_path_core';
 import { type PropAsset, propAsset } from './props';
 import { radialGlowTexture } from './textures';
@@ -384,11 +384,6 @@ interface HarborShipHandle {
   deckStandIn: CharacterVisual | null;
 }
 
-interface PendingHarborShipCue {
-  cue: string;
-  startSec: number;
-}
-
 // Ship-local yards for the 60-yard grand ferry. The authored shipDecks center
 // the main deck 6.6 yards along the +x bow axis at world y 0.72. The keel
 // parent rests at WATER_LEVEL - draft = -7, so y 7.72 puts the feet on deck.
@@ -411,9 +406,9 @@ const DECK_STAND_IN_IDLE_STATE: AnimState = {
 };
 
 const SHIPS = new Map<string, HarborShipHandle>();
-const PENDING_SHIP_CUES = new Map<string, PendingHarborShipCue>();
 const PROP_PATH_SEGMENTS: Readonly<Record<string, PropPathSegment | undefined>> =
   LAST_BELL_PROP_PATH_SEGMENTS;
+const SHIP_CUE_STATE = new HarborShipPendingCueState(PROP_PATH_SEGMENTS);
 const CUE_POSE: PropPathSample = { x: 0, y: 0, z: 0, yaw: 0, done: false };
 const SHIP_ATTACH_FRAME: SceneAttachFrame = {
   position: { x: 0, y: 0, z: 0 },
@@ -445,13 +440,14 @@ export function harborShipAttachFrame(
  *  stay inside the freezeStaticMatrices contract the rest of the time. */
 export function cueHarborShip(target: string, cue: string): void {
   const handle = SHIPS.get(target);
-  if (!handle) {
-    PENDING_SHIP_CUES.set(target, { cue, startSec: performance.now() / 1000 });
-    return;
-  }
-  PENDING_SHIP_CUES.delete(target);
-  const segment = PROP_PATH_SEGMENTS[cue];
-  if (!segment) {
+  const resolved = SHIP_CUE_STATE.routeCue(
+    target,
+    cue,
+    performance.now() / 1000,
+    handle !== undefined,
+  );
+  if (!handle) return;
+  if (!resolved) {
     resetShip(handle);
     return;
   }
@@ -461,14 +457,14 @@ export function cueHarborShip(target: string, cue: string): void {
   for (const [otherTarget, other] of SHIPS) {
     if (otherTarget !== target && other.cueStartSec !== null) resetShip(other);
   }
-  handle.segment = segment;
-  handle.cueStartSec = performance.now() / 1000;
+  handle.segment = resolved.segment;
+  handle.cueStartSec = resolved.cueStartSec;
   handle.group.matrixAutoUpdate = true;
 }
 
 /** Scene teardown: every ship back at its berth. */
 export function resetHarborShipCues(): void {
-  PENDING_SHIP_CUES.clear();
+  SHIP_CUE_STATE.clearPending();
   for (const handle of SHIPS.values()) resetShip(handle);
 }
 
@@ -561,13 +557,10 @@ function buildShip(parent: THREE.Group, harbor: HarborDef): void {
     deckStandIn: null,
   };
   SHIPS.set(target, handle);
-  const pending = PENDING_SHIP_CUES.get(target);
+  const pending = SHIP_CUE_STATE.consumePending(target);
   if (!pending) return;
-  PENDING_SHIP_CUES.delete(target);
-  const segment = PROP_PATH_SEGMENTS[pending.cue];
-  if (!segment) return;
-  handle.segment = segment;
-  handle.cueStartSec = pending.startSec;
+  handle.segment = pending.segment;
+  handle.cueStartSec = pending.cueStartSec;
   handle.group.matrixAutoUpdate = true;
 }
 
@@ -576,6 +569,8 @@ export function buildHarbors(seed: number): { group: THREE.Group } {
   const group = new THREE.Group();
   group.name = 'harbors';
   SHIPS.clear();
+  // World rebuilds must discard cues recorded against the prior harbor handles.
+  SHIP_CUE_STATE.clearPending();
   const harbors = getActiveWorldContent().props.harbors ?? [];
   for (const harbor of harbors) {
     const g = new THREE.Group();

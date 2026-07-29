@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   measureArrivalApproach,
   measureSegment,
+  worldToLocal,
 } from '../scripts/lib/cinematic_trajectory_geometry.mjs';
 import {
   applySceneOp,
@@ -16,6 +17,7 @@ import {
   sceneRigLocalToWorld,
   sceneRigLookAtPosition,
 } from '../src/game/scene_rig_core';
+import { composeHarborShipAttachFrame } from '../src/render/harbor_ship_attach_core';
 import { type PropPathSegment, propPathPoseAt } from '../src/render/prop_path_core';
 import {
   LAST_BELL_CINEMATIC_SHIP_SPEED_CAP_YARDS_PER_SEC,
@@ -1124,18 +1126,6 @@ function propPose(
   return propPathPoseAt(active.segment, time - active.startedAt);
 }
 
-function worldToLocal(frame: SceneAttachFrame, point: SceneRigPoint): SceneRigPoint {
-  const dx = point.x - frame.position.x;
-  const dz = point.z - frame.position.z;
-  const cos = Math.cos(frame.yaw);
-  const sin = Math.sin(frame.yaw);
-  return {
-    x: dx * cos - dz * sin,
-    y: point.y - frame.position.y,
-    z: dx * sin + dz * cos,
-  };
-}
-
 function shipTarget(harbor: HarborDef): string {
   return `harbor_ship_${harbor.id}`;
 }
@@ -1153,20 +1143,16 @@ function shipFrameForPose(
   harbor: HarborDef,
   pose: { x: number; y: number; z: number; yaw: number },
 ): SceneAttachFrame {
-  const yaw = harbor.berth.rot + pose.yaw;
-  const translated = sceneRigLocalToWorld(
+  return composeHarborShipAttachFrame(
     {
-      position: {
-        x: harbor.berth.x,
-        y: runtimeWaterLevel - harbor.berth.draft,
-        z: harbor.berth.z,
-      },
-      yaw,
+      baseX: harbor.berth.x,
+      baseY: runtimeWaterLevel - harbor.berth.draft,
+      baseZ: harbor.berth.z,
+      baseRot: harbor.berth.rot,
     },
-    { x: pose.x, y: pose.y, z: pose.z },
-    { x: 0, y: 0, z: 0 },
+    { ...pose, done: false },
+    { position: { x: 0, y: 0, z: 0 }, yaw: 0 },
   );
-  return { position: translated, yaw };
 }
 
 function maximumPropSegmentSpeed(harbor: HarborDef, segment: PropPathSegment): number {
@@ -2056,6 +2042,8 @@ describe('cinematic shot mechanical gate', () => {
           violation.sceneId === control.def.id && violation.check === control.expectedCheck,
       );
       expect(expected, violations.map(violationMessage).join('\n')).toBeDefined();
+      // LOAD-BEARING: several arrival controls trip multiple arms. The expectedMeasured
+      // substring keeps per-arm coverage from silently collapsing to whichever arm reports first.
       if (control.expectedMeasured !== undefined) {
         expect(expected?.measured).toContain(control.expectedMeasured);
       }
