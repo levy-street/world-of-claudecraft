@@ -17,6 +17,7 @@
   let factorMode = $state<'totp' | 'recovery'>('totp');
   let busy = $state(false);
   let usernameInput = $state<HTMLInputElement>();
+  let passwordInput = $state<HTMLInputElement>();
   let factorInput = $state<HTMLInputElement>();
 
   async function focusFactorInput(): Promise<void> {
@@ -24,9 +25,15 @@
     factorInput?.focus();
   }
 
+  async function focusPasswordInput(): Promise<void> {
+    await tick();
+    passwordInput?.focus();
+  }
+
   async function submit(e: SubmitEvent): Promise<void> {
     e.preventDefault();
     if (busy) return;
+    const wasTwoFactorRequired = auth.twoFactorRequired;
     busy = true;
     try {
       await auth.login(
@@ -38,6 +45,9 @@
     } finally {
       busy = false;
       if (auth.twoFactorRequired) await focusFactorInput();
+      else if (!wasTwoFactorRequired && !auth.authed && auth.loginError) {
+        await focusPasswordInput();
+      }
     }
   }
 
@@ -115,6 +125,7 @@
         autocomplete="current-password"
         required
         disabled={busy}
+        bind:this={passwordInput}
         bind:value={password}
       />
       <button type="submit" disabled={busy}>{t('auth.signIn')}</button>

@@ -22,6 +22,7 @@ vi.mock('../../src/admin/api', () => ({
   getToken: () => null,
 }));
 
+import { ApiError } from '../../src/admin/api';
 import Login from '../../src/admin/components/Login.svelte';
 import { t } from '../../src/admin/i18n';
 import { auth } from '../../src/admin/state/auth.svelte';
@@ -62,6 +63,22 @@ afterEach(async () => {
 });
 
 describe('admin login challenge in Chromium', () => {
+  it('returns focus to the password after a failed credential request', async () => {
+    h.apiLogin.mockRejectedValueOnce(new ApiError(401, 'invalid credentials'));
+    input('#login-username', 'alice');
+    input('#login-password', 'wrong-password');
+    const password = document.querySelector<HTMLInputElement>('#login-password');
+    if (!password) throw new Error('missing password input');
+    password.focus();
+
+    document.querySelector<HTMLFormElement>('#login-form')?.requestSubmit();
+
+    await vi.waitFor(() =>
+      expect(document.querySelector('#login-error')).not.toBeEmptyDOMElement(),
+    );
+    await vi.waitFor(() => expect(document.activeElement).toBe(password));
+  });
+
   it('moves focus through the challenge modes and exposes live status', async () => {
     h.apiLogin.mockResolvedValueOnce({ twoFactorRequired: true });
     input('#login-username', 'alice');

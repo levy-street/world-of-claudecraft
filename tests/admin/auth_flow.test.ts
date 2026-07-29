@@ -212,10 +212,13 @@ describe('admin auth flow', () => {
     h.apiLogin.mockRejectedValue(new ApiError(401, 'invalid credentials'));
     render(App);
     await fireEvent.input(screen.getByLabelText(t('auth.username')), { target: { value: 'bob' } });
-    await fireEvent.input(screen.getByLabelText(t('auth.password')), { target: { value: 'nope' } });
+    const passwordInput = screen.getByLabelText(t('auth.password'));
+    await fireEvent.input(passwordInput, { target: { value: 'nope' } });
+    passwordInput.focus();
     await fireEvent.submit(loginForm());
 
     await vi.waitFor(() => expect(auth.loginError).not.toBe(''));
+    expect(passwordInput).toHaveFocus();
     expect(screen.queryByText(t('auth.signOut'))).not.toBeInTheDocument();
   });
 
