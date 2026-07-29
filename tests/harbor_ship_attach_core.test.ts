@@ -126,32 +126,17 @@ describe('harbor ship attachment wiring', () => {
     expect(updateSource).toContain('handle.group.rotation.y = frame.yaw;');
   });
 
-  it('keeps a cue pending when its ship handle is not registered yet', () => {
+  it('routes cues through the executable pending-cue registry', () => {
     const cueSource = functionSource('cueHarborShip');
-    expect(cueSource).toContain(
-      'PENDING_SHIP_CUES.set(target, { cue, startSec: performance.now() / 1000 });',
-    );
-    expect(cueSource).toContain(
-      'if (!handle) {\n    PENDING_SHIP_CUES.set(target, { cue, startSec: performance.now() / 1000 });\n    return;\n  }',
-    );
-    expect(cueSource).toContain('PENDING_SHIP_CUES.delete(target);');
-    expect(cueSource).toMatch(/if \(!segment\) \{\n {4}resetShip\(handle\);\n {4}return;\n {2}\}/);
+    expect(cueSource).toContain('SHIP_CUES.cue(target, cue);');
   });
 
-  it('applies a pending known cue after registration with its original start time', () => {
+  it('registers built ship handles with the executable pending-cue registry', () => {
     const buildSource = functionSource('buildShip');
-    expect(buildSource).toContain('SHIPS.set(target, handle);');
-    expect(buildSource).toContain('const pending = PENDING_SHIP_CUES.get(target);');
-    expect(buildSource).toContain('if (!pending) return;');
-    expect(buildSource).toContain('PENDING_SHIP_CUES.delete(target);');
-    expect(buildSource).toContain('const segment = PROP_PATH_SEGMENTS[pending.cue];');
-    expect(buildSource).toContain('if (!segment) return;');
-    expect(buildSource).toContain('handle.cueStartSec = pending.startSec;');
-    expect(buildSource).toContain('handle.group.matrixAutoUpdate = true;');
-    expect(buildSource).not.toContain('resetShip(handle)');
+    expect(buildSource).toContain('SHIP_CUES.register(target, handle);');
   });
 
   it('clears pending cues during scene reset', () => {
-    expect(functionSource('resetHarborShipCues')).toContain('PENDING_SHIP_CUES.clear();');
+    expect(functionSource('resetHarborShipCues')).toContain('SHIP_CUES.resetAll();');
   });
 });

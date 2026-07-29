@@ -156,6 +156,82 @@ describe('scene input lock frame coordination', () => {
     expect(targetLocked).toBe(false);
   });
 
+  it('parks stale scene props whenever represented scene state converges', () => {
+    const world = { playerId: 7, entities: new Map() } as unknown as IWorld;
+    const propCue = vi.fn();
+    const propReset = vi.fn();
+    const director = new SceneDirector({
+      world: () => world,
+      nowSec: () => 10,
+      musicSilence: vi.fn(),
+      propCue,
+      propReset,
+      reducedMotion: () => false,
+    });
+
+    director.handleEvents([
+      {
+        type: 'scene',
+        sceneId: 'scn_old_target',
+        pid: 7,
+        op: { kind: 'start', duration: 20 },
+      },
+      {
+        type: 'scene',
+        sceneId: 'scn_old_target',
+        pid: 7,
+        op: {
+          kind: 'camera',
+          shot: {
+            kind: 'focus',
+            entityId: null,
+            x: 0,
+            y: 0,
+            z: 0,
+            dist: 8,
+            pitch: 0.3,
+            yaw: 0,
+            dur: 2,
+          },
+        },
+      },
+      {
+        type: 'scene',
+        sceneId: 'scn_old_target',
+        pid: 7,
+        op: { kind: 'prop', target: 'harbor_ship_mainland', cue: 'old_voyage' },
+      },
+    ]);
+
+    expect(propCue).toHaveBeenCalledWith('harbor_ship_mainland', 'old_voyage');
+    expect(director.cameraActive()).toBe(true);
+
+    director.handleEvents([
+      {
+        type: 'sceneSync',
+        state: {
+          sceneId: 'scn_new_target',
+          remainingSeconds: 8,
+          inputLocked: true,
+          letterbox: true,
+          musicSilenced: false,
+        },
+      },
+    ]);
+
+    expect(propReset).toHaveBeenCalledTimes(1);
+    expect(director.sceneActive()).toBe(true);
+    expect(director.inputLocked()).toBe(true);
+    expect(director.cameraActive()).toBe(false);
+
+    director.handleEvents([{ type: 'sceneSync', state: null }]);
+
+    expect(propReset).toHaveBeenCalledTimes(2);
+    expect(director.sceneActive()).toBe(false);
+    expect(director.inputLocked()).toBe(false);
+    expect(director.cameraActive()).toBe(false);
+  });
+
   it('wires both event paths before their next authoritative input boundary', () => {
     const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
     const offline = main.slice(main.indexOf('while (acc >= DT)'), main.indexOf('const pp ='));

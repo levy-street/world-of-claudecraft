@@ -13,7 +13,7 @@
 import { GULLHAVEN_HARBOR, type HarborDef, MAINLAND_HARBOR } from '../harbor_layout';
 import { registerScenario } from '../scenarios/registry';
 import { registerChoice } from '../scenes/choices';
-import { registerScene, type SceneAttachShotDef, type SceneDollyShotDef } from '../scenes/scenes';
+import { registerScene, type SceneAttachShotDef, type SceneDollyShotDef } from '../scenes/registry';
 import type { MobTemplate, NpcDef, QuestDef } from '../types';
 import { LAST_BELL_VOYAGE_SEGMENT_IDS, LB_PROP_CUE_PARK } from './last_bell_cinematics';
 
