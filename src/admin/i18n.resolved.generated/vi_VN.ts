@@ -490,6 +490,7 @@ export const vi_VN: AdminTranslations = {
   "common.justNow": "vừa xong",
   "charts.sessionsTooltip": "{day}: {sessions} phiên, {accounts} tài khoản, {played} đã chơi",
   "error.tooManyAttempts": "quá nhiều lần thử — chờ một phút rồi thử lại",
+  "error.tooManyFailedAttempts": "too many failed attempts, wait a few minutes and try again",
   "error.invalidCredentials": "tên đăng nhập hoặc mật khẩu không hợp lệ",
   "error.noAdminAccess": "tài khoản này không có quyền quản trị",
   "error.cannotModerateAdmin": "không thể đình chỉ hoặc cấm tài khoản quản trị",

@@ -490,6 +490,7 @@ export const ru_RU: AdminTranslations = {
   "common.justNow": "только что",
   "charts.sessionsTooltip": "{day}: сеансов: {sessions}, учётных записей: {accounts}, время в игре: {played}",
   "error.tooManyAttempts": "слишком много попыток — подождите минуту и попробуйте снова",
+  "error.tooManyFailedAttempts": "too many failed attempts, wait a few minutes and try again",
   "error.invalidCredentials": "неверное имя пользователя или пароль",
   "error.noAdminAccess": "у этой учётной записи нет прав администратора",
   "error.cannotModerateAdmin": "учётные записи администраторов нельзя заблокировать или забанить",

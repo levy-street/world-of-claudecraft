@@ -490,6 +490,7 @@ export const ja_JP: AdminTranslations = {
   "common.justNow": "たった今",
   "charts.sessionsTooltip": "{day}：{sessions}セッション、{accounts}アカウント、プレイ時間{played}",
   "error.tooManyAttempts": "試行回数が多すぎます — 1分ほど待ってから再試行してください",
+  "error.tooManyFailedAttempts": "too many failed attempts, wait a few minutes and try again",
   "error.invalidCredentials": "ユーザー名またはパスワードが正しくありません",
   "error.noAdminAccess": "このアカウントには管理者権限がありません",
   "error.cannotModerateAdmin": "管理者アカウントは一時停止または永久停止できません",

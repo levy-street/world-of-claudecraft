@@ -490,6 +490,7 @@ export const cs_CZ: AdminTranslations = {
   "common.justNow": "právě teď",
   "charts.sessionsTooltip": "{day}: {sessions} relací, {accounts} účtů, {played} odehráno",
   "error.tooManyAttempts": "příliš mnoho pokusů, počkej minutu a zkus to znovu",
+  "error.tooManyFailedAttempts": "too many failed attempts, wait a few minutes and try again",
   "error.invalidCredentials": "neplatné uživatelské jméno nebo heslo",
   "error.noAdminAccess": "tento účet nemá admin přístup",
   "error.cannotModerateAdmin": "admin účty nelze pozastavit ani zabanovat",

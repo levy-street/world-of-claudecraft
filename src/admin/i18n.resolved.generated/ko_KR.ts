@@ -490,6 +490,7 @@ export const ko_KR: AdminTranslations = {
   "common.justNow": "방금 전",
   "charts.sessionsTooltip": "{day}: 세션 {sessions}개, 계정 {accounts}개, 플레이 시간 {played}",
   "error.tooManyAttempts": "시도 횟수가 너무 많습니다 — 잠시 후 다시 시도하세요",
+  "error.tooManyFailedAttempts": "too many failed attempts, wait a few minutes and try again",
   "error.invalidCredentials": "사용자 이름 또는 비밀번호가 올바르지 않습니다",
   "error.noAdminAccess": "이 계정에는 관리자 권한이 없습니다",
   "error.cannotModerateAdmin": "관리자 계정은 정지하거나 차단할 수 없습니다",

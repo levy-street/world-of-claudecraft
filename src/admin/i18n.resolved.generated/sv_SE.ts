@@ -490,6 +490,7 @@ export const sv_SE: AdminTranslations = {
   "common.justNow": "just nu",
   "charts.sessionsTooltip": "{day}: {sessions} sessioner, {accounts} konton, {played} spelat",
   "error.tooManyAttempts": "för många försök — vänta en minut och försök igen",
+  "error.tooManyFailedAttempts": "too many failed attempts, wait a few minutes and try again",
   "error.invalidCredentials": "ogiltigt användarnamn eller lösenord",
   "error.noAdminAccess": "detta konto har inte administratörsåtkomst",
   "error.cannotModerateAdmin": "administratörskonton kan inte stängas av eller bannlysas",

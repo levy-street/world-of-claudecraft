@@ -490,6 +490,7 @@ export const da_DK: AdminTranslations = {
   "common.justNow": "lige nu",
   "charts.sessionsTooltip": "{day}: {sessions} sessioner, {accounts} konti, {played} spillet",
   "error.tooManyAttempts": "for mange forsøg — vent et minut og prøv igen",
+  "error.tooManyFailedAttempts": "too many failed attempts, wait a few minutes and try again",
   "error.invalidCredentials": "ugyldigt brugernavn eller adgangskode",
   "error.noAdminAccess": "denne konto har ikke admin-adgang",
   "error.cannotModerateAdmin": "admin-konti kan ikke suspenderes eller udelukkes",

@@ -99,7 +99,7 @@ import {
   setDailyRewardsIpBan,
 } from './moderation_db';
 import { providerUsageSnapshot } from './provider_usage';
-import { rateLimited } from './ratelimit';
+import { authThrottled, clearAuthFailures, rateLimited, recordAuthFailure } from './ratelimit';
 import {
   adminRolesForAccount,
   listStaff,
@@ -117,6 +117,14 @@ import { PgUserAssetsDb } from './user_assets_db';
 // runs, so a route absent from that table can never execute.
 
 const ADMIN_LOGIN_MAX_PER_MINUTE = 10;
+// Per-account brute-force throttle, mirroring server/auth_routes.ts loginHandler
+// (#93): the per-IP ceiling above cannot stop a distributed attacker who spreads
+// guesses for one admin username across many source IPs, so admin login also gates
+// on authThrottled/recordAuthFailure/clearAuthFailures (server/ratelimit.ts), keyed
+// by username exactly like the player /api/login guard. The message matches a
+// bad-password response so it never reveals whether the account exists.
+const ADMIN_LOGIN_TOO_MANY_FAILED_ATTEMPTS =
+  'too many failed attempts, wait a few minutes and try again';
 const MAX_PAGE_LIMIT = 200;
 const DEFAULT_PAGE_LIMIT = 25;
 const ACTIVITY_WINDOW_DAYS = 30;
@@ -296,14 +304,20 @@ async function handleLogin(req: http.IncomingMessage, res: http.ServerResponse):
     return fail(res, 429, 'too many attempts, wait a minute and try again');
   }
   const body = await readBody(req);
-  const account = typeof body.username === 'string' ? await findAccount(body.username) : null;
+  const username = typeof body.username === 'string' ? body.username : '';
+  if (username && !authThrottled(username).allowed) {
+    return fail(res, 429, ADMIN_LOGIN_TOO_MANY_FAILED_ATTEMPTS);
+  }
+  const account = username ? await findAccount(username) : null;
   if (!account || !(await verifyPassword(String(body.password ?? ''), account.password_hash))) {
+    if (username) recordAuthFailure(username);
     return fail(res, 401, 'invalid username or password');
   }
   const staff = await adminRolesForAccount(account.id);
   if (staff === null) {
     return fail(res, 403, 'this account does not have admin access');
   }
+  clearAuthFailures(username);
   await touchLogin(account.id);
   const token = newToken();
   await saveToken(token, account.id);
@@ -1104,7 +1118,11 @@ export async function handleAdminApi(
 //    ADMIN_LOGIN_MAX_PER_MINUTE), NOT the new coded POLICIES table (rate_limit.ts):
 //    its own per-minute ceiling, isolated from the account/IP policy set, keeping the
 //    429 body byte-identical. Its own isolated limiter STORE is the two-tier limiter
-//    end-state; parity-first keeps the legacy shared-store call in-handler.
+//    end-state; parity-first keeps the legacy shared-store call in-handler. Both login
+//    arms ALSO gate on the shared per-account authThrottled/recordAuthFailure/
+//    clearAuthFailures throttle (server/ratelimit.ts), the same username-keyed guard
+//    server/auth_routes.ts uses for the player login: the per-IP ceiling alone cannot
+//    stop a distributed attacker who never repeats a source IP against one account.
 //
 //  - The enum-segment route restructures. The legacy regex route
 //    /moderation/accounts/:id/(suspend|unsuspend|ban|unban) violates the table
@@ -1289,6 +1307,10 @@ function makeRealAdminDb() {
     emailSecurityIncident,
     providerUsageSnapshot,
     rateLimited,
+    // Per-account failed-login throttle (mirrors server/auth_routes.ts loginHandler).
+    authThrottled,
+    recordAuthFailure,
+    clearAuthFailures,
     // Staff-role reads/writes (accounts.admin_roles + the audit trail).
     adminRolesForAccount,
     listStaff,
@@ -1344,24 +1366,34 @@ const MODERATION_ACTION_SCHEMA = enum_(['suspend', 'unsuspend', 'ban', 'unban'] 
 // ported body is byte-identical.
 // ---------------------------------------------------------------------------
 
-/** POST /admin/api/login: anonymous, its own in-handler rateLimited limiter. */
+/**
+ * POST /admin/api/login: anonymous, its own in-handler rateLimited limiter PLUS the
+ * per-account failed-login throttle (mirrors server/auth_routes.ts loginHandler),
+ * so a distributed attack spread across many source IPs cannot bypass a lockout by
+ * never repeating an IP.
+ */
 async function loginHandler(ctx: Ctx): Promise<void> {
   if (!adminDb().rateLimited(ctx.req, ADMIN_LOGIN_MAX_PER_MINUTE).allowed) {
     return fail(ctx.res, 429, 'too many attempts, wait a minute and try again');
   }
   const body = await readBody(ctx.req);
-  const account =
-    typeof body.username === 'string' ? await adminDb().findAccount(body.username) : null;
+  const username = typeof body.username === 'string' ? body.username : '';
+  if (username && !adminDb().authThrottled(username).allowed) {
+    return fail(ctx.res, 429, ADMIN_LOGIN_TOO_MANY_FAILED_ATTEMPTS);
+  }
+  const account = username ? await adminDb().findAccount(username) : null;
   if (
     !account ||
     !(await adminDb().verifyPassword(String(body.password ?? ''), account.password_hash))
   ) {
+    if (username) adminDb().recordAuthFailure(username);
     return fail(ctx.res, 401, 'invalid username or password');
   }
   const staff = await adminDb().adminRolesForAccount(account.id);
   if (staff === null) {
     return fail(ctx.res, 403, 'this account does not have admin access');
   }
+  adminDb().clearAuthFailures(username);
   await adminDb().touchLogin(account.id);
   const token = adminDb().newToken();
   await adminDb().saveToken(token, account.id);

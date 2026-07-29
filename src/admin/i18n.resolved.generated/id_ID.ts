@@ -490,6 +490,7 @@ export const id_ID: AdminTranslations = {
   "common.justNow": "baru saja",
   "charts.sessionsTooltip": "{day}: {sessions} sesi, {accounts} akun, {played} dimainkan",
   "error.tooManyAttempts": "terlalu banyak percobaan, tunggu sebentar dan coba lagi",
+  "error.tooManyFailedAttempts": "too many failed attempts, wait a few minutes and try again",
   "error.invalidCredentials": "nama pengguna atau kata sandi tidak valid",
   "error.noAdminAccess": "akun ini tidak memiliki akses admin",
   "error.cannotModerateAdmin": "akun admin tidak dapat ditangguhkan atau dicekal",

@@ -490,6 +490,7 @@ export const tr_TR: AdminTranslations = {
   "common.justNow": "az önce",
   "charts.sessionsTooltip": "{day}: {sessions} oturum, {accounts} hesap, {played} oynandı",
   "error.tooManyAttempts": "çok fazla deneme — bir dakika bekleyip tekrar deneyin",
+  "error.tooManyFailedAttempts": "too many failed attempts, wait a few minutes and try again",
   "error.invalidCredentials": "geçersiz kullanıcı adı veya parola",
   "error.noAdminAccess": "bu hesabın yönetici erişimi yok",
   "error.cannotModerateAdmin": "yönetici hesapları askıya alınamaz veya yasaklanamaz",

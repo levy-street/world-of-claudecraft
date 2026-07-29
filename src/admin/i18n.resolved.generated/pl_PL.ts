@@ -490,6 +490,7 @@ export const pl_PL: AdminTranslations = {
   "common.justNow": "przed chwilą",
   "charts.sessionsTooltip": "{day}: {sessions} sesji, {accounts} kont, czas gry {played}",
   "error.tooManyAttempts": "zbyt wiele prób — odczekaj minutę i spróbuj ponownie",
+  "error.tooManyFailedAttempts": "too many failed attempts, wait a few minutes and try again",
   "error.invalidCredentials": "nieprawidłowa nazwa użytkownika lub hasło",
   "error.noAdminAccess": "to konto nie ma dostępu administratora",
   "error.cannotModerateAdmin": "kont administratorów nie można zawiesić ani zbanować",

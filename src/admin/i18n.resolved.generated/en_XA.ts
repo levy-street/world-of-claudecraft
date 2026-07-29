@@ -490,6 +490,7 @@ export const en_XA: AdminTranslations = {
   "common.justNow": "[ĵúšţ ñóŵ]",
   "charts.sessionsTooltip": "[{day}: {sessions} šéššíóñš, {accounts} áççóúñţš, {played} þļáýéð]",
   "error.tooManyAttempts": "[ţóó ɱáñý áţţéɱþţš, ŵáíţ á ɱíñúţé áñð ţŕý áĝáíñ]",
+  "error.tooManyFailedAttempts": "[ţóó ɱáñý ƒáíļéð áţţéɱþţš, ŵáíţ á ƒéŵ ɱíñúţéš áñð ţŕý áĝáíñ]",
   "error.invalidCredentials": "[íñʋáļíð úšéŕñáɱé óŕ þáššŵóŕð]",
   "error.noAdminAccess": "[ţĥíš áççóúñţ ðóéš ñóţ ĥáʋé áðɱíñ áççéšš]",
   "error.cannotModerateAdmin": "[áðɱíñ áççóúñţš çáññóţ ƀé šúšþéñðéð óŕ ƀáññéð]",

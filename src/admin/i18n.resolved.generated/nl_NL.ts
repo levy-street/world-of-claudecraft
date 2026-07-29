@@ -490,6 +490,7 @@ export const nl_NL: AdminTranslations = {
   "common.justNow": "zojuist",
   "charts.sessionsTooltip": "{day}: {sessions} sessies, {accounts} accounts, {played} gespeeld",
   "error.tooManyAttempts": "te veel pogingen — wacht een minuut en probeer opnieuw",
+  "error.tooManyFailedAttempts": "too many failed attempts, wait a few minutes and try again",
   "error.invalidCredentials": "ongeldige gebruikersnaam of wachtwoord",
   "error.noAdminAccess": "dit account heeft geen admintoegang",
   "error.cannotModerateAdmin": "adminaccounts kunnen niet geschorst of verbannen worden",

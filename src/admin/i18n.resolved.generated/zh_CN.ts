@@ -490,6 +490,7 @@ export const zh_CN: AdminTranslations = {
   "common.justNow": "刚刚",
   "charts.sessionsTooltip": "{day}：{sessions} 个会话，{accounts} 个账号，时长 {played}",
   "error.tooManyAttempts": "尝试次数过多——请稍等一分钟后重试",
+  "error.tooManyFailedAttempts": "too many failed attempts, wait a few minutes and try again",
   "error.invalidCredentials": "用户名或密码无效",
   "error.noAdminAccess": "此账号没有管理员权限",
   "error.cannotModerateAdmin": "管理员账号无法被封停或封禁",

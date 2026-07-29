@@ -49,6 +49,7 @@ import { apiRegistry } from '../../server/http/registry';
 import type { Method, Middleware } from '../../server/http/types';
 import {
   rateLimited,
+  resetAuthFailures,
   resetRateLimitClock,
   resetRateLimits,
   setRateLimitClock,
@@ -64,6 +65,9 @@ const ADMIN_ACCOUNT_ID = 7;
 const fullToken = (accountId = ADMIN_ACCOUNT_ID) => ({ accountId, scope: 'full' as const });
 // The admin-login per-minute ceiling (server/admin.ts ADMIN_LOGIN_MAX_PER_MINUTE).
 const ADMIN_LOGIN_MAX = 10;
+// The per-account failed-login ceiling within the window (server/ratelimit.ts
+// MAX_AUTH_FAILURES, which is not exported; mirrors tests/server/auth.login.test.ts).
+const MAX_AUTH_FAILURES = 10;
 // A frozen instant so a limiter drain sits inside one 60s window.
 const FIXED_NOW_MS = 1_700_000_000_000;
 
@@ -210,11 +214,13 @@ async function runRoute(
 beforeEach(() => {
   setRateLimitClock(() => FIXED_NOW_MS);
   resetRateLimits();
+  resetAuthFailures();
   resetAdminDbForTests();
 });
 
 afterEach(() => {
   resetRateLimits();
+  resetAuthFailures();
   resetRateLimitClock();
   resetAdminDbForTests();
   resetAdminRuntimeForTests();
@@ -405,6 +411,112 @@ describe('POST /admin/api/login', () => {
       success: false,
       data: null,
       error: 'too many attempts, wait a minute and try again',
+    });
+  });
+
+  // Regression coverage for the missing per-account brute-force lockout: unlike
+  // POST /api/login (server/auth_routes.ts), admin login had no authThrottled /
+  // recordAuthFailure / clearAuthFailures gate, so a distributed attacker who never
+  // repeats a source IP could guess a known admin username's password forever,
+  // capped only by ADMIN_LOGIN_MAX per IP (never per account).
+  describe('per-account failed-login throttle (distributed brute force)', () => {
+    it('429s the (MAX_AUTH_FAILURES + 1)th bad-password attempt against ONE account even though every attempt uses a DIFFERENT source IP', async () => {
+      const verifyPassword = vi.fn(async () => false);
+      setDb({
+        findAccount: async () => ({ id: 9, username: 'victim', password_hash: 'h' }) as never,
+        verifyPassword,
+      });
+      let last: Awaited<ReturnType<typeof runRoute>> | undefined;
+      for (let i = 0; i < MAX_AUTH_FAILURES + 1; i++) {
+        // A fresh, never-repeated source IP per attempt: the per-IP limiter (10/min,
+        // ADMIN_LOGIN_MAX) never sees more than one request from any of these, so if
+        // it were the only guard this loop would never 429.
+        last = await runRoute('POST', '/admin/api/login', {
+          body: { username: 'victim', password: 'wrong' },
+          headers: { 'x-forwarded-for': `203.0.113.${i + 1}` },
+        });
+      }
+      expect(last?.status).toBe(429);
+      expect(last?.body).toEqual({
+        success: false,
+        data: null,
+        error: 'too many failed attempts, wait a few minutes and try again',
+      });
+      // Locked out BEFORE any credential check on the final attempt: verifyPassword
+      // was reached exactly MAX_AUTH_FAILURES times (once per prior failure), never
+      // on the attempt that trips the lockout.
+      expect(verifyPassword).toHaveBeenCalledTimes(MAX_AUTH_FAILURES);
+    });
+
+    it('never locks out a DIFFERENT account sharing no username with the attacked one', async () => {
+      const verifyPassword = vi.fn(async () => false);
+      setDb({
+        findAccount: async () => ({ id: 9, username: 'victim', password_hash: 'h' }) as never,
+        verifyPassword,
+      });
+      for (let i = 0; i < MAX_AUTH_FAILURES; i++) {
+        await runRoute('POST', '/admin/api/login', {
+          body: { username: 'victim', password: 'wrong' },
+          headers: { 'x-forwarded-for': `203.0.113.${i + 1}` },
+        });
+      }
+      // 'bystander' has never failed a login, so it is unaffected by victim's lockout.
+      setDb({
+        findAccount: async () => ({ id: 10, username: 'bystander', password_hash: 'h2' }) as never,
+        verifyPassword: async () => true,
+        adminRolesForAccount: async () => ({ username: 'bystander', roles: ['viewer'] }),
+        touchLogin: async () => {},
+        newToken: () => 'tokBystander',
+        saveToken: async () => {},
+      });
+      const r = await runRoute('POST', '/admin/api/login', {
+        body: { username: 'bystander', password: 'right' },
+        headers: { 'x-forwarded-for': '198.51.100.1' },
+      });
+      expect(r.status).toBe(200);
+    });
+
+    it('a successful login clears the account throttle so a later lockout needs a fresh MAX_AUTH_FAILURES run', async () => {
+      const verifyPassword = vi.fn(async () => false);
+      setDb({
+        findAccount: async () => ({ id: 9, username: 'bob', password_hash: 'h' }) as never,
+        verifyPassword,
+      });
+      for (let i = 0; i < MAX_AUTH_FAILURES - 1; i++) {
+        await runRoute('POST', '/admin/api/login', {
+          body: { username: 'bob', password: 'wrong' },
+          headers: { 'x-forwarded-for': `203.0.113.${i + 1}` },
+        });
+      }
+      // One under the ceiling; a correct password now succeeds and forgives the typos.
+      setDb({
+        findAccount: async () => ({ id: 9, username: 'bob', password_hash: 'h' }) as never,
+        verifyPassword: async () => true,
+        adminRolesForAccount: async () => ({ username: 'bob', roles: ['viewer'] }),
+        touchLogin: async () => {},
+        newToken: () => 'tok456',
+        saveToken: async () => {},
+      });
+      const ok1 = await runRoute('POST', '/admin/api/login', {
+        body: { username: 'bob', password: 'correct' },
+        headers: { 'x-forwarded-for': '198.51.100.9' },
+      });
+      expect(ok1.status).toBe(200);
+
+      // Failures started fresh: MAX_AUTH_FAILURES - 1 more bad attempts still don't
+      // lock the account out.
+      setDb({
+        findAccount: async () => ({ id: 9, username: 'bob', password_hash: 'h' }) as never,
+        verifyPassword: async () => false,
+      });
+      let last: Awaited<ReturnType<typeof runRoute>> | undefined;
+      for (let i = 0; i < MAX_AUTH_FAILURES - 1; i++) {
+        last = await runRoute('POST', '/admin/api/login', {
+          body: { username: 'bob', password: 'wrong-again' },
+          headers: { 'x-forwarded-for': `192.0.2.${i + 1}` },
+        });
+      }
+      expect(last?.status).toBe(401);
     });
   });
 
