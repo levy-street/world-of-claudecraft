@@ -24,10 +24,19 @@ describe('stepKeyboardTurnFacing', () => {
   it('drops every pending local and wire heading when a scene lock takes ownership', () => {
     const st = newKeyboardTurnState();
     stepKeyboardTurnFacing(st, args({ turnLeft: true, serverFacing: 1 }));
+    st.releaseMs = 275;
+    st.suppressTurnFlags = true;
+    st.wasTurning = true;
 
     resetKeyboardTurnState(st);
 
-    expect(st).toEqual(newKeyboardTurnState());
+    expect(st).toEqual({
+      facing: null,
+      releaseMs: 0,
+      wireFacing: null,
+      suppressTurnFlags: false,
+      wasTurning: false,
+    });
   });
 
   it('integrates a right turn as a DECREASING facing at TURN_SPEED', () => {

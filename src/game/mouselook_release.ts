@@ -18,3 +18,22 @@ export function mouselookReleaseFacing(
 ): number | null {
   return prevMouselook && !mouselook ? camYaw : null;
 }
+
+export interface MouselookReleaseState {
+  active: boolean;
+}
+
+export function updateMouselookReleaseFacing(
+  state: MouselookReleaseState,
+  active: boolean,
+  camYaw: number,
+  inputLocked: boolean,
+): number | null {
+  if (inputLocked) {
+    state.active = false;
+    return null;
+  }
+  const facing = mouselookReleaseFacing(state.active, active, camYaw);
+  state.active = active;
+  return facing;
+}
