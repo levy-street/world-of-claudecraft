@@ -91,12 +91,17 @@ describe('NPC voice prompt catalog', () => {
     }
   });
 
-  it('aliases recurring characters onto a declared voice, never onto another alias', () => {
+  it('aliases recurring and ensemble-cast characters onto a declared voice, never an alias', () => {
     for (const [from, to] of Object.entries(VOICE_ALIAS as Record<string, string>)) {
       expect(promptIds.has(to), `${from} -> ${to}`).toBe(true);
       expect(promptIds.has(from), `${from} must not also be its own voice`).toBe(false);
       expect(Object.hasOwn(VOICE_ALIAS, to), `${to} must not itself be aliased`).toBe(false);
     }
+    expect(VOICE_ALIAS).toMatchObject({
+      ferryman_ewald: 'ferrymaster_caddow',
+      ferrykeeper_odda: 'harbormaster_odile',
+      sergeant_marsh: 'marshal_redbrook',
+    });
   });
 
   it('has a designed ElevenLabs voice id for every declared voice', () => {

@@ -840,7 +840,10 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
   });
 
   it('keeps the fixed-seed world projection stable through wandering and respawn', {
-    timeout: 90000,
+    // The canonical four-worker gate can put this synchronous dual-world
+    // projection just over 90 seconds under CPU contention. Keep the full seed,
+    // tick, and equality contract; only give the worker enough wall-clock room.
+    timeout: 120000,
   }, () => {
     const stabilitySeed = 4_242;
     const legacyWorld = {
