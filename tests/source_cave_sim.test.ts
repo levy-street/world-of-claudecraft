@@ -1092,7 +1092,13 @@ describe('source cave: death uses the dungeon model, not the delve no-op', () =>
     expect(pa.corpsePos).not.toBeNull();
 
     // The copy sits empty during the disconnect and is freed after the timeout.
-    for (let i = 0; i < 20 * (INSTANCE_EMPTY_TIMEOUT + 5); i++) sim.tick();
+    // The reaper runs once a second and counts seconds, so jump the empty timer
+    // to the threshold rather than simulating the full 300s: ticking it out costs
+    // 6100 ticks and put this one test at 16s against the 20s budget, which is
+    // what makes it time out under a full unbounded run.
+    const stale = claimedCave(sim);
+    stale.emptyFor = INSTANCE_EMPTY_TIMEOUT - 1;
+    for (let i = 0; i < 20; i++) sim.tick();
     expect(claimedCave(sim)).toBeUndefined();
 
     // Another group claims the freed slot, so Alice's re-entry lands in a

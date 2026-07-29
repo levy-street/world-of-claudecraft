@@ -773,6 +773,10 @@ describe('handlePickedEntity while dead (the ghost/death loop)', () => {
         return true;
       },
       startAutoAttack: () => {},
+      interact: () => {
+        calls.push('interact');
+        return true;
+      },
       resurrectAtSpiritHealer: () => {
         calls.push('resurrectAtSpiritHealer');
         return true;
@@ -827,6 +831,63 @@ describe('handlePickedEntity while dead (the ghost/death loop)', () => {
     expect(calls).not.toContain('enterDungeon');
     expect(calls).toContain('showError');
   });
+
+  // The Source Cave's well is the one INTERACT-ONLY dungeon entrance: alive, the
+  // walk-in trigger deliberately skips it (its banter gate is a server decision,
+  // src/sim/instances/dungeons.ts). The sim already routes a released spirit's
+  // well interact through to re-entry (the ghost/portal arm of interact() in
+  // src/sim/interaction.ts, whose own comment says that without it the well
+  // "strands a corpse-running ghost outside"), so the client must let that one
+  // click reach the server instead of answering with the generic dead toast.
+  // Everything else the cave gates stays refused here: the sim refuses it too.
+  const caveWell = () =>
+    stubEntity({
+      id: 2,
+      kind: 'object',
+      templateId: 'dungeon_door',
+      dungeonId: 'source_cave',
+      lootable: true,
+      pos: { x: 1, y: 0, z: 0 },
+    });
+
+  for (const [label, button] of [
+    ['right', 2],
+    ['left', 0],
+  ] as const) {
+    it(`a ghost ${label}-clicking the Source Cave well still reaches the server`, () => {
+      const { world, hud, calls } = rig({ dead: true, ghost: true }, caveWell());
+      expect(handlePickedEntity(world, hud, 2, button, 10, 20)).toBe(true);
+      expect(calls).toEqual(['interact']);
+    });
+  }
+
+  it('a dead but unreleased player clicking the Source Cave well is still refused', () => {
+    // Only a released spirit gets the exemption: a fresh corpse cannot act at
+    // all, and the sim's dead branch refuses it too.
+    const { world, hud, calls } = rig({ dead: true, ghost: false }, caveWell());
+    expect(handlePickedEntity(world, hud, 2, 2, 10, 20)).toBe(false);
+    expect(calls).not.toContain('interact');
+    expect(calls).toContain('showError');
+  });
+
+  for (const templateId of [
+    'source_cave_reboot',
+    'source_cave_chest_sealed',
+    'source_cave_chest',
+  ]) {
+    it(`a ghost clicking the cave's ${templateId} is still refused`, () => {
+      // The exemption is the WELL, not everything isSourceCaveGatedObject covers:
+      // the sim's dead branch honours portals only, so a ghost pressing the reboot
+      // button or looting the chest would just earn a server refusal.
+      const target = caveWell();
+      target.templateId = templateId;
+      target.dungeonId = null;
+      const { world, hud, calls } = rig({ dead: true, ghost: true }, target);
+      expect(handlePickedEntity(world, hud, 2, 2, 10, 20)).toBe(false);
+      expect(calls).not.toContain('interact');
+      expect(calls).toContain('showError');
+    });
+  }
 
   it('a dead player clicking visible corpse loot does not open it', () => {
     const corpse = stubEntity({

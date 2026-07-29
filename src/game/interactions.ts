@@ -1,5 +1,9 @@
 import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
-import { isSourceCaveBanterTarget, isSourceCaveGatedObject } from '../sim/source_cave';
+import {
+  isSourceCaveBanterTarget,
+  isSourceCaveGatedObject,
+  isSourceCaveWell,
+} from '../sim/source_cave';
 import {
   dist2d,
   EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS,
@@ -203,7 +207,12 @@ export function handlePickedEntity(
     // players: right-click only targets — the interaction menu lives on the
     // target portrait (right-click it), like classic-MMO unit frames
     if (e.kind === 'object') {
-      if (world.player.dead) {
+      // A released spirit keeps exactly one object interaction: the Source Cave's
+      // well. It is the only interact-only dungeon entrance (every other door has
+      // a walk-in trigger), so refusing the click here is what strands a ghost
+      // outside its own corpse. The sim's dead branch honours the same one case
+      // and refuses the rest of the cave's gated objects, so nothing else moves.
+      if (world.player.dead && !(world.player.ghost && isSourceCaveWell(e))) {
         hud.showError(tSim('error.cantWhileDead'));
         return false;
       }
@@ -313,7 +322,12 @@ export function handlePickedEntity(
   } else if (button === 0) {
     hud.closeContextMenu();
     if (e.kind === 'object') {
-      if (world.player.dead) {
+      // A released spirit keeps exactly one object interaction: the Source Cave's
+      // well. It is the only interact-only dungeon entrance (every other door has
+      // a walk-in trigger), so refusing the click here is what strands a ghost
+      // outside its own corpse. The sim's dead branch honours the same one case
+      // and refuses the rest of the cave's gated objects, so nothing else moves.
+      if (world.player.dead && !(world.player.ghost && isSourceCaveWell(e))) {
         hud.showError(tSim('error.cantWhileDead'));
         return false;
       }

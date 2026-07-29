@@ -48,7 +48,7 @@ export {
   updateSourceCaveEncounters,
   wakeSourceCaveGuardian,
 } from './encounter';
-export { isSourceCaveGatedObject } from './interaction_objects';
+export { isSourceCaveGatedObject, isSourceCaveWell } from './interaction_objects';
 export {
   isSourceCaveBanterTarget,
   SOURCE_CAVE_MOB_BANTER_LINES,

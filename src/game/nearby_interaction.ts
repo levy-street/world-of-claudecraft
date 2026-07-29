@@ -1,4 +1,8 @@
-import { isSourceCaveBanterTarget, isSourceCaveGatedObject } from '../sim/source_cave';
+import {
+  isSourceCaveBanterTarget,
+  isSourceCaveGatedObject,
+  isSourceCaveWell,
+} from '../sim/source_cave';
 import {
   dist2d,
   type Entity,
@@ -121,7 +125,15 @@ export function tryNearbyInteraction(
         bestDelve = entity.id;
         bestDelveDistance = distance;
       }
-    } else if (!player.dead && entity.kind === 'object' && entity.lootable) {
+    } else if (
+      entity.kind === 'object' &&
+      entity.lootable &&
+      // A released spirit keeps one object: the Source Cave's well. Every other
+      // dungeon door has a walk-in trigger, so the well is the only entrance a
+      // ghost cannot reach without this, which strands it outside its own corpse.
+      // The npc arm below carries the same shape for the spirit healer.
+      (!player.dead || (player.ghost && isSourceCaveWell(entity)))
+    ) {
       if (distance <= objectInteractionRange(entity) && distance < bestObjectDistance) {
         bestObject = entity.id;
         bestObjectDistance = distance;
