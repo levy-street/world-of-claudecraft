@@ -121,6 +121,14 @@ function authedDb(overrides: DbOverrides = {}): void {
   setCharactersDbForTests({
     accountAndScopeForToken: scopeOf('full'),
     moderationStatusForAccount: async () => modStatus(),
+    // The list payload resolves the account's Armory loadout per character;
+    // default to no cosmetics so unrelated tests stay Postgres-free.
+    loadAccountCosmetics: async () => ({
+      completedQuestIds: [],
+      mechChromaIds: [],
+      weaponSkinIds: [],
+      weaponSkinLoadout: {},
+    }),
     ...overrides,
   });
 }
@@ -335,7 +343,17 @@ describe('character list handlers', () => {
       last_played: null,
       playtime_seconds: null,
     });
-    setCharactersDbForTests({ listCharacters: async () => [rowA, rowB] });
+    setCharactersDbForTests({
+      listCharacters: async () => [rowA, rowB],
+      // A sword skin in the account loadout: resolves onto the warrior's held
+      // worn_sword and NOT onto the stateless mage (no mainhand, null skin).
+      loadAccountCosmetics: async () => ({
+        completedQuestIds: [],
+        mechChromaIds: [],
+        weaponSkinIds: ['ice_fang_sword'],
+        weaponSkinLoadout: { sword: 'ice_fang_sword' },
+      }),
+    });
     // Online status comes from the injected runtime: row 1 online, row 2 offline.
     installRuntime({ isCharacterOnline: (id) => id === 1 });
 
@@ -355,6 +373,7 @@ describe('character list handlers', () => {
           skinCatalog: 'mech',
           mainhandItemId: 'worn_sword',
           offhandItemId: 'eastbrook_buckler',
+          weaponSkinId: 'ice_fang_sword',
         },
         {
           id: 2,
@@ -369,6 +388,7 @@ describe('character list handlers', () => {
           skinCatalog: 'class',
           mainhandItemId: null,
           offhandItemId: null,
+          weaponSkinId: null,
         },
       ],
     };
@@ -796,6 +816,96 @@ describe('rename handler', () => {
     });
     expect(res.status).toBe(200);
     expect(saveMail).not.toHaveBeenCalled();
+  });
+
+  it("sweeps the renamed character's own instance signers and persists the swept blob", async () => {
+    // The RETURNING row carries the persisted blob; the handler
+    // rewrites ONLY the character's own old-name signers across bags, bank,
+    // and the equipped-instance map, leaves foreign-signed copies alone,
+    // keeps a count-3 same-signer stack as one slot at count 3, and saves
+    // the swept state back before responding.
+    const blob = st({
+      inventory: [
+        { itemId: 'bone_fragments', count: 3, instance: { signer: 'Oldname' } },
+        { itemId: 'bone_fragments', count: 1, instance: { signer: 'SomeoneElse' } },
+      ],
+      bank: {
+        inventory: [{ itemId: 'iron_bar', count: 1, instance: { signer: 'Oldname' } }],
+        purchasedSlots: 0,
+        bonusSlots: 0,
+      },
+      equipmentInstance: { chest: { signer: 'Oldname', enchant: 'ench_minor_stamina' } },
+    });
+    const renamed = charRow({ id: 5, name: 'Newname', level: 8, force_rename: false, state: blob });
+    const saveCharacterState = vi.fn(
+      async (_characterId: number, _level: number, _state: CharacterState) => true,
+    );
+    setCharactersDbForTests({ renameCharacter: async () => renamed, saveCharacterState });
+    installRuntime({ isCharacterOnline: () => false });
+
+    const character = charRow({ id: 5, name: 'Oldname', level: 8, force_rename: true });
+    const res = await callHandler('POST', '/api/characters/:id/rename', {
+      account: { accountId: 7, scope: 'full' },
+      state: stateWith(character),
+      body: { name: 'Newname' },
+    });
+    expect(res.status).toBe(200);
+    expect(saveCharacterState).toHaveBeenCalledTimes(1);
+    expect(saveCharacterState).toHaveBeenCalledWith(5, 8, blob);
+    const saved = saveCharacterState.mock.calls[0][2];
+    expect(saved.inventory).toEqual([
+      { itemId: 'bone_fragments', count: 3, instance: { signer: 'Newname' } },
+      { itemId: 'bone_fragments', count: 1, instance: { signer: 'SomeoneElse' } },
+    ]);
+    expect(saved.bank?.inventory).toEqual([
+      { itemId: 'iron_bar', count: 1, instance: { signer: 'Newname' } },
+    ]);
+    expect(saved.equipmentInstance).toEqual({
+      chest: { signer: 'Newname', enchant: 'ench_minor_stamina' },
+    });
+  });
+
+  it('skips the state save when no held instance carried the old name', async () => {
+    const blob = st({
+      inventory: [{ itemId: 'bone_fragments', count: 1, instance: { signer: 'SomeoneElse' } }],
+    });
+    const renamed = charRow({ id: 5, name: 'Newname', force_rename: false, state: blob });
+    const saveCharacterState = vi.fn(
+      async (_characterId: number, _level: number, _state: CharacterState) => true,
+    );
+    setCharactersDbForTests({ renameCharacter: async () => renamed, saveCharacterState });
+    installRuntime({ isCharacterOnline: () => false });
+
+    const character = charRow({ id: 5, name: 'Oldname', force_rename: true });
+    const res = await callHandler('POST', '/api/characters/:id/rename', {
+      account: { accountId: 7, scope: 'full' },
+      state: stateWith(character),
+      body: { name: 'Newname' },
+    });
+    expect(res.status).toBe(200);
+    expect(saveCharacterState).not.toHaveBeenCalled();
+    // The foreign-signed copy passed through the no-op sweep untouched.
+    expect(blob.inventory).toEqual([
+      { itemId: 'bone_fragments', count: 1, instance: { signer: 'SomeoneElse' } },
+    ]);
+  });
+
+  it('skips the state save when the renamed row carries no state blob', async () => {
+    const renamed = charRow({ id: 5, name: 'Newname', force_rename: false, state: null });
+    const saveCharacterState = vi.fn(
+      async (_characterId: number, _level: number, _state: CharacterState) => true,
+    );
+    setCharactersDbForTests({ renameCharacter: async () => renamed, saveCharacterState });
+    installRuntime({ isCharacterOnline: () => false });
+
+    const character = charRow({ id: 5, name: 'Oldname', force_rename: true });
+    const res = await callHandler('POST', '/api/characters/:id/rename', {
+      account: { accountId: 7, scope: 'full' },
+      state: stateWith(character),
+      body: { name: 'Newname' },
+    });
+    expect(res.status).toBe(200);
+    expect(saveCharacterState).not.toHaveBeenCalled();
   });
 
   it('400s an invalid new name (normalizeCharName -> null) before the force_rename gate', async () => {

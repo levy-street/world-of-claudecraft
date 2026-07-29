@@ -74,7 +74,7 @@ describe('battlefieldExperienceTrickle (#1149, self-observation)', () => {
     ).toBe(0);
     expect(
       battlefieldExperienceTrickle(skills, {
-        // No rolled.quality at all (the Phase 2 crafted shape): the rarity
+        // No rolled.quality at all (the masterwork-model crafted shape): the rarity
         // gate falls back to the item def's static quality, common here.
         itemId: 'minor_healing_potion',
         instance: { signer: 'Aria' },
@@ -123,7 +123,7 @@ describe('battlefieldExperienceTrickle (#1149, self-observation)', () => {
   });
 });
 
-// Phase 2 (Professions 2.0 masterwork model): deterministic crafts sign a
+// The Professions 2.0 masterwork model: deterministic crafts sign a
 // rare-plus-DEF output WITHOUT writing rolled.quality, so the trickle's
 // rarity gate falls back to the item def's static quality when the instance
 // carries none, and a legacy instance's own rolled.quality wins whenever it
@@ -131,7 +131,7 @@ describe('battlefieldExperienceTrickle (#1149, self-observation)', () => {
 // rare-plus def today, so the rare-def arm temporarily re-points the potion's
 // def quality (content-driven read, same mutate-and-restore idiom
 // tests/professions_perks.test.ts uses on PERK_THRESHOLDS).
-describe('battlefieldExperienceTrickle def-quality fallback (Phase 2)', () => {
+describe('battlefieldExperienceTrickle def-quality fallback', () => {
   it('a new crafted rare-def instance (signer only, no rolled.quality) still triggers the trickle', () => {
     const def = ITEMS.minor_healing_potion;
     const originalQuality = def.quality;
@@ -140,7 +140,7 @@ describe('battlefieldExperienceTrickle def-quality fallback (Phase 2)', () => {
       const skills = emptyCraftSkills();
       const amount = battlefieldExperienceTrickle(skills, {
         itemId: 'minor_healing_potion',
-        // The exact Phase 2 crafted rare-def shape: signer, no rolled at all.
+        // The exact masterwork-model crafted rare-def shape: signer, no rolled at all.
         instance: { signer: 'Aria' },
         observerName: 'Aria',
         observerActiveArchetype: 'alchemy',
@@ -200,7 +200,7 @@ describe('battlefieldExperienceTrickle def-quality fallback (Phase 2)', () => {
       const pid = sim.playerId;
       const meta = (sim as any).players.get(pid);
       meta.archetype.activeArchetype = 'alchemy';
-      // The Phase 2 crafted grant shape (crafting.ts signs rare-plus-def
+      // The masterwork-model crafted grant shape (crafting.ts signs rare-plus-def
       // outputs with { signer } alone, never rolled.quality).
       sim.addItemInstance('minor_healing_potion', { signer: meta.name }, pid);
       const entity = (sim as any).entities.get(pid);

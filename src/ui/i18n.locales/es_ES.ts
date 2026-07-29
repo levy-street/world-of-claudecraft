@@ -12,6 +12,10 @@ import type { TranslationKey } from '../i18n.catalog';
 
 export const es_ES: Partial<Record<TranslationKey, string>> = {
   'hudChrome.emotes.question': '¿Tío?',
+  'hudChrome.professions.ctaRaiseSpecialized':
+    'Sigue subiendo {craft}: {points} puntos más para Especializado, y los costes de materiales bajan.',
+  'guide.profPages.econ.feesNote':
+    'Una economía de jugadores sana necesita que las monedas salgan del mundo, y los oficios llevan varios de esos drenajes. Aprender una receta de un entrenador cuesta una tarifa única según su peldaño, cada creación exitosa paga una pequeña tarifa escalada al presupuesto de estadísticas de la pieza, y encima de esas están las tarifas de desvinculación y la comisión del Mercado.\n\nNinguna de estas monedas va a otro jugador: sale del juego por completo, que es lo que mantiene el valor de las monedas que el resto de vosotros ganáis.',
   'nav.loginRegister': 'Iniciar sesión/Registrarse',
   'stats.playersOnline': 'Jugadores en línea',
   'stats.realmName': 'Nombre del mundo',

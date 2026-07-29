@@ -1,9 +1,11 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import * as items from '../src/sim/items';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
-import { type Entity, POTION_COOLDOWN, type SimEvent } from '../src/sim/types';
+import { type Entity, type ItemDef, POTION_COOLDOWN, type SimEvent } from '../src/sim/types';
 
 // Direct tests for the extracted inventory/vendor module (W2). They call the module
 // functions with the real SimContext the Sim built in its ctor (the same seam the thin
@@ -118,6 +120,26 @@ describe('items.useItem', () => {
     expect(sim.countItem('spring_water', pid)).toBe(0);
   });
 
+  it('sitting down to eat/drink emits an immediate sound-only heal (source + sfxTick), before any regen tick', () => {
+    const sim = makeWorld();
+    const { pid, p } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    sim.addItem('baked_bread', 1, pid);
+    sim.addItem('spring_water', 1, pid);
+
+    sim.drainEvents();
+    items.useItem(ctx, 'baked_bread', pid);
+    const eatHeals = (sim.drainEvents() as any[]).filter((e) => e.type === 'heal');
+    expect(eatHeals).toHaveLength(1);
+    expect(eatHeals[0]).toMatchObject({ source: 'food', sfxTick: true, amount: 0 });
+
+    sim.drainEvents();
+    items.useItem(ctx, 'spring_water', pid);
+    const drinkHeals = (sim.drainEvents() as any[]).filter((e) => e.type === 'heal');
+    expect(drinkHeals).toHaveLength(1);
+    expect(drinkHeals[0]).toMatchObject({ source: 'drink', sfxTick: true, amount: 0 });
+  });
+
   it('potion heals up to the deficit and arms the shared cooldown', () => {
     const sim = makeWorld();
     const { pid, p } = vendorPlayer(sim);
@@ -129,6 +151,36 @@ describe('items.useItem', () => {
     expect(p.hp).toBe(p.maxHp); // 90 potion clamped to the 50 deficit
     expect(p.potionCooldownUntil).toBeGreaterThan(0);
     expect(sim.countItem('minor_healing_potion', pid)).toBe(0);
+  });
+
+  it('a potion heal emits source:potion (distinct from a generic heal_impact)', () => {
+    const sim = makeWorld();
+    const { pid, p } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    sim.addItem('minor_healing_potion', 1, pid);
+    p.hp = p.maxHp - 50;
+
+    sim.drainEvents();
+    items.useItem(ctx, 'minor_healing_potion', pid);
+    const heals = (sim.drainEvents() as any[]).filter((e) => e.type === 'heal');
+    expect(heals).toHaveLength(1);
+    expect(heals[0]).toMatchObject({ source: 'potion', amount: 50 });
+  });
+
+  it('a pure-mana potion still emits source:potion, amount 0 (sound-only, no floating heal number)', () => {
+    const sim = makeWorld();
+    const { pid, p } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    sim.addItem('minor_mana_potion', 1, pid);
+    p.resourceType = 'mana';
+    p.resource = p.maxResource - 50;
+    p.hp = p.maxHp; // full: no hp portion of this potion applies
+
+    sim.drainEvents();
+    items.useItem(ctx, 'minor_mana_potion', pid);
+    const heals = (sim.drainEvents() as any[]).filter((e) => e.type === 'heal');
+    expect(heals).toHaveLength(1);
+    expect(heals[0]).toMatchObject({ source: 'potion', amount: 0 });
   });
 
   it('shares one 2-minute cooldown across all potions and materializes the remaining timer', () => {
@@ -166,7 +218,10 @@ describe('items.useItem', () => {
     sim.addItem('elixir_of_the_bear', 1, pid);
 
     items.useItem(ctx, 'elixir_of_the_bear', pid);
-    expect(p.auras.some((a) => a.id === 'elixir_elixir_of_the_bear')).toBe(true);
+    const aura = p.auras.find((a) => a.id === 'elixir_buff_sta');
+    expect(aura).toBeTruthy();
+    expect(aura!.kind).toBe('buff_sta');
+    expect(aura!.value).toBe(12);
     expect(sim.countItem('elixir_of_the_bear', pid)).toBe(0);
   });
 
@@ -359,21 +414,45 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     const { pid, meta } = vendorPlayer(sim);
     const ctx = ctxOf(sim);
     meta.copper = 0;
-    sim.addItem('wolf_fang', 2, pid); // poor, sellValue 4 -> 8
+    // wolf_fang is a crafting reagent now (quality common, never
+    // swept), so this sweep uses mudfin_scale as its gray fodder.
+    sim.addItem('mudfin_scale', 2, pid); // poor, sellValue 5 -> 10
     sim.addItem('bandit_bandana', 1, pid); // poor, sellValue 6
+    sim.addItem('wolf_fang', 1, pid); // reagent (common, white) -> kept
     sim.addItem('apprentice_staff', 1, pid); // not poor -> kept
     sim.drainEvents();
 
     items.sellAllJunk(ctx, pid);
-    expect(sim.countItem('wolf_fang', pid)).toBe(0);
+    expect(sim.countItem('mudfin_scale', pid)).toBe(0);
     expect(sim.countItem('bandit_bandana', pid)).toBe(0);
+    expect(sim.countItem('wolf_fang', pid)).toBe(1);
     expect(sim.countItem('apprentice_staff', pid)).toBe(1);
-    expect(meta.copper).toBe(2 * 4 + 6); // 14
-    expect(meta.vendorBuyback.some((s) => s.itemId === 'wolf_fang' && s.count === 2)).toBe(true);
+    expect(meta.copper).toBe(2 * 5 + 6); // 16
+    expect(meta.vendorBuyback.some((s) => s.itemId === 'mudfin_scale' && s.count === 2)).toBe(true);
     const summary = sim
       .drainEvents()
       .filter((e) => e.type === 'loot' && /^Sold \d+ junk item/.test((e as { text: string }).text));
     expect(summary).toHaveLength(1);
+  });
+
+  it('junkSellableSlot is the one sweep rule: every arm decides, and the HUD preview consumes it', () => {
+    // The predicate is shared by sellAllJunk and the vendor preview in
+    // hud.ts renderVendor; per-arm decisiveness here plus the source pin
+    // below keep the two surfaces from ever drifting apart again.
+    const gray: ItemDef = ITEMS.mudfin_scale;
+    const slot = { count: 1 };
+    expect(items.junkSellableSlot(gray, slot)).toBe(true);
+    expect(items.junkSellableSlot(undefined, slot)).toBe(false);
+    expect(items.junkSellableSlot(ITEMS.wolf_fang, slot)).toBe(false); // common, not poor
+    expect(items.junkSellableSlot({ ...gray, kind: 'quest' } as ItemDef, slot)).toBe(false);
+    expect(items.junkSellableSlot({ ...gray, noVendorSell: true }, slot)).toBe(false);
+    expect(items.junkSellableSlot({ ...gray, soulbound: true }, slot)).toBe(false);
+    expect(items.junkSellableSlot(gray, { count: 0 })).toBe(false);
+    expect(items.junkSellableSlot(gray, { count: 1, instance: { boundTo: 7 } })).toBe(false);
+    expect(items.junkSellableSlot(gray, { count: 1, instance: { signer: 'Ana' } })).toBe(true);
+
+    const hud = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+    expect(hud).toContain('junkSellableSlot(ITEMS[slot.itemId], slot)');
   });
 
   it('buyBackItem repurchases via the silent add, spends copper, and clears the buyback slot', () => {
@@ -384,7 +463,7 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     items.sellItem(ctx, 'apprentice_staff', 1, pid); // copper + 120, records buyback
     const copperAfterSell = meta.copper;
 
-    items.buyBackItem(ctx, 'apprentice_staff', pid);
+    items.buyBackItem(ctx, 'apprentice_staff', undefined, pid);
     expect(sim.countItem('apprentice_staff', pid)).toBe(1);
     expect(meta.copper).toBe(copperAfterSell - 120); // repurchase at sellValue
     expect(meta.vendorBuyback.some((s) => s.itemId === 'apprentice_staff')).toBe(false);
@@ -409,7 +488,7 @@ describe('items module determinism', () => {
       items.sellItem(ctx, 'wolf_fang', 1, pid);
       sim.addItem('bandit_bandana', 1, pid);
       items.sellAllJunk(ctx, pid);
-      items.buyBackItem(ctx, 'wolf_fang', pid);
+      items.buyBackItem(ctx, 'wolf_fang', undefined, pid);
       return {
         copper: meta.copper,
         inventory: meta.inventory,

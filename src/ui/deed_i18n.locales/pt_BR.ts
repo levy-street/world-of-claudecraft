@@ -82,7 +82,7 @@ export const table: DeedLocaleTable = {
   },
   prog_master_gatherer: {
     name: 'Mestre Coletor',
-    desc: 'Alcance 100 de proficiência em Mineração, Lenharia e Herborismo.',
+    desc: 'Alcance 100 de proficiência em quaisquer tres dentre Mineracao, Lenharia, Herborismo e Pesca.',
   },
   prog_first_craft: { name: 'Feito à Mão', desc: 'Conclua sua primeira criação bem-sucedida.' },
   prog_craft_specialist: {
@@ -440,7 +440,7 @@ export const table: DeedLocaleTable = {
   },
   col_glimmerfin: {
     name: 'Lampejo de Esperança',
-    desc: 'Pesque um Koi de nadadeiras cintilantes.',
+    desc: 'Pesque um Koi do Brilho Solar.',
   },
   col_full_creel: {
     name: 'Cesto Cheio',
@@ -623,7 +623,10 @@ export const table: DeedLocaleTable = {
     title: 'o Andarilho',
   },
   exp_something_shiny: { name: 'Algo Brilhante', desc: 'Pegue um objeto cintilante do chão.' },
-  exp_first_ore: { name: 'Golpeie a Terra', desc: 'Colete seu primeiro veio de minério.' },
+  exp_first_ore: {
+    name: 'Picareta Encontra Pedra',
+    desc: 'Colete seu primeiro veio de minério.',
+  },
   exp_first_timber: { name: 'Madeira!', desc: 'Colete seu primeiro ponto de madeira.' },
   exp_first_herb: { name: 'Dedo Verde', desc: 'Colha seu primeiro ponto de ervas.' },
   feat_era_cap: {
@@ -695,5 +698,120 @@ export const table: DeedLocaleTable = {
   chr_marsh_first_cast: {
     name: 'Enguias nos Juncos',
     desc: 'Pesque um peixe nas águas do Pântano de Mirefen.',
+  },
+  prog_guildsworn: {
+    name: 'Jurado do Ofício',
+    desc: 'Sintonize-se a um par de arquétipos e assuma seus ofícios de vez.',
+    title: 'Jurado do Ofício',
+  },
+  prog_masterwright: {
+    name: 'Mestre Artesao',
+    desc: 'Crie sua primeira obra-prima, uma peca tao refinada que a zona inteira fica sabendo.',
+    title: 'Mestre Artesao',
+  },
+  prog_fishing_100: {
+    name: 'Sal Velho',
+    desc: 'Alcance 100 de proficiência em Pesca.',
+  },
+  prog_master_angler: {
+    name: 'Pescador Mestre',
+    desc: 'Alcance 200 de proficiência em Pesca, o ponto mais alto da arte do pescador.',
+    title: 'Pescador Mestre',
+  },
+  prog_engineering_50: {
+    name: 'Engrenagens e Molas',
+    desc: 'Alcance 50 de perícia em Engenharia.',
+  },
+  prog_alchemy_50: {
+    name: 'Pocoes Estranhas',
+    desc: 'Alcance 50 de perícia em Alquimia.',
+  },
+  prog_cooking_50: {
+    name: 'Cozinheiro Experiente',
+    desc: 'Alcance 50 de perícia em Culinária.',
+  },
+  prog_leatherworking_50: {
+    name: 'Ofício de Curtidor',
+    desc: 'Alcance 50 de perícia em Couraria.',
+  },
+  prog_tailoring_50: {
+    name: 'Uma Costura Fina',
+    desc: 'Alcance 50 de perícia em Alfaiataria.',
+  },
+  prog_enchanting_50: {
+    name: 'Um Brilho de Arcana',
+    desc: 'Alcance 50 de perícia em Encantamento.',
+  },
+  prog_weaponcrafting_50: {
+    name: 'Gume e Têmpera',
+    desc: 'Alcance 50 de perícia em Fabricacao de Armas.',
+  },
+  prog_armorcrafting_50: {
+    name: 'Martelo e Placa',
+    desc: 'Alcance 50 de perícia em Fabricacao de Armaduras.',
+  },
+  prog_grandmaster_engineering: {
+    name: 'Grão-Mestre em Engenharia',
+    desc: 'Alcance 125 de perícia em Engenharia, o ponto mais alto do ofício.',
+    title: 'Grão-Mestre em Engenharia',
+  },
+  prog_grandmaster_alchemy: {
+    name: 'Grão-Mestre em Alquimia',
+    desc: 'Alcance 125 de perícia em Alquimia, o ponto mais alto do ofício.',
+    title: 'Grão-Mestre em Alquimia',
+  },
+  prog_grandmaster_cooking: {
+    name: 'Grão-Mestre em Culinária',
+    desc: 'Alcance 125 de perícia em Culinária, o ponto mais alto do ofício.',
+    title: 'Grão-Mestre em Culinária',
+  },
+  prog_grandmaster_leatherworking: {
+    name: 'Grão-Mestre em Couraria',
+    desc: 'Alcance 125 de perícia em Couraria, o ponto mais alto do ofício.',
+    title: 'Grão-Mestre em Couraria',
+  },
+  prog_grandmaster_tailoring: {
+    name: 'Grão-Mestre em Alfaiataria',
+    desc: 'Alcance 125 de perícia em Alfaiataria, o ponto mais alto do ofício.',
+    title: 'Grão-Mestre em Alfaiataria',
+  },
+  prog_grandmaster_enchanting: {
+    name: 'Grão-Mestre em Encantamento',
+    desc: 'Alcance 125 de perícia em Encantamento, o ponto mais alto do ofício.',
+    title: 'Grão-Mestre em Encantamento',
+  },
+  prog_grandmaster_weaponcrafting: {
+    name: 'Grão-Mestre em Fabricacao de Armas',
+    desc: 'Alcance 125 de perícia em Fabricacao de Armas, o ponto mais alto do ofício.',
+    title: 'Grão-Mestre em Fabricacao de Armas',
+  },
+  prog_grandmaster_armorcrafting: {
+    name: 'Grão-Mestre em Fabricacao de Armaduras',
+    desc: 'Alcance 125 de perícia em Fabricacao de Armaduras, o ponto mais alto do ofício.',
+    title: 'Grão-Mestre em Fabricacao de Armaduras',
+  },
+  col_pristine_vein: {
+    name: 'Veia Imaculada',
+    desc: 'Quebre uma veia imaculada e deixe a zona inteira saber disso.',
+  },
+  col_ancient_heartwood: {
+    name: 'Cerne Anciao',
+    desc: 'Extraia um pedaco de cerne anciao de um tronco derrubado.',
+  },
+  col_moonlit_bloom: {
+    name: 'Flor ao Luar',
+    desc: 'Colha uma flor ao luar no exato momento em que ela desabrocha.',
+  },
+  col_perfect_specimen: {
+    name: 'Um Espécime Perfeito',
+    desc: 'Retire um espécime perfeito de uma besta abatida, sem um arranhao ou imperfeicao.',
+  },
+  soc_first_salvage: {
+    name: 'Nada se Perde',
+    desc: 'Recupere uma peca de equipamento transformando-a em materiais brutos.',
+  },
+  soc_salvage_50: {
+    name: 'O Ferro-Velho',
+    desc: 'Recupere 50 pecas de equipamento transformando-as em materiais brutos.',
   },
 };

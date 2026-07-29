@@ -154,8 +154,11 @@ describe('selfHotPctMax effect (effect_dispatch)', () => {
 
 describe('offhand surfacing (paperdoll, player card, chat readout)', () => {
   it('shows the offhand cell on the character sheet paperdoll', async () => {
-    const { PAPERDOLL_RIGHT_SLOTS } = await import('../src/ui/char_view');
-    expect(PAPERDOLL_RIGHT_SLOTS).toContain('offhand');
+    // Showcase redesign: the offhand moved to the LEFT column (under Main Hand) to
+    // balance the paperdoll 6/6. It is still surfaced on the sheet, now on the left.
+    const { PAPERDOLL_LEFT_SLOTS, PAPERDOLL_RIGHT_SLOTS } = await import('../src/ui/char_view');
+    expect(PAPERDOLL_LEFT_SLOTS).toContain('offhand');
+    expect(PAPERDOLL_RIGHT_SLOTS).not.toContain('offhand');
   });
 
   it('lists the offhand in the chat gear readout', async () => {
@@ -508,5 +511,29 @@ describe('target-of-target wire field (dynamicFields tgt) and resolution', () =>
     sim.targetEntity(null, a);
     internals.applySnapshot({ t: 'snap', ents: [wireEntity(e)] });
     expect(client.entities.get(a)?.targetId).toBeNull();
+  });
+
+  it('carries taunt forced-target state through the entity wire', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
+    const tank = sim.addPlayer('warrior', 'Tank');
+    const mob = [...sim.entities.values()].find((e) => e.kind === 'mob');
+    if (!mob) throw new Error('missing mob entity');
+    mob.forcedTargetId = tank;
+    mob.forcedTargetTimer = 2.95;
+    expect(wireEntity(mob)).toMatchObject({ ft: tank, ftm: 2.95 });
+
+    const client = bareClient(tank + 1000);
+    const internals = client as unknown as { applySnapshot(snapshot: unknown): void };
+    internals.applySnapshot({ t: 'snap', ents: [wireEntity(mob)] });
+    const mirrored = client.entities.get(mob.id);
+    if (!mirrored) throw new Error('missing mirrored mob');
+    expect(mirrored.forcedTargetId).toBe(tank);
+    expect(mirrored.forcedTargetTimer).toBe(2.95);
+
+    mob.forcedTargetId = null;
+    mob.forcedTargetTimer = 0;
+    internals.applySnapshot({ t: 'snap', ents: [wireEntity(mob)] });
+    expect(client.entities.get(mob.id)?.forcedTargetId).toBeNull();
+    expect(client.entities.get(mob.id)?.forcedTargetTimer).toBe(0);
   });
 });

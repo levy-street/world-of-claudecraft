@@ -172,14 +172,14 @@ describe('spec masteries', () => {
     expect(effect(known('warlock', 'corruption'), 'dot').total).toBe(85);
     expect(effect(known('warlock', 'corruption', 'affliction'), 'dot').total).toBe(102);
 
-    expect(effect(known('druid', 'rejuvenation'), 'hot').total).toBe(116);
-    expect(effect(known('druid', 'rejuvenation', 'restoration'), 'hot').total).toBe(145);
+    expect(effect(known('druid', 'rejuvenation'), 'hot').total).toBe(168);
+    expect(effect(known('druid', 'rejuvenation', 'restoration'), 'hot').total).toBe(210);
 
-    expect(effect(known('priest', 'power_word_shield'), 'absorb').amount).toBe(145);
-    expect(effect(known('priest', 'power_word_shield', 'discipline'), 'absorb').amount).toBe(189);
+    expect(effect(known('priest', 'power_word_shield'), 'absorb').amount).toBe(210);
+    expect(effect(known('priest', 'power_word_shield', 'discipline'), 'absorb').amount).toBe(273);
 
-    expect(known('shaman', 'healing_wave').cost).toBe(90);
-    expect(known('shaman', 'healing_wave', 'restoration').cost).toBe(72);
+    expect(known('shaman', 'healing_wave').cost).toBe(115);
+    expect(known('shaman', 'healing_wave', 'restoration').cost).toBe(92);
 
     expect(effect(known('rogue', 'sinister_strike'), 'weaponStrike').bonus).toBe(18);
     // Balance pass: Scrapper's Edge lost the -10% cut, so the combat-specced

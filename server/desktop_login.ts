@@ -70,7 +70,7 @@ export function desktopLoginCodeCountForTest(): number {
 // Shapes are structural subsets of the real functions on purpose.
 //
 // Scope fix: the create leg no longer resolves its own bearer (the
-// original deps carried the scope-blind accountForToken, which let a read-scope
+// original deps carried a scope-blind identity resolver, which let a read-scope
 // companion/OAuth token mint a handoff code that exchange then traded for a
 // FULL session, a scope escalation). Both serving paths now authenticate with
 // the full-session resolver BEFORE calling issueDesktopLoginCode: the legacy

@@ -251,8 +251,15 @@ export const PALMREACH_NPCS: Record<string, NpcDef> = {
     id: 'hermit_okku',
     name: 'Okku',
     title: 'The Man Who Went In',
-    pos: { x: -398, z: 1074 },
-    facing: -0.6,
+    // 12.4 yd out from the great banyan at (-400, 1080), on the shoulder of
+    // the Tangle road's last waypoint (2.2 yd from it, 2.4 yd off the road
+    // line, so he reads as standing at the path edge). The trunk COLLIDER is
+    // only r * 1.45 (4.6 yd), but the rendered banyan scales to
+    // t.r * (2.5..3.0) and its roots flare wider still: at z 1074 he showed
+    // as a nameplate floating in the bark, and at z 1071.5 (8.7 yd out) he
+    // still clipped the trunk. Keep him a full 12 yd clear.
+    pos: { x: -397, z: 1068 },
+    facing: -0.24, // atan2(dx, dz) toward the banyan he went in to
     color: 0x6f8a5a,
     questIds: [
       'q_pr_the_man_who_went_in',
@@ -514,7 +521,8 @@ export const PALMREACH_CAMPS: CampDef[] = [
   { mobId: 'tide_scuttler', center: { x: -456, z: 878 }, radius: 10, count: 3 },
   { mobId: 'tide_scuttler', center: { x: -252, z: 840 }, radius: 10, count: 3 },
   { mobId: 'thicket_boar', center: { x: -368, z: 940 }, radius: 10, count: 3 },
-  { mobId: 'thicket_boar', center: { x: -416, z: 1004 }, radius: 10, count: 3 },
+  // moved off the Emerald Run's new river valley onto the dry shoulder
+  { mobId: 'thicket_boar', center: { x: -410, z: 960 }, radius: 10, count: 3 },
   { mobId: 'canopy_weaver', center: { x: -326, z: 1060 }, radius: 10, count: 3 },
   { mobId: 'canopy_weaver', center: { x: -426, z: 1120 }, radius: 10, count: 2 },
   { mobId: 'idol_guardian', center: { x: -256, z: 1090 }, radius: 5, count: 1 },
@@ -582,6 +590,17 @@ export const PALMREACH_PROPS: ZonePropsDef = {
   buildings: [
     { kind: 'inn', x: -308, z: 824, w: 6, d: 7, rot: 0.9 },
     { kind: 'house', x: -292, z: 814, w: 5, d: 5, rot: -0.7 },
+    // the outlying hamlets, one house anchoring each mud-hut cluster: the
+    // back-beach, the Vinefall approach, and the idol road (probed level)
+    { kind: 'house', x: -380, z: 795, w: 5, d: 5, rot: 0.2 },
+    { kind: 'house', x: -370, z: 1045, w: 5, d: 5, rot: 2.9 },
+    { kind: 'house', x: -280, z: 1055, w: 5, d: 5, rot: 1.4 },
+    // the second wave: lone homesteads spread wide (every site probed level
+    // and dry, 18-plus yards clear of every other structure)
+    { kind: 'house', x: -320, z: 780, w: 5, d: 5, rot: 1.8 },
+    { kind: 'house', x: -270, z: 820, w: 5, d: 5, rot: -1.1 },
+    { kind: 'house', x: -440, z: 900, w: 5, d: 5, rot: 0.6 },
+    { kind: 'house', x: -410, z: 1130, w: 5, d: 5, rot: 2.2 },
   ],
   wells: [{ x: -300, z: 822, r: 1.5 }],
   stalls: [
@@ -591,14 +610,31 @@ export const PALMREACH_PROPS: ZonePropsDef = {
   tents: [
     { x: -288, z: 826, rot: 1.1, scale: 1 },
     { x: -312, z: 834, rot: -2.0, scale: 1.1 },
+    // the Sunway camp: a traveller ring on the jungle shelf east of town
+    { x: -245, z: 876, rot: -0.785, scale: 1 },
+    { x: -256, z: 877, rot: 0.983, scale: 1.1 },
+    { x: -250, z: 888, rot: 3.14, scale: 1 },
+    // riverside camps: one tent each on the Emerald Run and West Arm banks
+    { x: -445, z: 1000, rot: 2.3, scale: 1 },
+    { x: -506, z: 1039, rot: 0.75, scale: 1 },
   ],
   crates: [
     [-302, 816],
     [-294, 820],
+    [-246, 884], // the Sunway camp's stores
+    [-376, 797], // the hamlets' yards
+    [-374, 1047],
+    [-284, 1057],
   ],
   campfires: [
     [-300, 818],
     [-418, 720], // the Tanglemouth's waycamp
+    [-250, 881], // the Sunway camp
+    [-380, 803], // the hamlets' hearths
+    [-370, 1053],
+    [-280, 1063],
+    [-441, 997], // the riverside camps
+    [-503, 1036],
   ],
   // a fishing dock running off the village beach into the shallows
   // Drifthaven's beach dock (kept on the strand: the flat coast has no open
@@ -607,19 +643,41 @@ export const PALMREACH_PROPS: ZonePropsDef = {
   mudHuts: [
     [-316, 826],
     [-290, 808],
+    // the hamlet huts, two flanking each anchor house
+    [-387, 803],
+    [-373, 802],
+    [-377, 1053],
+    [-363, 1052],
+    [-287, 1063],
+    [-273, 1062],
+    // lone huts on the far moors, each well away from everything else
+    [-250, 1000],
+    [-220, 1210],
+  ],
+  // beached rowboats along the river banks, the pool, and the lagoon shore
+  decorProps: [
+    { key: 'rowboat', x: -437, z: 984, rot: 1.2, scale: 1, r: 1.4, h: 1.2 },
+    { key: 'rowboat', x: -356, z: 1194, rot: -0.6, scale: 1, r: 1.4, h: 1.2 },
+    { key: 'rowboat', x: -498, z: 1034, rot: 2.0, scale: 1, r: 1.4, h: 1.2 },
+    { key: 'rowboat', x: -396, z: 1006, rot: 0.4, scale: 1, r: 1.4, h: 1.2 },
+    { key: 'rowboat', x: -288, z: 958, rot: -2.2, scale: 1, r: 1.4, h: 1.2 },
   ],
   // the Sunken Idol: a mossy ring of drowned-temple columns
   ruinRings: [{ x: -256, z: 1090, ringR: 8, columns: 6 }],
   // The giant banyans of the Vinefall and the deep Tangle: solid trunk
   // colliders in the sim, vine-hung crowns drawn by jungle_features.ts.
+  // every spot probed LEVEL (height spread under 1.5 across the root ring)
+  // and pushed back from the lakes, the rivers, and the road net
   greatTrees: [
     { x: -400, z: 1080, r: 3.2 },
     { x: -422, z: 1058, r: 2.8 },
     { x: -378, z: 1100, r: 3.0 },
-    { x: -354, z: 1004, r: 2.8 },
     { x: -390, z: 930, r: 2.6 },
-    { x: -320, z: 980, r: 2.6 },
     { x: -446, z: 1030, r: 2.6 },
     { x: -338, z: 1120, r: 2.8 },
+    { x: -368, z: 902, r: 3.0 },
+    { x: -448, z: 1094, r: 2.8 },
+    { x: -316, z: 970, r: 2.6 },
+    { x: -306, z: 1128, r: 2.8 },
   ],
 };

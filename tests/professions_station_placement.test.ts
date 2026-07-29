@@ -1,4 +1,4 @@
-// Professions 2.0 Phase 8: station and master PLACEMENT safety, the
+// Professions 2.0: station and master PLACEMENT safety, the
 // master-to-zone assignment, the hands-vs-stations recipe split, and the
 // fixed-seed determinism of a world that now spawns the six master NPCs.
 //
@@ -74,7 +74,7 @@ const MASTER_IDS = new Set(STATIONS.map((s) => s.masterNpcId));
 
 // The pre-existing town NPCs the safety bar is derived from: statically
 // placed (non-dynamic) NPCs standing inside their zone's hub circle,
-// excluding the six Phase 8 masters themselves (the bar must be what the
+// excluding the six station masters themselves (the bar must be what the
 // town already satisfied BEFORE the masters arrived).
 function townNpcs(entry: ZoneContent): NpcDef[] {
   return Object.values(entry.npcs).filter(
@@ -232,7 +232,7 @@ describe('determinism with the six masters spawned', () => {
     }
     const pa = projection(a);
     expect(pa).toEqual(projection(b));
-    // The projection genuinely includes the Phase 8 content: all six masters
+    // The projection genuinely includes the station content: all six masters
     // spawned as world entities in both runs.
     const templates = new Set(pa.map((e) => e.templateId));
     for (const station of STATIONS) {

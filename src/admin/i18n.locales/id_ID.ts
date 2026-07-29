@@ -161,6 +161,7 @@ export const id_ID: Record<string, string> = {
   'stats.sessions24h': 'sesi 24j',
   'stats.uptime': 'waktu aktif',
   'stats.avgTick': 'rata-rata tick',
+  'stats.playersCap': 'batas pemain',
   'stats.serverRss': 'rss server',
   'online.title': 'Pemain daring',
   'online.refreshHint': 'menyegar setiap 5d',

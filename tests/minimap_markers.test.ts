@@ -105,6 +105,7 @@ function makeWorld(shape: 'sim' | 'client'): IWorld {
     delveRun: null,
     cfg: { seed: 42, playerClass: 'warrior' },
     playerId: 1,
+    stationPlacements: STATIONS,
     questState: (q: string) => (q === GIVER_QUEST.id ? 'available' : 'unavailable'),
   } as unknown as IWorld;
 }
@@ -297,6 +298,7 @@ describe('station markers (Professions 2.0)', () => {
       delveRun: null,
       cfg: { seed: 42, playerClass: 'warrior' },
       playerId: 1,
+      stationPlacements: STATIONS,
       questState: () => 'unavailable',
       nodeHarvestableByMe: () => true,
       ...over,
@@ -330,6 +332,27 @@ describe('station markers (Professions 2.0)', () => {
     const world = makeStationWorld('sim');
     (world.player as unknown as { pos: { x: number; z: number } }).pos = { x: 0, z: 150 };
     expect(stationMarkers(world)).toHaveLength(0);
+  });
+
+  it('reads the active IWorld station surface, so a custom world leaks no built-in markers', () => {
+    expect(stationMarkers(makeStationWorld('sim', { stationPlacements: [] }))).toEqual([]);
+    const custom = [
+      {
+        id: 'custom_station',
+        type: 'forge',
+        zoneId: 'custom',
+        pos: { x: 2, z: 12 },
+        masterNpcId: 'custom_master',
+      },
+    ] as const;
+    const markers = stationMarkers(makeStationWorld('sim', { stationPlacements: custom }));
+    expect(markers).toEqual([
+      {
+        kind: 'station',
+        mx: S / 2 - (2 - VIEW_POS.x) * PPY,
+        my: S / 2 - (12 - VIEW_POS.z) * PPY,
+      },
+    ]);
   });
 
   it('is host- and viewer-invariant: shapes and unrelated stub state never change the set', () => {
@@ -371,5 +394,85 @@ describe('minimap corpse marker (ghost run)', () => {
       z: PZ,
     };
     expect(buildMarkers(world).some((m) => m.kind === 'corpse')).toBe(true);
+  });
+});
+
+// The gather-node marker's locked dimension. The viewer stands ON
+// the new tier-2 mirefen vein (ore_mirefen_t2), where the rim covers exactly
+// five nodes in GATHER_NODES order: ore_mirefen_1, ore_mirefen_3,
+// herb_mirefen_1, herb_mirefen_3 (all tier 1) and the tier-2 vein itself at
+// the map centre. Actionable info on every preset: locked resolves from the
+// bags, never a graphics knob.
+describe('gather-node markers: the locked dimension', () => {
+  const T2 = { x: 48, z: 352 }; // ore_mirefen_t2, pinned literally
+
+  function makeGatherWorld(
+    shape: 'sim' | 'client',
+    opts: {
+      inventory?: { itemId: string; count: number }[];
+      harvestable?: (id: string) => boolean;
+    } = {},
+  ): IWorld {
+    const junk = shape === 'sim' ? { hp: 100, maxHp: 100, castingAbility: null } : {};
+    const player = {
+      id: 1,
+      kind: 'player',
+      name: 'Me',
+      pos: { x: T2.x, z: T2.z },
+      facing: 0,
+      dead: false,
+      lootable: false,
+      aggroTargetId: null,
+      questIds: [],
+      templateId: '',
+      ...junk,
+    };
+    return {
+      player,
+      entities: new Map([[1, player]]),
+      partyInfo: null,
+      socialInfo: null,
+      delveRun: null,
+      cfg: { seed: 42, playerClass: 'warrior' },
+      playerId: 1,
+      stationPlacements: STATIONS,
+      inventory: opts.inventory ?? [],
+      nodeHarvestableByMe: opts.harvestable ?? (() => true),
+      questState: () => 'unavailable',
+    } as unknown as IWorld;
+  }
+
+  function gatherMarkers(world: IWorld) {
+    return buildMarkers(world).filter((m) => m.kind === 'gather-node') as Extract<
+      MinimapMarker,
+      { kind: 'gather-node' }
+    >[];
+  }
+
+  it('a toolless viewer sees EVERY node locked (#2343: bare hands never gather)', () => {
+    const markers = gatherMarkers(makeGatherWorld('sim'));
+    expect(markers.map((m) => m.locked)).toEqual([true, true, true, true, true]);
+    // The centre marker is the tier-2 vein under the viewer, still ready:
+    // locked is the tool dimension, never the respawn one.
+    const centre = markers.find((m) => m.mx === S / 2 && m.my === S / 2);
+    expect(centre).toMatchObject({ locked: true, ready: true });
+  });
+
+  it('the tier-2 pick unlocks only the ore nodes; herb stays locked without a sickle', () => {
+    const tooled = gatherMarkers(
+      makeGatherWorld('sim', { inventory: [{ itemId: 'iron_mining_pick', count: 1 }] }),
+    );
+    // GATHER_NODES rim order: ore t1, ore t1, herb t1, herb t1, ore t2 (centre).
+    expect(tooled.map((m) => m.locked)).toEqual([false, false, true, true, false]);
+    // Locked composes WITH the respawn dimension, never replaces it: a
+    // cooling locked vein keeps ready=false (the silhouette the painter keeps
+    // readable under the locked tint).
+    const cooling = gatherMarkers(makeGatherWorld('sim', { harvestable: () => false }));
+    const centre = cooling.find((m) => m.mx === S / 2 && m.my === S / 2);
+    expect(centre).toMatchObject({ locked: true, ready: false });
+  });
+
+  it('both IWorld shapes produce identical gather markers (decision-15 parity)', () => {
+    expect(gatherMarkers(makeGatherWorld('sim'))).toEqual(gatherMarkers(makeGatherWorld('client')));
   });
 });

@@ -37,6 +37,7 @@ import { isTrivialTo } from '../mob/targeting';
 import { findPlayerPath, PLAYER_BODY_RADIUS } from '../pathfind';
 import { scheduleProjectile } from '../projectile_travel';
 import type { SimContext } from '../sim_context';
+import { canDetectStealthedTarget } from '../threat';
 import {
   type Aura,
   DT,
@@ -87,7 +88,8 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
   pullNearbyMobs(ctx, pet);
 
   let target = pet.aggroTargetId !== null ? (ctx.entities.get(pet.aggroTargetId) ?? null) : null;
-  if (target && (target.dead || !ctx.isHostileTo(pet, target))) target = null;
+  if (target && (target.dead || !ctx.isHostileTo(pet, target) || !petCanSeeTarget(pet, target)))
+    target = null;
   if (target && dist2d(owner.pos, pet.pos) > PET_LEASH) target = null;
   if (!target && !owner.dead) target = petPickTarget(ctx, pet, owner);
   pet.aggroTargetId = target?.id ?? null;
@@ -180,6 +182,7 @@ function updateWaterJetChannel(ctx: SimContext, pet: Entity): boolean {
     !target ||
     target.dead ||
     !ctx.isHostileTo(pet, target) ||
+    !petCanSeeTarget(pet, target) ||
     dist2d(pet.pos, target.pos) > range;
   if (canceled) {
     clearWaterJetChannel(ctx, pet, true);
@@ -412,6 +415,7 @@ export function petPickTarget(ctx: SimContext, pet: Entity, owner: Entity): Enti
   // callback's squared d2 to avoid a units mismatch silently changing the radius.
   ctx.grid.forEachInRadius(pet.pos.x, pet.pos.z, PET_ASSIST_RANGE, (m) => {
     if (m.id === pet.id || m.dead || !ctx.isHostileTo(pet, m)) return;
+    if (!petCanSeeTarget(pet, m)) return;
     const engagingUs =
       m.kind === 'mob' && (m.aggroTargetId === owner.id || m.aggroTargetId === pet.id);
     const ownerOffense =
@@ -426,4 +430,9 @@ export function petPickTarget(ctx: SimContext, pet: Entity, owner: Entity): Enti
     }
   });
   return best;
+}
+
+function petCanSeeTarget(pet: Entity, target: Entity): boolean {
+  if (target.kind !== 'player') return true;
+  return canDetectStealthedTarget(pet, target, PET_ASSIST_RANGE);
 }

@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { isBlocked } from '../src/sim/colliders';
+import { clonePropsWithoutEastbrookLayout } from '../src/sim/custom_world_props';
 import { BUILTIN_WORLD, getActiveWorldContent, setActiveWorldContent } from '../src/sim/data';
+import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
 import { sanitizeMapDoc } from '../src/sim/map_doc';
 import type { WorldContent } from '../src/sim/types';
 import { biomeAt, terrainHeight, WATER_LEVEL, waterLevel, zoneBiomeAt } from '../src/sim/world';
@@ -60,6 +62,33 @@ describe('custom-map terrain seam', () => {
     setActiveWorldContent(null);
     const got = POINTS.map(([x, z]) => terrainHeight(x, z, SEED));
     expect(got).toEqual(golden);
+  });
+
+  it('keeps exterior static collision while removing the canonical Eastbrook layout', () => {
+    const bank = EASTBROOK_LAYOUT.buildings.find((building) => building.id === 'eastbrook_bank');
+    const fenbridgeInn = BUILTIN_WORLD.props.buildings.find(
+      (building) => building.x === 13 && building.z === 306,
+    );
+    expect(bank).toBeDefined();
+    expect(fenbridgeInn).toBeDefined();
+    if (!bank || !fenbridgeInn) return;
+
+    setActiveWorldContent(null);
+    expect(isBlocked(SEED, bank.position.x, bank.position.z, 0.4)).toBe(true);
+    expect(isBlocked(SEED, fenbridgeInn.x, fenbridgeInn.z, 0.4)).toBe(true);
+
+    const props = clonePropsWithoutEastbrookLayout(BUILTIN_WORLD.props);
+    setActiveWorldContent({ ...BUILTIN_WORLD, props });
+    expect(props.buildings.some((building) => building.id === bank.id)).toBe(false);
+    expect(
+      props.graveyards.some(
+        ({ x, z }) =>
+          x === EASTBROOK_LAYOUT.services.graveyard.position.x &&
+          z === EASTBROOK_LAYOUT.services.graveyard.position.z,
+      ),
+    ).toBe(false);
+    expect(isBlocked(SEED, bank.position.x, bank.position.z, 0.4)).toBe(false);
+    expect(isBlocked(SEED, fenbridgeInn.x, fenbridgeInn.z, 0.4)).toBe(true);
   });
 
   it('a terrain edit raises the ground at the stamp centre (sim + render agree)', () => {

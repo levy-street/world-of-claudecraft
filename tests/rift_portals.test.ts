@@ -68,6 +68,20 @@ function clearRiftToBossKill(sim: Sim, inst: RiftInstance): Entity {
     sim.tick();
   }
   expect(inst.floorIndex).toBe(inst.floorCount - 1);
+  // Clear the BOSS floor's own pack too, exactly as the loop clears every other
+  // floor. Since the 2026-07-26 rank recalibration a boss floor's dais guards
+  // are real heroic-tier elites (an S-rank pack lands 666+ per swing), so a
+  // solo level-20 walking in dies inside a second, which is the intended
+  // group-content behaviour but would strand any caller that keeps ticking
+  // after the kill (see the ranked-clear ledger test, which enters a second
+  // rift afterwards and needs a living player).
+  for (const id of inst.mobIds) {
+    const mob = sim.entities.get(id);
+    if (mob && mob.id !== inst.bossId) {
+      mob.hp = 0;
+      mob.dead = true;
+    }
+  }
   const boss = sim.entities.get(inst.bossId!)!;
   boss.hp = 0;
   boss.dead = true;

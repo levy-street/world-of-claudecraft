@@ -6,6 +6,7 @@ import * as http from 'node:http';
 import * as path from 'node:path';
 import { WebSocketServer } from 'ws';
 import { DEEDS } from '../src/sim/content/deeds';
+import { resolveActiveWeaponSkin } from '../src/sim/content/weapon_skin_rules';
 import {
   LEADERBOARD_MAX,
   LEADERBOARD_PAGE_SIZE,
@@ -16,11 +17,12 @@ import {
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import { virtualLevel } from '../src/sim/types';
-import type {
-  DeedsLeaderboardEntry,
-  DeedsLeaderboardSelf,
-  GuildLeaderboardEntry,
-  LeaderboardEntry,
+import {
+  type DeedsLeaderboardEntry,
+  type DeedsLeaderboardSelf,
+  type GuildLeaderboardEntry,
+  type LeaderboardEntry,
+  ONLINE_WORLD_AUTH_TYPE,
 } from '../src/world_api';
 import {
   configureAccountRuntime,
@@ -77,7 +79,7 @@ import { bankLedgerIdle } from './bank_ledger';
 import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from './bug_report_db';
 import { createCachedRead } from './cached_read';
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
-import { configureCharactersRuntime } from './characters';
+import { buildCharacterList, configureCharactersRuntime } from './characters';
 import {
   claudiumPreAuthMutationRateLimited,
   configureClaudiumRuntime,
@@ -96,7 +98,6 @@ import {
   type ArenaLeaderRow,
   accountAndScopeForToken,
   accountById,
-  accountForToken,
   acquireCharacterLease,
   bankBonusFactsForAccount,
   type CharacterRow,
@@ -115,6 +116,7 @@ import {
   getAccountsCount,
   getCharacter,
   getCharacterById,
+  getCharactersCount,
   guildNameForCharacter,
   isAdminAccount,
   lifetimeXpRankForCharacter,
@@ -787,33 +789,43 @@ async function getDeedsRarity(): Promise<import('../src/world_api').DeedsRarity>
   }
 }
 
-// Project-stats accounts-created counter cache. Unlike the player/guild/arena
-// boards, a COUNT(*) over accounts is moderation-INVARIANT (a ban or unban never
-// changes the row count, only eligibility), so it needs NO bust or epoch wiring,
-// the same call getDeedsRarity's cache makes above. It is a single-key read, so it
-// rides createCachedRead (server/cached_read.ts) directly rather than the per-scope
-// singleFlight the boards use. 60s TTL (the D11 exception): accounts-created is a
-// slow-moving marketing counter, not a moderation-sensitive ranked list, so a
-// minute of staleness is fine. Named to avoid colliding with db.ts's imported
-// getAccountsCount (mirrors getLeaderboard wrapping topLifetimeXp under a domain
-// name). readProjectStats (server/leaderboard.ts) is the INNER read; players_online
-// is a live per-request value the handler re-attaches, so the cache holds only the
-// count and the inner read gets a throwaway 0 for players_online that it discards.
+// Project-stats counters cache. Unlike the player/guild/arena boards, the
+// COUNT(*) reads over accounts and characters are moderation-INVARIANT (a ban or
+// unban never changes a row count, only eligibility), so they need NO bust or
+// epoch wiring, the same call getDeedsRarity's cache makes above. They are a
+// single-key read, so they ride createCachedRead (server/cached_read.ts) directly
+// rather than the per-scope singleFlight the boards use. 60s TTL (the D11
+// exception): both are slow-moving marketing counters, not moderation-sensitive
+// ranked lists, so a minute of staleness is fine. ONE cache holds the whole
+// readProjectStats body (server/leaderboard.ts, the INNER read), so a cold burst
+// costs one shared flight with exactly one getAccountsCount and one
+// getCharactersCount read between both getters; players_online is a live
+// per-request value the handler re-attaches, so the inner read gets a throwaway 0
+// for players_online that the getters discard.
 const PROJECT_STATS_TTL_MS = 60_000;
-const accountsCreatedCache = createCachedRead(
-  async () => (await readProjectStats({ getAccountsCount }, 0, REALM)).accounts_created,
+const projectStatsCache = createCachedRead(
+  () => readProjectStats({ getAccountsCount, getCharactersCount }, 0, REALM),
   { ttlMs: PROJECT_STATS_TTL_MS },
 );
 
 async function getAccountsCreatedCount(): Promise<number> {
   try {
-    return await accountsCreatedCache.read();
+    return (await projectStatsCache.read()).accounts_created;
   } catch (err) {
     // Only a never-warmed cache reaches here (createCachedRead stale-serves the
-    // last count on a later failure). Serve 0 rather than 500, the same
+    // last counts on a later failure). Serve 0 rather than 500, the same
     // degrade-not-throw contract getLeaderboard / getDeedsRarity already ship, so
     // /api/project-stats stays 200 when the db is unreachable.
     console.error('accounts-created count refresh failed:', err);
+    return 0;
+  }
+}
+
+async function getCharactersCreatedCount(): Promise<number> {
+  try {
+    return (await projectStatsCache.read()).characters_created;
+  } catch (err) {
+    console.error('characters-created count refresh failed:', err);
     return 0;
   }
 }
@@ -831,6 +843,7 @@ export const boardReadTestSeam = {
   getGuildLeaderboard,
   getArenaLeaderboard,
   getAccountsCreatedCount,
+  getCharactersCreatedCount,
   refreshDeedsRarityShared,
   refreshLeaderboardShared,
   refreshGuildLeaderboardShared,
@@ -845,7 +858,7 @@ export const boardReadTestSeam = {
     arenaLeaderboardCache['2v2'] = null;
     deedsBoardCache = null;
     deedsRarityCache = null;
-    accountsCreatedCache.bust();
+    projectStatsCache.bust();
   },
 };
 
@@ -936,49 +949,29 @@ function toSheetRank(rank: { rank: number; total: number } | null): SheetRank | 
 
 // The character-list response shared by the full-session GET /api/characters and
 // the read-scoped GET /api/me/characters, so both stay byte-identical.
-function characterListPayload(chars: CharacterRow[]): {
-  realm: string;
-  characters: {
-    id: number;
-    name: string;
-    class: PlayerClass;
-    level: number;
-    skin: number;
-    online: boolean;
-    forceRename: boolean;
-    lastPlayed: string | null;
-    playtimeSeconds: number;
-    skinCatalog: 'class' | 'mech';
-    mainhandItemId: string | null;
-    offhandItemId: string | null;
-  }[];
-} {
-  return {
-    realm: REALM,
-    characters: chars.map((c) => ({
-      id: c.id,
-      name: c.name,
-      class: c.class,
-      level: c.level,
-      skin: c.state?.skin ?? 0,
-      online: [...liveGame().clients.values()].some((s) => s.characterId === c.id),
-      forceRename: c.force_rename,
-      lastPlayed: c.last_played ? new Date(c.last_played).toISOString() : null,
-      playtimeSeconds: Number(c.playtime_seconds ?? 0),
-      // Real appearance for the char-select 3D preview (the client renders the
-      // Combat Mech cosmetic body and both equipped hands, matching the world).
-      skinCatalog: c.state?.skinCatalog === 'mech' ? 'mech' : 'class',
-      mainhandItemId: c.state?.equipment?.mainhand ?? null,
-      offhandItemId: c.state?.equipment?.offhand ?? null,
-    })),
-  };
+function characterListPayload(
+  chars: CharacterRow[],
+  weaponSkinLoadout: Record<string, string>,
+): unknown {
+  // Delegates to the RouteDef arm's shared builder (review follow-up on the
+  // weaponSkinId addition): one implementation means the retained legacy arm
+  // and the new pipeline CANNOT diverge in payload shape, and the behavioral
+  // route tests in tests/server/characters.test.ts cover both by construction.
+  // Only the online scan stays legacy-owned (the same live-session scan main
+  // injects into the RouteDef runtime as isCharacterOnline).
+  return buildCharacterList(
+    chars,
+    (characterId) => [...liveGame().clients.values()].some((s) => s.characterId === characterId),
+    weaponSkinLoadout,
+  );
 }
 
 async function bearerAccount(req: http.IncomingMessage): Promise<number | null> {
   const auth = req.headers.authorization ?? '';
   const m = /^Bearer ([a-f0-9]{64})$/.exec(auth);
   if (!m) return null;
-  return accountForToken(m[1]);
+  const info = await accountAndScopeForToken(m[1]);
+  return info?.accountId ?? null;
 }
 
 // Account + token scope for the bearer (or null when unauthenticated). The scope
@@ -1445,7 +1438,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       // via exchange, so create requires a full active session too
       // (bearerActiveAccount: read and companion tokens answer 403 'this token
       // is read-only'), where the pre-fix handler resolved the scope-blind
-      // accountForToken. Mirrored on
+      // identity-only token resolver. Mirrored on
       // the RouteDef twin (server/desktop_login_routes.ts); the
       // desktopLoginCreateFullScope known deviation records the change.
       const accountId = await bearerActiveAccount(req, res);
@@ -1464,13 +1457,27 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     if (req.method === 'GET' && url === '/api/me/characters') {
       const accountId = await bearerReadAccount(req, res);
       if (accountId === null) return;
-      return json(res, 200, characterListPayload(await listCharacters(accountId)));
+      return json(
+        res,
+        200,
+        characterListPayload(
+          await listCharacters(accountId),
+          (await loadAccountCosmetics(accountId)).weaponSkinLoadout,
+        ),
+      );
     }
     if (url === '/api/characters') {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
       if (req.method === 'GET') {
-        return json(res, 200, characterListPayload(await listCharacters(accountId)));
+        return json(
+          res,
+          200,
+          characterListPayload(
+            await listCharacters(accountId),
+            (await loadAccountCosmetics(accountId)).weaponSkinLoadout,
+          ),
+        );
       }
       if (req.method === 'POST') {
         const body = await readBody(req);
@@ -1842,8 +1849,13 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       // per-request read, so it is re-attached here rather than cached. Rate-limited
       // per IP like its migrated twin (same public-read budget, same 429 body).
       if (!publicReadRateLimited(req).allowed) return json(res, 429, { error: 'rate limited' });
+      const [accountsCreated, charactersCreated] = await Promise.all([
+        getAccountsCreatedCount(),
+        getCharactersCreatedCount(),
+      ]);
       return json(res, 200, {
-        accounts_created: await getAccountsCreatedCount(),
+        accounts_created: accountsCreated,
+        characters_created: charactersCreated,
         players_online: liveGame().clients.size,
         realm: REALM,
       });
@@ -1868,6 +1880,13 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         players_cap: canonicalPlayersCap(),
         names: [...liveGame().clients.values()].map((s) => s.name),
         steam: { enabled: false },
+        // The /dev GUI capability advert. NOT hardcoded like steam.enabled above:
+        // the dev_* cheats ride the websocket dispatcher, which this arm serves
+        // exactly as the migrated one does, so advertising the real env here
+        // strands nobody. Dual-arm edit: the migrated statusHandler
+        // (server/leaderboard.ts) carries the same dev_commands field. Read live
+        // per request, mirroring the /api/perf gate just below.
+        dev_commands: process.env.ALLOW_DEV_COMMANDS === '1',
       });
     }
     // Dev-only world-loop perf profile (per-phase tick p95/max), for the load
@@ -2013,7 +2032,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     }
     if (req.method === 'POST' && url === '/api/account/logout') {
       const callerToken = bearerToken(req);
-      if (!callerToken || (await accountForToken(callerToken)) === null)
+      if (!callerToken || (await accountAndScopeForToken(callerToken)) === null)
         return json(res, 401, { error: 'not authenticated', code: 'auth.required' });
       return handleAccountLogout(res, callerToken);
     }
@@ -2170,6 +2189,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const mode = discordStartUrl.searchParams.get('mode') === 'link' ? 'link' : 'login';
       const native = discordStartUrl.searchParams.get('native') === '1';
       const nativeChallenge = discordStartUrl.searchParams.get('challenge') ?? undefined;
+      const desktop = mode === 'login' && discordStartUrl.searchParams.get('desktop') === '1';
       let accountId: number | null = null;
       if (mode === 'link') {
         accountId = await bearerActiveAccount(req, res);
@@ -2184,6 +2204,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         native,
         nativeChallenge,
         nativeAttestation: body.nativeAttestation,
+        desktop,
       });
     }
     if (req.method === 'GET' && url === '/api/auth/discord/callback') {
@@ -2445,6 +2466,7 @@ configureLeaderboardRuntime({
   deedsSelfRank,
   getArenaLeaderboard,
   getAccountsCreatedCount,
+  getCharactersCreatedCount,
   getReleases,
   // A getter, not a value: configureLeaderboardRuntime runs at module load (before
   // startServer primes the config), but leaderboard.ts reads rt.githubRepo only at
@@ -2954,7 +2976,7 @@ export async function startServer(): Promise<http.Server> {
   const wss = new WebSocketServer({ noServer: true, maxPayload: WS_MAX_PAYLOAD_BYTES });
   const wsAuth = createWsAuth({
     game,
-    accountForToken,
+    accountAndScopeForToken,
     moderationStatusForAccount,
     getCharacter,
     chatMuteStatusForAccount,
@@ -3007,7 +3029,7 @@ export async function startServer(): Promise<http.Server> {
   server.listen(config.port, () => {
     console.log(`World of ClaudeCraft server listening on http://localhost:${config.port}`);
     console.log(`  REST: /api/register /api/login /api/characters /api/status`);
-    console.log(`  WS:   /ws, then first message {t:"auth",token,character}`);
+    console.log(`  WS:   /ws, then first message {t:"${ONLINE_WORLD_AUTH_TYPE}",token,character}`);
   });
 
   // Off-peak batched retention. The sweep self-clocks once per UTC day behind a

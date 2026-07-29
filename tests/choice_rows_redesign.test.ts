@@ -251,7 +251,10 @@ describe('paladin redesign', () => {
   });
 
   it('Righteous Cause: swings under an active Oathbrand shave the Verdict cooldown', () => {
-    const { sim, p } = rig('paladin', 20, { 14: 'pal_r14_righteous_cause' });
+    // Seed hunted (post-merge camp order) so the first counted physical swing
+    // LANDS under the re-branded seal: an avoided swing draws no shave and the
+    // cooldown delta assertion needs a landed hit. Spares: 2, 3.
+    const { sim, p } = rig('paladin', 20, { 14: 'pal_r14_righteous_cause' }, 1);
     addTargetMob(sim);
     castAndSettle(sim, 'seal_of_righteousness', 2);
     castAndSettle(sim, 'judgement', 2);

@@ -17,7 +17,7 @@ export type { ProcDef, ProcResponse, ProcTrigger } from '../content/talents';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { convergenceOnCast } from './convergence';
-import { PERSONAL_BARRIER_IDS } from './fire_mage';
+import { combustionRestokesCinderfall, PERSONAL_BARRIER_IDS } from './fire_mage';
 
 function state(player: Entity): NonNullable<Entity['procState']> {
   if (!player.procState) player.procState = { counters: {}, icds: {} };
@@ -102,20 +102,23 @@ function fireOne(
       }
       player.resource = Math.min(player.maxResource, player.resource + response.amount);
       break;
-    case 'heal':
+    case 'heal': {
+      const recipient = response.target === 'self' ? player : subject;
       ctx.applyHeal(
         player,
-        subject,
+        recipient,
         response.amountPctSourceMaxHp !== undefined
           ? Math.round(player.maxHp * response.amountPctSourceMaxHp)
           : response.amountPctMaxHp !== undefined
-            ? Math.round(subject.maxHp * response.amountPctMaxHp)
+            ? Math.round(recipient.maxHp * response.amountPctMaxHp)
             : (response.amount ?? 0),
         def.name,
       );
       break;
-    case 'absorb':
-      ctx.applyAura(subject, {
+    }
+    case 'absorb': {
+      const recipient = response.target === 'self' ? player : subject;
+      ctx.applyAura(recipient, {
         id: def.id,
         name: def.name,
         kind: 'absorb',
@@ -123,7 +126,7 @@ function fireOne(
         duration: response.duration,
         value:
           response.amountPctMaxHp !== undefined
-            ? Math.round(subject.maxHp * response.amountPctMaxHp)
+            ? Math.round(recipient.maxHp * response.amountPctMaxHp)
             : (response.amount ?? 0),
         sourceId: player.id,
         school: def.school ?? 'holy',
@@ -131,11 +134,12 @@ function fireOne(
       ctx.emit({
         type: 'spellfx',
         sourceId: player.id,
-        targetId: subject.id,
+        targetId: recipient.id,
         school: def.school ?? 'holy',
         fx: 'wardBloom',
       });
       break;
+    }
     case 'aura':
       ctx.applyAura(player, {
         id: def.id,
@@ -182,6 +186,9 @@ export function onCastCompleted(
   // Elemental Convergence (mage choice row): school-alternation memory, kept
   // here because every completed cast funnels through this hook. Draws no rng.
   convergenceOnCast(ctx, player, abilityId);
+  // Phoenix Trance restokes one Cinderfall charge (designer rule 2026-07-25);
+  // same reasoning: the one seam every completed cast passes. Draws no rng.
+  combustionRestokesCinderfall(ctx, player, abilityId);
   if (wasEmpowered) return;
   for (const def of procsFor(ctx, player)) {
     const trigger = def.trigger;

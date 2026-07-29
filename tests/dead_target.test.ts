@@ -63,6 +63,7 @@ describe('Targeting.targetEntity with a dead pet', () => {
       },
       stopFollow,
       isHostileTo: (_a: Entity, b: Entity) => b.kind === 'mob' && b.hostile === true,
+      partyOf: () => null,
     } as unknown as SimContext;
     return { ctx, entities };
   }
@@ -93,6 +94,91 @@ describe('Targeting.targetEntity with a dead pet', () => {
     targeting.targetEntity(21, 1);
 
     expect(player.targetId).toBeNull();
+  });
+
+  it('does not select a lootable corpse when the viewer has no loot or harvest rights', () => {
+    const { ctx, entities } = makeCtx();
+    const player = ent({ id: 1, kind: 'player', dead: false, hostile: false });
+    const corpse = ent({
+      id: 30,
+      kind: 'mob',
+      templateId: 'kobold_miner',
+      dead: true,
+      lootable: true,
+      tappedById: 2,
+      lootFfaTimer: 30,
+      loot: { copper: 0, items: [{ itemId: 'worn_sword', count: 1 }] },
+      harvestClaimedBy: 2,
+    });
+    entities.set(1, player);
+    entities.set(30, corpse);
+    const targeting = new Targeting(ctx);
+
+    targeting.targetEntity(30, 1);
+
+    expect(player.targetId).toBeNull();
+  });
+
+  it('stops selecting a stranger-tapped corpse whose every family is unmapped (#2513)', () => {
+    // The one derived behavior change #2513 has outside the harvest itself:
+    // Targeting gates a lootable corpse on corpseInteractionAvailability, whose
+    // `harvestable` term now reads mapped families. A fen_troll corpse tapped by
+    // someone else was selectable purely because the harvest half said yes, and
+    // that harvest can no longer happen, so there is nothing left to select it
+    // for. The claim is deliberately UNSPENT here, which is what made it
+    // selectable before.
+    const { ctx, entities } = makeCtx();
+    const player = ent({ id: 1, kind: 'player', dead: false, hostile: false });
+    // A FACTORY, not one spread object: sharing it would alias `loot` (and its
+    // slot array) across both corpses, so a future assertion that touched loot
+    // would silently be reading the other fixture.
+    const stranger = () => ({
+      kind: 'mob' as const,
+      dead: true,
+      lootable: true,
+      tappedById: 2,
+      lootFfaTimer: 30,
+      loot: { copper: 0, items: [{ itemId: 'worn_sword', count: 1 }] },
+      harvestClaimedBy: null,
+    });
+    const troll = ent({ id: 32, templateId: 'fen_troll', ...stranger() });
+    // The discriminator on the identical fixture: wild_boar carries the same
+    // unmapped `tusk` beside two mapped families, so its harvest half still
+    // says yes and its corpse is still selectable.
+    const boar = ent({ id: 33, templateId: 'wild_boar', ...stranger() });
+    entities.set(1, player);
+    entities.set(32, troll);
+    entities.set(33, boar);
+    const targeting = new Targeting(ctx);
+
+    targeting.targetEntity(32, 1);
+    expect(player.targetId).toBeNull();
+
+    targeting.targetEntity(33, 1);
+    expect(player.targetId).toBe(33);
+  });
+
+  it('selects a lootable corpse when the viewer owns the shared loot rights', () => {
+    const { ctx, entities } = makeCtx();
+    const player = ent({ id: 1, kind: 'player', dead: false, hostile: false });
+    const corpse = ent({
+      id: 31,
+      kind: 'mob',
+      templateId: 'kobold_miner',
+      dead: true,
+      lootable: true,
+      tappedById: 1,
+      lootFfaTimer: 30,
+      loot: { copper: 0, items: [{ itemId: 'worn_sword', count: 1 }] },
+      harvestClaimedBy: 2,
+    });
+    entities.set(1, player);
+    entities.set(31, corpse);
+    const targeting = new Targeting(ctx);
+
+    targeting.targetEntity(31, 1);
+
+    expect(player.targetId).toBe(31);
   });
 });
 

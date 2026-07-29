@@ -30,6 +30,7 @@ import {
 } from '../src/sim/data';
 import { devTierIndexForMergedPrs } from '../src/sim/dev_tier';
 import { parseRelayCommand } from '../src/sim/discord_relay';
+import { specialRoleChatTag } from '../src/sim/discord_roles';
 import {
   isInJailCage,
   JAIL_CENTER,
@@ -40,6 +41,7 @@ import {
   jailGateTeleport,
 } from '../src/sim/jail';
 import type { PickAction } from '../src/sim/lockpick';
+import { lootHasGoneFfa } from '../src/sim/loot/loot_ffa';
 import { sanitizeMarketQuery } from '../src/sim/market_query';
 import { parseMoveInputFrame } from '../src/sim/move_input';
 import {
@@ -81,6 +83,7 @@ import {
 import { isAtSowfield } from '../src/sim/vale_cup_layout';
 import {
   type BankBonusSource,
+  COMMAND_NAMES,
   type CommandName,
   type DungeonFinderBoard,
   isOverheadEmoteId,
@@ -90,6 +93,7 @@ import {
   type VcSharedCupInfo,
   type VcViewerReadout,
 } from '../src/world_api';
+import { type ActionBarLayout, sanitizeActionBarLayout } from '../src/world_api/action_bar';
 import { recordOnlineSample } from './admin_db';
 import { offensiveName } from './auth';
 import { recordBankOp } from './bank_ledger';
@@ -136,6 +140,7 @@ import {
   saveMarketState,
   saveRiftState,
   setAccountWeaponSkinLoadout,
+  setCharacterHotbarLayout,
   touchCharacterLogin,
   walletForAccount,
 } from './db';
@@ -151,16 +156,22 @@ import { enqueueActivity } from './discord_activity';
 import { discordFlairForAccount, grantRewardPoints } from './discord_db';
 import { enqueueRelay } from './discord_relay';
 import { formatDuration } from './duration';
+import { shouldDeliverCombatEventToViewer } from './event_delivery';
 import { assembleEventsFrame, serializeEventFragments } from './event_frame';
 import { mergedPrsForLogin } from './github_contributors';
 import { githubForAccount } from './github_db';
 import { forEachGuarded, runGuarded } from './guarded_iter';
-import { gameMetricsCounters } from './http/game_signals';
+import { gameMetricsCounters, type WsDropCause } from './http/game_signals';
 import { buildSharedInterestCandidates } from './interest_candidates';
 import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
 import { keepaliveSweepDelayed } from './keepalive_sweep';
 import { LINKDEAD_GRACE_MS, planJoin } from './linkdead';
+import {
+  consumeListReadToken,
+  createListReadGuard,
+  type ListReadGuardState,
+} from './list_read_guard';
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
 import { trackReachedLevel5 } from './meta_capi';
 import {
@@ -179,7 +190,21 @@ import {
   type ModerationHost,
   ModerationService,
 } from './moderation_service';
-import { consumeMsgToken, createMsgRateBucket, type MsgRateBucketState } from './msg_rate_limit';
+import {
+  classifyMsgLane,
+  consumeLaneToken,
+  createMsgLanes,
+  type MsgLane,
+  type MsgLaneState,
+} from './msg_lanes';
+import {
+  consumeInboundFrame,
+  createMsgRateBucket,
+  MSG_RATE_KICK_REASON,
+  MSG_SEQ_GAP_SANITY,
+  type MsgRateBucketState,
+  tallyDrop,
+} from './msg_rate_limit';
 import { PartyFrameProjectionCache } from './party_frame_projection';
 import { applyBoostKitToPlayer, pbeBoostEnabled } from './pbe_boost';
 import { nextRaidResetMs } from './raid_reset';
@@ -502,6 +527,19 @@ const HEAVY_SELF_REFRESH_TICKS = 40; // ~2 s backstop; staggered per session so 
 // duel. The dungeon/delve entries are door-proximity-gated anyway (a prisoner
 // can never stand at a door), listed here as explicit policy. Leave/abort
 // commands stay allowed.
+// Runtime membership for the dispatched command vocabulary (the CommandName
+// union as data). The command-lane check consults it so a KNOWN command draws
+// its lane token before the switch, while an unknown cmd draws in the default
+// arm AFTER its protocol-anomaly observation (R5: lane drops must never mute
+// the anomaly channel).
+const KNOWN_COMMANDS: ReadonlySet<string> = new Set(COMMAND_NAMES);
+// Lane-drop cause labels (R8): the map keeps the counter's cause vocabulary
+// closed at the seam's fixed WS_DROP_CAUSES set, never a raw lane string.
+const LANE_DROP_CAUSE = {
+  movement: 'lane_movement',
+  command: 'lane_command',
+  chat: 'lane_chat',
+} as const satisfies Record<MsgLane, WsDropCause>;
 const JAILED_BLOCKED_COMMANDS = new Set<string>([
   'arena_queue',
   'vcup_queue',
@@ -589,6 +627,21 @@ const HEAVY_SELF_EVENTS = new Set<string>([
   'summonPet',
   'dismissPet',
   'summonDemon',
+  // Maker's Bond unbind (Professions 2.0): a successful unbind can
+  // clear boundTo IN PLACE (the single-copy arm emits no loot event), so the
+  // result event itself must re-diff the heavy self keys or the holder's inv
+  // mirror goes stale until the staggered refresh. Also refreshes the purse
+  // for the fee debit.
+  'unbindResult',
+  // Apply-enchant, for the same reason as unbindResult above: the WORN arm
+  // (src/sim/professions/enchanting.ts resolveApplyEnchantWorn) enchants in
+  // place, so it only REMOVES reagents and emits no loot event. Without this the
+  // enchant itself would show at once (it rides the `eqi` identity diff, which
+  // recalcPlayerStats rebuilds) while the spent reagents lingered in the bag
+  // mirror until the staggered refresh, and re-opening the picker could still
+  // offer an enchant the player can no longer afford. The bagged arm's loot
+  // event already covered it; this makes both arms explicit.
+  'enchantResult',
 ]);
 
 // How often to re-broadcast online players' $WOC holder-tier flair. Each wallet
@@ -644,10 +697,20 @@ export interface ClientSession {
   chatLastRateError: number;
   chatRateViolations: number;
   chatCooldownUntil: number;
-  // Global inbound-message token bucket (#978): covers every frame (input,
-  // cast, cmd, ...), separate from the chat-only bucket above, so a client
-  // flooding non-chat frames is throttled/kicked instead of processed unconditionally.
+  // Pre-parse inbound gate state (#978): the frame and byte token buckets
+  // plus the windowed abuse score, covering every frame (input, cast, cmd,
+  // ...), separate from the chat-only bucket above, so a client flooding
+  // non-chat frames is throttled/kicked instead of processed unconditionally.
   msgRate: MsgRateBucketState;
+  // Post-parse per-class lanes (movement / command / chat) beside the global
+  // bucket above, so one class can never starve another; lane drops tally
+  // into msgRate's abuse window (R6).
+  msgLanes: MsgLaneState;
+  // The ignore/block list-readout bucket (the phase 06 maintainer ruling):
+  // the readouts stay chat-token-free per R5 but are per-call DB reads, so
+  // refusals above the far-above-human budget drop and tally into the same
+  // abuse window.
+  listReadGuard: ListReadGuardState;
   chatMutedUntil: number | null;
   chatMuteReason: string;
   // Hard-word enforcement strike count driving the mute ladder. Account-scoped:
@@ -740,6 +803,12 @@ export interface ClientSession {
     priorGm: boolean;
     stowedPet: PetState | null;
   } | null;
+  // The character's stored action-bar layout as loaded at join (already
+  // bounds-validated), or null when the character has never saved one. Sent to
+  // the owning client exactly once via the `hbl` self field (self-scoped: never
+  // an entity/broadcast field), then frozen; subsequent client saves persist to
+  // the DB and never re-echo here. null wires as an explicit "seed from local".
+  initialHotbarLayout: ActionBarLayout | null;
 }
 
 interface SentEntityVersions {
@@ -893,13 +962,16 @@ function identityFields(e: Entity): Record<string, unknown> {
       break;
     }
     // Per-slot ItemInstancePayloads of the worn set (masterwork/enchant rolls),
-    // for the inspect window (Professions 2.0 Phase 6). Same sparse rule as
+    // for the inspect window (Professions 2.0). Same sparse rule as
     // `eq` above: players only, only when at least one worn piece carries a
     // payload, riding the identity record (wireCacheFor diffs the identity
     // JSON, so an equip/unequip of an instanced piece re-emits automatically).
     // Data minimization: only the cosmetic inspect fields (signer, enchant,
-    // rolled) leave the server; boundTo and charges are gameplay state no
-    // inspecting client needs and never ride this key.
+    // rolled) leave the server; boundTo, charges, and the bindOnTrade
+    // arm are gameplay state no inspecting client needs and never ride this key.
+    // The pub allowlist below (signer/enchant/rolled ONLY) is what enforces this,
+    // so a new non-cosmetic ItemInstancePayload field is excluded by construction;
+    // the owner still sees their own payload in full via the self `inv` mirror.
     let eqi: Record<string, unknown> | undefined;
     for (const [slot, inst] of Object.entries(e.equippedInstances)) {
       if (!inst) continue;
@@ -1014,6 +1086,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   if (e.ghost) out.gh = 1; // released spirit (ghost form); renders translucent
   if (e.lootable) out.loot = 1;
   if (e.hostile) out.h = 1;
+  if (e.afk) out.ak = 1; // /afk display bit: other clients tag the nameplate + presence dot
   // The target frame's resource bar: type + current/max, sent only for entities
   // that HAVE a resource (players and caster mobs; a resource-less wolf omits all
   // three and the frame hides its bar). The rounded res keeps an idle entity's
@@ -1039,8 +1112,19 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   if (e.mountCastKey) out.mck = e.mountCastKey;
   if (e.sitting || e.eating || e.drinking) out.sit = 1;
   if (e.riftSliding) out.sld = 1; // ice-slide: render a frozen gliding pose
+  // Ledge climb: quantized progress (1..99), not the arc. The client never
+  // re-simulates the pull (the server owns it and streams the resulting
+  // positions); it needs to know a climb is running, to stop predicting a
+  // fall, and how far through it is so the pull-up pose tracks the motion.
+  // Any non-zero value reads as "climbing" on older clients.
+  if (e.climb) {
+    const t = e.climb.elapsed / e.climb.duration;
+    out.cl = Math.max(1, Math.min(99, Math.round(t * 100)));
+  }
   if (e.weaponStowed) out.ws = 1; // Z-key sheathe: weapons render on the back
   if (e.aggroTargetId !== null) out.aggro = e.aggroTargetId;
+  if (e.forcedTargetId !== null) out.ft = e.forcedTargetId;
+  if (e.forcedTargetTimer > 0) out.ftm = round2(e.forcedTargetTimer);
   // A player's/bot's SELECTED target (mobs use aggroTargetId above): rides so the
   // client can render the target-of-target frame for a PLAYER target, exactly as
   // `aggro` already enables it for a mob/pet target. Emitted only for an entity that
@@ -1051,6 +1135,11 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   // corpse harvest claim (single-use, first-come): the online corpse picker
   // must stop offering a corpse another player already harvested
   if (e.harvestClaimedBy !== null) out.hcb = e.harvestClaimedBy;
+  // loot owner-lock lapse (FFA): the online corpse picker must offer a
+  // stranger's aged-out corpse again for a deliberate manual loot, the same
+  // reliability contract hcb gives harvest claims. Flips once per corpse, so
+  // the per-entity dyn cache re-serializes exactly one changed record.
+  if (e.kind === 'mob' && e.lootable && lootHasGoneFfa(e.lootFfaTimer)) out.ffa = 1;
   if (e.ownerId !== null) out.own = e.ownerId;
   if (e.overheadEmoteId) {
     out.emo = e.overheadEmoteId;
@@ -1324,6 +1413,10 @@ export class GameServer {
   // state row. Keep one FIFO per account so rapid apply/detach commands cannot
   // commit on separate pool clients in reverse order and resurrect stale state.
   private readonly weaponSkinLoadoutSaveQueues = new Map<number, Promise<void>>();
+  // Action-bar layout is a whole-record replacement in its own character column.
+  // One FIFO per character so a burst of debounced client saves cannot commit on
+  // separate pool clients in reverse order and persist a stale layout.
+  private readonly hotbarLayoutSaveQueues = new Map<number, Promise<void>>();
   // Serializes every write of the single global Market blob (the 30s autosave
   // and the leave-path combined save). Both serialize the whole market; without
   // a queue their transactions could commit out of capture order and persist an
@@ -1586,6 +1679,11 @@ export class GameServer {
     moderator.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
     moderator.lastDfWireTick = -DF_WIRE_INTERVAL_TICKS;
     moderator.sentEnts.clear();
+    // force the heavy self block (tal/inv/equip/bags/...) to re-run next
+    // snapshot: it is gated on meta.wireRev vs session.lastWireRev, and that
+    // comparison is keyed to whichever entity's meta is being wired, so
+    // without this the target's heavy fields can silently fail to resend.
+    moderator.selfHeavyDirty = true;
     this.send(moderator, { t: 'spectate', name: target.name });
     this.sendSystemNotice(moderator, `Now spectating ${target.name}.`);
   }
@@ -1610,6 +1708,10 @@ export class GameServer {
     moderator.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
     moderator.lastDfWireTick = -DF_WIRE_INTERVAL_TICKS;
     moderator.sentEnts.clear();
+    // same as enterSpectate: force the heavy self block to re-run so the
+    // moderator's OWN talents/inventory/equip/etc. resend immediately
+    // instead of staying stuck on the spectated target's last-sent values.
+    moderator.selfHeavyDirty = true;
     this.send(moderator, { t: 'spectate', name: null });
     if (announce) this.sendSystemNotice(moderator, 'Stopped spectating.');
   }
@@ -1779,6 +1881,9 @@ export class GameServer {
     if (e.dead) status = 'dead';
     else if (instanceZone != null) status = 'dungeon';
     else if (e.inCombat) status = 'combat';
+    // AFK is the lowest-priority active state: a dead/instanced/in-combat player
+    // reports that first, but an idle /afk player shows 'afk' over plain 'online'.
+    else if (this.sim.meta(session.pid)?.away?.mode === 'afk') status = 'afk';
     // The Sowfield is overworld ground (no instance band, no status change),
     // but the stadium is the presence players expect on match days: fighters
     // and walk-up spectators inside the footprint report the venue, not the
@@ -2645,6 +2750,23 @@ export class GameServer {
     });
   }
 
+  private enqueueHotbarLayoutSave(characterId: number, layout: ActionBarLayout): void {
+    const previous = this.hotbarLayoutSaveQueues.get(characterId);
+    const run = (previous ? previous.catch(() => {}) : Promise.resolve()).then(async () => {
+      await setCharacterHotbarLayout(characterId, layout);
+    });
+    this.hotbarLayoutSaveQueues.set(characterId, run);
+    const cleanup = (): void => {
+      if (this.hotbarLayoutSaveQueues.get(characterId) === run) {
+        this.hotbarLayoutSaveQueues.delete(characterId);
+      }
+    };
+    void run.then(cleanup, (err) => {
+      console.error('failed to save hotbar layout:', err);
+      cleanup();
+    });
+  }
+
   join(
     ws: WebSocket,
     accountId: number,
@@ -2669,6 +2791,10 @@ export class GameServer {
         // the character state via addPlayer. Absent on a resume and for callers that
         // pass no meta (tests, the bot-detector overlay), which keep the saved value.
         bankBonus?: { bonusSlots: number; sources: BankBonusSource[] };
+        // The character's stored action-bar layout (characters.hotbar_layout),
+        // passed through from the join handler's DB read. Untrusted at rest, so
+        // it is re-validated here before it reaches the client.
+        hotbarLayout?: ActionBarLayout | null;
       } = {},
   ): ClientSession | { error: string } {
     // Anti-bot: cap simultaneous online characters per account. Accounts can
@@ -2774,6 +2900,8 @@ export class GameServer {
       chatRateViolations: 0,
       chatCooldownUntil: 0,
       msgRate: createMsgRateBucket(Date.now() / 1000),
+      msgLanes: createMsgLanes(Date.now() / 1000),
+      listReadGuard: createListReadGuard(Date.now() / 1000),
       chatMutedUntil: meta.mutedUntil ? new Date(meta.mutedUntil).getTime() : null,
       chatMuteReason: meta.reason ?? '',
       chatStrikes: meta.chatStrikes ?? 0,
@@ -2811,6 +2939,8 @@ export class GameServer {
       spectating: null,
       jailed: state?.jail ?? null,
       jailVisit: null,
+      // Re-validate the stored layout (untrusted at rest) before it can wire out.
+      initialHotbarLayout: sanitizeActionBarLayout(meta.hotbarLayout),
     };
     if (session.jailed) this.teleportJailedSession(session);
     this.ipSessionCounts.set(sessionIp, (this.ipSessionCounts.get(sessionIp) ?? 0) + 1);
@@ -3904,12 +4034,17 @@ export class GameServer {
     if (this.draining) return;
     gameMetricsCounters().wsMessage('in');
     const receivedAtMs = Date.now();
-    const verdict = consumeMsgToken(session.msgRate, receivedAtMs / 1000);
-    if (verdict === 'kick') {
-      void this.kickSession(session, 'rejected by server', 'moderation action');
+    const gate = consumeInboundFrame(session.msgRate, receivedAtMs / 1000, raw.length);
+    if (gate.verdict !== 'allow') {
+      // R8: the loss is visible by cause. A kick verdict is the crossing drop
+      // plus the kick, so it counts under both counters.
+      gameMetricsCounters().wsMessageDropped(gate.cause);
+      if (gate.verdict === 'kick') {
+        gameMetricsCounters().wsRateKick();
+        void this.kickSession(session, MSG_RATE_KICK_REASON, 'message flood');
+      }
       return;
     }
-    if (verdict === 'drop') return;
     let msg: unknown;
     try {
       msg = JSON.parse(raw);
@@ -3937,6 +4072,36 @@ export class GameServer {
     return String(record.cmd ?? record.t ?? 'unknown');
   }
 
+  /** Draw a post-parse lane token (R5). On a drop the frame is discarded,
+   *  never queued, and the drop tallies into the same per-second abuse window
+   *  as the pre-parse gate (R6), so a sustained lane flood reaches the kick
+   *  verdict through the identical path. Returns whether to keep processing. */
+  private consumeLane(session: ClientSession, lane: MsgLane, nowSec: number): boolean {
+    if (consumeLaneToken(session.msgLanes, lane, nowSec) === 'allow') return true;
+    gameMetricsCounters().wsMessageDropped(LANE_DROP_CAUSE[lane]);
+    if (tallyDrop(session.msgRate, nowSec) === 'kick') {
+      gameMetricsCounters().wsRateKick();
+      void this.kickSession(session, MSG_RATE_KICK_REASON, 'message flood');
+    }
+    return false;
+  }
+
+  /** Draw a list-read guard token (the phase 06 maintainer ruling): the
+   *  ignore/block list readouts stay chat-token-free per R5, but each is a
+   *  live DB read, so a refusal above the far-above-human budget drops the
+   *  readout and tallies into the same abuse window as every other shed
+   *  frame, making a sustained read flood kickable. Returns whether to run
+   *  the readout. */
+  private consumeListRead(session: ClientSession, nowSec: number): boolean {
+    if (consumeListReadToken(session.listReadGuard, nowSec)) return true;
+    gameMetricsCounters().wsMessageDropped('list_read');
+    if (tallyDrop(session.msgRate, nowSec) === 'kick') {
+      gameMetricsCounters().wsRateKick();
+      void this.kickSession(session, MSG_RATE_KICK_REASON, 'message flood');
+    }
+    return false;
+  }
+
   private dispatchMessage(
     session: ClientSession,
     rawMsg: unknown,
@@ -3953,6 +4118,9 @@ export class GameServer {
         raw,
         receivedAtMs,
       );
+      // Garbage draws a command-lane token AFTER its anomaly observation (R5):
+      // the lane bounds sub-ceiling garbage without muting the anomaly channel.
+      this.consumeLane(session, 'command', receivedAtMs / 1000);
       return;
     }
     const msg = rawMsg as ClientMessage;
@@ -3966,6 +4134,11 @@ export class GameServer {
       return;
     }
     if (msg.t === 'input') {
+      // The movement lane verdicts at the top of the arm, before the sim
+      // moveInput assignment and before observeInput (R5): a dropped movement
+      // frame reaches neither the sim nor the detector, which is FP-safe
+      // because input_absence only counts input frames toward ACTIVE time.
+      if (!this.consumeLane(session, 'movement', receivedAtMs / 1000)) return;
       if (session.spectating) return;
       const meta = sim.meta(pid);
       const e = sim.entities.get(pid);
@@ -3974,7 +4147,19 @@ export class GameServer {
       Object.assign(meta.moveInput, frame.moveInput);
       session.lastInputAt = sim.time;
       if (typeof msg.seq === 'number' && Number.isFinite(msg.seq) && msg.seq > 0) {
-        session.lastInputSeq = Math.max(session.lastInputSeq, Math.floor(msg.seq));
+        const seq = Math.floor(msg.seq);
+        // R9: the client seq is a per-send increment on an ordered socket, so
+        // a forward jump past lastInputSeq + 1 proves the missing seqs were
+        // sent and never processed (the input-frame-attributed share of the
+        // server's own drops). Guarded to a positive high-water because resume
+        // zeroes it while the client restarts its counter on reconnect, and
+        // capped so a reset mismatch never books a giant gap.
+        if (session.lastInputSeq > 0 && seq > session.lastInputSeq + 1) {
+          gameMetricsCounters().wsInputSeqGap(
+            Math.min(seq - session.lastInputSeq - 1, MSG_SEQ_GAP_SANITY),
+          );
+        }
+        session.lastInputSeq = Math.max(session.lastInputSeq, seq);
       }
       // A released spirit turns with the camera like the living; only a corpse that
       // has not yet released (dead and not a ghost) keeps its facing frozen. Without
@@ -3992,6 +4177,8 @@ export class GameServer {
         raw,
         receivedAtMs,
       );
+      // Same rule as non_object above: anomaly first, then the command lane.
+      this.consumeLane(session, 'command', receivedAtMs / 1000);
       return;
     }
     if (session.spectating) {
@@ -4018,6 +4205,21 @@ export class GameServer {
       receivedAtMs,
       msg,
     );
+    // The command lane verdicts AFTER observeCommand (R5, observe-then-drop):
+    // the detector keeps seeing the traffic shape even when the handler never
+    // runs. Chat draws from its own lane beside consumeChatToken; telemetry
+    // and challengeResponse are exempt; an unknown cmd draws in the default
+    // arm below, after its protocol-anomaly observation. It also verdicts
+    // BEFORE the jailed notice and the HEAVY_SELF_CMDS dirty flag below: a
+    // lane-dropped frame must neither send a jailed notice nor force a heavy
+    // self re-diff (drops are drops).
+    if (
+      classifyMsgLane(msg) === 'command' &&
+      KNOWN_COMMANDS.has(String(msg.cmd)) &&
+      !this.consumeLane(session, 'command', receivedAtMs / 1000)
+    ) {
+      return;
+    }
     // W0b command-schema lockstep: cast the untyped wire token to the shared
     // CommandName union so tsc proves every `case` label below is a member of
     // COMMAND_NAMES (a typo or out-of-table token is a compile error) and that
@@ -4250,7 +4452,14 @@ export class GameServer {
         }
         break;
       case 'buyback':
-        if (typeof msg.item === 'string') sim.buyBackItem(msg.item, pid);
+        if (typeof msg.item === 'string')
+          sim.buyBackItem(
+            msg.item,
+            typeof msg.index === 'number' ? msg.index : undefined,
+            msg.instance && typeof msg.instance === 'object' ? msg.instance : undefined,
+            pid,
+            typeof msg.craftedRecipeId === 'string' ? msg.craftedRecipeId : undefined,
+          );
         break;
       case 'harvest_node':
         this.sendCommandOutcome(
@@ -4260,10 +4469,68 @@ export class GameServer {
         );
         break;
       case 'craft_item':
-        if (typeof msg.recipe === 'string') sim.craftItem(msg.recipe, pid);
+        // `commission` (Professions 2.0): a strict boolean-true
+        // check (the dispatch type-guard rule); anything else reads as false.
+        // The sim honors it only for eligible equipment outputs and mints the
+        // bindOnTrade arm itself, so nothing here trusts client data.
+        if (typeof msg.recipe === 'string') sim.craftItem(msg.recipe, msg.commission === true, pid);
+        break;
+      // Enchanting profession commands (Professions 2.0): the sim
+      // resolvers re-validate ownership/eligibility/throttle (nothing trusted
+      // from the client); the outcome reaches this client as the pid-scoped
+      // disenchantResult/enchantResult/salvageResult event plus the denc/ench/salv
+      // self-delta. A successful disenchant/salvage, and a bagged apply, emit a
+      // `loot` event (a HEAVY_SELF_EVENTS member) via the inventory hub, so the self
+      // inventory refreshes exactly like a craft; no explicit dirty-marking is needed
+      // here. The WORN apply arm mints nothing and so emits no loot event, which is
+      // why `enchantResult` is itself a HEAVY_SELF_EVENTS member (the unbindResult
+      // precedent): otherwise the spent reagents would linger in the bag mirror.
+      case 'disenchant_item':
+        if (typeof msg.item === 'string') {
+          const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
+          sim.disenchantItem(msg.item, pid, slot);
+        }
+        break;
+      case 'apply_enchant':
+        if (typeof msg.item === 'string' && typeof msg.enchant === 'string') {
+          // The optional worn target (the in-place enchant arm) is accepted only
+          // when it names a real equipment key, the same untrusted-input rule the
+          // 'equip' case above applies to its aimed slot; anything else falls back
+          // to undefined, which is the bagged arm. The sim then re-validates that
+          // the named slot is actually wearing this item id and, without the
+          // confirm flag below, that the worn copy is not already enchanted.
+          const worn =
+            typeof msg.slot === 'string' &&
+            (ALL_EQUIP_SLOTS as readonly string[]).includes(msg.slot)
+              ? (msg.slot as EquipSlot)
+              : undefined;
+          // `confirm` (#2415): the explicit consent to replace an existing
+          // enchant. A strict boolean-true check (the dispatch type-guard
+          // rule, the craft_item `commission` precedent); anything else reads
+          // as false. The sim re-validates the target and picks the pinned
+          // victim itself, so nothing here trusts client data: the flag can
+          // only ever unlock the dedicated replace arm, never aim it.
+          // Note the two tokens are independent: an unrecognized `slot` falls
+          // back to undefined ABOVE, so a hand-crafted {slot: bogus, confirm:
+          // true} becomes a confirmed BAGGED replace rather than being
+          // rejected. Harmless by construction (the victim is still the sim's
+          // own pin over the SENDER's inventory, so the worst case is that
+          // sender destroying one of their own enchants), and an honest client
+          // never emits an invalid slot.
+          sim.applyEnchant(msg.item, msg.enchant, worn, msg.confirm === true, pid);
+        }
         break;
       case 'salvage_item':
         if (typeof msg.item === 'string') sim.salvageItem(msg.item, pid);
+        break;
+      case 'unbind_item':
+        // Maker's Bond unbind service (Professions 2.0): the sim
+        // resolver re-validates eligibility/bound-ness/station range/fee
+        // (nothing trusted from the client); the outcome reaches this client
+        // as the pid-scoped text-free unbindResult event, a HEAVY_SELF_EVENTS
+        // member so the cleared payload and the fee debit re-diff the self
+        // inv/purse mirrors on the next snapshot.
+        if (typeof msg.item === 'string') sim.unbindItem(msg.item, pid);
         break;
       case 'rift_upgrade_item':
         if (typeof msg.item === 'string') sim.upgradeRiftItem(msg.item, pid);
@@ -4282,7 +4549,7 @@ export class GameServer {
         if (typeof msg.craft === 'string') sim.placeMobileStation(msg.craft, pid);
         break;
       case 'train_recipe':
-        // Professions 2.0 Phase 9: fee + grant resolve inside the sim
+        // Professions 2.0: fee + grant resolve inside the sim
         // (Sim.trainRecipe -> professions/training.ts resolveTrain); the
         // outcome reaches this client as the pid-scoped trainResult event and
         // the learned set rides the per-tick cprof diff (knownRecipes is part
@@ -4370,6 +4637,15 @@ export class GameServer {
       case 'stow_weapon':
         sim.toggleWeaponStow(pid);
         break;
+      // Per-character action-bar layout upload (untrusted client input). Validate
+      // + bound the payload; a malformed/oversized layout is dropped silently
+      // (never crashes the session). A clean layout is persisted to the
+      // character's own JSONB column via the per-character FIFO save queue.
+      case 'save_hotbar_layout': {
+        const layout = sanitizeActionBarLayout(msg.layout);
+        if (layout) this.enqueueHotbarLayoutSave(session.characterId, layout);
+        break;
+      }
       // Skin-select event lock-in. The Sim re-validates the skin against the
       // rank it rolled and consumes the event token; a forged claim no-ops.
       case 'claim_event_skin':
@@ -4420,9 +4696,16 @@ export class GameServer {
         // their own lists, and a list readout must not burn a chat token toward
         // the rate-limit cooldown. Deliberately AFTER the moderation router, so
         // the ADMIN "/mute" is always claimed as the account silence and can
-        // never be shadowed by a player command.
-        if (this.handleChatFilterCommand(session, text)) break;
+        // never be shadowed by a player command. The two list READOUTS carry
+        // their own DB-read guard inside (the phase 06 maintainer ruling).
+        if (this.handleChatFilterCommand(session, text, receivedAtMs / 1000)) break;
         if (this.isChatMuted(session)) break;
+        // The chat lane is a pre-guard CO-LOCATED with the ladder, not at the
+        // case entry (R5): the moderation router and the ignore/block/filter
+        // management above stay unthrottled, and because the lane is more
+        // generous than the ladder, the ladder's cooldown messaging still
+        // fires on the subset the lane passes.
+        if (!this.consumeLane(session, 'chat', receivedAtMs / 1000)) break;
         if (!this.consumeChatToken(session)) break;
         const whoMatch = /^\/who(?:\s+([\s\S]+))?$/i.exec(text);
         if (whoMatch) {
@@ -4718,6 +5001,17 @@ export class GameServer {
         if (typeof msg.id === 'number')
           void this.social.guildEventRemove(this.actorFor(session), msg.id).catch(logSocialErr);
         break;
+      case 'guild_set_motd':
+        // Guild billboard: player text, so it flows through the same mute +
+        // rate + hard-word gates as chat (the guild_event_create stack) before
+        // the service applies its own officer/clamp validation.
+        if (typeof msg.text === 'string') {
+          if (this.isChatMuted(session)) break;
+          if (!this.consumeChatToken(session)) break;
+          if (this.enforceChatPolicy(session, msg.text)) break;
+          void this.social.guildSetMotd(this.actorFor(session), msg.text).catch(logSocialErr);
+        }
+        break;
       // arena (Ashen Coliseum queue)
       case 'arena_queue': {
         const fmt =
@@ -4731,10 +5025,19 @@ export class GameServer {
                   ? 'yumi5'
                   : '1v1';
         sim.arenaQueueJoin(pid, fmt);
+        // ARENA_WIRE_HZ throttles the `arena` self key to once per 10s (the
+        // #940 perf fix for the uncached arenaLadder() sort), so without this
+        // the Arena window would keep showing the stale Queue button for up to
+        // 10s after the player just clicked it. Force the next snapshot to
+        // carry fresh arenaInfo, same reset used at the spectate transitions.
+        session.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
         break;
       }
       case 'arena_leave':
         sim.arenaQueueLeave(pid);
+        // Same staleness fix as arena_queue above: surface the cleared queue
+        // state immediately instead of on the next throttled tick.
+        session.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
         break;
       case 'arena_augment': {
         if (typeof msg.augment === 'string' && msg.augment.length <= 64)
@@ -4902,6 +5205,8 @@ export class GameServer {
             search: typeof msg.q === 'string' ? msg.q : '',
             itemType: msg.itemType,
             subtype: msg.subtype,
+            armorClass: msg.armorClass,
+            primaryStat: msg.primaryStat,
             rarity: msg.rarity,
             page: typeof msg.page === 'number' ? msg.page : 0,
           }),
@@ -5263,6 +5568,9 @@ export class GameServer {
           raw,
           receivedAtMs,
         );
+        // Unknown cmds draw their command-lane token here, AFTER the anomaly
+        // observation (R5), so the lane never mutes the anomaly channel.
+        this.consumeLane(session, 'command', receivedAtMs / 1000);
       }
     }
   }
@@ -5649,6 +5957,8 @@ export class GameServer {
       sh: p.spellHaste,
       crit: p.critChance,
       dodge: p.dodgeChance,
+      blk: p.blockChance,
+      bval: p.blockValue,
       crat: p.critRating,
       hrat: p.hasteRating,
       hirat: p.hitRating,
@@ -5746,11 +6056,35 @@ export class GameServer {
         'achg',
         session.timerWireCache.encodeCharges(anchorSession.pid, p.abilityCharges).json,
       );
+      // The companion recharge timers ({abilityId: [deadline, length]}), so the
+      // bar can show the thin recharge sweep while the pool still holds a use
+      // (the empty-pool timer keeps riding `cds` unchanged). Additive key: an
+      // older client simply ignores it.
+      maybeSerialized(
+        'achr',
+        session.timerWireCache.encodeChargeRecharges(
+          anchorSession.pid,
+          p.abilityCharges,
+          this.sim.time,
+        ).json,
+      );
     } else {
       maybe(
         'achg',
         p.abilityCharges
           ? Object.fromEntries(Object.entries(p.abilityCharges).map(([k, v]) => [k, v.charges]))
+          : {},
+      );
+      // Legacy arm: raw remaining seconds ({abilityId: [remaining, length]}),
+      // resent per snapshot like every legacy timer.
+      maybe(
+        'achr',
+        p.abilityCharges
+          ? Object.fromEntries(
+              Object.entries(p.abilityCharges)
+                .filter(([, v]) => v.recharge > 0 && Number.isFinite(v.recharge))
+                .map(([k, v]) => [k, [v.recharge, v.rechargeLength]]),
+            )
           : {},
       );
     }
@@ -5777,10 +6111,10 @@ export class GameServer {
     // sizes, the live strip, the winners and guild boards, who is practicing) rides
     // `vcupb`, serialized ONCE per broadcast pass by the realm-readout memo and
     // reused across every viewer. A fresh join or a spectate enter/exit clears
-    // lastSent, so the `sent['vcup'] === undefined` arm re-ships both keys
+    // lastSent, so the `sent.vcup === undefined` arm re-ships both keys
     // immediately even between due passes (the old per-session negative-init did
     // this; the dueness gate alone would not, so keep this arm).
-    if (vcupDue || sent['vcup'] === undefined) {
+    if (vcupDue || sent.vcup === undefined) {
       const shared = realmReadoutObject(this.realmReadout, this.sim.tickCount, () =>
         this.sim.cupSharedInfoFor(),
       );
@@ -5845,6 +6179,9 @@ export class GameServer {
     // market info is null unless the player is standing at the Merchant, so it
     // only rides the wire for players actually browsing the World Market
     maybe('market', this.sim.marketInfoFor(anchorSession.pid));
+    // the lightweight collect-indicator bit streams ALWAYS (the mailU pattern),
+    // so the minimap badge lights anywhere while proceeds/items wait
+    maybe('mktU', this.sim.marketCollectPendingFor(anchorSession.pid) ? 1 : 0);
     maybe('mail', this.sim.mailInfoFor(anchorSession.pid));
     maybe('mailU', this.sim.mailUnreadFor(anchorSession.pid));
     // bank info is null unless the player is standing at a banker, so it only
@@ -5876,11 +6213,20 @@ export class GameServer {
     // evaluates a recipe against a pair from one tick and skills from another.
     maybe('cprof', this.sim.craftingIdentityFor(anchorSession.pid));
     // The viewer's own active mobile crafting station craft id (Professions
-    // 2.0 Phase 8), or null. Expiry resolves server-side (Sim.
+    // 2.0), or null. Expiry resolves server-side (Sim.
     // activeMobileStationCraftFor checks its own tickCount), so the delta
     // naturally flips to null the tick a station lapses and the client never
     // reasons about tick domains. Small scalar, diffed per tick like atitle.
     maybe('mst', this.sim.activeMobileStationCraftFor(anchorSession.pid));
+    // The viewer's own most recent enchanting-action outcomes (Professions
+    // 2.0), or null. Small per-player reads diffed per tick like the other
+    // scalars above (a successful action already refreshed the self inventory via
+    // its loot event); the convergence arm for lastDisenchantResult/lastEnchantResult/
+    // lastSalvageResult, alongside the pid-scoped disenchantResult/enchantResult/
+    // salvageResult event. See TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts.
+    maybe('denc', this.sim.lastDisenchantResultFor(anchorSession.pid));
+    maybe('ench', this.sim.lastEnchantResultFor(anchorSession.pid));
+    maybe('salv', this.sim.lastSalvageResultFor(anchorSession.pid));
     maybe('tfocus', this.sim.townFocusFor(anchorSession.pid));
     // Raw gathering-profession proficiency map (IWorld `gatheringProficiency`,
     // #1119), a second small read alongside `prof` for the ORIGINAL flat-map
@@ -5956,6 +6302,12 @@ export class GameServer {
         loadouts: meta.loadouts,
         activeLoadout: meta.activeLoadout,
       });
+      // IWorldActionBar login restore (self-scoped, never a broadcast/entity
+      // field): the VIEWER's own stored layout, or an explicit null meaning "the
+      // server has no copy, seed from this device". Bound to the frozen join-time
+      // value, so lastSent-diffing sends it exactly once and a later client save
+      // never round-trips back to clobber an in-flight edit.
+      maybe('hbl', session.initialHotbarLayout);
       // Vale Cup sport-kit flag ({ role } | null): while set, the client's
       // action bar rebuilds the role kit instead of the class kit. Rides the
       // wireRev-gated block because the sim bumps wireRev on BOTH the kickoff
@@ -6358,7 +6710,19 @@ export class GameServer {
     for (const ev of events) {
       if (ev.type !== 'chat') continue;
       const flair = this.chatFlairForPid(ev.fromPid);
-      if (flair) ev.flair = flair;
+      // The sender's top STAFF Discord role (the anti-impersonation chat tag)
+      // is composed here from the SENDER's entity rather than folded into the
+      // cached session.chatFlair: e.discordRole is written by the bot's
+      // members-meta push on its own cadence, so reading it live at fan-out
+      // cannot go stale. Gated on the catalog's chatTag flag so community
+      // roles (Artist, Content Creator, LEGEND, SHILL) stay nameplate-only
+      // and the chat tag remains a pure authority signal. Allocates only for
+      // staff senders.
+      const role = this.sim.entities.get(ev.fromPid)?.discordRole;
+      // `flair` may be undefined here; spreading undefined is a spec-defined
+      // no-op, so a role-only sender yields a clean { role } object.
+      if (role && specialRoleChatTag(role)) ev.flair = { ...flair, role };
+      else if (flair) ev.flair = flair;
     }
     // ignore list: social invites from blocked senders are resolved once per
     // batch (dropped for every session and declined in the sim), not per
@@ -6391,10 +6755,12 @@ export class GameServer {
           anchorPid = target.pid;
           anchorPos = targetEntity.pos;
         }
+        const anchorParty = this.sim.partyOf(anchorPid);
         const mine: string[] = [];
         for (let i = 0; i < events.length; i++) {
           const ev = events[i];
           if (suppressedInvites?.has(ev)) continue;
+          if (!shouldDeliverCombatEventToViewer(ev, anchorPid, anchorParty)) continue;
           // ignore list: drop chat originating from a character this player has
           // blocked, before it ever reaches their client
           if (
@@ -6443,6 +6809,11 @@ export class GameServer {
               // a sim-driven change to a heavy self field (loot, level-up, quest
               // credit, ...) refreshes those fields on the next snapshot
               if (HEAVY_SELF_EVENTS.has(ev.type)) session.selfHeavyDirty = true;
+              // A match concluding (win, loss, draw, or forfeit) changes rating
+              // and standings on the throttled `arena` self key (ARENA_WIRE_HZ):
+              // force it fresh next snapshot instead of leaving the Arena
+              // window showing the pre-match rating for up to 10s.
+              if (ev.type === 'arenaEnd') session.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
               // remember the last person to whisper us, for /r reply (the
               // recipient copy of a whisper has no `to`; the sender echo does)
               if (
@@ -6496,14 +6867,16 @@ export class GameServer {
   // of them and has been handled, so the caller stops before the chat pipeline
   // treats it as something to broadcast. The ADMIN /mute is a different command
   // entirely and is claimed earlier, by the moderation router.
-  private handleChatFilterCommand(session: ClientSession, text: string): boolean {
+  private handleChatFilterCommand(session: ClientSession, text: string, nowSec: number): boolean {
     const parsed = parseChatFilterCommand(text);
     if (!parsed) return false;
     const actor = this.actorFor(session);
 
-    // The two list commands are reads and stay free: they must work even for a
-    // GM-silenced player, and echoing your own list back must never burn a token
-    // toward the chat cooldown. The four WRITE commands each cost a chat token:
+    // The two list commands are reads and stay chat-token-free: they must work
+    // even for a GM-silenced player, and echoing your own list back must never
+    // burn a token toward the chat cooldown. Each readout is a live DB read
+    // though, so it draws from the dedicated list-read guard below (the phase
+    // 06 maintainer ruling). The four WRITE commands each cost a chat token:
     // they INSERT/DELETE and then push a full social snapshot, so they are the
     // most expensive thing on the chat path and must not be the one thing on it
     // that is unmetered.
@@ -6515,10 +6888,10 @@ export class GameServer {
     // as phantom wire commands and fail the gate.
     const logErr = (err: unknown) => console.error('ignore/block command failed:', err);
     const kind = parsed.kind;
-    if (kind === 'ignoreList') {
-      void this.social.ignoreList(actor).catch(logErr);
-    } else if (kind === 'blockList') {
-      void this.social.blockList(actor).catch(logErr);
+    if (kind === 'ignoreList' || kind === 'blockList') {
+      if (!this.consumeListRead(session, nowSec)) return true;
+      if (kind === 'ignoreList') void this.social.ignoreList(actor).catch(logErr);
+      else void this.social.blockList(actor).catch(logErr);
     } else if (kind === 'ignore') {
       if (!parsed.name) this.sendChatNotice(session, IGNORE_USAGE);
       else void this.social.ignoreAdd(actor, parsed.name).catch(logErr);

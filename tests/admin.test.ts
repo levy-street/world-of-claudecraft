@@ -9,7 +9,7 @@ vi.mock('../server/db', () => ({
   findAccount: vi.fn(),
   touchLogin: vi.fn(),
   saveToken: vi.fn(),
-  accountForToken: vi.fn(),
+  accountAndScopeForToken: vi.fn(),
   isAdminAccount: vi.fn(),
   accountMailTarget: vi.fn(async () => null),
   accountById: vi.fn(),
@@ -116,8 +116,8 @@ import {
   updateFilterConfig,
 } from '../server/chat_filter_db';
 import {
+  accountAndScopeForToken,
   accountById,
-  accountForToken,
   accountMailTarget,
   findAccount,
   isAdminAccount,
@@ -145,6 +145,7 @@ import {
 } from '../server/staff_db';
 
 const VALID_TOKEN = 'a'.repeat(64);
+const fullToken = (accountId: number) => ({ accountId, scope: 'full' as const });
 
 function fakeReq(opts: { method?: string; url?: string; token?: string; body?: unknown } = {}) {
   const req = new EventEmitter() as EventEmitter & {
@@ -261,7 +262,7 @@ describe('admin api auth', () => {
   });
 
   it('rejects a valid token whose account is not an admin', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(false);
     const res = fakeRes();
 
@@ -271,8 +272,27 @@ describe('admin api auth', () => {
     expect(isAdminAccount).toHaveBeenCalledWith(7);
   });
 
+  it('rejects a staff read token before resolving roles or serving the handler', async () => {
+    vi.mocked(accountAndScopeForToken).mockResolvedValue({ accountId: 7, scope: 'read' });
+    vi.mocked(isAdminAccount).mockResolvedValue(true);
+    vi.mocked(adminRolesForAccount).mockClear();
+    const res = fakeRes();
+
+    await handleAdminApi(fakeReq({ token: VALID_TOKEN }), res, fakeGame);
+
+    expect(res.statusCode).toBe(401);
+    expect(res.body).toEqual({
+      success: false,
+      data: null,
+      error: 'admin authentication required',
+    });
+    expect(adminRolesForAccount).not.toHaveBeenCalled();
+    expect(isAdminAccount).not.toHaveBeenCalled();
+    expect(overviewCounts).not.toHaveBeenCalled();
+  });
+
   it('serves the overview to an admin token and includes live server stats', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
     vi.mocked(overviewCounts).mockResolvedValue({
       accounts: 10,
@@ -311,7 +331,7 @@ describe('admin api auth', () => {
   });
 
   it('serves fresh counts to a later cold request instead of a stale snapshot', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
     // A different stub body than the other overview test: without the
     // beforeEach cache reset, whichever overview test runs second would be
@@ -353,7 +373,7 @@ describe('admin api auth', () => {
     // proves both dispatch arms read the one injected canonicalPlayersCap source, and
     // reds if the legacy arm ever omits playersCap (the objectContaining "serves the
     // overview" case would stay green on such an omission).
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
     vi.mocked(overviewCounts).mockResolvedValue({
       accounts: 1,
@@ -385,7 +405,7 @@ describe('admin api auth', () => {
   });
 
   it('serves persistent online history with cleaned range parameters', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
     vi.mocked(onlineHistory).mockResolvedValue({
       range: '7d',
@@ -418,7 +438,7 @@ describe('admin api auth', () => {
   });
 
   it('serves live suspicious players to an authenticated admin', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
     fakeGame.suspiciousPlayers.mockReturnValue([
       {
@@ -455,7 +475,7 @@ describe('admin api auth', () => {
   });
 
   it('serves detection calibration histograms to an authenticated admin', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
     fakeGame.detectionCalibration.mockReturnValue({
       schemaVersion: 1,
@@ -521,7 +541,7 @@ describe('admin api auth', () => {
   });
 
   it('rejects non-GET methods on data endpoints', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
     const res = fakeRes();
     await handleAdminApi(
@@ -534,7 +554,7 @@ describe('admin api auth', () => {
   });
 
   it('returns 404 for unknown admin endpoints', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
     const res = fakeRes();
 
@@ -544,7 +564,7 @@ describe('admin api auth', () => {
   });
 
   it('passes pagination and search through to the accounts query', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
     vi.mocked(listAccounts).mockResolvedValue({ rows: [], total: 0, page: 2, limit: 50 });
     const res = fakeRes();
@@ -560,7 +580,7 @@ describe('admin api auth', () => {
   });
 
   it('passes pagination, search, and sorting through to the characters query', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
     vi.mocked(listCharacters).mockResolvedValue({ rows: [], total: 0, page: 3, limit: 50 });
     const res = fakeRes();
@@ -579,7 +599,7 @@ describe('admin api auth', () => {
   });
 
   it('serves unstuck reports through the production admin dispatcher', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
     vi.mocked(pool.query)
       .mockResolvedValueOnce({
@@ -669,7 +689,7 @@ describe('admin api auth', () => {
   });
 
   it('skips the unstuck hotspot aggregate on legacy cursor pages', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
     vi.mocked(pool.query).mockResolvedValueOnce({ rows: [], rowCount: 0 } as never);
     const res = fakeRes();
@@ -696,7 +716,7 @@ describe('admin api auth', () => {
   });
 
   it('serves shared IPs with their current block state', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
     vi.mocked(listSharedIps).mockResolvedValue({
       rows: [
@@ -730,7 +750,7 @@ describe('admin api auth', () => {
   });
 
   it('serves online shared IPs from memory without querying session history', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
     fakeGame.liveSharedIps.mockReturnValue([
       {
@@ -773,7 +793,7 @@ describe('admin api auth', () => {
   });
 
   it('serves grouped IP associations with normalized pagination', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
     vi.mocked(associationsForIp).mockResolvedValue({
       ip: '203.0.113.7',
@@ -811,11 +831,44 @@ describe('admin api auth', () => {
     expect(associationsForIp).toHaveBeenCalledWith('203.0.113.7', 2, 50);
     expect(res.statusCode).toBe(200);
     expect(res.body.data.blocked).toBe(true);
+    expect(res.body.data.blockable).toBe(true);
     expect(res.body.data.accounts[0].online).toBe(true);
   });
 
+  it('serves associations for the stored unknown marker without checking the block list', async () => {
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
+    vi.mocked(isAdminAccount).mockResolvedValue(true);
+    vi.mocked(associationsForIp).mockResolvedValue({
+      ip: 'unknown',
+      accounts: [],
+      total: 0,
+      page: 1,
+      limit: 25,
+    });
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/ip-associations?ip=unknown' }),
+      res,
+      fakeGame,
+    );
+
+    expect(associationsForIp).toHaveBeenCalledWith('unknown', 1, 25);
+    expect(fakeGame.isIpBlocked).not.toHaveBeenCalled();
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data).toEqual({
+      ip: 'unknown',
+      accounts: [],
+      total: 0,
+      page: 1,
+      limit: 25,
+      blocked: false,
+      blockable: false,
+    });
+  });
+
   it('rejects an invalid IP association lookup', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
     const res = fakeRes();
 
@@ -830,7 +883,7 @@ describe('admin api auth', () => {
   });
 
   it('serves the moderation queue to admins with online account context', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
     vi.mocked(moderationQueue).mockResolvedValue([
       {
@@ -860,7 +913,7 @@ describe('admin api auth', () => {
   });
 
   it('serves perf summaries and raw rows through existing admin auth', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
     vi.mocked(clientPerfSummary).mockResolvedValue({
       hours: 24,
@@ -879,7 +932,9 @@ describe('admin api auth', () => {
       byBrowser: [],
       byOs: [],
       byScenario: [],
+      byCrowd: [],
       worstGpuBuckets: [],
+      suggestionCounts: [{ id: 'hardware-acceleration', sampleCount: 3 }],
     });
     vi.mocked(clientPerfRaw).mockResolvedValue([
       { id: 123 } as unknown as PerfRawRow,
@@ -895,6 +950,10 @@ describe('admin api auth', () => {
     expect(summaryRes.statusCode).toBe(200);
     expect(clientPerfSummary).toHaveBeenCalledWith(24);
     expect(summaryRes.body.data.totals.sampleCount).toBe(1);
+    // The phase 05 suggestionCounts field rides the summary response verbatim.
+    expect(summaryRes.body.data.suggestionCounts).toEqual([
+      { id: 'hardware-acceleration', sampleCount: 3 },
+    ]);
 
     const rawRes = fakeRes();
     await handleAdminApi(
@@ -910,7 +969,7 @@ describe('admin api auth', () => {
   });
 
   it('loads moderation account detail with open reports', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
     vi.mocked(accountDetail).mockResolvedValue({
       id: 9,
@@ -948,7 +1007,7 @@ describe('admin api auth', () => {
   });
 
   it('includes the in-memory online state in account detail without another query', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
     vi.mocked(accountDetail).mockResolvedValue({
       id: 9,
@@ -985,7 +1044,7 @@ describe('admin api auth', () => {
   });
 
   it('ignores an open report', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
     vi.mocked(ignoreReport).mockResolvedValue(true);
     const res = fakeRes();
@@ -1006,7 +1065,7 @@ describe('admin api auth', () => {
   });
 
   it('suspends and disconnects an account', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValueOnce(true).mockResolvedValueOnce(false);
     vi.mocked(moderateAccount).mockResolvedValue();
     const res = fakeRes();
@@ -1032,10 +1091,11 @@ describe('admin api auth', () => {
       expiresAt,
     });
     expect(fakeGame.disconnectAccount).toHaveBeenCalledWith(9, 'This account is suspended.');
+    expect(revokeTokensExcept).toHaveBeenCalledWith(9, null);
   });
 
   it('bans and disconnects an account', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValueOnce(true).mockResolvedValueOnce(false);
     vi.mocked(moderateAccount).mockResolvedValue();
     const res = fakeRes();
@@ -1060,10 +1120,11 @@ describe('admin api auth', () => {
       expiresAt: undefined,
     });
     expect(fakeGame.disconnectAccount).toHaveBeenCalledWith(9, 'This account has been banned.');
+    expect(revokeTokensExcept).toHaveBeenCalledWith(9, null);
   });
 
   it('mutes account chat and sends a live warning without disconnecting', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValueOnce(true).mockResolvedValueOnce(false);
     vi.mocked(muteAccountChat).mockResolvedValue();
     const res = fakeRes();
@@ -1092,7 +1153,7 @@ describe('admin api auth', () => {
   });
 
   it('unbans without disconnecting the account', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
     vi.mocked(moderateAccount).mockResolvedValue();
     const res = fakeRes();
@@ -1117,10 +1178,11 @@ describe('admin api auth', () => {
       expiresAt: undefined,
     });
     expect(fakeGame.disconnectAccount).not.toHaveBeenCalled();
+    expect(revokeTokensExcept).not.toHaveBeenCalled();
   });
 
   it('unsuspends without disconnecting the account', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
     vi.mocked(moderateAccount).mockResolvedValue();
     const res = fakeRes();
@@ -1146,10 +1208,11 @@ describe('admin api auth', () => {
     });
     expect(fakeGame.disconnectAccount).not.toHaveBeenCalled();
     expect(accountMailTarget).not.toHaveBeenCalled();
+    expect(revokeTokensExcept).not.toHaveBeenCalled();
   });
 
   it('rejects suspending or banning admin accounts', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValueOnce(true).mockResolvedValueOnce(true);
     const res = fakeRes();
 
@@ -1171,7 +1234,7 @@ describe('admin api auth', () => {
   });
 
   it('forces a character rename and disconnects that account', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
     vi.mocked(forceCharacterRename).mockResolvedValue({ accountId: 9 });
     const res = fakeRes();
@@ -1202,7 +1265,7 @@ describe('admin api auth', () => {
 
 describe('admin api chat filter', () => {
   beforeEach(() => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
   });
 
@@ -1329,7 +1392,7 @@ describe('admin api chat filter', () => {
   });
 
   it('lifts a mute and syncs the live session', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(liftAccountChatMute).mockResolvedValue();
     const res = fakeRes();
 
@@ -1454,7 +1517,7 @@ describe('escapeLike', () => {
 
 describe('blocked-ips admin route', () => {
   beforeEach(() => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(isAdminAccount).mockResolvedValue(true);
   });
 
@@ -1490,6 +1553,26 @@ describe('blocked-ips admin route', () => {
       fakeGame,
     );
     expect(res.statusCode).toBe(400);
+    expect(fakeGame.disconnectByIp).not.toHaveBeenCalled();
+  });
+
+  it('refuses to block unknown before the write boundary', async () => {
+    const res = fakeRes();
+
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        token: VALID_TOKEN,
+        url: '/admin/api/blocked-ips',
+        body: { ip: 'unknown' },
+      }),
+      res,
+      fakeGame,
+    );
+
+    expect(res.statusCode).toBe(400);
+    expect(addBlockedIp).not.toHaveBeenCalled();
+    expect(fakeGame.reloadBlockedIps).not.toHaveBeenCalled();
     expect(fakeGame.disconnectByIp).not.toHaveBeenCalled();
   });
 
@@ -1546,7 +1629,7 @@ describe('blocked-ips admin route', () => {
 
 describe('admin api password reset', () => {
   const actAs = (roles: string[], accountId = 7) => {
-    vi.mocked(accountForToken).mockResolvedValue(accountId);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(accountId));
     vi.mocked(adminRolesForAccount).mockResolvedValue({ username: 'operator', roles });
   };
   const targetExists = () =>
@@ -1681,7 +1764,7 @@ describe('admin api password reset', () => {
 
 describe('admin api permissions', () => {
   const actAs = (roles: string[], accountId = 7) => {
-    vi.mocked(accountForToken).mockResolvedValue(accountId);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(accountId));
     vi.mocked(adminRolesForAccount).mockResolvedValue({ username: 'operator', roles });
   };
 
@@ -1824,7 +1907,7 @@ describe('admin api permissions', () => {
     expect(res.body.error).toBe('you cannot change your own roles');
 
     // Superadmin target: refused even for another superadmin actor.
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(adminRolesForAccount).mockImplementation(async (id: number) =>
       id === 7
         ? { username: 'operator', roles: ['superadmin'] }
@@ -1839,7 +1922,7 @@ describe('admin api permissions', () => {
   });
 
   it('applies a valid role change through the audited writer', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(adminRolesForAccount).mockImplementation(async (id: number) =>
       id === 7 ? { username: 'operator', roles: ['superadmin'] } : null,
     );
@@ -1952,7 +2035,7 @@ describe('staff role change live effects', () => {
     fakeReq({ method: 'POST', token: VALID_TOKEN, url: '/admin/api/staff/roles', body });
 
   const actorAndTarget = () => {
-    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
     vi.mocked(adminRolesForAccount).mockImplementation(async (id: number) =>
       id === 7
         ? { username: 'operator', roles: ['superadmin'] }

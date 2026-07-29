@@ -14,7 +14,7 @@
 // raw hex sits in this painter.
 
 import { audio } from '../game/audio';
-import type { EquipSlot } from '../sim/types';
+import type { ItemSlot } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { markDialogRoot } from './dialog_root';
 import { dropdownKeyNav } from './dropdown_nav';
@@ -24,11 +24,13 @@ import { esc } from './esc';
 import { formatMoney as formatLocalizedMoney, formatNumber, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import {
-  MARKET_ARMOR_TYPE_FILTERS,
+  MARKET_ARMOR_CLASS_FILTERS,
   MARKET_ITEM_TYPE_FILTERS,
+  MARKET_PRIMARY_STAT_FILTERS,
   MARKET_RARITY_FILTERS,
-  MARKET_WEAPON_TYPE_FILTERS,
+  type MarketArmorClassFilter,
   type MarketItemTypeFilter,
+  type MarketPrimaryStatFilter,
   type MarketQuery,
   type MarketRarityFilter,
   type MarketSubtypeFilter,
@@ -41,8 +43,10 @@ import {
   type MarketCollectBody,
   type MarketSellBody,
   type MarketSellMeta,
+  type MarketSubtypeKind,
   type MarketTab,
   marketCollectBadgeCount,
+  marketFilterMenus,
 } from './market_view';
 import type { PainterHostPresentation } from './painter_host';
 import { svgIcon } from './ui_icons';
@@ -75,7 +79,7 @@ export interface MarketWindowDeps extends PainterHostPresentation {
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
   showError(text: string): void;
-  slotName(slot: EquipSlot): string;
+  slotName(slot: ItemSlot): string;
   /** Render the bags window and, when `open`, reveal it alongside the market. */
   syncBags(open: boolean): void;
 }
@@ -85,6 +89,8 @@ export class MarketWindow {
   private tab: MarketTab = 'browse';
   private itemTypeFilter: MarketItemTypeFilter = 'all';
   private subtypeFilter: MarketSubtypeFilter = 'all';
+  private armorClassFilter: MarketArmorClassFilter = 'all';
+  private primaryStatFilter: MarketPrimaryStatFilter = 'all';
   private rarityFilter: MarketRarityFilter = 'all';
   private browsePage = 0;
   private sellItemId: string | null = null;
@@ -110,6 +116,8 @@ export class MarketWindow {
     this.tab = 'browse';
     this.itemTypeFilter = 'all';
     this.subtypeFilter = 'all';
+    this.armorClassFilter = 'all';
+    this.primaryStatFilter = 'all';
     this.rarityFilter = 'all';
     this.browsePage = 0;
     this.sellItemId = null;
@@ -152,6 +160,8 @@ export class MarketWindow {
       search: this.searchQuery,
       itemType: this.itemTypeFilter,
       subtype: this.subtypeFilter,
+      armorClass: this.armorClassFilter,
+      primaryStat: this.primaryStatFilter,
       rarity: this.rarityFilter,
       page: this.browsePage,
     };
@@ -174,6 +184,8 @@ export class MarketWindow {
       this.tab,
       this.itemTypeFilter,
       this.subtypeFilter,
+      this.armorClassFilter,
+      this.primaryStatFilter,
       this.rarityFilter,
       this.browsePage,
       info?.listings,
@@ -324,10 +336,18 @@ export class MarketWindow {
           if (next !== this.itemTypeFilter) {
             this.itemTypeFilter = next;
             this.subtypeFilter = 'all';
+            this.armorClassFilter = 'all';
+            this.primaryStatFilter = 'all';
             this.browsePage = 0;
           }
         } else if (key === 'subtype') {
           this.subtypeFilter = value as MarketSubtypeFilter;
+          this.browsePage = 0;
+        } else if (key === 'armorClass') {
+          this.armorClassFilter = value as MarketArmorClassFilter;
+          this.browsePage = 0;
+        } else if (key === 'primaryStat') {
+          this.primaryStatFilter = value as MarketPrimaryStatFilter;
           this.browsePage = 0;
         } else if (key === 'rarity') {
           this.rarityFilter = value as MarketRarityFilter;
@@ -416,6 +436,8 @@ export class MarketWindow {
       filters: {
         itemType: this.itemTypeFilter,
         subtype: this.subtypeFilter,
+        armorClass: this.armorClassFilter,
+        primaryStat: this.primaryStatFilter,
         rarity: this.rarityFilter,
       },
       sellItemId: this.sellItemId,
@@ -705,6 +727,7 @@ export class MarketWindow {
   private marketItemTypeLabel(filter: MarketItemTypeFilter): string {
     if (filter === 'weapon') return t('itemUi.market.filterTypeWeapon');
     if (filter === 'armor') return t('itemUi.market.filterTypeArmor');
+    if (filter === 'bag') return t('itemUi.market.filterTypeBag');
     if (filter === 'consumable') return t('itemUi.market.filterTypeConsumable');
     if (filter === 'material') return t('itemUi.market.filterTypeMaterial');
     if (filter === 'cosmetic') return t('itemUi.market.filterTypeCosmetic');
@@ -722,28 +745,51 @@ export class MarketWindow {
     return t('itemUi.market.filterRarityAll');
   }
 
-  private marketSubtypeOptions(): readonly MarketSubtypeFilter[] {
-    if (this.itemTypeFilter === 'armor') return MARKET_ARMOR_TYPE_FILTERS;
-    if (this.itemTypeFilter === 'weapon') return MARKET_WEAPON_TYPE_FILTERS;
-    return ['all'];
+  // Both label functions switch on the core's subtypeKind, never on the item type:
+  // the options and their wording are decided together in marketFilterMenus, so a type
+  // that gains a subtype axis cannot get its list from one place and its words from
+  // another (which is how a bag size would have read "Other weapons").
+  private marketSubtypeLabel(kind: MarketSubtypeKind): string {
+    if (kind === 'bagCapacity') return t('itemUi.market.filterBagSize');
+    if (kind === 'armorSlot') return t('itemUi.market.filterArmorSlot');
+    return t('itemUi.market.filterWeaponType');
   }
 
-  private marketSubtypeLabel(): string {
-    return t(
-      this.itemTypeFilter === 'armor'
-        ? 'itemUi.market.filterArmorType'
-        : 'itemUi.market.filterWeaponType',
-    );
+  private marketArmorClassLabel(filter: MarketArmorClassFilter): string {
+    if (filter === 'cloth') return t('itemUi.market.armorCloth');
+    if (filter === 'leather') return t('itemUi.market.armorLeather');
+    if (filter === 'mail') return t('itemUi.market.armorMail');
+    return t('itemUi.market.filterArmorClassAll');
   }
 
-  private marketSubtypeOptionLabel(filter: MarketSubtypeFilter): string {
+  private marketPrimaryStatLabel(filter: MarketPrimaryStatFilter): string {
+    if (filter === 'str') return t('itemUi.stats.str');
+    if (filter === 'agi') return t('itemUi.stats.agi');
+    if (filter === 'int') return t('itemUi.stats.int');
+    return t('itemUi.market.filterPrimaryStatAll');
+  }
+
+  private marketSubtypeOptionLabel(kind: MarketSubtypeKind, filter: MarketSubtypeFilter): string {
+    // Bags first: their option values are capacities, so they must not fall through to
+    // the weapon-family chain below, whose tail labels anything unmatched "Other weapons".
+    if (kind === 'bagCapacity') {
+      const slots = Number(filter);
+      // A non-numeric value here means a subtype left over from another item type, which
+      // the wire's union allowlist permits even though the chrome resets on every type
+      // change. Label it "All bags" rather than rendering a literal "NaN Slot Bag".
+      return filter === 'all' || !Number.isFinite(slots)
+        ? t('itemUi.market.filterBagAll')
+        : t('itemUi.tooltip.bagSlots', {
+            // useGrouping: false so the label and the option VALUE stay the same digits
+            // at any capacity the catalog might ship ("1000", never "1,000").
+            slots: formatNumber(slots, { maximumFractionDigits: 0, useGrouping: false }),
+          });
+    }
     if (filter === 'all')
       return t(
-        this.itemTypeFilter === 'armor'
-          ? 'itemUi.market.filterArmorAll'
-          : 'itemUi.market.filterWeaponAll',
+        kind === 'armorSlot' ? 'itemUi.market.filterArmorAll' : 'itemUi.market.filterWeaponAll',
       );
-    if (this.itemTypeFilter === 'armor') return this.deps.slotName(filter as EquipSlot);
+    if (kind === 'armorSlot') return this.deps.slotName(filter as ItemSlot);
     if (filter === 'sword') return t('itemUi.market.weaponSword');
     if (filter === 'dagger') return t('itemUi.market.weaponDagger');
     if (filter === 'staff') return t('itemUi.market.weaponStaff');
@@ -753,7 +799,7 @@ export class MarketWindow {
   }
 
   private renderMarketFilterMenu(
-    menu: 'itemType' | 'subtype' | 'rarity',
+    menu: 'itemType' | 'subtype' | 'armorClass' | 'primaryStat' | 'rarity',
     label: string,
     value: string,
     options: readonly string[],
@@ -763,12 +809,15 @@ export class MarketWindow {
     const optionHtml = options
       .map((option) => {
         const selected = option === value;
-        return `<button type="button" class="mkt-select-option${selected ? ' sel' : ''}" role="option" tabindex="-1" aria-selected="${selected ? 'true' : 'false'}" data-market-filter-option="${option}">${esc(optionLabel(option))}</button>`;
+        // esc() on the value too: every option used to be a source-authored literal, but
+        // the bag capacities are derived from content (ITEMS[*].bagSlots), so the reason
+        // this interpolation was safe by construction no longer holds on its own.
+        return `<button type="button" class="mkt-select-option${selected ? ' sel' : ''}" role="option" tabindex="-1" aria-selected="${selected ? 'true' : 'false'}" data-market-filter-option="${esc(option)}">${esc(optionLabel(option))}</button>`;
       })
       .join('');
     return (
       `<div class="mkt-filter"><span>${esc(label)}</span><div class="mkt-select" data-market-filter-menu="${menu}">` +
-      `<button type="button" class="mkt-select-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="${esc(`${label}: ${current}`)}"><span>${esc(current)}</span><span class="mkt-select-chevron" aria-hidden="true"></span></button>` +
+      `<button type="button" class="mkt-select-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="${esc(t('itemUi.market.filterValueAria', { label, value: current }))}"><span>${esc(current)}</span><span class="mkt-select-chevron" aria-hidden="true"></span></button>` +
       `<div class="mkt-select-menu" role="listbox" hidden>${optionHtml}</div>` +
       `</div></div>`
     );
@@ -776,7 +825,11 @@ export class MarketWindow {
 
   private renderMarketFilters(): string {
     if (this.tab !== 'browse') return '';
-    const hasSubtype = this.itemTypeFilter === 'armor' || this.itemTypeFilter === 'weapon';
+    // WHICH secondary menus this item type shows is a pure function of the type, so it
+    // is decided in the view core and merely painted here.
+    const menus = marketFilterMenus(this.itemTypeFilter);
+    // Bound to a const so the null check below narrows inside the option-label closure.
+    const subtypeKind = menus.subtypeKind;
     return (
       `<div class="mkt-filters" role="group" aria-label="${esc(t('itemUi.market.filters'))}">` +
       this.renderMarketFilterMenu(
@@ -786,13 +839,31 @@ export class MarketWindow {
         MARKET_ITEM_TYPE_FILTERS,
         (filter) => this.marketItemTypeLabel(filter as MarketItemTypeFilter),
       ) +
-      (hasSubtype
+      (menus.subtype && subtypeKind
         ? this.renderMarketFilterMenu(
             'subtype',
-            this.marketSubtypeLabel(),
+            this.marketSubtypeLabel(subtypeKind),
             this.subtypeFilter,
-            this.marketSubtypeOptions(),
-            (filter) => this.marketSubtypeOptionLabel(filter as MarketSubtypeFilter),
+            menus.subtype,
+            (filter) => this.marketSubtypeOptionLabel(subtypeKind, filter as MarketSubtypeFilter),
+          )
+        : '') +
+      (menus.armorClass
+        ? this.renderMarketFilterMenu(
+            'armorClass',
+            t('itemUi.market.filterArmorType'),
+            this.armorClassFilter,
+            MARKET_ARMOR_CLASS_FILTERS,
+            (filter) => this.marketArmorClassLabel(filter as MarketArmorClassFilter),
+          )
+        : '') +
+      (menus.primaryStat
+        ? this.renderMarketFilterMenu(
+            'primaryStat',
+            t('itemUi.market.filterPrimaryStat'),
+            this.primaryStatFilter,
+            MARKET_PRIMARY_STAT_FILTERS,
+            (filter) => this.marketPrimaryStatLabel(filter as MarketPrimaryStatFilter),
           )
         : '') +
       this.renderMarketFilterMenu(

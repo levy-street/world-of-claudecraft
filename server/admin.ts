@@ -15,6 +15,7 @@ import {
   registrationsByDay,
   sessionsByDay,
 } from './admin_db';
+import { cleanIpAssociationLookup } from './admin_ip_association';
 import { readOverviewCounts } from './admin_overview_cache';
 import {
   type AdminPermission,
@@ -50,8 +51,8 @@ import {
 } from './chat_filter_db';
 import { currentDailyRewardDay } from './daily_rewards';
 import {
+  accountAndScopeForToken,
   accountById,
-  accountForToken,
   accountMailTarget,
   findAccount,
   isAdminAccount,
@@ -117,9 +118,10 @@ import {
 } from './unstuck_db';
 import { PgUserAssetsDb } from './user_assets_db';
 
-// Admin API: everything under /admin/api/*. Auth is a bearer token whose
-// account has at least one staff role (accounts.admin_roles; is_admin stays
-// the derived "is staff" flag): the admin.* hostname is routing, not security.
+// Admin API: everything under /admin/api/*. Auth is an exact full-scope bearer
+// token whose account has at least one staff role (accounts.admin_roles;
+// is_admin stays the derived "is staff" flag): the admin.* hostname is routing,
+// not security.
 // Authorization is per route: every route is declared with a permission in
 // admin_routes.ts and gated centrally in handleAdminApi before any handler
 // runs, so a route absent from that table can never execute.
@@ -385,8 +387,9 @@ interface AdminIdentity {
 async function adminIdentity(req: http.IncomingMessage): Promise<AdminIdentity | null> {
   const m = /^Bearer ([a-f0-9]{64})$/.exec(req.headers.authorization ?? '');
   if (!m) return null;
-  const accountId = await accountForToken(m[1]);
-  if (accountId === null) return null;
+  const account = await accountAndScopeForToken(m[1]);
+  if (account === null || account.scope !== 'full') return null;
+  const accountId = account.accountId;
   const staff = await adminRolesForAccount(accountId);
   if (staff === null) return null;
   return {
@@ -584,6 +587,12 @@ export async function handleAdminApi(
         if (action === 'suspend' || action === 'ban') {
           const statusText =
             action === 'ban' ? 'This account has been banned.' : 'This account is suspended.';
+          // Every device is signed out here too, mirroring the reset-password arm
+          // above: revoke all tokens then disconnect the live socket (revocation
+          // alone leaves an already-open connection intact). Otherwise a token
+          // issued before the sanction stays valid in auth_tokens and regains
+          // access with no re-authentication once the sanction is lifted or expires.
+          await revokeTokensExcept(targetAccountId, null);
           game.disconnectAccount(targetAccountId, statusText);
           // Notify the affected account of the moderation action. Best-effort and
           // fully isolated: a mail-target lookup or send failure must never turn a
@@ -865,9 +874,11 @@ export async function handleAdminApi(
 
     if (req.method === 'POST' && path === '/admin/api/blocked-ips') {
       const body = await readBody(req);
+      const cleanedIp = cleanIp(body.ip);
+      if (!cleanedIp) return fail(res, 400, 'a valid IP address is required');
       try {
         const ip = await addBlockedIp({
-          ip: body.ip,
+          ip: cleanedIp,
           reason: body.reason,
           createdByAccountId: accountId,
           expiresAt: body.expiresAt,
@@ -1040,18 +1051,20 @@ export async function handleAdminApi(
       });
     }
     if (path === '/admin/api/ip-associations') {
-      const ip = cleanIp(url.searchParams.get('ip'));
+      const ip = cleanIpAssociationLookup(url.searchParams.get('ip'));
       if (!ip) return fail(res, 400, 'a valid IP address is required');
       const { page, limit } = parsePageParams(url.searchParams);
       const associations = await associationsForIp(ip, page, limit);
       const onlineAccountIds = game.liveAccountIds();
+      const blockableIp = cleanIp(ip);
       return ok(res, {
         ...associations,
         accounts: associations.accounts.map((account) => ({
           ...account,
           online: onlineAccountIds.has(account.accountId),
         })),
-        blocked: game.isIpBlocked(ip),
+        blocked: blockableIp ? game.isIpBlocked(blockableIp) : false,
+        blockable: Boolean(blockableIp),
       });
     }
     if (path === '/admin/api/moderation/queue') {
@@ -1175,15 +1188,15 @@ export async function handleAdminApi(
 //    internal throw). The happy + guard paths never reach withErrors.
 //
 //  - AUTH is the legacy-body admin gate (createRequireAdmin), mirroring
-//    adminIdentity(req) EXACTLY (v0.22.0 staff roles): bearer -> accountForToken ->
-//    staff_db.adminRolesForAccount (fail closed; no roles means not staff), a
+//    adminIdentity(req) EXACTLY (v0.22.0 staff roles): bearer -> scoped token
+//    resolver (full required) -> staff_db.adminRolesForAccount (fail closed), a
 //    uniform 401 { ...error: 'admin authentication required' } on any failure, then
 //    the CENTRAL AUTHORIZATION gate: the route's declared permission resolves from
 //    ADMIN_ROUTE_PERMISSIONS (server/admin_routes.ts) against the concrete request
 //    path, fail-closed (unmapped -> 404 'unknown admin endpoint' / 405; missing
 //    permission -> 403), mirroring the legacy handleAdminApi preamble byte-for-byte.
-//    NO read-only-scope 403 and NO moderation gate (legacy admin auth applies
-//    neither). Mounted on every route except login (anonymous by design).
+//    Read-scope tokens receive the same uniform 401 as every other invalid admin
+//    credential. No moderation gate applies. Mounted on every route except login.
 //    requireAdmin runs BEFORE the :id / :action decode, so an unauthenticated
 //    malformed request 401s exactly as legacy did (auth precedes route/method).
 //
@@ -1352,7 +1365,7 @@ function makeRealAdminDb() {
     moderationQueue,
     moderationReportsForAccount,
     muteAccountChat,
-    accountForToken,
+    accountAndScopeForToken,
     accountMailTarget,
     findAccount,
     // Target-account staff check (the "admin accounts cannot be suspended / banned /
@@ -1417,7 +1430,7 @@ export function resetAdminDbForTests(): void {
   adminDbOverride = undefined;
 }
 
-// The admin-auth gate reads its two db functions (accountForToken,
+// The admin-auth gate reads its two db functions (accountAndScopeForToken and
 // adminRolesForAccount) off the active bundle, so a setAdminDbForTests fake drives
 // it too. AdminDb is a superset of AdminAuthDb, so the getter is assignable.
 const requireAdmin = createRequireAdmin((): AdminAuthDb => adminDb());
@@ -1702,21 +1715,23 @@ async function sharedIpsHandler(ctx: Ctx): Promise<void> {
   });
 }
 
-/** GET /admin/api/ip-associations: accounts tied to one IP, with live online flags. */
+/** GET /admin/api/ip-associations: accounts tied to one stored IP marker, with live flags. */
 async function ipAssociationsHandler(ctx: Ctx): Promise<void> {
   const rt = useAdminRuntime();
-  const ip = adminDb().cleanIp(ctx.url.searchParams.get('ip'));
+  const ip = cleanIpAssociationLookup(ctx.url.searchParams.get('ip'));
   if (!ip) return fail(ctx.res, 400, 'a valid IP address is required');
   const { page, limit } = parsePageParams(ctx.url.searchParams);
   const associations = await adminDb().associationsForIp(ip, page, limit);
   const onlineAccountIds = rt.liveAccountIds();
+  const blockableIp = adminDb().cleanIp(ip);
   ok(ctx.res, {
     ...associations,
     accounts: associations.accounts.map((account) => ({
       ...account,
       online: onlineAccountIds.has(account.accountId),
     })),
-    blocked: rt.isIpBlocked(ip),
+    blocked: blockableIp ? rt.isIpBlocked(blockableIp) : false,
+    blockable: Boolean(blockableIp),
   });
 }
 
@@ -1729,9 +1744,11 @@ async function blockedIpsGetHandler(ctx: Ctx): Promise<void> {
 async function blockedIpsPostHandler(ctx: Ctx): Promise<void> {
   const rt = useAdminRuntime();
   const body = await readBody(ctx.req);
+  const cleanedIp = adminDb().cleanIp(body.ip);
+  if (!cleanedIp) return fail(ctx.res, 400, 'a valid IP address is required');
   try {
     const ip = await adminDb().addBlockedIp({
-      ip: body.ip,
+      ip: cleanedIp,
       reason: body.reason,
       createdByAccountId: ctxAccountId(ctx),
       expiresAt: body.expiresAt,
@@ -1783,6 +1800,12 @@ async function moderateActionHandler(ctx: Ctx): Promise<void> {
     if (action === 'suspend' || action === 'ban') {
       const statusText =
         action === 'ban' ? 'This account has been banned.' : 'This account is suspended.';
+      // Every device is signed out here too, mirroring resetPasswordHandler: revoke
+      // all tokens then disconnect the live socket (revocation alone leaves an
+      // already-open connection intact). Otherwise a token issued before the
+      // sanction stays valid in auth_tokens and regains access with no
+      // re-authentication the moment the sanction is lifted or expires.
+      await adminDb().revokeTokensExcept(targetAccountId, null);
       rt.disconnectAccount(targetAccountId, statusText);
       // Notify the affected account of the moderation action. Best-effort and fully
       // isolated: a mail-target lookup or send failure must never turn a successful

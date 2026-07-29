@@ -103,6 +103,13 @@ const actionBarControllerTs = readFileSync(
   new URL('../src/ui/hud/action_bar/action_bar_controller.ts', import.meta.url),
   'utf8',
 ).replace(/\r\n/g, '\n');
+// The per-form storage key scheme (incl. the `_seeded` / `_blank_v1` markers) is
+// shared with the layout-sync module so server-restore writes cannot drift from
+// the keys the controller loads.
+const actionBarLayoutSyncTs = readFileSync(
+  new URL('../src/ui/hud/action_bar/action_bar_layout_sync.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
 // The Esc options menu was extracted to options_view.ts (the declarative menu
 // model) + options_window.ts (the painter); the menu guard reads the
 // model rather than the old inline hud.ts main-menu builder.
@@ -567,6 +574,11 @@ describe('client HTML shell', () => {
     expect(cmStart).toBeGreaterThan(-1);
     expect(cmBody).toContain("case 'char-window':");
     expect(cmBody).toContain('this.charWindow.close();');
+    // The inspect window gained its focus trap in the showcase extraction; Escape
+    // (closeAll -> closeManagedWindow) must route through the painter too, not the
+    // default inline hide, or the trap's focus-return never fires on keyboard close.
+    expect(cmBody).toContain("case 'inspect-window':");
+    expect(cmBody).toContain('this.inspectWindow.close();');
     // The sibling cold windows route the same way; lock the family so a future case is not
     // left on an inline hide that drops focus.
     expect(cmBody).toContain('this.socialWindow.close();');
@@ -896,7 +908,7 @@ describe('client HTML shell', () => {
   it('keeps the desktop character roster readable inside a centered cinematic stage', () => {
     expect(shellCss).toContain('--cs-stage-gutter: max(26px, calc((100vw - 1780px) / 2));');
     expect(shellCss).toContain('--cs-roster-width: clamp(340px, 28vw, 440px);');
-    expect(shellCss).toContain('--cs-details-width: var(--cs-roster-width);');
+    expect(shellCss).toContain('--cs-details-width: clamp(380px, 30vw, 720px);');
     expect(shellCss).toContain(
       '@media (min-width: 861px) {\n    #offline-select.cs-wow,\n    body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow {',
     );
@@ -910,22 +922,23 @@ describe('client HTML shell', () => {
       'body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-name {\n      overflow-wrap: anywhere;',
     );
     expect(shellCss).toContain(
-      'body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-grid {\n      grid-template-columns: minmax(0, 1fr);',
+      'body:not(.mobile-touch) #charselect-panel.cs-wow .cs-news-panel {\n      position: absolute;\n      left: clamp(24px, 2vw, 48px);',
     );
     expect(shellCss).toContain(
-      'overflow-y: auto;\n      scrollbar-width: thin;\n      scrollbar-color: color-mix(in srgb, var(--scrollbar-thumb) 42%, transparent) transparent;',
+      'scrollbar-width: thin;\n      scrollbar-color: color-mix(in srgb, var(--scrollbar-thumb) 42%, transparent) transparent;',
     );
     expect(shellCss).toContain(
-      'body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-panel::-webkit-scrollbar {\n      width: 6px;',
-    );
-    expect(shellCss).toContain(
-      'body:not(.mobile-touch) #charselect-panel.cs-wow .details-gear-row .badge {\n      padding: 0;\n      border: 0;\n      border-radius: 0;\n      background: none;\n      text-transform: none;',
+      'body:not(.mobile-touch) #charselect-panel.cs-wow .cs-news-feed::-webkit-scrollbar {\n      width: 6px;',
     );
     expect(shellCss).toContain('font-size: clamp(13px, 0.72vw, 15px);');
     expect(characterPreviewTs).toContain('const LIVE_PREVIEW_X = 0;');
-    expect(characterPreviewTs).toContain('this.camera.position.set(LIVE_PREVIEW_X, 1.45, 5.1);');
+    // The self character-sheet framing (x=0, y=1.45, z=5.1, aimed at y=1.3) now
+    // lives in the pure preview_framing.ts constants and is applied on construction;
+    // the exact numbers are pinned decisively in tests/preview_framing.test.ts.
+    expect(characterPreviewTs).toContain('this.applyFraming(PREVIEW_FRAMING.sheet);');
+    expect(characterPreviewTs).toContain('this.camera.position.set(LIVE_PREVIEW_X, f.y, f.z);');
     expect(characterPreviewTs).toContain(
-      'this.camera.lookAt(new THREE.Vector3(LIVE_PREVIEW_X, 1.3, 0));',
+      'this.camera.lookAt(new THREE.Vector3(LIVE_PREVIEW_X, f.lookY, 0));',
     );
   });
 
@@ -1302,11 +1315,15 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain(
       'body.mobile-touch #party-frames {\n    position: fixed;\n    left: max(20px, calc(env(safe-area-inset-left) + 10px));\n    top: calc(max(8px, env(safe-area-inset-top)) + 74px);',
     );
-    // The base below-target offset was nudged +5px (130 -> 135) so the new first-child
-    // collapse chip clears the target frame's bottom edge; a comment now sits between the
-    // selector and the top, so assert the selector and the pinned value independently.
+    // The below-target offset derives from the measured target-stack bottom
+    // (party_below_target_painter.ts writes --party-below-target-bottom); the var
+    // fallback reproduces the old hand-nudged +135px constant (safe-area + 127px
+    // + the 8px gap) until the first measure lands. Biome wraps the long
+    // declaration, so pin against a whitespace-normalized view of the source.
     expect(hudMobileCss).toContain('body.mobile-touch #party-frames.below-target {');
-    expect(hudMobileCss).toContain('top: calc(max(8px, env(safe-area-inset-top)) + 135px);');
+    expect(hudMobileCss.replace(/\s+/g, ' ').replace(/\( /g, '(').replace(/ \)/g, ')')).toContain(
+      'top: calc(var(--party-below-target-bottom, calc(max(8px, env(safe-area-inset-top)) + 127px)) + 8px);',
+    );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #party-frames .party-frame {\n    width: calc(112px * var(--mobile-chrome-scale, 1));\n    min-height: 40px;',
     );
@@ -1342,8 +1359,12 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain(
       'body.mobile-touch #target-frame {\n      left: max(6px, env(safe-area-inset-left));\n      top: calc(max(6px, env(safe-area-inset-top)) + 56px);',
     );
-    // Landscape below-target offset likewise nudged +5px (100 -> 105) for the chip.
-    expect(hudMobileCss).toContain('top: calc(max(6px, env(safe-area-inset-top)) + 105px);');
+    // Landscape below-target offset likewise derives from the measured
+    // target-stack bottom; its fallback reproduces the old +105px constant
+    // (whitespace-normalized like the base-tier pin above).
+    expect(hudMobileCss.replace(/\s+/g, ' ').replace(/\( /g, '(').replace(/ \)/g, ')')).toContain(
+      'top: calc(var(--party-below-target-bottom, calc(max(6px, env(safe-area-inset-top)) + 97px)) + 8px);',
+    );
     expect(hudMobileCss).not.toContain('body.mobile-touch.mobile-left-handed #xpbar,');
     // The XP fill fraction is mirrored into --xp-fill on BOTH the #xpbar and the
     // #player-frame (the mobile ring around the class circle reads it). The painter
@@ -1446,7 +1467,7 @@ describe('client HTML shell', () => {
     // zero layout height, so only the panel's own top/bottom padding is left.
     expect(shellCss).toContain('height: min(560px, calc(var(--app-vh) - 20px));');
     expect(shellCss).toContain(
-      'body.mobile-touch #charselect-panel .cs-detail-col {\n      display: grid;\n      grid-template-columns: minmax(120px, 0.54fr) minmax(0, 1.46fr);',
+      'body.mobile-touch #charselect-panel .cs-detail-col {\n      display: flex;\n      flex-direction: column;',
     );
     expect(shellCss).toContain(
       'body.mobile-touch #charselect-panel #char-list {\n      overflow-y: auto;\n      scrollbar-gutter: stable;\n      scrollbar-width: auto;',
@@ -1455,17 +1476,17 @@ describe('client HTML shell', () => {
       'body.mobile-touch #charselect-panel #char-list::-webkit-scrollbar {\n      width: 8px;',
     );
     expect(shellCss).toContain(
-      'body.mobile-touch #charselect-panel #charselect-class-details {\n      box-sizing: border-box;\n      min-height: 0;\n      overflow-y: auto;',
+      'body.mobile-touch #charselect-panel #charselect-news {\n      grid-column: 1 / -1;',
     );
     expect(shellCss).toContain('scrollbar-gutter: stable;\n      scrollbar-width: auto;');
     expect(shellCss).toContain(
-      'body.mobile-touch #charselect-panel #charselect-class-details .class-details-grid {\n      display: flex;\n      flex-direction: column;',
+      'body.mobile-touch #charselect-panel {\n      height: auto;\n      overflow: visible;',
     );
     expect(shellCss).toContain(
-      'body.mobile-touch #charselect-panel #charselect-class-details .details-spells-list {\n      display: grid;\n      grid-template-columns: minmax(0, 1fr);',
+      'body.mobile-touch #charselect-panel .cs-news-feed {\n    flex: none;\n    min-height: 0;\n    overflow: visible;',
     );
     // charselect's columns stay overflow:hidden (their #char-list and
-    // #charselect-class-details CHILDREN scroll); charcreate's columns hold a
+    // .cs-news-feed CHILDREN scroll); charcreate's columns hold a
     // single tall flow with no inner scroll container, so THEY scroll instead
     // (overflow-y: auto), or the Create button clips off with no way to reach it.
     expect(shellCss).toContain(
@@ -1571,16 +1592,16 @@ describe('client HTML shell', () => {
     );
   });
 
-  it('stacks selected character details on mobile', () => {
-    expect(html).toContain('id="charselect-class-details"');
+  it('stacks the character-select news panel on mobile', () => {
+    expect(html).toContain('id="charselect-news"');
     expect(shellCss).toContain(
-      'body.mobile-touch #charselect-panel #charselect-class-details .class-details-grid,\n  body.mobile-touch #charselect-panel #online-class-details .class-details-grid {\n    display: flex;\n    flex-direction: column;',
+      'body.mobile-touch #charselect-panel #charselect-news {\n    flex: none;\n    width: 100%;',
     );
   });
 
   it('lays out mobile More tray buttons horizontally', () => {
     expect(html).toContain(
-      '<div id="mobile-extra-controls" class="window panel" role="dialog" aria-modal="true" aria-labelledby="mobile-more-title">',
+      '<div id="mobile-extra-controls" class="window panel" role="dialog" aria-modal="true" aria-labelledby="mobile-more-title" aria-hidden="true">',
     );
     expect(html).toContain('<div class="panel-title">');
     expect(html).toContain(
@@ -1590,6 +1611,11 @@ describe('client HTML shell', () => {
       '<span id="mobile-more-title" data-i18n="hud.core.mobileMore">More</span>',
     );
     expect(html).toContain('id="mobile-more-close"');
+    for (const entry of [html, playHtml]) {
+      expect(entry).toMatch(
+        /id="mobile-more"[^>]*aria-controls="mobile-extra-controls"[^>]*aria-expanded="false"/,
+      );
+    }
     expect(html).toContain('<div id="mobile-extra-grid">');
     // Daily Rewards, the Book of Deeds, Mount / Dismount, and Crafting ride the More grid in BOTH
     // entries (play.html historically lags index.html; these pins keep them in
@@ -1600,8 +1626,12 @@ describe('client HTML shell', () => {
       expect(entry).toContain('id="mobile-mounts"');
       expect(entry).toContain('id="mobile-crafting"');
     }
-    expect(hudMobileCss).toContain(
-      'body.mobile-touch.mobile-more-open #mobile-controls {\n    z-index: 140;\n  }',
+    expect(hudMobileCss).not.toContain('body.mobile-touch.mobile-more-open #mobile-controls');
+    expect(html).toContain(
+      '</div>\n    </div>\n  </section>\n      <div id="mobile-extra-controls"',
+    );
+    expect(playHtml).toContain(
+      '</div>\n    </div>\n  </div>\n      <div id="mobile-extra-controls"',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #mobile-extra-controls {\n    position: fixed;\n    left: 50%;\n    top: 50%;\n    bottom: auto;\n    --mobile-more-open-transform: translate(-50%, -50%);\n    --mobile-more-closed-transform: translate(-50%, -46%) scale(0.96);\n    transform: var(--mobile-more-closed-transform);',
@@ -1663,8 +1693,27 @@ describe('client HTML shell', () => {
     expect(mobileControlsTs).toContain(
       "const open = !document.body.classList.contains('mobile-more-open');",
     );
-    expect(mobileControlsTs).toContain("this.root?.classList.toggle('expanded', open);");
-    expect(mobileControlsTs).toContain("document.body.classList.toggle('mobile-more-open', open);");
+    expect(mobileControlsTs).toContain("this.root?.classList.add('expanded');");
+    expect(mobileControlsTs).toContain("document.body.classList.add('mobile-more-open');");
+    expect(mainTs).toContain('watchMobileMoreState(document.body, (open) => {');
+    expect(mainTs).toContain('syncCharacterOpenDiagnostics();');
+    expect(mainTs).toContain('syncQuestDialogOpenDiagnostics();');
+    expect(mainTs).toContain(
+      "entryDiagnostics.checkpoint(optionsOpen ? 'settings-open' : 'settings-closed')",
+    );
+    expect(mainTs).toContain(
+      "entryDiagnostics.checkpoint(characterOpen ? 'character-open' : 'character-closed')",
+    );
+    expect(mainTs).toContain('hud.onQuestDialogStateChange = (open) => {');
+    expect(mainTs).toContain(
+      "entryDiagnostics.checkpoint(open ? 'quest-dialog-open' : 'quest-dialog-closed')",
+    );
+    expect(mainTs).toContain('hud.syncMobileMoreDialog(open, open || !hud.isWindowOpen());');
+    expect(mainTs).toContain('input.setAutorun(false);');
+    expect(mainTs).toContain('mobileControls.syncAutorun(false);');
+    expect(mainTs).toContain(
+      "entryDiagnostics.checkpoint(open ? 'mobile-more-open' : 'mobile-more-closed')",
+    );
     expect(mobileControlsTs).toContain("modal.style.left = '50%';");
     expect(mobileControlsTs).toContain("modal.style.top = '50%';");
     expect(mobileControlsTs).toContain("modal.style.transform = 'translate(-50%, -50%)';");
@@ -1679,7 +1728,11 @@ describe('client HTML shell', () => {
     );
     expect(bindButton.indexOf("button.closest('#mobile-extra-controls')")).toBeGreaterThan(-1);
     expect(bindButton.indexOf('this.closeMoreModal();')).toBeLessThan(bindButton.indexOf('cb();'));
+    expect(bindButton.indexOf("document.getElementById('mobile-more')?.focus();")).toBeLessThan(
+      bindButton.indexOf('cb();'),
+    );
     expect(hudTs).toContain(".filter((win) => win.id !== 'mobile-extra-controls')");
+    expect(hudTs).toContain('if (destination) this.focusManager.focusFirst(destination);');
   });
 
   it('keeps the More tray out of the managed-window close path', () => {
@@ -1707,6 +1760,14 @@ describe('client HTML shell', () => {
     expect(closeManaged).toContain(
       "document.getElementById('mobile-more')?.classList.remove('active');",
     );
+  });
+
+  it('treats the aria-modal More tray as movement-blocking while it is open', () => {
+    const modalProbe = hudTs.slice(
+      hudTs.indexOf('isModalOpen(): boolean {'),
+      hudTs.indexOf('promptModalOpen(): boolean {'),
+    );
+    expect(modalProbe).toContain("document.body.classList.contains('mobile-more-open')");
   });
 
   it('replaces the dual mode cards with one Play CTA and a realm selector', () => {
@@ -1800,8 +1861,11 @@ describe('client HTML shell', () => {
     // reach it. The window now scrolls the whole sheet (tabs, controls, and the
     // listing body together) instead of clipping, and #market-body sizes to its
     // natural content height rather than flexing to fill a fixed remainder.
+    // height: auto releases the desktop height clamp on the mobile sheet's
+    // standalone arm too (the market docking pair's mobile fix), so the sheet
+    // owns its height on every arm rather than inheriting min(640px, ...).
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #market-window {\n    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);\n    overflow-y: auto;\n    overflow-x: hidden;',
+      'body.mobile-touch #market-window {\n    height: auto;\n    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);\n    overflow-y: auto;\n    overflow-x: hidden;',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #market-body {\n    flex: none;\n    overflow-y: visible;\n    min-height: 0;',
@@ -1816,6 +1880,8 @@ describe('client HTML shell', () => {
     expect(marketWindowTs).toContain('data-market-filter-menu="${menu}"');
     expect(marketWindowTs).toMatch(/this\.renderMarketFilterMenu\(\s*'itemType'/);
     expect(marketWindowTs).toMatch(/this\.renderMarketFilterMenu\(\s*'subtype'/);
+    expect(marketWindowTs).toMatch(/this\.renderMarketFilterMenu\(\s*'armorClass'/);
+    expect(marketWindowTs).toMatch(/this\.renderMarketFilterMenu\(\s*'primaryStat'/);
     expect(marketWindowTs).toMatch(/this\.renderMarketFilterMenu\(\s*'rarity'/);
     expect(marketWindowTs).not.toContain('<select data-market-filter=');
     // The load-bearing claim of the landscape refactor: `.mkt-controls` (search +
@@ -1984,7 +2050,7 @@ describe('client HTML shell', () => {
     );
     expect(mainTs).toContain("import { tryNearbyInteraction } from './game/nearby_interaction';");
     expect(mainTs).toContain('stopAutorunForInteraction(\n      tryNearbyInteraction(');
-    // Phase 4 open-gate flip: the trailing (online === null) override is gone,
+    // Open-gate flip: the trailing (online === null) override is gone,
     // so the helpers default harvestStateReliable = true (trusting the hcb
     // corpse-claim mirror online); the call now closes right after the
     // nothing-to-interact string.
@@ -1992,7 +2058,7 @@ describe('client HTML shell', () => {
     expect(mainTs).not.toContain('online === null');
     expect(mainTs).toContain('const interactionOutcome = handlePickedEntity(');
     expect(mainTs).toContain(
-      'isClickMoveButton &&\n        shouldApproachPickedEntity(world.player, e, didInteractImmediately)',
+      'isClickMoveButton &&\n        shouldApproachPickedEntity(\n          world.player,\n          e,\n          didInteractImmediately,\n          true,\n          localPartyMemberIds(world.partyInfo),\n        )',
     );
     expect(mainTs).toContain(
       'stopAutorunForInteraction(interactionOutcome, input, mobileControls);',
@@ -2216,7 +2282,10 @@ describe('client HTML shell', () => {
   });
 
   it('migrates a pre-existing form bar at most once via a per-form seeded marker', () => {
-    expect(actionBarControllerTs).toContain('_seeded');
+    // The `_seeded` marker suffix lives in the shared key-scheme module; the
+    // controller gates seeding on it via formBarSeededKey.
+    expect(actionBarLayoutSyncTs).toContain('_seeded');
+    expect(actionBarControllerTs).toContain('actionBarFormSeededKey(this.slotMapKey(form))');
     expect(actionBarControllerTs).toContain('shouldSeedFormBar(parsed, normalActions, false)');
   });
 

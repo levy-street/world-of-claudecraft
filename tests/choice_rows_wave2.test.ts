@@ -10,8 +10,9 @@ function rig(
   level: number,
   rows: Record<number, string>,
   spec: string | null = null,
+  seed = 1,
 ) {
-  const sim = new Sim({ seed: 1, playerClass: cls, autoEquip: true });
+  const sim = new Sim({ seed, playerClass: cls, autoEquip: true });
   sim.setPlayerLevel(level);
   expect(sim.applyTalents({ spec, rows })).toBe(true);
   const p = sim.player;
@@ -266,9 +267,33 @@ describe('warlock wave 2 choice rows', () => {
     expect(p.auras.some((a) => a.id === 'wlk_curse_mastery')).toBe(false);
   });
 
+  it('Hellglass Ward shields the warlock on the 3rd damaging cast, never the mob', () => {
+    const { sim, p } = rig('warlock', 20, { 20: 'wlk_r20_grimoire_of_haste' });
+    const mob = addTargetMob(sim);
+    // Hold the mob still so nothing consumes the ward while the casts settle.
+    mob.auras.push({
+      id: 'test_hold',
+      name: 'Test Hold',
+      kind: 'stun',
+      remaining: 600,
+      duration: 600,
+      value: 0,
+      sourceId: p.id,
+      school: 'shadow',
+    });
+    for (let i = 0; i < 3; i++) castAndSettle(sim, 'shadow_bolt');
+    expect(mob.dead).toBe(false);
+    expect(p.auras.some((a) => a.id === 'wlk_grimoire_of_carnage' && a.kind === 'absorb')).toBe(
+      true,
+    );
+    expect(mob.auras.some((a) => a.id === 'wlk_grimoire_of_carnage')).toBe(false);
+  });
+
   it('Deepened Hex and defensive pact hooks change live combat outcomes', () => {
     const hit = (withDot: boolean) => {
-      const { sim } = rig('warlock', 20, { 14: 'wlk_r14_amplify_curse' });
+      // Seed hunted (post-merge camp order) so the level-20 bolt LANDS in both
+      // arms (a resist zeroes the delta and voids the ratio). Spares: 3, 4.
+      const { sim } = rig('warlock', 20, { 14: 'wlk_r14_amplify_curse' }, null, 2);
       const mob = addTargetMob(sim);
       if (withDot) {
         mob.auras.push({

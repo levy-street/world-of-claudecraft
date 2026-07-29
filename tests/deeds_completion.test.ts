@@ -114,10 +114,17 @@ describe('the real catalog', () => {
       (id) => DEEDS[id].renown === 0 && DEEDS[id].feat !== true,
     ).sort();
     expect(zeroNonFeat).toEqual([
+      // Deliberate growth: the four luck-based rare-find deeds
+      // (pristine vein, ancient heartwood, moonlit bloom, perfect specimen)
+      // join the zero-renown class per rule 2 (luck earns no Renown).
+      'col_ancient_heartwood',
       'col_first_epic',
       'col_first_legendary',
       'col_first_rare',
       'col_glimmerfin',
+      'col_moonlit_bloom',
+      'col_perfect_specimen',
+      'col_pristine_vein',
       'col_set_boundstone_vanguard',
       'col_set_crownforged',
       'col_set_deathlord',

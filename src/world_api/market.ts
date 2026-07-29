@@ -35,6 +35,10 @@ export interface MarketInfo {
 
 export interface IWorldMarket {
   marketInfo: MarketInfo | null;
+  // True while gold or items wait at the Merchant. Always available (the HUD
+  // minimap badge; the mailUnread pattern), while the full marketInfo above
+  // still streams only at the Merchant.
+  marketCollectPending: boolean;
   // World Market. The browse query (search + type/subtype/rarity filters + page) is
   // sent to the server, which filters and paginates; marketInfo mirrors the result.
   marketSearch(query: MarketQuery): void;

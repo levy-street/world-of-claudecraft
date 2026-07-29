@@ -46,7 +46,7 @@ export const ja_JP: AdminTranslations = {
   "stats.peakOnline": "最大同時接続",
   "stats.peakOnlineToday": "24時間の最大同時接続",
   "stats.peakOnlineAllTime": "過去最大同時接続",
-  "stats.playersCap": "player cap",
+  "stats.playersCap": "プレイヤー上限",
   "stats.accounts": "アカウント",
   "stats.characters": "キャラクター",
   "stats.newAccounts24h": "新規アカウント 24h",

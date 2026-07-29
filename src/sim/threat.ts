@@ -10,8 +10,15 @@
 //  - Taunt/Growl set the caster's threat to the table's top value and force
 //    the mob to attack the caster for 3 seconds
 import type { Entity } from './types';
+import { dist2d } from './types';
 
 export const MELEE_SWITCH_MULT = 1.1;
+// Boss-summoned adds spawn with this much threat on the boss's current target
+// (the tank): enough that normal healing cannot peel a fresh wave, low enough
+// that sustained DPS focus still rips one loose. Consumed by Sim.spawnBossAdds
+// (the five-man summoners) AND the Nythraxis encounter-script spawners, so the
+// two paths cannot drift. Pinned by tests/summon_threat_seed.test.ts.
+export const SUMMONED_ADD_THREAT_SEED = 750;
 export const RANGED_SWITCH_MULT = 1.3;
 export const HEAL_THREAT_FACTOR = 0.5;
 export const DEFENSIVE_STANCE_THREAT_MULT = 1.3;
@@ -52,6 +59,20 @@ export function stealthDetectionRadius(
   baseRadius: number,
 ): number {
   return baseRadius * stealthDetectionMultiplier(observer.level, stealthed.level);
+}
+
+export function hasEscapeStealth(target: Entity): boolean {
+  return target.auras.some((a) => a.id === 'vanish' && a.kind === 'stealth');
+}
+
+export function canDetectStealthedTarget(
+  observer: Entity,
+  target: Entity,
+  baseRadius: number,
+): boolean {
+  if (!target.auras.some((a) => a.kind === 'stealth')) return true;
+  if (hasEscapeStealth(target)) return false;
+  return dist2d(observer.pos, target.pos) <= stealthDetectionRadius(observer, target, baseRadius);
 }
 
 export function addThreat(mob: Entity, sourceId: number, amount: number): void {

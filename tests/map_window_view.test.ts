@@ -10,12 +10,30 @@
 // getComputedStyle and are covered by the no-magic-values source guard instead.
 
 import { describe, expect, it } from 'vitest';
-import { CAMPS, DELVE_X_MIN, QUESTS, STRIP_MAX_X, STRIP_MIN_X, ZONES } from '../src/sim/data';
-import { isQuestTurnInNpc, type QuestProgress } from '../src/sim/types';
+import {
+  CAMPS,
+  DELVE_X_MIN,
+  DUNGEON_LIST,
+  PROPS,
+  QUESTS,
+  STRIP_MAX_X,
+  STRIP_MIN_X,
+  WORLD_MAX_X,
+  WORLD_MIN_X,
+  ZONES,
+} from '../src/sim/data';
+import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
+import {
+  emptyZoneProps,
+  isQuestTurnInNpc,
+  type QuestProgress,
+  type ZonePropsDef,
+} from '../src/sim/types';
 import type { Decoration } from '../src/sim/world';
 import {
   buildOverworldMapModel,
   MAP_MAX_ZOOM,
+  mapBuildingMarkerKind,
   mapWindowMode,
   npcMarkerAt,
   type OverworldMapInput,
@@ -133,8 +151,9 @@ function input(
   world: IWorld,
   zoom: number,
   decorations: Decoration[] = NO_DECOR,
+  props: ZonePropsDef = PROPS,
 ): OverworldMapInput {
-  return { world, zone: ZONE, zoom, center: null, canvasSize: CANVAS, decorations };
+  return { world, props, zone: ZONE, zoom, center: null, canvasSize: CANVAS, decorations };
 }
 
 describe('mapWindowMode (delve vs overworld discriminator)', () => {
@@ -236,6 +255,7 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     const model = buildOverworldMapModel({
       world: world as unknown as IWorld,
       zone: col,
+      props: PROPS,
       zoom: MAP_MAX_ZOOM,
       center: null,
       canvasSize: CANVAS,
@@ -248,6 +268,135 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     // matches the world region transform exactly (+X is map-left)
     const r = model.region;
     expect(model.player?.mx).toBeCloseTo(((r.maxX - 394) / (r.maxX - r.minX)) * CANVAS, 6);
+  });
+
+  it('classifies the Eastbrook landmark before its semantic inn kind', () => {
+    expect(mapBuildingMarkerKind({ kind: 'inn', landmark: 'eastbrook_grand_armoury' })).toBe(
+      'armoury',
+    );
+    expect(mapBuildingMarkerKind({ kind: 'inn' })).toBe('inn');
+
+    const world = makeOverworldWorld('sim') as unknown as {
+      player: { pos: { x: number; z: number } };
+    };
+    world.player.pos.x = 17.5;
+    world.player.pos.z = -5.5;
+    const detail = buildOverworldMapModel(input(world as unknown as IWorld, MAP_MAX_ZOOM)).detail;
+    const armouries = detail?.buildings.filter((building) => building.kind === 'armoury');
+    expect(armouries).toHaveLength(1);
+    expect(armouries?.[0].points).toEqual([
+      { mx: 322, my: 219.33333333333334 },
+      { mx: 322, my: 340.66666666666663 },
+      { mx: 238, my: 340.66666666666663 },
+      { mx: 238, my: 219.33333333333334 },
+    ]);
+  });
+
+  it('maps every rebuilt Eastbrook building, civic prop, stall, and authored wall segment', () => {
+    const model = buildOverworldMapModel(input(makeOverworldWorld('sim'), MAP_MAX_ZOOM));
+    const detail = model.detail;
+    expect(detail).not.toBeNull();
+    if (!detail) return;
+
+    expect(
+      detail.buildings.filter((marker) => marker.kind !== 'wall').map((marker) => marker.id),
+    ).toEqual([
+      ...EASTBROOK_LAYOUT.preservedBuildings.map((building) => building.id),
+      ...EASTBROOK_LAYOUT.buildings.map((building) => building.id),
+    ]);
+    expect(
+      detail.props.filter((marker) => marker.kind === 'well').map((marker) => marker.id),
+    ).toEqual([EASTBROOK_LAYOUT.civic.wellBeacon.id]);
+    const stallMarkerIds = detail.props
+      .filter((marker) => marker.kind === 'stall')
+      .map((marker) => marker.id);
+    expect(stallMarkerIds).toEqual([
+      'eastbrook_market_stall_world_market',
+      'eastbrook_market_stall_provisions',
+    ]);
+    expect(stallMarkerIds).not.toContain('eastbrook_market_stall_artisans');
+    expect(
+      detail.buildings.filter((marker) => marker.kind === 'wall').map((marker) => marker.id),
+    ).toEqual(EASTBROOK_LAYOUT.wall.segments.map((segment) => segment.id));
+    expect(detail.buildings.every((marker) => marker.points.length === 4)).toBe(true);
+    expect(
+      detail.buildings.every((marker) =>
+        marker.points.every((point) => Number.isFinite(point.mx) && Number.isFinite(point.my)),
+      ),
+    ).toBe(true);
+  });
+
+  it('projects wall footprints from the injected active-world dimensions', () => {
+    const props = emptyZoneProps();
+    props.walls = [
+      {
+        id: 'custom_wall',
+        assetId: '/models/props/custom_wall.glb',
+        x: 1,
+        z: 2,
+        w: 8,
+        d: 1,
+        rot: 0,
+        height: 3,
+      },
+    ];
+    const model = buildOverworldMapModel(
+      input(makeOverworldWorld('client'), MAP_MAX_ZOOM, NO_DECOR, props),
+    );
+    const detail = model.detail;
+    expect(detail?.buildings).toHaveLength(1);
+    const wall = detail?.buildings[0];
+    expect(wall).toMatchObject({ id: 'custom_wall', kind: 'wall' });
+    if (!wall) return;
+    // Scale off the model's OWN projected region: the map is world-region
+    // relative, so the visible x span is the realm rect, not the full world
+    // width. Deriving it here keeps this an assertion about the footprint
+    // transform rather than about which constants bound the region.
+    const spanX = model.view.spanX;
+    const spanZ = model.view.spanZ;
+    expect(Math.abs(wall.points[1].mx - wall.points[0].mx)).toBeCloseTo((8 / spanX) * CANVAS, 10);
+    expect(Math.abs(wall.points[2].my - wall.points[1].my)).toBeCloseTo((1 / spanZ) * CANVAS, 10);
+  });
+
+  it('renders only injected custom-world town records without canonical Eastbrook leakage', () => {
+    const props = emptyZoneProps();
+    props.buildings.push({
+      id: 'custom_hall',
+      assetId: '/models/props/custom_hall.glb',
+      kind: 'house',
+      x: 0,
+      z: 0,
+      w: 6,
+      d: 5,
+      rot: 0,
+      height: 7,
+    });
+    props.wells.push({ id: 'custom_well', x: 4, z: 0, r: 1 });
+    props.stalls.push({ id: 'custom_stall', x: -4, z: 0, rot: 0, r: 1 });
+    props.walls = [
+      {
+        id: 'custom_wall',
+        assetId: '/models/props/custom_wall.glb',
+        x: 0,
+        z: 8,
+        w: 7,
+        d: 0.5,
+        rot: 0,
+        height: 3,
+      },
+    ];
+
+    const detail = buildOverworldMapModel(
+      input(makeOverworldWorld('client'), MAP_MAX_ZOOM, NO_DECOR, props),
+    ).detail;
+    expect(detail?.buildings.map((marker) => [marker.id, marker.kind])).toEqual([
+      ['custom_hall', 'house'],
+      ['custom_wall', 'wall'],
+    ]);
+    expect(detail?.props.map((marker) => [marker.id, marker.kind])).toEqual([
+      ['custom_well', 'well'],
+      ['custom_stall', 'stall'],
+    ]);
   });
 
   it('emits a player arrow at -facing and one quest-giver glyph when zoomed in', () => {
@@ -342,6 +491,7 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     const model = buildOverworldMapModel({
       world: world as unknown as IWorld,
       zone: col,
+      props: PROPS,
       zoom: 1,
       center: null,
       canvasSize: CANVAS,

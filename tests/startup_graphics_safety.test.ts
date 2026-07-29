@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { safeStartupGraphicsPreset } from '../src/game/startup_graphics_safety';
 
@@ -24,5 +25,17 @@ describe('safeStartupGraphicsPreset', () => {
 
   it('never touches a preset already below Ultra', () => {
     expect(safeStartupGraphicsPreset(false, 'webkit', true, MEDIUM, ULTRA, HIGH)).toBe(MEDIUM);
+  });
+
+  it('keeps Medium selected in the native iOS shell', () => {
+    expect(safeStartupGraphicsPreset(true, 'webkit', true, MEDIUM, ULTRA, HIGH)).toBe(MEDIUM);
+  });
+});
+
+describe('constrained renderer integration', () => {
+  it('uses the resolved dynamic-shadow policy for both the WebGL map and sun pass', () => {
+    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    expect(source).toContain('this.webgl.shadowMap.enabled = GFX.dynamicShadows;');
+    expect(source).toContain('sun.castShadow = GFX.dynamicShadows;');
   });
 });

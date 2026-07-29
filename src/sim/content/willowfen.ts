@@ -19,15 +19,17 @@ import type {
 } from '../types';
 import { emptyZoneProps } from '../types';
 
-// The moat: a ring of overlapping carves around the Bridgemere island, with
-// one gap at the south where the Fenway causeway crosses (the bridge).
+// The moat: a ring of overlapping carves around the Bridgemere island (a
+// wider ring than the old town's, roughly doubling the island), with one
+// gap at the south where the Fenway causeway crosses (the bridge).
 const MOAT: { x: number; z: number; radius: number }[] = [
-  { x: -338, z: 358, radius: 11 },
-  { x: -344, z: 380, radius: 11 },
-  { x: -364, z: 390, radius: 11 },
-  { x: -382, z: 380, radius: 11 },
-  { x: -386, z: 358, radius: 11 },
-  { x: -382, z: 336, radius: 9 }, // the ring closes SW, clear of the causeway
+  { x: -384, z: 336, radius: 11 },
+  { x: -396, z: 361, radius: 11 },
+  { x: -386, z: 387, radius: 11 },
+  { x: -360, z: 398, radius: 11 },
+  { x: -334, z: 387, radius: 11 },
+  { x: -324, z: 361, radius: 11 },
+  { x: -336, z: 336, radius: 11 }, // the ring closes SE, clear of the causeway
 ];
 
 export const WILLOWFEN_ZONE: ZoneDef = {
@@ -42,8 +44,8 @@ export const WILLOWFEN_ZONE: ZoneDef = {
   levelRange: [19, 20],
   biome: 'fen',
   eastPassZ: 440, // the Mirewalk: where the marsh road wades into the fen
-  hub: { x: -360, z: 362, radius: 17, name: 'Bridgemere' },
-  graveyard: { x: -346, z: 338 },
+  hub: { x: -360, z: 362, radius: 20, name: 'Bridgemere' },
+  graveyard: { x: -344, z: 306 },
   lakes: [
     ...MOAT,
     // the Lilymoors: three pools ringing a real dry islet at (-87,3247)
@@ -93,16 +95,17 @@ export const WILLOWFEN_ROADS: { x: number; z: number }[][] = [
     { x: -312, z: 286 },
   ], // the causeway -> Bogshine Pools' southern edge
   [
-    { x: -360, z: 324 },
-    { x: -396, z: 322 },
-    { x: -406, z: 360 },
-    { x: -410, z: 404 },
+    { x: -360, z: 322 },
+    { x: -404, z: 314 },
+    { x: -418, z: 362 },
+    { x: -416, z: 406 },
     { x: -412, z: 442 },
   ], // the causeway -> wide around the moat's west -> Willowweep's shore
   [
-    { x: -360, z: 324 },
-    { x: -322, z: 342 },
-    { x: -322, z: 406 },
+    { x: -360, z: 322 },
+    { x: -332, z: 312 },
+    { x: -306, z: 336 },
+    { x: -308, z: 404 },
     { x: -330, z: 456 },
   ], // the causeway -> around the moat's east -> the Drowsy Flats' shore
   [
@@ -113,7 +116,7 @@ export const WILLOWFEN_ROADS: { x: number; z: number }[][] = [
     { x: -398, z: 706 },
   ], // Willowweep's shore -> the north fen -> the Tanglemouth
   [
-    { x: -330, z: 390 },
+    { x: -310, z: 396 },
     { x: -278, z: 418 },
     { x: -230, z: 434 },
     { x: -184, z: 440 },
@@ -521,35 +524,60 @@ export const WILLOWFEN_QUEST_CAMPS: CampDef[] = [
 
 export const WILLOWFEN_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
-  // Bridgemere: a snug island town inside its moat
+  // Bridgemere: the island town, its buildings spread wide across the
+  // doubled moat island so every lane between them stays open
   buildings: [
-    { kind: 'inn', x: -368, z: 366, w: 6, d: 7, rot: 0.7 },
-    { kind: 'house', x: -351, z: 360, w: 6, d: 6, rot: -0.9 },
-    { kind: 'house', x: -366, z: 352, w: 5, d: 5, rot: 2.4 },
-    { kind: 'chapel', x: -354, z: 372, w: 5, d: 7, rot: -2.1 },
+    { kind: 'inn', x: -370, z: 369, w: 6, d: 7, rot: 0.7 },
+    { kind: 'house', x: -350, z: 354, w: 6, d: 6, rot: -0.9 },
+    { kind: 'house', x: -371, z: 349, w: 5, d: 5, rot: 2.4 },
+    { kind: 'chapel', x: -351, z: 370, w: 5, d: 7, rot: -2.1 },
+    { kind: 'house', x: -360, z: 375, w: 5, d: 5, rot: 0.1 },
   ],
-  wells: [{ x: -360, z: 364, r: 1.5 }],
+  wells: [{ x: -356, z: 361, r: 1.5 }],
   stalls: [
-    { x: -363, z: 358, rot: 0.5, r: 1.6 },
-    { x: -356, z: 366, rot: -1.3, r: 1.6 },
+    { x: -365, z: 359, rot: 0.5, r: 1.6 },
+    // the gate market: one stall trading at the causeway's south approach
+    { x: -352, z: 314, rot: -1.3, r: 1.6 },
   ],
   crates: [
-    [-365, 362],
-    [-353, 356],
+    [-368, 365],
+    [-352, 358],
   ],
   campfires: [
-    [-360, 360],
+    [-358, 366],
     [-379, 212], // the Steps' waycamp (Waykeeper Pell's fire)
     [-416, 449], // Mother Sedge's fire at Willowweep
   ],
   tents: [
     { x: -411, z: 449, rot: 2.0, scale: 1 }, // Mother Sedge's camp at Willowweep
   ],
-  // the Fenway: dock planks spanning the moat neck as the town bridge
-  // (hutLocal pushed far off-plank so no hut renders on the crossing)
-  docks: [{ x: -360, z: 333, rot: 0, hutLocal: { x: 40, z: 40, hw: 0.1, hd: 0.1 } }],
+  // homesteads and watchtowers spread across the fen's dry rises, each on
+  // probed level ground (KayKit blue set, matching Bridgemere's roofs)
+  decorProps: [
+    { key: 'hexbHomeA', x: -448, z: 452, rot: 0.6, scale: 7.5, r: 4.5, h: 8 },
+    { key: 'hexbHomeB', x: -392, z: 232, rot: 2.4, scale: 7.5, r: 5, h: 10 },
+    { key: 'hexbHomeA', x: -268, z: 434, rot: -1.2, scale: 7.5, r: 4.5, h: 8 },
+    { key: 'hexbHomeB', x: -390, z: 560, rot: 0.3, scale: 7.5, r: 5, h: 10 },
+    { key: 'hexbTowerBase', x: -382, z: 296, rot: 0.4, scale: 5, r: 2.8, h: 8 },
+    { key: 'hexbTowerBase', x: -388, z: 608, rot: 1.2, scale: 5, r: 2.8, h: 8 },
+    // the second wave: one more neighbour spaced out from each homestead,
+    // every site probed level (spread under 1.2) and well above the water
+    { key: 'hexbHomeB', x: -428, z: 417, rot: -0.5, scale: 7.5, r: 5, h: 10 },
+    { key: 'hexbHomeA', x: -392, z: 266, rot: 1.7, scale: 7.5, r: 4.5, h: 8 },
+    { key: 'hexbHomeA', x: -258, z: 473, rot: 0.9, scale: 7.5, r: 4.5, h: 8 },
+    { key: 'hexbHomeB', x: -383, z: 587, rot: -2.0, scale: 7.5, r: 5, h: 10 },
+    // the Steps' waycamp: three traveller tents ringing the fire, each on
+    // probed level ground, spaced clear of the road, the scatter rock east
+    // of the fire, and one another
+    { key: 'hexrTent', x: -372.3, z: 222, rot: -2.55, scale: 7, r: 4.5, h: 5 },
+    { key: 'hexrTent', x: -374.4, z: 200.9, rot: -0.39, scale: 7, r: 4.5, h: 5 },
+    { key: 'hexrTent', x: -390.8, z: 214.3, rot: 1.76, scale: 7, r: 4.5, h: 5 },
+  ],
+  // the Fenway: rail fences flanking the causeway's south approach (the
+  // crossing itself is dry ground between the moat pools, kept clear of
+  // props so nothing stands on the path)
   fences: [
-    { x1: -364, z1: 328, x2: -364, z2: 338 }, // bridge rails
-    { x1: -356, z1: 328, x2: -356, z2: 338 },
+    { x1: -364, z1: 325, x2: -364, z2: 336 },
+    { x1: -356, z1: 325, x2: -356, z2: 336 },
   ],
 };

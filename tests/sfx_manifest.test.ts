@@ -162,11 +162,10 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps the release catalog, mount cues, and all 36 UI cues in one 191-key inventory', () => {
+  it('keeps the release catalog, mount cues, Last Bell cues, and all UI cues together', () => {
     const keys = new Set(SFX.map((entry) => entry.key));
-    // 188 + the 3 Last Bell harbor cues (bell toll, harbor ambience, cast-off).
-    expect(keys.size).toBe(191);
-    expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(36);
+    expect(keys.size).toBe(220);
+    expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(62);
     for (const key of [
       'cast_lightning_bolt',
       'mob_mudfin_attack',
@@ -184,6 +183,9 @@ describe('buildManifest', () => {
       'lb_bell_toll',
       'lb_harbor_ambience',
       'lb_ship_castoff',
+      'player_eat_food',
+      'player_drink_water',
+      'player_drink_potion',
     ]) {
       expect(keys.has(key), key).toBe(true);
     }
@@ -196,7 +198,7 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(191);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(220);
   });
 });
 

@@ -63,9 +63,14 @@ import {
   buildInterfaceControls,
   buildOptionsMenu,
   type ChoiceControl,
+  INTERFACE_TAB_LABEL_KEY,
+  INTERFACE_TAB_ORDER,
+  type InterfaceTab,
+  interfaceControlsForTab,
   type OptionsControl,
   type OptionsPanelId,
   type OptionsSettingsSource,
+  optionsControlKeys,
   type SliderControl,
   type SliderFmt,
   sliderDispatchValue,
@@ -74,6 +79,8 @@ import {
   toggleNextValue,
 } from './options_view';
 import { PerfOverlaySettingsPanel, type PerfSettingsHost } from './perf_overlay_settings';
+import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
+import { tabStripHtml, tabStripModel } from './tab_strip_view';
 import {
   PRESET_ORDER,
   type PresetId,
@@ -303,6 +310,10 @@ export function buildDeedBroadcastRow(parent: HTMLElement, seam: DeedBroadcastSe
 
 export class OptionsWindow {
   private view: OptionsView = 'main';
+  // The active Interface sub-tab. Remembered for the SESSION (a field on the
+  // controller, not a persisted setting): reopening the panel returns to the
+  // last tab, but a fresh session starts on General. Not reset on close/open.
+  private interfaceTab: InterfaceTab = 'general';
   private capturingKey: { action: string; index: number } | null = null; // binding awaiting a key
   private keybindNote = '';
   // The Options > Performance panel, lazily built and reused (it caches the live
@@ -763,19 +774,23 @@ export class OptionsWindow {
     return body;
   }
 
-  private settingsViewFooter(): void {
+  // `controls` is the sub-view's own declarative control list (as built for
+  // this render pass): Reset to Defaults scopes to exactly the setting keys
+  // that view renders (issue 2341), rather than wiping the whole GameSettings
+  // object. NoteControl/MusicToggleControl carry no key and are filtered out
+  // by optionsControlKeys.
+  private settingsViewFooter(controls: OptionsControl[]): void {
     const el = this.deps.root();
+    const keys = optionsControlKeys(controls) as (keyof GameSettings)[];
     const reset = document.createElement('button');
     reset.className = 'btn';
     reset.textContent = t('hud.options.resetToDefaults');
     reset.addEventListener('click', () => {
       audio.click();
-      this.deps.options()?.settings.reset();
-      // re-apply every setting to its subsystem, then redraw the view
-      const all = this.deps.options()?.settings.all();
-      if (all)
-        for (const k of Object.keys(all) as (keyof GameSettings)[])
-          this.deps.options()?.onSettingChange(k, all[k]);
+      const hooks = this.deps.options();
+      hooks?.settings.reset(keys);
+      // re-apply only this view's settings to their subsystem, then redraw
+      for (const k of keys) hooks?.onSettingChange(k, hooks.settings.get(k));
       this.render();
     });
     const back = document.createElement('button');
@@ -794,13 +809,13 @@ export class OptionsWindow {
   private renderGraphics(): void {
     const hooks = this.deps.options();
     const body = this.settingsViewShell(t('hud.options.graphics'));
-    if (hooks) {
-      const controls = buildGraphicsControls(this.settingsSource(hooks), {
-        touch: useTouchInterface(),
-        nativeShell: isNativeAppShell(),
-      });
-      this.applyControls(body, controls, hooks, () => this.renderGraphics());
-    }
+    const controls = hooks
+      ? buildGraphicsControls(this.settingsSource(hooks), {
+          touch: useTouchInterface(),
+          nativeShell: isNativeAppShell(),
+        })
+      : [];
+    if (hooks) this.applyControls(body, controls, hooks, () => this.renderGraphics());
     const el = this.deps.root();
     const note = document.createElement('div');
     note.className = 'set-note';
@@ -818,7 +833,7 @@ export class OptionsWindow {
       location.reload();
     });
     el.append(reloadNote, reload);
-    this.settingsViewFooter();
+    this.settingsViewFooter(controls);
   }
 
   // -------------------------------------------------------------------------
@@ -828,11 +843,9 @@ export class OptionsWindow {
   private renderAudio(): void {
     const hooks = this.deps.options();
     const body = this.settingsViewShell(t('hud.options.audio'));
-    if (hooks)
-      this.applyControls(body, buildAudioControls(this.settingsSource(hooks)), hooks, () =>
-        this.renderAudio(),
-      );
-    this.settingsViewFooter();
+    const controls = hooks ? buildAudioControls(this.settingsSource(hooks)) : [];
+    if (hooks) this.applyControls(body, controls, hooks, () => this.renderAudio());
+    this.settingsViewFooter(controls);
   }
 
   // -------------------------------------------------------------------------
@@ -988,15 +1001,51 @@ export class OptionsWindow {
     body.appendChild(grid);
   }
 
+  // The Interface panel is split into four tabs (General / Frames / Chat /
+  // Combat), the shared WAI-ARIA tab family sitting above the panel body. The
+  // body is the tabpanel; selecting a tab repaints the whole Interface view off
+  // this.interfaceTab (the re-render-on-select pattern social_window uses). The
+  // declarative rows come from the pure model filtered per tab; the bespoke rows
+  // (language + theme, the chat/frame reset rows, the deed-broadcast row) are
+  // placed into their tab by the same approved taxonomy.
   private renderInterface(): void {
     const body = this.settingsViewShell(t('hud.options.interface'));
-    this.languageSelect(body);
-    this.renderThemeControls(body);
+    const el = this.deps.root();
     const hooks = this.deps.options();
+    const tab = this.interfaceTab;
+
+    const stripHost = document.createElement('div');
+    stripHost.innerHTML = tabStripHtml(
+      tabStripModel({
+        ariaLabel: t('hud.options.interface'),
+        panelId: 'interface-tabpanel',
+        stripClass: 'opt-tabs',
+        tabClass: 'opt-tab',
+        selectedClass: 'on',
+        tabs: INTERFACE_TAB_ORDER.map((id) => ({ id, label: t(INTERFACE_TAB_LABEL_KEY[id]) })),
+        selected: tab,
+      }),
+    );
+    const strip = stripHost.firstElementChild as HTMLElement;
+    el.insertBefore(strip, body);
+    body.id = 'interface-tabpanel';
+    body.setAttribute('role', 'tabpanel');
+    wireTabStrip(el, 'opt-tab', (id, focusFollow) => {
+      this.interfaceTab = id as InterfaceTab;
+      this.renderInterface();
+      if (focusFollow) focusActiveTab(this.deps.root(), 'opt-tab', 'on');
+    });
+
+    // General leads with the bespoke language + theme controls, then its list.
+    if (tab === 'general') {
+      this.languageSelect(body);
+      this.renderThemeControls(body);
+    }
+
     if (hooks)
       this.applyControls(
         body,
-        buildInterfaceControls(this.settingsSource(hooks)),
+        interfaceControlsForTab(buildInterfaceControls(this.settingsSource(hooks)), tab),
         hooks,
         (focusKey) => {
           this.renderInterface();
@@ -1008,7 +1057,41 @@ export class OptionsWindow {
         },
       );
 
-    // On/off toggle for chat timestamps.
+    // Frames closes with the unit-frames reset row.
+    if (tab === 'frames') this.unitFramesResetRow(body);
+
+    // Chat closes with the timestamp toggle + clock pair, the chat-window reset
+    // row, the online deed-broadcast row, then the explanatory notes.
+    if (tab === 'chat') {
+      this.chatTimestampRows(body);
+      this.chatWindowResetRow(body);
+      // Deed broadcasts (share deed unlocks with guild and friends): an ASYNC
+      // account setting (accounts.deed_broadcasts), not a settings.ts key, so it
+      // is a bespoke row; the seam is the final truth (main.ts wires it only when
+      // an authenticated account exists, so an offline character never sees it).
+      if (hooks?.deedBroadcasts) buildDeedBroadcastRow(body, hooks.deedBroadcasts);
+      for (const noteKey of [
+        'hudChrome.chatTimestamps.note',
+        'hudChrome.chatWindow.note',
+      ] as const) {
+        const note = document.createElement('div');
+        note.className = 'set-note';
+        note.textContent = t(noteKey);
+        body.appendChild(note);
+      }
+    }
+
+    const back = document.createElement('button');
+    back.className = 'btn';
+    back.textContent = t('hud.options.back');
+    back.addEventListener('click', () => this.goBack());
+    el.appendChild(back);
+    el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
+  }
+
+  // The chat-timestamp on/off toggle plus the 12/24-hour clock-format pair (the
+  // format buttons dim while timestamps are off). Chat tab.
+  private chatTimestampRows(body: HTMLElement): void {
     const tsRow = document.createElement('div');
     tsRow.className = 'set-row';
     const tsName = document.createElement('span');
@@ -1017,7 +1100,6 @@ export class OptionsWindow {
     const tsToggle = document.createElement('button');
     tsToggle.className = 'btn set-toggle';
 
-    // 12/24-hour format selector: two segmented buttons, dimmed when off.
     const fmtRow = document.createElement('div');
     fmtRow.className = 'set-row';
     const fmtName = document.createElement('span');
@@ -1063,8 +1145,10 @@ export class OptionsWindow {
 
     tsRow.append(tsName, tsToggle);
     body.append(tsRow, fmtRow);
+  }
 
-    // Reset the movable/resizable chat window back to its default placement.
+  // Reset the movable/resizable chat window back to its default placement. Chat tab.
+  private chatWindowResetRow(body: HTMLElement): void {
     const resetRow = document.createElement('div');
     resetRow.className = 'set-row';
     const resetName = document.createElement('span');
@@ -1079,9 +1163,11 @@ export class OptionsWindow {
     });
     resetRow.append(resetName, resetBtn);
     body.append(resetRow);
+  }
 
-    // Reset the movable player + target unit frames back to their stock spots
-    // (forgets the saved drag positions and re-docks the player frame).
+  // Reset the movable player + target unit frames back to their stock spots
+  // (forgets the saved drag positions and re-docks the player frame). Frames tab.
+  private unitFramesResetRow(body: HTMLElement): void {
     const framesRow = document.createElement('div');
     framesRow.className = 'set-row';
     const framesName = document.createElement('span');
@@ -1096,31 +1182,6 @@ export class OptionsWindow {
     });
     framesRow.append(framesName, framesBtn);
     body.append(framesRow);
-
-    // Deed broadcasts (share deed unlocks with guild and friends): an ASYNC
-    // account setting (accounts.deed_broadcasts), not a settings.ts key, so it
-    // is a bespoke row like the chat pair above; the seam is the final truth
-    // (main.ts wires it only when an authenticated account exists, so an
-    // offline character never sees the row).
-    if (hooks?.deedBroadcasts) buildDeedBroadcastRow(body, hooks.deedBroadcasts);
-
-    const el = this.deps.root();
-    const note = document.createElement('div');
-    note.className = 'set-note';
-    note.textContent = t('hudChrome.chatTimestamps.note');
-    el.appendChild(note);
-
-    const chatWinNote = document.createElement('div');
-    chatWinNote.className = 'set-note';
-    chatWinNote.textContent = t('hudChrome.chatWindow.note');
-    el.appendChild(chatWinNote);
-
-    const back = document.createElement('button');
-    back.className = 'btn';
-    back.textContent = t('hud.options.back');
-    back.addEventListener('click', () => this.goBack());
-    el.appendChild(back);
-    el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
   }
 
   // -------------------------------------------------------------------------
@@ -1352,10 +1413,8 @@ export class OptionsWindow {
   private renderController(): void {
     const hooks = this.deps.options();
     const body = this.settingsViewShell(t('hudChrome.controller.title'));
-    if (hooks)
-      this.applyControls(body, buildControllerControls(this.settingsSource(hooks)), hooks, () =>
-        this.renderController(),
-      );
+    const controls = hooks ? buildControllerControls(this.settingsSource(hooks)) : [];
+    if (hooks) this.applyControls(body, controls, hooks, () => this.renderController());
 
     const note = document.createElement('div');
     note.className = 'set-note';
@@ -1405,7 +1464,7 @@ export class OptionsWindow {
       });
       body.appendChild(reset);
     }
-    this.settingsViewFooter();
+    this.settingsViewFooter(controls);
   }
 
   // -------------------------------------------------------------------------

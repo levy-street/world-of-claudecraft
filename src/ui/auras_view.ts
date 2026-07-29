@@ -110,6 +110,10 @@ export interface AuraInput {
   // present it drives the badge overlay INSTEAD of stacks (a charge count, not a stack count),
   // and unlike stacks it shows even at 1 so the player sees the shield about to drop.
   charges?: number;
+  // Full authored duration in seconds, for the expiring-blink threshold. Present on the
+  // offline Sim aura and mirrored over the wire (terse `dur`); an old server omitting it
+  // degrades to never-blink rather than misfiring.
+  duration?: number;
   // The caster's entity id, for the "own aura" prominence on the target strip. Present on
   // the offline Sim aura and mirrored over the wire (terse `src`); an old server omits it
   // and the mirror decodes 0, which matches no player id, so the strip degrades to the
@@ -192,6 +196,9 @@ export interface AuraSlotState {
   /** Whether the LOCAL player cast this aura (ownFirst views only, false elsewhere):
    *  drives the `own` class (bigger icon) and the own-first slot order. */
   own: boolean;
+  /** Whether the aura is about to run out (drives the `expiring` blink class). Always
+   *  false for toggles/permanents, which show no countdown either. */
+  expiring: boolean;
 }
 
 /** The whole strip's derived state: the reused slot pool plus the active count. Both
@@ -225,6 +232,19 @@ export function isAuraDebuff(aura: AuraInput): boolean {
   return classifyDebuffAura(aura.kind, aura.value);
 }
 
+// Expiring-blink threshold (QoL: a DoT/buff about to run out flashes its icon).
+// Classic-feel rule: blink inside the last EXPIRING_BLINK_SEC seconds, but never
+// before EXPIRING_BLINK_FRAC of the full duration has elapsed-remaining, so a
+// short 12s DoT blinks for its last ~3.6s while a 30 minute buff blinks for its
+// last 10s (not its last 9 minutes). Pure and exported so the threshold is
+// unit-tested directly; a missing/zero duration (an old server) never blinks.
+export const EXPIRING_BLINK_SEC = 10;
+export const EXPIRING_BLINK_FRAC = 0.3;
+export function isAuraExpiring(remaining: number, duration: number | undefined): boolean {
+  if (!duration || duration <= 0 || remaining <= 0) return false;
+  return remaining <= Math.min(EXPIRING_BLINK_SEC, duration * EXPIRING_BLINK_FRAC);
+}
+
 function makeSlotState(): AuraSlotState {
   return {
     key: '',
@@ -238,6 +258,7 @@ function makeSlotState(): AuraSlotState {
     cancelable: false,
     effectHtml: '',
     own: false,
+    expiring: false,
   };
 }
 
@@ -290,10 +311,10 @@ export function createAurasView(
         slot.iconKey = deps.iconId(a);
         slot.isDebuff = debuff;
         slot.school = debuff ? (a.school ?? 'physical') : '';
-        slot.durationText =
-          (TOGGLE_KINDS.has(a.kind) || TOGGLE_IDS.has(a.id)) && !TIMED_IDS.has(a.id)
-            ? ''
-            : compactAuraDuration(a.remaining, units);
+        const toggle = (TOGGLE_KINDS.has(a.kind) || TOGGLE_IDS.has(a.id)) && !TIMED_IDS.has(a.id);
+        slot.durationText = toggle ? '' : compactAuraDuration(a.remaining, units);
+        // Toggles show no countdown, so they never blink either.
+        slot.expiring = !toggle && isAuraExpiring(a.remaining, a.duration);
         // A charge-limited aura badges its remaining charges (shown even at 1); otherwise the
         // badge shows a stack count, and only when it stacks past 1.
         slot.stacksText =

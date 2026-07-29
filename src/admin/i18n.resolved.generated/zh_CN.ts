@@ -46,7 +46,7 @@ export const zh_CN: AdminTranslations = {
   "stats.peakOnline": "在线峰值",
   "stats.peakOnlineToday": "24小时在线峰值",
   "stats.peakOnlineAllTime": "历史在线峰值",
-  "stats.playersCap": "player cap",
+  "stats.playersCap": "玩家上限",
   "stats.accounts": "账号数",
   "stats.characters": "角色数",
   "stats.newAccounts24h": "24小时新增账号",

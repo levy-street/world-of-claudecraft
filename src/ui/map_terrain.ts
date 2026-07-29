@@ -26,6 +26,7 @@ import {
 import { fbm2, hash2 } from '../sim/rng';
 import type { BiomeId, ZoneDef } from '../sim/types';
 import {
+  inGardenMazeWall,
   inHollowOpenSea,
   roadDistance,
   terrainHeight,
@@ -362,8 +363,10 @@ export function paintTerrainRows(
         r = 96;
         g = 104;
         b = 84;
-      } else if (biome === 'garden' && h > 9) {
-        // the hedge walls: the Great Maze draws itself onto the map
+      } else if (biome === 'garden' && inGardenMazeWall(x, z)) {
+        // the hedge walls: the Great Maze draws itself onto the map from
+        // the exact wall bands movement blocks on (the walls are modeled
+        // props over flat lawn now, not terrain)
         r = 40;
         g = 84;
         b = 42;

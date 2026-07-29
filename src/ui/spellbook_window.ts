@@ -27,6 +27,7 @@ import { esc } from './esc';
 import {
   encodeHotbarAction,
   HOTBAR_ACTION_MIME,
+  HOTBAR_ATTACK_MIME,
   isAbilityActionBarEligible,
 } from './hud/action_bar/hotbar';
 import { formatNumber, t } from './i18n';
@@ -324,6 +325,21 @@ export class SpellbookWindow {
       this.refreshHotbarControls();
     });
     el.appendChild(toggle);
+    // Attack drags onto the action bar like any ability row. It has no ability/item
+    // id, so it cannot ride the HotbarAction path: the dragstart carries the dedicated
+    // Attack marker MIME, which the action bar accepts by turning showAttackButton back
+    // on (restoring Attack to slot 0). The +/- toggle above stays for touch/keyboard.
+    el.draggable = true;
+    el.addEventListener('dragstart', (e) => {
+      if (e.dataTransfer) {
+        e.dataTransfer.setData(HOTBAR_ATTACK_MIME, '1');
+        e.dataTransfer.effectAllowed = 'move';
+      }
+      this.deps.hideTooltip();
+    });
+    el.addEventListener('dragend', () => {
+      this.deps.clearActionDropTargets();
+    });
     this.deps.attachTooltip(
       el,
       () =>

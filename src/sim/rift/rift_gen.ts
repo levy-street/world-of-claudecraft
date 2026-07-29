@@ -26,6 +26,7 @@ import {
 import { polygonIsStarShaped, polygonSelfIntersects, polygonSignedArea } from '../geometry2d';
 import { Rng } from '../rng';
 import { authoredLiftAt } from './authored';
+import { riftMinSpawnZ } from './entry_clearance';
 import { RIFT_RANK_BASE_LEVEL, riftFloorLevel, riftHeroicTuningFor } from './ranks';
 import { buildStyle, mixSeed } from './style';
 import type {
@@ -54,6 +55,14 @@ export { RIFT_LEVEL_CAP, RIFT_MAX_MOB_LEVEL } from './ranks';
 const ENTRY_Z_OFFSET = 8; // player arrival, past the entrance porch
 const AISLE_HALF = 5.5; // centre column kept clear of all obstacles (walkable spine)
 const BODY_R = 0.6; // player body radius used for clearance checks
+const PACK_Z_JITTER = 2; // how far a trash spawn is jittered off its pack line
+
+/** The arrival point's instance-local z. One expression, read by both the spawn planner
+ * (which clears it, see entry_clearance.ts) and the plan's `entry`, so moving the porch
+ * can never desync the two and silently reintroduce a pull on arrival. */
+function entryZFor(layout: DungeonLayout): number {
+  return layout.zMin + ENTRY_Z_OFFSET;
+}
 
 const RIFT_SUFFIXES = [
   'Abyss',
@@ -379,13 +388,23 @@ function planSpawns(
   const { layout, colliders, halfWidthAt } = geo;
   const out: RiftSpawn[] = [];
 
-  const packStartZ = layout.zMin + 22;
+  // Nothing may spawn within the arrival clearance, or walking in pulls the front pack
+  // before the player has done anything (rift/entry_clearance.ts explains the radius).
+  // The band start absorbs the per-spawn jitter so the whole first pack sits beyond it.
+  const minSpawnZ = riftMinSpawnZ(entryZFor(layout));
+  const rawStartZ = layout.zMin + 22;
+  const packStartZ = Math.max(rawStartZ, minSpawnZ + PACK_Z_JITTER);
   const packEndZ = layout.dais.z - (isBoss ? 22 : 14);
   const packGap = rng.pick([16, 18, 20]);
-  const packCount = Math.max(2, Math.floor((packEndZ - packStartZ) / packGap));
+  // packCount stays keyed to the ORIGINAL band start, so pushing the packs back off the
+  // entry neither adds nor drops an rng draw: the same number of packs is spread across
+  // the shorter band instead. Changing the draw COUNT here would shift every downstream
+  // object, hazard and roller on every procedural floor as a side effect.
+  const packCount = Math.max(2, Math.floor((packEndZ - rawStartZ) / packGap));
+  const packStride = packCount > 1 ? Math.max(0, (packEndZ - packStartZ) / (packCount - 1)) : 0;
 
   for (let i = 0; i < packCount; i++) {
-    const z = packStartZ + i * packGap;
+    const z = packStartZ + i * packStride;
     const size = isBoss ? rng.int(1, 2) : rng.int(2, 3);
     for (let j = 0; j < size; j++) {
       const templateId = rng.pick(theme.trash as string[]);
@@ -394,7 +413,14 @@ function planSpawns(
       // stored point is exactly the one validated as clear (no rounding drift).
       const spread = Math.max(2, halfWidthAt(z) - 4);
       const rawX = Math.round(rng.range(-spread, spread) * 10) / 10;
-      const rawZ = Math.round((z + rng.range(-2, 2)) * 10) / 10;
+      // Floored at the arrival clearance. packStartZ already guarantees this for the
+      // current jitter, but keeping the clamp on the write is what makes the invariant
+      // local: a later band or jitter retune cannot quietly walk a pack back onto the
+      // entry. Clamping z BEFORE the march is safe because toClear only slides x.
+      const rawZ = Math.max(
+        minSpawnZ,
+        Math.round((z + rng.range(-PACK_Z_JITTER, PACK_Z_JITTER)) * 10) / 10,
+      );
       const p = toClear(colliders, rawX, rawZ);
       // color/scale left undefined: the base template's (theme-appropriate) values
       // are used, then lightly jittered per-entity at spawn time (rift/runs.ts).
@@ -411,9 +437,11 @@ function planSpawns(
       boss: true,
     };
     out.push(boss);
+    // The boss stays ON the dais, unclamped: the dais is at the far end of a 120 yd-plus
+    // nave, so it is never within the arrival clearance (the guard test pins that).
     // Two dais guards flanking the boss.
     for (const gx of [-6, 6]) {
-      const p = toClear(colliders, gx, layout.dais.z - 6);
+      const p = toClear(colliders, gx, Math.max(minSpawnZ, layout.dais.z - 6));
       out.push({
         templateId: rng.pick(theme.trash as string[]),
         x: p.x,
@@ -830,7 +858,7 @@ export function generateRiftFloor(
     themeName: theme.name,
     layout: geo.layout,
     style,
-    entry: { x: 0, z: geo.layout.zMin + ENTRY_Z_OFFSET },
+    entry: { x: 0, z: entryZFor(geo.layout) },
     spawns,
     objects,
     puzzle,

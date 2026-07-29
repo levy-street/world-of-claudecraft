@@ -92,6 +92,83 @@ function bareClient(pid: number): ClientWorld {
   return c;
 }
 
+// Phase 06 companion pin (packet-0-instruments R11): remote-entity continuity
+// across a 400 ms broadcast gap. While records are missing, the renderer
+// rides the POS_EXTRAPOLATION_CAP past the last wire segment; the gap-ending
+// record must re-anchor prevPos at that SAME capped pose (the LOCKSTEP
+// contract in net_interp_core.ts), so the frame after resume draws exactly
+// where the frame before resume did instead of snapping back to a wire pose.
+describe('ClientWorld gap-resume continuity', () => {
+  it('re-anchors a 400ms gap resume at the capped pose the renderer drew', () => {
+    const client = bareClient(1);
+    const internals = client as unknown as { applySnapshot(snapshot: unknown): void };
+    const self = {
+      id: 1,
+      k: 'player',
+      tid: 'warrior',
+      nm: 'Watcher',
+      lv: 10,
+      x: 0,
+      y: 0,
+      z: 0,
+      f: 0,
+      hp: 100,
+      mhp: 100,
+      res: 0,
+      mres: 100,
+      rtype: 'rage',
+    };
+    const mob = (x: number, full = false) => ({
+      id: 2,
+      ...(full ? { k: 'mob', tid: 'forest_wolf', nm: 'Forest Wolf', lv: 5 } : {}),
+      x,
+      y: 0,
+      z: 3,
+      f: 0,
+      hp: 50,
+      mhp: 50,
+    });
+    internals.applySnapshot({ t: 'snap', ents: [mob(0, true)], self });
+    const tracked = client.entities.get(2);
+    if (!tracked) throw new Error('mob entity missing');
+    // teach the per-entity clock a ~100 ms cadence, then deliver a step
+    (tracked as any).netUpdatedAt = performance.now() - 100;
+    internals.applySnapshot({ t: 'snap', ents: [mob(3)], self });
+    const netInterval = (tracked as any).netInterval as number;
+    expect(netInterval).toBeGreaterThan(5);
+    expect(netInterval).toBeLessThan(450);
+    // 400 ms of silence: the renderer's alpha must have RIDDEN the 1.25 cap,
+    // which is what makes the continuity equality below non-trivial
+    (tracked as any).netUpdatedAt = performance.now() - 400;
+    const alphaBefore = remoteEntityAlpha(
+      performance.now(),
+      (tracked as any).netUpdatedAt as number,
+      netInterval,
+      0.4,
+    );
+    expect(alphaBefore).toBe(POS_EXTRAPOLATION_CAP);
+    const poseBeforeX = tracked.prevPos.x + (tracked.pos.x - tracked.prevPos.x) * alphaBefore;
+    // the drawn pose sits PAST the last wire pose and OFF the incoming one:
+    // equality with either endpoint would prove nothing
+    expect(poseBeforeX).toBeGreaterThan(tracked.pos.x);
+    expect(Math.abs(poseBeforeX - 4)).toBeGreaterThan(0.2);
+    // the gap-ending record: a normal walking step, far under the 40 yd
+    // teleport snap, so the continuity path (not the snap path) runs
+    internals.applySnapshot({ t: 'snap', ents: [mob(4)], self });
+    expect(tracked.prevPos.x).toBeCloseTo(poseBeforeX, 12);
+    expect(tracked.pos.x).toBe(4);
+    // the frame right after resume draws the same pose the stall froze on
+    const alphaAfter = remoteEntityAlpha(
+      performance.now(),
+      (tracked as any).netUpdatedAt as number,
+      (tracked as any).netInterval as number,
+      0.4,
+    );
+    const poseAfterX = tracked.prevPos.x + (tracked.pos.x - tracked.prevPos.x) * alphaAfter;
+    expect(poseAfterX).toBeCloseTo(poseBeforeX, 2);
+  });
+});
+
 describe('ClientWorld prevFacing basis', () => {
   it('stays bounded in (-PI, PI] while a mob turns full circles across the seam', () => {
     const client = bareClient(1);

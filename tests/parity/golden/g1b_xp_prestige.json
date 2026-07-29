@@ -10,14 +10,14 @@
     "max-level overflow -> lifetimeXp / virtualLevelUp (accrueLifetimeXp, C1)",
     "cosmetic prestige accept + below-threshold reject (prestige, G1b)"
   ],
-  "draws": 150,
-  "drawDigest": "a92b57dc",
+  "draws": 147,
+  "drawDigest": "c0d62f2a",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 842,
-      "state": "c77b4344",
+      "nextId": 821,
+      "state": "920bd021",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -55,7 +55,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 833,
+          "entityId": 816,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -92,7 +92,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 833
+              "sourceId": 816
             }
           ],
           "blockChance": 0.05,
@@ -105,7 +105,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 833,
+          "id": 816,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -149,9 +149,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 842,
-      "state": "14e6bd2f",
-      "events": "4c5fabff",
+      "nextId": 821,
+      "state": "11b80494",
+      "events": "e7261915",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -160,8 +160,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 842,
-      "state": "73cee288",
+      "nextId": 821,
+      "state": "8a0756d1",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -171,23 +171,23 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 842,
-      "state": "1d39c989",
+      "nextId": 821,
+      "state": "5e95a108",
       "events": "741638a5",
       "rng": {
-        "draws": 150,
-        "digest": "a92b57dc"
+        "draws": 147,
+        "digest": "c0d62f2a"
       }
     },
     {
       "tick": 60,
       "time": 3,
-      "nextId": 842,
-      "state": "1d39c989",
+      "nextId": 821,
+      "state": "5e95a108",
       "events": "741638a5",
       "rng": {
-        "draws": 150,
-        "digest": "a92b57dc"
+        "draws": 147,
+        "digest": "c0d62f2a"
       },
       "label": "rested-accrued",
       "players": [
@@ -217,9 +217,6 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -230,7 +227,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 833,
+          "entityId": 816,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -269,7 +266,7 @@
               "name": "Battle Stance",
               "remaining": 3597,
               "school": "physical",
-              "sourceId": 833
+              "sourceId": 816
             }
           ],
           "blockChance": 0.05,
@@ -279,10 +276,10 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 1.5,
+          "fallStartY": 1.559276,
           "fiveSecondRule": 102,
           "hp": 100,
-          "id": 833,
+          "id": 816,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -294,9 +291,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 12,
-            "y": 1.5,
-            "z": -6
+            "x": -12.5,
+            "y": 1.559276,
+            "z": 16.5
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -326,12 +323,12 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 842,
-      "state": "ed44869a",
-      "events": "b95d0cbe",
+      "nextId": 821,
+      "state": "1f9554d9",
+      "events": "a64f451f",
       "rng": {
-        "draws": 150,
-        "digest": "a92b57dc"
+        "draws": 147,
+        "digest": "c0d62f2a"
       },
       "label": "rested-consumed",
       "players": [
@@ -363,9 +360,6 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -376,7 +370,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 833,
+          "entityId": 816,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -417,7 +411,7 @@
               "name": "Battle Stance",
               "remaining": 3597,
               "school": "physical",
-              "sourceId": 833
+              "sourceId": 816
             }
           ],
           "blockChance": 0.05,
@@ -427,10 +421,10 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 1.5,
+          "fallStartY": 1.559276,
           "fiveSecondRule": 102,
           "hp": 100,
-          "id": 833,
+          "id": 816,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -442,9 +436,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 12,
-            "y": 1.5,
-            "z": -6
+            "x": -12.5,
+            "y": 1.559276,
+            "z": 16.5
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -474,12 +468,12 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 842,
-      "state": "62babb79",
-      "events": "0e50dead",
+      "nextId": 821,
+      "state": "4588f37c",
+      "events": "82290a87",
       "rng": {
-        "draws": 150,
-        "digest": "a92b57dc"
+        "draws": 147,
+        "digest": "c0d62f2a"
       },
       "label": "ding",
       "players": [
@@ -512,9 +506,6 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -525,7 +516,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 833,
+          "entityId": 816,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -566,7 +557,7 @@
               "name": "Battle Stance",
               "remaining": 3597,
               "school": "physical",
-              "sourceId": 833
+              "sourceId": 816
             }
           ],
           "blockChance": 0.05,
@@ -576,10 +567,10 @@
           "critChance": 0.0605,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0605,
-          "fallStartY": 1.5,
+          "fallStartY": 1.559276,
           "fiveSecondRule": 102,
           "hp": 138,
-          "id": 833,
+          "id": 816,
           "kind": "player",
           "level": 2,
           "lootFfaTimer": "Infinity",
@@ -591,9 +582,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 12,
-            "y": 1.5,
-            "z": -6
+            "x": -12.5,
+            "y": 1.559276,
+            "z": 16.5
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -623,12 +614,12 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 842,
-      "state": "24f01e3f",
-      "events": "d56046df",
+      "nextId": 821,
+      "state": "43a688e4",
+      "events": "220fb335",
       "rng": {
-        "draws": 150,
-        "digest": "a92b57dc"
+        "draws": 147,
+        "digest": "c0d62f2a"
       },
       "label": "overflow",
       "players": [
@@ -661,9 +652,6 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -674,7 +662,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 833,
+          "entityId": 816,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -715,7 +703,7 @@
               "name": "Battle Stance",
               "remaining": 3597,
               "school": "physical",
-              "sourceId": 833
+              "sourceId": 816
             }
           ],
           "blockChance": 0.05,
@@ -725,10 +713,10 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 1.5,
+          "fallStartY": 1.559276,
           "fiveSecondRule": 102,
           "hp": 822,
-          "id": 833,
+          "id": 816,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -740,9 +728,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 12,
-            "y": 1.5,
-            "z": -6
+            "x": -12.5,
+            "y": 1.559276,
+            "z": 16.5
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -772,12 +760,12 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 842,
-      "state": "ecb9ab12",
-      "events": "3eb6cc25",
+      "nextId": 821,
+      "state": "423f619d",
+      "events": "c1b3d658",
       "rng": {
-        "draws": 150,
-        "digest": "a92b57dc"
+        "draws": 147,
+        "digest": "c0d62f2a"
       },
       "label": "prestige-accept",
       "players": [
@@ -810,9 +798,6 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -823,7 +808,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 833,
+          "entityId": 816,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -864,7 +849,7 @@
               "name": "Battle Stance",
               "remaining": 3597,
               "school": "physical",
-              "sourceId": 833
+              "sourceId": 816
             }
           ],
           "blockChance": 0.05,
@@ -874,10 +859,10 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 1.5,
+          "fallStartY": 1.559276,
           "fiveSecondRule": 102,
           "hp": 822,
-          "id": 833,
+          "id": 816,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -889,9 +874,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 12,
-            "y": 1.5,
-            "z": -6
+            "x": -12.5,
+            "y": 1.559276,
+            "z": 16.5
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -921,12 +906,12 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 842,
-      "state": "ecb9ab12",
+      "nextId": 821,
+      "state": "423f619d",
       "events": "741638a5",
       "rng": {
-        "draws": 150,
-        "digest": "a92b57dc"
+        "draws": 147,
+        "digest": "c0d62f2a"
       },
       "label": "prestige-reject",
       "players": [
@@ -959,9 +944,6 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -972,7 +954,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 833,
+          "entityId": 816,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1013,7 +995,7 @@
               "name": "Battle Stance",
               "remaining": 3597,
               "school": "physical",
-              "sourceId": 833
+              "sourceId": 816
             }
           ],
           "blockChance": 0.05,
@@ -1023,10 +1005,10 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 1.5,
+          "fallStartY": 1.559276,
           "fiveSecondRule": 102,
           "hp": 822,
-          "id": 833,
+          "id": 816,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1038,9 +1020,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 12,
-            "y": 1.5,
-            "z": -6
+            "x": -12.5,
+            "y": 1.559276,
+            "z": 16.5
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -1070,12 +1052,12 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 842,
-      "state": "ecb9ab12",
+      "nextId": 821,
+      "state": "423f619d",
       "events": "741638a5",
       "rng": {
-        "draws": 150,
-        "digest": "a92b57dc"
+        "draws": 147,
+        "digest": "c0d62f2a"
       },
       "label": "final",
       "players": [
@@ -1108,9 +1090,6 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -1121,7 +1100,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 833,
+          "entityId": 816,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1162,7 +1141,7 @@
               "name": "Battle Stance",
               "remaining": 3597,
               "school": "physical",
-              "sourceId": 833
+              "sourceId": 816
             }
           ],
           "blockChance": 0.05,
@@ -1172,10 +1151,10 @@
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fallStartY": 1.5,
+          "fallStartY": 1.559276,
           "fiveSecondRule": 102,
           "hp": 822,
-          "id": 833,
+          "id": 816,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1187,9 +1166,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 12,
-            "y": 1.5,
-            "z": -6
+            "x": -12.5,
+            "y": 1.559276,
+            "z": 16.5
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",

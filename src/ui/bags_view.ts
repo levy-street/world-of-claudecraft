@@ -178,6 +178,19 @@ export function bagsWindowShown(display: string): boolean {
   return display !== 'none' && display !== '';
 }
 
+/** Whether a SHOWN bag window's money row is painting a stale purse (issue #2373).
+ *  The money row is the only thing inside #bags that reads copper (neither
+ *  buildBagGrid nor buildBagBar sees it), and several credits reach no bags arm in
+ *  either host: online a money-only snapshot carries no inventory delta at all, and
+ *  offline a trainer fee, a settled Vale Cup bet or delve copper emit no event the
+ *  bags listen to. The window has to be SHOWN before the purse is compared, so a
+ *  hidden or never-opened window costs one string compare and never reaches a
+ *  painter. `lastPainted` is the purse as of the last paint; the -1 cold sentinel a
+ *  caller starts from can never equal a real purse, which is never negative. */
+export function bagsMoneyRowStale(display: string, copper: number, lastPainted: number): boolean {
+  return bagsWindowShown(display) && copper !== lastPainted;
+}
+
 /** What the shift+right-click destroy affordance on a bag item does. 'discard' opens
  *  the destroy prompt, 'discardBlocked' rejects a protected item with feedback, 'none'
  *  means the destroy affordance is inert. A plain right-click (no shift) now runs the

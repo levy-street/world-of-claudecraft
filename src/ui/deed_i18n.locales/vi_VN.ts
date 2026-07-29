@@ -79,7 +79,7 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: 'Bậc Thầy Đồng Cỏ', desc: 'Đạt 100 điểm thành thạo Thảo Dược Học.' },
   prog_master_gatherer: {
     name: 'Bậc Thầy Thu Thập',
-    desc: 'Đạt 100 điểm thành thạo trong Khai Khoáng, Đốn Gỗ, và Thảo Dược Học.',
+    desc: 'Đạt 100 điểm thành thạo trong bất kỳ ba trong số Khai Khoáng, Đốn Gỗ, Thảo Dược Học, và Câu Cá.',
   },
   prog_first_craft: {
     name: 'Làm Bằng Đôi Tay',
@@ -429,7 +429,10 @@ export const table: DeedLocaleTable = {
     name: 'Khách Quen Hạng Nhất',
     desc: 'Khám phá đủ cả mười món hàng của Quân Nhu Trưởng Vex.',
   },
-  col_glimmerfin: { name: 'Tia Hy Vọng Lấp Lánh', desc: 'Câu được một con Cá Koi Vây Lấp Lánh.' },
+  col_glimmerfin: {
+    name: 'Tia Hy Vọng Lấp Lánh',
+    desc: 'Câu được một Cá Koi Ánh Nắng.',
+  },
   col_full_creel: {
     name: 'Giỏ Cá Đầy Ắp',
     desc: 'Khám phá đủ sáu loại cá thường từ vùng nước của Thung Lũng, Đầm Lầy và Cao Nguyên.',
@@ -617,7 +620,10 @@ export const table: DeedLocaleTable = {
     name: 'Thứ Gì Đó Lấp Lánh',
     desc: 'Nhặt một vật thể lấp lánh trên mặt đất.',
   },
-  exp_first_ore: { name: 'Cuốc Vỡ Đất', desc: 'Thu hoạch mạch quặng đầu tiên của bạn.' },
+  exp_first_ore: {
+    name: 'Cuốc Chạm Đá',
+    desc: 'Thu hoạch mạch quặng đầu tiên của bạn.',
+  },
   exp_first_timber: { name: 'Cây Đổ Đấy!', desc: 'Thu hoạch cụm gỗ đầu tiên của bạn.' },
   exp_first_herb: { name: 'Mát Tay', desc: 'Thu hoạch bụi thảo dược đầu tiên của bạn.' },
   feat_era_cap: {
@@ -692,5 +698,120 @@ export const table: DeedLocaleTable = {
   chr_marsh_first_cast: {
     name: 'Lươn Trong Lau Sậy',
     desc: 'Câu một con cá từ vùng nước của Đầm Lầy Bùn Sâu.',
+  },
+  prog_guildsworn: {
+    name: 'Thề Nguyện Thủ Công',
+    desc: 'Gắn kết bản thân với một đôi kiểu mẫu và dấn thân vào các nghề của nó một cách thực sự.',
+    title: 'Thề Nguyện Thủ Công',
+  },
+  prog_masterwright: {
+    name: 'Thợ Đại Tài',
+    desc: 'Chế tạo kiệt tác đầu tiên của bạn, một tác phẩm tinh xảo đến mức cả khu vực đều nghe danh.',
+    title: 'Thợ Đại Tài',
+  },
+  prog_fishing_100: {
+    name: 'Lão Muối',
+    desc: 'Đạt 100 điểm thành thạo Câu Cá.',
+  },
+  prog_master_angler: {
+    name: 'Ngư Sư Thành Thạo',
+    desc: 'Đạt 200 điểm thành thạo Câu Cá, đỉnh cao tuyệt đối của nghệ thuật câu cá.',
+    title: 'Ngư Sư Thành Thạo',
+  },
+  prog_engineering_50: {
+    name: 'Bánh Răng và Lò Xo',
+    desc: 'Đạt 50 điểm kỹ năng Cơ Khí.',
+  },
+  prog_alchemy_50: {
+    name: 'Những Pha Chế Kỳ Lạ',
+    desc: 'Đạt 50 điểm kỹ năng Giả Kim.',
+  },
+  prog_cooking_50: {
+    name: 'Đầu Bếp Có Kinh Nghiệm',
+    desc: 'Đạt 50 điểm kỹ năng Nấu Ăn.',
+  },
+  prog_leatherworking_50: {
+    name: 'Nghề Thợ Thuộc Da',
+    desc: 'Đạt 50 điểm kỹ năng Thuộc Da.',
+  },
+  prog_tailoring_50: {
+    name: 'Đường May Đẹp',
+    desc: 'Đạt 50 điểm kỹ năng May Vá.',
+  },
+  prog_enchanting_50: {
+    name: 'Ánh Huyền Thuật Đầu Tiên',
+    desc: 'Đạt 50 điểm kỹ năng Pháp Khắc.',
+  },
+  prog_weaponcrafting_50: {
+    name: 'Lưỡi và Tôi Luyện',
+    desc: 'Đạt 50 điểm kỹ năng Rèn Vũ Khí.',
+  },
+  prog_armorcrafting_50: {
+    name: 'Búa và Giáp Tấm',
+    desc: 'Đạt 50 điểm kỹ năng Rèn Giáp.',
+  },
+  prog_grandmaster_engineering: {
+    name: 'Đại Sư Cơ Khí',
+    desc: 'Đạt 125 điểm kỹ năng Cơ Khí, đỉnh cao tuyệt đối của nghề.',
+    title: 'Đại Sư Cơ Khí',
+  },
+  prog_grandmaster_alchemy: {
+    name: 'Đại Sư Giả Kim',
+    desc: 'Đạt 125 điểm kỹ năng Giả Kim, đỉnh cao tuyệt đối của nghề.',
+    title: 'Đại Sư Giả Kim',
+  },
+  prog_grandmaster_cooking: {
+    name: 'Đại Sư Nấu Ăn',
+    desc: 'Đạt 125 điểm kỹ năng Nấu Ăn, đỉnh cao tuyệt đối của nghề.',
+    title: 'Đại Sư Nấu Ăn',
+  },
+  prog_grandmaster_leatherworking: {
+    name: 'Đại Sư Thuộc Da',
+    desc: 'Đạt 125 điểm kỹ năng Thuộc Da, đỉnh cao tuyệt đối của nghề.',
+    title: 'Đại Sư Thuộc Da',
+  },
+  prog_grandmaster_tailoring: {
+    name: 'Đại Sư May Vá',
+    desc: 'Đạt 125 điểm kỹ năng May Vá, đỉnh cao tuyệt đối của nghề.',
+    title: 'Đại Sư May Vá',
+  },
+  prog_grandmaster_enchanting: {
+    name: 'Đại Sư Pháp Khắc',
+    desc: 'Đạt 125 điểm kỹ năng Pháp Khắc, đỉnh cao tuyệt đối của nghề.',
+    title: 'Đại Sư Pháp Khắc',
+  },
+  prog_grandmaster_weaponcrafting: {
+    name: 'Đại Sư Rèn Vũ Khí',
+    desc: 'Đạt 125 điểm kỹ năng Rèn Vũ Khí, đỉnh cao tuyệt đối của nghề.',
+    title: 'Đại Sư Rèn Vũ Khí',
+  },
+  prog_grandmaster_armorcrafting: {
+    name: 'Đại Sư Rèn Giáp',
+    desc: 'Đạt 125 điểm kỹ năng Rèn Giáp, đỉnh cao tuyệt đối của nghề.',
+    title: 'Đại Sư Rèn Giáp',
+  },
+  col_pristine_vein: {
+    name: 'Mạch Quặng Nguyên Sơ',
+    desc: 'Phá vỡ một mạch quặng nguyên sơ và để cả khu vực nghe tin về điều đó.',
+  },
+  col_ancient_heartwood: {
+    name: 'Lõi Gỗ Cổ Đại',
+    desc: 'Khai thác một đoạn lõi gỗ cổ đại từ một bãi cây đã đổ xuống.',
+  },
+  col_moonlit_bloom: {
+    name: 'Hoa Nở Dưới Ánh Trăng',
+    desc: 'Thu hái một bông hoa nở dưới ánh trăng đúng vào khoảnh khắc nó bung cánh.',
+  },
+  col_perfect_specimen: {
+    name: 'Mẫu Vật Hoàn Hảo',
+    desc: 'Lấy ra một mẫu vật hoàn hảo từ xác thú vừa thu hoạch, không một vết xước hay tỳ vết.',
+  },
+  soc_first_salvage: {
+    name: 'Không Bỏ Phí Thứ Gì',
+    desc: 'Tháo dỡ một món trang bị thành nguyên liệu thô.',
+  },
+  soc_salvage_50: {
+    name: 'Bãi Phế Liệu',
+    desc: 'Tháo dỡ 50 món trang bị thành nguyên liệu thô.',
   },
 };

@@ -108,6 +108,7 @@ export const sv_SE: Record<string, string> = {
   'stats.peakOnline': 'topp anslutna',
   'stats.peakOnlineToday': 'topp anslutna 24h',
   'stats.peakOnlineAllTime': 'topp anslutna genom tiderna',
+  'stats.playersCap': 'spelargräns',
   'stats.accounts': 'konton',
   'stats.characters': 'karaktärer',
   'stats.newAccounts24h': 'nya konton 24 tim',

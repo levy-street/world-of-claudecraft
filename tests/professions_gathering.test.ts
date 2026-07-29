@@ -3,6 +3,8 @@ import { GATHERING_PROFESSIONS } from '../src/sim/content/professions';
 import {
   drainGatheringGrants,
   emptyGatheringProficiency,
+  GATHER_GAIN_TIER_STEP,
+  gatherNodeGainMultiplier,
   normalizeGatheringProficiency,
   queueGatheringGrant,
 } from '../src/sim/professions/gathering';
@@ -45,12 +47,14 @@ describe('gathering profession proficiency (#1119)', () => {
     const pid = sim.playerId;
     sim.chat('/dev gather herbalism 4', pid);
     sim.tick();
+    // The enforced per-profession caps (mining/logging/herbalism 100,
+    // fishing 200) replace the old uniform 300.
     const expected = {
       skills: [
-        { professionId: 'mining', skill: 0, maxSkill: 300 },
-        { professionId: 'logging', skill: 0, maxSkill: 300 },
-        { professionId: 'herbalism', skill: 4, maxSkill: 300 },
-        { professionId: 'fishing', skill: 0, maxSkill: 300 },
+        { professionId: 'mining', skill: 0, maxSkill: 100 },
+        { professionId: 'logging', skill: 0, maxSkill: 100 },
+        { professionId: 'herbalism', skill: 4, maxSkill: 100 },
+        { professionId: 'fishing', skill: 0, maxSkill: 200 },
       ],
     };
     expect(sim.professionsState).toEqual(expected);
@@ -74,7 +78,7 @@ describe('gathering profession proficiency (#1119)', () => {
     expect(meta2.gatheringProficiency).toEqual({ mining: 7, logging: 0, herbalism: 2, fishing: 0 });
   });
 
-  it('a NONZERO fishing proficiency survives the save/load round trip (Phase 11)', () => {
+  it('a NONZERO fishing proficiency survives the save/load round trip', () => {
     // Every other persistence fixture in this file carries fishing:0, so a
     // regression dropping the fishing key from serializeCharacter (or a
     // hand-rolled normalize key list) would stay green without this pin.
@@ -105,8 +109,8 @@ describe('gathering profession proficiency (#1119)', () => {
     });
   });
 
-  it('ACCEPTED ROLLBACK CAVEAT (documented Phase 11 semantic): a pre-Phase-11 round trip re-zeroes fishing only', () => {
-    // A pre-Phase-11 loader normalizes the blob to the starter three keys, so
+  it('ACCEPTED ROLLBACK CAVEAT (documented semantic): a pre-fishing-support round trip re-zeroes fishing only', () => {
+    // A pre-fishing-support loader normalizes the blob to the starter three keys, so
     // a save written by that code path comes back WITHOUT the fishing key:
     // accrued fishing proficiency is deliberately lost on the downgrade round
     // trip (the mailWelcomed class; release-notes line at tag time) while the
@@ -180,7 +184,7 @@ describe('gathering profession proficiency (#1119)', () => {
       herbalism: 0,
       fishing: 0,
     });
-    // A nonzero fishing value passes through intact (Phase 11: every other
+    // A nonzero fishing value passes through intact (every other
     // fixture in this file feeds fishing 0, which a fishing-specific drop
     // would satisfy vacuously).
     expect(normalizeGatheringProficiency({ fishing: 57 })).toEqual({
@@ -257,6 +261,36 @@ describe('gathering profession proficiency (#1119)', () => {
     sim.tick();
     const meta = (sim as any).players.get(pid);
     expect(meta.gatheringProficiency).toEqual({ mining: 0, logging: 0, herbalism: 0, fishing: 0 });
+  });
+
+  it('node-tier-relative gain: gatherNodeGainMultiplier walks the mastery curve AT the band boundaries', () => {
+    // A node of tier T maps to gain tier T - 1, scored against
+    // floor(proficiency / GATHER_GAIN_TIER_STEP) through the shared four-state
+    // curve (wheel.ts). Pinned AT each boundary, not only past it.
+    // t1 (all pre-phase content, bare hands): full through 24, then down.
+    expect(gatherNodeGainMultiplier(0, 1)).toBe(1);
+    expect(gatherNodeGainMultiplier(24, 1)).toBe(1);
+    expect(gatherNodeGainMultiplier(25, 1)).toBe(0.5);
+    expect(gatherNodeGainMultiplier(49, 1)).toBe(0.5);
+    expect(gatherNodeGainMultiplier(50, 1)).toBe(0.25);
+    expect(gatherNodeGainMultiplier(74, 1)).toBe(0.25);
+    expect(gatherNodeGainMultiplier(75, 1)).toBe(0); // t1 nodes gray out at 75+
+    // t2: full through 49 (carries the band below 50).
+    expect(gatherNodeGainMultiplier(49, 2)).toBe(1);
+    expect(gatherNodeGainMultiplier(50, 2)).toBe(0.5);
+    expect(gatherNodeGainMultiplier(75, 2)).toBe(0.25);
+    // t3 (Thornpeak): full through 74, still reduced at 99: what finishes the
+    // climb to 100.
+    expect(gatherNodeGainMultiplier(74, 3)).toBe(1);
+    expect(gatherNodeGainMultiplier(75, 3)).toBe(0.5);
+    expect(gatherNodeGainMultiplier(99, 3)).toBe(0.5);
+    // Negative or degenerate inputs clamp instead of throwing.
+    expect(gatherNodeGainMultiplier(-5, 1)).toBe(1);
+    expect(gatherNodeGainMultiplier(0, 0)).toBe(1);
+  });
+
+  it('pins GATHER_GAIN_TIER_STEP at its literal value', () => {
+    expect(GATHER_GAIN_TIER_STEP).toBe(25);
   });
 
   it('rejects an unknown profession id without throwing or granting anything', () => {

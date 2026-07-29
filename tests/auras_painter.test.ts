@@ -150,6 +150,7 @@ function slot(over: Partial<AuraSlotState> & { key: string }): AuraSlotState {
     isDebuff: false,
     school: '',
     own: false,
+    expiring: false,
     durationText: '',
     stacksText: '',
     name: over.key,
@@ -321,6 +322,7 @@ describe('AurasPainter: keyed pool over the elided writers', () => {
           school: 'nature',
           durationText: '5s',
           stacksText: '3',
+          expiring: true,
         }),
       ]),
     );
@@ -332,6 +334,8 @@ describe('AurasPainter: keyed pool over the elided writers', () => {
     ).toBe(true);
     // debuff via toggleClass (a structural class, not a color).
     expect(has('toggleClass', (c) => c.args[0] === 'debuff' && c.args[1] === true)).toBe(true);
+    // the expiring blink via toggleClass too (the stylesheet owns the animation).
+    expect(has('toggleClass', (c) => c.args[0] === 'expiring' && c.args[1] === true)).toBe(true);
     // the school border tint via setAttr(data-school), a structural attribute the
     // stylesheet maps to a --color-debuff-* token.
     expect(has('setAttr', (c) => c.args[0] === 'data-school' && c.args[1] === 'nature')).toBe(true);
@@ -340,6 +344,15 @@ describe('AurasPainter: keyed pool over the elided writers', () => {
     expect(has('setText', (c) => c.args[0] === '3')).toBe(true);
     // stacks badge shown via setDisplay('').
     expect(has('setDisplay', (c) => c.args[0] === '')).toBe(true);
+  });
+
+  it('clears the expiring blink through the elided writer when an aura is refreshed', () => {
+    painter.paint(state([slot({ key: 'a', expiring: true })]));
+    calls.length = 0;
+    painter.paint(state([slot({ key: 'a', expiring: false })]));
+    expect(
+      calls.some((c) => c.m === 'toggleClass' && c.args[0] === 'expiring' && c.args[1] === false),
+    ).toBe(true);
   });
 
   it('hides the stacks badge (setDisplay none) when the aura does not stack', () => {

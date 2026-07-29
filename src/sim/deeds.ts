@@ -28,11 +28,12 @@
 import { DEED_ORDER, DEEDS, DEEDS_ERA } from './content/deeds';
 import { GATHERING_PROFESSION_IDS } from './content/professions';
 import { pointsSpent } from './content/talents';
-import { ITEMS, MOBS, ZONES, zoneAt } from './data';
+import { ITEMS, MOBS, zoneAt } from './data';
 import { RESURRECTION_SICKNESS_ID } from './resurrection';
 import type { ArenaMatch, InstanceSlot, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import {
+  type DamageEventKind,
   DEED_STAT_KEYS,
   type DeedFlagId,
   type DeedMeterId,
@@ -1056,9 +1057,10 @@ export function seedItemDiscovery(ctx: SimContext, meta: PlayerMeta): void {
     if (bagId) markItemDiscovered(ctx, meta, bagId);
   }
   for (const slot of meta.vendorBuyback) {
-    // Buyback entries persist bare {itemId, count} today, but the rolled
-    // quality rides along like the sibling loops so a future instance payload
-    // cannot silently under-credit quality-first discoveries.
+    // Buyback entries can carry an instance payload (masterwork/signed sales,
+    // #2398); the rolled quality rides along like the sibling loops so
+    // quality-first discovery credit is never under-counted for a row that
+    // preserved its instance.
     markItemDiscovered(ctx, meta, slot.itemId, slot.instance?.rolled?.quality);
   }
 }
@@ -1082,6 +1084,16 @@ export function retroFallbackGrants(ctx: SimContext, meta: PlayerMeta, player: E
   // never prove one.
   if (Object.entries(meta.craftSkills).some(([craftId, v]) => craftId !== 'enchanting' && v > 0)) {
     grantDeed(ctx, meta, 'prog_first_craft', { retro: true });
+  }
+  // Proof: attunedPairs records every archetype pair this character ever
+  // attuned (written only by professions/archetype.ts: attuneArchetypePair
+  // and the save-restore of that same history, both downstream of a real
+  // quest-validated attunement), so a non-empty history proves an attunement
+  // happened before the attunementsCompleted counter existed. Without this
+  // arm a veteran who attuned once and never switches would be PERMANENTLY
+  // stranded (attunement can be once-ever for a player who never switches).
+  if (meta.archetype.attunedPairs.length > 0) {
+    grantDeed(ctx, meta, 'prog_guildsworn', { retro: true });
   }
   // Proof: every ground object is a quest item whose pickup is denied unless
   // its quest is active (interaction.ts), so a done proving quest can only
@@ -1126,7 +1138,7 @@ export function onDamageDealtForDeeds(
   target: Entity,
   amount: number,
   crit: boolean,
-  kind: 'hit' | 'miss' | 'dodge',
+  kind: DamageEventKind,
 ): void {
   if (source.kind === 'player' && source.id !== target.id) {
     const meta = ctx.players.get(source.id);
@@ -1328,7 +1340,11 @@ export function onMobKillCreditForDeeds(
   eligible: PlayerMeta[],
 ): void {
   const tmpl = MOBS[mob.templateId];
-  bumpDeedStat(ctx, credited, 'kills', 1);
+  // A shared kill credits XP, quest progress, and loot to every eligible
+  // party member (damage.ts), not just the tapper: the lifetime kills
+  // counter must match, like every sibling stat in this file (dungeon
+  // clears, thunzharr kills, the rare-slain marks two lines below).
+  for (const meta of eligible) bumpDeedStat(ctx, meta, 'kills', 1);
 
   // chr_vale_packbreaker: three forest_wolf kill credits inside a rolling
   // 10 s window (session-scoped times; pruned on every push).
@@ -1636,7 +1652,7 @@ export function onCupTouchForDeeds(ctx: SimContext, match: CupMatchForDeeds, pid
 export function onCupGoalForDeeds(
   ctx: SimContext,
   match: CupMatchForDeeds,
-  team: 'A' | 'B',
+  _team: 'A' | 'B',
   scorerPid: number | null,
 ): void {
   if (!match.rated || scorerPid === null) return;
@@ -1836,4 +1852,11 @@ export const VISITED_MARK_NAMESPACES = [
   'fiesta',
   'dungeon',
   'witness',
+  // Rare gather-event finds (the marks were authored dormant before their
+  // deed consumers): the three node flavors written by announceGatherRareEvent
+  // plus the corpse-harvest perfect_specimen jackpot. Registering the
+  // namespace also lets restoreDeedStats keep marks an older save
+  // already carries (they serialized fine but were dropped on load while the
+  // namespace was unregistered).
+  'gather_event',
 ] as const;

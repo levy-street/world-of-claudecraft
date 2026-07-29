@@ -1,0 +1,183 @@
+{
+  "sourceImage": "docs/design/eastbrook-vale-rebuild/polish-img2threejs/mailbox/admitted-views/front-three-quarter.png",
+  "scanMethod": "grid-3x3 plus front, rear, side, and grazing cross-check",
+  "targetMinDetails": 12,
+  "details": [
+    {
+      "id": "roof-course-seams",
+      "kind": "seam",
+      "description": "Four shallow overlapping cobalt roof courses per slope produce horizontal construction shadows.",
+      "region": { "x": 0.12, "y": 0.03, "width": 0.76, "height": 0.28, "units": "normalized" },
+      "scale": "meso",
+      "affects": "geometry and cavity value",
+      "mapsTo": { "type": "component.localFeatures", "ref": "roof-shell/roof-course-seams" },
+      "evidenceRef": "front-three-quarter",
+      "confidence": 0.96
+    },
+    {
+      "id": "ridge-cap-bevel",
+      "kind": "bevel",
+      "description": "The dark timber ridge and gold top cap use real chamfers that catch the grazing highlight.",
+      "region": { "x": 0.38, "y": 0.0, "width": 0.24, "height": 0.16, "units": "normalized" },
+      "scale": "meso",
+      "affects": "silhouette and highlight",
+      "mapsTo": { "type": "component.localFeatures", "ref": "roof-shell/ridge-cap-chamfer" },
+      "evidenceRef": "grazing",
+      "confidence": 0.92
+    },
+    {
+      "id": "blue-roof-edge-wear",
+      "kind": "stain",
+      "description": "Cobalt edges carry restrained lighter wear while roof cavities stay darker.",
+      "region": { "x": 0.12, "y": 0.08, "width": 0.76, "height": 0.25, "units": "normalized" },
+      "scale": "micro",
+      "affects": "vertex color and roughness",
+      "mapsTo": { "type": "material.localOverrides", "ref": "town-opaque/roof-edge-wear" },
+      "evidenceRef": "front-three-quarter",
+      "confidence": 0.83
+    },
+    {
+      "id": "mail-slot-opening",
+      "kind": "hole",
+      "description": "A real deep horizontal opening sits in the front facade rather than a black decal.",
+      "region": { "x": 0.29, "y": 0.31, "width": 0.42, "height": 0.13, "units": "normalized" },
+      "scale": "meso",
+      "affects": "negative space and cavity depth",
+      "mapsTo": { "type": "component.localFeatures", "ref": "mail-slot/mail-slot-opening" },
+      "evidenceRef": "front",
+      "confidence": 0.99
+    },
+    {
+      "id": "mail-slot-frame-bevel",
+      "kind": "bevel",
+      "description": "The thick faceted gold frame around the slot has a two-plane chamfer and darker inner reveal.",
+      "region": { "x": 0.25, "y": 0.28, "width": 0.5, "height": 0.2, "units": "normalized" },
+      "scale": "meso",
+      "affects": "geometry and metal highlight",
+      "mapsTo": { "type": "component.localFeatures", "ref": "mail-slot/slot-frame-chamfer" },
+      "evidenceRef": "grazing",
+      "confidence": 0.97
+    },
+    {
+      "id": "raven-emblem-relief",
+      "kind": "ridge",
+      "description": "A dark abstract raven head and paired wings project slightly above the gable face without readable text.",
+      "region": { "x": 0.31, "y": 0.17, "width": 0.38, "height": 0.16, "units": "normalized" },
+      "scale": "meso",
+      "affects": "identity relief and silhouette pockets",
+      "mapsTo": { "type": "component.localFeatures", "ref": "front-crest/raven-relief" },
+      "evidenceRef": "front",
+      "confidence": 0.94
+    },
+    {
+      "id": "facade-board-seams",
+      "kind": "linework",
+      "description": "Horizontal timber board seams and restrained grain break the broad front and side faces.",
+      "region": { "x": 0.2, "y": 0.2, "width": 0.6, "height": 0.34, "units": "normalized" },
+      "scale": "micro",
+      "affects": "surface relief and value breakup",
+      "mapsTo": { "type": "component.localFeatures", "ref": "mailhouse-body/facade-board-seams" },
+      "evidenceRef": "front-three-quarter",
+      "confidence": 0.9
+    },
+    {
+      "id": "rear-door-seams",
+      "kind": "seam",
+      "description": "The rear shutter uses inset perimeter and horizontal board seams with a clear closed, non-interactive read.",
+      "region": { "x": 0.08, "y": 0.08, "width": 0.84, "height": 0.72, "units": "normalized" },
+      "scale": "meso",
+      "affects": "construction relief",
+      "mapsTo": { "type": "component.localFeatures", "ref": "rear-panel/rear-panel-seams" },
+      "evidenceRef": "rear-detail",
+      "confidence": 0.96
+    },
+    {
+      "id": "gold-bolt-system",
+      "kind": "fastener",
+      "description": "Small gold square-headed bolts repeat on the front uprights and trim plates.",
+      "region": { "x": 0.16, "y": 0.27, "width": 0.68, "height": 0.24, "units": "normalized" },
+      "scale": "micro",
+      "affects": "instanced metal detail",
+      "mapsTo": { "type": "component.localFeatures", "ref": "front-trim/gold-fastener-heads" },
+      "evidenceRef": "front",
+      "confidence": 0.9
+    },
+    {
+      "id": "side-diamond-relief",
+      "kind": "ridge",
+      "description": "Each side wall carries one shallow faceted gold diamond wayfinding badge.",
+      "region": { "x": 0.73, "y": 0.3, "width": 0.12, "height": 0.12, "units": "normalized" },
+      "scale": "micro",
+      "affects": "side identity relief",
+      "mapsTo": { "type": "component.localFeatures", "ref": "side-badges/diamond-relief" },
+      "evidenceRef": "right",
+      "confidence": 0.95
+    },
+    {
+      "id": "post-collar-fasteners",
+      "kind": "fastener",
+      "description": "The gold collar wraps the post with four repeated raised diamond studs.",
+      "region": { "x": 0.39, "y": 0.63, "width": 0.22, "height": 0.1, "units": "normalized" },
+      "scale": "micro",
+      "affects": "instanced collar detail",
+      "mapsTo": { "type": "component.localFeatures", "ref": "post-collar/collar-studs" },
+      "evidenceRef": "front-three-quarter",
+      "confidence": 0.94
+    },
+    {
+      "id": "stone-block-joints",
+      "kind": "groove",
+      "description": "Two footing courses are separated by deep horizontal and offset vertical joints.",
+      "region": { "x": 0.31, "y": 0.79, "width": 0.38, "height": 0.19, "units": "normalized" },
+      "scale": "meso",
+      "affects": "stone geometry and AO",
+      "mapsTo": { "type": "component.localFeatures", "ref": "stone-plinth/stone-joint-grooves" },
+      "evidenceRef": "front",
+      "confidence": 0.98
+    },
+    {
+      "id": "stone-edge-chamfer",
+      "kind": "bevel",
+      "description": "Every exposed footing block has a low-segment chamfer that remains visible at player distance.",
+      "region": { "x": 0.3, "y": 0.78, "width": 0.4, "height": 0.2, "units": "normalized" },
+      "scale": "micro",
+      "affects": "geometry and grazing highlight",
+      "mapsTo": { "type": "component.localFeatures", "ref": "stone-plinth/stone-edge-chamfers" },
+      "evidenceRef": "grazing",
+      "confidence": 0.93
+    },
+    {
+      "id": "base-cavity-dirt",
+      "kind": "stain",
+      "description": "Dark desaturated contact dirt is limited to stone joints and the floor contact band.",
+      "region": { "x": 0.3, "y": 0.87, "width": 0.4, "height": 0.11, "units": "normalized" },
+      "scale": "micro",
+      "affects": "vertex-color local mask",
+      "mapsTo": { "type": "material.localOverrides", "ref": "town-opaque/base-cavity-dirt" },
+      "evidenceRef": "front-three-quarter",
+      "confidence": 0.8
+    },
+    {
+      "id": "timber-grain",
+      "kind": "linework",
+      "description": "Sparse directional grain follows each post, board, and brace rather than using screen-space noise.",
+      "region": { "x": 0.2, "y": 0.2, "width": 0.6, "height": 0.58, "units": "normalized" },
+      "scale": "micro",
+      "affects": "shared-atlas UV orientation and vertex value",
+      "mapsTo": { "type": "material.localOverrides", "ref": "town-opaque/timber-grain" },
+      "evidenceRef": "grazing",
+      "confidence": 0.88
+    },
+    {
+      "id": "bracket-join-seams",
+      "kind": "seam",
+      "description": "Two diagonal underside braces visibly overlap the body sill and post with no air gaps.",
+      "region": { "x": 0.31, "y": 0.5, "width": 0.38, "height": 0.2, "units": "normalized" },
+      "scale": "meso",
+      "affects": "attachment and contact shadow",
+      "mapsTo": { "type": "component.localFeatures", "ref": "support-brackets/bracket-join-seams" },
+      "evidenceRef": "rear-three-quarter",
+      "confidence": 0.96
+    }
+  ]
+}

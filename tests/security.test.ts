@@ -59,6 +59,8 @@ const GM_TEST_WORLD: WorldContent = {
   groundObjects: [],
 };
 
+import { ONLINE_WORLD_AUTH_TYPE, ONLINE_WORLD_LAYOUT_VERSION } from '../src/world_api';
+
 function fakeReq(headers: Record<string, string>, remoteAddress: string) {
   const req: any = new EventEmitter();
   req.headers = headers;
@@ -84,6 +86,15 @@ function withUsernameBanlist(env: { inline?: string; file?: string }, test: () =
 }
 
 describe('websocket authentication', () => {
+  it('pins the strict world-layout auth epoch for symmetric mixed-release rejection', () => {
+    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(3);
+    expect(ONLINE_WORLD_AUTH_TYPE).toBe(`auth-world-${ONLINE_WORLD_LAYOUT_VERSION}`);
+    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-3');
+    // The previous layout-gated server accepts only `auth-world-2`, so the new
+    // client discriminator must remain necessarily unrecognizable to it.
+    expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-2');
+  });
+
   it('keeps bearer tokens out of the websocket URL', () => {
     const url = buildWebSocketUrl('https:', 'worldofclaudecraft.com');
 
@@ -93,7 +104,7 @@ describe('websocket authentication', () => {
 
   it('sends credentials as an auth message instead of query params', () => {
     expect(buildWebSocketAuthMessage('a'.repeat(64), 42)).toEqual({
-      t: 'auth',
+      t: ONLINE_WORLD_AUTH_TYPE,
       token: 'a'.repeat(64),
       character: 42,
       clientSeed: '',
@@ -103,7 +114,7 @@ describe('websocket authentication', () => {
 
   it('carries the client seed when one is supplied', () => {
     expect(buildWebSocketAuthMessage('a'.repeat(64), 42, 'seed-123')).toEqual({
-      t: 'auth',
+      t: ONLINE_WORLD_AUTH_TYPE,
       token: 'a'.repeat(64),
       character: 42,
       clientSeed: 'seed-123',

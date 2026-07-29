@@ -38,6 +38,14 @@ export const zh_CN: EnTranslations = {
     "filterLabel": "筛选命令",
     "filterPlaceholder": "搜索此类别",
     "noMatches": "没有匹配的命令。",
+    "itemSearchPlaceholder": "按名称或 ID 搜索",
+    "itemResultsAria": "匹配的物品",
+    "itemNoMatches": "没有匹配的物品。",
+    "itemMore": "显示 {shown} 项（共 {total} 项），继续输入以缩小范围。",
+    "itemChosen": "已选择：{name}",
+    "itemUnknown": "没有该 ID 对应的物品。",
+    "itemHeroicTag": "英雄",
+    "kitCurrentSpec": "当前专精",
     "serverRequirement": "服务器作弊功能仍需 ALLOW_DEV_COMMANDS=1。",
     "invalidValues": "运行此命令前请选择有效值。",
     "sent": "已发送：{command}",
@@ -55,7 +63,8 @@ export const zh_CN: EnTranslations = {
       "z": "Z",
       "dungeon": "地下城",
       "difficulty": "难度",
-      "name": "名称"
+      "name": "名称",
+      "spec": "专精"
     },
     "difficulty": {
       "normal": "普通",
@@ -113,6 +122,10 @@ export const zh_CN: EnTranslations = {
       "give": {
         "label": "给予物品",
         "description": "向玩家物品栏添加一件物品。"
+      },
+      "kit": {
+        "label": "装备新晋20级预设",
+        "description": "为该专精穿上圣所前20级预设装备，背包优先。仅限装备。"
       },
       "gold": {
         "label": "添加金币",
@@ -331,6 +344,7 @@ export const zh_CN: EnTranslations = {
       "countdown": "脱困：{seconds}",
       "completed": "已移动到最近且可到达的安全位置。",
       "completedAtGraveyard": "你的灵魂已返回最近的墓地。与灵魂医者交谈并接受守护者的代价。",
+      "revivedAtGraveyard": "你已被送回最近的墓地并复活。守护者的代价正压在你身上。",
       "cancelledMoved": "你进行了移动，脱困已取消。",
       "cancelledDamaged": "你受到了伤害，脱困已取消。",
       "cancelledCombat": "你进入了战斗，脱困已取消。",
@@ -386,6 +400,7 @@ export const zh_CN: EnTranslations = {
       "close": "关闭每日奖励",
       "loading": "正在加载每日奖励...",
       "error": "无法加载每日奖励。",
+      "disabled": "每日奖励目前已停用。我们将在 Discord 频道中公布此功能的更新。",
       "intro": "在已验证的钱包中持有足够的 WOC 即可解锁每日奖励。通过每日一次转盘和轮换任务赚取积分，然后攀登每日排行榜，赢取奖池分成。",
       "disclaimer": "WOC 价格可能快速波动。我们建议持有高于 $20 USD 最低要求的数量，避免正常价格波动导致奖励被锁定。这不是财务建议。",
       "prize": "奖池",
@@ -640,7 +655,8 @@ export const zh_CN: EnTranslations = {
         "staff": "法杖",
         "wand": "魔杖",
         "bow": "弓",
-        "crossbow": "弩"
+        "crossbow": "弩",
+        "polearm": "长柄武器"
       },
       "badge": {
         "flagship": "旗舰",
@@ -682,7 +698,7 @@ export const zh_CN: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "优惠 20%",
+      "railWocDiscount": "优惠 {percent}%",
       "railWocUnavailable": "WOC 定价暂时不可用。",
       "railNativeUnavailable": "SOL/WOC 不可用",
       "amountLabel": "数量",
@@ -735,6 +751,12 @@ export const zh_CN: EnTranslations = {
       "count": "（{count}）",
       "collapseHint": "收起任务追踪器",
       "expandHint": "展开任务追踪器"
+    },
+    "interfaceTabs": {
+      "general": "通用",
+      "frames": "头像框",
+      "chat": "聊天",
+      "combat": "战斗"
     },
     "chatTimestamps": {
       "show": "显示聊天时间戳",
@@ -1117,6 +1139,7 @@ export const zh_CN: EnTranslations = {
       "showWalletOnPlayerCard": "在玩家卡片显示钱包",
       "showDevBadges": "显示开发者徽章",
       "showOwnNameplate": "显示我的姓名板",
+      "showPlayerNameplates": "显示玩家姓名板",
       "uiScale": "界面缩放",
       "playerFrameScale": "玩家框缩放",
       "targetFrameScale": "目标框缩放",
@@ -1126,6 +1149,7 @@ export const zh_CN: EnTranslations = {
       "walkByAutoloot": "路过自动拾取",
       "groundReticle": "地面瞄准指示圈",
       "mouseoverCast": "队伍头像上鼠标悬停施法",
+      "stickyTarget": "点击地面时保留目标",
       "showItemLevel": "显示物品等级",
       "itemLevelLine": "物品等级 {level}",
       "itemScoreLine": "评分 {score}",
@@ -1262,6 +1286,10 @@ export const zh_CN: EnTranslations = {
         "fiestaComplete": "完成嘉年华",
         "fiestaWin": "嘉年华胜利"
       }
+    },
+    "charSheet": {
+      "offense": "攻击",
+      "defense": "防御"
     },
     "statInfo": {
       "fromYour": "来自你的 {value} 点{stat}：",
@@ -1521,8 +1549,9 @@ export const zh_CN: EnTranslations = {
     "corpseHarvest": {
       "title": "采集",
       "harvestButton": "采集",
-      "harvestButtonTooltip": "采集：从这具尸体上获取制作材料（兽皮、尖牙、丝线等类似部位），与战利品分开。任何人都可以采集，但每具尸体只能被一名玩家采集。",
+      "harvestTooltip": "采集勾选的部位。每具尸体只能被采集一次，先到先得。不会拾取战利品。",
       "concentrateHint": "选择的部位越少，每个部位的品质越高。",
+      "nothingSelectedYields": "你选择的部位都无法从这具尸体上采集。",
       "alreadyHarvested": "这具尸体已经被采集过了。",
       "componentAria": "采集{component}",
       "components": {
@@ -1533,12 +1562,16 @@ export const zh_CN: EnTranslations = {
         "gills": "鱼鳃",
         "claw": "爪",
         "horn": "角",
-        "tusk": "獠牙"
+        "tusk": "獠牙",
+        "meat": "兽肉",
+        "cloth": "布"
       }
     },
     "townFocus": {
       "title": "城镇专注",
       "hint": "专注点会在每种材料的基础产出上叠加加成。未专注的材料保持基础产出不变。",
+      "tierHint": "每在一种材料上投入{points}点专注，其采集品阶就会提升一阶，最多提升{steps}阶；不足{points}点时仍会提高产出。",
+      "townOnlyHint": "专注只能在城镇中调整。",
       "budgetLabel": "剩余点数：{remaining} / {budget}",
       "saveButton": "保存专注",
       "notInTownHint": "你必须在城镇中才能设置专注。",
@@ -1597,6 +1630,10 @@ export const zh_CN: EnTranslations = {
       "dragEquipHint": "拖到角色身上以装备",
       "dragDestroyHint": "拖出到世界中以销毁",
       "reorderNeedsRecent": "清除筛选并按“最近”排序即可整理背包",
+      "itemAriaInstanced": "{item}，数量 {count}，带工匠印记的物品",
+      "itemAriaEnchanted": "{item}，数量 {count}，已附魔的副本",
+      "itemAriaBound": "{item}，数量 {count}，已绑定的副本",
+      "itemAriaMasterwork": "{item}，数量 {count}，杰作",
       "filterGroupAria": "按类别筛选背包",
       "filterAll": "全部",
       "filterWeapon": "武器",
@@ -1763,7 +1800,9 @@ export const zh_CN: EnTranslations = {
     },
     "loot": {
       "chestTitle": "宝箱",
-      "takeAllTooltip": "全部拾取：收取此战利品窗口中的所有金币和物品。"
+      "takeLootButton": "拾取战利品",
+      "takeLootTooltip": "收取金币和掉落的物品。不会用掉采集机会。",
+      "unifiedPressHint": "按一次互动键即可同时拾取战利品并按城镇专注进行采集。"
     },
     "spellbook": {
       "addToBarAria": "将{name}添加到动作条",
@@ -1771,7 +1810,8 @@ export const zh_CN: EnTranslations = {
     },
     "nameplate": {
       "mobLevel": "{level}",
-      "mobEliteLevel": "{level}+"
+      "mobEliteLevel": "{level}+",
+      "afkTag": "暂离"
     },
     "mobTooltip": {
       "levelFamily": "等级 {level} {family}",
@@ -1821,7 +1861,19 @@ export const zh_CN: EnTranslations = {
       "requiresLevel": "需要等级 {level}",
       "riftTier": "{tier}级裂隙物品",
       "riftUpgrade": "裂隙强化 {level}/{max}",
-      "riftSockets": "裂隙宝石 {used}/{total}"
+      "riftSockets": "裂隙宝石 {used}/{total}",
+      "statEnchanted": "+{value} {stat}（附魔）",
+      "enchantedFallback": "已附魔"
+    },
+    "materialHint": {
+      "arcaneDust": "附魔材料。分解普通和优秀品质的装备可得。",
+      "arcaneEssence": "附魔材料。分解精良品质的装备可得。",
+      "arcaneShard": "附魔材料。分解史诗和传说品质的装备可得。",
+      "resonantThread": "附魔材料。分解精良及以上品质的布甲可得。",
+      "resonantHide": "附魔材料。分解精良及以上品质的皮甲可得。",
+      "resonantLinks": "附魔材料。分解精良及以上品质的锁甲可得。",
+      "resonantSteel": "附魔材料。分解精良及以上品质的近战武器可得。",
+      "resonantTimber": "附魔材料。分解精良及以上品质的法杖、魔杖、弓和弩可得。"
     },
     "discord": {
       "title": "Discord",
@@ -1913,6 +1965,7 @@ export const zh_CN: EnTranslations = {
         "legend": "传奇",
         "shill": "布道者"
       },
+      "roleTagChatTitle": "已验证的服务器身份组: {role}",
       "guildMember": "已验证成员",
       "notMember": "尚未加入服务器",
       "joinCta": "加入 Discord",
@@ -2037,6 +2090,7 @@ export const zh_CN: EnTranslations = {
       "removeParcelAria": "从信件中移除 {item}",
       "parcelQtyDecreaseAria": "少寄一个{item}",
       "parcelQtyIncreaseAria": "多寄一个{item}",
+      "parcelQtyAria": "要寄出的{item}数量",
       "sendButton": "寄出信件",
       "postageNote": "邮资：{amount}。渡鸦飞行约 {seconds} 秒。",
       "arrivedBanner": "渡鸦已降落：来自 {name} 的邮件。",
@@ -2059,6 +2113,13 @@ export const zh_CN: EnTranslations = {
         "letterGone": "那封信已不在你的邮箱里。",
         "takeParcelsFirst": "请先取出包裹再丢弃信件。"
       }
+    },
+    "marketIndicator": {
+      "aria": "世界市场收益或物品待领取",
+      "tip": "销售收益或退回物品正在商人处等待你领取。"
+    },
+    "noticeboard": {
+      "empty": "看起来没有张贴任何内容。"
     },
     "bank": {
       "title": "银行",
@@ -2172,7 +2233,23 @@ export const zh_CN: EnTranslations = {
       "blockSearchPlaceholder": "玩家名称",
       "blockAction": "屏蔽",
       "nowBlocking": "已屏蔽 {name}。",
-      "stopBlockingTitle": "取消对 {name} 的屏蔽"
+      "stopBlockingTitle": "取消对 {name} 的屏蔽",
+      "onlineHeader": "在线 ({n})",
+      "offlineHeader": "离线 ({n})",
+      "hideOffline": "隐藏离线",
+      "hideOfflineTitle": "隐藏离线公会成员",
+      "billboard": {
+        "label": "公会公告板",
+        "empty": "公告板上还没有内容。",
+        "setBy": "由 {name} 设置",
+        "save": "保存",
+        "placeholder": "给公会写一条消息",
+        "inputLabel": "公会公告板消息",
+        "result": {
+          "set": "公会公告板已更新。",
+          "notOfficer": "只有官员和会长可以编辑公告板。"
+        }
+      }
     },
     "gathering": {
       "title": "采集",
@@ -2183,7 +2260,71 @@ export const zh_CN: EnTranslations = {
       "notReady": "这个资源节点尚未为你重新生成。",
       "gatherLine": "你采集了：{name}。",
       "gatherLineQty": "你采集了：{name} x{qty}。",
-      "catchLine": "你钓上了：{name}"
+      "harvestLine": "你剥取了：{name}。",
+      "harvestLineQty": "你剥取了：{name} x{qty}。",
+      "harvestSpecimenLine": "你还获得了{name}。",
+      "catchLine": "你钓上了：{name}",
+      "biteLine": "有东西上钩了！",
+      "gotAwayLine": "它跑掉了。",
+      "nodeName": {
+        "ore": "矿脉",
+        "wood": "林木",
+        "herb": "草药丛"
+      },
+      "tierRequired": {
+        "mining": "需要{tier}阶采矿镐",
+        "logging": "需要{tier}阶伐木斧",
+        "herbalism": "需要{tier}阶草药镰"
+      },
+      "requiresTool": {
+        "mining": "需要采矿镐",
+        "logging": "需要伐木斧",
+        "herbalism": "需要草药镰"
+      },
+      "toolTierUnmet": {
+        "mining": "你需要{tier}阶采矿镐才能开采这条矿脉。",
+        "logging": "你需要{tier}阶伐木斧才能砍伐这片林木。",
+        "herbalism": "你需要{tier}阶草药镰才能采集这片草药丛。"
+      },
+      "toolRequired": {
+        "mining": "你需要采矿镐才能开采这条矿脉。",
+        "logging": "你需要伐木斧才能砍伐这片林木。",
+        "herbalism": "你需要草药镰才能采集这片草药丛。",
+        "fishing": "你需要钓竿才能抛竿垂钓。"
+      },
+      "noNodeNearby": {
+        "mining": "附近没有矿脉可供开采。",
+        "logging": "附近没有林木可供砍伐。",
+        "herbalism": "附近没有草药丛可供采集。"
+      },
+      "toolTierUnmetCorpse": "你需要{tier}阶采集工具才能取得最上等的材料。",
+      "toolTooltip": {
+        "kind": {
+          "mining": "采矿工具（{tier}阶）",
+          "logging": "伐木工具（{tier}阶）",
+          "herbalism": "草药工具（{tier}阶）",
+          "fishing": "钓鱼竿（{tier}阶）"
+        },
+        "unlocks": {
+          "mining": "开采最高{tier}阶的矿脉所需。",
+          "logging": "砍伐最高{tier}阶的林木所需。",
+          "herbalism": "采集最高{tier}阶的草药丛所需。"
+        },
+        "use": {
+          "mining": "使用：开采附近的矿脉。",
+          "logging": "使用：砍伐附近的林木。",
+          "herbalism": "使用：采集附近的草药丛。"
+        },
+        "speed": "在低于{tier}阶的节点采集速度更快。",
+        "rodRequired": "钓鱼所需。",
+        "rodBite": "鱼上钩最多可提前{seconds}秒。",
+        "rodReel": "收线时限延长{seconds}秒。",
+        "rodBand": "钓鱼技能达到{skill}后可解锁更丰富的渔获。"
+      },
+      "downgradeMark": "背包已满：这份收获未能留下采集者的印记。",
+      "downgradeFind": "背包已满：一件完美的收获溜走了。",
+      "stateReady": "可采集",
+      "stateCooldown": "恢复中"
     },
     "archetypeTitle": {
       "label": "称号",
@@ -2195,7 +2336,7 @@ export const zh_CN: EnTranslations = {
       "alchemy+cooking": "药剂师",
       "cooking+leatherworking": "捕兽人",
       "leatherworking+tailoring": "制装师",
-      "tailoring+inscription": "织法师",
+      "tailoring+inscription": "织墨师",
       "inscription+enchanting": "秘法师",
       "enchanting+jewelcrafting": "缚晶师",
       "jewelcrafting+weaponcrafting": "铸刃师",
@@ -2213,6 +2354,49 @@ export const zh_CN: EnTranslations = {
       "enchanting": "附魔",
       "tailoring": "裁缝",
       "leatherworking": "制皮"
+    },
+    "enchantName": {
+      "enchant_weapon_might": "武器附魔 - 威力",
+      "enchant_weapon_intellect": "武器附魔 - 法术强度",
+      "enchant_helmet_fortitude": "头盔附魔 - 坚韧",
+      "enchant_neck_spirit": "项链附魔 - 精神",
+      "enchant_shoulder_agility": "肩甲附魔 - 敏捷",
+      "enchant_chest_stamina": "胸甲附魔 - 耐力",
+      "enchant_waist_stamina": "腰带附魔 - 耐力",
+      "enchant_legs_stamina": "腿甲附魔 - 耐力",
+      "enchant_gloves_agility": "护手附魔 - 敏捷",
+      "enchant_gloves_intellect": "护手附魔 - 法术强度",
+      "enchant_feet_agility": "长靴附魔 - 敏捷",
+      "enchant_ring_spirit": "戒指附魔 - 精神",
+      "enchant_weapon_agility": "武器附魔 - 敏捷",
+      "enchant_helmet_intellect": "头盔附魔 - 智力",
+      "enchant_helmet_armor": "头盔附魔 - 加固",
+      "enchant_neck_intellect": "项链附魔 - 智力",
+      "enchant_neck_agility": "项链附魔 - 敏捷",
+      "enchant_shoulder_strength": "肩甲附魔 - 力量",
+      "enchant_shoulder_intellect": "肩甲附魔 - 智力",
+      "enchant_chest_spirit": "胸甲附魔 - 精神",
+      "enchant_chest_armor": "胸甲附魔 - 加固",
+      "enchant_waist_strength": "腰带附魔 - 力量",
+      "enchant_waist_agility": "腰带附魔 - 敏捷",
+      "enchant_legs_intellect": "腿甲附魔 - 智力",
+      "enchant_gloves_strength": "护手附魔 - 力量",
+      "enchant_feet_strength": "长靴附魔 - 力量",
+      "enchant_feet_stamina": "长靴附魔 - 耐力",
+      "enchant_ring_strength": "戒指附魔 - 力量",
+      "enchant_ring_agility": "戒指附魔 - 敏捷",
+      "enchant_ring_intellect": "戒指附魔 - 智力",
+      "enchant_weapon_greater_might": "武器附魔 - 强效威力",
+      "enchant_weapon_greater_spellpower": "武器附魔 - 强效法术强度",
+      "enchant_helmet_greater_fortitude": "头盔附魔 - 强效坚韧",
+      "enchant_chest_greater_stamina": "胸甲附魔 - 强效耐力",
+      "enchant_legs_greater_stamina": "腿甲附魔 - 强效耐力",
+      "enchant_gloves_greater_agility": "护手附魔 - 强效敏捷",
+      "enchant_weapon_runed_edge": "武器附魔 - 符文利刃",
+      "enchant_weapon_runed_focus": "武器附魔 - 符文印记",
+      "enchant_chest_runeweave": "胸甲附魔 - 符文织纹",
+      "enchant_legs_runed_hide": "腿甲附魔 - 符文兽皮",
+      "enchant_helmet_runed_links": "头盔附魔 - 符文锁环"
     },
     "professions": {
       "title": "专业",
@@ -2233,7 +2417,7 @@ export const zh_CN: EnTranslations = {
       "tierPipAria": "阶级 {tier}",
       "nextUnlockTier": "距离下一阶级还差 {points} 点：打造大师之作的几率将提升",
       "nextUnlockSpecialized": "距离专精还差 {points} 点：材料消耗将降低",
-      "nextUnlockMax": "已达技能上限",
+      "nextUnlockMastered": "已精通，暂时如此",
       "perkSpecializedLine": "{craft}：专精，材料消耗 -{pct}%",
       "perkSpecializedAt": "技能达到 {threshold} 后专精",
       "switchCost": "下次切换原型需要 {cost} 点补偿",
@@ -2241,6 +2425,7 @@ export const zh_CN: EnTranslations = {
       "tutorialLine": "将任意一门技艺提升到技能 {target}，即可解锁你的第一个阶级。",
       "ctaHeader": "下一步",
       "ctaRaise": "继续提升{craft}：距离下一阶级还差 {points} 点。",
+      "ctaRaiseSpecialized": "继续提升{craft}：距离专精还差 {points} 点，材料消耗将降低。",
       "ctaStart": "使用任意专业进行制作或采集，即可开始。",
       "unattunedIdentity": "你尚未调谐任何原型。提升你的技艺并完成一次调谐，以选择你的组合。",
       "nudgeNearTier": "{craft}：距离下一阶级还差 {points} 点",
@@ -2259,6 +2444,7 @@ export const zh_CN: EnTranslations = {
       "empty": "尚无已知配方。",
       "resultAria": "制作{name}",
       "craftedToast": "已制作:{name}",
+      "craftedToastQty": "已制作:{name} x{qty}",
       "insufficientMaterials": "你没有足够的材料。",
       "unknownRecipe": "该配方不存在。",
       "comboRequirementUnmet": "你没有达到该配方所需组合的两项制造技能等级。",
@@ -2274,6 +2460,7 @@ export const zh_CN: EnTranslations = {
       "pairOptionLabel": "{pair}（{craftA} + {craftB}）",
       "attunementPreview": "结果：获得{title}称号；{majorA}和{majorB}成为无上限主修技艺；{hobby}成为上限为稀有品质的爱好技艺；所有其他技能知识都会保留，但休眠时上限为普通品质。",
       "hobbyPreview": "结果：{hobby}成为上限为稀有品质的爱好技艺。两项主修技艺和所有已保留的技能数值保持不变。",
+      "attunementReturnCost": "若你离开这个组合，日后想要重归需要完成 {cost} 项补偿任务。",
       "identity": {
         "title": "制作身份",
         "syncing": "正在等待服务器发送你的制作身份。",
@@ -2310,18 +2497,100 @@ export const zh_CN: EnTranslations = {
       },
       "throttled": "你制作得太快了，请稍等片刻后再试。",
       "recipeNotLearned": "你还没有学会这个配方。",
+      "noBagSpace": "背包空间不足，无法存放制作的物品。",
       "skillReqLine": "需要{craft} {skill}",
       "difficultyFull": "完整技能成长",
       "difficultyReduced": "技能成长减少",
+      "difficultyMinimal": "微量技能成长",
       "difficultyNone": "无技能成长",
       "stationBadge": "制作站",
       "stationOutOfRangeNamed": "前往{station}即可制作该物品。",
+      "learnMoreAtStation": "{station}的{master}可以教你更多{craft}配方。",
       "masterworkToast": "杰作！{name}",
       "masterworkZoneLine": "{crafter}制作出了杰作{name}！",
       "tierUpToast": "{craft}提升至阶级 {tier}！",
+      "trendNudge": "你的双手正倾向于{archetype}之道。其调谐任务在{master}处等候。",
+      "trendNudgeNoMaster": "你的双手正倾向于{archetype}之道。去寻找一位工艺大师来踏上此道吧。",
+      "attunedZoneLine": "{name}已调谐为{archetype}！",
+      "attunedBanner": "已调谐：{title}",
+      "tierTutorial": {
+        "title": "你的第一个阶级",
+        "tierCap": "一门技艺在技能 {skill} 时达到第一个阶级，每提升一个阶级都会改善其制作能力。但只有当某门技艺成为你两门主修之一时，才能制作超越稀有品质的作品。",
+        "radar": "你的专业构成一个环轮。调谐到相邻的一对，这两门技艺便成为无上限的主修；环轮对面的一门技艺成为上限为稀有的爱好；其余技艺则进入休眠：知识仍会保留，但在你重新拾起之前上限为普通。",
+        "masters": "各城镇的工艺大师提供调谐任务。准备好后去拜访他们，选择你的组合。你所学到的一切都不会失去。",
+        "dismiss": "明白了"
+      },
       "makersMark": "制作者：{name}",
+      "gatheredBy": "采集者：{name}",
       "masterworkSeal": "杰作",
-      "enchantedLine": "已附魔"
+      "commissionToggle": "委托制品",
+      "commissionToggleHint": "将绑定给交易中第一个收到它的角色。",
+      "commissionUnbound": "委托制品：将绑定给第一位收货人",
+      "commissionBound": "委托制品：已绑定给收货人"
+    },
+    "itemMenu": {
+      "use": "使用",
+      "equip": "装备",
+      "disenchant": "分解",
+      "salvage": "拆解",
+      "applyEnchant": "施加附魔"
+    },
+    "enchanting": {
+      "disenchantedLine": "你分解了{item}。",
+      "disenchantedYield": "你将{item}分解为{material}。",
+      "disenchantedYieldQty": "你将{item}分解为{material} x{qty}。",
+      "disenchantedAlso": "你还获得了{material}。",
+      "disenchantedAlsoQty": "你还获得了{material} x{qty}。",
+      "salvagedLine": "你拆解了{item}。",
+      "salvagedYield": "你将{item}拆解为{material}。",
+      "salvagedYieldQty": "你将{item}拆解为{material} x{qty}。",
+      "enchantAppliedLine": "你用{enchant}为{item}附魔。",
+      "notHeld": "你没有那件物品。",
+      "notDisenchantable": "你无法分解那件物品。",
+      "notSalvageable": "你无法拆解那件物品。",
+      "disenchantThrottled": "你分解得太快了，请稍等片刻后再试。",
+      "salvageThrottled": "你拆解得太快了，请稍等片刻后再试。",
+      "enchantThrottled": "你附魔得太快了，请稍等片刻后再试。",
+      "enchantWrongSlot": "该附魔无法施加于那件物品。",
+      "enchantUnknown": "该附魔不存在。",
+      "enchantInsufficient": "你没有该附魔所需的材料。",
+      "disenchantNoSpace": "背包空间不足，无法存放奥术材料。",
+      "salvageNoSpace": "背包空间不足，无法存放拆解出的材料。",
+      "enchantNoSpace": "背包空间不足，无法存放附魔后的物品。",
+      "disenchantConfirmTitle": "分解{item}？",
+      "disenchantConfirmBody": "这会摧毁{item}并产出奥术材料。此操作无法撤销。",
+      "disenchantConfirmBodySpecial": "这会摧毁一件特殊的{item}（署名、杰作或已附魔）并产出奥术材料。此操作无法撤销。",
+      "salvageConfirmTitle": "拆解{item}？",
+      "salvageConfirmBody": "这会摧毁{item}并产出制作材料。此操作无法撤销。",
+      "salvageConfirmBodySpecial": "这会摧毁一件特殊的{item}（署名、杰作或已附魔）并产出制作材料。此操作无法撤销。",
+      "pickerTitle": "施加附魔",
+      "targetTitle": "选择要附魔的物品",
+      "noEnchants": "没有附魔会用到这种材料。",
+      "noTargets": "没有可供附魔的物品。",
+      "wornTag": "已装备（{slot}）",
+      "tier": {
+        "base": "基础附魔",
+        "runed": "符文附魔",
+        "greater": "强效附魔"
+      },
+      "yieldHeader": "预计产出材料：",
+      "yieldLineExact": "{item} {count} 个",
+      "yieldLineRange": "{item} {min} 至 {max} 个",
+      "alreadyEnchanted": "那件物品已经附魔。",
+      "sameEnchant": "那件物品已经拥有该附魔。",
+      "replaceTag": "替换{enchant}",
+      "sameEnchantTag": "已施加",
+      "plainTag": "未附魔",
+      "replaceConfirmTitle": "替换{item}上的附魔？",
+      "replaceConfirmBody": "这会将{item}上的{old}替换为{new}。",
+      "replaceConfirmNoRefund": "旧附魔将被摧毁，材料不予退还。此操作无法撤销。",
+      "replaceConfirmKeeps": "保留：{kept}",
+      "replaceConfirmKeepsSigner": "制作者印记",
+      "replaceConfirmKeepsMasterwork": "杰作加成",
+      "replaceConfirmKeepsBond": "委托绑定",
+      "replaceConfirmCost": "费用：{cost}",
+      "replaceConfirmCostItem": "{name} {count} 个",
+      "replaceConfirmAccept": "替换"
     },
     "training": {
       "title": "训练：{name}",
@@ -2331,8 +2600,10 @@ export const zh_CN: EnTranslations = {
       "stateKnown": "已学会",
       "stateTeachable": "可学习",
       "stateLocked": "未解锁",
+      "statePending": "学习中",
       "requirement": "需要{craft}达到 {skill} 后传授",
       "trainAria": "花费{fee}学习{name}",
+      "pendingAria": "正在学习{name}",
       "dialogOption": "训练",
       "dialogOptionAria": "向{name}学习配方",
       "learned": "已学会配方：{recipe}",
@@ -2341,6 +2612,26 @@ export const zh_CN: EnTranslations = {
       "notTaughtHere": "这里不传授该配方。",
       "alreadyKnown": "你已经学会了该配方。",
       "outOfRange": "你必须站在对应的工作台旁才能训练。"
+    },
+    "unbind": {
+      "title": "解绑：{name}",
+      "close": "关闭解绑",
+      "intro": "大师可以收取费用，解除委托制品的绑定。",
+      "empty": "你没有已绑定的委托制品。",
+      "rowSub": "解除绑定；该制品会在下次交易时重新绑定。",
+      "unbindAria": "花费{fee}为{name}解绑",
+      "dialogOption": "解绑",
+      "dialogOptionAria": "请{name}为委托制品解绑",
+      "confirmTitle": "解绑委托制品",
+      "confirmBody": "花费{fee}为{name}解绑？",
+      "confirmOk": "解绑",
+      "confirmCancel": "取消",
+      "unbound": "已花费{fee}为{name}解绑。它会在下次交易时重新绑定。",
+      "notEligible": "该物品无法解绑。",
+      "notBound": "该物品未绑定。",
+      "cannotAfford": "你付不起解绑费用。",
+      "outOfRange": "你必须站在工作台旁才能解绑。",
+      "noSpace": "背包空间不足，无法存放解绑后的物品。"
     },
     "finder": {
       "title": "地下城查找器",
@@ -2428,7 +2719,7 @@ export const zh_CN: EnTranslations = {
         "lunar_tide": "月潮（周期性范围伤害）",
         "enrage": "低血量时狂怒",
         "shuddering_stomp": "震颤践踏（范围眩晕）",
-        "necrotic_shockwave": "死灵冲击波（高额范围伤害）",
+        "grave_inferno": "墓场炼狱（引导火焰AoE，保持分散）",
         "grave_cleaver": "掘墓劈砍（正面顺劈）",
         "shadow_nova": "暗影新星（范围爆发）",
         "profane_mending": "亵渎治疗（治疗其盟友）",
@@ -2507,6 +2798,14 @@ export const zh_CN: EnTranslations = {
       "lbEmpty": "暂无上榜的编年史家。",
       "broadcastsLabel": "与公会和好友分享功绩达成",
       "titledName": "{name}【{title}】"
+    },
+    "continentMap": {
+      "title": "世界地图",
+      "summary": "世界地图。选择一个地区以打开其地图。",
+      "toWorld": "世界地图",
+      "toZone": "Zone map",
+      "toggleAria": "在世界地图和地区地图之间切换",
+      "levels": "等级 {min} 到 {max}"
     }
   },
   "lb": {
@@ -2648,9 +2947,6 @@ export const zh_CN: EnTranslations = {
     },
     "wallet": {
       "handoff_invalid": "钱包授权已过期或无法验证。请重试。"
-    },
-    "welcome": {
-      "invalid_input": "输入无效。"
     }
   },
   "guide": {
@@ -3323,7 +3619,7 @@ export const zh_CN: EnTranslations = {
       "hauntPlaceNotes": "绞湖镇蜷缩在自己的灯笼之间。鸦门是这片森林阴森的正门；寡妇棘丛被蛛网织得密不透风；吊影林地与哀石礼拜堂承载着森林最古老的悲恸；而猎手林隙属于至今仍在那里狩猎的东西。",
       "galePlaceNotes": "烛港迎风而立。风道是进来的悬崖之路；啸风丘陵在狂风下光秃起伏；老灯塔燃烧的岁月已无人能说清；断崖直落入海；沉船滩让人不敢小看这段海岸；而镜湖是整个国度里唯一静止的东西。",
       "junglePlaceNotes": "漂流港在海滩上燃着篝火。缠木隘口是大河汇入绿墙之处；棕榈长滩沿着浪缘铺展，洁白而温暖；翠绿丛林与垂藤林吞没了内陆；蓝宝石潟湖清澈而幽深地发着光；而沉没神像则在水下静静注视。",
-      "gardenPlaceNotes": "篱苑镇候在花园之门前。雕像步道有它沉默的伙伴相随；野蔷薇丛早已长出了花圃之外；花瓣池终年漂着粉色的花瓣；大迷宫会为每一位客人重新排布自己的礼数；而喷泉庭院仍在花园中心流淌着清泉。",
+      "gardenPlaceNotes": "篱苑镇候在花园之门前。花坛步道绽放着修剪齐整的色彩；晨曦堡在新筑的城墙后操练骑士；花瓣池终年漂着粉色的花瓣；老磨坊在自己的环形花坛上转动；大迷宫会为每一位客人重新排布自己的礼数，拱门有绿叶狐狸守望；北望哨守着出口之路；睡莲池在这一切之外静卧；而喷泉庭院仍在花园中心流淌着清泉。",
       "gladeTitle": "宁静一隅：明木林地",
       "gladeBody": "the Vale 里的故事并不全都关于亡者。北方有一片阳光照耀的林地，名为 Brightwood Glade，自有它更为温和的节奏：尽是安静的小径，以及枝叶下斑驳的光影。它是你所追寻的踪迹之外一段柔和的对照，若道路给你余裕闲逛，很值得去看一看。",
       "worldBossTitle": "当山峰苏醒：世界首领",
@@ -3397,7 +3693,6 @@ export const zh_CN: EnTranslations = {
       "bastionBody": "一座沉入沼泽、被淹没守军和不断上涨的潮水所占据的失落要塞。",
       "templeBody": "沼泽小路旁一座沉没的圣殿，是为好奇者与有备而来者准备的岔路。",
       "sanctumBody": "棘峰的黑暗核心，邪教漫长的图谋在此达到可怖的顶点。",
-      "orkadiaBody": "一座盘踞在德雷克兰黑色火山岩上的残暴兽人战营，开阔的战场由剧毒的绿色战火照亮。杀穿血牙兵卒与铁皮劫掠者，直取盘踞在头骨高台上的督军格罗莫克·碎颅者。",
       "wildheartBody": "一座被暖雨浸透的丛林火山口，两条高起的猎径环绕着碧色深潭。穿过兽巢与先祖遗迹，在仪式金字塔上迎战祖尔加。",
       "raidName": "终局团队副本",
       "raidBody": "在一扇封印的皇家大门之后，等待着一场十人试炼：一场多阶段的战斗，以及一股不死之力，需要整支团队齐心协力将其镇压。先赢得入场资格，再带上九位好友。",
@@ -3641,38 +3936,311 @@ export const zh_CN: EnTranslations = {
     },
     "professions": {
       "intro": "除了战斗和任务之外，这个世界还会奖励你耕耘土地与执掌熔炉：采集原材料，通过十种制作行业将其打造成装备与货物，并在这些行业所代表的十种命途之一中确立自己的身份。",
-      "gatherTitle": "采集：采矿、伐木与草药学",
-      "gatherIntro": "三种采集行业让你从世界中直接获取原材料：采矿从矿脉中开采矿石与石料，伐木从林地中砍伐木材，草药学采集野生生长的草药与植物。三者分别计算进度，从事其中一项绝不会拖慢你在另一项上的进展。初来乍到？东溪镇的工头奥德尔有一件简短的差事《一技之长》，会带你走完第一次采集。",
-      "gatherWhatTitle": "资源节点",
-      "gatherWhatBody": "矿脉、林地与药草丛作为可见、无主的地物分布在溪谷与湿地各处。走近并与之互动即可采集其中的资源。采集过一个节点后，它需要一段时间才能恢复，供你本人再次采集，但这从不会阻挡其他玩家：其他人可以在此期间采集同一个节点。",
-      "gatherProficiencyTitle": "熟练度",
-      "gatherProficiencyBody": "每次成功采集都会提升你在该采集行业的熟练度，而你的角色面板会分别记录每一门行业。多加练习绝不会损害你的进度，只会不断为它添砖加瓦。",
-      "gatherToolsTitle": "行业工具",
-      "gatherToolsBody": "商人出售各采集行业的基础工具，更好的工具则可以制作出来。如今采集一个节点并不需要任何工具：工具是为将来更丰富的节点打下的基础，届时更高级的镐、斧和镰刀将成为采集它们的门道。",
       "harvestTitle": "收获狩猎本身",
       "harvestBody": "采集并不止步于资源节点。有些被击杀的野兽也可以从尸体上采集出材料：兽皮、尖牙、丝线，以及更稀奇的东西，与它的普通战利品一并直接取自尸体。每具尸体只容一位收获者：谁先采集，就归谁所有。每次如何取舍也由你决定：把尸体能给的全部取走，或专注于单一一种材料，换取它更精细的品级。任何角色都可以采集，无需行业也无需训练，而一件格外精良的材料上，甚至会带着采集者的名字。",
       "focusTitle": "城镇专注",
       "focusBody": "每座主城都为过路的采集者备有一块城镇专注面板：站在城镇里，从小地图旁打开它，把一小笔专注点数投向你在意的那些材料种类。此后每具尸体上产出的受专注材料都会精细一个品级、也略微丰厚一些；你的分配会跟随你的角色走遍各地，而且日后任何一次回到城镇，都可以免费重新调整。",
-      "craftTitle": "十大制作行业",
-      "craftIntro": "十种制作行业将采集到的材料转化为成品装备与物品：制甲、制械与珠宝加工将原材料塑形为可穿戴装备；炼金术与工程学依靠反复试验；烹饪、铭文与附魔各自作用于其他行业的产出；裁缝与制皮则依照精确的图样进行。它们共同构成一个轮环，每种行业都与两个邻居相邻，并与另一种行业相对。",
-      "craftRingTitle": "专精之轮",
-      "craftRingBody": "十种行业排列在一个固定的轮环上，行业在轮环上的位置很重要：相邻的行业彼此之间的共通之处比处于对面的行业更多。专注于一种行业应当让人感觉像是加入了一个相关行业组成的家族，而不是选择了一项孤立的技能。",
-      "craftRecipesTitle": "配方与材料",
-      "craftRecipesBody": "每个配方都需要你采集或购买的特定材料。最简单的配方只需要普通材料，从一开始就能制作，因此你拿起一门行业的那一刻就能着手打造。配方列表仍在不断充实：少数行业还在等待它们的第一批配方，随着这些行业的成长，更多配方会陆续到来。",
       "craftHowTitle": "制作窗口",
-      "craftHowBody": "打开制作窗口（默认按键 T），即可查看你已知的每个配方、各自所需的材料，以及你手头现有的材料；材料齐备时，点击一下即可完成制作。普通配方可以在世界的任何地方制作。少数进阶配方，包括高阶工具和稀有的施法者护甲，则要求你站在高守哨站的制作枢纽处。",
       "craftMasteryTitle": "技能与精通",
       "craftMasteryBody": "成功制作会提升你在该行业的技能，而技能绝不会把某个行业的配方锁起来：只要你知道一个配方并持有它的材料，你就可以尝试制作。每个配方产出的都是它所承诺的那件成品，而熟练的手艺偶尔能打造出一件杰作：同样的成品，做工更精，并蕴含一丝额外的力量。唯一的例外是组合配方：只有调谐到连接这两门行业的原型、并在两门行业都证明过技艺的制作者，才能使用它们。",
-      "craftComboTitle": "组合配方",
-      "craftComboBody": "除了单一行业自身的配方列表之外，这个轮环还支持需要同时调用两个相邻行业的组合配方，用以奖励那些在轮环上投入了相邻行业、而非只专精孤立一项的角色。制作者必须自己同时掌握这两门行业；搭档的技能无法替代其中任何一半。",
-      "archetypeTitle": "十大命途",
-      "archetypeIntro": "十种行业各自也代表一种命途，一种超越单纯从事该行业本身的更广阔身份。你的当前命途一次只能有一个，而非一份清单：你只承载一个命途，但如果愿意，之后可以更改。",
       "archetypeChooseTitle": "选择你的命途",
       "archetypeChooseBody": "宣告命途是一个剧情时刻：一个正式接纳你进入该身份的任务。在你宣告之前，每种行业的技能都能提升到稀有层级。一旦你选定一对行业，这两门行业便完全放开；轮盘对侧的一门行业会作为爱好留在你身边，仍能练到稀有层级；而在你保有这一身份期间，其余所有行业都停留在普通层级。",
-      "archetypeSwitchTitle": "回心转意",
       "archetypeSwitchBody": "宣告也不会是一纸终身判决。按照规划，在改投新的命途之前，你需要先向旧行业完成一次可重复的赎罪，而每转换一次，下一次赎罪的代价都会更沉，因此这个选择始终有分量，而非毫无代价。与宣告本身一样，它也仍在路上。",
-      "archetypeIdentityTitle": "你的命途意味着什么",
-      "archetypeIdentityBody": "你当前的命途，是关于你的角色在这个世界中是谁的一种宣告，会体现在他人与世界如何称呼你之中。它所附带的具体奖励与认可仍在完善之中；请随着系统的完善持续关注。"
+      "whatHeading": "剑之外的一门手艺",
+      "whatBody": "专业是这个世界的营生：四种采集行业从大地中获取原料，十种制作行业把它们变成装备、饭菜、药水与工具。万物环环相扣：你挖出的矿石成为刀剑，刀剑接受附魔，而附魔又需要从旧装备中分解出的粉尘。这里没有专业数量限制：每个角色都能同时修习全部八种已有内容的制作行业与全部四种采集行业，唯一的排他选择是你最终宣誓的命途，而一旦宣誓，落入休眠的制作行业便不再上升。技能永不下降，学会的东西也永远不会被夺走。",
+      "ringHeading": "制作之轮",
+      "ringBody": "十种制作行业排列在一个轮环上，各自独立记录技能；点开一张卡片即可查看完整的配方表与数值。",
+      "ringWaveNote": "珠宝加工与铭文如今已在轮环上，但尚未提供任何配方；它们的内容将随后续的区域扩展一同到来。",
+      "capFmt": "上限{cap}",
+      "comingSoon": "暂无配方",
+      "gatherHubHeading": "采集",
+      "gatherHubBody": "四种采集行业为制作供给材料：采矿、伐木与草药学的上限为100，钓鱼为200。",
+      "archetypesHeading": "十大命途",
+      "archetypesBody": "调谐到两个相邻行业即可获得一个成对头衔：两门主修可以一路练到最高层级，对侧的一门行业作为爱好保留在精良层级，其余行业则停留在普通层级。",
+      "pairFmt": "{a}与{b}",
+      "curveHeading": "精通曲线",
+      "curveBody": "每{step}点技能为一个层级：在自身层级或以上的配方给予全额成长，随着配方落到你之下，成长会减半、再减为四分之一，最终停止。",
+      "provenanceHeading": "出处",
+      "provenanceBody": "精良及以上的成品带有制作者的名字，杰作会额外提升一个品质层级，而委托制品会绑定给它的收货人（制作者之约）。",
+      "stationsHeading": "工位与大师",
+      "stationsBody": "三座主城中共设六座分类工位，常驻大师在此传授配方并发布工作订单。",
+      "deedsHeading": "铭记旅程的功业",
+      "deedsBody": "功业之书伴随这一切：首次调谐获得Craftsworn，首次杰作获得Masterwright，均可作为头衔佩戴。八种可修行业各在技能50设有里程碑功业，并在上限125加冕Grandmaster头衔；钓鱼在100熟练获得Old Salt，200获得Master Angler头衔。\n\n此外还有更静默的篇章：首次采集与首次制作的功业、野外奇遇中的意外收获，以及拾起拆解之路的印记。这一切皆为装饰，只有头衔与声望。功业永不赋予力量，它只证明你曾在场。",
+      "startHeading": "从哪里开始",
+      "startBody": "初到Eastbrook？找Foreman Odell接下A Trade for Every Hand，他会指给你镇西南Copper Dig一带的矿脉。此后旅途中经过的每处矿脉、树木与草药都值得采集。回到镇上按T打开制作窗口，先做人人都会的普通配方，再去锻造坊、厨房、织机与工坊拜访诸位大师，顺便接下他们的工作订单换取稳定的铜板。等公会的信找到你时，你早已知道哪一对行业才是归宿。",
+      "colStation": "工位",
+      "colHub": "主城",
+      "colMaster": "大师",
+      "masterCellFmt": "{name}（{title}）"
+    },
+    "profPages": {
+      "back": "返回专业总览",
+      "capLabel": "技能上限",
+      "stationLabel": "工位",
+      "stationNone": "无需工位",
+      "stationAnywhere": "任意地点",
+      "mastersLabel": "大师",
+      "masterFmt": "{name}（{hub}）",
+      "specializationLabel": "专精",
+      "specializationFact": "技能{at}：材料消耗减少{pct}%",
+      "matFmt": "{name}×{count}",
+      "outputFmt": "{name}×{count}",
+      "comboReq": "需要{a}与{b}",
+      "sourceTrainerFee": "训练师，{fee}",
+      "sourceTrainerFree": "训练师，免费",
+      "sourceKnown": "初始即会",
+      "gainFmt": "{reduced} / {minimal} / {zero}",
+      "colRecipe": "配方",
+      "colSkill": "技能",
+      "colSource": "来源",
+      "colStation": "工位",
+      "colMaterials": "材料",
+      "colQuality": "品质",
+      "colGain": "成长衰减点",
+      "colMaterial": "材料",
+      "colTool": "工具",
+      "colTier": "阶",
+      "colPrice": "价格",
+      "colZone": "区域",
+      "colNodes": "节点数",
+      "colNodeTier": "节点阶级",
+      "colToolNeeded": "所需工具",
+      "craftIntro": {
+        "weaponcrafting": "武器锻造是东溪锻造坊的兵器台：斧、锤、刃、矛，乃至法师的法杖，从铜制入门武器一路到精良的锇金与铭钢之作。武器是每个等级段最有感的单件升级，所以武器锻造者是人人都记得结交的朋友。",
+        "armorcrafting": "护甲锻造锤出锁甲，那是工匠能打造的最重护甲，从铆接铜甲基础款到精良的锇鳞套装，旁边还有两件法系属性件。它的客户是那些站在挨打最前线的人。",
+        "tailoring": "裁缝织就施法者赖以生存的智力与精神布甲，从家纺基础款经鎏金织套装爬到精良的日织系列，并缝制Silkspun Satchel，一只十格背包，没有人会拒绝。",
+        "leatherworking": "制皮在芬桥的制革坊鞣制灵巧的皮甲，从兽皮基础款到精良的泽守系列。",
+        "cooking": "烹饪在东溪的厨房把鱼、野味和草药做成坐下享用的餐食，最高可达精良的盛宴佳肴。",
+        "alchemy": "炼金术在高望的药坊调配治疗与法力药剂，以及耐力合剂。",
+        "engineering": "工程学在东溪的工坊打造4阶与5阶采集工具，每一件都要消耗低一阶的工具。",
+        "enchanting": "附魔将不需要的装备分解成奥术材料，再将其用于永久性的装备附魔，无需任何工位。"
+      },
+      "craftProse": {
+        "weaponcrafting": {
+          "identityHeading": "人人都要买的锋刃",
+          "identityBody": "精良一档就覆盖三种胃口：力量近战的Osmium Warblade、敏捷战士的Glyphsteel War Axe，以及施法者的智力精神法杖Highpine Battle Staff。\n\n在制作之轮上它位于护甲锻造与珠宝加工之间。现役命途是铁匠（武器锻造与护甲锻造），可在锻造坊的锻造宗师Darva处宣誓，以自己双手挖掘三处矿脉方可；刃匠（与珠宝加工的搭档）也标注在制作之轮上，但要等珠宝加工随未来区域带来第一批配方，方可宣誓。",
+          "materialsHeading": "锻炉吞噬什么",
+          "materialsBody": "采矿是根基。铜矿出自Eastbrook Vale的一级矿脉，铁矿出自Mirefen Marsh，锇矿出自Thornpeak Heights，每一档梯子都如此升级。伐木的重要性超出预期：铁皮木做野猪矛的矛杆，梣木扛起锤柄，一根高松原木成就那根战棍。\n\n其余材料来自猎获与柜台：粗皮直接从狼和野猪尸体上剥取，碎骨来自日常猎杀，锻造梯子要烧Smithing Flux（Darva处20铜一罐）。若自己采矿跟不上，Darva在锻造坊柜台卖锇矿，Tinker Gizzel在工坊备有铭钢锭，价格之高让人觉得还是交几个采矿朋友合算。",
+          "ladderHeading": "一级一级的梯子",
+          "ladderBody": "野外配方Eastbrook Arming Sword人人初始即会，可在任何地方用猎获材料（几根狼牙与碎骨）加六罐Smithing Flux打造，无需工位。真正的梯子是三档九个训练师配方，全部绑定锻造坊：铜档技能0免费，铁档技能25每个25银，锇档技能50每个1金。Darva在你该行业的档位达到其门槛的那一刻便会传授，所以每档正好在自身技能段开启时解锁。\n\n命途之外还有一件配方：Gravewyrm Gauntlets，由训练师传授的组合件，只有武器锻造与护甲锻造都达到技能25的调谐铁匠才能制作，且完全不需要任何工位。",
+          "routeHeading": "杰作与通往125之路",
+          "routeBody": "梯子上有真实属性加成的成品（即铁档及以上）才有机会出杰作；无属性的铜档普通件永远不会触发，因为杰作是对属性的提升，而它们没有属性。铁算一级材料，高松与铭钢算二级，所以顶档触发率略高。\n\n铜档做到25，铁档一开即练并做到50，再做锇档到75。75之后暂无更高配方，锇档配方收益先降至半速再降至四分之一：预计约需150次才能到达125上限，批量制作时记住每分钟十次制作的共享节流。\n\n边练边回本：Darva的锻造工作订单每30分钟收八块铜矿，换来一点铜钱与经验；铁档与锇档的成品也卖得过练级的近战。功业之书在技能50记下Edge and Temper，125加冕Grandmaster Weaponcrafting。"
+        },
+        "armorcrafting": {
+          "identityHeading": "前线的锁甲",
+          "identityBody": "梯子如同士兵的履历：铆接铜甲起步，ironlink一档有了真正的属性，精良的osmiumscale头盔、胸甲与护腿则是工匠能敲出的最大护甲数值。\n\n还有安静的一面：野外普通件Eastbrook Warded Leggings与技能75的Kilnscale Mantle（智力精神锁甲肩）留住法系锁甲客户。它位于武器锻造与工程学之间；铁匠可在Darva处宣誓，齿轮匠（与工程学搭档）已标注在制作之轮上，但尚无誓约任务。",
+          "materialsHeading": "成袋的矿石",
+          "materialsBody": "没有哪个行业吃矿更快：ironlink hauberk一件就要五块铁矿，每件osmiumscale要三到四块锇矿外加一块铭钢锭，认真的甲匠要么自己挖遍Mirefen Marsh和Thornpeak Heights，要么花钱请人。铜矿从矿坑旁的铜矿脉出发供给第一档。\n\n金属之外还有软料：粗皮从狼和野猪尸体上剥取，碎骨与亚麻碎布来自日常猎杀，几乎每个配方都要一罐Smithing Flux（锻造坊20铜）。急用时Darva柜台就卖锇矿。",
+          "ladderHeading": "在Darva的锻炉学艺",
+          "ladderBody": "两件野外普通件（Eastbrook Chainmail Vest与Warded Leggings）人人都会、随处可做。训练师梯子是Eastbrook锻造坊的三档九个配方：铜档技能0免费，ironlink档25技能每个25银，osmiumscale档50技能每个1金，各档在你达到其门槛的那一刻即可学习。\n\n梯子之外有两件特例：Boundstone Helm是铁匠组合配方，由训练师传授，无需工位，但只有武器锻造与护甲锻造双技能25的调谐铁匠才能制作；Kilnscale Mantle无需任何训练师，人人都会，但要技能75且绑定锻造坊，是本行业的三层压轴。",
+          "routeHeading": "杰作与通往125之路",
+          "routeBody": "ironlink档及以上都掷杰作；只有护甲值的铜档普通件不会触发，因为杰作是对属性的提升，而它们没有属性。铁算一级材料，铭钢算二级。\n\n路线照常三档：铜到25，ironlink到50，osmiumscale到75，每档一开即学。护甲锻造的运气在于75之后：Kilnscale Mantle是三层配方，到99全速、之后半速，最后五十点约75次而非其他行业没有压轴配方时所需的150次。每件要七块锇矿五份Smithing Flux，先在Thornpeak和锻造坊柜台备货再开跑。\n\nDarva的订单每30分钟收八块铜矿，换来铜钱与经验，是消化低级矿的好去处。功业之书在技能50记下Hammer and Plate，125等着Grandmaster Armorcrafting。"
+        },
+        "tailoring": {
+          "identityHeading": "施法者的布衣，所有人的背包",
+          "identityBody": "梯子从homespun基础布装经鎏金织套装爬到精良档：Silkbinder's Raiment与sunweave件。第二门生意人人需要：Silkspun Satchel是十格背包，没有哪个职业或等级嫌包多。\n\n裁缝位于制皮与铭文之间。现役命途是制装师（制皮与裁缝），在Eastbrook织机旁的Weaver Ottilie处宣誓，先猎四只webwood蜘蛛取丝；与铭文组成的Inkweaver也标注在制作之轮上，但要等铭文的第一批配方到来方可宣誓。",
+          "materialsHeading": "线、丝，还有草药",
+          "materialsBody": "织机靠猎获与田野运转：亚麻碎布与家纺布来自人形生物，蜘蛛丝从蛛尸上采取，精良档的核心Silkbinder's Raiment要一块Pristine Silk（尸体采集的署名标本）。\n\n草药喂养裁缝胜过任何装备行业：润光叶镶拖鞋，金叶染鎏金织，日瓣草贯穿整个精良档，所以自己采药的裁缝能持续节省材料。Spool of Thread在Ottilie处12铜一轴，织机根本不用金属，连Wardweave Cowl顶阶也是用高级草药、Pristine Silk、蛛丝与线织成。",
+          "ladderHeading": "在Ottilie的织机学艺",
+          "ladderBody": "两件野外普通件（Eastbrook Wool Trousers与Ritual Vestments）随处可做。训练师梯子在Eastbrook水井南侧的织机：homespun档技能0免费，鎏金织档（含Silkspun Satchel）技能25每个25银，精良档技能50每个1金。\n\nWardweave Cowl无需训练师：人人都会，但要技能75且绑定织机，是本行业的三层压轴。如同其他行业，Ottilie在你的裁缝档位达到配方档位的那一刻便会传授。",
+          "routeHeading": "杰作与通往125之路",
+          "routeBody": "长袍里的Pristine Silk本身就补足署名材料加成，金叶与日瓣草分别算一、二级材料，精良档因此触发率最高；背包之类无属性的成品永不触发，因为杰作是对属性的提升，而背包没有属性。\n\n路线：homespun到25，鎏金织一开即练并做到50，再做精良档到75；75之后靠Wardweave Cowl（三层配方，到99全速、之后半速），最后五十点约75次，每次两块Pristine Silk、四束蛛丝、日瓣草与金叶各两、两份线。\n\n让攀升自给自足：背包卖给所有人，Ottilie的织机订单每30分钟收六束蛛丝。功业之书在技能50记下A Fine Seam，125等着Grandmaster Tailoring。"
+        },
+        "leatherworking": {
+          "identityHeading": "迅捷者的皮甲",
+          "identityBody": "梯子从朴素的Fenbridge硬皮件经优秀的marshstalker件爬到精良的mirewarden套装，工匠能裁出的最好皮甲。两件法系皮件补全阵容：野外普通件Eastbrook Druid's Hide与技能75的Duskhide Wraps。制皮位于烹饪与裁缝之间；制装师在Eastbrook的Weaver Ottilie处宣誓，与烹饪组成的Trapper暂无誓约任务。",
+          "materialsHeading": "狩猎即收获",
+          "materialsBody": "在制皮这里，练级路线与供应线是同一条：粗皮直接从带皮尸体上剥取（狼和野猪最多），每具尸体只服务先到的一人。精良及以上的采集还会给出Pristine Hide，Mirewarden Jerkin正需要这种署名标本，见一块存一块。\n\n配角不多：蛛腿与蛛丝、人形生物的家纺布、每件mirewarden精良品一块锇矿（Duskhide Wraps顶阶要六块），以及制革坊柜台16铜的Tanning Agent。不想挖矿的话Tanner Hesk也卖锇矿。",
+          "ladderHeading": "在Fenbridge受训",
+          "ladderBody": "特别之处：制革坊在Mirefen Marsh路上的Fenbridge，这是唯一在Eastbrook之外受训的深度行业。Tanner Hesk在他的鞣池边授课：硬皮档技能0免费，marshstalker档技能25每个25银，mirewarden档技能50每个1金。两件配方跳过训练师：野外普通件（Tanned Leather Jerkin与Druid's Hide）随处可做，Duskhide Wraps人人都会但要技能75且绑定制革坊。注意制装师誓约本身在Eastbrook的Ottilie处宣誓，只有授课在沼泽。",
+          "routeHeading": "杰作与通往125之路",
+          "routeBody": "marshstalker档及以上都掷杰作，Mirewarden Jerkin里的Pristine Hide自动提供署名材料加成；锇矿算一级材料。无属性的硬皮普通件不会触发。\n\n自然而然地练：从一级起剥下每只狼和野猪，硬皮档随地做到25，随任务进沼泽时顺路受训；marshstalker到50，mirewarden到75，此后Duskhide Wraps（三层配方，六块锇矿、三块Pristine Hide、两块粗皮、一份Tanning Agent）到99全速、之后半速，最后五十点约75次。75专精后移动制革坊尤其宝贵：营火边就能把一袋皮子变成成品。Hesk的订单每30分钟收八张粗皮。技能50记下Tanner's Trade，上限处是Grandmaster Leatherworking。"
+        },
+        "cooking": {
+          "identityHeading": "喂饱队伍的锅",
+          "identityBody": "吃下熟食会在18秒的休息中治疗你，这是拉怪间隙最便宜的治疗。梯子从90点治疗的Pan-Seared River Perch一路做到980点的Marlow's Grand Roast，现存最大的坐地回复。烹饪位于炼金术与制皮之间；药剂师（炼金术与烹饪）在Eastbrook厨房的Cook Marlow处宣誓（先为锅猎四头野猪），与制皮组成的Trapper暂无誓约任务。",
+          "materialsHeading": "钓竿与猎刀供养的食柜",
+          "materialsBody": "钓鱼按区域供应招牌食材：Eastbrook Vale的镜鳟与河鲈，Mirefen Marsh的沼狗鱼与泥鳗，Thornpeak Heights的霜鳃鳟与板鳍鲤，每一档都烹本档的鱼。屠夫的一侧来自尸体采集：野味肉，以及精良采集掷出的署名Prime Cut（大烤肉的核心）。草药调味，梣木熏鳗，Cooking Salt在Marlow摊位8铜一袋。",
+          "ladderHeading": "从肉干到大烤肉",
+          "ladderBody": "Salted Jerky是野外配方：初始即会、一条蛛腿、随处可做。训练师梯子在广场西侧的Eastbrook厨房：免费档技能0（河鲈、Hunter's Game Skewer、Herbed Marsh Pike），中档技能25每个25银（Ashwood Smoked Eel、Goldleaf Game Stew、Frostgill Chowder），精良档技能50每个1金（Silvered Carp Supper、Angler's Feast Platter、Marlow's Grand Roast）。批量菜省料：熏鳗与炖肉每次两份，宴会拼盘三份。",
+          "routeHeading": "专精而非杰作，以及通往125之路",
+          "routeBody": "烹饪是杰作故事里诚实的例外：菜肴没有属性可提升，永不触发，也不必追。这门手艺的精通在于75的专精：每样食材省五分之一（批量菜上叠加极快），外加移动野外厨房，让宴席在副本门口出锅。边钓边做，两门技能互相供养：免费档到25，中档到50，精良档到75；此后精良菜衰减为半速与四分之一，到上限约再做150次。Marlow的订单每30分钟收八块野味肉。技能50记下Seasoned Chef，125是Grandmaster Cooking头衔。"
+        },
+        "alchemy": {
+          "identityHeading": "赢下战斗的瓶子",
+          "identityBody": "这门手艺在Highwatch的药坊操持，主人是Alchemist Verane：教配方、卖12铜的Glass Vial、以工作订单收草药。炼金术位于工程学与烹饪之间，因此有两条命途：爆破师（工程学与炼金术，在Eastbrook的Tinker Gizzel处受誓）与药剂师（炼金术与烹饪，在Cook Marlow处宣誓）。调谐任一对即可让炼金成为主修直至上限；此前它像所有未宣誓行业一样练到精良层。",
+          "materialsHeading": "草药、毒腺与玻璃",
+          "materialsBody": "每瓶药剂要一个Glass Vial外加对应档位的草药：润光叶生于Eastbrook Vale，金叶生于Mirefen Marsh，日瓣草生于Thornpeak Heights，一区一药，瓶子随世界一起攀升。草药学是天然的伙伴技能，不过从采集者或市场购买同样奏效；深区的高阶草丛需要更好的镰刀，所以若自己采药，记得及时更新工具。\n\n强化药剂一线另需猎手的材料：从带毒尸体采集的Venom Gland，顶级药剂还要一块Pristine Venom Gland（署名稀有标本）。若不自己采集，这正是值得托猎手朋友顺路带回的好物。",
+          "ladderHeading": "配方阶梯",
+          "ladderBody": "Minor Healing Potion人人初始即会、随处可调，无需工位。真正的梯子是Verane在药坊教的九个配方，每档三个：技能0免费，25档每个25银，50档每个1金；每档都是治疗药剂、法力药剂与耐力强化剂，从普通润光叶瓶（120生命、160法力）经优秀金叶（200、260）到精良日瓣（280、360）。\n\n强化剂同样攀升：Elixir of the Boar给6耐力10分钟，Vipersear Elixir给9耐力15分钟，Elixir of the Serpent给12耐力15分钟且一次两瓶。旁边还有一个组合配方Elixir of the Bear：炼金达到25时Verane以25银传授，随处可调，但只有炼金术与工程学双技能25的调谐爆破师才能调制。",
+          "routeHeading": "酿药师的125之路",
+          "routeBody": "药剂与强化剂永不出杰作，那属于有属性的装备。你的名字仍会流传：精良的日瓣药剂单瓶酿造、出瓶即署名，而双瓶的Elixir of the Serpent则是无名的。75专精后每个配方省20%材料。\n\n早学草药、边练边采：润光叶遍布山谷，到了Verane的工作台，免费档就能靠顺手采的草药干净地推到25。25档一开即学，采药转往沼泽采金叶，Verane的订单（六株金叶草换45铜，每30分钟一次）顺路回本。\n\n50以后用Thornpeak的草药酿日瓣与蛇药批次。100到125是刻意的涓流，酿能卖的东西，别为追数字烧草药，记住消耗品是唯一人人反复购买的制作品。功业之书在技能50记下Strange Brews，上限处是Grandmaster Alchemy。"
+        },
+        "engineering": {
+          "identityHeading": "工具匠的独门生意",
+          "identityBody": "这门手艺在Eastbrook广场东南角的工坊操持，主人是Tinker Gizzel，工坊宗师。每条工具线的1到3级都是寻常商店货；4级与5级只出自工程师之手。\n\n在制作之轮上它与炼金术及护甲锻造相邻，由此形成两条命途：爆破师（工程学与炼金术，向Gizzel本人宣誓）和齿轮匠（护甲锻造与工程学，已标注但尚无誓约任务）。这里有一条比其他任何行业都更要紧的警告：工程学的两档配方都高于爱好与未宣誓者的精良层上限，因此技能只为主修包含工程学的人（如今即爆破师）增长。任何人都能制作这些工具，未调谐者只是学不到东西。",
+          "materialsHeading": "材料与前置工具",
+          "materialsBody": "每个工具配方都吞掉低一级的工具外加高级材料：四块锇矿加一把天银采矿镐成为锇金采矿镐，再用两块铭钢锭加锇金镐成为铭钢采矿镐；斧与镰两条线以梣木与高松原木、金叶与日瓣草如法炮制。\n\nGizzel在工坊备齐全部六种高级材料，但矿石、原木与草药都能在Mirefen Marsh与Thornpeak Heights自采，自采才是利润所在；唯一例外是仅商店有售的铭钢锭，给每件铭钢级工具垫了固定的成本底价。",
+          "ladderHeading": "工具阶梯",
+          "ladderBody": "整条梯子只有六个配方，全部绑定工坊且自动学会、永不收费：技能75的4级镐、斧、镰，与技能150的5级版本。150不是笔误，故意高于当前125上限：技能需求从不阻止制作，只影响成长，材料与前置工具到手当天就能做出5级工具。每件成品都是精良或史诗品质且出厂署名。工程学还撑起一件组合配方的一半：Elixir of the Bear，由双技能25的调谐爆破师调制。",
+          "routeHeading": "工程师的125之路",
+          "routeBody": "工具没有战斗属性，永不出杰作。75照常专精：省20%材料，外加把任何采集之旅变成车间的临时野外工坊。成长几乎不衰减：75档配方到100全速、之后半速，150档配方到125上限一路全速，真正的瓶颈是材料与铜板。先定命途，从Tinker Gizzel处取爆破师调谐；再喂梯子：自练采集或结交采集者，商店买齐3级工具，把Gizzel的订单（八根Ironbark Log换16铜，每30分钟一次）当零花钱。卖点不言自明：高于节点的每级工具都从2.5秒采集读条里削去0.4秒（下限1.5秒）。技能50记下Cogs and Sprockets，125是Grandmaster Engineering。"
+        },
+        "enchanting": {
+          "identityHeading": "拆开装备，注回力量",
+          "identityBody": "没有工位、没有训练师、没有要买的配方书：所有附魔初始即会，谁都能从第一天开始分解，技能与各行业一样以125为上限。它位于铭文与珠宝加工之间，两条命途是Arcanist与Gembinder，均因邻居还没有配方而暂不可宣誓；因此附魔今天是所有人的手艺：宣誓前自由练到精良层，也是爆破师或药剂师天然的爱好选择。附魔师还维系着采集世界：三种可镶嵌的工具效果都是附魔师的作品，原作者为自己的作品充能享有折扣，专精后更深。",
+          "levelingHeading": "附魔如何升级",
+          "levelingBody": "两种行动推动技能：分解与施加附魔，每次成功最多一点，按工作的分量折算：普通分解与纯粉尘附魔算普通活；优秀分解与精华附魔算优秀活；精良分解与所有Runed或Greater附魔算精良活；史诗与传说分解更高。熟悉的精通衰减按25点层级作用：普通活在技能75变灰，优秀活在100，精良活恰在125上限。附魔另有一份仁慈：高于命途上限的输入向下取整而非归零，宣誓前史诗分解按精良计而非一无所获；若附魔沦为休眠，一切按普通活计，爬升停在75；作为爱好则精良活仍有收益，只是75之后变慢。",
+          "marketHeading": "附魔副本、出处与市场",
+          "marketBody": "施加附魔消耗材料并标记特定的一件副本。用在背包中的副本上，交还一件独立的附魔副本；用在已穿戴的装备上，则就地附魔，无需脱下再穿上。无论哪种，加成都永远跟随。一件一附魔：对附魔副本施加另一个附魔会先要求确认，然后直接替换旧附魔，旧附魔被摧毁且不退还材料；出售、丢弃与分解都优先取用普通副本，成品不会被误吞；完全相同的附魔副本还能叠放。杰作与附魔是朋友：杰作完全可附魔，附魔叠加在杰作加成与署名之上互不干扰；署名杰作配Greater附魔是工艺品的极致，仍按设计低于团本战利品。世界市场只经手无标记的普通货，附魔与署名件都面对面交易；材料才是可上市的一半：粉尘、精华与碎片自由挂单，挂单免费，成交才抽5%。"
+        }
+      },
+      "howHeading": "制作流程",
+      "howBody": "备齐材料后打开制作窗口（默认按键T）；绑定工位的配方要求你站在对应工位旁，野外配方则随处可做。",
+      "recipesHeading": "配方",
+      "recipesNote": "每个配方的确切技能与材料需求、学习来源，以及其成长开始衰减的技能数值。",
+      "masteryHeading": "技能成长",
+      "masteryBody": "每{step}点技能为一个层级：配方在你层级或以上给予全额成长，低一层减半，低两层为四分之一，低三层及以上则毫无成长；本行业的上限为{cap}。",
+      "masterworkHeading": "杰作",
+      "masterworkBody": "每次成功制作都有{base}%的杰作几率，你每高于配方一层再加{perTier}%，使用任何署名材料加{signed}%，专精后加{spec}%，上限为{cap}%。",
+      "trainingHeading": "训练",
+      "trainingBody": "当你在本行业的层级达到配方自身的层级时，大师即可传授：0层配方免费，1层需{tier1}，2层需{tier2}。",
+      "specializationHeading": "专精",
+      "specializationBody": "技能达到{at}即在本行业专精，配方材料消耗减少{pct}%。",
+      "ench": {
+        "disenchantHeading": "分解",
+        "disenchantNote": "分解会消耗一件普通品质或更高的武器或护甲，优先消耗未附魔的物品；当只剩下已附魔的物品时，将连同附魔一并分解其中一件。普通与优秀品质的物品磨碎后产出数量不等的铃音之尘，稀有度越高或等级越高的物品产量越丰；从精良品质起，产出形态不同：精良件恰好给出一个铃音精华，史诗或传说件恰好给出一个铃音碎片，此外还附带一种与物品材质相关的定向副产物。",
+        "typedHeading": "定向副产物",
+        "typedNote": "精良及以上的装备还会产出一种定向的、交易绑定的副产物：精良装备产出{rare}件，史诗或传说产出{epicMin}到{epicMax}件。",
+        "colSource": "拆解来源",
+        "meleeWeapons": "近战武器",
+        "timberWeapons": "法杖、魔杖、弓与弩",
+        "enchantsHeading": "附魔",
+        "enchantsNote": "附魔分三个层级。基础层级消耗铃音之尘（高端配方还需少量铃音精华），覆盖武器槽与除副手以外的全部护甲槽，属性轴选项之丰令每种配装都能在每个槽位找到合适的附魔。进阶层级每件消耗一个铃音碎片加若干铃音精华，也是碎片的唯一用途：对影响最大的槽位给出更强的加成。\n\n夹在两者之间的是五种符文附魔，各对应一种定向副产物，确保你磨出的任何材料都不会白费：符文锋刃（武器，力量，消耗共鸣钢片），符文印记（武器，智力，共鸣木片），符文织纹（胸甲，精神，共鸣线段），符文皮甲（护腿，敏捷，共鸣皮料），符文锁链（头盔，耐力，共鸣链片）。每件还各需两个铃音精华；对于同时拥有基础与进阶附魔的槽位和属性，符文附魔的加成介于两者之间，唯有符文织纹是迄今最强的胸甲精神附魔，符文皮甲则是唯一的护腿敏捷附魔。确切加成详见下方表格。",
+        "colEnchant": "附魔",
+        "colSlot": "部位",
+        "colTier": "层级",
+        "colBonus": "加成",
+        "tier": {
+          "base": "基础",
+          "runed": "符文",
+          "greater": "强效"
+        },
+        "salvageHeading": "回收",
+        "salvageNote": "任何人都可以把武器或护甲按品质回收成普通材料，无需附魔技能。",
+        "bonusFmt": "+{value}{stat}"
+      },
+      "gatherIntro": {
+        "mining": "采矿从世界的岩层中直接提取矿石：东溪谷产铜矿，泥沼湿地产铁矿，荆峰高地产锇矿，为锻造类行业供料。从1级起向所有人开放：只需背包里备有一把采矿镐，任意主城均售20铜。以独立计数器追踪，上限为100。",
+        "logging": "伐木在三大区域的林地中砍伐木材：东溪谷产铁皮木，泥沼湿地产梣木，荆峰高地产高松，为武器柄材、法杖与工程学工作台供料。从1级起向所有人开放，只需背包里备有一把伐木斧（任意主城20铜），以独立计数器追踪，上限为100。",
+        "herbalism": "草药学采集野生植物：东溪谷产润光叶，泥沼湿地产金叶，荆峰高地产日瓣草，为药坊类行业持续供应叶茎原料。从1级起向所有人开放，只需背包里备有一把草药镰（任意主城20铜），以独立计数器追踪，上限为100。",
+        "fishing": "钓鱼通过咬钩与收线的节奏，在每个区域的开阔水面垂钓，上限为200。"
+      },
+      "rhythmHeading": "采集节奏",
+      "rhythmBody": "采集是一段可见的施法：基础{base}秒，最短不低于{floor}秒；工具每高于节点一阶缩短{tool}秒，每个熟练度区间再缩短{band}秒。",
+      "gainBody": "每{step}点熟练度为一个成长层级，与节点阶级相比较：低阶节点的成长会逐渐消退，而更高阶的节点会带你练到{cap}的上限。",
+      "nodesHeading": "各区域节点",
+      "nodesNote": "节点的位置、阶级、所需工具与产出；每个节点在你采集后{respawn}秒才会为你本人刷新。",
+      "toolsHeading": "工具",
+      "toolsNote": "每一处节点都需要背包里备有对应行业的工具，1阶节点也不例外：没有采矿镐就采不到矿石，没有鱼竿就钓不上鱼。商人阶梯覆盖1到3阶，各主城均有备货；工具只需放在背包里即可，没有装备栏位，也没有耐久，因此每件都是一次性购置。门槛只看阶级：工具的品质颜色纯属外观。\n\n商人阶梯之上还有两件制作工具，4阶与5阶，由工程师在工坊打造，任何NPC都不出售。目前没有任何节点需要3阶以上的工具，因此它们眼下的价值在于速度：顶级工具能把低阶节点的采集读条压到时间下限；等更高阶的地界开放时，它们便是入场券。",
+      "toolCrafted": "制作获得（{craft}）",
+      "toolVendor": "{name}（{hub}）",
+      "toolUnavailable": "无出售",
+      "priceNone": "无出售",
+      "toolTierReq": "{tier}阶工具",
+      "yieldsHeading": "一次采集的收获",
+      "yieldsBody": "每次采集都会掷出品质，而熟练度决定一切：新手永远采到普通品，熟练度越高，权重越向高品质移动，绝不倒退。到100上限时普通品完全消失：60%优秀、30%精良、8%史诗、2%传说。品质也意味着数量：普通1个，优秀与精良2个，史诗3个，传说4个。精良及以上的收获都会以你的名字署名（Gathered by），封顶时十次采集有四次带着你的名字。",
+      "bandsHeading": "熟练度区间",
+      "bandsBody": "熟练度区间会加快你的采集施法；对钓鱼而言还决定渔获表。",
+      "bandFmt": "区间{band}：自{at}熟练度起",
+      "rareHeading": "稀有发现",
+      "rareBody": "每次采集都有{oneIn}分之一的几率触发稀有发现：产量乘以{mult}、必定署名，并向全区域播报。",
+      "specimenBody": "采集尸体还可能获得署名的完美标本：约{pct}%的尸体采集会掷出精良或更高品质。",
+      "gatherDeedsHeading": "沿途的功业",
+      "gatherDeeds": {
+        "mining": "任意行业的第一次采集获得Fruits of the Field，采矿100上限铭刻Ore in the Blood。采矿、伐木、草药学与钓鱼中任意三项达到100可得Master Gatherer（25声望），凿开纯净矿脉另有收藏印记。功业只有头衔与声望，永不赋予力量。",
+        "logging": "任意行业的第一次采集获得Fruits of the Field，伐木100上限铭刻Heartwood Hewer。四种采集行业中任意三项达到100可得Master Gatherer（25声望），劈出远古心材另有收藏印记。功业只有头衔与声望，永不赋予力量。",
+        "herbalism": "任意行业的第一次采集获得Fruits of the Field，草药学100上限铭刻Master of the Meadow。四种采集行业中任意三项达到100可得Master Gatherer（25声望），采下月光绽放另有收藏印记。功业只有头衔与声望，永不赋予力量。",
+        "fishing": "钓鱼100熟练铭刻Old Salt，200铭刻Master Angler及其头衔，那是垂钓技艺的顶点；钓鱼同样计入Master Gatherer（任意三项采集达到100）。在每个区域的水域钓起第一条鱼各有其页，钓起日辉锦鲤则记下Glimmer of Hope，所以包里常备鱼竿的旅人往往比预想中更快填满功业之书。"
+      },
+      "fish": {
+        "startHeading": "入门",
+        "startBody": "一根Simple Fishing Pole在Eastbrook的Fisherman Brandt处只卖20铜（他在镇东缘望着Mirror Lake）；Tinker Gizzel、Fenbridge的Provisioner Hale和Highwatch的Quartermaster Bree也有存货。面向前方约24码内足够深的水面使用鱼竿即可抛竿。战斗中、游泳时或死亡时无法抛竿：站在岸上钓才是正途，任何区域的可钓水域都行。",
+        "biteHeading": "咬钩与收线",
+        "biteBody": "抛竿后{min}到{max}秒之间鱼会咬钩（更好的鱼竿最多缩短{rod}秒等待），收线窗口持续{reel}秒、鱼竿每高一阶再加{reelRod}秒，单次垂钓最长{cap}秒。",
+        "scheduleHeading": "熟练度成长",
+        "scheduleNote": "钓鱼成长按熟练度遵循固定档位，且从{cutoff}起，钓上杂物不再有任何成长。",
+        "colProficiency": "熟练度",
+        "colGain": "每次渔获成长",
+        "belowFmt": "低于{below}",
+        "tablesHeading": "渔获表",
+        "tablesNote": "每个区间在各区域的确切渔获几率；每一行中的{rare}都是稀有渔获。",
+        "bandHeading": "区间{band}：熟练度{at}及以上，需{rod}阶鱼竿",
+        "colCatch": "渔获",
+        "colOdds": "几率",
+        "pctFmt": "{pct}%",
+        "emptyHook": "无鱼上钩",
+        "koiHeading": "日辉锦鲤",
+        "koiBody": "全世界的每片水域都藏着同一份大奖：日辉锦鲤，一尾优秀品质的闪光锦鲤，卖给商人值75铜，对你的自豪感则远不止此。它的几率固定为每次起竿3%（Thornpeak的冷水中为4%），不随等级段变化，因此码头上的新手与Master Angler机会均等。钓起它会在功业之书记下Glimmer of Hope（零声望的收藏印记）。当那一刻来临，战斗日志会让你知道。"
+      },
+      "econ": {
+        "title": "制作经济",
+        "intro": "专业经济背后的确切费用、回收与报酬。",
+        "feesHeading": "费用与回收",
+        "feesNote": "各项专业费用，从每次制作的金币回收到市场抽成。",
+        "feeCraft": "制作费",
+        "feeCraftValue": "每点物品预算{fee}",
+        "feeMarket": "市场抽成",
+        "feeMarketValue": "成交额的{pct}%",
+        "feeDeposit": "挂单押金",
+        "feeDepositValue": "无",
+        "feeUnbind": "解绑费",
+        "feeUnbindValue": "优秀{uncommon}、精良{rare}、史诗{epic}",
+        "trainingHeading": "训练费",
+        "trainingNote": "按配方层级收取一笔固定费用，仅在大师传授时收取一次。",
+        "trainingTierFmt": "{tier}层：{fee}",
+        "free": "免费",
+        "sellsHeading": "什么好卖，为什么",
+        "sellsBody": "最稳的生意是消耗品，因为用掉就要再买：药水、熟食与附魔都随使用而消失。杰作是高端市场：无法定制，想要的人只能出高价，而上面的署名就是行走的招牌。原料是第三支柱：分解所得的奥术材料、直接从拆解者流向附魔师的各类Resonant次级材料，以及追逐杰作触发的工匠愿意溢价收购的署名采集品。",
+        "marketHeading": "世界市场与抽成",
+        "marketBody": "世界市场是全服交易所，由Eastbrook的Merchant与Highwatch的Auctioneer Voss主持。挂单免费，没有押金，流拍原样退回；只在成交时抽取5%。重要限制：市场只经手无标记的普通货，署名、杰作、附魔或已绑定的副本一律不收，这些特殊物品只能面对面通过交易窗口转手。",
+        "workOrdersHeading": "工作订单",
+        "workOrdersNote": "每位大师都会以商店价的{pct}%收购一批本行常用材料，每{minutes}分钟可重复一次。",
+        "colOrder": "工作订单",
+        "colMaster": "大师",
+        "colAsks": "需求",
+        "colPays": "报酬",
+        "commissionsHeading": "委托与制作者之约",
+        "commissionsBody": "自愿选择的委托制作会附上制作者之约：成品会绑定给交易中收到它的人，而任意工位大师都可按层级费用为其解绑。",
+        "provenanceHeading": "署名作品",
+        "provenanceBody": "精良及以上的成品与发现都带有制作者的署名，而署名完全相同的物品仍可堆叠。",
+        "collectorsHeading": "收藏家、战利品与故事的价格",
+        "collectorsBody": "商人看不见出处：署名物品卖给NPC只值普通价，签名的溢价只存在于玩家之间。名家署名的横财矿石、一块Prime Cut、一柄署着已退隐工匠之名的杰作之刃，价格全凭记忆开价。功业之书里的Pristine Vein、Ancient Heartwood、Moonlit Bloom、A Perfect Specimen与Glimmer of Hope都是零声望的收藏印记，只为证明那一刻发生在你身上。出处不买属性也不赢战斗，它是这游戏里美好日子的存根。",
+        "throttleHeading": "操作限频",
+        "throttleBody": "制作、分解、附魔与回收共用一个限频：每{seconds}秒最多{actions}次操作。",
+        "doctrineHeading": "玩家与玩家交易",
+        "doctrineBody": "制作装备的强度始终低于团队副本的底线，而上述费用会把货物推向玩家之间的交易，而非商店循环。"
+      },
+      "faq": {
+        "title": "专业常见问题",
+        "intro": "制作者最常问的问题，一并作答。",
+        "q1": "我能学多少专业？",
+        "a1": "每个角色都可以提升全部八种可修炼制作行业和全部四种采集行业；只有命途身份是唯一的选择。",
+        "q2": "在哪里学配方？",
+        "a2": "训练师阶梯配方由各工位的常驻大师传授，而九个通用野外配方和工具配方所有人从一开始就会。",
+        "q3": "采集需要工具吗？",
+        "a3": "1阶节点徒手即可；2阶或3阶节点需要至少同阶级的对应工具。",
+        "q4": "为什么技能不再增长？",
+        "a4": "当配方落到你之下时，精通曲线会把成长减为一半、四分之一直至归零，而每种专业都会在上限处停止。",
+        "q5": "什么是杰作？",
+        "a5": "每次制作都有一个小几率（3%起，上限15%）产出品质高一层的成品，但绝不会超过团队副本的底线。",
+        "q6": "“由某某制作”是什么意思？",
+        "a6": "九种通用的野外配方与工具配方人人从一开始便已知晓，三种绑定作业台的三层压轴配方（Kilnscale Mantle、Wardweave Cowl与Duskhide Wraps）也是如此，它们无需训练师，只需对应的作业台。其余一切都由三座枢纽城镇中各作业台旁的常驻师傅传授：多数在东溪，制革师守着芬桥的制革场，炼金师守着高望的药房。\n\n训练师配方分为技能0、25、50三档，作为一次性费用分别是免费、25银和1金。当你在该行业的档位达到配方自身的档位时，师傅便会传授，而且学习时你必须站在其作业台旁：移动作业台不算数。",
+        "q7": "什么是制作者之约？",
+        "a7": "委托制品会绑定给交易中收到它的人，而任意工位大师都可按层级费用为其解绑。",
+        "q8": "我能更换命途吗？",
+        "a8": "从未持有过的组合只需一次全新的调谐任务，而回到曾经持有的组合则需要完成代价递增的赎罪差事。"
+      }
     },
     "economy": {
       "intro": "钱币让整个世界运转：它能购买你的装备、补给与旅行用具，还能在玩家之间易手。这一切只需游玩便能逐渐到手，所以不妨把本页看作一张地图，标明你的钱从何而来、又向何处去。",
@@ -4288,6 +4856,7 @@ export const zh_CN: EnTranslations = {
   "stats": {
     "title": "服务器状态",
     "accountsCreated": "玩家",
+    "charactersCreated": "已创建角色",
     "playersOnline": "在线玩家数",
     "realmName": "服务器名称"
   },
@@ -4321,7 +4890,9 @@ export const zh_CN: EnTranslations = {
     "error": "无法加载更新，请稍后重试。",
     "empty": "暂无更新，敬请期待。",
     "prerelease": "预发布",
-    "viewOnGithub": "在 GitHub 上查看"
+    "viewOnGithub": "在 GitHub 上查看",
+    "new": "新",
+    "viewAll": "在 GitHub 上查看全部更新"
   },
   "download": {
     "title": "下载电脑版启动器",
@@ -5327,8 +5898,10 @@ export const zh_CN: EnTranslations = {
     "reconnectingNow": "连接已断开，正在立即重新连接...（第 {attempt}/{maxAttempts} 次尝试）",
     "slowConnection": "加载时间比平时长。请检查您的网络连接。",
     "connectionRejected": "服务器关闭了连接。",
+    "incompatibleWorldVersion": "游戏与服务器版本不兼容。请刷新或更新后重试。",
     "realmFull": "当前服务器已满，请稍后几分钟再试。",
     "tooManyConnections": "您的网络向该服务器发起的连接过多。请关闭多余的游戏窗口，或稍后几分钟再试。",
+    "messageRateExceeded": "由于发送操作过快，您已断开连接。请稍等片刻后重新登录。",
     "tips": {
       "classes": "提示：9 个职业玩法各不相同，投入之前不妨都试一试。",
       "talents": "提示：你可以在任意脱离战斗的时候重置天赋，因此早期的选择永远不会成为陷阱。",
@@ -5396,6 +5969,12 @@ export const zh_CN: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请更新显卡驱动后重启游戏。在 Windows 上，还请在 设置 > 系统 > 显示 > 显示卡 中将本游戏设为“高性能”。",
     "bodyWeb": "游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请在浏览器设置中启用硬件加速，更新显卡驱动，然后重启浏览器。",
+    "dismiss": "关闭"
+  },
+  "perfNudge": {
+    "integratedGpu": "游戏正在集成（节能）显卡上运行。如果这台电脑还配有独立游戏显卡，请在 Windows 的 设置 > 系统 > 显示 > 显示卡 中将浏览器设为“高性能”，然后重启浏览器。桌面版会自动选择游戏显卡。",
+    "hardwareAccelerationDesktop": "游戏正在没有 GPU 加速的情况下运行，因此非常缓慢。请更新显卡驱动后重启游戏。在 Windows 上，还请在 设置 > 系统 > 显示 > 显示卡 中将本游戏设为“高性能”。",
+    "hardwareAccelerationWeb": "游戏正在没有 GPU 加速的情况下运行，因此非常缓慢。请在浏览器设置中启用硬件加速，更新显卡驱动，然后重启浏览器。",
     "dismiss": "关闭"
   },
   "realm": {
@@ -5538,29 +6117,6 @@ export const zh_CN: EnTranslations = {
     "heading": "服务器暂时不可用。",
     "body": "我们正在重启游戏服务，Claudemoon 应会很快恢复。此页面会自动继续检查。",
     "status": "即将恢复"
-  },
-  "welcome": {
-    "back": "欢迎回来，{name}",
-    "level": "等级 {level}",
-    "lastPlayed": "上次游玩：{when}",
-    "continue": "进入世界",
-    "continueHint": "按 Enter 继续，按 Esc 跳过",
-    "continueHintTouch": "点击继续",
-    "discord": {
-      "title": "社区活跃在 Discord",
-      "sub": "版本预告、活动、开发者聊天，绑定还可获得 2 个额外银行格。",
-      "join": "加入我们的 Discord"
-    },
-    "chest": {
-      "ready": "每日宝箱已就绪"
-    },
-    "armory": {
-      "cta": "进入并浏览军械库"
-    },
-    "news": {
-      "new": "新",
-      "viewAll": "在 GitHub 上查看全部更新"
-    }
   },
   "hud": {
     "core": {
@@ -5847,7 +6403,8 @@ export const zh_CN: EnTranslations = {
       "death": "{name}死亡。",
       "auraGain": "你获得了 {name}。",
       "auraFade": "{name}从你身上消失。",
-      "auraAfflicted": "{target}受到了 {name} 影响。"
+      "auraAfflicted": "{target}受到了 {name} 影响。",
+      "auraGainOther": "{target}获得了 {name}。"
     },
     "system": {
       "playerDeath": "你已经死亡。",
@@ -5933,7 +6490,8 @@ export const zh_CN: EnTranslations = {
       "tradeInProgress": "已有交易正在进行。",
       "tradeTooFar": "目标太远，无法交易。",
       "tradeExpired": "交易请求已过期。",
-      "tradeFailed": "交易失败：物品或金钱已不可用。"
+      "tradeFailed": "交易失败：物品或金钱已不可用。",
+      "tradeBound": "该物品已绑定，无法交易。"
     },
     "logs": {
       "standUp": "你站了起来。",
@@ -5949,6 +6507,7 @@ export const zh_CN: EnTranslations = {
       "arenaJoin": "你加入了灰烬斗技场队列。等待一位值得一战的对手...",
       "arenaLeave": "你离开了灰烬斗技场队列。",
       "arenaSands": "你踏上了灰烬斗技场的沙地。",
+      "arenaSandsDrowned": "你踏上了沉没王庭的水淹石地。",
       "tradeRequestSent": "你已请求与 {name} 交易。",
       "tradeOpened": "交易窗口已打开。",
       "tradeComplete": "交易完成。",
@@ -5959,6 +6518,8 @@ export const zh_CN: EnTranslations = {
       "soldItem": "你以 {money} 卖出 {item}。",
       "soldJunkOne": "你以 {money} 卖出 {count} 件杂物。",
       "soldJunkMany": "你以 {money} 卖出 {count} 件杂物。",
+      "keptBoundOne": "已保留 {count} 件绑定物品。",
+      "keptBoundMany": "已保留 {count} 件绑定物品。",
       "friendOnline": "{name} 上线了。",
       "friendOffline": "{name} 下线了。"
     },
@@ -6081,7 +6642,8 @@ export const zh_CN: EnTranslations = {
         "offline": "离线",
         "combat": "战斗中",
         "dungeon": "地下城中",
-        "dead": "死亡"
+        "dead": "死亡",
+        "afk": "暂离"
       },
       "statusWithZone": "{status} - {zone}",
       "ranks": {
@@ -6114,6 +6676,11 @@ export const zh_CN: EnTranslations = {
       "playerLevelClassTitle": "{name} - {level} 级 {className}",
       "noChallengers": "还没有已排名的挑战者 - 成为第一个。",
       "matchInProgress": "正在对战 {name}。",
+      "mapName": "地图：{name}",
+      "map": {
+        "coliseum": "灰烬斗技场",
+        "drownedCourt": "沉没王庭"
+      },
       "leaveQueue": "离开队列",
       "searching": "正在寻找对手...（队列中 {count} 人）",
       "enterQueue": "加入队列",
@@ -6189,6 +6756,7 @@ export const zh_CN: EnTranslations = {
     },
     "cast": {
       "fishing": "钓鱼",
+      "gathering": "采集",
       "demonHeal": "恶魔治疗",
       "thunzharrStormcall": "风暴召唤",
       "rift_frost_execution": "Glacial Grave",
@@ -6241,6 +6809,7 @@ export const zh_CN: EnTranslations = {
       "readyQuestAria": "可交付任务：{name}",
       "discussQuest": "谈论{name}。",
       "discussQuestAria": "谈论任务：{name}",
+      "profIntroHint": "请找{name}接取《{quest}》。",
       "nythraxisDeathlessKingWarning": "三件遗物讲述着同一个故事：奥德伦为守护国王而战，马尔里克打破了死亡的界限，沃斯试图阻止随后发生的一切。封印正在减弱，废弃墓穴就是通往地下的道路。",
       "browseGoods": "让我看看你的货物。",
       "browseGoodsAria": "查看 {name} 的货物",
@@ -6344,7 +6913,6 @@ export const zh_CN: EnTranslations = {
       "ifYouEquip": "装备后",
       "damageSpeed": "{min} - {max} 伤害 速度 {speed}",
       "dps": "（每秒 {dps} 伤害）",
-      "dagger": "匕首",
       "armorStat": "{value} 护甲",
       "stat": "+{value} {stat}",
       "useFood": "使用：在 {seconds} 秒内恢复 {amount} 点生命值。进食时必须保持坐下。",
@@ -6422,18 +6990,29 @@ export const zh_CN: EnTranslations = {
       "pageNextAria": "下一页市场商品",
       "pageStatus": "第 {current} 页，共 {total} 页",
       "filters": "市场筛选",
+      "filterValueAria": "{label}：{value}",
       "filterType": "类型",
       "filterTypeAll": "全部类型",
       "filterTypeWeapon": "武器",
       "filterTypeArmor": "护甲",
+      "filterTypeBag": "背包",
       "filterTypeConsumable": "消耗品",
       "filterTypeMaterial": "材料",
       "filterTypeCosmetic": "外观",
       "filterTypeOther": "其他",
       "filterArmorType": "护甲类型",
       "filterArmorAll": "全部护甲",
+      "filterArmorSlot": "护甲部位",
+      "filterArmorClassAll": "所有护甲类型",
+      "armorCloth": "布甲",
+      "armorLeather": "皮甲",
+      "armorMail": "锁甲",
       "filterWeaponType": "武器类型",
       "filterWeaponAll": "全部武器",
+      "filterBagSize": "背包容量",
+      "filterBagAll": "全部背包",
+      "filterPrimaryStat": "主属性",
+      "filterPrimaryStatAll": "任意主属性",
       "filterRarity": "稀有度",
       "filterRarityAll": "全部稀有度",
       "weaponSword": "剑",
@@ -7120,7 +7699,7 @@ export const zh_CN: EnTranslations = {
       },
       "bear_form": {
         "name": "巨熊形态",
-        "description": "变形为熊：护甲 +90%，攻击强度大幅提高，你的攻击会产生怒气并额外产生 30% 威胁值。再次施放可返回施法者形态。"
+        "description": "变形为熊：护甲 +130%，攻击强度大幅提高，你的攻击会产生怒气并额外产生 30% 威胁值。再次施放可返回施法者形态。"
       },
       "maul": {
         "name": "碎骨击",
@@ -7856,7 +8435,7 @@ export const zh_CN: EnTranslations = {
         "name": "暮影裹手"
       },
       "sootscale_mantle": {
-        "name": "灰鳞披肩"
+        "name": "窑鳞披肩"
       },
       "gravecaller_blade": {
         "name": "唤墓者宽刃剑"
@@ -7931,13 +8510,13 @@ export const zh_CN: EnTranslations = {
         "name": "亚麻碎布"
       },
       "arcane_dust": {
-        "name": "奥术之尘"
+        "name": "铃音之尘"
       },
       "arcane_essence": {
-        "name": "奥术精华"
+        "name": "铃音精华"
       },
       "arcane_shard": {
-        "name": "奥术碎片"
+        "name": "铃音碎片"
       },
       "fen_muster_order": {
         "name": "芬桥集结令"
@@ -8186,7 +8765,7 @@ export const zh_CN: EnTranslations = {
         "name": "峰羊毛长袍"
       },
       "stalkerhide_jerkin": {
-        "name": "潜猎者皮甲"
+        "name": "巡猎皮甲"
       },
       "cragwalker_boots": {
         "name": "岩行者长靴"
@@ -8327,7 +8906,7 @@ export const zh_CN: EnTranslations = {
         "name": "铁制采矿镐"
       },
       "mithril_mining_pick": {
-        "name": "秘银采矿镐"
+        "name": "天银采矿镐"
       },
       "handaxe": {
         "name": "手斧"
@@ -8345,19 +8924,19 @@ export const zh_CN: EnTranslations = {
         "name": "青铜镰刀"
       },
       "silverleaf_sickle": {
-        "name": "银叶镰刀"
+        "name": "润光叶镰刀"
       },
       "thorium_mining_pick": {
-        "name": "钍矿采矿镐"
+        "name": "锇金采矿镐"
       },
       "arcanite_mining_pick": {
-        "name": "秘法采矿镐"
+        "name": "铭钢采矿镐"
       },
       "ashwood_axe": {
         "name": "白蜡木斧"
       },
       "elderwood_axe": {
-        "name": "古木斧"
+        "name": "高松斧"
       },
       "goldleaf_sickle": {
         "name": "金叶镰刀"
@@ -8365,77 +8944,17 @@ export const zh_CN: EnTranslations = {
       "sunpetal_sickle": {
         "name": "阳瓣镰刀"
       },
-      "duskwisp_essence": {
-        "name": "暮光灵精华"
-      },
-      "spore_heart": {
-        "name": "孢子之心"
-      },
-      "gleaming_antler": {
-        "name": "辉光鹿角"
-      },
-      "wisp_mote": {
-        "name": "光尘"
-      },
-      "starfall_shard": {
-        "name": "星落碎片"
-      },
-      "elder_bark": {
-        "name": "长者树皮"
-      },
-      "hollow_sealstone": {
-        "name": "幽谷封印石"
-      },
-      "monument_overlook": {
-        "name": "风蚀石碑"
-      },
-      "monument_court": {
-        "name": "沉没石碑"
-      },
-      "monument_north": {
-        "name": "遗忘石碑"
-      },
-      "guardian_core": {
-        "name": "守卫核心"
-      },
-      "wardens_seal": {
-        "name": "守望者之印"
-      },
-      "gleamstag_charm": {
-        "name": "辉鹿护符"
-      },
-      "veilsteel_blade": {
-        "name": "帷钢之刃"
-      },
-      "duskfang_dirk": {
-        "name": "暮牙短剑"
-      },
-      "gleamwood_stave": {
-        "name": "辉木长杖"
-      },
-      "wardens_oathband": {
-        "name": "守望者誓言护手"
-      },
-      "wardplate_cuirass": {
-        "name": "守卫板甲胸铠"
-      },
-      "nightweave_tunic": {
-        "name": "夜织皮甲"
-      },
-      "veilcloth_robe": {
-        "name": "帷纱长袍"
-      },
       "thorium_ore": {
-        "name": "瑟银矿石"
+        "name": "锇矿石"
       },
       "arcanite_bar": {
-        "name": "秘银锭"
+        "name": "铭钢锭"
       },
       "ashwood_log": {
         "name": "灰木原木"
       },
       "elderwood_log": {
-        "name": "古老接骨木原木"
+        "name": "高松原木"
       },
       "goldleaf_herb": {
         "name": "金叶草"
@@ -8563,72 +9082,6 @@ export const zh_CN: EnTranslations = {
       "emberglass_warstaff": {
         "name": "烬晶战杖"
       },
-      "rift_essence": {
-        "name": "裂隙精华"
-      },
-      "rift_gem_crimson": {
-        "name": "猩红裂隙宝石"
-      },
-      "rift_gem_azure": {
-        "name": "蔚蓝裂隙宝石"
-      },
-      "rift_gem_verdant": {
-        "name": "翠绿裂隙宝石"
-      },
-      "riftbound_band_of_might": {
-        "name": "力量裂隙之戒"
-      },
-      "riftbound_band_of_insight": {
-        "name": "洞察裂隙之戒"
-      },
-      "riftbound_band_of_guile": {
-        "name": "诡诈裂隙之戒"
-      },
-      "hoarfrost_edge": {
-        "name": "白霜之锋"
-      },
-      "emberforge_gauntlets": {
-        "name": "烬炉护手"
-      },
-      "broodmother_carapace": {
-        "name": "育母甲壳"
-      },
-      "bonelord_mantle": {
-        "name": "骸骨领主衬肩"
-      },
-      "graskbreaker_girdle": {
-        "name": "格拉斯克碎击腰带"
-      },
-      "voidscar_handwraps": {
-        "name": "虚痕裹手"
-      },
-      "stormscale_treads": {
-        "name": "风暴鳞之靴"
-      },
-      "abyssal_loop": {
-        "name": "深渊之环"
-      },
-      "pactbound_vestments": {
-        "name": "缚约法袍"
-      },
-      "pitlords_cleaver": {
-        "name": "深渊领主的劈斧"
-      },
-      "emberforged_bulwark": {
-        "name": "烬铸壁垒胸甲"
-      },
-      "stormsunder_hood": {
-        "name": "裂风兜帽"
-      },
-      "voidweave_mantle": {
-        "name": "虚织衬肩"
-      },
-      "abysswrought_band": {
-        "name": "渊铸指环"
-      },
-      "heart_of_the_rift": {
-        "name": "裂隙之心"
-      },
       "copper_ore": {
         "name": "铜矿石"
       },
@@ -8639,7 +9092,7 @@ export const zh_CN: EnTranslations = {
         "name": "铁皮木原木"
       },
       "silverleaf_herb": {
-        "name": "银叶草"
+        "name": "润光叶草"
       },
       "rough_hide": {
         "name": "粗糙的兽皮"
@@ -8702,13 +9155,13 @@ export const zh_CN: EnTranslations = {
         "name": "磨利铁匕首"
       },
       "thorium_warblade": {
-        "name": "瑟银战刃"
+        "name": "锇金战刃"
       },
       "arcanite_war_axe": {
-        "name": "秘银战斧"
+        "name": "铭钢战斧"
       },
       "elderwood_battle_staff": {
-        "name": "古老接骨木战棍"
+        "name": "高松战棍"
       },
       "riveted_copper_girdle": {
         "name": "铆钉铜腰带"
@@ -8729,13 +9182,13 @@ export const zh_CN: EnTranslations = {
         "name": "铁链肩甲"
       },
       "thoriumscale_greathelm": {
-        "name": "瑟银鳞巨盔"
+        "name": "锇鳞巨盔"
       },
       "thoriumscale_cuirass": {
-        "name": "瑟银鳞胸甲"
+        "name": "锇鳞胸甲"
       },
       "thoriumscale_leggings": {
-        "name": "瑟银鳞腿甲"
+        "name": "锇鳞腿甲"
       },
       "homespun_hood": {
         "name": "手织兜帽"
@@ -8744,13 +9197,13 @@ export const zh_CN: EnTranslations = {
         "name": "手织连指手套"
       },
       "silverthread_slippers": {
-        "name": "银线便鞋"
+        "name": "素线便鞋"
       },
       "goldweave_robe": {
-        "name": "金织长袍"
+        "name": "鎏金织长袍"
       },
       "goldweave_leggings": {
-        "name": "金织护腿"
+        "name": "鎏金织护腿"
       },
       "silkspun_satchel": {
         "name": "丝纺挎包"
@@ -8819,10 +9272,10 @@ export const zh_CN: EnTranslations = {
         "name": "马洛的盛大烤肉"
       },
       "silverleaf_healing_draught": {
-        "name": "银叶治疗药水"
+        "name": "润光叶治疗药水"
       },
       "silverleaf_mana_draught": {
-        "name": "银叶法力药水"
+        "name": "润光叶法力药水"
       },
       "elixir_of_the_boar": {
         "name": "野猪药剂"
@@ -8834,7 +9287,7 @@ export const zh_CN: EnTranslations = {
         "name": "金叶法力药水"
       },
       "venomfire_elixir": {
-        "name": "毒火药剂"
+        "name": "蝰灼药剂"
       },
       "sunpetal_healing_draught": {
         "name": "阳瓣治疗药水"
@@ -8844,6 +9297,270 @@ export const zh_CN: EnTranslations = {
       },
       "elixir_of_the_serpent": {
         "name": "巨蛇药剂"
+      },
+      "mosshide_vest": {
+        "name": "苔皮背心"
+      },
+      "thornling_grips": {
+        "name": "棘灵护手"
+      },
+      "acolyte_chain_grips": {
+        "name": "侍僧链甲护手"
+      },
+      "votive_chain_belt": {
+        "name": "誓愿链甲腰带"
+      },
+      "briarroot_staff": {
+        "name": "棘根法杖"
+      },
+      "valefire_lantern": {
+        "name": "谷火灯笼"
+      },
+      "fenbark_leggings": {
+        "name": "沼皮护腿"
+      },
+      "mirebloom_treads": {
+        "name": "泥花软靴"
+      },
+      "fenwarden_sabatons": {
+        "name": "沼卫铁靴"
+      },
+      "marshlight_hauberk": {
+        "name": "沼光锁甲"
+      },
+      "duskthorn_mantle": {
+        "name": "暮棘披肩"
+      },
+      "fenshadow_maul": {
+        "name": "沼影重锤"
+      },
+      "wildgrove_cinch": {
+        "name": "野林束带"
+      },
+      "cragward_pauldrons": {
+        "name": "岩卫肩甲"
+      },
+      "cragthorn_greatstaff": {
+        "name": "岩棘巨杖"
+      },
+      "moonbark_vestments": {
+        "name": "月皮祭服"
+      },
+      "peaksong_helm": {
+        "name": "峰歌头盔"
+      },
+      "stormchant_gauntlets": {
+        "name": "风暴咏唱护手"
+      },
+      "cragprowl_belt": {
+        "name": "岩行腰带"
+      },
+      "stormroot_cowl": {
+        "name": "风根兜帽"
+      },
+      "thunderward_legguards": {
+        "name": "雷卫护腿"
+      },
+      "revenantstep_treads": {
+        "name": "亡魂行靴"
+      },
+      "shardfang_grips": {
+        "name": "片牙护手"
+      },
+      "shardsong_mantle": {
+        "name": "碎片之歌披肩"
+      },
+      "wyrmcult_spellgrips": {
+        "name": "龙教法术护手"
+      },
+      "thornpeak_wildwraps": {
+        "name": "荆峰野性裹手"
+      },
+      "stormvotive_hauberk": {
+        "name": "风暴誓愿锁甲"
+      },
+      "cryptbloom_shoulderguards": {
+        "name": "墓花护肩"
+      },
+      "gravewyrm_thornmaul": {
+        "name": "墓龙棘锤"
+      },
+      "vestments_of_the_waking_grove": {
+        "name": "苏醒林地祭服"
+      },
+      "nightfangs_greatstaff": {
+        "name": "夜牙巨杖"
+      },
+      "maul_of_the_scourged_wilds": {
+        "name": "灾野重锤"
+      },
+      "tidehymn_slippers": {
+        "name": "潮诗便鞋"
+      },
+      "pearlward_aegis": {
+        "name": "珍珠守护盾"
+      },
+      "wildgrowth_leggings": {
+        "name": "荒野生长护腿"
+      },
+      "grovewardens_grips": {
+        "name": "林地守护者护手"
+      },
+      "verdant_walkers": {
+        "name": "翠绿行者长靴"
+      },
+      "lunarward_cinch": {
+        "name": "月卫束带"
+      },
+      "dreamroot_boots": {
+        "name": "梦根长靴"
+      },
+      "stormbark_mantle": {
+        "name": "风暴树皮披肩"
+      },
+      "wildsoul_maul": {
+        "name": "荒野之魂重锤"
+      },
+      "resonant_thread": {
+        "name": "共鸣丝线"
+      },
+      "resonant_hide": {
+        "name": "共鸣兽皮"
+      },
+      "resonant_links": {
+        "name": "共鸣锁环"
+      },
+      "resonant_steel": {
+        "name": "共鸣钢材"
+      },
+      "resonant_timber": {
+        "name": "共鸣木材"
+      },
+      "duskwisp_essence": {
+        "name": "暮光灵精华"
+      },
+      "spore_heart": {
+        "name": "孢子之心"
+      },
+      "gleaming_antler": {
+        "name": "辉光鹿角"
+      },
+      "wisp_mote": {
+        "name": "光尘"
+      },
+      "starfall_shard": {
+        "name": "星落碎片"
+      },
+      "elder_bark": {
+        "name": "长者树皮"
+      },
+      "hollow_sealstone": {
+        "name": "幽谷封印石"
+      },
+      "monument_overlook": {
+        "name": "风蚀石碑"
+      },
+      "monument_court": {
+        "name": "沉没石碑"
+      },
+      "monument_north": {
+        "name": "遗忘石碑"
+      },
+      "guardian_core": {
+        "name": "守卫核心"
+      },
+      "wardens_seal": {
+        "name": "守望者之印"
+      },
+      "gleamstag_charm": {
+        "name": "辉鹿护符"
+      },
+      "veilsteel_blade": {
+        "name": "帷钢之刃"
+      },
+      "duskfang_dirk": {
+        "name": "暮牙短剑"
+      },
+      "gleamwood_stave": {
+        "name": "辉木长杖"
+      },
+      "wardens_oathband": {
+        "name": "守望者誓言护手"
+      },
+      "wardplate_cuirass": {
+        "name": "守卫板甲胸铠"
+      },
+      "nightweave_tunic": {
+        "name": "夜织皮甲"
+      },
+      "veilcloth_robe": {
+        "name": "帷纱长袍"
+      },
+      "rift_essence": {
+        "name": "裂隙精华"
+      },
+      "rift_gem_crimson": {
+        "name": "猩红裂隙宝石"
+      },
+      "rift_gem_azure": {
+        "name": "蔚蓝裂隙宝石"
+      },
+      "rift_gem_verdant": {
+        "name": "翠绿裂隙宝石"
+      },
+      "riftbound_band_of_might": {
+        "name": "力量裂隙之戒"
+      },
+      "riftbound_band_of_insight": {
+        "name": "洞察裂隙之戒"
+      },
+      "riftbound_band_of_guile": {
+        "name": "诡诈裂隙之戒"
+      },
+      "hoarfrost_edge": {
+        "name": "白霜之锋"
+      },
+      "emberforge_gauntlets": {
+        "name": "烬炉护手"
+      },
+      "broodmother_carapace": {
+        "name": "育母甲壳"
+      },
+      "bonelord_mantle": {
+        "name": "骸骨领主衬肩"
+      },
+      "graskbreaker_girdle": {
+        "name": "格拉斯克碎击腰带"
+      },
+      "voidscar_handwraps": {
+        "name": "虚痕裹手"
+      },
+      "stormscale_treads": {
+        "name": "风暴鳞之靴"
+      },
+      "abyssal_loop": {
+        "name": "深渊之环"
+      },
+      "pactbound_vestments": {
+        "name": "缚约法袍"
+      },
+      "pitlords_cleaver": {
+        "name": "深渊领主的劈斧"
+      },
+      "emberforged_bulwark": {
+        "name": "烬铸壁垒胸甲"
+      },
+      "stormsunder_hood": {
+        "name": "裂风兜帽"
+      },
+      "voidweave_mantle": {
+        "name": "虚织衬肩"
+      },
+      "abysswrought_band": {
+        "name": "渊铸指环"
+      },
+      "heart_of_the_rift": {
+        "name": "裂隙之心"
       },
       "wildheart_tuskblade": {
         "name": "荒野之心獠牙巨刃"
@@ -9019,6 +9736,9 @@ export const zh_CN: EnTranslations = {
       "mantle_of_the_unbroken_shore": {
         "name": "不破之岸披风"
       },
+      "last_keep_signet": {
+        "name": "最后的堡垒印戒"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
@@ -9173,7 +9893,7 @@ export const zh_CN: EnTranslations = {
         "name": "夜牙足垫"
       },
       "glimmerfin_koi": {
-        "name": "微光鳍锦鲤"
+        "name": "日辉锦鲤"
       },
       "raw_bog_eel": {
         "name": "生沼泽鳗鱼"
@@ -9264,6 +9984,12 @@ export const zh_CN: EnTranslations = {
       },
       "verlans_oathblade": {
         "name": "维尔兰的誓约之刃"
+      },
+      "ironreel_fishing_rod": {
+        "name": "铁轮钓竿"
+      },
+      "silverstream_fishing_rod": {
+        "name": "银溪钓竿"
       },
       "briny_idol": {
         "name": "咸海神像"
@@ -10254,6 +10980,9 @@ export const zh_CN: EnTranslations = {
       "hedge_gnome": {
         "name": "树篱地精"
       },
+      "hedge_knight": {
+        "name": "晨曦堡骑士"
+      },
       "the_topiary_bull": {
         "name": "绿雕公牛"
       },
@@ -10265,6 +10994,12 @@ export const zh_CN: EnTranslations = {
       },
       "shoal_scuttler": {
         "name": "浅滩蟹"
+      },
+      "downs_bandit": {
+        "name": "丘陵强盗"
+      },
+      "wreck_thief": {
+        "name": "沉船窃贼"
       },
       "the_wreck_warden": {
         "name": "沉船守卫"
@@ -10298,30 +11033,6 @@ export const zh_CN: EnTranslations = {
       },
       "rift_boss_pitlord": {
         "name": "深渊之主阿兹戈拉斯"
-      },
-      "orkadia_grunt": {
-        "name": "血牙兵卒"
-      },
-      "orkadia_marauder": {
-        "name": "铁皮劫掠者"
-      },
-      "orkadia_axethrower": {
-        "name": "血牙掷斧手"
-      },
-      "orkadia_fel_shaman": {
-        "name": "灰骨邪能萨满"
-      },
-      "orkadia_beast_handler": {
-        "name": "铁皮战兽驯兽师"
-      },
-      "orkadia_siege_brute": {
-        "name": "奥卡迪亚攻城蛮兵"
-      },
-      "orkadia_banner_captain": {
-        "name": "黑旗队长"
-      },
-      "orkadia_warlord": {
-        "name": "督军格罗莫克·碎颅者"
       },
       "wildheart_stalker": {
         "name": "藤爪潜猎者"
@@ -11339,7 +12050,7 @@ export const zh_CN: EnTranslations = {
         }
       },
       "q_stalker_pelts": {
-        "title": "冬日将至高望",
+        "title": "初霜降临高望",
         "text": "{playerName}，这座山的冬天不会敲门，它会踹门。8张山脊潜猎者皮能为守墙披风加衬。",
         "completion": "厚得像我的手臂。今年守望者不会冻死。",
         "objectives": {
@@ -11695,23 +12406,143 @@ export const zh_CN: EnTranslations = {
           }
         }
       },
-      "q_archetype_acceptance": {
-        "title": "属于你自己的技艺",
-        "text": "技艺是学识，{playerName}，而调谐是一份承诺。选择两门相邻的技艺作为你的主修，再把你亲手从谷地矿脉中采出的矿石带给我。",
-        "completion": "承诺已经立下。这两门技艺现为你的主修，与它们相对的技艺则成为你的爱好。",
+      "q_prof_attune_smith": {
+        "title": "铁匠的誓约",
+        "text": "钢铁不会宽恕三心二意的手，所以在你立下任何誓言之前，我把话说明白。把自己交给我的熔炉，武器锻造和护甲锻造便成为你的两门主修技艺，也是你唯一能越过稀有品质继续精进的技艺。轮盘对侧的那门技艺会作为你的爱好安顿下来，练到稀有品质便到此为止。你其余的手艺不会烧尽，{playerName}：它们只是沉寂下去，进入休眠，直到你再次唤醒它们。落锤之前记住这一点：抛下这一对去投别人，你就得靠实打实的苦工才能爬回来。第一次回头放倒五个敌人，下一次八个，再往后十一个，你每背离一次，代价就更重。还站在这儿？那就亲手在溪谷采出三处矿脉的矿石，我们便算立下了这份誓约。",
+        "completion": "好矿石，也有一双会干活的好手。武器锻造和护甲锻造，如今归你去精通了。其余的，自己去挣。",
         "objectives": {
           "0": {
             "label": "已开采矿脉"
           }
         }
       },
-      "q_prof_make_amends": {
-        "title": "弥补",
-        "text": "你曾掌握过这组技艺，{playerName}。重拾旧途并非新的誓言。去帮忙清理谷地道路，让劳作唤醒双手曾经熟悉的节奏。",
-        "completion": "昔日的节奏回来了。你曾经的那组技艺再次生效。",
+      "q_prof_attune_outfitter": {
+        "title": "制装师的尺度",
+        "text": "下刀之前先量清代价，这是我织机前的头一条规矩。选择我，制皮和裁缝便成为你的两门主修技艺，是你能越过稀有品质继续精进的一对；与之相对的那门技艺则作为爱好安顿下来，练到稀有品质便留在那里。你搁置的那些手艺不会散线，{playerName}，只是叠好收起，进入休眠，直到你重新拾起。不过要想清楚：若你离开这一对，日后又想要回来，归途要用一次比一次更长的苦工来偿还，起先宰杀五只，然后八只，再是十一只，每次都多一点。若你心意已定，就剿除四只墨网潜伏者，把它们的丝带到织机前来，因为每一件好衣裳都始于一根好线。",
+        "completion": "针脚匀称，手也稳。制皮和裁缝，任你的技艺能到多远，你就能带它们走多远。量两次，它们便不会辜负你。",
         "objectives": {
           "0": {
-            "label": "击败森林之狼"
+            "label": "已剿除墨网潜伏者"
+          }
+        }
+      },
+      "q_prof_attune_apothecary": {
+        "title": "值得珍藏的食谱",
+        "text": "每一道好菜都是两种相得益彰的味道，好技艺也一样，{playerName}。坐下来跟我学，炼金术和烹饪便成为你的两门主修技艺，是你能越过稀有品质慢炖下去的两门；轮盘另一侧的那门技艺是你的爱好，调味到稀有品质便别再加火了。你其余的手艺都好好收在食柜里，休眠着，不会坏掉，等你哪天取回来。趁锅还凉着我把丑话说前头：溜去投别的一对，回头就是一桩越来越费劲的活计，第一次照应五头野兽，下一次八头，再往后十一头，每添一份就更沉。还馋着这口？那就替我猎来四头野猪，因为一间像样的厨房，得从好肉开始。",
+        "completion": "这个开头才有点油水。炼金术和烹饪，任你烹到多高都行。饿着肚子再回来。",
+        "objectives": {
+          "0": {
+            "label": "已猎杀野猪"
+          }
+        }
+      },
+      "q_prof_attune_bombardier": {
+        "title": "一桩易爆的交易",
+        "text": "哦，哦，你想要好东西，会响的东西，对吧？听着，听着，在你碰任何会滴答作响的玩意儿之前：说句话，工程学和炼金术就成了你的两门主修技艺，是你唯一能往稀有品质之上猛推的两门（相信我，好戏就在那儿）。对侧那门技艺揣进兜里当爱好，练到稀有就打住，别撅嘴。你别的手艺？没丢，{playerName}，只是打个盹，休眠着，你想什么时候叫醒就什么时候叫醒。可是（总有个可是，先按住引线）甩了这一对，晚点再摇摇晃晃爬回来，那可要你流一大堆越攒越多的汗，第一次放倒五个，下一次八个，再往后十一个，你每回一临阵退缩，就更多、更多。行不行？行不行？那就去替我采三丛草药，会炸的那种，别问是哪种，只要你信得够狠，它们全都有点会炸。",
+        "completion": "哈。试剂，正经货，手指头还全都在，好，好。工程学和炼金术，归你了，去做点让人后悔的东西吧。快去。",
+        "objectives": {
+          "0": {
+            "label": "采集草药丛"
+          }
+        }
+      },
+      "q_prof_amends_smith": {
+        "title": "重返熔炉",
+        "text": "这么说，你回到熔炉边了。我不会假装这一点也不刺人，{playerName}，但我是个讲公道的人，这活计也讲公道。你知道回来的代价：苦工，而且你每背离一次，苦工就更多。去放倒骚扰北路的那群狼吧，那挥砍的手感，会让你的双臂重新记起这一对技艺当年对你的要求。",
+        "completion": "手上的节奏回来了。武器锻造和护甲锻造重新成为你的主修技艺。别养成离开的习惯。",
+        "objectives": {
+          "0": {
+            "label": "击败森林狼"
+          }
+        }
+      },
+      "q_prof_amends_outfitter": {
+        "title": "重续经纬",
+        "text": "到底还是回到我的织机前了。我不记恨，{playerName}，可丝线记得那只放它走的手，而重新拾起的代价，每一次都量得更长。去剿除挤满西边树林的墨网潜伏者，这份苦工会在你的手再次触到好丝之前，先把它安顿稳当。",
+        "completion": "又稳了。制皮和裁缝作为主修技艺回到你手中。这一次，在你游荡之前先量两次。",
+        "objectives": {
+          "0": {
+            "label": "已剿除墨网潜伏者"
+          }
+        }
+      },
+      "q_prof_amends_apothecary": {
+        "title": "重回灶台",
+        "text": "瞧瞧，谁又回到我的锅边了。不计前嫌，{playerName}，厨房里总有位置，可你知道，你每撂挑子走一回，这笔账就赊得更长。去东边草地里把野猪清一清，因为实打实的汗水是第一味料，它会让你的手重新记起这份活计。",
+        "completion": "这才是那股老味道。炼金术和烹饪重新回到你的灶台上，成为主修技艺。这一次多留一阵吧。",
+        "objectives": {
+          "0": {
+            "label": "已猎杀野猪"
+          }
+        }
+      },
+      "q_prof_amends_bombardier": {
+        "title": "账本越记越长",
+        "text": "你回来啦，哈，他们总会回来，会响的东西有股魔力，对吧？我可不摆脸色，{playerName}，可这账本，哦这账本，你每溜号一次它就长一截，每回来一次就更长，这才叫公道。去替我把矿坑里的深岩挖掘者清干净，先流汗，后放火花，这是我刚编出来的规矩。",
+        "completion": "就是它，那股痒又回到你手上了。工程学和炼金术，又是主修技艺了，去吧，去放个响的。这回试着待住，嗯？",
+        "objectives": {
+          "0": {
+            "label": "已消灭深岩挖掘者"
+          }
+        }
+      },
+      "q_prof_workorder_forge": {
+        "title": "熔炉工单",
+        "text": "熔炉总是要喂的，{playerName}。给我带来八块铜矿石，我会按这趟脚力付你工钱。不讲排场，只认矿石和铜板。",
+        "completion": "分量足，没炉渣。这是你该得的。用不了多久熔炉又该饿了。",
+        "objectives": {
+          "0": {
+            "label": "已交付铜矿石"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens": {
+        "title": "厨房工单",
+        "text": "我的储藏室见底了，{playerName}，而空储藏室会让厨子发脾气。替我取来八份野味肉，里头有你的工钱，外加我没齿难忘的感激，这份感激不值几个钱，但尝起来更香。",
+        "completion": "这才叫满仓。这是你的酬劳。等你的行囊又沉了，就再来。",
+        "objectives": {
+          "0": {
+            "label": "已交付野味肉"
+          }
+        }
+      },
+      "q_prof_workorder_loom": {
+        "title": "织机工单",
+        "text": "织机空转，闲着的手白白浪费日头，{playerName}。给我带来六束蜘蛛丝，我会按公道的价钱付你，一个铜板都算清楚。",
+        "completion": "好丝，纺得匀。你的铜板，分毫不差。织机谢你，我也谢你。",
+        "objectives": {
+          "0": {
+            "label": "已交付蜘蛛丝"
+          }
+        }
+      },
+      "q_prof_workorder_toolworks": {
+        "title": "工具坊工单",
+        "text": "斧柄、手柄、枪托，我用木头的速度简直像它要绝版了似的，可它才不会绝版，木头是永恒的，{playerName}。给我扛来八根铁皮木原木，我就付你钱，铜板，真金白银的铜板，不是人情，我保证，大概吧。",
+        "completion": "完美，完美，纹理笔直，一点不糟。喏，你的铜板，看，我说话算话（大概）。等你哪天绊到棵树，就再带些来。",
+        "objectives": {
+          "0": {
+            "label": "已交付铁皮木原木"
+          }
+        }
+      },
+      "q_prof_workorder_tannery": {
+        "title": "制革坊工单",
+        "text": "鞣桶空了。带八张粗糙的兽皮来。到了付钱。",
+        "completion": "皮不错。价公道。有了再来。",
+        "objectives": {
+          "0": {
+            "label": "已交付粗糙的兽皮"
+          }
+        }
+      },
+      "q_prof_workorder_apothecary": {
+        "title": "药剂坊工单",
+        "text": "我的架子上需要金叶草，而市面上的存货，不出所料，掺了假。给我带来六株金叶草，不许有伤，我会分毫不差地付你酬劳。有淤伤的叶子恕不收下，所以看好你的行囊。",
+        "completion": "合格。药性足，处理也得当。你的报酬，一枚铜板都点清了。别让它冲昏了头，那是另一种试剂。",
+        "objectives": {
+          "0": {
+            "label": "已交付金叶草"
           }
         }
       },
@@ -12991,9 +13822,6 @@ export const zh_CN: EnTranslations = {
           },
           "9": {
             "label": "墓龙圣所"
-          },
-          "10": {
-            "label": "高望马厩"
           }
         }
       },
@@ -13044,9 +13872,12 @@ export const zh_CN: EnTranslations = {
             "label": "巨魔集会"
           },
           "4": {
-            "label": "血玻璃原野"
+            "label": "最后的堡垒"
           },
           "5": {
+            "label": "血玻璃原野"
+          },
+          "6": {
             "label": "龙喉火山口"
           }
         }
@@ -13212,10 +14043,10 @@ export const zh_CN: EnTranslations = {
             "label": "花园之门"
           },
           "2": {
-            "label": "雕像步道"
+            "label": "花坛步道"
           },
           "3": {
-            "label": "野蔷薇丛"
+            "label": "晨曦堡"
           },
           "4": {
             "label": "花瓣池"
@@ -13225,6 +14056,15 @@ export const zh_CN: EnTranslations = {
           },
           "6": {
             "label": "喷泉庭院"
+          },
+          "7": {
+            "label": "老磨坊"
+          },
+          "8": {
+            "label": "北望哨"
+          },
+          "9": {
+            "label": "睡莲池"
           }
         }
       },
@@ -13252,6 +14092,9 @@ export const zh_CN: EnTranslations = {
           },
           "6": {
             "label": "镜湖"
+          },
+          "7": {
+            "label": "疾风崖马厩"
           }
         }
       },
@@ -13309,15 +14152,15 @@ export const zh_CN: EnTranslations = {
         "enterText": "你穿过封印的王室之门。",
         "leaveText": "你回到荆峰的寒冷空气中。"
       },
-      "orkadia": {
-        "name": "奥卡迪亚",
-        "enterText": "战火骤然泛起绿光。奥卡迪亚的战营已知你到来。",
-        "leaveText": "你杀出重围，回到德雷克兰灰烬弥漫的劲风之中。"
-      },
       "wildheart_basin": {
         "name": "荒野之心盆地",
         "enterText": "温热的雨水在古老石面上嘶嘶作响。荒野之心盆地在你眼前展开。",
         "leaveText": "你从石牙之下穿回棕榈之境的阳光中。"
+      },
+      "the_last_keep": {
+        "name": "最后的堡垒",
+        "enterText": "你踏入最后的堡垒那冰冷而寂静的大厅。",
+        "leaveText": "你带上堡门，重新走进龙裔荒原的寒风中。"
       },
       "drowned_temple": {
         "name": "溺亡神殿",
@@ -13412,6 +14255,111 @@ export const zh_CN: EnTranslations = {
         "sender": "工匠公会",
         "subject": "关于你的护甲锻造与工程学",
         "body": "工匠：\n\n你钻研护甲锻造与工程学的名声已传到公会：铆好甲片，校准齿轮，两门技艺相辅相成。能同时打磨相邻两门技艺的手，正是准备好调谐的手。请到东溪镇拜访哈德伦铁匠：眼下由他代诸位大师发言。用亲手做出的成果向他证明你的技艺，他便会把这两门技艺调谐为你的主修。\n\n谨此，\n工匠公会"
+      },
+      "mastery_reset_notice": {
+        "sender": "公会会馆",
+        "subject": "你的手艺，从此作数",
+        "body": "公会同仁：\n\n公会已启用全新的技艺衡量之法。人人从头攀登：你的制作技能与采集熟练度已归零。\n\n其余一切分毫未动，仍归你所有：你的配方、工具与材料、银行与金币、调谐与头衔、功绩与名望、任务与邮件。\n\n如今的攀登童叟无欺。廉价的活计再也带不动你。去寻求更难的配方、更富的矿脉、更深的水域吧。\n\n谨致敬意，\n公会会馆"
+      },
+      "prof_tier_weaponcrafting_armorcrafting_1": {
+        "sender": "达尔瓦锻造师",
+        "subject": "值得一提的火花",
+        "body": "消息传到了我的熔炉：你有一门主修技艺如今已稳在优秀品质。这不过是漫长攀登里最低的一阶，但你是在铁砧上挣来的，不是靠开口讨来的。把火烧旺。"
+      },
+      "prof_tier_weaponcrafting_armorcrafting_2": {
+        "sender": "达尔瓦锻造师",
+        "subject": "稀有品质，实打实挣来的",
+        "body": "他们告诉我，你有一门主修技艺已达到稀有品质。到了这一阶，马虎的手就被甩下，留下的都是真正的铁匠。你还站着。好。"
+      },
+      "prof_tier_weaponcrafting_armorcrafting_3": {
+        "sender": "达尔瓦锻造师",
+        "subject": "金属如今听你的了",
+        "body": "你有一门主修技艺已越过稀有，进入真正硬核的活计。金属会回应这样一双手，不再和它较劲。别让这几句夸奖软了你的臂膀。"
+      },
+      "prof_tier_weaponcrafting_armorcrafting_4": {
+        "sender": "达尔瓦锻造师",
+        "subject": "已近梯顶",
+        "body": "你有一门主修技艺，如今距大师级只差一阶。我认识的手里，能爬到这个高度的没几双，能在这里守住锋芒的更少。把这段攀登走完。"
+      },
+      "prof_tier_weaponcrafting_armorcrafting_5": {
+        "sender": "达尔瓦锻造师",
+        "subject": "终臻大师级",
+        "body": "你有一门主修技艺已达到大师级，那是一双手所能攀到的最高处。我不轻易夸人，所以这话只说一次：熔炉为你骄傲。现在，去教火焰点新东西吧。"
+      },
+      "prof_tier_leatherworking_tailoring_1": {
+        "sender": "奥蒂莉织工",
+        "subject": "匀整的第一行",
+        "body": "公会注意到，你有一门主修技艺已达到优秀品质。这只是许多行里的第一行，但它匀整而端正。下一行也要量得这般仔细。"
+      },
+      "prof_tier_leatherworking_tailoring_2": {
+        "sender": "奥蒂莉织工",
+        "subject": "稀有品质，量得妥帖",
+        "body": "你有一门主修技艺已攀到稀有品质。到了这一步，粗心的手会露出每一处漏针，而你没有。我暗自欣慰。"
+      },
+      "prof_tier_leatherworking_tailoring_3": {
+        "sender": "奥蒂莉织工",
+        "subject": "纹样渐渐清晰",
+        "body": "你有一门主修技艺已越过稀有，进入更精细的活计。到了这个水准，纹样便在手下渐渐清晰，不必再靠猜。继续量两次。"
+      },
+      "prof_tier_leatherworking_tailoring_4": {
+        "sender": "奥蒂莉织工",
+        "subject": "距顶端仅一行",
+        "body": "你有一门主修技艺，距大师级只差一行。最后一行总是最难保持匀整。此刻别急。"
+      },
+      "prof_tier_leatherworking_tailoring_5": {
+        "sender": "奥蒂莉织工",
+        "subject": "最后一针",
+        "body": "你有一门主修技艺已达到大师级。我把你的活计量了两次，一如我量一切，它经得起。很少有手能把最后一针收得这般利落。我很骄傲，而这话我不轻易说。"
+      },
+      "prof_tier_alchemy_cooking_1": {
+        "sender": "马洛厨师",
+        "subject": "未来滋味的一点先尝",
+        "body": "消息飘回了我的厨房：你有一门主修技艺已达到优秀品质。这只是头一口，仅此而已，但很有奔头。让锅子一直转起来。"
+      },
+      "prof_tier_alchemy_cooking_2": {
+        "sender": "马洛厨师",
+        "subject": "稀有品质，还没糊边",
+        "body": "他们告诉我，你有一门主修技艺已慢炖到稀有品质。到了这个火候，多数厨子会把菜烧焦，你没有。坐一会儿，但别坐太久。"
+      },
+      "prof_tier_alchemy_cooking_3": {
+        "sender": "马洛厨师",
+        "subject": "这下上道了",
+        "body": "你有一门主修技艺已咕嘟着越过稀有，炖出了真正的深味。用他们的话说，这下你算上道了。放胆调味，别停下尝口。"
+      },
+      "prof_tier_alchemy_cooking_4": {
+        "sender": "马洛厨师",
+        "subject": "离盛宴只差一道菜",
+        "body": "你有一门主修技艺，距大师级只差一道菜。最后这道总是最浓，也最容易过火。握勺的手稳住。"
+      },
+      "prof_tier_alchemy_cooking_5": {
+        "sender": "马洛厨师",
+        "subject": "大师级，趁热上桌",
+        "body": "你有一门主修技艺已达到大师级，那是整个食柜最高的一层。我给谁都做饭，可很少有人能一路烧到这儿。真为你骄傲。现在，去做一道让人在餐桌前落泪的菜吧。"
+      },
+      "prof_tier_engineering_alchemy_1": {
+        "sender": "吉泽尔修补匠",
+        "subject": "第一颗火花，哈",
+        "body": "喂，数字说你有一门主修技艺刚够着优秀品质，小意思，芝麻大点，可它嘭地响了一声，对吧？第一颗火花总是最可爱的。再多来点火花。去。"
+      },
+      "prof_tier_engineering_alchemy_2": {
+        "sender": "吉泽尔修补匠",
+        "subject": "稀有，哦，稀有啊",
+        "body": "他们告诉我，你有一门主修技艺爬到了稀有品质，而稀有正是开始真正危险起来的地方（好的那种危险）。多数人还没等到好玩就撒手了。你没有。哈。"
+      },
+      "prof_tier_engineering_alchemy_3": {
+        "sender": "吉泽尔修补匠",
+        "subject": "这下要响了",
+        "body": "你有一门主修技艺炸着越过了稀有，冲进了正经玩意儿，哦，就是从这儿开始要响了。千万别停，冲劲就是一切，还有引线。"
+      },
+      "prof_tier_engineering_alchemy_4": {
+        "sender": "吉泽尔修补匠",
+        "subject": "离顶端一阶，就一阶",
+        "body": "你有一门主修技艺，距大师级就差一阶，一阶，就一阶，你感觉到它在嗡嗡响了吗？最后一步是最响的一声。别眨眼。"
+      },
+      "prof_tier_engineering_alchemy_5": {
+        "sender": "吉泽尔修补匠",
+        "subject": "大师级，轰",
+        "body": "你有一门主修技艺到了大师级，最顶上，轰，整架梯子，爬完了。我不派发夸奖，我派发引线，不过这次两样都给你：你既出色，又有那么点吓人。去让群山紧张紧张吧。"
       }
     },
     "itemSets": {
@@ -13484,6 +14432,7 @@ export const zh_CN: EnTranslations = {
     "delveRiteShrineCandleInteract": "烛火神龛：按 F 触碰",
     "delveRiteShrineReedInteract": "芦苇神龛：按 F 触碰",
     "delveRiteShrineSkullInteract": "骷髅神龛：按 F 触碰",
-    "mailboxName": "邮箱"
+    "mailboxName": "邮箱",
+    "noticeboardName": "告示板"
   }
 };

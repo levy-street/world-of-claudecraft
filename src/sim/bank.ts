@@ -16,7 +16,7 @@
 // (enforced by tests/architecture.test.ts). This module draws NO rng.
 
 import type { BankInfo } from '../world_api';
-import { addStacked, bagCapacity, bagsFullError, countFit } from './bags';
+import { addStacked, bagCapacity, bagsFullError, countFit, instancedCountCap } from './bags';
 import { ITEMS } from './data';
 import * as deedsMod from './deeds';
 import type { SimContext } from './sim_context';
@@ -75,8 +75,11 @@ export interface MoveResult {
  *
  *  - `count` undefined = the whole stack.
  *  - An instanced slot (#1165 per-instance payload) moves as ONE indivisible unit
- *    regardless of count: it never merges with a dest stack (a deep clone is pushed
- *    into a fresh slot), so it needs one free dest slot or refuses 'no_fit'.
+ *    regardless of count (its units can never be split from their payload).
+ *    Identical-payload stacking: the units merge into a byte-equal
+ *    mergeable dest stack with room and otherwise land in a fresh deep-cloned
+ *    dest slot (countFit/addStacked carry the payload), refusing 'no_fit' only
+ *    when the whole count cannot land.
  *  - A fungible slot reuses the bags.ts stacking rules (countFit/addStacked): the
  *    move fits only when every requested copy fits, then tops up dest stacks and
  *    appends fresh ones. A partial count decrements the source; a whole-stack move
@@ -93,11 +96,14 @@ export function moveBetweenContainers(
   }
   const slot = source[sourceIndex];
 
-  // Instanced: the whole slot moves as one unit (a per-instance payload can never be
-  // split or merged), so it always needs a fresh dest slot.
+  // Instanced: the whole slot moves as one unit (a per-instance payload can never
+  // be split from its units), merging into a byte-equal dest stack when one has
+  // room and taking a fresh (deep-cloned) dest slot otherwise.
   if (slot.instance) {
-    if (dest.length >= destCapacity) return { moved: 0, refusal: 'no_fit' };
-    dest.push(cloneInvSlot(slot));
+    if (countFit(dest, destCapacity, slot.itemId, slot.count, slot.instance) < slot.count) {
+      return { moved: 0, refusal: 'no_fit' };
+    }
+    addStacked(dest, slot.itemId, slot.count, slot.instance);
     source.splice(sourceIndex, 1);
     return { moved: slot.count };
   }
@@ -296,8 +302,15 @@ export function sanitizeBankState(raw: unknown): BankState {
       const e = entry as { itemId?: unknown; count?: unknown; instance?: unknown };
       if (typeof e.itemId !== 'string' || e.itemId === '') continue;
       const hasInstance = !!e.instance && typeof e.instance === 'object';
-      // An instanced slot forces count 1: a count above 1 would mint payload copies.
-      const count = hasInstance ? 1 : Math.max(1, Math.floor(Number(e.count)) || 1);
+      // The shared tamper ceiling (bags.ts instancedCountCap, also applied to
+      // the carried-inventory hydration in Sim.addPlayer): merge-legal stack
+      // cap for a counted instanced slot, 1 for a charge-bearing payload, and
+      // an unknown item def stays dormant uncapped data like the plain arm.
+      const instanceCap = instancedCountCap(
+        ITEMS[e.itemId],
+        hasInstance ? (e.instance as InvSlot['instance']) : undefined,
+      );
+      const count = Math.min(instanceCap, Math.max(1, Math.floor(Number(e.count)) || 1));
       const slot: InvSlot = hasInstance
         ? { itemId: e.itemId, count, instance: e.instance as InvSlot['instance'] }
         : { itemId: e.itemId, count };

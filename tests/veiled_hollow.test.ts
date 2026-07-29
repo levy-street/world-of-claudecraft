@@ -74,8 +74,11 @@ describe('the sealed border is a hard movement wall', () => {
   it('still lets the portal deliver players across', () => {
     const sim = new Sim({ seed: SEED, playerClass: 'warrior', world: VEILED_HOLLOW_TEST_WORLD });
     const p = sim.player;
-    p.pos.x = -140;
-    p.pos.z = 844.5;
+    // stand inside the crystal cave gate (REALM_PORTALS side a, the Thornpeak
+    // bench): the start point must track the authored gate position
+    const gate = REALM_PORTALS[0].a;
+    p.pos.x = gate.x;
+    p.pos.z = gate.z + 0.5;
     p.prevPos = { ...p.pos };
     sim.tick();
     expect(p.pos.z).toBeGreaterThan(CREST);

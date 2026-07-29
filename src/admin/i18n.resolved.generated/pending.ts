@@ -13,7 +13,6 @@ export const pending: Record<string, readonly string[]> = {
   "es": [
     "location.kind.rift",
     "nav.unstuckReports",
-    "stats.playersCap",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
     "unstuckReports.colArea",
@@ -54,7 +53,6 @@ export const pending: Record<string, readonly string[]> = {
   "es_ES": [
     "location.kind.rift",
     "nav.unstuckReports",
-    "stats.playersCap",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
     "unstuckReports.colArea",
@@ -95,7 +93,6 @@ export const pending: Record<string, readonly string[]> = {
   "fr_FR": [
     "location.kind.rift",
     "nav.unstuckReports",
-    "stats.playersCap",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
     "unstuckReports.colArea",
@@ -136,7 +133,6 @@ export const pending: Record<string, readonly string[]> = {
   "fr_CA": [
     "location.kind.rift",
     "nav.unstuckReports",
-    "stats.playersCap",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
     "unstuckReports.colArea",
@@ -178,7 +174,6 @@ export const pending: Record<string, readonly string[]> = {
   "it_IT": [
     "location.kind.rift",
     "nav.unstuckReports",
-    "stats.playersCap",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
     "unstuckReports.colArea",
@@ -219,7 +214,6 @@ export const pending: Record<string, readonly string[]> = {
   "de_DE": [
     "location.kind.rift",
     "nav.unstuckReports",
-    "stats.playersCap",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
     "unstuckReports.colArea",
@@ -260,7 +254,6 @@ export const pending: Record<string, readonly string[]> = {
   "zh_CN": [
     "location.kind.rift",
     "nav.unstuckReports",
-    "stats.playersCap",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
     "unstuckReports.colArea",
@@ -301,7 +294,6 @@ export const pending: Record<string, readonly string[]> = {
   "zh_TW": [
     "location.kind.rift",
     "nav.unstuckReports",
-    "stats.playersCap",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
     "unstuckReports.colArea",
@@ -342,7 +334,6 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [
     "location.kind.rift",
     "nav.unstuckReports",
-    "stats.playersCap",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
     "unstuckReports.colArea",
@@ -383,7 +374,6 @@ export const pending: Record<string, readonly string[]> = {
   "ja_JP": [
     "location.kind.rift",
     "nav.unstuckReports",
-    "stats.playersCap",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
     "unstuckReports.colArea",
@@ -424,7 +414,6 @@ export const pending: Record<string, readonly string[]> = {
   "pt_BR": [
     "location.kind.rift",
     "nav.unstuckReports",
-    "stats.playersCap",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
     "unstuckReports.colArea",
@@ -465,7 +454,6 @@ export const pending: Record<string, readonly string[]> = {
   "ru_RU": [
     "location.kind.rift",
     "nav.unstuckReports",
-    "stats.playersCap",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
     "unstuckReports.colArea",
@@ -506,7 +494,6 @@ export const pending: Record<string, readonly string[]> = {
   "cs_CZ": [
     "location.kind.rift",
     "nav.unstuckReports",
-    "stats.playersCap",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
     "unstuckReports.colArea",
@@ -547,7 +534,6 @@ export const pending: Record<string, readonly string[]> = {
   "nl_NL": [
     "location.kind.rift",
     "nav.unstuckReports",
-    "stats.playersCap",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
     "unstuckReports.colArea",
@@ -588,7 +574,6 @@ export const pending: Record<string, readonly string[]> = {
   "pl_PL": [
     "location.kind.rift",
     "nav.unstuckReports",
-    "stats.playersCap",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
     "unstuckReports.colArea",
@@ -629,7 +614,6 @@ export const pending: Record<string, readonly string[]> = {
   "id_ID": [
     "location.kind.rift",
     "nav.unstuckReports",
-    "stats.playersCap",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
     "unstuckReports.colArea",
@@ -670,7 +654,6 @@ export const pending: Record<string, readonly string[]> = {
   "tr_TR": [
     "location.kind.rift",
     "nav.unstuckReports",
-    "stats.playersCap",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
     "unstuckReports.colArea",
@@ -711,7 +694,6 @@ export const pending: Record<string, readonly string[]> = {
   "sv_SE": [
     "location.kind.rift",
     "nav.unstuckReports",
-    "stats.playersCap",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
     "unstuckReports.colArea",
@@ -752,7 +734,6 @@ export const pending: Record<string, readonly string[]> = {
   "vi_VN": [
     "location.kind.rift",
     "nav.unstuckReports",
-    "stats.playersCap",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
     "unstuckReports.colArea",
@@ -793,7 +774,6 @@ export const pending: Record<string, readonly string[]> = {
   "da_DK": [
     "location.kind.rift",
     "nav.unstuckReports",
-    "stats.playersCap",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
     "unstuckReports.colArea",

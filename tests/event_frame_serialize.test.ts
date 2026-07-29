@@ -573,6 +573,34 @@ describe('event_frame pure assembly', () => {
 // Over-delivery and empty-batch selection guards the fan-out relies on (pre-existing
 // routeEvents branches the refactor keeps intact).
 describe('routeEvents selection guards', () => {
+  it('routes structured noticeboard state only to its pid-scoped reader', () => {
+    const server = new GameServer();
+    const fReader = fakeWs();
+    const reader = joinServer(server, fReader, 1, 'Reader');
+    const fBystander = fakeWs();
+    joinServer(server, fBystander, 2, 'Bystander');
+    fReader.sent.length = 0;
+    fBystander.sent.length = 0;
+
+    const event: SimEvent = {
+      type: 'noticeboard',
+      noticeboardId: 'noticeboard_eastbrook',
+      state: 'empty',
+      pid: reader.pid,
+    };
+    routeRaw(server, [event]);
+
+    expect(fReader.sent).toEqual([
+      eventsFrame({
+        type: 'noticeboard',
+        noticeboardId: 'noticeboard_eastbrook',
+        state: 'empty',
+        pid: reader.pid,
+      }),
+    ]);
+    expect(fBystander.sent).toEqual([]);
+  });
+
   it('does not deliver the spectated target whisper to a spectator (plain-arm chat skip)', () => {
     const server = new GameServer();
     const fWatcher = fakeWs();

@@ -23,6 +23,7 @@ import {
   isDelvePos,
   isRiftPos,
   OVERWORLD_GRAVEYARDS,
+  PLAYER_START,
   RIFT_REGION_HALF_X,
   RIFT_REGION_HALF_Z,
   riftInstanceOrigin,
@@ -63,11 +64,17 @@ export { RESURRECTION_SICKNESS_ID };
 
 // --- graveyard selection ----------------------------------------------------
 
-// Nearest overworld graveyard to a position (pure: a scan of the static list).
-export function nearestOverworldGraveyard(x: number, z: number): { x: number; z: number } {
-  let best = OVERWORLD_GRAVEYARDS[0];
+// Nearest overworld graveyard to a position. Worlds without authored graveyards
+// fall back to their own start point rather than leaking a built-in town anchor.
+export function nearestOverworldGraveyard(
+  x: number,
+  z: number,
+  graveyards: readonly { x: number; z: number }[] = OVERWORLD_GRAVEYARDS,
+  fallback: { x: number; z: number } = PLAYER_START,
+): { x: number; z: number } {
+  let best: { x: number; z: number } = fallback;
   let bestD = Infinity;
-  for (const g of OVERWORLD_GRAVEYARDS) {
+  for (const g of graveyards) {
     const dx = g.x - x;
     const dz = g.z - z;
     const d = dx * dx + dz * dz;
@@ -84,13 +91,20 @@ export function nearestOverworldGraveyard(x: number, z: number): { x: number; z:
 // ghost runs its spirit back to the door and re-enters to resurrect at the entrance, so
 // no Spirit Healer stands inside an instance. Outdoors it is the nearest overworld
 // graveyard to where the body fell.
-function ghostGraveyard(ctx: SimContext, p: Entity): { x: number; z: number } {
+function ghostGraveyard(
+  ctx: SimContext,
+  p: Entity,
+  graveyards: readonly { x: number; z: number }[] = OVERWORLD_GRAVEYARDS,
+  fallback: { x: number; z: number } = PLAYER_START,
+): { x: number; z: number } {
   const dungeon = dungeonAt(p.pos.x);
-  if (dungeon) return nearestOverworldGraveyard(dungeon.doorPos.x, dungeon.doorPos.z);
+  if (dungeon) {
+    return nearestOverworldGraveyard(dungeon.doorPos.x, dungeon.doorPos.z, graveyards, fallback);
+  }
   const delve = ctx.delveRunForPlayer(p.id);
   if (delve && isDelvePos(p.pos.x)) {
     const door = DELVES[delve.delveId]?.doorPos;
-    if (door) return nearestOverworldGraveyard(door.x, door.z);
+    if (door) return nearestOverworldGraveyard(door.x, door.z, graveyards, fallback);
   }
   // A rift death returns the spirit to the overworld graveyard nearest where the
   // player STEPPED THROUGH the portal (the instance's returnPos), not the far-off
@@ -104,18 +118,23 @@ function ghostGraveyard(ctx: SimContext, p: Entity): { x: number; z: number } {
         Math.abs(p.pos.x - o.x) <= RIFT_REGION_HALF_X &&
         Math.abs(p.pos.z - o.z) <= RIFT_REGION_HALF_Z
       ) {
-        return nearestOverworldGraveyard(inst.returnPos.x, inst.returnPos.z);
+        return nearestOverworldGraveyard(inst.returnPos.x, inst.returnPos.z, graveyards, fallback);
       }
     }
   }
-  return nearestOverworldGraveyard(p.pos.x, p.pos.z);
+  return nearestOverworldGraveyard(p.pos.x, p.pos.z, graveyards, fallback);
 }
 
 // --- release / resurrect ----------------------------------------------------
 
 // Release the spirit: leave the body where it fell and rise as a ghost at the
 // nearest graveyard. Replaces the old instant-respawn-at-graveyard behavior.
-export function releasePlayerSpirit(ctx: SimContext, pid?: number): void {
+export function releasePlayerSpirit(
+  ctx: SimContext,
+  pid?: number,
+  graveyards: readonly { x: number; z: number }[] = OVERWORLD_GRAVEYARDS,
+  fallback: { x: number; z: number } = PLAYER_START,
+): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
@@ -126,7 +145,7 @@ export function releasePlayerSpirit(ctx: SimContext, pid?: number): void {
     releaseSpiritInDelve(ctx, meta.entityId);
     return;
   }
-  releaseAtNearestGraveyard(ctx, meta, p, true);
+  releaseAtNearestGraveyard(ctx, meta, p, true, graveyards, fallback);
 }
 
 /**
@@ -140,14 +159,34 @@ export function releasePlayerSpiritForUnstuck(ctx: SimContext, pid?: number): vo
   releaseAtNearestGraveyard(ctx, r.meta, r.e, false);
 }
 
+/**
+ * Finish Unstuck for a player who was ALREADY dead when they invoked it. The
+ * graveyard/Pale Keeper loop has nothing left to offer a body that cannot reach
+ * its corpse or an angel, so pull them to the graveyard and resurrect them there
+ * on exactly the Spirit Healer's terms: RES_HEALER_HP_FRACTION of their pools
+ * plus The Keeper's Toll. Unstuck only saves them the walk, never the toll, so it
+ * can never be the cheap way out of a death.
+ */
+export function reviveAtGraveyardForUnstuck(ctx: SimContext, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r?.e.dead) return;
+  const { meta, e: p } = r;
+  // Resolve the graveyard before the revive moves the body out of its instance band.
+  const gy = ghostGraveyard(ctx, p);
+  reviveAt(ctx, meta, p, { x: gy.x, y: p.pos.y, z: gy.z }, RES_HEALER_HP_FRACTION, true);
+  ctx.emit({ type: 'respawn', pid: meta.entityId });
+}
+
 function releaseAtNearestGraveyard(
   ctx: SimContext,
   meta: PlayerMeta,
   p: Entity,
   leaveCorpse: boolean,
+  graveyards: readonly { x: number; z: number }[] = OVERWORLD_GRAVEYARDS,
+  fallback: { x: number; z: number } = PLAYER_START,
 ): void {
   // Resolve the graveyard before moving the entity out of its instance band.
-  const gy = ghostGraveyard(ctx, p);
+  const gy = ghostGraveyard(ctx, p, graveyards, fallback);
   p.corpsePos = leaveCorpse ? { x: p.pos.x, y: p.pos.y, z: p.pos.z } : null;
   p.corpseInstanceId = leaveCorpse ? ctx.instanceClaimIdAt(p.pos) : null;
   p.ghost = true; // p.dead stays true
@@ -313,6 +352,11 @@ export function spawnSpiritHealerAt(ctx: SimContext, x: number, z: number): numb
 }
 
 // Place an angel at every overworld graveyard. Called once from the Sim ctor.
-export function spawnOverworldSpiritHealers(ctx: SimContext): void {
-  for (const g of OVERWORLD_GRAVEYARDS) spawnSpiritHealerAt(ctx, g.x, g.z);
+export function spawnOverworldSpiritHealers(
+  ctx: SimContext,
+  graveyards: readonly { x: number; z: number }[] = OVERWORLD_GRAVEYARDS,
+): void {
+  for (const g of graveyards) {
+    spawnSpiritHealerAt(ctx, g.x, g.z);
+  }
 }

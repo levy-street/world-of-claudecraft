@@ -24,7 +24,6 @@ import {
   accountAndScopeForToken,
   accountById,
   accountByUnsubscribeToken,
-  accountForToken,
   accountMailTarget,
   accountTwoFactorEnabled,
   backfillAccountEmailIfEmpty,
@@ -631,7 +630,6 @@ function useRuntime(): AccountGameHooks {
 
 const REAL_ACCOUNT_DB = {
   accountAndScopeForToken,
-  accountForToken,
   moderationStatusForAccount,
   createCompanionToken,
   listCompanionTokens,
@@ -697,12 +695,12 @@ const activeGuard: Middleware = async (ctx, next) => {
  * Logout gate (mirrors the legacy /api/account/logout arm): any bearer token that
  * still maps to an account may proceed, with NO scope or moderation gate, so a
  * banned/suspended/deactivated account can still sign out this device. A missing
- * token 401s DB-free; a present-but-unknown token 401s after the accountForToken
- * lookup, exactly as the legacy arm did.
+ * token 401s DB-free; a present-but-unknown token 401s after the scoped lookup,
+ * exactly as the legacy arm did.
  */
 const logoutGuard: Middleware = async (ctx, next) => {
   const token = bearerToken(ctx.req);
-  if (token === null || (await accountDb.accountForToken(token)) === null) {
+  if (token === null || (await accountDb.accountAndScopeForToken(token)) === null) {
     json(ctx.res, 401, NOT_AUTHENTICATED);
     return;
   }

@@ -8,6 +8,7 @@ import { Sim } from '../src/sim/sim';
 import {
   type Aura,
   dist2d,
+  FISHING_CAST_ID,
   MAX_LEVEL,
   meleeMissChance,
   mobXpValue,
@@ -184,7 +185,7 @@ describe('movement directions', () => {
     expect(sim.player.pos.z).toBeCloseTo(zAfterForward, 1);
   });
 
-  it('preserves launch momentum while airborne', () => {
+  it('keeps launch momentum while airborne and steers with air control', () => {
     const sim = makeScopedSim(EMPTY_TEST_WORLD, 'warrior');
     teleportTo(sim, 0, -40);
     sim.player.facing = 0;
@@ -192,13 +193,21 @@ describe('movement directions', () => {
     sim.moveInput.jump = true;
     sim.tick();
     expect(sim.player.onGround).toBe(false);
+    // Every key released mid-air: the launch velocity carries unchanged.
     sim.moveInput.forward = false;
-    sim.moveInput.strafeRight = true;
+    sim.moveInput.jump = false;
     const xAtLaunch = sim.player.pos.x;
     const zAtLaunch = sim.player.pos.z;
-    for (let i = 0; i < 4; i++) sim.tick();
+    sim.tick();
     expect(sim.player.pos.z).toBeGreaterThan(zAtLaunch);
-    expect(Math.abs(sim.player.pos.x - xAtLaunch)).toBeLessThan(0.05);
+    expect(Math.abs(sim.player.pos.x - xAtLaunch)).toBeLessThan(1e-9);
+    // A held strafe now steers the arc (air control) while the forward
+    // momentum still carries: rightward drift is -x at facing 0.
+    sim.moveInput.strafeRight = true;
+    const zBeforeSteer = sim.player.pos.z;
+    for (let i = 0; i < 4; i++) sim.tick();
+    expect(sim.player.pos.z).toBeGreaterThan(zBeforeSteer);
+    expect(sim.player.pos.x).toBeLessThan(xAtLaunch - 0.2);
   });
 
   it('walks down a walkable slope without going airborne', () => {
@@ -443,6 +452,10 @@ describe('combat', () => {
     facePlayerAt(sim, wolf);
     for (let i = 0; i < 20 * 30 && !wolf.dead; i++) sim.tick();
     expect(wolf.dead).toBe(true);
+    // Consume BOTH halves (harvest then loot); a tagged corpse with
+    // an unclaimed harvest would otherwise hold its 30s grace window and defer
+    // the respawn past this loop.
+    sim.harvestCorpse(wolf.id);
     sim.lootCorpse(wolf.id);
     for (let i = 0; i < 20 * 10 && wolf.dead; i++) sim.tick();
     expect(wolf.dead).toBe(false);

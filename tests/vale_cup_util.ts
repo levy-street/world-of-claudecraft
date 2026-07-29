@@ -15,7 +15,10 @@ import { groundHeight } from '../src/sim/world';
 export const VALE_CUP_TEST_WORLD: WorldContent = {
   ...BUILTIN_WORLD,
   camps: [],
-  npcs: {},
+  // Bram spawns from the ACTIVE world's npc registry (a custom world without
+  // him must not inherit one), so the scoped world keeps his record while
+  // still dropping every other npc for a cheap construction.
+  npcs: { groundskeeper_bram: BUILTIN_WORLD.npcs.groundskeeper_bram },
   groundObjects: [],
 };
 

@@ -38,12 +38,18 @@ function writeDismissed(): void {
   }
 }
 
-export function initGpuNotice(input: { softwareRendering: boolean; desktopShell: boolean }): void {
+// Returns true when the notice was shown this boot, so the perf-nudge sibling
+// can suppress its redundant software arm (packet 0 ruling R16); everything
+// else here is unchanged by that packet.
+export function initGpuNotice(input: {
+  softwareRendering: boolean;
+  desktopShell: boolean;
+}): boolean {
   let state: GpuNoticeState = resolveGpuNotice({
     softwareRendering: input.softwareRendering,
     dismissedBefore: readDismissed(),
   });
-  if (!state.shown) return;
+  if (!state.shown) return false;
 
   let root: HTMLDivElement | null = null;
   let message: HTMLSpanElement | null = null;
@@ -87,4 +93,5 @@ export function initGpuNotice(input: { softwareRendering: boolean; desktopShell:
   // Locale flips re-render whatever is currently shown (the language selector
   // dispatches this on both the shell and the in-game options path).
   document.addEventListener('woc:languagechange', render);
+  return true;
 }

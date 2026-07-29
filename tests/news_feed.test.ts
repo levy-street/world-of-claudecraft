@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
   loadNewsInto,
+  markNewReleases,
   type NewsReleaseEntry,
+  nextLastSeenReleaseId,
+  renderCompactNews,
   renderReleaseArticle,
   renderReleaseBody,
-  renderWelcomeNews,
   stripReleaseNotesPreamble,
 } from '../src/ui/news_feed';
 
@@ -31,6 +33,18 @@ describe('renderReleaseBody', () => {
   it('drops a non-http(s) link target, rendering it as plain text', () => {
     const html = renderReleaseBody('[danger](javascript:alert(1))');
     expect(html).not.toContain('<a href');
+  });
+
+  it('joins hard-wrapped consecutive lines into one paragraph; a blank line breaks it', () => {
+    // GitHub release notes arrive hard-wrapped near 72 columns; per-line
+    // paragraphs rendered every source wrap as its own one-line paragraph.
+    expect(renderReleaseBody('adds a broad set\nof improvements.\n\nNext paragraph.')).toBe(
+      '<p>adds a broad set of improvements.</p><p>Next paragraph.</p>',
+    );
+  });
+
+  it('a plain line directly after a bullet list closes the list and starts a paragraph', () => {
+    expect(renderReleaseBody('- one\nplain tail')).toBe('<ul><li>one</li></ul><p>plain tail</p>');
   });
 });
 
@@ -101,7 +115,7 @@ describe('renderReleaseArticle: NEW badge', () => {
   });
 });
 
-describe('renderWelcomeNews: the Welcome Screen compact news column', () => {
+describe('renderCompactNews: the character-select compact news feed', () => {
   const releases = (n: number): (NewsReleaseEntry & { isNew: boolean })[] =>
     Array.from({ length: n }, (_, i) => ({
       id: n - i,
@@ -115,23 +129,23 @@ describe('renderWelcomeNews: the Welcome Screen compact news column', () => {
     }));
 
   it('renders the empty state when there are no releases', () => {
-    expect(renderWelcomeNews([], 'https://example.com/releases')).toContain('news-empty');
+    expect(renderCompactNews([], 'https://example.com/releases')).toContain('news-empty');
   });
 
   it('renders the latest release fully expanded (a news-item article) with its NEW badge', () => {
-    const html = renderWelcomeNews(releases(1), 'https://example.com/releases');
+    const html = renderCompactNews(releases(1), 'https://example.com/releases');
     expect(html).toContain('news-item');
     expect(html).toContain('notes for 1');
     expect(html).toContain('news-badge');
   });
 
   it('collapses every OLDER release to a version + date <details> row that expands in place', () => {
-    const html = renderWelcomeNews(releases(3), 'https://example.com/releases');
+    const html = renderCompactNews(releases(3), 'https://example.com/releases');
     // The latest is a full article, not a collapsed row.
     expect(html).toContain('news-item');
     // The two older releases are native <details> disclosures (expand in place,
     // no JS wiring needed): one per older release.
-    expect((html.match(/<details class="ws-news-collapsed">/g) ?? []).length).toBe(2);
+    expect((html.match(/<details class="news-collapsed">/g) ?? []).length).toBe(2);
     expect(html).toContain('v2.0.0');
     expect(html).toContain('v1.0.0');
     // Each collapsed row still carries its rendered body, just inside the
@@ -142,26 +156,79 @@ describe('renderWelcomeNews: the Welcome Screen compact news column', () => {
 
   it('marks every NEW release, not only the expanded latest: a collapsed row for an older release also carries the badge when it is new too', () => {
     const all = releases(3).map((r) => ({ ...r, isNew: true }));
-    const html = renderWelcomeNews(all, 'https://example.com/releases');
+    const html = renderCompactNews(all, 'https://example.com/releases');
     expect((html.match(/news-badge/g) ?? []).length).toBe(3);
   });
 
   it('a not-new older release renders its collapsed row without a badge', () => {
-    const html = renderWelcomeNews(releases(3), 'https://example.com/releases');
+    const html = renderCompactNews(releases(3), 'https://example.com/releases');
     // releases(3) marks only index 0 (the latest, v3) as new; v2/v1 are not.
     expect((html.match(/news-badge/g) ?? []).length).toBe(1);
   });
 
   it('appends a "View all updates on GitHub" link at the bottom, pointed at the given URL', () => {
-    const html = renderWelcomeNews(releases(2), 'https://github.com/example/repo/releases');
-    expect(html).toContain('ws-news-view-all');
+    const html = renderCompactNews(releases(2), 'https://github.com/example/repo/releases');
+    expect(html).toContain('news-view-all');
     expect(html).toContain('href="https://github.com/example/repo/releases"');
-    expect(html.indexOf('ws-news-view-all')).toBeGreaterThan(html.indexOf('ws-news-collapsed'));
+    expect(html.indexOf('news-view-all')).toBeGreaterThan(html.indexOf('news-collapsed'));
   });
 
   it('escapes the URL passed for the view-all link', () => {
-    const html = renderWelcomeNews(releases(1), 'https://example.com/"><script>x</script>');
+    const html = renderCompactNews(releases(1), 'https://example.com/"><script>x</script>');
     expect(html).not.toContain('<script>x</script>');
+  });
+});
+
+describe('NEW-badge marker logic', () => {
+  const releases = [
+    { id: 5, tag: 'v0.26.0', name: 'v0.26.0', publishedAt: '2026-07-10T00:00:00Z' },
+    { id: 4, tag: 'v0.25.0', name: 'v0.25.0', publishedAt: '2026-06-01T00:00:00Z' },
+    { id: 3, tag: 'v0.24.0', name: 'v0.24.0', publishedAt: '2026-05-01T00:00:00Z' },
+  ];
+
+  it('marks every release NEW when no marker is stored yet (first-ever visit)', () => {
+    const marked = markNewReleases(releases, null);
+    expect(marked.every((r) => r.isNew)).toBe(true);
+  });
+
+  it('marks only releases newer than the stored marker', () => {
+    const marked = markNewReleases(releases, 4);
+    expect(marked.find((r) => r.id === 5)?.isNew).toBe(true);
+    expect(marked.find((r) => r.id === 4)?.isNew).toBe(false);
+    expect(marked.find((r) => r.id === 3)?.isNew).toBe(false);
+  });
+
+  it('caps the shown list at 5 releases', () => {
+    const many = Array.from({ length: 8 }, (_, i) => ({
+      id: 8 - i,
+      tag: `v${8 - i}`,
+      name: `v${8 - i}`,
+      publishedAt: '2026-01-01T00:00:00Z',
+    }));
+    expect(markNewReleases(many, null)).toHaveLength(5);
+  });
+
+  it('advances the last-seen marker to the max seen release id, never backwards', () => {
+    expect(nextLastSeenReleaseId(releases, null)).toBe(5);
+    expect(nextLastSeenReleaseId(releases, 5)).toBe(5);
+    expect(nextLastSeenReleaseId(releases, 10)).toBe(10);
+    expect(nextLastSeenReleaseId([], 3)).toBe(3);
+  });
+
+  it('preserves extra fields on a superset type (the full release body/url/prerelease shape renderCompactNews renders from), not just the minimal ReleaseSummary shape', () => {
+    const fullReleases = releases.map((r) => ({
+      ...r,
+      body: `body for ${r.tag}`,
+      url: `https://example.com/${r.tag}`,
+      prerelease: false,
+    }));
+    const marked = markNewReleases(fullReleases, 4);
+    expect(marked.find((r) => r.id === 5)).toMatchObject({
+      body: 'body for v0.26.0',
+      url: 'https://example.com/v0.26.0',
+      prerelease: false,
+      isNew: true,
+    });
   });
 });
 
@@ -205,11 +272,11 @@ describe('stripReleaseNotesPreamble', () => {
   });
 });
 
-describe('welcome news strips the redundant preamble at render time', () => {
+describe('compact news strips the redundant preamble at render time', () => {
   it('renders neither the Release Notes h1 nor the metadata rows', () => {
     const body =
       '# World of ClaudeCraft v0.26.0 Release Notes\n\n**Release:** v0.26.0\n\nThe real intro.';
-    const html = renderWelcomeNews(
+    const html = renderCompactNews(
       [
         {
           id: 1,

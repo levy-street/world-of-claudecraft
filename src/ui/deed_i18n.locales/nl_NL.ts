@@ -85,7 +85,7 @@ export const table: DeedLocaleTable = {
   },
   prog_master_gatherer: {
     name: 'Meesterverzamelaar',
-    desc: 'Bereik 100 vaardigheid in Mijnbouw, Houthakken en Kruidenkunde.',
+    desc: 'Bereik 100 vaardigheid in drie van de vier verzamelberoepen Mijnbouw, Houthakken, Kruidenkunde en Vissen.',
   },
   prog_first_craft: { name: 'Handwerk', desc: 'Voltooi je eerste geslaagde ambachtswerk.' },
   prog_craft_specialist: {
@@ -409,7 +409,7 @@ export const table: DeedLocaleTable = {
     desc: 'Ontdek elk onderdeel van de Mournweave-Dracht.',
   },
   col_set_crownforged: {
-    name: 'Bonewrought-Regalia',
+    name: 'Beengetemperde Regalia',
     desc: 'Ontdek elk onderdeel van de Bonewrought-Regalia.',
   },
   col_set_nighttalon: {
@@ -417,7 +417,7 @@ export const table: DeedLocaleTable = {
     desc: 'Ontdek elk onderdeel van de Direfang-Vacht.',
   },
   col_set_soulflame: {
-    name: 'Wraithfire-Regalia',
+    name: 'Schimvuur-Regalia',
     desc: 'Ontdek elk onderdeel van de Wraithfire-Regalia.',
   },
   col_set_stormcallers: {
@@ -441,7 +441,10 @@ export const table: DeedLocaleTable = {
     name: 'Vaste Klant',
     desc: 'Ontdek alle tien de stukken uit de voorraad van de Heroïsche Kwartiermeester.',
   },
-  col_glimmerfin: { name: 'Een Glansje Hoop', desc: 'Vang een Glansvin-Koi.' },
+  col_glimmerfin: {
+    name: 'Een Glansje Hoop',
+    desc: 'Vang een Zonglinstering-Koi.',
+  },
   col_full_creel: {
     name: 'Volle Viskorf',
     desc: 'Ontdek alle zes de gewone vangsten uit de wateren van het Dal, het Moeras en de Hoogten.',
@@ -623,7 +626,10 @@ export const table: DeedLocaleTable = {
     name: 'Iets Glinsterends',
     desc: 'Raap een fonkelend voorwerp op van de grond.',
   },
-  exp_first_ore: { name: 'De Eerste Ader', desc: 'Oogst je eerste ertsader.' },
+  exp_first_ore: {
+    name: 'Hak Ontmoet Steen',
+    desc: 'Oogst je eerste ertsader.',
+  },
   exp_first_timber: { name: 'Van Onderen!', desc: 'Oogst je eerste houtvindplaats.' },
   exp_first_herb: { name: 'Groene Vingers', desc: 'Oogst je eerste kruidenvindplaats.' },
   feat_era_cap: {
@@ -695,5 +701,120 @@ export const table: DeedLocaleTable = {
   chr_marsh_first_cast: {
     name: 'Alen in het Riet',
     desc: 'Vang een vis in de wateren van Slijkveenmoeras.',
+  },
+  prog_guildsworn: {
+    name: 'Ambachtsgetrouwe',
+    desc: 'Stem je af op een archetypepaar en neem zijn ambachten ernstig ter hand.',
+    title: 'Ambachtsgetrouwe',
+  },
+  prog_masterwright: {
+    name: 'Meestersmaker',
+    desc: 'Vervaardigt je eerste meesterwerk, een stuk zo fijn dat de hele zone er van hoort.',
+    title: 'Meestersmaker',
+  },
+  prog_fishing_100: {
+    name: 'Oude Zout',
+    desc: 'Bereik 100 vaardigheid in Vissen.',
+  },
+  prog_master_angler: {
+    name: 'Meesterhengelaar',
+    desc: 'Bereik 200 vaardigheid in Vissen, het absolute toppunt van de visserskunst.',
+    title: 'Meesterhengelaar',
+  },
+  prog_engineering_50: {
+    name: 'Tandraderen en Veren',
+    desc: 'Bereik 50 vaardigheid in Knutselwerk.',
+  },
+  prog_alchemy_50: {
+    name: 'Vreemde Brouwsels',
+    desc: 'Bereik 50 vaardigheid in Alchemie.',
+  },
+  prog_cooking_50: {
+    name: 'Ervaren Kok',
+    desc: 'Bereik 50 vaardigheid in Koken.',
+  },
+  prog_leatherworking_50: {
+    name: 'Looiers-Handel',
+    desc: 'Bereik 50 vaardigheid in Leerbewerken.',
+  },
+  prog_tailoring_50: {
+    name: 'Een Verfijnde Naad',
+    desc: 'Bereik 50 vaardigheid in Kleermaken.',
+  },
+  prog_enchanting_50: {
+    name: 'Een Glinstering van het Arcane',
+    desc: 'Bereik 50 vaardigheid in Betovering.',
+  },
+  prog_weaponcrafting_50: {
+    name: 'Snijvlak en Warmte',
+    desc: 'Bereik 50 vaardigheid in Wapensmeden.',
+  },
+  prog_armorcrafting_50: {
+    name: 'Hamer en Plaat',
+    desc: 'Bereik 50 vaardigheid in Harnasmaken.',
+  },
+  prog_grandmaster_engineering: {
+    name: 'Grootmeester-Knutselwerk',
+    desc: 'Bereik 125 vaardigheid in Knutselwerk, het absolute toppunt van het ambacht.',
+    title: 'Grootmeester-Knutselwerk',
+  },
+  prog_grandmaster_alchemy: {
+    name: 'Grootmeester-Alchemie',
+    desc: 'Bereik 125 vaardigheid in Alchemie, het absolute toppunt van het ambacht.',
+    title: 'Grootmeester-Alchemie',
+  },
+  prog_grandmaster_cooking: {
+    name: 'Grootmeester-Koken',
+    desc: 'Bereik 125 vaardigheid in Koken, het absolute toppunt van het ambacht.',
+    title: 'Grootmeester-Koken',
+  },
+  prog_grandmaster_leatherworking: {
+    name: 'Grootmeester-Leerbewerken',
+    desc: 'Bereik 125 vaardigheid in Leerbewerken, het absolute toppunt van het ambacht.',
+    title: 'Grootmeester-Leerbewerken',
+  },
+  prog_grandmaster_tailoring: {
+    name: 'Grootmeester-Kleermaken',
+    desc: 'Bereik 125 vaardigheid in Kleermaken, het absolute toppunt van het ambacht.',
+    title: 'Grootmeester-Kleermaken',
+  },
+  prog_grandmaster_enchanting: {
+    name: 'Grootmeester-Betovering',
+    desc: 'Bereik 125 vaardigheid in Betovering, het absolute toppunt van het ambacht.',
+    title: 'Grootmeester-Betovering',
+  },
+  prog_grandmaster_weaponcrafting: {
+    name: 'Grootmeester-Wapensmeden',
+    desc: 'Bereik 125 vaardigheid in Wapensmeden, het absolute toppunt van het ambacht.',
+    title: 'Grootmeester-Wapensmeden',
+  },
+  prog_grandmaster_armorcrafting: {
+    name: 'Grootmeester-Harnasmaken',
+    desc: 'Bereik 125 vaardigheid in Harnasmaken, het absolute toppunt van het ambacht.',
+    title: 'Grootmeester-Harnasmaken',
+  },
+  col_pristine_vein: {
+    name: 'Ongerept Ader',
+    desc: 'Breek een ongerepte ader open en laat de hele zone er van horen.',
+  },
+  col_ancient_heartwood: {
+    name: 'Oud Hardhout',
+    desc: 'Ontlok een stuk oud hardhout aan een gevelde boom.',
+  },
+  col_moonlit_bloom: {
+    name: 'Maanbloesem',
+    desc: 'Oogst een maanbloesem op het exacte moment dat hij openbarst.',
+  },
+  col_perfect_specimen: {
+    name: 'Een Perfect Exemplaar',
+    desc: 'Haal een perfect exemplaar van een geslacht beest, zonder een snee of een vlek.',
+  },
+  soc_first_salvage: {
+    name: 'Niets Weggooien',
+    desc: 'Salvage een stuk uitrusting terug tot ruwe grondstoffen.',
+  },
+  soc_salvage_50: {
+    name: 'Het Slopersveld',
+    desc: 'Salvage 50 stuks uitrusting terug tot ruwe grondstoffen.',
   },
 };

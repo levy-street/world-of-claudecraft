@@ -6,6 +6,7 @@
 // pass (southPassX). Terrain shape: the EMBER_* tables in world.ts (coast
 // lobes, the desert gradient, volcano cones).
 
+import { CASTLE_BUILDINGS } from '../castle_layout';
 import type {
   CampDef,
   GroundObjectDef,
@@ -44,6 +45,7 @@ export const DRAKELANDS_ZONE: ZoneDef = {
     { x: 360, z: 1940, label: 'The Gatewood', id: 'the_gatewood' },
     { x: 330, z: 2100, label: 'Cinder Dunes', id: 'cinder_dunes' },
     { x: 460, z: 2140, label: 'Trollmoot', id: 'trollmoot' },
+    { x: 406, z: 2032, label: 'The Last Keep', id: 'the_last_keep' },
     { x: 270, z: 2270, label: 'Bloodglass Fields', id: 'bloodglass_fields' },
     { x: 390, z: 2320, label: 'Drakemaw Caldera', id: 'drakemaw_caldera' },
   ],
@@ -53,6 +55,34 @@ export const DRAKELANDS_ZONE: ZoneDef = {
 };
 
 // The causeway road runs on through the Wyrmgate, then forks into the wastes.
+// Authored always-bloom flower circles (render/foliage.ts reads these the
+// way the dusk realm reads REALM_FLOWER_MEADOWS): firebloom fields on the
+// green land around Wyrmwatch and down the Gatewood road verges, before the
+// waste opens. The ember flower palette is bright red and orange, so the
+// fields read as drifts of flame against the grass line.
+export const DRAKELANDS_FLOWER_MEADOWS: { x: number; z: number; r: number }[] = [
+  // the gate lawns north of town, flanking the causeway road
+  { x: 384, z: 1858, r: 9 },
+  { x: 426, z: 1866, r: 8 },
+  // the east downs off the hub ring
+  { x: 440, z: 1908, r: 11 },
+  { x: 432, z: 1934, r: 7 },
+  // the west approach and the warren hollow
+  { x: 368, z: 1884, r: 9 },
+  { x: 352, z: 1914, r: 7 },
+  // the Gatewood road south, verges widening toward the dune fork
+  { x: 382, z: 1946, r: 10 },
+  { x: 356, z: 1986, r: 12 },
+  { x: 390, z: 1992, r: 8 },
+  // the second bloom wave: the causeway shore, the pass mouth, and the
+  // gatewood clearings past the warren
+  { x: 404, z: 1826, r: 7 },
+  { x: 418, z: 1842, r: 8 },
+  { x: 344, z: 1866, r: 8 },
+  { x: 330, z: 1940, r: 10 },
+  { x: 416, z: 1966, r: 9 },
+];
+
 export const DRAKELANDS_ROADS: { x: number; z: number }[][] = [
   [
     { x: 404, z: 1804 },
@@ -419,6 +449,16 @@ export const DRAKELANDS_QUEST_ORDER: string[] = [
 ];
 
 export const DRAKELANDS_ITEMS: Record<string, ItemDef> = {
+  // --- keepsakes ---
+  // The Last Keep's entrance-hall souvenir: the interior instance's one
+  // ground object (a dungeon must place at least one encounter; the
+  // zero-combat keep places a keepsake instead of a fight).
+  last_keep_signet: {
+    id: 'last_keep_signet',
+    name: 'Signet of the Last Keep',
+    kind: 'junk',
+    sellValue: 25,
+  },
   // --- quest items ---
   ashbone_war_brand: {
     id: 'ashbone_war_brand',
@@ -478,8 +518,10 @@ export const DRAKELANDS_CAMPS: CampDef[] = [
   { mobId: 'ashbone_raider', center: { x: 356, z: 2086 }, radius: 10, count: 3 },
   { mobId: 'ashbone_raider', center: { x: 296, z: 2184 }, radius: 10, count: 3 },
   { mobId: 'ashbone_warcaller', center: { x: 448, z: 2106 }, radius: 8, count: 2 },
-  { mobId: 'emberwing_drake', center: { x: 408, z: 2292 }, radius: 8, count: 1 },
-  { mobId: 'emberwing_drake', center: { x: 284, z: 2268 }, radius: 8, count: 1 },
+  // the dens sit on the probed level shelves at the volcano feet, so the
+  // hoard and egg clutches (render/ember_features.ts) rest on flat ground
+  { mobId: 'emberwing_drake', center: { x: 419, z: 2266 }, radius: 8, count: 1 },
+  { mobId: 'emberwing_drake', center: { x: 302, z: 2258 }, radius: 8, count: 1 },
 ];
 export const DRAKELANDS_OBJECTS: GroundObjectDef[] = [
   {
@@ -522,11 +564,12 @@ export const DRAKELANDS_QUEST_CAMPS: CampDef[] = [
 
 export const DRAKELANDS_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
-  // fallen keeps of the old drake-cult: castle ruins across the wastes
+  // fallen keeps of the old drake-cult: castle ruins across the wastes.
+  // (The Last Keep's ring at (422, 2032) is gone: that castle STANDS now,
+  // rebuilt as the walled garrison in castle_layout.ts.)
   ruinRings: [
     { x: 330, z: 2114, ringR: 10, columns: 8 }, // the Cinder Bastion
     { x: 338, z: 2124, ringR: 6, columns: 5 },
-    { x: 422, z: 2032, ringR: 8, columns: 6 }, // the Last Keep, forest's edge
     { x: 468, z: 2158, ringR: 7, columns: 6 }, // the Trollmoot henge
     { x: 268, z: 2256, ringR: 6, columns: 5 }, // Bloodglass watch
   ],
@@ -544,11 +587,21 @@ export const DRAKELANDS_PROPS: ZonePropsDef = {
     { kind: 'house', x: 393, z: 1888, w: 5, d: 5, rot: 2.0 },
     { kind: 'house', x: 416, z: 1912, w: 5, d: 6, rot: 2.6 },
   ],
-  wells: [{ x: 410, z: 1902, r: 1.5 }],
+  wells: [
+    { x: 410, z: 1902, r: 1.5 },
+    // the Last Keep's courtyard well
+    { x: 408, z: 2033, r: 1.5 },
+  ],
   stalls: [
     { x: 398, z: 1896, rot: 0.5, r: 1.6 },
     { x: 410, z: 1910, rot: -1.2, r: 1.6 },
+    // the keep's market row inside the main gate
+    { x: 391, z: 2033, rot: 0.7, r: 1.6 },
+    { x: 402, z: 2044.5, rot: -2.1, r: 1.6 },
   ],
+  // the Last Keep's bailey: every building comes from the castle plan (one
+  // source of truth with the walls, walks, and colliders)
+  decorProps: [...CASTLE_BUILDINGS],
   crates: [
     [406, 1892],
     [396, 1912],

@@ -52,7 +52,10 @@ export function unstuckFeedback(event: Event): UnstuckFeedback {
   }
   if (event.phase === 'completed') {
     return {
-      key: 'hudChrome.unstuck.completedAtGraveyard',
+      key:
+        event.reason === 'revived_at_graveyard'
+          ? 'hudChrome.unstuck.revivedAtGraveyard'
+          : 'hudChrome.unstuck.completedAtGraveyard',
       kind: 'success',
       banner: true,
       log: true,

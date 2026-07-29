@@ -2,9 +2,17 @@
 //
 // Unstuck is intentionally not a short-range teleport. An eligible player may
 // start it from any valid world position. If they remain idle and undisturbed
-// for the countdown, they die and rise as a ghost at the nearest graveyard.
-// Their corpse is abandoned, so the only way back is the Pale Keeper and The
-// Keeper's Toll.
+// for the countdown, the outcome depends on whether they were alive when they
+// asked:
+//  - alive: they die and rise as a ghost at the nearest graveyard. Their corpse
+//    is abandoned, so the only way back is the Pale Keeper and The Keeper's Toll.
+//  - dead or a ghost: the death loop has nothing left to take, so they are pulled
+//    to the nearest graveyard and raised there on exactly the Pale Keeper's terms
+//    (a fifth of their pools plus The Keeper's Toll). This is the escape hatch for
+//    a spirit that cannot reach its corpse or an angel; it saves the walk, not the
+//    toll, so it is never the cheap way out of a death.
+// Either way the price is paid, and neither outcome can be reached by an attempt
+// that started on the other side of the life/death line (see cancelReason).
 
 import { isRooted, isStunned } from './combat/cc';
 import {
@@ -19,7 +27,7 @@ import { delveModuleZOffset } from './delves/runs';
 import { riftInstanceAtPos } from './rift/runs';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import { releasePlayerSpiritForUnstuck } from './spirit';
+import { releasePlayerSpiritForUnstuck, reviveAtGraveyardForUnstuck } from './spirit';
 import {
   DT,
   type Entity,
@@ -49,6 +57,13 @@ export interface PendingUnstuck {
   area: UnstuckArea;
   damageTaken: number;
   lastAnnouncedSecond: number;
+  /**
+   * Whether the invoker was dead or a ghost when the countdown began. It decides
+   * the outcome (release vs revive) and makes a crossing of the life/death line
+   * IN EITHER DIRECTION a cancel, so an attempt can never resolve as the outcome
+   * the player did not ask for.
+   */
+  startedDead: boolean;
 }
 
 export type CancelledUnstuckEvent = Extract<UnstuckEvent, { phase: 'cancelled' }> & {
@@ -163,14 +178,33 @@ function competitive(ctx: SimContext, pid: number, p: Entity): boolean {
   );
 }
 
+/**
+ * A dead, unreleased body is frozen: the tick runs no movement for it, so its
+ * velocity, `onGround`, and `jumping` keep whatever value they held at the instant
+ * of death and never update again. Gating on them would strand exactly the player
+ * Unstuck exists to rescue, since dying mid-fall leaves `onGround` false forever.
+ * A ghost is excluded: it moves under the ordinary movement update, so its motion
+ * is live and the stand-still contract still means something. Only these physics
+ * fields go stale; handleDeath already clears casting, eating, drinking, sitting,
+ * charge, and follow, so the action gates stay honest for a corpse.
+ */
+function isFrozenCorpse(p: Entity): boolean {
+  return p.dead && !p.ghost;
+}
+
+function motionBlock(p: Entity): UnstuckBlockedReason | null {
+  if (isFrozenCorpse(p)) return null;
+  if (!p.onGround || p.jumping) return 'falling';
+  if (forcedMovement(p)) return 'moving';
+  return null;
+}
+
 function blockedReason(ctx: SimContext, meta: PlayerMeta, p: Entity): UnstuckBlockedReason | null {
-  if (p.ghost) return 'ghost';
-  if (p.dead) return 'dead';
   if (p.jailed) return 'jailed';
   if (p.inCombat || p.combatTimer < 5) return 'combat';
   if (isStunned(p) || isRooted(p)) return 'controlled';
-  if (!p.onGround || p.jumping) return 'falling';
-  if (forcedMovement(p)) return 'moving';
+  const motion = motionBlock(p);
+  if (motion) return motion;
   if (p.castingAbility !== null || isConsuming(p) || p.sitting) return 'busy';
   if (competitive(ctx, p.id, p)) return 'competitive';
   if (ctx.tradeFor(p.id)) return 'trading';
@@ -219,6 +253,7 @@ export function requestUnstuck(ctx: SimContext, pid?: number): boolean {
     area: current.area,
     damageTaken: meta.counters.damageTaken,
     lastAnnouncedSecond: UNSTUCK_COUNTDOWN_SECONDS,
+    startedDead: p.dead || p.ghost,
   };
   p.cooldowns.set(UNSTUCK_COOLDOWN_ID, UNSTUCK_RETRY_SECONDS);
   ctx.emit({
@@ -245,15 +280,15 @@ function cancelReason(
     Math.abs(p.pos.y - pending.origin.y) > CANCEL_VERTICAL_DISTANCE
   )
     return 'moved';
+  // Crossing the life/death line either way invalidates the attempt: a living
+  // player who died must not silently get the revive, and a player who was raised
+  // mid-countdown no longer needs one.
+  if ((p.dead || p.ghost) !== pending.startedDead) return 'state_changed';
   if (
-    p.dead ||
-    p.ghost ||
     p.jailed ||
     isStunned(p) ||
     isRooted(p) ||
-    !p.onGround ||
-    p.jumping ||
-    forcedMovement(p) ||
+    motionBlock(p) !== null ||
     competitive(ctx, p.id, p) ||
     ctx.tradeFor(p.id)
   )
@@ -302,8 +337,16 @@ function completeUnstuck(
   pending: PendingUnstuck,
 ): void {
   meta.pendingUnstuck = null;
-  ctx.handleDeath(p, null);
-  releasePlayerSpiritForUnstuck(ctx, p.id);
+  // A living player pays the ordinary price: they die here and rise as a ghost,
+  // corpse abandoned. Someone who was ALREADY dead has nothing left to lose that
+  // way, so they are pulled to the graveyard and raised on the Pale Keeper's terms.
+  const wasDead = p.dead || p.ghost;
+  if (wasDead) {
+    reviveAtGraveyardForUnstuck(ctx, p.id);
+  } else {
+    ctx.handleDeath(p, null);
+    releasePlayerSpiritForUnstuck(ctx, p.id);
+  }
   p.cooldowns.set(UNSTUCK_COOLDOWN_ID, UNSTUCK_SUCCESS_COOLDOWN_SECONDS);
 
   const destination = unstuckLocationAt(ctx, p.id, p.pos)?.point ?? {
@@ -314,7 +357,7 @@ function completeUnstuck(
   ctx.emit({
     type: 'unstuck',
     phase: 'completed',
-    reason: 'nearest_graveyard',
+    reason: wasDead ? 'revived_at_graveyard' : 'nearest_graveyard',
     area: pending.area,
     origin: pending.origin,
     destination,

@@ -393,6 +393,7 @@ describe('main.ts wiring', () => {
     expect(statsStart).toBeGreaterThan(-1);
     const statsArm = stripComments(src.slice(statsStart, src.indexOf('\n    }', statsStart)));
     expect(statsArm).toContain('getAccountsCreatedCount()');
+    expect(statsArm).toContain('getCharactersCreatedCount()');
     expect(statsArm).toContain('publicReadRateLimited(req)');
     expect(statsArm).not.toContain('getAccountsCount(');
   });

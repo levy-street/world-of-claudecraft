@@ -121,7 +121,7 @@ describe('MOUNT_RACE_COURSE geometry contract', () => {
       expect(g.z).toBeLessThan(STABLE_PADDOCK.divider.z - 4);
     }
     expect(MOUNT_RACE_COURSE.jumps.length).toBe(7);
-    expect(MOUNT_RACE_COURSE.arch.x).toBe(114);
+    expect(MOUNT_RACE_COURSE.arch.x).toBe(390);
     expect(isOnMountRaceStartPlatform(MOUNT_RACE_START_PLATFORM)).toBe(true);
     expect(MOUNT_RACE_START_PLATFORM.x).toBeLessThan(MOUNT_RACE_COURSE.arch.x);
     expect(MOUNT_RACE_START_PLATFORM.size).toBe(8);

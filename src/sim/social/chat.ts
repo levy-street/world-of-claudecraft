@@ -31,6 +31,7 @@ import {
 import type { SimContext } from '../sim_context';
 import { dist2d, type Entity, type OverheadEmoteId, type PlayerClass, YELL_RANGE } from '../types';
 import { requestUnstuck } from '../unstuck';
+import { setAwayState } from './away';
 import * as readouts from './chat_readouts';
 
 const CHAT_BURST = 8; // messages a player may send back-to-back...
@@ -129,7 +130,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     const mode = awaym[1].toLowerCase() as AwayStatus['mode'];
     const custom = awaym[2]?.trim();
     if (r.meta.away?.mode === mode && !custom) {
-      r.meta.away = null;
+      setAwayState(r.e, r.meta, null);
       ctx.emit({
         type: 'log',
         text:
@@ -141,7 +142,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
       });
     } else {
       const message = custom || (mode === 'afk' ? 'Away From Keyboard' : 'Do Not Disturb');
-      r.meta.away = { mode, message };
+      setAwayState(r.e, r.meta, { mode, message });
       ctx.emit({
         type: 'log',
         text:
@@ -157,7 +158,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
 
   // Any other chat means you're back: clear a lingering away status.
   if (r.meta.away) {
-    r.meta.away = null;
+    setAwayState(r.e, r.meta, null);
     ctx.emit({
       type: 'log',
       text: 'You are no longer marked as away.',

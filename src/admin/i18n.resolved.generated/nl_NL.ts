@@ -46,7 +46,7 @@ export const nl_NL: AdminTranslations = {
   "stats.peakOnline": "piek online",
   "stats.peakOnlineToday": "piek online 24u",
   "stats.peakOnlineAllTime": "piek online aller tijden",
-  "stats.playersCap": "player cap",
+  "stats.playersCap": "spelerskapaciteit",
   "stats.accounts": "accounts",
   "stats.characters": "personages",
   "stats.newAccounts24h": "nieuwe accounts 24u",

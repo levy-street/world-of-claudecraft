@@ -23,9 +23,19 @@ import { COMMAND_NAMES, type CommandName, DISPATCH_ONLY_COMMANDS } from '../src/
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 
 // Verified counts on the current tree (re-derived below; never trust stale prose).
-// +2 each for the Last Bell scene commands (scene_skip + scene_choice).
-const EXPECTED_SEND_COUNT = 171;
-const EXPECTED_DISPATCH_COUNT = 182;
+// Merged union: the Talent V2 row-selection surface (selectTalentRow supersedes the
+// mage line's pickRowTalent) plus the mage line's empowered-cast release and pet
+// Water Jet commands, on top of Season 1 Armory skin, ignore_add/ignore_remove,
+// stow_weapon, Dungeon Finder, inv_move, the release's Card Duel minigame
+// (card_queue_join/leave, play_card, card_forfeit), Professions 2.0's
+// place_mobile_station, train_recipe, the three enchanting actions
+// (disenchant_item, apply_enchant, salvage_item), unbind_item (the
+// Maker's Bond unbind service), and the Rift + mounts surface (rift and
+// forge commands, learn_riding, mount selection).
+// The Last Bell scene_skip and scene_choice commands add two sends and two
+// dispatch arms on top of that upstream surface.
+const EXPECTED_SEND_COUNT = 176;
+const EXPECTED_DISPATCH_COUNT = 187;
 const EXPECTED_DISPATCH_ONLY_COUNT = 11;
 
 // The chat sub-channel routing switch (server/game.ts `switch

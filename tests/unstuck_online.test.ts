@@ -84,6 +84,7 @@ function armUnstuck(server: GameServer, session: ClientSession): void {
     area: { kind: 'overworld', id: 'eastbrook_vale' },
     damageTaken: meta.counters.damageTaken,
     lastAnnouncedSecond: UNSTUCK_COUNTDOWN_SECONDS,
+    startedDead: player.dead || player.ghost,
   };
   player.cooldowns.set(UNSTUCK_COOLDOWN_ID, UNSTUCK_RETRY_SECONDS);
 }

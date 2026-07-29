@@ -20,17 +20,20 @@ const FULL: Partial<Record<EquipSlot, string>> = {
 };
 
 describe('char_view: paperdoll data model', () => {
-  it('lays the classic two columns: head/neck/shoulder/chest/weapon, then hands/waist/legs/feet/rings', () => {
-    expect(PAPERDOLL_LEFT_SLOTS).toEqual(['helmet', 'neck', 'shoulder', 'chest', 'mainhand']);
-    expect(PAPERDOLL_RIGHT_SLOTS).toEqual([
-      'gloves',
-      'waist',
-      'legs',
-      'feet',
-      'ring1',
-      'ring2',
+  it('lays two balanced 6/6 columns: head/neck/shoulder/chest/mainhand/offhand, then hands/waist/legs/feet/rings', () => {
+    // Showcase redesign: the offhand moved from the tail of the RIGHT column to
+    // the end of the LEFT column (under Main Hand), balancing the paperdoll to
+    // 6/6 so both bands flank the fixed-width model stage evenly. Inspect inherits
+    // this since it reuses these arrays via buildPaperdollView.
+    expect(PAPERDOLL_LEFT_SLOTS).toEqual([
+      'helmet',
+      'neck',
+      'shoulder',
+      'chest',
+      'mainhand',
       'offhand',
     ]);
+    expect(PAPERDOLL_RIGHT_SLOTS).toEqual(['gloves', 'waist', 'legs', 'feet', 'ring1', 'ring2']);
   });
 
   it('resolves every equipped slot to its item, in column order', () => {
@@ -41,6 +44,7 @@ describe('char_view: paperdoll data model', () => {
       'shoulder',
       'chest',
       'mainhand',
+      'offhand',
     ]);
     expect(view.right.map((c) => c.slot)).toEqual([
       'gloves',
@@ -49,10 +53,10 @@ describe('char_view: paperdoll data model', () => {
       'feet',
       'ring1',
       'ring2',
-      'offhand',
     ]);
     expect(view.left[0].item).toBe(ITEMS.cryptbone_helm);
     expect(view.left[4].item).toBe(ITEMS.worn_sword);
+    expect(view.left[5].item).toBeNull(); // offhand: unequipped in FULL, now the left tail
     expect(view.right[3].item).toBe(ITEMS.oiled_boots);
   });
 

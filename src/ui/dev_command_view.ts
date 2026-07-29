@@ -145,6 +145,18 @@ export const DEV_COMMAND_ACTIONS: readonly DevCommandAction[] = [
     },
   },
   {
+    id: 'kit',
+    category: 'inventory',
+    labelKey: 'devCommand.actions.kit.label',
+    descriptionKey: 'devCommand.actions.kit.description',
+    // The spec is optional: with the field left blank the server uses whatever the
+    // character is currently specced into, so a tester can just press Run.
+    command: (values) => {
+      const spec = token(values, 'kitSpec');
+      return spec ? `/dev kit ${spec}` : '/dev kit';
+    },
+  },
+  {
     id: 'gold',
     category: 'inventory',
     labelKey: 'devCommand.actions.gold.label',

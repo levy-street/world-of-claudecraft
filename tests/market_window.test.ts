@@ -12,6 +12,10 @@ const componentsCss = readFileSync(
   new URL('../src/styles/components.css', import.meta.url),
   'utf8',
 );
+const mobileCss = readFileSync(
+  new URL('../src/styles/hud.mobile.css', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
 const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
 
 describe('market_window: no magic values', () => {
@@ -122,6 +126,103 @@ describe('market_window: desktop docking with bags (PR #2107 review round 4)', (
   });
 });
 
+describe('market_window: mobile pairing (hud.mobile.css)', () => {
+  // Whitespace-normalized view: biome wraps long selector lists and declarations,
+  // so raw multi-line source pins on these rules would rot on a reformat.
+  const norm = mobileCss.replace(/\s+/g, ' ');
+
+  it('joins the paired-geometry rule so the desktop dock cannot leak through on touch', () => {
+    // The regression this fix exists for: the mobile sheet base never declared
+    // height, so the desktop #market-window height: min(640px, calc(85vh - 24px))
+    // leaked through the layer order and squeezed the market to a ~308px sliver
+    // on a landscape phone (about 1.5 listing rows), while the force-opened
+    // #bags companion had no mobile pairing arm at all and stacked fully over
+    // the market, burying the Sell staging flow. The paired rule must
+    // neutralize every desktop docking property for BOTH halves of the market
+    // cluster (max-width/max-height/transform included, mirroring the bank's
+    // neutralizer, so no desktop clamp can undercut the 50/50 split).
+    const start = norm.indexOf(
+      'body.mobile-touch.bank-open #bank-window, body.mobile-touch.bank-open #bags, body.mobile-touch.market-open #market-window, body.mobile-touch.market-open #bags {',
+    );
+    expect(start, 'the market cluster must join the shared paired-geometry rule').toBeGreaterThan(
+      0,
+    );
+    const block = norm.slice(start, norm.indexOf('}', start));
+    expect(block).toContain('max-width: none');
+    expect(block).toContain('max-height: none');
+    expect(block).toContain('transform: none');
+    // Full height above the tray reservation, mirroring the bank/vendor pairing.
+    expect(block).toContain('top: max(10px, env(safe-area-inset-top))');
+    expect(block).toContain('bottom: calc(72px + env(safe-area-inset-bottom))');
+    // The standalone (undocked) mobile arm owns height too: a bags-only close
+    // undocks the market onto the sheet base, where the desktop clamp would
+    // otherwise re-leak and mis-size the sheet against the viewport. The full
+    // block is pinned so the docked pair's overflow-x: hidden (inherited from
+    // this lower-specificity rule) cannot silently vanish either.
+    expect(norm).toContain(
+      'body.mobile-touch #market-window { height: auto; max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px); overflow-y: auto; overflow-x: hidden; }',
+    );
+  });
+
+  it('joins the paired-cluster companion rules: chips one row, titles aligned, own x-btn kept', () => {
+    // The market's #bags half sits at the same half-viewport width as the
+    // bank's, so it joins the one-scrollable-row chips rule (a wrapped chip
+    // row eats the grid on 360px-tall phones) and the 47px title alignment.
+    expect(norm).toContain('body.mobile-touch.market-open #bags .bag-chips { flex-wrap: nowrap;');
+    expect(norm).toContain('body.mobile-touch.market-open #bags .bag-chip { flex: 0 0 auto; }');
+    expect(norm).toContain(
+      'body.mobile-touch.market-open #market-window .panel-title, body.mobile-touch.market-open #bags .panel-title { height: 47px;',
+    );
+    // Deliberate divergence from the bank/vendor pairs: the market KEEPS its
+    // own x-btn (bags is only its optional Sell-tab companion, and the bags
+    // x-btn deliberately closes bags alone), so no hide rule may appear.
+    expect(norm).not.toContain('body.mobile-touch.market-open #market-window .panel-title .x-btn');
+  });
+
+  it('disqualifies the market pairing from the fullscreen bottom-bar hide (fairness)', () => {
+    // The paired-geometry rule reserves the 72px band FOR the player frame;
+    // without the market-open disqualifier the docked bags flips
+    // mobile-fullscreen-window-open and hides own HP/resource while the world
+    // keeps running. The core pins the flag list; this pins the hud wiring.
+    expect(hud).toMatch(
+      /isMobileFullscreenWindowOpen\([\s\S]{0,400}?contains\('market-open'\),\s*document\.body\.classList\.contains\('char-bags-paired'\)/,
+    );
+  });
+
+  it('pairs the market cluster 50/50 at the scale-aware split: market LEFT, bags RIGHT', () => {
+    // #ui's zoom multiplies author lengths, so the split divides the shared
+    // --app-vw box by the live scale (the bank/vendor split-point rationale).
+    const split = 'calc(var(--app-vw) / var(--ui-scale, 1) / 2)';
+    const left = norm.indexOf('body.mobile-touch.market-open #market-window {');
+    expect(left, 'the market-open left-half rule must exist').toBeGreaterThan(0);
+    const leftBlock = norm.slice(left, norm.indexOf('}', left));
+    expect(leftBlock).toContain('left: max(10px, env(safe-area-inset-left))');
+    expect(leftBlock).toContain(`right: ${split}`);
+    // The market keeps its whole-sheet scroll model (PR #2107): height: auto
+    // releases the desktop 640px clamp so the top/bottom pins size the sheet
+    // and the window scroller gets real room instead of a clipped sliver.
+    expect(leftBlock).toContain('height: auto');
+    expect(leftBlock).toContain('overflow-y: auto');
+    expect(norm).toContain(
+      `body.mobile-touch.bank-open #bags, body.mobile-touch.market-open #bags { left: ${split}`,
+    );
+  });
+
+  it('undocks a still-open market when bags alone closes on touch, and re-docks on re-open', () => {
+    // A bags-only close (the bags x-btn or the tray toggle; the market keeps its
+    // own x-btn) must not leave the still-open market pinned to the left half of
+    // the pairing with nothing on the right: dropping the class lets the
+    // standalone mobile sheet rule take the full width back, mirroring the
+    // bank undock in onBagsClosed. toggleBags re-docks on re-open.
+    expect(hud).toMatch(
+      /private onBagsClosed\(\): void \{[\s\S]{0,1200}?contains\('mobile-touch'\) && this\.marketWindow\.isOpen[\s\S]{0,120}?classList\.remove\('market-open'\);/,
+    );
+    expect(hud).toMatch(
+      /this\.bagsWindow\.noteOpener\(\);[\s\S]{0,700}?if \(this\.marketWindow\.isOpen\) document\.body\.classList\.add\('market-open'\);/,
+    );
+  });
+});
+
 describe('market_window: behavior preserved through the core', () => {
   it('renders every state of the view union (no-data + the three tabs)', () => {
     expect(painter).toContain("view.kind === 'no-data'");
@@ -146,6 +247,79 @@ describe('market_window: behavior preserved through the core', () => {
     expect(market, 'the server is the single source of browse filtering').toContain(
       'marketItemMatches',
     );
+  });
+
+  // Source discipline only: the RENDERED menus, their labels, the committed values and the
+  // emitted query are asserted for real in tests/browser/keyboard_nav.browser.test.ts. The
+  // aria-label grep below is not redundant with it: reverting to a hand-built
+  // `${label}: ${current}` produces a byte-identical English string, so the DOM assertion
+  // cannot see that regression and this source pin is the only guard against it.
+  it('wires the advanced filters through the shared constants and the i18n aria pattern', () => {
+    expect(painter).toContain('MARKET_ARMOR_CLASS_FILTERS');
+    expect(painter).toContain('MARKET_PRIMARY_STAT_FILTERS');
+    expect(painter).toMatch(/this\.renderMarketFilterMenu\(\s*'armorClass'/);
+    expect(painter).toMatch(/this\.renderMarketFilterMenu\(\s*'primaryStat'/);
+    expect(painter).toContain('armorClass: this.armorClassFilter');
+    expect(painter).toContain('primaryStat: this.primaryStatFilter');
+    expect(painter).toContain("t('itemUi.market.filterValueAria', { label, value: current })");
+  });
+
+  // Issue #2189. WHICH menus each item type shows is decided in the pure core and pinned
+  // behaviorally in tests/market_view.test.ts (marketFilterMenus); the rendered DOM is
+  // driven in tests/browser/keyboard_nav.browser.test.ts. What is left for a source pin
+  // is exactly the thing neither can see: that the painter DELEGATES instead of
+  // re-deriving the gate inline, which would pass both of those suites while drifting
+  // from the tested core. Comments are stripped so prose cannot satisfy a pin.
+  it('delegates the per-item-type menu shape to the view core instead of re-deriving it', () => {
+    const code = painter.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^[ \t]*\/\/.*$/gm, '');
+    expect(code).toContain('marketFilterMenus(this.itemTypeFilter)');
+    expect(code).toContain('const subtypeKind = menus.subtypeKind;');
+    expect(code).toMatch(
+      /\(menus\.subtype\s*&&\s*subtypeKind\s*\?\s*this\.renderMarketFilterMenu\(\s*'subtype'/,
+    );
+    expect(code).toMatch(
+      /\(menus\.armorClass\s*\?\s*this\.renderMarketFilterMenu\(\s*'armorClass'/,
+    );
+    expect(code).toMatch(
+      /\(menus\.primaryStat\s*\?\s*this\.renderMarketFilterMenu\(\s*'primaryStat'/,
+    );
+    // No inline gate may survive alongside the delegation, or the core stops being the
+    // single source of truth for the menu shape.
+    // No inline re-derivation may survive in ANY form (ternary, ||, a hoisted const),
+    // or the core stops being the single source of truth for the menu shape. The painter
+    // switches on the core's subtypeKind, so it needs no item-type test of its own: the
+    // one legitimate 'bag' comparison left is marketItemTypeLabel's, on its `filter`
+    // argument rather than on this.itemTypeFilter.
+    expect(code, 'the menu shape must not be re-derived on the painter').not.toContain(
+      "this.itemTypeFilter === 'bag'",
+    );
+    expect(code, 'subtype wording must switch on the core discriminator').toMatch(
+      /kind === 'bagCapacity'/,
+    );
+    // The option VALUE is escaped too. Every option used to be a source-authored literal
+    // from an `as const` tuple; the bag capacities are the first derived from content, so
+    // what made this interpolation safe by construction no longer holds on its own.
+    expect(code).toContain('data-market-filter-option="${esc(option)}"');
+    // The bag labels are i18n dispatch, which a pure core may not do, so they stay here.
+    expect(code).toContain("t('itemUi.market.filterTypeBag')");
+    expect(code).toContain("t('itemUi.market.filterBagSize')");
+    expect(code).toContain("t('itemUi.market.filterBagAll')");
+    // Capacity option labels reuse the bag tooltip template, already translated in every
+    // locale, instead of minting a new per-size string.
+    expect(code).toContain("t('itemUi.tooltip.bagSlots'");
+  });
+
+  // MKT_MENU_PREFERRED_HEIGHT drives the runtime open-up/clamp decision and must agree
+  // with the stylesheet's static cap, or the two disagree about where a menu ends. The
+  // bag capacity menu is the first new consumer of that pair since it was introduced.
+  it('keeps the dropdown menu height in the painter and the stylesheet in agreement', () => {
+    const preferred = painter.match(/const MKT_MENU_PREFERRED_HEIGHT = (\d+);/)?.[1];
+    expect(preferred, 'MKT_MENU_PREFERRED_HEIGHT must exist').toBe('236');
+    // Scoped to the .mkt-select-menu rule rather than searched across the whole sheet,
+    // so the agreement is proved against the rule that actually caps this menu.
+    const rule = componentsCss.match(/\.mkt-select-menu\s*\{[^}]*\}/)?.[0];
+    expect(rule, '.mkt-select-menu rule must exist').toBeTruthy();
+    expect(rule).toContain(`max-height: ${preferred}px`);
   });
 
   it('preserves the buy / list / cancel / collect dispatch and money formatting', () => {

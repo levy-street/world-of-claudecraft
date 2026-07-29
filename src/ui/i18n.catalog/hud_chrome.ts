@@ -52,6 +52,8 @@ export const hudChromeStrings = {
     completed: 'Moved to the nearest reachable safe spot.',
     completedAtGraveyard:
       "Your spirit has returned to the nearest graveyard. Speak to the Pale Keeper to accept The Keeper's Toll.",
+    revivedAtGraveyard:
+      "You have been returned to the nearest graveyard and revived. The Keeper's Toll weighs on you.",
     cancelledMoved: 'Unstuck cancelled because you moved.',
     cancelledDamaged: 'Unstuck cancelled because you took damage.',
     cancelledCombat: 'Unstuck cancelled because you entered combat.',
@@ -113,6 +115,8 @@ export const hudChromeStrings = {
     close: 'Close daily rewards',
     loading: 'Loading daily rewards...',
     error: 'Could not load daily rewards.',
+    disabled:
+      'Daily Rewards is currently disabled. We will announce updates to this feature in the Discord channel.',
     intro:
       'Hold enough WOC in your verified wallet to unlock daily rewards. Earn points with one daily spin and rotating tasks, then climb the daily leaderboard for a share of the prize pool.',
     disclaimer:
@@ -229,6 +233,7 @@ export const hudChromeStrings = {
       wand: 'Wand',
       bow: 'Bow',
       crossbow: 'Crossbow',
+      polearm: 'Polearm',
     },
     badge: {
       flagship: 'Flagship',
@@ -275,7 +280,7 @@ export const hudChromeStrings = {
     railSol: 'SOL',
     railUsdc: 'USDC',
     railWoc: 'WOC',
-    railWocDiscount: '20% off',
+    railWocDiscount: '{percent}% off',
     railWocUnavailable: 'WOC pricing is unavailable right now.',
     railNativeUnavailable: 'Crypto off.',
     amountLabel: 'Amount',
@@ -333,6 +338,12 @@ export const hudChromeStrings = {
     count: '({count})',
     collapseHint: 'Collapse quest tracker',
     expandHint: 'Expand quest tracker',
+  },
+  interfaceTabs: {
+    general: 'General',
+    frames: 'Frames',
+    chat: 'Chat',
+    combat: 'Combat',
   },
   chatTimestamps: {
     show: 'Show Chat Timestamps',
@@ -961,6 +972,9 @@ export const hudChromeStrings = {
     // Interface panel toggle: render your own overhead nameplate the way other
     // players see it (on by default).
     showOwnNameplate: 'Show My Nameplate',
+    // Interface panel toggle: render other players' overhead nameplates (on by
+    // default); off declutters crowded hubs, the current target stays visible.
+    showPlayerNameplates: 'Show Player Nameplates',
     // Interface panel: global HUD zoom slider, and the mirror of the landing
     // page's high-contrast backdrop toggle.
     uiScale: 'UI Scale',
@@ -983,6 +997,10 @@ export const hudChromeStrings = {
     // Interface panel toggle: Clique-style mouseover casting of friendly abilities
     // on the hovered party frame (on by default).
     mouseoverCast: 'Mouseover Cast on Party Frames',
+    // Combat-tab toggle (off by default: ground left-clicks clear the target,
+    // the classic behavior). On keeps the target on a ground left-click so
+    // click-to-move repositioning does not deselect.
+    stickyTarget: 'Keep Target on Ground Click',
     // Interface panel toggle + the item-tooltip lines it reveals (off by default).
     showItemLevel: 'Show Item Level',
     itemLevelLine: 'Item Level {level}',
@@ -1164,6 +1182,13 @@ export const hudChromeStrings = {
       fiestaWin: 'Fiesta victory',
     },
   },
+  // Character sheet showcase layout: the two titled stat-panel headings under the
+  // primary attribute tiles. Stat NAMES themselves reuse itemUi.stats.* / the
+  // statInfo.names.* labels below; only these two group headings are new here.
+  charSheet: {
+    offense: 'Offense',
+    defense: 'Defense',
+  },
   // Character-screen stat tooltips (hover a stat on the C panel). The stat NAMES
   // reuse itemUi.stats.*; only these descriptions / effect lines / notes are new.
   // The breakdown numbers are recomputed live from the player's current stats
@@ -1200,9 +1225,9 @@ export const hudChromeStrings = {
       critChance: 'Your chance for an attack to strike critically, dealing double damage.',
       dodge: 'Your chance to completely avoid an incoming melee attack, taking no damage.',
       critRating:
-        'Crit rating from your gear and set bonuses, raising the critical strike chance of both your attacks and your spells. Every 10 rating grants exactly 1% crit.',
+        'Crit rating from your gear and set bonuses, raising the critical strike chance of both your attacks and your spells. Every 20 rating grants exactly 1% crit.',
       hasteRating:
-        'Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. Every 10 rating grants exactly 1% haste.',
+        'Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. Every 20 rating grants exactly 1% haste.',
       parry:
         'Your chance to fully parry a frontal melee attack, taking no damage. A blow from behind cannot be parried.',
       hitRating:
@@ -1307,10 +1332,10 @@ export const hudChromeStrings = {
   // count is auto-supplied as {count}. Keep all four categories present per base.
   plurals: {
     guildMembers: {
-      one: 'you are {rank}, {count} member',
-      few: 'you are {rank}, {count} members',
-      many: 'you are {rank}, {count} members',
-      other: 'you are {rank}, {count} members',
+      one: 'your guild rank is {rank}; {count} member',
+      few: 'your guild rank is {rank}; {count} members',
+      many: 'your guild rank is {rank}; {count} members',
+      other: 'your guild rank is {rank}; {count} members',
     },
     finderPartySize: {
       one: '{count} player',
@@ -1499,13 +1524,18 @@ export const hudChromeStrings = {
   corpseHarvest: {
     title: 'Harvest',
     harvestButton: 'Harvest',
-    // Playtester-clarity fix: new players did not know Harvest is a separate,
-    // no-cost gathering action (not a profession skill check) that extracts raw
-    // crafting materials (hide, fang, silk, and the rest of the component list
-    // below) from the corpse, on top of any coin or items taken with Take All.
-    harvestButtonTooltip:
-      'Harvest: gather crafting materials from this corpse (hide, fang, silk, and similar components), separate from any loot. Anyone can harvest; only one player may harvest a given corpse.',
+    // Loot-window legibility reword: states the once-per-corpse,
+    // first-come claim rule and that harvesting leaves the loot untouched.
+    // Successor to the retired harvestButtonTooltip; a new key because the old
+    // one carried reviewed fills in every locale (in-place rewords go stale).
+    harvestTooltip:
+      'Gathers the checked components. Each corpse can be harvested once, first come. Does not take the loot.',
     concentrateHint: 'Fewer chosen components yield a higher tier each.',
+    // #2509: claw, tusk, gills and horn are tagged on corpses but no harvest
+    // item is wired to them yet, so a selection of nothing but those would
+    // spend the single-use corpse for nothing. The command refuses it and the
+    // picker says why, in place: a disabled button's tooltip is unreachable.
+    nothingSelectedYields: 'Nothing you selected can be harvested from this corpse.',
     alreadyHarvested: 'This corpse has already been harvested.',
     componentAria: 'Harvest {component}',
     components: {
@@ -1517,6 +1547,8 @@ export const hudChromeStrings = {
       claw: 'Claw',
       horn: 'Horn',
       tusk: 'Tusk',
+      meat: 'Meat',
+      cloth: 'Cloth',
     },
   },
   // #1143: persistent town focus allocation panel. Reuses the corpseHarvest
@@ -1525,6 +1557,11 @@ export const hudChromeStrings = {
   townFocus: {
     title: 'Town Focus',
     hint: "Focus points add a bonus on top of every component's baseline yield. Unfocused components stay at baseline.",
+    // Tier legibility: the tier-shift rule ({points} = POINTS_PER_TIER_BONUS,
+    // {steps} = MAX_FOCUS_TIER_BONUS) and the town-only rule, always visible.
+    tierHint:
+      'Every {points} points on a component raise its harvest tier one step, up to {steps} steps; fewer than {points} points still boost the yield.',
+    townOnlyHint: 'Focus can only be changed while you are in town.',
     budgetLabel: 'Points remaining: {remaining} / {budget}',
     saveButton: 'Save Focus',
     notInTownHint: 'You must be in town to set your focus.',
@@ -1624,6 +1661,22 @@ export const hudChromeStrings = {
     // that grid is a derived list, its squares hold no bag position, so honoring the drop
     // would move a stack the player never aimed at. Say so instead of doing nothing.
     reorderNeedsRecent: 'Clear the filter and sort by Recent to rearrange your bags',
+    // Accessible-name arm of the instanced-slot corner marker: the
+    // visual tab is aria-hidden, so the per-copy flag rides the cell's label
+    // (the tooltip on focus stays the detail surface).
+    itemAriaInstanced: '{item}, quantity {count}, maker-marked copy',
+    // Per-kind accessible names for the bag corner glyphs
+    // (src/ui/bag_instance_glyph_view.ts decides the kind). The glyph itself is
+    // aria-hidden, so the CELL's name is what carries the fact: without these
+    // an enchanted or bound copy announced as "maker-marked copy", which is
+    // both a mislabel and less than the three distinguishable glyphs a sighted
+    // player gets. A signed copy keeps itemAriaInstanced above (that wording is
+    // accurate for it), as does an instanced copy of no recognized kind.
+    itemAriaEnchanted: '{item}, quantity {count}, enchanted copy',
+    itemAriaBound: '{item}, quantity {count}, bound copy',
+    // Accessible-name sibling for the authored masterwork seal. Keep the whole
+    // phrase in one key so punctuation and status placement remain localizable.
+    itemAriaMasterwork: '{item}, quantity {count}, masterwork',
     filterGroupAria: 'Filter bags by category',
     filterAll: 'All',
     filterWeapon: 'Weapons',
@@ -1826,9 +1879,17 @@ export const hudChromeStrings = {
   // uses the chest's localized entity name); replaces a former hard-coded 'Chest'.
   loot: {
     chestTitle: 'Chest',
-    // Playtester-clarity fix: pairs with corpseHarvest.harvestButtonTooltip so
-    // the two loot-window buttons read as clearly distinct actions.
-    takeAllTooltip: 'Take All: collect every coin and item in this loot window.',
+    // Loot-window legibility reword: the corpse arm's button is
+    // "Take Loot" (the old "Take All" label promised the harvest too); the
+    // delve-chest arm keeps itemUi.loot.takeAll, where "all" is accurate.
+    // takeLootTooltip pairs with corpseHarvest.harvestTooltip so the two
+    // loot-window buttons read as clearly distinct actions; successors to the
+    // retired takeAllTooltip/harvestButtonTooltip (reviewed fills in every
+    // locale, so a reword mints new keys rather than going stale in place).
+    takeLootButton: 'Take Loot',
+    takeLootTooltip: 'Takes the coins and dropped items. Does not use up the harvest.',
+    // Footer hint on the corpse loot window, the town-focus hint-line idiom.
+    unifiedPressHint: 'The interact key loots and harvests in one press, using your town focus.',
   },
   // Spellbook action-bar toggle accessible names. The visible glyph is +/-; the
   // accessible name states the action so a screen reader is not left with a bare
@@ -1845,6 +1906,9 @@ export const hudChromeStrings = {
     // to the bracket only, not the mob name text.
     mobLevel: '{level}',
     mobEliteLevel: '{level}+',
+    // /afk tag prefixed to a player's overhead name (nameplate_painter.ts wraps
+    // it in angle brackets: "<AFK> Name"). Short label, not a sentence.
+    afkTag: 'AFK',
   },
   // World mouseover tooltip shown when hovering a mob (mob_tooltip_view.ts):
   // name (colored by the nameplate con-color), then "Level N <type>" ({family}
@@ -1919,6 +1983,38 @@ export const hudChromeStrings = {
     riftTier: '{tier}-rank Rift item',
     riftUpgrade: 'Rift upgrade {level}/{max}',
     riftSockets: 'Rift gems {used}/{total}',
+    // The enchant-attributed sibling of itemUi.tooltip.stat, rendered on the
+    // share of a per-copy bonus stat that an applied enchant granted
+    // (item_instance_tooltip.ts instanceBonusStatLines). It replaced the old
+    // standalone "Enchanted" badge, so the tooltip names WHICH bonus the
+    // enchant paid for instead of only that one exists. Its own key with its
+    // own fills: the suffix is never concatenated onto the plain stat line.
+    statEnchanted: '+{value} {stat} (Enchanted)',
+    // The safety net behind statEnchanted: attribution can only speak through a
+    // bonus stat line, so a copy whose enchant grants no readable line (an
+    // enchant id this client's ENCHANTS table does not know, e.g. mid-rollout
+    // against a newer server, or a payload carrying the marker without
+    // rolled.stats) would otherwise say nothing at all about being enchanted,
+    // while its bag corner still paints the enchant glyph. Rendered ONLY in
+    // that case, never beside an attributed line.
+    enchantedFallback: 'Enchanted',
+  },
+  // Purpose hints for the eight enchanting materials
+  // (src/ui/material_hint_view.ts), keyed by item id there. Each says what the
+  // material is for and which gear disenchants into it, so a junk-kind reagent
+  // stops being an unexplained stack in the bags. The sources track the sim's
+  // own routing: DISENCHANT_MATERIAL_BY_QUALITY for the three arcane tiers,
+  // ARMOR_SECONDARY_BY_TYPE / TIMBER_WEAPON_TYPES for the five resonants.
+  materialHint: {
+    arcaneDust: 'Enchanting reagent. Disenchanted from common and uncommon gear.',
+    arcaneEssence: 'Enchanting reagent. Disenchanted from rare gear.',
+    arcaneShard: 'Enchanting reagent. Disenchanted from epic and legendary gear.',
+    resonantThread: 'Enchanting reagent. Disenchanted from rare and better cloth armor.',
+    resonantHide: 'Enchanting reagent. Disenchanted from rare and better leather armor.',
+    resonantLinks: 'Enchanting reagent. Disenchanted from rare and better mail armor.',
+    resonantSteel: 'Enchanting reagent. Disenchanted from rare and better melee weapons.',
+    resonantTimber:
+      'Enchanting reagent. Disenchanted from rare and better staves, wands, bows, and crossbows.',
   },
   discord: {
     title: 'Discord',
@@ -2021,6 +2117,10 @@ export const hudChromeStrings = {
       legend: 'LEGEND',
       shill: 'SHILL',
     },
+    // Chat anti-impersonation disclosure: the hover/aria text on the colored
+    // [Role] tag beside a staff member's chat name (wordy, M16: the five
+    // non-Latin fills land in this same change).
+    roleTagChatTitle: 'Verified server role: {role}',
     guildMember: 'Verified member',
     notMember: 'Not in the server yet',
     joinCta: 'Join the Discord',
@@ -2150,6 +2250,9 @@ export const hudChromeStrings = {
     removeParcelAria: 'Remove {item} from the letter',
     parcelQtyDecreaseAria: 'Send one fewer {item}',
     parcelQtyIncreaseAria: 'Send one more {item}',
+    // The chip's typeable quantity field (wordy, M16: the five non-Latin
+    // fills land in this same change).
+    parcelQtyAria: 'Quantity of {item} to send',
     sendButton: 'Send letter',
     postageNote: 'Postage: {amount}. The raven flies for about {seconds}s.',
     arrivedBanner: 'The raven has landed: mail from {name}.',
@@ -2172,6 +2275,16 @@ export const hudChromeStrings = {
       letterGone: 'That letter is no longer in your box.',
       takeParcelsFirst: 'Take the parcels out before discarding the letter.',
     },
+  },
+  // The World Market coin by the minimap (the mailbox indicator pattern):
+  // visible while sale proceeds or returned items wait at the Merchant.
+  // (Wordy, M16: the five non-Latin fills land in this same change.)
+  marketIndicator: {
+    aria: 'World Market proceeds or items waiting',
+    tip: 'Sale proceeds or returned items are waiting for you at the Merchant.',
+  },
+  noticeboard: {
+    empty: 'Nothing seems posted.',
   },
   // The bank window (the Gilded Strongbox): a pooled deposit box shown while standing
   // at a banker NPC. Plain click withdraws a stack; shift-click withdraws a partial
@@ -2305,6 +2418,29 @@ export const hudChromeStrings = {
     blockAction: 'Block',
     nowBlocking: 'Blocked {name}.',
     stopBlockingTitle: 'Stop blocking {name}',
+    // Guild roster grouping: members are split into an online group over an offline
+    // group, each header carrying its member count ({n}, formatted). The hide-offline
+    // toggle is a persisted USER choice that suppresses the offline group.
+    onlineHeader: 'Online ({n})',
+    offlineHeader: 'Offline ({n})',
+    hideOffline: 'Hide offline',
+    hideOfflineTitle: 'Hide offline guild members',
+    // The guild billboard: a short officer-set message (announcements, Discord
+    // links) pinned atop the Guild tab. Rendered as plain escaped text only,
+    // deliberately (player-controlled; never linkified). {name} in setBy is the
+    // setter's character name, spliced verbatim.
+    billboard: {
+      label: 'Guild Billboard',
+      empty: 'Nothing on the billboard yet.',
+      setBy: 'Set by {name}',
+      save: 'Save',
+      placeholder: 'Write a message for the guild',
+      inputLabel: 'Guild billboard message',
+      result: {
+        set: 'The guild billboard was updated.',
+        notOfficer: 'Only officers and the Guild Master may edit the billboard.',
+      },
+    },
   },
   // Gathering proficiency section on the character sheet (#1124). Profession
   // display names mirror src/sim/content/professions.ts (GatheringProfessionId).
@@ -2317,21 +2453,137 @@ export const hudChromeStrings = {
     // #1866: click/tap/interact-key error when a targeted node's per-viewer
     // respawn timer has not elapsed yet (IWorldProfessions#nodeHarvestableByMe).
     notReady: 'This resource node has not respawned for you yet.',
-    // Harvest feedback line (Professions 2.0 Phase 4), rendered from the
-    // id-based gatherResult SimEvent. Deliberately worded APART from the
-    // loot family: the grant hub's own 'loot' event already prints
-    // "You receive:" for the same harvest, so this line must never regress
-    // into that wording (divergence pin: tests/gather_event_i18n.test.ts).
+    // Harvest feedback line (Professions 2.0), rendered from the
+    // id-based gatherResult SimEvent. The SOLE player-visible line for a
+    // harvest grant (#2430): the grant hub's own 'loot' event no longer prints
+    // its "You receive:" line for a gather (the loot event's callerLogs flag),
+    // so this line carries the quantity and splices {name} as a clickable,
+    // quality-colored item link. It stays worded APART from the loot family
+    // anyway, because that family's "You receive:" wording still belongs to
+    // every non-profession grant and its hud.ts matcher (single-line contract
+    // pin: tests/gather_event_i18n.test.ts).
     gatherLine: 'You gather: {name}.',
     gatherLineQty: 'You gather: {name} x{qty}.',
-    // Reel-in feedback line (Professions 2.0 Phase 11), rendered from the
-    // id-based fishingResult SimEvent. Like gatherLine above, deliberately
-    // worded APART from the loot family: the grant hub's own 'loot' event
-    // already prints "You receive:" for the same catch, so this line must
-    // never regress into that wording (nor into gatherLine's).
+    // Corpse-harvest feedback lines (#2457), rendered from the id-based
+    // harvestResult SimEvent. One line per DISTINCT item the harvest granted,
+    // and the SOLE lines for those grants: corpse harvest reaches the grant
+    // hub from six call sites and every one of them now stands its
+    // "You receive:" line down (the loot event's callerLogs flag), where it
+    // used to print one line and one ding per component. Like gatherLine
+    // above, these carry the quantity and splice {name} as a clickable,
+    // quality-colored item link, and stay worded APART from the loot family
+    // whose "You receive:" wording Hud.localizeLootText still matches on
+    // (contract pin: tests/gather_event_i18n.test.ts).
+    harvestLine: 'You harvest: {name}.',
+    harvestLineQty: 'You harvest: {name} x{qty}.',
+    // The Pristine specimen jackpot (#1145) takes its own line: it is a pure
+    // extra granted BESIDE its family's own plain component, so folding it
+    // into the line above would read as the same yield reported twice. The
+    // wording follows the rare-or-better disenchant's typed secondary
+    // (hudChrome.enchanting.disenchantedAlso), the shipped precedent for a
+    // second distinct yield on its own line. Always exactly one unit, so this
+    // family has no Qty sibling.
+    harvestSpecimenLine: 'You also recover {name}.',
+    // Reel-in feedback line (Professions 2.0), rendered from the
+    // id-based fishingResult SimEvent. Like gatherLine above, the sole line
+    // for a landed catch and worded apart from both the loot family and the
+    // gather family. The ONE grant-line family with no Qty sibling, and only
+    // because a catch is always exactly one fish (professions/fishing.ts grants
+    // `caught` with count 1). A multi-fish catch would need the variant added
+    // here, or the count would go unreported now that the hub line is gone.
     catchLine: 'You reel in: {name}',
+    // Bite minigame lines (Professions 2.0), rendered from the
+    // text-free personal fishingBite / fishingGotAway SimEvents. biteLine
+    // keeps the bite moment visible in the log (never sound-only,
+    // accessibility); gotAwayLine is the no-cost miss.
+    biteLine: 'Something takes the bait!',
+    gotAwayLine: 'It got away.',
+    // Base tool tier gating (Professions 2.0). The sim's gatherDenied
+    // SimEvent and the node hover tooltip are both text-free at the source:
+    // every line here is composed client-side off structured fields, keyed per
+    // profession (single-key interpolation, never concatenated fragments).
+    nodeName: {
+      ore: 'Ore Vein',
+      wood: 'Timber Stand',
+      herb: 'Herb Patch',
+    },
+    // Tooltip requirement line for tier 2+ nodes; doubles as the locked-state
+    // line (red while the viewer's owned-best tool falls short).
+    tierRequired: {
+      mining: 'Requires a tier {tier} mining pick',
+      logging: 'Requires a tier {tier} logging axe',
+      herbalism: 'Requires a tier {tier} herbalism sickle',
+    },
+    // Tooltip requirement line for tier-1 nodes (#2343: every harvest needs a
+    // matching tool, bare hands never gather, so tier 1 needs the base tool).
+    requiresTool: {
+      mining: 'Requires a mining pick',
+      logging: 'Requires a logging axe',
+      herbalism: 'Requires a herbalism sickle',
+    },
+    // gatherDenied error toast, surface 'node', worded per node family.
+    toolTierUnmet: {
+      mining: 'You need a tier {tier} mining pick to harvest this vein.',
+      logging: 'You need a tier {tier} logging axe to fell this stand.',
+      herbalism: 'You need a tier {tier} herbalism sickle to gather this patch.',
+    },
+    // gatherDenied error toast for requiredTier 1 (#2343): the player owns no
+    // matching tool at all, so no tier number is named. The fishing arm is
+    // the startFishing implement gate (surface 'fishing').
+    toolRequired: {
+      mining: 'You need a mining pick to harvest this vein.',
+      logging: 'You need a logging axe to fell this stand.',
+      herbalism: 'You need a herbalism sickle to gather this patch.',
+      fishing: 'You need a fishing pole to cast a line.',
+    },
+    // gatherToolNoNode error toast (#2343): the player used a gathering tool
+    // from the bags with no matching resource node within interact range.
+    noNodeNearby: {
+      mining: 'There is no ore vein within reach.',
+      logging: 'There is no timber stand within reach.',
+      herbalism: 'There is no herb patch within reach.',
+    },
+    // gatherDenied error toast, surface 'corpse': profession-neutral (a corpse
+    // harvest is gated by the best owned tool across ALL gathering
+    // professions, so no single tool is named).
+    toolTierUnmetCorpse: 'You need a tier {tier} gathering tool to recover the finest materials.',
+    // Gathering-tool item tooltip lines (#2343): what the tool is, what it is
+    // required for, how using it behaves, and its speed/fishing bonuses. All
+    // composed client-side (src/ui/gather_tool_tooltip.ts), keyed per
+    // profession (single-key interpolation, never concatenated fragments).
+    toolTooltip: {
+      kind: {
+        mining: 'Mining tool (tier {tier})',
+        logging: 'Logging tool (tier {tier})',
+        herbalism: 'Herbalism tool (tier {tier})',
+        fishing: 'Fishing rod (tier {tier})',
+      },
+      unlocks: {
+        mining: 'Required to mine ore veins up to tier {tier}.',
+        logging: 'Required to fell timber stands up to tier {tier}.',
+        herbalism: 'Required to gather herb patches up to tier {tier}.',
+      },
+      use: {
+        mining: 'Use: Mine a nearby ore vein.',
+        logging: 'Use: Fell a nearby timber stand.',
+        herbalism: 'Use: Gather from a nearby herb patch.',
+      },
+      speed: 'Gathers faster at nodes below tier {tier}.',
+      rodRequired: 'Required to fish.',
+      rodBite: 'Fish bite up to {seconds}s sooner.',
+      rodReel: 'Extends the reel window by {seconds}s.',
+      rodBand: 'Unlocks richer catch tables at fishing skill {skill} and above.',
+    },
+    // Full-bag signed-grant downgrade toasts, rendered from the
+    // text-free personal gatherDowngrade SimEvent, one key per lost arm:
+    // 'mark' (the yield arrived unsigned) and 'find' (the jackpot dropped).
+    downgradeMark: "Bags full: the find was stored without its gatherer's mark.",
+    downgradeFind: 'Bags full: a pristine find slipped away.',
+    // Tooltip third line: the per-viewer respawn state.
+    stateReady: 'Ready',
+    stateCooldown: 'Respawning',
   },
-  // Archetype title chrome (#1130, pair-named under Professions 2.0 Phase 1):
+  // Archetype title chrome (#1130, pair-named under Professions 2.0):
   // `label` heads the character-sheet title line, `none` is shown before the
   // zone-1 acceptance quest has ever been completed (no "Jack of All Trades"
   // fallback, just untitled), and `hobbyLabel` heads the hobby line (#1294).
@@ -2341,7 +2593,7 @@ export const hudChromeStrings = {
     none: 'None',
     hobbyLabel: 'Hobby',
   },
-  // Pair-named archetype titles (Professions 2.0 Phase 1): one named title per
+  // Pair-named archetype titles (Professions 2.0): one named title per
   // selectable adjacent-pair attunement, keyed by the CANONICAL PAIR ID from
   // src/sim/professions/archetype.ts ARCHETYPE_PAIR_TARGETS (the two majors
   // joined by '+' in CRAFT_RING order); keep both in sync. These replace the
@@ -2351,12 +2603,12 @@ export const hudChromeStrings = {
     'alchemy+cooking': 'Apothecary',
     'cooking+leatherworking': 'Trapper',
     'leatherworking+tailoring': 'Outfitter',
-    'tailoring+inscription': 'Mageweaver',
+    'tailoring+inscription': 'Inkweaver',
     'inscription+enchanting': 'Arcanist',
     'enchanting+jewelcrafting': 'Gembinder',
     'jewelcrafting+weaponcrafting': 'Bladewright',
     'weaponcrafting+armorcrafting': 'Smith',
-    'armorcrafting+engineering': 'Cogsmith',
+    'armorcrafting+engineering': 'Gearwright',
   },
   // Per-craft display names, keyed by the same craft id as CRAFT_RING
   // (src/sim/content/professions.ts); keep both in sync. Used wherever a CRAFT
@@ -2374,7 +2626,55 @@ export const hudChromeStrings = {
     tailoring: 'Tailoring',
     leatherworking: 'Leatherworking',
   },
-  // Professions window (Professions 2.0 Phase 5): the read-only craft-wheel
+  // Per-enchant display names (Professions 2.0), keyed by the same
+  // enchant id as content/enchants.ts ENCHANTS; keep both in sync. This is the
+  // FIRST render sink for EnchantDef.name (it never rendered before), resolved
+  // by enchant_apply_view.ts enchantNameKey in the Apply Enchant picker; never
+  // the raw def name in the DOM.
+  enchantName: {
+    enchant_weapon_might: 'Enchant Weapon - Might',
+    enchant_weapon_intellect: 'Enchant Weapon - Spellpower',
+    enchant_helmet_fortitude: 'Enchant Helmet - Fortitude',
+    enchant_neck_spirit: 'Enchant Necklace - Spirit',
+    enchant_shoulder_agility: 'Enchant Shoulders - Agility',
+    enchant_chest_stamina: 'Enchant Chest - Stamina',
+    enchant_waist_stamina: 'Enchant Belt - Stamina',
+    enchant_legs_stamina: 'Enchant Legs - Stamina',
+    enchant_gloves_agility: 'Enchant Gloves - Agility',
+    enchant_gloves_intellect: 'Enchant Gloves - Spellpower',
+    enchant_feet_agility: 'Enchant Boots - Agility',
+    enchant_ring_spirit: 'Enchant Ring - Spirit',
+    enchant_weapon_agility: 'Enchant Weapon - Agility',
+    enchant_helmet_intellect: 'Enchant Helmet - Intellect',
+    enchant_helmet_armor: 'Enchant Helmet - Reinforcement',
+    enchant_neck_intellect: 'Enchant Necklace - Intellect',
+    enchant_neck_agility: 'Enchant Necklace - Agility',
+    enchant_shoulder_strength: 'Enchant Shoulders - Strength',
+    enchant_shoulder_intellect: 'Enchant Shoulders - Intellect',
+    enchant_chest_spirit: 'Enchant Chest - Spirit',
+    enchant_chest_armor: 'Enchant Chest - Reinforcement',
+    enchant_waist_strength: 'Enchant Belt - Strength',
+    enchant_waist_agility: 'Enchant Belt - Agility',
+    enchant_legs_intellect: 'Enchant Legs - Intellect',
+    enchant_gloves_strength: 'Enchant Gloves - Strength',
+    enchant_feet_strength: 'Enchant Boots - Strength',
+    enchant_feet_stamina: 'Enchant Boots - Stamina',
+    enchant_ring_strength: 'Enchant Ring - Strength',
+    enchant_ring_agility: 'Enchant Ring - Agility',
+    enchant_ring_intellect: 'Enchant Ring - Intellect',
+    enchant_weapon_greater_might: 'Enchant Weapon - Greater Might',
+    enchant_weapon_greater_spellpower: 'Enchant Weapon - Greater Spellpower',
+    enchant_helmet_greater_fortitude: 'Enchant Helmet - Greater Fortitude',
+    enchant_chest_greater_stamina: 'Enchant Chest - Greater Stamina',
+    enchant_legs_greater_stamina: 'Enchant Legs - Greater Stamina',
+    enchant_gloves_greater_agility: 'Enchant Gloves - Greater Agility',
+    enchant_weapon_runed_edge: 'Enchant Weapon - Runed Edge',
+    enchant_weapon_runed_focus: 'Enchant Weapon - Runed Sigil',
+    enchant_chest_runeweave: 'Enchant Chest - Runed Weave',
+    enchant_legs_runed_hide: 'Enchant Legs - Runed Hide',
+    enchant_helmet_runed_links: 'Enchant Helmet - Runed Links',
+  },
+  // Professions window (Professions 2.0): the read-only craft-wheel
   // window. Craft and pair NAMES resolve through craftName / archetypePair
   // above; these keys are the window's own chrome. Wording follows the
   // crafting identity card family (crafting.identity.*).
@@ -2397,7 +2697,7 @@ export const hudChromeStrings = {
     tierPipAria: 'Tier {tier}',
     nextUnlockTier: '{points} points to the next tier: masterwork odds improve',
     nextUnlockSpecialized: '{points} points to Specialized: material costs drop',
-    nextUnlockMax: 'At maximum skill',
+    nextUnlockMastered: 'Mastered, for now',
     perkSpecializedLine: '{craft}: Specialized, material costs -{pct}%',
     perkSpecializedAt: 'Specializes at {threshold} skill',
     switchCost: 'Next archetype switch costs {cost} amends',
@@ -2405,6 +2705,8 @@ export const hudChromeStrings = {
     tutorialLine: 'Reach {target} skill in any craft to unlock your first tier.',
     ctaHeader: 'Next step',
     ctaRaise: 'Keep raising {craft}: {points} more points to the next tier.',
+    ctaRaiseSpecialized:
+      'Keep raising {craft}: {points} more points to Specialized, and material costs drop.',
     ctaStart: 'Craft or gather with any profession to begin.',
     unattunedIdentity:
       'You are not yet attuned to an archetype. Raise your crafts and complete an attunement to choose your pair.',
@@ -2425,7 +2727,14 @@ export const hudChromeStrings = {
     reagentLine: '{name} x{have}/{required}',
     empty: 'No recipes known yet.',
     resultAria: 'Craft {name}',
+    // The SOLE player-visible line for a craft grant (#2430). The grant hub's
+    // own 'loot' event no longer prints its "You receive:" line for a craft
+    // (the loot event's callerLogs flag), so this line carries everything it
+    // used to: {name} is spliced as a clickable, quality-colored item link,
+    // and the Qty variant carries the output count of a resultCount > 1
+    // recipe, which used to be visible only through the hub line's " xN".
     craftedToast: 'Crafted: {name}',
+    craftedToastQty: 'Crafted: {name} x{qty}',
     insufficientMaterials: 'You do not have the materials for that.',
     unknownRecipe: 'That recipe does not exist.',
     comboRequirementUnmet:
@@ -2436,7 +2745,7 @@ export const hudChromeStrings = {
     comboNotAttuned: 'Choose an archetype pair first.',
     comboWrongPair: 'Activate this exact pair to craft it.',
     comboTierUnmet: 'Raise both major crafts to the required tier.',
-    // Named tier_unmet guidance (Phase 6 QA): {crafts} is the localized
+    // Named tier_unmet guidance: {crafts} is the localized
     // craft-name list of ONLY the under-tier crafts, so the player can tell
     // which one to raise from the row alone. comboTierUnmet above stays the
     // defensive fallback when the eligibility result names no craft.
@@ -2450,6 +2759,11 @@ export const hudChromeStrings = {
       'Result: {title} title; {majorA} and {majorB} become uncapped majors; {hobby} becomes the rare-capped hobby; all other skill knowledge is retained but capped at common while dormant.',
     hobbyPreview:
       'Result: {hobby} becomes the rare-capped hobby. Both majors and all retained skill values stay unchanged.',
+    // Professions 2.0: the escalating make-amends return cost, shown in
+    // the attunement preview and on the identity card (closes the 2039 preview
+    // gap). {cost} is requiredAmendsProgress at rest.
+    attunementReturnCost:
+      'If you leave this pair, returning to it later costs {cost} make-amends tasks.',
     identity: {
       title: 'Crafting Identity',
       syncing: 'Waiting for your crafting identity from the realm.',
@@ -2480,7 +2794,7 @@ export const hudChromeStrings = {
       dormantKnowledge:
         '{craft} knowledge is retained but dormant until its pair or hobby is active.',
     },
-    // Professions 2.0 Phase 8 (supersedes the retired notAtHub key): denied
+    // Professions 2.0 (supersedes the retired notAtHub key): denied
     // because the recipe is station-bound and the player is not at a station
     // of its type. {station} is the localized stationName.* value below.
     stationRequired: 'You must be at the {station} to craft that.',
@@ -2498,28 +2812,216 @@ export const hudChromeStrings = {
     throttled: 'You are crafting too quickly. Wait a moment and try again.',
     // #1299: the recipe exists but this player has not learned it yet.
     recipeNotLearned: 'You have not learned that recipe yet.',
-    // Professions 2.0 Phase 6: crafting window legibility (skill requirement
+    // #2350: denied because the output cannot fit the bags, even after the
+    // reagents are consumed.
+    noBagSpace: 'You do not have room for the crafted item.',
+    // Professions 2.0: crafting window legibility (skill requirement
     // line, skill-gain difficulty labels, hub-station badge) plus the
     // masterwork and tier-up celebration copy. Masterwork is a proc with
     // baked bonus stats; the copy never claims a quality-rank upgrade.
     skillReqLine: 'Requires {craft} {skill}',
     difficultyFull: 'Full skill gain',
     difficultyReduced: 'Reduced skill gain',
+    difficultyMinimal: 'Minimal skill gain',
     difficultyNone: 'No skill gain',
     stationBadge: 'Station',
-    // Phase 8 (supersedes the retired stationOutOfRange key): the crafting
+    // Supersedes the retired stationOutOfRange key: the crafting
     // window's out-of-range row note, naming WHICH station to walk to.
     stationOutOfRangeNamed: 'Move to the {station} to craft this.',
+    // Professions 2.0: the per-section "learnable at a master"
+    // discoverability hint, shown when the viewer has unlearned trainer recipes
+    // for a craft. {master} is the resident master's name (entity i18n),
+    // {station} the localized stationName.* value, {craft} the craftName.* value.
+    learnMoreAtStation: '{master} at the {station} can teach you more {craft} recipes.',
     masterworkToast: 'Masterwork! {name}',
     masterworkZoneLine: '{crafter} crafted a masterwork {name}!',
     tierUpToast: '{craft} advanced to tier {tier}!',
+    // Professions 2.0 attunement + trend events (profession_event_lines
+    // _core.ts). Trend nudge: the soft in-world hint that an unattuned crafter's
+    // skills lean toward a pair; {archetype} is the pair's archetype title,
+    // {master} the anchor master's name (the noMaster variant for the six ring
+    // pairs with no seated master). attunedZoneLine mirrors masterworkZoneLine;
+    // attunedBanner is the personal celebration banner naming the earned title.
+    trendNudge:
+      'Your hands are leaning toward the {archetype}. Its attunement waits with {master}.',
+    trendNudgeNoMaster:
+      'Your hands are leaning toward the {archetype}. Seek a craft master to take it up.',
+    attunedZoneLine: '{name} has attuned as {archetype}!',
+    attunedBanner: 'Attuned: {title}',
+    // The one-time first-tier tutorial panel (profession_tutorial_view.ts),
+    // fired the first time any craft crosses tier 1. Explains the tier cap that
+    // just bit, the craft-wheel identity concept, and that masters offer
+    // attunement quests. {skill} is the first-tier threshold.
+    tierTutorial: {
+      title: 'Your First Tier',
+      tierCap:
+        'A craft reaches its first tier at {skill} skill, and each tier improves what it can make. But a craft only climbs past rare work once it is one of your two majors.',
+      radar:
+        'Your professions form a wheel. Attune to an adjacent pair and those two crafts become uncapped majors, one craft across the wheel becomes a rare-capped hobby, and the rest lie dormant: their knowledge kept, but capped at common until you take them up again.',
+      masters:
+        'Craft masters in the towns offer attunement quests. Visit one to choose your pair whenever you are ready. Nothing you have learned is ever lost.',
+      dismiss: 'Got it',
+    },
     makersMark: 'Crafted by {name}',
+    // The gathered-material sibling of makersMark, resolved by item
+    // KIND (item_instance_tooltip.ts isGatheredProvenanceKind); same signer
+    // payload, different wording.
+    gatheredBy: 'Gathered by {name}',
     masterworkSeal: 'Masterwork',
-    // Generic enchanted marker: EnchantDef.name has no localized display
-    // surface yet, so the tooltip marks the state without naming the enchant.
-    enchantedLine: 'Enchanted',
+    // (The standalone `enchantedLine` badge was retired: the enchanted state is
+    // now attributed inline on the bonus stat lines it caused, through
+    // hudChrome.itemTooltip.statEnchanted.)
+    // Commissions and the Maker's Bond (Professions 2.0): the
+    // per-craft opt-in control in the crafting window, and the two tooltip
+    // lines a commissioned copy renders beside the soulbound line. The bound
+    // line deliberately names no one (boundTo is an entity id, not a stable
+    // cross-session identity).
+    commissionToggle: 'Commission piece',
+    commissionToggleHint: 'Binds to the first character to receive it in a trade.',
+    commissionUnbound: 'Commission piece: binds to the first recipient',
+    commissionBound: 'Commission piece: bound to its recipient',
   },
-  // Recipe training window (Professions 2.0 Phase 9): a station master
+  // Bag-item context menu verbs (Professions 2.0): the row labels for
+  // the right-click / touch action menu (bag_item_context_menu.ts). The first
+  // row mirrors the classic left-click action (equip gear, use everything else);
+  // the rest are the eligible enchanting actions.
+  itemMenu: {
+    use: 'Use',
+    equip: 'Equip',
+    disenchant: 'Disenchant',
+    salvage: 'Salvage',
+    applyEnchant: 'Apply Enchant',
+  },
+  // Enchanting actions (Professions 2.0): the result toasts for the
+  // disenchant / apply-enchant / salvage commands (enchanting_view.ts maps each
+  // text-free SimEvent to one of these), the destroy-confirm copy (a stronger
+  // body when the copy consumed is special), and the Apply Enchant picker chrome.
+  // Each throttled key names ITS OWN action: the 10-per-60s throttle is shared
+  // with crafting and gathering, so a generic "crafting is busy" line would
+  // mis-attribute the deny.
+  enchanting: {
+    // The SOLE player-visible lines for these actions (#2430). The grant hub's
+    // "You receive:" lines no longer print for a disenchant or a salvage yield
+    // (the loot event's callerLogs flag), so the Yield variants below name the
+    // reclaimed material as well as the consumed piece, or the player would be
+    // told nothing about what came back. {item} and {material} are both
+    // spliced as clickable, quality-colored item links. The plain
+    // disenchantedLine / salvagedLine stay as the yield-free fallback for a
+    // success carrying no resolvable material.
+    disenchantedLine: 'You disenchant {item}.',
+    disenchantedYield: 'You disenchant {item} into {material}.',
+    disenchantedYieldQty: 'You disenchant {item} into {material} x{qty}.',
+    // A rare-or-better disenchant also yields a typed bind-on-trade material.
+    // That is a DIFFERENT item from the primary, so it takes its own line
+    // rather than being folded into the sentence above (one line per distinct
+    // granted item); rendering it from the event's secondaryCount is also what
+    // collapses the sim's per-unit grant calls into this one line.
+    disenchantedAlso: 'You also recover {material}.',
+    disenchantedAlsoQty: 'You also recover {material} x{qty}.',
+    salvagedLine: 'You salvage {item}.',
+    salvagedYield: 'You salvage {item} into {material}.',
+    salvagedYieldQty: 'You salvage {item} into {material} x{qty}.',
+    enchantAppliedLine: 'You enchant {item} with {enchant}.',
+    notHeld: 'You do not have that item.',
+    notDisenchantable: 'You cannot disenchant that.',
+    notSalvageable: 'You cannot salvage that.',
+    disenchantThrottled: 'You are disenchanting too quickly. Wait a moment and try again.',
+    salvageThrottled: 'You are salvaging too quickly. Wait a moment and try again.',
+    enchantThrottled: 'You are enchanting too quickly. Wait a moment and try again.',
+    enchantWrongSlot: 'That enchant cannot be applied to that item.',
+    enchantUnknown: 'That enchant does not exist.',
+    enchantInsufficient: 'You do not have the materials for that enchant.',
+    // #2350 capacity denials: each names ITS OWN action (the throttled-key
+    // rule above), fired when the yields cannot fit the bags even after the
+    // consumed copy and reagents are accounted for.
+    disenchantNoSpace: 'You do not have room for the arcane materials.',
+    salvageNoSpace: 'You do not have room for the salvaged materials.',
+    enchantNoSpace: 'You do not have room for the enchanted item.',
+    disenchantConfirmTitle: 'Disenchant {item}?',
+    disenchantConfirmBody:
+      'This destroys {item} and yields arcane materials. This cannot be undone.',
+    disenchantConfirmBodySpecial:
+      'This destroys a special copy of {item} (signed, masterwork, or enchanted) and yields arcane materials. This cannot be undone.',
+    salvageConfirmTitle: 'Salvage {item}?',
+    salvageConfirmBody:
+      'This destroys {item} and yields crafting materials. This cannot be undone.',
+    salvageConfirmBodySpecial:
+      'This destroys a special copy of {item} (signed, masterwork, or enchanted) and yields crafting materials. This cannot be undone.',
+    pickerTitle: 'Apply Enchant',
+    targetTitle: 'Choose an item to enchant',
+    noEnchants: 'No enchant uses this reagent.',
+    noTargets: 'No eligible item to enchant.',
+    // The tag on a WORN target row in the Apply Enchant picker: worn gear is
+    // enchanted in place, so it lists alongside the bagged copies and needs to
+    // say which equipment slot it is on ({slot} resolves through the shared
+    // itemUi.slots labels, so Main Hand and Off Hand separate a dual-wielded
+    // pair). Both rings share the one "Finger" label there, which is fine: two
+    // eligible identical rings take the same enchant either way.
+    wornTag: 'Worn ({slot})',
+    // The Apply Enchant picker's three section headers, in ladder order. The
+    // tier is derived from the reagents alone (enchant_apply_view.ts
+    // enchantTier), so these headers name the same ladder content/enchants.ts
+    // documents: the dust/essence basics, the typed resonant tier, and the
+    // shard-consuming top tier.
+    tier: {
+      base: 'Base Enchants',
+      runed: 'Runed Enchants',
+      greater: 'Greater Enchants',
+    },
+    // The disenchant confirm's expected-yield preview
+    // (src/ui/disenchant_yield_view.ts), appended under the destroy warning so
+    // an irreversible destroy states what it pays out first. The range shape
+    // covers the sub-rare rng bonus arm and the epic/legendary secondary roll.
+    yieldHeader: 'Expected materials:',
+    yieldLineExact: '{count} {item}',
+    yieldLineRange: '{min} to {max} {item}',
+    // Enchant replacement (#2415): the two dedicated denies (the honest copy
+    // that replaced the misleading notHeld fallback for an already-enchanted
+    // target), the flagged replace-target row tags, and the replace confirm
+    // dialog. {old} in the confirm body is the doomed enchant's name, or a
+    // legacy copy's raw stat lines when the copy predates the enchant marker
+    // and has no name to give. The no-refund line states the settled economy
+    // ruling; the cost line states the reagents being paid before they are.
+    alreadyEnchanted: 'That item is already enchanted.',
+    sameEnchant: 'That item already has that enchant.',
+    replaceTag: 'Replaces {enchant}',
+    sameEnchantTag: 'Already applied',
+    // The tag on the PLAIN twin of a mixed holding (#2421): one item id held
+    // both plain and enchanted emits two rows under one item name, and without
+    // this the pair differs only by the replace row HAVING a sub-line. Painted
+    // on that twin alone (enchant_apply_view.ts mixedHolding), never on an
+    // unambiguous plain row, so an ordinary target list stays tag-free.
+    plainTag: 'Not enchanted',
+    replaceConfirmTitle: 'Replace the enchant on {item}?',
+    replaceConfirmBody: 'This replaces {old} on {item} with {new}.',
+    replaceConfirmNoRefund:
+      'The old enchant is destroyed. Its materials are not refunded. This cannot be undone.',
+    // What the swap does NOT destroy (#2421). The sim's replace payload carries
+    // the signature, the masterwork roll, and the bind state through
+    // byte-identical, and the dialog previously named only what dies; {kept}
+    // joins the trait labels below, and the whole line is omitted when the
+    // victim carries none of them (a plain copy is never told its signature is
+    // safe). One label per trait rather than one key per combination, the
+    // replaceConfirmCost / replaceConfirmCostItem shape next door. Each label
+    // reuses the vocabulary its own surface already taught the player: the
+    // maker's mark from makersMark, the seal from masterworkSeal, and the bond
+    // from the commission lines, never a raw ItemInstancePayload field name.
+    replaceConfirmKeeps: 'Kept: {kept}',
+    replaceConfirmKeepsSigner: "Maker's mark",
+    replaceConfirmKeepsMasterwork: 'Masterwork bonus',
+    // ONE label for both bind states. An armed lock (bindOnTrade) and an applied
+    // one (boundTo) are the same bond, and this line says what the swap leaves
+    // alone, not which state the bond is in; the item tooltip's commissionBound
+    // / commissionUnbound lines own that distinction. Named for the mechanic the
+    // tooltip and the unbind window already call it, so a player recognizes the
+    // thing being preserved; it never names WHO it is bound to (boundTo is an
+    // entity id, not a stable identity).
+    replaceConfirmKeepsBond: 'Commission bond',
+    replaceConfirmCost: 'Cost: {cost}',
+    replaceConfirmCostItem: '{name} x{count}',
+    replaceConfirmAccept: 'Replace',
+  },
+  // Recipe training window (Professions 2.0): a station master
   // teaches trainer-acquisition recipes for a tier-priced copper fee
   // (src/sim/professions/training.ts). Recipe result names resolve through
   // the item table, craft names through craftName above, so these keys are
@@ -2534,10 +3036,16 @@ export const hudChromeStrings = {
     stateKnown: 'Known',
     stateTeachable: 'Available',
     stateLocked: 'Locked',
+    // The in-flight state label on a teachable row whose learn command has
+    // been sent but not yet answered (issue #2342).
+    statePending: 'Learning',
     // The locked-row requirement line: {craft} is the localized craft name,
     // {skill} the flat skill threshold of the recipe's tier.
     requirement: 'Taught at {craft} {skill}',
     trainAria: 'Learn {name} for {fee}',
+    // Accessible name of a pending row's disabled button: the visible
+    // statePending pill never reaches AT through the aria-label above.
+    pendingAria: 'Learning {name}',
     // The gossip-dialog Train option on a station master.
     dialogOption: 'Training',
     dialogOptionAria: 'Browse training from {name}',
@@ -2549,6 +3057,35 @@ export const hudChromeStrings = {
     notTaughtHere: 'That recipe is not taught here.',
     alreadyKnown: 'You already know that recipe.',
     outOfRange: 'You must be at the station to train.',
+  },
+  // Maker's Bond unbind service window + result lines (Professions 2.0):
+  // the station master's second gossip service beside training.
+  // Item NAMES resolve through entity i18n, never through these keys; the
+  // fee formats via formatMoney.
+  unbind: {
+    title: 'Unbinding: {name}',
+    close: 'Close unbinding',
+    intro: 'The master can release a commission piece from its bond, for a fee.',
+    empty: 'You carry no bound commission pieces.',
+    rowSub: 'Releases the bond; the piece binds again on its next trade.',
+    unbindAria: 'Unbind {name} for {fee}',
+    // The gossip-dialog Unbind option on a station master.
+    dialogOption: 'Unbinding',
+    dialogOptionAria: 'Unbind a commission piece with {name}',
+    confirmTitle: 'Unbind Commission Piece',
+    confirmBody: 'Unbind {name} for {fee}?',
+    confirmOk: 'Unbind',
+    confirmCancel: 'Cancel',
+    // unbindResult chat lines. unbound is the ONE success surface: no toast,
+    // no sound cue (the trainResult single-surface rule).
+    unbound: 'Unbound {name} for {fee}. It will bind again on its next trade.',
+    notEligible: 'That item cannot be unbound.',
+    notBound: 'That item is not bound.',
+    cannotAfford: 'You cannot afford the unbinding fee.',
+    outOfRange: 'You must be at a crafting station to unbind.',
+    // #2350: unbinding one copy out of a bound stack needs room for the
+    // unbound copy it peels off.
+    noSpace: 'You do not have room for the unbound copy.',
   },
   // Dungeon Finder window (docs/prd/dungeon-finder.md). Dungeon, creature,
   // item, quest, and zone NAMES resolve through tEntity/world_entity_i18n,
@@ -2646,7 +3183,7 @@ export const hudChromeStrings = {
       lunar_tide: 'Lunar Tide (pulsing area damage)',
       enrage: 'Enrages at low health',
       shuddering_stomp: 'Shuddering Stomp (area stun)',
-      necrotic_shockwave: 'Necrotic Shockwave (heavy area damage)',
+      grave_inferno: 'Grave Inferno (channeled fire AoE, stay spread)',
       grave_cleaver: 'Grave-Cleaver (frontal cleave)',
       shadow_nova: 'Shadow Nova (area burst)',
       profane_mending: 'Profane Mending (heals its allies)',
@@ -2746,5 +3283,19 @@ export const hudChromeStrings = {
     // placement around the name live HERE so a locale owns both. Non-wordy
     // after placeholder strip, so no forced non-Latin fills.
     titledName: '{name} [{title}]',
+  },
+  // World map continent overview (right-click the map, or the level-toggle
+  // button, to zoom out to the whole world; click a region to open its zone map).
+  continentMap: {
+    title: 'World Map',
+    // aria-live summary announced when the overview opens.
+    summary: 'World map. Choose a zone to open its map.',
+    // Level-toggle button visible text per level (the accessible name too). The
+    // static aria/title is generic so it never needs a per-level setAttribute.
+    toWorld: 'World map',
+    toZone: 'Zone map',
+    toggleAria: 'Switch between the world map and the zone map',
+    // Hover tooltip over a zone region: its name plus the suggested level band.
+    levels: 'Levels {min} to {max}',
   },
 };

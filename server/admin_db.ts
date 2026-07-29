@@ -3,7 +3,9 @@ import {
   type ClientPerfSummaryBuckets,
   cleanHours,
   mapClientPerfSummaryRows,
+  mapSuggestionCountRows,
   PERF_SUMMARY_LIMITS,
+  type PerfSuggestionCount,
 } from './client_perf_summary_shape';
 import {
   DB_HEAVY_STATEMENT_TIMEOUT_MS,
@@ -438,6 +440,10 @@ export type { PerfAggregate, PerfBucket } from './client_perf_summary_shape';
 export interface PerfSummary extends ClientPerfSummaryBuckets {
   hours: number;
   generatedAt: string;
+  // Per-id report counts for the window (ruling R14): how many stored reports
+  // carried each allowlisted perf-doctor suggestion id. A report carries up to
+  // three ids, so these never partition the totals row.
+  suggestionCounts: PerfSuggestionCount[];
 }
 
 export interface PerfRawRow {
@@ -479,6 +485,12 @@ export interface PerfRawRow {
   glRendererBucket: string;
   zoneOrScenario: string;
   source: string;
+  crowdBucket: string;
+  simEntities: number;
+  activeViews: number;
+  visibleViews: number;
+  worst10sFrameP95Ms: number;
+  suggestionIds: string[];
   rawSummary: unknown;
 }
 
@@ -494,17 +506,22 @@ function cleanBeforeId(id: number | undefined): number | null {
 
 export async function clientPerfSummary(hoursInput = 24): Promise<PerfSummary> {
   const hours = cleanHours(hoursInput);
-  // ONE raised-timeout statement (GROUPING SETS over client_perf_reports) replaces
-  // the former seven serialized reads: the () set is the totals row and each
-  // single-column set is one bucket list. Postgres computes BOTH orderings as
-  // window ranks per grouping set (volume: sample_count DESC with the key ASC
-  // tie-break under database collation; worst: p95 DESC, sample_count DESC) and
-  // the outer filter caps each set at its list limit, so only rows the response
-  // can show cross to Node. p99_frame_ms stays percentile_cont(0.99) over
-  // frame_p95_ms, a long-standing quirk preserved deliberately. The pure shape
-  // module (client_perf_summary_shape.ts) rebuilds the response from the flat rows.
-  const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
-    query(
+  // TWO raised-timeout statements inside one transaction. The first (GROUPING
+  // SETS over client_perf_reports) replaced the former seven serialized reads:
+  // the () set is the totals row and each single-column set is one bucket list.
+  // Postgres computes BOTH orderings as window ranks per grouping set (volume:
+  // sample_count DESC with the key ASC tie-break under database collation;
+  // worst: p95 DESC, sample_count DESC) and the outer filter caps each set at
+  // its list limit, so only rows the response can show cross to Node.
+  // p99_frame_ms stays percentile_cont(0.99) over frame_p95_ms, a long-standing
+  // quirk preserved deliberately. The SECOND statement is the deliberate phase
+  // 05 addition (ruling R14): suggestion_ids is an ARRAY column a report
+  // carries up to three of, so its per-id counts come from a bounded unnest
+  // aggregate, not another grouping set (which counts rows, not array
+  // elements). The pure shape module (client_perf_summary_shape.ts) rebuilds
+  // the response from both flat row sets.
+  const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, async (query) => {
+    const summary = await query(
       `WITH agg AS (
          SELECT
            graphics_preset,
@@ -512,11 +529,13 @@ export async function clientPerfSummary(hoursInput = 24): Promise<PerfSummary> {
            browser_family,
            os_family,
            zone_or_scenario,
+           crowd_bucket,
            GROUPING(graphics_preset) AS g_preset,
            GROUPING(gl_renderer_bucket) AS g_gpu,
            GROUPING(browser_family) AS g_browser,
            GROUPING(os_family) AS g_os,
            GROUPING(zone_or_scenario) AS g_scenario,
+           GROUPING(crowd_bucket) AS g_crowd,
            count(*)::int AS sample_count,
            COALESCE(percentile_cont(0.5) WITHIN GROUP (ORDER BY fps_avg), 0)::real AS median_fps,
            COALESCE(percentile_cont(0.95) WITHIN GROUP (ORDER BY frame_p95_ms), 0)::real AS p95_frame_ms,
@@ -526,32 +545,49 @@ export async function clientPerfSummary(hoursInput = 24): Promise<PerfSummary> {
            COALESCE(avg(effective_render_scale), 0)::real AS avg_effective_render_scale
          FROM client_perf_reports
          WHERE created_at > now() - ($1 || ' hours')::interval
-         GROUP BY GROUPING SETS ((), (graphics_preset), (gl_renderer_bucket), (browser_family), (os_family), (zone_or_scenario))
+         GROUP BY GROUPING SETS ((), (graphics_preset), (gl_renderer_bucket), (browser_family), (os_family), (zone_or_scenario), (crowd_bucket))
        ),
        ranked AS (
          SELECT
            agg.*,
            (row_number() OVER (
-             PARTITION BY g_preset, g_gpu, g_browser, g_os, g_scenario
-             ORDER BY sample_count DESC, COALESCE(graphics_preset, gl_renderer_bucket, browser_family, os_family, zone_or_scenario) ASC
+             PARTITION BY g_preset, g_gpu, g_browser, g_os, g_scenario, g_crowd
+             ORDER BY sample_count DESC, COALESCE(graphics_preset, gl_renderer_bucket, browser_family, os_family, zone_or_scenario, crowd_bucket) ASC
            ))::int AS vol_rank,
            (row_number() OVER (
-             PARTITION BY g_preset, g_gpu, g_browser, g_os, g_scenario
+             PARTITION BY g_preset, g_gpu, g_browser, g_os, g_scenario, g_crowd
              ORDER BY p95_frame_ms DESC, sample_count DESC
            ))::int AS worst_rank
          FROM agg
        )
        SELECT * FROM ranked
-       WHERE (g_preset + g_gpu + g_browser + g_os + g_scenario = 5)
+       WHERE (g_preset + g_gpu + g_browser + g_os + g_scenario + g_crowd = 6)
           OR (g_preset = 0 AND vol_rank <= ${PERF_SUMMARY_LIMITS.byPreset})
           OR (g_gpu = 0 AND (vol_rank <= ${PERF_SUMMARY_LIMITS.byGpu} OR worst_rank <= ${PERF_SUMMARY_LIMITS.worstGpu}))
           OR (g_browser = 0 AND vol_rank <= ${PERF_SUMMARY_LIMITS.byBrowser})
           OR (g_os = 0 AND vol_rank <= ${PERF_SUMMARY_LIMITS.byOs})
-          OR (g_scenario = 0 AND vol_rank <= ${PERF_SUMMARY_LIMITS.byScenario})`,
+          OR (g_scenario = 0 AND vol_rank <= ${PERF_SUMMARY_LIMITS.byScenario})
+          OR (g_crowd = 0 AND vol_rank <= ${PERF_SUMMARY_LIMITS.byCrowd})`,
       [String(hours)],
-    ),
-  );
-  return { hours, generatedAt: new Date().toISOString(), ...mapClientPerfSummaryRows(res.rows) };
+    );
+    const suggestions = await query(
+      `SELECT s.id AS suggestion_id, count(*)::int AS sample_count
+         FROM client_perf_reports
+         CROSS JOIN LATERAL unnest(suggestion_ids) AS s(id)
+        WHERE created_at > now() - ($1 || ' hours')::interval
+        GROUP BY s.id
+        ORDER BY sample_count DESC, s.id ASC
+        LIMIT ${PERF_SUMMARY_LIMITS.suggestionCounts}`,
+      [String(hours)],
+    );
+    return { summaryRows: summary.rows, suggestionRows: suggestions.rows };
+  });
+  return {
+    hours,
+    generatedAt: new Date().toISOString(),
+    ...mapClientPerfSummaryRows(res.summaryRows),
+    suggestionCounts: mapSuggestionCountRows(res.suggestionRows),
+  };
 }
 
 export async function clientPerfRaw(
@@ -570,7 +606,9 @@ export async function clientPerfRaw(
        renderer_calls, renderer_triangles, renderer_textures, renderer_programs, context_lost_count,
        long_task_count, long_task_p95_ms, memory_used_mb, memory_limit_mb,
        dpr, viewport_bucket, device_memory, hardware_concurrency, mobile_touch,
-       browser_family, os_family, gl_vendor, gl_renderer_bucket, zone_or_scenario, source, raw_summary
+       browser_family, os_family, gl_vendor, gl_renderer_bucket, zone_or_scenario, source,
+       crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms,
+       suggestion_ids, raw_summary
      FROM client_perf_reports
      WHERE created_at > now() - ($1 || ' hours')::interval
        AND ($3::bigint IS NULL OR id < $3)
@@ -617,6 +655,12 @@ export async function clientPerfRaw(
     glRendererBucket: r.gl_renderer_bucket,
     zoneOrScenario: r.zone_or_scenario,
     source: r.source,
+    crowdBucket: r.crowd_bucket,
+    simEntities: r.sim_entities,
+    activeViews: r.active_views,
+    visibleViews: r.visible_views,
+    worst10sFrameP95Ms: r.worst_10s_frame_p95_ms,
+    suggestionIds: r.suggestion_ids,
     rawSummary: r.raw_summary,
   }));
 }

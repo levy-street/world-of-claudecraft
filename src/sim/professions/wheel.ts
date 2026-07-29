@@ -20,6 +20,7 @@
 import {
   CRAFT_RING,
   craftById,
+  craftMaxSkillFor,
   PERK_THRESHOLDS,
   type PerkThresholdDef,
 } from '../content/professions';
@@ -36,8 +37,10 @@ export function emptyCraftSkills(): CraftSkills {
 }
 
 /** Backfill a persisted/partial record so every ring craft has an entry, without
- *  disturbing any value already present (additive back-compat: an older save with
- *  fewer or zero craft keys loads cleanly at 0 for the missing ones). */
+ *  disturbing any in-range value already present (additive back-compat: an older
+ *  save with fewer or zero craft keys loads cleanly at 0 for the missing ones).
+ *  A loaded value above the craft's enforced content cap clamps DOWN
+ *  to it (the load-time arm of the maxSkill cap). */
 export function normalizeCraftSkills(
   saved: Record<string, number> | undefined | null,
 ): CraftSkills {
@@ -45,17 +48,21 @@ export function normalizeCraftSkills(
   if (!saved) return skills;
   for (const craft of CRAFT_RING) {
     const value = saved[craft.id];
-    if (typeof value === 'number' && Number.isFinite(value) && value >= 0) skills[craft.id] = value;
+    if (typeof value === 'number' && Number.isFinite(value) && value >= 0)
+      skills[craft.id] = Math.min(craft.maxSkill, value);
   }
   return skills;
 }
 
 /** Additive-only skill gain for exactly one craft. Never touches any other craft's
  *  value (each of the ten crafts is an independent counter). A non-positive amount
- *  is a no-op; skill never goes negative. */
+ *  is a no-op; skill never goes negative. Gain clamps at the craft's
+ *  enforced content cap (craftMaxSkillFor); this single primitive is the gain-time
+ *  arm for crafting, enchanting, AND the battlefield trickle, so at cap all of
+ *  them stop advancing skill while the actions themselves keep working. */
 export function gainCraftSkill(skills: CraftSkills, craftId: string, amount: number): void {
   if (!(craftId in skills) || !(amount > 0)) return;
-  skills[craftId] += amount;
+  skills[craftId] = Math.min(craftMaxSkillFor(craftId), skills[craftId] + amount);
 }
 
 /** Read surface: a copy of a player's ten craft skill values, keyed by craft id.
@@ -69,29 +76,27 @@ export function craftSkillsFor(ctx: SimContext, pid: number): CraftSkills {
 //
 // A player's "tier capability" in a craft is derived from their current flat
 // skill value in that craft via a simple, fixed bucket: every TIER_SKILL_STEP
-// points of skill unlocks one more tier. Tier 0 ("common") is the free floor:
+// points of skill unlocks one more tier. Tier 0 ("common") is the baseline:
 // skill 0-24 has common-tier capability, 25-49 tier-1 capability, 50-74 tier-2,
 // and so on. Recipes bucket their skillReq the same way, so a recipe's tier
 // and a player's capability tier are directly comparable.
 //
-// Skill-progress rule on a successful craft:
-// - common tier (recipe tier 0): always the full amount, regardless of the
-//   player's capability (the free floor from #1126/#1127 holds unconditionally).
+// Skill-progress rule on a successful craft (Professions 2.0, the
+// four-state mastery curve): EVERY recipe tier, tier 0 included, is scored by
+// how many tiers it sits below the player's capability. The tier-0 free floor
+// from #1126/#1127 (full gain forever on the cheapest recipe) is retired.
 // - recipe tier at or above the player's capability: full amount (this is how
 //   capability advances in the first place).
 // - recipe exactly one tier below capability: reduced amount (diminishing
 //   returns for crafting something already mastered).
-// - recipe two or more tiers below capability: zero (no progress at all).
+// - recipe exactly two tiers below capability: minimal amount (a trickle).
+// - recipe three or more tiers below capability: zero (no progress at all).
 //
-// #1148 tuning pass: this diminishing-returns shape (full at/above capability,
-// reduced one tier below, zero two-plus tiers below) matches the design doc's
-// own decided text ("crafting below your current capability gives diminishing
-// returns, and a craft two tiers under your capability gives nothing"), so it
-// is CONFIRMED, not re-tuned. The doc's own Open Questions section leaves the
-// "crafts-per-tier" step size itself open ("the example uses about 20");
-// TIER_SKILL_STEP of 25 is kept as the working value (a round number close to
-// that example, over the 1-300 classic skill scale used elsewhere in this
-// module) rather than re-guessed, pending a real number from that open item.
+// The doc's own Open Questions section leaves the "crafts-per-tier" step size
+// itself open ("the example uses about 20"); TIER_SKILL_STEP of 25 is kept as
+// the working value (a round number close to that example, over the 1-300
+// classic skill scale used elsewhere in this module) rather than re-guessed,
+// pending a real number from that open item.
 export const TIER_SKILL_STEP = 25;
 
 /** Bucket a flat skill value into a tier index. Skill 0-24 -> tier 0 (common),
@@ -108,18 +113,27 @@ export function tierCapability(skills: CraftSkills, craftId: string): number {
 }
 
 // Multiplier applied to a one-tier-below craft's skill-progress amount.
-const REDUCED_TIER_MULTIPLIER = 0.5;
+export const REDUCED_TIER_MULTIPLIER = 0.5;
+
+// Multiplier applied to a two-tiers-below craft's skill-progress amount: the
+// third state of the four-state mastery curve.
+export const MINIMAL_TIER_MULTIPLIER = 0.25;
 
 /** The skill-progress multiplier for crafting a recipe of `recipeTier` given a
- *  player's `capabilityTier` in that craft. Common tier (recipeTier 0) is
- *  always 1 (the free floor), independent of capability. Otherwise: full (1)
- *  at or above capability, reduced (0.5) one tier below, zero two or more
- *  tiers below. */
+ *  player's `capabilityTier` in that craft: the four-state mastery curve, the
+ *  classic orange/yellow/green/gray reading, applied to EVERY recipe tier
+ *  including tier 0 (the old tier-0 free floor is retired).
+ *  - orange (recipe at or above your capability): full gain (1).
+ *  - yellow (exactly one tier below): reduced gain (0.5).
+ *  - green (exactly two tiers below): minimal gain (0.25).
+ *  - gray (three or more tiers below): nothing (0).
+ *  Gains are deterministic fractional amounts, NEVER a skill-up roll: the same
+ *  craft at the same capability always moves skill by exactly this multiple. */
 export function tierProgressMultiplier(capabilityTier: number, recipeTier: number): number {
-  if (recipeTier <= 0) return 1;
   const tiersBelow = capabilityTier - recipeTier;
   if (tiersBelow <= 0) return 1;
   if (tiersBelow === 1) return REDUCED_TIER_MULTIPLIER;
+  if (tiersBelow === 2) return MINIMAL_TIER_MULTIPLIER;
   return 0;
 }
 

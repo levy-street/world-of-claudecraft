@@ -224,6 +224,19 @@ describe('POST /api/auth/discord/start', () => {
     expect(insert?.[1]?.[4]).toBe(NATIVE_STATE_REDIRECT);
   });
 
+  it('marks a desktop-shell login start so the callback bounces back to /desktop-login', async () => {
+    const res = makeRes();
+    await handleDiscordStart(makeReq({ url: '/api/auth/discord/start?mode=login' }), res, {
+      mode: 'login',
+      accountId: null,
+      desktop: true,
+    });
+    const insert = dbMock.query.mock.calls.find((c) =>
+      String(c[0]).includes('INSERT INTO discord_oauth_states'),
+    );
+    expect(insert?.[1]?.[4]).toBe('desktop-login');
+  });
+
   it('503s when Discord is not configured', async () => {
     delete process.env.DISCORD_CLIENT_ID;
     const res = makeRes();
@@ -605,6 +618,51 @@ describe('GET /api/auth/discord/callback', () => {
     // A session token is minted in the payload; the chooser is not offered.
     expect(res.body).toContain('"token"');
     expect(res.body).not.toContain('"choose":true');
+    // A plain (non-desktop) login bounces to the web app, same as always.
+    expect(res.body).toContain('var target = "/";');
+  });
+
+  it('bounces a desktop-shell login back to /desktop-login, never the plain web root', async () => {
+    stateRows = [
+      {
+        state: 's',
+        code_verifier: 'v',
+        mode: 'login',
+        account_id: null,
+        redirect_to: 'desktop-login',
+      },
+    ];
+    ownerRows = [{ account_id: 1 }]; // already linked, so this mints a session straight away
+    accountByIdRows = [{ id: 1, username: 'maxp', password_set: true }];
+    mockDiscordFetch();
+    const res = makeRes();
+    await handleDiscordCallback(
+      makeReq({ url: '/api/auth/discord/callback?code=abc&state=s' }),
+      res,
+    );
+    expect(res.body).toContain('"token"');
+    expect(res.body).toContain('var target = "/desktop-login";');
+  });
+
+  it('bounces a desktop-shell FIRST-TIME login (chooser) back to /desktop-login too', async () => {
+    stateRows = [
+      {
+        state: 's',
+        code_verifier: 'v',
+        mode: 'login',
+        account_id: null,
+        redirect_to: 'desktop-login',
+      },
+    ];
+    ownerRows = []; // no account linked yet: the chooser path, not a straight session
+    mockDiscordFetch();
+    const res = makeRes();
+    await handleDiscordCallback(
+      makeReq({ url: '/api/auth/discord/callback?code=abc&state=s' }),
+      res,
+    );
+    expect(res.body).toContain('"choose":true');
+    expect(res.body).toContain('var target = "/desktop-login";');
   });
 
   it('returns a native returning user through a one-time handoff code', async () => {

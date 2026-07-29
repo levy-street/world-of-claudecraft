@@ -44,6 +44,7 @@ function sweep(
     BODY_R,
     false,
     undefined,
+    undefined,
     token,
   );
   return { x: res.x - origin.x, z: res.z - origin.z };

@@ -1,4 +1,4 @@
-// Paired suite for src/sim/professions/masterwork.ts (Professions 2.0 Phase 2):
+// Paired suite for src/sim/professions/masterwork.ts (Professions 2.0):
 // the pure masterwork proc-chance and bonus-baking primitives, the raid-floor
 // acceptance bound over the real recipe content, and the draw-order
 // determinism contract over a real Sim (one rng draw per successful craft,
@@ -43,7 +43,7 @@ const statSum = (stats: Partial<CoreStats> | null | undefined): number => {
   return PRIMARY_STATS.reduce((a, k) => a + (stats[k] ?? 0), 0);
 };
 
-describe('masterworkProcChance (Phase 2 tuning)', () => {
+describe('masterworkProcChance (locked tuning)', () => {
   it('pins the locked tuning constants', () => {
     // Load-bearing tuning literals (same convention as the
     // MATERIAL_RARITY_MAX_PROFICIENCY pin in professions_rarity_roll.test.ts):
@@ -110,7 +110,7 @@ describe('masterworkProcChance (Phase 2 tuning)', () => {
     ).toBe(0.03);
   });
 
-  it('materialTierBonus (the Phase 10 hook) defaults to 0 and is a real additive summand', () => {
+  it('materialTierBonus defaults to 0 and is a real additive summand', () => {
     const omitted = masterworkProcChance({
       tiersAboveRecipe: 0,
       signedReagent: false,
@@ -276,7 +276,7 @@ describe('masterworkBonusStats (the baked tier-delta budget)', () => {
   });
 });
 
-// The Phase 2 acceptance bound: a masterworked crafted output must stay
+// The masterwork acceptance bound: a masterworked crafted output must stay
 // STRICTLY below the raid-loot band. Derivation (src/sim/item_level.ts, no
 // invented constants): a raid drop from band-level B content reads item level
 // B + QUALITY_ILVL_BONUS[quality] + RAID_ILVL_BONUS (itemLevel(): raid loot
@@ -391,15 +391,17 @@ describe('masterwork stays strictly below the raid-loot band (acceptance bound)'
   });
 });
 
-describe('draw-order determinism over a real Sim (Phase 2)', () => {
+describe('draw-order determinism over a real Sim', () => {
   // Scenario: tailoring as the active archetype (unlimited empowerment
   // ceiling), skill 200 (tier-8 capability, past the specialization
   // threshold), so each successful vestments craft rolls the proc at
-  // 0.03 + 0.08 + 0.03 = 0.14. Seed 23 was hunted (bounded scan from seed 1)
-  // so the three-success sequence procs on the second and third successful
-  // crafts; only the pinned literal is committed, per the suite idiom. Spares
-  // on record: 40, 48, 172, 180, and 208.
-  const SEED = 23;
+  // 0.03 + 0.08 + 0.03 = 0.14. Seed 53 was hunted (bounded scan from seed 1,
+  // re-recorded after the Eastbrook camp respacing thinned the zone-1 camp
+  // counts and shifted the camp-driven world-gen draw sequence) so the
+  // three-success sequence procs on the second and third successful crafts;
+  // only the pinned literal is committed, per the suite idiom. Spares on
+  // record: 138, 177, 182, 196, and 231.
+  const SEED = 53;
 
   function run() {
     const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: false });
@@ -409,6 +411,9 @@ describe('draw-order determinism over a real Sim (Phase 2)', () => {
     meta.craftSkills.tailoring = 200;
     for (let i = 0; i < 12; i++) sim.addItem('linen_scrap', 1, pid);
     for (let i = 0; i < 6; i++) sim.addItem('spider_leg', 1, pid);
+    // Economy rework: the vestments recipe gained cloth and thread volume.
+    for (let i = 0; i < 9; i++) sim.addItem('homespun_cloth', 1, pid);
+    for (let i = 0; i < 15; i++) sim.addItem('spool_of_thread', 1, pid);
     sim.drainEvents();
     const rng: Rng = (sim as any).ctx.rng;
     let draws = 0;
@@ -418,7 +423,7 @@ describe('draw-order determinism over a real Sim (Phase 2)', () => {
     const drawCounts: number[] = [];
     const craft = (recipeId: string) => {
       const before = draws;
-      sim.craftItem(recipeId, pid);
+      sim.craftItem(recipeId, false, pid);
       drawCounts.push(draws - before);
       return { ...sim.lastCraftResult! };
     };
@@ -507,17 +512,18 @@ describe('proc-chance wiring over a real Sim (hunted boundary-window seeds)', ()
     const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: false });
     const pid = sim.playerId;
     setup(sim, pid);
-    sim.craftItem('recipe_eastbrook_ritual_vestments', pid);
+    sim.craftItem('recipe_eastbrook_ritual_vestments', false, pid);
     return { ...sim.lastCraftResult! };
   }
 
   it('a self-signed reagent feeds the proc chance: the same seed procs only with the signed copy', () => {
-    // Seed 26, hunted: the single proc draw lands in [0.03, 0.05), above the
-    // 3 percent base but under base plus the 2 percent signed-reagent bonus,
-    // so the proc fires ONLY when crafting.ts passes the signed-reagent
-    // holding check into masterworkProcChance. Spares on record: 30, 157,
-    // 326, and 374.
-    const SEED = 26;
+    // Seed 50, hunted (re-recorded after the Eastbrook camp respacing thinned
+    // the zone-1 camp counts and shifted the camp-driven world-gen draw
+    // sequence): the single proc draw lands in [0.03, 0.05), above the 3
+    // percent base but under base plus the 2 percent signed-reagent bonus, so
+    // the proc fires ONLY when crafting.ts passes the signed-reagent holding
+    // check into masterworkProcChance. Spares on record: 57, 229, and 369.
+    const SEED = 50;
     const signed = craftVestments(SEED, (sim, pid) => {
       const meta = (sim as any).players.get(pid);
       // One self-signed linen_scrap plus one plain: the #1145 reduction drops
@@ -527,6 +533,8 @@ describe('proc-chance wiring over a real Sim (hunted boundary-window seeds)', ()
       sim.addItemInstance('linen_scrap', { signer: meta.name }, pid);
       sim.addItem('linen_scrap', 1, pid);
       sim.addItem('spider_leg', 1, pid);
+      sim.addItem('homespun_cloth', 3, pid);
+      sim.addItem('spool_of_thread', 5, pid);
     });
     expect(signed.ok).toBe(true);
     expect(signed.selfSignedBonusApplied).toBe(true);
@@ -536,6 +544,8 @@ describe('proc-chance wiring over a real Sim (hunted boundary-window seeds)', ()
     const plain = craftVestments(SEED, (sim, pid) => {
       for (let i = 0; i < 3; i++) sim.addItem('linen_scrap', 1, pid);
       sim.addItem('spider_leg', 1, pid);
+      sim.addItem('homespun_cloth', 3, pid);
+      sim.addItem('spool_of_thread', 5, pid);
     });
     expect(plain.ok).toBe(true);
     expect(plain.selfSignedBonusApplied).toBe(false);
@@ -543,17 +553,19 @@ describe('proc-chance wiring over a real Sim (hunted boundary-window seeds)', ()
   });
 
   it("another player's signed reagent feeds the proc chance equally (the 2026-07-17 any-signed ruling)", () => {
-    // Same hunted seed-26 window: the draw sits in [0.03, 0.05), so the proc
+    // Same hunted seed-50 window: the draw sits in [0.03, 0.05), so the proc
     // fires exactly when the 2 percent signed-reagent term applies. The signed
     // copy carries SOMEONE ELSE'S signature, so the #1145 quantity discount
     // must NOT apply (all 3 linen are required and consumed) while the proc
     // bonus MUST: trade-bought signed materials are worth as much to the proc
     // as self-gathered ones.
-    const SEED = 26;
+    const SEED = 50;
     const traded = craftVestments(SEED, (sim, pid) => {
       sim.addItemInstance('linen_scrap', { signer: 'Gatherer Friend' }, pid);
       sim.addItem('linen_scrap', 2, pid);
       sim.addItem('spider_leg', 1, pid);
+      sim.addItem('homespun_cloth', 3, pid);
+      sim.addItem('spool_of_thread', 5, pid);
     });
     expect(traded.ok).toBe(true);
     expect(traded.selfSignedBonusApplied).toBe(false);
@@ -561,15 +573,17 @@ describe('proc-chance wiring over a real Sim (hunted boundary-window seeds)', ()
   });
 
   it('a count-1 signed reagent feeds the proc chance (decoupled from the quantity-discount flag)', () => {
-    // Same hunted seed-26 window. The signed copy is the SPIDER LEG, whose
+    // Same hunted seed-50 window. The signed copy is the SPIDER LEG, whose
     // reagent count is 1: the #1145 reduction floors at 1 so the discount
     // flag can never set for it (the old coupling made this exact case lose
     // the proc bonus). The signed-reagent term must fire anyway.
-    const SEED = 26;
+    const SEED = 50;
     const countOne = craftVestments(SEED, (sim, pid) => {
       const meta = (sim as any).players.get(pid);
       for (let i = 0; i < 3; i++) sim.addItem('linen_scrap', 1, pid);
       sim.addItemInstance('spider_leg', { signer: meta.name }, pid);
+      sim.addItem('homespun_cloth', 3, pid);
+      sim.addItem('spool_of_thread', 5, pid);
     });
     expect(countOne.ok).toBe(true);
     expect(countOne.selfSignedBonusApplied).toBe(false);
@@ -580,20 +594,24 @@ describe('proc-chance wiring over a real Sim (hunted boundary-window seeds)', ()
     // Premise anchor: the content threshold this boundary rides. A content
     // retune moves the boundary and this seed must be re-hunted.
     expect(PERK_THRESHOLDS.tailoring.specializedSkillThreshold).toBe(75);
-    // Seed 7, hunted: the single proc draw lands in [0.06, 0.09). At skill 74
-    // (tier 2, not specialized) the chance is 0.03 + 0.02 = 0.05: miss. At 75
-    // and 76 (tier 3, specialized) it is 0.03 + 0.03 + 0.03 = 0.09: proc, and
-    // only if BOTH the tiersAboveRecipe term and isSpecialized are wired into
-    // masterworkProcChance by crafting.ts (either wiring dropped leaves the
-    // chance at or below 0.06, under the hunted draw). Spares on record: 31,
-    // 99, 165, 197, and 225.
-    const SEED = 7;
+    // Seed 38, hunted (re-recorded after the Eastbrook camp respacing thinned
+    // the zone-1 camp counts and shifted the camp-driven world-gen draw
+    // sequence): the single proc draw lands in
+    // [0.06, 0.09). At skill 74 (tier 2, not specialized) the chance is
+    // 0.03 + 0.02 = 0.05: miss. At 75 and 76 (tier 3, specialized) it is
+    // 0.03 + 0.03 + 0.03 = 0.09: proc, and only if BOTH the tiersAboveRecipe
+    // term and isSpecialized are wired into masterworkProcChance by
+    // crafting.ts (either wiring dropped leaves the chance at or below 0.06,
+    // under the hunted draw). Spares on record: 40, 56, 89, and 158.
+    const SEED = 38;
     const at = (skill: number) =>
       craftVestments(SEED, (sim, pid) => {
         const meta = (sim as any).players.get(pid);
         meta.craftSkills.tailoring = skill;
         for (let i = 0; i < 3; i++) sim.addItem('linen_scrap', 1, pid);
         sim.addItem('spider_leg', 1, pid);
+        sim.addItem('homespun_cloth', 3, pid);
+        sim.addItem('spool_of_thread', 5, pid);
       });
     const r74 = at(74);
     const r75 = at(75);
@@ -605,7 +623,7 @@ describe('proc-chance wiring over a real Sim (hunted boundary-window seeds)', ()
   });
 });
 
-describe('material-tier masterwork feed (Phase 10, material_tier.ts)', () => {
+describe('material-tier masterwork feed (material_tier.ts)', () => {
   it('pins the tier table and the per-tier chance step literally', () => {
     // Load-bearing tuning literals, same convention as the proc-chance
     // constant pins above: the step rides the masterwork bonus scale
@@ -642,7 +660,7 @@ describe('material-tier masterwork feed (Phase 10, material_tier.ts)', () => {
     ).toBe(0);
     expect(materialTierBonusForReagents([])).toBe(0);
     // The two recipes the parity golden crafts consume only tier-0 reagents,
-    // so their proc chance is byte-identical to pre-Phase-10: this pin is the
+    // so their proc chance is unchanged by the tier feed: this pin is the
     // tripwire against any table growth that would touch a golden scenario.
     expect(materialTierBonusForReagents(recipeById('recipe_minor_healing_potion')!.reagents)).toBe(
       0,
@@ -701,8 +719,8 @@ describe('material-tier masterwork feed (Phase 10, material_tier.ts)', () => {
     ).toBe(0.15);
   });
 
-  it('the crafting call site passes the consumed materials tier into the proc (hunted seed-26 window)', () => {
-    // Same hunted seed-26 window as the signed-reagent cases above: the
+  it('the crafting call site passes the consumed materials tier into the proc (hunted seed-50 window)', () => {
+    // Same hunted seed-50 window as the signed-reagent cases above: the
     // single proc draw lands in [0.03, 0.05). A synthetic skillReq-0 recipe
     // (resolveCraftForRecipe's exported-for-tests seam) on a fresh warrior
     // has no other bonus in play, so the ONLY chance input separating the
@@ -711,7 +729,7 @@ describe('material-tier masterwork feed (Phase 10, material_tier.ts)', () => {
     // base and misses the identical draw (proving a tier-0 recipe's chance
     // is unchanged by the wiring). Both arms draw exactly once: the lookup
     // is pure and cannot move the procRoll draw.
-    const SEED = 26;
+    const SEED = 50;
     const craftSynthetic = (reagentItemId: string) => {
       const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: false });
       const pid = sim.playerId;

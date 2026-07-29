@@ -42,10 +42,24 @@ import {
   REQUEST_TIMEOUT_MS,
 } from '../../server/http/server_timeouts';
 import { DEFAULT_JSON_BODY_MAX_BYTES } from '../../server/http_util';
+import { LIST_READ_BURST, LIST_READ_REFILL_PER_SECOND } from '../../server/list_read_guard';
 import {
+  MSG_LANE_CHAT_BURST,
+  MSG_LANE_CHAT_REFILL_PER_SECOND,
+  MSG_LANE_COMMAND_BURST,
+  MSG_LANE_COMMAND_REFILL_PER_SECOND,
+  MSG_LANE_MOVEMENT_BURST,
+  MSG_LANE_MOVEMENT_REFILL_PER_SECOND,
+} from '../../server/msg_lanes';
+import {
+  MSG_ABUSE_KICK_SECONDS,
+  MSG_ABUSE_SECOND_DROP_FLOOR,
+  MSG_ABUSE_WINDOW_SECONDS,
+  MSG_BYTE_BURST,
+  MSG_BYTE_REFILL_PER_SECOND,
   MSG_RATE_BURST,
   MSG_RATE_REFILL_PER_SECOND,
-  MSG_RATE_VIOLATIONS_FOR_KICK,
+  MSG_SEQ_GAP_SANITY,
 } from '../../server/msg_rate_limit';
 import {
   ASSET_UPLOAD_MAX_PER_MINUTE,
@@ -300,11 +314,30 @@ describe('byte caps + page sizes hold their literal values', () => {
     expect(DAILY_OPS_LEADERBOARD_PAGE_SIZE).toBe(50);
   });
 
-  it('msg-rate trio + desktop-login TTL', () => {
-    expect(MSG_RATE_BURST).toBe(60);
-    expect(MSG_RATE_REFILL_PER_SECOND).toBe(40);
-    expect(MSG_RATE_VIOLATIONS_FOR_KICK).toBe(200);
+  it('inbound gate constants + desktop-login TTL', () => {
+    expect(MSG_RATE_BURST).toBe(180);
+    expect(MSG_RATE_REFILL_PER_SECOND).toBe(120);
+    expect(MSG_BYTE_BURST).toBe(131_072); // 128 KiB
+    expect(MSG_BYTE_REFILL_PER_SECOND).toBe(65_536); // 64 KiB
+    expect(MSG_ABUSE_WINDOW_SECONDS).toBe(10);
+    expect(MSG_ABUSE_KICK_SECONDS).toBe(5);
+    expect(MSG_ABUSE_SECOND_DROP_FLOOR).toBe(30);
+    expect(MSG_SEQ_GAP_SANITY).toBe(1000);
     expect(DESKTOP_LOGIN_TTL_MS).toBe(300_000); // 5 min
+  });
+
+  it('inbound lane constants', () => {
+    expect(MSG_LANE_MOVEMENT_REFILL_PER_SECOND).toBe(90);
+    expect(MSG_LANE_MOVEMENT_BURST).toBe(120);
+    expect(MSG_LANE_COMMAND_REFILL_PER_SECOND).toBe(30);
+    expect(MSG_LANE_COMMAND_BURST).toBe(60);
+    expect(MSG_LANE_CHAT_REFILL_PER_SECOND).toBe(4);
+    expect(MSG_LANE_CHAT_BURST).toBe(8);
+  });
+
+  it('list-read guard constants', () => {
+    expect(LIST_READ_BURST).toBe(10);
+    expect(LIST_READ_REFILL_PER_SECOND).toBe(1);
   });
 });
 

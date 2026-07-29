@@ -23,9 +23,13 @@ import {
   RIFT_NONLETHAL_MECHANIC_CAP_PCT,
   RIFT_RANK_MECHANIC_BUDGET,
   RIFT_S_ZONE_TEMPO,
+  type RiftSpawnRole,
   riftFloorLevel,
   riftMechanicSuppressed,
   riftRankForBaseLevel,
+  riftRankTuningFor,
+  riftRoleDamageMultiplier,
+  riftRoleHealthMultiplier,
 } from '../src/sim/rift/ranks';
 import { generateRiftFloor, isSetPieceSeed, riftFloorCount } from '../src/sim/rift/rift_gen';
 import { Rng } from '../src/sim/rng';
@@ -188,42 +192,15 @@ describe('rift ranks: boss mechanic kits (content integrity)', () => {
   });
 });
 
-describe('rift ranks: A/S/B heroic spawn scaling', () => {
-  it('B/A/S trash takes the heroic stat transform + mechanic multipliers; C does not', () => {
-    // C is the only rank without the heroic transform.
-    for (const baseLevel of [20]) {
-      const sim = makeSim();
-      sim.enterRift(SEED, baseLevel, sim.player.id);
-      const inst = active(sim);
-      for (const id of inst.mobIds) {
-        const m = sim.entities.get(id)!;
-        expect(m.mechanicDamageMult, `C mob ${m.templateId}`).toBeUndefined();
-        expect(m.riftMechanicLimit, 'trash carries no mechanic budget').toBeUndefined();
-      }
-    }
-    // B-rank mobs DO carry the 1.5/1.35 heroic transform (new in B-rank tuning).
-    {
-      const sim = makeSim();
-      sim.enterRift(SEED, 22, sim.player.id);
-      const inst = active(sim);
-      const tuning = RIFT_HEROIC_TUNING.B!;
-      expect(inst.mobIds.length).toBeGreaterThan(0);
-      for (const id of inst.mobIds) {
-        const m = sim.entities.get(id)!;
-        const t = MOBS[m.templateId];
-        expect(m.mechanicDamageMult, `B mob ${m.templateId}`).toBe(tuning.damageMultiplier);
-        expect(m.mechanicHealMult).toBe(tuning.healthMultiplier);
-        expect(m.moveSpeed, 'anti-kite move-speed floor').toBeGreaterThanOrEqual(
-          RIFT_HEROIC_MIN_MOVE_SPEED,
-        );
-        const hm = tuning.healthMultiplier;
-        const expected = Math.round((t.hpBase * hm + t.hpPerLevel * hm * (m.level - 1)) * 2.3);
-        expect(m.maxHp, `B ${m.templateId} hp`).toBe(expected);
-      }
-    }
-    for (const baseLevel of [25, 28]) {
+describe('rift ranks: C/B/A/S spawn scaling', () => {
+  it('every rank takes a stat transform + mechanic multipliers, on its own table', () => {
+    // Since the 2026-07-26 recalibration C is scaled too, on the sibling
+    // RIFT_NORMAL_TUNING (the normal-dungeon rung), so no rank spawns raw
+    // templates any more. C keeps the template's own move speed: the anti-kite
+    // floor is a heroic-only property.
+    for (const baseLevel of [20, 22, 25, 28]) {
       const tier = riftRankForBaseLevel(baseLevel);
-      const tuning = RIFT_HEROIC_TUNING[tier]!;
+      const tuning = riftRankTuningFor(baseLevel);
       const sim = makeSim();
       sim.enterRift(SEED, baseLevel, sim.player.id);
       const inst = active(sim);
@@ -231,16 +208,39 @@ describe('rift ranks: A/S/B heroic spawn scaling', () => {
       for (const id of inst.mobIds) {
         const m = sim.entities.get(id)!;
         const t = MOBS[m.templateId];
-        expect(m.mechanicDamageMult, `${tier} mob ${m.templateId}`).toBe(tuning.damageMultiplier);
-        expect(m.mechanicHealMult).toBe(tuning.healthMultiplier);
-        expect(m.moveSpeed, 'anti-kite move-speed floor').toBeGreaterThanOrEqual(
-          RIFT_HEROIC_MIN_MOVE_SPEED,
+        // Floor 0 is never a boss floor, but a C set-piece seed fields the
+        // citadel miniboss there, which takes the BOSS pair.
+        const role: RiftSpawnRole = id === inst.bossId || id === inst.minibossId ? 'boss' : 'trash';
+        expect(m.mechanicDamageMult, `${tier} mob ${m.templateId}`).toBe(
+          riftRoleDamageMultiplier(tuning, role),
         );
+        expect(m.mechanicHealMult).toBe(riftRoleHealthMultiplier(tuning, role));
+        if (tier === 'C') {
+          expect(m.moveSpeed, 'C keeps the template speed').toBe(t.moveSpeed);
+        } else {
+          expect(m.moveSpeed, 'anti-kite move-speed floor').toBeGreaterThanOrEqual(
+            RIFT_HEROIC_MIN_MOVE_SPEED,
+          );
+        }
         // The spawn-time template transform reached the derived stats: maxHp is
         // the elite formula over the health-multiplied template line.
-        const hm = tuning.healthMultiplier;
-        const expected = Math.round((t.hpBase * hm + t.hpPerLevel * hm * (m.level - 1)) * 2.3);
+        const hm = riftRoleHealthMultiplier(tuning, role);
+        const eliteHp = t.elite ? 2.3 : 1;
+        const expected = Math.round((t.hpBase * hm + t.hpPerLevel * hm * (m.level - 1)) * eliteHp);
         expect(m.maxHp, `${tier} ${m.templateId} hp`).toBe(expected);
+      }
+    }
+    // Trash never carries a boss mechanic budget, at any rank.
+    for (const baseLevel of [20, 22, 25, 28]) {
+      const sim = makeSim();
+      sim.enterRift(SEED, baseLevel, sim.player.id);
+      const inst = active(sim);
+      for (const id of inst.mobIds) {
+        if (id === inst.bossId || id === inst.minibossId) continue;
+        expect(
+          sim.entities.get(id)!.riftMechanicLimit,
+          'trash carries no mechanic budget',
+        ).toBeUndefined();
       }
     }
   });
@@ -491,36 +491,18 @@ describe('rift ranks: lethal boss death zone (deathZoneCast / deathZoneStrike)',
     expect(new Set(anchors).size, 'zones land on distinct member positions').toBe(2);
   });
 
-  it('the heroic tuning table carries the approved literals', () => {
+  it('the heroic tuning table covers exactly B, A and S', () => {
     // The transform tests above assert WIRING against this table (field on the
-    // mob === field in the table), so the numbers themselves must be pinned
-    // here as literals or a silent retune of any multiplier passes every test.
-    expect(RIFT_HEROIC_TUNING).toEqual({
-      B: {
-        healthMultiplier: 1.5,
-        damageMultiplier: 1.35,
-        addDamageMultiplier: 1.12,
-        armorMultiplier: 1.12,
-      },
-      A: {
-        healthMultiplier: 1.9,
-        damageMultiplier: 1.6,
-        addDamageMultiplier: 1.25,
-        armorMultiplier: 1.25,
-      },
-      // heroic_s: S is a full difficulty tier above the B/A heroic ladder,
-      // double the old S hp and damage (playtest verdict 2026-07-21: a 5-man
-      // of capped players cleared S without pressure).
-      S: {
-        healthMultiplier: 5.0,
-        damageMultiplier: 4.0,
-        addDamageMultiplier: 3.0,
-        armorMultiplier: 1.4,
-      },
-    });
+    // mob === field in the table). The VALUES are pinned as literals, together
+    // with C's RIFT_NORMAL_TUNING and every floor they were solved against, in
+    // tests/rift_difficulty_floors.test.ts: that is the file that must go red
+    // when the dungeon ladder moves. Here we only pin the rank COVERAGE, which
+    // is what this file's wiring assertions depend on (C must stay absent, or
+    // the citadel and the C boulder gate change meaning silently).
+    expect(Object.keys(RIFT_HEROIC_TUNING).sort()).toEqual(['A', 'B', 'S']);
   });
 
-  it('B-rank boss adds take the softer 1.12 multiplier (venom summons in budget)', () => {
+  it('B-rank boss adds take the softer add multiplier (venom summons in budget)', () => {
     const seed = seedWithFinalBoss('rift_boss_venom');
     const b = enterAtBossFloor(seed, 22);
     const bBoss = b.entities.get(active(b).bossId!)!;
@@ -539,12 +521,16 @@ describe('rift ranks: lethal boss death zone (deathZoneCast / deathZoneStrike)',
     );
     tickAlive(b, 3);
     expect(bBoss.summonedIds.length, 'B summons (venom slot 1 fits budget 2)').toBeGreaterThan(0);
+    const addMult = RIFT_HEROIC_TUNING.B!.addDamageMultiplier;
     for (const addId of bBoss.summonedIds) {
       const add = b.entities.get(addId)!;
       expect(add.level, 'adds match the boss level').toBe(bBoss.level);
-      expect(add.mechanicDamageMult, 'softer add multiplier, literal').toBe(1.12);
+      expect(add.mechanicDamageMult, 'softer add multiplier, literal').toBe(10.3);
+      expect(addMult, 'and it is the table value').toBe(10.3);
+      // Strictly softer than the boss's own line: wave pressure, not extra bosses.
+      expect(addMult).toBeLessThan(RIFT_HEROIC_TUNING.B!.bossDamageMultiplier);
       const t = MOBS[add.templateId];
-      const swing = t.dmgBase * 1.12 + t.dmgPerLevel * 1.12 * (add.level - 1);
+      const swing = t.dmgBase * addMult + t.dmgPerLevel * addMult * (add.level - 1);
       expect(add.weapon.min, 'add swings at the softer multiplier').toBe(Math.round(swing * 0.8));
     }
   });

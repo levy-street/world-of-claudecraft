@@ -1,7 +1,10 @@
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { cssTreeUnder } from './helpers/css_tree_under';
+import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
 
 // Section-by-section completeness guard for the game-HUD CSS, the floor the CSS
 // extraction regresses against. That extraction relocates CSS section by
@@ -13,14 +16,21 @@ import { describe, expect, it } from 'vitest';
 // banner comment /* ---------- name ---------- */, and the guard asserts that the
 // full set of those section names still exists somewhere in the corpus.
 //
-// THE CORPUS IS A UNION: both entries' inline <style> text UNION the contents of
-// src/styles/*.css. Today src/styles/ does not exist, so the union is just the
-// two inline blocks. That union is the whole point: when the extraction moves a section
-// out of an inline block and into a src/styles module keyed on the SAME ten-dash
+// THE CORPUS IS A UNION: both entries' inline <style> text UNION the src/styles
+// sheets. That union is the whole point: when the extraction moves a section out of
+// an inline block and into a src/styles module keyed on the SAME ten-dash
 // marker, the section leaves the inline block but reappears in the module, so the
 // union stays complete and this guard stays green. A section that vanishes from
 // BOTH the inline blocks and src/styles fails the guard, which is exactly the
 // "a rule was dropped during extraction" regression we want to catch.
+//
+// The extraction is now COMPLETE, so today the union is lopsided: both inline
+// <style> blocks are comment-only (pinned by tests/per_entry_css_wiring.test.ts) and
+// carry no ten-dash banner, so every pinned section below is accounted for by
+// src/styles alone. The union side stays because it is what makes the guard
+// indifferent to WHERE a section lives, which is the property being guarded, but it
+// means the src/styles read below is now the whole corpus rather than a supplement
+// to it.
 //
 // TWO TRAPS this guard is built to avoid (both are silent false greens):
 //   1. Vacuous marker pattern. V16 authored the banners with exactly ten dashes.
@@ -59,17 +69,45 @@ function inlineStyleCss(entryFile: string): string {
   return parts.join('\n');
 }
 
-// Every CSS module already migrated into src/styles/. None exist yet and the
-// directory itself is absent, so glob it and tolerate a missing dir. This is the
-// extension seam: as the extraction moves sections out of the inline blocks, they land
-// here and the union below picks them up with no edit to this guard.
-function extractedStyleCss(): string {
-  if (!existsSync(stylesDir)) return '';
-  const parts: string[] = [''];
-  for (const name of readdirSync(stylesDir).sort()) {
-    if (name.endsWith('.css')) parts.push(readFileSync(join(stylesDir, name), 'utf8'));
+// The src/styles sheets, read ONCE for this whole file: the union corpus below and
+// the per-file brace balance at the bottom both consume this list, so neither can
+// drift from the other and the file owns exactly one directory reader.
+//
+// This read stays FLAT deliberately, the same ruling #2499 made for
+// tests/mobile_window_coverage.test.ts and for the same reason: the corpus CREDITS
+// a pinned section to whatever text it finds, so a sheet parked in a subfolder
+// (component-local, experimental, half-migrated) would let a section that no entry
+// loads count as still shipping. That is a false green, which is strictly worse than
+// the narrowed scan recursing would fix. Only the top level ships: the index.css
+// barrel, the 7 modules it @imports, and the two .extra.css that a <link> pulls in
+// per entry (pinned by tests/per_entry_css_wiring.test.ts).
+//
+// The premise is CHECKED rather than asserted in prose (#2502): the day a sheet
+// lands in a subdirectory this throws, HERE, next to the reasoning, so the choice
+// gets re-made deliberately instead of quietly meaning something else. `dirs` comes
+// out of the same walk as the files, so checking it costs no second read, and it
+// sees a SYMLINKED subdirectory that a `Dirent.isDirectory()` test reads as a file.
+// A missing or renamed src/styles now throws out of the walk too: this used to fall
+// back to an empty corpus, and while that fails the completeness assertion loudly
+// today, the teeth case below would pass over the empty corpus vacuously.
+function styleSheets(root = stylesDir): { file: string; css: string }[] {
+  const tree = cssTreeUnder(root);
+  if (tree.dirs.length > 0) {
+    throw new Error(
+      `src/styles gained a subdirectory (${tree.dirs.join(', ')}): re-read the note above styleSheets()`,
+    );
   }
-  return parts.join('\n');
+  return tree.files.map(({ file, full }) => ({ file, css: readFileSync(full, 'utf8') }));
+}
+
+const STYLE_SHEETS = styleSheets();
+
+// Every CSS module migrated into src/styles/, concatenated. This is the extension
+// seam: a section moved out of an inline block lands here and the union below picks
+// it up with no edit to this guard, as long as it lands at the top level, where the
+// entries load it from.
+function extractedStyleCss(): string {
+  return ['', ...STYLE_SHEETS.map((sheet) => sheet.css)].join('\n');
 }
 
 // The whole game-HUD CSS corpus: both entries' inline <style> UNION src/styles.
@@ -291,14 +329,21 @@ function braceBalance(css: string): number {
 
 describe('css_corpus per-file brace balance', () => {
   it('balances every src/styles module exactly', () => {
-    expect(existsSync(stylesDir)).toBe(true);
-    const files = readdirSync(stylesDir)
-      .sort()
-      .filter((name) => name.endsWith('.css'));
-    expect(files.length).toBeGreaterThan(0);
-    for (const name of files) {
-      const css = readFileSync(join(stylesDir, name), 'utf8');
-      expect(braceBalance(css), `src/styles/${name} must have balanced braces`).toBe(0);
+    // Consumes the ONE read at the top of the file (this used to be a second,
+    // separately-flat readdirSync, so the two could drift, #2502).
+    //
+    // The vacuity floor sits at the live module count, 10, which an empty OR a
+    // truncated scan cannot clear: the `> 0` floor it replaces was satisfied by a
+    // single sheet, so a walk that lost the other nine, or that returned only the
+    // one file whose name survived a filter typo, passed while checking almost
+    // nothing. The names pin that the 10 are the real modules.
+    const names = STYLE_SHEETS.map((sheet) => sheet.file);
+    expect(names.length).toBeGreaterThanOrEqual(10);
+    expect(names).toEqual(
+      expect.arrayContaining(['index.css', 'components.css', 'hud.mobile.css', 'tokens.css']),
+    );
+    for (const { file, css } of STYLE_SHEETS) {
+      expect(braceBalance(css), `src/styles/${file} must have balanced braces`).toBe(0);
     }
   });
 
@@ -312,5 +357,78 @@ describe('css_corpus per-file brace balance', () => {
     expect(braceBalance('.a { color: red;')).toBe(1);
     expect(braceBalance('.a { color: red; } }')).toBe(-1);
     expect(braceBalance('.a { content: "}"; } /* } */ .b { color: blue; }')).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The flat-read premise, pinned. src/styles is flat today, so nothing asserted
+// over the real tree can tell this reader from one that quietly stopped at the
+// top level: only a fixture root can, and it has to drive styleSheets() itself
+// rather than the shared walk (helpers/css_tree_under.test.ts owns that).
+// ---------------------------------------------------------------------------
+
+describe('css_corpus src/styles read is flat BY RULING, and refuses instead of narrowing', () => {
+  let root = '';
+
+  const write = (relative: string, body: string): void => {
+    const full = join(root, ...relative.split('/'));
+    mkdirSync(join(full, '..'), { recursive: true });
+    writeFileSync(full, body);
+  };
+
+  beforeEach(() => {
+    root = mkdtempSync(join(tmpdir(), 'woc-css-corpus-styles-'));
+  });
+
+  afterEach(() => {
+    rmSync(root, { recursive: true, force: true });
+  });
+
+  it('is the only reader of src/styles in this file', () => {
+    // The collapse of the two independently-flat reads into one STYLE_SHEETS is
+    // the part of this guard that nothing else can pin: a re-added reader in the
+    // brace-balance case would return the same 10 sheets today, every assertion
+    // would stay green, and the two would be free to drift apart again.
+    expectScansOnlyThroughSharedWalkers(import.meta.url, ['css_tree_under']);
+  });
+
+  it('reads the top-level sheets of a flat root', () => {
+    // The other polarity of the two refusals below: without this, a reader that
+    // threw unconditionally would pass them both.
+    write('a.css', '/* ---------- alpha ---------- */\n.a { color: red; }\n');
+    write('b.css', '.b { color: blue; }\n');
+    expect(styleSheets(root).map((sheet) => sheet.file)).toEqual(['a.css', 'b.css']);
+    expect(
+      sectionNames(
+        styleSheets(root)
+          .map((sheet) => sheet.css)
+          .join('\n'),
+      ),
+    ).toEqual(['alpha']);
+  });
+
+  it('throws when a sheet lands in a subdirectory, naming it', () => {
+    write('a.css', '.a { color: red; }\n');
+    write('nested/sunk.css', '/* ---------- sunk ---------- */\n.s { color: red; }\n');
+    // The failure the ruling is worth having: a section (or a brace bug) inside a
+    // sheet no entry loads must not read as covered, and the day one appears the
+    // decision gets re-made here rather than silently meaning something else.
+    expect(() => styleSheets(root)).toThrow(/gained a subdirectory \(nested\)/);
+  });
+
+  it('throws for a subdirectory that holds no sheet at all', () => {
+    write('a.css', '.a { color: red; }\n');
+    mkdirSync(join(root, 'experimental'), { recursive: true });
+    // Keyed on the DIRECTORY, not on finding a .css inside it, so the choice is
+    // re-made when the shape changes rather than on the later day something lands.
+    expect(() => styleSheets(root)).toThrow(/gained a subdirectory \(experimental\)/);
+  });
+
+  it('throws for a missing root instead of reporting an empty corpus', () => {
+    // The hole this replaces: `if (!existsSync(stylesDir)) return ''` answered a
+    // moved or renamed src/styles with an empty corpus. The completeness assertion
+    // would go red on that today, but the dropped-section teeth case above passes
+    // over an empty corpus vacuously, so the read is the place to fail.
+    expect(() => styleSheets(join(root, 'no_such_dir'))).toThrow(/ENOENT/);
   });
 });

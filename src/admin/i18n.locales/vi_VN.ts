@@ -144,6 +144,7 @@ export const vi_VN: Record<string, string> = {
   'nav.primaryLabel': 'Điều hướng của quản trị viên',
   'nav.openMenu': 'Mở điều hướng',
   'nav.closeMenu': 'Đóng điều hướng',
+  'stats.playersCap': 'giới hạn người chơi',
   'stats.onlineNow': 'đang trực tuyến',
   'stats.onlineAccounts': 'tài khoản trực tuyến',
   'stats.siteUsersNow': 'người dùng trang hiện tại',

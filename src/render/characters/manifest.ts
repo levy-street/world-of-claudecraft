@@ -3,6 +3,7 @@
 // Pure data + dispatch — no three.js imports, no loading.
 
 import { MECH_CHROMAS, type MechChroma } from '../../sim/content/skins';
+import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { ITEMS, MOBS } from '../../sim/data';
 import type { Entity, PlayerClass } from '../../sim/types';
@@ -99,8 +100,13 @@ export interface VisualDef {
    *  applied as a local-space rotation (radians) after the bind transform. */
   weaponFix?: { node: string; rotX?: number; rotY?: number; rotZ?: number }[];
   /** Glowing ring parented behind the head bone (the priest's Light halo).
-   *  Value is the glow color; geometry/placement live in visual.ts. */
+   *  Value is the glow color; geometry/placement live in halo.ts. */
   halo?: number;
+  /** Halo placement overrides, head-bone space (defaults in halo.ts): lift
+   *  above the bone and ring radius, for models whose headgear the default
+   *  ring would clip. */
+  haloUpOffset?: number;
+  haloRadius?: number;
 }
 
 /** The slice of a VisualDef that decides how held weapons attach (which bones, and
@@ -224,27 +230,7 @@ const BIPED14: ClipMap = {
   death: 'Death',
 };
 
-// Tripo orc rig (Orkadia dungeon: black/blue/red orc GLBs). Ships Idle_Loop,
-// Walk_Loop, Sprint_Loop, Punch_Jab, Sword_Attack (Red also Sword_Idle). The
-// batch had no death or hit-react take, so `Death` (a hips-driven topple that
-// clamps flat) and `Hit` (a short spine/neck flinch) are synthesized onto the
-// shipped Mixamo skeleton by scripts/_add_orc_death_anim.mjs (the Stone Cantor
-// precedent, _add_cantor_hit_anim.mjs); re-run it if the GLBs are regenerated.
-// A real Tripo death retarget exists (scripts/reanim_orc_death.mjs artifacts
-// under tmp/asset_pipeline/reanim_orc_death_*_orc/), but it targets Tripo's
-// 41-joint biped rig (Hip/Waist/Pelvis/...) after a full re-rig, not the
-// shipped 22-joint mixamorig:* skeleton, scripts/graft_orc_death.mjs verifies
-// the mismatch and refuses to graft, so the synthesized clips remain.
-const ORC_TRIPO: ClipMap = {
-  idle: 'Idle_Loop',
-  walk: 'Walk_Loop',
-  run: 'Sprint_Loop',
-  attack: ['Sword_Attack', 'Punch_Jab'],
-  hit: ['Hit'],
-  death: 'Death',
-};
-
-// Orkadia specialist rig. These five creatures come through the current biped
+// Tripo biped rig. These creatures come through the current biped
 // pipeline, which retargets and bakes the complete game vocabulary directly.
 const TRIPO_BIPED_FULL_RIG: ClipMap = {
   idle: 'Idle',
@@ -369,6 +355,7 @@ const ITEM_OFFHAND_MODELS: Readonly<Record<string, string>> = {
   eastbrook_buckler: 'shield_round',
   highwatch_wallshield: 'shield_square',
   bonewrought_bulwark: 'shield_square',
+  pearlward_aegis: 'shield_round', // the first caster (int/spi) shield
 };
 
 function itemModelKey(
@@ -398,6 +385,22 @@ export function itemWeaponModelUrl(itemId: string | null | undefined): string | 
 export function itemOffhandModelUrl(itemId: string | null | undefined): string | null {
   const key = itemModelKey(itemId, ITEM_OFFHAND_MODELS);
   return key ? `${WEAPONS}/${key}.glb` : null;
+}
+
+/** GLB url the offhand slot should render: the active weapon skin's model when it
+ *  mirrors onto a matching-type offhand weapon (a rogue's second dagger
+ *  under a dagger skin), otherwise the equipped offhand item's own model. A shield,
+ *  held offhand (orb/tome), or different-type offhand weapon never mirrors, so it
+ *  keeps its item model; null when the offhand has no mapped model. The mirror
+ *  decision is the pure sim rule, so server and clients agree on both hands. */
+export function offhandModelUrl(
+  offhandItemId: string | null | undefined,
+  weaponSkinId: string | null | undefined,
+): string | null {
+  if (offhandMirrorsWeaponSkin(weaponSkinId, offhandItemId)) {
+    return weaponSkinModelUrl(weaponSkinId);
+  }
+  return itemOffhandModelUrl(offhandItemId);
 }
 
 /** Distinct held-weapon GLB urls (one per variant), for the boot preload sweep so
@@ -657,8 +660,18 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${PLAYERS}/mage.glb`,
     height: HUMANOID_H,
     clips: kaykit(['2H_Melee_Attack_Chop']),
-    // The priest's Light: a warm golden halo ring above the crown.
+    // The priest's Light: a warm golden halo ring above the crown. The mage
+    // model's pointed hat is canon here, and at the default lift the ring
+    // plane crosses the hat cone where it is wide, clipping through it; +0.15
+    // raises the plane to the cone tip, where the default-size ring clears it
+    // on every side (tuned by screenshot against the current mage.glb; a hat
+    // reshape in an asset update means re-tuning). Kept just below the hat's
+    // bounding-box top so portrait/turntable framing is unchanged for priests.
     halo: 0xffd766,
+    haloUpOffset: 1.45,
+    // show is a no-op for the hat/cape: the current mage.glb rigs every
+    // accessory as a SkinnedMesh, and the allowlist filter (assets.ts) only
+    // hides non-skinned nodes, so the hat always renders. Sanctioned look.
     show: [],
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
     weaponSlots: [0],
@@ -686,8 +699,10 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${PLAYERS}/mage.glb`,
     height: HUMANOID_H,
     clips: kaykit(['2H_Melee_Attack_Chop']),
-    // no Mage_Hat on players: the brim hides the whole body from the default
-    // chase-camera pitch (NPC mages keep theirs — they're seen from the side)
+    // The hat and cape render regardless of this list: the current mage.glb
+    // rigs every accessory as a SkinnedMesh, and the show allowlist
+    // (assets.ts) only hides non-skinned nodes. The hatted silhouette is the
+    // sanctioned mage look; listing Mage_Cape is inert but kept as intent.
     show: ['Mage_Cape'],
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
     weaponSlots: [0],
@@ -938,7 +953,10 @@ export const VISUALS: Record<string, VisualDef> = {
   mob_stag: {
     url: `${CREATURES}/stag.glb`,
     height: 1.9,
-    clips: animal(['Attack_Headbutt', 'Attack']),
+    // Attack_Kick, not 'Attack': the rig ships no clip by that name, so every
+    // second swing in the rotation resolved to nothing and played no animation
+    // at all (the repainted siblings below always had it right).
+    clips: animal(['Attack_Headbutt', 'Attack_Kick']),
     tint: 'entity',
     tintStrength: 0.35,
   },
@@ -1053,66 +1071,6 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: ENEMY7,
     tint: 'entity',
     tintStrength: 0.2, // skin washes pink fast
-  },
-  // Orkadia orc war-camp (Tripo GLBs). Low tint strength so each orc keeps its
-  // own baked black/blue/red identity; the mob `color` only nudges it.
-  mob_orc_grunt: {
-    url: `${CREATURES}/black_orc.glb`,
-    height: 2.3,
-    clips: ORC_TRIPO,
-    tint: 'entity',
-    tintStrength: 0.1,
-  },
-  mob_orc_marauder: {
-    url: `${CREATURES}/blue_orc.glb`,
-    height: 2.4,
-    clips: ORC_TRIPO,
-    tint: 'entity',
-    tintStrength: 0.1,
-  },
-  mob_orc_warlord: {
-    url: `${CREATURES}/red_orc.glb`,
-    height: 2.6,
-    clips: ORC_TRIPO,
-    tint: 'entity',
-    tintStrength: 0.1,
-  },
-  // Five bespoke Orkadia specialists, kept effectively untinted so their
-  // authored armor, warpaint, fel runes, and rank silhouettes remain distinct.
-  mob_orkadia_axethrower: {
-    url: `${CREATURES}/orkadia_axethrower.glb`,
-    height: 2.4,
-    clips: TRIPO_BIPED_FULL_RIG,
-    tint: 'entity',
-    tintStrength: 0.06,
-  },
-  mob_orkadia_fel_shaman: {
-    url: `${CREATURES}/orkadia_fel_shaman.glb`,
-    height: 2.4,
-    clips: TRIPO_BIPED_FULL_RIG,
-    tint: 'entity',
-    tintStrength: 0.06,
-  },
-  mob_orkadia_beast_handler: {
-    url: `${CREATURES}/orkadia_beast_handler.glb`,
-    height: 2.5,
-    clips: TRIPO_BIPED_FULL_RIG,
-    tint: 'entity',
-    tintStrength: 0.06,
-  },
-  mob_orkadia_siege_brute: {
-    url: `${CREATURES}/orkadia_siege_brute.glb`,
-    height: 2.9,
-    clips: TRIPO_BIPED_FULL_RIG,
-    tint: 'entity',
-    tintStrength: 0.04,
-  },
-  mob_orkadia_banner_captain: {
-    url: `${CREATURES}/orkadia_banner_captain.glb`,
-    height: 2.7,
-    clips: TRIPO_BIPED_FULL_RIG,
-    tint: 'entity',
-    tintStrength: 0.05,
   },
   // Five Wildheart troll silhouettes use the same complete biped vocabulary,
   // but preserve their woven cloth, bone paint, feathers, and jungle palette.
@@ -1623,15 +1581,6 @@ export const VISUALS: Record<string, VisualDef> = {
 // ---------------------------------------------------------------------------
 
 const MOB_KEYS: Record<string, string> = {
-  // Orkadia orc war-camp: each orc template renders its own Tripo GLB.
-  orkadia_grunt: 'mob_orc_grunt',
-  orkadia_marauder: 'mob_orc_marauder',
-  orkadia_warlord: 'mob_orc_warlord',
-  orkadia_axethrower: 'mob_orkadia_axethrower',
-  orkadia_fel_shaman: 'mob_orkadia_fel_shaman',
-  orkadia_beast_handler: 'mob_orkadia_beast_handler',
-  orkadia_siege_brute: 'mob_orkadia_siege_brute',
-  orkadia_banner_captain: 'mob_orkadia_banner_captain',
   wildheart_stalker: 'mob_wildheart_stalker',
   wildheart_ravager: 'mob_wildheart_ravager',
   wildheart_hexcaller: 'mob_wildheart_hexcaller',
@@ -1640,6 +1589,9 @@ const MOB_KEYS: Record<string, string> = {
   // Ambient Highwatch stable horse: the Valorsteed mount model (mob_stable_horse
   // above) so it renders as an animated horse, not a humanoid.
   stable_horse: 'mob_stable_horse',
+  // Dawnhold's garrison: the armored knight body (helmet, cape, sword), not
+  // the humanoid family's hooded outlaw fallback.
+  hedge_knight: 'npc_knight',
   // Protect Yumi objective cat: the dedicated Meshy familiar
   // (docs/prd/protect-yumi-assets.md item 1, delivered).
   yumi_cat: 'mob_yumi_cat',
@@ -1761,7 +1713,8 @@ const MOB_KEYS: Record<string, string> = {
   the_topiary_bull: 'mob_bull',
   moor_ram: 'mob_alpaca',
   shoal_scuttler: 'mob_crab',
-  the_wreck_warden: 'skel_golem',
+  // The Wreck Warden walks as Mogger's hulking bruiser body, not a skeleton.
+  the_wreck_warden: 'mob_bruiser',
   // The Infernal Citadel: the pact cult reads as robed casters, not the `undead`
   // family's default skeleton minion. Its demons keep the family fallback
   // (mob_demonalt), re-tinted deep red by the templates.

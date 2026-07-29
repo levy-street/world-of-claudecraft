@@ -170,6 +170,55 @@ describe('Targeting: target selection', () => {
     expect(actor.targetId).toBe(11); // the nearer mob
   });
 
+  it('targetNearestEnemy keeps focus on engaged mobs before idle mobs', () => {
+    const t = makeCtx();
+    const actor = t.add(ent({ id: 1, kind: 'player', pos: { x: 0, y: 0, z: 0 } }));
+    t.add(ent({ id: 10, hostile: true, pos: { x: 4, y: 0, z: 0 } })); // nearer, idle
+    t.add(
+      ent({
+        id: 11,
+        hostile: true,
+        pos: { x: 9, y: 0, z: 0 },
+        aggroTargetId: 1,
+      }),
+    );
+    t.add(
+      ent({
+        id: 12,
+        hostile: true,
+        pos: { x: 7, y: 0, z: 0 },
+        targetId: 1,
+      }),
+    );
+    const targeting = new Targeting(t.ctx);
+    targeting.targetNearestEnemy(1);
+    expect(actor.targetId).toBe(12); // nearest engaged mob, not the closer idle one
+  });
+
+  it('targetNearestEnemy breaks equal-distance ties deterministically by id', () => {
+    const t = makeCtx();
+    const actor = t.add(ent({ id: 1, kind: 'player', pos: { x: 0, y: 0, z: 0 } }));
+    t.add(
+      ent({
+        id: 12,
+        hostile: true,
+        pos: { x: -6, y: 0, z: 0 },
+        aggroTargetId: 1,
+      }),
+    );
+    t.add(
+      ent({
+        id: 11,
+        hostile: true,
+        pos: { x: 6, y: 0, z: 0 },
+        aggroTargetId: 1,
+      }),
+    );
+    const targeting = new Targeting(t.ctx);
+    targeting.targetNearestEnemy(1);
+    expect(actor.targetId).toBe(11);
+  });
+
   it('friendlyTabTarget cycles party-mates by distance and wraps', () => {
     const t = makeCtx();
     const actor = t.add(ent({ id: 1, kind: 'player', pos: { x: 0, y: 0, z: 0 } }));
@@ -187,7 +236,7 @@ describe('Targeting: target selection', () => {
   it('targetEntity ends a follow and clears auto-attack on a non-hostile pick', () => {
     const t = makeCtx();
     const actor = t.add(ent({ id: 1, kind: 'player', followTargetId: 99, autoAttack: true }));
-    const ally = t.add(ent({ id: 2, kind: 'player' }));
+    t.add(ent({ id: 2, kind: 'player' }));
     const targeting = new Targeting(t.ctx);
     targeting.targetEntity(2, 1);
     expect(t.stopFollow).toHaveBeenCalledWith(actor, 'You stop following.');

@@ -1151,8 +1151,10 @@ export const KNOWN_DEVIATIONS: readonly KnownDeviation[] = [
   {
     id: DEVIATION_ID.dailyRewardsOpsBodyValidationRemap,
     routes: [
+      '/internal/daily-rewards/finalize',
       '/internal/daily-rewards/pending-payouts',
       '/internal/daily-rewards/payout-history',
+      '/internal/daily-rewards/leaderboard',
       '/internal/daily-rewards/mark-payout',
       '/internal/daily-rewards/void-payout',
       '/internal/daily-rewards/restore-payout',
@@ -1162,7 +1164,7 @@ export const KNOWN_DEVIATIONS: readonly KnownDeviation[] = [
       '(handleDailyRewardInternalApi, tried before handleInternalApi), fired ' +
       'fire-and-forget with NO outer catch: mark-payout self-reads its body via an ' +
       'UN-caught readBody (unlike internal.ts, which .catch(() => ({}))s every read), ' +
-      'so a malformed/over-cap body AND any DB throw in the five handlers become an ' +
+      'so a malformed/over-cap body AND any DB throw in the seven handlers become an ' +
       'unhandled rejection: NO response is written and the payout service request ' +
       'HANGS. The gate itself is FAIL-CLOSED: an unset ' +
       'WOC_DAILY_REWARD_SERVICE_SECRET and a wrong x-woc-daily-reward-secret header ' +

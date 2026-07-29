@@ -1,4 +1,13 @@
+import { beaconSpiralLift } from './beacon_spiral';
+import {
+  castleLift,
+  castlePadTarget,
+  castlePadWeight,
+  castleSkirtWeight,
+  LAST_SPRING,
+} from './castle_layout';
 import { STABLE_FLAT, STABLE_PADDOCK } from './content/mounts';
+import { PALMREACH_PROPS } from './content/palmreach';
 import {
   CAMPS,
   COLUMN_ZONES,
@@ -24,9 +33,18 @@ import {
 import { dockLocalPoint, dockSectionAtLocal, dockSurfaceLine, dockSurfaceYAt } from './dock_layout';
 import { harborSurfaceHeight } from './harbor_layout';
 import { LAST_BELL_AREAS } from './last_bell_field';
-import { orkadiaFieldHeight } from './orkadia_field';
+import { dungeonFloorLift } from './dungeon_floor';
+import { lastKeepLiftAt } from './dungeon_layout';
+import {
+  EMBER_FLAT_POOLS,
+  EMBER_LAVA_LINKS,
+  emberLinkDistanceNorm,
+  emberNearestOnLink,
+} from './ember_lava_layout';
+import { GALE_DECK_FREEBOARD, galeDeckSurface } from './gale_harbor';
+import { reachDeckClear, reachDeckSurface } from './reach_decks';
 import { fbm2, hash2, noise2 } from './rng';
-import type { BiomeId, HeightStamp, ZoneDef } from './types';
+import type { BiomeId, HeightStamp, WorldContent, ZoneDef } from './types';
 import { isInSowfieldShell, SOWFIELD_FLAT, sowfieldStandLift } from './vale_cup_layout';
 import { wildheartFieldHeight } from './wildheart_field';
 
@@ -846,18 +864,100 @@ let reachPalmCache: { seed: number; spots: ReachPalm[] } | null = null;
 export function reachPalmSpots(seed: number): ReachPalm[] {
   if (reachPalmCache && reachPalmCache.seed === seed) return reachPalmCache.spots;
   const spots: ReachPalm[] = [];
+  // props a palm must never stand in (the village, the camps, the walkways)
+  const rp = PALMREACH_PROPS;
+  const propClear = (x: number, z: number): boolean => {
+    for (const b of rp.buildings ?? []) if (Math.hypot(x - b.x, z - b.z) < 9) return false;
+    for (const m of rp.mudHuts ?? []) if (Math.hypot(x - m[0], z - m[1]) < 5) return false;
+    for (const t of rp.tents ?? []) if (Math.hypot(x - t.x, z - t.z) < 5) return false;
+    for (const f of rp.campfires ?? []) if (Math.hypot(x - f[0], z - f[1]) < 8) return false;
+    for (const st of rp.stalls ?? []) if (Math.hypot(x - st.x, z - st.z) < 5) return false;
+    for (const d of rp.decorProps ?? [])
+      if (Math.hypot(x - d.x, z - d.z) < (d.r ?? 3) + 3) return false;
+    for (const g of rp.greatTrees ?? []) if (Math.hypot(x - g.x, z - g.z) < g.r + 6) return false;
+    for (const ring of rp.ruinRings ?? [])
+      if (Math.hypot(x - ring.x, z - ring.z) < ring.ringR + 4) return false;
+    return reachDeckClear(x, z, 1.5);
+  };
+  const push = (x: number, z: number, y: number, sizeF: number): void => {
+    const variant = Math.floor(hash2(x, z, seed + 5151) * 3);
+    const scale = (PALM_TARGET_H / PALM_NATIVE_H[variant]) * sizeF;
+    spots.push({
+      x,
+      z,
+      y: y - 0.15,
+      rot: hash2(z, x, seed + 5141) * Math.PI * 2,
+      variant,
+      scale,
+      r: PALM_TRUNK_R * scale,
+    });
+  };
   for (let gx = -536; gx <= -184; gx += 8) {
     for (let gz = REACH_ZMIN + 10; gz <= REACH_ZMAX - 10; gz += 8) {
-      if (hash2(gx, gz, seed + 5101) > 0.62) continue; // thin the grid (~38% kept)
+      if (hash2(gx, gz, seed + 5101) > 0.7) continue; // thin the grid (~30% dropped)
       const x = gx + (hash2(gx, gz, seed + 5111) - 0.5) * 7;
       const z = gz + (hash2(gz, gx, seed + 5121) - 0.5) * 7;
       const land = reachLandness(x, z);
       if (land < 0.045 || land > 0.24) continue; // the beach band only
       const y = terrainHeight(x, z, seed);
       if (y < WATER_LEVEL + 0.5 || y > 3.6) continue; // out of the surf, off the bluff
+      if (roadDistance(x, z) < 4) continue;
+      if (Math.hypot(x + 300, z - 820) < 18) continue; // Drifthaven's lanes stay open
+      if (!propClear(x, z)) continue;
+      if (isCliffFace(x, z, seed)) continue;
+      // a few of the strand's palms grow into towering elders
+      const grand = hash2(x + 3, z, seed + 5161) < 0.09 ? 1.4 : 1;
+      push(x, z, y, (0.85 + hash2(x, z, seed + 5131) * 0.5) * grand);
+    }
+  }
+  // the inland palms: a sparser scatter through the jungle interior, so the
+  // green runs palm-crowned all the way across the realm, not just the shore
+  for (let gx = -530; gx <= -190; gx += 14) {
+    for (let gz = REACH_ZMIN + 16; gz <= REACH_ZMAX - 16; gz += 14) {
+      if (hash2(gx, gz, seed + 5171) > 0.34) continue;
+      const x = gx + (hash2(gx + 1, gz, seed + 5181) - 0.5) * 11;
+      const z = gz + (hash2(gx, gz + 1, seed + 5191) - 0.5) * 11;
+      if (reachLandness(x, z) <= 0.24) continue; // the interior only
+      const y = terrainHeight(x, z, seed);
+      if (y < WATER_LEVEL + 0.6 || y > 9) continue;
+      if (roadDistance(x, z) < 5) continue;
+      if (reachRiverDistance(x, z) < 9) continue;
+      if (Math.hypot(x + 300, z - 820) < 22) continue;
+      if (!propClear(x, z)) continue;
+      if (isCliffFace(x, z, seed)) continue;
+      const grand = hash2(x + 5, z, seed + 5162) < 0.12 ? 1.35 : 1;
+      push(x, z, y, (0.95 + hash2(x, z, seed + 5131) * 0.6) * grand);
+    }
+  }
+  reachPalmCache = { seed, spots };
+  return spots;
+}
+
+// The Farshore strand: the same three beach-palm models scattered over the
+// isle's beach apron (the reachPalmSpots idiom): one deterministic list
+// feeds the renderer (render/farshore_features.ts) and the trunk colliders
+// (sim/colliders.ts). Memoized per seed.
+let farshorePalmCache: { seed: number; spots: ReachPalm[] } | null = null;
+
+export function farshorePalmSpots(seed: number): ReachPalm[] {
+  if (farshorePalmCache && farshorePalmCache.seed === seed) return farshorePalmCache.spots;
+  const spots: ReachPalm[] = [];
+  for (let gx = 186; gx <= 556; gx += 9) {
+    for (let gz = -170; gz <= 170; gz += 9) {
+      if (hash2(gx, gz, seed + 5501) > 0.6) continue;
+      const x = gx + (hash2(gx, gz, seed + 5511) - 0.5) * 8;
+      const z = gz + (hash2(gz, gx, seed + 5521) - 0.5) * 8;
+      const land = isleLandness(x, z);
+      if (land < 0.045 || land > 0.22) continue; // the beach apron only
+      const y = terrainHeight(x, z, seed);
+      if (y < WATER_LEVEL + 0.5 || y > 3.8) continue;
+      if (roadDistance(x, z) < 4.5) continue;
+      if (Math.hypot(x - 305, z - 70) < 22) continue; // Gullhaven's lanes
+      if (Math.hypot(x - 290, z - 86) < 12) continue; // the graveyard
       const variant = Math.floor(hash2(x, z, seed + 5151) * 3);
+      const grand = hash2(x + 3, z, seed + 5531) < 0.08 ? 1.35 : 1;
       const scale =
-        (PALM_TARGET_H / PALM_NATIVE_H[variant]) * (0.85 + hash2(x, z, seed + 5131) * 0.5);
+        (PALM_TARGET_H / PALM_NATIVE_H[variant]) * (0.85 + hash2(x, z, seed + 5131) * 0.5) * grand;
       spots.push({
         x,
         z,
@@ -869,7 +969,7 @@ export function reachPalmSpots(seed: number): ReachPalm[] {
       });
     }
   }
-  reachPalmCache = { seed, spots };
+  farshorePalmCache = { seed, spots };
   return spots;
 }
 
@@ -902,7 +1002,77 @@ function applyReachCoast(x: number, z: number, h: number): number {
   // ...and the Nightgate's south ramp, meeting the dream's pass cap
   const passN = (1 - smoothstep(26, 52, Math.abs(x + 330))) * smoothstep(1200, 1245, z);
   if (passN > 0) out = out + (6 + (out - 6) * 0.15 - out) * passN;
+  // the jungle rivers: each run lies in a gentle valley (banks eased down
+  // to just above the waterline so boats beach naturally and bridges sit
+  // low) with the swimmable channel carved along the center-line; both
+  // blends only ever LOWER ground (min), so the open seabed is never raised
+  for (const river of REACH_RIVERS) {
+    const d = riverDistance(river.pts, x, z);
+    if (d >= river.hw + 16) continue;
+    const tv = 1 - smoothstep(river.hw, river.hw + 16, d);
+    out = Math.min(out, out + (WATER_LEVEL + 1.1 - out) * tv);
+    if (d < river.hw + 2) {
+      const tc = 1 - smoothstep(river.hw * 0.4, river.hw + 2, d);
+      out = Math.min(out, out + (WATER_LEVEL - 1.6 - out) * tc);
+    }
+  }
   return h + (out - h) * seam * zSeam;
+}
+
+// The Palmreach's rivers, polyline center-lines with a half-width; every
+// run keeps clear of the road net (the road-water guard samples raw
+// terrain, so a road never dips into a channel).
+const REACH_RIVERS: { pts: { x: number; z: number }[]; hw: number }[] = [
+  {
+    // the Emerald Run: out of the jungle pool, west to the sea
+    pts: [
+      { x: -374, z: 1006 },
+      { x: -408, z: 1000 },
+      { x: -446, z: 988 },
+      { x: -482, z: 972 },
+      { x: -520, z: 956 },
+    ],
+    hw: 4.5,
+  },
+  {
+    // the Tanglewash: the northern tarn's outflow to the north bight
+    pts: [
+      { x: -336, z: 1166 },
+      { x: -350, z: 1192 },
+      { x: -366, z: 1220 },
+      { x: -384, z: 1246 },
+    ],
+    hw: 4,
+  },
+  {
+    // the West Arm stream, a short run off the west arm's shoulder
+    pts: [
+      { x: -466, z: 1052 },
+      { x: -492, z: 1034 },
+      { x: -518, z: 1014 },
+    ],
+    hw: 3.5,
+  },
+];
+
+function riverDistance(pts: { x: number; z: number }[], x: number, z: number): number {
+  let best = Infinity;
+  for (let i = 0; i + 1 < pts.length; i++) {
+    const ax = pts[i].x;
+    const az = pts[i].z;
+    const dx = pts[i + 1].x - ax;
+    const dz = pts[i + 1].z - az;
+    const t = Math.max(0, Math.min(1, ((x - ax) * dx + (z - az) * dz) / (dx * dx + dz * dz)));
+    best = Math.min(best, Math.hypot(x - (ax + dx * t), z - (az + dz * t)));
+  }
+  return best;
+}
+
+/** Distance from (x, z) to the nearest Palmreach river center-line. */
+export function reachRiverDistance(x: number, z: number): number {
+  let best = Infinity;
+  for (const river of REACH_RIVERS) best = Math.min(best, riverDistance(river.pts, x, z));
+  return best;
 }
 
 // ---------------------------------------------------------------------------
@@ -918,10 +1088,10 @@ const GARDEN_LAND_LOBES = [
   { x: 410, z: 740, r: 55 }, // the Garden Gate's approach lawn
   { x: 378, z: 765, r: 45 }, // the gate road's lawn, bridging to the hub
   { x: 320, z: 810, r: 70 }, // Hedgewick and the gate lawns
-  { x: 360, z: 880, r: 80 }, // the Statuary Walk
+  { x: 360, z: 880, r: 80 }, // the Parterre Walk
   { x: 440, z: 850, r: 55 }, // the Petal Pond's basin
   { x: 290, z: 870, r: 40 }, // the rose road's shoulder
-  { x: 270, z: 910, r: 60 }, // the Rose Wilds
+  { x: 270, z: 910, r: 60 }, // Dawnhold Castle's lawn
   { x: 360, z: 1016, r: 95 }, // the Great Maze's terrace...
   { x: 305, z: 960, r: 60 }, // ...and its four corners, kept well ashore
   { x: 415, z: 960, r: 60 },
@@ -944,6 +1114,60 @@ const GARDEN_LAND_LOBES = [
   { x: 240, z: 782, r: 46 }, // ...joined to Hedgewick's lawns
   { x: 522, z: 726, r: 50 }, // the Moonmere's east cap, garden side
   { x: 488, z: 786, r: 46 }, // ...joined to the Petal Pond's basin
+] as const;
+
+// Level pads under the Evergarden's modeled flower beds: one per bed (the
+// six large square gardens and their small round satellites), consumed by
+// the pad-flattening loop in terrainHeight so no bed sinks into a slope.
+// Every satellite ANCHORS to its parent square bed (ax, az), so a whole
+// ensemble levels to one shared terrace height and overlapping pads never
+// fight. The render plan (garden_parterre_core PARTERRE_PLOTS) and the
+// collide decor entries (content/evergarden decorProps) carry the SAME
+// sites; the parterre test pins all three against each other.
+export interface GardenBedPad {
+  x: number;
+  z: number;
+  r: number;
+  /** the pad's height anchor; satellites point at their parent bed */
+  ax: number;
+  az: number;
+}
+const bedGroup = (ax: number, az: number, r: number, sats: [number, number][]): GardenBedPad[] => [
+  { x: ax, z: az, r, ax, az },
+  ...sats.map(([x, z]) => ({ x, z, r: 3.25, ax, az })),
+];
+export const GARDEN_BED_PADS: readonly GardenBedPad[] = [
+  ...bedGroup(322, 878, 10, [
+    [322, 892.8],
+    [322, 863.2],
+    [336.8, 878],
+    [307.2, 878],
+  ]),
+  ...bedGroup(400, 866, 9, [
+    [400, 879.8],
+    [400, 852.2],
+    [413.8, 866],
+    [386.2, 866],
+  ]),
+  ...bedGroup(256, 952, 9, [
+    [256, 965.8],
+    [256, 938.2],
+    [269.8, 952],
+    [242.2, 952],
+  ]),
+  ...bedGroup(476, 1010, 7.5, [
+    [476, 1022.3],
+    [476, 997.7],
+    [463.7, 1010],
+  ]),
+  // (the Garden Gate group came out: its lawn belongs to the extended gate
+  // wall and its channel-bank tower now)
+  ...bedGroup(300, 1118, 6, [
+    [300, 1128.8],
+    [300, 1107.3],
+    [310.8, 1118],
+    [289.2, 1118],
+  ]),
 ] as const;
 const GARDEN_BAYS = [
   { x: 190, z: 940, r: 50 }, // the west water
@@ -982,14 +1206,16 @@ function applyGardenCoast(x: number, z: number, h: number): number {
   return h + (out - h) * seam * zSeam;
 }
 
-// The Great Maze. '#' cells are hedge walls raised straight out of the
-// heightfield; '.' cells are gravel corridors. Row 0 is the NORTH row (the
-// map's top), the entrance is the gap in the south row, and the open 3x3
-// court at the center is the Fountain Court. Solvability (entrance to
-// court) is asserted by tests/evergarden.test.ts, so an edit here that
-// bricks the maze fails CI instead of stranding players.
+// The Great Maze. '#' cells are modeled hedge walls; '.' cells are lawn
+// corridors. Row 0 is the NORTH row (the map's top): the entrance is the
+// gap in the south row, the exit the gap in the north row, and the open
+// 3x3 court at the center is the Fountain Court. Solvability (entrance to
+// court to exit) is asserted by tests/evergarden.test.ts, so an edit here
+// that bricks the maze fails CI instead of stranding players.
 const GARDEN_MAZE = [
-  '###############',
+  // the exit sits at column 10: straight north of column 7 lies the garden
+  // pond, so the way out opens onto the dry east lawn instead
+  '##########.####',
   '#.....#.......#',
   '#.###.#####.###',
   '#.#.#.....#...#',
@@ -1014,9 +1240,15 @@ export const MAZE_ROWS = 17;
 export const MAZE_X0 = 360 - (MAZE_COLS * MAZE_CELL) / 2; // west edge, x 292.5
 export const MAZE_Z1 = 1093; // north edge (row 0); south edge z 940
 export const MAZE_Z0 = MAZE_Z1 - MAZE_ROWS * MAZE_CELL;
-const MAZE_WALL_H = 12;
-const MAZE_SKIRT = 2.2; // yd of wall flank beyond the inset face
-const MAZE_FACE_INSET = 1.2; // corridor-facing faces pull into the wall cell
+// The hedge walls are MODELED now (the user's hedge GLB, rendered by
+// garden_features.ts from this same grid), not terrain: the ground through
+// the maze is flat lawn and the walls block movement as crisp solid boxes.
+// Each wall cell carries a hedge piece along each axis that continues into
+// a neighboring wall cell: a piece spans its full cell along the run and
+// MAZE_WALL_DEPTH across it, so runs read as continuous clipped hedges and
+// corners/junctions read as crossing pieces. Collision is the union of the
+// same boxes, so the blocked ground IS the modeled hedge's footprint.
+export const MAZE_WALL_DEPTH = 4.2; // yd across a hedge piece (tracks the modeled hedge scale)
 
 /** Inside the maze footprint (small margin), where dressing must not spawn. */
 export function inGardenMaze(x: number, z: number): boolean {
@@ -1025,54 +1257,44 @@ export function inGardenMaze(x: number, z: number): boolean {
   );
 }
 
-// Is a grid position open ground? Out-of-bounds counts as open (the lawn
-// beyond the maze), so the outer wall's outward face behaves like any other.
-function mazeOpenAt(c: number, r: number): boolean {
-  if (r < 0 || r >= MAZE_ROWS || c < 0 || c >= MAZE_COLS) return true;
-  return GARDEN_MAZE[r].charCodeAt(c) === 46; // '.'
+// Is a grid position a wall? Out-of-bounds counts as open (the lawn beyond
+// the maze), so the outer ring's pieces run along the perimeter only.
+function mazeWallAt(c: number, r: number): boolean {
+  if (r < 0 || r >= MAZE_ROWS || c < 0 || c >= MAZE_COLS) return false;
+  return GARDEN_MAZE[r].charCodeAt(c) === 35; // '#'
 }
 
-// How much hedge stands at a point, 0..1 of full height. Each wall cell is
-// a square block whose corridor-facing faces are inset into the cell (so
-// lanes stay wide) while wall-facing edges are NOT inset (so runs tile with
-// no seam), and the union is a MAX over blocks: a shared edge inside a run
-// is interior to both blocks and stays at full height. Chebyshev distance
-// gives square height contours, so a run's END keeps its corners tall
-// right to the block edge instead of tapering into the see-through notch a
-// round distance field cuts at every junction corner.
-function gardenMazeHedgeFactor(x: number, z: number): number {
+/**
+ * Which hedge pieces a wall cell carries: h runs east-west, v runs
+ * north-south, both at a junction. An isolated wall cell (no wall
+ * neighbors) reads as a single east-west piece. Shared by the movement
+ * wall test, the modeled-hedge renderer, and the map painter, so all
+ * three always agree exactly. Returns null for corridor cells.
+ */
+export function gardenMazeCellPieces(c: number, r: number): { h: boolean; v: boolean } | null {
+  if (!mazeWallAt(c, r)) return null;
+  const h = mazeWallAt(c - 1, r) || mazeWallAt(c + 1, r);
+  const v = mazeWallAt(c, r - 1) || mazeWallAt(c, r + 1);
+  if (!h && !v) return { h: true, v: false };
+  return { h, v };
+}
+
+// Movement treats the hedge pieces as hard walls (see colliders
+// .resolveMovement). A piece never reaches outside its own cell, so only
+// the containing cell is tested.
+export function inGardenMazeWall(x: number, z: number): boolean {
   const w = MAZE_COLS * MAZE_CELL;
-  if (x < MAZE_X0 - 1 || x > MAZE_X0 + w + 1) return 0;
-  if (z < MAZE_Z0 - 1 || z > MAZE_Z1 + 1) return 0;
+  if (x < MAZE_X0 || x > MAZE_X0 + w) return false;
+  if (z < MAZE_Z0 || z > MAZE_Z1) return false;
   const ci = Math.floor((x - MAZE_X0) / MAZE_CELL);
   const ri = Math.floor((MAZE_Z1 - z) / MAZE_CELL);
-  let best = 0;
-  for (let dr = -1; dr <= 1; dr++) {
-    for (let dc = -1; dc <= 1; dc++) {
-      const r = ri + dr;
-      const c = ci + dc;
-      if (r < 0 || r >= MAZE_ROWS || c < 0 || c >= MAZE_COLS) continue;
-      if (GARDEN_MAZE[r].charCodeAt(c) !== 35) continue; // '#' wall cells
-      const x0 = MAZE_X0 + c * MAZE_CELL + (mazeOpenAt(c - 1, r) ? MAZE_FACE_INSET : 0);
-      const x1 = MAZE_X0 + (c + 1) * MAZE_CELL - (mazeOpenAt(c + 1, r) ? MAZE_FACE_INSET : 0);
-      const zTop = MAZE_Z1 - r * MAZE_CELL - (mazeOpenAt(c, r - 1) ? MAZE_FACE_INSET : 0);
-      const zBot = MAZE_Z1 - (r + 1) * MAZE_CELL + (mazeOpenAt(c, r + 1) ? MAZE_FACE_INSET : 0);
-      const ddx = Math.max(x0 - x, x - x1, 0);
-      const ddz = Math.max(zBot - z, z - zTop, 0);
-      const d = Math.max(ddx, ddz); // Chebyshev: square contours
-      const f = 1 - smoothstep(0, MAZE_SKIRT, d);
-      if (f > best) best = f;
-    }
-  }
-  return best;
-}
-
-// A hedge tall enough to block: movement treats it as a hard wall (see
-// colliders.resolveMovement); the slope gate alone is not enough, a shallow
-// diagonal walk sneaks over any gradient. Knee height, just inside the face.
-const MAZE_WALL_SOLID = 0.12; // of full hedge height
-export function inGardenMazeWall(x: number, z: number): boolean {
-  return gardenMazeHedgeFactor(x, z) > MAZE_WALL_SOLID;
+  const p = gardenMazeCellPieces(ci, ri);
+  if (!p) return false;
+  const half = MAZE_CELL / 2;
+  const d = MAZE_WALL_DEPTH / 2;
+  const lx = x - (MAZE_X0 + ci * MAZE_CELL) - half; // offset from cell center
+  const lz = MAZE_Z1 - ri * MAZE_CELL - z - half;
+  return (p.h && Math.abs(lz) <= d) || (p.v && Math.abs(lx) <= d);
 }
 
 // Does the segment pass through hedge? The endpoint test alone is not
@@ -1097,12 +1319,6 @@ export function crossesGardenHedge(
     if (inGardenMazeWall(fromX + (toX - fromX) * t, fromZ + (toZ - fromZ) * t)) return true;
   }
   return false;
-}
-
-// The hedge heightfield: sheer faces (well past the climb gate) whose skirt
-// mostly eats into the wall cells, not the corridors.
-function gardenMazeOffset(x: number, z: number): number {
-  return MAZE_WALL_H * gardenMazeHedgeFactor(x, z);
 }
 
 // ---------------------------------------------------------------------------
@@ -1771,7 +1987,10 @@ function applyFrostCoast(x: number, z: number, h: number): number {
 export const EMBER_VOLCANOES = [
   { x: 390, z: 2320, r: 62, h: 27, craterR: 16, craterD: 13 }, // Drakemaw Caldera
   { x: 270, z: 2282, r: 40, h: 20, craterR: 8, craterD: 8 },
-  { x: 500, z: 2370, r: 36, h: 18, craterR: 7, craterD: 7 },
+  // the east cone, on its real footing: at (500, 2370) it straddled the
+  // column strait and row mere carves, which sank its seaward half (and
+  // its crater pool) to the seabed after every shaping pass
+  { x: 487, z: 2356, r: 32, h: 18, craterR: 7, craterD: 7 },
   { x: 318, z: 2392, r: 30, h: 14, craterR: 0, craterD: 0 },
 ] as const;
 // the Snowline crossing's drake-side footing (appended to the ember lobes
@@ -1779,15 +1998,24 @@ export const EMBER_VOLCANOES = [
 
 // Open lava pools out in the wastes (shaped as shallow flat-floored basins;
 // the render lava surface sits just above each floor).
+// padK: where the flat melt floor ends, as a fraction of r. The default 0.95
+// keeps the whole model footprint on level ground; the Drakemaw vent keeps
+// the original tight eye (0.55) because its shore is the escape bench's
+// wade-out ramp (DRAKEMAW_ESCAPE), pinned by tests/terrain_escape.test.ts.
 export const EMBER_LAVA_POOLS = [
-  { x: 390, z: 2320, r: 14, floor: 12 }, // the vent inside the Drakemaw crater
+  { x: 390, z: 2320, r: 14, floor: 12, padK: 0.55 }, // the vent inside the Drakemaw crater
   { x: 446, z: 2220, r: 11, floor: -0.5 },
   { x: 302, z: 2328, r: 11, floor: 0 },
-  // crater pools high in the two smaller cones
-  { x: 270, z: 2282, r: 7, floor: 11.5 },
-  { x: 500, z: 2370, r: 6, floor: 9.5 },
-  // the Moltenmaw: an open lava-lake field east of the caldera
-  { x: 418, z: 2342, r: 16, floor: -1.2 },
+  // crater pools high in the two smaller cones (padK 0.55: the pit walls
+  // cradle the model's rocky ring, and the escape walkers need the legacy
+  // gentle floor-to-wall transition)
+  { x: 270, z: 2282, r: 7, floor: 11.5, padK: 0.55 },
+  { x: 487, z: 2356, r: 6, floor: 9.5, padK: 0.55 },
+  // the Moltenmaw: an open lava-lake field east of the caldera. The big eye
+  // sits at (423, 2347) so its whole model footprint (r * 1.15) stays clear
+  // of the Drakemaw escape bench ring (benchFade 23 from the vent), whose
+  // every-azimuth dry-shore guarantee is pinned by tests/terrain_escape.
+  { x: 423, z: 2347, r: 16, floor: -1.2 },
   { x: 438, z: 2326, r: 10, floor: -1.2 },
 ] as const;
 
@@ -1812,72 +2040,315 @@ function emberShapingOffset(x: number, z: number, seed: number): number {
   return dh;
 }
 
-// The Drakemaw's breached south rim: the caldera wall climbs past the
-// movement gate at every azimuth, so anyone stepping over the lip was
-// stranded on the vent floor (the player report: three stranded attempts,
-// and the world's ONLY closed basin in the trap scan). Volcanoes breach:
-// an old outflow channel now cuts the south face, a walkable 0.5 rise/run
-// gorge from just above the melt lip down to the open waste. Applied
-// AFTER the cone shaping and the basin lip so it clamps both; it starts
-// above the pool floor, so the melt never drains into the channel.
-// tests/terrain_escape.test.ts walks a real player out through it.
-const DRAKEMAW_BREACH = {
+// The Drakemaw's escapable vent: the caldera wall climbs past the movement
+// gate at every azimuth and the melt pool used to fill the vent floor wall
+// to wall, so anyone dropping in was stranded standing IN the rendered lava
+// (the player report: three stranded attempts, and the world's ONLY closed
+// basin in the trap scan). Two shapes fix it together, and both must stay
+// above the rendered melt surface (pool floor + 0.9, see
+// src/render/ember_features.ts), or the "dry" ground reads as lava and no
+// player will walk it:
+// - a flat SHORE BENCH ringing the melt eye, so every landing spot around
+//   the pool is dry rock with a gentle wade-out ramp from the melt, and
+// - an old outflow GORGE cutting the south face, a walkable 0.5 rise/run
+//   descent from the bench down to the open waste (volcanoes breach; the
+//   melt had to go somewhere). The bench sits above the melt, so the pool
+//   never drains into it.
+// Both pull terrain TO their target (never only downward): a raise-and-cut
+// makes the shore and channel floors deterministic, with no one-way dips
+// where the old lip crossed the mouth. tests/terrain_escape.test.ts walks
+// a real player from the reported stranding spot around the ring and out.
+const DRAKEMAW_ESCAPE = {
   x: 390,
   z: 2320,
-  // due south, out the crater's low approach
+  benchH: 13.4, // 0.5 above the rendered melt surface (12 + 0.9)
+  benchIn: 8, // wade-out ramp from the melt eye starts here...
+  benchFull: 10.6, // ...and reaches the dry bench height here
+  benchOut: 18, // bench ends; the crater wall (or the gorge) takes over
+  benchFade: 23, // wall-side fade end: steps stay under the climb gate
+  // the gorge: due south, out the crater's low approach
   angle: -Math.PI / 2,
-  mouthR: 14, // the pool's melt radius: the channel begins at its edge
-  mouthH: 12.4, // just above the rendered melt surface
   slope: 0.5,
   floorH: 5.4, // the south plain's height: the channel grades onto it, never below
   endR: 54,
 } as const;
-function applyDrakemawBreach(x: number, z: number, h: number): number {
-  const b = DRAKEMAW_BREACH;
+function applyDrakemawEscape(x: number, z: number, h: number): number {
+  const b = DRAKEMAW_ESCAPE;
   const dx = x - b.x;
   const dz = z - b.z;
-  // corridor coordinates along the outflow ray: a constant-width channel
-  // (perpendicular distance, not a widening cone) so the mouth is a real
-  // walkable gate, not a slit
+  const d = Math.hypot(dx, dz);
+  let out = h;
+  // the shore bench ring
+  if (d > b.benchIn && d < b.benchFade) {
+    const w = smoothstep(b.benchIn, b.benchFull, d) * (1 - smoothstep(b.benchOut, b.benchFade, d));
+    out = out + (b.benchH - out) * w;
+  }
+  // the outflow gorge, in corridor coordinates along the south ray: a
+  // constant-width channel (perpendicular distance, not a widening cone)
+  // so the mouth is a real walkable gate, not a slit
   const along = dx * Math.cos(b.angle) + dz * Math.sin(b.angle);
   const perp = Math.abs(dx * Math.sin(b.angle) - dz * Math.cos(b.angle));
-  if (along < 7 || along > b.endR || perp > 8) return h;
-  // the window opens right at the pool edge: the ramp value exceeds the melt
-  // floor inside the pool, so the clamp is a no-op there, and the basin lip
-  // can never stack a doorstep across the channel mouth
+  if (along >= b.benchFull && along <= b.endR && perp <= 8) {
+    const wedge =
+      (1 - smoothstep(4, 8, perp)) *
+      smoothstep(b.benchFull, b.benchOut, along) *
+      (1 - smoothstep(b.endR - 8, b.endR, along));
+    if (wedge > 0) {
+      // flat at bench height across the mouth, then the 0.5 rise/run descent
+      const ramp = Math.max(b.benchH - b.slope * Math.max(0, along - b.benchOut), b.floorH);
+      out = out + (ramp - out) * wedge;
+    }
+  }
+  return out;
+}
+
+// The east cone's breach: a shallow melt-notch cut southwest through its
+// crater rim, the walkable way out (the Drakemaw gorge idiom scaled down;
+// an unbreached crater is a foot trap, and this cone's old seaward breach
+// was an accident of the coast carve). The notch floor starts above the
+// rendered melt surface so the pool never drains through it.
+const EAST_CONE_BREACH = {
+  x: 487,
+  z: 2356,
+  angle: Math.atan2(-25.1, -16.4), // toward the open waste at (470, 2331)
+  startH: 10.4,
+  slope: 0.55,
+  floorH: 3.0,
+  endR: 30,
+} as const;
+function applyEastConeBreach(x: number, z: number, h: number): number {
+  const b = EAST_CONE_BREACH;
+  const dx = x - b.x;
+  const dz = z - b.z;
+  if (Math.abs(dx) > b.endR + 8 || Math.abs(dz) > b.endR + 8) return h;
+  const along = dx * Math.cos(b.angle) + dz * Math.sin(b.angle);
+  const perp = Math.abs(dx * Math.sin(b.angle) - dz * Math.cos(b.angle));
+  if (along < 2 || along > b.endR || perp > 5.5) return h;
   const wedge =
-    (1 - smoothstep(4, 8, perp)) *
-    smoothstep(5, 8, along) *
-    (1 - smoothstep(b.endR - 8, b.endR, along));
+    (1 - smoothstep(2.5, 5.5, perp)) *
+    smoothstep(2, 6, along) *
+    (1 - smoothstep(b.endR - 6, b.endR, along));
   if (wedge <= 0) return h;
-  // flat shelf across the whole mouth (held just above the melt surface, so
-  // the channel floor stays dry of lava), then the 0.5 rise/run descent
-  const ramp = Math.max(b.mouthH - b.slope * Math.max(0, along - b.mouthR), b.floorH);
-  if (h <= ramp) return h;
+  const ramp = Math.max(b.startH - b.slope * Math.max(0, along - 5), b.floorH);
   return h + (ramp - h) * wedge;
+}
+
+// The Glacier Tarn's shore ramp: the one authored way in and out of the tarn
+// bowl on foot. The tarn is the merged carve of two declared lakes (the tarn
+// and its northern finger, src/sim/content/frostveil.ts), and the frost
+// benches terrace the rim 10 to 25yd above the pond, so a player who jumped
+// in was stranded on the sandy floor with the Rime Elementals' beach camp for
+// company (the player report, world (42, 1642)). The tarn's WEST flank is the
+// shallowest and is already the designed approach: the Icemantle road comes
+// down to the "Glacier Tarn shore" waypoint at (42, 1626) and runs north past
+// the rim, so the terracing is suppressed there and the natural flank was
+// already close to walkable. It failed on a two-yard band at the waterline,
+// where the carve's organic shore wobble spiked the gradient past the climb
+// gate. This grades that flank into one straight slipway from the tarn's
+// shallows up onto the road bench: the target height is linear along the
+// segment (a constant rise/run well under the gate), it starts BELOW the
+// waterline so a swimmer meets it, and it cuts at most about 1.7yd into the
+// shoulder, so the terraced bowl keeps its shape and the elemental camp on
+// the far shore is untouched.
+//
+// It runs LAST, after applyLakeShoreGrading, so the heights below are the
+// FINISHED ones a player stands on (the shore grading rescales the waterline
+// band and drops everything above it by about 1.4yd, so a ramp authored
+// upstream of it would land well below the bench it is supposed to meet).
+// tests/frostveil_pit_escape.test.ts walks a real player out of the reported
+// stranding spot and back down again.
+export const GLACIER_TARN_RAMP = {
+  ax: 48.5, // the foot, out in the tarn's shallows...
+  az: 1640.5,
+  ah: -7, // ...below the waterline, on the natural bed height
+  bx: 34, // the top, on the road bench above the rim...
+  bz: 1640,
+  bh: 3, // ...at the bench's own height, so the tie-in has no seam
+  wIn: 3, // the walkable channel's half-width...
+  wOut: 8.5, // ...easing back to the untouched flank here
+} as const;
+// The capsule's bounding box, derived so it can never drift from the record:
+// this applier is on the hot path for EVERY height sample in the world.
+const TARN_RAMP_BOUNDS = {
+  x0: Math.min(GLACIER_TARN_RAMP.ax, GLACIER_TARN_RAMP.bx) - GLACIER_TARN_RAMP.wOut,
+  x1: Math.max(GLACIER_TARN_RAMP.ax, GLACIER_TARN_RAMP.bx) + GLACIER_TARN_RAMP.wOut,
+  z0: Math.min(GLACIER_TARN_RAMP.az, GLACIER_TARN_RAMP.bz) - GLACIER_TARN_RAMP.wOut,
+  z1: Math.max(GLACIER_TARN_RAMP.az, GLACIER_TARN_RAMP.bz) + GLACIER_TARN_RAMP.wOut,
+} as const;
+
+// The ramp itself: a capsule stamp (the cove-apron idiom used on the Hollow's
+// northeast shore walk). The target height runs linearly along the segment,
+// full strength inside the channel half-width and easing back to the natural
+// flank by wOut, so the cut has no lip at either end and no lateral step.
+function applyGlacierTarnRamp(x: number, z: number, h: number): number {
+  const b = TARN_RAMP_BOUNDS;
+  if (x < b.x0 || x > b.x1 || z < b.z0 || z > b.z1) return h;
+  const r = GLACIER_TARN_RAMP;
+  const dx = r.bx - r.ax;
+  const dz = r.bz - r.az;
+  const t = Math.max(0, Math.min(1, ((x - r.ax) * dx + (z - r.az) * dz) / (dx * dx + dz * dz)));
+  const d = Math.hypot(x - (r.ax + dx * t), z - (r.az + dz * t));
+  if (d >= r.wOut) return h;
+  const natural = smoothstep(r.wIn, r.wOut, d); // 0 on the channel floor, 1 off it
+  return h * natural + lerp(r.ah, r.bh, t) * (1 - natural);
+}
+
+// The modeled lava network's ground (render/ember_features.ts): the pool
+// records, link topology, and meander curves live in the shared leaf
+// src/sim/ember_lava_layout.ts, and this applier grades terrain to them:
+// a LEVEL pad flush under each pool model's whole footprint, a flat bed
+// following each river link's actual meander, and a low moulded shoulder
+// ringing both so the melt sits down IN the ground. Every rim parts where
+// a channel crosses it (emberLinkDistanceNorm), and every slope stays
+// gentle (rise/run well under the movement climb gate), so nothing strands
+// a player inside the melt line.
+function applyEmberLavaNetwork(x: number, z: number, h: number): number {
+  if (z < DRAKE_ZMIN || z > DRAKE_ZMAX) return h;
+  if (x < 260 || x > 480 || z < 2160 || z > 2360) return h; // network bbox
+  let out = h;
+  const linkNorm = emberLinkDistanceNorm(x, z);
+  const rimGate = smoothstep(0.55, 1.15, linkNorm);
+  for (const pool of EMBER_FLAT_POOLS) {
+    const d = Math.hypot(x - pool.x, z - pool.z);
+    const edge = pool.r * 1.15; // the model's rocky ring ends here
+    if (d < edge + 7) {
+      // flush pad under the whole model, easing back to open ground
+      const w = 1 - smoothstep(edge, edge + 4.5, d);
+      // the moulded shoulder just past the model edge (0.33 rise/run)
+      const rim =
+        1.5 *
+        smoothstep(edge - 1, edge + 2, d) *
+        (1 - smoothstep(edge + 2, edge + 6.5, d)) *
+        rimGate;
+      out = out + (pool.h - out) * w + rim;
+    }
+  }
+  for (const link of EMBER_LAVA_LINKS) {
+    const s = emberNearestOnLink(link, x, z);
+    const half = link.w * 0.62; // the channel model overhangs its melt line
+    if (s.dist < half + 6.5) {
+      const w = 1 - smoothstep(half, half + 3.5, s.dist);
+      // low banks shouldering the channel, parted at every pool mouth
+      const bankGate = smoothstep(0.1, 0.55, poolDistanceNorm(x, z));
+      const rim =
+        1.2 *
+        smoothstep(half - 0.5, half + 2, s.dist) *
+        (1 - smoothstep(half + 2, half + 6, s.dist)) *
+        bankGate;
+      out = out + (s.h - out) * w + rim;
+    }
+  }
+  return out;
+}
+
+// distance to the nearest pool edge (flat pools AND shaped basins),
+// normalized by that pool's radius: river banks fade out near mouths
+function poolDistanceNorm(x: number, z: number): number {
+  let best = Infinity;
+  for (const pool of EMBER_FLAT_POOLS) {
+    best = Math.min(best, Math.hypot(x - pool.x, z - pool.z) / pool.r - 1.15);
+  }
+  for (const pool of EMBER_LAVA_POOLS) {
+    best = Math.min(best, Math.hypot(x - pool.x, z - pool.z) / pool.r - 1.15);
+  }
+  return best;
 }
 
 // Real craters, carved after the cones: a raised rock lip rings each pool
 // and the floor sinks genuinely below the surrounding ground, so the melt
 // sits down INSIDE its bowl the way lake water does (the floors stay above
-// WATER_LEVEL so the zone water plane never floods a vent).
+// WATER_LEVEL so the zone water plane never floods a vent). The flat floor
+// runs out past the whole model footprint (r * 1.15) so the modeled rim
+// rests on level ground even where the base terrain falls away (the coast
+// side of the Moltenmaw used to drop out from under its pool), and the lip
+// peaks OUTSIDE the model edge: the moulded shoulder players walk over.
 function applyEmberLavaBasins(x: number, z: number, h: number): number {
   if (z < DRAKE_ZMIN || z > DRAKE_ZMAX) return h;
   let out = h;
   for (const pool of EMBER_LAVA_POOLS) {
     const d = Math.hypot(x - pool.x, z - pool.z);
-    if (d < pool.r * 2.2) {
-      // the lip: rises from the bowl edge, falls away outward
+    if (d < pool.r * 2.4) {
+      const padK = (pool as { padK?: number }).padK ?? 0.95;
+      const linkGate = smoothstep(0.55, 1.15, emberLinkDistanceNorm(x, z));
+      // the lip: rises past the melt edge, falls away outward; it parts
+      // where a modeled river link crosses it (normalized by that link's
+      // width), so the melt flows in flush. Crater-nested pools
+      // (padK < 0.9) keep the legacy tight lip the escape walkers are
+      // tuned against; open basins take the outward moulded shoulder.
       const lip =
-        2.4 *
-        smoothstep(pool.r * 0.7, pool.r * 1.05, d) *
-        (1 - smoothstep(pool.r * 1.05, pool.r * 2.2, d));
-      // the bowl: flat melt floor inside, blending up to the lip
-      const blend = smoothstep(pool.r * 0.55, pool.r * 1.05, d);
+        padK < 0.9
+          ? 2.4 *
+            smoothstep(pool.r * 0.7, pool.r * 1.05, d) *
+            (1 - smoothstep(pool.r * 1.05, pool.r * 2.2, d)) *
+            linkGate
+          : 2.4 *
+            smoothstep(pool.r * 1.02, pool.r * 1.45, d) *
+            (1 - smoothstep(pool.r * 1.45, pool.r * 2.4, d)) *
+            linkGate;
+      // the bowl: flat melt floor under the model, blending up to the lip
+      // across a gentle walkable shoulder
+      const blend = smoothstep(pool.r * padK, pool.r * (padK + 0.4), d);
       out = out * blend + pool.floor * (1 - blend) + lip;
     }
   }
   return out;
+}
+
+// The Last Keep's terraced grounds: the castle pads grade to their local
+// target (the outer bailey floor, or the raised inner ward with its stair
+// cuts; the plan lives in castle_layout.ts), with a gentle skirt back onto
+// the midlands.
+function applyCastlePad(x: number, z: number, h: number): number {
+  const w = castlePadWeight(x, z);
+  if (w <= 0) return h;
+  return h + (castlePadTarget(x, z) - h) * w;
+}
+
+// The pad's northeast apron meets the Last Spring pool, and the pad yields to
+// the pool over castlePadWeight's own ring: the bailey's level floor ends on an
+// arc about 16yd out from the pool center and the ground then falls to the pool
+// bed in about 5yd of run. That left a 1.85 rise/run face standing straight out
+// of the water (tests/world_edge_coast.test.ts swept it on the drake east
+// margin: 4.5 and 4.3yd per 2yd step at z 1990 and 1998).
+//
+// Grade the apron into the shore: fill the hollow between the arc and the water
+// with a straight bank, so the pad's skirt reaches the pool as a shore slope
+// instead of a lip (the near-shore band measures 1.58 rise/run after, 2.82
+// before). Three properties keep the castle out of it:
+//   - it RAISES ONLY, so no pad, courtyard, or grounds height can move down;
+//   - its rim stops inside the castle's closest masonry (the northeast
+//     bastion's outer face at x 440.2, 15.8yd from the pool center), so no
+//     wall, bastion, ramp, or flank-trap seal is ever in its reach;
+//   - its authority is the pad's OWN skirt (castleSkirtWeight), so the fill is
+//     the skirt meeting the water and dies out around the pool's far shores,
+//     which have no pad behind them and keep their natural bank.
+// The bank line dives under the pool bed inside the shallows and rises above
+// the natural apron outside it, so the fill releases to zero at both ends on
+// its own: no window edge to seam (tests/terrain_window_seams.test.ts).
+const LAST_SPRING_BANK = {
+  /** the bank's outer rim, measured from the pool center (castle_layout) */
+  rim: 15.5,
+  /** the bank's height at the rim, just under the apron it meets there */
+  rimH: 3.5,
+  /** rise/run of the bank plane, under PLAYER_MAX_CLIMB_SLOPE (the apron
+   *  ABOVE it is the pad's own yield ramp and stays as steep as it was) */
+  slope: 1.4,
+  /** the fill eases back to the natural apron over the last of the rim */
+  ease: 1.5,
+} as const;
+
+function applyLastSpringBank(x: number, z: number, h: number): number {
+  const b = LAST_SPRING_BANK;
+  const dx = x - LAST_SPRING.x;
+  const dz = z - LAST_SPRING.z;
+  if (dx < -b.rim || dx > b.rim || dz < -b.rim || dz > b.rim) return h;
+  const d = Math.hypot(dx, dz);
+  if (d >= b.rim) return h;
+  const target = b.rimH - b.slope * (b.rim - d);
+  if (target <= h) return h; // raises only: the apron above the bank never moves
+  const w = castleSkirtWeight(x, z) * (1 - smoothstep(b.rim - b.ease, b.rim, d));
+  if (w <= 0) return h;
+  return h + (target - h) * w;
 }
 
 // ---------------------------------------------------------------------------
@@ -2565,7 +3036,24 @@ export function stableFlattenWeight(x: number, z: number): number {
 // the plank top as a raised walkable surface. Return the matching absolute
 // surface height, or -Infinity outside every deck footprint.
 function dockSurfaceHeight(x: number, z: number, seed: number): number {
-  let surface = -Infinity;
+  // Wickharbor's stilt piers and boardwalk ride the same raised-surface arm
+  // (an absolute plank plane, never a terrain lift; see sim/gale_harbor.ts).
+  let surface = galeDeckSurface(
+    x,
+    z,
+    (sampleX, sampleZ) => terrainHeight(sampleX, sampleZ, seed),
+    WATER_LEVEL,
+  );
+  // ...and the Palmreach's river bridges and lagoon decks, the same idiom
+  surface = Math.max(
+    surface,
+    reachDeckSurface(
+      x,
+      z,
+      (sampleX, sampleZ) => terrainHeight(sampleX, sampleZ, seed),
+      WATER_LEVEL,
+    ),
+  );
   for (const dock of getActiveWorldContent().props.docks) {
     const local = dockLocalPoint(dock, x, z);
     if (dockSectionAtLocal(local.x, local.z) < 0) continue;
@@ -2688,20 +3176,125 @@ function applyLakeShoreGrading(x: number, z: number, h: number): number {
   return gradeShoreBand(h, w);
 }
 
-// Ground height including instanced dungeon floors (flat, far off-world), the
-// Orkadia open-field relief, the walkable Vale Cup grandstand lift, raised
-// docks, and custom-map sculpt edits.
+// ---------------------------------------------------------------------------
+// The Palmreach jungle-pool walkway's bed: the two places the terrain under
+// the viewing platform (sim/reach_decks.ts) has to be shaped for the walkway
+// to behave, the rim it crosses and the sand it lands on.
+// ---------------------------------------------------------------------------
+
+// The Palmreach jungle pool's east rim, where the viewing platform and the
+// stair that lands on it cross it (sim/reach_decks.ts). The rim climbs at
+// almost exactly the movement climb limit (PLAYER_MAX_CLIMB_SLOPE, 1.5), and
+// the platform's LEVEL plank plane covers the handful of 1-yard cells that tip
+// over it. That pairing is not a slow spot, it is a permanent freeze: the
+// movement kernel takes the player's own steepness from the TERRAIN under the
+// planks (rideSteepnessAt defers to the memoized terrain view on dry ground),
+// so a player standing there counts as standing on unwalkable ground and loses
+// all steering; but BOTH escapes from unwalkable ground read groundHeight,
+// which over a level deck is a dead-flat plane, so terrainDownhill finds no
+// downhill to slide along and terrainWallStandoff finds no wall to be pushed
+// off. Nothing ever moves the player again (reported stuck at -373, 1003).
+//
+// Ease the rim's face where the walkway crosses it so no cell the planks cover
+// reaches the limit, with margin. Only the face moves: everything at or above
+// `top` is untouched (including both deck anchors, so every plank plane stays
+// exactly where it was), and the pool floor below the face simply lifts by the
+// rise the face gives up. Bbox-guarded, so the rest of the world never pays.
+const REACH_POOL_RIM_EASE = {
+  // the early-out box around the crossing
+  x1: -379,
+  x2: -367,
+  z1: 993,
+  z2: 1012,
+  // the crest line the walkway crosses, as a capsule (the rim runs as an arc
+  // of the declared jungle pool at -380, 1000)
+  ax: -371.5,
+  az: 998.4,
+  bx: -374.9,
+  bz: 1006.2,
+  full: 3.4, // full weight within this far of the crest line
+  fade: 7.0, // and none past this
+  // the rim face itself, in finished heights: `drop` yards below `top`
+  top: -5.35,
+  drop: 1.6,
+  // the face keeps this much of its rise, so this much of its gradient
+  scale: 0.62,
+};
+
+function applyReachPoolRimEase(x: number, z: number, h: number): number {
+  const e = REACH_POOL_RIM_EASE;
+  if (x < e.x1 || x > e.x2 || z < e.z1 || z > e.z2) return h;
+  const y = h - e.top;
+  if (y >= 0) return h; // the shelf above the rim, and both deck anchors, never move
+  const sx = e.bx - e.ax;
+  const sz = e.bz - e.az;
+  const t = Math.min(1, Math.max(0, ((x - e.ax) * sx + (z - e.az) * sz) / (sx * sx + sz * sz)));
+  const d = Math.hypot(x - (e.ax + sx * t), z - (e.az + sz * t));
+  const w = 1 - smoothstep(e.full, e.fade, d);
+  if (w === 0) return h;
+  // monotone and continuous at both ends of the face (y = 0 maps to 0, and the
+  // ground below the face rides up by exactly the rise the face gave up), so
+  // wet stays wet, dry stays dry, and no step opens anywhere along the blend
+  const eased = y < -e.drop ? y + e.drop * (1 - e.scale) : y * e.scale;
+  return h + (eased - y) * w;
+}
+
+// The sand tie-in at the platform's landward end. The plank plane is set by the
+// deck freeboard (GALE_DECK_FREEBOARD over the waterline), not by the shore, so
+// it rides about a yard proud of the flat beach behind it: the whole landward
+// end reads as a knee-high plinth the climb gate refuses, and a player who
+// walks off the deck onto the strand can never step back on. Drift the sand up
+// against the deck's end so the walkway is a path in BOTH directions, one deck
+// lift below the planks (the height the deck's own bed sits at, so the boards
+// meet the sand instead of hanging over it). Raises only, so the beach is never
+// carved, and its reach stops well short of the shared deck anchor at
+// (-368, 1000): both plank planes are anchored there and must not move.
+const REACH_POOL_DECK_TIE_IN = {
+  x1: -377,
+  x2: -363,
+  z1: 1002,
+  z2: 1015,
+  x: -369.5,
+  z: 1008.6,
+  full: 2.6, // sand at the tie-in height within this far of the end
+  fade: 6.0, // easing back to the natural strand by here
+};
+
+function applyReachPoolDeckTieIn(x: number, z: number, h: number): number {
+  const t = REACH_POOL_DECK_TIE_IN;
+  if (x < t.x1 || x > t.x2 || z < t.z1 || z > t.z2) return h;
+  // the platform is freeboard-seated, so its planks (and this tie-in with them)
+  // sit a fixed height over the waterline wherever the shore happens to be.
+  // WATER_LEVEL, not waterLevel(): dockSurfaceHeight seats every deck on the
+  // constant, so the sand has to answer to the same line the planks do.
+  const target = WATER_LEVEL + GALE_DECK_FREEBOARD;
+  if (h >= target) return h;
+  const w = 1 - smoothstep(t.full, t.fade, Math.hypot(x - t.x, z - t.z));
+  if (w === 0) return h;
+  return h + (target - h) * w;
+}
+
+// One shared early-out over both shapers' boxes: this runs for every terrain
+// sample in the world, so the rest of it never pays for more than four compares.
+const REACH_POOL_BED_BOX = {
+  x1: Math.min(REACH_POOL_RIM_EASE.x1, REACH_POOL_DECK_TIE_IN.x1),
+  x2: Math.max(REACH_POOL_RIM_EASE.x2, REACH_POOL_DECK_TIE_IN.x2),
+  z1: Math.min(REACH_POOL_RIM_EASE.z1, REACH_POOL_DECK_TIE_IN.z1),
+  z2: Math.max(REACH_POOL_RIM_EASE.z2, REACH_POOL_DECK_TIE_IN.z2),
+};
+
+function applyReachPoolWalkwayBed(x: number, z: number, h: number): number {
+  const b = REACH_POOL_BED_BOX;
+  if (x < b.x1 || x > b.x2 || z < b.z1 || z > b.z2) return h;
+  return applyReachPoolDeckTieIn(x, z, applyReachPoolRimEase(x, z, h));
+}
+
+// Ground height including instanced dungeon floors (flat, far off-world, plus
+// the raised boss dais where the room stacks one), the walkable Vale Cup
+// grandstand lift, raised docks, and custom-map sculpt edits.
 export function groundHeight(x: number, z: number, seed: number): number {
   if (x > DUNGEON_X_THRESHOLD) {
-    // Orkadia's instance is an open field, not a flat floor: dunes, side berms,
-    // and the boss terrace rise off the instance plane (src/sim/orkadia_field.ts).
-    // The renderer displaces its ground mesh with the same function, so what you
-    // see is what you stand on.
     const dungeon = dungeonAt(x);
-    if (dungeon?.interior === 'orkadia') {
-      const origin = instanceOrigin(dungeon.index, instanceSlotForZ(z));
-      return DUNGEON_FLOOR_Y + orkadiaFieldHeight(x - origin.x, z - origin.z);
-    }
     if (dungeon?.interior === 'wildheart') {
       const origin = instanceOrigin(dungeon.index, instanceSlotForZ(z));
       return DUNGEON_FLOOR_Y + wildheartFieldHeight(x - origin.x, z - origin.z);
@@ -2710,7 +3303,7 @@ export function groundHeight(x: number, z: number, seed: number): number {
       // Last Bell story instances: a MIRROR area re-samples the island's own
       // terrain at its source anchor, so a private Riftfields/Landing/redoubt
       // copy stands on ground identical to the shared island; an AUTHORED
-      // area displaces the flat instance plane like Orkadia does.
+      // area displaces the flat instance plane.
       const area = LAST_BELL_AREAS[dungeon.id];
       if (area) {
         const origin = instanceOrigin(dungeon.index, instanceSlotForZ(z));
@@ -2721,7 +3314,16 @@ export function groundHeight(x: number, z: number, seed: number): number {
       }
       return DUNGEON_FLOOR_Y;
     }
-    return DUNGEON_FLOOR_Y;
+    if (dungeon?.interior === 'lastkeep') {
+      // The Last Keep's authored rooms carry per-room lifts (door ramps
+      // become stairs); the renderer builds risers and stairs from the same
+      // authoredLiftAt field, so what you climb is what you stand on.
+      const origin = instanceOrigin(dungeon.index, instanceSlotForZ(z));
+      return DUNGEON_FLOOR_Y + lastKeepLiftAt(x - origin.x, z - origin.z);
+    }
+    // Every other interior is the flat room floor plus the raised boss dais
+    // where its room plan stacks one (dungeon_floor.ts).
+    return DUNGEON_FLOOR_Y + dungeonFloorLift(x, z);
   }
   // The Vale Cup grandstands are walkable: the ground steps up in seated tiers so
   // players can climb the bleachers (raised WALKABLE ground is the heightfield).
@@ -2730,11 +3332,133 @@ export function groundHeight(x: number, z: number, seed: number): number {
   // ramp just raises where the player stands. Zero outside the stand footprints,
   // so the pitch stays flat. (The custom-map edit layer is applied inside
   // terrainHeight, so it never touches the flat instance/rift floor above.)
-  const terrain = terrainHeight(x, z, seed) + sowfieldStandLift(x, z);
+  // The Old Beacon's stair rides the same idiom: beaconSpiralLift raises the
+  // walkable plank helix and gallery ring around the lighthouse (and its
+  // sheer core plug is what blocks walking through the tower). The Last
+  // Keep's curtain walls, bastions, and stair flights ride it too
+  // (castleLift): the wall mass is a sheer riser the climb gate refuses,
+  // and its flat top is the wall-walk.
+  const terrain =
+    terrainHeight(x, z, seed) + sowfieldStandLift(x, z) + beaconSpiralLift(x, z) + castleLift(x, z);
   return Math.max(terrain, dockSurfaceHeight(x, z, seed), harborWalkHeight(x, z));
 }
 
 export function terrainHeight(x: number, z: number, seed: number): number {
+  let h = terrainHeightUnpadded(x, z, seed);
+  // The Last Keep's courtyard pad, over the FINISHED height (the world-edge
+  // sea shave runs late in the unpadded chain and was clipping the castle's
+  // seaward corner; the castle plateau must win everywhere inside its walls).
+  h = applyCastlePad(x, z, h);
+  // ...and the shore bank that carries that pad's northeast apron down into the
+  // Last Spring, applied straight after it: the hollow it fills is the one the
+  // pad's own pool yield opens, so it has to read the padded height.
+  h = applyLastSpringBank(x, z, h);
+  // The Palmreach jungle-pool walkway's bed, over the FINISHED height: the
+  // deck surfaces the movement kernel walks are anchored to this function, so
+  // the rim the planks cover and the sand they land on have to be shaped here,
+  // after the shore grading that forms them (see REACH_POOL_RIM_EASE for the freeze
+  // it closes and REACH_POOL_DECK_TIE_IN for the one-way edge it closes).
+  h = applyReachPoolWalkwayBed(x, z, h);
+  // Level pads under the Evergarden's modeled flower beds, applied over the
+  // FINISHED height (the garden seam reshapes the lawn per position, so an
+  // early flatten would drift apart again): each bed ensemble sits flush on
+  // one terrace at its anchor's finished height. The garden bounding box
+  // gates the loop so the rest of the world never pays for it.
+  if (x > 180 && x < 540 && z > 700 && z < 1260) {
+    for (const pad of GARDEN_BED_PADS) {
+      const dx = x - pad.x,
+        dz = z - pad.z;
+      const padGate = pad.r + 4;
+      if (dx * dx + dz * dz >= padGate * padGate) continue;
+      const d = Math.sqrt(dx * dx + dz * dz);
+      const ch = terrainHeightUnpadded(pad.ax, pad.az, seed);
+      const blend = smoothstep(pad.r + 1, pad.r + 4, d);
+      h = h * blend + ch * (1 - blend);
+    }
+  }
+  // The Bridgemere island: one level pad inside the widened moat ring,
+  // over the finished height, so the doubled town floor stays dry wall to
+  // wall (the natural fen dips below the waterline inside the wider ring;
+  // the pad's rim fades into the moat's carved banks without drying them).
+  if (x > -540 && x < -180 && z > 180 && z < 700) {
+    const bdx = x + 360,
+      bdz = z - 362;
+    if (bdx * bdx + bdz * bdz < 19 * 19) {
+      const d = Math.sqrt(bdx * bdx + bdz * bdz);
+      const w = 1 - smoothstep(15, 19, d);
+      h = h * (1 - w) + 2.0 * w;
+    }
+  }
+  // The Galecrest's shaping, over the finished height like the bed pads:
+  if (x > 180 && x < 540 && z > 180 && z < 700) {
+    // the Mirror Tarn's bathing shore FIRST: pull the carved banks down onto
+    // one long gentle sandy ramp, so the water is waded into, never fallen
+    // into (the level pads below then win wherever the two overlap)
+    const tdx = x - 300,
+      tdz = z - 560;
+    if (tdx * tdx + tdz * tdz < 32 * 32) {
+      const d = Math.sqrt(tdx * tdx + tdz * tdz);
+      const target = WATER_LEVEL - 2.2 + smoothstep(5, 26, d) * 8.2;
+      const w = 1 - smoothstep(26, 32, d);
+      if (h > target) h = h * (1 - w) + target * w;
+    }
+    // level pads under the raider encampments and the tarn's north-bank
+    // stable barns (the built-in camp flatten only reaches the mob spawn
+    // ring; tents and barns stand wider than that)
+    for (const pad of GALE_LEVEL_PADS) {
+      const dx = x - pad.x,
+        dz = z - pad.z;
+      const padGate = pad.r + 5;
+      if (dx * dx + dz * dz >= padGate * padGate) continue;
+      const d = Math.sqrt(dx * dx + dz * dz);
+      const ch = pad.h ?? terrainHeightUnpadded(pad.x, pad.z, seed);
+      const blend = smoothstep(pad.r, pad.r + 5, d);
+      h = h * blend + ch * (1 - blend);
+    }
+    // the Beacon dock stair's cutting: the headland face is carved down to
+    // the stair's ramp line so the treads climb an open notch instead of
+    // vanishing inside the cliff (mirror of the beacon stair deck in
+    // sim/gale_harbor.ts: center 503.3,325.3 rot 0.99 hl 6.94)
+    const sdx = x - 503.3,
+      sdz = z - 325.3;
+    if (sdx * sdx + sdz * sdz < 10.6 * 10.6) {
+      const dirx = 0.8360259786005205; // sin(0.99)
+      const dirz = 0.5486979929717658; // cos(0.99)
+      const along = sdx * dirx + sdz * dirz;
+      const across = sdx * dirz - sdz * dirx;
+      if (along > -8.4 && along < 8.4 && Math.abs(across) < 4.4) {
+        const topY = terrainHeightUnpadded(497, 321, seed) + 0.1;
+        const botY = Math.max(terrainHeightUnpadded(507, 327, seed), WATER_LEVEL + 0.55) + 0.1;
+        const t = Math.min(1, Math.max(0, (along + 6.94) / 13.88));
+        const rampY = topY + (botY - topY) * t - 0.25;
+        const w =
+          (1 - smoothstep(1.4, 4.4, Math.abs(across))) *
+          (1 - smoothstep(6.94, 8.4, Math.abs(along)));
+        if (h > rampY) h = h * (1 - w) + rampY * w;
+      }
+    }
+  }
+  return h;
+}
+
+// The Galecrest's level ground (terrainHeight above): each pad blends the
+// finished height to its center's, wide enough that every tent, tower,
+// palisade run, and barn sits flush instead of sinking into a rise.
+const GALE_LEVEL_PADS: { x: number; z: number; r: number; h?: number }[] = [
+  { x: 252, z: 250, r: 14 },
+  { x: 210, z: 410, r: 14 },
+  { x: 354, z: 664, r: 14 },
+  // the stable barns' lakeside terrace on the Mirror Tarn's north bank: an
+  // explicit height keeps it a low shelf above the beach, the downs rising
+  // behind it, instead of a high pad with a sheer rim over the water
+  { x: 299, z: 531, r: 12, h: WATER_LEVEL + 3.2 },
+  // the Old Beacon's lawn: one flat disc under the whole tower and spiral
+  // stair, so the stair foot always meets level ground (a sloping lawn left
+  // the first tread hovering and broke click-to-move approaches)
+  { x: 498, z: 308, r: 11 },
+];
+
+function terrainHeightUnpadded(x: number, z: number, seed: number): number {
   let h = baseHeight(x, z, seed);
 
   // Flatten each camp a little so mobs don't stand on cliffs. The squared
@@ -2901,14 +3625,15 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   h = applyStripFlankCoast(x, z, h);
   h = applyRowMeres(x, z, h);
   h = applyNorthBay(x, z, h);
+  h = applyEmberLavaNetwork(x, z, h);
   h = applyEmberLavaBasins(x, z, h);
-  h = applyDrakemawBreach(x, z, h);
+  h = applyDrakemawEscape(x, z, h);
+  h = applyEastConeBreach(x, z, h);
   h = applyFrostTerraces(x, z, h);
   h = applyFenBraids(x, z, h);
-  // The Great Maze rises out of the finished lawn: walls are pure additive
-  // hedge over whatever the garden terrain does beneath them, so corridors
-  // follow the ground and the walls stay a constant unclimbable height.
-  h += gardenMazeOffset(x, z);
+  // (The Great Maze no longer shapes terrain: its hedge walls are modeled
+  // props over flat lawn, blocked by inGardenMazeWall in the movement pass
+  // and drawn by garden_features.ts from the same grid.)
   // World rims AFTER the coast, so the border ranges rise out of the sea
   // (mountains dipping into the ocean at the flanks) instead of being sunk
   // by it. The NORTH rim is suppressed over the Hollow's open sea: looking
@@ -3078,6 +3803,10 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   // stand lift and the editor's stamps, so nothing above can re-steepen a
   // shore a player must wade out of.
   h = applyLakeShoreGrading(x, z, h);
+  // The Glacier Tarn's shore ramp, after that grading: the bowl's one authored
+  // way in and out, authored in FINISHED height space so its foot meets the
+  // pond and its top meets the road bench with no seam at either end.
+  h = applyGlacierTarnRamp(x, z, h);
   const sow = sowfieldFlattenWeight(x, z);
   if (sow > 0) h = lerp(h, SOWFIELD_FLAT.height, sow);
   // The Highwatch paddock is another authored level pull. It sits deep inside
@@ -3095,10 +3824,22 @@ export function terrainHeight(x: number, z: number, seed: number): number {
 // travel direction. Movement gates on this (not just the slope along the step)
 // so a diagonal switchback approach cannot beat the straight-line climb limit.
 export const STEEPNESS_SAMPLE = 0.35; // yards; about one movement tick of run
+// The steepness field reads the NATURAL walking surface: the designed raised
+// decks (the Beacon's spiral stair, the harbor piers) are deliberately left
+// out. Their tall rims are honest DROPS that the movement kernel's step-rise
+// gate already handles; sampling them here would smear each rim across a
+// whole cached steepness cell and wall the deck off as a fake cliff face
+// (the bug that made the lighthouse stair unclimbable for a real player).
+function steepnessGroundHeight(x: number, z: number, seed: number): number {
+  if (x > DUNGEON_X_THRESHOLD) return DUNGEON_FLOOR_Y;
+  return terrainHeight(x, z, seed) + sowfieldStandLift(x, z);
+}
 export function terrainSteepness(x: number, z: number, seed: number): number {
   const e = STEEPNESS_SAMPLE;
-  const hx = (groundHeight(x + e, z, seed) - groundHeight(x - e, z, seed)) / (2 * e);
-  const hz = (groundHeight(x, z + e, seed) - groundHeight(x, z - e, seed)) / (2 * e);
+  const hx =
+    (steepnessGroundHeight(x + e, z, seed) - steepnessGroundHeight(x - e, z, seed)) / (2 * e);
+  const hz =
+    (steepnessGroundHeight(x, z + e, seed) - steepnessGroundHeight(x, z - e, seed)) / (2 * e);
   return Math.hypot(hx, hz);
 }
 
@@ -3466,6 +4207,14 @@ export function biomeAt(x: number, z: number): BiomeId {
 // Pinned as a literal by tests/fixes.test.ts.
 export const DECORATION_MAX_SLOPE = 1.5;
 
+/** True where the ground is too steep to anchor a surface prop: the shared gate
+ * for every scatter that snaps to terrainHeight (the generic tree/rock props
+ * below, the Palmreach palms and their coconut clusters). Four heightfield
+ * samples, so callers check it LAST, after their cheaper gates. */
+export function isCliffFace(x: number, z: number, seed: number): boolean {
+  return terrainSteepness(x, z, seed) > DECORATION_MAX_SLOPE;
+}
+
 const DECORATION_STEP = 10;
 const DECORATION_X_START = -(WORLD_MAX_X - 14);
 const DECORATION_X_END = WORLD_MAX_X - 14;
@@ -3497,11 +4246,24 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
     kind = r < 0.14 ? 'tree' : r < 0.28 ? 'tree2' : 'rock';
   } else if (biome === 'ember') {
     // the gatewood thins mile by mile into open waste: trees fade out
-    // northward, scorched rock takes over
+    // northward, scorched rock takes over (the widened rock band keeps the
+    // waste strewn with boulders the way a volcanic plain reads)
     const t = Math.max(0, Math.min(1, (gz - 1560) / 170));
     const treeGate = 0.36 * (1 - t) + 0.05 * t;
-    if (r > treeGate + 0.12 + t * 0.1) return null; // rockier as the waste opens
+    if (r > treeGate + 0.2 + t * 0.16) return null; // rockier as the waste opens
     kind = r < treeGate * 0.55 ? 'tree' : r < treeGate ? 'tree2' : 'rock';
+    // no boulders inside the modeled lava network: the melt pads, the river
+    // beds, and the shaped basins stay clear (a rock there is also a stray
+    // collider standing in the melt)
+    if (gz > 2160 && gz < 2360 && emberLinkDistanceNorm(gx, gz) < 1.1) return null;
+    // the Last Keep's graded grounds carry no wild scatter
+    if (castlePadWeight(gx, gz) > 0) return null;
+    for (const pool of EMBER_FLAT_POOLS) {
+      if (Math.hypot(gx - pool.x, gz - pool.z) < pool.r * 1.6 + 4) return null;
+    }
+    for (const pool of EMBER_LAVA_POOLS) {
+      if (Math.hypot(gx - pool.x, gz - pool.z) < pool.r * 1.7 + 4) return null;
+    }
   } else if (biome === 'frost') {
     // hardy pines and broken stone on the snow benches
     if (r > 0.36) return null;
@@ -3535,10 +4297,10 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
     if (r > 0.3) return null;
     kind = r < 0.16 ? 'tree' : r < 0.2 ? 'tree2' : 'rock';
   } else if (biome === 'gale') {
-    // wind-scoured downs: rock outcrops everywhere, trees almost never
-    // (what survives grows stunted in the render dressing)
+    // wind-scoured downs: rock outcrops everywhere, and hardy windbreak
+    // trees scattered across the open land between them
     if (r > 0.22) return null;
-    kind = r < 0.04 ? 'tree' : r < 0.07 ? 'tree2' : 'rock';
+    kind = r < 0.09 ? 'tree' : r < 0.14 ? 'tree2' : 'rock';
   } else {
     if (r > 0.44) return null;
     kind = r < 0.2 ? 'tree' : r < 0.24 ? 'tree2' : 'rock';
@@ -3560,7 +4322,7 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
   // The Sowfield stadium footprint grows no trees or rocks (hash-based
   // placement, so skipping here shifts no other decoration or rng draw).
   if (isInSowfieldShell(x, z)) return null;
-  // The Highwatch paddock is a worked yard and race course. Keep the same
+  // The Galecrest paddock is a worked yard and race course. Keep the same
   // deterministic decoration field out of its apron so no tree becomes an
   // invisible obstacle across a jump line.
   if (
@@ -3570,6 +4332,23 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
     z < STABLE_PADDOCK.z2 + 1
   ) {
     return null;
+  }
+  // No rock or stunted tree grows up through Wickharbor's boardwalk planks.
+  if (galeDeckSurface(x, z, (sx, sz) => terrainHeight(sx, sz, seed), WATER_LEVEL) !== -Infinity) {
+    return null;
+  }
+  if (!reachDeckClear(x, z, 1)) return null;
+  // The Old Beacon's lawn stays clear (nothing crowds the lighthouse stair),
+  // and the raider encampments keep trees and rocks off their level pads.
+  {
+    const bdx = x - 498,
+      bdz = z - 308;
+    if (bdx * bdx + bdz * bdz < 20 * 20) return null;
+    for (const camp of GALE_LEVEL_PADS) {
+      const cdx = x - camp.x,
+        cdz = z - camp.z;
+      if (cdx * cdx + cdz * cdz < 13 * 13) return null;
+    }
   }
   for (const zone of ZONES) {
     const dx = x - zone.hub.x,
@@ -3587,7 +4366,7 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
   // off the wall (and large ones would be phantom colliders). Checked last,
   // after the cheaper gates, so the four-sample steepness only runs for
   // candidates that survive everything else.
-  if (terrainSteepness(x, z, seed) > DECORATION_MAX_SLOPE) return null;
+  if (isCliffFace(x, z, seed)) return null;
   return {
     kind,
     x,

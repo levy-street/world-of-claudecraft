@@ -7,6 +7,7 @@ import {
   backGripFor,
   quatFromEulerXYZ,
 } from '../src/render/characters/back_grips';
+import { KAYKIT_SHIELD_ACCESSORIES } from '../src/render/characters/held_item_grips';
 
 function quatLength(q: [number, number, number, number]): number {
   return Math.hypot(q[0], q[1], q[2], q[3]);
@@ -74,9 +75,19 @@ describe('backGripFor', () => {
       'VAR_AXE',
       'VAR_POLEARM',
       'VAR_WAND',
+      ...Object.values(KAYKIT_SHIELD_ACCESSORIES),
     ]) {
       expect(quatLength(backGripFor(fam, 'r').quaternion), fam).toBeCloseTo(1, 12);
       expect(quatLength(backGripFor(fam, 'l').quaternion), fam).toBeCloseTo(1, 12);
+    }
+  });
+
+  it('a shield lies flat on the back instead of sheathing like a sword', () => {
+    for (const fam of Object.values(KAYKIT_SHIELD_ACCESSORIES)) {
+      const shield = backGripFor(fam, 'l');
+      const sword = backGripFor('1H_Sword', 'l');
+      expect(shield.position, fam).not.toEqual(sword.position);
+      expect(shield.quaternion, fam).not.toEqual(sword.quaternion);
     }
   });
 });
@@ -98,10 +109,19 @@ describe('every weapon grip family has a tuned on-back carry', () => {
     );
   };
 
+  // KAYKIT_WEAPON_ACCESSORY also spreads in KAYKIT_SHIELD_ACCESSORIES from
+  // held_item_grips.ts (`...KAYKIT_SHIELD_ACCESSORIES,`), which a source-text
+  // regex over assets.ts alone cannot see: it produced no literal `key: 'Value'`
+  // pairs, so shield families silently escaped this guard (the exact gap that
+  // let Round_Shield/Rectangle_Shield/Badge_Shield sheathe with the sword pose
+  // instead of a tuned carry). Merge the spread module's own values in directly.
   const accessoryFamilies = (): string[] => {
     const table = assetsSrc.match(/const KAYKIT_WEAPON_ACCESSORY[^{]*\{([\s\S]*?)\n\};/);
     expect(table, 'KAYKIT_WEAPON_ACCESSORY table not found in assets.ts').toBeTruthy();
-    return [...(table as RegExpMatchArray)[1].matchAll(/:\s*'([A-Za-z0-9_]+)'/g)].map((m) => m[1]);
+    const literal = [...(table as RegExpMatchArray)[1].matchAll(/:\s*'([A-Za-z0-9_]+)'/g)].map(
+      (m) => m[1],
+    );
+    return [...literal, ...Object.values(KAYKIT_SHIELD_ACCESSORIES)];
   };
 
   it('covers every VARIANT_GRIPS family (the weapon-skin variant packs)', () => {

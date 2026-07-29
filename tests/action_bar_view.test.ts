@@ -92,7 +92,9 @@ interface WorldOpts {
   targetPos?: { x: number; y: number; z: number } | null;
   targetDead?: boolean;
   inventory?: { itemId: string; count: number }[];
-  abilityCharges?: { [id: string]: { charges: number } | undefined };
+  abilityCharges?: {
+    [id: string]: { charges: number; recharge?: number; rechargeLength?: number } | undefined;
+  };
   stealthed?: boolean;
   auras?: ActionBarAuraInput[];
 }
@@ -615,6 +617,66 @@ describe('actionBarView: attack + item slots', () => {
       fakeDeps(),
     );
     expect(single.tick(world()).slots[0].count).toBe('');
+  });
+
+  it('marks the charge badge distinct (isCharges) only on a charge-pool ability', () => {
+    const iceBlock: ActionBarAbility = { def: ability('ice_block').def, cost: 0, bonusCharges: 1 };
+    const view = createActionBarView(
+      descriptor(
+        slot(1, { ability: iceBlock }),
+        slot(2, { ability: ability('frostbolt') }),
+        slot(3, { item: item('potion') }),
+      ),
+      fakeDeps(),
+    );
+    const slots = view.tick(world({ inventory: [{ itemId: 'potion', count: 2 }] })).slots;
+    expect(slots[0].isCharges).toBe(true);
+    // A plain single-use ability and an item stack count both stay non-charge.
+    expect(slots[1].isCharges).toBe(false);
+    expect(slots[2].isCharges).toBe(false);
+    expect(slots[2].count).toBe('2');
+  });
+
+  it('runs the thin recharge sweep while a use is still stored (pressable, no full sweep)', () => {
+    const iceBlock: ActionBarAbility = { def: ability('ice_block').def, cost: 0, bonusCharges: 1 };
+    const view = createActionBarView(descriptor(slot(1, { ability: iceBlock })), fakeDeps());
+    // 1 of 2 charges held, the spent one 6s into a 12s recharge: half-height
+    // strip, NO full-width sweep (the cooldowns mirror is empty while a use
+    // remains), no countdown text, and the button stays pressable.
+    const s = view.tick(
+      world({ abilityCharges: { ice_block: { charges: 1, recharge: 6, rechargeLength: 12 } } }),
+    ).slots[0];
+    expect(s.rechargePercent).toBe(50);
+    expect(s.cooldownPercent).toBe(0);
+    expect(s.cdText).toBe('');
+    expect(s.count).toBe('1');
+    expect(s.usable).toBe(true);
+  });
+
+  it('keeps the strip through the empty pool and hides it on a full or timerless one', () => {
+    const iceBlock: ActionBarAbility = { def: ability('ice_block').def, cost: 0, bonusCharges: 1 };
+    const view = createActionBarView(descriptor(slot(1, { ability: iceBlock })), fakeDeps());
+    // Empty pool: the cooldowns mirror runs the normal full sweep AND the strip
+    // stays for continuity (the same soonest timer drives both).
+    const empty = view.tick(
+      world({
+        abilityCharges: { ice_block: { charges: 0, recharge: 6, rechargeLength: 12 } },
+        cooldowns: new Map([['ice_block', 6]]),
+      }),
+    ).slots[0];
+    expect(empty.rechargePercent).toBe(50);
+    expect(empty.cooldownPercent).toBeGreaterThan(0);
+    expect(empty.usable).toBe(false);
+    // Full pool (recharge 0): no strip.
+    const full = view.tick(
+      world({ abilityCharges: { ice_block: { charges: 2, recharge: 0, rechargeLength: 12 } } }),
+    ).slots[0];
+    expect(full.rechargePercent).toBe(0);
+    // An online mirror that has not received the achr timer wire zero-fills the
+    // timers: count still paints, strip stays hidden rather than lying.
+    const zeroFilled = view.tick(world({ abilityCharges: { ice_block: { charges: 1 } } })).slots[0];
+    expect(zeroFilled.count).toBe('1');
+    expect(zeroFilled.rechargePercent).toBe(0);
   });
 
   it('paints the shared potion cooldown swipe on a potion item-slot', () => {

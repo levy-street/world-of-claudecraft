@@ -4,7 +4,11 @@ import { delveModuleEntry } from '../src/sim/delves/runs';
 import { DUNGEON_WALL_X } from '../src/sim/dungeon_layout';
 import { swimSurfaceY } from '../src/sim/player_motion';
 import { Sim } from '../src/sim/sim';
-import { nearestOverworldGraveyard, RESURRECTION_SICKNESS_ID } from '../src/sim/spirit';
+import {
+  nearestOverworldGraveyard,
+  RES_HEALER_HP_FRACTION,
+  RESURRECTION_SICKNESS_ID,
+} from '../src/sim/spirit';
 import type { BlockerDef, SimEvent, WorldContent } from '../src/sim/types';
 import {
   UNSTUCK_COOLDOWN_ID,
@@ -20,7 +24,9 @@ const SEED = 42;
 const START = { x: 0, z: -40 };
 const WEDGE_WALL_Z = START.z + 0.4;
 // A deep point inside Mirror Lake where the normal swim kernel can move.
-const WATER_TRAP = { x: -64.75, z: 88 };
+// The lake's southeast rim shallowed when the respaced wolf camp's flatten
+// apron reached it (PR #2584), so the point sits in the deep western core.
+const WATER_TRAP = { x: -90, z: 91 };
 
 function required<T>(value: T | null | undefined, label: string): T {
   if (value == null) throw new Error(`Expected ${label}`);
@@ -394,6 +400,148 @@ describe('unstuck graveyard release', () => {
   });
 });
 
+describe('unstuck while dead', () => {
+  // Kill the player outright. A sourceless killing blow starts no combat, so the
+  // body lands out of combat and the combat gate is exercised on its own below.
+  function killed(sim: Sim): Sim['player'] {
+    const p = sim.player;
+    sim.ctx.dealDamage(null, p, p.maxHp * 10, false, 'physical', null, 'hit');
+    expect(p.dead).toBe(true);
+    sim.drainEvents();
+    return p;
+  }
+
+  function completionOf(sim: Sim): Extract<Event, { phase: 'completed' }> | undefined {
+    return eventsOf(tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20)).find(
+      (event): event is Extract<Event, { phase: 'completed' }> => event.phase === 'completed',
+    );
+  }
+
+  it('revives an unreleased body at the nearest graveyard under the Keeper toll', () => {
+    const sim = makeWorld();
+    sim.setPlayerLevel(10);
+    const player = killed(sim);
+    const graveyard = nearestOverworldGraveyard(START.x, START.z);
+    expect(player.ghost).toBe(false);
+
+    expect(sim.unstuck(player.id)).toBe(true);
+    sim.drainEvents();
+    const completed = completionOf(sim);
+
+    expect(completed?.reason).toBe('revived_at_graveyard');
+    expect(completed?.destination).toMatchObject(graveyard);
+    expect(player.pos).toMatchObject(graveyard);
+    expect(player.prevPos).toEqual(player.pos);
+    expect(player.dead).toBe(false);
+    expect(player.ghost).toBe(false);
+    expect(player.corpsePos).toBeNull();
+    expect(player.auras.some((aura) => aura.id === RESURRECTION_SICKNESS_ID)).toBe(true);
+    expect(player.hp).toBe(Math.max(1, Math.round(player.maxHp * RES_HEALER_HP_FRACTION)));
+    expect(player.cooldowns.get(UNSTUCK_COOLDOWN_ID)).toBe(UNSTUCK_SUCCESS_COOLDOWN_SECONDS);
+  });
+
+  it('emits a respawn event so a mirroring client leaves the ghost UI', () => {
+    const sim = makeWorld();
+    sim.setPlayerLevel(10);
+    const player = killed(sim);
+
+    expect(sim.unstuck(player.id)).toBe(true);
+    sim.drainEvents();
+    const events = tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20);
+
+    expect(events).toContainEqual({ type: 'respawn', pid: player.id });
+  });
+
+  it('revives a released ghost that cannot reach its corpse or a Pale Keeper', () => {
+    const sim = makeWorld();
+    sim.setPlayerLevel(10);
+    const player = killed(sim);
+    sim.releaseSpirit();
+    sim.drainEvents();
+    expect(player.ghost).toBe(true);
+    const graveyard = nearestOverworldGraveyard(player.pos.x, player.pos.z);
+
+    expect(sim.unstuck(player.id)).toBe(true);
+    sim.drainEvents();
+    const completed = completionOf(sim);
+
+    expect(completed?.reason).toBe('revived_at_graveyard');
+    expect(player.pos).toMatchObject(graveyard);
+    expect(player.dead).toBe(false);
+    expect(player.ghost).toBe(false);
+    expect(player.corpsePos).toBeNull();
+    expect(player.auras.some((aura) => aura.id === RESURRECTION_SICKNESS_ID)).toBe(true);
+  });
+
+  it('accepts a body frozen mid-fall, whose physics fields never tick again', () => {
+    const sim = makeWorld();
+    const player = killed(sim);
+    player.onGround = false;
+    player.jumping = true;
+    player.vy = -12;
+
+    // The tick runs no movement for a dead, unreleased body, so these stay set
+    // forever: gating on them would strand exactly the player Unstuck is for.
+    tickMany(sim, 20);
+    expect(player.onGround).toBe(false);
+    expect(player.vy).toBe(-12);
+
+    expect(sim.unstuck(player.id)).toBe(true);
+    sim.drainEvents();
+    expect(completionOf(sim)?.reason).toBe('revived_at_graveyard');
+  });
+
+  it('still blocks a body that died in combat until the five seconds elapse', () => {
+    const sim = makeWorld();
+    const player = killed(sim);
+    player.inCombat = true;
+    player.combatTimer = 0;
+
+    expect(sim.unstuck(player.id)).toBe(false);
+    expect(eventsOf(sim.drainEvents())).toContainEqual(
+      expect.objectContaining({ type: 'unstuck', phase: 'blocked', reason: 'combat' }),
+    );
+
+    // updateTimers runs for the dead too, so the corpse leaves combat normally.
+    tickMany(sim, 6 * 20);
+    sim.drainEvents();
+    expect(player.inCombat).toBe(false);
+    expect(sim.unstuck(player.id)).toBe(true);
+  });
+
+  it('cancels when the body is resurrected during the countdown', () => {
+    const sim = makeWorld();
+    sim.setPlayerLevel(10);
+    const player = killed(sim);
+    const meta = required(sim.meta(player.id), 'player metadata');
+
+    expect(sim.unstuck(player.id)).toBe(true);
+    sim.drainEvents();
+    sim.revivePlayerAt(player.id, player.pos);
+
+    expect(eventsOf(sim.tick())).toContainEqual(
+      expect.objectContaining({ type: 'unstuck', phase: 'cancelled', reason: 'state_changed' }),
+    );
+    expect(meta.pendingUnstuck).toBeNull();
+  });
+
+  it('cancels a living attempt that dies mid-countdown rather than switching outcome', () => {
+    const sim = makeWorld();
+    sim.setPlayerLevel(10);
+    const { player, meta } = accepted(sim);
+
+    sim.ctx.dealDamage(null, player, player.maxHp * 10, false, 'physical', null, 'hit');
+
+    // Lethal damage trips the damage-taken guard first; either way the living
+    // attempt must not silently become a revive.
+    const cancelled = eventsOf(sim.tick()).find((event) => event.phase === 'cancelled');
+    expect(cancelled).toBeDefined();
+    expect(meta.pendingUnstuck).toBeNull();
+    expect(player.dead).toBe(true);
+    expect(player.ghost).toBe(false);
+  });
+});
+
 describe('unstuck area identity', () => {
   it('reports content-local positions for dungeon, delve, and procedural rift clones', () => {
     const dungeon = makeWorld();
@@ -527,7 +675,14 @@ describe('unstuck area identity', () => {
     sim.grid.update(ownerPlayer);
     sim.playerGrid.update(ownerPlayer);
 
-    expect(sim.instanceInfoAt(widePoint)).toBeNull();
+    // instanceInfoAt shares the CLAIM envelope (not the narrower generic 120-yard
+    // rectangle) since the v0.30.0 raid-room widening, so the side wings resolve to
+    // this instance for the raid gates built on it too, and still to this slot rather
+    // than the arena slot 500 yards away.
+    expect(sim.instanceInfoAt(widePoint)).toMatchObject({
+      slot: claim.slot,
+      dungeonId: 'nythraxis_boss_arena',
+    });
     expect(sim.instanceClaimIdAt(widePoint)).toBe(claim.exitId);
     expect(unstuckLocationAt(sim.ctx, owner, widePoint)?.area).toMatchObject({
       kind: 'dungeon',
@@ -544,6 +699,8 @@ describe('unstuck area identity', () => {
 
     const outside = sim.groundPos(origin.x + 270, origin.z + 96);
     expect(sim.instanceClaimIdAt(outside)).toBeNull();
+    // The widened envelope still has an edge: past it neither lookup resolves.
+    expect(sim.instanceInfoAt(outside)).toBeNull();
     expect(unstuckLocationAt(sim.ctx, owner, outside)).toBeNull();
 
     // The side-wing tomb is a real collider outside the generic 120-yard

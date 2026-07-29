@@ -1,7 +1,7 @@
 // Default (Mouse Camera off): classic-MMO-style (WASD + A/D keyboard turn, Q/E strafe,
 // left-drag orbits, right-drag mouselooks, both buttons run forward).
 // Optional Mouse Camera (on): OSRS-style (WASD is camera-relative, A/D strafe,
-// mouse drag rotates the orbit (no pointer lock), no keyboard turn).
+// mouse drag rotates the orbit, no keyboard turn).
 // Shared: space jump, wheel zoom, Tab target, rebindable action bar, R autorun.
 
 import { sanitizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
@@ -139,6 +139,10 @@ export class Input {
   camYaw = Math.PI;
   camPitch = 0.32;
   camDist = 12;
+  // Fired whenever the player changes the zoom distance (wheel / pinch), so main.ts can
+  // persist it to settings (issue 1657). Not fired on a direct camDist assignment (the
+  // startup restore / Reset path sets the field itself), so restoring never re-persists.
+  onCameraDistChange?: (dist: number) => void;
   autorun = false;
   suspendMovement = false;
   // click-to-move (#95): a world destination the player clicked; the frame loop
@@ -371,7 +375,10 @@ export class Input {
 
   /** Move the camera in/out, clamped to the zoom limits. */
   zoomBy(delta: number): void {
-    this.camDist = Math.min(22, Math.max(3, this.camDist + delta));
+    const next = Math.min(22, Math.max(3, this.camDist + delta));
+    if (next === this.camDist) return;
+    this.camDist = next;
+    this.onCameraDistChange?.(next);
   }
 
   /** True while a mouse button is held for camera drag. */
@@ -763,6 +770,40 @@ export class Input {
     );
   }
 
+  /**
+   * Engage the pointer lock for the active camera drag if it is both wanted
+   * (setting on, not already locked, not in Firefox's forced-unlock cooldown).
+   * The Lock Cursor setting means every active camera drag holds the pointer
+   * until mouseup, so the cursor cannot escape the game surface mid-look. Still
+   * at most one request per drag (#116), in both camera modes, with fullscreen
+   * on the same path so mouselook behaves identically there.
+   */
+  private maybeEngageDragPointerLock(): void {
+    if (this.pointerLockRequestedForDrag) return;
+    if (
+      !shouldEngagePointerLock({
+        lockOnRotate: this.lockCursorOnRotate,
+        isFullscreen: this.isBrowserFullscreen(),
+        alreadyLocked: document.pointerLockElement === this.canvas,
+      })
+    )
+      return;
+    if (
+      inForcedPointerLockCooldown({
+        needsSyncGesture: this.needsSyncPointerLockGesture,
+        msSinceForcedUnlock: this.msSinceForcedUnlock(),
+      })
+    )
+      return;
+    this.pointerLockRequestedForDrag = true;
+    this.canvas.requestPointerLock?.();
+  }
+
+  private activateCameraDrag(): void {
+    this.cameraDragActive = true;
+    this.maybeEngageDragPointerLock();
+  }
+
   private isBrowserFullscreen(): boolean {
     const doc = document as FullscreenDocument;
     return !!(document.fullscreenElement ?? doc.webkitFullscreenElement);
@@ -1001,21 +1042,16 @@ export class Input {
     this.downAt = performance.now();
     this.dragDistance = 0;
     this.cameraDragActive = false;
-    // Pointer lock is requested lazily once a drag actually begins (see
-    // onMouseMove) — NOT on every press, which spammed the browser "mouse
-    // capture" banner on every right-click used to attack/look (#116). That
-    // deferred mousemove call is denied by Firefox outside fullscreen (see
+    // Pointer lock is requested lazily once a drag actually begins on browsers
+    // that allow a deferred request (see onMouseMove), not on every press, so
+    // ordinary clicks do not show the browser's capture notice (#116). Firefox
+    // denies that deferred mousemove call outside fullscreen (see
     // needsSyncPointerLockGesture), so on Firefox it is instead requested
-    // synchronously right here, for either drag-capable button (left or
-    // right), excluding the click-to-move button. That preserves #116 fully
-    // only on Chromium: on Firefox, an ordinary click on a non-click-to-move
-    // button (e.g. right-click to loot/target/interact) still takes and
-    // releases the lock on every press, a visible flicker, because we cannot
-    // tell a click from the start of a drag until it has already moved. A
-    // genuine drag started on the click-to-move button also stays unfixed on
-    // Firefox (its lock request only ever comes from the denied mousemove
-    // path). Both are accepted trade-offs of restoring working camera drag on
-    // Firefox; see shouldEngagePointerLockOnMouseDown for the full reasoning.
+    // synchronously right here for either drag-capable button (left or right),
+    // excluding the click-to-move button. That preserves #116 fully only on
+    // Chromium: on Firefox, an ordinary click on a non-click-to-move button
+    // still takes and releases the lock on every press because we cannot tell a
+    // click from a drag until it has already moved.
     this.pointerLockRequestedForDrag = false;
     if (
       shouldEngagePointerLockOnMouseDown({
@@ -1087,39 +1123,25 @@ export class Input {
       isGecko: this.isGeckoEngine,
       devicePixelRatio: typeof window !== 'undefined' ? window.devicePixelRatio : 1,
     });
-    if (mx === 0 && my === 0) return;
+    if (mx === 0 && my === 0) {
+      if (this.cameraDragActive) this.maybeEngageDragPointerLock();
+      return;
+    }
     const heldMs = this.pressDurationMs();
     if (this.downButton === this.clickMoveMouseButton && heldMs <= DEFAULT_CLICK_PICK_MAX_MS)
       return;
     this.dragDistance += Math.abs(mx) + Math.abs(my);
     if (!this.cameraDragActive) {
       if (this.dragDistance < CAMERA_DRAG_START_DISTANCE && heldMs < CAMERA_DRAG_START_MS) return;
-      this.cameraDragActive = true;
-      // Engage pointer lock the instant a press becomes a real camera drag, in
-      // BOTH camera modes, so rotation never begins with a free cursor that can
-      // reach the screen edge (movementX clamps to 0 and the camera freezes) or
-      // slip onto a second monitor. One lock per drag, none for a plain click
-      // (#116). Fullscreen uses the same lock path so right-drag mouselook
-      // behaves identically there.
-      if (
-        !this.pointerLockRequestedForDrag &&
-        shouldEngagePointerLock({
-          lockOnRotate: this.lockCursorOnRotate,
-          isFullscreen: this.isBrowserFullscreen(),
-          alreadyLocked: document.pointerLockElement === this.canvas,
-        }) &&
-        !inForcedPointerLockCooldown({
-          needsSyncGesture: this.needsSyncPointerLockGesture,
-          msSinceForcedUnlock: this.msSinceForcedUnlock(),
-        })
-      ) {
-        this.pointerLockRequestedForDrag = true;
-        this.canvas.requestPointerLock?.();
-      }
+      this.activateCameraDrag();
       this.noteIntent('look');
       this.updateCursor();
       return;
     }
+    // Re-checked on every move of an already-active drag in case the previous
+    // request was denied or the lock was released by the browser while the
+    // player kept holding a drag button.
+    this.maybeEngageDragPointerLock();
     this.camYaw -= mx * this.lookSensitivity;
     this.camPitch = Math.min(
       1.35,

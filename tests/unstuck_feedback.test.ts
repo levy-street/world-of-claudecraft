@@ -50,6 +50,30 @@ describe('unstuck feedback', () => {
     expect(t(completed.key)).toContain('Pale Keeper');
   });
 
+  it('separates the revive completion from the spirit release so neither text misleads', () => {
+    const revived = unstuckFeedback({
+      type: 'unstuck',
+      phase: 'completed',
+      reason: 'revived_at_graveyard',
+      area,
+      origin,
+      destination: { ...origin, z: 1, localZ: 1 },
+      duration: 10,
+      distance: 1,
+    });
+    expect(revived).toEqual({
+      key: 'hudChrome.unstuck.revivedAtGraveyard',
+      kind: 'success',
+      banner: true,
+      log: true,
+      clearBanner: true,
+    });
+    // A revived player is alive and already carries the toll, so the release
+    // copy telling them to go speak to the Pale Keeper must not be reused.
+    expect(t(revived.key)).toContain('revived');
+    expect(t(revived.key)).not.toContain('Speak to the Pale Keeper');
+  });
+
   it('formats visible countdown numbers through the active locale formatter', () => {
     expect(
       unstuckFeedback({ type: 'unstuck', phase: 'countdown', seconds: 1000 }).values?.seconds,

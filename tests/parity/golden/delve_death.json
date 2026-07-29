@@ -9,13 +9,13 @@
     "rebucket after delve respawn teleport"
   ],
   "draws": 1,
-  "drawDigest": "05460955",
+  "drawDigest": "d643a1a5",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 842,
-      "state": "56455171",
+      "nextId": 821,
+      "state": "f731810d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -52,7 +52,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 833,
+          "entityId": 816,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -90,7 +90,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 62,
-          "id": 833,
+          "id": 816,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -142,12 +142,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 856,
-      "state": "eeb5b5d5",
-      "events": "1f4b615b",
+      "nextId": 835,
+      "state": "d9357d03",
+      "events": "7db55712",
       "rng": {
         "draws": 1,
-        "digest": "05460955"
+        "digest": "d643a1a5"
       },
       "label": "delve-first-release",
       "players": [
@@ -180,7 +180,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 833,
+          "entityId": 816,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -219,7 +219,7 @@
           "fallStartY": 2.077747,
           "fiveSecondRule": 99,
           "hp": 93,
-          "id": 833,
+          "id": 816,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -270,12 +270,12 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 856,
-      "state": "0b78a66f",
-      "events": "84451ed2",
+      "nextId": 835,
+      "state": "281de973",
+      "events": "37883e46",
       "rng": {
         "draws": 1,
-        "digest": "05460955"
+        "digest": "d643a1a5"
       },
       "label": "delve-fail",
       "players": [
@@ -318,7 +318,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 833,
+          "entityId": 816,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -355,10 +355,10 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0715,
           "dualWielding": true,
-          "fallStartY": 2.353205,
+          "fallStartY": 2.266438,
           "fiveSecondRule": 99.1,
           "hp": 185,
-          "id": 833,
+          "id": 816,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -377,8 +377,8 @@
           "petMode": "defensive",
           "pos": {
             "x": -5,
-            "y": 2.353205,
-            "z": -56
+            "y": 2.266438,
+            "z": -54.044
           },
           "potionCooldownUntil": -1,
           "resource": 100,
@@ -410,12 +410,12 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 856,
-      "state": "0b78a66f",
+      "nextId": 835,
+      "state": "281de973",
       "events": "741638a5",
       "rng": {
         "draws": 1,
-        "digest": "05460955"
+        "digest": "d643a1a5"
       },
       "label": "final",
       "players": [
@@ -458,7 +458,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 833,
+          "entityId": 816,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -495,10 +495,10 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0715,
           "dualWielding": true,
-          "fallStartY": 2.353205,
+          "fallStartY": 2.266438,
           "fiveSecondRule": 99.1,
           "hp": 185,
-          "id": 833,
+          "id": 816,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -517,8 +517,8 @@
           "petMode": "defensive",
           "pos": {
             "x": -5,
-            "y": 2.353205,
-            "z": -56
+            "y": 2.266438,
+            "z": -54.044
           },
           "potionCooldownUntil": -1,
           "resource": 100,

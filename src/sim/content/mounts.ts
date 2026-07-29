@@ -132,12 +132,15 @@ export function mountMoveSpeedPct(mountKey: string): number {
 }
 
 // ---------------------------------------------------------------------------
-// The Highwatch Stables (zone 3): an L-shaped fenced paddock with a narrower NORTH
-// horse pasture above the full-width SOUTH open yard, plus the ambient stable
-// horses. This is the SINGLE SOURCE OF TRUTH for the stable-yard geometry: zone3
-// content (content/zone3.ts) places its fences and horse spawns from it, and
-// ambient.ts clamps the horse wander to it. Keep the numbers here so the fences
-// and horses can never drift.
+// The Galecrest Stables (relocated whole from Highwatch onto the downs
+// between the Shear and the Wreckfields): an L-shaped fenced paddock with a
+// narrower NORTH horse pasture above the full-width SOUTH open yard, plus
+// the ambient stable horses. This is the SINGLE SOURCE OF TRUTH for the
+// stable-yard geometry: zone3 content (content/zone3.ts) still defines the
+// buildings, Marla, and horse spawns (their ids and saves stay stable) but
+// places them at these Galecrest coordinates, and ambient.ts clamps the
+// horse wander to it. Keep the numbers here so the fences and horses can
+// never drift.
 // ---------------------------------------------------------------------------
 
 export interface StablePaddockDef {
@@ -158,16 +161,16 @@ export interface StablePaddockDef {
  *  src/sim/mob/ambient.ts (via STABLE_PASTURE below) as the single source of
  *  truth; do not duplicate these coordinates. Sized so the (enlarged) show-jumping
  *  race ring (MOUNT_RACE_COURSE below) fits south of the divider with clearance.
- *  The south edge (z1) keeps ~3yd clear of the deeprock_kobold camp at (75,625)
- *  r18 (its north edge is z=643), so the flattened apron never swallows the camp. */
+ *  On the Galecrest downs the rect keeps clear of the rerouted cliff road to
+ *  its east, the gale_wisp camp (moved west), and the Shear cliffs. */
 export const STABLE_PADDOCK: StablePaddockDef = {
-  x1: 54,
-  x2: 150,
-  z1: 646,
-  z2: 706,
-  pasture: { x1: 104 },
-  entrance: { x1: 84, x2: 94 },
-  divider: { z: 688 },
+  x1: 330,
+  x2: 426,
+  z1: 546,
+  z2: 606,
+  pasture: { x1: 380 },
+  entrance: { x1: 360, x2: 370 },
+  divider: { z: 588 },
 };
 
 /** The paddock terrain plateau: terrainHeight (src/sim/world.ts) blends the ground
@@ -175,8 +178,8 @@ export const STABLE_PADDOCK: StablePaddockDef = {
  *  `falloff` yards beyond the fence (the Sowfield SOWFIELD_FLAT precedent), so the
  *  course sits on flat, fair ground. Living in terrainHeight means sim collision,
  *  movement, fences, props, and the renderer all agree on the height (the repo's
- *  hard terrain invariant). `height` (7.5) is the mid of the rect's natural range
- *  (samples at seed 20061 spanned ~-2..16, mean ~7.3); `falloff` (10) keeps the
+ *  hard terrain invariant). `height` (4.5) sits just above the rect's natural means
+ *  (seed 20061 mean ~3.5, seed 42 mean ~1.1, both spot-checked dry); `falloff` (10) keeps the
  *  apron a gentle slope, not a cliff. Derived from STABLE_PADDOCK so it can never
  *  drift from the shared yard apron. The full bounding rectangle intentionally
  *  stays level so the barn cluster in the open northwest notch is not left on a
@@ -186,7 +189,7 @@ export const STABLE_FLAT = {
   x2: STABLE_PADDOCK.x2,
   z1: STABLE_PADDOCK.z1,
   z2: STABLE_PADDOCK.z2,
-  height: 7.5,
+  height: 4.5,
   falloff: 10,
 } as const;
 
@@ -201,12 +204,12 @@ export const STABLE_PASTURE = {
   zMax: STABLE_PADDOCK.z2 - PASTURE_MARGIN,
 } as const;
 
-/** Template id of the ambient Highwatch stable horse (content/zone3 mob def). The
+/** Template id of the ambient stable horse (content/zone3 mob def). The
  *  locomotion dispatcher's ambient arm (src/sim/mob/ambient.ts) routes on it. */
 export const STABLE_HORSE_TEMPLATE_ID = 'stable_horse';
 
 // ---------------------------------------------------------------------------
-// The Highwatch show-jumping race (docs-free minigame, always open): a permanent
+// The stables show-jumping race (docs-free minigame, always open): a permanent
 // course inside the paddock's south yard. Stand on the glowing platform behind
 // the start arch to arm your personal timer, clear every jump in riding order,
 // and cross the arch again before the time limit. This block is the SINGLE SOURCE OF TRUTH
@@ -251,10 +254,10 @@ export interface MountRaceCourseDef {
 }
 
 // The ring the course is laid out on: an ellipse centred in the south yard. The
-// enlarged paddock (x 54..150, south yard z 646..688) lets it grow to a proper
-// arena. Ring x spans 66..138, z spans 652..682. Clearances (ring edge to fence):
-// west 12, east 12, south 6, divider 6.
-const RACE_RING = { cx: 102, cz: 667, rx: 36, rz: 15 } as const;
+// paddock (x 330..426, south yard z 546..588) gives it a proper arena. Ring x
+// spans 342..414, z spans 552..582. Clearances (ring edge to fence): west 12,
+// east 12, south 6, divider 6.
+const RACE_RING = { cx: 378, cz: 567, rx: 36, rz: 15 } as const;
 
 /** A point + riding tangent on RACE_RING at parameter t (t=0 is the north point,
  *  increasing t rides CLOCKWISE: east along the top first). */
@@ -266,10 +269,10 @@ function ringGate(t: number, kind: RaceJumpKind): RaceGateDef {
   return { x, z, dir, kind };
 }
 
-/** The Highwatch stables race course: the arch sits east of the ring's north
+/** The stables race course: the arch sits east of the ring's north
  *  point and is ridden EASTWARD, then seven jumps circle the arena. */
 export const MOUNT_RACE_COURSE: MountRaceCourseDef = {
-  arch: { x: 114, z: RACE_RING.cz + RACE_RING.rz, dir: Math.PI / 2 },
+  arch: { x: 390, z: RACE_RING.cz + RACE_RING.rz, dir: Math.PI / 2 },
   // Half-widths of the crossing segments, sized to the bigger fixtures (props.ts):
   // the ~10yd arch and the 7.5-8yd jumps, each a touch wider than the physical
   // gate so brushing a post still counts.

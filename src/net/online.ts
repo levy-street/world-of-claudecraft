@@ -33,7 +33,14 @@ import {
 import { resolveSportKit } from '../sim/content/vale_cup';
 import { resolveActiveWeaponSkin, withWeaponSkinApplied } from '../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../sim/content/weapon_skins';
-import { ALL_RECIPES, abilitiesKnownAt, CLASSES, NPCS, resolveDelveShopOffers } from '../sim/data';
+import {
+  ALL_RECIPES,
+  abilitiesKnownAt,
+  CLASSES,
+  NPCS,
+  resolveDelveShopOffers,
+  STATIONS,
+} from '../sim/data';
 import { deadTargetSelectable } from '../sim/dead_target';
 import { freshDeedStats } from '../sim/deeds';
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
@@ -108,6 +115,8 @@ import {
   type MailInfo,
   type MarketInfo,
   type MountRaceView,
+  ONLINE_WORLD_AUTH_TYPE,
+  ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
   type OverheadEmoteId,
   type PartyInfo,
   type PlayerProfessionsView,
@@ -121,8 +130,20 @@ import {
   type VcSharedCupInfo,
   type VcViewerReadout,
 } from '../world_api';
-import type { MasterworkView } from '../world_api/professions';
+import {
+  type ActionBarLayout,
+  type ActionBarLayoutRestore,
+  sanitizeActionBarLayout,
+} from '../world_api/action_bar';
+import type {
+  ApplyEnchantResultView,
+  DisenchantResultView,
+  MasterworkView,
+  SalvageResultView,
+} from '../world_api/professions';
 import { computeBackoffDelay } from './backoff';
+import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
+import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_stats';
 import { optimisticQuestState } from './quest_state_optimistic';
 import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
 import {
@@ -173,6 +194,9 @@ export interface CharacterSummary {
   skinCatalog?: 'class' | 'mech';
   mainhandItemId?: string | null;
   offhandItemId?: string | null;
+  /** The account's active Armory weapon skin for this character (server-resolved
+   *  per class + mainhand). Optional for back-compat like the fields above. */
+  weaponSkinId?: string | null;
 }
 
 function stringList(value: unknown): string[] {
@@ -217,14 +241,14 @@ export function buildWebSocketAuthMessage(
   characterId: number,
   clientSeed = '',
 ): {
-  t: 'auth';
+  t: typeof ONLINE_WORLD_AUTH_TYPE;
   token: string;
   character: number;
   clientSeed: string;
   timerWire: typeof STABLE_TIMER_WIRE_VERSION;
 } {
   return {
-    t: 'auth',
+    t: ONLINE_WORLD_AUTH_TYPE,
     token,
     character: characterId,
     clientSeed,
@@ -779,6 +803,7 @@ export class Api {
 
   async projectStats(): Promise<{
     accounts_created: number;
+    characters_created: number;
     players_online: number;
     realm: string;
   }> {
@@ -842,9 +867,16 @@ export class Api {
     native = false,
     challenge = '',
     nativeAttestation: unknown = undefined,
+    desktop = false,
   ): Promise<{ url: string }> {
     const nativeQuery = native ? `&native=1&challenge=${encodeURIComponent(challenge)}` : '';
-    return this.post(`/api/auth/discord/start?mode=${mode}${nativeQuery}`, { nativeAttestation });
+    // `desktop` and `native` are mutually exclusive: native is the mobile-app PKCE
+    // handoff, desktop marks a login start from the Electron/Steam shell's system
+    // browser so the callback bounces back to /desktop-login instead of '/'.
+    const desktopQuery = !native && desktop ? '&desktop=1' : '';
+    return this.post(`/api/auth/discord/start?mode=${mode}${nativeQuery}${desktopQuery}`, {
+      nativeAttestation,
+    });
   }
 
   async exchangeNativeDiscordCode(
@@ -901,18 +933,6 @@ export class Api {
     return this.get('/api/discord');
   }
 
-  // Server-side Welcome Screen flags (today: the Season 1 Armory promo gate).
-  async welcomeFlags(): Promise<{ armoryPromoEnabled: boolean }> {
-    return this.get('/api/welcome/flags');
-  }
-
-  // Daily rewards status (bearer-only, no world/character needed): the Welcome
-  // Screen's chest-tile readiness read reuses the same endpoint the in-world
-  // daily rewards window polls via ClientWorld.dailyRewards().
-  async dailyRewards(): Promise<DailyRewardStatus> {
-    return this.get('/api/daily-rewards');
-  }
-
   // Unlink Discord. A Discord-provisioned account (no real password yet) must send a
   // `password` so it stays reachable after unlinking; the server 400s with
   // 'password_required' otherwise. A normal account passes nothing.
@@ -944,6 +964,19 @@ export class Api {
     try {
       const data = await this.get('/api/status');
       return (data.steam as { enabled?: boolean } | undefined)?.enabled === true;
+    } catch {
+      return false;
+    }
+  }
+
+  // Whether this realm was booted with ALLOW_DEV_COMMANDS=1, so the client can
+  // offer the /dev GUI on a hosted dev/PBE realm instead of only in a local dev
+  // build. Advert only: every dev_* cheat is re-gated server-side per message,
+  // so a forged true opens an inert window. Fails closed on any error.
+  async devCommandsAdvert(): Promise<boolean> {
+    try {
+      const data = await this.get('/api/status');
+      return data.dev_commands === true;
     } catch {
       return false;
     }
@@ -1045,6 +1078,10 @@ const TELEPORT_SNAP_DIST_SQ = 40 * 40;
 // genuine leaver (logout, corpse cleanup) lingers only momentarily.
 const DESPAWN_GRACE_MS = 600;
 
+// Debounce for the action-bar layout upload: coalesce a burst of drag/drop edits
+// into one wire save rather than a send per slot change (server persists it).
+const ACTION_BAR_SAVE_DEBOUNCE_MS = 1500;
+
 // Auto-reconnect backoff for an unexpectedly dropped game socket. The server
 // holds the character in-world (linkdead) for five minutes; the retry window
 // is deliberately longer, since past the grace a successful auth simply
@@ -1058,6 +1095,12 @@ const DESPAWN_GRACE_MS = 600;
 const RECONNECT_BASE_DELAY_MS = 1_000;
 const RECONNECT_MAX_DELAY_MS = 15_000;
 const RECONNECT_MAX_ATTEMPTS = 40;
+// A pre-layout-gate server accepts only `t:'auth'`, so it rejects our current
+// discriminator with this otherwise-generic literal. During a handshake only,
+// turn that legacy response into the same actionable reason a current server
+// emits for an old client. Never reinterpret an error on an established session.
+const LEGACY_WORLD_AUTH_REQUIRED_ERROR = 'authentication required';
+const INCOMPATIBLE_WORLD_VERSION_ERROR = ONLINE_WORLD_INCOMPATIBLE_MESSAGE;
 // ...but only for entities last seen near/beyond the interest boundary, where
 // that churn happens. A close-range disappearance is intentional (an enemy going
 // stealth) and must hide at once, so anything nearer than this drops immediately.
@@ -1065,6 +1108,15 @@ const RECONNECT_MAX_ATTEMPTS = 40;
 // DESPAWN_GRACE_MS before vanishing — acceptable, since you can only see a
 // stealthed unit at that range when far out-leveling it.
 const DESPAWN_GRACE_MIN_DIST_SQ = 70 * 70;
+// How many self snapshots a pending target echo may hold the optimistic value
+// before the server's value wins regardless (the reconcile valve: a server
+// REFUSAL, an invalid, dead, or out-of-interest target, must still win). Self
+// snapshots broadcast once per 50 ms server loop callback, so 3 spans ~150 ms,
+// comfortably past the typical command round trip; on a slower link the worst
+// case degrades to the pre-fix one-snapshot blink, never a stuck target. A
+// snapshot COUNT rather than wall-clock keeps the valve deterministic in tests
+// (and needs no clock at all in the decode path).
+const TARGET_ECHO_SNAPSHOT_BUDGET = 3;
 
 function blankEntity(id: number): Entity {
   return {
@@ -1154,6 +1206,9 @@ function blankEntity(id: number): Entity {
     castTotal: 0,
     castTargetId: null,
     castAim: null,
+    gatherCastNodeId: '',
+    fishBiteAtTick: 0,
+    fishReelDeadlineTick: 0,
     channeling: false,
     channelTickTimer: 0,
     channelTickEvery: 0,
@@ -1175,6 +1230,7 @@ function blankEntity(id: number): Entity {
     chargePath: [],
     followTargetId: null,
     sitting: false,
+    afk: false,
     weaponStowed: false,
     eating: null,
     drinking: null,
@@ -1185,6 +1241,10 @@ function blankEntity(id: number): Entity {
     bigCastTimer: 0,
     deathZoneCastTimer: 0,
     deathZoneStrikeTimer: 0,
+    infernoTimer: 0,
+    infernoRemaining: 0,
+    infernoPulsesFired: 0,
+    infernoGatesFired: 0,
     yelledEngage: false,
     stoneskinTimer: 0,
     terrifyTimer: 0,
@@ -1344,8 +1404,10 @@ export class ClientWorld implements IWorld {
   // the write rule. NON-IWorld mirror: the seam exposes only `accountFlair`.
   private playerFlair = new Map<string, PlayerFlair>();
   // --- IWorldMarket: World Market view, mirrored from the snapshot self
-  // (`s.market`, delta-omitted). ---
+  // (`s.market`, delta-omitted). `s.mktU` is the always-streamed collect
+  // indicator bit (the mailU pattern; the minimap badge). ---
   marketInfo: MarketInfo | null = null;
+  marketCollectPending = false;
   // --- IWorldMail: Ravenpost mailbox view + unread badge, mirrored from the
   // snapshot self (`s.mail` / `s.mailU`, delta-omitted). ---
   mailInfo: MailInfo | null = null;
@@ -1427,6 +1489,7 @@ export class ClientWorld implements IWorld {
     amendsProgress: 0,
     amendsRequired: 0,
     knownRecipes: [],
+    cadenceBlockedQuests: [],
   };
   // Gathering profession proficiency (Mining/Logging/Herbalism, #1119), mirrored
   // from the `gprof` self-wire delta below (the real read surface; see
@@ -1458,30 +1521,32 @@ export class ClientWorld implements IWorld {
   // tier plus combo recipes) ships with the client bundle like every other
   // content table, so this needs no wire round-trip. See src/world_api/professions.ts.
   recipeList: readonly RecipeDef[] = ALL_RECIPES;
+  // Online realms always use the version-pinned built-in static layout; no
+  // snapshot field is needed for authored station markers.
+  readonly stationPlacements = STATIONS;
   // Craft-result surface (#1127), mirrored from the server's `craftResult`
   // event (applyEvent below). Null until this session's first craft attempt.
   lastCraftResult: CraftResultView | null = null;
-  // Masterwork proc surface (Professions 2.0 Phase 2), mirrored LIVE from the
+  // Masterwork proc surface (Professions 2.0), mirrored LIVE from the
   // server's `masterwork` event (applyMasterworkEvent below), exactly like
   // lastCraftResult above. Null until this session's first masterwork proc.
   lastMasterwork: MasterworkView | null = null;
-  // The viewer's own active mobile crafting station (Professions 2.0 Phase 8),
+  // Enchanting-action outcome surfaces (Professions 2.0), each mirrored
+  // from BOTH the server's pid-scoped disenchantResult/enchantResult/salvageResult
+  // event (applyDisenchantResultEvent/applyEnchantResultEvent/applySalvageResultEvent
+  // below, the immediacy arm) AND the denc/ench/salv self-delta (applySnapshot, the
+  // convergence arm) exactly the way lastCraftResult mirrors craftResult. Null until
+  // this session's first such attempt.
+  lastDisenchantResult: DisenchantResultView | null = null;
+  lastEnchantResult: ApplyEnchantResultView | null = null;
+  lastSalvageResult: SalvageResultView | null = null;
+  // The viewer's own active mobile crafting station (Professions 2.0),
   // mirrored from the server's `mst` self-delta (applySnapshot below). The
   // server computes the active/expired state against its own tickCount, so
   // this is always a server-authoritative value: placement is never predicted
   // locally (net/ optimism rules), the delta lands after the server accepts
   // the specialization-gated command, and it flips back to null on expiry.
   activeMobileStationCraft: string | null = null;
-  // Compatibility scalar projections of the atomic `cprof` identity mirror.
-  // Quest acceptance is the only online transition path, so these direct legacy
-  // methods deliberately send no wire commands.
-  activeArchetype: string | null = null;
-  archetypeSwitchCount = 0;
-  archetypeAmendsProgress = 0;
-  archetypeAmendsRequired = 0;
-  acceptArchetypeQuest(_craftId: string): void {}
-  advanceAmendsProgress(): void {}
-  switchArchetype(_craftId: string): void {}
   // Title granted by the active pair attunement (#1130, pair-named under
   // Professions 2.0): the canonical pair id, derived live from the cprof
   // mirror (applySnapshot replaces craftingIdentity wholesale on every cprof
@@ -1490,11 +1555,13 @@ export class ClientWorld implements IWorld {
     const identity = this.craftingIdentity;
     return getArchetypeTitle(identity.activeArchetype, identity.pairedMajor);
   }
-  // Explicit hobby from cprof. The fallback supports pre-cprof servers.
+  // Explicit hobby from cprof. The fallback supports pre-cprof servers (the
+  // mirror's activeArchetype is null until the first cprof lands, matching
+  // the retired scalar projection it replaces byte-for-byte).
   get hobbyCraft(): string | null {
     return this.craftingIdentity.synced
       ? this.craftingIdentity.hobbyCraft
-      : getHobbyCraft(this.activeArchetype);
+      : getHobbyCraft(this.craftingIdentity.activeArchetype);
   }
   // --- IWorldParty: raid-target marker mirror, from the self-wire `marks` (markerFor
   // reads it, no send). ---
@@ -1518,12 +1585,19 @@ export class ClientWorld implements IWorld {
   private stableTimerOwnerId: number | undefined;
   private stableCooldownSchedules: Map<string, StableCooldownWire> | undefined = new Map();
   private stableNodeDeadlines: Map<string, number> | undefined = new Map();
+  // abilityId -> [recharge deadline, recharge length] from the `achr` timer wire,
+  // retained like stableCooldownSchedules so the action bar's recharge strip
+  // keeps aging across snapshots that omit the unchanged achr JSON.
+  private stableChargeRecharges: Map<string, readonly [number, number]> | undefined = new Map();
   // entity id -> performance.now() when it first went missing from a snapshot;
   // used for the despawn grace window (anti-flicker), cleared once it returns
   private missingSince = new Map<number, number>();
   // scratch for applySnapshot's per-message "ids present in this snap" set,
   // reused across snapshots (20 Hz) instead of allocating a Set per message
   private wireSeen = new Set<number>();
+  // always-on net-pipeline counters (net_pipeline_stats.ts); no initializer on
+  // purpose, see netPipeline() below
+  private netPipelineStats: NetPipelineStats | undefined;
   // camera follow for keyboard turns applied by the main loop
   pendingFacingDelta = 0;
   connected = false;
@@ -1562,12 +1636,32 @@ export class ClientWorld implements IWorld {
   // HUD redraws on — the frame loop polls this so open panels re-render
   private invChanged = false;
   private cosmeticsChanged = false;
+  // IWorldActionBar: the login-time reconciliation, resolved once from the first
+  // self-payload (undefined until then, and again once consumed); the debounced
+  // upload state coalesces rapid layout edits into one wire save and skips a
+  // send whose serialized layout matches the last one sent.
+  private actionBarRestore: ActionBarLayoutRestore | undefined = undefined;
+  private actionBarRestoreResolved = false;
+  private actionBarSaveTimer: ReturnType<typeof setTimeout> | null = null;
+  private actionBarSaveLastJson: string | null = null;
+  private actionBarSavePending: ActionBarLayout | null = null;
   // Soft (cosmetic) profanity terms the server sends in `hello` and pushes via
   // `censor` frames when an admin edits the list. The HUD drains these to mask
   // chat locally when the player's filter is on. Hard words never arrive here.
   profanityWords: string[] = [];
   private profanityDirty = false;
   private pendingQuestCommands = new Map<string, 'accept' | 'turnin'>();
+  // Pending-target echo protection, the same sanctioned display-only-optimism
+  // idiom as pendingQuestCommands / quest_state_optimistic.ts. targetEntity
+  // writes the optimistic targetId locally, but a snapshot the server generated
+  // BEFORE processing the 'target' command is nearly always already in flight
+  // and still carries the OLD target; applying it blanks the target frame for
+  // one snapshot (and re-toggles the party-frames below-target push), the
+  // select flicker. While set, every self targetId write routes through
+  // applySelfTargetFromServer, which keeps displaying the optimistic id until
+  // the server echoes it or the snapshot budget runs out (server authority is
+  // untouched: a refusal still wins via that valve).
+  private pendingTargetEcho: { id: number | null; snapshotsLeft: number } | null = null;
   private nextCommandOutcomeId = 1;
   private pendingCommandOutcomes = new Map<
     number,
@@ -1592,8 +1686,9 @@ export class ClientWorld implements IWorld {
     this.ownPlayerClass = cls;
     this.cfg = { seed: 20061, playerClass: cls };
     this.openSocket();
-    // input stream at sim rate
-    this.sendTimer = window.setInterval(() => this.sendInput(), 50);
+    // unconditional input stream beat; constants + gate shared with the
+    // cadence-model matrix via input_send_cadence.ts (R13)
+    this.sendTimer = window.setInterval(() => this.sendInput(), INPUT_SEND_TIMER_INTERVAL_MS);
     if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
@@ -1611,6 +1706,16 @@ export class ClientWorld implements IWorld {
   // resume, force a real state check and retry immediately instead of
   // waiting for a close event or the rest of the backoff delay.
   private readonly handleVisibilityChange = (): void => {
+    if (document.visibilityState === 'hidden') {
+      // Backgrounding (tab switch, tab close, phone lock) is the last reliable
+      // beat to get an in-flight debounced layout edit to the server while the
+      // socket is still open, so a "rearrange then close the tab" never strands
+      // the final edit for a second device. Bounded: a no-op unless a save is
+      // pending. A raw tab close routes through pagehide, not sendLogout, so this
+      // is what covers it.
+      this.flushActionBarLayoutSave();
+      return;
+    }
     if (document.visibilityState !== 'visible') return;
     if (this.sessionEnded) return;
     if (this.ws.readyState === WebSocket.OPEN) return;
@@ -1704,6 +1809,11 @@ export class ClientWorld implements IWorld {
   }
 
   private endSession(): void {
+    // Flush a pending layout save BEFORE teardown, while the socket is still open
+    // and `connected` is still true: close() calls this before ws.close() and
+    // sendLogout() calls it before the logout frame, so the final edit is not
+    // lost to a deliberate logout within the debounce window.
+    this.flushActionBarLayoutSave();
     this.sessionEnded = true;
     this.failPendingCommandOutcomes();
     clearInterval(this.sendTimer);
@@ -1796,7 +1906,7 @@ export class ClientWorld implements IWorld {
     const sig = this.inputSignature();
     if (changedOnly) {
       if (sig === this.lastInputSig) return false;
-      if (now - this.lastInputSentAt < 16) return false;
+      if (!inputFlushGateOpen(now, this.lastInputSentAt)) return false;
     }
     const mi = this.moveInput;
     const msg: Record<string, unknown> = {
@@ -1888,13 +1998,27 @@ export class ClientWorld implements IWorld {
     this.rawCmd(payload);
   }
 
+  /**
+   * Lazy holder, never a field initializer (the wireSeen pattern): bareClient
+   * suites build instances via Object.create(ClientWorld.prototype), which
+   * skips field initializers. main.ts drains this once per animation frame
+   * (main.ts is the src/net to src/game junction; this module never imports
+   * src/game, ruling R8).
+   */
+  netPipeline(): NetPipelineStats {
+    if (this.netPipelineStats === undefined) this.netPipelineStats = createNetPipelineStats();
+    return this.netPipelineStats;
+  }
+
   private onMessage(raw: string): void {
     let msg: any;
+    const parseStart = performance.now();
     try {
       msg = JSON.parse(raw);
     } catch {
       return;
     }
+    const parseMs = performance.now() - parseStart;
     if (
       msg.t === 'commandOutcome' &&
       Number.isSafeInteger(msg.rid) &&
@@ -1930,6 +2054,10 @@ export class ClientWorld implements IWorld {
         this.inputEchoSamples = [];
         this.missingSince.clear();
         this.lastSnapAt = 0;
+        // any in-flight target echo died with the old transport; the resent
+        // world's value must apply from the first snapshot
+        this.pendingTargetEcho = null;
+        this.netPipeline().noteReset();
         // the server exits spectate at grace start, so undo the whole client
         // spectate swap too (playerId is already restored from this hello)
         this.spectating = null;
@@ -1946,6 +2074,9 @@ export class ClientWorld implements IWorld {
       this.spectating = typeof msg.name === 'string' ? msg.name : null;
       this.spectateFacingPending = true;
       this.pendingSpectateFacing = null;
+      // the spectate swap changes whose record the self-decode writes; a hold
+      // armed for the previous identity must not shadow the new one's target
+      this.pendingTargetEcho = null;
       this.pendingInputSeqSentAt.clear();
       this.inputEchoSamples = [];
       if (typeof this.spectating !== 'string') {
@@ -1965,6 +2096,7 @@ export class ClientWorld implements IWorld {
       return;
     }
     if (msg.t === 'error') {
+      const wasConnected = this.connected;
       this.connected = false;
       // Mid-reconnect, 'character already in world' is the transient window
       // where the server has not yet noticed the old socket died (a
@@ -1989,8 +2121,12 @@ export class ClientWorld implements IWorld {
       }
       // any other server rejection (kick, moderation, takeover, failed auth)
       // ends the session for good: no auto-reconnect
+      const rejection =
+        !wasConnected && msg.error === LEGACY_WORLD_AUTH_REQUIRED_ERROR
+          ? INCOMPATIBLE_WORLD_VERSION_ERROR
+          : msg.error;
       this.endSession();
-      this.onDisconnect?.(msg.error ?? 'rejected by server');
+      this.onDisconnect?.(rejection ?? 'rejected by server');
       return;
     }
     if (msg.t === 'events') {
@@ -2002,6 +2138,9 @@ export class ClientWorld implements IWorld {
         this.applyRiftStateEvent(ev as SimEvent);
         this.applyRiftDeathZoneSpawnEvent(ev as SimEvent);
         this.applyMasterworkEvent(ev as SimEvent);
+        this.applyDisenchantResultEvent(ev as SimEvent);
+        this.applyEnchantResultEvent(ev as SimEvent);
+        this.applySalvageResultEvent(ev as SimEvent);
         this.applyChatFlairEvent(ev as SimEvent);
         this.applyUnstuckEvent(ev as SimEvent);
         this.eventQueue.push(ev as SimEvent);
@@ -2058,7 +2197,21 @@ export class ClientWorld implements IWorld {
       return;
     }
     if (msg.t === 'snap') {
+      // Raw inter-arrival gap, read BEFORE applySnapshot updates lastSnapAt
+      // and feeds its (5,500)-windowed EWMA: the raw ring keeps the stall
+      // outliers that filter deliberately eats (finding 20, ruling R9).
+      const applyStart = performance.now();
+      const rawGapMs = this.lastSnapAt > 0 ? applyStart - this.lastSnapAt : null;
       this.applySnapshot(msg);
+      this.netPipeline().recordSnapshot({
+        nowMs: applyStart,
+        approxBytes: raw.length,
+        parseMs,
+        applyMs: performance.now() - applyStart,
+        entCount: Array.isArray(msg.ents) ? msg.ents.length : 0,
+        keepCount: Array.isArray(msg.keep) ? msg.keep.length : 0,
+        rawGapMs,
+      });
     }
   }
 
@@ -2089,6 +2242,7 @@ export class ClientWorld implements IWorld {
       this.stableTimerOwnerId = undefined;
       this.stableCooldownSchedules?.clear();
       this.stableNodeDeadlines?.clear();
+      this.stableChargeRecharges?.clear();
     }
     if (
       mode !== 'stable' ||
@@ -2101,10 +2255,12 @@ export class ClientWorld implements IWorld {
 
     if (this.stableCooldownSchedules === undefined) this.stableCooldownSchedules = new Map();
     if (this.stableNodeDeadlines === undefined) this.stableNodeDeadlines = new Map();
+    if (this.stableChargeRecharges === undefined) this.stableChargeRecharges = new Map();
     if (this.stableTimerOwnerId !== this.playerId) {
       this.stableTimerOwnerId = this.playerId;
       this.stableCooldownSchedules.clear();
       this.stableNodeDeadlines.clear();
+      this.stableChargeRecharges.clear();
       this.nodeCooldowns = new Map();
     }
 
@@ -2129,6 +2285,7 @@ export class ClientWorld implements IWorld {
       // schedules tied to the old clock before decoding it.
       this.stableCooldownSchedules.clear();
       this.stableNodeDeadlines.clear();
+      this.stableChargeRecharges.clear();
     }
     this.stableTimerTime = rawTime;
     this.refreshStableSelfTimers(rawTime);
@@ -2155,6 +2312,23 @@ export class ClientWorld implements IWorld {
         else {
           this.stableNodeDeadlines.delete(nodeId);
           this.nodeCooldowns.delete(nodeId);
+        }
+      }
+    }
+    if (player?.abilityCharges && this.stableChargeRecharges) {
+      // Age the recharge strip between achr rebuilds (the wire only resends on a
+      // charge event). A deadline that passed floors at 0 until the server's
+      // refund event lands with the authoritative new count.
+      for (const [abilityId, [deadline, length]] of this.stableChargeRecharges) {
+        const rec = player.abilityCharges[abilityId];
+        if (!rec) continue;
+        const remaining = stableDeadlineRemaining(deadline, now);
+        if (remaining !== null && remaining > 0) {
+          rec.recharge = remaining;
+          rec.rechargeLength = length;
+        } else {
+          this.stableChargeRecharges.delete(abilityId);
+          rec.recharge = 0;
         }
       }
     }
@@ -2419,16 +2593,32 @@ export class ClientWorld implements IWorld {
       e.mountCastKey = w.mck ?? '';
       e.sitting = !!w.sit;
       e.riftSliding = !!w.sld;
+      e.climbing = !!w.cl;
+      // Quantized 1..99 progress through the pull (see server snapshot);
+      // undefined when not climbing so the visual falls back to its own clock.
+      e.climbProgress = typeof w.cl === 'number' && w.cl > 0 ? w.cl / 100 : undefined;
+      e.afk = !!w.ak; // /afk display bit: drives the nameplate tag + social presence dot
       e.weaponStowed = !!w.ws;
       e.aggroTargetId = w.aggro ?? null;
+      e.forcedTargetId = w.ft ?? null;
+      e.forcedTargetTimer = w.ftm ?? 0;
       // Another entity's selected target (players/bots; mobs use aggro above). Powers
       // the target-of-target frame for a player target. For the SELF record this is
-      // re-set authoritatively from `s.target` in the self-decode below (same value).
-      e.targetId = w.tgt ?? null;
+      // re-set authoritatively from `s.target` in the self-decode below (same value),
+      // and both writes route through the pending-target echo guard (countStale
+      // false here: the self-decode owns the budget decrement).
+      if (w.id === this.playerId) this.applySelfTargetFromServer(e, w.tgt ?? null, false);
+      else e.targetId = w.tgt ?? null;
       e.tappedById = w.tap ?? null;
       // corpse harvest claim: unconditional so a record without hcb (unclaimed,
       // or a respawn that cleared the claim) resets any stale mirrored pid
       e.harvestClaimedBy = typeof w.hcb === 'number' ? w.hcb : null;
+      // loot owner-lock lapse: flag present means lapsed (mirror as already
+      // counted down), absent means the lock still holds or never started;
+      // unconditional so a respawned record resets any stale lapse (same
+      // contract as hcb above). The server owns the countdown; the client only
+      // ever needs the boolean.
+      e.lootFfaTimer = w.ffa ? 0 : Infinity;
       e.ownerId = w.own ?? null;
       e.petMode = w.pm ?? 'defensive';
       e.petTauntTimer = w.pt ?? 0;
@@ -2594,8 +2784,10 @@ export class ClientWorld implements IWorld {
         this.nodeCooldowns = new Map(Object.entries(s.ncd).map(([k, v]) => [k, Number(v)]));
       }
       if (s.achg !== undefined) {
-        // Recharge-model live counts (Frost's second Ice Block). Only the count is
-        // displayed; max/recharge are server-side details the mirror zero-fills.
+        // Recharge-model live counts (Frost's second Ice Block). maxCharges stays
+        // a server-side detail the mirror zero-fills (the bar derives the max from
+        // its own known-list rebake); recharge/rechargeLength are filled from the
+        // `achr` companion below when a charge is regenerating.
         e.abilityCharges = {};
         for (const k in s.achg) {
           e.abilityCharges[k] = {
@@ -2605,11 +2797,70 @@ export class ClientWorld implements IWorld {
             rechargeLength: 0,
           };
         }
+        if (s.achr === undefined && timerWire.mode === 'stable' && timerWire.time !== null) {
+          // achg re-sent without achr (the recharge JSON happened to be
+          // unchanged): the rebuilt zero-filled records re-fill from the
+          // retained deadlines instead of blanking the strip for a snapshot.
+          if (this.stableChargeRecharges) {
+            for (const [abilityId, [deadline, len]] of this.stableChargeRecharges) {
+              const rec = e.abilityCharges[abilityId];
+              if (!rec) continue;
+              const remaining = stableDeadlineRemaining(deadline, timerWire.time);
+              if (remaining !== null && remaining > 0) {
+                rec.recharge = remaining;
+                rec.rechargeLength = len;
+              }
+            }
+          }
+        }
+      }
+      if (s.achr !== undefined && e.abilityCharges) {
+        // The companion recharge timers, driving the action bar's thin recharge
+        // sweep while the pool still holds a use. Stable timer wire sends
+        // [deadline, length] pairs (retained in stableChargeRecharges so
+        // refreshStableSelfTimers keeps aging them across omitted snapshots);
+        // legacy sends raw [remaining, length], resent per snapshot. Decoded
+        // OUTSIDE the achg gate: under a Temporal Hourglass the accelerated
+        // deadline re-ships every tick while the unchanged counts are
+        // delta-omitted, and those re-sent deadlines must land (a nested decode
+        // silently dropped them, freezing the strip at 1x for the window). An id
+        // without a running recharge keeps the 0 fill, and an older server that
+        // never sends achr leaves the strip hidden.
+        const stable = timerWire.mode === 'stable' && timerWire.time !== null;
+        if (stable) {
+          if (this.stableChargeRecharges === undefined) this.stableChargeRecharges = new Map();
+          this.stableChargeRecharges.clear();
+        }
+        for (const k in s.achr) {
+          const rec = e.abilityCharges[k];
+          const pair = s.achr[k] as unknown;
+          if (!rec || !Array.isArray(pair)) continue;
+          // pair[0]'s meaning depends on the wire mode: an absolute sim-time
+          // DEADLINE on the stable wire, raw REMAINING seconds on legacy.
+          const rawPair0 = Number(pair[0]);
+          const len = Number(pair[1]);
+          const remaining =
+            timerWire.mode === 'stable'
+              ? timerWire.time !== null
+                ? stableDeadlineRemaining(rawPair0, timerWire.time)
+                : null
+              : rawPair0;
+          if (remaining !== null && remaining > 0 && len > 0) {
+            rec.recharge = remaining;
+            rec.rechargeLength = len;
+            // Retention stores the DEADLINE form (stable mode only).
+            if (stable) this.stableChargeRecharges?.set(k, [rawPair0, len]);
+          }
+        }
       }
       e.gcdRemaining = s.gcd ?? 0;
       e.potionCdRemaining = s.pcd ?? 0;
       e.comboPoints = s.combo ?? 0;
-      e.targetId = s.target ?? null;
+      // Routed through the pending-target echo guard: a stale in-flight
+      // snapshot must not clobber an optimistic targetEntity write (the target
+      // frame + party-frames select flicker). This is the counting site: one
+      // budget decrement per self snapshot.
+      this.applySelfTargetFromServer(e, s.target ?? null, true);
       e.autoAttack = !!s.auto;
       e.swingTimer = s.swing ?? e.swingTimer;
       e.queuedOnSwing = s.queued ?? null;
@@ -2627,6 +2878,8 @@ export class ClientWorld implements IWorld {
       e.spellHaste = s.sh ?? 0;
       e.critChance = s.crit ?? 0.05;
       e.dodgeChance = s.dodge ?? 0.05;
+      e.blockChance = s.blk ?? 0;
+      e.blockValue = s.bval ?? 0;
       // Crit/haste/hit RATING are informational paper-doll stats (combat values ride
       // crit/sh above, and hit resolves server-side); sent always like the other self
       // stats so the online character sheet shows them instead of the blankEntity 0.
@@ -2635,11 +2888,29 @@ export class ClientWorld implements IWorld {
       e.hasteRating = s.hrat ?? 0;
       e.hitRating = s.hirat ?? 0;
       e.weapon = s.weapon ?? e.weapon;
+      // ticksElapsed is a sim-internal sfx-cadence counter (consume_sfx.ts):
+      // the client never derives a sound decision from this local shadow (the
+      // server's heal SimEvents already carry sfxTick), so 0 is an inert
+      // placeholder here, same as the other display-only zeros above.
       e.eating = s.eat
-        ? { itemId: '', kind: 'food', hpPer2s: 0, manaPer2s: 0, remaining: s.eat.remaining }
+        ? {
+            itemId: '',
+            kind: 'food',
+            hpPer2s: 0,
+            manaPer2s: 0,
+            remaining: s.eat.remaining,
+            ticksElapsed: 0,
+          }
         : null;
       e.drinking = s.drk
-        ? { itemId: '', kind: 'drink', hpPer2s: 0, manaPer2s: 0, remaining: s.drk.remaining }
+        ? {
+            itemId: '',
+            kind: 'drink',
+            hpPer2s: 0,
+            manaPer2s: 0,
+            remaining: s.drk.remaining,
+            ticksElapsed: 0,
+          }
         : null;
       // IWorldProgressionXp facet (W7) self-decode: xp/lxp/rxp/prk ride every
       // self-frame (?? 0); milestones is delta-guarded (omitted keeps the prior
@@ -2654,7 +2925,15 @@ export class ClientWorld implements IWorld {
       // inv/buyback/equip are delta-guarded (a missing field keeps the prior mirror).
       // Terse keys (inv/buyback/equip/copper) and the per-field guards are unchanged by
       // the move; the offline counterpart is src/sim/items.ts.
-      this.copper = s.copper ?? 0;
+      // A money-only delta carries no inventory echo at all (a proceeds-only market
+      // collect, a trainer fee, a bank slot buy all move meta.copper and nothing else),
+      // so without this the bag money row and vendor affordability sat stale until the
+      // window was reopened (#2373). DIFF against the prior mirror, never a presence
+      // test: copper rides EVERY self-frame, so `s.copper !== undefined` would raise the
+      // flag at 20 Hz and rebuild the bags under the player's cursor continuously.
+      const copper = s.copper ?? 0;
+      if (copper !== this.copper) this.invChanged = true;
+      this.copper = copper;
       if (s.inv !== undefined) {
         this.inventory = s.inv;
         this.invChanged = true;
@@ -2768,6 +3047,7 @@ export class ClientWorld implements IWorld {
       if (s.vcupb !== undefined) this.lastVcupShared = s.vcupb as VcSharedCupInfo | null;
       if (s.vcup !== undefined || s.vcupb !== undefined) this.recomputeCupInfo();
       if (s.market !== undefined) this.marketInfo = s.market;
+      if (s.mktU !== undefined) this.marketCollectPending = !!s.mktU;
       if (s.mail !== undefined) this.mailInfo = s.mail;
       if (s.mailU !== undefined) this.mailUnread = s.mailU ?? 0;
       // `bank` is delta-omitted when unchanged (an omitted key means unchanged, NOT
@@ -2803,6 +3083,14 @@ export class ClientWorld implements IWorld {
       // mst -> activeMobileStationCraft: a nullable scalar, so the delta's
       // explicit null (station expired or never placed) must overwrite.
       if (s.mst !== undefined) this.activeMobileStationCraft = (s.mst as string | null) ?? null;
+      // Enchanting-action outcome mirrors (Professions 2.0): the
+      // convergence arm for lastDisenchantResult/lastEnchantResult/lastSalvageResult
+      // (the event mirror above is the immediacy arm; both feed the same field).
+      // Server-diffed per tick, so two identical consecutive deny results produce
+      // no delta change, which is exactly why the event arm also exists.
+      if (s.denc !== undefined) this.lastDisenchantResult = s.denc ?? null;
+      if (s.ench !== undefined) this.lastEnchantResult = s.ench ?? null;
+      if (s.salv !== undefined) this.lastSalvageResult = s.salv ?? null;
       if (s.gprof !== undefined) this.gatheringProficiency = s.gprof ?? {};
       if (s.prof !== undefined) this.professionsState = s.prof ?? { skills: [] };
       if (s.cprof !== undefined && s.cprof) {
@@ -2819,17 +3107,18 @@ export class ClientWorld implements IWorld {
           switchCount: cprof.switchCount ?? 0,
           amendsProgress: cprof.amendsProgress ?? 0,
           amendsRequired: cprof.amendsRequired ?? 0,
-          // Phase 9: the learned-recipe mirror. The identity is replaced
+          // The learned-recipe mirror. The identity is replaced
           // wholesale on every cprof delta (see the comment above), so a
           // train_recipe grant goes live the tick the server re-emits cprof
           // (its JSON diff fires on the sorted array changing). The ?? []
-          // keeps a pre-Phase-9 server's payload loading cleanly.
+          // keeps an older server's payload (without the field) loading cleanly.
           knownRecipes: [...(cprof.knownRecipes ?? [])],
+          // The server-computed work-order cooldown set (against ITS
+          // tickCount). questState() feeds it into computeQuestState so a work
+          // order on cooldown shows unavailable on the client too. The ?? []
+          // keeps an older server's payload (without the field) loading cleanly.
+          cadenceBlockedQuests: [...(cprof.cadenceBlockedQuests ?? [])],
         };
-        this.activeArchetype = this.craftingIdentity.activeArchetype;
-        this.archetypeSwitchCount = this.craftingIdentity.switchCount;
-        this.archetypeAmendsProgress = this.craftingIdentity.amendsProgress;
-        this.archetypeAmendsRequired = this.craftingIdentity.amendsRequired;
       }
       // camera follows server-side facing changes when not mouselooking
       if (prevSelfFacing !== undefined && this.mouselookFacing === null) {
@@ -2837,6 +3126,22 @@ export class ClientWorld implements IWorld {
         while (d > Math.PI) d -= 2 * Math.PI;
         while (d < -Math.PI) d += 2 * Math.PI;
         this.pendingFacingDelta += d;
+      }
+      // IWorldActionBar: resolve the login-time layout reconciliation exactly
+      // once, on the first self-payload this ClientWorld processes. A fresh join
+      // always carries the heavy self block, so `hbl` is present: the stored
+      // server layout (server WINS) or an explicit null (the server has no copy,
+      // so seed from local). `hbl` absent on the first payload (a resumed
+      // session's re-sync, where it was already sent once) leaves the local
+      // mirror authoritative ('noop').
+      if (!this.actionBarRestoreResolved) {
+        this.actionBarRestoreResolved = true;
+        if (s.hbl !== undefined) {
+          const clean = s.hbl === null ? null : sanitizeActionBarLayout(s.hbl);
+          this.actionBarRestore = clean ? { source: 'server', layout: clean } : { source: 'seed' };
+        } else {
+          this.actionBarRestore = { source: 'noop' };
+        }
       }
     }
 
@@ -2886,6 +3191,13 @@ export class ClientWorld implements IWorld {
 
   questState(questId: string): QuestState {
     const identity = this.craftingIdentity;
+    // The server-computed work-order cooldown set rides cprof and gates
+    // computeQuestState here exactly as it does server-side (the offline Sim
+    // re-derives the same set from live PlayerMeta.questCadence).
+    const cadenceBlocked =
+      identity && identity.cadenceBlockedQuests && identity.cadenceBlockedQuests.length > 0
+        ? new Set(identity.cadenceBlockedQuests)
+        : undefined;
     return optimisticQuestState(
       questId,
       this.questLog,
@@ -2905,6 +3217,7 @@ export class ClientWorld implements IWorld {
             amendsProgress: identity.amendsProgress,
           }
         : undefined,
+      cadenceBlocked,
     );
   }
 
@@ -3015,26 +3328,84 @@ export class ClientWorld implements IWorld {
     this.cmd({ cmd: 'resurrect_respond', accept });
   }
 
+  // The single write path for the LOCAL player's mirrored targetId from server
+  // state. Two snapshot sites assign it (the wireEntity `tgt` decode in
+  // applyWire and the precise `target` self-decode, same server-side value per
+  // server/game.ts selfWireJson) and both must apply the same echo protection,
+  // else the unguarded one re-introduces the clobber. `countStale` is true only
+  // for the self-decode, so one snapshot never burns two units of the budget.
+  private applySelfTargetFromServer(
+    e: Entity,
+    serverTarget: number | null,
+    countStale: boolean,
+  ): void {
+    const pending = this.pendingTargetEcho;
+    if (!pending) {
+      e.targetId = serverTarget;
+      return;
+    }
+    if (serverTarget === pending.id) {
+      // The echo landed: the server agrees, resume normal mirroring so a LATER
+      // server-initiated change (target death, out of interest) applies again.
+      this.pendingTargetEcho = null;
+      e.targetId = serverTarget;
+      return;
+    }
+    if (countStale) {
+      pending.snapshotsLeft -= 1;
+      if (pending.snapshotsLeft <= 0) {
+        // Reconciliation valve: the server never echoed the command (it refused
+        // an invalid, dead, or out-of-interest target). Server authority wins.
+        this.pendingTargetEcho = null;
+        e.targetId = serverTarget;
+        return;
+      }
+    }
+    // A stale pre-command snapshot: keep displaying the optimistic value.
+    // Assigned (not merely skipped) so the applyWire write earlier in the same
+    // snapshot pass cannot leave the clobbered value behind.
+    e.targetId = pending.id;
+  }
+
   // --- IWorldTargeting: target selection + tab cycling ---
   targetEntity(id: number | null): void {
-    // optimistic local update for snappy UI
+    // optimistic local update for snappy UI, plus the pending echo record that
+    // shields it from in-flight stale snapshots (applySelfTargetFromServer).
+    // Armed only when the optimistic write actually happened, and never while
+    // spectating: cmd() drops non-chat commands in spectate, so no echo would
+    // ever arrive to release the hold on the spectated player's mirror.
     const p = this.entities.get(this.playerId);
     if (p) {
-      if (id === null) p.targetId = null;
-      else {
+      if (id === null) {
+        p.targetId = null;
+        if (typeof this.spectating !== 'string') {
+          // last write wins: a newer call replaces any older pending record
+          this.pendingTargetEcho = { id: null, snapshotsLeft: TARGET_ECHO_SNAPSHOT_BUDGET };
+        }
+      } else {
         const e = this.entities.get(id);
-        if (e && (!e.dead || deadTargetSelectable(e, this.playerId))) p.targetId = id;
+        if (e && (!e.dead || deadTargetSelectable(e, this.playerId))) {
+          p.targetId = id;
+          if (typeof this.spectating !== 'string') {
+            this.pendingTargetEcho = { id, snapshotsLeft: TARGET_ECHO_SNAPSHOT_BUDGET };
+          }
+        }
       }
     }
     this.cmd({ cmd: 'target', id });
   }
   tabTarget(): void {
+    // Server-resolved retarget: its result must apply from the very next
+    // snapshot, so drop any in-flight click echo hold before sending.
+    this.pendingTargetEcho = null;
     this.cmd({ cmd: 'tab' });
   }
   targetNearestFriendly(): void {
+    this.pendingTargetEcho = null; // server-resolved retarget, as tabTarget
     this.cmd({ cmd: 'targetNearestFriendly' });
   }
   friendlyTabTarget(): void {
+    this.pendingTargetEcho = null; // server-resolved retarget, as tabTarget
     this.cmd({ cmd: 'tabFriendly' });
   }
 
@@ -3107,9 +3478,6 @@ export class ClientWorld implements IWorld {
   unequipItem(slot: EquipSlot): void {
     this.cmd({ cmd: 'unequip_item', slot });
   }
-  salvageItem(itemId: string): void {
-    this.cmd({ cmd: 'salvage_item', item: itemId });
-  }
   upgradeRiftItem(itemId: string): void {
     this.cmd({ cmd: 'rift_upgrade_item', item: itemId });
   }
@@ -3140,17 +3508,67 @@ export class ClientWorld implements IWorld {
   harvestNode(nodeId: string): Promise<boolean> {
     return this.cmdWithOutcome({ cmd: 'harvest_node', node: nodeId });
   }
-  craftItem(recipeId: string): void {
-    this.cmd({ cmd: 'craft_item', recipe: recipeId });
+  // `commission` (Professions 2.0): the boolean Maker's Bond
+  // opt-in, sent ONLY when true so a non-commission craft's wire message
+  // stays byte-identical to the pre-phase form. The server mints the
+  // bindOnTrade arm itself; no payload ever rides the command.
+  craftItem(recipeId: string, commission?: boolean): void {
+    if (commission === true) {
+      this.cmd({ cmd: 'craft_item', recipe: recipeId, commission: true });
+    } else {
+      this.cmd({ cmd: 'craft_item', recipe: recipeId });
+    }
   }
   placeMobileStation(craftId: string): void {
     this.cmd({ cmd: 'place_mobile_station', craft: craftId });
   }
-  // Recipe training (Professions 2.0 Phase 9): command only, never predicted.
+  // Recipe training (Professions 2.0): command only, never predicted.
   // The server resolves resolveTrain and answers with the personal
   // trainResult event; the learned set mirrors back via the cprof delta.
   trainRecipe(recipeId: string): void {
     this.cmd({ cmd: 'train_recipe', recipe: recipeId });
+  }
+  // Enchanting profession commands (Professions 2.0): command only,
+  // never predicted. The server re-validates ownership/eligibility/throttle in
+  // the sim resolvers and answers with the personal disenchantResult/
+  // enchantResult/salvageResult event plus the denc/ench/salv self-delta.
+  disenchantItem(itemId: string, target?: { slotIndex: number }): void {
+    if (target === undefined) {
+      this.cmd({ cmd: 'disenchant_item', item: itemId });
+    } else {
+      this.cmd({ cmd: 'disenchant_item', item: itemId, slot: target.slotIndex });
+    }
+  }
+  // `slot` rides only when the target is a WORN piece (the in-place arm); a
+  // bagged target sends a message byte-identical to the pre-feature form. The
+  // server re-validates the token against ALL_EQUIP_SLOTS and the sim re-checks
+  // what is actually worn there, so this is a request, never a bypass.
+  // `confirm` (#2415) rides ONLY when confirmReplace is exactly true (the
+  // craftItem `commission` idiom), so every non-replace apply stays
+  // byte-identical to the pre-feature form; the sim re-validates the target
+  // and denies already_enchanted/same_enchant itself, never the client.
+  applyEnchant(
+    itemId: string,
+    enchantId: string,
+    slot?: EquipSlot,
+    confirmReplace?: boolean,
+  ): void {
+    if (confirmReplace === true) {
+      this.cmd({ cmd: 'apply_enchant', item: itemId, enchant: enchantId, slot, confirm: true });
+    } else {
+      this.cmd({ cmd: 'apply_enchant', item: itemId, enchant: enchantId, slot });
+    }
+  }
+  salvageItem(itemId: string): void {
+    this.cmd({ cmd: 'salvage_item', item: itemId });
+  }
+  // Maker's Bond unbind service (Professions 2.0): command only,
+  // never predicted. The server re-validates eligibility/bound-ness/station
+  // range/fee in src/sim/professions/commission.ts and answers with the
+  // personal unbindResult event; the cleared payload mirrors back via the
+  // self inv delta.
+  unbindItem(itemId: string): void {
+    this.cmd({ cmd: 'unbind_item', item: itemId });
   }
   sellItem(itemId: string, count?: number): void {
     this.cmd({ cmd: 'sell', item: itemId, count });
@@ -3158,8 +3576,13 @@ export class ClientWorld implements IWorld {
   sellAllJunk(): void {
     this.cmd({ cmd: 'sell_all_junk' });
   }
-  buyBackItem(itemId: string): void {
-    this.cmd({ cmd: 'buyback', item: itemId });
+  buyBackItem(
+    itemId: string,
+    index?: number,
+    instance?: ItemInstancePayload,
+    craftedRecipeId?: string,
+  ): void {
+    this.cmd({ cmd: 'buyback', item: itemId, index, instance, craftedRecipeId });
   }
   // --- IWorldCosmetics: skin + mech-chroma equips. Optimistic local nudge, then
   // the snake_case cmd (change_skin/claim_event_skin/unequip_mech_chroma); the
@@ -3355,6 +3778,46 @@ export class ClientWorld implements IWorld {
       this.cosmeticsChanged = true;
     }
     this.cmd({ cmd: 'change_weapon_skin', skin: skinId, wtype: type ?? null });
+  }
+  saveActionBarLayout(layout: ActionBarLayout): void {
+    // Debounced, deduped upload of the whole layout. The controller has already
+    // written the localStorage mirror; this pushes the server copy so it
+    // restores on other devices. Rapid drags coalesce to the last layout, and an
+    // upload whose serialized form matches the last send is skipped, so a
+    // re-save during login (or an unchanged bar) never amplifies wire/db writes.
+    const clean = sanitizeActionBarLayout(layout);
+    if (!clean) return;
+    const json = JSON.stringify(clean);
+    if (json === this.actionBarSaveLastJson) return;
+    this.actionBarSaveLastJson = json;
+    this.actionBarSavePending = clean;
+    if (this.actionBarSaveTimer !== null) clearTimeout(this.actionBarSaveTimer);
+    this.actionBarSaveTimer = setTimeout(
+      () => this.flushActionBarLayoutSave(),
+      ACTION_BAR_SAVE_DEBOUNCE_MS,
+    );
+  }
+
+  // Send any debounced-but-not-yet-sent layout NOW. Called on the debounce timer
+  // and, critically, when the session ends or the page backgrounds (endSession +
+  // the visibilitychange 'hidden' branch), so the final sub-debounce edit reaches
+  // the server before the socket goes away instead of being stranded (the local
+  // mirror would still be right on the same device, but a second device would
+  // miss it). No-op unless a save is pending.
+  private flushActionBarLayoutSave(): void {
+    if (this.actionBarSaveTimer !== null) {
+      clearTimeout(this.actionBarSaveTimer);
+      this.actionBarSaveTimer = null;
+    }
+    const pending = this.actionBarSavePending;
+    if (pending === null) return;
+    this.actionBarSavePending = null;
+    this.cmd({ cmd: 'save_hotbar_layout', layout: pending });
+  }
+  takeActionBarLayoutRestore(): ActionBarLayoutRestore | undefined {
+    const restore = this.actionBarRestore;
+    this.actionBarRestore = undefined; // one-shot: consumed by the HUD at world entry
+    return restore;
   }
   chat(text: string): void {
     this.cmd({ cmd: 'chat', text });
@@ -3633,6 +4096,9 @@ export class ClientWorld implements IWorld {
   guildEventRemove(eventId: number): void {
     this.cmd({ cmd: 'guild_event_remove', id: eventId });
   }
+  guildSetMotd(text: string): void {
+    this.cmd({ cmd: 'guild_set_motd', text });
+  }
   async searchCharacters(query: string): Promise<CharacterSearchResult[]> {
     const q = query.trim();
     if (!q) return [];
@@ -3729,6 +4195,8 @@ export class ClientWorld implements IWorld {
       q: query.search,
       itemType: query.itemType,
       subtype: query.subtype,
+      armorClass: query.armorClass,
+      primaryStat: query.primaryStat,
       rarity: query.rarity,
       page: query.page,
     });
@@ -3977,12 +4445,48 @@ export class ClientWorld implements IWorld {
   }
 
   // Mirror the authoritative masterwork event into lastMasterwork
-  // (Professions 2.0 Phase 2), modeled exactly on applyCraftResultEvent
+  // (Professions 2.0), modeled exactly on applyCraftResultEvent
   // above. The event still flows to the HUD (drainEvents) for a future
-  // Phase 6 toast.
+  // toast.
   private applyMasterworkEvent(ev: SimEvent): void {
     if (ev.type !== 'masterwork') return;
     this.lastMasterwork = { recipeId: ev.recipeId, itemId: ev.itemId, crafter: ev.crafter };
+  }
+  // Mirror the authoritative enchanting-action outcomes into their lastX field
+  // (Professions 2.0), each modeled exactly on applyCraftResultEvent
+  // above (the immediacy arm; the denc/ench/salv self-delta is the convergence
+  // arm in applySnapshot). The events still flow to the HUD (drainEvents) for a
+  // toast/log line.
+  private applyDisenchantResultEvent(ev: SimEvent): void {
+    if (ev.type !== 'disenchantResult') return;
+    this.lastDisenchantResult = {
+      ok: ev.ok,
+      itemId: ev.itemId,
+      materialItemId: ev.materialItemId,
+      count: ev.count,
+      secondaryItemId: ev.secondaryItemId,
+      secondaryCount: ev.secondaryCount,
+      reason: ev.reason,
+    };
+  }
+  private applyEnchantResultEvent(ev: SimEvent): void {
+    if (ev.type !== 'enchantResult') return;
+    this.lastEnchantResult = {
+      ok: ev.ok,
+      itemId: ev.itemId,
+      enchantId: ev.enchantId,
+      reason: ev.reason,
+    };
+  }
+  private applySalvageResultEvent(ev: SimEvent): void {
+    if (ev.type !== 'salvageResult') return;
+    this.lastSalvageResult = {
+      ok: ev.ok,
+      itemId: ev.itemId,
+      materialItemId: ev.materialItemId,
+      count: ev.count,
+      reason: ev.reason,
+    };
   }
   delveRiteChoose(intensity: RiteIntensity): void {
     this.cmd({ cmd: 'delve_rite_choose', intensity });

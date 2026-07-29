@@ -28,6 +28,7 @@ import {
   type MailSendBody,
   type MailTab,
   mailSendBlocked,
+  parseParcelQty,
   recipientSuggestions,
   wrappedSuggestionIndex,
 } from './mailbox_view';
@@ -135,7 +136,12 @@ export class MailboxWindow {
     if (count < 1) return;
     this.attachments.push({ itemId, count });
     audio.click();
-    this.render();
+    // Targeted repaint, NOT this.render(): the full render rebuilds the send
+    // form via innerHTML with empty inputs, wiping the typed recipient,
+    // subject, body, and coin amounts the moment a parcel was attached. The
+    // stepper and remove paths already repaint this way (#1695); attach was
+    // the one parcel mutation still running the full rebuild.
+    this.renderParcels();
   }
 
   /**
@@ -159,6 +165,20 @@ export class MailboxWindow {
     if (next === slot.count) return;
     slot.count = next;
     audio.click();
+    this.renderParcels();
+  }
+
+  /** Commit a TYPED parcel quantity (the chip input's change event). Always
+   *  repaints, even when the count is unchanged, so a normalized-away entry
+   *  ("007", "", "999" over stock) snaps the field back to the real value. */
+  private setParcelQty(itemId: string, raw: string): void {
+    const slot = this.attachments.find((s) => s.itemId === itemId);
+    if (!slot) return;
+    const next = parseParcelQty(raw, this.ownedCountFor(itemId), slot.count);
+    if (next !== slot.count) {
+      slot.count = next;
+      audio.click();
+    }
     this.renderParcels();
   }
 
@@ -619,7 +639,12 @@ export class MailboxWindow {
     }
     const itemControls = new Map<
       string,
-      { minus?: HTMLButtonElement; plus?: HTMLButtonElement; remove?: HTMLButtonElement }
+      {
+        minus?: HTMLButtonElement;
+        plus?: HTMLButtonElement;
+        qty?: HTMLInputElement;
+        remove?: HTMLButtonElement;
+      }
     >();
     for (const slot of this.attachments) {
       const item = ITEMS[slot.itemId];
@@ -639,6 +664,7 @@ export class MailboxWindow {
       const controls: {
         minus?: HTMLButtonElement;
         plus?: HTMLButtonElement;
+        qty?: HTMLInputElement;
         remove?: HTMLButtonElement;
       } = {};
       if (owned > 1) {
@@ -655,11 +681,39 @@ export class MailboxWindow {
           t('hudChrome.mailbox.parcelQtyDecreaseAria', { item: itemDisplayName(item) }),
         );
         minus.addEventListener('click', () => this.adjustParcelQty(slot.itemId, -1));
-        const qty = document.createElement('span');
-        qty.className = 'mail-parcel-qty-value';
+        // Typeable quantity (was a read-only span): validated on change/blur,
+        // never per keystroke, so typing is not interrupted by the repaint.
+        // Purely client UX: the sim's post office re-validates every send
+        // (floors counts, rejects < 1, checks fungible stock) authoritatively.
+        const qty = document.createElement('input');
+        qty.type = 'number';
+        qty.min = '1';
+        qty.max = String(owned);
+        qty.inputMode = 'numeric';
+        qty.className = 'mail-parcel-qty-input';
+        qty.value = String(slot.count);
+        qty.dataset.focusKey = `${slot.itemId}:qty`;
+        // Still a live region even as an input: a +/- stepper click changes
+        // this value while focus sits on the BUTTON, and without aria-live a
+        // screen reader hears nothing about the new count.
         qty.setAttribute('aria-live', 'polite');
-        qty.textContent = t('itemUi.bags.stackCount', {
-          count: formatNumber(slot.count, { maximumFractionDigits: 0 }),
+        qty.setAttribute(
+          'aria-label',
+          t('hudChrome.mailbox.parcelQtyAria', { item: itemDisplayName(item) }),
+        );
+        // The coin-input focus contract: select the value so typing replaces it
+        // (clicking into "2" and typing 5 must mean 5, not 25); the once-only
+        // mouseup swallow keeps click-to-focus from collapsing the selection.
+        qty.addEventListener('focus', () => {
+          qty.select();
+          qty.addEventListener('mouseup', (e) => e.preventDefault(), { once: true });
+        });
+        qty.addEventListener('change', () => this.setParcelQty(slot.itemId, qty.value));
+        qty.addEventListener('keydown', (ke) => {
+          if (ke.key === 'Enter') {
+            ke.preventDefault();
+            qty.blur();
+          }
         });
         const plus = document.createElement('button');
         plus.type = 'button';
@@ -676,6 +730,7 @@ export class MailboxWindow {
         chip.appendChild(step);
         controls.minus = minus;
         controls.plus = plus;
+        controls.qty = qty;
       }
       const remove = document.createElement('button');
       remove.type = 'button';
@@ -699,18 +754,25 @@ export class MailboxWindow {
     if (focusKey) {
       const [itemId, role] = focusKey.split(':');
       const controls = itemControls.get(itemId);
+      // The qty input matters most here: a number input's arrow keys fire
+      // `change` WITHOUT blurring, so the repaint runs while the input is
+      // focused; falling through to Remove would turn the player's next
+      // Enter/Space into removing the parcel mid-adjustment.
       const preferred = controls
         ? role === 'minus'
           ? controls.minus
           : role === 'plus'
             ? controls.plus
-            : controls.remove
+            : role === 'qty'
+              ? controls.qty
+              : controls.remove
         : undefined;
       // The just-activated control (or its whole item) can vanish on rebuild
       // (disabled at a bound, or the stepper dropped once owned <= 1): fall
       // back to the nearest still-focusable control for the same item.
-      let target: HTMLButtonElement | undefined;
+      let target: HTMLButtonElement | HTMLInputElement | undefined;
       if (preferred && !preferred.disabled) target = preferred;
+      else if (controls?.qty) target = controls.qty;
       else if (controls?.minus && !controls.minus.disabled) target = controls.minus;
       else if (controls?.plus && !controls.plus.disabled) target = controls.plus;
       else target = controls?.remove;

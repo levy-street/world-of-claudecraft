@@ -46,6 +46,30 @@ Direct OpenAI Responses API mode is selected only when both are present:
 remain server-side and are never emitted, persisted in Rift state, or sent to a
 client.
 
+## Rank difficulty
+
+Rank (C/B/A/S) is the ONLY difficulty axis: a rift never scales with party size,
+and mob levels are capped at 22 (23 at S), so all four ranks differ purely
+through the spawn-time stat transform in `rift/ranks.ts`, the rank mechanic
+budget (C=1 .. S=4 of a boss's `rankMechanics` kit), and the hazard gate.
+Rifts are group content at every rank including C.
+
+The ladder is calibrated onto the v0.30 dungeon ladder: C is a normal dungeon
+(normal Gravewyrm Sanctum's own line), B is the heroic five-man line at 1.0x, A
+is 1.2x heroic, S is 1.33x heroic. Health and damage are split by mob class
+(spawn-list trash, boss, boss-summoned add), because one multiplier per rank
+cannot serve two classes at once. The full derivation, the Monte Carlo benches,
+the decision ledger, and pre-measured fallback options are in
+[../rift-rank-monte-carlo-analysis.md](../rift-rank-monte-carlo-analysis.md);
+every tuning literal and floor is pinned by
+`tests/rift_difficulty_floors.test.ts`. Re-run the benches with
+`npm run sim:rift`.
+
+Note that only SPAWN-LIST templates (`RIFT_TRASH_IDS`) may be substituted into a
+floor roster by an upgrade manifest. The shared summoned-add templates are
+non-boss and appear in the bone, void and citadel theme rosters, but they are
+non-elite and carry no loot table, so `applyRiftUpgrade` filters them out.
+
 ## Monster and asset safety
 
 `content/rift/monster_index.ts` indexes every static Rift `MobTemplate` by role,

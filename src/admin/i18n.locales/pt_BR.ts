@@ -109,6 +109,7 @@ export const pt_BR: Record<string, string> = {
   'stats.peakOnline': 'pico online',
   'stats.peakOnlineToday': 'pico online 24h',
   'stats.peakOnlineAllTime': 'pico online histórico',
+  'stats.playersCap': 'limite de jogadores',
   'stats.accounts': 'contas',
   'stats.characters': 'personagens',
   'stats.newAccounts24h': 'novas contas 24h',

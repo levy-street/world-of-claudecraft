@@ -25,6 +25,12 @@ export const ACHIEVEMENT_MAP: Record<string, string> = {
   prog_crown_below: 'ACH_CROWN_BELOW',
   prog_mere_at_rest: 'ACH_MERE_AT_REST',
   prog_tools_of_the_trade: 'ACH_TOOLS_OF_THE_TRADE',
+  // Professions 2.0 marquee deeds: the
+  // three titled milestones join the mirror. Partner-site registration of
+  // these ACH names in App Admin is a maintainer release task.
+  prog_guildsworn: 'ACH_GUILDSWORN',
+  prog_masterwright: 'ACH_MASTERWRIGHT',
+  prog_master_angler: 'ACH_MASTER_ANGLER',
   cmb_first_blood: 'ACH_FIRST_BLOOD',
   cmb_slayer: 'ACH_SLAYER',
   cmb_first_fall: 'ACH_FIRST_FALL',

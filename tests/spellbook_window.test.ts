@@ -89,6 +89,25 @@ describe('spellbook_window: the pinned Attack row', () => {
   });
 });
 
+describe('spellbook_window: the Attack row is draggable onto the action bar', () => {
+  it('marks the Attack row draggable, like an ability row', () => {
+    // The row previously offered only the +/- toggle, so a player dragging Attack
+    // (the natural gesture other spells support) got nothing. It now drags too.
+    const attackStart = code.indexOf('private appendAttackRow(');
+    const attackRow = code.slice(attackStart, code.indexOf('private appendRow(', attackStart));
+    expect(attackRow).toContain('el.draggable = true');
+  });
+
+  it('writes the dedicated Attack marker MIME on dragstart (not an encoded action)', () => {
+    // Attack has no ability/item id, so it cannot ride the HotbarAction path; the
+    // dragstart carries the marker MIME the action bar recognizes.
+    const attackStart = code.indexOf('private appendAttackRow(');
+    const attackRow = code.slice(attackStart, code.indexOf('private appendRow(', attackStart));
+    expect(attackRow).toContain('HOTBAR_ATTACK_MIME');
+    expect(attackRow).toMatch(/dragstart/);
+  });
+});
+
 describe('spellbook_window: mobile action-ring page label (Phase 4, touch-only)', () => {
   it('feeds abilityIdByBarSlot through to the pure view core', () => {
     expect(code).toContain('abilityIdByBarSlot: this.deps.abilityIdByBarSlot()');

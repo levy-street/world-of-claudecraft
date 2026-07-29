@@ -79,7 +79,7 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: 'Mistrz Łąk', desc: 'Osiągnij 100 biegłości w Zielarstwie.' },
   prog_master_gatherer: {
     name: 'Mistrz Zbieractwa',
-    desc: 'Osiągnij 100 biegłości w Górnictwie, Drwalnictwie i Zielarstwie.',
+    desc: 'Osiągnij 100 biegłości w dowolnych trzech spośród Górnictwa, Drwalnictwa, Zielarstwa i Wędkarstwa.',
   },
   prog_first_craft: { name: 'Własnoręczna Robota', desc: 'Ukończ swój pierwszy udany wyrób.' },
   prog_craft_specialist: {
@@ -429,7 +429,10 @@ export const table: DeedLocaleTable = {
     name: 'Stały klient',
     desc: 'Odkryj wszystkie dziesięć przedmiotów z zapasów Kwatermistrza Vexa.',
   },
-  col_glimmerfin: { name: 'Promyk nadziei', desc: 'Złów Lśniącopłetwego karpia koi.' },
+  col_glimmerfin: {
+    name: 'Promyk nadziei',
+    desc: 'Złów Karpika Słonecznoblask.',
+  },
   col_full_creel: {
     name: 'Pełen kosz',
     desc: 'Odkryj wszystkie sześć pospolitych ryb z wód Doliny, Trzęsawiska i Wyżyn.',
@@ -612,7 +615,7 @@ export const table: DeedLocaleTable = {
   },
   exp_something_shiny: { name: 'Błyskotka', desc: 'Podnieś z ziemi migoczący przedmiot.' },
   exp_first_ore: {
-    name: 'Kilofem w ziemię!',
+    name: 'Kilof spotyka Kamień',
     desc: 'Wydobądź surowce ze swojego pierwszego złoża rudy.',
   },
   exp_first_timber: { name: 'Uwaga, drzewo!', desc: 'Pozyskaj swoje pierwsze stanowisko drewna.' },
@@ -683,5 +686,120 @@ export const table: DeedLocaleTable = {
   chr_marsh_first_cast: {
     name: 'Węgorze w trzcinach',
     desc: 'Złów rybę w wodach Trzęsawiska Mokrzawia.',
+  },
+  prog_guildsworn: {
+    name: 'Zaprzysiężony Rzemiosłu',
+    desc: 'Dostroić się do pary archetypów i podjąć na serio jej rzemiosła.',
+    title: 'Zaprzysiężony Rzemiosłu',
+  },
+  prog_masterwright: {
+    name: 'Mistrz Wyrobu',
+    desc: 'Wykonać swoje pierwsze arcydzieło, coś tak znakomitego, że sława o nim rozlega się po całej strefie.',
+    title: 'Mistrz Wyrobu',
+  },
+  prog_fishing_100: {
+    name: 'Stary Solony',
+    desc: 'Osiągnij 100 biegłości w Wędkarstwie.',
+  },
+  prog_master_angler: {
+    name: 'Mistrz Wędkarstwa',
+    desc: 'Osiągnij 200 biegłości w Wędkarstwie, sam szczyt sztuki wędkarskiej.',
+    title: 'Mistrz Wędkarstwa',
+  },
+  prog_engineering_50: {
+    name: 'Tryby i Sprężyny',
+    desc: 'Osiągnij 50 umiejętności w Inżynierii.',
+  },
+  prog_alchemy_50: {
+    name: 'Dziwne Wywary',
+    desc: 'Osiągnij 50 umiejętności w Alchemii.',
+  },
+  prog_cooking_50: {
+    name: 'Doświadczony Kucharz',
+    desc: 'Osiągnij 50 umiejętności w Gotowaniu.',
+  },
+  prog_leatherworking_50: {
+    name: 'Rzemiosło Garbarza',
+    desc: 'Osiągnij 50 umiejętności w Garbarstwie.',
+  },
+  prog_tailoring_50: {
+    name: 'Dobre Szycie',
+    desc: 'Osiągnij 50 umiejętności w Krawiectwie.',
+  },
+  prog_enchanting_50: {
+    name: 'Blask Arkany',
+    desc: 'Osiągnij 50 umiejętności w Czarodziejstwie.',
+  },
+  prog_weaponcrafting_50: {
+    name: 'Ostrze i Zahartowanie',
+    desc: 'Osiągnij 50 umiejętności w Wytwarzaniu Broni.',
+  },
+  prog_armorcrafting_50: {
+    name: 'Młot i Płyta',
+    desc: 'Osiągnij 50 umiejętności w Wytwarzaniu Pancerzy.',
+  },
+  prog_grandmaster_engineering: {
+    name: 'Arcymistrzostwo Inżynierii',
+    desc: 'Osiągnij 125 umiejętności w Inżynierii, sam szczyt rzemiosła.',
+    title: 'Arcymistrzostwo Inżynierii',
+  },
+  prog_grandmaster_alchemy: {
+    name: 'Arcymistrzostwo Alchemii',
+    desc: 'Osiągnij 125 umiejętności w Alchemii, sam szczyt rzemiosła.',
+    title: 'Arcymistrzostwo Alchemii',
+  },
+  prog_grandmaster_cooking: {
+    name: 'Arcymistrzostwo Gotowania',
+    desc: 'Osiągnij 125 umiejętności w Gotowaniu, sam szczyt rzemiosła.',
+    title: 'Arcymistrzostwo Gotowania',
+  },
+  prog_grandmaster_leatherworking: {
+    name: 'Arcymistrzostwo Garbarstwa',
+    desc: 'Osiągnij 125 umiejętności w Garbarstwie, sam szczyt rzemiosła.',
+    title: 'Arcymistrzostwo Garbarstwa',
+  },
+  prog_grandmaster_tailoring: {
+    name: 'Arcymistrzostwo Krawiectwa',
+    desc: 'Osiągnij 125 umiejętności w Krawiectwie, sam szczyt rzemiosła.',
+    title: 'Arcymistrzostwo Krawiectwa',
+  },
+  prog_grandmaster_enchanting: {
+    name: 'Arcymistrzostwo Czarodziejstwa',
+    desc: 'Osiągnij 125 umiejętności w Czarodziejstwie, sam szczyt rzemiosła.',
+    title: 'Arcymistrzostwo Czarodziejstwa',
+  },
+  prog_grandmaster_weaponcrafting: {
+    name: 'Arcymistrzostwo Wytwarzania Broni',
+    desc: 'Osiągnij 125 umiejętności w Wytwarzaniu Broni, sam szczyt rzemiosła.',
+    title: 'Wielki Mistrz Wytwarzania Broni',
+  },
+  prog_grandmaster_armorcrafting: {
+    name: 'Arcymistrzostwo Wytwarzania Pancerzy',
+    desc: 'Osiągnij 125 umiejętności w Wytwarzaniu Pancerzy, sam szczyt rzemiosła.',
+    title: 'Arcymistrzostwo Wytwarzania Pancerzy',
+  },
+  col_pristine_vein: {
+    name: 'Nieskazitelna Żyła',
+    desc: 'Rozbij nieskazitelną żyłę i niech cała strefa się o tym dowie.',
+  },
+  col_ancient_heartwood: {
+    name: 'Starożytna Twardziel',
+    desc: 'Wydobyć polano starożytnej twardzieli z powalonego drzewostanu.',
+  },
+  col_moonlit_bloom: {
+    name: 'Rozkwit w Blasku Księżyca',
+    desc: 'Zebrać rozkwit w blasku księżyca w chwili, gdy się rozchyla.',
+  },
+  col_perfect_specimen: {
+    name: 'Nieskazitelny Okaz',
+    desc: 'Wydobyć nieskazitelny okaz z upolowanej bestii, bez żadnej rysy ani skazy.',
+  },
+  soc_first_salvage: {
+    name: 'Nic Się Nie Marnuje',
+    desc: 'Odzyskaj część ekwipunku, rozkładając ją na surowce.',
+  },
+  soc_salvage_50: {
+    name: 'Dziedziniec Rozbieraczy',
+    desc: 'Odzyskaj 50 sztuk ekwipunku, rozkładając je na surowce.',
   },
 };

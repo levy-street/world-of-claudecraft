@@ -27,7 +27,9 @@
 // `src/sim`-pure: no DOM/Three, no Math.random/Date.now; all randomness is the shared
 // `ctx.rng` stream, drawn in the exact pre-move positions.
 
-import { CLASSES, isArenaPos, MOBS } from '../data';
+import { CLASSES, ITEMS, isArenaPos, MOBS } from '../data';
+import { weaponHand } from '../equipment_rules';
+import { TWOHAND_DPS_MULT } from '../item_budget';
 import { forceDismount } from '../mounts';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta } from '../sim';
@@ -46,6 +48,7 @@ import {
   normAngle,
   STANCE_MASTERY_BERSERKER_HASTE,
   swingMissChance,
+  type WeaponHand,
   type WeaponInfo,
 } from '../types';
 import { drawWeapon } from '../weapon_stow';
@@ -70,6 +73,23 @@ const RANGED_WEAPON_COEFF = 0.6;
 const DUAL_WIELD_WHITE_MISS_PENALTY = 0.1;
 const SUDDEN_DEATH_CHANCE = 0.1;
 const SUDDEN_DEATH_DURATION = 10;
+const ONE_HAND_AUTO_ATTACK_BASE_SPEED = 2;
+const OFFHAND_AUTO_ATTACK_DMG_MULT = 0.5;
+
+type AutoAttackHand = Extract<WeaponHand, 'onehand' | 'twohand'> | 'offhand';
+
+function autoAttackWeaponDamageMult(hand: AutoAttackHand, speed: number): number {
+  const speedMult = Math.max(0.1, speed) / ONE_HAND_AUTO_ATTACK_BASE_SPEED;
+  const handMult = hand === 'twohand' ? TWOHAND_DPS_MULT : 1;
+  const offhandMult = hand === 'offhand' ? OFFHAND_AUTO_ATTACK_DMG_MULT : 1;
+  return speedMult * handMult * offhandMult;
+}
+
+function mainhandAutoAttackHand(attacker: Entity): AutoAttackHand {
+  const item = attacker.mainhandItemId ? ITEMS[attacker.mainhandItemId] : undefined;
+  if (item?.kind !== 'weapon') return 'onehand';
+  return weaponHand(item) === 'twohand' ? 'twohand' : 'onehand';
+}
 
 export function startAutoAttack(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
@@ -209,6 +229,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
       delete p.queuedOnSwingCostMultiplier;
     }
     const connected = meleeSwing(ctx, p, t, bonus, abilityName, {
+      autoAttackHand: 'mainhand',
       threatFlat,
       threatMult,
       whiteDualWieldPenalty: p.dualWielding && abilityName === null,
@@ -219,6 +240,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
     const extraAttackPct = ctx.playerMods(meta).global.extraAttackPct;
     if (connected && abilityName === null && extraAttackPct > 0 && ctx.rng.chance(extraAttackPct)) {
       meleeSwing(ctx, p, t, 0, null, {
+        autoAttackHand: 'mainhand',
         whiteDualWieldPenalty: p.dualWielding,
       });
     }
@@ -236,7 +258,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
     const offhand = p.offhandWeapon;
     const connected = meleeSwing(ctx, p, t, 0, null, {
       weapon: offhand,
-      weaponMult: 0.5,
+      autoAttackHand: 'offhand',
       apSwingSpeed: offhand.speed,
       whiteDualWieldPenalty: true,
     });
@@ -384,6 +406,7 @@ export function meleeSwing(
     cannotBeDodged?: boolean;
     weapon?: WeaponInfo;
     weaponMult?: number;
+    autoAttackHand?: AutoAttackHand | 'mainhand';
     apSwingSpeed?: number;
     threatFlat?: number;
     threatMult?: number;
@@ -452,12 +475,16 @@ export function meleeSwing(
   }
   const mult = opts.weaponMult ?? 1;
   const weapon = opts.weapon ?? attacker.weapon;
+  const autoAttackHand =
+    opts.autoAttackHand === 'mainhand' ? mainhandAutoAttackHand(attacker) : opts.autoAttackHand;
+  const weaponRollMult =
+    autoAttackHand === undefined ? 1 : autoAttackWeaponDamageMult(autoAttackHand, weapon.speed);
   const apSwingSpeed = opts.apSwingSpeed ?? baseSwingSpeed(attacker);
   // weapon imbues (seals, rockbiter) add flat damage to every swing
   let imbueBonus = 0;
   for (const a of attacker.auras) if (a.kind === 'imbue') imbueBonus += a.value;
   let dmg =
-    (ctx.rng.range(weapon.min, weapon.max) +
+    (ctx.rng.range(weapon.min, weapon.max) * weaponRollMult +
       // Normalize the attack-power contribution to the SAME cadence the swing
       // fires at: Wolf Form swings at the rogue speed (baseSwingSpeed), so its
       // AP-per-swing must use that speed too, not the slow staff's, or feral
@@ -477,7 +504,8 @@ export function meleeSwing(
     opts.forceCrit === true;
   if (crit) dmg *= 2 + attacker.critDmgPhysBonus;
   dmg *= 1 - armorReduction(ctx.effectiveArmor(target), attacker.level);
-  if (blockChance > 0 && roll < missChance + dodgeChance + parryChance + blockChance) {
+  const blocked = blockChance > 0 && roll < missChance + dodgeChance + parryChance + blockChance;
+  if (blocked) {
     dmg = Math.max(1, dmg - target.blockValue);
   }
   const dealtAmount = Math.max(1, Math.round(dmg));
@@ -488,7 +516,7 @@ export function meleeSwing(
     crit,
     'physical',
     abilityName,
-    'hit',
+    blocked ? 'block' : 'hit',
     false,
     {
       flat: opts.threatFlat ?? 0,

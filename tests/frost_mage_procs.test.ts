@@ -286,7 +286,13 @@ describe('Ice Lance frozen resolution', () => {
   });
 
   it("spends Fingers of Frost before Winter's Chill (the owner's order)", () => {
-    const { sim, p } = makeSim();
+    // Seed hunted (re-hunted off the default 1 after the Eastbrook camp respacing
+    // thinned the zone-1 camp counts, which shifts every seed's stream because
+    // world-gen draws 5 rng values per camp mob). All three lances have to LAND
+    // for the spend order to be observable: on the default seed the third lance
+    // now rolls a full resist, so it spends nothing and Winter's Chill never
+    // ticks down. Spares on record: 3, 4.
+    const { sim, p } = makeSim({ seed: 2 });
     const mob = spawnTarget(sim, p);
     pushAura(p, {
       id: 'fingers_of_frost',

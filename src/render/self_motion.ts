@@ -25,7 +25,7 @@
 // facing_smooth.ts / locomotion.ts. tests/self_motion.test.ts drives it
 // against a real lagging Sim.
 
-import { resolveMovement } from '../sim/colliders';
+import { moverHeight, resolveMovement } from '../sim/colliders';
 import { moveSpeedMult, type PlayerMotionDeps, stepPlayerMotion } from '../sim/player_motion';
 import { DT, type Entity, type MoveInput, RUN_SPEED, type SimEvent } from '../sim/types';
 
@@ -191,8 +191,8 @@ export class SelfMotionPredictor {
     this.deps = {
       seed,
       moveSpeedMult: (e) => moveSpeedMult(e, 0),
-      resolveMove: (fromX, fromZ, nx, nz, r, _e, ignoreFences) =>
-        resolveMovement(seed, fromX, fromZ, nx, nz, r, ignoreFences),
+      resolveMove: (fromX, fromZ, nx, nz, r, e, ignoreFences) =>
+        resolveMovement(seed, fromX, fromZ, nx, nz, r, ignoreFences, undefined, moverHeight(e)),
       resolvedAbility: () => null,
       cancelCast: () => {},
       standUp: () => {},

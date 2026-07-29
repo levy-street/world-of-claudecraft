@@ -47,7 +47,7 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: '초원의 달인', desc: '약초 채집 숙련도 100을 달성하십시오.' },
   prog_master_gatherer: {
     name: '채집의 대가',
-    desc: '채광, 벌목, 약초 채집 숙련도를 모두 100까지 올리십시오.',
+    desc: '채광, 벌목, 약초 채집, 낚시 중 세 가지 이상에서 숙련도 100을 달성하십시오.',
   },
   prog_first_craft: { name: '손수 만든 물건', desc: '첫 제작을 성공적으로 완료하십시오.' },
   prog_craft_specialist: {
@@ -388,7 +388,10 @@ export const table: DeedLocaleTable = {
     name: '단골 손님',
     desc: '병참장교 벡스의 취급 물품 열 가지를 모두 발견하십시오.',
   },
-  col_glimmerfin: { name: '희망의 반짝임', desc: '반짝이는 지느러미 코이를 낚으십시오.' },
+  col_glimmerfin: {
+    name: '희망의 반짝임',
+    desc: '윤슬 코이를 낚으십시오.',
+  },
   col_full_creel: {
     name: '가득 찬 어망',
     desc: '골짜기, 습지, 고지의 물에서 나는 여섯 가지 흔한 어획물을 모두 발견하십시오.',
@@ -546,7 +549,15 @@ export const table: DeedLocaleTable = {
     title: '길손',
   },
   exp_something_shiny: { name: '반짝이는 무언가', desc: '땅에 떨어진 반짝이는 물건을 주우십시오.' },
-  exp_first_ore: { name: '땅을 내리쳐라', desc: '처음으로 광맥을 캐내십시오.' },
+  prog_guildsworn: {
+    name: '기예에 맹세한 자',
+    desc: '원형 쌍에 조율하고 그 두 직업에 본격적으로 발을 들이십시오.',
+    title: '기예에 맹세한 자',
+  },
+  exp_first_ore: {
+    name: '곡괭이가 돌을 만나다',
+    desc: '처음으로 광맥을 캐내십시오.',
+  },
   exp_first_timber: { name: '나무 넘어간다!', desc: '처음으로 나무를 베어 목재를 거두십시오.' },
   exp_first_herb: { name: '약초 캐는 손', desc: '처음으로 약초를 캐십시오.' },
   feat_era_cap: { name: '제1시대의 아이', desc: '제1시대가 이어지는 동안 레벨 20을 달성했습니다.' },
@@ -606,5 +617,115 @@ export const table: DeedLocaleTable = {
   chr_marsh_first_cast: {
     name: '갈대밭의 뱀장어',
     desc: '마이어펜 습지의 물에서 물고기 한 마리를 낚으십시오.',
+  },
+  prog_masterwright: {
+    name: '걸작 장인',
+    desc: '첫 걸작을 제작하십시오. 온 구역이 그 소문을 듣게 될 만큼 훌륭한 작품입니다.',
+    title: '걸작 장인',
+  },
+  prog_fishing_100: {
+    name: '바다의 노인',
+    desc: '낚시 숙련도 100을 달성하십시오.',
+  },
+  prog_master_angler: {
+    name: '낚시의 달인',
+    desc: '낚시 숙련도 200을 달성하여 낚시꾼 기예의 정점에 오르십시오.',
+    title: '낚시의 달인',
+  },
+  prog_engineering_50: {
+    name: '톱니와 태엽',
+    desc: '기계공학 기술 50을 달성하십시오.',
+  },
+  prog_alchemy_50: {
+    name: '수상한 혼합물',
+    desc: '연금술 기술 50을 달성하십시오.',
+  },
+  prog_cooking_50: {
+    name: '손맛 든 요리사',
+    desc: '요리 기술 50을 달성하십시오.',
+  },
+  prog_leatherworking_50: {
+    name: '무두장이의 생업',
+    desc: '가죽세공 기술 50을 달성하십시오.',
+  },
+  prog_tailoring_50: {
+    name: '반듯한 솔기',
+    desc: '재봉 기술 50을 달성하십시오.',
+  },
+  prog_enchanting_50: {
+    name: '비전의 첫 빛',
+    desc: '마법부여 기술 50을 달성하십시오.',
+  },
+  prog_weaponcrafting_50: {
+    name: '날과 담금질',
+    desc: '무기 제작 기술 50을 달성하십시오.',
+  },
+  prog_armorcrafting_50: {
+    name: '망치와 철판',
+    desc: '방어구 제작 기술 50을 달성하십시오.',
+  },
+  prog_grandmaster_engineering: {
+    name: '기계공학 대가',
+    desc: '기계공학 기술 125를 달성하여 그 기예의 정점에 오르십시오.',
+    title: '기계공학 대가',
+  },
+  prog_grandmaster_alchemy: {
+    name: '연금술 대가',
+    desc: '연금술 기술 125를 달성하여 그 기예의 정점에 오르십시오.',
+    title: '연금술 대가',
+  },
+  prog_grandmaster_cooking: {
+    name: '요리 대가',
+    desc: '요리 기술 125를 달성하여 그 기예의 정점에 오르십시오.',
+    title: '요리 대가',
+  },
+  prog_grandmaster_leatherworking: {
+    name: '가죽세공 대가',
+    desc: '가죽세공 기술 125를 달성하여 그 기예의 정점에 오르십시오.',
+    title: '가죽세공 대가',
+  },
+  prog_grandmaster_tailoring: {
+    name: '재봉 대가',
+    desc: '재봉 기술 125를 달성하여 그 기예의 정점에 오르십시오.',
+    title: '재봉 대가',
+  },
+  prog_grandmaster_enchanting: {
+    name: '마법부여 대가',
+    desc: '마법부여 기술 125를 달성하여 그 기예의 정점에 오르십시오.',
+    title: '마법부여 대가',
+  },
+  prog_grandmaster_weaponcrafting: {
+    name: '무기 제작 대가',
+    desc: '무기 제작 기술 125를 달성하여 그 기예의 정점에 오르십시오.',
+    title: '무기 제작 대가',
+  },
+  prog_grandmaster_armorcrafting: {
+    name: '방어구 제작 대가',
+    desc: '방어구 제작 기술 125를 달성하여 그 기예의 정점에 오르십시오.',
+    title: '방어구 제작 대가',
+  },
+  col_pristine_vein: {
+    name: '순수한 광맥',
+    desc: '순수한 광맥을 깨뜨려 그 소식이 온 구역에 울려 퍼지게 하십시오.',
+  },
+  col_ancient_heartwood: {
+    name: '고대 심목',
+    desc: '쓰러진 나무 군락에서 고대 심목 한 조각을 끌어내십시오.',
+  },
+  col_moonlit_bloom: {
+    name: '달빛 꽃',
+    desc: '달빛 꽃이 막 피어나는 그 순간에 채집하십시오.',
+  },
+  col_perfect_specimen: {
+    name: '완벽한 표본',
+    desc: '수확한 짐승에게서 흠집 하나 없는 완벽한 표본을 취하십시오.',
+  },
+  soc_first_salvage: {
+    name: '버릴 것이 없다',
+    desc: '장비 한 점을 분해하여 원재료로 되돌리십시오.',
+  },
+  soc_salvage_50: {
+    name: '해체의 마당',
+    desc: '장비 50점을 분해하여 원재료로 되돌리십시오.',
   },
 };

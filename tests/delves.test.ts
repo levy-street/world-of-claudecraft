@@ -177,19 +177,15 @@ describe('delve spatial band', () => {
     expect(isDelvePos(ARENA_X)).toBe(false);
   });
 
-  it('pins the delve boundary against the arena and Orkadia seams (relocation regression)', () => {
+  it('pins the delve boundary against the arena seam (relocation regression)', () => {
     // DELVE_X_MIN moved 3600 -> 4800 when v0.10.0 pushed the arena to x=4200,
     // and the whole instance plane moved east by INSTANCE_X_BASE when the
     // world went grid (stage 2). Pin the load-bearing offset and the exact
-    // arena/dungeon/delve seams so a respacing that re-introduces overlap fails here.
+    // arena/delve seam so a respacing that re-introduces overlap fails here.
     expect(DELVE_X_MIN).toBe(INSTANCE_X_BASE + 4800);
-    // Three regions sit west of the delve band: the tight arena column (ARENA_X),
-    // the Orkadia dungeon slot (index 6, past the arena), then the delve band. The
-    // x just below the delve band is the Orkadia slot, NOT the arena, so the arena
-    // band no longer stretches across the whole gap (that was the pitch-black-room bug).
-    expect(isArenaPos(DELVE_BAND_X_MIN - 1)).toBe(false);
+    // The seam: DELVE_BAND_X_MIN is the first delve x; the x just below it is arena.
+    expect(isArenaPos(DELVE_BAND_X_MIN - 1)).toBe(true);
     expect(isDelvePos(DELVE_BAND_X_MIN - 1)).toBe(false);
-    expect(dungeonAt(DELVE_BAND_X_MIN - 1)?.interior).toBe('orkadia');
     expect(isDelvePos(DELVE_BAND_X_MIN)).toBe(true);
     expect(isArenaPos(DELVE_BAND_X_MIN)).toBe(false);
     // Keep a real gap between the arena anchor and the delve band.

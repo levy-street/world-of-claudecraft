@@ -94,7 +94,7 @@ export const table: DeedLocaleTable = {
   },
   prog_master_gatherer: {
     name: 'Maître récolteur',
-    desc: 'Atteignez 100 points de maîtrise en Minage, en Bûcheronnage et en Herboristerie.',
+    desc: 'Atteignez 100 points de maîtrise dans trois quelconques des métiers Minage, Bûcheronnage, Herboristerie et Pêche.',
   },
   prog_first_craft: { name: 'Fait main', desc: 'Réussissez votre première fabrication.' },
   prog_craft_specialist: {
@@ -458,7 +458,7 @@ export const table: DeedLocaleTable = {
   },
   col_glimmerfin: {
     name: "Une lueur d'espoir",
-    desc: 'Pêcher un Koï aux nageoires scintillantes.',
+    desc: 'Pêcher un Koi solaire.',
   },
   col_full_creel: {
     name: 'Bourriche pleine',
@@ -657,7 +657,7 @@ export const table: DeedLocaleTable = {
     desc: 'Ramassez un objet scintillant sur le sol.',
   },
   exp_first_ore: {
-    name: 'Premier coup de pioche',
+    name: 'La pioche et la roche',
     desc: 'Récoltez votre premier filon de minerai.',
   },
   exp_first_timber: { name: 'Ça va tomber !', desc: 'Récoltez votre première coupe de bois.' },
@@ -731,6 +731,121 @@ export const table: DeedLocaleTable = {
   chr_marsh_first_cast: {
     name: 'Des anguilles dans les roseaux',
     desc: 'Pêcher un poisson dans les eaux du Marais de Mirefen.',
+  },
+  prog_guildsworn: {
+    name: 'Juré-métier',
+    desc: "Harmonisez-vous à une paire d'archétype et embrassez sérieusement ses métiers.",
+    title: 'Juré-métier',
+  },
+  prog_masterwright: {
+    name: 'Maître-artisan',
+    desc: "Fabriquez votre premier chef-d'oeuvre, une pièce si belle que toute la zone en entend parler.",
+    title: 'Maître-artisan',
+  },
+  prog_fishing_100: {
+    name: 'Vieux Sel',
+    desc: 'Atteignez 100 points de maîtrise en Pêche.',
+  },
+  prog_master_angler: {
+    name: 'Grand Pêcheur',
+    desc: "Atteignez 200 points de maîtrise en Pêche, le sommet absolu de l'art du pêcheur.",
+    title: 'Grand Pêcheur',
+  },
+  prog_engineering_50: {
+    name: 'Rouages et Ressorts',
+    desc: 'Atteignez 50 points de compétence en Ingénierie.',
+  },
+  prog_alchemy_50: {
+    name: 'Étranges Préparations',
+    desc: 'Atteignez 50 points de compétence en Alchimie.',
+  },
+  prog_cooking_50: {
+    name: 'Chef aguerri',
+    desc: 'Atteignez 50 points de compétence en Cuisine.',
+  },
+  prog_leatherworking_50: {
+    name: "L'Art du tanneur",
+    desc: 'Atteignez 50 points de compétence en Travail du cuir.',
+  },
+  prog_tailoring_50: {
+    name: 'Une belle couture',
+    desc: 'Atteignez 50 points de compétence en Couture.',
+  },
+  prog_enchanting_50: {
+    name: "Une lueur d'arcane",
+    desc: 'Atteignez 50 points de compétence en Enchantement.',
+  },
+  prog_weaponcrafting_50: {
+    name: 'Tranchant et Trempe',
+    desc: "Atteignez 50 points de compétence en Fabrication d'armes.",
+  },
+  prog_armorcrafting_50: {
+    name: 'Marteau et Plaque',
+    desc: "Atteignez 50 points de compétence en Fabrication d'armures.",
+  },
+  prog_grandmaster_engineering: {
+    name: 'Grand Maître Ingénierie',
+    desc: 'Atteignez 125 points de compétence en Ingénierie, le sommet absolu du métier.',
+    title: 'Grand Maître Ingénierie',
+  },
+  prog_grandmaster_alchemy: {
+    name: 'Grand Maître Alchimie',
+    desc: 'Atteignez 125 points de compétence en Alchimie, le sommet absolu du métier.',
+    title: 'Grand Maître Alchimie',
+  },
+  prog_grandmaster_cooking: {
+    name: 'Grand Maître Cuisine',
+    desc: 'Atteignez 125 points de compétence en Cuisine, le sommet absolu du métier.',
+    title: 'Grand Maître Cuisine',
+  },
+  prog_grandmaster_leatherworking: {
+    name: 'Grand Maître Travail du cuir',
+    desc: 'Atteignez 125 points de compétence en Travail du cuir, le sommet absolu du métier.',
+    title: 'Grand Maître Travail du cuir',
+  },
+  prog_grandmaster_tailoring: {
+    name: 'Grand Maître Couture',
+    desc: 'Atteignez 125 points de compétence en Couture, le sommet absolu du métier.',
+    title: 'Grand Maître Couture',
+  },
+  prog_grandmaster_enchanting: {
+    name: 'Grand Maître Enchantement',
+    desc: 'Atteignez 125 points de compétence en Enchantement, le sommet absolu du métier.',
+    title: 'Grand Maître Enchantement',
+  },
+  prog_grandmaster_weaponcrafting: {
+    name: "Grand Maître Fabrication d'armes",
+    desc: "Atteignez 125 points de compétence en Fabrication d'armes, le sommet absolu du métier.",
+    title: "Grand Maître Fabrication d'armes",
+  },
+  prog_grandmaster_armorcrafting: {
+    name: "Grand Maître Fabrication d'armures",
+    desc: "Atteignez 125 points de compétence en Fabrication d'armures, le sommet absolu du métier.",
+    title: "Grand Maître Fabrication d'armures",
+  },
+  col_pristine_vein: {
+    name: 'Veine vierge',
+    desc: "Brisez une veine vierge et laissez toute la zone l'apprendre.",
+  },
+  col_ancient_heartwood: {
+    name: 'Bois de coeur ancien',
+    desc: "Tirez une longueur de bois de coeur ancien d'un bouquet abattu.",
+  },
+  col_moonlit_bloom: {
+    name: 'Floraison au clair de lune',
+    desc: "Cueillez une floraison au clair de lune au moment precis ou elle s'ouvre.",
+  },
+  col_perfect_specimen: {
+    name: 'Un spécimen parfait',
+    desc: 'Prélevez un spécimen parfait sur une bête récoltée, sans la moindre entaille ni imperfection.',
+  },
+  soc_first_salvage: {
+    name: 'Rien ne se perd',
+    desc: "Récupérez une pièce d'équipement pour en extraire les matériaux bruts.",
+  },
+  soc_salvage_50: {
+    name: 'La Casse du démolisseur',
+    desc: "Récupérez 50 pièces d'équipement pour en extraire les matériaux bruts.",
   },
 };
 

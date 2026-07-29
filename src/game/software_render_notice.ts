@@ -9,8 +9,20 @@ import { gfxSoftwareRendering } from '../render/gfx';
 import { probeMajorPerformanceCaveat } from '../render/software_renderer';
 import { initGpuNotice } from '../ui/gpu_notice_toast';
 
+// Whether the boot-time notice was actually DISPLAYED this session, recorded
+// so the perf-nudge assembler (perf_nudge.ts) can suppress its redundant
+// software arm (packet 0 ruling R16). False until initSoftwareRenderNotice
+// runs, and false when the notice stayed hidden (hardware session, or a
+// previously persisted dismissal).
+let noticeShown = false;
+
 /** Call AFTER the Renderer is constructed (initGfxTier has resolved by then). */
 export function initSoftwareRenderNotice(desktopShell: boolean): void {
   const softwareRendering = gfxSoftwareRendering() || probeMajorPerformanceCaveat() === true;
-  initGpuNotice({ softwareRendering, desktopShell });
+  noticeShown = initGpuNotice({ softwareRendering, desktopShell }) === true;
+}
+
+/** True when the boot-time software-rendering notice showed this session. */
+export function softwareNoticeShown(): boolean {
+  return noticeShown;
 }

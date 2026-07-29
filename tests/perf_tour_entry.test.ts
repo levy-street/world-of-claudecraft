@@ -6,7 +6,7 @@ import { perfTourEntryOptions } from '../scripts/perf_tour_entry_options.mjs';
 
 interface FakePageState {
   mobilePreflightClicks: number;
-  welcomeClicks: number;
+  startOfflineClicks: number;
   selectorWaits: Array<{ selector: string; options: object }>;
   functionWaits: object[];
 }
@@ -20,7 +20,6 @@ function entryDom(): void {
     <input id="char-name">
     <button id="btn-start-offline"></button>
     <button id="mobile-preflight-continue"></button>
-    <button id="ws-continue"></button>
     <div id="ui"></div>
   `;
 }
@@ -28,15 +27,15 @@ function entryDom(): void {
 function fakePage(bootSucceeds = true): { page: object; state: FakePageState } {
   const state: FakePageState = {
     mobilePreflightClicks: 0,
-    welcomeClicks: 0,
+    startOfflineClicks: 0,
     selectorWaits: [],
     functionWaits: [],
   };
   document.querySelector('#mobile-preflight-continue')?.addEventListener('click', () => {
     state.mobilePreflightClicks++;
   });
-  document.querySelector('#ws-continue')?.addEventListener('click', () => {
-    state.welcomeClicks++;
+  document.querySelector('#btn-start-offline')?.addEventListener('click', () => {
+    state.startOfflineClicks++;
     if (bootSucceeds) {
       (window as unknown as { __game?: object }).__game = { sim: { player: { id: 1 } } };
     }
@@ -82,7 +81,7 @@ describe('performance tour entry options', () => {
 });
 
 describe('shared offline entry helper', () => {
-  it('uses caller timeouts, clicks both gates, and reports a successful boot', async () => {
+  it('uses caller timeouts, clicks the mobile gate, and reports a successful boot', async () => {
     entryDom();
     const { page, state } = fakePage();
 
@@ -97,13 +96,9 @@ describe('shared offline entry helper', () => {
       selector: '#mobile-preflight-continue',
       options: { visible: true, timeout: 30_000 },
     });
-    expect(state.selectorWaits).toContainEqual({
-      selector: '#ws-continue:not([disabled])',
-      options: { visible: true, timeout: 5000 },
-    });
     expect(state.functionWaits).toEqual([{ timeout: 120_000 }]);
     expect(state.mobilePreflightClicks).toBe(1);
-    expect(state.welcomeClicks).toBe(1);
+    expect(state.startOfflineClicks).toBe(1);
     expect(gameBooted).toBe(true);
 
     delete (window as unknown as { __game?: object }).__game;

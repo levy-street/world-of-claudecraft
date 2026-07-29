@@ -204,4 +204,71 @@ describe('arena: online integration (GameServer)', () => {
     expect(victorSave?.[2].honor).toBe(RANKED_ARENA_WIN_HONOR['1v1']);
     expect(victorSave?.[2].lifetimeHonor).toBe(RANKED_ARENA_WIN_HONOR['1v1']);
   });
+
+  // Regression coverage for the stale Arena window: ARENA_WIRE_HZ throttles the
+  // `arena` self key to once per 200 ticks (10s), a real perf fix (#940) for the
+  // uncached arenaLadder() sort. A queue join/leave must still surface on the
+  // very next snapshot rather than waiting out that window, or the window keeps
+  // showing "Queue" after the player already queued (and vice versa on leave).
+  function snapsWithArenaKey(fc: FakeClient, fromIndex: number): any[] {
+    return fc.sent
+      .slice(fromIndex)
+      .filter((msg: any) => msg.t === 'snap' && Object.hasOwn(msg.self, 'arena'));
+  }
+
+  it('refreshes the arena self key on the very next tick after arena_queue/arena_leave, not after the 10s throttle', () => {
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 40, 'Quick', 'warrior');
+    teleport(server.sim, session.pid, 0, -40);
+
+    // A fresh join always ships arena on its first snapshot (lastArenaWireTick
+    // starts negative); consume that grace before probing the steady-state gate.
+    advance(server);
+    const first = lastSnap(fc);
+    expect(first.self.arena).toBeTruthy();
+    expect(first.self.arena.queued).toBe(false);
+
+    const beforeQueue = fc.sent.length;
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'arena_queue', format: '1v1' }));
+    advance(server); // a single tick: far short of the 200-tick (10s) throttle window
+    const queueUpdates = snapsWithArenaKey(fc, beforeQueue);
+    expect(queueUpdates.length).toBeGreaterThan(0);
+    expect(queueUpdates[queueUpdates.length - 1].self.arena.queued).toBe(true);
+
+    const beforeLeave = fc.sent.length;
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'arena_leave' }));
+    advance(server);
+    const leaveUpdates = snapsWithArenaKey(fc, beforeLeave);
+    expect(leaveUpdates.length).toBeGreaterThan(0);
+    expect(leaveUpdates[leaveUpdates.length - 1].self.arena.queued).toBe(false);
+  });
+
+  it('refreshes the arena self key on the very next tick after a match concludes (arenaEnd), not after the 10s throttle', async () => {
+    const fcA = fakeWs();
+    const fcB = fakeWs();
+    const sa = joinServer(server, fcA, 41, 'Loser', 'warrior');
+    const sb = joinServer(server, fcB, 42, 'Winner', 'mage');
+    teleport(server.sim, sa.pid, 0, -40);
+    teleport(server.sim, sb.pid, 4, -40);
+    server.handleMessage(sa, JSON.stringify({ t: 'cmd', cmd: 'arena_queue' }));
+    server.handleMessage(sb, JSON.stringify({ t: 'cmd', cmd: 'arena_queue' }));
+    for (let i = 0; i < 20 * 6; i++) advance(server);
+    expect(server.sim.arenaMatchFor(sa.pid)?.state).toBe('active');
+
+    // Run well past the throttle window so lastArenaWireTick sits in a settled
+    // steady state (not still inside the queue command's own forced-fresh grace).
+    for (let i = 0; i < 200; i++) advance(server);
+    const priorArenaSnaps = snapsWithArenaKey(fcB, 0);
+    const ratingBefore =
+      priorArenaSnaps[priorArenaSnaps.length - 1].self.arena.standings['1v1'].rating;
+
+    const before = fcB.sent.length;
+    await server.leave(sa, 'disconnect'); // forfeit win for sb: sim.arenaResolveDesertion emits arenaEnd
+    advance(server); // one tick later: routes the arenaEnd event, then broadcasts
+
+    const updates = snapsWithArenaKey(fcB, before);
+    expect(updates.length).toBeGreaterThan(0);
+    const updated = updates[updates.length - 1].self.arena;
+    expect(updated.standings['1v1'].rating).toBeGreaterThan(ratingBefore);
+  });
 });

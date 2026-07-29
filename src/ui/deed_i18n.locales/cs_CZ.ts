@@ -75,7 +75,7 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: 'Mistr lučin', desc: 'Dosáhni zdatnosti 100 v bylinkářství.' },
   prog_master_gatherer: {
     name: 'Mistr sběrač',
-    desc: 'Dosáhni zdatnosti 100 v hornictví, dřevorubectví a bylinkářství.',
+    desc: 'Dosáhni zdatnosti 100 ve třech z Hornictví, Dřevorubectví, Bylinkářství a Rybaření.',
   },
   prog_first_craft: { name: 'Vlastníma rukama', desc: 'Dokonči svou první úspěšnou výrobu.' },
   prog_craft_specialist: {
@@ -416,7 +416,10 @@ export const table: DeedLocaleTable = {
     name: 'Věrný zákazník',
     desc: 'Objev všech deset kusů z nabídky Zásobovače Vexe.',
   },
-  col_glimmerfin: { name: 'Třpyt naděje', desc: 'Chyť Koi se třpytivou ploutví.' },
+  col_glimmerfin: {
+    name: 'Třpyt naděje',
+    desc: 'Chyť Slunolesklého koi.',
+  },
   col_full_creel: {
     name: 'Plný košík',
     desc: 'Objev všech šest běžných úlovků z vod Údolí, Močálu a Výšin.',
@@ -589,7 +592,10 @@ export const table: DeedLocaleTable = {
     title: 'Pocestný',
   },
   exp_something_shiny: { name: 'Něco se třpytí', desc: 'Seber ze země třpytící se předmět.' },
-  exp_first_ore: { name: 'Udeř do země', desc: 'Skliď své první naleziště rudy.' },
+  exp_first_ore: {
+    name: 'Krumpáč potkal rudu',
+    desc: 'Skliď své první naleziště rudy.',
+  },
   exp_first_timber: { name: 'Pozor, padá!', desc: 'Skliď své první naleziště dřeva.' },
   exp_first_herb: { name: 'Zelené prsty', desc: 'Skliď své první naleziště bylin.' },
   feat_era_cap: {
@@ -658,5 +664,120 @@ export const table: DeedLocaleTable = {
   chr_marsh_first_cast: {
     name: 'Úhoři v rákosí',
     desc: 'Chyť rybu ve vodách Mirefenského močálu.',
+  },
+  prog_guildsworn: {
+    name: 'Přísežný řemeslu',
+    desc: 'Nalaď se na archetyp pár a ujmi se jeho řemesel doopravdy.',
+    title: 'Přísežný řemeslu',
+  },
+  prog_masterwright: {
+    name: 'Mistr díla',
+    desc: 'Vytvoř své první mistrovské dílo, kus tak dokonalý, že o tom uslyší celá zóna.',
+    title: 'Mistr řemeslník',
+  },
+  prog_fishing_100: {
+    name: 'Starý Solanář',
+    desc: 'Dosáhni zdatnosti 100 v rybaření.',
+  },
+  prog_master_angler: {
+    name: 'Mistrný rybář',
+    desc: 'Dosáhni zdatnosti 200 v rybaření, samotný vrchol rybářského umění.',
+    title: 'Mistrný rybář',
+  },
+  prog_engineering_50: {
+    name: 'Ozubená kola a pérka',
+    desc: 'Dosáhni dovednosti 50 ve strojírenství.',
+  },
+  prog_alchemy_50: {
+    name: 'Podivné lektvary',
+    desc: 'Dosáhni dovednosti 50 v alchymii.',
+  },
+  prog_cooking_50: {
+    name: 'Zkušený kuchař',
+    desc: 'Dosáhni dovednosti 50 ve vaření.',
+  },
+  prog_leatherworking_50: {
+    name: 'Řemeslo koželuha',
+    desc: 'Dosáhni dovednosti 50 v kožedělnictví.',
+  },
+  prog_tailoring_50: {
+    name: 'Jemný šev',
+    desc: 'Dosáhni dovednosti 50 v krejčovství.',
+  },
+  prog_enchanting_50: {
+    name: 'Záblesk arkanismu',
+    desc: 'Dosáhni dovednosti 50 v okouzlování.',
+  },
+  prog_weaponcrafting_50: {
+    name: 'Ostří a temperování',
+    desc: 'Dosáhni dovednosti 50 v kovářství zbraní.',
+  },
+  prog_armorcrafting_50: {
+    name: 'Kladivo a plát',
+    desc: 'Dosáhni dovednosti 50 ve zbrojnictví.',
+  },
+  prog_grandmaster_engineering: {
+    name: 'Velmistr strojírenství',
+    desc: 'Dosáhni dovednosti 125 ve strojírenství, samotného vrcholu řemesla.',
+    title: 'Velmistr strojírenství',
+  },
+  prog_grandmaster_alchemy: {
+    name: 'Velmistr alchymie',
+    desc: 'Dosáhni dovednosti 125 v alchymii, samotného vrcholu řemesla.',
+    title: 'Velmistr alchymie',
+  },
+  prog_grandmaster_cooking: {
+    name: 'Velmistr vaření',
+    desc: 'Dosáhni dovednosti 125 ve vaření, samotného vrcholu řemesla.',
+    title: 'Velmistr vaření',
+  },
+  prog_grandmaster_leatherworking: {
+    name: 'Velmistr kožedělnictví',
+    desc: 'Dosáhni dovednosti 125 v kožedělnictví, samotného vrcholu řemesla.',
+    title: 'Velmistr kožedělnictví',
+  },
+  prog_grandmaster_tailoring: {
+    name: 'Velmistr krejčovství',
+    desc: 'Dosáhni dovednosti 125 v krejčovství, samotného vrcholu řemesla.',
+    title: 'Velmistr krejčovství',
+  },
+  prog_grandmaster_enchanting: {
+    name: 'Velmistr okouzlování',
+    desc: 'Dosáhni dovednosti 125 v okouzlování, samotného vrcholu řemesla.',
+    title: 'Velmistr okouzlování',
+  },
+  prog_grandmaster_weaponcrafting: {
+    name: 'Velmistr kovářství zbraní',
+    desc: 'Dosáhni dovednosti 125 v kovářství zbraní, samotného vrcholu řemesla.',
+    title: 'Velmistr kovářství zbraní',
+  },
+  prog_grandmaster_armorcrafting: {
+    name: 'Velmistr zbrojnictví',
+    desc: 'Dosáhni dovednosti 125 ve zbrojnictví, samotného vrcholu řemesla.',
+    title: 'Velmistr zbrojnictví',
+  },
+  col_pristine_vein: {
+    name: 'Nedotčená rudná žíla',
+    desc: 'Rozlom nedotčenou rudnou žílu a nech celou zónu, aby se o tom doslechla.',
+  },
+  col_ancient_heartwood: {
+    name: 'Prastaré jádrové dřevo',
+    desc: 'Vytěž délku prastarého jádrového dřeva z pokáceného porostu.',
+  },
+  col_moonlit_bloom: {
+    name: 'Měsíční květ',
+    desc: 'Sklid měsíční květ v okamžiku, kdy se právě rozevírá.',
+  },
+  col_perfect_specimen: {
+    name: 'Dokonalý exemplář',
+    desc: 'Získej dokonalý exemplář ze sklizeného těla zvěře, bez jediné rány ani poskvrny.',
+  },
+  soc_first_salvage: {
+    name: 'Nic nepřijde nazmar',
+    desc: 'Rozeber kus výstroje zpět na základní materiály.',
+  },
+  soc_salvage_50: {
+    name: 'Burza vrakovišť',
+    desc: 'Rozeber 50 kusů výstroje zpět na základní materiály.',
   },
 };

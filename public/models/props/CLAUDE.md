@@ -9,12 +9,12 @@ Buildings, market stalls, graves, rocks, and other overworld/delve decoration
 
 ## Size budget
 
-Category average as of this writing: **~70 KB** (39 pre-existing files,
-~2.7 MB total). Keep new additions in the 40-100 KB range; a hero landmark
+Category average as of this writing: **~72.5 KiB** (83 files,
+6,164,317 bytes / 5.879 MiB total). Keep new additions in the 40-100 KB range; a hero landmark
 prop (a house, a dungeon entrance) can run larger, but a small standalone
 decoration (a gravestone, a crate) should land well under the average. The
-mailbox/grave/wall/crate additions land at 83-115 KB, a bit above that range:
-see the compression note below for why.
+procedural Ravenpost mailbox is 32,884 bytes and the Eastbrook noticeboard is
+24,684 bytes; older grave/wall/crate additions remain 83-115 KB.
 
 ## Compression pipeline
 
@@ -29,8 +29,8 @@ npx gltf-transform optimize <in>.glb <out>.glb \
   --texture-compress webp --compress meshopt
 ```
 
-The mailbox/grave/wall/crate additions landed at 83-115 KB from raw ~15 MB
-Tripo exports. Meshopt is less space-efficient than Draco on these meshes,
+The grave/wall/crate additions landed at 83-115 KB from raw ~15 MB Tripo
+exports. Meshopt is less space-efficient than Draco on these meshes,
 which is why these land above the category average; iterate `--texture-size`
 down first if a future addition needs to land smaller before accepting a size
 above budget.
@@ -52,10 +52,14 @@ Any file dropped here is picked up automatically by
   regardless of graphics tier (see the P0 note above `preloadPropKeys`),
   guarded by `tests/render_asset_preload.test.ts`.
 - The mailbox pillar (`src/render/mailbox.ts`): `buildMailboxPillar()`
-  prefers the GLB (preloaded via `loadGltf()`/`registerPreload()`) and falls
-  back to the original procedural carved-stone-and-timber build; either path
-  attaches the same "unread mail" votive glow child (`group.userData.mailGlow`,
-  toggled by the renderer from `IWorld.mailUnread`).
+  prefers the deterministic Eastbrook GLB (preloaded via
+  `loadGltf()`/`registerPreload()`), binds the shared Eastbrook atlas, and
+  falls back to a matching procedural silhouette; either path attaches the
+  same "unread mail" votive glow child (`group.userData.mailGlow`, toggled by
+  the renderer from `IWorld.mailUnread`).
+- The Eastbrook noticeboard (`src/render/noticeboard.ts`) uses the same
+  immutable-template and shared-atlas contract, with a two-material
+  procedural fallback and tier-independent preload.
 - Standalone delve props (`src/render/delve_props.ts`): `STANDALONE_PROP_URL`
   lists the cracked-grave/destructible-wall/fallback-crate GLBs;
   `buildStandaloneGlb()` clones the preloaded scene, normalizes it to the

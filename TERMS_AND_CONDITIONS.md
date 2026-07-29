@@ -2,7 +2,7 @@
 
 **World of ClaudeCraft**
 
-Last updated: 21 June 2026
+Last updated: 22 July 2026
 
 ## 1. Who we are and what these terms cover
 
@@ -22,7 +22,11 @@ You must be at least 13 years old to use the Service, or older where your countr
 
 We grant you a limited, personal, non-exclusive, non-transferable, revocable licence to access and play the Game for your own non-commercial entertainment, subject to these Terms.
 
-The Game's source code is published in a public repository for viewing only. All rights in the source code are reserved. Making the repository publicly viewable does not grant you any licence or right to use, copy, modify, distribute, or create derivative works from the code, for commercial or non-commercial purposes, except with our prior written permission. These Terms govern your use of the hosted Service we operate, which is separate from any rights in the code.
+The Game's source code is published in a public repository and is licensed to you under the MIT Licence, the full text of which is in the `LICENSE` file in that repository. Nothing in these Terms limits, reduces, or conditions the rights the MIT Licence grants you in that source code. These Terms govern your use of the hosted Service we operate, which is separate from your rights in the code.
+
+The MIT Licence covers source code only. Art, audio, fonts, and other media assets in the repository are not covered by it. Each of those assets is governed by the licence recorded against it in `CREDITS.md`, and that recorded licence controls over the MIT Licence. Some of them may not be redistributed at all, and some may be redistributed only on non-commercial terms. A media asset that is not recorded in `CREDITS.md` is not licensed to you either, because that register is still being completed. Read `CREDITS.md` before you redistribute the repository or use any asset from it, and ask us if something is not listed.
+
+The "World of ClaudeCraft" and "Levy Street" names, logos, and branding are not licensed by the MIT Licence or by these Terms.
 
 ## 5. Accounts
 
@@ -80,7 +84,7 @@ The Service links to and relies on third-party services, including GitHub, Ko-fi
 
 World of ClaudeCraft is an independent, community project. It is not affiliated with, endorsed by, sponsored by, or associated with any third-party company, game, product, or brand. All third-party names, marks, and trademarks are the property of their respective owners. Any such names that appear are used only descriptively and do not imply any association.
 
-Except for your User Content, the Service and the source code, including their original content, features, design, and branding, are owned by us or our licensors and are protected by intellectual property laws. You may not copy, distribute, or create derivative works from the Service or the source code except as these Terms expressly allow or with our prior written permission.
+Except for your User Content, the Service, including its original content, features, design, media assets, and branding, is owned by us or our licensors and is protected by intellectual property laws. You may not copy, distribute, or create derivative works from the Service, from the media assets described in Section 4, or from our names, logos, and branding, except as these Terms or the licence recorded in `CREDITS.md` expressly allows, or with our prior written permission. Your rights in the source code are governed by the MIT Licence as described in Section 4, and this Section does not restrict them.
 
 If you believe content on the Service infringes your intellectual property, contact us using Section 22 with enough detail to identify the work and the allegedly infringing material, and we will respond appropriately.
 

@@ -112,6 +112,7 @@ function makeCtx() {
     get players() {
       return players;
     },
+    stationPlacements: [],
     get cfg() {
       return cfg;
     },
@@ -311,6 +312,9 @@ function makeCtx() {
     // delveDetectMult stubbed above (C1/M2/C3) - deduped here.
     partyMembersForKey: vi.fn(() => []),
     addItem: vi.fn(),
+    equipBag: vi.fn(),
+    equipItem: vi.fn(),
+    unequipItem: vi.fn(),
     addItemInstance: vi.fn(),
     // removeItem stubbed above (P1b inventory-hub helper) - deduped.
     spawnBossAdds: vi.fn(),
@@ -344,6 +348,7 @@ function makeCtx() {
     startAutoAttack: vi.fn(),
     revivePet: vi.fn(),
     completeFishing: vi.fn(),
+    completeGatherCast: vi.fn(),
     applyDemonHealTick: vi.fn(),
     awardCombo: vi.fn(),
     meleeSwing: vi.fn(() => false),

@@ -126,7 +126,9 @@ describe('reviewed localization semantics', () => {
       copper: 'Copper Ore',
       iron: 'Iron Ore',
       log: 'Ironbark Log',
-      herb: 'Silverleaf Herb',
+      // The release renamed the herb's display name (Sheenleaf); the id and
+      // its slot are unchanged, which is what this shift guard pins.
+      herb: 'Sheenleaf Herb',
     });
   });
 

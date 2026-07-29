@@ -46,7 +46,7 @@ export const pl_PL: AdminTranslations = {
   "stats.peakOnline": "szczyt online",
   "stats.peakOnlineToday": "szczyt online 24h",
   "stats.peakOnlineAllTime": "szczyt online wszech czasów",
-  "stats.playersCap": "player cap",
+  "stats.playersCap": "limit graczy",
   "stats.accounts": "konta",
   "stats.characters": "postacie",
   "stats.newAccounts24h": "nowe konta 24 godz.",

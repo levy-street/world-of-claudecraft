@@ -159,10 +159,16 @@ export interface ActionBarPlayerInput {
    *  next_cast_free) that drives the slot glow and usable state, the kill-window
    *  gate, and the next-cast empowerment read. Both worlds expose the live aura
    *  list. */
-  /** Live charge counts on the abilityCharges recharge model (Twinstrike, Double
-   *  Charge, Frost's second Ice Block): the current count per ability id.
-   *  Optional: absent when no charge-limited ability has been cast yet. */
-  abilityCharges?: { [id: string]: { charges: number } | undefined };
+  /** Live charge state on the abilityCharges recharge model (Twinstrike, Double
+   *  Charge, Frost's second Ice Block): the current count per ability id, plus
+   *  the running recharge timer (the SOONEST per-charge timer, seconds left) and
+   *  its full length, which drive the thin recharge sweep while the pool still
+   *  holds a use. Optional: absent when no charge-limited ability has been cast
+   *  yet; recharge/rechargeLength are 0 when the pool is full (and on an online
+   *  mirror that has not yet received the `achr` timer wire). */
+  abilityCharges?: {
+    [id: string]: { charges: number; recharge?: number; rechargeLength?: number } | undefined;
+  };
   /** Whether the player currently carries a `kind:'stealth'` aura (Stealth or
    *  Vanish). Gates a `requiresStealth` ability's usable state (issue #1890):
    *  without this the bar never dimmed Cheap Shot/Ambush/Garrote out of
@@ -202,6 +208,15 @@ export interface ActionBarSlotState {
   cooldownPercent: number;
   cdText: string;
   count: string;
+  /** The count is a CHARGE count (stored uses left on a charge-pool ability),
+   *  not an item stack count: the painter styles it distinctly so "2" reads as
+   *  charges at a glance. */
+  isCharges: boolean;
+  /** The thin recharge sweep, 0..100: nonzero while a charge-pool ability has a
+   *  spent charge regenerating, INCLUDING while the pool still holds a use (the
+   *  full-strength cooldownPercent sweep only runs on an empty pool). Drains
+   *  toward 0 as the soonest charge completes, like cooldownPercent. */
+  rechargePercent: number;
   usable: boolean;
   outOfRange: boolean;
   queued: boolean;
@@ -237,6 +252,8 @@ function makeSlotState(): ActionBarSlotState {
     cooldownPercent: 0,
     cdText: '',
     count: '',
+    isCharges: false,
+    rechargePercent: 0,
     usable: true,
     outOfRange: false,
     queued: false,
@@ -337,6 +354,8 @@ export function createActionBarView(
           slot.cooldownPercent = 0;
           slot.cdText = '';
           slot.count = '';
+          slot.isCharges = false;
+          slot.rechargePercent = 0;
           slot.usable = true;
           slot.outOfRange = tgtDist !== null && tgtDist > MELEE_RANGE;
           slot.queued = player.autoAttack;
@@ -363,6 +382,8 @@ export function createActionBarView(
           slot.cooldownPercent = 0;
           slot.cdText = '';
           slot.count = '';
+          slot.isCharges = false;
+          slot.rechargePercent = 0;
           slot.usable = true;
           slot.outOfRange = false;
           slot.queued = false;
@@ -395,6 +416,8 @@ export function createActionBarView(
           slot.cdText =
             potionCd > COOLDOWN_TEXT_THRESHOLD ? deps.formatCount(Math.ceil(potionCd)) : '';
           slot.count = deps.formatCount(count);
+          slot.isCharges = false;
+          slot.rechargePercent = 0;
           slot.usable = !(count <= 0 || player.dead);
           slot.outOfRange = false;
           slot.queued = false;
@@ -438,13 +461,24 @@ export function createActionBarView(
         // the live count comes from player.abilityCharges, full until the first
         // spend creates the pool.
         const maxCharges = Math.max(1 + (ability.bonusCharges ?? 0), ability.charges ?? 1);
-        const chargesLeft =
-          maxCharges > 1
-            ? (player.abilityCharges?.[def.id]?.charges ?? maxCharges)
-            : cd > 0
-              ? 0
-              : 1;
+        const chargeState = maxCharges > 1 ? player.abilityCharges?.[def.id] : undefined;
+        const chargesLeft = maxCharges > 1 ? (chargeState?.charges ?? maxCharges) : cd > 0 ? 0 : 1;
         slot.count = maxCharges > 1 ? deps.formatCount(chargesLeft) : '';
+        slot.isCharges = maxCharges > 1;
+        // The thin recharge sweep: whenever a spent charge is regenerating, even
+        // while a use is still stored (the empty-pool case ALSO runs the normal
+        // full sweep via the cooldowns mirror; the strip stays for continuity).
+        // recharge is the soonest per-charge timer; 0 = pool full. An online
+        // mirror without the achr timer wire zero-fills these and shows no strip.
+        const recharge = chargeState?.recharge ?? 0;
+        const rechargeLength = chargeState?.rechargeLength ?? 0;
+        slot.rechargePercent =
+          chargesLeft < maxCharges && recharge > 0 && rechargeLength > 0
+            ? Math.min(
+                MAX_COOLDOWN_PERCENT,
+                (recharge / Math.max(COOLDOWN_DENOM_FLOOR, rechargeLength)) * MAX_COOLDOWN_PERCENT,
+              )
+            : 0;
         // A free-cost proc (Battle Trance / next_cast_free) covers the cost:
         // the slot is usable at any resource and glows (the sim predicate is
         // imported so bar and combat can never disagree on the proc's scope).

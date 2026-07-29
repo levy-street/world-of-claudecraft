@@ -20,7 +20,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 841,
+      "nextId": 820,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -34,8 +34,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 842,
-      "state": "44fcc69c",
+      "nextId": 821,
+      "state": "dc9c78b4",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -73,7 +73,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 841,
+          "entityId": 820,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -110,7 +110,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 841
+              "sourceId": 820
             }
           ],
           "blockChance": 0.05,
@@ -123,7 +123,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 841,
+          "id": 820,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -135,9 +135,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -3.662525,
+            "x": -5.125851,
             "y": 1.5,
-            "z": 1.540014
+            "z": 0.812357
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -167,9 +167,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 842,
-      "state": "a1457b93",
-      "events": "856fab23",
+      "nextId": 821,
+      "state": "f72335e5",
+      "events": "940fa765",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -208,7 +208,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 841,
+          "entityId": 820,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -253,7 +253,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 841
+              "sourceId": 820
             }
           ],
           "blockChance": 0.05,
@@ -266,7 +266,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 841,
+          "id": 820,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -278,9 +278,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -3.662525,
+            "x": -5.125851,
             "y": 1.5,
-            "z": 1.540014
+            "z": 0.812357
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -310,9 +310,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 842,
-      "state": "5ddff672",
-      "events": "ff88b676",
+      "nextId": 821,
+      "state": "b43f5ee4",
+      "events": "7127b769",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -353,7 +353,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 841,
+          "entityId": 820,
           "equipment": {
             "chest": "recruit_tunic",
             "helmet": "cryptbone_helm",
@@ -403,7 +403,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 841
+              "sourceId": 820
             }
           ],
           "blockChance": 0.05,
@@ -416,7 +416,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 130,
-          "id": 841,
+          "id": 820,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -428,9 +428,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -3.662525,
+            "x": -5.125851,
             "y": 1.5,
-            "z": 1.540014
+            "z": 0.812357
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -460,9 +460,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 842,
-      "state": "37662517",
-      "events": "136540f0",
+      "nextId": 821,
+      "state": "ca57986d",
+      "events": "b088fda1",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -503,7 +503,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 841,
+          "entityId": 820,
           "equipment": {
             "chest": "recruit_tunic",
             "helmet": "roadwardens_helm",
@@ -553,7 +553,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 841
+              "sourceId": 820
             }
           ],
           "blockChance": 0.05,
@@ -566,7 +566,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 120,
-          "id": 841,
+          "id": 820,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -578,9 +578,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -3.662525,
+            "x": -5.125851,
             "y": 1.5,
-            "z": 1.540014
+            "z": 0.812357
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -610,9 +610,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 842,
-      "state": "652e3ee9",
-      "events": "6056f1e9",
+      "nextId": 821,
+      "state": "db40f41b",
+      "events": "eb71288c",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -653,7 +653,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 841,
+          "entityId": 820,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -706,7 +706,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 841
+              "sourceId": 820
             }
           ],
           "blockChance": 0.05,
@@ -719,7 +719,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 841,
+          "id": 820,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -731,9 +731,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -3.662525,
+            "x": -5.125851,
             "y": 1.5,
-            "z": 1.540014
+            "z": 0.812357
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -763,9 +763,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 842,
-      "state": "e8ec270d",
-      "events": "9c38c5c9",
+      "nextId": 821,
+      "state": "0e3e7851",
+      "events": "8c01ad17",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -806,7 +806,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 841,
+          "entityId": 820,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -859,7 +859,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 841
+              "sourceId": 820
             }
           ],
           "blockChance": 0.05,
@@ -884,7 +884,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 841,
+          "id": 820,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -896,9 +896,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -3.662525,
+            "x": -5.125851,
             "y": 1.5,
-            "z": 1.540014
+            "z": 0.812357
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -929,9 +929,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 842,
-      "state": "c4efa38c",
-      "events": "6aef13de",
+      "nextId": 821,
+      "state": "38d08e7a",
+      "events": "59493776",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -972,7 +972,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 841,
+          "entityId": 820,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1021,7 +1021,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 841
+              "sourceId": 820
             }
           ],
           "blockChance": 0.05,
@@ -1046,7 +1046,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 841,
+          "id": 820,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1058,9 +1058,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -3.662525,
+            "x": -5.125851,
             "y": 1.5,
-            "z": 1.540014
+            "z": 0.812357
           },
           "potionCooldownUntil": 120,
           "resourceType": "rage",
@@ -1091,9 +1091,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 842,
-      "state": "bb91e738",
-      "events": "38eaeacf",
+      "nextId": 821,
+      "state": "89d348db",
+      "events": "336d3e62",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1135,7 +1135,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 841,
+          "entityId": 820,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1184,16 +1184,16 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 841
+              "sourceId": 820
             },
             {
               "duration": 900,
-              "id": "elixir_elixir_of_the_bear",
+              "id": "elixir_buff_sta",
               "kind": "buff_sta",
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 841,
+              "sourceId": 820,
               "value": 12
             }
           ],
@@ -1219,7 +1219,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 220,
-          "id": 841,
+          "id": 820,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1231,9 +1231,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -3.662525,
+            "x": -5.125851,
             "y": 1.5,
-            "z": 1.540014
+            "z": 0.812357
           },
           "potionCooldownUntil": 120,
           "resourceType": "rage",
@@ -1264,9 +1264,186 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 842,
-      "state": "5cffa3c9",
-      "events": "59d512d6",
+      "nextId": 821,
+      "state": "d03c2880",
+      "events": "3e09fe85",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "quaffed-second-elixir",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "copper": 710,
+          "counters": {},
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "cryptbone_helm",
+              "eastbrook_buckler",
+              "elixir_of_the_bear",
+              "elixir_of_the_serpent",
+              "minor_healing_potion",
+              "recruit_tunic",
+              "roadwardens_helm",
+              "spring_water",
+              "worn_sword"
+            ],
+            "visited": [
+              "quality:rare"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 820,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 9,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 4,
+              "itemId": "spring_water"
+            },
+            {
+              "count": 1,
+              "itemId": "cryptbone_helm"
+            },
+            {
+              "count": 1,
+              "itemId": "roadwardens_helm"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "selectedMount": "valorsteed",
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 820
+            },
+            {
+              "duration": 900,
+              "id": "elixir_buff_sta",
+              "kind": "buff_sta",
+              "name": "Might of the Serpent",
+              "remaining": 900,
+              "school": "nature",
+              "sourceId": 820,
+              "value": 12
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "drinking": {
+            "itemId": "spring_water",
+            "kind": "drink",
+            "manaPer2s": 8,
+            "remaining": 18
+          },
+          "eating": {
+            "hpPer2s": 7,
+            "itemId": "baked_bread",
+            "kind": "food",
+            "remaining": 18
+          },
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 220,
+          "id": 820,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 220,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -5.125851,
+            "y": 1.5,
+            "z": 0.812357
+          },
+          "potionCooldownUntil": 120,
+          "resourceType": "rage",
+          "sitting": true,
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 35,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 821,
+      "state": "09082c1b",
+      "events": "a62052f0",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1299,17 +1476,21 @@
               "cryptbone_helm",
               "eastbrook_buckler",
               "elixir_of_the_bear",
+              "elixir_of_the_serpent",
               "minor_healing_potion",
               "recruit_tunic",
               "roadwardens_helm",
               "spring_water",
               "wolf_fang",
               "worn_sword"
+            ],
+            "visited": [
+              "quality:rare"
             ]
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 841,
+          "entityId": 820,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1362,16 +1543,16 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 841
+              "sourceId": 820
             },
             {
               "duration": 900,
-              "id": "elixir_elixir_of_the_bear",
+              "id": "elixir_buff_sta",
               "kind": "buff_sta",
-              "name": "Might of the Bear",
+              "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 841,
+              "sourceId": 820,
               "value": 12
             }
           ],
@@ -1397,7 +1578,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 220,
-          "id": 841,
+          "id": 820,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1409,9 +1590,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -3.662525,
+            "x": -5.125851,
             "y": 1.5,
-            "z": 1.540014
+            "z": 0.812357
           },
           "potionCooldownUntil": 120,
           "resourceType": "rage",
@@ -1442,9 +1623,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 842,
-      "state": "5a506d70",
-      "events": "7daa5458",
+      "nextId": 821,
+      "state": "81dc2896",
+      "events": "2f1d0610",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1477,17 +1658,21 @@
               "cryptbone_helm",
               "eastbrook_buckler",
               "elixir_of_the_bear",
+              "elixir_of_the_serpent",
               "minor_healing_potion",
               "recruit_tunic",
               "roadwardens_helm",
               "spring_water",
               "wolf_fang",
               "worn_sword"
+            ],
+            "visited": [
+              "quality:rare"
             ]
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 841,
+          "entityId": 820,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1546,16 +1731,16 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 841
+              "sourceId": 820
             },
             {
               "duration": 900,
-              "id": "elixir_elixir_of_the_bear",
+              "id": "elixir_buff_sta",
               "kind": "buff_sta",
-              "name": "Might of the Bear",
+              "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 841,
+              "sourceId": 820,
               "value": 12
             }
           ],
@@ -1581,7 +1766,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 220,
-          "id": 841,
+          "id": 820,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1593,9 +1778,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -3.662525,
+            "x": -5.125851,
             "y": 1.5,
-            "z": 1.540014
+            "z": 0.812357
           },
           "potionCooldownUntil": 120,
           "resourceType": "rage",
@@ -1626,199 +1811,14 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 842,
-      "state": "523bb34b",
-      "events": "9232d4ba",
+      "nextId": 821,
+      "state": "de8e4f73",
+      "events": "aa574404",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
       },
       "label": "sold-junk",
-      "players": [
-        {
-          "activeLoadout": -1,
-          "archetype": {},
-          "arena2v2Rating": 1500,
-          "arenaRating": 1500,
-          "bags": [
-            null,
-            null,
-            null,
-            null
-          ],
-          "bank": {},
-          "cls": "warrior",
-          "companionUpgrades": {},
-          "copper": 724,
-          "counters": {},
-          "craftSkills": {},
-          "craftThrottle": {},
-          "deedStats": {
-            "counters": {},
-            "dungeonClears": {},
-            "itemsDiscovered": [
-              "baked_bread",
-              "bandit_bandana",
-              "cryptbone_helm",
-              "eastbrook_buckler",
-              "elixir_of_the_bear",
-              "minor_healing_potion",
-              "recruit_tunic",
-              "roadwardens_helm",
-              "spring_water",
-              "wolf_fang",
-              "worn_sword"
-            ]
-          },
-          "delveClears": {},
-          "delveDaily": {},
-          "entityId": 841,
-          "equipment": {
-            "chest": "recruit_tunic",
-            "mainhand": "worn_sword",
-            "offhand": "eastbrook_buckler"
-          },
-          "equipmentInstance": {},
-          "gatheringProficiency": {},
-          "heroicDaily": {},
-          "inventory": [
-            {
-              "count": 9,
-              "itemId": "baked_bread"
-            },
-            {
-              "count": 4,
-              "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "cryptbone_helm"
-            },
-            {
-              "count": 1,
-              "itemId": "roadwardens_helm"
-            }
-          ],
-          "mailWelcomed": true,
-          "nodeHarvestReadyAt": {},
-          "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
-          "talents": {
-            "rows": {}
-          },
-          "townFocus": {},
-          "vendorBuyback": [
-            {
-              "count": 1,
-              "itemId": "bandit_bandana"
-            },
-            {
-              "count": 2,
-              "itemId": "wolf_fang"
-            }
-          ]
-        }
-      ],
-      "entities": [
-        {
-          "aiState": "idle",
-          "attackPower": 46,
-          "auras": [
-            {
-              "duration": 3600,
-              "id": "battle_stance",
-              "kind": "battle_stance",
-              "name": "Battle Stance",
-              "remaining": 3600,
-              "school": "physical",
-              "sourceId": 841
-            },
-            {
-              "duration": 900,
-              "id": "elixir_elixir_of_the_bear",
-              "kind": "buff_sta",
-              "name": "Might of the Bear",
-              "remaining": 900,
-              "school": "nature",
-              "sourceId": 841,
-              "value": 12
-            }
-          ],
-          "blockChance": 0.05,
-          "blockValue": 6,
-          "combatTimer": 99,
-          "comboUntil": -1,
-          "critChance": 0.06,
-          "detonateTimer": "Infinity",
-          "dodgeChance": 0.06,
-          "drinking": {
-            "itemId": "spring_water",
-            "kind": "drink",
-            "manaPer2s": 8,
-            "remaining": 18
-          },
-          "eating": {
-            "hpPer2s": 7,
-            "itemId": "baked_bread",
-            "kind": "food",
-            "remaining": 18
-          },
-          "fallStartY": 1.5,
-          "fiveSecondRule": 99,
-          "hp": 220,
-          "id": 841,
-          "kind": "player",
-          "level": 1,
-          "lootFfaTimer": "Infinity",
-          "maxHp": 220,
-          "maxResource": 100,
-          "moveSpeed": 7,
-          "offhandItemId": "eastbrook_buckler",
-          "onGround": true,
-          "overpowerUntil": -1,
-          "petMode": "defensive",
-          "pos": {
-            "x": -3.662525,
-            "y": 1.5,
-            "z": 1.540014
-          },
-          "potionCooldownUntil": 120,
-          "resourceType": "rage",
-          "sitting": true,
-          "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
-          },
-          "spellPower": 5,
-          "stats": {
-            "agi": 20,
-            "armor": 144,
-            "int": 10,
-            "spi": 11,
-            "sta": 35,
-            "str": 23
-          },
-          "templateId": "warrior",
-          "weapon": {
-            "max": 5,
-            "min": 2,
-            "speed": 2
-          }
-        }
-      ]
-    },
-    {
-      "tick": 0,
-      "time": 0,
-      "nextId": 842,
-      "state": "f81f5121",
-      "events": "df20facd",
-      "rng": {
-        "draws": 0,
-        "digest": "811c9dc5"
-      },
-      "label": "bought-back",
       "players": [
         {
           "activeLoadout": -1,
@@ -1847,17 +1847,21 @@
               "cryptbone_helm",
               "eastbrook_buckler",
               "elixir_of_the_bear",
+              "elixir_of_the_serpent",
               "minor_healing_potion",
               "recruit_tunic",
               "roadwardens_helm",
               "spring_water",
               "wolf_fang",
               "worn_sword"
+            ],
+            "visited": [
+              "quality:rare"
             ]
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 841,
+          "entityId": 820,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1920,16 +1924,16 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 841
+              "sourceId": 820
             },
             {
               "duration": 900,
-              "id": "elixir_elixir_of_the_bear",
+              "id": "elixir_buff_sta",
               "kind": "buff_sta",
-              "name": "Might of the Bear",
+              "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 841,
+              "sourceId": 820,
               "value": 12
             }
           ],
@@ -1955,7 +1959,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 220,
-          "id": 841,
+          "id": 820,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1967,9 +1971,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -3.662525,
+            "x": -5.125851,
             "y": 1.5,
-            "z": 1.540014
+            "z": 0.812357
           },
           "potionCooldownUntil": 120,
           "resourceType": "rage",
@@ -2000,8 +2004,197 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 842,
-      "state": "f81f5121",
+      "nextId": 821,
+      "state": "16e356ac",
+      "events": "4356aa5d",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "bought-back",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "copper": 716,
+          "counters": {},
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "bandit_bandana",
+              "cryptbone_helm",
+              "eastbrook_buckler",
+              "elixir_of_the_bear",
+              "elixir_of_the_serpent",
+              "minor_healing_potion",
+              "recruit_tunic",
+              "roadwardens_helm",
+              "spring_water",
+              "wolf_fang",
+              "worn_sword"
+            ],
+            "visited": [
+              "quality:rare"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 820,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 9,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 4,
+              "itemId": "spring_water"
+            },
+            {
+              "count": 1,
+              "itemId": "cryptbone_helm"
+            },
+            {
+              "count": 1,
+              "itemId": "roadwardens_helm"
+            },
+            {
+              "count": 2,
+              "itemId": "wolf_fang"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "selectedMount": "valorsteed",
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vendorBuyback": [
+            {
+              "count": 1,
+              "itemId": "bandit_bandana"
+            }
+          ]
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 820
+            },
+            {
+              "duration": 900,
+              "id": "elixir_buff_sta",
+              "kind": "buff_sta",
+              "name": "Might of the Serpent",
+              "remaining": 900,
+              "school": "nature",
+              "sourceId": 820,
+              "value": 12
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "drinking": {
+            "itemId": "spring_water",
+            "kind": "drink",
+            "manaPer2s": 8,
+            "remaining": 18
+          },
+          "eating": {
+            "hpPer2s": 7,
+            "itemId": "baked_bread",
+            "kind": "food",
+            "remaining": 18
+          },
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 220,
+          "id": 820,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 220,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -5.125851,
+            "y": 1.5,
+            "z": 0.812357
+          },
+          "potionCooldownUntil": 120,
+          "resourceType": "rage",
+          "sitting": true,
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 35,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 821,
+      "state": "16e356ac",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -2023,7 +2216,7 @@
           "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 720,
+          "copper": 716,
           "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
@@ -2036,17 +2229,21 @@
               "cryptbone_helm",
               "eastbrook_buckler",
               "elixir_of_the_bear",
+              "elixir_of_the_serpent",
               "minor_healing_potion",
               "recruit_tunic",
               "roadwardens_helm",
               "spring_water",
               "wolf_fang",
               "worn_sword"
+            ],
+            "visited": [
+              "quality:rare"
             ]
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 841,
+          "entityId": 820,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2073,7 +2270,7 @@
               "itemId": "roadwardens_helm"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "wolf_fang"
             }
           ],
@@ -2089,10 +2286,6 @@
             {
               "count": 1,
               "itemId": "bandit_bandana"
-            },
-            {
-              "count": 1,
-              "itemId": "wolf_fang"
             }
           ]
         }
@@ -2109,16 +2302,16 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 841
+              "sourceId": 820
             },
             {
               "duration": 900,
-              "id": "elixir_elixir_of_the_bear",
+              "id": "elixir_buff_sta",
               "kind": "buff_sta",
-              "name": "Might of the Bear",
+              "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 841,
+              "sourceId": 820,
               "value": 12
             }
           ],
@@ -2144,7 +2337,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 220,
-          "id": 841,
+          "id": 820,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2156,9 +2349,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -3.662525,
+            "x": -5.125851,
             "y": 1.5,
-            "z": 1.540014
+            "z": 0.812357
           },
           "potionCooldownUntil": 120,
           "resourceType": "rage",
