@@ -240,6 +240,35 @@ describe('linkdead grace lifecycle', () => {
     expect(server.clients.size).toBe(0);
   });
 
+  it('disconnectAccount kicks every live session for the account unconditionally, even one authenticated with the same stolen bearer token', async () => {
+    const server = new GameServer();
+    const wsVictim = fakeWs();
+    const wsAttacker = fakeWs();
+    // Both sessions join as GM (isGm=true): MAX_ACTIVE_SESSIONS_PER_ACCOUNT caps an
+    // account at one LIVE session, and GMs are the one exemption, which is the
+    // simplest way to get two simultaneous live sessions for one account in this
+    // test. A bearer token is a reusable wire credential, not a per-socket identity,
+    // so an attacker holding a stolen/shared token can authenticate their own live
+    // session with it; disconnectAccount must not spare either session by token
+    // equality (a prior revision did exactly that, and it could just as easily have
+    // spared the attacker's session instead of the victim's own).
+    const victimSession = expectJoined(
+      server.join(wsVictim, 11, 101, 'Victim', 'warrior', null, true),
+    );
+    const attackerSession = expectJoined(
+      server.join(wsAttacker, 11, 102, 'Attacker', 'warrior', null, true),
+    );
+
+    server.disconnectAccount(11, 'credential change');
+    await vi.waitFor(() => {
+      expect(victimSession.left).toBe(true);
+      expect(attackerSession.left).toBe(true);
+    });
+
+    expect(server.clients.has(victimSession.pid)).toBe(false);
+    expect(server.clients.has(attackerSession.pid)).toBe(false);
+  });
+
   it('fully logs the character out when the grace window expires', async () => {
     closePlaySession.mockClear();
     const server = new GameServer();

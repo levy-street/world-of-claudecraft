@@ -3753,6 +3753,13 @@ export class GameServer {
     return state ? state.level : null;
   }
 
+  // Force-close every live session for the account. A bearer token is a reusable
+  // wire credential, not a per-socket identity: an earlier revision tried to spare
+  // the caller's own session by comparing the live socket's auth token against the
+  // request's bearer token, but a stolen/shared token authenticates identically on
+  // both, so that comparison could just as easily spare an attacker's connection.
+  // Kick unconditionally; a legitimate caller's own other tab reconnects with the
+  // fresh credentials the same as any other client would.
   disconnectAccount(accountId: number, reason: string): void {
     for (const session of [...this.clients.values()]) {
       if (session.accountId !== accountId) continue;
