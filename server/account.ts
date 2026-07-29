@@ -650,30 +650,45 @@ function useRuntime(): AccountGameHooks {
 // Db seam. The bearer-resolution + companion-token reads/writes, bundled once
 // behind a test-only setter so the guards and companion handlers can be driven
 // with a fake and no Postgres. Production never calls the setter, so
-// REAL_ACCOUNT_DB is the only runtime binding and it references the exact
-// functions the legacy arms call. scopeAllowsMutation is pure (no DB), so it
-// stays a direct import rather than a seam member. The handleAccount* domain
-// functions keep their own direct db.ts imports (driven by the existing
-// account_server.test.ts pg-mock harness); this seam covers only the NEW code.
+// makeRealAccountDb is the only runtime binding and it references the exact
+// functions the legacy arms call. It is lazy so importing one independent
+// account helper (for example admin login's shared 2FA verifier) does not
+// eagerly dereference every db export under a focused partial mock.
+// scopeAllowsMutation is pure (no DB), so it stays a direct import rather than
+// a seam member. The handleAccount* domain functions keep their own direct
+// db.ts imports (driven by the existing account_server.test.ts pg-mock
+// harness); this seam covers only the NEW code.
 // ---------------------------------------------------------------------------
 
-const REAL_ACCOUNT_DB = {
-  accountAndScopeForToken,
-  moderationStatusForAccount,
-  createCompanionToken,
-  listCompanionTokens,
-  revokeCompanionToken,
-};
-let accountDb = REAL_ACCOUNT_DB;
+function makeRealAccountDb() {
+  return {
+    accountAndScopeForToken,
+    moderationStatusForAccount,
+    createCompanionToken,
+    listCompanionTokens,
+    revokeCompanionToken,
+  };
+}
+
+type AccountDb = ReturnType<typeof makeRealAccountDb>;
+let realAccountDb: AccountDb | undefined;
+let accountDbOverride: AccountDb | undefined;
+
+function accountDb(): AccountDb {
+  if (accountDbOverride) return accountDbOverride;
+  realAccountDb ??= makeRealAccountDb();
+  return realAccountDb;
+}
 
 /** Override the account db bundle with a fake (test-only; merges over the real reads). */
-export function setAccountDbForTests(overrides: Partial<typeof REAL_ACCOUNT_DB>): void {
-  accountDb = { ...REAL_ACCOUNT_DB, ...overrides };
+export function setAccountDbForTests(overrides: Partial<AccountDb>): void {
+  realAccountDb ??= makeRealAccountDb();
+  accountDbOverride = { ...realAccountDb, ...overrides };
 }
 
 /** Restore the real account db bundle after a setAccountDbForTests override (test-only). */
 export function resetAccountDbForTests(): void {
-  accountDb = REAL_ACCOUNT_DB;
+  accountDbOverride = undefined;
 }
 
 // ---------------------------------------------------------------------------
@@ -697,7 +712,7 @@ async function resolveBearerScope(
 ): Promise<{ accountId: number; scope: 'read' | 'full' } | null> {
   const token = bearerToken(req);
   if (token === null) return null;
-  return accountDb.accountAndScopeForToken(token);
+  return accountDb().accountAndScopeForToken(token);
 }
 
 /** Mutating + account-scoped gate (mirrors server/main.ts bearerActiveAccount). */
@@ -711,7 +726,7 @@ const activeGuard: Middleware = async (ctx, next) => {
     json(ctx.res, 403, READ_ONLY_TOKEN);
     return;
   }
-  const status = await accountDb.moderationStatusForAccount(info.accountId);
+  const status = await accountDb().moderationStatusForAccount(info.accountId);
   if (status.locked) {
     json(ctx.res, 403, moderationErrorBody(status));
     return;
@@ -729,7 +744,7 @@ const activeGuard: Middleware = async (ctx, next) => {
  */
 const logoutGuard: Middleware = async (ctx, next) => {
   const token = bearerToken(ctx.req);
-  if (token === null || (await accountDb.accountAndScopeForToken(token)) === null) {
+  if (token === null || (await accountDb().accountAndScopeForToken(token)) === null) {
     json(ctx.res, 401, NOT_AUTHENTICATED);
     return;
   }
@@ -838,7 +853,7 @@ async function companionCreateHandler(ctx: Ctx): Promise<void> {
   const rawLabel = typeof body.label === 'string' ? body.label.trim().slice(0, 64) : '';
   const label = rawLabel || null;
   const token = newToken();
-  await accountDb.createCompanionToken(token, accountId, label, COMPANION_TOKEN_TTL_HOURS);
+  await accountDb().createCompanionToken(token, accountId, label, COMPANION_TOKEN_TTL_HOURS);
   return json(ctx.res, 200, {
     token,
     label,
@@ -849,7 +864,9 @@ async function companionCreateHandler(ctx: Ctx): Promise<void> {
 
 /** GET /api/account/companion-token: list the account's companion tokens (no secrets). */
 async function companionListHandler(ctx: Ctx): Promise<void> {
-  return json(ctx.res, 200, { tokens: await accountDb.listCompanionTokens(ctxAccountId(ctx)) });
+  return json(ctx.res, 200, {
+    tokens: await accountDb().listCompanionTokens(ctxAccountId(ctx)),
+  });
 }
 
 /** DELETE /api/account/companion-token: revoke a companion token by prefix. */
@@ -857,7 +874,7 @@ async function companionRevokeHandler(ctx: Ctx): Promise<void> {
   const accountId = ctxAccountId(ctx);
   const body = await readBody(ctx.req);
   const prefix = typeof body.prefix === 'string' ? body.prefix.trim().toLowerCase() : '';
-  const ok = await accountDb.revokeCompanionToken(accountId, prefix);
+  const ok = await accountDb().revokeCompanionToken(accountId, prefix);
   return json(ctx.res, ok ? 200 : 404, ok ? { ok: true } : COMPANION_TOKEN_NOT_FOUND);
 }
 
