@@ -102,7 +102,9 @@ describe('Ice Block visual', () => {
 
     expect(renderer).toContain("if (a.id === 'ice_block' && a.kind === 'stasis')");
     expect(renderer).toContain('v.iceBlockVisual = syncIceBlockVisual(');
-    expect(renderer).toContain("if (iceBlockActivated) this.activeVisual(v)?.playEmote('wave', 1)");
+    expect(renderer).not.toContain(
+      "if (iceBlockActivated) this.activeVisual(v)?.playEmote('wave', 1)",
+    );
     expect(renderer).toContain('v.iceBlockVisual?.dispose()');
   });
 });

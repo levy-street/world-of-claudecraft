@@ -161,10 +161,14 @@ import type { WalletOption, WalletPickerMode, WalletPickerResult } from './net/w
 import { resolveWalletCapability } from './net/wallet_capability';
 import { installWalletResumeHandlers } from './net/wallet_resume';
 import { assetsReady } from './render/assets/preload';
-import { CharacterPreview, type PreviewAppearance } from './render/characters';
+import {
+  CharacterPreview,
+  DEFAULT_HEAD_APPEARANCE,
+  defaultHeadFor,
+  type PreviewAppearance,
+} from './render/characters';
 import { charactersReady, preloadMechAssets } from './render/characters/assets';
-import { skinCount } from './render/characters/manifest';
-import { onPortraitsReady, playerPortraitDataUrl } from './render/characters/portrait';
+import { skinCount, skinSwatchColor } from './render/characters/manifest';
 import { installWebGLContextRelease } from './render/context_release';
 import { firstRunGraphicsPreset, GFX, graphicsPresetLabel } from './render/gfx';
 import { Renderer } from './render/renderer';
@@ -211,9 +215,11 @@ import {
   maybeShowFirstRunCameraPrompt,
 } from './ui/camera_prompt';
 import { deleteCharButtonHtml } from './ui/char_delete_button';
+import { characterSummaryAppearance } from './ui/character_summary_appearance';
 import { loadCharselectNews } from './ui/charselect_news';
 import { ChatCommandMenu } from './ui/chat_command_menu';
 import { CLASS_DETAILS, SIGNATURE_ABILITIES } from './ui/class_details_data';
+import { classIconUrl } from './ui/class_icon_url';
 import { claudiumBalanceAddress, currentWocDiscountBps } from './ui/claudium_view';
 import { ensureDeedLocalesLoaded } from './ui/deed_i18n';
 import { isDevGuiCommand } from './ui/dev_command_view';
@@ -238,6 +244,7 @@ import { showEntryGuardBanner } from './ui/entry_guard_banner';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
 import { attachGatherNodeHoverTooltip, gatherNodeToolGateFor } from './ui/gather_node_tooltip';
 import { gatherToolNoNodeKey } from './ui/gathering_view';
+import { renderHeadPicker } from './ui/head_picker';
 import { type ClaudiumHooks, Hud } from './ui/hud';
 import { resolveActionBarVisibility } from './ui/hud/action_bar/action_bar_visibility_core';
 import { autosizeChatInput } from './ui/hud/chat/chat_input_autosize';
@@ -280,7 +287,7 @@ import { applyPerfOrnamentVars } from './ui/perf_ornament_svg';
 import { PerfOverlay } from './ui/perf_overlay';
 import { type PerfOverlayConfig, PerfOverlayConfigStore } from './ui/perf_overlay_config';
 import { buildPerfOverlayView, FrameMeter } from './ui/perf_overlay_model';
-import { hydratePortraits, portraitChipHtml } from './ui/portrait_chip';
+import { decorateClassChips, hydratePortraits, portraitChipHtml } from './ui/portrait_chip';
 import { hideReconnectOverlay, showReconnectOverlay } from './ui/reconnect_overlay';
 import { createSpectateBadge } from './ui/spectate_badge';
 import { refreshSteamLinkStatus, wireSteamLink } from './ui/steam_link';
@@ -3684,6 +3691,11 @@ async function startOffline(
   skin = 0,
   world?: WorldContent,
   seedOverride?: number,
+  hairStyle = 0,
+  beard = false,
+  hairColor?: number,
+  faceColor?: number,
+  face = 0,
 ): Promise<void> {
   if (!(await prepareWorldEntry())) return;
   enterLoadingState(t('loading.world'));
@@ -3699,6 +3711,7 @@ async function startOffline(
     world,
   });
   sim.setPlayerSkin(sim.playerId, skin);
+  sim.setPlayerHead(sim.playerId, hairStyle, beard, hairColor, faceColor, face);
   // Dev convenience: ?mech drops an offline session straight into the Combat Mech
   // cosmetic body holding a spread of class-usable weapons, to eyeball the held
   // weapon model on the mech (swap them in the bag to see each one). DEV builds
@@ -3770,6 +3783,21 @@ let characterPreview: CharacterPreview | null = null;
 let authModeApply: ((mode: 'login' | 'register') => void) | null = null;
 let offlineSkin = 0; // chosen appearance skin for the offline quick-start character
 let onlineSkin = 0; // chosen appearance skin for new online characters
+// Whether the level-20 armored cosmetic body is the picked "chroma" (it sits on
+// the end of the chroma row and swaps the body rather than the atlas).
+// chosen head look for the offline character (face index + hairStyle + beard +
+// optional hair/face colour tints; undefined = the model's baked colour)
+let offlineFace = DEFAULT_HEAD_APPEARANCE.face;
+let offlineHairStyle = DEFAULT_HEAD_APPEARANCE.hairStyle;
+let offlineBeard = DEFAULT_HEAD_APPEARANCE.beard;
+let offlineHairColor: number | undefined;
+let offlineFaceColor: number | undefined;
+// Chosen head look for a NEW online character (sent in the create request).
+let onlineFace = DEFAULT_HEAD_APPEARANCE.face;
+let onlineHairStyle = DEFAULT_HEAD_APPEARANCE.hairStyle;
+let onlineBeard = DEFAULT_HEAD_APPEARANCE.beard;
+let onlineHairColor: number | undefined;
+let onlineFaceColor: number | undefined;
 
 function releaseStartScreenPreview(): void {
   if (!characterPreview) return;
@@ -3789,6 +3817,8 @@ function renderSkinPicker(
   if (!row) return;
   row.innerHTML = '';
   const count = skinCount(`player_${cls}`);
+  // Chromas only. The level-20 armor set is NOT offered at creation: it unlocks at
+  // level 20 and is toggled on the in-game character sheet (char_skin_window.ts).
   const picker = row.closest('.skin-picker') as HTMLElement | null;
   if (count <= 1) {
     // only the default exists, nothing to pick
@@ -3801,61 +3831,35 @@ function renderSkinPicker(
   for (let i = 0; i < count; i++) {
     const b = document.createElement('button');
     b.type = 'button';
-    b.className = `skin-swatch skin-swatch-portrait${i === current ? ' sel' : ''}`;
+    // Chroma swatch shows just the armour colour (a plain colour dot), not a portrait.
+    const color = skinSwatchColor(`player_${cls}`, i);
+    b.className = `skin-swatch skin-swatch-color${i === current ? ' sel' : ''}`;
     b.dataset.skin = String(i);
-    b.setAttribute('role', 'listitem');
     b.setAttribute('aria-label', t('auth.chromaOption', { n: i + 1 }));
-    const url = playerPortraitDataUrl(cls, i);
-    if (url) {
-      const img = document.createElement('img');
-      img.src = url;
-      img.alt = '';
-      img.className = 'skin-swatch-img';
-      b.appendChild(img);
-    } else {
-      b.textContent = String(i + 1);
-    }
+    b.setAttribute('aria-pressed', String(i === current));
+    // Chroma swatch shows just the armour colour (a plain colour dot), not a
+    // portrait; preview/revert/pick are wired centrally by wireSkinPicker below.
+    if (color) b.style.setProperty('--skin-swatch', color);
+    else b.textContent = String(i + 1);
     swatches.push(b);
     row.appendChild(b);
   }
+  const show = (i: number): void => {
+    characterPreview?.setSkin(i);
+  };
   // Live-preview the chroma on the avatar while hovering, commit on click, and
   // revert to the committed selection when the pointer leaves the whole row.
   // The revert is row-level, not per swatch, so hovering the swatch next to the
   // selected one previews instead of being clobbered (issue 1464); see
   // wireSkinPicker.
   wireSkinPicker(row, swatches, current, {
-    onPreview: (i) => characterPreview?.setSkin(i),
-    onRevert: (i) => characterPreview?.setSkin(i),
-    onPick,
+    onPreview: show,
+    onRevert: show,
+    onPick: (i) => {
+      show(i);
+      onPick(i);
+    },
   });
-}
-
-/** Give each class button a small portrait preview of that class. Wired to
- *  {@link onPortraitsReady} so it runs once portrait.ts's own asset barrier
- *  resolves (portraits render synchronously from then on); one-shot per chip
- *  via the .mini-class-portrait guard below, so it is safe to call again. */
-function decorateClassChips(): void {
-  document
-    .querySelectorAll<HTMLElement>('#charcreate-panel .mini-class, #offline-select .mini-class')
-    .forEach((li) => {
-      if (li.querySelector('.mini-class-portrait')) return;
-      const cls = li.dataset.class as PlayerClass;
-      const key = li.dataset.i18n;
-      const label = document.createElement('span');
-      label.className = 'mini-class-label';
-      if (key) label.dataset.i18n = key;
-      label.textContent = (li.textContent ?? '').trim();
-      li.removeAttribute('data-i18n'); // moved onto the label so i18n won't wipe the portrait
-      li.textContent = '';
-      const img = document.createElement('img');
-      img.className = 'mini-class-portrait';
-      img.alt = '';
-      const url = playerPortraitDataUrl(cls, 0);
-      if (url) img.src = url;
-      li.appendChild(img);
-      li.appendChild(label);
-      li.classList.add('has-portrait');
-    });
 }
 
 function selectedSkin(rowId: string, fallback: number): number {
@@ -3871,17 +3875,48 @@ function refreshOfflineSkins(cls: PlayerClass): void {
   characterPreview?.setSkin(0);
   renderSkinPicker('#offline-skin-row', cls, 0, (i) => {
     offlineSkin = i;
-    characterPreview?.setSkin(i);
+  });
+  // Head look: reset to this class's starting look (its per-class default merged
+  // over the global default); the player can still pick any option in the picker.
+  const offlineHead = defaultHeadFor(cls);
+  offlineFace = offlineHead.face;
+  offlineHairStyle = offlineHead.hairStyle;
+  offlineBeard = offlineHead.beard;
+  offlineHairColor = undefined;
+  offlineFaceColor = undefined;
+  characterPreview?.setCosmetics(offlineHairStyle, offlineBeard, undefined, undefined, offlineFace);
+  renderHeadPicker('#offline-head-row', cls, { ...offlineHead }, (s) => {
+    offlineFace = s.face;
+    offlineHairStyle = s.hairStyle;
+    offlineBeard = s.beard;
+    offlineHairColor = s.hairColor;
+    offlineFaceColor = s.faceColor;
+    characterPreview?.setCosmetics(s.hairStyle, s.beard, s.hairColor, s.faceColor, s.face);
   });
 }
 
-/** Reset to the default skin and (re)render the online creation picker for a class. */
+/** Reset to the default skin/head and (re)render the online creation pickers for a
+ *  class. Mirrors the offline creator: the head picker feeds the create request. */
 function refreshOnlineSkins(cls: PlayerClass): void {
   onlineSkin = 0;
   characterPreview?.setSkin(0);
   renderSkinPicker('#online-skin-row', cls, 0, (i) => {
     onlineSkin = i;
-    characterPreview?.setSkin(i);
+  });
+  const onlineHead = defaultHeadFor(cls);
+  onlineFace = onlineHead.face;
+  onlineHairStyle = onlineHead.hairStyle;
+  onlineBeard = onlineHead.beard;
+  onlineHairColor = undefined;
+  onlineFaceColor = undefined;
+  characterPreview?.setCosmetics(onlineHairStyle, onlineBeard, undefined, undefined, onlineFace);
+  renderHeadPicker('#charcreate-head-row', cls, { ...onlineHead }, (s) => {
+    onlineFace = s.face;
+    onlineHairStyle = s.hairStyle;
+    onlineBeard = s.beard;
+    onlineHairColor = s.hairColor;
+    onlineFaceColor = s.faceColor;
+    characterPreview?.setCosmetics(s.hairStyle, s.beard, s.hairColor, s.faceColor, s.face);
   });
 }
 
@@ -3901,7 +3936,7 @@ function updatePreviewContainer(panelId: string): void {
     // The selected roster row drives the showcase: its full real appearance
     // (class or Combat Mech body + chroma + equipped mainhand), matching the world.
     if (charselectSelected) {
-      characterPreview.setAppearance(charselectAppearance(charselectSelected));
+      characterPreview.setAppearance(characterSummaryAppearance(charselectSelected));
     } else {
       const row = document.querySelector('#char-list .char-row.sel') as HTMLElement | null;
       const cls = (row?.dataset.class as PlayerClass) ?? 'warrior';
@@ -4976,7 +5011,7 @@ async function refreshCharacters(): Promise<void> {
       const inWorldHint = c.online
         ? `<span class="char-inworld-hint">${escapeHtml(t('character.inWorldHint'))}</span>`
         : '';
-      row.innerHTML = `${portraitChipHtml({ cls: c.class, skin: c.skin ?? 0, name: c.name, variant: 'sm' })}
+      row.innerHTML = `${portraitChipHtml({ cls: c.class, skin: c.skin ?? 0, name: c.name, variant: 'sm', iconUrl: classIconUrl(c.class) })}
         <div class="char-id">
           <span class="char-name">${escapeHtml(c.name)}</span>
           <span class="char-sub">${escapeHtml(t('character.levelClass', { level: c.level, className }))}${escapeHtml(statusText)}</span>
@@ -5031,7 +5066,7 @@ async function refreshCharacters(): Promise<void> {
         // The class-details sheet is gone from this screen (the news panel sits
         // there now), so drive the 3D preview directly: two characters of the
         // same class can still differ in gear, skin, or cosmetic body.
-        characterPreview?.setAppearance(charselectAppearance(c));
+        characterPreview?.setAppearance(characterSummaryAppearance(c));
         charselectSelected = c;
         syncCharselectEnterButton();
         setCharselectPreviewName(c.name);
@@ -5272,17 +5307,6 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
 const activeClassDetailsTimeouts: Record<string, number | null> = {};
 
 // The char-select roster row's real, in-world appearance for the 3D preview.
-function charselectAppearance(c: CharacterSummary): PreviewAppearance {
-  return {
-    cls: c.class,
-    skin: c.skin ?? 0,
-    skinCatalog: c.skinCatalog ?? 'class',
-    mainhandItemId: c.mainhandItemId ?? null,
-    offhandItemId: c.offhandItemId ?? null,
-    weaponSkinId: c.weaponSkinId ?? null,
-  };
-}
-
 function renderClassDetails(
   panelId: string,
   className: PlayerClass,
@@ -7835,7 +7859,18 @@ function wireStartScreens(): void {
     music.init();
     sfx.init();
     const name = sanitizeOfflineName(rawName);
-    void startOffline(cls, name, selectedSkin('#offline-skin-row', offlineSkin));
+    void startOffline(
+      cls,
+      name,
+      selectedSkin('#offline-skin-row', offlineSkin),
+      undefined,
+      undefined,
+      offlineHairStyle,
+      offlineBeard,
+      offlineHairColor,
+      offlineFaceColor,
+      offlineFace,
+    );
   };
 
   const handleOfflineSelect = () => {
@@ -8665,7 +8700,16 @@ function wireStartScreens(): void {
       await api.createCharacter(
         name,
         clsEl.dataset.class as PlayerClass,
+        // the armored swatch is not a chroma index; the armored look is applied
+        // in-world from the character sheet until create-time persistence lands
         selectedSkin('#online-skin-row', onlineSkin),
+        {
+          hairStyle: onlineHairStyle,
+          beard: onlineBeard,
+          face: onlineFace,
+          hairColor: onlineHairColor,
+          faceColor: onlineFaceColor,
+        },
       );
       newCharNameInput.value = '';
       charselectError.textContent = '';
@@ -9389,15 +9433,8 @@ function wireStartScreens(): void {
     syncLandingGraphicsSelect();
   });
 
-  // Give each class chip its portrait as soon as portrait.ts's own (separate,
-  // wider) character-asset barrier resolves, independent of the 3D preview
-  // below. portraitsReady() latches once and decorateClassChips() is one-shot
-  // per chip, so gating this off charactersReady()'s narrower, retried set
-  // (as the 3D preview below does) left it permanently false whenever a
-  // transient failure landed in the wider set portrait.ts actually waits on:
-  // the preview would recover (that is charactersReady()'s job) but every
-  // class chip stayed a plain label for the rest of the page's life.
-  onPortraitsReady(decorateClassChips);
+  // These are static painted icons and need no 3D-asset readiness barrier.
+  decorateClassChips();
 
   // Initialize 3D character preview once its assets are ready. Gated on the
   // narrower charactersReady() (with its own retries), not the site-wide
@@ -9412,14 +9449,18 @@ function wireStartScreens(): void {
   charactersReady()
     .then(() => {
       // Resolve each panel defensively: play.html (online-only) has no #offline-select.
-      const activePanelId = ['#charselect-panel', '#offline-select'].find((id) => {
-        const panel = $(id) as HTMLElement | null;
-        return panel !== null && !panel.hasAttribute('hidden');
-      });
+      const activePanelId = ['#charselect-panel', '#charcreate-panel', '#offline-select'].find(
+        (id) => {
+          const panel = $(id) as HTMLElement | null;
+          return panel !== null && !panel.hasAttribute('hidden');
+        },
+      );
       const containerId =
         activePanelId === '#offline-select'
           ? '#offline-preview-container'
-          : '#online-preview-container';
+          : activePanelId === '#charcreate-panel'
+            ? '#charcreate-preview-container'
+            : '#online-preview-container';
       const container = $(containerId);
       const canvas = $('#char-preview-canvas') as HTMLCanvasElement | null;
       if (container && canvas) {
@@ -9429,8 +9470,8 @@ function wireStartScreens(): void {
         // If a token auto-login already rendered the roster and selected a
         // character before assets finished, show its real appearance; otherwise
         // fall back to the selected class chip (create/offline panels).
-        if (charselectSelected) {
-          characterPreview.setAppearance(charselectAppearance(charselectSelected));
+        if (activePanelId === '#charselect-panel' && charselectSelected) {
+          characterPreview.setAppearance(characterSummaryAppearance(charselectSelected));
         } else {
           const selSelector =
             activePanelId === '#offline-select'

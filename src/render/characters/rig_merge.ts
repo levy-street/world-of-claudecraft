@@ -187,12 +187,18 @@ function hasMorphTargets(sm: THREE.SkinnedMesh): boolean {
  * bind matrix, and bind data satisfying the single-T law. Anything else is left
  * untouched as its own SkinnedMesh, so a rig we cannot prove safe still renders
  * correctly (just without the saving).
+ *
+ * `exclude` names meshes that MUST stay their own addressable node (the cosmetic
+ * head/hair/beard meshes a char-select customizer toggles by name): merging them
+ * into one `_bodymerged` mesh would silently break `getObjectByName`, so they are
+ * left out of the buckets entirely.
  */
-export function mergeSkinnedParts(root: THREE.Object3D): void {
+export function mergeSkinnedParts(root: THREE.Object3D, exclude: Set<string> = new Set()): void {
   const groups = new Map<string, THREE.SkinnedMesh[]>();
   root.traverse((o) => {
     const sm = o as THREE.SkinnedMesh;
     if (!sm.isSkinnedMesh || !sm.visible) return;
+    if (exclude.has(sm.name)) return; // cosmetic mesh: keep individually addressable
     if (Array.isArray(sm.material)) return; // never happens via GLTFLoader
     if (hasMorphTargets(sm)) return; // would be silently dropped by the rebake
     const key = bucketKey(sm);

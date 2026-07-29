@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 
 // The bug: the landing character-creation preview was gated on the site-wide
@@ -26,6 +27,18 @@ function mockGltfLoad(failFirstNCalls: number): { calls: Map<string, number> } {
 }
 
 describe('character preview boot (first-visit transient asset failure)', () => {
+  it('mounts delayed boot into whichever play panel is active, including creation', () => {
+    const source = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
+    const boot = source.slice(
+      source.indexOf('charactersReady()'),
+      source.indexOf('// Looping home-page theme'),
+    );
+    expect(boot).toContain("'#charcreate-panel'");
+    expect(boot).toContain("'#charcreate-preview-container'");
+    expect(boot).toContain("activePanelId === '#charselect-panel' && charselectSelected");
+    expect(source).toContain('decorateClassChips();');
+  });
+
   it('retries a failed character GLB and eventually resolves', async () => {
     vi.resetModules();
     const { calls } = mockGltfLoad(1); // every URL fails once, then succeeds

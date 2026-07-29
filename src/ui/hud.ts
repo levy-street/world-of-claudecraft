@@ -18,10 +18,14 @@ import {
 import { voice, voiceDistanceGain } from '../game/voice';
 import type { ClaudiumStoreItem } from '../net/economy_sdk';
 import { castBarState, consumeBarState } from '../render/cast_bar';
-import { CharacterPreview, type PreviewFramingName } from '../render/characters';
+import {
+  CharacterPreview,
+  type PreviewAppearance,
+  type PreviewFramingName,
+} from '../render/characters';
 import { preloadMechAssets } from '../render/characters/assets';
-import { mechHeldWeaponOverride } from '../render/characters/manifest';
 import { onPortraitsReady } from '../render/characters/portrait';
+import { catalogForVisualKey } from '../render/characters/preview_appearance';
 import { isFriendlyPet, mobTooltipConColor } from '../render/reaction';
 import type { Renderer } from '../render/renderer';
 import {
@@ -1773,14 +1777,10 @@ export class Hud {
       this.claudiumWindow.onWalletChanged();
     });
     $('#pf-name').textContent = sim.player.name;
+    // No portraits-ready upgrade pass: every unit-frame portrait is now a committed
+    // static image (players use the painted class art, mobs /ui/mobs/<id>.webp), so
+    // none of them waits on the character GLB preload the way the old 3D headshot did.
     this.drawPlayerFramePortrait();
-    // Character GLBs preload after the HUD mounts; once the real 3D portraits are
-    // ready, upgrade the player frame and force the target frame to redraw.
-    onPortraitsReady(() => {
-      this.drawPlayerFramePortrait();
-      this.targetFramePainter.invalidatePortrait();
-      this.totFramePainter.invalidatePortrait();
-    });
     const mm = $('#minimap') as unknown as HTMLCanvasElement;
     this.minimapCtx = require2dContext(mm);
     this.minimapBg = this.renderTerrainCanvas(140, {
@@ -4215,24 +4215,19 @@ export class Hud {
     this.portraits.drawClass(
       $('#pf-portrait') as unknown as HTMLCanvasElement,
       this.sim.cfg.playerClass,
-      this.sim.player.skin ?? 0,
     );
   }
 
   // Redraw the target portrait canvas. Called by the unit_frame painter's repaint
   // gate ONLY when the target identity changes (or after invalidatePortrait), never
   // per frame, and reads the subject set just before that frame's paint() call. A
-  // player target shows its real 3D class headshot (rendered locally from the synced
-  // class + skin); mobs use committed model portraits and NPCs use their crest.
+  // player target shows its painted class art (the same icon the pre-game screens
+  // use); mobs use committed model portraits and NPCs use their crest.
   private drawTargetPortrait(): void {
     const target = this.targetPortraitSubject;
     if (!target) return;
     if (target.kind === 'player') {
-      this.portraits.drawClass(
-        this.targetPortraitEl,
-        target.templateId as PlayerClass,
-        target.skin ?? 0,
-      );
+      this.portraits.drawClass(this.targetPortraitEl, target.templateId as PlayerClass);
     } else {
       const template = MOBS[target.templateId];
       const faceUrl = targetPortraitUrl(target.templateId, Boolean(template));
@@ -4259,7 +4254,7 @@ export class Hud {
     const tot = this.totPortraitSubject;
     if (!tot) return;
     if (tot.kind === 'player') {
-      this.portraits.drawClass(this.totPortraitEl, tot.templateId as PlayerClass, tot.skin ?? 0);
+      this.portraits.drawClass(this.totPortraitEl, tot.templateId as PlayerClass);
     } else {
       this.portraits.drawCrest(
         this.totPortraitEl,
@@ -9143,6 +9138,10 @@ export class Hud {
           this.showBanner(t('hud.core.levelBanner', { level: ev.level }));
           this.log(t('hud.core.levelLog', { level: ev.level }), '#ffd100');
           audio.levelUp();
+          // The sheet's level, progression bar and the level-20 armor-set toggle are
+          // all level-derived, so a level-up with the sheet open leaves them stale
+          // until it is reopened (same staleness class the prestige arm fixes).
+          this.renderCharIfOpen();
           if (isTalentRowUnlockLevel(ev.level)) {
             this.showBanner(t('game.talents.rowUnlockToast'));
             // No local gain override: the manifest's resolved gain (keyTrimDb)
@@ -12501,6 +12500,11 @@ export class Hud {
       offhand: string | null;
       /** The active Armory weapon-skin cosmetic (null = the item's own model). */
       weaponSkinId: string | null;
+      face?: number;
+      hairStyle?: number;
+      beard?: boolean;
+      hairColor?: number;
+      faceColor?: number;
       framing: PreviewFramingName;
     },
   ): void {
@@ -12513,16 +12517,20 @@ export class Hud {
     } else {
       this.charPreview.setContainer(container);
     }
-    if (opts.previewKey) {
-      // Mech is class-agnostic; mirror the wearer class's hand layout so the
-      // paperdoll matches the in-world render.
-      const override = opts.previewKey === 'player_mech' ? mechHeldWeaponOverride(opts.cls) : null;
-      this.charPreview.setVisualKey(opts.previewKey, opts.mainhand, override, opts.offhand);
-    } else {
-      this.charPreview.setClass(opts.cls, opts.mainhand, opts.offhand);
-    }
-    this.charPreview.setSkin(opts.skin);
-    this.charPreview.setWeaponSkin(opts.weaponSkinId);
+    const appearance: PreviewAppearance = {
+      cls: opts.cls,
+      skin: opts.skin,
+      skinCatalog: opts.previewKey ? catalogForVisualKey(opts.previewKey) : 'class',
+      mainhandItemId: opts.mainhand,
+      offhandItemId: opts.offhand,
+      weaponSkinId: opts.weaponSkinId,
+      face: opts.face,
+      hairStyle: opts.hairStyle,
+      beard: opts.beard,
+      hairColor: opts.hairColor,
+      faceColor: opts.faceColor,
+    };
+    this.charPreview.setAppearance(appearance);
     this.charPreview.setFraming(opts.framing);
   }
 
@@ -12549,6 +12557,11 @@ export class Hud {
         mainhand,
         this.sim.accountCosmetics.weaponSkinLoadout,
       ),
+      face: this.sim.player.face,
+      hairStyle: this.sim.player.hairStyle,
+      beard: this.sim.player.beard,
+      hairColor: this.sim.player.hairColor,
+      faceColor: this.sim.player.faceColor,
       framing: 'sheet',
     });
   }
@@ -12568,6 +12581,11 @@ export class Hud {
       offhand: string | null;
       /** The inspected player's server-resolved active weapon skin (wire wsk). */
       weaponSkinId: string | null;
+      face?: number;
+      hairStyle?: number;
+      beard?: boolean;
+      hairColor?: number;
+      faceColor?: number;
     },
   ): void {
     const preview = activeCharacterAppearancePreview(params.cls, params.skin, params.skinCatalog);
@@ -12579,6 +12597,11 @@ export class Hud {
         mainhand: params.mainhand,
         offhand: params.offhand,
         weaponSkinId: params.weaponSkinId,
+        face: params.face,
+        hairStyle: params.hairStyle,
+        beard: params.beard,
+        hairColor: params.hairColor,
+        faceColor: params.faceColor,
         framing: 'inspect',
       });
     if (preview.visualKey !== 'player_mech') {

@@ -51,6 +51,12 @@ describe('inspect_window: thin painter, deps-only Hud access', () => {
     expect(painter).toContain('weaponSkinId: e.weaponSkinId ?? null');
   });
 
+  it('feeds the complete inspected head appearance to the shared turntable', () => {
+    for (const field of ['face', 'hairStyle', 'beard', 'hairColor', 'faceColor']) {
+      expect(painter).toContain(`${field}: e.${field}`);
+    }
+  });
+
   it('feeds the entity skin catalog to the pure core and the turntable mount (mech rigs)', () => {
     // Remote entities carry skinCatalog on the wire (the `cat` identity field); the
     // mount must see it or a mech-cosmetic player renders as a class rig wearing a

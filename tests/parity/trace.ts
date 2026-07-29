@@ -170,6 +170,11 @@ export const ENTITY_EXCLUDE: ReadonlySet<string> = new Set([
   'color',
   'skin', // appearance
   'skinCatalog',
+  'face', // render-only head appearance
+  'hairStyle',
+  'beard',
+  'hairColor',
+  'faceColor',
   'potionCdRemaining', // derived display copy of potionCooldownUntil (the pinned authority)
   'mainhandItemId', // render-only; "the sim never reads it for gameplay"
   'weaponSkinLoadout', // cosmetic weapon-skin selection; never read for gameplay

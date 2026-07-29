@@ -4,8 +4,11 @@ import type { PlayerClass } from '../../sim/types';
 import { trackWebGLContext } from '../context_release';
 import { mechAssetsReady, preloadMechAssets } from './assets';
 import type { WeaponLayoutOverride } from './manifest';
+import { PLAYER_HEIGHT_SCALE } from './player_scale';
 import {
   appearanceSignature,
+  classVisualKey,
+  DEFAULT_HEAD_APPEARANCE,
   type PreviewAppearance,
   previewAppearanceVisual,
 } from './preview_appearance';
@@ -42,6 +45,11 @@ export class CharacterPreview {
   private characterGroup: THREE.Group;
   private currentVisual: CharacterVisual | null = null;
   private currentSkin = 0;
+  private currentFace = DEFAULT_HEAD_APPEARANCE.face;
+  private currentHairStyle = DEFAULT_HEAD_APPEARANCE.hairStyle;
+  private currentBeard = DEFAULT_HEAD_APPEARANCE.beard;
+  private currentHairColor: number | undefined = undefined;
+  private currentFaceColor: number | undefined = undefined;
   // The active Armory weapon-skin cosmetic, persisted across visual rebuilds
   // exactly like currentSkin so a class/appearance swap keeps the skinned
   // weapon (the in-world renderer and the store preview both apply it; the
@@ -124,15 +132,23 @@ export class CharacterPreview {
 
   /** Set the active character model by player class. Pass explicit hand ids for a
    *  character sheet; omit them to show the class starter equipment in creation. */
-  setClass(cls: PlayerClass, weaponItemId?: string | null, offhandItemId?: string | null): void {
+  setClass(
+    cls: PlayerClass,
+    weaponItemId?: string | null,
+    offhandItemId?: string | null,
+    catalog: 'class' | 'armored' = 'class',
+  ): void {
     if (this.destroyed) return;
     // A class-driven selection (create/offline picker, or a panel switch) supersedes
     // any pending async mech re-apply, so invalidate the tracked appearance.
     this.appearanceSig = null;
+    // Creation/offline previews are not persisted roster appearances. Do not
+    // carry an Armory skin from the previously selected online character.
+    this.currentWeaponSkinId = null;
     const weapon = weaponItemId !== undefined ? weaponItemId : (CLASSES[cls].startWeapon ?? null);
     const offhand =
       offhandItemId !== undefined ? offhandItemId : (CLASSES[cls].startOffhand ?? null);
-    this.setVisualKey(`player_${cls}`, weapon, null, offhand);
+    this.setVisualKey(classVisualKey(cls, catalog), weapon, null, offhand);
   }
 
   /** Show a character's real, in-world appearance: the class rig or the Combat Mech
@@ -144,6 +160,11 @@ export class CharacterPreview {
   setAppearance(a: PreviewAppearance): void {
     if (this.destroyed) return;
     this.currentSkin = a.skin;
+    this.currentFace = a.face ?? 0;
+    this.currentHairStyle = a.hairStyle ?? 0;
+    this.currentBeard = a.beard ?? false;
+    this.currentHairColor = a.hairColor;
+    this.currentFaceColor = a.faceColor;
     this.currentWeaponSkinId = a.weaponSkinId ?? null;
     const sig = appearanceSignature(a);
     this.appearanceSig = sig;
@@ -184,6 +205,11 @@ export class CharacterPreview {
         weaponItemId,
         weaponOverride,
         offhandItemId,
+        this.currentHairStyle,
+        this.currentBeard,
+        this.currentHairColor,
+        this.currentFaceColor,
+        this.currentFace,
       );
       this.characterGroup.add(this.currentVisual.root);
       // Re-apply the persisted weapon-skin cosmetic to the rebuilt visual (the
@@ -214,6 +240,25 @@ export class CharacterPreview {
     this.appearanceSig = null;
     this.currentSkin = skinIndex;
     this.currentVisual?.setSkin(skinIndex);
+  }
+
+  /** Swap the previewed head look (face + hairstyle/beard + hair/face colour);
+   *  persists across setClass. */
+  setCosmetics(
+    hairStyle: number,
+    beard: boolean,
+    hairColor?: number,
+    faceColor?: number,
+    face = 0,
+  ): void {
+    if (this.destroyed) return;
+    this.appearanceSig = null;
+    this.currentFace = face;
+    this.currentHairStyle = hairStyle;
+    this.currentBeard = beard;
+    this.currentHairColor = hairColor;
+    this.currentFaceColor = faceColor;
+    this.currentVisual?.setCosmetics(hairStyle, beard, hairColor, faceColor, face);
   }
 
   /** Dynamically shift the canvas to a new container */
@@ -400,8 +445,12 @@ export class CharacterPreview {
     // above the 2.6 head-top to clear the raised weapon/arms of the hero & victory
     // poses (~3.3u) while the feet stay inside (BUG: card character was out of
     // bounds). The card's drawCharacter() fit math then frames the whole capture.
-    this.camera.position.set(-0.1, 1.62, 4.6);
-    this.camera.lookAt(new THREE.Vector3(-0.1, 1.55, 0));
+    //
+    // Those numbers are absolute world units composed around that 2.6 head-top, so
+    // they scale with the body: PLAYER_HEIGHT_SCALE keeps the same headroom and the
+    // same feet margin now that a player rig stands 3.12 tall.
+    this.camera.position.set(-0.1, 1.62 * PLAYER_HEIGHT_SCALE, 4.6 * PLAYER_HEIGHT_SCALE);
+    this.camera.lookAt(new THREE.Vector3(-0.1, 1.55 * PLAYER_HEIGHT_SCALE, 0));
     this.camera.updateProjectionMatrix();
     this.characterGroup.rotation.y = angle;
     this.renderer.render(this.scene, this.camera);
@@ -413,7 +462,8 @@ export class CharacterPreview {
     this.renderer.setSize(prevSize.x, prevSize.y, false);
     this.camera.aspect = prevAspect;
     this.camera.position.copy(prevPos);
-    this.camera.lookAt(new THREE.Vector3(LIVE_PREVIEW_X, 1.3, 0));
+    // Same aim height as PREVIEW_FRAMING.sheet.lookY, scaled the same way.
+    this.camera.lookAt(new THREE.Vector3(LIVE_PREVIEW_X, PREVIEW_FRAMING.sheet.lookY, 0));
     this.camera.updateProjectionMatrix();
     this.characterGroup.rotation.y = prevRotY;
     this.renderer.render(this.scene, this.camera);

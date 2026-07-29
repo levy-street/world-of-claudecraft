@@ -13,11 +13,26 @@ export interface AnimState {
   reverseBackpedal?: boolean;
   dead: boolean;
   casting: boolean;
+  /** The authoritative cast is a channel and must keep its pose cycling until
+   *  the server clears the channel, even when the authored cast clip is short. */
+  channeling?: boolean;
   /** Channeling a self-centered whirl such as Bladestorm. This wins over the
    *  generic cast and locomotion poses. */
   spinning?: boolean;
   swimming: boolean;
   sitting: boolean;
+}
+
+/** Copy authoritative cast facts into the renderer's reusable animation state. */
+export function writeCastingAnimState(
+  state: Pick<AnimState, 'casting' | 'channeling'>,
+  authoritativeChannel: boolean,
+  hasCast: boolean,
+  visualChannel: boolean,
+  visuallyDead: boolean,
+): void {
+  state.channeling = (authoritativeChannel || visualChannel) && !visuallyDead;
+  state.casting = (hasCast || state.channeling) && !visuallyDead;
 }
 
 export type BaseState =

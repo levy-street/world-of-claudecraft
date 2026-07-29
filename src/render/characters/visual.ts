@@ -167,7 +167,7 @@ const CLIMB_TOPOUT_END = 0.98;
 // surface glide; clip-less rigs (creatures) get the full procedural prone
 const SWIM_PITCH_CLIP = 0.35;
 const SWIM_PITCH_PROCEDURAL = 1.18;
-const SWIM_RISE = 0.95; // body must break the surface or only the hat floats
+const SWIM_RISE = 0.05; // sit the prone body at the surface (0.45 rode too high, -0.07 too deep)
 const MIXER_DT_CAP = 0.3; // throttled entities never integrate a huge step
 const SPIN_RATE = 14;
 const SPIN_ATTACK_TIMESCALE = 1.6;
@@ -226,6 +226,11 @@ export class CharacterVisual {
   private entityColor: number;
   private skinIndex: number;
   private weaponItemId: string | null;
+  private face: number;
+  private hairStyle: number;
+  private beard: boolean;
+  private hairColor: number | undefined;
+  private faceColor: number | undefined;
   private offhandItemId: string | null;
   private weaponSkinId: string | null = null;
   private weaponVfx: WeaponVfxHandle[] = [];
@@ -259,6 +264,7 @@ export class CharacterVisual {
   private shadowProxy: THREE.Mesh | null = null;
   private casters: THREE.Mesh[] = [];
   private originalMaterials = new Map<THREE.Mesh, THREE.Material | THREE.Material[]>();
+  private cosmeticTintMaterials = new Map<THREE.Mesh, THREE.Material>();
   /** The halo's build-time shared additive material. Re-snapshots after a
    *  swap must record THIS handle, not the live material: a swap under an
    *  active overlay (ghost/shadowform/...) would otherwise capture the
@@ -273,6 +279,8 @@ export class CharacterVisual {
   private metamorphMaterials = new Map<THREE.Material, THREE.Material>();
 
   private baseState: BaseState = 'idle';
+  private castShouldLoop = false;
+  private castLooping = false;
   private current: THREE.AnimationAction | null = null;
   private currentIsOneShot = false;
   private currentOneShotIsEmote = false;
@@ -308,6 +316,9 @@ export class CharacterVisual {
   private shadowform = false;
   private moonkin = false;
   private metamorph = false;
+  // Held weapons/shields are hidden while swimming (hands are busy) and shown on
+  // exit; tracked so a weapon swap mid-swim re-applies the hidden state.
+  private swimHidingWeapons = false;
   private bobPhase = Math.random() * Math.PI * 2;
 
   constructor(
@@ -317,6 +328,11 @@ export class CharacterVisual {
     weaponItemId: string | null = null,
     weaponOverride: WeaponLayoutOverride | null = null,
     offhandItemId: string | null = null,
+    hairStyle = 0,
+    beard = false,
+    hairColor: number | undefined = undefined,
+    faceColor: number | undefined = undefined,
+    face = 0,
   ) {
     const prep = prepareVisual(key);
     // A cosmetic body (the Combat Mech) keeps its model/clips but can adopt the
@@ -335,6 +351,11 @@ export class CharacterVisual {
     this.entityColor = entityColor;
     this.skinIndex = skinIndex;
     this.weaponItemId = weaponItemId;
+    this.face = face;
+    this.hairStyle = hairStyle;
+    this.beard = beard;
+    this.hairColor = hairColor;
+    this.faceColor = faceColor;
     this.offhandItemId = offhandItemId;
     this.height = prep.def.height;
 
@@ -365,6 +386,10 @@ export class CharacterVisual {
       const mesh = o as THREE.Mesh;
       if (mesh.isMesh) this.originalMaterials.set(mesh, mesh.material);
     });
+    // Head customization: hide/show the cosmetic hair + beard meshes per the
+    // chosen hairStyle/beard. Toggles visibility only, so it is independent of
+    // the material snapshot above and survives skin/ghost material swaps.
+    this.applyCosmetics();
     this.modelWrap.rotation.y = prep.def.yaw ?? 0;
     this.modelWrap.scale.setScalar(prep.normScale);
     this.modelWrap.position.y = prep.yOffset;
@@ -452,12 +477,23 @@ export class CharacterVisual {
       const desired = this.desiredBase(s);
       const baseChanged = desired !== this.baseState;
       if (baseChanged) this.baseState = desired;
+      const castLooping = desired === 'cast' && s.channeling === true;
+      this.castShouldLoop = castLooping;
+      const castLoopChanged = desired === 'cast' && castLooping !== this.castLooping;
       if (this.currentOneShotIsEmote && this.shouldInterruptEmote(s)) {
         this.currentIsOneShot = false;
         this.currentOneShotIsEmote = false;
-        this.fadeTo(this.baseAction(), FADE, false);
+        this.fadeTo(this.baseAction(), FADE, false, castLooping);
+        this.castLooping = castLooping;
       } else if (baseChanged && !this.currentIsOneShot) {
-        this.fadeTo(this.baseAction(), FADE, false);
+        this.fadeTo(this.baseAction(), FADE, false, castLooping);
+        this.castLooping = castLooping;
+      } else if (!this.currentIsOneShot && castLoopChanged) {
+        // A channel may begin or end while the cast action remains current.
+        // Switch the loop mode in place so a following hardcast becomes a
+        // clamped one-shot again without resetting the pose.
+        this.fadeTo(this.baseAction(), FADE, false, castLooping);
+        this.castLooping = castLooping;
       }
       // foot-speed matching on locomotion cycles
       if (!this.currentIsOneShot && this.current) {
@@ -501,6 +537,13 @@ export class CharacterVisual {
       this.swimBlend * (SWIM_RISE + Math.sin(this.swimBobTime * 2 + this.bobPhase) * 0.08) +
       // Compress at the start of the pull, back to neutral as the body rises.
       CLIMB_BODY_DUCK * climb * (1 - env01(this.climbPhase, 0.1, 0.55));
+
+    // Hide held weapons/shields while swimming (both hands are busy); show them
+    // again on exit. Edge-triggered on the swim state.
+    if (s.swimming !== this.swimHidingWeapons) {
+      this.swimHidingWeapons = s.swimming;
+      this.setHeldPropsVisible(!s.swimming);
+    }
 
     // distant corpses show the static idle far mesh — tip it over
     if (this.farMesh && this.farMesh.visible) {
@@ -752,7 +795,14 @@ export class CharacterVisual {
     this.baseState = 'cast';
     this.currentIsOneShot = false;
     this.currentOneShotIsEmote = false;
-    this.fadeTo(this.action(this.def.clips.cast) ?? this.action(this.def.clips.idle), FADE, false);
+    this.castShouldLoop = true;
+    this.castLooping = true;
+    this.fadeTo(
+      this.action(this.def.clips.cast) ?? this.action(this.def.clips.idle),
+      FADE,
+      false,
+      true,
+    );
   }
 
   playAttack(abilityId?: string): void {
@@ -784,6 +834,22 @@ export class CharacterVisual {
     if (clips.length > 0) {
       this.playOneShot(clips[this.attackIdx++ % clips.length], SPIN_ATTACK_TIMESCALE);
     }
+  }
+
+  /** Play a specific rig clip exactly once (clamped), or NOTHING if this rig has
+   *  no such clip. The primitive behind dedicated ability gestures and shouts: an
+   *  instant skill with no authored clip stays still (never a fallback swing, and
+   *  never an emote: emotes are reserved for actual emoting). */
+  playClipOnce(clip: string): void {
+    if (this.deadLock || !this.action(clip)) return;
+    this.playOneShot(clip, this.def.attackTimeScale ?? 1.3);
+  }
+
+  /** Play the ability's dedicated gesture clip (manifest attackByAbility), or
+   *  nothing when the ability has no mapped clip on this rig. */
+  playGesture(abilityId: string): void {
+    const clip = this.def.clips.attackByAbility?.[abilityId];
+    if (clip) this.playClipOnce(clip);
   }
 
   playHit(): void {
@@ -963,6 +1029,119 @@ export class CharacterVisual {
     }
   }
 
+  /** Swap the cosmetic head look at runtime; no-op if unchanged. Selects the face
+   *  (male/female), the hairstyle + beard within it, and the hair/face colour tints. */
+  setCosmetics(
+    hairStyle: number,
+    beard: boolean,
+    hairColor?: number,
+    faceColor?: number,
+    face = 0,
+  ): void {
+    if (
+      face === this.face &&
+      hairStyle === this.hairStyle &&
+      beard === this.beard &&
+      hairColor === this.hairColor &&
+      faceColor === this.faceColor
+    ) {
+      return;
+    }
+    this.face = face;
+    this.hairStyle = hairStyle;
+    this.beard = beard;
+    this.hairColor = hairColor;
+    this.faceColor = faceColor;
+    this.applyCosmetics();
+  }
+
+  private applyCosmetics(): void {
+    const cos = this.def.cosmetics;
+    if (!cos?.faces?.length) return;
+    const faceIdx = Math.min(Math.max(0, this.face), cos.faces.length - 1);
+    // Show the selected face's head + beard, hide the other faces' heads/beards.
+    cos.faces.forEach((f, i) => {
+      const active = i === faceIdx;
+      for (const name of f.face) {
+        const mesh = this.model.getObjectByName(name);
+        if (mesh) mesh.visible = active;
+      }
+      for (const name of f.beard ?? []) {
+        const mesh = this.model.getObjectByName(name);
+        if (mesh) mesh.visible = active && this.beard;
+      }
+    });
+    // Hair: hide every option across all faces, then show the selected face's
+    // chosen style (an empty option = bald, so nothing is shown).
+    const sel = cos.faces[faceIdx];
+    const shown = new Set(sel.hair[this.hairStyle] ?? sel.hair[0] ?? []);
+    for (const f of cos.faces) {
+      for (const option of f.hair) {
+        for (const name of option) {
+          const mesh = this.model.getObjectByName(name);
+          if (mesh) mesh.visible = shown.has(name);
+        }
+      }
+    }
+    // Colour tints: the flat hair group takes hairColor exactly; the textured
+    // face is multiplied by faceColor. undefined = keep the model's baked colour.
+    this.tintCosmeticMeshes(cos.hairMeshes, this.hairColor);
+    this.tintCosmeticMeshes(cos.faceMeshes, this.faceColor);
+  }
+
+  /** Clone the named meshes' materials and set their colour to the tint (a cheap
+   *  per-instance recolour). An undefined tint RESTORES the untinted look: it must
+   *  not be a no-op, or reverting to the default shade would leave the last tint
+   *  stuck on until the head model changed. Derives every tint from the pristine
+   *  cosmeticBase (not the current material) so shades never compound. */
+  private tintCosmeticMeshes(names: string[] | undefined, color: number | undefined): void {
+    if (!names) return;
+    for (const name of names) {
+      const mesh = this.model.getObjectByName(name) as THREE.Mesh | undefined;
+      if (!mesh?.isMesh) continue;
+      // The untinted material to fall back to. Stamped from the current (freshly
+      // applyMaterials'd) material the first time; re-stamped whenever a skin/weapon
+      // swap re-runs applyMaterials (see invalidateCosmeticBase).
+      if (mesh.userData.cosmeticBase === undefined) mesh.userData.cosmeticBase = mesh.material;
+      const cosmeticBase = mesh.userData.cosmeticBase as THREE.Material;
+      const previous = this.cosmeticTintMaterials.get(mesh);
+      if (previous) {
+        previous.dispose();
+        this.cosmeticTintMaterials.delete(mesh);
+      }
+      if (color === undefined) {
+        mesh.material = cosmeticBase;
+        this.originalMaterials.set(mesh, cosmeticBase);
+        continue;
+      }
+      const mat = (cosmeticBase as THREE.MeshStandardMaterial).clone();
+      if ((mat as THREE.MeshStandardMaterial).color) {
+        (mat as THREE.MeshStandardMaterial).color.setHex(color);
+      }
+      mesh.material = mat;
+      this.cosmeticTintMaterials.set(mesh, mat);
+      this.originalMaterials.set(mesh, mat);
+    }
+  }
+
+  private disposeCosmeticTintMaterials(): void {
+    for (const material of this.cosmeticTintMaterials.values()) material.dispose();
+    this.cosmeticTintMaterials.clear();
+  }
+
+  /** A skin/weapon swap re-runs applyMaterials, which rebuilds every mesh from its
+   *  embedded base and so invalidates the untinted cosmeticBase snapshot. Drop it so
+   *  the next applyCosmetics re-stamps from the fresh material. */
+  private invalidateCosmeticBase(): void {
+    const cos = this.def.cosmetics;
+    if (!cos) return;
+    this.disposeCosmeticTintMaterials();
+    for (const name of [...(cos.hairMeshes ?? []), ...(cos.faceMeshes ?? [])]) {
+      const mesh = this.model.getObjectByName(name);
+      if (mesh) mesh.userData.cosmeticBase = undefined;
+    }
+  }
+
   private applySkinMaterials(skinIndex: number): void {
     applyMaterials(
       this.model,
@@ -984,6 +1163,10 @@ export class CharacterVisual {
         mesh.name === 'class_halo' ? (this.haloBaseMaterial ?? mesh.material) : mesh.material;
       this.originalMaterials.set(mesh, original);
     });
+    // applyMaterials reset the cosmetic head meshes too, so re-stamp their untinted
+    // base and re-apply the hair/face tints; otherwise a chroma swap drops them.
+    this.invalidateCosmeticBase();
+    this.applyCosmetics();
     this.applyVisualMaterials();
   }
 
@@ -1038,6 +1221,8 @@ export class CharacterVisual {
     this.originalMaterials.clear();
     this.rebuildCasters();
     this.applyVisualMaterials();
+    // an offhand swap mid-swim rebuilt visible props: keep them hidden if swimming
+    if (this.swimHidingWeapons) this.setHeldPropsVisible(false);
   }
 
   /** Apply or clear a Season 1 Armory weapon-skin cosmetic: the skin's model
@@ -1130,9 +1315,15 @@ export class CharacterVisual {
     // list and re-snapshot originals, then re-apply ghost/stealth overlays.
     this.originalMaterials.clear();
     this.rebuildCasters();
+    // applyMaterials reset the cosmetic head meshes too: re-stamp + re-tint so a
+    // weapon swap does not drop the hair/face tints.
+    this.invalidateCosmeticBase();
+    this.applyCosmetics();
     this.applyVisualMaterials();
     this.buildWeaponVfx(payloads);
     this.rebuildWeaponAura();
+    // a swap mid-swim rebuilt visible props: honor the hidden-while-swimming state
+    if (this.swimHidingWeapons) this.setHeldPropsVisible(false);
   }
 
   setWeaponAura(on: boolean): void {
@@ -1181,6 +1372,18 @@ export class CharacterVisual {
       (mesh.material as THREE.Material).dispose();
     }
     this.weaponAuraMeshes.length = 0;
+  }
+
+  /** Show/hide every held prop mesh (weapons, shield, their VFX + aura) without
+   *  disturbing the attach graph. Used to clear the hands while swimming. */
+  private setHeldPropsVisible(visible: boolean): void {
+    this.model.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      if (mesh.isMesh && (mesh.userData.weaponMesh || mesh.userData.weaponVfxMesh)) {
+        mesh.visible = visible;
+      }
+    });
+    for (const m of this.weaponAuraMeshes) m.visible = visible;
   }
 
   private weaponSkinVfxSpec() {
@@ -1376,6 +1579,7 @@ export class CharacterVisual {
     this.disposeWeaponAura();
     this.disposeWeaponVfx();
     this.disposeWeaponSkinMaterials();
+    this.disposeCosmeticTintMaterials();
     this.disposeEffectMaterials();
     this.mixer.stopAllAction();
     this.mixer.uncacheRoot(this.model);
@@ -1542,13 +1746,28 @@ export class CharacterVisual {
     return s.moving || s.airborne || s.swimming || s.casting || !!s.spinning || s.sitting || s.dead;
   }
 
-  private fadeTo(next: THREE.AnimationAction | null, fade: number, oneShot: boolean): void {
+  private fadeTo(
+    next: THREE.AnimationAction | null,
+    fade: number,
+    oneShot: boolean,
+    forceLoop = false,
+  ): void {
     if (!next) return;
-    if (next === this.current && !oneShot) return;
+    if (next === this.current && !oneShot) {
+      const loopOnce = !forceLoop && this.isOnce(next);
+      next.setLoop(loopOnce ? THREE.LoopOnce : THREE.LoopRepeat, Infinity);
+      next.clampWhenFinished = loopOnce;
+      // A completed, clamped LoopOnce action is paused by Three.js. Promoting
+      // that same clip to a channel must resume mixer integration; setLoop()
+      // alone only changes metadata and leaves the final frame frozen.
+      if (forceLoop) next.paused = false;
+      return;
+    }
     const prev = this.current;
     next.reset();
-    next.setLoop(oneShot || this.isOnce(next) ? THREE.LoopOnce : THREE.LoopRepeat, Infinity);
-    next.clampWhenFinished = true;
+    const loopOnce = oneShot || (!forceLoop && this.isOnce(next));
+    next.setLoop(loopOnce ? THREE.LoopOnce : THREE.LoopRepeat, Infinity);
+    next.clampWhenFinished = loopOnce;
     next.timeScale = 1;
     if (prev && prev !== next) prev.fadeOut(fade);
     next.fadeIn(fade).play();
@@ -1559,7 +1778,12 @@ export class CharacterVisual {
 
   /** sit-down transitions play once, then hand off to the sit-idle loop */
   private isOnce(a: THREE.AnimationAction): boolean {
-    return this.baseState === 'sit' && a === this.action(this.def.clips.sitDown);
+    if (this.baseState === 'sit') return a === this.action(this.def.clips.sitDown);
+    // The cast and jump poses play ONCE and hold their final frame: a cast (or an
+    // airtime) longer than the clip no longer loops it (onFinished holds, below).
+    if (this.baseState === 'cast') return a === this.action(this.def.clips.cast);
+    if (this.baseState === 'jump') return a === this.action(this.def.clips.jump);
+    return false;
   }
 
   private playOneShot(
@@ -1593,10 +1817,17 @@ export class CharacterVisual {
       this.fadeTo(this.action(this.def.clips.sitIdle) ?? a, 0.25, false);
       return;
     }
+    // Cast and jump poses are LoopOnce: hold the clamped final frame instead of
+    // re-triggering (which would loop). They leave the state via update()'s normal
+    // baseChanged path the moment casting ends / the character lands.
+    if (this.baseState === 'cast' && a === this.action(this.def.clips.cast)) return;
+    if (this.baseState === 'jump' && a === this.action(this.def.clips.jump)) return;
     if (a === this.current) {
       this.currentIsOneShot = false;
       this.currentOneShotIsEmote = false;
-      this.fadeTo(this.baseAction(), 0.18, false);
+      const castLooping = this.baseState === 'cast' && this.castShouldLoop;
+      this.fadeTo(this.baseAction(), 0.18, false, castLooping);
+      this.castLooping = castLooping;
     }
   }
 

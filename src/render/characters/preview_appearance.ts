@@ -9,12 +9,76 @@ import { mechHeldWeaponOverride } from './manifest';
 export interface PreviewAppearance {
   cls: PlayerClass;
   skin: number;
-  skinCatalog: 'class' | 'mech';
+  skinCatalog: 'class' | 'mech' | 'armored';
   mainhandItemId: string | null;
   /** The active Armory weapon-skin cosmetic, or null/absent for none. */
   weaponSkinId?: string | null;
   /** Optional for older character-summary callers; absent renders no offhand. */
   offhandItemId?: string | null;
+  /** Cosmetic head look (defaults: face 0, hairStyle 0, beard off, model colours). */
+  face?: number;
+  hairStyle?: number;
+  beard?: boolean;
+  hairColor?: number;
+  faceColor?: number;
+}
+
+export const DEFAULT_HEAD_APPEARANCE: Readonly<{
+  face: number;
+  hairStyle: number;
+  beard: boolean;
+}> = Object.freeze({
+  face: 0,
+  hairStyle: 0,
+  beard: false,
+});
+
+/** Per-class starting head look for the character creator, so the class roster
+ *  reads with variety instead of every class sharing hairStyle 0. Any field left
+ *  out falls back to DEFAULT_HEAD_APPEARANCE, and the player can still pick any
+ *  option in the head picker. Indices map to the picker buttons (button N shows
+ *  index N-1). face: 0 = male (button 1), 1 = female (button 2). hairStyle (for
+ *  the male face): 0 = Hair_04, 1 = Hair_01, 2 = Hair_02, 3 = Hair_03, 4 = bald.
+ *  (see V02_HEAD_COSMETICS in manifest.ts.) */
+export const CLASS_DEFAULT_HEAD: Readonly<
+  Partial<Record<PlayerClass, Readonly<{ face?: number; hairStyle?: number; beard?: boolean }>>>
+> = Object.freeze({
+  rogue: { face: 1 },
+  druid: { face: 1 },
+  priest: { face: 1 },
+  paladin: { hairStyle: 2 },
+  warrior: { hairStyle: 3, beard: true },
+  hunter: { hairStyle: 2 },
+  mage: { hairStyle: 3 },
+});
+
+/** The character creator's starting head look for a class: the per-class default
+ *  merged over the global default. */
+export function defaultHeadFor(cls: PlayerClass): {
+  face: number;
+  hairStyle: number;
+  beard: boolean;
+} {
+  return { ...DEFAULT_HEAD_APPEARANCE, ...(CLASS_DEFAULT_HEAD[cls] ?? {}) };
+}
+
+/** The body model key for a class in a given cosmetic catalog. The level-20
+ *  'armored' look is a separate per-class body (like the Mech), so it resolves
+ *  to its own key; every other catalog uses the plain class body. Shared by the
+ *  preview and the appearance resolver so they can never disagree. */
+export function classVisualKey(cls: PlayerClass, catalog: 'class' | 'mech' | 'armored'): string {
+  if (catalog === 'mech') return 'player_mech';
+  return catalog === 'armored' ? `player_${cls}_armored` : `player_${cls}`;
+}
+
+/** The cosmetic catalog a body model key came from: the inverse of
+ *  `classVisualKey`. Callers that only have a key (the HUD mounts the character
+ *  preview by key) need this to rebuild a PreviewAppearance without flattening
+ *  every non-mech key to 'class', which silently rendered the base body in place
+ *  of the level-20 armored one. */
+export function catalogForVisualKey(key: string): 'class' | 'mech' | 'armored' {
+  if (key === 'player_mech') return 'mech';
+  return key.endsWith('_armored') ? 'armored' : 'class';
 }
 
 /** The model key + held-weapon layout the appearance resolves to. */
@@ -32,7 +96,7 @@ export interface PreviewVisual {
 export function previewAppearanceVisual(a: PreviewAppearance): PreviewVisual {
   const mech = a.skinCatalog === 'mech';
   return {
-    visualKey: mech ? 'player_mech' : `player_${a.cls}`,
+    visualKey: classVisualKey(a.cls, a.skinCatalog),
     weaponItemId: a.mainhandItemId ?? null,
     offhandItemId: a.offhandItemId ?? null,
     weaponOverride: mech ? mechHeldWeaponOverride(a.cls) : null,
@@ -45,5 +109,5 @@ export function appearanceSignature(a: PreviewAppearance): string {
   // weaponSkinId is part of the identity: without it, applying or removing an
   // Armory skin while a preview is mounted elides as "same appearance" and the
   // stale weapon model survives the repaint.
-  return `${a.cls}|${a.skin}|${a.skinCatalog}|${a.mainhandItemId ?? ''}|${a.offhandItemId ?? ''}|${a.weaponSkinId ?? ''}`;
+  return `${a.cls}|${a.skin}|${a.skinCatalog}|${a.mainhandItemId ?? ''}|${a.offhandItemId ?? ''}|${a.weaponSkinId ?? ''}|${a.face ?? 0}|${a.hairStyle ?? 0}|${a.beard ?? false}|${a.hairColor ?? ''}|${a.faceColor ?? ''}`;
 }

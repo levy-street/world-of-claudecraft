@@ -59,8 +59,12 @@ export function wireSkinPicker(
     b.addEventListener(
       'click',
       () => {
-        for (const s of swatches) s.classList.remove('sel');
+        for (const s of swatches) {
+          s.classList.remove('sel');
+          s.setAttribute('aria-pressed', 'false');
+        }
         b.classList.add('sel');
+        b.setAttribute('aria-pressed', 'true');
         hooks.onPick(skin);
       },
       { signal },

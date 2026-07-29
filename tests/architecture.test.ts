@@ -1046,6 +1046,7 @@ const UI_DOM_MODULES = [
   'src/ui/form_draft.ts',
   'src/ui/gather_node_tooltip.ts',
   'src/ui/gpu_notice_toast.ts',
+  'src/ui/head_picker.ts',
   'src/ui/hud.ts',
   'src/ui/hud/chat/chat_geometry_controller.ts',
   'src/ui/hud/chat/chat_window_controller.ts',

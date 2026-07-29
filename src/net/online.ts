@@ -42,7 +42,7 @@ import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import { getArchetypeTitle, getHobbyCraft } from '../sim/professions/archetype';
 import type { MaterialRarity } from '../sim/professions/gathering';
 import { emptyCraftSkills } from '../sim/professions/wheel';
-import type { ResolvedAbility } from '../sim/sim';
+import type { HeadAppearance, ResolvedAbility } from '../sim/sim';
 import { parseTalentAllocation } from '../sim/talent_allocation_input';
 import { repairTalentLoadouts } from '../sim/talent_loadouts';
 import {
@@ -179,12 +179,17 @@ export interface CharacterSummary {
   // Real, in-world appearance so the char-select preview matches the game. Both
   // optional for back-compat with an older server that omits them: absent
   // skinCatalog defaults to the class rig, absent hand fields show no item.
-  skinCatalog?: 'class' | 'mech';
+  skinCatalog?: 'class' | 'mech' | 'armored';
   mainhandItemId?: string | null;
   offhandItemId?: string | null;
   /** The account's active Armory weapon skin for this character (server-resolved
    *  per class + mainhand). Optional for back-compat like the fields above. */
   weaponSkinId?: string | null;
+  face?: number;
+  hairStyle?: number;
+  beard?: boolean;
+  hairColor?: number;
+  faceColor?: number;
 }
 
 function stringList(value: unknown): string[] {
@@ -737,8 +742,13 @@ export class Api {
     return data.characters;
   }
 
-  async createCharacter(name: string, cls: PlayerClass, skin = 0): Promise<void> {
-    await this.post('/api/characters', { name, class: cls, skin });
+  async createCharacter(
+    name: string,
+    cls: PlayerClass,
+    skin = 0,
+    head?: HeadAppearance,
+  ): Promise<void> {
+    await this.post('/api/characters', { name, class: cls, skin, ...(head ?? {}) });
   }
 
   async renameCharacter(characterId: number, name: string): Promise<void> {
@@ -2398,6 +2408,12 @@ export class ClientWorld implements IWorld {
         e.name = w.nm;
         e.level = w.lv;
         e.skin = w.sk ?? 0;
+        // Head cosmetics (identity fields; absent on a full record = default look).
+        e.face = w.fac ?? 0;
+        e.hairStyle = w.hs ?? 0;
+        e.beard = !!w.bd;
+        e.hairColor = typeof w.hcl === 'number' ? w.hcl : undefined;
+        e.faceColor = typeof w.fcl === 'number' ? w.fcl : undefined;
         e.mainhandItemId = w.mh ?? null; // equipped mainhand → held weapon model (render-only)
         e.offhandItemId = w.oh ?? null; // equipped offhand → held weapon model (render-only)
         e.weaponSkinId = w.wsk ?? null; // active weapon-skin cosmetic (render-only)
@@ -2412,7 +2428,10 @@ export class ClientWorld implements IWorld {
             ([slot, inst]) => [slot, cloneItemInstancePayload(inst)],
           ),
         );
-        e.skinCatalog = w.cat === 'mech' ? 'mech' : 'class';
+        // Absolute, not `w.cat ?? e.skinCatalog`: decoding it absolutely is what
+        // reverts the optimistic local nudge in changeSkin when the server refuses
+        // the catalog (e.g. below the armor-set unlock level).
+        e.skinCatalog = w.cat === 'mech' ? 'mech' : w.cat === 'armored' ? 'armored' : 'class';
         e.holderTier = w.ht ?? 0; // $WOC holder-tier flair (cosmetic, server-set)
         e.holderBalance = typeof w.hb === 'number' ? w.hb : undefined; // exact $WOC, for inspect
         e.discordTier = w.dt ?? 0; // Discord status-tier flair (cosmetic, server-set)
@@ -3485,7 +3504,7 @@ export class ClientWorld implements IWorld {
   // --- IWorldCosmetics: skin + mech-chroma equips. Optimistic local nudge, then
   // the snake_case cmd (change_skin/claim_event_skin/unequip_mech_chroma); the
   // server re-validates and the self-snapshot reconciles. ---
-  changeSkin(skin: number, catalog: 'class' | 'mech' = 'class'): void {
+  changeSkin(skin: number, catalog: 'class' | 'mech' | 'armored' = 'class'): void {
     const idx =
       catalog === 'mech'
         ? Math.max(0, Math.floor(skin))

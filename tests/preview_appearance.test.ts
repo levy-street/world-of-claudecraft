@@ -4,6 +4,9 @@ import { mechHeldWeaponOverride } from '../src/render/characters/manifest';
 import { CharacterPreview } from '../src/render/characters/preview';
 import {
   appearanceSignature,
+  CLASS_DEFAULT_HEAD,
+  DEFAULT_HEAD_APPEARANCE,
+  defaultHeadFor,
   type PreviewAppearance,
   previewAppearanceVisual,
 } from '../src/render/characters/preview_appearance';
@@ -82,6 +85,10 @@ beforeEach(() => {
 });
 
 describe('previewAppearanceVisual', () => {
+  it('uses the same clean-shaven defaults as character creation and persistence', () => {
+    expect(DEFAULT_HEAD_APPEARANCE).toEqual({ face: 0, hairStyle: 0, beard: false });
+  });
+
   it('uses the class rig for a class-catalog character and holds its mainhand', () => {
     const v = previewAppearanceVisual(
       appearance({ cls: 'rogue', mainhandItemId: 'dagger_x', offhandItemId: 'dagger_y' }),
@@ -125,6 +132,42 @@ describe('previewAppearanceVisual', () => {
   });
 });
 
+describe('defaultHeadFor (per-class character-creator starting head)', () => {
+  it('gives the named classes the face-2 (female) head, and paladin hair 3', () => {
+    // "face 2" is the picker's second Face button = face index 1 (female).
+    expect(defaultHeadFor('rogue').face).toBe(1);
+    expect(defaultHeadFor('druid').face).toBe(1);
+    expect(defaultHeadFor('priest').face).toBe(1);
+    // paladin was asked for "hair 3" = hairStyle index 2, male face kept.
+    expect(defaultHeadFor('paladin')).toEqual({ face: 0, hairStyle: 2, beard: false });
+  });
+
+  it('falls back to the global default for a class with no per-class override', () => {
+    // shaman and warlock are intentionally left on the global default.
+    expect(CLASS_DEFAULT_HEAD.shaman).toBeUndefined();
+    expect(defaultHeadFor('shaman')).toEqual(DEFAULT_HEAD_APPEARANCE);
+    expect(defaultHeadFor('warlock')).toEqual(DEFAULT_HEAD_APPEARANCE);
+  });
+
+  it('merges a partial override over the global default without dropping other fields', () => {
+    // warrior overrides hairStyle AND beard; face must still inherit the default 0.
+    const warrior = defaultHeadFor('warrior');
+    expect(warrior).toEqual({ face: 0, hairStyle: 3, beard: true });
+  });
+
+  it('keeps the male face (index 0) for every class not given face 2', () => {
+    for (const cls of ['warrior', 'paladin', 'hunter', 'shaman', 'mage', 'warlock'] as const) {
+      expect(defaultHeadFor(cls).face).toBe(0);
+    }
+  });
+
+  it('returns a fresh object each call so a caller cannot mutate the shared default', () => {
+    const a = defaultHeadFor('rogue');
+    a.face = 99;
+    expect(defaultHeadFor('rogue').face).toBe(1);
+  });
+});
+
 describe('appearanceSignature', () => {
   it('changes when any appearance field changes', () => {
     const base = appearance({ cls: 'rogue', skin: 2, mainhandItemId: 'a' });
@@ -136,6 +179,11 @@ describe('appearanceSignature', () => {
     expect(appearanceSignature({ ...base, skinCatalog: 'mech' })).not.toBe(sig);
     expect(appearanceSignature({ ...base, mainhandItemId: 'b' })).not.toBe(sig);
     expect(appearanceSignature({ ...base, offhandItemId: 'b' })).not.toBe(sig);
+    expect(appearanceSignature({ ...base, face: 1 })).not.toBe(sig);
+    expect(appearanceSignature({ ...base, hairStyle: 2 })).not.toBe(sig);
+    expect(appearanceSignature({ ...base, beard: true })).not.toBe(sig);
+    expect(appearanceSignature({ ...base, hairColor: 0x112233 })).not.toBe(sig);
+    expect(appearanceSignature({ ...base, faceColor: 0x445566 })).not.toBe(sig);
   });
 
   it('changes when the Armory weapon skin changes (apply, swap, and remove)', () => {
@@ -285,6 +333,13 @@ describe('CharacterPreview.setVisualKey: the weapon-skin rebuild contract', () =
   it('leaves the skin path untouched when none is persisted (char-create stays bare)', () => {
     const preview = rawPreview(null);
     preview.setVisualKey('player_rogue', 'rusty_dagger', null, null);
+    const built = visualDoubles.built.at(-1) as { setWeaponSkin: ReturnType<typeof vi.fn> };
+    expect(built.setWeaponSkin).not.toHaveBeenCalled();
+  });
+
+  it('clears a roster weapon skin when switching to class creation', () => {
+    const preview = rawPreview('frostbite_dagger');
+    preview.setClass('rogue');
     const built = visualDoubles.built.at(-1) as { setWeaponSkin: ReturnType<typeof vi.fn> };
     expect(built.setWeaponSkin).not.toHaveBeenCalled();
   });

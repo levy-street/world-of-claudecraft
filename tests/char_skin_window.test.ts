@@ -8,19 +8,22 @@ vi.mock('../src/render/characters/assets', () => ({
 import { MECH_CHROMAS } from '../src/sim/content/skins';
 import { type CharSkinPainterHost, paintCharSkinPicker } from '../src/ui/char_skin_window';
 
+type Catalog = 'class' | 'mech' | 'armored';
+
 function makeHost(overrides?: {
   playerClass?: string;
   skin?: number;
-  skinCatalog?: 'class' | 'mech';
+  skinCatalog?: Catalog;
   mechChromaIds?: string[];
+  level?: number;
 }): CharSkinPainterHost & {
-  changeSkinCalls: [number, 'class' | 'mech'][];
+  changeSkinCalls: [number, Catalog][];
   unequipCalls: string[];
   renderBagsCalls: number;
   renderCharIfOpenCalls: number;
   preloadMechAssetsCalls: number;
 } {
-  const changeSkinCalls: [number, 'class' | 'mech'][] = [];
+  const changeSkinCalls: [number, Catalog][] = [];
   const unequipCalls: string[] = [];
   let renderBagsCalls = 0;
   let renderCharIfOpenCalls = 0;
@@ -31,9 +34,11 @@ function makeHost(overrides?: {
       player: {
         skin: overrides?.skin ?? 0,
         skinCatalog: overrides?.skinCatalog ?? 'class',
+        // Below the armor-set unlock level unless a case opts in.
+        level: overrides?.level ?? 1,
       },
       accountCosmetics: { mechChromaIds: overrides?.mechChromaIds ?? [] },
-      changeSkin(skin: number, catalog: 'class' | 'mech') {
+      changeSkin(skin: number, catalog: Catalog) {
         changeSkinCalls.push([skin, catalog]);
       },
       unequipMechChroma(id: string) {
@@ -149,5 +154,112 @@ describe('char_skin_window: paintCharSkinPicker (extracted from hud.ts)', () => 
     await Promise.resolve();
     await Promise.resolve();
     expect(host.mountCharPreview).toHaveBeenCalled();
+  });
+});
+
+describe('level-20 armor-set toggle', () => {
+  const armorToggle = (): HTMLButtonElement | null =>
+    document.querySelector('#char-skin-row [data-kind="armored"]');
+
+  it('is absent below the unlock level and present at it', () => {
+    paintCharSkinPicker(makeHost({ level: 19 }));
+    expect(armorToggle()).toBeNull();
+
+    paintCharSkinPicker(makeHost({ level: 20 }));
+    expect(armorToggle()).not.toBeNull();
+  });
+
+  it('shows the class armor art, not a chroma number', () => {
+    paintCharSkinPicker(makeHost({ playerClass: 'druid', level: 20 }));
+    const toggle = armorToggle();
+
+    const art = toggle?.querySelector('img');
+    expect(art?.getAttribute('src')).toBe('/ui/armor-sets/druid.webp');
+    // Decorative: the accessible name lives on the button, so a screen reader must
+    // not hear the filename twice.
+    expect(art?.getAttribute('alt')).toBe('');
+    expect(toggle?.textContent).toBe('');
+    expect(toggle?.getAttribute('aria-label')).toBeTruthy();
+    // The row is painted role=list, so every child has to be a listitem.
+    expect(toggle?.getAttribute('role')).toBe('listitem');
+  });
+
+  it('wears the armor over the CHROMA the player already picked', () => {
+    const host = makeHost({ level: 20, skin: 2, skinCatalog: 'class' });
+    paintCharSkinPicker(host);
+
+    expect(armorToggle()?.getAttribute('aria-pressed')).toBe('false');
+    armorToggle()?.click();
+
+    // skin 2, not 0: equipping the set must not silently reset the chroma.
+    expect(host.changeSkinCalls).toEqual([[2, 'armored']]);
+  });
+
+  it('restores that chroma when the armor is toggled back off', () => {
+    const host = makeHost({ level: 20, skin: 2, skinCatalog: 'armored' });
+    paintCharSkinPicker(host);
+
+    expect(armorToggle()?.getAttribute('aria-pressed')).toBe('true');
+    armorToggle()?.click();
+
+    expect(host.changeSkinCalls).toEqual([[2, 'class']]);
+  });
+
+  it('keeps the underlying chroma visibly selected while the armor is worn', () => {
+    paintCharSkinPicker(makeHost({ level: 20, skin: 2, skinCatalog: 'armored' }));
+
+    const chromas = [...document.querySelectorAll('#char-skin-row [data-kind="class"]')];
+    // Showing nothing selected would misreport what removing the armor returns to.
+    expect(chromas.findIndex((el) => el.classList.contains('sel'))).toBe(2);
+    expect(armorToggle()?.classList.contains('sel')).toBe(true);
+  });
+
+  it('wears the armor over a chroma picked AFTER the row was painted', () => {
+    // The regression this pins: clicking a chroma does not repaint the row, so a
+    // handler that captured the skin at paint time equips over a stale 0 and throws
+    // the chroma away. Only a live read survives this ordering.
+    const host = makeHost({ level: 20, skin: 0, skinCatalog: 'class' });
+    let liveSkin = 0;
+    let liveCatalog: Catalog = 'class';
+    host.sim.player.skin = 0;
+    const originalChange = host.sim.changeSkin.bind(host.sim);
+    host.sim.changeSkin = (skin: number, catalog: Catalog) => {
+      liveSkin = skin;
+      liveCatalog = catalog;
+      host.sim.player.skin = skin;
+      host.sim.player.skinCatalog = catalog;
+      originalChange(skin, catalog);
+    };
+    paintCharSkinPicker(host);
+
+    document.querySelectorAll<HTMLButtonElement>('#char-skin-row [data-kind="class"]')[2]?.click();
+    expect(liveSkin).toBe(2);
+
+    armorToggle()?.click();
+
+    expect([liveSkin, liveCatalog]).toEqual([2, 'armored']);
+  });
+
+  it('changes chroma without taking the armor off', () => {
+    const host = makeHost({ level: 20, skin: 0, skinCatalog: 'armored' });
+    paintCharSkinPicker(host);
+
+    const chromas = document.querySelectorAll<HTMLButtonElement>(
+      '#char-skin-row [data-kind="class"]',
+    );
+    chromas[3]?.click();
+
+    // Still 'armored': the two choices are independent.
+    expect(host.changeSkinCalls).toEqual([[3, 'armored']]);
+  });
+
+  it('repaints after a toggle so the pressed state cannot go stale', () => {
+    const host = makeHost({ level: 20 });
+    paintCharSkinPicker(host);
+    const before = host.renderCharIfOpenCalls;
+
+    armorToggle()?.click();
+
+    expect(host.renderCharIfOpenCalls).toBe(before + 1);
   });
 });

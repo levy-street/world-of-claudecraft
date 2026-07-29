@@ -141,12 +141,25 @@ describe('held weapon models', () => {
       ],
     ] as const;
 
+    // The left row is NOT the table's usual "same position, identity quaternion"
+    // mirror. Measured against the live bind pose on the Mixamo-rigged player
+    // bodies, that naive row presented the shield's INNER face (it read as strapped
+    // on backwards): the bone's local -Z is the character's left, so the right-hand
+    // +z pinned the disc to the inside of the forearm. So the left row negates z and
+    // keeps the same half turn about the hand's up axis as the right.
     for (const [file, node, grip] of seats) {
       expect(KAYKIT_SHIELD_ACCESSORIES[file]).toBe(node);
+      const [x, y, z] = grip.position;
       expect(KAYKIT_SHIELD_GRIPS[node]).toEqual({
         r: { ...grip, quaternion: [0, 1, 0, 0] },
-        l: { ...grip, quaternion: [0, 0, 0, 1] },
+        l: { ...grip, position: [x, y, -z], quaternion: [0, 1, 0, 0] },
       });
+      // Stated on its own so a regression to the naive mirror is unmistakable: the
+      // two hands must not share a z, and neither may fall back to identity.
+      expect(KAYKIT_SHIELD_GRIPS[node].l.position[2], `${node} left z`).toBe(-z);
+      expect(KAYKIT_SHIELD_GRIPS[node].l.quaternion, `${node} left rotation`).not.toEqual([
+        0, 0, 0, 1,
+      ]);
     }
     expect(KAYKIT_SHIELD_GRIPS).not.toHaveProperty('Shield');
   });
@@ -187,10 +200,14 @@ describe('held weapon models', () => {
     const players = Object.keys(VISUALS).filter((k) => k.startsWith('player_'));
     expect(players).toContain('player_hunter');
     expect(players).toContain('player_mech');
+    expect(players).toContain('player_hunter_armored');
     for (const key of players) {
       const def = VISUALS[key];
-      if (key === 'player_hunter') {
-        expect(def.weaponSlots, 'hunter must keep its crossbow').toBeUndefined();
+      // The level-20 armored bodies are cosmetic swaps of the class body, so the
+      // exemption is a property of the CLASS, not of one visual key: the armored
+      // hunter keeps its crossbow for exactly the same reason the base one does.
+      if (key === 'player_hunter' || key === 'player_hunter_armored') {
+        expect(def.weaponSlots, `${key} must keep its crossbow`).toBeUndefined();
       } else {
         expect(def.weaponSlots?.includes(0), `${key} should swap its mainhand`).toBe(true);
       }
@@ -205,7 +222,14 @@ describe('held weapon models', () => {
     expect(VISUALS.player_warrior.offhandSlot).toBe(1);
     expect(VISUALS.player_warrior.attach).toEqual([
       { url: 'models/weapons/sword_1handed.glb', bone: 'handslot.r' },
-      { url: 'models/weapons/shield_round.glb', bone: 'handslot.l' },
+      // the shield seats on the hand slot via the per-attach grip modifiers
+      {
+        url: 'models/weapons/shield_round.glb',
+        bone: 'handslot.l',
+        flipY: false,
+        scaleMul: 0.5,
+        gripOffset: [0, -0.38, 0],
+      },
     ]);
   });
 
@@ -248,6 +272,9 @@ describe('held weapon models', () => {
     expect(warrior?.attach?.[1]).toEqual({
       url: 'models/weapons/shield_round.glb',
       bone: 'handslot.l',
+      flipY: false,
+      scaleMul: 0.5,
+      gripOffset: [0, -0.38, 0],
     });
   });
 });

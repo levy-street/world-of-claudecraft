@@ -2,16 +2,17 @@
 // Unit-frame portrait painter
 //
 // Paints the circular portrait shared by the player frame and the target frame:
-// a procedural crest (mob family / NPC / class fallback) or a 3D-headshot data
-// URL, blitted into the small <canvas> that CSS clips to a circle.
+// a procedural crest (mob family / NPC / class fallback), a mob's committed model
+// portrait, or a PLAYER's painted class art, blitted into the small <canvas> that
+// CSS clips to a circle.
 //
 // Extracted from hud.ts so the player and target frames share one correct,
 // HiDPI-crisp, disc-filling implementation. The pure geometry it relies on
 // lives in unit_portrait.ts (and is unit-tested there).
 // ---------------------------------------------------------------------------
 
-import { playerPortraitDataUrl } from '../render/characters/portrait';
 import type { PlayerClass } from '../sim/types';
+import { classIconUrl } from './class_icon_url';
 import { iconCanvas } from './icons';
 import {
   CREST_OVERSCAN,
@@ -108,11 +109,20 @@ export class UnitPortraitPainter {
     }
   }
 
-  /** Paint a (class, skin) headshot, falling back to the class crest until the
-   *  3D portraits have finished loading. */
-  drawClass(canvas: HTMLCanvasElement, cls: PlayerClass, skin: number): void {
-    const url = playerPortraitDataUrl(cls, skin);
-    if (url) this.drawHeadshot(canvas, url);
-    else this.drawCrest(canvas, `class_${cls}`);
+  /**
+   * Paint a player's portrait: the painted class art the pre-game character
+   * screens use (public/ui/class-icons), so a player reads the same in the unit
+   * frames as on the choose/create screen.
+   *
+   * This replaced a 3D headshot rendered from the live model. That headshot varied
+   * by (class, skin), so the one thing given up is per-chroma variation; it never
+   * reflected the mech or level-20 armored catalogs either way, since
+   * playerPortraitDataUrl only ever took class and skin. The crest stays as the
+   * fallback for a failed decode.
+   */
+  drawClass(canvas: HTMLCanvasElement, cls: PlayerClass): void {
+    this.drawHeadshot(canvas, classIconUrl(cls), () => {
+      this.drawCrest(canvas, `class_${cls}`);
+    });
   }
 }

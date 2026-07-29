@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
-// The priest's Light halo: per-visual geometry (PR: halo must not clip the
-// canon mage-model hat). Pins the halo.ts cache doctrine (geometry keyed by
-// radius, material keyed by color, both shared and never disposed) and the
-// manifest contract: only player_priest overrides the placement, so every
-// other current and future halo user gets the default constants unchanged.
+// The priest's Light halo: halo.ts still supports per-visual geometry overrides
+// (kept and unit-tested below), but the v02 bodies are bald chibi heads with no
+// hats, so no visual currently overrides the placement. Pins the halo.ts cache
+// doctrine (geometry keyed by radius, material keyed by color, both shared and
+// never disposed) and the manifest contract: every halo user gets the default
+// constants unchanged.
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import { buildHalo, HALO_RADIUS, HALO_UP_OFFSET } from '../src/render/characters/halo';
@@ -73,7 +74,9 @@ describe('class halo geometry', () => {
     const visual = new CharacterVisual('player_priest', 0xffffff, 0);
     const halo = visual.root.getObjectByName('class_halo') as THREE.Mesh;
     expect(halo).toBeDefined();
-    expect(halo.position.y).toBe(1.45);
+    // the v02 priest is a bald chibi head (no hat), so it rides the default
+    // halo placement with no per-visual upOffset override
+    expect(halo.position.y).toBe(HALO_UP_OFFSET);
     // no radius override: the priest rides the shared default-size geometry
     expect((halo.geometry as THREE.PlaneGeometry).parameters.width).toBeCloseTo(1.0);
     // the caster sweeps must not overwrite buildHalo's castShadow = false
@@ -113,23 +116,20 @@ describe('class halo geometry', () => {
     vi.resetModules();
   });
 
-  it('gives the priest hat clearance and leaves every other visual on defaults', () => {
+  it('keeps the priest Light color and leaves every visual on the default halo placement', () => {
     const priest = VISUALS.player_priest;
     expect(priest.halo).toBe(0xffd766);
-    // Screenshot-tuned against the mage.glb hat cone; see the manifest comment.
-    // Raise-only: the default-size ring clears the cone at tip height, and
-    // staying below the hat's bounding-box top keeps portrait framing
-    // untouched for priests.
-    expect(priest.haloUpOffset).toBe(1.45);
+    // The v02 priest is a bald chibi head with no hat to clear, so it rides the
+    // default halo placement: no per-visual upOffset or radius override. (The
+    // 1.45 hat-clearance offset was tuned for the old mage.glb priest that the
+    // v02 body replaces.)
+    expect(priest.haloUpOffset).toBeUndefined();
     expect(priest.haloRadius).toBeUndefined();
+    // No current visual overrides placement; a future haloed visual may set
+    // these, but placement overrides are meaningless without a halo color.
     for (const [key, def] of Object.entries(VISUALS)) {
-      if (key === 'player_priest') continue;
-      // placement overrides are meaningless without a halo; a future second
-      // haloed visual may legitimately set all three
-      if (def.halo === undefined) {
-        expect(def.haloUpOffset, key).toBeUndefined();
-        expect(def.haloRadius, key).toBeUndefined();
-      }
+      expect(def.haloUpOffset, key).toBeUndefined();
+      expect(def.haloRadius, key).toBeUndefined();
     }
   });
 });

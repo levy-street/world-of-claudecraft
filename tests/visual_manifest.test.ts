@@ -175,6 +175,92 @@ describe('character visual manifest', () => {
     expect(animationNames.has('Jump')).toBe(false);
   });
 
+  // The custom v02 class bodies bake fewer clips than the 22-clip KayKit set,
+  // so their defs are pinned tighter: every non-emote clip the ClipMap can
+  // resolve (including the per-hand and per-ability overrides) must be baked
+  // in, and every emote spec needs at least one of its alternatives (the
+  // runtime plays the first LOADED clip per spec, so alternatives may be
+  // absent but a fully-unloadable emote is a silent no-op).
+  for (const [label, key, url] of [
+    ['warrior', 'player_warrior', 'models/chars/players/warrior_v02.glb'],
+    ['paladin', 'player_paladin', 'models/chars/players/paladin_v02.glb'],
+    ['mage', 'player_mage', 'models/chars/players/mage_male_v02.glb'],
+    ['druid', 'player_druid', 'models/chars/players/druid_male_v02.glb'],
+    ['priest', 'player_priest', 'models/chars/players/priest_male_v02.glb'],
+    ['rogue', 'player_rogue', 'models/chars/players/rogue_male_v02.glb'],
+    ['warlock', 'player_warlock', 'models/chars/players/warlock_male_v02.glb'],
+    ['shaman', 'player_shaman', 'models/chars/players/shaman_male_v02.glb'],
+    ['hunter', 'player_hunter', 'models/chars/players/hunter_male_v02.glb'],
+  ] as const) {
+    it(`points the ${label} manifest at clips baked into ${url.split('/').pop()}`, async () => {
+      const visual = VISUALS[key];
+      expect(visual.url).toBe(url);
+      const animationNames = await glbAnimationNames(`public/${visual.url}`);
+      expect(animationNames.size).toBeGreaterThan(0);
+
+      const c = visual.clips;
+      // All nine v02 player bodies share ONE canonical clip vocabulary (the
+      // kaykit() base map). Pin it so a future re-bake or manifest edit can't
+      // silently re-cook a base state: jump was briefly stripped (airborne fell
+      // back to idle), which is the class of regression this pin guards. Each
+      // class's own attack/attackByHand/attackByAbility clips are checked for
+      // existence in the GLB below, not pinned here (they legitimately differ).
+      expect({
+        idle: c.idle,
+        walk: c.walk,
+        run: c.run,
+        walkBack: c.walkBack,
+        jump: c.jump,
+        swim: c.swim,
+        sitDown: c.sitDown,
+        sitIdle: c.sitIdle,
+        death: c.death,
+        cast: c.cast,
+        hit: c.hit,
+        stow: c.stow,
+      }).toEqual({
+        idle: 'Idle',
+        walk: 'Walking_A',
+        run: 'Running_A',
+        walkBack: 'Walking_Backwards',
+        jump: 'Jump_Idle',
+        swim: 'Lie_Idle',
+        sitDown: 'Sit_Floor_Down',
+        sitIdle: 'Sit_Floor_Idle',
+        death: 'Death_A',
+        cast: 'Spellcasting',
+        hit: ['Hit_A'],
+        stow: '1H_Melee_Attack_Chop',
+      });
+      const required = [
+        c.idle,
+        c.walk,
+        c.run,
+        c.death,
+        c.cast,
+        c.sitDown,
+        c.sitIdle,
+        c.swim,
+        c.jump,
+        c.walkBack,
+        c.stow,
+        c.flourish,
+        ...c.attack,
+        ...(c.hit ?? []),
+        ...Object.values(c.attackByHand ?? {}),
+        ...Object.values(c.attackByAbility ?? {}),
+      ].filter((name): name is string => !!name);
+      expect([...new Set(required)].filter((name) => !animationNames.has(name))).toEqual([]);
+
+      for (const [emote, spec] of Object.entries(c.emote ?? {})) {
+        expect(
+          spec.clips.some((name) => animationNames.has(name)),
+          `emote ${emote} has no loadable clip`,
+        ).toBe(true);
+      }
+    });
+  }
+
   it('points the baked wolf visuals (form_cat, mob_wolf, greyjaw) at clips in their GLBs', async () => {
     const byUrl = new Map<string, Set<string>>();
     for (const key of ['form_cat', 'mob_wolf', 'greyjaw'] as const) {

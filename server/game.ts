@@ -921,8 +921,18 @@ type RememberedChat =
 // changes. The client treats their absence in a record as "unchanged".
 function identityFields(e: Entity): Record<string, unknown> {
   const out: Record<string, unknown> = { k: e.kind, tid: e.templateId, nm: e.name, lv: e.level };
-  if (e.skinCatalog === 'mech') out.cat = 'mech';
+  // Sparse on 'class' so every NPC and unarmored player costs the same bytes as
+  // before; 'mech' and 'armored' both ride here.
+  if (e.skinCatalog && e.skinCatalog !== 'class') out.cat = e.skinCatalog;
   if (e.skin) out.sk = e.skin;
+  // Head cosmetics (render-only, like sk): sent only when non-default, so an
+  // unset head (NPCs, default players) adds nothing. hairColor/faceColor use
+  // !== undefined since 0x000000 (black) is a valid tint.
+  if (e.face) out.fac = e.face;
+  if (e.hairStyle) out.hs = e.hairStyle;
+  if (e.beard) out.bd = 1;
+  if (e.hairColor !== undefined) out.hcl = e.hairColor;
+  if (e.faceColor !== undefined) out.fcl = e.faceColor;
   if (e.mainhandItemId) out.mh = e.mainhandItemId; // equipped mainhand → held weapon model (render-only)
   if (e.offhandItemId) out.oh = e.offhandItemId; // equipped offhand → held weapon model (render-only)
   if (e.weaponSkinId) out.wsk = e.weaponSkinId; // active weapon-skin cosmetic (render-only, like mh)
@@ -4425,6 +4435,10 @@ export class GameServer {
             if (chroma && session.accountCosmetics.mechChromaIds.includes(chroma.id)) {
               sim.setPlayerSkin(pid, idx, 'mech');
             }
+          } else if (msg.catalog === 'armored') {
+            // The Sim refuses this below the unlock level (and mid-Fiesta), so this
+            // arm only stops the request being silently downgraded to 'class'.
+            sim.setPlayerSkin(pid, msg.skin, 'armored');
           } else {
             sim.setPlayerSkin(pid, msg.skin, 'class');
           }

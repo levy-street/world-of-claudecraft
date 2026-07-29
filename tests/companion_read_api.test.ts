@@ -248,14 +248,14 @@ describe('GET /api/me/characters (read-scoped my-characters list)', () => {
     // char-select preview resolves the active weapon skin per character).
     expect(block).toContain('characterListPayload(');
     expect(block).toContain('await listCharacters(accountId)');
-    expect(block).toContain('(await loadAccountCosmetics(accountId)).weaponSkinLoadout');
+    expect(block).toContain('await loadAccountWeaponSkinLoadout(accountId)');
     expect(block).not.toContain('bearerActiveAccount');
   });
 
   it('returns the same shape as GET /api/characters (both call characterListPayload)', () => {
     const calls = (
       MAIN.match(
-        /characterListPayload\(\s*await listCharacters\(accountId\),\s*\(await loadAccountCosmetics\(accountId\)\)\.weaponSkinLoadout,\s*\)/g,
+        /characterListPayload\(\s*await listCharacters\(accountId\),\s*await loadAccountWeaponSkinLoadout\(accountId\),\s*\)/g,
       ) ?? []
     ).length;
     expect(calls).toBe(2); // /api/me/characters and the full-session GET /api/characters

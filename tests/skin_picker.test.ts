@@ -34,6 +34,7 @@ function makeTarget() {
 
 function fakeSwatch(skin: number, selected: boolean) {
   const classes = new Set<string>(selected ? ['sel'] : []);
+  const attributes = new Map<string, string>([['aria-pressed', String(selected)]]);
   const target = makeTarget();
   return {
     ...target,
@@ -43,6 +44,8 @@ function fakeSwatch(skin: number, selected: boolean) {
       remove: (c: string) => classes.delete(c),
       contains: (c: string) => classes.has(c),
     },
+    setAttribute: (name: string, value: string) => attributes.set(name, value),
+    getAttribute: (name: string) => attributes.get(name) ?? null,
     isSel: () => classes.has('sel'),
     hasHandler: (type: string) => target.count(type) > 0,
   };
@@ -99,6 +102,8 @@ describe('wireSkinPicker (char-creator chroma preview, issue 1464)', () => {
     expect(onPick).toHaveBeenCalledWith(3);
     expect((swatches[3] as Swatch).isSel()).toBe(true);
     expect((swatches[1] as Swatch).isSel()).toBe(false);
+    expect((swatches[3] as Swatch).getAttribute('aria-pressed')).toBe('true');
+    expect((swatches[1] as Swatch).getAttribute('aria-pressed')).toBe('false');
     row.fire('mouseleave');
     expect(onRevert).toHaveBeenLastCalledWith(3);
   });

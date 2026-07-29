@@ -37,6 +37,7 @@ import {
   visualAssetUrlForGraphics,
   weaponSkinModelUrl,
 } from './manifest';
+import { graftSkinnedNodes } from './mesh_graft';
 import { mergeSkinnedParts } from './rig_merge';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
 import { variantGripTransform, WEAPON_GRIP_OVERRIDES } from './weapon_grip';
@@ -193,6 +194,21 @@ const KAYKIT_HAND_GRIPS: Record<string, { r: HandGrip; l?: HandGrip }> = {
       quaternion: [0, 0.7071068, 0, 0.7071067],
       scale: 0.6109,
     },
+    // The hunter holds its crossbow in the LEFT hand (manifest player_hunter).
+    // Tuned against the render, not derived: the rotation carries over from the right
+    // hand unchanged (composing the 180-about-Y that the authored 1H_Axe and Knife
+    // left rows use flips this model end-over-end), and x is the seat height. BOTH
+    // hand bones point local +x straight DOWN in world space on this rig, measured,
+    // so they are NOT mirrored the way the axe/knife pair implies: a more negative x
+    // raises the weapon, a less negative one drops it. 0.115 lower than the mirrored
+    // -0.2286: the first 0.065 pulled the stock butt down out of the air above the
+    // fist, and this second 0.05 seats the wrapped grip properly mid-palm rather than
+    // at the top of the fingers.
+    l: {
+      position: [-0.1136, 0.0213, -0.0012],
+      quaternion: [0, 0.7071068, 0, 0.7071067],
+      scale: 0.6109,
+    },
   },
   '2H_Crossbow': {
     r: { position: [0.3381, 0.058, 0], quaternion: [0, 0.7071068, 0, 0.7071067], scale: 0.7204 },
@@ -251,26 +267,25 @@ function copyAccessoryTransform(payload: THREE.Object3D, ref: THREE.Object3D): v
   payload.scale.copy(ref.scale);
 }
 
-function applyHandGrip(
-  payload: THREE.Object3D,
-  root: THREE.Object3D,
-  bone: string,
-  url: string,
-): void {
-  const accessory = kaykitAccessoryFor(url);
+function applyHandGrip(payload: THREE.Object3D, root: THREE.Object3D, att: AttachDef): void {
+  const accessory = kaykitAccessoryFor(att.url);
   if (!accessory) return;
-  const side = handSide(bone);
+  const side = handSide(att.bone);
   const ref = findAccessoryNode(root, accessoryNodeName(accessory, side));
   if (ref) {
     copyAccessoryTransform(payload, ref);
-    return;
+  } else {
+    const grips = KAYKIT_HAND_GRIPS[accessory];
+    if (!grips) return;
+    const grip = side === 'l' ? (grips.l ?? grips.r) : grips.r;
+    payload.position.set(...grip.position);
+    payload.quaternion.set(...grip.quaternion);
+    payload.scale.setScalar(grip.scale);
   }
-  const grips = KAYKIT_HAND_GRIPS[accessory];
-  if (!grips) return;
-  const grip = side === 'l' ? (grips.l ?? grips.r) : grips.r;
-  payload.position.set(...grip.position);
-  payload.quaternion.set(...grip.quaternion);
-  payload.scale.setScalar(grip.scale);
+  // per-attach grip modifiers (stack on the resolved grip)
+  if (att.flipY) payload.quaternion.multiply(new THREE.Quaternion(0, 1, 0, 0));
+  if (att.scaleMul !== undefined) payload.scale.multiplyScalar(att.scaleMul);
+  if (att.gripOffset) payload.position.add(new THREE.Vector3(...att.gripOffset));
 }
 
 function flattenWeaponScene(src: THREE.Object3D): THREE.Object3D {
@@ -362,7 +377,7 @@ function attachProp(
     const ref = findAccessoryNode(root, att.gripRef);
     if (ref) copyAccessoryTransform(payload, ref);
   } else if (isHandslotBone(att.bone)) {
-    applyHandGrip(payload, root, att.bone, att.url);
+    applyHandGrip(payload, root, att);
   }
   // Sheathed: override where the prop SITS (on-back position/lean, chest-bone
   // space; the caller resolved the chest bone) but keep the SCALE the normal
@@ -388,7 +403,17 @@ function swapAttachDef(
   weaponSkinId: string | null | undefined = null,
 ): AttachDef {
   const url = weaponSkinModelUrl(weaponSkinId) ?? itemWeaponModelUrl(weaponItemId);
-  return url ? { url, bone: base.bone } : base;
+  // carry the generic grip modifiers (flipY/scaleMul/gripOffset) onto the substituted
+  // model so an equipped shield keeps the same orientation/size as the class default.
+  return url
+    ? {
+        url,
+        bone: base.bone,
+        flipY: base.flipY,
+        scaleMul: base.scaleMul,
+        gripOffset: base.gripOffset,
+      }
+    : base;
 }
 
 // The AttachDef for the actual equipped offhand. Its model is the offhand item's
@@ -633,11 +658,30 @@ function resolvedGltf(url: string): GLTF {
 
 const optimizedSceneCache = new Map<string, THREE.Object3D>();
 
-function optimizedScene(url: string): THREE.Object3D {
+/** Every head-mesh name a cosmetics descriptor toggles or tints by name. These must
+ *  survive the rig merge as their own nodes, or char-select head customization
+ *  (applyCosmetics) can no longer show/hide/tint them. */
+function cosmeticMeshNames(def: VisualDef): Set<string> {
+  const names = new Set<string>();
+  const cos = def.cosmetics;
+  if (!cos) return names;
+  for (const face of cos.faces) {
+    for (const n of face.face) names.add(n);
+    for (const option of face.hair) for (const n of option) names.add(n);
+    for (const n of face.beard ?? []) names.add(n);
+  }
+  for (const n of cos.hairMeshes ?? []) names.add(n);
+  for (const n of cos.faceMeshes ?? []) names.add(n);
+  return names;
+}
+
+// Keyed by url: the exclusion set is stable per url (one class def per model file),
+// so the first build's merge result is safe to share for every later clone.
+function optimizedScene(url: string, exclude: Set<string> = new Set()): THREE.Object3D {
   const hit = optimizedSceneCache.get(url);
   if (hit) return hit;
   const root = cloneSkinned(resolvedGltf(url).scene);
-  mergeSkinnedParts(root);
+  mergeSkinnedParts(root, exclude);
   optimizedSceneCache.set(url, root);
   return root;
 }
@@ -653,11 +697,30 @@ export function assembleModel(
   weaponItemId?: string | null,
   offhandItemId?: string | null,
 ): THREE.Object3D {
-  const root = cloneSkinned(optimizedScene(def.url));
+  const cosmeticNames = cosmeticMeshNames(def);
+  const root = cloneSkinned(optimizedScene(def.url, cosmeticNames));
+  // A cosmetic body whose own GLB has no head (the level-20 armored bodies are
+  // Armor_* plates only) borrows the class body's head meshes onto the SAME rig,
+  // so a mask or an open hat is not worn over a hole. Runs before the tagging
+  // sweep below so the grafted meshes are tagged like any other body mesh.
+  if (def.graftUrl) {
+    const source = cloneSkinned(optimizedScene(def.graftUrl, cosmeticNames));
+    const { skipped } = graftSkinnedNodes(root, source, cosmeticNames);
+    for (const miss of skipped) {
+      console.warn(`head graft skipped ${miss.name} from ${def.graftUrl}: ${miss.reason}`);
+    }
+  }
   // tag the character's own meshes (body + accessories share one texture atlas)
-  // so a skin override hits them but not the separate weapons attached below
+  // so a skin override hits them but not the separate weapons attached below.
+  // `skinnable` narrows WHICH of those meshes a chroma atlas actually remaps:
+  // undefined skinMeshNames = every body mesh (single-atlas KayKit rigs + mech);
+  // an allowlist = only the named armor meshes (dual-atlas v02 players), leaving
+  // the head atlas untouched.
+  const skinNames = def.skinMeshNames;
   root.traverse((o) => {
-    if ((o as THREE.Mesh).isMesh) o.userData.bodyMesh = true;
+    if (!(o as THREE.Mesh).isMesh) return;
+    o.userData.bodyMesh = true;
+    o.userData.skinnable = !skinNames || skinNames.includes(o.name);
   });
   // KayKit characters ship every accessory mesh visible; keep only the kit
   if (def.show) {
@@ -960,6 +1023,8 @@ export function applyMaterials(
   root.traverse((o) => {
     const mesh = o as THREE.Mesh;
     if (!mesh.isMesh) return;
+    // the head halo keeps its own additive glow material (visual.ts/halo.ts)
+    if (mesh.name === 'class_halo') return;
     // Weapon-skin VFX rigs own their ShaderMaterials, and a skinned weapon's
     // payload materials are per-instance clones the VFX emissive derive mutates
     // and restores. Tinting either (or re-deriving them from the shared cache
@@ -977,9 +1042,13 @@ export function applyMaterials(
     sourceMaterials.set(mesh, source);
     const role: MaterialRole = mesh.userData.weaponMesh ? 'weapon' : 'body';
     const materialTint = role === 'weapon' ? null : tint;
-    // skin/emissive override only touches the character's own atlas meshes, not weapons
-    const sk = skinTex && mesh.userData.bodyMesh ? skinTex : null;
-    const em = emisTex && mesh.userData.bodyMesh ? emisTex : null;
+    // skin/emissive override only touches the character's own body atlas meshes:
+    // `bodyMesh` excludes attached weapons, and `skinnable !== false` additionally
+    // drops a dual-atlas body's head meshes (skinMeshNames marks them non-skinnable)
+    // so the v02 head atlas is left untouched.
+    const skinTarget = mesh.userData.bodyMesh && mesh.userData.skinnable !== false;
+    const sk = skinTex && skinTarget ? skinTex : null;
+    const em = emisTex && skinTarget ? emisTex : null;
     if (Array.isArray(source)) {
       mesh.material = source.map((m) => tintedMaterial(m, materialTint, strength, sk, em, role));
     } else {
@@ -1092,8 +1161,18 @@ export function prepareVisual(key: string): PreparedVisual {
     });
   }
   const rawHeight = Math.max(1e-3, bounds.max.y - bounds.min.y);
-  const normScale = def.height / rawHeight;
-  const yOffset = (def.hover ?? 0) - bounds.min.y * normScale;
+  // `def.height` is a normalization TARGET for this model's own measured bounds, not
+  // a scale factor, so two defs sharing a height do NOT render at the same size: a
+  // helm crest or a robe hem moves rawHeight and shrinks or grows the whole rig.
+  // A cosmetic body that must match its base body therefore inherits the base's
+  // normScale/yOffset outright (normalizeFrom) instead of deriving its own. That is
+  // exact rather than tuned, because the two GLBs carry the same rig with identical
+  // rest transforms, so every bone lands at the base body's world position and a
+  // tall crest simply extends past the height target, as it should.
+  const inherited =
+    def.normalizeFrom && def.normalizeFrom !== key ? prepareVisual(def.normalizeFrom) : null;
+  const normScale = inherited ? inherited.normScale : def.height / rawHeight;
+  const yOffset = inherited ? inherited.yOffset : (def.hover ?? 0) - bounds.min.y * normScale;
   const clickRadius = Math.min(
     2.2,
     Math.max(
