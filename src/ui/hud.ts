@@ -1539,7 +1539,6 @@ export class Hud {
   // party frames are deliberately not stamped (party-member HP is a healer's actionable
   // signal, so it stays on the mediumHud band for every tier: see ui_tier_knobs).
   private lastMinimapDrawAt = 0;
-  private lastBuffBarPaintAt = 0;
   private lastTargetDebuffsPaintAt = 0;
   private lastTargetFramePaintAt = 0;
   private lastTargetFrameId: number | null = null;
@@ -7520,14 +7519,14 @@ export class Hud {
     // every frame (the elided writers make a no-op frame free). Buffs and debuffs render to
     // separate rows (classic layout) so a fresh debuff is never lost in a wall of long-lived
     // buffs: two view+painter instances, mode 'buffs' (#buff-bar) and 'debuffs' (#debuff-bar).
-    // The graphics tier coarsens the refresh (tick) granularity: full tiers repaint every
-    // frame (interval 0, cadenceDue always true); low coarsens to ~4Hz. The visible-count cap
-    // is applied inside the painter.
-    if (cadenceDue(this.lastBuffBarPaintAt, now, auraRefreshIntervalMs(fxTier))) {
-      this.lastBuffBarPaintAt = now;
-      this.buffBarPainter.paint(this.buffBarView.tick(p));
-      this.debuffBarPainter.paint(this.debuffBarView.tick(p));
-    }
+    // SELF/player auras are NEVER tier-gated: your own debuffs are the ACTIONABLE read named in
+    // docs/design/graphics-settings-fairness.md (there is no self-dispel, so the aura icon and
+    // its remaining duration are the only way to react to a DoT/curse/CC), so this paints every
+    // frame on every graphics preset. The visible-count cap (auraVisibleCap, still tiered) is
+    // applied inside the painter and is debuff-priority (a shed slot is always a buff, never a
+    // debuff). Only the TARGET (non-self) debuffs strip below stays on the tiered ~4Hz cadence.
+    this.buffBarPainter.paint(this.buffBarView.tick(p));
+    this.debuffBarPainter.paint(this.debuffBarView.tick(p));
 
     // target frame: the SECOND instance of the unit_frame family. The shared
     // frame (display/name/level/hp/absorb/portrait gate) goes through the family
