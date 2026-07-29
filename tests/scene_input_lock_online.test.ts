@@ -71,8 +71,24 @@ describe('online scene input lock receipt', () => {
     ]);
   });
 
-  it('preserves an on-to-off batch while leaving cleared input for the next send', () => {
+  it('preserves an explicit input-lock on-to-off batch', () => {
     vi.stubGlobal('WebSocket', { OPEN: 1 });
+    const { client } = bareOnline();
+    const changes = vi.fn();
+    client.onSceneInputLockChanged = changes;
+
+    feed(client, [
+      { type: 'scene', pid: 7, op: { kind: 'inputLock', on: true } } as SimEvent,
+      { type: 'scene', pid: 7, op: { kind: 'inputLock', on: false } } as SimEvent,
+    ]);
+
+    expect(changes.mock.calls).toEqual([[true], [false]]);
+    expect(client.sceneInputLockPending()).toBe(false);
+    expect(client.moveInput).toEqual(emptyMoveInput());
+    expect(client.drainEvents()).toHaveLength(2);
+  });
+
+  it('also releases a pending lock when the scene ends', () => {
     const { client } = bareOnline();
     const changes = vi.fn();
     client.onSceneInputLockChanged = changes;
@@ -84,8 +100,6 @@ describe('online scene input lock receipt', () => {
 
     expect(changes.mock.calls).toEqual([[true], [false]]);
     expect(client.sceneInputLockPending()).toBe(false);
-    expect(client.moveInput).toEqual(emptyMoveInput());
-    expect(client.drainEvents()).toHaveLength(2);
   });
 
   it('ignores scene locks scoped to another player', () => {

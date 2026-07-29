@@ -34,7 +34,13 @@ import { BUILTIN_WORLD, DELVES, GATHER_NODES, ITEMS, MOBS } from '../src/sim/dat
 import { createMob } from '../src/sim/entity';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
 import { Sim } from '../src/sim/sim';
-import { type Aura, DT, type PlayerClass, type WorldContent } from '../src/sim/types';
+import {
+  type Aura,
+  DT,
+  emptyMoveInput,
+  type PlayerClass,
+  type WorldContent,
+} from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { absorbTotal } from '../src/ui/absorb_bar';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
@@ -153,6 +159,8 @@ function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWo
   c.connected = true;
   c.eventQueue = [];
   c.mouselookFacing = null;
+  c.sceneInputLockedBeforeDrain = false;
+  c.onSceneInputLockChanged = null;
   c.lastInputSentAt = 0;
   c.lastInputSig = '';
   c.inputSeq = 0;
@@ -335,8 +343,29 @@ describe('spectate client POV', () => {
         rtype: 'rage',
       },
     });
-    internals.onMessage(JSON.stringify({ t: 'spectate', name: 'Suspect' }));
+    const lockChanges = vi.fn();
+    client.onSceneInputLockChanged = lockChanges;
+    client.setMoveInput({ ...emptyMoveInput(), forward: true }, 1.25);
+    internals.onMessage(
+      JSON.stringify({
+        t: 'spectate',
+        name: 'Suspect',
+        pid: 2,
+        sceneState: {
+          sceneId: 'scn_test_spectated',
+          remainingSeconds: 4,
+          inputLocked: true,
+          letterbox: true,
+          musicSilenced: false,
+        },
+        sceneChoiceState: null,
+      }),
+    );
     expect(client.spectating).toBe('Suspect');
+    expect(client.playerId).toBe(2);
+    expect(client.sceneInputLockPending()).toBe(true);
+    expect(client.moveInput).toEqual(emptyMoveInput());
+    expect(lockChanges).toHaveBeenCalledExactlyOnceWith(true);
 
     const snapshot = (facing: number, dead: boolean) => ({
       t: 'snap',
@@ -373,12 +402,37 @@ describe('spectate client POV', () => {
     expect(client.consumeSpectateFacing()).toBe(-0.75);
     expect(client.consumeSpectateFacing()).toBeNull();
 
-    internals.onMessage(JSON.stringify({ t: 'spectate', name: null }));
+    internals.onMessage(
+      JSON.stringify({
+        t: 'spectate',
+        name: null,
+        pid: 1,
+        sceneState: null,
+        sceneChoiceState: null,
+      }),
+    );
     expect(client.spectating).toBeNull();
     expect(client.playerId).toBe(1);
     expect(client.player.name).toBe('Moderator');
     expect(client.cfg.playerClass).toBe('warrior');
     expect(client.consumeSpectateFacing()).toBeNull();
+    expect(client.sceneInputLockPending()).toBe(false);
+    expect(lockChanges.mock.calls).toEqual([[true], [false]]);
+    expect(client.drainEvents()).toEqual([
+      {
+        type: 'sceneSync',
+        state: {
+          sceneId: 'scn_test_spectated',
+          remainingSeconds: 4,
+          inputLocked: true,
+          letterbox: true,
+          musicSilenced: false,
+        },
+      },
+      { type: 'sceneChoiceSync', state: null },
+      { type: 'sceneSync', state: null },
+      { type: 'sceneChoiceSync', state: null },
+    ]);
   });
 });
 

@@ -4,6 +4,35 @@
 // online input frame.
 
 import type { SimEvent } from '../sim/types';
+import {
+  type KeyboardTurnState,
+  newKeyboardTurnState,
+  resetKeyboardTurnState,
+} from './keyboard_turn_facing';
+import type { MouselookReleaseState } from './mouselook_release';
+
+export interface SceneFacingInputState {
+  /** Falling-edge memory for classic mouselook and Mouse Camera movement. */
+  cameraDrivenFacing: MouselookReleaseState;
+  /** Release yaw held until an offline tick or online frame consumes it. */
+  pendingReleaseFacing: number | null;
+  /** Locally integrated online keyboard heading and wire-flag gate. */
+  keyboardTurn: KeyboardTurnState;
+}
+
+export function newSceneFacingInputState(): SceneFacingInputState {
+  return {
+    cameraDrivenFacing: { active: false },
+    pendingReleaseFacing: null,
+    keyboardTurn: newKeyboardTurnState(),
+  };
+}
+
+export function resetSceneFacingInputState(state: SceneFacingInputState): void {
+  state.cameraDrivenFacing.active = false;
+  state.pendingReleaseFacing = null;
+  resetKeyboardTurnState(state.keyboardTurn);
+}
 
 export interface SceneInputLockSource {
   handleEvents(events: SimEvent[]): void;

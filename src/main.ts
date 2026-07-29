@@ -64,11 +64,7 @@ import {
 } from './game/interactions';
 import { createIntroLogoOverlay } from './game/intro_logo_overlay';
 import { Keybinds } from './game/keybinds';
-import {
-  newKeyboardTurnState,
-  resetKeyboardTurnState,
-  stepKeyboardTurnFacing,
-} from './game/keyboard_turn_facing';
+import { resetKeyboardTurnState, stepKeyboardTurnFacing } from './game/keyboard_turn_facing';
 import { applyMobileKeyboardViewport } from './game/keyboard_viewport_applier';
 import { shouldUseStaticBackdrop } from './game/landing_backdrop';
 import { createLandingThemeAudio } from './game/landing_theme';
@@ -91,7 +87,11 @@ import { createPerfMonitor } from './game/perf';
 import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
 import { SceneDirector } from './game/scene_director';
-import { SceneInputLockCoordinator } from './game/scene_input_lock';
+import {
+  newSceneFacingInputState,
+  resetSceneFacingInputState,
+  SceneInputLockCoordinator,
+} from './game/scene_input_lock';
 import { playSceneDirectiveSfx } from './game/scene_sfx';
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
 import {
@@ -1774,9 +1774,15 @@ async function startGame(
     },
   });
   mobileControls.start();
-  const sceneInputLock = new SceneInputLockCoordinator(sceneDirector, input, () =>
-    mobileControls.syncAutorun(false),
-  );
+  // The online receipt callback can observe a complete lock-on/lock-off batch
+  // before the next animation frame. Keep every facing edge/latch in one state
+  // object so the rising edge clears it immediately even when the batch ends
+  // unlocked.
+  const sceneFacingInput = newSceneFacingInputState();
+  const sceneInputLock = new SceneInputLockCoordinator(sceneDirector, input, () => {
+    mobileControls.syncAutorun(false);
+    resetSceneFacingInputState(sceneFacingInput);
+  });
   if (online) {
     online.onSceneInputLockChanged = (locked) => sceneInputLock.applyPending(locked);
     sceneInputLock.applyPending(online.sceneInputLockPending());
@@ -3171,22 +3177,6 @@ async function startGame(
   // eases back to zero so the camera settles in behind the character.
   let lastInterpFacing: number | null = null;
   let wasClickMoving = false;
-  // Tracks camera-driven facing (classic right-mouse mouselook, or Mouse Camera
-  // mode while a movement key is held) across frames so its falling edge can
-  // commit the final camera yaw to the player facing (see mouselook_release.ts
-  // and camera_driven_facing.ts).
-  const cameraDrivenFacingEdge = { active: false };
-  // The release yaw, latched until a sim tick actually commits it. Offline a tick
-  // runs on only ~2/3 of frames (60Hz frames, 20Hz ticks), so committing only on
-  // the release frame would drop the one-shot when release lands on a zero-tick
-  // frame. Held here until consumed, then cleared.
-  let pendingReleaseFacing: number | null = null;
-  // Local integration of keyboard turns online, streamed on the facing channel
-  // (see the module docs). The module also decides the per-frame wire turn-flag
-  // gating (suppressTurnFlags): zeroed while the streamed heading owns the
-  // channel, passed through on the one engage-edge frame so the server still
-  // sees a manual turn (breaks /follow, marks anti-AFK activity).
-  const kbTurn = newKeyboardTurnState();
   function updateCamera(frameDt: number, interpFacing: number): void {
     const mi = input.readMoveInput();
     const clickMoving = !!input.clickMoveTarget && !input.suspendMovement && !movementFrozen();
@@ -3543,23 +3533,23 @@ async function startGame(
       movementFrozen(),
     );
     const edgeReleaseFacing = updateMouselookReleaseFacing(
-      cameraDrivenFacingEdge,
+      sceneFacingInput.cameraDrivenFacing,
       cameraDrivenFacing,
       input.camYaw,
       sceneInputLocked,
     );
     if (sceneInputLocked) {
-      pendingReleaseFacing = null;
+      sceneFacingInput.pendingReleaseFacing = null;
     } else if (renderFacing !== null || controllerFacing !== null) {
-      pendingReleaseFacing = null;
+      sceneFacingInput.pendingReleaseFacing = null;
     } else if (edgeReleaseFacing !== null) {
-      pendingReleaseFacing = edgeReleaseFacing;
+      sceneFacingInput.pendingReleaseFacing = edgeReleaseFacing;
     }
     // A ghost (dead && ghost) is not movement-frozen and keeps its facing; only a
     // corpse-bound dead player (dead && !ghost) loses it.
     const movementFacing =
       !sceneInputLocked && !movementFrozen()
-        ? (renderFacing ?? controllerFacing ?? pendingReleaseFacing)
+        ? (renderFacing ?? controllerFacing ?? sceneFacingInput.pendingReleaseFacing)
         : null;
 
     const visualFacingFor = (
@@ -3594,7 +3584,7 @@ async function startGame(
         );
         // A tick consumed the latched release facing (movementFacing fed
         // stepFacing above); drop it so it is not re-applied next frame.
-        pendingReleaseFacing = null;
+        sceneFacingInput.pendingReleaseFacing = null;
         acc -= DT;
       }
       const pp = offlineSim.player;
@@ -3665,10 +3655,10 @@ async function startGame(
     // stutter this feature has chased). The turn flags are zeroed on the wire
     // while the local heading owns the channel, or the server would integrate
     // the turn a second time on top of the streamed facing.
-    if (sceneInputLocked) resetKeyboardTurnState(kbTurn);
+    if (sceneInputLocked) resetKeyboardTurnState(sceneFacingInput.keyboardTurn);
     const kbFacing = sceneInputLocked
       ? null
-      : stepKeyboardTurnFacing(kbTurn, {
+      : stepKeyboardTurnFacing(sceneFacingInput.keyboardTurn, {
           turnLeft: resolved.mi.turnLeft,
           turnRight: resolved.mi.turnRight,
           turnAllowed: net.spectating === null && !movementFrozen() && !isStunned(pe),
@@ -3681,18 +3671,20 @@ async function startGame(
     // Streaming the seam/glide corrections (which chase the mirror) would
     // close a feedback loop through the server that at high RTT never
     // converges (the observed self-spinning resonance under netem).
-    const netFacing = sceneInputLocked ? null : (foreignFacing ?? kbTurn.wireFacing);
+    const netFacing = sceneInputLocked
+      ? null
+      : (foreignFacing ?? sceneFacingInput.keyboardTurn.wireFacing);
     const onlineRenderFacing =
       visualFacingFor(resolved.mi, netFacing ?? kbFacing ?? interpServerFacing) ?? netFacing;
     Object.assign(net.moveInput, resolved.mi);
-    if (kbTurn.suppressTurnFlags) {
+    if (sceneFacingInput.keyboardTurn.suppressTurnFlags) {
       net.moveInput.turnLeft = false;
       net.moveInput.turnRight = false;
     }
     net.setMouselookFacing(netFacing);
     // Online streams facing every frame, so the mouselook release yaw is
     // consumed here; drop it so it is not re-applied next frame.
-    pendingReleaseFacing = null;
+    sceneFacingInput.pendingReleaseFacing = null;
     if (net.flushInput()) perf.markInputSent(performance.now());
     const echoSamples = net.consumeInputEchoSamples();
     for (const sample of echoSamples) {
