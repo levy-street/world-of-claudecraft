@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { t } from '../src/ui/i18n';
+import { afterEach, describe, expect, it } from 'vitest';
+import { en, ensureLocaleLoaded, fr_FR, setLanguage, t } from '../src/ui/i18n';
 import {
   classifyAuthCode,
   formatRecoveryCodesFile,
@@ -77,5 +77,26 @@ describe('formatRecoveryCodesFile', () => {
     );
     expect(lines[3]).toBe(t('hudChrome.account.recoveryCodesFileHint'));
     expect(lines[4]).toBe(t('hudChrome.account.recoveryCodesFileWarn'));
+  });
+
+  afterEach(() => setLanguage('en'));
+
+  it('follows the active locale, not a decoupled English literal', async () => {
+    // Non-vacuous floor: fr_FR genuinely differs from English for this key, so a test that
+    // still hardcoded the English literals (rather than calling t()) would fail here even
+    // though the earlier default-locale assertions would still pass.
+    expect(fr_FR.hudChrome.account.recoveryCodesFileWarn).not.toBe(
+      en.hudChrome.account.recoveryCodesFileWarn,
+    );
+
+    await ensureLocaleLoaded('fr_FR');
+    setLanguage('fr_FR');
+
+    const lines = formatRecoveryCodesFile(['aaaa-bbbb'], 'Aelwyn').split('\n');
+    expect(lines[0]).toBe(
+      fr_FR.hudChrome.account.recoveryCodesFileHeader.replace('{brand}', 'World of ClaudeCraft'),
+    );
+    expect(lines[3]).toBe(fr_FR.hudChrome.account.recoveryCodesFileHint);
+    expect(lines[4]).toBe(fr_FR.hudChrome.account.recoveryCodesFileWarn);
   });
 });
