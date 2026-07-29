@@ -158,9 +158,18 @@ describe('Input autorun', () => {
   });
 
   it('hard-locks scene movement and clears persistent travel latches', () => {
-    const { input } = makeInput();
+    const { input, windowListeners } = makeInput();
+    const now = vi.spyOn(performance, 'now').mockReturnValue(1_000);
     input.setAutorun(true);
     input.setClickMoveTarget({ x: 8, z: 3 }, 0.5);
+    input.triggerTouchJump();
+    input.setControllerFacing(1.25);
+    windowListeners.get('keydown')?.({
+      code: 'Space',
+      repeat: false,
+      preventDefault: vi.fn(),
+    });
+    windowListeners.get('keyup')?.({ code: 'Space' });
 
     input.setSceneInputLocked(true);
 
@@ -176,6 +185,7 @@ describe('Input autorun', () => {
       strafeRight: false,
       jump: false,
     });
+    expect(input.controllerFacingOverride()).toBeNull();
 
     expect(input.toggleAutorun()).toBe(false);
     expect(input.setAutorun(true)).toBe(false);
@@ -183,12 +193,22 @@ describe('Input autorun', () => {
     input.setTouchMove({ forward: true, back: false, strafeLeft: false, strafeRight: false });
     input.setGamepadMove({ forward: true, back: false, strafeLeft: false, strafeRight: false });
     input.setControllerMoveInput({ forward: true });
+    input.setControllerFacing(2.5);
+    input.triggerTouchJump();
 
     input.setSceneInputLocked(false);
 
     expect(input.autorun).toBe(false);
     expect(input.clickMoveTarget).toBeNull();
     expect(input.readMoveInput().forward).toBe(false);
+    expect(input.readMoveInput().jump).toBe(false);
+    expect(input.controllerFacingOverride()).toBeNull();
+
+    input.setSceneInputLocked(true);
+    input.triggerGamepadJump();
+    input.setSceneInputLocked(false);
+    expect(input.readMoveInput().jump).toBe(false);
+    now.mockRestore();
   });
 
   it('a forward touch-move cancels autorun (classic tap-to-stop)', () => {
@@ -800,6 +820,26 @@ describe('Input pointer lock', () => {
     });
 
     expect(cb.onClickPick).not.toHaveBeenCalled();
+  });
+
+  it('dispatches a canvas pick when the production gameplay gate explicitly allows it', () => {
+    const { canvas, cb, canvasListeners, windowListeners } = makeInput();
+    (cb as any).canUseGameKeys = vi.fn(() => true);
+
+    canvasListeners.get('mousedown')!({
+      button: 0,
+      clientX: 120,
+      clientY: 160,
+      preventDefault: vi.fn(),
+    });
+    windowListeners.get('mouseup')!({
+      button: 0,
+      clientX: 120,
+      clientY: 160,
+      target: canvas,
+    });
+
+    expect(cb.onClickPick).toHaveBeenCalledWith(120, 160, 0);
   });
 
   it('starts camera drag by distance but discards the threshold-crossing movement', () => {
