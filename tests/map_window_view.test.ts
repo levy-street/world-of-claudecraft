@@ -438,6 +438,19 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     expect(npcMarkerAt([], glyph.mx, glyph.my)).toBeNull();
   });
 
+  it('still shows the quest-giver glyph when the npc entity is not mirrored (online interest-radius parity)', () => {
+    // Online, ClientWorld.entities only carries entities inside the ~120-130yd
+    // interest radius, so a distant quest giver is never mirrored into it. The
+    // glyph must resolve from static NPCS content regardless, exactly like the
+    // quest-area blobs already do (documented at the top of this file).
+    const world = makeOverworldWorld('client') as unknown as { entities: Map<number, unknown> };
+    world.entities.delete(2); // the seeded giver npc; only the player remains
+    const model = buildOverworldMapModel(input(world as unknown as IWorld, 1));
+    expect(model.npcs).toHaveLength(1);
+    expect(model.npcs[0].ready).toBe(false);
+    expect(model.npcs[0].quests).toEqual([{ questId: GIVER_QUEST.id, ready: false }]);
+  });
+
   it("marks the glyph ready when a turn-in is ready (the '?' branch, not '!')", () => {
     const world = makeOverworldWorld('client') as unknown as {
       entities: Map<number, { templateId: string; questIds: string[] }>;

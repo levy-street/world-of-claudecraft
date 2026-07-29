@@ -18,13 +18,16 @@
 import {
   DUNGEON_LIST,
   isDelvePos,
-  QUESTS,
   STRIP_MAX_X,
   STRIP_MIN_X,
   type ZoneDef,
 } from '../sim/data';
-import { type QuestObjectiveRef, questObjectiveAreas } from '../sim/quest_targets';
-import { type BuildingDef, isQuestTurnInNpc, type ZonePropsDef } from '../sim/types';
+import {
+  type QuestObjectiveRef,
+  questGiverNpcMarkers,
+  questObjectiveAreas,
+} from '../sim/quest_targets';
+import { type BuildingDef, type ZonePropsDef } from '../sim/types';
 import type { Decoration } from '../sim/world';
 import type { FriendInfo, IWorld } from '../world_api';
 import { overworldDungeonPortals } from './map_dungeon_portals';
@@ -319,12 +322,11 @@ export function mapWindowMode(world: IWorld): MapWindowMode {
 
 /**
  * Build the overworld map draw model. Reads only IWorld members (player /
- * entities / socialInfo / questState / questLog) plus the committed zone and
- * shared world content (zone bounds, dungeon portals, camps, props,
- * decorations), so the offline Sim and the online ClientWorld mirror produce
- * identical output. Every
- * position is projected to canvas pixels here; the painter only resolves colors +
- * localized text and strokes.
+ * socialInfo / questState / questLog) plus the committed zone and shared world
+ * content (ZONES bounds, dungeon portals, camps, props, decorations, NPCS), so
+ * the offline Sim and the online ClientWorld mirror produce identical output.
+ * Every position is projected to canvas pixels here; the painter only resolves
+ * colors + localized text and strokes.
  */
 export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapModel {
   const { world, props, zone, zoom, center, canvasSize: S, decorations } = input;
@@ -432,31 +434,14 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     portals.push({ mx, my, dungeonId: portal.id });
   }
 
-  // Quest-giver glyphs show at every zoom (actionable markers, unlike the
-  // zoom-gated zone/POI text labels), culled to the visible map rect.
+  // Quest-giver glyphs, resolved from the static NPCS content table (like the
+  // quest-area blobs above) rather than world.entities, so the online interest
+  // radius never hides a distant giver's '!'/'?' glyph.
   const npcs: MapNpcMarker[] = [];
-  for (const e of world.entities.values()) {
-    if (e.kind !== 'npc') continue;
-    if (!inZone(e.pos.x, e.pos.z) || !inView(e.pos.x, e.pos.z)) continue;
-    const avail = e.questIds.filter(
-      (q) => QUESTS[q].giverNpcId === e.templateId && world.questState(q) === 'available',
-    );
-    const readyQuests = e.questIds.filter(
-      (q) => isQuestTurnInNpc(QUESTS[q], e.templateId) && world.questState(q) === 'ready',
-    );
-    if (avail.length > 0 || readyQuests.length > 0) {
-      const { mx, my } = toMap(e.pos.x, e.pos.z);
-      npcs.push({
-        mx,
-        my,
-        ready: readyQuests.length > 0,
-        // turn-ins first: the '?' state wins the glyph, so its quests lead the tooltip
-        quests: [
-          ...readyQuests.map((questId) => ({ questId, ready: true })),
-          ...avail.map((questId) => ({ questId, ready: false })),
-        ],
-      });
-    }
+  for (const marker of questGiverNpcMarkers((q) => world.questState(q))) {
+    if (marker.pos.z < zone.zMin || marker.pos.z >= zone.zMax) continue;
+    const { mx, my } = toMap(marker.pos.x, marker.pos.z);
+    npcs.push({ mx, my, ready: marker.ready, quests: marker.quests });
   }
 
   let player: MapPlayerMarker | null = null;

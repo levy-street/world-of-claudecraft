@@ -4,10 +4,14 @@
 // real content tables (QUESTS/CAMPS/MOBS/GROUND_OBJECTS) so the fixtures can
 // never drift from shipped content.
 
-import { describe, expect, it } from 'vitest';
-import { CAMPS, GATHER_NODES, GROUND_OBJECTS, MOBS, QUESTS } from '../src/sim/data';
-import { questObjectiveAreas, questObjectivesForMob } from '../src/sim/quest_targets';
-import type { QuestDef, QuestProgress } from '../src/sim/types';
+import { afterEach, describe, expect, it } from 'vitest';
+import { CAMPS, GATHER_NODES, GROUND_OBJECTS, MOBS, NPCS, QUESTS } from '../src/sim/data';
+import {
+  questGiverNpcMarkers,
+  questObjectiveAreas,
+  questObjectivesForMob,
+} from '../src/sim/quest_targets';
+import { isQuestTurnInNpc, type QuestDef, type QuestProgress } from '../src/sim/types';
 
 function activeLog(quest: QuestDef, counts?: number[]): Map<string, QuestProgress> {
   return new Map([
@@ -180,5 +184,92 @@ describe('questObjectiveAreas', () => {
       for (const o of a.objectives)
         expect(QUESTS[o.questId]?.objectives[o.objectiveIndex]).toBeTruthy();
     }
+  });
+
+  describe('gather objective with only an itemId (no nodeType)', () => {
+    // No shipped quest uses this shape yet (every gather objective in content
+    // pins a nodeType), so it is installed as a temporary test-only quest, the
+    // same pattern tests/profession_quest_objectives.test.ts uses for a latent
+    // objective shape. Restored after each test so no other suite sees it.
+    const TEST_QUEST_ID = 'q_test_gather_itemid_only';
+    const originalQuest = QUESTS[TEST_QUEST_ID];
+    afterEach(() => {
+      if (originalQuest) QUESTS[TEST_QUEST_ID] = originalQuest;
+      else delete QUESTS[TEST_QUEST_ID];
+    });
+
+    it('resolves the ground-object cluster feeding the item, same as a collect objective', () => {
+      const { itemId } = requireGroundObjectQuest();
+      const quest: QuestDef = {
+        id: TEST_QUEST_ID,
+        name: 'Test Gather ItemId Only',
+        giverNpcId: 'foreman_odell',
+        turnInNpcId: 'foreman_odell',
+        text: 'Test only.',
+        completionText: 'Test complete.',
+        objectives: [{ type: 'gather', itemId, count: 1, label: 'Test gather' }],
+        xpReward: 0,
+        copperReward: 0,
+        itemRewards: {},
+        retired: true,
+      };
+      QUESTS[TEST_QUEST_ID] = quest;
+
+      const def = GROUND_OBJECTS.find((g) => g.itemId === itemId && g.positions.length > 0);
+      expect(def).toBeTruthy();
+      if (!def) return;
+
+      const areas = questObjectiveAreas(activeLog(quest));
+      const containing = areas.find((a) =>
+        def.positions.every(
+          (p) => Math.hypot(p.x - a.center.x, p.z - a.center.z) <= a.radius + 1e-9,
+        ),
+      );
+      expect(containing, 'expected one area enclosing the whole object cluster').toBeTruthy();
+      expect(
+        containing?.objectives.some((o) => o.questId === TEST_QUEST_ID && o.objectiveIndex === 0),
+      ).toBe(true);
+    });
+  });
+});
+
+describe('questGiverNpcMarkers (the world-map quest-giver glyphs, resolved from static content)', () => {
+  it('is empty when no quest is available or ready', () => {
+    expect(questGiverNpcMarkers(() => 'unavailable')).toEqual([]);
+  });
+
+  it("resolves a real giver's static position for an available quest ('!' glyph)", () => {
+    const quest = Object.values(QUESTS).find((q) => q.giverNpcId);
+    if (!quest) throw new Error('expected a quest with a giverNpcId');
+    const giver = NPCS[quest.giverNpcId as string];
+    const markers = questGiverNpcMarkers((q) => (q === quest.id ? 'available' : 'unavailable'));
+    const marker = markers.find((m) => m.pos.x === giver.pos.x && m.pos.z === giver.pos.z);
+    expect(marker, "expected a marker at the giver's static content position").toBeTruthy();
+    expect(marker?.ready).toBe(false);
+    expect(marker?.quests).toContainEqual({ questId: quest.id, ready: false });
+  });
+
+  it("marks ready ('?') ahead of available ('!') for a giver that is also its own turn-in npc", () => {
+    const quest = Object.values(QUESTS).find(
+      (q) => q.giverNpcId && isQuestTurnInNpc(q, q.giverNpcId),
+    );
+    if (!quest) throw new Error('expected a quest whose giver is also a turn-in npc');
+    const giver = NPCS[quest.giverNpcId as string];
+    const markers = questGiverNpcMarkers((q) => (q === quest.id ? 'ready' : 'unavailable'));
+    const marker = markers.find((m) => m.pos.x === giver.pos.x && m.pos.z === giver.pos.z);
+    expect(marker?.ready).toBe(true);
+  });
+
+  it('skips a dynamic NPC (spawned on demand by its owning system) even when it lists a matching turn-in quest', () => {
+    const dynamicNpc = Object.values(NPCS).find(
+      (n) => n.dynamic && n.questIds.some((q) => QUESTS[q] && isQuestTurnInNpc(QUESTS[q], n.id)),
+    );
+    if (!dynamicNpc) throw new Error('expected a dynamic NPC carrying a turn-in quest');
+    const questId = dynamicNpc.questIds.find((q) => isQuestTurnInNpc(QUESTS[q], dynamicNpc.id));
+    if (!questId) throw new Error('expected a turn-in questId on the dynamic NPC');
+    const markers = questGiverNpcMarkers((q) => (q === questId ? 'ready' : 'unavailable'));
+    expect(markers.some((m) => m.pos.x === dynamicNpc.pos.x && m.pos.z === dynamicNpc.pos.z)).toBe(
+      false,
+    );
   });
 });
