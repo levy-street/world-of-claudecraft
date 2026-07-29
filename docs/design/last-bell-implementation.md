@@ -395,3 +395,24 @@ keeper at the gangplank is the interaction affordance, not a stick on
 the dock. Suites re-pinned to keeper talk; verify pass deferred to
 after the owner's session (tight-loop rule: no local runs while the
 owner tests).
+
+### The main sync lands (2026-07-30)
+
+Merged feature/last-bell-campaign-main-sync (commit 27ab35a14): the
+owner's reconciliation branch that carried the release/v0.32.0 era
+integration base and the latest origin/feature/procedural-dungeons into
+the campaign, with its own merge-audit round already closed. The only
+campaign commit that branch had not seen was the cinematic fix-loop
+review closure, and the two sides had refactored the same ship-cue
+machinery in parallel: the sync side's HarborShipCueRegistry plus
+harbor_ship_update_core won (it subsumes the campaign-side
+HarborShipPendingCueState extraction, now deleted), and the campaign's
+review finding was ported into it: a world rebuild discards pending
+ship cues (registry clear()), because ship registration is synchronous
+inside buildHarbors, so any cue still pending at rebuild time was
+recorded against the prior world's handles. Registry and attach-core
+tests re-pin the merged semantics. Post-merge audit found one stale
+generated artifact (the untracked i18n status registry predated the
+merge on disk; npm run i18n:gen refreshed it and the S3 guard went
+green with a clean tree) and confirmed the campaign's scene wire verbs,
+scene-director bindings, and planning-doc premises all survived.
