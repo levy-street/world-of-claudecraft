@@ -9,13 +9,13 @@
     "augment wave: fiestaPickOffers + arenaAugmentPick (fiestaAugments on meta + augmentOffer/Chosen events)",
     "multi-player meta"
   ],
-  "draws": 1146,
-  "drawDigest": "56600370",
+  "draws": 1192,
+  "drawDigest": "455401f5",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 820,
+      "nextId": 843,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -29,9 +29,9 @@
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 824,
-      "state": "9dfb6353",
-      "events": "445fd575",
+      "nextId": 847,
+      "state": "ebf966c6",
+      "events": "5d41a6ee",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -40,67 +40,67 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 824,
-      "state": "7130c042",
-      "events": "f68efa25",
+      "nextId": 847,
+      "state": "0c569f0f",
+      "events": "a251f2f9",
       "rng": {
-        "draws": 62,
-        "digest": "74b32d31"
+        "draws": 66,
+        "digest": "383a5306"
       }
     },
     {
       "tick": 75,
       "time": 3.75,
-      "nextId": 824,
-      "state": "b4e356c4",
-      "events": "4313e4ad",
+      "nextId": 847,
+      "state": "2d1d8481",
+      "events": "2b57d341",
       "rng": {
-        "draws": 237,
-        "digest": "8e7d48eb"
+        "draws": 249,
+        "digest": "88fa0391"
       }
     },
     {
       "tick": 100,
       "time": 5,
-      "nextId": 824,
-      "state": "6ef9cb93",
-      "events": "64ec10ed",
+      "nextId": 847,
+      "state": "e332a20e",
+      "events": "623e5ee1",
       "rng": {
-        "draws": 468,
-        "digest": "e51f191c"
+        "draws": 480,
+        "digest": "4118f318"
       }
     },
     {
       "tick": 125,
       "time": 6.25,
-      "nextId": 824,
-      "state": "d63dae78",
-      "events": "49c42e6f",
+      "nextId": 847,
+      "state": "3facc123",
+      "events": "65f137e9",
       "rng": {
-        "draws": 747,
-        "digest": "787c1f1c"
+        "draws": 766,
+        "digest": "fa8ca98c"
       }
     },
     {
       "tick": 150,
       "time": 7.5,
-      "nextId": 824,
-      "state": "661c9a87",
+      "nextId": 847,
+      "state": "590123d0",
       "events": "741638a5",
       "rng": {
-        "draws": 1011,
-        "digest": "8e9a0f02"
+        "draws": 1041,
+        "digest": "4a68f71a"
       }
     },
     {
       "tick": 163,
       "time": 8.15,
-      "nextId": 824,
-      "state": "1eec6cf8",
-      "events": "2681b6c8",
+      "nextId": 847,
+      "state": "328cb5d1",
+      "events": "25bd6078",
       "rng": {
-        "draws": 1146,
-        "digest": "56600370"
+        "draws": 1192,
+        "digest": "455401f5"
       },
       "label": "final",
       "players": [
@@ -137,7 +137,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 820,
+          "entityId": 843,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -206,7 +206,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 821,
+          "entityId": 844,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -277,7 +277,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 822,
+          "entityId": 845,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -347,7 +347,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 823,
+          "entityId": 846,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
@@ -401,7 +401,7 @@
               "name": "Battle Stance",
               "remaining": 3591.9,
               "school": "physical",
-              "sourceId": 820
+              "sourceId": 843
             }
           ],
           "blockChance": 0.05,
@@ -413,7 +413,7 @@
           "dodgeChance": 0.0695,
           "fiveSecondRule": 107.15,
           "hp": 822,
-          "id": 820,
+          "id": 843,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -461,7 +461,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 107.15,
           "hp": 418,
-          "id": 821,
+          "id": 844,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -511,7 +511,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 107.15,
           "hp": 510,
-          "id": 822,
+          "id": 845,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -568,7 +568,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 107.15,
           "hp": 783,
-          "id": 823,
+          "id": 846,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
