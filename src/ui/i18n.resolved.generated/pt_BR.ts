@@ -11523,7 +11523,7 @@ export const pt_BR: EnTranslations = {
       "harbormaster_odile": {
         "name": "Capitã do Porto Odile",
         "title": "Capitã do Porto de Wickharbor",
-        "greeting": "Todo barco nesta enseada deve sua quilha ao Velho Farol. Fale rápido, a maré não espera."
+        "greeting": "Cada barco desta enseada deve a própria quilha ao Velho Farol. Fale logo, porque a maré não espera."
       },
       "keeper_bram": {
         "name": "Guardião Bram",
@@ -12908,7 +12908,7 @@ export const pt_BR: EnTranslations = {
       },
       "q_dk_marrow_and_ash": {
         "title": "Medula e Cinzas",
-        "text": "Todo saqueador ossocinza carrega um tição de guerra, {playerName}: uma contagem chamuscada da horda sob a qual marcha. Contei quatro hordas deste cume, mas suposições não são inteligência. Traga-me seis tições dos saqueadores e seus convocadores de guerra, e darei a Brannoc a forma da guerra que está chegando.",
+        "text": "Cada saqueador ossocinza leva um tição de guerra, {playerName}: uma contagem chamuscada da hoste que ele segue. Deste cume já contei quatro hostes, mas palpite não é informação. Traga seis tições tirados dos saqueadores e de seus arautos de guerra, e eu mostrarei a Brannoc o contorno da guerra que se aproxima.",
         "completion": "Seis tições, e uma marca queimada em cada um deles. Isto não é uma simples reunião de saque, {playerName}. Toda horda nas dunas responde ao portão de guerra abaixo de nós, os trolls o chamam de Orkadia, e nenhum dos cinco soldados com quem já servi conseguiria derrubar o que ecoa atrás daquela porta. Talvez cinco como você.",
         "objectives": {
           "0": {
@@ -13300,7 +13300,7 @@ export const pt_BR: EnTranslations = {
       },
       "q_pr_scuttler_cull": {
         "title": "Ladrões de Casco",
-        "text": "Todo naufrágio nesta costa atrai os corredores da maré, e o Pearlwake atraiu metade do recife. Minhas tripulações de salvamento não vão trabalhar uma linha com aquelas garras nos baixios. Quebre dez deles, {playerName}, e a linha de destroços será nossa de novo.",
+        "text": "Qualquer naufrágio nesta costa chama os corredores da maré, e o Pearlwake trouxe meio recife atrás dele. Minhas equipes de salvamento não puxam uma só amarra com aquelas garras rondando os baixios. Rache dez deles, {playerName}, e a fileira de destroços volta a ser nossa.",
         "completion": "Dez garras a menos na arrebentação. Minhas tripulações já estão vadeando de volta, e nenhuma delas disse obrigado, então eu direi: obrigada, {playerName}.",
         "objectives": {
           "0": {
@@ -13393,7 +13393,7 @@ export const pt_BR: EnTranslations = {
       },
       "q_eg_stolen_shears": {
         "title": "As Tesouras Roubadas",
-        "text": "Todo par de tesouras em Hedgewick sumiu em quinze dias, {playerName}: dos ganchos, de galpões trancados, um par até do meu próprio avental enquanto eu cochilava. São os gnomos das sebes, os pequenos jardineiros que nos odeiam por caminhar em seus gramados. Recupere seis pares antes que o vilarejo inteiro fique reduzido a facas de cozinha.",
+        "text": "Em quinze dias, todas as tesouras de Hedgewick desapareceram, {playerName}: arrancadas dos ganchos, levadas de galpões trancados, até um par do meu próprio avental enquanto eu cochilava. Foram os gnomos das sebes, pequenos zeladores que detestam nos ver pisando nos gramados deles. Recupere seis pares antes que o vilarejo inteiro tenha que se virar com facas de cozinha.",
         "completion": "Seis pares, e o meu entre eles, eu reconheceria aquele entalhe na lâmina em qualquer lugar. Aqui, estas luvas foram tricotadas para o trabalho de poda. Mãos quentes seguram tesouras firmes.",
         "objectives": {
           "0": {
