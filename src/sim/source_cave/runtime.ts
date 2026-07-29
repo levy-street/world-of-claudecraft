@@ -54,11 +54,16 @@ export const SOURCE_CAVE_SLOT_COUNT = 24;
 /**
  * Overworld entrance position (relocated per user decision, resolves O3 in
  * docs/the-source-cave/state.md; was {x: 165, z: -120}, Phase 3's provisional
- * spot). The ctor nudges it onto walkable land via findSafePos, so the exact
- * value only needs to be roughly clear of other content. The entrance visual is
- * a well (render/door_portal.ts), not the generic dungeon-door arch.
+ * spot, then {x: -140.05, z: 463.43}). The ctor nudges it onto walkable land via
+ * findSafePos, so the exact value only needs to be roughly clear of other
+ * content. The entrance visual is a well (render/door_portal.ts), not the
+ * generic dungeon-door arch.
+ *
+ * Moving it moves more than the well: a cave death raises the spirit at the
+ * overworld graveyard NEAREST THIS POINT (ghostGraveyard in spirit.ts), so the
+ * corpse run starts wherever that resolves to.
  */
-export const SOURCE_CAVE_DOOR_POS = { x: -140.05, z: 463.43 } as const;
+export const SOURCE_CAVE_DOOR_POS = { x: -177, z: 481 } as const;
 
 // The entrance/exit arena-local z anchors are computed dynamically from the
 // actual roster (source_cave/spec.ts's sourceCaveEntryZ/sourceCaveExitZ), not a
