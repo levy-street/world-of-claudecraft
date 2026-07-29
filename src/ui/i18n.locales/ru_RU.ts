@@ -4451,6 +4451,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.emotes.wave': 'Помахать',
   'hudChrome.emoteWheel.edit': 'Изменить',
   'hudChrome.emoteWheel.label': 'Эмоции',
+  'hudChrome.meters.breakdownOther': 'Прочее ({count})',
+  'hudChrome.meters.melee': 'Ближний бой',
   'hudChrome.meters.minutesSeconds': '{m} мин {s} сек.',
   'hudChrome.meters.perSecond': '{value}/с',
   'hudChrome.meters.perSecondRow': '{total} ({rate})',

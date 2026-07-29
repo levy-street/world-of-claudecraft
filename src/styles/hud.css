@@ -2799,6 +2799,48 @@
     color: #ffe;
     text-shadow: 1px 1px 1px #000;
   }
+  /* Each bar is focusable so its hover breakdown is reachable by keyboard, not
+     by pointer only (attachTooltip shows on focusin and on a long-press). */
+  .mt-row:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: -1px;
+  }
+  /* Hover breakdown painted into the shared #tooltip box (meters.ts): one row
+     per ability, or per contributor on the Threat tab. The mini bar sits behind
+     the text the same way .mt-fill does on the bar itself. */
+  #tooltip .mt-tip-sub {
+    color: var(--color-text-muted);
+    font-size: 11px;
+    margin-bottom: 4px;
+  }
+  #tooltip .mt-tip-row {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    min-width: 180px;
+    padding: 1px 4px;
+    line-height: 1.5;
+  }
+  #tooltip .mt-tip-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background: #ffffff14;
+    border-radius: 2px;
+  }
+  #tooltip .mt-tip-name {
+    position: relative;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #tooltip .mt-tip-val {
+    position: relative;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
   body.mobile-touch #meters-window .mt-rows {
     max-height: 82px;
     overflow-y: auto;

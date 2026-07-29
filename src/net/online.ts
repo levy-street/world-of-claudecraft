@@ -2100,6 +2100,7 @@ export class ClientWorld implements IWorld {
         this.applyEnchantResultEvent(ev as SimEvent);
         this.applySalvageResultEvent(ev as SimEvent);
         this.applyChatFlairEvent(ev as SimEvent);
+        this.applyPrestigeEvent(ev as SimEvent);
         this.eventQueue.push(ev as SimEvent);
       }
       return;
@@ -3982,6 +3983,19 @@ export class ClientWorld implements IWorld {
     if (ev.type !== 'chat' || !ev.flair) return;
     // never trust the wire: re-sanitize the links, same as the identity decode
     this.rememberFlair(ev.from, ev.flair.ai === true, normalizeStreamerLinks(ev.flair.links));
+  }
+  // Mirror the authoritative prestige rank into this.prestigeRank the moment
+  // the event lands (issue #2137). The self snapshot's `prk` field is the
+  // convergence arm (same pattern as applyCraftResultEvent above), but the
+  // server sends this tick's `events` frame BEFORE the next `snap` frame that
+  // carries the bumped rank: without this immediacy arm, an already-open
+  // character sheet's renderCharIfOpen() (triggered by this very event) reads
+  // the STALE prestigeRank still on the mirror, so the sheet freezes one rank
+  // behind the chat line's "Prestige Rank N" until an unrelated repaint (or
+  // the next snapshot) catches it up.
+  private applyPrestigeEvent(ev: SimEvent): void {
+    if (ev.type !== 'prestige') return;
+    this.prestigeRank = ev.rank;
   }
   // --- IWorldMarket: World Market browse/list/buy/cancel/collect command sends
   // (snake_case wire strings). marketInfo is a snapshot read (mirror field above). ---

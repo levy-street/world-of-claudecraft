@@ -127,6 +127,7 @@ import {
   abilitySecondaryEffect,
   abilityTemporalHourglassValues,
 } from './ability_damage';
+import { abilityDisplayName, abilityDisplayNameFromSource } from './ability_display_name';
 import { ArenaWindow } from './arena_window';
 import { auraDisplayNameFromSource } from './aura_display_name';
 import { type AuraEffectInput, auraEffectDescriptor } from './aura_effect';
@@ -477,7 +478,7 @@ import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view'
 import { restView } from './rest_indicator';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
-import { localizeSimAuraName, localizeSimText } from './sim_i18n';
+import { localizeSimText } from './sim_i18n';
 import { SocialWindow } from './social_window';
 import { SpellbookWindow } from './spellbook_window';
 import { stanceBarView, WARRIOR_STANCE_GROUP } from './stance_bar_view';
@@ -1501,7 +1502,9 @@ export class Hud {
     private readonly features: HudFeatures = { dailyRewardsEnabled: true },
   ) {
     this.localIgnoredNames = this.loadLocalIgnoredNames();
-    this.meters = new Meters(sim);
+    this.meters = new Meters(sim, {
+      attachTooltip: (element, html) => this.attachTooltip(element, html),
+    });
     this.actionBarController = new ActionBarController({
       storage: localStorage,
       playerClass: this.sim.cfg.playerClass,
@@ -14432,10 +14435,6 @@ function describeAbilitySummary(
   return parts.join(' · ');
 }
 
-function abilityDisplayName(def: AbilityDef): string {
-  return tEntity({ kind: 'ability', id: def.id, field: 'name' });
-}
-
 // Fills every description placeholder from the RESOLVED ability: {damage} ($d)
 // the primary hit, {overTime} ($o) a hybrid's dot/hot total, {buff} ($b) the
 // first buff's value, {duration} ($t) the first timed effect's duration. All are
@@ -14556,14 +14555,6 @@ function entityDisplayName(entity: Entity): string {
 
 function delveDisplayName(delveId: string): string {
   return tEntity({ kind: 'delve', id: delveId, field: 'name' });
-}
-
-function abilityDisplayNameFromSource(name: string): string {
-  const ability = Object.values(ABILITIES).find((candidate) => candidate.name === name);
-  if (ability) return abilityDisplayName(ability);
-  // Boss/mob mechanic names (War Stomp, etc.) surface as a damage-log ability label but
-  // are not in ABILITIES; route them through the shared sim aura/mechanic localizer.
-  return localizeSimAuraName(name) ?? name;
 }
 
 function combatAbilityName(name: string | null): string {

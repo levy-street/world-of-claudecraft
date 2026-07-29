@@ -122,6 +122,10 @@ export function arenaQueueJoin(
     ctx.error(id, 'You are already in an arena match.');
     return;
   }
+  if (ctx.vcupSeatedOrQueued(id)) {
+    ctx.error(id, 'You are already in an arena match.');
+    return;
+  }
   if (r.e.dead) {
     ctx.error(id, 'You cannot queue for the arena while dead.');
     return;
@@ -205,6 +209,10 @@ export function arenaQueueJoin(
         ctx.error(id, `${mMeta.name} is already in the arena queue.`);
         return;
       }
+      if (ctx.vcupSeatedOrQueued(mPid)) {
+        ctx.error(id, `${mMeta.name} is already in an arena match.`);
+        return;
+      }
       if (ctx.duels.has(mPid)) {
         ctx.error(id, `${mMeta.name} cannot queue while dueling.`);
         return;
@@ -270,6 +278,10 @@ export function arenaQueueJoin(
     }
     if (isArenaQueued(ctx, mPid)) {
       ctx.error(id, `${mMeta.name} is already in the arena queue.`);
+      return;
+    }
+    if (ctx.vcupSeatedOrQueued(mPid)) {
+      ctx.error(id, `${mMeta.name} is already in an arena match.`);
       return;
     }
     if (ctx.duels.has(mPid)) {
@@ -637,8 +649,17 @@ export function matchmakeArena1v1(ctx: SimContext): void {
       const e = ctx.entities.get(id);
       // A queued player who walked into a dungeon/instance is not matchable: the
       // bout would teleport them back inside fully restored (issue #1600). Same
-      // x-band test the queue-join guard uses.
-      return !!e && !e.dead && !ctx.arenaMatches.has(id) && e.pos.x <= DUNGEON_X_THRESHOLD;
+      // x-band test the queue-join guard uses. Also drop anyone who slipped into
+      // a Vale Cup match/queue after joining here (arenaQueueJoin already blocks
+      // this at entry; this is the defense-in-depth re-check for paths that seat
+      // a player into Vale Cup without going through that guard, e.g. practice).
+      return (
+        !!e &&
+        !e.dead &&
+        !ctx.arenaMatches.has(id) &&
+        e.pos.x <= DUNGEON_X_THRESHOLD &&
+        !ctx.vcupSeatedOrQueued(id)
+      );
     });
     if (ctx.arenaQueue1v1.length < 2 || freeArenaSlot(ctx, '1v1') === null) return;
     const aPid = ctx.arenaQueue1v1[0];
@@ -666,7 +687,15 @@ export function pruneTeamQueue(ctx: SimContext, fmt: '2v2' | 'fiesta'): void {
       const e = ctx.entities.get(id);
       // Drop the whole unit if any member walked into a dungeon/instance while
       // queued: the bout would return them inside fully restored (issue #1600).
-      return !!e && !e.dead && !ctx.arenaMatches.has(id) && e.pos.x <= DUNGEON_X_THRESHOLD;
+      // Also drop the unit if a member slipped into a Vale Cup match/queue
+      // after joining here (see matchmakeArena1v1's matching comment).
+      return (
+        !!e &&
+        !e.dead &&
+        !ctx.arenaMatches.has(id) &&
+        e.pos.x <= DUNGEON_X_THRESHOLD &&
+        !ctx.vcupSeatedOrQueued(id)
+      );
     });
   if (fmt === 'fiesta') ctx.arenaQueueFiesta = ctx.arenaQueueFiesta.filter(keep);
   else ctx.arenaQueue2v2 = ctx.arenaQueue2v2.filter(keep);

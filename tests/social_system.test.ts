@@ -258,6 +258,10 @@ class FakeTransport implements SocialTransport {
   isBlocking(recipientId: number, senderCharacterId: number): boolean {
     return !!this.db.blocks.get(recipientId)?.has(senderCharacterId);
   }
+  notLoaded = new Set<number>();
+  blockListLoaded(characterId: number): boolean {
+    return !this.notLoaded.has(characterId);
+  }
   onIgnoresChanged(id: number, ids: number[]): void {
     this.ignoreSets.set(id, ids);
   }
@@ -422,6 +426,61 @@ describe('friends', () => {
     expect(h.tx.textFor(1).join()).toMatch(/Bet has come online/);
     expect(h.tx.snapshotCount.get(1)).toBe(1);
   });
+
+  it('does not notify a watcher the actor has blocked (stale friend-of-me edge)', async () => {
+    // 1 has 2 on their friends list (a "watches 2" edge); 2 then blocks 1, which
+    // only cleans 2's OWN friend edge, never 1's, so 1 keeps watching 2 unless
+    // announcePresence itself checks the block.
+    await h.svc.friendAdd(h.actor(1), 'Bet');
+    h.tx.setOnline(1);
+    await h.db.addBlock(2, 1); // Bet blocks Aleph directly (bypassing blockAdd's own-edge cleanup)
+    h.tx.clear();
+    await h.svc.announcePresence(h.actor(2), true);
+    expect(h.tx.textFor(1)).toHaveLength(0);
+    expect(h.tx.snapshotCount.get(1) ?? 0).toBe(0);
+  });
+
+  it('does not notify a watcher who has blocked the actor', async () => {
+    await h.svc.friendAdd(h.actor(1), 'Bet');
+    h.tx.setOnline(1);
+    await h.db.addBlock(1, 2); // Aleph (the watcher) blocks Bet (the actor)
+    h.tx.clear();
+    await h.svc.announcePresence(h.actor(2), true);
+    expect(h.tx.textFor(1)).toHaveLength(0);
+    expect(h.tx.snapshotCount.get(1) ?? 0).toBe(0);
+  });
+
+  it('hides live presence for a friend who has blocked the viewer (stale one-directional edge)', async () => {
+    await h.svc.friendAdd(h.actor(1), 'Bet'); // Aleph friends Bet
+    h.tx.setOnline(2, { zone: 'Mirewood', status: 'online', x: 5, z: 9 });
+    await h.svc.blockAdd(h.actor(2), 'Aleph'); // Bet blocks Aleph; Aleph's own edge to Bet survives
+    const snap = await h.svc.snapshot(1);
+    expect(snap.friends.map((f) => f.name)).toEqual(['Bet']);
+    expect(snap.friends[0].online).toBe(false);
+    expect(snap.friends[0].x).toBeUndefined();
+    expect(snap.friends[0].zone).toBeUndefined();
+  });
+
+  it('fails closed on a snapshot when the friend has a persisted block but their live block list has not loaded yet (#2437)', async () => {
+    await h.svc.friendAdd(h.actor(1), 'Bet'); // Aleph friends Bet
+    await h.db.addBlock(2, 1); // Bet has persisted a block on Aleph
+    h.tx.setOnline(2, { zone: 'Mirewood', status: 'online', x: 5, z: 9 });
+    h.tx.notLoaded.add(2); // but Bet's session block list has not loaded yet
+    const snap = await h.svc.snapshot(1);
+    expect(snap.friends[0].online).toBe(false);
+    expect(snap.friends[0].x).toBeUndefined();
+    expect(snap.friends[0].zone).toBeUndefined();
+  });
+
+  it('does not notify or refresh a watcher whose own block list has not loaded yet (#2437)', async () => {
+    await h.svc.friendAdd(h.actor(1), 'Bet'); // Aleph watches Bet
+    h.tx.setOnline(1);
+    h.tx.notLoaded.add(1); // Aleph's session block list has not loaded yet
+    h.tx.clear();
+    await h.svc.announcePresence(h.actor(2), true);
+    expect(h.tx.textFor(1)).toHaveLength(0);
+    expect(h.tx.snapshotCount.get(1) ?? 0).toBe(0);
+  });
 });
 
 describe('ignore / block', () => {
@@ -453,6 +512,16 @@ describe('ignore / block', () => {
     await h.svc.blockRemove(h.actor(1), 'Bet');
     expect((await h.svc.snapshot(1)).blocks).toHaveLength(0);
     expect(h.tx.blockSets.get(1)).toEqual([]);
+  });
+
+  it('pushes a snapshot refresh to the blocked target too, not just the actor (#2437)', async () => {
+    h.tx.setOnline(2);
+    h.tx.clear();
+    await h.svc.blockAdd(h.actor(1), 'Bet');
+    expect(h.tx.snapshotCount.get(2)).toBe(1);
+    h.tx.clear();
+    await h.svc.blockRemove(h.actor(1), 'Bet');
+    expect(h.tx.snapshotCount.get(2)).toBe(1);
   });
 
   it('does not claim success when unignoring someone who is not ignored', async () => {
@@ -561,6 +630,17 @@ describe('ignore / block', () => {
     expect(snap.friends).toHaveLength(0);
     expect(snap.blocks.map((b) => b.name)).toEqual(['Bet']);
   });
+
+  it('refuses a friend add when the TARGET has blocked the actor, even while offline', async () => {
+    // Bet blocked Aleph; Aleph never sees Bet's own block list, so this must be
+    // checked server-side regardless of who is currently online. A blocked
+    // stalker must not be able to re-add the blocker and keep tracking them.
+    await h.db.addBlock(2, 1); // Bet (target) has blocked Aleph (actor)
+    await h.svc.friendAdd(h.actor(1), 'Bet');
+    expect(h.tx.errorsFor(1)).toHaveLength(1);
+    const snap = await h.svc.snapshot(1);
+    expect(snap.friends).toHaveLength(0);
+  });
 });
 
 describe('guilds', () => {
@@ -616,6 +696,37 @@ describe('guilds', () => {
     h.tx.clear();
     await h.svc.announcePresence(h.actor(2), true);
     expect(h.tx.snapshotCount.get(1) ?? 0).toBe(1); // exactly one refresh, not two
+  });
+
+  it('does not refresh a guildmate the actor has blocked (guild membership survives a block)', async () => {
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    await h.svc.blockAdd(h.actor(2), 'Aleph'); // Bet blocks the actor; guild membership is untouched
+    h.tx.clear();
+    await h.svc.announcePresence(h.actor(1), true);
+    expect(h.tx.snapshotCount.get(2) ?? 0).toBe(0);
+  });
+
+  it("hides a blocked guildmate's live presence in the guild roster, in either block direction", async () => {
+    await h.svc.guildCreate(h.actor(1), 'Iron Vanguard');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    h.tx.setOnline(2, { zone: 'Mirewood', status: 'online', x: 1, z: 2 });
+    // Aleph (the viewer) blocks guildmate Bet; guild membership is untouched.
+    await h.svc.blockAdd(h.actor(1), 'Bet');
+    let snap = await h.svc.snapshot(1);
+    let bet = snap.guild?.members.find((m) => m.name === 'Bet');
+    expect(bet).toBeDefined();
+    expect(bet?.online).toBe(false);
+
+    await h.svc.blockRemove(h.actor(1), 'Bet');
+    // Now the reverse: Bet blocks Aleph (the viewer) instead.
+    await h.svc.blockAdd(h.actor(2), 'Aleph');
+    snap = await h.svc.snapshot(1);
+    bet = snap.guild?.members.find((m) => m.name === 'Bet');
+    expect(bet).toBeDefined();
+    expect(bet?.online).toBe(false);
   });
 
   it('rejects an invalid or duplicate guild name', async () => {

@@ -690,6 +690,16 @@ describe('axe: market window (Sim + ClientWorld shapes)', () => {
       expect(root.getAttribute('aria-label')).toBe(t('itemUi.market.title'));
       // The async-results live region is persistent + polite (the lazy-load a11y fix).
       expect(root.querySelector('.mkt-status')?.getAttribute('role')).toBe('status');
+      const groups = root.querySelectorAll<HTMLElement>('[role="group"]');
+      expect(groups).toHaveLength(1);
+      const filters = groups[0];
+      expect(filters.classList.contains('mkt-controls')).toBe(true);
+      expect(filters.getAttribute('aria-label')).toBe(t('itemUi.market.filters'));
+      expect(filters.querySelector('.mkt-search')).toBeTruthy();
+      for (const field of root.querySelectorAll('.mkt-filter')) {
+        expect(field.closest('[role="group"]')).toBe(filters);
+      }
+      expect(root.querySelector('.mkt-filters')?.hasAttribute('role')).toBe(false);
       await expectClean(root);
     });
   }

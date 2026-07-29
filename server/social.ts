@@ -197,6 +197,15 @@ export interface SocialTransport {
   // true if `recipientId` has `senderCharacterId` on their BLOCK list, so
   // guild/officer chat can honour the same filter say/whisper already apply
   isBlocking(recipientId: number, senderCharacterId: number): boolean;
+  // true once `characterId`'s persisted block list has finished loading into
+  // the live session (or the character is offline, where there is nothing to
+  // load and no live presence to leak). While a just-joined character's block
+  // list is still loading, isBlocking() above answers false for them the same
+  // way an unset Set would, so a caller that skips this check can briefly
+  // disclose presence across a block the target already placed. Mirrors the
+  // canShowInWho fail-closed guard (server/game.ts) for the presence() /
+  // announcePresence() paths in this file.
+  blockListLoaded(characterId: number): boolean;
   // true if `recipientId` has `senderCharacterId` on their IGNORE list. Guild and
   // officer chat fan out through deliver() and never pass the routeEvents chat
   // filter, so they must consult the ignore list here, exactly as for blocks.
@@ -324,6 +333,7 @@ export class SocialService {
       this.db.listIgnores(charId),
       this.db.guildMembership(charId),
     ]);
+    const blockedByViewer = new Set(blocks.map((b) => b.id));
     let guild: GuildView | null = null;
     if (membership) {
       const fromDay = shiftDay(this.todayIso(), -GUILD_EVENT_KEEP_PAST_DAYS);
@@ -339,14 +349,14 @@ export class SocialService {
         motd: motd.motd,
         motdSetBy: motd.motdSetBy,
         members: members
-          .map((m) => ({ ...m, ...this.presence(m.id) }))
+          .map((m) => ({ ...m, ...this.presence(charId, m.id, blockedByViewer) }))
           .sort((a, b) => rankOrder(a.rank) - rankOrder(b.rank) || a.name.localeCompare(b.name)),
         events,
       };
     }
     return {
       friends: friends
-        .map((f) => ({ ...f, ...this.presence(f.id) }))
+        .map((f) => ({ ...f, ...this.presence(charId, f.id, blockedByViewer) }))
         .sort((a, b) => Number(b.online) - Number(a.online) || a.name.localeCompare(b.name)),
       blocks,
       ignores,
@@ -355,14 +365,31 @@ export class SocialService {
   }
 
   // Collapse a character's online presence into the fields a roster row needs.
-  private presence(charId: number): {
+  // A friend or guild edge can survive a block on either side (blockAdd only
+  // ever cleans the blocker's OWN outgoing friend edge, and never touches guild
+  // membership at all), so this hides live position and online status the same
+  // way canShowInWho already hides /who visibility: bidirectionally, and
+  // regardless of which side added the other or blocked the other.
+  private presence(
+    viewerCharId: number,
+    otherCharId: number,
+    viewerBlockedIds: Set<number>,
+  ): {
     online: boolean;
     zone?: string;
     status?: PresenceStatus;
     x?: number;
     z?: number;
   } {
-    const loc = this.tx.locationOf(charId);
+    if (
+      otherCharId !== viewerCharId &&
+      (viewerBlockedIds.has(otherCharId) ||
+        !this.tx.blockListLoaded(otherCharId) ||
+        this.tx.isBlocking(otherCharId, viewerCharId))
+    ) {
+      return { online: false };
+    }
+    const loc = this.tx.locationOf(otherCharId);
     return loc
       ? { online: true, zone: loc.zone, status: loc.status, x: loc.x, z: loc.z }
       : { online: false };
@@ -423,6 +450,21 @@ export class SocialService {
       this.err(actor.characterId, `${target.name} is already your friend.`);
       return;
     }
+    // A block is meant to be mutual (canShowInWho, broadcastDeedUnlock, and
+    // guildInvite all enforce it both ways): if the TARGET has blocked the
+    // actor, refuse the add too, or a blocked stalker could re-add the person
+    // who blocked them and keep live-tracking their position and online
+    // status through the one-directional friend list. The target may be
+    // offline, so this reads the DB rather than the live session set. This
+    // check runs AFTER the "already your friend" check above so re-running
+    // `/friend add` on an existing friend edge always answers the same way,
+    // even once the target blocks the actor: keeping the reply stable there
+    // avoids handing a blocker-detection oracle to an already-added friend.
+    const targetBlockedIds = await this.db.blockedIds(target.id);
+    if (targetBlockedIds.includes(actor.characterId)) {
+      this.err(actor.characterId, `You cannot add ${target.name} as a friend.`);
+      return;
+    }
     if (friends.length >= FRIEND_LIMIT) {
       this.err(actor.characterId, 'Your friends list is full.');
       return;
@@ -449,12 +491,31 @@ export class SocialService {
   }
 
   // Called by game.ts when a character logs in/out, so friends watching them
-  // see a come-online / go-offline notice (and refresh their panel).
+  // see a come-online / go-offline notice (and refresh their panel). Filtered
+  // bidirectionally by block, the same as broadcastDeedUnlock: a friend-of-me
+  // or guild edge on the OTHER side survives a block (blockAdd only cleans the
+  // blocker's own outgoing friend edge, never guild membership), so without
+  // this a blocked stalker (or someone the actor blocked) would keep hearing
+  // the actor's login/logout and getting their panel refreshed with the
+  // actor's live position.
   async announcePresence(actor: SocialActor, online: boolean): Promise<void> {
-    const watchers = await this.db.whoFriended(actor.characterId);
+    const [watchers, actorBlockedIds] = await Promise.all([
+      this.db.whoFriended(actor.characterId),
+      this.db.blockedIds(actor.characterId),
+    ]);
+    const actorBlocked = new Set(actorBlockedIds);
+    // Fail closed the same way presence() does: while otherId's own block
+    // list is still loading (a just-joined watcher or guildmate), we cannot
+    // yet tell whether they blocked the actor, so treat that as a block
+    // rather than deliver the notice or refresh their panel.
+    const blockedPair = (otherId: number): boolean =>
+      actorBlocked.has(otherId) ||
+      !this.tx.blockListLoaded(otherId) ||
+      this.tx.isBlocking(otherId, actor.characterId);
     const notified = new Set<number>();
     for (const watcherId of watchers) {
       if (!this.tx.isOnline(watcherId)) continue;
+      if (blockedPair(watcherId)) continue;
       this.tx.deliver(watcherId, [
         {
           type: 'log',
@@ -473,6 +534,7 @@ export class SocialService {
       const members = await this.db.guildMembers(membership.guildId);
       for (const m of members) {
         if (m.id === actor.characterId || notified.has(m.id) || !this.tx.isOnline(m.id)) continue;
+        if (blockedPair(m.id)) continue;
         this.push(m.id);
         notified.add(m.id);
       }
@@ -505,6 +567,9 @@ export class SocialService {
     this.info(actor.characterId, `${target.name} is now blocked.`);
     this.tx.onBlocksChanged(actor.characterId, await this.db.blockedIds(actor.characterId));
     this.push(actor.characterId);
+    // The target's own panel must lose the actor's presence too, or it stays
+    // frozen "online" on their side for the rest of the session (#2437).
+    this.push(target.id);
   }
 
   async blockRemove(actor: SocialActor, name: string): Promise<void> {
@@ -522,6 +587,7 @@ export class SocialService {
     this.info(actor.characterId, `${target.name} is no longer blocked.`);
     this.tx.onBlocksChanged(actor.characterId, await this.db.blockedIds(actor.characterId));
     this.push(actor.characterId);
+    this.push(target.id);
   }
 
   // "/blocklist": echo the blocked names back to the actor.

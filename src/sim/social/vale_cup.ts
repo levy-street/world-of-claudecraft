@@ -75,7 +75,13 @@ import {
   VC_SPAWNS_B,
   vcPracticeOrigin,
 } from '../vale_cup_layout';
-import { arenaCombatants, cloneAbilityCharges, cloneCcDr, snapshotArenaReturnPools } from './arena';
+import {
+  arenaCombatants,
+  cloneAbilityCharges,
+  cloneCcDr,
+  isArenaQueued,
+  snapshotArenaReturnPools,
+} from './arena';
 
 // ---------------------------------------------------------------------------
 // Tuning constants (fiesta style: all at the top).
@@ -432,7 +438,7 @@ export function vcupQueueJoin(
     return;
   }
   const match = ctx.vcup.match;
-  if ((match && vcupTeamOf(match, id)) || ctx.arenaMatches.has(id)) {
+  if ((match && vcupTeamOf(match, id)) || ctx.arenaMatches.has(id) || isArenaQueued(ctx, id)) {
     ctx.error(id, 'You are already in an arena match.');
     return;
   }
@@ -488,7 +494,11 @@ export function vcupQueueJoin(
       ctx.error(id, `${mMeta.name} cannot queue while dead.`);
       return;
     }
-    if ((match && vcupTeamOf(match, mPid)) || ctx.arenaMatches.has(mPid)) {
+    if (
+      (match && vcupTeamOf(match, mPid)) ||
+      ctx.arenaMatches.has(mPid) ||
+      isArenaQueued(ctx, mPid)
+    ) {
       ctx.error(id, `${mMeta.name} is already in an arena match.`);
       return;
     }
@@ -1347,6 +1357,17 @@ export function vcupMatchOf(ctx: SimContext, pid: number): VcMatch | null {
   const match = ctx.vcup.match;
   if (match && vcupTeamOf(match, pid)) return match;
   return ctx.vcup.practices.find((p) => vcupTeamOf(p, pid)) ?? null;
+}
+
+// True when pid is seated in ANY live Vale Cup match (the rated Sowfield match
+// or a private practice instance) or is waiting in a Vale Cup bracket queue.
+// Consumed by social/arena.ts (via the ctx.vcupSeatedOrQueued SimContext
+// callback) to keep the Arena and Vale Cup queues mutually exclusive: a
+// player mid-match or mid-queue in one system must never be pulled into the
+// other (arena.ts never imports this module directly, unlike the reverse:
+// vcupQueueJoin above calls isArenaQueued via a direct import).
+export function vcupSeatedOrQueued(ctx: SimContext, pid: number): boolean {
+  return vcupMatchOf(ctx, pid) !== null || vcupQueuedUnitOf(ctx, pid) !== null;
 }
 
 // ---------------------------------------------------------------------------

@@ -23,6 +23,9 @@ export const DICT: Record<string, Record<string, string>> = {
     'friends.ignoringRemoveFirst':
       'You are ignoring {name}. Remove them from your ignore list first.',
     'friends.alreadyFriend': '{name} is already your friend.',
+    // Refusal when the TARGET has blocked the actor (friendAdd's reverse-block
+    // check): deliberately generic, does not reveal the block exists.
+    'friends.cannotAdd': 'You cannot add {name} as a friend.',
     'friends.listFull': 'Your friends list is full.',
     'friends.notOnFriends': "No character named '{name}' on your friends list.",
     'friends.notYourFriend': '{name} is not on your friends list.',
@@ -154,6 +157,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'friends.ignoringRemoveFirst':
       'You are ignoring {name}. Remove them from your ignore list first.',
     'friends.alreadyFriend': '{name} is already your friend.',
+    'friends.cannotAdd': 'You cannot add {name} as a friend.',
     'friends.listFull': 'Your friends list is full.',
     'friends.notOnFriends': "No character named '{name}' on your friends list.",
     'friends.notYourFriend': '{name} is not on your friends list.',
@@ -270,6 +274,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'friends.ignoringRemoveFirst':
       'Estás ignorando a {name}. Quítalo primero de tu lista de ignorados.',
     'friends.alreadyFriend': '{name} ya es tu amigo.',
+    'friends.cannotAdd': 'No puedes agregar a {name} como amigo.',
     'friends.listFull': 'Tu lista de amigos está llena.',
     'friends.notOnFriends': "No hay ningún personaje llamado '{name}' en tu lista de amigos.",
     'friends.notYourFriend': '{name} no está en tu lista de amigos.',
@@ -392,6 +397,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'friends.ignoringRemoveFirst':
       'Estás ignorando a {name}. Quítalo primero de tu lista de ignorados.',
     'friends.alreadyFriend': '{name} ya está en tu lista de amigos.',
+    'friends.cannotAdd': 'No puedes añadir a {name} como amigo.',
     'friends.listFull': 'Tu lista de amigos está llena.',
     'friends.notOnFriends': "No hay ningún personaje llamado '{name}' en tu lista de amigos.",
     'friends.notYourFriend': '{name} no está en tu lista de amigos.',
@@ -517,6 +523,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'friends.ignoringRemoveFirst':
       "Vous ignorez {name}. Retirez-le d'abord de votre liste d'ignorés.",
     'friends.alreadyFriend': '{name} fait déjà partie de vos amis.',
+    'friends.cannotAdd': 'Vous ne pouvez pas ajouter {name} comme ami.',
     'friends.listFull': "Votre liste d'amis est pleine.",
     'friends.notOnFriends': "Aucun personnage du nom de « {name} » dans votre liste d'amis.",
     'friends.notYourFriend': "{name} ne fait pas partie de votre liste d'amis.",
@@ -640,6 +647,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'friends.ignoringRemoveFirst':
       "Vous ignorez {name}. Retirez d'abord ce personnage de votre liste des joueurs ignorés.",
     'friends.alreadyFriend': '{name} fait déjà partie de vos amis.',
+    'friends.cannotAdd': 'Vous ne pouvez pas ajouter {name} comme ami.',
     'friends.listFull': "Votre liste d'amis est pleine.",
     'friends.notOnFriends': "Aucun personnage nommé « {name} » dans votre liste d'amis.",
     'friends.notYourFriend': "{name} ne fait pas partie de votre liste d'amis.",
@@ -761,6 +769,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'friends.cannotBefriendSelf': 'Non puoi aggiungere te stesso agli amici.',
     'friends.ignoringRemoveFirst': 'Stai ignorando {name}. Rimuovilo prima dalla lista ignorati.',
     'friends.alreadyFriend': '{name} è già tra i tuoi amici.',
+    'friends.cannotAdd': 'Non puoi aggiungere {name} come amico.',
     'friends.listFull': 'La tua lista amici è piena.',
     'friends.notOnFriends': "Nessun personaggio chiamato '{name}' nella tua lista amici.",
     'friends.notYourFriend': '{name} non è nella tua lista amici.',
@@ -882,6 +891,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'friends.ignoringRemoveFirst':
       'Ihr ignoriert {name}. Entfernt sie zuerst von Eurer Ignorierliste.',
     'friends.alreadyFriend': '{name} ist bereits Euer Freund.',
+    'friends.cannotAdd': 'Ihr könnt {name} nicht als Freund hinzufügen.',
     'friends.listFull': 'Eure Freundesliste ist voll.',
     'friends.notOnFriends':
       "Es befindet sich kein Charakter mit dem Namen '{name}' auf Eurer Freundesliste.",
@@ -1002,6 +1012,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'friends.cannotBefriendSelf': '你无法将自己加为好友。',
     'friends.ignoringRemoveFirst': '你正在屏蔽{name}。请先将其从屏蔽列表中移除。',
     'friends.alreadyFriend': '{name}已经是你的好友了。',
+    'friends.cannotAdd': '你不能把{name}加为好友。',
     'friends.listFull': '你的好友列表已满。',
     'friends.notOnFriends': '你的好友列表中没有名为“{name}”的角色。',
     'friends.notYourFriend': '{name}不在你的好友列表中。',
@@ -1115,6 +1126,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'friends.cannotBefriendSelf': '你無法將自己加為好友。',
     'friends.ignoringRemoveFirst': '你正在忽略 {name}。請先將其從你的忽略名單中移除。',
     'friends.alreadyFriend': '{name} 已經是你的好友。',
+    'friends.cannotAdd': '你不能將 {name} 加為好友。',
     'friends.listFull': '你的好友名單已滿。',
     'friends.notOnFriends': '你的好友名單中沒有名為「{name}」的角色。',
     'friends.notYourFriend': '{name} 不在你的好友名單中。',
@@ -1229,6 +1241,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'friends.cannotBefriendSelf': '자신을 친구로 추가할 수 없습니다.',
     'friends.ignoringRemoveFirst': '{name}님을 무시하고 있습니다. 먼저 무시 목록에서 제거하십시오.',
     'friends.alreadyFriend': '{name}님은 이미 친구입니다.',
+    'friends.cannotAdd': '{name}님을 친구로 추가할 수 없습니다.',
     'friends.listFull': '친구 목록이 가득 찼습니다.',
     'friends.notOnFriends': "친구 목록에 '{name}'(이)라는 이름의 캐릭터가 없습니다.",
     'friends.notYourFriend': '{name}님은 친구 목록에 없습니다.',
@@ -1344,6 +1357,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'friends.cannotBefriendSelf': '自分自身をフレンドに追加することはできません。',
     'friends.ignoringRemoveFirst': '{name}を無視しています。先に無視リストから削除してください。',
     'friends.alreadyFriend': '{name}はすでにフレンドです。',
+    'friends.cannotAdd': '{name}をフレンドに追加することはできません。',
     'friends.listFull': 'フレンドリストがいっぱいです。',
     'friends.notOnFriends': '「{name}」という名前のキャラクターはフレンドリストにいません。',
     'friends.notYourFriend': '{name}はフレンドリストにいません。',
@@ -1464,6 +1478,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'friends.ignoringRemoveFirst':
       'Você está ignorando {name}. Remova-o da sua lista de ignorados primeiro.',
     'friends.alreadyFriend': '{name} já é seu amigo.',
+    'friends.cannotAdd': 'Você não pode adicionar {name} como amigo.',
     'friends.listFull': 'Sua lista de amigos está cheia.',
     'friends.notOnFriends': "Nenhum personagem chamado '{name}' na sua lista de amigos.",
     'friends.notYourFriend': '{name} não está na sua lista de amigos.',
@@ -1584,6 +1599,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'friends.ignoringRemoveFirst':
       'Вы игнорируете {name}. Сначала удалите этого персонажа из списка игнорируемых.',
     'friends.alreadyFriend': '{name} уже у вас в друзьях.',
+    'friends.cannotAdd': 'Вы не можете добавить {name} в друзья.',
     'friends.listFull': 'Ваш список друзей заполнен.',
     'friends.notOnFriends': 'В вашем списке друзей нет персонажа с именем «{name}».',
     'friends.notYourFriend': '{name} отсутствует в вашем списке друзей.',
@@ -2048,6 +2064,10 @@ const RULES: Rule[] = [
   {
     re: /^(.+) is already your friend\.$/,
     build: (m) => tServer('friends.alreadyFriend', { name: m[1] }),
+  },
+  {
+    re: /^You cannot add (.+) as a friend\.$/,
+    build: (m) => tServer('friends.cannotAdd', { name: m[1] }),
   },
   {
     re: /^(.+) is not on your friends list\.$/,

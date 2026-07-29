@@ -1893,6 +1893,13 @@ export class GameServer {
         const s = this.sessionByCharacterId(recipientId);
         return s ? s.blockedIds.has(senderCharacterId) : false;
       },
+      // Offline characters have nothing loaded and no live presence to leak,
+      // so they report loaded (true); an online session reports its own
+      // blockListLoaded flag, set once initSocial's DB read resolves.
+      blockListLoaded: (characterId) => {
+        const s = this.sessionByCharacterId(characterId);
+        return s ? s.blockListLoaded : true;
+      },
       onIgnoresChanged: (id, ids) => {
         const s = this.sessionByCharacterId(id);
         if (s) s.ignoredIds = new Set(ids);
@@ -1947,6 +1954,12 @@ export class GameServer {
       for (const id of ids) {
         const other = this.sessionByCharacterId(id);
         if (!other) continue; // offline — snapshots own the online/offline flip
+        // A friend/guild edge on the OTHER side survives a block (blockAdd only
+        // cleans the blocker's own outgoing friend edge, never guild
+        // membership), so this tracked id can stay in socialTrackedIds long
+        // after a block either way. Refuse to leak live position across it,
+        // the same bidirectional rule canShowInWho already applies to /who.
+        if (!this.canShowInWho(session, other)) continue;
         const loc = this.presenceOf(other);
         if (loc.x === undefined || loc.z === undefined) continue;
         // The live Book of Deeds title (sim meta, no DB read); the `social`
@@ -7081,6 +7094,9 @@ export class GameServer {
   }
 
   private canShowInWho(viewer: ClientSession, candidate: ClientSession): boolean {
+    // Fail closed while the candidate's block list is still loading: showing
+    // them in /who before we know their blocks could leak presence to
+    // someone they've blocked.
     if (!candidate.blockListLoaded) return false;
     if (viewer.blockedIds.has(candidate.characterId)) return false;
     if (

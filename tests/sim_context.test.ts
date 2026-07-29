@@ -228,6 +228,8 @@ const CALLBACK_KEYS = [
   'mailAuthoredLetter',
   // Set proc firing.
   'applySetProcs',
+  // Vale Cup <-> Arena queue exclusion (social/vale_cup.ts).
+  'vcupSeatedOrQueued',
   // The Vale Cup sport-move arms (social/vale_cup.ts).
   'vcupBallKick',
   'vcupBallPass',
@@ -524,6 +526,8 @@ function makeFakeHost() {
     mailHeroicMarks: vi.fn(),
     mailAuthoredLetter: vi.fn(),
     applySetProcs: vi.fn(),
+    // Vale Cup <-> Arena queue exclusion.
+    vcupSeatedOrQueued: vi.fn(() => false),
     // The Vale Cup sport-move arms.
     vcupBallKick: vi.fn(),
     vcupBallPass: vi.fn(),

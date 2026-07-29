@@ -849,6 +849,15 @@ export interface SimContextCallbacks {
   markDeedsDirty(pid: number): void;
   grantDeed(meta: PlayerMeta, deedId: string, opts?: { retro?: boolean }): boolean;
 
+  // Vale Cup <-> Arena queue exclusion (owned by social/vale_cup.ts). True when
+  // pid is seated in a live Vale Cup match (rated or practice) or waiting in a
+  // Vale Cup bracket queue. social/arena.ts calls this from arenaQueueJoin and
+  // the 1v1/2v2/fiesta prune predicates so a player already committed to Vale
+  // Cup can never be pulled into an Arena queue or match, and vice versa (the
+  // mirror check, isArenaQueued, is a direct import since vale_cup.ts already
+  // imports arena.ts one direction).
+  vcupSeatedOrQueued(pid: number): boolean;
+
   // The Vale Cup sport-move arms (owned by social/vale_cup.ts; consumed by
   // combat/effect_dispatch.ts). All three silently no-op unless the caster is
   // seated in the live Sowfield match's play phase. vcupBallKick launches the
@@ -1302,6 +1311,8 @@ export function createSimContext(host: SimContextHost): SimContext {
     markVisited: host.markVisited,
     markDeedsDirty: host.markDeedsDirty,
     grantDeed: host.grantDeed,
+    // Vale Cup <-> Arena queue exclusion (points at social/vale_cup.ts).
+    vcupSeatedOrQueued: host.vcupSeatedOrQueued,
     // The Vale Cup sport-move arms (points at social/vale_cup.ts).
     vcupBallKick: host.vcupBallKick,
     vcupBallPass: host.vcupBallPass,

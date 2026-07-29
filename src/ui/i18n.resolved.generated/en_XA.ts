@@ -872,7 +872,13 @@ export const en_XA: EnTranslations = {
       "perSecondRow": "[{total} ({rate})]",
       "minutesSeconds": "[{m}ɱ {s}š]",
       "seconds": "[{s}š]",
-      "autoShowHint": "[Ŕóŵš áþþéáŕ áúţóɱáţíçáļļý óñçé ýóúŕ þáŕţý ðéáļš ðáɱáĝé óŕ ĥéáļíñĝ, áñð ţĥíš šéĝɱéñţ çļóšéš á ƒéŵ šéçóñðš áƒţéŕ çóɱƀáţ éñðš.]"
+      "autoShowHint": "[Ŕóŵš áþþéáŕ áúţóɱáţíçáļļý óñçé ýóúŕ þáŕţý ðéáļš ðáɱáĝé óŕ ĥéáļíñĝ, áñð ţĥíš šéĝɱéñţ çļóšéš á ƒéŵ šéçóñðš áƒţéŕ çóɱƀáţ éñðš.]",
+      "breakdownSummary": "[{tab}: {value}]",
+      "breakdownRow": "[{value} ({percent})]",
+      "breakdownOther": "[Óţĥéŕ ({count})]",
+      "percent": "[{value}%]",
+      "petAbility": "[{pet}: {ability}]",
+      "melee": "[Ɱéļéé]"
     },
     "petFeed": {
       "disabledFullHp": "[Þéţ íš áţ ƒúļļ ĥéáļţĥ]",

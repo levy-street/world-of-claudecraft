@@ -9585,23 +9585,22 @@
     color: #9fdc7f;
     font-size: 10.5px;
   }
-  /* The search box and the type/subtype/rarity dropdowns are one control row: at 860px
-     wide, a full-width search box (or a filter row spanning the whole window) reads
-     oversized, so both are capped to a sensible max-width and sit side by side,
-     wrapping onto their own line only once the window narrows too much to fit them
-     (mobile, or a three-menu row once the subtype filter appears). */
+  /* Search and every visible filter participate in one grid. The previous nested flex
+     rows wrapped independently, so the search aligned against the bottom of the entire
+     filter block and jumped beside its last row as the window narrowed. A shared grid
+     keeps every control on the same columns and moves complete fields between rows. */
   .mkt-controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: flex-end;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+    gap: 10px 8px;
+    align-items: end;
     margin: 2px 0 8px;
     position: relative;
     z-index: 3;
   }
   .mkt-search {
-    flex: 1 1 200px;
-    max-width: 260px;
+    width: 100%;
+    max-width: none;
     min-width: 0;
     box-sizing: border-box;
     margin: 0;
@@ -9623,18 +9622,13 @@
     border-color: var(--color-border-focus);
   }
   .mkt-filters {
-    display: flex;
-    flex-wrap: wrap;
-    flex: 2 1 auto;
-    gap: 8px;
-    margin: 0;
+    display: contents;
   }
   .mkt-filter {
     display: flex;
     flex-direction: column;
     gap: 3px;
-    flex: 1 1 140px;
-    max-width: 220px;
+    max-width: none;
     min-width: 0;
   }
   .mkt-filter span {

@@ -38,6 +38,8 @@ export const MODERATION_ACTIONS = [
   'daily_rewards_unban',
   'daily_rewards_ip_ban',
   'daily_rewards_ip_unban',
+  'reactivate',
+  'chat_strikes_reset',
   // Account flair. Not punitive (they grant a cosmetic mark, they do not sanction),
   // so unlike every action above they take an OPTIONAL reason. Audited all the same:
   // the AI mark and a streamer's links are visible to every player, so who set them
@@ -576,6 +578,81 @@ export async function liftAccountChatMute(input: {
       reason,
     });
     await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+/**
+ * Reverse a player's self-service account deactivation (admin-only). Mirrors
+ * liftAccountChatMute: a reason is required and the UPDATE plus its audit-log row
+ * commit in one transaction, so an operator can never flip an account back on
+ * without leaving a recoverable trail of who did it and why. Deliberately a fresh
+ * UPDATE here rather than a call into db.ts's setAccountDeactivated: that function
+ * backs the player's own self-deactivation path (server/account.ts) and stays
+ * unaudited and untouched, since a player acting on their own account is not a
+ * moderation action.
+ */
+export async function reactivateAccountAudited(input: {
+  accountId: number;
+  adminAccountId: number;
+  reason: unknown;
+}): Promise<void> {
+  const reason = cleanText(input.reason, ACTION_REASON_MAX);
+  if (!reason) throw new Error('moderation reason is required');
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    await client.query(`UPDATE accounts SET deactivated_at = NULL WHERE id = $1`, [
+      input.accountId,
+    ]);
+    await recordModerationAction(client, 'reactivate', {
+      accountId: input.accountId,
+      adminAccountId: input.adminAccountId,
+      reason,
+    });
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+/**
+ * Zero an account's chat strikes (admin-only). Mirrors liftAccountChatMute: a reason
+ * is required, and the UPDATE plus its audit-log row commit in one transaction. The
+ * audit row is written only when a row was actually reset (found === true), matching
+ * the existing "account not found" 404 the caller derives from the return value: an
+ * audit log entry for a target that never existed would be noise, not a record.
+ */
+export async function resetChatStrikesAudited(input: {
+  accountId: number;
+  adminAccountId: number;
+  reason: unknown;
+}): Promise<boolean> {
+  const reason = cleanText(input.reason, ACTION_REASON_MAX);
+  if (!reason) throw new Error('moderation reason is required');
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const updated = await client.query(`UPDATE accounts SET chat_strikes = 0 WHERE id = $1`, [
+      input.accountId,
+    ]);
+    const found = (updated.rowCount ?? 0) > 0;
+    if (found) {
+      await recordModerationAction(client, 'chat_strikes_reset', {
+        accountId: input.accountId,
+        adminAccountId: input.adminAccountId,
+        reason,
+      });
+    }
+    await client.query('COMMIT');
+    return found;
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
     throw err;

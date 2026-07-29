@@ -35,6 +35,7 @@ describe('server-sent message localization', () => {
     'You are blocking Mira. Remove them from your block list first.',
     'Your block list is still loading. Try /who again in a moment.',
     'Mira added to friends.',
+    'You cannot add Mira as a friend.',
     'Your friends list is full.',
     "No character named 'Zzz' exists.",
     'Bob has joined the guild.',

@@ -464,10 +464,10 @@ export function resolveCraftForRecipe(
     // The grant shapes, mirroring the grant arms below field for field so the
     // modeled payloads merge exactly like the minted ones.
     const shapes: InvSlot[][] = [];
-    if (recipe.resultCount === 1 && isSignableMaterialRarity(outputQuality)) {
+    if (isSignableMaterialRarity(outputQuality)) {
       const payload: ItemInstancePayload = { signer: meta.name };
       if (commissioned) payload.bindOnTrade = true;
-      shapes.push([{ itemId: recipe.resultItemId, count: 1, instance: payload }]);
+      shapes.push([{ itemId: recipe.resultItemId, count: recipe.resultCount, instance: payload }]);
     } else if (commissioned) {
       shapes.push([
         { itemId: recipe.resultItemId, count: recipe.resultCount, instance: { bindOnTrade: true } },
@@ -554,17 +554,21 @@ export function resolveCraftForRecipe(
     bumped !== null &&
     bumped.tier <= ceilingTier;
   // Deterministic grant: every successful craft yields recipe.resultItemId.
-  // #1149 signing rule preserved on the DEF quality: a single-copy output
-  // whose def is rare-or-better is a signed instance so it carries an
-  // attribution target for Battlefield Experience; anything below stays
-  // fungible, and a resultCount > 1 output is never itself signable
-  // (matching every recipe in content/recipes.ts today). A masterwork proc
-  // is always minted as ONE signed instance carrying the baked bonus stats;
-  // a resultCount > 1 recipe grants the remainder plain, exactly as the
-  // plain arm would. NEW crafts never write rolled.quality (retired for new
-  // writes; legacy payloads keep loading). A commissioned craft arms every
-  // copy (the player opted the CRAFT in, so a multi-copy output mints each
-  // remainder copy as its own armed instance; they stack byte-equal), and a
+  // #1149 signing rule preserved on the DEF quality: an output whose def is
+  // rare-or-better is a signed instance so it carries an attribution target
+  // for Battlefield Experience, EVERY granted copy included (a resultCount >
+  // 1 recipe_anglers_feast_platter/recipe_elixir_of_the_serpent-shaped output
+  // is just as signable as a resultCount 1 one; the same {signer} payload on
+  // every copy stacks byte-equal, so this is one addItemInstance call with
+  // count set to the full resultCount, not a loop); anything below stays
+  // fungible. A masterwork proc is always minted as ONE signed instance
+  // carrying the baked bonus stats; a resultCount > 1 recipe grants the
+  // remainder plain, exactly as the plain arm would (the proc bonus is
+  // specific to the one procced unit, unlike the DEF-quality signing rule
+  // above). NEW crafts never write rolled.quality (retired for new writes;
+  // legacy payloads keep loading). A commissioned craft arms every copy (the
+  // player opted the CRAFT in, so a multi-copy output mints each remainder
+  // copy as its own armed instance; they stack byte-equal), and a
   // commissioned sub-rare output forces the instance path a plain grant
   // would skip. Commission never adds signer: the #1149 signing rule is
   // untouched (the bond composes with the maker's mark, it does not extend
@@ -575,7 +579,18 @@ export function resolveCraftForRecipe(
   // top of it, and it logs the quality-colored, item-linked crafted line
   // carrying the output count, so the hub's "You receive:" line would be a
   // second (and for a resultCount > 1 recipe a third) line for the one craft
-  // (#2430).
+  // (#2430). Applying the DEF-quality rule to recipe_anglers_feast_platter and
+  // recipe_elixir_of_the_serpent is a deliberate, accepted cost: both are
+  // food/elixir, so useItem's battlefieldExperienceTrickle arm (gated on
+  // def.kind === 'potion') never reaches them, meaning this signs every copy
+  // for zero Battlefield Experience payoff. It still applies, for consistency
+  // with the four existing rare single-copy consumables (silvered_carp_supper,
+  // marlows_grand_roast, the two sunpetal draughts): the signed instance is
+  // non-fungible, so countFungibleItem/removeFungibleItem (src/sim/market.ts)
+  // and post_office.ts see zero fungible copies of either output, which takes
+  // both out of the World Market and mail entirely. Crafting is their only
+  // source, so this closes that acquisition path outright; player-to-player
+  // trade of the signed instance still works.
   if (meta && masterwork && bonusStats) {
     const payload: ItemInstancePayload = {
       signer: meta.name,
@@ -604,10 +619,10 @@ export function resolveCraftForRecipe(
         });
       }
     }
-  } else if (meta && recipe.resultCount === 1 && isSignableMaterialRarity(outputQuality)) {
+  } else if (meta && isSignableMaterialRarity(outputQuality)) {
     const payload: ItemInstancePayload = { signer: meta.name };
     if (commissioned) payload.bindOnTrade = true;
-    ctx.addItemInstance(recipe.resultItemId, payload, pid, 1, {
+    ctx.addItemInstance(recipe.resultItemId, payload, pid, recipe.resultCount, {
       silent: true,
       callerLogs: true,
       craftedRecipeId,

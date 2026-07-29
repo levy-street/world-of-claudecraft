@@ -45,10 +45,10 @@ import {
   getFilterConfig,
   listFilterWords,
   removeFilterWord,
-  resetChatStrikes,
   updateFilterConfig,
   type WordTier,
 } from './chat_filter_db';
+import { cleanContentModerationReason } from './content_moderation_db';
 import { currentDailyRewardDay } from './daily_rewards';
 import {
   accountAndScopeForToken,
@@ -60,7 +60,6 @@ import {
   pool,
   revokeTokensExcept,
   saveToken,
-  setAccountDeactivated,
   touchLogin,
   updatePasswordHash,
 } from './db';
@@ -91,7 +90,9 @@ import {
   moderationQueue,
   moderationReportsForAccount,
   muteAccountChat,
+  reactivateAccountAudited,
   recordPasswordReset,
+  resetChatStrikesAudited,
   setAccountAiFlag,
   setAccountStreamerFlair,
   setDailyRewardsBan,
@@ -513,8 +514,13 @@ export async function handleAdminApi(
     const reactivateMatch = /^\/admin\/api\/moderation\/accounts\/(\d+)\/reactivate$/.exec(path);
     if (req.method === 'POST' && reactivateMatch) {
       const targetAccountId = Number(reactivateMatch[1]);
+      const body = await readBody(req);
       try {
-        await setAccountDeactivated(targetAccountId, false);
+        await reactivateAccountAudited({
+          accountId: targetAccountId,
+          adminAccountId: accountId,
+          reason: body.reason,
+        });
         return ok(res, { ok: true });
       } catch (err) {
         return fail(res, 400, err instanceof Error ? err.message : 'reactivation failed');
@@ -648,9 +654,18 @@ export async function handleAdminApi(
     );
     if (req.method === 'POST' && resetStrikesMatch) {
       const id = Number(resetStrikesMatch[1]);
-      const reset = await resetChatStrikes(id);
-      if (reset) game.resetChatStrikesLive(id);
-      return reset ? ok(res, { ok: true }) : fail(res, 404, 'account not found');
+      const body = await readBody(req);
+      try {
+        const reset = await resetChatStrikesAudited({
+          accountId: id,
+          adminAccountId: accountId,
+          reason: body.reason,
+        });
+        if (reset) game.resetChatStrikesLive(id);
+        return reset ? ok(res, { ok: true }) : fail(res, 404, 'account not found');
+      } catch (err) {
+        return fail(res, 400, err instanceof Error ? err.message : 'chat strikes reset failed');
+      }
     }
 
     // Set a new password on any account (admin-initiated credential reset). The
@@ -791,16 +806,25 @@ export async function handleAdminApi(
 
     // Map editor moderation: force a published map back to private, and
     // block/unblock an uploaded GLB asset (blocked assets 404 on the public
-    // byte GET and reject re-uploads of the same hash).
+    // byte GET and reject re-uploads of the same hash). Both write a
+    // content_moderation_actions audit row (content_moderation_db.ts).
     const mapUnpublishMatch = /^\/admin\/api\/maps\/(\d+)\/unpublish$/.exec(path);
     if (req.method === 'POST' && mapUnpublishMatch) {
-      const done = await adminMapsDb().setStatus(Number(mapUnpublishMatch[1]), null, 'private');
+      const body = await readBody(req);
+      const done = await adminMapsDb().adminUnpublish(Number(mapUnpublishMatch[1]), {
+        adminAccountId: accountId,
+        reason: cleanContentModerationReason(body.reason),
+      });
       return done ? ok(res, { ok: true }) : fail(res, 404, 'map_not_found');
     }
     const assetBlockMatch = /^\/admin\/api\/user-assets\/(\d+)\/(block|unblock)$/.exec(path);
     if (req.method === 'POST' && assetBlockMatch) {
       const status = assetBlockMatch[2] === 'block' ? 'blocked' : 'active';
-      const done = await adminUserAssetsDb().setStatus(Number(assetBlockMatch[1]), status);
+      const body = await readBody(req);
+      const done = await adminUserAssetsDb().adminSetStatus(Number(assetBlockMatch[1]), status, {
+        adminAccountId: accountId,
+        reason: cleanContentModerationReason(body.reason),
+      });
       return done ? ok(res, { ok: true }) : fail(res, 404, 'asset_not_found');
     }
 
@@ -1224,7 +1248,7 @@ function makeRealAdminDb() {
     updateFilterConfig,
     chatModerationForAccount,
     chatModeratedAccounts,
-    resetChatStrikes,
+    resetChatStrikesAudited,
     cleanIp,
     listBlockedIps,
     addBlockedIp,
@@ -1244,7 +1268,7 @@ function makeRealAdminDb() {
     // chat muted" guards); the CALLER gate resolves roles via adminRolesForAccount.
     isAdminAccount,
     saveToken,
-    setAccountDeactivated,
+    reactivateAccountAudited,
     touchLogin,
     newToken,
     verifyPassword,
@@ -1708,8 +1732,14 @@ async function moderateActionHandler(ctx: Ctx): Promise<void> {
 
 /** POST /admin/api/moderation/accounts/:id/reactivate: reverse a self-deactivation. */
 async function reactivateHandler(ctx: Ctx): Promise<void> {
+  const id = adminTargetId(ctx);
+  const body = await readBody(ctx.req);
   try {
-    await adminDb().setAccountDeactivated(adminTargetId(ctx), false);
+    await adminDb().reactivateAccountAudited({
+      accountId: id,
+      adminAccountId: ctxAccountId(ctx),
+      reason: body.reason,
+    });
     return ok(ctx.res, { ok: true });
   } catch (err) {
     return fail(ctx.res, 400, err instanceof Error ? err.message : 'reactivation failed');
@@ -1846,9 +1876,18 @@ async function noteHandler(ctx: Ctx): Promise<void> {
 async function resetStrikesHandler(ctx: Ctx): Promise<void> {
   const rt = useAdminRuntime();
   const id = adminTargetId(ctx);
-  const reset = await adminDb().resetChatStrikes(id);
-  if (reset) rt.resetChatStrikesLive(id);
-  return reset ? ok(ctx.res, { ok: true }) : fail(ctx.res, 404, 'account not found');
+  const body = await readBody(ctx.req);
+  try {
+    const reset = await adminDb().resetChatStrikesAudited({
+      accountId: id,
+      adminAccountId: ctxAccountId(ctx),
+      reason: body.reason,
+    });
+    if (reset) rt.resetChatStrikesLive(id);
+    return reset ? ok(ctx.res, { ok: true }) : fail(ctx.res, 404, 'account not found');
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : 'chat strikes reset failed');
+  }
 }
 
 /** GET /admin/api/moderation/queue: accounts with open reports. */
@@ -2081,16 +2120,24 @@ async function adminUserAssetsListHandler(ctx: Ctx): Promise<void> {
   ok(ctx.res, { rows, total, page, limit });
 }
 
-/** POST /admin/api/maps/:id/unpublish: force a published map back to private. */
+/** POST /admin/api/maps/:id/unpublish: force a published map back to private, audited. */
 async function adminMapUnpublishHandler(ctx: Ctx): Promise<void> {
-  const done = await adminMapsDb().setStatus(adminTargetId(ctx), null, 'private');
+  const body = await readBody(ctx.req);
+  const done = await adminMapsDb().adminUnpublish(adminTargetId(ctx), {
+    adminAccountId: adminIdentityOf(ctx).accountId,
+    reason: cleanContentModerationReason(body.reason),
+  });
   return done ? ok(ctx.res, { ok: true }) : fail(ctx.res, 404, 'map_not_found');
 }
 
-/** POST /admin/api/user-assets/:id/(block|unblock): flip an upload's moderation flag. */
+/** POST /admin/api/user-assets/:id/(block|unblock): flip an upload's moderation flag, audited. */
 function adminAssetStatusHandler(status: 'blocked' | 'active') {
   return async (ctx: Ctx): Promise<void> => {
-    const done = await adminUserAssetsDb().setStatus(adminTargetId(ctx), status);
+    const body = await readBody(ctx.req);
+    const done = await adminUserAssetsDb().adminSetStatus(adminTargetId(ctx), status, {
+      adminAccountId: adminIdentityOf(ctx).accountId,
+      reason: cleanContentModerationReason(body.reason),
+    });
     return done ? ok(ctx.res, { ok: true }) : fail(ctx.res, 404, 'asset_not_found');
   };
 }

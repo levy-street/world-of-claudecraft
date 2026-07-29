@@ -32,6 +32,7 @@ import { YUMI_TEMPLATE_ID } from '../content/yumi';
 import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { resetDrownedLitanyBossEncounter } from '../delves/drowned_litany_boss';
+import { clearDelveRaiseDeadChannel } from '../delves/runs';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
 import type { SimContext } from '../sim_context';
 import { clearThreat, hasEscapeStealth, stealthDetectionRadius } from '../threat';
@@ -835,6 +836,11 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.wanderTimer = ctx.rng.range(2, 8);
   if (mob.templateId === NYTHRAXIS_BOSS_ID) ctx.resetNythraxisEncounter(mob);
   if (mob.templateId === SISTER_NHALIA_BOSS_ID) resetDrownedLitanyBossEncounter(ctx, mob);
+  // No bossId check needed here: clearDelveRaiseDeadChannel is a no-op for every
+  // mob other than the one that actually started the channel, so it is safe to
+  // call unconditionally (unlike the two hooks above, which key on a specific
+  // template id).
+  clearDelveRaiseDeadChannel(ctx, mob);
 }
 
 // Cowardly mobs panic once per pull at low HP, then recover their nerve and turn to

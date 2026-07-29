@@ -999,6 +999,33 @@ export const TARGETS = [
       return open ? { clip: '#market-window' } : {};
     },
   },
+  {
+    key: 'market-armor-filters',
+    label: 'World Market armor filters (responsive search and filter grid)',
+    when: ['ui/market_window', 'ui/market_view', 'ui/market_filters'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page, shot) {
+      if (!(await openMarketBrowse(page))) return {};
+      const selected = await page.evaluate(() => {
+        const option = document.querySelector(
+          '[data-market-filter-menu="itemType"] [data-market-filter-option="armor"]',
+        );
+        if (!(option instanceof HTMLElement)) return false;
+        option.click();
+        document.activeElement instanceof HTMLElement && document.activeElement.blur();
+        return true;
+      });
+      if (!selected) return {};
+      await wait(250);
+      if (shot?.mobile) {
+        await page.evaluate(() => {
+          const market = document.querySelector('#market-window');
+          if (market) market.scrollTop = 150;
+        });
+      }
+      return { clip: '#market-window' };
+    },
+  },
   // The market-window target above shoots the browse grid with every dropdown CLOSED, so
   // it is blind to the filter vocabulary itself. These two open the menus. Keyed on the
   // shared query module (which holds the option lists) plus the view core (which decides
@@ -1100,6 +1127,105 @@ export const TARGETS = [
       });
       const open = await pollForSize(page, '#card-duel-window');
       return open ? { clip: '#card-duel-window' } : {};
+    },
+  },
+  {
+    key: 'meters',
+    label: 'Damage meters: bars plus the per-ability hover breakdown',
+    when: ['ui/meters', 'meters_breakdown'],
+    variants: [
+      { key: 'desktop', charClass: 'warlock', charName: 'Nyxaris' },
+      { key: 'mobile', charClass: 'warlock', charName: 'Nyxaris', mobile: true },
+    ],
+    // Summon a pet so the owner row folds pet output, feed a spread of combat
+    // events through the REAL Meters.onEvent path (the same call handleEvents
+    // makes, only the events are staged), then focus the top bar: attachTooltip's
+    // focusin arm paints the breakdown, a sturdier trigger than a synthetic
+    // mouseenter under headless. Full-frame shot: #tooltip sits beside the panel
+    // and a single-selector clip cannot union the two rects.
+    async capture(page) {
+      // The summon lands its own entity, so it gets its own evaluate + settle:
+      // scanning for the pet in the same turn raced it, and on the mobile page
+      // window.__game is sometimes not published yet on the first try, so this
+      // retries until a pet is actually in the world.
+      const hasPet = () =>
+        page.evaluate(() => {
+          const sim = window.__game?.sim;
+          if (!sim?.player) return false;
+          for (const e of sim.entities.values()) {
+            if (e.kind === 'mob' && e.ownerId === sim.player.id) return true;
+          }
+          return false;
+        });
+      for (let attempt = 0; attempt < 30 && !(await hasPet()); attempt++) {
+        await page.evaluate(() => {
+          const sim = window.__game?.sim;
+          document.querySelector('#gpu-notice')?.remove();
+          document.querySelector('.camera-prompt-confirm')?.click();
+          if (!sim?.player) return;
+          try {
+            sim.summonPet?.(sim.player, 'emberkin');
+          } catch {}
+        });
+        await wait(500);
+      }
+      await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!sim || !player) return;
+        let petId = null;
+        for (const e of sim.entities.values()) {
+          if (e.kind === 'mob' && e.ownerId === player.id) petId = e.id;
+        }
+        // A dummy target the party "fought", so the segment has a mob to name.
+        let mobId = null;
+        for (const e of sim.entities.values()) {
+          if (e.kind === 'mob' && e.ownerId == null && !e.dead) {
+            mobId = e.id;
+            break;
+          }
+        }
+        const meters = game?.hud?.meters;
+        if (meters === undefined || mobId === null) return;
+        const hit = (sourceId, amount, ability) =>
+          meters.onEvent({
+            type: 'damage',
+            sourceId,
+            targetId: mobId,
+            amount,
+            crit: false,
+            school: 'physical',
+            ability,
+            kind: 'hit',
+          });
+        hit(player.id, 1840, 'Shadow Bolt');
+        hit(player.id, 910, 'Corruption');
+        hit(player.id, 470, 'Immolate');
+        hit(player.id, 260, null);
+        if (petId !== null) {
+          hit(petId, 620, 'Firebolt');
+          hit(petId, 180, null);
+        }
+        const el = document.querySelector('#meters-window');
+        if (el) el.style.display = 'none';
+        game?.hud?.toggleMeters?.();
+      });
+      const open = await pollForSize(page, '#meters-window');
+      if (!open) return {};
+      // The segment's duration (and so its rate column) is still settling right
+      // after the events land, and the shared tooltip paints ONCE on focus: let
+      // the panel settle first, or the breakdown header disagrees with the bar.
+      await wait(2000);
+      await page.evaluate(() => {
+        const banner = document.querySelector('#banner');
+        if (banner) banner.style.opacity = '0';
+        const row = document.querySelector('#meters-window .mt-row');
+        if (row instanceof HTMLElement) row.focus();
+      });
+      await pollForSize(page, '#tooltip');
+      await wait(300);
+      return {};
     },
   },
   {

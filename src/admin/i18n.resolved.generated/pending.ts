@@ -10,25 +10,125 @@
 // and `pretest`). Reproducibility is checked by tests/i18n_admin_catalog.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes"
+  ],
+  "es_ES": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes"
+  ],
+  "fr_FR": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes"
+  ],
+  "fr_CA": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes"
+  ],
+  "de_DE": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes"
+  ],
+  "zh_CN": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes"
+  ],
+  "zh_TW": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes"
+  ],
+  "ko_KR": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes"
+  ],
+  "ja_JP": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes"
+  ],
+  "pt_BR": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes"
+  ],
+  "ru_RU": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes"
+  ],
+  "cs_CZ": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes"
+  ],
+  "nl_NL": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes"
+  ],
+  "pl_PL": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes"
+  ],
+  "id_ID": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes"
+  ],
+  "tr_TR": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes"
+  ],
+  "sv_SE": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes"
+  ],
+  "vi_VN": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes"
+  ],
+  "da_DK": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes"
+  ]
 };
