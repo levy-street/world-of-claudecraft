@@ -84,8 +84,8 @@ describe('the ferry fare', () => {
     expect(meta.copper).toBe(50 - FERRY_FARE_COPPER);
     expect(
       Math.hypot(
-        sim.player.pos.x - GULLHAVEN_HARBOR.arrival.x,
-        sim.player.pos.z - GULLHAVEN_HARBOR.arrival.z,
+        sim.player.pos.x - GULLHAVEN_HARBOR.deckArrival.x,
+        sim.player.pos.z - GULLHAVEN_HARBOR.deckArrival.z,
       ),
     ).toBeLessThan(3);
     expect(sim.questLog.get(Q0)?.state).toBe('active');
@@ -178,8 +178,8 @@ describe('the ferry fare', () => {
     expect(meta.copper).toBe(30 - 2 * FERRY_FARE_COPPER);
     expect(
       Math.hypot(
-        sim.player.pos.x - MAINLAND_HARBOR.arrival.x,
-        sim.player.pos.z - MAINLAND_HARBOR.arrival.z,
+        sim.player.pos.x - MAINLAND_HARBOR.deckArrival.x,
+        sim.player.pos.z - MAINLAND_HARBOR.deckArrival.z,
       ),
     ).toBeLessThan(3);
   });

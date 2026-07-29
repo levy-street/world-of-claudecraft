@@ -139,10 +139,22 @@ function harness(
   return { painter, layer };
 }
 
-describe('batched canvas nameplate state', () => {
-  it('uses one canvas for many entities and creates no per-entity nameplate DOM', () => {
-    const targets = [entity({ id: 2 }), entity({ id: 3, name: 'Other' })];
-    const { painter, layer } = harness(targets);
+describe('nameplate [AI] account tag', () => {
+  it('hides a painted plate when the owning render group is hidden', () => {
+    const target = entity({ id: 2 });
+    const { painter, v } = harness(target);
+    painter.update(true);
+    expect(v.nameplateDisplay).toBe('');
+
+    v.group.visible = false;
+    painter.update(true);
+    expect(v.nameplateDisplay).toBe('none');
+    expect(v.nameplate.style.display).toBe('none');
+  });
+
+  it('draws no tag for a normal player', () => {
+    const target = entity({ id: 2 });
+    const { painter, v } = harness(target);
     painter.update(true);
 
     expect(layer.querySelectorAll('canvas.nameplate-canvas')).toHaveLength(1);

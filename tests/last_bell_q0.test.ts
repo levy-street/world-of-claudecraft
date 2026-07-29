@@ -6,6 +6,7 @@
 import { describe, expect, it } from 'vitest';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { GULLHAVEN_HARBOR, MAINLAND_HARBOR } from '../src/sim/harbor_layout';
 import { scenarioRunFor } from '../src/sim/scenarios/scenarios';
 import { answerSceneChoice } from '../src/sim/scenes/choices';
 import { Sim } from '../src/sim/sim';
@@ -51,8 +52,8 @@ describe('Q0 Ashore end to end', () => {
 
     // 1. Talk to Ewald on the mainland ship's deck: the fare opens (H2, the
     // gossip button drives the same talk + pay pair), paying charges the
-    // purse and crosses, the quest auto-accepts, the crossing lands on
-    // Gullhaven's harbor deck, and the arrival scene starts for this player.
+    // purse and crosses, the quest auto-accepts, the crossing lands on the
+    // Gullhaven ship deck, and the voyage scene starts for this player.
     const meta = sim.ctx.players.get(sim.playerId);
     if (meta) meta.copper = 50;
     teleport(sim, 238, -47.5);
@@ -66,7 +67,12 @@ describe('Q0 Ashore end to end', () => {
     expect(answerSceneChoice(sim.ctx, 'ch_lb_ferry_fare_out', 'pay')).toBe(true);
     expect(meta?.copper).toBe(40);
     expect(sim.questLog.get(QUEST)?.state).toBe('active');
-    expect(Math.hypot(sim.player.pos.x - 782, sim.player.pos.z - 116)).toBeLessThan(3);
+    expect(
+      Math.hypot(
+        sim.player.pos.x - GULLHAVEN_HARBOR.deckArrival.x,
+        sim.player.pos.z - GULLHAVEN_HARBOR.deckArrival.z,
+      ),
+    ).toBeLessThan(3);
     const arrival = collect(sim, 30);
     const sceneKinds = arrival
       .filter((e): e is Extract<SimEvent, { type: 'scene' }> => e.type === 'scene')
@@ -181,14 +187,14 @@ describe('Q0 Ashore end to end', () => {
     expect(sceneEvents.length).toBeGreaterThan(0);
     expect(sceneEvents.every((e) => e.sceneId === 'scn_lb_ferry_depart_out')).toBe(true);
     expect(sceneEvents.some((e) => e.op.kind === 'line')).toBe(false);
-    // And talking to Odda on the Gullhaven ship's deck (out past the pier
-    // head, a walk from the arrival deck at the harbor's land end) ferries
-    // back.
+    // And talking to Odda on the Gullhaven ship's deck ferries back.
     teleport(sim, 727, 131);
     const odda = findByName(sim, 'Ferrykeeper Odda');
     sim.player.targetId = odda?.id ?? null;
     sim.interact();
     expect(answerSceneChoice(sim.ctx, 'ch_lb_ferry_fare_back', 'pay')).toBe(true);
-    expect(sim.player.pos.x).toBeLessThan(200);
+    expect(sim.player.pos).toEqual(
+      sim.groundPos(MAINLAND_HARBOR.deckArrival.x, MAINLAND_HARBOR.deckArrival.z),
+    );
   });
 });

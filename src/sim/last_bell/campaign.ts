@@ -55,9 +55,10 @@ export function ferryFareOfferFor(
 // the Gullhaven harbor. Boarding at one lands you at the other. The harbor
 // layout is the single source for both anchors: the boarding fixtures stand
 // at each harbor's gangplank (the railing gap facing the ship berth), and
-// arrivals step off onto the deck near the harbor's land end.
-const MAINLAND_DOCK = MAINLAND_HARBOR.arrival;
-const GULLHAVEN_PIER = GULLHAVEN_HARBOR.arrival;
+// arrivals appear at the destination ship's deck arrival point so the
+// scene can walk the real player down the gangplank.
+const MAINLAND_DECK_ARRIVAL = MAINLAND_HARBOR.deckArrival;
+const GULLHAVEN_DECK_ARRIVAL = GULLHAVEN_HARBOR.deckArrival;
 const MAINLAND_BOARD = MAINLAND_HARBOR.boarding;
 const GULLHAVEN_BOARD = GULLHAVEN_HARBOR.boarding;
 
@@ -127,7 +128,7 @@ function firstCrossingFor(ctx: SimContext, pid: number, fromMainland: boolean): 
 function crossFerry(ctx: SimContext, fromMainland: boolean, pid: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
-  const dest = fromMainland ? GULLHAVEN_PIER : MAINLAND_DOCK;
+  const dest = fromMainland ? GULLHAVEN_DECK_ARRIVAL : MAINLAND_DECK_ARRIVAL;
   // First crossing: the campaign begins. acceptQuest is a no-op error path
   // when already active; gate on the log so re-rides stay silent.
   const firstCrossing = firstCrossingFor(ctx, r.meta.entityId, fromMainland);
@@ -148,9 +149,9 @@ function crossFerry(ctx: SimContext, fromMainland: boolean, pid: number): void {
     color: '#b9f',
     pid: r.meta.entityId,
   });
-  // The voyage presentation (H3): the rider already stands at the arrival
-  // dock (teleported above), so the cinematic is pure world-coordinate
-  // presentation and a skip at any point leaves consistent state.
+  // The voyage presentation (H3): the rider already stands at the destination
+  // ship's deck arrival point, ready for the authored gangplank walk. A skip
+  // settles that walk at its pier endpoint.
   const departure = fromMainland ? DEPART_OUT_SCENE : DEPART_BACK_SCENE;
   playSceneForPlayer(ctx, r.meta.entityId, firstCrossing ? VOYAGE_SCENE : departure);
 }
@@ -179,9 +180,9 @@ function payFare(ctx: SimContext, fromMainland: boolean, pid: number): void {
   crossFerry(ctx, fromMainland, pid);
 }
 
-// The fare dialog, opened by the boarding fixture and by talking to either
-// gangplank keeper. Personal prompt: in a party each rider pays their own
-// fare (leader-answers stays a story-claim rule).
+// The fare dialog opens only by talking to a gangplank keeper. The mooring
+// fixtures stay inert scenery. Personal prompt: in a party each rider pays
+// their own fare (leader-answers stays a story-claim rule).
 function offerFare(ctx: SimContext, fromMainland: boolean, pid: number): void {
   const r = ctx.resolve(pid);
   if (!r || r.e.dead) return;

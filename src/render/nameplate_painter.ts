@@ -171,19 +171,17 @@ export class NameplatePainter {
     const showNameplates = this.showNameplates();
     const showDevBadges = this.showDevBadges();
     const showOwnNameplate = this.showOwnNameplate();
-    const showPlayerNameplates = this.showPlayerNameplates();
-    // Drop the quest-marker snapshot at every full pass so it re-resolves
-    // lazily below; throttled passes reuse it (see the field's rationale).
-    if (fullPass) this.questMarkerCtx = null;
-
-    for (const [id, view] of this.views) {
-      const entity = world.entities.get(id);
-      if (!entity) continue;
-      // Quest-gated mobs (Broodmother eggs): no nameplate or hp bar for players not
-      // on the gating quest, so the clutch reads as inert scenery until you have it.
-      // The canvas pass draws only what it reaches, so skipping the entity is the
-      // whole hide (the removed DOM-era hideNameplate had to clear styles instead).
-      if (isQuestGatedEntityHidden(entity, world.questLog)) continue;
+    this.anchorCount = 0;
+    for (const [id, v] of this.views) {
+      const e = world.entities.get(id);
+      if (!e) continue;
+      // Entity-level render visibility also owns its DOM label. In particular,
+      // voyage shots hide the parked local rig while its moving deck stand-in
+      // is live, so its optional self nameplate must not remain at the berth.
+      if (!v.group.visible) {
+        this.hideNameplate(v);
+        continue;
+      }
       // the saddle lift rides the anchor so a mounted player's plate clears the head
       const plan = nameplatePlanInto(
         this.plan,

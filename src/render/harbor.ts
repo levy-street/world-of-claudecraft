@@ -36,7 +36,7 @@ import {
   deckStandInAction,
   deckStandInParentTransform,
 } from './harbor_deck_stand_in_core';
-import { harborShipAttachFrameFrom } from './harbor_ship_attach_core';
+import { composeHarborShipAttachFrame } from './harbor_ship_attach_core';
 import { type PropPathSample, type PropPathSegment, propPathPoseAt } from './prop_path_core';
 import { type PropAsset, propAsset } from './props';
 import { radialGlowTexture } from './textures';
@@ -384,6 +384,11 @@ interface HarborShipHandle {
   deckStandIn: CharacterVisual | null;
 }
 
+interface PendingHarborShipCue {
+  cue: string;
+  startSec: number;
+}
+
 // Ship-local yards for the 60-yard grand ferry. The authored shipDecks center
 // the main deck 6.6 yards along the +x bow axis at world y 0.72. The keel
 // parent rests at WATER_LEVEL - draft = -7, so y 7.72 puts the feet on deck.
@@ -406,6 +411,7 @@ const DECK_STAND_IN_IDLE_STATE: AnimState = {
 };
 
 const SHIPS = new Map<string, HarborShipHandle>();
+const PENDING_SHIP_CUES = new Map<string, PendingHarborShipCue>();
 const PROP_PATH_SEGMENTS: Readonly<Record<string, PropPathSegment | undefined>> =
   LAST_BELL_PROP_PATH_SEGMENTS;
 const CUE_POSE: PropPathSample = { x: 0, y: 0, z: 0, yaw: 0, done: false };
@@ -413,14 +419,24 @@ const SHIP_ATTACH_FRAME: SceneAttachFrame = {
   position: { x: 0, y: 0, z: 0 },
   yaw: 0,
 };
+const SHIP_UPDATE_FRAME: SceneAttachFrame = {
+  position: { x: 0, y: 0, z: 0 },
+  yaw: 0,
+};
 
-/** Read the ship's current world transform without touching its freeze state.
+/** Compute the ship's current world transform without touching its freeze state.
  * The yaw convention is shared with scene_rig_core.localToWorld. */
 export function harborShipAttachFrame(
   target: string,
   out: SceneAttachFrame = SHIP_ATTACH_FRAME,
 ): SceneAttachFrame | null {
-  return harborShipAttachFrameFrom(SHIPS, target, out);
+  const handle = SHIPS.get(target);
+  if (!handle) return null;
+  const pose =
+    handle.cueStartSec !== null && handle.segment !== null
+      ? propPathPoseAt(handle.segment, performance.now() / 1000 - handle.cueStartSec, CUE_POSE)
+      : null;
+  return composeHarborShipAttachFrame(handle, pose, out);
 }
 
 /** Route a scene prop cue to a ship. Unknown targets are ignored and unknown
@@ -429,11 +445,21 @@ export function harborShipAttachFrame(
  *  stay inside the freezeStaticMatrices contract the rest of the time. */
 export function cueHarborShip(target: string, cue: string): void {
   const handle = SHIPS.get(target);
-  if (!handle) return;
+  if (!handle) {
+    PENDING_SHIP_CUES.set(target, { cue, startSec: performance.now() / 1000 });
+    return;
+  }
+  PENDING_SHIP_CUES.delete(target);
   const segment = PROP_PATH_SEGMENTS[cue];
   if (!segment) {
     resetShip(handle);
     return;
+  }
+  // A voyage cut may swap between the two harbor instances of the same
+  // ferry. Retire the prior moving instance under that cut so only one
+  // local-player stand-in can survive into the next shot.
+  for (const [otherTarget, other] of SHIPS) {
+    if (otherTarget !== target && other.cueStartSec !== null) resetShip(other);
   }
   handle.segment = segment;
   handle.cueStartSec = performance.now() / 1000;
@@ -442,6 +468,7 @@ export function cueHarborShip(target: string, cue: string): void {
 
 /** Scene teardown: every ship back at its berth. */
 export function resetHarborShipCues(): void {
+  PENDING_SHIP_CUES.clear();
   for (const handle of SHIPS.values()) resetShip(handle);
 }
 
@@ -483,25 +510,28 @@ function syncDeckStandIn(handle: HarborShipHandle, player: Entity | null): void 
   }
 }
 
-/** Per-frame ship motion and deck visual lifecycle from the live cue state. */
-export function updateHarborShips(localPlayer: Entity, dt: number): void {
+/** Per-frame ship motion and deck visual lifecycle from the live cue state.
+ * Returns true while a moving deck stand-in replaces the parked local rig. */
+export function updateHarborShips(localPlayer: Entity, dt: number): boolean {
+  let deckStandInActive = false;
   for (const handle of SHIPS.values()) {
     syncDeckStandIn(handle, localPlayer);
     if (handle.deckStandIn) {
+      deckStandInActive = true;
       handle.deckStandIn.update(dt, DECK_STAND_IN_IDLE_STATE, false);
     }
     if (handle.cueStartSec === null || handle.segment === null) continue;
+    handle.group.matrixAutoUpdate = true;
     const pose = propPathPoseAt(
       handle.segment,
       performance.now() / 1000 - handle.cueStartSec,
       CUE_POSE,
     );
-    handle.group.position.set(handle.baseX, handle.baseY, handle.baseZ);
-    handle.group.rotation.y = handle.baseRot + pose.yaw;
-    handle.group.translateX(pose.x);
-    handle.group.translateY(pose.y);
-    handle.group.translateZ(pose.z);
+    const frame = composeHarborShipAttachFrame(handle, pose, SHIP_UPDATE_FRAME);
+    handle.group.position.set(frame.position.x, frame.position.y, frame.position.z);
+    handle.group.rotation.y = frame.yaw;
   }
+  return deckStandInActive;
 }
 
 // The moored ferry ship: the generated GLB (long axis x, base at the keel)
@@ -518,7 +548,8 @@ function buildShip(parent: THREE.Group, harbor: HarborDef): void {
     scale,
   });
   g.rotation.y = harbor.berth.rot;
-  SHIPS.set(`harbor_ship_${harbor.id}`, {
+  const target = `harbor_ship_${harbor.id}`;
+  const handle: HarborShipHandle = {
     group: g,
     baseX: harbor.berth.x,
     baseY: WATER_LEVEL - harbor.berth.draft,
@@ -528,7 +559,16 @@ function buildShip(parent: THREE.Group, harbor: HarborDef): void {
     cueStartSec: null,
     segment: null,
     deckStandIn: null,
-  });
+  };
+  SHIPS.set(target, handle);
+  const pending = PENDING_SHIP_CUES.get(target);
+  if (!pending) return;
+  PENDING_SHIP_CUES.delete(target);
+  const segment = PROP_PATH_SEGMENTS[pending.cue];
+  if (!segment) return;
+  handle.segment = segment;
+  handle.cueStartSec = pending.startSec;
+  handle.group.matrixAutoUpdate = true;
 }
 
 /** Build every authored harbor of the active world into one static group. */

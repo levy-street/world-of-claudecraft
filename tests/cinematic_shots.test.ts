@@ -1,6 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
+  measureArrivalApproach,
+  measureSegment,
+} from '../scripts/lib/cinematic_trajectory_geometry.mjs';
+import {
   applySceneOp,
   createSceneDirectorState,
   type SceneLivePose,
@@ -13,12 +17,19 @@ import {
   sceneRigLookAtPosition,
 } from '../src/game/scene_rig_core';
 import { type PropPathSegment, propPathPoseAt } from '../src/render/prop_path_core';
-import { LAST_BELL_PROP_PATH_SEGMENTS } from '../src/sim/content/last_bell_cinematics';
 import {
+  LAST_BELL_CINEMATIC_SHIP_SPEED_CAP_YARDS_PER_SEC,
+  LAST_BELL_PROP_PATH_SEGMENTS,
+  LAST_BELL_VOYAGE_SEGMENT_IDS,
+  LB_PROP_CUE_PARK,
+} from '../src/sim/content/last_bell_cinematics';
+import {
+  GULLHAVEN_HARBOR,
   HARBORS,
   type HarborDeck,
   type HarborDef,
-  harborRampHeight,
+  harborShipLocalBounds,
+  harborShipLocalPointInside,
 } from '../src/sim/harbor_layout';
 import type { SceneDef, SceneOpDef } from '../src/sim/scenes/scenes';
 import type { Sim } from '../src/sim/sim';
@@ -35,12 +46,16 @@ import {
   sceneOverlayView,
 } from '../src/ui/hud/scene/scene_overlay_view';
 
-// Ten samples per second catch visible motion errors without tying the gate to render frame rate.
-const SHOT_SAMPLE_RATE_HZ = 10;
+// Twenty samples per second match the authoring report without tying the gate to render frame rate.
+const SHOT_SAMPLE_RATE_HZ = 20;
 // Cameras must keep this vertical distance above the terrain surface.
 const CAMERA_TERRAIN_CLEARANCE_YARDS = 0.75;
 // Cameras over submerged terrain must also keep this distance above the water surface.
 const CAMERA_WATER_CLEARANCE_YARDS = 0.75;
+// Fixed pier and ramp geometry occupies this much space above its walkable surface.
+const PIER_KEEP_OUT_HEIGHT_YARDS = 3.5;
+// Camera collision has a small horizontal radius around fixed pier and ramp footprints.
+const PIER_KEEP_OUT_HORIZONTAL_MARGIN_YARDS = 0.75;
 // Sight lines sample terrain at this fixed world-space interval.
 const SIGHT_LINE_STEP_YARDS = 1;
 // A sight line needs this much room above sampled terrain to avoid grazing the surface.
@@ -75,10 +90,19 @@ const CINEMATIC_VERTICAL_FOV_DEG = 60;
 const CINEMATIC_FRAME_ASPECT = 16 / 9;
 // Overlay opacity must reach this value before a camera jump is hidden.
 const FULL_BLACK_OPACITY = 1;
+// The authoritative player collider is a 0.5-yard radius, and the visual is about 2.6 yards tall.
+const PLAYER_BODY_RADIUS_YARDS = 0.5;
+const PLAYER_BODY_HEIGHT_YARDS = 2.6;
 // Capture aborts at this duration so a malformed registry entry cannot hang the suite.
 const MAX_SCENE_CAPTURE_SECONDS = 180;
 // The linter uses a stable built-in world seed for every registered scene.
 const LINTER_WORLD_SEED = 4242;
+// Arrival paths must begin materially beyond the berth on its layout-derived seaward side.
+const MIN_ARRIVAL_SEAWARD_START_YARDS = 12;
+// Arrival travel and the ship's bow must align closely with the direct course to the berth.
+const MIN_ARRIVAL_DIRECTION_DOT = 0.95;
+// The final arrival pose must land on the destination berth before the hidden park cue.
+const MAX_ARRIVAL_BERTH_DISTANCE_YARDS = 0.5;
 
 type MechanicalCheck =
   | 'clearance.terrain'
@@ -96,7 +120,10 @@ type MechanicalCheck =
   | 'cut.finalRelease'
   | 'cut.releaseDelta'
   | 'continuity.shipScreenDirection'
-  | 'prop.segment';
+  | 'continuity.standInHandoff'
+  | 'prop.segment'
+  | 'prop.speed'
+  | 'prop.arrivalDirection';
 
 interface LegacyExemption {
   readonly sceneId: string;
@@ -175,8 +202,16 @@ interface Violation {
 interface SyntheticControl {
   readonly def: SceneDef;
   readonly expectedCheck: MechanicalCheck | null;
+  readonly expectedMeasured?: string;
   readonly actorIds?: readonly string[];
+  readonly playerStart?: { x: number; z: number };
 }
+
+const SYNTHETIC_FAST_PROP_CUE = 'scn_test_lint_prop_speed_bad';
+const SYNTHETIC_LANDWARD_ARRIVAL_CUE = 'scn_test_lint_arrival_direction_bad';
+const SYNTHETIC_REVERSED_BOW_ARRIVAL_CUE = 'scn_test_lint_arrival_bow_bad';
+const SYNTHETIC_MISSED_BERTH_ARRIVAL_CUE = 'scn_test_lint_arrival_berth_bad';
+const SYNTHETIC_CROSSWIND_ARRIVAL_CUE = 'scn_test_lint_arrival_travel_bad';
 
 function syntheticCameraScene(
   id: string,
@@ -234,10 +269,10 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
         kind: 'camera',
         shot: {
           kind: 'attach',
-          target: 'harbor_ship_mainland',
-          fallbackFrame: { point: { x: 240.5, z: -44, height: 12 }, yaw: Math.PI / 2 },
-          offset: { x: 6.6, y: 12, z: 8 },
-          lookAt: { x: 6.6, y: 8, z: 0 },
+          target: 'test_ship',
+          fallbackFrame: { point: { x: 2, z: -2, height: 0 }, yaw: 0 },
+          offset: { x: 0, y: 5.774799, z: -11.390825 },
+          lookAt: { x: 0, y: 2, z: 0 },
         },
       },
     ]),
@@ -391,8 +426,53 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
           kind: 'attach',
           target: 'harbor_ship_mainland',
           fallbackFrame: { point: { x: 240.5, z: -44, height: 8 }, yaw: Math.PI / 2 },
-          offset: { x: 6.6, y: 7.72, z: 0 },
-          lookAt: { x: 16.6, y: 7.72, z: 0 },
+          offset: { x: 6.6, y: 20, z: 0 },
+          lookAt: { x: 16.6, y: 20, z: 0 },
+        },
+      },
+    ]),
+    expectedCheck: 'clearance.volume',
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_fixed_deck_height_bad', 1.7, [
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'dolly',
+          points: [{ x: 225, z: -48, height: 2 }],
+          lookAt: { kind: 'point', point: { x: 230, z: -48, height: 1 } },
+          dur: 1.6,
+        },
+      },
+    ]),
+    expectedCheck: 'clearance.volume',
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_fixed_deck_margin_bad', 1.7, [
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'dolly',
+          points: [{ x: 173, z: -40.5, height: 1 }],
+          lookAt: { kind: 'point', point: { x: 173, z: -48, height: 1 } },
+          dur: 1.6,
+        },
+      },
+    ]),
+    expectedCheck: 'clearance.volume',
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_fixed_ramp_height_bad', 1.7, [
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'dolly',
+          points: [{ x: 172, z: -57, height: 2 }],
+          lookAt: { kind: 'point', point: { x: 172, z: -52, height: 1 } },
+          dur: 1.6,
         },
       },
     ]),
@@ -419,10 +499,215 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
     ),
     expectedCheck: 'cut.releaseDelta',
   },
+  {
+    def: syntheticCameraScene('scn_test_lint_prop_speed_bad', 1.7, [
+      {
+        at: 0,
+        kind: 'prop',
+        target: 'harbor_ship_mainland',
+        cue: SYNTHETIC_FAST_PROP_CUE,
+      },
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'attach',
+          target: 'harbor_ship_mainland',
+          fallbackFrame: { point: { x: 240.5, z: -44, height: 12 }, yaw: Math.PI / 2 },
+          offset: { x: 6.6, y: 12, z: 8 },
+          lookAt: { x: 6.6, y: 8, z: 0 },
+        },
+      },
+    ]),
+    expectedCheck: 'prop.speed',
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_arrival_direction_bad', 1.7, [
+      {
+        at: 0,
+        kind: 'prop',
+        target: 'harbor_ship_gullhaven',
+        cue: SYNTHETIC_LANDWARD_ARRIVAL_CUE,
+      },
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'attach',
+          target: 'harbor_ship_gullhaven',
+          fallbackFrame: { point: { x: 732, z: 132.5, height: 12 }, yaw: Math.PI },
+          offset: { x: 6.6, y: 12, z: -8 },
+          lookAt: { x: 6.6, y: 8, z: 0 },
+        },
+      },
+    ]),
+    expectedCheck: 'prop.arrivalDirection',
+    expectedMeasured: 'seaward -',
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_arrival_bow_bad', 1.7, [
+      {
+        at: 0,
+        kind: 'prop',
+        target: 'harbor_ship_gullhaven',
+        cue: SYNTHETIC_REVERSED_BOW_ARRIVAL_CUE,
+      },
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'attach',
+          target: 'harbor_ship_gullhaven',
+          fallbackFrame: { point: { x: 732, z: 132.5, height: 12 }, yaw: Math.PI },
+          offset: { x: 6.6, y: 12, z: -8 },
+          lookAt: { x: 6.6, y: 8, z: 0 },
+        },
+      },
+    ]),
+    expectedCheck: 'prop.arrivalDirection',
+    expectedMeasured: 'bow dot -1.000',
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_arrival_travel_bad', 1.7, [
+      {
+        at: 0,
+        kind: 'prop',
+        target: 'harbor_ship_gullhaven',
+        cue: SYNTHETIC_CROSSWIND_ARRIVAL_CUE,
+      },
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'attach',
+          target: 'harbor_ship_gullhaven',
+          fallbackFrame: { point: { x: 732, z: 132.5, height: 12 }, yaw: Math.PI },
+          offset: { x: 6.6, y: 12, z: -12 },
+          lookAt: { x: 6.6, y: 8, z: 0 },
+        },
+      },
+    ]),
+    expectedCheck: 'prop.arrivalDirection',
+    expectedMeasured: 'travel dot 0.514',
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_arrival_berth_bad', 1.7, [
+      {
+        at: 0,
+        kind: 'prop',
+        target: 'harbor_ship_gullhaven',
+        cue: SYNTHETIC_MISSED_BERTH_ARRIVAL_CUE,
+      },
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'attach',
+          target: 'harbor_ship_gullhaven',
+          fallbackFrame: { point: { x: 732, z: 132.5, height: 12 }, yaw: Math.PI },
+          offset: { x: 6.6, y: 12, z: -8 },
+          lookAt: { x: 6.6, y: 8, z: 0 },
+        },
+      },
+    ]),
+    expectedCheck: 'prop.arrivalDirection',
+    expectedMeasured: 'berth 1.00 yd',
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_arrival_target_bad', 1.7, [
+      {
+        at: 0,
+        kind: 'prop',
+        target: 'harbor_ship_mainland',
+        cue: LAST_BELL_VOYAGE_SEGMENT_IDS.out.arrival,
+      },
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'attach',
+          target: 'harbor_ship_mainland',
+          fallbackFrame: { point: { x: 240.5, z: -44, height: 12 }, yaw: Math.PI / 2 },
+          offset: { x: 6.6, y: 12, z: 8 },
+          lookAt: { x: 6.6, y: 8, z: 0 },
+        },
+      },
+    ]),
+    expectedCheck: 'prop.arrivalDirection',
+    expectedMeasured: 'targeted mainland',
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_stand_in_handoff_bad', 4.5, [
+      {
+        at: 0,
+        kind: 'prop',
+        target: 'harbor_ship_gullhaven',
+        cue: LAST_BELL_VOYAGE_SEGMENT_IDS.out.arrival,
+      },
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'attach',
+          target: 'harbor_ship_gullhaven',
+          fallbackFrame: { point: { x: 732, z: 132.5, height: 12 }, yaw: Math.PI },
+          offset: { x: 6.6, y: 14, z: -12 },
+          lookAt: { x: -8, y: 8.6, z: 0 },
+        },
+      },
+      {
+        at: 2,
+        kind: 'prop',
+        target: 'harbor_ship_gullhaven',
+        cue: LB_PROP_CUE_PARK,
+      },
+    ]),
+    expectedCheck: 'continuity.standInHandoff',
+    expectedMeasured: 'deck stand-in handed off outside full black',
+  },
 ];
 
-const PROP_SEGMENTS: Readonly<Record<string, PropPathSegment | undefined>> =
-  LAST_BELL_PROP_PATH_SEGMENTS;
+const PROP_SEGMENTS: Readonly<Record<string, PropPathSegment | undefined>> = {
+  ...LAST_BELL_PROP_PATH_SEGMENTS,
+  [SYNTHETIC_FAST_PROP_CUE]: {
+    start: { x: 0, y: 0, z: 0, yaw: 0 },
+    end: { x: 40, y: 0, z: 0, yaw: 0 },
+    duration: 1,
+    ease: 'linear',
+  },
+  [SYNTHETIC_LANDWARD_ARRIVAL_CUE]: {
+    start: { x: -20, y: 0, z: 0, yaw: 0 },
+    end: { x: 0, y: 0, z: 0, yaw: 0 },
+    duration: 4,
+    ease: 'linear',
+  },
+  [SYNTHETIC_REVERSED_BOW_ARRIVAL_CUE]: {
+    start: { x: 32, y: 0, z: 0, yaw: 0.318748 },
+    end: { x: 0, y: 0, z: 0, yaw: 0.318748 },
+    duration: 4.3,
+    ease: 'easeInOutSine',
+  },
+  [SYNTHETIC_MISSED_BERTH_ARRIVAL_CUE]: {
+    start: { x: -32, y: 0, z: 0, yaw: -2.822845 },
+    end: { x: -1, y: 0, z: 0, yaw: -2.822845 },
+    duration: 4.3,
+    ease: 'easeInOutSine',
+  },
+  [SYNTHETIC_CROSSWIND_ARRIVAL_CUE]: {
+    start: { x: -23.323808, y: 0, z: 0, yaw: 2.429963 },
+    end: { x: 0, y: 0, z: 0, yaw: 2.429963 },
+    duration: 4.3,
+    ease: 'easeInOutSine',
+  },
+};
+const ARRIVAL_HARBOR_BY_CUE = new Map<string, HarborDef['id']>([
+  [LAST_BELL_VOYAGE_SEGMENT_IDS.out.arrival, 'gullhaven'],
+  [LAST_BELL_VOYAGE_SEGMENT_IDS.back.arrival, 'mainland'],
+  [SYNTHETIC_LANDWARD_ARRIVAL_CUE, 'gullhaven'],
+  [SYNTHETIC_REVERSED_BOW_ARRIVAL_CUE, 'gullhaven'],
+  [SYNTHETIC_MISSED_BERTH_ARRIVAL_CUE, 'gullhaven'],
+  [SYNTHETIC_CROSSWIND_ARRIVAL_CUE, 'gullhaven'],
+]);
 const RENDERER_SOURCE = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
 let SimConstructor: typeof import('../src/sim/sim').Sim;
 let playRegisteredScene: typeof import('../src/sim/scenes/scenes').playSceneForPlayer;
@@ -492,16 +777,20 @@ function settledPlayerStartForScene(id: string): { x: number; z: number } | null
         ? 'gullhaven'
         : null;
   if (harborId === null) return null;
-  return HARBORS.find((harbor) => harbor.id === harborId)?.arrival ?? null;
+  return HARBORS.find((harbor) => harbor.id === harborId)?.deckArrival ?? null;
 }
 
-function captureScene(id: string, actorIds: readonly string[] = []): CapturedScene {
+function captureScene(
+  id: string,
+  actorIds: readonly string[] = [],
+  playerStart?: { x: number; z: number },
+): CapturedScene {
   const sim = new SimConstructor({
     seed: LINTER_WORLD_SEED,
     playerClass: 'warrior',
     playerName: 'Shot Linter',
   });
-  const settledStart = settledPlayerStartForScene(id);
+  const settledStart = playerStart ?? settledPlayerStartForScene(id);
   if (settledStart) {
     sim.player.pos = sim.groundPos(settledStart.x, settledStart.z);
     sim.player.prevPos = { ...sim.player.pos };
@@ -553,9 +842,7 @@ function captureScene(id: string, actorIds: readonly string[] = []): CapturedSce
       if (event.op.kind === 'start') duration = event.op.duration;
       if (event.op.kind === 'end') ended = true;
     }
-    if (tick % 2 === 0) {
-      frames.set(Math.round(elapsed * SHOT_SAMPLE_RATE_HZ), sceneFrame(sim, trackedIds));
-    }
+    frames.set(Math.round(elapsed * SHOT_SAMPLE_RATE_HZ), sceneFrame(sim, trackedIds));
   }
 
   expect(ended, `registered scene ${id} exceeded the capture limit`).toBe(true);
@@ -564,6 +851,132 @@ function captureScene(id: string, actorIds: readonly string[] = []): CapturedSce
     id,
     seed: sim.cfg.seed,
     duration: duration ?? 0,
+    ops,
+    frames,
+  };
+}
+
+function resolveSyntheticRigPoint(point: { x: number; z: number; height: number }): SceneRigPoint {
+  return {
+    x: point.x,
+    y: sampleTerrainHeight(point.x, point.z, LINTER_WORLD_SEED) + point.height,
+    z: point.z,
+  };
+}
+
+function syntheticWireOp(op: SceneOpDef): SceneWireOp | null {
+  switch (op.kind) {
+    case 'camera': {
+      if (op.shot.kind === 'release') return { kind: 'camera', shot: { kind: 'release' } };
+      if (op.shot.kind === 'focus') {
+        if (op.shot.actorId !== undefined) {
+          throw new Error('actor focus controls require authoritative Sim capture');
+        }
+        const x = op.shot.x ?? 0;
+        const z = op.shot.z ?? 0;
+        return {
+          kind: 'camera',
+          shot: {
+            kind: 'focus',
+            entityId: null,
+            x,
+            y: sampleTerrainHeight(x, z, LINTER_WORLD_SEED),
+            z,
+            dist: op.shot.dist ?? 8,
+            pitch: op.shot.pitch ?? 0.3,
+            yaw: op.shot.yaw ?? 0,
+            dur: op.shot.dur,
+          },
+        };
+      }
+      if (op.shot.kind === 'attach') {
+        return {
+          kind: 'camera',
+          shot: {
+            ...op.shot,
+            fallbackFrame: {
+              position: resolveSyntheticRigPoint(op.shot.fallbackFrame.point),
+              yaw: op.shot.fallbackFrame.yaw,
+            },
+          },
+        };
+      }
+      if (op.shot.lookAt.kind === 'subject') {
+        throw new Error('subject controls require authoritative Sim capture');
+      }
+      return {
+        kind: 'camera',
+        shot: {
+          kind: 'dolly',
+          points: op.shot.points.map(resolveSyntheticRigPoint),
+          lookAt:
+            op.shot.lookAt.kind === 'point'
+              ? { kind: 'point', point: resolveSyntheticRigPoint(op.shot.lookAt.point) }
+              : {
+                  kind: 'spline',
+                  points: op.shot.lookAt.points.map(resolveSyntheticRigPoint),
+                },
+          dur: op.shot.dur,
+        },
+      };
+    }
+    case 'line':
+      if (op.speakerActorId !== undefined) {
+        throw new Error('actor line controls require authoritative Sim capture');
+      }
+      return {
+        kind: 'line',
+        speaker: op.speaker,
+        speakerEntityId: null,
+        key: op.key,
+        dur: op.dur ?? 4,
+      };
+    case 'letterbox':
+      return { kind: 'letterbox', on: op.on };
+    case 'inputLock':
+      return { kind: 'inputLock', on: op.on };
+    case 'fade':
+      return { kind: 'fade', to: op.to, dur: op.dur };
+    case 'music':
+      return { kind: 'music', directive: op.directive };
+    case 'prop':
+      return { kind: 'prop', target: op.target, cue: op.cue };
+    case 'playerWalk':
+    case 'actorMove':
+    case 'actorFace':
+    case 'anim':
+      throw new Error(`${op.kind} controls require authoritative Sim capture`);
+  }
+}
+
+function captureSyntheticControl(def: SceneDef): CapturedScene {
+  const sortedOps = [...def.ops].sort((a, b) => a.at - b.at);
+  const resolved = sortedOps.flatMap((op) => {
+    const wire = syntheticWireOp(op);
+    return wire === null ? [] : [{ at: op.at, op: wire }];
+  });
+  const ops: TimedSceneOp[] = [
+    { index: 0, at: 0, op: { kind: 'start', duration: def.duration } },
+    ...resolved.map((timed, index) => ({ index: index + 1, ...timed })),
+    { index: resolved.length + 1, at: def.duration, op: { kind: 'end' } },
+  ];
+  const playerY = sampleTerrainHeight(0, 0, LINTER_WORLD_SEED);
+  const live: SceneLivePose = {
+    yaw: 0,
+    pitch: 0.32,
+    dist: 12,
+    playerX: 0,
+    playerY,
+    playerZ: 0,
+  };
+  const frames = new Map<number, SceneFrame>();
+  for (let sample = 0; sample <= Math.ceil(def.duration * SHOT_SAMPLE_RATE_HZ); sample++) {
+    frames.set(sample, { live, entities: new Map() });
+  }
+  return {
+    id: def.id,
+    seed: LINTER_WORLD_SEED,
+    duration: def.duration,
     ops,
     frames,
   };
@@ -660,6 +1073,28 @@ function pointInFrame(
   };
 }
 
+function playerCapsuleIntersectsFrame(
+  geometry: CameraGeometry,
+  player: { x: number; y: number; z: number },
+): boolean {
+  const lowerCenterY = player.y + PLAYER_BODY_RADIUS_YARDS;
+  const upperCenterY = player.y + PLAYER_BODY_HEIGHT_YARDS - PLAYER_BODY_RADIUS_YARDS;
+  const lower = subtract({ x: player.x, y: lowerCenterY, z: player.z }, geometry.camera);
+  const upper = subtract({ x: player.x, y: upperCenterY, z: player.z }, geometry.camera);
+  const horizontalTan = Math.tan(HORIZONTAL_HALF_FOV_RAD);
+  const verticalTan = Math.tan(VERTICAL_HALF_FOV_RAD);
+  const inwardPlanes = [
+    normalize(add(scale(geometry.forward, horizontalTan), geometry.right)),
+    normalize(subtract(scale(geometry.forward, horizontalTan), geometry.right)),
+    normalize(add(scale(geometry.forward, verticalTan), geometry.up)),
+    normalize(subtract(scale(geometry.forward, verticalTan), geometry.up)),
+    geometry.forward,
+  ];
+  return inwardPlanes.every(
+    (normal) => Math.max(dot(lower, normal), dot(upper, normal)) >= -PLAYER_BODY_RADIUS_YARDS,
+  );
+}
+
 function screenX(geometry: CameraGeometry, point: SceneRigPoint): number {
   const projected = pointInFrame(geometry, point);
   return Math.tan(projected.horizontal) / Math.tan(HORIZONTAL_HALF_FOV_RAD);
@@ -711,6 +1146,13 @@ function shipFrameAt(
   activeProps: ReadonlyMap<string, ActiveProp>,
 ): SceneAttachFrame {
   const pose = propPose(shipTarget(harbor), time, activeProps);
+  return shipFrameForPose(harbor, pose);
+}
+
+function shipFrameForPose(
+  harbor: HarborDef,
+  pose: { x: number; y: number; z: number; yaw: number },
+): SceneAttachFrame {
   const yaw = harbor.berth.rot + pose.yaw;
   const translated = sceneRigLocalToWorld(
     {
@@ -725,6 +1167,35 @@ function shipFrameAt(
     { x: 0, y: 0, z: 0 },
   );
   return { position: translated, yaw };
+}
+
+function maximumPropSegmentSpeed(harbor: HarborDef, segment: PropPathSegment): number {
+  return measureSegment(
+    (elapsed) => shipFrameForPose(harbor, propPathPoseAt(segment, elapsed)).position,
+    segment.duration,
+    SHOT_SAMPLE_RATE_HZ,
+  ).maximumSpeed;
+}
+
+function arrivalDirectionMetrics(
+  harbor: HarborDef,
+  segment: PropPathSegment,
+): {
+  seawardStart: number;
+  towardBerth: number;
+  bowFirst: number;
+  berthDistance: number;
+} {
+  const startFrame = shipFrameForPose(harbor, propPathPoseAt(segment, 0));
+  const endFrame = shipFrameForPose(harbor, propPathPoseAt(segment, segment.duration));
+  const bow = { x: Math.cos(startFrame.yaw), y: 0, z: -Math.sin(startFrame.yaw) };
+  return measureArrivalApproach({
+    berth: harbor.berth,
+    landward: harbor.arrival,
+    start: startFrame.position,
+    end: endFrame.position,
+    bow,
+  });
 }
 
 function parkedShipFrame(harbor: HarborDef): SceneAttachFrame {
@@ -790,37 +1261,31 @@ function cameraVolumeIntrusion(
 ): { label: string; clearance: number } | null {
   for (const harbor of HARBORS) {
     for (const deck of harbor.decks) {
-      if (Math.abs(camera.x - deck.x) > deck.hw || Math.abs(camera.z - deck.z) > deck.hd) {
-        continue;
-      }
-      const clearance = camera.y - deck.y;
-      if (clearance < CAMERA_TERRAIN_CLEARANCE_YARDS) {
-        return { label: `${harbor.id} deck`, clearance };
-      }
-    }
-    const rampY = harborRampHeight(harbor, camera.x, camera.z);
-    if (rampY !== Number.NEGATIVE_INFINITY) {
-      const clearance = camera.y - rampY;
-      if (clearance < CAMERA_TERRAIN_CLEARANCE_YARDS) {
-        return { label: `${harbor.id} ramp`, clearance };
-      }
-    }
-    const liveFrame = shipFrameAt(harbor, time, activeProps);
-    const localCamera = worldToLocal(liveFrame, camera);
-    for (const deck of harbor.shipDecks) {
-      const bounds = shipDeckLocalBounds(harbor, deck);
       if (
-        localCamera.x < bounds.x0 ||
-        localCamera.x > bounds.x1 ||
-        localCamera.z < bounds.z0 ||
-        localCamera.z > bounds.z1
+        Math.abs(camera.x - deck.x) > deck.hw + PIER_KEEP_OUT_HORIZONTAL_MARGIN_YARDS ||
+        Math.abs(camera.z - deck.z) > deck.hd + PIER_KEEP_OUT_HORIZONTAL_MARGIN_YARDS
       ) {
         continue;
       }
-      const clearance = localCamera.y - bounds.centerY;
-      if (clearance < CAMERA_TERRAIN_CLEARANCE_YARDS) {
-        return { label: `${harbor.id} live ship deck`, clearance };
+      const clearance = camera.y - deck.y - PIER_KEEP_OUT_HEIGHT_YARDS;
+      if (clearance < 0) {
+        return { label: `${harbor.id} deck`, clearance };
       }
+    }
+    for (const ramp of harbor.ramps) {
+      if (
+        Math.abs(camera.x - ramp.x) > ramp.hw + PIER_KEEP_OUT_HORIZONTAL_MARGIN_YARDS ||
+        Math.abs(camera.z - ramp.z) > ramp.hd + PIER_KEEP_OUT_HORIZONTAL_MARGIN_YARDS
+      ) {
+        continue;
+      }
+      const clearance = camera.y - Math.max(ramp.highY, ramp.lowY) - PIER_KEEP_OUT_HEIGHT_YARDS;
+      if (clearance < 0) return { label: `${harbor.id} ramp`, clearance };
+    }
+    const localCamera = worldToLocal(shipFrameAt(harbor, time, activeProps), camera);
+    const bounds = harborShipLocalBounds(harbor.berth);
+    if (harborShipLocalPointInside(bounds, localCamera, PIER_KEEP_OUT_HORIZONTAL_MARGIN_YARDS)) {
+      return { label: `${harbor.id} live ship model`, clearance: localCamera.y - bounds.topY };
     }
   }
   return null;
@@ -965,6 +1430,26 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
         });
       }
       if (timed.op.kind === 'prop') {
+        const target = timed.op.target;
+        if (timed.op.cue === LB_PROP_CUE_PARK) {
+          if (activeProps.has(target)) {
+            const fullBlack = sceneOverlayView(overlay, timed.at).fadeOpacity >= FULL_BLACK_OPACITY;
+            if (!fullBlack) {
+              report({
+                sceneId: scene.id,
+                check: 'continuity.standInHandoff',
+                opIndex: timed.index,
+                opKind: opKind(timed.op),
+                time: timed.at,
+                threshold:
+                  'the moving deck stand-in hands back to the real player under full black',
+                measured: 'deck stand-in handed off outside full black',
+              });
+            }
+          }
+          activeProps.delete(target);
+          continue;
+        }
         const segment = PROP_SEGMENTS[timed.op.cue];
         if (!segment) {
           report({
@@ -977,11 +1462,70 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
             measured: `missing cue ${timed.op.cue}`,
           });
         } else {
-          activeProps.set(timed.op.target, {
+          activeProps.set(target, {
             segment,
             startedAt: timed.at,
             timedOp: timed,
           });
+          const harbor = HARBORS.find((candidate) => shipTarget(candidate) === target);
+          if (harbor) {
+            const maximumSpeed = maximumPropSegmentSpeed(harbor, segment);
+            if (maximumSpeed > LAST_BELL_CINEMATIC_SHIP_SPEED_CAP_YARDS_PER_SEC) {
+              report({
+                sceneId: scene.id,
+                check: 'prop.speed',
+                opIndex: timed.index,
+                opKind: opKind(timed.op),
+                time: timed.at,
+                threshold: `at most ${LAST_BELL_CINEMATIC_SHIP_SPEED_CAP_YARDS_PER_SEC.toFixed(
+                  1,
+                )} yd/s world-space ship speed`,
+                measured: `${maximumSpeed.toFixed(2)} yd/s from cue ${timed.op.cue}`,
+              });
+            }
+            const arrivalHarborId = ARRIVAL_HARBOR_BY_CUE.get(timed.op.cue);
+            if (arrivalHarborId !== undefined) {
+              if (harbor.id !== arrivalHarborId) {
+                report({
+                  sceneId: scene.id,
+                  check: 'prop.arrivalDirection',
+                  opIndex: timed.index,
+                  opKind: opKind(timed.op),
+                  time: timed.at,
+                  threshold: `arrival cue targeting ${arrivalHarborId}`,
+                  measured: `targeted ${harbor.id}`,
+                });
+              } else {
+                const approach = arrivalDirectionMetrics(harbor, segment);
+                if (
+                  approach.seawardStart < MIN_ARRIVAL_SEAWARD_START_YARDS ||
+                  approach.towardBerth < MIN_ARRIVAL_DIRECTION_DOT ||
+                  approach.bowFirst < MIN_ARRIVAL_DIRECTION_DOT ||
+                  approach.berthDistance > MAX_ARRIVAL_BERTH_DISTANCE_YARDS
+                ) {
+                  report({
+                    sceneId: scene.id,
+                    check: 'prop.arrivalDirection',
+                    opIndex: timed.index,
+                    opKind: opKind(timed.op),
+                    time: timed.at,
+                    threshold: `start at least ${MIN_ARRIVAL_SEAWARD_START_YARDS.toFixed(
+                      1,
+                    )} yd seaward, travel and bow dots at least ${MIN_ARRIVAL_DIRECTION_DOT.toFixed(
+                      2,
+                    )}, end within ${MAX_ARRIVAL_BERTH_DISTANCE_YARDS.toFixed(1)} yd of berth`,
+                    measured: `seaward ${approach.seawardStart.toFixed(
+                      2,
+                    )} yd, travel dot ${approach.towardBerth.toFixed(
+                      3,
+                    )}, bow dot ${approach.bowFirst.toFixed(
+                      3,
+                    )}, berth ${approach.berthDistance.toFixed(2)} yd`,
+                  });
+                }
+              }
+            }
+          }
         }
       }
       overlayApplyOp(overlay, timed.op, timed.at);
@@ -1078,8 +1622,12 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
         opIndex: currentCameraOp.index,
         opKind: opKind(currentCameraOp.op),
         time,
-        threshold: `${CAMERA_TERRAIN_CLEARANCE_YARDS.toFixed(2)} yd outside or above harbor volumes`,
-        measured: `${intrusion.clearance.toFixed(2)} yd over ${intrusion.label}`,
+        threshold: `${PIER_KEEP_OUT_HORIZONTAL_MARGIN_YARDS.toFixed(
+          2,
+        )} yd horizontal margin, ${PIER_KEEP_OUT_HEIGHT_YARDS.toFixed(
+          2,
+        )} yd above fixed harbor surfaces, or outside the measured live ship model bounds`,
+        measured: `${intrusion.clearance.toFixed(2)} yd above ${intrusion.label} keep-out top`,
       });
     }
 
@@ -1352,11 +1900,84 @@ describe('cinematic shot mechanical gate', () => {
     it.skip(`${exemption.sceneId} ${exemption.check}: ${exemption.reason}`, () => {});
   }
 
-  it('samples every registered scene at 10 Hz against the mechanical rubric', async () => {
+  it('samples every registered scene at 20 Hz against the mechanical rubric', async () => {
     await loadLinterRuntime();
     expect(LEGACY_EXEMPTIONS, 'C5 scenes must pass without legacy exemptions').toEqual([]);
     // A renderer lens change must update the linter's framing calculations.
     expect(RENDERER_SOURCE).toContain('CAMERA_BASE_FOV = 60');
+    const modelBounds = harborShipLocalBounds(GULLHAVEN_HARBOR.berth);
+    expect(modelBounds).toEqual({
+      x: 0,
+      z: 0,
+      hw: 30,
+      hd: 8.863490707113863,
+      bottomY: -0.0004148165653705534,
+      topY: 39.56988457001259,
+    });
+    const modelCenter = { x: 0, y: 20, z: 0 };
+    expect(harborShipLocalPointInside(modelBounds, modelCenter)).toBe(true);
+    expect(harborShipLocalPointInside(modelBounds, { ...modelCenter, x: -30 })).toBe(true);
+    expect(harborShipLocalPointInside(modelBounds, { ...modelCenter, x: 30 })).toBe(true);
+    expect(harborShipLocalPointInside(modelBounds, { ...modelCenter, x: -30.01 })).toBe(false);
+    expect(harborShipLocalPointInside(modelBounds, { ...modelCenter, x: 30.01 })).toBe(false);
+    expect(harborShipLocalPointInside(modelBounds, { ...modelCenter, z: -modelBounds.hd })).toBe(
+      true,
+    );
+    expect(harborShipLocalPointInside(modelBounds, { ...modelCenter, z: modelBounds.hd })).toBe(
+      true,
+    );
+    expect(
+      harborShipLocalPointInside(modelBounds, { ...modelCenter, z: -modelBounds.hd - 0.01 }),
+    ).toBe(false);
+    expect(
+      harborShipLocalPointInside(modelBounds, { ...modelCenter, z: modelBounds.hd + 0.01 }),
+    ).toBe(false);
+    expect(
+      harborShipLocalPointInside(modelBounds, { ...modelCenter, y: modelBounds.bottomY }),
+    ).toBe(true);
+    expect(
+      harborShipLocalPointInside(modelBounds, { ...modelCenter, y: modelBounds.bottomY - 0.01 }),
+    ).toBe(false);
+    expect(
+      harborShipLocalPointInside(modelBounds, { ...modelCenter, y: modelBounds.topY - 0.01 }),
+    ).toBe(true);
+    expect(harborShipLocalPointInside(modelBounds, { ...modelCenter, y: modelBounds.topY })).toBe(
+      false,
+    );
+    expect(harborShipLocalPointInside(modelBounds, { ...modelCenter, x: 30.74 }, 0.75)).toBe(true);
+    expect(harborShipLocalPointInside(modelBounds, { ...modelCenter, x: 30.76 }, 0.75)).toBe(false);
+    expect(harborShipLocalPointInside(modelBounds, { ...modelCenter, x: -30.74 }, 0.75)).toBe(true);
+    expect(harborShipLocalPointInside(modelBounds, { ...modelCenter, x: -30.76 }, 0.75)).toBe(
+      false,
+    );
+    expect(
+      harborShipLocalPointInside(modelBounds, { ...modelCenter, z: modelBounds.hd + 0.74 }, 0.75),
+    ).toBe(true);
+    expect(
+      harborShipLocalPointInside(modelBounds, { ...modelCenter, z: modelBounds.hd + 0.76 }, 0.75),
+    ).toBe(false);
+    expect(
+      harborShipLocalPointInside(modelBounds, { ...modelCenter, z: -modelBounds.hd - 0.74 }, 0.75),
+    ).toBe(true);
+    expect(
+      harborShipLocalPointInside(modelBounds, { ...modelCenter, z: -modelBounds.hd - 0.76 }, 0.75),
+    ).toBe(false);
+    const testGeometry: CameraGeometry = {
+      camera: { x: 0, y: 0, z: 0 },
+      lookAt: { x: 0, y: 0, z: 1 },
+      forward: { x: 0, y: 0, z: 1 },
+      right: { x: 1, y: 0, z: 0 },
+      up: { x: 0, y: 1, z: 0 },
+    };
+    expect(
+      playerCapsuleIntersectsFrame(testGeometry, { x: 0.4, y: -1.3, z: 0.3 }),
+      'the swept mid-body intersects even though neither endpoint sphere does',
+    ).toBe(true);
+    expect(playerCapsuleIntersectsFrame(testGeometry, { x: -100, y: -1.3, z: 10 })).toBe(false);
+    expect(playerCapsuleIntersectsFrame(testGeometry, { x: 100, y: -1.3, z: 10 })).toBe(false);
+    expect(playerCapsuleIntersectsFrame(testGeometry, { x: 0, y: -100, z: 10 })).toBe(false);
+    expect(playerCapsuleIntersectsFrame(testGeometry, { x: 0, y: 100, z: 10 })).toBe(false);
+    expect(playerCapsuleIntersectsFrame(testGeometry, { x: 0, y: -1.3, z: -100 })).toBe(false);
 
     const ids = readRegisteredSceneIds();
     expect(ids.length, 'the Last Bell scene registry must not be empty').toBeGreaterThan(0);
@@ -1395,7 +2016,10 @@ describe('cinematic shot mechanical gate', () => {
     for (const control of SYNTHETIC_CONTROLS) registerSceneForLinter(control.def);
     for (const control of SYNTHETIC_CONTROLS) {
       const violations: Violation[] = [];
-      const scene = captureScene(control.def.id, control.actorIds);
+      const scene =
+        control.actorIds || control.playerStart
+          ? captureScene(control.def.id, control.actorIds, control.playerStart)
+          : captureSyntheticControl(control.def);
       if (control.actorIds) {
         const subjectShot = scene.ops.find(
           (
@@ -1427,13 +2051,14 @@ describe('cinematic shot mechanical gate', () => {
         expect(violations, violations.map(violationMessage).join('\n')).toEqual([]);
         continue;
       }
-      expect(
-        violations.some(
-          (violation) =>
-            violation.sceneId === control.def.id && violation.check === control.expectedCheck,
-        ),
-        violations.map(violationMessage).join('\n'),
-      ).toBe(true);
+      const expected = violations.find(
+        (violation) =>
+          violation.sceneId === control.def.id && violation.check === control.expectedCheck,
+      );
+      expect(expected, violations.map(violationMessage).join('\n')).toBeDefined();
+      if (control.expectedMeasured !== undefined) {
+        expect(expected?.measured).toContain(control.expectedMeasured);
+      }
     }
-  }, 60_000);
+  }, 120_000);
 });
