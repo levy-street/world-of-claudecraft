@@ -35,14 +35,15 @@ export interface SceneOverlayModel {
   announcementId: number;
   /** 0..1 opacity of the full-screen black layer. */
   fadeOpacity: number;
-  /** True for the whole scene (start op to end op). Drives cinematic mode:
-   *  the painter toggles the `cinematic-mode` HUD-root class from this flag, so
-   *  the end op (watched or skipped) restores the HUD in one step. */
+  /** True while the scene authority locks player input. Drives cinematic mode:
+   *  unlocked scenes keep the normal controls available, while end (watched
+   *  or skipped) restores the HUD in one step. */
   cinematic: boolean;
 }
 
 export interface SceneOverlayState {
   sceneActive: boolean;
+  inputLocked: boolean;
   letterbox: boolean;
   subtitle: SceneSubtitle | null;
   fade: SceneFade | null;
@@ -54,6 +55,7 @@ export interface SceneOverlayState {
 export function createSceneOverlayState(): SceneOverlayState {
   return {
     sceneActive: false,
+    inputLocked: false,
     letterbox: false,
     subtitle: null,
     fade: null,
@@ -71,8 +73,8 @@ export function createSceneOverlayState(): SceneOverlayState {
   };
 }
 
-/** Apply one scene op. Ops the overlay does not own (camera/inputLock/music/
- *  anim) are the director's and are ignored here. The end op is the
+/** Apply one scene op. Ops the overlay does not own (camera/music/anim) are
+ *  the director's and are ignored here. The end op is the
  *  unconditional teardown: a skipped scene drops its remaining presentation
  *  ops, so end must clear letterbox, fade, and subtitle whatever arrived. */
 export function overlayApplyOp(s: SceneOverlayState, op: SceneWireOp, nowSec: number): void {
@@ -82,6 +84,7 @@ export function overlayApplyOp(s: SceneOverlayState, op: SceneWireOp, nowSec: nu
       break;
     case 'end':
       s.sceneActive = false;
+      s.inputLocked = false;
       s.letterbox = false;
       s.subtitle = null;
       s.fade = null;
@@ -94,6 +97,9 @@ export function overlayApplyOp(s: SceneOverlayState, op: SceneWireOp, nowSec: nu
         until: nowSec + op.dur,
         announcementId: ++s.nextAnnouncementId,
       };
+      break;
+    case 'inputLock':
+      s.inputLocked = op.on;
       break;
     case 'letterbox':
       s.letterbox = op.on;
@@ -115,6 +121,7 @@ export function overlayApplyOp(s: SceneOverlayState, op: SceneWireOp, nowSec: nu
  * the persistent overlay state the authority reports. */
 export function overlayApplySync(s: SceneOverlayState, state: SceneReconnectState | null): void {
   s.sceneActive = state !== null;
+  s.inputLocked = state?.inputLocked ?? false;
   s.letterbox = state?.letterbox ?? false;
   s.subtitle = null;
   s.fade = null;
@@ -141,7 +148,7 @@ export function sceneOverlayView(s: SceneOverlayState, nowSec: number): SceneOve
   const m = s.model;
   m.letterbox = s.letterbox;
   m.skipHintVisible = s.sceneActive;
-  m.cinematic = s.sceneActive;
+  m.cinematic = s.inputLocked;
   if (s.subtitle !== null && nowSec >= s.subtitle.until) s.subtitle = null;
   m.speakerKey = s.subtitle?.speakerKey ?? null;
   m.lineKey = s.subtitle?.lineKey ?? null;
