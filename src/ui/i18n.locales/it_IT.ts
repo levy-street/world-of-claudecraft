@@ -8181,19 +8181,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.notInPartyError':
     'Devi essere in un gruppo per avviare un controllo di prontezza.',
   'hudChrome.readyCheck.inProgressError': 'È già in corso un controllo di prontezza.',
-  // Rideable mounts: the Z keybind + the Mounts window (the stable).
+  // Rideable mounts: Z dismounts normally and summons the lesson steed during training.
   'hudChrome.keybinds.mount': 'Monta / Smonta',
-  'hudChrome.mobile.mounts': 'Cavalcature',
-  'hudChrome.mounts.title': 'Cavalcature',
-  'hudChrome.mounts.close': 'Chiudi',
-  'hudChrome.mounts.select': 'Scegli',
-  'hudChrome.mounts.selected': 'Scelta',
-  'hudChrome.mounts.riding': 'In sella',
-  'hudChrome.mounts.mount': 'Monta',
-  'hudChrome.mounts.dismount': 'Smonta',
-  'hudChrome.mounts.rarity_common': 'Comune',
-  'hudChrome.mounts.rarity_rare': 'Rara',
-  'hudChrome.mounts.rarity_epic': 'Epica',
   'hudChrome.mounts.spec_speed': '+{pct}% di mobilità extra',
   'hudChrome.mounts.name_valorsteed': 'Destriero del Valore',
   'hudChrome.mounts.name_grag_bear': 'Orso Grag Golia',
@@ -8216,11 +8205,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Un grifone della tempesta regale che incede al suolo su artigli runici, ali ripiegate.',
   'hudChrome.mounts.desc_thunderstrut_gobbler':
     'Un tacchino colossale nato dalla tempesta che scende impettito dal Picco Risvegliato, con la coda spiegata come un fronte di tempesta.',
-  'hudChrome.mounts.emptyTitle': 'Nessuna cavalcatura ottenuta',
-  'hudChrome.mounts.emptyStableHint':
-    'Raggiungi il livello 20 e prendi lezioni di equitazione dalla Stalliera capo Marla alle stalle a ovest di Highwatch.',
-  'hudChrome.mounts.emptyDropHint':
-    'Le cavalcature più rare sono bottino dei boss di spedizione e incursione.',
   'hudChrome.mounts.useToRide': 'Usa per evocare questa cavalcatura.',
   'guide.bestiary.flavor.sethrael_palecoil':
     "Un serpente pallido come l'osso che scivola lungo la piattaforma profonda del Glimmermere, guardiano silenzioso delle acque che ha reclamato. Chi nuota nel lago in sua compagnia di rado torna a galla.",

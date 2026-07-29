@@ -8986,19 +8986,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '팁: 특성 로드아웃을 여러 개 저장해 두면 포인트를 다시 쓰지 않고도 빌드를 바꿀 수 있습니다.',
   'loading.tips.pvp':
     '팁: 다른 플레이어에게 친선 결투를 신청하거나 잿빛 콜로세움 투기장에 참가해 빌드를 시험해보세요.',
-  // Rideable mounts: the Z keybind + the Mounts window (the stable).
+  // Rideable mounts: Z dismounts normally and summons the lesson steed during training.
   'hudChrome.keybinds.mount': '탑승 / 하차',
-  'hudChrome.mobile.mounts': '탈것',
-  'hudChrome.mounts.title': '탈것',
-  'hudChrome.mounts.close': '닫기',
-  'hudChrome.mounts.select': '선택',
-  'hudChrome.mounts.selected': '선택됨',
-  'hudChrome.mounts.riding': '탑승 중',
-  'hudChrome.mounts.mount': '탑승',
-  'hudChrome.mounts.dismount': '내리기',
-  'hudChrome.mounts.rarity_common': '일반',
-  'hudChrome.mounts.rarity_rare': '희귀',
-  'hudChrome.mounts.rarity_epic': '서사',
   'hudChrome.mounts.spec_speed': '+{pct}% 추가 기동력',
   'hudChrome.mounts.name_valorsteed': '발러스티드',
   'hudChrome.mounts.name_grag_bear': '골리앗 그라그곰',
@@ -9018,11 +9007,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '룬 발톱으로 땅을 누비는 위엄 있는 폭풍 그리핀입니다. 날개는 접혀 있습니다.',
   'hudChrome.mounts.desc_thunderstrut_gobbler':
     '깨어나는 봉우리에서 꼬리깃을 뇌운처럼 펼친 채 활보하며 내려오는, 폭풍이 낳은 거대한 칠면조입니다.',
-  'hudChrome.mounts.emptyTitle': '보유한 탈것 없음',
-  'hudChrome.mounts.emptyStableHint':
-    '20레벨을 달성한 뒤 하이워치 서쪽 마구간에서 마구간지기 마를라에게 승마를 배우세요.',
-  'hudChrome.mounts.emptyDropHint':
-    '더 희귀한 탈것은 영웅 던전 우두머리나 균열 완료를 통해 얻을 수 있습니다.',
   'hudChrome.mountTraining.mountPrompt': '{key} 키를 눌러 훈련용 발러스티드에 탑승한다.',
   'hudChrome.mountTraining.buyReinsPrompt':
     '이제 탈것을 탈 수 있습니다. 말라에게서 10골드에 발러스티드 고삐를 구매한 뒤 사용해 타세요.',

@@ -3500,14 +3500,15 @@ export interface Entity extends ClientMirroredEntityFields {
   mountKey: string;
   // Mount summon transition (players only; 0 = idle). Seconds left in the
   // call-the-mount summon, driven per tick by updateMountTransition
-  // (src/sim/mounts.ts). The sim READS it: player_motion.stepPlayerMotion roots the
-  // player (no walk/strafe/jump) while it is > 0, so it must sync on the wire like
-  // mountKey (terse `mcr`) for the online self-extrapolator to root in lockstep and
-  // for other clients to time the summon FX. handleDeath clears it.
+  // (src/sim/mounts.ts). Movement input cancels a keyed summon rather than rooting
+  // the player. It syncs on the wire like mountKey (terse `mcr`) so the online
+  // self-extrapolator predicts cancellation in lockstep and other clients can time
+  // the summon FX. handleDeath clears it.
   mountCastRemaining: number;
   // The catalog key being summoned during a mount transition ('' while idle).
-  // Render-only (the summon-FX / call-pose the client draws); the sim never
-  // reads it. Syncs on the wire (terse `mck`) alongside mountCastRemaining, and
+  // The sim reads it to revalidate and apply the exact owned mount at completion,
+  // and movement reads it to distinguish a live summon from an idle/legacy empty
+  // transition. Syncs on the wire (terse `mck`) alongside mountCastRemaining, and
   // handleDeath clears it.
   mountCastKey: string;
   // Equipped mainhand item id (players only; null otherwise). Render-only: the

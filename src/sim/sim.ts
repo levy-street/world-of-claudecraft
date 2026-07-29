@@ -5060,9 +5060,9 @@ export class Sim {
           // Proficiency just became visible; the gathering predicates re-check.
           deedsMod.markDeedsDirty(this.ctx, p.id);
         }
-        // Mount summon/dismount transition: decrement the timer, cancel a summon
-        // on combat/swim, complete a mount/dismount, and force-dismount a mounted
-        // swimmer. Live players only (a dead player is already force-dismounted by
+        // Mount transition: decrement the summon timer, cancel it on combat/swim,
+        // apply its revalidated target, and force-dismount a mounted swimmer.
+        // Live players only (a dead player is already force-dismounted by
         // handleDeath). Draws no rng, so the tick-phase draw order is unchanged.
         updateMountTransition(this.ctx, p, this.isSwimming(p));
         lap?.('p.regen');

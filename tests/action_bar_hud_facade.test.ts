@@ -1,6 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Hud } from '../src/ui/hud';
+import {
+  ACTION_BAR_ABILITY_SLOTS,
+  ActionBarController,
+} from '../src/ui/hud/action_bar/action_bar_controller';
 
 vi.mock('../src/render/characters', () => ({ CharacterPreview: class {} }));
 vi.mock('../src/render/characters/assets', () => ({ preloadMechAssets: vi.fn() }));
@@ -94,8 +98,24 @@ describe('Hud action-bar facade', () => {
     const hud = Object.create(Hud.prototype) as any;
     hud.isGroundAimActive = () => false;
     hud.attackSlotIsAttack = () => false;
-    hud.actionForSlot = () => ({ type: 'item', id: 'reins_grag_bear' });
-    hud.isHotbarItemId = (id: string) => id === 'reins_grag_bear';
+    hud.actionBarController = new ActionBarController({
+      storage: {
+        getItem: () => null,
+        setItem: () => {},
+        removeItem: () => {},
+      },
+      playerClass: 'warrior',
+      playerName: 'ReinsFacade',
+      knownAbilityIds: () => [],
+      hasAura: () => false,
+      isInSportMatch: () => false,
+      showAttackButton: () => true,
+    });
+    hud.actionBarController.replaceActions(
+      Array.from({ length: ACTION_BAR_ABILITY_SLOTS }, (_, index) =>
+        index === 0 ? { type: 'item', id: 'reins_grag_bear' } : null,
+      ),
+    );
     hud.tryGatherToolUse = () => false;
     hud.sim = { tradeInfo: null, useItem };
     hud.flashActionSlot = flashActionSlot;
@@ -105,5 +125,8 @@ describe('Hud action-bar facade', () => {
     expect(useItem).toHaveBeenCalledTimes(1);
     expect(useItem).toHaveBeenCalledWith('reins_grag_bear');
     expect(flashActionSlot).toHaveBeenCalledWith(1);
+    expect(
+      hud.actionBarController.isAssignableAction(hud.actionBarController.actionForSlot(1)),
+    ).toBe(true);
   });
 });

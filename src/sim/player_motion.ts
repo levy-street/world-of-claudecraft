@@ -212,14 +212,14 @@ export function stepPlayerMotion(
   // slides it back into deep water.
   const steepGround =
     p.onGround && !swimming && rideSteepnessAt(p.pos.x, p.pos.z, deps.seed) > MAX_CLIMB_SLOPE;
-  // Move-to-cancel: any movement input during a summon channel cancels the cast.
-  // Dismount channels (mountCastKey === '') remain fully rooted (handled by mountLocked below).
+  // Move-to-cancel: any movement input during a keyed summon cancels the cast.
   if (p.mountCastRemaining > 0 && p.mountCastKey !== '' && hasMoveInput) {
     p.mountCastRemaining = 0;
     p.mountCastKey = '';
   }
-  // Keep the root ONLY during the dismount channel (mountCastKey === '' means dismounting).
-  // During a summon channel, movement is allowed (and handled above via move-to-cancel).
+  // Current code dismounts instantly. Preserve rooting only for an empty-key
+  // transition received from the retired put-away channel during a mixed-version
+  // session; keyed summons allow movement and cancel above.
   const mountLocked = p.mountCastRemaining > 0 && p.mountCastKey === '';
   const moving = hasMoveInput && !isRooted(p) && !steepGround && !mountLocked;
   let wishX = 0,
@@ -477,9 +477,9 @@ function verticalPass(
   wishSpeed: number,
   swimming: boolean,
   steepGround: boolean,
-  // A dismount channel roots the rider outright, so it gates every jump arm
-  // here as well as the horizontal wish above (one rule, threaded rather than
-  // recomputed, so the two can never drift).
+  // A legacy empty-key transition roots the rider outright, so it gates every
+  // jump arm here as well as the horizontal wish above (one rule, threaded
+  // rather than recomputed, so the two can never drift).
   mountLocked: boolean,
 ): void {
   const ground = groundHeight(p.pos.x, p.pos.z, deps.seed);

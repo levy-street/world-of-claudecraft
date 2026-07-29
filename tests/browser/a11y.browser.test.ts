@@ -631,6 +631,7 @@ describe('axe: character window', () => {
     expect(root.getAttribute('aria-labelledby')).toBe('char-title');
     expect(root.querySelector('#char-title')).toBeTruthy();
     expect(root.querySelector('#char-model-preview')?.getAttribute('role')).toBe('img');
+    expect(root.querySelector('[data-mount-key]')).toBeNull();
     // The role=img preview HOST carries its OWN name, not a duplicate of the
     // title's level/class subtitle.
     const previewName = root.querySelector('#char-model-preview')?.getAttribute('aria-label');

@@ -2691,9 +2691,9 @@ export class ClientWorld implements IWorld {
       e.castRemaining = w.castRem ?? 0;
       e.castTotal = w.castTot ?? 0;
       e.channeling = !!w.chan;
-      // Mount summon/dismount transition (volatile): absent decodes to idle. Feeds
-      // the summon FX / call pose and (for the local player) the self-extrapolator's
-      // movement root, which reads mountCastRemaining.
+      // Mount summon transition (volatile): absent decodes to idle. Feeds the
+      // summon FX / call pose and, for the local player, the self-extrapolator's
+      // move-to-cancel decision.
       e.mountCastRemaining = w.mcr ?? 0;
       e.mountCastKey = w.mck ?? '';
       e.sitting = !!w.sit;

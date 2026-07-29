@@ -8047,19 +8047,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.notInPartyError':
     'Debes estar en un grupo para iniciar una comprobación de disponibilidad.',
   'hudChrome.readyCheck.inProgressError': 'Ya hay una comprobación de disponibilidad en curso.',
-  // Rideable mounts: the Z keybind + the Mounts window (the stable).
+  // Rideable mounts: Z dismounts normally and summons the lesson steed during training.
   'hudChrome.keybinds.mount': 'Montar / Desmontar',
-  'hudChrome.mobile.mounts': 'Monturas',
-  'hudChrome.mounts.title': 'Monturas',
-  'hudChrome.mounts.close': 'Cerrar',
-  'hudChrome.mounts.select': 'Elegir',
-  'hudChrome.mounts.selected': 'Elegida',
-  'hudChrome.mounts.riding': 'Montada',
-  'hudChrome.mounts.mount': 'Montar',
-  'hudChrome.mounts.dismount': 'Desmontar',
-  'hudChrome.mounts.rarity_common': 'Común',
-  'hudChrome.mounts.rarity_rare': 'Rara',
-  'hudChrome.mounts.rarity_epic': 'Épica',
   'hudChrome.mounts.spec_speed': '+{pct}% de movilidad adicional',
   'hudChrome.mounts.name_valorsteed': 'Corcel del Valor',
   'hudChrome.mounts.name_grag_bear': 'Oso Grag Goliat',
@@ -8082,11 +8071,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Un grifo de tormenta majestuoso que acecha por tierra sobre garras rúnicas, con las alas plegadas.',
   'hudChrome.mounts.desc_thunderstrut_gobbler':
     'Un pavo colosal nacido de la tormenta que baja pavoneándose del Pico Despierto, con la cola desplegada como un frente de tormenta.',
-  'hudChrome.mounts.emptyTitle': 'Ninguna montura obtenida',
-  'hudChrome.mounts.emptyStableHint':
-    'Alcanza el nivel 20 y toma clases de monta con la Caballeriza mayor Marla en los establos al oeste de Highwatch.',
-  'hudChrome.mounts.emptyDropHint':
-    'Las monturas más raras las sueltan los jefes de mazmorras y bandas.',
   'hudChrome.mounts.useToRide': 'Úsalo para invocar esta montura.',
   'guide.bestiary.flavor.sethrael_palecoil':
     'Una serpiente pálida como el hueso que se desliza por la profunda plataforma del Glimmermere, guardiana silenciosa de las aguas que ha reclamado. Los nadadores que comparten el lago con ella rara vez vuelven a la superficie.',

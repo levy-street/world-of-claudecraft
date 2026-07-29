@@ -455,7 +455,6 @@ export const hudChromeStrings = {
     leaderboard: 'Ranks',
     dailyRewards: 'Store',
     deeds: 'Deeds',
-    mounts: 'Mounts',
     professions: 'Professions',
     nameplates: 'Names',
     haptics: 'Haptics',
@@ -678,35 +677,15 @@ export const hudChromeStrings = {
     petTaunt: 'Pet: Taunt',
     petDefensive: 'Pet: Defensive',
     petAggressive: 'Pet: Aggressive',
-    // Rideable mounts: the Z toggle (opens the stable while nothing is picked).
+    // Rideable mounts: Z dismounts normally and summons the lesson steed during training.
     mount: 'Mount / Dismount',
   },
-  // Rideable mount labels and shared reins affordances. Names and descriptions
+  // Rideable mount labels and the shared reins affordance. Names and descriptions
   // come from the reference cards
   // (src/sim/content/mounts.ts carries the canonical English names for the sim
   // side); useToRide is shared by every reins tooltip surface.
   mounts: {
-    title: 'Mounts',
-    close: 'Close',
-    select: 'Select',
-    selected: 'Selected',
-    riding: 'Riding',
-    mount: 'Mount',
-    dismount: 'Dismount',
-    // Reins are usable items: the bag tooltip tells the player to use them. There
-    // is no per-mount level gate and no picker, so the old requiresLevel /
-    // pickFirst / keybindHint lines went with them.
     useToRide: 'Use to summon this mount.',
-    // The empty state, shown when the player owns no mount yet: a heading plus
-    // how to earn a first one (the stablemaster's riding lessons) and the rarer
-    // boss-drop mounts.
-    emptyTitle: 'No mounts collected',
-    emptyStableHint:
-      'Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.',
-    emptyDropHint: 'Rarer mounts drop from heroic dungeon bosses and Rift completions.',
-    rarity_common: 'Common',
-    rarity_rare: 'Rare',
-    rarity_epic: 'Epic',
     spec_speed: '+{pct}% extra mobility',
     name_valorsteed: 'Valorsteed',
     name_grag_bear: 'Goliath Grag-Bear',

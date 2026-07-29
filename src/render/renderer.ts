@@ -866,11 +866,11 @@ export interface EntityView {
   wasSwimming: boolean;
   // consecutive frames the foot-height heuristic read airborne (debounce)
   airborneHeurFrames: number;
-  // mount summon/dismount transition edge-detects. lastMountKey fires the summon
-  // glow when e.mountKey changes (a dedicated tracker: mountVisualKey above lags
-  // asset loading). wasMountCasting fires the rider's call pose on the idle ->
-  // summoning edge. Both seeded from the entity's current state so an already-
-  // mounted login does not flash a spurious glow or pose.
+  // Mount transition edge-detects. lastMountKey fires the shimmer whenever
+  // e.mountKey changes (a dedicated tracker: mountVisualKey above lags asset
+  // loading). wasMountCasting fires the rider's call pose on the idle -> summoning
+  // edge. Both seed from the entity's current state so an already-mounted login
+  // does not flash a spurious shimmer or pose.
   lastMountKey: string;
   wasMountCasting: boolean;
   /** Display-only vertical smoothing (step-up/step-down presentation). */
@@ -7920,16 +7920,16 @@ export class Renderer {
         }
       }
 
-      // Mount summon/dismount transition FX (render-only; the wire fields carry
+      // Mount summon transition FX (render-only; the wire fields carry
       // the state to every client, so no SimEvent is needed). The rider throws up
       // a call pose the instant a summon begins, and a yellow-orange shimmer rings
       // them when the mount actually appears, swaps, or clears.
       if (e.kind === 'player') {
         const mountCasting = e.mountCastRemaining > 0;
         // idle -> summoning edge (mountCastKey set): play the arm-raise call pose
-        // for ~the transition window. A dismount (mountCastKey === '') gets no
-        // pose; its effect is the completion glow below. Gated like the emote path
-        // (the sim roots the player, so moving/airborne is unlikely regardless).
+        // for ~the transition window. A legacy empty-key transition gets no pose;
+        // its effect is the completion glow below. Gated like the emote path;
+        // movement cancels the authoritative keyed summon.
         if (
           mountCasting &&
           !v.wasMountCasting &&
@@ -7940,7 +7940,7 @@ export class Renderer {
           active.playCallPose(e.mountCastRemaining);
         }
         v.wasMountCasting = mountCasting;
-        // mountKey change = summon completed, dismount completed, or a live swap:
+        // mountKey change = summon completed, instant dismount, or a live swap:
         // fire the shimmer at the rider. Tracked separately from mountVisualKey,
         // which lags async asset loading.
         if (e.mountKey !== v.lastMountKey) {

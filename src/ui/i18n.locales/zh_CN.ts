@@ -8597,19 +8597,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'loading.tips.professions': '提示：采集与制造类生活技能可以与你的战斗职业同时培养。',
   'loading.tips.loadouts': '提示：保存多套天赋配置，即可在不同 build 间切换而无需重新分配天赋点。',
   'loading.tips.pvp': '提示：向其他玩家发起友谊决斗，或报名灰烬竞技场，来检验你的 build。',
-  // Rideable mounts: the Z keybind + the Mounts window (the stable).
+  // Rideable mounts: Z dismounts normally and summons the lesson steed during training.
   'hudChrome.keybinds.mount': '骑乘 / 下骑',
-  'hudChrome.mobile.mounts': '坐骑',
-  'hudChrome.mounts.title': '坐骑',
-  'hudChrome.mounts.close': '关闭',
-  'hudChrome.mounts.select': '选择',
-  'hudChrome.mounts.selected': '已选择',
-  'hudChrome.mounts.riding': '骑乘中',
-  'hudChrome.mounts.mount': '骑乘',
-  'hudChrome.mounts.dismount': '下骑',
-  'hudChrome.mounts.rarity_common': '普通',
-  'hudChrome.mounts.rarity_rare': '稀有',
-  'hudChrome.mounts.rarity_epic': '史诗',
   'hudChrome.mounts.spec_speed': '+{pct}%额外移动力',
   'hudChrome.mounts.name_valorsteed': '英勇战马',
   'hudChrome.mounts.name_grag_bear': '歌利亚格拉格巨熊',
@@ -8629,9 +8618,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '一头威严的风暴狮鹫，收拢双翼，以符文利爪行走于大地。',
   'hudChrome.mounts.desc_thunderstrut_gobbler':
     '一只风暴所生的庞然大火鸡，从觉醒之峰昂首阔步而下，尾羽如雷云般展开。',
-  'hudChrome.mounts.emptyTitle': '尚未收集坐骑',
-  'hudChrome.mounts.emptyStableHint': '升到20级，前往高望以西的马厩，向马厩总管玛拉学习骑术。',
-  'hudChrome.mounts.emptyDropHint': '较稀有的坐骑由英雄地下城首领掉落或完成裂隙获得。',
   'hudChrome.mountTraining.mountPrompt': '按 {key} 键骑上训练用英勇战马。',
   'hudChrome.mountTraining.buyReinsPrompt':
     '你已学会骑术。向玛拉购买价值10金币的英勇战马缰绳，然后使用它骑乘。',

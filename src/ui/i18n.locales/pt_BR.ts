@@ -8024,19 +8024,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.notInPartyError':
     'Você precisa estar em um grupo para iniciar uma verificação de prontidão.',
   'hudChrome.readyCheck.inProgressError': 'Já há uma verificação de prontidão em andamento.',
-  // Rideable mounts: the Z keybind + the Mounts window (the stable).
+  // Rideable mounts: Z dismounts normally and summons the lesson steed during training.
   'hudChrome.keybinds.mount': 'Montar / Desmontar',
-  'hudChrome.mobile.mounts': 'Montarias',
-  'hudChrome.mounts.title': 'Montarias',
-  'hudChrome.mounts.close': 'Fechar',
-  'hudChrome.mounts.select': 'Escolher',
-  'hudChrome.mounts.selected': 'Escolhida',
-  'hudChrome.mounts.riding': 'Montado',
-  'hudChrome.mounts.mount': 'Montar',
-  'hudChrome.mounts.dismount': 'Desmontar',
-  'hudChrome.mounts.rarity_common': 'Comum',
-  'hudChrome.mounts.rarity_rare': 'Rara',
-  'hudChrome.mounts.rarity_epic': 'Épica',
   'hudChrome.mounts.spec_speed': '+{pct}% de mobilidade extra',
   'hudChrome.mounts.name_valorsteed': 'Corcel do Valor',
   'hudChrome.mounts.name_grag_bear': 'Urso Grag Golias',
@@ -8059,10 +8048,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Um grifo da tempestade majestoso que ronda o chão sobre garras rúnicas, asas recolhidas.',
   'hudChrome.mounts.desc_thunderstrut_gobbler':
     'Um peru colossal nascido da tempestade que desce do Pico Desperto se pavoneando, com a cauda aberta como uma frente de tempestade.',
-  'hudChrome.mounts.emptyTitle': 'Nenhuma montaria coletada',
-  'hudChrome.mounts.emptyStableHint':
-    'Alcance o nível 20 e faça aulas de montaria com a Cavalariça-mor Marla nos estábulos a oeste de Highwatch.',
-  'hudChrome.mounts.emptyDropHint': 'Montarias mais raras caem de chefes de masmorra e raide.',
   'hudChrome.mounts.useToRide': 'Use para invocar esta montaria.',
   'guide.bestiary.flavor.sethrael_palecoil':
     'Uma serpente pálida como osso que desliza pelo fundo profundo do Glimmermere, guardiã silenciosa das águas que reivindicou para si. Nadadores que dividem o lago com ela raramente voltam à superfície.',

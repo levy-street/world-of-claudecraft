@@ -1,5 +1,5 @@
 // Render 3D face/front icons for the six rideable mounts, for use as the 2D bag/tooltip
-// icons on their reins items (and the mount-picker cards). Mirrors the headless-Chrome +
+// icons on their reins items. Mirrors the headless-Chrome +
 // swiftshader harness of scripts/render_weapon_icons.mjs and the transparent-WebP + blank
 // alpha check of scripts/wiki/render_model_stills.mjs, but frames a front three-quarter
 // close-up of each mount's head from its own bounding box (see scripts/mount_icon_entry.js

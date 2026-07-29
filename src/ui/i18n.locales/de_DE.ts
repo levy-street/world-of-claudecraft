@@ -8132,19 +8132,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Tipp: Fordere einen anderen Spieler zu einem freundschaftlichen Duell heraus oder reihe dich für die Arena des Aschenen Kolosseums ein, um deinen Build zu testen.',
   'loading.tips.talents':
     'Tipp: Du kannst deine Talente jederzeit außerhalb des Kampfes zurücksetzen, eine frühe Wahl ist also nie eine Falle.',
-  // Rideable mounts: the Z keybind + the Mounts window (the stable).
+  // Rideable mounts: Z dismounts normally and summons the lesson steed during training.
   'hudChrome.keybinds.mount': 'Aufsitzen / Absitzen',
-  'hudChrome.mobile.mounts': 'Reittiere',
-  'hudChrome.mounts.title': 'Reittiere',
-  'hudChrome.mounts.close': 'Schließen',
-  'hudChrome.mounts.select': 'Auswählen',
-  'hudChrome.mounts.selected': 'Ausgewählt',
-  'hudChrome.mounts.riding': 'Im Sattel',
-  'hudChrome.mounts.mount': 'Aufsitzen',
-  'hudChrome.mounts.dismount': 'Absitzen',
-  'hudChrome.mounts.rarity_common': 'Verbreitet',
-  'hudChrome.mounts.rarity_rare': 'Selten',
-  'hudChrome.mounts.rarity_epic': 'Episch',
   'hudChrome.mounts.spec_speed': '+{pct}% zusätzliche Mobilität',
   'hudChrome.mounts.name_valorsteed': 'Valorross',
   'hudChrome.mounts.name_grag_bear': 'Goliath-Gragbär',
@@ -8167,11 +8156,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Ein königlicher Sturmgreif, der mit runenbeschlagenen Klauen und angelegten Schwingen über den Boden pirscht.',
   'hudChrome.mounts.desc_thunderstrut_gobbler':
     'Ein kolossaler sturmgeborener Puter, der vom Erwachenden Gipfel herabstolziert, den Schwanz gefächert wie eine Gewitterfront.',
-  'hudChrome.mounts.emptyTitle': 'Keine Reittiere gesammelt',
-  'hudChrome.mounts.emptyStableHint':
-    'Erreicht Stufe 20 und nehmt bei Stallmeisterin Marla in den Ställen westlich von Highwatch Reitstunden.',
-  'hudChrome.mounts.emptyDropHint':
-    'Seltenere Reittiere lassen Dungeon- und Schlachtzugsbosse fallen.',
   'hudChrome.mounts.useToRide': 'Benutzen, um dieses Reittier zu beschwören.',
   'guide.bestiary.flavor.sethrael_palecoil':
     'Eine knochenbleiche Schlange, die über den tiefen Grund des Glimmermere gleitet, stiller Wächter des Wassers, das sie für sich beansprucht hat. Schwimmer, die den See mit ihr teilen, tauchen selten wieder auf.',

@@ -9150,19 +9150,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Совет: сохраните несколько наборов талантов, чтобы менять билды, не тратя очки заново.',
   'loading.tips.pvp':
     'Совет: вызовите другого игрока на дружескую дуэль или встаньте в очередь на арену Пепельного Колизея, чтобы испытать свой билд.',
-  // Rideable mounts: the Z keybind + the Mounts window (the stable).
+  // Rideable mounts: Z dismounts normally and summons the lesson steed during training.
   'hudChrome.keybinds.mount': 'Сесть / Спешиться',
-  'hudChrome.mobile.mounts': 'Транспорт',
-  'hudChrome.mounts.title': 'Транспорт',
-  'hudChrome.mounts.close': 'Закрыть',
-  'hudChrome.mounts.select': 'Выбрать',
-  'hudChrome.mounts.selected': 'Выбран',
-  'hudChrome.mounts.riding': 'Верхом',
-  'hudChrome.mounts.mount': 'Сесть',
-  'hudChrome.mounts.dismount': 'Спешиться',
-  'hudChrome.mounts.rarity_common': 'Обычный',
-  'hudChrome.mounts.rarity_rare': 'Редкий',
-  'hudChrome.mounts.rarity_epic': 'Эпический',
   'hudChrome.mounts.spec_speed': '+{pct}% к скорости передвижения',
   'hudChrome.mounts.name_valorsteed': 'Доблестный скакун',
   'hudChrome.mounts.name_grag_bear': 'Голиаф Граг-медведь',
@@ -9185,11 +9174,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Величавый штормовой грифон, ступающий по земле на рунных когтях со сложенными крыльями.',
   'hudChrome.mounts.desc_thunderstrut_gobbler':
     'Исполинский индюк, рожденный бурей: он важно спускается с Пробуждающегося пика, распустив хвост, словно грозовой фронт.',
-  'hudChrome.mounts.emptyTitle': 'Скакунов пока нет',
-  'hudChrome.mounts.emptyStableHint':
-    'Достигните 20 уровня и возьмите урок верховой езды у старшей конюшей Марлы в конюшнях к западу от Хайвотча.',
-  'hudChrome.mounts.emptyDropHint':
-    'Более редких скакунов выбивают боссы героических подземелий или получают за прохождение Разломов.',
   'hudChrome.mountTraining.mountPrompt':
     'Нажми {key}, чтобы оседлать учебного Доблестного скакуна.',
   'hudChrome.mountTraining.buyReinsPrompt':

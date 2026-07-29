@@ -93,7 +93,7 @@ function trainingSummon(meta: PlayerMeta | undefined, key: string): boolean {
 }
 
 /** Force an instant dismount with no put-away channel: clears the live mount and
- *  any in-flight summon/dismount channel, then recomputes stats. Used by the riding
+ *  any in-flight mount transition, then recomputes stats. Used by the riding
  *  lesson to take the unowned training steed back the moment the lesson ends, and by
  *  the auto-attack loop and cast path to dismount on ability use. */
 export function forceDismount(ctx: SimContext, e: Entity): void {
@@ -254,10 +254,12 @@ export function updateMountTransition(ctx: SimContext, e: Entity, swimming: bool
     if (meta) recalcFor(ctx, e, meta);
     return;
   }
-  // (b) Advance an in-flight summon channel.
+  // (b) Advance an in-flight transition. Current code only creates keyed summon
+  // transitions; the empty-key completion arm preserves mixed-version entities
+  // created by the retired put-away channel during a rolling deployment.
   if ((e.mountCastRemaining ?? 0) > 0) {
-    // A summon (mountCastKey names a mount) cancels on entering combat or water,
-    // with no error toast. A dismount (mountCastKey === '') always proceeds.
+    // A keyed summon cancels on entering combat or water, with no error toast.
+    // A legacy empty-key transition always proceeds.
     if (e.mountCastKey !== '' && (e.inCombat || swimming)) {
       e.mountCastRemaining = 0;
       e.mountCastKey = '';

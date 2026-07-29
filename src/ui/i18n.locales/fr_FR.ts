@@ -8628,19 +8628,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.notInPartyError':
     'Vous devez être dans un groupe pour lancer une vérification de disponibilité.',
   'hudChrome.readyCheck.inProgressError': 'Une vérification de disponibilité est déjà en cours.',
-  // Rideable mounts: the Z keybind + the Mounts window (the stable).
+  // Rideable mounts: Z dismounts normally and summons the lesson steed during training.
   'hudChrome.keybinds.mount': 'Monter / Descendre',
-  'hudChrome.mobile.mounts': 'Montures',
-  'hudChrome.mounts.title': 'Montures',
-  'hudChrome.mounts.close': 'Fermer',
-  'hudChrome.mounts.select': 'Choisir',
-  'hudChrome.mounts.selected': 'Choisie',
-  'hudChrome.mounts.riding': 'En selle',
-  'hudChrome.mounts.mount': 'Monter',
-  'hudChrome.mounts.dismount': 'Descendre',
-  'hudChrome.mounts.rarity_common': 'Commune',
-  'hudChrome.mounts.rarity_rare': 'Rare',
-  'hudChrome.mounts.rarity_epic': 'Épique',
   'hudChrome.mounts.spec_speed': '+{pct}% de mobilité supplémentaire',
   'hudChrome.mounts.name_valorsteed': 'Destrier de Bravoure',
   'hudChrome.mounts.name_grag_bear': 'Ours-Grag Goliath',
@@ -8663,11 +8652,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Un griffon d’orage majestueux qui arpente le sol sur des serres runiques, ailes repliées.',
   'hudChrome.mounts.desc_thunderstrut_gobbler':
     'Un dindon colossal né de l’orage qui descend du Pic Éveillé en se pavanant, la queue déployée comme un front d’orage.',
-  'hudChrome.mounts.emptyTitle': 'Aucune monture collectée',
-  'hudChrome.mounts.emptyStableHint':
-    'Atteignez le niveau 20 et prenez des leçons d’équitation auprès de la Maîtresse d’écurie Marla aux écuries à l’ouest de Highwatch.',
-  'hudChrome.mounts.emptyDropHint':
-    'Les montures plus rares sont lâchées par les boss de donjon et de raid.',
   'hudChrome.mounts.useToRide': 'Utilisez pour invoquer cette monture.',
   'guide.bestiary.flavor.sethrael_palecoil':
     "Un serpent d'une pâleur d'os qui glisse dans les profondeurs du Glimmermere, gardien silencieux de l'eau qu'il a faite sienne. Les nageurs qui partagent le lac avec lui refont rarement surface.",

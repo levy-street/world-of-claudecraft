@@ -8597,19 +8597,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'loading.tips.professions': '提示：採集與製造類生活技能可以與你的戰鬥職業同時培養。',
   'loading.tips.loadouts': '提示：保存多套天賦配置，即可在不同組合間切換而無需重新分配天賦點。',
   'loading.tips.pvp': '提示：向其他玩家發起友誼決鬥，或報名灰燼競技場，來檢驗你的組合。',
-  // Rideable mounts: the Z keybind + the Mounts window (the stable).
+  // Rideable mounts: Z dismounts normally and summons the lesson steed during training.
   'hudChrome.keybinds.mount': '騎乘 / 下騎',
-  'hudChrome.mobile.mounts': '坐騎',
-  'hudChrome.mounts.title': '坐騎',
-  'hudChrome.mounts.close': '關閉',
-  'hudChrome.mounts.select': '選擇',
-  'hudChrome.mounts.selected': '已選擇',
-  'hudChrome.mounts.riding': '騎乘中',
-  'hudChrome.mounts.mount': '騎乘',
-  'hudChrome.mounts.dismount': '下騎',
-  'hudChrome.mounts.rarity_common': '普通',
-  'hudChrome.mounts.rarity_rare': '稀有',
-  'hudChrome.mounts.rarity_epic': '史詩',
   'hudChrome.mounts.spec_speed': '+{pct}% 額外移動力',
   'hudChrome.mounts.name_valorsteed': '英勇戰馬',
   'hudChrome.mounts.name_grag_bear': '歌利亞格拉格巨熊',
@@ -8629,9 +8618,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '一頭威嚴的風暴獅鷲，收攏雙翼，以符文利爪行走於大地。',
   'hudChrome.mounts.desc_thunderstrut_gobbler':
     '一隻風暴所生的龐然大火雞，從覺醒之峰昂首闊步而下，尾羽如雷雲般展開。',
-  'hudChrome.mounts.emptyTitle': '尚未收集坐騎',
-  'hudChrome.mounts.emptyStableHint': '升到 20 級，前往高望以西的馬廄，向馬廄總管瑪拉學習騎術。',
-  'hudChrome.mounts.emptyDropHint': '較稀有的坐騎由英雄地城首領掉落或完成裂隙獲得。',
   'hudChrome.mountTraining.mountPrompt': '按 {key} 鍵騎上訓練用英勇戰馬。',
   'hudChrome.mountTraining.buyReinsPrompt':
     '你已學會騎術。向瑪拉購買價值 10 金幣的英勇戰馬韁繩，然後使用它騎乘。',

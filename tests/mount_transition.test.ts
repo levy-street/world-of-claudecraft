@@ -147,7 +147,7 @@ function findMountShore(seed: number): { x: number; z: number; facing: number } 
   throw new Error('no mountable shore found near a deep lake');
 }
 
-describe('mount summon/dismount transition', () => {
+describe('mount summon transition and instant dismount', () => {
   it('completes a mount summon after MOUNT_SUMMON_SECONDS of ticks, then rides', () => {
     const sim = makeSim();
     const pid = joinRider(sim);

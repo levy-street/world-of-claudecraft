@@ -95,14 +95,13 @@ const MOUNT_SUMMON_HIDDEN: MountSummonBarState = {
 };
 
 /** Derive the player's mount summon bar state from the entity's mountCastRemaining
- *  and mountCastKey. Shown when mountCastKey is non-empty (summon in progress);
- *  hidden during a dismount channel (mountCastKey === ''). */
+ *  and mountCastKey. Shown only while a keyed summon is in progress. */
 export function mountSummonBarState(
   mountCastRemaining: number,
   mountCastKey: string,
 ): MountSummonBarState {
-  // mountCastKey is '' during a dismount channel; only show the summon bar during
-  // an actual summon (key is the target mount's key).
+  // An empty key is idle (or a retired mixed-version transition); only an actual
+  // summon carries a target mount key.
   if (!mountCastKey || mountCastRemaining <= 0) return MOUNT_SUMMON_HIDDEN;
   return {
     visible: true,

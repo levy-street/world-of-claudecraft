@@ -63,7 +63,7 @@ function errorTexts(events: SimEvent[]): string[] {
     .map((e) => e.text);
 }
 
-// Drive the mount summon/dismount channel to completion by hand. The tick-loop
+// Drive a mount summon transition to completion by hand. The tick-loop
 // integration (updateMountTransition wired into sim.tick) is covered in
 // tests/mount_transition.test.ts; here we call the transition directly with
 // swimming=false so these unit tests do not depend on that wiring landing.
@@ -527,7 +527,7 @@ describe('mount and dismount rules', () => {
   });
 });
 
-describe('mount summon/dismount channel (updateMountTransition)', () => {
+describe('mount summon transition (updateMountTransition)', () => {
   it('mounts only after the summon channel completes, not on the toggle', () => {
     const sim = makeWorld();
     const pid = join(sim, 20);

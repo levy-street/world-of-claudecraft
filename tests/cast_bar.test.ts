@@ -194,17 +194,17 @@ describe('overhead eat/drink overlay', () => {
 });
 
 // mountSummonBarState: the player-only mount summon channel bar. Hidden during a
-// dismount channel (mountCastKey === '') and when mountCastRemaining is 0 or
+// empty-key transition (mountCastKey === '') and when mountCastRemaining is 0 or
 // negative. Drains like a channel over MOUNT_SUMMON_SECONDS. The mountKey is the
 // stable discriminator; the painter resolves the localized mount name.
 describe('mount summon bar', () => {
-  it('is hidden when mountCastKey is empty (no summon or dismount channel)', () => {
+  it('is hidden when mountCastKey is empty (no keyed summon)', () => {
     const s = mountSummonBarState(0, '');
     expect(s.visible).toBe(false);
   });
 
-  it('is hidden when mountCastKey is empty even if time remains (dismount channel)', () => {
-    // A dismount channel has mountCastKey === '': the summon bar must NOT show.
+  it('is hidden when mountCastKey is empty even if a legacy transition remains', () => {
+    // A retired empty-key transition must never show the summon bar.
     const s = mountSummonBarState(0.5, '');
     expect(s.visible).toBe(false);
   });

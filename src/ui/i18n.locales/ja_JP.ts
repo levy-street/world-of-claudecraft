@@ -9001,19 +9001,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ヒント：複数の特性ロードアウトを保存しておけば、ポイントを使い直さずにビルドを切り替えられます。',
   'loading.tips.pvp':
     'ヒント：他のプレイヤーに友好的な決闘を申し込むか、灰塵のコロシアムに参加してビルドを試してみましょう。',
-  // Rideable mounts: the Z keybind + the Mounts window (the stable).
+  // Rideable mounts: Z dismounts normally and summons the lesson steed during training.
   'hudChrome.keybinds.mount': '騎乗 / 降車',
-  'hudChrome.mobile.mounts': 'マウント',
-  'hudChrome.mounts.title': 'マウント',
-  'hudChrome.mounts.close': '閉じる',
-  'hudChrome.mounts.select': '選択',
-  'hudChrome.mounts.selected': '選択中',
-  'hudChrome.mounts.riding': '騎乗中',
-  'hudChrome.mounts.mount': '騎乗',
-  'hudChrome.mounts.dismount': '降りる',
-  'hudChrome.mounts.rarity_common': 'コモン',
-  'hudChrome.mounts.rarity_rare': 'レア',
-  'hudChrome.mounts.rarity_epic': 'エピック',
   'hudChrome.mounts.spec_speed': '+{pct}% 移動力上昇',
   'hudChrome.mounts.name_valorsteed': 'ヴァロースティード',
   'hudChrome.mounts.name_grag_bear': 'ゴリアテ・グラグベア',
@@ -9033,11 +9022,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ルーンの爪で地を闊歩する気高き嵐のグリフォン。翼はたたまれている。',
   'hudChrome.mounts.desc_thunderstrut_gobbler':
     '嵐より生まれた巨大な七面鳥。目覚めし峰から尾羽を雷雲のごとく広げ、闊歩して降りてくる。',
-  'hudChrome.mounts.emptyTitle': 'マウントは未入手',
-  'hudChrome.mounts.emptyStableHint':
-    'レベル20に到達し、ハイウォッチ西の厩舎で厩舎長マーラの乗馬レッスンを受けましょう。',
-  'hudChrome.mounts.emptyDropHint':
-    'より希少なマウントはヒロイックダンジョンのボスからドロップするか、リフトの完了で入手できます。',
   'hudChrome.mountTraining.mountPrompt': '{key} キーを押して訓練用ヴァロースティードに騎乗する。',
   'hudChrome.mountTraining.buyReinsPrompt':
     '騎乗を習得しました。マーラから10ゴールドでヴァロースティードの手綱を購入し、使用して騎乗しましょう。',
