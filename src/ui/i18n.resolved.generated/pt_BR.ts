@@ -1119,6 +1119,11 @@ export const pt_BR: EnTranslations = {
         "refundLog": "Apostas anuladas, sua entrada de {amount} foi devolvida."
       }
     },
+    "actionBar": {
+      "title": "Action Bars",
+      "lock": "Lock Action Bars",
+      "unlock": "Unlock Action Bars"
+    },
     "options": {
       "clickMoveLeft": "Clique esquerdo",
       "clickMoveRight": "Clique direito",
@@ -1158,6 +1163,7 @@ export const pt_BR: EnTranslations = {
       "itemLevelLine": "Nível do item {level}",
       "itemScoreLine": "Pontuação {score}",
       "showSecondaryActionBar": "Mostrar Barra de Ação Secundária",
+      "lockActionBars": "Lock Action Bars",
       "showThirdActionBar": "Mostrar terceira barra de ação",
       "showTargetOfTarget": "Mostrar Alvo do Alvo",
       "showAttackButton": "Exibir Botão de Ataque",

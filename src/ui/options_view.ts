@@ -471,7 +471,10 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
     ]),
     ...tag('combat', [
       boolToggle(s, 'startAttackOnAbilityUse', 'hudChrome.options.startAttackOnAbility'),
-      boolToggle(s, 'showAttackButton', 'hudChrome.options.showAttackButton'),
+      boolToggle(s, 'lockActionBars', 'hudChrome.options.lockActionBars', { rerender: true }),
+      boolToggle(s, 'showAttackButton', 'hudChrome.options.showAttackButton', {
+        disabled: s.bool('lockActionBars'),
+      }),
       boolToggle(s, 'walkByAutoloot', 'hudChrome.options.walkByAutoloot'),
       boolToggle(s, 'groundReticle', 'hudChrome.options.groundReticle'),
       boolToggle(s, 'mouseoverCast', 'hudChrome.options.mouseoverCast'),

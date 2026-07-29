@@ -346,6 +346,7 @@ const FRAMES_KEYS = [
 const CHAT_KEYS = ['chatFontScale', 'chatOpacity', 'compactChat'];
 const COMBAT_KEYS = [
   'startAttackOnAbilityUse',
+  'lockActionBars',
   'showAttackButton',
   'walkByAutoloot',
   'groundReticle',
@@ -389,6 +390,22 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       category: 'combat',
       labelKey: 'hudChrome.options.stickyTarget',
     });
+  });
+
+  it('keeps the lock control active while disabling bar mutations when locked', () => {
+    const controls = buildInterfaceControls(makeSource({}, { lockActionBars: true }));
+    expect(find(controls, 'lockActionBars')).toMatchObject({
+      control: 'boolToggle',
+      on: true,
+      category: 'combat',
+      rerender: true,
+    });
+    expect(find(controls, 'lockActionBars')).not.toHaveProperty('disabled');
+    expect(find(controls, 'showAttackButton')).toMatchObject({ disabled: true });
+
+    const unlocked = buildInterfaceControls(makeSource({}, { lockActionBars: false }));
+    expect(find(unlocked, 'lockActionBars')).toMatchObject({ on: false, rerender: true });
+    expect(find(unlocked, 'showAttackButton')).toMatchObject({ disabled: false });
   });
 
   it('enables the third action-bar toggle only while the secondary row is visible', () => {

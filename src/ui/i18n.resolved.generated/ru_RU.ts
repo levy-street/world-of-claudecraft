@@ -1119,6 +1119,11 @@ export const ru_RU: EnTranslations = {
         "refundLog": "Ставки аннулированы, ваша ставка {amount} возвращена."
       }
     },
+    "actionBar": {
+      "title": "Панели действий",
+      "lock": "Заблокировать панели действий",
+      "unlock": "Разблокировать панели действий"
+    },
     "options": {
       "clickMoveLeft": "Левая кнопка",
       "clickMoveRight": "Правая кнопка",
@@ -1158,6 +1163,7 @@ export const ru_RU: EnTranslations = {
       "itemLevelLine": "Уровень предмета {level}",
       "itemScoreLine": "Оценка {score}",
       "showSecondaryActionBar": "Показывать вторичную панель действий",
+      "lockActionBars": "Блокировать панели действий",
       "showThirdActionBar": "Показывать третью панель действий",
       "showTargetOfTarget": "Показывать цель цели",
       "showAttackButton": "Показывать кнопку атаки",

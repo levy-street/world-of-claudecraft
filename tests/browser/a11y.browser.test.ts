@@ -270,6 +270,7 @@ describe('axe: spellbook window', () => {
           ({ cfg: { playerClass: 'warrior' }, known: [], player: { level: 1 } }) as never,
         barActions: () => [],
         hasFreeSlot: () => true,
+        actionBarsLocked: () => false,
         hasFormBars: () => false,
         captureFocus: () => null,
       }),

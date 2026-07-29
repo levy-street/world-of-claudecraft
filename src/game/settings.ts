@@ -211,6 +211,9 @@ export const BOOL_SETTINGS = {
   partyFrameShowSelf: { def: false },
 
   // --- Interface & Comfort pack (booleans). ---
+  // off by default: when enabled, action-bar casts and saved loadout restores
+  // keep working but manual layout edits (assign, move, clear, or reset) are blocked.
+  lockActionBars: { def: false },
   // off by default: drop every HUD cross-fade / panel animation, for players
   // who get motion-sick or just want instant windows. Mirrors the built-in
   // prefers-reduced-motion handling as an explicit in-game switch.

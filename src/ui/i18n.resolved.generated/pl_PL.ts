@@ -1119,6 +1119,11 @@ export const pl_PL: EnTranslations = {
         "refundLog": "Zakłady unieważnione, twoja stawka {amount} została zwrócona."
       }
     },
+    "actionBar": {
+      "title": "Action Bars",
+      "lock": "Lock Action Bars",
+      "unlock": "Unlock Action Bars"
+    },
     "options": {
       "clickMoveLeft": "Lewy przycisk",
       "clickMoveRight": "Prawy przycisk",
@@ -1158,6 +1163,7 @@ export const pl_PL: EnTranslations = {
       "itemLevelLine": "Poziom przedmiotu {level}",
       "itemScoreLine": "Ocena {score}",
       "showSecondaryActionBar": "Pokaż dodatkowy pasek akcji",
+      "lockActionBars": "Lock Action Bars",
       "showThirdActionBar": "Pokaż trzeci pasek akcji",
       "showTargetOfTarget": "Pokaż cel celu",
       "showAttackButton": "Pokaż Przycisk Ataku",

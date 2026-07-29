@@ -1119,6 +1119,11 @@ export const sv_SE: EnTranslations = {
         "refundLog": "Vaden ogiltigförklarades, din insats på {amount} återlämnades."
       }
     },
+    "actionBar": {
+      "title": "Action Bars",
+      "lock": "Lock Action Bars",
+      "unlock": "Unlock Action Bars"
+    },
     "options": {
       "clickMoveLeft": "Vänsterklick",
       "clickMoveRight": "Högerklick",
@@ -1158,6 +1163,7 @@ export const sv_SE: EnTranslations = {
       "itemLevelLine": "Föremålsnivå {level}",
       "itemScoreLine": "Poäng {score}",
       "showSecondaryActionBar": "Visa sekundärt handlingsfält",
+      "lockActionBars": "Lock Action Bars",
       "showThirdActionBar": "Visa tredje åtgärdsfältet",
       "showTargetOfTarget": "Visa målets mål",
       "showAttackButton": "Visa attackknapp",

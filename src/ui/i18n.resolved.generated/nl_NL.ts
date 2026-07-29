@@ -1119,6 +1119,11 @@ export const nl_NL: EnTranslations = {
         "refundLog": "Weddenschappen nietig verklaard, je inzet van {amount} is teruggegeven."
       }
     },
+    "actionBar": {
+      "title": "Action Bars",
+      "lock": "Lock Action Bars",
+      "unlock": "Unlock Action Bars"
+    },
     "options": {
       "clickMoveLeft": "Linkermuisklik",
       "clickMoveRight": "Rechtermuisklik",
@@ -1158,6 +1163,7 @@ export const nl_NL: EnTranslations = {
       "itemLevelLine": "Itemniveau {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Secundaire actiebalk tonen",
+      "lockActionBars": "Lock Action Bars",
       "showThirdActionBar": "Derde actiebalk tonen",
       "showTargetOfTarget": "Doelwit van doelwit tonen",
       "showAttackButton": "Aanvalsknop Tonen",

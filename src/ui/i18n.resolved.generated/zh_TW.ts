@@ -1119,6 +1119,11 @@ export const zh_TW: EnTranslations = {
         "refundLog": "投注作廢，已退還你的 {amount} 本金。"
       }
     },
+    "actionBar": {
+      "title": "動作列",
+      "lock": "鎖定動作列",
+      "unlock": "解除鎖定動作列"
+    },
     "options": {
       "clickMoveLeft": "左鍵",
       "clickMoveRight": "右鍵",
@@ -1158,6 +1163,7 @@ export const zh_TW: EnTranslations = {
       "itemLevelLine": "物品等級 {level}",
       "itemScoreLine": "評分 {score}",
       "showSecondaryActionBar": "顯示副動作列",
+      "lockActionBars": "鎖定動作列",
       "showThirdActionBar": "顯示第三動作列",
       "showTargetOfTarget": "顯示目標的目標",
       "showAttackButton": "顯示攻擊按鈕",

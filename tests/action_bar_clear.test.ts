@@ -9,7 +9,9 @@ describe('action-bar clear gestures', () => {
     const preventDefault = vi.fn();
     const clear = vi.fn();
 
-    expect(handleShiftClearContextMenu({ shiftKey: false, preventDefault }, clear)).toBe(false);
+    expect(handleShiftClearContextMenu({ shiftKey: false, preventDefault }, false, clear)).toBe(
+      false,
+    );
     expect(preventDefault).not.toHaveBeenCalled();
     expect(clear).not.toHaveBeenCalled();
   });
@@ -18,7 +20,9 @@ describe('action-bar clear gestures', () => {
     const preventDefault = vi.fn();
     const clear = vi.fn();
 
-    expect(handleShiftClearContextMenu({ shiftKey: true, preventDefault }, clear)).toBe(true);
+    expect(handleShiftClearContextMenu({ shiftKey: true, preventDefault }, false, clear)).toBe(
+      true,
+    );
     expect(preventDefault).toHaveBeenCalledOnce();
     expect(clear).toHaveBeenCalledOnce();
   });
@@ -29,7 +33,11 @@ describe('action-bar clear gestures', () => {
     const clear = vi.fn();
 
     expect(
-      handleShiftClearKeydown({ shiftKey: true, key, preventDefault, stopPropagation }, clear),
+      handleShiftClearKeydown(
+        { shiftKey: true, key, preventDefault, stopPropagation },
+        false,
+        clear,
+      ),
     ).toBe(true);
     expect(preventDefault).toHaveBeenCalledOnce();
     expect(stopPropagation).toHaveBeenCalledOnce();
@@ -44,17 +52,37 @@ describe('action-bar clear gestures', () => {
     expect(
       handleShiftClearKeydown(
         { shiftKey: false, key: 'Delete', preventDefault, stopPropagation },
+        false,
         clear,
       ),
     ).toBe(false);
     expect(
       handleShiftClearKeydown(
         { shiftKey: true, key: 'Enter', preventDefault, stopPropagation },
+        false,
         clear,
       ),
     ).toBe(false);
     expect(preventDefault).not.toHaveBeenCalled();
     expect(stopPropagation).not.toHaveBeenCalled();
+    expect(clear).not.toHaveBeenCalled();
+  });
+
+  it('suppresses every clear gesture while the action bars are locked', () => {
+    const preventDefault = vi.fn();
+    const stopPropagation = vi.fn();
+    const clear = vi.fn();
+
+    expect(handleShiftClearContextMenu({ shiftKey: true, preventDefault }, true, clear)).toBe(true);
+    expect(
+      handleShiftClearKeydown(
+        { shiftKey: true, key: 'Delete', preventDefault, stopPropagation },
+        true,
+        clear,
+      ),
+    ).toBe(true);
+    expect(preventDefault).toHaveBeenCalledTimes(2);
+    expect(stopPropagation).toHaveBeenCalledOnce();
     expect(clear).not.toHaveBeenCalled();
   });
 });

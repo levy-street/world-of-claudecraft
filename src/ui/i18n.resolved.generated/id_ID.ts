@@ -1119,6 +1119,11 @@ export const id_ID: EnTranslations = {
         "refundLog": "Taruhan dibatalkan, uang taruhanmu sebesar {amount} dikembalikan."
       }
     },
+    "actionBar": {
+      "title": "Action Bars",
+      "lock": "Lock Action Bars",
+      "unlock": "Unlock Action Bars"
+    },
     "options": {
       "clickMoveLeft": "Klik Kiri",
       "clickMoveRight": "Klik Kanan",
@@ -1158,6 +1163,7 @@ export const id_ID: EnTranslations = {
       "itemLevelLine": "Level Item {level}",
       "itemScoreLine": "Skor {score}",
       "showSecondaryActionBar": "Tampilkan Bilah Aksi Sekunder",
+      "lockActionBars": "Lock Action Bars",
       "showThirdActionBar": "Tampilkan Bilah Tindakan Ketiga",
       "showTargetOfTarget": "Tampilkan Sasaran dari Sasaran",
       "showAttackButton": "Tampilkan Tombol Serang",

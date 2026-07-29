@@ -82,6 +82,7 @@ interface Harness {
     bar: HotbarAction[];
     hasFree: boolean;
     attackOnBar: boolean;
+    locked: boolean;
   };
   /** How many times each dep the per-frame path can reach was called. */
   calls: Record<string, number>;
@@ -101,6 +102,7 @@ function harness(): Harness {
     bar: [null, null, null, itemSlot('minor_healing_potion')] as HotbarAction[],
     hasFree: true,
     attackOnBar: true,
+    locked: false,
   };
   const calls: Record<string, number> = {};
   const count = <T>(name: string, value: T): T => {
@@ -126,6 +128,7 @@ function harness(): Harness {
     abilityTooltip: () => '<div></div>',
     barActions: () => count('barActions', state.bar),
     hasFreeSlot: () => count('hasFreeSlot', state.hasFree),
+    actionBarsLocked: () => count('actionBarsLocked', state.locked),
     attackOnBar: () => count('attackOnBar', state.attackOnBar),
     setAttackOnBar: (on) => {
       state.attackOnBar = on;
@@ -466,14 +469,20 @@ describe('spellbook per-frame tick: an unchanged frame costs nothing', () => {
     );
   });
 
-  it('reads exactly four deps a frame, and allocates no array while doing it', () => {
+  it('reads exactly five deps a frame, and allocates no array while doing it', () => {
     const h = harness();
     open(h);
     h.resetCalls();
     const alloc = watchAlloc();
     for (let i = 0; i < 5; i++) h.win.tickOpen();
     alloc.stop();
-    expect(h.calls).toEqual({ world: 5, attackOnBar: 5, hasFreeSlot: 5, barActions: 5 });
+    expect(h.calls).toEqual({
+      world: 5,
+      attackOnBar: 5,
+      hasFreeSlot: 5,
+      actionBarsLocked: 5,
+      barActions: 5,
+    });
     expect(alloc.calls, `the tick allocated: ${[...new Set(alloc.calls)].join(', ')}`).toEqual([]);
   });
 
@@ -628,6 +637,27 @@ describe('spellbook per-frame tick: a changed frame paints, without walking the 
     expect(attack.getAttribute('aria-label')).toBe(
       t('hudChrome.spellbook.addToBarAria', { name: t('abilityUi.actionBar.attackName') }),
     );
+  });
+
+  it('disables every manual edit control when the lock setting flips', () => {
+    const h = harness();
+    open(h);
+    const attack = h.attackToggle() as HTMLButtonElement;
+    const ability = h.toggle('charge') as HTMLButtonElement;
+    const attackRow = attack.closest<HTMLElement>('.spell-row') as HTMLElement;
+    const abilityRow = ability.closest<HTMLElement>('.spell-row') as HTMLElement;
+    expect(attack.disabled).toBe(false);
+    expect(ability.disabled).toBe(false);
+    expect(attackRow.draggable).toBe(true);
+    expect(abilityRow.draggable).toBe(true);
+
+    h.state.locked = true;
+    h.win.tickOpen();
+
+    expect(attack.disabled).toBe(true);
+    expect(ability.disabled).toBe(true);
+    expect(attackRow.draggable).toBe(false);
+    expect(abilityRow.draggable).toBe(false);
   });
 });
 

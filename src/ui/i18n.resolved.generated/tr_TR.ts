@@ -1119,6 +1119,11 @@ export const tr_TR: EnTranslations = {
         "refundLog": "Bahisler iptal edildi, {amount} tutarındaki bahsin iade edildi."
       }
     },
+    "actionBar": {
+      "title": "Action Bars",
+      "lock": "Lock Action Bars",
+      "unlock": "Unlock Action Bars"
+    },
     "options": {
       "clickMoveLeft": "Sol Tık",
       "clickMoveRight": "Sağ Tık",
@@ -1158,6 +1163,7 @@ export const tr_TR: EnTranslations = {
       "itemLevelLine": "Eşya Seviyesi {level}",
       "itemScoreLine": "Puan {score}",
       "showSecondaryActionBar": "İkincil Eylem Çubuğunu Göster",
+      "lockActionBars": "Lock Action Bars",
       "showThirdActionBar": "Üçüncü Eylem Çubuğunu Göster",
       "showTargetOfTarget": "Hedefin Hedefini Göster",
       "showAttackButton": "Saldırı Düğmesini Göster",

@@ -1119,6 +1119,11 @@ export const vi_VN: EnTranslations = {
         "refundLog": "Cược bị hủy, {amount} tiền cược của bạn đã được hoàn lại."
       }
     },
+    "actionBar": {
+      "title": "Action Bars",
+      "lock": "Lock Action Bars",
+      "unlock": "Unlock Action Bars"
+    },
     "options": {
       "clickMoveLeft": "Nhấp Trái",
       "clickMoveRight": "Nhấp Phải",
@@ -1158,6 +1163,7 @@ export const vi_VN: EnTranslations = {
       "itemLevelLine": "Cấp Vật Phẩm {level}",
       "itemScoreLine": "Điểm {score}",
       "showSecondaryActionBar": "Hiện Thanh Hành Động Phụ",
+      "lockActionBars": "Lock Action Bars",
       "showThirdActionBar": "Hiển thị thanh hành động thứ ba",
       "showTargetOfTarget": "Hiện Mục Tiêu Của Mục Tiêu",
       "showAttackButton": "Hiển Thị Nút Tấn Công",

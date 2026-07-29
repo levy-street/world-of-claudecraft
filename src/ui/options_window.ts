@@ -377,6 +377,12 @@ export class OptionsWindow {
     if (this.isOpen && this.view === 'controller') this.renderController();
   }
 
+  /** A context-menu setting change can happen while this panel is already open.
+   *  Rebuild the Interface controls so dependent disabled states update at once. */
+  refreshInterfaceControls(): void {
+    if (this.isOpen && this.view === 'interface') this.renderInterface();
+  }
+
   // -------------------------------------------------------------------------
   // View dispatcher
   // -------------------------------------------------------------------------

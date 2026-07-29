@@ -268,6 +268,7 @@ import {
   handleShiftClearContextMenu,
   handleShiftClearKeydown,
 } from './hud/action_bar/action_bar_clear';
+import { ActionBarContextMenu } from './hud/action_bar/action_bar_context_menu';
 import { ActionBarController } from './hud/action_bar/action_bar_controller';
 import {
   ACTION_BAR_ABILITY_SLOTS,
@@ -279,6 +280,7 @@ import {
   captureActionBarLayout,
   planActionBarRestore,
 } from './hud/action_bar/action_bar_layout_sync';
+import { actionBarEditAllowed } from './hud/action_bar/action_bar_lock_core';
 import { ActionBarPainter, type ActionBarSlotElements } from './hud/action_bar/action_bar_painter';
 import {
   ABILITY_ICON_PREFIX,
@@ -1054,6 +1056,24 @@ export class Hud {
   // stop autorun without making Hud own Input or MobileControls.
   onResurrectAtSpiritHealer: (() => void) | null = null;
   private readonly actionBarController: ActionBarController;
+  private readonly actionBarContextMenu = new ActionBarContextMenu({
+    element: () => $('#ctx-menu'),
+    locked: () => this.actionBarsLocked(),
+    setLocked: (locked) => {
+      const hooks = this.optionsHooks;
+      if (!hooks) return;
+      hooks.onSettingChange('lockActionBars', locked);
+      this.optionsWindow.refreshInterfaceControls();
+    },
+    setOpener: (opener) => {
+      this.ctxMenuOpener = opener;
+    },
+    place: (element, x, y, reserveRight, reserveBottom) => {
+      this.placePopupAt(element, x, y, reserveRight, reserveBottom);
+      this.keepPopupOnScreen(element);
+    },
+    bind: (onActivate) => this.bindContextMenuActions(onActivate),
+  });
   // One-shot latch for the login-time action-bar layout reconciliation.
   private actionBarLayoutRestored = false;
   private get hotbarActions(): HotbarAction[] {
@@ -4391,10 +4411,14 @@ export class Hud {
     // The window derives both views itself now, at render time (#2519).
     barActions: () => this.hotbarActions,
     hasFreeSlot: () => this.actionBarController.hasFreeSlot(),
+    actionBarsLocked: () => this.actionBarsLocked(),
     attackOnBar: () => this.attackSlotIsAttack(),
     // Routes through the Interface showAttackButton setting, the same state the
     // options window and the slot-0 right-click drive, so all three stay one.
-    setAttackOnBar: (on) => this.optionsHooks?.settings.set('showAttackButton', on),
+    setAttackOnBar: (on) => {
+      if (this.actionBarsLocked()) return;
+      this.optionsHooks?.onSettingChange('showAttackButton', on);
+    },
     addToBar: (id) => this.addAbilityToHotbar(id),
     removeFromBar: (id) => this.removeAbilityFromHotbar(id),
     hasFormBars: () => this.classHasFormBars(),
@@ -5486,15 +5510,37 @@ export class Hud {
   }
 
   private addAbilityToHotbar(abilityId: string): boolean {
+    if (this.actionBarsLocked()) return false;
     return this.actionBarController.addAbility(abilityId);
   }
 
   private removeAbilityFromHotbar(abilityId: string): boolean {
+    if (this.actionBarsLocked()) return false;
     return this.actionBarController.removeAbility(abilityId);
   }
 
   private resetActiveFormBarToDefault(): void {
+    if (this.actionBarsLocked()) return;
     this.actionBarController.resetActiveBar();
+    this.spellbookWindow.refreshHotbarControls();
+  }
+
+  private actionBarsLocked(): boolean {
+    return this.optionsHooks?.settings.get('lockActionBars') ?? false;
+  }
+
+  private canEditActionBars(): boolean {
+    return actionBarEditAllowed(this.actionBarsLocked());
+  }
+
+  setActionBarsLocked(locked: boolean): void {
+    if (!locked) {
+      this.spellbookWindow.refreshHotbarControls();
+      return;
+    }
+    this.dragAction = null;
+    this.clearMobileHotbarDrag();
+    this.clearActionDropTargets();
     this.spellbookWindow.refreshHotbarControls();
   }
 
@@ -6036,6 +6082,7 @@ export class Hud {
       // without right-click need a way in); the kit fills slots 1+
       this.bindEmpoweredActionHold(btn, () => slot);
       btn.addEventListener('click', () => {
+        if (this.actionBarContextMenu.isOpenFor(btn)) this.closeContextMenu();
         if (this.suppressNextActionClick) {
           this.suppressNextActionClick = false;
           btn.blur();
@@ -6059,10 +6106,15 @@ export class Hud {
       });
       this.attachTooltip(btn, () => {
         if (slot === 0 && this.attackSlotIsAttack()) {
-          return `<div class="tt-title">${esc(t('abilityUi.actionBar.attackName'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackTooltip'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackRemoveHint'))}</div>`;
+          const removeHint = this.actionBarsLocked()
+            ? ''
+            : `<div class="tt-sub">${esc(t('abilityUi.actionBar.attackRemoveHint'))}</div>`;
+          return `<div class="tt-title">${esc(t('abilityUi.actionBar.attackName'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackTooltip'))}</div>${removeHint}`;
         }
         const known = this.abilityForSlot(slot);
-        const clearHint = `<div class="tt-sub">${esc(t('abilityUi.actionBar.clearHint'))}</div>`;
+        const clearHint = this.actionBarsLocked()
+          ? ''
+          : `<div class="tt-sub">${esc(t('abilityUi.actionBar.clearHint'))}</div>`;
         if (known) return this.abilityTooltip(known) + clearHint;
         const item = this.itemForSlot(slot);
         if (item) {
@@ -6079,7 +6131,7 @@ export class Hud {
             clearHint
           );
         }
-        return `<div class="tt-sub">${esc(t('abilityUi.actionBar.emptySlot'))}<br>${esc(t('abilityUi.actionBar.clearHint'))}</div>`;
+        return `<div class="tt-sub">${esc(t('abilityUi.actionBar.emptySlot'))}</div>${clearHint}`;
       });
       if (slot >= 1) {
         // drag an action onto another slot to place or swap it;
@@ -6093,12 +6145,19 @@ export class Hud {
           this.hideTooltip();
         };
         btn.addEventListener('contextmenu', (e) => {
-          handleShiftClearContextMenu(e, clearSlot);
+          if (handleShiftClearContextMenu(e, this.actionBarsLocked(), clearSlot)) return;
+          e.preventDefault();
+          this.actionBarContextMenu.openForEvent(e, btn);
         });
         btn.addEventListener('keydown', (e) => {
-          handleShiftClearKeydown(e, clearSlot);
+          if (handleShiftClearKeydown(e, this.actionBarsLocked(), clearSlot)) return;
+          this.actionBarContextMenu.openForKeyboardEvent(e, btn);
         });
         btn.addEventListener('dragstart', (e) => {
+          if (!this.canEditActionBars()) {
+            e.preventDefault();
+            return;
+          }
           const action = this.actionForSlot(slot);
           if (!action) {
             e.preventDefault();
@@ -6110,6 +6169,7 @@ export class Hud {
           this.hideTooltip();
         });
         btn.addEventListener('dragover', (e) => {
+          if (!this.canEditActionBars()) return;
           if (this.tryAcceptAttackDrag(e, btn, slot, 'over')) return;
           const dragged = this.dragAction?.action ?? this.readDraggedAction(e.dataTransfer);
           if (!dragged) return;
@@ -6127,6 +6187,12 @@ export class Hud {
         });
         btn.addEventListener('dragleave', () => btn.classList.remove('drop-target'));
         btn.addEventListener('drop', (e) => {
+          if (!this.canEditActionBars()) {
+            e.preventDefault();
+            btn.classList.remove('drop-target');
+            this.dragAction = null;
+            return;
+          }
           if (this.tryAcceptAttackDrag(e, btn, slot, 'drop')) return;
           e.preventDefault();
           btn.classList.remove('drop-target');
@@ -6166,30 +6232,42 @@ export class Hud {
         });
         this.bindMobileActionDrag(btn, slot);
       } else {
-        // Slot 0 (Attack). Right-click removes the Attack toggle from the bar
+        // Slot 0 (Attack). Shift-right-click removes the Attack toggle from the bar
         // (Interface option showAttackButton -> off), freeing the slot and its key
         // for a normal action. The Options toggle restores Attack at any time.
         btn.draggable = true;
         const clearAttackSlotAction = () => {
+          if (this.attackSlotIsAttack()) {
+            this.optionsHooks?.onSettingChange('showAttackButton', false);
+            this.hideTooltip();
+            return;
+          }
           if (this.attackSlotAction === null) return;
           this.attackSlotAction = null;
           this.saveAttackSlotAction();
           this.hideTooltip();
         };
         btn.addEventListener('contextmenu', (e) => {
-          if (this.attackSlotIsAttack()) {
-            e.preventDefault();
-            this.optionsHooks?.settings.set('showAttackButton', false);
-            this.hideTooltip();
+          if (handleShiftClearContextMenu(e, this.actionBarsLocked(), clearAttackSlotAction))
             return;
-          }
-          handleShiftClearContextMenu(e, clearAttackSlotAction);
+          e.preventDefault();
+          this.actionBarContextMenu.openForEvent(e, btn);
         });
         btn.addEventListener('keydown', (e) => {
-          if (this.attackSlotIsAttack()) return;
-          handleShiftClearKeydown(e, clearAttackSlotAction);
+          const attackIsFixed = this.attackSlotIsAttack();
+          if (
+            !attackIsFixed &&
+            handleShiftClearKeydown(e, this.actionBarsLocked(), clearAttackSlotAction)
+          )
+            return;
+          if (attackIsFixed && e.shiftKey && (e.key === 'Delete' || e.key === 'Backspace')) return;
+          this.actionBarContextMenu.openForKeyboardEvent(e, btn);
         });
         btn.addEventListener('dragstart', (e) => {
+          if (!this.canEditActionBars()) {
+            e.preventDefault();
+            return;
+          }
           const action = this.actionForSlot(0);
           if (!action) {
             e.preventDefault();
@@ -6202,6 +6280,7 @@ export class Hud {
         });
         // With Attack removed, the freed slot accepts a drag like any other slot.
         btn.addEventListener('dragover', (e) => {
+          if (!this.canEditActionBars()) return;
           if (this.tryAcceptAttackDrag(e, btn, slot, 'over')) return;
           if (this.attackSlotIsAttack()) return;
           if (this.dragAction?.sourceAttackSlot) return;
@@ -6213,6 +6292,12 @@ export class Hud {
         });
         btn.addEventListener('dragleave', () => btn.classList.remove('drop-target'));
         btn.addEventListener('drop', (e) => {
+          if (!this.canEditActionBars()) {
+            e.preventDefault();
+            btn.classList.remove('drop-target');
+            this.dragAction = null;
+            return;
+          }
           if (this.tryAcceptAttackDrag(e, btn, slot, 'drop')) return;
           e.preventDefault();
           btn.classList.remove('drop-target');
@@ -6644,6 +6729,7 @@ export class Hud {
   private bindMobileActionDrag(btn: HTMLButtonElement, slot: number): void {
     btn.addEventListener('pointerdown', (e) => {
       if (!document.body.classList.contains('mobile-touch') || e.pointerType !== 'touch') return;
+      if (!this.canEditActionBars()) return;
       if (this.empoweredAbilityIdForSlot(slot)) return;
       // Any populated slot (ability or item) can be picked up and swapped by
       // touch, matching desktop drag-and-drop which does not special-case
@@ -6737,6 +6823,7 @@ export class Hud {
   private bindMobileRingDrag(btn: HTMLButtonElement, ringIndex: number): void {
     btn.addEventListener('pointerdown', (e) => {
       if (!document.body.classList.contains('mobile-touch') || e.pointerType !== 'touch') return;
+      if (!this.canEditActionBars()) return;
       const sourceSlot = this.mobileSourceSlotForButton(ringIndex);
       if (this.empoweredAbilityIdForSlot(sourceSlot)) return;
       if (!this.actionForSlot(sourceSlot)) return;
@@ -14691,6 +14778,7 @@ export class Hud {
       item.addEventListener('keydown', (ev) => {
         if (ev.key !== 'Enter' && ev.key !== ' ') return;
         ev.preventDefault();
+        ev.stopPropagation();
         activate();
       });
     });
@@ -14842,6 +14930,7 @@ export class Hud {
     el.style.display = 'none';
     el.classList.remove(CTX_MENU_PICKER_CLASS);
     this.ctxMenuOpener = null;
+    this.actionBarContextMenu.onSharedClose();
   }
 
   // -------------------------------------------------------------------------

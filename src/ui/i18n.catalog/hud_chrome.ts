@@ -941,6 +941,11 @@ export const hudChromeStrings = {
   },
   // Click-to-move mouse-button toggle labels (Key Bindings panel). The button id
   // 0/2 maps to these at the HUD render boundary.
+  actionBar: {
+    title: 'Action Bars',
+    lock: 'Lock Action Bars',
+    unlock: 'Unlock Action Bars',
+  },
   options: {
     clickMoveLeft: 'Left Click',
     clickMoveRight: 'Right Click',
@@ -1023,6 +1028,7 @@ export const hudChromeStrings = {
     // Interface panel toggle that reveals the optional second action bar row (off
     // by default). The abilities bound to its slots stay castable via their keybinds.
     showSecondaryActionBar: 'Show Secondary Action Bar',
+    lockActionBars: 'Lock Action Bars',
     // Enabled only while the secondary row is visible. Slots remain reachable
     // through keybinds and the mobile action-ring pages while this row is hidden.
     showThirdActionBar: 'Show Third Action Bar',
@@ -1032,7 +1038,7 @@ export const hudChromeStrings = {
     showTargetOfTarget: 'Show Target of Target',
     // Interface panel toggle for the fixed Attack button in the first action-bar
     // slot (on by default). Off frees that slot for a normal action (drag one in;
-    // its key then casts it). Right-clicking the Attack button flips this off too.
+    // its key then casts it). Shift-right-clicking the Attack button flips this off too.
     showAttackButton: 'Show Attack Button',
     showDailyRewardsChest: 'Show Daily Rewards Chest',
     // Touch-only Graphics panel toggles (mobile combat HUD rework, phase 2).

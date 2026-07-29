@@ -9,7 +9,7 @@ const abilityStringsEn = {
       attackTooltip: 'Toggle auto-attack on your target. Right-clicking an enemy also attacks.',
       // Shown under the Attack tooltip: right-click removes the button from the bar,
       // freeing the slot (and its key) for a normal action. Restored in Options.
-      attackRemoveHint: 'Right-click to remove it from the bar and free the slot.',
+      attackRemoveHint: 'Shift-right-click to remove it from the bar and free the slot.',
       emptySlot: 'Empty slot',
       slotAria: 'Action slot {slot}: {ability}',
       emptySlotAria: 'Action slot {slot}: empty',

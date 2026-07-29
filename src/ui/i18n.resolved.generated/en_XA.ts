@@ -1119,6 +1119,11 @@ export const en_XA: EnTranslations = {
         "refundLog": "[Ɓéţš ʋóíðéð, ýóúŕ {amount} šţáķé ŵáš ŕéţúŕñéð.]"
       }
     },
+    "actionBar": {
+      "title": "[Áçţíóñ Ɓáŕš]",
+      "lock": "[Ļóçķ Áçţíóñ Ɓáŕš]",
+      "unlock": "[Úñļóçķ Áçţíóñ Ɓáŕš]"
+    },
     "options": {
       "clickMoveLeft": "[Ļéƒţ Çļíçķ]",
       "clickMoveRight": "[Ŕíĝĥţ Çļíçķ]",
@@ -1158,6 +1163,7 @@ export const en_XA: EnTranslations = {
       "itemLevelLine": "[Íţéɱ Ļéʋéļ {level}]",
       "itemScoreLine": "[Šçóŕé {score}]",
       "showSecondaryActionBar": "[Šĥóŵ Šéçóñðáŕý Áçţíóñ Ɓáŕ]",
+      "lockActionBars": "[Ļóçķ Áçţíóñ Ɓáŕš]",
       "showThirdActionBar": "[Šĥóŵ Ţĥíŕð Áçţíóñ Ɓáŕ]",
       "showTargetOfTarget": "[Šĥóŵ Ţáŕĝéţ óƒ Ţáŕĝéţ]",
       "showAttackButton": "[Šĥóŵ Áţţáçķ Ɓúţţóñ]",
@@ -6684,7 +6690,7 @@ export const en_XA: EnTranslations = {
     "actionBar": {
       "attackName": "[Áţţáçķ]",
       "attackTooltip": "[Ţóĝĝļé áúţó-áţţáçķ óñ ýóúŕ ţáŕĝéţ. Ŕíĝĥţ-çļíçķíñĝ áñ éñéɱý áļšó áţţáçķš.]",
-      "attackRemoveHint": "[Ŕíĝĥţ-çļíçķ ţó ŕéɱóʋé íţ ƒŕóɱ ţĥé ƀáŕ áñð ƒŕéé ţĥé šļóţ.]",
+      "attackRemoveHint": "[Šĥíƒţ-ŕíĝĥţ-çļíçķ ţó ŕéɱóʋé íţ ƒŕóɱ ţĥé ƀáŕ áñð ƒŕéé ţĥé šļóţ.]",
       "emptySlot": "[Éɱþţý šļóţ]",
       "slotAria": "[Áçţíóñ šļóţ {slot}: {ability}]",
       "emptySlotAria": "[Áçţíóñ šļóţ {slot}: éɱþţý]",

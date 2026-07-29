@@ -1119,6 +1119,11 @@ export const en: EnTranslations = {
         "refundLog": "Bets voided, your {amount} stake was returned."
       }
     },
+    "actionBar": {
+      "title": "Action Bars",
+      "lock": "Lock Action Bars",
+      "unlock": "Unlock Action Bars"
+    },
     "options": {
       "clickMoveLeft": "Left Click",
       "clickMoveRight": "Right Click",
@@ -1158,6 +1163,7 @@ export const en: EnTranslations = {
       "itemLevelLine": "Item Level {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Show Secondary Action Bar",
+      "lockActionBars": "Lock Action Bars",
       "showThirdActionBar": "Show Third Action Bar",
       "showTargetOfTarget": "Show Target of Target",
       "showAttackButton": "Show Attack Button",
@@ -6684,7 +6690,7 @@ export const en: EnTranslations = {
     "actionBar": {
       "attackName": "Attack",
       "attackTooltip": "Toggle auto-attack on your target. Right-clicking an enemy also attacks.",
-      "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
+      "attackRemoveHint": "Shift-right-click to remove it from the bar and free the slot.",
       "emptySlot": "Empty slot",
       "slotAria": "Action slot {slot}: {ability}",
       "emptySlotAria": "Action slot {slot}: empty",
