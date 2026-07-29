@@ -148,6 +148,18 @@ function harness(
 }
 
 describe('nameplate [AI] account tag', () => {
+  it('hides a painted plate when the owning render group is hidden', () => {
+    const target = entity({ id: 2 });
+    const { painter, v } = harness(target);
+    painter.update(true);
+    expect(v.nameplateDisplay).toBe('');
+
+    v.group.visible = false;
+    painter.update(true);
+    expect(v.nameplateDisplay).toBe('none');
+    expect(v.nameplate.style.display).toBe('none');
+  });
+
   it('draws no tag for a normal player', () => {
     const target = entity({ id: 2 });
     const { painter, v } = harness(target);

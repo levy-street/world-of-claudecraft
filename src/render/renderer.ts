@@ -6210,7 +6210,7 @@ export class Renderer {
     sharedUniforms.uTime.value = this.time;
     // Scene-cued harbor ship motion and transient deck visual lifecycle. This
     // performs one cheap stand-in decision per ship handle even with no live cue.
-    updateHarborShips(this.sim.player, dt);
+    const harborDeckStandInActive = updateHarborShips(this.sim.player, dt);
     for (const [id, remaining] of this.waterJetVisualChannels) {
       const next = remaining - dt;
       if (next <= 0) this.waterJetVisualChannels.delete(id);
@@ -6340,7 +6340,10 @@ export class Renderer {
       const d2 = cdx * cdx + cdz * cdz;
       const isSelf = id === p.id;
       if (isSelf) {
-        v.group.visible = true;
+        // The authoritative rider is already parked at the destination ship
+        // while the moving clone carries the voyage shots. The park cue drops
+        // the clone under black, and this real rig returns on the next frame.
+        v.group.visible = !harborDeckStandInActive;
         v.isFar = false;
         v.visual?.setShadow(true);
         v.visual?.setProxyShadow(false);

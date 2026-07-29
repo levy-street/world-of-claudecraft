@@ -122,6 +122,13 @@ export class NameplatePainter {
     for (const [id, v] of this.views) {
       const e = world.entities.get(id);
       if (!e) continue;
+      // Entity-level render visibility also owns its DOM label. In particular,
+      // voyage shots hide the parked local rig while its moving deck stand-in
+      // is live, so its optional self nameplate must not remain at the berth.
+      if (!v.group.visible) {
+        this.hideNameplate(v);
+        continue;
+      }
       // the saddle lift rides the anchor so a mounted player's plate clears the head
       const plan = nameplatePlanInto(
         this.plan,

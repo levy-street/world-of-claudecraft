@@ -480,6 +480,9 @@ export function interact(ctx: SimContext, pid?: number): void {
         lootCorpse(ctx, target.id, p.id);
         return;
       }
+      // An explicit target on inert scenery consumes the interact. Falling
+      // through would activate an unrelated nearby NPC or object instead.
+      if (target.kind === 'object' && !target.lootable) return;
       if (target.kind === 'object' && target.lootable) {
         if (target.templateId === 'dungeon_door' && target.dungeonId) {
           ctx.enterDungeon(target.dungeonId, p.id);

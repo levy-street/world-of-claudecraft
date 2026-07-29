@@ -12,7 +12,10 @@ const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url));
 const DEFAULT_OUT_ROOT = path.join(REPO_ROOT, 'docs/screenshots/cinematics');
 const GAME_URL = process.env.GAME_URL ?? 'http://localhost:5173';
 const VIEWPORT = { width: 1280, height: 720, deviceScaleFactor: 1 };
-const WORLD_BOOT_TIMEOUT_MS = 120_000;
+// Cold SwiftShader boots (the offline entry's asset build) can exceed two
+// minutes on a busy machine; the cap is generous because a genuine hang is
+// caught by the per-scene watchdog anyway.
+const WORLD_BOOT_TIMEOUT_MS = 300_000;
 const SCENE_START_TIMEOUT_MS = 10_000;
 const POLL_MS = 250;
 const WORLD_SEED_FALLBACK = 20061;
@@ -174,7 +177,7 @@ async function readSceneRegistry(page) {
       const cameraCuts = [];
       const preparePoints = new Map();
       let firstCameraPoint = null;
-      let harborShipTarget = null;
+      let walkTarget = null;
       const addPoint = (point) => {
         if (!point || !Number.isFinite(point.x) || !Number.isFinite(point.z)) return;
         const flat = { x: point.x, z: point.z };
@@ -183,9 +186,7 @@ async function readSceneRegistry(page) {
       };
 
       for (const op of def.ops) {
-        if (op.kind === 'prop' && op.target.startsWith('harbor_ship_')) {
-          harborShipTarget ??= op.target;
-        }
+        if (op.kind === 'playerWalk') walkTarget = op.to;
         if (op.kind !== 'camera') continue;
         cameraCuts.push(op.at);
         const shot = op.shot;
@@ -204,18 +205,16 @@ async function readSceneRegistry(page) {
       }
 
       let stagePoint = firstCameraPoint ?? { x: current.x, z: current.z };
-      // Stage where the fare flow leaves the rider: the DESTINATION harbor's
-      // arrival point (ashore end), not its boarding deck; the scene's walk
-      // op is authored from there.
-      if (harborShipTarget === 'harbor_ship_mainland') {
+      // Stage where the fare flow leaves the rider: the destination ship's
+      // deck arrival point, where the scene starts its gangplank walk.
+      const arrivalHarbor = harbors.HARBORS.find(
+        (harbor) =>
+          walkTarget && harbor.gangplank.x === walkTarget.x && harbor.gangplank.z === walkTarget.z,
+      );
+      if (arrivalHarbor) {
         stagePoint = {
-          x: harbors.GULLHAVEN_HARBOR.arrival.x,
-          z: harbors.GULLHAVEN_HARBOR.arrival.z,
-        };
-      } else if (harborShipTarget === 'harbor_ship_gullhaven') {
-        stagePoint = {
-          x: harbors.MAINLAND_HARBOR.arrival.x,
-          z: harbors.MAINLAND_HARBOR.arrival.z,
+          x: arrivalHarbor.deckArrival.x,
+          z: arrivalHarbor.deckArrival.z,
         };
       }
       preparePoints.set(pointKey(stagePoint), stagePoint);
@@ -442,6 +441,9 @@ async function main() {
   const browser = await puppeteer.launch({
     executablePath: BROWSER_PATH,
     headless: 'new',
+    // Software rendering can hold a single evaluate past puppeteer's 180s
+    // default while the offline world builds; the boot cap governs failure.
+    protocolTimeout: 360_000,
     args: [
       `--window-size=${VIEWPORT.width},${VIEWPORT.height}`,
       '--use-angle=swiftshader',
