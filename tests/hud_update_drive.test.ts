@@ -395,16 +395,16 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
     call: 'this.buffBarPainter.paint',
     band: 'frame',
-    gate: 'cadenceDue(this.lastBuffBarPaintAt, now, auraRefreshIntervalMs(fxTier))',
+    gate: '',
     surface: 'chrome',
-    why: 'the buff row, tier-coarsened (full tiers every frame, low ~4 Hz)',
+    why: 'the SELF buff row: never tier-gated, every frame on every graphics preset (the debuff row below shares this rule; only the TARGET debuffs strip is tier-coarsened)',
   },
   {
     call: 'this.debuffBarPainter.paint',
     band: 'frame',
-    gate: 'cadenceDue(this.lastBuffBarPaintAt, now, auraRefreshIntervalMs(fxTier))',
+    gate: '',
     surface: 'chrome',
-    why: 'the debuff row, on the same latch as the buff row',
+    why: 'the SELF debuff row: never tier-gated (your own debuffs are the ACTIONABLE read, docs/design/graphics-settings-fairness.md), so it paints every frame on every graphics preset, unlike the target debuffs strip',
   },
   {
     call: 'this.targetReannounce.mark',

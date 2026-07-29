@@ -59,9 +59,12 @@ What each knob does, and why it is gameplay-neutral:
 - Auras, `src/ui/auras_painter.ts`: on low, the visible-count cap is DEBUFF-PRIORITY. The
   player buff bar (`createAurasView('all')`) interleaves buffs and debuffs in sim-application
   order; the cap sheds BUFF overflow only (`if (!s.isDebuff && rendered >= cap) continue`), so
-  a debuff is never culled. Full tiers are byte-identical (cap is +Infinity). The aura strip
-  also coarsens its repaint cadence to about 4 Hz on low (at the human reaction floor and the
-  same rate the party frames run at on every tier).
+  a debuff is never culled. Full tiers are byte-identical (cap is +Infinity). The player's OWN
+  buff and debuff bars are never tier-gated: they repaint every frame on every preset, because
+  your own debuffs are the ACTIONABLE read named above. Only the TARGET's (non-self) debuffs
+  strip coarsens its repaint cadence to about 4 Hz on low (at the human reaction floor and the
+  same rate the party frames run at on every tier), the same non-self throttle the target frame
+  body uses.
 - Target frame, hud + `unit_frame_painter.ts`: on low, the target frame BODY (HP / level /
   portrait) refreshes at about 10 Hz; a target SWAP bypasses the throttle
   (`nonSelfRepaintDue`), and the cast bar is painted OUTSIDE the throttle (full rate, so
