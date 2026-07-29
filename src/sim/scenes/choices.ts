@@ -289,7 +289,7 @@ export function answerSceneChoice(
   }
   for (const choice of ctx.activeChoices.values()) {
     if (choice.audiencePid !== undefined || choice.choiceId !== choiceId) continue;
-    if (choice.leaderPid !== r.meta.entityId) return false;
+    if (choice.leaderPid !== r.meta.entityId) continue;
     resolveChoice(ctx, choice, optionId);
     return true;
   }

@@ -446,9 +446,10 @@ export function requestSceneSkip(ctx: SimContext, pid?: number): boolean {
   return false;
 }
 
-// Per-tick driver, called from the Sim tick body after scenarios (a stage
-// that cues a scene arms it the same tick; ops start next tick). Zero work
-// while no scene is live.
+// Per-tick driver, called from the Sim tick body after scenarios. A stage
+// that cues a scene arms it and emits at:0 ops in the same tick; scripted
+// player movement starts next tick because the player phase already ran.
+// Zero work while no scene is live.
 export function updateScenes(ctx: SimContext): void {
   for (const playback of [...ctx.scenePlaybacks.values()]) {
     const def = SCENES[playback.sceneId];

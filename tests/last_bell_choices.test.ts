@@ -180,6 +180,35 @@ describe('dialogue choices', () => {
     ]);
   });
 
+  it('routes a shared choice id to the answering leader’s own story claim', () => {
+    const sim = makeSim();
+    const a = sim.playerId;
+    const b = sim.addPlayer('mage', 'Bet');
+    sim.ctx.players
+      .get(b)
+      ?.questLog.set(QUEST_ID, { questId: QUEST_ID, counts: [0], state: 'active' });
+
+    expect(startScenario(sim.ctx, 'sc_test_vote', a)).toBe(true);
+    expect(startScenario(sim.ctx, 'sc_test_vote', b)).toBe(true);
+    collect(sim, 2);
+
+    const claims = [...sim.ctx.activeChoices.values()].filter(
+      (choice) => choice.choiceId === 'ch_test_vote',
+    );
+    expect(claims.map((choice) => choice.leaderPid).sort((x, y) => x - y)).toEqual(
+      [a, b].sort((x, y) => x - y),
+    );
+
+    expect(answerSceneChoice(sim.ctx, 'ch_test_vote', 'against', b)).toBe(true);
+    expect(sim.ctx.players.get(b)?.campaignFlags.get('lastBellVote')).toBe('against');
+    expect(sim.ctx.players.get(a)?.campaignFlags.has('lastBellVote')).toBe(false);
+    expect([...sim.ctx.activeChoices.values()].map((choice) => choice.leaderPid)).toEqual([a]);
+
+    expect(answerSceneChoice(sim.ctx, 'ch_test_vote', 'for', a)).toBe(true);
+    expect(sim.ctx.players.get(a)?.campaignFlags.get('lastBellVote')).toBe('for');
+    expect(sim.ctx.activeChoices.size).toBe(0);
+  });
+
   it('the window closes on the default so a scene never deadlocks', () => {
     const sim = makeSim();
     startScenario(sim.ctx, 'sc_test_vote');
