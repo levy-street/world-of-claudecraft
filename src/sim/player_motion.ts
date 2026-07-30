@@ -198,8 +198,20 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
   // Steepness is of the RIDDEN surface (submerged ground clamps to the
   // waterline), so an uneven lake bed never strips control from a wader and
   // slides it back into deep water.
-  const steepGround =
+  //
+  // The steepness gate reads a 1-yard-CELL memo (rideSteepnessAt rounds to the
+  // cell): a level point one step from a sheer riser inherits the cell's slope
+  // and reads steep though the ground under the feet is flat. Stripping control
+  // off that alone froze the body against the riser base, input disabled and no
+  // downhill to slide off (players stuck all along the Last Keep's west terrace
+  // edge). So the control strip also requires an ACTUAL downhill, sampled at the
+  // EXACT position (terrainDownhill): genuinely steep ground still strips
+  // control and slides, but a flat shoulder the cell memo over-reads keeps
+  // control, and the wall/contour gate below still refuses the climb.
+  const steepFlagged =
     p.onGround && !swimming && rideSteepnessAt(p.pos.x, p.pos.z, deps.seed) > MAX_CLIMB_SLOPE;
+  const steepSlide = steepFlagged ? terrainDownhill(p.pos.x, p.pos.z, deps.seed) : null;
+  const steepGround = steepSlide !== null;
   // Move-to-cancel: any movement input during a summon channel cancels the cast.
   // Dismount channels (mountCastKey === '') remain fully rooted (handled by mountLocked below).
   if (p.mountCastRemaining > 0 && p.mountCastKey !== '' && hasMoveInput) {
@@ -249,7 +261,7 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
   // Also what lets a jump STARTED in place drift forward, and a fall off a
   // ledge stay steerable, instead of the old frozen-at-takeoff trajectory.
   const airSteering = moving && !p.onGround && !swimming;
-  const slide = steepGround ? terrainDownhill(p.pos.x, p.pos.z, deps.seed) : null;
+  const slide = steepSlide;
   if (slide || movingOnGround || airSteering || (!p.onGround && (p.vx !== 0 || p.vz !== 0))) {
     if (slide && p.castingAbility) deps.cancelCast(p);
     if (airSteering) {
