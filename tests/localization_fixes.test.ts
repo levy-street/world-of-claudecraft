@@ -586,6 +586,26 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
     setLanguage('en');
   });
 
+  it('every Undermount wing 1 and 2 mechanic resolves through the aura matcher', () => {
+    setLanguage('zh_CN');
+    for (const name of [
+      'Glazing',
+      'Cinder-Toad',
+      'Anneal',
+      'Kiln Fury',
+      'Scorched',
+      'Chilled',
+      'Tempering',
+      'Tempering Clash',
+      'Cinder Arc',
+      'Temper Sweep',
+      'Forge Draft',
+    ]) {
+      expect(localizeSimAuraName(name), name).not.toBeNull();
+    }
+    setLanguage('en');
+  });
+
   it('helper-returned pet error strings resolve through the matcher (the S3 scanner cannot see them)', () => {
     // noPetError (src/sim/pet/pet_commands.ts) builds its string inside a ternary,
     // and the delve arm 'Pets are not allowed inside the delves.' is a literal in

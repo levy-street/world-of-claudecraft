@@ -7,13 +7,14 @@
 // src/sim/encounters/odrenn.ts and the section-1 constants are authored.
 
 import { describe, expect, it } from 'vitest';
+import { MOBS } from '../src/sim/data';
 import { resetOdrennEncounter } from '../src/sim/encounters/odrenn';
 import {
   ODRENN_ARC_RADIUS,
   ODRENN_HYSTERESIS_YD,
   ODRENN_MARK_BURN_RADIUS,
 } from '../src/sim/encounters/undermount';
-import { enterDungeon, instanceKeyFor } from '../src/sim/instances/dungeons';
+import { enterDungeon, heroicLockoutId, instanceKeyFor } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 
@@ -86,6 +87,28 @@ function ticks(sim: AnySim, n: number): void {
 }
 
 describe('Odrenn the Temperer (wing 2)', () => {
+  it('authors the exact guaranteed legs and 0.55 bonus groups', () => {
+    const loot = MOBS[ODRENN].loot;
+    const guaranteed = loot.filter((entry) => entry.rollGroup === 'undermount_wing2_guaranteed');
+    const bonus = loot.filter((entry) => entry.rollGroup === 'undermount_wing2_bonus');
+    expect(guaranteed.map((entry) => entry.itemId)).toEqual([
+      'crownforged_warleggings',
+      'nighttalon_prowlers',
+      'soulflame_kilt',
+      'stormcallers_legwraps',
+    ]);
+    expect(guaranteed.reduce((sum, entry) => sum + entry.chance, 0)).toBe(1);
+    expect(bonus.map((entry) => [entry.itemId, entry.chance])).toEqual([
+      ['the_even_temper', 0.12],
+      ['cinderarc_odrenns_rod', 0.12],
+      ['twicetempered_girdle', 0.1],
+      ['ashwalk_sandals', 0.08],
+      ['quenchsilk_cord', 0.07],
+      ['slakeleather_belt', 0.06],
+    ]);
+    expect(bonus.reduce((sum, entry) => sum + entry.chance, 0)).toBeCloseTo(0.55);
+  });
+
   it('marks every living raider with exactly one geography mark', () => {
     const sim = makeSim();
     const { boss, pids } = pullOdrenn(sim, 2);
@@ -187,5 +210,59 @@ describe('Odrenn the Temperer (wing 2)', () => {
     const p = sim.entities.get(pids[0]) as AnyEntity;
     expect(hasAura(p, SCORCHED) || hasAura(p, CHILLED)).toBe(false);
     expect((boss as any).odrenn).toBeUndefined();
+  });
+
+  it('heroic entry tunes Odrenn and his kill pays heroic loot and lockout', () => {
+    const sim = makeSim(19);
+    const pid = sim.addPlayer('warrior', 'Solo');
+    const meta = metaOf(sim, pid);
+    meta.undermountCleared.add('undermount_wing1');
+    sim.setDungeonDifficulty('heroic', pid);
+    enterDungeon(sim.ctx, WING2, pid);
+    const inst = claimFor(sim, WING2, pid);
+    const boss = bossIn(sim, inst, ODRENN);
+    const player = sim.entities.get(pid) as AnyEntity;
+    expect(boss.maxHp).toBeGreaterThan(48000);
+    sim.dealDamage(player, boss, boss.hp + 1, false, 'physical', null, 'hit', true);
+    const ids = (boss.loot?.items ?? []).map((slot: any) => slot.itemId);
+    expect(ids.every((id: string) => id.startsWith('heroic_'))).toBe(true);
+    expect(
+      ids.filter((id: string) =>
+        [
+          'heroic_crownforged_warleggings',
+          'heroic_nighttalon_prowlers',
+          'heroic_soulflame_kilt',
+          'heroic_stormcallers_legwraps',
+        ].includes(id),
+      ),
+    ).toHaveLength(1);
+    expect(meta.raidLockouts.has(heroicLockoutId(WING2))).toBe(true);
+    expect(meta.deedStats.dungeonClears[`${WING2}:heroic`]).toBe(1);
+  });
+
+  it('normal Odrenn pays base loot, deed credit, and the normal daily lockout', () => {
+    const sim = makeSim(29);
+    const pid = sim.addPlayer('warrior', 'Solo');
+    const meta = metaOf(sim, pid);
+    meta.undermountCleared.add('undermount_wing1');
+    enterDungeon(sim.ctx, WING2, pid);
+    const inst = claimFor(sim, WING2, pid);
+    const boss = bossIn(sim, inst, ODRENN);
+    const player = sim.entities.get(pid) as AnyEntity;
+    sim.dealDamage(player, boss, boss.hp + 1, false, 'physical', null, 'hit', true);
+    const ids = (boss.loot?.items ?? []).map((slot: any) => slot.itemId);
+    expect(ids.some((id: string) => id.startsWith('heroic_'))).toBe(false);
+    expect(
+      ids.filter((id: string) =>
+        [
+          'crownforged_warleggings',
+          'nighttalon_prowlers',
+          'soulflame_kilt',
+          'stormcallers_legwraps',
+        ].includes(id),
+      ),
+    ).toHaveLength(1);
+    expect(meta.deedStats.dungeonClears[WING2]).toBe(1);
+    expect(meta.raidLockouts.has(WING2)).toBe(true);
   });
 });

@@ -27,6 +27,48 @@ import {
 const CHEST_TRIO = ['hollowbone_hauberk', 'gravewoven_raiment', 'cryptstalker_jerkin'];
 const WEAPON_TRIO = ['gravecaller_blade', 'widowfang_dirk', 'gravecaller_staff'];
 
+const UNDERMOUNT_ILVL_33_ITEMS = [
+  ['slag_tempered_sabatons', 'Slag-Tempered Sabatons', 15],
+  ['glasswalker_treads', 'Glasswalker Treads', 15],
+  ['twice_fired_slippers', 'Twice-Fired Slippers', 15],
+  ['stokebrand_striders', 'Stokebrand Striders', 15],
+  ['saans_stoking_iron', "Saan's Stoking Iron", 23],
+  ['glassblowers_shiv', "Glassblower's Shiv", 23],
+  ['sluicebearer', 'Sluicebearer', 23],
+  ['cindertoad_signet', 'Cindertoad Signet', 14],
+  ['ring_of_the_first_quench', 'Ring of the First Quench', 14],
+  ['coalglow_band', 'Coalglow Band', 14],
+  ['crownforged_warleggings', 'Crownforged Warleggings', 21],
+  ['nighttalon_prowlers', 'Nighttalon Prowlers', 21],
+  ['soulflame_kilt', 'Soulflame Kilt', 21],
+  ['stormcallers_legwraps', "Stormcaller's Legwraps", 21],
+  ['the_even_temper', 'The Even Temper', 23],
+  ['cinderarc_odrenns_rod', "Cinderarc, Odrenn's Rod", 23],
+  ['twicetempered_girdle', 'Twicetempered Girdle', 16],
+  ['ashwalk_sandals', 'Ashwalk Sandals', 15],
+  ['quenchsilk_cord', 'Quenchsilk Cord', 16],
+  ['slakeleather_belt', 'Slakeleather Belt', 16],
+] as const;
+
+const UNDERMOUNT_RATING_ALLOWANCES = [
+  ['glasswalker_treads', 'critRating', 40],
+  ['stokebrand_striders', 'hasteRating', 40],
+  ['saans_stoking_iron', 'hasteRating', 65],
+  ['glassblowers_shiv', 'critRating', 65],
+  ['cindertoad_signet', 'armor', 40],
+  ['ring_of_the_first_quench', 'critRating', 40],
+  ['coalglow_band', 'critRating', 40],
+  ['crownforged_warleggings', 'critRating', 40],
+  ['nighttalon_prowlers', 'critRating', 40],
+  ['soulflame_kilt', 'hasteRating', 40],
+  ['stormcallers_legwraps', 'hasteRating', 40],
+  ['the_even_temper', 'critRating', 65],
+  ['cinderarc_odrenns_rod', 'hasteRating', 65],
+  ['ashwalk_sandals', 'hasteRating', 40],
+  ['quenchsilk_cord', 'hasteRating', 40],
+  ['slakeleather_belt', 'critRating', 40],
+] as const;
+
 describe('item level: source derivation', () => {
   it('derives the drop level from the dropping mob band', () => {
     // The chest trio drops from the level-7 chapel rare elites.
@@ -197,6 +239,40 @@ describe('itemScore', () => {
 });
 
 describe('item level: raid tier', () => {
+  it('pins every wing 1 and wing 2 drop to its exact ilvl 33 primary budget', () => {
+    for (const [id, name, budget] of UNDERMOUNT_ILVL_33_ITEMS) {
+      const item = ITEMS[id];
+      expect(item?.name, id).toBe(name);
+      expect(itemSourceLevel(id), id).toBe(24);
+      expect(itemFromRaid(id), id).toBe(true);
+      expect(itemLevel(item), id).toBe(33);
+      expect(expectedStatBudget(item), id).toBe(budget);
+      expect(primaryStatSum(item), id).toBe(budget);
+    }
+    expect(ITEMS.crownforged_warleggings.set).toBe('crownforged');
+    expect(ITEMS.nighttalon_prowlers.set).toBe('nighttalon');
+    expect(ITEMS.soulflame_kilt.set).toBe('soulflame');
+    expect(ITEMS.stormcallers_legwraps.set).toBe('stormcallers');
+  });
+
+  it('pins Undermount combat ratings to the raid-tier allowances', () => {
+    for (const [id, stat, allowance] of UNDERMOUNT_RATING_ALLOWANCES) {
+      const item = ITEMS[id];
+      const actual = stat === 'armor' ? item.stats?.armor : item[stat];
+      expect(actual, `${id}.${stat}`).toBe(allowance);
+    }
+  });
+
+  it('prices heroic Undermount variants above the normal raid tier', () => {
+    for (const [id] of UNDERMOUNT_ILVL_33_ITEMS) {
+      const heroic = ITEMS[`heroic_${id}`];
+      expect(heroic?.heroicOf, id).toBe(id);
+      expect(itemLevel(heroic), id).toBe(37);
+      expect(primaryStatSum(heroic), id).toBe(expectedStatBudget(heroic));
+      expect(heroic?.set, id).toBe(ITEMS[id].set);
+    }
+  });
+
   it('flags raid (10-player) drops and not dungeon (5-player) drops', () => {
     // Nythraxis raid loot vs Korzul 5-player dungeon loot, both from level-20 bosses.
     expect(itemFromRaid('crownforged_dreadhelm')).toBe(true);

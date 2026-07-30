@@ -32,12 +32,19 @@ describe('heroic loot flair: variant generation', () => {
         e.itemId ? [e.itemId] : [],
       ),
     );
+    const undermountBases = new Set(
+      ['vosh_the_glazier', 'saan_the_stoker', 'odrenn_the_temperer'].flatMap((bossId) =>
+        (MOBS[bossId]?.loot ?? []).flatMap((entry: any) => (entry.itemId ? [entry.itemId] : [])),
+      ),
+    );
     const all = variants();
     expect(all.length).toBeGreaterThan(0);
     for (const v of all) {
       expect(['epic', 'rare', 'legendary']).toContain(v.quality);
       if (raidBases.has(v.heroicOf ?? '')) {
         expect(itemLevel(v), v.id).toBe(v.quality === 'legendary' ? 37 : 33);
+      } else if (undermountBases.has(v.heroicOf ?? '')) {
+        expect(itemLevel(v), v.id).toBe(37);
       } else {
         expect(itemLevel(v), v.id).toBe(v.quality === 'epic' ? 28 : 25);
       }

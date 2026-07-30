@@ -56,9 +56,9 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 221 deeds worth 2730 total Renown', () => {
-    expect(DEED_ORDER.length).toBe(221);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2730);
+  it('ships exactly 225 deeds worth 2770 total Renown', () => {
+    expect(DEED_ORDER.length).toBe(225);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2770);
   });
 
   it('ships the audited per-category counts', () => {
@@ -67,7 +67,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     expect(byCategory).toEqual({
       progression: 50,
       combat: 10,
-      dungeon: 29,
+      dungeon: 33,
       delve: 13,
       chronicle: 24,
       collection: 28,
@@ -122,7 +122,34 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // Professions 2.0 tail (the release base merge put that tail first).
       'dgn_wildheart_basin',
       'dgn_wildheart_basin_heroic',
+      'dgn_undermount_kiln_keepers',
+      'dgn_undermount_kiln_keepers_heroic',
+      'dgn_undermount_odrenn',
+      'dgn_undermount_odrenn_heroic',
     ]);
+    expect(DEEDS.dgn_undermount_kiln_keepers.renown).toBe(10);
+    expect(DEEDS.dgn_undermount_kiln_keepers.trigger).toEqual({
+      kind: 'dungeonClears',
+      dungeonId: 'undermount_wing1',
+      count: 1,
+    });
+    expect(DEEDS.dgn_undermount_kiln_keepers_heroic.trigger).toEqual({
+      kind: 'dungeonClears',
+      dungeonId: 'undermount_wing1',
+      difficulty: 'heroic',
+      count: 1,
+    });
+    expect(DEEDS.dgn_undermount_odrenn.trigger).toEqual({
+      kind: 'dungeonClears',
+      dungeonId: 'undermount_wing2',
+      count: 1,
+    });
+    expect(DEEDS.dgn_undermount_odrenn_heroic.trigger).toEqual({
+      kind: 'dungeonClears',
+      dungeonId: 'undermount_wing2',
+      difficulty: 'heroic',
+      count: 1,
+    });
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin.trigger).toEqual({
@@ -329,7 +356,9 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // Re-baselined at the release/v0.30.0 base merge: the catalog appends the
   // Wildheart Basin dungeon deed pair (2 new deeds); no shipped
   // trigger or renown changed.
-  const FROZEN_CATALOG_SHA256 = '7e6b910bfc0b7a9a4635d7df67ee6c22691edb583a8bb59355d8a5063568ee75';
+  // Re-baselined for four appended Undermount wing 1 and 2 first-kill deeds;
+  // no shipped trigger or renown changed.
+  const FROZEN_CATALOG_SHA256 = 'a97eff5e666f7eaff86803504ba814e5201dd68677641154f35a3861398010c7';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -473,7 +502,7 @@ describe('table shape', () => {
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('dgn_wildheart_basin_heroic');
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('dgn_undermount_odrenn_heroic');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

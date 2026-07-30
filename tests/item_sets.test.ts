@@ -149,14 +149,14 @@ describe('aggregateSetBonuses (pure resolver)', () => {
 describe('item set tooltip model', () => {
   it('counts each set as its distinct equip slots (base + all heroic versions are one piece)', () => {
     const counts = itemSetMemberCounts();
-    // The t2 sets are 5 slots (soulflame cloth is 4). The normal piece, its
+    // The wing 2 legs bring every t2 set to 5 distinct slots. The normal piece, its
     // auto-generated heroic variant, and any bespoke heroic raid piece for the
     // same slot all collapse to one member, so the "X/N" denominator reflects the
     // real number of collectible pieces (not the parallel heroic-variant ids).
-    expect(counts.crownforged).toBe(4);
-    expect(counts.nighttalon).toBe(4);
-    expect(counts.soulflame).toBe(4);
-    expect(counts.stormcallers).toBe(4);
+    expect(counts.crownforged).toBe(5);
+    expect(counts.nighttalon).toBe(5);
+    expect(counts.soulflame).toBe(5);
+    expect(counts.stormcallers).toBe(5);
     // Leveling haste kits: 3 pieces each.
     expect(counts.vale_arcanist).toBe(3);
     expect(counts.boundstone_vanguard).toBe(3);

@@ -449,4 +449,18 @@ describe('item webp icons', () => {
       );
     }
   });
+
+  it('K) heroic Undermount weapons inherit their base rendered thumbnails', () => {
+    for (const id of [
+      'saans_stoking_iron',
+      'glassblowers_shiv',
+      'sluicebearer',
+      'the_even_temper',
+      'cinderarc_odrenns_rod',
+    ]) {
+      expect(iconDataUrl('item', `heroic_${id}`), id).toBe(
+        `/ui/weapons/${ITEM_WEAPON_VARIANTS[id]}.jpg`,
+      );
+    }
+  });
 });
