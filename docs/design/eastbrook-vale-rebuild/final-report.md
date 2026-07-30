@@ -263,9 +263,9 @@ with the current bank rebuild's hashes or measurements.
 The bank was rebuilt from its Eastbrook turnaround while retaining its exact
 `7 x 7.8 x 5.5` runtime envelope, two materials, two primitives, and two named sockets. The
 shipping bank is `52,504` bytes and `3,104` triangles (`2,928` opaque and `176` emissive), with
-SHA-256 `0307318abca6a245c47bd9f1dc5b411960adbf0f3b6f06340e36fdc1a53e2409`.
+SHA-256 `dd665a7f89cd14acc9b4e984449f17bbc29184f94ab23867f26aa2aceac6908d`.
 Its source fingerprint is
-`68fd598d1794136685b8d0dd401fe12b9f6db390580a44938709a611a3412597`.
+`46e1d67e363309fa96bdd1d8ecbc7cbca428fa700798a56d341369936f80ffe5`.
 
 The rebuilt facade keeps the arched entrance visible, aligns the teller counter with its awning,
 posts, and socket, and leaves the secure alcove empty so the separate runtime banker chest is not
