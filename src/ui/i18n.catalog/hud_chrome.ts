@@ -1009,6 +1009,12 @@ export const hudChromeStrings = {
     // Interface panel toggle: loot corpses by walking past them (off by default).
     walkByAutoloot: 'Walk-by Autoloot',
     groundReticle: 'Ground-Targeting Reticle',
+    // Interface panel toggle + sliders: the world-space rune and crescents drawn
+    // under a character running a persistent exclusive self-buff (a paladin aura,
+    // a warrior stance or shout, a hunter aspect). Presentation only.
+    showAuraSigils: 'Aura Sigils',
+    auraSigilOpacity: 'Aura Sigil Opacity',
+    auraSigilScale: 'Aura Sigil Size',
     // Interface panel toggle: Clique-style mouseover casting of friendly abilities
     // on the hovered party frame (on by default).
     mouseoverCast: 'Mouseover Cast on Party Frames',

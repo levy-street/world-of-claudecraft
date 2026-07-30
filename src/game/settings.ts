@@ -44,6 +44,12 @@ export const SETTING_RANGES = {
   // to Input on boot via the startup apply-all loop and on Reset (issue 1657).
   cameraZoom: { min: 3, max: 22, def: 12 },
   renderScale: { min: 0.5, max: 1, def: 1 },
+  // Aura sigils: the ground rune + flanking crescents drawn under a character
+  // running a persistent exclusive self-buff (paladin aura, warrior stance or
+  // shout, hunter aspect). Opacity defaults below full so a party of paladins
+  // does not wash out the floor; scale lets a player shrink them out of the way.
+  auraSigilOpacity: { min: 0, max: 1, def: 0.65 },
+  auraSigilScale: { min: 0.5, max: 1.5, def: 1 },
   fullscreen: { min: 0, max: 1, def: 1 },
   // on by default: post-cap players see their overflow/virtual-level bar; turn
   // off for the classic static "MAX LEVEL" text (Max-Level XP Overflow)
@@ -208,6 +214,10 @@ export const BOOL_SETTINGS = {
   partyFrameShowResource: { def: true },
   partyFrameShowAbsorbs: { def: true },
   partyFrameShowAuras: { def: true },
+
+  // on by default: draw the world-space sigil under a character running an
+  // exclusive self-buff. Purely presentational — the buff itself is unaffected.
+  showAuraSigils: { def: true },
   partyFrameShowSelf: { def: false },
 
   // --- Interface & Comfort pack (booleans). ---

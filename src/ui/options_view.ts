@@ -432,6 +432,9 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
       boolToggle(s, 'showItemLevel', 'hudChrome.options.showItemLevel'),
       boolToggle(s, 'showOwnNameplate', 'hudChrome.options.showOwnNameplate'),
       boolToggle(s, 'showPlayerNameplates', 'hudChrome.options.showPlayerNameplates'),
+      boolToggle(s, 'showAuraSigils', 'hudChrome.options.showAuraSigils'),
+      slider(s, 'auraSigilOpacity', 'hudChrome.options.auraSigilOpacity'),
+      slider(s, 'auraSigilScale', 'hudChrome.options.auraSigilScale'),
     ]),
     ...tag('frames', [
       slider(s, 'playerFrameScale', 'hudChrome.options.playerFrameScale'),
