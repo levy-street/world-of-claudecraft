@@ -12,6 +12,21 @@ The bar for every phase is AAA: the engine makes bad cinematics hard to author, 
 live feedback while authoring, and the gate exists to catch cross-cutting regressions,
 never to be the place an author discovers a mistake.
 
+## Completion note
+
+| Phase | Landed result |
+|---|---|
+| P0 | One mirrored presentation clock, one shared world seed, shipped subtitle and statue fixes, and scene teardown liveness |
+| P1 | Closed cue and directive types, the `buildScene` authoring layer, and the voyage re-authored through it |
+| P2 | Collision and support, motion quality, film grammar, reference resolution, lifecycle, and synthetic-control completeness gates |
+| P3 | Deck-NPC riding, reduced-motion static compositions, live-pose easing, and development tripwires |
+| P4 | Editor Cinematic panel round 1: scene picker, fixed-tick scrubber, fade preview, and provenance-bearing camera capture |
+| P5 | Deterministic contact sheets and the canonical `docs/design/cinematics-workflow.md` authoring contract |
+
+Every phase has a landed implementation. P4 viewport violation gizmos remain a
+follow-up to the shipped round 1 panel and are not described as available in the
+workflow.
+
 ## Resolved decisions
 
 1. **The statue is placed, not retargeted.** Q0's quest text anchors it ("east past

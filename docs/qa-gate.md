@@ -47,6 +47,11 @@ working binary.
 Use this command instead of an ad hoc shell pipeline. Piping a test run can hide its exit
 status, and unconstrained full-suite parallelism can make healthy heavy sim tests flake.
 
+The cinematics gate is the mechanical linter and synthetic-control meta-test in
+`tests/cinematic_shots.test.ts`, plus the watched lifecycle smoke and skip parity
+sweep in `tests/scene_lifecycle.test.ts`. The authoring workflow and complete check
+taxonomy live in `docs/design/cinematics-workflow.md`.
+
 ### Judgment review
 
 Reasoning is required for determinism, host parity, server authority, persistence,

@@ -47,6 +47,20 @@ tight loop, and the deferred suites/browser pass run later on their word.
 Dependency spine: C1 and C2 are the keystone evaluators; C4 consumes them;
 C5 consumes everything; C0, C3, and C6a are parallel side tracks.
 
+| Phase | Status |
+|---|---|
+| C0 | Shipped |
+| C1 | Shipped |
+| C2 | Shipped |
+| C3a and C3b | Shipped |
+| C4 | Shipped |
+| C5 | Shipped |
+| C6a | Shipped |
+| C6b | Superseded by P4 of `docs/prd/cinematics-quality-program.md` |
+
+The shipped authoring and review contract now lives in
+`docs/design/cinematics-workflow.md`.
+
 ### C0. Cinematic mode (HUD hide) - independent, do first
 
 While a scene is active, the HUD enters cinematic mode: everything hides
