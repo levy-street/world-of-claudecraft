@@ -16,10 +16,12 @@
 // axis-aligned shores, and a rot-free footprint keeps the groundHeight arm,
 // the collider builder, and the plank tiling trivially correct.
 //
-// The ship at each berth is walkable the same way (the FFX ferry feel): its
-// deck plan lives here as shipDecks/shipRails so the sim, colliders, and
-// render agree. The ship GLB is dressing over that plan; the gangplank is a
-// normal ramp through a railing gap.
+// The ship at each berth is walkable the same way (the FFX ferry feel). Its
+// procedural factory emits grand_ferry_ship_plan.generated.ts beside the GLB,
+// then this leaf transforms that generated data into each berth. The sim never
+// reads the GLB. The gangplank is a normal ramp through the generated rail gap.
+
+import { GRAND_FERRY_SHIP_PLAN } from './grand_ferry_ship_plan.generated';
 
 export const HARBOR_RAIL_HALF_THICK = 0.14;
 export const HARBOR_RAIL_HEIGHT = 1.05;
@@ -40,6 +42,7 @@ export interface HarborRail {
   z: number;
   hw: number;
   rot: number;
+  halfThickness?: number;
 }
 
 // A walkable ramp rect: the surface runs from highY (at the edge opposite
@@ -72,6 +75,19 @@ export interface HarborBerth {
   rot: number;
   draft: number;
   length: number;
+  mirrorZ?: boolean;
+}
+
+export interface HarborShipBlocker {
+  id: string;
+  kind: 'lower-hull' | 'bow' | 'stern' | 'superstructure';
+  x: number;
+  z: number;
+  hw: number;
+  hd: number;
+  rot: number;
+  topY?: number;
+  cameraTopY: number;
 }
 
 export interface HarborShipLocalBounds {
@@ -83,22 +99,15 @@ export interface HarborShipLocalBounds {
   topY: number;
 }
 
-// Measured from grand_ferry_ship.glb. The renderer scales the model by its
-// x-axis length, so these ratios keep audit volumes aligned at every berth.
-const HARBOR_SHIP_MODEL_LENGTH = 36.391693115234375;
-const HARBOR_SHIP_MODEL_HALF_WIDTH = 5.375957229050324;
-const HARBOR_SHIP_MODEL_BOTTOM_Y = -0.000251597952434679;
-const HARBOR_SHIP_MODEL_TOP_Y = 24.000251597952435;
-
 export function harborShipLocalBounds(berth: HarborBerth): HarborShipLocalBounds {
-  const scale = berth.length / HARBOR_SHIP_MODEL_LENGTH;
+  const scale = berth.length / GRAND_FERRY_SHIP_PLAN.model.length;
   return {
     x: 0,
     z: 0,
     hw: berth.length / 2,
-    hd: HARBOR_SHIP_MODEL_HALF_WIDTH * scale,
-    bottomY: HARBOR_SHIP_MODEL_BOTTOM_Y * scale,
-    topY: HARBOR_SHIP_MODEL_TOP_Y * scale,
+    hd: (GRAND_FERRY_SHIP_PLAN.model.beam / 2) * scale,
+    bottomY: GRAND_FERRY_SHIP_PLAN.model.keelY * scale,
+    topY: GRAND_FERRY_SHIP_PLAN.model.height * scale,
   };
 }
 
@@ -124,15 +133,11 @@ export interface HarborDef {
   ramps: readonly HarborRamp[];
   dressing: readonly HarborDressing[];
   berth: HarborBerth;
-  // The ship's walkable deck plan (world rects over the berth) and its hull
-  // railings. Same height/collider semantics as decks/rails; the render
-  // builds no boardwalk planks for these (the ship model is the visual).
-  // Measured from the grand_ferry_ship model: main deck plane at 4.68 of
-  // its 24-unit normalized height (length 36.39), so at hull length 60
-  // (scale 1.649) the deck stands 7.72 above the keel, and the keel rides
-  // at WATER_LEVEL - draft over the carved berth basin.
+  // Generated ship collision data transformed into this berth. Same
+  // height/collider semantics as decks/rails; the GLB owns the visuals.
   shipDecks: readonly HarborDeck[];
   shipRails: readonly HarborRail[];
+  shipBlockers: readonly HarborShipBlocker[];
   // The pier-side top of the gangplank ramp: the ferryman keeps his post
   // here. facing is the yaw an NPC at the gangplank should stand with
   // (looking down the pier at arrivals).
@@ -169,6 +174,166 @@ function withBounds(def: Omit<HarborDef, 'bounds'>): HarborDef {
   }
   return { ...def, bounds: { x0, x1, z0, z1 } };
 }
+
+interface HarborShipRampMatingEdge {
+  x: number;
+  z: number;
+  halfWidth: number;
+  y: number;
+  outwardX: number;
+  outwardZ: number;
+}
+
+interface HarborShipPlacementPlan {
+  decks: readonly HarborDeck[];
+  rails: readonly HarborRail[];
+  blockers: readonly HarborShipBlocker[];
+  rampMatingEdge: HarborShipRampMatingEdge;
+}
+
+function snapAxis(value: number): number {
+  if (Math.abs(value) < 1e-12) return 0;
+  if (Math.abs(value - 1) < 1e-12) return 1;
+  if (Math.abs(value + 1) < 1e-12) return -1;
+  return value;
+}
+
+function snapGeneratedValue(value: number): number {
+  return Math.round(value * 1e12) / 1e12;
+}
+
+function rotateLocal(lx: number, lz: number, rot: number): { x: number; z: number } {
+  const cos = snapAxis(Math.cos(rot));
+  const sin = snapAxis(Math.sin(rot));
+  return { x: lx * cos + lz * sin, z: -lx * sin + lz * cos };
+}
+
+function generatedDirection(direction: 'x+' | 'x-' | 'z+' | 'z-'): { x: number; z: number } {
+  switch (direction) {
+    case 'x+':
+      return { x: 1, z: 0 };
+    case 'x-':
+      return { x: -1, z: 0 };
+    case 'z+':
+      return { x: 0, z: 1 };
+    case 'z-':
+      return { x: 0, z: -1 };
+  }
+}
+
+function generatedShipPlacement(berth: HarborBerth): HarborShipPlacementPlan {
+  const scale = berth.length / GRAND_FERRY_SHIP_PLAN.model.length;
+  const mirror = berth.mirrorZ ? -1 : 1;
+  const baseY = GRAND_FERRY_SHIP_PLAN.standardBerth.waterlineY - berth.draft;
+  const worldPoint = (x: number, z: number) => {
+    const offset = rotateLocal(x * scale, z * mirror * scale, berth.rot);
+    return { x: berth.x + offset.x, z: berth.z + offset.z };
+  };
+  const deck = GRAND_FERRY_SHIP_PLAN.deck;
+  const deckCenter = worldPoint(deck.x, deck.z);
+  const deckCos = Math.abs(snapAxis(Math.cos(berth.rot)));
+  const deckSin = Math.abs(snapAxis(Math.sin(berth.rot)));
+  const decks: readonly HarborDeck[] = [
+    {
+      ...deckCenter,
+      hw: (deck.hw * deckCos + deck.hd * deckSin) * scale,
+      hd: (deck.hw * deckSin + deck.hd * deckCos) * scale,
+      y: snapGeneratedValue(baseY + deck.y * scale),
+    },
+  ];
+  const rails = GRAND_FERRY_SHIP_PLAN.rails.map((rail) => {
+    const center = worldPoint(rail.x, rail.z);
+    return {
+      ...center,
+      hw: rail.hw * scale,
+      rot: berth.rot + rail.rot * mirror,
+      halfThickness: rail.halfThickness * scale,
+    };
+  });
+  const blockers = GRAND_FERRY_SHIP_PLAN.blockingVolumes.map((blocker) => {
+    const center = worldPoint(blocker.x, blocker.z);
+    return {
+      id: blocker.id,
+      kind: blocker.kind,
+      ...center,
+      hw: blocker.hw * scale,
+      hd: blocker.hd * scale,
+      rot: berth.rot + blocker.rot * mirror,
+      ...(blocker.topY === null ? {} : { topY: snapGeneratedValue(baseY + blocker.topY * scale) }),
+      cameraTopY: snapGeneratedValue(baseY + blocker.cameraTopY * scale),
+    };
+  });
+  const localEdge = GRAND_FERRY_SHIP_PLAN.rampMatingEdge;
+  const edge = worldPoint(localEdge.x, localEdge.z);
+  const localOutward = generatedDirection(localEdge.outward);
+  const outward = rotateLocal(localOutward.x, localOutward.z * mirror, berth.rot);
+  return {
+    decks,
+    rails,
+    blockers,
+    rampMatingEdge: {
+      ...edge,
+      halfWidth: localEdge.halfWidth * scale,
+      y: snapGeneratedValue(baseY + localEdge.y * scale),
+      outwardX: outward.x,
+      outwardZ: outward.z,
+    },
+  };
+}
+
+function generatedGangplankRamp(
+  ship: HarborShipPlacementPlan,
+  lowEdge: { x: number; z: number; y: number },
+): HarborRamp {
+  const high = ship.rampMatingEdge;
+  if (Math.abs(high.outwardX) > 0.5) {
+    return {
+      x: (high.x + lowEdge.x) / 2,
+      z: high.z,
+      hw: Math.abs(high.x - lowEdge.x) / 2,
+      hd: high.halfWidth,
+      dir: high.outwardX > 0 ? 'x+' : 'x-',
+      highY: high.y,
+      lowY: lowEdge.y,
+    };
+  }
+  return {
+    x: high.x,
+    z: (high.z + lowEdge.z) / 2,
+    hw: high.halfWidth,
+    hd: Math.abs(high.z - lowEdge.z) / 2,
+    dir: high.outwardZ > 0 ? 'z+' : 'z-',
+    highY: high.y,
+    lowY: lowEdge.y,
+  };
+}
+
+const MAINLAND_BERTH: HarborBerth = {
+  x: 240.5,
+  z: -44,
+  rot: Math.PI / 2,
+  draft: 2.5,
+  length: 60,
+};
+const MAINLAND_SHIP = generatedShipPlacement(MAINLAND_BERTH);
+const MAINLAND_PIER_GANGWAY_GAP = {
+  min: MAINLAND_SHIP.rampMatingEdge.z - MAINLAND_SHIP.rampMatingEdge.halfWidth,
+  max: MAINLAND_SHIP.rampMatingEdge.z + MAINLAND_SHIP.rampMatingEdge.halfWidth,
+};
+
+const GULLHAVEN_BERTH: HarborBerth = {
+  x: 732,
+  z: 132.5,
+  rot: Math.PI,
+  draft: 2.5,
+  length: 60,
+  mirrorZ: true,
+};
+const GULLHAVEN_SHIP = generatedShipPlacement(GULLHAVEN_BERTH);
+const GULLHAVEN_PIER_GANGWAY_GAP = {
+  min: GULLHAVEN_SHIP.rampMatingEdge.x - GULLHAVEN_SHIP.rampMatingEdge.halfWidth,
+  max: GULLHAVEN_SHIP.rampMatingEdge.x + GULLHAVEN_SHIP.rampMatingEdge.halfWidth,
+};
 
 // ---------------------------------------------------------------------------
 // The mainland harbor: the vale's east point. A broad shore apron hugging the
@@ -220,14 +385,24 @@ export const MAINLAND_HARBOR: HarborDef = withBounds({
     // outer pier run
     { x: 212.5, z: -50.8, hw: 7, rot: 0 },
     { x: 212.5, z: -45.2, hw: 7, rot: 0 },
-    // berth head; the east edge (facing the ship) leaves the gangplank gap
-    // (z -49.4..-46.6)
+    // berth head; the east edge gap is derived from the generated ship
+    // mating edge, so the gangplank never overlaps either rail segment
     { x: 225, z: -54.5, hw: 6, rot: 0 },
     { x: 225, z: -41.5, hw: 6, rot: 0 },
     { x: 219, z: -52.65, hw: 1.85, rot: Math.PI / 2 },
     { x: 219, z: -43.35, hw: 1.85, rot: Math.PI / 2 },
-    { x: 231, z: -51.95, hw: 2.55, rot: Math.PI / 2 },
-    { x: 231, z: -44.05, hw: 2.55, rot: Math.PI / 2 },
+    {
+      x: 231,
+      z: (-54.5 + MAINLAND_PIER_GANGWAY_GAP.min) / 2,
+      hw: (MAINLAND_PIER_GANGWAY_GAP.min + 54.5) / 2,
+      rot: Math.PI / 2,
+    },
+    {
+      x: 231,
+      z: (MAINLAND_PIER_GANGWAY_GAP.max - 41.5) / 2,
+      hw: (-41.5 - MAINLAND_PIER_GANGWAY_GAP.max) / 2,
+      rot: Math.PI / 2,
+    },
   ],
   ramps: [
     // headland entry: down from the apron's south edge to the graded grass
@@ -237,9 +412,13 @@ export const MAINLAND_HARBOR: HarborDef = withBounds({
     // deck seams: apron down to pier, pier down to head
     { x: 180.5, z: -48, hw: 1.5, hd: 2, dir: 'x+', highY: 0.9, lowY: 0.4 },
     { x: 196.75, z: -48, hw: 1.25, hd: 2, dir: 'x+', highY: 0.4, lowY: -0.2 },
-    // the gangplank: UP from the berth head's east gap onto the tall
-    // ship's main deck (the grand hull rides higher than the pier)
-    { x: 232.65, z: -48, hw: 1.65, hd: 1.4, dir: 'x-', highY: 0.72, lowY: -0.2 },
+    // the gangplank: its high edge comes from the generated ship plan, so
+    // the ramp and visible deck mating sill stay flush.
+    generatedGangplankRamp(MAINLAND_SHIP, {
+      x: 231,
+      z: MAINLAND_SHIP.rampMatingEdge.z,
+      y: -0.2,
+    }),
   ],
   dressing: [
     { kind: 'lamp', x: 167, z: -54.2 },
@@ -260,24 +439,16 @@ export const MAINLAND_HARBOR: HarborDef = withBounds({
   // the berth head, bow south; the basin under it is CARVED to depth by
   // the stamps below, so the 60 yard hull rides draft 2.5 with its main
   // deck at +0.72, a gangplank's rise above the pier).
-  berth: { x: 240.5, z: -44, rot: Math.PI / 2, draft: 2.5, length: 60 },
-  shipDecks: [
-    // the main deck (model x -4.5..12.5 at plane 4.68, mapped along world
-    // z; scale 1.649: deck 7.72 above the keel at WATER_LEVEL - 2.5)
-    { x: 240.5, z: -50.6, hw: 6.2, hd: 14, y: 0.72 },
-  ],
-  shipRails: [
-    // hull rails at the walkable deck's edges; the pier-side edge leaves
-    // the gangplank opening (z -49.4..-46.6)
-    { x: 246.7, z: -50.6, hw: 14, rot: Math.PI / 2 },
-    { x: 234.3, z: -57, hw: 7.6, rot: Math.PI / 2 },
-    { x: 234.3, z: -41.6, hw: 2.5, rot: Math.PI / 2 },
-    { x: 240.5, z: -64.6, hw: 6.2, rot: 0 },
-    { x: 240.5, z: -36.6, hw: 6.2, rot: 0 },
-  ],
+  berth: MAINLAND_BERTH,
+  shipDecks: MAINLAND_SHIP.decks,
+  shipRails: MAINLAND_SHIP.rails,
+  shipBlockers: MAINLAND_SHIP.blockers,
   gangplank: { x: 230.4, z: -48, facing: Math.PI / 2 },
   boarding: { x: 239, z: -48 },
-  deckArrival: { x: 240.5, z: -50.6 },
+  deckArrival: {
+    x: MAINLAND_SHIP.decks[0].x,
+    z: MAINLAND_SHIP.decks[0].z,
+  },
   arrival: { x: 173, z: -48 },
 });
 
@@ -332,11 +503,21 @@ export const GULLHAVEN_HARBOR: HarborDef = withBounds({
     // outer run
     { x: 741, z: 113.2, hw: 9, rot: 0 },
     { x: 741, z: 118.8, hw: 9, rot: 0 },
-    // berth head; the north edge (facing the ship) leaves the gangplank
-    // gap (x 726.1..728.9)
+    // berth head; the north edge gap is derived from the mirrored generated
+    // ship mating edge, so the gangplank never overlaps either rail segment
     { x: 727.5, z: 110, hw: 5, rot: 0 },
-    { x: 724.3, z: 123, hw: 1.8, rot: 0 },
-    { x: 730.7, z: 123, hw: 1.8, rot: 0 },
+    {
+      x: (722.5 + GULLHAVEN_PIER_GANGWAY_GAP.min) / 2,
+      z: 123,
+      hw: (GULLHAVEN_PIER_GANGWAY_GAP.min - 722.5) / 2,
+      rot: 0,
+    },
+    {
+      x: (GULLHAVEN_PIER_GANGWAY_GAP.max + 732.5) / 2,
+      z: 123,
+      hw: (732.5 - GULLHAVEN_PIER_GANGWAY_GAP.max) / 2,
+      rot: 0,
+    },
     { x: 722.5, z: 116.5, hw: 6.5, rot: Math.PI / 2 },
     { x: 732.5, z: 113.35, hw: 3.35, rot: Math.PI / 2 },
     { x: 732.5, z: 121.6, hw: 1.4, rot: Math.PI / 2 },
@@ -348,9 +529,13 @@ export const GULLHAVEN_HARBOR: HarborDef = withBounds({
     { x: 779, z: 116, hw: 1.5, hd: 2.5, dir: 'x-', highY: 5.9, lowY: 4.2 },
     { x: 768.75, z: 116, hw: 1.25, hd: 2.5, dir: 'x-', highY: 4.2, lowY: 2.6 },
     { x: 761.75, z: 116, hw: 2.25, hd: 2.5, dir: 'x-', highY: 2.6, lowY: 0.2 },
-    // the gangplank: UP from the berth head's north gap onto the tall
-    // ship's main deck
-    { x: 727.5, z: 124.65, hw: 1.4, hd: 1.65, dir: 'z-', highY: 0.72, lowY: 0.2 },
+    // the gangplank: its high edge comes from the mirrored generated ship
+    // plan, so the same authored port opening serves this berth.
+    generatedGangplankRamp(GULLHAVEN_SHIP, {
+      x: GULLHAVEN_SHIP.rampMatingEdge.x,
+      z: 123,
+      y: 0.2,
+    }),
   ],
   dressing: [
     { kind: 'lamp', x: 779, z: 108 },
@@ -370,24 +555,16 @@ export const GULLHAVEN_HARBOR: HarborDef = withBounds({
   // The grand hull lies west of the bay's shoal corner, bow west out to
   // sea (rot PI flips the model's +x bow), over water the stamps below
   // carve deep; the gangplank gap in the berth head's north rail faces it.
-  berth: { x: 732, z: 132.5, rot: Math.PI, draft: 2.5, length: 60 },
-  shipDecks: [
-    // the main deck (model x -4.5..12.5 at plane 4.68; rot PI maps +x to
-    // -x, so the deck runs west of the berth center)
-    { x: 725.4, z: 132.5, hw: 14, hd: 6.2, y: 0.72 },
-  ],
-  shipRails: [
-    // hull rails at the walkable deck's edges; the pier-side edge leaves
-    // the gangplank opening (x 726.1..728.9)
-    { x: 725.4, z: 138.7, hw: 14, rot: 0 },
-    { x: 718.75, z: 126.3, hw: 7.35, rot: 0 },
-    { x: 734.15, z: 126.3, hw: 5.25, rot: 0 },
-    { x: 711.4, z: 132.5, hw: 6.2, rot: Math.PI / 2 },
-    { x: 739.4, z: 132.5, hw: 6.2, rot: Math.PI / 2 },
-  ],
+  berth: GULLHAVEN_BERTH,
+  shipDecks: GULLHAVEN_SHIP.decks,
+  shipRails: GULLHAVEN_SHIP.rails,
+  shipBlockers: GULLHAVEN_SHIP.blockers,
   gangplank: { x: 727.5, z: 122, facing: 0 },
   boarding: { x: 727.5, z: 130 },
-  deckArrival: { x: 725.4, z: 132.5 },
+  deckArrival: {
+    x: GULLHAVEN_SHIP.decks[0].x,
+    z: GULLHAVEN_SHIP.decks[0].z,
+  },
   arrival: { x: 782, z: 116 },
 });
 

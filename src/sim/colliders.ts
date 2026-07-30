@@ -881,10 +881,23 @@ function staticWorldColliders(seed: number): Collider[] {
         x: rail.x,
         z: rail.z,
         hw: rail.hw,
-        hd: HARBOR_RAIL_HALF_THICK,
+        hd: rail.halfThickness ?? HARBOR_RAIL_HALF_THICK,
         rot: rail.rot,
         cameraTopY: topY(seed, rail.x, rail.z, HARBOR_RAIL_HEIGHT + 0.2),
         camGhost: true,
+      });
+    }
+    for (const blocker of h.shipBlockers) {
+      out.push({
+        type: 'obb',
+        x: blocker.x,
+        z: blocker.z,
+        hw: blocker.hw,
+        hd: blocker.hd,
+        rot: blocker.rot,
+        cameraTopY: blocker.cameraTopY,
+        camGhost: true,
+        ...(blocker.topY === undefined ? {} : { moveTopY: blocker.topY }),
       });
     }
     for (const d of h.dressing) {

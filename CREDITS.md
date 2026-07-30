@@ -278,22 +278,7 @@ non-commercial. For commercial use, arrange your own licence with the author.
 | Generated prop model (wildheart_giant_fern) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated prop model (wildheart_ancestor_ruin) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated prop model (wildheart_jungle_canopy_tree) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
-| Generated prop model (streetlamp_eastbrook_civic) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
-| Generated prop model (streetlamp_mirefen_witchflame) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
-| Generated prop model (streetlamp_thornpeak_beacon) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
-| Generated prop model (streetlamp_veiled_crystal) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
-| Generated prop model (streetlamp_drakelands_brazier) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
-| Generated prop model (streetlamp_frostveil_icicle) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
-| Generated prop model (streetlamp_amberfall_crystal) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
-| Generated prop model (streetlamp_willowfen_reed) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
-| Generated prop model (streetlamp_nightbloom_moonflower) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
-| Generated prop model (streetlamp_wraithwood_ghost) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
-| Generated prop model (streetlamp_palmreach_totem) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
-| Generated prop model (streetlamp_evergarden_flower) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
-| Generated prop model (frostveil_ice_spire) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
-| Generated prop model (streetlamp_galecrest_mast) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
-| Generated prop model (streetlamp_farshore_coral) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
-| Generated creature model + animations (bear_form, the druid Bear Form quadruped) | World of ClaudeCraft | Project-generated Tripo AI 3D sculpt, owned under the Tripo paid-plan license; rigged and animated locally rather than auto-rigged (29 bone deform rig fitted to the sculpt by measurement, distance-solver skinning, and nine IK-authored clips), then KTX2-compressed via glTF-Transform | Project asset | With the project only |
+| Procedural prop model (grand_ferry_ship) | World of ClaudeCraft | Project-authored deterministic procedural reconstruction of the retired Tripo reference | Project asset | With the project only |
 Assets were optimized for shipping (animation clip pruning, meshopt compression,
 texture resizing) via `scripts/assets/build_assets.mjs`; raw packs are not
 committed.
