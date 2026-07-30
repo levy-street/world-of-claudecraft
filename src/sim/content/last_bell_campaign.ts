@@ -276,7 +276,7 @@ const OUTBOUND: VoyageDirection = {
     lookAt: {
       kind: 'spline',
       points: [
-        { x: 733, z: 126, height: 2 },
+        { x: 733, z: 126.3, height: 2 },
         {
           x: GULLHAVEN_HARBOR.gangplank.x,
           z: GULLHAVEN_HARBOR.gangplank.z,
@@ -450,8 +450,8 @@ const Q0_TOLL_SHOT: SceneDollyShotDef = {
     kind: 'spline',
     points: [
       { x: 818, z: 120, height: 2 },
-      { x: 786, z: 122, height: 2 },
-      { x: 755, z: 122, height: 2 },
+      { x: 785, z: 122, height: 2 },
+      { x: 755, z: 121.5, height: 2 },
       {
         x: GULLHAVEN_HARBOR.gangplank.x,
         z: GULLHAVEN_HARBOR.gangplank.z,
