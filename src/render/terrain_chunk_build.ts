@@ -2,7 +2,7 @@
 // the row-wise fills that write plain typed arrays.
 //
 // Split out of terrain.ts because none of it touches WebGL. It writes
-// Float32Array / Uint32Array and nothing else, so it can run off the main
+// Float32Array / Uint16Array and nothing else, so it can run off the main
 // thread; terrain.ts keeps finishChunkGeometry, which is the only part that
 // needs Three's BufferGeometry, and every other WebGL-side concern.
 //
@@ -40,6 +40,10 @@ import { meshTerrainHeight } from './terrain_mesh_height';
 
 const SKIRT_DROP = 0.3;
 const SLOPE_EPS = 1.5; // matches the legacy color pass so tints don't shift
+// Three-quad tiles keep a compact working set across both diagonal choices.
+// The old full-row walk evicted one grid row before the next quad could reuse
+// it on the 25-52-quad chunk widths.
+const INDEX_TILE_QUADS = 3;
 const BIOME_PALETTE: Record<
   BiomeId,
   { grass: number; grassDark: number; grassYellow: number; dirt: number; sand: number }
@@ -532,7 +536,7 @@ export interface ChunkGeometryArrays {
   uvs: Float32Array;
   splats: Float32Array | null;
   extras: Float32Array | null;
-  indices: Uint32Array;
+  indices: Uint16Array;
 }
 
 export interface ChunkGeometryBuildState extends ChunkGeometryArrays {
@@ -579,7 +583,13 @@ export function beginChunkGeometry(
   const extras = withSplat ? new Float32Array(count * 4) : null;
   const quadsX = gw - 1,
     quadsZ = gh - 1;
-  const indices = new Uint32Array(quadsX * quadsZ * 6);
+  // WebGL2 reserves 65535 as the fixed primitive-restart index. The largest
+  // current chunk has 2,809 vertices, but keep the exact safety condition
+  // beside the narrowing in case the chunk ladder changes later.
+  if (count > 0xffff) {
+    throw new Error(`Terrain chunk has ${count} vertices; Uint16 indices require at most 65535`);
+  }
+  const indices = new Uint16Array(quadsX * quadsZ * 6);
   return {
     nx,
     nz,
@@ -652,8 +662,18 @@ export function fillChunkVertexRow(state: ChunkGeometryBuildState, gj: number): 
 
 export function fillChunkIndexRow(state: ChunkGeometryBuildState, gj: number): void {
   const quadsX = state.gw - 1;
-  let k = gj * quadsX * 6;
+  const quadsZ = state.gh - 1;
+  const tileRowStart = Math.floor(gj / INDEX_TILE_QUADS) * INDEX_TILE_QUADS;
+  const tileHeight = Math.min(INDEX_TILE_QUADS, quadsZ - tileRowStart);
   for (let gi = 0; gi < quadsX; gi++) {
+    const tileColumnStart = Math.floor(gi / INDEX_TILE_QUADS) * INDEX_TILE_QUADS;
+    const tileWidth = Math.min(INDEX_TILE_QUADS, quadsX - tileColumnStart);
+    const cellOffset =
+      tileRowStart * quadsX +
+      tileColumnStart * tileHeight +
+      (gj - tileRowStart) * tileWidth +
+      (gi - tileColumnStart);
+    let k = cellOffset * 6;
     const a = gj * state.gw + gi;
     const b = a + 1;
     const c = a + state.gw;
