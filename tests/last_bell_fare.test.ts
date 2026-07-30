@@ -46,7 +46,7 @@ function boardMainland(sim: Sim): void {
 }
 
 function boardGullhaven(sim: Sim): void {
-  teleport(sim, 727, 131);
+  teleport(sim, GULLHAVEN_HARBOR.boarding.x, GULLHAVEN_HARBOR.boarding.z);
   const odda = keeper(sim, 'ferrykeeper_odda');
   expect(odda).toBeTruthy();
   sim.player.targetId = odda?.id ?? null;

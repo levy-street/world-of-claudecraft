@@ -193,7 +193,11 @@ export const MAINLAND_HARBOR: HarborDef = withBounds({
     // boardwalk out to the carved-deep basin where the tall ship lies
     // (same height as the head, so the run is seamless)
     { x: 212.5, z: -48, hw: 7, hd: 2.8, y: -0.2 },
-    { x: 225, z: -48, hw: 6, hd: 6.5, y: -0.2 },
+    // berth head split around the gangplank corridor so the turning hull
+    // clears the two outer deck corners while the boarding route stays flush
+    { x: 225, z: -48, hw: 5.9, hd: 1.4, y: -0.2 },
+    { x: 223.8, z: -51.95, hw: 4.7, hd: 2.55, y: -0.2 },
+    { x: 225, z: -44.05, hw: 5.9, hd: 2.55, y: -0.2 },
   ],
   rails: [
     // apron south edge; gap x 169..175 is the headland entry ramp
@@ -224,10 +228,10 @@ export const MAINLAND_HARBOR: HarborDef = withBounds({
     // (z -49.4..-46.6)
     { x: 225, z: -54.5, hw: 6, rot: 0 },
     { x: 225, z: -41.5, hw: 6, rot: 0 },
-    { x: 219, z: -52.65, hw: 1.85, rot: Math.PI / 2 },
-    { x: 219, z: -43.35, hw: 1.85, rot: Math.PI / 2 },
-    { x: 231, z: -51.95, hw: 2.55, rot: Math.PI / 2 },
-    { x: 231, z: -44.05, hw: 2.55, rot: Math.PI / 2 },
+    { x: 219.1, z: -52.65, hw: 1.85, rot: Math.PI / 2 },
+    { x: 219.1, z: -43.35, hw: 1.85, rot: Math.PI / 2 },
+    { x: 228.5, z: -51.95, hw: 2.55, rot: Math.PI / 2 },
+    { x: 230.9, z: -44.05, hw: 2.55, rot: Math.PI / 2 },
   ],
   ramps: [
     // headland entry: down from the apron's south edge to the graded grass
@@ -237,9 +241,10 @@ export const MAINLAND_HARBOR: HarborDef = withBounds({
     // deck seams: apron down to pier, pier down to head
     { x: 180.5, z: -48, hw: 1.5, hd: 2, dir: 'x+', highY: 0.9, lowY: 0.4 },
     { x: 196.75, z: -48, hw: 1.25, hd: 2, dir: 'x+', highY: 0.4, lowY: -0.2 },
-    // the gangplank: UP from the berth head's east gap onto the tall
-    // ship's main deck (the grand hull rides higher than the pier)
-    { x: 232.65, z: -48, hw: 1.65, hd: 1.4, dir: 'x-', highY: 0.72, lowY: -0.2 },
+    // the gangplank: UP from the berth head's east gap to the hull seam.
+    // The ship-deck landing below carries the walk across the inset hull
+    // shoulder without making the fixed ramp penetrate the parked hull.
+    { x: 231.218, z: -48, hw: 0.418, hd: 1.4, dir: 'x-', highY: 0.72, lowY: -0.2 },
   ],
   dressing: [
     { kind: 'lamp', x: 167, z: -54.2 },
@@ -265,6 +270,8 @@ export const MAINLAND_HARBOR: HarborDef = withBounds({
     // the main deck (model x -4.5..12.5 at plane 4.68, mapped along world
     // z; scale 1.649: deck 7.72 above the keel at WATER_LEVEL - 2.5)
     { x: 240.5, z: -50.6, hw: 6.2, hd: 14, y: 0.72 },
+    // the gangplank landing from the measured hull seam to the inset deck
+    { x: 232.968, z: -48, hw: 1.332, hd: 1.4, y: 0.72 },
   ],
   shipRails: [
     // hull rails at the walkable deck's edges; the pier-side edge leaves
@@ -278,7 +285,7 @@ export const MAINLAND_HARBOR: HarborDef = withBounds({
   gangplank: { x: 230.4, z: -48, facing: Math.PI / 2 },
   boarding: { x: 239, z: -48 },
   deckArrival: { x: 240.5, z: -50.6 },
-  arrival: { x: 173, z: -48 },
+  arrival: { x: 173, z: -42 },
 });
 
 // ---------------------------------------------------------------------------
@@ -305,7 +312,11 @@ export const GULLHAVEN_HARBOR: HarborDef = withBounds({
     // the grand extension: the boardwalk runs on west over the deep bay to
     // the berth head where the tall ship lies (same height, seamless)
     { x: 741, z: 116, hw: 9, hd: 2.8, y: 0.2 },
-    { x: 727.5, z: 116.5, hw: 5, hd: 6.5, y: 0.2 },
+    // berth head split around the gangplank corridor so the turning hull
+    // clears the two outer deck corners while the boarding route stays flush
+    { x: 727.5, z: 116.5, hw: 4.9, hd: 1.4, y: 0.2 },
+    { x: 728.7, z: 112.55, hw: 3.7, hd: 2.55, y: 0.2 },
+    { x: 727.5, z: 120.45, hw: 4.9, hd: 2.55, y: 0.2 },
   ],
   rails: [
     // apron west edge outside the pier seam (walkway z 112.8..119.2 open)
@@ -332,14 +343,14 @@ export const GULLHAVEN_HARBOR: HarborDef = withBounds({
     // outer run
     { x: 741, z: 113.2, hw: 9, rot: 0 },
     { x: 741, z: 118.8, hw: 9, rot: 0 },
-    // berth head; the north edge (facing the ship) leaves the gangplank
-    // gap (x 726.1..728.9)
+    // berth head; the west edge (facing the ship) leaves the gangplank
+    // gap (z 115.1..117.9)
     { x: 727.5, z: 110, hw: 5, rot: 0 },
-    { x: 724.3, z: 123, hw: 1.8, rot: 0 },
-    { x: 730.7, z: 123, hw: 1.8, rot: 0 },
-    { x: 722.5, z: 116.5, hw: 6.5, rot: Math.PI / 2 },
-    { x: 732.5, z: 113.35, hw: 3.35, rot: Math.PI / 2 },
-    { x: 732.5, z: 121.6, hw: 1.4, rot: Math.PI / 2 },
+    { x: 727.5, z: 123, hw: 5, rot: 0 },
+    { x: 725, z: 112.55, hw: 2.55, rot: Math.PI / 2 },
+    { x: 722.6, z: 120.45, hw: 2.55, rot: Math.PI / 2 },
+    { x: 732.4, z: 113.35, hw: 3.35, rot: Math.PI / 2 },
+    { x: 732.4, z: 121.6, hw: 1.4, rot: Math.PI / 2 },
   ],
   ramps: [
     // the town entry up from the graded waterfront street pocket
@@ -348,9 +359,10 @@ export const GULLHAVEN_HARBOR: HarborDef = withBounds({
     { x: 779, z: 116, hw: 1.5, hd: 2.5, dir: 'x-', highY: 5.9, lowY: 4.2 },
     { x: 768.75, z: 116, hw: 1.25, hd: 2.5, dir: 'x-', highY: 4.2, lowY: 2.6 },
     { x: 761.75, z: 116, hw: 2.25, hd: 2.5, dir: 'x-', highY: 2.6, lowY: 0.2 },
-    // the gangplank: UP from the berth head's north gap onto the tall
-    // ship's main deck
-    { x: 727.5, z: 124.65, hw: 1.4, hd: 1.65, dir: 'z-', highY: 0.72, lowY: 0.2 },
+    // the gangplank: UP from the berth head's west gap to the hull seam.
+    // The ship-deck landing below carries the walk across the inset hull
+    // shoulder without making the fixed ramp penetrate the parked hull.
+    { x: 722.282, z: 116.5, hw: 0.418, hd: 1.4, dir: 'x+', highY: 0.72, lowY: 0.2 },
   ],
   dressing: [
     { kind: 'lamp', x: 779, z: 108 },
@@ -367,28 +379,30 @@ export const GULLHAVEN_HARBOR: HarborDef = withBounds({
     { kind: 'bollard', x: 759.4, z: 121.2 },
     { kind: 'bollard', x: 753.4, z: 111.4 },
   ],
-  // The grand hull lies west of the bay's shoal corner, bow west out to
-  // sea (rot PI flips the model's +x bow), over water the stamps below
-  // carve deep; the gangplank gap in the berth head's north rail faces it.
-  berth: { x: 732, z: 132.5, rot: Math.PI, draft: 2.5, length: 60 },
+  // The grand hull lies west of the berth head, perpendicular to the pier
+  // with its +x bow pointing south like the mainland ship. The basin stamps
+  // below keep the full north-south hull in deep water.
+  berth: { x: 713, z: 120.5, rot: Math.PI / 2, draft: 2.5, length: 60 },
   shipDecks: [
-    // the main deck (model x -4.5..12.5 at plane 4.68; rot PI maps +x to
-    // -x, so the deck runs west of the berth center)
-    { x: 725.4, z: 132.5, hw: 14, hd: 6.2, y: 0.72 },
+    // the main deck (model x -4.5..12.5 at plane 4.68; rot PI / 2 maps
+    // +x south, so the deck center lies south of the berth center)
+    { x: 713, z: 113.9, hw: 6.2, hd: 14, y: 0.72 },
+    // the gangplank landing from the measured hull seam to the inset deck
+    { x: 720.532, z: 116.5, hw: 1.332, hd: 1.4, y: 0.72 },
   ],
   shipRails: [
-    // hull rails at the walkable deck's edges; the pier-side edge leaves
-    // the gangplank opening (x 726.1..728.9)
-    { x: 725.4, z: 138.7, hw: 14, rot: 0 },
-    { x: 718.75, z: 126.3, hw: 7.35, rot: 0 },
-    { x: 734.15, z: 126.3, hw: 5.25, rot: 0 },
-    { x: 711.4, z: 132.5, hw: 6.2, rot: Math.PI / 2 },
-    { x: 739.4, z: 132.5, hw: 6.2, rot: Math.PI / 2 },
+    // hull rails at the walkable deck's edges; the pier-side east edge
+    // leaves the gangplank opening (z 115.1..117.9)
+    { x: 706.8, z: 113.9, hw: 14, rot: Math.PI / 2 },
+    { x: 719.2, z: 107.5, hw: 7.6, rot: Math.PI / 2 },
+    { x: 719.2, z: 122.9, hw: 5, rot: Math.PI / 2 },
+    { x: 713, z: 99.9, hw: 6.2, rot: 0 },
+    { x: 713, z: 127.9, hw: 6.2, rot: 0 },
   ],
-  gangplank: { x: 727.5, z: 122, facing: 0 },
-  boarding: { x: 727.5, z: 130 },
-  deckArrival: { x: 725.4, z: 132.5 },
-  arrival: { x: 782, z: 116 },
+  gangplank: { x: 723.5, z: 116.5, facing: 0 },
+  boarding: { x: 714.5, z: 116.5 },
+  deckArrival: { x: 713, z: 113.9 },
+  arrival: { x: 782, z: 125 },
 });
 
 export const HARBORS: readonly HarborDef[] = [MAINLAND_HARBOR, GULLHAVEN_HARBOR];
@@ -415,11 +429,19 @@ export const HARBOR_TERRAIN_EDITS = [
   // each hull is pulled toward -12 (the mainland dive plateau sits at
   // -5.7 to -6.6 and could never float her; deepening is invisible to the
   // farshore crossing-line pins, which only need wet, open-sea points).
-  { x: 240, z: -30, radius: 22, delta: -12, falloff: 'smooth', mode: 'level' },
+  { x: 265, z: -8, radius: 30, delta: -12, falloff: 'smooth', mode: 'level' },
+  { x: 240, z: -14, radius: 18, delta: -12, falloff: 'smooth', mode: 'level' },
+  { x: 240, z: -30, radius: 32, delta: -12, falloff: 'smooth', mode: 'level' },
   { x: 240, z: -56, radius: 22, delta: -12, falloff: 'smooth', mode: 'level' },
   { x: 240, z: -76, radius: 18, delta: -12, falloff: 'smooth', mode: 'level' },
-  { x: 715, z: 132, radius: 24, delta: -12, falloff: 'smooth', mode: 'level' },
-  { x: 745, z: 132, radius: 24, delta: -12, falloff: 'smooth', mode: 'level' },
+  { x: 246, z: -88, radius: 20, delta: -12, falloff: 'smooth', mode: 'level' },
+  { x: 280, z: -57, radius: 55, delta: -12, falloff: 'smooth', mode: 'level' },
+  { x: 305, z: -44, radius: 22, delta: -12, falloff: 'smooth', mode: 'level' },
+  { x: 673, z: 108, radius: 55, delta: -12, falloff: 'smooth', mode: 'level' },
+  { x: 708, z: 76, radius: 20, delta: -12, falloff: 'smooth', mode: 'level' },
+  { x: 713, z: 96, radius: 26, delta: -12, falloff: 'smooth', mode: 'level' },
+  { x: 713, z: 121, radius: 24, delta: -12, falloff: 'smooth', mode: 'level' },
+  { x: 713, z: 146, radius: 22, delta: -12, falloff: 'smooth', mode: 'level' },
 ] as const;
 
 // The deck rect containing (x, z), or null. Later rects win ties so a seam

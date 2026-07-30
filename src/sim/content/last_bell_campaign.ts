@@ -208,21 +208,21 @@ const VOYAGE_CORE_BEATS = {
   castOff: 0.2,
   openWater: 4.2,
   seaArrival: 8.5,
-  pier: 12.8,
+  pier: 15.5,
 } as const;
 
 const RERIDE_BEATS = {
   ...VOYAGE_CORE_BEATS,
-  release: 17.8,
-  end: 18.8,
+  release: 20.5,
+  end: 21.5,
 } as const;
 
 const Q0_VOYAGE_BEATS = {
   ...VOYAGE_CORE_BEATS,
-  statue: 18.3,
-  toll: 26.1,
-  release: 33,
-  end: 34,
+  statue: 21,
+  toll: 28.8,
+  release: 35.7,
+  end: 36.7,
 } as const;
 
 const Q0_DOORWAY_BEATS = {
@@ -270,13 +270,15 @@ const OUTBOUND: VoyageDirection = {
   pierShot: {
     kind: 'dolly',
     points: [
-      { x: 738, z: 110.609175, height: 20.203309 },
-      { x: 727.5, z: 110.609175, height: 5.774799 },
+      { x: 723.5, z: 98.5, height: 16.448243 },
+      { x: 723.5, z: 102.5, height: 16.441451 },
+      { x: 723.5, z: 105.109175, height: 15.369799 },
     ],
     lookAt: {
       kind: 'spline',
       points: [
-        { x: 733, z: 126.3, height: 2 },
+        { x: GULLHAVEN_HARBOR.deckArrival.x, z: GULLHAVEN_HARBOR.deckArrival.z, height: 2 },
+        { x: 718, z: 115.5, height: 2 },
         {
           x: GULLHAVEN_HARBOR.gangplank.x,
           z: GULLHAVEN_HARBOR.gangplank.z,
@@ -441,7 +443,7 @@ const Q0_TOLL_SHOT: SceneDollyShotDef = {
     { x: 808, z: 113, height: 7.4 },
     { x: 780, z: 115, height: 5.9 },
     { x: 755, z: 116, height: 8 },
-    { x: 727.5, z: 110.609175, height: 5.774799 },
+    { x: 723.5, z: 105.109175, height: 15.369799 },
   ],
   lookAt: {
     kind: 'spline',
