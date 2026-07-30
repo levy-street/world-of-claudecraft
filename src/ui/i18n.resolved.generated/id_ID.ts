@@ -10740,6 +10740,9 @@ export const id_ID: EnTranslations = {
       "volzharr_buried_furnace": {
         "name": "Volzharr, the Buried Furnace"
       },
+      "undermount_cinderling": {
+        "name": "Cinderling"
+      },
       "reliquary_ledger_wraith": {
         "name": "Arwah Buku Catatan"
       },

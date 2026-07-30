@@ -496,6 +496,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.saan_the_stoker.name': '화부 사안',
   'entities.mobs.odrenn_the_temperer.name': '뜨임장이 오드렌',
   'entities.mobs.volzharr_buried_furnace.name': '묻힌 용광로 볼자르',
+  'entities.mobs.undermount_cinderling.name': '잿불정령',
   'entities.npcs.runeseeker_maerin.name': '룬추적자 매린',
   'entities.npcs.runeseeker_maerin.title': '떠도는 고고학자',
   'entities.npcs.runeseeker_maerin.greeting':

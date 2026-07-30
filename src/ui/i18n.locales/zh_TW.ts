@@ -486,6 +486,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.saan_the_stoker.name': '司爐薩安',
   'entities.mobs.odrenn_the_temperer.name': '回火者奧德倫',
   'entities.mobs.volzharr_buried_furnace.name': '沃爾札爾，埋藏熔爐',
+  'entities.mobs.undermount_cinderling.name': '餘燼靈',
   'entities.npcs.runeseeker_maerin.name': '尋符者梅林',
   'entities.npcs.runeseeker_maerin.title': '流浪考古學家',
   'entities.npcs.runeseeker_maerin.greeting':

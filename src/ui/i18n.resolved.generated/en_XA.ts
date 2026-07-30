@@ -10740,6 +10740,9 @@ export const en_XA: EnTranslations = {
       "volzharr_buried_furnace": {
         "name": "[Ʋóļžĥáŕŕ, ţĥé Ɓúŕíéð Ƒúŕñáçé]"
       },
+      "undermount_cinderling": {
+        "name": "[Çíñðéŕļíñĝ]"
+      },
       "reliquary_ledger_wraith": {
         "name": "[Ļéðĝéŕ Ŵŕáíţĥ]"
       },

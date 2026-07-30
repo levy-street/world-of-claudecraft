@@ -493,6 +493,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.saan_the_stoker.name': '火焚きサーン',
   'entities.mobs.odrenn_the_temperer.name': '焼き戻し師オドレン',
   'entities.mobs.volzharr_buried_furnace.name': '埋もれた炉ヴォルザール',
+  'entities.mobs.undermount_cinderling.name': '燼の子',
   'entities.npcs.runeseeker_maerin.name': 'ルーン探しのメイリン',
   'entities.npcs.runeseeker_maerin.title': '放浪の考古学者',
   'entities.npcs.runeseeker_maerin.greeting':

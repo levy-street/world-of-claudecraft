@@ -10740,6 +10740,9 @@ export const zh_CN: EnTranslations = {
       "volzharr_buried_furnace": {
         "name": "沃尔扎尔，埋藏熔炉"
       },
+      "undermount_cinderling": {
+        "name": "余烬灵"
+      },
       "reliquary_ledger_wraith": {
         "name": "名册幽魂"
       },

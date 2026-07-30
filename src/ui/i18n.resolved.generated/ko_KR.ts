@@ -10740,6 +10740,9 @@ export const ko_KR: EnTranslations = {
       "volzharr_buried_furnace": {
         "name": "묻힌 용광로 볼자르"
       },
+      "undermount_cinderling": {
+        "name": "잿불정령"
+      },
       "reliquary_ledger_wraith": {
         "name": "명부의 망령"
       },

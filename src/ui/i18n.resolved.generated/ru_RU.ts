@@ -10740,6 +10740,9 @@ export const ru_RU: EnTranslations = {
       "volzharr_buried_furnace": {
         "name": "Волзхарр, Погребенная Печь"
       },
+      "undermount_cinderling": {
+        "name": "Угленыш"
+      },
       "reliquary_ledger_wraith": {
         "name": "Книжный призрак"
       },

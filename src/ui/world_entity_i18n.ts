@@ -91,6 +91,7 @@ const MOB_IDS = [
   'saan_the_stoker',
   'odrenn_the_temperer',
   'volzharr_buried_furnace',
+  'undermount_cinderling',
   // Collapsed Reliquary delve mobs
   'reliquary_ledger_wraith',
   'reliquary_funeral_ringer',

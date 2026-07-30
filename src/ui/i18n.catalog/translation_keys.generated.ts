@@ -2665,6 +2665,7 @@ export type TranslationKeyFlat =
   | 'entities.mobs.training_dummy.name'
   | 'entities.mobs.treant_elder.name'
   | 'entities.mobs.tunnel_rat.name'
+  | 'entities.mobs.undermount_cinderling.name'
   | 'entities.mobs.vael_the_mistcaller.name'
   | 'entities.mobs.vale_bandit.name'
   | 'entities.mobs.vale_cup_ball.name'

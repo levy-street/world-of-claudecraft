@@ -492,6 +492,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.saan_the_stoker.name': 'Саан Кочегар',
   'entities.mobs.odrenn_the_temperer.name': 'Одренн Закальщик',
   'entities.mobs.volzharr_buried_furnace.name': 'Волзхарр, Погребенная Печь',
+  'entities.mobs.undermount_cinderling.name': 'Угленыш',
   'entities.npcs.runeseeker_maerin.name': 'Руноискательница Мейрин',
   'entities.npcs.runeseeker_maerin.title': 'Странствующий археолог',
   'entities.npcs.runeseeker_maerin.greeting':

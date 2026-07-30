@@ -10740,6 +10740,9 @@ export const ja_JP: EnTranslations = {
       "volzharr_buried_furnace": {
         "name": "埋もれた炉ヴォルザール"
       },
+      "undermount_cinderling": {
+        "name": "燼の子"
+      },
       "reliquary_ledger_wraith": {
         "name": "台帳の亡霊"
       },
