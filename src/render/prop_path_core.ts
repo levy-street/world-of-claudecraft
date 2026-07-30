@@ -1,7 +1,7 @@
 // Pure prop path evaluation for scene cues. Segments are independent authored
 // pose-to-pose glides, so a cut may start from any pose while every individual
-// segment stays continuous and clamped. Three transforms and the wall clock
-// remain in the render consumer.
+// segment stays continuous and clamped. Three transforms and the mirrored
+// simulation clock remain in the render consumer.
 
 export interface PropPathPose {
   readonly x: number;

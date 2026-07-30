@@ -31,7 +31,7 @@ export interface SceneHudControllerDeps {
   /** The HUD layer the overlay + choice window append to (#ui). */
   container: HTMLElement;
   world: () => IWorld;
-  /** Milliseconds clock (performance.now). */
+  /** Authoritative mirrored simulation clock in seconds. */
   now: () => number;
   writers: PainterHostWriters;
   openFocusTrap(root: HTMLElement): FocusTrapHandle;
@@ -64,7 +64,7 @@ export class SceneHudController {
 
   /** Route one drained SimEvent (Hud.handleEvents already pid-gated it). */
   onEvent(ev: SimEvent): void {
-    const nowSec = this.deps.now() / 1000;
+    const nowSec = ev.presentationTime ?? this.deps.now();
     if (ev.type === 'sceneSync') {
       overlayApplySync(this.overlay, ev.state);
       return;
@@ -132,7 +132,7 @@ export class SceneHudController {
 
   /** Per-frame paint, called from Hud.update(). */
   update(): void {
-    const nowSec = this.deps.now() / 1000;
+    const nowSec = this.deps.now();
     this.overlayWindow.paint(sceneOverlayView(this.overlay, nowSec));
     this.choiceWindow.update(
       sceneChoiceView(this.choice, nowSec, this.deps.world().playerId),

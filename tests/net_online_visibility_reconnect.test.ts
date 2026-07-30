@@ -527,6 +527,7 @@ describe('ClientWorld reconnect error-frame tolerance (auth timeout)', () => {
           t: 'hello',
           pid: 1,
           seed: 42,
+          time: 12.5,
           sceneState: {
             sceneId: 'scn_lb_q0_voyage',
             remainingSeconds: 4.5,
@@ -563,6 +564,7 @@ describe('ClientWorld reconnect error-frame tolerance (auth timeout)', () => {
       expect(world.drainEvents()).toEqual([
         {
           type: 'sceneSync',
+          presentationTime: 12.5,
           state: {
             sceneId: 'scn_lb_q0_voyage',
             remainingSeconds: 4.5,
@@ -573,6 +575,7 @@ describe('ClientWorld reconnect error-frame tolerance (auth timeout)', () => {
         },
         {
           type: 'sceneChoiceSync',
+          presentationTime: 12.5,
           state: {
             choiceId: 'ch_lb_ferry_fare_out',
             promptKey: 'lb.fare.promptOut',
@@ -587,7 +590,12 @@ describe('ClientWorld reconnect error-frame tolerance (auth timeout)', () => {
             remainingSeconds: 3,
           },
         },
-        { type: 'sceneChoiceResult', choiceId: 'ch_lb_ferry_fare_out', optionId: 'pay' },
+        {
+          type: 'sceneChoiceResult',
+          choiceId: 'ch_lb_ferry_fare_out',
+          optionId: 'pay',
+          presentationTime: 12.5,
+        },
       ]);
       world.close();
     });
@@ -616,8 +624,8 @@ describe('ClientWorld reconnect error-frame tolerance (auth timeout)', () => {
         }),
       );
       expect(world.drainEvents()).toEqual([
-        { type: 'sceneSync', state: null },
-        { type: 'sceneChoiceSync', state: null },
+        { type: 'sceneSync', state: null, presentationTime: 0 },
+        { type: 'sceneChoiceSync', state: null, presentationTime: 0 },
       ]);
       world.close();
     });
@@ -657,8 +665,8 @@ describe('ClientWorld reconnect error-frame tolerance (auth timeout)', () => {
           }),
         );
         expect(world.drainEvents()).toEqual([
-          { type: 'sceneSync', state: null },
-          { type: 'sceneChoiceSync', state: null },
+          { type: 'sceneSync', state: null, presentationTime: 0 },
+          { type: 'sceneChoiceSync', state: null, presentationTime: 0 },
         ]);
       }
       world.close();

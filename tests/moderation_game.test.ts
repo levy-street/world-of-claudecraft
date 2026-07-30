@@ -671,6 +671,7 @@ describe('moderator spectate integration', () => {
       t: 'spectate',
       name: 'Suspect',
       pid: suspect.pid,
+      time: expect.any(Number),
       sceneState: null,
       sceneChoiceState: null,
     });
@@ -731,6 +732,7 @@ describe('moderator spectate integration', () => {
       t: 'spectate',
       name: null,
       pid: moderator.pid,
+      time: expect.any(Number),
       sceneState: null,
       sceneChoiceState: null,
     });
@@ -779,6 +781,7 @@ describe('moderator spectate integration', () => {
     expect(entered).toMatchObject({
       name: 'Suspect',
       pid: suspect.pid,
+      time: expect.any(Number),
       sceneState: {
         sceneId: 'scn_test_spectate_lock_convergence',
         inputLocked: true,
@@ -804,6 +807,7 @@ describe('moderator spectate integration', () => {
       t: 'spectate',
       name: null,
       pid: moderator.pid,
+      time: expect.any(Number),
       sceneState: null,
       sceneChoiceState: null,
     });
@@ -902,6 +906,7 @@ describe('moderator spectate integration', () => {
       t: 'spectate',
       name: null,
       pid: moderator.pid,
+      time: expect.any(Number),
       sceneState: null,
       sceneChoiceState: null,
     });
