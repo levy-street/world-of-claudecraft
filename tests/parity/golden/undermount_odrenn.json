@@ -15,7 +15,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 825,
+      "nextId": 822,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -29,9 +29,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 830,
-      "state": "fe6b5224",
-      "events": "31bba59a",
+      "nextId": 827,
+      "state": "a120d623",
+      "events": "3310de72",
       "rng": {
         "draws": 6,
         "digest": "7360e6a1"
@@ -40,9 +40,9 @@
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 830,
-      "state": "a4855297",
-      "events": "3d2696e9",
+      "nextId": 827,
+      "state": "a03024e2",
+      "events": "87710bfd",
       "rng": {
         "draws": 6,
         "digest": "7360e6a1"
@@ -83,7 +83,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 825,
+          "entityId": 822,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -140,7 +140,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 826,
+          "entityId": 823,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -182,7 +182,7 @@
               "name": "Battle Stance",
               "remaining": 3598.5,
               "school": "physical",
-              "sourceId": 825
+              "sourceId": 822
             },
             {
               "duration": 2,
@@ -191,7 +191,7 @@
               "name": "Scorched",
               "remaining": 2,
               "school": "fire",
-              "sourceId": 827
+              "sourceId": 824
             }
           ],
           "blockChance": 0.05,
@@ -203,7 +203,7 @@
           "fallStartY": 44.201238,
           "fiveSecondRule": 100.5,
           "hp": 899504,
-          "id": 825,
+          "id": 822,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -254,7 +254,7 @@
               "name": "Chilled",
               "remaining": 2,
               "school": "frost",
-              "sourceId": 827
+              "sourceId": 824
             }
           ],
           "comboUntil": -1,
@@ -264,7 +264,7 @@
           "fallStartY": 44.393607,
           "fiveSecondRule": 100.5,
           "hp": 899678,
-          "id": 826,
+          "id": 823,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -304,7 +304,7 @@
           }
         },
         {
-          "aggroTargetId": 825,
+          "aggroTargetId": 822,
           "aiState": "attack",
           "comboUntil": -1,
           "critChance": 0.05,
@@ -314,7 +314,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 47975,
-          "id": 827,
+          "id": 824,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -346,11 +346,11 @@
             "armor": 782
           },
           "swingTimer": 1.2,
-          "tappedById": 825,
+          "tappedById": 822,
           "templateId": "odrenn_the_temperer",
           "threat": [
             [
-              825,
+              822,
               26
             ]
           ],
@@ -365,9 +365,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 830,
-      "state": "e283ba7e",
-      "events": "36ad60bc",
+      "nextId": 827,
+      "state": "d49ba1ff",
+      "events": "b7a872f4",
       "rng": {
         "draws": 6,
         "digest": "7360e6a1"
@@ -376,8 +376,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 830,
-      "state": "e283ba7e",
+      "nextId": 827,
+      "state": "d49ba1ff",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -419,7 +419,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 825,
+          "entityId": 822,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -476,7 +476,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 826,
+          "entityId": 823,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -518,7 +518,7 @@
               "name": "Battle Stance",
               "remaining": 3598,
               "school": "physical",
-              "sourceId": 825
+              "sourceId": 822
             },
             {
               "duration": 2,
@@ -527,7 +527,7 @@
               "name": "Chilled",
               "remaining": 2,
               "school": "frost",
-              "sourceId": 827
+              "sourceId": 824
             }
           ],
           "blockChance": 0.05,
@@ -540,7 +540,7 @@
           "fallStartY": 44.49883,
           "fiveSecondRule": 101,
           "hp": 899504,
-          "id": 825,
+          "id": 822,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -591,7 +591,7 @@
               "name": "Chilled",
               "remaining": 2,
               "school": "frost",
-              "sourceId": 827
+              "sourceId": 824
             }
           ],
           "combatTimer": 0.5,
@@ -602,7 +602,7 @@
           "fallStartY": 44.393607,
           "fiveSecondRule": 101,
           "hp": 899678,
-          "id": 826,
+          "id": 823,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -642,7 +642,7 @@
           }
         },
         {
-          "aggroTargetId": 825,
+          "aggroTargetId": 822,
           "aiState": "attack",
           "combatTimer": 0.5,
           "comboUntil": -1,
@@ -653,7 +653,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 47975,
-          "id": 827,
+          "id": 824,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -685,11 +685,11 @@
             "armor": 782
           },
           "swingTimer": 0.7,
-          "tappedById": 825,
+          "tappedById": 822,
           "templateId": "odrenn_the_temperer",
           "threat": [
             [
-              825,
+              822,
               26
             ]
           ],
@@ -704,9 +704,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 830,
-      "state": "c363a837",
-      "events": "0b023eb2",
+      "nextId": 827,
+      "state": "823413f0",
+      "events": "d0485486",
       "rng": {
         "draws": 136,
         "digest": "4b1f3274"
@@ -715,8 +715,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 830,
-      "state": "c363a837",
+      "nextId": 827,
+      "state": "823413f0",
       "events": "741638a5",
       "rng": {
         "draws": 136,
@@ -758,7 +758,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 825,
+          "entityId": 822,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -828,7 +828,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 826,
+          "entityId": 823,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -871,7 +871,7 @@
               "name": "Battle Stance",
               "remaining": 3597,
               "school": "physical",
-              "sourceId": 825
+              "sourceId": 822
             },
             {
               "duration": 2,
@@ -880,7 +880,7 @@
               "name": "Chilled",
               "remaining": 2,
               "school": "frost",
-              "sourceId": 827
+              "sourceId": 824
             }
           ],
           "blockChance": 0.05,
@@ -893,7 +893,7 @@
           "fallStartY": 44.49883,
           "fiveSecondRule": 102,
           "hp": 899071,
-          "id": 825,
+          "id": 822,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -943,7 +943,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 102,
-          "id": 826,
+          "id": 823,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -983,7 +983,7 @@
           }
         },
         {
-          "aggroTargetId": 825,
+          "aggroTargetId": 822,
           "aiState": "attack",
           "auras": [
             {
@@ -993,7 +993,7 @@
               "name": "Tempering",
               "remaining": 3599.05,
               "school": "fire",
-              "sourceId": 827,
+              "sourceId": 824,
               "stacks": 1,
               "value": 0.06
             }
@@ -1007,7 +1007,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 47975,
-          "id": 827,
+          "id": 824,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -1040,11 +1040,11 @@
             "armor": 782
           },
           "swingTimer": 2.35,
-          "tappedById": 825,
+          "tappedById": 822,
           "templateId": "odrenn_the_temperer",
           "threat": [
             [
-              825,
+              822,
               26
             ]
           ],
@@ -1059,8 +1059,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 830,
-      "state": "c363a837",
+      "nextId": 827,
+      "state": "823413f0",
       "events": "741638a5",
       "rng": {
         "draws": 136,
@@ -1102,7 +1102,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 825,
+          "entityId": 822,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1172,7 +1172,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 826,
+          "entityId": 823,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1215,7 +1215,7 @@
               "name": "Battle Stance",
               "remaining": 3597,
               "school": "physical",
-              "sourceId": 825
+              "sourceId": 822
             },
             {
               "duration": 2,
@@ -1224,7 +1224,7 @@
               "name": "Chilled",
               "remaining": 2,
               "school": "frost",
-              "sourceId": 827
+              "sourceId": 824
             }
           ],
           "blockChance": 0.05,
@@ -1237,7 +1237,7 @@
           "fallStartY": 44.49883,
           "fiveSecondRule": 102,
           "hp": 899071,
-          "id": 825,
+          "id": 822,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1287,7 +1287,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 102,
-          "id": 826,
+          "id": 823,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1327,7 +1327,7 @@
           }
         },
         {
-          "aggroTargetId": 825,
+          "aggroTargetId": 822,
           "aiState": "attack",
           "auras": [
             {
@@ -1337,7 +1337,7 @@
               "name": "Tempering",
               "remaining": 3599.05,
               "school": "fire",
-              "sourceId": 827,
+              "sourceId": 824,
               "stacks": 1,
               "value": 0.06
             }
@@ -1351,7 +1351,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 47975,
-          "id": 827,
+          "id": 824,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -1384,11 +1384,11 @@
             "armor": 782
           },
           "swingTimer": 2.35,
-          "tappedById": 825,
+          "tappedById": 822,
           "templateId": "odrenn_the_temperer",
           "threat": [
             [
-              825,
+              822,
               26
             ]
           ],
