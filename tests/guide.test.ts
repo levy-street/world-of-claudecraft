@@ -1000,6 +1000,7 @@ describe('Guide deeds cross-page surfaces', () => {
     expect(html).toContain('Heroic Marks');
     expect(html).toContain('/dungeon heroic');
     expect(html).toContain('/dungeon reset');
+    expect(new Set(GUIDE_DUNGEONS.map((d) => d.id)).size).toBe(GUIDE_DUNGEONS.length);
     // Every generated dungeon card carries its deep-link anchor for site search.
     for (const d of GUIDE_DUNGEONS) {
       expect(html, `dungeon card missing anchor id "dungeon-${d.id}"`).toContain(
