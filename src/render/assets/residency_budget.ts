@@ -63,6 +63,18 @@ function textureBytes(tex: THREE.Texture, seenImages: Set<unknown>): number {
     | undefined;
   if (!img || seenImages.has(img)) return 0;
   seenImages.add(img);
+  // KTX2 textures keep their transcoded blocks in the mipmap array; the image
+  // is a bare {width,height} and w*h*4 would over-report by the compression
+  // ratio (the whole point of shipping them compressed).
+  const compressed = tex as {
+    isCompressedTexture?: boolean;
+    mipmaps?: { data?: { byteLength?: number } }[];
+  };
+  if (compressed.isCompressedTexture) {
+    let total = 0;
+    for (const mip of compressed.mipmaps ?? []) total += mip.data?.byteLength ?? 0;
+    return total;
+  }
   // DataTexture carries its buffer; decoded bitmaps cost w*h*RGBA.
   if (img.data?.byteLength) return img.data.byteLength;
   if (img.width && img.height) return img.width * img.height * 4;

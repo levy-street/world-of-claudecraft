@@ -1,7 +1,8 @@
 // Small 3D animation-context viewer used only by the local SFX Studio.
-import { GLTFLoader, MeshoptDecoder, OrbitControls, THREE } from '/three.bundle.js';
+import { GLTFLoader, KTX2Loader, MeshoptDecoder, OrbitControls, THREE } from '/three.bundle.js';
 
 const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+let ktx2Attached = false;
 let session = null;
 
 function disposeObject(root) {
@@ -91,6 +92,13 @@ function setClipOptions(current, select, preferred) {
 async function open(asset, ui) {
   close();
   const renderer = new THREE.WebGLRenderer({ canvas: ui.canvas, antialias: true, alpha: false });
+  if (!ktx2Attached) {
+    // Shipped GLBs carry KTX2 textures; transcoder served by the studio server.
+    ktx2Attached = true;
+    const ktx2 = new KTX2Loader().setTranscoderPath('/basis/');
+    ktx2.detectSupport(renderer);
+    loader.setKTX2Loader(ktx2);
+  }
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   const scene = new THREE.Scene();

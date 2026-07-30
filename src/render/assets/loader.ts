@@ -6,6 +6,7 @@ import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 import { resampleHdrRgba } from '../hdr_resample';
+import { ktx2Loader } from './ktx2_support';
 import { MAX_LOAD_ATTEMPTS, retryDelayMs } from './load_retry';
 import { assetUrl } from './media';
 import { assetLoadStarted, recordAssetLoad } from './stats';
@@ -78,6 +79,9 @@ function loader(): GLTFLoader {
   if (!gltfLoader) {
     gltfLoader = new GLTFLoader();
     gltfLoader.setMeshoptDecoder(MeshoptDecoder);
+    // Model textures ship as KTX2 (KHR_texture_basisu): without the transcoder
+    // attached, parsing any public/models GLB rejects outright.
+    gltfLoader.setKTX2Loader(ktx2Loader());
   }
   return gltfLoader;
 }

@@ -16,6 +16,7 @@ import * as esbuild from 'esbuild';
 import puppeteer from 'puppeteer-core';
 import sharp from 'sharp';
 import { BROWSER_PATH } from './browser_path.mjs';
+import { ktx2TranscoderScriptTag } from './lib/ktx2_assets.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mountsDir = path.join(root, 'public/models/mounts');
@@ -83,7 +84,10 @@ const built = await esbuild.build({
   logLevel: 'silent',
 });
 const bundleJs = built.outputFiles[0].text;
-const html = `<!doctype html><html><head><meta charset="utf8"><style>html,body{margin:0;background:transparent}</style></head><body><script>${bundleJs}</script></body></html>`;
+const ktx2Tag = ktx2TranscoderScriptTag(
+  path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'),
+);
+const html = `<!doctype html><html><head><meta charset="utf8"><style>html,body{margin:0;background:transparent}</style></head><body>${ktx2Tag}<script>${bundleJs}</script></body></html>`;
 
 // 2) Drive headless Chrome over software WebGL.
 const browser = await puppeteer.launch({
