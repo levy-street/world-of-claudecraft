@@ -28,7 +28,13 @@ import { queueGatheringGrant } from '../src/sim/professions/gathering';
 import { turnInQuestCore } from '../src/sim/quests/quest_commands';
 import { type ArenaMatch, type CharacterState, Sim } from '../src/sim/sim';
 import * as duelMod from '../src/sim/social/duel';
-import { type Entity, MAX_LEVEL, MILESTONES, type SimEvent } from '../src/sim/types';
+import {
+  type DeedTrigger,
+  type Entity,
+  MAX_LEVEL,
+  MILESTONES,
+  type SimEvent,
+} from '../src/sim/types';
 
 function makeSim(seed = 42): Sim {
   return new Sim({ seed, playerClass: 'warrior', autoEquip: false });
@@ -272,6 +278,23 @@ describe('trigger kinds grant once, with negatives', () => {
     expect(checkDeedTrigger(meta, e, { kind: 'quests', questIds: ['qa', 'qb'] })).toBe(false);
     meta.questsDone.add('qb');
     expect(checkDeedTrigger(meta, e, { kind: 'quests', questIds: ['qa', 'qb'] })).toBe(true);
+  });
+
+  it('meta: a lockout-window requirement needs every lockout to share one reset', () => {
+    const sim = makeSim();
+    const { meta, e } = primary(sim);
+    for (const id of ['wing1', 'wing2', 'wing3']) meta.deedsEarned.set(id, '');
+    const trigger: DeedTrigger = {
+      kind: 'meta',
+      deedIds: ['wing1', 'wing2', 'wing3'],
+      raidLockoutIds: ['undermount_wing1', 'undermount_wing2', 'undermount_wing3'],
+    };
+    meta.raidLockouts.set('undermount_wing1', 1000);
+    meta.raidLockouts.set('undermount_wing2', 1000);
+    meta.raidLockouts.set('undermount_wing3', 2000);
+    expect(checkDeedTrigger(meta, e, trigger)).toBe(false);
+    meta.raidLockouts.set('undermount_wing3', 1000);
+    expect(checkDeedTrigger(meta, e, trigger)).toBe(true);
   });
 
   it('quests (plural): the Thornpeak chain needs all five, the crypt deed its one', () => {

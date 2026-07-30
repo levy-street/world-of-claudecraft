@@ -314,6 +314,33 @@ describe('item webp icons', () => {
       expect(entry.name, `${entry.itemId} must name its source asset`).toBeTruthy();
       expect(entry.sourcePack, `${entry.itemId} must identify its source pack`).toBeTruthy();
     }
+    const volzharrIds = new Set([
+      'band_of_the_ninth_quench',
+      'crownforged_heartplate',
+      'footwraps_of_the_waking_floor',
+      'forgeheat_cinch',
+      'heroic_band_of_the_ninth_quench',
+      'heroic_crownforged_heartplate',
+      'heroic_footwraps_of_the_waking_floor',
+      'heroic_forgeheat_cinch',
+      'heroic_magmastrider_greaves',
+      'heroic_nighttalon_emberweave',
+      'heroic_soulflame_vestments',
+      'heroic_stormcallers_hauberk',
+      'heroic_volzharrs_knucklestone',
+      'magmastrider_greaves',
+      'moltenheart_chroma',
+      'nighttalon_emberweave',
+      'soulflame_vestments',
+      'stormcallers_hauberk',
+      'volzharrs_knucklestone',
+    ]);
+    for (const id of volzharrIds) {
+      const entry = m.entries.find((candidate) => candidate.itemId === id);
+      expect(entry?.sourcePack, id).toBe('woc_generated');
+      expect(entry?.sourceFile, id).toBe(`${id}.webp`);
+      expect(entry?.license, id).toContain('project asset');
+    }
     expect(m.generatedBatches, 'generated art must retain its batch provenance').not.toEqual([]);
     for (const batch of m.generatedBatches ?? []) {
       expect(batch.source).toBeTruthy();
@@ -457,6 +484,8 @@ describe('item webp icons', () => {
       'sluicebearer',
       'the_even_temper',
       'cinderarc_odrenns_rod',
+      'corebreaker_heart_of_the_undermount',
+      'the_last_restraint',
     ]) {
       expect(iconDataUrl('item', `heroic_${id}`), id).toBe(
         `/ui/weapons/${ITEM_WEAPON_VARIANTS[id]}.jpg`,

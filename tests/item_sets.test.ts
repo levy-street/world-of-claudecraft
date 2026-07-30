@@ -4,9 +4,11 @@ import {
   ITEM_SETS,
   SET_BOUNDSTONE_VANGUARD,
   SET_CRIT_3PC_RATING,
+  SET_CRIT_5PC,
   SET_CROWNFORGED,
   SET_DEATHLORD,
   SET_NECROMANCERS,
+  SET_NIGHTTALON,
   SET_SOULFLAME,
   SET_STORMCALLERS,
   SET_WYRMSHADOW,
@@ -16,7 +18,11 @@ import { createMob, createPlayer, recalcPlayerStats } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, PlayerClass } from '../src/sim/types';
 import { CAST_PUSHBACK_SEC, CHANNEL_PUSHBACK_FRACTION } from '../src/sim/types';
-import { itemSetMemberCounts, itemSetTooltipModel } from '../src/ui/item_set_tooltip_view';
+import {
+  itemSetBonusField,
+  itemSetMemberCounts,
+  itemSetTooltipModel,
+} from '../src/ui/item_set_tooltip_view';
 
 const counts = (m: Record<string, number>) => new Map(Object.entries(m));
 
@@ -107,6 +113,17 @@ describe('aggregateSetBonuses (pure resolver)', () => {
     expect(stormcallers.sta).toBe(0);
   });
 
+  it('tier 2 families gain exactly one 5-piece +3% crit tier', () => {
+    for (const setId of [SET_CROWNFORGED, SET_NIGHTTALON, SET_SOULFLAME, SET_STORMCALLERS]) {
+      const four = aggregateSetBonuses(counts({ [setId]: 4 }));
+      const five = aggregateSetBonuses(counts({ [setId]: 5 }));
+      expect(four.crit, `${setId} below 5pc`).toBe(0);
+      expect(five.crit, `${setId} at 5pc`).toBe(0.03);
+      expect(SET_CRIT_5PC).toBe(0.03);
+      expect(ITEM_SETS[setId].bonuses.filter((bonus) => bonus.pieces === 5)).toHaveLength(1);
+    }
+  });
+
   it('pushback reduction max-combines across met tiers and clamps to 0..1', () => {
     const twoCasterSets = aggregateSetBonuses(
       counts({ [SET_NECROMANCERS]: 2, [SET_SOULFLAME]: 2 }),
@@ -135,12 +152,13 @@ describe('aggregateSetBonuses (pure resolver)', () => {
   });
 
   it('every set definition lists ascending tiers ending at its authored cap', () => {
+    const tier2 = new Set([SET_CROWNFORGED, SET_NIGHTTALON, SET_SOULFLAME, SET_STORMCALLERS]);
     for (const set of Object.values(ITEM_SETS)) {
       const pieces = set.bonuses.map((b) => b.pieces);
       // every epic (raid/dungeon) family carries 2-, 3-, and 4-piece tiers (the
       // 4-piece is a proc); the leveling haste kits deliberately carry the
       // single 3-piece tier.
-      const expected = pieces.length === 1 ? '3' : '2,3,4';
+      const expected = pieces.length === 1 ? '3' : tier2.has(set.id) ? '2,3,4,5' : '2,3,4';
       expect([pieces.join(','), set.id]).toEqual([expected, set.id]);
     }
   });
@@ -149,14 +167,14 @@ describe('aggregateSetBonuses (pure resolver)', () => {
 describe('item set tooltip model', () => {
   it('counts each set as its distinct equip slots (base + all heroic versions are one piece)', () => {
     const counts = itemSetMemberCounts();
-    // The wing 2 legs bring every t2 set to 5 distinct slots. The normal piece, its
+    // The wing 3 chests bring every t2 set to 6 distinct slots. The normal piece, its
     // auto-generated heroic variant, and any bespoke heroic raid piece for the
     // same slot all collapse to one member, so the "X/N" denominator reflects the
     // real number of collectible pieces (not the parallel heroic-variant ids).
-    expect(counts.crownforged).toBe(5);
-    expect(counts.nighttalon).toBe(5);
-    expect(counts.soulflame).toBe(5);
-    expect(counts.stormcallers).toBe(5);
+    expect(counts.crownforged).toBe(6);
+    expect(counts.nighttalon).toBe(6);
+    expect(counts.soulflame).toBe(6);
+    expect(counts.stormcallers).toBe(6);
     // Leveling haste kits: 3 pieces each.
     expect(counts.vale_arcanist).toBe(3);
     expect(counts.boundstone_vanguard).toBe(3);
@@ -196,6 +214,16 @@ describe('item set tooltip model', () => {
     });
     expect(model?.totalPieces).toBe(2);
     expect(model?.bonusTiers.map((tier) => tier.pieces)).toEqual([2]);
+  });
+
+  it('routes every supported tier to its own localized tooltip field', () => {
+    expect([2, 3, 4, 5, 6].map(itemSetBonusField)).toEqual([
+      'bonus2',
+      'bonus3',
+      'bonus4',
+      'bonus5',
+      null,
+    ]);
   });
 });
 

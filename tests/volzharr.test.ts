@@ -18,7 +18,7 @@ import {
   FORGEHEAT_AURA_ID,
   resetVolzharrEncounter,
 } from '../src/sim/encounters/volzharr';
-import { enterDungeon, instanceKeyFor } from '../src/sim/instances/dungeons';
+import { enterDungeon, heroicLockoutId, instanceKeyFor } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 
@@ -102,6 +102,57 @@ function ventsOf(sim: AnySim, boss: AnyEntity): any[] {
 }
 
 describe('Volzharr, the Buried Furnace (wing 3)', () => {
+  it('pays two guaranteed groups, the exact chase group, Moltenheart, and 15 gold', () => {
+    const loot = MOBS[VOLZHARR].loot ?? [];
+    const group = (id: string) => loot.filter((entry) => entry.rollGroup === id);
+    expect(
+      group('undermount_wing3_t2_chests').map(({ itemId, chance }) => [itemId, chance]),
+    ).toEqual([
+      ['crownforged_heartplate', 0.25],
+      ['nighttalon_emberweave', 0.25],
+      ['soulflame_vestments', 0.25],
+      ['stormcallers_hauberk', 0.25],
+    ]);
+    expect(
+      group('undermount_wing3_offpieces').map(({ itemId, chance }) => [itemId, chance]),
+    ).toEqual([
+      ['volzharrs_knucklestone', 0.25],
+      ['magmastrider_greaves', 0.25],
+      ['footwraps_of_the_waking_floor', 0.25],
+      ['forgeheat_cinch', 0.25],
+    ]);
+    expect(group('undermount_wing3_chase').map(({ itemId, chance }) => [itemId, chance])).toEqual([
+      ['corebreaker_heart_of_the_undermount', 0.03],
+      ['the_last_restraint', 0.03],
+      ['band_of_the_ninth_quench', 0.1],
+      ['moltenheart_chroma', 0.01],
+    ]);
+    expect(loot).toContainEqual({ copper: 150000, chance: 1 });
+  });
+
+  it('settles heroic variants, the heroic lockout, and the heroic deed through the live kill path', () => {
+    const sim = makeSim(13);
+    const pid = sim.addPlayer('warrior', 'Heroic Raider');
+    const meta = metaOf(sim, pid);
+    meta.undermountCleared.add('undermount_wing1');
+    meta.undermountCleared.add('undermount_wing2');
+    sim.setDungeonDifficulty('heroic', pid);
+    enterDungeon(sim.ctx, WING3, pid);
+    const inst = claimFor(sim, WING3, pid);
+    const boss = bossIn(sim, inst, VOLZHARR);
+    const player = sim.entities.get(pid) as AnyEntity;
+    player.pos = { ...boss.pos };
+
+    sim.dealDamage(player, boss, boss.hp + 1, false, 'physical', null, 'hit', true);
+
+    const ids = (boss.loot?.items ?? []).map((slot: any) => String(slot.itemId));
+    expect(ids.filter((id: string) => id.startsWith('heroic_'))).toHaveLength(2);
+    expect(meta.raidLockouts.has(heroicLockoutId(WING3))).toBe(true);
+    expect(meta.deedStats.dungeonClears[`${WING3}:heroic`]).toBe(1);
+    sim.tick();
+    expect(meta.deedsEarned.has('dgn_undermount_volzharr_heroic')).toBe(true);
+  });
+
   it('spawns dormant Cinderlings with the boss and gives him the walk speed', () => {
     const sim = makeSim();
     const { boss, inst } = pullVolzharr(sim, 1);

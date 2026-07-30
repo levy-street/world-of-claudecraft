@@ -37,6 +37,11 @@ describe('heroic loot flair: variant generation', () => {
         (MOBS[bossId]?.loot ?? []).flatMap((entry: any) => (entry.itemId ? [entry.itemId] : [])),
       ),
     );
+    const volzharrBases = new Set(
+      (MOBS.volzharr_buried_furnace?.loot ?? []).flatMap((entry: any) =>
+        entry.itemId ? [entry.itemId] : [],
+      ),
+    );
     const all = variants();
     expect(all.length).toBeGreaterThan(0);
     for (const v of all) {
@@ -45,6 +50,8 @@ describe('heroic loot flair: variant generation', () => {
         expect(itemLevel(v), v.id).toBe(v.quality === 'legendary' ? 37 : 33);
       } else if (undermountBases.has(v.heroicOf ?? '')) {
         expect(itemLevel(v), v.id).toBe(37);
+      } else if (volzharrBases.has(v.heroicOf ?? '')) {
+        expect(itemLevel(v), v.id).toBe(39);
       } else {
         expect(itemLevel(v), v.id).toBe(v.quality === 'epic' ? 28 : 25);
       }

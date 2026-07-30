@@ -51,6 +51,20 @@ const UNDERMOUNT_ILVL_33_ITEMS = [
   ['slakeleather_belt', 'Slakeleather Belt', 16],
 ] as const;
 
+const UNDERMOUNT_ILVL_35_ITEMS = [
+  ['crownforged_heartplate', 'Crownforged Heartplate', 25],
+  ['nighttalon_emberweave', 'Nighttalon Emberweave', 25],
+  ['soulflame_vestments', 'Soulflame Vestments', 25],
+  ['stormcallers_hauberk', "Stormcaller's Hauberk", 25],
+  ['volzharrs_knucklestone', "Volzharr's Knucklestone", 15],
+  ['magmastrider_greaves', 'Magmastrider Greaves', 16],
+  ['footwraps_of_the_waking_floor', 'Footwraps of the Waking Floor', 16],
+  ['forgeheat_cinch', 'Forgeheat Cinch', 17],
+  ['corebreaker_heart_of_the_undermount', 'Corebreaker, Heart of the Undermount', 33],
+  ['the_last_restraint', 'The Last Restraint', 25],
+  ['band_of_the_ninth_quench', 'Band of the Ninth Quench', 15],
+] as const;
+
 const UNDERMOUNT_RATING_ALLOWANCES = [
   ['glasswalker_treads', 'critRating', 40],
   ['stokebrand_striders', 'hasteRating', 40],
@@ -68,6 +82,17 @@ const UNDERMOUNT_RATING_ALLOWANCES = [
   ['ashwalk_sandals', 'hasteRating', 40],
   ['quenchsilk_cord', 'hasteRating', 40],
   ['slakeleather_belt', 'critRating', 40],
+  ['crownforged_heartplate', 'critRating', 40],
+  ['nighttalon_emberweave', 'critRating', 40],
+  ['soulflame_vestments', 'hasteRating', 40],
+  ['stormcallers_hauberk', 'hasteRating', 40],
+  ['volzharrs_knucklestone', 'critRating', 40],
+  ['footwraps_of_the_waking_floor', 'hasteRating', 40],
+  ['forgeheat_cinch', 'hasteRating', 40],
+  ['corebreaker_heart_of_the_undermount', 'critRating', 65],
+  ['corebreaker_heart_of_the_undermount', 'hasteRating', 20],
+  ['the_last_restraint', 'hasteRating', 65],
+  ['band_of_the_ninth_quench', 'hasteRating', 40],
 ] as const;
 
 describe('item level: source derivation', () => {
@@ -256,6 +281,22 @@ describe('item level: raid tier', () => {
     expect(ITEMS.stormcallers_legwraps.set).toBe('stormcallers');
   });
 
+  it('pins every Volzharr gear drop to its exact ilvl 35 primary budget', () => {
+    for (const [id, name, budget] of UNDERMOUNT_ILVL_35_ITEMS) {
+      const item = ITEMS[id];
+      expect(item?.name, id).toBe(name);
+      expect(itemSourceLevel(id), id).toBe(26);
+      expect(itemFromRaid(id), id).toBe(true);
+      expect(itemLevel(item), id).toBe(35);
+      expect(expectedStatBudget(item), id).toBe(budget);
+      expect(primaryStatSum(item), id).toBe(budget);
+    }
+    expect(ITEMS.crownforged_heartplate.set).toBe('crownforged');
+    expect(ITEMS.nighttalon_emberweave.set).toBe('nighttalon');
+    expect(ITEMS.soulflame_vestments.set).toBe('soulflame');
+    expect(ITEMS.stormcallers_hauberk.set).toBe('stormcallers');
+  });
+
   it('pins Undermount combat ratings to the raid-tier allowances', () => {
     for (const [id, stat, allowance] of UNDERMOUNT_RATING_ALLOWANCES) {
       const item = ITEMS[id];
@@ -272,6 +313,23 @@ describe('item level: raid tier', () => {
       expect(primaryStatSum(heroic), id).toBe(expectedStatBudget(heroic));
       expect(heroic?.set, id).toBe(ITEMS[id].set);
     }
+    for (const [id] of UNDERMOUNT_ILVL_35_ITEMS) {
+      const heroic = ITEMS[`heroic_${id}`];
+      expect(heroic?.heroicOf, id).toBe(id);
+      expect(itemLevel(heroic), id).toBe(39);
+      expect(primaryStatSum(heroic), id).toBe(expectedStatBudget(heroic));
+      expect(heroic?.set, id).toBe(ITEMS[id].set);
+    }
+    const corebreaker = ITEMS.heroic_corebreaker_heart_of_the_undermount;
+    expect(corebreaker.critRating).toBe(70);
+    expect(corebreaker.hitRating).toBe(30);
+    expect(corebreaker.hasteRating).toBeUndefined();
+    expect(
+      ['hitRating', 'critRating', 'hasteRating'].filter(
+        (rating) =>
+          (corebreaker[rating as keyof typeof corebreaker] as number | undefined) !== undefined,
+      ),
+    ).toHaveLength(2);
   });
 
   it('flags raid (10-player) drops and not dungeon (5-player) drops', () => {

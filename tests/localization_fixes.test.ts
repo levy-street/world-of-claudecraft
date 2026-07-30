@@ -611,6 +611,7 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
     for (const name of [
       'Emberfeed',
       'Forgeheat',
+      'Searing Grip',
       'Vent Fissure',
       'Undermount Eruption',
       'The Embers Come Home',
@@ -622,6 +623,7 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
       for (const name of [
         'Emberfeed',
         'Forgeheat',
+        'Searing Grip',
         'Vent Fissure',
         'Undermount Eruption',
         'The Embers Come Home',

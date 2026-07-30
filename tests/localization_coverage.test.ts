@@ -962,10 +962,10 @@ describe('i18n Localization Key Coverage', () => {
 
   it('should track item-set names and bonus text in the entity catalog', async () => {
     const itemSetEntries = entityTranslationManifest().filter((entry) => entry.group === 'itemSet');
-    // 7 raid/dungeon families with name+bonus2+bonus3+bonus4 (every epic family
-    // carries a 4-piece proc tier), plus 3 leveling haste kits carrying a
-    // single 3-piece tier (name+bonus3 only).
-    expect(itemSetEntries).toHaveLength(7 * 4 + 3 * 2);
+    // 4 T2 Undermount families carry name+bonus2+bonus3+bonus4+bonus5, the
+    // other 3 raid/dungeon families stop at bonus4, and 3 leveling haste kits
+    // carry a single 3-piece tier (name+bonus3 only).
+    expect(itemSetEntries).toHaveLength(4 * 5 + 3 * 4 + 3 * 2);
     expect(missingEntityTranslationsForGroups(['itemSet'])).toHaveLength(0);
 
     for (const lang of ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const) {
@@ -1312,9 +1312,9 @@ describe('i18n Localization Key Coverage', () => {
 
   it('should provide deed content translations for every supported locale', () => {
     const deedEntries = deedTranslationManifest();
-    // name + desc per deed, plus one title entry per title deed (30 as of
-    // Professions 2.0; tests/deeds_content.test.ts pins the count).
-    expect(deedEntries.length).toBe(Object.keys(DEEDS).length * 2 + 30);
+    // name + desc per deed, plus one title entry per title deed (31 as of
+    // Undermount S7; tests/deeds_content.test.ts pins the count).
+    expect(deedEntries.length).toBe(Object.keys(DEEDS).length * 2 + 31);
 
     for (const lang of supportedLanguages) {
       setLanguage(lang);

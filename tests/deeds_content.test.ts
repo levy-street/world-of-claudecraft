@@ -56,9 +56,9 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 225 deeds worth 2770 total Renown', () => {
-    expect(DEED_ORDER.length).toBe(225);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2770);
+  it('ships exactly 228 deeds worth 2845 total Renown', () => {
+    expect(DEED_ORDER.length).toBe(228);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2845);
   });
 
   it('ships the audited per-category counts', () => {
@@ -67,7 +67,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     expect(byCategory).toEqual({
       progression: 50,
       combat: 10,
-      dungeon: 33,
+      dungeon: 36,
       delve: 13,
       chronicle: 24,
       collection: 28,
@@ -126,6 +126,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'dgn_undermount_kiln_keepers_heroic',
       'dgn_undermount_odrenn',
       'dgn_undermount_odrenn_heroic',
+      'dgn_undermount_volzharr',
+      'dgn_undermount_full_descent',
+      'dgn_undermount_volzharr_heroic',
     ]);
     expect(DEEDS.dgn_undermount_kiln_keepers.renown).toBe(10);
     expect(DEEDS.dgn_undermount_kiln_keepers.trigger).toEqual({
@@ -149,6 +152,32 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       dungeonId: 'undermount_wing2',
       difficulty: 'heroic',
       count: 1,
+    });
+    expect(DEEDS.dgn_undermount_volzharr).toMatchObject({
+      renown: 25,
+      trigger: { kind: 'dungeonClears', dungeonId: 'undermount_wing3', count: 1 },
+      reward: { kind: 'title', text: 'the Mountainbreaker' },
+    });
+    expect(DEEDS.dgn_undermount_full_descent).toMatchObject({
+      renown: 25,
+      trigger: {
+        kind: 'meta',
+        deedIds: [
+          'dgn_undermount_kiln_keepers',
+          'dgn_undermount_odrenn',
+          'dgn_undermount_volzharr',
+        ],
+        raidLockoutIds: ['undermount_wing1', 'undermount_wing2', 'undermount_wing3'],
+      },
+    });
+    expect(DEEDS.dgn_undermount_volzharr_heroic).toMatchObject({
+      renown: 25,
+      trigger: {
+        kind: 'dungeonClears',
+        dungeonId: 'undermount_wing3',
+        difficulty: 'heroic',
+        count: 1,
+      },
     });
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -310,14 +339,14 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     expect(DEEDS.prog_ringwright).toBeUndefined();
   });
 
-  it('ships exactly 30 titles and 3 borders', () => {
+  it('ships exactly 31 titles and 3 borders', () => {
     const titles = ALL.filter((d) => d.reward?.kind === 'title');
     const borders = ALL.filter((d) => d.reward?.kind === 'border');
-    expect(titles.length).toBe(30);
+    expect(titles.length).toBe(31);
     expect(borders.length).toBe(3);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(30);
+    expect(new Set(titleTexts).size).toBe(31);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual(['curators_gilt', 'deepward', 'prestige_laurels']);
   });
@@ -358,7 +387,9 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // trigger or renown changed.
   // Re-baselined for four appended Undermount wing 1 and 2 first-kill deeds;
   // no shipped trigger or renown changed.
-  const FROZEN_CATALOG_SHA256 = 'a97eff5e666f7eaff86803504ba814e5201dd68677641154f35a3861398010c7';
+  // Re-baselined for the three appended Undermount wing 3 deeds; no shipped
+  // trigger or renown changed.
+  const FROZEN_CATALOG_SHA256 = '6f06e46f9924fc3ea48316cb0029e9f5a86173cd88400010eeb82100146d992a';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -502,7 +533,7 @@ describe('table shape', () => {
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('dgn_undermount_odrenn_heroic');
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('dgn_undermount_volzharr_heroic');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

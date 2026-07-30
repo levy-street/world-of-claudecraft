@@ -209,6 +209,7 @@ describe('heroic tuning data contract', () => {
       nythraxis_boss_arena: [3.2, 7.25, 7.25],
       undermount_wing1: [3.2, 7.25, 7.25],
       undermount_wing2: [3.2, 7.25, 7.25],
+      undermount_wing3: [3.2, 7.25, 7.25],
     });
   });
 
