@@ -13,6 +13,8 @@ import {
 } from '../harbor_layout';
 import type { SceneAttachFrame, SceneRigPoint } from '../types';
 
+export { MIN_PERCEPTUAL_FADE_SECONDS } from './fade_timing';
+
 // Twenty samples per second match the authoring report without tying the gate to render frame rate.
 export const SHOT_SAMPLE_RATE_HZ = 20;
 // Cameras must keep this vertical distance above the terrain surface.
@@ -77,8 +79,6 @@ export const CINEMATIC_VERTICAL_FOV_DEG = 60;
 export const CINEMATIC_FRAME_ASPECT = 16 / 9;
 // Overlay opacity must reach this value before a camera jump is hidden.
 export const FULL_BLACK_OPACITY = 1;
-// Every camera cut needs one full sim tick of black leading into the cut.
-export const MIN_FULL_BLACK_CUT_SLACK_SECONDS = 1 / 20;
 // Authored times within this tolerance are treated as lying on a scene boundary.
 export const SCENE_TIME_EPSILON_SECONDS = 1e-7;
 // The authoritative player collider is a 0.5-yard radius, and the visual is about 2.6 yards tall.

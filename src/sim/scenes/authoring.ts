@@ -1,7 +1,8 @@
 import { DT } from '../types';
+import { MIN_PERCEPTUAL_FADE_SECONDS } from './fade_timing';
 import type { SceneDef, SceneOpDef } from './registry';
 
-export const SCENE_CUT_FADE_SECONDS = 0.4;
+export { MIN_PERCEPTUAL_FADE_SECONDS } from './fade_timing';
 // Mirrors resolveAndApply's authored-line fallback without importing the runtime.
 export const SCENE_DEFAULT_LINE_SECONDS = 4;
 export const DEFAULT_SCENE_RELEASE_MARGIN_SECONDS = 1;
@@ -59,7 +60,7 @@ export function coveredCut<const Beat extends string>(
 
 export function fadeInTail<const Beat extends string>(
   at: SceneBeatAt<Beat>,
-  dur = SCENE_CUT_FADE_SECONDS,
+  dur = MIN_PERCEPTUAL_FADE_SECONDS,
 ): FadeInTailDef<Beat> {
   return { helper: 'fadeInTail', at, dur };
 }
@@ -101,16 +102,30 @@ function expandCoveredCut<Beat extends string>(
   beats: SceneBeatMap,
 ): SceneOpDef[] {
   const cutAt = resolveAt(entry.at, beats);
-  const availableLeadSeconds = Math.max(0, cutAt - DT);
-  const fadeLeadSeconds = Math.min(SCENE_CUT_FADE_SECONDS, availableLeadSeconds);
-  const fadeLeadAt = Math.max(0, cutAt - (DT + fadeLeadSeconds));
-  const fadeClearAt = cutAt + (cutAt < DT ? DT * 2 : DT);
+  const requiredLeadSeconds = MIN_PERCEPTUAL_FADE_SECONDS + DT;
+  if (cutAt < requiredLeadSeconds) {
+    throw new Error(
+      `coveredCut at ${cutAt}s requires at least ${requiredLeadSeconds}s for the fade floor`,
+    );
+  }
+  const fadeLeadAt = cutAt - requiredLeadSeconds;
+  const fadeClearAt = cutAt + DT;
 
   return [
-    { at: fadeLeadAt, kind: 'fade', to: 'black', dur: fadeLeadSeconds },
+    {
+      at: fadeLeadAt,
+      kind: 'fade',
+      to: 'black',
+      dur: MIN_PERCEPTUAL_FADE_SECONDS,
+    },
     { at: cutAt, kind: 'fade', to: 'black', dur: 0 },
     { at: cutAt, kind: 'camera', shot: entry.shot },
-    { at: fadeClearAt, kind: 'fade', to: 'clear', dur: SCENE_CUT_FADE_SECONDS },
+    {
+      at: fadeClearAt,
+      kind: 'fade',
+      to: 'clear',
+      dur: MIN_PERCEPTUAL_FADE_SECONDS,
+    },
   ];
 }
 
@@ -151,8 +166,8 @@ export function buildScene<const Beats extends SceneBeatMap>(
       continue;
     }
     if ('helper' in entry && entry.helper === 'fadeInTail') {
-      if (!Number.isFinite(entry.dur) || entry.dur < DT) {
-        throw new Error(`fadeInTail duration must be at least one sim tick (${DT}s)`);
+      if (!Number.isFinite(entry.dur) || entry.dur < MIN_PERCEPTUAL_FADE_SECONDS) {
+        throw new Error(`fadeInTail duration must be at least ${MIN_PERCEPTUAL_FADE_SECONDS}s`);
       }
       expanded.push({
         op: {
