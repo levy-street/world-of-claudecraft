@@ -122,9 +122,9 @@ describe('shared Rift race with group-isolated dungeon instances', () => {
     // absence assertions below cannot pass vacuously.
     expect((boss.loot?.items ?? []).some((item) => item.instance?.rift !== undefined)).toBe(true);
 
-    // The loser finishes their own run: lost outcome, egress spawned, the
-    // rank-gated corpse ladder still pays, but the first-clear extras (ring,
-    // essence, gem) stay exclusive to the winner.
+    // The loser finishes their own run: lost outcome, egress spawned, but NO
+    // completion loot of any kind (no gear ladder, no sealed cache, no
+    // first-clear extras): a loser keeps only what dropped off the mobs.
     clearToBoss(sim, loserRun, loser);
     const loserBoss = sim.entities.get(loserRun.bossId!)!;
     loserBoss.dead = true;
@@ -135,6 +135,8 @@ describe('shared Rift race with group-isolated dungeon instances', () => {
     expect(loserRun.outcome).toBe('lost');
     expect(loserRun.rewarded).toBe(true);
     expect(loserRun.exitId).not.toBeNull();
+    expect(loserRun.cacheId).toBeNull(); // the sealed cache is completion loot
+    expect(winnerRun.cacheId).not.toBeNull(); // ... and the winner does get it
     expect(loserEvents).toContainEqual(
       expect.objectContaining({
         type: 'riftRaceResult',
@@ -143,8 +145,12 @@ describe('shared Rift race with group-isolated dungeon instances', () => {
         winnerNames: ['Aleph'],
       }),
     );
+    // This kill was a dead-flag stamp (no handleDeath), so any corpse item here
+    // could only have come from a completion payout: there must be NONE. The
+    // per-item negatives stay as belt and braces should normal drops ever
+    // appear on this path.
     const loserItems = loserBoss.loot?.items ?? [];
-    expect(loserItems.length).toBeGreaterThan(0);
+    expect(loserItems).toHaveLength(0);
     expect(loserItems.some((item) => item.itemId === HEROIC_MARK_ITEM_ID)).toBe(false);
     expect(loserItems.some((item) => item.instance?.rift !== undefined)).toBe(false);
     expect(loserItems.some((item) => item.itemId === RIFT_ESSENCE_ITEM_ID)).toBe(false);

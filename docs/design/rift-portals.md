@@ -255,7 +255,9 @@ A scheduler opens ranked portals automatically. Tuning is `RIFT_TIER_INFO` plus 
   ladder on the boss corpse (C a guaranteed themed rare + coin; B/A/S the epic
   ladder up to the S legendary), the natural-first-clear personal rings, essence
   and gems, the mount rolls, and the rank coin bonus. Dev-portal runs (tier
-  null) still pay the gear ladder but no first-clear extras.
+  null) still pay the gear ladder but no first-clear extras. A race LOSER pays
+  nothing at completion (egress only, no gear ladder, no sealed cache): losers
+  keep only what dropped off the mobs during the run.
 - **Population policy (all realms).** Every eligible zone keeps one open portal,
   cycling hourly: a zone's next portal opens `RIFT_PORTAL_ZONE_CYCLE` (1 h) after
   the previous one OPENED, so an uncleared portal is replaced the moment it

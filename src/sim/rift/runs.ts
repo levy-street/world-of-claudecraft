@@ -1193,17 +1193,21 @@ function openExit(ctx: SimContext, inst: RiftInstance): void {
   // Beside the way home, the giga-boss leaves a SEALED reward cache: pick its lock
   // (the shared Tumbler's Path minigame) for bonus spoils. Lootable so the interact
   // scan targets it; the pick, not a grab, opens it (see interaction.ts + rift_lockpick).
-  const cache = createGroundObject(
-    ctx.nextId++,
-    '',
-    'Sealed Rift Cache',
-    ctx.groundPos(origin.x + pos.x - 4, origin.z + pos.z),
-  );
-  cache.templateId = 'rift_locked_chest';
-  cache.objectItemId = null;
-  cache.lootable = true;
-  ctx.addEntity(cache);
-  inst.cacheId = cache.id;
+  // COMPLETION loot, so race losers get the egress but no cache (maintainer
+  // decision, 2026-07-30: a loser keeps only what dropped off the mobs).
+  if (inst.outcome !== 'lost') {
+    const cache = createGroundObject(
+      ctx.nextId++,
+      '',
+      'Sealed Rift Cache',
+      ctx.groundPos(origin.x + pos.x - 4, origin.z + pos.z),
+    );
+    cache.templateId = 'rift_locked_chest';
+    cache.objectItemId = null;
+    cache.lootable = true;
+    ctx.addEntity(cache);
+    inst.cacheId = cache.id;
+  }
   for (const pid of instancePlayerIds(ctx, inst)) {
     ctx.emit({
       type: 'log',
@@ -1220,10 +1224,11 @@ function openExit(ctx: SimContext, inst: RiftInstance): void {
 
 /** Complete a run whose event was first-cleared by another group. No eject, no
  * teardown (maintainer decision, 2026-07-30): the group keeps its instance to
- * the end, the boss corpse still pays the rank-gated gear ladder, and only the
- * event's first-clear extras (rings, essence, gems, the world banner) stay
+ * the end and gets an egress, but NO completion loot of any kind. Everything a
+ * loser walks out with came off the mobs (or a mid-run treasure chest) the
+ * normal way; the gear ladder, sealed cache, and first-clear extras all stay
  * exclusive to the race winner. */
-function completeLosingRun(ctx: SimContext, inst: RiftInstance, boss: Entity | null): void {
+function completeLosingRun(ctx: SimContext, inst: RiftInstance): void {
   const event =
     inst.eventId === null
       ? null
@@ -1234,7 +1239,6 @@ function completeLosingRun(ctx: SimContext, inst: RiftInstance, boss: Entity | n
   inst.rewarded = true;
   inst.outcome = 'lost';
   inst.finishedAt = ctx.time;
-  if (boss) addRiftClearGearLoot(ctx, boss, inst.baseLevel);
   if (event && tier) {
     for (const pid of instancePlayerIds(ctx, inst)) {
       ctx.emit({
@@ -1260,7 +1264,7 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
   const participants = present.length > 0 ? present : [...inst.memberIds];
   const claim = claimRiftFirstClear(ctx, inst, participants);
   if (!claim.won) {
-    completeLosingRun(ctx, inst, boss);
+    completeLosingRun(ctx, inst);
     return true;
   }
 

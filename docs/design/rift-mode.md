@@ -18,10 +18,12 @@ content artifact and the event's atomic first-clear claim.
    instance per group. Every competing instance receives the same artifact hash.
 5. `rift/race.ts` performs the single-threaded check-and-write first-clear claim.
    The winner receives the race rewards; every other instance keeps running and
-   completes as the race loser when its own boss falls (corpse gear ladder, no
-   first-clear extras). The first mob kill marks an instance PROGRESSED, which
-   binds its members to it WoW-raid style; unspoiled instances recycle when
-   their members regroup, so a freshly formed party shares one clean run.
+   completes as the race loser when its own boss falls, with an egress but NO
+   completion loot (no gear ladder, no sealed cache, no first-clear extras): a
+   loser keeps only what dropped off the mobs. The first mob kill marks an
+   instance PROGRESSED, which binds its members to it WoW-raid style; unspoiled
+   instances recycle when their members regroup, so a freshly formed party
+   shares one clean run.
 6. `rift/persistence.ts` saves portal deadlines, event history, winner metadata,
    scheduler state, and upgrade artifacts. Runtime party instances are never
    restored after a realm restart.
