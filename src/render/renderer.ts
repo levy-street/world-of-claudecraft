@@ -211,6 +211,7 @@ import {
 import { facingAlpha, remoteEntityAlpha } from './net_interp_core';
 import { buildNightFeatures, type NightFeaturesView } from './night_features';
 import { buildEastbrookNoticeboard } from './noticeboard';
+import { opaqueFrontToBackSort } from './opaque_draw_order_core';
 import { resolveDirectPickEntityId } from './pick_resolution';
 import { PlacedAssetsView } from './placed_assets';
 import { type PlayerAuraRingInput, PlayerAuraRings } from './player_aura_rings';
@@ -1614,6 +1615,12 @@ export class Renderer {
       this.vfx.onContextRestored();
     });
     initGfxTier(this.webgl); // software-GL autodetect needs the live context
+    // Three r165 sorts opaque draws by material before projected depth. PBR
+    // shading is fragment-heavy enough that front-to-back early-Z wins over
+    // that state batching; solid depth writers also precede alpha-tested cards
+    // so town geometry rejects foliage hidden behind it. Explicit group and
+    // render-order barriers remain the comparator's first keys.
+    if (GFX.standardMaterials) this.webgl.setOpaqueSort(opaqueFrontToBackSort);
     if (GFX.composer) {
       // three r165's render() resets info per pass (after the shadow pass, see
       // draw_stats_core.ts header), so with the composer's multiple passes every

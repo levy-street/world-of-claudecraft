@@ -295,6 +295,7 @@ const RENDER_PURE_CORES = [
   'src/render/eastbrook_town_visibility_core.ts',
   'src/render/nameplate_view.ts',
   'src/render/net_interp_core.ts',
+  'src/render/opaque_draw_order_core.ts',
   'src/render/prop_cell_core.ts',
   'src/render/race_line_core.ts',
   'src/render/scene_census_core.ts',
