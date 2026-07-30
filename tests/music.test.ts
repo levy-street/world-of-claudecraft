@@ -421,6 +421,12 @@ describe('dungeon music entry reset', () => {
     expect(shouldResetMusicForDungeonEntry('nythraxis_boss_arena', null)).toBe(false);
   });
 
+  it('routes all three Undermount wings through existing streamed dungeon tracks', () => {
+    expect(dungeonMusicZoneForDungeon('undermount_wing1')).toBe('dungeon_hollow_crypt');
+    expect(dungeonMusicZoneForDungeon('undermount_wing2')).toBe('dungeon_sunken_bastion');
+    expect(dungeonMusicZoneForDungeon('undermount_wing3')).toBe('dungeon_gravewyrm_sanctum');
+  });
+
   it('rewinds the active dungeon stream and boss loop on dungeon entry', () => {
     vi.stubGlobal('AudioContext', FakeAudioContext);
     vi.stubGlobal('Audio', FakeAudio);
