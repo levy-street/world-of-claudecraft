@@ -1879,7 +1879,8 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "families": [
       "beast",
       "undead",
-      "elemental"
+      "elemental",
+      "reptile"
     ]
   },
   {
@@ -2251,16 +2252,6 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "model": "mob_wolf",
         "tint": "#9db4c8",
         "still": "/guide-stills/mob_wolf__9db4c8.webp"
-      },
-      {
-        "name": "Gloam Strider",
-        "min": 20,
-        "max": 20,
-        "rare": false,
-        "templateId": "gloam_strider",
-        "model": "mob_raptor",
-        "tint": "#4c4a72",
-        "still": "/guide-stills/mob_raptor__4c4a72.webp"
       },
       {
         "name": "Moonfleece Grazer",
@@ -2898,6 +2889,21 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "model": "mob_demonalt",
         "tint": "#7a3fb0",
         "still": "/guide-stills/mob_demonalt__7a3fb0.webp"
+      }
+    ]
+  },
+  {
+    "family": "reptile",
+    "creatures": [
+      {
+        "name": "Gloam Strider",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "gloam_strider",
+        "model": "mob_raptor",
+        "tint": "#4c4a72",
+        "still": "/guide-stills/mob_raptor__4c4a72.webp"
       }
     ]
   }

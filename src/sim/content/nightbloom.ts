@@ -130,7 +130,7 @@ export const NIGHTBLOOM_MOBS: Record<string, MobTemplate> = {
     name: 'Gloam Strider',
     minLevel: 20,
     maxLevel: 20,
-    family: 'beast',
+    family: 'reptile',
     hpBase: 58,
     hpPerLevel: 20,
     dmgBase: 12,
