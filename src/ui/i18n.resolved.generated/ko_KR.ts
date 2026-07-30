@@ -9787,6 +9787,15 @@ export const ko_KR: EnTranslations = {
       "slakeleather_belt": {
         "name": "식힘가죽 허리띠"
       },
+      "undermount_rune_rubbing": {
+        "name": "Undermount Rune Rubbing"
+      },
+      "undermount_foreman_ledger": {
+        "name": "Foreman's Undermount Ledger"
+      },
+      "runeseekers_lantern": {
+        "name": "Runeseeker's Lantern"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },
@@ -10742,6 +10751,9 @@ export const ko_KR: EnTranslations = {
       },
       "undermount_cinderling": {
         "name": "잿불정령"
+      },
+      "wyrmcult_dig_foreman": {
+        "name": "Wyrmcult Dig Foreman"
       },
       "reliquary_ledger_wraith": {
         "name": "명부의 망령"
@@ -12099,31 +12111,37 @@ export const ko_KR: EnTranslations = {
       },
       "q_undermount_heat": {
         "title": "있어서는 안 될 열기",
-        "text": "광신도들이 발굴석에 몰려 있으면 그 돌을 읽을 수 없습니다, {playerName}. Wyrmcult 는 밤낮으로 이 균열에서 일하고 있고, 어떤 불에서도 백 걸음 떨어진 바위가 따뜻합니다. 그들을 줄여서 내게 조용한 한 시간을 벌어 주십시오.",
-        "completion": "좋습니다. 이제 일할 수 있겠군요. 이것들은 대장장이의 작업 표식이 아닙니다, {playerName}. 결계입니다. 그리고 무언가가 그것들을 계속 베어 내고 있었죠.",
+        "text": "이 균열 주변의 돌은 목탄이 번질 만큼 뜨겁습니다, {playerName}. 교단이 다시 묻기 전에 드러난 세 룬 면을 탁본해 오십시오. 무늬가 반복되면 아래에 무엇이 있는지 알 수 있습니다.",
+        "completion": "선이 모두 안쪽으로 향합니다. 대장장이의 작업 표식이 아닙니다, {playerName}. 결계이며, 무언가가 아래에서 베어 내고 있습니다.",
         "objectives": {
           "0": {
-            "label": "Wyrmcult 광신도 처치"
+            "label": "룬 탁본 채취"
           }
         }
       },
       "q_undermount_ledger": {
         "title": "교단이 묻은 것",
-        "text": "강령술사들은 대장간이 만들어 내는 것을 기록합니다. 충분히 부숴 놓으면 제가 조각을 맞춰 보겠습니다. 이 모든 열기가 어디로 가는지 알고 싶습니다.",
-        "completion": "아래입니다. 모든 주괴, 모든 잿불, 전부 우리 발밑에서 쓰이고 있습니다, {playerName}. 그들은 여기 위에서 아무것도 만들고 있지 않습니다. 대장간은 뚜껑입니다.",
+        "text": "발굴 감독은 작업 장부를 몸에 지니고 야영지의 광신도들이 지킵니다. 가져오십시오, {playerName}. 모든 주괴와 식량과 임금이 어디로 가는지 알고 싶습니다.",
+        "completion": "아래입니다. 모든 주괴와 잿불이 우리 발밑에서 쓰입니다, {playerName}. 용광로는 지상에 아무것도 만들지 않습니다. 산이 묻은 존재를 먹이고 있습니다.",
         "objectives": {
           "0": {
-            "label": "Wyrmcult 강령술사 처치"
+            "label": "Wyrmcult 발굴 감독 처치"
+          },
+          "1": {
+            "label": "Wyrmcult 경비병 처치"
+          },
+          "2": {
+            "label": "감독의 장부 회수"
           }
         }
       },
       "q_undermount_descent": {
         "title": "언더마운트로",
-        "text": "의식 지도자 하나가 아직 내부 원을 장악하고 있습니다. 그를 쓰러뜨리면, 당신이 바닥에 닿기 전에 교단은 시작한 일을 끝낼 수 없습니다.",
-        "completion": "공장은 처음부터 없었습니다, {playerName}. 있었던 것은 오직 그와 아주 훌륭한 위장뿐이었습니다. 저도 함께 내려가겠습니다. 그들이 잠재워 둔 것이 무엇이든, 우리는 그것을 일찍 깨우게 될 겁니다.",
+        "text": "장부는 발굴지 아래의 두 번째 작업장을 확인해 주며 모든 운송품이 아래를 향합니다. 준비되면 말하십시오, {playerName}. 저도 하강에 합류하겠습니다.",
+        "completion": "이 등불을 가져가십시오. 마법은 없고 흔들리지 않는 불꽃뿐이지만 아래에서는 정직한 빛이 필요합니다. 이 연속 퀘스트를 건너뛰어도 공격대 입구는 열려 있습니다.",
         "objectives": {
           "0": {
-            "label": "Wyrmcult 의식 지도자 처치"
+            "label": "룬추적자 매린과 대화"
           }
         }
       },

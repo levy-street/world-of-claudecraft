@@ -500,22 +500,24 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ここは死んだ教団の鍛炉だと聞かされたよ、{className}。死んだものがここまで熱を出すはずがない。下にはこの煙すべてに見合う何かがある。',
   'entities.quests.q_undermount_heat.title': 'あるはずのない熱',
   'entities.quests.q_undermount_heat.text':
-    '狂信者どもが発掘石に群がっていて、読めやしない、{playerName}。Wyrmcult は昼夜この裂け目で働き、どんな火からも百歩離れた岩まで温かい。奴らを間引いて、私に静かな一時間を買ってくれ。',
+    'この裂け目の石は木炭がにじむほど熱い、{playerName}。教団が再び埋める前に、露出した三つのルーン面から拓本を取ってくれ。模様が繰り返すなら、下に何があるか分かる。',
   'entities.quests.q_undermount_heat.completion':
-    'よし。これで作業できる。これは鍛冶師の作業印ではない、{playerName}。結界だ。そして何かがそれを切り裂いている。',
-  'entities.quests.q_undermount_heat.objectives.0.label': 'Wyrmcult の狂信者を討伐',
+    '線はすべて内側へ向かっている。これは鍛冶師の作業印ではない、{playerName}。結界だ。そして何かが下から切り裂いている。',
+  'entities.quests.q_undermount_heat.objectives.0.label': 'ルーンの拓本を採取',
   'entities.quests.q_undermount_ledger.title': '教団が埋めたもの',
   'entities.quests.q_undermount_ledger.text':
-    '死霊術師たちは鍛炉が産み出すものの数を記録している。十分に叩き潰せば、私がつなぎ合わせる。この熱がどこへ行くのか知りたい。',
+    '発掘監督は作業台帳を肌身離さず持ち、野営地の狂信者が守っている。持ってきてくれ、{playerName}。地金も食料も賃金も、どこへ行くのか知りたい。',
   'entities.quests.q_undermount_ledger.completion':
-    '下だ。地金ひとつ、残り火ひとつ、すべてが私たちの下で費やされている、{playerName}。ここで何かを作っているのではない。鍛炉は蓋なのだ。',
-  'entities.quests.q_undermount_ledger.objectives.0.label': 'Wyrmcult の死霊術師を討伐',
+    '下だ。地金ひとつ、残り火ひとつ、すべてが私たちの下で費やされている、{playerName}。鍛炉は地上に何も生み出していない。山が埋めたものに餌を与えている。',
+  'entities.quests.q_undermount_ledger.objectives.0.label': 'Wyrmcult の発掘監督を討伐',
+  'entities.quests.q_undermount_ledger.objectives.1.label': 'Wyrmcult の護衛を討伐',
+  'entities.quests.q_undermount_ledger.objectives.2.label': '監督の台帳を回収',
   'entities.quests.q_undermount_descent.title': 'アンダーマウントへ',
   'entities.quests.q_undermount_descent.text':
-    'まだ一人の儀式指導者が内陣を押さえている。そいつを倒せ。底に着く前に、教団は始めたことを終えられなくなる。',
+    '台帳は発掘場の下に第二の工区があると示し、すべての積荷が下を指している。準備ができたら話しかけてくれ、{playerName}。私も降下に加わる。',
   'entities.quests.q_undermount_descent.completion':
-    '工場など最初からなかった、{playerName}。いたのは彼だけ、そして実に見事な偽装だけだった。私も一緒に下りる。彼らが眠らせていたものが何であれ、私たちは早めに目覚めさせることになる。',
-  'entities.quests.q_undermount_descent.objectives.0.label': 'Wyrmcult の儀式指導者を討伐',
+    'この灯を持っていけ。魔力はなく、ただ安定した炎があるだけだが、下では正直な光が必要になる。この連続クエストを終えていなくても、レイド入口は開いている。',
+  'entities.quests.q_undermount_descent.objectives.0.label': 'ルーン探しのメイリンと話す',
   'editor.topbar.redo': 'やり直す',
   'editor.topbar.undo': '元に戻す',
   'hudChrome.bags.bagSocketAria': '{name}: {slots}',

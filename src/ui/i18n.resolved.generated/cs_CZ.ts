@@ -9787,6 +9787,15 @@ export const cs_CZ: EnTranslations = {
       "slakeleather_belt": {
         "name": "Opasek z kalicí kůže"
       },
+      "undermount_rune_rubbing": {
+        "name": "Undermount Rune Rubbing"
+      },
+      "undermount_foreman_ledger": {
+        "name": "Foreman's Undermount Ledger"
+      },
+      "runeseekers_lantern": {
+        "name": "Runeseeker's Lantern"
+      },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"
       },
@@ -10742,6 +10751,9 @@ export const cs_CZ: EnTranslations = {
       },
       "undermount_cinderling": {
         "name": "Cinderling"
+      },
+      "wyrmcult_dig_foreman": {
+        "name": "Wyrmcult Dig Foreman"
       },
       "reliquary_ledger_wraith": {
         "name": "Přízrak pohřební knihy"
@@ -12098,32 +12110,38 @@ export const cs_CZ: EnTranslations = {
         }
       },
       "q_undermount_heat": {
-        "title": "The Heat That Should Not Be",
-        "text": "I cannot read the dig-stones with zealots swarming them, {playerName}. The Wyrmcult works this fissure day and night, and the rock is warm a hundred paces from any fire. Thin them out and buy me a quiet hour.",
-        "completion": "Good. Now I can work. These are not a smith's workmarks, {playerName}. They are wards, and something has been cutting them.",
+        "title": "The Heat That Shouldn't Be",
+        "text": "The stones around this fissure are hot enough to blur the charcoal, {playerName}. Take rubbings from the three exposed rune faces before the cult buries them again. If the pattern repeats, we will know what lies below.",
+        "completion": "The lines all turn inward. These are not a smith's workmarks, {playerName}. They are wards, and something has been cutting them from below.",
         "objectives": {
           "0": {
-            "label": "Wyrmcult Zealots slain"
+            "label": "Rune rubbings taken"
           }
         }
       },
       "q_undermount_ledger": {
         "title": "What the Cult Buried",
-        "text": "The necromancers keep the count of what the forge produces. Break enough of them and I will piece it together. I want to know where all this heat is going.",
-        "completion": "Downward. Every ingot, every ember, all of it spent below us, {playerName}. They are not making anything up here. The forge is a lid.",
+        "text": "The dig foreman keeps the work ledger close, guarded by the zealots at his camp. Bring it to me, {playerName}. I want to know where every ingot, ration, and wage is going.",
+        "completion": "Downward. Every ingot, every ember, all of it spent below us, {playerName}. The forge produces nothing for the surface. It is feeding whatever the mountain buried.",
         "objectives": {
           "0": {
-            "label": "Wyrmcult Necromancers slain"
+            "label": "Wyrmcult foreman slain"
+          },
+          "1": {
+            "label": "Wyrmcult guards slain"
+          },
+          "2": {
+            "label": "Foreman ledger recovered"
           }
         }
       },
       "q_undermount_descent": {
         "title": "Into the Undermount",
-        "text": "One ritual-leader still holds the inner circle. Put him down, and the cult cannot finish what they started before you reach the bottom.",
-        "completion": "There was never a factory, {playerName}. There was only ever him, and a very good disguise. I am going down with you. Whatever they kept asleep, we are about to wake it early.",
+        "text": "The ledger confirms a second works beneath the dig, and every shipment points down. Speak with me when you are ready, {playerName}. I am joining the descent.",
+        "completion": "Take the lantern. It has no enchantment, only a steady flame, but we will need one honest light down there. The raid entrance is open whether you came through this chain or not.",
         "objectives": {
           "0": {
-            "label": "Wyrmcult ritual-leader slain"
+            "label": "Speak with Runeseeker Maerin"
           }
         }
       },

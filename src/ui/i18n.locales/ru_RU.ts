@@ -499,22 +499,24 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Мне сказали, что это горн мертвого культа, {className}. Мертвые вещи не бывают такими горячими. Внизу есть нечто, ради чего стоит весь этот дым.',
   'entities.quests.q_undermount_heat.title': 'Жар, которого не должно быть',
   'entities.quests.q_undermount_heat.text':
-    'Я не могу прочесть камни раскопа, пока вокруг них кишат фанатики, {playerName}. Wyrmcult работает у этой расселины день и ночь, а камень теплый в сотне шагов от любого огня. Проредите их и купите мне тихий час.',
+    'Камни вокруг этой расселины так горячи, что уголь расплывается, {playerName}. Снимите оттиски с трех открытых рунных граней, пока культ снова их не закопал. Повтор узора покажет, что лежит внизу.',
   'entities.quests.q_undermount_heat.completion':
-    'Хорошо. Теперь я могу работать. Это не метки кузнеца, {playerName}. Это обереги, и что-то их разрезает.',
-  'entities.quests.q_undermount_heat.objectives.0.label': 'Фанатики Wyrmcult убиты',
+    'Все линии поворачивают внутрь. Это не метки кузнеца, {playerName}. Это обереги, и нечто разрезает их снизу.',
+  'entities.quests.q_undermount_heat.objectives.0.label': 'Сняты оттиски рун',
   'entities.quests.q_undermount_ledger.title': 'Что культ похоронил',
   'entities.quests.q_undermount_ledger.text':
-    'Некроманты ведут счет тому, что производит горн. Сломайте достаточно из них, и я соберу картину. Я хочу знать, куда уходит весь этот жар.',
+    'Прораб держит рабочую книгу при себе, а фанатики охраняют его лагерь. Принесите ее мне, {playerName}. Я хочу знать, куда уходят каждый слиток, паек и монета жалованья.',
   'entities.quests.q_undermount_ledger.completion':
-    'Вниз. Каждый слиток, каждая искра, все потрачено под нами, {playerName}. Они ничего не делают здесь наверху. Горн это крышка.',
-  'entities.quests.q_undermount_ledger.objectives.0.label': 'Некроманты Wyrmcult убиты',
+    'Вниз. Каждый слиток и каждый уголек потрачены под нами, {playerName}. Горн ничего не производит для поверхности. Он кормит то, что погребла гора.',
+  'entities.quests.q_undermount_ledger.objectives.0.label': 'Прораб Wyrmcult убит',
+  'entities.quests.q_undermount_ledger.objectives.1.label': 'Стражи Wyrmcult убиты',
+  'entities.quests.q_undermount_ledger.objectives.2.label': 'Книга прораба найдена',
   'entities.quests.q_undermount_descent.title': 'В Подгорье',
   'entities.quests.q_undermount_descent.text':
-    'Один предводитель ритуала все еще держит внутренний круг. Убейте его, и культ не сможет закончить начатое до того, как вы достигнете дна.',
+    'Книга подтверждает, что под раскопом есть вторые работы, и каждый груз направлен вниз. Поговорите со мной, когда будете готовы, {playerName}. Я иду с вами.',
   'entities.quests.q_undermount_descent.completion':
-    'Никакой фабрики никогда не было, {playerName}. Был только он и очень хорошая маскировка. Я спускаюсь с вами. Что бы они ни держали во сне, мы вот-вот разбудим это раньше срока.',
-  'entities.quests.q_undermount_descent.objectives.0.label': 'Предводитель ритуала Wyrmcult убит',
+    'Возьмите фонарь. В нем нет чар, только ровное пламя, но внизу нам нужен честный свет. Вход в рейд открыт независимо от этой цепочки заданий.',
+  'entities.quests.q_undermount_descent.objectives.0.label': 'Поговорить с руноискательницей Мейрин',
   'editor.topbar.redo': 'Повторить',
   'editor.topbar.undo': 'Отменить',
   'hudChrome.bags.bagSocketAria': '{name}: {slots}',

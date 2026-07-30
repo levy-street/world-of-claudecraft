@@ -9787,6 +9787,15 @@ export const zh_CN: EnTranslations = {
       "slakeleather_belt": {
         "name": "淬革腰带"
       },
+      "undermount_rune_rubbing": {
+        "name": "Undermount Rune Rubbing"
+      },
+      "undermount_foreman_ledger": {
+        "name": "Foreman's Undermount Ledger"
+      },
+      "runeseekers_lantern": {
+        "name": "Runeseeker's Lantern"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
@@ -10742,6 +10751,9 @@ export const zh_CN: EnTranslations = {
       },
       "undermount_cinderling": {
         "name": "余烬灵"
+      },
+      "wyrmcult_dig_foreman": {
+        "name": "Wyrmcult Dig Foreman"
       },
       "reliquary_ledger_wraith": {
         "name": "名册幽魂"
@@ -12099,31 +12111,37 @@ export const zh_CN: EnTranslations = {
       },
       "q_undermount_heat": {
         "title": "不该存在的热量",
-        "text": "狂信徒在掘石旁蜂拥，我就读不懂那些石头，{playerName}。Wyrmcult 日夜经营这道裂隙，岩石在离任何火焰百步外都还发热。削弱他们，给我买来一小时清静。",
-        "completion": "很好。现在我能干活了。这些不是铁匠的工印，{playerName}。它们是结界，而且有什么东西一直在切开它们。",
+        "text": "这道裂隙周围的石头热得足以让木炭字迹模糊，{playerName}。趁邪教还没再次掩埋它们，拓下三块裸露符文面的纹样。如果图案重复，我们就能知道下方藏着什么。",
+        "completion": "所有线条都向内转折。这些不是铁匠的工印，{playerName}。它们是结界，而且有什么东西正从下方割开它们。",
         "objectives": {
           "0": {
-            "label": "已击杀 Wyrmcult 狂信徒"
+            "label": "已拓印符文"
           }
         }
       },
       "q_undermount_ledger": {
         "title": "邪教埋藏之物",
-        "text": "死灵法师记录着锻炉产出了什么。打垮足够多的他们，我就能拼出真相。我想知道这些热量究竟流向何处。",
-        "completion": "向下。每一块锭，每一点余烬，全都耗在我们脚下，{playerName}。他们不是在这里制造东西。锻炉是一只盖子。",
+        "text": "发掘工头把工作账簿贴身保管，营地里的狂信徒负责守卫。把它带给我，{playerName}。我要知道每块锭、每份口粮和每笔工钱都去了哪里。",
+        "completion": "向下。每一块锭，每一点余烬，全都耗在我们脚下，{playerName}。锻炉没有为地表生产任何东西。它在喂养山中埋藏的存在。",
         "objectives": {
           "0": {
-            "label": "已击杀 Wyrmcult 死灵法师"
+            "label": "已击杀 Wyrmcult 发掘工头"
+          },
+          "1": {
+            "label": "已击杀 Wyrmcult 守卫"
+          },
+          "2": {
+            "label": "已找回工头账簿"
           }
         }
       },
       "q_undermount_descent": {
         "title": "进入地底山",
-        "text": "还有一个仪式首领掌控着内圈。放倒他，在你抵达底部之前，邪教就无法完成他们开头的事。",
-        "completion": "从来没有什么工厂，{playerName}。从来只有他，以及一层非常高明的伪装。我要和你一起下去。无论他们让什么东西沉睡，我们都要提前唤醒它。",
+        "text": "账簿证实发掘场下还有第二处工事，每批货物都指向下方。准备好时来找我，{playerName}。我要加入这次下行。",
+        "completion": "带上这盏灯。它没有附魔，只有稳定的火焰，但我们在下面需要一束诚实的光。无论你是否完成这条任务链，团队入口都会开放。",
         "objectives": {
           "0": {
-            "label": "已击杀 Wyrmcult 仪式首领"
+            "label": "与寻符者梅林交谈"
           }
         }
       },
