@@ -58,6 +58,9 @@ export class SceneOverlayWindow {
     }
     this.subtitleEl = make('div', 'scene-subtitle');
     this.subtitleEl.setAttribute('aria-hidden', 'true');
+    // The painter owns the resting state. The stylesheet leaves display at its
+    // natural block value so clearing this inline value can reveal a line.
+    this.subtitleEl.style.display = 'none';
     this.speakerEl = doc.createElement('span');
     this.speakerEl.className = 'scene-subtitle-speaker';
     this.lineEl = doc.createElement('span');

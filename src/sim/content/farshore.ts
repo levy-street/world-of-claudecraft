@@ -679,6 +679,20 @@ export const FARSHORE_PROPS: ZonePropsDef = {
     { kind: 'house', x: 811, z: 126, w: 5, d: 5, rot: 2.1 },
     { kind: 'chapel', x: 831, z: 110, w: 5, d: 7, rot: -2.4 }, // the menders' hall
   ],
+  // The old bronze warden above the harbor steps. Both existing nature-kit
+  // parts share one camera-ghost group at the Q0 shot target.
+  decorProps: [
+    {
+      key: 'statueBlock',
+      x: 818,
+      z: 120,
+      rot: Math.PI / 2,
+      scale: 5,
+      r: 1,
+      h: 4.4,
+      parts: [{ key: 'statueHead', y: 1.95, scale: 2.5 }],
+    },
+  ],
   wells: [{ x: 820, z: 119, r: 1.5 }],
   stalls: [
     { x: 825, z: 116, rot: 0.6, r: 1.6 }, // the quartermaster's arming table
