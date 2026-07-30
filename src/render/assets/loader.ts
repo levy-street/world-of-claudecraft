@@ -82,6 +82,23 @@ function loader(): GLTFLoader {
   return gltfLoader;
 }
 
+// Dev-channel load telemetry (English on purpose, console.* only): one line per
+// asset fetch start/settle so a device console shows exactly how far through the
+// preload set a WebContent kill lands and which asset preceded it. Release shells
+// suppress the JS console, so shipping builds stay silent; the ~700 lines only
+// surface in a Debug shell attached for diagnosis (the iPhone 17 Pro entry-kill
+// investigation: WebContent died at 1.54 GB resident mid-decode with no JS error,
+// so sequencing evidence has to come from the console, not from error handlers).
+let loadDiagSeq = 0;
+function diagStart(kind: string, resolved: string): number {
+  const seq = ++loadDiagSeq;
+  console.info(`[load-diag] ${seq} ${kind} start ${resolved}`);
+  return seq;
+}
+function diagSettle(seq: number, kind: string, resolved: string, ok: boolean): void {
+  console.info(`[load-diag] ${seq} ${kind} ${ok ? 'done' : 'FAIL'} ${resolved}`);
+}
+
 /** Load + parse a .glb once; subsequent calls share the same parsed scene.
  *  Consumers must treat the result as immutable — clone before mutating. */
 export function loadGltf(url: string): Promise<GLTF> {
@@ -89,16 +106,26 @@ export function loadGltf(url: string): Promise<GLTF> {
   let p = gltfCache.get(resolved);
   if (!p) {
     const startedAt = assetLoadStarted();
-    p = scheduleLoad(gltfQueue, () =>
-      withRetry(
+    p = scheduleLoad(gltfQueue, () => {
+      const seq = diagStart('gltf', resolved);
+      return withRetry(
         () =>
           new Promise<GLTF>((resolve, reject) => {
             loader().load(resolved, resolve, undefined, () =>
               reject(new Error(`asset load failed: ${url} (missing file or bad GLB)`)),
             );
           }),
-      ),
-    ).then(
+      ).then(
+        (gltf) => {
+          diagSettle(seq, 'gltf', resolved, true);
+          return gltf;
+        },
+        (err: unknown) => {
+          diagSettle(seq, 'gltf', resolved, false);
+          throw err;
+        },
+      );
+    }).then(
       (gltf) => {
         recordAssetLoad('gltf', resolved, startedAt);
         return gltf;
@@ -303,8 +330,9 @@ export function loadTexture(
   let p = texCache.get(key);
   if (!p) {
     const startedAt = assetLoadStarted();
-    p = scheduleLoad(textureQueue, () =>
-      withRetry(
+    p = scheduleLoad(textureQueue, () => {
+      const seq = diagStart('tex', resolved);
+      return withRetry(
         () =>
           new Promise<THREE.Texture>((resolve, reject) => {
             new THREE.TextureLoader().load(
@@ -318,8 +346,17 @@ export function loadTexture(
               () => reject(new Error(`texture load failed: ${url}`)),
             );
           }),
-      ),
-    ).then(
+      ).then(
+        (tex) => {
+          diagSettle(seq, 'tex', resolved, true);
+          return tex;
+        },
+        (err: unknown) => {
+          diagSettle(seq, 'tex', resolved, false);
+          throw err;
+        },
+      );
+    }).then(
       (tex) => {
         recordAssetLoad('texture', resolved, startedAt);
         return tex;
