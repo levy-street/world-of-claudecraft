@@ -9796,6 +9796,42 @@ export const es: EnTranslations = {
       "runeseekers_lantern": {
         "name": "Runeseeker's Lantern"
       },
+      "crownforged_heartplate": {
+        "name": "Coraza Forjacorona"
+      },
+      "nighttalon_emberweave": {
+        "name": "Tejido de Ascuas Garranocturna"
+      },
+      "soulflame_vestments": {
+        "name": "Vestiduras Llama de Alma"
+      },
+      "stormcallers_hauberk": {
+        "name": "Camisote del Invocatormentas"
+      },
+      "volzharrs_knucklestone": {
+        "name": "Piedra de Nudillos de Volzharr"
+      },
+      "magmastrider_greaves": {
+        "name": "Grebas Zancamagma"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "Vendas del Suelo Despierto"
+      },
+      "forgeheat_cinch": {
+        "name": "Faja de Calor de Forja"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "Rompenúcleos, Corazón de la Submontaña"
+      },
+      "the_last_restraint": {
+        "name": "La Última Atadura"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "Sortija de la Novena Templanza"
+      },
+      "moltenheart_chroma": {
+        "name": "Corazón Fundido"
+      },
       "conjured_water4": {
         "name": "Agua de Manantial Conjurada"
       },
@@ -14496,7 +14532,8 @@ export const es: EnTranslations = {
         "name": "Equipo de batalla Bonewrought",
         "bonus2": "Aumenta el poder de ataque en 40.",
         "bonus3": "Aumenta la fuerza en 15, el aguante en 15 y la velocidad de ataque y de lanzamiento en 15%.",
-        "bonus4": "Tus golpes críticos con el arma astillan al objetivo con Astilla de Hueso, haciéndolo sangrar 8 de daño cada 2 s durante 12 s. Se acumula hasta 3 veces."
+        "bonus4": "Tus golpes críticos con el arma astillan al objetivo con Astilla de Hueso, haciéndolo sangrar 8 de daño cada 2 s durante 12 s. Se acumula hasta 3 veces.",
+        "bonus5": "Aumenta un 3 % la probabilidad de golpe crítico."
       },
       "deathlord": {
         "name": "Equipo de batalla de Barrowlord",
@@ -14518,19 +14555,22 @@ export const es: EnTranslations = {
         "name": "Atuendo de cuero Direfang",
         "bonus2": "Aumenta el poder de ataque en 40.",
         "bonus3": "Aumenta la agilidad en 15, la probabilidad de crítico en 2% y la velocidad de ataque y de lanzamiento en 15%.",
-        "bonus4": "Tus golpes críticos con el arma abren un Tajo Desgarrado, haciendo sangrar al objetivo 6 de daño cada 2 s durante 12 s. Se acumula hasta 3 veces."
+        "bonus4": "Tus golpes críticos con el arma abren un Tajo Desgarrado, haciendo sangrar al objetivo 6 de daño cada 2 s durante 12 s. Se acumula hasta 3 veces.",
+        "bonus5": "Aumenta un 3 % la probabilidad de golpe crítico."
       },
       "soulflame": {
         "name": "Vestiduras de Wraithfire",
         "bonus2": "Aumenta el poder de los hechizos en 20. El daño recibido ya no retrasa tus hechizos (100% de resistencia al retraso de lanzamiento).",
         "bonus3": "Aumenta el intelecto en 15, el espíritu en 15 y la velocidad de ataque y de lanzamiento en 15%.",
-        "bonus4": "Tus hechizos tienen un 10% de probabilidad de otorgar Fulgor del Alma, aumentando el poder con hechizos en 40 durante 10 s."
+        "bonus4": "Tus hechizos tienen un 10% de probabilidad de otorgar Fulgor del Alma, aumentando el poder con hechizos en 40 durante 10 s.",
+        "bonus5": "Aumenta un 3 % la probabilidad de golpe crítico con hechizos."
       },
       "stormcallers": {
         "name": "Vestiduras de Galecall",
         "bonus2": "Aumenta el poder de los hechizos en 20. El daño recibido ya no retrasa tus hechizos (100% de resistencia al retraso de lanzamiento).",
         "bonus3": "Aumenta el intelecto en 15, el espíritu en 15 y la velocidad de ataque y de lanzamiento en 15%.",
-        "bonus4": "Tus hechizos tienen un 10% de probabilidad de otorgar Fulgor del Alma, aumentando el poder con hechizos en 40 durante 10 s."
+        "bonus4": "Tus hechizos tienen un 10% de probabilidad de otorgar Fulgor del Alma, aumentando el poder con hechizos en 40 durante 10 s.",
+        "bonus5": "Aumenta un 3 % la probabilidad de golpe crítico con hechizos."
       },
       "vale_arcanist": {
         "name": "Vestiduras del Arcanista del Valle",

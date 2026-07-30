@@ -128,6 +128,7 @@ const FINAL_BOSS_DUNGEONS: Record<string, string> = {
   vosh_the_glazier: 'undermount_wing1',
   saan_the_stoker: 'undermount_wing1',
   odrenn_the_temperer: 'undermount_wing2',
+  volzharr_buried_furnace: 'undermount_wing3',
 };
 
 // Perfection tasks: zero player deaths inside the boss's heroic instance
@@ -848,11 +849,19 @@ export function checkDeedTrigger(meta: PlayerMeta, e: Entity, trigger: DeedTrigg
       for (const mark of trigger.markIds) if (meta.deedStats.visited.has(mark)) have++;
       return have >= need;
     }
-    case 'meta':
+    case 'meta': {
+      if (!trigger.deedIds.every((id) => meta.deedsEarned.has(id))) return false;
+      if (!(trigger.questIds ?? []).every((q) => meta.questsDone.has(q))) return false;
+      const lockoutIds = trigger.raidLockoutIds ?? [];
+      if (lockoutIds.length === 0) return true;
+      const firstReset = meta.raidLockouts.get(lockoutIds[0]);
       return (
-        trigger.deedIds.every((id) => meta.deedsEarned.has(id)) &&
-        (trigger.questIds ?? []).every((q) => meta.questsDone.has(q))
+        firstReset !== undefined &&
+        Number.isFinite(firstReset) &&
+        firstReset > 0 &&
+        lockoutIds.every((id) => meta.raidLockouts.get(id) === firstReset)
       );
+    }
     case 'meter':
       return METERS[trigger.meter](meta) >= trigger.amount;
     case 'flag':

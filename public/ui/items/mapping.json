@@ -2403,6 +2403,158 @@
       "sourceFile": "heroic_slakeleather_belt.webp",
       "confidence": "high",
       "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "band_of_the_ninth_quench",
+      "name": "Band of the Ninth Quench",
+      "sourcePack": "woc_generated",
+      "sourceFile": "band_of_the_ninth_quench.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "crownforged_heartplate",
+      "name": "Crownforged Heartplate",
+      "sourcePack": "woc_generated",
+      "sourceFile": "crownforged_heartplate.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "footwraps_of_the_waking_floor",
+      "name": "Footwraps of the Waking Floor",
+      "sourcePack": "woc_generated",
+      "sourceFile": "footwraps_of_the_waking_floor.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "forgeheat_cinch",
+      "name": "Forgeheat Cinch",
+      "sourcePack": "woc_generated",
+      "sourceFile": "forgeheat_cinch.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "heroic_band_of_the_ninth_quench",
+      "name": "Heroic Band of the Ninth Quench",
+      "sourcePack": "woc_generated",
+      "sourceFile": "heroic_band_of_the_ninth_quench.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "heroic_crownforged_heartplate",
+      "name": "Heroic Crownforged Heartplate",
+      "sourcePack": "woc_generated",
+      "sourceFile": "heroic_crownforged_heartplate.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "heroic_footwraps_of_the_waking_floor",
+      "name": "Heroic Footwraps of the Waking Floor",
+      "sourcePack": "woc_generated",
+      "sourceFile": "heroic_footwraps_of_the_waking_floor.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "heroic_forgeheat_cinch",
+      "name": "Heroic Forgeheat Cinch",
+      "sourcePack": "woc_generated",
+      "sourceFile": "heroic_forgeheat_cinch.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "heroic_magmastrider_greaves",
+      "name": "Heroic Magmastrider Greaves",
+      "sourcePack": "woc_generated",
+      "sourceFile": "heroic_magmastrider_greaves.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "heroic_nighttalon_emberweave",
+      "name": "Heroic Nighttalon Emberweave",
+      "sourcePack": "woc_generated",
+      "sourceFile": "heroic_nighttalon_emberweave.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "heroic_soulflame_vestments",
+      "name": "Heroic Soulflame Vestments",
+      "sourcePack": "woc_generated",
+      "sourceFile": "heroic_soulflame_vestments.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "heroic_stormcallers_hauberk",
+      "name": "Heroic Stormcaller's Hauberk",
+      "sourcePack": "woc_generated",
+      "sourceFile": "heroic_stormcallers_hauberk.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "heroic_volzharrs_knucklestone",
+      "name": "Heroic Volzharr's Knucklestone",
+      "sourcePack": "woc_generated",
+      "sourceFile": "heroic_volzharrs_knucklestone.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "magmastrider_greaves",
+      "name": "Magmastrider Greaves",
+      "sourcePack": "woc_generated",
+      "sourceFile": "magmastrider_greaves.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "moltenheart_chroma",
+      "name": "Moltenheart Chroma",
+      "sourcePack": "woc_generated",
+      "sourceFile": "moltenheart_chroma.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "nighttalon_emberweave",
+      "name": "Nighttalon Emberweave",
+      "sourcePack": "woc_generated",
+      "sourceFile": "nighttalon_emberweave.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "soulflame_vestments",
+      "name": "Soulflame Vestments",
+      "sourcePack": "woc_generated",
+      "sourceFile": "soulflame_vestments.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "stormcallers_hauberk",
+      "name": "Stormcaller's Hauberk",
+      "sourcePack": "woc_generated",
+      "sourceFile": "stormcallers_hauberk.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
+    },
+    {
+      "itemId": "volzharrs_knucklestone",
+      "name": "Volzharr's Knucklestone",
+      "sourcePack": "woc_generated",
+      "sourceFile": "volzharrs_knucklestone.webp",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art (AI image generation, gpt-image via Codex), project asset, rights reserved"
     }
   ],
   "generatedBatches": [

@@ -9796,6 +9796,42 @@ export const da_DK: EnTranslations = {
       "runeseekers_lantern": {
         "name": "Runeseeker's Lantern"
       },
+      "crownforged_heartplate": {
+        "name": "Kronesmedet hjertebrynje"
+      },
+      "nighttalon_emberweave": {
+        "name": "Nattalons glødevæv"
+      },
+      "soulflame_vestments": {
+        "name": "Sjæleflammegevandter"
+      },
+      "stormcallers_hauberk": {
+        "name": "Stormkalderens ringbrynje"
+      },
+      "volzharrs_knucklestone": {
+        "name": "Volzharrs knosten"
+      },
+      "magmastrider_greaves": {
+        "name": "Magmavandrerens benskinner"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "Fodvikler fra det vågnende gulv"
+      },
+      "forgeheat_cinch": {
+        "name": "Smedjevarmt livbælte"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "Kerneknuser, Underbjergets hjerte"
+      },
+      "the_last_restraint": {
+        "name": "Den sidste lænke"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "Ring fra den niende køling"
+      },
+      "moltenheart_chroma": {
+        "name": "Smeltehjerte"
+      },
       "conjured_water4": {
         "name": "Fremmanet kildevand"
       },
@@ -14496,7 +14532,8 @@ export const da_DK: EnTranslations = {
         "name": "Bonewrought regalier",
         "bonus2": "Øger angrebskraft med 40.",
         "bonus3": "Øger styrke med 15, udholdenhed med 15 og angrebs- og magihastighed med 15%.",
-        "bonus4": "Dine kritiske våbenslag splintrer målet med Bensplint og påfører 8 blødningsskade hvert 2. sek. i 12 sek. Stakker op til 3 gange."
+        "bonus4": "Dine kritiske våbenslag splintrer målet med Bensplint og påfører 8 blødningsskade hvert 2. sek. i 12 sek. Stakker op til 3 gange.",
+        "bonus5": "Øger chancen for kritiske træffere med 3 %."
       },
       "deathlord": {
         "name": "Barrowlord kampudstyr",
@@ -14518,19 +14555,22 @@ export const da_DK: EnTranslations = {
         "name": "Direfang pels",
         "bonus2": "Øger angrebskraft med 40.",
         "bonus3": "Øger smidighed med 15, kritisk chance med 2% og angrebs- og magihastighed med 15%.",
-        "bonus4": "Dine kritiske våbenslag river en Laset Flænge og påfører 6 blødningsskade hvert 2. sek. i 12 sek. Stakker op til 3 gange."
+        "bonus4": "Dine kritiske våbenslag river en Laset Flænge og påfører 6 blødningsskade hvert 2. sek. i 12 sek. Stakker op til 3 gange.",
+        "bonus5": "Øger chancen for kritiske træffere med 3 %."
       },
       "soulflame": {
         "name": "Wraithfire regalier",
         "bonus2": "Øger magikraft med 20. Skade, du tager, forsinker ikke længere dine besværgelser (100% modstand mod fordrøjelse af besværgelser).",
         "bonus3": "Øger intellekt med 15, ånd med 15 og angrebs- og magihastighed med 15%.",
-        "bonus4": "Dine besværgelser har 10% chance for at give Sjælebrand og øge besværgelseskraft med 40 i 10 sek."
+        "bonus4": "Dine besværgelser har 10% chance for at give Sjælebrand og øge besværgelseskraft med 40 i 10 sek.",
+        "bonus5": "Øger chancen for kritiske træffere med besværgelser med 3 %."
       },
       "stormcallers": {
         "name": "Galecall klæder",
         "bonus2": "Øger magikraft med 20. Skade, du tager, forsinker ikke længere dine besværgelser (100% modstand mod fordrøjelse af besværgelser).",
         "bonus3": "Øger intellekt med 15, ånd med 15 og angrebs- og magihastighed med 15%.",
-        "bonus4": "Dine besværgelser har 10% chance for at give Sjælebrand og øge besværgelseskraft med 40 i 10 sek."
+        "bonus4": "Dine besværgelser har 10% chance for at give Sjælebrand og øge besværgelseskraft med 40 i 10 sek.",
+        "bonus5": "Øger chancen for kritiske træffere med besværgelser med 3 %."
       },
       "vale_arcanist": {
         "name": "Dalarkanistens klæder",

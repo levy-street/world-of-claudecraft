@@ -516,7 +516,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Книга подтверждает, что под раскопом есть вторые работы, и каждый груз направлен вниз. Поговорите со мной, когда будете готовы, {playerName}. Я иду с вами.',
   'entities.quests.q_undermount_descent.completion':
     'Возьмите фонарь. В нем нет чар, только ровное пламя, но внизу нам нужен честный свет. Вход в рейд открыт независимо от этой цепочки заданий.',
-  'entities.quests.q_undermount_descent.objectives.0.label': 'Поговорить с руноискательницей Мейрин',
+  'entities.quests.q_undermount_descent.objectives.0.label':
+    'Поговорить с руноискательницей Мейрин',
   'editor.topbar.redo': 'Повторить',
   'editor.topbar.undo': 'Отменить',
   'hudChrome.bags.bagSocketAria': '{name}: {slots}',
@@ -9274,7 +9275,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.clickManage': 'Нажмите, чтобы выбрать транспорт',
   'hudChrome.mountTraining.mountPrompt':
     'Нажми {key}, чтобы оседлать учебного Доблестного скакуна.',
-  'hudChrome.mountTraining.ownedMountPrompt': 'Поводья лежат в сумке. Используйте их, чтобы сесть верхом.',
+  'hudChrome.mountTraining.ownedMountPrompt':
+    'Поводья лежат в сумке. Используйте их, чтобы сесть верхом.',
   'hudChrome.mounts.useToRide': 'Используйте, чтобы призвать это ездовое животное.',
   'hudChrome.mountTraining.ridePrompt':
     'Следуй за светящейся меткой к линии старта и нажми «Начать заезд».',
@@ -10057,9 +10059,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.wildheart_basin.leaveText':
     'Вы проходите под каменными клыками и возвращаетесь к солнцу Палмрича.',
   'entities.dungeons.the_last_keep.name': 'Последний оплот',
-  'entities.dungeons.the_last_keep.enterText': 'Вы входите в холодные безмолвные залы Последнего оплота.',
+  'entities.dungeons.the_last_keep.enterText':
+    'Вы входите в холодные безмолвные залы Последнего оплота.',
   'entities.items.last_keep_signet.name': 'Печатка Последнего оплота',
-  'entities.dungeons.the_last_keep.leaveText': 'Вы затворяете дверь оплота и возвращаетесь под ветер Земель Драконов.',
+  'entities.dungeons.the_last_keep.leaveText':
+    'Вы затворяете дверь оплота и возвращаетесь под ветер Земель Драконов.',
   'entities.items.wildheart_tuskblade.name': 'Клыкастый клинок Дикого Сердца',
   'entities.items.wildheart_hexwood_staff.name': 'Посох колдовского дерева из Котловины',
   'entities.items.wildheart_fangknife.name': 'Клыковый нож Зулгара',
@@ -10897,4 +10901,22 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.the_even_temper.name': 'Ровный закал',
   'entities.items.twice_fired_slippers.name': 'Дважды обожжённые туфли',
   'entities.items.twicetempered_girdle.name': 'Пояс двойной закалки',
+  'entities.items.crownforged_heartplate.name': 'Коронокованная кираса сердца',
+  'entities.items.nighttalon_emberweave.name': 'Углеткань Ночного Когтя',
+  'entities.items.soulflame_vestments.name': 'Облачения Пламени Души',
+  'entities.items.stormcallers_hauberk.name': 'Хауберк Зовущего Бури',
+  'entities.items.volzharrs_knucklestone.name': 'Костяшечник Волжарра',
+  'entities.items.magmastrider_greaves.name': 'Наголенники Магмохода',
+  'entities.items.footwraps_of_the_waking_floor.name': 'Обмотки Пробуждающегося Пола',
+  'entities.items.forgeheat_cinch.name': 'Пояс Жара Горна',
+  'entities.items.corebreaker_heart_of_the_undermount.name': 'Крушитель Ядра, Сердце Подгорья',
+  'entities.items.the_last_restraint.name': 'Последняя Окова',
+  'entities.items.band_of_the_ninth_quench.name': 'Кольцо Девятой Закалки',
+  'entities.items.moltenheart_chroma.name': 'Расплавленное Сердце',
+  'entities.itemSets.crownforged.bonus5': 'Повышает вероятность критического удара на 3%.',
+  'entities.itemSets.nighttalon.bonus5': 'Повышает вероятность критического удара на 3%.',
+  'entities.itemSets.soulflame.bonus5':
+    'Повышает вероятность критического эффекта заклинаний на 3%.',
+  'entities.itemSets.stormcallers.bonus5':
+    'Повышает вероятность критического эффекта заклинаний на 3%.',
 };

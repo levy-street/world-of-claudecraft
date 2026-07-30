@@ -4734,6 +4734,28 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "dungeon",
     "renown": 10,
     "feat": false
+  },
+  {
+    "id": "dgn_undermount_volzharr",
+    "name": "The Mountainbreaker",
+    "category": "dungeon",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "the Mountainbreaker"
+  },
+  {
+    "id": "dgn_undermount_full_descent",
+    "name": "The Full Descent",
+    "category": "dungeon",
+    "renown": 25,
+    "feat": false
+  },
+  {
+    "id": "dgn_undermount_volzharr_heroic",
+    "name": "Heroic: The Waking",
+    "category": "dungeon",
+    "renown": 25,
+    "feat": false
   }
 ];
 

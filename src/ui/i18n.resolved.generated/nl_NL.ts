@@ -9796,6 +9796,42 @@ export const nl_NL: EnTranslations = {
       "runeseekers_lantern": {
         "name": "Runeseeker's Lantern"
       },
+      "crownforged_heartplate": {
+        "name": "Kroon gesmede hartplaat"
+      },
+      "nighttalon_emberweave": {
+        "name": "Nachtklauw-gloedweefsel"
+      },
+      "soulflame_vestments": {
+        "name": "Zielvlamgewaden"
+      },
+      "stormcallers_hauberk": {
+        "name": "Stormroepers maliënkolder"
+      },
+      "volzharrs_knucklestone": {
+        "name": "Volzharrs knokkelsteen"
+      },
+      "magmastrider_greaves": {
+        "name": "Magmawandelaar-scheenplaten"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "Voetwindsels van de Ontwakende Vloer"
+      },
+      "forgeheat_cinch": {
+        "name": "Smederijhitte-gordel"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "Kernbreker, Hart van de Onderberg"
+      },
+      "the_last_restraint": {
+        "name": "De Laatste Boei"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "Ring van de Negende Koeling"
+      },
+      "moltenheart_chroma": {
+        "name": "Smelthart"
+      },
       "conjured_water4": {
         "name": "Getoverd bronwater"
       },
@@ -14496,7 +14532,8 @@ export const nl_NL: EnTranslations = {
         "name": "Bonewrought-Regalia",
         "bonus2": "Verhoogt aanvalskracht met 40.",
         "bonus3": "Verhoogt kracht met 15, uithoudingsvermogen met 15 en aanvals- en spreuksnelheid met 15%.",
-        "bonus4": "Je kritieke wapentreffers splinteren het doelwit met Beensplinter, waardoor het 8 schade bloedt elke 2 sec gedurende 12 sec. Stapelt tot 3 keer."
+        "bonus4": "Je kritieke wapentreffers splinteren het doelwit met Beensplinter, waardoor het 8 schade bloedt elke 2 sec gedurende 12 sec. Stapelt tot 3 keer.",
+        "bonus5": "Verhoogt de kans op een kritieke treffer met 3%."
       },
       "deathlord": {
         "name": "Barrowlord-Strijduitrusting",
@@ -14518,19 +14555,22 @@ export const nl_NL: EnTranslations = {
         "name": "Direfang-Pels",
         "bonus2": "Verhoogt aanvalskracht met 40.",
         "bonus3": "Verhoogt behendigheid met 15, kritieke kans met 2% en aanvals- en spreuksnelheid met 15%.",
-        "bonus4": "Je kritieke wapentreffers rijten een Rafelige Snee, waardoor het doelwit 6 schade bloedt elke 2 sec gedurende 12 sec. Stapelt tot 3 keer."
+        "bonus4": "Je kritieke wapentreffers rijten een Rafelige Snee, waardoor het doelwit 6 schade bloedt elke 2 sec gedurende 12 sec. Stapelt tot 3 keer.",
+        "bonus5": "Verhoogt de kans op een kritieke treffer met 3%."
       },
       "soulflame": {
         "name": "Wraithfire-Regalia",
         "bonus2": "Verhoogt spreukkracht met 20. Opgelopen schade vertraagt je spreuken niet meer (100% weerstand tegen spreukvertraging).",
         "bonus3": "Verhoogt intellect met 15, geest met 15 en aanvals- en spreuksnelheid met 15%.",
-        "bonus4": "Je spreuken hebben 10% kans om Zielevlam te verlenen, waardoor je spreukkracht met 40 toeneemt gedurende 10 sec."
+        "bonus4": "Je spreuken hebben 10% kans om Zielevlam te verlenen, waardoor je spreukkracht met 40 toeneemt gedurende 10 sec.",
+        "bonus5": "Verhoogt de kans op een kritieke spreuktreffer met 3%."
       },
       "stormcallers": {
         "name": "Galecall-Gewaden",
         "bonus2": "Verhoogt spreukkracht met 20. Opgelopen schade vertraagt je spreuken niet meer (100% weerstand tegen spreukvertraging).",
         "bonus3": "Verhoogt intellect met 15, geest met 15 en aanvals- en spreuksnelheid met 15%.",
-        "bonus4": "Je spreuken hebben 10% kans om Zielevlam te verlenen, waardoor je spreukkracht met 40 toeneemt gedurende 10 sec."
+        "bonus4": "Je spreuken hebben 10% kans om Zielevlam te verlenen, waardoor je spreukkracht met 40 toeneemt gedurende 10 sec.",
+        "bonus5": "Verhoogt de kans op een kritieke spreuktreffer met 3%."
       },
       "vale_arcanist": {
         "name": "Gewaden van de Dal-arcanist",

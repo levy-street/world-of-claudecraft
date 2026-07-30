@@ -2282,6 +2282,40 @@ export const DEEDS: Record<string, DeedDef> = {
       count: 1,
     },
   },
+  dgn_undermount_volzharr: {
+    id: 'dgn_undermount_volzharr',
+    name: 'The Mountainbreaker',
+    desc: 'Defeat Volzharr, the Buried Furnace in Undermount: The Waking.',
+    category: 'dungeon',
+    renown: 25,
+    trigger: { kind: 'dungeonClears', dungeonId: 'undermount_wing3', count: 1 },
+    reward: { kind: 'title', text: 'the Mountainbreaker' },
+  },
+  dgn_undermount_full_descent: {
+    id: 'dgn_undermount_full_descent',
+    name: 'The Full Descent',
+    desc: 'Clear all three wings of the Undermount Descent in one lockout week.',
+    category: 'dungeon',
+    renown: 25,
+    trigger: {
+      kind: 'meta',
+      deedIds: ['dgn_undermount_kiln_keepers', 'dgn_undermount_odrenn', 'dgn_undermount_volzharr'],
+      raidLockoutIds: ['undermount_wing1', 'undermount_wing2', 'undermount_wing3'],
+    },
+  },
+  dgn_undermount_volzharr_heroic: {
+    id: 'dgn_undermount_volzharr_heroic',
+    name: 'Heroic: The Waking',
+    desc: 'Defeat Volzharr, the Buried Furnace in Undermount: The Waking on Heroic difficulty.',
+    category: 'dungeon',
+    renown: 25,
+    trigger: {
+      kind: 'dungeonClears',
+      dungeonId: 'undermount_wing3',
+      difficulty: 'heroic',
+      count: 1,
+    },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

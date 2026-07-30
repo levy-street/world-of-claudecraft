@@ -9796,6 +9796,42 @@ export const pl_PL: EnTranslations = {
       "runeseekers_lantern": {
         "name": "Runeseeker's Lantern"
       },
+      "crownforged_heartplate": {
+        "name": "Napierśnik Serca Koronokutych"
+      },
+      "nighttalon_emberweave": {
+        "name": "Żarotkanina Nocnego Szponu"
+      },
+      "soulflame_vestments": {
+        "name": "Szaty Płomienia Duszy"
+      },
+      "stormcallers_hauberk": {
+        "name": "Kolczuga Wzywającego Burze"
+      },
+      "volzharrs_knucklestone": {
+        "name": "Kamień Pięści Volzharra"
+      },
+      "magmastrider_greaves": {
+        "name": "Nagolenniki Magmowego Kroku"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "Owijacze Budzącej się Posadzki"
+      },
+      "forgeheat_cinch": {
+        "name": "Pas Żaru Kuźni"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "Łamacz Rdzenia, Serce Podgórza"
+      },
+      "the_last_restraint": {
+        "name": "Ostatnie Więzy"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "Pierścień Dziewiątego Hartowania"
+      },
+      "moltenheart_chroma": {
+        "name": "Stopione Serce"
+      },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"
       },
@@ -14496,7 +14532,8 @@ export const pl_PL: EnTranslations = {
         "name": "Regalia Bonewrought",
         "bonus2": "Zwiększa siłę ataku o 40.",
         "bonus3": "Zwiększa siłę o 15, wytrzymałość o 15 oraz szybkość ataku i rzucania zaklęć o 15%.",
-        "bonus4": "Twoje krytyczne trafienia bronią rozłupują cel Kościaną Drzazgą, zadając 8 obrażeń od krwawienia co 2 s przez 12 s. Kumuluje się do 3 razy."
+        "bonus4": "Twoje krytyczne trafienia bronią rozłupują cel Kościaną Drzazgą, zadając 8 obrażeń od krwawienia co 2 s przez 12 s. Kumuluje się do 3 razy.",
+        "bonus5": "Zwiększa szansę na trafienie krytyczne o 3%."
       },
       "deathlord": {
         "name": "Rynsztunek bojowy Barrowlorda",
@@ -14518,19 +14555,22 @@ export const pl_PL: EnTranslations = {
         "name": "Skóra Direfang",
         "bonus2": "Zwiększa siłę ataku o 40.",
         "bonus3": "Zwiększa zręczność o 15, szansę na trafienie krytyczne o 2% oraz szybkość ataku i rzucania zaklęć o 15%.",
-        "bonus4": "Twoje krytyczne trafienia bronią rozrywają cel Poszarpaną Raną, zadając 6 obrażeń od krwawienia co 2 s przez 12 s. Kumuluje się do 3 razy."
+        "bonus4": "Twoje krytyczne trafienia bronią rozrywają cel Poszarpaną Raną, zadając 6 obrażeń od krwawienia co 2 s przez 12 s. Kumuluje się do 3 razy.",
+        "bonus5": "Zwiększa szansę na trafienie krytyczne o 3%."
       },
       "soulflame": {
         "name": "Regalia Wraithfire",
         "bonus2": "Zwiększa moc zaklęć o 20. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć (100% odporności na opóźnienie rzucania).",
         "bonus3": "Zwiększa intelekt o 15, ducha o 15 oraz szybkość ataku i rzucania zaklęć o 15%.",
-        "bonus4": "Twoje zaklęcia mają 10% szansy na udzielenie Płomienia Duszy, zwiększającego moc zaklęć o 40 na 10 s."
+        "bonus4": "Twoje zaklęcia mają 10% szansy na udzielenie Płomienia Duszy, zwiększającego moc zaklęć o 40 na 10 s.",
+        "bonus5": "Zwiększa szansę na krytyczne trafienie zaklęciem o 3%."
       },
       "stormcallers": {
         "name": "Szaty Galecall",
         "bonus2": "Zwiększa moc zaklęć o 20. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć (100% odporności na opóźnienie rzucania).",
         "bonus3": "Zwiększa intelekt o 15, ducha o 15 oraz szybkość ataku i rzucania zaklęć o 15%.",
-        "bonus4": "Twoje zaklęcia mają 10% szansy na udzielenie Płomienia Duszy, zwiększającego moc zaklęć o 40 na 10 s."
+        "bonus4": "Twoje zaklęcia mają 10% szansy na udzielenie Płomienia Duszy, zwiększającego moc zaklęć o 40 na 10 s.",
+        "bonus5": "Zwiększa szansę na krytyczne trafienie zaklęciem o 3%."
       },
       "vale_arcanist": {
         "name": "Szaty Arkanisty z Doliny",

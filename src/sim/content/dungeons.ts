@@ -2,9 +2,12 @@
 // lists, and the DungeonDef registry merged by sim/data.ts.
 
 import type { DungeonDef, DungeonSpawn, ItemDef, MobTemplate } from '../types';
+import { MOLTENHEART_CHROMA_ID, MOLTENHEART_CHROMA_ITEM_ID } from './skins';
 
-// Undermount wing 1 and 2 raid gear. Primary-stat sums are the engine-derived
+// Undermount raid gear. Wing 1 and 2 primary-stat sums are the engine-derived
 // ilvl 33 epic budgets: feet 15, mainhand 23, ring 14, legs 21, and waist 16.
+// Volzharr's ilvl 35 budgets are chest/mainhand 25, ring 15, feet 16, waist 17,
+// and 33 for Corebreaker's two-hand stat multiplier.
 // Unless a number is one of those budgets or a PRD-locked loot chance, numeric
 // armor, weapon, rating, and vendor values in this block are (tuning).
 export const UNDERMOUNT_ITEMS: Record<string, ItemDef> = {
@@ -243,6 +246,152 @@ export const UNDERMOUNT_ITEMS: Record<string, ItemDef> = {
     sellValue: 5000,
     requiredClass: ['rogue', 'hunter', 'druid'],
   },
+  crownforged_heartplate: {
+    id: 'crownforged_heartplate',
+    name: 'Crownforged Heartplate',
+    kind: 'armor',
+    slot: 'chest',
+    armorType: 'mail',
+    quality: 'epic',
+    stats: { armor: 255, str: 13, sta: 12 },
+    critRating: 40,
+    sellValue: 7500,
+    requiredClass: ['warrior', 'paladin'],
+    set: 'crownforged',
+  },
+  nighttalon_emberweave: {
+    id: 'nighttalon_emberweave',
+    name: 'Nighttalon Emberweave',
+    kind: 'armor',
+    slot: 'chest',
+    armorType: 'leather',
+    quality: 'epic',
+    stats: { armor: 190, agi: 15, sta: 10 },
+    critRating: 40,
+    sellValue: 7500,
+    requiredClass: ['rogue', 'hunter', 'druid'],
+    set: 'nighttalon',
+  },
+  soulflame_vestments: {
+    id: 'soulflame_vestments',
+    name: 'Soulflame Vestments',
+    kind: 'armor',
+    slot: 'chest',
+    armorType: 'cloth',
+    quality: 'epic',
+    stats: { armor: 110, int: 15, spi: 10 },
+    hasteRating: 40,
+    sellValue: 7500,
+    requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+    set: 'soulflame',
+  },
+  stormcallers_hauberk: {
+    id: 'stormcallers_hauberk',
+    name: "Stormcaller's Hauberk",
+    kind: 'armor',
+    slot: 'chest',
+    armorType: 'mail',
+    quality: 'epic',
+    stats: { armor: 255, int: 14, sta: 11 },
+    hasteRating: 40,
+    sellValue: 7500,
+    requiredClass: ['shaman'],
+    set: 'stormcallers',
+  },
+  volzharrs_knucklestone: {
+    id: 'volzharrs_knucklestone',
+    name: "Volzharr's Knucklestone",
+    kind: 'armor',
+    slot: 'ring',
+    quality: 'epic',
+    stats: { str: 8, sta: 7 },
+    critRating: 40,
+    sellValue: 6500,
+    requiredClass: ['warrior', 'paladin', 'shaman'],
+  },
+  magmastrider_greaves: {
+    id: 'magmastrider_greaves',
+    name: 'Magmastrider Greaves',
+    kind: 'armor',
+    slot: 'feet',
+    armorType: 'mail',
+    quality: 'epic',
+    stats: { armor: 135, str: 9, sta: 7 },
+    sellValue: 6000,
+    requiredClass: ['warrior', 'paladin'],
+  },
+  footwraps_of_the_waking_floor: {
+    id: 'footwraps_of_the_waking_floor',
+    name: 'Footwraps of the Waking Floor',
+    kind: 'armor',
+    slot: 'feet',
+    armorType: 'cloth',
+    quality: 'epic',
+    stats: { armor: 60, int: 10, spi: 6 },
+    hasteRating: 40,
+    sellValue: 6000,
+    requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+  },
+  forgeheat_cinch: {
+    id: 'forgeheat_cinch',
+    name: 'Forgeheat Cinch',
+    kind: 'armor',
+    slot: 'waist',
+    armorType: 'leather',
+    quality: 'epic',
+    stats: { armor: 112, agi: 10, sta: 7 },
+    hasteRating: 40,
+    sellValue: 6500,
+    requiredClass: ['rogue', 'hunter', 'druid'],
+  },
+  corebreaker_heart_of_the_undermount: {
+    id: 'corebreaker_heart_of_the_undermount',
+    name: 'Corebreaker, Heart of the Undermount',
+    kind: 'weapon',
+    slot: 'mainhand',
+    hand: 'twohand',
+    quality: 'epic',
+    weapon: { min: 56, max: 86, speed: 3.6 },
+    stats: { str: 20, sta: 13 },
+    critRating: 65,
+    hasteRating: 20,
+    sellValue: 10000,
+    requiredClass: ['warrior', 'hunter', 'shaman', 'paladin'],
+  },
+  the_last_restraint: {
+    id: 'the_last_restraint',
+    name: 'The Last Restraint',
+    kind: 'weapon',
+    slot: 'mainhand',
+    quality: 'epic',
+    weapon: { min: 45, max: 65, speed: 3.2 },
+    stats: { int: 16, spi: 9 },
+    hasteRating: 65,
+    sellValue: 10000,
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
+  },
+  band_of_the_ninth_quench: {
+    id: 'band_of_the_ninth_quench',
+    name: 'Band of the Ninth Quench',
+    kind: 'armor',
+    slot: 'ring',
+    quality: 'epic',
+    stats: { str: 8, agi: 7 },
+    hasteRating: 40,
+    sellValue: 6500,
+    requiredClass: ['warrior', 'paladin', 'hunter', 'rogue', 'shaman', 'druid'],
+  },
+  [MOLTENHEART_CHROMA_ITEM_ID]: {
+    id: MOLTENHEART_CHROMA_ITEM_ID,
+    name: 'Moltenheart',
+    kind: 'tool',
+    quality: 'epic',
+    use: { type: 'mechChroma', chromaId: MOLTENHEART_CHROMA_ID },
+    sellValue: 0,
+    noVendorSell: true,
+    noDiscard: true,
+    noMarketList: true,
+  },
 };
 
 const UNDERMOUNT_WING1_LOOT: MobTemplate['loot'] = [
@@ -271,6 +420,30 @@ const UNDERMOUNT_WING2_LOOT: MobTemplate['loot'] = [
   { itemId: 'ashwalk_sandals', chance: 0.08, rollGroup: 'undermount_wing2_bonus' },
   { itemId: 'quenchsilk_cord', chance: 0.07, rollGroup: 'undermount_wing2_bonus' },
   { itemId: 'slakeleather_belt', chance: 0.06, rollGroup: 'undermount_wing2_bonus' },
+];
+
+const UNDERMOUNT_WING3_LOOT: MobTemplate['loot'] = [
+  { copper: 150000, chance: 1 }, // 15g raid payout
+  { itemId: 'crownforged_heartplate', chance: 0.25, rollGroup: 'undermount_wing3_t2_chests' },
+  { itemId: 'nighttalon_emberweave', chance: 0.25, rollGroup: 'undermount_wing3_t2_chests' },
+  { itemId: 'soulflame_vestments', chance: 0.25, rollGroup: 'undermount_wing3_t2_chests' },
+  { itemId: 'stormcallers_hauberk', chance: 0.25, rollGroup: 'undermount_wing3_t2_chests' },
+  { itemId: 'volzharrs_knucklestone', chance: 0.25, rollGroup: 'undermount_wing3_offpieces' },
+  { itemId: 'magmastrider_greaves', chance: 0.25, rollGroup: 'undermount_wing3_offpieces' },
+  {
+    itemId: 'footwraps_of_the_waking_floor',
+    chance: 0.25,
+    rollGroup: 'undermount_wing3_offpieces',
+  },
+  { itemId: 'forgeheat_cinch', chance: 0.25, rollGroup: 'undermount_wing3_offpieces' },
+  {
+    itemId: 'corebreaker_heart_of_the_undermount',
+    chance: 0.03,
+    rollGroup: 'undermount_wing3_chase',
+  },
+  { itemId: 'the_last_restraint', chance: 0.03, rollGroup: 'undermount_wing3_chase' },
+  { itemId: 'band_of_the_ninth_quench', chance: 0.1, rollGroup: 'undermount_wing3_chase' },
+  { itemId: MOLTENHEART_CHROMA_ITEM_ID, chance: 0.01, rollGroup: 'undermount_wing3_chase' },
 ];
 
 export const DUNGEON_MOBS: Record<string, MobTemplate> = {
@@ -1143,7 +1316,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 34,
     moveSpeed: 5.5, // the kite: below player run 7, pass-6 movement finale
     aggroRadius: 18,
-    loot: [],
+    loot: UNDERMOUNT_WING3_LOOT,
     scale: 1.8,
     color: 0x9c3d24,
   },

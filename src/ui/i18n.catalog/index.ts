@@ -47,7 +47,7 @@ export { shellStrings } from './shell';
 
 type ItemSetEntityText = Record<
   string,
-  { name: string; bonus2?: string; bonus3?: string; bonus4?: string }
+  { name: string; bonus2?: string; bonus3?: string; bonus4?: string; bonus5?: string }
 >;
 
 const itemSetEntityText: ItemSetEntityText = Object.fromEntries(
@@ -59,6 +59,7 @@ const itemSetEntityText: ItemSetEntityText = Object.fromEntries(
       const bonus2 = set.bonuses.find((bonus) => bonus.pieces === 2)?.text;
       const bonus3 = set.bonuses.find((bonus) => bonus.pieces === 3)?.text;
       const bonus4 = set.bonuses.find((bonus) => bonus.pieces === 4)?.text;
+      const bonus5 = set.bonuses.find((bonus) => bonus.pieces === 5)?.text;
       return [
         set.id,
         {
@@ -66,6 +67,7 @@ const itemSetEntityText: ItemSetEntityText = Object.fromEntries(
           ...(bonus2 ? { bonus2 } : {}),
           ...(bonus3 ? { bonus3 } : {}),
           ...(bonus4 ? { bonus4 } : {}),
+          ...(bonus5 ? { bonus5 } : {}),
         },
       ];
     }),

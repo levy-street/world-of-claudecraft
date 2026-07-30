@@ -9796,6 +9796,42 @@ export const en: EnTranslations = {
       "runeseekers_lantern": {
         "name": "Runeseeker's Lantern"
       },
+      "crownforged_heartplate": {
+        "name": "Crownforged Heartplate"
+      },
+      "nighttalon_emberweave": {
+        "name": "Nighttalon Emberweave"
+      },
+      "soulflame_vestments": {
+        "name": "Soulflame Vestments"
+      },
+      "stormcallers_hauberk": {
+        "name": "Stormcaller's Hauberk"
+      },
+      "volzharrs_knucklestone": {
+        "name": "Volzharr's Knucklestone"
+      },
+      "magmastrider_greaves": {
+        "name": "Magmastrider Greaves"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "Footwraps of the Waking Floor"
+      },
+      "forgeheat_cinch": {
+        "name": "Forgeheat Cinch"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "Corebreaker, Heart of the Undermount"
+      },
+      "the_last_restraint": {
+        "name": "The Last Restraint"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "Band of the Ninth Quench"
+      },
+      "moltenheart_chroma": {
+        "name": "Moltenheart"
+      },
       "conjured_water4": {
         "name": "Conjured Springwater"
       },
@@ -14496,7 +14532,8 @@ export const en: EnTranslations = {
         "name": "Bonewrought Regalia",
         "bonus2": "Increases attack power by 40.",
         "bonus3": "Increases Strength by 15, Stamina by 15, and attack and casting speed by 7.5%.",
-        "bonus4": "Increases Hit by 6%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 8 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus4": "Increases Hit by 6%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 8 damage every 2 sec for 12 sec. Stacks up to 3 times.",
+        "bonus5": "Increases critical strike chance by 3%."
       },
       "deathlord": {
         "name": "Barrowlord Battlegear",
@@ -14518,19 +14555,22 @@ export const en: EnTranslations = {
         "name": "Direfang Pelt",
         "bonus2": "Increases attack power by 40.",
         "bonus3": "Increases Agility by 15, critical strike chance by 1%, and attack and casting speed by 7.5%.",
-        "bonus4": "Increases Hit by 6%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus4": "Increases Hit by 6%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times.",
+        "bonus5": "Increases critical strike chance by 3%."
       },
       "soulflame": {
         "name": "Wraithfire Regalia",
         "bonus2": "Increases spell power by 20. Damage taken no longer delays your spellcasting (100% pushback resistance).",
         "bonus3": "Increases Intellect by 15, Spirit by 15, and attack and casting speed by 7.5%.",
-        "bonus4": "Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec."
+        "bonus4": "Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec.",
+        "bonus5": "Increases spell critical strike chance by 3%."
       },
       "stormcallers": {
         "name": "Galecall Vestments",
         "bonus2": "Increases spell power by 20. Damage taken no longer delays your spellcasting (100% pushback resistance).",
         "bonus3": "Increases Intellect by 15, Spirit by 15, and attack and casting speed by 7.5%.",
-        "bonus4": "Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec."
+        "bonus4": "Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec.",
+        "bonus5": "Increases spell critical strike chance by 3%."
       },
       "vale_arcanist": {
         "name": "Vale Arcanist's Regalia",

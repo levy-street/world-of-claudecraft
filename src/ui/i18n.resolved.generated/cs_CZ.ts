@@ -9796,6 +9796,42 @@ export const cs_CZ: EnTranslations = {
       "runeseekers_lantern": {
         "name": "Runeseeker's Lantern"
       },
+      "crownforged_heartplate": {
+        "name": "Korunokovaná hrudní zbroj"
+      },
+      "nighttalon_emberweave": {
+        "name": "Žhavotkanina Nočního spáru"
+      },
+      "soulflame_vestments": {
+        "name": "Roucha plamene duše"
+      },
+      "stormcallers_hauberk": {
+        "name": "Hauberk Volatele bouří"
+      },
+      "volzharrs_knucklestone": {
+        "name": "Volzharrův pěstní kámen"
+      },
+      "magmastrider_greaves": {
+        "name": "Holenice lávochodce"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "Ovinutí Probuzené podlahy"
+      },
+      "forgeheat_cinch": {
+        "name": "Pás žáru výhně"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "Drtič jádra, Srdce Podhory"
+      },
+      "the_last_restraint": {
+        "name": "Poslední zábrana"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "Prsten devátého zchlazení"
+      },
+      "moltenheart_chroma": {
+        "name": "Žhavé srdce"
+      },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"
       },
@@ -14496,7 +14532,8 @@ export const cs_CZ: EnTranslations = {
         "name": "Regálie z kosti",
         "bonus2": "Zvyšuje sílu útoku o 40.",
         "bonus3": "Zvyšuje sílu o 15, výdrž o 15 a rychlost útoku i sesílání o 15 %.",
-        "bonus4": "Kritické zásahy tvé zbraně roztříští cíl efektem Kostitříska a způsobí mu krvácení za 8 poškození každé 2 s po dobu 12 s. Nasčítá se až 3krát."
+        "bonus4": "Kritické zásahy tvé zbraně roztříští cíl efektem Kostitříska a způsobí mu krvácení za 8 poškození každé 2 s po dobu 12 s. Nasčítá se až 3krát.",
+        "bonus5": "Zvyšuje šanci na kritický zásah o 3 %."
       },
       "deathlord": {
         "name": "Bojová výbava mohylového pána",
@@ -14518,19 +14555,22 @@ export const cs_CZ: EnTranslations = {
         "name": "Kožešina děsivého tesáku",
         "bonus2": "Zvyšuje sílu útoku o 40.",
         "bonus3": "Zvyšuje obratnost o 15, šanci na kritický zásah o 2 % a rychlost útoku i sesílání o 15 %.",
-        "bonus4": "Kritické zásahy tvé zbraně vytrhnou Rozšklebenou ránu a způsobí cíli krvácení za 6 poškození každé 2 s po dobu 12 s. Nasčítá se až 3krát."
+        "bonus4": "Kritické zásahy tvé zbraně vytrhnou Rozšklebenou ránu a způsobí cíli krvácení za 6 poškození každé 2 s po dobu 12 s. Nasčítá se až 3krát.",
+        "bonus5": "Zvyšuje šanci na kritický zásah o 3 %."
       },
       "soulflame": {
         "name": "Regálie přízračného ohně",
         "bonus2": "Zvyšuje sílu kouzel o 20. Utrpěné poškození již nezdržuje tvé sesílání kouzel (100% odolnost proti zdržení sesílání).",
         "bonus3": "Zvyšuje intelekt o 15, ducha o 15 a rychlost útoku i sesílání o 15 %.",
-        "bonus4": "Tvá kouzla mají 10% šanci udělit Dušový žár, který zvýší sílu kouzel o 40 na 10 s."
+        "bonus4": "Tvá kouzla mají 10% šanci udělit Dušový žár, který zvýší sílu kouzel o 40 na 10 s.",
+        "bonus5": "Zvyšuje šanci na kritický zásah kouzlem o 3 %."
       },
       "stormcallers": {
         "name": "Roucha volání vichru",
         "bonus2": "Zvyšuje sílu kouzel o 20. Utrpěné poškození již nezdržuje tvé sesílání kouzel (100% odolnost proti zdržení sesílání).",
         "bonus3": "Zvyšuje intelekt o 15, ducha o 15 a rychlost útoku i sesílání o 15 %.",
-        "bonus4": "Tvá kouzla mají 10% šanci udělit Dušový žár, který zvýší sílu kouzel o 40 na 10 s."
+        "bonus4": "Tvá kouzla mají 10% šanci udělit Dušový žár, který zvýší sílu kouzel o 40 na 10 s.",
+        "bonus5": "Zvyšuje šanci na kritický zásah kouzlem o 3 %."
       },
       "vale_arcanist": {
         "name": "Regálie arkánisty z údolí",

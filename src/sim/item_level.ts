@@ -26,6 +26,8 @@ import {
   NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL,
   UNDERMOUNT_RAID_BOSS_IDS,
   UNDERMOUNT_RAID_LOOT_SOURCE_LEVEL,
+  VOLZHARR_RAID_BOSS_ID,
+  VOLZHARR_RAID_LOOT_SOURCE_LEVEL,
 } from './content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from './content/heroic_vendor';
 import { FURY_STOCK, WARFARE_SOURCE_LEVEL } from './content/pvp_honor';
@@ -225,13 +227,20 @@ function buildSourceIndex(): Map<string, ItemSource> {
       (MOBS[bossId]?.loot ?? []).flatMap((entry) => (entry.itemId ? [entry.itemId] : [])),
     ),
   );
+  const volzharrRaidBases = new Set(
+    (MOBS[VOLZHARR_RAID_BOSS_ID]?.loot ?? []).flatMap((entry) =>
+      entry.itemId ? [entry.itemId] : [],
+    ),
+  );
   for (const item of Object.values(ITEMS)) {
     if (!item.heroicOf) continue;
     const src = raidBases.has(item.heroicOf)
       ? NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL
       : undermountRaidBases.has(item.heroicOf)
         ? UNDERMOUNT_RAID_LOOT_SOURCE_LEVEL
-        : HEROIC_VARIANT_SOURCE_LEVEL;
+        : volzharrRaidBases.has(item.heroicOf)
+          ? VOLZHARR_RAID_LOOT_SOURCE_LEVEL
+          : HEROIC_VARIANT_SOURCE_LEVEL;
     bump(item.id, src, false);
   }
   // Rift-only clear-time epics and legendaries: gated behind B+/A/S final-boss

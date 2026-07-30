@@ -4351,6 +4351,26 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'heroic_ashwalk_sandals',
   'heroic_quenchsilk_cord',
   'heroic_slakeleather_belt',
+  // Undermount S7: Volzharr normal and heroic non-weapon rewards
+  'band_of_the_ninth_quench',
+  'crownforged_heartplate',
+  'footwraps_of_the_waking_floor',
+  'forgeheat_cinch',
+  'magmastrider_greaves',
+  'moltenheart_chroma',
+  'nighttalon_emberweave',
+  'soulflame_vestments',
+  'stormcallers_hauberk',
+  'volzharrs_knucklestone',
+  'heroic_band_of_the_ninth_quench',
+  'heroic_crownforged_heartplate',
+  'heroic_footwraps_of_the_waking_floor',
+  'heroic_forgeheat_cinch',
+  'heroic_magmastrider_greaves',
+  'heroic_nighttalon_emberweave',
+  'heroic_soulflame_vestments',
+  'heroic_stormcallers_hauberk',
+  'heroic_volzharrs_knucklestone',
 ]);
 
 // The grouped literals above preserve the curated catalog's provenance history. Derive the

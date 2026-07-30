@@ -9796,6 +9796,42 @@ export const it_IT: EnTranslations = {
       "runeseekers_lantern": {
         "name": "Runeseeker's Lantern"
       },
+      "crownforged_heartplate": {
+        "name": "Corazza del Cuore Forgiacorona"
+      },
+      "nighttalon_emberweave": {
+        "name": "Tessibrace Artiglionotturno"
+      },
+      "soulflame_vestments": {
+        "name": "Vesti Fiamma dell’Anima"
+      },
+      "stormcallers_hauberk": {
+        "name": "Usbergo dell’Invocatore delle Tempeste"
+      },
+      "volzharrs_knucklestone": {
+        "name": "Pietra da Nocche di Volzharr"
+      },
+      "magmastrider_greaves": {
+        "name": "Schinieri Passomagma"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "Fasce del Pavimento Risvegliato"
+      },
+      "forgeheat_cinch": {
+        "name": "Cintura Calore della Forgia"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "Spezzanucleo, Cuore del Sottomonte"
+      },
+      "the_last_restraint": {
+        "name": "L’Ultimo Vincolo"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "Anello della Nona Tempra"
+      },
+      "moltenheart_chroma": {
+        "name": "Cuore Fuso"
+      },
       "conjured_water4": {
         "name": "Acqua sorgiva evocata"
       },
@@ -14496,7 +14532,8 @@ export const it_IT: EnTranslations = {
         "name": "Tenuta da battaglia Bonewrought",
         "bonus2": "Aumenta la potenza d'attacco di 40.",
         "bonus3": "Aumenta la forza di 15, la vigoria di 15 e la velocità d'attacco e di lancio del 15%.",
-        "bonus4": "I colpi critici della tua arma scheggiano il bersaglio con Scheggiaossa, facendolo sanguinare per 8 danni ogni 2 sec per 12 sec. Si accumula fino a 3 volte."
+        "bonus4": "I colpi critici della tua arma scheggiano il bersaglio con Scheggiaossa, facendolo sanguinare per 8 danni ogni 2 sec per 12 sec. Si accumula fino a 3 volte.",
+        "bonus5": "Aumenta del 3% la probabilità di colpo critico."
       },
       "deathlord": {
         "name": "Tenuta da battaglia di Barrowlord",
@@ -14518,19 +14555,22 @@ export const it_IT: EnTranslations = {
         "name": "Tenuta di cuoio Direfang",
         "bonus2": "Aumenta la potenza d'attacco di 40.",
         "bonus3": "Aumenta l'agilità di 15, la probabilità di critico del 2% e la velocità d'attacco e di lancio del 15%.",
-        "bonus4": "I colpi critici della tua arma aprono uno Squarcio Frastagliato, facendo sanguinare il bersaglio per 6 danni ogni 2 sec per 12 sec. Si accumula fino a 3 volte."
+        "bonus4": "I colpi critici della tua arma aprono uno Squarcio Frastagliato, facendo sanguinare il bersaglio per 6 danni ogni 2 sec per 12 sec. Si accumula fino a 3 volte.",
+        "bonus5": "Aumenta del 3% la probabilità di colpo critico."
       },
       "soulflame": {
         "name": "Paramenti Wraithfire",
         "bonus2": "Aumenta il potere degli incantesimi di 20. I danni subiti non ritardano più i tuoi incantesimi (100% di resistenza al ritardo di lancio).",
         "bonus3": "Aumenta l'intelletto di 15, lo spirito di 15 e la velocità d'attacco e di lancio del 15%.",
-        "bonus4": "I tuoi incantesimi hanno una probabilità del 10% di conferire Vampanima, aumentando la potenza magica di 40 per 10 sec."
+        "bonus4": "I tuoi incantesimi hanno una probabilità del 10% di conferire Vampanima, aumentando la potenza magica di 40 per 10 sec.",
+        "bonus5": "Aumenta del 3% la probabilità di colpo critico degli incantesimi."
       },
       "stormcallers": {
         "name": "Vesti Galecall",
         "bonus2": "Aumenta il potere degli incantesimi di 20. I danni subiti non ritardano più i tuoi incantesimi (100% di resistenza al ritardo di lancio).",
         "bonus3": "Aumenta l'intelletto di 15, lo spirito di 15 e la velocità d'attacco e di lancio del 15%.",
-        "bonus4": "I tuoi incantesimi hanno una probabilità del 10% di conferire Vampanima, aumentando la potenza magica di 40 per 10 sec."
+        "bonus4": "I tuoi incantesimi hanno una probabilità del 10% di conferire Vampanima, aumentando la potenza magica di 40 per 10 sec.",
+        "bonus5": "Aumenta del 3% la probabilità di colpo critico degli incantesimi."
       },
       "vale_arcanist": {
         "name": "Tenuta dell'Arcanista della Valle",

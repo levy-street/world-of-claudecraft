@@ -29,6 +29,7 @@ import type { ItemSet, SetBonusEffect, SetBonusTier, SetProc } from '../types';
 export const SET_HASTE_3PC = 0.075;
 export const SET_HASTE_3PC_RATING = 150; // -> 7.5% haste at 20 rating = 1%
 export const SET_CRIT_3PC_RATING = 20; // -> +1% crit at 20 rating = 1%
+export const SET_CRIT_5PC = 0.03; // (tuning), +3% crit at the T2 5-piece tier
 // The two T2 4-piece bleeds (Bonesplinter, Ragged Gash) are marginal on their own
 // (roughly their 2-piece's flat 40 AP). They now also grant Hit rating so completing
 // the set is worth chasing for Heroic (+3 above-level), where the bleed alone was not.
@@ -160,6 +161,11 @@ const STRENGTH_T2_BONUSES: SetBonusTier[] = [
     },
     text: 'Increases Hit by 6%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 8 damage every 2 sec for 12 sec. Stacks up to 3 times.',
   },
+  {
+    pieces: 5,
+    effect: { crit: SET_CRIT_5PC },
+    text: 'Increases critical strike chance by 3%.',
+  },
 ];
 const AGILITY_T2_BONUSES: SetBonusTier[] = [
   { pieces: 2, effect: { ap: 40 }, text: 'Increases attack power by 40.' },
@@ -192,6 +198,11 @@ const AGILITY_T2_BONUSES: SetBonusTier[] = [
     },
     text: 'Increases Hit by 6%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times.',
   },
+  {
+    pieces: 5,
+    effect: { crit: SET_CRIT_5PC },
+    text: 'Increases critical strike chance by 3%.',
+  },
 ];
 const CASTER_T2_BONUSES: SetBonusTier[] = [
   {
@@ -219,6 +230,11 @@ const CASTER_T2_BONUSES: SetBonusTier[] = [
       },
     },
     text: 'Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec.',
+  },
+  {
+    pieces: 5,
+    effect: { crit: SET_CRIT_5PC },
+    text: 'Increases spell critical strike chance by 3%.',
   },
 ];
 // The leveling haste kits grant haste alone, and only at 3 pieces:

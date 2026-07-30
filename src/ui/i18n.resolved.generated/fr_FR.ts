@@ -9796,6 +9796,42 @@ export const fr_FR: EnTranslations = {
       "runeseekers_lantern": {
         "name": "Runeseeker's Lantern"
       },
+      "crownforged_heartplate": {
+        "name": "Cuirasse du Cœur Forgé-couronne"
+      },
+      "nighttalon_emberweave": {
+        "name": "Tissebraise Serre-de-nuit"
+      },
+      "soulflame_vestments": {
+        "name": "Habits Flamme-d’âme"
+      },
+      "stormcallers_hauberk": {
+        "name": "Haubert de l’Appel-tempête"
+      },
+      "volzharrs_knucklestone": {
+        "name": "Pierre de poing de Volzharr"
+      },
+      "magmastrider_greaves": {
+        "name": "Grèves Marche-magma"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "Bandelettes du Sol éveillé"
+      },
+      "forgeheat_cinch": {
+        "name": "Ceinture Chaleur de forge"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "Brise-cœur, Cœur du Sous-mont"
+      },
+      "the_last_restraint": {
+        "name": "La Dernière Entrave"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "Anneau de la Neuvième Trempe"
+      },
+      "moltenheart_chroma": {
+        "name": "Cœur en fusion"
+      },
       "conjured_water4": {
         "name": "Eau de source invoquée"
       },
@@ -14496,7 +14532,8 @@ export const fr_FR: EnTranslations = {
         "name": "Tenue d'apparat Bonewrought",
         "bonus2": "Augmente la puissance d'attaque de 40.",
         "bonus3": "Augmente la force de 15, l'endurance de 15 et la vitesse d'attaque et d'incantation de 15%.",
-        "bonus4": "Vos coups critiques d'arme lacèrent la cible avec Éclat d'os, lui infligeant 8 points de dégâts de saignement toutes les 2 s pendant 12 s. Se cumule jusqu'à 3 fois."
+        "bonus4": "Vos coups critiques d'arme lacèrent la cible avec Éclat d'os, lui infligeant 8 points de dégâts de saignement toutes les 2 s pendant 12 s. Se cumule jusqu'à 3 fois.",
+        "bonus5": "Augmente de 3 % les chances de coup critique."
       },
       "deathlord": {
         "name": "Tenue de guerre de Barrowlord",
@@ -14518,19 +14555,22 @@ export const fr_FR: EnTranslations = {
         "name": "Peau de Direfang",
         "bonus2": "Augmente la puissance d'attaque de 40.",
         "bonus3": "Augmente l'agilité de 15, les chances de critique de 2% et la vitesse d'attaque et d'incantation de 15%.",
-        "bonus4": "Vos coups critiques d'arme ouvrent une Entaille déchiquetée, infligeant à la cible 6 points de dégâts de saignement toutes les 2 s pendant 12 s. Se cumule jusqu'à 3 fois."
+        "bonus4": "Vos coups critiques d'arme ouvrent une Entaille déchiquetée, infligeant à la cible 6 points de dégâts de saignement toutes les 2 s pendant 12 s. Se cumule jusqu'à 3 fois.",
+        "bonus5": "Augmente de 3 % les chances de coup critique."
       },
       "soulflame": {
         "name": "Tenue d'apparat Wraithfire",
         "bonus2": "Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).",
         "bonus3": "Augmente l'intelligence de 15, l'esprit de 15 et la vitesse d'attaque et d'incantation de 15%.",
-        "bonus4": "Vos sorts ont 10% de chances de conférer Embrasement d'âme, augmentant la puissance des sorts de 40 pendant 10 s."
+        "bonus4": "Vos sorts ont 10% de chances de conférer Embrasement d'âme, augmentant la puissance des sorts de 40 pendant 10 s.",
+        "bonus5": "Augmente de 3 % les chances de coup critique des sorts."
       },
       "stormcallers": {
         "name": "Vêtements de Galecall",
         "bonus2": "Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).",
         "bonus3": "Augmente l'intelligence de 15, l'esprit de 15 et la vitesse d'attaque et d'incantation de 15%.",
-        "bonus4": "Vos sorts ont 10% de chances de conférer Embrasement d'âme, augmentant la puissance des sorts de 40 pendant 10 s."
+        "bonus4": "Vos sorts ont 10% de chances de conférer Embrasement d'âme, augmentant la puissance des sorts de 40 pendant 10 s.",
+        "bonus5": "Augmente de 3 % les chances de coup critique des sorts."
       },
       "vale_arcanist": {
         "name": "Tenue de l'arcaniste du Val",

@@ -9796,6 +9796,42 @@ export const zh_TW: EnTranslations = {
       "runeseekers_lantern": {
         "name": "尋符者提燈"
       },
+      "crownforged_heartplate": {
+        "name": "冠鑄心甲"
+      },
+      "nighttalon_emberweave": {
+        "name": "夜爪燼織衣"
+      },
+      "soulflame_vestments": {
+        "name": "魂焰法衣"
+      },
+      "stormcallers_hauberk": {
+        "name": "喚風者鎖甲"
+      },
+      "volzharrs_knucklestone": {
+        "name": "沃爾扎爾的拳骨石"
+      },
+      "magmastrider_greaves": {
+        "name": "熔岩行者脛甲"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "甦醒地面的裹足"
+      },
+      "forgeheat_cinch": {
+        "name": "鍛爐熱力束帶"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "碎核者，山下之心"
+      },
+      "the_last_restraint": {
+        "name": "最後的束縛"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "第九次淬火之戒"
+      },
+      "moltenheart_chroma": {
+        "name": "熔火之心"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
@@ -14496,7 +14532,8 @@ export const zh_TW: EnTranslations = {
         "name": "骨鑄戰裝",
         "bonus2": "攻擊強度提高 40 點。",
         "bonus3": "力量提高 15 點，耐力提高 15 點，攻擊速度和施法速度提高 15%。",
-        "bonus4": "你的武器致命一擊會使目標產生「骨刺」，每 2 秒流血 8 點傷害，持續 12 秒。最多疊加 3 層。"
+        "bonus4": "你的武器致命一擊會使目標產生「骨刺」，每 2 秒流血 8 點傷害，持續 12 秒。最多疊加 3 層。",
+        "bonus5": "致命一擊機率提高3%。"
       },
       "deathlord": {
         "name": "塚陵領主戰鬥護甲",
@@ -14518,19 +14555,22 @@ export const zh_TW: EnTranslations = {
         "name": "厲牙皮甲",
         "bonus2": "攻擊強度提高 40 點。",
         "bonus3": "敏捷提高 15 點，致命一擊機率提高 2%，攻擊速度和施法速度提高 15%。",
-        "bonus4": "你的武器致命一擊會撕開「撕裂傷口」，使目標每 2 秒流血 6 點傷害，持續 12 秒。最多疊加 3 層。"
+        "bonus4": "你的武器致命一擊會撕開「撕裂傷口」，使目標每 2 秒流血 6 點傷害，持續 12 秒。最多疊加 3 層。",
+        "bonus5": "致命一擊機率提高3%。"
       },
       "soulflame": {
         "name": "怨焰法衣",
         "bonus2": "法術強度提高 20 點。受到傷害不再延遲你的施法（施法延遲抗性 100%）。",
         "bonus3": "智力提高 15 點，精神提高 15 點，攻擊速度和施法速度提高 15%。",
-        "bonus4": "你的法術有 10% 的機率觸發「灼魂之焰」，使法術強度提高 40 點，持續 10 秒。"
+        "bonus4": "你的法術有 10% 的機率觸發「灼魂之焰」，使法術強度提高 40 點，持續 10 秒。",
+        "bonus5": "法術致命一擊機率提高3%。"
       },
       "stormcallers": {
         "name": "喚風法衣",
         "bonus2": "法術強度提高 20 點。受到傷害不再延遲你的施法（施法延遲抗性 100%）。",
         "bonus3": "智力提高 15 點，精神提高 15 點，攻擊速度和施法速度提高 15%。",
-        "bonus4": "你的法術有 10% 的機率觸發「灼魂之焰」，使法術強度提高 40 點，持續 10 秒。"
+        "bonus4": "你的法術有 10% 的機率觸發「灼魂之焰」，使法術強度提高 40 點，持續 10 秒。",
+        "bonus5": "法術致命一擊機率提高3%。"
       },
       "vale_arcanist": {
         "name": "谷地秘法師法衣",

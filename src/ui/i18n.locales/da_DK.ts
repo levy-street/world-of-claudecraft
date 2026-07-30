@@ -10782,4 +10782,22 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.items.the_even_temper.name': 'Det jævne temperament',
   'entities.items.twice_fired_slippers.name': 'Dobbeltbrændte tøfler',
   'entities.items.twicetempered_girdle.name': 'Dobbelthærdet bælte',
+  'entities.items.crownforged_heartplate.name': 'Kronesmedet hjertebrynje',
+  'entities.items.nighttalon_emberweave.name': 'Nattalons glødevæv',
+  'entities.items.soulflame_vestments.name': 'Sjæleflammegevandter',
+  'entities.items.stormcallers_hauberk.name': 'Stormkalderens ringbrynje',
+  'entities.items.volzharrs_knucklestone.name': 'Volzharrs knosten',
+  'entities.items.magmastrider_greaves.name': 'Magmavandrerens benskinner',
+  'entities.items.footwraps_of_the_waking_floor.name': 'Fodvikler fra det vågnende gulv',
+  'entities.items.forgeheat_cinch.name': 'Smedjevarmt livbælte',
+  'entities.items.corebreaker_heart_of_the_undermount.name': 'Kerneknuser, Underbjergets hjerte',
+  'entities.items.the_last_restraint.name': 'Den sidste lænke',
+  'entities.items.band_of_the_ninth_quench.name': 'Ring fra den niende køling',
+  'entities.items.moltenheart_chroma.name': 'Smeltehjerte',
+  'entities.itemSets.crownforged.bonus5': 'Øger chancen for kritiske træffere med 3 %.',
+  'entities.itemSets.nighttalon.bonus5': 'Øger chancen for kritiske træffere med 3 %.',
+  'entities.itemSets.soulflame.bonus5':
+    'Øger chancen for kritiske træffere med besværgelser med 3 %.',
+  'entities.itemSets.stormcallers.bonus5':
+    'Øger chancen for kritiske træffere med besværgelser med 3 %.',
 };

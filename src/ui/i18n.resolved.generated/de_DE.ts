@@ -9796,6 +9796,42 @@ export const de_DE: EnTranslations = {
       "runeseekers_lantern": {
         "name": "Runeseeker's Lantern"
       },
+      "crownforged_heartplate": {
+        "name": "Kronengeschmiedeter Herzpanzer"
+      },
+      "nighttalon_emberweave": {
+        "name": "Nachtkrallen-Glutgewebe"
+      },
+      "soulflame_vestments": {
+        "name": "Seelenflammengewänder"
+      },
+      "stormcallers_hauberk": {
+        "name": "Hauberk des Sturmberufers"
+      },
+      "volzharrs_knucklestone": {
+        "name": "Volzharrs Knöchelstein"
+      },
+      "magmastrider_greaves": {
+        "name": "Magmaschreiter-Beinschienen"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "Fußwickel des erwachenden Bodens"
+      },
+      "forgeheat_cinch": {
+        "name": "Schmiedehitze-Gurt"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "Kernbrecher, Herz des Unterbergs"
+      },
+      "the_last_restraint": {
+        "name": "Die letzte Fessel"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "Band der neunten Abschreckung"
+      },
+      "moltenheart_chroma": {
+        "name": "Schmelzherz"
+      },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"
       },
@@ -14496,7 +14532,8 @@ export const de_DE: EnTranslations = {
         "name": "Bonewrought-Kriegstracht",
         "bonus2": "Erhöht Angriffskraft um 40.",
         "bonus3": "Erhöht Stärke um 15, Ausdauer um 15 sowie Angriffs- und Zaubertempo um 15%.",
-        "bonus4": "Eure kritischen Waffentreffer zersplittern das Ziel mit Knochensplitter und lassen es 12 Sek. lang alle 2 Sek. 8 Schaden bluten. Stapelt sich bis zu 3-mal."
+        "bonus4": "Eure kritischen Waffentreffer zersplittern das Ziel mit Knochensplitter und lassen es 12 Sek. lang alle 2 Sek. 8 Schaden bluten. Stapelt sich bis zu 3-mal.",
+        "bonus5": "Erhöht die kritische Trefferchance um 3 %."
       },
       "deathlord": {
         "name": "Barrowlord-Kriegstracht",
@@ -14518,19 +14555,22 @@ export const de_DE: EnTranslations = {
         "name": "Direfang-Pelz",
         "bonus2": "Erhöht Angriffskraft um 40.",
         "bonus3": "Erhöht Beweglichkeit um 15, kritische Trefferchance um 2% sowie Angriffs- und Zaubertempo um 15%.",
-        "bonus4": "Eure kritischen Waffentreffer reißen eine Zerfetzte Wunde und lassen das Ziel 12 Sek. lang alle 2 Sek. 6 Schaden bluten. Stapelt sich bis zu 3-mal."
+        "bonus4": "Eure kritischen Waffentreffer reißen eine Zerfetzte Wunde und lassen das Ziel 12 Sek. lang alle 2 Sek. 6 Schaden bluten. Stapelt sich bis zu 3-mal.",
+        "bonus5": "Erhöht die kritische Trefferchance um 3 %."
       },
       "soulflame": {
         "name": "Wraithfire-Gewänder",
         "bonus2": "Erhöht Zaubermacht um 20. Erlittener Schaden verzögert Eure Zauber nicht mehr (100% Widerstand gegen Zauberverzögerung).",
         "bonus3": "Erhöht Intelligenz um 15, Willenskraft um 15 sowie Angriffs- und Zaubertempo um 15%.",
-        "bonus4": "Eure Zauber haben eine Chance von 10%, Seelenbrand zu gewähren, was die Zaubermacht 10 Sek. lang um 40 erhöht."
+        "bonus4": "Eure Zauber haben eine Chance von 10%, Seelenbrand zu gewähren, was die Zaubermacht 10 Sek. lang um 40 erhöht.",
+        "bonus5": "Erhöht die kritische Zaubertrefferchance um 3 %."
       },
       "stormcallers": {
         "name": "Galecall-Gewänder",
         "bonus2": "Erhöht Zaubermacht um 20. Erlittener Schaden verzögert Eure Zauber nicht mehr (100% Widerstand gegen Zauberverzögerung).",
         "bonus3": "Erhöht Intelligenz um 15, Willenskraft um 15 sowie Angriffs- und Zaubertempo um 15%.",
-        "bonus4": "Eure Zauber haben eine Chance von 10%, Seelenbrand zu gewähren, was die Zaubermacht 10 Sek. lang um 40 erhöht."
+        "bonus4": "Eure Zauber haben eine Chance von 10%, Seelenbrand zu gewähren, was die Zaubermacht 10 Sek. lang um 40 erhöht.",
+        "bonus5": "Erhöht die kritische Zaubertrefferchance um 3 %."
       },
       "vale_arcanist": {
         "name": "Ornat des Talarkanisten",

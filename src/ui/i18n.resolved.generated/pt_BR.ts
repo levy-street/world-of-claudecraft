@@ -9796,6 +9796,42 @@ export const pt_BR: EnTranslations = {
       "runeseekers_lantern": {
         "name": "Runeseeker's Lantern"
       },
+      "crownforged_heartplate": {
+        "name": "Peitoral Coração Forjacoroa"
+      },
+      "nighttalon_emberweave": {
+        "name": "Trama de Brasas Garra Noturna"
+      },
+      "soulflame_vestments": {
+        "name": "Vestes Chama da Alma"
+      },
+      "stormcallers_hauberk": {
+        "name": "Cota do Invocador de Tempestades"
+      },
+      "volzharrs_knucklestone": {
+        "name": "Pedra de Punho de Volzharr"
+      },
+      "magmastrider_greaves": {
+        "name": "Grevas Passomagma"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "Faixas do Chão Desperto"
+      },
+      "forgeheat_cinch": {
+        "name": "Cinturão Calor da Forja"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "Quebra-núcleo, Coração do Submonte"
+      },
+      "the_last_restraint": {
+        "name": "A Última Restrição"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "Anel da Nona Têmpera"
+      },
+      "moltenheart_chroma": {
+        "name": "Coração Fundido"
+      },
       "conjured_water4": {
         "name": "Água de Nascente Conjurada"
       },
@@ -14496,7 +14532,8 @@ export const pt_BR: EnTranslations = {
         "name": "Traje de Batalha Bonewrought",
         "bonus2": "Aumenta o poder de ataque em 40.",
         "bonus3": "Aumenta a força em 15, o vigor em 15 e a velocidade de ataque e de lançamento em 15%.",
-        "bonus4": "Seus acertos críticos com armas estilhaçam o alvo com Estilhaço Ósseo, causando 8 de sangramento a cada 2 s por 12 s. Acumula até 3 vezes."
+        "bonus4": "Seus acertos críticos com armas estilhaçam o alvo com Estilhaço Ósseo, causando 8 de sangramento a cada 2 s por 12 s. Acumula até 3 vezes.",
+        "bonus5": "Aumenta em 3% a chance de acerto crítico."
       },
       "deathlord": {
         "name": "Traje de Batalha Barrowlord",
@@ -14518,19 +14555,22 @@ export const pt_BR: EnTranslations = {
         "name": "Traje de Couro Direfang",
         "bonus2": "Aumenta o poder de ataque em 40.",
         "bonus3": "Aumenta a agilidade em 15, a chance de crítico em 2% e a velocidade de ataque e de lançamento em 15%.",
-        "bonus4": "Seus acertos críticos com armas abrem um Corte Dilacerado, causando 6 de sangramento no alvo a cada 2 s por 12 s. Acumula até 3 vezes."
+        "bonus4": "Seus acertos críticos com armas abrem um Corte Dilacerado, causando 6 de sangramento no alvo a cada 2 s por 12 s. Acumula até 3 vezes.",
+        "bonus5": "Aumenta em 3% a chance de acerto crítico."
       },
       "soulflame": {
         "name": "Vestes Wraithfire",
         "bonus2": "Aumenta o poder mágico em 20. Dano recebido não atrasa mais suas conjurações (100% de resistência a atraso de conjuração).",
         "bonus3": "Aumenta o intelecto em 15, o espírito em 15 e a velocidade de ataque e de lançamento em 15%.",
-        "bonus4": "Suas magias têm 10% de chance de conceder Chama da Alma, aumentando o poder mágico em 40 por 10 s."
+        "bonus4": "Suas magias têm 10% de chance de conceder Chama da Alma, aumentando o poder mágico em 40 por 10 s.",
+        "bonus5": "Aumenta em 3% a chance de acerto crítico com feitiços."
       },
       "stormcallers": {
         "name": "Vestes Galecall",
         "bonus2": "Aumenta o poder mágico em 20. Dano recebido não atrasa mais suas conjurações (100% de resistência a atraso de conjuração).",
         "bonus3": "Aumenta o intelecto em 15, o espírito em 15 e a velocidade de ataque e de lançamento em 15%.",
-        "bonus4": "Suas magias têm 10% de chance de conceder Chama da Alma, aumentando o poder mágico em 40 por 10 s."
+        "bonus4": "Suas magias têm 10% de chance de conceder Chama da Alma, aumentando o poder mágico em 40 por 10 s.",
+        "bonus5": "Aumenta em 3% a chance de acerto crítico com feitiços."
       },
       "vale_arcanist": {
         "name": "Vestes do Arcanista do Vale",

@@ -2302,6 +2302,18 @@ const ITEM_ENTITY_IDS = [
   'undermount_rune_rubbing',
   'undermount_foreman_ledger',
   'runeseekers_lantern',
+  'crownforged_heartplate',
+  'nighttalon_emberweave',
+  'soulflame_vestments',
+  'stormcallers_hauberk',
+  'volzharrs_knucklestone',
+  'magmastrider_greaves',
+  'footwraps_of_the_waking_floor',
+  'forgeheat_cinch',
+  'corebreaker_heart_of_the_undermount',
+  'the_last_restraint',
+  'band_of_the_ninth_quench',
+  'moltenheart_chroma',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2416,6 +2428,18 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   undermount_rune_rubbing: 'Undermount Rune Rubbing',
   undermount_foreman_ledger: "Foreman's Undermount Ledger",
   runeseekers_lantern: "Runeseeker's Lantern",
+  crownforged_heartplate: 'Crownforged Heartplate',
+  nighttalon_emberweave: 'Nighttalon Emberweave',
+  soulflame_vestments: 'Soulflame Vestments',
+  stormcallers_hauberk: "Stormcaller's Hauberk",
+  volzharrs_knucklestone: "Volzharr's Knucklestone",
+  magmastrider_greaves: 'Magmastrider Greaves',
+  footwraps_of_the_waking_floor: 'Footwraps of the Waking Floor',
+  forgeheat_cinch: 'Forgeheat Cinch',
+  corebreaker_heart_of_the_undermount: 'Corebreaker, Heart of the Undermount',
+  the_last_restraint: 'The Last Restraint',
+  band_of_the_ninth_quench: 'Band of the Ninth Quench',
+  moltenheart_chroma: 'Moltenheart',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

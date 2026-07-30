@@ -10979,4 +10979,22 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.the_even_temper.name': 'La Tempra Equanime',
   'entities.items.twice_fired_slippers.name': 'Pantofole Cotte Due Volte',
   'entities.items.twicetempered_girdle.name': 'Cinturone a Doppia Tempra',
+  'entities.items.crownforged_heartplate.name': 'Corazza del Cuore Forgiacorona',
+  'entities.items.nighttalon_emberweave.name': 'Tessibrace Artiglionotturno',
+  'entities.items.soulflame_vestments.name': 'Vesti Fiamma dell’Anima',
+  'entities.items.stormcallers_hauberk.name': 'Usbergo dell’Invocatore delle Tempeste',
+  'entities.items.volzharrs_knucklestone.name': 'Pietra da Nocche di Volzharr',
+  'entities.items.magmastrider_greaves.name': 'Schinieri Passomagma',
+  'entities.items.footwraps_of_the_waking_floor.name': 'Fasce del Pavimento Risvegliato',
+  'entities.items.forgeheat_cinch.name': 'Cintura Calore della Forgia',
+  'entities.items.corebreaker_heart_of_the_undermount.name': 'Spezzanucleo, Cuore del Sottomonte',
+  'entities.items.the_last_restraint.name': 'L’Ultimo Vincolo',
+  'entities.items.band_of_the_ninth_quench.name': 'Anello della Nona Tempra',
+  'entities.items.moltenheart_chroma.name': 'Cuore Fuso',
+  'entities.itemSets.crownforged.bonus5': 'Aumenta del 3% la probabilità di colpo critico.',
+  'entities.itemSets.nighttalon.bonus5': 'Aumenta del 3% la probabilità di colpo critico.',
+  'entities.itemSets.soulflame.bonus5':
+    'Aumenta del 3% la probabilità di colpo critico degli incantesimi.',
+  'entities.itemSets.stormcallers.bonus5':
+    'Aumenta del 3% la probabilità di colpo critico degli incantesimi.',
 };

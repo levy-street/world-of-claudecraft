@@ -5388,8 +5388,10 @@ export type DeedTrigger =
   | { kind: 'visit'; markId: string }
   | { kind: 'visits'; markIds: string[]; count?: number }
   // All listed deeds earned, plus (optionally) all listed quests done. The
-  // quest arm exists for the Chronicle chapters, which mix both.
-  | { kind: 'meta'; deedIds: string[]; questIds?: string[] }
+  // quest arm exists for the Chronicle chapters, which mix both. When
+  // raidLockoutIds is present, every listed lockout must point at the same
+  // authoritative reset boundary, proving the clears happened in one window.
+  | { kind: 'meta'; deedIds: string[]; questIds?: string[]; raidLockoutIds?: string[] }
   // A numeric reading over persisted state at or above amount.
   | { kind: 'meter'; meter: DeedMeterId; amount: number }
   // A boolean predicate over persisted state.

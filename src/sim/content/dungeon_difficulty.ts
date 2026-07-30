@@ -298,4 +298,15 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     finalBossId: 'odrenn_the_temperer',
     marksPerParticipant: 3,
   },
+  undermount_wing3: {
+    id: 'undermount_wing3',
+    difficulty: 'heroic',
+    level: 22,
+    healthMultiplier: 3.2,
+    damageMultiplier: 7.25,
+    addDamageMultiplier: 7.25,
+    armorMultiplier: 1.2,
+    finalBossId: 'volzharr_buried_furnace',
+    marksPerParticipant: 3,
+  },
 };

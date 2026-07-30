@@ -10988,4 +10988,23 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.the_even_temper.name': 'El Temple Sereno',
   'entities.items.twice_fired_slippers.name': 'Zapatillas de Doble Cocción',
   'entities.items.twicetempered_girdle.name': 'Cinturón de Doble Temple',
+  'entities.items.crownforged_heartplate.name': 'Coraza Forjacorona',
+  'entities.items.nighttalon_emberweave.name': 'Tejido de Ascuas Garranocturna',
+  'entities.items.soulflame_vestments.name': 'Vestiduras Llama de Alma',
+  'entities.items.stormcallers_hauberk.name': 'Camisote del Invocatormentas',
+  'entities.items.volzharrs_knucklestone.name': 'Piedra de Nudillos de Volzharr',
+  'entities.items.magmastrider_greaves.name': 'Grebas Zancamagma',
+  'entities.items.footwraps_of_the_waking_floor.name': 'Vendas del Suelo Despierto',
+  'entities.items.forgeheat_cinch.name': 'Faja de Calor de Forja',
+  'entities.items.corebreaker_heart_of_the_undermount.name':
+    'Rompenúcleos, Corazón de la Submontaña',
+  'entities.items.the_last_restraint.name': 'La Última Atadura',
+  'entities.items.band_of_the_ninth_quench.name': 'Sortija de la Novena Templanza',
+  'entities.items.moltenheart_chroma.name': 'Corazón Fundido',
+  'entities.itemSets.crownforged.bonus5': 'Aumenta un 3 % la probabilidad de golpe crítico.',
+  'entities.itemSets.nighttalon.bonus5': 'Aumenta un 3 % la probabilidad de golpe crítico.',
+  'entities.itemSets.soulflame.bonus5':
+    'Aumenta un 3 % la probabilidad de golpe crítico con hechizos.',
+  'entities.itemSets.stormcallers.bonus5':
+    'Aumenta un 3 % la probabilidad de golpe crítico con hechizos.',
 };

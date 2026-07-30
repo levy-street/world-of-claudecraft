@@ -9796,6 +9796,42 @@ export const tr_TR: EnTranslations = {
       "runeseekers_lantern": {
         "name": "Runeseeker's Lantern"
       },
+      "crownforged_heartplate": {
+        "name": "Taçdövme Yürek Zırhı"
+      },
+      "nighttalon_emberweave": {
+        "name": "Gecepençesi Kor Dokuması"
+      },
+      "soulflame_vestments": {
+        "name": "Ruhalevi Cübbeleri"
+      },
+      "stormcallers_hauberk": {
+        "name": "Fırtınaçağıranın Zırhlı Gömleği"
+      },
+      "volzharrs_knucklestone": {
+        "name": "Volzharr’ın Yumruk Taşı"
+      },
+      "magmastrider_greaves": {
+        "name": "Magmayürüyen Baldırlıkları"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "Uyanan Zeminin Ayak Sargıları"
+      },
+      "forgeheat_cinch": {
+        "name": "Ocak Isısı Kuşağı"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "Çekirdekkıran, Alt Dağın Yüreği"
+      },
+      "the_last_restraint": {
+        "name": "Son Bağ"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "Dokuzuncu Suverme Yüzüğü"
+      },
+      "moltenheart_chroma": {
+        "name": "Erimiş Yürek"
+      },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"
       },
@@ -14496,7 +14532,8 @@ export const tr_TR: EnTranslations = {
         "name": "Bonewrought Kıyafetleri",
         "bonus2": "Saldırı gücünü 40 artırır.",
         "bonus3": "Gücü 15, dayanıklılığı 15, saldırı ve büyü hızını %15 artırır.",
-        "bonus4": "Silah kritik vuruşların hedefi Kemikkıymık ile parçalar, 12 sn boyunca her 2 sn'de 8 kanama hasarı verir. 3 kata kadar üst üste binebilir."
+        "bonus4": "Silah kritik vuruşların hedefi Kemikkıymık ile parçalar, 12 sn boyunca her 2 sn'de 8 kanama hasarı verir. 3 kata kadar üst üste binebilir.",
+        "bonus5": "Kritik vuruş şansını %3 artırır."
       },
       "deathlord": {
         "name": "Barrowlord Savaş Takımı",
@@ -14518,19 +14555,22 @@ export const tr_TR: EnTranslations = {
         "name": "Direfang Postu",
         "bonus2": "Saldırı gücünü 40 artırır.",
         "bonus3": "Çevikliği 15, kritik şansını %2, saldırı ve büyü hızını %15 artırır.",
-        "bonus4": "Silah kritik vuruşların bir Pürüzlü Yarık açar, hedefi 12 sn boyunca her 2 sn'de 6 kanama hasarıyla kanatır. 3 kata kadar üst üste binebilir."
+        "bonus4": "Silah kritik vuruşların bir Pürüzlü Yarık açar, hedefi 12 sn boyunca her 2 sn'de 6 kanama hasarıyla kanatır. 3 kata kadar üst üste binebilir.",
+        "bonus5": "Kritik vuruş şansını %3 artırır."
       },
       "soulflame": {
         "name": "Wraithfire Kıyafetleri",
         "bonus2": "Büyü gücünü 20 artırır. Alınan hasar artık büyü yapmanı geciktirmez (%100 büyü gecikme direnci).",
         "bonus3": "Zekayı 15, ruhu 15, saldırı ve büyü hızını %15 artırır.",
-        "bonus4": "Büyülerinin %10 ihtimalle Ruhalazı kazandırır, 10 sn boyunca büyü gücünü 40 artırır."
+        "bonus4": "Büyülerinin %10 ihtimalle Ruhalazı kazandırır, 10 sn boyunca büyü gücünü 40 artırır.",
+        "bonus5": "Büyülerin kritik vuruş şansını %3 artırır."
       },
       "stormcallers": {
         "name": "Galecall Cübbeleri",
         "bonus2": "Büyü gücünü 20 artırır. Alınan hasar artık büyü yapmanı geciktirmez (%100 büyü gecikme direnci).",
         "bonus3": "Zekayı 15, ruhu 15, saldırı ve büyü hızını %15 artırır.",
-        "bonus4": "Büyülerinin %10 ihtimalle Ruhalazı kazandırır, 10 sn boyunca büyü gücünü 40 artırır."
+        "bonus4": "Büyülerinin %10 ihtimalle Ruhalazı kazandırır, 10 sn boyunca büyü gücünü 40 artırır.",
+        "bonus5": "Büyülerin kritik vuruş şansını %3 artırır."
       },
       "vale_arcanist": {
         "name": "Vadi Arkanisti giysileri",

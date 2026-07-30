@@ -36,6 +36,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   bonewrought_greatsword: 'adv_sword_2handed_color', // EPIC: Nythraxis raid 2H
   direfang_greatblade: 'adv_sword_2handed_color', // EPIC: Nythraxis hunter 2H
   wildheart_tuskblade: 'adv_sword_2handed_color',
+  corebreaker_heart_of_the_undermount: 'adv_sword_2handed_color',
 
   // ---- daggers (only 4 models for ~21 daggers; spread as evenly as art allows)-
   rusty_dagger: 'dagger_a',
@@ -96,6 +97,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   lunar_tide_greatstaff: 'adv_staff', // EPIC: Heroic Ysolei staff
   wildheart_hexwood_staff: 'adv_druid_staff',
   saans_stoking_iron: 'adv_staff',
+  the_last_restraint: 'adv_staff',
 
   // ---- wands (1H caster: scepters / rods / foci) ------------------------------
   drowned_tide_scepter: 'wand_a',

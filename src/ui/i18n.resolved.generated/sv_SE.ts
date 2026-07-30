@@ -9796,6 +9796,42 @@ export const sv_SE: EnTranslations = {
       "runeseekers_lantern": {
         "name": "Runeseeker's Lantern"
       },
+      "crownforged_heartplate": {
+        "name": "Krönsmidd hjärtbröstplåt"
+      },
+      "nighttalon_emberweave": {
+        "name": "Nattklons glödväv"
+      },
+      "soulflame_vestments": {
+        "name": "Själaflammevestment"
+      },
+      "stormcallers_hauberk": {
+        "name": "Stormkallarens ringbrynja"
+      },
+      "volzharrs_knucklestone": {
+        "name": "Volzharrs knogsten"
+      },
+      "magmastrider_greaves": {
+        "name": "Magmavandrarens benskenor"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "Fotlindor från det vaknande golvet"
+      },
+      "forgeheat_cinch": {
+        "name": "Smedjehettans gördel"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "Kärnkrossare, Underbergets hjärta"
+      },
+      "the_last_restraint": {
+        "name": "Den sista bojan"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "Ringen från den nionde kylningen"
+      },
+      "moltenheart_chroma": {
+        "name": "Smälthjärta"
+      },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"
       },
@@ -14496,7 +14532,8 @@ export const sv_SE: EnTranslations = {
         "name": "Bonewrought-regalier",
         "bonus2": "Ökar attackkraft med 40.",
         "bonus3": "Ökar styrka med 15, uthållighet med 15 samt attack- och magihastighet med 15%.",
-        "bonus4": "Dina kritiska vapenträffar splittrar målet med Benflisa och får det att blöda för 8 skada var 2:e sek i 12 sek. Staplas upp till 3 gånger."
+        "bonus4": "Dina kritiska vapenträffar splittrar målet med Benflisa och får det att blöda för 8 skada var 2:e sek i 12 sek. Staplas upp till 3 gånger.",
+        "bonus5": "Ökar chansen för kritiska träffar med 3 %."
       },
       "deathlord": {
         "name": "Barrowlords stridsutrustning",
@@ -14518,19 +14555,22 @@ export const sv_SE: EnTranslations = {
         "name": "Direfang-päls",
         "bonus2": "Ökar attackkraft med 40.",
         "bonus3": "Ökar smidighet med 15, kritisk chans med 2% samt attack- och magihastighet med 15%.",
-        "bonus4": "Dina kritiska vapenträffar river upp ett Rivsår och får målet att blöda för 6 skada var 2:e sek i 12 sek. Staplas upp till 3 gånger."
+        "bonus4": "Dina kritiska vapenträffar river upp ett Rivsår och får målet att blöda för 6 skada var 2:e sek i 12 sek. Staplas upp till 3 gånger.",
+        "bonus5": "Ökar chansen för kritiska träffar med 3 %."
       },
       "soulflame": {
         "name": "Wraithfire-regalier",
         "bonus2": "Ökar trollformelskraft med 20. Skada du tar fördröjer inte längre dina besvärjelser (100% motstånd mot fördröjning av besvärjelser).",
         "bonus3": "Ökar intellekt med 15, ande med 15 samt attack- och magihastighet med 15%.",
-        "bonus4": "Dina besvärjelser har 10% chans att ge Själslåga och öka besvärjelseskraften med 40 i 10 sek."
+        "bonus4": "Dina besvärjelser har 10% chans att ge Själslåga och öka besvärjelseskraften med 40 i 10 sek.",
+        "bonus5": "Ökar chansen för kritiska besvärjelseeffekter med 3 %."
       },
       "stormcallers": {
         "name": "Galecall-skrud",
         "bonus2": "Ökar trollformelskraft med 20. Skada du tar fördröjer inte längre dina besvärjelser (100% motstånd mot fördröjning av besvärjelser).",
         "bonus3": "Ökar intellekt med 15, ande med 15 samt attack- och magihastighet med 15%.",
-        "bonus4": "Dina besvärjelser har 10% chans att ge Själslåga och öka besvärjelseskraften med 40 i 10 sek."
+        "bonus4": "Dina besvärjelser har 10% chans att ge Själslåga och öka besvärjelseskraften med 40 i 10 sek.",
+        "bonus5": "Ökar chansen för kritiska besvärjelseeffekter med 3 %."
       },
       "vale_arcanist": {
         "name": "Dalarkanistens skrud",

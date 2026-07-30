@@ -9796,6 +9796,42 @@ export const vi_VN: EnTranslations = {
       "runeseekers_lantern": {
         "name": "Runeseeker's Lantern"
       },
+      "crownforged_heartplate": {
+        "name": "Giáp Ngực Tim Rèn Vương Miện"
+      },
+      "nighttalon_emberweave": {
+        "name": "Vải Dệt Than Hồng Móng Đêm"
+      },
+      "soulflame_vestments": {
+        "name": "Lễ Phục Lửa Linh Hồn"
+      },
+      "stormcallers_hauberk": {
+        "name": "Áo Giáp Lưới Người Gọi Bão"
+      },
+      "volzharrs_knucklestone": {
+        "name": "Đá Đấm Tay của Volzharr"
+      },
+      "magmastrider_greaves": {
+        "name": "Giáp Chân Bước Dung Nham"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "Vải Quấn Chân của Sàn Thức Tỉnh"
+      },
+      "forgeheat_cinch": {
+        "name": "Đai Nhiệt Lò Rèn"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "Kẻ Phá Lõi, Trái Tim Dưới Núi"
+      },
+      "the_last_restraint": {
+        "name": "Gông Xiềng Cuối Cùng"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "Nhẫn Tôi Luyện Thứ Chín"
+      },
+      "moltenheart_chroma": {
+        "name": "Trái Tim Nóng Chảy"
+      },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
       },
@@ -14496,7 +14532,8 @@ export const vi_VN: EnTranslations = {
         "name": "Bộ Lễ Phục Bonewrought",
         "bonus2": "Tăng sức mạnh tấn công thêm 40.",
         "bonus3": "Tăng sức mạnh thêm 15, thể lực thêm 15 và tốc độ tấn công cùng thi triển thêm 15%.",
-        "bonus4": "Các đòn chí mạng bằng vũ khí của bạn găm Dằm Xương vào mục tiêu, khiến nó chảy máu nhận 8 sát thương mỗi 2 giây trong 12 giây. Cộng dồn tối đa 3 lần."
+        "bonus4": "Các đòn chí mạng bằng vũ khí của bạn găm Dằm Xương vào mục tiêu, khiến nó chảy máu nhận 8 sát thương mỗi 2 giây trong 12 giây. Cộng dồn tối đa 3 lần.",
+        "bonus5": "Tăng 3% cơ hội chí mạng."
       },
       "deathlord": {
         "name": "Bộ Chiến Barrowlord",
@@ -14518,19 +14555,22 @@ export const vi_VN: EnTranslations = {
         "name": "Bộ Da Direfang",
         "bonus2": "Tăng sức mạnh tấn công thêm 40.",
         "bonus3": "Tăng nhanh nhẹn thêm 15, tỉ lệ chí mạng thêm 2% và tốc độ tấn công cùng thi triển thêm 15%.",
-        "bonus4": "Các đòn chí mạng bằng vũ khí của bạn xé ra một Vết Rách Toạc, khiến mục tiêu chảy máu nhận 6 sát thương mỗi 2 giây trong 12 giây. Cộng dồn tối đa 3 lần."
+        "bonus4": "Các đòn chí mạng bằng vũ khí của bạn xé ra một Vết Rách Toạc, khiến mục tiêu chảy máu nhận 6 sát thương mỗi 2 giây trong 12 giây. Cộng dồn tối đa 3 lần.",
+        "bonus5": "Tăng 3% cơ hội chí mạng."
       },
       "soulflame": {
         "name": "Lễ Phục Wraithfire",
         "bonus2": "Tăng sức mạnh phép thuật thêm 20. Sát thương phải chịu không còn làm chậm việc thi triển phép của bạn (kháng trì hoãn thi triển 100%).",
         "bonus3": "Tăng trí tuệ thêm 15, tinh thần thêm 15 và tốc độ tấn công cùng thi triển thêm 15%.",
-        "bonus4": "Các phép của bạn có 10% cơ hội ban Hồn Hỏa, tăng sức mạnh phép thuật thêm 40 trong 10 giây."
+        "bonus4": "Các phép của bạn có 10% cơ hội ban Hồn Hỏa, tăng sức mạnh phép thuật thêm 40 trong 10 giây.",
+        "bonus5": "Tăng 3% cơ hội chí mạng của phép thuật."
       },
       "stormcallers": {
         "name": "Áo Lễ Galecall",
         "bonus2": "Tăng sức mạnh phép thuật thêm 20. Sát thương phải chịu không còn làm chậm việc thi triển phép của bạn (kháng trì hoãn thi triển 100%).",
         "bonus3": "Tăng trí tuệ thêm 15, tinh thần thêm 15 và tốc độ tấn công cùng thi triển thêm 15%.",
-        "bonus4": "Các phép của bạn có 10% cơ hội ban Hồn Hỏa, tăng sức mạnh phép thuật thêm 40 trong 10 giây."
+        "bonus4": "Các phép của bạn có 10% cơ hội ban Hồn Hỏa, tăng sức mạnh phép thuật thêm 40 trong 10 giây.",
+        "bonus5": "Tăng 3% cơ hội chí mạng của phép thuật."
       },
       "vale_arcanist": {
         "name": "Bộ Arcanist Thung Khê",

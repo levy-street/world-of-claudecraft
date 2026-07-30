@@ -42,6 +42,8 @@ export const UNDERMOUNT_RAID_BOSS_IDS = [
   'saan_the_stoker',
   'odrenn_the_temperer',
 ] as const;
+export const VOLZHARR_RAID_BOSS_ID = 'volzharr_buried_furnace';
+export const VOLZHARR_RAID_LOOT_SOURCE_LEVEL = 33;
 
 // Combat-rating allowance for the ilvl-31 five-player heroic set: ONE rating
 // (hit/crit/haste) per piece, the tier's differentiator over ilvl 26/28 gear.

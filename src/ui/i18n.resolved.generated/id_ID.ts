@@ -9796,6 +9796,42 @@ export const id_ID: EnTranslations = {
       "runeseekers_lantern": {
         "name": "Runeseeker's Lantern"
       },
+      "crownforged_heartplate": {
+        "name": "Pelindung Dada Tempa Mahkota"
+      },
+      "nighttalon_emberweave": {
+        "name": "Tenun Bara Cakar Malam"
+      },
+      "soulflame_vestments": {
+        "name": "Jubah Api Jiwa"
+      },
+      "stormcallers_hauberk": {
+        "name": "Baju Zirah Pemanggil Badai"
+      },
+      "volzharrs_knucklestone": {
+        "name": "Batu Buku Jari Volzharr"
+      },
+      "magmastrider_greaves": {
+        "name": "Pelindung Kaki Pelangkah Magma"
+      },
+      "footwraps_of_the_waking_floor": {
+        "name": "Balutan Kaki Lantai yang Bangkit"
+      },
+      "forgeheat_cinch": {
+        "name": "Ikat Pinggang Panas Tempa"
+      },
+      "corebreaker_heart_of_the_undermount": {
+        "name": "Pemecah Inti, Jantung Bawah Gunung"
+      },
+      "the_last_restraint": {
+        "name": "Kekang Terakhir"
+      },
+      "band_of_the_ninth_quench": {
+        "name": "Cincin Pendinginan Kesembilan"
+      },
+      "moltenheart_chroma": {
+        "name": "Jantung Lebur"
+      },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"
       },
@@ -14496,7 +14532,8 @@ export const id_ID: EnTranslations = {
         "name": "Regalia Bonewrought",
         "bonus2": "Meningkatkan daya serang sebesar 40.",
         "bonus3": "Meningkatkan kekuatan sebesar 15, stamina sebesar 15, serta kecepatan serangan dan rapal sebesar 15%.",
-        "bonus4": "Serangan kritis senjatamu menyerpihkan target dengan Serpih Tulang, membuatnya berdarah sebesar 8 kerusakan setiap 2 detik selama 12 detik. Menumpuk hingga 3 kali."
+        "bonus4": "Serangan kritis senjatamu menyerpihkan target dengan Serpih Tulang, membuatnya berdarah sebesar 8 kerusakan setiap 2 detik selama 12 detik. Menumpuk hingga 3 kali.",
+        "bonus5": "Meningkatkan peluang serangan kritis sebesar 3%."
       },
       "deathlord": {
         "name": "Perlengkapan Tempur Barrowlord",
@@ -14518,19 +14555,22 @@ export const id_ID: EnTranslations = {
         "name": "Perlengkapan Kulit Direfang",
         "bonus2": "Meningkatkan daya serang sebesar 40.",
         "bonus3": "Meningkatkan kelincahan sebesar 15, peluang kritis sebesar 2%, serta kecepatan serangan dan rapal sebesar 15%.",
-        "bonus4": "Serangan kritis senjatamu mengoyakkan Cabikan Kasar, membuat target berdarah sebesar 6 kerusakan setiap 2 detik selama 12 detik. Menumpuk hingga 3 kali."
+        "bonus4": "Serangan kritis senjatamu mengoyakkan Cabikan Kasar, membuat target berdarah sebesar 6 kerusakan setiap 2 detik selama 12 detik. Menumpuk hingga 3 kali.",
+        "bonus5": "Meningkatkan peluang serangan kritis sebesar 3%."
       },
       "soulflame": {
         "name": "Regalia Wraithfire",
         "bonus2": "Meningkatkan kekuatan sihir sebesar 20. Kerusakan yang diterima tidak lagi menunda perapalan sihirmu (ketahanan penundaan rapalan 100%).",
         "bonus3": "Meningkatkan kecerdasan sebesar 15, roh sebesar 15, serta kecepatan serangan dan rapal sebesar 15%.",
-        "bonus4": "Mantramu memiliki peluang 10% memberikan Nyala Jiwa, meningkatkan kekuatan mantra sebesar 40 selama 10 detik."
+        "bonus4": "Mantramu memiliki peluang 10% memberikan Nyala Jiwa, meningkatkan kekuatan mantra sebesar 40 selama 10 detik.",
+        "bonus5": "Meningkatkan peluang serangan kritis mantra sebesar 3%."
       },
       "stormcallers": {
         "name": "Jubah Galecall",
         "bonus2": "Meningkatkan kekuatan sihir sebesar 20. Kerusakan yang diterima tidak lagi menunda perapalan sihirmu (ketahanan penundaan rapalan 100%).",
         "bonus3": "Meningkatkan kecerdasan sebesar 15, roh sebesar 15, serta kecepatan serangan dan rapal sebesar 15%.",
-        "bonus4": "Mantramu memiliki peluang 10% memberikan Nyala Jiwa, meningkatkan kekuatan mantra sebesar 40 selama 10 detik."
+        "bonus4": "Mantramu memiliki peluang 10% memberikan Nyala Jiwa, meningkatkan kekuatan mantra sebesar 40 selama 10 detik.",
+        "bonus5": "Meningkatkan peluang serangan kritis mantra sebesar 3%."
       },
       "vale_arcanist": {
         "name": "Perlengkapan Arkanis Lembah",

@@ -32,6 +32,8 @@ import {
   NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL,
   UNDERMOUNT_RAID_BOSS_IDS,
   UNDERMOUNT_RAID_LOOT_SOURCE_LEVEL,
+  VOLZHARR_RAID_BOSS_ID,
+  VOLZHARR_RAID_LOOT_SOURCE_LEVEL,
 } from './heroic_loot';
 import { TEMPLE_DUNGEON_DEFS } from './temple';
 
@@ -87,6 +89,7 @@ function applyRaidVariantRatings(variant: ItemDef, base: ItemDef, targetLevel: n
     : base.weapon
       ? RAID_PRIMARY_WEAPON
       : RAID_PRIMARY_ARMOR;
+  for (const ratingKey of RAID_RATING_KEYS) delete variant[ratingKey];
   variant[primaryKey] = primaryVal;
   variant[secondaryKey] = isIlvl37 ? RAID_SECONDARY_LEGENDARY : RAID_SECONDARY;
 }
@@ -135,7 +138,8 @@ function makeHeroicVariant(base: ItemDef, sourceLevel = HEROIC_VARIANT_SOURCE_LE
   // their base's ratings unchanged via the spread.
   if (
     sourceLevel === NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL ||
-    sourceLevel === UNDERMOUNT_RAID_LOOT_SOURCE_LEVEL
+    sourceLevel === UNDERMOUNT_RAID_LOOT_SOURCE_LEVEL ||
+    sourceLevel === VOLZHARR_RAID_LOOT_SOURCE_LEVEL
   )
     applyRaidVariantRatings(variant, base, targetLevel);
   // The spread widens ItemDef's discriminated union; the transform preserves the
@@ -194,13 +198,20 @@ export function buildHeroicVariants(
       (mobs[bossId]?.loot ?? []).flatMap((entry) => (entry.itemId ? [entry.itemId] : [])),
     ),
   );
+  const volzharrRaidBases = new Set(
+    (mobs[VOLZHARR_RAID_BOSS_ID]?.loot ?? []).flatMap((entry) =>
+      entry.itemId ? [entry.itemId] : [],
+    ),
+  );
   const out: Record<string, ItemDef> = {};
   for (const id of eligible) {
     const sourceLevel = raidBases.has(id)
       ? NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL
       : undermountRaidBases.has(id)
         ? UNDERMOUNT_RAID_LOOT_SOURCE_LEVEL
-        : HEROIC_VARIANT_SOURCE_LEVEL;
+        : volzharrRaidBases.has(id)
+          ? VOLZHARR_RAID_LOOT_SOURCE_LEVEL
+          : HEROIC_VARIANT_SOURCE_LEVEL;
     out[heroicVariantId(id)] = makeHeroicVariant(items[id], sourceLevel);
   }
   return out;
