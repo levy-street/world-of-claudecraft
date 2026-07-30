@@ -83,6 +83,8 @@ const PIER_KEEP_OUT_HEIGHT_YARDS = 3.5;
 const PIER_KEEP_OUT_HORIZONTAL_MARGIN_YARDS = 0.75;
 // Sight lines sample terrain at this fixed world-space interval.
 const SIGHT_LINE_STEP_YARDS = 1;
+// Ignore this short segment so a camera resting against geometry does not occlude itself.
+const SIGHT_LINE_NEAR_CAMERA_CLEARANCE_YARDS = 0.25;
 // A sight line needs this much room above sampled terrain to avoid grazing the surface.
 const SIGHT_LINE_TERRAIN_MARGIN_YARDS = 0.1;
 // A two-yard subject is the shared actor-scale proxy for framing checks.
@@ -109,6 +111,8 @@ const MAX_RELEASE_POSITION_DELTA_YARDS = 20;
 const MAX_RELEASE_ORIENTATION_DELTA_DEG = 75;
 // Screen motion below this normalized-frame rate is treated as stationary.
 const MIN_SHIP_SCREEN_VELOCITY_PER_SEC = 0.01;
+// Opposing screen vectors make a vessel appear to travel against its projected world velocity.
+const MIN_SHIP_SCREEN_DIRECTION_DOT = 0;
 // A vessel under way below this speed reads as stopped while it remains on camera.
 const MIN_ON_CAMERA_PROP_WAY_YARDS_PER_SEC = 0.5;
 // One hundredth of a yard distinguishes an authored voyage from a stationary prop cue.
@@ -165,7 +169,7 @@ type MechanicalCheck =
   | 'clearance.terrain'
   | 'clearance.water'
   | 'clearance.volume'
-  | 'visibility.terrain'
+  | 'visibility.occlusion'
   | 'framing.size'
   | 'framing.direction'
   | 'motion.panRate'
@@ -197,6 +201,48 @@ type MechanicalCheck =
   | 'reference.subject'
   | 'reference.lineKey'
   | 'reference.subtitleReadTime';
+
+const MECHANICAL_CHECKS = [
+  'clearance.terrain',
+  'clearance.water',
+  'clearance.volume',
+  'visibility.occlusion',
+  'framing.size',
+  'framing.direction',
+  'motion.panRate',
+  'motion.dollySpeed',
+  'motion.poseContinuity',
+  'motion.cutJump',
+  'motion.propWay',
+  'motion.propAcceleration',
+  'motion.visualFloor',
+  'cut.heldDuration',
+  'cut.bracketing',
+  'cut.firstTransition',
+  'cut.finalRelease',
+  'cut.releaseDelta',
+  'cut.fadeSlack',
+  'fade.symmetry',
+  'timing.opWithinDuration',
+  'cut.teardown',
+  'continuity.shipScreenDirection',
+  'continuity.standInHandoff',
+  'prop.segment',
+  'prop.speed',
+  'prop.arrivalDirection',
+  'collision.hull',
+  'support.entity',
+  'containment.rider',
+  'reference.music',
+  'reference.orphan',
+  'reference.subject',
+  'reference.lineKey',
+  'reference.subtitleReadTime',
+] as const satisfies readonly MechanicalCheck[];
+type AssertNever<T extends never> = T;
+type _EveryMechanicalCheckIsMirrored = AssertNever<
+  Exclude<MechanicalCheck, (typeof MECHANICAL_CHECKS)[number]>
+>;
 
 interface LegacyExemption {
   readonly sceneId: string;
@@ -372,13 +418,20 @@ interface ScreenPoint {
   readonly y: number;
 }
 
+interface ShipScreenSample {
+  readonly screen: ScreenPoint;
+  readonly world: SceneRigPoint;
+  readonly propOpIndex: number | null;
+  readonly inFrame: boolean;
+}
+
 interface CameraSample {
   readonly time: number;
   readonly timedOp: TimedSceneOp;
   readonly pose: ScenePose;
   readonly geometry: CameraGeometry;
   readonly fullBlack: boolean;
-  readonly shipScreenX: ReadonlyMap<string, number>;
+  readonly ships: ReadonlyMap<string, ShipScreenSample>;
   readonly subject: SceneRigPoint | null;
   readonly subjectScreen: ScreenPoint | null;
   readonly entryEase: boolean;
@@ -443,6 +496,7 @@ const SYNTHETIC_RIDER_DRIFT_CUE = 'scn_test_lint_rider_drift_bad';
 const SYNTHETIC_ATTACH_PASS_CUE = 'scn_test_lint_attach_pass';
 const SYNTHETIC_PROP_DEAD_STOP_CUE = 'scn_test_lint_prop_dead_stop_bad';
 const SYNTHETIC_PROP_LURCH_CUE = 'scn_test_lint_prop_lurch_bad';
+const SYNTHETIC_REVERSED_SCREEN_DIRECTION_CUE = 'scn_test_lint_ship_screen_direction_bad';
 
 type SyntheticSceneOpDef =
   | SceneOpDef
@@ -453,6 +507,7 @@ interface SyntheticCameraSceneOptions {
   readonly hideRelease?: boolean;
   readonly coverFirstCut?: boolean;
   readonly clearReleaseFade?: boolean;
+  readonly includeInitialLock?: boolean;
   readonly includeRelease?: boolean;
   readonly includeUnlock?: boolean;
   readonly includeLetterboxOff?: boolean;
@@ -470,6 +525,7 @@ function syntheticCameraScene(
     hideRelease = true,
     coverFirstCut = true,
     clearReleaseFade = true,
+    includeInitialLock = true,
     includeRelease = true,
     includeUnlock = true,
     includeLetterboxOff = true,
@@ -482,7 +538,9 @@ function syntheticCameraScene(
     duration,
     presentationFixture,
     ops: [
-      { at: 0, kind: 'inputLock', on: true },
+      ...(includeInitialLock
+        ? ([{ at: 0, kind: 'inputLock', on: true }] satisfies SceneOpDef[])
+        : []),
       { at: 0, kind: 'letterbox', on: true },
       ...(coverFirstCut
         ? ([{ at: 0, kind: 'fade', to: 'black', dur: 0 }] satisfies SceneOpDef[])
@@ -635,6 +693,69 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
       },
     ),
     expectedCheck: null,
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_terrain_clearance_bad', 1.7, [
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'dolly',
+          points: [{ x: 0, z: 0, height: 0 }],
+          lookAt: { kind: 'point', point: { x: 0, z: 10, height: 2 } },
+          dur: 1.6,
+        },
+      },
+    ]),
+    expectedCheck: 'clearance.terrain',
+    expectedMeasured: '0.00 yd',
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_water_clearance_bad', 1.7, [
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'dolly',
+          points: [{ x: 240.5, z: -44, height: 1.75 }],
+          lookAt: { kind: 'point', point: { x: 240.5, z: -34, height: 10 } },
+          dur: 1.6,
+        },
+      },
+    ]),
+    expectedCheck: 'clearance.water',
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_pier_occlusion_bad', 1.7, [
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'dolly',
+          points: [{ x: 212.5, z: -40, height: 4 }],
+          lookAt: { kind: 'point', point: { x: 212.5, z: -56, height: 4 } },
+          dur: 1.6,
+        },
+      },
+    ]),
+    expectedCheck: 'visibility.occlusion',
+    expectedMeasured: 'mainland deck',
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_hull_occlusion_bad', 1.7, [
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'dolly',
+          points: [{ x: 232, z: -44, height: 4 }],
+          lookAt: { kind: 'point', point: { x: 250, z: -44, height: 4 } },
+          dur: 1.6,
+        },
+      },
+    ]),
+    expectedCheck: 'visibility.occlusion',
+    expectedMeasured: 'mainland ship hull',
   },
   {
     def: syntheticCameraScene('scn_test_lint_hull_clip_bad', 1.7, [
@@ -949,6 +1070,56 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
   },
   {
     def: syntheticCameraScene(
+      'scn_test_lint_prop_segment_missing_bad',
+      1.7,
+      SYNTHETIC_GRAMMAR_CAMERA_OPS,
+      {
+        extraOps: [
+          {
+            at: 0.2,
+            kind: 'prop',
+            target: 'harbor_ship_mainland',
+            cue: 'scn_test_lint_prop_segment_missing_bad',
+          },
+        ],
+      },
+    ),
+    expectedCheck: 'prop.segment',
+    expectedMeasured: 'missing cue scn_test_lint_prop_segment_missing_bad',
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_ship_screen_direction_bad', 1.7, [
+      {
+        at: 0,
+        kind: 'prop',
+        target: 'harbor_ship_mainland',
+        cue: SYNTHETIC_REVERSED_SCREEN_DIRECTION_CUE,
+      },
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'dolly',
+          points: [
+            { x: 140, z: -84, height: 50 },
+            { x: 140, z: -88, height: 50 },
+          ],
+          lookAt: {
+            kind: 'spline',
+            points: [
+              { x: 240, z: -84, height: 50 },
+              { x: 240, z: -88, height: 50 },
+            ],
+          },
+          dur: 1.6,
+        },
+      },
+    ]),
+    expectedCheck: 'continuity.shipScreenDirection',
+    expectedMeasured: 'direction dot',
+  },
+  {
+    def: syntheticCameraScene(
       'scn_test_lint_prop_dead_stop_bad',
       1.7,
       [
@@ -1209,6 +1380,25 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
     expectedCheck: 'cut.fadeSlack',
   },
   {
+    def: syntheticCameraScene('scn_test_lint_held_duration_bad', 1.2, [
+      {
+        at: 0,
+        kind: 'camera',
+        shot: {
+          kind: 'dolly',
+          points: [
+            { x: 0, z: 0, height: 100 },
+            { x: 1, z: 0, height: 100 },
+          ],
+          lookAt: { kind: 'point', point: { x: 0, z: 10, height: 100 } },
+          dur: 1.1,
+        },
+      },
+    ]),
+    expectedCheck: 'cut.heldDuration',
+    expectedMeasured: '1.10s',
+  },
+  {
     def: syntheticCameraScene(
       'scn_test_lint_fade_symmetry_bad',
       1.7,
@@ -1427,6 +1617,16 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
   },
   {
     def: syntheticCameraScene(
+      'scn_test_lint_final_release_bad',
+      1.7,
+      SYNTHETIC_GRAMMAR_CAMERA_OPS,
+      { includeRelease: false },
+    ),
+    expectedCheck: 'cut.finalRelease',
+    expectedMeasured: 'camera/dolly',
+  },
+  {
+    def: syntheticCameraScene(
       'scn_test_lint_unlock_missing_bad',
       1.7,
       SYNTHETIC_GRAMMAR_CAMERA_OPS,
@@ -1434,6 +1634,13 @@ const SYNTHETIC_CONTROLS: readonly SyntheticControl[] = [
     ),
     expectedCheck: 'cut.teardown',
     expectedMeasured: 'release=true, inputUnlock=false, letterboxOff=true',
+  },
+  {
+    def: syntheticCameraScene('scn_test_lint_bracketing_bad', 1.7, SYNTHETIC_GRAMMAR_CAMERA_OPS, {
+      includeInitialLock: false,
+    }),
+    expectedCheck: 'cut.bracketing',
+    expectedMeasured: 'inputLock=false',
   },
   {
     def: syntheticCameraScene(
@@ -1508,6 +1715,12 @@ const PROP_SEGMENTS: Readonly<Record<string, PropPathSegment | undefined>> = {
     end: { x: 167.519453, y: 0, z: -4.456482, yaw: -1.910796 },
     duration: 1.6,
     ease: 'easeInQuad',
+  },
+  [SYNTHETIC_REVERSED_SCREEN_DIRECTION_CUE]: {
+    start: { x: 40, y: 0, z: 0, yaw: 0 },
+    end: { x: 42, y: 0, z: 0, yaw: 0 },
+    duration: 1.6,
+    ease: 'linear',
   },
 };
 const ARRIVAL_HARBOR_BY_CUE = new Map<string, HarborDef['id']>([
@@ -2126,10 +2339,6 @@ function playerCapsuleIntersectsFrame(
   );
 }
 
-function screenX(geometry: CameraGeometry, point: SceneRigPoint): number {
-  return screenPoint(geometry, point).x;
-}
-
 function subjectForShot(
   shot: Exclude<SceneCameraShot, { kind: 'release' }>,
   pose: ScenePose,
@@ -2266,6 +2475,43 @@ function shipDeckCenterAt(
     },
     { x: 0, y: 0, z: 0 },
   );
+}
+
+function subjectReferencePointsAt(
+  scene: CapturedScene,
+  subjectRef: string,
+  time: number,
+  activeProps: ReadonlyMap<string, ActiveProp>,
+  frame: SceneFrame,
+): SceneRigPoint[] {
+  const candidates: SceneRigPoint[] = [];
+  for (const fixture of PROPS.decorProps ?? []) {
+    if (
+      fixture.key !== subjectRef &&
+      !(fixture.parts ?? []).some((part) => part.key === subjectRef)
+    ) {
+      continue;
+    }
+    candidates.push({
+      x: fixture.x,
+      y:
+        sampleTerrainHeight(fixture.x, fixture.z, scene.seed) +
+        (fixture.h ?? NOMINAL_SUBJECT_HEIGHT_YARDS) / 2,
+      z: fixture.z,
+    });
+  }
+  for (const entityId of scene.entityReferenceIds.get(subjectRef) ?? []) {
+    const point = frame.entities.get(entityId);
+    if (point) {
+      candidates.push({ ...point, y: point.y + NOMINAL_SUBJECT_HEIGHT_YARDS });
+    }
+  }
+  const harbor = HARBORS.find((candidate) => shipTarget(candidate) === subjectRef);
+  if (harbor) {
+    const deckCenter = shipDeckCenterAt(harbor, time, activeProps);
+    candidates.push({ ...deckCenter, y: deckCenter.y + NOMINAL_SUBJECT_HEIGHT_YARDS / 2 });
+  }
+  return candidates;
 }
 
 type HullFootprint = ReturnType<typeof harborShipLocalBounds>;
@@ -2494,21 +2740,62 @@ function cameraVolumeIntrusion(
   return null;
 }
 
-function sightLineClearance(camera: SceneRigPoint, subject: SceneRigPoint, seed: number): number {
+interface SightLineOcclusion {
+  readonly label: string;
+  readonly clearance: number;
+  readonly point: SceneRigPoint;
+  readonly distanceFromCamera: number;
+}
+
+function sightLineOcclusion(
+  camera: SceneRigPoint,
+  subject: SceneRigPoint,
+  seed: number,
+  time: number,
+  activeProps: ReadonlyMap<string, ActiveProp>,
+): SightLineOcclusion | null {
   const delta = subtract(subject, camera);
   const distance = length(delta);
-  let minimum = Number.POSITIVE_INFINITY;
+  let worst: SightLineOcclusion | null = null;
+  const consider = (label: string, clearance: number, point: SceneRigPoint, traveled: number) => {
+    if (clearance >= 0 || (worst !== null && clearance >= worst.clearance)) return;
+    worst = { label, clearance, point, distanceFromCamera: traveled };
+  };
   for (
-    let traveled = SIGHT_LINE_STEP_YARDS;
+    let traveled = SIGHT_LINE_NEAR_CAMERA_CLEARANCE_YARDS;
     traveled < distance - SIGHT_LINE_STEP_YARDS * 0.5;
     traveled += SIGHT_LINE_STEP_YARDS
   ) {
     const point = add(camera, scale(delta, traveled / distance));
-    const clearance =
+    const terrainClearance =
       point.y - sampleTerrainHeight(point.x, point.z, seed) - SIGHT_LINE_TERRAIN_MARGIN_YARDS;
-    minimum = Math.min(minimum, clearance);
+    consider('terrain', terrainClearance, point, traveled);
+    for (const harbor of HARBORS) {
+      for (const [index, deck] of harbor.decks.entries()) {
+        if (!pointInsideDeck(deck, point.x, point.z)) continue;
+        const clearance = point.y - deck.y - SIGHT_LINE_TERRAIN_MARGIN_YARDS;
+        consider(`${harbor.id} deck ${index}`, clearance, point, traveled);
+      }
+      const rampY = harborRampHeight(harbor, point.x, point.z);
+      if (rampY !== Number.NEGATIVE_INFINITY) {
+        const clearance = point.y - rampY - SIGHT_LINE_TERRAIN_MARGIN_YARDS;
+        consider(`${harbor.id} ramp`, clearance, point, traveled);
+      }
+      const local = worldToLocal(shipFrameAt(harbor, time, activeProps), point);
+      const footprint = HARBOR_HULL_FOOTPRINTS[harbor.id];
+      const hullTopY = Math.max(
+        ...harbor.shipDecks.map((deck) => shipDeckLocalBounds(harbor, deck).centerY),
+      );
+      const clearance = Math.max(
+        Math.abs(local.x - footprint.x) - footprint.hw,
+        Math.abs(local.z - footprint.z) - footprint.hd,
+        footprint.bottomY - local.y,
+        local.y - hullTopY,
+      );
+      consider(`${harbor.id} ship hull`, clearance, point, traveled);
+    }
   }
-  return minimum;
+  return worst;
 }
 
 function opKind(op: SceneWireOp): string {
@@ -3193,26 +3480,15 @@ function lintSubjectReferences(
       ? samples.find((candidate) => candidate.timedOp.index === timed.index && !candidate.entryEase)
       : undefined;
     const lookAt = sample?.geometry.lookAt;
-    const candidates: Array<{ x: number; z: number }> = [];
-    for (const fixture of PROPS.decorProps ?? []) {
-      if (
-        fixture.key === subjectRef ||
-        (fixture.parts ?? []).some((part) => part.key === subjectRef)
-      ) {
-        candidates.push(fixture);
-      }
-    }
-    if (sample) {
-      const frame = frameAt(scene, sample.time);
-      for (const entityId of scene.entityReferenceIds.get(subjectRef) ?? []) {
-        const point = frame.entities.get(entityId);
-        if (point) candidates.push(point);
-      }
-      const harbor = HARBORS.find((candidate) => shipTarget(candidate) === subjectRef);
-      if (harbor) {
-        candidates.push(shipDeckCenterAt(harbor, sample.time, activePropsAt(scene, sample.time)));
-      }
-    }
+    const candidates = sample
+      ? subjectReferencePointsAt(
+          scene,
+          subjectRef,
+          sample.time,
+          activePropsAt(scene, sample.time),
+          frameAt(scene, sample.time),
+        )
+      : [];
     const nearest =
       lookAt === undefined
         ? Number.POSITIVE_INFINITY
@@ -3412,6 +3688,16 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
   }
   const cameraOps = scene.ops.filter((timed): timed is TimedCameraOp => timed.op.kind === 'camera');
   const shotOps = cameraOps.filter((timed) => timed.op.shot.kind !== 'release');
+  const authoredCameraOps = scene.authoredOps.filter(
+    (op): op is Extract<SceneOpDef, { kind: 'camera' }> => op.kind === 'camera',
+  );
+  const subjectRefByCameraIndex = new Map<number, string>();
+  for (const [index, timed] of cameraOps.entries()) {
+    const authored = authoredCameraOps[index];
+    if (authored?.shot.kind !== 'release' && authored.shot.subjectRef) {
+      subjectRefByCameraIndex.set(timed.index, authored.shot.subjectRef);
+    }
+  }
   const finalRelease = cameraOps.at(-1);
   const endOp =
     [...scene.ops].reverse().find((timed) => timed.op.kind === 'end') ?? scene.ops.at(-1);
@@ -3691,25 +3977,31 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
       !scene.disableLivePoseEase &&
       time - currentCameraOp.at < SCENE_RIG_ENTRY_SEC;
     const subject = activeShot ? subjectForShot(activeShot, poseCopy, resolveEntity) : null;
-    const shipScreenPositions = new Map<string, number>();
+    const ships = new Map<string, ShipScreenSample>();
     for (const target of propTargets) {
       const harbor = HARBORS.find((candidate) => shipTarget(candidate) === target);
       if (!harbor) continue;
       const shipCenter = shipDeckCenterAt(harbor, time, activeProps);
-      shipScreenPositions.set(target, screenX(geometry, shipCenter));
       const active = activeProps.get(target);
-      if (!active) continue;
       const projected = pointInFrame(geometry, shipCenter);
+      const inFrame =
+        projected.depth > 0 &&
+        Math.abs(projected.horizontal) <= HORIZONTAL_HALF_FOV_RAD &&
+        Math.abs(projected.vertical) <= VERTICAL_HALF_FOV_RAD;
+      ships.set(target, {
+        screen: screenPoint(geometry, shipCenter),
+        world: shipCenter,
+        propOpIndex: active?.timedOp.index ?? null,
+        inFrame,
+      });
+      if (!active) continue;
       propMotionSamples.push({
         time,
         target,
         active,
         cameraOp: currentCameraOp,
         position: shipFrameAt(harbor, time, activeProps).position,
-        inFrame:
-          projected.depth > 0 &&
-          Math.abs(projected.horizontal) <= HORIZONTAL_HALF_FOV_RAD &&
-          Math.abs(projected.vertical) <= VERTICAL_HALF_FOV_RAD,
+        inFrame,
         fullBlack,
       });
     }
@@ -3719,7 +4011,7 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
       pose: poseCopy,
       geometry,
       fullBlack,
-      shipScreenX: shipScreenPositions,
+      ships,
       subject,
       subjectScreen: subject ? screenPoint(geometry, subject) : null,
       entryEase: rigEntryEase,
@@ -3776,16 +4068,41 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
 
     if (activeShot) {
       if (!subject) throw new Error(`scene ${scene.id} has an active shot without a subject`);
-      const sightClearance = sightLineClearance(geometry.camera, subject, scene.seed);
-      if (sightClearance < 0) {
+      const subjectRef = subjectRefByCameraIndex.get(currentCameraOp.index);
+      const referencedSubjects = subjectRef
+        ? subjectReferencePointsAt(scene, subjectRef, time, activeProps, frame)
+        : [];
+      const sightTarget = referencedSubjects.reduce(
+        (nearest, candidate) =>
+          length(subtract(candidate, geometry.lookAt)) < length(subtract(nearest, geometry.lookAt))
+            ? candidate
+            : nearest,
+        subject,
+      );
+      const occlusion = sightLineOcclusion(
+        geometry.camera,
+        sightTarget,
+        scene.seed,
+        time,
+        activeProps,
+      );
+      if (occlusion) {
         report({
           sceneId: scene.id,
-          check: 'visibility.terrain',
+          check: 'visibility.occlusion',
           opIndex: currentCameraOp.index,
           opKind: opKind(currentCameraOp.op),
           time,
-          threshold: `${SIGHT_LINE_TERRAIN_MARGIN_YARDS.toFixed(2)} yd terrain margin at ${SIGHT_LINE_STEP_YARDS.toFixed(2)} yd steps`,
-          measured: `${sightClearance.toFixed(2)} yd minimum clearance`,
+          threshold: `no terrain, ship hull, or pier structure after ${SIGHT_LINE_NEAR_CAMERA_CLEARANCE_YARDS.toFixed(
+            2,
+          )} yd of near-camera clearance, sampled every ${SIGHT_LINE_STEP_YARDS.toFixed(2)} yd`,
+          measured: `${occlusion.label} with ${occlusion.clearance.toFixed(
+            2,
+          )} yd clearance at (${occlusion.point.x.toFixed(2)}, ${occlusion.point.y.toFixed(
+            2,
+          )}, ${occlusion.point.z.toFixed(
+            2,
+          )}), ${occlusion.distanceFromCamera.toFixed(2)} yd from camera`,
         });
       }
       const subjectDistance = length(subtract(subject, geometry.camera));
@@ -3947,95 +4264,82 @@ function lintScene(scene: CapturedScene, report: (violation: Violation) => void)
     }
   }
 
-  lintShipScreenContinuity(scene, cameraOps, samples, report);
+  lintShipScreenDirection(scene, samples, report);
   lintPropMotionQuality(scene, propMotionSamples, report);
   lintMinimumVisualMotion(scene, shotOps, samples, report);
   lintSubjectReferences(scene, samples, report);
   return samples;
 }
 
-function lintShipScreenContinuity(
+function lintShipScreenDirection(
   scene: CapturedScene,
-  cameraOps: readonly TimedSceneOp[],
   samples: readonly CameraSample[],
   report: (violation: Violation) => void,
 ): void {
-  interface DirectionSummary {
-    firstSign: number;
-    lastSign: number;
-    firstTime: number;
-    lastTime: number;
-    timedOp: TimedSceneOp;
-  }
-
-  const shotOrder = new Map(
-    cameraOps
-      .filter((timed) => timed.op.kind === 'camera' && timed.op.shot.kind !== 'release')
-      .map((timed, index) => [timed.index, index]),
-  );
-  const byTarget = new Map<string, Map<number, DirectionSummary>>();
-
+  const reported = new Set<string>();
   for (let index = 1; index < samples.length; index++) {
     const previous = samples[index - 1];
     const current = samples[index];
-    if (previous.timedOp.index !== current.timedOp.index) continue;
-    const dt = current.time - previous.time;
-    for (const [target, currentX] of current.shipScreenX) {
-      const previousX = previous.shipScreenX.get(target);
-      if (previousX === undefined) continue;
-      const velocity = (currentX - previousX) / dt;
-      if (Math.abs(velocity) < MIN_SHIP_SCREEN_VELOCITY_PER_SEC) continue;
-      const sign = Math.sign(velocity);
-      let byShot = byTarget.get(target);
-      if (!byShot) {
-        byShot = new Map();
-        byTarget.set(target, byShot);
-      }
-      const summary = byShot.get(current.timedOp.index);
-      if (summary) {
-        summary.lastSign = sign;
-        summary.lastTime = current.time;
-      } else {
-        byShot.set(current.timedOp.index, {
-          firstSign: sign,
-          lastSign: sign,
-          firstTime: current.time,
-          lastTime: current.time,
-          timedOp: current.timedOp,
-        });
-      }
+    if (
+      previous.timedOp.index !== current.timedOp.index ||
+      previous.entryEase ||
+      current.entryEase ||
+      previous.fullBlack ||
+      current.fullBlack
+    ) {
+      continue;
     }
-  }
-
-  for (const summaries of byTarget.values()) {
-    const ordered = [...summaries.values()].sort((a, b) => a.firstTime - b.firstTime);
-    for (let index = 1; index < ordered.length; index++) {
-      const previous = ordered[index - 1];
-      const current = ordered[index];
-      const previousOrder = shotOrder.get(previous.timedOp.index);
-      const currentOrder = shotOrder.get(current.timedOp.index);
+    const dt = current.time - previous.time;
+    if (dt <= SCENE_TIME_EPSILON_SECONDS) continue;
+    for (const [target, currentShip] of current.ships) {
+      const previousShip = previous.ships.get(target);
       if (
-        previousOrder === undefined ||
-        currentOrder === undefined ||
-        currentOrder !== previousOrder + 1
+        !previousShip?.inFrame ||
+        !currentShip.inFrame ||
+        previousShip.propOpIndex === null ||
+        previousShip.propOpIndex !== currentShip.propOpIndex
       ) {
         continue;
       }
-      const fadeSeparates = samples.some(
-        (sample) =>
-          sample.time >= previous.lastTime && sample.time <= current.firstTime && sample.fullBlack,
-      );
-      if (previous.lastSign !== current.firstSign && !fadeSeparates) {
-        report({
-          sceneId: scene.id,
-          check: 'continuity.shipScreenDirection',
-          opIndex: current.timedOp.index,
-          opKind: opKind(current.timedOp.op),
-          time: current.firstTime,
-          threshold: 'the same non-zero horizontal ship screen velocity sign across the cut',
-          measured: `${previous.lastSign} before and ${current.firstSign} after`,
-        });
-      }
+      const worldVelocity = scale(subtract(currentShip.world, previousShip.world), 1 / dt);
+      if (length(worldVelocity) < MIN_ON_CAMERA_PROP_WAY_YARDS_PER_SEC) continue;
+      const screenVelocity = {
+        x: (currentShip.screen.x - previousShip.screen.x) / dt,
+        y: (currentShip.screen.y - previousShip.screen.y) / dt,
+      };
+      const screenSpeed = Math.hypot(screenVelocity.x, screenVelocity.y);
+      if (screenSpeed < MIN_SHIP_SCREEN_VELOCITY_PER_SEC) continue;
+      const previousWorldInCurrentFrame = screenPoint(current.geometry, previousShip.world);
+      const projectedWorldVelocity = {
+        x: (currentShip.screen.x - previousWorldInCurrentFrame.x) / dt,
+        y: (currentShip.screen.y - previousWorldInCurrentFrame.y) / dt,
+      };
+      const projectedSpeed = Math.hypot(projectedWorldVelocity.x, projectedWorldVelocity.y);
+      if (projectedSpeed < MIN_SHIP_SCREEN_VELOCITY_PER_SEC) continue;
+      const directionDot =
+        (screenVelocity.x * projectedWorldVelocity.x +
+          screenVelocity.y * projectedWorldVelocity.y) /
+        (screenSpeed * projectedSpeed);
+      const reportKey = `${current.timedOp.index}\u0000${target}`;
+      if (directionDot >= MIN_SHIP_SCREEN_DIRECTION_DOT || reported.has(reportKey)) continue;
+      reported.add(reportKey);
+      report({
+        sceneId: scene.id,
+        check: 'continuity.shipScreenDirection',
+        opIndex: current.timedOp.index,
+        opKind: opKind(current.timedOp.op),
+        time: current.time,
+        threshold: `screen travel direction dot at least ${MIN_SHIP_SCREEN_DIRECTION_DOT.toFixed(
+          2,
+        )} against world velocity projected through the shot camera`,
+        measured: `${target} screen velocity (${screenVelocity.x.toFixed(
+          3,
+        )}, ${screenVelocity.y.toFixed(
+          3,
+        )}) and projected world velocity (${projectedWorldVelocity.x.toFixed(
+          3,
+        )}, ${projectedWorldVelocity.y.toFixed(3)}), direction dot ${directionDot.toFixed(3)}`,
+      });
     }
   }
 }
@@ -4044,6 +4348,19 @@ describe('cinematic shot mechanical gate', () => {
   for (const exemption of LEGACY_EXEMPTIONS) {
     it.skip(`${exemption.sceneId} ${exemption.check}: ${exemption.reason}`, () => {});
   }
+
+  it('covers every MechanicalCheck with a synthetic failing control', () => {
+    const controlledChecks = new Set(
+      SYNTHETIC_CONTROLS.flatMap((control) =>
+        control.expectedCheck === null ? [] : [control.expectedCheck],
+      ),
+    );
+    const missingChecks = MECHANICAL_CHECKS.filter((check) => !controlledChecks.has(check));
+    expect(
+      missingChecks,
+      `MechanicalCheck members without a synthetic failing control: ${missingChecks.join(', ')}`,
+    ).toEqual([]);
+  });
 
   it('samples every registered scene at 20 Hz against the mechanical rubric', async () => {
     await loadLinterRuntime();
