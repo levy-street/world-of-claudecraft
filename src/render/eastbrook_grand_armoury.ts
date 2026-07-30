@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { buildingTerrainEnvelope, isEastbrookGrandArmoury } from '../sim/building_layout';
 import type { BuildingDef } from '../sim/types';
 import { loadGltf, releaseGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import {
   eastbrookMaterialUsesAtlas,
   eastbrookSemanticForMaterial,
@@ -20,7 +20,7 @@ let loadedSource: THREE.Group | null = null;
 let preparedTemplate: THREE.Group | null = null;
 
 if (typeof window !== 'undefined') {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(ASSET_URL).then((gltf) => {
       loadedSource = gltf.scene;
     }),

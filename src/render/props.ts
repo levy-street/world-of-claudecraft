@@ -25,7 +25,7 @@ import { hash2 } from '../sim/rng';
 import type { BuildingDef } from '../sim/types';
 import { terrainHeight, WATER_LEVEL, waterLevel } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { buildEastbrookGrandArmouryView } from './eastbrook_grand_armoury';
 import {
   isEastbrookRebuildBuilding,
@@ -426,7 +426,7 @@ if (typeof window !== 'undefined') {
   const preloadKeys = preloadPropKeys(GFX.standardMaterials);
   for (const [key, def] of Object.entries(PROP_ASSET_DEFS)) {
     if (!preloadKeys.has(key as PropKey)) continue;
-    registerPreload(
+    registerDeferredPreload(() =>
       loadGltf(def.url).then((gltf) => {
         loadedProps.set(key, gltf);
       }),

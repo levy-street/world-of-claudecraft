@@ -26,7 +26,7 @@ import {
   zoneBiomeAt,
 } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import {
   applyInstanceCollapse,
   type CollapseRole,
@@ -168,7 +168,7 @@ const loadedModels = new Map<string, GLTF>();
 const extractedParts = new Map<string, ModelPart[]>();
 for (const urls of Object.values(MODEL_URLS)) {
   for (const url of urls) {
-    registerPreload(
+    registerDeferredPreload(() =>
       loadGltf(url).then((g) => {
         loadedModels.set(url, g);
       }),

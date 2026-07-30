@@ -114,9 +114,22 @@ significant-contributor name glow lives there too. Narrow helpers:
 rules, all CI-enforced:
 - **Cache results are IMMUTABLE: clone before mutating.** `releaseGltf(url)` drops
   the cache entry after geometry is extracted.
-- **`preload.ts` is the boot gate.** Subsystems call `registerPreload(promise)` at
-  import time and `startGame` awaits `assetsReady()`, so `build*()` can read resolved
-  assets synchronously. A new module-load fetch MUST `registerPreload`.
+- **`preload.ts` is the boot gate, and it has TWO lanes.** `startGame` awaits
+  `assetsReady()` either way, so `build*()` still reads resolved assets
+  synchronously; the lanes differ only in WHEN the fetch starts. A new module-load
+  fetch MUST register in one of them, and for world content that is the deferred one:
+  - `registerDeferredPreload(() => load...())` for world content. Nothing runs until
+    `startGame` calls `beginDeferredPreloads()`. The thunk must CREATE the promise
+    when invoked, never close over one already in flight.
+  - `registerPreload(promise)` stays eager, for the few assets the LAUNCHER itself
+    draws. Today that is `characters/assets.ts` (the character-creation preview) and
+    `placed_assets.ts` (which runs during world build, not at import).
+  Fetching world content at import meant merely reaching the home screen decoded the
+  whole set, and the spike crossed WKWebView's per-process ceiling: a 12 GB iPhone 17
+  Pro was killed 1.6s in and reloaded forever, unseen by the entry crash guard (it
+  only arms inside `startGame`). Guarded by `tests/defer_launcher_preloads.test.ts`,
+  which also pins that the lane opens BEFORE the `assetsReady()` that gates the
+  Renderer, and fails on any new eager registrant outside the two allowed files.
 - **Preload sets are tier-INDEPENDENT.** They freeze at the import-time tier
   guess but placement runs against the LIVE tier, so a preload set must be a
   superset of EVERY tier's placement set or world entry crashes with "asset not

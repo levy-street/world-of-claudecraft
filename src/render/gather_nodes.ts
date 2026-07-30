@@ -3,7 +3,7 @@ import type { GatherNodeType } from '../sim/data';
 import { GATHER_NODES } from '../sim/data';
 import { terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { NODE_COLOR, NODE_Y_OFFSET } from './gather_nodes_lookup';
 import { surfaceMat } from './gfx';
 
@@ -36,7 +36,7 @@ const loadedNodeGltf = new Map<GatherNodeType, THREE.Group>();
 
 if (typeof window !== 'undefined') {
   for (const [type, url] of Object.entries(NODE_ASSET_URL) as [GatherNodeType, string][]) {
-    registerPreload(
+    registerDeferredPreload(() =>
       loadGltf(url).then((gltf) => {
         loadedNodeGltf.set(type, gltf.scene);
       }),

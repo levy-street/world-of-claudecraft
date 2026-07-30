@@ -9,7 +9,7 @@ import {
   wildheartFieldHeight,
 } from '../sim/wildheart_field';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { surfaceMat } from './gfx';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 import { radialGlowTexture } from './textures';
@@ -56,7 +56,7 @@ const loadedWildheartGltf = new Map<WildheartPropKind, WildheartGltf | null>();
 
 if (typeof window !== 'undefined') {
   for (const [kind, url] of Object.entries(WILDHEART_ASSET_URL) as [WildheartPropKind, string][]) {
-    registerPreload(
+    registerDeferredPreload(() =>
       loadGltf(url)
         .then((gltf: WildheartGltf) => {
           gltf.scene.traverse((child) => {

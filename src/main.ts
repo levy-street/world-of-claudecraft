@@ -169,7 +169,7 @@ import { openStripeCheckout } from './net/stripe_checkout';
 import type { WalletOption, WalletPickerMode, WalletPickerResult } from './net/wallet';
 import { resolveWalletCapability } from './net/wallet_capability';
 import { installWalletResumeHandlers } from './net/wallet_resume';
-import { assetsReady } from './render/assets/preload';
+import { assetsReady, beginDeferredPreloads } from './render/assets/preload';
 import { CharacterPreview, type PreviewAppearance } from './render/characters';
 import { charactersReady, preloadMechAssets } from './render/characters/assets';
 import { skinCount } from './render/characters/manifest';
@@ -1169,6 +1169,13 @@ async function startGame(
   } catch {
     // Soft fallback: English is statically resident; boot in English (the picker can retry).
   }
+  // Open the deferred preload lane: the world's assets do not fetch at module
+  // import any more, because decoding them merely to show the LAUNCHER crossed
+  // WKWebView's per-process ceiling (a 12 GB iPhone 17 Pro was killed 1.6 s in and
+  // reloaded forever). This must run BEFORE the await below, which snapshots the
+  // task list, so the Renderer still cannot outrun a load.
+  const deferredStarted = beginDeferredPreloads();
+  console.info(`[entry-guard] world assets: started ${deferredStarted} deferred preloads`);
   try {
     await assetsReady((done, total) => setLoadingProgressRange(done, total, 0, 35));
   } catch (err) {

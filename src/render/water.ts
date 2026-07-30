@@ -3,7 +3,7 @@ import { WORLD_MAX_Z, WORLD_MIN_Z, WORLD_SIZE } from '../sim/data';
 import type { ZoneDef } from '../sim/types';
 import { waterLevel } from '../sim/world';
 import { loadTexture } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { GFX, SUN_DIR, sharedUniforms } from './gfx';
 import { idleSlot, runIdleQueue } from './idle_queue';
 import { waterNormalish, waterNormalMaps } from './textures';
@@ -120,7 +120,7 @@ const APRON_TERRAIN_FADE_YARDS = 240;
 // so it does not pay network/decode/upload cost for water detail.
 const WATER_TEX: Record<string, THREE.Texture> = {};
 function kickWaterTex(key: string, file: string): void {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadTexture(`/textures/water/${file}`, { repeat: true }).then((tex) => {
       tex.anisotropy = 4;
       WATER_TEX[key] = tex;

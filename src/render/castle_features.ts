@@ -21,7 +21,7 @@ import {
   WARD_STEPS,
 } from '../sim/castle_layout';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import { surfaceMat } from './gfx';
 import { PROP_ASSET_DEFS } from './props';
 
@@ -57,7 +57,7 @@ type CastleKey = (typeof CASTLE_KEYS)[number];
 
 const castleScenes: Partial<Record<CastleKey, THREE.Group>> = {};
 for (const key of CASTLE_KEYS) {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(PROP_ASSET_DEFS[key].url).then((gltf) => {
       castleScenes[key] = gltf.scene;
     }),
