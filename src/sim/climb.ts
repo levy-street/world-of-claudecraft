@@ -17,10 +17,11 @@
 // Pure sim: no rng, no wall clock. `Sim.updatePlayerMovement` runs the driver
 // in its short-circuit chain and the renderer reads the same state to pose it.
 
-import { supportHeightAt } from './colliders';
+import { MANTLE_REACH, supportHeightAt } from './colliders';
 import { isRooted, isStunned } from './combat/cc';
 import { PLAYER_BODY_RADIUS } from './pathfind';
 import { findLedgeGrab, LEDGE_GRAB_MAX, LEDGE_GRAB_MIN } from './physics/ledge';
+import { GRAVITY, JUMP_VELOCITY } from './player_motion';
 import { DT, type Entity, type LedgeClimb } from './types';
 import { groundHeight } from './world';
 
@@ -45,13 +46,19 @@ const CLIMB_MAX_RISE_SPEED = 2.5;
 /**
  * The pull-up is for lips ABOVE YOUR HEAD: a ledge lower than this over the
  * floor the body is jumping from is silent-vault territory (the mantle
- * covers rises up to jump apex + MANTLE_REACH, about 1.83 from flat ground),
- * so a hop onto a crate or a bench never plays the full-body climb. Measured
- * against the floor DIRECTLY BENEATH the body at grab time, so chained
- * parkour (crate to canopy) also stays a quick vault while a ground-level
- * jump at the same canopy is a real climb.
+ * covers rises up to jump apex + MANTLE_REACH from flat ground), so a hop
+ * onto a crate or a bench never plays the full-body climb. Measured against
+ * the floor DIRECTLY BENEATH the body at grab time, so chained parkour
+ * (crate to canopy) also stays a quick vault while a ground-level jump at
+ * the same canopy is a real climb.
+ *
+ * Derived, not hand-tuned: it must always equal the true vault ceiling, or a
+ * band of lips the mantle can already reach gets forced into the scripted
+ * climb instead (this drifted once already, when MANTLE_REACH moved and this
+ * literal did not).
  */
-export const CLIMB_MIN_OVERHEAD = 1.8;
+const CLIMB_JUMP_APEX = (JUMP_VELOCITY * JUMP_VELOCITY) / (2 * GRAVITY);
+export const CLIMB_MIN_OVERHEAD = CLIMB_JUMP_APEX + MANTLE_REACH;
 
 const smooth = (t: number): number => {
   const c = Math.min(1, Math.max(0, t));

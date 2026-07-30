@@ -476,8 +476,12 @@ export class PostOffice {
       m.read = true;
     }
     if (kept.length > 0) {
-      // Attachments remain: the expiry clock stays paused (Infinity) and the
-      // player is told to make room, exactly as the Merchant's collect does.
+      // Attachments remain: expiresAt is untouched here, so the letter's
+      // existing clock keeps running. That is Infinity for system/npc mail
+      // (their by-construction exemption, see the book() comment below), but a
+      // player parcel's real MAIL_ATTACHMENT_EXPIRY_SECONDS deadline still
+      // ticks and can still trip returnToSender. The player is told to make
+      // room, exactly as the Merchant's collect does.
       this.ctx.error(meta.entityId, 'Your bags are full.');
       return;
     }

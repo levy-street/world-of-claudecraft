@@ -2060,6 +2060,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.errors.arenaQueueTrading': 'Завершите обмен перед постановкой в очередь.',
   'hud.errors.arenaQueueInstance': 'Нельзя вставать в очередь из подземелья.',
   'hud.errors.tradeInProgress': 'Обмен уже идет.',
+  'hud.errors.tradeAlreadyTrading': 'Этот игрок уже торгует.',
   'hud.errors.tradeTooFar': 'Цель слишком далеко для обмена.',
   'hud.errors.tradeExpired': 'Запрос обмена истек.',
   'hud.errors.tradeFailed': 'Обмен не удался: предметы или деньги больше недоступны.',

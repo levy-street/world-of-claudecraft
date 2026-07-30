@@ -6473,6 +6473,7 @@ export const en_XA: EnTranslations = {
       "arenaQueueTrading": "[Ƒíñíšĥ ýóúŕ ţŕáðé ƀéƒóŕé ɋúéúéíñĝ.]",
       "arenaQueueInstance": "[Ýóú çáññóţ ɋúéúé ƒŕóɱ íñšíðé áñ íñšţáñçé.]",
       "tradeInProgress": "[Á ţŕáðé íš áļŕéáðý íñ þŕóĝŕéšš.]",
+      "tradeAlreadyTrading": "[Ţĥáţ þļáýéŕ íš áļŕéáðý ţŕáðíñĝ.]",
       "tradeTooFar": "[Ţáŕĝéţ íš ţóó ƒáŕ áŵáý ţó ţŕáðé.]",
       "tradeExpired": "[Ţĥé ţŕáðé ŕéɋúéšţ ĥáš éẋþíŕéð.]",
       "tradeFailed": "[Ţŕáðé ƒáíļéð: íţéɱš óŕ ɱóñéý ñó ļóñĝéŕ áʋáíļáƀļé.]",

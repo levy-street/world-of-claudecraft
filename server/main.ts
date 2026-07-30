@@ -130,6 +130,9 @@ import {
   primarySlugForAccount,
   pruneChatLogsBatch,
   pruneClientPerfReportsBatch,
+  pruneEmailChangeRequestsBatch,
+  pruneEmailLogBatch,
+  prunePasswordResetRequestsBatch,
   reclaimDeactivatedName,
   referralCountForAccount,
   releaseAllCharacterLeases,
@@ -3091,6 +3094,19 @@ export async function startServer(): Promise<http.Server> {
         name: 'account_ip_associations',
         pruneBatch: (n) =>
           pruneAccountIpAssociationsBatch(pool, config.accountIpAssociationRetentionDays, n),
+      },
+      {
+        name: 'password_reset_requests',
+        pruneBatch: (n) =>
+          prunePasswordResetRequestsBatch(config.passwordResetRequestRetentionDays, n),
+      },
+      {
+        name: 'email_change_requests',
+        pruneBatch: (n) => pruneEmailChangeRequestsBatch(config.emailChangeRequestRetentionDays, n),
+      },
+      {
+        name: 'email_log',
+        pruneBatch: (n) => pruneEmailLogBatch(config.emailLogRetentionDays, n),
       },
     ],
     // The fold precondition makes sample pruning lossless; skip the whole group

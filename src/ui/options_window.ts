@@ -321,11 +321,17 @@ export class OptionsWindow {
   private perfSettings: PerfOverlaySettingsPanel | null = null;
   // The element to refocus when the window closes (WCAG 2.2 AA focus return).
   private returnFocus: HTMLElement | null = null;
+  // Tracked separately from the root's inline `display` (rather than reading
+  // it back, the char-window precedent): the Performance sub-view needs
+  // `display: flex` (its scroll wrapper needs a flex column, issue 2569)
+  // while every other sub-view stays `block`, so no single string value means
+  // "open" any more (the deeds/bank-window precedent for the same reason).
+  private opened = false;
 
   constructor(private readonly deps: OptionsWindowDeps) {}
 
   get isOpen(): boolean {
-    return this.deps.root().style.display === 'block';
+    return this.opened;
   }
 
   toggle(): void {
@@ -344,8 +350,8 @@ export class OptionsWindow {
     this.view = 'main';
     this.capturingKey = null;
     this.keybindNote = '';
+    this.opened = true;
     this.render();
-    this.deps.root().style.display = 'block';
     music.pauseForMenu();
     audio.click();
   }
@@ -354,6 +360,7 @@ export class OptionsWindow {
   // the panel, drop the key-capture + tooltip + perf overlay placement, resume
   // music, and return focus to the opener (WCAG 2.2 AA).
   close(): void {
+    this.opened = false;
     this.deps.root().style.display = 'none';
     this.capturingKey = null;
     this.deps.options()?.perfOverlay.setPlacement(false);
@@ -435,6 +442,14 @@ export class OptionsWindow {
     // buildTitle (it rerender()s internally, which would drop a listener added
     // here).
     el.querySelector('[data-back]')?.addEventListener('click', () => this.goBack());
+    // Performance is the one sub-view whose scroll wrapper needs a flex column
+    // (`.perf-scroll`, components.css, issue 2569); every other sub-view stays
+    // the plain block card. render() re-runs on every navigation (goBack, a
+    // menu entry), so this always reflects the CURRENT view, not just the one
+    // active when the window first opened. A perf control's own self-rerender
+    // (perf_overlay_settings.ts) rebuilds only its own subtree and never
+    // touches this display value, which is already correct while that view stays open.
+    if (this.opened) el.style.display = this.view === 'performance' ? 'flex' : 'block';
   }
 
   // Return to the Game Menu root without closing the window. The title-bar back

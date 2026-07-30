@@ -1013,14 +1013,25 @@ export function applyMaterials(
   });
 }
 
+/** Tint (and, since the materials are keyed 1:1 with `isBody`, skin) the far
+ *  LOD's baked source materials. `isBody` mirrors applyMaterials' own gate: a
+ *  skin/emissive atlas only ever replaces the character's own body texture,
+ *  never a baked-in weapon's (the far mesh includes the class default weapon
+ *  geometry too, see PreparedVisual.idleSrcMats), so the override is applied
+ *  per material rather than uniformly across the whole baked set. */
 export function tintedFarMaterials(
   def: VisualDef,
   entityColor: number,
   srcMats: THREE.Material[],
+  isBody: boolean[],
+  skinTex: THREE.Texture | null = null,
+  emisTex: THREE.Texture | null = null,
 ): THREE.Material[] {
   const tint = tintFor(def, entityColor);
   const strength = def.tintStrength ?? DEFAULT_TINT_STRENGTH;
-  return srcMats.map((m) => tintedMaterial(m, tint, strength));
+  return srcMats.map((m, i) =>
+    tintedMaterial(m, tint, strength, isBody[i] ? skinTex : null, isBody[i] ? emisTex : null),
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -1040,6 +1051,10 @@ export interface PreparedVisual {
   idleGeo: THREE.BufferGeometry | null;
   /** source materials aligned with idleGeo groups */
   idleSrcMats: THREE.Material[];
+  /** parallel to idleSrcMats: whether that material belongs to the
+   *  character's own body (vs. a baked-in weapon), the same distinction
+   *  applyMaterials uses to gate the skin/emissive override */
+  idleSrcIsBody: boolean[];
   /** click-capsule radius in world units (from measured XZ body extents —
    *  long/wide creatures like wolves need far more than a humanoid sliver) */
   clickRadius: number;
@@ -1132,7 +1147,7 @@ export function prepareVisual(key: string): PreparedVisual {
     .multiply(new THREE.Matrix4().makeRotationY(def.yaw ?? 0))
     .multiply(new THREE.Matrix4().makeScale(normScale, normScale, normScale));
 
-  const { geo, mats } = bakeStaticPose(temp, norm);
+  const { geo, mats, isBody } = bakeStaticPose(temp, norm);
 
   const prep: PreparedVisual = {
     key,
@@ -1142,6 +1157,7 @@ export function prepareVisual(key: string): PreparedVisual {
     clips,
     idleGeo: geo,
     idleSrcMats: mats,
+    idleSrcIsBody: isBody,
     clickRadius,
   };
   prepared.set(key, prep);
@@ -1163,9 +1179,10 @@ function meshChainVisible(o: THREE.Object3D, stopAt: THREE.Object3D): boolean {
 function bakeStaticPose(
   root: THREE.Object3D,
   norm: THREE.Matrix4,
-): { geo: THREE.BufferGeometry | null; mats: THREE.Material[] } {
+): { geo: THREE.BufferGeometry | null; mats: THREE.Material[]; isBody: boolean[] } {
   const geos: THREE.BufferGeometry[] = [];
   const mats: THREE.Material[] = [];
+  const isBody: boolean[] = [];
   const v = new THREE.Vector3();
   const full = new THREE.Matrix4();
 
@@ -1205,9 +1222,10 @@ function bakeStaticPose(
     geos.push(out);
     // GLTFLoader emits one Mesh per primitive — materials are never arrays here
     mats.push(Array.isArray(mesh.material) ? mesh.material[0] : mesh.material);
+    isBody.push(!!mesh.userData.bodyMesh);
   });
 
-  if (geos.length === 0) return { geo: null, mats: [] };
+  if (geos.length === 0) return { geo: null, mats: [], isBody: [] };
   // uv presence must agree for merging — drop uvs entirely if any geo lacks them
   const allHaveUv = geos.every((g) => g.getAttribute('uv'));
   if (!allHaveUv) for (const g of geos) g.deleteAttribute('uv');
@@ -1216,5 +1234,5 @@ function bakeStaticPose(
     geo.clearGroups();
     geo.addGroup(0, geo.index ? geo.index.count : geo.getAttribute('position').count, 0);
   }
-  return { geo, mats };
+  return { geo, mats, isBody };
 }

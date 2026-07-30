@@ -357,6 +357,41 @@ describe('auto-release-on-logout: save/load of a dead-unreleased character', () 
     expect(healerInRange(sim2, e2.pos, SPIRIT_HEALER_RANGE)).toBe(true);
   });
 
+  it('a released-ghost save inside a live dungeon claim recomputes corpseInstanceId on relog', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(10);
+    const p = sim.player as AnyEntity;
+    sim.enterDungeon('hollow_crypt');
+    expect(p.pos.x).toBeGreaterThan(DUNGEON_X_THRESHOLD);
+    // Die deeper inside the instance, then release: the normal death path
+    // (spirit.ts releasePlayerSpirit) stamps corpseInstanceId from the live
+    // claim so a fallen party member's corpse still counts for loot/XP.
+    p.pos = { x: p.pos.x, y: p.pos.y, z: p.pos.z + 30 };
+    p.prevPos = { ...p.pos };
+    sim.rebucket(p);
+    p.hp = 0;
+    p.dead = true;
+    sim.releaseSpirit();
+    const inst = (sim.instances as any[]).find(
+      (i) => i.dungeonId === 'hollow_crypt' && i.partyKey !== null,
+    );
+    expect(p.corpseInstanceId).toBe(inst.exitId);
+
+    // A relog within the SAME server session (the common case: the process
+    // does not restart, so the party's instance claim is still live) must not
+    // lose the corpse's instance binding, or a reconnecting downed member is
+    // permanently excluded from loot/XP/Heroic Mark credit for that corpse.
+    const state = sim.serializeCharacter(sim.playerId)!;
+    sim.removePlayer(sim.playerId);
+    const pid2 = sim.addPlayer('warrior', 'Reloger', { state });
+    const e2 = sim.entities.get(pid2) as AnyEntity;
+
+    expect(e2.dead).toBe(true);
+    expect(e2.ghost).toBe(true);
+    expect(e2.corpsePos).toBeTruthy();
+    expect(e2.corpseInstanceId).toBe(inst.exitId);
+  });
+
   it('an alive save still loads alive and unchanged', () => {
     const sim = makeSim();
     sim.setPlayerLevel(10);

@@ -2896,6 +2896,12 @@ export class Sim {
       player.corpsePos = savedState.corpsePos
         ? this.groundPos(savedState.corpsePos.x, savedState.corpsePos.z)
         : null;
+      // Instance ids are boot-local (recreated on every claim), so recompute
+      // from the restored position via the same helper the death path uses
+      // (spirit.ts releasePlayerSpirit) rather than persisting the raw id: a
+      // relog within a still-live claim recovers the corpse's instance
+      // binding, while a stale or reset claim correctly resolves to null.
+      player.corpseInstanceId = player.corpsePos ? this.instanceClaimIdAt(player.corpsePos) : null;
       player.hp = player.maxHp;
     } else if (savedState?.dead && !isArenaPos(savedState.pos.x) && !isDelvePos(savedState.pos.x)) {
       // Auto-release-on-logout: a character saved dead but UNRELEASED resumes as

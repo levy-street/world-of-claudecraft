@@ -6473,6 +6473,7 @@ export const es_ES: EnTranslations = {
       "arenaQueueTrading": "Termina tu comercio antes de entrar en cola.",
       "arenaQueueInstance": "No puedes entrar en cola desde una instancia.",
       "tradeInProgress": "Ya hay un comercio en curso.",
+      "tradeAlreadyTrading": "That player is already trading.",
       "tradeTooFar": "El objetivo está demasiado lejos para comerciar.",
       "tradeExpired": "La solicitud de comercio ha expirado.",
       "tradeFailed": "Comercio fallido: los objetos o el dinero ya no están disponibles.",

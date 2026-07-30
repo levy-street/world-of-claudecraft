@@ -5694,6 +5694,7 @@ export type TranslationKeyFlat =
   | 'hud.errors.targetMustDodge'
   | 'hud.errors.targetTooFar'
   | 'hud.errors.tooClose'
+  | 'hud.errors.tradeAlreadyTrading'
   | 'hud.errors.tradeBound'
   | 'hud.errors.tradeExpired'
   | 'hud.errors.tradeFailed'

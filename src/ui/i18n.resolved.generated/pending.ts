@@ -44,7 +44,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_undermount_ledger.objectives.1.label",
     "entities.quests.q_undermount_ledger.objectives.2.label",
     "entities.quests.q_undermount_ledger.text",
-    "entities.quests.q_undermount_ledger.title"
+    "entities.quests.q_undermount_ledger.title",
+    "hud.errors.tradeAlreadyTrading"
   ],
   "es_ES": [
     "entities.dungeons.undermount_wing1.enterText",
@@ -81,7 +82,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_undermount_ledger.objectives.1.label",
     "entities.quests.q_undermount_ledger.objectives.2.label",
     "entities.quests.q_undermount_ledger.text",
-    "entities.quests.q_undermount_ledger.title"
+    "entities.quests.q_undermount_ledger.title",
+    "hud.errors.tradeAlreadyTrading"
   ],
   "fr_FR": [
     "entities.dungeons.undermount_wing1.enterText",
@@ -118,7 +120,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_undermount_ledger.objectives.1.label",
     "entities.quests.q_undermount_ledger.objectives.2.label",
     "entities.quests.q_undermount_ledger.text",
-    "entities.quests.q_undermount_ledger.title"
+    "entities.quests.q_undermount_ledger.title",
+    "hud.errors.tradeAlreadyTrading"
   ],
   "fr_CA": [
     "entities.dungeons.undermount_wing1.enterText",
@@ -155,7 +158,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_undermount_ledger.objectives.1.label",
     "entities.quests.q_undermount_ledger.objectives.2.label",
     "entities.quests.q_undermount_ledger.text",
-    "entities.quests.q_undermount_ledger.title"
+    "entities.quests.q_undermount_ledger.title",
+    "hud.errors.tradeAlreadyTrading"
   ],
   "en_CA": [],
   "it_IT": [
@@ -193,7 +197,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_undermount_ledger.objectives.1.label",
     "entities.quests.q_undermount_ledger.objectives.2.label",
     "entities.quests.q_undermount_ledger.text",
-    "entities.quests.q_undermount_ledger.title"
+    "entities.quests.q_undermount_ledger.title",
+    "hud.errors.tradeAlreadyTrading"
   ],
   "de_DE": [
     "entities.dungeons.undermount_wing1.enterText",
@@ -230,7 +235,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_undermount_ledger.objectives.1.label",
     "entities.quests.q_undermount_ledger.objectives.2.label",
     "entities.quests.q_undermount_ledger.text",
-    "entities.quests.q_undermount_ledger.title"
+    "entities.quests.q_undermount_ledger.title",
+    "hud.errors.tradeAlreadyTrading"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -271,7 +277,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_undermount_ledger.objectives.1.label",
     "entities.quests.q_undermount_ledger.objectives.2.label",
     "entities.quests.q_undermount_ledger.text",
-    "entities.quests.q_undermount_ledger.title"
+    "entities.quests.q_undermount_ledger.title",
+    "hud.errors.tradeAlreadyTrading"
   ],
   "ru_RU": [],
   "cs_CZ": [
@@ -309,7 +316,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_undermount_ledger.objectives.1.label",
     "entities.quests.q_undermount_ledger.objectives.2.label",
     "entities.quests.q_undermount_ledger.text",
-    "entities.quests.q_undermount_ledger.title"
+    "entities.quests.q_undermount_ledger.title",
+    "hud.errors.tradeAlreadyTrading"
   ],
   "nl_NL": [
     "entities.dungeons.undermount_wing1.enterText",
@@ -346,7 +354,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_undermount_ledger.objectives.1.label",
     "entities.quests.q_undermount_ledger.objectives.2.label",
     "entities.quests.q_undermount_ledger.text",
-    "entities.quests.q_undermount_ledger.title"
+    "entities.quests.q_undermount_ledger.title",
+    "hud.errors.tradeAlreadyTrading"
   ],
   "pl_PL": [
     "entities.dungeons.undermount_wing1.enterText",
@@ -383,7 +392,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_undermount_ledger.objectives.1.label",
     "entities.quests.q_undermount_ledger.objectives.2.label",
     "entities.quests.q_undermount_ledger.text",
-    "entities.quests.q_undermount_ledger.title"
+    "entities.quests.q_undermount_ledger.title",
+    "hud.errors.tradeAlreadyTrading"
   ],
   "id_ID": [
     "entities.dungeons.undermount_wing1.enterText",
@@ -420,7 +430,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_undermount_ledger.objectives.1.label",
     "entities.quests.q_undermount_ledger.objectives.2.label",
     "entities.quests.q_undermount_ledger.text",
-    "entities.quests.q_undermount_ledger.title"
+    "entities.quests.q_undermount_ledger.title",
+    "hud.errors.tradeAlreadyTrading"
   ],
   "tr_TR": [
     "entities.dungeons.undermount_wing1.enterText",
@@ -457,7 +468,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_undermount_ledger.objectives.1.label",
     "entities.quests.q_undermount_ledger.objectives.2.label",
     "entities.quests.q_undermount_ledger.text",
-    "entities.quests.q_undermount_ledger.title"
+    "entities.quests.q_undermount_ledger.title",
+    "hud.errors.tradeAlreadyTrading"
   ],
   "sv_SE": [
     "entities.dungeons.undermount_wing1.enterText",
@@ -494,7 +506,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_undermount_ledger.objectives.1.label",
     "entities.quests.q_undermount_ledger.objectives.2.label",
     "entities.quests.q_undermount_ledger.text",
-    "entities.quests.q_undermount_ledger.title"
+    "entities.quests.q_undermount_ledger.title",
+    "hud.errors.tradeAlreadyTrading"
   ],
   "vi_VN": [
     "entities.dungeons.undermount_wing1.enterText",
@@ -531,7 +544,8 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_undermount_ledger.objectives.1.label",
     "entities.quests.q_undermount_ledger.objectives.2.label",
     "entities.quests.q_undermount_ledger.text",
-    "entities.quests.q_undermount_ledger.title"
+    "entities.quests.q_undermount_ledger.title",
+    "hud.errors.tradeAlreadyTrading"
   ],
   "da_DK": [
     "entities.dungeons.undermount_wing1.enterText",
@@ -568,6 +582,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.quests.q_undermount_ledger.objectives.1.label",
     "entities.quests.q_undermount_ledger.objectives.2.label",
     "entities.quests.q_undermount_ledger.text",
-    "entities.quests.q_undermount_ledger.title"
+    "entities.quests.q_undermount_ledger.title",
+    "hud.errors.tradeAlreadyTrading"
   ]
 };

@@ -2205,7 +2205,10 @@ export function runEffects(
         break;
       }
       case 'breakRoots': {
-        removeRootAuras(ctx, p);
+        // Self-cast only: a personal barrier laid on a friendly TARGET (the
+        // Chronomancy Temporal Barrier can shield an ally) must not cleanse
+        // the caster's own root just because they cast the spell.
+        if (!target || target === p) removeRootAuras(ctx, p);
         break;
       }
       case 'breakControl': {

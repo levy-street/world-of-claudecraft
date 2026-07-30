@@ -125,6 +125,15 @@ export interface Config {
   // the business-metrics fact table) to keep. The snapshot reads touch only
   // today and yesterday, so any positive window is read-invisible to them.
   readonly playerActivityRetentionDays: number;
+  // How many days of password_reset_requests / email_change_requests rows to
+  // keep after creation. The per-account supersede DELETE at each create call
+  // only removes a duplicate still-PENDING row (createPasswordResetRequest /
+  // createEmailChangeRequest, server/db.ts); a consumed or abandoned-and-expired
+  // row is untouched there, so these are the only knobs that bound either table.
+  readonly passwordResetRequestRetentionDays: number;
+  readonly emailChangeRequestRetentionDays: number;
+  // How many days of email_log rows (the outbound-email audit trail) to keep.
+  readonly emailLogRetentionDays: number;
   // The two sweep knobs follow the maxPlayersPerRealm trimmed-read contract
   // instead, because for them a whitespace-derived 0 is fail-DANGEROUS: hour 0
   // moves the sweep to 00:00 UTC, next to the nightly 03:15 UTC pg_dump window
@@ -178,6 +187,9 @@ const DEFAULT_SITE_PRESENCE_RETENTION_DAYS = 90;
 const DEFAULT_PLAY_SESSION_RETENTION_DAYS = 180;
 const DEFAULT_ACCOUNT_IP_ASSOCIATION_RETENTION_DAYS = 730;
 const DEFAULT_PLAYER_ACTIVITY_RETENTION_DAYS = 400;
+const DEFAULT_PASSWORD_RESET_REQUEST_RETENTION_DAYS = 30;
+const DEFAULT_EMAIL_CHANGE_REQUEST_RETENTION_DAYS = 30;
+const DEFAULT_EMAIL_LOG_RETENTION_DAYS = 90;
 // PROVISIONAL: two hours after the nightly 03:15 UTC pg_dump window, pending real
 // traffic-curve evidence of the quietest hour; revisit when that evidence lands.
 const DEFAULT_RETENTION_SWEEP_UTC_HOUR = 5;
@@ -371,6 +383,15 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
       env.PLAYER_ACTIVITY_RETENTION_DAYS,
       DEFAULT_PLAYER_ACTIVITY_RETENTION_DAYS,
     ),
+    passwordResetRequestRetentionDays: numberOr(
+      env.PASSWORD_RESET_REQUEST_RETENTION_DAYS,
+      DEFAULT_PASSWORD_RESET_REQUEST_RETENTION_DAYS,
+    ),
+    emailChangeRequestRetentionDays: numberOr(
+      env.EMAIL_CHANGE_REQUEST_RETENTION_DAYS,
+      DEFAULT_EMAIL_CHANGE_REQUEST_RETENTION_DAYS,
+    ),
+    emailLogRetentionDays: numberOr(env.EMAIL_LOG_RETENTION_DAYS, DEFAULT_EMAIL_LOG_RETENTION_DAYS),
     // An hour outside 0..23 is garbage, not a preference; fall back like numberOr does.
     retentionSweepUtcHour:
       Number.isInteger(sweepHourRaw) && sweepHourRaw >= 0 && sweepHourRaw <= 23

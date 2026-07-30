@@ -127,6 +127,11 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
             ability: [
               { ability: 'ice_barrier', addEffects: [{ type: 'breakRoots' }] },
               { ability: 'blazing_barrier', addEffects: [{ type: 'breakRoots' }] },
+              // Chronomancy's shield fills the same personal-barrier slot (see
+              // PERSONAL_BARRIER_IDS) and can also be cast on an ally: the
+              // breakRoots dispatch case gates on a self-cast so a ward laid
+              // on an ally never cleanses the caster's own root.
+              { ability: 'temporal_barrier', addEffects: [{ type: 'breakRoots' }] },
             ],
           },
         },

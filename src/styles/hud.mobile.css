@@ -4164,6 +4164,7 @@
     right: 10px !important;
     width: auto !important;
     box-sizing: border-box;
+    transform: none;
   }
   body.mobile-touch #report-window select,
   body.mobile-touch #report-window textarea {

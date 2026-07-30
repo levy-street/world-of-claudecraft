@@ -32,7 +32,13 @@ vi.mock('pg', () => ({
   }),
 }));
 
-import { pruneChatLogsBatch, pruneClientPerfReportsBatch } from '../server/db';
+import {
+  pruneChatLogsBatch,
+  pruneClientPerfReportsBatch,
+  pruneEmailChangeRequestsBatch,
+  pruneEmailLogBatch,
+  prunePasswordResetRequestsBatch,
+} from '../server/db';
 
 beforeEach(() => {
   dbMock.query.mockReset();
@@ -82,6 +88,57 @@ describe('retention prune batches', () => {
     expect(params).toEqual(['90', 500]);
   });
 
+  it('password-reset-request prune deletes one bounded oldest-first batch and reports the row count', async () => {
+    dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 4 });
+
+    await expect(prunePasswordResetRequestsBatch(30, 500)).resolves.toBe(4);
+
+    const [sql, params] = dbMock.query.mock.calls[0];
+    // Same bounded shape: the age predicate rides the dedicated created_at
+    // index, oldest-first, id-subselect bounded. This is the retention story
+    // the misleading "keeps the table from accumulating dead rows" comment on
+    // the per-account supersede DELETE never actually provided: that DELETE
+    // only removes duplicate PENDING rows, never a consumed or abandoned one.
+    expect(sql).toContain('DELETE FROM password_reset_requests');
+    expect(sql).toContain('created_at <');
+    expect(sql).toContain('id IN');
+    expect(sql).toContain('ORDER BY created_at');
+    expect(sql).toContain('LIMIT $2');
+    expect(sql).toContain("($1 || ' days')::interval");
+    expect(params).toEqual(['30', 500]);
+  });
+
+  it('email-change-request prune deletes one bounded oldest-first batch and reports the row count', async () => {
+    dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 5 });
+
+    await expect(pruneEmailChangeRequestsBatch(30, 500)).resolves.toBe(5);
+
+    const [sql, params] = dbMock.query.mock.calls[0];
+    expect(sql).toContain('DELETE FROM email_change_requests');
+    expect(sql).toContain('created_at <');
+    expect(sql).toContain('id IN');
+    expect(sql).toContain('ORDER BY created_at');
+    expect(sql).toContain('LIMIT $2');
+    expect(sql).toContain("($1 || ' days')::interval");
+    expect(params).toEqual(['30', 500]);
+  });
+
+  it('email-log prune deletes one bounded oldest-first batch on sent_at and reports the row count', async () => {
+    dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 6 });
+
+    await expect(pruneEmailLogBatch(90, 500)).resolves.toBe(6);
+
+    const [sql, params] = dbMock.query.mock.calls[0];
+    // email_log ages on sent_at, not created_at: it has no created_at column.
+    expect(sql).toContain('DELETE FROM email_log');
+    expect(sql).toContain('sent_at <');
+    expect(sql).toContain('id IN');
+    expect(sql).toContain('ORDER BY sent_at');
+    expect(sql).toContain('LIMIT $2');
+    expect(sql).toContain("($1 || ' days')::interval");
+    expect(params).toEqual(['90', 500]);
+  });
+
   it('client-perf prune normalizes fractional retention days up to one full day', async () => {
     dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 0 });
 
@@ -111,22 +168,32 @@ describe('retention prune batches', () => {
     await expect(pruneChatLogsBatch(-1, 500)).resolves.toBe(0);
     await expect(pruneClientPerfReportsBatch(0, 500)).resolves.toBe(0);
     await expect(pruneClientPerfReportsBatch(-1, 500)).resolves.toBe(0);
+    await expect(prunePasswordResetRequestsBatch(0, 500)).resolves.toBe(0);
+    await expect(prunePasswordResetRequestsBatch(-1, 500)).resolves.toBe(0);
+    await expect(pruneEmailChangeRequestsBatch(0, 500)).resolves.toBe(0);
+    await expect(pruneEmailChangeRequestsBatch(-1, 500)).resolves.toBe(0);
+    await expect(pruneEmailLogBatch(0, 500)).resolves.toBe(0);
+    await expect(pruneEmailLogBatch(-1, 500)).resolves.toBe(0);
     expect(dbMock.query).not.toHaveBeenCalled();
   });
 
-  it('a zero batch size floors to LIMIT 1, never LIMIT 0, on both prunes', async () => {
+  it('a zero batch size floors to LIMIT 1, never LIMIT 0, on every prune', async () => {
     dbMock.query.mockResolvedValue({ rows: [], rowCount: 0 });
 
     await pruneChatLogsBatch(90, 0);
     await pruneClientPerfReportsBatch(14, 0);
+    await prunePasswordResetRequestsBatch(30, 0);
+    await pruneEmailChangeRequestsBatch(30, 0);
+    await pruneEmailLogBatch(90, 0);
 
     // A LIMIT 0 batch would delete nothing forever while looking healthy; the sweep
     // normalizes its tunable too, so this floor is defense in depth.
-    expect(dbMock.query.mock.calls[0][1][1]).toBe(1);
-    expect(dbMock.query.mock.calls[1][1][1]).toBe(1);
+    for (let i = 0; i < 5; i++) {
+      expect(dbMock.query.mock.calls[i][1][1]).toBe(1);
+    }
   });
 
-  it('both prunes run on the default statement timeout, never a SET LOCAL raise', async () => {
+  it('every prune runs on the default statement timeout, never a SET LOCAL raise', async () => {
     // The behavioral twin of the tunables source pin: a re-wrap in
     // runWithStatementTimeout would surface here as a SET LOCAL statement_timeout
     // control statement on the connected client.
@@ -134,6 +201,9 @@ describe('retention prune batches', () => {
 
     await pruneChatLogsBatch(30, 100);
     await pruneClientPerfReportsBatch(30, 100);
+    await prunePasswordResetRequestsBatch(30, 100);
+    await pruneEmailChangeRequestsBatch(30, 100);
+    await pruneEmailLogBatch(90, 100);
 
     const recorded = [
       ...dbMock.clientStatements,

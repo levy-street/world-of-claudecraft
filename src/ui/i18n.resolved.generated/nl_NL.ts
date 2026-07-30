@@ -6473,6 +6473,7 @@ export const nl_NL: EnTranslations = {
       "arenaQueueTrading": "Rond je ruil af voordat je in de wachtrij gaat.",
       "arenaQueueInstance": "Je kunt niet in de wachtrij gaan vanuit een instantie.",
       "tradeInProgress": "Er is al een ruil aan de gang.",
+      "tradeAlreadyTrading": "That player is already trading.",
       "tradeTooFar": "Het doelwit is te ver weg om mee te ruilen.",
       "tradeExpired": "Het ruilverzoek is verlopen.",
       "tradeFailed": "Ruil mislukt: voorwerpen of geld niet langer beschikbaar.",
