@@ -243,6 +243,10 @@ describe('boss templates are CC and snare immune on BOTH difficulties', () => {
       'ysolei',
       'korzul_the_gravewyrm',
       'nythraxis_scourge_of_thornpeak',
+      'vosh_the_glazier',
+      'saan_the_stoker',
+      'odrenn_the_temperer',
+      'volzharr_buried_furnace',
     ].sort();
     const instanceTemplates = [
       ...Object.values(DUNGEON_MOBS),

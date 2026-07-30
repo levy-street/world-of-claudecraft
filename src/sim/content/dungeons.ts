@@ -723,6 +723,10 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     family: 'humanoid',
     elite: true,
     boss: true,
+    // Raid-boss control immunity, the endgame rule every boss-flagged
+    // template carries (tests/dungeon_difficulty.test.ts): no CC, no snares.
+    ccImmune: true,
+    slowImmune: true,
     // 34k effective on normal (createMob applies the 2.3x elite factor). The
     // Kiln-Keepers are a 10-player wing-1 duo: two health pools fought together,
     // combined below the 60k Nythraxis finale but each a real tank-and-spank.
@@ -759,6 +763,10 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     family: 'humanoid',
     elite: true,
     boss: true,
+    // Raid-boss control immunity, the endgame rule every boss-flagged
+    // template carries (tests/dungeon_difficulty.test.ts): no CC, no snares.
+    ccImmune: true,
+    slowImmune: true,
     // 28k effective on normal (the 2.3x elite factor). Saan is the caster half of
     // the duo: a smaller pool than Vosh, but her cross-heal (Stoke the Coals) tops
     // off her partner, so the raid must burn the two keepers down together rather
@@ -799,6 +807,10 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     family: 'humanoid',
     elite: true,
     boss: true,
+    // Raid-boss control immunity, the endgame rule every boss-flagged
+    // template carries (tests/dungeon_difficulty.test.ts): no CC, no snares.
+    ccImmune: true,
+    slowImmune: true,
     // Wing 2, single boss. 48k effective (2.3x elite factor). The SORT script
     // (geography marks, mixed-mark burn, Cinder Arc, Tempering) lives in
     // encounters/odrenn.ts; this template carries only the data-only texture.
@@ -824,6 +836,10 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     family: 'elemental',
     elite: true,
     boss: true,
+    // Raid-boss control immunity, the endgame rule every boss-flagged
+    // template carries (tests/dungeon_difficulty.test.ts): no CC, no snares.
+    ccImmune: true,
+    slowImmune: true,
     // Wing 3, the raid capstone (level 26, drops ilvl 35). 69k effective (2.3x
     // elite factor), the review-corrected 1.15x anchor over the 60k Nythraxis
     // finale since this is a higher-level tier. Mechanics not yet authored:
