@@ -827,6 +827,11 @@ function requestBrowserFullscreen(): void {
   const root = document.documentElement as FullscreenElement;
   const request = root.requestFullscreen?.bind(root) ?? root.webkitRequestFullscreen?.bind(root);
   if (!request) return;
+  // Fullscreen needs transient activation. Chrome logs a console error for every
+  // call made without it, whether or not the rejection is caught, so skip the
+  // call we already know will be refused. Browsers without userActivation still
+  // attempt it, which is the previous behavior.
+  if (navigator.userActivation && !navigator.userActivation.isActive) return;
   try {
     const result = request();
     if (result instanceof Promise) void result.catch(() => {});
@@ -1739,14 +1744,12 @@ async function startGame(
     if (characterOpen === lastCharacterOpen) return;
     lastCharacterOpen = characterOpen;
     entryDiagnostics.checkpoint(characterOpen ? 'character-open' : 'character-closed');
-    console.info(`[entry-diag] character ${characterOpen ? 'opened' : 'closed'}`);
   };
   const syncQuestDialogOpenDiagnostics = (): void => {
     const questDialogOpen = hud.questDialogOpen;
     if (questDialogOpen === lastQuestDialogOpen) return;
     lastQuestDialogOpen = questDialogOpen;
     entryDiagnostics.checkpoint(questDialogOpen ? 'quest-dialog-open' : 'quest-dialog-closed');
-    console.info(`[entry-diag] quest dialog ${questDialogOpen ? 'opened' : 'closed'}`);
   };
 
   const mobileControls = new MobileControls(input, {
@@ -1805,13 +1808,11 @@ async function startGame(
     if (optionsOpen !== lastOptionsOpen) {
       lastOptionsOpen = optionsOpen;
       entryDiagnostics.checkpoint(optionsOpen ? 'settings-open' : 'settings-closed');
-      console.info(`[entry-diag] settings ${optionsOpen ? 'opened' : 'closed'}`);
     }
   };
   hud.onQuestDialogStateChange = (open) => {
     lastQuestDialogOpen = open;
     entryDiagnostics.checkpoint(open ? 'quest-dialog-open' : 'quest-dialog-closed');
-    console.info(`[entry-diag] quest dialog ${open ? 'opened' : 'closed'}`);
     syncOverlayDiagnostics();
   };
   stopMobileMoreDiagnostics?.();
@@ -1828,7 +1829,6 @@ async function startGame(
       mobileControls.syncAutorun(false);
     }
     entryDiagnostics.checkpoint(open ? 'mobile-more-open' : 'mobile-more-closed');
-    console.info(`[entry-diag] mobile More ${open ? 'opened' : 'closed'}`);
   });
   hud.onResurrectAtSpiritHealer = () => {
     void stopAutorunForInteraction(world.resurrectAtSpiritHealer(), input, mobileControls);
@@ -6293,8 +6293,10 @@ async function loadProjectStats(): Promise<void> {
         }),
       );
     }
-  } catch (err) {
-    console.error('Failed to fetch project stats:', err);
+  } catch {
+    // A marketing counter is not worth an error entry: the API being down or
+    // absent (offline play, a dev client with no server) is an ordinary state
+    // and the cache fallback below already handles it.
     // If API fails, fall back to cached data (even if expired)
     if (cached) {
       setAll(characterEls, String(cached.characters_created ?? '-'));
@@ -9654,7 +9656,6 @@ function wireStartScreens(): void {
   // no-op when no session is in play, so it is safe to register unconditionally.
   const restampResumeMarker = () => {
     if (document.visibilityState === 'hidden') {
-      console.info('[entry-diag] page hidden; entry probe cleared as a lifecycle transition');
       refreshPlayMarker(Date.now());
       // A page that leaves the foreground mid-entry was not killed by a foreground
       // memory spike: a later eviction while backgrounded (or a deliberate reload,
@@ -9668,11 +9669,7 @@ function wireStartScreens(): void {
     }
   };
   document.addEventListener('visibilitychange', restampResumeMarker);
-  window.addEventListener('pageshow', (event) => {
-    console.info(`[entry-diag] pageshow persisted=${event.persisted}`);
-  });
-  window.addEventListener('pagehide', (event) => {
-    console.info(`[entry-diag] pagehide persisted=${event.persisted}; entry probe cleared`);
+  window.addEventListener('pagehide', () => {
     refreshPlayMarker(Date.now());
     stopActiveEntryDiagnostics();
     clearEntryProbe();
