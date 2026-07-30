@@ -197,40 +197,10 @@ interface LegacyExemption {
   readonly reason: string;
 }
 
-// P1.3 and P3 must clear every row while fixing voyage content and deck riding.
+// P3 must clear every row while fixing deck riding.
 const LEGACY_EXEMPTIONS: readonly LegacyExemption[] = [
   {
     sceneId: 'scn_lb_ferry_depart_back',
-    check: 'collision.hull',
-    reason: 'P1.3 must re-author voyage paths clear of harbor solids and the water floor.',
-  },
-  {
-    sceneId: 'scn_lb_ferry_depart_back',
-    check: 'cut.fadeSlack',
-    reason: 'P1.3 must add full-black tick slack to every voyage cut.',
-  },
-  {
-    sceneId: 'scn_lb_ferry_depart_back',
-    check: 'cut.firstTransition',
-    reason: 'P3 must ease the first attach shot from the live camera pose.',
-  },
-  {
-    sceneId: 'scn_lb_ferry_depart_back',
-    check: 'fade.symmetry',
-    reason: 'P1.3 must author a clear fade before the voyage scene ends.',
-  },
-  {
-    sceneId: 'scn_lb_ferry_depart_back',
-    check: 'motion.propAcceleration',
-    reason: 'P1.3 must author constant-way voyage eases without on-camera lurches.',
-  },
-  {
-    sceneId: 'scn_lb_ferry_depart_back',
-    check: 'motion.propWay',
-    reason: 'P1.3 must author constant-way voyage eases without on-camera dead stops.',
-  },
-  {
-    sceneId: 'scn_lb_ferry_depart_back',
     check: 'support.entity',
     reason: 'P3 must move deck-posted NPCs with the displaced ship support.',
   },
@@ -238,36 +208,6 @@ const LEGACY_EXEMPTIONS: readonly LegacyExemption[] = [
     sceneId: 'scn_lb_ferry_depart_back',
     check: 'containment.rider',
     reason: 'P3 must keep deck-posted NPCs inside the displaced deck bounds.',
-  },
-  {
-    sceneId: 'scn_lb_ferry_depart_out',
-    check: 'collision.hull',
-    reason: 'P1.3 must re-author voyage paths clear of harbor solids and the water floor.',
-  },
-  {
-    sceneId: 'scn_lb_ferry_depart_out',
-    check: 'cut.fadeSlack',
-    reason: 'P1.3 must add full-black tick slack to every voyage cut.',
-  },
-  {
-    sceneId: 'scn_lb_ferry_depart_out',
-    check: 'cut.firstTransition',
-    reason: 'P3 must ease the first attach shot from the live camera pose.',
-  },
-  {
-    sceneId: 'scn_lb_ferry_depart_out',
-    check: 'fade.symmetry',
-    reason: 'P1.3 must author a clear fade before the voyage scene ends.',
-  },
-  {
-    sceneId: 'scn_lb_ferry_depart_out',
-    check: 'motion.propAcceleration',
-    reason: 'P1.3 must author constant-way voyage eases without on-camera lurches.',
-  },
-  {
-    sceneId: 'scn_lb_ferry_depart_out',
-    check: 'motion.propWay',
-    reason: 'P1.3 must author constant-way voyage eases without on-camera dead stops.',
   },
   {
     sceneId: 'scn_lb_ferry_depart_out',
@@ -280,46 +220,6 @@ const LEGACY_EXEMPTIONS: readonly LegacyExemption[] = [
     reason: 'P3 must keep deck-posted NPCs inside the displaced deck bounds.',
   },
   {
-    sceneId: 'scn_lb_q0_ashore',
-    check: 'cut.fadeSlack',
-    reason: 'P1.3 must add full-black tick slack to every voyage cut.',
-  },
-  {
-    sceneId: 'scn_lb_q0_ashore',
-    check: 'fade.symmetry',
-    reason: 'P1.3 must author a clear fade before the voyage scene ends.',
-  },
-  {
-    sceneId: 'scn_lb_q0_voyage',
-    check: 'collision.hull',
-    reason: 'P1.3 must re-author voyage paths clear of harbor solids and the water floor.',
-  },
-  {
-    sceneId: 'scn_lb_q0_voyage',
-    check: 'cut.fadeSlack',
-    reason: 'P1.3 must add full-black tick slack to every voyage cut.',
-  },
-  {
-    sceneId: 'scn_lb_q0_voyage',
-    check: 'cut.firstTransition',
-    reason: 'P3 must ease the first attach shot from the live camera pose.',
-  },
-  {
-    sceneId: 'scn_lb_q0_voyage',
-    check: 'fade.symmetry',
-    reason: 'P1.3 must author a clear fade before the voyage scene ends.',
-  },
-  {
-    sceneId: 'scn_lb_q0_voyage',
-    check: 'motion.propAcceleration',
-    reason: 'P1.3 must author constant-way voyage eases without on-camera lurches.',
-  },
-  {
-    sceneId: 'scn_lb_q0_voyage',
-    check: 'motion.propWay',
-    reason: 'P1.3 must author constant-way voyage eases without on-camera dead stops.',
-  },
-  {
     sceneId: 'scn_lb_q0_voyage',
     check: 'support.entity',
     reason: 'P3 must move deck-posted NPCs with the displaced ship support.',
@@ -328,31 +228,6 @@ const LEGACY_EXEMPTIONS: readonly LegacyExemption[] = [
     sceneId: 'scn_lb_q0_voyage',
     check: 'containment.rider',
     reason: 'P3 must keep deck-posted NPCs inside the displaced deck bounds.',
-  },
-  {
-    sceneId: 'cast_off',
-    check: 'reference.orphan',
-    reason: 'P1.3 must cue or remove the legacy authored cast-off prop segment.',
-  },
-  {
-    sceneId: 'scn_lb_q0_ashore',
-    check: 'reference.orphan',
-    reason: 'P1.3 must trigger or remove the superseded standalone arrival scene.',
-  },
-  {
-    sceneId: 'scn_lb_q0_ashore',
-    check: 'reference.subtitleReadTime',
-    reason: 'P1.3 must re-author Last Bell subtitle durations for readable locale fills.',
-  },
-  {
-    sceneId: 'scn_lb_q0_doorway',
-    check: 'reference.subtitleReadTime',
-    reason: 'P1.3 must re-author Last Bell subtitle durations for readable locale fills.',
-  },
-  {
-    sceneId: 'scn_lb_q0_voyage',
-    check: 'reference.subtitleReadTime',
-    reason: 'P1.3 must re-author Last Bell subtitle durations for readable locale fills.',
   },
 ];
 
@@ -3303,7 +3178,7 @@ function lintReferenceOrphans(
   triggerSources: readonly SceneTriggerSource[],
   report: (violation: Violation) => void,
 ): void {
-  const cuedSegments = new Set(
+  const cuedSegments = new Set<string>(
     scenes.flatMap((scene) => scene.ops.flatMap((op) => (op.kind === 'prop' ? [op.cue] : []))),
   );
   for (const segmentId of segmentIds) {
@@ -3968,36 +3843,6 @@ describe('cinematic shot mechanical gate', () => {
     expect(LEGACY_EXEMPTIONS, 'cinematic exemption inventory must stay exact').toEqual([
       {
         sceneId: 'scn_lb_ferry_depart_back',
-        check: 'collision.hull',
-        reason: 'P1.3 must re-author voyage paths clear of harbor solids and the water floor.',
-      },
-      {
-        sceneId: 'scn_lb_ferry_depart_back',
-        check: 'cut.fadeSlack',
-        reason: 'P1.3 must add full-black tick slack to every voyage cut.',
-      },
-      {
-        sceneId: 'scn_lb_ferry_depart_back',
-        check: 'cut.firstTransition',
-        reason: 'P3 must ease the first attach shot from the live camera pose.',
-      },
-      {
-        sceneId: 'scn_lb_ferry_depart_back',
-        check: 'fade.symmetry',
-        reason: 'P1.3 must author a clear fade before the voyage scene ends.',
-      },
-      {
-        sceneId: 'scn_lb_ferry_depart_back',
-        check: 'motion.propAcceleration',
-        reason: 'P1.3 must author constant-way voyage eases without on-camera lurches.',
-      },
-      {
-        sceneId: 'scn_lb_ferry_depart_back',
-        check: 'motion.propWay',
-        reason: 'P1.3 must author constant-way voyage eases without on-camera dead stops.',
-      },
-      {
-        sceneId: 'scn_lb_ferry_depart_back',
         check: 'support.entity',
         reason: 'P3 must move deck-posted NPCs with the displaced ship support.',
       },
@@ -4005,36 +3850,6 @@ describe('cinematic shot mechanical gate', () => {
         sceneId: 'scn_lb_ferry_depart_back',
         check: 'containment.rider',
         reason: 'P3 must keep deck-posted NPCs inside the displaced deck bounds.',
-      },
-      {
-        sceneId: 'scn_lb_ferry_depart_out',
-        check: 'collision.hull',
-        reason: 'P1.3 must re-author voyage paths clear of harbor solids and the water floor.',
-      },
-      {
-        sceneId: 'scn_lb_ferry_depart_out',
-        check: 'cut.fadeSlack',
-        reason: 'P1.3 must add full-black tick slack to every voyage cut.',
-      },
-      {
-        sceneId: 'scn_lb_ferry_depart_out',
-        check: 'cut.firstTransition',
-        reason: 'P3 must ease the first attach shot from the live camera pose.',
-      },
-      {
-        sceneId: 'scn_lb_ferry_depart_out',
-        check: 'fade.symmetry',
-        reason: 'P1.3 must author a clear fade before the voyage scene ends.',
-      },
-      {
-        sceneId: 'scn_lb_ferry_depart_out',
-        check: 'motion.propAcceleration',
-        reason: 'P1.3 must author constant-way voyage eases without on-camera lurches.',
-      },
-      {
-        sceneId: 'scn_lb_ferry_depart_out',
-        check: 'motion.propWay',
-        reason: 'P1.3 must author constant-way voyage eases without on-camera dead stops.',
       },
       {
         sceneId: 'scn_lb_ferry_depart_out',
@@ -4047,46 +3862,6 @@ describe('cinematic shot mechanical gate', () => {
         reason: 'P3 must keep deck-posted NPCs inside the displaced deck bounds.',
       },
       {
-        sceneId: 'scn_lb_q0_ashore',
-        check: 'cut.fadeSlack',
-        reason: 'P1.3 must add full-black tick slack to every voyage cut.',
-      },
-      {
-        sceneId: 'scn_lb_q0_ashore',
-        check: 'fade.symmetry',
-        reason: 'P1.3 must author a clear fade before the voyage scene ends.',
-      },
-      {
-        sceneId: 'scn_lb_q0_voyage',
-        check: 'collision.hull',
-        reason: 'P1.3 must re-author voyage paths clear of harbor solids and the water floor.',
-      },
-      {
-        sceneId: 'scn_lb_q0_voyage',
-        check: 'cut.fadeSlack',
-        reason: 'P1.3 must add full-black tick slack to every voyage cut.',
-      },
-      {
-        sceneId: 'scn_lb_q0_voyage',
-        check: 'cut.firstTransition',
-        reason: 'P3 must ease the first attach shot from the live camera pose.',
-      },
-      {
-        sceneId: 'scn_lb_q0_voyage',
-        check: 'fade.symmetry',
-        reason: 'P1.3 must author a clear fade before the voyage scene ends.',
-      },
-      {
-        sceneId: 'scn_lb_q0_voyage',
-        check: 'motion.propAcceleration',
-        reason: 'P1.3 must author constant-way voyage eases without on-camera lurches.',
-      },
-      {
-        sceneId: 'scn_lb_q0_voyage',
-        check: 'motion.propWay',
-        reason: 'P1.3 must author constant-way voyage eases without on-camera dead stops.',
-      },
-      {
         sceneId: 'scn_lb_q0_voyage',
         check: 'support.entity',
         reason: 'P3 must move deck-posted NPCs with the displaced ship support.',
@@ -4095,31 +3870,6 @@ describe('cinematic shot mechanical gate', () => {
         sceneId: 'scn_lb_q0_voyage',
         check: 'containment.rider',
         reason: 'P3 must keep deck-posted NPCs inside the displaced deck bounds.',
-      },
-      {
-        sceneId: 'cast_off',
-        check: 'reference.orphan',
-        reason: 'P1.3 must cue or remove the legacy authored cast-off prop segment.',
-      },
-      {
-        sceneId: 'scn_lb_q0_ashore',
-        check: 'reference.orphan',
-        reason: 'P1.3 must trigger or remove the superseded standalone arrival scene.',
-      },
-      {
-        sceneId: 'scn_lb_q0_ashore',
-        check: 'reference.subtitleReadTime',
-        reason: 'P1.3 must re-author Last Bell subtitle durations for readable locale fills.',
-      },
-      {
-        sceneId: 'scn_lb_q0_doorway',
-        check: 'reference.subtitleReadTime',
-        reason: 'P1.3 must re-author Last Bell subtitle durations for readable locale fills.',
-      },
-      {
-        sceneId: 'scn_lb_q0_voyage',
-        check: 'reference.subtitleReadTime',
-        reason: 'P1.3 must re-author Last Bell subtitle durations for readable locale fills.',
       },
     ]);
     expect(

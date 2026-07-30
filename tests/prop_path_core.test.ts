@@ -4,7 +4,10 @@ import {
   type PropPathSegment,
   propPathPoseAt,
 } from '../src/render/prop_path_core';
-import { LAST_BELL_PROP_PATH_SEGMENTS } from '../src/sim/content/last_bell_cinematics';
+import {
+  LAST_BELL_PROP_PATH_SEGMENTS,
+  LAST_BELL_VOYAGE_SEGMENT_IDS,
+} from '../src/sim/content/last_bell_cinematics';
 
 const GLIDE: PropPathSegment = {
   start: { x: 3, y: -2, z: 7, yaw: -0.8 },
@@ -95,32 +98,37 @@ describe('propPathPoseAt', () => {
   });
 });
 
-describe('migrated cast_off segment', () => {
-  const segment: PropPathSegment = LAST_BELL_PROP_PATH_SEGMENTS.cast_off;
+describe('Last Bell outbound cast-off segment', () => {
+  const segment: PropPathSegment =
+    LAST_BELL_PROP_PATH_SEGMENTS[LAST_BELL_VOYAGE_SEGMENT_IDS.out.castOff];
 
-  // These values are the migrated harbor_cast_off constants. Changing this
-  // pin changes the shipped voyage motion.
+  // These are authored berth-local values. Changing this pin changes the
+  // shipped voyage clearance or visible motion.
   it('pins the shipped cast-off segment values', () => {
-    expect(LAST_BELL_PROP_PATH_SEGMENTS.cast_off).toEqual({
-      start: { x: 0, y: 0, z: 0, yaw: 0 },
-      end: { x: 26, y: 0, z: 0, yaw: 0.09 },
-      duration: 16,
-      ease: 'easeInQuad',
+    expect(LAST_BELL_PROP_PATH_SEGMENTS[LAST_BELL_VOYAGE_SEGMENT_IDS.out.castOff]).toEqual({
+      start: { x: 0, y: 0.5, z: 4, yaw: 0 },
+      end: { x: 22, y: 0.5, z: 7, yaw: 0 },
+      duration: 4,
+      ease: 'linear',
     });
   });
 
-  it('starts at rest and is clamped below zero', () => {
-    expect(propPathPoseAt(segment, 0)).toEqual({ x: 0, y: 0, z: 0, yaw: 0, done: false });
+  it('starts at the authored seaward pose and is clamped below zero', () => {
+    expect(propPathPoseAt(segment, 0)).toEqual({ x: 0, y: 0.5, z: 4, yaw: 0, done: false });
     expect(propPathPoseAt(segment, -3).x).toBe(0);
   });
 
-  it('eases in: the first quarter covers far less than the last quarter', () => {
-    const q1 = propPathPoseAt(segment, segment.duration * 0.25).x;
-    const q4 =
-      propPathPoseAt(segment, segment.duration).x -
-      propPathPoseAt(segment, segment.duration * 0.75).x;
-    expect(q1).toBeGreaterThan(0);
-    expect(q4).toBeGreaterThan(q1 * 2);
+  it('covers equal distance in every quarter of the visible glide', () => {
+    const poses = Array.from({ length: 5 }, (_, index) =>
+      propPathPoseAt(segment, (segment.duration * index) / 4),
+    );
+    const distances = poses.slice(1).map((pose, index) => {
+      const previous = poses[index];
+      return Math.hypot(pose.x - previous.x, pose.y - previous.y, pose.z - previous.z);
+    });
+    for (const distance of distances.slice(1)) {
+      expect(distance).toBeCloseTo(distances[0], 10);
+    }
   });
 
   it('grows monotonically and holds its final pose past the duration', () => {

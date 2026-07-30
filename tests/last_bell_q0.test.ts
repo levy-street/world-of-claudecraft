@@ -150,7 +150,7 @@ describe('Q0 Ashore end to end', () => {
 
     // 7. The scene ends, the run completes, the two walk back to the cliffs
     // (despawn), and the quest is ready for Coalfast.
-    collect(sim, 8 * 20);
+    collect(sim, 11 * 20);
     expect(run?.done).toBe(true);
     expect(squadActorEntity(sim.ctx, claimId, 'tam')).toBeNull();
     expect(sim.questLog.get(QUEST)?.state).toBe('ready');
