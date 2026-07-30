@@ -65,6 +65,16 @@ export const LAST_BELL_CAMPAIGN_MOBS: Record<string, MobTemplate> = {
 // posts in FARSHORE_NPCS)
 // ---------------------------------------------------------------------------
 
+const EWALD_POST = {
+  x: MAINLAND_HARBOR.boarding.x - 2,
+  z: MAINLAND_HARBOR.boarding.z - 0.9,
+} as const;
+
+const ODDA_POST = {
+  x: GULLHAVEN_HARBOR.boarding.x - 0.9,
+  z: GULLHAVEN_HARBOR.boarding.z + 1.5,
+} as const;
+
 export const LAST_BELL_CAMPAIGN_NPCS: Record<string, NpcDef> = {
   // The mainland side of the crossing. He sells nothing and saves lives
   // anyway: the ferry is how a proven hand reaches a besieged island.
@@ -75,11 +85,11 @@ export const LAST_BELL_CAMPAIGN_NPCS: Record<string, NpcDef> = {
     // His post is ON DECK at the top of the gangplank: he greets riders as
     // they step aboard, and stands close enough to the boarding point to
     // hand out Q0. The harbor layout is the single anchor source.
-    pos: {
-      x: MAINLAND_HARBOR.boarding.x - 2,
-      z: MAINLAND_HARBOR.boarding.z - 0.9,
-    },
-    facing: MAINLAND_HARBOR.gangplank.facing,
+    pos: EWALD_POST,
+    facing: Math.atan2(
+      MAINLAND_HARBOR.gangplank.x - EWALD_POST.x,
+      MAINLAND_HARBOR.gangplank.z - EWALD_POST.z,
+    ),
     color: 0x4a5a7a,
     // Q0 is accepted automatically on the first crossing, but the canonical
     // giver link still belongs on Ewald for quest integrity, save repair, and
@@ -94,11 +104,11 @@ export const LAST_BELL_CAMPAIGN_NPCS: Record<string, NpcDef> = {
     id: 'ferrykeeper_odda',
     name: 'Ferrykeeper Odda',
     title: 'The Farshore Crossing',
-    pos: {
-      x: GULLHAVEN_HARBOR.boarding.x - 0.9,
-      z: GULLHAVEN_HARBOR.boarding.z + 1.5,
-    },
-    facing: Math.PI / 2,
+    pos: ODDA_POST,
+    facing: Math.atan2(
+      GULLHAVEN_HARBOR.gangplank.x - ODDA_POST.x,
+      GULLHAVEN_HARBOR.gangplank.z - ODDA_POST.z,
+    ),
     color: 0x4a5a7a,
     questIds: [],
     greeting:
