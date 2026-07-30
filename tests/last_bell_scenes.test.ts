@@ -15,6 +15,7 @@ import { GULLHAVEN_HARBOR, MAINLAND_HARBOR } from '../src/sim/harbor_layout';
 import { registerScenario, scenarioRunFor, startScenario } from '../src/sim/scenarios/scenarios';
 import { answerSceneChoice } from '../src/sim/scenes/choices';
 import {
+  isSceneTerminalTeardownOp,
   registerScene,
   requestSceneSkip,
   sceneActiveFor,
@@ -77,6 +78,11 @@ beforeAll(() => {
       { at: 3.5, kind: 'inputLock', on: false },
     ],
   });
+  registerScene({
+    id: 'scn_test_delayed_walk',
+    duration: 3,
+    ops: [{ at: 1.4, kind: 'playerWalk', to: { x: 40, z: -20 }, speed: 4 }],
+  });
   registerScenario({
     id: 'sc_test_scene_stage',
     dungeonId: 'lb_council',
@@ -86,6 +92,13 @@ beforeAll(() => {
       { id: 'opening', objective: { kind: 'scene' }, sceneId: 'scn_test_doorway' },
       { id: 'after', objective: { kind: 'survive', seconds: 1 } },
     ],
+  });
+  registerScenario({
+    id: 'sc_test_delayed_walk_stage',
+    dungeonId: 'lb_council',
+    questId: QUEST_ID,
+    squad: { actorIds: [] },
+    stages: [{ id: 'opening', objective: { kind: 'scene' }, sceneId: 'scn_test_delayed_walk' }],
   });
 });
 
@@ -233,6 +246,135 @@ describe('scene playback', () => {
     expect(sceneActiveFor(sim.ctx, claimIdOf(sim))).toBe(true); // b has not skipped
     expect(requestSceneSkip(sim.ctx, b)).toBe(true);
     expect(sceneActiveFor(sim.ctx, claimIdOf(sim))).toBe(false);
+  });
+
+  it('sends end to every participant that received start after they leave the audience box', () => {
+    const sim = makeSim();
+    const a = sim.playerId;
+    const b = sim.addPlayer('mage', 'Wayfarer');
+    sim.partyInvite(b, a);
+    sim.partyAccept(b);
+    const bMeta = sim.ctx.players.get(b);
+    bMeta?.questLog.set(QUEST_ID, { questId: QUEST_ID, counts: [0], state: 'active' });
+    startScenario(sim.ctx, 'sc_test_scene_stage', a);
+    startScenario(sim.ctx, 'sc_test_scene_stage', b);
+
+    const started = sceneOps(collect(sim, 2)).filter((event) => event.op.kind === 'start');
+    expect(
+      started.map((event) => event.pid).sort((left, right) => (left ?? 0) - (right ?? 0)),
+    ).toEqual([a, b].sort((left, right) => left - right));
+
+    const instance = sim.ctx.instances.find((slot) => slot.exitId === claimIdOf(sim));
+    const playerB = sim.entities.get(b);
+    expect(instance).toBeDefined();
+    expect(playerB).toBeDefined();
+    if (!instance || !playerB) return;
+    const origin = sim.ctx.instanceOriginOf(instance);
+    playerB.pos.x = origin.x + 121;
+    playerB.prevPos = { ...playerB.pos };
+    const latePid = sim.addPlayer('rogue', 'Latecomer');
+    const latePlayer = sim.entities.get(latePid);
+    expect(latePlayer).toBeDefined();
+    if (!latePlayer) return;
+    latePlayer.pos = { ...sim.player.pos };
+    latePlayer.prevPos = { ...latePlayer.pos };
+
+    expect(sim.sceneReconnectStateFor(b)).toMatchObject({
+      sceneId: 'scn_test_doorway',
+      inputLocked: true,
+      letterbox: true,
+    });
+    expect(sim.sceneReconnectStateFor(latePid)).toBeNull();
+
+    const remaining = sceneOps(collect(sim, 5 * 20));
+    expect(remaining.some((event) => event.pid === latePid)).toBe(false);
+    expect(remaining.filter((event) => event.pid === b).map((event) => event.op)).toEqual([
+      { kind: 'letterbox', on: false },
+      { kind: 'inputLock', on: false },
+      { kind: 'end' },
+    ]);
+    const ended = remaining.filter((event) => event.op.kind === 'end');
+    expect(
+      ended.map((event) => event.pid).sort((left, right) => (left ?? 0) - (right ?? 0)),
+    ).toEqual([a, b].sort((left, right) => left - right));
+  });
+
+  it('does not apply a delayed player walk to a participant that joined after start', () => {
+    const sim = makeSim();
+    const startedPid = sim.playerId;
+    startScenario(sim.ctx, 'sc_test_delayed_walk_stage');
+    const started = sceneOps(collect(sim, 2)).filter((event) => event.op.kind === 'start');
+    expect(started.map((event) => event.pid)).toEqual([startedPid]);
+
+    const latePid = sim.addPlayer('rogue', 'Late Walker');
+    const latePlayer = sim.entities.get(latePid);
+    expect(latePlayer).toBeDefined();
+    if (!latePlayer) return;
+    latePlayer.pos = { ...sim.player.pos };
+    latePlayer.prevPos = { ...latePlayer.pos };
+
+    const events = sceneOps(collect(sim, 2 * 20));
+    expect(events.some((event) => event.pid === startedPid && event.op.kind === 'playerWalk')).toBe(
+      true,
+    );
+    expect(events.some((event) => event.pid === latePid && event.op.kind === 'playerWalk')).toBe(
+      false,
+    );
+    expect(sim.scriptedPlayerWalks.has(startedPid)).toBe(true);
+    expect(sim.scriptedPlayerWalks.has(latePid)).toBe(false);
+    expect(requestSceneSkip(sim.ctx, latePid)).toBe(false);
+    expect(requestSceneSkip(sim.ctx, startedPid)).toBe(true);
+    expect(sceneActiveFor(sim.ctx, claimIdOf(sim))).toBe(false);
+  });
+
+  it('classifies every persistent presentation release as terminal teardown', () => {
+    expect([
+      isSceneTerminalTeardownOp({ kind: 'end' }),
+      isSceneTerminalTeardownOp({ kind: 'camera', shot: { kind: 'release' } }),
+      isSceneTerminalTeardownOp({ kind: 'letterbox', on: false }),
+      isSceneTerminalTeardownOp({ kind: 'inputLock', on: false }),
+      isSceneTerminalTeardownOp({ kind: 'fade', to: 'clear', dur: 0.5 }),
+      isSceneTerminalTeardownOp({ kind: 'music', directive: 'resume' }),
+    ]).toEqual([true, true, true, true, true, true]);
+    expect([
+      isSceneTerminalTeardownOp({ kind: 'letterbox', on: true }),
+      isSceneTerminalTeardownOp({ kind: 'inputLock', on: true }),
+      isSceneTerminalTeardownOp({ kind: 'fade', to: 'black', dur: 0.5 }),
+      isSceneTerminalTeardownOp({ kind: 'music', directive: 'silence' }),
+    ]).toEqual([false, false, false, false]);
+  });
+
+  it('sends end to the started audience when the claim terminates mid-scene', () => {
+    const sim = makeSim();
+    startScenario(sim.ctx, 'sc_test_scene_stage');
+    const started = sceneOps(collect(sim, 2)).filter((event) => event.op.kind === 'start');
+    expect(started.map((event) => event.pid)).toEqual([sim.playerId]);
+
+    const claimId = claimIdOf(sim);
+    const instanceIndex = sim.ctx.instances.findIndex((slot) => slot.exitId === claimId);
+    expect(instanceIndex).toBeGreaterThanOrEqual(0);
+    sim.ctx.instances.splice(instanceIndex, 1);
+
+    const ended = sceneOps(sim.tick()).filter((event) => event.op.kind === 'end');
+    expect(ended.map((event) => event.pid)).toEqual([sim.playerId]);
+    expect(sceneActiveFor(sim.ctx, claimId)).toBe(false);
+  });
+
+  it('sends end when a live playback loses its registered scene definition', () => {
+    const sim = makeSim();
+    startScenario(sim.ctx, 'sc_test_scene_stage');
+    const started = sceneOps(collect(sim, 2)).filter((event) => event.op.kind === 'start');
+    expect(started.map((event) => event.pid)).toEqual([sim.playerId]);
+
+    const claimId = claimIdOf(sim);
+    const playback = sim.scenePlaybacks.get(claimId);
+    expect(playback).toBeDefined();
+    if (!playback) return;
+    playback.sceneId = 'scn_missing_after_start';
+
+    const ended = sceneOps(sim.tick()).filter((event) => event.op.kind === 'end');
+    expect(ended.map((event) => event.pid)).toEqual([sim.playerId]);
+    expect(sceneActiveFor(sim.ctx, claimId)).toBe(false);
   });
 });
 

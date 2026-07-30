@@ -121,6 +121,7 @@ const SCENE_WALL_CLOCK_RE = /\b(?:performance\.now|Date\.now)\b|\bnew\s+Date\s*\
 const SCENE_PRESENTATION_CLOCK_FILES = [
   join(repoRoot, 'src', 'game', 'scene_director.ts'),
   join(repoRoot, 'src', 'game', 'scene_director_core.ts'),
+  join(repoRoot, 'src', 'game', 'scene_teardown_watchdog_core.ts'),
   join(repoRoot, 'src', 'ui', 'hud', 'scene', 'scene_controller.ts'),
   join(repoRoot, 'src', 'ui', 'hud', 'scene', 'scene_overlay_view.ts'),
   join(repoRoot, 'src', 'ui', 'hud', 'scene', 'scene_choice_view.ts'),
@@ -278,6 +279,7 @@ const UI_PURE_CORES = [
   // two src/game entries above.
   'src/game/scene_director_core.ts',
   'src/game/scene_rig_core.ts',
+  'src/game/scene_teardown_watchdog_core.ts',
   'src/ui/trade_view.ts',
 ].map((rel) => join(repoRoot, rel));
 

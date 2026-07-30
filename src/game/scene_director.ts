@@ -18,6 +18,12 @@ import {
   scenePose,
 } from './scene_director_core';
 import type { SceneAttachmentResolver } from './scene_rig_core';
+import {
+  armSceneTeardownWatchdog,
+  clearSceneTeardownWatchdog,
+  consumeSceneTeardownWatchdog,
+  createSceneTeardownWatchdogState,
+} from './scene_teardown_watchdog_core';
 
 export interface SceneDirectorDeps {
   world: () => IWorld;
@@ -31,6 +37,8 @@ export interface SceneDirectorDeps {
   propCue?: (target: string, cue: string, startSec: number) => void;
   /** Scene teardown: every prop cue back to rest. */
   propReset?: () => void;
+  /** Clear the online receipt-side input-lock mirror on terminal teardown. */
+  releaseInputLockMirror?: () => void;
   /** Live world frame of a scene attachment target, when its renderer owns one. */
   attachmentFrame?: SceneAttachmentResolver;
   /** Effective OS-or-game reduced-motion preference, sampled live. */
@@ -39,6 +47,7 @@ export interface SceneDirectorDeps {
 
 export class SceneDirector {
   private readonly state = createSceneDirectorState();
+  private readonly teardownWatchdog = createSceneTeardownWatchdogState();
   private readonly resolveEntity: (id: number) => { x: number; y: number; z: number } | null;
 
   constructor(private readonly deps: SceneDirectorDeps) {
@@ -55,7 +64,12 @@ export class SceneDirector {
     const world = this.deps.world();
     for (const ev of events) {
       if (ev.type === 'sceneSync') {
+        const eventNowSec = ev.presentationTime ?? this.deps.nowSec();
         applySceneSync(this.state, ev.state);
+        if (ev.state === null) clearSceneTeardownWatchdog(this.teardownWatchdog);
+        else {
+          armSceneTeardownWatchdog(this.teardownWatchdog, eventNowSec, ev.state.remainingSeconds);
+        }
         this.deps.musicSilence(ev.state?.musicSilenced ?? false);
         this.deps.propReset?.();
         continue;
@@ -65,7 +79,14 @@ export class SceneDirector {
       // personal events must be dropped here (same gate as hud.handleEvents).
       if (ev.pid !== undefined && ev.pid !== world.playerId) continue;
       const eventNowSec = ev.presentationTime ?? this.deps.nowSec();
+      if (ev.op.kind === 'end') {
+        this.teardown(eventNowSec);
+        continue;
+      }
       const directive = applySceneOp(this.state, ev.op, eventNowSec);
+      if (ev.op.kind === 'start') {
+        armSceneTeardownWatchdog(this.teardownWatchdog, eventNowSec, ev.op.duration);
+      }
       if (directive !== null) {
         const action = sceneMusicAction(directive);
         if (action === 'silence') this.deps.musicSilence(true);
@@ -73,28 +94,24 @@ export class SceneDirector {
         else this.deps.playDirective?.(directive);
       }
       if (ev.op.kind === 'prop') this.deps.propCue?.(ev.op.target, ev.op.cue, eventNowSec);
-      // A skipped scene drops its remaining presentation ops (a scheduled
-      // 'resume' included), so the end op always restores the music and
-      // parks every prop cue.
-      if (ev.op.kind === 'end') {
-        this.deps.musicSilence(false);
-        this.deps.propReset?.();
-      }
     }
   }
 
   /** True while a scene plays (Esc routes to sceneSkip instead of the menu). */
   sceneActive(): boolean {
+    this.expireWatchdog();
     return this.state.sceneActive;
   }
 
   /** True while gameplay input is presentation-locked by the scene. */
   inputLocked(): boolean {
+    this.expireWatchdog();
     return this.state.inputLocked;
   }
 
   /** True while the scene camera owns the pose (shots or the release ease). */
   cameraActive(): boolean {
+    this.expireWatchdog();
     return sceneCameraActive(this.state);
   }
 
@@ -102,6 +119,7 @@ export class SceneDirector {
    *  frame. Entity focus tracks IWorld, and attach shots use the injected
    *  live attachment frame when one is available. */
   cameraPose(live: SceneLivePose): ScenePose | null {
+    this.expireWatchdog();
     return scenePose(
       this.state,
       this.deps.nowSec(),
@@ -115,5 +133,21 @@ export class SceneDirector {
   /** Route a skip gesture (Esc / the HUD skip button) to the authority. */
   requestSkip(): void {
     this.deps.world().sceneSkip();
+  }
+
+  private expireWatchdog(): void {
+    const nowSec = this.deps.nowSec();
+    if (consumeSceneTeardownWatchdog(this.teardownWatchdog, nowSec)) this.teardown(nowSec);
+  }
+
+  private teardown(nowSec: number): void {
+    clearSceneTeardownWatchdog(this.teardownWatchdog);
+    applySceneOp(this.state, { kind: 'end' }, nowSec);
+    // A skipped scene drops its remaining presentation ops (a scheduled
+    // 'resume' included), so every terminal path restores music and parks
+    // every prop cue.
+    this.deps.musicSilence(false);
+    this.deps.propReset?.();
+    this.deps.releaseInputLockMirror?.();
   }
 }
