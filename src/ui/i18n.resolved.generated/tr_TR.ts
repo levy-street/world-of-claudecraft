@@ -6832,7 +6832,8 @@ export const tr_TR: EnTranslations = {
       "incomplete": "O görev tamamlanmadı.",
       "giverMissing": "O görev veren yakında değil.",
       "turnInMissing": "O görevin teslim yeri yakında değil.",
-      "tooFar": "Çok uzakta."
+      "tooFar": "Çok uzakta.",
+      "escortAway": "Eşlik edeceğin kişi şu anda yerinde değil. Kısa süre içinde dönecek."
     }
   },
   "itemUi": {
@@ -12835,7 +12836,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Wren'i Eve Ulaştırmak",
-        "text": "Çırağım Wren iki gün önce Altın Eriyiş hattını yürümeye çıktı ve bir daha geri dönmedi. İzlerini buldum, Kutup Işığı Basamakları'nın güneybatısındaki yol işaretlerinin altında saklanıyor, kurtlardan çok korktuğu için kımıldayamıyor. Bataklığı terk edemem, {playerName}. Onu Basamaklardaki Veyla'nın kampına götür. Işıkların altında güvende olacak.",
+        "text": "Çırağım Wren iki gün önce Altın Eriyiş hattını yürümeye çıktı ve bir daha geri dönmedi. İzlerini buldum, Kutup Işığı Basamakları'nın kuzeydoğusundaki yol işaretlerinin altında saklanıyor, kurtlardan çok korktuğu için kımıldayamıyor. Bataklığı terk edemem, {playerName}. Onu Basamaklardaki Veyla'nın kampına götür. Işıkların altında güvende olacak.",
         "completion": "Kız içeride, battaniyelerimin yarısına sarılı ve yıldızları gökten indirecek kadar konuşuyor. Bugün nazik bir şey yaptın, {playerName}. Diyar bunlardan pek fazla görmüyor.",
         "objectives": {
           "0": {

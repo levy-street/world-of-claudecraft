@@ -6832,7 +6832,8 @@ export const fr_CA: EnTranslations = {
       "incomplete": "Cette quête n'est pas terminée.",
       "giverMissing": "Le donneur de cette quête n'est pas à proximité.",
       "turnInMissing": "Le rendu de cette quête n'est pas à proximité.",
-      "tooFar": "Vous êtes trop loin."
+      "tooFar": "Vous êtes trop loin.",
+      "escortAway": "Votre escorte n'est pas à son poste pour le moment. Elle y reviendra sous peu."
     }
   },
   "itemUi": {
@@ -12835,7 +12836,7 @@ export const fr_CA: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Ramener Wren à bon port",
-        "text": "Mon apprentie Wren est partie parcourir la ligne du Goldmelt il y a deux jours et n'est jamais revenue. J'ai trouvé ses traces, elle s'est terrée sous les bornes routières au sud-ouest des Marches de l'Aurore, trop effrayée par les loups pour bouger. Je ne peux quitter la tourbière, {playerName}. Ramenez-la au camp de Veyla sur les Marches. Elle sera en sécurité sous les lumières.",
+        "text": "Mon apprentie Wren est partie parcourir la ligne du Goldmelt il y a deux jours et n'est jamais revenue. J'ai trouvé ses traces, elle s'est terrée sous les bornes routières au nord-est des Marches de l'Aurore, trop effrayée par les loups pour bouger. Je ne peux quitter la tourbière, {playerName}. Ramenez-la au camp de Veyla sur les Marches. Elle sera en sécurité sous les lumières.",
         "completion": "La fille est à l'intérieur, enroulée dans la moitié de mes couvertures, à discourir sur les étoiles. Vous avez fait une bonne chose aujourd'hui, {playerName}. Le Reach n'en voit pas beaucoup.",
         "objectives": {
           "0": {

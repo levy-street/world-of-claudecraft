@@ -6832,7 +6832,8 @@ export const da_DK: EnTranslations = {
       "incomplete": "Den quest er ikke fuldført.",
       "giverMissing": "Den quest-giver er ikke i nærheden.",
       "turnInMissing": "Den quest-aflevering er ikke i nærheden.",
-      "tooFar": "For langt væk."
+      "tooFar": "For langt væk.",
+      "escortAway": "Din eskorte er ikke på sin post lige nu og vender snart tilbage."
     }
   },
   "itemUi": {
@@ -12835,7 +12836,7 @@ export const da_DK: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Wren Bragt Hjem",
-        "text": "Min lærling Wren gik ud for at gå Guldsmeltets linje for to dage siden og kom aldrig tilbage. Jeg fandt hendes spor, hun sidder under vejmarkeringerne sydvest for Nordlys-Trapperne, for bange for ulvene til at bevæge sig. Jeg kan ikke forlade kæret, {playerName}. Følg hende til Veylas lejr på Trapperne. Hun vil være sikker under lysene.",
+        "text": "Min lærling Wren gik ud for at gå Guldsmeltets linje for to dage siden og kom aldrig tilbage. Jeg fandt hendes spor, hun sidder under vejmarkeringerne nordøst for Nordlys-Trapperne, for bange for ulvene til at bevæge sig. Jeg kan ikke forlade kæret, {playerName}. Følg hende til Veylas lejr på Trapperne. Hun vil være sikker under lysene.",
         "completion": "Pigen er indenfor, svøbt i halvdelen af mine tæpper og snakker stjernerne ned fra himlen. Du gjorde noget venligt i dag, {playerName}. Sløret ser ikke mange af den slags.",
         "objectives": {
           "0": {

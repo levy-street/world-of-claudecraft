@@ -6832,7 +6832,8 @@ export const it_IT: EnTranslations = {
       "incomplete": "Quella missione non è completata.",
       "giverMissing": "Chi assegna quella missione non è vicino.",
       "turnInMissing": "Il punto di consegna di quella missione non è vicino.",
-      "tooFar": "Sei troppo lontano."
+      "tooFar": "Sei troppo lontano.",
+      "escortAway": "La tua scorta non è al suo posto in questo momento. Vi tornerà a breve."
     }
   },
   "itemUi": {
@@ -12835,7 +12836,7 @@ export const it_IT: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Riportare Wren a Casa",
-        "text": "La mia apprendista Wren è uscita per percorrere la linea del Goldmelt due giorni fa e non è mai tornata. Ho trovato le sue tracce, si è rintanata sotto i segnavia a sudovest della Scalinata dell'Aurora, troppo spaventata dai lupi per muoversi. Non posso lasciare la palude, {playerName}. Accompagnala all'accampamento di Veyla sulla Scalinata. Sarà al sicuro sotto le luci.",
+        "text": "La mia apprendista Wren è uscita per percorrere la linea del Goldmelt due giorni fa e non è mai tornata. Ho trovato le sue tracce, si è rintanata sotto i segnavia a nordest della Scalinata dell'Aurora, troppo spaventata dai lupi per muoversi. Non posso lasciare la palude, {playerName}. Accompagnala all'accampamento di Veyla sulla Scalinata. Sarà al sicuro sotto le luci.",
         "completion": "La ragazza è dentro, avvolta in metà delle mie coperte e a chiacchierare con le stelle nel cielo. Hai fatto una cosa gentile oggi, {playerName}. La Distesa non ne vede molte.",
         "objectives": {
           "0": {

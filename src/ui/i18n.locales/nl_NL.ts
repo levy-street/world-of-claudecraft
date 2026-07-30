@@ -7164,6 +7164,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.incomplete': 'Die quest is niet voltooid.',
   'questUi.errors.notInLog': 'Die quest staat niet in je logboek.',
   'questUi.errors.tooFar': 'Te ver weg.',
+  'questUi.errors.escortAway':
+    'Degene die je moet begeleiden is er nu niet. Die komt binnenkort terug.',
   'questUi.errors.turnInMissing': 'Die questinlevering is niet in de buurt.',
   'questUi.errors.unavailable': 'Die quest is niet beschikbaar.',
   'questUi.log.abandon': 'Quest opgeven',
@@ -8670,7 +8672,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'De nacht voelt al ijler aan. Wat hen ook wekt, is nog niet klaar, maar je hebt de Trappen wat rust gekocht.',
   'entities.quests.q_fv_seeing_wren_home.title': 'Wren Veilig Thuisbrengen',
   'entities.quests.q_fv_seeing_wren_home.text':
-    "Mijn leerling Wren ging twee dagen geleden de Goudsmelt-lijn lopen en is nooit teruggekomen. Ik vond haar sporen, ze schuilt onder de wegmarkeringen ten zuidwesten van de Aurora-Trappen, te bang voor de wolven om te bewegen. Ik kan het veen niet verlaten, {playerName}. Breng haar naar Veyla's kamp op de Trappen. Daar is ze veilig onder de lichten.",
+    "Mijn leerling Wren ging twee dagen geleden de Goudsmelt-lijn lopen en is nooit teruggekomen. Ik vond haar sporen, ze schuilt onder de wegmarkeringen ten noordoosten van de Aurora-Trappen, te bang voor de wolven om te bewegen. Ik kan het veen niet verlaten, {playerName}. Breng haar naar Veyla's kamp op de Trappen. Daar is ze veilig onder de lichten.",
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
     'Leerling Wren veilig naar de Aurora-Trappen gebracht',
   'entities.quests.q_fv_seeing_wren_home.completion':

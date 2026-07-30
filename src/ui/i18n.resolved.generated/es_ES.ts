@@ -6832,7 +6832,8 @@ export const es_ES: EnTranslations = {
       "incomplete": "Esa misión no está completada.",
       "giverMissing": "El dador de esa misión no está cerca.",
       "turnInMissing": "La entrega de esa misión no está cerca.",
-      "tooFar": "Está demasiado lejos."
+      "tooFar": "Está demasiado lejos.",
+      "escortAway": "Tu escolta no está en su puesto ahora mismo. Volverá allí en breve."
     }
   },
   "itemUi": {
@@ -12835,7 +12836,7 @@ export const es_ES: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Llevando a Wren a Casa",
-        "text": "Mi aprendiz Wren salió a recorrer la línea del Goldmelt hace dos días y nunca volvió. Encontré sus huellas, está refugiada bajo los mojones al suroeste de los Escalones de la Aurora, demasiado asustada de los lobos para moverse. No puedo dejar la ciénaga, {playerName}. Llévala al campamento de Veyla en los Escalones. Estará a salvo bajo las luces.",
+        "text": "Mi aprendiz Wren salió a recorrer la línea del Goldmelt hace dos días y nunca volvió. Encontré sus huellas, está refugiada bajo los mojones al noreste de los Escalones de la Aurora, demasiado asustada de los lobos para moverse. No puedo dejar la ciénaga, {playerName}. Llévala al campamento de Veyla en los Escalones. Estará a salvo bajo las luces.",
         "completion": "La chica está dentro, envuelta en la mitad de mis mantas y hablándole a las estrellas hasta bajarlas del cielo. Hiciste algo bondadoso hoy, {playerName}. El Reach no ve muchos gestos así.",
         "objectives": {
           "0": {

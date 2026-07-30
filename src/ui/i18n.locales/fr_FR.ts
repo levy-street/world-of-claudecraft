@@ -4126,6 +4126,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.giverMissing': "Le donneur de cette quête n'est pas à proximité.",
   'questUi.errors.turnInMissing': "Le rendu de cette quête n'est pas à proximité.",
   'questUi.errors.tooFar': 'Vous êtes trop loin.',
+  'questUi.errors.escortAway':
+    "Votre escorte n'est pas à son poste pour le moment. Elle y reviendra sous peu.",
   'itemUi.money.goldShort': 'po',
   'itemUi.money.silverShort': 'pa',
   'itemUi.money.copperShort': 'pc',
@@ -9204,7 +9206,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
     "Apprentie Wren ramenée saine et sauve aux Marches de l'Aurore",
   'entities.quests.q_fv_seeing_wren_home.text':
-    "Mon apprentie Wren est partie parcourir la ligne du Goldmelt il y a deux jours et n'est jamais revenue. J'ai trouvé ses traces, elle s'est terrée sous les bornes routières au sud-ouest des Marches de l'Aurore, trop effrayée par les loups pour bouger. Je ne peux quitter la tourbière, {playerName}. Ramenez-la au camp de Veyla sur les Marches. Elle sera en sécurité sous les lumières.",
+    "Mon apprentie Wren est partie parcourir la ligne du Goldmelt il y a deux jours et n'est jamais revenue. J'ai trouvé ses traces, elle s'est terrée sous les bornes routières au nord-est des Marches de l'Aurore, trop effrayée par les loups pour bouger. Je ne peux quitter la tourbière, {playerName}. Ramenez-la au camp de Veyla sur les Marches. Elle sera en sécurité sous les lumières.",
   'entities.quests.q_fv_seeing_wren_home.title': 'Ramener Wren à bon port',
   'entities.quests.q_fv_silent_trapline.completion':
     'Maeve vous envoie ? Ha. Onze ans, et cette femme croit encore que la tourbière va me dévorer. Enfin... cette année, elle pourrait bien avoir raison. Regardez ce que ça a fait à mes lignes.',

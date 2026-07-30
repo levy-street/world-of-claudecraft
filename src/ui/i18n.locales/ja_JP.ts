@@ -2281,6 +2281,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.giverMissing': 'そのクエストの依頼主が近くにいません。',
   'questUi.errors.turnInMissing': 'そのクエストの報告先が近くにいません。',
   'questUi.errors.tooFar': '遠すぎます。',
+  'questUi.errors.escortAway': '護衛する相手は今その場所にいません。しばらくすれば戻ってきます。',
   'itemUi.money.goldShort': '金',
   'itemUi.money.silverShort': '銀',
   'itemUi.money.copperShort': '銅',
@@ -4699,7 +4700,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_rime_unbound.objectives.0.label': '霧氷の精霊を倒した',
   'entities.quests.q_fv_seeing_wren_home.title': 'レンを送り届けて',
   'entities.quests.q_fv_seeing_wren_home.text':
-    '弟子のレンが二日前にゴールドメルトの罠のラインを見回りに出て、戻ってこない。足跡は見つけた。オーロラの階段の南西の道標の下に隠れて、狼が怖くて動けずにいるんだ。わたしは沼を離れられない、{playerName}。あの子を階段のヴェイラの野営まで歩かせてやってくれ。光の下なら安全だ。',
+    '弟子のレンが二日前にゴールドメルトの罠のラインを見回りに出て、戻ってこない。足跡は見つけた。オーロラの階段の北東の道標の下に隠れて、狼が怖くて動けずにいるんだ。わたしは沼を離れられない、{playerName}。あの子を階段のヴェイラの野営まで歩かせてやってくれ。光の下なら安全だ。',
   'entities.quests.q_fv_seeing_wren_home.completion':
     'あの子は中にいるよ。わたしの毛布を半分体に巻きつけて、空から星を語り落とす勢いでしゃべっている。今日、お前は優しいことをしたね、{playerName}。この果ての地では、めったに見られないものだよ。',
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':

@@ -6832,7 +6832,8 @@ export const pl_PL: EnTranslations = {
       "incomplete": "To zadanie nie jest ukończone.",
       "giverMissing": "Tego zleceniodawcy nie ma w pobliżu.",
       "turnInMissing": "Miejsca oddania tego zadania nie ma w pobliżu.",
-      "tooFar": "Za daleko."
+      "tooFar": "Za daleko.",
+      "escortAway": "Osoba, którą masz eskortować, nie jest teraz na miejscu. Wróci tam wkrótce."
     }
   },
   "itemUi": {
@@ -12835,7 +12836,7 @@ export const pl_PL: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Odprowadzenie Wren do Domu",
-        "text": "Moja uczennica Wren wyszła dwa dni temu, by przejść linię Złotego Roztopu, i nigdy nie wróciła. Znalazłam jej ślady, schowała się pod znacznikami drogi na południowy zachód od Stopni Zorzy, zbyt przerażona wilkami, by się ruszyć. Nie mogę opuścić mokradła, {playerName}. Odprowadź ją do obozu Veyli na Stopniach. Będzie bezpieczna pod światłami.",
+        "text": "Moja uczennica Wren wyszła dwa dni temu, by przejść linię Złotego Roztopu, i nigdy nie wróciła. Znalazłam jej ślady, schowała się pod znacznikami drogi na północny wschód od Stopni Zorzy, zbyt przerażona wilkami, by się ruszyć. Nie mogę opuścić mokradła, {playerName}. Odprowadź ją do obozu Veyli na Stopniach. Będzie bezpieczna pod światłami.",
         "completion": "Dziewczyna jest w środku, owinięta w połowę moich koców i gadająca tak, że gwiazdy pospadałyby z nieba. Zrobiłeś dziś coś dobrego, {playerName}. Kraina niewiele takich rzeczy widuje.",
         "objectives": {
           "0": {

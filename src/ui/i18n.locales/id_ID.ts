@@ -4549,7 +4549,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
     'Murid Wren diantar dengan selamat ke Tangga Aurora',
   'entities.quests.q_fv_seeing_wren_home.text':
-    'Muridku Wren pergi menyusuri jalur Goldmelt dua hari lalu dan tak pernah kembali. Aku menemukan jejaknya, ia bersembunyi di bawah penanda jalan barat daya Tangga Aurora, terlalu takut pada serigala untuk bergerak. Aku tak bisa meninggalkan rawa ini, {playerName}. Antarkan dia ke perkemahan Veyla di Tangga itu. Ia akan aman di bawah cahaya-cahaya itu.',
+    'Muridku Wren pergi menyusuri jalur Goldmelt dua hari lalu dan tak pernah kembali. Aku menemukan jejaknya, ia bersembunyi di bawah penanda jalan timur laut Tangga Aurora, terlalu takut pada serigala untuk bergerak. Aku tak bisa meninggalkan rawa ini, {playerName}. Antarkan dia ke perkemahan Veyla di Tangga itu. Ia akan aman di bawah cahaya-cahaya itu.',
   'entities.quests.q_fv_seeing_wren_home.title': 'Mengantar Wren Pulang',
   'entities.quests.q_fv_silent_trapline.completion':
     'Maeve mengirimmu? Ha. Sebelas tahun dan wanita itu masih mengira rawa ini akan memakanku. Yah... tahun ini mungkin dia benar. Lihatlah apa yang telah dilakukannya pada jalur-jalurku.',
@@ -7780,6 +7780,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.incomplete': 'Misi itu belum selesai.',
   'questUi.errors.notInLog': 'Misi itu tidak ada di catatan Anda.',
   'questUi.errors.tooFar': 'Terlalu jauh.',
+  'questUi.errors.escortAway':
+    'Orang yang harus kau antar sedang tidak ada di tempatnya. Ia akan segera kembali.',
   'questUi.errors.turnInMissing': 'Tempat penyerahan misi itu tidak ada di dekat sini.',
   'questUi.errors.unavailable': 'Misi itu tidak tersedia.',
   'questUi.log.abandon': 'Tinggalkan Misi',

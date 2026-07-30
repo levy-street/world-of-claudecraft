@@ -6832,7 +6832,8 @@ export const zh_TW: EnTranslations = {
       "incomplete": "該任務尚未完成。",
       "giverMissing": "該任務發布者不在附近。",
       "turnInMissing": "該任務交付點不在附近。",
-      "tooFar": "距離太遠。"
+      "tooFar": "距離太遠。",
+      "escortAway": "你要護送的人現在不在原處，稍後就會回來。"
     }
   },
   "itemUi": {
@@ -12835,7 +12836,7 @@ export const zh_TW: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "送雯恩回家",
-        "text": "我的學徒雯恩兩天前出門去巡融金隘口的路線，就再沒回來。我找到了她的足跡，她躲在極光台階西南邊的路標底下，怕狼怕得不敢動彈。我離不開這片沼澤，{playerName}。陪她走到台階上薇拉的營地吧。在極光底下她會安全的。",
+        "text": "我的學徒雯恩兩天前出門去巡融金隘口的路線，就再沒回來。我找到了她的足跡，她躲在極光台階東北邊的路標底下，怕狼怕得不敢動彈。我離不開這片沼澤，{playerName}。陪她走到台階上薇拉的營地吧。在極光底下她會安全的。",
         "completion": "姑娘進帳了，裹著我一半的毯子，正把天上的星星一顆顆說下來。你今天做了件善事，{playerName}。霜幕之境可不常見到善事。",
         "objectives": {
           "0": {

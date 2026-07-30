@@ -6832,7 +6832,8 @@ export const id_ID: EnTranslations = {
       "incomplete": "Misi itu belum selesai.",
       "giverMissing": "Pemberi misi itu tidak ada di dekat sini.",
       "turnInMissing": "Tempat penyerahan misi itu tidak ada di dekat sini.",
-      "tooFar": "Terlalu jauh."
+      "tooFar": "Terlalu jauh.",
+      "escortAway": "Orang yang harus kau antar sedang tidak ada di tempatnya. Ia akan segera kembali."
     }
   },
   "itemUi": {
@@ -12835,7 +12836,7 @@ export const id_ID: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Mengantar Wren Pulang",
-        "text": "Muridku Wren pergi menyusuri jalur Goldmelt dua hari lalu dan tak pernah kembali. Aku menemukan jejaknya, ia bersembunyi di bawah penanda jalan barat daya Tangga Aurora, terlalu takut pada serigala untuk bergerak. Aku tak bisa meninggalkan rawa ini, {playerName}. Antarkan dia ke perkemahan Veyla di Tangga itu. Ia akan aman di bawah cahaya-cahaya itu.",
+        "text": "Muridku Wren pergi menyusuri jalur Goldmelt dua hari lalu dan tak pernah kembali. Aku menemukan jejaknya, ia bersembunyi di bawah penanda jalan timur laut Tangga Aurora, terlalu takut pada serigala untuk bergerak. Aku tak bisa meninggalkan rawa ini, {playerName}. Antarkan dia ke perkemahan Veyla di Tangga itu. Ia akan aman di bawah cahaya-cahaya itu.",
         "completion": "Gadis itu ada di dalam, terbungkus setengah selimutku dan mengoceh tentang bintang-bintang di langit. Kau melakukan hal yang baik hari ini, {playerName}. Reach ini tak sering melihat hal seperti itu.",
         "objectives": {
           "0": {

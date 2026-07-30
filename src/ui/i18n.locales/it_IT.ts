@@ -3671,6 +3671,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.giverMissing': 'Chi assegna quella missione non è vicino.',
   'questUi.errors.turnInMissing': 'Il punto di consegna di quella missione non è vicino.',
   'questUi.errors.tooFar': 'Sei troppo lontano.',
+  'questUi.errors.escortAway':
+    'La tua scorta non è al suo posto in questo momento. Vi tornerà a breve.',
   'itemUi.money.goldShort': 'o',
   'itemUi.money.silverShort': 'a',
   'itemUi.money.copperShort': 'r',
@@ -8749,7 +8751,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "La notte sembra già più rarefatta. Qualunque cosa li risvegli non ha finito, ma hai comprato un po' di quiete per la Scalinata.",
   'entities.quests.q_fv_seeing_wren_home.title': 'Riportare Wren a Casa',
   'entities.quests.q_fv_seeing_wren_home.text':
-    "La mia apprendista Wren è uscita per percorrere la linea del Goldmelt due giorni fa e non è mai tornata. Ho trovato le sue tracce, si è rintanata sotto i segnavia a sudovest della Scalinata dell'Aurora, troppo spaventata dai lupi per muoversi. Non posso lasciare la palude, {playerName}. Accompagnala all'accampamento di Veyla sulla Scalinata. Sarà al sicuro sotto le luci.",
+    "La mia apprendista Wren è uscita per percorrere la linea del Goldmelt due giorni fa e non è mai tornata. Ho trovato le sue tracce, si è rintanata sotto i segnavia a nordest della Scalinata dell'Aurora, troppo spaventata dai lupi per muoversi. Non posso lasciare la palude, {playerName}. Accompagnala all'accampamento di Veyla sulla Scalinata. Sarà al sicuro sotto le luci.",
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
     "Apprendista Wren accompagnata sana e salva alla Scalinata dell'Aurora",
   'entities.quests.q_fv_seeing_wren_home.completion':

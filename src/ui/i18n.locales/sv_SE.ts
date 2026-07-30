@@ -6955,6 +6955,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.incomplete': 'Det uppdraget är inte slutfört.',
   'questUi.errors.notInLog': 'Det uppdraget finns inte i din logg.',
   'questUi.errors.tooFar': 'För långt bort.',
+  'questUi.errors.escortAway':
+    'Den du ska eskortera är inte på plats just nu och återvänder snart.',
   'questUi.errors.turnInMissing': 'Den uppdragsmottagaren är inte i närheten.',
   'questUi.errors.unavailable': 'Det uppdraget är inte tillgängligt.',
   'questUi.log.abandon': 'Överge uppdrag',
@@ -8382,7 +8384,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
     'Lärling Wren säkert förd till Norrskenstrapporna',
   'entities.quests.q_fv_seeing_wren_home.text':
-    'Min lärling Wren gick ut för att vandra Guldsmältans linje för två dagar sedan och kom aldrig tillbaka. Jag fann hennes spår, hon gömmer sig under vägmärkena sydväst om Norrskenstrapporna, för rädd för vargarna för att röra sig. Jag kan inte lämna kärret, {playerName}. För henne till Veylas läger på trapporna. Hon kommer vara säker under skenen.',
+    'Min lärling Wren gick ut för att vandra Guldsmältans linje för två dagar sedan och kom aldrig tillbaka. Jag fann hennes spår, hon gömmer sig under vägmärkena nordost om Norrskenstrapporna, för rädd för vargarna för att röra sig. Jag kan inte lämna kärret, {playerName}. För henne till Veylas läger på trapporna. Hon kommer vara säker under skenen.',
   'entities.quests.q_fv_seeing_wren_home.title': 'Föra Wren hem',
   'entities.quests.q_fv_silent_trapline.completion':
     'Maeve skickade dig? Ha. Elva år och kvinnan tror fortfarande att kärret ska äta upp mig. Nåväl... i år kanske hon har rätt. Titta vad det har gjort med mina linor.',

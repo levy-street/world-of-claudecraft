@@ -8416,6 +8416,7 @@ export type TranslationKeyFlat =
   | 'questUi.dialog.unavailable'
   | 'questUi.dialog.worldMarket'
   | 'questUi.dialog.worldMarketAria'
+  | 'questUi.errors.escortAway'
   | 'questUi.errors.giverMissing'
   | 'questUi.errors.incomplete'
   | 'questUi.errors.notInLog'

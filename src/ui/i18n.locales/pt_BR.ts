@@ -3635,6 +3635,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.giverMissing': 'Quem oferece essa missão não está por perto.',
   'questUi.errors.turnInMissing': 'A entrega dessa missão não está por perto.',
   'questUi.errors.tooFar': 'Você está longe demais.',
+  'questUi.errors.escortAway':
+    'Sua escolta não está em seu posto agora. Ela voltará para lá em breve.',
   'itemUi.money.goldShort': 'o',
   'itemUi.money.silverShort': 'p',
   'itemUi.money.copperShort': 'c',
@@ -8587,7 +8589,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'A noite já parece mais leve. O que quer que os desperte não terminou, mas você comprou um pouco de paz para a Escadaria.',
   'entities.quests.q_fv_seeing_wren_home.title': 'Levando Wren para Casa',
   'entities.quests.q_fv_seeing_wren_home.text':
-    'Minha aprendiz Wren saiu para percorrer a linha do Goldmelt há dois dias e nunca voltou. Encontrei suas pegadas, ela está escondida sob os marcos da estrada a sudoeste da Escadaria da Aurora, com medo demais dos lobos para se mover. Não posso deixar o pântano, {playerName}. Leve-a até o acampamento de Veyla na Escadaria. Ela estará segura sob as luzes.',
+    'Minha aprendiz Wren saiu para percorrer a linha do Goldmelt há dois dias e nunca voltou. Encontrei suas pegadas, ela está escondida sob os marcos da estrada a nordeste da Escadaria da Aurora, com medo demais dos lobos para se mover. Não posso deixar o pântano, {playerName}. Leve-a até o acampamento de Veyla na Escadaria. Ela estará segura sob as luzes.',
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
     'Aprendiz Wren levada em segurança até a Escadaria da Aurora',
   'entities.quests.q_fv_seeing_wren_home.completion':

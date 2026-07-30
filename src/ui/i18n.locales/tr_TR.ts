@@ -4504,7 +4504,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
     'Çırak Wren Kutup Işığı Basamaklarına Güvenle Ulaştırıldı',
   'entities.quests.q_fv_seeing_wren_home.text':
-    "Çırağım Wren iki gün önce Altın Eriyiş hattını yürümeye çıktı ve bir daha geri dönmedi. İzlerini buldum, Kutup Işığı Basamakları'nın güneybatısındaki yol işaretlerinin altında saklanıyor, kurtlardan çok korktuğu için kımıldayamıyor. Bataklığı terk edemem, {playerName}. Onu Basamaklardaki Veyla'nın kampına götür. Işıkların altında güvende olacak.",
+    "Çırağım Wren iki gün önce Altın Eriyiş hattını yürümeye çıktı ve bir daha geri dönmedi. İzlerini buldum, Kutup Işığı Basamakları'nın kuzeydoğusundaki yol işaretlerinin altında saklanıyor, kurtlardan çok korktuğu için kımıldayamıyor. Bataklığı terk edemem, {playerName}. Onu Basamaklardaki Veyla'nın kampına götür. Işıkların altında güvende olacak.",
   'entities.quests.q_fv_seeing_wren_home.title': "Wren'i Eve Ulaştırmak",
   'entities.quests.q_fv_silent_trapline.completion':
     'Maeve mi gönderdi seni? Ha. On bir yıl oldu ve kadın hala bataklığın beni yiyeceğini düşünüyor. Şey... bu yıl haklı olabilir. Hatlarıma ne yaptığına bak.',
@@ -7687,6 +7687,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.incomplete': 'O görev tamamlanmadı.',
   'questUi.errors.notInLog': 'O görev kaydında yok.',
   'questUi.errors.tooFar': 'Çok uzakta.',
+  'questUi.errors.escortAway':
+    'Eşlik edeceğin kişi şu anda yerinde değil. Kısa süre içinde dönecek.',
   'questUi.errors.turnInMissing': 'O görevin teslim yeri yakında değil.',
   'questUi.errors.unavailable': 'O görev mevcut değil.',
   'questUi.log.abandon': 'Görevi Bırak',

@@ -1753,6 +1753,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.incomplete': 'Tento úkol není dokončený.',
   'questUi.errors.notInLog': 'Tento úkol nemáš v deníku.',
   'questUi.errors.tooFar': 'Příliš daleko.',
+  'questUi.errors.escortAway':
+    'Ten, koho máš doprovodit, teď není na svém místě. Za chvíli se tam vrátí.',
   'questUi.errors.turnInMissing': 'Místo pro odevzdání tohoto úkolu není poblíž.',
   'questUi.errors.unavailable': 'Tento úkol není dostupný.',
   'questUi.log.abandon': 'Opustit úkol',
@@ -8325,7 +8327,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
     'Učednice Wren bezpečně dovedena ke Schodům polární záře',
   'entities.quests.q_fv_seeing_wren_home.text':
-    'Má učednice Wren šla před dvěma dny projít linii Zlatotání a nikdy se nevrátila. Našel jsem její stopy, schovává se pod cestními značkami jihozápadně od Schodů polární záře, příliš vyděšená z vlků na to, aby se hnula. Nemohu opustit bažinu, {playerName}. Doveď ji do tábora Veyly na schodech. Bude v bezpečí pod světly.',
+    'Má učednice Wren šla před dvěma dny projít linii Zlatotání a nikdy se nevrátila. Našel jsem její stopy, schovává se pod cestními značkami severovýchodně od Schodů polární záře, příliš vyděšená z vlků na to, aby se hnula. Nemohu opustit bažinu, {playerName}. Doveď ji do tábora Veyly na schodech. Bude v bezpečí pod světly.',
   'entities.quests.q_fv_seeing_wren_home.title': 'Doprovodit Wren domů',
   'entities.quests.q_fv_silent_trapline.completion':
     'Maeve tě poslala? Ha. Jedenáct let a ta žena si pořád myslí, že mě bažina sežere. No... letos by mohla mít pravdu. Podívej se, co to udělalo s mými linkami.',

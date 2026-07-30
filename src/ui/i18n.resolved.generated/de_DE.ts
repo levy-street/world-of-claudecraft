@@ -6832,7 +6832,8 @@ export const de_DE: EnTranslations = {
       "incomplete": "Diese Quest ist nicht abgeschlossen.",
       "giverMissing": "Der Questgeber ist nicht in der Nähe.",
       "turnInMissing": "Die Abgabe dieser Quest ist nicht in der Nähe.",
-      "tooFar": "Ihr seid zu weit entfernt."
+      "tooFar": "Ihr seid zu weit entfernt.",
+      "escortAway": "Eure Eskorte ist gerade nicht an ihrem Platz. Sie kehrt in Kürze dorthin zurück."
     }
   },
   "itemUi": {
@@ -12835,7 +12836,7 @@ export const de_DE: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Wren sicher heimbringen",
-        "text": "Meine Lehrling Wren ging vor zwei Tagen los, um die Goldmelt-Linie abzugehen, und kam nie zurück. Ich fand ihre Spuren, sie hat sich unter den Wegmarkierungen südwestlich der Aurorastufen verkrochen, zu verängstigt vor den Wölfen, um sich zu bewegen. Ich kann das Moor nicht verlassen, {playerName}. Bring sie zu Veylas Lager auf den Stufen. Dort wird sie unter den Lichtern sicher sein.",
+        "text": "Meine Lehrling Wren ging vor zwei Tagen los, um die Goldmelt-Linie abzugehen, und kam nie zurück. Ich fand ihre Spuren, sie hat sich unter den Wegmarkierungen nordöstlich der Aurorastufen verkrochen, zu verängstigt vor den Wölfen, um sich zu bewegen. Ich kann das Moor nicht verlassen, {playerName}. Bring sie zu Veylas Lager auf den Stufen. Dort wird sie unter den Lichtern sicher sein.",
         "completion": "Das Mädchen ist drinnen, in die Hälfte meiner Decken gewickelt, und redet den Sternen den Himmel voll. Du hast heute etwas Gutes getan, {playerName}. Davon sieht der Reach nicht viel.",
         "objectives": {
           "0": {

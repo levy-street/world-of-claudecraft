@@ -2651,6 +2651,7 @@ async function startGame(
         (node) => gatherNodeToolGateFor(world, node),
         t('questUi.errors.tooFar'),
         t('hudChrome.gathering.notReady'),
+        t('questUi.errors.escortAway'),
         t('errors.nothingInteract'),
       ),
       input,

@@ -2306,6 +2306,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.giverMissing': 'Выдавший это задание не рядом.',
   'questUi.errors.turnInMissing': 'Место сдачи этого задания не рядом.',
   'questUi.errors.tooFar': 'Слишком далеко.',
+  'questUi.errors.escortAway': 'Тот, кого вы должны сопроводить, сейчас не на месте. Он скоро туда вернётся.',
   'itemUi.money.goldShort': 'з',
   'itemUi.money.silverShort': 'с',
   'itemUi.money.copperShort': 'м',
@@ -4755,7 +4756,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_sprung_traps.objectives.1.label': 'Капкан возвращён',
   'entities.quests.q_fv_seeing_wren_home.title': 'Проводить Рен домой',
   'entities.quests.q_fv_seeing_wren_home.text':
-    'Моя ученица Рен два дня назад ушла обходить линию у Золотой Проталины и не вернулась. Я нашёл её следы: она забилась под дорожные вехи к юго-западу от Ступеней Сияния и от страха перед волками не может сдвинуться с места. Мне нельзя оставить топь, {playerName}. Доведи её до лагеря Вейлы на Ступенях. Под огнями она будет в безопасности.',
+    'Моя ученица Рен два дня назад ушла обходить линию у Золотой Проталины и не вернулась. Я нашёл её следы: она забилась под дорожные вехи к северо-востоку от Ступеней Сияния и от страха перед волками не может сдвинуться с места. Мне нельзя оставить топь, {playerName}. Доведи её до лагеря Вейлы на Ступенях. Под огнями она будет в безопасности.',
   'entities.quests.q_fv_seeing_wren_home.completion':
     'Девочка внутри, закутана в половину моих одеял и болтает так, что звёзды с неба сыплются. Ты сделал сегодня доброе дело, {playerName}. Предел таких видит немного.',
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':

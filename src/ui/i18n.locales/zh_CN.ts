@@ -2183,6 +2183,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.giverMissing': '该任务发布者不在附近。',
   'questUi.errors.turnInMissing': '该任务交付点不在附近。',
   'questUi.errors.tooFar': '距离太远。',
+  'questUi.errors.escortAway': '你要护送的人现在不在原处，稍后就会回来。',
   'itemUi.money.goldShort': '金',
   'itemUi.money.silverShort': '银',
   'itemUi.money.copperShort': '铜',
@@ -4526,7 +4527,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '姑娘已经在帐里了，裹着我一半的毯子，叽叽喳喳快把星星都聊下来了。你今天做了件善事，{playerName}。这样的事，霜幕之境可不多见。',
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label': '已护送学徒雯恩平安抵达极光台阶',
   'entities.quests.q_fv_seeing_wren_home.text':
-    '我的学徒雯恩两天前出门去巡融金线，就再没回来。我找到了她的足迹，她正躲在极光台阶西南边的路标底下，怕狼怕得不敢挪窝。我离不开这片沼泽，{playerName}。送她去台阶上薇拉的营地吧。在极光底下她会安全的。',
+    '我的学徒雯恩两天前出门去巡融金线，就再没回来。我找到了她的足迹，她正躲在极光台阶东北边的路标底下，怕狼怕得不敢挪窝。我离不开这片沼泽，{playerName}。送她去台阶上薇拉的营地吧。在极光底下她会安全的。',
   'entities.quests.q_fv_seeing_wren_home.title': '送雯恩回家',
   'entities.quests.q_fv_silent_trapline.completion':
     '梅芙派你来的？哈。十一年了，那女人还当沼泽会吃了我。唔……今年她也许还真说对了。看看它把我的陷阱线糟蹋成什么样了。',

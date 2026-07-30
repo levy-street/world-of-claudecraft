@@ -6832,7 +6832,8 @@ export const sv_SE: EnTranslations = {
       "incomplete": "Det uppdraget är inte slutfört.",
       "giverMissing": "Den uppdragsgivaren är inte i närheten.",
       "turnInMissing": "Den uppdragsmottagaren är inte i närheten.",
-      "tooFar": "För långt bort."
+      "tooFar": "För långt bort.",
+      "escortAway": "Den du ska eskortera är inte på plats just nu och återvänder snart."
     }
   },
   "itemUi": {
@@ -12835,7 +12836,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Föra Wren hem",
-        "text": "Min lärling Wren gick ut för att vandra Guldsmältans linje för två dagar sedan och kom aldrig tillbaka. Jag fann hennes spår, hon gömmer sig under vägmärkena sydväst om Norrskenstrapporna, för rädd för vargarna för att röra sig. Jag kan inte lämna kärret, {playerName}. För henne till Veylas läger på trapporna. Hon kommer vara säker under skenen.",
+        "text": "Min lärling Wren gick ut för att vandra Guldsmältans linje för två dagar sedan och kom aldrig tillbaka. Jag fann hennes spår, hon gömmer sig under vägmärkena nordost om Norrskenstrapporna, för rädd för vargarna för att röra sig. Jag kan inte lämna kärret, {playerName}. För henne till Veylas läger på trapporna. Hon kommer vara säker under skenen.",
         "completion": "Flickan är inne, insvept i hälften av mina filtar och pratar stjärnorna ur skyn. Du gjorde något gott idag, {playerName}. Vidderna ser inte många sådana.",
         "objectives": {
           "0": {

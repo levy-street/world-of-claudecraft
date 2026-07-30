@@ -2265,6 +2265,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.giverMissing': '그 퀘스트를 주는 대상이 근처에 없습니다.',
   'questUi.errors.turnInMissing': '그 퀘스트를 보고할 대상이 근처에 없습니다.',
   'questUi.errors.tooFar': '너무 멉니다.',
+  'questUi.errors.escortAway': '호송할 대상이 지금 자리에 없습니다. 잠시 후 그곳으로 돌아옵니다.',
   'itemUi.money.goldShort': '금',
   'itemUi.money.silverShort': '은',
   'itemUi.money.copperShort': '동',
@@ -4683,7 +4684,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_rime_unbound.objectives.0.label': '서리 정령 처치',
   'entities.quests.q_fv_seeing_wren_home.title': '렌을 바래다주는 길',
   'entities.quests.q_fv_seeing_wren_home.text':
-    '내 견습생 렌이 이틀 전에 금빛눈녹이 길을 살피러 나갔다가 돌아오지 않았네. 발자국은 찾았어. 오로라 계단 남서쪽 길표지 아래 웅크리고 있는데, 늑대가 무서워 꼼짝을 못 하고 있지. 나는 늪을 비울 수가 없네, {playerName}. 그 아이를 계단 위 베일라의 야영지까지 데려다주게. 빛 아래라면 안전할 걸세.',
+    '내 견습생 렌이 이틀 전에 금빛눈녹이 길을 살피러 나갔다가 돌아오지 않았네. 발자국은 찾았어. 오로라 계단 북동쪽 길표지 아래 웅크리고 있는데, 늑대가 무서워 꼼짝을 못 하고 있지. 나는 늪을 비울 수가 없네, {playerName}. 그 아이를 계단 위 베일라의 야영지까지 데려다주게. 빛 아래라면 안전할 걸세.',
   'entities.quests.q_fv_seeing_wren_home.completion':
     '그 아이는 안에 있네. 내 담요를 절반이나 두르고서 하늘의 별을 다 헤아릴 기세로 떠들고 있지. 오늘 자네는 고운 일을 했어, {playerName}. 서리장막 봉우리에서는 좀처럼 보기 힘든 일이라네.',
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':

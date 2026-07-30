@@ -6832,7 +6832,8 @@ export const zh_CN: EnTranslations = {
       "incomplete": "该任务尚未完成。",
       "giverMissing": "该任务发布者不在附近。",
       "turnInMissing": "该任务交付点不在附近。",
-      "tooFar": "距离太远。"
+      "tooFar": "距离太远。",
+      "escortAway": "你要护送的人现在不在原处，稍后就会回来。"
     }
   },
   "itemUi": {
@@ -12835,7 +12836,7 @@ export const zh_CN: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "送雯恩回家",
-        "text": "我的学徒雯恩两天前出门去巡融金线，就再没回来。我找到了她的足迹，她正躲在极光台阶西南边的路标底下，怕狼怕得不敢挪窝。我离不开这片沼泽，{playerName}。送她去台阶上薇拉的营地吧。在极光底下她会安全的。",
+        "text": "我的学徒雯恩两天前出门去巡融金线，就再没回来。我找到了她的足迹，她正躲在极光台阶东北边的路标底下，怕狼怕得不敢挪窝。我离不开这片沼泽，{playerName}。送她去台阶上薇拉的营地吧。在极光底下她会安全的。",
         "completion": "姑娘已经在帐里了，裹着我一半的毯子，叽叽喳喳快把星星都聊下来了。你今天做了件善事，{playerName}。这样的事，霜幕之境可不多见。",
         "objectives": {
           "0": {

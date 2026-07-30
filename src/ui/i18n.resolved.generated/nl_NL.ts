@@ -6832,7 +6832,8 @@ export const nl_NL: EnTranslations = {
       "incomplete": "Die quest is niet voltooid.",
       "giverMissing": "Die questgever is niet in de buurt.",
       "turnInMissing": "Die questinlevering is niet in de buurt.",
-      "tooFar": "Te ver weg."
+      "tooFar": "Te ver weg.",
+      "escortAway": "Degene die je moet begeleiden is er nu niet. Die komt binnenkort terug."
     }
   },
   "itemUi": {
@@ -12835,7 +12836,7 @@ export const nl_NL: EnTranslations = {
       },
       "q_fv_seeing_wren_home": {
         "title": "Wren Veilig Thuisbrengen",
-        "text": "Mijn leerling Wren ging twee dagen geleden de Goudsmelt-lijn lopen en is nooit teruggekomen. Ik vond haar sporen, ze schuilt onder de wegmarkeringen ten zuidwesten van de Aurora-Trappen, te bang voor de wolven om te bewegen. Ik kan het veen niet verlaten, {playerName}. Breng haar naar Veyla's kamp op de Trappen. Daar is ze veilig onder de lichten.",
+        "text": "Mijn leerling Wren ging twee dagen geleden de Goudsmelt-lijn lopen en is nooit teruggekomen. Ik vond haar sporen, ze schuilt onder de wegmarkeringen ten noordoosten van de Aurora-Trappen, te bang voor de wolven om te bewegen. Ik kan het veen niet verlaten, {playerName}. Breng haar naar Veyla's kamp op de Trappen. Daar is ze veilig onder de lichten.",
         "completion": "Het meisje is binnen, gewikkeld in de helft van mijn dekens en kletsend de sterren van de hemel. Je hebt vandaag iets goeds gedaan, {playerName}. Dat ziet de Sluier niet vaak.",
         "objectives": {
           "0": {

@@ -7189,6 +7189,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.incomplete': 'To zadanie nie jest ukończone.',
   'questUi.errors.notInLog': 'Tego zadania nie ma w twoim dzienniku.',
   'questUi.errors.tooFar': 'Za daleko.',
+  'questUi.errors.escortAway':
+    'Osoba, którą masz eskortować, nie jest teraz na miejscu. Wróci tam wkrótce.',
   'questUi.errors.turnInMissing': 'Miejsca oddania tego zadania nie ma w pobliżu.',
   'questUi.errors.unavailable': 'To zadanie jest niedostępne.',
   'questUi.log.abandon': 'Porzuć zadanie',
@@ -8571,7 +8573,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
     'Uczennica Wren bezpiecznie odprowadzona do Stopni Zorzy',
   'entities.quests.q_fv_seeing_wren_home.text':
-    'Moja uczennica Wren wyszła dwa dni temu, by przejść linię Złotego Roztopu, i nigdy nie wróciła. Znalazłam jej ślady, schowała się pod znacznikami drogi na południowy zachód od Stopni Zorzy, zbyt przerażona wilkami, by się ruszyć. Nie mogę opuścić mokradła, {playerName}. Odprowadź ją do obozu Veyli na Stopniach. Będzie bezpieczna pod światłami.',
+    'Moja uczennica Wren wyszła dwa dni temu, by przejść linię Złotego Roztopu, i nigdy nie wróciła. Znalazłam jej ślady, schowała się pod znacznikami drogi na północny wschód od Stopni Zorzy, zbyt przerażona wilkami, by się ruszyć. Nie mogę opuścić mokradła, {playerName}. Odprowadź ją do obozu Veyli na Stopniach. Będzie bezpieczna pod światłami.',
   'entities.quests.q_fv_seeing_wren_home.title': 'Odprowadzenie Wren do Domu',
   'entities.quests.q_fv_silent_trapline.completion':
     'Maeve cię przysłała? Ha. Jedenaście lat, a ta kobieta wciąż myśli, że mokradło mnie pożre. Cóż... w tym roku może mieć rację. Spójrz, co zrobiło z moimi liniami.',

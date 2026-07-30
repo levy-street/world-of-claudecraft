@@ -3,7 +3,7 @@
 // waves that attack the escortee and pause the walk, failure + respawn, and
 // the success credit that readies the quest.
 import { describe, expect, it } from 'vitest';
-import { ESCORTS, MOBS, NPCS, QUESTS } from '../src/sim/data';
+import { ESCORTS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
 
@@ -70,6 +70,29 @@ describe('escort content integrity', () => {
         expect(ambush.atWaypoint).toBeLessThan(def.waypoints.length);
       }
     }
+  });
+
+  // The quest text is the ONLY navigation aid this game gives (there are no
+  // objective markers on the map or minimap), so a wrong bearing is a
+  // functional bug. Bearings must be computed under the convention the compass
+  // and the map actually render: +z north, +x WEST, so east is -x (see
+  // src/ui/compass.ts, and src/ui/map_terrain.ts drawing +x on the left).
+  // PR #1904 previously pinned a direction "fix" to the mirrored convention by
+  // reading it off content ids, so this asserts the axes explicitly.
+  it('sends the player the way the compass and map actually point', () => {
+    const frostveil = ZONES.find((zone) => zone.id === 'frostveil');
+    const steps = frostveil?.pois?.find((poi) => poi.id === 'the_aurora_steps');
+    expect(steps).toBeTruthy();
+    if (!steps) return;
+    const post = ESCORTS.esc_fv_wren.start;
+
+    // East is -x: a SMALLER x than the landmark is east of it. North is +z.
+    expect(post.x).toBeLessThan(steps.x);
+    expect(post.z).toBeGreaterThan(steps.z);
+
+    const text = QUESTS.q_fv_seeing_wren_home.text;
+    expect(text).toContain('northeast of the Aurora Steps');
+    expect(text).not.toContain('southwest');
   });
 });
 

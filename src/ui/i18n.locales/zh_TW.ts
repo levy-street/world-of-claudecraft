@@ -2185,6 +2185,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'questUi.errors.giverMissing': '該任務發布者不在附近。',
   'questUi.errors.turnInMissing': '該任務交付點不在附近。',
   'questUi.errors.tooFar': '距離太遠。',
+  'questUi.errors.escortAway': '你要護送的人現在不在原處，稍後就會回來。',
   'itemUi.money.goldShort': '金',
   'itemUi.money.silverShort': '銀',
   'itemUi.money.copperShort': '銅',
@@ -4393,7 +4394,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_sprung_traps.objectives.1.label': '已尋回陷阱',
   'entities.quests.q_fv_seeing_wren_home.title': '送雯恩回家',
   'entities.quests.q_fv_seeing_wren_home.text':
-    '我的學徒雯恩兩天前出門去巡融金隘口的路線，就再沒回來。我找到了她的足跡，她躲在極光台階西南邊的路標底下，怕狼怕得不敢動彈。我離不開這片沼澤，{playerName}。陪她走到台階上薇拉的營地吧。在極光底下她會安全的。',
+    '我的學徒雯恩兩天前出門去巡融金隘口的路線，就再沒回來。我找到了她的足跡，她躲在極光台階東北邊的路標底下，怕狼怕得不敢動彈。我離不開這片沼澤，{playerName}。陪她走到台階上薇拉的營地吧。在極光底下她會安全的。',
   'entities.quests.q_fv_seeing_wren_home.completion':
     '姑娘進帳了，裹著我一半的毯子，正把天上的星星一顆顆說下來。你今天做了件善事，{playerName}。霜幕之境可不常見到善事。',
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label': '已護送學徒雯恩安全抵達極光台階',
