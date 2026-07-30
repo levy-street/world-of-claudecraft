@@ -109,10 +109,34 @@ describe('no test file registers the same block twice (#2506)', () => {
     // The other way a scan goes quiet: `ts.createSourceFile` does not throw on a
     // malformed source, it returns a partial tree. A file the parser gave up on
     // contributes no blocks, cannot hold a duplicate, and leaves the scan with
-    // nothing to show for it. Every `*.test.ts` in the tree registers at least
-    // one block today, so nothing yet excuses a zero, and a regression in the
-    // head resolver that hit a whole file family would land here first.
-    const empty = perFile.filter((f) => /\.test\.ts$/.test(f.file) && f.blocks.length === 0);
+    // nothing to show for it. Nearly every `*.test.ts` in the tree registers at
+    // least one block of its own, so a zero is normally the tell, and a
+    // regression in the head resolver that hit a whole file family would land
+    // here first.
+    //
+    // The one shape that legitimately registers none: the parity gate's shards,
+    // each of which is a single `runParityShard(n)` call and gets its blocks
+    // from the shared runner. Named exactly rather than pattern-matched, so a
+    // NEW empty file still fails, and each one is proved below to really
+    // delegate rather than just being empty.
+    const DELEGATED_TO_A_SHARED_RUNNER = [
+      'parity/parity_a.test.ts',
+      'parity/parity_b.test.ts',
+      'parity/parity_c.test.ts',
+      'parity/parity_d.test.ts',
+      'parity/parity_e.test.ts',
+      'parity/parity_f.test.ts',
+      'parity/parity_g.test.ts',
+    ];
+    for (const rel of DELEGATED_TO_A_SHARED_RUNNER) {
+      const src = readFileSync(path.join(TESTS_ROOT, rel), 'utf8');
+      expect(src, `${rel} no longer delegates: it needs its own row above`).toMatch(
+        /runParityShard\(\d+\)/,
+      );
+    }
+    const empty = perFile
+      .filter((f) => /\.test\.ts$/.test(f.file) && f.blocks.length === 0)
+      .filter((f) => !DELEGATED_TO_A_SHARED_RUNNER.includes(f.file));
     expect(empty.map((f) => f.file)).toEqual([]);
   });
 
@@ -151,8 +175,12 @@ describe('no test file registers the same block twice (#2506)', () => {
     const titles: Array<[string, string]> = [
       ['gathering.test.ts', "describe('resolveCorpseFocusHarvest: concentrate vs spread"],
       ['gathering.test.ts', "describe('harvestTierQuantity'"],
-      ['fixes.test.ts', "describe('mob tap rights'"],
-      ['fixes.test.ts', "describe('pet heel warp'"],
+      // #1584 split fixes.test.ts, and these two rode the tail into
+      // fixes_loot_npcs.test.ts. The pin follows the BLOCK, not the filename:
+      // this row exists to catch a re-duplicating merge or a deletion, and both
+      // hazards moved with the code.
+      ['fixes_loot_npcs.test.ts', "describe('mob tap rights'"],
+      ['fixes_loot_npcs.test.ts', "describe('pet heel warp'"],
     ];
     for (const [file, title] of titles) {
       const found = perFile.find((f) => f.file === file);

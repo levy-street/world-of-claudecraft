@@ -43,8 +43,8 @@ function mustMeta(sim: Sim, pid: number) {
   return meta;
 }
 
-function makeWorld() {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+function makeWorld(seed = 42) {
+  return new Sim({ seed, playerClass: 'warrior', noPlayer: true });
 }
 
 function mustEntity(sim: Sim, pid: number): Entity {
@@ -150,7 +150,11 @@ describe('gather node harvest (#1121)', () => {
   });
 
   it("two players harvesting the same node each get their own respawn timer: A's harvest never blocks B", () => {
-    const sim = makeWorld();
+    // Seed 2 keeps both harvests on the ordinary one-item outcome (re-hunted
+    // after the procedural-dungeons merge shifted the camp-driven world-gen
+    // draw sequence). That keeps this timer-isolation case independent of the
+    // valid five-item rare event.
+    const sim = makeWorld(2);
     const pidA = sim.addPlayer('warrior', 'PlayerA');
     const pidB = sim.addPlayer('warrior', 'PlayerB');
     // Each carries their own tier-1 pick: bare hands never harvest (#2343).

@@ -382,6 +382,12 @@ export default defineConfig({
     // - agent-runtime directories may contain local worktree copies, and their tracked
     //   config or instruction files are not product test sources. Excluding them keeps a
     //   stale local worktree from duplicating tests. .venv is local Python tooling.
+    //   .worktrees/ is the repo's own gitignored convention for local linked worktrees
+    //   (see .gitignore); leaving it out of this list meant a worktree left checked out
+    //   there re-ran its whole frozen test tree on every `vitest run`, so a stale branch
+    //   snapshot inside it could fail tests/architecture.test.ts or
+    //   tests/localization_fixes.test.ts and block pre-push for reasons unrelated to the
+    //   current branch.
     // - the opt-in browser suite (vitest.browser.config.ts, npm run test:browser) must NOT
     //   leak into a bare `vitest run`: excluding its files keeps the default Node run from
     //   importing the Playwright provider or launching a browser. Cross-engine CI is P17b.
@@ -395,10 +401,19 @@ export default defineConfig({
       '**/.claude/**',
       '**/.codex/**',
       '**/.agents/**',
+      '**/.worktrees/**',
       '**/.venv/**',
       'tmp/**',
       'tests/browser/**',
       '**/*.browser.test.ts',
     ],
+    // The world grew from 3 zones to 11 and Sim construction/tick cost with
+    // it: the long tick-loop tests written against the 3-zone world brush
+    // vitest's 5s default under full-suite parallel load and flip flakily by
+    // scheduling luck. Seed sweeps use subsystem-sized world fixtures instead of
+    // repeatedly constructing unrelated ambient content, so 20s remains honest
+    // headroom for the current world size; deliberately long walkers keep their
+    // own explicit budgets.
+    testTimeout: 20000,
   },
 });

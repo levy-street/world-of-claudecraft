@@ -3,14 +3,32 @@ import { nextRaidResetMs } from '../server/raid_reset';
 import { visualKeyFor } from '../src/render/characters/manifest';
 import { dungeonDaisHasRaisedPlatform } from '../src/render/dungeon';
 import { isBlocked } from '../src/sim/colliders';
-import { DUNGEONS, ITEMS, instanceOrigin, MOBS } from '../src/sim/data';
+import { BUILTIN_WORLD, DUNGEONS, ITEMS, instanceOrigin, MOBS } from '../src/sim/data';
 import { NYTHRAXIS_LAYOUT } from '../src/sim/dungeon_layout';
 import { nythraxisGravebreakerOnMobSwing } from '../src/sim/encounters/nythraxis';
 import { isShieldItem } from '../src/sim/equipment_rules';
 import { expectedStatBudget, itemLevel, primaryStatSum } from '../src/sim/item_level';
 import { Sim } from '../src/sim/sim';
-import { type Aura, armorReduction, dist2d, type Entity } from '../src/sim/types';
+import {
+  type Aura,
+  armorReduction,
+  dist2d,
+  type Entity,
+  type WorldContent,
+} from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+
+// The raid assertions run inside the Nythraxis instance band (x > 3000): the
+// boss, adds, Aldric, and wardstones are all spawned by the encounter/dungeon
+// code from the global registries, never from the overworld placements. So
+// spawning every ambient realm mob only makes each tick scan unrelated
+// overworld AI (the fiesta/arena subsystem-world precedent).
+const NYTHRAXIS_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
 
 type TickEvent = ReturnType<Sim['tick']>[number];
 type TimedEvent = { at: number; event: TickEvent };
@@ -36,7 +54,14 @@ function isDamageEvent(event: TickEvent): event is DamageEvent {
 }
 
 function makeWorld(lockoutNowMs?: () => number, raidResetMs?: (nowMs: number) => number) {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, lockoutNowMs, raidResetMs });
+  return new Sim({
+    seed: 42,
+    playerClass: 'warrior',
+    noPlayer: true,
+    lockoutNowMs,
+    raidResetMs,
+    world: NYTHRAXIS_TEST_WORLD,
+  });
 }
 
 function teleport(sim: Sim, pid: number, x: number, z: number) {
@@ -290,7 +315,11 @@ describe('Nythraxis raid encounter', () => {
   });
 
   it('defines four Nythraxis equipment drops with 3 percent legendary rolls', () => {
-    const loot = MOBS.nythraxis_scourge_of_thornpeak.loot.filter((entry) => entry.itemId);
+    // Equipment drops only: the collectible mount reins (kind 'mount') is its
+    // own independent draw outside the four roll groups, pinned by tests/mounts.test.ts.
+    const loot = MOBS.nythraxis_scourge_of_thornpeak.loot.filter(
+      (entry) => entry.itemId && ITEMS[entry.itemId]?.kind !== 'mount',
+    );
     const groups = new Map<string, typeof loot>();
     for (const entry of loot) {
       expect(entry.rollGroup).toMatch(/^nythraxis_drop_[1-5]$/);

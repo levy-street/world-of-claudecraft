@@ -463,7 +463,7 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     items.sellItem(ctx, 'apprentice_staff', 1, pid); // copper + 120, records buyback
     const copperAfterSell = meta.copper;
 
-    items.buyBackItem(ctx, 'apprentice_staff', pid);
+    items.buyBackItem(ctx, 'apprentice_staff', undefined, pid);
     expect(sim.countItem('apprentice_staff', pid)).toBe(1);
     expect(meta.copper).toBe(copperAfterSell - 120); // repurchase at sellValue
     expect(meta.vendorBuyback.some((s) => s.itemId === 'apprentice_staff')).toBe(false);
@@ -488,7 +488,7 @@ describe('items module determinism', () => {
       items.sellItem(ctx, 'wolf_fang', 1, pid);
       sim.addItem('bandit_bandana', 1, pid);
       items.sellAllJunk(ctx, pid);
-      items.buyBackItem(ctx, 'wolf_fang', pid);
+      items.buyBackItem(ctx, 'wolf_fang', undefined, pid);
       return {
         copper: meta.copper,
         inventory: meta.inventory,

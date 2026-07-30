@@ -4,10 +4,13 @@ import {
   dungeonMusicZoneForDungeon,
   MusicDirector,
   musicZoneForLocation,
+  riftMusicZoneForTheme,
   shouldResetMusicForDungeonEntry,
   THEME_TRIM,
 } from '../src/game/music';
 import { COMBAT_STREAM_URLS, ZONE_STREAM_URLS } from '../src/game/music_tracks';
+import { RIFT_THEMES } from '../src/sim/content/rift/themes';
+import type { BiomeId } from '../src/sim/types';
 
 class FakeParam {
   value = 0;
@@ -553,5 +556,140 @@ describe('world music zone selection', () => {
 
   it('keeps the Thornpeak hub on the Highwatch town theme', () => {
     expect(musicZoneForLocation('thornpeak_heights', 'peaks', true, false)).toBe('town_highwatch');
+  });
+
+  it('gives every new-world biome its own bespoke theme', () => {
+    // Each shipped zone biome resolves to its own registered cue, hub or not
+    // (none of the new zones are TOWN_MUSIC hubs, so both paths agree).
+    const zoneByBiome: [string, BiomeId][] = [
+      ['veiled_hollow', 'dusk'],
+      ['drakelands', 'ember'],
+      ['frostveil', 'frost'],
+      ['amberfall', 'amber'],
+      ['willowfen', 'fen'],
+      ['nightbloom', 'night'],
+      ['wraithwood', 'haunt'],
+      ['palmreach', 'jungle'],
+      ['evergarden', 'garden'],
+      ['galecrest', 'gale'],
+    ];
+    const themes = buildMusicThemes();
+    for (const [zoneId, biome] of zoneByBiome) {
+      expect(musicZoneForLocation(zoneId, biome, false, false), zoneId).toBe(biome);
+      expect(themes[biome], `no composed theme for biome '${biome}'`).toBeDefined();
+    }
+  });
+
+  it('gives Farshore Isle its own vigil theme instead of the vale loop', () => {
+    expect(musicZoneForLocation('farshore_isle', 'vale', false, false)).toBe('farshore');
+    expect(buildMusicThemes().farshore).toBeDefined();
+  });
+
+  it('keeps Gullhaven (the Farshore hub, no town theme) on the vigil too', () => {
+    expect(musicZoneForLocation('farshore_isle', 'vale', true, false)).toBe('farshore');
+  });
+
+  it('borrows the nearest-mood cue for paint-only biomes', () => {
+    expect(musicZoneForLocation('custom', 'beach', false, false)).toBe('jungle');
+    expect(musicZoneForLocation('custom', 'desert', false, false)).toBe('ember');
+    expect(musicZoneForLocation('custom', 'volcano', false, false)).toBe('ember');
+    expect(musicZoneForLocation('custom', 'cave', false, false)).toBe('dusk');
+  });
+
+  it('still routes dungeons ahead of any biome theme', () => {
+    expect(musicZoneForLocation('frostveil', 'frost', false, true, 'hollow_crypt')).toBe(
+      'dungeon_hollow_crypt',
+    );
+  });
+});
+
+describe('rift crawl selection', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+    FakeAudio.instances = [];
+  });
+
+  it('maps every rift archetype to its own registered crawl theme', () => {
+    const themes = buildMusicThemes();
+    const seen = new Set<string>();
+    for (const theme of RIFT_THEMES) {
+      const zone = riftMusicZoneForTheme(theme.name);
+      expect(zone.startsWith('rift_'), `theme '${theme.name}' fell back to '${zone}'`).toBe(true);
+      expect(themes[zone], `no composed theme for rift zone '${zone}'`).toBeDefined();
+      expect(seen.has(zone), `rift zone '${zone}' reused across archetypes`).toBe(false);
+      seen.add(zone);
+    }
+    expect(seen.size).toBe(RIFT_THEMES.length);
+  });
+
+  it('pins the archetype names so a rename cannot silently fall back', () => {
+    expect(riftMusicZoneForTheme('Frostbound')).toBe('rift_frost');
+    expect(riftMusicZoneForTheme('Emberforge')).toBe('rift_ember');
+    expect(riftMusicZoneForTheme('Venomweald')).toBe('rift_venom');
+    expect(riftMusicZoneForTheme('Boneyard')).toBe('rift_bone');
+    expect(riftMusicZoneForTheme('Warcamp')).toBe('rift_brute');
+    expect(riftMusicZoneForTheme('Voidscar')).toBe('rift_void');
+    expect(riftMusicZoneForTheme('Stormspire')).toBe('rift_storm');
+    expect(riftMusicZoneForTheme('Sunken')).toBe('rift_tide');
+  });
+
+  it('falls back to the Voidscar crawl for an unknown archetype name', () => {
+    expect(riftMusicZoneForTheme('Some Future Theme')).toBe('rift_void');
+  });
+
+  it('rewinds an explicit rift cue on floor entry (no DUNGEON_MUSIC row)', () => {
+    vi.stubGlobal('AudioContext', FakeAudioContext);
+    vi.stubGlobal('Audio', FakeAudio);
+    vi.stubGlobal('window', { setInterval: vi.fn(() => 1) });
+    const director = makeDirector();
+    director.update('rift_ember', false);
+    const el = internals(director).zoneStreams.rift_ember?.el;
+    if (!el) throw new Error('rift stream element missing');
+    el.currentTime = 21;
+    director.resetForDungeonEntry('rift:12:3', 'rift_ember');
+    expect(el.currentTime).toBe(0);
+    clearInterval(internals(director).timer);
+  });
+});
+
+describe('composed theme integrity', () => {
+  const UNPITCHED = new Set(['frameDrum', 'warDrum', 'woodBlock', 'shaker', 'timpani', 'cymSwell']);
+
+  // The three hash-frozen Eastbrook themes predate this guard and let phrase
+  // tails cross the loop seam by a beat or two; they are pinned byte-identical
+  // by the checksum test above, so the structural guard covers the rest.
+  const FROZEN = new Set(['town_eastbrook', 'vale', 'vale_legacy']);
+
+  it('keeps every note of every theme inside its loop and sane ranges', () => {
+    for (const [name, theme] of Object.entries(buildMusicThemes())) {
+      const loopBeats = theme.bars * 4;
+      expect(theme.bpm, name).toBeGreaterThan(0);
+      expect(theme.events.length, name).toBeGreaterThan(0);
+      for (const e of theme.events) {
+        expect(e.beat, `${name}: beat out of loop`).toBeGreaterThanOrEqual(0);
+        if (!FROZEN.has(name)) {
+          expect(e.beat, `${name}: beat out of loop`).toBeLessThan(loopBeats);
+        }
+        expect(e.dur, `${name}: non-positive duration`).toBeGreaterThan(0);
+        expect(e.vel, `${name}: velocity out of range`).toBeGreaterThan(0);
+        expect(e.vel, `${name}: velocity out of range`).toBeLessThanOrEqual(0.7);
+        if (!UNPITCHED.has(e.inst)) {
+          expect(e.midi, `${name}: midi out of range`).toBeGreaterThanOrEqual(24);
+          expect(e.midi, `${name}: midi out of range`).toBeLessThanOrEqual(96);
+        }
+      }
+    }
+  });
+
+  it('sorts every theme by beat so the lookahead scheduler never skips notes', () => {
+    for (const [name, theme] of Object.entries(buildMusicThemes())) {
+      for (let i = 1; i < theme.events.length; i++) {
+        expect(
+          theme.events[i].beat,
+          `${name}: events not sorted at index ${i}`,
+        ).toBeGreaterThanOrEqual(theme.events[i - 1].beat);
+      }
+    }
   });
 });

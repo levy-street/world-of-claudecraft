@@ -20,7 +20,10 @@ Everything else is a sibling module in one of these families:
   `dungeon.ts` (instanced/merged GLBs), `water.ts` (terrain-aware water bodies;
   shore-depth and tier core in `water_core.ts`, sleeping GPU height field and
   facing-aligned character volume wakes in `water_simulation.ts`), `sky.ts`. Event/minigame scenes follow
-  the same pattern: `jail_scene.ts`, `vale_cup_*.ts`, `yumi_*.ts`.
+  the same pattern: `jail_scene.ts`, `vale_cup_*.ts`, `yumi_*.ts`. Rift
+  portals: `door_portal.ts` also builds the bespoke world-rift gate GLB with
+  its rank-tinted energy membrane (`buildRiftGateBody`), and `rift_rank.ts` is
+  the floating C/B/A/S rank badge above a world rift portal.
 - **Per-frame overlay/FX modules** ticked from `sync()`: `vfx.ts` (pooled
   particles), `weather.ts`, `character_effects.ts`.
 - **The nameplate suite** (below) owns all overhead text and badges.

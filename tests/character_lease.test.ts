@@ -146,7 +146,7 @@ describe('releaseAllCharacterLeases', () => {
 });
 
 describe('shutdown wiring (source pin)', () => {
-  it('main.ts drains the bank ledger and deed records, then sweeps leases, then closes the pool', () => {
+  it('main.ts drains queued records, then sweeps leases, then closes the pool', () => {
     // The shutdown closure in server/main.ts is not unit-drivable, so pin its
     // ordering by source. The load-bearing order is: endAllPlaySessions() (close
     // the play-session rows), then bankLedgerIdle() (flush every queued audit row
@@ -158,14 +158,16 @@ describe('shutdown wiring (source pin)', () => {
     // audit replays by (false negative_net / purchased_regression alarms). The
     // deed-records FIFO drains in the same window: a queued character_deeds insert
     // rejected by pool.end() would go missing until that character's next login
-    // (the join reconcile is the only heal). Match the awaited CALL forms so a
-    // prose mention in a comment never shifts an index.
+    // (the join reconcile is the only heal). Unstuck telemetry stops intake and
+    // drains to its finite deadline in that window. Match the awaited CALL forms
+    // so a prose mention in a comment never shifts an index.
     const src = readFileSync(new URL('../server/main.ts', import.meta.url), 'utf8');
     const saveAll = src.indexOf("await game.saveAll('shutdown')");
     const endSessions = src.indexOf('await game.endAllPlaySessions(');
     const sweep = src.indexOf('await releaseAllCharacterLeases(');
     const ledgerDrain = src.indexOf('await bankLedgerIdle()');
     const deedsDrain = src.indexOf('await deedRecordsIdle()');
+    const unstuckDrain = src.indexOf('await stopUnstuckRecords(UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS)');
     const poolEnd = src.indexOf('await pool.end()');
     // The shutdown save runs FIRST, while this process still holds every lease:
     // the saves are lease-fenced (a holder + nonce EXISTS inside the UPDATE), so
@@ -175,9 +177,11 @@ describe('shutdown wiring (source pin)', () => {
     expect(endSessions).toBeGreaterThan(saveAll);
     expect(ledgerDrain).toBeGreaterThan(endSessions);
     expect(deedsDrain).toBeGreaterThan(endSessions);
+    expect(unstuckDrain).toBeGreaterThan(endSessions);
     expect(sweep).toBeGreaterThan(saveAll);
     expect(sweep).toBeGreaterThan(ledgerDrain);
     expect(sweep).toBeGreaterThan(deedsDrain);
+    expect(sweep).toBeGreaterThan(unstuckDrain);
     expect(poolEnd).toBeGreaterThan(sweep);
   });
 });

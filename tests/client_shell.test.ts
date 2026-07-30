@@ -886,6 +886,25 @@ describe('client HTML shell', () => {
     expect(characterPreviewTs).toContain('this.renderer.dispose();');
   });
 
+  it('keeps the character preview render loop dormant while its host is hidden', () => {
+    expect(characterPreviewTs.match(/requestAnimationFrame\(this\.animate\)/g)).toHaveLength(1);
+    expect(characterPreviewTs).toContain('if (!this.renderActive) return;');
+    expect(characterPreviewTs).toContain('this.renderActive = width > 0 && height > 0;');
+  });
+
+  it('warms contextual Canvas HUD assets before gameplay becomes visible', () => {
+    expect(mainTs).toContain('hud.prewarmStaticUiAssets();');
+    expect(hudTs).toContain('prewarmStaticUiAssets(): void {');
+    expect(hudTs).toContain('raidMarkerDataUrl(marker);');
+    const crestWarm = mainTs.slice(
+      mainTs.indexOf('for (const cls of ALL_CLASSES)'),
+      mainTs.indexOf('for (const slot of world.inventory)'),
+    );
+    expect(crestWarm).toContain("kind: 'crest'");
+    expect(crestWarm).toContain('size: 20');
+    expect(crestWarm).toContain('size: 96');
+  });
+
   it('keeps the desktop character roster readable inside a centered cinematic stage', () => {
     expect(shellCss).toContain('--cs-stage-gutter: max(26px, calc((100vw - 1780px) / 2));');
     expect(shellCss).toContain('--cs-roster-width: clamp(340px, 28vw, 440px);');
@@ -1598,12 +1617,13 @@ describe('client HTML shell', () => {
       );
     }
     expect(html).toContain('<div id="mobile-extra-grid">');
-    // Daily Rewards, the Book of Deeds, and Crafting ride the More grid in BOTH
+    // Daily Rewards, the Book of Deeds, Mount / Dismount, and Crafting ride the More grid in BOTH
     // entries (play.html historically lags index.html; these pins keep them in
     // step).
     for (const entry of [html, playHtml]) {
       expect(entry).toContain('id="mobile-daily-rewards"');
       expect(entry).toContain('id="mobile-deeds"');
+      expect(entry).toContain('id="mobile-mounts"');
       expect(entry).toContain('id="mobile-crafting"');
     }
     expect(hudMobileCss).not.toContain('body.mobile-touch.mobile-more-open #mobile-controls');
@@ -1856,6 +1876,18 @@ describe('client HTML shell', () => {
     expect(marketWindowTs).toContain('data-market-page="next"');
     expect(marketWindowTs).toContain('itemUi.market.pageRange');
     expect(marketWindowTs).toContain('class="mkt-filters"');
+    // Search and every visible filter must participate in the same responsive grid.
+    // A nested wrapping flex row makes the search align against the full filter block,
+    // so it drops beside the last filter row as the window narrows.
+    expect(componentsCss).toContain(
+      '.mkt-controls {\n    display: grid;\n    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));',
+    );
+    expect(componentsCss).toContain('.mkt-filters {\n    display: contents;');
+    expect(componentsCss).toContain('.mkt-search {\n    width: 100%;\n    max-width: none;');
+    expect(componentsCss).toContain(
+      '.mkt-filter {\n    display: flex;\n    flex-direction: column;\n    gap: 3px;\n    max-width: none;',
+    );
+    expect(marketWindowTs).toContain('`<div class="mkt-controls" role="group" aria-label="');
     // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the source literally contains this template expression
     expect(marketWindowTs).toContain('data-market-filter-menu="${menu}"');
     expect(marketWindowTs).toMatch(/this\.renderMarketFilterMenu\(\s*'itemType'/);
@@ -1872,7 +1904,7 @@ describe('client HTML shell', () => {
     // other test catching it. controlsHtml (built with `.mkt-controls` as its own
     // top-level div) is spliced into el.innerHTML as a sibling ahead of the
     // `#market-body` div, never inside it.
-    expect(marketWindowTs).toContain('`<div class="mkt-controls">`');
+    expect(marketWindowTs).toContain('`<div class="mkt-controls" role="group"');
     const markupIdx = marketWindowTs.indexOf('el.innerHTML =');
     const controlsHtmlIdx = marketWindowTs.indexOf('controlsHtml +', markupIdx);
     const bodyIdx = marketWindowTs.indexOf('<div id="market-body">', markupIdx);
@@ -1884,11 +1916,10 @@ describe('client HTML shell', () => {
     // multi-column landscape grid would otherwise go undetected.
     expect(componentsCss).toContain('.mkt-list {');
     expect(marketWindowTs).toContain("list.className = 'mkt-list';");
-    // Mobile stacks the controls row to one column (the flex-basis-neutralizing
-    // fix depends on this direction flip actually happening) and forces the
-    // listing grid back to a single column instead of relying on auto-fill alone.
+    // Mobile reduces the shared controls grid to one column and forces the listing
+    // grid back to a single column instead of relying on auto-fill alone.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch .mkt-controls {\n    flex-direction: column;\n    align-items: stretch;',
+      'body.mobile-touch .mkt-controls {\n    grid-template-columns: 1fr;\n    align-items: stretch;',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch .mkt-list {\n    grid-template-columns: 1fr;',

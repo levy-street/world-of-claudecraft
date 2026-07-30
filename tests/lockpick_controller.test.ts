@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { FocusTrapHandle } from '../src/ui/focus_manager';
 import { LockpickController } from '../src/ui/hud/delve/lockpick_controller';
+import { t } from '../src/ui/i18n';
 import type { LockpickView } from '../src/world_api';
 import { FakeDocument, FakeWindow } from './helpers/fake_dom';
 
@@ -130,10 +131,73 @@ describe('LockpickController', () => {
     const test = harness(liveView);
     test.controller.openBoard();
 
-    test.controller.end('success', 'premium');
+    test.controller.end('success', 'premium', liveView.sessionId);
 
     expect(test.showBanner).toHaveBeenCalledTimes(1);
     expect(test.log).toHaveBeenCalledWith(expect.any(String), '#7fdc4f');
+    expect(test.panel.style.display).toBe('none');
+    expect(test.release).toHaveBeenCalledWith(true);
+  });
+
+  it('a stale lockpickEnd cannot tear down a fresh session board (the online flash)', () => {
+    // The online shape: withdraw session lp_1 (the panel stays up waiting on
+    // the wire answer), re-engage, and the FRESH session lp_9's board is on
+    // screen when lp_1's late lockpickEnd finally lands. The end arm used to
+    // close whatever was up: the fresh 420px dead-centre board vanished for
+    // the player (a split-second dark-panel flash at best) while its session
+    // stayed live server-side, burning tries toward a forfeited chest.
+    // ClientWorld.applyLockpickEvent already id-scopes the mirror clear; this
+    // pins the SAME scoping on the HUD arm's close.
+    const fresh: LockpickView = { ...liveView, sessionId: 'lp_9' };
+    const test = harness(fresh);
+    test.controller.openBoard();
+    expect(test.panel.style.display).toBe('block');
+
+    test.controller.end('abandoned', undefined, 'lp_1'); // the withdrawn session's late answer
+
+    expect(test.panel.style.display, 'the fresh board survives the stale end').toBe('block');
+    // The summary still lands (that attempt really was withdrawn); only the
+    // CLOSE is session-scoped. A same-message [end(old), session(new)] batch
+    // leaves the mirror on the new id before this arm runs, and a success in
+    // that shape must not lose its banner and green line.
+    expect(test.log).toHaveBeenCalledWith(t('lockpickUi.summary.abandoned'), '#ccc');
+    expect(test.release).not.toHaveBeenCalled();
+  });
+
+  it('a session-scoped end for the LIVE session still closes and summarizes', () => {
+    // The guard must scope, not suppress: an end naming the on-screen session
+    // (and any end with no live mirror left, the normal online order, where
+    // applyLockpickEvent cleared the state before the HUD drained) closes.
+    const test = harness(liveView);
+    test.controller.openBoard();
+
+    test.controller.end('abandoned', undefined, liveView.sessionId);
+
+    expect(test.panel.style.display).toBe('none');
+    expect(test.log).toHaveBeenCalledWith(t('lockpickUi.summary.abandoned'), '#ccc');
+
+    // And the mirror-already-cleared shape closes too.
+    const second = harness(null);
+    second.controller.openBoard();
+    second.panel.style.display = 'block';
+    second.controller.end('success', 'premium', 'lp_1');
+    expect(second.panel.style.display).toBe('none');
+    expect(second.showBanner).toHaveBeenCalledTimes(1);
+  });
+
+  it('logs a withdrawal without a banner before closing the panel', () => {
+    // end() branches three ways on outcome and only 'success' was pinned, so the colour and
+    // the no-banner half of the arm that a withdrawal actually takes were free to change.
+    // This is the arm every #2517 dismissal of a live board ends on.
+    const test = harness(liveView);
+    test.controller.openBoard();
+
+    test.controller.end('abandoned', undefined, liveView.sessionId);
+
+    expect(test.showBanner, 'a withdrawal is not an achievement').not.toHaveBeenCalled();
+    // The KEY, not just the colour: swapping the abandoned and fail summaries (or wiring
+    // this arm to the fail key) leaves an `expect.any(String)` version of this green.
+    expect(test.log).toHaveBeenCalledWith(t('lockpickUi.summary.abandoned'), '#ccc');
     expect(test.panel.style.display).toBe('none');
     expect(test.release).toHaveBeenCalledWith(true);
   });

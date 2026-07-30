@@ -24,6 +24,7 @@ import { type ClientSession, GameServer } from '../server/game';
 import type { Entity, SimEvent } from '../src/sim/types';
 
 type DamageEvent = Extract<SimEvent, { type: 'damage' }>;
+type Heal2Event = Extract<SimEvent, { type: 'heal2' }>;
 type WireMsg = { t?: string; list?: SimEvent[] };
 
 interface FakeClient {
@@ -71,6 +72,13 @@ function deliveredDamage(client: FakeClient): DamageEvent[] {
     .filter((event): event is DamageEvent => event.type === 'damage');
 }
 
+function deliveredHeals(client: FakeClient): Heal2Event[] {
+  return client.sent
+    .filter((msg) => msg.t === 'events')
+    .flatMap((msg) => msg.list ?? [])
+    .filter((event): event is Heal2Event => event.type === 'heal2');
+}
+
 function damage(sourceId: number, targetId: number): DamageEvent {
   return {
     type: 'damage',
@@ -81,6 +89,17 @@ function damage(sourceId: number, targetId: number): DamageEvent {
     school: 'physical',
     ability: null,
     kind: 'hit',
+  };
+}
+
+function heal(sourceId: number, targetId: number, amount = 0): Heal2Event {
+  return {
+    type: 'heal2',
+    sourceId,
+    targetId,
+    amount,
+    crit: false,
+    ability: 'Whispered Prayer',
   };
 }
 
@@ -156,5 +175,36 @@ describe('online combat log event routing', () => {
     expect(deliveredDamage(viewerClient)).toHaveLength(0);
     expect(deliveredDamage(sourceClient)).toEqual([event]);
     expect(deliveredDamage(targetClient)).toEqual([event]);
+  });
+
+  it('keeps zero-effective direct self heals for online healer feedback', () => {
+    const { server, viewerClient, viewer } = setup();
+    const event = heal(viewer.pid, viewer.pid, 0);
+
+    route(server, [event]);
+
+    expect(deliveredHeals(viewerClient)).toEqual([event]);
+  });
+
+  it('keeps party member heal events for the local player', () => {
+    const { server, viewerClient, viewer, ally } = setup();
+    server.sim.partyInvite(ally.pid, viewer.pid);
+    server.sim.partyAccept(ally.pid);
+    clearSent(viewerClient);
+    const event = heal(ally.pid, ally.pid, 0);
+
+    route(server, [event]);
+
+    expect(deliveredHeals(viewerClient)).toEqual([event]);
+  });
+
+  it('filters unrelated nearby player heal events from the local player', () => {
+    const { server, viewerClient, sourceClient, source, target } = setup();
+    const event = heal(source.pid, target.pid, 0);
+
+    route(server, [event]);
+
+    expect(deliveredHeals(viewerClient)).toHaveLength(0);
+    expect(deliveredHeals(sourceClient)).toEqual([event]);
   });
 });

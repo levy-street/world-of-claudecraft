@@ -464,6 +464,8 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
   const dbSrc = read('server/db.ts');
   const reportsSrc = read('server/reports.ts');
   const dailySrc = read('server/daily_rewards.ts');
+  const unstuckDbSrc = read('server/unstuck_db.ts');
+  const unstuckRecordsSrc = read('server/unstuck_records.ts');
   const retentionSrc = read('server/play_session_retention_db.ts');
 
   // Slice a function BODY: from its declaration to the next top-level export,
@@ -514,6 +516,37 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
     expect(mainSrc).toContain('setTimeout(r, DB_BOOT_RETRY_MS)');
     expect(mainSrc).not.toContain('if (attempt >= 30)');
     expect(mainSrc).not.toContain('setTimeout(r, 2000)');
+  });
+
+  it('wires the bounded unstuck retention prune at boot and daily maintenance', () => {
+    expect(unstuckDbSrc).toContain(
+      'export const UNSTUCK_REPORT_RETENTION_DAYS = UNSTUCK_REPORT_MAX_DAYS;',
+    );
+    expect(unstuckDbSrc).toContain('export const UNSTUCK_REPORT_PRUNE_BATCH_SIZE = 10_000;');
+    expect(unstuckDbSrc).toContain('export const UNSTUCK_REPORT_PRUNE_MAX_BATCHES = 10;');
+    expect(unstuckDbSrc).toContain('pg_try_advisory_lock($1::int)');
+    expect(unstuckDbSrc).toContain('LIMIT $2');
+    expect(mainSrc).toContain('const prunedUnstuckReports = await pruneUnstuckReports(pool);');
+    expect(mainSrc).toContain('void pruneUnstuckReports(pool).catch((err) =>');
+    expect(count(mainSrc, 'pruneUnstuckReports(pool)')).toBe(2);
+  });
+
+  it('bounds unstuck inserts and the shutdown drain with named timeouts', () => {
+    expect(unstuckDbSrc).toContain('export const UNSTUCK_INSERT_QUERY_TIMEOUT_MS = 1_000;');
+    expect(unstuckDbSrc).toContain('query_timeout: UNSTUCK_INSERT_QUERY_TIMEOUT_MS');
+    expect(unstuckRecordsSrc).toContain('export const UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS = 5_000;');
+    expect(mainSrc).toContain(
+      'const unstuckReportsDrained = await stopUnstuckRecords(UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS);',
+    );
+    expect(mainSrc).not.toContain('await unstuckRecordsIdle();');
+  });
+
+  it('bounds unstuck recorder memory and rate-limits overflow warnings', () => {
+    expect(unstuckRecordsSrc).toContain('export const UNSTUCK_RECORD_MAX_PENDING = 256;');
+    expect(unstuckRecordsSrc).toContain(
+      'export const UNSTUCK_RECORD_OVERFLOW_WARN_INTERVAL_MS = 60_000;',
+    );
+    expect(unstuckRecordsSrc).toContain('queueState.pending >= UNSTUCK_RECORD_MAX_PENDING');
   });
 
   it('the pg pool max references DB_POOL_MAX_CLIENTS', () => {

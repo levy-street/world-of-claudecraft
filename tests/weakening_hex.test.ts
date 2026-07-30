@@ -4,9 +4,9 @@
 // attack-power cut, physical only) and `mortal_wound` (healing *received*): it
 // throttles the hexed player's whole offensive/support output.
 import { describe, expect, it } from 'vitest';
-import { Sim } from '../src/sim/sim';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 
 function makeSim(playerClass: 'warrior' | 'priest' = 'priest') {
@@ -16,7 +16,11 @@ function makeSim(playerClass: 'warrior' | 'priest' = 'priest') {
 // Spawn a Gravecaller Cultist adjacent to the player, hostile and ready to swing.
 function spawnCultist(sim: Sim, target: Entity): Entity {
   const template = MOBS['gravecaller_cultist'];
-  const mob = createMob((sim as any).nextId++, template, 12, { x: target.pos.x, y: target.pos.y, z: target.pos.z });
+  const mob = createMob((sim as any).nextId++, template, 12, {
+    x: target.pos.x,
+    y: target.pos.y,
+    z: target.pos.z,
+  });
   mob.hostile = true;
   (sim as any).addEntity(mob);
   return mob;
@@ -30,7 +34,13 @@ function swing(sim: Sim, mob: Entity, target: Entity) {
   const rng = (sim as any).rng;
   const realNext = rng.next.bind(rng);
   let firstRoll = true;
-  rng.next = () => { if (firstRoll) { firstRoll = false; return 0.999; } return realNext(); };
+  rng.next = () => {
+    if (firstRoll) {
+      firstRoll = false;
+      return 0.999;
+    }
+    return realNext();
+  };
   try {
     (sim as any).mobSwing(mob, target);
   } finally {
@@ -39,21 +49,32 @@ function swing(sim: Sim, mob: Entity, target: Entity) {
 }
 
 const HEX_AURA = {
-  id: 'hex_gravecaller_cultist', name: 'Weakening Hex', kind: 'hex' as const,
-  remaining: 10, duration: 10, value: 0.2, sourceId: 999, school: 'shadow' as const,
+  id: 'hex_gravecaller_cultist',
+  name: 'Weakening Hex',
+  kind: 'hex' as const,
+  remaining: 10,
+  duration: 10,
+  value: 0.2,
+  sourceId: 999,
+  school: 'shadow' as const,
 };
 
 describe('mob hex ("Weakening Hex")', () => {
   it('seeds the hex mechanic on the Gravecaller Cultist', () => {
     expect(MOBS['gravecaller_cultist'].hex).toEqual({
-      chance: 0.3, reductionPct: 0.2, duration: 10, name: 'Weakening Hex', school: 'shadow',
+      chance: 0.3,
+      reductionPct: 0.2,
+      duration: 10,
+      name: 'Weakening Hex',
+      school: 'shadow',
     });
   });
 
   it('applies a hex aura on a landed hit when it rolls', () => {
     const sim = makeSim();
     const p = sim.player;
-    p.maxHp = 100000; p.hp = 100000;
+    p.maxHp = 100000;
+    p.hp = 100000;
     const mob = spawnCultist(sim, p);
     MOBS['gravecaller_cultist'].hex!.chance = 1; // deterministic for the test
     swing(sim, mob, p);
@@ -78,7 +99,8 @@ describe('mob hex ("Weakening Hex")', () => {
     const sim = makeSim('warrior');
     const p = sim.player;
     const dummy = spawnCultist(sim, p);
-    dummy.maxHp = 100000; dummy.hp = 100000;
+    dummy.maxHp = 100000;
+    dummy.hp = 100000;
     // Baseline hit (unhexed).
     (sim as any).dealDamage(p, dummy, 1000, false, 'shadow', null, 'hit', true);
     const plain = 100000 - dummy.hp;
@@ -94,8 +116,13 @@ describe('mob hex ("Weakening Hex")', () => {
   it('reduces the healing a hexed source does', () => {
     const sim = makeSim('priest');
     const p = sim.player;
-    (sim as any).spellCrit = () => 0; // remove crit RNG so the ratio is exact
-    p.maxHp = 100000; p.hp = 1; // huge deficit so nothing is capped by overheal
+    // remove crit RNG so the ratio is exact: the heal module rolls
+    // ctx.rng.chance(ctx.spellCrit(...)), and ctx binds spellCrit by
+    // reference at construction, so stubbing the facade method does nothing;
+    // stubbing the chance draw itself is what actually pins the roll
+    (sim as any).rng.chance = () => false;
+    p.maxHp = 100000;
+    p.hp = 1; // huge deficit so nothing is capped by overheal
     (sim as any).applyHeal(p, p, 1000, 'Test Heal');
     const plain = p.hp - 1;
     p.hp = 1;
@@ -109,7 +136,8 @@ describe('mob hex ("Weakening Hex")', () => {
   it('a friendly pet swing never hexes its target', () => {
     const sim = makeSim();
     const p = sim.player;
-    p.maxHp = 100000; p.hp = 100000;
+    p.maxHp = 100000;
+    p.hp = 100000;
     const pet = spawnCultist(sim, p);
     pet.hostile = false; // a tamed/friendly cultist shape
     pet.ownerId = p.id;

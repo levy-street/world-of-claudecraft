@@ -38,8 +38,11 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   moonscale_saber: 'sword',
   deathless_greatblade: 'sword',
   final_argument_greatblade: 'sword',
+  veilsteel_blade: 'sword',
   bonewrought_greatsword: 'sword',
   direfang_greatblade: 'sword',
+  hoarfrost_edge: 'sword',
+  wildheart_tuskblade: 'sword',
   // Daggers
   rusty_dagger: 'dagger',
   whetted_iron_dirk: 'dagger',
@@ -67,6 +70,9 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   drowned_choir_fang: 'dagger',
   mistcallers_fang: 'dagger',
   first_blood_razor: 'dagger',
+  duskfang_dirk: 'dagger',
+  wildheart_fangknife: 'dagger',
+  voidsong_dirk: 'dagger',
   // Maces
   training_mace: 'mace',
   copper_flanged_mace: 'mace',
@@ -95,6 +101,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   deacons_cleaver: 'axe',
   drogmars_skullcleaver: 'axe',
   gravewyrm_cleaver: 'axe',
+  pitlords_cleaver: 'axe',
   // Staves
   gnarled_staff: 'staff',
   elderwood_battle_staff: 'staff',
@@ -119,6 +126,8 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   briarroot_staff: 'staff',
   cragthorn_greatstaff: 'staff',
   nightfangs_greatstaff: 'staff',
+  gleamwood_stave: 'staff',
+  wildheart_hexwood_staff: 'staff',
   // Wands
   drowned_tide_scepter: 'wand',
   palecoil_rod: 'wand',

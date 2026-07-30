@@ -20,6 +20,8 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   crossroads_saber: 'sword_d',
   mistcallers_edge: 'sword_e',
   zealotsbane_blade: 'sword_e',
+  hoarfrost_edge: 'sword_e', // rift rare 1H sword (heroic clone rides heroicOf)
+  veilsteel_blade: 'sword_b', // realm uncommon 1H sword (arming-sword sibling)
   kingsbane_last_oath: 'sword_f', // LEGENDARY: the flaming blade (exclusive)
   valeborn_spellblade: 'sword_g', // crystalline
   maldrecs_soulbinder: 'sword_g',
@@ -33,6 +35,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   final_argument_greatblade: 'adv_sword_2handed_color', // WARFARE Strength main hand
   bonewrought_greatsword: 'adv_sword_2handed_color', // EPIC: Nythraxis raid 2H
   direfang_greatblade: 'adv_sword_2handed_color', // EPIC: Nythraxis hunter 2H
+  wildheart_tuskblade: 'adv_sword_2handed_color',
 
   // ---- daggers (only 4 models for ~21 daggers; spread as evenly as art allows)-
   rusty_dagger: 'dagger_a',
@@ -47,6 +50,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   mirejaw_biteblade: 'dagger_b',
   cultist_flayer: 'dagger_b',
   tideglass_dirk: 'dagger_b',
+  duskfang_dirk: 'dagger_b', // realm uncommon dirk (dirks share dagger_b)
   moggers_shiv: 'dagger_c',
   widowfang_dirk: 'dagger_c',
   nhalias_dirgeblade: 'dagger_c',
@@ -61,6 +65,8 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   mirejaw_fang_knife: 'dagger_a', // knives share dagger_a (vale_carving_knife)
   drowned_choir_fang: 'dagger_c', // fangs share dagger_c (fang_of_korzul)
   mistcallers_fang: 'adv_dagger', // EPIC: Heroic Vael dagger
+  wildheart_fangknife: 'adv_dagger',
+  voidsong_dirk: 'adv_dagger', // LEGENDARY: the S-rift caster dirk
 
   // ---- staves (staff_a..d + adv_staff + adv_druid_staff) ----------------------
   gnarled_staff: 'staff_a',
@@ -81,11 +87,13 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   briarroot_staff: 'staff_b', // feral ladder, zone-1 rung
   cragthorn_greatstaff: 'staff_c', // feral ladder, zone-3 rung
   nightfangs_greatstaff: 'adv_staff', // feral ladder, Korzul epic rung
+  gleamwood_stave: 'staff_b', // realm uncommon caster stave (apprentice-tier)
   staff_of_the_gravewyrm: 'adv_druid_staff',
   deathless_heartwood: 'adv_druid_staff', // LEGENDARY druid relic (antler staff)
   drovers_staff: 'adv_druid_staff',
   emberglass_warstaff: 'adv_staff', // WARFARE caster main hand
   lunar_tide_greatstaff: 'adv_staff', // EPIC: Heroic Ysolei staff
+  wildheart_hexwood_staff: 'adv_druid_staff',
 
   // ---- wands (1H caster: scepters / rods / foci) ------------------------------
   drowned_tide_scepter: 'wand_a',
@@ -124,6 +132,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   gorraks_cleaver: 'adv_axe_1handed',
   tradesman_hatchet: 'adv_axe_1handed',
   gravewyrm_cleaver: 'adv_axe_1handed', // EPIC: Heroic Korzul axe
+  pitlords_cleaver: 'adv_axe_1handed', // rift rare cleaver (heroic clone rides heroicOf)
   tunnelkings_spade: 'adv_axe_2handed',
 
   // ---- polearms --------------------------------------------------------------

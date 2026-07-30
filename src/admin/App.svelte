@@ -32,6 +32,7 @@
   import ChatFilter from './pages/ChatFilter.svelte';
   import BlockedIps from './pages/BlockedIps.svelte';
   import BugReports from './pages/BugReports.svelte';
+  import UnstuckReports from './pages/UnstuckReports.svelte';
   import IpAssociations from './pages/IpAssociations.svelte';
   import Staff from './pages/Staff.svelte';
 
@@ -56,6 +57,7 @@
     'chat-filter': ChatFilter,
     'blocked-ips': BlockedIps,
     'bug-reports': BugReports,
+    'unstuck-reports': UnstuckReports,
     staff: Staff,
   } satisfies Record<AdminPage, Component>;
   // Permission route guard (presentation only; the server re-checks every

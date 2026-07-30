@@ -359,12 +359,15 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned for the v0.31 physics merge: renderer.ts and
-      // eastbrook_layout.ts are fingerprinted inputs and both changed (the
-      // landing fall-speed reset; the graveyard walk threading the headstone
-      // gap), and the after-evidence was recaptured against them. Re-derived
-      // again for the scene-census merge (renderer.ts is a provenance input).
-      fingerprint: 'ffa42e5851699346c6301e829538738de894cebd952e5062c5e97d4f3e13e0cd',
+      // Deliberately re-pinned for the release/v0.33.0 resync of the
+      // draw-call diet branch: the seal fingerprints src/render/renderer.ts,
+      // so it re-mints whenever the renderer coordinator moves. Exactly one
+      // component leaf moves here, runtimeRender.renderer.sha256, folding the
+      // census hooks and the diet's batching seams into the streaming,
+      // zone-feature cull, fog and parkour deltas already pinned by the base.
+      // Every Eastbrook line in renderer.ts is byte-identical across that
+      // delta, so the accepted evidence still depicts this tree. No recapture.
+      fingerprint: '1effaf5e7adb130ff44dc188ceec515848ca53b55a499b49a910f40231cb7fc7',
       components: {
         captureContract: {
           id: 'polish-v2',

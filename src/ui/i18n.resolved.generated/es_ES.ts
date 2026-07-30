@@ -336,6 +336,33 @@ export const es_ES: EnTranslations = {
       "healerConfirmAccept": "Revívame",
       "healerConfirmCancel": "Cancelar"
     },
+    "unstuck": {
+      "menuButton": "Desatascar",
+      "help": "Recuperación: /unstuck inicia una cuenta regresiva estacionaria para llevarte a un punto seguro accesible cercano.",
+      "helpAtGraveyard": "Recuperación: /unstuck inicia una cuenta regresiva estacionaria y luego envía tu espíritu al cementerio más cercano. Volver a través del Guardián Pálido requiere el Tañido del Guardián.",
+      "started": "Desatascar en {seconds} segundos. Moverte, luchar, recibir daño o iniciar otra acción lo cancela.",
+      "countdown": "Desatascar: {seconds}",
+      "completed": "Trasladado al punto seguro accesible más cercano.",
+      "completedAtGraveyard": "Tu espíritu ha regresado al cementerio más cercano. Habla con el Guardián Pálido para aceptar el Tañido del Guardián.",
+      "revivedAtGraveyard": "Has sido devuelto al cementerio más cercano y revivido. El Tañido del Guardián pesa sobre ti.",
+      "cancelledMoved": "Desatascar se canceló porque te moviste.",
+      "cancelledDamaged": "Desatascar se canceló porque recibiste daño.",
+      "cancelledCombat": "Desatascar se canceló porque entraste en combate.",
+      "cancelledBusy": "Desatascar se canceló porque iniciaste otra acción.",
+      "cancelledState": "Desatascar se canceló porque tu estado cambió.",
+      "cancelledDisconnected": "Desatascar se canceló porque te desconectaste.",
+      "noSafePosition": "No se encontró ningún punto seguro accesible cerca. No fuiste trasladado.",
+      "alreadyActive": "Desatascar ya está en cuenta regresiva.",
+      "alreadySafe": "Ya estás en una posición segura y accesible.",
+      "cooldown": "Desatascar estará listo en {seconds} segundos.",
+      "dead": "No puedes usar Desatascar mientras estás muerto o en forma de espíritu.",
+      "combat": "No puedes usar Desatascar durante el combate.",
+      "controlled": "No puedes usar Desatascar mientras tu movimiento está impedido.",
+      "standStill": "Quédate quieto sobre suelo firme antes de usar Desatascar.",
+      "standStillAnywhere": "Quédate quieto antes de usar Desatascar.",
+      "busy": "Termina tu acción actual antes de usar Desatascar.",
+      "unavailable": "Desatascar no está disponible en tu estado actual."
+    },
     "fct": {
       "absorbed": "Absorbido {amount}",
       "cheap": "¡Coste reducido!"
@@ -775,6 +802,7 @@ export const es_ES: EnTranslations = {
       "leaderboard": "Clasificación",
       "dailyRewards": "Tienda",
       "deeds": "Gestas",
+      "mounts": "Monturas",
       "professions": "Profesiones",
       "nameplates": "Nombres",
       "haptics": "Vibración",
@@ -872,7 +900,18 @@ export const es_ES: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m} min {s} s",
       "seconds": "{s} s",
-      "autoShowHint": "Las filas aparecen automaticamente cuando tu grupo inflige dano o curacion, y este panel se cierra unos segundos despues de que el combate termine."
+      "autoShowHint": "Las filas aparecen automaticamente cuando tu grupo inflige dano o curacion, y este panel se cierra unos segundos despues de que el combate termine.",
+      "breakdownSummary": "{tab}: {value}",
+      "breakdownRow": "{value} ({percent})",
+      "breakdownOther": "Otros ({count})",
+      "percent": "{value}%",
+      "petAbility": "{pet}: {ability}",
+      "melee": "Cuerpo a cuerpo",
+      "move": "Arrastra para mover este medidor",
+      "resize": "Arrastra para cambiar el tamaño de este medidor",
+      "dock": "Devuelve este medidor a la ventana de medidores",
+      "separate": "Separar {meter}",
+      "regroup": "Reagrupar {meter}"
     },
     "petFeed": {
       "disabledFullHp": "La mascota tiene la salud al maximo",
@@ -890,7 +929,59 @@ export const es_ES: EnTranslations = {
       "petStop": "Mascota: detenerse",
       "petTaunt": "Mascota: provocar",
       "petDefensive": "Mascota: defensiva",
-      "petAggressive": "Mascota: agresiva"
+      "petAggressive": "Mascota: agresiva",
+      "mount": "Montar / Desmontar"
+    },
+    "mounts": {
+      "title": "Monturas",
+      "close": "Cerrar",
+      "select": "Elegir",
+      "selected": "Elegida",
+      "riding": "Montada",
+      "mount": "Montar",
+      "dismount": "Desmontar",
+      "useToRide": "Usar para invocar esta montura.",
+      "emptyTitle": "Ninguna montura obtenida",
+      "emptyStableHint": "Alcanza el nivel 20 y toma clases de monta con la Caballeriza mayor Marla en los establos al oeste de Highwatch.",
+      "emptyDropHint": "Las monturas más raras las sueltan los jefes de mazmorras y bandas.",
+      "clickManage": "Haz clic para elegir tu montura",
+      "rarity_common": "Común",
+      "rarity_rare": "Rara",
+      "rarity_epic": "Épica",
+      "spec_speed": "+{pct}% de movilidad adicional",
+      "name_valorsteed": "Corcel del Valor",
+      "name_grag_bear": "Oso Grag Goliat",
+      "name_stalkglider_snail": "Deslizador de Caparazón Musgoso",
+      "name_aether_hover_cycle": "Aerocicleta Justadora del Éter",
+      "name_shadowjump_toad": "Kama-Kage, el Sapo Saltasombras",
+      "name_stormfeather_griffin": "Plumatormenta Alcanzacielos",
+      "name_thunderstrut_gobbler": "Pavoneatruenos, el Gran Pavo",
+      "desc_valorsteed": "Un corcel resistente y de paso firme que aumenta la velocidad de viaje.",
+      "desc_grag_bear": "Un oso resistente y de paso firme que aumenta la velocidad de viaje.",
+      "desc_stalkglider_snail": "Un caracol recio y de combustión lenta que aumenta la velocidad de viaje.",
+      "desc_aether_hover_cycle": "Una potente moto magitecnológica diseñada para desplazamientos de combate veloces a baja altura.",
+      "desc_shadowjump_toad": "Un sapo gigante, macizo y de paso firme, adiestrado en saltos sombríos relámpago que cubren cualquier terreno.",
+      "desc_stormfeather_griffin": "Un grifo de tormenta majestuoso que acecha por tierra sobre garras rúnicas, con las alas plegadas.",
+      "desc_thunderstrut_gobbler": "Un pavo colosal nacido de la tormenta que baja pavoneándose del Pico Despierto, con la cola desplegada como un frente de tormenta."
+    },
+    "mountTraining": {
+      "mountPrompt": "Pulsa {key} para montar el Corcel del Valor de entrenamiento.",
+      "ownedMountPrompt": "Tus riendas están en tus bolsas. Úsalas para montar.",
+      "ridePrompt": "Sigue el marcador brillante hasta la línea de salida, y luego pulsa Iniciar Carrera.",
+      "begin": "Comenzar Lección",
+      "success": "Has domado al Corcel del Valor.",
+      "returnToMarla": "Vuelve con Marla en los establos para comprar tus riendas del Corcel del Valor por 10po."
+    },
+    "mountRace": {
+      "startButton": "Iniciar Carrera",
+      "cancelButton": "Cancelar Carrera",
+      "go": "¡YA!",
+      "start": "¡Adelante! Supera cada salto y luego cabalga de vuelta por el arco.",
+      "toFinish": "¡Cabalga de vuelta por el arco!",
+      "finished": "¡Terminada en {seconds}s!",
+      "timeout": "Carrera Fallida",
+      "progress": "Puertas {n} de {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "La Copa del Valle",
@@ -1422,6 +1513,10 @@ export const es_ES: EnTranslations = {
       "twoFactorRecoveryTitle": "Guarda tus códigos de recuperación",
       "twoFactorRecoveryHint": "Cada código funciona una sola vez. Guárdalos en un lugar seguro: son la única forma de volver a entrar si pierdes tu app de autenticación.",
       "twoFactorDownloadCodes": "Descargar Códigos",
+      "recoveryCodesFileHeader": "Códigos de recuperación de {brand}",
+      "recoveryCodesFileAccount": "Cuenta: {username}",
+      "recoveryCodesFileHint": "Cada código se puede usar una sola vez si pierdes el acceso a tu app de autenticación.",
+      "recoveryCodesFileWarn": "Guarda este archivo en un lugar seguro y privado.",
       "twoFactorDone": "Listo",
       "twoFactorDisableHint": "Introduce tu contraseña para desactivar los dos pasos. Tus códigos de recuperación se descartarán.",
       "twoFactorDisableBtn": "Desactivar Dos Pasos",
@@ -1463,10 +1558,12 @@ export const es_ES: EnTranslations = {
       "title": "Recolección",
       "harvestButton": "Recolectar",
       "harvestTooltip": "Recoge los componentes marcados. Cada cadáver puede recolectarse una vez, el primero en llegar.",
-      "concentrateHint": "Cuantos menos componentes elijas, mayor será la calidad de cada uno.",
+      "yieldTierHint": "Cuantos menos componentes extraiga una recolección, mayor será el nivel de recolección de cada uno.",
       "nothingSelectedYields": "Nada de lo que has seleccionado se puede recolectar de este cadáver.",
       "alreadyHarvested": "Este cadáver ya ha sido recolectado.",
       "componentAria": "Recolectar {component}",
+      "componentNoYield": "aún nada",
+      "componentAriaNoYield": "Recolectar {component}: {note}",
       "components": {
         "hide": "Piel",
         "fang": "Colmillo",
@@ -1554,6 +1651,7 @@ export const es_ES: EnTranslations = {
       "filterConsumable": "Consumibles",
       "filterMaterial": "Materiales",
       "filterQuest": "Misión",
+      "filterMount": "Monturas",
       "sortAria": "Ordenar objetos de la bolsa",
       "sortRecent": "Recientes",
       "sortQuality": "Calidad",
@@ -1771,6 +1869,9 @@ export const es_ES: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "Requiere nivel {level}",
+      "riftTier": "Objeto de Brecha de rango {tier}",
+      "riftUpgrade": "Mejora de brecha {level}/{max}",
+      "riftSockets": "Gemas de brecha {used}/{total}",
       "statEnchanted": "+{value} {stat} (Encantado)",
       "enchantedFallback": "Encantado"
     },
@@ -2024,8 +2125,8 @@ export const es_ES: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Recogida pendiente en el Mercado Mundial",
-      "tip": "Oro u objetos te esperan en el Mercader."
+      "aria": "Ganancias u objetos del Mercado Mundial en espera",
+      "tip": "Las ganancias de venta u objetos devueltos te esperan en el Mercader."
     },
     "noticeboard": {
       "empty": "Parece que no hay nada publicado."
@@ -2169,9 +2270,9 @@ export const es_ES: EnTranslations = {
       "notReady": "Este nodo de recursos aun no ha reaparecido para ti.",
       "gatherLine": "Reúnes: {name}.",
       "gatherLineQty": "Reúnes: {name} x{qty}.",
-      "harvestLine": "You harvest: {name}.",
-      "harvestLineQty": "You harvest: {name} x{qty}.",
-      "harvestSpecimenLine": "You also recover {name}.",
+      "harvestLine": "Despiezas: {name}.",
+      "harvestLineQty": "Despiezas: {name} x{qty}.",
+      "harvestSpecimenLine": "También recuperas {name}.",
       "catchLine": "Recoges: {name}",
       "biteLine": "¡Algo muerde el anzuelo!",
       "gotAwayLine": "Se escapó.",
@@ -2353,7 +2454,7 @@ export const es_ES: EnTranslations = {
       "empty": "Aún no se conocen recetas.",
       "resultAria": "Elaboración {name}",
       "craftedToast": "Elaborado: {name}",
-      "craftedToastQty": "Crafted: {name} x{qty}",
+      "craftedToastQty": "Elaborado: {name} x{qty}",
       "insufficientMaterials": "No tienes los materiales para eso.",
       "unknownRecipe": "Esa receta no existe.",
       "comboRequirementUnmet": "No tienes las dos profesiones requeridas al nivel necesario para esa receta.",
@@ -2446,13 +2547,13 @@ export const es_ES: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Desencatas {item}.",
-      "disenchantedYield": "You disenchant {item} into {material}.",
-      "disenchantedYieldQty": "You disenchant {item} into {material} x{qty}.",
-      "disenchantedAlso": "You also recover {material}.",
-      "disenchantedAlsoQty": "You also recover {material} x{qty}.",
+      "disenchantedYield": "Desencantas {item} en {material}.",
+      "disenchantedYieldQty": "Desencantas {item} en {material} x{qty}.",
+      "disenchantedAlso": "También recuperas {material}.",
+      "disenchantedAlsoQty": "También recuperas {material} x{qty}.",
       "salvagedLine": "Desguazas {item}.",
-      "salvagedYield": "You salvage {item} into {material}.",
-      "salvagedYieldQty": "You salvage {item} into {material} x{qty}.",
+      "salvagedYield": "Desguazas {item} en {material}.",
+      "salvagedYieldQty": "Desguazas {item} en {material} x{qty}.",
       "enchantAppliedLine": "Encantas {item} con {enchant}.",
       "notHeld": "No tienes ese objeto.",
       "notDisenchantable": "No puedes desencatar eso.",
@@ -2477,6 +2578,7 @@ export const es_ES: EnTranslations = {
       "noEnchants": "Ningún encantamiento usa este reactivo.",
       "noTargets": "No hay ningún objeto elegible para encantar.",
       "wornTag": "Equipado ({slot})",
+      "wornTagIndexed": "Equipado ({slot} {index})",
       "tier": {
         "base": "Encantamientos base",
         "runed": "Encantamientos Rúnicos",
@@ -2489,14 +2591,14 @@ export const es_ES: EnTranslations = {
       "sameEnchant": "Ese objeto ya tiene ese encantamiento.",
       "replaceTag": "Reemplaza {enchant}",
       "sameEnchantTag": "Ya aplicado",
-      "plainTag": "Not enchanted",
+      "plainTag": "Sin encantar",
       "replaceConfirmTitle": "¿Reemplazar el encantamiento de {item}?",
       "replaceConfirmBody": "Esto reemplaza {old} en {item} por {new}.",
       "replaceConfirmNoRefund": "El encantamiento antiguo se destruye. Sus materiales no se reembolsan. No se puede deshacer.",
-      "replaceConfirmKeeps": "Kept: {kept}",
-      "replaceConfirmKeepsSigner": "Maker's mark",
-      "replaceConfirmKeepsMasterwork": "Masterwork bonus",
-      "replaceConfirmKeepsBond": "Commission bond",
+      "replaceConfirmKeeps": "Conserva: {kept}",
+      "replaceConfirmKeepsSigner": "Marca del artesano",
+      "replaceConfirmKeepsMasterwork": "Bonificación de obra maestra",
+      "replaceConfirmKeepsBond": "Vínculo de encargo",
       "replaceConfirmCost": "Coste: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Reemplazar"
@@ -2707,6 +2809,14 @@ export const es_ES: EnTranslations = {
       "lbEmpty": "Aún no hay cronistas clasificados.",
       "broadcastsLabel": "Compartir las gestas conseguidas con la hermandad y los amigos",
       "titledName": "{name} [{title}]"
+    },
+    "continentMap": {
+      "title": "Mapa del Mundo",
+      "summary": "Mapa del mundo. Elige una zona para abrir su mapa.",
+      "toWorld": "Mapa del mundo",
+      "toZone": "Mapa de la zona",
+      "toggleAria": "Alternar entre el mapa del mundo y el mapa de la zona",
+      "levels": "Niveles {min} a {max}"
     }
   },
   "gatherEvent": {
@@ -2935,7 +3045,17 @@ export const es_ES: EnTranslations = {
         "marshName": "Ciénaga de Mirefen",
         "marshBlurb": "Marismas sumergidas y ruinas desgastadas por la marea, hogar de mudfins y cosas peores.",
         "peaksName": "Alturas de Thornpeak",
-        "peaksBlurb": "Crestas azotadas por el viento que ascienden hacia los peligros más gélidos del reino."
+        "peaksBlurb": "Crestas azotadas por el viento que ascienden hacia los peligros más gélidos del reino.",
+        "duskName": "La Hondonada Velada",
+        "duskBlurb": "Un reino sellado bajo las montañas, si los susurros de una entrada son ciertos.",
+        "emberName": "Las Tierras del Dragón",
+        "emberBlurb": "Al otro lado de la Calzada Pálida el verde da paso a la ceniza, y algo antiguo gobierna los páramos.",
+        "frostName": "El Velo de Escarcha",
+        "frostBlurb": "Una altura nevada más allá de todo mapa, vislumbrada solo en las luces danzantes.",
+        "amberName": "La Cascada de Ámbar",
+        "amberBlurb": "Tras los acantilados occidentales, un otoño que nunca termina, y faroles sobre un mere dorado.",
+        "fenName": "El Pantano de los Sauces",
+        "fenBlurb": "Más allá de la corona de otoño, una ciénaga luminosa de sauces y aguas quietas, y un pueblo tras un foso."
       },
       "group": {
         "heading": "Formad grupo para las partes difíciles",
@@ -3404,6 +3524,18 @@ export const es_ES: EnTranslations = {
       "reptile": {
         "name": "Reptilidos",
         "desc": "Cazadores de sangre fria con su propio silbido y mordisco, bien distintos de las bestias de sangre caliente."
+      },
+      "murloc": {
+        "name": "Aletacroantes",
+        "desc": "Gente-pez croante de orillas de lago y charcas de marea, rápidos para enjambrarse sobre cualquiera que vadee demasiado cerca."
+      },
+      "kobold": {
+        "name": "Bribones",
+        "desc": "Carroñeros correteantes y duendes de claros y setos, más molestia que amenaza hasta que se juntan en número."
+      },
+      "demon": {
+        "name": "Demonios",
+        "desc": "Invasores de más allá de las brechas, todo fuego y rencor. Donde uno se planta, una brecha nunca está lejos."
       }
     },
     "worldPage": {
@@ -3417,15 +3549,55 @@ export const es_ES: EnTranslations = {
       "valeBlurb": "El verde valle inicial, donde los nuevos héroes se foguean contra lobos y bandidos en torno al pueblo de Eastbrook.",
       "marshBlurb": "Una tierra ahogada de niebla y ruinas. Los mudfins pululan por los bajíos y algo más antiguo se agita bajo el agua, vigilado desde el pueblo-puente de Fenbridge.",
       "peaksBlurb": "Crestas azotadas por el viento y viejas labores mineras que ascienden hacia los peligros más gélidos y elevados del reino, en poder del puesto de avanzada de Highwatch.",
+      "duskBlurb": "Un valle de ocaso permanente bajo el gran árbol de Eldergleam, donde las ruinas de cristal brillan y el aire zumba con magia antigua.",
+      "emberBlurb": "Páramos de ceniza y vidrio sangriento iluminados por tormentas, donde los dragones trazan círculos sobre la caldera y hogueras trol arden entre las dunas, vigilados desde el pueblo-puerta de Wyrmwatch.",
+      "frostBlurb": "Un silencio de nieve y pinos oscuros bajo la aurora, donde el propio frío parece estar despierto y Icemantle mantiene sus fuegos encendidos.",
+      "amberBlurb": "Un otoño eterno de hojas doradas y rojas que nunca caen, reunido alrededor del pueblo iluminado por faroles de Lanternmere.",
+      "fenBlurb": "Un humedal luminoso y zumbante de lirios y aguas lentas, cruzado por viejas pasarelas desde el pueblo-puente de Bridgemere.",
+      "nightBlurb": "Un reino de medianoche estrellada donde las flores iluminan los senderos y Moonrest mantiene una vela silenciosa bajo un cielo soñador.",
+      "hauntBlurb": "Un bosque encantado bajo doseles gigantes, donde los faroles de Gallowmere son la única luz honesta del camino.",
+      "galeBlurb": "Acantilados marinos y páramos aulladores donde el viento nunca descansa, el Viejo Faro nunca se apaga, y Wickharbor cierra bien sus puertas.",
+      "jungleBlurb": "Una maraña tropical de palmeras, arena blanca y pájaros ruidosos, con el pueblo playero de Drifthaven manteniendo una hoguera encendida en la costa.",
+      "gardenBlurb": "Un reino jardín de laberinto de setos que nadie ha visto recortar, al que se entra pasando Hedgewick y sus cortes con fuentes.",
       "valeGreeting": "Mantén tu espada cerca. El Valle ya no es lo que era.",
       "valeGreeter": "Mariscal Redbrook, Eastbrook",
       "marshGreeting": "Detente en la puerta. Pasados esos juncos, la ciénaga mata por nosotros.",
       "marshGreeter": "Guardiana Fenwick, Fenbridge",
       "peaksGreeting": "Doscientos años ha resistido este muro. No caerá durante mi guardia, pero cruje.",
       "peaksGreeter": "Capitana Thessaly, Highwatch",
+      "duskGreeting": "Pocos de los tuyos han estado bajo estas ramas. Camina con cuidado, y sé bienvenido.",
+      "duskGreeter": "Guardiana Saelwyn, Eldergleam",
+      "emberGreeting": "Viento caliente desde los páramos, dragones sobre el Drakemaw, y hogueras trol en las dunas. Bebe algo antes de salir ahí fuera.",
+      "emberGreeter": "El guardapuerta, Wyrmwatch",
+      "frostGreeting": "La nieve devora cada sonido más allá de la muralla. Si las luces empiezan a danzar, baja la voz y mantén tu fuego encendido.",
+      "frostGreeter": "La guardiana del hogar, Icemantle",
+      "amberGreeting": "Aquí cada hoja arde en oro y rojo, y sin embargo ninguna cae jamás. Los faroles están encendidos para ti; cuidado con el Goldmelt en tu camino de subida.",
+      "amberGreeter": "El farolero, Lanternmere",
+      "fenGreeting": "La ciénaga zumba con libélulas y abejas. Cruza el puente, descansa los pies un rato, y quédate en las pasarelas más allá de las charcas.",
+      "fenGreeter": "El puentero, Bridgemere",
+      "nightGreeting": "Más allá del Nightgate el aire mismo sueña. Sigue la luz de las flores, y cuidado con el mundo dormido que cuelga en el cielo.",
+      "nightGreeter": "La guardiana de la vela, Moonrest",
+      "hauntGreeting": "Mantente cerca de los faroles, viajero. Y si el bosque pronuncia tu nombre desde fuera del camino, no respondas.",
+      "hauntGreeter": "El farolero, Gallowmere",
+      "galeGreeting": "El viento nunca ha dejado de soplar aquí, y el Viejo Faro nunca se ha apagado. Cierra la puerta de la posada al entrar.",
+      "galeGreeter": "El guardián del faro, Wickharbor",
+      "jungleGreeting": "Arena cálida, pájaros ruidosos, y una selva que devora el horizonte. Mantenemos una hoguera encendida en la playa; intenta volver a ella.",
+      "jungleGreeter": "La capitana del puerto, Drifthaven",
+      "gardenGreeting": "Alguien sigue recortando los setos, aunque no se ha visto a ningún jardinero en cien años. Cuidado con el laberinto: él también te vigila a ti.",
+      "gardenGreeter": "El guardapuerta, Hedgewick",
       "valePlaceNotes": "Eastbrook es tu primera base de operaciones. Wolf Run y el Prado de los Jabalíes son terreno de caza apacible; el Lago Espejo es buena agua para pescar, aunque los aletafango pululan por sus bajíos; el Sableweb y la Excavación de Cobre ocultan arañas y excavadores ávidos de mineral; un Campamento de Bandidos y la Capilla Caída albergan trabajos más recios; la colina del Relicario desciende hasta el Relicario Derrumbado, la primera expedición del reino; el Claro de Brightwood es una apacible arboleda soleada en el norte; y el Sembradal es el campo de balonjabalí amurallado de Eastbrook, donde se juega la Copa del Valle bajo una tregua de la cosecha.",
       "marshPlaceNotes": "Fenbridge custodia el único camino seco. Los Juncos del Acechador y los Bajíos de Deepfen rebosan de bestias de la ciénaga y mudfins; la Espesura de la Viuda está tupida de telarañas; la Capilla Ahogada y los Túmulos de los Troles guardan peligros más antiguos, con La Letanía Ahogada, la expedición propia de la ciénaga, abriéndose justo al norte de los túmulos; el Campamento de Gravecaller es el culto atrincherado, y el Bastión Sumergido es el corazón instanciado de la ciénaga.",
       "peaksPlaceNotes": "Highwatch defiende el muro. La Cresta del Acechador y las Galerías de Deeprock pertenecen a felinos de las crestas y madrigueros; las Estribaciones de los Ogros y el Campamento de Guerra de Drogmar, a brutos a sueldo; Stormcrag crepita de elementales, y a sus pies reluce el Glimmermere, el lago de montaña cuya orilla guarda la puerta de luz pálida que baja al Templo Ahogado; las Tiendas del Culto del Vermis y los Campos de los Resucitados rodean el bastión elevado del culto, con el Santuario del Gravewyrm en su cima.",
+      "duskPlaceNotes": "Eldergleam se reúne bajo el gran árbol. La Cueva de Duskfall y su mirador son la entrada y la primera vista del valle; la Arboleda Anciana y la Cuenca de Starfall guardan el sur silencioso; la Corte Sumergida alberga ruinas cubiertas de maleza en el este; y el Abismo Reluciente y los Bajíos Cristalinos brillan por todo el norte.",
+      "emberPlaceNotes": "Wyrmwatch sostiene la puerta. El Gatewood es el último verde antes del páramo; las Dunas de Ceniza flotan con ceniza y algo peor; el Trollmoot es donde los troles de las dunas encienden sus hogueras; los Campos de Vidrio Sangriento brillan con esquirlas afiladas; y la Caldera de Drakemaw es la corona humeante que rodean los dragones.",
+      "frostPlaceNotes": "Icemantle guarda el último hogar cálido. La Línea de Nieve marca donde los ventisqueros toman el mando; el Lago del Glaciar es agua negra y quieta bajo el hielo; los Escalones de la Aurora suben bajo las luces danzantes; el Shiverfen es un cenagal congelado que nunca duerme del todo; y las Terrazas Aulladoras se ganan su nombre cada noche.",
+      "amberPlaceNotes": "Lanternmere brilla en el corazón de la cosecha. El Goldmelt es el paso ambarino de entrada; el Huerto Dorado y la Hondonada de la Cosecha guardan los frutos más dulces y a los ladrones más audaces; el Gran Mere refleja las hojas ardientes; el Alto de Cindermaple se alza más alto y más rojo que ningún otro; y el Monolito Inclinado recuerda algo más antiguo que el otoño.",
+      "fenPlaceNotes": "Bridgemere se asienta sobre las aguas lentas. Los Escalones de Amberfen bajan desde el país de la cosecha; los Páramos de Lirios y las Charcas de Bogshine brillan con fuegos fatuos y libélulas; Willowweep arrastra sus ramas hacia el mere; y las Llanuras Somnolientas son lo más apacible que ofrece esta tierra.",
+      "nightPlaceNotes": "Moonrest mantiene la vela. El Nightgate es la entrada al país de la medianoche; el Pozo de Luna guarda luz estelar junto a la que puedes estar de pie; Gloamfield florece en la oscuridad; la Vela Permanente vigila sin moverse jamás; y el Túmulo Insomne es el único lugar aquí que nunca sueña.",
+      "hauntPlaceNotes": "Gallowmere se acurruca dentro de sus faroles. El Crowgate es la sombría puerta principal del bosque; el Matorral de la Viuda está tejido de telarañas espesas; el Claro Colgante y la Capilla de Mournstone guardan los duelos más antiguos del bosque; y el Claro del Cazador pertenece a lo que sea que todavía caza allí.",
+      "galePlaceNotes": "Wickharbor se inclina contra el viento. El Windway es el camino del acantilado de entrada; los Páramos Aulladores se extienden sin árboles bajo el vendaval; el Viejo Faro ha ardido desde tiempos que nadie recuerda; el Shear cae a pico hacia el agua; los Wreckfields mantienen honesta a la costa; y el Lago Espejo es lo único quieto en todo el reino.",
+      "junglePlaceNotes": "Drifthaven mantiene su hoguera en la playa. El Tanglemouth es donde el río se encuentra con el muro verde; el Palmstrand se extiende blanco y cálido junto al oleaje; la Maraña Esmeralda y el Vinefall devoran el interior; la Laguna Zafiro brilla clara y profunda; y el Ídolo Sumergido observa desde bajo el agua.",
+      "gardenPlaceNotes": "Hedgewick espera en la Puerta del Jardín. El Paseo del Parterre florece en color recortado; el Castillo de Dawnhold entrena a sus caballeros tras murallas nuevas; el Estanque de Pétalos flota rosado todo el año; el Viejo Molino da vueltas sobre sus propios lechos en anillo; el Gran Laberinto reordena sus pasillos para cada visitante, sus arcos vigilados por zorros de follaje; la Guardia del Norte custodia el camino de salida; la Cuenca de los Lirios descansa más allá de todo; y la Corte de la Fuente todavía corre clara en el corazón del jardín.",
       "gladeTitle": "Un rincón tranquilo: la arboleda de Brightwood",
       "gladeBody": "No todas las historias del Valle tratan de los muertos. Al norte, una arboleda soleada llamada arboleda de Brightwood conserva su propio ritmo más amable, solo senderos silenciosos y luz moteada bajo las ramas. Es un contrapunto suave al rastro que sigues y merece verse cuando el camino te deje espacio para vagar.",
       "worldBossTitle": "Cuando la cima despierta: el jefe del mundo",
@@ -3499,6 +3671,7 @@ export const es_ES: EnTranslations = {
       "bastionBody": "Una fortaleza inundada perdida en la ciénaga, en poder de los defensores ahogados y de la propia marea creciente.",
       "templeBody": "Un altar sumergido junto al camino de la ciénaga, un desvío para los curiosos y los bien preparados.",
       "sanctumBody": "El oscuro corazón de Thornpeak, donde la larga labor del culto alcanza su terrible apogeo.",
+      "wildheartBody": "Una caldera selvática empapada de lluvia donde dos senderos de caza elevados rodean un cenote de jade. Cruza guaridas de bestias y ruinas ancestrales, y luego escala la pirámide ritual para enfrentarte a Zulgar.",
       "raidName": "La banda del final del juego",
       "raidBody": "Tras una puerta real sellada aguarda una prueba para diez jugadores: un combate de varias fases y un poder imperecedero que toda la banda debe neutralizar en conjunto. Gánate la entrada y luego trae a nueve amigos.",
       "heroicTitle": "Modo heroico",
@@ -3742,7 +3915,7 @@ export const es_ES: EnTranslations = {
     "professions": {
       "intro": "Más allá del combate y las misiones, el mundo te recompensa por trabajar la tierra y la fragua: recolectar materias primas, convertirlas en equipo y bienes a lo largo de diez oficios de artesanía, y asentarte en una identidad como uno de los diez arquetipos que esos oficios representan.",
       "harvestTitle": "Cosechar la propia cacería",
-      "harvestBody": "La recolección no se limita a los nodos. Muchas bestias abatidas pueden cosecharse una sola vez, el primero en llegar, para obtener pieles, colmillos, seda y carne directamente del cadáver junto a su botín ordinario; con una pulsación se abre todo a la vez. La elección también es tuya cada vez: extrae todo lo que ofrece el cadáver, o concéntrate en menos componentes y obtén una calidad notablemente superior de lo que sí tomas.\n\nUna tirada de cosecha rara o mejor en una familia portadora de ejemplares también otorga un ejemplar perfecto firmado (una Piel Prístina, Seda Prístina, Glándula de Veneno Prístina o Corte Primo) además del rendimiento ordinario, y registra Espécimen Perfecto en tu Libro de Gestas. Cualquier personaje puede cosechar, sin necesidad de entrenamiento, y cualquier herramienta de recolección que poseas cuenta para el tramo de calidad superior, sea del oficio que sea.",
+      "harvestBodyChoice": "La recolección no se limita a los nodos. Muchas bestias abatidas pueden cosecharse una sola vez, el primero en llegar, para obtener pieles, colmillos, seda y carne directamente del cadáver junto a su botín ordinario; con una pulsación se abre todo a la vez. Cuando una bestia porta más de un componente aprovechable, la elección es tuya: toma todo lo que pueda dar, o concéntrate en menos componentes y obtén una calidad notablemente superior de lo que sí tomas.\n\nUna tirada de cosecha rara o mejor en una familia portadora de ejemplares también otorga un ejemplar perfecto firmado (una Piel Prístina, Seda Prístina, Glándula de Veneno Prístina o Corte Primo) además del rendimiento ordinario, y registra Espécimen Perfecto en tu Libro de Gestas. Cualquier personaje puede cosechar, sin necesidad de entrenamiento, y cualquier herramienta de recolección que poseas cuenta para el tramo de calidad superior, sea del oficio que sea.",
       "focusTitle": "Enfoque del pueblo",
       "focusBody": "Cada pueblo principal mantiene un panel de Enfoque del pueblo para los recolectores de paso: párate en el pueblo, ábrelo junto al minimapa y dirige un pequeño presupuesto de puntos de enfoque hacia los tipos de componente que te interesan. Cuanto más enfoque des a un componente, más fino y rico saldrá de cada cadáver posterior; tu asignación acompaña a tu personaje dondequiera que vaya, y puedes reajustarla, gratis, en cualquier visita posterior al pueblo.",
       "craftHowTitle": "La ventana de artesanía",
@@ -5033,6 +5206,57 @@ export const es_ES: EnTranslations = {
     "chat": "Abrir chat"
   },
   "sim": {
+    "rift": {
+      "allUnstable": "Todas las brechas están inestables en este momento. Vuelve a intentarlo pronto.",
+      "enterFloor": "Cruzas la brecha hacia {name}.",
+      "descendFloor": "Desciendes más profundo en {name}.",
+      "stepBack": "Retrocedes a través de la brecha.",
+      "pylonLit": "Un pilar rúnico cobra vida ({lit}/{total}).",
+      "wayDownOpens": "El camino hacia abajo se abre.",
+      "exitOpens": "La brecha se estremece. Un camino a casa se abre tras los caídos.",
+      "portalOpens": "¡Una brecha de rango {tier} se abre en {zone}!",
+      "portalSealed": "La brecha de rango {tier} en {zone} ha sido sellada.",
+      "portalCollapses": "La brecha de rango {tier} en {zone} colapsa.",
+      "levelGate": "Solo aventureros de nivel {level} o superior pueden entrar en esta brecha.",
+      "deadEntry": "No puedes entrar en una brecha estando muerto.",
+      "deadEntryCombat": "Tu grupo sigue en combate. Los caídos pueden volver a entrar cuando termine la lucha.",
+      "iceGoalLit": "El sigilo de escarcha resplandece. El camino se agita.",
+      "socketsShut": "Los engarces se cierran con un chirrido. El camino se agita.",
+      "seqProgress": "Las runas responden en su turno ({step}/{total}).",
+      "seqReset": "Las runas se apagan. Comienza de nuevo.",
+      "gateOpen": "La puerta se abre con un chirrido.",
+      "orbSealed": "El orbe está sellado por el ritual de abajo.",
+      "orbWakes": "La llama del pentagrama se apaga. Algo despierta en el altar.",
+      "orbOpensGate": "El Orbe de Sangre resplandece. Las puertas del templo se abren con un chirrido.",
+      "alreadyCleared": "Esta brecha ya ha sido despejada por {names}.",
+      "raceLost": "La brecha ya ha sido despejada por {names}. Tu intento termina.",
+      "raceWorldWin": "¡{names} ganó la carrera de brecha de rango {tier} en {seconds}s!",
+      "raceWinBanner": "Carrera de Brecha Ganada - {seconds}s",
+      "raceLostBanner": "Brecha Ya Despejada",
+      "forgeUpgraded": "Mejora de brecha completada para {name}.",
+      "forgeEnchanted": "Encantamiento de brecha completado para {name}.",
+      "forgeSocketed": "Gema de brecha engarzada para {name}.",
+      "detonateGlacialGrave": "¡La Tumba Glacial detona!",
+      "detonateAbsoluteZero": "¡Cero Absoluto estalla!",
+      "detonateMagmaWell": "¡El Pozo de Magma estalla!",
+      "detonateCoreMeltdown": "¡La Fusión del Núcleo detona!",
+      "detonateVenomPool": "¡La Charca de Veneno estalla!",
+      "detonateBroodmothersMark": "¡La Marca de la Progenitora detona!",
+      "detonateSoulGrave": "¡La Tumba del Alma detona!",
+      "detonateDeathSentence": "¡Cae la Sentencia de Muerte!",
+      "detonateEarthshatter": "¡Quiebratierra detona!",
+      "detonateFinalJudgment": "¡Cae el Juicio Final!",
+      "detonateVoidRift": "¡La Brecha del Vacío detona!",
+      "detonateArcaneAnnihilation": "¡Aniquilación Arcana estalla!",
+      "detonateLightningRod": "¡La Vara de Rayo golpea!",
+      "detonateStormcallersWrath": "¡La Ira del Invocatormentas estalla!",
+      "detonateAbyssalMaw": "¡Las Fauces Abisales se cierran!",
+      "detonateCrushingDepth": "¡La Profundidad Aplastante aplasta!",
+      "detonatePactSeal": "¡El Sello del Pacto detona!",
+      "detonateBloodRite": "¡Cae el Rito de Sangre!",
+      "detonatePitSentence": "¡La Sentencia del Pozo detona!",
+      "detonateHellfireBrand": "¡La Marca de Fuego Infernal detona!"
+    },
     "delve": {
       "cannotEnterNow": "No puedes entrar en una Profundidad ahora mismo.",
       "leaveDungeonFirst": "Sal primero de la mazmorra.",
@@ -5516,6 +5740,7 @@ export const es_ES: EnTranslations = {
     },
     "augment": {
       "choose": "Elige una mejora",
+      "cardAria": "{name} ({category}): {description}",
       "aug_brutality": {
         "name": "Brutalidad",
         "desc": "Tus golpes físicos pegan un 15% más fuerte."
@@ -5886,6 +6111,8 @@ export const es_ES: EnTranslations = {
       "secondsRemaining": "Quedan {seconds} segundos",
       "enteringZone": "Entrando en {zone}.",
       "welcomeZone": "¡Bienvenido a {zone}!",
+      "riftLabel": "{name}",
+      "riftLabelRanked": "{name} ({rank})",
       "levelBanner": "¡Nivel {level}!",
       "levelLog": "Has alcanzado el nivel {level}.",
       "xpGain": "Ganas {amount} de experiencia.",
@@ -6138,6 +6365,8 @@ export const es_ES: EnTranslations = {
       "floatingDodge": "Esquiva",
       "floatingParry": "Rechazo",
       "floatingResist": "Resistido",
+      "floatingHealFull": "Completo",
+      "floatingHealAbsorbed": "Absorbido",
       "cannotMove": "¡No puedes moverte!",
       "attack": "ataque",
       "damageDone": "Tu {ability} golpea a {target} por {amount}.",
@@ -6152,6 +6381,10 @@ export const es_ES: EnTranslations = {
       "healSelfCrit": "Tu {ability} te sana críticamente {amount}.",
       "healOther": "Tu {ability} sana a {target} por {amount}.",
       "healOtherCrit": "Tu {ability} sana críticamente a {target} por {amount}.",
+      "healSelfFull": "Tu {ability} llega, pero ya tienes la salud completa.",
+      "healOtherFull": "Tu {ability} llega a {target}, pero ya tiene la salud completa.",
+      "healSelfAbsorbed": "Tu {ability} es devorado por la plaga sobre ti.",
+      "healOtherAbsorbed": "Tu {ability} es devorado por la plaga sobre {target}.",
       "death": "{name} muere.",
       "auraGain": "Obtienes {name}.",
       "auraFade": "{name} se desvanece de ti.",
@@ -6240,6 +6473,7 @@ export const es_ES: EnTranslations = {
       "arenaQueueTrading": "Termina tu comercio antes de entrar en cola.",
       "arenaQueueInstance": "No puedes entrar en cola desde una instancia.",
       "tradeInProgress": "Ya hay un comercio en curso.",
+      "tradeAlreadyTrading": "That player is already trading.",
       "tradeTooFar": "El objetivo está demasiado lejos para comerciar.",
       "tradeExpired": "La solicitud de comercio ha expirado.",
       "tradeFailed": "Comercio fallido: los objetos o el dinero ya no están disponibles.",
@@ -6510,7 +6744,23 @@ export const es_ES: EnTranslations = {
       "fishing": "Pesca",
       "gathering": "Recolectando",
       "demonHeal": "Sanación demoníaca",
-      "thunzharrStormcall": "Llamada de la tormenta"
+      "thunzharrStormcall": "Llamada de la tormenta",
+      "rift_frost_execution": "Tumba glacial",
+      "rift_frost_strike": "Cero absoluto",
+      "rift_ember_execution": "Pozo de magma",
+      "rift_ember_strike": "Fusión del núcleo",
+      "rift_venom_execution": "Charca de veneno",
+      "rift_venom_strike": "Marca de la progenitora",
+      "rift_necro_execution": "Tumba del alma",
+      "rift_necro_strike": "Sentencia de muerte",
+      "rift_brute_execution": "Quiebratierra",
+      "rift_brute_strike": "Juicio final",
+      "rift_arcane_execution": "Brecha del vacío",
+      "rift_arcane_strike": "Aniquilación arcana",
+      "rift_storm_execution": "Vara de rayo",
+      "rift_storm_strike": "Ira del invocatormentas",
+      "rift_tide_execution": "Fauces abisales",
+      "rift_tide_strike": "Profundidad aplastante"
     }
   },
   "questUi": {
@@ -6627,7 +6877,8 @@ export const es_ES: EnTranslations = {
       "tool": "Herramienta",
       "potion": "Poción",
       "elixir": "Elixir",
-      "bag": "Bolsa"
+      "bag": "Bolsa",
+      "mount": "Montura"
     },
     "stats": {
       "armor": "Armadura",
@@ -9171,6 +9422,312 @@ export const es_ES: EnTranslations = {
       "resonant_timber": {
         "name": "Madera resonante"
       },
+      "duskwisp_essence": {
+        "name": "Esencia de fuego crepuscular"
+      },
+      "spore_heart": {
+        "name": "Corazón de espora"
+      },
+      "gleaming_antler": {
+        "name": "Asta reluciente"
+      },
+      "wisp_mote": {
+        "name": "Mota de fuego fatuo"
+      },
+      "starfall_shard": {
+        "name": "Esquirla de estrella caída"
+      },
+      "elder_bark": {
+        "name": "Corteza de anciano"
+      },
+      "hollow_sealstone": {
+        "name": "La Piedra del Sello de la Hondonada"
+      },
+      "monument_overlook": {
+        "name": "Monumento desgastado"
+      },
+      "monument_court": {
+        "name": "Monumento hundido"
+      },
+      "monument_north": {
+        "name": "Monumento olvidado"
+      },
+      "guardian_core": {
+        "name": "Núcleo de guardián"
+      },
+      "wardens_seal": {
+        "name": "El Sello del Vigilante"
+      },
+      "gleamstag_charm": {
+        "name": "Talismán del Ciervo Radiante"
+      },
+      "veilsteel_blade": {
+        "name": "Hoja de acero velado"
+      },
+      "duskfang_dirk": {
+        "name": "Daga colmillo crepuscular"
+      },
+      "gleamwood_stave": {
+        "name": "Bastón de madera radiante"
+      },
+      "wardens_oathband": {
+        "name": "Banda de juramento del Vigilante"
+      },
+      "wardplate_cuirass": {
+        "name": "Coraza de placas guardianas"
+      },
+      "nightweave_tunic": {
+        "name": "Túnica de tejido nocturno"
+      },
+      "veilcloth_robe": {
+        "name": "Toga de tela velada"
+      },
+      "rift_essence": {
+        "name": "Esencia de la Brecha"
+      },
+      "rift_gem_crimson": {
+        "name": "Gema Carmesí de la Brecha"
+      },
+      "rift_gem_azure": {
+        "name": "Gema Azur de la Brecha"
+      },
+      "rift_gem_verdant": {
+        "name": "Gema Verde de la Brecha"
+      },
+      "riftbound_band_of_might": {
+        "name": "Banda Ligada a la Brecha del Poder"
+      },
+      "riftbound_band_of_insight": {
+        "name": "Banda Ligada a la Brecha de la Perspicacia"
+      },
+      "riftbound_band_of_guile": {
+        "name": "Banda Ligada a la Brecha de la Astucia"
+      },
+      "hoarfrost_edge": {
+        "name": "Filo de Escarcha"
+      },
+      "emberforge_gauntlets": {
+        "name": "Guanteletes de Emberforge"
+      },
+      "broodmother_carapace": {
+        "name": "Caparazón de la Progenitora"
+      },
+      "bonelord_mantle": {
+        "name": "Manto del Señor de los Huesos"
+      },
+      "graskbreaker_girdle": {
+        "name": "Cinturón Quiebra-Grask"
+      },
+      "voidscar_handwraps": {
+        "name": "Vendas de Manos Cicatriz del Vacío"
+      },
+      "stormscale_treads": {
+        "name": "Botas Escamatormenta"
+      },
+      "abyssal_loop": {
+        "name": "Anillo Abisal"
+      },
+      "pactbound_vestments": {
+        "name": "Vestiduras Ligadas al Pacto"
+      },
+      "pitlords_cleaver": {
+        "name": "Cuchilla del Señor del Pozo"
+      },
+      "emberforged_bulwark": {
+        "name": "Baluarte Forjado en Ascuas"
+      },
+      "stormsunder_hood": {
+        "name": "Capucha Quiebratormentas"
+      },
+      "voidweave_mantle": {
+        "name": "Manto de Tejido del Vacío"
+      },
+      "abysswrought_band": {
+        "name": "Banda Forjada en el Abismo"
+      },
+      "heart_of_the_rift": {
+        "name": "Corazón de la Brecha"
+      },
+      "voidsong_dirk": {
+        "name": "Canto del Vacío, Daga del Velo Escindido"
+      },
+      "wildheart_tuskblade": {
+        "name": "Hoja de Colmillo Wildheart"
+      },
+      "wildheart_hexwood_staff": {
+        "name": "Bastón de Madera Hechizada de la Cuenca"
+      },
+      "wildheart_fangknife": {
+        "name": "Cuchillo Colmillo de Zulgar"
+      },
+      "thick_winter_pelt": {
+        "name": "Piel Gruesa de Invierno"
+      },
+      "aurora_mote": {
+        "name": "Mota de Aurora"
+      },
+      "hearth_ember_cache": {
+        "name": "Alijo de Ascuas"
+      },
+      "sprung_trap": {
+        "name": "Trampa de Ciénaga Disparada"
+      },
+      "hearthlined_treads": {
+        "name": "Botas Forradas de Hogar"
+      },
+      "frostmane_mantle": {
+        "name": "Manto del Frostmane"
+      },
+      "ashbone_war_brand": {
+        "name": "Marca de Guerra Ashbone"
+      },
+      "emberwing_scale": {
+        "name": "Escama de Emberwing"
+      },
+      "scorched_supply_crate": {
+        "name": "Cajón de Suministros Chamuscado"
+      },
+      "wyrmwatch_warning_banner": {
+        "name": "Estandarte de Advertencia de Wyrmwatch"
+      },
+      "cinderwalk_treads": {
+        "name": "Botas Paso de Ceniza"
+      },
+      "mawscale_pauldrons": {
+        "name": "Hombreras de Escama de Fauces"
+      },
+      "gilded_sap_clot": {
+        "name": "Coágulo de Savia Dorada"
+      },
+      "amberfall_sap_bucket": {
+        "name": "Cubo de Extracción de Savia"
+      },
+      "mere_ferry_lantern": {
+        "name": "Farol de Transbordador"
+      },
+      "orchard_sapbinder_grips": {
+        "name": "Guantes Ligasavia"
+      },
+      "mantle_of_the_meredark": {
+        "name": "Manto del Meredark"
+      },
+      "plump_fen_eel": {
+        "name": "Anguila Rolliza de la Ciénaga"
+      },
+      "wisplight_globe": {
+        "name": "Globo de Luz de Fuego Fatuo"
+      },
+      "fenway_mooring_line": {
+        "name": "Amarre Cortado"
+      },
+      "bridgemere_toll_chest": {
+        "name": "Cofre de Peaje Hundido"
+      },
+      "eelskin_mudwaders": {
+        "name": "Vadeadores de Piel de Anguila"
+      },
+      "lilybed_mantle": {
+        "name": "Manto del Lecho de Lirios"
+      },
+      "moonfleece_tuft": {
+        "name": "Mechón de Moonfleece"
+      },
+      "gloamfield_nightbloom": {
+        "name": "Flor de Nightbloom"
+      },
+      "vigil_star_chart": {
+        "name": "Carta Estelar de la Vela"
+      },
+      "barrow_grave_offering": {
+        "name": "Ofrenda Fúnebre Dispersa"
+      },
+      "moonfleece_mitts": {
+        "name": "Manoplas Moonfleece"
+      },
+      "barrowshade_mantle": {
+        "name": "Manto de Sombra del Túmulo"
+      },
+      "widowsilk_skein": {
+        "name": "Madeja de Seda de Viuda"
+      },
+      "gallowmere_grave_candle": {
+        "name": "Vela Fúnebre"
+      },
+      "silkbound_remains": {
+        "name": "Restos Envueltos en Seda"
+      },
+      "gravebound_silk_wraps": {
+        "name": "Vendas de Seda Ligadas a la Tumba"
+      },
+      "mantle_of_the_unhorsed": {
+        "name": "Manto del Desmontado"
+      },
+      "pearlwake_cargo_crate": {
+        "name": "Cajón de Carga del Pearlwake"
+      },
+      "canopy_silk_hank": {
+        "name": "Madeja de Seda del Dosel"
+      },
+      "sunken_offering_bowl": {
+        "name": "Cuenco de Ofrendas Rellenado"
+      },
+      "saltwalker_sandals": {
+        "name": "Sandalias del Paso Salino"
+      },
+      "sunken_idol_mantle": {
+        "name": "Manto del Ídolo Sumergido"
+      },
+      "hedgewick_shears": {
+        "name": "Tijeras Robadas de Hedgewick"
+      },
+      "evergarden_bloom_clipping": {
+        "name": "Esqueje de Flor Podada"
+      },
+      "hedgewick_tool_cart": {
+        "name": "Carreta de Herramientas Volcada"
+      },
+      "evergarden_statue_rubbing": {
+        "name": "Calco de Estatua"
+      },
+      "shearkeeper_gloves": {
+        "name": "Guantes Guardatijeras"
+      },
+      "fountain_court_mantle": {
+        "name": "Manto de la Corte de la Fuente"
+      },
+      "galecrest_ram_wool": {
+        "name": "Lana Grasienta de Carnero"
+      },
+      "shear_storm_lantern": {
+        "name": "Farol de Tormenta Apagado"
+      },
+      "wreckfield_flotsam_crate": {
+        "name": "Cajón de Restos Flotantes"
+      },
+      "wickspun_treads": {
+        "name": "Botas Hiladas de Wick"
+      },
+      "wreck_wardens_mantle": {
+        "name": "Manto del Guardián del Naufragio"
+      },
+      "breakscarred_steel": {
+        "name": "Acero Marcado por las Brechas"
+      },
+      "farshore_salt_moss": {
+        "name": "Musgo Salino del Farshore"
+      },
+      "gullhaven_watchbell": {
+        "name": "Campana de Vigía Costera"
+      },
+      "saltforged_grips": {
+        "name": "Guantes Forjados en Sal"
+      },
+      "mantle_of_the_unbroken_shore": {
+        "name": "Manto de la Costa Inquebrantable"
+      },
+      "last_keep_signet": {
+        "name": "Sello del Last Keep"
+      },
       "conjured_water4": {
         "name": "Agua de Manantial Invocada"
       },
@@ -9902,6 +10459,30 @@ export const es_ES: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Guardacintura del Invocatormentas"
+      },
+      "riding_training": {
+        "name": "Entrenamiento de Monta"
+      },
+      "reins_valorsteed": {
+        "name": "Riendas del Corcel del Valor"
+      },
+      "reins_grag_bear": {
+        "name": "Riendas del Oso Grag Goliat"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Riendas del Deslizador de Caparazón Musgoso"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Llave de encendido: Aerocicleta Justadora del Éter"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Riendas de Kama-Kage, el Sapo Saltasombras"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Riendas del Plumatormenta Alcanzacielos"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Riendas de Pavoneatruenos, el Gran Pavo"
       }
     },
     "mobs": {
@@ -10151,6 +10732,312 @@ export const es_ES: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Elemental de tormenta despierto"
       },
+      "stable_horse": {
+        "name": "Caballo de establo"
+      },
+      "rift_spawnling": {
+        "name": "Cría de la Brecha"
+      },
+      "rift_bonewalker": {
+        "name": "Caminante Óseo Resucitado"
+      },
+      "rift_frost_revenant": {
+        "name": "Aparecido Escarchado"
+      },
+      "rift_rime_elemental": {
+        "name": "Elemental de Escarcha"
+      },
+      "rift_ember_fiend": {
+        "name": "Demonio de Ascuas"
+      },
+      "rift_magma_brute": {
+        "name": "Bruto de Magma"
+      },
+      "rift_venom_weaver": {
+        "name": "Tejedora Venenosa"
+      },
+      "rift_thornback": {
+        "name": "Acechador Espinodorso"
+      },
+      "rift_boneclad": {
+        "name": "Guerrero Enhuesado"
+      },
+      "rift_marrow_troll": {
+        "name": "Trol de Médula"
+      },
+      "rift_void_acolyte": {
+        "name": "Acólito Cicatriz del Vacío"
+      },
+      "rift_dread_stalker": {
+        "name": "Acechador del Espanto"
+      },
+      "rift_storm_caller": {
+        "name": "Invocador de Tormentas"
+      },
+      "rift_stormscale": {
+        "name": "Dragón Escamatormenta"
+      },
+      "rift_tide_thrall": {
+        "name": "Esclavo de la Marea"
+      },
+      "rift_deep_lurker": {
+        "name": "Acechador de las Profundidades"
+      },
+      "rift_stone_ogre": {
+        "name": "Ogro de Piedra"
+      },
+      "rift_boss_frost": {
+        "name": "Guardián de la Escarcha"
+      },
+      "rift_boss_ember": {
+        "name": "Tirano de Emberforge"
+      },
+      "rift_boss_venom": {
+        "name": "Progenitora Vysska"
+      },
+      "rift_boss_necro": {
+        "name": "Señor de los Huesos Xarreth"
+      },
+      "rift_boss_brute": {
+        "name": "Señor de la Guerra Grask"
+      },
+      "rift_boss_arcane": {
+        "name": "Arconte Nyxaris"
+      },
+      "rift_boss_storm": {
+        "name": "Tempestad Vharok"
+      },
+      "rift_boss_tide": {
+        "name": "Fauces Abisales"
+      },
+      "glimmerwisp": {
+        "name": "Fuego Fatuo Centelleante"
+      },
+      "duskwisp": {
+        "name": "Fuego Crepuscular"
+      },
+      "veiled_stag": {
+        "name": "Ciervo Velado"
+      },
+      "veiled_doe": {
+        "name": "Cierva Velada"
+      },
+      "gleamstag": {
+        "name": "El Ciervo Reluciente"
+      },
+      "sporeling_gatherer": {
+        "name": "Esporita Recolectora"
+      },
+      "corrupted_sporeling": {
+        "name": "Esporita Corrupta"
+      },
+      "mushroom_pixie": {
+        "name": "Hada Gleamfolk"
+      },
+      "treant_elder": {
+        "name": "Ente Anciano"
+      },
+      "ancient_guardian": {
+        "name": "Guardián Ancestral"
+      },
+      "waking_warden": {
+        "name": "El Guardián Despierto"
+      },
+      "old_marrowshell": {
+        "name": "El Viejo Marrowshell"
+      },
+      "aurelhorn": {
+        "name": "Aurelhorn, Primero de la Manada"
+      },
+      "snowdrift_wolf": {
+        "name": "Lobo de la Ventisca"
+      },
+      "ice_wisp": {
+        "name": "Fuego Fatuo del Hielo"
+      },
+      "rime_elemental": {
+        "name": "Elemental de Escarcha"
+      },
+      "fen_sprite": {
+        "name": "Duende de la Ciénaga"
+      },
+      "frostmane_yeti": {
+        "name": "Yeti Frostmane"
+      },
+      "terrace_howler": {
+        "name": "Aullador de las Terrazas"
+      },
+      "apprentice_wren": {
+        "name": "Aprendiz Wren"
+      },
+      "emberwing_drake": {
+        "name": "Dragón Emberwing"
+      },
+      "ashbone_raider": {
+        "name": "Saqueador Ashbone"
+      },
+      "ashbone_warcaller": {
+        "name": "Heraldo de guerra Ashbone"
+      },
+      "dune_troll": {
+        "name": "Trol de las Dunas"
+      },
+      "cindraleth_maw_matriarch": {
+        "name": "Cindraleth, la Matriarca de las Fauces"
+      },
+      "gilded_stag": {
+        "name": "Ciervo Dorado"
+      },
+      "gloam_fox": {
+        "name": "Zorro del Ocaso"
+      },
+      "orchard_treant": {
+        "name": "Ente del Huerto"
+      },
+      "the_meredark": {
+        "name": "El Meredark"
+      },
+      "harvest_sprite": {
+        "name": "Duende de la Cosecha"
+      },
+      "mere_lurker": {
+        "name": "Acechador del Mere"
+      },
+      "bogtoad": {
+        "name": "Sapo del Pantano"
+      },
+      "drowsy_croaker": {
+        "name": "El Croador Somnoliento"
+      },
+      "lily_wisp": {
+        "name": "Fuego Fatuo del Lirio"
+      },
+      "willow_sprite": {
+        "name": "Duende del Sauce"
+      },
+      "moonfleece_grazer": {
+        "name": "Ramoneador Moonfleece"
+      },
+      "gloam_strider": {
+        "name": "Zancudo del Ocaso"
+      },
+      "nightkin_stargazer": {
+        "name": "Astrónomo Nightkin"
+      },
+      "barrow_king": {
+        "name": "El Rey del Túmulo"
+      },
+      "barrow_wight": {
+        "name": "Espectro del Túmulo"
+      },
+      "widowsilk_spinner": {
+        "name": "Tejedora de Seda de Viuda"
+      },
+      "wood_wraith": {
+        "name": "Aparecido del Bosque"
+      },
+      "gravenbark_shambler": {
+        "name": "Bamboleante de Corteza Tumular"
+      },
+      "pale_huntsman": {
+        "name": "El Pálido Cazador"
+      },
+      "gravedigger_mosley": {
+        "name": "Sepulturero Mosley"
+      },
+      "tide_scuttler": {
+        "name": "Cangrejo de Marea"
+      },
+      "thicket_boar": {
+        "name": "Jabalí del Matorral"
+      },
+      "canopy_weaver": {
+        "name": "Tejedora del Dosel"
+      },
+      "idol_guardian": {
+        "name": "El Guardián del Ídolo"
+      },
+      "castaway_navigator": {
+        "name": "Navegante Suli"
+      },
+      "topiary_stag": {
+        "name": "Ciervo Topiario"
+      },
+      "topiary_wolf": {
+        "name": "Lobo Topiario"
+      },
+      "hedge_gnome": {
+        "name": "Gnomo del Seto"
+      },
+      "hedge_knight": {
+        "name": "Caballero de Dawnhold"
+      },
+      "the_topiary_bull": {
+        "name": "El Toro Topiario"
+      },
+      "moor_ram": {
+        "name": "Carnero del Páramo"
+      },
+      "gale_wisp": {
+        "name": "Fuego Fatuo del Vendaval"
+      },
+      "shoal_scuttler": {
+        "name": "Cangrejo de Bajío"
+      },
+      "downs_bandit": {
+        "name": "Bandido de los Páramos"
+      },
+      "wreck_thief": {
+        "name": "Ladrón de Wreckfield"
+      },
+      "the_wreck_warden": {
+        "name": "El Guardián del Naufragio"
+      },
+      "drowned_deckhand": {
+        "name": "Marinero Ahogado"
+      },
+      "riftspawn": {
+        "name": "Engendro de la Brecha"
+      },
+      "breach_wretch": {
+        "name": "Miserable de la Brecha"
+      },
+      "void_stalker": {
+        "name": "Acechador del Vacío"
+      },
+      "sundered_horror": {
+        "name": "El Horror Escindido"
+      },
+      "fisher_bram": {
+        "name": "Pescador Bram"
+      },
+      "rift_hellguard": {
+        "name": "Guardia Infernal"
+      },
+      "rift_pact_acolyte": {
+        "name": "Acólito del Pacto"
+      },
+      "rift_boss_ritualist": {
+        "name": "Magus Vel'Kor el Pactado"
+      },
+      "rift_boss_pitlord": {
+        "name": "Azgorath, Señor del Pozo"
+      },
+      "wildheart_stalker": {
+        "name": "Acechador Vineclaw"
+      },
+      "wildheart_ravager": {
+        "name": "Devastador Bloodmane"
+      },
+      "wildheart_hexcaller": {
+        "name": "Invocador de Hechizos Sunbone"
+      },
+      "wildheart_beastmaster": {
+        "name": "Domador de Bestias Fanglord"
+      },
+      "wildheart_high_priest": {
+        "name": "Zulgar, Voz de la Cuenca"
+      },
       "ironvein_foreman": {
         "name": "Capataz Vena de Hierro"
       },
@@ -10304,6 +11191,11 @@ export const es_ES: EnTranslations = {
         "title": "Capataz de la mina",
         "greeting": "¡Toda la excavación está llena de esas alimañas cubiertas de tierra!"
       },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Caballeriza mayor",
+        "greeting": "Cada jinete llega a pie, {className}. No te daré las riendas hasta que puedas montar al Corcel del Valor sin besar el barro, y en Highwatch no sobran sanadores para huesos rotos."
+      },
       "warden_fenwick": {
         "name": "Guardián Fenwick",
         "title": "Guardián de Fenbridge",
@@ -10433,6 +11325,246 @@ export const es_ES: EnTranslations = {
         "name": "Cronista Zenzie",
         "title": "La Crónica de las Alturas",
         "greeting": "La montaña no olvida nada, {playerName}, y yo tampoco. Veamos lo que has hecho."
+      },
+      "keeper_saelwyn": {
+        "name": "Guardiana Saelwyn",
+        "title": "Guardiana del Hollow",
+        "greeting": "Pocos de los tuyos han estado bajo estas ramas, {className}. Camina con cuidado, y sé bienvenido."
+      },
+      "loremother_bryn": {
+        "name": "Madre del Saber Bryn",
+        "title": "Voz del Santuario",
+        "greeting": "Cada luz de este valle recuerda algo, {playerName}. Ayúdame a escuchar."
+      },
+      "provisioner_fenna": {
+        "name": "Proveedora Fenna",
+        "title": "Proveedora de Eldergleam",
+        "greeting": "Pan aún caliente, agua aún dulce. El Hollow provee, y yo también."
+      },
+      "wardsmith_orun": {
+        "name": "Herrero de Guardas Orun",
+        "title": "Guardián de las Viejas Forjas",
+        "greeting": "Estas forjas se enfriaron hace siglos, {className}, pero su obra aún conserva el filo."
+      },
+      "archivist_tullo": {
+        "name": "Archivista Tullo",
+        "title": "Lector de Piedras",
+        "greeting": "Los monumentos de ahí fuera no le han hablado a nadie en una era. Quizá esperaban oídos nuevos."
+      },
+      "huntsman_deral": {
+        "name": "Cazador Deral",
+        "title": "Guardián de las Manadas",
+        "greeting": "Silencio ahora. La manada conoce cada sonido de este valle, y yo también."
+      },
+      "warden_kaldra": {
+        "name": "Guardiana Kaldra",
+        "title": "Guardiana de Icemantle",
+        "greeting": "Cuidado con los bancos de nieve, forastero. La nieve guarda lo que se lleva."
+      },
+      "hearthkeeper_maeve": {
+        "name": "Guardiana del Hogar Maeve",
+        "title": "Guardiana del Albergue del Hogar",
+        "greeting": "Entra, deja el frío afuera. El fuego del albergue no se apaga mientras yo respire."
+      },
+      "scout_einna": {
+        "name": "Exploradora Einna",
+        "title": "Exploradora del Snowline",
+        "greeting": "Cruzaste el paso con vida. Bien. Icemantle debería saberlo."
+      },
+      "aurorist_veyla": {
+        "name": "Aurorista Veyla",
+        "title": "Lectora de las Luces",
+        "greeting": "Silencio. Las luces hablan esta noche, y no se repiten."
+      },
+      "trapper_brosk": {
+        "name": "Trampero Brosk",
+        "title": "Trampero de Shiverfen",
+        "greeting": "La ciénaga se llevó tres de mis trampas esta semana. La ciénaga no se había llevado ni una en veinte años."
+      },
+      "gatecaptain_brannoc": {
+        "name": "Capitán de Puerta Brannoc",
+        "title": "Comandante de Wyrmwatch",
+        "greeting": "Wyrmwatch sostiene la puerta. La ha sostenido cuarenta años. La sostendrá esta noche."
+      },
+      "quartermaster_sela": {
+        "name": "Intendenta Sela",
+        "title": "Guardiana de los Almacenes de la Guarnición",
+        "greeting": "Cada cajón de este patio cruzó cuarenta millas de ceniza para llegar aquí. Trátalos con cuidado."
+      },
+      "scout_yerrin": {
+        "name": "Explorador Yerrin",
+        "title": "Vigía de las Dunas Lejanas",
+        "greeting": "Mantente agachado. El sonido viaja extraño sobre el cristal, y la puerta de abajo tiene oídos."
+      },
+      "reeve_ottoline": {
+        "name": "Alguacila Ottoline",
+        "title": "Alguacila de Lanternmere",
+        "greeting": "Bienvenido a Lanternmere, donde la cosecha nunca termina, y el trabajo tampoco."
+      },
+      "waywatcher_sorrel": {
+        "name": "Vigía del Camino Sorrel",
+        "title": "Vigía del Goldmelt",
+        "greeting": "Nieve detrás, oro por delante. Pocos cruzan el Goldmelt dos veces, así que haz que el cruce valga la pena."
+      },
+      "ferrymaster_caddow": {
+        "name": "Barquero Caddow",
+        "title": "Guardián de las Barcazas de Linterna",
+        "greeting": "La niebla vuelve a cubrir el Mere. Cuando los faroles se apagan sobre el agua, la gente sensata se queda en tierra."
+      },
+      "orchardist_pomeline": {
+        "name": "Hortelana Pomeline",
+        "title": "Guardiana de las Hileras Doradas",
+        "greeting": "Cuidado dónde pisas. Cada raíz de estas hileras es más vieja que el pueblo, y recuerdan."
+      },
+      "waykeeper_pell": {
+        "name": "Guardacamino Pell",
+        "title": "Guardián de los Escalones de Amberfen",
+        "greeting": "Baja los escalones y entra en la tierra blanda. Cuidado dónde plantas las botas."
+      },
+      "bridgewright_alden": {
+        "name": "Puentero Alden",
+        "title": "Maestro del Fenway",
+        "greeting": "Cada tabla de este pueblo es mía para cuidar, y la ciénaga las va royendo todas."
+      },
+      "netter_maris": {
+        "name": "Redera Maris",
+        "title": "Pescadora de Anguilas de Bridgemere",
+        "greeting": "¿Hueles eso? Anguila ahumada. Medio pueblo se sostiene sobre pilotes que compré con ella."
+      },
+      "mother_sedge": {
+        "name": "Madre Sedge",
+        "title": "Bruja de la Ciénaga de Willowweep",
+        "greeting": "Los sauces me dijeron que venías antes de que tus botas dejaran el puente."
+      },
+      "lamplighter_sorrel": {
+        "name": "Farolero Sorrel",
+        "title": "Guardián del Nightgate",
+        "greeting": "Cuida los faroles, amigo. Más allá de esta puerta el sol se rinde y las flores toman el mando."
+      },
+      "lira_dewsong": {
+        "name": "Lira Dewsong",
+        "title": "Jardinera Nocturna de Moonrest",
+        "greeting": "Bienvenido a Moonrest, donde las flores amanecen por nosotros."
+      },
+      "weaver_amelle": {
+        "name": "Tejedora Amelle",
+        "title": "Tejedora de Moonfleece",
+        "greeting": "¿Sientes eso? Moonfleece en el telar. Más cálido que cualquier fuego junto al que te hayas sentado."
+      },
+      "astronomer_cassian": {
+        "name": "Astrónomo Cassian",
+        "title": "Vigía de la Vigilia",
+        "greeting": "Silencio. Aquí el cielo nunca amanece, así que tampoco deja nunca de hablar."
+      },
+      "lampman_cobb": {
+        "name": "Farolero Cobb",
+        "title": "Guardián de los Faroles del Crowgate",
+        "greeting": "Quédate en la luz del farol, amigo. El bosque cuenta a todos los que cruzan la puerta."
+      },
+      "sexton_marrow": {
+        "name": "Sacristán Marrow",
+        "title": "Sacristán de Gallowmere",
+        "greeting": "Aquí los enterramos hondo, y tocamos las campanas para que recuerden quedarse abajo."
+      },
+      "widow_tansy": {
+        "name": "Viuda Tansy",
+        "title": "Cerera de Gallowmere",
+        "greeting": "Una vela por cada tumba, y ni una puede apagarse. Ni una, ¿me oyes?"
+      },
+      "vicar_creel": {
+        "name": "Vicario Creel",
+        "title": "Último Vicario del Mournstone",
+        "greeting": "La capilla cayó hace años. Los muertos debajo no lo notaron, así que me quedé."
+      },
+      "strandwatcher_pell": {
+        "name": "Vigía de la Playa Pell",
+        "title": "Vigía del Tanglemouth",
+        "greeting": "Fuera de los árboles negros al fin. Respira, forastero, el sol se sostiene en este lado del paso."
+      },
+      "salvage_boss_ryna": {
+        "name": "Jefa de Rescate Ryna",
+        "title": "Señora de la Línea de Naufragios",
+        "greeting": "Un {className} con brazos que funcionan, bien. La línea de naufragios paga bien, si los cangrejos te dejan dedos suficientes para contarlo."
+      },
+      "pearlmother_isha": {
+        "name": "Madre-Perla Isha",
+        "title": "Anciana de los Buceadores",
+        "greeting": "El mar da, la arena guarda, y la selva quita. Quédate en la playa, forastero."
+      },
+      "hermit_okku": {
+        "name": "Okku",
+        "title": "El Hombre que Entró",
+        "greeting": "Silencio ahora. Los tambores cuentan todo lo que camina bajo los árboles, y ya te han contado a ti."
+      },
+      "gatewarden_pell": {
+        "name": "Guardapuerta Pell",
+        "title": "Guardián de la Puerta del Jardín",
+        "greeting": "Cuidado dónde pisas en el césped. El jardín lo mantiene recortado, y le gusta ordenado."
+      },
+      "head_gardener_amaranth": {
+        "name": "Jardinera Mayor Amaranth",
+        "title": "Jardinera Mayor del Evergarden",
+        "greeting": "No te fijes en las ojeras. Alguien tiene que quedarse despierto mientras el jardín sueña."
+      },
+      "wickmother_sorrel": {
+        "name": "Madre Wick Sorrel",
+        "title": "Guardiana de la Posada de Hedgewick",
+        "greeting": "Entra, siéntate, hay cordial al fuego. Solo no sueltes nada de hierro: los gnomos andan con los dedos largos últimamente."
+      },
+      "gardener_yew": {
+        "name": "Jardinero Yew",
+        "title": "El Último Jardinero",
+        "greeting": "¿Me alcanzas esa carretilla? Estos céspedes no se cuidan solos, piense lo que piense la aldea."
+      },
+      "watcher_maren": {
+        "name": "Vigía Maren",
+        "title": "La Guardia del Windway",
+        "greeting": "Cuidado dónde pisas más allá de la puerta. El viento de aquí arriba se lleva primero los sombreros, y las preguntas nunca."
+      },
+      "harbormaster_odile": {
+        "name": "Capitana del Puerto Odile",
+        "title": "Capitana del Puerto de Wickharbor",
+        "greeting": "Cada barco de esta cala le debe su quilla al Viejo Faro. Habla rápido, la marea no espera."
+      },
+      "keeper_bram": {
+        "name": "Guardián Bram",
+        "title": "Guardián del Viejo Faro",
+        "greeting": "Treinta y nueve años lleva ardiendo esta lámpara bajo mi vigilancia. No se apagará bajo la tuya."
+      },
+      "salvager_edda": {
+        "name": "Rescatista Edda",
+        "title": "Rescatista de Wreckfield",
+        "greeting": "Madera de naufragio, cuerda, y cargamento de muertos. El mar paga mi sueldo, cuando el Guardián lo permite."
+      },
+      "warden_coalfast": {
+        "name": "Guardián Coalfast",
+        "title": "Comandante del Reducto",
+        "greeting": "A las brechas no les importa que Gullhaven sea pequeño, {className}. Sostenemos esta costa, o no queda costa que sostener. Ponte de nuestro lado y no lo olvidaré."
+      },
+      "riftwatch_ollun": {
+        "name": "Vigía de Brecha Ollun",
+        "title": "Erudito de las Brechas",
+        "greeting": "Cada brecha canta antes de abrirse, si tienes oído para ello. Puedo oír tres agitándose en la isla ahora mismo, y una está cerca."
+      },
+      "quartermaster_edda": {
+        "name": "Intendenta Edda",
+        "title": "Armera del Reducto",
+        "greeting": "Acero y sal, {className}, es todo lo que me queda para repartir. Tómalo y haz que las brechas lamenten haberse abierto donde pudiera alcanzarlas."
+      },
+      "mender_saul": {
+        "name": "Sanador Saul",
+        "title": "Cirujano de Campaña",
+        "greeting": "He encajado más huesos este mes que en diez años curando caídas de pesca. Las brechas no dejan mucho de lo que toman. Vuelve a mí entero, si puedes arreglártelas."
+      },
+      "bellkeeper_tam": {
+        "name": "Campanero Tam",
+        "title": "Guardián de la Campana de Vigía",
+        "greeting": "La campana es la única advertencia que nos dan las brechas, {className}. Un toque por los campos, dos por los acantilados, tres cuando está tan cerca que correr ya no sirve de nada. Mantén el oído atento, y puede que te mantenga entero."
+      },
+      "fisher_nell": {
+        "name": "Nell la Asustada",
+        "title": "Pescadora de Gullhaven",
+        "greeting": "Se abrió justo donde se secan las redes. Justo ahí, donde estuve cada mañana de mi vida. Ya no bajo a la orilla. Ya casi no voy a ningún sitio."
       },
       "forgemistress_darva": {
         "name": "Maestra Forjadora Darva",
@@ -11403,6 +12535,192 @@ export const es_ES: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "Lecciones de equitación",
+        "text": "Cada jinete llega a pie, {playerName}, tal como te dije el día que nos conocimos. Paga la cuota y, cuando te dé la orden, llama al Corcel del Valor de entrenamiento y sube a la silla. Luego haz el recorrido: sigue la señal hasta el arco de salida, salta limpio cada obstáculo y cruza la línea de nuevo antes de que se acabe la arena. Hazlo y la silla es tuya. Si te sales del corral, empezamos de nuevo.",
+        "completion": "Así, muy bien. Arriba de un solo impulso y bien firme en la silla. El Corcel del Valor es tuyo, {playerName}: silla, riendas y la reputación de un jinete que se ganó el asiento en vez de comprarlo.",
+        "objectives": {
+          "0": {
+            "label": "Doma al Corcel del Valor"
+          }
+        }
+      },
+      "q_veil_thinned": {
+        "title": "El Velo Adelgazado",
+        "text": "Así que la cueva se abrió para ti. Entonces el sello es más débil de lo que temía, {playerName}. Donde el velo se desgarra, los fuegos fatuos se vuelven oscuros y fríos. Tráeme ocho esencias de los fuegos crepusculares y leeré cuán profunda es la herida.",
+        "completion": "Fríos, todos ellos. Al Hollow le queda quizás una estación antes de que el desgarro se convierta en una brecha. Tenemos trabajo que hacer, tú y yo.",
+        "objectives": {
+          "0": {
+            "label": "Esencia de Fuego Crepuscular"
+          }
+        }
+      },
+      "q_gleaming_antlers": {
+        "title": "Astas Relucientes",
+        "text": "Los ciervos velados desprenden luz por donde pastan, y sus astas mudadas la retienen durante años. Cinco de ellas, de las manadas en el claro abierto en el corazón del valle, y mis faroles arderán durante todo el invierno sin aceite. No hace falta dañar a los ciervos, pero no se separan de ellas fácilmente.",
+        "completion": "¡Mira cómo retienen la luz! Sin llama, sin humo, solo el resplandor. El Hollow provee.",
+        "objectives": {
+          "0": {
+            "label": "Asta Reluciente"
+          }
+        }
+      },
+      "q_wisp_lights": {
+        "title": "Luces de los Bajíos",
+        "text": "Los fuegos fatuos centelleantes llevan motas de la vieja luz estelar que cayó aquí cuando el Hollow fue sellado. Seis motas, y las lámparas del santuario arderán durante un año. Toma solo de los que se desvanecen; el Hollow da lo suficiente sin necesidad de codicia.",
+        "completion": "Suaves como las primeras estrellas. Colócalas aquí junto al altar; el santuario hará el resto.",
+        "objectives": {
+          "0": {
+            "label": "Mota de Fuego Fatuo"
+          }
+        }
+      },
+      "q_calming_the_deep": {
+        "title": "Calmando el Abismo",
+        "text": "Las esporitas del Abismo Reluciente eran gente apacible antes de que el desgarro tocara sus anillos. Lo que la corrupción toma, no lo devuelve. Concede descanso a las corrompidas, {playerName}: diez de ellas, en el norte del Abismo.",
+        "completion": "Hiciste lo que yo no podía soportar hacer. Las recolectoras aún cantan en los anillos del sur; gracias a ti, seguirán cantando.",
+        "objectives": {
+          "0": {
+            "label": "Esporita Corrupta puesta a descansar"
+          }
+        }
+      },
+      "q_spore_hearts": {
+        "title": "Corazones del Anillo",
+        "text": "Cuando una esporita cae ante la oscuridad, su corazón sigue latiendo con sombra prestada. Cuatro de esos corazones, purificados en el santuario, podrían enseñarnos cómo se propaga la corrupción. Es un trabajo sombrío, {playerName}, pero es un trabajo de sanación.",
+        "completion": "Ahí está. Purificado, y en calma. Cada uno muestra la misma marca: la sombra fluye DESDE la Corte Sumergida. Díselo a Saelwyn.",
+        "objectives": {
+          "0": {
+            "label": "Corazón de Esporita"
+          }
+        }
+      },
+      "q_monument_tour": {
+        "title": "Lo Que las Piedras Recuerdan",
+        "text": "Tres monumentos siguen en pie desde antes del sellado: uno en el Mirador de Duskfall, uno en la Corte Sumergida, y uno perdido en el lejano noreste donde nadie camina. Léelos por mí, {playerName}. Mis rodillas se rindieron hace dos siglos de escaleras.",
+        "completion": "Un mirador, una corte, y un rincón olvidado... y los tres versos del canto de sellado, juntos por primera vez desde que se entonó. Has hecho muy feliz a un viejo lector.",
+        "objectives": {
+          "0": {
+            "label": "Monumento del Mirador leído"
+          },
+          "1": {
+            "label": "Monumento de la Corte leído"
+          },
+          "2": {
+            "label": "Monumento olvidado leído"
+          }
+        }
+      },
+      "q_grove_menace": {
+        "title": "Amenaza en el Claro",
+        "text": "Fuegos crepusculares han empezado a flotar entre mis puestos después del anochecer, {playerName}, y su frío estropea todo lo que toca. Diezmalos por mí: diez de ellos, donde sea que el velo se haya desgarrado.",
+        "completion": "El mercado nocturno puede abrir de nuevo. Tienes un cliente de por vida, o al menos un descuento.",
+        "objectives": {
+          "0": {
+            "label": "Fuego Crepuscular dispersado"
+          }
+        }
+      },
+      "q_shards_of_starfall": {
+        "title": "Fragmentos de Starfall",
+        "text": "Cuando los fuegos crepusculares pasan sobre los campos de cristal, esquirlas de vieja luz estelar se les pegan como abrojos. Seis fragmentos, {playerName}, y podré datar el sellado en la mismísima estación en que se entonó.",
+        "completion": "¡Mira las estriaciones! Otoño. El Hollow fue sellado en otoño. Doscientos años de discusión, resueltos por seis piedrecitas.",
+        "objectives": {
+          "0": {
+            "label": "Fragmento de Starfall"
+          }
+        }
+      },
+      "q_treant_accord": {
+        "title": "El Acuerdo del Ente",
+        "text": "Los ancianos de la Arboleda desprenden su corteza exterior mientras la corrupción roe sus raíces. Cuatro trozos de ella, y podré preparar un ungüento para toda la Arboleda. No te lo agradecerán mientras se la arrancas, {playerName}, pero se mantendrán en pie un siglo más gracias a ello.",
+        "completion": "Gruesos y sanos, los cuatro. El ungüento tardará una semana en prepararse y cien años en terminar su labor. Los árboles miden la bondad de otra manera.",
+        "objectives": {
+          "0": {
+            "label": "Corteza Anciana"
+          }
+        }
+      },
+      "q_spore_tide": {
+        "title": "Contra la Marea de Esporas",
+        "text": "El ungüento sostiene la Arboleda, pero la corrupción presiona con más fuerza sobre el Abismo con cada anochecer. Doce más de las corrompidas deben ser puestas a descansar antes de que las recolectoras puedan reclamar sus anillos del norte, {playerName}.",
+        "completion": "Los anillos del norte vuelven a cantar esta noche. En voz baja, pero cantando.",
+        "objectives": {
+          "0": {
+            "label": "Esporita Corrupta puesta a descansar"
+          }
+        }
+      },
+      "q_sunken_court": {
+        "title": "La Corte Sumergida",
+        "text": "Bryn leyó bien los corazones: el desgarro atraviesa la vieja corte en el este, y sus guardianes han despertado mal. Fueron construidos para proteger el sello; ahora aplastarán a cualquiera que se acerque. Elimina a ocho de ellos de las ruinas.",
+        "completion": "Ocho guardianes, detenidos. Recuerdo cuando se alzaron, {playerName}. No pongas esa cara de sorpresa; el Hollow conserva a sus guardianes mucho tiempo.",
+        "objectives": {
+          "0": {
+            "label": "Guardián Ancestral detenido"
+          }
+        }
+      },
+      "q_wardens_echoes": {
+        "title": "Ecos del Guardián",
+        "text": "Incluso con su amo silenciado, los guardianes de la corte repiten su última orden como un eco que no se desvanece. Hasta que el sello no se restaure, seguirán despertando, {playerName}. Silencia a diez más para que los canteros puedan llegar a la piedra de sellado.",
+        "completion": "El eco se debilita cada vez más. Pronto la corte no contendrá más que viento y hiedra, como debe ser una ruina.",
+        "objectives": {
+          "0": {
+            "label": "Guardián Ancestral detenido"
+          }
+        }
+      },
+      "q_waking_warden": {
+        "title": "El Guardián Despierto",
+        "text": "La corte está en calma, pero su amo no lo está. El Guardián que sostiene el sello ha despertado retorcido, y mientras siga en pie, el sello no podrá repararse. No caerá fácilmente; trae a un amigo si encuentras uno, {playerName}. Trae a dos si encuentras dos.",
+        "completion": "La campana de su voz está silenciada. Lo sentí desde aquí, como un peso que se levanta de todo el valle.",
+        "objectives": {
+          "0": {
+            "label": "El Guardián Despierto derrotado"
+          }
+        }
+      },
+      "q_seal_restored": {
+        "title": "El Sello Restaurado",
+        "text": "Lleva el sello del Guardián a la piedra de sellado en el corazón de la corte y colócalo de nuevo donde fue arrancado. Entonces el Hollow podrá empezar a sanar, y tú, {playerName}, habrás hecho lo que nadie de los tuyos había hecho antes.",
+        "completion": "Lo sentí cerrarse desde aquí, suave como el ocaso. El Hollow recuerda a sus amigos, {playerName}. Por lejos que viajes, siempre habrá una luz para ti bajo el gran árbol.",
+        "objectives": {
+          "0": {
+            "label": "El sello devuelto a la piedra de sellado"
+          }
+        }
+      },
+      "q_hollow_the_huntsman": {
+        "title": "El Guardián de las Manadas",
+        "text": "Pareces alguien capaz de manejar algo más que fuegos fatuos, {playerName}. El Cazador Deral mantiene su vigía entre los prados de ciervos al este de aquí, y lleva semanas preguntando por manos capaces. Lo que sea que esté rastreando ahí fuera, no lo dirá en voz alta en la aldea.",
+        "completion": "¿Fenna te envió? Bien. Entonces confía en ti, y tengo dos nombres que necesitan tacharse.",
+        "objectives": {
+          "0": {
+            "label": "Encuentra al Cazador Deral"
+          }
+        }
+      },
+      "q_hollow_old_marrowshell": {
+        "title": "El Viejo Caparazón de los Bajíos",
+        "text": "El primer nombre es el Viejo Marrowshell, un cangrejo del tamaño de una carreta que ha cazado en los bajíos del este desde antes de que Eldergleam tuviera una puerta. Vaga, {playerName}, así que tendrás que caminar la orilla hasta cruzarte con su rastro. No vayas solo, y no confíes en su quietud.",
+        "completion": "Los bajíos vuelven a ser solo agua. He visto ese caparazón romper a cazadores mejores que yo, {playerName}. A ti no.",
+        "objectives": {
+          "0": {
+            "label": "El Viejo Marrowshell abatido"
+          }
+        }
+      },
+      "q_hollow_first_of_the_herd": {
+        "title": "Primero de la Manada",
+        "text": "El segundo nombre es más difícil de decir. Aurelhorn guiaba estas manadas cuando mi abuela ocupaba este puesto de vigía, y lo que sea que despertó en el Hollow lo despertó mal a él. Pisotea lo que antes protegía, y la manada no sobrevivirá a su locura. Vaga por los prados cerca de los viejos caminos de la corte. Acaba con él con piedad, {playerName}, y trae a un amigo para compartir el peso de ello.",
+        "completion": "Así que el Primero cae ante el último. La manada ya está más calmada, ¿lo sientes? Le hiciste hoy un favor al Hollow, aunque no lo parezca.",
+        "objectives": {
+          "0": {
+            "label": "Aurelhorn concedido la paz"
+          }
+        }
+      },
       "q_prof_hobby_switch": {
         "title": "Un Pasatiempo Diferente",
         "text": "Las especializaciones principales exigen un voto. Una afición solo pregunta hacia dónde vaga tu curiosidad, {playerName}. Recoge algunas hierbas y decide qué oficio, contrario a tus especializaciones principales, quieres desarrollar.",
@@ -11410,6 +12728,916 @@ export const es_ES: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Mata de hierba recolectada"
+          }
+        }
+      },
+      "q_fv_snowline_report": {
+        "title": "Noticias desde el Snowline",
+        "text": "Cada alma que sube desde los Drakelands pasa por mi fuego, {playerName}, y cada semana suben menos. La Guardiana Kaldra mantiene Icemantle camino arriba al norte. Dile que el paso sigue abierto, y dile que un forastero lo cruzó solo.",
+        "completion": "El paso resiste, entonces. Einna mantiene ese campamento de paso a través de tormentas que sepultan los mojones, y nunca me ha enviado noticias vanas. Bienvenido a Icemantle, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Informa a la Guardiana Kaldra"
+          }
+        }
+      },
+      "q_fv_wolves_at_the_door": {
+        "title": "Lobos a la Puerta",
+        "text": "Las manadas de la ventisca solían quedarse en las terrazas altas. Ahora cruzan el camino del lago a plena luz del día y mis leñadores no quieren salir de las murallas. Diezma las manadas, {playerName}, diez de ellas, y el camino volverá a ser un camino.",
+        "completion": "Diez sombras menos entre aquí y el lago. Los leñadores ya discuten sobre quién sale primero.",
+        "objectives": {
+          "0": {
+            "label": "Lobo de la Ventisca abatido"
+          }
+        }
+      },
+      "q_fv_winter_pelts": {
+        "title": "Pieles para el Albergue",
+        "text": "La leña mantiene un cuerpo con vida, {playerName}, pero la lana no detiene este frío, solo la piel de lobo lo hace. Seis pieles gruesas de invierno de las manadas de la ventisca y podré forrar los sacos de dormir de todos los que el albergue acoge.",
+        "completion": "Una piel así es el único argumento que el invierno escucha. Toma estas botas, están forradas con el último lote.",
+        "objectives": {
+          "0": {
+            "label": "Piel Gruesa de Invierno"
+          }
+        }
+      },
+      "q_fv_ember_caches": {
+        "title": "Ascuas en el Camino del Lago",
+        "text": "Un trineo de alijos de ascuas volcó anoche en el camino del lago: calderos de hierro que mantienen viva una brasa cubierta durante un mes. Tres de ellos siguen tirados en la nieve, {playerName}, y el albergue no puede prescindir de lo que contienen. Trae el fuego de vuelta.",
+        "completion": "Aún cálidos, todos ellos. Le has comprado al albergue todo un invierno de clemencia, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Alijo de Ascuas recuperado"
+          }
+        }
+      },
+      "q_fv_lights_over_steps": {
+        "title": "Luces sobre los Escalones",
+        "text": "La aurora ha ardido verde cada noche este mes, y los mayores no quieren caminar bajo ella. Una mujer podría saber por qué: Veyla, la Aurorista. Acampa sola en los Escalones de la Aurora, al sureste pasado el lago. Encuentra su campamento, {playerName}, y escucha lo que las luces le han dicho.",
+        "completion": "¿Kaldra te envió? Entonces por fin está preocupada, y tiene razón en estarlo. Siéntate, {playerName}. Observa el cielo conmigo un rato.",
+        "objectives": {
+          "0": {
+            "label": "Encuentra a la Aurorista Veyla"
+          }
+        }
+      },
+      "q_fv_silent_trapline": {
+        "title": "La Línea de Trampas Silenciosa",
+        "text": "El viejo Brosk trabaja la línea de trampas del Shiverfen al oeste de aquí, y durante once años, cada semana, ha enviado un fardo de pieles con el trineo de leña. Dos semanas ya, y nada. Es demasiado terco para congelarse y demasiado cuidadoso para ahogarse, {playerName}, así que algo más anda mal. Encuentra su campamento en la ciénaga y comprueba que respira.",
+        "completion": "¿Maeve te envió? Ja. Once años y la mujer todavía cree que la ciénaga va a comerme. Bueno... este año quizás tenga razón. Mira lo que le ha hecho a mis líneas.",
+        "objectives": {
+          "0": {
+            "label": "Encuentra al Trampero Brosk"
+          }
+        }
+      },
+      "q_fv_aurora_motes": {
+        "title": "Motas de la Aurora",
+        "text": "Los fuegos fatuos que flotan por estos escalones son desprendidos por las propias luces, y cada uno lleva una mota de la aurora en su corazón. Necesito seis para leer lo que el cielo está escribiendo, {playerName}. Los fuegos fatuos no se defienden. Si eso hace el trabajo más fácil o más difícil es cosa tuya y de tu conciencia.",
+        "completion": "Seis motas, aún brillando. Mírelas, {playerName}: laten al mismo ritmo entre sí. Las luces no son clima. Son una señal.",
+        "objectives": {
+          "0": {
+            "label": "Mota de Aurora"
+          }
+        }
+      },
+      "q_fv_rime_unbound": {
+        "title": "Escarcha Desatada",
+        "text": "Cuando la aurora arde tan brillante, el frío se levanta y camina: elementales de escarcha, hielo con voluntad propia. Se reúnen donde las luces tocan las terrazas, y cada noche vagan más cerca de mi campamento. Rompe a ocho de ellos, {playerName}, antes de que uno de ellos me rompa a mí.",
+        "completion": "La noche ya se siente más ligera. Lo que sea que los despierta no ha terminado, pero le has comprado a los Escalones algo de calma.",
+        "objectives": {
+          "0": {
+            "label": "Elemental de Escarcha abatido"
+          }
+        }
+      },
+      "q_fv_sprung_traps": {
+        "title": "Duendes en las Trampas",
+        "text": "Duendes de la ciénaga, {playerName}. Los pequeños diablos disparan mis trampas por diversión y esparcen el hierro entre los juncos. Ahuyéntalos, ocho deberían enseñarle una lección al resto, y recoge lo que queda de mis líneas de trampas mientras estás allí.",
+        "completion": "Cuatro buenas trampas de vuelta y los juncos en calma. Atrapas con mano más dura que la mía, {playerName}, pero no puedo discutir los resultados.",
+        "objectives": {
+          "0": {
+            "label": "Duende de la Ciénaga ahuyentado"
+          },
+          "1": {
+            "label": "Trampa recuperada"
+          }
+        }
+      },
+      "q_fv_howl_above": {
+        "title": "El Aullido en las Terrazas",
+        "text": "Lo oyes al anochecer, {playerName}: un aullido desde las Terrazas Aulladoras que no es de las manadas de la ventisca. Gargantas más grandes. Los aulladores de las terrazas han bajado de los picos por primera vez desde que mi abuela ocupó este puesto, y son ellos quienes empujaron a los lobos hacia mi camino. Elimina a ocho y hazlos retroceder.",
+        "completion": "Ocho, y el coro del anochecer suena más débil por ello. Pero los aulladores no dejan los picos sin razón. Algo allá arriba los movió, y temo que tenga nombre.",
+        "objectives": {
+          "0": {
+            "label": "Aullador de las Terrazas abatido"
+          }
+        }
+      },
+      "q_fv_seeing_wren_home": {
+        "title": "Llevando a Wren a Casa",
+        "text": "Mi aprendiz Wren salió a recorrer la línea del Goldmelt hace dos días y nunca volvió. Encontré sus huellas, está refugiada bajo los mojones al suroeste de los Escalones de la Aurora, demasiado asustada de los lobos para moverse. No puedo dejar la ciénaga, {playerName}. Llévala al campamento de Veyla en los Escalones. Estará a salvo bajo las luces.",
+        "completion": "La chica está dentro, envuelta en la mitad de mis mantas y hablándole a las estrellas hasta bajarlas del cielo. Hiciste algo bondadoso hoy, {playerName}. El Reach no ve muchos gestos así.",
+        "objectives": {
+          "0": {
+            "label": "Aprendiz Wren acompañada a salvo a los Escalones de la Aurora"
+          }
+        }
+      },
+      "q_fv_frostmane_tyrant": {
+        "title": "El Tirano Frostmane",
+        "text": "Los aulladores no cazaban cuando bajaron por las terrazas. Huían. Un yeti ha reclamado las alturas, la gente de la montaña lo llama el Frostmane, y ni siquiera las manadas comparten ladera con él. Tiene que acabar, {playerName}, antes de que el invierno lo empuje hacia mis murallas. Lleva a un amigo. Lleva a dos.",
+        "completion": "Cuando el viento amainó anoche, todo el pueblo oyó el silencio donde antes estaba el Frostmane. El Reach te debe una deuda que tardará años en pagar, {playerName}. Lleva esto, y cada puerta en Icemantle estará abierta para ti.",
+        "objectives": {
+          "0": {
+            "label": "El Frostmane abatido"
+          }
+        }
+      },
+      "q_dk_ash_on_the_wind": {
+        "title": "Ceniza en el Viento",
+        "text": "Mira al sur desde la empalizada, {playerName}. Esas hogueras en las dunas no son fogatas de troles, son concentraciones ashbone, y cada noche hay más. Los muertos suben desde los campos de huesos con arena aún entre los dientes. Abate a diez saqueadores antes de que abran un camino hasta mi puerta.",
+        "completion": "Diez espadas menos en las dunas, y las hogueras de concentración ardieron más bajas anoche. Mis centinelas durmieron, algo que no hacían desde hace una semana. Bien cortado, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Saqueador Ashbone abatido"
+          }
+        }
+      },
+      "q_dk_trolls_on_the_road": {
+        "title": "Troles en el Camino",
+        "text": "Los troles de las dunas han aprendido el sonido de un carromato de suministros, {playerName}. Han atacado el camino de las Dunas de Ceniza tres veces este mes, y el último conductor llegó sin nada más que las riendas. Ocho troles menos en ese camino y mis carromatos volverán a rodar.",
+        "completion": "Ocho, y mis conductores han dejado de escribir cartas de despedida antes de cada viaje. La guarnición come gracias a ti, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Trol de las Dunas abatido"
+          }
+        }
+      },
+      "q_dk_scorched_stores": {
+        "title": "Reservas Chamuscadas",
+        "text": "El último carromato ardió, {playerName}, pero los cajones reforzados con hierro no arden por dentro. Cuatro de ellos siguen tirados, chamuscados, a lo largo del camino de las dunas, con una temporada de sal, clavos y cuerdas de arco dentro. Trae mis reservas de vuelta antes de que los troles descubran cómo abrirlos.",
+        "completion": "Chamuscados hasta ennegrecer, y cada cierre aguantando aún. El herrero recibe sus clavos, la flechera sus cuerdas, y tú recibes las botas que guardaba para quien me trajera de vuelta los cajones, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Cajón de suministros chamuscado recuperado"
+          }
+        }
+      },
+      "q_dk_banners_over_the_dunes": {
+        "title": "Estandartes sobre las Dunas",
+        "text": "Los ashbone se concentran en las viejas tumbas del campo de huesos, {playerName}, y mis patrullas no pueden leer las dunas como leen un muro. Mata a cinco de sus heraldos de guerra, los que gritan para poner en pie a los muertos, y planta un estandarte de advertencia en cada terreno de concentración para que mis centinelas puedan marcarlo desde la cresta.",
+        "completion": "Tres estandartes ondeando en el viento caliente, justo donde mi catalejo puede encontrarlos. Con cinco heraldos de guerra silenciados, lo que sea que responda a su llamado vendrá más despacio. Nos compraste tiempo, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Heraldo de guerra Ashbone abatido"
+          },
+          "1": {
+            "label": "Estandarte de advertencia plantado"
+          }
+        }
+      },
+      "q_dk_watcher_at_the_wargate": {
+        "title": "La Vigía en la Puerta de Guerra",
+        "text": "Algo está arrastrando a los ashbone hacia el este, {playerName}, y envié a mi mejor exploradora a averiguar qué. La Exploradora Yerrin ha acampado un mes en las dunas lejanas más allá de Trollmoot, a la vista de una puerta que nadie construyó en toda mi vida. Sus informes cesaron hace diez días. Encuentra su campamento y tráeme lo que ella vio.",
+        "completion": "¿Brannoc te envió? Entonces mi último mensajero nunca llegó. Baja la voz y siéntate, {playerName}. ¿Ves esa puerta ahí abajo? Cuenta los estandartes de guerra frente a ella, y entenderás por qué dejé de escribir nada.",
+        "objectives": {
+          "0": {
+            "label": "Encuentra a la Exploradora Yerrin"
+          }
+        }
+      },
+      "q_dk_marrow_and_ash": {
+        "title": "Médula y Ceniza",
+        "text": "Cada saqueador ashbone lleva una marca de guerra, {playerName}: un recuento chamuscado de la hueste bajo la que marcha. He contado cuatro huestes desde esta cresta, pero las suposiciones no son inteligencia. Tráeme seis marcas de los saqueadores y sus heraldos, y le daré a Brannoc la forma de la guerra que se avecina.",
+        "completion": "Seis marcas, y una misma señal quemada en todas ellas. Esto no es una simple concentración de asalto, {playerName}. Cada hueste de las dunas responde a la puerta de guerra bajo nosotros, los troles la llaman Orkadia, y ningún grupo de cinco soldados con los que serví pudo romper lo que retumba tras esa puerta. Quizás cinco como tú sí.",
+        "objectives": {
+          "0": {
+            "label": "Marca de Guerra Ashbone"
+          }
+        }
+      },
+      "q_dk_scales_of_the_maw": {
+        "title": "Escamas de las Fauces",
+        "text": "Cuando el viento cambia desde el Drakemaw, los dragones emberwing lo cabalgan sobre mi campamento lo bastante bajo como para contarles los dientes, {playerName}. Se alejan más cada día, y algo en ese cráter los impulsa. Tráeme tres de sus escamas. Las escamas recuerdan el calor, y puedo leer dónde ha estado posado un dragón por la quemadura.",
+        "completion": "Mira el reverso de esta, {playerName}: chamuscada en espiral, y solo una cosa anida en círculos. Estos dragones son guardianes de cría. Algo en el Drakemaw es una madre.",
+        "objectives": {
+          "0": {
+            "label": "Escama de Emberwing"
+          }
+        }
+      },
+      "q_dk_matriarch_of_the_maw": {
+        "title": "Matriarca de las Fauces",
+        "text": "Las escamas decían la verdad, {playerName}. Escalé el borde al alba y la vi en el fondo del cráter: Cindraleth, la matriarca bajo la que nació cada emberwing de este cielo, dorada como un carbón a punto de prender. Mientras ella incuba, los dragones se vuelven más audaces, y Wyrmwatch no puede luchar contra dragones y ashbone a la vez. Acaba con ella en su cráter, y luego lleva la noticia al Capitán de Puerta Brannoc. No vayas solo.",
+        "completion": "El cielo sobre el Drakemaw lleva dos días vacío, y ahora cruzas mi puerta con sangre de matriarca en las botas. Wyrmwatch ha vigilado cuarenta años exactamente por esto, {playerName}. Toma estas hombreras de escama de fauces, forjadas por nuestro propio herrero. Llévalas donde los dragones puedan verlas.",
+        "objectives": {
+          "0": {
+            "label": "Cindraleth, la Matriarca de las Fauces, abatida"
+          }
+        }
+      },
+      "q_af_goldmelt_road": {
+        "title": "El Camino Dorado Hacia Abajo",
+        "text": "Cruzaste el Goldmelt, {playerName}, con nieve aún en las botas. Mantengo este santuario para que Lanternmere sepa quién llega desde el frío, y últimamente he tenido poco que informar. Toma el camino dorado hacia el pueblo, encuentra a la Alguacila Ottoline junto al pozo, y dile que el paso está en calma.",
+        "completion": "Calma en el Goldmelt, y un viajero con nieve en el pelo para probarlo. Sorrel vigila demasiado bien como para enviar noticias vanas. Sé bienvenido en Lanternmere, {playerName}. Los faroles arden para ti.",
+        "objectives": {
+          "0": {
+            "label": "Informa a la Alguacila Ottoline"
+          }
+        }
+      },
+      "q_af_foxes_in_the_lamplight": {
+        "title": "Zorros a la Luz del Farol",
+        "text": "Los zorros del ocaso han aprendido cuánto valen las reservas de los faroles, {playerName}. Cada anochecer se cuelan por las cercas y se llevan el sebo que prensamos para los faroles de los transbordadores. Patas suaves, conciencia más suave aún. Elimina a diez y el resto recordará temer al pueblo.",
+        "completion": "Diez, y las reservas quedaron intactas anoche por primera vez esta temporada. Los faroleros te envían su agradecimiento, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Zorro del Ocaso abatido"
+          }
+        }
+      },
+      "q_af_lanterns_on_the_water": {
+        "title": "Faroles en el Agua",
+        "text": "Cada transbordador del Mere lleva un farol de popa, {playerName}, y tres de mis barcas volvieron al alba sin el suyo. La niebla se los llevó, o algo dentro de la niebla lo hizo. Aparecen varados en la orilla este cuando el viento cambia. Camina por el sendero de la orilla y trae mis faroles de vuelta.",
+        "completion": "Los tres, y aún encendidos. Los faroles de los transbordadores no se apagan en el agua, {playerName}. Ese es el sentido de tenerlos. Lo que me preocupa es qué los arrancó.",
+        "objectives": {
+          "0": {
+            "label": "Farol de Transbordador recuperado"
+          }
+        }
+      },
+      "q_af_orchard_call": {
+        "title": "Una Carreta para el Huerto",
+        "text": "La Hortelana Pomeline cuida el Huerto Dorado en el camino del oeste, y sus carretas de savia llevan tres días de retraso. Todo el pueblo depende de esa savia ambarina, {playerName}: resina para faroles, endulzante, la cerveza de la cosecha. Camina por el camino del oeste y averigua qué la retiene.",
+        "completion": "¿Así que la Alguacila cuenta sus carretas? Bueno, puede seguir contándolas ausentes un rato más. Mira mis hileras, {playerName}. Tengo problemas mayores que una entrega tardía.",
+        "objectives": {
+          "0": {
+            "label": "Encuentra a la Hortelana Pomeline"
+          }
+        }
+      },
+      "q_af_amber_from_the_herd": {
+        "title": "Ámbar de la Manada",
+        "text": "Los ciervos dorados se recuestan bajo mis árboles más viejos, y la savia gotea oro sobre su pelaje toda la noche. Los coágulos que se peinan de él son el ámbar más puro del bosque. Tráeme seis, {playerName}. Los ciervos no te lo agradecerán, pero tampoco lo echarán en falta.",
+        "completion": "Seis coágulos, limpios como miel vertida. Estos guantes están cosidos con el último lote, {playerName}: endurecidos con savia, y más cálidos de lo que parecen.",
+        "objectives": {
+          "0": {
+            "label": "Coágulo de Savia Dorada"
+          }
+        }
+      },
+      "q_af_what_took_the_moorings": {
+        "title": "Lo Que Se Llevó los Amarres",
+        "text": "Ahora te diré lo que no dije delante del pueblo. Los amarres no se soltaron, los mordieron hasta cortarlos. Acechadores del Mere, cada noche más audaces, tirando de las cuerdas y los timones. Devuelve a ocho de ellos al agua para siempre, {playerName}, antes de que se lleven a algún barquero con ellos.",
+        "completion": "Ocho siluetas menos en los bajíos, y la travesía llegó a tiempo hoy por primera vez en quince días. Pero acechadores audaces son acechadores empujados, {playerName}. Algo bajo el Mere los está moviendo.",
+        "objectives": {
+          "0": {
+            "label": "Acechador del Mere abatido"
+          }
+        }
+      },
+      "q_af_sprites_and_spigots": {
+        "title": "Duendes y Espitas",
+        "text": "Duendes de la cosecha, {playerName}. Arrancan mis espitas de los troncos por la dulzura de dentro y arrojan los cubos a la hierba. Ahuyenta a ocho de los pequeños ladrones y trae de vuelta cuatro de mis cubos, y las carretas volverán a rodar.",
+        "completion": "Cuatro cubos de vuelta en sus ganchos y las hileras en calma. Tienes mano más dura con los duendes que yo, {playerName}, y hoy me alegro de ello.",
+        "objectives": {
+          "0": {
+            "label": "Duende de la Cosecha ahuyentado"
+          },
+          "1": {
+            "label": "Cubo de Extracción de Savia recuperado"
+          }
+        }
+      },
+      "q_af_the_meredark": {
+        "title": "El Meredark",
+        "text": "Los viejos barqueros tienen un nombre que solo dicen en tierra: el Meredark, el primer acechador, tan viejo como el lago y el doble de paciente. Ya emergió una vez antes, el año en que el embarcadero se hundió, y ahora está emergiendo de nuevo. Al atardecer se asolea en las ruinas del embarcadero, en la orilla sur, {playerName}. Lleva a un amigo, lleva a dos, y acaba con él mientras aún se pueda acabar.",
+        "completion": "La niebla se levantó del Mere esta mañana, {playerName}, y todo el pueblo lo vio. Los transbordadores volverán a hacer la travesía nocturna, y cada farol sobre el agua arderá en tu nombre. Toma esto: fue dragado del embarcadero hundido, y nadie tiene más derecho a llevarlo que tú.",
+        "objectives": {
+          "0": {
+            "label": "El Meredark abatido"
+          }
+        }
+      },
+      "q_wf_across_the_fenway": {
+        "title": "A Través del Fenway",
+        "text": "Un territorio apacible, el Willowfen, pero apacible no es lo mismo que seguro, {playerName}. Sigue el camino al norte hasta la calzada del Fenway y cruza hacia Bridgemere. Dile al Puentero Alden que los Escalones están abiertos y la hoguera del campamento está encendida.",
+        "completion": "Pell mantiene esa hoguera encendida a través de cada niebla que la ciénaga le sopla. Si dice que los Escalones están abiertos, lo están. Bienvenido a Bridgemere, {playerName}. Ten cuidado con tus pasos en mis tablas y nos llevaremos bien.",
+        "objectives": {
+          "0": {
+            "label": "Informa al Puentero Alden"
+          }
+        }
+      },
+      "q_wf_rope_chewers": {
+        "title": "Los Roedores de Cuerdas",
+        "text": "Sapos del pantano, {playerName}. Se arrastran fuera del foso de noche y muerden mis cuerdas de amarre como si fueran tallos de junco. Tres botes salieron a la deriva la semana pasada, y uno de ellos llevaba mi buen torno a bordo. Diezma a las cosas gordas, diez de ellas, y los botes se quedarán donde los atamos.",
+        "completion": "Diez juegos de dientes menos en mi foso. Los botes se quedaron en sus amarres toda la noche por primera vez en un mes, {playerName}. Tienes el agradecimiento de cada redor del pueblo.",
+        "objectives": {
+          "0": {
+            "label": "Sapo del Pantano abatido"
+          }
+        }
+      },
+      "q_wf_eels_for_the_smokehouse": {
+        "title": "Anguilas para la Ahumadería",
+        "text": "Los sapos del pantano no solo se comen mis cuerdas, {playerName}, se comen mi pesca: engullen las anguilas enteras, directamente de las trampas. Libera a seis rollizas de las criaturas glotonas antes de que la carne se eche a perder, y los fuegos de la ahumadería seguirán encendidos.",
+        "completion": "Seis buenas anguilas, apenas magulladas. La ahumadería olerá a dinero por la mañana. Toma, estos vadeadores eran míos cuando era más rápido: la piel de anguila repele el agua como ninguna otra cosa.",
+        "objectives": {
+          "0": {
+            "label": "Anguila Rolliza de la Ciénaga"
+          }
+        }
+      },
+      "q_wf_mind_the_moorings": {
+        "title": "Cuidado con los Amarres",
+        "text": "La buena cuerda es cara por aquí, {playerName}: cada línea que muerden los sapos es una semana de dinero de anguilas perdida. Los extremos cortados siguen tirados a lo largo de la orilla del foso donde los botes los soltaron. Camina por las pasarelas y tráeme de vuelta cuatro cuerdas, y podré empalmarlas como nuevas.",
+        "completion": "Mira eso: mordiscos limpios, todos ellos, pero queda cuerda suficiente para empalmar. Me has ahorrado un mes de monedas y a las redoras un mes de quejas, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Amarre Cortado recuperado"
+          }
+        }
+      },
+      "q_wf_witch_of_willowweep": {
+        "title": "La Bruja de Willowweep",
+        "text": "Ya lo has oído, {playerName}: el ronquido. Lento y pesado, más allá de las Llanuras Somnolientas, como si la propia ciénaga se diera la vuelta en su sueño. Los sapos, los duendes, los fuegos fatuos ardiendo al mediodía: todo empezó cuando lo hizo ese sonido. Un alma podría saber qué es. Madre Sedge mantiene un campamento en Willowweep, al oeste alrededor del foso y bajando por la orilla lejana. Encuéntrala, y pregúntale qué duerme en el centro de mi ciénaga.",
+        "completion": "¿Alden te envió todo este camino para preguntar por el ronquido? Entonces la gente del puente por fin está escuchando. Siéntate lejos de la humedad, {playerName}. Ese sonido tiene un nombre, y una garganta, y he estado esperando a alguien lo bastante loco como para ayudarme a acallarlo.",
+        "objectives": {
+          "0": {
+            "label": "Encuentra a la Madre Sedge"
+          }
+        }
+      },
+      "q_wf_toll_and_tangle": {
+        "title": "Peaje y Enredo",
+        "text": "Los duendes del sauce creen que es un buen juego soltar un transbordador, {playerName}, y la semana pasada el bote de peaje volcó en la ruta este con toda una estación de peaje de puente a bordo. Los cofres se hundieron en los bajíos y los duendes bailan en las pasarelas como si fueran suyas. Ahuyenta a ocho y saca tres cofres de peaje, y Bridgemere comerá este invierno.",
+        "completion": "Tres cofres, y las monedas todavía secas dentro. Los duendes rabiarán entre los mimbres durante una semana, {playerName}, y el pueblo te debe su pan de invierno.",
+        "objectives": {
+          "0": {
+            "label": "Duende del Sauce ahuyentado"
+          },
+          "1": {
+            "label": "Cofre de Peaje recuperado"
+          }
+        }
+      },
+      "q_wf_wisplight_charms": {
+        "title": "Amuletos de Luz de Fuego Fatuo",
+        "text": "Los fuegos fatuos sobre las charcas son la ciénaga soñando en voz alta, {playerName}, y su luz es lo único que resiste contra el arrullo del Croador. La tejo en amuletos de sauce: uno al cuello y el ronquido no podrá cerrarte los párpados. Tráeme seis globos de luz de fuego fatuo. Los fuegos fatuos no lucharán contigo por ellos, lo que lo convierte en un acto de bondad o de robo, según cómo lo lleves.",
+        "completion": "Seis globos, aún cálidos de soñar. Dame hasta la salida de la luna y tendré amuletos tejidos para ti y para quien sea lo bastante valiente como para estar a tu lado.",
+        "objectives": {
+          "0": {
+            "label": "Globo de Luz de Fuego Fatuo"
+          }
+        }
+      },
+      "q_wf_croakers_hush": {
+        "title": "El Silencio del Croador",
+        "text": "Ahora conoces el nombre del roncador, {playerName}: el Croador Somnoliento, el viejo rey sapo de las Llanuras Somnolientas. Cada año su croar se vuelve más pesado, y cada año más partes de la ciénaga olvidan despertar. Los amuletos mantendrán tus ojos abiertos, pero su tamaño es otro asunto: trae a un amigo, y no lo enfrentes en el agua. Dale al viejo rey un sueño más tranquilo.",
+        "completion": "Escucha, {playerName}. Nada. El primer silencio verdadero sobre esta ciénaga en treinta años, y medio pueblo no dormirá esta noche por lo extraño que resulta. Los sauces dan las gracias, a su manera. Lleva esto, tejido de su propio lecho de lirios, y la ciénaga te reconocerá como amigo donde sea que llegue el agua.",
+        "objectives": {
+          "0": {
+            "label": "El Croador Somnoliento abatido"
+          }
+        }
+      },
+      "q_nb_road_of_lanterns": {
+        "title": "El Camino de los Faroles",
+        "text": "Aquí arriba el sol nunca sigue, {playerName}, solo las lámparas que mantengo encendidas a lo largo de la subida. Moonrest yace al norte, donde se reúne la luz de las flores. Encuentra a Lira Dewsong entre sus jardines y dile que las lámparas del Nightgate siguen ardiendo.",
+        "completion": "Las lámparas siguen ardiendo, y el camino sigue trayéndonos forasteros. Sorrel ha guardado esa puerta más tiempo del que nadie en Moonrest recuerda. Bienvenido, {playerName}, al reino que nunca amanece.",
+        "objectives": {
+          "0": {
+            "label": "Encuentra a Lira Dewsong en Moonrest"
+          }
+        }
+      },
+      "q_nb_striders_in_the_dark": {
+        "title": "Zancudos en la Oscuridad",
+        "text": "Los zancudos del ocaso siempre fueron cazadores pacientes, {playerName}, pero últimamente se cuelan directo en los lechos de flores y se llevan corderos moonfleece bajo nuestros faroles. Elimina a diez de ellos y devuélvele la calma a los páramos.",
+        "completion": "Diez zancudos menos, y las manadas ya pastan más tranquilas. Los jardines guardan sus propias horas, pero esta noche las guardan en paz.",
+        "objectives": {
+          "0": {
+            "label": "Zancudo del Ocaso abatido"
+          }
+        }
+      },
+      "q_nb_wool_by_moonlight": {
+        "title": "Lana a la Luz de la Luna",
+        "text": "Nada abriga como el moonfleece, {playerName}, y nada se hila tan fino. Los ramoneadores llevan su lana plateada suelta en mechones mientras vagan por los páramos. Tráeme seis buenos mechones de las manadas y te tejeré algo que valga la caminata.",
+        "completion": "Plateado como la luz estelar y el doble de suave. Toma, {playerName}: manoplas del último lote, forradas como solo el moonfleece puede forrar.",
+        "objectives": {
+          "0": {
+            "label": "Mechón de Moonfleece"
+          }
+        }
+      },
+      "q_nb_night_gardens": {
+        "title": "Los Jardines Nocturnos",
+        "text": "La flor nocturna solo se abre bajo este cielo, y Gloamfield alberga los lechos más antiguos del reino. Necesito cuatro flores frescas para las guirnaldas del santuario, {playerName}. Córtalas con suavidad: un lecho recuerda una mano brusca durante toda una estación.",
+        "completion": "Aún brillando, cada pétalo. El santuario olerá a noche durante una semana, y Moonrest dormirá más tranquilo gracias a ello.",
+        "objectives": {
+          "0": {
+            "label": "Flor de Nightbloom recolectada"
+          }
+        }
+      },
+      "q_nb_eyes_on_the_vigil": {
+        "title": "Ojos en la Vela",
+        "text": "Algo tiene a los zancudos audaces y a las manadas inquietas, {playerName}, y no puedo leerlo en las flores. Cassian puede leerlo en el cielo. Mantiene su campamento observatorio junto a la Vela Permanente al este de aquí, donde los nightkin vagan entre las piedras. Encuéntralo, y pregúntale qué dicen las estrellas.",
+        "completion": "¿Lira te envió? Entonces los jardines también lo sienten. Siéntate junto al catalejo un momento, {playerName}. Las estrellas han estado inquietas durante un mes, y cada carta que dibujo se inclina hacia el norte, hacia el túmulo.",
+        "objectives": {
+          "0": {
+            "label": "Encuentra al Astrónomo Cassian en la Vela Permanente"
+          }
+        }
+      },
+      "q_nb_charts_of_the_stones": {
+        "title": "Las Cartas en las Piedras",
+        "text": "Las piedras de la Vela son más viejas que Moonrest, más viejas que los nightkin que las cuidan, y sus caras están talladas con cartas estelares que he pasado la vida aprendiendo a leer. El cielo se ha desplazado, {playerName}, y debo saber cuánto. Lee las cartas en tres de las piedras y tráeme sus posiciones.",
+        "completion": "No queda ninguna duda. Cada posición se ha ido acercando al Túmulo Insomne, como si el propio cielo se inclinara sobre ese montículo para observar. Los viejos reyes fueron enterrados bajo estrellas alineadas por una razón, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Carta estelar leída"
+          }
+        }
+      },
+      "q_nb_restless_mounds": {
+        "title": "Los Túmulos Inquietos",
+        "text": "Las cartas eran una advertencia, y el campo de túmulos lo demuestra: los montículos se abren desde abajo. Los espectros caminan por las hileras de tumbas vistiendo los viejos honores, y las ofrendas que los mantenían dormidos yacen esparcidas por la hierba. Acaba con ocho de ellos, {playerName}, y recoge cuatro de las ofrendas de vuelta para mí.",
+        "completion": "Oro de tumba, aún frío de la tierra. Los espectros no se levantan por sí solos, {playerName}: algo bajo el gran montículo los está llamando, y temo que las cartas ya nos hayan dicho su nombre.",
+        "objectives": {
+          "0": {
+            "label": "Espectro del Túmulo abatido"
+          },
+          "1": {
+            "label": "Ofrenda fúnebre recuperada"
+          }
+        }
+      },
+      "q_nb_the_barrow_king": {
+        "title": "El Rey del Túmulo Despierta",
+        "text": "Cada posición, cada estrella inquieta, cada montículo abierto apunta a una sola cosa: el Rey del Túmulo está despertando bajo el gran montículo, y este reino no tiene amanecer para contenerlo. Debe ser puesto a descansar antes de que recuerde su corona, {playerName}. No vayas solo: trae a un amigo, y mantén la luz de las flores a tu espalda.",
+        "completion": "Las estrellas se han calmado por primera vez en una estación, {playerName}. Los montículos están cerrados, los nightkin han quedado quietos junto a sus piedras, y el rey vuelve a dormir bajo tierra. Lleva este manto: Moonrest lo cortó para quien la noche finalmente decidiera confiar.",
+        "objectives": {
+          "0": {
+            "label": "El Rey del Túmulo puesto a descansar"
+          }
+        }
+      },
+      "q_ww_bells_of_gallowmere": {
+        "title": "Las Campanas de Gallowmere",
+        "text": "¿Oyes ese tañido, {playerName}? Es Gallowmere, camino arriba al norte, tocando a sus muertos para que duerman. El Sacristán Marrow lleva la cuenta de cada alma bajo el dosel, vivos y sepultados. Ve y hazte contar, antes de que el bosque mismo te cuente a ti.",
+        "completion": "¿Cobb te envió por el camino entero? Buen hombre. Ha mantenido esos faroles de la puerta encendidos durante treinta años, y el bosque nunca ha logrado pasar de él. Bienvenido a Gallowmere, {playerName}. Cuidado con las campanas.",
+        "objectives": {
+          "0": {
+            "label": "Informa al Sacristán Marrow"
+          }
+        }
+      },
+      "q_ww_silk_in_the_eaves": {
+        "title": "Seda en los Aleros",
+        "text": "Mira hacia arriba cuando camines por el camino del oeste, {playerName}, y las verás: formas envueltas en el dosel, balanceándose donde no llega ningún viento. Las tejedoras de seda de viuda se han arrastrado fuera del Matorral y han tendido sus despensas sobre mis faroles. Mata a diez, y el camino volverá a ser un camino.",
+        "completion": "Diez tejedoras menos en los aleros. Los faroleros harán sus rondas esta noche sin mirar hacia arriba, y eso vale más aquí de lo que crees.",
+        "objectives": {
+          "0": {
+            "label": "Tejedora de Seda de Viuda abatida"
+          }
+        }
+      },
+      "q_ww_widows_skeins": {
+        "title": "Las Madejas de la Viuda",
+        "text": "Las tejedoras toman a nuestros muertos para sus despensas, {playerName}, así que yo tomo su seda para nuestros sudarios. Arde limpia y retiene una bendición mejor de lo que el lino jamás pudo. Tráeme seis madejas de seda de viuda, y la próxima alma que enterremos bajará envuelta y protegida.",
+        "completion": "Seis madejas, suaves como un aliento contenido. Los muertos yacerán más tranquilos en esto. Toma estas vendas, las cosí del último lote, y el bosque nunca las ha mordido.",
+        "objectives": {
+          "0": {
+            "label": "Madeja de Seda de Viuda"
+          }
+        }
+      },
+      "q_ww_candles_at_the_bounds": {
+        "title": "Velas en los Límites",
+        "text": "Cuatro piedras límite rodean Gallowmere, {playerName}, una en cada camino de salida, y una vela fúnebre arde sobre cada piedra. Mientras arden, los sepultados permanecen sepultados. La llovizna las ha apagado, las cuatro, y soy demasiado viejo para recorrer los límites solo. Toma mi vela y vuelve a encenderlas, deprisa.",
+        "completion": "¿Las cuatro ardiendo? Entonces respira, {playerName}. Tú no lo oíste, pero toda la aldea sí: las campanas sonaron más ligeras en el momento en que prendió la última mecha.",
+        "objectives": {
+          "0": {
+            "label": "Vela fúnebre reencendida"
+          }
+        }
+      },
+      "q_ww_the_last_vicar": {
+        "title": "El Último Vicario",
+        "text": "Al sur de aquí la Capilla de Mournstone se pudre junto a su lago negro, y un hombre todavía la cuida: el Vicario Creel, que no quiso irse cuando el techo se derrumbó. Conoce los viejos ritos mejor que mis campanas, {playerName}, y no ha enviado noticias en un mes. Camina el camino de la capilla y comprueba que respira.",
+        "completion": "¿Marrow se preocupa por mí? Eso es nuevo. Dile que el Mournstone sigue en pie, a su manera, y yo también. Quédate un rato, {playerName}. El lago ha estado susurrando, y preferiría no escucharlo solo.",
+        "objectives": {
+          "0": {
+            "label": "Encuentra al Vicario Creel"
+          }
+        }
+      },
+      "q_ww_wraiths_of_the_tarn": {
+        "title": "Aparecidos del Lago",
+        "text": "Los aparecidos del bosque fueron alguna vez los guardianes de la capilla, {playerName}, crecidos de árboles plantados sobre los muertos honrados. Desde que el lago se volvió negro han olvidado su deber, y ahora vagan por mi cementerio tirando de la tierra. Destrúyelos a ocho antes de que terminen lo que empezaron.",
+        "completion": "Ocho guardianes derribados al fin. No lo llamaré una piedad a la luz del día, pero entre nosotros, {playerName}, lo fue.",
+        "objectives": {
+          "0": {
+            "label": "Aparecido del Bosque abatido"
+          }
+        }
+      },
+      "q_ww_what_the_bark_holds": {
+        "title": "Lo Que la Corteza Guarda",
+        "text": "En el Claro Colgante al este de Gallowmere las tejedoras cuelgan a sus muertos envueltos en seda de las ramas, y los bamboleantes de corteza tumular vigilan debajo como portadores de féretro pacientes. Esa es nuestra gente ahí arriba, {playerName}. Destruye a cinco bamboleantes, corta a tres de los muertos envueltos, y tráelos a casa a la tierra.",
+        "completion": "Tres almas de vuelta bajo tierra honesta antes del anochecer. Los bamboleantes volverán a crecer, la corteza siempre lo hace, pero esta noche el claro cuelga vacío, y eso basta.",
+        "objectives": {
+          "0": {
+            "label": "Bamboleante de Corteza Tumular abatido"
+          },
+          "1": {
+            "label": "Restos envueltos en seda cortados"
+          }
+        }
+      },
+      "q_ww_walking_mosley_home": {
+        "title": "Llevando a Mosley a Casa",
+        "text": "Mi sepulturero Mosley tomó el camino de la capilla hace tres días para abrir una parcela en el viejo cementerio, y la excavación se derrumbó sobre él. Se abrió camino a zarpazos, el necio está vivo, pero está acurrucado junto a las tumbas de la capilla y no se moverá por las tejedoras del camino. Llévalo a casa, {playerName}. No puedo tocar las campanas por un hombre vivo.",
+        "completion": "Cruzó la puerta por su propio pie, jurando que de ahora en adelante no cavará nada más profundo que un lecho de nabos. Estará de vuelta en el cementerio para el domingo, siempre lo están. Gracias, {playerName}. Gallowmere cuida a su gente, esa es toda nuestra ley.",
+        "objectives": {
+          "0": {
+            "label": "Sepulturero Mosley acompañado a salvo de vuelta a Gallowmere"
+          }
+        }
+      },
+      "q_ww_horn_of_the_huntsman": {
+        "title": "El Cuerno del Cazador",
+        "text": "Ya has oído el cuerno, {playerName}, fino y lejano, el sonido para el que todo el bosque contiene el aliento. El Pálido Cazador cabalga su claro al norte de aquí, y cada tumba que atraviesa se vuelve más superficial. Fue un hombre alguna vez, y fue enterrado mal, y he dejado de fingir que la plegaria bastará. Lleva a un amigo, lleva a dos, y desmóntalo.",
+        "completion": "El cuerno se detuvo a media nota. Cada campana en Gallowmere sonó una vez, por sí sola, y luego el bosque quedó más silencioso de lo que lo he oído en treinta años. Has hecho el rito que yo no pude, {playerName}. Lleva esto, y camina bajo el dosel sin miedo.",
+        "objectives": {
+          "0": {
+            "label": "El Pálido Cazador desmontado"
+          }
+        }
+      },
+      "q_pr_down_to_drifthaven": {
+        "title": "Bajando a Drifthaven",
+        "text": "Fuera de los árboles negros y hacia el sol, {playerName}. Sigue el camino de la orilla al norte y llegarás a Drifthaven antes de que cambie la marea. Pregunta por la Jefa de Rescate Ryna, tiene trabajo para cualquier par de manos desde la tormenta, y dile que el camino del Tanglemouth sigue abierto.",
+        "completion": "¿Pell te envió? Entonces caminaste todo el camino del Tanglemouth solo, y eso es referencia suficiente para mí. Bienvenido a Drifthaven, {playerName}. Toma una cuerda, andamos cortos de manos.",
+        "objectives": {
+          "0": {
+            "label": "Informa a la Jefa de Rescate Ryna"
+          }
+        }
+      },
+      "q_pr_wreck_line_cargo": {
+        "title": "La Línea de Naufragios",
+        "text": "La tormenta de hace tres noches arrastró al Pearlwake contra el arrecife, y su carga quedó esparcida a lo largo de toda la línea de naufragios entre aquí y el Palmstrand. Tres cajones de mercancías de comercio siguen tirados en el oleaje, {playerName}. Tráelos antes de que la marea, o los cangrejos, reclamen lo que queda.",
+        "completion": "Manchados de sal pero intactos, los tres. Las buceadoras comen este mes gracias a ti, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Cajón de Carga del Pearlwake recuperado"
+          }
+        }
+      },
+      "q_pr_scuttler_cull": {
+        "title": "Ladrones de Caparazón",
+        "text": "Cada naufragio en esta costa atrae a los cangrejos de marea, y el Pearlwake ha atraído a medio arrecife. Mis cuadrillas de rescate no trabajarán una línea con esas garras en los bajíos. Rompe a diez de ellos, {playerName}, y la línea de naufragios volverá a ser nuestra.",
+        "completion": "Diez garras menos en el oleaje. Mis cuadrillas ya están volviendo a vadear, y ninguna de ellas dio las gracias, así que lo haré yo: gracias, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Cangrejo de Marea partido"
+          }
+        }
+      },
+      "q_pr_boars_in_the_gardens": {
+        "title": "Jabalíes en los Jardines",
+        "text": "Lo que sea que se agita en el verde profundo, empuja a los jabalíes del matorral hacia nuestra playa. Han desenterrado las terrazas del jardín dos veces esta semana, y los tendederos serán lo siguiente. Diez jabalíes, {playerName}, y empuja al resto de vuelta bajo los árboles.",
+        "completion": "Los tendederos siguen en pie y los jardines pueden replantarse. Los jabalíes no eligieron venir a la arena, {playerName}. Recuerda eso: algo los movió.",
+        "objectives": {
+          "0": {
+            "label": "Jabalí del Matorral ahuyentado"
+          }
+        }
+      },
+      "q_pr_the_man_who_went_in": {
+        "title": "El Hombre que Entró",
+        "text": "Las buceadoras no pasarán de la línea de árboles, {playerName}, y no se lo voy a pedir. Ya has oído los tambores a estas alturas: todos los oyen, a la segunda noche. Solo un hombre en esta isla caminó hacia ese sonido y volvió. Okku. Acampa bajo los grandes banianos en el Vinefall, camino arriba por el Tangle. Encuéntralo, y pregúntale qué esconde el verde.",
+        "completion": "¿Isha te envió? La Madre-Perla no ha pronunciado mi nombre en años. Siéntate lejos del alcance de las lianas, {playerName}, y te diré lo que sé: los tambores no son el peligro. Son la advertencia.",
+        "objectives": {
+          "0": {
+            "label": "Encuentra a Okku en el Vinefall"
+          }
+        }
+      },
+      "q_pr_canopy_silk": {
+        "title": "Seda del Dosel",
+        "text": "Mira hacia arriba, {playerName}. Cada dosel desde aquí hasta el ídolo está tejido como una red de pesca, y las tejedoras se vuelven más audaces cada temporada. Tiendo su propia seda a través de los senderos, campanas trampa, para que la selva no pueda acercarse sigilosamente. Seis buenas madejas de las tejedoras del dosel volverán a tensar mis líneas.",
+        "completion": "Buena seda, resistente. Mis campanas cantarán un rato más, y nada camina estos senderos de noche sin que yo lo sepa, {playerName}. Últimamente, algo ha estado caminando a menudo.",
+        "objectives": {
+          "0": {
+            "label": "Madeja de Seda del Dosel"
+          }
+        }
+      },
+      "q_pr_the_lost_navigator": {
+        "title": "La Navegante Perdida",
+        "text": "Sacamos a todos del Pearlwake menos a uno: la Navegante Suli, que nadó hacia la playa lejana y nunca llegó caminando. Una buceadora la vio refugiada en los restos de la proa pasado el Palmstrand, viva, pero demasiado exhausta para correr sola el peligro. Llévala a casa por el camino de la orilla, {playerName}. A los cangrejos no les gustará, y a la selva le gustará menos.",
+        "completion": "Suli está junto al fuego, todavía jurando que podría haberlo nadado. Trajiste de vuelta a la única lectora de cartas náuticas de esta costa, {playerName}. Estas son de su cofre de mar, con su bendición.",
+        "objectives": {
+          "0": {
+            "label": "Navegante Suli acompañada a salvo a Drifthaven"
+          }
+        }
+      },
+      "q_pr_what_the_drums_guard": {
+        "title": "Lo Que los Tambores Guardan",
+        "text": "He caminado tan cerca del Ídolo Sumergido como un hombre vivo se atreve, y vi dos cosas: las tejedoras han cubierto el camino del ídolo con telarañas, y los viejos cuencos de ofrendas a lo largo de él han vuelto a llenarse. Recientemente, {playerName}. Corta a ocho tejedoras del camino y tráeme tres de esas ofrendas. Quisiera saber qué mano todavía alimenta a un dios muerto.",
+        "completion": "Musgo, concha de perla, y sangre de jabalí, prensados con los dedos. Algo en esa ruina todavía guarda sus ritos, {playerName}, y el Guardián mantiene todo lo demás fuera. Es hora de que hablemos de ello con claridad.",
+        "objectives": {
+          "0": {
+            "label": "Tejedora del Dosel derribada"
+          },
+          "1": {
+            "label": "Cuenco de Ofrendas Rellenado recolectado"
+          }
+        }
+      },
+      "q_pr_idol_guardian": {
+        "title": "El Guardián del Ídolo",
+        "text": "El ídolo es más viejo que la isla, {playerName}. Más viejo que los tambores, más viejo que el nombre Palmreach. Su Guardián ha estado de pie en ese anillo sumergido desde antes de que crecieran las palmeras, y ahora despierta y camina por las columnas de noche. Sea lo que sea lo que alimentan las ofrendas, el Guardián es su custodio de puerta. Trae a un amigo, y destrúyelo.",
+        "completion": "Derribaste algo que ni la propia selva quería tocar. Mira allí, detrás del ídolo: el Guardián nunca vigilaba las columnas, {playerName}, vigilaba los escalones debajo de ellas. Los tambores han callado esta noche. Lo que sea que duerme bajo el Wildheart Basin ahora conoce tu nombre.",
+        "objectives": {
+          "0": {
+            "label": "El Guardián del Ídolo destruido"
+          }
+        }
+      },
+      "q_eg_gate_report": {
+        "title": "Noticias a Través de la Puerta",
+        "text": "Los céspedes más allá de esta puerta se han recortado solos durante cien años, {playerName}, y últimamente han empezado a recortar visitantes también. La Jardinera Mayor Amaranth lleva las cuentas en Hedgewick, camino arriba pasado el césped de la puerta. Dile que ha llegado otro viajero, y dile que los setos junto a la puerta se movieron anoche.",
+        "completion": "Conque se movieron. Pell informa de eso cada semana, y cada semana tiene razón. Perdona mis ojos, {playerName}, llevo años sin dormir una noche entera: alguien tiene que vigilar al jardín mientras nos vigila. Bienvenido a Hedgewick.",
+        "objectives": {
+          "0": {
+            "label": "Informa a la Jardinera Mayor Amaranth"
+          }
+        }
+      },
+      "q_eg_hungry_shapes": {
+        "title": "Podados hacia el Hambre",
+        "text": "Quienquiera que dé forma a este jardín se ha vuelto descuidado, o cruel. Las figuras de lobo en los Rosales Salvajes se recortaban para lucirse, pero últimamente cazan: fauces verdes, sin vientre, y sin ninguna razón para detenerse jamás. Derriba a diez lobos topiarios, {playerName}, y deja que los céspedes vuelvan a ser céspedes por un tiempo.",
+        "completion": "Diez montones de recortes donde antes había diez lobos. Debería sentirse como jardinería, {playerName}. ¿Por qué se siente como una guerra?",
+        "objectives": {
+          "0": {
+            "label": "Lobo Topiario abatido"
+          }
+        }
+      },
+      "q_eg_stolen_shears": {
+        "title": "Las Tijeras Robadas",
+        "text": "Todos los pares de tijeras de Hedgewick han desaparecido en quince días, {playerName}: de las clavijas, de cobertizos cerrados, un par de mi propio delantal mientras dormitaba. Son los gnomos del seto, los pequeños guardacampos que odian que pisemos su césped. Recupera seis pares antes de que toda la aldea se quede con cuchillos de cocina.",
+        "completion": "Seis pares, y el mío entre ellos, reconocería esa mella en la hoja en cualquier parte. Toma, estos guantes se tejieron para el trabajo de poda. Manos cálidas hacen tijeras firmes.",
+        "objectives": {
+          "0": {
+            "label": "Tijeras Robadas de Hedgewick"
+          }
+        }
+      },
+      "q_eg_who_trims_the_hedges": {
+        "title": "Quién Recorta los Setos",
+        "text": "Llevo treinta años con los libros, {playerName}, y diez de ellos sin dormir bien, porque las cuentas no cuadran. La hierba necesita corte y los setos necesitan forma, y nadie aquí hace ni lo uno ni lo otro, y sin embargo cada amanecer el jardín amanece recortado. Últimamente la gente del bosque jura ver a un anciano con una carretilla en los céspedes del extremo sur, más allá del laberinto junto a la Cuenca de los Lirios. Encuéntralo. Si es real, por fin podré dormir. Si no lo es, supongo que nunca lo haré.",
+        "completion": "Así que la casa por fin envió a alguien. Cien años llevo caminando estos céspedes, {playerName}, y el jardín y yo tenemos un entendimiento: recorto lo que pide ser recortado. Siéntate. Los setos pueden prescindir de ti una hora.",
+        "objectives": {
+          "0": {
+            "label": "Encuentra al jardinero junto a la Cuenca de los Lirios"
+          }
+        }
+      },
+      "q_eg_gnomes_in_the_green": {
+        "title": "El Rencor de los Guardacampos",
+        "text": "Las tijeras fueron solo el principio, {playerName}. Anoche los gnomos volcaron nuestras carretas de herramientas en el verde, una junto a su madriguera al oeste del laberinto, otra al otro lado del jardín en el paseo del estanque, y esparcieron cien años de buen hierro por la hierba. Ahuyenta a ocho de los pequeños diablos y trae de vuelta las carretas volcadas.",
+        "completion": "Tres carretas de vuelta y las clavijas llenas otra vez. Que los pequeños diablos rabien en sus setos: Hedgewick también trabaja estos céspedes.",
+        "objectives": {
+          "0": {
+            "label": "Gnomo del Seto ahuyentado"
+          },
+          "1": {
+            "label": "Carreta de herramientas recuperada"
+          }
+        }
+      },
+      "q_eg_bloom_clippings": {
+        "title": "Esquejes del Verde Vivo",
+        "text": "¿Quieres entender este jardín? Entonces léelo como yo lo hago. Los ciervos que pastan en el césped crecen del verde más fiel: cada hoja en ellos es una página. Tráeme seis esquejes frescos de los ciervos topiarios, {playerName}. No te agradecerán la poda, pero volverán a crecer. Aquí todo vuelve a crecer.",
+        "completion": "Mira esto: las hojas se enroscan sobre sí mismas, cada esqueje igual. El jardín tiene miedo, {playerName}. En cien años nunca lo había visto asustado.",
+        "objectives": {
+          "0": {
+            "label": "Esqueje de Flor Podada"
+          }
+        }
+      },
+      "q_eg_four_statues": {
+        "title": "Las Cuatro Hermanas Silenciosas",
+        "text": "Cuando el jardín era joven, los primeros jardineros alzaron cuatro hermanas de mármol para vigilar sus cuartos: una sobre los Rosales Salvajes, una en el paseo del estanque al este del laberinto, una en el césped oeste donde los gnomos tienen su madriguera, y una en el césped sur más allá de los setos. El laberinto creció entre ellas, y la mayoría de la gente nunca las ve las cuatro. Camina los cuartos, {playerName}, y posa la palma sobre cada hermana. Cuando el jardín te haya mirado desde los cuatro lados, abrirá lugares que guarda de los forasteros.",
+        "completion": "Cuatro calcos, cuatro hermanas, y ninguna lloró mármol. El jardín te ha tomado la medida, {playerName}, y no te ha encontrado indigno. Ahora puedo enviarte adonde vive de verdad el problema.",
+        "objectives": {
+          "0": {
+            "label": "Estatua del jardín visitada"
+          }
+        }
+      },
+      "q_eg_bull_of_the_court": {
+        "title": "El Toro de la Corte de la Fuente",
+        "text": "Ahora la verdad, {playerName}. El toro en el corazón del laberinto fue mi obra maestra: lo modelé para guardar la Corte de la Fuente, y durante cien años lo hizo. Pero el miedo del verde lo ha alcanzado, y ya no guarda nada, ahora caza. El laberinto le ofrece a quien se adentre en él. Soy demasiado viejo para deshacerlo, y debe ser un deshacer de raíz y rama. Lleva a un amigo, camina el laberinto hasta la corte, y derriba a mi toro.",
+        "completion": "Lo sentí, aquí, cuando se deshizo. Cien años de trabajo, y tuviste razón en acabarlo. Toma este manto: lo corté para quien demostrara ser más fuerte que mi mejor obra. La corte esta noche es solo una fuente, {playerName}, y el jardín es solo un jardín. Quizás ahora la Jardinera Mayor y yo podamos dormir los dos.",
+        "objectives": {
+          "0": {
+            "label": "El Toro Topiario deshecho"
+          }
+        }
+      },
+      "q_fs_bell_at_the_landing": {
+        "title": "La Campana del Embarcadero",
+        "text": "¿Cruzaste el Ferrywalk, {playerName}? Entonces eres el primero en una semana, y la Guardiana querrá examinarte. Gullhaven se encuentra camino arriba por la orilla, pasados los tendederos que ya nadie atiende. Dile al Guardián Coalfast que la calzada sigue en pie, y que Tam no ha tocado un triple toque hoy. Todavía.",
+        "completion": "La calzada resiste, y Tam aún tiene aliento para bromear sobre el triple toque. Bien. Somos una isla bajo asedio, {playerName}, y cada par de manos que cruza ese banco de arena es un par que las brechas deben superar antes de llegar a mi gente. Bienvenido a Gullhaven.",
+        "objectives": {
+          "0": {
+            "label": "Informa al Guardián Coalfast"
+          }
+        }
+      },
+      "q_fs_hold_the_riftfields": {
+        "title": "Defiende los Campos de la Brecha",
+        "text": "Al este del pueblo las hileras de grano se han echado a perder, y los miserables que llegaron por la brecha de los Campos de la Brecha ahora las despojan por completo. Mi gente no puede cuidar un campo en el que no puede pararse, {playerName}. Elimina a diez de los miserables y devuélveles la tierra a los granjeros.",
+        "completion": "Diez menos, y los jornaleros ya discuten sobre quién sale primero. No durará, las brechas nunca descansan mucho, pero un pueblo que come es un pueblo que resiste.",
+        "objectives": {
+          "0": {
+            "label": "Miserable de la Brecha abatido"
+          }
+        }
+      },
+      "q_fs_steel_for_the_redoubt": {
+        "title": "Acero para el Reducto",
+        "text": "Cada hoja que reparto es una que el mar devolvió o una que arranqué de un muerto, {playerName}. Los miserables llevan chatarra a través de las brechas, bisagras, ganchos, acero de espada roto, cosas de urraca, pero se forja bien igual. Tráeme seis piezas de su acero rebuscado y la línea de barricadas recuperará sus dientes.",
+        "completion": "Picado de sal y marcado por las brechas, y aun así conservará el filo. Toma, forré estos guantes yo misma. Acero por acero, {playerName}: es el único comercio que corre en el Farshore estos días.",
+        "objectives": {
+          "0": {
+            "label": "Acero Marcado por las Brechas"
+          }
+        }
+      },
+      "q_fs_the_three_bells": {
+        "title": "Las Tres Campanas",
+        "text": "Tres campanas de vigía se alzan en la costa además de la mía: una en el Embarcadero, una en la playa sur, otra junto a la orilla de los Campos de la Brecha. Si una cuerda se ha podrido o un badajo ha desaparecido, el pueblo se entera de una brecha cuando ya está en las calles. Camina la costa, {playerName}, y toca cada campana una vez, para saber que aún tiene voz.",
+        "completion": "Tres voces, tres respuestas, transportadas limpias sobre el agua. Duerme en Gullhaven esta noche, {playerName}, y sabe que si una campana te despierta, será por mi mano y a tiempo.",
+        "objectives": {
+          "0": {
+            "label": "Campana de vigía tocada"
+          }
+        }
+      },
+      "q_fs_song_before_the_break": {
+        "title": "El Canto Antes de la Brecha",
+        "text": "Hay un hombre que oye las brechas antes de que se abran. Vigía de Brecha Ollun: un erudito, o un loco, y últimamente no puedo permitirme la diferencia. Mantiene su vela en el Prado de Vigilancia, camino arriba al sureste del pueblo. Encuéntralo, {playerName}, y pregúntale qué va a hacernos la isla a continuación.",
+        "completion": "¿Te envió la Guardiana? Bien. Eso significa que el pueblo por fin ha empezado a escuchar. Ahora quédate quieto un momento, {playerName}. Ahí, bajo el viento, ¿lo oyes? Los acantilados están cantando, y no me gusta la melodía.",
+        "objectives": {
+          "0": {
+            "label": "Encuentra al Vigía de Brecha Ollun"
+          }
+        }
+      },
+      "q_fs_moss_and_mending": {
+        "title": "Musgo y Remiendo",
+        "text": "El musgo salino que crece a lo largo de la línea de marea es el mejor apósito para heridas que conozco, y los engendros de la brecha han reclamado cada tramo de orilla donde crece. Llevan mechones enganchados en sus pieles, nada menos. Elimina a seis de ellos en los tramos del este, {playerName}, y arráncame cuatro buenos puñados de musgo de lo que han pisoteado.",
+        "completion": "Musgo en una mano y una orilla más tranquila en la otra. Has reabastecido toda mi consulta, {playerName}. Hazme el favor de no convertirte en mi próximo paciente.",
+        "objectives": {
+          "0": {
+            "label": "Engendro de la Brecha abatido"
+          },
+          "1": {
+            "label": "Musgo Salino del Farshore"
+          }
+        }
+      },
+      "q_fs_bram_come_home": {
+        "title": "Bram Vuelve a Casa",
+        "text": "Mi Bram sacó el bote la mañana en que se abrió la brecha de las redes, y el mar lo devolvió en algún lugar pasado el Embarcadero. Lo oí hace tres noches, {playerName}, llamando sobre el agua, y tuve demasiado miedo para ir. Todavía tengo demasiado miedo. Por favor. Su bote yace naufragado en la orilla norte. Tráelo caminando de vuelta a mí.",
+        "completion": "¡Bram! Me lo trajiste de vuelta entero, {playerName}. Los dos lloramos y ninguno se avergüenza de ello. Lo que sea que las brechas le quiten a esta isla la próxima vez, no se llevarán a mi familia. Ya no.",
+        "objectives": {
+          "0": {
+            "label": "Pescador Bram acompañado a salvo a Gullhaven"
+          }
+        }
+      },
+      "q_fs_stalkers_off_the_light": {
+        "title": "Acechadores Lejos de la Luz",
+        "text": "Los acechadores cazan en la oscuridad entre las hogueras de vigilancia, y cada noche rodean mi prado un poco más cerca. No carecen de mente, {playerName}, son pacientes, y la paciencia es lo único que no puedo superar en resistencia. Mata a ocho y empuja la oscuridad de vuelta a los acantilados de donde vino.",
+        "completion": "Ocho noches de acecho, terminadas en una. Las hogueras ya arden más firmes, o quizás sean solo mis manos. De cualquier forma el prado vuelve a ser mío, y puedo oír pensar a la isla.",
+        "objectives": {
+          "0": {
+            "label": "Acechador del Vacío abatido"
+          }
+        }
+      },
+      "q_fs_the_great_break": {
+        "title": "La Gran Brecha",
+        "text": "Cada canto que entona esta isla termina en la misma nota grave, y viene de los Acantilados Escindidos. Algo llegó por la gran brecha de allí, {playerName}, algo que los propios acantilados se agrietaron para dejar pasar, y todavía está creciendo. Si camina hacia el norte, ninguna campana importará. Lleva a un amigo, lleva a dos, y acaba con ello. Luego dile a Coalfast que la melodía ha cambiado.",
+        "completion": "Ollun envió aviso por delante: el canto cesó. Todo mi pueblo oyó el silencio, {playerName}, y la mitad lloró al sonido de la nada absoluta. Lleva este manto. El Farshore no olvida quién sostuvo su costa.",
+        "objectives": {
+          "0": {
+            "label": "El Horror Escindido abatido"
+          }
+        }
+      },
+      "q_gc_down_the_windway": {
+        "title": "Bajando por el Windway",
+        "text": "Hiciste la subida, {playerName}, así que el viento ha decidido quedarse contigo. Wickharbor se encuentra al este por el camino de los páramos, resguardado a sotavento de su cala. La Capitana del Puerto Odile cuenta a cada alma que cruza el paso, y querrá contarte a ti también. Dile que el Windway sigue abierto.",
+        "completion": "¿Cruzar el paso a pie, con este clima? Maren me envía pocos nombres, y menos aún llegan en persona a responder por sí mismos. Bienvenido a Wickharbor, {playerName}. Cierra la puerta de la posada al entrar.",
+        "objectives": {
+          "0": {
+            "label": "Informa a la Capitana del Puerto Odile"
+          }
+        }
+      },
+      "q_gc_wool_off_the_downs": {
+        "title": "Lana de los Páramos",
+        "text": "Mis tripulaciones reman contra un vendaval que corta el hule como papel, {playerName}. Solo una cosa detiene este viento: la lana grasienta de los carneros del páramo, hilada gruesa a la manera de Wickharbor. Los rebaños pastan en los Páramos Aulladores al oeste del pueblo. Seis buenos vellones y cada tripulación remará caliente esta temporada.",
+        "completion": "Un vellón así es la razón por la que los carneros se plantan ahí fuera gordos y ufanos en un clima que mata a los hombres. Las hilanderas se pondrán a ello a la luz del farol. Toma estas botas, {playerName}, están forradas del último esquileo.",
+        "objectives": {
+          "0": {
+            "label": "Lana Grasienta de Carnero"
+          }
+        }
+      },
+      "q_gc_scuttlers_in_the_pots": {
+        "title": "Cangrejos en las Nasas",
+        "text": "Los cangrejos de bajío han aprendido a subir por el camino del acantilado y a partir nuestras nasas contra las rocas, {playerName}. Media captura perdida esta semana, y un nasero con una mano que no podrá usar en un mes. Destroza a diez de ellos y el resto recordará por qué se quedaban en los bajíos.",
+        "completion": "Diez caparazones menos en mi camino, y las nasas subieron llenas esta mañana. Los naseros te llaman buen augurio, {playerName}. En Wickharbor eso es lo más cálido que llega el elogio.",
+        "objectives": {
+          "0": {
+            "label": "Cangrejo de Bajío abatido"
+          }
+        }
+      },
+      "q_gc_keeper_of_the_flame": {
+        "title": "El Guardián de la Llama",
+        "text": "El viejo Bram cuida el Faro en el alto cabo al noreste del pueblo, y no ha bajado por sus provisiones en dos semanas. La lámpara sigue ardiendo, así que vive, pero un hombre de su edad solo en ese cabo con este viento, {playerName}. Sube el camino del faro y comprueba que sigue en pie.",
+        "completion": "¿Odile te envió todo este camino para ver si el viento me había arrastrado? Ja. Dile que la lámpara arde y yo también. Pero ya que has hecho la subida, {playerName}, quédate un momento. El Faro tiene un trabajo que solo un forastero parece capaz de hacer.",
+        "objectives": {
+          "0": {
+            "label": "Encuentra al Guardián Bram"
+          }
+        }
+      },
+      "q_gc_lanterns_on_the_shear": {
+        "title": "Faroles en el Shear",
+        "text": "El Faro es la gran luz, {playerName}, pero son los faroles de tormenta los que guían a un viajero nocturno por el camino del acantilado sobre el Shear. Anoche el vendaval apagó todos, y ese camino en la oscuridad es una caída larga con un final corto. Toma mi yesquero y vuelve a encender los cuatro a lo largo del acantilado.",
+        "completion": "Cuatro puntos de luz en el camino del acantilado, justo donde deben estar. Desde aquí arriba parece que la costa ha vuelto a abrir los ojos. Tienes madera de guardián, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Farol de tormenta reencendido"
+          }
+        }
+      },
+      "q_gc_wind_against_the_wick": {
+        "title": "Viento Contra la Mecha",
+        "text": "Los fuegos fatuos del vendaval son el viento vuelto rencoroso, {playerName}. Se reúnen en los páramos altos junto al Lago Espejo, y cada llama que encuentran la apagan, un farol, un hogar, un día esta lámpara. Treinta y nueve años llevo con el Faro encendido, y no voy a perderlo ante un clima con rencor. Dispérsalos, a ocho de ellos.",
+        "completion": "La lámpara ni siquiera vaciló anoche, primera vez en un mes. El viento todavía nos odia, {playerName}, pero ha vuelto a odiarnos con justicia.",
+        "objectives": {
+          "0": {
+            "label": "Fuego Fatuo del Vendaval dispersado"
+          }
+        }
+      },
+      "q_gc_the_far_shore": {
+        "title": "La Orilla Lejana",
+        "text": "Desde esta sala de la lámpara puedo ver toda la costa, {playerName}, y lo que veo en el norte no me gusta. Luces verdes caminando por los Wreckfields con marea baja, casco tras casco. Una mujer trabaja esa orilla sola: Edda, la rescatista. Sigue el camino del acantilado al norte pasado el Shear hasta donde empiezan los naufragios, y comprueba que aún respira.",
+        "completion": "¿Así que Bram vigila mi orilla desde su torre ahora? El viejo tiene razón en preocuparse, {playerName}. Los muertos han estado caminando por sus propios naufragios de noche, y últimamente han dejado de importarles si el sol está arriba.",
+        "objectives": {
+          "0": {
+            "label": "Encuentra a la Rescatista Edda"
+          }
+        }
+      },
+      "q_gc_dead_mens_cargo": {
+        "title": "Carga de Hombres Muertos",
+        "text": "La ley de salvamento es simple, {playerName}: lo que el mar entrega a la playa es mío. Los marineros ahogados no están de acuerdo. Se levantan de sus cascos y arrastran de vuelta bajo la línea de marea cada cajón que apilo. Acaba con seis de ellos para siempre, y mientras la playa esté tranquila, saca tres cajones de restos flotantes antes de que la marea presente su contrademanda.",
+        "completion": "Seis tripulaciones más calladas y tres cajones a salvo y secos. Salvas con mano más dura que la mía, {playerName}, pero al libro de cuentas no le importa. La mitad de esto es tuya por ley, y por ley me refiero a que yo lo digo.",
+        "objectives": {
+          "0": {
+            "label": "Marinero Ahogado puesto a descansar"
+          },
+          "1": {
+            "label": "Cajón de Restos Flotantes rescatado"
+          }
+        }
+      },
+      "q_gc_the_wreck_warden": {
+        "title": "El Guardián del Naufragio",
+        "text": "Ahora sabes por qué se levantan los marineros, {playerName}. Algo lleva puesta la placa cubierta de percebes del primer naufragio que jamás se rompió en esta orilla, y custodia cada casco de la playa como un cementerio que fue contratado para vigilar. Guarda un tesoro que he codiciado durante diez años y una tripulación que preferiría ver descansar. Acaba con el Guardián del Naufragio. Lleva a un amigo, los muertos vigilan bien.",
+        "completion": "La playa quedó en silencio en el momento en que cayó, {playerName}. El primer silencio que oigo en esta orilla en diez años de trabajarla. Las tripulaciones ya son solo huesos, huesos en reposo. Toma el manto de encima del tesoro, siempre le iba a sentar mejor a una espalda viva.",
+        "objectives": {
+          "0": {
+            "label": "El Guardián del Naufragio abatido"
           }
         }
       },
@@ -11514,6 +13742,9 @@ export const es_ES: EnTranslations = {
           },
           "10": {
             "label": "El Sembradal"
+          },
+          "11": {
+            "label": "La Calzada del Farshore"
           }
         }
       },
@@ -11582,6 +13813,300 @@ export const es_ES: EnTranslations = {
             "label": "Santuario del Gravewyrm"
           }
         }
+      },
+      "veiled_hollow": {
+        "name": "La Hondonada Velada",
+        "welcome": "El aire zumba con magia antigua. Busca a la Guardiana Saelwyn bajo el gran árbol de Eldergleam.",
+        "pois": {
+          "0": {
+            "label": "Eldergleam"
+          },
+          "1": {
+            "label": "Cueva de Duskfall"
+          },
+          "2": {
+            "label": "Mirador de Duskfall"
+          },
+          "3": {
+            "label": "Arboleda Anciana"
+          },
+          "4": {
+            "label": "Cuenca de Starfall"
+          },
+          "5": {
+            "label": "La Corte Sumergida"
+          },
+          "6": {
+            "label": "Bajíos Cristalinos"
+          },
+          "7": {
+            "label": "El Abismo Reluciente"
+          }
+        }
+      },
+      "drakelands": {
+        "name": "Las Tierras del Dragón",
+        "welcome": "Un viento caliente sopla desde los páramos de más adelante. Los dragones trazan círculos sobre el Drakemaw, y hogueras trol arden en las dunas.",
+        "pois": {
+          "0": {
+            "label": "Wyrmwatch"
+          },
+          "1": {
+            "label": "El Gatewood"
+          },
+          "2": {
+            "label": "Dunas de Ceniza"
+          },
+          "3": {
+            "label": "Trollmoot"
+          },
+          "4": {
+            "label": "La Última Fortaleza"
+          },
+          "5": {
+            "label": "Campos de Vidrio Sangriento"
+          },
+          "6": {
+            "label": "Caldera de Drakemaw"
+          }
+        }
+      },
+      "frostveil": {
+        "name": "El Velo de Escarcha",
+        "welcome": "La nieve devora cada sonido. Bajo las luces danzantes, el propio frío parece estar despierto.",
+        "pois": {
+          "0": {
+            "label": "Icemantle"
+          },
+          "1": {
+            "label": "La Línea de Nieve"
+          },
+          "2": {
+            "label": "Lago del Glaciar"
+          },
+          "3": {
+            "label": "Los Escalones de la Aurora"
+          },
+          "4": {
+            "label": "El Shiverfen"
+          },
+          "5": {
+            "label": "Las Terrazas Aulladoras"
+          }
+        }
+      },
+      "amberfall": {
+        "name": "La Cascada de Ámbar",
+        "welcome": "Aquí cada hoja arde en oro y rojo, y sin embargo ninguna cae jamás. Los faroles de Lanternmere están encendidos para ti.",
+        "pois": {
+          "0": {
+            "label": "Lanternmere"
+          },
+          "1": {
+            "label": "El Goldmelt"
+          },
+          "2": {
+            "label": "El Huerto Dorado"
+          },
+          "3": {
+            "label": "Hondonada de la Cosecha"
+          },
+          "4": {
+            "label": "El Gran Mere"
+          },
+          "5": {
+            "label": "Alto de Cindermaple"
+          },
+          "6": {
+            "label": "El Monolito Inclinado"
+          }
+        }
+      },
+      "willowfen": {
+        "name": "El Pantano de los Sauces",
+        "welcome": "La ciénaga zumba con libélulas y abejas. Cruza el puente hacia Bridgemere y descansa los pies un rato.",
+        "pois": {
+          "0": {
+            "label": "Bridgemere"
+          },
+          "1": {
+            "label": "Los Escalones de Amberfen"
+          },
+          "2": {
+            "label": "Los Páramos de Lirios"
+          },
+          "3": {
+            "label": "Charcas de Bogshine"
+          },
+          "4": {
+            "label": "Willowweep"
+          },
+          "5": {
+            "label": "Las Llanuras Somnolientas"
+          }
+        }
+      },
+      "nightbloom": {
+        "name": "La Flor Nocturna",
+        "welcome": "Más allá del Nightgate el aire mismo sueña. Sigue la luz de las flores hasta Moonrest, y cuidado con el mundo dormido que cuelga en el cielo.",
+        "pois": {
+          "0": {
+            "label": "Moonrest"
+          },
+          "1": {
+            "label": "El Nightgate"
+          },
+          "2": {
+            "label": "El Pozo de Luna"
+          },
+          "3": {
+            "label": "Gloamfield"
+          },
+          "4": {
+            "label": "La Vela Permanente"
+          },
+          "5": {
+            "label": "El Túmulo Insomne"
+          }
+        }
+      },
+      "wraithwood": {
+        "name": "El Bosque de los Espectros",
+        "welcome": "El dosel se cierra sobre el camino como una tapa. Mantente cerca de los faroles de Gallowmere, y no respondas si el bosque pronuncia tu nombre.",
+        "pois": {
+          "0": {
+            "label": "Gallowmere"
+          },
+          "1": {
+            "label": "El Crowgate"
+          },
+          "2": {
+            "label": "El Matorral de la Viuda"
+          },
+          "3": {
+            "label": "El Claro Colgante"
+          },
+          "4": {
+            "label": "La Capilla de Mournstone"
+          },
+          "5": {
+            "label": "El Claro del Cazador"
+          }
+        }
+      },
+      "palmreach": {
+        "name": "La Bahía de las Palmeras",
+        "welcome": "Arena cálida, pájaros ruidosos, y una selva que devora el horizonte. Drifthaven mantiene una hoguera encendida en la playa para ti.",
+        "pois": {
+          "0": {
+            "label": "Drifthaven"
+          },
+          "1": {
+            "label": "El Tanglemouth"
+          },
+          "2": {
+            "label": "El Palmstrand"
+          },
+          "3": {
+            "label": "La Maraña Esmeralda"
+          },
+          "4": {
+            "label": "El Vinefall"
+          },
+          "5": {
+            "label": "La Laguna Zafiro"
+          },
+          "6": {
+            "label": "El Ídolo Sumergido"
+          }
+        }
+      },
+      "evergarden": {
+        "name": "El Jardín Eterno",
+        "welcome": "Alguien sigue recortando los setos, aunque no se ha visto a ningún jardinero en cien años. Cuidado con el laberinto: él también te vigila a ti.",
+        "pois": {
+          "0": {
+            "label": "Hedgewick"
+          },
+          "1": {
+            "label": "La Puerta del Jardín"
+          },
+          "2": {
+            "label": "El Paseo del Parterre"
+          },
+          "3": {
+            "label": "Castillo de Dawnhold"
+          },
+          "4": {
+            "label": "El Estanque de Pétalos"
+          },
+          "5": {
+            "label": "El Gran Laberinto"
+          },
+          "6": {
+            "label": "La Corte de la Fuente"
+          },
+          "7": {
+            "label": "El Viejo Molino"
+          },
+          "8": {
+            "label": "La Guardia del Norte"
+          },
+          "9": {
+            "label": "La Cuenca de los Lirios"
+          }
+        }
+      },
+      "galecrest": {
+        "name": "La Cresta del Vendaval",
+        "welcome": "El viento nunca ha dejado de soplar aquí, y el Viejo Faro nunca se ha apagado. Wickharbor solo pide que cierres la puerta de la posada al entrar.",
+        "pois": {
+          "0": {
+            "label": "Wickharbor"
+          },
+          "1": {
+            "label": "El Windway"
+          },
+          "2": {
+            "label": "Los Páramos Aulladores"
+          },
+          "3": {
+            "label": "El Viejo Faro"
+          },
+          "4": {
+            "label": "El Shear"
+          },
+          "5": {
+            "label": "Los Wreckfields"
+          },
+          "6": {
+            "label": "El Lago Espejo"
+          },
+          "7": {
+            "label": "Los Establos del Galecrest"
+          }
+        }
+      },
+      "farshore_isle": {
+        "name": "La Costa Lejana",
+        "welcome": "Cruza el banco de arena y la campana de Gullhaven te encontrará antes que el pueblo. Las brechas se abren sin previo aviso, y el reducto sostiene su costa contra lo que sea que salga de ellas. Llevan mucho tiempo esperando a alguien como tú.",
+        "pois": {
+          "0": {
+            "label": "Gullhaven"
+          },
+          "1": {
+            "label": "El Embarcadero"
+          },
+          "2": {
+            "label": "El Prado de Vigilancia"
+          },
+          "3": {
+            "label": "Los Acantilados Escindidos"
+          },
+          "4": {
+            "label": "Los Campos de la Brecha"
+          }
+        }
       }
     },
     "dungeons": {
@@ -11609,6 +14134,16 @@ export const es_ES: EnTranslations = {
         "name": "Arena de banda de Nythraxis",
         "enterText": "Cruzas la puerta real sellada.",
         "leaveText": "Regresas al aire frío de Thornpeak."
+      },
+      "wildheart_basin": {
+        "name": "La Cuenca del Corazón Salvaje",
+        "enterText": "Una lluvia cálida sisea sobre piedra vieja. El Wildheart Basin se abre ante ti.",
+        "leaveText": "Vuelves a pasar bajo los colmillos de piedra hacia el sol de Palmreach."
+      },
+      "the_last_keep": {
+        "name": "La Última Fortaleza",
+        "enterText": "Entras en los fríos y silenciosos salones del Last Keep.",
+        "leaveText": "Cierras tras de ti la puerta de la fortaleza y vuelves al viento de los Drakelands."
       },
       "drowned_temple": {
         "name": "El Templo Ahogado",

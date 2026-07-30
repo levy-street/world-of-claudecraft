@@ -64,8 +64,6 @@ process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_phase25_d
 // The one required Config field; every other field takes its default.
 const MIN_ENV: NodeJS.ProcessEnv = { DATABASE_URL: 'postgres://x' };
 
-// routeHttpRequest is synchronous fire-and-forget, so a dispatch polls writableEnded.
-const MAX_POLL_TICKS = 5000;
 // The two secret-gate env vars that must be UNSET for the internal restart-countdown
 // route to answer its feature-off 404 (matching parity.test.ts's feature-off case).
 const RESTART_SECRET_ENV = 'RESTART_COUNTDOWN_SECRET';
@@ -78,15 +76,10 @@ let handleOAuth: ReturnType<typeof vi.fn>;
 let handleInternalApi: ReturnType<typeof vi.fn>;
 let handleDailyRewardInternalApi: ReturnType<typeof vi.fn>;
 
-// A Dispatch over the REAL routeHttpRequest, polling res.writableEnded (mirrors
-// parity.test.ts's makeModedDispatch). The MODE is set by the caller beforehand.
-const drive: Dispatch = async (req, res) => {
+// A Dispatch over the REAL routeHttpRequest. captureResponse waits on the
+// FakeRes end signal; the MODE is set by the caller beforehand.
+const drive: Dispatch = (req, res) => {
   main.routeHttpRequest(req, res);
-  let ticks = 0;
-  while (!(res as unknown as { writableEnded: boolean }).writableEnded) {
-    if (ticks++ > MAX_POLL_TICKS) throw new Error('response never ended');
-    await new Promise((r) => setImmediate(r));
-  }
 };
 
 // Run `fn` with both internal secret env vars UNSET (restored after), so the

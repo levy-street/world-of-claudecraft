@@ -1,13 +1,24 @@
 import { describe, expect, it } from 'vitest';
-import { MOBS } from '../src/sim/data';
+import { BUILTIN_WORLD, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { LOOT_FFA_DELAY } from '../src/sim/loot/loot_ffa';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
-import type { Entity } from '../src/sim/types';
+import type { Entity, WorldContent } from '../src/sim/types';
 
 // End-to-end: a stranger cannot loot a tapped corpse until LOOT_FFA_DELAY seconds
 // after it became lootable; once the owner-lock lapses, the loot goes free-for-all.
+
+// The corpse under test is hand-built (createMob below), so none of the ambient
+// world mobs/NPCs/objects matter here, and the FFA timeline ticks a minute-plus
+// of world time. Strip the constructor-spawned entity content, keep the rest of
+// BUILTIN_WORLD identical.
+const LOOT_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
 
 type SimInternals = {
   entities: Map<number, Entity>;
@@ -15,7 +26,7 @@ type SimInternals = {
 };
 
 function setup() {
-  const sim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
+  const sim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true, world: LOOT_TEST_WORLD });
   const internals = sim as unknown as SimInternals;
   const tapper = sim.addPlayer('warrior', 'Tapper');
   const stranger = sim.addPlayer('warrior', 'Stranger');
@@ -84,5 +95,6 @@ describe('loot goes FFA one minute after a corpse becomes lootable', () => {
       return Math.max(0, Math.round(mob.lootFfaTimer * 1000));
     };
     expect(run()).toEqual(run());
-  });
+    // two full FFA-delay runs: headroom under suite load
+  }, 90_000);
 });

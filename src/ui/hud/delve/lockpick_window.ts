@@ -72,6 +72,14 @@ export class LockpickWindow {
   private timerInterval: number | null = null;
   private lastSig = '';
   private lastTimerKey = '';
+  // The ante selector's own inputs, retained only so a language switch can
+  // repaint it (see renderAnte); null whenever the selector is not what the
+  // panel is showing.
+  private ante: { objectId: number; coffer: boolean } | null = null;
+  // The live clock's deadline, retained so a rebuild that does NOT restart the
+  // clock can still paint the bar at where the clock actually is (see
+  // relocalize); null whenever no clock is running.
+  private timerDeadline: { end: number; seconds: number } | null = null;
   // The countdown's element refs, and the urgent-class latch that rides with them.
   //
   // RESOLVED PER BOARD PAINT, not once at construction, and that distinction is the whole
@@ -98,6 +106,12 @@ export class LockpickWindow {
   renderAnte(objectId: number, coffer: boolean): void {
     const el = this.panel();
     if (!el) return;
+    // Retained so relocalize() can repaint this half of the panel. The ante
+    // selector is the state where getState() is still null (the player opened
+    // the chest and has not picked an ante yet), so the board path below cannot
+    // reach it, and a language switch spent staring at the selector would
+    // otherwise leave every one of its labels in the old locale.
+    this.ante = { objectId, coffer };
     this.lastSig = '';
     const buttons = anteOptions(coffer)
       .map(
@@ -143,6 +157,13 @@ export class LockpickWindow {
    * follow the authoritative state (a new pin/try/page refills it; the lock
    * ending stops it). Driven by the lockpickStep event in both hosts. */
   onStep(result: StepResult): void {
+    // The guard repaintIfChanged already carries, and load-bearing since #2517 gave the panel
+    // a close-while-the-session-is-live path: requestClose's repeat arm closes without waiting
+    // for the server's lockpickEnd, so a lockpickStep still in flight would otherwise land
+    // here, rewrite the hidden panel's markup, and (because close() cleared lastTimerKey)
+    // restart the 100ms countdown against a subtree nobody can see. That is exactly the leak
+    // this issue is about, arriving from the other direction.
+    if (this.panel()?.style.display !== 'block') return;
     const fb = stepFeedback(result);
     // stepFeedback returns English text only for the known step results; localize
     // those via t() and leave the (empty) default unlocalized.
@@ -161,6 +182,40 @@ export class LockpickWindow {
     if (!view) return;
     if (lockpickRenderSig(view) !== this.lastSig) this.renderBoard();
     this.syncTimer();
+  }
+
+  /**
+   * Re-localize after an in-game language switch (the Hud's woc:languagechange
+   * fan-out). Self-gated on the panel being up, so the fan-out can call it
+   * unconditionally.
+   *
+   * BOTH halves of the panel need it, and they need different treatment.
+   * The board's lockpickRenderSig is rows, columns, tries and the pick position,
+   * all numbers, so a switch alone never moves it and the per-frame
+   * repaintIfChanged above would leave the board in the old locale; clearing
+   * forces exactly one renderBoard, which re-latches the signature in the same
+   * call. The ante selector has no signature and no driver at all: it is painted
+   * once by openAnte and sits there until the player chooses, so it repaints
+   * straight from its retained inputs.
+   */
+  relocalize(): void {
+    if (this.panel()?.style.display !== 'block') return;
+    if (!this.deps.getState()) {
+      if (this.ante) this.renderAnte(this.ante.objectId, this.ante.coffer);
+      return;
+    }
+    this.lastSig = '';
+    this.repaintIfChanged();
+    // renderBoard re-emits the countdown at width:100% and the full-duration
+    // label, and syncTimer correctly does NOT restart the clock (the timer key
+    // did not move), so without this the bar would read a full budget until the
+    // running interval's next tick. That is up to 100 ms of a TIMED minigame
+    // showing the wrong remaining time, which is not something a cosmetic
+    // repaint is allowed to do.
+    const clock = this.timerDeadline;
+    if (clock) {
+      this.paintTimer(Math.max(0, (clock.end - performance.now()) / 1000), clock.seconds);
+    }
   }
 
   /** Refill the per-page clock whenever the timed move changes (a new pin, try,
@@ -195,6 +250,10 @@ export class LockpickWindow {
       return;
     }
     this.lastSig = lockpickRenderSig(view);
+    // The board markup replaces the ante selector's, so the retained selector
+    // inputs stop being what the panel shows here (a stale pair would let a
+    // relocalize repaint the selector back over a live board).
+    this.ante = null;
     const m = lockpickBoardModel(view);
     const rowH = (r: number): string => `${(r / Math.max(1, m.h - 1)) * 100}%`;
     // Tumbler tracks: one brass column per lock column. Only lit wards (open /
@@ -318,6 +377,7 @@ export class LockpickWindow {
       this.timerInterval = null;
     }
     const end = performance.now() + seconds * 1000;
+    this.timerDeadline = { end, seconds };
     this.paintTimer(seconds, seconds);
     this.timerInterval = window.setInterval(() => {
       if (gen !== this.timerGen) return; // superseded by a newer clock
@@ -330,6 +390,7 @@ export class LockpickWindow {
   /** Stop the clock and invalidate any in-flight callback. */
   stopTimer(): void {
     this.timerGen++;
+    this.timerDeadline = null;
     if (this.timerInterval !== null) {
       clearInterval(this.timerInterval);
       this.timerInterval = null;
@@ -360,5 +421,6 @@ export class LockpickWindow {
     this.forgetTimerEls();
     this.lastSig = '';
     this.lastTimerKey = '';
+    this.ante = null;
   }
 }

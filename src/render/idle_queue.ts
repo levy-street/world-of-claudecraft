@@ -17,6 +17,15 @@ function defaultScheduler(callback: () => void, timeoutMs: number): void {
   }
 }
 
+/** Resolves in the next browser idle slot, or after `timeoutMs` under
+ *  sustained load (the requestIdleCallback timeout forces progress). The
+ *  awaitable single-step counterpart of runIdleQueue below, for callers whose
+ *  work loop cannot be shaped as an items array. */
+export function idleSlot(timeoutMs: number, scheduler?: IdleScheduler): Promise<void> {
+  const schedule = scheduler ?? defaultScheduler;
+  return new Promise((resolve) => schedule(resolve, timeoutMs));
+}
+
 export interface IdleQueueOptions {
   /** Max items worked per idle slot. Keeps any single callback cheap. */
   batchSize: number;

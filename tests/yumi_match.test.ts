@@ -3,10 +3,10 @@
 // death (guaranteed winner, unranked), win + cleanup, and determinism.
 
 import { describe, expect, it } from 'vitest';
-import { yumiMazeOrigin } from '../src/sim/data';
+import { BUILTIN_WORLD, DUNGEON_X_THRESHOLD, yumiMazeOrigin } from '../src/sim/data';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
-import { updateArena } from '../src/sim/social/arena';
+import { isArenaQueued, updateArena } from '../src/sim/social/arena';
 import {
   matchmakeYumiFormat,
   packYumiTeams,
@@ -16,12 +16,22 @@ import {
   YUMI_SUDDEN_AT,
   YUMI_TELEPORT_EVERY,
 } from '../src/sim/social/yumi';
-import type { Entity, SimEvent } from '../src/sim/types';
+import type { Entity, SimEvent, WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 import { teleportPoints, YUMI_TELEPORT_MIN_SEP, yumiMazeLayout } from '../src/sim/yumi_maze_layout';
 
+// Yumi assertions exercise queued players, the maze slots, and the cats the
+// match itself spawns. Spawning every ambient realm mob only makes each tick
+// scan unrelated overworld AI (the fiesta/arena subsystem-world precedent).
+const YUMI_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+
 function makeWorld(seed = 42) {
-  return new Sim({ seed, playerClass: 'warrior', noPlayer: true });
+  return new Sim({ seed, playerClass: 'warrior', noPlayer: true, world: YUMI_TEST_WORLD });
 }
 
 function teleport(sim: Sim, pid: number, x: number, z: number) {
@@ -155,6 +165,29 @@ describe('yumi: queue and matchmaking', () => {
       ),
     ).toBe(true);
     expect(sim.arenaQueueYumi3.length).toBe(0);
+  });
+
+  it('prunes a queued player who walked into a dungeon/instance mid-queue (issue #1600 x-band recheck)', () => {
+    // The join-time instance guard only blocks queuing FROM inside an instance;
+    // matchmaking itself must recheck the guard every pass, mirroring the
+    // sibling arena 1v1/2v2/fiesta queues (arena.ts matchmakeArena1v1 /
+    // pruneTeamQueue), or a player who wanders into a dungeon mid-queue stays a
+    // valid candidate and gets teleported out of the instance into the maze,
+    // fully restored, when the match pops.
+    const sim = makeWorld();
+    const inside = sim.addPlayer('warrior', 'Inside');
+    const outside = sim.addPlayer('mage', 'Outside');
+    teleport(sim, inside, 0, -40);
+    teleport(sim, outside, 4, -40);
+    sim.arenaQueueJoin(inside, 'yumi3');
+    sim.arenaQueueJoin(outside, 'yumi3');
+    // Move the queued player past the instance x-band WITHOUT entering a real
+    // dungeon, so the entry-dequeue path does not mask the prune under test.
+    teleport(sim, inside, DUNGEON_X_THRESHOLD + 50, -40);
+    sim.tick();
+    expect(sim.arenaMatchFor(inside)).toBeNull();
+    expect(isArenaQueued(sim.ctx, inside)).toBe(false); // pruned
+    expect(isArenaQueued(sim.ctx, outside)).toBe(true); // the honest queuer waits
   });
 
   it('packs premades and solos FIFO first-fit', () => {

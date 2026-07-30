@@ -37,7 +37,7 @@ import { abilitiesKnownAt, DUNGEON_X_THRESHOLD, MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { createMob, createNpc, recalcPlayerStats } from '../entity';
 import { restorePetFromDelveStash, stowPetForDelve } from '../pet/pet_commands';
-import type { PlayerMeta } from '../sim';
+import type { ArenaReturnPools, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
   DT,
@@ -75,7 +75,13 @@ import {
   VC_SPAWNS_B,
   vcPracticeOrigin,
 } from '../vale_cup_layout';
-import { arenaCombatants } from './arena';
+import {
+  arenaCombatants,
+  cloneAbilityCharges,
+  cloneCcDr,
+  isArenaQueued,
+  snapshotArenaReturnPools,
+} from './arena';
 
 // ---------------------------------------------------------------------------
 // Tuning constants (fiesta style: all at the top).
@@ -228,6 +234,12 @@ export interface VcMatch {
   kickoffTeam: 'A' | 'B';
   kickoffGraceUntil: number; // sim.time the whistle grace ends (long boots clamp)
   returns: Map<number, { x: number; z: number; facing: number }>;
+  // Pre-match HP/resource/cooldown/CC DR pools keyed by pid, snapshotted before
+  // the sport-kit clean-slate reset and restored on teardown, so a Vale Cup
+  // match (rated or practice) can never be farmed as a free full HP/mana/
+  // cooldown restore. Mirrors ArenaMatch.preMatchPools (issue #1600); optional
+  // only for compatibility with synthetic/legacy VcMatch fixtures.
+  preMatchPools?: Map<number, ArenaReturnPools>;
   ball: VcBallState | null; // spawned at kickoff, despawned at match end
   pocket: 'west' | 'east' | null; // which net the celebrating ball settles in
   pendingWinner: 'A' | 'B' | null | undefined; // decided during 'goal' celebrate
@@ -426,7 +438,7 @@ export function vcupQueueJoin(
     return;
   }
   const match = ctx.vcup.match;
-  if ((match && vcupTeamOf(match, id)) || ctx.arenaMatches.has(id)) {
+  if ((match && vcupTeamOf(match, id)) || ctx.arenaMatches.has(id) || isArenaQueued(ctx, id)) {
     ctx.error(id, 'You are already in an arena match.');
     return;
   }
@@ -482,7 +494,11 @@ export function vcupQueueJoin(
       ctx.error(id, `${mMeta.name} cannot queue while dead.`);
       return;
     }
-    if ((match && vcupTeamOf(match, mPid)) || ctx.arenaMatches.has(mPid)) {
+    if (
+      (match && vcupTeamOf(match, mPid)) ||
+      ctx.arenaMatches.has(mPid) ||
+      isArenaQueued(ctx, mPid)
+    ) {
       ctx.error(id, `${mMeta.name} is already in an arena match.`);
       return;
     }
@@ -564,8 +580,10 @@ export function vcupSetRole(ctx: SimContext, role: SportRole, pid?: number): voi
   queued.unit.roles[id] = normalizeRole(role, queued.bracket);
 }
 
-// Drop units whose members died, vanished, or got seated elsewhere (arena
-// matchmaker prune pattern).
+// Drop units whose members died, vanished, got seated elsewhere, or walked
+// into a dungeon/instance while queued (arena matchmaker prune pattern,
+// issue #1600's x-band recheck: the bout would return them inside fully
+// restored otherwise).
 export function vcupPruneQueue(ctx: SimContext, bracket: VcBracket): void {
   const match = ctx.vcup.match;
   ctx.vcup.queues[bracket] = ctx.vcup.queues[bracket].filter((unit) =>
@@ -573,6 +591,7 @@ export function vcupPruneQueue(ctx: SimContext, bracket: VcBracket): void {
       const e = ctx.entities.get(id);
       if (!e || e.dead) return false;
       if (ctx.arenaMatches.has(id)) return false;
+      if (e.pos.x > DUNGEON_X_THRESHOLD) return false;
       return !(match && vcupTeamOf(match, id));
     }),
   );
@@ -835,9 +854,15 @@ export function startCupMatch(
   for (const pid of sideA.pids) sideA.roles[pid] = roles[pid];
   for (const pid of sideB.pids) sideB.roles[pid] = roles[pid];
   const returns = new Map<number, { x: number; z: number; facing: number }>();
+  // Snapshot each fighter's recovery pools NOW, before the sport-kit clean-slate
+  // reset below (valeCupStandardize -> ctx.resetForArena), so teardownCupMatch
+  // restores what they walked in with instead of a free full restore (mirrors
+  // arena.ts's startArenaMatch, issue #1600).
+  const preMatchPools = new Map<number, ArenaReturnPools>();
   for (let i = 0; i < allPids.length; i++) {
     const e = entities[i] as Entity;
     returns.set(allPids[i], { x: e.pos.x, z: e.pos.z, facing: e.facing });
+    preMatchPools.set(allPids[i], snapshotArenaReturnPools(e));
   }
   // Guild banner entries carried from the queue (rated matches only credit these;
   // bots and practice never populate a guild, so the map is empty there).
@@ -874,6 +899,7 @@ export function startCupMatch(
     kickoffTeam: 'A',
     kickoffGraceUntil: 0,
     returns,
+    preMatchPools,
     ball: null,
     pocket: null,
     pendingWinner: undefined,
@@ -1244,7 +1270,24 @@ function teardownCupMatch(ctx: SimContext, match: VcMatch): void {
     const e = ctx.entities.get(pid);
     if (!meta || !e) continue;
     valeCupRestore(ctx, meta, e);
-    ctx.resetForArena(e); // wipes sport_* cooldowns; the arena accepts the same tradeoff
+    ctx.resetForArena(e); // clean slate first: wipes sport_* cooldowns too
+    // The match is a parenthesis, not a rest stop: undo the clean-slate full
+    // restore and hand back exactly the HP, resource, cooldowns, and CC DR the
+    // fighter carried in, so a Vale Cup match (rated or practice) can never be
+    // farmed as a free heal, mana refill, or cooldown reset (mirrors arena.ts's
+    // returnFromArena, issue #1600). recalcPlayerStats already ran inside
+    // resetForArena, so maxHp/maxResource are current for the clamp.
+    const pools = match.preMatchPools?.get(pid);
+    if (pools) {
+      e.cooldowns = new Map(pools.cooldowns);
+      e.abilityCharges =
+        Object.keys(pools.abilityCharges).length > 0
+          ? cloneAbilityCharges(pools.abilityCharges)
+          : undefined;
+      e.ccDr = cloneCcDr(pools.ccDr);
+      e.hp = Math.max(0, Math.min(pools.hp, e.maxHp));
+      e.resource = Math.max(0, Math.min(pools.resource, e.maxResource));
+    }
     const ret = match.returns.get(pid);
     if (ret) {
       e.pos = ctx.groundPos(ret.x, ret.z);
@@ -1314,6 +1357,17 @@ export function vcupMatchOf(ctx: SimContext, pid: number): VcMatch | null {
   const match = ctx.vcup.match;
   if (match && vcupTeamOf(match, pid)) return match;
   return ctx.vcup.practices.find((p) => vcupTeamOf(p, pid)) ?? null;
+}
+
+// True when pid is seated in ANY live Vale Cup match (the rated Sowfield match
+// or a private practice instance) or is waiting in a Vale Cup bracket queue.
+// Consumed by social/arena.ts (via the ctx.vcupSeatedOrQueued SimContext
+// callback) to keep the Arena and Vale Cup queues mutually exclusive: a
+// player mid-match or mid-queue in one system must never be pulled into the
+// other (arena.ts never imports this module directly, unlike the reverse:
+// vcupQueueJoin above calls isArenaQueued via a direct import).
+export function vcupSeatedOrQueued(ctx: SimContext, pid: number): boolean {
+  return vcupMatchOf(ctx, pid) !== null || vcupQueuedUnitOf(ctx, pid) !== null;
 }
 
 // ---------------------------------------------------------------------------

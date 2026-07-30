@@ -241,6 +241,30 @@ describe('lockpick countdown repaint', () => {
     expect(barB.style.width, 'the second instance must paint its own node').toBe(barA.style.width);
   });
 
+  it('ignores a step that lands after the panel was closed while the session is still live', () => {
+    // #2517's repeat-dismissal arm closes the board without waiting for the server's
+    // lockpickEnd, so a lockpickStep can still arrive for a session the player has already
+    // walked away from. Without the display guard, onStep repaints the hidden panel and
+    // (because close() cleared lastTimerKey) syncTimer starts a FRESH 100ms interval on it,
+    // which is the leak the whole issue is about, re-created from the other side.
+    const h = harness();
+    h.win.openBoard();
+    const bar = h.bar() as HTMLElement;
+    tick(20);
+    const frozen = bar.style.width;
+
+    // What the controller's repeat arm does: close the window, state still live.
+    h.panel.style.display = 'none';
+    h.win.close();
+    expect(vi.getTimerCount(), 'close stops the clock').toBe(0);
+
+    h.win.onStep('advanced');
+
+    expect(vi.getTimerCount(), 'a straggler step must not re-arm the countdown').toBe(0);
+    tick(20);
+    expect(bar.style.width, 'and must not repaint the hidden subtree').toBe(frozen);
+  });
+
   it('paints nothing when the board carries no per-step budget', () => {
     const h = harness({ ...VIEW, stepTimeoutMs: null });
     h.win.openBoard();

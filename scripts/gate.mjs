@@ -16,7 +16,7 @@ import { spawnSync } from 'node:child_process';
 import os from 'node:os';
 import { FFMPEG_PATH, FFPROBE_PATH } from './sfx/ffmpeg_paths.mjs';
 
-const workers = Math.max(1, Math.floor(os.cpus().length / 2));
+const workers = Math.max(1, Math.floor(os.availableParallelism() / 2));
 // npm/npx resolve to .cmd files on Windows, which spawnSync only finds via a shell.
 const shell = process.platform === 'win32';
 

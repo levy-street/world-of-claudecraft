@@ -30,7 +30,7 @@ export interface PlayerCardPreviewPort {
     angle?: number;
     poseClips?: readonly string[];
     poseFraction?: number;
-  }): string;
+  }): Promise<HTMLCanvasElement>;
 }
 
 export interface PlayerCardOptionsPort {
@@ -154,7 +154,7 @@ export class PlayerCardController {
       const pose = CARD_POSES[poseIndex];
       selectPose(poseIndex);
       try {
-        const characterImage = preview.captureCloseup({
+        const characterImage = await preview.captureCloseup({
           poseClips: pose.clips,
           poseFraction: pose.fraction,
         });

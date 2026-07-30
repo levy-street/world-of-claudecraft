@@ -39,7 +39,8 @@ import {
   SUPPORT_OVERLAP,
   supportHeightAt,
 } from '../colliders';
-import { groundHeight, terrainDownhill, terrainSteepnessAt } from '../world';
+import { rideSteepnessAt, shoreStepOut, stepWaterLevel } from '../ride_height';
+import { groundHeight, terrainDownhill } from '../world';
 import { overlapCollider, SKIN_WIDTH, sweepCollider } from './sweep';
 
 /**
@@ -189,7 +190,11 @@ function supportFromCandidates(x: number, z: number, r: number, maxY: number): n
  * `MANTLE_REACH` allowance `colliders.ts` grants the legacy sweep): a jump
  * that falls just short of a crate rim still carries over it, and the vertical
  * pass then seats the body on top. Grounded bodies get no lift; they climb
- * only through step-up, which has its own, stricter gate.
+ * only through step-up, which has its own, stricter gate. `MANTLE_REACH` is
+ * pinned to the same height as the grounded stride band (`MAX_STEP_HEIGHT`),
+ * so leaving the ground never costs a body a top it could have strided over,
+ * and the ONE constant keeps this gate and the vertical support query
+ * (`floorHeightAt` in `player_motion.ts`) admitting exactly the same tops.
  *
  * Sloped tops are sampled at the body's own position: a body standing on a
  * canopy's fabric is ON the surface there, and must not be treated as inside
@@ -409,14 +414,25 @@ export function moveCharacter(
   // a slope far below, killing every leap onto a bank); and the slope ratio is
   // measured against the REQUESTED step, not the collision-shortened one (a
   // 0.05 yd slide along a crate beside a hill is not a 2:1 climb).
-  const groundStart = groundHeight(x, z, params.seed);
-  let groundEnd = groundHeight(px, pz, params.seed);
+  //
+  // Heights and gradients are of the RIDDEN surface (ride_height.ts: submerged
+  // ground clamps to the step's waterline), so a bumpy lake bed is never a wall
+  // and the climb out of water measures the real waterline-to-bank rise. The
+  // raw end height still gates the gradient half of the rule: only a step that
+  // LANDS on dry ground is judged by the terrain's own steepness. A too-steep
+  // bank then yields to the shore step-out onto a low standable lip.
+  const wls = stepWaterLevel(x, z, px, pz);
+  const rawEnd = groundHeight(px, pz, params.seed);
+  const groundStart = Math.max(groundHeight(x, z, params.seed), wls);
+  let groundEnd = Math.max(rawEnd, wls);
   const run = Math.hypot(dx, dz);
   const airborneClears = !params.grounded && groundEnd <= feetY;
   if (!params.swimming && !airborneClears && groundEnd > groundStart && run > 1e-5) {
     const rise = groundEnd - groundStart;
     const unwalkable =
-      rise / run > params.maxSlope || terrainSteepnessAt(px, pz, params.seed) > params.maxSlope;
+      (rise / run > params.maxSlope ||
+        (rawEnd >= wls && rideSteepnessAt(px, pz, params.seed) > params.maxSlope)) &&
+      !shoreStepOut(x, z, px, pz, params.seed, params.maxSlope);
     // NOTE: step-up deliberately does NOT apply to the heightfield. A per-tick
     // step allowance on terrain is a cliff-climbing ladder: at 20 Hz a body
     // covers about 0.35 yd per tick, so allowing a step-height rise each tick
@@ -451,14 +467,16 @@ export function moveCharacter(
         if (Math.hypot(contourX, contourZ) > MIN_MOTION) {
           const cx = x + contourX;
           const cz = z + contourZ;
-          const contourGround = groundHeight(cx, cz, params.seed);
-          const contourRise = contourGround - groundStart;
+          const contourWls = stepWaterLevel(x, z, cx, cz);
+          const contourRaw = groundHeight(cx, cz, params.seed);
+          const contourGround = Math.max(contourRaw, contourWls);
+          const contourRise = contourGround - Math.max(groundStart, contourWls);
           const contourRun = Math.hypot(contourX, contourZ);
-          // Both halves of the original wall rule: the step's own slope AND
-          // the gradient of the ground it lands on.
+          // Both halves of the original wall rule, on the ridden surface: the
+          // step's own slope AND the gradient of the ground it lands on.
           const contourOk =
             (contourRise <= 0 || contourRise / contourRun <= params.maxSlope) &&
-            terrainSteepnessAt(cx, cz, params.seed) <= params.maxSlope;
+            (contourRaw < contourWls || rideSteepnessAt(cx, cz, params.seed) <= params.maxSlope);
           if (contourOk && isClear(cx, cz, feetY, params)) {
             px = cx;
             pz = cz;

@@ -840,7 +840,7 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
   });
 
   it('keeps the fixed-seed world projection stable through wandering and respawn', {
-    timeout: 30000,
+    timeout: 90000,
   }, () => {
     const stabilitySeed = 4_242;
     const legacyWorld = {

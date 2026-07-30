@@ -187,15 +187,38 @@ describe('spec masteries', () => {
     expect(effect(known('rogue', 'sinister_strike', 'combat'), 'weaponStrike').bonus).toBe(18);
   });
 
+  it('Iron Aim (Marksmanship mastery) reaches Arcane Shot, not just physical-school shots', () => {
+    // Iron Aim's tooltip promises "ranged ability damage" (not "physical"), and Hunter is
+    // the only class whose ranged-AP kit spans magic schools: Aimed Shot is school:'physical'
+    // but Arcane Shot is school:'arcane' (both scalesWith:'ranged'). applyTalentMods used to
+    // gate the mastery's global meleeDmgPct on entry.def.school === 'physical', so Arcane Shot
+    // silently never received it. masteryOnly() isolates the mastery's global meleeDmgPct=0.2
+    // from the ability-scoped spec-baseline dmgPct in spec_baselines.ts, pinning the mastery
+    // bonus alone on both shots.
+    const aimedBase = effect(known('hunter', 'aimed_shot'), 'directDamage');
+    const aimedSpecced = effect(known('hunter', 'aimed_shot', 'marksmanship'), 'directDamage');
+    expect(aimedSpecced.min).toBe(Math.round(aimedBase.min * 1.2));
+    expect(aimedSpecced.max).toBe(Math.round(aimedBase.max * 1.2));
+
+    const arcaneBase = effect(known('hunter', 'arcane_shot'), 'directDamage');
+    const arcaneSpecced = effect(known('hunter', 'arcane_shot', 'marksmanship'), 'directDamage');
+    expect(arcaneSpecced.min).toBe(Math.round(arcaneBase.min * 1.2));
+    expect(arcaneSpecced.max).toBe(Math.round(arcaneBase.max * 1.2));
+  });
+
   it('applies petDmgPct at BOTH the melee and ranged pet damage sites, not only the helper', () => {
     // Drive the actual damage sites (a regression that drops `dmg *= petDamageMult` at
-    // either would still pass a helper-only assertion). Same seed + fixed rolls + an
+    // either would still pass a helper-only assertion). A fixed attack-site RNG + an
     // identical dummy (armor cancels in the ratio) isolate the multiplier: BM's Packbond (petDmgPct 0.35)
     // must deal exactly 1.35x what a no-pet-mastery spec's identical pet deals.
     const setup = (spec: string) => {
       const sim = new Sim({ seed: 11, playerClass: 'hunter', autoEquip: true });
       sim.setPlayerLevel(20);
       sim.setSpec(spec);
+      // World construction consumes the shared RNG, so pin subsequent combat rolls:
+      // adding unrelated world content must not move this multiplier test across an
+      // integer-rounding boundary.
+      (sim as unknown as { rng: { next: () => number } }).rng.next = () => 0.5;
       const pet = createMob(9101, MOBS.forest_wolf, 20, sim.player.pos);
       pet.ownerId = sim.player.id;
       pet.weapon = { ...pet.weapon, min: 100, max: 100 };

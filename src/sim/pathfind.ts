@@ -1,4 +1,5 @@
 import { isBlocked, pathCrossesFence, resolvePosition } from './colliders';
+import { rideHeight as rideOverWater } from './ride_height';
 import { groundHeight, waterLevelAt } from './world';
 
 // Local A* over a 1-yard grid, used for short forced moves (warrior Charge).
@@ -23,6 +24,8 @@ export interface PathOpts {
   // bottom — is what the body rides, so a sloped bed isn't a wall and the climb
   // check at the shore measures the real waterline-to-bank step.
   swim?: boolean;
+  // Per-Sim rift collision token (colliders.ts registry); 0/undefined = none.
+  riftToken?: number;
 }
 
 function minGroundAt(o: PathOpts, x: number, z: number): number {
@@ -31,10 +34,10 @@ function minGroundAt(o: PathOpts, x: number, z: number): number {
 
 // Height the mover's body actually rides at a cell: the water surface when
 // swimming over submerged ground, the ground itself otherwise. Used only for
-// slope/climb gating so an uneven lake bed doesn't read as a cliff.
+// slope/climb gating so an uneven lake bed doesn't read as a cliff. The clamp
+// itself is shared with the movement kernel (ride_height.ts).
 function rideHeight(x: number, z: number, h: number, swim: boolean | undefined): number {
-  const wl = waterLevelAt(x, z);
-  return swim && h < wl ? wl : h;
+  return swim ? rideOverWater(x, z, h) : h;
 }
 
 const CELL = 1; // yards
@@ -70,7 +73,8 @@ function segmentWalkable(
     const isEnd = i === steps;
     if (
       (!isEnd || !allowBlockedEnd) &&
-      (h < minGroundAt(o, x, z) || isBlocked(o.seed, x, z, o.bodyRadius, o.ignoreFences))
+      (h < minGroundAt(o, x, z) ||
+        isBlocked(o.seed, x, z, o.bodyRadius, o.ignoreFences, undefined, o.riftToken))
     ) {
       return false;
     }
@@ -148,7 +152,7 @@ export function findPath(
         i === startIdx ||
         i === goalIdx ||
         (groundAt(i) >= minGroundAt(o, cellX, cellZ) &&
-          !isBlocked(o.seed, cellX, cellZ, o.bodyRadius, o.ignoreFences));
+          !isBlocked(o.seed, cellX, cellZ, o.bodyRadius, o.ignoreFences, undefined, o.riftToken));
       walk[i] = ok ? 1 : -1;
     }
     return walk[i] === 1;
@@ -250,6 +254,7 @@ export function findPlayerPath(
   maxSpan = 128,
   ignoreFences = false,
   swim = false,
+  riftToken = 0,
 ): { x: number; z: number }[] {
   return findPath(from, to, {
     seed,
@@ -264,6 +269,7 @@ export function findPlayerPath(
     maxSpan,
     ignoreFences,
     swim,
+    riftToken,
   });
 }
 

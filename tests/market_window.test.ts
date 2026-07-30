@@ -331,3 +331,38 @@ describe('market_window: behavior preserved through the core', () => {
     expect(painter).toContain('formatLocalizedMoney(');
   });
 });
+
+describe('market_window: stale tooltip on re-filter (#2456)', () => {
+  // Typing in the search box, or picking a type/subtype/rarity filter that then narrows
+  // the async listings update, drives the signature-checked refresh path
+  // (refreshIfChanged -> renderContent), not the full render() rebuild. renderContent()
+  // tears down and rebuilds every `.mkt-row` node (`list.innerHTML = ''`); a row removed
+  // this way fires no mouseleave, so a tooltip left open on a row whose item no longer
+  // matches the query would otherwise linger, still describing an item the list no
+  // longer shows. render() already hides the tooltip on every full rebuild; this pins
+  // the same guard on the signature-driven refresh path.
+  it('hides the tooltip once the listings signature changes, before renderContent rebuilds the rows', () => {
+    const method = painter.slice(
+      painter.indexOf('refreshIfChanged(): void {'),
+      painter.indexOf('render(): void {'),
+    );
+    expect(method, 'refreshIfChanged must exist').toContain('if (sig === this.lastSig) return;');
+    const afterSigChange = method.slice(method.indexOf('this.lastSig = sig;'));
+    const hideIdx = afterSigChange.indexOf('this.deps.hideTooltip();');
+    const renderIdx = afterSigChange.indexOf('this.renderContent();');
+    expect(hideIdx, 'hideTooltip() must run once the signature actually changed').toBeGreaterThan(
+      -1,
+    );
+    expect(
+      hideIdx,
+      'hideTooltip() must run before renderContent() tears down the row nodes',
+    ).toBeLessThan(renderIdx);
+  });
+
+  it('still guards the full render() rebuild path (tab switch, filter-menu click) the same way', () => {
+    const render = painter.slice(painter.indexOf('render(): void {'));
+    expect(render.indexOf('this.deps.hideTooltip();')).toBeLessThan(
+      render.indexOf('this.renderContent();'),
+    );
+  });
+});

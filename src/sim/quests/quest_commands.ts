@@ -145,6 +145,12 @@ export function finalizeQuestAccept(
   selection?: string,
 ): boolean {
   if (!validateProfessionQuestSelection(quest, meta, selection)) return false;
+  // The riding lesson is pickable only after the 80g skill purchase at Marla.
+  // Gated here so the npc, linked-share, and dev accept paths cannot drift.
+  if (quest.requiresRidingTrained && !meta.ridingTrained) {
+    ctx.error(meta.entityId, 'You must learn Riding before taking this lesson.');
+    return false;
+  }
   meta.questLog.set(questId, {
     questId,
     counts: quest.objectives.map(() => 0),

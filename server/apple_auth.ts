@@ -5,7 +5,6 @@ import {
   accountForApple,
   consumeApplePendingLogin,
   createApplePendingLogin,
-  deleteUnusedAppleProvision,
   linkAppleAccount,
   peekApplePendingLogin,
 } from './apple_auth_db';
@@ -20,6 +19,7 @@ import {
   saveToken,
   touchLogin,
 } from './db';
+import { deleteUnusedFederatedProvision } from './federated_auth_db';
 import { withBody } from './http/middleware/body';
 import type { Ctx, RouteDef } from './http/types';
 import { isUniqueViolation, json, moderationErrorBody } from './http_util';
@@ -249,7 +249,7 @@ export async function handleAppleLoginNew(
     if (await linkAppleAccount(pool, account.id, pending.apple_subject, pending.apple_email)) {
       accountId = account.id;
     } else {
-      await deleteUnusedAppleProvision(pool, account.id);
+      await deleteUnusedFederatedProvision(pool, account.id);
       accountId = await accountForApple(pool, pending.apple_subject);
       if (accountId === null)
         return json(res, 409, { error: 'already_linked', code: 'auth.invalid_credentials' });

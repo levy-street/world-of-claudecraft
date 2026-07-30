@@ -338,11 +338,36 @@ interface Range {
 const STORE_KEY = 'woc_settings';
 const NUMERIC_KEYS = Object.keys(SETTING_RANGES) as NumericSettingKey[];
 const BOOL_KEYS = Object.keys(BOOL_SETTINGS) as BoolSettingKey[];
+// Mirrors PHONE_TOUCH_QUERY in mobile_controls.ts without importing that DOM-heavy
+// module into the pure settings core.
+const DEFAULT_TOUCH_INTERFACE_QUERY =
+  '(pointer: coarse) and (hover: none), (pointer: coarse) and (max-width: 940px), (pointer: coarse) and (max-height: 760px)';
 
 function clampNumeric(key: NumericSettingKey, v: number): number {
   const r = SETTING_RANGES[key];
   if (!Number.isFinite(v)) return r.def;
   return Math.min(r.max, Math.max(r.min, v));
+}
+
+function defaultTouchInterface(): boolean {
+  try {
+    if (typeof document !== 'undefined' && document.body.classList.contains('native-app'))
+      return true;
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
+    return window.matchMedia(DEFAULT_TOUCH_INTERFACE_QUERY).matches;
+  } catch {
+    return false;
+  }
+}
+
+function defaultBoolSetting(
+  key: BoolSettingKey,
+  values: Pick<GameSettings, 'interfaceMode'>,
+): boolean {
+  if (key !== 'showPlayerNameplates') return BOOL_SETTINGS[key].def;
+  if (values.interfaceMode >= 2) return false;
+  if (values.interfaceMode >= 1) return true;
+  return !defaultTouchInterface();
 }
 
 export type ClickMoveMouseButton = 0 | 2;
@@ -377,7 +402,7 @@ export class Settings {
     }
     for (const key of BOOL_KEYS) {
       const v = raw[key];
-      out[key] = typeof v === 'boolean' ? v : BOOL_SETTINGS[key].def;
+      out[key] = typeof v === 'boolean' ? v : defaultBoolSetting(key, out);
     }
     return out;
   }
@@ -422,13 +447,14 @@ export class Settings {
   reset(keys?: readonly (keyof GameSettings)[]): void {
     if (!keys) {
       for (const key of NUMERIC_KEYS) this.values[key] = SETTING_RANGES[key].def;
-      for (const key of BOOL_KEYS) this.values[key] = BOOL_SETTINGS[key].def;
+      for (const key of BOOL_KEYS) this.values[key] = defaultBoolSetting(key, this.values);
       this.save();
       return;
     }
     for (const key of keys) {
       if ((BOOL_KEYS as readonly string[]).includes(key as string)) {
-        this.values[key as BoolSettingKey] = BOOL_SETTINGS[key as BoolSettingKey].def;
+        const boolKey = key as BoolSettingKey;
+        this.values[boolKey] = defaultBoolSetting(boolKey, this.values);
       } else if ((NUMERIC_KEYS as readonly string[]).includes(key as string)) {
         this.values[key as NumericSettingKey] = SETTING_RANGES[key as NumericSettingKey].def;
       }

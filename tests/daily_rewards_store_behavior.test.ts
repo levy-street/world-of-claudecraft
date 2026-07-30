@@ -4,14 +4,19 @@ vi.mock('../src/ui/armory_inspect', () => ({
   ArmoryInspect: class {
     openSkinId: string | null = null;
     close(): void {}
+    destroy(): void {}
     open(): void {}
+    async prewarm(): Promise<void> {}
     refresh(): void {}
   },
   badgeLabel: () => '',
   rarityLabel: () => '',
   weaponTypeLabel: () => '',
 }));
-vi.mock('../src/ui/portrait_chip', () => ({ portraitChipHtml: () => '' }));
+vi.mock('../src/ui/portrait_chip', () => ({
+  hydratePortraits: () => undefined,
+  portraitChipHtml: () => '',
+}));
 
 import { WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import { DailyRewardsWindow } from '../src/ui/daily_rewards_window';

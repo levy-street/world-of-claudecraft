@@ -113,7 +113,6 @@ describe('ChatModerationControls', () => {
           chatStrikes: 2,
         },
         onSubmit,
-        onReset: vi.fn(),
       },
     });
 
@@ -145,13 +144,60 @@ describe('ChatModerationControls', () => {
           chatStrikes: 0,
         },
         onSubmit: vi.fn(async (_pending: PendingAction) => true),
-        onReset: vi.fn(),
       },
     });
 
     expect(screen.getByRole('button', { name: t('detail.chatMute1h') })).toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: t('chatMod.liftChatMute') }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('asks for a reason before resetting chat strikes', async () => {
+    const onSubmit = vi.fn(async (_pending: PendingAction) => true);
+    render(ChatModerationControls, {
+      props: {
+        target: {
+          id: 42,
+          isAdmin: false,
+          bannedAt: null,
+          chatMutedUntil: null,
+          chatMuteReason: '',
+          chatStrikes: 3,
+        },
+        onSubmit,
+      },
+    });
+
+    await fireEvent.click(screen.getByRole('button', { name: t('chatMod.resetChatStrikes') }));
+    const reason = screen.getByPlaceholderText(t('detail.notePlaceholder'));
+    await fireEvent.input(reason, { target: { value: 'appeal accepted' } });
+    await fireEvent.click(screen.getByRole('button', { name: t('dialog.confirm') }));
+
+    expect(onSubmit).toHaveBeenCalledOnce();
+    expect(onSubmit.mock.calls[0][0]).toMatchObject({
+      endpoint: '/admin/api/moderation/accounts/42/reset-strikes',
+      body: { reason: 'appeal accepted' },
+    });
+  });
+
+  it('does not offer a strikes reset when the account has none', () => {
+    render(ChatModerationControls, {
+      props: {
+        target: {
+          id: 42,
+          isAdmin: false,
+          bannedAt: null,
+          chatMutedUntil: null,
+          chatMuteReason: '',
+          chatStrikes: 0,
+        },
+        onSubmit: vi.fn(async (_pending: PendingAction) => true),
+      },
+    });
+
+    expect(
+      screen.queryByRole('button', { name: t('chatMod.resetChatStrikes') }),
     ).not.toBeInTheDocument();
   });
 });

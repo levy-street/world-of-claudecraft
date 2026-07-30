@@ -16,6 +16,7 @@ import { GameServer } from '../server/game';
 import { ClientWorld } from '../src/net/online';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { RAID_MAX } from '../src/sim/social/party';
 
 function fakeWs() {
   const sent: any[] = [];
@@ -50,6 +51,16 @@ function bareClient(pid: number): ClientWorld {
   c.mouselookFacing = null;
   c.markers = {};
   return c;
+}
+
+// A hand-built frame, the untrusted shape a client actually sends, parsed and
+// dispatched exactly as a socket message is. `t: 'cmd'` is the real envelope
+// (ClientWorld.rawCmd); without it the dispatcher drops the frame as a protocol
+// anomaly and a test would pass on a command that never ran.
+function sendCmd(server: GameServer, session: any, frame: Record<string, unknown>): string {
+  const raw = JSON.stringify({ t: 'cmd', ...frame });
+  (server as any).dispatchMessage(session, JSON.parse(raw), raw, 0);
+  return raw;
 }
 
 describe('loot roll self-snapshot parity', () => {
@@ -94,6 +105,110 @@ describe('loot roll self-snapshot parity', () => {
     (client as any).applySnapshot(snapB);
     expect(client.activeLootRolls().map((p) => p.itemId)).toContain('greyjaw_hide_boots');
   });
+
+  // #2526, the whole chain end to end: setPartyLootMaster -> lootCorpse ->
+  // maybe('mloot', activeMasterLootRolls) -> applySnapshot -> the HUD read. The
+  // sim suite drives Sim directly and the snapshot suite hand-pokes
+  // pendingLootRolls, so this is the only place the real server produces the key.
+  it('rides the self snapshot to the master looter only, and survives a refused assignment', () => {
+    const server = new GameServer();
+    const fa = fakeWs();
+    const fb = fakeWs();
+    const sa = server.join(fa.ws as any, 21, 21, 'Aaa', 'warrior', null) as any;
+    const sb = server.join(fb.ws as any, 22, 22, 'Bbb', 'mage', null) as any;
+    sa.blockListLoaded = true;
+    sb.blockListLoaded = true;
+    const a = sa.pid,
+      b = sb.pid;
+    const sim = server.sim;
+    const pa = sim.entities.get(a)!,
+      pb = sim.entities.get(b)!;
+    pa.pos = { x: 20, y: 0, z: 20 };
+    pa.prevPos = { ...pa.pos };
+    pb.pos = { x: 21, y: 0, z: 20 };
+    pb.prevPos = { ...pb.pos };
+    sim.partyInvite(b, a);
+    sim.partyAccept(b);
+    sim.setPartyLootMaster(true, 0, 'uncommon', a); // 0 = the leader curates
+
+    const mobId = [...sim.entities.keys()].reduce((max, k) => (k > max ? k : max), 0) + 1;
+    const mob = createMob(mobId, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
+    mob.dead = true;
+    mob.lootable = true;
+    mob.tappedById = a;
+    mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
+    sim.entities.set(mob.id, mob);
+
+    sim.lootCorpse(mob.id, a);
+    const opened = sim.events.find((e) => e.type === 'masterLoot')!;
+    const rollId = opened.rollId;
+    // The deadline the EVENT announced, so the wire field below is pinned against
+    // an independent producer rather than fed its own value back as its expectation.
+    const expiresAt = (opened as { expiresAt: number }).expiresAt;
+    expect(expiresAt).toBeGreaterThan(0);
+    sim.tick();
+    (server as any).broadcastSnapshots();
+
+    // The looter's snapshot carries the curate prompt; the candidate's carries an
+    // empty one, and NEITHER carries it as a need/greed roll.
+    const snapA = lastSnap(fa.sent);
+    const snapB = lastSnap(fb.sent);
+    expect(snapA.self.mloot).toEqual([
+      {
+        rollId,
+        itemId: 'greyjaw_hide_boots',
+        itemName: 'Greyjaw Hide Boots',
+        quality: 'uncommon',
+        expiresAt,
+        candidates: [
+          { pid: a, name: 'Aaa' },
+          { pid: b, name: 'Bbb' },
+        ],
+      },
+    ]);
+    expect(snapB.self.mloot).toEqual([]);
+    expect(snapA.self.lroll).toEqual([]);
+    expect(snapB.self.lroll).toEqual([]);
+
+    const clientA = bareClient(a);
+    const clientB = bareClient(b);
+    (clientA as any).applySnapshot(snapA);
+    (clientB as any).applySnapshot(snapB);
+    expect(clientA.activeMasterLootRolls().map((p) => p.rollId)).toEqual([rollId]);
+    expect(clientB.activeMasterLootRolls()).toEqual([]);
+
+    // The refusal arm over the wire: a pid that is not a candidate leaves the
+    // roll curating, so the surface is UNCHANGED and the delta encoder therefore
+    // omits the key entirely. The mirror must keep its prior value, which is what
+    // lets the HUD restore the row after the grace.
+    fa.sent.length = 0;
+    // Spied through (not stubbed): every assertion below also holds if the frame
+    // were rejected by the masterAssign wire validation and the sim never ran, so
+    // pin that the refusal really happened at the SIM boundary.
+    const assignSpy = vi.spyOn(sim, 'assignMasterLoot');
+    sendCmd(server, sa, { cmd: 'masterAssign', rollId, pids: [999999] });
+    expect(assignSpy).toHaveBeenCalledWith(rollId, [999999], a);
+    assignSpy.mockRestore();
+    sim.tick();
+    (server as any).broadcastSnapshots();
+    const snapA2 = lastSnap(fa.sent);
+    expect(snapA2.self).not.toHaveProperty('mloot');
+    (clientA as any).applySnapshot(snapA2);
+    expect(clientA.activeMasterLootRolls().map((p) => p.rollId)).toEqual([rollId]);
+    expect(sim.countItem('greyjaw_hide_boots', b)).toBe(0);
+
+    // And it really was still assignable: the accepted assignment lands and the
+    // surface empties, so the pins above are not just a stuck mirror.
+    fa.sent.length = 0;
+    sendCmd(server, sa, { cmd: 'masterAssign', rollId, pids: [b] });
+    sim.tick();
+    (server as any).broadcastSnapshots();
+    const snapA3 = lastSnap(fa.sent);
+    expect(snapA3.self.mloot).toEqual([]);
+    (clientA as any).applySnapshot(snapA3);
+    expect(clientA.activeMasterLootRolls()).toEqual([]);
+    expect(sim.countItem('greyjaw_hide_boots', b)).toBe(1);
+  });
 });
 
 // #2505 over the wire. `pids` is a client-supplied array the authoritative
@@ -107,16 +222,6 @@ describe('loot roll self-snapshot parity', () => {
 // WORLD_SEED (asserted below, not assumed), so two runs generate the identical
 // world and any difference in the result is the pid list.
 describe('a repeated pid in a masterAssign frame, through a real GameServer (#2505)', () => {
-  // A hand-built frame, the untrusted shape the issue reproduces with, parsed
-  // and dispatched exactly as a socket message is. `t: 'cmd'` is the real
-  // envelope (ClientWorld.rawCmd); without it the dispatcher drops the frame as
-  // a protocol anomaly and a test would pass on a command that never ran.
-  function sendCmd(server: GameServer, session: any, frame: Record<string, unknown>): string {
-    const raw = JSON.stringify({ t: 'cmd', ...frame });
-    (server as any).dispatchMessage(session, JSON.parse(raw), raw, 0);
-    return raw;
-  }
-
   function serverAssign(pids: (ids: { a: number; b: number }) => number[]) {
     const server = new GameServer();
     const sa = server.join(fakeWs().ws as any, 11, 11, 'Aaa', 'warrior', null) as any;
@@ -252,5 +357,220 @@ describe('a repeated pid in a masterAssign frame, through a real GameServer (#25
     const spy = vi.spyOn(server.sim, 'assignMasterLoot').mockImplementation(() => {});
     sendCmd(server, session, { cmd: 'masterAssign', rollId: 4242, pids: [7, 7] });
     expect(spy).toHaveBeenCalledWith(4242, [7, 7], session.pid);
+  });
+});
+
+// #2524. `masterAssign` took a client-supplied array with no upper length bound,
+// unlike the capped cases beside it: `df_roles` at 3, `df_queue` at 16,
+// `df_list_create` tags at 8, `mail_send` attachments at 3, each rejecting the
+// whole frame over cap. It was NOT the only unbounded one, so do not read this
+// block as an audit: `harvestCorpse` components, `trade_offer` items, and
+// `saveLoadout` bar all still arrive unbounded (each is filtered or sliced
+// sim-side rather than rejected at the wire). The bound here is the raid roster,
+// because a curate-phase roll's candidate list is the tapping group's
+// loot-eligible members and a group can never hold more than a full raid. These
+// drive real GameServer frames, since the dispatch is where the untrusted array
+// enters.
+describe('the masterAssign pids length cap (#2524)', () => {
+  it('is the full raid roster, ten', () => {
+    // The literal the cap resolves to. Every assertion below is written in terms of
+    // RAID_MAX, which the server imports too, so without this anchor a future edit
+    // to the roster size would move the test with the source and stop pinning any
+    // particular boundary at all.
+    expect(RAID_MAX).toBe(10);
+  });
+
+  // A real ten-member raid on a real GameServer, holding a curate-phase master-loot
+  // roll whose candidate list is the whole roster. This is the largest honest
+  // masterAssign a client can build, which is the entire argument for the cap: it is
+  // reachable in normal play, so the cap must not reject it.
+  function raidMasterRoll() {
+    const server = new GameServer();
+    const sessions: any[] = [];
+    for (let i = 0; i < RAID_MAX; i++) {
+      // A distinct account AND character id per raider: join rejects a second live
+      // session on either (MAX_ACTIVE_SESSIONS_PER_ACCOUNT is 1), and it reports
+      // that by RETURNING an error rather than throwing, which would otherwise
+      // surface here as an undefined pid several assertions later.
+      const s = server.join(fakeWs().ws as any, 30 + i, 30 + i, `Raider${i}`, 'warrior', null);
+      if ('error' in s) throw new Error(s.error);
+      (s as any).blockListLoaded = true;
+      sessions.push(s);
+    }
+    const pids = sessions.map((s) => s.pid as number);
+    const sim = server.sim;
+    const leader = pids[0];
+    // Everyone stands on the corpse (PARTY_XP_RANGE is 80 yards), so every member
+    // is loot-eligible and the roll opens with all ten as candidates.
+    for (const [i, pid] of pids.entries()) {
+      const e = sim.entities.get(pid)!;
+      e.pos = { x: 20 + i * 0.5, y: 0, z: 20 };
+      e.prevPos = { ...e.pos };
+    }
+    // Five, convert, then five more: the only route to a ten-member roster
+    // through the invite path, since convertPartyToRaid gates on RAID_MIN and
+    // partyAccept refuses past capacity. The Dungeon Finder forms one in a single
+    // step instead, through the same RAID_MAX gate (party.ts formation seam).
+    for (const pid of pids.slice(1, 5)) {
+      sim.partyInvite(pid, leader);
+      sim.partyAccept(pid);
+    }
+    sim.convertPartyToRaid(leader);
+    for (const pid of pids.slice(5)) {
+      sim.partyInvite(pid, leader);
+      sim.partyAccept(pid);
+    }
+    expect(sim.partyOf(leader)?.members).toEqual(pids);
+    sim.setPartyLootMaster(true, 0, 'uncommon', leader);
+
+    // A world-unique corpse id: the server sim is a full generated world, so a
+    // hand-picked literal could collide with a real entity.
+    const mobId = [...sim.entities.keys()].reduce((max, k) => (k > max ? k : max), 0) + 1;
+    const mob = createMob(mobId, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
+    mob.dead = true;
+    mob.lootable = true;
+    mob.tappedById = leader;
+    mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
+    sim.entities.set(mob.id, mob);
+    sim.lootCorpse(mob.id, leader);
+    const opened = sim.events.find((e) => e.type === 'masterLoot') as any;
+    // Read before dereferencing, so a fixture that failed to open the roll says so
+    // instead of throwing a bare TypeError on the line below.
+    expect(opened).toBeTruthy();
+    // The premise: a legitimate frame really can name RAID_MAX pids.
+    expect(opened.candidates.map((c: any) => c.pid)).toEqual(pids);
+    sim.events.length = 0;
+    return { server, sim, pids, leaderSession: sessions[0], rollId: opened.rollId as number };
+  }
+
+  function promptedPids(sim: any, rollId: number): number[] {
+    return sim.events
+      .filter((e: any) => e.type === 'lootRoll' && e.rollId === rollId)
+      .map((e: any) => e.pid as number);
+  }
+
+  it('lets a full-raid assignment through: ten pids open the roll for all ten', () => {
+    const { server, sim, pids, leaderSession, rollId } = raidMasterRoll();
+    expect(pids).toHaveLength(RAID_MAX);
+    sendCmd(server, leaderSession, { cmd: 'masterAssign', rollId, pids });
+    // Every member gets the need/greed prompt, in request order: the at-cap frame
+    // reached the sim and did the whole job, not just some of it.
+    expect(promptedPids(sim, rollId)).toEqual(pids);
+    // And the same thing read off the surfaces the client mirrors: the curate
+    // prompt is gone from the looter and the roll is now live for all ten.
+    expect(sim.activeMasterLootRolls(pids[0])).toEqual([]);
+    for (const pid of pids) expect(sim.activeLootRolls(pid).map((p) => p.rollId)).toEqual([rollId]);
+  });
+
+  it('rejects one pid over the cap at the dispatch, leaving the roll assignable', () => {
+    const { server, sim, pids, leaderSession, rollId } = raidMasterRoll();
+    // A real full roster plus one repeat. Every element is a valid candidate and
+    // the sender is the master looter of an open curate-phase roll, so length is
+    // the only thing that can stop this frame.
+    const overCap = [...pids, pids[0]];
+    expect(overCap).toHaveLength(RAID_MAX + 1);
+
+    const assignSpy = vi.spyOn(sim, 'assignMasterLoot');
+    sendCmd(server, leaderSession, { cmd: 'masterAssign', rollId, pids: overCap });
+    expect(assignSpy).not.toHaveBeenCalled();
+    // Rejected at the dispatch means nothing moved in the world either: no prompts
+    // went out, and the roll is still curating on the master looter's own surface
+    // rather than resolved, converted, or dropped.
+    expect(promptedPids(sim, rollId)).toEqual([]);
+    expect(sim.activeMasterLootRolls(pids[0]).map((p) => p.rollId)).toEqual([rollId]);
+    for (const pid of pids) expect(sim.activeLootRolls(pid)).toEqual([]);
+
+    // The positive control, on the same server and the same roll and through the
+    // same spy: at cap it still lands. Without this the assertions above would all
+    // read the same way if the harness never delivered a frame at all, or if the
+    // rejection had consumed the roll.
+    sendCmd(server, leaderSession, { cmd: 'masterAssign', rollId, pids });
+    expect(assignSpy).toHaveBeenCalledWith(rollId, pids, pids[0]);
+    expect(promptedPids(sim, rollId)).toEqual(pids);
+    assignSpy.mockRestore();
+  });
+
+  it('draws the line on length alone, before any roll is looked up', () => {
+    // The boundary in isolation, with the sim stubbed out: the cap is a dispatch
+    // check, so it holds for a rollId that does not exist and pids that name nobody.
+    // Both sides of the boundary, because a pin that only shows RAID_MAX + 1 being
+    // refused cannot tell a cap of ten from a cap of one.
+    const server = new GameServer();
+    const session = server.join(fakeWs().ws as any, 14, 14, 'Ddd', 'warrior', null) as any;
+    session.blockListLoaded = true;
+    const spy = vi.spyOn(server.sim, 'assignMasterLoot').mockImplementation(() => {});
+    const atCap = Array.from({ length: RAID_MAX }, (_, i) => 7000 + i);
+
+    sendCmd(server, session, { cmd: 'masterAssign', rollId: 4243, pids: atCap });
+    expect(spy).toHaveBeenCalledWith(4243, atCap, session.pid);
+
+    spy.mockClear();
+    sendCmd(server, session, { cmd: 'masterAssign', rollId: 4243, pids: [...atCap, 7999] });
+    expect(spy).not.toHaveBeenCalled();
+
+    // The pre-existing lower bound is untouched: an empty selection is still no
+    // selection, and is still refused. So is a non-numeric element, the sibling
+    // conjunct the cap now sits in front of.
+    sendCmd(server, session, { cmd: 'masterAssign', rollId: 4243, pids: [] });
+    expect(spy).not.toHaveBeenCalled();
+    sendCmd(server, session, { cmd: 'masterAssign', rollId: 4243, pids: [7000, 'x'] });
+    expect(spy).not.toHaveBeenCalled();
+
+    // Re-arm: the three refusals above share one positive control, and it ran
+    // BEFORE them, so on its own it cannot rule out a session or spy that stopped
+    // working part way through. Send the accepted shape again, last.
+    sendCmd(server, session, { cmd: 'masterAssign', rollId: 4243, pids: atCap });
+    expect(spy).toHaveBeenCalledWith(4243, atCap, session.pid);
+    spy.mockRestore();
+  });
+
+  it('decides on length alone before reading a single element', () => {
+    // The dispatch comment claims the length test runs BEFORE the `.every` element
+    // scan, "so the per-element work is bounded too". Both orders accept and reject
+    // exactly the same frames, so no ordinary payload can tell them apart: the
+    // array itself has to be the instrument. Index getters count reads, and the
+    // frame goes straight to dispatchMessage rather than through sendCmd, because
+    // JSON.parse would flatten the getters away before the dispatch ever saw them.
+    const server = new GameServer();
+    const session = server.join(fakeWs().ws as any, 15, 15, 'Eee', 'warrior', null);
+    if ('error' in session) throw new Error(session.error);
+    (session as any).blockListLoaded = true;
+    const spy = vi.spyOn(server.sim, 'assignMasterLoot').mockImplementation(() => {});
+
+    const counting = (length: number) => {
+      let reads = 0;
+      const pids: number[] = [];
+      for (let i = 0; i < length; i++) {
+        Object.defineProperty(pids, i, {
+          enumerable: true,
+          configurable: true,
+          get: () => {
+            reads++;
+            return 7000 + i;
+          },
+        });
+      }
+      return { pids, reads: () => reads };
+    };
+    const send = (pids: number[]) =>
+      (server as any).dispatchMessage(
+        session,
+        { t: 'cmd', cmd: 'masterAssign', rollId: 4244, pids },
+        '{"t":"cmd","cmd":"masterAssign"}',
+        0,
+      );
+
+    const over = counting(RAID_MAX + 1);
+    send(over.pids);
+    expect(spy).not.toHaveBeenCalled();
+    expect(over.reads()).toBe(0);
+
+    // The instrument really counts, so the zero above is a short circuit and not a
+    // getter that never fires: at cap every element is read exactly once.
+    const at = counting(RAID_MAX);
+    send(at.pids);
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(at.reads()).toBe(RAID_MAX);
+    spy.mockRestore();
   });
 });

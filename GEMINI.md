@@ -4,8 +4,12 @@
 truth.** This project is driven primarily through Claude Code; read the root `CLAUDE.md` in full
 and the local `CLAUDE.md` when you open files in a directory. They own the architecture, the hard
 invariants (sim purity and determinism, graphics fairness, i18n, secrets, the no-em-dash and
-no-emoji rule), the module-first doctrine, the commands, the UI / a11y / i18n rules, and the git
-conventions (Conventional Commits WITH a scope). When this guide and `CLAUDE.md` disagree,
+no-emoji rule), the module-first doctrine, the commands, the UI / a11y / i18n rules, the git
+conventions (Conventional Commits WITH a scope, and every commit carries a body), and the
+default task workflow: base the work on the latest `release/**` branch rather than `main`,
+use a separate worktree, add tests with every `src/sim/` or `server/` change, and deliver a
+mergeable PR gated locally with `npm run gate`. Before calling an implementation complete,
+run the QA gate described in `docs/qa-gate.md`. When this guide and `CLAUDE.md` disagree,
 **`CLAUDE.md` wins.** Do not keep a second copy of those rules here; this file holds only the
 Gemini-session notes that have no home in `CLAUDE.md`.
 
@@ -17,7 +21,8 @@ Gemini-session notes that have no home in `CLAUDE.md`.
   to save latency and cost. Reason through edge cases and blast radius before writing code, and
   red-team your own diff before declaring it done.
 - **Context-cache discipline (large input discount).** Keep imports stable and grouped at the
-  top of files; avoid gratuitous edits to large files (`src/sim/sim.ts`, `src/ui/hud.ts`, this
+  top of files; avoid gratuitous edits to the large coordinators (`src/sim/sim.ts`,
+  `src/ui/hud.ts`, `src/main.ts`, `src/render/renderer.ts`, this
   guide), since any prefix or import change invalidates the cache and raises latency and cost.
   Keep static reference material early in the prompt.
 - **Agentic loop.** Spawn a research subagent for long-horizon research or verbose E2E runs to

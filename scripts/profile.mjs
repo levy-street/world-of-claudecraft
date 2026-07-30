@@ -122,6 +122,7 @@ async function scenarioCrowd(p) {
   out.push(await p.sample({ ms: MS, label: 'solo' }));
   for (const target of [Math.round(CROWD / 2), CROWD]) {
     const got = await p.spawnCrowd(target, { radius: 28 });
+    if (got !== target) throw new Error(`crowd ramp stopped at ${got}/${target} players`);
     await sleep(3000);
     out.push(await p.sample({ ms: MS, label: `crowd-${got}` }));
   }

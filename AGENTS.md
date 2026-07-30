@@ -2,15 +2,16 @@
 
 This file owns Codex runtime behavior for World of ClaudeCraft. The root and
 directory-local `CLAUDE.md` files remain canonical for repository facts, architecture,
-hard invariants, conventions, commands, and the QA contract. Claude-specific model,
+hard invariants, conventions, commands, the default task workflow and deliverable
+contract, and the QA contract. Claude-specific model,
 memory, Workflow, slash-command, and agent-runtime instructions do not apply to Codex.
 Do not edit or replace the Claude setup unless the user explicitly asks for that work.
 
 ## Start safely
 
 1. Run `git status --short` before edits and preserve unrelated user work.
-2. Confirm the requested base branch. Use an isolated worktree when another session may
-   share the checkout, and keep work off the shared branch.
+2. Follow the default task workflow in `CLAUDE.md`: base the work on the latest
+   `release/**` branch, never `main`, and create a separate worktree for the task.
 3. Read the root `CLAUDE.md` in full. Before reading or changing files in a directory,
    read that directory's `CLAUDE.md` if it exists. Codex builds its instruction chain at
    session start, so opening a nested file does not load local guidance automatically.

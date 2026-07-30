@@ -51,6 +51,8 @@ export const MODERATION_ACTION_LABEL_KEYS: Record<string, string> = {
   set_streamer: 'moderationHistory.actionSetStreamer',
   block: 'moderationHistory.actionIpBlock',
   unblock: 'moderationHistory.actionIpUnblock',
+  reactivate: 'moderationHistory.actionReactivate',
+  chat_strikes_reset: 'moderationHistory.actionResetChatStrikes',
 };
 
 const BAD_ACTIONS = new Set(['ban', 'block', 'daily_rewards_ban', 'daily_rewards_ip_ban']);
@@ -63,6 +65,8 @@ const GOOD_ACTIONS = new Set([
   'unblock',
   'daily_rewards_unban',
   'daily_rewards_ip_unban',
+  'reactivate',
+  'chat_strikes_reset',
 ]);
 
 export function moderationActionLabel(action: string): string {

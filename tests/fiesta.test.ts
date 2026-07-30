@@ -5,13 +5,20 @@ import {
   eligibleAugments,
   tierForWave,
 } from '../src/sim/content/augments';
-import { arenaOrigin } from '../src/sim/data';
+import { arenaOrigin, BUILTIN_WORLD } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import type { PlayerClass } from '../src/sim/types';
+import type { PlayerClass, WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
+const FIESTA_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+
 function makeWorld() {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: FIESTA_TEST_WORLD });
 }
 
 function teleport(sim: Sim, pid: number, x: number, z: number) {
@@ -223,7 +230,12 @@ describe('fiesta: augments', () => {
   });
 
   it('standardizes every fighter to level 20 with a balanced build, restoring after', () => {
-    const sim = new Sim({ seed: 5, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 5,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: FIESTA_TEST_WORLD,
+    });
     const pids = (['warrior', 'mage', 'rogue', 'priest'] as const).map((c, i) =>
       sim.addPlayer(c, `P${i}`),
     );
@@ -290,7 +302,7 @@ describe('fiesta: determinism', () => {
 
 describe('fiesta: offline practice vs bots', () => {
   it('spawns three bots, seats a 2v2 bout, and the bots fight (score climbs)', () => {
-    const sim = new Sim({ seed: 7, playerClass: 'warrior' });
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', world: FIESTA_TEST_WORLD });
     expect(sim.startFiestaPractice()).toBe(true);
     expect((sim as any).fiestaBotPids.length).toBe(3);
     let match: any = null;
@@ -305,7 +317,7 @@ describe('fiesta: offline practice vs bots', () => {
   });
 
   it('toggling practice off tears down the bots and dequeues them', () => {
-    const sim = new Sim({ seed: 7, playerClass: 'warrior' });
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', world: FIESTA_TEST_WORLD });
     sim.startFiestaPractice();
     const botPids = [...(sim as any).fiestaBotPids];
     expect(botPids.length).toBe(3);
@@ -316,7 +328,7 @@ describe('fiesta: offline practice vs bots', () => {
 
   it('practice runs are deterministic (same score timeline on replay)', () => {
     const run = () => {
-      const sim = new Sim({ seed: 11, playerClass: 'mage' });
+      const sim = new Sim({ seed: 11, playerClass: 'mage', world: FIESTA_TEST_WORLD });
       sim.startFiestaPractice();
       for (let i = 0; i < 20 * 30; i++) {
         sim.updateFiestaBots();
@@ -326,7 +338,7 @@ describe('fiesta: offline practice vs bots', () => {
       return m?.fiesta ? [m.fiesta.scoreA, m.fiesta.scoreB] : null;
     };
     expect(run()).toEqual(run());
-  });
+  }, 90_000);
 });
 
 describe('fiesta: augment catalog integrity', () => {

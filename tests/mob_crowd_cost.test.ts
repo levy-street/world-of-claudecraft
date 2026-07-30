@@ -32,12 +32,13 @@ import { terrainHeight } from '../src/sim/world';
 type AnyEntity = ReturnType<typeof createMob> & Record<string, any>;
 const seedOf = (sim: Sim): number => (sim as unknown as { cfg: { seed: number } }).cfg.seed;
 
-// WORLD_SIZE is 360 (x spans [-180, 180]); (500, 500) sits well outside the playable
-// world, so no world-spawned camp or mob is anywhere near it (asserted below as 0
-// entities within 60 yd). The whole camp lands within ~23 yd of FAR, so an ambient mob
-// beyond 60 yd of FAR is beyond even the former 25-yd query bound of every player here
-// (let alone today's 20) and never counts one.
-const FAR = { x: 500, z: 500 };
+// The overworld occupies a multi-realm grid around the origin, while dungeon, arena,
+// and Rift instances use large positive-x bands. (-10_000, -10_000) stays clear of
+// both spaces, so no generated camp or instance mob is anywhere near it (asserted
+// below as 0 entities within 60 yd). The whole camp lands within about 23 yd of FAR,
+// so an ambient mob beyond 60 yd is beyond even the former 25-yd query bound of every
+// player here (let alone today's 20) and never counts one.
+const FAR = { x: -10_000, z: -10_000 };
 
 // Camp sizes. WOLVES x NEAR is the pinned crowd cost (7 x 6 = 42). FORMER players ride
 // the former-window ring: under the old 25-yd radius they would have added FORMER x
@@ -209,8 +210,7 @@ describe('mob crowd cost: per-tick aggro-scan visits equal the grid product', ()
       addTrivialPlayerAt(sim, `MixNear${j}`, dx, dz);
     }
     const bait = addPlayerAt(sim, 'MixBait', CAMP_B + 10, 0);
-    // Nothing else lives near either camp (the world sits 450+ yd away), so both
-    // products are exact.
+    // Nothing else lives near either camp, so both products are exact.
     let near = 0;
     for (const e of (sim as unknown as { entities: Map<number, Entity> }).entities.values()) {
       const dx = e.pos.x - FAR.x;

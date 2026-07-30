@@ -113,6 +113,12 @@ describe('mob combat profiles', () => {
 
     expect(mobEffectiveMeleeRange(pursuing)).toBe(MELEE_RANGE + 1);
     expect(tryMobMeleeSwingInRange(sim.ctx, pursuing, player)).toBe(true);
+    // the swing runs the real hit table, so any single roll can miss or be
+    // dodged; swing until one connects (bounded), asserting reach, not luck
+    for (let i = 0; i < 50 && player.hp === 100000; i++) {
+      pursuing.swingTimer = 0;
+      tryMobMeleeSwingInRange(sim.ctx, pursuing, player);
+    }
     expect(player.hp).toBeLessThan(100000);
   });
 });

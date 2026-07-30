@@ -10,7 +10,7 @@ import type { PlayerCardData, PlayerCardStat } from './player_card';
 import type { CharacterStanding, ReferralInfo } from './player_card_share';
 
 export interface PlayerCardDataInput {
-  characterImage: string;
+  characterImage: PlayerCardData['characterImage'];
   referral: ReferralInfo | null;
   standing: CharacterStanding | null;
   balance: number | null;

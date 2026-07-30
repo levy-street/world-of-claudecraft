@@ -130,6 +130,44 @@ describe('loot_roll: rollLoot producer (drop-rate determinism)', () => {
   });
 });
 
+describe('loot_roll: rollLoot sets lootable for a harvestable corpse with empty loot', () => {
+  // Regression test: a mob template whose loot table is entirely chance-based
+  // (no guaranteed copper/item) but carries componentTags mapping to a real
+  // harvest item must still end up lootable=true after rollLoot, so
+  // corpseInteractionAvailability offers the harvest interaction. Before the
+  // fix, rollLoot only set mob.lootable inside `if (copper > 0 || items.length
+  // > 0)`, leaving it false (the baseEntity default) whenever every chance
+  // roll failed, even though isHarvestableCorpse(componentTags) is true.
+  const TEMPLATE_ID = 'test_harvest_only_empty_loot';
+
+  it('sets mob.lootable = true even when every chance-based loot entry fails to roll', () => {
+    (MOBS as Record<string, (typeof MOBS)['forest_wolf']>)[TEMPLATE_ID] = {
+      ...MOBS.forest_wolf,
+      id: TEMPLATE_ID,
+      // No guaranteed { copper, chance: 1 } entry: every entry is chance-based.
+      loot: [{ itemId: 'wolf_fang', chance: 0.45 }],
+      componentTags: ['hide'],
+    };
+    try {
+      const sim = makeSim(1);
+      const pid = sim.addPlayer('warrior', 'Looter');
+      const meta = playerMeta(sim, pid);
+      const template = MOBS[TEMPLATE_ID];
+      expect(isHarvestableCorpse(template.componentTags)).toBe(true);
+      const mob = createMob(-1, template, template.minLevel, { x: 0, y: 0, z: 0 });
+      // Force every chance-based roll to fail, so the regular loot table
+      // produces zero copper and zero items.
+      const chanceSpy = vi.spyOn(sim.ctx.rng, 'chance').mockReturnValue(false);
+      rollLoot(sim.ctx, mob, meta);
+      chanceSpy.mockRestore();
+      expect(mob.loot).toBeNull();
+      expect(mob.lootable).toBe(true);
+    } finally {
+      delete (MOBS as Record<string, unknown>)[TEMPLATE_ID];
+    }
+  });
+});
+
 describe('loot_roll: pickRollGroupWinner (cross-group fall-forward)', () => {
   it('returns the plain partition winner when nothing in the group was awarded yet', () => {
     const group: LootEntry[] = [

@@ -336,6 +336,33 @@ export const de_DE: EnTranslations = {
       "healerConfirmAccept": "Belebe mich wieder",
       "healerConfirmCancel": "Abbrechen"
     },
+    "unstuck": {
+      "menuButton": "Befreien",
+      "help": "Rettung: /unstuck startet einen Countdown im Stehen, der dich zu einer nahen, erreichbaren sicheren Stelle bewegt.",
+      "helpAtGraveyard": "Rettung: /unstuck startet einen Countdown im Stehen und schickt deinen Geist dann zum nächsten Friedhof. Die Rückkehr über den Bleichen Hüter erfordert den Hüterzoll.",
+      "started": "Befreien in {seconds} Sekunden. Bewegen, Kämpfen, Schaden erleiden oder eine andere Aktion beginnen bricht es ab.",
+      "countdown": "Befreien: {seconds}",
+      "completed": "Zur nächsten erreichbaren sicheren Stelle bewegt.",
+      "completedAtGraveyard": "Dein Geist ist zum nächsten Friedhof zurückgekehrt. Sprich mit dem Bleichen Hüter, um den Hüterzoll anzunehmen.",
+      "revivedAtGraveyard": "Du wurdest zum nächsten Friedhof zurückgebracht und wiederbelebt. Der Hüterzoll lastet auf dir.",
+      "cancelledMoved": "Befreien abgebrochen, weil du dich bewegt hast.",
+      "cancelledDamaged": "Befreien abgebrochen, weil du Schaden erlitten hast.",
+      "cancelledCombat": "Befreien abgebrochen, weil du in den Kampf eingetreten bist.",
+      "cancelledBusy": "Befreien abgebrochen, weil du eine andere Aktion begonnen hast.",
+      "cancelledState": "Befreien abgebrochen, weil sich dein Zustand geändert hat.",
+      "cancelledDisconnected": "Befreien abgebrochen, weil die Verbindung getrennt wurde.",
+      "noSafePosition": "In der Nähe wurde keine erreichbare sichere Stelle gefunden. Du wurdest nicht bewegt.",
+      "alreadyActive": "Befreien zählt bereits herunter.",
+      "alreadySafe": "Du befindest dich bereits an einer sicheren, erreichbaren Position.",
+      "cooldown": "Befreien ist in {seconds} Sekunden bereit.",
+      "dead": "Du kannst Befreien nicht benutzen, während du tot oder in Geistform bist.",
+      "combat": "Du kannst Befreien nicht im Kampf benutzen.",
+      "controlled": "Du kannst Befreien nicht benutzen, solange deine Bewegung beeinträchtigt ist.",
+      "standStill": "Steh still auf festem Boden, bevor du Befreien benutzt.",
+      "standStillAnywhere": "Steh still, bevor du Befreien benutzt.",
+      "busy": "Schließe deine aktuelle Aktion ab, bevor du Befreien benutzt.",
+      "unavailable": "Befreien ist in deinem aktuellen Zustand nicht verfügbar."
+    },
     "fct": {
       "absorbed": "{amount} absorbiert",
       "cheap": "Günstiger!"
@@ -775,6 +802,7 @@ export const de_DE: EnTranslations = {
       "leaderboard": "Rangliste",
       "dailyRewards": "Shop",
       "deeds": "Taten",
+      "mounts": "Reittiere",
       "professions": "Berufe",
       "nameplates": "Namen",
       "haptics": "Haptik",
@@ -872,7 +900,18 @@ export const de_DE: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m} Min. {s} Sek.",
       "seconds": "{s} Sek.",
-      "autoShowHint": "Zeilen erscheinen automatisch, sobald deine Gruppe Schaden verursacht oder heilt, und dieses Segment schliessen sich einige Sekunden nach Kampfende."
+      "autoShowHint": "Zeilen erscheinen automatisch, sobald deine Gruppe Schaden verursacht oder heilt, und dieses Segment schliessen sich einige Sekunden nach Kampfende.",
+      "breakdownSummary": "{tab}: {value}",
+      "breakdownRow": "{value} ({percent})",
+      "breakdownOther": "Andere ({count})",
+      "percent": "{value}%",
+      "petAbility": "{pet}: {ability}",
+      "melee": "Nahkampf",
+      "move": "Ziehen, um diese Anzeige zu verschieben",
+      "resize": "Ziehen, um die Größe dieser Anzeige zu ändern",
+      "dock": "Diese Anzeige wieder in das Anzeigenfenster andocken",
+      "separate": "{meter} trennen",
+      "regroup": "{meter} wieder eingliedern"
     },
     "petFeed": {
       "disabledFullHp": "Begleiter hat volle Gesundheit",
@@ -890,7 +929,59 @@ export const de_DE: EnTranslations = {
       "petStop": "Begleiter: Stopp",
       "petTaunt": "Begleiter: Verspotten",
       "petDefensive": "Begleiter: Defensiv",
-      "petAggressive": "Begleiter: Aggressiv"
+      "petAggressive": "Begleiter: Aggressiv",
+      "mount": "Aufsitzen / Absitzen"
+    },
+    "mounts": {
+      "title": "Reittiere",
+      "close": "Schließen",
+      "select": "Auswählen",
+      "selected": "Ausgewählt",
+      "riding": "Im Sattel",
+      "mount": "Aufsitzen",
+      "dismount": "Absitzen",
+      "useToRide": "Benutzen, um dieses Reittier herbeizurufen.",
+      "emptyTitle": "Keine Reittiere gesammelt",
+      "emptyStableHint": "Erreicht Stufe 20 und nehmt bei Stallmeisterin Marla in den Ställen westlich von Highwatch Reitstunden.",
+      "emptyDropHint": "Seltenere Reittiere lassen Dungeon- und Schlachtzugsbosse fallen.",
+      "clickManage": "Anklicken, um Euer Reittier zu wählen",
+      "rarity_common": "Verbreitet",
+      "rarity_rare": "Selten",
+      "rarity_epic": "Episch",
+      "spec_speed": "+{pct}% zusätzliche Mobilität",
+      "name_valorsteed": "Valorross",
+      "name_grag_bear": "Goliath-Gragbär",
+      "name_stalkglider_snail": "Moosschalen-Stielgleiter",
+      "name_aether_hover_cycle": "Ätherlanzen-Schwebrad",
+      "name_shadowjump_toad": "Kama-Kage die Schattensprungkröte",
+      "name_stormfeather_griffin": "Himmelsgreif Sturmfeder",
+      "name_thunderstrut_gobbler": "Donnerstolz der Große Puter",
+      "desc_valorsteed": "Ein robustes, trittsicheres Ross, das die Reisegeschwindigkeit erhöht.",
+      "desc_grag_bear": "Ein robuster, trittsicherer Bär, der die Reisegeschwindigkeit erhöht.",
+      "desc_stalkglider_snail": "Eine herzhafte, ausdauernde Schnecke, die die Reisegeschwindigkeit erhöht.",
+      "desc_aether_hover_cycle": "Ein mächtiges Magitech-Rad für schnelles, bodennah schwebendes Kampfmanövrieren.",
+      "desc_shadowjump_toad": "Eine massige, trittsichere Riesenkröte, geschult in blitzschnellen Schattensprüngen über jedes Gelände.",
+      "desc_stormfeather_griffin": "Ein königlicher Sturmgreif, der mit runenbeschlagenen Klauen und angelegten Schwingen über den Boden pirscht.",
+      "desc_thunderstrut_gobbler": "Ein kolossaler sturmgeborener Puter, der vom Erwachenden Gipfel herabstolziert, den Schwanz gefächert wie eine Gewitterfront."
+    },
+    "mountTraining": {
+      "mountPrompt": "Drücke {key}, um das Übungs-Valorross zu besteigen.",
+      "ownedMountPrompt": "Deine Zügel sind in deinen Taschen. Benutze sie, um zu reiten.",
+      "ridePrompt": "Folge der leuchtenden Markierung zur Startlinie und drücke dann Rennen starten.",
+      "begin": "Reitstunde beginnen",
+      "success": "Du hast das Valorross gezähmt.",
+      "returnToMarla": "Kehre zu Marla in den Ställen zurück, um deine Valorross-Zügel für 10g zu kaufen."
+    },
+    "mountRace": {
+      "startButton": "Rennen starten",
+      "cancelButton": "Rennen abbrechen",
+      "go": "LOS!",
+      "start": "Los! Überspringe jedes Hindernis und reite dann zurück durch den Bogen.",
+      "toFinish": "Reite zurück durch den Bogen!",
+      "finished": "Beendet in {seconds}s!",
+      "timeout": "Rennen gescheitert",
+      "progress": "Tore {n} von {total}",
+      "timeLeft": "{seconds}s"
     },
     "vcup": {
       "title": "Der Talpokal",
@@ -1422,6 +1513,10 @@ export const de_DE: EnTranslations = {
       "twoFactorRecoveryTitle": "Speichert Eure Wiederherstellungscodes",
       "twoFactorRecoveryHint": "Jeder Code funktioniert nur einmal. Bewahrt sie an einem sicheren Ort auf: Sie sind der einzige Weg zurück, falls Ihr Eure Authentifizierungs-App verliert.",
       "twoFactorDownloadCodes": "Codes herunterladen",
+      "recoveryCodesFileHeader": "{brand}-Wiederherstellungscodes",
+      "recoveryCodesFileAccount": "Konto: {username}",
+      "recoveryCodesFileHint": "Jeder Code kann einmal verwendet werden, falls Ihr den Zugriff auf Eure Authentifizierungs-App verliert.",
+      "recoveryCodesFileWarn": "Bewahrt diese Datei an einem sicheren, privaten Ort auf.",
       "twoFactorDone": "Fertig",
       "twoFactorDisableHint": "Gebt Euer Passwort ein, um die Zwei-Faktor-Authentifizierung zu deaktivieren. Eure Wiederherstellungscodes werden verworfen.",
       "twoFactorDisableBtn": "Zwei-Faktor deaktivieren",
@@ -1463,10 +1558,12 @@ export const de_DE: EnTranslations = {
       "title": "Verwerten",
       "harvestButton": "Verwerten",
       "harvestTooltip": "Verwirft die markierten Komponenten. Jeder Kadaver kann einmal verwertet werden, wer zuerst kommt. Nimmt nicht die Beute.",
-      "concentrateHint": "Je weniger Teile du wählst, desto höher ist die Qualitätsstufe jedes einzelnen Teils.",
+      "yieldTierHint": "Je weniger Teile eine Verwertung tatsächlich entnimmt, desto höher ist die Sammelstufe jedes einzelnen Teils.",
       "nothingSelectedYields": "An diesem Kadaver gibt es nichts aus deiner Auswahl zu verwerten.",
       "alreadyHarvested": "Dieser Kadaver wurde bereits verwertet.",
       "componentAria": "{component} verwerten",
+      "componentNoYield": "noch nichts",
+      "componentAriaNoYield": "{component} verwerten: {note}",
       "components": {
         "hide": "Haut",
         "fang": "Fangzahn",
@@ -1554,6 +1651,7 @@ export const de_DE: EnTranslations = {
       "filterConsumable": "Verbrauchbares",
       "filterMaterial": "Materialien",
       "filterQuest": "Quest",
+      "filterMount": "Reittiere",
       "sortAria": "Taschengegenstände sortieren",
       "sortRecent": "Neueste",
       "sortQuality": "Qualität",
@@ -1771,6 +1869,9 @@ export const de_DE: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "Benötigt Stufe {level}",
+      "riftTier": "Riss-Gegenstand (Rang {tier})",
+      "riftUpgrade": "Riss-Aufwertung {level}/{max}",
+      "riftSockets": "Riss-Edelsteine {used}/{total}",
       "statEnchanted": "+{value} {stat} (Verzaubert)",
       "enchantedFallback": "Verzaubert"
     },
@@ -2024,8 +2125,8 @@ export const de_DE: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Abholung auf dem Weltmarkt wartet",
-      "tip": "Gold oder Gegenstände warten beim Händler auf dich."
+      "aria": "Weltmarkt-Erlöse oder Gegenstände warten",
+      "tip": "Verkaufserlöse oder zurückgegebene Gegenstände warten beim Händler auf dich."
     },
     "noticeboard": {
       "empty": "Hier scheint nichts ausgehängt zu sein."
@@ -2169,9 +2270,9 @@ export const de_DE: EnTranslations = {
       "notReady": "Dieser Ressourcenknoten ist fur dich noch nicht nachgewachsen.",
       "gatherLine": "Sie sammeln: {name}.",
       "gatherLineQty": "Sie sammeln: {name} x{qty}.",
-      "harvestLine": "You harvest: {name}.",
-      "harvestLineQty": "You harvest: {name} x{qty}.",
-      "harvestSpecimenLine": "You also recover {name}.",
+      "harvestLine": "Ihr häutet: {name}.",
+      "harvestLineQty": "Ihr häutet: {name} x{qty}.",
+      "harvestSpecimenLine": "Ihr erhaltet außerdem {name}.",
       "catchLine": "Du holst ein: {name}",
       "biteLine": "Etwas nimmt den Köder!",
       "gotAwayLine": "Es ist entkommen.",
@@ -2353,7 +2454,7 @@ export const de_DE: EnTranslations = {
       "empty": "Noch keine Rezepte bekannt.",
       "resultAria": "Basteln {name}",
       "craftedToast": "Hergestellt: {name}",
-      "craftedToastQty": "Crafted: {name} x{qty}",
+      "craftedToastQty": "Hergestellt: {name} x{qty}",
       "insufficientMaterials": "Dafür fehlen Ihnen die Materialien.",
       "unknownRecipe": "Dieses Rezept existiert nicht.",
       "comboRequirementUnmet": "Ihr besitzt nicht beide erforderlichen Berufe auf der nötigen Stufe für dieses Rezept.",
@@ -2446,13 +2547,13 @@ export const de_DE: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Du entzauberst {item}.",
-      "disenchantedYield": "You disenchant {item} into {material}.",
-      "disenchantedYieldQty": "You disenchant {item} into {material} x{qty}.",
-      "disenchantedAlso": "You also recover {material}.",
-      "disenchantedAlsoQty": "You also recover {material} x{qty}.",
+      "disenchantedYield": "Du entzauberst {item} zu {material}.",
+      "disenchantedYieldQty": "Du entzauberst {item} zu {material} x{qty}.",
+      "disenchantedAlso": "Du gewinnst außerdem {material}.",
+      "disenchantedAlsoQty": "Du gewinnst außerdem {material} x{qty}.",
       "salvagedLine": "Du zerlegst {item}.",
-      "salvagedYield": "You salvage {item} into {material}.",
-      "salvagedYieldQty": "You salvage {item} into {material} x{qty}.",
+      "salvagedYield": "Du zerlegst {item} zu {material}.",
+      "salvagedYieldQty": "Du zerlegst {item} zu {material} x{qty}.",
       "enchantAppliedLine": "Du verzauberst {item} mit {enchant}.",
       "notHeld": "Du hast diesen Gegenstand nicht.",
       "notDisenchantable": "Du kannst das nicht entzaubern.",
@@ -2477,6 +2578,7 @@ export const de_DE: EnTranslations = {
       "noEnchants": "Keine Verzauberung verwendet dieses Reagenz.",
       "noTargets": "Kein geeigneter Gegenstand zum Verzaubern.",
       "wornTag": "Angelegt ({slot})",
+      "wornTagIndexed": "Angelegt ({slot} {index})",
       "tier": {
         "base": "Basisverzauberungen",
         "runed": "Runen-Verzauberungen",
@@ -2489,14 +2591,14 @@ export const de_DE: EnTranslations = {
       "sameEnchant": "Dieser Gegenstand hat diese Verzauberung bereits.",
       "replaceTag": "Ersetzt {enchant}",
       "sameEnchantTag": "Bereits angewendet",
-      "plainTag": "Not enchanted",
+      "plainTag": "Nicht verzaubert",
       "replaceConfirmTitle": "Verzauberung auf {item} ersetzen?",
       "replaceConfirmBody": "Dies ersetzt {old} auf {item} durch {new}.",
       "replaceConfirmNoRefund": "Die alte Verzauberung wird zerstört. Ihre Materialien werden nicht erstattet. Dies kann nicht rückgängig gemacht werden.",
-      "replaceConfirmKeeps": "Kept: {kept}",
-      "replaceConfirmKeepsSigner": "Maker's mark",
-      "replaceConfirmKeepsMasterwork": "Masterwork bonus",
-      "replaceConfirmKeepsBond": "Commission bond",
+      "replaceConfirmKeeps": "Bleibt erhalten: {kept}",
+      "replaceConfirmKeepsSigner": "Zeichen des Herstellers",
+      "replaceConfirmKeepsMasterwork": "Meisterwerkbonus",
+      "replaceConfirmKeepsBond": "Auftragsbindung",
       "replaceConfirmCost": "Kosten: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Ersetzen"
@@ -2707,6 +2809,14 @@ export const de_DE: EnTranslations = {
       "lbEmpty": "Noch keine platzierten Chronisten.",
       "broadcastsLabel": "Errungene Taten mit Gilde und Freunden teilen",
       "titledName": "{name} [{title}]"
+    },
+    "continentMap": {
+      "title": "Weltkarte",
+      "summary": "Weltkarte. Wähle eine Zone, um ihre Karte zu öffnen.",
+      "toWorld": "Weltkarte",
+      "toZone": "Zonenkarte",
+      "toggleAria": "Zwischen Weltkarte und Zonenkarte wechseln",
+      "levels": "Stufe {min} bis {max}"
     }
   },
   "gatherEvent": {
@@ -2935,7 +3045,17 @@ export const de_DE: EnTranslations = {
         "marshName": "Mirefen-Moor",
         "marshBlurb": "Versunkene Sümpfe und von der Flut zernagte Ruinen, Heimat von Mudfins und Schlimmerem.",
         "peaksName": "Thornpeak-Höhen",
-        "peaksBlurb": "Windgepeitschte Grate, die zu den kältesten Gefahren des Reichs emporsteigen."
+        "peaksBlurb": "Windgepeitschte Grate, die zu den kältesten Gefahren des Reichs emporsteigen.",
+        "duskName": "Die Schleiersenke",
+        "duskBlurb": "Ein Reich, versiegelt unter den Bergen, wenn die Flüstereien von einem Weg hinein wahr sind.",
+        "emberName": "Die Drakenlande",
+        "emberBlurb": "Jenseits des Bleichen Damms weicht das Grün der Asche, und etwas Altes herrscht über die Ödnis.",
+        "frostName": "Der Frostschleier",
+        "frostBlurb": "Eine schneebedeckte Höhe jenseits jeder Karte, nur in den tanzenden Lichtern zu erahnen.",
+        "amberName": "Der Bernsteinfall",
+        "amberBlurb": "Hinter den westlichen Klippen ein Herbst, der niemals endet, und Laternen auf einem goldenen See.",
+        "fenName": "Das Weidenmoor",
+        "fenBlurb": "Hinter der herbstlichen Krone ein helles Sumpfland aus Weiden und stillem Wasser, und eine Stadt hinter einem Wallgraben."
       },
       "group": {
         "heading": "Schließt euch für die harten Stellen zusammen",
@@ -3404,6 +3524,18 @@ export const de_DE: EnTranslations = {
       "reptile": {
         "name": "Reptilien",
         "desc": "Kaltblutige Jaeger mit ihrem ganz eigenen Zischen und Schnappen, deutlich verschieden von den warmblutigen Bestien."
+      },
+      "murloc": {
+        "name": "Quakflossen",
+        "desc": "Quakendes Fischvolk aus Seeufern und Gezeitentümpeln, schnell dabei, alles zu überfallen, das zu nah heranwatet."
+      },
+      "kobold": {
+        "name": "Schelme",
+        "desc": "Huschende Aasfresser und Wichte aus Lichtung und Hecke, eher lästig als bedrohlich, bis sie sich in großer Zahl versammeln."
+      },
+      "demon": {
+        "name": "Dämonen",
+        "desc": "Eindringlinge von jenseits der Risse, ganz Feuer und Bosheit. Wo einer steht, ist ein Durchbruch nie fern."
       }
     },
     "worldPage": {
@@ -3417,15 +3549,55 @@ export const de_DE: EnTranslations = {
       "valeBlurb": "Das grüne Starttal, wo neue Helden sich an Wölfen und Banditen rund um die Stadt Eastbrook ihre ersten Sporen verdienen.",
       "marshBlurb": "Ein ertrunkenes Land aus Nebel und Ruinen. Mudfins überschwemmen das Seichte, und etwas Älteres regt sich unter dem Wasser, beobachtet aus der Brückenstadt Fenbridge.",
       "peaksBlurb": "Windgepeitschte Grate und alte Minenwerke, die zu den kältesten, höchsten Gefahren des Reichs emporsteigen, gehalten vom Außenposten Highwatch.",
+      "duskBlurb": "Ein Tal ewiger Dämmerung unter dem großen Baum von Eldergleam, wo Kristallruinen leuchten und die Luft von alter Magie summt.",
+      "emberBlurb": "Sturmerleuchtete Ödländer aus Asche und Blutglas, wo Drachen über der Caldera kreisen und Trollfeuer zwischen den Dünen brennen, überwacht von der Torstadt Wyrmwacht.",
+      "frostBlurb": "Eine Stille aus Schnee und dunklen Kiefern unter der Aurora, wo die Kälte selbst wach zu sein scheint und Icemantle seine Feuer brennend hält.",
+      "amberBlurb": "Ein ewiger Herbst aus goldenen und roten Blättern, die niemals fallen, versammelt um die laternenerleuchtete Stadt Lanternmere.",
+      "fenBlurb": "Ein helles, summendes Feuchtgebiet aus Lilien und trägem Wasser, durchquert auf alten Bohlenwegen von der Brückenstadt Bridgemere aus.",
+      "nightBlurb": "Ein Reich sternenklarer Mitternacht, wo Blumen die Pfade erleuchten und Moonrest eine stille Mahnwache unter einem träumenden Himmel hält.",
+      "hauntBlurb": "Ein verwunschener Wald unter riesigen Baumkronen, wo die Laternen von Gallowmere das einzige ehrliche Licht auf der Straße sind.",
+      "galeBlurb": "Meeresklippen und heulende Hügel, wo der Wind nie ruht, das Alte Leuchtfeuer nie erlischt, und Wickharbor seine Türen fest verschließt.",
+      "jungleBlurb": "Ein tropisches Gewirr aus Palmen, weißem Sand und lauten Vögeln, mit der Strandstadt Drifthaven, die ein Feuer am Ufer brennend hält.",
+      "gardenBlurb": "Ein Gartenreich aus Heckenlabyrinthen, noch immer gestutzt von keinem Gärtner, den je jemand gesehen hat, betreten hinter Hedgewick und seinen Brunnenhöfen.",
       "valeGreeting": "Halt deine Klinge griffbereit. Das Tal ist nicht mehr, was es war.",
       "valeGreeter": "Marschall Redbrook, Eastbrook",
       "marshGreeting": "Halt am Tor. Jenseits dieses Schilfs erledigt das Moor das Töten für uns.",
       "marshGreeter": "Wächter Fenwick, Fenbridge",
       "peaksGreeting": "Zweihundert Jahre hat diese Mauer gehalten. Unter meiner Wache wird sie nicht brechen, doch sie ächzt.",
       "peaksGreeter": "Hauptmann Thessaly, Highwatch",
+      "duskGreeting": "Nur wenige deiner Art haben unter diesen Ästen gestanden. Geh sanft, und sei willkommen.",
+      "duskGreeter": "Hüter Saelwyn, Eldergleam",
+      "emberGreeting": "Heißer Wind von den Ödländern, Drachen über dem Drakenrachen, und Trollfeuer in den Dünen. Trink etwas, bevor du dort hinausgehst.",
+      "emberGreeter": "Der Torwächter, Wyrmwacht",
+      "frostGreeting": "Jenseits der Mauer verschluckt der Schnee jeden Laut. Wenn die Lichter zu tanzen beginnen, halte deine Stimme leise und dein Feuer brennend.",
+      "frostGreeter": "Der Herdwächter, Icemantle",
+      "amberGreeting": "Jedes Blatt hier brennt in Gold und Rot, doch keines fällt jemals. Die Laternen sind für dich entzündet; achte auf den Goldmelt auf deinem Weg hinauf.",
+      "amberGreeter": "Der Laternenmacher, Lanternmere",
+      "fenGreeting": "Das Moor summt von Libellen und Bienen. Überquere die Brücke, lass deine Füße eine Weile ruhen, und bleib an den Tümpeln vorbei auf den Bohlen.",
+      "fenGreeter": "Der Brückenwärter, Bridgemere",
+      "nightGreeting": "Hinter dem Nachttor träumt die Luft selbst. Folge dem Blütenlicht, und achte auf die schlafende Welt, die am Himmel hängt.",
+      "nightGreeter": "Der Wachhüter, Moonrest",
+      "hauntGreeting": "Halte dich an die Laternen, Reisender. Und wenn der Wald deinen Namen abseits der Straße ruft, antworte ihm nicht.",
+      "hauntGreeter": "Der Laternenanzünder, Gallowmere",
+      "galeGreeting": "Der Wind hat hier noch nie aufgehört zu wehen, und das Alte Leuchtfeuer ist noch nie erloschen. Schließe die Wirtshaustür hinter dir.",
+      "galeGreeter": "Der Leuchtfeuerwärter, Wickharbor",
+      "jungleGreeting": "Warmer Sand, laute Vögel und ein Dschungel, der den Horizont verschlingt. Wir halten ein Feuer am Strand brennend; versuche, zu ihm zurückzukehren.",
+      "jungleGreeter": "Die Hafenmeisterin, Drifthaven",
+      "gardenGreeting": "Jemand stutzt noch immer die Hecken, doch seit hundert Jahren wurde kein Gärtner gesehen. Achte auf das Labyrinth: Es achtet auch auf dich.",
+      "gardenGreeter": "Der Torwächter, Hedgewick",
       "valePlaceNotes": "Eastbrook ist deine erste Heimatbasis. Der Wolfslauf und die Eberwiese sind sanftes Jagdgebiet; der Spiegelsee ist gutes Wasser zum Angeln, wenn auch Schlammflossen seine Untiefen durchschwärmen; das Sableweb und die Kupfergrube verbergen Spinnen und erzgierige Schaufler; ein Banditenlager und die Gefallene Kapelle bergen rauere Arbeit; der Reliquiarhügel führt hinab in das Eingestürzte Reliquiar, den ersten Tiefgang des Reichs; Brightwood Glade ist ein ruhiger, sonnenheller Hain im Norden; und das Saufeld ist Eastbrooks ummauerter Keilerball-Platz, auf dem der Talpokal unter einem Erntefrieden ausgetragen wird.",
       "marshPlaceNotes": "Fenbridge bewacht die einzige trockene Straße. Das Pirscher-Schilf und die Deepfen-Untiefen wimmeln von Moorbestien und Mudfins; das Witwendickicht ist dicht mit Netzen versponnen; die Ertrunkene Kapelle und die Trollhügel bergen ältere Gefahren, und die Ertrunkene Litanei, der eigene Tiefgang des Moores, öffnet sich gleich nördlich der Hügel; das Gravecaller-Lager ist der eingegrabene Kult, und die versunkene Bastion ist das instanzierte Herz des Moores.",
       "peaksPlaceNotes": "Highwatch hält die Mauer. Der Pirscherkamm und die Deeprock-Baue gehören Bergkatzen und Wühlern; die Ogervorberge und Drogmars Kriegslager den Schlägern für Sold; Stormcrag knistert vor Elementaren, und darunter leuchtet der Glimmermere, der Bergsee, an dessen Ufer das Tor aus fahlem Licht hinab zum Ertränkten Tempel liegt; die Wyrmkultzelte und die Wiedergängerfelder umringen das Hochland des Kults, mit dem Gravewyrm-Heiligtum auf seinem Gipfel.",
+      "duskPlaceNotes": "Eldergleam versammelt sich unter dem großen Baum. Die Duskfall-Höhle und ihre Aussicht sind der Weg hinein und der erste Blick auf das Tal; der Alte Hain und das Sternenfallbecken bewahren den stillen Süden; der Versunkene Hof birgt überwucherte Ruinen im Osten; und die Gleißende Tiefe und die Kristallinen Untiefen leuchten im ganzen Norden.",
+      "emberPlaceNotes": "Wyrmwacht hält das Tor. Der Torwald ist das letzte Grün vor der Ödnis; die Aschendünen wehen mit Asche und Schlimmerem; das Trollmoot ist, wo die Dünentrolle ihre Feuer versammeln; die Blutglasfelder glitzern mit rasiermesserscharfen Splittern; und die Drakenrachen-Caldera ist die rauchende Krone, um die die Drachen kreisen.",
+      "frostPlaceNotes": "Icemantle bewahrt den letzten warmen Herd. Die Schneegrenze markiert, wo die Verwehungen die Herrschaft übernehmen; der Gletschersee ist schwarzes, stilles Wasser unter dem Eis; die Aurorastufen steigen unter den tanzenden Lichtern empor; The Shiverfen ist ein gefrorenes Moor, das niemals ganz schläft; und die Heulenden Terrassen verdienen sich ihren Namen jede Nacht.",
+      "amberPlaceNotes": "Lanternmere leuchtet im Herzen der Ernte. Der Goldmelt ist der bernsteinglatte Pass hinein; der Vergoldete Obstgarten und die Erntemulde bewahren die süßeste Beute und die kühnsten Diebe; der Große See spiegelt die brennenden Blätter; die Aschenahorn-Höhe steht am höchsten und rötesten; und der Schiefe Monolith erinnert sich an etwas Älteres als den Herbst.",
+      "fenPlaceNotes": "Bridgemere liegt über dem trägen Wasser. Die Amberfen-Stufen kommen aus dem Erntegebiet herab; die Lilienmoore und die Moorglanz-Tümpel glitzern mit Irrlichtern und Libellen; Weidenweinen lässt seine Zweige in den See hängen; und die Schläfrigen Ebenen sind so sanft, wie dieses Land nur werden kann.",
+      "nightPlaceNotes": "Moonrest hält die Mahnwache. Das Nachttor ist der Weg in das Mitternachtsland; der Mondbrunnen birgt Sternenlicht, neben dem du stehen kannst; Dämmerfeld blüht im Dunkeln; die Immerwährende Wache wacht, ohne sich je zu bewegen; und der Schlaflose Grabhügel ist der einzige Ort hier, der niemals träumt.",
+      "hauntPlaceNotes": "Gallowmere duckt sich hinter seine Laternen. Das Krähentor ist die düstere Vordertür des Waldes; das Witwendickicht ist dick mit Spinnweben durchzogen; die Hängende Lichtung und die Mournstone-Kapelle bewahren die ältesten Leiden des Waldes; und die Lichtung des Jägers gehört dem, was dort immer noch jagt.",
+      "galePlaceNotes": "Wickharbor stemmt sich gegen den Wind. Der Windweg ist die Klippenstraße hinein; die Heulenden Hügel rollen baumlos unter dem Sturm; das Alte Leuchtfeuer brennt, solange sich irgendjemand erinnern kann; der Abbruch fällt senkrecht zum Wasser; die Wrackfelder halten die Küste ehrlich; und der Spiegelweiher ist das einzig Stille im ganzen Reich.",
+      "junglePlaceNotes": "Drifthaven hält sein Feuer am Strand. Die Wirrmündung ist, wo der Fluss auf die grüne Wand trifft; der Palmenstrand verläuft weiß und warm entlang der Brandung; das Smaragddickicht und der Rankenfall verschlingen das Landesinnere; die Saphirlagune leuchtet klar und tief; und das Versunkene Idol wacht unter dem Wasser.",
+      "gardenPlaceNotes": "Hedgewick wartet am Gartentor. Der Parterreweg blüht in gestutzter Farbenpracht; Schloss Dawnhold drillt seine Ritter hinter neuen Mauern; der Blütenteich treibt das ganze Jahr über rosa dahin; die Alte Mühle dreht ihre eigenen Ringbeete; das Große Labyrinth ändert für jeden Gast seine Gepflogenheiten, seine Bögen bewacht von belaubten Füchsen; die Nordwacht hält die Ausfallstraße; das Lilienbecken ruht jenseits von allem; und der Brunnenhof läuft noch immer klar im Herzen des Gartens.",
       "gladeTitle": "Eine stille Ecke: Brightwood Glade",
       "gladeBody": "Nicht jede Geschichte im Tal handelt von den Toten. Im Norden bewahrt ein sonnenheller Hain namens Brightwood Glade seinen eigenen, sanfteren Rhythmus, ganz aus stillen Pfaden und geflecktem Licht unter den Zweigen. Er ist ein sanfter Gegenklang zu der Spur, der du folgst, und einen Blick wert, wenn die Straße dir Raum zum Umherstreifen lässt.",
       "worldBossTitle": "Wenn der Gipfel erwacht: der Weltboss",
@@ -3499,6 +3671,7 @@ export const de_DE: EnTranslations = {
       "bastionBody": "Eine überflutete Festung, ans Moor verloren, gehalten von ertrunkenen Verteidigern und der steigenden Flut selbst.",
       "templeBody": "Ein versunkener Schrein abseits der Moorstraße, ein Nebenweg für die Neugierigen und gut Vorbereiteten.",
       "sanctumBody": "Das dunkle Herz von Thornpeak, wo das lange Wirken des Kults seinen schrecklichen Höhepunkt erreicht.",
+      "wildheartBody": "Eine regendurchtränkte Dschungelcaldera, in der zwei erhöhte Jagdpfade einen jadegrünen Cenote umkreisen. Durchquere Tierhöhlen und Ahnenruinen, dann erklimme die Ritualpyramide, um Zulgar entgegenzutreten.",
       "raidName": "Der Endgame-Schlachtzug",
       "raidBody": "Hinter einer versiegelten königlichen Tür wartet eine Prüfung für zehn Spieler: ein Kampf über mehrere Phasen und eine todlose Macht, die der ganze Schlachtzug gemeinsam ausschalten muss. Verdiene dir den Zutritt und bring dann neun Freunde mit.",
       "heroicTitle": "Heroischer Modus",
@@ -3742,7 +3915,7 @@ export const de_DE: EnTranslations = {
     "professions": {
       "intro": "Jenseits von Kampf und Quests belohnt dich die Welt für die Arbeit an Land und Esse: Rohstoffe sammeln, sie über zehn Handwerksgewerbe hinweg zu Ausrüstung und Waren verarbeiten und in eine Identität als einer der zehn Archetypen hineinwachsen, für die diese Gewerbe stehen.",
       "harvestTitle": "Die Jagd selbst ernten",
-      "harvestBody": "Das Sammeln hört nicht bei Knoten auf. Viele erlegte Tiere können jeweils einmal geerntet werden, nach dem Prinzip Erster kommt, Erster mahlt, für Häute, Fangzähne, Seide und Fleisch, direkt von der Leiche neben der gewöhnlichen Beute; ein Tastendruck öffnet beides. Die Wahl liegt auch jedes Mal bei dir: Streife alles ab, was die Leiche bietet, oder konzentriere dich auf weniger Komponenten und nimm eine messbar feinere Güte dessen mit, was du nimmst.\n\nEin seltener oder besserer Erntewurf bei einer exemplartragenden Familie gewährt zudem ein signiertes makelloses Exemplar (eine Makellose Haut, Makellose Seide, eine Unberührte Giftdrüse oder ein Erstklassiges Filet) zusätzlich zum gewöhnlichen Ertrag und vermerkt Ein makelloses Exemplar in deinem Buch der Taten. Jeder Charakter kann ernten, ohne Ausbildung, und jedes Sammelwerkzeug, das du besitzt, zählt für den Gütegewinn, gleichgültig, zu welchem Beruf es gehört.",
+      "harvestBodyChoice": "Das Sammeln hört nicht bei Knoten auf. Viele erlegte Tiere können jeweils einmal geerntet werden, nach dem Prinzip Erster kommt, Erster mahlt, für Häute, Fangzähne, Seide und Fleisch, direkt von der Leiche neben der gewöhnlichen Beute; ein Tastendruck öffnet beides. Trägt ein Tier mehr als eine verwertbare Komponente, so liegt die Wahl bei dir: Nimm alles mit, was es hergeben kann, oder konzentriere dich auf weniger Komponenten und nimm eine messbar feinere Güte dessen mit, was du nimmst.\n\nEin seltener oder besserer Erntewurf bei einer exemplartragenden Familie gewährt zudem ein signiertes makelloses Exemplar (eine Makellose Haut, Makellose Seide, eine Unberührte Giftdrüse oder ein Erstklassiges Filet) zusätzlich zum gewöhnlichen Ertrag und vermerkt Ein makelloses Exemplar in deinem Buch der Taten. Jeder Charakter kann ernten, ohne Ausbildung, und jedes Sammelwerkzeug, das du besitzt, zählt für den Gütegewinn, gleichgültig, zu welchem Beruf es gehört.",
       "focusTitle": "Stadtfokus",
       "focusBody": "Jede größere Stadt hält ein Stadtfokus-Panel für vorbeikommende Sammler bereit: Stell dich in die Stadt, öffne es neben der Minikarte und richte ein kleines Budget an Fokuspunkten auf die Komponententypen, die dir wichtig sind. Je mehr Fokus du einer Komponente gibst, desto feiner und reicher fällt sie von jeder späteren Leiche ab; deine Verteilung folgt deinem Charakter, wohin er auch zieht, und du kannst sie bei jedem späteren Besuch in der Stadt kostenlos umarbeiten.",
       "craftHowTitle": "Das Handwerksfenster",
@@ -5033,6 +5206,57 @@ export const de_DE: EnTranslations = {
     "chat": "Chat öffnen"
   },
   "sim": {
+    "rift": {
+      "allUnstable": "Alle Risse sind gerade instabil. Versuche es bald noch einmal.",
+      "enterFloor": "Du trittst durch den Riss nach {name}.",
+      "descendFloor": "Du steigst tiefer hinab in {name}.",
+      "stepBack": "Du trittst zurück durch den Riss.",
+      "pylonLit": "Ein Runenpylon erwacht flammend zum Leben ({lit}/{total}).",
+      "wayDownOpens": "Der Weg hinab reißt auf.",
+      "exitOpens": "Der Riss erzittert. Hinter den Gefallenen reißt ein Weg nach Hause auf.",
+      "portalOpens": "Ein Riss vom Rang {tier} reißt in {zone} auf!",
+      "portalSealed": "Der Riss vom Rang {tier} in {zone} wurde versiegelt.",
+      "portalCollapses": "Der Riss vom Rang {tier} in {zone} bricht zusammen.",
+      "levelGate": "Nur Abenteurer der Stufe {level} oder höher dürfen diesen Riss betreten.",
+      "deadEntry": "Du kannst keinen Riss betreten, während du tot bist.",
+      "deadEntryCombat": "Deine Gruppe befindet sich noch im Kampf. Die Toten können erneut eintreten, sobald der Kampf endet.",
+      "iceGoalLit": "Das Frostsiegel entflammt. Der Weg regt sich.",
+      "socketsShut": "Die Fassungen schließen sich knirschend. Der Weg regt sich.",
+      "seqProgress": "Die Runen antworten nacheinander ({step}/{total}).",
+      "seqReset": "Die Runen erlöschen. Beginne von vorn.",
+      "gateOpen": "Das Tor öffnet sich knirschend.",
+      "orbSealed": "Die Kugel ist durch das Ritual darunter versiegelt.",
+      "orbWakes": "Die Flamme des Pentagramms erlischt flackernd. Etwas erwacht auf dem Altar.",
+      "orbOpensGate": "Die Blutkugel flammt auf. Die Tore des Tempels öffnen sich knirschend.",
+      "alreadyCleared": "Dieser Riss wurde bereits von {names} bereinigt.",
+      "raceLost": "Der Riss wurde bereits von {names} bereinigt. Dein Lauf endet.",
+      "raceWorldWin": "{names} hat das Riss-Rennen vom Rang {tier} in {seconds}s gewonnen!",
+      "raceWinBanner": "Riss-Rennen gewonnen - {seconds}s",
+      "raceLostBanner": "Riss bereits bereinigt",
+      "forgeUpgraded": "Riss-Aufwertung für {name} abgeschlossen.",
+      "forgeEnchanted": "Riss-Verzauberung für {name} abgeschlossen.",
+      "forgeSocketed": "Riss-Edelstein für {name} eingesetzt.",
+      "detonateGlacialGrave": "Gletschergrab detoniert!",
+      "detonateAbsoluteZero": "Absoluter Nullpunkt bricht aus!",
+      "detonateMagmaWell": "Magmaquelle bricht aus!",
+      "detonateCoreMeltdown": "Kernschmelze detoniert!",
+      "detonateVenomPool": "Gifttümpel bricht aus!",
+      "detonateBroodmothersMark": "Mal der Brutmutter detoniert!",
+      "detonateSoulGrave": "Seelengrab detoniert!",
+      "detonateDeathSentence": "Todesurteil fällt!",
+      "detonateEarthshatter": "Erdspalter detoniert!",
+      "detonateFinalJudgment": "Letztes Urteil trifft ein!",
+      "detonateVoidRift": "Leerenriss detoniert!",
+      "detonateArcaneAnnihilation": "Arkane Auslöschung bricht aus!",
+      "detonateLightningRod": "Blitzableiter schlägt ein!",
+      "detonateStormcallersWrath": "Zorn des Sturmrufers bricht aus!",
+      "detonateAbyssalMaw": "Abgrundrachen schließt sich!",
+      "detonateCrushingDepth": "Erdrückende Tiefe zermalmt!",
+      "detonatePactSeal": "Paktsiegel detoniert!",
+      "detonateBloodRite": "Blutritus fällt!",
+      "detonatePitSentence": "Grubenurteil detoniert!",
+      "detonateHellfireBrand": "Höllenfeuerbrand detoniert!"
+    },
     "delve": {
       "cannotEnterNow": "Du kannst jetzt keinen Tiefgang betreten.",
       "leaveDungeonFirst": "Verlasse zuerst den Dungeon.",
@@ -5516,6 +5740,7 @@ export const de_DE: EnTranslations = {
     },
     "augment": {
       "choose": "Wählt eine Augmentierung",
+      "cardAria": "{name} ({category}): {description}",
       "aug_brutality": {
         "name": "Brutalität",
         "desc": "Eure physischen Schläge treffen 15% härter."
@@ -5886,6 +6111,8 @@ export const de_DE: EnTranslations = {
       "secondsRemaining": "Noch {seconds} Sekunden",
       "enteringZone": "Betrete {zone}.",
       "welcomeZone": "Willkommen in {zone}!",
+      "riftLabel": "{name}",
+      "riftLabelRanked": "{name} ({rank})",
       "levelBanner": "Stufe {level}!",
       "levelLog": "Ihr habt Stufe {level} erreicht!",
       "xpGain": "Ihr erhaltet {amount} Erfahrung.",
@@ -6138,6 +6365,8 @@ export const de_DE: EnTranslations = {
       "floatingDodge": "Ausgewichen",
       "floatingParry": "Pariert",
       "floatingResist": "Widerstand",
+      "floatingHealFull": "Voll",
+      "floatingHealAbsorbed": "Absorbiert",
       "cannotMove": "Bewegungsunfähig!",
       "attack": "Angriff",
       "damageDone": "Euer {ability} trifft {target} für {amount}.",
@@ -6152,6 +6381,10 @@ export const de_DE: EnTranslations = {
       "healSelfCrit": "Euer {ability} heilt Euch kritisch um {amount}.",
       "healOther": "Euer {ability} heilt {target} um {amount}.",
       "healOtherCrit": "Euer {ability} heilt {target} kritisch um {amount}.",
+      "healSelfFull": "Euer {ability} landet, aber Ihr habt bereits volle Gesundheit.",
+      "healOtherFull": "Euer {ability} landet auf {target}, aber das Ziel hat bereits volle Gesundheit.",
+      "healSelfAbsorbed": "Dein {ability} wird von der Seuche auf dir verschlungen.",
+      "healOtherAbsorbed": "Dein {ability} wird von der Seuche auf {target} verschlungen.",
       "death": "{name} stirbt.",
       "auraGain": "Ihr erhaltet {name}.",
       "auraFade": "{name} schwindet von Euch.",
@@ -6240,6 +6473,7 @@ export const de_DE: EnTranslations = {
       "arenaQueueTrading": "Beendet Euren Handel, bevor Ihr Euch anmeldet.",
       "arenaQueueInstance": "Aus einer Instanz heraus könnt Ihr Euch nicht anmelden.",
       "tradeInProgress": "Es läuft bereits ein Handel.",
+      "tradeAlreadyTrading": "That player is already trading.",
       "tradeTooFar": "Das Ziel ist zu weit entfernt zum Handeln.",
       "tradeExpired": "Die Handelsanfrage ist abgelaufen.",
       "tradeFailed": "Handel fehlgeschlagen: Gegenstände oder Geld sind nicht mehr verfügbar.",
@@ -6510,7 +6744,23 @@ export const de_DE: EnTranslations = {
       "fishing": "Angeln",
       "gathering": "Sammeln",
       "demonHeal": "Dämonenheilung",
-      "thunzharrStormcall": "Sturmruf"
+      "thunzharrStormcall": "Sturmruf",
+      "rift_frost_execution": "Gletschergrab",
+      "rift_frost_strike": "Absoluter Nullpunkt",
+      "rift_ember_execution": "Magmaquelle",
+      "rift_ember_strike": "Kernschmelze",
+      "rift_venom_execution": "Gifttümpel",
+      "rift_venom_strike": "Mal der Brutmutter",
+      "rift_necro_execution": "Seelengrab",
+      "rift_necro_strike": "Todesurteil",
+      "rift_brute_execution": "Erdspalter",
+      "rift_brute_strike": "Letztes Urteil",
+      "rift_arcane_execution": "Leerenriss",
+      "rift_arcane_strike": "Arkane Auslöschung",
+      "rift_storm_execution": "Blitzableiter",
+      "rift_storm_strike": "Zorn des Sturmrufers",
+      "rift_tide_execution": "Abgrundrachen",
+      "rift_tide_strike": "Erdrückende Tiefe"
     }
   },
   "questUi": {
@@ -6627,7 +6877,8 @@ export const de_DE: EnTranslations = {
       "tool": "Werkzeug",
       "potion": "Trank",
       "elixir": "Elixier",
-      "bag": "Tasche"
+      "bag": "Tasche",
+      "mount": "Reittier"
     },
     "stats": {
       "armor": "Rüstung",
@@ -9171,6 +9422,312 @@ export const de_DE: EnTranslations = {
       "resonant_timber": {
         "name": "Resonantes Holz"
       },
+      "duskwisp_essence": {
+        "name": "Dämmerirrlicht-Essenz"
+      },
+      "spore_heart": {
+        "name": "Sporenherz"
+      },
+      "gleaming_antler": {
+        "name": "Schimmerndes Geweih"
+      },
+      "wisp_mote": {
+        "name": "Irrlichtstaub"
+      },
+      "starfall_shard": {
+        "name": "Sternenfall-Splitter"
+      },
+      "elder_bark": {
+        "name": "Ältestenrinde"
+      },
+      "hollow_sealstone": {
+        "name": "Der Siegelstein der Senke"
+      },
+      "monument_overlook": {
+        "name": "Verwitterte Gedenksäule"
+      },
+      "monument_court": {
+        "name": "Versunkene Gedenksäule"
+      },
+      "monument_north": {
+        "name": "Vergessene Gedenksäule"
+      },
+      "guardian_core": {
+        "name": "Wächterkern"
+      },
+      "wardens_seal": {
+        "name": "Das Siegel des Wächters"
+      },
+      "gleamstag_charm": {
+        "name": "Glanzhirsch-Talisman"
+      },
+      "veilsteel_blade": {
+        "name": "Schleierstahlklinge"
+      },
+      "duskfang_dirk": {
+        "name": "Dämmerfang-Dolch"
+      },
+      "gleamwood_stave": {
+        "name": "Glanzholzstab"
+      },
+      "wardens_oathband": {
+        "name": "Schwurband des Wächters"
+      },
+      "wardplate_cuirass": {
+        "name": "Wachtplatten-Kürass"
+      },
+      "nightweave_tunic": {
+        "name": "Nachtgewebe-Wams"
+      },
+      "veilcloth_robe": {
+        "name": "Schleiertuch-Robe"
+      },
+      "rift_essence": {
+        "name": "Riss-Essenz"
+      },
+      "rift_gem_crimson": {
+        "name": "Karminroter Riss-Edelstein"
+      },
+      "rift_gem_azure": {
+        "name": "Azurblauer Riss-Edelstein"
+      },
+      "rift_gem_verdant": {
+        "name": "Grüner Riss-Edelstein"
+      },
+      "riftbound_band_of_might": {
+        "name": "Rissgebundener Reif der Macht"
+      },
+      "riftbound_band_of_insight": {
+        "name": "Rissgebundener Reif der Einsicht"
+      },
+      "riftbound_band_of_guile": {
+        "name": "Rissgebundener Reif der Arglist"
+      },
+      "hoarfrost_edge": {
+        "name": "Raureifklinge"
+      },
+      "emberforge_gauntlets": {
+        "name": "Glutschmiede-Stulpen"
+      },
+      "broodmother_carapace": {
+        "name": "Brutmutter-Panzer"
+      },
+      "bonelord_mantle": {
+        "name": "Knochenfürst-Umhang"
+      },
+      "graskbreaker_girdle": {
+        "name": "Graskbrecher-Gürtel"
+      },
+      "voidscar_handwraps": {
+        "name": "Leerennarbe-Handbandagen"
+      },
+      "stormscale_treads": {
+        "name": "Sturmschuppen-Tritte"
+      },
+      "abyssal_loop": {
+        "name": "Abgrundreif"
+      },
+      "pactbound_vestments": {
+        "name": "Paktgebundenes Gewand"
+      },
+      "pitlords_cleaver": {
+        "name": "Hackmesser des Grubenfürsten"
+      },
+      "emberforged_bulwark": {
+        "name": "Glutgeschmiedetes Bollwerk"
+      },
+      "stormsunder_hood": {
+        "name": "Sturmspalter-Kapuze"
+      },
+      "voidweave_mantle": {
+        "name": "Leerengewebe-Umhang"
+      },
+      "abysswrought_band": {
+        "name": "Abgrundgeschmiedeter Reif"
+      },
+      "heart_of_the_rift": {
+        "name": "Herz des Risses"
+      },
+      "voidsong_dirk": {
+        "name": "Voidsong, Dolch des Zerrissenen Schleiers"
+      },
+      "wildheart_tuskblade": {
+        "name": "Wildheart-Stoßzahnklinge"
+      },
+      "wildheart_hexwood_staff": {
+        "name": "Hexenwald-Stab des Beckens"
+      },
+      "wildheart_fangknife": {
+        "name": "Zulgars Fangmesser"
+      },
+      "thick_winter_pelt": {
+        "name": "Dickes Winterfell"
+      },
+      "aurora_mote": {
+        "name": "Aurorafunke"
+      },
+      "hearth_ember_cache": {
+        "name": "Glutversteck"
+      },
+      "sprung_trap": {
+        "name": "Ausgelöste Moorfalle"
+      },
+      "hearthlined_treads": {
+        "name": "Herdgefütterte Tritte"
+      },
+      "frostmane_mantle": {
+        "name": "Umhang der Frostmähne"
+      },
+      "ashbone_war_brand": {
+        "name": "Aschenknochen-Kriegsklinge"
+      },
+      "emberwing_scale": {
+        "name": "Glutschwingen-Schuppe"
+      },
+      "scorched_supply_crate": {
+        "name": "Versengte Vorratskiste"
+      },
+      "wyrmwatch_warning_banner": {
+        "name": "Wyrmwacht-Warnbanner"
+      },
+      "cinderwalk_treads": {
+        "name": "Aschenpfad-Tritte"
+      },
+      "mawscale_pauldrons": {
+        "name": "Rachenschuppen-Schulterstücke"
+      },
+      "gilded_sap_clot": {
+        "name": "Vergoldeter Harzklumpen"
+      },
+      "amberfall_sap_bucket": {
+        "name": "Harzzapf-Eimer"
+      },
+      "mere_ferry_lantern": {
+        "name": "Fährlaterne"
+      },
+      "orchard_sapbinder_grips": {
+        "name": "Harzbinder-Griffe"
+      },
+      "mantle_of_the_meredark": {
+        "name": "Umhang des Seedunkels"
+      },
+      "plump_fen_eel": {
+        "name": "Praller Moor-Aal"
+      },
+      "wisplight_globe": {
+        "name": "Irrlichtkugel"
+      },
+      "fenway_mooring_line": {
+        "name": "Durchtrennte Festmacherleine"
+      },
+      "bridgemere_toll_chest": {
+        "name": "Versunkene Zolltruhe"
+      },
+      "eelskin_mudwaders": {
+        "name": "Aalhaut-Schlammwatstiefel"
+      },
+      "lilybed_mantle": {
+        "name": "Umhang des Lilienbeets"
+      },
+      "moonfleece_tuft": {
+        "name": "Mondvlies-Büschel"
+      },
+      "gloamfield_nightbloom": {
+        "name": "Nachtblüte"
+      },
+      "vigil_star_chart": {
+        "name": "Sternenkarte der Wache"
+      },
+      "barrow_grave_offering": {
+        "name": "Verstreute Grabgabe"
+      },
+      "moonfleece_mitts": {
+        "name": "Mondvlies-Handschuhe"
+      },
+      "barrowshade_mantle": {
+        "name": "Grabhügelschatten-Umhang"
+      },
+      "widowsilk_skein": {
+        "name": "Witwenseiden-Strang"
+      },
+      "gallowmere_grave_candle": {
+        "name": "Grabkerze"
+      },
+      "silkbound_remains": {
+        "name": "Seidenumhüllte Überreste"
+      },
+      "gravebound_silk_wraps": {
+        "name": "Grabgebundene Seidenbandagen"
+      },
+      "mantle_of_the_unhorsed": {
+        "name": "Umhang des Entsattelten"
+      },
+      "pearlwake_cargo_crate": {
+        "name": "Pearlwake-Frachtkiste"
+      },
+      "canopy_silk_hank": {
+        "name": "Kronendach-Seidenstrang"
+      },
+      "sunken_offering_bowl": {
+        "name": "Nachgefüllte Opferschale"
+      },
+      "saltwalker_sandals": {
+        "name": "Salzwanderer-Sandalen"
+      },
+      "sunken_idol_mantle": {
+        "name": "Umhang des Versunkenen Idols"
+      },
+      "hedgewick_shears": {
+        "name": "Gestohlene Hedgewick-Schere"
+      },
+      "evergarden_bloom_clipping": {
+        "name": "Gestutzter Blütenschnitt"
+      },
+      "hedgewick_tool_cart": {
+        "name": "Umgekippter Werkzeugkarren"
+      },
+      "evergarden_statue_rubbing": {
+        "name": "Statuenabdruck"
+      },
+      "shearkeeper_gloves": {
+        "name": "Abbruchwächter-Handschuhe"
+      },
+      "fountain_court_mantle": {
+        "name": "Umhang des Brunnenhofs"
+      },
+      "galecrest_ram_wool": {
+        "name": "Fettige Widderwolle"
+      },
+      "shear_storm_lantern": {
+        "name": "Gelöschte Sturmlaterne"
+      },
+      "wreckfield_flotsam_crate": {
+        "name": "Strandgutkiste"
+      },
+      "wickspun_treads": {
+        "name": "Dochtgesponnene Tritte"
+      },
+      "wreck_wardens_mantle": {
+        "name": "Umhang des Wrackwächters"
+      },
+      "breakscarred_steel": {
+        "name": "Bruchvernarbter Stahl"
+      },
+      "farshore_salt_moss": {
+        "name": "Farshore-Salzmoos"
+      },
+      "gullhaven_watchbell": {
+        "name": "Küstenwachglocke"
+      },
+      "saltforged_grips": {
+        "name": "Salzgeschmiedete Griffe"
+      },
+      "mantle_of_the_unbroken_shore": {
+        "name": "Umhang der Ungebrochenen Küste"
+      },
+      "last_keep_signet": {
+        "name": "Siegelring von Last Keep"
+      },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"
       },
@@ -9902,6 +10459,30 @@ export const de_DE: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Gürtelschutz des Sturmrufers"
+      },
+      "riding_training": {
+        "name": "Reitausbildung"
+      },
+      "reins_valorsteed": {
+        "name": "Zügel des Valorross"
+      },
+      "reins_grag_bear": {
+        "name": "Zügel des Goliath-Gragbären"
+      },
+      "reins_stalkglider_snail": {
+        "name": "Zügel des Moosschalen-Stielgleiters"
+      },
+      "reins_aether_hover_cycle": {
+        "name": "Zündschlüssel: Ätherlanzen-Schwebrad"
+      },
+      "reins_shadowjump_toad": {
+        "name": "Zügel von Kama-Kage der Schattensprungkröte"
+      },
+      "reins_stormfeather_griffin": {
+        "name": "Zügel des Himmelsgreifs Sturmfeder"
+      },
+      "reins_thunderstrut_gobbler": {
+        "name": "Zügel von Donnerstolz, dem Großen Puter"
       }
     },
     "mobs": {
@@ -10151,6 +10732,312 @@ export const de_DE: EnTranslations = {
       "thunzharr_stormling": {
         "name": "Geweckter Sturmling"
       },
+      "stable_horse": {
+        "name": "Stallpferd"
+      },
+      "rift_spawnling": {
+        "name": "Riss-Brutling"
+      },
+      "rift_bonewalker": {
+        "name": "Erstandener Knochenwandler"
+      },
+      "rift_frost_revenant": {
+        "name": "Frostgebundener Wiedergänger"
+      },
+      "rift_rime_elemental": {
+        "name": "Reif-Elementar"
+      },
+      "rift_ember_fiend": {
+        "name": "Glutdämon"
+      },
+      "rift_magma_brute": {
+        "name": "Magmakoloss"
+      },
+      "rift_venom_weaver": {
+        "name": "Giftweber"
+      },
+      "rift_thornback": {
+        "name": "Dornrücken-Pirscher"
+      },
+      "rift_boneclad": {
+        "name": "Knochengepanzerter Krieger"
+      },
+      "rift_marrow_troll": {
+        "name": "Knochenmark-Troll"
+      },
+      "rift_void_acolyte": {
+        "name": "Leerennarbe-Akolyth"
+      },
+      "rift_dread_stalker": {
+        "name": "Furchtpirscher"
+      },
+      "rift_storm_caller": {
+        "name": "Sturmrufer"
+      },
+      "rift_stormscale": {
+        "name": "Sturmschuppen-Drache"
+      },
+      "rift_tide_thrall": {
+        "name": "Gezeitenknecht"
+      },
+      "rift_deep_lurker": {
+        "name": "Tiefenlauerer"
+      },
+      "rift_stone_ogre": {
+        "name": "Steinoger"
+      },
+      "rift_boss_frost": {
+        "name": "Raureif-Wächter"
+      },
+      "rift_boss_ember": {
+        "name": "Glutschmiede-Tyrann"
+      },
+      "rift_boss_venom": {
+        "name": "Brutmutter Vysska"
+      },
+      "rift_boss_necro": {
+        "name": "Knochenfürst Xarreth"
+      },
+      "rift_boss_brute": {
+        "name": "Kriegsherr Grask"
+      },
+      "rift_boss_arcane": {
+        "name": "Archont Nyxaris"
+      },
+      "rift_boss_storm": {
+        "name": "Sturmfürst Vharok"
+      },
+      "rift_boss_tide": {
+        "name": "Abgrundrachen"
+      },
+      "glimmerwisp": {
+        "name": "Glimmerirrlicht"
+      },
+      "duskwisp": {
+        "name": "Dämmerirrlicht"
+      },
+      "veiled_stag": {
+        "name": "Verschleierter Hirsch"
+      },
+      "veiled_doe": {
+        "name": "Verschleierte Hirschkuh"
+      },
+      "gleamstag": {
+        "name": "Der Glanzhirsch"
+      },
+      "sporeling_gatherer": {
+        "name": "Sporenling-Sammler"
+      },
+      "corrupted_sporeling": {
+        "name": "Verdorbener Sporenling"
+      },
+      "mushroom_pixie": {
+        "name": "Glanzvolk-Fee"
+      },
+      "treant_elder": {
+        "name": "Alter Baumhüter"
+      },
+      "ancient_guardian": {
+        "name": "Alter Wächter"
+      },
+      "waking_warden": {
+        "name": "Der Erwachende Wächter"
+      },
+      "old_marrowshell": {
+        "name": "Alter Marrowshell"
+      },
+      "aurelhorn": {
+        "name": "Aurelhorn, Erster der Herde"
+      },
+      "snowdrift_wolf": {
+        "name": "Schneewehen-Wolf"
+      },
+      "ice_wisp": {
+        "name": "Eisirrlicht"
+      },
+      "rime_elemental": {
+        "name": "Reif-Elementar"
+      },
+      "fen_sprite": {
+        "name": "Moorwicht"
+      },
+      "frostmane_yeti": {
+        "name": "Frostmähnen-Yeti"
+      },
+      "terrace_howler": {
+        "name": "Terrassenheuler"
+      },
+      "apprentice_wren": {
+        "name": "Lehrling Wren"
+      },
+      "emberwing_drake": {
+        "name": "Glutschwingen-Drache"
+      },
+      "ashbone_raider": {
+        "name": "Aschenknochen-Plünderer"
+      },
+      "ashbone_warcaller": {
+        "name": "Aschenknochen-Kriegsrufer"
+      },
+      "dune_troll": {
+        "name": "Dünentroll"
+      },
+      "cindraleth_maw_matriarch": {
+        "name": "Cindraleth, die Rachen-Matriarchin"
+      },
+      "gilded_stag": {
+        "name": "Vergoldeter Hirsch"
+      },
+      "gloam_fox": {
+        "name": "Dämmerfuchs"
+      },
+      "orchard_treant": {
+        "name": "Obstgarten-Baumhüter"
+      },
+      "the_meredark": {
+        "name": "Der Seedunkel"
+      },
+      "harvest_sprite": {
+        "name": "Erntewicht"
+      },
+      "mere_lurker": {
+        "name": "Seelauerer"
+      },
+      "bogtoad": {
+        "name": "Sumpfkröte"
+      },
+      "drowsy_croaker": {
+        "name": "Der Schläfrige Quaker"
+      },
+      "lily_wisp": {
+        "name": "Lilienirrlicht"
+      },
+      "willow_sprite": {
+        "name": "Weidenwicht"
+      },
+      "moonfleece_grazer": {
+        "name": "Mondvlies-Weidetier"
+      },
+      "gloam_strider": {
+        "name": "Dämmerschreiter"
+      },
+      "nightkin_stargazer": {
+        "name": "Nachtvolk-Sternseher"
+      },
+      "barrow_king": {
+        "name": "Der Grabhügelkönig"
+      },
+      "barrow_wight": {
+        "name": "Grabhügel-Wiedergänger"
+      },
+      "widowsilk_spinner": {
+        "name": "Witwenseiden-Spinner"
+      },
+      "wood_wraith": {
+        "name": "Waldschemen"
+      },
+      "gravenbark_shambler": {
+        "name": "Grabrinden-Schlurfer"
+      },
+      "pale_huntsman": {
+        "name": "Der Bleiche Jäger"
+      },
+      "gravedigger_mosley": {
+        "name": "Totengräber Mosley"
+      },
+      "tide_scuttler": {
+        "name": "Gezeitenkrabbler"
+      },
+      "thicket_boar": {
+        "name": "Dickichteber"
+      },
+      "canopy_weaver": {
+        "name": "Kronendachweber"
+      },
+      "idol_guardian": {
+        "name": "Der Idolwächter"
+      },
+      "castaway_navigator": {
+        "name": "Navigatorin Suli"
+      },
+      "topiary_stag": {
+        "name": "Formschnitt-Hirsch"
+      },
+      "topiary_wolf": {
+        "name": "Formschnitt-Wolf"
+      },
+      "hedge_gnome": {
+        "name": "Heckengnom"
+      },
+      "hedge_knight": {
+        "name": "Ritter von Dawnhold"
+      },
+      "the_topiary_bull": {
+        "name": "Der Formschnitt-Stier"
+      },
+      "moor_ram": {
+        "name": "Moorwidder"
+      },
+      "gale_wisp": {
+        "name": "Sturmirrlicht"
+      },
+      "shoal_scuttler": {
+        "name": "Untiefen-Krabbler"
+      },
+      "downs_bandit": {
+        "name": "Hügelland-Bandit"
+      },
+      "wreck_thief": {
+        "name": "Wrackfeld-Dieb"
+      },
+      "the_wreck_warden": {
+        "name": "Der Wrackwächter"
+      },
+      "drowned_deckhand": {
+        "name": "Ertrunkener Decksmann"
+      },
+      "riftspawn": {
+        "name": "Rissbrut"
+      },
+      "breach_wretch": {
+        "name": "Breschenwicht"
+      },
+      "void_stalker": {
+        "name": "Leerenpirscher"
+      },
+      "sundered_horror": {
+        "name": "Der Zerrissene Schrecken"
+      },
+      "fisher_bram": {
+        "name": "Fischer Bram"
+      },
+      "rift_hellguard": {
+        "name": "Höllenwächter"
+      },
+      "rift_pact_acolyte": {
+        "name": "Pakt-Akolyth"
+      },
+      "rift_boss_ritualist": {
+        "name": "Magus Vel'Kor der Paktgebundene"
+      },
+      "rift_boss_pitlord": {
+        "name": "Azgorath, Fürst der Grube"
+      },
+      "wildheart_stalker": {
+        "name": "Rankenklauen-Pirscher"
+      },
+      "wildheart_ravager": {
+        "name": "Blutmähnen-Verwüster"
+      },
+      "wildheart_hexcaller": {
+        "name": "Sonnenknochen-Hexenrufer"
+      },
+      "wildheart_beastmaster": {
+        "name": "Fangfürst, Bestienmeister"
+      },
+      "wildheart_high_priest": {
+        "name": "Zulgar, Stimme des Beckens"
+      },
       "ironvein_foreman": {
         "name": "Eisenader-Vorarbeiter"
       },
@@ -10304,6 +11191,11 @@ export const de_DE: EnTranslations = {
         "title": "Minenvorarbeiter",
         "greeting": "Der ganze Stollen wimmelt von diesem schlammverkrusteten Ungeziefer!"
       },
+      "stablemaster_marla": {
+        "name": "Marla Hitchen",
+        "title": "Stallmeisterin",
+        "greeting": "Jeder Reiter kommt auf zwei Beinen herein, {className}. Die Zügel gebe ich erst, wenn Ihr den Valorross reiten könnt, ohne im Dreck zu landen, und Highwatch hat keine Heiler für gebrochene Knochen übrig."
+      },
       "warden_fenwick": {
         "name": "Wärter Fenwick",
         "title": "Wärter von Fenbridge",
@@ -10433,6 +11325,246 @@ export const de_DE: EnTranslations = {
         "name": "Chronistin Zenzie",
         "title": "Chronik der Gipfel",
         "greeting": "Der Berg vergisst nichts, {playerName}, und ich ebenso wenig. Sehen wir uns an, was du vollbracht hast."
+      },
+      "keeper_saelwyn": {
+        "name": "Hüter Saelwyn",
+        "title": "Hüter von Veiled Hollow",
+        "greeting": "Nur wenige deiner Art haben unter diesen Ästen gestanden, {className}. Geh sanft, und sei willkommen."
+      },
+      "loremother_bryn": {
+        "name": "Wissensmutter Bryn",
+        "title": "Stimme des Schreins",
+        "greeting": "Jedes Licht in diesem Tal erinnert sich an etwas, {playerName}. Hilf mir zuzuhören."
+      },
+      "provisioner_fenna": {
+        "name": "Versorgerin Fenna",
+        "title": "Versorgerin von Eldergleam",
+        "greeting": "Brot noch warm, Wasser noch süß. Veiled Hollow versorgt, und ich auch."
+      },
+      "wardsmith_orun": {
+        "name": "Bannschmied Orun",
+        "title": "Hüter der Alten Schmieden",
+        "greeting": "Diese Schmieden erkalteten vor Jahrhunderten, {className}, aber ihre Arbeit hält noch immer eine Schneide."
+      },
+      "archivist_tullo": {
+        "name": "Archivar Tullo",
+        "title": "Leser der Steine",
+        "greeting": "Die Monumente da draußen haben seit einer Ewigkeit zu niemandem gesprochen. Vielleicht warteten sie auf frische Ohren."
+      },
+      "huntsman_deral": {
+        "name": "Jäger Deral",
+        "title": "Wächter der Herden",
+        "greeting": "Still jetzt. Die Herde kennt jeden Laut, den dieses Tal macht, und ich auch."
+      },
+      "warden_kaldra": {
+        "name": "Wächterin Kaldra",
+        "title": "Wächterin von Icemantle",
+        "greeting": "Achte auf die Bänke, Fremder. Der Schnee behält, was er nimmt."
+      },
+      "hearthkeeper_maeve": {
+        "name": "Herdhüterin Maeve",
+        "title": "Hüterin der Herdhütte",
+        "greeting": "Komm herein aus der Kälte. Das Hüttenfeuer erlischt nie, solange ich noch atme."
+      },
+      "scout_einna": {
+        "name": "Späherin Einna",
+        "title": "Kundschafterin der Schneegrenze",
+        "greeting": "Du bist den Pass lebend gegangen. Gut. Icemantle sollte davon hören."
+      },
+      "aurorist_veyla": {
+        "name": "Aurora-Deuterin Veyla",
+        "title": "Deuterin der Lichter",
+        "greeting": "Still. Die Lichter sprechen heute Nacht, und sie wiederholen sich nicht."
+      },
+      "trapper_brosk": {
+        "name": "Fallensteller Brosk",
+        "title": "Fallensteller von Shiverfen",
+        "greeting": "Das Moor hat mir diese Woche drei Leinen genommen. Das Moor hat in zwanzig Jahren nie eine Leine genommen."
+      },
+      "gatecaptain_brannoc": {
+        "name": "Torhauptmann Brannoc",
+        "title": "Kommandant von Wyrmwacht",
+        "greeting": "Wyrmwacht hält das Tor. Hat es vierzig Jahre lang gehalten. Wird es heute Nacht halten."
+      },
+      "quartermaster_sela": {
+        "name": "Quartiermeisterin Sela",
+        "title": "Hüterin der Garnisonsvorräte",
+        "greeting": "Jede Kiste in diesem Hof hat vierzig Meilen Asche überquert, um hierherzukommen. Behandle sie gut."
+      },
+      "scout_yerrin": {
+        "name": "Späherin Yerrin",
+        "title": "Wächterin der Fernen Dünen",
+        "greeting": "Bleib niedrig. Der Schall trägt sich seltsam über das Glas, und das Tor unten hat Ohren."
+      },
+      "reeve_ottoline": {
+        "name": "Vogtin Ottoline",
+        "title": "Vogtin von Lanternmere",
+        "greeting": "Willkommen in Lanternmere, wo die Ernte nie endet und die Arbeit auch nicht."
+      },
+      "waywatcher_sorrel": {
+        "name": "Wegwächterin Sorrel",
+        "title": "Wächterin des Goldmelt",
+        "greeting": "Schnee hinter dir, Gold voraus. Nur wenige gehen den Goldmelt zweimal, also lass die Überquerung zählen."
+      },
+      "ferrymaster_caddow": {
+        "name": "Fährmeister Caddow",
+        "title": "Hüter der Laternenfähren",
+        "greeting": "Nebel liegt wieder auf dem See. Wenn die Laternen auf dem Wasser erlöschen, bleiben kluge Leute an Land."
+      },
+      "orchardist_pomeline": {
+        "name": "Obstgärtnerin Pomeline",
+        "title": "Hüterin der Vergoldeten Reihen",
+        "greeting": "Achte auf deine Schritte. Jede Wurzel in diesen Reihen ist älter als die Stadt, und sie erinnern sich."
+      },
+      "waykeeper_pell": {
+        "name": "Wegwart Pell",
+        "title": "Hüter der Amberfen-Stufen",
+        "greeting": "Die Stufen hinab und hinein ins sanfte Land. Achte darauf, wo du deine Stiefel hinsetzt."
+      },
+      "bridgewright_alden": {
+        "name": "Brückenbaumeister Alden",
+        "title": "Meister des Fenway",
+        "greeting": "Jedes Brett in dieser Stadt ist meins zu hüten, und das Moor nagt an ihnen allen."
+      },
+      "netter_maris": {
+        "name": "Netzerin Maris",
+        "title": "Aalfängerin von Bridgemere",
+        "greeting": "Riechst du das? Geräucherter Aal. Die halbe Stadt steht auf Pfählen, die ich damit bezahlt habe."
+      },
+      "mother_sedge": {
+        "name": "Mutter Sedge",
+        "title": "Moorhexe von Willowweep",
+        "greeting": "Die Weiden erzählten mir, dass du kommst, bevor deine Stiefel die Brücke verließen."
+      },
+      "lamplighter_sorrel": {
+        "name": "Laternenanzünderin Sorrel",
+        "title": "Hüterin des Nachttors",
+        "greeting": "Achte auf die Laternen, Freund. Hinter diesem Tor gibt die Sonne auf, und die Blumen übernehmen."
+      },
+      "lira_dewsong": {
+        "name": "Lira Dewsong",
+        "title": "Nacht-Gärtnerin von Moonrest",
+        "greeting": "Willkommen in Moonrest, wo die Blumen für uns dämmern."
+      },
+      "weaver_amelle": {
+        "name": "Weberin Amelle",
+        "title": "Moonfleece-Weberin",
+        "greeting": "Fühlst du das? Moonfleece auf dem Webstuhl. Wärmer als jedes Feuer, neben dem du je gesessen hast."
+      },
+      "astronomer_cassian": {
+        "name": "Astronom Cassian",
+        "title": "Wächter an der Mahnwache",
+        "greeting": "Still jetzt. Der Himmel dämmert hier nie, also hört er auch nie auf zu sprechen."
+      },
+      "lampman_cobb": {
+        "name": "Laternenmann Cobb",
+        "title": "Hüter der Krähentor-Laternen",
+        "greeting": "Bleib im Laternenlicht, Freund. Der Wald zählt jeden, der das Tor passiert."
+      },
+      "sexton_marrow": {
+        "name": "Küster Marrow",
+        "title": "Küster von Gallowmere",
+        "greeting": "Wir begraben sie hier tief, und wir läuten die Glocken, damit sie daran denken, unten zu bleiben."
+      },
+      "widow_tansy": {
+        "name": "Witwe Tansy",
+        "title": "Kerzenmacherin von Gallowmere",
+        "greeting": "Eine Kerze für jedes Grab, und keine einzige darf erlöschen. Keine einzige, hörst du mich?"
+      },
+      "vicar_creel": {
+        "name": "Vikar Creel",
+        "title": "Letzter Vikar des Mournstone",
+        "greeting": "Die Kapelle fiel vor Jahren. Die Toten darunter bemerkten es nicht, also blieb ich."
+      },
+      "strandwatcher_pell": {
+        "name": "Strandwächter Pell",
+        "title": "Wächter der Wirrmündung",
+        "greeting": "Endlich aus den schwarzen Bäumen heraus. Atme, Fremder, die Sonne hält diese Seite des Passes."
+      },
+      "salvage_boss_ryna": {
+        "name": "Bergungschefin Ryna",
+        "title": "Herrin der Wracklinie",
+        "greeting": "Eine {className} mit tauglichen Armen, gut. Die Wracklinie zahlt gut, wenn die Krabben dir genug Finger lassen, um es zu zählen."
+      },
+      "pearlmother_isha": {
+        "name": "Perlenmutter Isha",
+        "title": "Älteste der Taucher",
+        "greeting": "Das Meer gibt, der Sand bewahrt, und der Dschungel nimmt. Bleib auf dem Strand, Fremder."
+      },
+      "hermit_okku": {
+        "name": "Okku",
+        "title": "Der Mann, der hineinging",
+        "greeting": "Still jetzt. Die Trommeln zählen alles, was unter den Bäumen wandelt, und sie haben dich bereits gezählt."
+      },
+      "gatewarden_pell": {
+        "name": "Torwächter Pell",
+        "title": "Hüter des Gartentors",
+        "greeting": "Achte darauf, wie du über die Rasenflächen gehst. Der Garten hält sie gestutzt, und er mag sie ordentlich."
+      },
+      "head_gardener_amaranth": {
+        "name": "Obergärtnerin Amaranth",
+        "title": "Obergärtnerin des Evergarden",
+        "greeting": "Kümmere dich nicht um die Schatten unter meinen Augen. Jemand muss wach bleiben, während der Garten träumt."
+      },
+      "wickmother_sorrel": {
+        "name": "Dochtmutter Sorrel",
+        "title": "Hüterin des Hedgewick-Gasthauses",
+        "greeting": "Komm herein, setz dich, es gibt Likör am Feuer. Halt nur eine Hand an allem aus Eisen: die Gnome sind in letzter Zeit langfingrig."
+      },
+      "gardener_yew": {
+        "name": "Gärtner Yew",
+        "title": "Der letzte Gärtner",
+        "greeting": "Reich mir die Schubkarre, ja? Diese Rasenflächen laufen nicht von allein, was auch immer der Weiler denkt."
+      },
+      "watcher_maren": {
+        "name": "Wächterin Maren",
+        "title": "Die Windweg-Wache",
+        "greeting": "Achte auf deinen Tritt hinter dem Tor. Der Wind hier oben nimmt zuerst Hüte und niemals Fragen."
+      },
+      "harbormaster_odile": {
+        "name": "Hafenmeisterin Odile",
+        "title": "Hafenmeisterin von Wickharbor",
+        "greeting": "Jedes Boot in dieser Bucht verdankt dem Alten Leuchtfeuer seinen Kiel. Sprich schnell, die Flut wartet nicht."
+      },
+      "keeper_bram": {
+        "name": "Hüter Bram",
+        "title": "Hüter des Alten Leuchtfeuers",
+        "greeting": "Neununddreißig Jahre hat diese Lampe unter meiner Wache gebrannt. Sie wird unter deiner nicht erlöschen."
+      },
+      "salvager_edda": {
+        "name": "Bergerin Edda",
+        "title": "Bergerin des Wrackfelds",
+        "greeting": "Wrackholz, Tauwerk und die Fracht toter Männer. Das Meer zahlt meinen Lohn, wenn der Wächter es zulässt."
+      },
+      "warden_coalfast": {
+        "name": "Wächter Coalfast",
+        "title": "Kommandant der Schanze",
+        "greeting": "Die Risse kümmert es nicht, dass Gullhaven klein ist, {className}. Wir halten diese Küste, oder es bleibt keine Küste zu halten. Steh mit uns, und ich werde es nicht vergessen."
+      },
+      "riftwatch_ollun": {
+        "name": "Risswache Ollun",
+        "title": "Gelehrter der Risse",
+        "greeting": "Jeder Riss singt, bevor er sich öffnet, wenn du das Ohr dafür hast. Ich kann gerade drei davon auf der Insel rühren hören, und einer von ihnen ist nah."
+      },
+      "quartermaster_edda": {
+        "name": "Quartiermeisterin Edda",
+        "title": "Waffenmeisterin der Schanze",
+        "greeting": "Stahl und Salz, {className}, das ist alles, was ich noch auszuteilen habe. Nimm es, und lass die Risse bereuen, dass sie sich dort öffneten, wo ich sie erreichen konnte."
+      },
+      "mender_saul": {
+        "name": "Heiler Saul",
+        "title": "Feldchirurg",
+        "greeting": "Ich habe in diesem einen Monat mehr Knochen gerichtet als in zehn Jahren des Ausbesserns von Angelstürzen. Die Risse lassen nicht viel von dem übrig, was sie nehmen. Komm heil zu mir zurück, wenn du es schaffst."
+      },
+      "bellkeeper_tam": {
+        "name": "Glockenwärter Tam",
+        "title": "Hüter der Wachglocke",
+        "greeting": "Die Glocke ist die einzige Warnung, die uns die Risse geben, {className}. Ein Schlag für die Felder, zwei für die Klippen, drei, wenn es nah genug ist, dass Weglaufen nicht mehr hilft. Behalte sie im Ohr, und sie könnte dich heil erhalten."
+      },
+      "fisher_nell": {
+        "name": "Verängstigte Nell",
+        "title": "Fischerin von Gullhaven",
+        "greeting": "Es öffnete sich genau dort, wo die Netze trocknen. Genau dort, wo ich jeden Morgen meines Lebens gestanden habe. Ich gehe nicht mehr zum Ufer hinunter. Ich gehe überhaupt nicht mehr viel irgendwohin."
       },
       "forgemistress_darva": {
         "name": "Schmiedemeisterin Darva",
@@ -11403,6 +12535,192 @@ export const de_DE: EnTranslations = {
           }
         }
       },
+      "q_riding_lessons": {
+        "title": "Reitstunden",
+        "text": "Jeder Reiter kommt auf zwei Beinen herein, {playerName}, genau wie ich Euch am Tag unserer ersten Begegnung sagte. Zahlt die Gebühr, und wenn ich das Wort gebe, ruft das Übungs-Valorross zu Euch und steigt auf. Dann reitet den Parcours: folgt der Markierung zum Startbogen, nehmt jeden Sprung sauber und überquert die Linie erneut, ehe die Sanduhr leerläuft. Schafft Ihr das, gehört Euch der Sattel. Verlasst Ihr die Koppel, fangen wir von vorn an.",
+        "completion": "So, ja. In einer einzigen sauberen Bewegung hinauf und oben ruhig gesessen. Der Valorross gehört Euch, {playerName}: Sattel, Zügel und der Stand eines Reiters, der sich den Sitz verdient hat, statt ihn zu kaufen.",
+        "objectives": {
+          "0": {
+            "label": "Bezähmt den Valorross"
+          }
+        }
+      },
+      "q_veil_thinned": {
+        "title": "Der ausgedünnte Schleier",
+        "text": "Die Höhle hat sich also für dich geöffnet. Dann ist das Siegel schwächer, als ich befürchtet habe, {playerName}. Wo der Schleier sich spaltet, werden die Irrlichter dunkel und kalt. Bring mir acht Essenzen von den Dämmerirrlichtern, und ich werde lesen, wie tief die Wunde reicht.",
+        "completion": "Kalt, jede einzelne. Veiled Hollow hat vielleicht noch eine Jahreszeit, bevor der Spalt zu einem Riss wird. Wir haben Arbeit vor uns, du und ich.",
+        "objectives": {
+          "0": {
+            "label": "Dämmerirrlicht-Essenz"
+          }
+        }
+      },
+      "q_gleaming_antlers": {
+        "title": "Glänzende Geweihe",
+        "text": "Die verschleierten Hirsche verlieren Licht, wo sie weiden, und ihre abgeworfenen Geweihe halten es jahrelang. Fünf davon, von den Herden auf der offenen Lichtung im Herzen des Tals, und meine Laternen brennen den ganzen Winter ohne Öl. Den Hirschen muss kein Leid geschehen, aber sie trennen sich nicht leicht davon.",
+        "completion": "Sieh nur, wie sie das Licht halten! Keine Flamme, kein Rauch, nur das Glühen. Veiled Hollow versorgt.",
+        "objectives": {
+          "0": {
+            "label": "Glänzendes Geweih"
+          }
+        }
+      },
+      "q_wisp_lights": {
+        "title": "Lichter der Untiefen",
+        "text": "Die Glimmerirrlichter tragen Funken des alten Sternenlichts, das hier fiel, als Veiled Hollow versiegelt wurde. Sechs Funken, und die Schreinlampen werden ein Jahr lang brennen. Nimm nur von denen, die verblassen; Veiled Hollow gibt genug, ohne Gier.",
+        "completion": "Weich wie die ersten Sterne. Leg sie hier neben den Altar; der Schrein wird den Rest tun.",
+        "objectives": {
+          "0": {
+            "label": "Irrlichtstaub"
+          }
+        }
+      },
+      "q_calming_the_deep": {
+        "title": "Die Tiefe beruhigen",
+        "text": "Die Sporenlinge der Gleißenden Tiefe waren ein sanftes Volk, bevor der Riss ihre Ringe berührte. Was die Verderbnis nimmt, gibt sie nicht zurück. Gewähre den Verdorbenen Ruhe, {playerName}: zehn von ihnen, im Norden der Tiefe.",
+        "completion": "Du hast getan, was ich nicht ertragen konnte. Die Sammler singen noch in den Südringen; deinetwegen werden sie weiter singen.",
+        "objectives": {
+          "0": {
+            "label": "Verdorbener Sporenling zur Ruhe gebettet"
+          }
+        }
+      },
+      "q_spore_hearts": {
+        "title": "Herzen des Rings",
+        "text": "Wenn ein Sporenling der Dunkelheit erliegt, schlägt sein Herz mit geliehenem Schatten weiter. Vier dieser Herzen, gereinigt am Schrein, könnten uns lehren, wie sich die Verderbnis ausbreitet. Es ist eine grimmige Arbeit, {playerName}, aber es ist heilende Arbeit.",
+        "completion": "Da. Gereinigt, und still. Jedes zeigt dasselbe Zeichen: Der Schatten strömt VOM Versunkenen Hof. Sag es Saelwyn.",
+        "objectives": {
+          "0": {
+            "label": "Sporenherz"
+          }
+        }
+      },
+      "q_monument_tour": {
+        "title": "Was die Steine erinnern",
+        "text": "Drei Monumente stehen noch aus der Zeit vor der Versiegelung: eines bei der Duskfall-Aussicht, eines im Versunkenen Hof, und eines verloren im fernen Nordosten, wo niemand geht. Lies sie mir vor, {playerName}. Meine Knie haben vor zwei Jahrhunderten Treppen aufgegeben.",
+        "completion": "Eine Aussicht, ein Hof, und eine vergessene Ecke... und alle drei Verse des Versiegelungslieds, zum ersten Mal beisammen, seit es gesungen wurde. Du hast einen alten Leser sehr glücklich gemacht.",
+        "objectives": {
+          "0": {
+            "label": "Das Monument der Aussicht gelesen"
+          },
+          "1": {
+            "label": "Das Monument des Hofes gelesen"
+          },
+          "2": {
+            "label": "Das vergessene Monument gelesen"
+          }
+        }
+      },
+      "q_grove_menace": {
+        "title": "Bedrohung in der Lichtung",
+        "text": "Dämmerirrlichter treiben in letzter Zeit nach Einbruch der Dunkelheit zwischen meine Stände, {playerName}, und ihre Kälte verdirbt alles, was sie berührt. Dünne sie für mich aus: zehn davon, wo immer der Schleier gerissen ist.",
+        "completion": "Der Nachtmarkt kann wieder öffnen. Du hast einen Kunden fürs Leben, oder zumindest einen Rabatt.",
+        "objectives": {
+          "0": {
+            "label": "Dämmerirrlicht zerstreut"
+          }
+        }
+      },
+      "q_shards_of_starfall": {
+        "title": "Scherben des Sternenfalls",
+        "text": "Wenn die Dämmerirrlichter über die Kristallfelder ziehen, haften Splitter alten Sternenlichts an ihnen wie Kletten. Sechs Scherben, {playerName}, und ich kann die Versiegelung auf die genaue Jahreszeit datieren, in der sie gesungen wurde.",
+        "completion": "Sieh dir die Streifen an! Herbst. Veiled Hollow wurde im Herbst versiegelt. Zweihundert Jahre Streit, beigelegt von sechs kleinen Steinen.",
+        "objectives": {
+          "0": {
+            "label": "Sternenfall-Scherbe"
+          }
+        }
+      },
+      "q_treant_accord": {
+        "title": "Der Baumhüter-Pakt",
+        "text": "Die Ältesten des Hains werfen ihre äußere Rinde ab, während die Verderbnis an ihren Wurzeln nagt. Vier Stücke davon, und ich kann eine Salbe für den ganzen Hain brauen. Sie werden es dir nicht danken, während du sie losbrichst, {playerName}, aber sie werden dafür ein Jahrhundert länger stehen.",
+        "completion": "Dick und gesund, alle vier. Die Salbe wird eine Woche zum Brauen brauchen und hundert Jahre, um ihre Wirkung zu vollenden. Bäume messen Freundlichkeit anders.",
+        "objectives": {
+          "0": {
+            "label": "Ältestenrinde"
+          }
+        }
+      },
+      "q_spore_tide": {
+        "title": "Gegen die Sporenflut",
+        "text": "Die Salbe hält den Hain, aber die Verderbnis drängt mit jeder Dämmerung härter auf die Tiefe. Zwölf weitere der Verdorbenen müssen zur Ruhe gebettet werden, bevor die Sammler ihre Nordringe zurückgewinnen können, {playerName}.",
+        "completion": "Die Ringe im Norden singen heute Nacht wieder. Leise, aber sie singen.",
+        "objectives": {
+          "0": {
+            "label": "Verdorbener Sporenling zur Ruhe gebettet"
+          }
+        }
+      },
+      "q_sunken_court": {
+        "title": "Der Versunkene Hof",
+        "text": "Bryn hat die Herzen richtig gelesen: Der Riss verläuft durch den alten Hof im Osten, und seine Wächter sind falsch erwacht. Sie wurden erschaffen, um das Siegel zu schützen; jetzt zerquetschen sie jeden, der sich ihm nähert. Räume acht von ihnen aus den Ruinen.",
+        "completion": "Acht Wächter, zum Stillstand gebracht. Ich erinnere mich, als sie errichtet wurden, {playerName}. Sieh nicht so überrascht aus; Veiled Hollow behält seine Hüter lange.",
+        "objectives": {
+          "0": {
+            "label": "Alter Wächter zum Stillstand gebracht"
+          }
+        }
+      },
+      "q_wardens_echoes": {
+        "title": "Echos des Wächters",
+        "text": "Selbst mit zum Schweigen gebrachtem Meister wiederholen die Hofwächter seinen letzten Befehl wie ein Echo, das nicht verklingen will. Bis das Siegel wieder eingesetzt ist, werden sie weiter erwachen, {playerName}. Bring zehn weitere von ihnen zur Ruhe, damit die Steinmetze den Siegelstein erreichen können.",
+        "completion": "Das Echo wird jedes Mal schwächer. Bald wird der Hof nichts mehr enthalten als Wind und Efeu, so wie es sich für eine Ruine gehört.",
+        "objectives": {
+          "0": {
+            "label": "Alter Wächter zum Stillstand gebracht"
+          }
+        }
+      },
+      "q_waking_warden": {
+        "title": "Der erwachende Wächter",
+        "text": "Der Hof ist still, doch sein Meister ist es nicht. Der Wächter, der das Siegel hält, ist verdreht erwacht, und solange er steht, kann das Siegel nicht ausgebessert werden. Er wird nicht leicht fallen; bring einen Freund mit, wenn du einen findest, {playerName}. Bring zwei mit, wenn du zwei findest.",
+        "completion": "Die Glocke seiner Stimme ist verstummt. Ich fühlte es von hier aus, wie eine Last, die vom ganzen Tal genommen wurde.",
+        "objectives": {
+          "0": {
+            "label": "Der erwachende Wächter besiegt"
+          }
+        }
+      },
+      "q_seal_restored": {
+        "title": "Das wiederhergestellte Siegel",
+        "text": "Bring das Siegel des Wächters zum Siegelstein im Herzen des Hofes und setze es dort wieder ein, wo es losgeschlagen wurde. Dann kann Veiled Hollow zu heilen beginnen, und du, {playerName}, wirst getan haben, was niemand deiner Art zuvor getan hat.",
+        "completion": "Ich fühlte es von hier aus sich schließen, sanft wie die Dämmerung. Veiled Hollow erinnert sich an seine Freunde, {playerName}. Wie weit du auch reist, es wird immer ein Licht für dich unter dem großen Baum geben.",
+        "objectives": {
+          "0": {
+            "label": "Das Siegel im Siegelstein wiedereingesetzt"
+          }
+        }
+      },
+      "q_hollow_the_huntsman": {
+        "title": "Der Wächter der Herden",
+        "text": "Du siehst aus wie jemand, der mit mehr als nur Irrlichtern fertigwerden kann, {playerName}. Jäger Deral hält seinen Ausguck zwischen den Hirschwiesen östlich von hier, und er fragt seit Wochen nach tauglichen Händen. Was auch immer er dort draußen aufspürt, im Dorf spricht er es nicht laut aus.",
+        "completion": "Fenna hat dich geschickt? Gut. Dann vertraut sie dir, und ich habe zwei Namen, die durchgestrichen werden müssen.",
+        "objectives": {
+          "0": {
+            "label": "Jäger Deral finden"
+          }
+        }
+      },
+      "q_hollow_old_marrowshell": {
+        "title": "Die alte Schale der Untiefen",
+        "text": "Der erste Name ist Alter Marrowshell, eine Krabbe von der Größe eines Karrens, die die östlichen Untiefen gejagt hat, seit Eldergleam noch kein Tor hatte. Er wandert, {playerName}, also musst du die Küstenlinie entlanggehen, bis du seine Spur kreuzt. Geh nicht allein, und traue seiner Stille nicht.",
+        "completion": "Die Untiefen sind wieder nur Wasser. Ich habe gesehen, wie diese Schale bessere Jäger gebrochen hat als mich, {playerName}. Nicht dich.",
+        "objectives": {
+          "0": {
+            "label": "Alter Marrowshell erlegt"
+          }
+        }
+      },
+      "q_hollow_first_of_the_herd": {
+        "title": "Erster der Herde",
+        "text": "Der zweite Name ist schwerer auszusprechen. Aurelhorn führte diese Herden, als meine Großmutter diesen Ausguck hielt, und was auch immer in Veiled Hollow erwachte, erweckte ihn falsch. Er zertrampelt, was er einst beschützte, und die Herde wird seinen Wahnsinn nicht überleben. Er streift durch die Wiesen nahe den alten Hofstraßen. Beende ihn in Gnade, {playerName}, und bring einen Freund mit, um die Last zu teilen.",
+        "completion": "So fällt der Erste durch den Letzten. Die Herde ist schon ruhiger, spürst du es? Du hast Veiled Hollow heute einen Gefallen getan, auch wenn es nicht danach aussieht.",
+        "objectives": {
+          "0": {
+            "label": "Aurelhorn Frieden geschenkt"
+          }
+        }
+      },
       "q_prof_hobby_switch": {
         "title": "Eine andere Freizeitbeschäftigung",
         "text": "Hauptberufe erfordern ein Gelöbnis. Ein Hobby fragt nur, wohin deine Neugier wandert, {playerName}. Sammle ein paar Kräuter und entscheide, welches Handwerk dem deiner Hauptberufe gegenüber du verfolgen möchtest.",
@@ -11410,6 +12728,916 @@ export const de_DE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Kräuterpflanze geerntet"
+          }
+        }
+      },
+      "q_fv_snowline_report": {
+        "title": "Nachricht von der Schneegrenze",
+        "text": "Jede Seele, die aus den Drakelands heraufsteigt, kommt an meinem Feuer vorbei, {playerName}, und jede Woche werden es weniger. Wächterin Kaldra hält Icemantle die Nordstraße hinauf. Sag ihr, der Pass sei noch offen, und sag ihr, eine Fremde sei ihn allein gegangen.",
+        "completion": "Der Pass hält also. Einna hält dieses Wegelager durch Stürme aus, die die Wegmarkierungen begraben, und sie hat mir noch nie müßige Neuigkeiten geschickt. Willkommen in Icemantle, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Bei Wächterin Kaldra melden"
+          }
+        }
+      },
+      "q_fv_wolves_at_the_door": {
+        "title": "Wölfe vor der Tür",
+        "text": "Die Schneewehen-Rudel hielten sich früher an die hohen Bänke. Jetzt überqueren sie die Seestraße bei Tageslicht, und meine Holzfäller wollen die Mauern nicht mehr verlassen. Dünne die Rudel aus, {playerName}, zehn von ihnen, und die Straße ist wieder eine Straße.",
+        "completion": "Zehn Schatten weniger zwischen hier und dem See. Die Holzfäller streiten schon darüber, wer zuerst hinausgeht.",
+        "objectives": {
+          "0": {
+            "label": "Schneewehen-Wolf erlegt"
+          }
+        }
+      },
+      "q_fv_winter_pelts": {
+        "title": "Felle für die Hütte",
+        "text": "Feuerholz hält einen Körper am Leben, {playerName}, aber Wolle wird diese Kälte nicht abwenden, nur Wolfsfell wird das. Sechs dicke Winterfelle von den Schneewehen-Rudeln, und ich kann Schlafrollen für jeden füttern, den die Hütte beherbergt.",
+        "completion": "Fell wie dieses ist das einzige Argument, auf das der Winter hört. Nimm diese Tritte, sie sind mit der letzten Charge gefüttert.",
+        "objectives": {
+          "0": {
+            "label": "Dickes Winterfell"
+          }
+        }
+      },
+      "q_fv_ember_caches": {
+        "title": "Glut auf der Seestraße",
+        "text": "Ein Schlitten mit Glutverstecken kippte letzte Nacht auf der Seestraße um: eiserne Kessel, die ein gebändigtes Feuer einen Monat lang am Leben halten. Drei davon liegen noch im Schnee, {playerName}, und die Hütte kann nicht entbehren, was sie enthalten. Bring das Feuer heim.",
+        "completion": "Noch warm, jedes einzelne. Du hast der Hütte einen ganzen Winter Gnade erkauft, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Glutversteck geborgen"
+          }
+        }
+      },
+      "q_fv_lights_over_steps": {
+        "title": "Lichter über den Stufen",
+        "text": "Die Aurora hat diesen Monat jede Nacht grün gebrannt, und die Alten wollen nicht darunter gehen. Eine Frau könnte wissen, warum: Veyla, die Aurora-Deuterin. Sie lagert allein auf den Aurorastufen, südöstlich hinter dem See. Finde ihr Lager, {playerName}, und höre, was ihr die Lichter erzählt haben.",
+        "completion": "Kaldra hat dich geschickt? Dann macht sie sich endlich Sorgen, und das zu Recht. Setz dich, {playerName}. Beobachte eine Weile mit mir den Himmel.",
+        "objectives": {
+          "0": {
+            "label": "Aurora-Deuterin Veyla finden"
+          }
+        }
+      },
+      "q_fv_silent_trapline": {
+        "title": "Die stille Fallenlinie",
+        "text": "Der alte Brosk arbeitet die Fallenlinie von Shiverfen westlich von hier, und seit elf Jahren schickt er jede Woche ein Bündel Felle mit dem Holzschlitten herauf. Seit zwei Wochen nun nichts. Er ist zu stur, um zu erfrieren, und zu vorsichtig, um zu ertrinken, {playerName}, also stimmt etwas anderes nicht. Finde sein Lager am Moor und sieh, ob er noch atmet.",
+        "completion": "Maeve hat dich geschickt? Ha. Elf Jahre, und die Frau denkt immer noch, das Moor wird mich fressen. Nun... dieses Jahr könnte sie recht haben. Sieh dir an, was es meinen Linien angetan hat.",
+        "objectives": {
+          "0": {
+            "label": "Fallensteller Brosk finden"
+          }
+        }
+      },
+      "q_fv_aurora_motes": {
+        "title": "Funken der Aurora",
+        "text": "Die Irrlichter, die über diese Stufen treiben, werden von den Lichtern selbst abgeworfen, und jedes trägt einen Funken der Aurora in seinem Herzen. Ich brauche sechs, um zu lesen, was der Himmel schreibt, {playerName}. Die Irrlichter wehren sich nicht. Ob das die Arbeit leichter oder schwerer macht, ist Sache zwischen dir und deinem Gewissen.",
+        "completion": "Sechs Funken, noch immer glühend. Sieh sie dir an, {playerName}: Sie pulsieren im Gleichtakt miteinander. Die Lichter sind kein Wetter. Sie sind ein Signal.",
+        "objectives": {
+          "0": {
+            "label": "Aurorafunke"
+          }
+        }
+      },
+      "q_fv_rime_unbound": {
+        "title": "Entfesselter Reif",
+        "text": "Wenn die Aurora so hell brennt, steht die Kälte auf und geht: Reif-Elementare, Frost mit eigenem Willen. Sie versammeln sich, wo die Lichter die Terrassenbänke berühren, und sie wandern jede Nacht näher an mein Lager heran. Zerbrich acht von ihnen, {playerName}, bevor eines von ihnen mich zerbricht.",
+        "completion": "Die Nacht fühlt sich schon dünner an. Was auch immer sie weckt, ist noch nicht fertig, aber du hast den Stufen etwas Ruhe erkauft.",
+        "objectives": {
+          "0": {
+            "label": "Reif-Elementar erlegt"
+          }
+        }
+      },
+      "q_fv_sprung_traps": {
+        "title": "Wichte in den Fallen",
+        "text": "Moorwichte, {playerName}. Die kleinen Teufel lösen meine Fallen zum Vergnügen aus und verstreuen das Eisen im Schilf. Vertreibe sie, acht sollten den Rest lehren, und sammle ein, was von meinen Fallenlinien übrig ist, während du dort draußen bist.",
+        "completion": "Vier gute Fallen zurück, und das Schilf ist ruhig geworden. Du fängst mit einer härteren Hand als ich, {playerName}, aber ich kann den Ergebnissen nicht widersprechen.",
+        "objectives": {
+          "0": {
+            "label": "Moorwicht vertrieben"
+          },
+          "1": {
+            "label": "Falle geborgen"
+          }
+        }
+      },
+      "q_fv_howl_above": {
+        "title": "Das Heulen auf den Terrassen",
+        "text": "Du hörst es bei Dämmerung, {playerName}: ein Heulen von den Heulenden Terrassen, das nicht von den Schneewehen-Rudeln stammt. Größere Kehlen. Die Terrassenheuler sind zum ersten Mal seit meine Großmutter diesen Posten hielt von den Gipfeln herabgekommen, und sie sind es, die die Wölfe auf meine Straße getrieben haben. Erlege acht und dränge sie zurück.",
+        "completion": "Acht, und der Dämmerungschor ist dadurch dünner geworden. Doch Heuler verlassen die Gipfel nicht ohne Grund. Etwas dort oben hat sie vertrieben, und ich fürchte, es hat einen Namen.",
+        "objectives": {
+          "0": {
+            "label": "Terrassenheuler erlegt"
+          }
+        }
+      },
+      "q_fv_seeing_wren_home": {
+        "title": "Wren sicher heimbringen",
+        "text": "Meine Lehrling Wren ging vor zwei Tagen los, um die Goldmelt-Linie abzugehen, und kam nie zurück. Ich fand ihre Spuren, sie hat sich unter den Wegmarkierungen südwestlich der Aurorastufen verkrochen, zu verängstigt vor den Wölfen, um sich zu bewegen. Ich kann das Moor nicht verlassen, {playerName}. Bring sie zu Veylas Lager auf den Stufen. Dort wird sie unter den Lichtern sicher sein.",
+        "completion": "Das Mädchen ist drinnen, in die Hälfte meiner Decken gewickelt, und redet den Sternen den Himmel voll. Du hast heute etwas Gutes getan, {playerName}. Davon sieht der Reach nicht viel.",
+        "objectives": {
+          "0": {
+            "label": "Lehrling Wren sicher zu den Aurorastufen gebracht"
+          }
+        }
+      },
+      "q_fv_frostmane_tyrant": {
+        "title": "Der Frostmähnen-Tyrann",
+        "text": "Die Heuler jagten nicht, als sie die Terrassen herabkamen. Sie flohen. Ein Yeti hat sich das Hochland angeeignet, das Bergvolk nennt es die Frostmähne, und selbst die Rudel wollen keinen Hang mit ihm teilen. Es muss enden, {playerName}, bevor der Winter es zu meinen Mauern treibt. Bring einen Freund mit. Bring zwei.",
+        "completion": "Als der Wind letzte Nacht nachließ, hörte das ganze Dorf die Stille, wo die Frostmähne einst war. Der Reach schuldet dir eine Schuld, die er Jahre brauchen wird, um sie abzuzahlen, {playerName}. Trag dies, und jede Tür in Icemantle steht dir offen.",
+        "objectives": {
+          "0": {
+            "label": "Die Frostmähne erlegt"
+          }
+        }
+      },
+      "q_dk_ash_on_the_wind": {
+        "title": "Asche im Wind",
+        "text": "Blick südlich von der Palisade, {playerName}. Diese Feuer in den Dünen sind keine Kochfeuer der Trolle, es sind Aschenknochen-Aufmärsche, und jede Nacht werden es mehr. Die Toten steigen aus den Knochenfeldern mit Sand noch zwischen den Zähnen. Erlege zehn Plünderer, bevor sie sich einen Weg zu meinem Tor schlagen.",
+        "completion": "Zehn Klingen weniger in den Dünen, und die Aufmarschfeuer brannten letzte Nacht niedriger. Meine Wachen schliefen, was sie seit einer Woche nicht getan hatten. Gut erledigt, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Aschenknochen-Plünderer erlegt"
+          }
+        }
+      },
+      "q_dk_trolls_on_the_road": {
+        "title": "Trolle auf der Straße",
+        "text": "Die Dünentrolle haben gelernt, wie ein Versorgungswagen klingt, {playerName}. Sie schlugen diesen Monat dreimal auf der Aschendünen-Straße zu, und der letzte Fuhrmann kam mit nichts als den Zügeln herein. Acht Trolle weniger auf dieser Straße, und meine Wagen rollen wieder.",
+        "completion": "Acht, und meine Fuhrleute haben aufgehört, vor jeder Fahrt Abschiedsbriefe zu schreiben. Die Garnison isst deinetwegen, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Dünentroll erlegt"
+          }
+        }
+      },
+      "q_dk_scorched_stores": {
+        "title": "Versengte Vorräte",
+        "text": "Der letzte Wagen brannte, {playerName}, aber eisenbeschlagene Kisten brennen nicht durch. Vier davon liegen noch versengt entlang der Dünenstraße, mit einer Saison Salz, Nägeln und Bogensehnen darin. Bring meine Vorräte heim, bevor die Trolle herausfinden, wie man sie öffnet.",
+        "completion": "Schwarz versengt, und jeder Riegel hält noch. Der Schmied bekommt seine Nägel, die Pfeilmacherin ihre Sehnen, und du bekommst die Stiefel, die ich für denjenigen aufgehoben habe, der meine Kisten zurückbringt, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Versengte Vorratskiste geborgen"
+          }
+        }
+      },
+      "q_dk_banners_over_the_dunes": {
+        "title": "Banner über den Dünen",
+        "text": "Die Aschenknochen versammeln sich an den alten Knochenfeldgräbern, {playerName}, und meine Patrouillen können die Dünen nicht lesen, wie sie eine Mauer lesen. Töte fünf ihrer Kriegsrufer, jene, die die Toten aufrecht schreien, und pflanze auf jedem Aufmarschgelände ein Warnbanner, damit meine Wachen es vom Grat aus markieren können.",
+        "completion": "Drei Banner flattern im heißen Wind, genau dort, wo mein Fernrohr sie finden kann. Mit fünf zum Schweigen gebrachten Kriegsrufern wird das, was auf ihren Ruf antwortet, langsamer kommen. Du hast uns Zeit erkauft, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Aschenknochen-Kriegsrufer erlegt"
+          },
+          "1": {
+            "label": "Warnbanner gepflanzt"
+          }
+        }
+      },
+      "q_dk_watcher_at_the_wargate": {
+        "title": "Der Wächter am Kriegstor",
+        "text": "Etwas zieht die Aschenknochen nach Osten, {playerName}, und ich schickte meinen Besten los, um herauszufinden, was. Späherin Yerrin hat einen Monat lang in den fernen Dünen hinter dem Trollmoot gelagert, in Sichtweite eines Tores, das niemand zu meinen Lebzeiten erbaut hat. Ihre Berichte blieben vor zehn Tagen aus. Finde ihr Lager und bring mir ihre Augen.",
+        "completion": "Brannoc hat dich geschickt? Dann hat es mein letzter Bote nie geschafft. Sprich leise und setz dich, {playerName}. Siehst du das Tor da unten? Zähl die Kriegsbanner davor, und du wirst verstehen, warum ich aufgehört habe, Dinge aufzuschreiben.",
+        "objectives": {
+          "0": {
+            "label": "Späherin Yerrin finden"
+          }
+        }
+      },
+      "q_dk_marrow_and_ash": {
+        "title": "Mark und Asche",
+        "text": "Jeder Aschenknochen-Plünderer trägt eine Kriegsklinge, {playerName}: eine versengte Zählmarke des Heeres, unter dem er marschiert. Ich habe von diesem Grat aus vier Heere gezählt, aber Vermutungen sind keine Aufklärung. Bring mir sechs Klingen von den Plünderern und ihren Kriegsrufern, und ich werde Brannoc die Gestalt des kommenden Krieges geben.",
+        "completion": "Sechs Klingen, und in jede von ihnen ein Zeichen gebrannt. Das ist kein Überfallsaufmarsch, {playerName}. Jedes Heer in den Dünen antwortet auf das Kriegstor unter uns, die Trolle nennen es Orkadia, und keine fünf Soldaten, mit denen ich je gedient habe, könnten aufbrechen, was hinter dieser Tür trommelt. Vielleicht fünf wie dich.",
+        "objectives": {
+          "0": {
+            "label": "Aschenknochen-Kriegsklinge"
+          }
+        }
+      },
+      "q_dk_scales_of_the_maw": {
+        "title": "Schuppen des Rachens",
+        "text": "Wenn der Wind vom Drakenrachen dreht, reiten die Glutschwingen-Drachen so tief über mein Lager, dass ich ihre Zähne zählen kann, {playerName}. Sie streifen jeden Tag weiter, und etwas in diesem Krater treibt sie an. Bring mir drei ihrer Schuppen. Schuppen erinnern sich an Hitze, und ich kann an der Verbrennung ablesen, wo ein Drache genächtigt hat.",
+        "completion": "Sieh dir die Unterseite von dieser hier an, {playerName}: spiralförmig versengt, und nur eine Sache nistet in Kreisen. Diese Drachen sind Brutwächter. Etwas im Drakenrachen ist eine Mutter.",
+        "objectives": {
+          "0": {
+            "label": "Glutschwingen-Schuppe"
+          }
+        }
+      },
+      "q_dk_matriarch_of_the_maw": {
+        "title": "Matriarchin des Rachens",
+        "text": "Die Schuppen sagten die Wahrheit, {playerName}. Ich erklomm bei Morgengrauen den Kraterrand und sah sie auf dem Kraterboden: Cindraleth, die Matriarchin, unter der jede Glutschwinge an diesem Himmel geschlüpft ist, golden wie eine Kohle kurz vorm Entflammen. Solange sie brütet, werden die Drachen kühner, und Wyrmwacht kann nicht Drachen und Aschenknochen zugleich bekämpfen. Beende sie in ihrem Krater, und trage dann das Wort zu Torhauptmann Brannoc. Geh nicht allein.",
+        "completion": "Der Himmel über dem Drakenrachen war zwei Tage lang leer, und jetzt gehst du durch mein Tor mit dem Blut einer Matriarchin an deinen Stiefeln. Wyrmwacht hat vierzig Jahre lang genau hierfür Wache gehalten, {playerName}. Nimm diese Schulterstücke, Rachenschuppen, von unserem eigenen Schmied gearbeitet. Trag sie, wo die Drachen sie sehen können.",
+        "objectives": {
+          "0": {
+            "label": "Cindraleth, die Rachen-Matriarchin, erlegt"
+          }
+        }
+      },
+      "q_af_goldmelt_road": {
+        "title": "Die Goldstraße hinab",
+        "text": "Du kamst über den Goldmelt, {playerName}, noch Schnee an den Stiefeln. Ich hüte diesen Schrein, damit Lanternmere weiß, wer aus der Kälte hereinkommt, und in letzter Zeit hatte ich wenig zu berichten. Nimm die Goldstraße hinab in die Stadt, finde Vogtin Ottoline am Brunnen, und sag ihr, der Pass sei ruhig.",
+        "completion": "Ruhe auf dem Goldmelt, und eine Reisende mit Schnee im Haar als Beweis. Sorrel hält ihre Wache zu gut, um müßige Worte zu senden. Sei willkommen in Lanternmere, {playerName}. Die Laternen brennen für dich.",
+        "objectives": {
+          "0": {
+            "label": "Bei Vogtin Ottoline melden"
+          }
+        }
+      },
+      "q_af_foxes_in_the_lamplight": {
+        "title": "Füchse im Laternenlicht",
+        "text": "Die Dämmerfüchse haben gelernt, was die Laternenvorräte wert sind, {playerName}. Jede Dämmerung schlüpfen sie durch die Zäune und tragen den Talg davon, den wir für die Fährlampen pressen. Weiche Pfoten, weicheres Gewissen. Erlege zehn von ihnen, und die übrigen werden sich daran erinnern, die Stadt zu fürchten.",
+        "completion": "Zehn, und die Vorräte blieben letzte Nacht zum ersten Mal in dieser Saison unberührt. Die Laternenanzünder senden dir ihren Dank, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Dämmerfuchs erlegt"
+          }
+        }
+      },
+      "q_af_lanterns_on_the_water": {
+        "title": "Laternen auf dem Wasser",
+        "text": "Jede Fähre auf dem See trägt eine Hecklaterne, {playerName}, und drei meiner Boote kehrten bei Morgengrauen ohne ihre zurück. Der Nebel nahm sie, oder etwas im Nebel tat es. Sie schwemmen ans Ostufer, wenn der Wind dreht. Geh die Uferstraße entlang und bring meine Laternen heim.",
+        "completion": "Alle drei, und noch immer brennend. Fährlaternen erlöschen nicht im Wasser, {playerName}. Das ist ja der Sinn von ihnen. Was mich beunruhigt, ist, was sie losgerissen hat.",
+        "objectives": {
+          "0": {
+            "label": "Fährlaterne geborgen"
+          }
+        }
+      },
+      "q_af_orchard_call": {
+        "title": "Ein Karren für den Obstgarten",
+        "text": "Obstgärtnerin Pomeline hütet den Vergoldeten Obstgarten an der Weststraße, und ihre Saftkarren sind drei Tage überfällig. Die ganze Stadt läuft auf diesem Bernsteinsaft, {playerName}: Lampenharz, Süßung, das Erntebier. Geh die Weststraße entlang und finde heraus, was sie aufhält.",
+        "completion": "Die Vogtin zählt ihre Karren, ja? Nun, sie kann sie noch eine Weile als fehlend zählen. Sieh dir meine Reihen an, {playerName}. Ich habe größere Sorgen als eine späte Lieferung.",
+        "objectives": {
+          "0": {
+            "label": "Obstgärtnerin Pomeline finden"
+          }
+        }
+      },
+      "q_af_amber_from_the_herd": {
+        "title": "Bernstein von der Herde",
+        "text": "Die vergoldeten Hirsche lagern unter meinen ältesten Bäumen, und der Saft tropft die ganze Nacht golden in ihr Fell. Ausgekämmte Klumpen davon sind der reinste Bernstein im Weald. Bring mir sechs, {playerName}. Die Hirsche werden es dir nicht danken, aber sie werden es auch nicht vermissen.",
+        "completion": "Sechs Klumpen, rein wie gegossener Honig. Diese Handschuhe sind mit der letzten Charge genäht, {playerName}: harzversteift, und wärmer, als sie aussehen.",
+        "objectives": {
+          "0": {
+            "label": "Vergoldeter Harzklumpen"
+          }
+        }
+      },
+      "q_af_what_took_the_moorings": {
+        "title": "Was die Vertäuungen nahm",
+        "text": "Jetzt sage ich dir, was ich vor der Stadt nicht gesagt habe. Die Vertäuungen lösten sich nicht, sie wurden durchgebissen. Seelauerer, jede Nacht kühner, zerren an den Seilen und den Rudern. Schick acht von ihnen für immer zurück unter das Wasser, {playerName}, bevor ein Fährmann mit ihnen geht.",
+        "completion": "Acht Gestalten weniger in den Untiefen, und die Überfahrt lief heute zum ersten Mal seit zwei Wochen pünktlich. Doch kühne Lauerer sind getriebene Lauerer, {playerName}. Etwas unter dem See bewegt sie.",
+        "objectives": {
+          "0": {
+            "label": "Seelauerer erlegt"
+          }
+        }
+      },
+      "q_af_sprites_and_spigots": {
+        "title": "Wichte und Zapfhähne",
+        "text": "Erntewichte, {playerName}. Sie brechen meine Zapfhähne aus den Stämmen wegen der Süße darin und schleudern die Eimer ins Gras. Vertreibe acht der kleinen Diebe und bring vier meiner Eimer zurück, und die Karren rollen wieder.",
+        "completion": "Vier Eimer wieder an ihren Haken, und die Reihen sind ruhig geworden. Du hast eine härtere Hand mit Wichten als ich, {playerName}, und heute bin ich froh darüber.",
+        "objectives": {
+          "0": {
+            "label": "Erntewicht vertrieben"
+          },
+          "1": {
+            "label": "Harzzapf-Eimer geborgen"
+          }
+        }
+      },
+      "q_af_the_meredark": {
+        "title": "Der Seedunkel",
+        "text": "Die alten Fährleute haben einen Namen, den sie nur an Land aussprechen: der Seedunkel, der erste Lauerer, alt wie der See und doppelt so geduldig. Er erhob sich schon einmal, in dem Jahr, als der versunkene Steg unterging, und er erhebt sich jetzt wieder. Bei Dämmerung sonnt er sich auf der Stegruine vor dem Südufer, {playerName}. Nimm einen Freund mit, nimm zwei, und beende es, solange es noch beendet werden kann.",
+        "completion": "Der Nebel hob sich heute Morgen vom See, {playerName}, und die ganze Stadt sah es. Die Fähren werden die Nachtüberfahrt wieder fahren, und jede Laterne auf dem Wasser wird in deinem Namen brennen. Nimm dies: Es wurde aus dem versunkenen Steg geborgen, und niemand hat mehr Recht, es zu tragen.",
+        "objectives": {
+          "0": {
+            "label": "Der Seedunkel erlegt"
+          }
+        }
+      },
+      "q_wf_across_the_fenway": {
+        "title": "Über den Fenway",
+        "text": "Ein sanftes Land, die Willowfen, doch sanft ist nicht dasselbe wie sicher, {playerName}. Folge der Straße nach Norden zum Fenway-Damm und überquere ihn nach Bridgemere. Sag Brückenbaumeister Alden, die Stufen seien offen und das Wegelagerfeuer brenne.",
+        "completion": "Pell hält dieses Feuer durch jeden Nebel brennend, den das Moor ihr entgegenatmet. Wenn sie sagt, die Stufen sind offen, dann sind sie offen. Willkommen in Bridgemere, {playerName}. Achte auf deinen Schritt auf meinen Planken, und wir werden gut miteinander auskommen.",
+        "objectives": {
+          "0": {
+            "label": "Bei Brückenbaumeister Alden melden"
+          }
+        }
+      },
+      "q_wf_rope_chewers": {
+        "title": "Die Seilkauer",
+        "text": "Sumpfkröten, {playerName}. Sie kriechen nachts aus dem Graben und kauen sich durch meine Vertäuungsseile, als wären es Schilfhalme. Drei Kähne trieben letzte Woche ab, und einer von ihnen hatte meine gute Winde an Bord. Dünne sie aus, zehn der fetten Dinger, und die Boote bleiben, wo wir sie festmachen.",
+        "completion": "Zehn Sätze Zähne weniger in meinem Graben. Die Kähne blieben zum ersten Mal seit einem Monat die ganze Nacht an ihrer Vertäuung, {playerName}. Du hast den Dank jedes Netzers in der Stadt.",
+        "objectives": {
+          "0": {
+            "label": "Sumpfkröte erlegt"
+          }
+        }
+      },
+      "q_wf_eels_for_the_smokehouse": {
+        "title": "Aale für das Räucherhaus",
+        "text": "Die Sumpfkröten fressen nicht nur meine Seile, {playerName}, sie fressen meinen Fang: Sie schlingen die Aale ganz herunter, direkt aus den Fallen. Schneide sechs pralle davon frei von den gierigen Dingern, bevor das Fleisch verdirbt, und die Räucherhausfeuer bleiben brennen.",
+        "completion": "Sechs gute Aale, kaum angeschlagen. Das Räucherhaus wird bis zum Morgen nach Geld riechen. Hier, diese Watstiefel gehörten mir, als ich noch schneller war: Aalhaut hält die Nässe ab wie nichts sonst.",
+        "objectives": {
+          "0": {
+            "label": "Praller Moor-Aal"
+          }
+        }
+      },
+      "q_wf_mind_the_moorings": {
+        "title": "Achte auf die Vertäuungen",
+        "text": "Gutes Seil ist hier draußen teuer, {playerName}: jede Leine, die die Kröten durchbeißen, ist eine Woche Aalgeld dahin. Die durchtrennten Enden liegen noch am Grabenufer, wo die Boote sie verloren haben. Geh die Bohlenwege entlang und bring mir vier Leinen zurück, und ich kann sie gut wie neu spleißen.",
+        "completion": "Sieh dir das an: saubere Bisse, jede einzelne, aber genug Seil übrig zum Spleißen. Du hast mir einen Monat Münze und den Netzern einen Monat Gemurre erspart, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Durchtrennte Festmacherleine geborgen"
+          }
+        }
+      },
+      "q_wf_witch_of_willowweep": {
+        "title": "Die Hexe von Willowweep",
+        "text": "Du hast es inzwischen gehört, {playerName}: das Schnarchen. Langsam und schwer, draußen hinter den Schläfrigen Ebenen, als würde sich das Moor selbst im Schlaf umdrehen. Die Kröten, die Wichte, die Irrlichter, die am Mittag brennen: alles begann, als dieser Klang begann. Eine Seele könnte wissen, was es ist. Mutter Sedge hält ein Lager bei Willowweep, westlich um den Graben und das ferne Ufer hinab. Finde sie, und frag sie, was in der Mitte meines Moors schläft.",
+        "completion": "Alden hat dich den ganzen Weg geschickt, um nach dem Schnarchen zu fragen? Dann hört das Brückenvolk endlich zu. Setz dich, weg von der Feuchtigkeit, {playerName}. Dieser Klang hat einen Namen, und eine Kehle, und ich habe auf jemanden gewartet, der töricht genug ist, mir zu helfen, ihn zum Schweigen zu bringen.",
+        "objectives": {
+          "0": {
+            "label": "Mutter Sedge finden"
+          }
+        }
+      },
+      "q_wf_toll_and_tangle": {
+        "title": "Zoll und Gewirr",
+        "text": "Die Weidenwichte halten es für ein feines Spiel, eine Fähre loszuschneiden, {playerName}, und letzte Woche kenterte der Zollkahn auf der Ostroute mit einer Saison Brückenzoll an Bord. Die Truhen sanken in den Untiefen, und die Wichte tanzen auf den Bohlenwegen, als gehörten sie ihnen. Vertreibe acht und hol drei Zolltruhen herauf, und Bridgemere isst diesen Winter.",
+        "completion": "Drei Truhen, und die Münzen noch trocken darin. Die Wichte werden eine Woche lang in den Weidenruten schmollen, {playerName}, und die Stadt schuldet dir ihr Winterbrot.",
+        "objectives": {
+          "0": {
+            "label": "Weidenwicht vertrieben"
+          },
+          "1": {
+            "label": "Zolltruhe geborgen"
+          }
+        }
+      },
+      "q_wf_wisplight_charms": {
+        "title": "Irrlicht-Amulette",
+        "text": "Die Irrlichter über den Tümpeln sind das Moor, das laut träumt, {playerName}, und ihr Licht ist das Einzige, das gegen das Wiegenlied des Quakers standhält. Ich webe es in Weidenamulette: eines um deinen Hals, und das Schnarchen kann deine Lider nicht herabziehen. Bring mir sechs Irrlichtkugeln. Die Irrlichter werden nicht um sie kämpfen, was es zu einer Gnade oder einem Diebstahl macht, je nachdem, wie du es trägst.",
+        "completion": "Sechs Kugeln, noch warm vom Träumen. Gib mir bis zum Mondaufgang, und ich werde Amulette gewoben haben für dich und jeden, der mutig genug ist, an deiner Seite zu stehen.",
+        "objectives": {
+          "0": {
+            "label": "Irrlichtkugel"
+          }
+        }
+      },
+      "q_wf_croakers_hush": {
+        "title": "Die Stille des Quakers",
+        "text": "Jetzt kennst du den Namen des Schnarchers, {playerName}: der Schläfrige Quaker, der alte Krötenkönig draußen auf den Schläfrigen Ebenen. Jedes Jahr wird sein Quaken schwerer, und jedes Jahr vergisst mehr vom Moor aufzuwachen. Die Amulette werden deine Augen offen halten, aber seine Wucht ist eine andere Sache: bring einen Freund mit, und kämpfe nicht im Wasser gegen ihn. Leg den alten König in einen ruhigeren Schlaf.",
+        "completion": "Horch, {playerName}. Nichts. Die erste wahre Stille über diesem Moor seit dreißig Jahren, und die halbe Stadt wird heute Nacht vor lauter Fremdheit nicht schlafen. Die Weiden sagen Dank, auf ihre Art. Trag dies, gewoben aus seinem eigenen Lilienbeet, und das Moor wird dich als Freund erkennen, wohin auch das Wasser reicht.",
+        "objectives": {
+          "0": {
+            "label": "Der Schläfrige Quaker erlegt"
+          }
+        }
+      },
+      "q_nb_road_of_lanterns": {
+        "title": "Die Straße der Laternen",
+        "text": "Hier oben folgt die Sonne nie, {playerName}, nur die Lampen, die ich entlang des Aufstiegs brennend halte. Moonrest liegt im Norden, wo sich das Blütenlicht sammelt. Finde Lira Dewsong in ihren Gärten und sag ihr, die Lampen des Nachttors brennen noch.",
+        "completion": "Die Lampen brennen noch, und die Straße trägt uns noch immer Fremde zu. Sorrel hütet dieses Tor länger, als sich irgendjemand in Moonrest erinnert. Willkommen, {playerName}, im Reich, das nie dämmert.",
+        "objectives": {
+          "0": {
+            "label": "Lira Dewsong in Moonrest finden"
+          }
+        }
+      },
+      "q_nb_striders_in_the_dark": {
+        "title": "Schreiter im Dunkeln",
+        "text": "Die Dämmerschreiter waren immer geduldige Jäger, {playerName}, doch in letzter Zeit schleichen sie sich direkt in die Blumenbeete und nehmen Mondvlies-Lämmer unter unseren Laternen. Erlege zehn von ihnen und gib den Hügeln ihre Ruhe zurück.",
+        "completion": "Zehn Schreiter weniger, und die Herden weiden schon ruhiger. Die Gärten halten ihre eigenen Stunden, doch heute Nacht halten sie sie in Frieden.",
+        "objectives": {
+          "0": {
+            "label": "Dämmerschreiter erlegt"
+          }
+        }
+      },
+      "q_nb_wool_by_moonlight": {
+        "title": "Wolle bei Mondlicht",
+        "text": "Nichts wärmt wie Mondvlies, {playerName}, und nichts spinnt sich so fein. Die Weidetiere tragen ihre silberne Wolle lose in Büscheln, während sie über die Hügel ziehen. Bring mir sechs gute Büschel von den Herden, und ich webe dir etwas, das den Weg wert ist.",
+        "completion": "Silbern wie Sternenlicht und doppelt so weich. Hier, {playerName}: Handschuhe aus der letzten Charge, gefüttert, wie nur Mondvlies füttert.",
+        "objectives": {
+          "0": {
+            "label": "Mondvlies-Büschel"
+          }
+        }
+      },
+      "q_nb_night_gardens": {
+        "title": "Die Nachtgärten",
+        "text": "Die Nachtblüte öffnet sich nur unter diesem Himmel, und Dämmerfeld birgt die ältesten Beete des Reichs. Ich brauche vier frische Blüten für die Schreingirlanden, {playerName}. Schneide sie sanft: Ein Beet erinnert sich eine ganze Jahreszeit lang an eine grobe Hand.",
+        "completion": "Noch immer leuchtend, jedes Blütenblatt. Der Schrein wird eine Woche lang nach Nacht duften, und Moonrest schläft dafür ruhiger.",
+        "objectives": {
+          "0": {
+            "label": "Nachtblüte gesammelt"
+          }
+        }
+      },
+      "q_nb_eyes_on_the_vigil": {
+        "title": "Augen auf die Wache",
+        "text": "Etwas macht die Schreiter kühn und die Herden unruhig, {playerName}, und ich kann es nicht in den Blumen lesen. Cassian kann es im Himmel lesen. Er hält sein Observatoriumslager bei der Immerwährenden Wache östlich von hier, wo das Nachtvolk zwischen den Steinen umherzieht. Finde ihn, und frag, was die Sterne sagen.",
+        "completion": "Lira hat dich geschickt? Dann spüren es die Gärten auch. Setz dich einen Moment neben das Fernrohr, {playerName}. Die Sterne sind seit einem Monat unruhig, und jede Karte, die ich zeichne, neigt sich nach Norden zum Grabhügel.",
+        "objectives": {
+          "0": {
+            "label": "Astronom Cassian bei der Immerwährenden Wache finden"
+          }
+        }
+      },
+      "q_nb_charts_of_the_stones": {
+        "title": "Die Karten in den Steinen",
+        "text": "Die Wachtsteine sind älter als Moonrest, älter als das Nachtvolk, das sie pflegt, und ihre Flächen sind mit Sternenkarten geschnitten, die zu lesen ich mein Leben verbracht habe zu lernen. Der Himmel hat sich verschoben, {playerName}, und ich muss wissen, wie weit. Lies die Karten auf drei der Steine und bring mir ihre Peilungen.",
+        "completion": "Kein Zweifel bleibt. Jede Peilung ist zum Schlaflosen Grabhügel gekrochen, als würde sich der Himmel selbst über diesen Hügel beugen, um zu wachen. Die alten Könige wurden nicht ohne Grund unter ausgerichteten Sternen begraben, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Sternenkarte gelesen"
+          }
+        }
+      },
+      "q_nb_restless_mounds": {
+        "title": "Die ruhelosen Hügel",
+        "text": "Die Karten waren eine Warnung, und das Grabhügelfeld beweist es: Die Hügel öffnen sich von unten. Wiedergänger wandeln die Grabreihen entlang, die alten Ehrenzeichen tragend, und die Opfergaben, die sie schlafen hielten, liegen verstreut im Gras. Leg acht von ihnen nieder, {playerName}, und sammle vier der Opfergaben zurück zu mir.",
+        "completion": "Grabgold, noch kalt von der Erde. Die Wiedergänger erheben sich nicht von selbst, {playerName}: Etwas unter dem großen Hügel ruft sie heraus, und ich fürchte, die Karten haben uns seinen Namen bereits verraten.",
+        "objectives": {
+          "0": {
+            "label": "Grabhügel-Wiedergänger erlegt"
+          },
+          "1": {
+            "label": "Grabgabe geborgen"
+          }
+        }
+      },
+      "q_nb_the_barrow_king": {
+        "title": "Der Grabhügelkönig erwacht",
+        "text": "Jede Peilung, jeder unruhige Stern, jeder geöffnete Hügel deutet auf eines hin: Der Grabhügelkönig erwacht unter dem großen Hügel, und dieses Reich hat keine Morgenröte, um ihn zurückzuhalten. Er muss zur Ruhe gebettet werden, bevor er sich an seine Krone erinnert, {playerName}. Geh nicht allein: Bring einen Freund mit, und halte das Blütenlicht im Rücken.",
+        "completion": "Die Sterne haben sich zum ersten Mal seit einer Jahreszeit beruhigt, {playerName}. Die Hügel sind geschlossen, das Nachtvolk ist an seinen Steinen still geworden, und der König schläft wieder unten. Trag diesen Umhang: Moonrest schnitt ihn für denjenigen, dem die Nacht endlich vertraute.",
+        "objectives": {
+          "0": {
+            "label": "Der Grabhügelkönig zur Ruhe gebettet"
+          }
+        }
+      },
+      "q_ww_bells_of_gallowmere": {
+        "title": "Die Glocken von Gallowmere",
+        "text": "Hörst du das Läuten, {playerName}? Das ist Gallowmere, die Nordstraße hinauf, das seine Toten in den Schlaf läutet. Küster Marrow führt Buch über jede Seele unter dem Blätterdach, lebend und begraben. Geh und lass dich zählen, bevor der Wald dich selbst zählt.",
+        "completion": "Cobb hat dich unversehrt die Straße hinaufgeschickt, ja? Guter Mann. Er hat diese Torlaternen dreißig Jahre lang brennend gehalten, und der Wald ist nie an ihm vorbeigekommen. Willkommen in Gallowmere, {playerName}. Achte auf die Glocken.",
+        "objectives": {
+          "0": {
+            "label": "Bei Küster Marrow melden"
+          }
+        }
+      },
+      "q_ww_silk_in_the_eaves": {
+        "title": "Seide im Geäst",
+        "text": "Sieh nach oben, wenn du die Weststraße gehst, {playerName}, und du wirst sie sehen: eingewickelte Gestalten im Blätterdach, schwankend, wo kein Wind hinreicht. Die Witwenseiden-Spinner sind aus dem Dickicht gekrochen und haben ihre Vorratskammern über meinen Laternen aufgespannt. Töte zehn, und die Straße ist wieder eine Straße.",
+        "completion": "Zehn Weber weniger im Geäst. Die Laternenanzünder werden heute Nacht ihre Runden gehen, ohne nach oben zu sehen, und das ist hier mehr wert, als du weißt.",
+        "objectives": {
+          "0": {
+            "label": "Witwenseiden-Spinner erlegt"
+          }
+        }
+      },
+      "q_ww_widows_skeins": {
+        "title": "Die Stränge der Witwe",
+        "text": "Die Spinner nehmen unsere Toten für ihre Vorratskammern, {playerName}, also nehme ich ihre Seide für unsere Leichentücher. Sie brennt sauber, und sie hält einen Segen besser, als Leinen es je tat. Bring mir sechs Stränge Witwenseide, und die nächste Seele, die wir begraben, geht eingehüllt und beschützt hinab.",
+        "completion": "Sechs Stränge, weich wie ein angehaltener Atem. Die Toten werden darin ruhiger liegen. Nimm diese Bandagen, ich habe sie aus der letzten Charge genäht, und der Wald hat sich noch nie durch sie hindurchgebissen.",
+        "objectives": {
+          "0": {
+            "label": "Witwenseiden-Strang"
+          }
+        }
+      },
+      "q_ww_candles_at_the_bounds": {
+        "title": "Kerzen an den Grenzen",
+        "text": "Vier Grenzsteine umringen Gallowmere, {playerName}, einer an jeder ausgehenden Straße, und auf jedem Stein brennt eine Grabkerze. Solange sie brennen, bleiben die Begrabenen begraben. Der Nieselregen hat sie alle vier ertränkt, und ich bin zu alt, um die Grenzen allein abzugehen. Nimm meine Kerze und entzünde sie neu, schnell.",
+        "completion": "Alle vier brennen? Dann atme durch, {playerName}. Du hast es nicht gehört, aber das ganze Dorf hat es gehört: Die Glocken läuteten leichter in dem Moment, als der letzte Docht Feuer fing.",
+        "objectives": {
+          "0": {
+            "label": "Grabkerze neu entzündet"
+          }
+        }
+      },
+      "q_ww_the_last_vicar": {
+        "title": "Der letzte Vikar",
+        "text": "Südlich von hier verfällt die Mournstone-Kapelle an ihrem schwarzen See, und ein Mann pflegt sie noch: Vikar Creel, der nicht gehen wollte, als das Dach einstürzte. Er kennt die alten Riten besser als meine Glocken, {playerName}, und er hat seit einem Monat kein Wort geschickt. Geh die Kapellenstraße entlang und sieh, ob er noch atmet.",
+        "completion": "Marrow sorgt sich um mich? Das ist neu. Sag ihm, der Mournstone stehe noch, auf seine Art, und ich auch. Bleib eine Weile, {playerName}. Der See hat geflüstert, und ich würde lieber nicht allein zuhören.",
+        "objectives": {
+          "0": {
+            "label": "Vikar Creel finden"
+          }
+        }
+      },
+      "q_ww_wraiths_of_the_tarn": {
+        "title": "Schemen des Sees",
+        "text": "Die Waldschemen waren einst die Kapellenwächter, {playerName}, gewachsen aus Bäumen, die über den geehrten Toten gepflanzt wurden. Seit der See sich schwarz färbte, haben sie ihr Amt vergessen, und jetzt treiben sie durch meinen Friedhof und zerren an der Erde. Zerbrich acht von ihnen, bevor sie vollenden, was sie begonnen haben.",
+        "completion": "Acht Wächter endlich zur Ruhe gelegt. Ich werde es bei Tageslicht keine Gnade nennen, aber unter uns, {playerName}, war es eine.",
+        "objectives": {
+          "0": {
+            "label": "Waldschemen erlegt"
+          }
+        }
+      },
+      "q_ww_what_the_bark_holds": {
+        "title": "Was die Rinde birgt",
+        "text": "In der Hängenden Lichtung östlich von Gallowmere hängen die Spinner ihre seidenumhüllten Toten von den Ästen, und die Grabrinden-Schlurfer stehen darunter Wache wie geduldige Sargträger. Das sind unsere Leute dort oben, {playerName}. Zerbrich fünf Schlurfer, schneide drei der eingewickelten Toten herab, und bring sie heim in die Erde.",
+        "completion": "Drei Seelen zurück unter ehrlicher Erde vor Einbruch der Nacht. Die Schlurfer werden nachwachsen, Rinde tut das immer, aber heute Nacht hängt die Lichtung leer, und das ist genug.",
+        "objectives": {
+          "0": {
+            "label": "Grabrinden-Schlurfer gefällt"
+          },
+          "1": {
+            "label": "Seidenumhüllte Überreste herabgeschnitten"
+          }
+        }
+      },
+      "q_ww_walking_mosley_home": {
+        "title": "Mosley heimbringen",
+        "text": "Mein Totengräber Mosley nahm vor drei Tagen die Kapellenstraße, um auf dem alten Hof ein Grab auszuheben, und die Grube stürzte über ihm ein. Er hat sich freigekrallt, der Narr lebt, aber er kauert bei den Kapellengräbern und will sich wegen der Spinner auf der Straße nicht bewegen. Bring ihn heim, {playerName}. Ich kann für einen lebenden Mann nicht die Glocken läuten.",
+        "completion": "Er kam auf seinen eigenen zwei Füßen durch das Tor, und schwor, er werde von nun an nichts tiefer graben als ein Rübenbeet. Er wird bis Sonntag wieder auf dem Hof sein, das sind sie immer. Danke, {playerName}. Gallowmere behält sein Volk, das ist unser ganzes Gesetz.",
+        "objectives": {
+          "0": {
+            "label": "Totengräber Mosley sicher nach Gallowmere zurückgebracht"
+          }
+        }
+      },
+      "q_ww_horn_of_the_huntsman": {
+        "title": "Das Horn des Jägers",
+        "text": "Du hast das Horn inzwischen gehört, {playerName}, dünn und fern, den Klang, für den der ganze Wald den Atem anhält. Der Bleiche Jäger reitet seine Lichtung nördlich von hier, und jedes Grab, an dem er vorbeireitet, wird flacher. Er war einst ein Mann, und er wurde falsch begraben, und ich gebe es auf, so zu tun, als würde ein Gebet reichen. Nimm einen Freund mit, nimm zwei, und wirf ihn vom Pferd.",
+        "completion": "Das Horn hielt mitten im Klang inne. Jede Glocke in Gallowmere läutete einmal, von selbst, und dann wurde der Wald stiller, als ich ihn seit dreißig Jahren gehört habe. Du hast den Ritus vollzogen, den ich nicht konnte, {playerName}. Trag dies, und geh unter dem Blätterdach ohne Furcht.",
+        "objectives": {
+          "0": {
+            "label": "Der Bleiche Jäger vom Pferd geworfen"
+          }
+        }
+      },
+      "q_pr_down_to_drifthaven": {
+        "title": "Hinab nach Drifthaven",
+        "text": "Aus den schwarzen Bäumen heraus und in die Sonne, {playerName}. Folge der Uferstraße nach Norden, und du erreichst Drifthaven, bevor die Flut dreht. Frag nach Bergungschefin Ryna, sie hat seit dem Sturm Arbeit für jedes Paar Hände, und sag ihr, die Straße zur Wirrmündung sei noch offen.",
+        "completion": "Pell hat dich geschickt? Dann bist du die ganze Straße zur Wirrmündung allein gegangen, und das ist mir Empfehlung genug. Willkommen in Drifthaven, {playerName}. Schnapp dir ein Seil, wir sind unterbesetzt.",
+        "objectives": {
+          "0": {
+            "label": "Bei Bergungschefin Ryna melden"
+          }
+        }
+      },
+      "q_pr_wreck_line_cargo": {
+        "title": "Die Wracklinie",
+        "text": "Der Sturm vor drei Nächten trieb die Pearlwake auf das Riff, und ihre Fracht liegt über die ganze Länge der Wracklinie zwischen hier und dem Palmenstrand verstreut. Drei Kisten Handelsgüter liegen noch in der Brandung, {playerName}. Bring sie herein, bevor die Flut, oder die Krabben, sich holen, was übrig ist.",
+        "completion": "Salzfleckig, aber unversehrt, alle drei. Die Taucher essen diesen Monat deinetwegen, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Pearlwake-Fracht geborgen"
+          }
+        }
+      },
+      "q_pr_scuttler_cull": {
+        "title": "Schalenrückige Diebe",
+        "text": "Jedes Wrack an dieser Küste zieht die Gezeitenkrabbler an, und die Pearlwake hat das halbe Riff angezogen. Meine Bergungsmannschaften werden keine Linie bearbeiten, solange diese Klauen in den Untiefen sind. Zerschlag zehn von ihnen, {playerName}, und die Wracklinie gehört wieder uns.",
+        "completion": "Zehn Klauen weniger in der Brandung. Meine Mannschaften waten schon wieder hinaus, und keine von ihnen hat sich bedankt, also tue ich es: Danke, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Gezeitenkrabbler zerschlagen"
+          }
+        }
+      },
+      "q_pr_boars_in_the_gardens": {
+        "title": "Eber in den Gärten",
+        "text": "Was auch immer sich im tiefen Grün regt, es drängt die Dickichteber auf unseren Strand hinaus. Sie haben die Gartenterrassen diese Woche schon zweimal umgewühlt, und als Nächstes sind die Trockengestelle dran. Zehn Eber, {playerName}, und dräng die übrigen zurück unter die Bäume.",
+        "completion": "Die Gestelle stehen, und die Gärten können neu bepflanzt werden. Die Eber haben sich nicht ausgesucht, auf den Sand zu kommen, {playerName}. Denk daran: Etwas hat sie vertrieben.",
+        "objectives": {
+          "0": {
+            "label": "Dickichteber vertrieben"
+          }
+        }
+      },
+      "q_pr_the_man_who_went_in": {
+        "title": "Der Mann, der hineinging",
+        "text": "Die Taucher werden die Baumgrenze nicht überschreiten, {playerName}, und ich werde sie nicht darum bitten. Du hast die Trommeln inzwischen gehört: jeder tut das, bis zur zweiten Nacht. Ein Mann auf dieser Insel ist je auf diesen Klang zugegangen und zurückgekommen. Okku. Er lagert unter den großen Banyanbäumen am Rankenfall, tief die Wirrstraße hinauf. Finde ihn, und frag ihn, was das Grün verbirgt.",
+        "completion": "Isha hat dich geschickt? Die Perlenmutter hat meinen Namen seit Jahren nicht mehr ausgesprochen. Setz dich außerhalb der Reichweite der Ranken, {playerName}, und ich werde dir sagen, was ich weiß: Die Trommeln sind nicht die Gefahr. Sie sind die Warnung.",
+        "objectives": {
+          "0": {
+            "label": "Okku am Rankenfall finden"
+          }
+        }
+      },
+      "q_pr_canopy_silk": {
+        "title": "Seide vom Kronendach",
+        "text": "Sieh nach oben, {playerName}. Jedes Kronendach von hier bis zum Idol ist mit Netzen überzogen wie ein Fischernetz, und die Weber werden jede Saison kühner. Ich spanne ihre eigene Seide über die Pfade, Stolperdraht-Glocken, damit sich der Dschungel nicht an mich heranschleichen kann. Sechs gute Stränge von den Kronendachwebern werden meine Leinen neu bespannen.",
+        "completion": "Gute, starke Seide. Meine Glocken werden noch eine Weile singen, und nichts geht nachts diese Pfade, ohne dass ich es weiß, {playerName}. In letzter Zeit geht etwas oft.",
+        "objectives": {
+          "0": {
+            "label": "Kronendach-Seidenstrang"
+          }
+        }
+      },
+      "q_pr_the_lost_navigator": {
+        "title": "Die verlorene Navigatorin",
+        "text": "Wir haben jede Hand von der Pearlwake gerettet bis auf eine: Navigatorin Suli, die zum fernen Strand schwamm und nie hereinkam. Ein Taucher entdeckte sie, verkrochen im Bugwrack hinter dem Palmenstrand, am Leben, aber zu erschöpft, um den Spießrutenlauf allein zu bestehen. Bring sie die Uferstraße entlang heim, {playerName}. Den Krabben wird es nicht gefallen, und dem Dschungel noch weniger.",
+        "completion": "Suli sitzt am Feuer und schwört immer noch, sie hätte es schwimmend geschafft. Du hast die einzige Kartenleserin an dieser Küste zurückgebracht, {playerName}. Diese hier sind aus ihrer Seetruhe, mit ihrem Segen.",
+        "objectives": {
+          "0": {
+            "label": "Navigatorin Suli sicher nach Drifthaven gebracht"
+          }
+        }
+      },
+      "q_pr_what_the_drums_guard": {
+        "title": "Was die Trommeln bewachen",
+        "text": "Ich bin so nah an das Versunkene Idol herangegangen, wie ein Lebender es wagt, und ich sah zwei Dinge: Die Weber haben die Idolstraße mit Netzen verhängt, und die alten Opferschalen entlang des Weges wurden erneut gefüllt. Frisch, {playerName}. Häute acht Weber von der Straße und bring mir drei dieser Opfergaben. Ich möchte wissen, welche Hand noch immer einen toten Gott füttert.",
+        "completion": "Moos, Perlmuschel, und Eberblut, von Fingern hineingepackt. Etwas in dieser Ruine hält noch immer seine Riten, {playerName}, und der Wächter hält alles andere fern. Es ist Zeit, dass wir offen darüber sprechen.",
+        "objectives": {
+          "0": {
+            "label": "Kronendachweber niedergestreckt"
+          },
+          "1": {
+            "label": "Nachgefüllte Opferschale gesammelt"
+          }
+        }
+      },
+      "q_pr_idol_guardian": {
+        "title": "Der Idolwächter",
+        "text": "Das Idol ist älter als die Insel, {playerName}. Älter als die Trommeln, älter als der Name Palmreach. Sein Wächter hat in diesem versunkenen Ring gestanden, seit bevor die Palmen wuchsen, und jetzt erwacht er und wandelt nachts zwischen den Säulen. Was auch immer die Opfergaben nähren, der Wächter ist dessen Türhüter. Bring einen Freund mit, und zerbrich ihn.",
+        "completion": "Du hast etwas gefällt, das selbst der Dschungel nicht anrühren wollte. Sieh dort, hinter dem Idol: Der Wächter bewachte nie die Säulen, {playerName}, er bewachte die Stufen darunter. Die Trommeln sind heute Nacht still geworden. Was auch immer unterhalb von Wildheart Basin schläft, kennt jetzt deinen Namen.",
+        "objectives": {
+          "0": {
+            "label": "Der Idolwächter zerbrochen"
+          }
+        }
+      },
+      "q_eg_gate_report": {
+        "title": "Wort durch das Tor",
+        "text": "Die Rasenflächen hinter diesem Tor haben sich hundert Jahre lang selbst gestutzt, {playerName}, und in letzter Zeit haben sie begonnen, Besucher zu stutzen. Obergärtnerin Amaranth führt die Bücher in Hedgewick, die Straße hinauf hinter den Torrasen. Sag ihr, dass ein weiterer Reisender durchgekommen ist, und sag ihr, dass sich die Hecken am Tor letzte Nacht bewegt haben.",
+        "completion": "Bewegt, so, so. Pell meldet das jede Woche, und jede Woche hat er recht. Verzeih meine Augen, {playerName}, ich habe seit Jahren keine ganze Nacht mehr geschlafen: Jemand muss beobachten, wie der Garten uns beobachtet. Willkommen in Hedgewick.",
+        "objectives": {
+          "0": {
+            "label": "Bei Obergärtnerin Amaranth melden"
+          }
+        }
+      },
+      "q_eg_hungry_shapes": {
+        "title": "In den Hunger gestutzt",
+        "text": "Wer auch immer diesen Garten formt, ist nachlässig geworden, oder grausam. Die Wolfsformen draußen in der Rosenwildnis wurden zur Schau gestutzt, doch in letzter Zeit jagen sie: grüne Kiefer, keine Bäuche, und kein Grund, je aufzuhören. Fälle zehn Formschnitt-Wölfe, {playerName}, und lass die Rasenflächen eine Weile wieder Rasenflächen sein.",
+        "completion": "Zehn Haufen Schnittgut, wo zehn Wölfe standen. Es sollte sich wie Gartenarbeit anfühlen, {playerName}. Warum fühlt es sich wie Krieg an?",
+        "objectives": {
+          "0": {
+            "label": "Formschnitt-Wolf erlegt"
+          }
+        }
+      },
+      "q_eg_stolen_shears": {
+        "title": "Die gestohlenen Scheren",
+        "text": "Jede Schere in Hedgewick ist innerhalb von zwei Wochen verschwunden, {playerName}: von den Haken, aus verschlossenen Schuppen, ein Paar aus meiner eigenen Schürze, während ich döste. Es sind die Heckengnome, die kleinen Platzwarte, die es hassen, wenn wir über ihre Rasenflächen gehen. Bring sechs Paare zurück, bevor der ganze Weiler auf Küchenmesser reduziert ist.",
+        "completion": "Sechs Paare, meine eigene darunter, ich würde die Kerbe in der Klinge überall erkennen. Hier, diese Handschuhe wurden für Schnittarbeit gestrickt. Warme Hände machen ruhige Scheren.",
+        "objectives": {
+          "0": {
+            "label": "Gestohlene Hedgewick-Schere"
+          }
+        }
+      },
+      "q_eg_who_trims_the_hedges": {
+        "title": "Wer die Hecken stutzt",
+        "text": "Ich führe die Bücher seit dreißig Jahren, {playerName}, und habe zehn davon nicht richtig geschlafen, weil die Summen nicht aufgehen. Gras will geschnitten und Hecken wollen geformt werden, und niemand hier tut eines von beidem, doch jeden Morgen steht der Garten gestutzt da. In letzter Zeit schwört das Waldvolk, einen alten Mann mit einer Schubkarre auf den fernen Südrasen zu sehen, hinter dem Labyrinth beim Lilienbecken. Finde ihn. Wenn er wirklich ist, kann ich endlich schlafen. Wenn nicht, werde ich es wohl nie.",
+        "completion": "So, das Haus hat also endlich jemanden geschickt. Hundert Jahre bin ich diese Rasenflächen gegangen, {playerName}, und der Garten und ich haben eine Abmachung: Ich stutze, was danach verlangt, gestutzt zu werden. Setz dich. Die Hecken können dir eine Stunde entbehren.",
+        "objectives": {
+          "0": {
+            "label": "Den Gärtner am Lilienbecken finden"
+          }
+        }
+      },
+      "q_eg_gnomes_in_the_green": {
+        "title": "Der Groll der Platzwarte",
+        "text": "Die Scheren waren nur der Anfang, {playerName}. Letzte Nacht kippten die Gnome unsere Werkzeugkarren ins Grün, einen draußen bei ihrem Bau westlich des Labyrinths, einen quer durch den ganzen Garten am Teichweg, und verstreuten hundert Jahre gutes Eisen im Gras. Vertreibe acht der kleinen Teufel und bring die umgekippten Karren heim.",
+        "completion": "Drei Karren zurück und die Haken wieder voll. Lass die kleinen Teufel in ihren Hecken schmollen: Hedgewick bearbeitet diese Rasenflächen auch.",
+        "objectives": {
+          "0": {
+            "label": "Heckengnom vertrieben"
+          },
+          "1": {
+            "label": "Werkzeugkarren geborgen"
+          }
+        }
+      },
+      "q_eg_bloom_clippings": {
+        "title": "Schnitt vom lebenden Grün",
+        "text": "Du willst diesen Garten verstehen? Dann lies ihn so, wie ich es tue. Die Hirsche, die die Rasenflächen abweiden, tragen das wahrste Grün: Jedes Blatt an ihnen ist eine Seite. Bring mir sechs frische Schnitte von den Formschnitt-Hirschen, {playerName}. Sie werden dir den Schnitt nicht danken, aber sie werden nachwachsen. Hier wächst alles nach.",
+        "completion": "Sieh her: Die Blätter rollen sich in sich selbst ein, jeder Schnitt derselbe. Der Garten hat Angst, {playerName}. In hundert Jahren habe ich ihn noch nie ängstlich erlebt.",
+        "objectives": {
+          "0": {
+            "label": "Gestutzter Blütenschnitt"
+          }
+        }
+      },
+      "q_eg_four_statues": {
+        "title": "Die vier stillen Schwestern",
+        "text": "Als der Garten jung war, errichteten die ersten Gärtner vier Marmorschwestern, um über seine Viertel zu wachen: eine über der Rosenwildnis, eine am Teichweg östlich des Labyrinths, eine auf dem Westrasen, wo die Gnome ihren Bau halten, und eine auf dem Südrasen hinter den Hecken. Das Labyrinth wuchs zwischen ihnen empor, und die meisten Leute sehen nie alle vier. Geh die Viertel ab, {playerName}, und lege deine Handfläche an jede Schwester. Wenn der Garten dich von allen vier Seiten betrachtet hat, wird er Orte öffnen, die er vor Fremden verbirgt.",
+        "completion": "Vier Abdrücke, vier Schwestern, und keine von ihnen weinte Marmor. Der Garten hat dich vermessen, {playerName}, und er fand dich nicht unzulänglich. Jetzt kann ich dich dorthin schicken, wo die Not wirklich wohnt.",
+        "objectives": {
+          "0": {
+            "label": "Gartenstatue besucht"
+          }
+        }
+      },
+      "q_eg_bull_of_the_court": {
+        "title": "Der Stier des Brunnenhofs",
+        "text": "Nun die Wahrheit, {playerName}. Der Stier im Herzen des Labyrinths war mein Meisterwerk: Ich formte ihn, um den Brunnenhof zu bewachen, und hundert Jahre lang tat er das. Doch die Furcht im Grün hat ihn erreicht, und jetzt bewacht er nichts mehr, er jagt. Das Labyrinth füttert ihn mit jedem, der hineinwandert. Ich bin zu alt, ihn ungeschehen zu machen, und es muss ein Ungeschehenmachen sein, mit Wurzel und Ast. Bring einen Freund mit, geh durch das Labyrinth zum Hof, und fälle meinen Stier.",
+        "completion": "Ich fühlte es, hier, als er auseinanderfiel. Hundert Jahre Arbeit, und du hattest recht, es zu beenden. Nimm diesen Umhang: Ich schnitt ihn für denjenigen zurecht, der sich stärker erweisen würde als mein Bestes. Der Hof ist heute Nacht nur ein Brunnen, {playerName}, und der Garten ist nur ein Garten. Vielleicht können die Obergärtnerin und ich jetzt beide schlafen.",
+        "objectives": {
+          "0": {
+            "label": "Der Formschnitt-Stier bezwungen"
+          }
+        }
+      },
+      "q_fs_bell_at_the_landing": {
+        "title": "Die Glocke an der Anlegestelle",
+        "text": "Du kamst über den Fährweg, {playerName}? Dann bist du der Erste seit einer Woche, und der Wächter wird dich in Augenschein nehmen wollen. Gullhaven liegt die Uferstraße hinauf, vorbei an den Trockengestellen, um die sich niemand mehr kümmert. Sag Wächter Coalfast, der Damm stehe noch, und dass Tam heute noch keinen Dreifachschlag geläutet hat. Noch nicht.",
+        "completion": "Der Damm hält, und Tam hat noch genug Atem, um über den Dreifachschlag zu scherzen. Gut. Wir sind eine belagerte Insel, {playerName}, und jedes Paar Hände, das diese Sandbank überquert, ist ein Paar, das sich die Risse erst durchkämpfen müssen, bevor sie mein Volk erreichen. Willkommen in Gullhaven.",
+        "objectives": {
+          "0": {
+            "label": "Bei Wächter Coalfast melden"
+          }
+        }
+      },
+      "q_fs_hold_the_riftfields": {
+        "title": "Die Rissfelder halten",
+        "text": "Östlich der Stadt sind die Getreidereihen verwahrlost, und die Elenden, die durch den Riss der Rissfelder kamen, plündern sie jetzt kahl. Mein Volk kann kein Feld bestellen, auf dem es nicht stehen kann, {playerName}. Erlege zehn der Elenden und gib den Bauern ihren Grund zurück.",
+        "completion": "Zehn weniger, und die Feldarbeiter streiten schon darüber, wer zuerst hinausgeht. Es wird nicht von Dauer sein, die Risse ruhen nie lange, aber eine Stadt, die isst, ist eine Stadt, die hält.",
+        "objectives": {
+          "0": {
+            "label": "Breschenwicht erlegt"
+          }
+        }
+      },
+      "q_fs_steel_for_the_redoubt": {
+        "title": "Stahl für die Schanze",
+        "text": "Jede Klinge, die ich austeile, ist eine, die das Meer zurückgegeben hat, oder eine, die ich den Toten entrissen habe, {playerName}. Die Elenden tragen Schrott durch die Risse, Scharniere, Haken, zerbrochener Schwertstahl, Elsterkram, aber es hämmert sich wahr aus. Bring mir sechs Stücke ihres erbeuteten Stahls, und die Barrikadenlinie bekommt ihre Zähne zurück.",
+        "completion": "Salzzerfressen und rissvernarbt, und trotzdem hält es eine Schneide. Hier, diese Griffe habe ich selbst gefüttert. Stahl für Stahl, {playerName}: Das ist der einzige Handel, den die Farshore heutzutage betreibt.",
+        "objectives": {
+          "0": {
+            "label": "Bruchvernarbter Stahl"
+          }
+        }
+      },
+      "q_fs_the_three_bells": {
+        "title": "Die drei Glocken",
+        "text": "Drei Wachglocken stehen an der Küste jenseits meiner eigenen: eine an der Landspitze, eine am Südstrand, eine draußen an der Küste der Rissfelder. Wenn ein Seil verrottet oder ein Klöppel entwendet wurde, erfährt die Stadt erst von einem Riss, wenn er schon in den Straßen ist. Geh die Küste entlang, {playerName}, und läute jede Glocke einmal, damit ich weiß, dass sie noch eine Stimme hat.",
+        "completion": "Drei Stimmen, drei Antworten, klar über das Wasser getragen. Schlaf heute Nacht in Gullhaven, {playerName}, und wisse, dass, wenn dich eine Glocke weckt, es durch meine Hand geschieht, und zur rechten Zeit.",
+        "objectives": {
+          "0": {
+            "label": "Wachglocke geläutet"
+          }
+        }
+      },
+      "q_fs_song_before_the_break": {
+        "title": "Das Lied vor dem Riss",
+        "text": "Es gibt einen Mann, der die Risse hört, bevor sie sich öffnen. Risswache Ollun: ein Gelehrter, oder ein Wahnsinniger, und in letzter Zeit kann ich mir den Unterschied nicht leisten. Er hält seine Wache an der Wachwiese, die Straße hinauf südöstlich der Stadt. Finde ihn, {playerName}, und frag ihn, was die Insel als Nächstes mit uns vorhat.",
+        "completion": "Der Wächter hat dich geschickt? Gut. Das heißt, die Stadt hat endlich angefangen zuzuhören. Jetzt sei einen Moment still, {playerName}. Da, unter dem Wind, hörst du es? Die Klippen singen, und mir gefällt die Melodie nicht.",
+        "objectives": {
+          "0": {
+            "label": "Risswache Ollun finden"
+          }
+        }
+      },
+      "q_fs_moss_and_mending": {
+        "title": "Moos und Heilung",
+        "text": "Das Salzmoos, das entlang der Gezeitenlinie wächst, ist der beste Wundverband, den ich kenne, und die Rissbrut hat jeden Küstenabschnitt beansprucht, auf dem es wächst. Ausgerechnet sie tragen Büschel davon in ihren Häuten verfangen. Räume sechs von ihnen von den östlichen Ufern, {playerName}, und pflücke mir vier gute Hände voll Moos aus dem, was sie zertrampelt haben.",
+        "completion": "Moos in der einen Hand und eine ruhigere Küste in der anderen. Du hast meine ganze Praxis wieder aufgefüllt, {playerName}. Tu mir den Gefallen und werde nicht mein nächster Patient.",
+        "objectives": {
+          "0": {
+            "label": "Rissbrut erlegt"
+          },
+          "1": {
+            "label": "Farshore-Salzmoos"
+          }
+        }
+      },
+      "q_fs_bram_come_home": {
+        "title": "Bram, komm heim",
+        "text": "Mein Bram nahm das Boot hinaus an dem Morgen, als sich der Netzriss öffnete, und das Meer warf ihn irgendwo hinter der Landspitze zurück. Ich hörte ihn vor drei Nächten, {playerName}, rufend über das Wasser, und ich hatte zu viel Angst zu gehen. Ich habe immer noch zu viel Angst. Bitte. Sein Boot liegt zerschellt am Nordufer. Bring ihn heim zu mir.",
+        "completion": "Bram! Du hast ihn mir unversehrt zurückgebracht, {playerName}. Wir haben beide geweint, und keiner von uns schämt sich dafür. Was auch immer die Risse dieser Insel als Nächstes nehmen, meine Familie bekommen sie nicht. Nicht mehr.",
+        "objectives": {
+          "0": {
+            "label": "Fischer Bram sicher nach Gullhaven heimgebracht"
+          }
+        }
+      },
+      "q_fs_stalkers_off_the_light": {
+        "title": "Pirscher außerhalb des Lichts",
+        "text": "Die Pirscher jagen im Dunkel zwischen den Wachfeuern, und jede Nacht umkreisen sie meine Wiese ein Stück enger. Sie sind nicht hirnlos, {playerName}, sie sind geduldig, und Geduld ist das Einzige, was ich nicht überdauern kann. Töte acht und dränge die Dunkelheit zurück zu den Klippen, aus denen sie kam.",
+        "completion": "Acht Nächte des Umkreisens, in einer beendet. Die Feuer brennen schon ruhiger, oder vielleicht sind das nur meine Hände. So oder so ist die Wiese wieder meine, und ich kann die Insel denken hören.",
+        "objectives": {
+          "0": {
+            "label": "Leerenpirscher erlegt"
+          }
+        }
+      },
+      "q_fs_the_great_break": {
+        "title": "Der große Riss",
+        "text": "Jedes Lied, das diese Insel singt, endet auf derselben tiefen Note, und sie kommt von den Zerklüfteten Klippen. Etwas kam dort durch den großen Riss, {playerName}, etwas, das die Klippen selbst aufbrachen, um es einzulassen, und es wächst noch immer. Wenn es nach Norden zieht, wird keine Glocke mehr zählen. Nimm einen Freund mit, nimm zwei, und beende es. Sag dann Coalfast, dass sich die Melodie geändert hat.",
+        "completion": "Ollun hat vorab Bescheid gesagt: Das Singen hörte auf. Meine ganze Stadt hörte die Stille, {playerName}, und die Hälfte von ihnen weinte beim Klang von gar nichts. Trag diesen Umhang. Die Farshore vergisst nicht, wer ihre Küste hielt.",
+        "objectives": {
+          "0": {
+            "label": "Der Zerrissene Schrecken erlegt"
+          }
+        }
+      },
+      "q_gc_down_the_windway": {
+        "title": "Den Windweg hinab",
+        "text": "Du hast den Aufstieg geschafft, {playerName}, also hat der Wind beschlossen, dich zu behalten. Wickharbor liegt östlich an der Hügellandstraße, geschützt im Windschatten seiner Bucht. Hafenmeisterin Odile zählt jede Seele, die über den Pass kommt, und sie wird dich zählen wollen. Sag ihr, der Windweg sei noch offen.",
+        "completion": "Zu Fuß über den Pass, bei diesem Wetter? Maren schickt mir ohnehin wenige Namen, und noch weniger kommen selbst herein, um für sich einzustehen. Willkommen in Wickharbor, {playerName}. Schließ die Wirtshaustür hinter dir.",
+        "objectives": {
+          "0": {
+            "label": "Bei Hafenmeisterin Odile melden"
+          }
+        }
+      },
+      "q_gc_wool_off_the_downs": {
+        "title": "Wolle vom Hügelland",
+        "text": "Meine Bootsmannschaften rudern in einen Sturm, der Ölzeug wie Papier durchschneidet, {playerName}. Nur eine Sache hält diesen Wind ab: die fettige Wolle der Moorwidder, dick gesponnen nach Wickharbor-Art. Die Herden weiden auf den Heulenden Hügeln westlich der Stadt. Sechs gute Vliese, und jede Mannschaft rudert diese Saison warm.",
+        "completion": "Vlies wie dieses ist der Grund, warum die Widder da draußen fett und selbstgefällig stehen, bei Wetter, das Menschen tötet. Die Spinnerinnen werden bei Laternenschein daran arbeiten. Nimm diese Tritte, {playerName}, sie sind von der letzten Schur gefüttert.",
+        "objectives": {
+          "0": {
+            "label": "Fettige Widderwolle"
+          }
+        }
+      },
+      "q_gc_scuttlers_in_the_pots": {
+        "title": "Krabbler in den Reusen",
+        "text": "Die Untiefen-Krabbler haben gelernt, die Klippenstraße zu erklimmen und unsere Krabbenreusen an den Steinen aufzubrechen, {playerName}. Diese Woche ist der halbe Fang weg, und ein Reusenmann hat eine Hand, die er einen Monat lang nicht benutzen wird. Zerschlag zehn von ihnen, und die übrigen werden sich erinnern, warum sie sich an die Untiefen hielten.",
+        "completion": "Zehn Panzer weniger auf meiner Straße, und die Reusen kamen heute Morgen voll herauf. Die Reusenmänner nennen dich ein gutes Omen, {playerName}. In Wickharbor ist das so herzlich, wie Lob nur wird.",
+        "objectives": {
+          "0": {
+            "label": "Untiefen-Krabbler erlegt"
+          }
+        }
+      },
+      "q_gc_keeper_of_the_flame": {
+        "title": "Der Hüter der Flamme",
+        "text": "Der alte Bram hütet das Leuchtfeuer auf der hohen Landzunge nordöstlich der Stadt, und er ist seit zwei Wochen nicht mehr für seine Vorräte heruntergekommen. Die Lampe brennt noch, also lebt er, aber ein Mann seines Alters, allein auf dieser Landzunge bei diesem Wind, {playerName}. Steig die Leuchtfeuerstraße hinauf und sieh, ob er noch steht.",
+        "completion": "Odile hat dich den ganzen Weg geschickt, um zu sehen, ob mich der Wind geholt hat? Ha. Sag ihr, die Lampe brennt, und ich auch. Aber da du nun schon den Aufstieg gemacht hast, {playerName}, bleib einen Moment. Das Leuchtfeuer hat Arbeit, für die nur ein Fremder geeignet scheint.",
+        "objectives": {
+          "0": {
+            "label": "Hüter Bram finden"
+          }
+        }
+      },
+      "q_gc_lanterns_on_the_shear": {
+        "title": "Laternen am Abbruch",
+        "text": "Das Leuchtfeuer ist das große Licht, {playerName}, aber es sind die Sturmlaternen, die einen nächtlichen Reisenden die Klippenstraße über dem Abbruch hinabgeleiten. Letzte Nacht hat der Sturm jede einzelne davon gelöscht, und diese Straße im Dunkeln ist ein langer Fall mit einem kurzen Ende. Nimm meinen Feuerstahl und entzünde die vier entlang der Klippe neu.",
+        "completion": "Vier Lichtpunkte auf der Klippenstraße, genau dort, wo sie hingehören. Von hier oben sieht es aus, als hätte die Küste ihre Augen wieder geöffnet. Du hast das Zeug zu einem Hüter, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Sturmlaterne neu entzündet"
+          }
+        }
+      },
+      "q_gc_wind_against_the_wick": {
+        "title": "Wind gegen den Docht",
+        "text": "Die Sturmirrlichter sind der Wind, boshaft geworden, {playerName}. Sie versammeln sich auf dem Hügelland beim Spiegelweiher, und jede Flamme, die sie finden, löschen sie, eine Laterne, ein Herd, eines Tages diese Lampe. Neununddreißig Jahre habe ich das Leuchtfeuer brennend gehalten, und ich werde es nicht an ein Wetter mit einem Groll verlieren. Zerstreue acht von ihnen.",
+        "completion": "Die Lampe flackerte letzte Nacht nicht einmal, zum ersten Mal seit einem Monat. Der Wind hasst uns immer noch, {playerName}, aber er hasst uns wieder auf faire Weise.",
+        "objectives": {
+          "0": {
+            "label": "Sturmirrlicht zerstreut"
+          }
+        }
+      },
+      "q_gc_the_far_shore": {
+        "title": "Das ferne Ufer",
+        "text": "Von diesem Laternenraum aus sehe ich die ganze Küste, {playerName}, und was ich im Norden sehe, gefällt mir nicht. Grüne Lichter, die bei Ebbe die Wrackfelder entlanggehen, Rumpf für Rumpf. Eine Frau arbeitet allein an dieser Küste: Edda, die Bergerin. Folge der Klippenstraße nordwärts hinter dem Abbruch, bis die Wracks beginnen, und sieh nach, ob sie noch atmet.",
+        "completion": "Bram beobachtet also jetzt von seinem Turm aus meine Küste? Der Alte hat recht, sich zu sorgen, {playerName}. Die Toten sind nachts auf ihren eigenen Wracks umhergegangen, und in letzter Zeit kümmert es sie nicht mehr, ob die Sonne scheint.",
+        "objectives": {
+          "0": {
+            "label": "Bergerin Edda finden"
+          }
+        }
+      },
+      "q_gc_dead_mens_cargo": {
+        "title": "Die Fracht toter Männer",
+        "text": "Das Bergungsrecht ist einfach, {playerName}: Was das Meer dem Strand gibt, gehört mir. Die ertrunkenen Decksleute sehen das anders. Sie erheben sich aus ihren Rümpfen und schleifen jede Kiste, die ich stapele, zurück unter die Gezeitenlinie. Schick sechs von ihnen für immer zur Ruhe, und solange der Strand still ist, hol drei Strandgutkisten herein, bevor die Flut ihren Gegenanspruch einreicht.",
+        "completion": "Sechs Mannschaften ruhiger, und drei Kisten hoch und trocken. Du bargest mit einer härteren Hand als ich, {playerName}, aber das Kontobuch kümmert das nicht. Die Hälfte davon gehört dir von Rechts wegen, und mit Recht meine ich, dass ich es sage.",
+        "objectives": {
+          "0": {
+            "label": "Ertrunkener Decksmann zur Ruhe gebettet"
+          },
+          "1": {
+            "label": "Strandgutkiste geborgen"
+          }
+        }
+      },
+      "q_gc_the_wreck_warden": {
+        "title": "Der Wrackwächter",
+        "text": "Jetzt weißt du, warum die Decksleute sich erheben, {playerName}. Etwas trägt die entenmuschelbewachsene Platte des ersten Wracks, das je an dieser Küste zerbrach, und es bewacht jeden Rumpf am Strand wie einen Friedhof, den zu hüten es beauftragt wurde. Es hütet einen Hort, den ich seit zehn Jahren begehre, und eine Mannschaft, die ich lieber ruhen sähe. Beende den Wrackwächter. Bring einen Freund mit, die Toten halten gute Wache.",
+        "completion": "Der Strand wurde still in dem Moment, als es fiel, {playerName}. Die erste Stille, die ich in zehn Jahren Arbeit an dieser Küste gehört habe. Die Mannschaften sind jetzt nur noch Knochen, ruhende Knochen. Nimm den Umhang von der Spitze des Horts, er würde ohnehin immer besser einem lebenden Rücken passen.",
+        "objectives": {
+          "0": {
+            "label": "Der Wrackwächter gefällt"
           }
         }
       },
@@ -11514,6 +13742,9 @@ export const de_DE: EnTranslations = {
           },
           "10": {
             "label": "Das Saufeld"
+          },
+          "11": {
+            "label": "Der Farshore-Damm"
           }
         }
       },
@@ -11582,6 +13813,300 @@ export const de_DE: EnTranslations = {
             "label": "Gravewyrm-Heiligtum"
           }
         }
+      },
+      "veiled_hollow": {
+        "name": "Die Schleiersenke",
+        "welcome": "Die Luft summt von alter Magie. Suche Hüter Saelwyn unter dem großen Baum von Eldergleam.",
+        "pois": {
+          "0": {
+            "label": "Eldergleam"
+          },
+          "1": {
+            "label": "Duskfall-Höhle"
+          },
+          "2": {
+            "label": "Duskfall-Aussicht"
+          },
+          "3": {
+            "label": "Der Alte Hain"
+          },
+          "4": {
+            "label": "Sternenfallbecken"
+          },
+          "5": {
+            "label": "Der Versunkene Hof"
+          },
+          "6": {
+            "label": "Kristalline Untiefen"
+          },
+          "7": {
+            "label": "Die Gleißende Tiefe"
+          }
+        }
+      },
+      "drakelands": {
+        "name": "Die Drakenlande",
+        "welcome": "Heißer Wind weht von den Ödländern voraus. Drachen kreisen über dem Drakenrachen, und Trollfeuer brennen in den Dünen.",
+        "pois": {
+          "0": {
+            "label": "Wyrmwacht"
+          },
+          "1": {
+            "label": "Der Torwald"
+          },
+          "2": {
+            "label": "Aschendünen"
+          },
+          "3": {
+            "label": "Trollmoot"
+          },
+          "4": {
+            "label": "Die Letzte Feste"
+          },
+          "5": {
+            "label": "Blutglasfelder"
+          },
+          "6": {
+            "label": "Drakenrachen-Caldera"
+          }
+        }
+      },
+      "frostveil": {
+        "name": "Der Frostschleier",
+        "welcome": "Schnee verschluckt jeden Laut. Unter den tanzenden Lichtern fühlt sich die Kälte selbst wach an.",
+        "pois": {
+          "0": {
+            "label": "Icemantle"
+          },
+          "1": {
+            "label": "Die Schneegrenze"
+          },
+          "2": {
+            "label": "Gletschersee"
+          },
+          "3": {
+            "label": "Die Aurorastufen"
+          },
+          "4": {
+            "label": "Das Zitterried"
+          },
+          "5": {
+            "label": "Die Heulenden Terrassen"
+          }
+        }
+      },
+      "amberfall": {
+        "name": "Der Bernsteinfall",
+        "welcome": "Jedes Blatt hier brennt in Gold und Rot, doch keines fällt jemals. Die Laternen von Lanternmere sind für dich entzündet.",
+        "pois": {
+          "0": {
+            "label": "Lanternmere"
+          },
+          "1": {
+            "label": "Die Goldschmelze"
+          },
+          "2": {
+            "label": "Der Vergoldete Obstgarten"
+          },
+          "3": {
+            "label": "Erntemulde"
+          },
+          "4": {
+            "label": "Der Große See"
+          },
+          "5": {
+            "label": "Aschenahorn-Höhe"
+          },
+          "6": {
+            "label": "Der Schiefe Monolith"
+          }
+        }
+      },
+      "willowfen": {
+        "name": "Das Weidenmoor",
+        "welcome": "Das Moor summt von Libellen und Bienen. Überquere die Brücke nach Bridgemere und lass deine Füße eine Weile ruhen.",
+        "pois": {
+          "0": {
+            "label": "Bridgemere"
+          },
+          "1": {
+            "label": "Die Amberfen-Stufen"
+          },
+          "2": {
+            "label": "Die Lilienmoore"
+          },
+          "3": {
+            "label": "Moorglanz-Tümpel"
+          },
+          "4": {
+            "label": "Weidenweinen"
+          },
+          "5": {
+            "label": "Die Schläfrigen Ebenen"
+          }
+        }
+      },
+      "nightbloom": {
+        "name": "Die Nachtblüte",
+        "welcome": "Hinter dem Nachttor träumt die Luft selbst. Folge dem Blütenlicht nach Moonrest, und achte auf die schlafende Welt, die am Himmel hängt.",
+        "pois": {
+          "0": {
+            "label": "Moonrest"
+          },
+          "1": {
+            "label": "Das Nachttor"
+          },
+          "2": {
+            "label": "Der Mondbrunnen"
+          },
+          "3": {
+            "label": "Dämmerfeld"
+          },
+          "4": {
+            "label": "Die Immerwährende Wache"
+          },
+          "5": {
+            "label": "Der Schlaflose Grabhügel"
+          }
+        }
+      },
+      "wraithwood": {
+        "name": "Der Gespensterwald",
+        "welcome": "Das Blätterdach schließt sich über der Straße wie ein Deckel. Halte dich an die Laternen von Gallowmere, und antworte nicht, wenn der Wald deinen Namen ruft.",
+        "pois": {
+          "0": {
+            "label": "Gallowmere"
+          },
+          "1": {
+            "label": "Das Krähentor"
+          },
+          "2": {
+            "label": "Witwendickicht"
+          },
+          "3": {
+            "label": "Die Hängende Lichtung"
+          },
+          "4": {
+            "label": "Mournstone-Kapelle"
+          },
+          "5": {
+            "label": "Die Lichtung des Jägers"
+          }
+        }
+      },
+      "palmreach": {
+        "name": "Die Palmenbucht",
+        "welcome": "Warmer Sand, laute Vögel und ein Dschungel, der den Horizont verschlingt. Drifthaven hält ein Feuer für dich am Strand entzündet.",
+        "pois": {
+          "0": {
+            "label": "Drifthaven"
+          },
+          "1": {
+            "label": "Die Wirrmündung"
+          },
+          "2": {
+            "label": "Der Palmenstrand"
+          },
+          "3": {
+            "label": "Das Smaragddickicht"
+          },
+          "4": {
+            "label": "Der Rankenfall"
+          },
+          "5": {
+            "label": "Die Saphirlagune"
+          },
+          "6": {
+            "label": "Das Versunkene Idol"
+          }
+        }
+      },
+      "evergarden": {
+        "name": "Der Immergarten",
+        "welcome": "Jemand stutzt noch immer die Hecken, doch seit hundert Jahren wurde kein Gärtner gesehen. Achte auf das Labyrinth: Es achtet auch auf dich.",
+        "pois": {
+          "0": {
+            "label": "Hedgewick"
+          },
+          "1": {
+            "label": "Das Gartentor"
+          },
+          "2": {
+            "label": "Der Parterreweg"
+          },
+          "3": {
+            "label": "Schloss Dawnhold"
+          },
+          "4": {
+            "label": "Der Blütenteich"
+          },
+          "5": {
+            "label": "Das Große Labyrinth"
+          },
+          "6": {
+            "label": "Der Brunnenhof"
+          },
+          "7": {
+            "label": "Die Alte Mühle"
+          },
+          "8": {
+            "label": "Die Nordwacht"
+          },
+          "9": {
+            "label": "Das Lilienbecken"
+          }
+        }
+      },
+      "galecrest": {
+        "name": "Der Windkamm",
+        "welcome": "Der Wind hat hier noch nie aufgehört zu wehen, und das Alte Leuchtfeuer ist noch nie erloschen. Wickharbor bittet nur darum, dass du die Wirtshaustür hinter dir schließt.",
+        "pois": {
+          "0": {
+            "label": "Wickharbor"
+          },
+          "1": {
+            "label": "Der Windweg"
+          },
+          "2": {
+            "label": "Die Heulenden Hügel"
+          },
+          "3": {
+            "label": "Das Alte Leuchtfeuer"
+          },
+          "4": {
+            "label": "Der Abbruch"
+          },
+          "5": {
+            "label": "Die Wrackfelder"
+          },
+          "6": {
+            "label": "Der Spiegelweiher"
+          },
+          "7": {
+            "label": "Die Galecrest-Ställe"
+          }
+        }
+      },
+      "farshore_isle": {
+        "name": "Die Fernküste",
+        "welcome": "Überquere die Sandbank, und Gullhavens Glocke wird dich finden, bevor es die Stadt tut. Die Risse reißen ohne Vorwarnung auf, und die Schanze hält ihre Küste gegen alles, was hindurchströmt. Man wartet hier schon lange auf jemanden wie dich.",
+        "pois": {
+          "0": {
+            "label": "Gullhaven"
+          },
+          "1": {
+            "label": "Die Anlegestelle"
+          },
+          "2": {
+            "label": "Die Wachwiese"
+          },
+          "3": {
+            "label": "Die Zerklüfteten Klippen"
+          },
+          "4": {
+            "label": "Die Rissfelder"
+          }
+        }
       }
     },
     "dungeons": {
@@ -11609,6 +14134,16 @@ export const de_DE: EnTranslations = {
         "name": "Nythraxis-Schlachtzugsarena",
         "enterText": "Ihr durchschreitet die versiegelte königliche Tür.",
         "leaveText": "Ihr kehrt in die kalte Luft von Thornpeak zurück."
+      },
+      "wildheart_basin": {
+        "name": "Das Wildherzbecken",
+        "enterText": "Warmer Regen zischt auf altem Stein. The Wildheart Basin öffnet sich vor dir.",
+        "leaveText": "Du gehst zurück unter den Steinzähnen hindurch in die Sonne von Palmreach."
+      },
+      "the_last_keep": {
+        "name": "Die Letzte Feste",
+        "enterText": "Du trittst in die kalten, stillen Hallen von Last Keep ein.",
+        "leaveText": "Du ziehst die Burgtür zu und trittst zurück in den Wind von Drakelands."
       },
       "drowned_temple": {
         "name": "Der Ertränkte Tempel",

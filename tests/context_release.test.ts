@@ -1,8 +1,8 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
-  trackWebGLContext,
-  releaseTrackedWebGLContexts,
   installWebGLContextRelease,
+  releaseTrackedWebGLContexts,
+  trackWebGLContext,
 } from '../src/render/context_release';
 
 function fakeHolder() {
@@ -41,11 +41,36 @@ describe('context_release', () => {
     expect(a.dispose).not.toHaveBeenCalled();
   });
 
+  it('normalizes nullable WebGL info logs for Three r165', () => {
+    releaseTrackedWebGLContexts();
+    const rawProgramLog = vi.fn((): string | null => null);
+    const rawShaderLog = vi.fn((): string | null => null);
+    const context = {
+      getProgramInfoLog: rawProgramLog,
+      getShaderInfoLog: rawShaderLog,
+    } as unknown as WebGLRenderingContext;
+    const holder = {
+      ...fakeHolder(),
+      getContext: () => context,
+    };
+
+    trackWebGLContext(holder);
+
+    expect(context.getProgramInfoLog({} as WebGLProgram)).toBe('');
+    expect(context.getShaderInfoLog({} as WebGLShader)).toBe('');
+    expect(rawProgramLog).toHaveBeenCalledTimes(1);
+    expect(rawShaderLog).toHaveBeenCalledTimes(1);
+  });
+
   it('swallows a failing holder so one bad context cannot block the rest', () => {
     releaseTrackedWebGLContexts();
     const bad = {
-      forceContextLoss: vi.fn(() => { throw new Error('context already lost'); }),
-      dispose: vi.fn(() => { throw new Error('gone'); }),
+      forceContextLoss: vi.fn(() => {
+        throw new Error('context already lost');
+      }),
+      dispose: vi.fn(() => {
+        throw new Error('gone');
+      }),
     };
     const good = fakeHolder();
     trackWebGLContext(bad);
@@ -56,8 +81,7 @@ describe('context_release', () => {
     expect(good.dispose).toHaveBeenCalledTimes(1);
   });
 
-  const pagehide = (persisted: boolean) =>
-    Object.assign(new Event('pagehide'), { persisted });
+  const pagehide = (persisted: boolean) => Object.assign(new Event('pagehide'), { persisted });
 
   it('releases tracked contexts on a real page teardown (persisted === false)', () => {
     releaseTrackedWebGLContexts();

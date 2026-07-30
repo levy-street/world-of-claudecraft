@@ -16,7 +16,7 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts). This region draws NO rng.
 
-import { addStacked, bagCapacity, bagsFullError, equipBag as equipBagCmd } from './bags';
+import { addStacked, bagCapacity, bagsFullError, countFit, equipBag as equipBagCmd } from './bags';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
 import {
@@ -30,7 +30,10 @@ import {
 } from './equipment_rules';
 import { formatMoney } from './format_money';
 import { moveStackToCell } from './inventory_order';
+import { canStackInstancePayloads, itemInstancePayloadsEqual } from './item_instance_merge';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
+import { mountOwned, summonMountItem } from './mounts';
+import { learnRiding } from './mounts_training';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
 import { useGatherToolItem } from './professions/gathering';
 import type { ItemUseResult, PlayerMeta } from './sim';
@@ -51,6 +54,76 @@ import {
 import { vendorStackSize } from './vendor_stack';
 
 const VENDOR_BUYBACK_LIMIT = 12;
+
+interface EquippedInventoryUnit {
+  instance: ItemInstancePayload | undefined;
+  craftedRecipeId: string | undefined;
+}
+
+interface VendorRemovedUnit {
+  instance: ItemInstancePayload | undefined;
+  craftedRecipeId: string | undefined;
+}
+
+function consumeEquippedInventoryUnit(meta: PlayerMeta, itemId: string): EquippedInventoryUnit {
+  for (let i = meta.inventory.length - 1; i >= 0; i--) {
+    const slot = meta.inventory[i];
+    if (slot.itemId !== itemId) continue;
+    const instance =
+      slot.instance && slot.count > 1 ? cloneItemInstancePayload(slot.instance) : slot.instance;
+    const craftedRecipeId = slot.craftedRecipeId;
+    slot.count -= 1;
+    if (slot.count <= 0) meta.inventory.splice(i, 1);
+    return { instance, craftedRecipeId };
+  }
+  return { instance: undefined, craftedRecipeId: undefined };
+}
+
+function equipmentPayloadFor(unit: EquippedInventoryUnit): ItemInstancePayload | undefined {
+  if (!unit.instance && unit.craftedRecipeId === undefined) return undefined;
+  return {
+    ...(unit.instance ? cloneItemInstancePayload(unit.instance) : {}),
+    ...(unit.craftedRecipeId === undefined ? {} : { craftedRecipeId: unit.craftedRecipeId }),
+  };
+}
+
+function payloadWithoutCraftedRecipeId(
+  payload: ItemInstancePayload,
+): ItemInstancePayload | undefined {
+  const { craftedRecipeId: _craftedRecipeId, ...instance } = payload;
+  return Object.keys(instance).length > 0 ? instance : undefined;
+}
+
+function returnEquippedItemToBags(
+  meta: PlayerMeta,
+  itemId: string,
+  payload?: ItemInstancePayload,
+): void {
+  const craftedRecipeId = payload?.craftedRecipeId;
+  const instance = payload ? payloadWithoutCraftedRecipeId(payload) : undefined;
+  if (instance || craftedRecipeId !== undefined) {
+    meta.inventory.push({
+      itemId,
+      count: 1,
+      ...(instance ? { instance } : {}),
+      ...(craftedRecipeId === undefined ? {} : { craftedRecipeId }),
+    });
+    return;
+  }
+  addItemSilent(itemId, 1, meta);
+}
+
+function canReturnEquippedItemToBags(
+  meta: PlayerMeta,
+  itemId: string,
+  payload?: ItemInstancePayload,
+): boolean {
+  const craftedRecipeId = payload?.craftedRecipeId;
+  const instance = payload ? payloadWithoutCraftedRecipeId(payload) : undefined;
+  return (
+    countFit(meta.inventory, bagCapacity(meta.bags), itemId, 1, instance, craftedRecipeId) >= 1
+  );
+}
 
 function desiredEquipSlot(meta: PlayerMeta, itemId: string): EquipSlot | null {
   const def = ITEMS[itemId];
@@ -138,6 +211,48 @@ export function removePreferFungible(
   // so a decoupled test ctx that models inventory but omits the hook (its own
   // removeItem does the same) is not forced to stub it; the live SimContext
   // always provides it.
+  ctx.onInventoryChangedForQuests?.(meta);
+  return consumed;
+}
+
+function removeVendorSellUnits(
+  ctx: SimContext,
+  itemId: string,
+  count: number,
+  pid: number,
+  skip?: (instance: ItemInstancePayload) => boolean,
+): VendorRemovedUnit[] {
+  const r = ctx.resolve(pid);
+  if (!r) return [];
+  const { meta } = r;
+  const consumed: VendorRemovedUnit[] = [];
+  let left = count;
+  for (let i = meta.inventory.length - 1; i >= 0 && left > 0; i--) {
+    const s = meta.inventory[i];
+    if (s.itemId !== itemId || s.instance) continue;
+    const take = Math.min(s.count, left);
+    for (let unit = 0; unit < take; unit++) {
+      consumed.push({ instance: undefined, craftedRecipeId: s.craftedRecipeId });
+    }
+    s.count -= take;
+    left -= take;
+    if (s.count <= 0) meta.inventory.splice(i, 1);
+  }
+  for (let i = meta.inventory.length - 1; i >= 0 && left > 0; i--) {
+    const s = meta.inventory[i];
+    if (s.itemId !== itemId || !s.instance || skip?.(s.instance)) continue;
+    const take = Math.min(s.count, left);
+    for (let unit = 0; unit < take; unit++) {
+      const finalUnitOfSlot = take >= s.count && unit === take - 1;
+      consumed.push({
+        instance: finalUnitOfSlot ? s.instance : cloneItemInstancePayload(s.instance),
+        craftedRecipeId: s.craftedRecipeId,
+      });
+    }
+    s.count -= take;
+    left -= take;
+    if (s.count <= 0) meta.inventory.splice(i, 1);
+  }
   ctx.onInventoryChangedForQuests?.(meta);
   return consumed;
 }
@@ -241,7 +356,7 @@ export function equipItem(
   if (displacedSlot && displacedId) {
     // Removing the incoming item frees one bag slot. If this equip also returns
     // the replaced item, the displaced other hand needs one additional slot.
-    if (old && !ctx.canAddItem(displacedId, 1, meta.entityId)) {
+    if (old && !canReturnEquippedItemToBags(meta, displacedId, displacedInstance)) {
       bagsFullError(ctx, meta.entityId);
       return;
     }
@@ -256,27 +371,24 @@ export function equipItem(
   // the highest-index match: loot another plain copy afterward and the plain
   // one gets equipped instead. Deterministic, acceptable for v1, but a future
   // picker UI should not assume the enchanted copy is always favored.
-  const consumed = ctx.removeItem(itemId, 1, meta.entityId);
+  const consumed = consumeEquippedInventoryUnit(meta, itemId);
+  ctx.onInventoryChangedForQuests(meta);
   if (old) {
     // Return the piece that was worn: if it carried an enchant, give it back
     // its own instanced slot (never merged into a plain stack, which would
     // silently drop the enchant; worn kinds are 1-per-slot, so the
     // identical-payload merge arm of addItemInstance could
     // never apply here anyway).
-    if (oldInstance) meta.inventory.push({ itemId: old, count: 1, instance: oldInstance });
-    else addItemSilent(old, 1, meta);
+    returnEquippedItemToBags(meta, old, oldInstance);
   }
   if (displacedId) {
-    if (displacedInstance) {
-      meta.inventory.push({ itemId: displacedId, count: 1, instance: displacedInstance });
-    } else {
-      addItemSilent(displacedId, 1, meta);
-    }
+    returnEquippedItemToBags(meta, displacedId, displacedInstance);
   }
   meta.equipment[slot] = itemId;
-  if (consumed[0]) {
+  const equippedPayload = equipmentPayloadFor(consumed);
+  if (equippedPayload) {
     meta.equipmentInstance ??= {};
-    meta.equipmentInstance[slot] = consumed[0];
+    meta.equipmentInstance[slot] = equippedPayload;
   } else if (meta.equipmentInstance) {
     delete meta.equipmentInstance[slot];
   }
@@ -302,8 +414,7 @@ export function revalidateOffhandForSpec(ctx: SimContext, pid?: number): void {
   const instance = meta.equipmentInstance?.offhand;
   delete meta.equipment.offhand;
   if (meta.equipmentInstance) delete meta.equipmentInstance.offhand;
-  if (instance) meta.inventory.push({ itemId: offhandId, count: 1, instance });
-  else addItemSilent(offhandId, 1, meta);
+  returnEquippedItemToBags(meta, offhandId, instance);
   ctx.markDeedsDirty(meta.entityId);
   recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   ctx.emit({
@@ -324,11 +435,11 @@ export function unequipItem(ctx: SimContext, slot: EquipSlot, pid?: number): boo
   const { meta, e: p } = r;
   const itemId = meta.equipment[slot];
   if (!itemId) return false;
-  if (!ctx.canAddItem(itemId, 1, meta.entityId)) {
+  const instance = meta.equipmentInstance?.[slot];
+  if (!canReturnEquippedItemToBags(meta, itemId, instance)) {
     bagsFullError(ctx, meta.entityId);
     return false;
   }
-  const instance = meta.equipmentInstance?.[slot];
   delete meta.equipment[slot];
   if (meta.equipmentInstance) delete meta.equipmentInstance[slot];
   // The all-slots deed reads equipment, so re-check this player's triggers.
@@ -337,8 +448,7 @@ export function unequipItem(ctx: SimContext, slot: EquipSlot, pid?: number): boo
   // not a fresh acquisition, so it must not fire collect-quest credit. No quest
   // today keys on an unequip, so there is nothing to award here regardless. An
   // enchanted piece gets its own instanced slot instead, so its enchant survives.
-  if (instance) meta.inventory.push({ itemId, count: 1, instance });
-  else addItemSilent(itemId, 1, meta);
+  returnEquippedItemToBags(meta, itemId, instance);
   recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   const def = ITEMS[itemId];
   ctx.emit({
@@ -511,6 +621,12 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     equipItem(ctx, itemId, meta.entityId);
   } else if (def.kind === 'bag') {
     equipBagCmd(ctx, itemId, undefined, meta.entityId);
+  } else if (def.kind === 'mount') {
+    // Reins work like any other usable item: clicking them (bags or an action-bar
+    // slot) summons THAT mount. summonMountItem owns every gate, riding skill
+    // first. Reins are never consumed: mountOwned() derives ownership from holding
+    // the item, so removing it here would delete the mount.
+    summonMountItem(ctx, meta.entityId, def.mount);
   }
 }
 
@@ -555,6 +671,31 @@ export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: nu
     ctx.error(meta.entityId, 'Too far away.');
     return;
   }
+  // Riding Training (the stablemaster's service entry): buying it delegates to
+  // learnRiding, which owns every gate (already trained, level 20, the 80g fee,
+  // trainer identity, range) and never puts an item in the bags.
+  if (def.teachesRiding) {
+    learnRiding(ctx, npcId, pid);
+    return;
+  }
+  // Mount purchase gates (the stablemaster's reins): a riding-skill requirement
+  // (ridingTrained, purchased from Marla for 80g), a hard level-20 gate, and a
+  // one-per-account ownership check (owning the reins item IS owning the mount).
+  // Placed after the vendor stock/price checks, before payment.
+  if (def.kind === 'mount') {
+    if (!meta.ridingTrained) {
+      ctx.error(meta.entityId, 'You must learn to ride first. Find a riding trainer.');
+      return;
+    }
+    if (p.level < 20) {
+      ctx.error(meta.entityId, 'You must be level 20 to buy a mount.');
+      return;
+    }
+    if (mountOwned(meta, def.mount)) {
+      ctx.error(meta.entityId, 'You already own that mount.');
+      return;
+    }
+  }
   // Food and drink are handed over in a stack (vendorStackSize); the player pays
   // the per-unit buyValue for every unit, so the per-unit price stays classic and
   // vendor buy price stays above the per-unit sell value (no buy-low/sell-high loop).
@@ -586,14 +727,39 @@ function vendorInRange(ctx: SimContext, p: Entity): boolean {
   );
 }
 
-function recordVendorBuyback(meta: PlayerMeta, itemId: string, count: number): void {
-  const existingIndex = meta.vendorBuyback.findIndex((s) => s.itemId === itemId);
+// `instance` carries the payload of the sold copies (absent for a plain
+// fungible sale). A row is a merge target only when its stored payload
+// matches under canStackInstancePayloads, exactly the identical-payload
+// stacking rule addStacked/addItemInstance already apply everywhere else in
+// bags: a plain sale never merges into an instanced row, and a differently
+// signed/rolled instanced sale never merges into another one, so a buyback
+// can never pair the wrong count with the wrong payload. The stored payload
+// is a deep clone: the caller's instance is never aliased into the buyback
+// list.
+function recordVendorBuyback(
+  meta: PlayerMeta,
+  itemId: string,
+  count: number,
+  instance?: ItemInstancePayload,
+  craftedRecipeId?: string,
+): void {
+  const existingIndex = meta.vendorBuyback.findIndex(
+    (s) =>
+      s.itemId === itemId &&
+      canStackInstancePayloads(s.instance, instance) &&
+      s.craftedRecipeId === craftedRecipeId,
+  );
   if (existingIndex >= 0) {
     const [existing] = meta.vendorBuyback.splice(existingIndex, 1);
     existing.count += count;
     meta.vendorBuyback.unshift(existing);
   } else {
-    meta.vendorBuyback.unshift({ itemId, count });
+    meta.vendorBuyback.unshift({
+      itemId,
+      count,
+      ...(instance && { instance: cloneItemInstancePayload(instance) }),
+      ...(craftedRecipeId === undefined ? {} : { craftedRecipeId }),
+    });
   }
   while (meta.vendorBuyback.length > VENDOR_BUYBACK_LIMIT) meta.vendorBuyback.pop();
 }
@@ -649,14 +815,23 @@ export function sellItem(ctx: SimContext, itemId: string, count = 1, pid?: numbe
   // above already guarantees enough unbound copies, but removePreferFungible's
   // highest-index-first instanced walk must still spare a bound copy sitting
   // above an unbound instanced one.
-  removePreferFungible(
+  //
+  // removePreferFungible reports exactly which consumed units carried an
+  // instance payload (masterwork/signed pieces, #1165): a plain sale (the
+  // common case) records a single plain buyback row, while any instanced
+  // units get their own per-unit rows so buyback can restore the exact
+  // payload sold instead of silently minting a generic copy (the #2207
+  // sibling gap social/trade.ts's grantOffer fix left open, see its comment).
+  const consumedUnits = removeVendorSellUnits(
     ctx,
     itemId,
     sellableCount,
     meta.entityId,
     (instance) => instance.boundTo !== undefined,
   );
-  recordVendorBuyback(meta, itemId, sellableCount);
+  for (const unit of consumedUnits) {
+    recordVendorBuyback(meta, itemId, 1, unit.instance, unit.craftedRecipeId);
+  }
   const payout = def.sellValue * sellableCount;
   meta.copper += payout;
   ctx.emit({ type: 'vendor', action: 'sell', itemId, pid: meta.entityId });
@@ -729,14 +904,20 @@ export function sellAllJunk(ctx: SimContext, pid?: number): void {
     const def = ITEMS[itemId]!;
     // Skip-aware removal: a spared bound slot sharing this itemId must never
     // be the slot the removal walk consumes (plain removeItem cannot skip).
-    removePreferFungible(
+    // Mirrors sellItem's instance-preserving record: the sweep can catch an
+    // unbound instanced poor-quality copy (e.g. a signed junk drop) just as
+    // easily as a single sellItem sale, so it must not silently wash its
+    // payload the way a plain-only recordVendorBuyback call would.
+    const consumedUnits = removeVendorSellUnits(
       ctx,
       itemId,
       count,
       meta.entityId,
       (instance) => instance.boundTo !== undefined,
     );
-    recordVendorBuyback(meta, itemId, count);
+    for (const unit of consumedUnits) {
+      recordVendorBuyback(meta, itemId, 1, unit.instance, unit.craftedRecipeId);
+    }
     total += def.sellValue * count;
     soldCount += count;
   }
@@ -749,12 +930,48 @@ export function sellAllJunk(ctx: SimContext, pid?: number): void {
   });
 }
 
-export function buyBackItem(ctx: SimContext, itemId: string, pid?: number): void {
+// `index` addresses the exact row the client clicked (its position in
+// meta.vendorBuyback, mirrored to the client verbatim as VendorView.buyback[].index),
+// and `expectedInstance` is that same row's instance payload as the client last saw
+// it (VendorBuybackRow.instance). Rows with the same itemId are no longer
+// interchangeable once an instanced (masterwork/signed) sale and a plain sale can
+// coexist: the buyback list is keyed by canStackInstancePayloads (recordVendorBuyback),
+// so an itemId-only lookup could silently redeem the wrong copy once a same-itemId row
+// shifts under a stale index (#2398 review: a plain sale recorded after the client's
+// snapshot can push the clicked masterwork row to a different index, and a bare
+// itemId check on the new occupant would pass and hand back the wrong payload).
+// The indexed row is only honored when its current payload still matches what the
+// client clicked; otherwise this falls back to an exact (itemId, payload) scan across
+// the whole list, and only if that also comes up empty does it fall back to the
+// first itemId-only match (a missing/no-instance click from an older client message).
+export function buyBackItem(
+  ctx: SimContext,
+  itemId: string,
+  index?: number,
+  pid?: number,
+  expectedInstance?: ItemInstancePayload,
+  expectedCraftedRecipeId?: string,
+): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
   const def = ITEMS[itemId];
-  const slot = meta.vendorBuyback.find((s) => s.itemId === itemId);
+  const indexed = index !== undefined ? meta.vendorBuyback[index] : undefined;
+  const indexedMatches =
+    indexed?.itemId === itemId &&
+    itemInstancePayloadsEqual(indexed.instance, expectedInstance) &&
+    indexed.craftedRecipeId === expectedCraftedRecipeId;
+  const slot =
+    (indexedMatches ? indexed : undefined) ??
+    meta.vendorBuyback.find(
+      (s) =>
+        s.itemId === itemId &&
+        itemInstancePayloadsEqual(s.instance, expectedInstance) &&
+        s.craftedRecipeId === expectedCraftedRecipeId,
+    ) ??
+    (expectedInstance === undefined && expectedCraftedRecipeId === undefined
+      ? meta.vendorBuyback.find((s) => s.itemId === itemId)
+      : undefined);
   if (!def || !slot || slot.count <= 0) {
     ctx.error(meta.entityId, 'That item is not available for buyback.');
     return;
@@ -771,17 +988,37 @@ export function buyBackItem(ctx: SimContext, itemId: string, pid?: number): void
     ctx.error(meta.entityId, 'Not enough money.');
     return;
   }
-  if (!ctx.canAddItem(itemId, 1, meta.entityId)) {
+  // A row's payload can top up an identical-payload stack that a plain add
+  // model would reject as full (canGrantItemInstance mirrors the countFit
+  // merge rule addStacked itself uses below, #2139-class gap): preflight the
+  // regrant with the row's own instance instead of always checking room for
+  // a generic plain copy.
+  const fits =
+    countFit(
+      meta.inventory,
+      bagCapacity(meta.bags),
+      itemId,
+      1,
+      slot.instance,
+      slot.craftedRecipeId,
+    ) >= 1;
+  if (!fits) {
     bagsFullError(ctx, meta.entityId);
     return;
   }
   meta.copper -= def.sellValue;
+  const instance = slot.instance;
+  const craftedRecipeId = slot.craftedRecipeId;
   slot.count -= 1;
   if (slot.count <= 0) meta.vendorBuyback = meta.vendorBuyback.filter((s) => s !== slot);
-  addItemSilent(itemId, 1, meta);
+  // A row recorded with an instance payload (a masterwork/signed piece sold
+  // unbound, #2207 sibling gap) re-grants that exact payload instead of a
+  // generic plain copy; addStacked deep-clones it into the new/topped-up
+  // inventory slot, so the buyback row's own copy is never aliased.
+  addItemSilent(itemId, 1, meta, instance, craftedRecipeId);
   // The silent add bypasses the inventory hub, so credit the discovery
   // ledger here (an acquisition like any other; the mark is idempotent).
-  ctx.markItemDiscovered(meta, itemId);
+  ctx.markItemDiscovered(meta, itemId, instance?.rolled?.quality);
   ctx.onInventoryChangedForQuests(meta);
   ctx.emit({ type: 'vendor', action: 'buyback', itemId, pid: meta.entityId });
   ctx.emit({
@@ -791,6 +1028,12 @@ export function buyBackItem(ctx: SimContext, itemId: string, pid?: number): void
   });
 }
 
-function addItemSilent(itemId: string, count: number, meta: PlayerMeta): void {
-  addStacked(meta.inventory, itemId, count);
+function addItemSilent(
+  itemId: string,
+  count: number,
+  meta: PlayerMeta,
+  instance?: ItemInstancePayload,
+  craftedRecipeId?: string,
+): void {
+  addStacked(meta.inventory, itemId, count, instance, craftedRecipeId);
 }

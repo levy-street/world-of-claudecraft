@@ -68,7 +68,7 @@ function deferred<T>() {
 
 function harness() {
   const ensurePreview = vi.fn();
-  const captureCloseup = vi.fn(() => 'data:image/png;base64,preview');
+  const captureCloseup = vi.fn(async () => document.createElement('canvas'));
   const focusFirst = vi.fn();
   const release = vi.fn();
   const trap: FocusTrapHandle = { focusFirst, release };
