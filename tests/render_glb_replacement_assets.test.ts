@@ -692,7 +692,11 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
       const file = path.join(publicDir, url.replace(/^\//, ''));
       const size = statSync(file).size;
       expect(size, `${url} should meet the static-prop size floor`).toBeGreaterThanOrEqual(40_000);
-      expect(size, `${url} should meet the static-prop size ceiling`).toBeLessThanOrEqual(100_000);
+      // KTX2 textures (tests/glb_texture_compression.test.ts) are larger on
+      // disk than the webp they replaced because they stay GPU-compressed in
+      // memory; the ceiling still catches an unoptimized re-export, which
+      // lands megabytes above this.
+      expect(size, `${url} should meet the static-prop size ceiling`).toBeLessThanOrEqual(256_000);
       expect(
         readGlbJson(path.join(publicDir, url.replace(/^\//, ''))).extensionsUsed,
         `${url} should use Meshopt`,

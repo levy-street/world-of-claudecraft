@@ -35,12 +35,28 @@ import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { meshopt, textureCompress } from '@gltf-transform/functions';
 import { MeshoptDecoder, MeshoptEncoder } from 'meshoptimizer';
 import sharp from 'sharp';
+import {
+  classifyGlb,
+  glbJsonChunk,
+  snapshotMismatch,
+  structuralSnapshot,
+  weaponVfxModelKeys,
+} from './lib/glb_texture_compression_core.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const DEFAULT_DIR = path.join(ROOT, 'public', 'models');
 
 // Slots that favor UASTC's higher quality over ETC1S's smaller size.
 const UASTC_SLOTS = /^(normalTexture|occlusionTexture)$/;
+
+function excludedGlbPaths() {
+  const source = fs.readFileSync(path.join(ROOT, 'src', 'render', 'weapon_vfx.ts'), 'utf8');
+  return new Set(
+    weaponVfxModelKeys(source).map((k) =>
+      path.join(ROOT, 'public', 'models', 'weapons', `${k}.glb`),
+    ),
+  );
+}
 
 export function parseArgs(argv) {
   const opts = { dir: DEFAULT_DIR, dryRun: false, jobs: 4, files: [] };
@@ -62,45 +78,6 @@ function* walkGlbs(dir) {
   }
 }
 
-// Read the raw JSON chunk without decoding buffers: cheap classification of
-// every file before any expensive parse, plus the structural snapshot the
-// post-transform assertion compares against.
-export function glbJsonChunk(buf) {
-  if (buf.readUInt32LE(0) !== 0x46546c67) throw new Error('not a GLB');
-  const jsonLen = buf.readUInt32LE(12);
-  return JSON.parse(buf.subarray(20, 20 + jsonLen).toString('utf8'));
-}
-
-export function classifyGlb(json) {
-  const images = json.images ?? [];
-  const convertible = images.filter(
-    (i) => i.mimeType === 'image/webp' || i.mimeType === 'image/png' || i.mimeType === 'image/jpeg',
-  ).length;
-  return {
-    images: images.length,
-    convertible,
-    hadMeshopt: (json.extensionsUsed ?? []).includes('EXT_meshopt_compression'),
-    skip: convertible === 0,
-  };
-}
-
-export function structuralSnapshot(json) {
-  return {
-    skins: json.skins?.length ?? 0,
-    animations: json.animations?.length ?? 0,
-    meshes: json.meshes?.length ?? 0,
-    nodes: json.nodes?.length ?? 0,
-    nodesWithExtras: (json.nodes ?? []).filter((n) => n.extras !== undefined).length,
-    hasAssetExtras: json.asset?.extras !== undefined,
-  };
-}
-
-export function snapshotMismatch(before, after) {
-  const keys = Object.keys(before);
-  const diffs = keys.filter((k) => before[k] !== after[k]);
-  return diffs.length ? diffs : null;
-}
-
 async function convertFile(io, file, { dryRun }) {
   const srcBuf = fs.readFileSync(file);
   const srcJson = glbJsonChunk(srcBuf);
@@ -111,8 +88,10 @@ async function convertFile(io, file, { dryRun }) {
   const doc = await io.readBinary(srcBuf);
   const transforms = [
     textureCompress({ encoder: sharp, targetFormat: 'png', formats: /^image\/webp$/ }),
-    toktx({ mode: Mode.UASTC, slots: UASTC_SLOTS, jobs: 2 }),
-    toktx({ mode: Mode.ETC1S, jobs: 2 }),
+    // encoder feeds the transform's own resize path: ktx requires dimensions
+    // that are multiples of four, and NPOT sources get resized via sharp first.
+    toktx({ mode: Mode.UASTC, slots: UASTC_SLOTS, jobs: 2, encoder: sharp }),
+    toktx({ mode: Mode.ETC1S, jobs: 2, encoder: sharp }),
   ];
   if (cls.hadMeshopt) transforms.push(meshopt({ encoder: MeshoptEncoder, level: 'high' }));
   await doc.transform(...transforms);
@@ -144,7 +123,16 @@ async function convertFile(io, file, { dryRun }) {
 
 async function main() {
   const opts = parseArgs(process.argv.slice(2));
-  const files = opts.files.length ? opts.files : [...walkGlbs(opts.dir)];
+  const excluded = excludedGlbPaths();
+  const files = (opts.files.length ? opts.files : [...walkGlbs(opts.dir)]).filter((f) => {
+    if (!excluded.has(path.resolve(f))) return true;
+    console.log(`excluded        ${path.relative(ROOT, f)} (WEAPON_VFX skin, stays webp)`);
+    return false;
+  });
+  // The meshopt WASM instantiates lazily; gltf-transform does not await it, so
+  // a decode reached before readiness dies with "reading 'exports'".
+  await MeshoptEncoder.ready;
+  await MeshoptDecoder.ready;
   const io = new NodeIO()
     .registerExtensions(ALL_EXTENSIONS)
     .registerDependencies({ 'meshopt.decoder': MeshoptDecoder, 'meshopt.encoder': MeshoptEncoder });
