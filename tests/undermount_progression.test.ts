@@ -341,6 +341,15 @@ describe('Undermount wing progression (seal enforced through the Sim)', () => {
 
     const restored = makeSim(83);
     restored.addPlayer('warrior', 'Runeseeker', { state });
+    for (const entity of restored.entities.values()) {
+      if (
+        questId === 'q_undermount_ledger' &&
+        (entity.templateId === UNDERMOUNT_FOREMAN_ID || entity.templateId === 'wyrmcult_zealot')
+      ) {
+        entity.pos.x += 5;
+      }
+    }
+    restored.addPlayer('warrior', 'RuneseekerTwo', { state });
     const entities = [...restored.entities.values()] as AnyEntity[];
     if (questId === 'q_undermount_heat') {
       expect(

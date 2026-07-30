@@ -67,6 +67,25 @@ describe('authored chat dialogue localization', () => {
     expect(presented.text).not.toBe(MAERIN_LEDGER_LINE);
   });
 
+  it('localizes an authenticated mob yell without a speaker snapshot', async () => {
+    await ensureLocaleLoaded('zh_CN');
+    setLanguage('zh_CN');
+
+    const presented = chatDialoguePresentation(
+      {
+        channel: 'yell',
+        entityId: 92,
+        from: 'Forest Wolf',
+        text: MAERIN_LEDGER_LINE,
+        authoredSpeaker: { kind: 'mob', templateId: 'forest_wolf' },
+      },
+      undefined,
+    );
+
+    expect(presented.from).not.toBe('Forest Wolf');
+    expect(presented.text).not.toBe(MAERIN_LEDGER_LINE);
+  });
+
   it('wires localized yell text to chat and bubbles while keeping the raw voice key', async () => {
     const source = await import('node:fs/promises').then((fs) =>
       fs.readFile(new URL('../src/ui/hud.ts', import.meta.url), 'utf8'),

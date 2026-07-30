@@ -28,10 +28,12 @@ function nearbyEntity(
   ctx: SimContext,
   predicate: (entity: Entity) => boolean,
   pos: Pick<Vec3, 'x' | 'z'>,
+  positionOf: (entity: Entity) => Pick<Vec3, 'x' | 'z'> = (entity) => entity.pos,
 ): boolean {
-  return [...ctx.entities.values()].some(
-    (entity) => predicate(entity) && Math.hypot(entity.pos.x - pos.x, entity.pos.z - pos.z) < 1,
-  );
+  return [...ctx.entities.values()].some((entity) => {
+    const entityPos = positionOf(entity);
+    return predicate(entity) && Math.hypot(entityPos.x - pos.x, entityPos.z - pos.z) < 1;
+  });
 }
 
 function ensureRuneFaces(ctx: SimContext): void {
@@ -63,6 +65,7 @@ function ensureDigOpposition(ctx: SimContext): void {
         ctx,
         (entity) => entity.kind === 'mob' && entity.templateId === spawn.templateId,
         spawn,
+        (entity) => entity.spawnPos,
       )
     ) {
       continue;
