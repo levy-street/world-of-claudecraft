@@ -2,6 +2,11 @@ import * as THREE from 'three';
 import { loadTexture, releaseTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { GFX } from './gfx';
+import {
+  packActiveParticleSlotsInto,
+  pointSpriteBoundingRadius,
+  spriteEarlyRejectRadiusSq,
+} from './vfx_pool_core';
 
 // Spell & ambience particle system. One pooled THREE.Points cloud drawn with
 // additive blending; projectiles are lightweight emitters that home on their
@@ -14,6 +19,14 @@ import { GFX } from './gfx';
 // tier keeps plain colors (same sprites, no HDR boost).
 
 const CAPACITY = 4096;
+const DRAW_STRIDE = 11;
+const DRAW_POSITION = 0;
+const DRAW_COLOR = 3;
+const DRAW_SIZE = 6;
+const DRAW_ALPHA = 7;
+const DRAW_SPRITE = 8;
+const DRAW_ROTATION = 9;
+const DRAW_RADIUS_SQ = 10;
 
 // HDR multipliers (graphics-plan step 9); 1.0 on the no-composer path
 function hdr(k: number): number {
@@ -115,12 +128,22 @@ for (let i = 0; i < SPRITE_FILES.length; i++) {
 // sprites, so recomposing would silently paint all 16 cells as fallback discs.
 // Retaining the one 1024x1024 canvas instead of 16 decoded sources is also the
 // cheaper half of that trade.
-let atlasCanvas: HTMLCanvasElement | null = null;
+interface ParticleAtlas {
+  texture: THREE.CanvasTexture;
+  earlyRejectRadiusSq: Float32Array;
+}
+
+interface ComposedParticleAtlas {
+  canvas: HTMLCanvasElement;
+  earlyRejectRadiusSq: Float32Array;
+}
+
+let composedAtlas: ComposedParticleAtlas | null = null;
 
 // Compose the atlas once. Any cell whose PNG is unavailable (e.g. unit tests
 // that construct Vfx without the preload gate) falls back to a soft painted
 // disc so the system always renders something sane.
-function composeAtlasCanvas(): HTMLCanvasElement {
+function composeParticleAtlas(): ComposedParticleAtlas {
   const size = ATLAS_GRID * ATLAS_CELL;
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = size;
@@ -161,21 +184,41 @@ function composeAtlasCanvas(): HTMLCanvasElement {
     spriteImages[i] = null;
     releaseTexture(`/vfx/${SPRITE_FILES[i]}.png`, { srgb: true });
   }
-  return canvas;
+  // The live fragment shader discards black atlas borders after sampling.
+  // Bound every sprite from the exact composed canvas so it can reject a
+  // strict subset of those fragments before rotation and the texture tap.
+  const earlyRejectRadiusSq = new Float32Array(SPRITE_FILES.length);
+  earlyRejectRadiusSq.fill(0.5);
+  try {
+    const pixels = ctx.getImageData(0, 0, size, size).data;
+    for (let i = 0; i < SPRITE_FILES.length; i++) {
+      earlyRejectRadiusSq[i] = spriteEarlyRejectRadiusSq(
+        pixels,
+        size,
+        (i % ATLAS_GRID) * ATLAS_CELL,
+        Math.floor(i / ATLAS_GRID) * ATLAS_CELL,
+        ATLAS_CELL,
+      );
+    }
+  } catch {
+    // A restricted canvas keeps the original full-point path.
+  }
+  return { canvas, earlyRejectRadiusSq };
 }
 
 /** A per-Vfx CanvasTexture over the one shared, already-composed atlas canvas.
  *  A fresh texture object per instance keeps each renderer's GPU upload its own
  *  (two live Vfx never share one texture), while the composed pixels are built
  *  exactly once. */
-function buildAtlasTexture(): THREE.CanvasTexture {
-  atlasCanvas ??= composeAtlasCanvas();
-  const tex = new THREE.CanvasTexture(atlasCanvas);
+function buildAtlasTexture(): ParticleAtlas {
+  composedAtlas ??= composeParticleAtlas();
+  const tex = new THREE.CanvasTexture(composedAtlas.canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.minFilter = THREE.LinearFilter;
   tex.magFilter = THREE.LinearFilter;
   tex.generateMipmaps = false;
-  return tex;
+
+  return { texture: tex, earlyRejectRadiusSq: composedAtlas.earlyRejectRadiusSq };
 }
 
 export const SCHOOL_COLORS: Record<string, number> = {
@@ -238,6 +281,18 @@ export class Vfx {
   private alphaAttr: Float32Array;
   private spriteAttr: Float32Array;
   private rotAttr: Float32Array;
+  private activeSlots: Int32Array;
+  private activeSlotIndex: Int32Array;
+  private activeCount = 0;
+  private renderSlots: Int32Array;
+  private drawData: Float32Array;
+  private drawBuffer: THREE.InterleavedBuffer;
+  private spriteRadiusSq: Float32Array;
+  private cloudWarmed = false;
+  private readonly particleBounds = new THREE.Sphere();
+  private pointProjectionScale = 1 / Math.tan(Math.PI / 6);
+  private readonly cullFrustum = new THREE.Frustum();
+  private readonly cullViewProjection = new THREE.Matrix4();
   private head = 0;
   private projectiles: Projectile[] = [];
   private bubbleBeams: BubbleBeam[] = [];
@@ -265,24 +320,54 @@ export class Vfx {
     this.alphaAttr = new Float32Array(CAPACITY);
     this.spriteAttr = new Float32Array(CAPACITY);
     this.rotAttr = new Float32Array(CAPACITY);
+    this.activeSlots = new Int32Array(CAPACITY);
+    this.activeSlotIndex = new Int32Array(CAPACITY);
+    this.activeSlotIndex.fill(-1);
+    this.renderSlots = new Int32Array(CAPACITY);
+    this.drawData = new Float32Array(CAPACITY * DRAW_STRIDE);
+    this.drawBuffer = new THREE.InterleavedBuffer(this.drawData, DRAW_STRIDE);
+    this.drawBuffer.setUsage(THREE.DynamicDrawUsage);
 
     const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.BufferAttribute(this.pos, 3));
-    geo.setAttribute('aColor', new THREE.BufferAttribute(this.col, 3));
-    geo.setAttribute('aSize', new THREE.BufferAttribute(this.size, 1));
-    geo.setAttribute('aAlpha', new THREE.BufferAttribute(this.alphaAttr, 1));
-    geo.setAttribute('aSprite', new THREE.BufferAttribute(this.spriteAttr, 1));
-    geo.setAttribute('aRot', new THREE.BufferAttribute(this.rotAttr, 1));
-    // huge static bounding sphere: particles fly everywhere, skip recompute
+    geo.setAttribute(
+      'position',
+      new THREE.InterleavedBufferAttribute(this.drawBuffer, 3, DRAW_POSITION),
+    );
+    geo.setAttribute(
+      'aColor',
+      new THREE.InterleavedBufferAttribute(this.drawBuffer, 3, DRAW_COLOR),
+    );
+    geo.setAttribute('aSize', new THREE.InterleavedBufferAttribute(this.drawBuffer, 1, DRAW_SIZE));
+    geo.setAttribute(
+      'aAlpha',
+      new THREE.InterleavedBufferAttribute(this.drawBuffer, 1, DRAW_ALPHA),
+    );
+    geo.setAttribute(
+      'aSprite',
+      new THREE.InterleavedBufferAttribute(this.drawBuffer, 1, DRAW_SPRITE),
+    );
+    geo.setAttribute(
+      'aRot',
+      new THREE.InterleavedBufferAttribute(this.drawBuffer, 1, DRAW_ROTATION),
+    );
+    geo.setAttribute(
+      'aRadiusSq',
+      new THREE.InterleavedBufferAttribute(this.drawBuffer, 1, DRAW_RADIUS_SQ),
+    );
+    geo.setDrawRange(0, 0);
+    // Keep the historical static geometry bound. Camera-aware point culling is
+    // separate and cannot affect transparent sorting against renderOrder peers.
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(450, 0, 0), 2400);
 
+    const atlas = buildAtlasTexture();
+    this.spriteRadiusSq = atlas.earlyRejectRadiusSq;
     const mat = new THREE.ShaderMaterial({
       transparent: true,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
       uniforms: {
         uScale: { value: 600 },
-        uAtlas: { value: buildAtlasTexture() },
+        uAtlas: { value: atlas.texture },
       },
       vertexShader: `
         attribute vec3 aColor;
@@ -290,16 +375,20 @@ export class Vfx {
         attribute float aAlpha;
         attribute float aSprite;
         attribute float aRot;
+        attribute float aRadiusSq;
         varying vec3 vColor;
         varying float vAlpha;
-        varying float vSprite;
-        varying float vRot;
+        varying vec2 vCell;
+        varying vec2 vRotCs;
+        varying float vRadiusSq;
         uniform float uScale;
         void main() {
           vColor = aColor;
           vAlpha = aAlpha;
-          vSprite = aSprite;
-          vRot = aRot;
+          float idx = floor(aSprite + 0.5);
+          vCell = vec2(mod(idx, ${ATLAS_GRID}.0), floor(idx / ${ATLAS_GRID}.0));
+          vRotCs = vec2(cos(aRot), sin(aRot));
+          vRadiusSq = aRadiusSq;
           vec4 mv = modelViewMatrix * vec4(position, 1.0);
           gl_PointSize = clamp(aSize * uScale / max(1.0, -mv.z), 0.0, 110.0);
           gl_Position = projectionMatrix * mv;
@@ -309,17 +398,19 @@ export class Vfx {
         uniform sampler2D uAtlas;
         varying vec3 vColor;
         varying float vAlpha;
-        varying float vSprite;
-        varying float vRot;
+        varying vec2 vCell;
+        varying vec2 vRotCs;
+        varying float vRadiusSq;
         void main() {
-          // rotate the point coord around its centre, clamped inside the cell
           vec2 pc = gl_PointCoord - 0.5;
-          float cs = cos(vRot), sn = sin(vRot);
-          pc = vec2(pc.x * cs - pc.y * sn, pc.x * sn + pc.y * cs);
+          if (dot(pc, pc) > vRadiusSq) discard;
+          // rotate the point coord around its centre, clamped inside the cell
+          pc = vec2(
+            pc.x * vRotCs.x - pc.y * vRotCs.y,
+            pc.x * vRotCs.y + pc.y * vRotCs.x
+          );
           pc = clamp(pc + 0.5, 0.01, 0.99);
-          float idx = floor(vSprite + 0.5);
-          vec2 cell = vec2(mod(idx, ${ATLAS_GRID}.0), floor(idx / ${ATLAS_GRID}.0));
-          vec2 uv = (cell + pc) / ${ATLAS_GRID}.0;
+          vec2 uv = (vCell + pc) / ${ATLAS_GRID}.0;
           uv.y = 1.0 - uv.y; // canvas row 0 is the visual top
           vec3 tex = texture2D(uAtlas, uv).rgb;
           float lum = max(tex.r, max(tex.g, tex.b));
@@ -332,12 +423,20 @@ export class Vfx {
     this.points.userData.renderCategory = 'vfx';
     this.points.frustumCulled = false;
     this.points.renderOrder = 5;
+    // The first zero-count submit still compiles the exact shader and uploads
+    // the atlas on constrained prewarm profiles that skip the explicit burst.
+    this.points.visible = true;
+    this.points.onAfterRender = () => {
+      this.cloudWarmed = true;
+      if (this.points.geometry.drawRange.count === 0) this.points.visible = false;
+    };
     scene.add(this.points);
   }
 
   setViewportScale(heightPx: number, fovDeg: number): void {
     const mat = this.points.material as THREE.ShaderMaterial;
     mat.uniforms.uScale.value = heightPx / (2 * Math.tan((fovDeg * Math.PI) / 360));
+    this.pointProjectionScale = 1 / Math.tan((fovDeg * Math.PI) / 360);
   }
 
   setQuality(level: number): void {
@@ -372,9 +471,15 @@ export class Vfx {
     this.life.fill(0);
     this.size.fill(0);
     this.alphaAttr.fill(0);
-    const geo = this.points.geometry;
-    (geo.attributes.aSize as THREE.BufferAttribute).needsUpdate = true;
-    (geo.attributes.aAlpha as THREE.BufferAttribute).needsUpdate = true;
+    this.activeCount = 0;
+    this.activeSlotIndex.fill(-1);
+    this.points.geometry.setDrawRange(0, 0);
+    this.points.visible = !this.cloudWarmed;
+  }
+
+  onContextRestored(): void {
+    this.cloudWarmed = false;
+    this.points.visible = true;
   }
 
   private scaledCount(count: number): number {
@@ -413,6 +518,10 @@ export class Vfx {
   ): void {
     const i = this.head;
     this.head = (this.head + 1) % CAPACITY;
+    if (this.activeSlotIndex[i] < 0) {
+      this.activeSlotIndex[i] = this.activeCount;
+      this.activeSlots[this.activeCount++] = i;
+    }
     this.pos[i * 3] = x;
     this.pos[i * 3 + 1] = y;
     this.pos[i * 3 + 2] = z;
@@ -430,6 +539,72 @@ export class Vfx {
     this.alphaAttr[i] = 1;
     this.spriteAttr[i] = sprite;
     this.rotAttr[i] = rot;
+  }
+
+  private packRenderCloud(camera: THREE.Camera): void {
+    const geo = this.points.geometry;
+    if (this.activeCount === 0) {
+      geo.setDrawRange(0, 0);
+      this.points.visible = !this.cloudWarmed;
+      return;
+    }
+
+    this.cullViewProjection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+    this.cullFrustum.setFromProjectionMatrix(this.cullViewProjection);
+    const perspective = (camera as THREE.PerspectiveCamera).isPerspectiveCamera === true;
+    const cameraProjectionScale = Math.abs(camera.projectionMatrix.elements[5]);
+    const liveCount = packActiveParticleSlotsInto(this.life, this.renderSlots);
+    let count = 0;
+    for (let live = 0; live < liveCount; live++) {
+      const slot = this.renderSlots[live];
+      const src3 = slot * 3;
+      const x = this.pos[src3];
+      const y = this.pos[src3 + 1];
+      const z = this.pos[src3 + 2];
+      if (perspective) {
+        this.particleBounds.center.set(x, y, z);
+        this.particleBounds.radius = pointSpriteBoundingRadius(
+          this.size[slot],
+          this.pointProjectionScale,
+          cameraProjectionScale,
+        );
+        if (!this.cullFrustum.intersectsSphere(this.particleBounds)) continue;
+      }
+
+      const dst = count * DRAW_STRIDE;
+      this.drawData[dst + DRAW_POSITION] = x;
+      this.drawData[dst + DRAW_POSITION + 1] = y;
+      this.drawData[dst + DRAW_POSITION + 2] = z;
+      this.drawData[dst + DRAW_COLOR] = this.col[src3];
+      this.drawData[dst + DRAW_COLOR + 1] = this.col[src3 + 1];
+      this.drawData[dst + DRAW_COLOR + 2] = this.col[src3 + 2];
+      this.drawData[dst + DRAW_SIZE] = this.size[slot];
+      this.drawData[dst + DRAW_ALPHA] = this.alphaAttr[slot];
+      const sprite = this.spriteAttr[slot];
+      this.drawData[dst + DRAW_SPRITE] = sprite;
+      this.drawData[dst + DRAW_ROTATION] = this.rotAttr[slot];
+      this.drawData[dst + DRAW_RADIUS_SQ] = this.spriteRadiusSq[sprite] ?? 0.5;
+      count++;
+    }
+
+    geo.setDrawRange(0, count);
+    this.points.visible = count > 0 || !this.cloudWarmed;
+    if (count === 0) return;
+
+    // The packed prefix fully supersedes any range queued while this cloud was
+    // off-screen. One interleaved range replaces six separate buffer uploads.
+    this.drawBuffer.clearUpdateRanges();
+    this.drawBuffer.addUpdateRange(0, count * DRAW_STRIDE);
+    this.drawBuffer.needsUpdate = true;
+  }
+
+  /**
+   * Cull only after the renderer has applied this frame's camera pose. The
+   * per-particle spheres contain every point-sprite corner, so rejected points
+   * contribute no scene-target pixel for the later bloom pass to spread.
+   */
+  prepareDraw(camera: THREE.Camera): void {
+    this.packRenderCloud(camera);
   }
 
   // ---------------------------------------------------------------------
@@ -1568,27 +1743,33 @@ export class Vfx {
       }
     }
 
-    // advance the pool
-    for (let i = 0; i < CAPACITY; i++) {
-      if (this.life[i] <= 0) {
-        if (this.size[i] !== 0) this.size[i] = 0;
+    // Advance only live state slots. Rendering is repacked separately in
+    // ascending slot order so additive blend accumulation stays byte-for-byte
+    // ordered like the original fixed pool.
+    let active = 0;
+    while (active < this.activeCount) {
+      const slot = this.activeSlots[active];
+      const slot3 = slot * 3;
+      this.life[slot] -= dt;
+      const f = Math.max(0, this.life[slot] / this.maxLife[slot]);
+      this.vel[slot3 + 1] -= this.grav[slot] * dt;
+      this.pos[slot3] += this.vel[slot3] * dt;
+      this.pos[slot3 + 1] += this.vel[slot3 + 1] * dt;
+      this.pos[slot3 + 2] += this.vel[slot3 + 2] * dt;
+      this.alphaAttr[slot] = f < 0.25 ? f * 4 : 1;
+      if (this.life[slot] > 0) {
+        active++;
         continue;
       }
-      this.life[i] -= dt;
-      const f = Math.max(0, this.life[i] / this.maxLife[i]);
-      this.vel[i * 3 + 1] -= this.grav[i] * dt;
-      this.pos[i * 3] += this.vel[i * 3] * dt;
-      this.pos[i * 3 + 1] += this.vel[i * 3 + 1] * dt;
-      this.pos[i * 3 + 2] += this.vel[i * 3 + 2] * dt;
-      this.alphaAttr[i] = f < 0.25 ? f * 4 : 1;
-      if (this.life[i] <= 0) this.size[i] = 0;
+
+      this.size[slot] = 0;
+      this.activeSlotIndex[slot] = -1;
+      this.activeCount--;
+      if (active < this.activeCount) {
+        const moved = this.activeSlots[this.activeCount];
+        this.activeSlots[active] = moved;
+        this.activeSlotIndex[moved] = active;
+      }
     }
-    const geo = this.points.geometry;
-    (geo.attributes.position as THREE.BufferAttribute).needsUpdate = true;
-    (geo.attributes.aSize as THREE.BufferAttribute).needsUpdate = true;
-    (geo.attributes.aAlpha as THREE.BufferAttribute).needsUpdate = true;
-    (geo.attributes.aColor as THREE.BufferAttribute).needsUpdate = true;
-    (geo.attributes.aSprite as THREE.BufferAttribute).needsUpdate = true;
-    (geo.attributes.aRot as THREE.BufferAttribute).needsUpdate = true;
   }
 }

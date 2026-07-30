@@ -108,16 +108,16 @@ describe('dead sprite retention after the VFX atlas composite', () => {
   // that no existing test would catch.
   it('composes the atlas canvas exactly once and wraps it per instance', () => {
     // The release lives in the composer, which is called only through the ??= memo.
-    const composeAt = vfxSource.indexOf('function composeAtlasCanvas()');
+    const composeAt = vfxSource.indexOf('function composeParticleAtlas()');
     const releaseAt = vfxSource.indexOf('spriteImages[i] = null;');
     const buildAt = vfxSource.indexOf('function buildAtlasTexture()');
     expect(composeAt).toBeGreaterThan(-1);
     expect(releaseAt).toBeGreaterThan(composeAt);
     expect(buildAt).toBeGreaterThan(releaseAt);
-    expect(vfxSource).toContain('atlasCanvas ??= composeAtlasCanvas();');
+    expect(vfxSource).toContain('composedAtlas ??= composeParticleAtlas();');
     // Each instance still gets its OWN texture object over that shared canvas,
     // so two live renderers never share one GPU upload.
-    expect(vfxSource).toContain('const tex = new THREE.CanvasTexture(atlasCanvas);');
+    expect(vfxSource).toContain('const tex = new THREE.CanvasTexture(composedAtlas.canvas);');
   });
 });
 
