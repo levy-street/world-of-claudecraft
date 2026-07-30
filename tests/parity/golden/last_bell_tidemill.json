@@ -2,15 +2,15 @@
   "scenario": "last_bell_tidemill",
   "seed": 20061,
   "sampleEvery": 20,
-  "ticks": 263,
+  "ticks": 323,
   "coverage": [
     "Last Bell shipped scenario entry (sc_lb_q0_tidemill)",
     "rng-free scenario spawn arming + tracked Tidemill Stalker",
     "normal quest kill credit advances q_lb_q0_ashore",
     "doorway scene start/ops/end + squad spawn/despawn"
   ],
-  "draws": 2273,
-  "drawDigest": "b209e3d1",
+  "draws": 2875,
+  "drawDigest": "b8b9e5ce",
   "frames": [
     {
       "tick": 0,
@@ -517,7 +517,7 @@
       "time": 0.15,
       "nextId": 848,
       "state": "e08b2c69",
-      "events": "8da3dced",
+      "events": "6900a55a",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -928,7 +928,7 @@
       "time": 10,
       "nextId": 848,
       "state": "41d7cb91",
-      "events": "3938f3ef",
+      "events": "bced1d2d",
       "rng": {
         "draws": 1732,
         "digest": "35e977ed"
@@ -960,22 +960,55 @@
       "tick": 260,
       "time": 13,
       "nextId": 848,
-      "state": "8c5b44f9",
-      "events": "06f9cd72",
+      "state": "2670d240",
+      "events": "741638a5",
       "rng": {
         "draws": 2239,
         "digest": "2c8549b7"
       }
     },
     {
-      "tick": 263,
-      "time": 13.15,
+      "tick": 280,
+      "time": 14,
       "nextId": 848,
-      "state": "3a59f4c3",
+      "state": "ffcfc583",
       "events": "741638a5",
       "rng": {
-        "draws": 2273,
-        "digest": "b209e3d1"
+        "draws": 2420,
+        "digest": "d6ade52a"
+      }
+    },
+    {
+      "tick": 300,
+      "time": 15,
+      "nextId": 848,
+      "state": "70e51bde",
+      "events": "741638a5",
+      "rng": {
+        "draws": 2621,
+        "digest": "b9a88956"
+      }
+    },
+    {
+      "tick": 320,
+      "time": 16,
+      "nextId": 848,
+      "state": "702d8b2d",
+      "events": "06f9cd72",
+      "rng": {
+        "draws": 2840,
+        "digest": "cf628268"
+      }
+    },
+    {
+      "tick": 323,
+      "time": 16.15,
+      "nextId": 848,
+      "state": "8f960655",
+      "events": "741638a5",
+      "rng": {
+        "draws": 2875,
+        "digest": "b8b9e5ce"
       },
       "label": "tidemill-complete",
       "players": [
@@ -1096,19 +1129,19 @@
               "id": "battle_stance",
               "kind": "battle_stance",
               "name": "Battle Stance",
-              "remaining": 3586.85,
+              "remaining": 3583.85,
               "school": "physical",
               "sourceId": 835
             }
           ],
           "blockChance": 0.05,
           "blockValue": 6,
-          "combatTimer": 13.1,
+          "combatTimer": 16.1,
           "comboUntil": -1,
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fiveSecondRule": 112.15,
+          "fiveSecondRule": 115.15,
           "hp": 822,
           "id": 835,
           "kind": "player",
@@ -1151,7 +1184,7 @@
         {
           "aiState": "dead",
           "comboUntil": -1,
-          "corpseTimer": 46.9,
+          "corpseTimer": 43.9,
           "critChance": 0.05,
           "dead": true,
           "detonateTimer": "Infinity",
@@ -1180,7 +1213,7 @@
             "z": -1243.5
           },
           "potionCooldownUntil": -1,
-          "respawnTimer": 11.9,
+          "respawnTimer": 8.9,
           "spawnPos": {
             "x": 115600,
             "z": -1243.5
@@ -1199,14 +1232,14 @@
       ]
     },
     {
-      "tick": 263,
-      "time": 13.15,
+      "tick": 323,
+      "time": 16.15,
       "nextId": 848,
-      "state": "3a59f4c3",
+      "state": "8f960655",
       "events": "741638a5",
       "rng": {
-        "draws": 2273,
-        "digest": "b209e3d1"
+        "draws": 2875,
+        "digest": "b8b9e5ce"
       },
       "label": "final",
       "players": [
@@ -1327,19 +1360,19 @@
               "id": "battle_stance",
               "kind": "battle_stance",
               "name": "Battle Stance",
-              "remaining": 3586.85,
+              "remaining": 3583.85,
               "school": "physical",
               "sourceId": 835
             }
           ],
           "blockChance": 0.05,
           "blockValue": 6,
-          "combatTimer": 13.1,
+          "combatTimer": 16.1,
           "comboUntil": -1,
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
-          "fiveSecondRule": 112.15,
+          "fiveSecondRule": 115.15,
           "hp": 822,
           "id": 835,
           "kind": "player",
@@ -1382,7 +1415,7 @@
         {
           "aiState": "dead",
           "comboUntil": -1,
-          "corpseTimer": 46.9,
+          "corpseTimer": 43.9,
           "critChance": 0.05,
           "dead": true,
           "detonateTimer": "Infinity",
@@ -1411,7 +1444,7 @@
             "z": -1243.5
           },
           "potionCooldownUntil": -1,
-          "respawnTimer": 11.9,
+          "respawnTimer": 8.9,
           "spawnPos": {
             "x": 115600,
             "z": -1243.5

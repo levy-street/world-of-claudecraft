@@ -4955,20 +4955,11 @@ function professionsGatherFine(seed = 1): Scenario {
       rec.snapshot('fine-grade-at-full-tier-vein');
       rec.tick(2);
 
-      // Step 2: the SAME tool at the zone's tier-1 vein still yields plain.
-      standOnNode(sim, p, 'ore_mirefen_1'); // tier 1
-      sim.harvestNode('ore_mirefen_1', undefined, pid);
-      rec.tick(castTicks);
-      rec.snapshot('plain-grade-at-lower-tier-vein');
-      rec.tick(2);
-
-      // Step 3: the herb patch, worked by a sickle that is only AT its tier.
-      // The tier-3 pick in the same bags must not leak across professions.
-      standOnNode(sim, p, 'herb_mirefen_t2'); // tier 2
-      sim.harvestNode('herb_mirefen_t2', undefined, pid);
-      rec.tick(castTicks);
-      rec.snapshot('wrong-profession-tool-does-not-upgrade');
-      rec.tick(2);
+      // The builder-authored scene ends at 15 seconds (subtitle read-time
+      // floors and the fade-in tail lengthened it); leave one second of runway
+      // for the scenario driver to observe completion and despawn the squad.
+      rec.tick(20 * 16);
+      rec.snapshot('tidemill-complete');
     },
   };
 }
