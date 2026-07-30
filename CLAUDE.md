@@ -128,6 +128,7 @@ the deeper check when you want the whole suite locally.
   goes through `Rng` (`src/sim/rng.ts`): **never `Math.random`**, `Date.now`, or
   `performance.now` in sim logic. Same seed gives the same world. (Also guarded by
   `tests/architecture.test.ts`.)
+- **Cinematics use one clock and one seed.** Scene presentation reads `IWorld.presentationTime`; the client, linter, editor, and tools import `WORLD_SEED` from `src/world_seed.mjs`; see `docs/design/cinematics-workflow.md`.
 - **Gameplay math follows real classic-era MMO formulas** (rage, hit tables, armor DR,
   XP curves; see `README.md` and `docs/design/`). Don't invent balance numbers.
 - **Graphics and performance settings are gameplay-neutral.** A preset or tier knob may shed
@@ -210,6 +211,7 @@ directly and leave the coordinator a thin consumer.
   about LOGIC, never data. Do not "modularize" a data table.
 
 Use the seams this repo already has, do not invent new ones:
+- New cinematic/scene: author through `src/sim/scenes/authoring.ts` against the live shot linter; see `docs/design/cinematics-workflow.md`.
 - New render/ui data or action: add it to the matching `IWorld` facet
   (`src/world_api/<domain>.ts`), implement in BOTH `Sim` and `ClientWorld`, update the
   parity pin (`tests/world_api_parity.test.ts`), then consume via `IWorld` only.

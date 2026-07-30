@@ -78,6 +78,7 @@ transport (see `social_system.test.ts`) rather than mocking. REST/RouteDef endpo
 use the `tests/server/helpers/` fakes (see Map), not a bespoke GameServer rig.
 
 ## Coverage & guards
+- Every cinematic linter check ships with a synthetic failing control enforced by the meta-test in `tests/cinematic_shots.test.ts`; see `docs/design/cinematics-workflow.md`.
 - **A guard that scans a directory of sources walks it with a shared walker, never its own
   `readdirSync`:** `helpers/ts_files_under.ts` for `.ts`, `helpers/css_tree_under.ts` for
   the `src/styles` sheets. A single-level read is a defect, not a style choice: the

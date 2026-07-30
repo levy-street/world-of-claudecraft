@@ -363,6 +363,11 @@ first drill and the first manual pass both come after that.
 Planning logic: `scripts/lib/nightly_plan.mjs`, pinned by `tests/nightly_plan.test.ts`;
 the workflow shape is pinned by `tests/nightly_workflow.test.ts`.
 
+The cinematics gate is the mechanical linter and synthetic-control meta-test in
+`tests/cinematic_shots.test.ts`, plus the watched lifecycle smoke and skip parity
+sweep in `tests/scene_lifecycle.test.ts`. The authoring workflow and complete check
+taxonomy live in `docs/design/cinematics-workflow.md`.
+
 ### Judgment review
 
 Reasoning is required for determinism, host parity, server authority, persistence,
