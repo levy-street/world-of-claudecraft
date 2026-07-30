@@ -21,6 +21,8 @@ import type { Entity } from '../src/sim/types';
 import { FARSHORE_BREACH, groundHeight } from '../src/sim/world';
 import { lastBellStrings } from '../src/ui/i18n.catalog/last_bell';
 
+const KEEPER_FACING_EPSILON_RADIANS = 1e-6;
+
 function makeSim(): Sim {
   const sim = new Sim({ seed: 4242, playerClass: 'warrior', playerName: 'Ash', devCommands: true });
   sim.player.level = 6;
@@ -80,6 +82,26 @@ describe('Last Bell campaign fixtures', () => {
     });
     // Pin the anchor itself so the fixture cannot silently drift off the crater.
     expect(FARSHORE_BREACH).toEqual({ x: 1012, z: -172 });
+  });
+
+  it.each([
+    ['Ferryman Ewald', 'ferryman_ewald', MAINLAND_HARBOR],
+    ['Ferrykeeper Odda', 'ferrykeeper_odda', GULLHAVEN_HARBOR],
+  ] as const)('%s faces the gangway boarding entry', (_name, templateId, harbor) => {
+    const sim = makeSim();
+    const keeper = fixtures(sim, templateId)[0];
+    expect(keeper).toBeDefined();
+    if (!keeper) return;
+
+    const expectedYaw = Math.atan2(
+      harbor.gangplank.x - keeper.pos.x,
+      harbor.gangplank.z - keeper.pos.z,
+    );
+    const yawError = Math.atan2(
+      Math.sin(keeper.facing - expectedYaw),
+      Math.cos(keeper.facing - expectedYaw),
+    );
+    expect(Math.abs(yawError)).toBeLessThan(KEEPER_FACING_EPSILON_RADIANS);
   });
 
   it('ignores interact on the Breach: it is scenery, not a device', () => {
