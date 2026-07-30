@@ -10691,6 +10691,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.toZone': 'ゾーンマップ',
   'hudChrome.enchanting.wornTagIndexed': '装備中 ({slot}{index})',
   'entities.items.ashwalk_sandals.name': '灰歩きのサンダル',
+  'entities.items.undermount_foreman_ledger.name': 'アンダーマウント監督官の帳簿',
+  'entities.items.runeseekers_lantern.name': 'ルーンシーカーのランタン',
   'entities.items.cinderarc_odrenns_rod.name': '炎弧、オドレンの杖',
   'entities.items.cindertoad_signet.name': '熾火蛙の印章',
   'entities.items.coalglow_band.name': '炭火の指輪',

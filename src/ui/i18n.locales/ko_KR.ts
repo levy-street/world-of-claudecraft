@@ -10682,6 +10682,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.toZone': '지역 지도',
   'hudChrome.enchanting.wornTagIndexed': '착용 중 ({slot} {index})',
   'entities.items.ashwalk_sandals.name': '잿길 샌들',
+  'entities.items.undermount_foreman_ledger.name': '언더마운트 작업반장의 장부',
+  'entities.items.runeseekers_lantern.name': '룬추적자의 등불',
   'entities.items.cinderarc_odrenns_rod.name': '불씨활, 오드렌의 지팡이',
   'entities.items.cindertoad_signet.name': '불씨두꺼비 인장',
   'entities.items.coalglow_band.name': '숯불빛 반지',

@@ -10212,6 +10212,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.toZone': '地區地圖',
   'hudChrome.enchanting.wornTagIndexed': '已裝備（{slot}{index}）',
   'entities.items.ashwalk_sandals.name': '踏灰涼鞋',
+  'entities.items.undermount_foreman_ledger.name': '地底熔爐工頭帳簿',
+  'entities.items.runeseekers_lantern.name': '尋符者提燈',
   'entities.items.cinderarc_odrenns_rod.name': '燼弧，奧德倫之杖',
   'entities.items.cindertoad_signet.name': '燼蟾徽戒',
   'entities.items.coalglow_band.name': '煤光指環',

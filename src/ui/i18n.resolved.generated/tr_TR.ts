@@ -9787,9 +9787,6 @@ export const tr_TR: EnTranslations = {
       "slakeleather_belt": {
         "name": "Suverilmiş Deri Kemeri"
       },
-      "undermount_rune_rubbing": {
-        "name": "Undermount Rune Rubbing"
-      },
       "undermount_foreman_ledger": {
         "name": "Foreman's Undermount Ledger"
       },
@@ -10751,9 +10748,6 @@ export const tr_TR: EnTranslations = {
       },
       "undermount_cinderling": {
         "name": "Cinderling"
-      },
-      "wyrmcult_dig_foreman": {
-        "name": "Wyrmcult Dig Foreman"
       },
       "reliquary_ledger_wraith": {
         "name": "Defter Hayaleti"

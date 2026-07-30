@@ -9787,14 +9787,11 @@ export const ja_JP: EnTranslations = {
       "slakeleather_belt": {
         "name": "冷まし革のベルト"
       },
-      "undermount_rune_rubbing": {
-        "name": "Undermount Rune Rubbing"
-      },
       "undermount_foreman_ledger": {
-        "name": "Foreman's Undermount Ledger"
+        "name": "アンダーマウント監督官の帳簿"
       },
       "runeseekers_lantern": {
-        "name": "Runeseeker's Lantern"
+        "name": "ルーンシーカーのランタン"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"
@@ -10751,9 +10748,6 @@ export const ja_JP: EnTranslations = {
       },
       "undermount_cinderling": {
         "name": "燼の子"
-      },
-      "wyrmcult_dig_foreman": {
-        "name": "Wyrmcult Dig Foreman"
       },
       "reliquary_ledger_wraith": {
         "name": "台帳の亡霊"

@@ -9787,14 +9787,11 @@ export const ko_KR: EnTranslations = {
       "slakeleather_belt": {
         "name": "식힘가죽 허리띠"
       },
-      "undermount_rune_rubbing": {
-        "name": "Undermount Rune Rubbing"
-      },
       "undermount_foreman_ledger": {
-        "name": "Foreman's Undermount Ledger"
+        "name": "언더마운트 작업반장의 장부"
       },
       "runeseekers_lantern": {
-        "name": "Runeseeker's Lantern"
+        "name": "룬추적자의 등불"
       },
       "conjured_water4": {
         "name": "창조된 샘물"
@@ -10751,9 +10748,6 @@ export const ko_KR: EnTranslations = {
       },
       "undermount_cinderling": {
         "name": "잿불정령"
-      },
-      "wyrmcult_dig_foreman": {
-        "name": "Wyrmcult Dig Foreman"
       },
       "reliquary_ledger_wraith": {
         "name": "명부의 망령"

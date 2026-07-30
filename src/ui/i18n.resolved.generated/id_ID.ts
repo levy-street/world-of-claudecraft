@@ -9787,9 +9787,6 @@ export const id_ID: EnTranslations = {
       "slakeleather_belt": {
         "name": "Sabuk Kulit Pendingin"
       },
-      "undermount_rune_rubbing": {
-        "name": "Undermount Rune Rubbing"
-      },
       "undermount_foreman_ledger": {
         "name": "Foreman's Undermount Ledger"
       },
@@ -10751,9 +10748,6 @@ export const id_ID: EnTranslations = {
       },
       "undermount_cinderling": {
         "name": "Cinderling"
-      },
-      "wyrmcult_dig_foreman": {
-        "name": "Wyrmcult Dig Foreman"
       },
       "reliquary_ledger_wraith": {
         "name": "Arwah Buku Catatan"

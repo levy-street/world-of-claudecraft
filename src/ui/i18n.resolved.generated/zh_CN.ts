@@ -9787,14 +9787,11 @@ export const zh_CN: EnTranslations = {
       "slakeleather_belt": {
         "name": "淬革腰带"
       },
-      "undermount_rune_rubbing": {
-        "name": "Undermount Rune Rubbing"
-      },
       "undermount_foreman_ledger": {
-        "name": "Foreman's Undermount Ledger"
+        "name": "地底熔炉工头账簿"
       },
       "runeseekers_lantern": {
-        "name": "Runeseeker's Lantern"
+        "name": "寻符者提灯"
       },
       "conjured_water4": {
         "name": "魔法泉水"
@@ -10751,9 +10748,6 @@ export const zh_CN: EnTranslations = {
       },
       "undermount_cinderling": {
         "name": "余烬灵"
-      },
-      "wyrmcult_dig_foreman": {
-        "name": "Wyrmcult Dig Foreman"
       },
       "reliquary_ledger_wraith": {
         "name": "名册幽魂"

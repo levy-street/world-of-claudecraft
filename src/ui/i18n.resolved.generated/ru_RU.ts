@@ -9787,14 +9787,11 @@ export const ru_RU: EnTranslations = {
       "slakeleather_belt": {
         "name": "Пояс из закалённой кожи"
       },
-      "undermount_rune_rubbing": {
-        "name": "Undermount Rune Rubbing"
-      },
       "undermount_foreman_ledger": {
-        "name": "Foreman's Undermount Ledger"
+        "name": "Журнал прораба Подгорья"
       },
       "runeseekers_lantern": {
-        "name": "Runeseeker's Lantern"
+        "name": "Фонарь искателя рун"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
@@ -10751,9 +10748,6 @@ export const ru_RU: EnTranslations = {
       },
       "undermount_cinderling": {
         "name": "Угленыш"
-      },
-      "wyrmcult_dig_foreman": {
-        "name": "Wyrmcult Dig Foreman"
       },
       "reliquary_ledger_wraith": {
         "name": "Книжный призрак"

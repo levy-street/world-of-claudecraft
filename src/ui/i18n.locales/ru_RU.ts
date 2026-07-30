@@ -10874,6 +10874,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.toZone': 'Карта региона',
   'hudChrome.enchanting.wornTagIndexed': 'Надето ({slot} {index})',
   'entities.items.ashwalk_sandals.name': 'Сандалии пеплохода',
+  'entities.items.undermount_foreman_ledger.name': 'Журнал прораба Подгорья',
+  'entities.items.runeseekers_lantern.name': 'Фонарь искателя рун',
   'entities.items.cinderarc_odrenns_rod.name': 'Жаровая дуга, жезл Одренна',
   'entities.items.cindertoad_signet.name': 'Печатка угольной жабы',
   'entities.items.coalglow_band.name': 'Кольцо угольного свечения',
