@@ -1,3 +1,4 @@
+import { WORLD_SEED } from '../../src/world_seed.mjs';
 import {
   measureArrivalApproach,
   measureSegment,
@@ -8,7 +9,9 @@ import {
 
 export const SAMPLE_RATE_HZ = 20;
 const SAMPLE_INTERVAL_SEC = 1 / SAMPLE_RATE_HZ;
-export const WORLD_SEED = 4242;
+
+export { WORLD_SEED };
+
 const EPSILON = 1e-9;
 
 function shipTarget(harbor) {

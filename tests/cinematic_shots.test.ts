@@ -47,6 +47,7 @@ import {
   overlayApplyOp,
   sceneOverlayView,
 } from '../src/ui/hud/scene/scene_overlay_view';
+import { WORLD_SEED } from '../src/world_seed.mjs';
 
 // Twenty samples per second match the authoring report without tying the gate to render frame rate.
 const SHOT_SAMPLE_RATE_HZ = 20;
@@ -97,8 +98,6 @@ const PLAYER_BODY_RADIUS_YARDS = 0.5;
 const PLAYER_BODY_HEIGHT_YARDS = 2.6;
 // Capture aborts at this duration so a malformed registry entry cannot hang the suite.
 const MAX_SCENE_CAPTURE_SECONDS = 180;
-// The linter uses a stable built-in world seed for every registered scene.
-const LINTER_WORLD_SEED = 4242;
 // Arrival paths must begin materially beyond the berth on its layout-derived seaward side.
 const MIN_ARRIVAL_SEAWARD_START_YARDS = 12;
 // Arrival travel and the ship's bow must align closely with the direct course to the berth.
@@ -788,7 +787,7 @@ function captureScene(
   playerStart?: { x: number; z: number },
 ): CapturedScene {
   const sim = new SimConstructor({
-    seed: LINTER_WORLD_SEED,
+    seed: WORLD_SEED,
     playerClass: 'warrior',
     playerName: 'Shot Linter',
   });
@@ -861,7 +860,7 @@ function captureScene(
 function resolveSyntheticRigPoint(point: { x: number; z: number; height: number }): SceneRigPoint {
   return {
     x: point.x,
-    y: sampleTerrainHeight(point.x, point.z, LINTER_WORLD_SEED) + point.height,
+    y: sampleTerrainHeight(point.x, point.z, WORLD_SEED) + point.height,
     z: point.z,
   };
 }
@@ -882,7 +881,7 @@ function syntheticWireOp(op: SceneOpDef): SceneWireOp | null {
             kind: 'focus',
             entityId: null,
             x,
-            y: sampleTerrainHeight(x, z, LINTER_WORLD_SEED),
+            y: sampleTerrainHeight(x, z, WORLD_SEED),
             z,
             dist: op.shot.dist ?? 8,
             pitch: op.shot.pitch ?? 0.3,
@@ -962,7 +961,7 @@ function captureSyntheticControl(def: SceneDef): CapturedScene {
     ...resolved.map((timed, index) => ({ index: index + 1, ...timed })),
     { index: resolved.length + 1, at: def.duration, op: { kind: 'end' } },
   ];
-  const playerY = sampleTerrainHeight(0, 0, LINTER_WORLD_SEED);
+  const playerY = sampleTerrainHeight(0, 0, WORLD_SEED);
   const live: SceneLivePose = {
     yaw: 0,
     pitch: 0.32,
@@ -977,7 +976,7 @@ function captureSyntheticControl(def: SceneDef): CapturedScene {
   }
   return {
     id: def.id,
-    seed: LINTER_WORLD_SEED,
+    seed: WORLD_SEED,
     duration: def.duration,
     ops,
     frames,

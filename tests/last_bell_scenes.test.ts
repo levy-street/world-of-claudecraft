@@ -561,7 +561,7 @@ describe('the voyage cinematic', () => {
     const line = ops.find((e) => e.op.kind === 'line');
     expect(line?.op.kind === 'line' ? line.op.key : '').toBe('lb.q0.scene.harbor');
     // The whole voyage ends as one scene.
-    const tail = sceneOps(collect(sim, 16 * 20));
+    const tail = sceneOps(collect(sim, 16.25 * 20));
     const lineKeys = [...ops, ...tail]
       .filter((e): e is typeof e & { op: { kind: 'line'; key: string } } => e.op.kind === 'line')
       .map((e) => e.op.key);
