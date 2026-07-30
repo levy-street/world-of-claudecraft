@@ -14,6 +14,7 @@ minimap, combat log, floating combat text, plus the locale table and runtime-dra
 - **Reads from / acts through `IWorld` only** (`world_api.ts`, see src/ CLAUDE.md);
   it never imports `Sim`/`ClientWorld`. It also takes `Renderer` + out-of-band glue
   via `OptionsHooks`/`ReportHooks` wired by `main.ts`.
+- Scene presentation runs on the sim clock through `IWorld.presentationTime`; see `docs/design/cinematics-workflow.md`.
 - All HTML interpolation goes through `esc()`. **Never `innerHTML` raw
   player/server text**: names, chat, guild names, etc. must pass through `esc`.
 
